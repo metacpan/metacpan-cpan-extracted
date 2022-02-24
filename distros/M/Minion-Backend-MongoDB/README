@@ -2,7 +2,7 @@ NAME
     Minion::Backend::MongoDB - MongoDB backend for Minion
 
 VERSION
-    version 1.13
+    version 1.14
 
 SYNOPSIS
       use Minion::Backend::MongoDB;

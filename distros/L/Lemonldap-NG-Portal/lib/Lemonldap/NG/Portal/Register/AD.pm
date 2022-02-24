@@ -9,7 +9,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
 
 extends 'Lemonldap::NG::Portal::Register::LDAP';
 
-our $VERSION = '2.0.10';
+our $VERSION = '2.0.14';
 
 sub createUser {
     my ( $self, $req ) = @_;
@@ -44,8 +44,6 @@ sub createUser {
             "LDAP error " . $mesg->code . ": " . $mesg->error );
 
         $self->ldap->unbind();
-        $self->{flags}->{ldapActive} = 0;
-
         return PE_LDAPERROR;
     }
     return PE_OK;

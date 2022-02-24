@@ -14,5 +14,6 @@ $hash{PREREQ_PM}{PDL} = $hash{CONFIGURE_REQUIRES}{PDL} = 0;
 #$hash{OBJECT} .= '';
 $hash{DIR} = [];
 $hash{realclean}{FILES} .= '*~ *.tmp';
+$hash{NO_MYMETA} = 1;
 
 WriteMakefile(%hash);

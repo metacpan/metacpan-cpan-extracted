@@ -2,9 +2,7 @@ use Test::More;
 use strict;
 use IO::String;
 
-BEGIN {
-    require 't/test-lib.pm';
-}
+require 't/test-lib.pm';
 
 my $res;
 
@@ -90,7 +88,8 @@ count(2);
   expectForm( $res, undef, '/checkuser', 'user', 'url', 'token' );
 
 # Bad VHost (checkXSS)
-$query =~ s/url=http%3A%2F%2Fappli.example.llng/url=http%3A%2F%2Fappli'.example.llng/;
+$query =~
+  s/url=http%3A%2F%2Fappli.example.llng/url=http%3A%2F%2Fappli'.example.llng/;
 
 ok(
     $res = $client->_post(

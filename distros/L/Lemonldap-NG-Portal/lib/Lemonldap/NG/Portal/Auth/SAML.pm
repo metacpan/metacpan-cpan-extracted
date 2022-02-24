@@ -3,6 +3,7 @@ package Lemonldap::NG::Portal::Auth::SAML;
 use strict;
 use MIME::Base64 qw/encode_base64/;
 use Mouse;
+use HTML::Entities qw(encode_entities);
 use Lemonldap::NG::Portal::Lib::SAML;
 use Lemonldap::NG::Common::FormEncode;
 use Lemonldap::NG::Portal::Main::Constants qw(
@@ -24,7 +25,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SENDRESPONSE
 );
 
-our $VERSION = '2.0.12';
+our $VERSION = '2.0.14';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Auth
@@ -342,9 +343,14 @@ sub extractFormInfo {
                         $self->logger->debug(
                             "Found value $value for attribute $userAttribute");
                     }
+                    else {
+                        $self->logger->warn(
+"No value for $userAttribute found in SAML assertion"
+                        );
+                    }
                 }
                 else {
-                    $self->logger->debug(
+                    $self->logger->warn(
                         "No attributes found in SAML assertion");
                 }
             }
@@ -767,8 +773,11 @@ sub extractFormInfo {
                 $req->postFields( { 'SAMLResponse' => $slo_body } );
 
                 # RelayState
-                $req->postFields->{'RelayState'} = $relaystate
-                  if ($relaystate);
+                if ($relaystate) {
+                    $req->{postFields}->{'RelayState'} =
+                      encode_entities($relaystate);
+                    $req->data->{safeHiddenFormValues}->{RelayState} = 1;
+                }
 
                 # TODO: verify this
                 push @{ $req->steps }, 'autoPost';
@@ -1127,8 +1136,11 @@ sub extractFormInfo {
         }
 
         # RelayState
-        $req->{postFields}->{'RelayState'} = $login->msg_relayState
-          if ( $login->msg_relayState );
+        if ( $login->msg_relayState ) {
+            $req->{postFields}->{'RelayState'} =
+              encode_entities( $login->msg_relayState );
+            $req->data->{safeHiddenFormValues}->{RelayState} = 1;
+        }
 
         # TODO: verify this
         $req->steps( ['autoPost'] );
@@ -1389,8 +1401,11 @@ sub authLogout {
         $req->postFields( { 'SAMLRequest' => $slo_body } );
 
         # RelayState
-        $req->postFields->{'RelayState'} = $logout->msg_relayState
-          if ( $logout->msg_relayState );
+        if ( $logout->msg_relayState ) {
+            $req->{postFields}->{'RelayState'} =
+              encode_entities( $logout->msg_relayState );
+            $req->data->{safeHiddenFormValues}->{RelayState} = 1;
+        }
 
         # Post done in Portal
         $req->steps( [ 'deleteSession', 'autoPost' ] );

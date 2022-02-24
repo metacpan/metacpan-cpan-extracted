@@ -187,6 +187,7 @@ sub fail {
                 MAIN_LOGO       => $self->conf->{portalMainLogo},
                 AUTH_ERROR      => $req->error,
                 AUTH_ERROR_TYPE => $req->error_type,
+                AUTH_ERROR_ROLE => $req->error_role,
                 SKIN            => $self->p->getSkin($req),
                 FAILED          => 1
             }

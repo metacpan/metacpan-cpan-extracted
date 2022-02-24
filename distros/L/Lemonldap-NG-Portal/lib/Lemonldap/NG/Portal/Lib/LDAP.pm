@@ -13,7 +13,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
 
 extends 'Lemonldap::NG::Common::Module';
 
-our $VERSION = '2.0.13';
+our $VERSION = '2.0.14';
 
 # PROPERTIES
 
@@ -45,7 +45,6 @@ sub newLdap {
         )
       )
     {
-        $self->logger->error("LDAP initialization error: $@");
         return undef;
     }
 
@@ -53,9 +52,6 @@ sub newLdap {
     my $msg = $ldap->bind;
     if ( $msg->code ) {
         $self->logger->error( 'LDAP test has failed: ' . $msg->error );
-    }
-    elsif ( $self->{conf}->{ldapPpolicyControl} and not $ldap->loadPP() ) {
-        $self->logger->error("LDAP password policy error");
     }
     return $ldap;
 }
@@ -76,8 +72,8 @@ has findUserFilter => (
     is      => 'ro',
     lazy    => 1,
     builder => sub {
-        $_[0]->conf->{AuthLDAPFilter} ||
-        $_[0]->conf->{LDAPFilter}
+        $_[0]->conf->{AuthLDAPFilter}
+          || $_[0]->conf->{LDAPFilter}
           || '(&(uid=$user)(objectClass=inetOrgPerson))';
     }
 );
@@ -132,7 +128,7 @@ sub getUser {
     $self->validateLdap;
     return PE_LDAPCONNECTFAILED unless $self->ldap;
 
-    $self->bind();
+    return PE_LDAPERROR unless $self->bind();
 
     my $mesg = $self->ldap->search(
         base   => $self->conf->{ldapBase},
@@ -234,6 +230,10 @@ sub findUser {
 # Validate LDAP connection before use
 sub validateLdap {
     my ($self) = @_;
+    local $SIG{'PIPE'} = sub {
+        $self->logger->info("Reconnecting to LDAP server due to broken socket");
+    };
+
     unless ($self->ldap
         and $self->ldap->root_dse( attrs => ['supportedLDAPVersion'] ) )
     {

@@ -19,7 +19,7 @@ BEGIN {
   *can = \&UNIVERSAL::can;
 }
 
-our $VERSION = '1.23.17'; ##-- update with perl-reversion from Perl::Version module
+our $VERSION = '1.23.18'; ##-- update with perl-reversion from Perl::Version module
 our @ISA = qw();
 our %EXPORT_TAGS =
   (
@@ -414,6 +414,7 @@ sub todense  :lvalue { isa($_[0],__PACKAGE__) ? (my $tmp=$_[0]->decode(@_[1..$#_
 
 ## $type = $obj->type()
 sub type { $_[0][$VALS]->type; }
+sub info { $_[0][$VALS]->info; }
 
 ## $obj2 = $obj->convert($type)
 ##  + unlike PDL function, respects 'inplace' flag
@@ -568,7 +569,7 @@ BEGIN { *_whichVals = \&_nzvals; }
 sub _nzvals :lvalue {
   my ($tmp);
   $_[0][$VALS]=$_[1]->append($_[0][$VALS]->slice("-1")) if (@_ > 1);
-  return $tmp=$_[0][$VALS]->index(PDL->null) if ($_[0][$VALS]->dim(0)<=1);
+  return $tmp=$_[0][$VALS]->index(PDL->zeroes(ccs_indx(), 0)) if ($_[0][$VALS]->dim(0)<=1);
   return $tmp=$_[0][$VALS]->slice("0:-2");
 }
 
@@ -1192,7 +1193,7 @@ sub _ufunc_ind_sub {
 			     pdims =>$newdims,
 			     vdims =>$newdims->sequence,
 			     which =>$which2,
-			     vals  =>$nzi2->append(-1),
+			     vals  =>$nzi2->append(ccs_indx(-1)),
 			    );
   };
 }
@@ -1238,7 +1239,7 @@ sub qsorti :lvalue {
 			      pdims =>$newdims,
 			      vdims =>$newdims->sequence,
 			      which =>$nzenum->slice("*1,")->glue(0,$which0->slice("1:-1,")->dice_axis(1,$nzix)),
-			      vals  =>$which0->slice("(0),")->index($nzix)->append(-1),
+			      vals  =>$which0->slice("(0),")->index($nzix)->append(ccs_indx(-1)),
 			     );
 }
 
@@ -3196,7 +3197,7 @@ Get/set the underlying $WHICH piddle.
 
 =item _nzvals($storedvals)
 
-Get/set the slice of the underlying $VALS piddle correpsonding for non-missing values only.
+Get/set the slice of the underlying $VALS piddle corresponding for non-missing values only.
 Alias: whichVals().
 
 

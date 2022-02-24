@@ -321,14 +321,14 @@ sub op {
                 oidcServiceAllowAuthorizationCodeFlow => 1,
                 oidcRPMetaDataOptions                 => {
                     rp => {
-                        oidcRPMetaDataOptionsDisplayName           => "RP",
-                        oidcRPMetaDataOptionsIDTokenExpiration     => 3600,
-                        oidcRPMetaDataOptionsClientID              => "rpid",
-                        oidcRPMetaDataOptionsIDTokenSignAlg        => "RS512",
-                        oidcRPMetaDataOptionsBypassConsent         => 0,
-                        oidcRPMetaDataOptionsPublic                => 1,
-                        oidcRPMetaDataOptionsUserIDAttr            => "",
-                        oidcRPMetaDataOptionsAccessTokenExpiration => 3600,
+                        oidcRPMetaDataOptionsDisplayName            => "RP",
+                        oidcRPMetaDataOptionsIDTokenExpiration      => 3600,
+                        oidcRPMetaDataOptionsClientID               => "rpid",
+                        oidcRPMetaDataOptionsIDTokenSignAlg         => "RS512",
+                        oidcRPMetaDataOptionsBypassConsent          => 0,
+                        oidcRPMetaDataOptionsPublic                 => 1,
+                        oidcRPMetaDataOptionsUserIDAttr             => "",
+                        oidcRPMetaDataOptionsAccessTokenExpiration  => 3600,
                         oidcRPMetaDataOptionsPostLogoutRedirectUris =>
                           "http://auth.rp.com/?logout=1"
                     }

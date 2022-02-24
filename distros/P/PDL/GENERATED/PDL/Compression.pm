@@ -21,7 +21,8 @@ use DynaLoader;
 
 
 
-#line 6 "compression.pd"
+#line 5 "compression.pd"
+
 
 =head1 NAME
 
@@ -31,7 +32,7 @@ PDL::Compression - compression utilities
 
 These routines generally accept some data as a PDL and compress it
 into a smaller PDL.  Algorithms typically work on a single dimension
-and thread over other dimensions, producing a threaded table of
+and broadcast over other dimensions, producing a broadcasted table of
 compressed values if more than one dimension is fed in.
 
 The Rice algorithm, in particular, is designed to be identical to the
@@ -48,7 +49,7 @@ RICE_1 algorithm used in internal FITS-file compression (see PDL::IO::FITS).
 
 use strict;
 use warnings;
-#line 52 "Compression.pm"
+#line 53 "Compression.pm"
 
 
 
@@ -62,16 +63,18 @@ use warnings;
 
 
 
-#line 75 "compression.pd"
+#line 74 "compression.pd"
+
 
 =head1 METHODS
 
 =cut
-#line 71 "Compression.pm"
+#line 73 "Compression.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 rice_compress
@@ -87,7 +90,7 @@ scalar context, you get back only the compressed PDL; in list context,
 you also get back ancillary information that is required to uncompress
 the data with rice_uncompress.  
 
-Multidimensional data are threaded over - each row is compressed
+Multidimensional data are broadcasted over - each row is compressed
 separately, and the returned PDL is squished to the maximum compressed
 size of any row.  If any of the streams could not be compressed (the
 algorithm produced longer output), the corresponding length is set to -1
@@ -135,11 +138,12 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 139 "Compression.pm"
+#line 142 "Compression.pm"
 
 
 
-#line 1060 "../../blib/lib/PDL/PP.pm"
+#line 1059 "../../blib/lib/PDL/PP.pm"
+
 sub PDL::rice_compress {
     my $in = shift;
     my $blocksize = shift || 32;
@@ -160,17 +164,19 @@ sub PDL::rice_compress {
     $out = $out->slice("0:".($l-1))->sever;
     return wantarray ? ($out, $in->dim(0), $blocksize, $len) : $out;
 }
-#line 164 "Compression.pm"
+#line 168 "Compression.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *rice_compress = \&PDL::rice_compress;
-#line 170 "Compression.pm"
+#line 175 "Compression.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 rice_expand
@@ -196,11 +202,12 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 200 "Compression.pm"
+#line 206 "Compression.pm"
 
 
 
-#line 1060 "../../blib/lib/PDL/PP.pm"
+#line 1059 "../../blib/lib/PDL/PP.pm"
+
 sub PDL::rice_expand {
     my $squished = shift;
     my $dim0 =shift;
@@ -210,19 +217,21 @@ sub PDL::rice_expand {
     PDL::_rice_expand_int( $squished, $out, $blocksize );
     return $out;
 }
-#line 214 "Compression.pm"
+#line 221 "Compression.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *rice_expand = \&PDL::rice_expand;
-#line 220 "Compression.pm"
+#line 228 "Compression.pm"
 
 
 
 
 
-#line 36 "compression.pd"
+#line 35 "compression.pd"
+
 
 =head1 AUTHORS
 
@@ -258,7 +267,7 @@ terms than PDL itself; that notice is present in the file "ricecomp.c".
 =back
 
 =cut
-#line 262 "Compression.pm"
+#line 271 "Compression.pm"
 
 
 

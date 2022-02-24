@@ -293,7 +293,8 @@ JjTJecOOS+88fK8qL1TrYv5rapIdqUI7aQ==
       or print STDERR Dumper( $res->[2]->[0] );
     my $devices;
     ok(
-        $devices = $res->[2]->[0] =~ s%<span device=\'(?:TOTP|U2F)\' epoch=\'\d{10}\'%%g,
+        $devices =
+          $res->[2]->[0] =~ s%<span device=\'(?:TOTP|U2F)\' epoch=\'\d{10}\'%%g,
         '2F device found'
     ) or print STDERR Dumper( $res->[2]->[0] );
     ok( $devices == 2, '2F devices found' )
@@ -383,7 +384,7 @@ JjTJecOOS+88fK8qL1TrYv5rapIdqUI7aQ==
     ok( $code = Lemonldap::NG::Common::TOTP::_code( undef, $key, 0, 30, 6 ),
         'Code' );
     ok( $code =~ /^\d{6}$/, 'Code contains 6 digits' );
-    $s     = "code=$code&token=$token&TOTPName=myTOTP";
+    $s = "code=$code&token=$token&TOTPName=myTOTP";
     my $epoch = time();
     ok(
         $res = $client->_post(
@@ -412,7 +413,8 @@ JjTJecOOS+88fK8qL1TrYv5rapIdqUI7aQ==
         'Found choose 2F' )
       or print STDERR Dumper( $res->[2]->[0] );
     ok(
-        $devices = $res->[2]->[0] =~ s%<span device=\'TOTP\' epoch=\'\d{10}\'%%g,
+        $devices =
+          $res->[2]->[0] =~ s%<span device=\'TOTP\' epoch=\'\d{10}\'%%g,
         '2F device found'
     ) or print STDERR Dumper( $res->[2]->[0] );
     ok( $devices == 1, '2F device found' )
@@ -537,13 +539,14 @@ JjTJecOOS+88fK8qL1TrYv5rapIdqUI7aQ==
     ok( $res->[2]->[0] =~ /<span id="msg" trspan="choose2f">/,
         'Found choose 2F' )
       or print STDERR Dumper( $res->[2]->[0] );
-    ok(
-        $res->[2]->[0] =~ m%<span device=\'TOTP\' epoch=\'(\d{10})\'%,
-        'TOTP found'
-    ) or print STDERR Dumper( $res->[2]->[0] );
+    ok( $res->[2]->[0] =~ m%<span device=\'TOTP\' epoch=\'(\d{10})\'%,
+        'TOTP found' )
+      or print STDERR Dumper( $res->[2]->[0] );
     $epoch = $1;
     ok(
-        $devices = $res->[2]->[0] =~ s%<span device=\'(?:TOTP|U2F)\' epoch=\'(?:\d{10})\'%%g,
+        $devices =
+          $res->[2]->[0] =~
+          s%<span device=\'(?:TOTP|U2F)\' epoch=\'(?:\d{10})\'%%g,
         '2F devices found'
     ) or print STDERR Dumper( $res->[2]->[0] );
     ok( $devices == 2, '2F devices registered' )
@@ -574,14 +577,15 @@ JjTJecOOS+88fK8qL1TrYv5rapIdqUI7aQ==
         ),
         'Form 2fregisters'
     );
-    ok( $res->[2]->[0] =~ /<span trspan="remove2fWarning">/,
-        'Found 2F modal' )
+    ok( $res->[2]->[0] =~ /<span trspan="remove2fWarning">/, 'Found 2F modal' )
       or print STDERR Dumper( $res->[2]->[0] );
     ok( $res->[2]->[0] =~ /<span id="msg" trspan="choose2f">/,
         'Found choose 2F' )
       or print STDERR Dumper( $res->[2]->[0] );
     ok(
-        $devices = $res->[2]->[0] =~ s%<span device=\'(?:TOTP|U2F)\' epoch=\'(\d{10})\'%%g,
+        $devices =
+          $res->[2]->[0] =~
+          s%<span device=\'(?:TOTP|U2F)\' epoch=\'(\d{10})\'%%g,
         '2F device found'
     ) or print STDERR Dumper( $res->[2]->[0] );
     ok( $devices == 1, '2F device registered' )

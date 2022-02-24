@@ -52,7 +52,7 @@ $obj->scratch->mkpath;
 dir_exists_ok($obj->scratch, 'scratch directory recreated');
 my @storeit;
 foreach (0 .. 2){
-  my $fh = $obj->scratch->tempfile("customXXX")->filehandle("+<");
+  my $fh = $obj->scratch->tempfile("customXXXXXXX")->filehandle("+<");
   print $fh $_ ;
   seek($fh, 0,0);
   while (my $line = <$fh>){

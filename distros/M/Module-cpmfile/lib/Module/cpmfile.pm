@@ -3,7 +3,7 @@ use 5.008001;
 use strict;
 use warnings;
 
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 
 use Module::cpmfile::Prereqs;
 use Module::cpmfile::Util qw(merge_version _yaml_hash);
@@ -152,6 +152,8 @@ THIS IS EXPERIMENTAL.
 
 cpmfile (usually saved as C<cpm.yml>) is yet another file format for describing module dependencies,
 and Module::cpmfile helps you parse it.
+
+The JSON Schema for cpmfile is available at L<jsonschema.json|https://github.com/skaji/cpmfile/blob/main/jsonschema.json>.
 
 cpmfile will be used mainly by L<App::cpm>.
 

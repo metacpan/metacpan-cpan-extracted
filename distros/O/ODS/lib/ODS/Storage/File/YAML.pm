@@ -1,20 +1,14 @@
 package ODS::Storage::File::YAML;
 
 use YAOO;
-use YAML::XS;
 
 extends 'ODS::Storage::File';
 
-has file_suffix => isa(string('yml'));
+use ODS::Serialize::YAML;
 
-sub parse_data_format {
-	my ($self, $data) = @_;
-	return Load $data;
-}
-
-sub stringify_data_format {
-	my ($self, $data) = @_;
-	return Dump $data;
-}
+has _serialize_class => isa(object('ODS::Serialize::YAML')), coerce(sub {
+	my ($self, $value) = @_;
+	$value->new;
+});
 
 1;

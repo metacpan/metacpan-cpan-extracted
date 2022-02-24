@@ -323,7 +323,7 @@ eval { $x = $source->indexND( $index ) };
 is $@, '';
 ok(eval { zcheck($x != pdl([23,45],[67,89])) }, "eval of zcheck 1");
 
-# Threaded indexND operation
+# Broadcast indexND operation
 $source = 100*xvals(10,10,2)+10*yvals(10,10,2)+zvals(10,10,2);
 $index  = pdl([[2,3],[4,5]],[[6,7],[8,9]]);
 eval { $x = $source->indexND($index) };
@@ -392,15 +392,9 @@ $z .= 2; # should *not* segfault!
 ok all($x==5), 'empty range .= no mutate';   # should *not* change $x!
 
 ### Check slicing of a null PDL
-
 $x = PDL->null;
-
-eval { $y = $x->slice("")->nelem };
-is $@, '', 'null->slice no error';
-is $y, 0;
-
-eval { $y = $x->slice(0)->nelem };
-like $@, qr/out of bounds/;
+eval { $y = $x->slice("") };
+like $@, qr/is null/, 'null->slice exception';
 
 for my $start (0, 4, -4, 20, -20) {
 	for my $stop (0, 4, -4, 20, -20) {

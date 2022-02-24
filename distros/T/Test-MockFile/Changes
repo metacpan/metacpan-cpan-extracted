@@ -1,5 +1,16 @@
 Revision history for Test-MockFile
 
+0.030   2/22/2022
+- Simplify _strict_mode_violation
+- Introduce new_dir() to allow older dir() syntax.
+- Provide a mechanism to setup custom strict rules
+- Make is_strict_mode a helper
+- Do not call _get_file_object when all we're trying to determine is if the file is mocked or not.
+- Add Test::MockFile::Plugins
+- We support "undef" as filename in strict rules to ignore filenames
+- Block Plugin::FileTemp < 5.28
+- Update MANIFEST
+
 0.029   2/16/2022
 - Fix broken link to small test documentation
 - Ensure strict mode is enabled by default and prevent import conflicts.

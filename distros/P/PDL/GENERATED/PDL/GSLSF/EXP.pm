@@ -21,7 +21,8 @@ use DynaLoader;
 
 
 
-#line 5 "gsl_sf_exp.pd"
+#line 4 "gsl_sf_exp.pd"
+
 use strict;
 use warnings;
 
@@ -34,7 +35,7 @@ PDL::GSLSF::EXP - PDL interface to GSL Special Functions
 This is an interface to the Special Function package present in the GNU Scientific Library. 
 
 =cut
-#line 38 "EXP.pm"
+#line 39 "EXP.pm"
 
 
 
@@ -48,7 +49,8 @@ This is an interface to the Special Function package present in the GNU Scientif
 
 
 
-#line 1059 "../../../../blib/lib/PDL/PP.pm"
+#line 1058 "../../../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 gsl_sf_exp
@@ -68,17 +70,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 72 "EXP.pm"
+#line 74 "EXP.pm"
 
 
 
-#line 1061 "../../../../blib/lib/PDL/PP.pm"
+#line 1060 "../../../../blib/lib/PDL/PP.pm"
+
 *gsl_sf_exp = \&PDL::gsl_sf_exp;
-#line 78 "EXP.pm"
+#line 81 "EXP.pm"
 
 
 
-#line 1059 "../../../../blib/lib/PDL/PP.pm"
+#line 1058 "../../../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 gsl_sf_exprel_n
@@ -98,17 +102,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 102 "EXP.pm"
+#line 106 "EXP.pm"
 
 
 
-#line 1061 "../../../../blib/lib/PDL/PP.pm"
+#line 1060 "../../../../blib/lib/PDL/PP.pm"
+
 *gsl_sf_exprel_n = \&PDL::gsl_sf_exprel_n;
-#line 108 "EXP.pm"
+#line 113 "EXP.pm"
 
 
 
-#line 1059 "../../../../blib/lib/PDL/PP.pm"
+#line 1058 "../../../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 gsl_sf_exp_err
@@ -128,19 +134,21 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 132 "EXP.pm"
-
-
-
-#line 1061 "../../../../blib/lib/PDL/PP.pm"
-*gsl_sf_exp_err = \&PDL::gsl_sf_exp_err;
 #line 138 "EXP.pm"
 
 
 
+#line 1060 "../../../../blib/lib/PDL/PP.pm"
+
+*gsl_sf_exp_err = \&PDL::gsl_sf_exp_err;
+#line 145 "EXP.pm"
 
 
-#line 66 "gsl_sf_exp.pd"
+
+
+
+#line 65 "gsl_sf_exp.pd"
+
 =head1 AUTHOR
 
 This file copyright (C) 1999 Christian Pellegrin <chri@infis.univ.trieste.it>
@@ -153,7 +161,7 @@ PDL distribution, the copyright notice should be included in the file.
 The GSL SF modules were written by G. Jungman.
 
 =cut
-#line 157 "EXP.pm"
+#line 165 "EXP.pm"
 
 
 

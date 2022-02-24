@@ -24,13 +24,14 @@ our $CAN_PACK_D = !! eval { my $packed = pack "D", 0; 1 };
 
 our @EXPORT = qw( piddle pdl null barf ); # Only stuff always exported!
 my @convertfuncs = map $_->convertfunc, PDL::Types::types();
-my @exports_internal = qw(howbig threadids topdl);
+my @exports_internal = qw(howbig broadcastids topdl);
 my @exports_normal   = (@EXPORT,
   @convertfuncs,
   qw(nelem dims shape null
+      empty
       convert inplace zeroes zeros ones nan inf i list listindices unpdl
-      set at flows thread_define over reshape dog cat barf type
-      dummy mslice approx flat sclr squeeze
+      set at flows broadcast_define over reshape dog cat barf type
+      thread_define dummy mslice approx flat sclr squeeze
       get_autopthread_targ set_autopthread_targ get_autopthread_actual
       get_autopthread_dim get_autopthread_size set_autopthread_size) );
 our @EXPORT_OK = (@exports_internal, @exports_normal);
@@ -57,11 +58,13 @@ $PDL::toolongtoprint = 10000;  # maximum pdl size to stringify for printing
 ################ Exportable functions of the Core ######################
 
 *at_c = *at_bad_c; # back-compat alias
+*thread_define = *broadcast_define;
+*PDL::threadover_n = *PDL::broadcastover_n;
 
 *howbig       = \&PDL::howbig;	  *unpdl	= \&PDL::unpdl;
 *nelem        = \&PDL::nelem;	  *inplace	= \&PDL::inplace;
 *dims	      = \&PDL::dims;	  *list 	= \&PDL::list;
-*threadids    = \&PDL::threadids; *listindices  = \&PDL::listindices;
+*broadcastids = \&PDL::broadcastids; *listindices  = \&PDL::listindices;
 *null	      = \&PDL::null;	  *set  	= \&PDL::set;
 *at		= \&PDL::at;	  *flows	= \&PDL::flows;
 *sclr           = \&PDL::sclr;    *shape        = \&PDL::shape;
@@ -76,7 +79,7 @@ for my $t (PDL::Types::types()) {
 }
 
 BEGIN {
-    *thread_define = \&PDL::thread_define;
+    *broadcast_define = \&PDL::broadcast_define;
     *convert      = \&PDL::convert;   *over 	 = \&PDL::over;
     *dog          = \&PDL::dog;       *cat 	         = \&PDL::cat;
     *type         = \&PDL::type;      *approx        = \&PDL::approx;
@@ -88,23 +91,23 @@ BEGIN {
 
 =head1 NAME
 
-PDL::Core - fundamental PDL functionality and vectorization/threading
+PDL::Core - fundamental PDL functionality and vectorization/broadcasting
 
 =head1 DESCRIPTION
 
 Methods and functions for type conversions, PDL creation,
-type conversion, threading etc.
+type conversion, broadcasting etc.
 
 =head1 SYNOPSIS
 
  use PDL::Core;             # Normal routines
  use PDL::Core ':Internal'; # Hairy routines
 
-=head1 VECTORIZATION/THREADING: METHOD AND NOMENCLATURE
+=head1 VECTORIZATION/BROADCASTING: METHOD AND NOMENCLATURE
 
 PDL provides vectorized operations via a built-in engine.
-Vectorization is called "threading" for historical reasons.
-The threading engine implements simple rules for each operation.
+Vectorization in PDL is called "broadcasting" (formerly, up to 2.075, "threading").
+The broadcasting engine implements simple rules for each operation.
 
 Each PDL object has a "shape" that is a generalized N-dimensional
 rectangle defined by a "dim list" of sizes in an arbitrary
@@ -124,12 +127,12 @@ automatically vectorized across -- e.g. multiplying a 2x5-PDL with a
 2x5-PDL requires 10 simple multiplication operations, and yields a
 2x5-PDL result.
 
-=head2 Threading rules
+=head2 Broadcasting rules
 
 In any PDL expression, the active dims appropriate for each operator
 are used starting at the 0 dim and working forward through the dim
 list of each object.  All additional dims after the active dims are
-"thread dims".  The thread dims do not have to agree exactly: they are
+"broadcast dims".  The broadcast dims do not have to agree exactly: they are
 coerced to agree according to simple rules:
 
 =over 3
@@ -175,18 +178,18 @@ so they cannot be empty.  1-D and higher PDLs can be empty.  Empty
 PDLs are useful for set operations, and are most commonly encountered
 in the output from selection operators such as L<which|PDL::Primitive>
 and L<whichND|PDL::Primitive>.  Not all empty PDLs have the same
-threading properties -- e.g. a 2x0-PDL represents a collection of
+broadcasting properties -- e.g. a 2x0-PDL represents a collection of
 2-vectors that happens to contain no elements, while a simple 0-PDL
 represents a collection of scalar values (that also happens to contain
 no elements).
 
-Note that 0 dims are not adjustable via the threading rules -- a dim
+Note that 0 dims are not adjustable via the broadcasting rules -- a dim
 with size 0 can only match a corresponding dim of size 0 or 1.
 
-=head2 Thread rules and assignments
+=head2 Broadcast rules and assignments
 
-Versions of PDL through 2.4.10 have some irregularity with threading and
-assignments.  Currently the threading engine performs a full expansion of
+Versions of PDL through 2.4.10 have some irregularity with broadcasting and
+assignments.  Currently the broadcasting engine performs a full expansion of
 both sides of the computed assignment operator C<.=> (which assigns values
 to a pre-existing PDL).  This leads to counter-intuitive behavior in
 some cases:
@@ -203,7 +206,7 @@ treated as a generalized scalar, as in:
     $y .= $x;
 
 In this case, C<$y> is automatically treated as a 2x3-PDL during the
-threading operation, but half of the values from C<$x> silently disappear.
+broadcasting operation, but half of the values from C<$x> silently disappear.
 The output is, as Kernighan and Ritchie would say, "undefined".
 
 Further, if the value on the right of C<.=> is empty, then C<.=> becomes
@@ -458,6 +461,26 @@ a single Empty PDL, you get back the Empty PDL (no padding).
 
 =cut
 
+=head2 empty
+
+=for ref
+
+Returns an empty ndarray, with a single zero-length dimension.
+Only available as a function, not a method.
+
+=for usage
+
+ $x = empty; # defaults to lowest type so it can always be promoted up
+ $x = empty(float);
+
+=cut
+
+sub empty {
+  my ($type) = @_;
+  $type //= 0;
+  PDL->new_from_specification(PDL::Type->new($type), 0);
+}
+
 =head2 null
 
 =for ref
@@ -507,7 +530,7 @@ Returns a 'null' ndarray.
 
  $x = PDL->nullcreate($arg)
 
-This is an routine used by many of the threading primitives
+This is an routine used by many of the broadcasting primitives
 (i.e. L<sumover|PDL::Ufunc/sumover>,
 L<minimum|PDL::Ufunc/minimum>, etc.) to generate a null ndarray for the
 function's output that will behave properly for derived (or
@@ -770,13 +793,13 @@ sub PDL::howbig {
 	PDL::howbig_c($t);
 }
 
-=head2 threadids
+=head2 broadcastids
 
 =for ref
 
-Returns the ndarray thread IDs as a perl list
+Returns the ndarray broadcast IDs as a perl list
 
-Note that C<threadids()> is not exported by default (see example
+Note that C<broadcastids()> is not exported by default (see example
 below for usage).
 
 =for usage
@@ -784,19 +807,19 @@ below for usage).
  use PDL::Core ':Internal'; # use the internal routines of
                             # the Core module
 
- @ids = threadids $ndarray;
+ @ids = broadcastids $ndarray;
 
 =cut
 
-sub PDL::threadids {  # Return dimensions as @list
-   PDL->topdl(shift)->threadids_c;
+sub PDL::broadcastids {
+   PDL->topdl(shift)->broadcastids_c;
 }
 
 ################# Creation/copying functions #######################
 
 sub piddle {PDL->pdl(@_)}
 sub pdl {PDL->pdl(@_)}
-sub PDL::pdl { my $x = shift; return $x->new(@_) }
+sub PDL::pdl { shift->new(@_) }
 
 =head2 doflow
 
@@ -1172,11 +1195,10 @@ sub _establish_type {
 }
 
 sub PDL::new {
-   # print "in PDL::new\n";
+   return $_[0]->copy if ref($_[0]);
    my $this = shift;
-   return $this->copy if ref($this);
    my $type = ref($_[0]) eq 'PDL::Type' ? shift->enum : undef;
-   my $value = (@_ >1 ? [@_] : shift);  # ref thyself
+   my $value = (@_ > 1 ? [@_] : shift);
    unless(defined $value) {
        if($PDL::debug) {
 	   print STDERR "Warning: PDL::new converted undef to \$PDL::undefval ($PDL::undefval)\n";
@@ -1186,7 +1208,7 @@ sub PDL::new {
    $type //= ref($value) ? _establish_type($value, $PDL_D) : $PDL_D;
 
    return pdl_avref($value,$this,$type) if ref($value) eq "ARRAY";
-   my $new = $this->initialize();
+   my $new = $this->initialize;
    $new->set_datatype($type);
 
    if (ref(\$value) eq "SCALAR") {
@@ -1250,8 +1272,9 @@ copies to be made.
 sub PDL::copy {
     my $value = shift;
     barf("Argument is an ".ref($value)." not an object") unless blessed($value);
-    # threadI(-1,[]) is just an identity vafftrans with threadId copying ;)
-    $value->threadI(-1,[])->sever;
+    return $value->nullcreate if $value->isnull;
+    # broadcastI(-1,[]) is just an identity vafftrans with broadcastid copying ;)
+    $value->broadcastI(-1,[])->sever;
 }
 
 =head2 hdr_copy
@@ -1377,7 +1400,7 @@ sub PDL::_deep_hdr_copy {
 =for ref
 
 Return an ndarray which is the same as the argument except
-that all threadids have been removed.
+that all broadcastids have been removed.
 
 =for usage
 
@@ -1415,7 +1438,7 @@ need to physicalise them (though there are exceptions).
 sub PDL::unwind {
 	my $value = shift;
 	my $foo = $value->null();
-	$foo .= $value->unthread();
+	$foo .= $value->unbroadcast();
 	return $foo;
 }
 
@@ -1539,31 +1562,31 @@ sub PDL::clump {
     $targd = $dim if $targd > $dim;
     barf "duplicate dimension $dim" if $dimmark[$dim]++ > $dim;
   }
-  my $clumped = $this->thread(@dims)->unthread(0)->clump(scalar @dims);
+  my $clumped = $this->broadcast(@dims)->unbroadcast(0)->clump(scalar @dims);
   $clumped = $clumped->mv(0,$targd) if $targd > 0;
   return $clumped;
 }
 
-=head2 thread_define
+=head2 broadcast_define
 
 =for ref
 
-define functions that support threading at the perl level
+define functions that support broadcasting at the perl level
 
 =for example
 
- thread_define 'tline(a(n);b(n))', over {
-  line $_[0], $_[1]; # make line compliant with threading
+ broadcast_define 'tline(a(n);b(n))', over {
+  line $_[0], $_[1]; # make line compliant with broadcasting
  };
 
 
-C<thread_define> provides some support for threading (see
+C<broadcast_define> provides some support for broadcasting (see
 L<PDL::Indexing>) at the perl level. It allows you to do things for
 which you normally would have resorted to PDL::PP (see L<PDL::PP>);
 however, it is most useful to wrap existing perl functions so that the
-new routine supports PDL threading.
+new routine supports PDL broadcasting.
 
-C<thread_define> is used to define new I<threading aware>
+C<broadcast_define> is used to define new I<broadcasting aware>
 functions. Its first argument is a symbolic repesentation of the new
 function to be defined. The string is composed of the name of the new
 function followed by its signature (see L<PDL::Indexing> and L<PDL::PP>)
@@ -1571,10 +1594,10 @@ in parentheses. The second argument is a subroutine that will be
 called with the slices of the actual runtime arguments as specified by
 its signature. Correct dimension sizes and minimal number of
 dimensions for all arguments will be checked (assuming the rules of
-PDL threading, see L<PDL::Indexing>).
+PDL broadcasting, see L<PDL::Indexing>).
 
 The actual work is done by the C<signature> class which parses the signature
-string, does runtime dimension checks and the routine C<threadover> that
+string, does runtime dimension checks and the routine C<broadcastover> that
 generates the loop over all appropriate slices of pdl arguments and creates
 pdls as needed.
 
@@ -1583,9 +1606,9 @@ define the new function so that it accepts normal perl args as well as
 ndarrays. You do this by using the C<NOtherPars> parameter in the
 signature. The number of C<NOtherPars> specified will be passed
 unaltered into the subroutine given as the second argument of
-C<thread_define>. Let's illustrate this with an example:
+C<broadcast_define>. Let's illustrate this with an example:
 
- PDL::thread_define 'triangles(inda();indb();indc()), NOtherPars => 2',
+ PDL::broadcast_define 'triangles(inda();indb();indc()), NOtherPars => 2',
   PDL::over {
     ${$_[3]} .= $_[4].join(',',map {$_->at} @_[0..2]).",-1,\n";
   };
@@ -1619,7 +1642,7 @@ C<[t]> qualifier and all type qualifiers are ignored.
 =cut
 
 sub PDL::over (&) { $_[0] }
-sub PDL::thread_define ($$) {
+sub PDL::broadcast_define ($$) {
   require PDL::PP::Signature;
   my ($str,$sub) = @_;
   my $others = 0;
@@ -1639,104 +1662,104 @@ sub PDL::thread_define ($$) {
   *{"$package\::$name"} = sub {
     @_[0..$args] = map PDL::Core::topdl($_), @_[0..$args];
     $sig->checkdims(@_);
-    PDL::threadover($others,@_,$sig->realdims,$sig->creating,$sub);
+    PDL::broadcastover($others,@_,$sig->realdims,$sig->creating,$sub);
   };
 }
 
-=head2 thread
+=head2 broadcast
 
 =for ref
 
-Use explicit threading over specified dimensions (see also L<PDL::Indexing>)
+Use explicit broadcasting over specified dimensions (see also L<PDL::Indexing>)
 
 =for usage
 
- $y = $x->thread($dim,[$dim1,...])
+ $y = $x->broadcast($dim,[$dim1,...])
 
 =for example
 
  $x = zeroes 3,4,5;
- $y = $x->thread(2,0);
+ $y = $x->broadcast(2,0);
 
-Same as L</thread1>, i.e. uses thread id 1.
+Same as L</broadcast1>, i.e. uses broadcast id 1.
 
 =cut
 
-sub PDL::thread {
+sub PDL::broadcast {
 	my $var = shift;
-	$var->threadI(1,\@_);
+	$var->broadcastI(1,\@_);
 }
 
-=head2 thread1
+=head2 broadcast1
 
 =for ref
 
-Explicit threading over specified dims using thread id 1.
+Explicit broadcasting over specified dims using broadcast id 1.
 
 =for usage
 
- $xx = $x->thread1(3,1)
+ $xx = $x->broadcast1(3,1)
 
 =for example
 
  Wibble
 
 Convenience function interfacing to
-L<PDL::Slices::threadI|PDL::Slices/threadI>.
+L<PDL::Slices::broadcastI|PDL::Slices/broadcastI>.
 
 =cut
 
-sub PDL::thread1 {
+sub PDL::broadcast1 {
 	my $var = shift;
-	$var->threadI(1,\@_);
+	$var->broadcastI(1,\@_);
 }
 
-=head2 thread2
+=head2 broadcast2
 
 =for ref
 
-Explicit threading over specified dims using thread id 2.
+Explicit broadcasting over specified dims using broadcast id 2.
 
 =for usage
 
- $xx = $x->thread2(3,1)
+ $xx = $x->broadcast2(3,1)
 
 =for example
 
  Wibble
 
 Convenience function interfacing to
-L<PDL::Slices::threadI|PDL::Slices/threadI>.
+L<PDL::Slices::broadcastI|PDL::Slices/broadcastI>.
 
 =cut
 
-sub PDL::thread2 {
+sub PDL::broadcast2 {
 	my $var = shift;
-	$var->threadI(2,\@_);
+	$var->broadcastI(2,\@_);
 }
 
-=head2 thread3
+=head2 broadcast3
 
 =for ref
 
-Explicit threading over specified dims using thread id 3.
+Explicit broadcasting over specified dims using broadcast id 3.
 
 =for usage
 
- $xx = $x->thread3(3,1)
+ $xx = $x->broadcast3(3,1)
 
 =for example
 
  Wibble
 
 Convenience function interfacing to
-L<PDL::Slices::threadI|PDL::Slices/threadI>.
+L<PDL::Slices::broadcastI|PDL::Slices/broadcastI>.
 
 =cut
 
-sub PDL::thread3 {
+sub PDL::broadcast3 {
 	my $var = shift;
-	$var->threadI(3,\@_);
+	$var->broadcastI(3,\@_);
 }
 
 my %info = (
@@ -1797,7 +1820,7 @@ sub dimstr {
   my $this = shift;
 
   my @dims = $this->dims;
-  my @ids  = $this->threadids;
+  my @ids  = $this->broadcastids;
   my ($nids,$i) = ($#ids - 1,0);
   my $dstr = 'D ['. join(',',@dims[0..($ids[0]-1)]) .']';
   if ($nids > 0) {
@@ -2809,7 +2832,7 @@ Convert ndarray to perl list
 
 Obviously this is grossly inefficient for the large datasets PDL is designed to
 handle. This was provided as a get out while PDL matured. It should now be mostly
-superseded by superior constructs, such as PP/threading. However it is still
+superseded by superior constructs, such as PP/broadcasting. However it is still
 occasionally useful and is provided for backwards compatibility.
 
 =for example
@@ -2824,7 +2847,7 @@ list converts any bad values into the string 'BAD'.
 
 =cut
 
-# No threading, just the ordinary dims.
+# No broadcasting, just the ordinary dims.
 sub PDL::list{ # pdl -> @list
      barf 'Usage: list($pdl)' if $#_!=0;
      my $pdl = PDL->topdl(shift);
@@ -2899,7 +2922,7 @@ C<@tmp> now contains the values C<0..nelem($x)>.
 
 Obviously this is grossly inefficient for the large datasets PDL is designed to
 handle. This was provided as a get out while PDL matured. It  should now be mostly
-superseded by superior constructs, such as PP/threading. However it is still
+superseded by superior constructs, such as PP/broadcasting. However it is still
 occasionally useful and is provied for backwards compatibility.
 
 =for example
@@ -3709,8 +3732,7 @@ See L<PDL::ParallelCPU> for an overview of the auto-pthread process.
   set_autopthread_targ(2);
   set_autopthread_size(1);
 
-  # Execute a pdl function, processing will split into two pthreads as long as
-  #  one of the pdl-threaded dimensions is divisible by 2.
+  # Execute a pdl function, processing will split into two pthreads
   $x = minimum($y);
 
   # Get the actual number of pthreads that were run.

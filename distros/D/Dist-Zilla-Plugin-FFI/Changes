@@ -1,5 +1,10 @@
 Revision history for Dist-Zilla-Plugin-FFI
 
+1.05      2022-02-22 09:32:27 -0700
+  - Bump required Perl to 5.24
+    (required by indirect dependency App::Cmd anyway)
+  - Move to PerlFFI GitHub org.
+
 1.04      2019-08-13 13:58:33 -0400
   - [FFI::Build] will prune ffi/_build files which you
     probably do not want bundled with your FFI dist.

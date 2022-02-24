@@ -1,5 +1,5 @@
 package HackaMol::Roles::PdbRole;
-$HackaMol::Roles::PdbRole::VERSION = '0.051';
+$HackaMol::Roles::PdbRole::VERSION = '0.053';
 #ABSTRACT: PdbRole of lazy attributes for HackaMol atoms
 use Moose::Role;
 use Carp;
@@ -14,7 +14,7 @@ has 'bfp',         is => 'rw', isa => 'Num'  ; # bfactor profile
                                                          # (10.1016/j.jmb.2015.09.024)
 has 'resname',     is => 'rw', isa => 'Str', lazy => 1, default => 'UNK';
 # cif label_asym_id
-has 'chain',       is => 'rw', isa => 'Str', lazy => 1, default => ' ';
+has 'chain',       is => 'rw', isa => 'Str', lazy => 1, default => '  ';
 # cif label_alt_id
 has 'altloc',      is => 'rw', isa => 'Str', lazy => 1, default => ' ';
 has 'icode',       is => 'rw', isa => 'Str', lazy => 1, default => ' ';
@@ -247,6 +247,8 @@ no Moose::Role;
 #79 - 80      LString(2)       charge     Charge on the atom.
 #';
 #
+# we will add support for reading two code chains using column 21
+#
 
 __END__
 
@@ -258,7 +260,7 @@ HackaMol::Roles::PdbRole - PdbRole of lazy attributes for HackaMol atoms
 
 =head1 VERSION
 
-version 0.051
+version 0.053
 
 =head1 SYNOPSIS
 
@@ -331,7 +333,8 @@ pdb cols 18-20: residue name. defaults to 'ALA'
 
 =head2 chain        
 
-pdb cols 22. protein chain.  default = '  '
+pdb cols 22. protein chain.  cols 22 is the pdb specification cols 21-22 is supported by hackamol
+default = '  '
 
 =head2 resid        
 

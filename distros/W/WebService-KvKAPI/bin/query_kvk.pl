@@ -11,73 +11,87 @@ use strict;
 use Data::Dumper;
 use Getopt::Long;
 use Pod::Usage;
+use WebService::KvKAPI;
 
 my %options = ();
 
-GetOptions(\%options, qw(
-    help|h
-    apiKey=s
-    raw=s
-    mainBranch
-    branch
-    legalPerson
-    profile
-    kvkNumber=s
-    branchNumber=s
-    street=s
-    houseNumber=s
-    postalCode=s
-    city=s
-    tradeName=s
-    q=s
-    rsin=s
-    pure_rsin
-));
+GetOptions(
+    \%options, qw(
+        help|h
+        man|m
+
+        spoof
+        profile|profiel=i
+        owner|eigenaar=i
+        mainLocation|main-location|hoofdvestiging=i
+        locations|vestigingen=i
+        geoData|geo
+
+        location_profile|vestigingsprofiel=i
+
+        apiKey|apikey=s
+        kvkNummer|kvkNumber=s
+        rsin=s
+        vestigingsnummer|branchNumber=s
+        handelsnaam|tradeName=s
+        straatnaam|street=s
+        postcode|postalCode=s
+        huisnummer|houseNumber=s
+        plaats|woonplaats|stad|city=s
+        type=s
+        InclusiefInactieveRegistraties|inactief|inactive
+        pagina=i
+        aantal=i
+    )
+);
 
 if ($options{help}) {
-    pod2usage({verbose => 1, exitval => 0});
+    pod2usage({ verbose => 1, exitval => 0 });
 }
+if ($options{man}) {
+    pod2usage({ verbose => 2, exitval => 0 });
+}
+
+my $api_key = delete $options{apiKey};
+
+if (!$api_key && !$options{spoof}) {
+    pod2usage({ verbose => 1, exitval => 1 });
+}
+
+my $api = WebService::KvKAPI->new(
+    $options{spoof} ? (spoof => 1) : ( api_key => $api_key ),
+);
+my $result;
 
 if (!keys %options) {
-    pod2usage({verbose => 1, exitval => 1});
+    pod2usage({ verbose => 1, exitval => 1 });
 }
 
-my $profile_search = delete $options{profile};
-my $api_key        = delete $options{apiKey};
-my $raw            = delete $options{raw};
-
-my $api;
-
-if ($api_key) {
-    use WebService::KvKAPI;
-    $api = WebService::KvKAPI->new(
-        api_key => $api_key,
-        $options{pure_rsin}
-        ? (pure_rsin => $options{pure_rsin})
-        : (),
-    );
+if ($options{profile}) {
+    $result = $api->get_basic_profile($options{profile}, $options{geoData});
 }
+elsif ($options{owner}) {
+    $result = $api->get_owner($options{owner}, $options{geoData});
+}
+elsif ($options{mainLocation}) {
+    $result
+        = $api->get_main_location($options{mainLocation}, $options{geoData});
+}
+elsif ($options{locations}) {
+    $result = $api->get_main_location($options{locations});
+}
+
+# location profile
+elsif ($options{location_profile}) {
+    $result = $api->get_location_profile($options{location_profile});
+}
+
+# default to search
 else {
-    use WebService::KvKAPI::Spoof;
-    print "Using spoof mode, no api key given", $/;
-
-    $api = WebService::KvKAPI::Spoof->new(
-        api_key => 'spoofmode',
-        $options{pure_rsin}
-        ? (pure_rsin => $options{pure_rsin})
-        : (),
-    );
+    $result = $api->search(%options);
 }
 
-if ($raw) {
-    print Dumper $api->api_call($raw, \%options);
-}
-elsif ($profile_search) {
-    print Dumper $api->profile(%options);
-}
-else {
-    print Dumper $api->search(%options);
-}
+print Dumper $result;
 
 __END__
 
@@ -91,15 +105,24 @@ query_kvk.pl - Query the Dutch Chamber of Commerce via the CLI
 
 =head1 VERSION
 
-version 0.011
+version 0.101
 
 =head1 SYNOPSIS
 
-query_kvk.pl --help [ OPTIONS ]
+query_kvk.pl [ OPTIONS ]
+
+=head1 DESCRIPTION
+
+Query the Kamer van Koophandel API via the command line. This tool supports all
+the calls that the KvK has made publicly available. By default you can search
+the KvK if you provide search terms.
+
+Please see L<the KvK developer page|https://developers.kvk.nl> for more
+information on how to use the API.
 
 =head1 NAME
 
-query_kvk.pl - Generate the KvK from the CLI
+query_kvk.pl - Query the KvK API from the CLI
 
 =head1 OPTIONS
 
@@ -109,47 +132,60 @@ query_kvk.pl - Generate the KvK from the CLI
 
 This help
 
-=item * --profile
-
-Get the C<profile> of the company (detailed information). When not provided it
-does a full search.
-
-=item * --kvkNumber
-
-A KvK number
-
-=item * --branchNumber
-
-A branch number
-
-=item * --tradeName
-
-The tradename at the KvK
-
-=item * --street
-
-The streetname
-
-=item * --houseNumber
-
-The house number
-
-=item * --postalCode
-
-The zipcode
-
-=item * --city
-
-The city
-
-=item * --apiKey
+=item * --api-key | --apikey | --apiKey
 
 The API key from the KvK
 
-=item * --mainBranch
+=item * --profile | --profiel <coc-number>
 
-Limit searches to main branches only. Watch out with I<Foundations> as they
-often don't have a main branch.
+Get the basic profile of the given company.
+
+=item * --owner | --eigenaar <coc-number>
+
+Get the owner details of the given company.
+
+=item * --locations | --vestigingen <coc-number>
+
+Get all the locations of the given company
+
+=item * --location-profile | --vestigingsprofiel <location-number>
+
+=back
+
+=head2 SEARCH OPTIONS
+
+The following options are here for searching purposes and are used when none of
+the other options above are used.
+
+=over
+
+=item * --coc-number | --kvk-nummer | --kvkNumber <number>
+
+A KvK number
+
+=item * --location-number | --vestigingsnummer | --branchNumber <number>
+
+A branch number
+
+=item * --tradename | --handelsnaam | --tradeName <name>
+
+The tradename at the KvK
+
+=item * --street | --straat
+
+The streetname
+
+=item * --house-number | --huisnummer | --houseNumber
+
+The house number
+
+=item * --postal-code | --postcode | --zipcode
+
+The zipcode
+
+=item * --city | --stad | --woonplaats
+
+The city
 
 =back
 

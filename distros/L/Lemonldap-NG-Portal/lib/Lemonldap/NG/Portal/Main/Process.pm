@@ -400,7 +400,7 @@ sub authenticate {
     $req->steps( [
             'setSessionInfo',           'setMacros',
             'setPersistentSessionInfo', 'storeHistory',
-            @{ $self->afterData }, sub { PE_BADCREDENTIALS }
+            @{ $self->afterData },      sub { PE_BADCREDENTIALS }
         ]
     );
 
@@ -505,6 +505,8 @@ sub setPersistentSessionInfo {
 
 sub setLocalGroups {
     my ( $self, $req ) = @_;
+    $req->{sessionInfo}->{groups}  //= '';
+    $req->{sessionInfo}->{hGroups} //= {};
     foreach ( sort keys %{ $self->_groups } ) {
         if ( $self->_groups->{$_}->( $req, $req->sessionInfo ) ) {
             $req->{sessionInfo}->{groups} .=

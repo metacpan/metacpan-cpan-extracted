@@ -11,10 +11,10 @@ WriteMakefile(
                                     },
               BUILD_REQUIRES    => {
 				    'Test::Pod' => '1.00',
+				    'Path::Tiny' => 0,
 				    'Test::Pod::Coverage' => '0.08',
 				    'Lingua::PT::Abbrev' => '0.05',
-                                    'File::Temp' => 0,
-                                    'Perl6::Slurp' => 0,
+                                    'File::Temp' => 0
                                    },
 	      PREREQ_PM         => {
 				    'utf8::all' => 0,

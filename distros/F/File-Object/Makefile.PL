@@ -17,7 +17,7 @@ name 'File-Object';
 readme_from 'Object.pm';
 recursive_author_tests('xt');
 requires 'Class::Utils' => 0.03;
-requires 'Error::Pure' => 0.16;
+requires 'Error::Pure' => 0.27;
 requires 'File::Spec::Functions' => 0;
 requires 'FindBin' => 0;
 requires 'perl' => '5.6.2';
@@ -31,7 +31,7 @@ test_requires 'FindBin' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.13';
+version '0.15';
 
 # Run.
 WriteAll();

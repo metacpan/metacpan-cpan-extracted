@@ -254,7 +254,7 @@ SKIP: {
     # Query IdP with iframe src
     $url   = $1;
     $query = $2;
-    expectCspChildOK($res, "auth.idp.com");
+    expectCspChildOK( $res, "auth.idp.com" );
 
     # Get iframe from CAS server
     switch ('issuer');

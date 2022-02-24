@@ -7,7 +7,7 @@ use warnings;
 use Cwd qw(abs_path);
 use Readonly;
 
-our $VERSION = 0.26;
+our $VERSION = 0.27;
 
 Readonly::Array our @EXPORT_OK => qw(clean err_get err_helper err_msg err_msg_hr);
 Readonly::Scalar my $DOTS => '...';
@@ -432,12 +432,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2008-2020 Michal Josef Špaček
+© 2008-2022 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.26
+0.27
 
 =cut

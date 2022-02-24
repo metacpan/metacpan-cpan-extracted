@@ -20,11 +20,11 @@ SYNOPSIS
 
 DESCRIPTION
 
-    This module is written in preparation for when perl will gain true
-    native syntax support for try/catch control flow.
+    This module makes syntax support for try/catch control flow easily
+    available.
 
-    Perl added such syntax in the development version 5.33.7, which is
-    enabled by
+    Perl added such syntax at version 5.34.0, and extended it to support
+    optional finally blocks at 5.35.9, which is enabled by
 
        use feature 'try';
 
@@ -49,7 +49,8 @@ KEYWORDS
        ...
 
     A try statement provides the main body of code that will be invoked,
-    and must be followed by a catch statement.
+    and must be followed by a catch statement. It may optionally be
+    followed by a finally statement.
 
     Execution of the try statement itself begins from the block given to
     the statement and continues until either it throws an exception, or
@@ -103,7 +104,28 @@ KEYWORDS
     contain loop control expressions (redo, next or last) which also have
     their usual effect.
 
-COMPATIBILITY NOTES
+ finally
+
+       ...
+       finally {
+          STATEMENTS...
+       }
+
+    A finally statement provides an optional block of code to the preceding
+    try/catch pair which is executed afterwards, both in the case of a
+    normal execution or a thrown exception. This code block may be used to
+    provide whatever clean-up operations might be required by preceding
+    code.
+
+    Because it is executed during a stack cleanup operation, a finally {}
+    block may not cause the containing function to return, or to alter the
+    return value of it. It also cannot see the containing function's @_
+    arguments array (though as it is block scoped within the function, it
+    will continue to share any normal lexical variables declared up until
+    that point). It is protected from disturbing the value of $@. If the
+    finally {} block code throws an exception, this will be printed as a
+    warning and discarded, leaving $@ containing the original exception, if
+    one existed. =head1 COMPATIBILITY NOTES
 
     This module may use either Syntax::Keyword::Try or the perl core try
     feature to implement its syntax. While the two behave very similarly,
@@ -125,6 +147,25 @@ COMPATIBILITY NOTES
       to inspect the state of callers to your code and there may be try
       frames in the way, you will need to somehow account for the
       difference in stack height.
+
+      * B::Deparse
+
+      The core feature 'try' is implemented by emitting real opcodes that
+      represent its behaviour, which is recognised by the version of
+      B::Deparse that ships with core perl. As a result, any code using
+      this implementation will deparse currently with tools like perl
+      -MO=Deparse ..., or others related to it such as coverage checkers.
+
+      By comparison, since Syntax::Keyword::Try uses OP_CUSTOM it is not
+      recognised by B::Deparse and so attempts to deparse this will result
+      in error messages like
+
+         unexpected OP_CUSTOM (catch) at ...
+
+      This is rather unavoidable due to the way that B::Deparse is
+      implemented and does not easily support custom operators.
+
+      See also https://rt.cpan.org/Ticket/Display.html?id=134812.
 
 AUTHOR
 

@@ -105,7 +105,24 @@ ok( $res = $op->_get( $url, query => $query, accept => 'text/html' ),
 count(1);
 expectOK($res);
 
-# Try to authenticate to OP
+# Try to authenticate to OP with unallowed user
+my $failquery = "user=rtyler&password=rtyler&$query";
+ok(
+    $res = $op->_post(
+        $url,
+        IO::String->new($failquery),
+        accept => 'text/html',
+        length => length($failquery),
+    ),
+    "Post authentication,        endpoint $url"
+);
+count(1);
+my $idpId = expectCookie($res);
+
+# Should be denied by rule
+expectPortalError( $res, 84 );
+
+# Try to authenticate to OP with allowed user
 $query = "user=french&password=french&$query";
 ok(
     $res = $op->_post(
@@ -117,7 +134,7 @@ ok(
     "Post authentication,        endpoint $url"
 );
 count(1);
-my $idpId = expectCookie($res);
+$idpId = expectCookie($res);
 my ( $host, $tmp );
 ( $host, $tmp, $query ) = expectForm( $res, '#', undef, 'confirm' );
 
@@ -332,9 +349,10 @@ sub op {
                         oidcRPMetaDataOptionsBypassConsent     => 0,
                         oidcRPMetaDataOptionsClientSecret      => "rpsecret",
                         oidcRPMetaDataOptionsUserIDAttr        => "",
-                        oidcRPMetaDataOptionsAccessTokenExpiration => 3600,
+                        oidcRPMetaDataOptionsAccessTokenExpiration  => 3600,
                         oidcRPMetaDataOptionsPostLogoutRedirectUris =>
-                          "http://auth.rp.com/?logout=1"
+                          "http://auth.rp.com/?logout=1",
+                        oidcRPMetaDataOptionsRule => '$uid eq "french"',
                     }
                 },
                 oidcOPMetaDataOptions           => {},

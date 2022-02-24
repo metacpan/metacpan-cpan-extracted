@@ -53,15 +53,16 @@ SKIP: {
     );
     expectOK($res);
 
-    $mail = mail();
+    $mail    = mail();
     $subject = subject();
     ok( $subject eq 'Demonstration', 'Found subject' )
       or explain( $subject, 'Custom subject' );
     ok( $mail =~ m#a href="http://auth.example.com/register\?(.+?)"#,
-        'Found register token' ) or explain( $mail, 'Confirm body' );
+        'Found register token' )
+      or explain( $mail, 'Confirm body' );
     $query = $1;
     ok( $query =~ /register_token=/, 'Found register_token' );
-    ok( $mail =~ /Fôo/, 'UTF-8 works' ) or explain( $mail, 'Fôo' );
+    ok( $mail  =~ /Fôo/,             'UTF-8 works' ) or explain( $mail, 'Fôo' );
 
     ok(
         $res =
@@ -70,7 +71,7 @@ SKIP: {
     );
     expectOK($res);
 
-    $mail = mail();
+    $mail    = mail();
     $subject = subject();
     ok( $subject eq '[LemonLDAP::NG] Your new account', 'Found subject' )
       or explain( $subject, 'Default subject' );

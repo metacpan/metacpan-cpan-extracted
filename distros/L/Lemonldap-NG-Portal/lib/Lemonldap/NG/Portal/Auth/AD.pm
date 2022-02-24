@@ -5,10 +5,14 @@ package Lemonldap::NG::Portal::Auth::AD;
 
 use strict;
 use Mouse;
-use Lemonldap::NG::Portal::Main::Constants
-  qw(PE_OK PE_PP_PASSWORD_EXPIRED PE_PP_CHANGE_AFTER_RESET PE_BADCREDENTIALS);
+use Lemonldap::NG::Portal::Main::Constants qw(
+  PE_OK
+  PE_PP_PASSWORD_EXPIRED
+  PE_PP_CHANGE_AFTER_RESET
+  PE_BADCREDENTIALS
+);
 
-our $VERSION = '2.0.6';
+our $VERSION = '2.0.14';
 
 extends 'Lemonldap::NG::Portal::Auth::LDAP';
 
@@ -156,6 +160,18 @@ sub authenticate {
     }
 
     return $res;
+}
+
+# Define which error codes will stop Combination process
+# @param res error code
+# @return result 1 if stop is needed
+sub stop {
+    my ( $self, $res ) = @_;
+
+    return 1
+      if ( $res == PE_PP_PASSWORD_EXPIRED
+        or $res == PE_PP_CHANGE_AFTER_RESET );
+    return 0;
 }
 
 1;

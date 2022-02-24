@@ -1,11 +1,11 @@
 ---
-abstract: 'SPVM Math Functions'
+abstract: 'Math Functions'
 author:
   - 'Yuki Kimoto<kimoto.yuki@gmail.com>'
 build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  SPVM: '0.9506'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -17,9 +17,8 @@ no_index:
   directory:
     - t
     - inc
-requires:
-  SPVM: '0.9500'
+requires: {}
 resources:
   repository: https://github.com/yuki-kimoto/Perl-SPVM-Math.git
-version: '0.06'
+version: '0.09'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

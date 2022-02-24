@@ -18,7 +18,7 @@ use Plack::Util::Accessor qw( rules handler status );
 
 # RECOMMEND PREREQ: Ref::Util::XS
 
-our $VERSION = 'v0.5.0';
+our $VERSION = 'v0.6.0';
 
 
 sub prepare_app {
@@ -80,7 +80,7 @@ Plack::Middleware::Security::Simple - A simple security filter for Plack
 
 =head1 VERSION
 
-version v0.5.0
+version v0.6.0
 
 =head1 SYNOPSIS
 
@@ -172,7 +172,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2014,2018-2021 by Robert Rothenberg.
+This software is Copyright (c) 2014,2018-2022 by Robert Rothenberg.
 
 This is free software, licensed under:
 

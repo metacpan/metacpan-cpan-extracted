@@ -1,5 +1,5 @@
 package HackaMol::Angle;
-$HackaMol::Angle::VERSION = '0.051';
+$HackaMol::Angle::VERSION = '0.053';
 #ABSTRACT: Angle class for HackaMol
 use 5.008;
 use Moose;
@@ -7,8 +7,9 @@ use namespace::autoclean;
 use Carp;
 use Math::Vector::Real;
 use MooseX::StrictConstructor;
+
 #use MooseX::Storage;
-#with Storage( 'io' => 'StorableFile' ), 
+#with Storage( 'io' => 'StorableFile' ),
 with 'HackaMol::Roles::NameRole', 'HackaMol::Roles::AtomGroupRole';
 
 has $_ => (
@@ -32,14 +33,15 @@ sub ang_normvec {
 }
 
 sub bisector {
-# vector that bisects the angle between two vectors of the angle
-    my $self = shift;
+
+    # vector that bisects the angle between two vectors of the angle
+    my $self  = shift;
     my @atoms = $self->all_atoms;
     my $ang   = $self->ang_deg;
     return V( 0, 0, 0 ) if ( $ang == 0 or $ang == 180 );
-    my $vec1  = $atoms[1]->inter_dcoords( $atoms[0] );
-    my $vec2  = $atoms[1]->inter_dcoords( $atoms[2] );
-    my $bvec  = ($vec1->versor+$vec2->versor)->versor;
+    my $vec1 = $atoms[1]->inter_dcoords( $atoms[0] );
+    my $vec2 = $atoms[1]->inter_dcoords( $atoms[2] );
+    my $bvec = ( $vec1->versor + $vec2->versor )->versor;
     return $bvec;
 }
 
@@ -74,7 +76,7 @@ sub _build_angle_efunc {
 }
 
 sub angle_energy {
-    my $self = shift;
+    my $self   = shift;
     my $energy = &{ $self->angle_efunc }( $self, @_ );
     return ($energy);
 }
@@ -93,7 +95,7 @@ HackaMol::Angle - Angle class for HackaMol
 
 =head1 VERSION
 
-version 0.051
+version 0.053
 
 =head1 SYNOPSIS
 

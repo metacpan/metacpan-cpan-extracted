@@ -3,6 +3,9 @@ eg/examples.pl
 lib/Test/MockFile.pm
 lib/Test/MockFile/DirHandle.pm
 lib/Test/MockFile/FileHandle.pm
+lib/Test/MockFile/Plugin.pm
+lib/Test/MockFile/Plugin/FileTemp.pm
+lib/Test/MockFile/Plugins.pm
 Makefile.PL
 MANIFEST			This list of files
 README
@@ -14,7 +17,6 @@ t/detect-common-mistakes.t
 t/dir_interface.t
 t/file_access_hooks.t
 t/file_from_disk.t
-t/filename.t
 t/fileno.t
 t/globbing.t
 t/goto_is_available.t
@@ -24,10 +26,13 @@ t/lib/Test/TMF.pm
 t/manifest.t
 t/mkdir.t
 t/mock_stat.t
+t/new_dir_interface.t
 t/open-noclose.t
 t/open.t
 t/opendir.t
 t/path.t
+t/plugin-filetemp.t
+t/plugin.t
 t/pod-coverage.t
 t/pod.t
 t/readline.t
@@ -35,6 +40,8 @@ t/readlink.t
 t/rmdir.t
 t/runtime-bareword-filehandles.t
 t/stat-x.t
+t/strict-rules.t
+t/strict-rules_file-temp-example.t
 t/symlink.t
 t/sysopen.t
 t/Test-MockFile_file.t

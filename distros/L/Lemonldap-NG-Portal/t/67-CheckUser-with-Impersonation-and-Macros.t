@@ -2,9 +2,7 @@ use Test::More;
 use strict;
 use IO::String;
 
-BEGIN {
-    require 't/test-lib.pm';
-}
+require 't/test-lib.pm';
 
 my $res;
 
@@ -18,7 +16,7 @@ my $client = LLNG::Manager::Test->new( {
             portalMainLogo                  => 'common/logos/logo_llng_old.png',
             requireToken                    => 0,
             checkUser                       => 1,
-            checkUserSearchAttributes       => 'employee_nbr  test1 mail ',
+            checkUserSearchAttributes       => 'employee_nbr,  test1 mail ',
             impersonationRule               => 1,
             checkUserDisplayComputedSession => 1,
             checkUserDisplayPersistentInfo  => 0,
@@ -29,7 +27,7 @@ my $client = LLNG::Manager::Test->new( {
             macros                          => {
                 authLevel     => '"Macro_$authenticationLevel"',
                 realAuthLevel => '"realMacro_$real_authenticationLevel"',
-                _whatToTrace =>
+                _whatToTrace  =>
                   '$real__user ? "$_user / $real__user" : "$_user / $_user"',
             },
             groups => {

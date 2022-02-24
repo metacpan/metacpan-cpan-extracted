@@ -9,8 +9,12 @@ BEGIN {
 my ( $client, $res, $id );
 
 $client = LLNG::Manager::Test->new( {
-        ini =>
-          { logLevel => 'error', restSessionServer => 1, useSafeJail => 1 },
+        ini => {
+            logLevel          => 'error',
+            restSessionServer => 1,
+            useSafeJail       => 1,
+            sameSite          => 'Strict'
+        },
     }
 );
 
@@ -52,7 +56,10 @@ ok(
 count(1);
 expectOK($res);
 $id = expectCookie($res);
-
+my $rawCookie = getHeader( $res, 'Set-Cookie' );
+ok( $rawCookie =~ /;\s*SameSite=Strict/, 'Found SameSite=Strict (conf)' )
+  or explain( $rawCookie, 'SameSite value must be "Strict"' );
+count(1);
 ok( $res = $client->_get("/sessions/global/$id"), 'Get session' );
 count(1);
 expectOK($res);

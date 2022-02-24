@@ -1,18 +1,18 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/ModuleFeaturesUtils/list_feature_set_features
-# and generated automatically using Perinci::CmdLine::Gen version 0.498
-
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-04-02'; # DATE
-our $DIST = 'App-ModuleFeaturesUtils'; # DIST
-our $VERSION = '0.005'; # VERSION
+# and generated automatically using Perinci::CmdLine::Gen version 0.500
 
 use 5.010001;
 use strict;
 use warnings;
 
 use Perinci::CmdLine::Any;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-08-31'; # DATE
+our $DIST = 'App-ModuleFeaturesUtils'; # DIST
+our $VERSION = '0.006'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/ModuleFeaturesUtils/list_feature_set_features",
@@ -38,15 +38,13 @@ list-feature-set-features - List features in a feature set
 
 =head1 VERSION
 
-This document describes version 0.005 of list-feature-set-features (from Perl distribution App-ModuleFeaturesUtils), released on 2021-04-02.
+This document describes version 0.006 of list-feature-set-features (from Perl distribution App-ModuleFeaturesUtils), released on 2021-08-31.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % list-feature-set-features [--detail] [--format=name] [--json] [-l]
-     [--(no)naked-res] [--no-detail] [--nodetail] [--page-result[=program]]
-     [--view-result[=program]] <feature_set_name>
+% B<list-feature-set-features> [B<--detail>|B<-l>|B<--no-detail>|B<--nodetail>] [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] -- E<lt>I<feature_set_name>E<gt>
 
 =head1 OPTIONS
 
@@ -61,6 +59,8 @@ C<*> marks required options.
 Return detailed record for each result item.
 
 =item B<--feature-set-name>=I<s>*
+
+Can also be specified as the 1st command-line argument.
 
 =back
 
@@ -167,23 +167,40 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-Module
 
 Source repository is at L<https://github.com/perlancar/perl-App-ModuleFeaturesUtils>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-ModuleFeaturesUtils/issues>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by perlancar@cpan.org.
+This software is copyright (c) 2021 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-ModuleFeaturesUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

@@ -1,8 +1,18 @@
 Revision history for XS-Parse-Keyword
 
-0.20    2021-10-11
+0.22    2022-02-21
+        [CHANGES]
+         * Added XPK_AUTOSEMI piece type
+
+        [BUGFIXES]
+         * Don't segfault if lex_scan_lexvar() fails (RT140402)
+         * Set required version of ExtUtils::ParseXS for multiple t/*.xs files
+
+0.21    2021-10-12
         [BUGFIXES]
          * Fix for perl 5.20 - cannot use assert() as an expression
+
+0.20    (bad MANIFEST)
 
 0.19    2021-10-05
         [CHANGES]

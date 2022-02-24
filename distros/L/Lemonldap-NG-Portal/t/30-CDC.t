@@ -213,7 +213,7 @@ sub issuer {
                 authentication                   => 'Demo',
                 userDB                           => 'Same',
                 samlCommonDomainCookieActivation => 1,
-                samlCommonDomainCookieReader =>
+                samlCommonDomainCookieReader     =>
                   'http://auth.cdc.com/?action=read',
                 samlCommonDomainCookieWriter =>
                   'http://auth.cdc.com/?action=write',
@@ -262,7 +262,7 @@ sub sp {
                 authentication                   => 'SAML',
                 userDB                           => 'Same',
                 samlCommonDomainCookieActivation => 1,
-                samlCommonDomainCookieReader =>
+                samlCommonDomainCookieReader     =>
                   'http://auth.cdc.com/?action=read',
                 samlCommonDomainCookieWriter =>
                   'http://auth.cdc.com/?action=write',

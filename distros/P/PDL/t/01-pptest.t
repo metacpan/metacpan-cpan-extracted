@@ -123,6 +123,13 @@ pp_deft('setdim',
 	Code => 'loop(n) %{ $a() = n; %}',
 );
 
+pp_deft("gelsd",
+        Pars => '[io,phys]A(m,n); [io,phys]B(p,q); [phys]rcond(); [o,phys]s(r); int [o,phys]rank();int [o,phys]info()',
+        RedoDimsCode => '$SIZE(r) = PDLMIN($SIZE(m),$SIZE(n));',
+        GenericTypes => ['F'],
+        Code => '$CROAK("croaking");'
+);
+
 pp_deft('fooseg',
         Pars => 'a(n);  [o]b(n);',
         Code => '
@@ -161,7 +168,7 @@ pp_deft('fooflow3',
 	Code => 'tinplace_c3($SIZE(n),$P(a),$P(b),$P(c));',
 	);
 
-pp_deft( 'threadloop_continue',
+pp_deft( 'broadcastloop_continue',
 	 Pars => 'in(); [o] out()',
 	 Code => q[
 	    int cnt = 0;
@@ -244,7 +251,7 @@ use strict;
 use warnings;
 use Test::More;
 use Test::Warn;
-BEGIN { $ENV{PDL_AUTOPTHREAD_TARG} = 1 } # for continue-in-threadloop test
+BEGIN { $ENV{PDL_AUTOPTHREAD_TARG} = 1 } # for continue-in-broadcastloop test
 use PDL::LiteF;
 use PDL::Types;
 use PDL::Dbg;
@@ -307,6 +314,14 @@ test_setdim(($x=null),10);
 is( join(',',$x->dims), "10" );
 ok( tapprox($x,sequence(10)) );
 
+{
+my @msg;
+local $SIG{__WARN__} = sub { push @msg, @_ };
+eval { nan(2,2)->test_gelsd(nan(2,2), -3) };
+like $@, qr/croaking/, 'right error message';
+is_deeply \@msg, [], 'no warnings' or diag explain \@msg;
+}
+
 # this used to segv under solaris according to Karl
 {
   my $ny=7;
@@ -320,8 +335,7 @@ ok( tapprox($x,sequence(10)) );
 eval { test__flatten_into(null, 2) };
 ok 1; #was also segfaulting
 
-# test the bug alluded to in the comments in
-# pdl_changed (pdlapi.c)
+# test the bug alluded to in the comments in pdl_changed (pdlapi.c)
 # used to segfault
 my $xx=ones(float,3,4);
 my $sl1 = $xx->slice('(0)');
@@ -334,7 +348,7 @@ test_fooflow2($sl11, $sl22);
 ok(all $xx->slice('(0)') == 599);
 ok(all $xx->slice('(1)') == 699);
 
-# test that continues in a threadloop work
+# test that continues in a broadcastloop work
 {
     my $in = sequence(10);
     my $got = $in->zeroes;
@@ -342,9 +356,9 @@ ok(all $xx->slice('(1)') == 699);
     my $tmp = $exp->where( ! ($in % 2) );
     $tmp .= 0;
 
-    test_threadloop_continue( $in, $got );
+    test_broadcastloop_continue( $in, $got );
 
-    ok( tapprox( $got, $exp ), "continue works in threadloop" )
+    ok( tapprox( $got, $exp ), "continue works in broadcastloop" )
       or do { diag "got     : $got"; diag "expected: $exp" };
 }
 
@@ -465,8 +479,8 @@ pp_def('testinc',
         },
 );
 
-# make sure that if the word "threadloop" appears, later automatic threadloops
-# will not be generated, even if the original threadloop was commented-out
+# make sure that if the word "broadcastloop" appears, later automatic broadcastloops
+# will not be generated, even if the original broadcastloop was commented-out
 
 pp_def('testinc2',
         Pars => 'a(); [o] b()',
@@ -501,14 +515,14 @@ my $y = $x->testinc;
 
 ok(all ($y == $x+1), 'Sanity check runs correctly');
 
-# Test the inability to comment-out a threadloop. This is documented on the
+# Test the inability to comment-out a broadcastloop. This is documented on the
 # 11th page of the PDL::PP chapter of the PDL book. If somebody ever fixes this
 # wart, this test will fail, in which case the book's text should be updated.
 $y = $x->testinc2;
 TODO: {
         # Note: This test appears to fail on Cygwin and some flavors of Linux.
         local $TODO = 'This test inexplicably passes on some machines';
-        ok(not (all $y == $x + 1), 'WART: commenting out a threadloop does not work')
+        ok(not (all $y == $x + 1), 'WART: commenting out a broadcastloop does not work')
                 or diag("\$x is $x and \$y is $y");
 }
 

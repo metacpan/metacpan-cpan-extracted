@@ -2,7 +2,7 @@
 # into "plugins" list in lemonldap-ng.ini, section "portal"
 package Lemonldap::NG::Portal::Main::Plugins;
 
-our $VERSION = '2.0.12';
+our $VERSION = '2.0.14';
 
 package Lemonldap::NG::Portal::Main;
 
@@ -29,15 +29,15 @@ our @pList = (
     portalForceAuthn                    => '::Plugins::ForceAuthn',
     checkUser                           => '::Plugins::CheckUser',
     checkDevOps                         => '::Plugins::CheckDevOps',
-    impersonationRule                   => '::Plugins::Impersonation',
     contextSwitchingRule                => '::Plugins::ContextSwitching',
     decryptValueRule                    => '::Plugins::DecryptValue',
     findUser                            => '::Plugins::FindUser',
-    adaptativeAuthenticationLevelRules =>
+    newLocationWarning                  => '::Plugins::NewLocationWarning',
+    adaptativeAuthenticationLevelRules  =>
       '::Plugins::AdaptativeAuthenticationLevel',
-    globalLogoutRule => '::Plugins::GlobalLogout',
     refreshSessions  => '::Plugins::Refresh',
     crowdsec         => '::Plugins::CrowdSec',
+    globalLogoutRule => '::Plugins::GlobalLogout',
 );
 
 ##@method list enabledPlugins
@@ -81,7 +81,7 @@ sub enabledPlugins {
       if ( $conf->{soapSessionServer}
         or $conf->{soapConfigServer} );
 
-    # Add REST (check is done by it)
+    # Add REST (check is done by plugin itself)
     push @res, '::Plugins::RESTServer';
 
     # Check if password is enabled
@@ -96,9 +96,16 @@ sub enabledPlugins {
     # Check if custom plugins are required
     if ( $conf->{customPlugins} ) {
         $self->logger->debug( 'Custom plugins: ' . $conf->{customPlugins} );
-        push @res, grep ( /\w+/, split( /,\s*/, $conf->{customPlugins} ) );
+        push @res, grep ( /\w+/, split( /[,\s]+/, $conf->{customPlugins} ) );
     }
-    
+
+    # Impersonation overwrites req->step and pops 'afterData' EP.
+    # Static and custom 'afterData' plugins will be never launched
+    # if they are loaded after Impersonation.
+    # This plugin must be the last 'afterData' loaded plugin. Fix #2655
+    push @res, '::Plugins::Impersonation'
+      if $conf->{impersonationRule};
+
     return @res;
 }
 

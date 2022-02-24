@@ -1,0 +1,17 @@
+MANIFEST
+Changes
+MYMETA.json
+MYMETA.yml
+Makefile.PL
+lib/mro/EVERY.pm
+t/01-use.t
+t/02-name.t
+t/03-name-c3.t
+t/04-name.t
+t/05-name-c3.t
+t/07-auto-minimal.t
+t/06-auto-minimal.t
+t/14-auto.t
+t/15-auto-c3.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

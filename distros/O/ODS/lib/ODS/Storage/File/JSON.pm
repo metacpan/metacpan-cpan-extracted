@@ -1,22 +1,16 @@
 package ODS::Storage::File::JSON;
 
 use YAOO;
-use JSON;
+
+use ODS::Utils qw/load/;
 
 extends 'ODS::Storage::File';
 
-has json => isa(object), default => sub { JSON->new->pretty(1) };
+use ODS::Serialize::JSON;
 
-has file_suffix => isa(string('json'));
-
-sub parse_data_format {
-	my ($self, $data) = @_;
-	return $self->json->decode($data);
-}
-
-sub stringify_data_format {
-	my ($self, $data) = @_;
-	return $self->json->encode($data);
-}
+has _serialize_class => isa(object('ODS::Serialize::JSON')), coerce(sub {
+	my ($self, $value) = @_;
+	$value->new;
+});
 
 1;

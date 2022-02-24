@@ -9,7 +9,7 @@ Mojo::Redis - Redis driver based on Mojo::IOLoop
     use Mojo::Redis;
     my $redis = Mojo::Redis->new;
     $redis->db->set(foo => 42);
-    $redis->expire(foo => 600);
+    $redis->db->expire(foo => 600);
     warn $redis->db->get('foo');
 
 ## Promises

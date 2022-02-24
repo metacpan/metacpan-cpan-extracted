@@ -5,7 +5,7 @@ use Mouse;
 use Safe;
 use constant PE_OK => 0;
 
-our $VERSION = '2.0.6';
+our $VERSION = '2.0.14';
 
 # Handle "if then else" (used during init)
 # return a sub that can be called with ($req) to get a [array] of combination
@@ -88,14 +88,16 @@ sub parseAnd {
                     my ( $r, $name ) = $obj->(@_);
 
                     # Case "string" (form type)
-                    if ( $r & ~$r ) {
+                    if ( $r && $r & ~$r ) {
                         $str{$r}++;
                     }
                     else {
-                        return ( $r, $name ) unless ( $r == PE_OK );
+                        return ( wantarray ? ( $r, $name ) : $r )
+                          unless ( !$r || $r == PE_OK );
                     }
                 }
-                return ( ( %str ? join( ',', keys %str ) : PE_OK ), $expr );
+                my $res = %str ? join( ',', keys %str ) : PE_OK;
+                return wantarray ? ( $res, $expr ) : $res;
             };
         }
         return \@res;
@@ -135,7 +137,8 @@ sub parseMod {
         my ($m) = @mods;
         return sub {
             my $sub = shift;
-            return ( $m->$sub(@_), $expr );
+            my $res = $m->$sub(@_);
+            return wantarray ? ( $res, $expr ) : $res;
         };
     }
     return sub {
@@ -149,10 +152,12 @@ sub parseMod {
                 $str{$res}++;
             }
             else {
-                return ( $res, $list[$i] ) unless ( $res == PE_OK );
+                return ( wantarray ? ( $res, $list[$i] ) : $res )
+                  unless ( $res == PE_OK );
             }
         }
-        return ( ( %str ? join( ',', keys %str ) : PE_OK ), $expr );
+        my $res = %str ? join( ',', keys %str ) : PE_OK;
+        return wantarray ? ( $res, $expr ) : $res;
     };
 }
 

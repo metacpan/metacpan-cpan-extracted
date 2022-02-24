@@ -1,10 +1,10 @@
 use strict;
 use warnings;
-package Test::JSON::Schema::Acceptance; # git description: v1.014-9-gfc785a3
+package Test::JSON::Schema::Acceptance; # git description: v1.015-5-g58b267c
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Acceptance testing for JSON-Schema based validators like JSON::Schema
 
-our $VERSION = '1.015';
+our $VERSION = '1.016';
 
 use 5.020;
 use Moo;
@@ -499,7 +499,7 @@ Test::JSON::Schema::Acceptance - Acceptance testing for JSON-Schema based valida
 
 =head1 VERSION
 
-version 1.015
+version 1.016
 
 =head1 SYNOPSIS
 
@@ -791,9 +791,14 @@ Ricardo Signes <rjbs@cpan.org> for direction to and creation of Test::Fatal.
 
 Various others in #perl-help.
 
+=for stopwords OpenAPI
+
 =head1 SUPPORT
 
 Bugs may be submitted through L<https://github.com/karenetheridge/Test-JSON-Schema-Acceptance/issues>.
+
+You can also find me on the L<JSON Schema Slack server|https://json-schema.slack.com> and L<OpenAPI Slack
+server|https://open-api.slack.com>, which are also great resources for finding help.
 
 =head1 AUTHOR
 

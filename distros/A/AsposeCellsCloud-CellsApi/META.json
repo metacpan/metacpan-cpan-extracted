@@ -62,7 +62,7 @@
       },
       "AsposeCellsCloud::CellsApi" : {
          "file" : "lib/AsposeCellsCloud/CellsApi.pm",
-         "version" : "22.1"
+         "version" : "22.2"
       },
       "AsposeCellsCloud::LiteCellsApi" : {
          "file" : "lib/AsposeCellsCloud/LiteCellsApi.pm"
@@ -129,6 +129,9 @@
       },
       "AsposeCellsCloud::Object::CellsCloudResponse" : {
          "file" : "lib/AsposeCellsCloud/Object/CellsCloudResponse.pm"
+      },
+      "AsposeCellsCloud::Object::CellsCloudFileInfo" : {
+         "file" : "lib/AsposeCellsCloud/Object/CellsCloudFileInfo.pm"
       },
       "AsposeCellsCloud::Object::CellsColor" : {
          "file" : "lib/AsposeCellsCloud/Object/CellsColor.pm"
@@ -840,6 +843,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "22.1",
+   "version" : "22.2",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

@@ -61,6 +61,7 @@ use Time::Fake;
 use URI::Escape;
 use MIME::Base64;
 use Lemonldap::NG::Common::FormEncode;
+use Lemonldap::NG::Common::Util qw/getPSessionID/;
 
 #use 5.10.0;
 
@@ -180,6 +181,40 @@ sub getCache {
             namespace   => 'lemonldap-ng-session',
             cache_root  => $tmpDir,
             cache_depth => 0,
+        }
+    );
+}
+
+sub getSession {
+    my $id           = shift;
+    my @sessionsOpts = (
+        storageModule        => "Apache::Session::File",
+        storageModuleOptions => {
+            Directory     => "$tmpDir",
+            LockDirectory => "$tmpDir/lock",
+        },
+        kind => 'SSO'
+    );
+
+    return Lemonldap::NG::Common::Session->new( {
+            @sessionsOpts, id => $id,
+        }
+    );
+}
+
+sub getPSession {
+    my $uid          = shift;
+    my @sessionsOpts = (
+        storageModule        => "Apache::Session::File",
+        storageModuleOptions => {
+            Directory     => "$tmpDir",
+            LockDirectory => "$tmpDir/lock",
+        },
+        kind => 'Persistent'
+    );
+
+    return Lemonldap::NG::Common::Session->new( {
+            @sessionsOpts, id => getPSessionID($uid),
         }
     );
 }
@@ -678,26 +713,26 @@ our $defaultIni = {
     ),
     https                => 0,
     globalStorageOptions => {
-        Directory     => $tmpDir,
-        LockDirectory => "$tmpDir/lock",
+        Directory      => $tmpDir,
+        LockDirectory  => "$tmpDir/lock",
         generateModule =>
           'Lemonldap::NG::Common::Apache::Session::Generate::SHA256',
     },
     casStorageOptions => {
-        Directory     => "$tmpDir/saml",
-        LockDirectory => "$tmpDir/saml/lock",
+        Directory      => "$tmpDir/saml",
+        LockDirectory  => "$tmpDir/saml/lock",
         generateModule =>
           'Lemonldap::NG::Common::Apache::Session::Generate::SHA256',
     },
     samlStorageOptions => {
-        Directory     => "$tmpDir/saml",
-        LockDirectory => "$tmpDir/saml/lock",
+        Directory      => "$tmpDir/saml",
+        LockDirectory  => "$tmpDir/saml/lock",
         generateModule =>
           'Lemonldap::NG::Common::Apache::Session::Generate::SHA256',
     },
     oidcStorageOptions => {
-        Directory     => "$tmpDir/saml",
-        LockDirectory => "$tmpDir/saml/lock",
+        Directory      => "$tmpDir/saml",
+        LockDirectory  => "$tmpDir/saml/lock",
         generateModule =>
           'Lemonldap::NG::Common::Apache::Session::Generate::SHA256',
     },
@@ -747,7 +782,7 @@ has ini => (
         main::ok( $self->{p} = $self->class->new(), 'Portal object' );
         main::count(1);
         unless ( $self->confFailure ) {
-            main::ok( $self->{p}->init($ini), 'Init' );
+            main::ok( $self->{p}->init($ini),           'Init' );
             main::ok( $self->{app} = $self->{p}->run(), 'Portal app' );
             main::count(2);
             no warnings 'redefine';
@@ -803,7 +838,7 @@ Launch a C</?logout=1> request an test:
 
 =item if response is 200
 
-=item if cookie 'lemonldap' and 'lemonldappdata' have no value
+=item if cookie $cookieName and "${cookieName}pdata" have no value
 
 =item if a GET request with previous cookie value I<($i)> is rejected
 
@@ -812,13 +847,15 @@ Launch a C</?logout=1> request an test:
 =cut
 
 sub logout {
-    my ( $self, $id ) = @_;
+    my ( $self, $id, $cookieName ) = @_;
     my $res;
+    $cookieName ||= 'lemonldap';
+
     main::ok(
         $res = $self->_get(
             '/',
             query  => 'logout',
-            cookie => "lemonldap=$id",
+            cookie => "$cookieName=$id",
             accept => 'text/html'
         ),
         'Logout request'
@@ -827,11 +864,12 @@ sub logout {
       or main::explain( $res->[0], 200 );
     my $c;
     main::ok(
-        ( defined( $c = main::getCookies($res)->{lemonldap} ) and not $c ),
+        ( defined( $c = main::getCookies($res)->{$cookieName} ) and not $c ),
         ' Cookie is deleted' )
       or main::explain( $res->[1], "Set-Cookie => 'lemonldap='" );
-    main::ok( not( main::getCookies($res)->{lemonldappdata} ), ' No pdata' );
-    main::ok( $res = $self->_get( '/', cookie => "lemonldap=$id" ),
+    main::ok( not( main::getCookies($res)->{"${cookieName}pdata"} ),
+        ' No pdata' );
+    main::ok( $res = $self->_get( '/', cookie => "$cookieName=$id" ),
         'Disconnect request' )
       or explain( $res, '[<code>,<hdrs>,<content>]' );
     main::ok( $res->[0] == 401, ' Response is 401' )

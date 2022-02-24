@@ -135,7 +135,7 @@ sub add_inds {
 }
 
 
-# do the dimension checking for perl level threading
+# do the dimension checking for perl level broadcasting
 # assumes that IndObjs have been created
 sub perldimcheck {
   my ($this,$pdl) = @_;
@@ -144,7 +144,7 @@ sub perldimcheck {
   return 1 if $pdl->isnull;
   my $rdims = @{$this->{RawInds}};
   croak ("not enough dimensions for ".$this->name)
-    if ($pdl->threadids)[0] < $rdims;
+    if ($pdl->broadcastids)[0] < $rdims;
   my @dims = $pdl->dims;
   my ($i,$ind) = (0,undef);
   for $ind (@{$this->{IndObjs}}) {

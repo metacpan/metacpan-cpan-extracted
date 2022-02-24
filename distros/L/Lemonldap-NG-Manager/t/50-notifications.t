@@ -56,7 +56,7 @@ displayTests('actives');
 $notif = '{"done":1}';
 $res   = &client->jsonPutResponse(
     'notifications/actives/dwho_Test',
-    '', IO::String->new($notif),
+    '',                 IO::String->new($notif),
     'application/json', length($notif)
 );
 ok( $res->{result} == 1, 'Result = 1' );
@@ -137,7 +137,7 @@ sub displayTests {
         ) or diag Dumper($res);
         my $internal_ref = $res->{values}->[0]->{notification};
         my $ref          = $res->{values}->[0]->{reference};
-        $res = &client->jsonResponse( "notifications/$type/$internal_ref" );
+        $res = &client->jsonResponse("notifications/$type/$internal_ref");
         ok( $res->{done} eq $internal_ref, 'Internal reference found' )
           or diag Dumper($res);
         ok( $res = eval { from_json( $res->{notifications}->[0] ) },

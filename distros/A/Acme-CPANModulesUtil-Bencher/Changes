@@ -1,3 +1,8 @@
+0.004   2021-09-06  Released-By: PERLANCAR; Urgency: medium
+
+	- Don't add participants that do not have code.
+
+
 0.003   2021-01-20  Released-By: PERLANCAR; Urgency: medium
 
 	- Extract per-function benchmark codes (Acme::CPANModules 0.1.7).

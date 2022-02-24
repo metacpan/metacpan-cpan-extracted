@@ -157,7 +157,10 @@ sub _postamble {
   my ($w, $internal, $src, $pref, $mod, $callpack, $multi_c) = @_;
   $callpack //= '';
   $w = dirname($w);
-  my ($perlrun, $pmdep, $install, $cdep) = ($internal ? '$(PERLRUNINST)' : "\$(PERL) \"-I$w\"", $src, '', '');
+  my $perlrun = $internal ? '$(PERLRUNINST)' : "\$(PERL) \"-I$w\"";
+  my ($pmdep, $install, $cdep) = ($src, '', '');
+  my @cbase = $multi_c ? map "pp-$_", _pp_list_functions($src, $internal) : ();
+  my @objs = map "$_\$(OBJ_EXT)", $pref, @cbase;
   if ($internal) {
     require File::Spec::Functions;
     my $top = File::Spec::Functions::abs2rel($w);
@@ -166,16 +169,13 @@ sub _postamble {
       File::Spec::Functions::catfile($top, qw(Basic Gen pm_to_blib)),
       File::Spec::Functions::catfile($core, qw(pm_to_blib)),
       ;
-    $cdep .= join ' ', map File::Spec::Functions::catfile($core, $_),
-      qw(pdl.h pdlcore.h pdlthread.h pdlmagic.h);
+    $cdep .= join ' ', @objs, ':', map File::Spec::Functions::catfile($core, $_),
+      qw(pdl.h pdlcore.h pdlbroadcast.h pdlmagic.h);
   } else {
     my $oneliner = _oneliner(qq{exit if \$ENV{DESTDIR}; use PDL::Doc; eval { PDL::Doc::add_module(q{$mod}); }});
     $install = qq|\ninstall ::\n\t\@echo "Updating PDL documentation database...";\n\t$oneliner\n|;
   }
-  my @generanda = "$pref.xs";
-  my @cbase = $multi_c ? map "pp-$_", _pp_list_functions($src, $internal) : ();
-  push @generanda, map "$_.c", @cbase;
-  my @objs = map "$_\$(OBJ_EXT)", $pref, @cbase;
+  my @generanda = ("$pref.xs", map "$_.c", @cbase);
   my $pp_call_arg = _pp_call_arg($mod, $mod, $pref, $callpack, $multi_c||'');
 qq|
 
@@ -186,7 +186,7 @@ $pref.pm : $pmdep
 @generanda : $pref.pm
 	\$(NOECHO) \$(NOOP)
 
-@objs : $cdep
+$cdep
 $install|
 }
 
@@ -290,6 +290,7 @@ sub pdlpp_mkgen {
     my $rv = system($^X, @in, $pp_call_arg, File::Spec::Functions::abs2rel(basename($pd)));
     die "pdlpp_mkgen: cannot convert '$pd'\n" unless $rv == 0 && -f $basefile;
     File::Copy::copy($basefile, $outfile) or die "$outfile: $!";
+    unlink $basefile; # Transform::Proj4.pm is wrong without GIS::Proj built
     chdir $old_cwd or die "chdir $old_cwd: $!";
     $added{"GENERATED/$prefix.pm"} = "mod=$mod pd=$pd (added by pdlpp_mkgen)";
   }

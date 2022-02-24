@@ -5,7 +5,7 @@ author:
 build_requires:
   File::Temp: '0'
   Lingua::PT::Abbrev: '0.05'
-  Perl6::Slurp: '0'
+  Path::Tiny: '0'
   Test::Pod: '1.00'
   Test::Pod::Coverage: '0.08'
 configure_requires:
@@ -24,5 +24,5 @@ no_index:
 requires:
   Lingua::PT::Abbrev: '0.05'
   utf8::all: '0'
-version: '0.28'
+version: '0.29'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

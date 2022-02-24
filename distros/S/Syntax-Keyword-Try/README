@@ -209,14 +209,6 @@ KEYWORDS
     warning and discarded, leaving $@ containing the original exception, if
     one existed.
 
-    Note that the finally syntax is not available when using this module
-    via Feature::Compat::Try, as it is not expected that syntax will be
-    added to the core perl 'try' feature. This is because a more
-    general-purpose ability may be added instead, under the name 'defer'.
-    If you wish to write code that may more easily be forward-compatible
-    with that feature instead, you should consider using
-    Syntax::Keyword::Defer rather than using finally statements.
-
 OTHER MODULES
 
     There are already quite a number of modules on CPAN that provide a

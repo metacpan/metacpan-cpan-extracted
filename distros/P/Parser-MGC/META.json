@@ -37,7 +37,7 @@
    "provides" : {
       "Parser::MGC" : {
          "file" : "lib/Parser/MGC.pm",
-         "version" : "0.20"
+         "version" : "0.21"
       },
       "Parser::MGC::Examples::EvaluateExpression" : {
          "file" : "lib/Parser/MGC/Examples/EvaluateExpression.pm"
@@ -49,6 +49,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.20",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.21",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

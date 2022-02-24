@@ -1,5 +1,11 @@
 Revision history for perl distribution Mojo-Redis
 
+3.29 2022-02-23T14:56:18+0900
+ - Fix use of "defined" in unit test
+
+3.28 2022-02-21T15:40:56+0900
+ - Add channel to Mojo::Redis::PubSub::listen() callback
+
 3.27 2021-11-20T10:51:49+0900
  - Add experimental "subscribe" and "psubscribe" events to Mojo::Redis::PubSub
  - Fix examples for set and expire #62

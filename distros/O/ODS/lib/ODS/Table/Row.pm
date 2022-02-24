@@ -2,7 +2,7 @@ package ODS::Table::Row;
 
 use YAOO;
 
-use overload 
+use overload
 	'%{}' => sub {  caller() =~ m/YAOO$/ ? $_[0] : $_[0]->as_hash; },
 	fallback => 1;
 
@@ -10,16 +10,37 @@ has table => isa(object);
 
 has columns => isa(ordered_hash), default(1);
 
+has __file => isa(string);
+
+has __custom_file_name => isa(string);
+
 sub build {
 	my ($self, %args) = @_;
 
 	$self->table($args{table});
-	for my $column ( keys %{ $self->table->columns } ) {
-		my $col = $self->table->columns->{$column}->build_column($args{data}{$column}, $args{inflated});
+
+	if (ref $args{data} eq 'ARRAY') {
+		my $column = 'array_items';
+		my $value = [ map { $self->table->parent_column->object_class->instantiate($self->table->parent_column, 0, $_) } @{ $args{data} } ];
+
+		my $col = $self->table->columns->{$column}->build_column(
+			$value, $args{inflated}, $args{serialize_class}
+		);
 		$self->columns->{$column} = $col;
-		YAOO::make_keyword($self->table->row_class, $column, sub { 
-			my $self = shift; 
-			$self->columns->{$column}->value(@_); 
+		return $self;
+	}
+
+	$self->__custom_file_name(delete $args{data}{__custom_file_name});
+	$self->__file(delete $args{data}{__file});
+
+	for my $column ( keys %{ $self->table->columns } ) {
+		my $col = $self->table->columns->{$column}->build_column(
+			$args{data}{$column}, $args{inflated}, $args{serialize_class}
+		);
+		$self->columns->{$column} = $col;
+		YAOO::make_keyword($self->table->row_class, $column, sub {
+			my $self = shift;
+			$self->columns->{$column}->value(@_);
 		}) unless $self->can($column);
 	}
 	return $self;
@@ -28,7 +49,7 @@ sub build {
 sub as_hash {
 	my %hash;
 	$hash{$_} = $_[0]->columns->{$_}->value
-		for keys %{$_[0]->columns};	
+		for keys %{$_[0]->columns};
 	return \%hash;
 }
 
@@ -60,7 +81,7 @@ sub validate {
 sub update {
 	my ($self, $update) = (shift, @_ > 1 ? { @_ } : $_[0]);
 	$self->set_row($update);
-	$self->table->storage->update_row();
+	$self->table->storage->update_row($self);
 }
 
 sub delete {

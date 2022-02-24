@@ -51,6 +51,21 @@ my $op = LLNG::Manager::Test->new( {
                     oidcRPMetaDataOptionsIDTokenForceClaims    => 1,
                     oidcRPMetaDataOptionsRule => '$_scope =~ /\bread\b/',
                 },
+                scopelessrp => {
+                    oidcRPMetaDataOptionsDisplayName       => "RP",
+                    oidcRPMetaDataOptionsIDTokenExpiration => 3600,
+                    oidcRPMetaDataOptionsClientID          => "scopelessrp",
+                    oidcRPMetaDataOptionsAllowOffline      => 1,
+                    oidcRPMetaDataOptionsAllowClientCredentialsGrant => 1,
+                    oidcRPMetaDataOptionsIDTokenSignAlg              => "HS512",
+                    oidcRPMetaDataOptionsClientSecret          => "rpsecret",
+                    oidcRPMetaDataOptionsUserIDAttr            => "",
+                    oidcRPMetaDataOptionsAccessTokenExpiration => 3600,
+                    oidcRPMetaDataOptionsBypassConsent         => 1,
+                    oidcRPMetaDataOptionsRefreshToken          => 1,
+                    oidcRPMetaDataOptionsIDTokenForceClaims    => 1,
+                    oidcRPMetaDataOptionsRule                  => '',
+                },
                 pubrp => {
                     oidcRPMetaDataOptionsAccessTokenExpiration       => 3600,
                     oidcRPMetaDataOptionsAllowClientCredentialsGrant => 1,
@@ -103,6 +118,13 @@ my $badquery2 = buildForm( {
     }
 );
 
+my $badquery3 = buildForm( {
+        client_id     => 'scopelessrp',
+        client_secret => 'rpsecret',
+        grant_type    => 'client_credentials',
+    }
+);
+
 my $goodquery = buildForm( {
         client_id     => 'rpid',
         client_secret => 'rpsecret',
@@ -128,6 +150,15 @@ $res = $op->_post(
     length => length($badquery2),
 );
 expectBadRequest($res);
+
+## Test empty scope
+$res = $op->_post(
+    "/oauth2/token",
+    IO::String->new($badquery3),
+    accept => 'application/json',
+    length => length($badquery3),
+);
+expectReject( $res, 400, "invalid_scope" );
 
 ## Test a confidential RP
 $res = $op->_post(

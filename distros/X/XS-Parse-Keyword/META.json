@@ -16,7 +16,8 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::CBuilder" : "0"
+            "ExtUtils::CBuilder" : "0",
+            "ExtUtils::ParseXS" : "3.16"
          }
       },
       "configure" : {
@@ -39,19 +40,19 @@
    "provides" : {
       "XS::Parse::Infix" : {
          "file" : "lib/XS/Parse/Infix.pm",
-         "version" : "0.21"
+         "version" : "0.22"
       },
       "XS::Parse::Infix::Builder" : {
          "file" : "lib/XS/Parse/Infix/Builder.pm",
-         "version" : "0.21"
+         "version" : "0.22"
       },
       "XS::Parse::Keyword" : {
          "file" : "lib/XS/Parse/Keyword.pm",
-         "version" : "0.21"
+         "version" : "0.22"
       },
       "XS::Parse::Keyword::Builder" : {
          "file" : "lib/XS/Parse/Keyword/Builder.pm",
-         "version" : "0.21"
+         "version" : "0.22"
       }
    },
    "release_status" : "stable",
@@ -60,6 +61,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.21",
-   "x_serialization_backend" : "JSON::PP version 4.05"
+   "version" : "0.22",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

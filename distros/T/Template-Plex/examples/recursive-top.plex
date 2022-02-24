@@ -2,7 +2,6 @@ Top level template with title is $title
 @{[
 	do {
 		$my_package_var=1;
-		say "OPTIONS IN TOP LEVEL", %options;
 		my $t=plex("recursive-2.plex",{});
 		$t->render();
 	}

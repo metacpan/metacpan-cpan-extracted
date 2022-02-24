@@ -1,6 +1,11 @@
 
 Revision history for Perl module MCE::Shared.
 
+1.876 Sun Feb 20 02:30:00 EST 2021
+
+  * Improved suppressing the PDL CLONE warning. Piddles should not be
+    naively copied into new threads.
+
 1.875 Fri Dec 03 06:30:00 EST 2021
 
   * Resolved edge case with _fill_index in MCE::Shared::Ordhash.

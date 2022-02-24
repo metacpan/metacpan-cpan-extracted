@@ -119,6 +119,7 @@ freedata(it)
       pdl *it
       CODE:
 	if(it->datasv) {
+		PDLDEBUG_f(printf("pdl=%p SvREFCNT_dec datasv=%p\n",it,it->datasv);)
 		SvREFCNT_dec(it->datasv);
 		it->datasv=0;
 		it->data=0;
@@ -392,9 +393,9 @@ listref_c(x)
       stop = 1;
       for(ind = 0; ind < x->ndims; ind++) {
 	 if(++(inds[ind]) >= x->dims[ind]) {
-       	    inds[ind] = 0;
+	    inds[ind] = 0;
          } else {
-       	    stop = 0; break;
+	    stop = 0; break;
          }
       }
    }
@@ -694,16 +695,16 @@ getdim(x,y)
 		RETVAL
 
 int
-getnthreadids(x)
+getnbroadcastids(x)
 	pdl *x
 	CODE:
 		pdl_barf_if_error(pdl_make_physdims(x));
-		RETVAL = x->nthreadids;
+		RETVAL = x->nbroadcastids;
 	OUTPUT:
 		RETVAL
 
 void
-threadids_c(x)
+broadcastids_c(x)
 	pdl *x
 	PREINIT:
 		PDL_Indx i;
@@ -711,19 +712,19 @@ threadids_c(x)
 	PPCODE:
 		pdl_barf_if_error(pdl_make_physdims(x));
 		if (gimme == G_ARRAY) {
-			EXTEND(sp, x->nthreadids);
-			for(i=0; i<x->nthreadids; i++) mPUSHi(x->threadids[i]);
+			EXTEND(sp, x->nbroadcastids);
+			for(i=0; i<x->nbroadcastids; i++) mPUSHi(x->broadcastids[i]);
 		}
 		else if (gimme == G_SCALAR) {
-			mXPUSHu(x->nthreadids);
+			mXPUSHu(x->nbroadcastids);
 		}
 
 int
-getthreadid(x,y)
+getbroadcastid(x,y)
 	pdl *x
 	int y
 	CODE:
-		RETVAL = x->threadids[y];
+		RETVAL = x->broadcastids[y];
 	OUTPUT:
 		RETVAL
 
@@ -808,18 +809,18 @@ gethdr(p)
 	 RETVAL
 
 void
-threadover_n(...)
+broadcastover_n(...)
    PREINIT:
    int npdls;
    SV *sv;
    CODE:
     npdls = items - 1;
     if(npdls <= 0)
-    	croak("Usage: threadover_n(pdl[,pdl...],sub)");
+	croak("Usage: broadcastover_n(pdl[,pdl...],sub)");
     int i,sd;
     pdl *pdls[npdls];
     PDL_Indx realdims[npdls];
-    pdl_thread pdl_thr;
+    pdl_broadcast pdl_brc;
     SV *code = ST(items-1);
     for(i=0; i<npdls; i++) {
 	pdls[i] = pdl_SvPDLV(ST(i));
@@ -827,32 +828,32 @@ threadover_n(...)
 	pdl_barf_if_error(pdl_make_physical(pdls[i]));
 	realdims[i] = 0;
     }
-    PDL_THR_CLRMAGIC(&pdl_thr);
-    pdl_barf_if_error(pdl_initthreadstruct(0,pdls,realdims,realdims,npdls,NULL,&pdl_thr,NULL,NULL,NULL, 1));
+    PDL_CLRMAGIC(&pdl_brc);
+    pdl_barf_if_error(pdl_initbroadcaststruct(0,pdls,realdims,realdims,npdls,NULL,&pdl_brc,NULL,NULL,NULL, 1));
     pdl_error error_ret = {0, NULL, 0};
-    if (pdl_startthreadloop(&pdl_thr,NULL,NULL,&error_ret) < 0) croak("Error starting threadloop");
+    if (pdl_startbroadcastloop(&pdl_brc,NULL,NULL,&error_ret) < 0) croak("Error starting broadcastloop");
     pdl_barf_if_error(error_ret);
-    sd = pdl_thr.ndims;
+    sd = pdl_brc.ndims;
     do {
-    	dSP;
+	dSP;
 	PUSHMARK(sp);
 	EXTEND(sp,items);
 	PUSHs(sv_2mortal(newSViv((sd-1))));
 	for(i=0; i<npdls; i++) {
 		PDL_Anyval pdl_val = { PDL_INVALID, {0} };
-		pdl_val = pdl_get_offs(pdls[i],pdl_thr.offs[i]);
+		pdl_val = pdl_get_offs(pdls[i],pdl_brc.offs[i]);
 		ANYVAL_TO_SV(sv, pdl_val);
 		PUSHs(sv_2mortal(sv));
 	}
-    	PUTBACK;
+	PUTBACK;
 	perl_call_sv(code,G_DISCARD);
-	sd = pdl_iterthreadloop(&pdl_thr,0);
-	if ( sd < 0 ) die("Error in iterthreadloop");
+	sd = pdl_iterbroadcastloop(&pdl_brc,0);
+	if ( sd < 0 ) die("Error in iterbroadcastloop");
     } while( sd );
-    pdl_freethreadstruct(&pdl_thr);
+    pdl_freebroadcaststruct(&pdl_brc);
 
 void
-threadover(...)
+broadcastover(...)
    PREINIT:
     int npdls;
     int targs;
@@ -861,22 +862,22 @@ threadover(...)
     targs = items - 4;
     if (items > 0) nothers = SvIV(ST(0));
     if(targs <= 0 || nothers < 0 || nothers >= targs)
-	croak("Usage: threadover(nothers,pdl[,pdl...][,otherpars..],realdims,creating,sub)");
+	croak("Usage: broadcastover(nothers,pdl[,pdl...][,otherpars..],realdims,creating,sub)");
     npdls = targs-nothers;
     int i,dtype=0;
     PDL_Indx nc=npdls,nd1,nd2;
     SV* rdimslist = ST(items-3);
     SV* cdimslist = ST(items-2);
     SV *code = ST(items-1);
-    pdl_thread pdl_thr;
+    pdl_broadcast pdl_brc;
     pdl *pdls[npdls], *child[npdls];
     SV *csv[npdls], *others[nothers];
     PDL_Indx *creating = pdl_packdims(cdimslist,&nd2);
     if (!creating) croak("Failed to packdims for creating");
+    if (nd2 < npdls) croak("broadcastover: need at least one creating flag per pdl: %d pdls, %"IND_FLAG" flags", npdls, nd2);
     PDL_Indx *realdims = pdl_packdims(rdimslist,&nd1);
     if (!realdims) croak("Failed to packdims for realdims");
-    if (nd1 != npdls) croak("threadover: need one realdim flag per pdl!");
-    if (nd2 != npdls) croak("threadover: need one creating flag per pdl!");
+    if (nd1 != npdls) croak("broadcastover: need one realdim flag per pdl: %d pdls, %"IND_FLAG" flags", npdls, nd1);
     for(i=0; i<npdls; i++) {
 	pdls[i] = pdl_SvPDLV(ST(i+1));
 	if (creating[i])
@@ -891,14 +892,14 @@ threadover(...)
     if (nd2 < nc)
 	croak("Not enough dimension info to create pdls");
     PDLDEBUG_f(for (i=0;i<npdls;i++) { printf("pdl %d ",i); pdl_dump(pdls[i]); });
-    PDL_THR_CLRMAGIC(&pdl_thr);
-    pdl_barf_if_error(pdl_initthreadstruct(0,pdls,realdims,creating,npdls,
-			NULL,&pdl_thr,NULL,NULL,NULL, 1));
+    PDL_CLRMAGIC(&pdl_brc);
+    pdl_barf_if_error(pdl_initbroadcaststruct(0,pdls,realdims,creating,npdls,
+			NULL,&pdl_brc,NULL,NULL,NULL, 1));
     for(i=0, nc=npdls; i<npdls; i++)  /* create as necessary */
       if (creating[i]) {
 	PDL_Indx *cp = creating+nc;
 	pdls[i]->datatype = dtype;
-	pdl_barf_if_error(pdl_thread_create_parameter(&pdl_thr,i,cp,0));
+	pdl_barf_if_error(pdl_broadcast_create_parameter(&pdl_brc,i,cp,0));
 	nc += realdims[i];
 	pdl_barf_if_error(pdl_make_physical(pdls[i]));
 	PDLDEBUG_f(pdl_dump(pdls[i]));
@@ -906,7 +907,7 @@ threadover(...)
 	pdls[i]->state &= (~PDL_NOMYDIMS);
       }
     pdl_error error_ret = {0, NULL, 0};
-    if (pdl_startthreadloop(&pdl_thr,NULL,NULL,&error_ret) < 0) croak("Error starting threadloop");
+    if (pdl_startbroadcastloop(&pdl_brc,NULL,NULL,&error_ret) < 0) croak("Error starting broadcastloop");
     pdl_barf_if_error(error_ret);
     for(i=0; i<npdls; i++) {
 	PDL_Indx *thesedims = pdls[i]->dims, *theseincs = PDL_REPRINCS(pdls[i]);
@@ -916,7 +917,7 @@ threadover(...)
 	child[i]=pdl_pdlnew();
 	if (!child[i]) pdl_pdl_barf("Error making null pdl");
 	/*  instead of pdls[i] its vaffine parent !!!XXX */
-	pdl_barf_if_error(pdl_affine_new(pdls[i],child[i],pdl_thr.offs[i],
+	pdl_barf_if_error(pdl_affine_new(pdls[i],child[i],pdl_brc.offs[i],
 		thesedims,realdims[i],
 		theseincs,realdims[i]));
 	pdl_barf_if_error(pdl_make_physical(child[i])); /* make sure we can get at
@@ -924,26 +925,26 @@ threadover(...)
 	csv[i] = sv_newmortal();
 	pdl_SetSV_PDL(csv[i], child[i]); /* pdl* into SV* */
     }
-    int thrloopval;
-    do {  /* the actual threadloop */
+    int brcloopval;
+    do {  /* the actual broadcastloop */
 	pdl_trans *traff;
-    	dSP;
+	dSP;
 	PUSHMARK(sp);
 	EXTEND(sp,npdls);
 	for(i=0; i<npdls; i++) {
 	   /* just twiddle the offset - quick and dirty */
 	   /* we must twiddle both !! */
 	   traff = child[i]->trans_parent;
-	   traff->offs = pdl_thr.offs[i];
-	   child[i]->vafftrans->offs = pdl_thr.offs[i];
+	   traff->offs = pdl_brc.offs[i];
+	   child[i]->vafftrans->offs = pdl_brc.offs[i];
 	   child[i]->state |= PDL_PARENTDATACHANGED;
 	   PUSHs(csv[i]);
 	}
 	for (i=0; i<nothers; i++)
 	  PUSHs(others[i]);   /* pass the OtherArgs onto the stack */
-    	PUTBACK;
+	PUTBACK;
 	perl_call_sv(code,G_DISCARD);
-	thrloopval = pdl_iterthreadloop(&pdl_thr,0);
-	if ( thrloopval < 0 ) die("Error in iterthreadloop");
-    } while( thrloopval );
-    pdl_freethreadstruct(&pdl_thr);
+	brcloopval = pdl_iterbroadcastloop(&pdl_brc,0);
+	if ( brcloopval < 0 ) die("Error in iterbroadcastloop");
+    } while( brcloopval );
+    pdl_freebroadcaststruct(&pdl_brc);

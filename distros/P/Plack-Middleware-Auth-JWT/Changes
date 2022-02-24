@@ -1,5 +1,9 @@
 Revision history for Plack::Middleware::Auth::JWT
 
+0.906     2022-02-22 09:51:35+01:00
+     - Fixed type-o in see also doc (Michael R. Davis)
+
+
 0.905     2021-01-03 17:44:47+01:00
     - dist housekeeping: github issues,
       Dist::Zilla::PluginBundle::Author::DOMM

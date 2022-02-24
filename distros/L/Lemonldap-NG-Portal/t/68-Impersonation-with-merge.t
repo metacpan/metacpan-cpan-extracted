@@ -164,15 +164,16 @@ count(1);
 my $json;
 ok( $json = eval { from_json( $res->[2]->[0] ) }, 'Response is JSON' )
   or print STDERR "$@\n" . Dumper($res);
-my @real_hGroups = map { $_->{key} eq 'real_hGroups' ? $_ : () }
-  @{ $json->{ATTRIBUTES} };
-ok( keys %{$real_hGroups[0]->{value}} == 5, 'Right number of real_hGroups found' )
-  or explain( $real_hGroups[0]->{value}, 'Wrong real_hGroups' );
+my @real_hGroups =
+  map { $_->{key} eq 'real_hGroups' ? $_ : () } @{ $json->{ATTRIBUTES} };
+ok(
+    keys %{ $real_hGroups[0]->{value} } == 5,
+    'Right number of real_hGroups found'
+) or explain( $real_hGroups[0]->{value}, 'Wrong real_hGroups' );
 count(2);
 
-my @hGroups = map { $_->{key} eq 'hGroups' ? $_ : () }
-  @{ $json->{ATTRIBUTES} };
-ok( keys %{$hGroups[0]->{value}} == 6, 'Right number of hGroups found' )
+my @hGroups = map { $_->{key} eq 'hGroups' ? $_ : () } @{ $json->{ATTRIBUTES} };
+ok( keys %{ $hGroups[0]->{value} } == 6, 'Right number of hGroups found' )
   or explain( $hGroups[0]->{value}, 'Wrong hGroups' );
 count(1);
 

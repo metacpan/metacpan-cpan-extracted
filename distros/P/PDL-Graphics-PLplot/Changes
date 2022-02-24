@@ -1,3 +1,6 @@
+0.81 2022-02-20
+- stop passing null ndarray in test as invalid in PDL 2.073
+
 0.80 2021-11-01
 - zap spurious long-double-related test differences
 

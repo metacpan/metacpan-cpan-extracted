@@ -51,11 +51,13 @@ SKIP: {
     ok(
         $res = $issuer->_get(
             '/saml/singleSignOn',
-            query  => buildForm({
-                IDPInitiated => 1,
-                spConfKey => 'sp.com',
-                spDest => 'http://auth.alternate.com/saml/proxySingleSignOnPost',
-            }),
+            query => buildForm( {
+                    IDPInitiated => 1,
+                    spConfKey    => 'sp.com',
+                    spDest       =>
+                      'http://auth.alternate.com/saml/proxySingleSignOnPost',
+                }
+            ),
             cookie => "lemonldap=$idpId",
             accept => 'test/html'
         ),
@@ -69,11 +71,13 @@ SKIP: {
     ok(
         $res = $issuer->_get(
             '/saml/singleSignOn',
-            query  => buildForm({
-                IDPInitiated => 1,
-                spConfKey => 'sp.com',
-                spDest => 'http://auth.perdu.com/saml/proxySingleSignOnPost',
-            }),
+            query => buildForm( {
+                    IDPInitiated => 1,
+                    spConfKey    => 'sp.com',
+                    spDest       =>
+                      'http://auth.perdu.com/saml/proxySingleSignOnPost',
+                }
+            ),
             cookie => "lemonldap=$idpId",
             accept => 'test/html'
         ),
@@ -144,8 +148,8 @@ m#iframe src="http://auth.idp.com(/saml/relaySingleLogoutPOST)\?(relay=.*?)"#s,
         'Get iframe request'
     ) or explain( $res, '' );
     ( $url, $query ) = ( $1, $2 );
-    expectCspChildOK($res, "auth.idp.com");
-    expectCspChildOK($res, "http://auth.sp.com");
+    expectCspChildOK( $res, "auth.idp.com" );
+    expectCspChildOK( $res, "http://auth.sp.com" );
 
     ok(
         $res = $issuer->_get(

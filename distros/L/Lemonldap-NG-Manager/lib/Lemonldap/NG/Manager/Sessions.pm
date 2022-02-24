@@ -248,7 +248,8 @@ sub sessions {
                 value    => $uid,
                 count    => scalar( @{ $r->{$uid} } ),
                 sessions => [
-                    map { {
+                    map {
+                        {
                             session =>
                               $self->_maybeEncryptSessionId( $_->{_sessionId} ),
                             date => $_->{_utime}
@@ -399,7 +400,8 @@ qq{Use of an uninitialized attribute "$group" to group sessions},
     else {
         $res = [
             sort { $a->{date} <=> $b->{date} }
-              map { {
+              map {
+                {
                     session => $self->_maybeEncryptSessionId($_),
                     date    => $res->{$_}->{_utime}
                 }
@@ -459,8 +461,8 @@ sub delSession {
 }
 
 sub cmpIPv4 {
-    my @a = split /\./, $_[0];
-    my @b = split /\./, $_[1];
+    my @a   = split /\./, $_[0];
+    my @b   = split /\./, $_[1];
     my $cmp = 0;
   F: for ( my $i = 0 ; $i < 4 ; $i++ ) {
         if ( $a[$i] != $b[$i] ) {

@@ -113,7 +113,8 @@ sub portalConstants {
         PE_UPGRADESESSION                    => 102,
         PE_NO_SECOND_FACTORS                 => 103,
         PE_BAD_DEVOPS_FILE                   => 104,
-        PE_FILENOTFOUND                      => 105
+        PE_FILENOTFOUND                      => 105,
+        PE_OIDC_AUTH_ERROR                   => 106,
     };
 }
 

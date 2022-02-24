@@ -2,7 +2,7 @@
 # Display functions for LemonLDAP::NG Portal
 package Lemonldap::NG::Portal::Main::Display;
 
-our $VERSION = '2.0.12';
+our $VERSION = '2.0.14';
 
 package Lemonldap::NG::Portal::Main;
 use strict;
@@ -13,6 +13,7 @@ use URI;
 has isPP          => ( is => 'rw' );
 has speChars      => ( is => 'rw' );
 has skinRules     => ( is => 'rw' );
+has stayConnected => ( is => 'rw', default => sub { 0 } );
 has requireOldPwd => ( is => 'rw', default => sub { 1 } );
 
 sub displayInit {
@@ -28,17 +29,25 @@ sub displayInit {
             else {
                 $self->logger->error(
                     qq(Skin rule "$skinRule" returns an error: )
-                      . HANDLER->tsv->{jail}->error );
+                      . HANDLER->tsv->{jail}->error
+                      || 'Unable to compile rule' );
             }
         }
     }
     my $rule = HANDLER->buildSub(
         HANDLER->substitute( $self->conf->{portalRequireOldPassword} ) );
     unless ($rule) {
-        my $error = HANDLER->tsv->{jail}->error || '???';
-        $self->logger->error( "Bad requireOldPwd rule: " . $error );
+        my $error = HANDLER->tsv->{jail}->error || 'Unable to compile rule';
+        $self->logger->error("Bad requireOldPwd rule: $error");
     }
     $self->requireOldPwd($rule);
+    $rule =
+      HANDLER->buildSub( HANDLER->substitute( $self->conf->{stayConnected} ) );
+    unless ($rule) {
+        my $error = HANDLER->tsv->{jail}->error || 'Unable to compile rule';
+        $self->logger->error("Bad stayConnected rule: $error");
+    }
+    $self->stayConnected($rule);
 
     my $speChars =
       $self->conf->{passwordPolicySpecialChar} eq '__ALL__'
@@ -77,6 +86,7 @@ sub display {
             MAIN_LOGO       => $self->conf->{portalMainLogo},
             LANGS           => $self->conf->{showLanguages},
             AUTH_ERROR_TYPE => $req->error_type,
+            AUTH_ERROR_ROLE => $req->error_role,
             NOTIFICATION    => $notif,
             HIDDEN_INPUTS   => $self->buildHiddenForm($req),
             AUTH_URL        => $req->{data}->{_url},
@@ -100,6 +110,7 @@ sub display {
             LANGS           => $self->conf->{showLanguages},
             AUTH_ERROR      => $req->error,
             AUTH_ERROR_TYPE => $req->error_type,
+            AUTH_ERROR_ROLE => $req->error_role,
             AUTH_URL        => $req->{data}->{_url},
             MSG             => $req->info,
             HIDDEN_INPUTS   => $self->buildHiddenForm($req),
@@ -131,6 +142,7 @@ sub display {
             LANGS           => $self->conf->{showLanguages},
             AUTH_ERROR      => $req->error,
             AUTH_ERROR_TYPE => $req->error_type,
+            AUTH_ERROR_ROLE => $req->error_role,
             AUTH_URL        => $req->{data}->{_url},
             HIDDEN_INPUTS   => $self->buildHiddenForm($req),
             ACTIVE_TIMER    => $req->data->{activeTimer},
@@ -142,7 +154,7 @@ sub display {
             ASK_LOGINS        => $req->param('checkLogins')   || 0,
             ASK_STAYCONNECTED => $req->param('stayconnected') || 0,
             CONFIRMKEY        => $self->stamp(),
-            LIST => $req->data->{list} || [],
+            LIST              => $req->data->{list} || [],
             (
                 $req->data->{customScript}
                 ? ( CUSTOM_SCRIPT => $req->data->{customScript} )
@@ -165,8 +177,9 @@ sub display {
             LANGS           => $self->conf->{showLanguages},
             AUTH_ERROR      => $self->error,
             AUTH_ERROR_TYPE => $req->error_type,
+            AUTH_ERROR_ROLE => $req->error_role,
             MSG             => $info,
-            URL => $req->{urldc} || $self->conf->{portal},    # Fix 2158
+            URL           => $req->{urldc} || $self->conf->{portal},  # Fix 2158
             HIDDEN_INPUTS => $self->buildOutgoingHiddenForm( $req, $method ),
             ACTIVE_TIMER  => $req->data->{activeTimer},
             CHOICE_PARAM  => $self->conf->{authChoiceParam},
@@ -198,6 +211,7 @@ sub display {
             LANGS           => $self->conf->{showLanguages},
             AUTH_ERROR      => $self->error,
             AUTH_ERROR_TYPE => $req->error_type,
+            AUTH_ERROR_ROLE => $req->error_role,
             PROVIDERURI     => $p,
             MSG             => $req->info(),
             (
@@ -239,11 +253,9 @@ sub display {
             LANGS     => $self->conf->{showLanguages},
             AUTH_USER => $req->{sessionInfo}->{ $self->conf->{portalUserAttr} },
             NEWWINDOW => $self->conf->{portalOpenLinkInNewWindow},
-            LOGOUT_URL     => $self->conf->{portal} . "?logout=1",
-            APPSLIST_ORDER => $req->{sessionInfo}->{'_appsListOrder'},
-            PING           => $self->conf->{portalPingInterval},
-            REQUIRE_OLDPASSWORD =>
-              $self->requireOldPwd->( $req, $req->userData ),
+            LOGOUT_URL          => $self->conf->{portal} . "?logout=1",
+            APPSLIST_ORDER      => $req->{sessionInfo}->{'_appsListOrder'},
+            PING                => $self->conf->{portalPingInterval},
             DONT_STORE_PASSWORD => $self->conf->{browsersDontStorePassword},
             HIDE_OLDPASSWORD    => 0,
             PPOLICY_NOPOLICY    => !$self->isPP(),
@@ -253,6 +265,11 @@ sub display {
             PPOLICY_MINUPPER    => $self->conf->{passwordPolicyMinUpper},
             PPOLICY_MINDIGIT    => $self->conf->{passwordPolicyMinDigit},
             PPOLICY_MINSPECHAR  => $self->conf->{passwordPolicyMinSpeChar},
+            (
+                $self->requireOldPwd->( $req, $req->userData )
+                ? ( REQUIRE_OLDPASSWORD => 1 )
+                : ()
+            ),
             (
                 $self->conf->{passwordPolicyMinSpeChar} || $self->speChars()
                 ? ( PPOLICY_ALLOWEDSPECHAR => $self->speChars() )
@@ -352,6 +369,7 @@ sub display {
             LANGS           => $self->conf->{showLanguages},
             AUTH_ERROR      => $req->error,
             AUTH_ERROR_TYPE => $req->error_type,
+            AUTH_ERROR_ROLE => $req->error_role,
             LOCKTIME        => $req->lockTime(),
             (
                 $req->data->{customScript}
@@ -364,42 +382,56 @@ sub display {
     # 3 Authentication has been refused OR first access
     else {
         $skinfile = 'login';
-        my $login = $self->userId($req);
-        if ( $login eq 'anonymous' ) {
-            $login = '';
-        }
-        elsif ( $req->user ) {
-            $login = $req->{user};
-        }
+        my $login = $req->user;
         %templateParams = (
             MAIN_LOGO             => $self->conf->{portalMainLogo},
             LANGS                 => $self->conf->{showLanguages},
             AUTH_ERROR            => $req->error,
             AUTH_ERROR_TYPE       => $req->error_type,
+            AUTH_ERROR_ROLE       => $req->error_role,
             AUTH_URL              => $req->{data}->{_url},
             LOGIN                 => $login,
             DONT_STORE_PASSWORD   => $self->conf->{browsersDontStorePassword},
             CHECK_LOGINS          => $self->conf->{portalCheckLogins},
-            ASK_LOGINS            => $req->param('checkLogins') || 0,
+            ASK_LOGINS            => $req->param('checkLogins')   || 0,
             ASK_STAYCONNECTED     => $req->param('stayconnected') || 0,
             DISPLAY_RESETPASSWORD => $self->conf->{portalDisplayResetPassword},
             DISPLAY_REGISTER      => $self->conf->{portalDisplayRegister},
-            DISPLAY_UPDATECERTIF =>
+            DISPLAY_UPDATECERTIF  =>
               $self->conf->{portalDisplayCertificateResetByMail},
             MAILCERTIF_URL => $self->conf->{certificateResetByMailURL},
             MAIL_URL       => $self->conf->{mailUrl},
             REGISTER_URL   => $self->conf->{registerUrl},
             HIDDEN_INPUTS  => $self->buildHiddenForm($req),
-            STAYCONNECTED  => $self->conf->{stayConnected},
-            IMPERSONATION  => $self->conf->{impersonationRule},
+            IMPERSONATION  => $self->conf->{impersonationRule}
+              || $self->conf->{proxyAuthServiceImpersonation},
+            ENABLE_PASSWORD_DISPLAY =>
+              $self->conf->{portalEnablePasswordDisplay},
+            (
+                $self->stayConnected->( $req, $req->sessionInfo )
+                ? ( STAYCONNECTED => 1 )
+                : ()
+            ),
             (
                 $req->data->{customScript}
                 ? ( CUSTOM_SCRIPT => $req->data->{customScript} )
                 : ()
             ),
-            ENABLE_PASSWORD_DISPLAY =>
-              $self->conf->{portalEnablePasswordDisplay},
         );
+
+        # External links
+        if ( $self->conf->{portalDisplayResetPassword} ) {
+            $templateParams{"MAIL_URL_EXTERNAL"} =
+              $self->_isExternalUrl( $self->conf->{mailUrl} );
+        }
+        if ( $self->conf->{portalDisplayRegister} ) {
+            $templateParams{"REGISTER_URL_EXTERNAL"} =
+              $self->_isExternalUrl( $self->conf->{registerUrl} );
+        }
+        if ( $self->conf->{portalDisplayCertificateResetByMail} ) {
+            $templateParams{MAILCERTIF_URL_EXTERNAL} =
+              $self->_isExternalUrl( $self->conf->{certificateResetByMailURL} );
+        }
 
         # Display captcha if it's enabled
         if ( $req->captcha ) {
@@ -486,15 +518,15 @@ sub display {
             my $plugin =
               $self->loadedModules->{
                 "Lemonldap::NG::Portal::Plugins::FindUser"};
-            my $fields = [];
-            my $slogin;
+            my ( $fields, $slogin, $mandatory ) = ( [], '', 0 );
+
             if (   $plugin
                 && $self->conf->{findUser}
                 && $self->conf->{impersonationRule}
                 && $self->conf->{findUserSearchingAttributes} )
             {
                 $slogin = $req->data->{findUser};
-                $fields = $plugin->buildForm();
+                ( $fields, $mandatory ) = $plugin->buildForm();
             }
 
             # Authentication loop
@@ -511,6 +543,7 @@ sub display {
                     DISPLAY_OPENID_FORM  => 0,
                     DISPLAY_YUBIKEY_FORM => 0,
                     DISPLAY_FINDUSER     => scalar @$fields,
+                    MANDATORY            => $mandatory,
                     FIELDS               => $fields,
                     SPOOFID              => $slogin
                 );
@@ -535,17 +568,18 @@ sub display {
                     : 0,
                     DISPLAY_SSL_FORM  => $displayType =~ /sslform/ ? 1 : 0,
                     DISPLAY_GPG_FORM  => $displayType =~ /gpgform/ ? 1 : 0,
-                    DISPLAY_LOGO_FORM => $displayType eq "logo"    ? 1 : 0,
+                    DISPLAY_LOGO_FORM => $displayType eq "logo" ? 1 : 0,
                     DISPLAY_FINDUSER  => scalar @$fields,
                     module            => $displayType eq "logo"
                     ? $self->getModule( $req, 'auth' )
                     : "",
-                    AUTH_LOOP => [],
+                    AUTH_LOOP  => [],
                     PORTAL_URL =>
                       ( $displayType eq "logo" ? $self->conf->{portal} : 0 ),
-                    MSG     => $req->info(),
-                    FIELDS  => $fields,
-                    SPOOFID => $slogin
+                    MSG       => $req->info(),
+                    MANDATORY => $mandatory,
+                    FIELDS    => $fields,
+                    SPOOFID   => $slogin
                 );
             }
         }
@@ -618,7 +652,9 @@ sub buildHiddenForm {
 
         # Check XSS attacks
         next
-          if $self->checkXSSAttack( $_, $req->{portalHiddenFormValues}->{$_} );
+          if (!$req->data->{safeHiddenFormValues}->{$_}
+            && $self->checkXSSAttack( $_, $req->{portalHiddenFormValues}->{$_} )
+          );
 
         # Build hidden input HTML code
         # 'id' is removed to avoid warning with Choice
@@ -685,7 +721,21 @@ sub mkSessionArray {
 
     return "" unless ( ref $sessions eq "ARRAY" and @$sessions );
 
-    my @fields = sort keys %{ $self->conf->{sessionDataToRemember} };
+    # Merge user configuration with plugin self-configuration
+    my %rememberedData = %{ $self->pluginSessionDataToRemember };
+    @rememberedData{ keys %{ $self->conf->{sessionDataToRemember} } } =
+      values %{ $self->conf->{sessionDataToRemember} };
+
+    # Delete fields with an empty/undef/__hidden__ column name
+    delete @rememberedData{
+        grep {
+                 ( not $rememberedData{$_} )
+              or ( $rememberedData{$_} eq "__hidden__" )
+        } keys %rememberedData
+    };
+
+    my @fields = sort( keys %rememberedData );
+
     return $self->loadTemplate(
         $req,
         'sessionArray',
@@ -693,11 +743,8 @@ sub mkSessionArray {
             title        => $title,
             displayUser  => $displayUser,
             displayError => $displayError,
-            fields       => [
-                map { { name => $self->conf->{sessionDataToRemember}->{$_} } }
-                  @fields
-            ],
-            sessions => [
+            fields       => [ map { { name => $rememberedData{$_} } } @fields ],
+            sessions     => [
                 map {
                     my $session = $_;
                     {
@@ -763,7 +810,8 @@ sub mkOidcConsent {
         'oidcConsents',
         params => {
             partners => [
-                map { {
+                map {
+                    {
                         name        => $_,
                         epoch       => $consents->{$_}->{epoch},
                         scope       => $consents->{$_}->{scope},
@@ -774,6 +822,11 @@ sub mkOidcConsent {
             consents => join( ",", keys %$consents ),
         }
     );
+}
+
+sub _isExternalUrl {
+    my ( $self, $url ) = @_;
+    return ( index( $url, $self->conf->{portal} ) < 0 );
 }
 
 1;

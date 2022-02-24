@@ -2,7 +2,7 @@ package Lemonldap::NG::Common::Logger::Dispatch;
 
 use strict;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.14';
 
 sub new {
     no warnings 'redefine';
@@ -35,7 +35,7 @@ sub new {
         $show = 0 if ( $conf->{logLevel} eq $l );
 
     }
-    die "unknown level $conf->{logLevel}" if ($show);
+    die "Unknown logLevel $conf->{logLevel}" if ($show);
     return $self;
 }
 

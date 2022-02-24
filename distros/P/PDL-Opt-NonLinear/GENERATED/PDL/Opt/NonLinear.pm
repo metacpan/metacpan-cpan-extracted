@@ -11,7 +11,7 @@ use PDL::Exporter;
 use DynaLoader;
 
 
-   our $VERSION = '0.07';
+   our $VERSION = '0.08';
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::Opt::NonLinear $VERSION;
@@ -19,6 +19,9 @@ use DynaLoader;
 
 
 
+
+
+#line 76 "nonlinear.pd"
 
 use strict;
 use PDL::Ufunc;
@@ -67,8 +70,7 @@ Some routines can handle bounds, so:
 	subject to   low <= x <= up
 
 =cut
-
-
+#line 74 "NonLinear.pm"
 
 
 
@@ -80,6 +82,9 @@ Some routines can handle bounds, so:
 =cut
 
 
+
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -177,15 +182,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 186 "NonLinear.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *tensoropt = \&PDL::tensoropt;
+#line 193 "NonLinear.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -372,15 +380,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 384 "NonLinear.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *lbfgs = \&PDL::lbfgs;
+#line 391 "NonLinear.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -651,15 +662,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 666 "NonLinear.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *lbfgsb = \&PDL::lbfgsb;
+#line 673 "NonLinear.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -803,15 +817,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 821 "NonLinear.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *spg = \&PDL::spg;
+#line 828 "NonLinear.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -916,15 +933,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 937 "NonLinear.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *lmqn = \&PDL::lmqn;
+#line 944 "NonLinear.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -1037,15 +1057,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 1061 "NonLinear.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *lmqnbc = \&PDL::lmqnbc;
+#line 1068 "NonLinear.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -1170,15 +1193,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 1197 "NonLinear.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *cgfam = \&PDL::cgfam;
+#line 1204 "NonLinear.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -1302,15 +1328,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 1332 "NonLinear.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *hooke = \&PDL::hooke;
+#line 1339 "NonLinear.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -1849,15 +1878,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 1882 "NonLinear.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *gencan = \&PDL::gencan;
+#line 1889 "NonLinear.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -2280,15 +2312,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 2316 "NonLinear.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *sgencan = \&PDL::sgencan;
+#line 2323 "NonLinear.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -2371,15 +2406,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 2410 "NonLinear.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *dhc = \&PDL::dhc;
+#line 2417 "NonLinear.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -2501,15 +2539,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 2543 "NonLinear.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *de_opt = \&PDL::de_opt;
+#line 2550 "NonLinear.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -2689,17 +2730,20 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 2734 "NonLinear.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *asa_opt = \&PDL::asa_opt;
+#line 2741 "NonLinear.pm"
 
 
 
 
+
+#line 3861 "nonlinear.pd"
 
 
 sub rosen{
@@ -3327,7 +3371,7 @@ All rights reserved. This program is free software; you can
 redistribute it and/or modify it under the same terms as Perl itself.
 
 =cut
-
+#line 3375 "NonLinear.pm"
 
 
 

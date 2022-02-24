@@ -509,10 +509,10 @@ our @ISA = qw (PDL::PP::Rule);
 my @std_redodims = (
   SETNDIMS => sub {PDL::PP::pp_line_numbers(__LINE__-1, "PDL_RETERROR(PDL_err, PDL->reallocdims(__it,$_[0]));")},
   SETDIMS => sub {PDL::PP::pp_line_numbers(__LINE__-1, "PDL_RETERROR(PDL_err, PDL->setdims_careful(__it));")},
-  SETDELTATHREADIDS => sub {PDL::PP::pp_line_numbers(__LINE__, <<EOF)},
-{int __ind; PDL_RETERROR(PDL_err, PDL->reallocthreadids(\$CHILD_PTR(), \$PARENT(nthreadids)));
-for(__ind=0; __ind<\$PARENT(nthreadids); __ind++)
-  \$CHILD(threadids[__ind]) = \$PARENT(threadids[__ind]) + ($_[0]);
+  SETDELTABROADCASTIDS => sub {PDL::PP::pp_line_numbers(__LINE__, <<EOF)},
+{int __ind; PDL_RETERROR(PDL_err, PDL->reallocbroadcastids(\$CHILD_PTR(), \$PARENT(nbroadcastids)));
+for(__ind=0; __ind<\$PARENT(nbroadcastids); __ind++)
+  \$CHILD(broadcastids[__ind]) = \$PARENT(broadcastids[__ind]) + ($_[0]);
 }
 EOF
 );
@@ -821,7 +821,7 @@ sub pp_addpm {
 	  $pos = 'Middle';
 	}
 	my @c = caller;
-	$::PDLPM{$pos} .= _pp_line_number_file(@c[1,2], $pm) . "\n\n";
+	$::PDLPM{$pos} .= _pp_line_number_file($c[1], $c[2]-1, "\n$pm")."\n\n";
 }
 
 sub pp_add_exported {
@@ -890,7 +890,7 @@ sub _pp_line_number_file {
 	$line++;
 	$filename =~ s/\\/\\\\/g; # Escape backslashes
 	my @to_return = "\nPDL_LINENO_START $line \"$filename\"\n";
-	# Look for threadloops and loops and add # line directives
+	# Look for broadcastloops and loops and add # line directives
 	foreach (split (/\n/, $string)) {
 		# Always add the current line.
 		push @to_return, "$_\n";
@@ -1057,7 +1057,7 @@ EOF
 	PDL::PP->pp_add_exported($name);
 	PDL::PP::pp_addpm("\n".$obj{PdlDoc}."\n") if $obj{PdlDoc};
 	PDL::PP::pp_addpm($obj{PMCode}) if defined $obj{PMCode};
-	PDL::PP::pp_addpm($obj{PMFunc}."\n");
+	PDL::PP::pp_addpm($obj{PMFunc}."\n") if defined $obj{PMFunc};
 
 	print "*** Leaving pp_def for $name\n" if $::PP_VERBOSE;
 }
@@ -1399,7 +1399,7 @@ $PDL::PP::deftbl =
             $CHILD(dims[i]) = $PARENT(dims[i]);
           }
           $SETDIMS();
-          $SETDELTATHREADIDS(0);
+          $SETDELTABROADCASTIDS(0);
           $PRIV(dims_redone) = 1;
         '),
         # NOTE: we use the same bit of code for all-good and bad data -
@@ -1610,9 +1610,10 @@ EOD
    PDL::PP::Rule::Returns->new("StructName", "__privtrans"),
    PDL::PP::Rule::Returns->new("ParamStructName", "__params"),
 
+   PDL::PP::Rule->new("HaveBroadcasting","HaveThreading", sub {@_}), # compat
    PDL::PP::Rule::Croak->new([qw(P2Child GenericTypes)],
        'Cannot have both P2Child and GenericTypes defined'),
-   PDL::PP::Rule->new([qw(Pars HaveThreading CallCopy GenericTypes DefaultFlow AllFuncHeader RedoDimsFuncHeader)],
+   PDL::PP::Rule->new([qw(Pars HaveBroadcasting CallCopy GenericTypes DefaultFlow AllFuncHeader RedoDimsFuncHeader)],
 		      ["P2Child","Name","StructName"],
       sub {
         my (undef,$name,$sname) = @_;
@@ -1661,7 +1662,7 @@ EOD
             $PRIV(incs[i]) = $PARENT(dimincs[cor]);
           }
           $SETDIMS();
-          $SETDELTATHREADIDS(0);
+          $SETDELTABROADCASTIDS(0);
           $PRIV(dims_redone) = 1;
         ');
       }),
@@ -1697,7 +1698,7 @@ EOD
       #      else                   { good-EquivCPOffsCode }
       #
       #  Note: since EquivCPOffsCode doesn't (or I haven't seen any that
-      #  do) use 'loop %{' or 'threadloop %{', we can't rely on
+      #  do) use 'loop %{' or 'broadcastloop %{', we can't rely on
       #  PDLCode to automatically write code like above, hence the
       #  explicit definition here.
       #
@@ -1741,10 +1742,10 @@ EOD
 
    PDL::PP::Rule::InsertName->new("NewXSName", '_${name}_int'),
 
-   PDL::PP::Rule::Returns::One->new("HaveThreading"),
+   PDL::PP::Rule::Returns::One->new("HaveBroadcasting"),
 
 # Parameters in the 'a(x,y); [o]b(y)' format, with
-# fixed nos of real, unthreaded-over dims.
+# fixed nos of real, unbroadcast-over dims.
 # Also "Other pars", the parameters which are usually not pdls.
    PDL::PP::Rule->new("SignatureObj", ["Pars","BadFlag","OtherPars"],
       sub { PDL::PP::Signature->new(@_) }),
@@ -2201,12 +2202,12 @@ EOF
    PDL::PP::Rule->new("VTableDef",
       ["VTableName","ParamStructType","RedoDimsFuncName","ReadDataFuncName",
        "WriteBackDataFuncName","FreeFuncName",
-       "SignatureObj","Affine_Ok","HaveThreading","NoPthread","Name",
+       "SignatureObj","Affine_Ok","HaveBroadcasting","NoPthread","Name",
        "GenericTypes","IsAffineFlag","TwoWayFlag","DefaultFlowFlag",
        "BadFlag"],
       sub {
         my($vname,$ptype,$rdname,$rfname,$wfname,$ffname,
-           $sig,$affine_ok,$havethreading, $noPthreadFlag, $name, $gentypes,
+           $sig,$affine_ok,$havebroadcasting, $noPthreadFlag, $name, $gentypes,
            $affflag, $revflag, $flowflag, $badflag) = @_;
         my ($pnames, $pobjs) = ($sig->names_sorted, $sig->objs);
         my $nparents = 0 + grep {! $pobjs->{$_}->{FlagW}} @$pnames;
@@ -2215,7 +2216,7 @@ EOF
         my $join_flags = join(", ",map {$pobjs->{$pnames->[$_]}->{FlagPhys} ?
                                           0 : $aff} 0..$npdls-1) || '0';
         my @op_flags;
-        push @op_flags, 'PDL_TRANS_DO_THREAD' if $havethreading;
+        push @op_flags, 'PDL_TRANS_DO_BROADCAST' if $havebroadcasting;
         push @op_flags, 'PDL_TRANS_BADPROCESS' if $badflag;
         push @op_flags, 'PDL_TRANS_BADIGNORE' if defined $badflag and !$badflag;
         push @op_flags, 'PDL_TRANS_NO_PARALLEL' if $noPthreadFlag;

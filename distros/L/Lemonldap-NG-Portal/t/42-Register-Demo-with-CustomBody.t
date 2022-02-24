@@ -28,11 +28,11 @@ SKIP: {
                 registerDB             => 'Demo',
                 registerTimeout        => '600',
                 registerConfirmSubject => 'Registration demonstration',
-                registerConfirmBody =>
+                registerConfirmBody    =>
 'Hello $firstname $lastname, follows this link to register your account $url
 Expired time: $expMailDate $expMailTime',
                 registerDoneSubject => 'Registration successful',
-                registerDoneBody =>
+                registerDoneBody    =>
 'Congratulations! Your account has been succesfully created with $mail from [$ipAddr]...
 Login=$login & Password=$password - Thanks to LemonLDAP::NG team.
 Go to Portal $url',

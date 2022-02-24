@@ -3,9 +3,9 @@ package IO::AsyncX::Notifier;
 
 use Object::Pad;
 
-class IO::AsyncX::Notifier extends IO::Async::Notifier;
+class IO::AsyncX::Notifier :isa(IO::Async::Notifier);
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 =head1 NAME
 
@@ -15,24 +15,24 @@ IO::AsyncX::Notifier - easier IO::Async::Notifiers with Object::Pad
 
  use Object::Pad;
  class Example isa IO::AsyncX::Notifier {
-  # This will be populated by ->configure(example_slot => ...)
-  # or ->new(example_slot => ...)
-  has $example_slot;
+  # This will be populated by ->configure(example_field => ...)
+  # or ->new(example_field => ...)
+  has $example_field;
   # This will be updated by ->configure (or ->new) in a similar fashion
   use Ryu::Observable;
-  has $observable_slot { Ryu::Observable->new };
+  has $observable_field { Ryu::Observable->new };
 
-  # You can have as many other slots as you want, main limitation
+  # You can have as many other fields as you want, main limitation
   # at the moment is that they have to be scalars.
 
   method current_values () {
-   'Example slot: ' . $example_slot,
-   ' and observable set to ' . $observable_slot->as_string
+   'Example field: ' . $example_field,
+   ' and observable set to ' . $observable_field->as_string
   }
  }
  my $obj = Example->new(
-  example_slot    => 'xyz',
-  observable_slot => 'starting value'
+  example_field    => 'xyz',
+  observable_field => 'starting value'
  );
  print join "\n", $obj->current_values;
 
@@ -65,32 +65,32 @@ method configure (%args) {
     # This does nothing until we have finished Object::Pad instantiation
     return unless $prepared;
 
-    # We only care about slots in the lowest-level subclass: there
+    # We only care about fields in the lowest-level subclass: there
     # is no support for IaNotifier -> first sub level -> second sub level
     # yet, since it's usually preferable to inherit directly from IaNotifier
     my $class = Object::Pad::MOP::Class->for_class(ref $self);
 
     # Ordering is enforced to make behaviour more predictable
-    SLOT:
+    FIELD:
     for my $k (sort keys %args) {
         try {
-            # Only scalar slots are supported currently
-            my $slot = $class->get_slot('$' . $k);
+            # Only scalar fields are supported currently
+            my $field = $class->get_field('$' . $k);
 
             my $v = delete $args{$k};
             # There isn't a standard protocol for "observable types", so
             # we only support Ryu::Observable currently.
-            if(Scalar::Util::blessed(my $current = $slot->value($self))) {
+            if(Scalar::Util::blessed(my $current = $field->value($self))) {
                 if($current->isa('Ryu::Observable')) {
                     $current->set_string($v);
-                    next SLOT;
+                    next FIELD;
                 }
             }
 
-            $slot->value($self) = $v;
+            $field->value($self) = $v;
         } catch($e) {
             # We really don't want to hide errors, but this might be good enough for now.
-            die $e unless $e =~ /does not have a slot/;
+            die $e unless $e =~ /does not have a field/;
         }
     }
 

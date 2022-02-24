@@ -118,8 +118,7 @@ $x = pdl(pdl(5));
 ok all( $x== pdl(5)), "pdl() can piddlify an ndarray";
 
 $x = pdl(null);
-is_deeply [$x->dims], [0], 'pdl(null) gives empty' or diag "x(", $x->info, ")";
-ok !$x->isnull, 'pdl(null) gives non-null' or diag "x(", $x->info, ")";
+ok $x->isnull, 'pdl(null) gives null' or diag "x(", $x->info, ")";
 
 $x = pdl(null, null);
 is_deeply [$x->dims], [0,2], 'pdl(null, null) gives empty' or diag "x(", $x->info, ")";
@@ -158,23 +157,24 @@ do {
 
 # empty pdl cases
 eval {$x = zeroes(2,0,1);};
-ok(!$@,"zeroes accepts empty PDL specification");
+is($@, '', "zeroes accepts empty PDL specification");
 
 eval { $y = pdl($x,sequence(2,0,1)); };
-ok((!$@ and all(pdl($y->dims) == pdl(2,0,1,2))), "concatenating two empties gives an empty");
+is $@, '';
+ok all(pdl($y->dims) == pdl(2,0,1,2)), "concatenating two empties gives an empty";
 
 eval { $y = pdl($x,sequence(2,1,1)); };
-ok((!$@ and all(pdl($y->dims) == pdl(2,1,1,2))), "concatenating an empty and a nonempty treats the empty as a filler");
+is $@, '';
+ok all(pdl($y->dims) == pdl(2,1,1,2)), "concatenating an empty and a nonempty treats the empty as a filler";
 
 eval { $y = pdl($x,5) };
-ok((!$@ and all(pdl($y->dims)==pdl(2,1,1,2))), "concatenating an empty and a scalar on the right works");
-ok( all($y==pdl([[[0,0]]],[[[5,0]]])), "concatenating an empty and a scalar on the right gives the right answer");
+is $@, '';
+ok all(pdl($y->dims)==pdl(2,1,1,2)), "concatenating an empty and a scalar on the right works";
 
 eval { $y = pdl(5,$x) };
-ok((!$@ and all(pdl($y->dims)==pdl(2,1,1,2))), "concatenating an empty and a scalar on the left works");
+is $@, '';
+ok all(pdl($y->dims)==pdl(2,1,1,2)), "concatenating an empty and a scalar on the left works";
 ok( all($y==pdl([[[5,0]]],[[[0,0]]])), "concatenating an empty and a scalar on the left gives the right answer");
-
-# end
 
 # cat problems
 eval {cat(1, pdl(1,2,3), {}, 6)};
@@ -207,7 +207,7 @@ like($@, qr/\(argument 1\)/,
 $@ = '';
 
 eval {$x = cat(pdl(1),pdl(2,3));};
-ok(!$@, 'cat(pdl(1),pdl(2,3)) succeeds');
+is($@, '', 'cat(pdl(1),pdl(2,3)) succeeds');
 ok( ($x->ndims==2 and $x->dim(0)==2 and $x->dim(1)==2), 'weird cat case has the right shape');
 ok( all( $x == pdl([1,1],[2,3]) ), "cat does the right thing with catting a 0-pdl and 2-pdl together");
 $@='';
@@ -258,7 +258,9 @@ ok(all($y==$x),"new_or_inplace returns the original thing if inplace is set");
 ok(!($y->is_inplace),"new_or_inplace clears the inplace flag");
 
 # check reshape and dims.  While we're at it, check null & empty creation too.
-my $empty = zeroes(0);
+my $empty = empty();
+is $empty->type->enum, 0, 'empty() gives lowest-numbered type';
+is empty(float)->type, 'float', 'empty(float) works';
 ok($empty->nelem==0,"you can make an empty PDL with zeroes(0)");
 ok("$empty" =~ m/Empty/, "an empty PDL prints 'Empty'");
 
@@ -275,7 +277,7 @@ ok($empty->isempty, "an empty ndarray is empty");
 
 $x = short pdl(3,4,5,6);
 eval { $x->reshape(2,2);};
-ok(!$@,"reshape succeeded in the normal case");
+is($@, '', "reshape succeeded in the normal case");
 ok( ( $x->ndims==2 and $x->dim(0)==2 and $x->dim(1)==2 ), "reshape did the right thing");
 ok(all($x == short pdl([[3,4],[5,6]])), "reshape moved the elements to the right place");
 

@@ -1,3 +1,11 @@
+0.004   2022-02-05  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Tweak Description and See Also POD sections. Mention
+          Begin::Eval::* modules.
+
+
 0.003   2021-08-13  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

@@ -1,5 +1,5 @@
 package App::xspf2m3u;
-$App::xspf2m3u::VERSION = '0.0.2';
+$App::xspf2m3u::VERSION = '0.2.0';
 use strict;
 use warnings;
 use 5.016;
@@ -21,7 +21,7 @@ App::xspf2m3u - convert .xspf playlists to .m3u ones.
 
 =head1 VERSION
 
-version 0.0.2
+version 0.2.0
 
 =for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
@@ -44,27 +44,11 @@ L<https://metacpan.org/release/App-xspf2m3u>
 
 =item *
 
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/App-xspf2m3u>
-
-=item *
-
 RT: CPAN's Bug Tracker
 
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-xspf2m3u>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/App-xspf2m3u>
 
 =item *
 

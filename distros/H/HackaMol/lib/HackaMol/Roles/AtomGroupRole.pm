@@ -1,5 +1,5 @@
 package HackaMol::Roles::AtomGroupRole;
-$HackaMol::Roles::AtomGroupRole::VERSION = '0.051';
+$HackaMol::Roles::AtomGroupRole::VERSION = '0.053';
 #ABSTRACT: Role for a group of atoms
 use Moose::Role;
 use Carp;
@@ -63,6 +63,7 @@ sub _lsq_slope {
     # private function used for each coordinate 
     # translation of tcl function written by Justin Gullingsrud @ uiuc.edu 
     # algorithm reference: Bevington
+    # https://www.ks.uiuc.edu/Research/vmd/mailing_list/vmd-l/att-2279/fit_angle.tcl
     # Fit the points x to x = ai + b, i=0...N-1, and return the value of a 
     # a = 12/( (N(N^2 - 1)) ) sum[ (i-(N-1)/2) * xi]    
     my $xis = shift || die "expecting array_ref of cartesian coordinate [x y or z]";
@@ -441,7 +442,7 @@ sub string_pdb {
     $string .= sprintf( "MODEL       %2i\n", $t + 1 ) unless $self->qcat_print;
 
     my $atform =
-      "%-6s%5i  %-3s%1s%3s %1s%4s%1s   %8.3f%8.3f%8.3f%6.2f%6.2f      %4s%2s\n";
+      "%-6s%5i  %-3s%1s%3s%2s%4s%1s   %8.3f%8.3f%8.3f%6.2f%6.2f      %4s%2s\n";
 
     foreach my $at (@atoms) {
 
@@ -449,7 +450,7 @@ sub string_pdb {
         my $form = $atform;
         if ( length $at->name > 3 ) {
             $form =
-"%-6s%5i %4s%1s%3s %1s%4s%1s   %8.3f%8.3f%8.3f%6.2f%6.2f      %4s%2s\n";
+      "%-6s%5i %4s%1s%3s%2s%4s%1s   %8.3f%8.3f%8.3f%6.2f%6.2f      %4s%2s\n";
         }
         $string .= sprintf(
             $form,
@@ -559,7 +560,7 @@ HackaMol::Roles::AtomGroupRole - Role for a group of atoms
 
 =head1 VERSION
 
-version 0.051
+version 0.053
 
 =head1 SYNOPSIS
 

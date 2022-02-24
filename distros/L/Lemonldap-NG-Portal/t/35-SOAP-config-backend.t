@@ -63,7 +63,7 @@ SKIP: {
 
     my $res;
     ok( $res = $soap->call('getConfig')->result(), 'Get configuration' );
-    ok( $res->{cfgNum} == 1, 'cfgNum is 1' );
+    ok( $res->{cfgNum} == 1,                       'cfgNum is 1' );
 
     $sp = register( 'sp', \&sp );
 

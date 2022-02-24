@@ -26,6 +26,7 @@ enum {
   /*                                    emits */
   XS_PARSE_KEYWORD_LITERALCHAR = 1,   /* nothing */
   XS_PARSE_KEYWORD_LITERALSTR,        /* nothing */
+  XS_PARSE_KEYWORD_AUTOSEMI,          /* nothing */
   XS_PARSE_KEYWORD_FAILURE = 0x0f,    /* nothing */
 
   XS_PARSE_KEYWORD_BLOCK = 0x10,      /* op */
@@ -119,6 +120,7 @@ enum {
 
 #define XPK_LITERAL(s) {.type = XS_PARSE_KEYWORD_LITERALSTR, .u.str = (const char *)s}
 #define XPK_STRING(s)  XPK_LITERAL(s)
+#define XPK_AUTOSEMI   {.type = XS_PARSE_KEYWORD_AUTOSEMI}
 
 #define XPK_INFIX(select) {.type = XS_PARSE_KEYWORD_INFIX, .u.c = select}
 #define XPK_INFIX_RELATION       XPK_INFIX(XPI_SELECT_RELATION)

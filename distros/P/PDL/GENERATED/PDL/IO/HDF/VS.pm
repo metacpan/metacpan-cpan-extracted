@@ -21,7 +21,8 @@ use DynaLoader;
 
 
 
-#line 5 "VS.pd"
+#line 4 "VS.pd"
+
 use strict;
 use warnings;
 
@@ -46,7 +47,7 @@ For more information on HDF4, see http://www.hdfgroup.org/products/hdf4/
 =head1 FUNCTIONS
 
 =cut
-#line 50 "VS.pm"
+#line 51 "VS.pm"
 
 
 
@@ -54,7 +55,8 @@ For more information on HDF4, see http://www.hdfgroup.org/products/hdf4/
 
 
 
-#line 326 "VS.pd"
+#line 325 "VS.pd"
+
 
 use PDL::Primitive;
 use PDL::Basic;
@@ -257,7 +259,7 @@ sub Vgetchildren
         unless defined( $self->{VGROUP}->{$name}->{children} );
     
     return sort keys %{$self->{VGROUP}->{$name}->{children}};
-#line 261 "VS.pm"
+#line 263 "VS.pm"
 #line 528 "VS.pd"
 } # End of Vgetchildren()...
 # Now defunct:
@@ -274,7 +276,7 @@ sub Vgetattach
         unless defined( $self->{VGROUP}->{$name}->{attach} );
 
     return sort keys %{$self->{VGROUP}->{$name}->{children}};
-#line 278 "VS.pm"
+#line 280 "VS.pm"
 #line 543 "VS.pd"
 } # End of Vgetattach()...
 
@@ -285,7 +287,7 @@ sub Vgetparents
         unless defined( $self->{VGROUP}->{$name}->{parents} );
     
     return sort keys %{$self->{VGROUP}->{$name}->{parents}};
-#line 289 "VS.pm"
+#line 291 "VS.pm"
 #line 552 "VS.pd"
 } # End of Vgetparents()...     
 
@@ -294,7 +296,7 @@ sub Vgetmains
     my ($self) = @_;
     my @rlist;
     foreach( sort keys %{$self->{VGROUP}} )
-#line 298 "VS.pm"
+#line 300 "VS.pm"
 #line 559 "VS.pd"
     {
         push(@rlist, $_) 
@@ -378,7 +380,7 @@ sub VSgetnames
 {
     my $self = shift;
     return sort keys %{$self->{VDATA}};
-#line 382 "VS.pm"
+#line 384 "VS.pm"
 #line 641 "VS.pd"
 } # End of VSgetnames()...
 
@@ -392,7 +394,7 @@ sub VSgetfieldnames
         unless defined( $self->{VDATA}->{$name} );
 
     return sort keys %{$self->{VDATA}->{$name}->{FIELDS}};
-#line 396 "VS.pm"
+#line 398 "VS.pm"
 #line 653 "VS.pd"
 } # End of VSgetfieldnames()...
 # Now defunct:
@@ -511,11 +513,12 @@ sub DESTROY
     my $self = shift;
     $self->close;
 } # End of DESTROY()...
-#line 515 "VS.pm"
+#line 517 "VS.pm"
 
 
 
-#line 777 "VS.pd"
+#line 776 "VS.pd"
+
 
 =head1 CURRENT AUTHOR & MAINTAINER
 
@@ -532,7 +535,7 @@ contribs of Patrick Leilde patrick.leilde@ifremer.fr
 perl(1), PDL(1), PDL::IO::HDF(1).
 
 =cut
-#line 536 "VS.pm"
+#line 539 "VS.pm"
 
 
 

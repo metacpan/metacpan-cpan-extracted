@@ -25,7 +25,7 @@ tie to on B<open> or B<sysopen>.
 
 =head1 VERSION
 
-Version 0.029
+Version 0.030
 
 =cut
 

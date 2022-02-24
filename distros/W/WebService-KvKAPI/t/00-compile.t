@@ -6,11 +6,15 @@ use warnings;
 
 use Test::More;
 
-plan tests => 3 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 7 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'WebService/KvKAPI.pm',
-    'WebService/KvKAPI/Spoof.pm'
+    'WebService/KvKAPI/BasicProfile.pm',
+    'WebService/KvKAPI/Formatters.pm',
+    'WebService/KvKAPI/LocationProfile.pm',
+    'WebService/KvKAPI/Roles/OpenAPI.pm',
+    'WebService/KvKAPI/Search.pm'
 );
 
 my @scripts = (

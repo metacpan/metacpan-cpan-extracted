@@ -32,7 +32,7 @@ resources:
   homepage: https://github.com/iph0/Redis-ClusterRider
   license: http://dev.perl.org/licenses/
   repository: https://github.com/iph0/Redis-ClusterRider
-version: '0.22'
+version: '0.24'
 x_contributors:
   - 'Sergei Zhmylev <zhmylove@cpan.org>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

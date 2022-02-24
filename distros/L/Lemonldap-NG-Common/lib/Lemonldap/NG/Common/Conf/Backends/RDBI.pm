@@ -19,7 +19,7 @@ sub store {
     $req = $self->_dbh->prepare(
         "INSERT INTO $self->{dbiTable} (cfgNum,field,value) VALUES (?,?,?)");
 
-    _delete($self,$cfgNum) if $lastCfg == $cfgNum;
+    _delete( $self, $cfgNum ) if $lastCfg == $cfgNum;
     unless ($req) {
         $self->logError;
         return UNKNOWN_ERROR;

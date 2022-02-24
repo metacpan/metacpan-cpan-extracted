@@ -7,9 +7,7 @@ BEGIN {
     require 't/test-lib.pm';
 }
 
-my $res;
-my $id;
-my $json;
+my ( $res, $id, $json );
 
 my $client = LLNG::Manager::Test->new( {
         ini => {

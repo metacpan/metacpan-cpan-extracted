@@ -123,7 +123,7 @@ ok( $res->[2]->[0] =~ qq%<h4 trspan="work2f"></h4>%, 'Found translation label' )
   or print STDERR Dumper( $res->[2]->[0] );
 count(1);
 
-ok( $res->[2]->[0] =~ qq%<h4>Home Label</h4>%, 'Found overriden label' )
+ok( $res->[2]->[0] =~ qq%<h4>Home Label</h4>%, 'Found overridden label' )
   or print STDERR Dumper( $res->[2]->[0] );
 count(1);
 

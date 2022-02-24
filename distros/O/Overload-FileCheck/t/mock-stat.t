@@ -16,19 +16,43 @@ use Test2::Plugin::NoWarnings;
 
 use Overload::FileCheck qw(CHECK_IS_FALSE CHECK_IS_TRUE FALLBACK_TO_REAL_OP);
 
+use File::Temp qw{ tempfile tempdir };
+
+my %STATS;
+
+our @FAKE_DIR;
+
+{
+    my ( $fh, $filename ) = tempfile();
+    $STATS{'file'} = [ stat($filename) ];
+
+    my $dir = tempdir( CLEANUP => 1 );
+
+    $STATS{'dir'} = [ stat("$dir") ];
+
+    $STATS{'$0'} = [ stat($0) ];
+
+    $STATS{'perl'} = [ stat($^X) ];
+
+    $STATS{'tty'} = [ stat('/dev/tty') ];
+
+    @FAKE_DIR = ( "$dir/not/there" );
+    push @FAKE_DIR, "/not/there" if -e q[/not/there];
+}
+
 my $current_test = "$0";
 
 my $call_my_stat = 0;
 my $last_called_for;
-our @FAKE_DIR = qw{/a/b/c /usr/somewhere /home/fake};
 
 ok 1, 'start';
 
 my $stat_result = [ stat($0) ];
 is scalar @$stat_result, 13, "call stat unmocked";
 
-my $unmocked_stat_for_perl = [ stat($^X) ];
+my $unmocked_stat_for_perl = $STATS{'perl'};
 
+# note: we are just mocking stat here...
 ok Overload::FileCheck::mock_stat( \&my_stat ), "mock_stat succees";
 
 is $call_my_stat, 0, "my_stat was not called at this point";
@@ -86,8 +110,7 @@ foreach my $f (qw{alpha1 alpha2 alpha3}) {
 
 foreach my $d (@FAKE_DIR) {
     is [ stat($d) ], stat_for_a_directory(), "stat_for_a_directory - $d";
-
-    ok !-e $d, "directory $d does not exist";
+    ok !-d $d, "!-d $d - we are just mocking the stats";
 }
 
 is [ stat('fake.binary') ], stat_for_a_binary(), "stat_for_a_binary - 'fake.binary'";
@@ -113,6 +136,8 @@ like(
 
 is [ stat($^X) ], $unmocked_stat_for_perl, q[stat is mocked but $^X should fallback to the regular stat];
 is [ stat(_) ], $unmocked_stat_for_perl, q[stat is mocked - using _ on an unmocked file];
+
+is [ stat('/empty') ], [], "stat /empty";
 
 # --- END ---
 ok Overload::FileCheck::unmock_all_file_checks(), "unmock all";
@@ -148,77 +173,25 @@ sub my_stat {
 
     return 666 if $f eq 'evil';
 
+    return [] if $f eq '/empty';
+
     return FALLBACK_TO_REAL_OP();
 }
 
 sub fake_stat_for_dollar_0 {
-    return [
-        0,
-        0,
-        4,
-        3,
-        2,
-        1,
-        42,
-        10001,
-        1000,
-        2000,
-        3000,
-        0,
-        0
-    ];
+    $STATS{'$0'};
 }
 
 sub stat_for_a_directory {
-    return [
-        64769,
-        67149975,
-        16877,
-        23,
-        0,
-        0,
-        0,
-        4096,
-        1539271725,
-        1524671853,
-        1524671853,
-        4096,
-        8,
-    ];
+    return $STATS{'dir'};
 }
 
 sub stat_for_a_binary {
-    return [
-        64769,
-        33728572,
-        33261,
-        1,
-        0,
-        0,
-        0,
-        28920,
-        1539797896,
-        1523421302,
-        1526572488,
-        4096,
-        64,
-    ];
+    return $STATS{'perl'};
 }
 
 sub stat_for_a_tty {
-    return [
-        5,
-        1043,
-        8592,
-        1,
-        0,
-        5,
-        1025,
-        0,
-        1538428544,
-        1538428544,
-        1538428550,
-        4096,
-        0,
-    ];
+    return $STATS{'tty'};
 }
+
+1;

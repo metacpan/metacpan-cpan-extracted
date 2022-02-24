@@ -9,7 +9,7 @@ use constant ();
 my $config = File::ShareDir::Dist::dist_config('FFI-ExtractSymbols');
 
 # ABSTRACT: Posix nm implementation for FFI::ExtractSymbols
-our $VERSION = '0.06'; # VERSION
+our $VERSION = '0.07'; # VERSION
 
 
 return 1 if FFI::ExtractSymbols->can('extract_symbols');
@@ -48,7 +48,10 @@ else
 
   $callbacks{$_} ||= sub {} for qw( export code data );
 
-  foreach my $line (`$nm -g -P -D $libpath`)
+  my @flags = qw( -g -P );
+  push @flags, '-D' unless $^O eq 'darwin';
+
+  foreach my $line (`$nm @flags $libpath`)
   {
     next if $line =~ /^\s/;
     my($symbol, $type) = split /\s+/, $line;
@@ -80,7 +83,7 @@ FFI::ExtractSymbols::PosixNm - Posix nm implementation for FFI::ExtractSymbols
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 DESCRIPTION
 

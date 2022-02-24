@@ -7,12 +7,15 @@ use Test::More;
 
 	auto_build;
 
-	has [qw/one two three/] => isa(integer);
+	has [qw/one two three/] => isa(integer), lazy, build_order(1);
 
 	has {
 		four => { isa(string) },
 		five => { isa(hash) }
-	}
+	};
+
+	has six => isa(string(1)), delay, coerce(sub { $_[0]->three + $_[0]->two + $_[0]->one });
+
 }
 
 ok(my $test = Test->new(
@@ -23,7 +26,11 @@ ok(my $test = Test->new(
 	five => { a => "b" },
 ));
 
-is($test->{one}, 1);
-is($test->{four}, 'fourth');
+is($test->one, 1);
+is($test->four, 'fourth');
+is($test->six, 6);
+is($test->one(undef), undef);
+
 
 done_testing();
+

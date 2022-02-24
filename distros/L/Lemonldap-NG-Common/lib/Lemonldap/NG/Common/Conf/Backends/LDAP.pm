@@ -194,8 +194,8 @@ sub store {
         $operation = $self->ldap->add(
             $confDN,
             attrs => [
-                objectClass => [ 'top', $self->{ldapObjectClass} ],
-                $self->{ldapAttributeId}      => $confName,
+                objectClass              => [ 'top', $self->{ldapObjectClass} ],
+                $self->{ldapAttributeId} => $confName,
                 $self->{ldapAttributeContent} => \@confValues,
             ]
         );

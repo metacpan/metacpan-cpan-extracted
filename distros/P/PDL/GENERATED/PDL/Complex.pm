@@ -21,7 +21,8 @@ BEGIN {
 
 
 
-#line 18 "complex.pd"
+#line 17 "complex.pd"
+
 use strict;
 use warnings;
 use Carp;
@@ -31,11 +32,12 @@ our $VERSION = '2.009';
    use PDL::Bad;
 
    use vars qw($sep $sep2);
-#line 35 "Complex.pm"
+#line 36 "Complex.pm"
 
 
 
-#line 31 "complex.pd"
+#line 30 "complex.pd"
+
 
 =encoding iso-8859-1
 
@@ -103,7 +105,7 @@ returns a native complex value.
 Use C<r2C(real-values)> to convert from real to complex, as in C<$r
 = Cpow $cplx, r2C 2>. The overloaded operators automatically do that for
 you, all the other functions, do not. So C<Croots 1, 5> will return all
-the fifths roots of 1+1*i (due to threading).
+the fifths roots of 1+1*i (due to broadcasting).
 
 =item *
 
@@ -250,7 +252,7 @@ BEGIN { $i = bless pdl 0,1 }
 no warnings 'redefine';
 sub i { $i->copy + (@_ ? $_[0] : 0) };
 }
-#line 254 "Complex.pm"
+#line 256 "Complex.pm"
 
 
 
@@ -264,7 +266,8 @@ sub i { $i->copy + (@_ ? $_[0] : 0) };
 
 
 
-#line 326 "complex.pd"
+#line 325 "complex.pd"
+
 
 =head2 from_native
 
@@ -366,11 +369,12 @@ sub real($) {
    return $_[0] unless UNIVERSAL::isa($_[0],'PDL::Complex'); # NOOP unless complex
    bless $_[0]->slice(''), 'PDL';
 }
-#line 370 "Complex.pm"
+#line 373 "Complex.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 r2C
@@ -390,11 +394,12 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 394 "Complex.pm"
+#line 398 "Complex.pm"
 
 
 
-#line 1060 "../../blib/lib/PDL/PP.pm"
+#line 1059 "../../blib/lib/PDL/PP.pm"
+
 
 undef &PDL::r2C;
 *PDL::r2C = \&PDL::Complex::r2C;
@@ -403,18 +408,20 @@ sub PDL::Complex::r2C {
   my $r = __PACKAGE__->initialize;
   &PDL::Complex::_r2C_int($_[0], $r);
   $r }
-#line 407 "Complex.pm"
+#line 412 "Complex.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 BEGIN {*r2C = \&PDL::Complex::r2C;
 }
-#line 414 "Complex.pm"
+#line 420 "Complex.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 i2C
@@ -434,24 +441,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 438 "Complex.pm"
-
-
-
-#line 1060 "../../blib/lib/PDL/PP.pm"
-undef &PDL::i2C; *PDL::i2C = \&PDL::Complex::i2C; sub PDL::Complex::i2C { my $r = __PACKAGE__->initialize; &PDL::Complex::_i2C_int($_[0], $r); $r }
-#line 444 "Complex.pm"
-
-
-
-#line 1061 "../../blib/lib/PDL/PP.pm"
-BEGIN {*i2C = \&PDL::Complex::i2C;
-}
-#line 451 "Complex.pm"
+#line 445 "Complex.pm"
 
 
 
 #line 1059 "../../blib/lib/PDL/PP.pm"
+
+undef &PDL::i2C; *PDL::i2C = \&PDL::Complex::i2C; sub PDL::Complex::i2C { my $r = __PACKAGE__->initialize; &PDL::Complex::_i2C_int($_[0], $r); $r }
+#line 452 "Complex.pm"
+
+
+
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
+BEGIN {*i2C = \&PDL::Complex::i2C;
+}
+#line 460 "Complex.pm"
+
+
+
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 Cr2p
@@ -471,18 +481,20 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 475 "Complex.pm"
+#line 485 "Complex.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 BEGIN {*Cr2p = \&PDL::Complex::Cr2p;
 }
-#line 482 "Complex.pm"
+#line 493 "Complex.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 Cp2r
@@ -502,32 +514,36 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 506 "Complex.pm"
+#line 518 "Complex.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 BEGIN {*Cp2r = \&PDL::Complex::Cp2r;
 }
-#line 513 "Complex.pm"
+#line 526 "Complex.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 BEGIN {*Cadd = \&PDL::Complex::Cadd;
 }
-#line 520 "Complex.pm"
+#line 534 "Complex.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 BEGIN {*Csub = \&PDL::Complex::Csub;
 }
-#line 527 "Complex.pm"
+#line 542 "Complex.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 Cmul
@@ -547,18 +563,20 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 551 "Complex.pm"
+#line 567 "Complex.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 BEGIN {*Cmul = \&PDL::Complex::Cmul;
 }
-#line 558 "Complex.pm"
+#line 575 "Complex.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 Cprodover
@@ -578,18 +596,20 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 582 "Complex.pm"
+#line 600 "Complex.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 BEGIN {*Cprodover = \&PDL::Complex::Cprodover;
 }
-#line 589 "Complex.pm"
+#line 608 "Complex.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 Cscale
@@ -609,18 +629,20 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 613 "Complex.pm"
+#line 633 "Complex.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 BEGIN {*Cscale = \&PDL::Complex::Cscale;
 }
-#line 620 "Complex.pm"
+#line 641 "Complex.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 Cdiv
@@ -640,18 +662,20 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 644 "Complex.pm"
+#line 666 "Complex.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 BEGIN {*Cdiv = \&PDL::Complex::Cdiv;
 }
-#line 651 "Complex.pm"
+#line 674 "Complex.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 Ceq
@@ -671,29 +695,32 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 675 "Complex.pm"
+#line 699 "Complex.pm"
 
 
 
-#line 1060 "../../blib/lib/PDL/PP.pm"
+#line 1059 "../../blib/lib/PDL/PP.pm"
+
 sub PDL::Complex::Ceq {
     my @args = !$_[2] ? @_[1,0] : @_[0,1];
     $args[1] = r2C($args[1]) if ref $args[1] ne __PACKAGE__;
     PDL::Complex::_Ceq_int($args[0], $args[1], my $r = PDL->null);
     $r;
 }
-#line 686 "Complex.pm"
+#line 711 "Complex.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 BEGIN {*Ceq = \&PDL::Complex::Ceq;
 }
-#line 693 "Complex.pm"
+#line 719 "Complex.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 Cconj
@@ -713,18 +740,20 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 717 "Complex.pm"
+#line 744 "Complex.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 BEGIN {*Cconj = \&PDL::Complex::Cconj;
 }
-#line 724 "Complex.pm"
+#line 752 "Complex.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 Cabs
@@ -744,29 +773,32 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 748 "Complex.pm"
+#line 777 "Complex.pm"
 
 
 
-#line 1060 "../../blib/lib/PDL/PP.pm"
+#line 1059 "../../blib/lib/PDL/PP.pm"
+
 sub PDL::Complex::Cabs($) {
            my $pdl= shift;
            my $abs = PDL->null;
            &PDL::Complex::_Cabs_int($pdl, $abs);
            $abs;
         }
-#line 759 "Complex.pm"
+#line 789 "Complex.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 BEGIN {*Cabs = \&PDL::Complex::Cabs;
 }
-#line 766 "Complex.pm"
+#line 797 "Complex.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 Cabs2
@@ -786,29 +818,32 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 790 "Complex.pm"
+#line 822 "Complex.pm"
 
 
 
-#line 1060 "../../blib/lib/PDL/PP.pm"
+#line 1059 "../../blib/lib/PDL/PP.pm"
+
 sub PDL::Complex::Cabs2($) {
            my $pdl= shift;
            my $abs2 = PDL->null;
            &PDL::Complex::_Cabs2_int($pdl, $abs2);
            $abs2;
         }
-#line 801 "Complex.pm"
+#line 834 "Complex.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 BEGIN {*Cabs2 = \&PDL::Complex::Cabs2;
 }
-#line 808 "Complex.pm"
+#line 842 "Complex.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 Carg
@@ -828,29 +863,32 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 832 "Complex.pm"
+#line 867 "Complex.pm"
 
 
 
-#line 1060 "../../blib/lib/PDL/PP.pm"
+#line 1059 "../../blib/lib/PDL/PP.pm"
+
 sub PDL::Complex::Carg($) {
            my $pdl= shift;
            my $arg = PDL->null;
            &PDL::Complex::_Carg_int($pdl, $arg);
            $arg;
         }
-#line 843 "Complex.pm"
+#line 879 "Complex.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 BEGIN {*Carg = \&PDL::Complex::Carg;
 }
-#line 850 "Complex.pm"
+#line 887 "Complex.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 Csin
@@ -870,18 +908,20 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 874 "Complex.pm"
+#line 912 "Complex.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 BEGIN {*Csin = \&PDL::Complex::Csin;
 }
-#line 881 "Complex.pm"
+#line 920 "Complex.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 Ccos
@@ -901,18 +941,20 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 905 "Complex.pm"
+#line 945 "Complex.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 BEGIN {*Ccos = \&PDL::Complex::Ccos;
 }
-#line 912 "Complex.pm"
+#line 953 "Complex.pm"
 
 
 
-#line 681 "complex.pd"
+#line 680 "complex.pd"
+
 
 =head2 Ctan
 
@@ -927,11 +969,12 @@ Does not work inplace.
 =cut
 
 sub Ctan($) { Csin($_[0]) / Ccos($_[0]) }
-#line 931 "Complex.pm"
+#line 973 "Complex.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 Cexp
@@ -951,18 +994,20 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 955 "Complex.pm"
+#line 998 "Complex.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 BEGIN {*Cexp = \&PDL::Complex::Cexp;
 }
-#line 962 "Complex.pm"
+#line 1006 "Complex.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 Clog
@@ -982,18 +1027,20 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 986 "Complex.pm"
+#line 1031 "Complex.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 BEGIN {*Clog = \&PDL::Complex::Clog;
 }
-#line 993 "Complex.pm"
+#line 1039 "Complex.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 Cpow
@@ -1013,18 +1060,20 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1017 "Complex.pm"
+#line 1064 "Complex.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 BEGIN {*Cpow = \&PDL::Complex::Cpow;
 }
-#line 1024 "Complex.pm"
+#line 1072 "Complex.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 Csqrt
@@ -1044,18 +1093,20 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1048 "Complex.pm"
+#line 1097 "Complex.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 BEGIN {*Csqrt = \&PDL::Complex::Csqrt;
 }
-#line 1055 "Complex.pm"
+#line 1105 "Complex.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 Casin
@@ -1075,18 +1126,20 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1079 "Complex.pm"
+#line 1130 "Complex.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 BEGIN {*Casin = \&PDL::Complex::Casin;
 }
-#line 1086 "Complex.pm"
+#line 1138 "Complex.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 Cacos
@@ -1106,18 +1159,20 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1110 "Complex.pm"
+#line 1163 "Complex.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 BEGIN {*Cacos = \&PDL::Complex::Cacos;
 }
-#line 1117 "Complex.pm"
+#line 1171 "Complex.pm"
 
 
 
-#line 828 "complex.pd"
+#line 827 "complex.pd"
+
 
 =head2 Catan
 
@@ -1133,11 +1188,12 @@ sub Catan($) {
    my $z = shift;
    Cmul Clog(Cdiv (PDL::Complex::i()+$z, PDL::Complex::i()-$z)), pdl(0, 0.5);
 }
-#line 1137 "Complex.pm"
+#line 1192 "Complex.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 Csinh
@@ -1157,18 +1213,20 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1161 "Complex.pm"
+#line 1217 "Complex.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 BEGIN {*Csinh = \&PDL::Complex::Csinh;
 }
-#line 1168 "Complex.pm"
+#line 1225 "Complex.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 Ccosh
@@ -1188,18 +1246,20 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1192 "Complex.pm"
+#line 1250 "Complex.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 BEGIN {*Ccosh = \&PDL::Complex::Ccosh;
 }
-#line 1199 "Complex.pm"
+#line 1258 "Complex.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 Ctanh
@@ -1219,18 +1279,20 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1223 "Complex.pm"
+#line 1283 "Complex.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 BEGIN {*Ctanh = \&PDL::Complex::Ctanh;
 }
-#line 1230 "Complex.pm"
+#line 1291 "Complex.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 Casinh
@@ -1250,18 +1312,20 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1254 "Complex.pm"
+#line 1316 "Complex.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 BEGIN {*Casinh = \&PDL::Complex::Casinh;
 }
-#line 1261 "Complex.pm"
+#line 1324 "Complex.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 Cacosh
@@ -1281,18 +1345,20 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1285 "Complex.pm"
+#line 1349 "Complex.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 BEGIN {*Cacosh = \&PDL::Complex::Cacosh;
 }
-#line 1292 "Complex.pm"
+#line 1357 "Complex.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 Catanh
@@ -1312,18 +1378,20 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1316 "Complex.pm"
+#line 1382 "Complex.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 BEGIN {*Catanh = \&PDL::Complex::Catanh;
 }
-#line 1323 "Complex.pm"
+#line 1390 "Complex.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 Cproj
@@ -1343,18 +1411,20 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1347 "Complex.pm"
+#line 1415 "Complex.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 BEGIN {*Cproj = \&PDL::Complex::Cproj;
 }
-#line 1354 "Complex.pm"
+#line 1423 "Complex.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 Croots
@@ -1374,29 +1444,32 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1378 "Complex.pm"
+#line 1448 "Complex.pm"
 
 
 
-#line 1060 "../../blib/lib/PDL/PP.pm"
+#line 1059 "../../blib/lib/PDL/PP.pm"
+
 sub PDL::Complex::Croots($$) {
            my ($pdl, $n) = @_;
            my $r = PDL->null;
            &PDL::Complex::_Croots_int($pdl, $r, $n);
            bless $r;
         }
-#line 1389 "Complex.pm"
+#line 1460 "Complex.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 BEGIN {*Croots = \&PDL::Complex::Croots;
 }
-#line 1396 "Complex.pm"
+#line 1468 "Complex.pm"
 
 
 
-#line 996 "complex.pd"
+#line 995 "complex.pd"
+
 
 =head2 re, im
 
@@ -1420,11 +1493,12 @@ sub slice :lvalue {
   $ret;
 }
 }
-#line 1424 "Complex.pm"
+#line 1497 "Complex.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 rCpolynomial
@@ -1444,11 +1518,12 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1448 "Complex.pm"
+#line 1522 "Complex.pm"
 
 
 
-#line 1060 "../../blib/lib/PDL/PP.pm"
+#line 1059 "../../blib/lib/PDL/PP.pm"
+
 
 sub rCpolynomial {
     my $coeffs = shift;
@@ -1457,20 +1532,22 @@ sub rCpolynomial {
     _rCpolynomial_int($coeffs,$x,$out);
     return PDL::complex($out);
     }
-#line 1461 "Complex.pm"
+#line 1536 "Complex.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 BEGIN {*rCpolynomial = \&PDL::Complex::rCpolynomial;
 }
-#line 1468 "Complex.pm"
+#line 1544 "Complex.pm"
 
 
 
 
 
-#line 1061 "complex.pd"
+#line 1060 "complex.pd"
+
 
 # overload must be here, so that all the functions can be seen
 
@@ -1520,7 +1597,7 @@ sub initialize {
    bless PDL->null, ref($_[0]) || $_[0];
 }
 
-# so threading doesn't also assign the real value into the imaginary
+# so broadcasting doesn't also assign the real value into the imaginary
 sub Cassgn {
     my @args = !$_[2] ? @_[1,0] : @_[0,1];
     $args[1] = r2C($args[1]) if ref $args[1] ne __PACKAGE__;
@@ -1571,7 +1648,7 @@ in the file COPYING in the PDL distribution.
 perl(1), L<PDL>.
 
 =cut
-#line 1575 "Complex.pm"
+#line 1652 "Complex.pm"
 
 
 

@@ -63,7 +63,9 @@ sub test_ufunc {
   ##-- check output type
  SKIP: {
     skip("${label}:type - only for PDL >= v2.014",1) if (!$HAVE_PDL_2_014);
-    isok("${label}:type", $ccs_rc->type, $dense_rc->type);
+    isok("${label}:type", $ccs_rc->type, $dense_rc->type)
+      or diag "ccs_rc(", $ccs_rc->info, ")=$ccs_rc\n",
+      "dense_rc(", $dense_rc->info, ")=$dense_rc\n";
   }
 
   ##-- check output values

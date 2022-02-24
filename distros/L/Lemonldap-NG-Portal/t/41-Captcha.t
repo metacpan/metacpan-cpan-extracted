@@ -52,11 +52,8 @@ SKIP: {
 
     ok( $res = $client->_get( '/', accept => 'text/html' ), 'Unauth request' );
     my ( $host, $url, $query ) = expectForm( $res, '#', undef, 'token' );
-    ok(
-        $res->[2]->[0] =~
-m%<input[^>]*name="password"%,
-        'Password: Found text input'
-    );
+    ok( $res->[2]->[0] =~ m%<input[^>]*name="password"%,
+        'Password: Found text input' );
 
     $query =~ s/.*\btoken=([^&]+).*/token=$1/;
     my $token;

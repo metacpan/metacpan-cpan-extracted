@@ -3,7 +3,7 @@
 #
 package PDL::Slices;
 
-our @EXPORT_OK = qw(index index1d index2d indexND indexNDb rangeb rld rle _clump_int xchg mv using diagonal lags splitdim rotate threadI unthread dice dice_axis slice );
+our @EXPORT_OK = qw(index index1d index2d indexND indexNDb rangeb rld rle _clump_int xchg mv using diagonal lags splitdim rotate broadcastI unbroadcast dice dice_axis slice );
 our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
@@ -21,7 +21,8 @@ use DynaLoader;
 
 
 
-#line 6 "slices.pd"
+#line 5 "slices.pd"
+
 
 =head1 NAME
 
@@ -86,7 +87,7 @@ use strict;
 use warnings;
 use PDL::Core ':Internal';
 use Scalar::Util 'blessed';
-#line 90 "Slices.pm"
+#line 91 "Slices.pm"
 
 
 
@@ -100,7 +101,8 @@ use Scalar::Util 'blessed';
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 index
@@ -120,17 +122,17 @@ C<index>, C<index1d>, and C<index2d> provide rudimentary index indirection.
  $c = index2d($source2,$ind1,$ind2);
 
 use the C<$ind> variables as indices to look up values in C<$source>.
-The three routines thread slightly differently.
+The three routines broadcast slightly differently.
 
 =over 3
 
 =item *
 
-C<index> uses direct threading for 1-D indexing across the 0 dim
-of C<$source>.  It can thread over source thread dims or index thread
+C<index> uses direct broadcasting for 1-D indexing across the 0 dim
+of C<$source>.  It can broadcast over source broadcast dims or index broadcast
 dims, but not (easily) both: If C<$source> has more than 1
 dimension and C<$ind> has more than 0 dimensions, they must agree in
-a threading sense.
+a broadcasting sense.
 
 =item * 
 
@@ -141,7 +143,7 @@ C<$source>'s 0 dimension.  The output has the same number of dims as
 C<$source>.  The 0 dim of the output has size 1 if C<$ind> is a
 scalar, and the same size as the 0 dim of C<$ind> if it is not. If
 C<$ind> and C<$source> both have more than 1 dim, then all dims higher
-than 0 must agree in a threading sense.
+than 0 must agree in a broadcasting sense.
 
 =item * 
 
@@ -159,7 +161,7 @@ These functions are two-way, i.e. after
 
 the changes in C<$c> will flow back to C<$x>.
 
-C<index> provids simple threading:  multiple-dimensioned arrays are treated
+C<index> provids simple broadcasting:  multiple-dimensioned arrays are treated
 as collections of 1-D arrays, so that
 
  $x = xvals(10,10)+10*yvals(10,10);
@@ -178,17 +180,19 @@ L</indexND>.
 index barfs if any of the index values are bad.
 
 =cut
-#line 182 "Slices.pm"
+#line 184 "Slices.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *index = \&PDL::index;
-#line 188 "Slices.pm"
+#line 191 "Slices.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 index1d
@@ -208,17 +212,17 @@ C<index>, C<index1d>, and C<index2d> provide rudimentary index indirection.
  $c = index2d($source2,$ind1,$ind2);
 
 use the C<$ind> variables as indices to look up values in C<$source>.
-The three routines thread slightly differently.
+The three routines broadcast slightly differently.
 
 =over 3
 
 =item *
 
-C<index> uses direct threading for 1-D indexing across the 0 dim
-of C<$source>.  It can thread over source thread dims or index thread
+C<index> uses direct broadcasting for 1-D indexing across the 0 dim
+of C<$source>.  It can broadcast over source broadcast dims or index broadcast
 dims, but not (easily) both: If C<$source> has more than 1
 dimension and C<$ind> has more than 0 dimensions, they must agree in
-a threading sense.
+a broadcasting sense.
 
 =item * 
 
@@ -229,7 +233,7 @@ C<$source>'s 0 dimension.  The output has the same number of dims as
 C<$source>.  The 0 dim of the output has size 1 if C<$ind> is a
 scalar, and the same size as the 0 dim of C<$ind> if it is not. If
 C<$ind> and C<$source> both have more than 1 dim, then all dims higher
-than 0 must agree in a threading sense.
+than 0 must agree in a broadcasting sense.
 
 =item * 
 
@@ -247,7 +251,7 @@ These functions are two-way, i.e. after
 
 the changes in C<$c> will flow back to C<$x>.
 
-C<index> provids simple threading:  multiple-dimensioned arrays are treated
+C<index> provids simple broadcasting:  multiple-dimensioned arrays are treated
 as collections of 1-D arrays, so that
 
  $x = xvals(10,10)+10*yvals(10,10);
@@ -266,17 +270,19 @@ L</indexND>.
 index1d propagates BAD index elements to the output variable.
 
 =cut
-#line 270 "Slices.pm"
+#line 274 "Slices.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *index1d = \&PDL::index1d;
-#line 276 "Slices.pm"
+#line 281 "Slices.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 index2d
@@ -296,17 +302,17 @@ C<index>, C<index1d>, and C<index2d> provide rudimentary index indirection.
  $c = index2d($source2,$ind1,$ind2);
 
 use the C<$ind> variables as indices to look up values in C<$source>.
-The three routines thread slightly differently.
+The three routines broadcast slightly differently.
 
 =over 3
 
 =item *
 
-C<index> uses direct threading for 1-D indexing across the 0 dim
-of C<$source>.  It can thread over source thread dims or index thread
+C<index> uses direct broadcasting for 1-D indexing across the 0 dim
+of C<$source>.  It can broadcast over source broadcast dims or index broadcast
 dims, but not (easily) both: If C<$source> has more than 1
 dimension and C<$ind> has more than 0 dimensions, they must agree in
-a threading sense.
+a broadcasting sense.
 
 =item * 
 
@@ -317,7 +323,7 @@ C<$source>'s 0 dimension.  The output has the same number of dims as
 C<$source>.  The 0 dim of the output has size 1 if C<$ind> is a
 scalar, and the same size as the 0 dim of C<$ind> if it is not. If
 C<$ind> and C<$source> both have more than 1 dim, then all dims higher
-than 0 must agree in a threading sense.
+than 0 must agree in a broadcasting sense.
 
 =item * 
 
@@ -335,7 +341,7 @@ These functions are two-way, i.e. after
 
 the changes in C<$c> will flow back to C<$x>.
 
-C<index> provids simple threading:  multiple-dimensioned arrays are treated
+C<index> provids simple broadcasting:  multiple-dimensioned arrays are treated
 as collections of 1-D arrays, so that
 
  $x = xvals(10,10)+10*yvals(10,10);
@@ -354,17 +360,19 @@ L</indexND>.
 index2d barfs if either of the index values are bad.
 
 =cut
-#line 358 "Slices.pm"
-
-
-
-#line 1061 "../../blib/lib/PDL/PP.pm"
-*index2d = \&PDL::index2d;
 #line 364 "Slices.pm"
 
 
 
-#line 300 "slices.pd"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
+*index2d = \&PDL::index2d;
+#line 371 "Slices.pm"
+
+
+
+#line 299 "slices.pd"
+
 
 =head2 indexNDb
 
@@ -414,11 +422,12 @@ sub PDL::indexND {
 }
 
 *PDL::indexNDb = \&PDL::indexND;
-#line 418 "Slices.pm"
+#line 426 "Slices.pm"
 
 
 
-#line 353 "slices.pd"
+#line 352 "slices.pd"
+
 
 sub PDL::range {
   my($source,$ind,$sz,$bound) = @_;
@@ -459,11 +468,12 @@ sub PDL::range {
   no warnings; # shut up about passing undef into rangeb
   $source->rangeb($index,$size,$bound);
 }
-#line 463 "Slices.pm"
+#line 472 "Slices.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 rangeb
@@ -583,15 +593,15 @@ but as a single word-style specifier if they are not (e.g. 'forbid').
 
 B<OUTPUT>
 
-The output threads over both C<$index> and C<$source>.  Because implicit
-threading can happen in a couple of ways, a little thought is needed.  The
+The output broadcasts over both C<$index> and C<$source>.  Because implicit
+broadcasting can happen in a couple of ways, a little thought is needed.  The
 returned dimension list is stacked up like this:
 
-   (index thread dims), (index dims (size)), (source thread dims)
+   (index broadcast dims), (index dims (size)), (source broadcast dims)
 
 The first few dims of the output correspond to the extra dims of
 C<$index> (beyond the 0 dim). They allow you to pick out individual
-ranges from a large, threaded collection.
+ranges from a large, broadcasted collection.
 
 The middle few dims of the output correspond to the size dims
 specified in C<$size>, and contain the range of values that is extracted
@@ -601,8 +611,8 @@ the dimension list here, so that if you feed in (for example) C<$size
 
 The last few dims of the output correspond to extra dims of C<$source> beyond
 the number of dims indexed by C<$index>.  These dims act like ordinary
-thread dims, because adding more dims to C<$source> just tacks extra dims
-on the end of the output.  Each source thread dim ranges over the entire
+broadcast dims, because adding more dims to C<$source> just tacks extra dims
+on the end of the output.  Each source broadcast dim ranges over the entire
 corresponding dim of C<$source>.
 
 B<Dataflow>: Dataflow is bidirectional.
@@ -653,7 +663,7 @@ how to mark loci in the original matrix (using dataflow).
   ]
  ]
  pdl> $src = xvals(5,3)*10+yvals(5,3)
- pdl> print $src->range(3,1)  # Thread over y dimension in $src
+ pdl> print $src->range(3,1)  # Broadcast over y dimension in $src
  [
   [30]
   [31]
@@ -727,7 +737,7 @@ C<rangeb> is marginally faster but requires that you include all arguments.
 
 DEVEL NOTES
 
-* index thread dimensions are effectively clumped internally.  This
+* index broadcast dimensions are effectively clumped internally.  This
 makes it easier to loop over the index array but a little more brain-bending
 to tease out the algorithm.
 
@@ -742,17 +752,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 746 "Slices.pm"
+#line 756 "Slices.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *rangeb = \&PDL::rangeb;
-#line 752 "Slices.pm"
+#line 763 "Slices.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 rld
@@ -781,18 +793,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 785 "Slices.pm"
+#line 797 "Slices.pm"
 
 
 
-#line 1060 "../../blib/lib/PDL/PP.pm"
+#line 1059 "../../blib/lib/PDL/PP.pm"
+
 sub PDL::rld {
   my ($x,$y) = @_;
   my ($c);
   if ($#_ == 2) {
     $c = $_[2];
   } else {
-# XXX Need to improve emulation of threading in auto-generating c
+# XXX Need to improve emulation of broadcasting in auto-generating c
     my ($size) = $x->sumover->max->sclr;
     my (@dims) = $x->dims;
     shift @dims;
@@ -801,17 +814,19 @@ sub PDL::rld {
   &PDL::_rld_int($x,$y,$c);
   $c;
 }
-#line 805 "Slices.pm"
+#line 818 "Slices.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *rld = \&PDL::rld;
-#line 811 "Slices.pm"
+#line 825 "Slices.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 rle
@@ -828,7 +843,7 @@ Given vector C<$c>, generate a vector C<$x> with the number of each
 element, and a vector C<$y> of the unique values.  New in PDL 2.017,
 only the elements up to the first instance of C<0> in C<$x> are
 returned, which makes the common use case of a 1-dimensional C<$c> simpler.
-For threaded operation, C<$x> and C<$y> will be large enough
+For broadcast operation, C<$x> and C<$y> will be large enough
 to hold the largest row of C<$y>, and only the elements up to the
 first instance of C<0> in each row of C<$x> should be considered.
 
@@ -866,11 +881,12 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 870 "Slices.pm"
+#line 885 "Slices.pm"
 
 
 
-#line 1060 "../../blib/lib/PDL/PP.pm"
+#line 1059 "../../blib/lib/PDL/PP.pm"
+
 sub PDL::rle {
   my $c = shift;
   my ($x,$y) = @_==2 ? @_ : (null,null);
@@ -879,23 +895,26 @@ sub PDL::rle {
                                 ($x!=0)->clump(1..$x->ndims-1)->sumover->max->sclr-1;
   return ($x->slice("0:$max_ind"),$y->slice("0:$max_ind"));
 }
-#line 883 "Slices.pm"
+#line 899 "Slices.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *rle = \&PDL::rle;
-#line 889 "Slices.pm"
+#line 906 "Slices.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *_clump_int = \&PDL::_clump_int;
-#line 895 "Slices.pm"
+#line 913 "Slices.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 xchg
@@ -930,17 +949,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 934 "Slices.pm"
+#line 953 "Slices.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *xchg = \&PDL::xchg;
-#line 940 "Slices.pm"
+#line 960 "Slices.pm"
 
 
 
-#line 1320 "slices.pd"
+#line 1319 "slices.pd"
+
 
 =head2 reorder
 
@@ -1055,16 +1076,17 @@ sub PDL::reorder {
           }
         }
 
-        # Checking that they are all present and also not duplicated is done by thread() [I think]
+        # Checking that they are all present and also not duplicated is done by broadcast() [I think]
 
         # a quicker way to do the reorder
-        return $pdl->thread(@newDimOrder)->unthread(0);
+        return $pdl->broadcast(@newDimOrder)->unbroadcast(0);
 }
-#line 1064 "Slices.pm"
+#line 1085 "Slices.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 mv
@@ -1099,17 +1121,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1103 "Slices.pm"
+#line 1125 "Slices.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *mv = \&PDL::mv;
-#line 1109 "Slices.pm"
+#line 1132 "Slices.pm"
 
 
 
-#line 1496 "slices.pd"
+#line 1495 "slices.pd"
+
 
 =head2 using
 
@@ -1139,11 +1163,12 @@ sub PDL::using {
   }
   @ind;
 }
-#line 1143 "Slices.pm"
+#line 1167 "Slices.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 diagonal
@@ -1173,7 +1198,7 @@ the ndarray C<$y> has dimensions C<(5,3,4,6)> and
 C<$y-E<gt>at(2,1,0,1)> refers
 to C<$x-E<gt>at(2,1,2,0,1,2)>.
 
-NOTE: diagonal doesn't handle threadids correctly. XXX FIX
+NOTE: diagonal doesn't handle broadcastids correctly. XXX FIX
 
  pdl> $x = zeroes(3,3,3);
  pdl> ($y = $x->diagonal(0,1))++;
@@ -1204,23 +1229,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1208 "Slices.pm"
-
-
-
-#line 1060 "../../blib/lib/PDL/PP.pm"
-sub PDL::diagonal { shift->_diagonal_int(my $o=PDL->null, \@_); $o }
-#line 1214 "Slices.pm"
-
-
-
-#line 1061 "../../blib/lib/PDL/PP.pm"
-*diagonal = \&PDL::diagonal;
-#line 1220 "Slices.pm"
+#line 1233 "Slices.pm"
 
 
 
 #line 1059 "../../blib/lib/PDL/PP.pm"
+
+sub PDL::diagonal { shift->_diagonal_int(my $o=PDL->null, \@_); $o }
+#line 1240 "Slices.pm"
+
+
+
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
+*diagonal = \&PDL::diagonal;
+#line 1247 "Slices.pm"
+
+
+
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 lags
@@ -1269,17 +1297,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1273 "Slices.pm"
+#line 1301 "Slices.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *lags = \&PDL::lags;
-#line 1279 "Slices.pm"
+#line 1308 "Slices.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 splitdim
@@ -1312,17 +1342,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1316 "Slices.pm"
+#line 1346 "Slices.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *splitdim = \&PDL::splitdim;
-#line 1322 "Slices.pm"
+#line 1353 "Slices.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 rotate
@@ -1343,20 +1375,22 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1347 "Slices.pm"
+#line 1379 "Slices.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *rotate = \&PDL::rotate;
-#line 1353 "Slices.pm"
+#line 1386 "Slices.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
 
 
-=head2 threadI
+
+=head2 broadcastI
 
 =for sig
 
@@ -1366,35 +1400,37 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 internal
 
-Put some dimensions to a threadid.
+Put some dimensions to a broadcastid.
 
 =for example
 
- $y = $x->threadI(0,1,5); # thread over dims 1,5 in id 1
+ $y = $x->broadcastI(0,1,5); # broadcast over dims 1,5 in id 1
 
 
 
 =for bad
 
-threadI does not process bad values.
+broadcastI does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
-#line 1385 "Slices.pm"
+#line 1419 "Slices.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
-*threadI = \&PDL::threadI;
-#line 1391 "Slices.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
+*broadcastI = \&PDL::broadcastI;
+#line 1426 "Slices.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
 
 
-=head2 unthread
+
+=head2 unbroadcast
 
 =for sig
 
@@ -1402,29 +1438,31 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-All threaded dimensions are made real again.
+All broadcasted dimensions are made real again.
 
 See [TBD Doc] for details and examples.
 
 
 =for bad
 
-unthread does not process bad values.
+unbroadcast does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
-#line 1418 "Slices.pm"
+#line 1454 "Slices.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
-*unthread = \&PDL::unthread;
-#line 1424 "Slices.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
+*unbroadcast = \&PDL::unbroadcast;
+#line 1461 "Slices.pm"
 
 
 
-#line 1936 "slices.pd"
+#line 1935 "slices.pd"
+
 
 =head2 dice
 
@@ -1575,11 +1613,12 @@ sub PDL::dice_axis {
   return $self->mv($axis,0)->index1d($ix)->mv(0,$axis);
 }
 *dice_axis = \&PDL::dice_axis;
-#line 1579 "Slices.pm"
+#line 1617 "Slices.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 slice
@@ -1752,11 +1791,12 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1756 "Slices.pm"
+#line 1795 "Slices.pm"
 
 
 
-#line 1060 "../../blib/lib/PDL/PP.pm"
+#line 1059 "../../blib/lib/PDL/PP.pm"
+
 sub PDL::slice {
     my ($source, @others) = @_;
     for my $i(0..$#others) {
@@ -1793,19 +1833,21 @@ sub PDL::slice {
     PDL::_slice_int($source,my $o=$source->initialize,\@others);
     $o;
 }
-#line 1797 "Slices.pm"
+#line 1837 "Slices.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *slice = \&PDL::slice;
-#line 1803 "Slices.pm"
+#line 1844 "Slices.pm"
 
 
 
 
 
-#line 2427 "slices.pd"
+#line 2426 "slices.pd"
+
 
 =head1 BUGS
 
@@ -1830,7 +1872,7 @@ distribution. If this file is separated from the PDL distribution,
 the copyright notice should be included in the file.
 
 =cut
-#line 1834 "Slices.pm"
+#line 1876 "Slices.pm"
 
 
 

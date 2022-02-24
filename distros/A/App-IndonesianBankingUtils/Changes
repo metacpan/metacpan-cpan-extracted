@@ -1,3 +1,8 @@
+0.146   2021-08-26  Released-By: PERLANCAR; Urgency: medium
+
+	- Change dumps log category Dumps -> _dumps (new convention).
+
+
 0.145   2021-05-07  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
 
 	- [incompatible change] Update to newer

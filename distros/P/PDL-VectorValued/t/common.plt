@@ -5,6 +5,7 @@ BEGIN { $| = 1; }
 
 # isok($label,@_) -- prints helpful label
 sub isok {
+  local $Test::Builder::Level = $Test::Builder::Level + 1;
   my $label = shift;
   if (@_==1) {
     ok($_[0],$label);
@@ -18,6 +19,7 @@ sub isok {
 # skipok($label,$skip_if_true,@_) -- prints helpful label
 # skipok($label,$skip_if_true,\&CODE) -- prints helpful label
 sub skipok {
+  local $Test::Builder::Level = $Test::Builder::Level + 1;
   my ($label,$skip_if_true) = splice(@_,0,2);
   if ($skip_if_true) {
     subtest $label => sub { plan skip_all => $skip_if_true; };
@@ -32,6 +34,7 @@ sub skipok {
 
 # skipordo($label,$skip_if_true,sub { ok ... },@args_for_sub)
 sub skipordo {
+  local $Test::Builder::Level = $Test::Builder::Level + 1;
   my ($label,$skip_if_true) = splice(@_,0,2);
   if ($skip_if_true) {
     subtest $label => sub { plan skip_all => $skip_if_true; };
@@ -43,6 +46,7 @@ sub skipordo {
 # ulistok($label,\@got,\@expect)
 # --> ok() for unsorted lists
 sub ulistok {
+  local $Test::Builder::Level = $Test::Builder::Level + 1;
   my ($label,$l1,$l2) = @_;
   is_deeply([sort @$l1],[sort @$l2],$label);
 }
@@ -68,18 +72,20 @@ sub cmp_dims {
 
 # pdlok($label, $got, $want)
 sub pdlok {
+  local $Test::Builder::Level = $Test::Builder::Level + 1;
   my ($label,$got,$want) = @_;
   $got  = PDL->topdl($got) if (defined($got));
   $want = PDL->topdl($want) if (defined($want));
   isok($label,
        defined($got) && defined($want)
        && cmp_dims($got,$want)
-       && all(matchpdl($want,$got)));
+       && all(matchpdl($want,$got))) or diag "got=$got\nwant=$want";
 }
 
 # pdlok_nodims($label, $got, $want)
 #  + ignores dimensions
 sub pdlok_nodims {
+  local $Test::Builder::Level = $Test::Builder::Level + 1;
   my ($label,$got,$want) = @_;
   $got  = PDL->topdl($got) if (defined($got));
   $want = PDL->topdl($want) if (defined($want));
@@ -91,6 +97,7 @@ sub pdlok_nodims {
 
 # pdlapprox($label, $got, $want, $eps=1e-5)
 sub pdlapprox {
+  local $Test::Builder::Level = $Test::Builder::Level + 1;
   my ($label,$got,$want,$eps) = @_;
   $got  = PDL->topdl($got) if (defined($got));
   $want = PDL->topdl($want) if (defined($want));
@@ -100,7 +107,6 @@ sub pdlapprox {
        && cmp_dims($got,$want)
        && all(matchpdla($want,$got,$eps)));
 }
-
 
 print "loaded ", __FILE__, "\n";
 

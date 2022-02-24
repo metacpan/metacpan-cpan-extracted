@@ -9,7 +9,7 @@ use Carp qw(confess);
 
 our $VERSION;
 BEGIN {
-$VERSION = '0.80'
+$VERSION = '0.81'
 };
 
 =head1 NAME
@@ -3126,7 +3126,8 @@ INIT:
 CODE:
 	$func (&menustr, &devname, &ndev);
 	HV* hv = newHV();
-	for( int i = 0; i < ndev; i++ ) {
+	int i;
+	for( i = 0; i < ndev; i++ ) {
 		SV* menustr_sv = newSVpvn(menustr[i], strlen(menustr[i]));
 		if( NULL == hv_store(hv, devname[i], strlen(devname[i]), menustr_sv, 0) ) {
 			sv_free(menustr_sv);

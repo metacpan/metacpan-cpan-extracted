@@ -1,10 +1,60 @@
 ==================================================
-Changes from 2021-02-17 00:00:00 +0000 to present.
+Changes from 2021-02-24 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.011 at 2022-02-17 00:25:54 +0000
+version 0.012 at 2022-02-24 17:59:37 +0000
 ------------------------------------------
+
+  Change: 085511fffe983fe0371f719a514db199fe14d9b4
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-02-24 14:58:19 +0000
+
+    Merge pull request #6 from glasswalk3r/refactor/user_agent
+
+    Refactor/user agent 
+
+  Change: 9e8ad58dc354228d9071dc6246a04bbfa4f11411
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-02-22 15:59:52 +0000
+
+    fix: TLS and hardcodes 
+
+  Change: 10e7188e4d27a21c8dfc8f7c85927df2a5e6d992
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-02-22 14:48:54 +0000
+
+    chore: version bump 
+
+  Change: e75b6954bb7987d5c966251b613fa63c587719fa
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-02-22 13:41:30 +0000
+
+    fix: several introduced bugs 
+
+  Change: 9eb574ca230738d2151bcffa09ef4d2c564a74c4
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-02-22 13:09:33 +0000
+
+    refactor: redact auth move to ua 
+
+  Change: ba4ba597da14f9286b94cb5d9cf6740544f4b71a
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-02-22 12:59:53 +0000
+
+    fix: removed old references 
+
+  Change: ce83b4fdad25385b7fdb0281015967728dac864b
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-02-22 12:40:18 +0000
+
+    refactor: replacing older ua 
+
+  Change: 07fcd3db3e7880b5ae8d6efdb72fe1755371417e
+  Author: alceu.freitas <alceu.freitas@semantix.com.br>
+  Date : 2022-02-16 21:41:26 +0000
+
+    Merge branch 'master' into refactor/user_agent 
 
   Change: e56053602a88ea09eb46c5d3f2a86a13208e807b
   Author: alceu.freitas <alceu.freitas@semantix.com.br>
@@ -166,6 +216,12 @@ version 0.011 at 2022-02-17 00:25:54 +0000
 
     fix: dependencies declaration 
 
+  Change: 0ec0949ea293ef0544962d987b229e389d50f4b8
+  Author: alceu.freitas <alceu.freitas@semantix.com.br>
+  Date : 2022-01-10 12:17:42 +0000
+
+    feat: testing user agent 
+
   Change: 00a0f1b8517298179dcc787f4bf2a3dd7106f887
   Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
   Date : 2022-01-10 11:57:26 +0000
@@ -241,6 +297,60 @@ version 0.011 at 2022-02-17 00:25:54 +0000
   Date : 2022-01-06 18:21:26 +0000
 
     fix: versioning happens at building time 
+
+  Change: fd4a9c2ba0d8f70daa97048b69acd54b49989788
+  Author: alceu.freitas <alceu.freitas@semantix.com.br>
+  Date : 2022-01-06 18:17:56 +0000
+
+    fix: rolling backup version bump 
+
+  Change: bb4f78f631a17f1d8b63b086e09d939033f03846
+  Author: alceu.freitas <alceu.freitas@semantix.com.br>
+  Date : 2022-01-06 18:17:09 +0000
+
+    feat: testing App::SpamcupNG::UserAgent 
+
+  Change: c94ceacf5cd62c120132659999bcad96f01f07a7
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-01-02 22:52:09 +0000
+
+    fix: linter 
+
+  Change: ae70c5806647b102c4925e7de1ed7d85e67808a9
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-01-02 22:50:52 +0000
+
+    chore: bumped version 
+
+  Change: e052c5f11f142aba31b0c30e59617ad83e652927
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-01-02 22:50:40 +0000
+
+    doc: added missing 
+
+  Change: 072ed1183f58000c9dc60ff0da22f2113a4db26f
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-01-02 22:01:16 +0000
+
+    refactor: new user agent 
+
+  Change: bfa163830f8d38c3bbc5d15184c226c0a979a40b
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-01-02 21:56:59 +0000
+
+    feat: user agent 
+
+  Change: ba9b2bdd98a197361127eed0a9f2831ea98d4a1d
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-01-02 20:56:01 +0000
+
+    refactor: reduced HTML size 
+
+  Change: cc3a44645141983ef78c930b59af94bb013d9495
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-01-02 15:31:11 +0000
+
+    feat: new error class 
 
   Change: 69d6ddb92adf97d4362f98a5d54f66f52648db34
   Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>

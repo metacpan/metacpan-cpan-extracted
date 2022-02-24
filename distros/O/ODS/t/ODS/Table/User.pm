@@ -40,7 +40,8 @@ column id => (
 	mandatory => true,
 	sortable => true,
 	filterable => true,
-	no_render => true
+	no_render => true,
+	keyfield => true
 );
 
 column username => (
@@ -84,7 +85,6 @@ column last_name => (
 
 column email => (
 	type => 'string',
-	validate => 'email',
 	mandatory => true,
 	sortable => true,
 	filterable => true,

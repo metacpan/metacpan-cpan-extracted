@@ -1,23 +1,20 @@
 package Lemonldap::NG::Portal::CertificateResetByMail::Custom;
+use Lemonldap::NG::Portal::Lib::CustomModule;
 
 use strict;
-use Mouse;
 
-extends 'Lemonldap::NG::Portal::Main::Plugin';
+our @ISA = qw(Lemonldap::NG::Portal::Lib::CustomModule);
+use constant {
+    custom_name       => "CertificateResetByMail",
+    custom_config_key => "customResetCertByMail",
+};
 
 sub new {
     my ( $class, $self ) = @_;
     unless ( $self->{conf}->{customRegister} ) {
         die 'Custom register module not defined';
     }
-
-    my $res = $self->{p}->loadModule( $self->{conf}->{customResetCertByMail} );
-    unless ($res) {
-        die 'Unable to load register module '
-          . $self->{conf}->{customResetCertByMail};
-    }
-
-    return $res;
+    return $class->Lemonldap::NG::Portal::Lib::CustomModule::new($self);
 }
 
 1;

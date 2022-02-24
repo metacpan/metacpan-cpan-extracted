@@ -19,12 +19,12 @@ name: Syntax-Keyword-Match
 provides:
   Syntax::Keyword::Match:
     file: lib/Syntax/Keyword/Match.pm
-    version: '0.08'
+    version: '0.09'
 requires:
   XS::Parse::Keyword: '0.14'
   perl: '5.016'
 resources:
   IRC: irc://irc.perl.org/#io-async
   license: http://dev.perl.org/licenses/
-version: '0.08'
+version: '0.09'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

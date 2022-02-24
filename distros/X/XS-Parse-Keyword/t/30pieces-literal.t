@@ -20,4 +20,12 @@ BEGIN { $^H{"t::pieces/permit"} = 1; }
    is( $ret, "foo", 'result of piecestr' );
 }
 
+{
+   my $ret1 = do { pieceautosemi; };
+   is( $ret1, "EOS", 'result of pieceautosemi with ;' );
+
+   my $ret2 = do { pieceautosemi };
+   is( $ret2, "EOS", 'result of pieceautosemi at end of block' );
+}
+
 done_testing;

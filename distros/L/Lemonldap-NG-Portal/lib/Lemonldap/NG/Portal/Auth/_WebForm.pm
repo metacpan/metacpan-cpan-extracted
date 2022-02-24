@@ -19,7 +19,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_PASSWORDFORMEMPTY
 );
 
-our $VERSION = '2.0.10';
+our $VERSION = '2.0.14';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Auth
@@ -73,7 +73,10 @@ sub extractFormInfo {
     my $res            = PE_OK;
 
     # 1. No user defined at all -> first access
-    unless ( $defUser and $req->method =~ /^POST$/i ) {
+    # _pwdCheck is a workaround to make CheckUser work while using a GET
+    unless ( $defUser
+        and ( uc( $req->method ) eq "POST" or $req->data->{_pwdCheck} ) )
+    {
         $res = PE_FIRSTACCESS;
     }
 
@@ -87,11 +90,13 @@ sub extractFormInfo {
     # 3. If user and oldpassword defined -> password form
     elsif ( $defUser and $defOldPassword ) {
         $res = PE_PASSWORDFORMEMPTY
-          unless ( ( $req->{user} = $req->param('user') )
+          unless (
+               ( $req->{user} = $req->param('user') )
             && ( $req->data->{oldpassword} = $req->param('oldpassword') )
             && ( $req->data->{newpassword} = $req->param('newpassword') )
             && ( $req->data->{confirmpassword} =
-                $req->param('confirmpassword') ) );
+                $req->param('confirmpassword') )
+          );
     }
 
     # If form seems empty
@@ -170,6 +175,7 @@ sub getDisplayType {
 
 sub setSecurity {
     my ( $self, $req ) = @_;
+    return if $req->data->{skipToken};
 
     # If captcha is enable, prepare it
     if ( $self->captcha ) {

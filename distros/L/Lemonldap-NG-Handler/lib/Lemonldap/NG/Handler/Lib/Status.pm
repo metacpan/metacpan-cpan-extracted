@@ -63,7 +63,7 @@ sub run {
 
             # Activity collect
             if (
-/^(\S+)\s+=>\s+(\S+)\s+(OK|REJECT|REDIRECT|LOGOUT|UNPROTECT|\-?\d+)$/
+/^(\S+)\s+=>\s+(\S+)\s+(OK|REJECT|REDIRECT|LOGOUT|UNPROTECT|SKIP|EXPIRED|\-?\d+)$/
               )
             {
                 my ( $user, $uri, $code ) = ( $1, $2, $3 );

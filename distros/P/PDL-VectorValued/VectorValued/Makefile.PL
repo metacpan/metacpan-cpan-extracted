@@ -15,6 +15,7 @@ WriteMakefile(
 	      DIR =>[
 		     #'my_subdir',
 		    ],
+	      NO_MYMETA => 1,
 	     );
 
 ##-- overrides

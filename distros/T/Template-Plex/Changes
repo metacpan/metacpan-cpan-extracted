@@ -1,4 +1,8 @@
-Revision history for Perl extension Template::Lexical.
+Revision history for Perl extension Template::Plex.
+
+0.1.1  Fri 18 Feb 2022 18:03:48 AEST
+	- Fixed examples in example directory
+	- Fixed Changes (wrong package name)
 
 0.1.0  Wed Aug  4 08:58:42 2021
 	- Inital version

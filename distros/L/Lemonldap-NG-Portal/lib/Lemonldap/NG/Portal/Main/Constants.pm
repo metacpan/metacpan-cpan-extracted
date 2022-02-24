@@ -4,7 +4,7 @@ package Lemonldap::NG::Portal::Main::Constants;
 use strict;
 use Exporter 'import';
 
-our $VERSION = '2.0.13';
+our $VERSION = '2.0.14';
 
 use constant HANDLER => 'Lemonldap::NG::Handler::PSGI::Main';
 use constant URIRE =>
@@ -112,6 +112,7 @@ use constant {
     PE_NO_SECOND_FACTORS                 => 103,
     PE_BAD_DEVOPS_FILE                   => 104,
     PE_FILENOTFOUND                      => 105,
+    PE_OIDC_AUTH_ERROR                   => 106,
 };
 
 sub portalConsts {
@@ -130,6 +131,7 @@ sub portalConsts {
         '103' => 'PE_NO_SECOND_FACTORS',
         '104' => 'PE_BAD_DEVOPS_FILE',
         '105' => 'PE_FILENOTFOUND',
+        '106' => 'PE_OIDC_AUTH_ERROR',
         '2'   => 'PE_FORMEMPTY',
         '20'  => 'PE_NO_PASSWORD_BE',
         '21'  => 'PE_PP_ACCOUNT_LOCKED',
@@ -328,7 +330,8 @@ our @EXPORT_OK = (
     'PE_UPGRADESESSION',
     'PE_NO_SECOND_FACTORS',
     'PE_BAD_DEVOPS_FILE',
-    'PE_FILENOTFOUND'
+    'PE_FILENOTFOUND',
+    'PE_OIDC_AUTH_ERROR'
 );
 our %EXPORT_TAGS = ( 'all' => [ @EXPORT_OK, 'import' ], );
 

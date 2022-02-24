@@ -13,7 +13,7 @@ no warnings qw( threads recursion uninitialized numeric once );
 
 package MCE::Shared::Server;
 
-our $VERSION = '1.875';
+our $VERSION = '1.876';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (Subroutines::ProhibitExplicitReturnUndef)
@@ -348,10 +348,11 @@ sub _share {
 sub _start {
    return if $_svr_pid;
 
-   if ($INC{'PDL.pm'}) {
-      local $@;
+   if ($INC{'PDL.pm'}) { local $@;
+      ## PDL::IO::Storable is required for serializing piddles.
       eval 'use PDL::IO::Storable' unless $INC{'PDL/IO/Storable.pm'};
-      eval 'PDL::no_clone_skip_warning()';
+      ## PDL data should not be naively copied in new threads.
+      eval 'no warnings; sub PDL::CLONE_SKIP { 1 }';
    }
 
    local $_;  $_init_pid = "$$.$_tid", $_stopped = undef;
@@ -1927,7 +1928,7 @@ MCE::Shared::Server - Server/Object packages for MCE::Shared
 
 =head1 VERSION
 
-This document describes MCE::Shared::Server version 1.875
+This document describes MCE::Shared::Server version 1.876
 
 =head1 DESCRIPTION
 

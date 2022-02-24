@@ -24,7 +24,7 @@ do { my $x = {
        'runtime' => {
                       'requires' => {
                                       'IO::Async::Notifier' => '0.79',
-                                      'Object::Pad' => '0.55'
+                                      'Object::Pad' => '0.61'
                                     }
                     },
        'test' => {

@@ -18,18 +18,19 @@ my $client = LLNG::Manager::Test->new( {
             bruteForceProtection => 0,
             requireToken         => 0,
             restSessionServer    => 1,
-            logoutServices       => { 'mytest' => 'http://test1.example.com/logout.html' }, # page that does not exist
+            logoutServices       =>
+              { 'mytest' => 'http://test1.example.com/logout.html' }
+            ,    # page that does not exist
             locationRules => {
-                               'test1.example.com' => {
-                                                       '(?#logout)^/logout.html' => 'unprotect',
-                                                       'default' => 'accept'
-                                                     },
-                             },
-            logger         => 'Lemonldap::NG::Common::Logger::Std',
+                'test1.example.com' => {
+                    '(?#logout)^/logout.html' => 'unprotect',
+                    'default'                 => 'accept'
+                },
+            },
+            logger => 'Lemonldap::NG::Common::Logger::Std',
         }
     }
 );
-
 
 # Handler part
 use_ok('Lemonldap::NG::Handler::Server');
@@ -39,7 +40,6 @@ count(2);
 my ( $cli, $app );
 ok( $app = Lemonldap::NG::Handler::Server->run( $client->ini ), 'App' );
 count(1);
-
 
 ## First successful connection for 'dwho'
 ok(
@@ -52,7 +52,7 @@ ok(
     '1st "dwho" Auth query'
 );
 count(1);
-my $cookie = expectCookie($res, 'lemonldap');
+my $cookie = expectCookie( $res, 'lemonldap' );
 
 expectRedirection( $res, 'http://auth.example.com/' );
 
@@ -68,7 +68,6 @@ ok(
 );
 count(1);
 
-
 ok(
     $res->[2]->[0] =~
       m%<h3 trspan="logoutFromOtherApp">logoutFromOtherApp</h3>%,
@@ -76,7 +75,7 @@ ok(
 ) or explain( $res->[2]->[0], "PE_LOGOUT_OK" );
 count(1);
 
-$cookie = expectCookie($res, 'lemonldap');
+$cookie = expectCookie( $res, 'lemonldap' );
 ok( $cookie eq "0", 'Test empty cookie sent at logout' );
 count(1);
 
@@ -84,12 +83,12 @@ count(1);
 my $cookies = getCookies($res);
 my $id;
 ok(
-    ! defined( $id = $cookies->{'lemonldappdata'} ),
-        " Verify absence of cookie lemonldappdata"
-) or explain( 'Get lemonldappdata cookie' );
+    !defined( $id = $cookies->{'lemonldappdata'} ),
+    " Verify absence of cookie lemonldappdata"
+) or explain('Get lemonldappdata cookie');
 count(1);
 
-my ($logouturl) = grep(/iframe/, split("\n", $res->[2]->[0]));
+my ($logouturl) = grep( /iframe/, split( "\n", $res->[2]->[0] ) );
 $logouturl =~ s/.*<iframe src="([^"]+)".*/\1/;
 my $ep = $logouturl;
 $ep =~ s/https?:\/\/[^\/]+//;
@@ -111,11 +110,11 @@ ok(
             'X_ORIGINAL_URI'       => "/",
             'SERVER_PORT'          => '80',
             'SERVER_PROTOCOL'      => 'HTTP/1.1',
-            'HTTP_USER_AGENT' =>
+            'HTTP_USER_AGENT'      =>
               'Mozilla/5.0 (VAX-4000; rv:36.0) Gecko/20350101 Firefox',
             'REMOTE_ADDR' => '127.0.0.1',
             'HTTP_HOST'   => 'test1.example.com',
-            'COOKIE'   => "lemonldap=$cookie",
+            'COOKIE'      => "lemonldap=$cookie",
         }
     ),
     'Forward logout'
@@ -126,9 +125,9 @@ count(1);
 $cookies = getCookies($res);
 $id;
 ok(
-    ! defined( $id = $cookies->{'lemonldappdata'} ),
-        " Verify absence of cookie lemonldappdata"
-) or explain( 'Get lemonldappdata cookie' );
+    !defined( $id = $cookies->{'lemonldappdata'} ),
+    " Verify absence of cookie lemonldappdata"
+) or explain('Get lemonldappdata cookie');
 count(1);
 
 clean_sessions();

@@ -17,7 +17,7 @@ my $client = LLNG::Manager::Test->new( {
             authentication   => 'Demo',
             userDB           => 'Same',
             mailSessionKey   => 'mail',
-            macros =>
+            macros           =>
               { mail2f => '"test\@example.com"', _whatToTrace => '$uid' },
             mail2fSessionKey => 'mail2f',
         }

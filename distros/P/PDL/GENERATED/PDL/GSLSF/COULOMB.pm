@@ -21,7 +21,8 @@ use DynaLoader;
 
 
 
-#line 5 "gsl_sf_coulomb.pd"
+#line 4 "gsl_sf_coulomb.pd"
+
 use strict;
 use warnings;
 
@@ -36,7 +37,7 @@ This is an interface to the Special Function package present in the GNU Scientif
 =head1 SYNOPSIS
 
 =cut
-#line 40 "COULOMB.pm"
+#line 41 "COULOMB.pm"
 
 
 
@@ -50,7 +51,8 @@ This is an interface to the Special Function package present in the GNU Scientif
 
 
 
-#line 1059 "../../../../blib/lib/PDL/PP.pm"
+#line 1058 "../../../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 gsl_sf_hydrogenicR
@@ -70,17 +72,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 74 "COULOMB.pm"
+#line 76 "COULOMB.pm"
 
 
 
-#line 1061 "../../../../blib/lib/PDL/PP.pm"
+#line 1060 "../../../../blib/lib/PDL/PP.pm"
+
 *gsl_sf_hydrogenicR = \&PDL::gsl_sf_hydrogenicR;
-#line 80 "COULOMB.pm"
+#line 83 "COULOMB.pm"
 
 
 
-#line 1059 "../../../../blib/lib/PDL/PP.pm"
+#line 1058 "../../../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 gsl_sf_coulomb_wave_FGp_array
@@ -100,17 +104,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 104 "COULOMB.pm"
+#line 108 "COULOMB.pm"
 
 
 
-#line 1061 "../../../../blib/lib/PDL/PP.pm"
+#line 1060 "../../../../blib/lib/PDL/PP.pm"
+
 *gsl_sf_coulomb_wave_FGp_array = \&PDL::gsl_sf_coulomb_wave_FGp_array;
-#line 110 "COULOMB.pm"
+#line 115 "COULOMB.pm"
 
 
 
-#line 1059 "../../../../blib/lib/PDL/PP.pm"
+#line 1058 "../../../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 gsl_sf_coulomb_wave_sphF_array
@@ -130,17 +136,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 134 "COULOMB.pm"
-
-
-
-#line 1061 "../../../../blib/lib/PDL/PP.pm"
-*gsl_sf_coulomb_wave_sphF_array = \&PDL::gsl_sf_coulomb_wave_sphF_array;
 #line 140 "COULOMB.pm"
 
 
 
-#line 1059 "../../../../blib/lib/PDL/PP.pm"
+#line 1060 "../../../../blib/lib/PDL/PP.pm"
+
+*gsl_sf_coulomb_wave_sphF_array = \&PDL::gsl_sf_coulomb_wave_sphF_array;
+#line 147 "COULOMB.pm"
+
+
+
+#line 1058 "../../../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 gsl_sf_coulomb_CL_e
@@ -160,19 +168,21 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 164 "COULOMB.pm"
+#line 172 "COULOMB.pm"
 
 
 
-#line 1061 "../../../../blib/lib/PDL/PP.pm"
+#line 1060 "../../../../blib/lib/PDL/PP.pm"
+
 *gsl_sf_coulomb_CL_e = \&PDL::gsl_sf_coulomb_CL_e;
-#line 170 "COULOMB.pm"
+#line 179 "COULOMB.pm"
 
 
 
 
 
-#line 91 "gsl_sf_coulomb.pd"
+#line 90 "gsl_sf_coulomb.pd"
+
 =head1 AUTHOR
 
 This file copyright (C) 1999 Christian Pellegrin <chri@infis.univ.trieste.it>
@@ -185,7 +195,7 @@ PDL distribution, the copyright notice should be included in the file.
 The GSL SF modules were written by G. Jungman.
 
 =cut
-#line 189 "COULOMB.pm"
+#line 199 "COULOMB.pm"
 
 
 

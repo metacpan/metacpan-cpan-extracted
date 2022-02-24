@@ -3,9 +3,7 @@ use strict;
 use IO::String;
 use JSON;
 
-BEGIN {
-    require 't/test-lib.pm';
-}
+require 't/test-lib.pm';
 
 my $res;
 
@@ -108,11 +106,8 @@ ok(
     ),
     'POST expired switchcontext'
 );
-ok(
-    $res->[2]->[0] =~
-      m%<div class="message message-negative alert"><span trmsg="82"></span>%,
-    'Found "<span trmsg="82">"'
-) or explain( $res->[2]->[0], '<span trmsg="82">' );
+ok( $res->[2]->[0] =~ m%<span trmsg="82"></span>%, 'Found "<span trmsg="82">"' )
+  or explain( $res->[2]->[0], '<span trmsg="82">' );
 count(3);
 
 # ContextSwitching form

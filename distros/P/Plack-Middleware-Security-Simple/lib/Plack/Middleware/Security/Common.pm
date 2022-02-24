@@ -1,6 +1,6 @@
 package Plack::Middleware::Security::Common;
 
-# ABSTRACT: A simple security filter for with common rules.
+# ABSTRACT: A simple security filter for Plack with common rules.
 
 use strict;
 use warnings;
@@ -13,10 +13,12 @@ our @EXPORT = qw(
    archive_extensions
    cgi_bin
    dot_files
+   fake_extensions
    ip_address_referer
    misc_extensions
    non_printable_chars
    null_or_escape
+   protocol_in_path_or_referer
    require_content
    script_extensions
    system_dirs
@@ -25,7 +27,7 @@ our @EXPORT = qw(
    wordpress
 );
 
-our $VERSION = 'v0.5.0';
+our $VERSION = 'v0.6.0';
 
 
 
@@ -52,6 +54,14 @@ sub dot_files {
         PATH_INFO    => qr{(?:\.\./|/\.(?!well-known/))},
         QUERY_STRING => qr{\.\./},
     );
+}
+
+
+sub fake_extensions {
+    my $re = qr{;[.](?:\w+)\b};
+    return (
+        PATH_INFO    => $re,
+    )
 }
 
 
@@ -82,6 +92,16 @@ sub null_or_escape {
     return (
         REQUEST_URI  => $re,
     )
+}
+
+
+sub protocol_in_path_or_referer {
+    my $re = qr{\b(?:file|dns|jndi|unix|ldap):};
+    return (
+        PATH_INFO    => $re,
+        QUERY_STRING => $re,
+        HTTP_REFERER => $re,
+    );
 }
 
 
@@ -144,11 +164,11 @@ __END__
 
 =head1 NAME
 
-Plack::Middleware::Security::Common - A simple security filter for with common rules.
+Plack::Middleware::Security::Common - A simple security filter for Plack with common rules.
 
 =head1 VERSION
 
-version v0.5.0
+version v0.6.0
 
 =head1 SYNOPSIS
 
@@ -180,6 +200,9 @@ provides common filtering rules.
 Most of these rules don't directly improve the security of your web
 application: they simply block common exploit scanners from getting
 past the PSGI layer.
+
+Note that they cannot block any exploits of proxies that are in front
+of your PSGI application.
 
 See L</EXPORTS> for a list of rules.
 
@@ -222,6 +245,11 @@ or query string, or a C<cgi_wrapper> script.
 This blocks all requests that refer to dot-files or C<..>, except for
 the F</.well-known/> path.
 
+=head2 fake_extensions
+
+This blocks requests with fake extensions, usually done with image extensions, e.g.
+F</some/path;.jpg>.
+
 =head2 ip_address_referer
 
 This blocks all requests where the HTTP referer is an IP4 or IP6
@@ -243,6 +271,11 @@ This blocks requests with non-printable characters in the path.
 
 This blocks requests with nulls or escape chatacters in the path or
 query string.
+
+=head2 protocol_in_path_or_referer
+
+This blocks requests that have non-web protocols like C<file>, C<dns>,
+C<jndi>, C<unix> or C<ldap> in the path, query string or referer.
 
 =head2 require_content
 
@@ -274,7 +307,7 @@ request in most logs.
 
 =head2 webdav_methods
 
-This blocks requests using WebDAV-realted methods.
+This blocks requests using WebDAV-related methods.
 
 =head2 wordpress
 
@@ -302,7 +335,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2014,2018-2021 by Robert Rothenberg.
+This software is Copyright (c) 2014,2018-2022 by Robert Rothenberg.
 
 This is free software, licensed under:
 

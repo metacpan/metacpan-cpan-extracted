@@ -216,7 +216,7 @@ sub op {
                         oidcRPMetaDataOptionsClientSecret      => "rpsecret",
                         oidcRPMetaDataOptionsUserIDAttr        => "",
                         oidcRPMetaDataOptionsAccessTokenExpiration => 3600,
-                        oidcRPMetaDataOptionsLogoutUrl =>
+                        oidcRPMetaDataOptionsLogoutUrl             =>
                           'http://auth.rp.com/oidc/logout',
                         oidcRPMetaDataOptionsLogoutType            => 'front',
                         oidcRPMetaDataOptionsLogoutSessionRequired => 0,

@@ -3,9 +3,8 @@ use strict;
 use IO::String;
 use JSON qw(to_json from_json);
 
-BEGIN {
-    require 't/test-lib.pm';
-}
+require 't/test-lib.pm';
+
 my $maintests = 76;
 
 SKIP: {

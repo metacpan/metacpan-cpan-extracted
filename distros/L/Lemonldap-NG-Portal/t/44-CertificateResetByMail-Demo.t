@@ -41,14 +41,10 @@ use DateTime::Format::RFC3339;';
                 customRegister        => '::Register::Demo',
                 customResetCertByMail => '::CertificateResetByMail::Demo',
                 captcha_mail_enabled  => 0,
-                portalDisplayCertificateResetByMail => 1,
-                certificateResetByMailCeaAttribute  => 'description',
+                portalDisplayCertificateResetByMail        => 1,
+                certificateResetByMailCeaAttribute         => 'description',
                 certificateResetByMailCertificateAttribute =>
                   'userCertificate;binary',
-                certificateResetByMailStep1Body =>
-'Click here <a href="$url">  to confirm your mail. It will expire $expMailDate',
-                certificateResetByMailStep2Body =>
-                  'Certificate successfully reset!',
                 certificateValidityDelay => 30
 
             }
@@ -129,7 +125,7 @@ lkRrWfQftwmLyNIu3HfSgXlgAZS30ymfbzBU
                 },
                 'Hash::MultiValue'
             ),
-            'PATH_INFO' => '/certificateReset',
+            'PATH_INFO'   => '/certificateReset',
             'HTTP_ACCEPT' =>
 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
             'REQUEST_METHOD'       => 'POST',
@@ -151,7 +147,7 @@ lkRrWfQftwmLyNIu3HfSgXlgAZS30ymfbzBU
             'SERVER_SIGNATURE'               => '',
             'psgix.input.buffered'           => 1,
             'HTTP_UPGRADE_INSECURE_REQUESTS' => '1',
-            'CONTENT_TYPE' =>
+            'CONTENT_TYPE'                   =>
 'multipart/form-data; boundary=----WebKitFormBoundarybabRY9u6K9tERoLr',
             'plack.request.upload' => bless( {
                     'certif' => bless( {
@@ -211,7 +207,7 @@ lkRrWfQftwmLyNIu3HfSgXlgAZS30ymfbzBU
         }
     );
 
-    ok( mail() =~ /Certificate successfully reset/,
+    ok( mail() =~ /Votre certificat a bien été réinitialisé!/,
         'Certificate has been reset' );
 
     # Test invalid certificate
@@ -270,7 +266,7 @@ lkRrWfQftwmLyNIu3HfSgXlgAZS30ymfbzBU
                 },
                 'Hash::MultiValue'
             ),
-            'PATH_INFO' => '/certificateReset',
+            'PATH_INFO'   => '/certificateReset',
             'HTTP_ACCEPT' =>
 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
             'REQUEST_METHOD'       => 'POST',
@@ -292,7 +288,7 @@ lkRrWfQftwmLyNIu3HfSgXlgAZS30ymfbzBU
             'SERVER_SIGNATURE'               => '',
             'psgix.input.buffered'           => 1,
             'HTTP_UPGRADE_INSECURE_REQUESTS' => '1',
-            'CONTENT_TYPE' =>
+            'CONTENT_TYPE'                   =>
 'multipart/form-data; boundary=----WebKitFormBoundarybabRY9u6K9tERoLr',
             'plack.request.upload' => bless( {
                     'certif' => bless( {
@@ -352,8 +348,8 @@ lkRrWfQftwmLyNIu3HfSgXlgAZS30ymfbzBU
         }
     );
 
-    my $trmsg = $res->[2]->[0];           # get html response
-    my @trmsg = split( /\n/, $trmsg );    # split into lines
+    my $trmsg = $res->[2]->[0];               # get html response
+    my @trmsg = split( /\n/, $trmsg );        # split into lines
     @trmsg = grep( /trmsg="/, @trmsg ); # only get line corresponding to message
     $trmsg = $trmsg[0];                 # get the first one only
     $trmsg =~ s/.*trmsg="([0-9]+)".*/$1/g;    # get error code number

@@ -1,5 +1,21 @@
 Revision history for Plack-Middleware-Security-Simple:
 
+v0.6.0    2022-02-18 18:29:34+00:00 Europe/London
+  [Documentation]
+  - Fix typo in Plack::Middleware::Security::Common ABSTRACT!
+
+v0.5.1    2022-02-18 18:20:32+00:00 Europe/London
+  [Enhancements]
+  - Add fake_extensions and protocol_in_path_or_referer rules.
+
+  [Documentation]
+  - Bump copyright year.
+
+  - Fix typo in Plack::Middleware::Security::Common POD.
+
+  - Added note that this will not protect against exploits on proxies
+    that are in front of the PSGI application.
+
 v0.5.0    2021-10-19 16:55:34+01:00 Europe/London
   [Enhancements]
   - Add .yml files to the misc_extensions rule.

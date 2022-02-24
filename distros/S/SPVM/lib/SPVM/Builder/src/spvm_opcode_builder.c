@@ -2530,7 +2530,7 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                                 break;
                               case SPVM_BASIC_TYPE_C_ID_LONG:
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_MOVE_CONSTANT_LONG);
-                                opcode.operand1 = constant->constant_id;
+                                *(int64_t*)&opcode.operand1 = constant->value.lval;
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                 break;
                               case SPVM_BASIC_TYPE_C_ID_FLOAT:
@@ -2540,7 +2540,7 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                                 break;
                               case SPVM_BASIC_TYPE_C_ID_DOUBLE:
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_MOVE_CONSTANT_DOUBLE);
-                                opcode.operand1 = constant->constant_id;
+                                *(double*)&opcode.operand1 = constant->value.dval;
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                 break;
                               default:
@@ -4963,6 +4963,32 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
       }
     }
   }
+  
+  // Cleanup ops
+  {
+    int32_t class_index;
+    for (class_index = compiler->cur_class_base; class_index < compiler->classes->length; class_index++) {
+      SPVM_CLASS* class = SPVM_LIST_fetch(compiler->classes, class_index);
+      class->op_class = NULL;
+      class->op_name = NULL;
+      class->op_type = NULL;
+      
+      SPVM_LIST* methods = class->methods;
+      {
+        int32_t method_index;
+        for (method_index = 0; method_index < methods->length; method_index++) {
+          SPVM_METHOD* method = SPVM_LIST_fetch(methods, method_index);
+          method->op_method = NULL;
+          method->op_name = NULL;
+          method->op_block = NULL;
+          method->op_inline = NULL;
+          method->op_list_tmp_mys = NULL;
+          method->op_my_condition_flag = NULL;
+        }
+      }
+    }
+  }
+
 #ifdef SPVM_DEBUG_DUMP
 #include "spvm_dumper.h"
   printf("\n[OP codes]\n");

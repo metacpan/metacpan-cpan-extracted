@@ -34,7 +34,7 @@ sub validate_cda {
                 'X_ORIGINAL_URI'       => "/?$query",
                 'SERVER_PORT'          => '80',
                 'SERVER_PROTOCOL'      => 'HTTP/1.1',
-                'HTTP_USER_AGENT' =>
+                'HTTP_USER_AGENT'      =>
                   'Mozilla/5.0 (VAX-4000; rv:36.0) Gecko/20350101 Firefox',
                 'REMOTE_ADDR' => '127.0.0.1',
                 'HTTP_HOST'   => $domain,
@@ -61,7 +61,7 @@ sub validate_cda {
                 'X_ORIGINAL_URI'       => "/",
                 'SERVER_PORT'          => '80',
                 'SERVER_PROTOCOL'      => 'HTTP/1.1',
-                'HTTP_USER_AGENT' =>
+                'HTTP_USER_AGENT'      =>
                   'Mozilla/5.0 (VAX-4000; rv:36.0) Gecko/20350101 Firefox',
                 'REMOTE_ADDR' => '127.0.0.1',
                 'HTTP_HOST'   => $domain,

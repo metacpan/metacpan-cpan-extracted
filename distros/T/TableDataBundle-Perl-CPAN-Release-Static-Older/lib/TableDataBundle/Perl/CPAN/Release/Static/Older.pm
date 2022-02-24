@@ -3,9 +3,9 @@
 package TableDataBundle::Perl::CPAN::Release::Static::Older;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-10-05'; # DATE
+our $DATE = '2022-02-18'; # DATE
 our $DIST = 'TableDataBundle-Perl-CPAN-Release-Static-Older'; # DIST
-our $VERSION = '20210927.1'; # VERSION
+our $VERSION = '20220218.2'; # VERSION
 
 1;
 # ABSTRACT: Collection of TableData:: modules that contain older CPAN releases data
@@ -22,7 +22,7 @@ TableDataBundle::Perl::CPAN::Release::Static::Older - Collection of TableData:: 
 
 =head1 VERSION
 
-This document describes version 20210927.1 of TableDataBundle::Perl::CPAN::Release::Static::Older (from Perl distribution TableDataBundle-Perl-CPAN-Release-Static-Older), released on 2021-10-05.
+This document describes version 20220218.2 of TableDataBundle::Perl::CPAN::Release::Static::Older (from Perl distribution TableDataBundle-Perl-CPAN-Release-Static-Older), released on 2022-02-18.
 
 =head1 DESCRIPTION
 
@@ -82,6 +82,8 @@ This distribution contains the following L<TableData>:: modules:
 
 =item * L<TableData::Perl::CPAN::Release::Static::2020>
 
+=item * L<TableData::Perl::CPAN::Release::Static::2021>
+
 =back
 
 =head1 HOMEPAGE
@@ -90,7 +92,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/TableDataB
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/perlancar/perl-TableDataBundle-CPAN-Release-Static-Older>.
+Source repository is at L<https://github.com/perlancar/perl-TableDataBundle-Perl-CPAN-Release-Static-Older>.
 
 =head1 SEE ALSO
 
@@ -121,7 +123,7 @@ beyond that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2021 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

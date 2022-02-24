@@ -1,3 +1,9 @@
+0.007   2022-02-18  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] CSV parser needs to be instantiated with escape_char to
+          handle backslash escaping.
+
+
 0.006   2021-03-20  Released-By: PERLANCAR; Urgency: medium
 
 	- Add command line options --csv-sep & --csv-loose for CSV input files

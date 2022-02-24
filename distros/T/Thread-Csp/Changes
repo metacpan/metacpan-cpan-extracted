@@ -1,5 +1,17 @@
 Revision history for Thread-Csp
 
+0.008     2022-02-24 17:08:54+01:00 Europe/Amsterdam
+          - Revert using socketpair
+          - Use PerlProc_pipe instead of pipe
+
+0.007     2022-02-22 15:08:28+01:00 Europe/Amsterdam
+          - Use socketpair when pipe is not available
+          - Rename notifier methods
+
+0.006     2022-02-19 19:05:31+01:00 Europe/Amsterdam
+          - Replace set_notify with get_notifier
+          - Split Channel notifier into read and write
+
 0.005     2022-01-07 14:46:45+01:00 Europe/Amsterdam
           - Improve compatibility with older perl versions
 

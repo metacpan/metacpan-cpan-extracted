@@ -1,18 +1,18 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /Business/ID/BCA/list_bca_branches
-# and generated automatically using Perinci::CmdLine::Gen version 0.498
-
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-05-07'; # DATE
-our $DIST = 'App-IndonesianBankingUtils'; # DIST
-our $VERSION = '0.145'; # VERSION
+# and generated automatically using Perinci::CmdLine::Gen version 0.500
 
 use 5.010001;
 use strict;
 use warnings;
 
 use Perinci::CmdLine::Any;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-08-26'; # DATE
+our $DIST = 'App-IndonesianBankingUtils'; # DIST
+our $VERSION = '0.146'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/Business/ID/BCA/list_bca_branches",
@@ -36,45 +36,13 @@ list-bca-branches - BCA branches
 
 =head1 VERSION
 
-This document describes version 0.145 of list-bca-branches (from Perl distribution App-IndonesianBankingUtils), released on 2021-05-07.
+This document describes version 0.146 of list-bca-branches (from Perl distribution App-IndonesianBankingUtils), released on 2021-08-26.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % list-bca-branches [--city-code-contains=s] [--city-code-in-json=s]
-     [--city-code-in=s+] [--city-code-is=s] [--city-code-isnt=s]
-     [--city-code-max=s] [--city-code-min=s] [--city-code-not-contains=s]
-     [--city-code-not-in-json=s] [--city-code-not-in=s+]
-     [--city-code-xmax=s] [--city-code-xmin=s] [--city-code=s]
-     [--city-name-contains=s] [--city-name-in-json=s] [--city-name-in=s+]
-     [--city-name-is=s] [--city-name-isnt=s] [--city-name-max=s]
-     [--city-name-min=s] [--city-name-not-contains=s]
-     [--city-name-not-in-json=s] [--city-name-not-in=s+]
-     [--city-name-xmax=s] [--city-name-xmin=s] [--city-name=s]
-     [--code-contains=s] [--code-in-json=s] [--code-in=s+] [--code-is=s]
-     [--code-isnt=s] [--code-max=s] [--code-min=s] [--code-not-contains=s]
-     [--code-not-in-json=s] [--code-not-in=s+] [--code-xmax=s]
-     [--code-xmin=s] [--code=s] [--config-path=path | -c]
-     [--config-profile=profile | -P] [--ctime-contains=s]
-     [--ctime-in-json=s] [--ctime-in=s+] [--ctime-is=s] [--ctime-isnt=s]
-     [--ctime-max=s] [--ctime-min=s] [--ctime-not-contains=s]
-     [--ctime-not-in-json=s] [--ctime-not-in=s+] [--ctime-xmax=s]
-     [--ctime-xmin=s] [--ctime=s] [--detail] [--exclude-field=s+]
-     [--exclude-fields-json=s] [--field=s+] [--fields-json=s]
-     [--format=name] [--json] [-l] [--(no)naked-res] [--name-contains=s]
-     [--name-in-json=s] [--name-in=s+] [--name-is=s] [--name-isnt=s]
-     [--name-max=s] [--name-min=s] [--name-not-contains=s]
-     [--name-not-in-json=s] [--name-not-in=s+] [--name-xmax=s]
-     [--name-xmin=s] [--name=s] [--no-config | -C] [--no-detail] [--no-env]
-     [--no-random] [--nodetail] [--norandom] [--note-contains=s]
-     [--note-in-json=s] [--note-in=s+] [--note-is=s] [--note-isnt=s]
-     [--note-max=s] [--note-min=s] [--note-not-contains=s]
-     [--note-not-in-json=s] [--note-not-in=s+] [--note-xmax=s]
-     [--note-xmin=s] [--note=s] [--page-result[=program]] [--random]
-     [--result-limit=s] [--result-start=s] [--sort-json=s] [--sort=s+]
-     [--view-result[=program]] [--with-field-names] [--without-field-names]
-     [query]
+% B<list-bca-branches> [B<--city-code-contains>=I<str>] [(B<--city-code-in>=I<str>)+] [B<--city-code-is>=I<str>] [B<--city-code-isnt>=I<str>] [B<--city-code-max>=I<str>] [B<--city-code-min>=I<str>] [B<--city-code-not-contains>=I<str>] [(B<--city-code-not-in>=I<str>)+] [B<--city-code-xmax>=I<str>] [B<--city-code-xmin>=I<str>] [B<--city-code>=I<str>] [B<--city-name-contains>=I<str>] [(B<--city-name-in>=I<str>)+] [B<--city-name-is>=I<str>] [B<--city-name-isnt>=I<str>] [B<--city-name-max>=I<str>] [B<--city-name-min>=I<str>] [B<--city-name-not-contains>=I<str>] [(B<--city-name-not-in>=I<str>)+] [B<--city-name-xmax>=I<str>] [B<--city-name-xmin>=I<str>] [B<--city-name>=I<str>] [B<--code-contains>=I<str>] [(B<--code-in>=I<str>)+] [B<--code-is>=I<str>] [B<--code-isnt>=I<str>] [B<--code-max>=I<str>] [B<--code-min>=I<str>] [B<--code-not-contains>=I<str>] [(B<--code-not-in>=I<str>)+] [B<--code-xmax>=I<str>] [B<--code-xmin>=I<str>] [B<--code>=I<str>] [B<--config-path>=I<path>|B<-c>|B<--no-config>|B<-C>] [B<--config-profile>=I<profile>|B<-P>] [B<--ctime-contains>=I<str>] [(B<--ctime-in>=I<str>)+] [B<--ctime-is>=I<str>] [B<--ctime-isnt>=I<str>] [B<--ctime-max>=I<str>] [B<--ctime-min>=I<str>] [B<--ctime-not-contains>=I<str>] [(B<--ctime-not-in>=I<str>)+] [B<--ctime-xmax>=I<str>] [B<--ctime-xmin>=I<str>] [B<--ctime>=I<str>] [B<--detail>|B<-l>|B<--no-detail>|B<--nodetail>] [(B<--exclude-field>=I<str>)+] [(B<--field>=I<str>)+] [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--name-contains>=I<str>] [(B<--name-in>=I<str>)+] [B<--name-is>=I<str>] [B<--name-isnt>=I<str>] [B<--name-max>=I<str>] [B<--name-min>=I<str>] [B<--name-not-contains>=I<str>] [(B<--name-not-in>=I<str>)+] [B<--name-xmax>=I<str>] [B<--name-xmin>=I<str>] [B<--name>=I<str>] [B<--no-env>] [B<--note-contains>=I<str>] [(B<--note-in>=I<str>)+] [B<--note-is>=I<str>] [B<--note-isnt>=I<str>] [B<--note-max>=I<str>] [B<--note-min>=I<str>] [B<--note-not-contains>=I<str>] [(B<--note-not-in>=I<str>)+] [B<--note-xmax>=I<str>] [B<--note-xmin>=I<str>] [B<--note>=I<str>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--random>|B<--no-random>|B<--norandom>] [B<--result-limit>=I<int>] [B<--result-start>=I<int>] [(B<--sort>=I<str>)+] [B<--with-field-names>|B<--without-field-names>] [B<--city-code-in-json>=I<json>] [B<--city-code-not-in-json>=I<json>] [B<--city-name-in-json>=I<json>] [B<--city-name-not-in-json>=I<json>] [B<--code-in-json>=I<json>] [B<--code-not-in-json>=I<json>] [B<--ctime-in-json>=I<json>] [B<--ctime-not-in-json>=I<json>] [B<--exclude-fields-json>=I<json>] [B<--fields-json>=I<json>] [B<--name-in-json>=I<json>] [B<--name-not-in-json>=I<json>] [B<--note-in-json>=I<json>] [B<--note-not-in-json>=I<json>] [B<--sort-json>=I<json>] -- [I<query>]
 
 =head1 DESCRIPTION
 
@@ -566,6 +534,8 @@ Only return records where the 'note' field equals specified value.
 
 Search.
 
+Can also be specified as the 1st command-line argument.
+
 =back
 
 =head2 Ordering options
@@ -721,7 +691,7 @@ You can put multiple profiles in a single file by using section names like C<[pr
 
 You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
 
-You can also filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+You can also filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable equals some string: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal some string: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when the value of an environment variable includes some string: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. If you only want a section to be read when the value of an environment variable does not include some string: C<[env=HOSTNAME!*=server ...]> or C<[SOMESECTION env=HOSTNAME!*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
 
 To load and configure plugins, you can use either the C<-plugins> parameter (e.g. C<< -plugins=DumpArgs >> or C<< -plugins=DumpArgs@before_validate_args >>), or use the C<[plugin=NAME ...]> sections, for example:
 
@@ -840,6 +810,34 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-Indone
 
 Source repository is at L<https://github.com/perlancar/perl-App-IndonesianBankingUtils>.
 
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-IndonesianBankingUtils>
@@ -847,16 +845,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

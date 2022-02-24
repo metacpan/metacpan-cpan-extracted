@@ -3,7 +3,7 @@ package Mojo::UserAgent::CookieJar::ChromeMacOS;
 use strict;
 use warnings;
 use v5.10;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Mojo::Base 'Mojo::UserAgent::CookieJar';
 
@@ -16,6 +16,9 @@ use Crypt::CBC;
 
 # default Chrome cookie file for MacOSx
 has 'file' => sub {
+    if ($^O eq 'linux') {
+        return $ENV{HOME} . "/.config/google-chrome/Default/Cookies";
+    }
     return $ENV{HOME} . "/Library/Application Support/Google/Chrome/Default/Cookies";
 };
 has 'pass'; # for Linux
@@ -34,7 +37,7 @@ sub find {
     my $salt_len = 16;
     my $pass = $self->_get_pass();
     my $iterations = 1003;
-    $iterations = 1 if $pass eq 'peanuts'; # Linux
+    $iterations = 1 if $^O eq 'linux'; # Linux
     my $key = derive( 'SHA-1', $pass, $salt, $iterations, $salt_len );
     my $cipher = Crypt::CBC->new(
         -cipher => 'Crypt::OpenSSL::AES',
@@ -57,8 +60,9 @@ sub find {
         $sth->execute($domain, '.' . $domain);
         while (my $row = $sth->fetchrow_hashref) {
             my $value = $row->{value} || $row->{encrypted_value} || '';
-            if ( $value =~ /^v10/ ) {
+            if ( $value =~ /^v10/ or $value =~ /^v11/ ) {
                 $value =~ s/^v10//;
+                $value =~ s/^v11//;
                 $value = $cipher->decrypt( $value );
             }
 
@@ -106,10 +110,25 @@ sub _get_pass {
     my ($self) = @_;
 
     return $self->pass if $self->pass; # for Linux which passed in ->new
-    my $pass = `security find-generic-password -w -s "Chrome Safe Storage"`;
-    chomp( $pass );
-    $self->pass($pass);
 
+    my $pass;
+    if ($^O eq 'linux') {
+        # # secret-tool search application chrome
+        # [/org/freedesktop/secrets/collection/Default_5fkeyring/1]
+        # label = Chrome Safe Storage
+        # secret = 5B9eGeijTg1xQTh+K70Czg==
+        # created = 2022-02-18 02:23:25
+        # modified = 2022-02-18 02:23:25
+        # schema = chrome_libsecret_os_crypt_password_v2
+        # attribute.application = chrome
+        my $text = `secret-tool search application chrome`;
+        ($pass) = ($text =~ /secret\s*\=\s*(\S+)/m);
+    } else {
+        $pass = `security find-generic-password -w -s "Chrome Safe Storage"`;
+        chomp( $pass );
+    }
+
+    $self->pass($pass);
     return $pass;
 }
 

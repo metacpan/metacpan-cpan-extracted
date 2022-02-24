@@ -35,7 +35,7 @@
       },
       "develop" : {
          "recommends" : {
-            "Dist::Zilla::PluginBundle::Author::ETHER" : "0.161",
+            "Dist::Zilla::PluginBundle::Author::ETHER" : "0.162",
             "Dist::Zilla::PluginBundle::Git::VersionManager" : "0.007"
          },
          "requires" : {
@@ -162,15 +162,15 @@
    "provides" : {
       "B::Hooks::EndOfScope" : {
          "file" : "lib/B/Hooks/EndOfScope.pm",
-         "version" : "0.25"
+         "version" : "0.26"
       },
       "B::Hooks::EndOfScope::PP" : {
          "file" : "lib/B/Hooks/EndOfScope/PP.pm",
-         "version" : "0.25"
+         "version" : "0.26"
       },
       "B::Hooks::EndOfScope::XS" : {
          "file" : "lib/B/Hooks/EndOfScope/XS.pm",
-         "version" : "0.25"
+         "version" : "0.26"
       }
    },
    "release_status" : "stable",
@@ -186,10 +186,10 @@
          "web" : "https://github.com/karenetheridge/B-Hooks-EndOfScope"
       }
    },
-   "version" : "0.25",
+   "version" : "0.26",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.035003"
+         "version" : "5.035008"
       },
       "plugins" : [
          {
@@ -560,11 +560,6 @@
                         "version" : "4.018"
                      },
                      {
-                        "class" : "Pod::Weaver::Section::AllowOverride",
-                        "name" : "@Author::ETHER/allow override SUPPORT",
-                        "version" : "0.05"
-                     },
-                     {
                         "class" : "Pod::Weaver::Section::Authors",
                         "name" : "@Author::ETHER/Authors",
                         "version" : "4.018"
@@ -710,7 +705,7 @@
             "class" : "Dist::Zilla::Plugin::Git::Contributors",
             "config" : {
                "Dist::Zilla::Plugin::Git::Contributors" : {
-                  "git_version" : "2.31.1",
+                  "git_version" : "2.34.1",
                   "include_authors" : 0,
                   "include_releaser" : 1,
                   "order_by" : "commits",
@@ -801,7 +796,7 @@
             "class" : "Dist::Zilla::Plugin::EnsureLatestPerl",
             "config" : {
                "Dist::Zilla::Plugin::EnsureLatestPerl" : {
-                  "Module::CoreList" : "5.20210920"
+                  "Module::CoreList" : "5.20220120"
                }
             },
             "name" : "@Author::ETHER/EnsureLatestPerl",
@@ -834,7 +829,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.31.1",
+                  "git_version" : "2.34.1",
                   "repo_root" : "."
                }
             },
@@ -845,7 +840,7 @@
             "class" : "Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts",
             "config" : {
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.31.1",
+                  "git_version" : "2.34.1",
                   "repo_root" : "."
                }
             },
@@ -856,7 +851,7 @@
             "class" : "Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch",
             "config" : {
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.31.1",
+                  "git_version" : "2.34.1",
                   "repo_root" : "."
                }
             },
@@ -890,7 +885,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.31.1",
+                  "git_version" : "2.34.1",
                   "repo_root" : "."
                }
             },
@@ -1002,7 +997,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.31.1",
+                  "git_version" : "2.34.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -1019,12 +1014,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.25",
+                  "tag" : "0.26",
                   "tag_format" : "%v",
                   "tag_message" : "v%v%t"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.31.1",
+                  "git_version" : "2.34.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -1074,7 +1069,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.31.1",
+                  "git_version" : "2.34.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -1105,7 +1100,7 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.31.1",
+                  "git_version" : "2.34.1",
                   "repo_root" : "."
                }
             },
@@ -1274,8 +1269,8 @@
       "Tatsuhiko Miyagawa <miyagawa@bulknews.net>",
       "Tomas Doran <bobtfish@bobtfish.net>"
    ],
-   "x_generated_by_perl" : "v5.35.3",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
+   "x_generated_by_perl" : "v5.35.8",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_use_unsafe_inc" : 0
 }

@@ -18734,10 +18734,10 @@ sub cells_post_row_style {
     __PACKAGE__->method_documentation->{ 'cells_post_set_cell_html_string' } = { 
     	summary => 'Set htmlstring value into cell',
         params => $params,
-        returns => 'CellResponse',
+        returns => 'CellsCloudResponse',
         };
 }
-# @return CellResponse
+# @return CellsCloudResponse
 #
 sub cells_post_set_cell_html_string {
     my ($self, %args) = @_;
@@ -18825,7 +18825,7 @@ sub cells_post_set_cell_html_string {
     if (!$response) {
         return;
     }
-    my $_response_object = $self->{api_client}->deserialize('CellResponse', $response);
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
     return $_response_object;
 }
 
@@ -29364,10 +29364,10 @@ sub cells_worksheet_validations_put_worksheet_validation {
     __PACKAGE__->method_documentation->{ 'cells_worksheets_delete_unprotect_worksheet' } = { 
     	summary => 'Unprotect worksheet.',
         params => $params,
-        returns => 'WorksheetResponse',
+        returns => 'CellsCloudResponse',
         };
 }
-# @return WorksheetResponse
+# @return CellsCloudResponse
 #
 sub cells_worksheets_delete_unprotect_worksheet {
     my ($self, %args) = @_;
@@ -29438,7 +29438,7 @@ sub cells_worksheets_delete_unprotect_worksheet {
     if (!$response) {
         return;
     }
-    my $_response_object = $self->{api_client}->deserialize('WorksheetResponse', $response);
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
     return $_response_object;
 }
 
@@ -32254,10 +32254,10 @@ sub cells_worksheets_post_rename_worksheet {
     __PACKAGE__->method_documentation->{ 'cells_worksheets_post_update_worksheet_property' } = { 
     	summary => 'Update worksheet property',
         params => $params,
-        returns => 'WorksheetResponse',
+        returns => 'CellsCloudResponse',
         };
 }
-# @return WorksheetResponse
+# @return CellsCloudResponse
 #
 sub cells_worksheets_post_update_worksheet_property {
     my ($self, %args) = @_;
@@ -32328,7 +32328,7 @@ sub cells_worksheets_post_update_worksheet_property {
     if (!$response) {
         return;
     }
-    my $_response_object = $self->{api_client}->deserialize('WorksheetResponse', $response);
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
     return $_response_object;
 }
 
@@ -33287,10 +33287,10 @@ sub cells_worksheets_put_change_visibility_worksheet {
     __PACKAGE__->method_documentation->{ 'cells_worksheets_put_protect_worksheet' } = { 
     	summary => 'Protect worksheet.',
         params => $params,
-        returns => 'WorksheetResponse',
+        returns => 'CellsCloudResponse',
         };
 }
-# @return WorksheetResponse
+# @return CellsCloudResponse
 #
 sub cells_worksheets_put_protect_worksheet {
     my ($self, %args) = @_;
@@ -33361,7 +33361,7 @@ sub cells_worksheets_put_protect_worksheet {
     if (!$response) {
         return;
     }
-    my $_response_object = $self->{api_client}->deserialize('WorksheetResponse', $response);
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
     return $_response_object;
 }
 

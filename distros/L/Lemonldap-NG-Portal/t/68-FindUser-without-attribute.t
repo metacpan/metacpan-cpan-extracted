@@ -11,13 +11,13 @@ my $res;
 my $json;
 my $client = LLNG::Manager::Test->new( {
         ini => {
-            logLevel          => 'error',
-            authentication    => 'Demo',
-            userDB            => 'Same',
-            useSafeJail       => 1,
-            requireToken      => 0,
-            findUser          => 1,
-            impersonationRule => 1,
+            logLevel                    => 'error',
+            authentication              => 'Demo',
+            userDB                      => 'Same',
+            useSafeJail                 => 1,
+            requireToken                => 0,
+            findUser                    => 1,
+            impersonationRule           => 1,
             findUserExcludingAttributes =>
               { type => 'mutant', uid => 'rtyler' },
         }

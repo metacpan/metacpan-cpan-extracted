@@ -50,18 +50,21 @@ sub init($$) {
 # Set log level for Lemonldap::NG logs
 sub logLevelInit {
     my ($class) = @_;
-    my $logger = $class->localConfig->{logger} ||= $class->defaultLogger;
+    my $logger  = $class->localConfig->{logger} ||= $class->defaultLogger;
     eval "require $logger";
     die $@ if ($@);
-    unless (
-        $class->localConfig->{logLevel} =~ /^(debug|info|notice|warn|error)$/ )
+    my $err;
+    unless ( $class->localConfig->{logLevel} =~
+        /^(?:debug|info|notice|warn|error)$/ )
     {
-        print STDERR 'Bad logLevel value \''
+        $err =
+            'Bad logLevel value \''
           . $class->localConfig->{logLevel}
           . "', switching to 'info'\n";
         $class->localConfig->{logLevel} = 'info';
     }
     $class->logger( $logger->new( $class->localConfig ) );
+    $class->logger->error($err) if $err;
     $class->logger->debug("Logger $logger loaded");
     $logger = $class->localConfig->{userLogger} || $logger;
     eval "require $logger";

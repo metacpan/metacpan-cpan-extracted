@@ -1,6 +1,6 @@
 package Lemonldap::NG::Manager::Api::Common;
 
-our $VERSION = '2.0.12';
+our $VERSION = '2.0.14';
 
 package Lemonldap::NG::Manager::Api;
 
@@ -110,6 +110,9 @@ sub _translateValueConfToApi {
     elsif ( $optionName eq "oidcRPMetaDataOptionsAdditionalAudiences" ) {
         return [ split( /\s+/, $optionValue, ) ];
     }
+    elsif ( $optionName eq "casAppMetaDataOptionsService" ) {
+        return [ split( /\s+/, $optionValue, ) ];
+    }
     else {
         return $optionValue;
     }
@@ -134,7 +137,14 @@ sub _translateValueApiToConf {
 
     # additionalAudiences is handled as an array
     elsif ( $optionName eq 'additionalAudiences' ) {
-        die "postLogoutRedirectUris is not an array\n"
+        die "additionalAudiences is not an array\n"
+          unless ( ref($optionValue) eq "ARRAY" );
+        return join( ' ', @{$optionValue} );
+    }
+
+    # service is handled as an array
+    elsif ( $optionName eq 'service' ) {
+        die "service is not an array\n"
           unless ( ref($optionValue) eq "ARRAY" );
         return join( ' ', @{$optionValue} );
     }

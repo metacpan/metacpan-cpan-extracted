@@ -1,5 +1,5 @@
 package HackaMol::AtomGroup;
-$HackaMol::AtomGroup::VERSION = '0.051';
+$HackaMol::AtomGroup::VERSION = '0.053';
 #ABSTRACT: HackaMol AtomGroup class
 use 5.008;
 use Moose;
@@ -42,7 +42,7 @@ HackaMol::AtomGroup - HackaMol AtomGroup class
 
 =head1 VERSION
 
-version 0.051
+version 0.053
 
 =head1 SYNOPSIS
 

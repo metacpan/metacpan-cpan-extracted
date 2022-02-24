@@ -1,5 +1,10 @@
 Revision history for App::TimeTracker::Command::GitHub
 
+1.002	2022-02-19T20:33:09
+   - min perl version is 5.24 because we use postfix deref
+   - remove dead code copied from A:TT:Gitlab and never adapted
+
+
 1.001	2022-02-17T16:12:43
     - handle upstream projects/forks (Thomas Mantl)
     - remove hardcoded github-repo in client-config (Thomas Mantl)

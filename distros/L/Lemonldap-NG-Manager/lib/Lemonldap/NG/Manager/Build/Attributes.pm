@@ -6,7 +6,7 @@
 
 package Lemonldap::NG::Manager::Build::Attributes;
 
-our $VERSION = '2.0.13';
+our $VERSION = '2.0.14';
 use strict;
 use Regexp::Common qw/URI/;
 
@@ -239,7 +239,7 @@ sub attributes {
 
         # Other
         checkTime => {
-            type => 'int',
+            type          => 'int',
             documentation =>
               'Timeout to check new configuration in local cache',
             default => 600,
@@ -248,7 +248,7 @@ sub attributes {
         mySessionAuthorizedRWKeys => {
             type          => 'array',
             documentation => 'Alterable session keys by user itself',
-            default =>
+            default       =>
               [ '_appsListOrder', '_oidcConnectedRP', '_oidcConsents' ],
         },
         configStorage => {
@@ -297,7 +297,7 @@ sub attributes {
             flags         => 'h',
         },
         confirmFormMethod => {
-            type => "select",
+            type   => "select",
             select =>
               [ { k => 'get', v => 'GET' }, { k => 'post', v => 'POST' }, ],
             default       => 'post',
@@ -318,7 +318,7 @@ sub attributes {
             flags         => 'h',
         },
         infoFormMethod => {
-            type => "select",
+            type   => "select",
             select =>
               [ { k => 'get', v => 'GET' }, { k => 'post', v => 'POST' }, ],
             default       => 'get',
@@ -379,13 +379,13 @@ sub attributes {
             documentation => 'Enable portal status',
         },
         portalUserAttr => {
-            type    => 'text',
-            default => '_user',
+            type          => 'text',
+            default       => '_user',
             documentation =>
               'Session parameter to display connected user in portal',
         },
         redirectFormMethod => {
-            type => "select",
+            type   => "select",
             select =>
               [ { k => 'get', v => 'GET' }, { k => 'post', v => 'POST' }, ],
             default       => 'get',
@@ -436,13 +436,18 @@ sub attributes {
             flags         => 'hmp',
         },
         stayConnected => {
+            type          => 'boolOrExpr',
+            default       => 0,
+            documentation => 'Stay connected activation rule',
+        },
+        stayConnectedBypassFG => {
             type          => 'bool',
             default       => 0,
-            documentation => 'Enable StayConnected plugin',
+            documentation => 'Disable fingerprint checkng',
         },
         stayConnectedTimeout => {
-            type    => 'int',
-            default => 2592000,
+            type          => 'int',
+            default       => 2592000,
             documentation =>
               'StayConnected persistent connexion session timeout',
             flags => 'm',
@@ -476,6 +481,18 @@ sub attributes {
             documentation => 'Enable check DevOps download field',
             flags         => 'p',
         },
+        checkDevOpsDisplayNormalizedHeaders => {
+            default       => 1,
+            type          => 'bool',
+            documentation => 'Display normalized headers',
+            flags         => 'p',
+        },
+        checkDevOpsCheckSessionAttributes => {
+            default       => 1,
+            type          => 'bool',
+            documentation => 'Check if session attributes exist',
+            flags         => 'p',
+        },
         checkUser => {
             default       => 0,
             type          => 'bool',
@@ -496,12 +513,12 @@ sub attributes {
         },
         checkUserHiddenAttributes => {
             type          => 'text',
-            default       => '_loginHistory _session_id hGroups',
+            default       => '_loginHistory, _session_id, hGroups',
             documentation => 'Attributes to hide in CheckUser plugin',
             flags         => 'p',
         },
         checkUserSearchAttributes => {
-            type => 'text',
+            type          => 'text',
             documentation =>
               'Attributes used for retrieving sessions in user DataBase',
             flags => 'p',
@@ -534,6 +551,18 @@ sub attributes {
             default       => 1,
             type          => 'boolOrExpr',
             documentation => 'Display empty headers rule',
+            flags         => 'p',
+        },
+        checkUserDisplayHistory => {
+            default       => 0,
+            type          => 'boolOrExpr',
+            documentation => 'Display history rule',
+            flags         => 'p',
+        },
+        checkUserDisplayHiddenAttributes => {
+            default       => 0,
+            type          => 'boolOrExpr',
+            documentation => 'Display hidden attributes rule',
             flags         => 'p',
         },
         checkUserHiddenHeaders => {
@@ -572,6 +601,38 @@ sub attributes {
             type          => 'pcre',
             default       => '^[*\w]+$',
             documentation => 'Regular expression to validate parameters',
+        },
+        newLocationWarning => {
+            default       => 0,
+            type          => 'bool',
+            documentation => 'Enable New Location Warning',
+        },
+        newLocationWarningLocationAttribute => {
+            type          => 'text',
+            default       => 'ipAddr',
+            documentation => 'New location session attribute',
+        },
+        newLocationWarningLocationDisplayAttribute => {
+            type          => 'text',
+            default       => '',
+            documentation => 'New location session attribute for user display',
+        },
+        newLocationWarningMaxValues => {
+            type          => 'int',
+            default       => '0',
+            documentation => 'How many previous locations should be compared',
+        },
+        newLocationWarningMailAttribute => {
+            type          => 'text',
+            documentation => 'New location warning mail session attribute',
+        },
+        newLocationWarningMailBody => {
+            type          => 'longtext',
+            documentation => 'Mail body for new location warning',
+        },
+        newLocationWarningMailSubject => {
+            type          => 'text',
+            documentation => 'Mail subject for new location warning',
         },
         globalLogoutRule => {
             type          => 'boolOrExpr',
@@ -623,7 +684,7 @@ sub attributes {
         },
         impersonationHiddenAttributes => {
             type          => 'text',
-            default       => '_2fDevices _loginHistory',
+            default       => '_2fDevices, _loginHistory',
             documentation => 'Attributes to skip',
             flags         => 'p',
         },
@@ -684,14 +745,14 @@ sub attributes {
             flags         => 'p',
         },
         skipRenewConfirmation => {
-            type    => 'bool',
-            default => 0,
+            type          => 'bool',
+            default       => 0,
             documentation =>
               'Avoid asking confirmation when an Issuer asks to renew auth',
         },
         skipUpgradeConfirmation => {
-            type    => 'bool',
-            default => 0,
+            type          => 'bool',
+            default       => 0,
             documentation =>
               'Avoid asking confirmation during a session upgrade',
         },
@@ -700,7 +761,7 @@ sub attributes {
             documentation => 'Refresh sessions plugin',
         },
         forceGlobalStorageIssuerOTT => {
-            type => 'bool',
+            type          => 'bool',
             documentation =>
               'Force Issuer tokens to be stored into Global Storage',
         },
@@ -784,8 +845,8 @@ sub attributes {
             documentation => 'Show error if session is expired',
         },
         portalErrorOnMailNotFound => {
-            type    => 'bool',
-            default => 0,
+            type          => 'bool',
+            default       => 0,
             documentation =>
               'Show error if mail is not found in password reset process',
         },
@@ -877,15 +938,15 @@ sub attributes {
             documentation => 'Check XSS',
         },
         portalForceAuthn => {
-            default => 0,
-            help    => 'forcereauthn.html',
-            type    => 'bool',
+            default       => 0,
+            help          => 'forcereauthn.html',
+            type          => 'bool',
             documentation =>
               'Enable force to authenticate when displaying portal',
         },
         portalForceAuthnInterval => {
-            default => 5,
-            type    => 'int',
+            default       => 5,
+            type          => 'int',
             documentation =>
 'Maximum interval in seconds since last authentication to force reauthentication',
         },
@@ -916,15 +977,15 @@ sub attributes {
             documentation => 'Max lock time',
         },
         bruteForceProtectionIncrementalTempo => {
-            default => 0,
-            help    => 'bruteforceprotection.html',
-            type    => 'bool',
+            default       => 0,
+            help          => 'bruteforceprotection.html',
+            type          => 'bool',
             documentation =>
               'Enable incremental lock time for brute force attack protection',
         },
         bruteForceProtectionLockTimes => {
-            type    => 'text',
-            default => '15, 30, 60, 300, 600',
+            type          => 'text',
+            default       => '15, 30, 60, 300, 600',
             documentation =>
               'Incremental lock time values for brute force attack protection',
         },
@@ -937,7 +998,7 @@ sub attributes {
         },
         hiddenAttributes => {
             type          => 'text',
-            default       => '_password _2fDevices',
+            default       => '_password, _2fDevices',
             documentation => 'Name of attributes to hide in logs',
         },
         displaySessionId => {
@@ -960,38 +1021,38 @@ sub attributes {
             documentation => 'Enable Cross-Origin Resource Sharing',
         },
         corsAllow_Credentials => {
-            type    => 'text',
-            default => 'true',
+            type          => 'text',
+            default       => 'true',
             documentation =>
               'Allow credentials for Cross-Origin Resource Sharing',
         },
         corsAllow_Headers => {
-            type    => 'text',
-            default => '*',
+            type          => 'text',
+            default       => '*',
             documentation =>
               'Allowed headers for Cross-Origin Resource Sharing',
         },
         corsAllow_Methods => {
-            type    => 'text',
-            default => 'POST,GET',
+            type          => 'text',
+            default       => 'POST,GET',
             documentation =>
               'Allowed methods for Cross-Origin Resource Sharing',
         },
         corsAllow_Origin => {
-            type    => 'text',
-            default => '*',
+            type          => 'text',
+            default       => '*',
             documentation =>
               'Allowed origine for Cross-Origin Resource Sharing',
         },
         corsExpose_Headers => {
-            type    => 'text',
-            default => '*',
+            type          => 'text',
+            default       => '*',
             documentation =>
               'Exposed headers for Cross-Origin Resource Sharing',
         },
         corsMax_Age => {
-            type    => 'text',
-            default => '86400',    # 24 hours
+            type          => 'text',
+            default       => '86400',    # 24 hours
             documentation => 'MAx-age for Cross-Origin Resource Sharing',
         },
         cspDefault => {
@@ -1000,8 +1061,8 @@ sub attributes {
             documentation => 'Default value for Content-Security-Policy',
         },
         cspFormAction => {
-            type    => 'text',
-            default => "*",
+            type          => 'text',
+            default       => "*",
             documentation =>
               'Form action destination for Content-Security-Policy',
         },
@@ -1021,8 +1082,8 @@ sub attributes {
             documentation => 'Style source for Content-Security-Policy',
         },
         cspConnect => {
-            type    => 'text',
-            default => "'self'",
+            type          => 'text',
+            default       => "'self'",
             documentation =>
               'Authorized Ajax destination for Content-Security-Policy',
         },
@@ -1193,8 +1254,8 @@ sub attributes {
             documentation => 'Display logout tab in portal',
         },
         portalDisplayCertificateResetByMail => {
-            type    => 'bool',
-            default => 0,
+            type          => 'bool',
+            default       => 0,
             documentation =>
               'Display certificate reset by mail button in portal',
         },
@@ -1219,8 +1280,8 @@ sub attributes {
             documentation => 'Display OIDC consent tab in portal',
         },
         portalDisplayGeneratePassword => {
-            default => 1,
-            type    => 'bool',
+            default       => 1,
+            type          => 'bool',
             documentation =>
               'Display password generate box in reset password form',
         },
@@ -1299,7 +1360,7 @@ sub attributes {
         # Viewer
         viewerHiddenKeys => {
             type          => 'text',
-            default       => 'samlIDPMetaDataNodes samlSPMetaDataNodes',
+            default       => 'samlIDPMetaDataNodes, samlSPMetaDataNodes',
             documentation => 'Hidden Conf keys',
             flags         => 'm',
         },
@@ -1370,8 +1431,8 @@ sub attributes {
             documentation => 'Notification server activation',
         },
         notificationServerSentAttributes => {
-            type    => 'text',
-            default => 'uid reference date title subtitle text check',
+            type          => 'text',
+            default       => 'uid reference date title subtitle text check',
             documentation =>
               'Prameters to send with notification server GET method',
             flags => 'p',
@@ -1449,8 +1510,8 @@ sub attributes {
         globalStorageOptions => {
             type    => 'keyTextContainer',
             default => {
-                'Directory'     => '/var/lib/lemonldap-ng/sessions/',
-                'LockDirectory' => '/var/lib/lemonldap-ng/sessions/lock/',
+                'Directory'      => '/var/lib/lemonldap-ng/sessions/',
+                'LockDirectory'  => '/var/lib/lemonldap-ng/sessions/lock/',
                 'generateModule' =>
                   'Lemonldap::NG::Common::Apache::Session::Generate::SHA256',
             },
@@ -1576,8 +1637,8 @@ sub attributes {
             documentation => 'Send a mail when password is changed',
         },
         portalRequireOldPassword => {
-            default => 1,
-            type    => 'boolOrExpr',
+            default       => 1,
+            type          => 'boolOrExpr',
             documentation =>
               'Rule to require old password to change the password',
         },
@@ -1792,7 +1853,7 @@ sub attributes {
             documentation => 'Upgrade session activation',
         },
         forceGlobalStorageUpgradeOTT => {
-            type => 'bool',
+            type          => 'bool',
             documentation =>
               'Force Upgrade tokens be stored into Global Storage',
         },
@@ -1821,7 +1882,7 @@ sub attributes {
             documentation => 'U2F self registration activation',
         },
         u2fAuthnLevel => {
-            type => 'int',
+            type          => 'int',
             documentation =>
               'Authentication level for users authentified by password+U2F'
         },
@@ -1855,7 +1916,7 @@ sub attributes {
             documentation => 'TOTP self registration activation',
         },
         totp2fAuthnLevel => {
-            type => 'int',
+            type          => 'int',
             documentation =>
               'Authentication level for users authentified by password+TOTP'
         },
@@ -1895,6 +1956,11 @@ sub attributes {
             type          => 'int',
             documentation => 'TOTP device time to live ',
         },
+        totp2fEncryptSecret => {
+            type          => 'bool',
+            default       => 0,
+            documentation => 'Encrypt TOTP secrets in database',
+        },
 
         # UTOTP 2F
         utotp2fActivation => {
@@ -1903,7 +1969,7 @@ sub attributes {
             documentation => 'UTOTP activation (mixed U2F/TOTP module)',
         },
         utotp2fAuthnLevel => {
-            type => 'int',
+            type          => 'int',
             documentation =>
 'Authentication level for users authentified by password+(U2F or TOTP)'
         },
@@ -1940,7 +2006,7 @@ sub attributes {
             documentation => 'Second factor code timeout',
         },
         mail2fAuthnLevel => {
-            type => 'int',
+            type          => 'int',
             documentation =>
 'Authentication level for users authenticated by Mail second factor'
         },
@@ -1977,7 +2043,7 @@ sub attributes {
             documentation => 'Validation command of External second factor',
         },
         ext2fAuthnLevel => {
-            type => 'int',
+            type          => 'int',
             documentation =>
 'Authentication level for users authentified by External second factor'
         },
@@ -2008,7 +2074,7 @@ sub attributes {
             documentation => 'Radius 2f verification timeout',
         },
         radius2fAuthnLevel => {
-            type => 'int',
+            type          => 'int',
             documentation =>
 'Authentication level for users authenticated by Radius second factor'
         },
@@ -2052,7 +2118,7 @@ sub attributes {
             documentation => 'Args for REST 2F init',
         },
         rest2fAuthnLevel => {
-            type => 'int',
+            type          => 'int',
             documentation =>
 'Authentication level for users authentified by REST second factor'
         },
@@ -2077,7 +2143,7 @@ sub attributes {
             documentation => 'Yubikey self registration activation',
         },
         yubikey2fAuthnLevel => {
-            type => 'int',
+            type          => 'int',
             documentation =>
 'Authentication level for users authentified by Yubikey second factor'
         },
@@ -2116,13 +2182,61 @@ sub attributes {
             documentation => 'Authorize users to remove existing Yubikey',
         },
         yubikey2fFromSessionAttribute => {
-            type => 'text',
+            type          => 'text',
             documentation =>
               'Provision yubikey from the given session variable',
         },
         yubikey2fTTL => {
             type          => 'int',
             documentation => 'Yubikey device time to live',
+        },
+
+        # WebAuthn 2FA
+        webauthn2fActivation => {
+            type          => 'boolOrExpr',
+            default       => 0,
+            documentation => 'WebAuthn second factor activation',
+        },
+        webauthn2fSelfRegistration => {
+            type          => 'boolOrExpr',
+            default       => 0,
+            documentation => 'WebAuthn self registration activation',
+        },
+        webauthn2fAuthnLevel => {
+            type          => 'int',
+            documentation =>
+'Authentication level for users authentified by WebAuthn second factor'
+        },
+        webauthn2fLabel => {
+            type          => 'text',
+            documentation => 'Portal label for WebAuthn second factor'
+        },
+        webauthn2fLogo => {
+            type          => 'text',
+            documentation => 'Custom logo for WebAuthn 2F',
+        },
+        webauthn2fUserVerification => {
+            type   => 'select',
+            select => [
+                { k => 'discouraged', v => 'Discouraged' },
+                { k => 'preferred',   v => 'Preferred' },
+                { k => 'required',    v => 'Required' },
+            ],
+            default       => 'preferred',
+            documentation => 'Verify user during registration and login',
+        },
+        webauthn2fUserCanRemoveKey => {
+            type          => 'bool',
+            default       => 1,
+            documentation => 'Authorize users to remove existing WebAuthn',
+        },
+        webauthnDisplayNameAttr => {
+            type          => 'text',
+            documentation => 'Session attribute containing user display name',
+        },
+        webauthnRpName => {
+            type          => 'text',
+            documentation => 'WebAuthn Relying Party display name',
         },
 
         # Single session
@@ -2169,14 +2283,14 @@ sub attributes {
             documentation => 'Enable REST password reset server',
         },
         restExportSecretKeys => {
-            default => 0,
-            type    => 'bool',
+            default       => 0,
+            type          => 'bool',
             documentation =>
               'Allow to export secret keys in REST session server',
         },
         restClockTolerance => {
-            default => 15,
-            type    => 'int',
+            default       => 15,
+            type          => 'int',
             documentation =>
               'How tolerant the REST session server will be to clock dift',
         },
@@ -2205,7 +2319,7 @@ sub attributes {
             documentation => 'Enable SOAP config server',
         },
         exportedAttr => {
-            type => 'text',
+            type          => 'text',
             documentation =>
               'List of attributes to export by SOAP or REST servers',
         },
@@ -2236,6 +2350,7 @@ sub attributes {
                 return $@ ? 0 : 1;
             },
             keyMsgFail    => '__badRegexp__',
+            help          => "adaptativeauthenticationlevel.html",
             documentation => 'Adaptative authentication level rules',
             flags         => 'p',
         },
@@ -2335,7 +2450,8 @@ sub attributes {
             default       => 'Main',
             documentation => 'Handler type',
         },
-        vhostAuthnLevel => { type => 'int' },
+        vhostAuthnLevel     => { type => 'int' },
+        vhostDevOpsRulesUrl => { type => 'url' },
 
         # SecureToken parameters
         secureTokenAllowOnError => {
@@ -2426,6 +2542,11 @@ sub attributes {
             type          => 'bool',
             documentation => 'Disable host-based matching of CAS services',
         },
+        casTicketExpiration => {
+            default       => 0,
+            type          => 'int',
+            documentation => 'Expiration time of Service and Proxy tickets',
+        },
         issuerDBCASActivation => {
             default       => 0,
             type          => 'bool',
@@ -2453,7 +2574,7 @@ sub attributes {
             documentation => 'CAS exported variables',
         },
         casAppMetaDataOptionsService => {
-            type          => 'url',
+            type          => 'text',
             documentation => 'CAS App service',
         },
         casAppMetaDataOptionsUserAttribute => {
@@ -2461,7 +2582,7 @@ sub attributes {
             documentation => 'CAS User attribute',
         },
         casAppMetaDataOptionsAuthnLevel => {
-            type => 'int',
+            type          => 'int',
             documentation =>
               'Authentication level requires to access to this CAS application',
         },
@@ -2623,8 +2744,8 @@ sub attributes {
             default => 'RSA_SHA256',
         },
         samlServiceUseCertificateInResponse => {
-            type    => 'bool',
-            default => 0,
+            type          => 'bool',
+            default       => 0,
             documentation =>
               'Use certificate instead of public key in SAML responses',
         },
@@ -2647,8 +2768,8 @@ sub attributes {
             documentation => 'SAML authn context password level',
         },
         samlAuthnContextMapPasswordProtectedTransport => {
-            type    => 'int',
-            default => 3,
+            type          => 'int',
+            default       => 3,
             documentation =>
               'SAML authn context password protected transport level',
         },
@@ -3009,15 +3130,15 @@ sub attributes {
             documentation => 'SAML SP SLO SOAP',
         },
         samlSPSSODescriptorAssertionConsumerServiceHTTPArtifact => {
-            type => 'samlAssertion',
+            type    => 'samlAssertion',
             default =>
-              '1;0;urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact;'
+              '0;1;urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact;'
               . '#PORTAL#/saml/proxySingleSignOnArtifact',
             documentation => 'SAML SP ACS HTTP artifact',
         },
         samlSPSSODescriptorAssertionConsumerServiceHTTPPost => {
             type    => 'samlAssertion',
-            default => '0;1;urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST;'
+            default => '1;0;urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST;'
               . '#PORTAL#/saml/proxySingleSignOnPost',
             documentation => 'SAML SP ACS HTTP POST',
         },
@@ -3101,7 +3222,7 @@ sub attributes {
             default => 1,
         },
         samlSPMetaDataOptionsAuthnLevel => {
-            type => 'int',
+            type          => 'int',
             documentation =>
               'Authentication level requires to access to this SP',
         },
@@ -3213,9 +3334,9 @@ sub attributes {
             documentation => 'Rule to display second factor Manager link',
         },
         sfRemovedMsgRule => {
-            type    => 'boolOrExpr',
-            default => 0,
-            help    => 'secondfactor.html',
+            type          => 'boolOrExpr',
+            default       => 0,
+            help          => 'secondfactor.html',
             documentation =>
               'Display a message if at leat one expired SF has been removed',
         },
@@ -3237,7 +3358,7 @@ sub attributes {
             documentation => 'Notification title',
         },
         sfRemovedNotifMsg => {
-            type => 'text',
+            type    => 'text',
             default =>
 '_removedSF_ expired second factor(s) has/have been removed (_nameSF_)!',
             help          => 'secondfactor.html',
@@ -3248,13 +3369,14 @@ sub attributes {
             documentation => 'Timeout for 2F registration process',
         },
         available2F => {
-            type          => 'text',
-            default       => 'UTOTP,TOTP,U2F,REST,Mail2F,Ext2F,Yubikey,Radius',
+            type    => 'text',
+            default =>
+              'UTOTP,TOTP,U2F,REST,Mail2F,Ext2F,WebAuthn,Yubikey,Radius',
             documentation => 'Available second factor modules',
         },
         available2FSelfRegistration => {
-            type    => 'text',
-            default => 'TOTP,U2F,Yubikey',
+            type          => 'text',
+            default       => 'TOTP,U2F,WebAuthn,Yubikey',
             documentation =>
               'Available self-registration modules for second factor',
         },
@@ -3418,8 +3540,8 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
             documentation => 'LDAP attribute name for member in groups',
         },
         ldapGroupAttributeNameUser => {
-            type    => 'text',
-            default => 'dn',
+            type          => 'text',
+            default       => 'dn',
             documentation =>
 'LDAP attribute name in user entry referenced as member in groups',
         },
@@ -3429,8 +3551,8 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
             documentation => 'LDAP attributes to search in groups',
         },
         ldapGroupAttributeNameGroup => {
-            type    => 'text',
-            default => 'dn',
+            type          => 'text',
+            default       => 'dn',
             documentation =>
 'LDAP attribute name in group entry referenced as member in groups',
         },
@@ -3472,12 +3594,12 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
             default => 'require',
         },
         ldapCAFile => {
-            type => 'text',
+            type          => 'text',
             documentation =>
               'Location of the certificate file for LDAP connections',
         },
         ldapCAPath => {
-            type => 'text',
+            type          => 'text',
             documentation =>
               'Location of the CA directory for LDAP connections',
         },
@@ -3585,8 +3707,8 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
             default       => 3,
             documentation => 'Radius authentication level',
         },
-        radiusSecret => { type => 'text', },
-        radiusServer => { type => 'text', },
+        radiusSecret => { type => 'text' },
+        radiusServer => { type => 'text' },
 
         # REST
         restAuthUrl       => { type => 'url' },
@@ -3597,7 +3719,14 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
         restPwdModifyUrl  => { type => 'url' },
 
         # Remote
-        remotePortal        => { type => 'text', },
+        remoteCookieName => {
+            type          => 'text',
+            test          => qr/^[a-zA-Z][a-zA-Z0-9_-]*$/,
+            msgFail       => '__badCookieName__',
+            documentation => 'Name of the remote portal cookie',
+            flags         => 'p',
+        },
+        remotePortal        => { type => 'text' },
         remoteGlobalStorage => {
             type          => 'PerlModule',
             default       => 'Lemonldap::NG::Common::Apache::Session::SOAP',
@@ -3607,17 +3736,33 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
             type    => 'keyTextContainer',
             default => {
                 proxy => 'http://auth.example.com/sessions',
-                ns =>
+                ns    =>
 'http://auth.example.com/Lemonldap/NG/Common/PSGI/SOAPService',
             },
             documentation => 'Apache::Session module parameters',
         },
 
         # Proxy
-        proxyAuthService    => { type => 'text', },
-        proxySessionService => { type => 'text', },
-        remoteCookieName    => { type => 'text', },
-        proxyUseSoap        => {
+        proxyAuthService            => { type => 'text' },
+        proxySessionService         => { type => 'text' },
+        proxyAuthServiceChoiceValue => { type => 'text' },
+        proxyAuthServiceChoiceParam => {
+            type    => 'text',
+            default => 'lmAuth'
+        },
+        proxyAuthServiceImpersonation => {
+            type          => 'bool',
+            default       => 0,
+            documentation => 'Enable internal portal Impersonation',
+        },
+        proxyCookieName => {
+            type          => 'text',
+            test          => qr/^[a-zA-Z][a-zA-Z0-9_-]*$/,
+            msgFail       => '__badCookieName__',
+            documentation => 'Name of the internal portal cookie',
+            flags         => 'p',
+        },
+        proxyUseSoap => {
             type          => 'bool',
             default       => 0,
             documentation => 'Use SOAP instead of REST',
@@ -3689,7 +3834,7 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
             default => 'id,first-name,last-name,email-address'
         },
         linkedInUserField => { type => 'text', default => 'emailAddress' },
-        linkedInScope =>
+        linkedInScope     =>
           { type => 'text', default => 'r_liteprofile r_emailaddress' },
 
         # GitHub
@@ -3736,10 +3881,10 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
         dbiUserTable    => { type => 'text', },
 
         # TODO: add dbiMailCol
-        dbiAuthLoginCol    => { type => 'text', },
-        dbiAuthPasswordCol => { type => 'text', },
-        dbiPasswordMailCol => { type => 'text', },
-        userPivot          => { type => 'text', },
+        dbiAuthLoginCol     => { type => 'text', },
+        dbiAuthPasswordCol  => { type => 'text', },
+        dbiPasswordMailCol  => { type => 'text', },
+        userPivot           => { type => 'text', },
         dbiAuthPasswordHash =>
           { type => 'text', help => 'authdbi.html#password', },
         dbiDynamicHashEnabled =>
@@ -4124,13 +4269,13 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
             documentation => 'OpenID Connect global access token TTL',
         },
         oidcServiceDynamicRegistrationExportedVars => {
-            type => 'keyTextContainer',
+            type          => 'keyTextContainer',
             documentation =>
               'OpenID Connect exported variables for dynamic registration',
         },
         oidcServiceDynamicRegistrationExtraClaims => {
-            type    => 'keyTextContainer',
-            keyTest => qr/^[\x21\x23-\x5B\x5D-\x7E]+$/,
+            type          => 'keyTextContainer',
+            keyTest       => qr/^[\x21\x23-\x5B\x5D-\x7E]+$/,
             documentation =>
               'OpenID Connect extra claims for dynamic registration',
         },
@@ -4189,7 +4334,7 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
         oidcOPMetaDataOptionsJWKSTimeout  => { type => 'int', default => 0 },
         oidcOPMetaDataOptionsClientID     => { type => 'text', },
         oidcOPMetaDataOptionsClientSecret => { type => 'password', },
-        oidcOPMetaDataOptionsScope =>
+        oidcOPMetaDataOptionsScope        =>
           { type => 'text', default => 'openid profile' },
         oidcOPMetaDataOptionsDisplay => {
             type   => 'select',
@@ -4218,13 +4363,14 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
           { type => 'bool', default => 1 },
         oidcOPMetaDataOptionsIDTokenMaxAge => { type => 'int',  default => 30 },
         oidcOPMetaDataOptionsUseNonce      => { type => 'bool', default => 1 },
-        oidcOPMetaDataOptionsDisplayName  => { type => 'text', },
-        oidcOPMetaDataOptionsIcon         => { type => 'text', },
-        oidcOPMetaDataOptionsStoreIDToken => { type => 'bool', default => 0 },
-        oidcOPMetaDataOptionsSortNumber   => { type => 'int', },
+        oidcOPMetaDataOptionsDisplayName   => { type => 'text', },
+        oidcOPMetaDataOptionsIcon          => { type => 'text', },
+        oidcOPMetaDataOptionsStoreIDToken  => { type => 'bool', default => 0 },
+        oidcOPMetaDataOptionsSortNumber    => { type => 'int', },
 
         # OpenID Connect relying parties
         oidcRPMetaDataExportedVars => {
+            help    => 'idpopenidconnect.html#oidcexportedattr',
             type    => 'oidcAttributeContainer',
             keyTest => qr/\w/,
             test    => qr/\w/,
@@ -4252,7 +4398,7 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
             ],
             default => 'HS512',
         },
-        oidcRPMetaDataOptionsIDTokenExpiration => { type => 'int' },
+        oidcRPMetaDataOptionsIDTokenExpiration  => { type => 'int' },
         oidcRPMetaDataOptionsIDTokenForceClaims =>
           { type => 'bool', default => 0 },
         oidcRPMetaDataOptionsAccessTokenSignAlg => {
@@ -4289,7 +4435,8 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
         oidcRPMetaDataOptionsExtraClaims                 => {
             type    => 'keyTextContainer',
             keyTest => qr/^[\x21\x23-\x5B\x5D-\x7E]+$/,
-            default => {}
+            default => {},
+            help    => 'idpopenidconnect.html#oidcextraclaims'
         },
         oidcRPMetaDataOptionsBypassConsent => {
             type    => 'bool',
@@ -4333,8 +4480,8 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
             documentation => 'Allow offline access',
         },
         oidcRPMetaDataOptionsAllowPasswordGrant => {
-            type    => 'bool',
-            default => 0,
+            type          => 'bool',
+            default       => 0,
             documentation =>
               'Allow OAuth2 Resource Owner Password Credentials Grant',
         },
@@ -4349,7 +4496,7 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
             documentation => 'Issue refresh tokens',
         },
         oidcRPMetaDataOptionsAuthnLevel => {
-            type => 'int',
+            type          => 'int',
             documentation =>
               'Authentication level requires to access to this RP',
         },

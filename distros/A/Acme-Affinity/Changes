@@ -1,5 +1,8 @@
 Revision history for Acme-Affinity
 
+0.0113 2022-02-18 06:46:03
+    - Attempt to appease cpantesters...
+
 0.0112 2022-02-16 22:09:44
     - Specify Math::BigInt minimum version.
 

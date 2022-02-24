@@ -47,7 +47,7 @@
    "provides" : {
       "YAOO" : {
          "file" : "lib/YAOO.pm",
-         "version" : "0.06"
+         "version" : "0.08"
       }
    },
    "release_status" : "stable",
@@ -58,6 +58,6 @@
          "web" : "https://github.com/ThisUsedToBeAnEmail/YAOO"
       }
    },
-   "version" : "0.06",
+   "version" : "0.08",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

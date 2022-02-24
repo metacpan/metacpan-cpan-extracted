@@ -21,7 +21,8 @@ use DynaLoader;
 
 
 
-#line 5 "gsl_sf_elementary.pd"
+#line 4 "gsl_sf_elementary.pd"
+
 use strict;
 use warnings;
 
@@ -34,7 +35,7 @@ PDL::GSLSF::ELEMENTARY - PDL interface to GSL Special Functions
 This is an interface to the Special Function package present in the GNU Scientific Library. 
 
 =cut
-#line 38 "ELEMENTARY.pm"
+#line 39 "ELEMENTARY.pm"
 
 
 
@@ -48,7 +49,8 @@ This is an interface to the Special Function package present in the GNU Scientif
 
 
 
-#line 1059 "../../../../blib/lib/PDL/PP.pm"
+#line 1058 "../../../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 gsl_sf_multiply
@@ -68,17 +70,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 72 "ELEMENTARY.pm"
+#line 74 "ELEMENTARY.pm"
 
 
 
-#line 1061 "../../../../blib/lib/PDL/PP.pm"
+#line 1060 "../../../../blib/lib/PDL/PP.pm"
+
 *gsl_sf_multiply = \&PDL::gsl_sf_multiply;
-#line 78 "ELEMENTARY.pm"
+#line 81 "ELEMENTARY.pm"
 
 
 
-#line 1059 "../../../../blib/lib/PDL/PP.pm"
+#line 1058 "../../../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 gsl_sf_multiply_err
@@ -98,19 +102,21 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 102 "ELEMENTARY.pm"
+#line 106 "ELEMENTARY.pm"
 
 
 
-#line 1061 "../../../../blib/lib/PDL/PP.pm"
+#line 1060 "../../../../blib/lib/PDL/PP.pm"
+
 *gsl_sf_multiply_err = \&PDL::gsl_sf_multiply_err;
-#line 108 "ELEMENTARY.pm"
+#line 113 "ELEMENTARY.pm"
 
 
 
 
 
-#line 52 "gsl_sf_elementary.pd"
+#line 51 "gsl_sf_elementary.pd"
+
 =head1 AUTHOR
 
 This file copyright (C) 1999 Christian Pellegrin <chri@infis.univ.trieste.it>
@@ -123,7 +129,7 @@ PDL distribution, the copyright notice should be included in the file.
 The GSL SF modules were written by G. Jungman.
 
 =cut
-#line 127 "ELEMENTARY.pm"
+#line 133 "ELEMENTARY.pm"
 
 
 

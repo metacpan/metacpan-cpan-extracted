@@ -21,7 +21,8 @@ use DynaLoader;
 
 
 
-#line 5 "gsl_sf_dilog.pd"
+#line 4 "gsl_sf_dilog.pd"
+
 use strict;
 use warnings;
 
@@ -34,7 +35,7 @@ PDL::GSLSF::DILOG - PDL interface to GSL Special Functions
 This is an interface to the Special Function package present in the GNU Scientific Library. 
 
 =cut
-#line 38 "DILOG.pm"
+#line 39 "DILOG.pm"
 
 
 
@@ -48,7 +49,8 @@ This is an interface to the Special Function package present in the GNU Scientif
 
 
 
-#line 1059 "../../../../blib/lib/PDL/PP.pm"
+#line 1058 "../../../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 gsl_sf_dilog
@@ -68,17 +70,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 72 "DILOG.pm"
+#line 74 "DILOG.pm"
 
 
 
-#line 1061 "../../../../blib/lib/PDL/PP.pm"
+#line 1060 "../../../../blib/lib/PDL/PP.pm"
+
 *gsl_sf_dilog = \&PDL::gsl_sf_dilog;
-#line 78 "DILOG.pm"
+#line 81 "DILOG.pm"
 
 
 
-#line 1059 "../../../../blib/lib/PDL/PP.pm"
+#line 1058 "../../../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 gsl_sf_complex_dilog
@@ -98,19 +102,21 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 102 "DILOG.pm"
+#line 106 "DILOG.pm"
 
 
 
-#line 1061 "../../../../blib/lib/PDL/PP.pm"
+#line 1060 "../../../../blib/lib/PDL/PP.pm"
+
 *gsl_sf_complex_dilog = \&PDL::gsl_sf_complex_dilog;
-#line 108 "DILOG.pm"
+#line 113 "DILOG.pm"
 
 
 
 
 
-#line 55 "gsl_sf_dilog.pd"
+#line 54 "gsl_sf_dilog.pd"
+
 =head1 AUTHOR
 
 This file copyright (C) 1999 Christian Pellegrin <chri@infis.univ.trieste.it>
@@ -123,7 +129,7 @@ PDL distribution, the copyright notice should be included in the file.
 The GSL SF modules were written by G. Jungman.
 
 =cut
-#line 127 "DILOG.pm"
+#line 133 "DILOG.pm"
 
 
 

@@ -47,10 +47,10 @@ ok( $bbb->sum == $bbb->nelem, "slices of slices of giant PDLs seem to work right
 # make_physical
 # dummy
 # clump
-# thread_define
-# thread
+# broadcast_define
+# broadcast
 # diagonal
-# thread[123I]
+# broadcast[123I]
 # sever
 # info
 # mslice

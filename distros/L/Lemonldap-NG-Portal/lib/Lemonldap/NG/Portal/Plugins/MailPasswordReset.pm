@@ -567,6 +567,7 @@ sub display {
         MAIN_LOGO       => $self->conf->{portalMainLogo},
         AUTH_ERROR      => $req->error,
         AUTH_ERROR_TYPE => $req->error_type,
+        AUTH_ERROR_ROLE => $req->error_role,
         AUTH_URL        => $req->data->{_url},
         CHOICE_VALUE    => $req->{_authChoice},
         EXPMAILDATE     => $req->data->{expMailDate},

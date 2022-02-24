@@ -43,7 +43,28 @@ sub launch {
     my $class = "Lemonldap::NG::Handler::ApacheMP2::$type";
     eval "require $class";
     die $@ if ($@);
+
+    # register the request object to the logging system
+    if ( ref( $class->logger ) and $class->logger->can('setRequestObj') ) {
+        $class->logger->setRequestObj($req);
+    }
+    if ( ref( $class->userLogger )
+        and $class->userLogger->can('setRequestObj') )
+    {
+        $class->userLogger->setRequestObj($req);
+    }
+
     my ($res) = $class->$sub($req);
+
+    # Clear the logging system before the next request
+    if ( ref( $class->logger ) and $class->logger->can('clearRequestObj') ) {
+        $class->logger->clearRequestObj($req);
+    }
+    if ( ref( $class->userLogger )
+        and $class->userLogger->can('clearRequestObj') )
+    {
+        $class->userLogger->clearRequestObj($req);
+    }
     return $res;
 }
 

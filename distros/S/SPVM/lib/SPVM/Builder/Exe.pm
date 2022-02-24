@@ -299,12 +299,18 @@ sub compile_source_file {
 
   my $source_file = $opt->{source_file};
   my $output_file = $opt->{output_file};
+  my $depend_files = $opt->{depend_files};
+  unless ($depend_files) {
+    $depend_files = [];
+  }
+  
+  my $input_files = [$source_file, @$depend_files];
   
   my $need_generate = SPVM::Builder::Util::need_generate({
     global_force => $self->force,
     config_force => $config->force,
     output_file => $output_file,
-    input_files => [$source_file],
+    input_files => $input_files,
   });
 
   # Compile command
@@ -344,11 +350,11 @@ sub create_bootstrap_source {
   my $class_name = $self->class_name;
   
   # Class names
-  my $class_names = $builder->get_class_names;
+  my $class_names_exclude_anon = $builder->get_class_names_exclude_anon;
   
   # Module files - Input
   my $module_files = [];
-  for my $class_name (@$class_names) {
+  for my $class_name (@$class_names_exclude_anon) {
     my $module_file = $builder->get_module_file($class_name);
     push @$module_files, $module_file;
   }
@@ -387,7 +393,7 @@ sub create_bootstrap_source {
 EOS
     
     $boot_source .= "// module source get functions declaration\n";
-    for my $class_name (@$class_names) {
+    for my $class_name (@$class_names_exclude_anon) {
       my $class_cname = $class_name;
       $class_cname =~ s/::/__/g;
       $boot_source .= <<"EOS";
@@ -395,9 +401,9 @@ const char* SPMODSRC__${class_cname}__get_module_source();
 EOS
     }
 
-    my $class_names_including_anon = $self->builder->get_class_names_including_anon;
+    my $class_names = $self->builder->get_class_names;
     $boot_source .= "// precompile functions declaration\n";
-    for my $class_name (@$class_names_including_anon) {
+    for my $class_name (@$class_names) {
       my $precompile_method_names = $builder->get_method_names($class_name, 'precompile');
       for my $method_name (@$precompile_method_names) {
         my $class_cname = $class_name;
@@ -409,7 +415,7 @@ EOS
     }
 
     $boot_source .= "// native functions declaration\n";
-    for my $class_cname (@$class_names) {
+    for my $class_cname (@$class_names_exclude_anon) {
       my $native_method_names = $builder->get_method_names($class_cname, 'native');
       for my $method_name (@$native_method_names) {
         my $class_cname = $class_cname;
@@ -431,21 +437,18 @@ EOS
 EOS
 
     $boot_source .= <<'EOS';
+
+  SPVM_ENV* compiler_env = SPVM_API_new_env_raw(NULL);
   
   // Create compiler
-  SPVM_COMPILER* compiler = SPVM_COMPILER_new();
+  SPVM_COMPILER* compiler = compiler_env->new_compiler(compiler_env);
 
-  // Create use op for entry point class
-  SPVM_OP* op_name_start = SPVM_OP_new_op_name(compiler, class_name, class_name, 0);
-  SPVM_OP* op_type_start = SPVM_OP_build_basic_type(compiler, op_name_start);
-  SPVM_OP* op_use_start = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_USE, class_name, 0);
-  SPVM_OP_build_use(compiler, op_use_start, op_type_start, NULL, 0);
-  SPVM_LIST_push(compiler->op_use_stack, op_use_start);
-  
+  compiler_env->compiler_set_start_file(compiler_env, compiler, class_name);
+
   // Set module source_files
 EOS
     
-    for my $class_name (@$class_names) {
+    for my $class_name (@$class_names_exclude_anon) {
       my $class_cname = $class_name;
       $class_cname =~ s/::/__/g;
       
@@ -458,15 +461,22 @@ EOS
 
     $boot_source .= <<'EOS';
 
-  SPVM_COMPILER_compile(compiler);
+  int32_t compile_error_code = compiler_env->compiler_compile_spvm(compiler_env, compiler, class_name);
 
-  if (SPVM_COMPILER_get_error_count(compiler) > 0) {
-    SPVM_COMPILER_print_error_messages(compiler, stderr);
-    exit(1);
+  if (compile_error_code != 0) {
+    int32_t error_messages_length = compiler_env->compiler_get_error_messages_length(compiler_env, compiler);
+    for (int32_t i = 0; i < error_messages_length; i++) {
+      const char* error_message = compiler_env->compiler_get_error_message(compiler_env, compiler, i);
+      fprintf(stderr, "%s\n", error_message);
+    }
+    exit(255);
   }
+
+  compiler_env->free_env_raw(compiler_env);
+  compiler_env = NULL;
 EOS
     
-    for my $class_name (@$class_names_including_anon) {
+    for my $class_name (@$class_names) {
       my $class_cname = $class_name;
       $class_cname =~ s/::/__/g;
       
@@ -489,7 +499,7 @@ EOS
       }
     }
 
-    for my $class_name (@$class_names) {
+    for my $class_name (@$class_names_exclude_anon) {
       my $class_cname = $class_name;
       $class_cname =~ s/::/__/g;
       
@@ -515,7 +525,15 @@ EOS
     $boot_source .= <<'EOS';
     
   // Create env
-  SPVM_ENV* env = SPVM_API_create_env(compiler);
+  SPVM_ENV* env = SPVM_API_new_env_raw(NULL);
+  
+  // Set the compiler
+  env->compiler = compiler;
+  
+  // Initialize env
+  SPVM_API_init_env(env);
+  
+  env->call_init_blocks(env);
   
   // Class
   int32_t method_id = SPVM_API_get_class_method_id(env, class_name, "main", "int(string,string[])");
@@ -560,8 +578,12 @@ EOS
   
   // Leave scope
   env->leave_scope(env, scope_id);
+
+  // Cleanup global variables
+  SPVM_API_cleanup_global_vars(env);
   
-  SPVM_API_free_env(env);
+  // Free env
+  SPVM_API_free_env_raw(env);
 
   // Free compiler
   SPVM_COMPILER_free(compiler);
@@ -585,7 +607,7 @@ EOS
   
   # Create source file
   $self->create_source_file({
-    input_files => $module_files,
+    input_files => [@$module_files, __FILE__],
     output_file => $boot_source_file,
     create_cb => $create_cb,
   });
@@ -623,52 +645,19 @@ sub compile_spvm_core_sources {
   my $spvm_builder_dir = $spvm_builder_config_dir;
   $spvm_builder_dir =~ s/\/Config\.pm$//;
 
-  # Add SPVM src directory
+  # SPVM src directory
   my $spvm_core_source_dir = "$spvm_builder_dir/src";
+
+  # SPVM header directory
+  my $spvm_core_header_dir = "$spvm_builder_dir/include";
   
   # SPVM runtime source files
-  my @spvm_runtime_src_base_names = qw(
-    spvm_allocator.c
-    spvm_allow.c
-    spvm_api.c
-    spvm_array_field_access.c
-    spvm_basic_type.c
-    spvm_block.c
-    spvm_call_method.c
-    spvm_case_info.c
-    spvm_implement.c
-    spvm_compiler.c
-    spvm_constant.c
-    spvm_csource_builder_precompile.c
-    spvm_descriptor.c
-    spvm_dumper.c
-    spvm_enumeration.c
-    spvm_enumeration_value.c
-    spvm_field_access.c
-    spvm_field.c
-    spvm_hash.c
-    spvm_list.c
-    spvm_my.c
-    spvm_op.c
-    spvm_op_checker.c
-    spvm_opcode_array.c
-    spvm_opcode_builder.c
-    spvm_opcode.c
-    spvm_class.c
-    spvm_class_var_access.c
-    spvm_class_var.c
-    spvm_string_buffer.c
-    spvm_method.c
-    spvm_switch_info.c
-    spvm_toke.c
-    spvm_type.c
-    spvm_use.c
-    spvm_var.c
-    spvm_yacc.c
-    spvm_yacc_util.c
-  );
+  my $spvm_runtime_src_base_names = SPVM::Builder::Util::get_spvm_core_source_file_names();
 
-  my @spvm_core_source_files = map { "$spvm_core_source_dir/$_" } @spvm_runtime_src_base_names;
+  my @spvm_core_source_files = map { "$spvm_core_source_dir/$_" } @$spvm_runtime_src_base_names;
+
+  my $spvm_core_header_file_names = SPVM::Builder::Util::get_spvm_core_header_file_names();
+  my @spvm_core_header_files = map { "$spvm_core_header_dir/$_" } @$spvm_core_header_file_names;
   
   # Object dir
   my $object_dir = $self->builder->create_build_object_path;
@@ -682,7 +671,11 @@ sub compile_spvm_core_sources {
     $object_file =~ s/\.c$//;
     $object_file .= '.o';
     
-    my $object_file_info = $self->compile_source_file({source_file => $src_file, output_file => $object_file});
+    my $object_file_info = $self->compile_source_file({
+      source_file => $src_file,
+      output_file => $object_file,
+      depend_files => [@spvm_core_header_files]
+    });
     push @$object_file_infos, $object_file_info;
   }
   
@@ -696,9 +689,9 @@ sub create_spvm_module_sources {
   my $builder = $self->builder;
   
   # Compiled class names
-  my $class_names = $builder->get_class_names;
+  my $class_names_exclude_anon = $builder->get_class_names_exclude_anon;
   
-  for my $class_name (@$class_names) {
+  for my $class_name (@$class_names_exclude_anon) {
     
     # Moudle file - Input
     my $module_file = $builder->get_module_file($class_name);
@@ -740,7 +733,7 @@ EOS
     
     # Create source file
     $self->create_source_file({
-      input_files => [$module_file],
+      input_files => [$module_file, __FILE__],
       output_file => $module_source_csource_file,
       create_cb => $create_cb,
     });
@@ -753,9 +746,9 @@ sub compile_spvm_module_sources {
   my $builder = $self->builder;
   
   # Compile module source files
-  my $class_names = $builder->get_class_names;
+  my $class_names_exclude_anon = $builder->get_class_names_exclude_anon;
   my $object_file_infos = [];
-  for my $class_name (@$class_names) {
+  for my $class_name (@$class_names_exclude_anon) {
     my $perl_class_name = "SPVM::$class_name";
     
     # Build source directory
@@ -798,8 +791,8 @@ sub create_precompile_csources {
     force => $self->force,
   );
 
-  my $class_names = $builder->get_class_names;
-  for my $class_name (@$class_names) {
+  my $class_names_exclude_anon = $builder->get_class_names_exclude_anon;
+  for my $class_name (@$class_names_exclude_anon) {
     my $precompile_method_names = $builder->get_method_names($class_name, 'precompile');
     if (@$precompile_method_names) {
       
@@ -834,9 +827,9 @@ sub compile_precompile_sources {
     force => $self->force,
   );
   
-  my $class_names = $builder->get_class_names;
+  my $class_names_exclude_anon = $builder->get_class_names_exclude_anon;
   my $object_files = [];
-  for my $class_name (@$class_names) {
+  for my $class_name (@$class_names_exclude_anon) {
     my $precompile_method_names = $builder->get_method_names($class_name, 'precompile');
     if (@$precompile_method_names) {
       my $src_dir = $self->builder->create_build_src_path;
@@ -878,9 +871,9 @@ sub compile_native_csources {
     force => $self->force,
   );
   
-  my $class_names = $builder->get_class_names;
+  my $class_names_exclude_anon = $builder->get_class_names_exclude_anon;
   my $all_object_files = [];
-  for my $class_name (@$class_names) {
+  for my $class_name (@$class_names_exclude_anon) {
 
     my $perl_class_name = "SPVM::$class_name";
     

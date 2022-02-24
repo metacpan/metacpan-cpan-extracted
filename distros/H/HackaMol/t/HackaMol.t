@@ -273,7 +273,7 @@ ok ($mol_lys->count_atoms, "readline_func for LYS read still has atoms");
 is ($mol_lys->select_group("resname LYS")->count_atoms, $mol_lys->count_atoms, "only lysines are parsed");
 
 #{
-#  my $mol = $hack->read_file_mol("t/lib/shit.zmat");
+#  my $mol = $hack->read_file_mol("t/lib/testing.zmat");
 #  $mol->print_xyz;
 #  exit;
 #}

@@ -3,12 +3,18 @@ package Lemonldap::NG::Portal::Auth::Combination;
 use strict;
 use Mouse;
 use Lemonldap::NG::Common::Combination::Parser;
-use Lemonldap::NG::Portal::Main::Constants qw(PE_OK PE_ERROR PE_FIRSTACCESS);
+use Lemonldap::NG::Portal::Main::Constants qw(
+  PE_CONFIRM
+  PE_ERROR
+  PE_FIRSTACCESS
+  PE_FORMEMPTY
+  PE_PASSWORD_OK
+  PE_OK
+);
 use Scalar::Util 'weaken';
 
-our $VERSION = '2.0.12';
+our $VERSION = '2.0.14';
 
-# TODO: See Lib::Wrapper
 extends 'Lemonldap::NG::Portal::Main::Auth';
 with 'Lemonldap::NG::Portal::Lib::OverConf';
 
@@ -126,7 +132,7 @@ sub getDisplayType {
         $req->data->{dataKeep}->{combinationTry},
         $req->data->{combinationStack}
     );
-    my ( $res, $name ) = $stack->[$nb]->[0]->( 'getDisplayType', @_ );
+    my $res = $stack->[$nb]->[0]->( 'getDisplayType', @_ );
     return $res;
 }
 
@@ -231,13 +237,14 @@ sub try {
         return PE_ERROR;
     }
 
+    my $stop = 0;
     if ( $nb < @$stack - 1 ) {
 
         # TODO: change logLevel for userLog()
         ( $res, $name ) = $stack->[$nb]->[$type]->( $subname, $req, @args );
 
         # On error, restart authentication with next scheme
-        if ( $res > PE_OK ) {
+        unless ( $stop = $self->stop( $stack->[$nb]->[$type], $res ) ) {
             $self->logger->info(qq'Scheme "$name" returned $res, trying next');
             $req->data->{dataKeep}->{combinationTry}++;
             $req->steps( [ @{ $req->data->{combinationSteps} } ] );
@@ -251,11 +258,17 @@ sub try {
     $req->sessionInfo->{ [ '_auth', '_userDB' ]->[$type] } = $name;
     $req->sessionInfo->{_combinationTry} =
       $req->data->{dataKeep}->{combinationTry};
-    if ( $res > 0 and $res != PE_FIRSTACCESS ) {
-        $self->userLogger->warn( 'All schemes failed'
-              . ( $req->user ? ' for user ' . $req->user : '' ) . ' ('
-              . $req->address
-              . ')' );
+    if ( $res > 0 ) {
+        if ($stop) {
+            $self->userLogger->info(
+                "Combination stopped by plugin $name (code $res)");
+        }
+        elsif ( $res != PE_FIRSTACCESS ) {
+            $self->userLogger->warn( 'All schemes failed'
+                  . ( $req->user ? ' for user ' . $req->user : '' ) . ' ('
+                  . $req->address
+                  . ')' );
+        }
     }
     return $res;
 }
@@ -267,6 +280,32 @@ sub name {
     my ( $self, $req, $type ) = @_;
     return $req->sessionInfo->{ ( $type eq 'auth' ? '_auth' : '_userDB' ) }
       || 'Combination';
+}
+
+sub stop {
+    my ( $self, $mod, $res ) = @_;
+    return 1
+      if (
+        $res <= 0    # PE_OK
+        or $res == PE_CONFIRM
+        or $res == PE_PASSWORD_OK
+
+        # TODO: adding this may generate behavior change
+        #or $res == PE_FIRSTACCESS
+        #or $res == PE_FORMEMPTY
+      );
+    my ( $ret, $name );
+    $ret = $mod->( 'can', 'stop' );
+    if ($ret) {
+        eval { ( $ret, $name ) = $mod->( 'stop', $res ) };
+        if ($@) {
+
+            $self->logger->error(
+                "Optional ${name}::stop() method failed: " . $@ );
+            return 0;
+        }
+    }
+    return $ret;
 }
 
 package Lemonldap::NG::Portal::Lib::Combination::UserLogger;

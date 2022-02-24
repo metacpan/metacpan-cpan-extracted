@@ -57,7 +57,7 @@ pp_def('polyfill_pp',
     HandleBad => 0, # a marker
 	Pars => 'int [o,nc] im(m,n); float ps(two=2,np); int col()',
 	Code => 'int ierr = 0, nerr;
-	         threadloop %{
+	         broadcastloop %{
 		   polyfill($P(im), $SIZE(m), $SIZE(n), $P(ps), $SIZE(np), $col(), &nerr);
 		   ierr = ierr < nerr ? nerr : ierr;
 		 %}
@@ -85,7 +85,7 @@ for my $name (sort keys %pnpolyFields) {
 	        #define VERTX(q) $ps(k=>0,l=>q)
 	        #define VERTY(q) $ps(k=>1,l=>q)
 
-			threadloop %{
+			broadcastloop %{
 				loop(n) %{
 					loop(m) %{
 	                	c = 0;
@@ -272,7 +272,7 @@ sub PDL::conv2d {
            init_map("i") .
            init_map("j") .
 '
-           threadloop %{
+           broadcastloop %{
            for(j=0; j<n_size; j++) {
               for(i=0; i<m_size; i++) {
                  tmp = 0;
@@ -297,7 +297,7 @@ sub PDL::conv2d {
            init_map("i") .
            init_map("j") .
 '
-           threadloop %{
+           broadcastloop %{
            for(j=0; j<n_size; j++) {
               for(i=0; i<m_size; i++) {
                  tmp = 0;
@@ -391,7 +391,7 @@ sub PDL::med2d {
            init_map("i") .
            init_map("j") .
 '
-           threadloop %{
+           broadcastloop %{
            for(j=0; j<n_size; j++) {
               for(i=0; i<m_size; i++) {
                  count = 0;
@@ -424,7 +424,7 @@ sub PDL::med2d {
            init_map("j") .
 '
            PDL_Double tmp[p_size*q_size];
-           threadloop %{
+           broadcastloop %{
            for(j=0; j<n_size; j++) {
               for(i=0; i<m_size; i++) {
                  count = 0;
@@ -521,7 +521,7 @@ sub PDL::med2df {
            init_map("j") .
 '
            $GENERIC() tmp[p_size*q_size];
-           threadloop %{
+           broadcastloop %{
            for(j=0; j<n_size; j++) {
               for(i=0; i<m_size; i++) {
                  count = 0;
@@ -565,7 +565,7 @@ pp_def('box2d',
 
 		div = 1/((2.0*nx+1)*(2.0*ny+1));
 
-		threadloop %{
+		broadcastloop %{
 		  first = 1;
 		  for (y=0;y<ys;y++)
 		    for (xx=0; xx<nx; xx++) {
@@ -666,7 +666,7 @@ EOD
 
          m_size = $SIZE(m); n_size = $SIZE(n);
 
-      threadloop %{
+      broadcastloop %{
 
          for(j=0; j<n_size; j++) {
             for(i=0; i<m_size; i++) {
@@ -700,7 +700,7 @@ EOD
 	    } /* for: i */
          } /* for: j */
 
-      %} /* threadloop */
+      %} /* broadcastloop */
 
          ', # Code
 );
@@ -739,7 +739,7 @@ bad values, depending on the pattern of bad values in the input ndarray.',
          flag = 0;
          m_size = $SIZE(m); n_size = $SIZE(n);
 
-      threadloop %{
+      broadcastloop %{
 
          for(j=0; j<n_size; j++) {
             for(i=0; i<m_size; i++) {
@@ -782,7 +782,7 @@ bad values, depending on the pattern of bad values in the input ndarray.',
 	    } /* for: i */
          } /* for: j */
 
-      %} /* threadloop */
+      %} /* broadcastloop */
 
          /* handle bad flag */
          if ( flag ) $PDLSTATESETBAD(b);
@@ -1302,7 +1302,7 @@ sub PDL::polyfillv :lvalue {
 EOPM
 
 pp_addhdr(<<'EOF');
-int getnewsize(int cols, int rows, float fangle, int *newcols, int *newrows);
+int getnewsize(PDL_Indx cols, PDL_Indx rows, float fangle, PDL_Indx *newcols, PDL_Indx *newrows);
 typedef unsigned char imT;    /* image type */
 int rotate(imT *im, imT *out, int cols, int rows, int nc, int nr,
            float fangle, imT bgval, int antialias);
@@ -1316,7 +1316,7 @@ rotnewsz(m,n,angle)
 	int n
 	float angle
 	PPCODE:
-	int newcols, newrows;
+	PDL_Indx newcols, newrows;
 
 	if (getnewsize(m,n,angle,&newcols,&newrows) != 0)
 		croak("wrong angle (should be between -90 and +90)");
@@ -1332,23 +1332,17 @@ pp_def('rot2d',
 		 if ((ierr = rotate($P(im),$P(om),$SIZE(m),$SIZE(n),$SIZE(p),
 			$SIZE(q),$angle(),$bg(),$aa())) != 0) {
 			if (ierr == -1)
-				croak("error during rotate, wrong angle");
+				$CROAK("error during rotate, wrong angle");
 			else
-				croak("wrong output dims, did you set them?");
+				$CROAK("wrong output dims, did you set them?");
 		}',
-	# ugly workaround since $SIZE(m) and $SIZE(n) are not initialized
-	# when the redodimscode is called
-	# need to fix this!
-	RedoDimsCode => 'int ncols, nrows;
-			if ($PDL(im)->ndims < 2)
-				croak("need > 2d ndarray");
-			if (getnewsize($PDL(im)->dims[0],$PDL(im)->dims[1],
-				$angle(), &ncols,
-				&nrows) != 0)
-			   croak("error during rotate, wrong angle");
+	RedoDimsCode => '
+			if (getnewsize($SIZE(m),$SIZE(n),
+				$angle(), &$SIZE(p),
+				&$SIZE(q)) != 0)
+			   $CROAK("error during rotate, wrong angle");
 			/* printf("o: %d, p: %d\n",ncols,nrows); */
-			$SIZE(p) = ncols;
-			$SIZE(q) = nrows;',
+			',
 	GenericTypes => ['B'],
 	Doc => << 'EOD',
 
@@ -1403,7 +1397,7 @@ EOD
   double x,y,dx,dy,y1,y2,y3,y4,t,u,sum;
 
   if ($SIZE(q)>=$SIZE(n) && $SIZE(p)>=$SIZE(m)) {
-    threadloop %{
+    broadcastloop %{
       dx = ((double) ($SIZE(n)-1)) / ($SIZE(q)-1);
       dy = ((double) ($SIZE(m)-1)) / ($SIZE(p)-1);
       for(i=0,x=0;i<$SIZE(q);i++,x+=dx) {
@@ -1460,7 +1454,7 @@ ox = $SIZE(p);
 oy = $SIZE(q);
 
 if(ox >= ix && oy >= iy) {
-  threadloop %{
+  broadcastloop %{
     kx = ((double) (ox)) / (ix);
     ky = ((double) (oy)) / (iy);
     lx = 0;
@@ -1481,7 +1475,7 @@ if(ox >= ix && oy >= iy) {
   %}
 }
 else if(ox < ix && oy < iy) {
-  threadloop %{
+  broadcastloop %{
     kx = ((double) (ix)) / (ox);
     ky = ((double) (iy)) / (oy);
     lx = 0;
@@ -1506,7 +1500,7 @@ else if(ox < ix && oy < iy) {
   %}
 }
 else if(ox >= ix && oy < iy) {
-  threadloop %{
+  broadcastloop %{
     kx = ((double) (ox)) / (ix);
     ky = ((double) (iy)) / (oy);
     lx = 0;
@@ -1533,7 +1527,7 @@ else if(ox >= ix && oy < iy) {
   %}
 }
 else if(ox < ix && oy >= iy) {
-  threadloop %{
+  broadcastloop %{
     kx = ((double) (ix)) / (ox);
     ky = ((double) (oy)) / (iy);
     lx = 0;
@@ -2183,7 +2177,7 @@ sub PDL::warp2d {
     /* Generate default interpolation kernel */
     kernel = generate_interpolation_kernel( $COMP(kernel_type) ) ;
     if (kernel == NULL) {
-      croak( "Ran out of memory building kernel\n" );
+      $CROAK( "Ran out of memory building kernel\n" );
     }
 
     /* Compute sizes  */
@@ -2217,12 +2211,12 @@ sub PDL::warp2d {
     /* allocate memory for polynomial */
     poly = malloc( ncoeff * sizeof(double) );
     if ( poly == NULL ) {
-      croak( "Ran out of memory\n" );
+      $CROAK( "Ran out of memory\n" );
     }
     poly[0] = 1.0;
 
     /* Loop over the output image */
-    threadloop %{
+    broadcastloop %{
 	loop(n) %{
 
 	    /* fill in poly array */
@@ -2294,7 +2288,7 @@ sub PDL::warp2d {
 
 	    %}   /* loop(m) */
 	 %}   /* loop(n) */
-    %}        /* threadloop */
+    %}        /* broadcastloop */
 
     free(poly);
     kernel_free(kernel) ;
@@ -2369,17 +2363,17 @@ sub PDL::warp2d_kernel ($) {
     double     *kernel, xx;
 
     if ( $SIZE(n) != KERNEL_SAMPLES ) {
-	croak( "Internal error in warp2d_kernel - mismatch in kernel size\n" );
+	$CROAK( "Internal error in warp2d_kernel - mismatch in kernel size\n" );
     }
 
     kernel = generate_interpolation_kernel($COMP(name));
     if ( kernel == NULL ) {
-	croak( "unable to allocate memory for kernel" );
+	$CROAK( "unable to allocate memory for kernel" );
     }
 
     /* fill in ndarrays */
     xx = 0.0;
-    threadloop %{
+    broadcastloop %{
 	loop (n) %{
 	    $x() = xx;
 	    $k() = kernel[n];

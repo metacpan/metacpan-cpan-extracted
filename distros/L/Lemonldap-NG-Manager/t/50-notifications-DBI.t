@@ -86,7 +86,7 @@ SKIP: {
     $notif = '{"done":1}';
     $res   = $client->jsonPutResponse(
         'notifications/actives/dwho_Test',
-        '', IO::String->new($notif),
+        '',                 IO::String->new($notif),
         'application/json', length($notif)
     );
     ok( $res->{result} == 1, 'Result = 1' );

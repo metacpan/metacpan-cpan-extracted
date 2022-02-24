@@ -100,7 +100,7 @@ sub _redirect {
         $self->logger->debug(
             'Add ' . $self->ipath . ', ' . $self->ipath . 'Path in keepPdata' );
         push @{ $req->pdata->{keepPdata} }, $self->ipath, $self->ipath . 'Path';
-        $req->{urldc} = $self->conf->{portal} . '/' . $self->path;
+        $req->{urldc}           = $self->p->buildUrl( $self->path );
         $req->pdata->{_url}     = encode_base64( $req->urldc, '' );
         $req->pdata->{issuerTs} = time;
     }
@@ -128,7 +128,7 @@ sub _redirect {
                     $self->restoreRequest( $_[0], $ir );
                     $self->cleanPdata( $_[0] );
                     return $self->run( @_, @path );
-                }
+                  }
                 : ()
             )
         ]

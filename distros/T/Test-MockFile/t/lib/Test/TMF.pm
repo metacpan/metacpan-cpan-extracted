@@ -48,7 +48,19 @@ sub tmf_test_code {
         push @_tmf_test_args, '-I' . $path;
     }
 
-    return t2_run_script( perl_args => \@_tmf_test_args, %params );
+    my $perl_args = [@_tmf_test_args];
+
+    my $extra_args = delete $params{perl_args};
+    if ( defined $extra_args ) {
+        if ( ref $extra_args ) {
+            push @$perl_args, @$extra_args;
+        }
+        else {
+            push @$perl_args, $extra_args;
+        }
+    }
+
+    return t2_run_script( perl_args => $perl_args, %params );
 }
 
 sub t2_run_script {

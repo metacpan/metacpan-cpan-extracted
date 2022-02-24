@@ -34,11 +34,19 @@
          "requires" : {
             "Blessed::Merge" : "0",
             "Cwd" : "0",
+            "Data::Dumper" : "0",
             "Data::GUID" : "0",
+            "Email::Valid" : "0",
             "File::Copy" : "0",
+            "Getopt::Long" : "0",
             "JSON" : "0",
+            "Parallel::ForkManager" : "0",
+            "Phone::Valid::International::Loose" : "0",
+            "Scalar::Util" : "0",
+            "Term::ProgressSpinner" : "0",
+            "YAML::As::Parsed" : "0.04",
             "YAML::XS" : "0",
-            "YAOO" : "0.06",
+            "YAOO" : "0.07",
             "overload" : "0",
             "perl" : "5.006"
          }
@@ -52,13 +60,28 @@
    "provides" : {
       "ODS" : {
          "file" : "lib/ODS.pm",
-         "version" : "0.02"
+         "version" : "0.04"
+      },
+      "ODS::Angel" : {
+         "file" : "lib/ODS/Angel.pm"
       },
       "ODS::Iterator" : {
          "file" : "lib/ODS/Iterator.pm"
       },
+      "ODS::Serialize::JSON" : {
+         "file" : "lib/ODS/Serialize/JSON.pm"
+      },
+      "ODS::Serialize::YAML" : {
+         "file" : "lib/ODS/Serialize/YAML.pm"
+      },
+      "ODS::Serialize::YAMLOrdered" : {
+         "file" : "lib/ODS/Serialize/YAMLOrdered.pm"
+      },
       "ODS::Storage::Base" : {
          "file" : "lib/ODS/Storage/Base.pm"
+      },
+      "ODS::Storage::Directory" : {
+         "file" : "lib/ODS/Storage/Directory.pm"
       },
       "ODS::Storage::File" : {
          "file" : "lib/ODS/Storage/File.pm"
@@ -71,6 +94,12 @@
       },
       "ODS::Table" : {
          "file" : "lib/ODS/Table.pm"
+      },
+      "ODS::Table::Column::Array" : {
+         "file" : "lib/ODS/Table/Column/Array.pm"
+      },
+      "ODS::Table::Column::ArrayObject" : {
+         "file" : "lib/ODS/Table/Column/ArrayObject.pm"
       },
       "ODS::Table::Column::Base" : {
          "file" : "lib/ODS/Table/Column/Base.pm"
@@ -87,14 +116,26 @@
       "ODS::Table::Column::Float" : {
          "file" : "lib/ODS/Table/Column/Float.pm"
       },
+      "ODS::Table::Column::Hash" : {
+         "file" : "lib/ODS/Table/Column/Hash.pm"
+      },
       "ODS::Table::Column::Integer" : {
          "file" : "lib/ODS/Table/Column/Integer.pm"
+      },
+      "ODS::Table::Column::Object" : {
+         "file" : "lib/ODS/Table/Column/Object.pm"
       },
       "ODS::Table::Column::Phone" : {
          "file" : "lib/ODS/Table/Column/Phone.pm"
       },
       "ODS::Table::Column::String" : {
          "file" : "lib/ODS/Table/Column/String.pm"
+      },
+      "ODS::Table::Generate" : {
+         "file" : "lib/ODS/Table/Generate.pm"
+      },
+      "ODS::Table::Generate::Data" : {
+         "file" : "lib/ODS/Table/Generate/Data.pm"
       },
       "ODS::Table::ResultSet" : {
          "file" : "lib/ODS/Table/ResultSet.pm"
@@ -117,6 +158,6 @@
          "web" : "https://github.com/ThisUsedToBeAnEmail/ODS"
       }
    },
-   "version" : "0.02",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

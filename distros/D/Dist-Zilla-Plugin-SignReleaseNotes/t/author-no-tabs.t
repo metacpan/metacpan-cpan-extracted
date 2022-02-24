@@ -16,11 +16,13 @@ use Test::NoTabs;
 
 my @files = (
     'lib/Dist/Zilla/Plugin/SignReleaseNotes.pm',
+    't/00-load.t',
     't/author-critic.t',
     't/author-eof.t',
     't/author-eol.t',
     't/author-no-tabs.t',
     't/author-pod-coverage.t',
+    't/author-pod-spell.t',
     't/author-pod-syntax.t',
     't/release-trailing-space.t'
 );

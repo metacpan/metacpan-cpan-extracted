@@ -56,8 +56,8 @@ eval { $resolver->debug_out('filename') };
 eval { $resolver->hosts('filename') };
 eval { $resolver->resolv_conf('filename') };
 eval { $resolver->set_fwd('127.0.0.53') };
-eval { $resolver->set_tls(0) };
 eval { $resolver->set_stub( 'zone', '10.1.2.3', 0 ) };
+eval { $resolver->set_tls(0) };
 eval { $resolver->trusted_keys('filename') };
 
 

@@ -19,108 +19,109 @@ name: BorderStyles-Standard
 provides:
   BorderStyle::ASCII::None:
     file: lib/BorderStyle/ASCII/None.pm
-    version: '0.013'
+    version: '0.014'
   BorderStyle::ASCII::SingleLine:
     file: lib/BorderStyle/ASCII/SingleLine.pm
-    version: '0.013'
+    version: '0.014'
   BorderStyle::ASCII::SingleLineDoubleAfterHeader:
     file: lib/BorderStyle/ASCII/SingleLineDoubleAfterHeader.pm
-    version: '0.013'
+    version: '0.014'
   BorderStyle::ASCII::SingleLineHorizontalOnly:
     file: lib/BorderStyle/ASCII/SingleLineHorizontalOnly.pm
-    version: '0.013'
+    version: '0.014'
   BorderStyle::ASCII::SingleLineInnerOnly:
     file: lib/BorderStyle/ASCII/SingleLineInnerOnly.pm
-    version: '0.013'
+    version: '0.014'
   BorderStyle::ASCII::SingleLineOuterOnly:
     file: lib/BorderStyle/ASCII/SingleLineOuterOnly.pm
-    version: '0.013'
+    version: '0.014'
   BorderStyle::ASCII::SingleLineVerticalOnly:
     file: lib/BorderStyle/ASCII/SingleLineVerticalOnly.pm
-    version: '0.013'
+    version: '0.014'
   BorderStyle::ASCII::Space:
     file: lib/BorderStyle/ASCII/Space.pm
-    version: '0.013'
+    version: '0.014'
   BorderStyle::ASCII::SpaceInnerOnly:
     file: lib/BorderStyle/ASCII/SpaceInnerOnly.pm
-    version: '0.013'
+    version: '0.014'
   BorderStyle::BoxChar::None:
     file: lib/BorderStyle/BoxChar/None.pm
-    version: '0.013'
+    version: '0.014'
   BorderStyle::BoxChar::SingleLine:
     file: lib/BorderStyle/BoxChar/SingleLine.pm
-    version: '0.013'
+    version: '0.014'
   BorderStyle::BoxChar::SingleLineHorizontalOnly:
     file: lib/BorderStyle/BoxChar/SingleLineHorizontalOnly.pm
-    version: '0.013'
+    version: '0.014'
   BorderStyle::BoxChar::SingleLineInnerOnly:
     file: lib/BorderStyle/BoxChar/SingleLineInnerOnly.pm
-    version: '0.013'
+    version: '0.014'
   BorderStyle::BoxChar::SingleLineOuterOnly:
     file: lib/BorderStyle/BoxChar/SingleLineOuterOnly.pm
-    version: '0.013'
+    version: '0.014'
   BorderStyle::BoxChar::SingleLineVerticalOnly:
     file: lib/BorderStyle/BoxChar/SingleLineVerticalOnly.pm
-    version: '0.013'
+    version: '0.014'
   BorderStyle::BoxChar::Space:
     file: lib/BorderStyle/BoxChar/Space.pm
-    version: '0.013'
+    version: '0.014'
   BorderStyle::BoxChar::SpaceInnerOnly:
     file: lib/BorderStyle/BoxChar/SpaceInnerOnly.pm
-    version: '0.013'
+    version: '0.014'
   BorderStyle::UTF8::Brick:
     file: lib/BorderStyle/UTF8/Brick.pm
-    version: '0.013'
+    version: '0.014'
   BorderStyle::UTF8::BrickOuterOnly:
     file: lib/BorderStyle/UTF8/BrickOuterOnly.pm
-    version: '0.013'
+    version: '0.014'
   BorderStyle::UTF8::DoubleLine:
     file: lib/BorderStyle/UTF8/DoubleLine.pm
-    version: '0.013'
+    version: '0.014'
   BorderStyle::UTF8::None:
     file: lib/BorderStyle/UTF8/None.pm
-    version: '0.013'
+    version: '0.014'
   BorderStyle::UTF8::SingleLine:
     file: lib/BorderStyle/UTF8/SingleLine.pm
-    version: '0.013'
+    version: '0.014'
   BorderStyle::UTF8::SingleLineBold:
     file: lib/BorderStyle/UTF8/SingleLineBold.pm
-    version: '0.013'
+    version: '0.014'
   BorderStyle::UTF8::SingleLineBoldHeader:
     file: lib/BorderStyle/UTF8/SingleLineBoldHeader.pm
-    version: '0.013'
+    version: '0.014'
   BorderStyle::UTF8::SingleLineCurved:
     file: lib/BorderStyle/UTF8/SingleLineCurved.pm
-    version: '0.013'
+    version: '0.014'
   BorderStyle::UTF8::SingleLineDoubleAfterHeader:
     file: lib/BorderStyle/UTF8/SingleLineDoubleAfterHeader.pm
-    version: '0.013'
+    version: '0.014'
   BorderStyle::UTF8::SingleLineHorizontalOnly:
     file: lib/BorderStyle/UTF8/SingleLineHorizontalOnly.pm
-    version: '0.013'
+    version: '0.014'
   BorderStyle::UTF8::SingleLineInnerOnly:
     file: lib/BorderStyle/UTF8/SingleLineInnerOnly.pm
-    version: '0.013'
+    version: '0.014'
   BorderStyle::UTF8::SingleLineOuterOnly:
     file: lib/BorderStyle/UTF8/SingleLineOuterOnly.pm
-    version: '0.013'
+    version: '0.014'
   BorderStyle::UTF8::SingleLineVerticalOnly:
     file: lib/BorderStyle/UTF8/SingleLineVerticalOnly.pm
-    version: '0.013'
+    version: '0.014'
   BorderStyle::UTF8::Space:
     file: lib/BorderStyle/UTF8/Space.pm
-    version: '0.013'
+    version: '0.014'
   BorderStyle::UTF8::SpaceInnerOnly:
     file: lib/BorderStyle/UTF8/SpaceInnerOnly.pm
-    version: '0.013'
+    version: '0.014'
   BorderStyles::Standard:
     file: lib/BorderStyles/Standard.pm
-    version: '0.013'
+    version: '0.014'
 requires:
   BorderStyleRole::Source::ASCIIArt: '0'
   BorderStyleRole::Spec::Basic: '0'
   BorderStyleRole::Transform::BoxChar: '0'
   BorderStyleRole::Transform::InnerOnly: '0'
+  Class::Method::Modifiers: '0'
   Role::Tiny::With: '0'
   perl: '5.010001'
   strict: '0'
@@ -130,7 +131,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=BorderStyles-Standard
   homepage: https://metacpan.org/release/BorderStyles-Standard
   repository: git://github.com/perlancar/perl-BorderStyles-Standard.git
-version: '0.013'
+version: '0.014'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -234,7 +235,7 @@ x_Dist_Zilla:
           Module::Metadata: '1.000037'
           version: '0.006'
       name: '@Author::PERLANCAR/PERLANCAR::EnsurePrereqToSpec'
-      version: '0.063'
+      version: '0.064'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::MetaResources
       name: '@Author::PERLANCAR/PERLANCAR::MetaResources'

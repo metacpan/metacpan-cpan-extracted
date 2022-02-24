@@ -16,8 +16,7 @@ SKIP: {
     }
     my $dbh = DBI->connect("dbi:SQLite:dbname=$userdb");
     $dbh->do('CREATE TABLE users (user text,password text,cn text)');
-    $dbh->do(
-        "INSERT INTO users VALUES ('french','french','Frédéric Accents')");
+    $dbh->do("INSERT INTO users VALUES ('french','french','Frédéric Accents')");
     $dbh->do("INSERT INTO users VALUES ('russian','russian','Русский')");
     my $client = LLNG::Manager::Test->new( {
             ini => {

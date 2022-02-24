@@ -13,6 +13,20 @@ translationFields = {}
 #                   content
 #  - trplaceholder: set result in "placeholder" attribute
 #  - localtime    : transform time (in ms)ing translate()
+
+setDanger = (cond, field) ->
+	result = false
+	if cond
+		$("##{field}").addClass 'fa-check text-success'
+		$("##{field}").removeClass 'fa-times text-danger'
+		$("##{field}").attr 'role', 'status'
+	else
+		$("##{field}").addClass 'fa-times text-danger'
+		$("##{field}").removeClass 'fa-check text-success'
+		$("##{field}").attr 'role', 'alert'
+		result = true
+	result
+
 translatePage = (lang) ->
 	$.getJSON "#{window.staticPrefix}languages/#{lang}.json", (data) ->
 		translationFields = data
@@ -33,7 +47,9 @@ translatePage = (lang) ->
 			if msg.match /_hide_/
 				$(this).parent().hide()
 		$("[trplaceholder]").each ->
-			$(this).attr 'placeholder', translate($(this).attr('trplaceholder'))
+			tmp = translate($(this).attr('trplaceholder'))
+			$(this).attr 'placeholder', tmp
+			$(this).attr 'aria-label', tmp
 		$("[localtime]").each ->
 			d = new Date $(this).attr('localtime') * 1000
 			$(this).text d.toLocaleString()
@@ -208,10 +224,10 @@ getCookie = (cname) ->
 			return c
 	return ''
 
-setCookie = (name, value, exdays) ->
+setCookie = (name, value, samesite, exdays) ->
 	d = new Date()
 	d.setTime d.getTime() + exdays*86400000
-	document.cookie = "#{name}=#{value}; expires=#{d.toUTCString()}; path=/"
+	document.cookie = "#{name}=#{value}; expires=#{d.toUTCString()}; path=/; SameSite=#{samesite}"
 
 # Function to change password using Ajax (instead of POST)
 # NOT USED FOR NOW
@@ -364,11 +380,11 @@ $(window).on 'load', () ->
 		console.log 'Selected lang ->', queryLang
 		if setCookieLang
 			console.log 'Set cookie lang ->', queryLang
-			setCookie 'llnglanguage', queryLang
+			setCookie 'llnglanguage', queryLang, datas['sameSite']
 		translatePage(queryLang)
 	else
 		console.log 'Selected lang ->', lang
-		setCookie 'llnglanguage', lang
+		setCookie 'llnglanguage', lang, datas['sameSite']
 		translatePage(lang)
 
 	# Build language icons
@@ -378,7 +394,7 @@ $(window).on 'load', () ->
 	$('#languages').html langdiv
 	$('.langicon').on 'click', () ->
 		lang = $(this).attr 'title'
-		setCookie 'llnglanguage', lang
+		setCookie 'llnglanguage', lang, datas['sameSite']
 		translatePage lang
 
 	isAlphaNumeric = (chr) ->
@@ -391,40 +407,16 @@ $(window).on 'load', () ->
 	checkpassword = (password) ->
 		result = true
 		if window.datas.ppolicy.minsize > 0
-			if password.length >= window.datas.ppolicy.minsize
-				$('#ppolicy-minsize-feedback').addClass 'fa-check text-success'
-				$('#ppolicy-minsize-feedback').removeClass 'fa-times text-danger'
-			else
-				$('#ppolicy-minsize-feedback').removeClass 'fa-check text-success'
-				$('#ppolicy-minsize-feedback').addClass 'fa-times text-danger'
-				result = false
+			result = false if setDanger( password.length >= window.datas.ppolicy.minsize, 'ppolicy-minsize-feedback' )
 		if window.datas.ppolicy.minupper > 0
 			upper = password.match(/[A-Z]/g)
-			if upper and upper.length >= window.datas.ppolicy.minupper
-				$('#ppolicy-minupper-feedback').addClass 'fa-check text-success'
-				$('#ppolicy-minupper-feedback').removeClass 'fa-times text-danger'
-			else
-				$('#ppolicy-minupper-feedback').removeClass 'fa-check text-success'
-				$('#ppolicy-minupper-feedback').addClass 'fa-times text-danger'
-				result = false
+			result = false if setDanger( upper and upper.length >= window.datas.ppolicy.minupper, 'ppolicy-minupper-feedback' )
 		if window.datas.ppolicy.minlower > 0
 			lower = password.match(/[a-z]/g)
-			if lower and lower.length >= window.datas.ppolicy.minlower
-				$('#ppolicy-minlower-feedback').addClass 'fa-check text-success'
-				$('#ppolicy-minlower-feedback').removeClass 'fa-times text-danger'
-			else
-				$('#ppolicy-minlower-feedback').removeClass 'fa-check text-success'
-				$('#ppolicy-minlower-feedback').addClass 'fa-times text-danger'
-				result = false
+			result = false if setDanger( lower and lower.length >= window.datas.ppolicy.minlower, 'ppolicy-minlower-feedback')
 		if window.datas.ppolicy.mindigit > 0
 			digit = password.match(/[0-9]/g)
-			if digit and digit.length >= window.datas.ppolicy.mindigit
-				$('#ppolicy-mindigit-feedback').addClass 'fa-check text-success'
-				$('#ppolicy-mindigit-feedback').removeClass 'fa-times text-danger'
-			else
-				$('#ppolicy-mindigit-feedback').removeClass 'fa-check text-success'
-				$('#ppolicy-mindigit-feedback').addClass 'fa-times text-danger'
-				result = false
+			result = false if setDanger( digit and digit.length >= window.datas.ppolicy.mindigit, 'ppolicy-mindigit-feedback')
 
 		if window.datas.ppolicy.allowedspechar
 			nonwhitespechar = window.datas.ppolicy.allowedspechar.replace(/\s/g, '')
@@ -436,13 +428,7 @@ $(window).on 'load', () ->
 					if nonwhitespechar.indexOf(password.charAt(i)) < 0
 						hasforbidden = true
 				i++
-			if hasforbidden == false
-				$('#ppolicy-allowedspechar-feedback').addClass 'fa-check text-success'
-				$('#ppolicy-allowedspechar-feedback').removeClass 'fa-times text-danger'
-			else
-				$('#ppolicy-allowedspechar-feedback').removeClass 'fa-check text-success'
-				$('#ppolicy-allowedspechar-feedback').addClass 'fa-times text-danger'
-				result = false
+			result = false if setDanger( hasforbidden == false, 'ppolicy-allowedspechar-feedback' )
 
 		if window.datas.ppolicy.minspechar > 0 and window.datas.ppolicy.allowedspechar
 			numspechar = 0
@@ -452,13 +438,7 @@ $(window).on 'load', () ->
 				if nonwhitespechar.indexOf(password.charAt(i)) >= 0
 					numspechar++
 				i++
-			if numspechar >= window.datas.ppolicy.minspechar
-				$('#ppolicy-minspechar-feedback').addClass 'fa-check text-success'
-				$('#ppolicy-minspechar-feedback').removeClass 'fa-times text-danger'
-			else
-				$('#ppolicy-minspechar-feedback').removeClass 'fa-check text-success'
-				$('#ppolicy-minspechar-feedback').addClass 'fa-times text-danger'
-				result = false
+			result = false if setDanger( numspechar >= window.datas.ppolicy.minspechar, 'ppolicy-minspechar-feedback')
 
 		if window.datas.ppolicy.minspechar > 0 and !window.datas.ppolicy.allowedspechar
 			numspechar = 0
@@ -466,13 +446,7 @@ $(window).on 'load', () ->
 			while i < password.length
 				numspechar++ if !isAlphaNumeric(password.charAt(i))
 				i++
-			if numspechar >= window.datas.ppolicy.minspechar
-				$('#ppolicy-minspechar-feedback').addClass 'fa-check text-success'
-				$('#ppolicy-minspechar-feedback').removeClass 'fa-times text-danger'
-			else
-				$('#ppolicy-minspechar-feedback').removeClass 'fa-check text-success'
-				$('#ppolicy-minspechar-feedback').addClass 'fa-times text-danger'
-				result = false
+			result = false if setDanger( numspechar >= window.datas.ppolicy.minspechar, 'ppolicy-minspechar-feedback')
 
 		if result
 			$('.ppolicy').removeClass('border-danger').addClass 'border-success'
@@ -618,11 +592,11 @@ $(window).on 'load', () ->
 				user = data.user
 				console.log 'Suggested spoofId=', user
 				$("input[name=spoofId]").each ->
-					$(this).attr 'value', user
+					$(this).val user
 				$('#captcha').attr 'src', data.captcha if data.captcha
 				if data.token
-					$('#finduserToken').attr 'value', data.token 
-					$('#token').attr 'value', data.token
+					$('#finduserToken').val data.token 
+					$('#token').val data.token
 			error: (j, status, err) ->
 				document.body.style.cursor = 'default'
 				console.log 'Error', err  if err

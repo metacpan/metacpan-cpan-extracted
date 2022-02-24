@@ -10,7 +10,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_BADCREDENTIALS
 );
 
-our $VERSION = '2.0.8';
+our $VERSION = '2.0.14';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Plugin
@@ -30,10 +30,10 @@ has ott => (
     }
 );
 
-has prefix  => ( is => 'rw' );
-has logo    => ( is => 'rw', default => '2f.png' );
-has label   => ( is => 'rw' );
-has noRoute => ( is => 'ro' );
+has prefix     => ( is => 'rw' );
+has logo       => ( is => 'rw', default => '2f.png' );
+has label      => ( is => 'rw' );
+has noRoute    => ( is => 'ro' );
 has authnLevel => (
     is      => 'rw',
     lazy    => 1,
@@ -45,7 +45,7 @@ has authnLevel => (
 sub init {
     my ($self) = @_;
 
-    # Set logo if overriden
+    # Set logo if overridden
     $self->logo( $self->conf->{ $self->prefix . "2fLogo" } )
       if ( $self->conf->{ $self->prefix . "2fLogo" } );
 

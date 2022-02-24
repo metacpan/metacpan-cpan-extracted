@@ -36,3 +36,4 @@ CCS/IO/t/(?:ccs|dense)3?\.
 \btmp\b
 ^#Makefile#$
 ^reversion.sh$
+^\.github/

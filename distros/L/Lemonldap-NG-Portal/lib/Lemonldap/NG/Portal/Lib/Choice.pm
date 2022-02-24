@@ -7,7 +7,7 @@ use Safe;
 extends 'Lemonldap::NG::Portal::Lib::Wrapper';
 with 'Lemonldap::NG::Portal::Lib::OverConf';
 
-our $VERSION = '2.0.12';
+our $VERSION = '2.0.14';
 
 has modules    => ( is => 'rw', default => sub { {} } );
 has rules      => ( is => 'rw', default => sub { {} } );
@@ -244,7 +244,7 @@ sub _buildAuthLoop {
                 # Get displayType for this module
                 no strict 'refs';
                 my $displayType = eval {
-                    "Lemonldap::NG::Portal::Auth::${auth}"
+                    $self->_authentication->modules->{$_}
                       ->can('getDisplayType')->( $self, $req );
                 } || 'logo';
 
@@ -252,10 +252,8 @@ sub _buildAuthLoop {
                     "Display type $displayType for module $auth");
                 $optionsLoop->{$displayType} = 1;
                 my $logo = $_;
-                if ( $auth eq 'Custom' ) {
-                    $logo =
-                      ( $self->{conf}->{customAuth} =~ /::(\w+)$/ )[0];
-                }
+
+                my $foundLogo = 0;
 
                 # If displayType is logo, check if key.png is available
                 if (  -e $self->conf->{templateDir}
@@ -264,9 +262,28 @@ sub _buildAuthLoop {
                     . ".png" )
                 {
                     $optionsLoop->{logoFile} = $logo . ".png";
+                    $foundLogo = 1;
                 }
                 else {
                     $optionsLoop->{logoFile} = $auth . ".png";
+                }
+
+                # Compatibility, with Custom, try the module name if
+                # key was not found
+                if ( $auth eq 'Custom' and not $foundLogo ) {
+                    $logo =
+                      ( ( $self->{conf}->{customAuth} || "" ) =~ /::(\w+)$/ )
+                      [0];
+                    if (
+                        $logo
+                        and ( -e $self->conf->{templateDir}
+                            . "/../htdocs/static/common/modules/"
+                            . $logo
+                            . ".png" )
+                      )
+                    {
+                        $optionsLoop->{logoFile} = $logo . ".png";
+                    }
                 }
 
                 # Register item in loop

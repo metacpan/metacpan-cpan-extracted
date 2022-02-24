@@ -3,13 +3,15 @@
 package PDL::IO::Dcm;
 
 
-our $VERSION = '1.003';
+our $VERSION = '1.011';
 
 
 use PDL;
-use PDL::NiceSlice;
-use List::MoreUtils; # qw{any};
-use Data::Dumper;
+#use PDL::NiceSlice;
+use List::Util qw/first /;
+#use List::MoreUtils; # qw{any};
+#use Data::Dumper;
+#use PDL::IO::Dumper;
 use DicomPack::IO::DicomReader;
 use Storable qw/dclone/;
 use DicomPack::DB::DicomTagDict qw/getTag getTagDesc/;
@@ -23,11 +25,7 @@ use strict;
 our @ISA=qw/Exporter/;
 our @EXPORT_OK=qw/read_dcm parse_dcms load_dcm_dir printStruct/;
 
-my @key_list=("Echo Time","Echo Number","Echo Number(s)", 'Pixel Bandwidth',
-	"Instance Number",,'Window Center','Content Time',
-	'Nominal Interval','Instance Creation Time','Largest Image Pixel Value',
-	'Trigger Time','Window Width','Acquisition Time','Smallest Image Pixel Value',
-);
+my $plugin_dir="PDL::IO::Dcm::Plugins::";
 
 
 sub sort_series {
@@ -48,9 +46,10 @@ sub printStruct {
 			if (ref($struct->[$i]) eq "HASH") {
 				$res.=printStruct($struct->[$i],$structName."->[$i]",$pre." ");
 			} elsif (ref($struct->[$i]) eq "ARRAY") { # contents of struct is array ref
-				$res.= "$structName->"."[$i]: ()\n" if (@{$struct->[$i]}==0);
+				#$res.= "$strucItName->"."[$i]: ()\n" if (@{$struct->[$i]}==0);
 				my $string = printStruct($struct->[$i],$structName."->[$i]",$pre." ");
-				$res.= "$structName->"."[$i]: $string\n" if ($string);
+				$res.=$string;
+				#$res.= "$structName->"."[$i]: $string\n" if ($string);
 			} elsif (ref($struct->[$i]) eq "PDL") { # contents of struct is array ref
 				$res.= "$structName->"."[$i]: ".(join (' ',list ($struct->[$i])))."\n";
 			} else { # contents of struct is a scalar, just print it.
@@ -65,7 +64,8 @@ sub printStruct {
 				$res.=printStruct($struct->{$_},$structName."->{$_}",$pre." ");
 			} elsif (ref($struct->{$_}) eq "ARRAY") { # contents of struct is array ref
 				my $string = printStruct($struct->{$_},$structName."->{$_}",$pre." ");
-				$res.= "$structName->"."{$_}: $string\n" if ($string);
+				$res.=$string;
+				#$res.= "$structName->"."{$_}: $string\n" if ($string);
 			} elsif (ref($struct->{$_}) eq "PDL") { # contents of struct is array ref
 				$res.= "$structName->"."{$_}: ".(join (' ',list($struct->{$_})))."\n";
 			} else { # contents of struct is a scalar, just print it.
@@ -121,18 +121,11 @@ sub read_dcm {
 	my $file=shift;
 	my $opt=shift; #options
 	my $dcm=DicomPack::IO::DicomReader->new($file) || return; 
-	my $h=unpack('S',substr ($dcm->getValue('Rows','native'),3,2));
-	my $w=unpack('S',substr ($dcm->getValue('Columns','native'),3,2));
 	my $data=$dcm->getValue('PixelData','native');
-	return (undef ) unless defined $data;
-	my $datatype= (substr($data,0,2));
-	my $pdl=zeroes(ushort,$w,$h) if ($datatype =~/OW|XX/); 
-	$pdl->make_physical;
-	${$pdl->get_dataref}=substr($data,3);
-	$pdl->upd_data;
+	my ($h,$w)=1;
+	my $pdl=PDL->null;
+	my $plugin=$$opt{plugin};
 	$pdl->hdr->{raw_dicom}=$dcm->getDicomField;
-	no PDL::NiceSlice;
-	delete $pdl->hdr->{raw_dicom}->{'7fe0,0010'}; # Pixel data
 	for my $id (keys %{$pdl->hdr->{raw_dicom}}) {
 		my $tag=getTag($id); # field tag for id, if present, store under tag
 		my $value=unpack_field($id,$tag,$dcm->getValue($id,'native')); 
@@ -142,7 +135,31 @@ sub read_dcm {
 		$pdl->hdr->{dicom}->{$id} #=~s/([0-9a-fA-F]{4}),([0-9a-fA-F]{4})/$1_$2/r}
 			=$value;
 	} # for loop over dicom ids
-	my $dims=$$opt{sort}->($dcm,$pdl); # call to vendor/modality specific stuff
+	unless (defined ($data)) {
+		if ($dcm->getValue('SeriesNumber') == 99) {
+			warn "Could be phoenix data \n";
+			return;
+		}
+		# This is not a standard dicom image, refer to plugin
+		#no PDL::NiceSlice;
+		$pdl=$$opt{$plugin}->{read_dcm}->($dcm,$opt,$pdl);
+	} else {
+		$h=unpack('S',substr ($dcm->getValue('Rows','native'),3,2));
+		$w=unpack('S',substr ($dcm->getValue('Columns','native'),3,2));
+		my $datatype= (substr($data,0,2));
+		#print "Data type $datatype \n";
+		if ($datatype =~/OW|XX/){ 
+			$pdl.=zeroes(ushort,$w,$h) ;
+		}
+		$pdl->make_physical;
+		${$pdl->get_dataref}=substr($data,3);
+		$pdl->upd_data;
+		$pdl->hdr->{plugin}=$plugin; # store this 
+		#no PDL::NiceSlice;
+		$$opt{$plugin}->{parser}->($dcm,$pdl); # 
+	}
+	#no PDL::NiceSlice;
+	#$$opt{$plugin}->{parser}->($dcm,$pdl,$opt);
 	# keep the raw_dicom structure? 
 	delete $pdl->hdr->{raw_dicom} if $$opt{delete_raw};
 	return $pdl;
@@ -165,82 +182,101 @@ sub load_dcm_dir {
 	my $dname=shift;
 	my %dims; 
 	my $opt=shift; # field by which to split
-	my $id=$$opt{id};
-	my $sp=$$opt{split};
+	my $id=$$opt{$$opt{plugin}}->{id};
+	my $sp=$$opt{$$opt{plugin}}->{split};
 	my $n=0;
 	my %refs; # reference images for each stack
+	# loop over all files in $dir, sort them using $pid into %dcms
+	print "Start reading files.\n";
 	opendir (my $dir, $dname) ||die "cannot open directory $dname!";
 	for my $file (readdir ($dir)) {
 		next unless (-f "$dname/$file"); # =~m/\.dcm$|\.IMA$/;
+		next if ( $file =~/REPORT.*\.SR$/ );
 		my $p=read_dcm("$dname/$file",$opt);
 		eval{$p->isa('PDL')} ||next;
+		die "No plugin \n" unless $p->hdr->{plugin};
 		$n++;
-		no PDL::NiceSlice;
+		#no PDL::NiceSlice;
 		my $pid=$id->($p); # Call to subroutine reference 
 		$dcms{$pid}={} unless ref $dcms{$pid};
 		my $ref =$refs{$pid}; 
 		if (defined $ref) {
-		# do files match? Can they be stacked together?
-		unless ( is_equal($ref,$p )) {
-			if ( !$sp and is_equal($ref,$p->transpose,'d')) {
-				$p->hdr->{tp}=1;
-			} else {
-				my $flag=0;
-				my $n='a';
-				my $nid;
-				do {
-					$nid=$id->($p).$n;
-					if (ref $dcms{$nid} eq 'HASH'){ # group
-						for my $r2 (values %{$dcms{$nid}}){
-							$flag=is_equal($r2,$p);
-							last unless $flag;
+# do files match? Can they be stacked together?
+			unless ( is_equal($ref,$p )) {
+				# This doesn't make any sense, does it?
+				if ( !$sp and is_equal($ref,$p->transpose,)) {
+					$p->hdr->{tp}=1;
+				} else {
+					my $flag=0;
+					my $n='a';
+					my $nid;
+					do {
+						$nid=$id->($p).$n;
+						if (ref $dcms{$nid} eq 'HASH'){ # group
+							for my $r2 (values %{$dcms{$nid}}){
+								$flag=is_equal($r2,$p);
+								last unless $flag;
+							}
+						} else {
+							$dcms{$nid}={};
+							$pid=$nid;
+							$flag=1;
 						}
-					} else {
-						$dcms{$nid}={};
-						$pid=$nid;
-						$flag=1;
-					}
-					$n++;
-				} until $flag;
-				$pid=$nid;
+						$n++;
+					} until $flag;
+					$pid=$nid;
+				}
 			}
-		}
 		} # defined $ref
-		use PDL::NiceSlice;
+		#use PDL::NiceSlice;
 		my $iced=$p->hdr->{dim_idx}->copy;
+		#print "id $pid iced $iced\n";
+		print "." unless ($n % 100); # progress
 		unless (grep (/^$pid$/,@pid)) {
 			$dims{$pid}=zeroes(short,$iced->dims);
 			push @pid,$pid;
 			$refs{$pid}=$p;
 		}
-		$iced++;
+		# Shouldn't that be in the plugin?
+		#$iced++;
+		# I'm not sure that this is necessary, $dims{$pid} is 0
+		#print "iced $iced pid $pid dims $dims{$pid}\n";
 		$dims{$pid}.=$dims{$pid}*($dims{$pid}>=$iced)+$iced*($iced>$dims{$pid});
-		die "This key is not unique! $pid, ",$p->hdr->{dcm_key} 
-			if (ref($dcms{$pid}->{$p->hdr->{dcm_key}}) eq 'PDL') ;
+		#print "iced $iced pid $pid dims $dims{$pid}\n";
+		#use PDL::NiceSlice;
+		if (ref($dcms{$pid}->{$p->hdr->{dcm_key}}) eq 'PDL') {
+			warn "This key is not unique! Probably double export $pid, ",$p->hdr->{dcm_key}
+			,' ',$p->hdr->{dicom}->{'Series Number'}
+			,' ',$p->hdr->{dicom}->{'Incstance  Number'};
+			next;
+		}
 		$dcms{$pid}->{$p->hdr->{dcm_key}}=$p; 
 	}
-	my $order=pdl($$opt{dim_order}); 
-	#print "Done reading.\n";
+	print "Done reading.\n";
 	for my $id (@pid) {
 		#print "Sorting out dims for $id\n";
 		my $ldims=$dims{$id}->copy;
-		my $test=zeroes(byte,$dims{$id}->($order));
+		my $plugin=$refs{$id}->hdr->{plugin};
+		die "No plugin for id $id \n" unless $plugin;
+		my $order=pdl($$opt{$plugin}->{dim_order}); 
+		my $test=zeroes(byte,$dims{$id}->slice($order));
 		my $i=0;
 		#print "Test: ",$test->info,"\n";
 		for my $dcm (values %{$dcms{$id}}) {
+			die "No plugin $id\n" unless $dcm->hdr->{plugin};
 			next unless eval{$dcm->isa('PDL')};
 			$i++;
 			#print "$i: ",$dcm->hdr->{dim_idx}->($order)," ? ";
 			#print $test(list $dcm->hdr->{dim_idx}->($order)),"\n";
-			if (any ($test(list $dcm->hdr->{dim_idx}->($order)))) {
-				no PDL::NiceSlice;
-				$test=$$opt{duplicates}->($test,$dcm,$opt);
-				use PDL::NiceSlice;
+			if (any ($test->slice(list $dcm->hdr->{dim_idx}->slice($order)-1))) {
+				#no PDL::NiceSlice;
+				$test=$$opt{$plugin}->{duplicates}->($test,$dcm,$opt);
+				#use PDL::NiceSlice;
 				#print "Duplicates detected. ",$test->info;
 			}
-			$test(list($dcm->hdr->{dim_idx}->($order))).=1;
+			$test->slice(list($dcm->hdr->{dim_idx}->slice($order)-1)).=1;
 		}
-		$ldims($order).=$test->shape->copy;
+		$ldims->slice($order).=$test->shape->copy;
 		$dcms{$id}->{dims}=$ldims;
 		#print "Set dims: id $id, $dims{$id}\n";
 		#print "Dims: $dims{$id} order $order ";
@@ -250,7 +286,7 @@ sub load_dcm_dir {
 
 sub clump_data {
 	my $data=shift;
-	my $offset=shift;
+	my $offset=shift; # leave 
 	my $clumplist=shift;
 	for my $clump (@$clumplist) {
 		$data=$data->clump( map {$_+$offset} @$clump);	
@@ -258,100 +294,194 @@ sub clump_data {
 	$data;
 }
 
+sub create_image_data {
+	# now get the rest. The plugin has to provide the dim_order
+	# field that determines the shape of the data
+	#print "Dims: $dims order $order ";
+	#print $dims($order),"\n";
+	my $data_ref=shift;
+	my $opt=shift;
+	next unless (ref $$data_ref{dims} eq 'PDL');
+	my $dims = $$data_ref{dims};
+#print "ID: $pid dims $dims transpose? \n";
+	die "No dims \n" unless eval {$dims->isa('PDL')};
+	die "No plugin \n" unless eval {$dims->isa('PDL')};
+	# get a dicom, need to exclude the dims key
+	my $ref=$$data_ref{first { not /^dims$/ } (keys %$data_ref)};
+	my $x=$ref->hdr->{dicom}->{Columns};
+	my $y=$ref->hdr->{dicom}->{Rows};
+	my $order=pdl($$opt{$$opt{plugin}}->{dim_order}); 
+	barf "Dimensions are all zero " unless any $order;
+	#say "id ".$ref->hdr->{dicom}->{"Series Number"}."$dims $dims\n";
+	my $data;
+	if ($ref->hdr->{tp}) {  $data=zeroes(ushort,$y,$x,0+$dims->slice($order));}
+	else { 			$data=zeroes(ushort,$x,$y,0+$dims->slice($order));}
+	$data;
+}
 
+sub fill_image_data {
+	my $data=shift;
+	my $header=$data->hdr;
+	my $dcm=shift;
+	my $ref=shift;
+	my $opt=shift;
+	my $plugin = $ref->hdr->{plugin};
+# Insert data. Swap x,y ? 
+	use PDL::NiceSlice;
+	my $order=$$opt{$plugin}->{dim_order};
+	#print "dcm: ",$dcm->hdr->{dim_idx},", data ",$data->info,"\n";
+	if ($dcm->hdr->{tp}) {
+		$data(,,list( $dcm->hdr->{dim_idx}->($order)-1))
+			.=$dcm->transpose;}
+	else {$data(,,list ($dcm->hdr->{dim_idx}->($order)-1)).=$dcm;}
+# now fill all the header data
+	for my $key (@{$$opt{$plugin}->{key_list}}) {
+		$dcm->hdr->{dicom}->{$key};
+		$header->{dicom}->{$key}->(list ($dcm->hdr->{dim_idx}->($order)-1))
+			.=$dcm->hdr->{dicom}->{$key};
+	}
+# preserve original info
+#print "IDX: ",$dcm->hdr->{dim_idx};
+	$header->{dim_idx}->{$dcm->hdr->{dcm_key}}=$dcm->hdr->{dim_idx};
+	$header->{dcm_key}->{join ('_',list ($dcm->hdr->{dim_idx}->($order)))}
+	=$dcm->hdr->{dcm_key};
+	$header->{dicom}->{'Image Orientation (Patient)'}->(,list ($dcm->hdr->{dim_idx}->($order)-1))
+		.=pdl (split /\\/,$dcm->hdr->{dicom}->{'Image Orientation (Patient)'});
+#say split /\\/,$dcm->hdr->{dicom}->{'Pixel Spacing'};
+#say $header->{dicom}->{'Pixel Spacing'}->(,list($dcm->hdr->{dim_idx}->{$order}));
+
+#say $header->{dicom}->{'Pixel Spacing'};
+	$header->{dicom}->{'Pixel Spacing'}->(,list $dcm->hdr->{dim_idx}->($order)-1)
+		.=pdl (split /\\/,$dcm->hdr->{dicom}->{'Pixel Spacing'});
+	$header->{dicom}->{'Image Position (Patient)'}->(,list $dcm->hdr->{dim_idx}->($order)-1)
+		.=pdl (split /\\/,$dcm->hdr->{dicom}->{'Image Position (Patient)'});
+	for my $field (keys %{$dcm->hdr->{dicom}}) {
+		if ($dcm->hdr->{dicom}->{$field} ne $ref->hdr->{dicom}->{$field}) {
+			$header->{diff}->{$field}={}
+			unless ref ($header->{diff}->{$field});
+		}
+	}
+	for my $field (keys %{$dcm->hdr->{csa}}) {
+		if ($dcm->hdr->{csa}->{$field} ne $ref->hdr->{csa}->{$field}) {
+			$header->{csa_diff}->{$field}={}
+			unless ref ($header->{csa_diff}->{$field});
+		}
+	}
+	no PDL::NiceSlice;
+}
+
+sub image_parser {
+	my $data=shift;
+	my $opt=shift;
+	my $pid=shift;
+	my $ind=whichND(maxover maxover maxover ($$data{$pid})); # actually populated fields!
+	my $header=$$data{$pid}->gethdr;
+	my $plugin=$$opt{plugin};
+	use PDL::NiceSlice;
+	if (any $ind  ) {
+#say $header->{dicom}->{'Pixel Spacing'}->info;
+		for my $ax (0..$ind->dim(0)-1) {
+#say "Axis $ax, ",$ind($ax;-);
+			$$data{$pid}=$$data{$pid}->dice_axis($ax+3,$ind($ax;-)->uniq); # compact the data!
+				$header->{dicom}->{'Image Position (Patient)'}
+				=$header->{dicom}->{'Image Position (Patient)'}->dice_axis($ax+2,$ind($ax)->uniq); 
+			$header->{dicom}->{'Image Orientation (Patient)'}
+				=$header->{dicom}->{'Image Orientation (Patient)'}->dice_axis($ax+2,$ind($ax)->uniq);
+#say $header->{dicom}->{'Pixel Spacing'}->info;
+#say "$ax+1 ",$ind($ax)->uniq;
+			$header->{dicom}->{'Pixel Spacing'}=$header->{dicom}->{'Pixel Spacing'}->dice_axis($ax+2,$ind($ax)->uniq);
+			for my $key (@{$$opt{$$opt{plugin}}->{key_list}}) {
+#next unless chomp $key;
+#say "key $key $ax, ",$ind($ax);
+				$header->{dicom}->{$key}=$header->{dicom}->{$key}->dice_axis($ax+1,$ind($ax)->uniq);
+			}
+			for my $val (values %{$header->{diff}}) {
+				$val=$val->dice_axis($ax+1,$ind($ax)->uniq) if (ref ($val) =~ /PDL/);
+			}
+			for my $val (values %{$header->{csa_diff}}) {
+				$val=$val->dice_axis($ax+1,$ind($ax)->uniq) if (ref ($val) =~ /PDL/);
+			}
+		}
+	}
+		#say "Data set $pid, dims $ind ", $$data{$pid}->info;
+		#say "done.";
+		$header->{dicom}->{'Image Position (Patient)'}
+			=clump_data($header->{dicom}->{'Image Position (Patient)'},1,$$opt{$plugin}->{clump_dims});
+		$header->{dicom}->{'Image Orientation (Patient)'}
+			=clump_data($header->{dicom}->{'Image Orientation (Patient)'},0,$$opt{$plugin}->{clump_dims});
+		#say $header->{dicom}->{'Pixel Spacing'};
+		$header->{dicom}->{'Pixel Spacing'}
+			=clump_data($header->{dicom}->{'Pixel Spacing'},0,$$opt{$plugin}->{clump_dims});
+	$$data{$pid}->sethdr($header);	
+	no PDL::NiceSlice;
+}
+
+# a lot of this has to go into plugins
 sub parse_dcms {
 	my %dcms=%{shift()}; # reference to hash of 
-	my %data;
+		my %data;
 	my $opt=shift;
+# loop over all Series, pid is the series unique id
 	for my $pid (sort keys %dcms) {
-		my %stack=%{$dcms{$pid}};
-		#next unless $pid;
-		next unless (ref $stack{dims} eq 'PDL');
-		my $dims =$stack{dims};
-		#print "ID: $pid dims $dims transpose? \n";
-		die "No dims $pid " unless eval {$dims->isa('PDL')};
+		my %stack=%{$dcms{$pid}}; # stack contains all data of one dicom series
+#next unless $pid;
+		# first in stack serves as reference
+		my $ref=$stack{first { not /^dims$/} (keys %stack)};
+		# let the plugin create the data structure
+		my $plugin=$ref->hdr->{plugin};
+		#no PDL::NiceSlice;
+		my $header;
+		#print "pid $pid plugin $plugin, ",$$opt{$plugin}->{create_data},"\n";
+		($data{$pid},$header)=$$opt{$plugin}->{create_data}->(\%stack,$opt); 
 		delete $stack{dims};
-		my $ref=$stack{(keys %stack)[0]};
-		my $x=$ref->hdr->{dicom}->{Columns} ; 
-		die "No $x ",$ref->info unless $x;
-		my $y=$ref->hdr->{dicom}->{Rows};
-		my $order=pdl($$opt{dim_order}); 
-		#print "Dims: $dims order $order ";
-		#print $dims($order),"\n";
-		if ($ref->hdr->{tp}) {  $data{$pid}=zeroes(ushort,$y,$x,$dims($order));}
-		else { 			$data{$pid}=zeroes(ushort,$x,$y,$dims($order));}
-		my $header=dclone($ref->gethdr); # populate the header
-		$header->{diff}={};
-		$header->{Dimensions}=$$opt{Dimensions}; 
-		for my $key (@key_list) {
-			$header->{dicom}->{$key}=zeroes(list $dims($order));
-		}
-		$header->{dicom}->{'Image Orientation (Patient)'}=zeroes(6,list $dims($order));
-		$header->{dicom}->{'Image Position (Patient)'}=zeroes(3,list $dims($order));
-		$header->{dicom}->{'Pixel Spacing'}=zeroes(2,list $dims($order));
+		$data{$pid}->sethdr($header);
+		# parse the individual dicom instances
 		for my $dcm (values %stack) {
-			if ($dcm->hdr->{tp}) {
-				$data{$pid}->(,,list $dcm->hdr->{dim_idx}->($order))
-					.=$dcm->transpose;}
-			else {$data{$pid}->(,,list $dcm->hdr->{dim_idx}->($order)).=$dcm;}
-			for my $key (@key_list) {
-				$header->{dicom}->{$key}->(list $dcm->hdr->{dim_idx}->($order))
-					.=$dcm->hdr->{dicom}->{$key};
+			$$opt{$plugin}->{fill_data}->($data{$pid},$dcm,$ref,$opt);
+			for my $field (keys %{$dcm->hdr->{csa}}) {
+				if ($dcm->hdr->{csa}->{$field} ne $ref->hdr->{csa}->{$field}) {
+					$header->{csa_diff}->{$field}={}
+					unless ref ($header->{csa_diff}->{$field});
+				}
 			}
-			$header->{dicom}->{'Image Orientation (Patient)'}
-				->(,list $dcm->hdr->{dim_idx}->($order))
-				.=pdl (split /\\/,$dcm->hdr->{dicom}->{'Image Orientation (Patient)'});
-			$header->{dicom}->{'Pixel Spacing'}
-				->(,list $dcm->hdr->{dim_idx}->($order))
-				.=pdl (split /\\/,$dcm->hdr->{dicom}->{'Pixel Spacing'});
-			$header->{dicom}->{'Image Position (Patient)'}
-				->(,list $dcm->hdr->{dim_idx}->($order))
-				.=pdl (split /\\/,$dcm->hdr->{dicom}->{'Image Position (Patient)'});
 			for my $field (keys %{$dcm->hdr->{dicom}}) {
 				if ($dcm->hdr->{dicom}->{$field} ne $ref->hdr->{dicom}->{$field}) {
 					$header->{diff}->{$field}={}
-						unless ref ($header->{diff}->{$field});
+					unless ref ($header->{diff}->{$field});
 				}
 			}
-
 		} # for ... values %stack
+		$$opt{$plugin}->{image_parser}->(\%data,$opt,$pid);
 		for my $dcm (values %stack) {
+			for my $field (keys %{$header->{csa_diff}}) {	
+				$header->{csa_diff}->{$field}->{$dcm->hdr->{dcm_key}}=
+					$dcm->hdr->{csa}->{$field};
+			}
 			for my $field (keys %{$header->{diff}}) {	
 				$header->{diff}->{$field}->{$dcm->hdr->{dcm_key}}=
 					$dcm->hdr->{dicom}->{$field};
 			}
 		}
-		my $ind=whichND(maxover maxover ($data{$pid})); # actually populated fields!
-		for my $ax (0..$ind->dim(0)-1) {
-			$data{$pid}=$data{$pid}->dice_axis($ax+2,$ind($ax)->uniq); # compact the data!
-			$header->{dicom}->{'Image Position (Patient)'}
-				=$header->{dicom}->{'Image Position (Patient)'}->dice_axis($ax+1,$ind($ax)->uniq); 
-		$header->{dicom}->{'Image Orientation (Patient)'}
-			=$header->{dicom}->{'Image Orientation (Patient)'}->dice_axis($ax+1,$ind($ax)->uniq);
-		$header->{dicom}->{'Pixel Spacing'}
-			=$header->{dicom}->{'Pixel Spacing'}->dice_axis($ax+1,$ind($ax)->uniq);
-			for my $key (@key_list) {
-				$header->{dicom}->{$key}=$header->{dicom}->{$key}->dice_axis($ax,$ind($ax)->uniq);
-			}
-			for my $val (values %{$header->{diff}}) {
-				$val=$val->dice_axis($ax,$ind($ax)->uniq) if (ref ($val) =~ /PDL/);
-			}
+
+		for my $key (@{$$opt{$plugin}->{key_list}}) {
+			#next unless chomp($key);
+			$header->{dicom}->{$key}=clump_data($header->{dicom}->{$key},0,$$opt{$plugin}->{clump_dims});
 		}
-		$header->{dicom}->{'Image Position (Patient)'}
-			=clump_data($header->{dicom}->{'Image Position (Patient)'},1,$$opt{clump_dims});
-		$header->{dicom}->{'Image Orientation (Patient)'}
-			=clump_data($header->{dicom}->{'Image Orientation (Patient)'},0,$$opt{clump_dims});
-		$header->{dicom}->{'Pixel Spacing'}
-			=clump_data($header->{dicom}->{'Pixel Spacing'},0,$$opt{clump_dims});
-		for my $key (@key_list) {
-			$header->{dicom}->{$key}=clump_data($header->{dicom}->{$key},0,$$opt{clump_dims});
+		for my $val (values %{$header->{csa_diff}}) {
+			$val=clump_data($val,0,$$opt{$plugin}->{clump_dims}) if (ref ($val) =~ /PDL/);
 		}
 		for my $val (values %{$header->{diff}}) {
-			$val=clump_data($val,0,$$opt{clump_dims}) if (ref ($val) =~ /PDL/);
+			$val=clump_data($val,0,$$opt{$plugin}->{clump_dims}) if (ref ($val) =~ /PDL/);
 		}
-		$data{$pid}=clump_data($data{$pid},2,$$opt{clump_dims}); 
-		die "Dimensions don't add up! @{$$opt{Dimensions}}, $#{$$opt{Dimensions}} ",
-			$data{$pid}->info if ($data{$pid}->ndims != $#{$$opt{Dimensions}}+1);
+		$data{$pid}=clump_data($data{$pid},2,$$opt{$plugin}->{clump_dims}); 
+		die "Dimensions don't add up! @{$$opt{Dimensions}}, $#{$$opt{$plugin}->{Dimensions}} ",
+			$data{$pid}->info if ($data{$pid}->ndims != $#{$$opt{$plugin}->{Dimensions}}+1);
+		#print "cloing $pid\n";
+		for my $key (keys %{$header->{dicom}}) {
+			#say "key $key";
+			#say sdump ($$header{dicom}->{$key});
+			#dclone($$header{$key});
+		}
 		$data{$pid}->sethdr(dclone($header));
 	} # for my $pid ...
 	\%data;
@@ -401,10 +531,15 @@ by instance number. If you need something more sophisticated, take a look at
 the MRISiemens plugin.
 
 This software is based on the use case of Siemens MRI data based on the
-author's needs. For general usage, the specific stuff is moved to its own plugin.
-Each plugin needs to support a setup_dcm() and a populate_header() function.
+author's needs. Specific handling of file formats, data, header fields is moved to its 
+own plugin.
 
-read_dcm function should and probably will be moved to
+Each plugin needs to support a etup_dcm() function that takes a reference to an options 
+hash. Important keys are: 
+
+create_data() sets up the piddle holding the data and setes the dimensions in options' field.
+
+read_dcm() function should and probably will be moved to
 vendor/modality specific plugin modules in future releases.
 
 =head1 Some notes on Dicom fields and how they are stored/treated
@@ -425,6 +560,9 @@ plugin may add additional keys as needed. Fields in the options hash used by thi
 
 =over 
 
+=item parser (rquired) - A function reference to a parser in the plugin. This function has to provide 
+dimensions information (dim_idx) key in the piddle header.
+
 =item clump_dims
 
 these are clumped together to reduce dimensions, required by e.g. Nifti (max. 7).
@@ -436,8 +574,8 @@ retained; default no.
 
 =item dim_order
 
-order in which dimensions are stored, used to reorder the data. xy are always
-at the beginning and are not counted.
+order in which dimensions are stored, used to reorder the data. xy are typically 
+the first two and are often not counted.
 
 =item Dimensions
 
@@ -449,7 +587,7 @@ plugin to help interpret data.
 a code ref executed if two images have identical positions in stack, e.g. same
 Series Number Instance Number, this can happen.
 
-=item id:
+=item id 
 
 code ref expecting to return a key to group files; defaults to \&sort_series.
 
@@ -475,6 +613,17 @@ Split slice groups, otherwise they are stacked together if xy-dims match, even t
 
 Utitlity to clump a piddle over clump_dims option field, takes an offset 
 
+=head2 create_image_data
+
+to be called from create_data() for image data.
+
+=head2 fill_image_data
+
+to be called from fill_data() for image data.
+
+=head2 image_parser
+
+to be called from parser() for image data.
 
 =head2 is_equal ($dcm1,$dcm2,$pattern)
 
@@ -582,4 +731,3 @@ __END__
 0020,0037 Image Orientation (Patient) - 
 0020,0052 Frame of Reference UID
 0020,1040 [Position Reference Indicator]->
-0020,1041 [Slice Location]->

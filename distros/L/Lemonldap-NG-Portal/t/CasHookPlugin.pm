@@ -9,11 +9,6 @@ use constant hook => {
     'casGenerateValidateResponse' => 'genResponse',
 };
 
-sub init {
-    my ($self) = @_;
-    return 1;
-}
-
 sub filterService {
     my ( $self, $req, $cas_request ) = @_;
     if ( $cas_request->{service} eq "http://auth.sp.com/" ) {

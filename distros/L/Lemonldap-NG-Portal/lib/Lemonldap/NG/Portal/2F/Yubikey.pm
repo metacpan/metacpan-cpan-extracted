@@ -122,7 +122,7 @@ sub _findYubikey {
         }
     }
 
-    return $yubikey;
+    return $yubikey || '';
 
 }
 

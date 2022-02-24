@@ -25,9 +25,11 @@ has field => rw, isa(hash);
 has inflated => rw, isa(boolean);
 
 sub build_column {
-	my ($self, $data, $already_inflated) = @_;
+	my ($self, $data, $already_inflated, $serialize) = @_;
 
 	$self = clone($self);
+
+	$self->serialize_class($serialize) if $serialize && $self->can('serialize_class');
 
 	$self->inflated($already_inflated);
 
@@ -48,7 +50,7 @@ sub validate {
 	my ($self) = @_;
 
 	# has_validation_class
-	return $self unless $self->can('validation');
+	return $self unless defined $self->value and $self->can('validation');
 
 	$self->value(
 		$self->validation($self->value)
@@ -61,14 +63,14 @@ sub inflate {
 	my ($self) = @_;
 
 	# has_validation_class
-	return $self unless not $self->inflated and $self->can('inflation');
-	
+	return $self unless defined $self->value and not $self->inflated and $self->can('inflation');
+
 	$self->value(
 		$self->inflation($self->value)
 	);
 
 	$self->inflated(1);
-	
+
 	return $self;
 }
 
@@ -76,7 +78,7 @@ sub deflate {
 	my ($self) = @_;
 
 	# has_validation_class
-	return $self unless $self->inflated && $self->can('deflation');
+	return $self unless defined $self->value and $self->inflated and $self->can('deflation');
 
 	$self->value(
 		$self->deflation($self->value)
@@ -85,16 +87,6 @@ sub deflate {
 	$self->inflated(0);
 
 	return $self;
-}
-
-sub coerce {
-	my ($self) = @_;
-	
-	return unless $self->can('coercion');
-
-	$self->value(
-		$self->coercion($self->value)
-	);
 }
 
 1;

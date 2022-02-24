@@ -1,20 +1,58 @@
---- #YAML:1.0
-name:               XML-Generator
-version:            1.04
-abstract:           ~
-author:  []
-license:            unknown
-distribution_type:  module
-configure_requires:
-    ExtUtils::MakeMaker:  0
+---
+abstract: 'Perl extension for generating XML'
+author:
+  - 'Benjamin Holzman <bholzman@gmail.com>'
 build_requires:
-    ExtUtils::MakeMaker:  0
-requires:  {}
-no_index:
-    directory:
-        - t
-        - inc
-generated_by:       ExtUtils::MakeMaker version 6.55_02
+  Test: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.022, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: XML-Generator
+provides:
+  XML::Generator:
+    file: lib/XML/Generator.pm
+    version: '1.09'
+  XML::Generator::DOM:
+    file: lib/XML/Generator/DOM.pm
+    version: '1.09'
+  XML::Generator::DOM::util:
+    file: lib/XML/Generator/DOM.pm
+    version: '1.09'
+  XML::Generator::cdata:
+    file: lib/XML/Generator.pm
+    version: '1.09'
+  XML::Generator::comment:
+    file: lib/XML/Generator.pm
+    version: '1.09'
+  XML::Generator::final:
+    file: lib/XML/Generator.pm
+    version: '1.09'
+  XML::Generator::overload:
+    file: lib/XML/Generator.pm
+    version: '1.09'
+  XML::Generator::pi:
+    file: lib/XML/Generator.pm
+    version: '1.09'
+  XML::Generator::pretty:
+    file: lib/XML/Generator.pm
+    version: '1.09'
+  XML::Generator::util:
+    file: lib/XML/Generator.pm
+    version: '1.09'
+recommends:
+  XML::DOM: '1.46'
+requires:
+  perl: '5.008'
+resources:
+  repository: git://github.com/perl-net-saml2/perl-XML-Generator.git
+version: '1.09'
+x_generated_by_perl: v5.32.1
+x_maintainers:
+  - 'Timothy Legge <timlegge@gmail.com>'
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

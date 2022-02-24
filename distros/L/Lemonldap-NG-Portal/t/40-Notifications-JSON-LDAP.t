@@ -15,7 +15,7 @@ my $ldapBindDN                 = 'cn=admin,dc=example,dc=com';
 my $ldapBindPassword           = 'admin';
 my $ldapConfBase               = 'ou=notifications,dc=example,dc=com';
 my $notificationStorageOptions = {
-    conf => {},
+    conf   => {},
     logger =>
       Lemonldap::NG::Common::Logger::Std->new( { logLevel => $logLevel } ),
     userLogger =>

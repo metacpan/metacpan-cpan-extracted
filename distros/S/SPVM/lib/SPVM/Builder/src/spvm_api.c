@@ -12,7 +12,6 @@
 
 #include "spvm_compiler.h"
 #include "spvm_allocator.h"
-#include "spvm_op.h"
 
 #include "spvm_opcode_array.h"
 #include "spvm_opcode.h"
@@ -94,9 +93,9 @@
 
 
 
-SPVM_ENV* SPVM_API_create_env(SPVM_COMPILER* compiler) {
+SPVM_ENV* SPVM_API_new_env_raw(SPVM_ENV* unused_env) {
 
-  // Native APIs. If a element is added, must increment env_length variable.
+  // The impelements of Native APIs
   void* env_init[]  = {
     NULL, // class_vars_heap
     (void*)(intptr_t)sizeof(SPVM_OBJECT), // object_header_byte_size
@@ -113,7 +112,7 @@ SPVM_ENV* SPVM_API_create_env(SPVM_COMPILER* compiler) {
     (void*)(intptr_t)SPVM_BASIC_TYPE_C_ID_LONG_OBJECT,  // long_object_basic_type_id
     (void*)(intptr_t)SPVM_BASIC_TYPE_C_ID_FLOAT_OBJECT, // float_object_basic_type_id
     (void*)(intptr_t)SPVM_BASIC_TYPE_C_ID_DOUBLE_OBJECT, // double_object_basic_type_id
-    compiler,
+    NULL, // compiler,
     NULL, // exception_object
     NULL, // native_mortal_stack
     NULL, // native_mortal_stack_top
@@ -274,32 +273,72 @@ SPVM_ENV* SPVM_API_create_env(SPVM_COMPILER* compiler) {
     SPVM_API_copy,
     SPVM_API_shorten,
     SPVM_API_has_interface,
+    NULL, // no_symbol_cache_flag
+    SPVM_API_set_no_symbol_cache_flag,
+    SPVM_API_get_no_symbol_cache_flag,
+    SPVM_API_print,
+    SPVM_API_print_stderr,
+    SPVM_API_new_env_raw,
+    SPVM_API_free_env_raw,
+    SPVM_API_init_env,
+    SPVM_API_call_init_blocks,
+    SPVM_API_cleanup_global_vars,
+    SPVM_API_new_compiler,
+    SPVM_API_compiler_free,
+    SPVM_API_compiler_set_start_line,
+    SPVM_API_compiler_get_start_line,
+    SPVM_API_compiler_set_start_file,
+    SPVM_API_compiler_get_start_file,
+    SPVM_API_compiler_add_module_dir,
+    SPVM_API_compiler_get_module_dirs_length,
+    SPVM_API_compiler_get_module_dir,
+    SPVM_API_compiler_compile_spvm,
+    SPVM_API_compiler_get_error_messages_length,
+    SPVM_API_compiler_get_error_message,
+    SPVM_API_compiler_get_class_id,
+    SPVM_API_compiler_get_classes_length,
+    SPVM_API_compiler_get_class_name,
+    SPVM_API_compiler_is_anon_class,
+    SPVM_API_compiler_get_methods_length,
+    SPVM_API_compiler_get_method_id,
+    SPVM_API_compiler_get_method_id_by_name,
+    SPVM_API_compiler_get_method_name,
+    SPVM_API_compiler_get_method_signature,
+    SPVM_API_compiler_is_anon_method,
+    SPVM_API_compiler_is_init_block_method,
+    SPVM_API_compiler_is_native_method,
+    SPVM_API_compiler_is_precompile_method,
+    SPVM_API_compiler_get_native_method_address,
+    SPVM_API_compiler_get_precompile_method_address,
+    SPVM_API_compiler_set_native_method_address,
+    SPVM_API_compiler_set_precompile_method_address,
   };
   
-  SPVM_ENV* env = SPVM_ALLOCATOR_new_block_runtime_noenv(compiler, sizeof(env_init));
+  SPVM_ENV* env = calloc(1, sizeof(env_init));
   if (env == NULL) {
     return NULL;
   }
   
-  {
-    int32_t memory_blocks_count = (int32_t)(intptr_t)env->memory_blocks_count;
-    memory_blocks_count++;
-    env->memory_blocks_count = (void*)(intptr_t)memory_blocks_count;
-  }
-  
   memcpy(env, env_init, sizeof(env_init));
+
+  return env;
+}
+
+int32_t SPVM_API_init_env(SPVM_ENV* env) {
+  
+  SPVM_COMPILER* compiler = env->compiler;
 
   // Mortal stack
   int32_t native_mortal_stack_capacity = 1;
-  void* native_mortal_stack = SPVM_API_alloc_memory_block_zero(env, sizeof(SPVM_OBJECT*) * native_mortal_stack_capacity);
+  void* native_mortal_stack = calloc(sizeof(SPVM_OBJECT*), native_mortal_stack_capacity);
   if (native_mortal_stack == NULL) {
-    return NULL;
+    return 1;
   }
 
   // Initialize Class Variables
-  void* class_vars_heap = SPVM_API_alloc_memory_block_zero(env, sizeof(SPVM_VALUE) * ((int64_t)compiler->class_vars->length + 1));
+  void* class_vars_heap = calloc(sizeof(SPVM_VALUE), ((int64_t)compiler->class_vars->length + 1));
   if (class_vars_heap == NULL) {
-    return NULL;
+    return 2;
   }
   
   env->native_mortal_stack_capacity = (void*)(intptr_t)native_mortal_stack_capacity;
@@ -315,10 +354,8 @@ SPVM_ENV* SPVM_API_create_env(SPVM_COMPILER* compiler) {
   
   // Object header byte size
   env->object_header_byte_size = (void*)(intptr_t)object_header_byte_size;
-
-  SPVM_API_call_init_blocks(env);
   
-  return env;
+  return 0;
 }
 
 void SPVM_API_make_read_only(SPVM_ENV* env, SPVM_OBJECT* string) {
@@ -1159,11 +1196,7 @@ int32_t SPVM_API_remove_mortal(SPVM_ENV* env, int32_t original_mortal_stack_top,
   return remove_count;
 }
 
-SPVM_ENV* SPVM_API_new_env(SPVM_ENV* env) {
-  return SPVM_API_create_env(env->compiler);
-}
-
-void SPVM_API_free_env(SPVM_ENV* env) {
+void SPVM_API_cleanup_global_vars(SPVM_ENV* env) {
 
   // Runtime
   SPVM_COMPILER* compiler = env->compiler;
@@ -1183,42 +1216,25 @@ void SPVM_API_free_env(SPVM_ENV* env) {
       }
     }
   }
-
-  // Free class variables heap
-  SPVM_API_free_memory_block(env, env->class_vars_heap);
-  env->class_vars_heap = NULL;
-  
-  // Free mortal stack
-  SPVM_API_free_memory_block(env, env->native_mortal_stack);
-  env->native_mortal_stack = NULL;
-  
-  SPVM_ALLOCATOR_free_block_runtime_noenv(compiler, env);
-
-  {
-    int32_t memory_blocks_count = (int32_t)(intptr_t)env->memory_blocks_count;
-    memory_blocks_count--;
-    env->memory_blocks_count = (void*)(intptr_t)memory_blocks_count;
-  }
 }
 
-void SPVM_API_call_init_blocks(SPVM_ENV* env) {
-  (void)env;
-  
-  // Runtime
-  SPVM_COMPILER* compiler = env->compiler;
-  
-  // Call INIT blocks
-  int32_t classes_length = compiler->classes->length;
-  SPVM_VALUE stack[SPVM_LIMIT_C_METHOD_ARGS_MAX_COUNT];
-  for (int32_t class_id = 0; class_id < classes_length; class_id++) {
-    
-    SPVM_CLASS* class = SPVM_LIST_fetch(compiler->classes, class_id);
-    
-    if (class->op_init_method) {
-      SPVM_METHOD* init_method = class->op_init_method->uv.method;
-      env->call_spvm_method(env, init_method->id, stack);
-    }
+void SPVM_API_free_env_raw(SPVM_ENV* env) {
+
+  // Free class variables heap
+  if (env->class_vars_heap != NULL) {
+    free(env->class_vars_heap);
+    env->class_vars_heap = NULL;
   }
+  
+  // Free mortal stack
+  if (env->native_mortal_stack != NULL) {
+    free(env->native_mortal_stack);
+    env->native_mortal_stack = NULL;
+  }
+  
+  // Free env
+  free(env);
+  env = NULL;
 }
 
 int32_t SPVM_API_call_spvm_method(SPVM_ENV* env, int32_t method_id, SPVM_VALUE* stack) {
@@ -2412,9 +2428,7 @@ int32_t SPVM_API_call_spvm_method_vm(SPVM_ENV* env, int32_t method_id, SPVM_VALU
         int_vars[opcode->operand0] = (int32_t)opcode->operand1;
         break;
       case SPVM_OPCODE_C_ID_MOVE_CONSTANT_LONG: {
-        int32_t constant_id = opcode->operand1;
-        SPVM_CONSTANT* constant = class->info_constants->values[constant_id];
-        long_vars[opcode->operand0] = constant->value.lval;
+        long_vars[opcode->operand0] = *(int64_t*)&opcode->operand1;
         break;
       }
       case SPVM_OPCODE_C_ID_MOVE_CONSTANT_FLOAT: {
@@ -2424,9 +2438,7 @@ int32_t SPVM_API_call_spvm_method_vm(SPVM_ENV* env, int32_t method_id, SPVM_VALU
         break;
       }
       case SPVM_OPCODE_C_ID_MOVE_CONSTANT_DOUBLE: {
-        int32_t constant_id = opcode->operand1;
-        SPVM_CONSTANT* constant = class->info_constants->values[constant_id];
-        double_vars[opcode->operand0] = constant->value.dval;
+        double_vars[opcode->operand0] = *(double*)&opcode->operand1;
         break;
       }
       case SPVM_OPCODE_C_ID_ARRAY_FETCH_BYTE: {
@@ -4619,11 +4631,11 @@ int32_t SPVM_API_call_spvm_method_vm(SPVM_ENV* env, int32_t method_id, SPVM_VALU
         if (case_infos_length > 0) {
           // min
           SPVM_CASE_INFO* min_case_info = (SPVM_CASE_INFO*)switch_info->case_infos->values[0];
-          int32_t min = min_case_info->constant->value.ival;
+          int32_t min = min_case_info->condition_value;
           
           // max
           SPVM_CASE_INFO* max_case_info = (SPVM_CASE_INFO*)switch_info->case_infos->values[case_infos_length - 1];
-          int32_t max = max_case_info->constant->value.ival;
+          int32_t max = max_case_info->condition_value;
           
           if (int_vars[opcode->operand0] >= min && int_vars[opcode->operand0] <= max) {
             // 2 opcode_rel_index searching
@@ -4637,7 +4649,7 @@ int32_t SPVM_API_call_spvm_method_vm(SPVM_ENV* env, int32_t method_id, SPVM_VALU
               }
               int32_t cur_half_pos = cur_min_pos + (cur_max_pos - cur_min_pos) / 2;
               SPVM_CASE_INFO* cur_half_case_info = (SPVM_CASE_INFO*)switch_info->case_infos->values[cur_half_pos];
-              int32_t cur_half = cur_half_case_info->constant->value.ival;
+              int32_t cur_half = cur_half_case_info->condition_value;
               
               if (int_vars[opcode->operand0] > cur_half) {
                 cur_min_pos = cur_half_pos + 1;
@@ -5721,8 +5733,12 @@ SPVM_OBJECT* SPVM_API_new_stack_trace(SPVM_ENV* env, SPVM_OBJECT* exception, con
   return str;
 }
 
-void SPVM_API_print(SPVM_ENV* env, SPVM_OBJECT* string) {
+void SPVM_API_fprint(SPVM_ENV* env, FILE* fh, SPVM_OBJECT* string) {
   (void)env;
+  
+  if (string == NULL) {
+    return;
+  }
   
   const char* bytes = env->get_chars(env, string);
   int32_t string_length = env->length(env, string);
@@ -5730,9 +5746,21 @@ void SPVM_API_print(SPVM_ENV* env, SPVM_OBJECT* string) {
   {
     int32_t i;
     for (i = 0; i < string_length; i++) {
-      putchar((char)bytes[i]);
+      putc((char)bytes[i], fh);
     }
   }
+}
+
+void SPVM_API_print(SPVM_ENV* env, SPVM_OBJECT* string) {
+  (void)env;
+  
+  SPVM_API_fprint(env, stdout, string);
+}
+
+void SPVM_API_print_stderr(SPVM_ENV* env, SPVM_OBJECT* string) {
+  (void)env;
+  
+  SPVM_API_fprint(env, stderr, string);
 }
 
 SPVM_OBJECT* SPVM_API_concat_raw(SPVM_ENV* env, SPVM_OBJECT* string1, SPVM_OBJECT* string2) {
@@ -7283,4 +7311,373 @@ void SPVM_API_shorten(SPVM_ENV* env, SPVM_OBJECT* string, int32_t new_length) {
       }
     }
   }
+}
+
+void SPVM_API_set_no_symbol_cache_flag(SPVM_ENV* env, int32_t flag) {
+  (void)env;
+
+  env->no_symbol_cache_flag = (void*)(intptr_t)flag;
+}
+
+int32_t SPVM_API_get_no_symbol_cache_flag(SPVM_ENV* env) {
+  (void)env;
+  
+  return (int32_t)(intptr_t)env->no_symbol_cache_flag;
+}
+
+// flag
+// 0 : all
+// 1 : native method
+// 2 : precompile method
+int32_t SPVM_API_compiler_get_next_method_id_flag(SPVM_ENV* env, SPVM_COMPILER* compiler, const char* method_abs_name, int32_t start_index, int32_t flag) {
+  (void)env;
+
+  SPVM_LIST* methods = compiler->methods;
+  
+  int32_t found_index = -1;
+  for (int32_t method_index = start_index; method_index < methods->length; method_index++) {
+    SPVM_METHOD* method = SPVM_LIST_fetch(methods, method_index);
+    
+    if (!method) {
+      break;
+    }
+    
+    // Native method
+    if (flag == 0 || flag == 1) {
+      if (method->flag & SPVM_METHOD_C_FLAG_NATIVE) {
+        found_index = method_index;
+        break;
+      }
+    }
+    
+    // Precompile method
+    if (flag == 0 || flag == 2) {
+      if (method->flag & SPVM_METHOD_C_FLAG_PRECOMPILE) {
+        found_index = method_index;
+        break;
+      }
+    }
+    
+    // Normal method
+    if (flag == 0) {
+      found_index = method_index;
+      break;
+    }
+  }
+  
+  return found_index;
+}
+
+int32_t SPVM_API_compiler_get_class_id(SPVM_ENV* env, SPVM_COMPILER* compiler, const char* class_name) {
+  (void)env;
+
+  SPVM_CLASS* class = SPVM_HASH_fetch(compiler->class_symtable, class_name, strlen(class_name));
+  
+  int32_t class_id;
+  if (class) {
+    class_id = class->id;
+  }
+  else {
+    class_id = -1;
+  }
+  
+  return class_id;
+}
+
+int32_t SPVM_API_compiler_get_classes_length(SPVM_ENV* env, SPVM_COMPILER* compiler) {
+  (void)env;
+
+  int32_t classes_length= compiler->classes->length;
+  
+  return classes_length;
+}
+
+const char* SPVM_API_compiler_get_class_name(SPVM_ENV* env, SPVM_COMPILER* compiler, int32_t class_id) {
+  (void)env;
+
+  SPVM_CLASS* class = SPVM_LIST_fetch(compiler->classes, class_id);
+  
+  const char* class_name = class->name;
+  
+  return class_name;
+}
+
+int32_t SPVM_API_compiler_is_anon_class(SPVM_ENV* env, SPVM_COMPILER* compiler, int32_t class_id) {
+  (void)env;
+
+  SPVM_CLASS* class = SPVM_LIST_fetch(compiler->classes, class_id);
+  
+  return class->is_anon;
+}
+
+int32_t SPVM_API_compiler_get_methods_length(SPVM_ENV* env, SPVM_COMPILER* compiler, int32_t class_id) {
+  (void)env;
+
+  SPVM_CLASS* class = SPVM_LIST_fetch(compiler->classes, class_id);
+  
+  int32_t methods_length = class->methods->length;
+  
+  return methods_length;
+}
+
+int32_t SPVM_API_compiler_get_method_id(SPVM_ENV* env, SPVM_COMPILER* compiler, int32_t class_id, int32_t method_index_of_class) {
+  (void)env;
+
+  SPVM_CLASS* class = SPVM_LIST_fetch(compiler->classes, class_id);
+  
+  int32_t method_id;
+  if (class) {
+    SPVM_METHOD* method = SPVM_LIST_fetch(class->methods, method_index_of_class);
+    if (method) {
+      method_id = method->id;
+    }
+    else {
+      method_id = -2;
+    }
+  }
+  else {
+    method_id = -1;
+  }
+  
+  return method_id;
+}
+
+int32_t SPVM_API_compiler_get_method_id_by_name(SPVM_ENV* env, SPVM_COMPILER* compiler, const char* class_name, const char* method_name) {
+  (void)env;
+
+  SPVM_CLASS* class = SPVM_HASH_fetch(compiler->class_symtable, class_name, strlen(class_name));
+  
+  int32_t method_id;
+  if (class) {
+    SPVM_METHOD* method_symtable = SPVM_HASH_fetch(class->method_symtable, method_name, strlen(method_name));
+    if (method_symtable) {
+      method_id = method_symtable->id;
+    }
+    else {
+      method_id = -2;
+    }
+  }
+  else {
+    method_id = -1;
+  }
+  
+  return method_id;
+}
+
+const char* SPVM_API_compiler_get_method_name(SPVM_ENV* env, SPVM_COMPILER* compiler, int32_t method_id) {
+  (void)env;
+
+  SPVM_METHOD* method = SPVM_LIST_fetch(compiler->methods, method_id);
+  
+  return method->name;
+}
+
+int32_t SPVM_API_compiler_is_anon_method(SPVM_ENV* env, SPVM_COMPILER* compiler, int32_t method_id) {
+  (void)env;
+
+  SPVM_METHOD* method = SPVM_LIST_fetch(compiler->methods, method_id);
+  
+  return method->flag & SPVM_METHOD_C_FLAG_ANON;
+}
+
+int32_t SPVM_API_compiler_is_init_block_method(SPVM_ENV* env, SPVM_COMPILER* compiler, int32_t method_id) {
+  (void)env;
+
+  SPVM_METHOD* method = SPVM_LIST_fetch(compiler->methods, method_id);
+  
+  return method->is_init;
+}
+
+int32_t SPVM_API_compiler_is_native_method(SPVM_ENV* env, SPVM_COMPILER* compiler, int32_t method_id) {
+  (void)env;
+
+  SPVM_METHOD* method = SPVM_LIST_fetch(compiler->methods, method_id);
+  
+  return method->flag & SPVM_METHOD_C_FLAG_NATIVE;
+}
+
+int32_t SPVM_API_compiler_is_precompile_method(SPVM_ENV* env, SPVM_COMPILER* compiler, int32_t method_id) {
+  (void)env;
+
+  SPVM_METHOD* method = SPVM_LIST_fetch(compiler->methods, method_id);
+  
+  return method->flag & SPVM_METHOD_C_FLAG_PRECOMPILE;
+}
+
+const char* SPVM_API_compiler_get_method_signature(SPVM_ENV* env, SPVM_COMPILER* compiler, int32_t method_id) {
+  (void)env;
+
+  SPVM_METHOD* method = SPVM_LIST_fetch(compiler->methods, method_id);
+  
+  return method->signature;
+}
+
+void* SPVM_API_compiler_get_native_method_address(SPVM_ENV* env, SPVM_COMPILER* compiler, int32_t method_id) {
+  (void)env;
+
+  SPVM_METHOD* method = SPVM_LIST_fetch(compiler->methods, method_id);
+  
+  void* native_method_address = method->native_address;
+  
+  return native_method_address;
+}
+
+void* SPVM_API_compiler_get_precompile_method_address(SPVM_ENV* env, SPVM_COMPILER* compiler, int32_t method_id) {
+  (void)env;
+
+  SPVM_METHOD* method = SPVM_LIST_fetch(compiler->methods, method_id);
+  
+  void* precompile_method_address = method->precompile_address;
+  
+  return precompile_method_address;
+}
+
+void SPVM_API_compiler_set_native_method_address(SPVM_ENV* env, SPVM_COMPILER* compiler, int32_t method_id, void* address) {
+  (void)env;
+
+  SPVM_METHOD* method = SPVM_LIST_fetch(compiler->methods, method_id);
+  
+  method->native_address = address;
+}
+
+void SPVM_API_compiler_set_precompile_method_address(SPVM_ENV* env, SPVM_COMPILER* compiler, int32_t method_id, void* address) {
+  (void)env;
+
+  SPVM_METHOD* method = SPVM_LIST_fetch(compiler->methods, method_id);
+  
+  method->precompile_address = address;
+}
+
+const char* SPVM_API_compiler_get_method_abs_name(SPVM_ENV* env, SPVM_COMPILER* compiler, int32_t method_id) {
+  (void)env;
+
+  SPVM_METHOD* method = SPVM_LIST_fetch(compiler->methods, method_id);
+  
+  const char* method_abs_name = method->abs_name;
+  
+  return method_abs_name;
+}
+
+SPVM_COMPILER* SPVM_API_new_compiler(SPVM_ENV* env) {
+  (void*)env;
+
+  SPVM_COMPILER* compiler = SPVM_COMPILER_new();
+  
+  return compiler;
+}
+
+void SPVM_API_compiler_set_start_line(SPVM_ENV* env, SPVM_COMPILER* compiler, int32_t start_line) {
+  (void*)env;
+
+  compiler->start_line = start_line;
+}
+
+int32_t SPVM_API_compiler_get_start_line(SPVM_ENV* env, SPVM_COMPILER* compiler) {
+  (void*)env;
+  
+  return compiler->start_line;
+}
+
+void SPVM_API_compiler_set_start_file(SPVM_ENV* env, SPVM_COMPILER* compiler, const char* start_file) {
+  (void*)env;
+
+  compiler->start_file = start_file;
+}
+
+const char* SPVM_API_compiler_get_start_file(SPVM_ENV* env, SPVM_COMPILER* compiler) {
+  (void*)env;
+  
+  return compiler->start_file;
+}
+
+void SPVM_API_compiler_add_module_dir(SPVM_ENV* env, SPVM_COMPILER* compiler, const char* module_dir) {
+  (void*)env;
+  
+  SPVM_LIST_push(compiler->module_dirs, (void*)module_dir);
+}
+
+int32_t SPVM_API_compiler_get_module_dirs_length (SPVM_ENV* env, SPVM_COMPILER* compiler) {
+  (void*)env;
+  
+  SPVM_LIST* module_dirs = compiler->module_dirs;
+  int32_t module_dirs_length = module_dirs->length;
+  
+  return module_dirs_length;
+}
+
+const char* SPVM_API_compiler_get_module_dir (SPVM_ENV* env, SPVM_COMPILER* compiler, int32_t module_dir_id) {
+  (void*)env;
+  
+  const char* module_dir = SPVM_LIST_fetch(compiler->module_dirs, module_dir_id);
+  
+  return module_dir;
+}
+
+int32_t SPVM_API_compiler_compile_spvm(SPVM_ENV* env, SPVM_COMPILER* compiler, const char* class_name) {
+  (void*)env;
+
+  int32_t error_code = SPVM_COMPILER_compile_spvm(compiler, class_name);
+  
+  return error_code;
+}
+
+void SPVM_API_call_init_blocks(SPVM_ENV* env) {
+  (void)env;
+  
+  // Runtime
+  SPVM_COMPILER* compiler = env->compiler;
+  
+  // Call INIT blocks
+  int32_t classes_length = compiler->classes->length;
+  SPVM_VALUE stack[SPVM_LIMIT_C_METHOD_ARGS_MAX_COUNT];
+  for (int32_t class_id = 0; class_id < classes_length; class_id++) {
+    
+    SPVM_CLASS* class = SPVM_LIST_fetch(compiler->classes, class_id);
+    
+    if (class->has_init_block) {
+      SPVM_METHOD* init_method = SPVM_HASH_fetch(class->method_symtable, "INIT", strlen("INIT"));
+      assert(init_method);
+      env->call_spvm_method(env, init_method->id, stack);
+    }
+  }
+}
+
+void SPVM_API_compiler_free(SPVM_ENV* env, SPVM_COMPILER* compiler) {
+  (void*)env;
+
+  SPVM_COMPILER_free(compiler);
+}
+
+int32_t SPVM_API_compiler_get_error_messages_length(SPVM_ENV* env, SPVM_COMPILER* compiler) {
+  return SPVM_COMPILER_get_error_messages_length(compiler);
+}
+
+const char* SPVM_API_compiler_get_error_message(SPVM_ENV* env, SPVM_COMPILER* compiler, int32_t index) {
+  return  SPVM_COMPILER_get_error_message(compiler, index);
+}
+
+SPVM_ENV* SPVM_API_new_env(SPVM_ENV* env) {
+  (void)env;
+  
+  // New raw env
+  SPVM_ENV* new_env = SPVM_API_new_env_raw(NULL);
+  
+  // Set the compiler
+  new_env->compiler = env->compiler;
+  
+  // Initialize env
+  new_env->init_env(new_env);
+  
+  // Call init blocks
+  new_env->call_init_blocks(new_env);
+  
+  return new_env;
+}
+
+void SPVM_API_free_env(SPVM_ENV* env) {
+  (void)env;
+  
+  env->cleanup_global_vars(env);
+  
+  env->free_env_raw(env);
 }

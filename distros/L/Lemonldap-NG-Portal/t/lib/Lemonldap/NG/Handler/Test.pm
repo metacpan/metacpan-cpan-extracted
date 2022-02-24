@@ -32,8 +32,8 @@ sub init {
                 dirName => 't',
             },
             globalStorageOptions => {
-                Directory     => $LLNG::TMPDIR,
-                LockDirectory => "$LLNG::TMPDIR/lock",
+                Directory      => $LLNG::TMPDIR,
+                LockDirectory  => "$LLNG::TMPDIR/lock",
                 generateModule =>
                   'Lemonldap::NG::Common::Apache::Session::Generate::SHA256',
             },

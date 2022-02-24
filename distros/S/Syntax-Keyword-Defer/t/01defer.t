@@ -235,47 +235,4 @@ use Syntax::Keyword::Defer;
    is($e, "Oopsie\n", 'Thrown exception still occurs after defer');
 }
 
-{
-   my $sub = sub {
-      while(1) {
-         defer { return "retval" }
-         last;
-      }
-      return "wrong";
-   };
-
-   my $e = defined eval {
-      my $ret = $sub->();
-      diag("return value was $ret");
-      1
-   } ? undef : $@;
-   like($e, qr/^Can't "return" out of a defer block /,
-      'Cannot return out of defer block');
-}
-
-{
-   my $sub = sub {
-      while(1) {
-         defer { goto HERE }
-      }
-      HERE:
-   };
-
-   my $e = defined eval { $sub->(); 1 } ? undef : $@;
-   like($e, qr/^Can't "goto" out of a defer block /,
-      'Cannot goto out of defer block');
-}
-
-{
-   my $sub = sub {
-      LOOP: while(1) {
-         defer { last LOOP }
-      }
-   };
-
-   my $e = defined eval { $sub->(); 1 } ? undef : $@;
-   like($e, qr/^Can't "last" out of a defer block /,
-      'Cannot last out of defer block');
-}
-
 done_testing;

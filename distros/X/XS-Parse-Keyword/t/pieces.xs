@@ -1,7 +1,7 @@
 /*  You may distribute under the terms of either the GNU General Public License
  *  or the Artistic License (the same terms as Perl itself)
  *
- *  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
+ *  (C) Paul Evans, 2021-2022 -- leonerd@leonerd.org.uk
  */
 
 #include "EXTERN.h"
@@ -95,7 +95,7 @@ static int build_literal(pTHX_ OP **out, XSParseKeywordPiece *arg0, void *hookda
 {
   /* ignore arg0 */
 
-  *out = newSVOP(OP_CONST, 0, (SV *)hookdata);
+  *out = newSVOP(OP_CONST, 0, SvREFCNT_inc((SV *)hookdata));
 
   return KEYWORD_PLUGIN_EXPR;
 }
@@ -277,6 +277,13 @@ static const struct XSParseKeywordHooks hooks_str = {
   .build1 = &build_literal,
 };
 
+static const struct XSParseKeywordHooks hooks_autosemi = {
+  .permit_hintkey = hintkey,
+
+  .piece1 = XPK_AUTOSEMI,
+  .build1 = &build_literal,
+};
+
 MODULE = t::pieces  PACKAGE = t::pieces
 
 BOOT:
@@ -311,3 +318,5 @@ BOOT:
   register_xs_parse_keyword("piececolon", &hooks_colon, newSVpvs("colon"));
 
   register_xs_parse_keyword("piecestr", &hooks_str, newSVpvs("foo"));
+
+  register_xs_parse_keyword("pieceautosemi", &hooks_autosemi, newSVpvs("EOS"));

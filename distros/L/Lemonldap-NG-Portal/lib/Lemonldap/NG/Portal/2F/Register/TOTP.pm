@@ -5,7 +5,7 @@ use strict;
 use Mouse;
 use JSON qw(from_json to_json);
 
-our $VERSION = '2.0.12';
+our $VERSION = '2.0.14';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Plugin
@@ -157,12 +157,19 @@ sub run {
                 400 );
         }
 
+        my $storable_secret =
+          $self->get_storable_secret( $token->{_totp2fSecret} );
+        unless ($storable_secret) {
+            $self->logger->error("Unable to encrypt TOTP secret");
+            return $self->p->sendError( $req, "serverError", 500 );
+        }
+
         # Store TOTP secret
         push @keep,
           {
             type    => 'TOTP',
             name    => $TOTPName,
-            _secret => $token->{_totp2fSecret},
+            _secret => $storable_secret,
             epoch   => $epoch
           };
         $self->logger->debug(

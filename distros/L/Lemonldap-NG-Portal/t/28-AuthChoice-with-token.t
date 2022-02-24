@@ -63,7 +63,7 @@ foreach (@form) {
     expectForm( [ $res->[0], $res->[1], [$_] ], undef, undef, 'test' );
 }
 
-$query =~ s/user=/user=dwho/;
+$query =~ s/user=[^&]*/user=dwho/;
 $query =~ s/password=/password=dwho/;
 $query =~ s/test=\w*\b/test=1_demo/;
 

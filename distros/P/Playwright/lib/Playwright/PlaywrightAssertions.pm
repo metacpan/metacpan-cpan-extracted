@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::PlaywrightAssertions;
-$Playwright::PlaywrightAssertions::VERSION = '0.018';
+$Playwright::PlaywrightAssertions::VERSION = '0.019';
 use parent 'Playwright::Base';
 
 sub new {
@@ -96,7 +96,7 @@ Playwright::PlaywrightAssertions - Automatically generated class for Playwright:
 
 =head1 VERSION
 
-version 0.018
+version 0.019
 
 =head1 CONSTRUCTOR
 

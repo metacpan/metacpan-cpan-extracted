@@ -11,14 +11,14 @@ package Test::Bug;
     our @EXPORT = qw(test_null_operation_bug);
 
     use Crypt::OpenSSL::Verify;
-    use File::Slurp qw(read_file);
+    use File::Slurper qw(read_text);
     use Crypt::OpenSSL::X509;
 
     sub test_null_operation_bug {
         my ($ca, $cert) = @_;
 
         my $x = Crypt::OpenSSL::Verify->new($ca);
-        my $x509 = Crypt::OpenSSL::X509->new_from_string(scalar read_file($cert));
+        my $x509 = Crypt::OpenSSL::X509->new_from_string(scalar read_text($cert));
 
         return $x->verify($x509);
     }

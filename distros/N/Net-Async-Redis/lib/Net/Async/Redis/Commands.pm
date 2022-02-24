@@ -3,7 +3,7 @@ package Net::Async::Redis::Commands;
 use strict;
 use warnings;
 
-our $VERSION = '3.020'; # VERSION
+our $VERSION = '3.021'; # VERSION
 
 =head1 NAME
 
@@ -30,6 +30,7 @@ our %KEY_FINDER = (
     'APPEND' => 1,
     'BITCOUNT' => 1,
     'BITFIELD' => 1,
+    'BITFIELD RO' => 2,
     'BITFIELD_RO' => 1,
     'BITOP' => 3,
     'BITPOS' => 1,
@@ -39,28 +40,34 @@ our %KEY_FINDER = (
     'BZMPOP' => 3,
     'BZPOPMAX' => 1,
     'BZPOPMIN' => 1,
+    'CLUSTER' => 3,
     'CLUSTER KEYSLOT' => 2,
     'DECR' => 1,
     'DECRBY' => 1,
     'DEL' => 1,
     'DUMP' => 1,
     'EVAL' => 3,
+    'EVAL RO' => 4,
     'EVAL_RO' => 3,
     'EVALSHA' => 3,
+    'EVALSHA RO' => 4,
     'EVALSHA_RO' => 3,
     'EXISTS' => 1,
     'EXPIRE' => 1,
     'EXPIREAT' => 1,
     'EXPIRETIME' => 1,
     'FCALL' => 3,
+    'FCALL RO' => 4,
     'FCALL_RO' => 3,
     'GEOADD' => 1,
     'GEODIST' => 1,
     'GEOHASH' => 1,
     'GEOPOS' => 1,
     'GEORADIUS' => 1,
+    'GEORADIUS RO' => 2,
     'GEORADIUS_RO' => 1,
     'GEORADIUSBYMEMBER' => 1,
+    'GEORADIUSBYMEMBER RO' => 2,
     'GEORADIUSBYMEMBER_RO' => 1,
     'GEOSEARCH' => 1,
     'GET' => 1,
@@ -100,12 +107,14 @@ our %KEY_FINDER = (
     'LREM' => 1,
     'LSET' => 1,
     'LTRIM' => 1,
+    'MEMORY' => 3,
     'MEMORY USAGE' => 2,
     'MGET' => 1,
     'MIGRATE' => 3,
     'MOVE' => 1,
     'MSET' => 1,
     'MSETNX' => 1,
+    'OBJECT' => 3,
     'OBJECT ENCODING' => 2,
     'OBJECT FREQ' => 2,
     'OBJECT IDLETIME' => 2,
@@ -142,6 +151,7 @@ our %KEY_FINDER = (
     'SMEMBERS' => 1,
     'SMISMEMBER' => 1,
     'SORT' => 1,
+    'SORT RO' => 2,
     'SORT_RO' => 1,
     'SPOP' => 1,
     'SRANDMEMBER' => 1,
@@ -3506,7 +3516,7 @@ sub evalsha_ro : method {
 
 =head2 fcall
 
-PATCH__TBD__38__.
+Invoke a function.
 
 =over 4
 
@@ -3531,7 +3541,7 @@ sub fcall : method {
 
 =head2 fcall_ro
 
-PATCH__TBD__7__.
+Invoke a read-only function.
 
 =over 4
 
@@ -3560,7 +3570,7 @@ Delete a function by name.
 
 =over 4
 
-=item * function-name
+=item * library-name
 
 =back
 
@@ -3651,7 +3661,7 @@ Create a function with the given arguments (name, code, description).
 
 =item * [REPLACE]
 
-=item * [DESC library-description]
+=item * [DESCRIPTION library-description]
 
 =item * function-code
 
@@ -4083,6 +4093,19 @@ L<https://redis.io/commands/command-getkeys>
 sub command_getkeys : method {
     my ($self, @args) = @_;
     $self->execute_command(qw(COMMAND GETKEYS) => @args)
+}
+
+=head2 command_getkeysandflags
+
+Extract keys given a full Redis command.
+
+L<https://redis.io/commands/command-getkeysandflags>
+
+=cut
+
+sub command_getkeysandflags : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(COMMAND GETKEYSANDFLAGS) => @args)
 }
 
 =head2 command_info
@@ -7029,6 +7052,235 @@ L<https://redis.io/commands/watch>
 sub watch : method {
     my ($self, @args) = @_;
     $self->execute_command(qw(WATCH) => @args)
+}
+
+
+=head1 METHODS - Legacy
+
+These take a subcommand as a parameter and construct the method name by
+combining the main command with subcommand - for example, C<< ->xgroup(CREATE => ...) >>
+would call C<< ->xgroup_create >>.
+
+=cut
+
+=head2 acl
+
+=cut
+
+sub acl : method {
+    my ($self, $cmd, @args) = @_;
+    $cmd =~ tr/ /_/;
+    my $method = "acl_" . lc($cmd);
+    return $self->$method(@args);
+}
+
+=head2 client
+
+=cut
+
+sub client : method {
+    my ($self, $cmd, @args) = @_;
+    $cmd =~ tr/ /_/;
+    my $method = "client_" . lc($cmd);
+    return $self->$method(@args);
+}
+
+=head2 client_no
+
+=cut
+
+sub client_no : method {
+    my ($self, $cmd, @args) = @_;
+    $cmd =~ tr/ /_/;
+    my $method = "client_no_" . lc($cmd);
+    return $self->$method(@args);
+}
+
+=head2 cluster
+
+=cut
+
+sub cluster : method {
+    my ($self, $cmd, @args) = @_;
+    $cmd =~ tr/ /_/;
+    my $method = "cluster_" . lc($cmd);
+    return $self->$method(@args);
+}
+
+=head2 cluster_count
+
+=cut
+
+sub cluster_count : method {
+    my ($self, $cmd, @args) = @_;
+    $cmd =~ tr/ /_/;
+    my $method = "cluster_count_" . lc($cmd);
+    return $self->$method(@args);
+}
+
+=head2 cluster_count_failure
+
+=cut
+
+sub cluster_count_failure : method {
+    my ($self, $cmd, @args) = @_;
+    $cmd =~ tr/ /_/;
+    my $method = "cluster_count_failure_" . lc($cmd);
+    return $self->$method(@args);
+}
+
+=head2 cluster_set
+
+=cut
+
+sub cluster_set : method {
+    my ($self, $cmd, @args) = @_;
+    $cmd =~ tr/ /_/;
+    my $method = "cluster_set_" . lc($cmd);
+    return $self->$method(@args);
+}
+
+=head2 cluster_set_config
+
+=cut
+
+sub cluster_set_config : method {
+    my ($self, $cmd, @args) = @_;
+    $cmd =~ tr/ /_/;
+    my $method = "cluster_set_config_" . lc($cmd);
+    return $self->$method(@args);
+}
+
+=head2 config
+
+=cut
+
+sub config : method {
+    my ($self, $cmd, @args) = @_;
+    $cmd =~ tr/ /_/;
+    my $method = "config_" . lc($cmd);
+    return $self->$method(@args);
+}
+
+=head2 function
+
+=cut
+
+sub function : method {
+    my ($self, $cmd, @args) = @_;
+    $cmd =~ tr/ /_/;
+    my $method = "function_" . lc($cmd);
+    return $self->$method(@args);
+}
+
+=head2 latency
+
+=cut
+
+sub latency : method {
+    my ($self, $cmd, @args) = @_;
+    $cmd =~ tr/ /_/;
+    my $method = "latency_" . lc($cmd);
+    return $self->$method(@args);
+}
+
+=head2 memory
+
+=cut
+
+sub memory : method {
+    my ($self, $cmd, @args) = @_;
+    $cmd =~ tr/ /_/;
+    my $method = "memory_" . lc($cmd);
+    return $self->$method(@args);
+}
+
+=head2 memory_malloc
+
+=cut
+
+sub memory_malloc : method {
+    my ($self, $cmd, @args) = @_;
+    $cmd =~ tr/ /_/;
+    my $method = "memory_malloc_" . lc($cmd);
+    return $self->$method(@args);
+}
+
+=head2 module
+
+=cut
+
+sub module : method {
+    my ($self, $cmd, @args) = @_;
+    $cmd =~ tr/ /_/;
+    my $method = "module_" . lc($cmd);
+    return $self->$method(@args);
+}
+
+=head2 object
+
+=cut
+
+sub object : method {
+    my ($self, $cmd, @args) = @_;
+    $cmd =~ tr/ /_/;
+    my $method = "object_" . lc($cmd);
+    return $self->$method(@args);
+}
+
+=head2 pubsub
+
+=cut
+
+sub pubsub : method {
+    my ($self, $cmd, @args) = @_;
+    $cmd =~ tr/ /_/;
+    my $method = "pubsub_" . lc($cmd);
+    return $self->$method(@args);
+}
+
+=head2 script
+
+=cut
+
+sub script : method {
+    my ($self, $cmd, @args) = @_;
+    $cmd =~ tr/ /_/;
+    my $method = "script_" . lc($cmd);
+    return $self->$method(@args);
+}
+
+=head2 slowlog
+
+=cut
+
+sub slowlog : method {
+    my ($self, $cmd, @args) = @_;
+    $cmd =~ tr/ /_/;
+    my $method = "slowlog_" . lc($cmd);
+    return $self->$method(@args);
+}
+
+=head2 xgroup
+
+=cut
+
+sub xgroup : method {
+    my ($self, $cmd, @args) = @_;
+    $cmd =~ tr/ /_/;
+    my $method = "xgroup_" . lc($cmd);
+    return $self->$method(@args);
+}
+
+=head2 xinfo
+
+=cut
+
+sub xinfo : method {
+    my ($self, $cmd, @args) = @_;
+    $cmd =~ tr/ /_/;
+    my $method = "xinfo_" . lc($cmd);
+    return $self->$method(@args);
 }
 
 1;

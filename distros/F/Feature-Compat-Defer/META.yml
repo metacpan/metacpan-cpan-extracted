@@ -16,11 +16,11 @@ name: Feature-Compat-Defer
 provides:
   Feature::Compat::Defer:
     file: lib/Feature/Compat/Defer.pm
-    version: '0.01'
+    version: '0.02'
 requires:
-  Syntax::Keyword::Defer: '0'
+  Syntax::Keyword::Defer: '0.06'
   perl: '5.014'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

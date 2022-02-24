@@ -45,6 +45,27 @@
 %# END BPS TAGGED BLOCK }}}
 
 <input type="hidden" class="hidden" name="id" value="<% $Ticket->id %>" />
+% if ( RT::Handle::cmp_version($RT::VERSION, '5.0.0') >= 0 ) {
+% # RT 5 version
+<div class="form-row">
+  <div class="label col-3"><&|/l&>Status</&>:</div>
+  <div class="value col-9"><& $status_comp, Name => 'Status', TicketObj => $Ticket, @extra &></div>
+</div>
+<div class="form-row">
+  <div class="label col-3"><&|/l&>Owner</&>:</div>
+  <div class="value col-9"><& /Elements/SelectOwner, Name => 'Owner', QueueObj => $Ticket->QueueObj, TicketObj => $Ticket, Default => $Ticket->OwnerObj->Id, DefaultValue => 0&></div>
+</div>
+<div class="form-row">
+  <div class="label col-3"><&|/l&>Priority</&>:</div>
+  <div class="value col-9"><& /Elements/SelectPriority, Name => 'Priority', QueueObj => $Ticket->QueueObj, Default => $Ticket->Priority &></div>
+</div>
+<div class="form-row">
+  <div class="label col-3"><&|/l&>Queue</&>:</div>
+  <div class="value col-9"><& /Elements/SelectQueue, Name => 'Queue', Default => $Ticket->QueueObj->Id, ShowNullOption => 0 &></div>
+</div>
+% }
+% else {
+% # RT 4 version
 <table>
   <tr>
  <td class="label"><&|/l&>Status</&>:</td><td> <& $status_comp, Name => 'Status', TicketObj => $Ticket, @extra &> </td>
@@ -64,6 +85,7 @@
   </td>
   </tr>
 </table>
+% }
 <%INIT>
 my $Ticket = LoadTicket($id);
 

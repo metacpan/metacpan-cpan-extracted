@@ -21,7 +21,8 @@ use DynaLoader;
 
 
 
-#line 5 "gsl_sf_zeta.pd"
+#line 4 "gsl_sf_zeta.pd"
+
 use strict;
 use warnings;
 
@@ -34,7 +35,7 @@ PDL::GSLSF::ZETA - PDL interface to GSL Special Functions
 This is an interface to the Special Function package present in the GNU Scientific Library. 
 
 =cut
-#line 38 "ZETA.pm"
+#line 39 "ZETA.pm"
 
 
 
@@ -48,7 +49,8 @@ This is an interface to the Special Function package present in the GNU Scientif
 
 
 
-#line 1059 "../../../../blib/lib/PDL/PP.pm"
+#line 1058 "../../../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 gsl_sf_zeta
@@ -68,17 +70,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 72 "ZETA.pm"
+#line 74 "ZETA.pm"
 
 
 
-#line 1061 "../../../../blib/lib/PDL/PP.pm"
+#line 1060 "../../../../blib/lib/PDL/PP.pm"
+
 *gsl_sf_zeta = \&PDL::gsl_sf_zeta;
-#line 78 "ZETA.pm"
+#line 81 "ZETA.pm"
 
 
 
-#line 1059 "../../../../blib/lib/PDL/PP.pm"
+#line 1058 "../../../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 gsl_sf_hzeta
@@ -98,17 +102,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 102 "ZETA.pm"
+#line 106 "ZETA.pm"
 
 
 
-#line 1061 "../../../../blib/lib/PDL/PP.pm"
+#line 1060 "../../../../blib/lib/PDL/PP.pm"
+
 *gsl_sf_hzeta = \&PDL::gsl_sf_hzeta;
-#line 108 "ZETA.pm"
+#line 113 "ZETA.pm"
 
 
 
-#line 1059 "../../../../blib/lib/PDL/PP.pm"
+#line 1058 "../../../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 gsl_sf_eta
@@ -128,19 +134,21 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 132 "ZETA.pm"
-
-
-
-#line 1061 "../../../../blib/lib/PDL/PP.pm"
-*gsl_sf_eta = \&PDL::gsl_sf_eta;
 #line 138 "ZETA.pm"
 
 
 
+#line 1060 "../../../../blib/lib/PDL/PP.pm"
+
+*gsl_sf_eta = \&PDL::gsl_sf_eta;
+#line 145 "ZETA.pm"
 
 
-#line 64 "gsl_sf_zeta.pd"
+
+
+
+#line 63 "gsl_sf_zeta.pd"
+
 
 =head1 AUTHOR
 
@@ -154,7 +162,7 @@ PDL distribution, the copyright notice should be included in the file.
 The GSL SF modules were written by G. Jungman.
 
 =cut
-#line 158 "ZETA.pm"
+#line 166 "ZETA.pm"
 
 
 

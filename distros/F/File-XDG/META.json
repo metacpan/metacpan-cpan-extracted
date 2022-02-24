@@ -28,7 +28,7 @@
             "Dist::Zilla::Plugin::Prereqs" : "0",
             "Dist::Zilla::Plugin::PruneFiles" : "0",
             "Dist::Zilla::Plugin::RemovePrereqs" : "0",
-            "Dist::Zilla::PluginBundle::Author::Plicease" : "2.66",
+            "Dist::Zilla::PluginBundle::Author::Plicease" : "2.69",
             "Perl::Critic::Policy::BuiltinFunctions::ProhibitBooleanGrep" : "0",
             "Perl::Critic::Policy::BuiltinFunctions::ProhibitStringyEval" : "0",
             "Perl::Critic::Policy::BuiltinFunctions::ProhibitStringySplit" : "0",
@@ -130,12 +130,12 @@
          "web" : "https://github.com/uperl/File-XDG"
       }
    },
-   "version" : "0.11",
+   "version" : "1.01",
    "x_contributors" : [
       "S\u00edle Ekaterin Aman",
       "Graham Ollis <plicease@cpan.org>"
    ],
-   "x_generated_by_perl" : "v5.35.6",
+   "x_generated_by_perl" : "v5.35.9",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_use_unsafe_inc" : 0

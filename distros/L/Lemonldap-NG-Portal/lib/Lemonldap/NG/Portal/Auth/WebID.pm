@@ -33,7 +33,7 @@ has reWebIDWhitelist => ( is => 'rw' );
 
 sub init {
     my ($self) = @_;
-    my @hosts = split /\s+/, $self->{conf}->{webIDWhitelist};
+    my @hosts  = split /\s+/, $self->{conf}->{webIDWhitelist};
     unless (@hosts) {
         $self->error(
 'WebID white list is empty. Set it in manager, use * to accept all FOAF providers'

@@ -75,7 +75,7 @@ sub init {
         '_utime'              => $now,
         '_passwordDB'         => 'Demo',
         '_auth'               => 'Demo',
-        'UA' =>
+        'UA'                  =>
 'Mozilla/5.0 (X11; VAX4000; rv:43.0) Gecko/20100101 Firefox/143.0 Iceweasel/143.0.1'
     };
 
@@ -152,7 +152,7 @@ sub _get {
             'X_ORIGINAL_URI'       => $path . ( $query ? "?$query" : '' ),
             'SERVER_PORT'          => '80',
             'SERVER_PROTOCOL'      => 'HTTP/1.1',
-            'HTTP_USER_AGENT' =>
+            'HTTP_USER_AGENT'      =>
               'Mozilla/5.0 (VAX-4000; rv:36.0) Gecko/20350101 Firefox',
             'REMOTE_ADDR' => '127.0.0.1',
             'HTTP_HOST'   => $host,

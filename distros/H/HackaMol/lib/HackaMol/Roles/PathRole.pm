@@ -1,5 +1,5 @@
 package HackaMol::Roles::PathRole;
-$HackaMol::Roles::PathRole::VERSION = '0.051';
+$HackaMol::Roles::PathRole::VERSION = '0.053';
 #ABSTRACT:  
 use 5.008;
 use Moose::Role;
@@ -82,7 +82,7 @@ HackaMol::Roles::PathRole -
 
 =head1 VERSION
 
-version 0.051
+version 0.053
 
 =head1 DESCRIPTION
 

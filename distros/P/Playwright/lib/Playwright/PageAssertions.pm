@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::PageAssertions;
-$Playwright::PageAssertions::VERSION = '0.018';
+$Playwright::PageAssertions::VERSION = '0.019';
 use parent 'Playwright::Base';
 
 sub new {
@@ -32,16 +32,6 @@ sub NotToHaveTitle {
     );
 }
 
-sub NotToHaveURL {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'NotToHaveURL',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
 sub not {
     my $self = shift;
     return $self->_api_request(
@@ -57,6 +47,16 @@ sub toHaveTitle {
     return $self->_api_request(
         args    => [@_],
         command => 'toHaveTitle',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub NotToHaveURL {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'NotToHaveURL',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -116,7 +116,7 @@ Playwright::PageAssertions - Automatically generated class for Playwright::PageA
 
 =head1 VERSION
 
-version 0.018
+version 0.019
 
 =head1 CONSTRUCTOR
 
@@ -133,12 +133,6 @@ Execute the PageAssertions::NotToHaveTitle playwright routine.
 
 See L<https://playwright.dev/api/class-PageAssertions#PageAssertions-NotToHaveTitle> for more information.
 
-=head2 NotToHaveURL(@args)
-
-Execute the PageAssertions::NotToHaveURL playwright routine.
-
-See L<https://playwright.dev/api/class-PageAssertions#PageAssertions-NotToHaveURL> for more information.
-
 =head2 not(@args)
 
 Execute the PageAssertions::not playwright routine.
@@ -150,6 +144,12 @@ See L<https://playwright.dev/api/class-PageAssertions#PageAssertions-not> for mo
 Execute the PageAssertions::toHaveTitle playwright routine.
 
 See L<https://playwright.dev/api/class-PageAssertions#PageAssertions-toHaveTitle> for more information.
+
+=head2 NotToHaveURL(@args)
+
+Execute the PageAssertions::NotToHaveURL playwright routine.
+
+See L<https://playwright.dev/api/class-PageAssertions#PageAssertions-NotToHaveURL> for more information.
 
 =head2 toHaveURL(@args)
 

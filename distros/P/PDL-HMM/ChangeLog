@@ -1,3 +1,6 @@
+v0.06006 Tue, 22 Feb 2022 19:33:06 +0100 moocow
+	* fixes for PDL 2.058+, from mowhawk2
+
 v0.06005 Tue, 06 Jun 2017 10:57:05 +0200 moocow
 	* added 'use lib "."' to Makefile.PL (RT bug #121661)
 

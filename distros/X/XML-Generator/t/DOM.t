@@ -7,7 +7,7 @@ unless (eval "use XML::DOM; 1;") {
   exit;
 }
 
-plan tests => 35;
+plan tests => 36;
 
 require XML::Generator::DOM;
 
@@ -22,6 +22,9 @@ ok($xml->toString, '<bar>42</bar>');
 
 $xml = $x->baz({'foo'=>3});
 ok($xml->toString, '<baz foo="3"/>');
+
+$xml = $x->password('パスワードをお忘れの方');
+ok($xml->toString, '<password>パスワードをお忘れの方</password>');
 
 $xml = $x->bam({'bar'=>42},$x->foo(),"qux");
 ok($xml->toString, '<bam bar="42"><foo/>qux</bam>');

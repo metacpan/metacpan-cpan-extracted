@@ -9,7 +9,7 @@
 #
 package Lemonldap::NG::Portal::Main::Run;
 
-our $VERSION = '2.0.13';
+our $VERSION = '2.0.14';
 
 package Lemonldap::NG::Portal::Main;
 
@@ -17,7 +17,7 @@ use strict;
 use URI::Escape;
 use URI;
 use JSON;
-use Lemonldap::NG::Common::Util qw(getPSessionID);
+use Lemonldap::NG::Common::Util qw(getPSessionID getSameSite);
 
 has trOverCache => ( is => 'rw', default => sub { {} } );
 
@@ -134,7 +134,7 @@ sub login {
     return $self->do(
         $req,
         [
-            'checkUnauthLogout', 'controlUrl',    # Fix 2342
+            'checkUnauthLogout',            'controlUrl',          # Fix 2342
             @{ $self->beforeAuth },         $self->authProcess,
             @{ $self->betweenAuthAndData }, $self->sessionData,
             @{ $self->afterData },          $self->validSession,
@@ -148,7 +148,7 @@ sub postLogin {
     return $self->do(
         $req,
         [
-            'checkUnauthLogout', 'restoreArgs',            # Fix 2342
+            'checkUnauthLogout', 'restoreArgs',                    # Fix 2342
             'controlUrl',        @{ $self->beforeAuth },
             $self->authProcess,  @{ $self->betweenAuthAndData },
             $self->sessionData,  @{ $self->afterData },
@@ -189,7 +189,8 @@ sub refresh {
     $req->user( $data{_user} || $data{ $self->conf->{whatToTrace} } );
     $req->id( $data{_session_id} );
     foreach ( keys %data ) {
-        delete $data{$_} unless ( /^_/ or /^(?:startTime)$/ );
+        delete $data{$_}
+          unless ( /^_/ or /^(?:startTime|authenticationLevel)$/ );
     }
     $data{_updateTime} = strftime( "%Y%m%d%H%M%S", localtime() );
     $self->logger->debug(
@@ -198,14 +199,14 @@ sub refresh {
             'getUser',
             @{ $self->betweenAuthAndData },
             'setSessionInfo',
-            $self->groupsAndMacros,
-            'setLocalGroups',
             sub {
                 $_[0]->sessionInfo->{$_} = $data{$_} foreach ( keys %data );
                 $_[0]->refresh(1);
                 return PE_OK;
             },
-            'store',
+            $self->groupsAndMacros,
+            'setLocalGroups',
+            'store'
         ]
     );
     my $res = $req->error( $self->process($req) );
@@ -289,6 +290,7 @@ sub do {
                     params => {
                         AUTH_ERROR      => $err,
                         AUTH_ERROR_TYPE => $req->error_type,
+                        AUTH_ERROR_ROLE => $req->error_role,
                     }
                 );
             }
@@ -355,6 +357,11 @@ sub do {
 
 sub getModule {
     my ( $self, $req, $type ) = @_;
+    if ( my $val =
+        $req->userData->{ { auth => '_auth', user => '_userDB' }->{$type} } )
+    {
+        return $val;
+    }
     if (
         my $mod = {
             auth     => '_authentication',
@@ -583,7 +590,9 @@ sub updateSession {
             $self->logger->debug("Update sessionInfo $_");
             $self->_dump( $infos->{$_} );
             $req->{sessionInfo}->{$_} = $infos->{$_};
-            if ( $self->HANDLER->data->{_session_id} && $id eq $self->HANDLER->data->{_session_id} ) {
+            if (   $self->HANDLER->data->{_session_id}
+                && $id eq $self->HANDLER->data->{_session_id} )
+            {
                 $self->HANDLER->data->{$_} = $infos->{$_};
             }
         }
@@ -1040,6 +1049,7 @@ sub tplParams {
         SKIN       => $self->getSkin($req),
         PORTAL_URL => $self->conf->{portal},
         SKIN_PATH  => $portalPath . "skins",
+        SAMESITE   => getSameSite( $self->conf ),
         SKIN_BG    => $self->conf->{portalSkinBackground},
         CUSTOM_CSS => $self->conf->{portalCustomCss},
         ( $self->customParameters ? ( %{ $self->customParameters } ) : () ),
@@ -1083,7 +1093,7 @@ sub registerLogin {
     }
 
     my $history = $req->sessionInfo->{_loginHistory} ||= {};
-    my $type = ( $req->authResult > 0 ? 'failed' : 'success' ) . 'Login';
+    my $type    = ( $req->authResult > 0 ? 'failed' : 'success' ) . 'Login';
     $history->{$type} ||= [];
     $self->logger->debug("Current login saved into $type");
 
@@ -1117,9 +1127,11 @@ sub _sumUpSession {
       $withoutUser
       ? {}
       : { user => $session->{ $self->conf->{whatToTrace} } };
-    $res->{$_} = $session->{$_}
-      foreach ( "_utime", "ipAddr",
-        keys %{ $self->conf->{sessionDataToRemember} } );
+    $res->{$_} = $session->{$_} foreach (
+        "_utime", "ipAddr",
+        keys %{ $self->conf->{sessionDataToRemember} },
+        keys %{ $self->pluginSessionDataToRemember }
+    );
     return $res;
 }
 
@@ -1219,6 +1231,31 @@ sub cspGetHost {
     }
     return (
         $uri->scheme . "://" . ( $uri->_port ? $uri->host_port : $uri->host ) );
+}
+
+sub buildUrl {
+    my $self = shift;
+    return $self->portal unless @_;
+
+    # URL base is $self->portal unless first arg is an URL
+    my $uri =
+      URI->new( ( $_[0] =~ m#^https?://# ) ? shift(@_) : $self->portal );
+    my @pathSg = grep { $_ ne '' } $uri->path_segments;
+    while (@_) {
+        my $s = shift;
+        if ( ref $s ) {
+            $uri->query_form($s);
+            if (@_) {
+                require Carp;
+                Carp::confess('Query must be the last arg of buildUrl');
+            }
+        }
+        else {
+            push @pathSg, $s;
+        }
+    }
+    $uri->path_segments(@pathSg);
+    return $uri;
 }
 
 1;

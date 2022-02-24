@@ -9,7 +9,7 @@ use Parser::FIT::Profile;
 
 #require "Profile.pm";
 
-our $VERSION = 0.03;
+our $VERSION = 0.05;
 
 sub new {
 	my $class = shift;
@@ -171,10 +171,6 @@ sub _parse_data_records {
 		my $header = $self->_parse_record_header($recordHeaderByte);
 
 		if($header->{isNormalHeader}) {
-			if($header->{isDeveloperData}) {
-				die "Header indicates message with developer data. Not yet supported!";
-			}
-
 			if($header->{isDefinitionMessage}) {
 				$self->_debug("Record definition header for LocalMessageType=" . $header->{localMessageType});
 				$self->_parse_definition_message($header);
@@ -217,6 +213,11 @@ sub emitRecord {
 	my $self = shift;
 	my ($msgType, $msgData) = @_;
 
+	if($msgType eq 'field_description') {
+		$self->_debug("Encountered a field_description message");
+		$self->attachDeveloperDataToGlobalMessage($msgData);
+	}
+
 	if(my $handler = $self->getHandler($msgType)) {
 		$handler->($msgData);
 	}
@@ -224,6 +225,26 @@ sub emitRecord {
 	if(my $allHandler = $self->getHandler("_any")) {
 		$allHandler->($msgType, $msgData);
 	}
+}
+
+sub attachDeveloperDataToGlobalMessage {
+	my $self = shift;
+	my $msgData = shift;
+
+	my $globalMessageid = $msgData->{native_mesg_num}->{value};
+	my $fieldId = $msgData->{field_definition_number}->{value};
+
+	my $globalMessage = $self->_get_global_message_type($globalMessageid);
+	$globalMessage->{developer_data}->{$fieldId} = {
+		id => $fieldId,
+		name => $msgData->{field_name}->{value},
+		units => $msgData->{units}->{value},
+		baseType => $self->_get_base_type($msgData->{fit_base_type_id}->{value} & 15),
+		type => undef,
+		# Developer data ist never scaled/offsetted!
+		offset => undef,
+		scale => undef,
+	};
 }
 
 sub getHandler {
@@ -255,17 +276,24 @@ sub _parse_definition_message {
 	$self->_debug("Arch: $arch - GlobalMessage: " . (defined $globalMessageType ? $globalMessageType->{name} : "<UNKNOWN_GLOBAL_MESSAGE>") . " ($globalMessageId) - #Fields: $fields");
 	carp "BigEndian isn't supported so far!" if($arch == 1);
 
-	my ($messageFields, $recordLength) = ([], 0);
+	my ($messageFields, $devMsgFields, $recordLength) = ([], [], 0);
+	my @fields;
 
-	if(defined $globalMessageType) {
-		($messageFields, $recordLength) = $self->_parse_defintion_message_fields($globalMessageType, $fields);
+	my $fieldDefinitions = defined $globalMessageType ? $globalMessageType->{fields} : {};
+	($messageFields, $recordLength) = $self->_parse_defintion_message_fields($fieldDefinitions, $fields);
+
+	if($header->{isDeveloperData}) {
+		($devMsgFields, my $devRecordLength) = $self->parseDeveloperDataDefinitionMessage($globalMessageType);
+		$recordLength += $devRecordLength;
 	}
+
+	my $combinedDataFields = [@$messageFields, @$devMsgFields];
 
 	my $localMessage = {
 		size => $recordLength,
-		dataFields => $messageFields,
+		dataFields => $combinedDataFields,
 		globalMessage => $globalMessageType,,
-		unpackTemplate => join("", map { $_->{baseType}->{packTemplate} } @$messageFields),
+		unpackTemplate => join("", map { $_->{baseType}->{packTemplate} . '[' . $_->{arrayLength} . ']' } @$combinedDataFields),
 		isDeveloperMessage => $header->{isDeveloperData},
 		isUnknownMessage => !defined $globalMessageType,
 	};
@@ -275,9 +303,26 @@ sub _parse_definition_message {
 	$self->_debug("Following Record length: " . $localMessage->{size} . " bytes");
 }
 
-sub _parse_defintion_message_fields {
+sub parseDeveloperDataDefinitionMessage {
 	my $self = shift;
 	my $globalMessageType = shift;
+
+	my $developerFieldCount = unpack("C", $self->_readBytes(1));
+
+	my ($devMsgFields, $devRecordLength) = $self->_parse_defintion_message_fields($globalMessageType->{developer_data}, $developerFieldCount);
+
+	foreach my $field (@$devMsgFields) {
+		# BaseTypes of Dev Data is not included in the 3bytes of the definition message but in the field_description message which introduces the dev data
+		# Therefore we simply overwrite the wrongly extracted BaseType from the definition message with the correct one.
+		$field->{baseType} = $field->{fieldDescriptor}->{baseType};
+	}
+
+	return ($devMsgFields, $devRecordLength);
+}
+
+sub _parse_defintion_message_fields {
+	my $self = shift;
+	my $fieldDefinitions = shift;
 	my $numberOfFields = shift;
 
 	my $recordLength = 0;
@@ -289,7 +334,7 @@ sub _parse_defintion_message_fields {
 		my ($fieldDefinition, $size, $baseTypeData)  = unpack("Ccc", $fieldDefinitionData);
 		my ($baseTypeEndian, $baseTypeNumber) = ($baseTypeData & 128, $baseTypeData & 15);
 		my $baseType = $self->_get_base_type($baseTypeNumber);
-		my $fieldDescriptor = $globalMessageType->{fields}->{$fieldDefinition};
+		my $fieldDescriptor = $fieldDefinitions->{$fieldDefinition};
 
 		if(!defined $fieldDescriptor) {
 			$fieldDescriptor = {
@@ -302,7 +347,7 @@ sub _parse_defintion_message_fields {
 		$self->_debug("FieldDefinition: Nr: $fieldDefinition (" . $fieldName . "), Size: $size, BaseType: " . $baseType->{name} . " ($baseTypeNumber), BaseTypeEndian: $baseTypeEndian");
 		$recordLength += $size;
 
-		push(@dataFields, { baseType => $baseType, fieldDescriptor => $fieldDescriptor });
+		push(@dataFields, { baseType => $baseType, storageSize => $size, isArray => $size > $baseType->{size}, arrayLength => $size/$baseType->{size}, fieldDescriptor => $fieldDescriptor });
 	}
 
 	return (\@dataFields, $recordLength);
@@ -464,8 +509,6 @@ sub _parse_local_message_record {
 	my $unpackTemplate = $localMessage->{unpackTemplate};
 	my @rawFields = unpack($unpackTemplate, $record);
 
-	my $globalMessageType = $localMessage->{globalMessage};
-
 	my %result;
 
 	my $fieldCount = scalar @{$localMessage->{dataFields}};
@@ -574,7 +617,7 @@ sub _get_base_type {
 			name => "string",
 			size => 1,
 			invalid => 0x00,
-			packTemplate => "a"
+			packTemplate => "Z"
 		},
 		{
 			name => "float32",

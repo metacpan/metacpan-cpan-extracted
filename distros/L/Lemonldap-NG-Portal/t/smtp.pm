@@ -1,9 +1,15 @@
 package main;
 
-my ($mail, $mail_envelope, $mail_subject);
+my ( $mail, $mail_envelope, $mail_subject );
 
 sub mail {
     return $mail;
+}
+
+sub clear_mail {
+    $mail          = undef;
+    $mail_envelope = undef;
+    $mail_subject  = undef;
 }
 
 sub envelope {
@@ -11,7 +17,7 @@ sub envelope {
 }
 
 sub subject {
-    my $subject = ($mail_subject =~ /=\?utf-8\?B\?(.+?)\?=/)[0];
+    my $subject = ( $mail_subject =~ /=\?utf-8\?B\?(.+?)\?=/ )[0];
     return decode_base64($subject);
 }
 

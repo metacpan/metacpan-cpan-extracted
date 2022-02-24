@@ -16,7 +16,7 @@ use MIME::Base64;
 use Digest::SHA;
 use Try::Tiny;
 
-our $VERSION = "0.012";
+our $VERSION = "0.013";
 
 with "Plack::Auth::SSO";
 
@@ -51,6 +51,22 @@ has openid_uri => (
 has uid_key => (
     is => "ro",
     isa => sub { is_string($_[0]) or die("uid_key should be string"); },
+    required => 1
+);
+
+has authorize_params => (
+    is => "ro",
+    isa => sub { is_hash_ref($_[0]) or die("authorize_params should be hash reference"); },
+    lazy => 1,
+    default => sub { +{}; },
+    required => 1
+);
+
+has allowed_authorize_params => (
+    is => "ro",
+    isa => sub { is_array_ref($_[0]) or die("allowed_authorize_params should be array reference"); },
+    lazy => 1,
+    default => sub { []; },
     required => 1
 );
 
@@ -183,6 +199,7 @@ sub generate_authorization_uri {
 
     my $request = $args{request};
     my $session = $args{session};
+    my $query_params = $request->query_parameters();
 
     my $openid_conf = $self->openid_configuration;
     my $authorization_endpoint = $openid_conf->{authorization_endpoint};
@@ -193,8 +210,22 @@ sub generate_authorization_uri {
     my $code_challenge = MIME::Base64::encode_base64url(Digest::SHA::sha256($code_verifier),"");
     my $state          = $self->make_random_string();
 
-    my $uri = URI->new($authorization_endpoint);
-    $uri->query_form(
+    my %query;
+
+    # merge in allowed params from current url
+    for my $key( @{ $self->allowed_authorize_params } ){
+
+        my $val = $query_params->get($key);
+
+        next unless is_string($val);
+
+        $query{$key} = $val;
+
+    }
+
+    %query = (
+        %query,
+        %{ $self->authorize_params },
         code_challenge          => $code_challenge,
         code_challenge_method   => "S256",
         state                   => $state,
@@ -203,6 +234,9 @@ sub generate_authorization_uri {
         response_type           => "code",
         redirect_uri            => $self->redirect_uri($request)
     );
+
+    my $uri = URI->new($authorization_endpoint);
+    $uri->query_form(%query);
     $self->set_csrf_token($session, $state);
     $session->set("auth_sso_oidc_code_verifier", $code_verifier);
 
@@ -338,19 +372,12 @@ sub to_app {
 
         }
 
-        my $auth_sso = $self->get_auth_sso($session);
-
-        #already got here before
-        if ( is_hash_ref($auth_sso) ) {
-
-            $log->debug( "auth_sso already present" );
-
-            return $self->redirect_to_authorization();
-
-        }
-
         my $state = $query_params->get("state");
         my $stored_state = $self->get_csrf_token($session);
+
+        # remove auth_sso from possibly previous successfull authentication
+        # (allowing for reauthentication)
+        $session->remove($self->session_key);
 
         # redirect to authorization url
         if ( !(is_string($stored_state) && is_string($state)) ) {
@@ -611,6 +638,52 @@ Please include scope C<< "openid" >>
 
 cf. L<https://openid.net/specs/openid-connect-basic-1_0.html#Scopes>
 
+=item C<< authorize_params >>
+
+Hash reference of parameters (values must be strings) that are added to
+
+the authorization url. Empty by default
+
+e.g. C<< { prompt => "login", "kc_idp_hint" => "orcid" } >>
+
+Note that some parameters are set internally
+
+and therefore will have no effect:
+
+=over 6
+
+=item C<< code_challenge >>
+
+=item C<< code_challenge_method >>
+
+=item C<< state >>
+
+=item C<< scope >>
+
+=item C<< client_id >>
+
+=item C<< response_type >>
+
+=item C<< redirect_uri >>
+
+=back
+
+=item C<< allowed_authorize_params >>
+
+Array reference of parameter names.
+
+When constructing the authorization url,
+
+these parameters are copied from the current url query
+
+to the authorization url. This allows to add some
+
+dynamic configuration, but should be used with caution.
+
+Note that parameters from C<< authorize_params >> always
+
+take precedence.
+
 =item C<< uid_key >>
 
 Attribute from claims to be used as uid
@@ -654,6 +727,32 @@ Note that all claims are also stored in C<< $session->get("auth_sso")->{info} >>
 =back
 
 =item the jwt payload from the C<< id_token >> is decoded into a json string and then to a perl hash. All this data is stored C<< $session->{auth_sso}->{info} >>. One of these attributes will be the uid that will be stored at C<< $session->{auth_sso}->{uid} >>. This is determined by configuration key C<< uid_key >> (see above). e.g. "email"
+
+=back
+
+=head1 NOTES
+
+=over 4
+
+=item Can I reauthenticate when I visit the application?
+
+When this Plack application is for example mounted at
+
+C<< /auth/oidc >>, then you can reauthenticate by visiting
+
+it again, but it depends on your configuration what actually
+
+happens at the openid connect server. If C<< prompt >> is not
+
+set anywhere (neither in C<< authorize_params >> nor in the
+
+current url if that is allowed), then the external server
+
+will just sent you back with the same tokens.
+
+Note that C<< session("auth_sso") >> is removed at the start
+
+of every (re)authentication.
 
 =back
 

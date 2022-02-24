@@ -15,7 +15,8 @@ LemonLDAP::NG U2F registration script
     if (level === 'positive') {
       level = 'success';
     }
-    return $('#color').addClass("alert-" + level);
+    $('#color').addClass("alert-" + level);
+    return $('#msg').attr('role', (level === 'danger' ? 'alert' : 'status'));
   };
 
   displayError = function(j, status, err) {

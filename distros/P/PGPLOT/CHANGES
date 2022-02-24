@@ -1,3 +1,6 @@
+2.28 2022-02-24
+- add NO_INIT to all output vars (#11) - thanks @djerius
+
 2.27 2021-02-16
 - need ExtUtils::F77 import to work at least on FreeBSD
 - disable calls to pgmtext(!) in tests on FreeBSD

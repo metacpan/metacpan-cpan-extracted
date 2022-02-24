@@ -236,12 +236,34 @@ ok( $nbr == 3, "Three sessions found" )
   or explain("Number of session(s) found = $nbr");
 count(4);
 
+# Try to auth: forth request
+ok(
+    $res = $client->_post(
+        '/', IO::String->new('user=dwho&password=dwho'),
+        length => 23,
+        accept => 'text/html'
+    ),
+    'Post user/password 4'
+);
+my $id = expectCookie($res);
+ok(
+    $res = $client->_delete(
+        '/session/my', cookie => "lemonldap=$id",
+    ),
+    'DELETE /session/my'
+);
+ok( $res = eval { JSON::from_json( $res->[2]->[0] ) }, ' GET JSON' )
+  or print STDERR $@;
+ok( $res->{result} == 1, 'Session removed' )
+  or explain( $res, "result == $res->{result}" );
+count(4);
+
 # GlobalLogout
 ok(
     $res = $client->_delete(
-        '/sessions/my/global', cookie => "lemonldap=$idd",
+        '/sessions/my', cookie => "lemonldap=$idd",
     ),
-    'DELETE /sessions/my/global'
+    'DELETE /sessions/my'
 );
 ok( $res = eval { JSON::from_json( $res->[2]->[0] ) }, ' GET JSON' )
   or print STDERR $@;

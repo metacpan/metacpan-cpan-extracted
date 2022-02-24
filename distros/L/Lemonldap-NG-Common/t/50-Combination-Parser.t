@@ -55,8 +55,11 @@ ok(
 
 # Test "and"
 
-@tests = ( '[A and B, A]', '[A,B] and [B,C]',
-    'if(0) then [A,B] else [A,B] and [B,C]' );
+@tests = (
+    '[A and B, A]',
+    '[A,B] and [B,C]',
+    'if(0) then [A,B] else [A,B] and [B,C]'
+);
 
 while ( my $expr = shift @tests ) {
     ok( [ getok($expr) ]->[0] == 0, qq{"$expr" returns PE_OK as auth result} )

@@ -40,6 +40,8 @@ t/30commit.t
 t/31scope_level.t
 t/32committed_scope_of.t
 t/33exception.t
+t/34stall.t
+t/40include_string.t
 t/90ex_bencode.t
 t/90ex_dict.t
 t/90ex_expr.t

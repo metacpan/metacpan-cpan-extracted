@@ -12,7 +12,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SENDRESPONSE
 );
 
-our $VERSION = '2.0.12';
+our $VERSION = '2.0.14';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Plugin
@@ -207,7 +207,8 @@ sub activeSessions {
             }
             $_;
           }
-          sort { $b->{startTime} cmp $a->{startTime} } map { {
+          sort { $b->{startTime} cmp $a->{startTime} } map {
+            {
                 id          => $_,
                 customParam => $sessions->{$_}->{$customParam},
                 ipAddr      => $sessions->{$_}->{ipAddr},
@@ -217,7 +218,7 @@ sub activeSessions {
             };
           } keys %$sessions;
     }
-    
+
     return $activeSessions;
 }
 

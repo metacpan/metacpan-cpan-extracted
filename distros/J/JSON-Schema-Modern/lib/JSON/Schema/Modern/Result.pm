@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Result;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Contains the result of a JSON Schema evaluation
 
-our $VERSION = '0.544';
+our $VERSION = '0.546';
 
 use 5.020;
 use Moo;
@@ -37,7 +37,7 @@ has valid => (
   isa => InstanceOf['JSON::PP::Boolean'],
   coerce => sub { $_[0] ? JSON::PP::true : JSON::PP::false },
 );
-sub result { goto \&valid } # backcompat only
+sub result { shift->valid } # backcompat only
 
 has exception => (
   is => 'rw',
@@ -201,7 +201,7 @@ JSON::Schema::Modern::Result - Contains the result of a JSON Schema evaluation
 
 =head1 VERSION
 
-version 0.544
+version 0.546
 
 =head1 SYNOPSIS
 

@@ -21,7 +21,8 @@ use DynaLoader;
 
 
 
-#line 3 "transform.pd"
+#line 2 "transform.pd"
+
 
 =head1 NAME
 
@@ -57,7 +58,7 @@ mapping R^N -> R^M with or without inverses.
 The simplest way to use a Transform object is to transform vector
 data between coordinate systems.  The L</apply> method
 accepts a PDL whose 0th dimension is coordinate index (all other
-dimensions are threaded over) and transforms the vectors into the new
+dimensions are broadcasted over) and transforms the vectors into the new
 coordinate system.
 
 Transform also includes image resampling, via the L</map> method.
@@ -164,7 +165,7 @@ inplace.  But C<func> should always return its result even when
 flagged to compute in-place.
 
 C<func> should treat the 0th dimension of its input as a dimensional
-index (running 0..N-1 for R^N operation) and thread over all other input
+index (running 0..N-1 for R^N operation) and broadcast over all other input
 dimensions.
 
 =item inv
@@ -259,7 +260,7 @@ are both Transform methods and PDL methods.
 
 use strict;
 use warnings;
-#line 263 "Transform.pm"
+#line 264 "Transform.pm"
 
 
 
@@ -273,7 +274,8 @@ use warnings;
 
 
 
-#line 315 "transform.pd"
+#line 314 "transform.pd"
+
 
 =head2 apply
 
@@ -321,11 +323,12 @@ sub apply {
   }
 
 }
-#line 325 "Transform.pm"
+#line 327 "Transform.pm"
 
 
 
-#line 367 "transform.pd"
+#line 366 "transform.pd"
+
 
 =head2 invert
 
@@ -370,11 +373,12 @@ sub invert {
       croak("invert requires a PDL and a PDL::Transform (did you want 'inverse' instead?)\n");
   }
 }
-#line 374 "Transform.pm"
+#line 377 "Transform.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 map
@@ -653,7 +657,7 @@ but don't affect reduced parts of the image.
 
 This is the largest allowable input spot size which may be mapped to a
 single output pixel by the hanning and gaussian methods, in units of
-the largest non-thread input dimension.  (i.e. the default won't let
+the largest non-broadcast input dimension.  (i.e. the default won't let
 you reduce the original image to less than 5 pixels across).  This places
 a limit on how long the processing can take for pathological transformations.
 Smaller numbers keep the code from hanging for a long time; larger numbers
@@ -723,11 +727,12 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 727 "Transform.pm"
+#line 731 "Transform.pm"
 
 
 
-#line 1060 "../../blib/lib/PDL/PP.pm"
+#line 1059 "../../blib/lib/PDL/PP.pm"
+
 
 sub PDL::match {
   # Set default for rectification to 0 for simple matching...
@@ -735,7 +740,7 @@ sub PDL::match {
       push(@_,{})
   }
   my @k = grep(m/^r(e(c(t)?)?)?/,sort keys %{$_[-1]});
-#line 739 "Transform.pm"
+#line 744 "Transform.pm"
 #line 1067 "../../blib/lib/PDL/PP.pm"
   unless(@k) {
       $_[-1]->{rectify} = 0;
@@ -786,7 +791,7 @@ sub map {
     my($x);
     if(defined ($x = $tmp->gethdr)) {
       my(%b) = %{$x};
-#line 790 "Transform.pm"
+#line 795 "Transform.pm"
 #line 1116 "../../blib/lib/PDL/PP.pm"
       $ohdr = \%b;
     }
@@ -797,7 +802,7 @@ sub map {
     }
     # deep-copy fits header into output
     my %foo = %{$tmp};
-#line 801 "Transform.pm"
+#line 806 "Transform.pm"
 #line 1125 "../../blib/lib/PDL/PP.pm"
     $ohdr = \%foo;
   } elsif(ref $tmp eq 'ARRAY') {
@@ -996,7 +1001,7 @@ sub map {
           ### These are the CROTA<n>, PCi_j, and CDi_j.
           delete @{$out->hdr}{
               grep /(^CROTA\d*$)|(^(CD|PC)\d+_\d+[A-Z]?$)/, keys %{$out->hdr}
-#line 1000 "Transform.pm"
+#line 1005 "Transform.pm"
 #line 1322 "../../blib/lib/PDL/PP.pm"
           };
       } else {
@@ -1042,7 +1047,7 @@ sub map {
           ## Eliminate competing header pointing tags if they exist
           delete @{$out->hdr}{
               grep /(^CROTA\d*$)|(^(PC)\d+_\d+[A-Z]?$)|(CDELT\d*$)/, keys %{$out->hdr}
-#line 1046 "Transform.pm"
+#line 1051 "Transform.pm"
 #line 1366 "../../blib/lib/PDL/PP.pm"
           };
       }
@@ -1093,8 +1098,8 @@ sub map {
         if($in->ndims < $idx->ndims-1);
 
   ####################
-  ## Condition the threading -- pixelwise interpolator only threads
-  ## in 1 dimension, so squish all thread dimensions into 1, if necessary
+  ## Condition the broadcasting -- pixelwise interpolator only broadcasts
+  ## in 1 dimension, so squish all broadcast dimensions into 1, if necessary
   my @iddims = $idx->dims;
   my $in2 = $in->ndims == $#iddims
     ? $in->dummy(-1,1)
@@ -1155,17 +1160,19 @@ sub map {
   }
   return $out;
 }
-#line 1159 "Transform.pm"
+#line 1164 "Transform.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *map = \&PDL::map;
-#line 1165 "Transform.pm"
+#line 1171 "Transform.pm"
 
 
 
-#line 1998 "transform.pd"
+#line 1997 "transform.pd"
+
 
 ######################################################################
 
@@ -1204,11 +1211,12 @@ sub unmap {
 
   return $me->inverse->map($data,@params);
 }
-#line 1208 "Transform.pm"
+#line 1215 "Transform.pm"
 
 
 
-#line 2041 "transform.pd"
+#line 2040 "transform.pd"
+
 
 =head2 t_inverse
 
@@ -1268,11 +1276,12 @@ sub inverse {
   bless $out,(ref $me);
   return $out;
 }
-#line 1272 "Transform.pm"
+#line 1280 "Transform.pm"
 
 
 
-#line 2105 "transform.pd"
+#line 2104 "transform.pd"
+
 
 =head2 t_compose
 
@@ -1384,11 +1393,12 @@ sub compose {
 
   return bless($me,'PDL::Transform::Composition');
 }
-#line 1388 "Transform.pm"
+#line 1397 "Transform.pm"
 
 
 
-#line 2222 "transform.pd"
+#line 2221 "transform.pd"
+
 
 =head2 t_wrap
 
@@ -1456,11 +1466,12 @@ sub _pow_op {
 
     t_compose(@l);
 }
-#line 1460 "Transform.pm"
+#line 1470 "Transform.pm"
 
 
 
-#line 2295 "transform.pd"
+#line 2294 "transform.pd"
+
 
 =head2 t_identity
 
@@ -1493,11 +1504,12 @@ sub new {
 
   return bless $me,$class;
 }
-#line 1497 "Transform.pm"
+#line 1508 "Transform.pm"
 
 
 
-#line 2333 "transform.pd"
+#line 2332 "transform.pd"
+
 
 =head2 t_lookup
 
@@ -1526,7 +1538,7 @@ lookup pixel space, because the pixels (which are numbered from 0 to
 N-1) are centered on their locations.
 
 Lookup is done using L<interpND|PDL::Primitive/interpnd>, so the boundary conditions
-and threading behaviour follow from that.
+and broadcasting behaviour follow from that.
 
 The indexed-over dimensions come first in the table, followed by a
 single dimension containing the column vector to be output for each
@@ -1536,7 +1548,7 @@ that has dimension list (50,50,2).  For the identity lookup table
 you could use  C<cat(xvals(50,50),yvals(50,50))>.
 
 If you want to output a single value per input vector, you still need
-that last index threading dimension -- if necessary, use C<dummy(-1,1)>.
+that last index broadcasting dimension -- if necessary, use C<dummy(-1,1)>.
 
 The lookup index scaling is: out = lookup[ (scale * data) + offset ].
 
@@ -1654,7 +1666,7 @@ sub t_lookup {
              );
 
 
-    # Put the index dimension (and threaded indices) back at the front of
+    # Put the index dimension (and broadcasted indices) back at the front of
     # the dimension list.
     my($dnd) = $data->ndims - 1;
     return ($x -> ndims > $data->ndims - 1) ?
@@ -1753,11 +1765,12 @@ sub t_lookup {
 
   return $me;
 }
-#line 1757 "Transform.pm"
+#line 1769 "Transform.pm"
 
 
 
-#line 2593 "transform.pd"
+#line 2592 "transform.pd"
+
 
 =head2 t_linear
 
@@ -2083,11 +2096,12 @@ sub PDL::Transform::Linear::stringify {
   $out =~ s/\n/\n  /go;
   $out;
 }
-#line 2087 "Transform.pm"
+#line 2100 "Transform.pm"
 
 
 
-#line 2924 "transform.pd"
+#line 2923 "transform.pd"
+
 
 =head2 t_scale
 
@@ -2108,16 +2122,17 @@ sub t_scale {
     my($scale) = shift;
     my($y) = shift;
     return t_linear(scale=>$scale,%{$y})
-#line 2112 "Transform.pm"
+#line 2126 "Transform.pm"
 #line 2944 "transform.pd"
         if(ref $y eq 'HASH');
     t_linear(Scale=>$scale,$y,@_);
 }
-#line 2117 "Transform.pm"
+#line 2131 "Transform.pm"
 
 
 
-#line 2952 "transform.pd"
+#line 2951 "transform.pd"
+
 
 =head2 t_offset
 
@@ -2138,17 +2153,18 @@ sub t_offset {
     my($pre) = shift;
     my($y) = shift;
     return t_linear(pre=>$pre,%{$y})
-#line 2142 "Transform.pm"
+#line 2157 "Transform.pm"
 #line 2972 "transform.pd"
         if(ref $y eq 'HASH');
 
     t_linear(pre=>$pre,$y,@_);
 }
-#line 2148 "Transform.pm"
+#line 2163 "Transform.pm"
 
 
 
-#line 2981 "transform.pd"
+#line 2980 "transform.pd"
+
 
 =head2 t_rot
 
@@ -2170,17 +2186,18 @@ sub t_rotate    {
     my $rot = shift;
     my($y) = shift;
     return t_linear(rot=>$rot,%{$y})
-#line 2174 "Transform.pm"
+#line 2190 "Transform.pm"
 #line 3002 "transform.pd"
         if(ref $y eq 'HASH');
 
     t_linear(rot=>$rot,$y,@_);
 }
-#line 2180 "Transform.pm"
+#line 2196 "Transform.pm"
 
 
 
-#line 3013 "transform.pd"
+#line 3012 "transform.pd"
+
 
 =head2 t_fits
 
@@ -2352,11 +2369,12 @@ sub t_fits {
 
 
 }
-#line 2356 "Transform.pm"
+#line 2373 "Transform.pm"
 
 
 
-#line 3193 "transform.pd"
+#line 3192 "transform.pd"
+
 
 =head2 t_code
 
@@ -2448,11 +2466,12 @@ sub t_code {
 
   $me;
 }
-#line 2452 "Transform.pm"
+#line 2470 "Transform.pm"
 
 
 
-#line 3292 "transform.pd"
+#line 3291 "transform.pd"
+
 
 =head2 t_cylindrical
 
@@ -2626,11 +2645,12 @@ sub t_radial {
 
   $me;
 }
-#line 2630 "Transform.pm"
+#line 2649 "Transform.pm"
 
 
 
-#line 3470 "transform.pd"
+#line 3469 "transform.pd"
+
 
 =head2 t_quadratic
 
@@ -2745,11 +2765,12 @@ sub t_quadratic {
     };
     $me;
 }
-#line 2749 "Transform.pm"
+#line 2769 "Transform.pm"
 
 
 
-#line 3589 "transform.pd"
+#line 3588 "transform.pd"
+
 
 =head2 t_cubic
 
@@ -2890,11 +2911,12 @@ sub t_cubic {
 
     $me;
 }
-#line 2894 "Transform.pm"
+#line 2915 "Transform.pm"
 
 
 
-#line 3735 "transform.pd"
+#line 3734 "transform.pd"
+
 
 =head2 t_quartic
 
@@ -3013,11 +3035,12 @@ sub t_quartic {
     };
     $me;
 }
-#line 3017 "Transform.pm"
+#line 3039 "Transform.pm"
 
 
 
-#line 3858 "transform.pd"
+#line 3857 "transform.pd"
+
 
 =head2 t_spherical
 
@@ -3151,11 +3174,12 @@ sub t_spherical {
 
     $me;
   }
-#line 3155 "Transform.pm"
+#line 3178 "Transform.pm"
 
 
 
-#line 3996 "transform.pd"
+#line 3995 "transform.pd"
+
 
 =head2 t_projective
 
@@ -3308,13 +3332,14 @@ sub t_projective {
 
   $me;
 }
-#line 3312 "Transform.pm"
+#line 3336 "Transform.pm"
 
 
 
 
 
-#line 245 "transform.pd"
+#line 244 "transform.pd"
+
 
 =head1 AUTHOR
 
@@ -3380,7 +3405,7 @@ sub stringify {
   $out .= "fwd ". ((defined ($me->{func})) ? ( (ref($me->{func}) eq 'CODE') ? "ok" : "non-CODE(!!)" ): "missing")."; ";
   $out .= "inv ". ((defined ($me->{inv})) ?  ( (ref($me->{inv}) eq 'CODE') ? "ok" : "non-CODE(!!)" ):"missing").".\n";
 }
-#line 3384 "Transform.pm"
+#line 3409 "Transform.pm"
 
 
 

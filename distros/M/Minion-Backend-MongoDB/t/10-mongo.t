@@ -118,8 +118,9 @@ subtest 'Repair missing worker' => sub {
         { _id => $minion->backend->_oid($id) },
         {
             '$set' => {
-                notified =>
-                  Time::Moment->now->plus_seconds(-$minion->missing_after - 1 )
+                notified => Time::Moment->now->plus_seconds(
+                    -$minion->missing_after - 1
+                )
             }
         }
     );
@@ -201,9 +202,8 @@ subtest 'Repair stuck jobs' => sub {
         { _id => $minion->backend->_oid($_) },
         {
             '$set' => {
-                'delayed' => Time::Moment->now->plus_seconds(
-                    -$minion->stuck_after - 1
-                )
+                'delayed' =>
+                  Time::Moment->now->plus_seconds( -$minion->stuck_after - 1 )
             }
         }
     ) for $id, $id2, $id3, $id4;
@@ -323,7 +323,7 @@ subtest 'List locks' => sub {
         { name => 'yada' },
         {
             '$set' => {
-                'expires.$[]' => Time::Moment->now->minus_seconds( 1 )
+                'expires.$[]' => Time::Moment->now->minus_seconds(1)
             }
         }
     );
@@ -460,7 +460,6 @@ subtest 'History' => sub {
     $job->remove;
 };
 
-
 # List jobs
 subtest 'List jobs' => sub {
     my $id      = $minion->enqueue('add');
@@ -542,7 +541,7 @@ subtest 'List jobs' => sub {
 
 # Enqueue, dequeue and perform
 subtest 'Enqueue, dequeue and perform' => sub {
-    is $minion->job( new BSON::ObjectId('123456789012') ), undef,
+    is $minion->job( new BSON::OID( oid => '123456789012' ) ), undef,
       'job does not exist';
     my $id = $minion->enqueue( add => [ 2, 2 ] );
     ok $minion->job($id), 'job does exist';
@@ -690,7 +689,7 @@ subtest 'Delayed jobs' => sub {
         { _id => $minion->backend->_oid($id) },
         {
             '$set' => {
-                delayed => Time::Moment->now->minus_seconds(1 )
+                delayed => Time::Moment->now->minus_seconds(1)
             }
         }
     );
@@ -1269,7 +1268,7 @@ subtest 'Expiring jobs' => sub {
         { _id => $db->_oid($id) },
         {
             '$set' => {
-                'expires' => Time::Moment->now->minus_days( 1 )
+                'expires' => Time::Moment->now->minus_days(1)
             }
         }
     );
@@ -1289,7 +1288,7 @@ subtest 'Expiring jobs' => sub {
         { _id => $db->_oid($id) },
         {
             '$set' => {
-                'expires' => Time::Moment->now->minus_days( 1 )
+                'expires' => Time::Moment->now->minus_days(1)
             }
         }
     );
@@ -1305,7 +1304,7 @@ subtest 'Expiring jobs' => sub {
         { _id => $db->_oid($id) },
         {
             '$set' => {
-                'expires' => Time::Moment->now->minus_days( 1 )
+                'expires' => Time::Moment->now->minus_days(1)
             }
         }
     );
@@ -1320,7 +1319,7 @@ subtest 'Expiring jobs' => sub {
         { _id => $db->_oid($id) },
         {
             '$set' => {
-                'expires' => Time::Moment->now->minus_days( 1 )
+                'expires' => Time::Moment->now->minus_days(1)
             }
         }
     );
@@ -1336,7 +1335,7 @@ subtest 'Expiring jobs' => sub {
         { _id => $db->_oid($id) },
         {
             '$set' => {
-                'expires' => Time::Moment->now->minus_days( 1 )
+                'expires' => Time::Moment->now->minus_days(1)
             }
         }
     );
@@ -1578,6 +1577,24 @@ subtest 'Single process worker' => sub {
     my $job2 = $minion->job($id2);
     is $job2->info->{state},    'failed',            'right state';
     like $job2->info->{result}, qr/Error: Bad job!/, 'right error';
+};
+
+subtest 'Long await process' => sub {
+    my $worker = $minion->repair->worker->register;
+    $minion->add_task( sum => sub { shift->finish( (shift) + (shift) ) } );
+    my $loop = Mojo::IOLoop->singleton;
+    $loop->timer( 10 => sub { fail('Timeout'); $loop->stop } );
+    $loop->timer( 1  => sub { $minion->enqueue( sum => [ 2, 2 ] ); } );
+    $loop->subprocess->run_p(
+        sub {
+            $minion->backend->mongodb->client->reconnect();
+            my $job = $worker->dequeue(5);
+            $job->perform;
+            return $job->info->{result};
+        }
+    )->then( sub { is shift, 4, 'right result'; $loop->stop; }
+    )->catch( sub { fail( "Subprocess error: " . shift ); $loop->stop; } );
+    $loop->start;
 };
 
 done_testing();

@@ -4,13 +4,13 @@
 ## Header Administrivia
 ##======================================================================
 
-our $VERSION = '0.06005';
+our $VERSION = '0.06006';
 pp_setversion($VERSION);
 
 ##-- accomodate typo-fix in PDL-2.008 API
-eval "use PDL::Version;";
+eval "require PDL";
 use version;
-our $pdl_version       = version->parse($PDL::Version::VERSION);
+our $pdl_version       = version->parse($PDL::VERSION);
 our $propagate_badflag = $pdl_version >= '2.008' ? "propagate_badflag" : "propogate_badflag";
 
 ##------------------------------------------------------
@@ -126,14 +126,14 @@ pp_addhdr(<<'EOH');
 #define LOG_ZERO  -1E+38
 #define LOG_ONE    0
 #define LOG_NONE   1
-double logadd1(double x, double y) {
+static inline double logadd1(double x, double y) {
   if      (y-x > LOG_BIG) return y;
   else if (x-y > LOG_BIG) return x;
   /*else        return min(x,y) + log(exp(x-min(x,y)) + exp(y-min(x,y))); */
   else if (x<y) return x        + log( 1              + exp(y-x));
   else          return y        + log(exp(x-y)        + 1);
 }
-double logadd0(double x, double y) {
+static inline double logadd0(double x, double y) {
   return log(exp(x)+exp(y));
 }
 
@@ -141,7 +141,7 @@ double logadd0(double x, double y) {
  *   + adapted from above
  *   + always returns positive (i.e. symmetric difference)
  */
-double logdiff1(double x, double y) {
+static inline double logdiff1(double x, double y) {
   if      (y-x > LOG_BIG) { return y; }
   else if (x-y > LOG_BIG) { return x; }
   /*else        { return max(x,y) + log(exp(max(x,y)-max(x,y)) - exp(min(x,y)-max(x,y))); } */
@@ -149,7 +149,7 @@ double logdiff1(double x, double y) {
   else if (x>y) { return x        + log( 1 - exp(y-x)); }
   else          { return y        + log( 1 - exp(x-y)); }
 }
-double logdiff0(double x, double y) {
+static inline double logdiff0(double x, double y) {
   return log(x>y ? (exp(x)-exp(y)) : (exp(y)-exp(x)));
 }
 

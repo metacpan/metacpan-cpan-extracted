@@ -798,6 +798,47 @@ Native APIs of L<SPVM> have the IDs that is corresponding to the names. These ID
   171 new_array_proto
   172 copy_raw
   173 copy
+  174 shorten
+  175 has_interface
+  176 no_symbol_cache_flag
+  177 set_no_symbol_cache_flag
+  178 get_no_symbol_cache_flag
+  179 print
+  180 print_stderr
+  181 new_env_raw,
+  182 free_env_raw,
+  183 init_env,
+  184 call_init_blocks,
+  185 cleanup_global_vars,
+  186 new_compiler,
+  187 compiler_free,
+  188 compiler_set_start_line,
+  189 compiler_get_start_line,
+  190 compiler_set_start_file,
+  191 compiler_get_start_file,
+  192 compiler_add_module_dir,
+  193 compiler_get_module_dirs_length,
+  194 compiler_get_module_dir,
+  195 compiler_compile_spvm,
+  196 compiler_get_error_messages_length,
+  197 compiler_get_error_message,
+  198 compiler_get_class_id,
+  199 compiler_get_classes_length,
+  200 compiler_get_class_name,
+  201 compiler_is_anon_class,
+  202 compiler_get_methods_length,
+  203 compiler_get_method_id,
+  204 compiler_get_method_id_by_name,
+  205 compiler_get_method_name,
+  206 compiler_get_method_signature,
+  207 compiler_is_anon_method,
+  208 compiler_is_init_block_method,
+  209 compiler_is_native_method,
+  210 compiler_is_precompile_method,
+  211 compiler_get_native_method_address,
+  212 compiler_get_precompile_method_address,
+  213 compiler_set_native_method_address,
+  214 compiler_set_precompile_method_address,
 
 =head1 List of Native APIs
 
@@ -1836,23 +1877,25 @@ If you specify an object, a new byte[] type object that stores the type name is 
 
   SPVM_ENV* (*new_env)(SPVM_ENV* env);
 
-Create a new execution environment based on the current execution environment.
+Create a new environment that is ready to call methods.
 
-Create a new SPVM runtime environment.
+1. Create a new environment using the L<"new_env_raw"> native API.
 
-The exception object and mortal stack information will be initialized.
+2. Set the current compiler to the new enviroment.
 
-Share the class variables with the original execution environment.
+3. Initialize the environment using the L<"init_env"> native API
+
+4. Call C<INIT> blocks using the L<"call_init_blocks"> native API.
 
 The number of memory blocks is shared with the original execution environment.
 
-If thie method can't allocate memory for SPVM runtime environment, return NULL.
+If this method can't allocate memory for the new environment, return NULL.
 
 =head2 free_env
 
   void (*free_env)(SPVM_ENV* env);
 
-Release the execution environment.
+Free an environment that is created by the L<"new_env"> native API.
 
 =head2 memory_blocks_count
 
@@ -2513,6 +2556,274 @@ If the given length is lower than C<0>, returns C<NULL>.
 Copy the object. The type of the object must be a string type, a numeric array, or a multi numeric array.
 
 If the given object is L<NULL>, returns L<NULL>.
+
+=head2 shorten
+
+  void (*shorten)(SPVM_ENV* env, void* string, int32_t new_length);
+
+Shorten the string with the given length.
+
+If the string is null, does nothing.
+
+If the given length is greater than the length of the string, does nothing.
+
+If the given length is lower than C<0>, the given length become C<0>.
+
+The charaters of the after the given length are filled with C<\0>.
+
+=head2 has_interface
+
+  int32_t (*has_interface)(SPVM_ENV* env, void* object, int32_t interface_basic_type_id);
+
+Check the class of the object has the interface type.
+
+=head2 no_symbol_cache_flag
+
+  void* no_symbol_cache_flag;
+
+Used internally.
+
+=head2 set_no_symbol_cache_flag
+
+  void (*set_no_symbol_cache_flag)(SPVM_ENV* env, int32_t flag);
+
+Set the flag that precompile and native codes don't use symbol cache such as basic type names, method names, field names, package names.
+
+If the flag is C<1>, caching is not done, if the flag is C<0>, caching is done.
+
+Note that this flag is merely intention for the native module authors. On the other hand, precompile and the core native code follow this flag.
+
+=head2 get_no_symbol_cache_flag
+
+  int32_t (*get_no_symbol_cache_flag)(SPVM_ENV* env);
+
+Get the flag that native code doesn't use symbol cache such as basic type names, method names, field names, package names.
+
+=head2 print
+
+  void (*print)(SPVM_ENV* env, void* string);
+
+Print the characters of the string to stdout.
+
+If the string is C<NULL>, nothing is printed.
+
+=head2 print_stderr
+
+  void (*print_stderr)(SPVM_ENV* env, void* string);
+
+Print the characters of the string to stderr.
+
+If the string is C<NULL>, nothing is printed.
+
+=head2 new_env_raw
+
+  SPVM_ENV* (*new_env_raw)(SPVM_ENV* env);
+
+Create a new environment. This environment is not yet initialized.
+
+=head2 free_env_raw
+
+  void (*free_env_raw)(SPVM_ENV* env);
+
+Release the execution environment.
+
+=head2 init_env
+
+  int32_t (*init_env)(SPVM_ENV* env);
+
+Initialize the environment.
+
+=head2 call_init_blocks
+  
+  void (*call_init_blocks)(SPVM_ENV* env);
+
+Call C<INIT> blocks.
+
+=head2 cleanup_global_vars
+  
+  void (*cleanup_global_vars)(SPVM_ENV* env);
+
+Cleanup gloval variable, such as class variables and the exception variable.
+
+=head2 new_compiler
+  
+  void* (*new_compiler)(SPVM_ENV* env);
+
+New a compiler.
+
+=head2 compiler_free
+  
+  void (*compiler_free)(SPVM_ENV* env, void* compiler);
+
+Free a compiler.
+
+=head2 compiler_set_start_line
+  
+  void (*compiler_set_start_line)(SPVM_ENV* env, void* compiler, int32_t start_line);
+
+Set the start line of the compiler.
+
+=head2 compiler_get_start_line
+  
+  int32_t (*compiler_get_start_line)(SPVM_ENV* env, void* compiler);
+
+Get the start line of the compiler.
+
+=head2 compiler_set_start_file
+  
+  void (*compiler_set_start_file)(SPVM_ENV* env, void* compiler, const char* start_file);
+
+Set the start file of the compiler.
+
+=head2 compiler_get_start_file
+  
+  const char* (*compiler_get_start_file)(SPVM_ENV* env, void* compiler);
+
+Get the start file of the compiler.
+
+=head2 compiler_add_module_dir
+  
+  void (*compiler_add_module_dir)(SPVM_ENV* env, void* compiler, const char* module_dir);
+
+Add a module searching directory of the compiler.
+
+=head2 compiler_get_module_dirs_length
+  
+  int32_t (*compiler_get_module_dirs_length)(SPVM_ENV* env, void* compiler);
+
+Get the length of the module searching directories of the compiler.
+
+=head2 compiler_get_module_dir
+
+  const char* (*compiler_get_module_dir)(SPVM_ENV* env, void* compiler, int32_t module_dir_id);
+
+Get a searching directories of the compiler with the index.
+
+=head2 compiler_compile_spvm
+  
+  int32_t (*compiler_compile_spvm)(SPVM_ENV* env, void* compiler, const char* class_name);
+
+Compile the SPVM class.
+
+=head2 compiler_get_error_messages_length
+  
+  int32_t (*compiler_get_error_messages_length)(SPVM_ENV* env, void* compiler);
+
+Get the length of the compiler error messages.
+
+=head2 compiler_get_error_message
+  
+  const char* (*compiler_get_error_message)(SPVM_ENV* env, void* compiler, int32_t index);
+
+Get a compiler error messages with the index.
+
+=head2 compiler_get_class_id
+  
+  int32_t (*compiler_get_class_id)(SPVM_ENV* env, void* compiler, const char* class_name);
+
+Get class ID with the class name.
+
+If the class doesn't found, return a negative value.
+
+=head2 compiler_get_classes_length
+  
+  int32_t (*compiler_get_classes_length)(SPVM_ENV* env, void* compiler);
+
+Get the length of classes that is compiled by the compiler.
+
+=head2 compiler_get_class_name
+  
+  const char* (*compiler_get_class_name)(SPVM_ENV* env, void* compiler, int32_t class_id);
+
+Get the class name with the class id.
+
+=head2 compiler_is_anon_class
+  
+  int32_t (*compiler_is_anon_class)(SPVM_ENV* env, void* compiler, int32_t class_id);
+
+If the class is an anon class, return C<1>, otherwise return C<0>.
+
+=head2 compiler_get_methods_length
+  
+  int32_t (*compiler_get_methods_length)(SPVM_ENV* env, void* compiler, int32_t class_id);
+
+Get the length of methods of the class.
+
+=head2 compiler_get_method_id
+  
+  int32_t (*compiler_get_method_id)(SPVM_ENV* env, void* compiler, int32_t class_id, int32_t method_index_of_class);
+
+Get the method id with the class id and the method index of the class.
+
+If the method doesn't found, return a negative value.
+
+=head2 compiler_get_method_id_by_name
+  
+  int32_t (*compiler_get_method_id_by_name)(SPVM_ENV* env, void* compiler, const char* class_name, const char* method_name);
+
+Get the method id with the class name and the method name.
+
+If the method doesn't found, return a negative value.
+
+=head2 compiler_get_method_name
+  
+  const char* (*compiler_get_method_name)(SPVM_ENV* env, void* compiler, int32_t method_id);
+
+Get the method name with the method ID.
+
+=head2 compiler_get_method_signature
+  
+  const char* (*compiler_get_method_signature)(SPVM_ENV* env, void* compiler, int32_t method_id);
+
+Get the method signature with the method ID.
+
+=head2 compiler_is_anon_method
+  
+  int32_t (*compiler_is_anon_method)(SPVM_ENV* env, void* compiler, int32_t method_id);
+
+Get the method name with the method ID.
+
+=head2 compiler_is_init_block_method
+  
+  int32_t (*compiler_is_init_block_method)(SPVM_ENV* env, void* compiler, int32_t method_id);
+
+If the method is the method of C<INIT> block, return C<1>, otherwise return C<0>.
+
+=head2 compiler_is_native_method
+  
+  int32_t (*compiler_is_native_method)(SPVM_ENV* env, void* compiler, int32_t method_id);
+
+If the method is a native method, return C<1>, otherwise return C<0>.
+
+=head2 compiler_is_precompile_method
+  
+  int32_t (*compiler_is_precompile_method)(SPVM_ENV* env, void* compiler, int32_t method_id);
+
+If the method is a precompile method, return C<1>, otherwise return C<0>.
+
+=head2 compiler_get_native_method_address
+  
+  void* (*compiler_get_native_method_address)(SPVM_ENV* env, void* compiler, int32_t method_id);
+
+Get the native method address.
+
+=head2 compiler_get_precompile_method_address
+  
+  void* (*compiler_get_precompile_method_address)(SPVM_ENV* env, void* compiler, int32_t method_id);
+
+Get the precompile method address.
+
+=head2 compiler_set_native_method_address
+  
+  void (*compiler_set_native_method_address)(SPVM_ENV* env, void* compiler, int32_t method_id, void* address);
+
+Set the native method address.
+
+=head2 compiler_set_precompile_method_address
+  
+  void (*compiler_set_precompile_method_address)(SPVM_ENV* env, void* compiler, int32_t method_id, void* address);
+
+Set the precompile method address.
 
 =head1 Utilities
 

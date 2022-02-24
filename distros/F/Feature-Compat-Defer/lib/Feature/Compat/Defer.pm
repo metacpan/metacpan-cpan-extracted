@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
 
-package Feature::Compat::Defer 0.01;
+package Feature::Compat::Defer 0.02;
 
 use v5.14;
 use warnings;
@@ -76,7 +76,7 @@ sub import
    }
    else {
       require Syntax::Keyword::Defer;
-      Syntax::Keyword::Defer->VERSION( '0' );
+      Syntax::Keyword::Defer->VERSION( '0.06' );
       Syntax::Keyword::Defer->import(qw( defer ));
    }
 }

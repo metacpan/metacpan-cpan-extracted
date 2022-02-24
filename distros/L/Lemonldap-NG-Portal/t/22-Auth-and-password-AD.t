@@ -20,7 +20,7 @@ SKIP: {
                 LDAPFilter      => $ENV{ADFILTER} || '(cn=$user)',
                 ldapServer      => $ENV{ADSERVER},
                 ldapBase        => $ENV{ADBASE},
-                managerDn       => $ENV{MANAGERDN} || '',
+                managerDn       => $ENV{MANAGERDN}       || '',
                 managerPassword => $ENV{MANAGERPASSWORD} || '',
             }
         }

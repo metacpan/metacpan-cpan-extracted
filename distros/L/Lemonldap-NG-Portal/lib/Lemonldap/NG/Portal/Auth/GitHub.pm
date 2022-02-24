@@ -155,8 +155,7 @@ sub extractFormInfo {
 
         $self->logger->debug("Response from GitHub User API: $user_content");
 
-        eval {
-            $json_hash = from_json( $user_content, { allow_nonref => 1 } ); };
+        eval { $json_hash = from_json( $user_content, { allow_nonref => 1 } ); };
         if ($@) {
             $self->logger->error("Unable to decode JSON $user_content");
             return PE_ERROR;

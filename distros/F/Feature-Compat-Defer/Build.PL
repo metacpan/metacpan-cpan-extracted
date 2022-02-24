@@ -7,7 +7,7 @@ my %REQUIRES_PERL = (
 );
 
 my %REQUIRES_SKD = (
-   'Syntax::Keyword::Defer' => '0',
+   'Syntax::Keyword::Defer' => '0.06',
 );
 
 use feature ();

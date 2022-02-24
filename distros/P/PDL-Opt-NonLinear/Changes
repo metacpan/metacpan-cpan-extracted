@@ -1,3 +1,7 @@
+0.08 2022-02-21
+- fix rank mismatch in tensor.f so gfortran 10 will still compile it
+
+0.07 2022-01-02
 - test stability and more build improvements
 
 0.06 2022-01-02

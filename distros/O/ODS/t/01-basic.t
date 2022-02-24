@@ -22,6 +22,7 @@ my $test = Table::Test->connect('File::JSON', {
 my $data2 = $test->all();
 
 is($data2->[0]->username, 'lnation');
+
 is($data2->first->username, 'lnation');
 is($data2->last->username, 'lnation3');
 while (my $data3 = $data2->next) {

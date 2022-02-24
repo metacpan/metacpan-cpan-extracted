@@ -1,5 +1,14 @@
 Revision history for Net-Async-Redis
 
+3.021     2022-02-24 23:13:49+08:00 Asia/Kuala_Lumpur
+    [New features]
+
+    - to improve compatibility in future, the approach for handling multi-word commands
+    such as `XGROUP CREATE` now applies to all commands, including cases such as `MEMORY DOCTOR`
+    so you can use `->memory('DOCTOR')` or `->memory_doctor` interchangeably. This is
+    due to the command list we auto-extract from the Redis website potentially changing
+    the structure again in future.
+
 3.020     2022-02-17 17:47:08+08:00 Asia/Kuala_Lumpur
     [Bugs fixed]
 

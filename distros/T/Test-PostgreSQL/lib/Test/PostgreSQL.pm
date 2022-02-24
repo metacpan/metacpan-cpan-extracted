@@ -13,7 +13,7 @@ use File::Which;
 use POSIX qw(SIGQUIT SIGKILL WNOHANG getuid setuid);
 use User::pwent;
 
-our $VERSION = '1.28';
+our $VERSION = '1.29';
 our $errstr;
 
 # Deprecate use of %Defaults as we want to remove this package global
@@ -116,7 +116,42 @@ has socket_dir => (
   is => "ro",
   isa => Str,
   lazy => 1,
-  default => method () { File::Spec->catdir( $self->base_dir, 'tmp' ) },
+  default => method () {
+    my $dir = File::Spec->catdir( $self->base_dir, 'tmp' );
+
+    # This magic number is based on the Unixy systems limit for
+    # Unix socket path lengths: on Linuxes it is at 108 characters,
+    # MacOS allows no more than 103. Considering that we are
+    # generating a directory path, and the actual socket file name
+    # will be appended to it, 80 characters seemed a safe assumption.
+    if (length $dir > 80) {
+      $self->{_socket_dir} = File::Temp->newdir(
+        'pgtest_sock.XXXXX',
+        
+        # base_dir is preserved if environment variable
+        # TEST_POSTGRESQL_PRESERVE is truthy; this is done
+        # for diagnostics. Socket directory should always
+        # be cleaned up since there is nothing of interest there.
+        CLEANUP => 1,
+        TMPDIR  => 1,
+
+        # TODO Come up with something better if this ever cause
+        # any trouble. Straightforward approach with using File::Temp
+        # that consults $TMPDIR environment variable is exactly
+        # the cause for the Unix socket path being too long;
+        # other approaches at sniffing what system we're running on
+        # and what temporary paths are available also fail at various
+        # edge cases, which is exactly the reason File::Temp was created
+        # in the first place. So, no easy answer here; simply falling back
+        # to the timeless default.
+        DIR => '/tmp',
+      );
+
+      $dir = $self->{_socket_dir}->dirname;
+    }
+
+    return $dir;
+  },
 );
 
 has initdb => (
@@ -335,6 +370,7 @@ method DEMOLISH($in_global_destruction) {
     if (defined $self->pid && $self->_owner_pid == $$) {
       $self->stop
     }
+    undef $self->{_socket_dir};
     return;
 }
 
@@ -389,16 +425,26 @@ method start() {
 # It could probably be made more sane.
 method _find_port_and_launch() {
   my $tries = 10;
-  my $port = $self->base_port;
+
   srand(); # Re-seed the RNG in case the caller forked the process
+
+  # There is a significant chance that there might be more than
+  # one Test::Postgresql test in flight so we better randomize
+  # the port before even trying to start the first time. Does
+  # no harm if there is no concurrent Postgres running; if there is
+  # then our process will start up a bit faster.
+  my $port = $self->base_port + int(rand(10)) + 1;
+
   # try by incrementing port number until PostgreSQL starts
   while (1) {
-    my $good = try {
+    my $good;
+    try {
+      #warn "Trying to start postgres on port $port...";
       $self->_try_start($port);
-      1;
+      $good = 1;
     }
     catch {
-      # warn "Postgres failed to start on port $port\n";
+      #warn "Postgres failed to start on port $port\n";
       unless ($tries--) {
         die "Failed to start postgres after trying 10 potential ports: $_";
       }
@@ -425,12 +471,18 @@ method _try_start($port) {
                 $port,                  '-k',
                 $self->socket_dir)
         );
+        #warn "Postgres starting command: " . join(' ', @cmd) . "\n";
         $self->setuid_cmd(\@cmd, 1);
 
         my $pid_path = File::Spec->catfile( $self->base_dir, 'data', 'postmaster.pid' );
 
-        open( my $pidfh, '<', $pid_path )
-          or die "Failed to open $pid_path: $!";
+        my $pidfh;
+        if (not open($pidfh, '<', $pid_path)) {
+            #open( my $logh, '<', $logfile );
+            #my @loglines = <$logh>;
+            #warn "Postgres log: \n" . join("\n", @loglines);
+            die "Failed to open $pid_path: $!";
+          }
 
         # Note that the file contains several lines; we only want the PID from the first.
         my $pid = <$pidfh>;
@@ -792,7 +844,7 @@ conflicting TCP ports on localhost.]
 
 =head2 socket_dir
 
-Unix socket directory to use if L</unix_socket> is true. Default is C<$basedir/tmp>.
+Unix socket directory to use if L</unix_socket> is true. Default is C<$base_dir/tmp>.
 
 =head2 pg_ctl
 
@@ -825,7 +877,7 @@ Extra args to be appended to L</initdb_args>. Default is empty.
 
 =head2 pg_config
 
-Configuration to place in C<$basedir/data/postgresql.conf>. Use this to override
+Configuration to place in C<$base_dir/data/postgresql.conf>. Use this to override
 PostgreSQL configuration defaults, e.g. to speed up PostgreSQL database init
 and seeding one might use something like this:
 

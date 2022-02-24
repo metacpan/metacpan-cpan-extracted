@@ -7,46 +7,54 @@
 #include "spvm_native.h"
 #include "spvm_api.h"
 
-#include "spvm_op.h"
-#include "spvm_compiler.h"
-#include "spvm_hash.h"
-#include "spvm_list.h"
-
-#include <spvm_native.h>
-
 int32_t main(int32_t argc, const char *argv[]) {
   
   // Class name
   const char* class_name = "MyExe";
   
+  SPVM_ENV* compiler_env = SPVM_API_new_env_raw(NULL);
+  
   // Create compiler
-  SPVM_COMPILER* compiler = SPVM_COMPILER_new();
+  void* compiler = compiler_env->new_compiler(compiler_env);
   
   // compiler->debug = 1;
   
-  // Create use op for entry point class
-  SPVM_OP* op_name_start = SPVM_OP_new_op_name(compiler, class_name, class_name, 0);
-  SPVM_OP* op_type_start = SPVM_OP_build_basic_type(compiler, op_name_start);
-  SPVM_OP* op_use_start = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_USE, class_name, 0);
-  SPVM_OP_build_use(compiler, op_use_start, op_type_start, NULL, 0);
-  SPVM_LIST_push(compiler->op_use_stack, op_use_start);
+  compiler_env->compiler_set_start_file(compiler_env, compiler, class_name);
+
+  compiler_env->compiler_set_start_line(compiler_env, compiler, 0);
   
   // Add module directory
   char* module_dir = "solo/SPVM";
-  SPVM_LIST_push(compiler->module_dirs, module_dir);
+  compiler_env->compiler_add_module_dir(compiler_env, compiler, module_dir);
+
+  int32_t compile_error_code = compiler_env->compiler_compile_spvm(compiler_env, compiler, class_name);
   
-  SPVM_COMPILER_compile(compiler);
-  
-  if (SPVM_COMPILER_get_error_count(compiler) > 0) {
-    SPVM_COMPILER_print_error_messages(compiler, stderr);
-    exit(1);
+  if (compile_error_code != 0) {
+    int32_t error_messages_length = compiler_env->compiler_get_error_messages_length(compiler_env, compiler);
+    for (int32_t i = 0; i < error_messages_length; i++) {
+      const char* error_message = compiler_env->compiler_get_error_message(compiler_env, compiler, i);
+      fprintf(stderr, "%s\n", error_message);
+    }
+    exit(255);
   }
+  
+  compiler_env->free_env_raw(compiler_env);
+  compiler_env = NULL;
 
   // Create env
-  SPVM_ENV* env = SPVM_API_create_env(compiler);
+  SPVM_ENV* env = SPVM_API_new_env_raw(NULL);
+  
+  // Set the compiler
+  env->compiler = compiler;
+  
+  // Initialize env
+  SPVM_API_init_env(env);
+  
+  // Call INIT blocks
+  env->call_init_blocks(env);
   
   // Class
-  int32_t method_id = SPVM_API_get_class_method_id(env, class_name, "main", "int(string,string[])");
+  int32_t method_id = env->get_class_method_id(env, class_name, "main", "int(string,string[])");
   
   if (method_id < 0) {
     fprintf(stderr, "Can't find main method\n");
@@ -78,7 +86,7 @@ int32_t main(int32_t argc, const char *argv[]) {
   
   int32_t status;
   if (exception_flag) {
-    SPVM_API_print(env, env->exception_object);
+    env->print_stderr(env, env->exception_object);
     printf("\n");
     status = 255;
   }
@@ -89,10 +97,14 @@ int32_t main(int32_t argc, const char *argv[]) {
   // Leave scope
   env->leave_scope(env, scope_id);
   
-  env->free_env(env);
+  // Cleanup global variables
+  env->cleanup_global_vars(env);
+  
+  // Free env
+  env->free_env_raw(env);
 
   // Free compiler
-  SPVM_COMPILER_free(compiler);
+  SPVM_API_compiler_free(compiler_env, compiler);
   
   return status;
 }

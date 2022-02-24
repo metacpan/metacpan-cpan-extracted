@@ -7,7 +7,7 @@ use Carp 'confess';
 
 use App::SpamcupNG::Summary::Receiver;
 
-our $VERSION = '0.011'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 =pod
 

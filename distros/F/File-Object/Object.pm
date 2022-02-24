@@ -8,7 +8,7 @@ use Error::Pure qw(err);
 use File::Spec::Functions qw(catdir catfile splitdir);
 use FindBin qw($Bin $Script);
 
-our $VERSION = 0.13;
+our $VERSION = 0.15;
 
 # Constructor.
 sub new {
@@ -492,12 +492,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© Michal Josef Špaček 2009-2021
+© Michal Josef Špaček 2009-2022
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.13
+0.15
 
 =cut

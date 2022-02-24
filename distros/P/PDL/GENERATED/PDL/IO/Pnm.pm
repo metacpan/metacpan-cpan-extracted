@@ -21,7 +21,8 @@ use DynaLoader;
 
 
 
-#line 10 "pnm.pd"
+#line 9 "pnm.pd"
+
 
 use strict;
 use warnings;
@@ -57,7 +58,7 @@ sub dmax {
     $sz-- if !PDL::Type->new($type)->unsigned;
     return ((1 << $sz)-1);
 }
-#line 61 "Pnm.pm"
+#line 62 "Pnm.pm"
 
 
 
@@ -71,7 +72,8 @@ sub dmax {
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 pnminraw
@@ -99,17 +101,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 103 "Pnm.pm"
+#line 105 "Pnm.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *pnminraw = \&PDL::pnminraw;
-#line 109 "Pnm.pm"
+#line 112 "Pnm.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 pnminascii
@@ -132,17 +136,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 136 "Pnm.pm"
+#line 140 "Pnm.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *pnminascii = \&PDL::pnminascii;
-#line 142 "Pnm.pm"
+#line 147 "Pnm.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 pnmout
@@ -156,7 +162,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 Write a line of pnm data.
 
-This function is implemented this way so that threading works
+This function is implemented this way so that broadcasting works
 naturally.
 
 
@@ -167,19 +173,21 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 171 "Pnm.pm"
-
-
-
-#line 1061 "../../blib/lib/PDL/PP.pm"
-*pnmout = \&PDL::pnmout;
 #line 177 "Pnm.pm"
 
 
 
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
+*pnmout = \&PDL::pnmout;
+#line 184 "Pnm.pm"
 
 
-#line 48 "pnm.pd"
+
+
+
+#line 47 "pnm.pd"
+
 =head2 rpnm
 
 =for ref
@@ -408,7 +416,7 @@ the copyright notice should be included in the file.
 
 
 ############################## END PM CODE ################################
-#line 412 "Pnm.pm"
+#line 420 "Pnm.pm"
 
 
 

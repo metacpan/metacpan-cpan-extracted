@@ -224,9 +224,11 @@ $id1 = expectCookie($res);
 
 ok( $res->[2]->[0] =~ /trspan="lastLogins"/, 'History found' )
   or print STDERR Dumper( $res->[2]->[0] );
-ok( $res->[2]->[0] =~ /<caption trspan="lastFailedLoginsCaptionLabel">/, 'History found' )
+ok( $res->[2]->[0] =~ /<caption trspan="lastFailedLoginsCaptionLabel">/,
+    'History found' )
   or print STDERR Dumper( $res->[2]->[0] );
-ok( $res->[2]->[0] =~ /<caption trspan="lastLoginsCaptionLabel">/, 'History found' )
+ok( $res->[2]->[0] =~ /<caption trspan="lastLoginsCaptionLabel">/,
+    'History found' )
   or print STDERR Dumper( $res->[2]->[0] );
 
 my @c  = ( $res->[2]->[0] =~ /<td>127.0.0.1/gs );

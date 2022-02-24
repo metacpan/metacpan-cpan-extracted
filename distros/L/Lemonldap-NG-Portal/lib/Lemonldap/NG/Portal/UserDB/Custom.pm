@@ -1,17 +1,12 @@
 package Lemonldap::NG::Portal::UserDB::Custom;
+use Lemonldap::NG::Portal::Lib::CustomModule;
 
 use strict;
 
-sub new {
-    my ( $class, $self ) = @_;
-    unless ( $self->{conf}->{customUserDB} ) {
-        die 'Custom User DB module not defined';
-    }
-
-    eval $self->{p}->loadModule( $self->{conf}->{customUserDB} );
-    ($@)
-      ? return $self->{p}->loadModule( $self->{conf}->{customUserDB} )
-      : die 'Unable to load UserDB module ' . $self->{conf}->{customUserDB};
-}
+our @ISA = qw(Lemonldap::NG::Portal::Lib::CustomModule);
+use constant {
+    custom_name       => "UserDB",
+    custom_config_key => "customUserDB",
+};
 
 1;

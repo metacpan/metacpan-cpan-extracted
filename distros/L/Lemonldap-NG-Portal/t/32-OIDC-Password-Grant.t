@@ -17,11 +17,11 @@ my $debug = 'error';
 # Initialization
 my $op = LLNG::Manager::Test->new( {
         ini => {
-            logLevel => $debug,
-            domain   => 'op.com',
-            portal   => 'http://auth.op.com',
-
-            macros => {
+            logLevel     => $debug,
+            domain       => 'op.com',
+            portal       => 'http://auth.op.com',
+            requireToken => 1,
+            macros       => {
                 gender       => '"32"',
                 _whatToTrace => '$uid',
                 nickname     => '"froggie; frenchie"',
@@ -37,6 +37,21 @@ my $op = LLNG::Manager::Test->new( {
                 }
             },
             oidcRPMetaDataOptions => {
+                scopelessrp => {
+                    oidcRPMetaDataOptionsDisplayName           => "RP",
+                    oidcRPMetaDataOptionsIDTokenExpiration     => 3600,
+                    oidcRPMetaDataOptionsClientID              => "scopelessrp",
+                    oidcRPMetaDataOptionsAllowOffline          => 1,
+                    oidcRPMetaDataOptionsAllowPasswordGrant    => 1,
+                    oidcRPMetaDataOptionsIDTokenSignAlg        => "HS512",
+                    oidcRPMetaDataOptionsClientSecret          => "rpsecret",
+                    oidcRPMetaDataOptionsUserIDAttr            => "",
+                    oidcRPMetaDataOptionsAccessTokenExpiration => 120,
+                    oidcRPMetaDataOptionsBypassConsent         => 1,
+                    oidcRPMetaDataOptionsRefreshToken          => 1,
+                    oidcRPMetaDataOptionsIDTokenForceClaims    => 1,
+                    oidcRPMetaDataOptionsRule => '$uid eq "french"',
+                },
                 rp => {
                     oidcRPMetaDataOptionsDisplayName           => "RP",
                     oidcRPMetaDataOptionsIDTokenExpiration     => 3600,
@@ -70,7 +85,47 @@ my $res;
 # Resource Owner Password Credentials Grant
 # Access Token Request
 # https://tools.ietf.org/html/rfc6749#section-4.3
+
+# Wrong password should fail
 my $query = buildForm( {
+        client_id     => 'rpid',
+        client_secret => 'rpsecret',
+        grant_type    => 'password',
+        username      => 'french',
+        password      => 'invalid',
+        scope         => 'profile email',
+    }
+);
+
+## Wrong password should fail
+$res = $op->_post(
+    "/oauth2/token",
+    IO::String->new($query),
+    accept => 'application/json',
+    length => length($query),
+);
+
+expectReject( $res, 400, "invalid_grant" );
+
+# Empty scope should fail
+my $query = buildForm( {
+        client_id     => 'scopelessrp',
+        client_secret => 'rpsecret',
+        grant_type    => 'password',
+        username      => 'french',
+        password      => 'french',
+    }
+);
+$res = $op->_post(
+    "/oauth2/token",
+    IO::String->new($query),
+    accept => 'application/json',
+    length => length($query),
+);
+
+expectReject( $res, 400, "invalid_scope" );
+
+$query = buildForm( {
         client_id     => 'rpid',
         client_secret => 'rpsecret',
         grant_type    => 'password',
@@ -92,6 +147,7 @@ my $payload = expectJSON($res);
 my $access_token = $payload->{access_token};
 ok( $access_token, "Access Token found" );
 count(1);
+
 my $token_res_scope = $payload->{scope};
 ok( $token_res_scope, "Scope found in token response" );
 is( $payload->{id_token}, undef, "No ID token in original request" );

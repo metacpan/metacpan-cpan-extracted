@@ -16,11 +16,11 @@ name: Feature-Compat-Try
 provides:
   Feature::Compat::Try:
     file: lib/Feature/Compat/Try.pm
-    version: '0.04'
+    version: '0.05'
 requires:
-  Syntax::Keyword::Try: '0.22'
+  Syntax::Keyword::Try: '0.27'
   perl: '5.014'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.04'
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

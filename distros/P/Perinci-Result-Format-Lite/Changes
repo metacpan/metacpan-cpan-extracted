@@ -1,3 +1,9 @@
+0.286   2022-02-18  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] Use double-doublequote escaping in CSV instead of
+          backslash.
+
+
 0.285   2022-01-23  Released-By: PERLANCAR; Urgency: medium
 
 	- Adjust with Rinci 1.1.100 and Text::Table::Any 0.111 ('title'

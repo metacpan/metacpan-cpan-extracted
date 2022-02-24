@@ -1595,12 +1595,12 @@
       "title": "samlSPSSODescriptorSingleLogoutService"
     }, {
       "_nodes": [{
-        "default": "1;0;urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact;#PORTAL#/saml/proxySingleSignOnArtifact",
+        "default": "0;1;urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact;#PORTAL#/saml/proxySingleSignOnArtifact",
         "id": "samlSPSSODescriptorAssertionConsumerServiceHTTPArtifact",
         "title": "samlSPSSODescriptorAssertionConsumerServiceHTTPArtifact",
         "type": "samlAssertion"
       }, {
-        "default": "0;1;urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST;#PORTAL#/saml/proxySingleSignOnPost",
+        "default": "1;0;urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST;#PORTAL#/saml/proxySingleSignOnPost",
         "id": "samlSPSSODescriptorAssertionConsumerServiceHTTPPost",
         "title": "samlSPSSODescriptorAssertionConsumerServiceHTTPPost",
         "type": "samlAssertion"

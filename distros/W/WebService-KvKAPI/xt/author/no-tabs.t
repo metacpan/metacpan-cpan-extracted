@@ -9,13 +9,16 @@ use Test::NoTabs;
 my @files = (
     'bin/query_kvk.pl',
     'lib/WebService/KvKAPI.pm',
-    'lib/WebService/KvKAPI/Spoof.pm',
+    'lib/WebService/KvKAPI/BasicProfile.pm',
+    'lib/WebService/KvKAPI/Formatters.pm',
+    'lib/WebService/KvKAPI/LocationProfile.pm',
+    'lib/WebService/KvKAPI/Roles/OpenAPI.pm',
+    'lib/WebService/KvKAPI/Search.pm',
     't/00-compile.t',
-    't/01-basic.t',
-    't/02-spoof.t',
-    't/03-host-override.t',
-    't/04-mangle-params.t',
-    't/9999-live-test.t'
+    't/001-openapi.t',
+    't/100-search.t',
+    't/200-basic-profile.t',
+    't/300-location-profile.t'
 );
 
 notabs_ok($_) foreach @files;

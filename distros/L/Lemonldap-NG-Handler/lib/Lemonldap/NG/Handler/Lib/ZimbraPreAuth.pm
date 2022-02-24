@@ -29,10 +29,10 @@ sub run {
     my $localConfig      = $class->localConfig;
     my $zimbraPreAuthKey = $localConfig->{zimbraPreAuthKey};
     my $zimbraAccountKey = $localConfig->{zimbraAccountKey} || 'uid';
-    my $zimbraBy         = $localConfig->{zimbraBy} || 'id';
-    my $zimbraUrl        = $localConfig->{zimbraUrl} || '/service/preauth';
+    my $zimbraBy         = $localConfig->{zimbraBy}         || 'id';
+    my $zimbraUrl        = $localConfig->{zimbraUrl}    || '/service/preauth';
     my $zimbraSsoUrl     = $localConfig->{zimbraSsoUrl} || '^/zimbrasso$';
-    my $timeout          = $localConfig->{'timeout'} || '0';
+    my $timeout          = $localConfig->{'timeout'}    || '0';
 
     # Remove trailing white-spaces
     $zimbraAccountKey =~ s/\s+$//;

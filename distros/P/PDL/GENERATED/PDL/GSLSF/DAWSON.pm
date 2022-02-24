@@ -21,7 +21,8 @@ use DynaLoader;
 
 
 
-#line 5 "gsl_sf_dawson.pd"
+#line 4 "gsl_sf_dawson.pd"
+
 use strict;
 use warnings;
 
@@ -36,7 +37,7 @@ This is an interface to the Special Function package present in the GNU Scientif
 =head1 SYNOPSIS
 
 =cut
-#line 40 "DAWSON.pm"
+#line 41 "DAWSON.pm"
 
 
 
@@ -50,7 +51,8 @@ This is an interface to the Special Function package present in the GNU Scientif
 
 
 
-#line 1059 "../../../../blib/lib/PDL/PP.pm"
+#line 1058 "../../../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 gsl_sf_dawson
@@ -70,19 +72,21 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 74 "DAWSON.pm"
+#line 76 "DAWSON.pm"
 
 
 
-#line 1061 "../../../../blib/lib/PDL/PP.pm"
+#line 1060 "../../../../blib/lib/PDL/PP.pm"
+
 *gsl_sf_dawson = \&PDL::gsl_sf_dawson;
-#line 80 "DAWSON.pm"
+#line 83 "DAWSON.pm"
 
 
 
 
 
-#line 43 "gsl_sf_dawson.pd"
+#line 42 "gsl_sf_dawson.pd"
+
 =head1 AUTHOR
 
 This file copyright (C) 1999 Christian Pellegrin <chri@infis.univ.trieste.it>
@@ -95,7 +99,7 @@ PDL distribution, the copyright notice should be included in the file.
 The GSL SF modules were written by G. Jungman.
 
 =cut
-#line 99 "DAWSON.pm"
+#line 103 "DAWSON.pm"
 
 
 

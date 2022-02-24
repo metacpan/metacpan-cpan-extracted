@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2021-2022 -- leonerd@leonerd.org.uk
 
-package XS::Parse::Keyword 0.21;
+package XS::Parse::Keyword 0.22;
 
 use v5.14;
 use warnings;
@@ -393,6 +393,20 @@ C<XPK_LEXVARNAME>.
 I<atomic, can probe, emits nothing.>
 
 A literal character (C<,>, C<:> or C<=>) is expected. No argument value is passed.
+
+=head2 XPK_AUTOSEMI
+
+I<atomic, emits nothing.>
+
+A literal semicolon (C<;>) as a statement terminator is optionally expected.
+If the next token is a closing brace to indicate the end of a block, then a
+semicolon is not required. If anything else is encountered an error will be
+raised.
+
+This piece type is the same as specifying the C<XPK_FLAG_AUTOSEMI>. It is
+useful to put at the end of a sequence that forms part of a choice of syntax,
+where some forms indicate a statement ending in a semicolon, whereas others
+may end in a full block that does not need one.
 
 =head2 XPK_INFIX_*
 

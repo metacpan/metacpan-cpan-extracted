@@ -2,6 +2,10 @@
 ##
 ## Change log for perl distribution PDL::VectorValued
 
+v1.0.15 Sun, 20 Feb 2022 13:40:45 +0100 moocow
+	* fix for PDL v2.075
+	  - PDL::null() is no longer a valid input PDL, even for conversions
+
 v1.0.14 Fri, 12 Nov 2021 20:05:32 +0100 moocow
 	* explicitly use PDL::Types from VectorValued/Dev; fixes https://github.com/moocow-the-bovine/PDL-VectorValued/issues/1
 

@@ -159,7 +159,7 @@ sub _get2F {
                 type => $device->{type},
                 name => $device->{name}
               }
-              unless ( ( defined $type and $type ne $device->{type} )
+              unless ( ( defined $type and uc($type) ne uc( $device->{type} ) )
                 or ( defined $id and $id ne genId2F($device) ) );
         }
     }
@@ -224,8 +224,12 @@ sub _delete2FFromSessions {
                 my $element = shift @$devices;
                 if (
                     ( defined $type or defined $id )
-                    and (  ( defined $type and $type ne $element->{type} )
-                        or ( defined $id and $id ne genId2F($element) ) )
+                    and ( (
+                            defined $type
+                            and uc($type) ne uc( $element->{type} )
+                        )
+                        or ( defined $id and $id ne genId2F($element) )
+                    )
                   )
                 {
                     push @keep, $element;
@@ -333,10 +337,10 @@ sub _checkType {
     return {
         res  => "ko",
         code => 400,
-        msg =>
-"Invalid input: Type \"$type\" does not exist. Allowed values for type are: \"U2F\", \"TOTP\" or \"UBK\""
+        msg  =>
+"Invalid input: Type \"$type\" does not exist. Allowed values for type are: \"U2F\", \"TOTP\", \"WebAuthn\" or \"UBK\""
       }
-      unless ( $type =~ /\b(?:U2F|TOTP|UBK)\b/ );
+      unless ( $type =~ /\b(?:U2F|TOTP|UBK|WebAuthn)\b/i );
 
     return { res => "ok" };
 }

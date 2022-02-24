@@ -47,11 +47,11 @@ files without touching the file system.
 
 =head1 VERSION
 
-Version 0.029
+Version 0.030
 
 =cut
 
-our $VERSION = '0.029';
+our $VERSION = '0.030';
 
 our %files_being_mocked;
 
@@ -87,6 +87,11 @@ throw a die when files are accessed during your tests!
 
     # non-strict mode
     use Test::MockFile qw< nostrict >;
+
+    # Load with one or more plugins
+
+    use Test::MockFile plugin => 'FileTemp';
+    use Test::MockFile plugin => [ 'FileTemp', ... ];
 
     # Be sure to assign the output of mocks, they disappear when they go out of scope
     my $foobar = Test::MockFile->file( "/foo/bar", "contents\ngo\nhere" );
@@ -171,14 +176,9 @@ use constant STRICT_MODE_ENABLED  => 2;
 use constant STRICT_MODE_UNSET    => 4;
 use constant STRICT_MODE_DEFAULT  => STRICT_MODE_ENABLED | STRICT_MODE_UNSET;    # default state when unset by user
 
-our %authorized_strict_mode_packages;
 our $STRICT_MODE_STATUS;
 
 BEGIN {
-    %authorized_strict_mode_packages = (
-        'DynaLoader' => 1,
-        'lib'        => 1,
-    );
     $STRICT_MODE_STATUS = STRICT_MODE_DEFAULT;
 }
 
@@ -221,23 +221,45 @@ sub _upgrade_barewords {
     return @args;
 }
 
+=head2 authorized_strict_mode_for_package( $pkg )
+
+Add a package namespace to the list of authorize namespaces.
+
+    authorized_strict_mode_for_package( 'Your::Package' );
+
+=cut
+
+our %authorized_strict_mode_packages;
+
+sub authorized_strict_mode_for_package {
+    my ($pkg) = @_;
+
+    $authorized_strict_mode_packages{$pkg} = 1;
+
+    return;
+}
+
+BEGIN {
+    authorized_strict_mode_for_package($_) for qw{ DynaLoader lib };
+}
+
 =head2 file_arg_position_for_command
 
 Args: ($command)
 
-Provides a hint with the position of the argument most likely
-holding the file name for the current C<$command> call.
+Provides a hint with the position of the argument most likely holding
+the file name for the current C<$command> call.
 
-This is used internaly to provide better error messages.
-This can be used when plugging hooks to know what's the filename
-we currently try to access.
+This is used internaly to provide better error messages. This can be
+used when plugging hooks to know what's the filename we currently try
+to access.
 
 =cut
 
 my $_file_arg_post;
 
 sub file_arg_position_for_command {    # can also be used by user hooks
-    my ($command) = @_;
+    my ( $command, $at_under_ref ) = @_;
 
     $_file_arg_post //= {
         'chmod'    => 2,
@@ -253,46 +275,293 @@ sub file_arg_position_for_command {    # can also be used by user hooks
         'unlink'   => 0,
     };
 
-    croak("Unknown strict mode violation for $command") unless defined $command && defined $_file_arg_post->{$command};
+    return -1 unless defined $command && defined $_file_arg_post->{$command};
+
+    # exception for open
+    return 1 if $command eq 'open' && ref $at_under_ref && scalar @$at_under_ref == 2;
 
     return $_file_arg_post->{$command};
+}
+
+use constant _STACK_ITERATION_MAX => 100;
+
+sub _get_stack {
+    my @stack;
+
+    foreach my $stack_level ( 1 .. _STACK_ITERATION_MAX ) {
+        @stack = caller($stack_level);
+        last if !scalar @stack;
+        last if !defined $stack[0];    # We don't know when this would ever happen.
+
+        next if $stack[0] eq __PACKAGE__;
+        next if $stack[0] eq 'Overload::FileCheck';    # companion package
+
+        return if $authorized_strict_mode_packages{ $stack[0] };
+
+        last;
+    }
+
+    return @stack;
+}
+
+=head2 add_strict_rule( $command_rule, $file_rule, $action )
+
+Args: ($command_rule, $file_rule, $action)
+
+Add a custom rule to validate strictness mode. This is the fundation to
+add strict rules. You should use it, when none of the other helper to
+add rules work for you.
+
+=over
+
+=item C<$command_rule> a string or regexp or list of any to indicate
+which command to match
+
+=itemC<$file_rule> a string or regexp or undef or list of any to indicate
+which files your rules apply to.
+
+=item C<$action> a CODE ref or scalar to handle the exception.
+Returning '1' skip all other rules and indicate an exception.
+
+=back
+
+    # Check open() on /this/file
+    add_strict_rule( 'open', '/this/file', sub { ... } );
+
+    # always bypass the strict rule
+    add_strict_rule( 'open', '/this/file', 1 );
+
+    # all available options
+    add_strict_rule( 'open', '/this/file', sub {
+        my ($context) = @_;
+
+        return;   # Skip this rule and continue from the next one
+        return 0; # Strict violation, stop testing rules and die
+        return 1; # Strict passing, stop testing rules
+    } );
+
+    # Disallow open(), close() on everything in /tmp/
+    add_strict_rule(
+        [ qw< open close > ],
+        qr{^/tmp}xms,
+        0,
+    );
+
+    # Disallow open(), close() on everything (ignore filenames)
+    # Use add_strict_rule_for_command() instead!
+    add_strict_rule(
+        [ qw< open close > ],
+        undef,
+        0,
+    );
+
+=cut
+
+my @STRICT_RULES;
+
+sub add_strict_rule {
+    my ( $command_rule, $file_rule, $action ) = @_;
+
+    defined $command_rule
+      or croak("add_strict_rule( COMMAND, PATH, ACTION )");
+
+    croak("Invalid rule: missing action code") unless defined $action;
+
+    my @commands = ref $command_rule eq 'ARRAY' ? @{$command_rule} : ($command_rule);
+    my @files    = ref $file_rule eq 'ARRAY'    ? @{$file_rule}    : ($file_rule);
+
+    foreach my $c_rule (@commands) {
+        foreach my $f_rule (@files) {
+            push @STRICT_RULES, {
+                'command_rule' => ref $c_rule eq 'Regexp'                         ? $c_rule : qr/^\Q$c_rule\E$/,
+                'file_rule'    => ( ref $f_rule eq 'Regexp' || !defined $f_rule ) ? $f_rule : qr/^\Q$f_rule\E$/,
+                'action'       => $action,
+            };
+        }
+    }
+
+    return;
+}
+
+=head2 clear_strict_rules()
+
+Args: none
+
+Clear all previously defined rules. (Mainly used for testing purpose)
+
+=cut
+
+sub clear_strict_rules {
+    @STRICT_RULES = ();
+
+    return;
+}
+
+=head2 add_strict_rule_for_filename( $file_rule, $action )
+
+Args: ($file_rule, $action)
+
+Prefer using that helper when trying to add strict rules targeting
+files.
+
+Apply a rule to one or more files.
+
+    add_strict_rule_for_filename( '/that/file' => sub { ... } );
+
+    add_strict_rule_for_filename( [ qw{list of files} ] => sub { ... } );
+
+    add_strict_rule_for_filename( qr{*\.t$} => sub { ... } );
+
+    add_strict_rule_for_filename( [ $dir, qr{^${dir}/} ] => 1 );
+
+=cut
+
+sub add_strict_rule_for_filename {
+    my ( $file_rule, $action ) = @_;
+
+    return add_strict_rule( qr/.*/, $file_rule, $action );
+}
+
+=head2 add_strict_rule_for_command( $command_rule, $action )
+
+Args: ($command_rule, $action)
+
+Prefer using that helper when trying to add strict rules targeting
+specici commands.
+
+Apply a rule to one or more files.
+
+    add_strict_rule_for_command( 'open' => sub { ... } );
+
+    add_strict_rule_for_command( [ qw{open readdir} ] => sub { ... } );
+
+    add_strict_rule_for_command( qr{open.*} => sub { ... } );
+
+    Test::MockFile::add_strict_rule_for_command(
+        [qw{ readdir closedir readlink }],
+        sub {
+            my ($ctx) = @_;
+            my $command = $ctx->{command} // 'unknown';
+
+            warn( "Ignoring strict mode violation for $command" );
+            return 1;
+        }
+    );
+
+=cut
+
+sub add_strict_rule_for_command {
+    my ( $command_rule, $action ) = @_;
+
+    return add_strict_rule( $command_rule, undef, $action );
+}
+
+=head2 add_strict_rule_generic( $action )
+
+Args: ($action)
+
+Prefer using that helper when adding a rule which is global and does
+not apply to a specific command or file.
+
+Apply a rule to one or more files.
+
+    add_strict_rule_generic( sub { ... } );
+
+    add_strict_rule_generic( sub  {
+        my ($ctx) = @_;
+
+        my $filename = $ctx->{filename};
+
+        return unless defined $filename;
+
+        return 1 if UNIVERSAL::isa( $filename, 'GLOB' );
+
+        return;
+    } );
+
+=cut
+
+sub add_strict_rule_generic {
+    my ($action) = @_;
+
+    return add_strict_rule( qr/.*/, undef, $action );
+}
+
+=head2 is_strict_mode
+
+Boolean helper to determine if strict mode is currently enabled.
+
+=cut
+
+sub is_strict_mode {
+    return $STRICT_MODE_STATUS & STRICT_MODE_ENABLED ? 1 : 0;
 }
 
 sub _strict_mode_violation {
     my ( $command, $at_under_ref ) = @_;
 
-    return unless $STRICT_MODE_STATUS & STRICT_MODE_ENABLED;
+    return unless is_strict_mode();
 
-    my @stack;
-    foreach my $stack_level ( 1 .. 100 ) {
-        @stack = caller($stack_level);
-        last if !scalar @stack;
-        last if !defined $stack[0];                       # We don't know when this would ever happen.
-        next if ( $stack[0] eq __PACKAGE__ );
-        next if ( $stack[0] eq 'Overload::FileCheck' );
+    my @stack = _get_stack();
+    return unless scalar @stack;    # skip the package
 
-        # We found a package that isn't one of ours. Is it allowed to access files?
-        # If so we're not going to die.
-        return if $authorized_strict_mode_packages{ $stack[0] };
-
-        #
-        last;
-    }
+    my $filename;
 
     # check it later so we give priority to authorized_strict_mode_packages
-    my $file_arg = file_arg_position_for_command($command);
+    my $file_arg = file_arg_position_for_command( $command, $at_under_ref );
 
-    if ( $command eq 'open' and scalar @$at_under_ref != 3 ) {
-        $file_arg = 1 if scalar @$at_under_ref == 2;
+    if ( $file_arg >= 0 ) {
+        $filename = scalar @$at_under_ref <= $file_arg ? '<not specified>' : $at_under_ref->[$file_arg];
     }
 
-    my $filename = scalar @$at_under_ref <= $file_arg ? '<not specified>' : $at_under_ref->[$file_arg];
-
     # Ignore stats on STDIN, STDOUT, STDERR
-    return if $filename =~ m/^\*?(?:main::)?[<*&+>]*STD(?:OUT|IN|ERR)$/;
+    return if defined $filename && $filename =~ m/^\*?(?:main::)?[<*&+>]*STD(?:OUT|IN|ERR)$/;
+
+    my $path = _abs_path_to_file($filename);
+
+    my $context = {
+        command      => $command,
+        filename     => $path,
+        at_under_ref => $at_under_ref
+    };    # object
+
+    my $pass = _validate_strict_rules($context);
+    return if $pass;
+
+    croak("Unknown strict mode violation for $command") if $file_arg == -1;
 
     confess("Use of $command to access unmocked file or directory '$filename' in strict mode at $stack[1] line $stack[2]");
 }
+
+sub _validate_strict_rules {
+    my ($context) = @_;
+
+    # rules dispatch
+    foreach my $rule (@STRICT_RULES) {
+
+        # This is when a rule was added without a filename at all
+        # intending to match whether there's a filename available or not
+        # (open() can be used on a scalar, for example)
+        if ( defined $rule->{'file_rule'} ) {
+            defined $context->{'filename'} && $context->{'filename'} =~ $rule->{'file_rule'}
+              or next;
+        }
+
+        $context->{'command'} =~ $rule->{'command_rule'}
+          or next;
+
+        my $answer = ref $rule->{'action'} ? $rule->{'action'}->($context) : $rule->{'action'};
+
+        defined $answer
+          and return $answer;
+    }
+
+    # We say it failed even though it didn't
+    # It's because we want to test the internal violation rule check
+    return;
+}
+
+my @plugins;
 
 sub import {
     my ( $class, @args ) = @_;
@@ -309,6 +578,14 @@ sub import {
         die q[Test::MockFile is imported multiple times with different strict modes (not currently supported) ] . $class;
     }
     $STRICT_MODE_STATUS = $strict_mode;
+
+    while ( my $opt = shift @args ) {
+        next unless defined $opt && $opt eq 'plugin';
+        my $what = shift @args;
+        require Test::MockFile::Plugins;
+
+        push @plugins, Test::MockFile::Plugins::load_plugin($what);
+    }
 
     return;
 }
@@ -341,7 +618,7 @@ sub file {
     my ( $class, $file, $contents, @stats ) = @_;
 
     ( defined $file && length $file ) or confess("No file provided to instantiate $class");
-    _get_file_object($file) and confess("It looks like $file is already being mocked. We don't support double mocking yet.");
+    _is_path_mocked($file) and confess("It looks like $file is already being mocked. We don't support double mocking yet.");
 
     my $path = _abs_path_to_file($file);
     _validate_path($_) for $file, $path;
@@ -439,7 +716,7 @@ sub symlink {
     ( defined $file && length $file )          or confess("No file provided to instantiate $class");
     ( !defined $readlink || length $readlink ) or confess("No file provided for $file to point to in $class");
 
-    _get_file_object($file) and confess("It looks like $file is already being mocked. We don't support double mocking yet.");
+    _is_path_mocked($file) and confess("It looks like $file is already being mocked. We don't support double mocking yet.");
 
     # Check if directory for this file is an object we're mocking
     # If so, mark it now as having content
@@ -532,8 +809,7 @@ sub dir {
     my ( $class, $dirname ) = @_;
 
     ( defined $dirname && length $dirname ) or confess("No directory name provided to instantiate $class");
-    _get_file_object($dirname)
-      and confess("It looks like $dirname is already being mocked. We don't support double mocking yet.");
+    _is_path_mocked($dirname) and confess("It looks like $dirname is already being mocked. We don't support double mocking yet.");
 
     my $path = _abs_path_to_file($dirname);
     _validate_path($_) for $dirname, $path;
@@ -559,6 +835,52 @@ sub dir {
             %stats
         }
     );
+}
+
+=head2 new_dir
+
+    # short form
+    $new_dir = Test::MockFile->new_dir( '/path' );
+    $new_dir = Test::MockFile->new_dir( '/path', { 'mode' => 0755 } );
+
+    # longer form 1
+    $dir = Test::MockFile->dir('/path');
+    mkdir $dir->path(), 0755;
+
+    # longer form 2
+    $dir = Test::MockFile->dir('/path');
+    mkdir $dir->path();
+    chmod $dir->path();
+
+This creates a new directory with an optional mode. This is a
+short-hand that might be removed in the future when a stable, new
+interface is introduced.
+
+=cut
+
+sub new_dir {
+    my ( $class, $dirname, $opts ) = @_;
+
+    my $mode;
+    my @args = $opts ? $opts : ();
+    if ( ref $opts eq 'HASH' && $opts->{'mode'} ) {
+        $mode = delete $opts->{'mode'};
+
+        # This is to make sure the error checking still happens as expected
+        if ( keys %{$opts} == 0 ) {
+            @args = ();
+        }
+    }
+
+    my $dir = $class->dir( $dirname, @args );
+    if ($mode) {
+        __mkdir( $dirname, $mode );
+    }
+    else {
+        __mkdir($dirname);
+    }
+
+    return $dir;
 }
 
 =head2 Mock Stats
@@ -708,6 +1030,13 @@ sub _mock_stat {
     return [ $file_data->stat ];
 }
 
+sub _is_path_mocked {
+    my ($file_path) = @_;
+    my $absolute_path_to_file = _find_file_or_fh($file_path) or return;
+
+    return $files_being_mocked{$absolute_path_to_file} ? 1 : 0;
+}
+
 sub _get_file_object {
     my ($file_path) = @_;
 
@@ -788,7 +1117,7 @@ sub _files_in_dir {
 sub _abs_path_to_file {
     my ($path) = shift;
 
-    defined $path or return;
+    return unless defined $path;
 
     my $match = 1;
     while ($match) {
@@ -1353,710 +1682,730 @@ sub _goto_is_available {
     return 0;    # 5.
 }
 
+############
+# KEYWORDS #
+############
+
+sub __glob {
+    my $spec = shift;
+
+    # Text::Glob does not understand multiple patterns
+    my @patterns = split /\s+/xms, $spec;
+
+    # Text::Glob does not accept directories in globbing
+    # But csh (and thus, Perl) does, so we need to add them
+    my @mocked_files = grep $files_being_mocked{$_}->exists(), keys %files_being_mocked;
+    @mocked_files = map /^(.+)\/[^\/]+$/xms ? ( $_, $1 ) : ($_), @mocked_files;
+
+    # Might as well be consistent
+    @mocked_files = sort @mocked_files;
+
+    my @results = map Text::Glob::match_glob( $_, @mocked_files ), @patterns;
+    return @results;
+}
+
+sub __open (*;$@) {
+    my $likely_bareword;
+    my $arg0;
+    if ( defined $_[0] && !ref $_[0] ) {
+
+        # We need to remember the first arg to override the typeglob for barewords
+        $arg0 = $_[0];
+        ( $likely_bareword, @_ ) = _upgrade_barewords(@_);
+    }
+
+    # We need to take out the mode and file
+    # but we must keep using $_[0] for the file-handle to update the caller
+    my ( undef, $mode, $file ) = @_;
+    my $arg_count = @_;
+
+    # Normalize two-arg to three-arg
+    if ( $arg_count == 2 ) {
+
+        # The order here matters, so '>>' won't turn into '>'
+        if ( $_[1] =~ /^ ( >> | [+]?> | [+]?< ) (.+) $/xms ) {
+            $mode = $1;
+            $file = $2;
+        }
+        elsif ( $_[1] =~ /^[\.\/\\\w\d\-]+$/xms ) {
+            $mode = '<';
+            $file = $_[1];
+        }
+        elsif ( $_[1] =~ /^\|/xms ) {
+            $mode = '|-';
+            $file = $_[1];
+        }
+        elsif ( $_[1] =~ /\|$/xms ) {
+            $mode = '-|';
+            $file = $_[1];
+        }
+        else {
+            die "Unsupported two-way open: $_[1]\n";
+        }
+
+        # We have all args
+        $arg_count++;
+    }
+
+    # We're not supporting 1 arg opens yet
+    if ( $arg_count != 3 ) {
+        _real_file_access_hook( "open", \@_ );
+        goto \&CORE::open if _goto_is_available();
+        if ( @_ == 1 ) {
+            return CORE::open( $_[0] );
+        }
+        elsif ( @_ == 2 ) {
+            return CORE::open( $_[0], $_[1] );
+        }
+        elsif ( @_ >= 3 ) {
+            return CORE::open( $_[0], $_[1], @_[ 2 .. $#_ ] );
+        }
+    }
+
+    # Allows for scalar file handles.
+    if ( ref $file && ref $file eq 'SCALAR' ) {
+        goto \&CORE::open if _goto_is_available();
+        return CORE::open( $_[0], $mode, $file );
+    }
+
+    my $abs_path = _find_file_or_fh( $file, 1 );    # Follow the link.
+    confess() if !$abs_path && $mode ne '|-' && $mode ne '-|';
+    confess() if $abs_path eq BROKEN_SYMLINK;
+    my $mock_file = _get_file_object($abs_path);
+
+    # For now we're going to just strip off the binmode and hope for the best.
+    $mode =~ s/(:.+$)//;
+    my $encoding_mode = $1;
+
+    # TODO: We don't yet support |- or -|
+    # TODO: We don't yet support modes outside of > < >> +< +> +>>
+    # We just pass through to open if we're not mocking the file right now.
+    if (   ( $mode eq '|-' || $mode eq '-|' )
+        or !grep { $_ eq $mode } qw/> < >> +< +> +>>/
+        or !defined $mock_file ) {
+        _real_file_access_hook( "open", \@_ );
+        goto \&CORE::open if _goto_is_available();
+        if ( @_ == 1 ) {
+            return CORE::open( $_[0] );
+        }
+        elsif ( @_ == 2 ) {
+            return CORE::open( $_[0], $_[1] );
+        }
+        elsif ( @_ >= 3 ) {
+            return CORE::open( $_[0], $_[1], @_[ 2 .. $#_ ] );
+        }
+    }
+
+    # At this point we're mocking the file. Let's do it!
+
+    # If contents is undef, we act like the file isn't there.
+    if ( !defined $mock_file->contents() && grep { $mode eq $_ } qw/< +</ ) {
+        $! = ENOENT;
+        return;
+    }
+
+    my $rw = '';
+    $rw .= 'r' if grep { $_ eq $mode } qw/+< +> +>> </;
+    $rw .= 'w' if grep { $_ eq $mode } qw/+< +> +>> > >>/;
+
+    my $filefh = IO::File->new;
+    tie *{$filefh}, 'Test::MockFile::FileHandle', $abs_path, $rw;
+
+    if ($likely_bareword) {
+        my $caller = caller();
+        no strict;
+        *{"${caller}::$arg0"} = $filefh;
+        @_ = ( $filefh, $_[1] ? @_[ 1 .. $#_ ] : () );
+    }
+    else {
+        $_[0] = $filefh;
+    }
+
+    # This is how we tell if the file is open by something.
+
+    $mock_file->{'fh'} = $_[0];
+    Scalar::Util::weaken( $mock_file->{'fh'} ) if ref $_[0];    # Will this make it go out of scope?
+
+    # Fix tell based on open options.
+    if ( $mode eq '>>' or $mode eq '+>>' ) {
+        $mock_file->{'contents'} //= '';
+        seek $_[0], length( $mock_file->{'contents'} ), 0;
+    }
+    elsif ( $mode eq '>' or $mode eq '+>' ) {
+        $mock_file->{'contents'} = '';
+    }
+
+    return 1;
+}
+
+# sysopen FILEHANDLE, FILENAME, MODE, MASK
+# sysopen FILEHANDLE, FILENAME, MODE
+
+# We curently support:
+# 1 - O_RDONLY - Read only.
+# 2 - O_WRONLY - Write only.
+# 3 - O_RDWR - Read and write.
+# 6 - O_APPEND - Append to the file.
+# 7 - O_TRUNC - Truncate the file.
+# 5 - O_EXCL - Fail if the file already exists.
+# 4 - O_CREAT - Create the file if it doesn't exist.
+# 8 - O_NOFOLLOW - Fail if the last path component is a symbolic link.
+
+sub __sysopen (*$$;$) {
+    my $mock_file = _get_file_object( $_[1] );
+
+    if ( !$mock_file ) {
+        _real_file_access_hook( "sysopen", \@_ );
+        goto \&CORE::sysopen if _goto_is_available();
+        return CORE::sysopen( $_[0], $_[1], @_[ 2 .. $#_ ] );
+    }
+
+    my $sysopen_mode = $_[2];
+
+    # Not supported by my linux vendor: O_EXLOCK | O_SHLOCK
+    if ( ( $sysopen_mode & SUPPORTED_SYSOPEN_MODES ) != $sysopen_mode ) {
+        confess( sprintf( "Sorry, can't open %s with 0x%x permissions. Some of your permissions are not yet supported by %s", $_[1], $sysopen_mode, __PACKAGE__ ) );
+    }
+
+    # O_NOFOLLOW
+    if ( ( $sysopen_mode & O_NOFOLLOW ) == O_NOFOLLOW && $mock_file->is_link ) {
+        $! = 40;
+        return undef;
+    }
+
+    # O_EXCL
+    if ( $sysopen_mode & O_EXCL && $sysopen_mode & O_CREAT && defined $mock_file->{'contents'} ) {
+        $! = EEXIST;
+        return;
+    }
+
+    # O_CREAT
+    if ( $sysopen_mode & O_CREAT && !defined $mock_file->{'contents'} ) {
+        $mock_file->{'contents'} = '';
+    }
+
+    # O_TRUNC
+    if ( $sysopen_mode & O_TRUNC && defined $mock_file->{'contents'} ) {
+        $mock_file->{'contents'} = '';
+
+    }
+
+    my $rd_wr_mode = $sysopen_mode & 3;
+    my $rw =
+        $rd_wr_mode == O_RDONLY ? 'r'
+      : $rd_wr_mode == O_WRONLY ? 'w'
+      : $rd_wr_mode == O_RDWR   ? 'rw'
+      :                           confess("Unexpected sysopen read/write mode ($rd_wr_mode)");    # O_WRONLY| O_RDWR mode makes no sense and we should die.
+
+    # If contents is undef, we act like the file isn't there.
+    if ( !defined $mock_file->{'contents'} && $rd_wr_mode == O_RDONLY ) {
+        $! = ENOENT;
+        return;
+    }
+
+    my $abs_path = $mock_file->{'path'};
+
+    $_[0] = IO::File->new;
+    tie *{ $_[0] }, 'Test::MockFile::FileHandle', $abs_path, $rw;
+
+    # This is how we tell if the file is open by something.
+    $files_being_mocked{$abs_path}->{'fh'} = $_[0];
+    Scalar::Util::weaken( $files_being_mocked{$abs_path}->{'fh'} ) if ref $_[0];    # Will this make it go out of scope?
+
+    # O_TRUNC
+    if ( $sysopen_mode & O_TRUNC ) {
+        $mock_file->{'contents'} = '';
+    }
+
+    # O_APPEND
+    if ( $sysopen_mode & O_APPEND ) {
+        seek $_[0], length $mock_file->{'contents'}, 0;
+    }
+
+    return 1;
+}
+
+sub __opendir (*$) {
+
+    # Upgrade but ignore bareword indicator
+    ( undef, @_ ) = _upgrade_barewords(@_) if defined $_[0] && !ref $_[9];
+
+    my $mock_dir = _get_file_object( $_[1] );
+
+    # 1 arg Opendir doesn't work??
+    if ( scalar @_ != 2 or !defined $_[1] ) {
+        _real_file_access_hook( "opendir", \@_ );
+
+        goto \&CORE::opendir if _goto_is_available();
+
+        return CORE::opendir( $_[0], @_[ 1 .. $#_ ] );
+    }
+
+    if ( !$mock_dir ) {
+        _real_file_access_hook( "opendir", \@_ );
+        goto \&CORE::opendir if _goto_is_available();
+        return CORE::opendir( $_[0], $_[1] );
+    }
+
+    if ( !defined $mock_dir->contents ) {
+        $! = ENOENT;
+        return undef;
+    }
+
+    if ( !( $mock_dir->{'mode'} & S_IFDIR ) ) {
+        $! = ENOTDIR;
+        return undef;
+    }
+
+    if ( !defined $_[0] ) {
+        $_[0] = Symbol::gensym;
+    }
+    elsif ( ref $_[0] ) {
+        no strict 'refs';
+        *{ $_[0] } = Symbol::geniosym;
+    }
+
+    # This is how we tell if the file is open by something.
+    my $abs_path = $mock_dir->{'path'};
+    $mock_dir->{'obj'} = Test::MockFile::DirHandle->new( $abs_path, $mock_dir->contents() );
+    $mock_dir->{'fh'}  = "$_[0]";
+
+    return 1;
+
+}
+
+sub __readdir (*) {
+
+    # Upgrade but ignore bareword indicator
+    ( undef, @_ ) = _upgrade_barewords(@_) if defined $_[0] && !ref $_[9];
+
+    my $mocked_dir = _get_file_object( $_[0] );
+
+    if ( !$mocked_dir ) {
+        _real_file_access_hook( 'readdir', \@_ );
+        goto \&CORE::readdir if _goto_is_available();
+        return CORE::readdir( $_[0] );
+    }
+
+    my $obj = $mocked_dir->{'obj'};
+    if ( !$obj ) {
+        confess("Read on a closed handle");
+    }
+
+    if ( !defined $obj->{'files_in_readdir'} ) {
+        confess("Did a readdir on an empty dir. This shouldn't have been able to have been opened!");
+    }
+
+    if ( !defined $obj->{'tell'} ) {
+        confess("readdir called on a closed dirhandle");
+    }
+
+    # At EOF for the dir handle.
+    return undef if $obj->{'tell'} > $#{ $obj->{'files_in_readdir'} };
+
+    if (wantarray) {
+        my @return;
+        foreach my $pos ( $obj->{'tell'} .. $#{ $obj->{'files_in_readdir'} } ) {
+            push @return, $obj->{'files_in_readdir'}->[$pos];
+        }
+        $obj->{'tell'} = $#{ $obj->{'files_in_readdir'} } + 1;
+        return @return;
+    }
+
+    return $obj->{'files_in_readdir'}->[ $obj->{'tell'}++ ];
+}
+
+sub __telldir (*) {
+
+    # Upgrade but ignore bareword indicator
+    ( undef, @_ ) = _upgrade_barewords(@_) if defined $_[0] && !ref $_[9];
+
+    my ($fh) = @_;
+    my $mocked_dir = _get_file_object($fh);
+
+    if ( !$mocked_dir || !$mocked_dir->{'obj'} ) {
+        _real_file_access_hook( 'telldir', \@_ );
+        goto \&CORE::telldir if _goto_is_available();
+        return CORE::telldir($fh);
+    }
+
+    my $obj = $mocked_dir->{'obj'};
+
+    if ( !defined $obj->{'files_in_readdir'} ) {
+        confess("Did a telldir on an empty dir. This shouldn't have been able to have been opened!");
+    }
+
+    if ( !defined $obj->{'tell'} ) {
+        confess("telldir called on a closed dirhandle");
+    }
+
+    return $obj->{'tell'};
+}
+
+sub __rewinddir (*) {
+
+    # Upgrade but ignore bareword indicator
+    ( undef, @_ ) = _upgrade_barewords(@_) if defined $_[0] && !ref $_[9];
+
+    my ($fh) = @_;
+    my $mocked_dir = _get_file_object($fh);
+
+    if ( !$mocked_dir || !$mocked_dir->{'obj'} ) {
+        _real_file_access_hook( 'rewinddir', \@_ );
+        goto \&CORE::rewinddir if _goto_is_available();
+        return CORE::rewinddir( $_[0] );
+    }
+
+    my $obj = $mocked_dir->{'obj'};
+
+    if ( !defined $obj->{'files_in_readdir'} ) {
+        confess("Did a rewinddir on an empty dir. This shouldn't have been able to have been opened!");
+    }
+
+    if ( !defined $obj->{'tell'} ) {
+        confess("rewinddir called on a closed dirhandle");
+    }
+
+    $obj->{'tell'} = 0;
+    return 1;
+}
+
+sub __seekdir (*$) {
+
+    # Upgrade but ignore bareword indicator
+    ( undef, @_ ) = _upgrade_barewords(@_) if defined $_[0] && !ref $_[9];
+
+    my ( $fh, $goto ) = @_;
+    my $mocked_dir = _get_file_object($fh);
+
+    if ( !$mocked_dir || !$mocked_dir->{'obj'} ) {
+        _real_file_access_hook( 'seekdir', \@_ );
+        goto \&CORE::seekdir if _goto_is_available();
+        return CORE::seekdir( $fh, $goto );
+    }
+
+    my $obj = $mocked_dir->{'obj'};
+
+    if ( !defined $obj->{'files_in_readdir'} ) {
+        confess("Did a seekdir on an empty dir. This shouldn't have been able to have been opened!");
+    }
+
+    if ( !defined $obj->{'tell'} ) {
+        confess("seekdir called on a closed dirhandle");
+    }
+
+    return $obj->{'tell'} = $goto;
+}
+
+sub __closedir (*) {
+
+    # Upgrade but ignore bareword indicator
+    ( undef, @_ ) = _upgrade_barewords(@_) if defined $_[0] && !ref $_[9];
+
+    my ($fh) = @_;
+    my $mocked_dir = _get_file_object($fh);
+
+    if ( !$mocked_dir || !$mocked_dir->{'obj'} ) {
+        _real_file_access_hook( 'closedir', \@_ );
+        goto \&CORE::closedir if _goto_is_available();
+        return CORE::closedir($fh);
+    }
+
+    delete $mocked_dir->{'obj'};
+    delete $mocked_dir->{'fh'};
+
+    return 1;
+}
+
+sub __unlink (@) {
+    my @files_to_unlink = @_;
+    my $files_deleted   = 0;
+
+    foreach my $file (@files_to_unlink) {
+        my $mock = _get_file_object($file);
+
+        if ( !$mock ) {
+            _real_file_access_hook( "unlink", [$file] );
+            $files_deleted += CORE::unlink($file);
+        }
+        else {
+            $files_deleted += $mock->unlink;
+        }
+    }
+
+    return $files_deleted;
+
+}
+
+sub __readlink (_) {
+    my ($file) = @_;
+
+    if ( !defined $file ) {
+        carp('Use of uninitialized value in readlink');
+        if ( $^O eq 'freebsd' ) {
+            $! = EINVAL;
+        }
+        else {
+            $! = ENOENT;
+        }
+        return;
+    }
+
+    my $mock_object = _get_file_object($file);
+    if ( !$mock_object ) {
+        _real_file_access_hook( 'readlink', \@_ );
+        goto \&CORE::readlink if _goto_is_available();
+        return CORE::readlink($file);
+    }
+
+    if ( !$mock_object->is_link ) {
+        $! = EINVAL;
+        return;
+    }
+    return $mock_object->readlink;
+}
+
+# $file is always passed because of the prototype.
+sub __mkdir (_;$) {
+    my ( $file, $perms ) = @_;
+
+    $perms = ( $perms // 0777 ) & S_IFPERMS;
+
+    if ( !defined $file ) {
+
+        # mkdir warns if $file is undef
+        carp("Use of uninitialized value in mkdir");
+        $! = ENOENT;
+        return 0;
+    }
+
+    my $mock = _get_file_object($file);
+
+    if ( !$mock ) {
+        _real_file_access_hook( 'mkdir', \@_ );
+        goto \&CORE::mkdir if _goto_is_available();
+        return CORE::mkdir(@_);
+    }
+
+    # File or directory, this exists and should fail
+    if ( $mock->exists ) {
+        $! = EEXIST;
+        return 0;
+    }
+
+    # If the mock was a symlink or a file, we've just made it a dir.
+    $mock->{'mode'} = ( $perms ^ umask ) | S_IFDIR;
+    delete $mock->{'readlink'};
+
+    # This should now start returning content
+    $mock->{'has_content'} = 1;
+
+    return 1;
+}
+
+# $file is always passed because of the prototype.
+sub __rmdir (_) {
+    my ($file) = @_;
+
+    # technically this is a minor variation from core. We don't seem to be able to
+    # detect when they didn't pass an arg like core can.
+    # Core sometimes warns: 'Use of uninitialized value $_ in rmdir'
+    if ( !defined $file ) {
+        carp('Use of uninitialized value in rmdir');
+        return 0;
+    }
+
+    my $mock = _get_file_object($file);
+
+    if ( !$mock ) {
+        _real_file_access_hook( 'rmdir', \@_ );
+        goto \&CORE::rmdir if _goto_is_available();
+        return CORE::rmdir($file);
+    }
+
+    # Because we've mocked this to be a file and it doesn't exist we are going to die here.
+    # The tester needs to fix this presumably.
+    if ( $mock->exists ) {
+        if ( $mock->is_file ) {
+            $! = ENOTDIR;
+            return 0;
+        }
+
+        if ( $mock->is_link ) {
+            $! = ENOTDIR;
+            return 0;
+        }
+    }
+
+    if ( !$mock->exists ) {
+        $! = ENOENT;
+        return 0;
+    }
+
+    if ( _files_in_dir($file) ) {
+        $! = 39;
+        return 0;
+    }
+
+    $mock->{'has_content'} = undef;
+    return 1;
+}
+
+sub __chown (@) {
+    my ( $uid, $gid, @files ) = @_;
+
+    $^O eq 'MSWin32'
+      and return 0;    # does nothing on Windows
+
+    # Not an error, report we changed zero files
+    @files
+      or return 0;
+
+    my %mocked_files   = map +( $_ => _get_file_object($_) ), @files;
+    my @unmocked_files = grep !$mocked_files{$_}, @files;
+    my @mocked_files   = map ref $_ ? $_->{'path'} : (), values %mocked_files;
+
+    # The idea is that if some are mocked and some are not,
+    # it's probably a mistake
+    if ( @mocked_files && @mocked_files != @files ) {
+        confess(
+            sprintf 'You called chown() on a mix of mocked (%s) and unmocked files (%s) ' . ' - this is very likely a bug on your side',
+            ( join ', ', @mocked_files ),
+            ( join ', ', @unmocked_files ),
+        );
+    }
+
+    # -1 means "keep as is"
+    $uid == -1 and $uid = $>;
+    $gid == -1 and $gid = $);
+
+    my $is_root     = $> == 0 || $) =~ /( ^ | \s ) 0 ( \s | $)/xms;
+    my $is_in_group = grep /(^ | \s ) \Q$gid\E ( \s | $ )/xms, $);
+
+    # TODO: Perl has an odd behavior that -1, -1 on a file that isn't owned by you still works
+    # Not sure how to write a test for it though...
+
+    my $set_error;
+    my $num_changed = 0;
+    foreach my $file (@files) {
+        my $mock = $mocked_files{$file};
+
+        # If this file is not mocked, none of the files are
+        # which means we can send them all and let the CORE function handle it
+        if ( !$mock ) {
+            _real_file_access_hook( 'chown', \@_ );
+            goto \&CORE::chown if _goto_is_available();
+            return CORE::chown(@files);
+        }
+
+        # Even if you're root, nonexistent file is nonexistent
+        if ( !$mock->exists() ) {
+
+            # Only set the error once
+            $set_error
+              or $! = ENOENT;
+
+            next;
+        }
+
+        # root can do anything, but you can't
+        # and if we are here, no point in keep trying
+        if ( !$is_root ) {
+            if ( $> != $uid || !$is_in_group ) {
+                $set_error
+                  or $! = EPERM;
+
+                last;
+            }
+        }
+
+        $mock->{'uid'} = $uid;
+        $mock->{'gid'} = $gid;
+
+        $num_changed++;
+    }
+
+    return $num_changed;
+}
+
+sub __chmod (@) {
+    my ( $mode, @files ) = @_;
+
+    # Not an error, report we changed zero files
+    @files
+      or return 0;
+
+    # Grab numbers - nothing means "0" (which is the behavior of CORE::chmod)
+    # (This will issue a warning, that's also the expected behavior)
+    {
+        no warnings;
+        $mode =~ /^[0-9]+/xms
+          or warn "Argument \"$mode\" isn't numeric in chmod";
+        $mode = int $mode;
+    }
+
+    my %mocked_files   = map +( $_ => _get_file_object($_) ), @files;
+    my @unmocked_files = grep !$mocked_files{$_}, @files;
+    my @mocked_files   = map ref $_ ? $_->{'path'} : (), values %mocked_files;
+
+    # The idea is that if some are mocked and some are not,
+    # it's probably a mistake
+    if ( @mocked_files && @mocked_files != @files ) {
+        confess(
+            sprintf 'You called chmod() on a mix of mocked (%s) and unmocked files (%s) ' . ' - this is very likely a bug on your side',
+            ( join ', ', @mocked_files ),
+            ( join ', ', @unmocked_files ),
+        );
+    }
+
+    my $num_changed = 0;
+    foreach my $file (@files) {
+        my $mock = $mocked_files{$file};
+
+        if ( !$mock ) {
+            _real_file_access_hook( 'chmod', \@_ );
+            goto \&CORE::chmod if _goto_is_available();
+            return CORE::chmod(@files);
+        }
+
+        # chmod is less specific in such errors
+        # chmod $mode, '/foo/' still yields ENOENT
+        if ( !$mock->exists() ) {
+            $! = ENOENT;
+            next;
+        }
+
+        $mock->{'mode'} = ( $mock->{'mode'} & S_IFMT ) + $mode;
+
+        $num_changed++;
+    }
+
+    return $num_changed;
+}
+
 BEGIN {
-    my $_handle_glob = sub {
-        my $spec = shift;
-
-        # Text::Glob does not understand multiple patterns
-        my @patterns = split /\s+/xms, $spec;
-
-        # Text::Glob does not accept directories in globbing
-        # But csh (and thus, Perl) does, so we need to add them
-        my @mocked_files = grep $files_being_mocked{$_}->exists(), keys %files_being_mocked;
-        @mocked_files = map /^(.+)\/[^\/]+$/xms ? ( $_, $1 ) : ($_), @mocked_files;
-
-        # Might as well be consistent
-        @mocked_files = sort @mocked_files;
-
-        my @results = map Text::Glob::match_glob( $_, @mocked_files ), @patterns;
-        return @results;
-    };
-
     *CORE::GLOBAL::glob = !$^V || $^V lt 5.18.0
       ? sub {
         pop;
-        goto &$_handle_glob;
+        goto &__glob;
       }
-      : sub (_;) { goto &$_handle_glob; };
-
-    *CORE::GLOBAL::open = sub(*;$@) {
-        my $likely_bareword;
-        my $arg0;
-        if ( defined $_[0] && !ref $_[0] ) {
-
-            # We need to remember the first arg to override the typeglob for barewords
-            $arg0 = $_[0];
-            ( $likely_bareword, @_ ) = _upgrade_barewords(@_);
-        }
-
-        # We need to take out the mode and file
-        # but we must keep using $_[0] for the file-handle to update the caller
-        my ( undef, $mode, $file ) = @_;
-        my $arg_count = @_;
-
-        # Normalize two-arg to three-arg
-        if ( $arg_count == 2 ) {
-
-            # The order here matters, so '>>' won't turn into '>'
-            if ( $_[1] =~ /^ ( >> | [+]?> | [+]?< ) (.+) $/xms ) {
-                $mode = $1;
-                $file = $2;
-            }
-            elsif ( $_[1] =~ /^[\.\/\\\w\d\-]+$/xms ) {
-                $mode = '<';
-                $file = $_[1];
-            }
-            elsif ( $_[1] =~ /^\|/xms ) {
-                $mode = '|-';
-                $file = $_[1];
-            }
-            elsif ( $_[1] =~ /\|$/xms ) {
-                $mode = '-|';
-                $file = $_[1];
-            }
-            else {
-                die "Unsupported two-way open: $_[1]\n";
-            }
-
-            # We have all args
-            $arg_count++;
-        }
-
-        # We're not supporting 1 arg opens yet
-        if ( $arg_count != 3 ) {
-            _real_file_access_hook( "open", \@_ );
-            goto \&CORE::open if _goto_is_available();
-            if ( @_ == 1 ) {
-                return CORE::open( $_[0] );
-            }
-            elsif ( @_ == 2 ) {
-                return CORE::open( $_[0], $_[1] );
-            }
-            elsif ( @_ >= 3 ) {
-                return CORE::open( $_[0], $_[1], @_[ 2 .. $#_ ] );
-            }
-        }
-
-        # Allows for scalar file handles.
-        if ( ref $file && ref $file eq 'SCALAR' ) {
-            goto \&CORE::open if _goto_is_available();
-            return CORE::open( $_[0], $mode, $file );
-        }
-
-        my $abs_path = _find_file_or_fh( $file, 1 );    # Follow the link.
-        confess() if !$abs_path && $mode ne '|-' && $mode ne '-|';
-        confess() if $abs_path eq BROKEN_SYMLINK;
-        my $mock_file = _get_file_object($abs_path);
-
-        # For now we're going to just strip off the binmode and hope for the best.
-        $mode =~ s/(:.+$)//;
-        my $encoding_mode = $1;
-
-        # TODO: We don't yet support |- or -|
-        # TODO: We don't yet support modes outside of > < >> +< +> +>>
-        # We just pass through to open if we're not mocking the file right now.
-        if (   ( $mode eq '|-' || $mode eq '-|' )
-            or !grep { $_ eq $mode } qw/> < >> +< +> +>>/
-            or !defined $mock_file ) {
-            _real_file_access_hook( "open", \@_ );
-            goto \&CORE::open if _goto_is_available();
-            if ( @_ == 1 ) {
-                return CORE::open( $_[0] );
-            }
-            elsif ( @_ == 2 ) {
-                return CORE::open( $_[0], $_[1] );
-            }
-            elsif ( @_ >= 3 ) {
-                return CORE::open( $_[0], $_[1], @_[ 2 .. $#_ ] );
-            }
-        }
-
-        # At this point we're mocking the file. Let's do it!
-
-        # If contents is undef, we act like the file isn't there.
-        if ( !defined $mock_file->contents() && grep { $mode eq $_ } qw/< +</ ) {
-            $! = ENOENT;
-            return;
-        }
-
-        my $rw = '';
-        $rw .= 'r' if grep { $_ eq $mode } qw/+< +> +>> </;
-        $rw .= 'w' if grep { $_ eq $mode } qw/+< +> +>> > >>/;
-
-        my $filefh = IO::File->new;
-        tie *{$filefh}, 'Test::MockFile::FileHandle', $abs_path, $rw;
-
-        if ($likely_bareword) {
-            my $caller = caller();
-            no strict;
-            *{"${caller}::$arg0"} = $filefh;
-            @_ = ( $filefh, $_[1] ? @_[ 1 .. $#_ ] : () );
-        }
-        else {
-            $_[0] = $filefh;
-        }
-
-        # This is how we tell if the file is open by something.
-
-        $mock_file->{'fh'} = $_[0];
-        Scalar::Util::weaken( $mock_file->{'fh'} ) if ref $_[0];    # Will this make it go out of scope?
-
-        # Fix tell based on open options.
-        if ( $mode eq '>>' or $mode eq '+>>' ) {
-            $mock_file->{'contents'} //= '';
-            seek $_[0], length( $mock_file->{'contents'} ), 0;
-        }
-        elsif ( $mode eq '>' or $mode eq '+>' ) {
-            $mock_file->{'contents'} = '';
-        }
-
-        return 1;
-    };
-
-    # sysopen FILEHANDLE, FILENAME, MODE, MASK
-    # sysopen FILEHANDLE, FILENAME, MODE
-
-    # We curently support:
-    # 1 - O_RDONLY - Read only.
-    # 2 - O_WRONLY - Write only.
-    # 3 - O_RDWR - Read and write.
-    # 6 - O_APPEND - Append to the file.
-    # 7 - O_TRUNC - Truncate the file.
-    # 5 - O_EXCL - Fail if the file already exists.
-    # 4 - O_CREAT - Create the file if it doesn't exist.
-    # 8 - O_NOFOLLOW - Fail if the last path component is a symbolic link.
-
-    *CORE::GLOBAL::sysopen = sub(*$$;$) {
-        my $mock_file = _get_file_object( $_[1] );
-
-        if ( !$mock_file ) {
-            _real_file_access_hook( "sysopen", \@_ );
-            goto \&CORE::sysopen if _goto_is_available();
-            return CORE::sysopen( $_[0], $_[1], @_[ 2 .. $#_ ] );
-        }
-
-        my $sysopen_mode = $_[2];
-
-        # Not supported by my linux vendor: O_EXLOCK | O_SHLOCK
-        if ( ( $sysopen_mode & SUPPORTED_SYSOPEN_MODES ) != $sysopen_mode ) {
-            confess( sprintf( "Sorry, can't open %s with 0x%x permissions. Some of your permissions are not yet supported by %s", $_[1], $sysopen_mode, __PACKAGE__ ) );
-        }
-
-        # O_NOFOLLOW
-        if ( ( $sysopen_mode & O_NOFOLLOW ) == O_NOFOLLOW && $mock_file->is_link ) {
-            $! = 40;
-            return undef;
-        }
-
-        # O_EXCL
-        if ( $sysopen_mode & O_EXCL && $sysopen_mode & O_CREAT && defined $mock_file->{'contents'} ) {
-            $! = EEXIST;
-            return;
-        }
-
-        # O_CREAT
-        if ( $sysopen_mode & O_CREAT && !defined $mock_file->{'contents'} ) {
-            $mock_file->{'contents'} = '';
-        }
-
-        # O_TRUNC
-        if ( $sysopen_mode & O_TRUNC && defined $mock_file->{'contents'} ) {
-            $mock_file->{'contents'} = '';
-
-        }
-
-        my $rd_wr_mode = $sysopen_mode & 3;
-        my $rw =
-            $rd_wr_mode == O_RDONLY ? 'r'
-          : $rd_wr_mode == O_WRONLY ? 'w'
-          : $rd_wr_mode == O_RDWR   ? 'rw'
-          :                           confess("Unexpected sysopen read/write mode ($rd_wr_mode)");    # O_WRONLY| O_RDWR mode makes no sense and we should die.
-
-        # If contents is undef, we act like the file isn't there.
-        if ( !defined $mock_file->{'contents'} && $rd_wr_mode == O_RDONLY ) {
-            $! = ENOENT;
-            return;
-        }
-
-        my $abs_path = $mock_file->{'path'};
-
-        $_[0] = IO::File->new;
-        tie *{ $_[0] }, 'Test::MockFile::FileHandle', $abs_path, $rw;
-
-        # This is how we tell if the file is open by something.
-        $files_being_mocked{$abs_path}->{'fh'} = $_[0];
-        Scalar::Util::weaken( $files_being_mocked{$abs_path}->{'fh'} ) if ref $_[0];    # Will this make it go out of scope?
-
-        # O_TRUNC
-        if ( $sysopen_mode & O_TRUNC ) {
-            $mock_file->{'contents'} = '';
-        }
-
-        # O_APPEND
-        if ( $sysopen_mode & O_APPEND ) {
-            seek $_[0], length $mock_file->{'contents'}, 0;
-        }
-
-        return 1;
-    };
-
-    *CORE::GLOBAL::opendir = sub(*$) {
-
-        # Upgrade but ignore bareword indicator
-        ( undef, @_ ) = _upgrade_barewords(@_) if defined $_[0] && !ref $_[9];
-
-        my $mock_dir = _get_file_object( $_[1] );
-
-        # 1 arg Opendir doesn't work??
-        if ( scalar @_ != 2 or !defined $_[1] ) {
-            _real_file_access_hook( "opendir", \@_ );
-
-            goto \&CORE::opendir if _goto_is_available();
-
-            return CORE::opendir( $_[0], @_[ 1 .. $#_ ] );
-        }
-
-        if ( !$mock_dir ) {
-            _real_file_access_hook( "opendir", \@_ );
-            goto \&CORE::opendir if _goto_is_available();
-            return CORE::opendir( $_[0], $_[1] );
-        }
-
-        if ( !defined $mock_dir->contents ) {
-            $! = ENOENT;
-            return undef;
-        }
-
-        if ( !( $mock_dir->{'mode'} & S_IFDIR ) ) {
-            $! = ENOTDIR;
-            return undef;
-        }
-
-        if ( !defined $_[0] ) {
-            $_[0] = Symbol::gensym;
-        }
-        elsif ( ref $_[0] ) {
-            no strict 'refs';
-            *{ $_[0] } = Symbol::geniosym;
-        }
-
-        # This is how we tell if the file is open by something.
-        my $abs_path = $mock_dir->{'path'};
-        $mock_dir->{'obj'} = Test::MockFile::DirHandle->new( $abs_path, $mock_dir->contents() );
-        $mock_dir->{'fh'}  = "$_[0]";
-
-        return 1;
-
-    };
-
-    *CORE::GLOBAL::readdir = sub(*) {
-
-        # Upgrade but ignore bareword indicator
-        ( undef, @_ ) = _upgrade_barewords(@_) if defined $_[0] && !ref $_[9];
-
-        my $mocked_dir = _get_file_object( $_[0] );
-
-        if ( !$mocked_dir ) {
-            _real_file_access_hook( 'readdir', \@_ );
-            goto \&CORE::readdir if _goto_is_available();
-            return CORE::readdir( $_[0] );
-        }
-
-        my $obj = $mocked_dir->{'obj'};
-        if ( !$obj ) {
-            confess("Read on a closed handle");
-        }
-
-        if ( !defined $obj->{'files_in_readdir'} ) {
-            confess("Did a readdir on an empty dir. This shouldn't have been able to have been opened!");
-        }
-
-        if ( !defined $obj->{'tell'} ) {
-            confess("readdir called on a closed dirhandle");
-        }
-
-        # At EOF for the dir handle.
-        return undef if $obj->{'tell'} > $#{ $obj->{'files_in_readdir'} };
-
-        if (wantarray) {
-            my @return;
-            foreach my $pos ( $obj->{'tell'} .. $#{ $obj->{'files_in_readdir'} } ) {
-                push @return, $obj->{'files_in_readdir'}->[$pos];
-            }
-            $obj->{'tell'} = $#{ $obj->{'files_in_readdir'} } + 1;
-            return @return;
-        }
-
-        return $obj->{'files_in_readdir'}->[ $obj->{'tell'}++ ];
-    };
-
-    *CORE::GLOBAL::telldir = sub(*) {
-
-        # Upgrade but ignore bareword indicator
-        ( undef, @_ ) = _upgrade_barewords(@_) if defined $_[0] && !ref $_[9];
-
-        my ($fh) = @_;
-        my $mocked_dir = _get_file_object($fh);
-
-        if ( !$mocked_dir || !$mocked_dir->{'obj'} ) {
-            _real_file_access_hook( 'telldir', \@_ );
-            goto \&CORE::telldir if _goto_is_available();
-            return CORE::telldir($fh);
-        }
-
-        my $obj = $mocked_dir->{'obj'};
-
-        if ( !defined $obj->{'files_in_readdir'} ) {
-            confess("Did a telldir on an empty dir. This shouldn't have been able to have been opened!");
-        }
-
-        if ( !defined $obj->{'tell'} ) {
-            confess("telldir called on a closed dirhandle");
-        }
-
-        return $obj->{'tell'};
-    };
-
-    *CORE::GLOBAL::rewinddir = sub(*) {
-
-        # Upgrade but ignore bareword indicator
-        ( undef, @_ ) = _upgrade_barewords(@_) if defined $_[0] && !ref $_[9];
-
-        my ($fh) = @_;
-        my $mocked_dir = _get_file_object($fh);
-
-        if ( !$mocked_dir || !$mocked_dir->{'obj'} ) {
-            _real_file_access_hook( 'rewinddir', \@_ );
-            goto \&CORE::rewinddir if _goto_is_available();
-            return CORE::rewinddir( $_[0] );
-        }
-
-        my $obj = $mocked_dir->{'obj'};
-
-        if ( !defined $obj->{'files_in_readdir'} ) {
-            confess("Did a rewinddir on an empty dir. This shouldn't have been able to have been opened!");
-        }
-
-        if ( !defined $obj->{'tell'} ) {
-            confess("rewinddir called on a closed dirhandle");
-        }
-
-        $obj->{'tell'} = 0;
-        return 1;
-    };
-
-    *CORE::GLOBAL::seekdir = sub(*$) {
-
-        # Upgrade but ignore bareword indicator
-        ( undef, @_ ) = _upgrade_barewords(@_) if defined $_[0] && !ref $_[9];
-
-        my ( $fh, $goto ) = @_;
-        my $mocked_dir = _get_file_object($fh);
-
-        if ( !$mocked_dir || !$mocked_dir->{'obj'} ) {
-            _real_file_access_hook( 'seekdir', \@_ );
-            goto \&CORE::seekdir if _goto_is_available();
-            return CORE::seekdir( $fh, $goto );
-        }
-
-        my $obj = $mocked_dir->{'obj'};
-
-        if ( !defined $obj->{'files_in_readdir'} ) {
-            confess("Did a seekdir on an empty dir. This shouldn't have been able to have been opened!");
-        }
-
-        if ( !defined $obj->{'tell'} ) {
-            confess("seekdir called on a closed dirhandle");
-        }
-
-        return $obj->{'tell'} = $goto;
-    };
-
-    *CORE::GLOBAL::closedir = sub(*) {
-
-        # Upgrade but ignore bareword indicator
-        ( undef, @_ ) = _upgrade_barewords(@_) if defined $_[0] && !ref $_[9];
-
-        my ($fh) = @_;
-        my $mocked_dir = _get_file_object($fh);
-
-        if ( !$mocked_dir || !$mocked_dir->{'obj'} ) {
-            _real_file_access_hook( 'closedir', \@_ );
-            goto \&CORE::closedir if _goto_is_available();
-            return CORE::closedir($fh);
-        }
-
-        delete $mocked_dir->{'obj'};
-        delete $mocked_dir->{'fh'};
-
-        return 1;
-    };
-
-    *CORE::GLOBAL::unlink = sub(@) {
-        my @files_to_unlink = @_;
-        my $files_deleted   = 0;
-
-        foreach my $file (@files_to_unlink) {
-            my $mock = _get_file_object($file);
-
-            if ( !$mock ) {
-                _real_file_access_hook( "unlink", [$file] );
-                $files_deleted += CORE::unlink($file);
-            }
-            else {
-                $files_deleted += $mock->unlink;
-            }
-        }
-
-        return $files_deleted;
-
-    };
-
-    *CORE::GLOBAL::readlink = sub(_) {
-        my ($file) = @_;
-
-        if ( !defined $file ) {
-            carp('Use of uninitialized value in readlink');
-            if ( $^O eq 'freebsd' ) {
-                $! = EINVAL;
-            }
-            else {
-                $! = ENOENT;
-            }
-            return;
-        }
-
-        my $mock_object = _get_file_object($file);
-        if ( !$mock_object ) {
-            _real_file_access_hook( 'readlink', \@_ );
-            goto \&CORE::readlink if _goto_is_available();
-            return CORE::readlink($file);
-        }
-
-        if ( !$mock_object->is_link ) {
-            $! = EINVAL;
-            return;
-        }
-        return $mock_object->readlink;
-    };
-
-    # $file is always passed because of the prototype.
-    *CORE::GLOBAL::mkdir = sub(_;$) {
-        my ( $file, $perms ) = @_;
-
-        $perms = ( $perms // 0777 ) & S_IFPERMS;
-
-        if ( !defined $file ) {
-
-            # mkdir warns if $file is undef
-            carp("Use of uninitialized value in mkdir");
-            $! = ENOENT;
-            return 0;
-        }
-
-        my $mock = _get_file_object($file);
-
-        if ( !$mock ) {
-            _real_file_access_hook( 'mkdir', \@_ );
-            goto \&CORE::mkdir if _goto_is_available();
-            return CORE::mkdir(@_);
-        }
-
-        # File or directory, this exists and should fail
-        if ( $mock->exists ) {
-            $! = EEXIST;
-            return 0;
-        }
-
-        # If the mock was a symlink or a file, we've just made it a dir.
-        $mock->{'mode'} = ( $perms ^ umask ) | S_IFDIR;
-        delete $mock->{'readlink'};
-
-        # This should now start returning content
-        $mock->{'has_content'} = 1;
-
-        return 1;
-    };
-
-    # $file is always passed because of the prototype.
-    *CORE::GLOBAL::rmdir = sub(_) {
-        my ($file) = @_;
-
-        # technically this is a minor variation from core. We don't seem to be able to
-        # detect when they didn't pass an arg like core can.
-        # Core sometimes warns: 'Use of uninitialized value $_ in rmdir'
-        if ( !defined $file ) {
-            carp('Use of uninitialized value in rmdir');
-            return 0;
-        }
-
-        my $mock = _get_file_object($file);
-
-        if ( !$mock ) {
-            _real_file_access_hook( 'rmdir', \@_ );
-            goto \&CORE::rmdir if _goto_is_available();
-            return CORE::rmdir($file);
-        }
-
-        # Because we've mocked this to be a file and it doesn't exist we are going to die here.
-        # The tester needs to fix this presumably.
-        if ( $mock->exists ) {
-            if ( $mock->is_file ) {
-                $! = ENOTDIR;
-                return 0;
-            }
-
-            if ( $mock->is_link ) {
-                $! = ENOTDIR;
-                return 0;
-            }
-        }
-
-        if ( !$mock->exists ) {
-            $! = ENOENT;
-            return 0;
-        }
-
-        if ( _files_in_dir($file) ) {
-            $! = 39;
-            return 0;
-        }
-
-        $mock->{'has_content'} = undef;
-        return 1;
-    };
-
-    *CORE::GLOBAL::chown = sub(@) {
-        my ( $uid, $gid, @files ) = @_;
-
-        $^O eq 'MSWin32'
-          and return 0;    # does nothing on Windows
-
-        # Not an error, report we changed zero files
-        @files
-          or return 0;
-
-        my %mocked_files   = map +( $_ => _get_file_object($_) ), @files;
-        my @unmocked_files = grep !$mocked_files{$_}, @files;
-        my @mocked_files   = map ref $_ ? $_->{'path'} : (), values %mocked_files;
-
-        # The idea is that if some are mocked and some are not,
-        # it's probably a mistake
-        if ( @mocked_files && @mocked_files != @files ) {
-            confess(
-                sprintf 'You called chown() on a mix of mocked (%s) and unmocked files (%s) ' . ' - this is very likely a bug on your side',
-                ( join ', ', @mocked_files ),
-                ( join ', ', @unmocked_files ),
-            );
-        }
-
-        # -1 means "keep as is"
-        $uid == -1 and $uid = $>;
-        $gid == -1 and $gid = $);
-
-        my $is_root     = $> == 0 || $) =~ /( ^ | \s ) 0 ( \s | $)/xms;
-        my $is_in_group = grep /(^ | \s ) \Q$gid\E ( \s | $ )/xms, $);
-
-        # TODO: Perl has an odd behavior that -1, -1 on a file that isn't owned by you still works
-        # Not sure how to write a test for it though...
-
-        my $set_error;
-        my $num_changed = 0;
-        foreach my $file (@files) {
-            my $mock = $mocked_files{$file};
-
-            # If this file is not mocked, none of the files are
-            # which means we can send them all and let the CORE function handle it
-            if ( !$mock ) {
-                _real_file_access_hook( 'chown', \@_ );
-                goto \&CORE::chown if _goto_is_available();
-                return CORE::chown(@files);
-            }
-
-            # Even if you're root, nonexistent file is nonexistent
-            if ( !$mock->exists() ) {
-
-                # Only set the error once
-                $set_error
-                  or $! = ENOENT;
-
-                next;
-            }
-
-            # root can do anything, but you can't
-            # and if we are here, no point in keep trying
-            if ( !$is_root ) {
-                if ( $> != $uid || !$is_in_group ) {
-                    $set_error
-                      or $! = EPERM;
-
-                    last;
-                }
-            }
-
-            $mock->{'uid'} = $uid;
-            $mock->{'gid'} = $gid;
-
-            $num_changed++;
-        }
-
-        return $num_changed;
-    };
-
-    *CORE::GLOBAL::chmod = sub(@) {
-        my ( $mode, @files ) = @_;
-
-        # Not an error, report we changed zero files
-        @files
-          or return 0;
-
-        # Grab numbers - nothing means "0" (which is the behavior of CORE::chmod)
-        # (This will issue a warning, that's also the expected behavior)
-        {
-            no warnings;
-            $mode =~ /^[0-9]+/xms
-              or warn "Argument \"$mode\" isn't numeric in chmod";
-            $mode = int $mode;
-        }
-
-        my %mocked_files   = map +( $_ => _get_file_object($_) ), @files;
-        my @unmocked_files = grep !$mocked_files{$_}, @files;
-        my @mocked_files   = map ref $_ ? $_->{'path'} : (), values %mocked_files;
-
-        # The idea is that if some are mocked and some are not,
-        # it's probably a mistake
-        if ( @mocked_files && @mocked_files != @files ) {
-            confess(
-                sprintf 'You called chmod() on a mix of mocked (%s) and unmocked files (%s) ' . ' - this is very likely a bug on your side',
-                ( join ', ', @mocked_files ),
-                ( join ', ', @unmocked_files ),
-            );
-        }
-
-        my $num_changed = 0;
-        foreach my $file (@files) {
-            my $mock = $mocked_files{$file};
-
-            if ( !$mock ) {
-                _real_file_access_hook( 'chmod', \@_ );
-                goto \&CORE::chmod if _goto_is_available();
-                return CORE::chmod(@files);
-            }
-
-            # chmod is less specific in such errors
-            # chmod $mode, '/foo/' still yields ENOENT
-            if ( !$mock->exists() ) {
-                $! = ENOENT;
-                next;
-            }
-
-            $mock->{'mode'} = ( $mock->{'mode'} & S_IFMT ) + $mode;
-
-            $num_changed++;
-        }
-
-        return $num_changed;
-    };
+      : sub (_;) { goto &__glob; };
+
+    *CORE::GLOBAL::open      = \&__open;
+    *CORE::GLOBAL::sysopen   = \&__sysopen;
+    *CORE::GLOBAL::opendir   = \&__opendir;
+    *CORE::GLOBAL::readdir   = \&__readdir;
+    *CORE::GLOBAL::telldir   = \&__telldir;
+    *CORE::GLOBAL::rewinddir = \&__rewinddir;
+    *CORE::GLOBAL::seekdir   = \&__seekdir;
+    *CORE::GLOBAL::closedir  = \&__closedir;
+    *CORE::GLOBAL::unlink    = \&__unlink;
+    *CORE::GLOBAL::readlink  = \&__readlink;
+    *CORE::GLOBAL::mkdir     = \&__mkdir;
+
+    *CORE::GLOBAL::rmdir = \&__rmdir;
+    *CORE::GLOBAL::chown = \&__chown;
+    *CORE::GLOBAL::chmod = \&__chmod;
 }
 
 =head1 CAEATS AND LIMITATIONS

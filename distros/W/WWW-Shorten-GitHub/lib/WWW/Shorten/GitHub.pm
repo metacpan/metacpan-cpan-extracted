@@ -8,6 +8,10 @@ WWW::Shorten::GitHub - Shorten GitHub URLs using GitHub's URL shortener - git.io
 
 =head1 SYNOPSIS
 
+B<RETIRED>: This module is now defunct. Git.io have retired their service. If
+you use this module, you need to move to using another shortening module.
+
+
 This module provides a perl interface to GitHub's URL shortening service, git.io.
 
 It allows you to shorten any GitHub URL, and also retrieve the original URL from
@@ -29,12 +33,14 @@ use warnings;
 use base qw(WWW::Shorten::generic Exporter);
 
 our @EXPORT = qw(makeashorterlink makealongerlink);
-our $VERSION = '0.1.7';
+our $VERSION = '0.1.8';
 
 use Carp;
 use URI;
 
 sub makeashorterlink {
+    croak 'git.io have retired their service. Please use another shortner.';
+
     my $url = shift or croak 'No URL passed to makeashorterlink';
 
     my $host = URI->new($url)->host();
@@ -58,6 +64,8 @@ sub makeashorterlink {
 
 
 sub makealongerlink {
+    croak 'git.io have retired their service. Please use another shortner.';
+
     my $token = shift or croak 'No URL / Git.io token passed to makealongerlink';
 
     my $url = URI->new($token);

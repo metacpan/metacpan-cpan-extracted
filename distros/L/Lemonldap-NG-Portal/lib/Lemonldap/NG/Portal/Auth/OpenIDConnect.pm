@@ -6,11 +6,11 @@ use MIME::Base64 qw/encode_base64 decode_base64/;
 use Lemonldap::NG::Common::JWT qw(getJWTPayload);
 use Lemonldap::NG::Portal::Main::Constants qw(
   PE_OK
-  PE_ERROR
+  PE_OIDC_AUTH_ERROR
   PE_IDPCHOICE
 );
 
-our $VERSION = '2.0.12';
+our $VERSION = '2.0.14';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Auth
@@ -110,7 +110,7 @@ sub extractFormInfo {
             }
             else {
                 $self->userLogger->error("Unable to extract state $state");
-                return PE_ERROR;
+                return PE_OIDC_AUTH_ERROR;
             }
         }
 
@@ -118,11 +118,11 @@ sub extractFormInfo {
         my $op = $req->data->{_oidcOPCurrent};
 
         unless ($op) {
-            $self->userLogger->error("OpenID Provider not found");
-            return PE_ERROR;
+            $self->userLogger->error("OpenIDConnect Provider not found");
+            return PE_OIDC_AUTH_ERROR;
         }
 
-        $self->logger->debug("Using OpenID Provider $op");
+        $self->logger->debug("Using OpenIDConnect Provider $op");
 
         # Check error
         my $error = $req->param("error");
@@ -135,7 +135,7 @@ sub extractFormInfo {
               if $error_description;
             $self->logger->error("Error URI: $error_uri") if $error_uri;
 
-            return PE_ERROR;
+            return PE_OIDC_AUTH_ERROR;
         }
 
         # Get access_token and id_token
@@ -148,19 +148,19 @@ sub extractFormInfo {
         my $content =
           $self->getAuthorizationCodeAccessToken( $req, $op, $code,
             $auth_method );
-        return PE_ERROR unless $content;
+        return PE_OIDC_AUTH_ERROR unless $content;
 
         my $token_response = $self->decodeTokenResponse($content);
 
         unless ($token_response) {
             $self->logger->error("Could not decode Token Response: $content");
-            return PE_ERROR;
+            return PE_OIDC_AUTH_ERROR;
         }
 
         # Check validity of token response
         unless ( $self->checkTokenResponseValidity($token_response) ) {
             $self->logger->error("Token response is not valid");
-            return PE_ERROR;
+            return PE_OIDC_AUTH_ERROR;
         }
         else {
             $self->logger->debug("Token response is valid");
@@ -178,7 +178,7 @@ sub extractFormInfo {
         {
             unless ( $self->verifyJWTSignature( $id_token, $op ) ) {
                 $self->logger->error("JWT signature verification failed");
-                return PE_ERROR;
+                return PE_OIDC_AUTH_ERROR;
             }
             $self->logger->debug("JWT signature verified");
         }
@@ -190,7 +190,7 @@ sub extractFormInfo {
         unless ( defined $id_token_payload_hash ) {
             $self->logger->error(
                 "Could not decode incoming ID token: $id_token");
-            return PE_ERROR;
+            return PE_OIDC_AUTH_ERROR;
         }
 
         # Check validity of Access Token (optional)
@@ -199,7 +199,7 @@ sub extractFormInfo {
             unless ( $self->verifyHash( $access_token, $at_hash, $id_token ) ) {
                 $self->userLogger->error(
                     "Access token hash verification failed");
-                return PE_ERROR;
+                return PE_OIDC_AUTH_ERROR;
             }
             $self->logger->debug("Access token hash verified");
         }
@@ -211,7 +211,7 @@ sub extractFormInfo {
         # Check validity of ID Token
         unless ( $self->checkIDTokenValidity( $op, $id_token_payload_hash ) ) {
             $self->userLogger->error('ID Token not valid');
-            return PE_ERROR;
+            return PE_OIDC_AUTH_ERROR;
         }
         else {
             $self->logger->debug('ID Token is valid');

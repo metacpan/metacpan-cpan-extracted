@@ -50,7 +50,7 @@ init(
 Lemonldap::NG::Common::Session->new( {
         storageModule        => 'Apache::Session::File',
         storageModuleOptions => { Directory => 't/sessions' },
-        id =>
+        id                   =>
           'f0fd4e85000ce35d062f97f5b466fc00abc2fad0406e03e086605f929ec4a249',
         force => 1,
         kind  => 'OIDCI',
@@ -144,7 +144,7 @@ ok(
     $res = $client->_get(
         '/read',             undef,
         'test1.example.com', '',
-        VHOSTTYPE => 'OAuth2',
+        VHOSTTYPE          => 'OAuth2',
         HTTP_AUTHORIZATION =>
 'Bearer f0fd4e85000ce35d062f97f5b466fc00abc2fad0406e03e086605f929ec4a249',
     ),
@@ -165,7 +165,7 @@ ok(
     $res = $client->_get(
         '/write',            undef,
         'test1.example.com', '',
-        VHOSTTYPE => 'OAuth2',
+        VHOSTTYPE          => 'OAuth2',
         HTTP_AUTHORIZATION =>
 'Bearer f0fd4e85000ce35d062f97f5b466fc00abc2fad0406e03e086605f929ec4a249',
     ),
@@ -178,7 +178,7 @@ ok(
     $res = $client->_get(
         '/test',             undef,
         'test1.example.com', '',
-        VHOSTTYPE => 'OAuth2',
+        VHOSTTYPE          => 'OAuth2',
         HTTP_AUTHORIZATION =>
 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwianRpIjoiZjBmZDRlODUwMDBjZTM1ZDA2MmY5N2Y1YjQ2NmZjMDBhYmMyZmFkMDQwNmUwM2UwODY2MDVmOTI5ZWM0YTI0OSJ9.h0RDBLo5Vy8lqbltEP2L496KOzJLhLCIRZZmEqcPuN8',
     ),

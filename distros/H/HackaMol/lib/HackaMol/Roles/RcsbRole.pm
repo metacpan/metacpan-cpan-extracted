@@ -1,5 +1,5 @@
 package HackaMol::Roles::RcsbRole;
-$HackaMol::Roles::RcsbRole::VERSION = '0.051';
+$HackaMol::Roles::RcsbRole::VERSION = '0.053';
 # ABSTRACT: Read files with molecular information
 use Moose::Role;
 use MooseX::Types::Path::Tiny qw/Path Paths AbsPath AbsPaths/;
@@ -191,7 +191,7 @@ HackaMol::Roles::RcsbRole - Read files with molecular information
 
 =head1 VERSION
 
-version 0.051
+version 0.053
 
 =head1 AUTHOR
 

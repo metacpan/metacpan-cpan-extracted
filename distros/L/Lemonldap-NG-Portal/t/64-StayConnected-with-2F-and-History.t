@@ -198,7 +198,8 @@ JjTJecOOS+88fK8qL1TrYv5rapIdqUI7aQ==
     ok(
         $res = $client->_post(
             '/',
-            IO::String->new('user=dwho&password=dwho&stayconnected=1&checkLogins=1'),
+            IO::String->new(
+                'user=dwho&password=dwho&stayconnected=1&checkLogins=1'),
             length => 53
         ),
         'Auth query'
@@ -363,8 +364,8 @@ JjTJecOOS+88fK8qL1TrYv5rapIdqUI7aQ==
     # History is displayed
     ok(
         $res->[2]->[0] =~ qr%<img src="/static/common/logos/logo_llng_old.png"%,
-        'Found custom Main Logo'
-    ) or print STDERR Dumper( $res->[2]->[0] );
+        'Found custom main Logo'
+    ) or explain( $res->[2]->[0], 'Custom main logo' );
     ok( $res->[2]->[0] =~ /trspan="lastLogins"/, 'History found' )
       or explain( $res->[2]->[0], 'trspan="lastLogins"' );
     @c = ( $res->[2]->[0] =~ /<td>127.0.0.1/gs );
@@ -385,7 +386,7 @@ JjTJecOOS+88fK8qL1TrYv5rapIdqUI7aQ==
     );
     ok( $res->[2]->[0] =~ m%<span trspan="yourApps">Your applications</span>%,
         ' Apps menu found' )
-      or print STDERR Dumper( $res->[2]->[0] );
+      or explain( $res->[2]->[0], 'Apps menu' );
 
     $client->logout($id);
 

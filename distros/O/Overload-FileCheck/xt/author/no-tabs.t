@@ -18,6 +18,7 @@ my @files = (
     't/exporter.t',
     't/issue-0001.t',
     't/mock-all-file-checks.t',
+    't/mock-all-from-stat.t',
     't/mock-all-from-stat_advanced.t',
     't/mock-all-from-stat_basic.t',
     't/mock-lstat.t',

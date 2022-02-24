@@ -1,13 +1,13 @@
 use Test::More;
 use Crypt::OpenSSL::Verify;
 use Crypt::OpenSSL::X509;
-use File::Slurp qw(read_file);
+use File::Slurper qw(read_text);
 use Test::Exception;
 
 my $v = Crypt::OpenSSL::Verify->new('t/cacert.pem', { strict_certs => 0 });
 isa_ok($v, 'Crypt::OpenSSL::Verify');
 
-my $text = read_file('t/cert-expired.pem');
+my $text = read_text('t/cert-expired.pem');
 like($text, qr/BhMCQ0ExFjAUBgNVBAgMDU5ldyBC/);
 
 my $cert = Crypt::OpenSSL::X509->new_from_string($text);

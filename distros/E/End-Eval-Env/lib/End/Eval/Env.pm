@@ -1,12 +1,16 @@
+# minimalist
+## no critic: TestingAndDebugging::RequireUseStrict
 package End::Eval::Env;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-08-13'; # DATE
-our $DIST = 'End-Eval-Env'; # DIST
-our $VERSION = '0.003'; # VERSION
-
+##BEGIN ifunbuilt
 use strict;
 use warnings;
+##END ifunbuilt
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-02-05'; # DATE
+our $DIST = 'End-Eval-Env'; # DIST
+our $VERSION = '0.004'; # VERSION
 
 my @envs;
 sub import {
@@ -39,7 +43,7 @@ End::Eval::Env - Take code from environment variable(s), then eval them in END b
 
 =head1 VERSION
 
-This document describes version 0.003 of End::Eval::Env (from Perl distribution End-Eval-Env), released on 2021-08-13.
+This document describes version 0.004 of End::Eval::Env (from Perl distribution End-Eval-Env), released on 2022-02-05.
 
 =head1 SYNOPSIS
 
@@ -55,9 +59,40 @@ Customize the environment variables:
 
 =head1 DESCRIPTION
 
-This module allows you to specify code(s) in environment variable(s), basically
-for convenience in one-liners. If name(s) of environment variables are not
-specified, C<PERL_END_EVAL_ENV> is the default.
+This module allows you to evaluate Perl code(s) in environment variable(s), in
+the END block, basically for convenience in one-liners. If name(s) of
+environment variables are not specified, C<PERL_END_EVAL_ENV> is the default.
+
+The purpose of Begin::Eval::* and End::Eval::* modules is to allow you to
+evaluate some extra Perl code in addition to running your application,
+respectively at the beginning and at the end. The code can be supplied via one
+of these means: first command-line argument, environment variable(s). Previously
+there are Begin::Eval and End::Eval modules that accept code from import
+arguments, but the limited syntax provided by perl's C<-M> switch diminishes the
+usefulness of the modules. Thus the modules are removed from CPAN.
+
+Use cases include:
+
+=over
+
+=item * printing \%INC at the start of your program run
+
+ % perl -MBegin::Eval::FirstArg /path/to/your-script.pl 'print "$_\n" for sort keys %INC' script-arg1 ...
+ % PERL_BEGIN_EVAL_END='print "$_\n" for sort keys %INC' perl -MBegin::Eval::Env /path/to/your-script.pl script-arg1 ...
+
+To know which modules are loaded before your program runs.
+
+=item * printing \%INC at the beginning of your program run
+
+To know all the modules that are loaded during your program run.
+
+=item * loading a module at the beginning of your program, with some initialization
+
+=back
+
+Alternatives to using these modules include using "do":
+
+ % perl -E 'your-extra-code-before-running-program; do "/path/to/your/script.pl"; your-extra-code-after-running-program'
 
 =head1 ENVIRONMENT
 
@@ -75,18 +110,13 @@ Please visit the project's homepage at L<https://metacpan.org/release/End-Eval-E
 
 Source repository is at L<https://github.com/perlancar/perl-End-Eval-Env>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=End-Eval-Env>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
-Other C<End::Eval::*> (like L<End::Eval> and L<End::Eval::FirstArg>) and
-C<End::*> modules.
+Other C<End::Eval::*> modules, like L<End::Eval::FirstArg>.
+
+Other C<End::*> modules.
+
+Other C<Begin::Eval::*> modules.
 
 Other C<Devel::End::*> modules (but this namespace is deprecated in favor of
 C<End>).
@@ -114,9 +144,17 @@ beyond that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2021 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=End-Eval-Env>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

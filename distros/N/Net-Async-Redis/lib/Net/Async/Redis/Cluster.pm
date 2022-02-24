@@ -10,7 +10,7 @@ use parent qw(
     IO::Async::Notifier
 );
 
-our $VERSION = '3.020'; # VERSION
+our $VERSION = '3.021'; # VERSION
 
 =encoding utf8
 
@@ -172,15 +172,6 @@ async sub watch_keyspace {
 
     $combined->events->emit_from(@sub);
     return $combined;
-}
-
-# Helper for XGROUP, recent versions of the API split that out into
-# separate two-word commands in the manual so this is here to support
-# any legacy code which calls `->xgroup`.
-sub xgroup {
-    my ($self, $cmd, @args) = @_;
-    my $method = "xgroup_" . lc($cmd);
-    return $self->$method(@args);
 }
 
 =head1 METHODS - Internal

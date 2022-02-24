@@ -21,7 +21,8 @@ use DynaLoader;
 
 
 
-#line 69 "gsl_mroot.pd"
+#line 68 "gsl_mroot.pd"
+
 use strict;
 use warnings;
 
@@ -65,7 +66,7 @@ to the algorithms in the GSL library that do not use derivatives.
 
      return $y;
   }
-#line 69 "MROOT.pm"
+#line 70 "MROOT.pm"
 
 
 
@@ -79,7 +80,8 @@ to the algorithms in the GSL library that do not use derivatives.
 
 
 
-#line 1059 "../../../blib/lib/PDL/PP.pm"
+#line 1058 "../../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 gslmroot_fsolver
@@ -101,11 +103,12 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 105 "MROOT.pm"
+#line 107 "MROOT.pm"
 
 
 
-#line 1060 "../../../blib/lib/PDL/PP.pm"
+#line 1059 "../../../blib/lib/PDL/PP.pm"
+
 sub gslmroot_fsolver {
 	my ($x, $f_vect) = @_;
         my $opt = ref($_[-1]) eq 'HASH' ? pop @_ : {Method => 0, EpsAbs => 1e-3};
@@ -116,19 +119,21 @@ sub gslmroot_fsolver {
 	_gslmroot_fsolver_int($res, $$opt{'EpsAbs'}, $$opt{'Method'}, $f_vect);
 	return $res;
 }
-#line 120 "MROOT.pm"
+#line 123 "MROOT.pm"
 
 
 
-#line 1061 "../../../blib/lib/PDL/PP.pm"
+#line 1060 "../../../blib/lib/PDL/PP.pm"
+
 *gslmroot_fsolver = \&PDL::GSL::MROOT::gslmroot_fsolver;
-#line 126 "MROOT.pm"
+#line 130 "MROOT.pm"
 
 
 
 
 
-#line 115 "gsl_mroot.pd"
+#line 114 "gsl_mroot.pd"
+
 =head1 SEE ALSO
 
 L<PDL>
@@ -147,7 +152,7 @@ COPYING in the PDL distribution. If this file is separated from the
 PDL distribution, the copyright notice should be included in the file.
 
 =cut
-#line 151 "MROOT.pm"
+#line 156 "MROOT.pm"
 
 
 

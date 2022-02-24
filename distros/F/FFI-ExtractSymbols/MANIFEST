@@ -16,6 +16,7 @@ lib/FFI/ExtractSymbols/OpenBSD.pm
 lib/FFI/ExtractSymbols/PosixNm.pm
 lib/FFI/ExtractSymbols/Windows.pm
 maint/cip-before-install
+perlcriticrc
 t/00_diag.t
 t/01_use.t
 t/02_diag.t
@@ -23,6 +24,7 @@ t/extract_symbols.t
 t/ffi/foo.c
 t/prefix_none.t
 t/prefix_underscore.t
+xt/author/critic.t
 xt/author/eol.t
 xt/author/no_tabs.t
 xt/author/pod.t

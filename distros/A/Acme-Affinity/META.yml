@@ -20,15 +20,15 @@ meta-spec:
   version: '1.4'
 name: Acme-Affinity
 requires:
-  Math::BigInt: '1.74'
-  Math::BigRat: '0'
+  Math::BigInt: '1.999829'
+  Math::BigRat: '0.2620'
   Moo: '2'
   namespace::clean: '0'
   strictures: '2'
 resources:
   homepage: https://github.com/ology/Acme-Affinity
   repository: https://github.com/ology/Acme-Affinity.git
-version: '0.0112'
+version: '0.0113'
 x_Dist_Zilla:
   perl:
     version: '5.032001'

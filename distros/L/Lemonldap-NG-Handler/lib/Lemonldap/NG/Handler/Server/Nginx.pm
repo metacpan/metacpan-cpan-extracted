@@ -17,7 +17,7 @@ sub init {
 }
 
 ## @method void _run()
-# Return a subroutine that call _authAndTrace() and tranform redirection
+# Return a subroutine that call _logAuthTrace() and tranform redirection
 # response code from 302 to 401 (not authenticated) ones. This is required
 # because Nginx "auth_request" parameter does not accept it. The Nginx
 # configuration file should transform them back to 302 using:
@@ -31,7 +31,7 @@ sub _run {
     return sub {
         my $req = $_[0];
         $self->logger->debug('New request');
-        my $res = $self->_authAndTrace(
+        my $res = $self->_logAuthTrace(
             Lemonldap::NG::Common::PSGI::Request->new($req) );
 
         # Transform 302 responses in 401 since Nginx refuse it

@@ -1,20 +1,20 @@
-use Template::Lexical;
+use Template::Plex;
 {	
 	print "EXAMPLE SYNOPSIS\n";
 	my $base_data={name=>"James", age=>"12", fruit=>"banana"};
 	my $template = '$name is $age and favourite fruit is $fruit';
 	print "Template is: $template\n";
 
-	my $render=prepare_template($template,$base_data);
+	my $t=plex [$template], $base_data;
 
-	my $string=$render->();		#renders with base values. 
+	my $string=$t->render();		#renders with base values. 
 	print "Rendered: $string\n";
 	#James's age is 12 and favourite fruit is banana
 
 	$base_data->{name}="John";
 	$base_data->{fruit}="apple";
 
-	$string=$render->();		#render with updated base values
+	$string=$t->render();		#render with updated base values
 	print "Rendered: $string\n";
 	#John's age is 12 and favourite fruit is apple
 	print "\n\n";
@@ -37,11 +37,11 @@ use Template::Lexical;
 
 	#Any keys present at preparation time are used to generate lexical aliases of the hash entries. This 
 	#Returned item is  code ref to execute
-	my $render=prepare_template $template, $data;
+	my $t=plex [$template], $data;
 
 
 	#executing with no arguments will only draw data from the base values specified
-	my $string=$render->();	
+	my $string=$t->render();	
 
 	print "Rendered: $string";
 	print "\n\n";
@@ -51,7 +51,7 @@ use Template::Lexical;
 	print "EXAMPLE 1b: UPDATE BASE/LEXICAL VALUES DYNAMICALLY\n";
 
 	$data->{field1}="lions";
-	$string=$render->();
+	$string=$t->render();
 	print "Rendered: $string";
 
 	print "\n\n";
@@ -69,13 +69,14 @@ use Template::Lexical;
 	my $data={field1=>"monkeys", field2=>"hippos"};		
 	#field3 is not specified and will be undefined
 	
-	my $render=prepare_template $template, $data;
-	my $string=$render->();	
+	my $t=plex [$template], $data;
+	my $string=$t->render();	
 
 	print "Rendered (base): $string\n";
 	my $new_data={field1=>"lions", field3=>"tigers"};
+
 	#Note that the new data has no field2. Thus will not be in the rendered output
-	$string=$render->($new_data);
+	$string=$t->render($new_data);
 	print "Rendered (override): $string\n";
 	print "\n\n";
 }

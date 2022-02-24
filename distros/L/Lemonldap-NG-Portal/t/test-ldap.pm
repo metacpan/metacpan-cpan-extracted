@@ -13,8 +13,8 @@ my $slapadd_bin;
 my $slapd_schema_dir;
 
 if ( $ENV{LLNGTESTLDAP} ) {
-    $slapd_bin   = $ENV{LLNGTESTLDAP_SLAPD_BIN}   || '/usr/sbin/slapd';
-    $slapadd_bin = $ENV{LLNGTESTLDAP_SLAPADD_BIN} || '/usr/sbin/slapadd';
+    $slapd_bin        = $ENV{LLNGTESTLDAP_SLAPD_BIN}   || '/usr/sbin/slapd';
+    $slapadd_bin      = $ENV{LLNGTESTLDAP_SLAPADD_BIN} || '/usr/sbin/slapadd';
     $slapd_schema_dir = (
         ( $ENV{LLNGTESTLDAP_SCHEMA_DIR} and -d $ENV{LLNGTESTLDAP_SCHEMA_DIR} )
         ? $ENV{LLNGTESTLDAP_SCHEMA_DIR}
@@ -43,13 +43,16 @@ sub stopLdapServer {
         my $die = 0;
         close F;
         if ($pid) {
-            system "kill $pid";
+            kill 15, $pid;
 
             # give the PID 10 seconds to stop
             my $waitloop = 0;
             while ( $waitloop < 1000 and kill 0, $pid ) {
                 $waitloop++;
                 usleep 10000;
+            }
+            if ( kill 0, $pid ) {
+                kill 9, $pid;
             }
         }
         else {
@@ -67,13 +70,16 @@ sub tempStopLdapServer {
         my $pid = join '', <F>;
         close F;
         if ($pid) {
-            system "kill $pid";
+            kill 15, $pid;
 
             # give the PID 10 seconds to stop
             my $waitloop = 0;
             while ( $waitloop < 1000 and kill 0, $pid ) {
                 $waitloop++;
                 usleep 10000;
+            }
+            if ( kill 0, $pid ) {
+                kill 9, $pid;
             }
         }
         else {

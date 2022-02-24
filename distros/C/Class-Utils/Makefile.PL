@@ -20,7 +20,7 @@ name 'Class-Utils';
 perl_version 5.008;
 readme_from 'Utils.pm';
 recursive_author_tests('xt');
-requires 'Error::Pure' => 0.09,
+requires 'Error::Pure' => 0.27,
 requires 'Exporter' => 0;
 requires 'Readonly' => 0;
 resources 'bugtracker' => 'https://github.com/michal-josef-spacek/Class-Utils/issues';
@@ -30,7 +30,7 @@ test_requires 'English' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.11';
+version '0.12';
 
 # Run.
 WriteAll();

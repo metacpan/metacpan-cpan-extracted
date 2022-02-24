@@ -7,7 +7,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_WAIT
 );
 
-our $VERSION = '2.0.12';
+our $VERSION = '2.0.14';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 
@@ -19,12 +19,10 @@ has lockTimes => (
     isa     => 'ArrayRef',
     default => sub { [] }
 );
-
 has maxAge => (
     is  => 'rw',
     isa => 'Int'
 );
-
 has maxFailed => (
     is  => 'rw',
     isa => 'Int'
@@ -56,6 +54,7 @@ sub init {
         return 0;
     }
 
+    my $maxAge = $self->conf->{bruteForceProtectionMaxAge} || 300;
     if ( $self->conf->{bruteForceProtectionIncrementalTempo} ) {
         my $lockTimes = @{ $self->lockTimes } =
           sort { $a <=> $b }
@@ -65,7 +64,7 @@ sub init {
               ? abs $_
               : ()
           }
-          grep { /\d+/ }
+          grep /\d+/,
           split /\s*,\s*/, $self->conf->{bruteForceProtectionLockTimes};
 
         unless ($lockTimes) {
@@ -87,14 +86,13 @@ sub init {
             $lockTimes = $self->conf->{failedLoginNumber};
         }
 
-        my $sum = $self->conf->{bruteForceProtectionMaxAge} *
-          ( 1 + $self->conf->{failedLoginNumber} - $lockTimes );
+        my $sum =
+          $maxAge * ( 1 + $self->conf->{failedLoginNumber} - $lockTimes );
         $sum += $_ foreach @{ $self->lockTimes };
         $self->maxAge($sum);
     }
     else {
-        $self->maxAge( $self->conf->{bruteForceProtectionMaxAge} *
-              ( 1 + $self->maxFailed ) );
+        $self->maxAge( $maxAge * ( 1 + $self->maxFailed ) );
     }
 
     return 1;

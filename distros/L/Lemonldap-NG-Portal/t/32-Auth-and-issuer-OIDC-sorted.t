@@ -207,7 +207,7 @@ sub rp {
                         oidcOPMetaDataOptionsStoreIDToken => 0,
                         oidcOPMetaDataOptionsDisplay      => "",
                         oidcOPMetaDataOptionsIcon => 'icons/sfa_manager.png',
-                        oidcOPMetaDataOptionsClientID => "rpid",
+                        oidcOPMetaDataOptionsClientID         => "rpid",
                         oidcOPMetaDataOptionsConfigurationURI =>
                           "https://auth.op.com/.well-known/openid-configuration"
                     },

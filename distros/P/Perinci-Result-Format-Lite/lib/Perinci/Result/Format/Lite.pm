@@ -11,9 +11,9 @@ use Exporter qw(import);
 use List::Util qw(first max);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-01-23'; # DATE
+our $DATE = '2022-02-18'; # DATE
 our $DIST = 'Perinci-Result-Format-Lite'; # DIST
-our $VERSION = '0.285'; # VERSION
+our $VERSION = '0.286'; # VERSION
 
 our @EXPORT_OK = qw(format);
 
@@ -374,7 +374,7 @@ sub __gen_table {
                     ",",
                     map {
                         my $cell = $_;
-                        $cell =~ s/(["\\])/\\$1/g;
+                        $cell =~ s/"/""/g;
                         qq("$cell");
                     } @$row)."\n";
             } @$data
@@ -551,7 +551,7 @@ Perinci::Result::Format::Lite - Format enveloped result
 
 =head1 VERSION
 
-This document describes version 0.285 of Perinci::Result::Format::Lite (from Perl distribution Perinci-Result-Format-Lite), released on 2022-01-23.
+This document describes version 0.286 of Perinci::Result::Format::Lite (from Perl distribution Perinci-Result-Format-Lite), released on 2022-02-18.
 
 =head1 SYNOPSIS
 

@@ -64,7 +64,7 @@ SKIP: {
         'Found register token' );
     $query = $1;
     ok( $query =~ /register_token=/, 'Found register_token' );
-    ok( $mail =~ /fôo/, 'UTF-8 works' ) or explain( $mail, 'fôo' );
+    ok( $mail  =~ /fôo/,             'UTF-8 works' ) or explain( $mail, 'fôo' );
 
     ok(
         $res =

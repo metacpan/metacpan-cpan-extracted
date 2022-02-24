@@ -25,7 +25,8 @@ struct channel {
 	Refcount refcount;
 	enum state state;
 	SV* message;
-	Notification notification;
+	Notification read_notification;
+	Notification write_notification;
 };
 
 Channel* channel_alloc(UV refcount) {
@@ -35,7 +36,8 @@ Channel* channel_alloc(UV refcount) {
 	MUTEX_INIT(&ret->writer_mutex);
 	COND_INIT(&ret->data_condvar);
 	refcount_init(&ret->refcount, refcount);
-	notification_init(&ret->notification);
+	notification_init(&ret->read_notification);
+	notification_init(&ret->write_notification);
 	return ret;
 }
 
@@ -44,6 +46,7 @@ void channel_send(Channel* channel, SV* message) {
 	MUTEX_LOCK(&channel->data_mutex);
 
 	channel->message = message;
+	notification_trigger(&channel->read_notification);
 	if (channel->state == HAS_READER) {
 		channel->state = HAS_MESSAGE;
 		COND_SIGNAL(&channel->data_condvar);
@@ -64,9 +67,9 @@ SV* S_channel_receive(pTHX_ Channel* channel) {
 	MUTEX_LOCK(&channel->reader_mutex);
 	MUTEX_LOCK(&channel->data_mutex);
 
+	notification_trigger(&channel->write_notification);
 	if (channel->state == HAS_NOTHING) {
 		channel->state = HAS_READER;
-		notification_trigger(&channel->notification);
 		do COND_WAIT(&channel->data_condvar, &channel->data_mutex);
 		while (channel->state != HAS_MESSAGE && channel->state != CLOSED);
 	}
@@ -90,19 +93,34 @@ SV* S_channel_receive(pTHX_ Channel* channel) {
 	return result;
 }
 
-void S_channel_set_notify(pTHX_ Channel* channel, PerlIO* handle, SV* value) {
+SV* S_channel_receive_ready_fh(pTHX_ Channel* channel) {
 	MUTEX_LOCK(&channel->data_mutex);
 
-	notification_set(&channel->notification, handle, value);
-	if (channel->state == HAS_WRITER)
-		notification_trigger(&channel->notification);
+	SV* result = notification_create(&channel->write_notification);
+	if (channel->state == HAS_READER)
+		notification_trigger(&channel->read_notification);
 
 	MUTEX_UNLOCK(&channel->data_mutex);
+
+	return result;
+}
+
+SV* S_channel_send_ready_fh(pTHX_ Channel* channel) {
+	MUTEX_LOCK(&channel->data_mutex);
+
+	SV* result = notification_create(&channel->write_notification);
+	if (channel->state == HAS_WRITER)
+		notification_trigger(&channel->write_notification);
+
+	MUTEX_UNLOCK(&channel->data_mutex);
+
+	return result;
 }
 
 void channel_close(Channel* channel) {
 	MUTEX_LOCK(&channel->data_mutex);
 
+	notification_unset(&channel->read_notification);
 	channel->state = CLOSED;
 	COND_SIGNAL(&channel->data_condvar);
 
@@ -111,6 +129,8 @@ void channel_close(Channel* channel) {
 
 void channel_refcount_dec(Channel* channel) {
 	if (refcount_dec(&channel->refcount) == 1) {
+		notification_unset(&channel->read_notification);
+		notification_unset(&channel->write_notification);
 		COND_DESTROY(&channel->data_condvar);
 		MUTEX_DESTROY(&channel->writer_mutex);
 		MUTEX_DESTROY(&channel->reader_mutex);

@@ -21,7 +21,8 @@ use DynaLoader;
 
 
 
-#line 2 "browser.pd"
+#line 1 "browser.pd"
+
 
 =head1 NAME
 
@@ -39,7 +40,7 @@ cursor terminal browser for ndarrays.
 
 use strict;
 use warnings;
-#line 43 "Browser.pm"
+#line 44 "Browser.pm"
 
 
 
@@ -53,7 +54,8 @@ use warnings;
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 browse
@@ -86,19 +88,21 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 90 "Browser.pm"
+#line 92 "Browser.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *browse = \&PDL::browse;
-#line 96 "Browser.pm"
+#line 99 "Browser.pm"
 
 
 
 
 
-#line 57 "browser.pd"
+#line 56 "browser.pd"
+
 
 =head1 AUTHOR
 
@@ -111,7 +115,7 @@ the copyright notice should be included in the file.
 
 
 =cut
-#line 115 "Browser.pm"
+#line 119 "Browser.pm"
 
 
 

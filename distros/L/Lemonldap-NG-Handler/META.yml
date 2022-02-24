@@ -1,7 +1,7 @@
 ---
 abstract: 'The Apache protection module part of Lemonldap::NG Web-SSO system.'
 author:
-  - 'Xavier Guimard <x.guimard@free.fr>, ClÃ©ment Oudot <clement@oodo.net>'
+  - 'Xavier Guimard <x.guimard@free.fr>, Clement Oudot <clement@oodo.net>, Christophe Maudoux <chrmdx@gmail.com>, Maxime Besson <maxime.besson@worteks.com>'
 build_requires:
   Cwd: '0'
   Digest::HMAC_SHA1: '0'
@@ -30,14 +30,14 @@ recommends:
   SOAP::Lite: '0'
 requires:
   LWP::UserAgent: '0'
-  Lemonldap::NG::Common: v2.0.13
+  Lemonldap::NG::Common: v2.0.14
   Mouse: '0'
   URI: '0'
 resources:
   MailingList: mailto:lemonldap-ng-dev@ow2.org
   X_twitter: https://twitter.com/lemonldapng
   bugtracker: https://gitlab.ow2.org/lemonldap-ng/lemonldap-ng/issues
-  homepage: http://lemonldap-ng.org/
+  homepage: https://lemonldap-ng.org/
   license: http://opensource.org/licenses/GPL-2.0
-version: v2.0.13
+version: v2.0.14
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

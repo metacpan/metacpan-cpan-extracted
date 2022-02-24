@@ -1,5 +1,8 @@
 Revision history for Perl module Business::ISSN
 
+1.005 2022-02-18T02:19:46Z
+	* Refresh distro, fix license issue
+
 1.004 2020-03-20T03:32:51Z
 	* This went missing from CPAN because I deleted it
 

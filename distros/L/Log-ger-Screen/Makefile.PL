@@ -7,7 +7,7 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Convenient packaging of Log::ger + Log::ger::Output::Screen + Log::ger::Level::FromEnv for one-liner",
+  "ABSTRACT" => "Convenient packaging of Log::ger + Lg:Output::Screen + Lg:Level::FromVar + Lg:Level::FromEnv for one-liner",
   "AUTHOR" => "perlancar <perlancar\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -18,6 +18,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Log::ger" => "0.038",
     "Log::ger::Level::FromEnv" => 0,
+    "Log::ger::Level::FromVar" => 0,
     "Log::ger::Output" => "0.005",
     "Log::ger::Output::Screen" => "0.018",
     "strict" => 0,
@@ -29,7 +30,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -42,6 +43,7 @@ my %FallbackPrereqs = (
   "IPC::Open3" => 0,
   "Log::ger" => "0.038",
   "Log::ger::Level::FromEnv" => 0,
+  "Log::ger::Level::FromVar" => 0,
   "Log::ger::Output" => "0.005",
   "Log::ger::Output::Screen" => "0.018",
   "Test::More" => 0,

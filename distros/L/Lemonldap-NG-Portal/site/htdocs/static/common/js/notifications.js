@@ -16,7 +16,8 @@ LemonLDAP::NG Notifications script
     if (level === 'positive') {
       level = 'success';
     }
-    return $('#color').addClass("alert-" + level);
+    $('#color').addClass("alert-" + level);
+    return $('#color').attr("role", "status");
   };
 
   displayError = function(j, status, err) {

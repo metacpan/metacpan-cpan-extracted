@@ -50,7 +50,7 @@ subtest(
         like(
             dies( sub { Test::MockFile->dir( '/etc', [ 'foo', 'bar' ], { 1 => 2 } ) } ),
             qr!^\QYou cannot set stats for nonexistent dir '/etc'\E!xms,
-            'Cannot do TMF->dir( "/etc", [@content] )',
+            'Cannot do TMF->dir( "/etc", [@content], { 1 => 2 } )',
         );
 
         like(

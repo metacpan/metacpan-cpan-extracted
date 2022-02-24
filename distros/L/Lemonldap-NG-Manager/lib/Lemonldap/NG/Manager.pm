@@ -17,14 +17,14 @@ use JSON;
 use Lemonldap::NG::Common::Conf::Constants;
 use Lemonldap::NG::Common::PSGI::Constants;
 
-our $VERSION = '2.0.13';
+our $VERSION = '2.0.14';
 
 extends qw(
   Lemonldap::NG::Handler::PSGI::Router
   Lemonldap::NG::Common::Conf::AccessLib
 );
 
-has csp => ( is => 'rw' );
+has csp            => ( is => 'rw' );
 has loadedPlugins  => ( is => 'rw', default => sub { [] } );
 has hLoadedPlugins => ( is => 'rw', default => sub { {} } );
 

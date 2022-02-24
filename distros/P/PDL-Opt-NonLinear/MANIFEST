@@ -28,6 +28,7 @@ MANIFEST			This list of files
 milalonga.f
 nonlinear.pd
 README
+select.c
 spg.f
 t/1.t
 tensor.f

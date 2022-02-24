@@ -1,10 +1,19 @@
-0.002   2018-12-06 (PERLANCAR)
+0.003   2021-09-07  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Fix copy-paste mistake in Summary.
+
+	- [doc] Mention Syntax::Operator::Equ.
+
+
+0.002   2018-12-06  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [doc] Update/fix Description.
 
 
-0.001   2018-12-06 (PERLANCAR)
+0.001   2018-12-06  Released-By: PERLANCAR
 
         - First release.

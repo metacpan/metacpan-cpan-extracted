@@ -62,7 +62,7 @@ WriteMakefile(
             },
             MailingList => 'mailto:lemonldap-ng-dev@ow2.org',
             license     => 'http://opensource.org/licenses/GPL-2.0',
-            homepage    => 'http://lemonldap-ng.org/',
+            homepage    => 'https://lemonldap-ng.org/',
             bugtracker =>
               'https://gitlab.ow2.org/lemonldap-ng/lemonldap-ng/issues',
             x_twitter => 'https://twitter.com/lemonldapng',
@@ -94,7 +94,7 @@ WriteMakefile(
             ABSTRACT_FROM =>
               'lib/Lemonldap/NG/Common.pm',    # retrieve abstract from module
             AUTHOR =>
-'Xavier Guimard <x.guimard@free.fr>, Clément Oudot <clement@oodo.net>'
+'Xavier Guimard <x.guimard@free.fr>, Clement Oudot <clement@oodo.net>, Christophe Maudoux <chrmdx@gmail.com>, Maxime Besson <maxime.besson@worteks.com>'
           )
         : ()
     ),
@@ -104,6 +104,7 @@ WriteMakefile(
     MAN1PODS => {
         'scripts/convertConfig'         => 'blib/man1/convertConfig.1p',
         'scripts/convertSessions'       => 'blib/man1/convertSessions.1p',
+        'scripts/encryptTotpSecrets'    => 'blib/man1/encryptTotpSecrets.1p',
         'scripts/lemonldap-ng-cli'      => 'blib/man1/lemonldap-ng-cli.1p',
         'scripts/lemonldap-ng-sessions' => 'blib/man1/lemonldap-ng-sessions.1p',
         'scripts/importMetadata'        => 'blib/man1/importMetadata.1p',

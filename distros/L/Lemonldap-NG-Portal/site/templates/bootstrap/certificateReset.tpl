@@ -3,7 +3,7 @@
 <div id="mailcontent" class="container">
 
   <TMPL_IF NAME="AUTH_ERROR">
-    <div class="message message-<TMPL_VAR NAME="AUTH_ERROR_TYPE"> alert">
+    <div class="message message-<TMPL_VAR NAME="AUTH_ERROR_TYPE"> alert" role="<TMPL_VAR NAME="AUTH_ERROR_ROLE">">
     <span trmsg="<TMPL_VAR NAME="AUTH_ERROR">"></span>
     </div>
   </TMPL_IF>
@@ -164,7 +164,7 @@
     <div class="card">
     <form action="#" method="post" class="login" role="form">
       <div class="form">
-        <h3 trspan="resetCertificateOK">A confirmation has been sent to your mail address.</h3>
+        <h3 trspan="newPwdSentTo">A confirmation has been sent to your mail address.</h3>
       </div>
     </form>
     </div>

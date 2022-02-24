@@ -14,7 +14,7 @@ use vars qw( @EXPORT_OK %EXPORT_TAGS );
 %EXPORT_TAGS = ( 'all' => \@EXPORT_OK );
 
 use vars '$VERSION';
-$VERSION = '1.23';
+$VERSION = '1.24';
 my $CPERL = $^V =~ /c$/ ? 1 : 0;
 
 use vars '@Scalars';
@@ -475,6 +475,10 @@ use vars '@Barewords';
   ),
   ($] >= 5.035004 ? qw(
       defer
+    ) : ()
+  ),
+  ($] >= 5.035008 ? qw(
+      finally
     ) : ()
   ),
 );

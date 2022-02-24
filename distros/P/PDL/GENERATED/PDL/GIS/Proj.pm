@@ -21,7 +21,8 @@ use DynaLoader;
 
 
 
-#line 20 "Proj.pd"
+#line 19 "Proj.pd"
+
 use strict;
 use warnings;
 
@@ -32,7 +33,7 @@ PDL::GIS::Proj - PDL interface to the PROJ projection library.
 =head1 DESCRIPTION
 
 For more information on the PROJ library, see: L<http://www.proj.org/>
-#line 36 "Proj.pm"
+#line 37 "Proj.pm"
 
 
 
@@ -46,7 +47,8 @@ For more information on the PROJ library, see: L<http://www.proj.org/>
 
 
 
-#line 65 "Proj.pd"
+#line 64 "Proj.pd"
+
 =head2 get_proj_info($params_string)
 
 Returns a string with information about what parameters proj will
@@ -63,11 +65,12 @@ sub get_proj_info
     pop(@a);
     return join("\n", @a);
 } # End of get_proj_info()...
-#line 67 "Proj.pm"
+#line 69 "Proj.pm"
 
 
 
-#line 1059 "../../../blib/lib/PDL/PP.pm"
+#line 1058 "../../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 fwd_transform
@@ -97,17 +100,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 101 "Proj.pm"
+#line 104 "Proj.pm"
 
 
 
-#line 1061 "../../../blib/lib/PDL/PP.pm"
+#line 1060 "../../../blib/lib/PDL/PP.pm"
+
 *fwd_transform = \&PDL::fwd_transform;
-#line 107 "Proj.pm"
+#line 111 "Proj.pm"
 
 
 
-#line 1059 "../../../blib/lib/PDL/PP.pm"
+#line 1058 "../../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 inv_transform
@@ -138,17 +143,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 142 "Proj.pm"
+#line 147 "Proj.pm"
 
 
 
-#line 1061 "../../../blib/lib/PDL/PP.pm"
+#line 1060 "../../../blib/lib/PDL/PP.pm"
+
 *inv_transform = \&PDL::inv_transform;
-#line 148 "Proj.pm"
+#line 154 "Proj.pm"
 
 
 
-#line 221 "Proj.pd"
+#line 220 "Proj.pd"
+
 
 =head2 proj_version
 
@@ -205,13 +212,14 @@ sub load_projection_information
     $info->{nzmg}{CATEGORIES} = [ 'fixed Earth' ];
     return $info;
 } # End of load_projection_information()...
-#line 209 "Proj.pm"
+#line 216 "Proj.pm"
 
 
 
 
 
-#line 33 "Proj.pd"
+#line 32 "Proj.pd"
+
 =head1 AUTHOR
 
 Judd Taylor, Orbital Systems, Ltd.
@@ -228,7 +236,7 @@ but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 =cut
-#line 232 "Proj.pm"
+#line 240 "Proj.pm"
 
 
 

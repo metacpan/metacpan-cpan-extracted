@@ -26,7 +26,7 @@ sub Lemonldap::NG::Handler::Main::defaultLogger {
     'Lemonldap::NG::Common::Logger::Std';
 }
 
-eval { Lemonldap::NG::Handler::Main->logLevelInit('error') };
+eval { Lemonldap::NG::Handler::Main->logLevelInit() };
 ok( !$@, 'logLevelInit' );
 
 ok(

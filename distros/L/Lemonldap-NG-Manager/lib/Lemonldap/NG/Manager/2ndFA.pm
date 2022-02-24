@@ -15,6 +15,7 @@ extends qw(
   Lemonldap::NG::Common::Conf::AccessLib
 );
 
+use constant _2FTYPES => [ "UBK", "U2F", "TOTP", "WebAuthn" ];
 our $VERSION = '2.0.10';
 
 #############################
@@ -46,7 +47,8 @@ sub init {
     $self->{hiddenAttributes} //= "_password";
     $self->{hiddenAttributes} .= ' _session_id'
       unless $conf->{displaySessionId};
-    $self->{TOTPCheck} = $self->{U2FCheck} = $self->{UBKCheck} = '1';
+    $self->{TOTPCheck} = $self->{U2FCheck} = $self->{UBKCheck} =
+      $self->{WebAuthnCheck} = '1';
     return 1;
 }
 
@@ -67,7 +69,7 @@ sub del2F {
     my $epoch = $params->{epoch}
       or return $self->sendError( $req, 'Missing "epoch" parameter', 400 );
 
-    if ( $type =~ /\b(?:U2F|TOTP|UBK)\b/ ) {
+    if ( grep { $_ eq $type } @{ _2FTYPES() } ) {
         $self->logger->debug(
             "Call procedure delete2F with type=$type and epoch=$epoch");
         return $self->delete2F( $req, $session, $skey );
@@ -117,7 +119,7 @@ sub sfa {
     $moduleOptions->{backend} = $mod->{module};
 
     # Select 2FA sessions to display
-    foreach (qw(U2F TOTP UBK)) {
+    foreach ( @{ _2FTYPES() } ) {
         $self->{ $_ . 'Check' } = delete $params->{ $_ . 'Check' }
           if ( defined $params->{ $_ . 'Check' } );
     }
@@ -188,17 +190,18 @@ sub sfa {
     # Remove sessions without at least one 2F device(s)
     $self->logger->debug(
         "Removing sessions without at least one 2F device(s)...");
+    my $_2f_types_re = join( '|', @{ _2FTYPES() } );
     foreach my $session ( keys %$res ) {
         delete $res->{$session}
           unless ( defined $res->{$session}->{_2fDevices}
             and $res->{$session}->{_2fDevices} =~
-            /"type":\s*"(?:U2F|TOTP|UBK)"/s );
+            /"type":\s*"(?:$_2f_types_re)"/s );
     }
 
     # Filter 2FA sessions if needed
     $self->logger->debug("Filtering 2F sessions...");
     my $all = ( keys %$res );
-    foreach (qw(U2F TOTP UBK)) {
+    foreach ( @{ _2FTYPES() } ) {
         if ( $self->{ $_ . 'Check' } eq '2' ) {
             foreach my $session ( keys %$res ) {
                 delete $res->{$session}
@@ -266,7 +269,7 @@ qq{Use of an uninitialized attribute "$group" to group sessions},
     #   { session => <sessionId>, userId => <_session_uid> }
     else {
         $res = [
-            sort { $a->{date} <=> $b->{date} }
+            sort  { $a->{date} <=> $b->{date} }
               map { { session => $_, userId => $res->{$_}->{_session_uid} } }
               keys %$res
         ];

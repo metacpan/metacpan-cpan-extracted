@@ -4,7 +4,7 @@ Plack::Middleware::Auth::JWT - Token-based Auth (aka Bearer Token) using JSON We
 
 # VERSION
 
-version 0.905
+version 0.906
 
 # SYNOPSIS
 
@@ -123,7 +123,7 @@ TODO, in the meantime you can take a look at the tests.
 
 # SEE ALSO
 
-- [Cryp::JWT](https://metacpan.org/pod/Crypt::JWT) - encode / decode JWTs using various algorithms. Very complete!
+- [Crypt::JWT](https://metacpan.org/pod/Crypt::JWT) - encode / decode JWTs using various algorithms. Very complete!
 - [Introduction to JSON Web Tokens](https://jwt.io/introduction) - good overview.
 - [Plack::Middleware::Auth::AccessToken](https://metacpan.org/pod/Plack::Middleware::Auth::AccessToken) - a more generic solution handling any kind of token. Does not handle token payload (`claims`).
 
@@ -135,6 +135,7 @@ Thanks to
 - [jwright](https://github.com/jwrightecs) for fixing a
 regression in the tests caused by an update in [Crypt::JWT](https://metacpan.org/pod/Crypt%3A%3AJWT) error
 messages. The same issue was also reported by SREZIC.
+- [Michael R. Davis](https://github.com/mrdvt92) for fixing a typo.
 
 # AUTHOR
 
@@ -142,7 +143,7 @@ Thomas Klausner <domm@plix.at>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 - 2021 by Thomas Klausner.
+This software is copyright (c) 2017 - 2022 by Thomas Klausner.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

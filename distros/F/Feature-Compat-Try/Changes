@@ -1,5 +1,9 @@
 Revision history for Feature-Compat-Try
 
+0.05    2022-02-20
+        [CHANGES]
+         * Support `finally {}` blocks on perl 5.35.9 or via SKT 0.27
+
 0.04    2021-03-27
         [CHANGES]
          * Unit tests and documentation of the handling of the final-value

@@ -4,7 +4,7 @@
       "Graham Ollis <plicease@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -22,10 +22,13 @@
    },
    "prereqs" : {
       "build" : {
-         "requires" : {}
+         "requires" : {
+            "Test::More" : "0.98"
+         }
       },
       "configure" : {
          "requires" : {
+            "ExtUtils::CBuilder" : "0.27",
             "ExtUtils::MakeMaker" : "6.64",
             "FFI::Build::MM" : "1.00",
             "File::Which" : "0"
@@ -47,15 +50,15 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/PerlFFI/FFI-Platypus-Lang-Rust/issues"
+         "web" : "https://github.com/PerlFFI/FFI-Platypus-Lang-CPP/issues"
       },
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/PerlFFI/FFI-Platypus-Lang-Rust.git",
-         "web" : "https://github.com/PerlFFI/FFI-Platypus-Lang-Rust"
+         "url" : "https://github.com/PerlFFI/FFI-Platypus-Lang-CPP.git",
+         "web" : "https://github.com/PerlFFI/FFI-Platypus-Lang-CPP"
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.05",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.06",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

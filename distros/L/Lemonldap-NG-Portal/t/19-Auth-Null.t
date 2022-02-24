@@ -30,6 +30,15 @@ ok( $res->[2]->[0] =~ qq%<img src="/static/common/logos/logo_llng_400px.png"%,
 ok( $res->[2]->[0] =~ m%<span id="languages"></span>%, 'Language icons found' )
   or print STDERR Dumper( $res->[2]->[0] );
 count(3);
+ok(
+    $res = $client->_get(
+        '/logout', accept => 'text/html'
+    ),
+    'Get logout page'
+);
+ok( $res->[2]->[0] =~ m%<span trmsg="47">%, ' PE_LOGOUT_OK' )
+  or print STDERR Dumper( $res->[2]->[0] );
+count(2);
 
 clean_sessions();
 

@@ -1,6 +1,12 @@
 Revision history for Parser-FIT
 
-Upcoming Release
+0.05    2022-02-22
+        - Implement/Fix unknown global message handling
+        
+0.04    2022-02-21
+        - Support developer data
+
+0.03    2022-02-17
         - post-process raw values
         - disable debug output by default
         - fix warnings

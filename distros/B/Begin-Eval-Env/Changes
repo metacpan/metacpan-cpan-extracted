@@ -1,3 +1,18 @@
+0.003   2022-02-05  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Add caveat.
+
+
+0.002   2022-02-05  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Fix POD section rendering because we forgot to enable
+          DZP:InsertBlock::FromModule.
+
+
 0.001   2022-02-05  Released-By: PERLANCAR
 
         - First release.

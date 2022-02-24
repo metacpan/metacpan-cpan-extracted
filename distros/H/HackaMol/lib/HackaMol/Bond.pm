@@ -1,13 +1,14 @@
 package HackaMol::Bond;
-$HackaMol::Bond::VERSION = '0.051';
+$HackaMol::Bond::VERSION = '0.053';
 #ABSTRACT: HackaMol Bond class
 use 5.008;
 use Moose;
 use namespace::autoclean;
 use Carp;
 use MooseX::StrictConstructor;
+
 #use MooseX::Storage;
-#with Storage( 'io' => 'StorableFile' ), 
+#with Storage( 'io' => 'StorableFile' ),
 with 'HackaMol::Roles::NameRole', 'HackaMol::Roles::AtomGroupRole';
 
 has $_ => (
@@ -57,7 +58,7 @@ sub bond_length {
 }
 
 sub bond_energy {
-    my $self = shift;
+    my $self   = shift;
     my $energy = &{ $self->bond_efunc }( $self, @_ );
     return ($energy);
 }
@@ -76,7 +77,7 @@ HackaMol::Bond - HackaMol Bond class
 
 =head1 VERSION
 
-version 0.051
+version 0.053
 
 =head1 SYNOPSIS
 

@@ -2,7 +2,7 @@ package App::perlimports::Include;
 
 use Moo;
 
-our $VERSION = '0.000034';
+our $VERSION = '0.000035';
 
 use Data::Dumper qw( Dumper );
 use List::Util qw( any none uniq );
@@ -358,12 +358,8 @@ sub _build_imports {
     # preserve it, rather than risk altering the behaviour of the module.
     if ( $self->_export_inspector->has_import_flags ) {
         for my $arg ( @{ $self->_export_inspector->import_flags } ) {
-            if (
-                defined $self->_original_imports && (
-                    any { $_ eq $arg }
-                    @{ $self->_original_imports }
-                )
-            ) {
+            if ( defined $self->_original_imports
+                && ( any { $_ eq $arg } @{ $self->_original_imports } ) ) {
                 push @found, $arg;
             }
         }
@@ -754,7 +750,7 @@ App::perlimports::Include - Encapsulate one use statement in a document
 
 =head1 VERSION
 
-version 0.000034
+version 0.000035
 
 =head1 METHODS
 

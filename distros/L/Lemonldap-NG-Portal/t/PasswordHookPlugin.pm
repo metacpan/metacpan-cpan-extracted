@@ -10,10 +10,6 @@ use constant hook => {
     passwordAfterChange  => 'afterChange',
 };
 
-sub init {
-    1;
-}
-
 sub beforeChange {
     my ( $self, $req, $user, $password, $old ) = @_;
     if ( $password eq "12345" ) {

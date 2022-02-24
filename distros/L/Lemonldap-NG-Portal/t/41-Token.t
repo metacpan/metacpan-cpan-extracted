@@ -23,11 +23,8 @@ ok( $res = $client->_get( '/', accept => 'text/html' ), 'Unauth request' );
 count(1);
 
 my ( $host, $url, $query ) = expectForm( $res, '#', undef, 'token' );
-ok(
-    $res->[2]->[0] =~
-m%<input[^>]*name="password"%,
-    'Password: Found password input'
-);
+ok( $res->[2]->[0] =~ m%<input[^>]*name="password"%,
+    'Password: Found password input' );
 count(1);
 
 $query =~ s/.*\b(token=[^&]+).*/$1/;

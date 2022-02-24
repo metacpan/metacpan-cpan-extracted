@@ -23,7 +23,7 @@ SKIP: {
                 utotp2fActivation      => 1,
                 totp2fSelfRegistration => 1,
                 u2fSelfRegistration    => 1,
-                u2fSelfRegistration =>
+                u2fSelfRegistration    =>
                   '$_2fDevices =~ /"type":\s*"(?:TOTP|U2F)"/s',
                 loginHistoryEnabled => 1,
                 authentication      => 'Demo',

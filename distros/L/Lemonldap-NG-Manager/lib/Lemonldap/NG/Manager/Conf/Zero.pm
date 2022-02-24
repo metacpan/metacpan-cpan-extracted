@@ -106,7 +106,7 @@ sub zeroConf {
         },
         'cfgNum'               => 0,
         'globalStorageOptions' => {
-            'Directory' => $sessionDir,
+            'Directory'      => $sessionDir,
             'generateModule' =>
               'Lemonldap::NG::Common::Apache::Session::Generate::SHA256',
             'LockDirectory' => "$sessionDir/lock"
@@ -177,14 +177,14 @@ sub zeroConf {
                   'inGroup("timelords") or $uid eq "rtyler"',
             }
         },
-        'whatToTrace'   => '_whatToTrace',
-        'securedCookie' => 0,
-        'cookieName'    => 'lemonldap',
-        'cfgAuthor'     => 'The LemonLDAP::NG team',
-        'cfgDate'       => '1627287638',
-        'cfgVersion'    => $VERSION,
-        'exportedVars'  => {},
-        'portalSkin'    => 'bootstrap',
+        'whatToTrace'          => '_whatToTrace',
+        'securedCookie'        => 0,
+        'cookieName'           => 'lemonldap',
+        'cfgAuthor'            => 'The LemonLDAP::NG team',
+        'cfgDate'              => '1627287638',
+        'cfgVersion'           => $VERSION,
+        'exportedVars'         => {},
+        'portalSkin'           => 'bootstrap',
         'portalSkinBackground' =>
           '1280px-Cedar_Breaks_National_Monument_partially.jpg',
         'mailUrl'                    => "http://auth.$domain/resetpwd",

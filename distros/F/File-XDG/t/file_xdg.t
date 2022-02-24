@@ -247,7 +247,7 @@ sub test_lookup {
       File::XDG->new(name => $name, api => 1);
     };
 
-    is scalar(@warn), 1, 'exactly one warning about experimental api';
+    is scalar(@warn), 0, 'no warnings about experimental api';
 
     my @subpath = ($name, 'filename');
     my $home = ($xdg->$home_m =~ /(.*)$name/)[0];

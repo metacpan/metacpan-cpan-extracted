@@ -1,3 +1,8 @@
+0.014   2022-02-20  Released-By: PERLANCAR; Urgency: medium
+
+        - Add missing dep to Class::Method::Modifiers (RT#141333).
+
+
 0.013   2022-02-14  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

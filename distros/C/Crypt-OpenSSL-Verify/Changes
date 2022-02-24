@@ -1,14 +1,67 @@
 Version History
 
+0.34 -- Wed Feb 23 23:10:26 AST 2022
+
+    [Minor Makefile update for Solaris]
+
+    - 7dc590f (HEAD -> master) Increment Version for release
+    - 4b68830 Solaris needs minimum missing SSL API COMPAT option
+    - a75ad95 (tag: 0.33, origin/master, origin/HEAD) v0.33
+
+0.33 -- Wed Feb 23 20:42:15 AST 2022
+
+    [Major updates since 0.29]
+
+    - Move build process to Dist::Zilla
+    - Improve GitHub automated tests
+    - Move to File::Slurper for tests
+    - Fix Expired certificate in test
+
+    Thanks to the work of Shoichi Kaji (skaji) on the Crypt::OpenSSL::X509 PR
+    that was the base of the Dist::Zilla and to Jonas Brømsø (jonasbn) for help
+    with improving the tests.
+
+    [Updates since 0.32-TRIAL]
+
+    - 9994958 Update Version for Release
+    - 5b996ec (tag: 0.32) v0.32
+
+0.32 -- Tue Feb 22 16:32:14 AST 2022
+
+    - 335c352 Update version for release
+    - f962158 Fix Bug Tracker and Spelling issue
+    - 76eb50f Merge pull request #14 from perl-net-saml2/github-test
+    - c659bda Add Windows github tests
+    - 8a547c9 Updating linux github tests
+    - 6ba8f5c Add Github tests for macOS
+    - b1a9dec (tag: 0.31) v0.31
+
+0.31 -- Mon Feb 21 19:50:52 AST 2022
+
+    - 405b547 .gignore Release-*
+    - 198375d Increment version for release
+    - 6b2797f Missing Dependency
+    - 0185c4c (tag: 0.30) v0.30
+
+0.30 -- Mon Feb 21 19:41:54 AST 2022
+
+    - 0c38370 Update version for release
+    - 2861479 Cert had expired and was not considered an error
+    - 9027323 Move to Dist::Zilla
+    - 5000fa1 Spelling fix
+    - cd8c00a Add META.json to the distribution
+    - 583d265 Move from File::Slurp to File::Slurper
+    - 499965b (tag: 0.29) Add SIGNATURE to MANIFEST
+
 0.29 2021-06-07
-    TBD     Update version and changes
+    b15fdcc Update Version and Changes
     0c51bec Croak message text changed
 
 0.28
 
     No code changes just fix incorrect version in META.yml
 
-    TBD     Update Version and Changes
+    3a7f692 (tag: 0.28) Update Version and Changes
     e42edee Increment missing version in META.yml
 
 0.27

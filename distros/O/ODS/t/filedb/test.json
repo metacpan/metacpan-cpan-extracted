@@ -1,17 +1,17 @@
 [
    {
+      "first_name" : "test",
       "last_name" : "test",
-      "username" : "lnation",
-      "first_name" : "test"
+      "username" : "lnation"
    },
    {
+      "last_name" : "test2",
       "username" : "lnation2",
-      "first_name" : "test2",
-      "last_name" : "test2"
+      "first_name" : "test2"
    },
    {
-      "first_name" : "test3",
+      "last_name" : "test3",
       "username" : "lnation3",
-      "last_name" : "test3"
+      "first_name" : "test3"
    }
 ]

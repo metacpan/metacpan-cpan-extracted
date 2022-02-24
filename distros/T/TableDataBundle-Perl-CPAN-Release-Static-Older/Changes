@@ -1,3 +1,21 @@
+20220218.2  2022-02-18  Released-By: PERLANCAR; Urgency: high
+
+            - [bugfix] Fix 2021 data CSV format (escape character '\' was used
+              instead of the default "").
+
+
+20220218.1  2022-02-18  Released-By: PERLANCAR; Urgency: high
+
+            - [bugfix] Derp, forgot to use CSV for 2021 data.
+
+
+20220218.0  2022-02-18  Released-By: PERLANCAR; Urgency: medium; Broken: yes
+
+            - Add 2021 data. UPDATE: broken.
+
+            - [internal] Add dev script to update data.
+
+
 20210927.1  2021-10-05  Released-By: PERLANCAR; Urgency: medium
 
 	    - Rename module/dist

@@ -32,7 +32,8 @@ my $result = GetOptions(
 );
 
 pod2usage(1) if $opts{help};
-pod2usage( -message => "Missing metadata URL (-m)", -exitval => 2) if !$opts{metadata};
+pod2usage( -message => "Missing metadata URL (-m)", -exitval => 2 )
+  if !$opts{metadata};
 
 #==============================================================================
 # Default values
@@ -338,22 +339,20 @@ foreach
             }
             else {
                 # Check if entityID already in configuration
+                my $confKey;
                 if ( defined $spList->{$entityID} ) {
+                    $confKey = $spList->{$entityID};
 
                     # Update metadata
-                    $lastConf->{samlSPMetaDataXML}->{ $spList->{$entityID} }
+                    $lastConf->{samlSPMetaDataXML}->{$confKey}
                       ->{samlSPMetaDataXML} = $partner_metadata;
 
                     # Update attributes
                     $lastConf->{samlSPMetaDataExportedAttributes}
                       ->{ $spList->{$entityID} } = $requestedAttributes;
 
-# Update options
-#                  $lastConf->{samlSPMetaDataOptions}->{ $spList->{$entityID} } =
-#                    $spOptions;
-# FIX AGA
-                    $lastConf->{samlSPMetaDataOptions}->{ $spList->{$entityID} }
-                      = { %{$spOptions} };
+                    $lastConf->{samlSPMetaDataOptions}->{$confKey} =
+                      { %{$spOptions} };
 
                     if ( $opts{verbose} ) {
                         print "Update SP $entityID in configuration\n";
@@ -362,7 +361,7 @@ foreach
                 }
                 else {
                     # Create a new partner
-                    my $confKey = toEntityIDkey( $spConfKeyPrefix, $entityID );
+                    $confKey = toEntityIDkey( $spConfKeyPrefix, $entityID );
 
                     # Metadata
                     $lastConf->{samlSPMetaDataXML}->{$confKey}
@@ -372,10 +371,6 @@ foreach
                     $lastConf->{samlSPMetaDataExportedAttributes}->{$confKey} =
                       $requestedAttributes;
 
-                  # Options
-                  # $lastConf->{samlSPMetaDataOptions}->{$confKey} = $spOptions;
-
-                    # FIX AGA
                     $lastConf->{samlSPMetaDataOptions}->{$confKey} =
                       { %{$spOptions} };
 
@@ -387,9 +382,12 @@ foreach
                 }
 
                 # handle eduPersonTargetedID
-                if ( $requestedAttributes->{eduPersonTargetedID} ) {
-                    delete $requestedAttributes->{eduPersonTargetedID};
-                    $lastConf->{samlSPMetaDataOptions}->{ $spList->{$entityID} }
+                if ( $lastConf->{samlSPMetaDataExportedAttributes}->{$confKey}
+                    ->{eduPersonTargetedID} )
+                {
+                    delete $lastConf->{samlSPMetaDataExportedAttributes}
+                      ->{$confKey}->{eduPersonTargetedID};
+                    $lastConf->{samlSPMetaDataOptions}->{$confKey}
                       ->{samlSPMetaDataOptionsNameIDFormat} = 'persistent';
                 }
 
@@ -556,7 +554,7 @@ Options:
     -m, --metadata          URL of metadata document
     -i, --idpconfprefix     Prefix used to set IDP configuration key
     -s, --spconfprefix      Prefix used to set SP configuration key
-    --ignore-sp             ignore SP maching this entityID (can be specified multiple times)
+    --ignore-sp             ignore SP matching this entityID (can be specified multiple times)
     --ignore-idp            ignore IdP matching this entityID (can be specified multiple times)
     -a, --nagios            output statistics in Nagios format
     -r, --remove            remove provider from LemonLDAP::NG if it does not appear in metadata

@@ -92,7 +92,18 @@ typedef struct {
   PDL_Value value;
 } PDL_Anyval;
 
-#include "pdlthread.h"
+#define PDL_CHKMAGIC_GENERAL(it,this_magic,type) \
+  if((it)->magicno != this_magic) \
+    return pdl_make_error(PDL_EFATAL, \
+      "INVALID " type " MAGICNO, got hex=%p (%lu)%s\n", \
+      it,(unsigned long)((it)->magicno), \
+      ((it)->magicno) == PDL_CLEARED_MAGICNO ? " (cleared)" : "" \
+    ); \
+  else (void)0
+#define PDL_CLEARED_MAGICNO 0x99876134 /* value once "cleared" */
+#define PDL_CLRMAGIC(it) (it)->magicno = PDL_CLEARED_MAGICNO
+
+#include "pdlbroadcast.h"
 
 /* Auto-PThreading (i.e. multi-threading) settings for PDL functions */
 /*  Target number of pthreads: Actual will be this number or less.
@@ -232,7 +243,7 @@ PDL_TYPELIST_ALL(X)
 
 #define PDL_NDIMS      6 /* Number of dims[] to preallocate */
 #define PDL_NCHILDREN  8 /* Number of trans_children ptrs to preallocate */
-#define PDL_NTHREADIDS 4 /* Number of different threadids/pdl to preallocate */
+#define PDL_NBROADCASTIDS 4 /* Number of different broadcastids/pdl to preallocate */
 
 /* Constants for pdl.state - not all combinations make sense */
 
@@ -304,13 +315,13 @@ PDL_TYPELIST_ALL(X)
  */
 
 /* Transformation flags */
-#define         PDL_TRANS_DO_THREAD        0x0001
+#define         PDL_TRANS_DO_BROADCAST     0x0001
 #define         PDL_TRANS_BADPROCESS       0x0002
 #define         PDL_TRANS_BADIGNORE        0x0004
 #define         PDL_TRANS_NO_PARALLEL      0x0008
 
 #define PDL_LIST_FLAGS_PDLVTABLE(X) \
-  X(PDL_TRANS_DO_THREAD) \
+  X(PDL_TRANS_DO_BROADCAST) \
   X(PDL_TRANS_BADPROCESS) \
   X(PDL_TRANS_BADIGNORE) \
   X(PDL_TRANS_NO_PARALLEL)
@@ -426,7 +437,7 @@ typedef struct pdl_transvtable {
   short flags;                                                          \
   pdl_transvtable *vtable;                                              \
   int bvalflag;                                                         \
-  pdl_thread pdlthread;                                                 \
+  pdl_broadcast broadcast;                                              \
   PDL_Indx *ind_sizes;                                                  \
   PDL_Indx *inc_sizes;                                                  \
   char dims_redone;                                                     \
@@ -444,12 +455,9 @@ typedef struct pdl_transvtable {
   /* The pdls involved in the transformation */ \
   pdl *pdls[]
 
-#define PDL_CHKMAGIC_GENERAL(it,this_magic,type) if((it)->magicno != this_magic) return pdl_make_error(PDL_EFATAL, "INVALID " #type "MAGIC NO 0x%p %d%s\n",it,(int)((it)->magicno), ((it)->magicno) == PDL_CLEARED_MAGICNO ? " (cleared)" : ""); else (void)0
-
 #define PDL_TR_MAGICNO      0x91827364
-#define PDL_TR_SETMAGIC(it) it->magicno = PDL_TR_MAGICNO
-#define PDL_TR_CLRMAGIC(it) it->magicno = PDL_CLEARED_MAGICNO
-#define PDL_TR_CHKMAGIC(it) PDL_CHKMAGIC_GENERAL(it, PDL_TR_MAGICNO, "TRANS ")
+#define PDL_TR_CHKMAGIC(it) PDL_CHKMAGIC_GENERAL(it, PDL_TR_MAGICNO, "TRANS")
+#define PDL_TR_SETMAGIC(it) (it)->magicno = PDL_TR_MAGICNO
 
 // This is a generic parent of all the trans structures. It is a flexible array
 // (can store an arbitrary number of pdl objects). Thus this can NOT be
@@ -500,8 +508,8 @@ struct pdl_magic;
  */
 
 #define PDL_MAGICNO 0x24645399
-#define PDL_CLEARED_MAGICNO 0x99876134 /* value once "cleared" */
-#define PDL_CHKMAGIC(it) PDL_CHKMAGIC_GENERAL(it,PDL_MAGICNO,"")
+#define PDL_CHKMAGIC(it) PDL_CHKMAGIC_GENERAL(it,PDL_MAGICNO,"PDL")
+#define PDL_SETMAGIC(it) (it)->magicno = PDL_MAGICNO
 
 struct pdl {
    unsigned long magicno; /* Always stores PDL_MAGICNO as a sanity check */
@@ -532,14 +540,14 @@ struct pdl {
    PDL_Indx   *dimincs;   /* Array of data default increments, aka strides through memory for each dim (0 for dummies) */
    PDL_Indx    ndims;     /* Number of data dimensions in dims and dimincs */
 
-   PDL_Indx *threadids;  /* Starting index of the thread index set n */
-   PDL_Indx nthreadids;
+   PDL_Indx *broadcastids;  /* Starting index of the broadcast index set n */
+   PDL_Indx nbroadcastids;
 
    pdl_trans_children trans_children;
 
    PDL_Indx   def_dims[PDL_NDIMS];   /* Preallocated space for efficiency */
    PDL_Indx   def_dimincs[PDL_NDIMS];   /* Preallocated space for efficiency */
-   PDL_Indx   def_threadids[PDL_NTHREADIDS];
+   PDL_Indx   def_broadcastids[PDL_NBROADCASTIDS];
 
    struct pdl_magic *magic;
 
@@ -585,8 +593,10 @@ typedef struct pdl_slice_args {
 #define ABORT_RECURSE_GUARD __nrec=0;
 #define END_RECURSE_GUARD __nrec--;
 
-#define PDL_RETERROR(rv, expr) \
-  do { rv = expr; if (rv.error) return rv; } while (0)
+#define PDL_RETERROR2(rv, expr, iferr) \
+  do { rv = expr; if (rv.error) { iferr } } while (0)
+#define PDL_RETERROR(rv, expr) PDL_RETERROR2(rv, expr, return rv;)
+#define PDL_ACCUMERROR(rv, expr) rv = pdl_error_accumulate(rv, expr)
 
 #define PDL_ENSURE_ALLOCATED(it) \
   if (!(it->state & PDL_ALLOCATED)) { \
@@ -617,17 +627,17 @@ typedef struct pdl_slice_args {
   }
 
 #define PDL_EXPAND(...) __VA_ARGS__
-#define PDL_THREADLOOP_START(funcName, thr, vtable, ptrStep1, ptrStep2, ptrStep3) \
-  __thrloopval = PDL->startthreadloop(&(thr),(vtable)->funcName, __privtrans, &PDL_err); \
+#define PDL_BROADCASTLOOP_START(funcName, brc, vtable, ptrStep1, ptrStep2, ptrStep3) \
+  __brcloopval = PDL->startbroadcastloop(&(brc),(vtable)->funcName, __privtrans, &PDL_err); \
   if (PDL_err.error) return PDL_err; \
-  if ( __thrloopval < 0 ) return PDL->make_error_simple(PDL_EFATAL, "Error starting threadloop"); \
-  if ( __thrloopval ) return PDL_err; \
+  if ( __brcloopval < 0 ) return PDL->make_error_simple(PDL_EFATAL, "Error starting broadcastloop"); \
+  if ( __brcloopval ) return PDL_err; \
   do { \
-    PDL_Indx *__tdims = PDL->get_threaddims(&(thr)); \
-    if (!__tdims) return PDL->make_error_simple(PDL_EFATAL, "Error in get_threaddims"); \
+    PDL_Indx *__tdims = PDL->get_broadcastdims(&(brc)); \
+    if (!__tdims) return PDL->make_error_simple(PDL_EFATAL, "Error in get_broadcastdims"); \
     register PDL_Indx __tdims0 = __tdims[0]; \
     register PDL_Indx __tdims1 = __tdims[1]; \
-    register PDL_Indx *__offsp = PDL->get_threadoffsp(&(thr)); \
+    register PDL_Indx *__offsp = PDL->get_threadoffsp(&(brc)); \
     if (!__offsp ) return PDL->make_error_simple(PDL_EFATAL, "Error in get_threadoffsp"); \
     PDL_COMMENT("incs are each pdl's stride, declared at func start") \
     PDL_COMMENT("offs are each pthread's starting offset into each pdl") \
@@ -644,15 +654,15 @@ typedef struct pdl_slice_args {
         __tind0++ \
         PDL_EXPAND ptrStep3 \
       ) { \
-        PDL_COMMENT("This is the tightest threadloop. Make sure inside is optimal.")
-#define PDL_THREADLOOP_END(thr, ptrStep1) \
+        PDL_COMMENT("This is the tightest loop. Make sure inside is optimal.")
+#define PDL_BROADCASTLOOP_END(brc, ptrStep1) \
       } \
     } \
     PDL_COMMENT("undo outer-loop of tinc1*tdims1, and original per-pthread offset") \
     ptrStep1 \
-    __thrloopval = PDL->iterthreadloop(&(thr),2); \
-    if ( __thrloopval < 0 ) return PDL->make_error_simple(PDL_EFATAL, "Error in iterthreadloop"); \
-  } while(__thrloopval);
+    __brcloopval = PDL->iterbroadcastloop(&(brc),2); \
+    if ( __brcloopval < 0 ) return PDL->make_error_simple(PDL_EFATAL, "Error in iterbroadcastloop"); \
+  } while(__brcloopval);
 
 /* __PDL_H */
 #endif

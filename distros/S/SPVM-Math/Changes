@@ -1,5 +1,15 @@
 Revision history for SPVM::Math
 
+0.09  2021-02-23
+        * SPVM::Math only supports FreeBSD 12+ because old FreeBSD doesn't support C99 math functions correctly, such as cpow.
+
+0.08  2021-02-22
+        * Fix the FreeBSD version checking
+
+0.07  2021-02-22
+        * SPVM::Math needs SPVM 0.9506+ to run Makefile.PL.
+        * SPVM::Math only supports FreeBSD 10+ because old FreeBSD doesn't support C99 math functions correctly.
+
 0.06  2021-02-01
         * SPVM::Math needs SPVM 0.9500+
 0.05  2021-12-24

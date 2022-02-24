@@ -85,9 +85,16 @@ has token => ( is => 'rw' );
 has wantErrorRender => ( is => 'rw' );
 
 # Error type
+
+sub error_role {
+    my $req = shift;
+    return $req->error_type(@_) eq 'negative' ? 'alert' : 'status';
+}
+
 sub error_type {
     my $req  = shift;
     my $code = shift || $req->error;
+    $req->error($code);
 
     # Positive errors
     return "positive"

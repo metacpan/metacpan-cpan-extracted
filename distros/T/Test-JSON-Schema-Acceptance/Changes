@@ -1,5 +1,11 @@
 Revision history for Test-JSON-Schema-Acceptance
 
+1.016     2022-02-22 01:59:45Z
+        - skip tests that are not possible on perls >= 5.35.9, due to changes
+          in internal handling of numbers when treated as strings
+        - updated test suite:
+          https://github.com/json-schema-org/JSON-Schema-Test-Suite/compare/20fb14bde8f3c45a8933cd13283557c1b1fdf5b5...637f0ac3ebdd110065ab846918c03b364d9ee253
+
 1.015     2021-12-31 21:17:27Z
         - removed bignum deserialization that was added in 1.014: you should
           override the json_decoder attribute if you want this

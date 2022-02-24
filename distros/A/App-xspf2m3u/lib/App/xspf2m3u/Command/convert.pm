@@ -1,5 +1,5 @@
 package App::xspf2m3u::Command::convert;
-$App::xspf2m3u::Command::convert::VERSION = '0.0.2';
+$App::xspf2m3u::Command::convert::VERSION = '0.2.0';
 use strict;
 use warnings;
 use autodie;
@@ -27,26 +27,32 @@ sub validate_args
 {
     my ( $self, $opt, $args ) = @_;
 
-    $self->usage_error("args required")            if not @$args;
-    $self->usage_error("can only accept one path") if @$args != 1;
+    $self->usage_error("args required") if not @$args;
+    if (0)
+    {
+        $self->usage_error("can only accept one path") if @$args != 1;
+    }
 }
 
 sub execute
 {
     my ( $self, $opt, $args ) = @_;
 
-    my $playlist = XML::XSPF->parse( $args->[0] );
-
     my $text = '';
-    foreach my $track ( $playlist->trackList )
+    foreach my $fn (@$args)
     {
-        if ( my $loc = $track->location )
+        my $playlist = XML::XSPF->parse($fn);
+
+        foreach my $track ( $playlist->trackList )
         {
-            if ( $loc =~ /[\n\r]/ )
+            if ( my $loc = $track->location )
             {
-                die "Invalid newline in location <<$loc>>!";
+                if ( $loc =~ /[\n\r]/ )
+                {
+                    die "Invalid newline in location <<$loc>>!";
+                }
+                $text .= "$loc\n";
             }
-            $text .= "$loc\n";
         }
     }
     path( $opt->{output} )->spew_utf8($text);
@@ -64,7 +70,7 @@ __END__
 
 =head1 VERSION
 
-version 0.0.2
+version 0.2.0
 
 =for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
@@ -87,27 +93,11 @@ L<https://metacpan.org/release/App-xspf2m3u>
 
 =item *
 
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/App-xspf2m3u>
-
-=item *
-
 RT: CPAN's Bug Tracker
 
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-xspf2m3u>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/App-xspf2m3u>
 
 =item *
 

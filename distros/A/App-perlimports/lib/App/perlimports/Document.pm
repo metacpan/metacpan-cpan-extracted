@@ -3,7 +3,7 @@ package App::perlimports::Document;
 use Moo;
 use utf8;
 
-our $VERSION = '0.000034';
+our $VERSION = '0.000035';
 
 use App::perlimports::Annotations     ();
 use App::perlimports::ExportInspector ();
@@ -727,11 +727,9 @@ sub _has_import_switches {
     # We will leave this case as broken for the time being. I'm not sure how
     # common that invocation is.
 
-    if (
-        exists $self->original_imports->{$module_name}
+    if ( exists $self->original_imports->{$module_name}
         && any { $_ =~ m{^[\-]} }
-        @{ $self->original_imports->{$module_name} || [] }
-    ) {
+        @{ $self->original_imports->{$module_name} || [] } ) {
         return 1;
     }
     return 0;
@@ -1028,7 +1026,7 @@ App::perlimports::Document - Make implicit imports explicit
 
 =head1 VERSION
 
-version 0.000034
+version 0.000035
 
 =head2 inspector_for( $module_name )
 

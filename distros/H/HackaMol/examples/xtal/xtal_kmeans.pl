@@ -343,9 +343,7 @@ sub fract_cart {
                 ]
              );
 
-             print Dumper $cort ; 
    my $cort_inv = $cort->inverse;
-             print Dumper $cort_inv ; exit;
    my $cart_fract_mvr =  [
       V($cort_inv->row(1)->as_list),
       V($cort_inv->row(2)->as_list),

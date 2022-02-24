@@ -1,3 +1,10 @@
+0.15 2022-02-24T00:33:56+01:00
+ - Fix default Error::Pure module via fix in Error::Pure.
+
+0.14 2022-02-23T23:40:09+01:00
+ - Fix default Error::Pure module, which is used for error in tests.
+ - Update copyright years.
+
 0.13 2021-02-21T10:59:26+01:00
  - Add blank lines after arguments and before return.
  - Improve constructor parameters in doc.

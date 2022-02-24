@@ -1,8 +1,10 @@
 Changes
 lib/PDL/IO/Dcm.pm
 lib/PDL/IO/Dcm/Plugins/MRISiemens.pm
+lib/PDL/IO/Dcm/Plugins/MRSSiemens.pm
 lib/PDL/IO/Dcm/Plugins/Primitive.pm
 bin/read_dcm.pl
+bin/sort_dcms.pl
 Makefile.PL
 MANIFEST			This list of files
 README

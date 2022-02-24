@@ -1,3 +1,6 @@
+0.0106 2022-02-23
+- fix setting HAVE_LAPACK to 1 - thanks @YuryPakhomov for report
+
 0.0105 2022-02-13
 - update dep to avoid older PDL breaking on #define
 

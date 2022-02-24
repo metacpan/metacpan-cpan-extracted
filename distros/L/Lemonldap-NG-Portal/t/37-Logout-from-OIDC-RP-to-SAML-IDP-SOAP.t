@@ -6,11 +6,10 @@ use LWP::UserAgent;
 use LWP::Protocol::PSGI;
 use MIME::Base64;
 
-
 # ------------      ---------------------------     ----------------
 # | OIDC RP  |  <-> | OIDC provider + SAML SP | <-> | SAML IdP     |
 # ------------      ---------------------------     ----------------
-# 
+#
 # Use case:
 # - login from RP up to SAML IdP
 # - logout asked from RP, and propagated up to SAML IdP
@@ -24,6 +23,7 @@ BEGIN {
 
 my $maintests = 17;
 my $debug     = 'error';
+
 #my $debug     = 'error';
 my ( $op, $rp, $idp, $res );
 
@@ -31,7 +31,8 @@ my ( $op, $rp, $idp, $res );
 LWP::Protocol::PSGI->register(
     sub {
         my $req = Plack::Request->new(@_);
-        ok( $req->uri =~ m#http://auth.((?:op|rp|idp)).com(.*)#, ' REST request' );
+        ok( $req->uri =~ m#http://auth.((?:op|rp|idp)).com(.*)#,
+            ' REST request' );
         my $host = $1;
         my $url  = $2;
         my ( $res, $client );
@@ -75,15 +76,17 @@ LWP::Protocol::PSGI->register(
             );
         }
         ok( $res->[0] == 200, '  Response is 200' );
-        ok( getHeader( $res, 'Content-Type' ) =~ m#^(application/json|text/xml)#,
-            '  Content is JSON|XML' )
-          or explain( $res->[1], 'Content-Type => (application/json|text/xml)' );
+        ok(
+            getHeader( $res, 'Content-Type' ) =~
+              m#^(application/json|text/xml)#,
+            '  Content is JSON|XML'
+          )
+          or
+          explain( $res->[1], 'Content-Type => (application/json|text/xml)' );
         count(4);
         return $res;
     }
 );
-
-
 
 SKIP: {
     eval "use Lasso";
@@ -112,7 +115,6 @@ SKIP: {
 
     $rp = register( 'rp', sub { rp( $jwks, $metadata ) } );
 
-
     # LOGIN PROCESS ############################################################
 
     # Query RP for auth
@@ -137,14 +139,16 @@ SKIP: {
 
     # Try to authenticate to IdP
     ok(
-        $res = $idp->_get( $urlidp, query => $queryidp, accept => 'text/html'),
-            "SAML Authentication on idp,        endpoint $urlidp" );
+        $res = $idp->_get( $urlidp, query => $queryidp, accept => 'text/html' ),
+        "SAML Authentication on idp,        endpoint $urlidp"
+    );
     my $pdataidp = expectCookie( $res, 'lemonldappdata' );
 
     my ( $host, $tmp );
+
     # expectForm (result, host, uri, @requiredfield)
     ( $host, $tmp, $query ) = expectForm( $res, '#', undef,
-                   ( 'url', 'timezone', 'skin', 'user', 'password' ) );
+        ( 'url', 'timezone', 'skin', 'user', 'password' ) );
     $query =~ s/user=/user=dwho/;
     $query =~ s/password=/password=dwho/;
 
@@ -161,7 +165,6 @@ SKIP: {
 
     $pdataidp = expectCookie( $res, 'lemonldappdata' );
     my $cookieidp = expectCookie( $res, 'lemonldap' );
-
 
     ( $host, $url, $query ) =
       expectForm( $res, 'auth.op.com', '/saml/proxySingleSignOnPost',
@@ -184,59 +187,70 @@ SKIP: {
     $pdataop = expectCookie( $res, 'lemonldappdata' );
     my $cookieop = expectCookie( $res, 'lemonldap' );
 
+    ( $url, $query ) =
+      expectRedirection( $res, qr#^http://auth.op.com(/oauth2)\?*(.*)$# );
 
-    ( $url, $query ) = expectRedirection( $res, qr#^http://auth.op.com(/oauth2)\?*(.*)$# );
-
-    ok( $res = $op->_get( $url, query => $query,
-                                accept => 'text/html',
-                                cookie => "lemonldappdata=$pdataop; lemonldap=$cookieop",
-                        ),
-        'Call OP from SAML SP' );
+    ok(
+        $res = $op->_get(
+            $url,
+            query  => $query,
+            accept => 'text/html',
+            cookie => "lemonldappdata=$pdataop; lemonldap=$cookieop",
+        ),
+        'Call OP from SAML SP'
+    );
 
     $pdataop = expectCookie( $res, 'lemonldappdata' );
 
-    # No consent here because we have disabled it (oidcRPMetaDataOptionsBypassConsent)
+# No consent here because we have disabled it (oidcRPMetaDataOptionsBypassConsent)
 
     ($query) = expectRedirection( $res, qr#^http://auth.rp.com/?\?(.*)$# );
-
 
     # Push OP response to RP
     switch ('rp');
 
     ok( $res = $rp->_get( '/', query => $query, accept => 'text/html' ),
         'Call openidconnectcallback on RP' );
-    my $cookierp = expectCookie($res, 'lemonldap');
+    my $cookierp = expectCookie( $res, 'lemonldap' );
 
     # Authentication done on RP + OP + IDP
 
-
     # LOGOUT PROCESS ###########################################################
-    $url = '/';
+    $url   = '/';
     $query = 'logout=1';
-    ok( $res = $rp->_get( $url, query => $query,
-                                accept => 'text/html',
-                                cookie => "lemonldap=$cookierp",
-                        ),
-        'Call logout from RP' );
+    ok(
+        $res = $rp->_get(
+            $url,
+            query  => $query,
+            accept => 'text/html',
+            cookie => "lemonldap=$cookierp",
+        ),
+        'Call logout from RP'
+    );
 
     # lemonldap cookie set to "0"
     $cookierp = expectCookie( $res, 'lemonldap' );
     ok( $cookierp eq "0", 'Test empty cookie on RP' );
 
     # forward logout to OP
-    ( $url, $query ) = expectRedirection( $res, qr#^http://auth.op.com(/.*)\?(.*)$# );
+    ( $url, $query ) =
+      expectRedirection( $res, qr#^http://auth.op.com(/.*)\?(.*)$# );
 
     switch ('op');
 
-    ok( $res = $op->_get( $url, query => $query,
-                                accept => 'text/html',
-                                cookie => "lemonldappdata=$pdataop; lemonldap=$cookieop",
-                        ),
-        'Forward logout to OP' );
+    ok(
+        $res = $op->_get(
+            $url,
+            query  => $query,
+            accept => 'text/html',
+            cookie => "lemonldappdata=$pdataop; lemonldap=$cookieop",
+        ),
+        'Forward logout to OP'
+    );
 
     # expectForm (result, host, uri, @requiredfield)
     ( $host, $tmp, $query ) = expectForm( $res, '#', undef,
-                   ( 'post_logout_redirect_uri', 'confirm', 'skin' ) );
+        ( 'post_logout_redirect_uri', 'confirm', 'skin' ) );
 
     ok(
         $res = $op->_post(
@@ -253,28 +267,38 @@ SKIP: {
     $cookieop = expectCookie( $res, 'lemonldap' );
     ok( $cookieop eq "0", 'Test empty cookie on OP' );
 
-    ( $url, $query ) = expectRedirection( $res, qr#^http://auth.rp.com(/?.*)\?(.*)$# );
+    ( $url, $query ) =
+      expectRedirection( $res, qr#^http://auth.rp.com(/?.*)\?(.*)$# );
 
     switch ('rp');
 
-    ok( $res = $rp->_get( $url, query => $query,
-                               accept => 'text/html',
-                               cookie => "lemonldap=$cookierp",
-                        ),
-        'redirect to RP' );
+    ok(
+        $res = $rp->_get(
+            $url,
+            query  => $query,
+            accept => 'text/html',
+            cookie => "lemonldap=$cookierp",
+        ),
+        'redirect to RP'
+    );
 
     expectOK($res);
 
     # test connexion on IDP
-    switch('idp');
-    ok( $res = $idp->_get( '/', query => '',
-                                accept => 'text/html',
-                                cookie => "lemonldap=$cookieidp",
-                        ),
-        'Test if still logged on IDP' );
+    switch ('idp');
+    ok(
+        $res = $idp->_get(
+            '/',
+            query  => '',
+            accept => 'text/html',
+            cookie => "lemonldap=$cookieidp",
+        ),
+        'Test if still logged on IDP'
+    );
 
-    like( $res->[2]->[0], qr/userfield/,
-       'test presence of user field in form (prove successful logout)' );
+    like( $res->[2]->[0],
+        qr/userfield/,
+        'test presence of user field in form (prove successful logout)' );
 
 }
 
@@ -310,8 +334,9 @@ sub op {
                         oidcRPMetaDataOptionsBypassConsent     => 1,
                         oidcRPMetaDataOptionsClientSecret      => "rpsecret",
                         oidcRPMetaDataOptionsUserIDAttr        => "",
-                        oidcRPMetaDataOptionsAccessTokenExpiration => 3600,
-                        oidcRPMetaDataOptionsPostLogoutRedirectUris => 'http://auth.rp.com?logout=1',
+                        oidcRPMetaDataOptionsAccessTokenExpiration  => 3600,
+                        oidcRPMetaDataOptionsPostLogoutRedirectUris =>
+                          'http://auth.rp.com?logout=1',
                     }
                 },
                 oidcOPMetaDataOptions           => {},
@@ -335,45 +360,46 @@ sub op {
                 samlServicePublicKeyEnc     => saml_key_sp_public_enc,
                 samlServicePublicKeySig     => saml_key_sp_public_sig,
                 samlIDPSSODescriptorWantAuthnRequestsSigned => 1,
-                samlSPSSODescriptorWantAssertionsSigned => 1,
-                samlIDPMetaDataXML           => {
+                samlSPSSODescriptorWantAssertionsSigned     => 1,
+                samlIDPMetaDataXML                          => {
                     'idp' => {
-                        samlIDPMetaDataXML =>
-                          samlIDPComplexMetaDataXML( 'idp', 'HTTP-Redirect', 'SOAP' )
+                        samlIDPMetaDataXML => samlIDPComplexMetaDataXML(
+                            'idp', 'HTTP-Redirect', 'SOAP'
+                        )
                     },
                 },
                 samlIDPMetaDataOptions => {
                     'idp' => {
-                        'samlIDPMetaDataOptionsAdaptSessionUtime' => 0,
-                        'samlIDPMetaDataOptionsAllowLoginFromIDP' => 0,
-                        'samlIDPMetaDataOptionsAllowProxiedAuthn' => 0,
-                        'samlIDPMetaDataOptionsCheckAudience' => 1,
+                        'samlIDPMetaDataOptionsAdaptSessionUtime'        => 0,
+                        'samlIDPMetaDataOptionsAllowLoginFromIDP'        => 0,
+                        'samlIDPMetaDataOptionsAllowProxiedAuthn'        => 0,
+                        'samlIDPMetaDataOptionsCheckAudience'            => 1,
                         'samlIDPMetaDataOptionsCheckSLOMessageSignature' => 1,
                         'samlIDPMetaDataOptionsCheckSSOMessageSignature' => 1,
-                        'samlIDPMetaDataOptionsCheckTime' => 1,
-                        'samlIDPMetaDataOptionsDisplayName' => 'idp',
-                        'samlIDPMetaDataOptionsEncryptionMode' => 'none',
-                        'samlIDPMetaDataOptionsForceAuthn' => 0,
-                        'samlIDPMetaDataOptionsForceUTF8' => 0,
-                        'samlIDPMetaDataOptionsIcon' => '',
-                        'samlIDPMetaDataOptionsIsPassive' => 0,
-                        'samlIDPMetaDataOptionsNameIDFormat' => '',
-                        'samlIDPMetaDataOptionsRelayStateURL' => 0,
+                        'samlIDPMetaDataOptionsCheckTime'                => 1,
+                        'samlIDPMetaDataOptionsDisplayName'           => 'idp',
+                        'samlIDPMetaDataOptionsEncryptionMode'        => 'none',
+                        'samlIDPMetaDataOptionsForceAuthn'            => 0,
+                        'samlIDPMetaDataOptionsForceUTF8'             => 0,
+                        'samlIDPMetaDataOptionsIcon'                  => '',
+                        'samlIDPMetaDataOptionsIsPassive'             => 0,
+                        'samlIDPMetaDataOptionsNameIDFormat'          => '',
+                        'samlIDPMetaDataOptionsRelayStateURL'         => 0,
                         'samlIDPMetaDataOptionsRequestedAuthnContext' => '',
-                        'samlIDPMetaDataOptionsResolutionRule' => '',
+                        'samlIDPMetaDataOptionsResolutionRule'        => '',
                         'samlIDPMetaDataOptionsSLOBinding' => 'http-soap',
                         'samlIDPMetaDataOptionsSSOBinding' => 'http-redirect',
-                        'samlIDPMetaDataOptionsSignSLOMessage' => 1,
-                        'samlIDPMetaDataOptionsSignSSOMessage' => 1,
+                        'samlIDPMetaDataOptionsSignSLOMessage'  => 1,
+                        'samlIDPMetaDataOptionsSignSSOMessage'  => 1,
                         'samlIDPMetaDataOptionsSignatureMethod' => '',
-                        'samlIDPMetaDataOptionsStoreSAMLToken' => 0
+                        'samlIDPMetaDataOptionsStoreSAMLToken'  => 0
                     }
                 },
                 samlIDPMetaDataExportedAttributes => {
-                        'idp' => {
-                           'cn' => '1;cn',
-                           'uid' => '1;uid'
-                        }
+                    'idp' => {
+                        'cn'  => '1;cn',
+                        'uid' => '1;uid'
+                    }
                 },
             }
         }
@@ -424,42 +450,44 @@ sub rp {
 sub idp {
     return LLNG::Manager::Test->new( {
             ini => {
-                logLevel                          => $debug,
-                domain                            => 'idp.com',
-                portal                            => 'http://auth.idp.com',
-                authentication                    => 'Demo',
-                userDB                            => 'Same',
-                issuerDBSAMLActivation            => 1,
-                restSessionServer                 => 1,
-                samlSPMetaDataOptions => {
+                logLevel               => $debug,
+                domain                 => 'idp.com',
+                portal                 => 'http://auth.idp.com',
+                authentication         => 'Demo',
+                userDB                 => 'Same',
+                issuerDBSAMLActivation => 1,
+                restSessionServer      => 1,
+                samlSPMetaDataOptions  => {
                     sp => {
                         'samlSPMetaDataOptionsCheckSLOMessageSignature' => 1,
                         'samlSPMetaDataOptionsCheckSSOMessageSignature' => 1,
-                        'samlSPMetaDataOptionsEnableIDPInitiatedURL' => 0,
-                        'samlSPMetaDataOptionsEncryptionMode' => 'none',
-                        'samlSPMetaDataOptionsForceUTF8' => 1,
-                        'samlSPMetaDataOptionsNameIDFormat' => '',
+                        'samlSPMetaDataOptionsEnableIDPInitiatedURL'    => 0,
+                        'samlSPMetaDataOptionsEncryptionMode'      => 'none',
+                        'samlSPMetaDataOptionsForceUTF8'           => 1,
+                        'samlSPMetaDataOptionsNameIDFormat'        => '',
                         'samlSPMetaDataOptionsNotOnOrAfterTimeout' => 72000,
-                        'samlSPMetaDataOptionsOneTimeUse' => 0,
-                        'samlSPMetaDataOptionsSessionNotOnOrAfterTimeout' => 72000,
-                        'samlSPMetaDataOptionsSignSLOMessage' => -1,
-                        'samlSPMetaDataOptionsSignSSOMessage' => 1,
+                        'samlSPMetaDataOptionsOneTimeUse'          => 0,
+                        'samlSPMetaDataOptionsSessionNotOnOrAfterTimeout' =>
+                          72000,
+                        'samlSPMetaDataOptionsSignSLOMessage'  => -1,
+                        'samlSPMetaDataOptionsSignSSOMessage'  => 1,
                         'samlSPMetaDataOptionsSignatureMethod' => ''
                     }
                 },
                 samlSPMetaDataXML => {
                     sp => {
-                        samlSPMetaDataXML =>
-                         samlSPComplexMetaDataXML( 'op', 'HTTP-Redirect', 'SOAP' ),
-                        'samlSPSSODescriptorAuthnRequestsSigned' => 1,
+                        samlSPMetaDataXML => samlSPComplexMetaDataXML(
+                            'op', 'HTTP-Redirect', 'SOAP'
+                        ),
+                        'samlSPSSODescriptorAuthnRequestsSigned'  => 1,
                         'samlSPSSODescriptorWantAssertionsSigned' => 1,
                     }
                 },
                 samlSPMetaDataExportedAttributes => {
-                        'sp' => {
-                           'cn' => '1;cn',
-                           'uid' => '1;uid'
-                        }
+                    'sp' => {
+                        'cn'  => '1;cn',
+                        'uid' => '1;uid'
+                    }
                 },
                 samlOrganizationDisplayName => "IDP",
                 samlOrganizationName        => "IDP",

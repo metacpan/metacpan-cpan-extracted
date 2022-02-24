@@ -9,6 +9,7 @@ setMsg = (msg, level) ->
 	$('#color').addClass "message-#{level}"
 	level = 'success' if level == 'positive'
 	$('#color').addClass "alert-#{level}"
+	$('#msg').attr 'role', (if level == 'danger' then 'alert' else 'status')
 
 displayError = (j, status, err) ->
 	console.log 'Error', err

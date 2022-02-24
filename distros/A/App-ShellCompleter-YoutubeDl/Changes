@@ -1,3 +1,11 @@
+0.123   2021-09-07  Released-By: PERLANCAR; Urgency: low
+
+	- [doc] Mention App::ShellCompleter::YtDlp.
+
+	- Remove devdata/, it has been moved to perl-CLI-Meta-YoutubeDl
+	  repo.
+
+
 0.122   2020-09-09  Released-By: PERLANCAR; Urgency: medium
 
 	- [refactor] Extract list of options to a separate distro:

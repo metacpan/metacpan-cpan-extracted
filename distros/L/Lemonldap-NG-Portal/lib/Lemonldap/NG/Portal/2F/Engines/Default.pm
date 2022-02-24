@@ -23,7 +23,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_NO_SECOND_FACTORS
 );
 
-our $VERSION = '2.0.12';
+our $VERSION = '2.0.14';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 with 'Lemonldap::NG::Portal::Lib::OverConf';
@@ -293,8 +293,8 @@ sub run {
                   || 'Second factor notification';
                 my $msg = $self->conf->{sfRemovedNotifMsg}
                   || "$removed expired second factor(s) has/have been removed ($name)!";
-                $msg =~ s/_removedSF_/$removed/;
-                $msg =~ s/_nameSF_/$name/;
+                $msg =~ s/\b_removedSF_\b/$removed/;
+                $msg =~ s/\b_nameSF_\b/$name/;
                 my $params =
                   $removed > 1
                   ? { trspan => "expired2Fremoved, $removed, $name" }
@@ -385,7 +385,8 @@ sub run {
             MSG           => $self->canUpdateSfa($req) || 'choose2f',
             ALERT   => ( $self->canUpdateSfa($req) ? 'warning' : 'positive' ),
             MODULES => [
-                map { {
+                map {
+                    {
                         CODE  => $_->prefix,
                         LOGO  => $_->logo,
                         LABEL => $_->label
@@ -440,7 +441,7 @@ sub _choice {
             return $self->p->do(
                 $req,
                 [
-                    sub { $res }, 'controlUrl',
+                    sub { $res },  'controlUrl',
                     'buildCookie', @{ $self->p->endAuth },
                 ]
             );

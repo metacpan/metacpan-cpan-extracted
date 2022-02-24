@@ -1,3 +1,8 @@
+0.004   2022-02-18  Released-By: PERLANCAR; Urgency: medium
+
+        - Use Log::ger::Level::FromVar.
+
+
 0.003   2022-01-16  Released-By: PERLANCAR; Urgency: medium
 
 	- [ux] Enable Screen 0.018's colorize_tags option.

@@ -12,7 +12,7 @@ extends 'Lemonldap::NG::Manager::Conf';
 has diffRule => ( is => 'rw', default => sub { 0 } );
 has brwRule  => ( is => 'rw', default => sub { 0 } );
 
-our $VERSION = '2.0.10';
+our $VERSION = '2.0.14';
 
 #############################
 # I. INITIALIZATION METHODS #
@@ -67,7 +67,7 @@ sub init {
     }
 
     # Forbid hidden keys
-    foreach ( split /\s+/, $hiddenKeys ) {
+    foreach ( split /[,\s]+/, $hiddenKeys ) {
         $self->addRoute(
             view => { ':cfgNum' => { $_ => 'rejectKey' } },
             ['GET']

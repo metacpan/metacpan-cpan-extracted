@@ -27,7 +27,7 @@ sub _get {
             'REQUEST_URI'          => $path . ( $query ? "?$query" : '' ),
             'SERVER_PORT'          => '8002',
             'SERVER_PROTOCOL'      => 'HTTP/1.1',
-            'HTTP_USER_AGENT' =>
+            'HTTP_USER_AGENT'      =>
               'Mozilla/5.0 (VAX-4000; rv:36.0) Gecko/20350101 Firefox',
             'REMOTE_ADDR' => '127.0.0.1',
             'HTTP_HOST'   => '127.0.0.1:8002'
@@ -52,7 +52,7 @@ sub _post {
             'REQUEST_URI'          => $path . ( $query ? "?$query" : '' ),
             'SERVER_PORT'          => '8002',
             'SERVER_PROTOCOL'      => 'HTTP/1.1',
-            'HTTP_USER_AGENT' =>
+            'HTTP_USER_AGENT'      =>
               'Mozilla/5.0 (VAX-4000; rv:36.0) Gecko/20350101 Firefox',
             'REMOTE_ADDR'          => '127.0.0.1',
             'HTTP_HOST'            => '127.0.0.1:8002',
@@ -81,7 +81,7 @@ sub _put {
             'REQUEST_URI'          => $path . ( $query ? "?$query" : '' ),
             'SERVER_PORT'          => '8002',
             'SERVER_PROTOCOL'      => 'HTTP/1.1',
-            'HTTP_USER_AGENT' =>
+            'HTTP_USER_AGENT'      =>
               'Mozilla/5.0 (VAX-4000; rv:36.0) Gecko/20350101 Firefox',
             'REMOTE_ADDR'          => '127.0.0.1',
             'HTTP_HOST'            => '127.0.0.1:8002',
@@ -110,7 +110,7 @@ sub _patch {
             'REQUEST_URI'          => $path . ( $query ? "?$query" : '' ),
             'SERVER_PORT'          => '8002',
             'SERVER_PROTOCOL'      => 'HTTP/1.1',
-            'HTTP_USER_AGENT' =>
+            'HTTP_USER_AGENT'      =>
               'Mozilla/5.0 (VAX-4000; rv:36.0) Gecko/20350101 Firefox',
             'REMOTE_ADDR'          => '127.0.0.1',
             'HTTP_HOST'            => '127.0.0.1:8002',
@@ -137,7 +137,7 @@ sub _del {
             'REQUEST_URI'          => $path . ( $query ? "?$query" : '' ),
             'SERVER_PORT'          => '8002',
             'SERVER_PROTOCOL'      => 'HTTP/1.1',
-            'HTTP_USER_AGENT' =>
+            'HTTP_USER_AGENT'      =>
               'Mozilla/5.0 (VAX-4000; rv:36.0) Gecko/20350101 Firefox',
             'REMOTE_ADDR' => '127.0.0.1',
             'HTTP_HOST'   => '127.0.0.1:8002',

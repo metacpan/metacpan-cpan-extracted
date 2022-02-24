@@ -2,7 +2,7 @@ package Lemonldap::NG::Common::Logger::Std;
 
 use strict;
 
-our $VERSION = '2.0.5';
+our $VERSION = '2.0.14';
 
 sub new {
     no warnings 'redefine';
@@ -18,7 +18,7 @@ qq'sub $_ {print STDERR "[".localtime."] [LLNG:\$\$] [$_] \$_[1]\n"}';
         }
         $show = 0 if ( $level eq $_ );
     }
-    die "unknown level $level" if ($show);
+    die "Unknown logLevel $level" if ($show);
     return bless {}, shift;
 }
 

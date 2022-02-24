@@ -10,7 +10,7 @@ die "No fortran compiler found. Will not build PDL::Opt::NonLinear on this syste
 my @pack = (qw(nonlinear.pd NonLinear PDL::Opt::NonLinear), undef, 1);
 my @ffiles = map {s/\.f$//; $_} glob("*.f");
 my $fobj = join ' ', map {"$_\$(OBJ_EXT)"} @ffiles;
-my @cfiles = qw(hooke asa asa_usr dhc de36);
+my @cfiles = qw(hooke asa asa_usr dhc de36 select);
 my $cobj = join ' ', map "$_\$(OBJ_EXT)", @cfiles;
 
 my %hash = pdlpp_stdargs(\@pack);

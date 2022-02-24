@@ -7,7 +7,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_INFO
 );
 
-our $VERSION = '2.0.10';
+our $VERSION = '2.0.14';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Plugin
@@ -17,8 +17,6 @@ extends qw(
 # INITIALIZATION
 
 use constant endAuth => 'run';
-
-sub init { 1 }
 
 # RUNNING METHOD
 

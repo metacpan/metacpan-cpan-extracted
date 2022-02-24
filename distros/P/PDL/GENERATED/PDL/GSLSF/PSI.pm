@@ -21,7 +21,8 @@ use DynaLoader;
 
 
 
-#line 5 "gsl_sf_psi.pd"
+#line 4 "gsl_sf_psi.pd"
+
 use strict;
 use warnings;
 
@@ -38,7 +39,7 @@ Poly-Gamma Functions
   psi(m,x) := (d/dx)^m psi(0,x) = (d/dx)^{m+1} log(gamma(x))
 
 =cut
-#line 42 "PSI.pm"
+#line 43 "PSI.pm"
 
 
 
@@ -52,7 +53,8 @@ Poly-Gamma Functions
 
 
 
-#line 1059 "../../../../blib/lib/PDL/PP.pm"
+#line 1058 "../../../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 gsl_sf_psi
@@ -72,17 +74,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 76 "PSI.pm"
+#line 78 "PSI.pm"
 
 
 
-#line 1061 "../../../../blib/lib/PDL/PP.pm"
+#line 1060 "../../../../blib/lib/PDL/PP.pm"
+
 *gsl_sf_psi = \&PDL::gsl_sf_psi;
-#line 82 "PSI.pm"
+#line 85 "PSI.pm"
 
 
 
-#line 1059 "../../../../blib/lib/PDL/PP.pm"
+#line 1058 "../../../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 gsl_sf_psi_1piy
@@ -102,17 +106,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 106 "PSI.pm"
+#line 110 "PSI.pm"
 
 
 
-#line 1061 "../../../../blib/lib/PDL/PP.pm"
+#line 1060 "../../../../blib/lib/PDL/PP.pm"
+
 *gsl_sf_psi_1piy = \&PDL::gsl_sf_psi_1piy;
-#line 112 "PSI.pm"
+#line 117 "PSI.pm"
 
 
 
-#line 1059 "../../../../blib/lib/PDL/PP.pm"
+#line 1058 "../../../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 gsl_sf_psi_n
@@ -132,19 +138,21 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 136 "PSI.pm"
-
-
-
-#line 1061 "../../../../blib/lib/PDL/PP.pm"
-*gsl_sf_psi_n = \&PDL::gsl_sf_psi_n;
 #line 142 "PSI.pm"
 
 
 
+#line 1060 "../../../../blib/lib/PDL/PP.pm"
+
+*gsl_sf_psi_n = \&PDL::gsl_sf_psi_n;
+#line 149 "PSI.pm"
 
 
-#line 70 "gsl_sf_psi.pd"
+
+
+
+#line 69 "gsl_sf_psi.pd"
+
 =head1 AUTHOR
 
 This file copyright (C) 1999 Christian Pellegrin <chri@infis.univ.trieste.it>
@@ -157,7 +165,7 @@ PDL distribution, the copyright notice should be included in the file.
 The GSL SF modules were written by G. Jungman.
 
 =cut
-#line 161 "PSI.pm"
+#line 169 "PSI.pm"
 
 
 

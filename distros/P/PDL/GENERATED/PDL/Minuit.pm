@@ -21,7 +21,8 @@ use DynaLoader;
 
 
 
-#line 15 "minuit.pd"
+#line 14 "minuit.pd"
+
 =head1 NAME
 
 PDL::Minuit -- a PDL interface to the Minuit library
@@ -40,7 +41,7 @@ the function mn_excm() can be used to issue many Minuit commands, including simp
 and migrad minimization algorithms (see Minuit manual for more details).
 
 See the test file minuit.t in the test (t/) directory for a basic example.
-#line 44 "Minuit.pm"
+#line 45 "Minuit.pm"
 
 
 
@@ -54,7 +55,8 @@ See the test file minuit.t in the test (t/) directory for a basic example.
 
 
 
-#line 37 "minuit.pd"
+#line 36 "minuit.pd"
+
 
 use strict;
 use warnings;
@@ -99,11 +101,12 @@ sub mn_init{
   }
 
 }
-#line 103 "Minuit.pm"
+#line 105 "Minuit.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 mninit
@@ -125,17 +128,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 129 "Minuit.pm"
+#line 132 "Minuit.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *mninit = \&PDL::Minuit::mninit;
-#line 135 "Minuit.pm"
+#line 139 "Minuit.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 mn_abre
@@ -157,17 +162,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 161 "Minuit.pm"
+#line 166 "Minuit.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *mn_abre = \&PDL::Minuit::mn_abre;
-#line 167 "Minuit.pm"
+#line 173 "Minuit.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 mn_cierra
@@ -189,17 +196,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 193 "Minuit.pm"
+#line 200 "Minuit.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *mn_cierra = \&PDL::Minuit::mn_cierra;
-#line 199 "Minuit.pm"
+#line 207 "Minuit.pm"
 
 
 
-#line 108 "minuit.pd"
+#line 107 "minuit.pd"
+
 
 sub mn_def_pars{
   my $pars  = shift;
@@ -246,11 +255,12 @@ sub mn_def_pars{
      PDL::Minuit::mn_cierra($mn_options->{Unit});
   }
 }
-#line 250 "Minuit.pm"
+#line 259 "Minuit.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 mnparm
@@ -272,17 +282,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 276 "Minuit.pm"
+#line 286 "Minuit.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *mnparm = \&PDL::Minuit::mnparm;
-#line 282 "Minuit.pm"
+#line 293 "Minuit.pm"
 
 
 
-#line 164 "minuit.pd"
+#line 163 "minuit.pd"
+
 
 sub mn_excm{
   my $command = shift;
@@ -311,11 +323,12 @@ sub mn_excm{
 
   return $iflag;
 }
-#line 315 "Minuit.pm"
+#line 327 "Minuit.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 mnexcm
@@ -337,17 +350,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 341 "Minuit.pm"
+#line 354 "Minuit.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *mnexcm = \&PDL::Minuit::mnexcm;
-#line 347 "Minuit.pm"
+#line 361 "Minuit.pm"
 
 
 
-#line 205 "minuit.pd"
+#line 204 "minuit.pd"
+
 
   sub mn_pout{
     barf "Usage: mn_pout(par_number)" unless ($#_ == 0);
@@ -373,11 +388,12 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
     return ($val,$err,$bnd1,$bnd2,$ivarbl,$par_name);    
   }
-#line 377 "Minuit.pm"
+#line 392 "Minuit.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 mnpout
@@ -399,17 +415,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 403 "Minuit.pm"
+#line 419 "Minuit.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *mnpout = \&PDL::Minuit::mnpout;
-#line 409 "Minuit.pm"
+#line 426 "Minuit.pm"
 
 
 
-#line 242 "minuit.pd"
+#line 241 "minuit.pd"
+
 
   sub mn_stat{
      if (defined (my $logfile = $mn_options->{Log})){
@@ -425,11 +443,12 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
      return ($fmin,$fedm,$errdef,$npari,$nparx,$istat);
   }
-#line 429 "Minuit.pm"
+#line 447 "Minuit.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 mnstat
@@ -451,17 +470,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 455 "Minuit.pm"
+#line 474 "Minuit.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *mnstat = \&PDL::Minuit::mnstat;
-#line 461 "Minuit.pm"
+#line 481 "Minuit.pm"
 
 
 
-#line 264 "minuit.pd"
+#line 263 "minuit.pd"
+
 
   sub mn_emat{
    
@@ -482,11 +503,12 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
     return $mat;
 
   }
-#line 486 "Minuit.pm"
+#line 507 "Minuit.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 mnemat
@@ -508,17 +530,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 512 "Minuit.pm"
+#line 534 "Minuit.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *mnemat = \&PDL::Minuit::mnemat;
-#line 518 "Minuit.pm"
+#line 541 "Minuit.pm"
 
 
 
-#line 292 "minuit.pd"
+#line 291 "minuit.pd"
+
 
   sub mn_err{
 
@@ -540,11 +564,12 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
     return ($eplus,$eminus,$eparab,$globcc);
   }
-#line 544 "Minuit.pm"
+#line 568 "Minuit.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 mnerrs
@@ -566,17 +591,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 570 "Minuit.pm"
+#line 595 "Minuit.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *mnerrs = \&PDL::Minuit::mnerrs;
-#line 576 "Minuit.pm"
+#line 602 "Minuit.pm"
 
 
 
-#line 320 "minuit.pd"
+#line 319 "minuit.pd"
+
 
   sub mn_contour{
     barf "Usage: mn_contour(par_number_1,par_number_2,npt)" unless ($#_ == 2);
@@ -603,11 +630,12 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
     return ($xpt,$ypt,$nfound);
   }
-#line 607 "Minuit.pm"
+#line 634 "Minuit.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 mncont
@@ -629,17 +657,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 633 "Minuit.pm"
+#line 661 "Minuit.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *mncont = \&PDL::Minuit::mncont;
-#line 639 "Minuit.pm"
+#line 668 "Minuit.pm"
 
 
 
-#line 358 "minuit.pd"
+#line 357 "minuit.pd"
+
 
 =head2 mn_init()
 
@@ -909,7 +939,7 @@ COPYING in the PDL distribution. If this file is separated from the
 PDL distribution, the copyright notice should be included in the file.
 
 =cut
-#line 913 "Minuit.pm"
+#line 943 "Minuit.pm"
 
 
 

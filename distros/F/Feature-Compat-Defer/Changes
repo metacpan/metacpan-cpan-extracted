@@ -1,4 +1,10 @@
 Revision history for Feature-Compat-Defer
 
+0.02    2022-02-20
+        [CHANGES]
+         * Updates to unit tests for latest core perl diagnostic messages
+         * Updates to unit tests for SKD 0.07's ability to reject forbidden
+           control-flow at compiletime
+
 0.01    2021-08-26
         First version, released on an unsuspecting world.

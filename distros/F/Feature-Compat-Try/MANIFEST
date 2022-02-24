@@ -1,13 +1,10 @@
 Build.PL
 Changes
 lib/Feature/Compat/Try.pm
-LICENSE
 MANIFEST			This list of files
-META.json
-META.yml
-README
 t/00use.t
 t/01trycatch.t
+t/03trycatchfinally.t
 t/10snail.t
 t/11loop.t
 t/12return.t
@@ -16,3 +13,7 @@ t/15context.t
 t/16final-expr.t
 t/80await+try.t
 t/99pod.t
+README
+LICENSE
+META.yml
+META.json

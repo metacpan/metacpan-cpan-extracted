@@ -4,7 +4,8 @@ use Config;
 use Test::More tests => 1;
 BEGIN {
   my @modules;
-  eval q{
+  eval ## no critic (BuiltinFunctions::ProhibitStringyEval)
+  q{
     require FindBin;
     require File::Spec;
     1;
@@ -18,7 +19,7 @@ BEGIN {
       chomp @modules;
     }
   };
-  eval qq{ require $_ } for @modules;
+  eval qq{ require $_ } for @modules;  ## no critic (BuiltinFunctions::ProhibitStringyEval)
 };
 
 sub spacer ()
@@ -75,9 +76,9 @@ require(File::Spec->catfile($FindBin::Bin, '00_diag.pl'))
 
 foreach my $module (@modules)
 {
-  if(eval qq{ require $module; 1 })
+  if(eval qq{ require $module; 1 }) ## no critic (BuiltinFunctions::ProhibitStringyEval)
   {
-    my $ver = eval qq{ \$$module\::VERSION };
+    my $ver = eval qq{ \$$module\::VERSION };  ## no critic (BuiltinFunctions::ProhibitStringyEval)
     $ver = 'undef' unless defined $ver;
     diag sprintf $format, $module, $ver;
   }

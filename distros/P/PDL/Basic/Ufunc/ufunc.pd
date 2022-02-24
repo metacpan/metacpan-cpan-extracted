@@ -254,34 +254,34 @@ pp_def(
        /* Integration formulae from Press et al 2nd Ed S 4.1 */
        switch (ns) {
       case 1:
-          threadloop %{
+          broadcastloop %{
           $b() = 0.; /* not a(n=>0); as interval has zero width */
           %}
           break;
         case 2:
-          threadloop %{
+          broadcastloop %{
           $b() = 0.5*($a(n=>0)+$a(n=>1));
           %}
           break;
         case 3:
-          threadloop %{
+          broadcastloop %{
           $b() = ($a(n=>0)+4*$a(n=>1)+$a(n=>2))/3.;
           %}
           break;
       case 4:
-          threadloop %{
+          broadcastloop %{
           $b() = ($a(n=>0)+$a(n=>3)+3.*($a(n=>1)+$a(n=>2)))*0.375;
           %}
           break;
       case 5:
-          threadloop %{
+          broadcastloop %{
           $b() = (14.*($a(n=>0)+$a(n=>4))
                    +64.*($a(n=>1)+$a(n=>3))
                    +24.*$a(n=>2))/45.;
           %}
           break;
       default:
-          threadloop %{
+          broadcastloop %{
         for (nn=3,tmp=0;nn<ns-3;nn++) { tmp += $a(n=>nn); }
         tmp += (23./24.)*($a(n=>2)+$a(n=>nn));nn++;
         tmp += (7./6.)  *($a(n=>1)+$a(n=>nn));nn++;
@@ -633,7 +633,7 @@ Returns a list with minimum and maximum values of an ndarray.
 
  ($mn, $mx) = minmax($pdl);
 
-This routine does I<not> thread over the dimensions of C<$pdl>;
+This routine does I<not> broadcast over the dimensions of C<$pdl>;
 it returns the minimum and maximum values of the whole ndarray.
 See L</minmaximum> if this is not what is required.
 The two values are returned as Perl scalars similar to min/max,
@@ -782,7 +782,7 @@ sub generic_qsortvec {
 # when copying the data over to the temporary array,
 # ignore the bad values and then only send the number
 # of good elements to the sort routines
-# should use threadloop ?
+# should use broadcastloop ?
 my $copy_to_temp_good = '
            PDL_Indx nn, nn1;
 	   loop(n) %{ $tmp() = $a(); %}
@@ -1191,7 +1191,7 @@ pp_def(
 Sort a list of vectors lexicographically.
 
 The 0th dimension of the source ndarray is dimension in the vector;
-the 1st dimension is list order.  Higher dimensions are threaded over.
+the 1st dimension is list order.  Higher dimensions are broadcasted over.
 
 =for example
 
@@ -1266,7 +1266,7 @@ containing the M-indices of original array rows, in sorted order.
 As with C<qsortvec>, the zeroth element of the vectors runs slowest in the
 sorted list.  
 
-Additional dimensions are threaded over: each plane is sorted separately,
+Additional dimensions are broadcasted over: each plane is sorted separately,
 so qsortveci may be thought of as a collapse operator of sorts (groan).
 
 =cut

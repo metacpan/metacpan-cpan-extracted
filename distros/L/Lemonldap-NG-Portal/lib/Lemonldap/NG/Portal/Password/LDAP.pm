@@ -38,13 +38,15 @@ sub modifyPassword {
       if $self->conf->{ldapGetUserBeforePasswordChange};
 
     if ( $req->data->{dn} ) {
-        $dn                 = $req->data->{dn};
-        $requireOldPassword = $self->requireOldPwdRule->( $req, $req->userData );
+        $dn = $req->data->{dn};
+        $requireOldPassword =
+          $self->requireOldPwdRule->( $req, $req->userData );
         $self->logger->debug("Get DN from request data: $dn");
     }
     else {
-        $dn                 = $req->sessionInfo->{_dn};
-        $requireOldPassword = $self->requireOldPwdRule->( $req, $req->sessionInfo );
+        $dn = $req->sessionInfo->{_dn};
+        $requireOldPassword =
+          $self->requireOldPwdRule->( $req, $req->sessionInfo );
         $self->logger->debug("Get DN from session data: $dn");
     }
     unless ($dn) {

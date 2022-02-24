@@ -1,5 +1,19 @@
 Revision history for Dist-Zilla-Plugin-SignReleaseNotes
 
+0.0008 -- Sat Feb 19 13:58:19 AST 2022
+
+    - af4ed9a Add a test
+    - 6118622 Update for new release version
+    - 94bc7b4 If repo tags less than 2 add all commits to Release notes
+    - 2da4b69 Support more than sha256 from Digest::SHA
+    - f87a753 (tag: 0.0007) v0.0007
+
+0.0007 -- Thu Feb 17 16:39:27 AST 2022
+
+  - b7d453d Update version number
+  - 450e9a7 Fix incorrect Git::Wrapper version
+  - 1e5d7ed v0.0006
+
 0.0006 -- Sun Feb 06 11:29:07 AST 2022
 
   - dd458e2 Update version

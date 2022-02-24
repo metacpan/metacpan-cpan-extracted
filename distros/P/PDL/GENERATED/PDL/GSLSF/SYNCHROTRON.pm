@@ -21,7 +21,8 @@ use DynaLoader;
 
 
 
-#line 5 "gsl_sf_synchrotron.pd"
+#line 4 "gsl_sf_synchrotron.pd"
+
 use strict;
 use warnings;
 
@@ -34,7 +35,7 @@ PDL::GSLSF::SYNCHROTRON - PDL interface to GSL Special Functions
 This is an interface to the Special Function package present in the GNU Scientific Library. 
 
 =cut
-#line 38 "SYNCHROTRON.pm"
+#line 39 "SYNCHROTRON.pm"
 
 
 
@@ -48,7 +49,8 @@ This is an interface to the Special Function package present in the GNU Scientif
 
 
 
-#line 1059 "../../../../blib/lib/PDL/PP.pm"
+#line 1058 "../../../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 gsl_sf_synchrotron_1
@@ -68,17 +70,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 72 "SYNCHROTRON.pm"
+#line 74 "SYNCHROTRON.pm"
 
 
 
-#line 1061 "../../../../blib/lib/PDL/PP.pm"
+#line 1060 "../../../../blib/lib/PDL/PP.pm"
+
 *gsl_sf_synchrotron_1 = \&PDL::gsl_sf_synchrotron_1;
-#line 78 "SYNCHROTRON.pm"
+#line 81 "SYNCHROTRON.pm"
 
 
 
-#line 1059 "../../../../blib/lib/PDL/PP.pm"
+#line 1058 "../../../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 gsl_sf_synchrotron_2
@@ -98,19 +102,21 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 102 "SYNCHROTRON.pm"
+#line 106 "SYNCHROTRON.pm"
 
 
 
-#line 1061 "../../../../blib/lib/PDL/PP.pm"
+#line 1060 "../../../../blib/lib/PDL/PP.pm"
+
 *gsl_sf_synchrotron_2 = \&PDL::gsl_sf_synchrotron_2;
-#line 108 "SYNCHROTRON.pm"
+#line 113 "SYNCHROTRON.pm"
 
 
 
 
 
-#line 51 "gsl_sf_synchrotron.pd"
+#line 50 "gsl_sf_synchrotron.pd"
+
 =head1 AUTHOR
 
 This file copyright (C) 1999 Christian Pellegrin <chri@infis.univ.trieste.it>
@@ -123,7 +129,7 @@ PDL distribution, the copyright notice should be included in the file.
 The GSL SF modules were written by G. Jungman.
 
 =cut
-#line 127 "SYNCHROTRON.pm"
+#line 133 "SYNCHROTRON.pm"
 
 
 

@@ -126,8 +126,8 @@ sub BUILD {
 
     if ( $self->{info} ) {
         foreach ( keys %{ $self->{info} } ) {
-            next if ( $_ eq "_session_id" and $data->{_session_id} );
-            next if ( $_ eq "_session_kind" and $data->{_session_kind});
+            next if ( $_ eq "_session_id"   and $data->{_session_id} );
+            next if ( $_ eq "_session_kind" and $data->{_session_kind} );
             if ( defined $self->{info}->{$_} ) {
                 $data->{$_} = $self->{info}->{$_};
             }

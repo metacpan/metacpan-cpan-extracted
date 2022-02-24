@@ -5,7 +5,7 @@ use IO::String;
 
 require 't/test-lib.pm';
 
-my $maintests = 25;
+my $maintests = 30;
 
 my $res;
 my $json;
@@ -22,9 +22,10 @@ my $client = LLNG::Manager::Test->new( {
             findUserWildcard            => '*',
             findUserSearchingAttributes => {
                 'uid##1'      => 'Name',
-                'guy'      => 'Kind',
+                'guy'         => 'Kind',
                 'type#Type#1' => 'mutant; mutant; character',
-                'cn#Name' => 'Bad Guy; Not a good person; The Daleks; daleks'
+                'cn#Name'     =>
+                  '2_Bad Guy; Not a good person; 1_The Daleks; daleks'
             },
             findUserExcludingAttributes =>
               { type => 'mutant', uid => 'rtyler' },
@@ -37,6 +38,17 @@ use Lemonldap::NG::Portal::Main::Constants 'PE_USERNOTFOUND';
 ok( $res = $client->_get( '/', accept => 'text/html' ), 'Get Portal', );
 my ( $host, $url, $query ) =
   expectForm( $res, '#', undef, 'user', 'password', 'spoofId' );
+ok( $res->[2]->[0] =~ m%mandatoryField%, 'Mandatory field' )
+  or explain( $res->[2]->[0], 'Mandatory' );
+
+my @c = ( $res->[2]->[0] =~ m%<option value="(.+?)">%gs );
+ok( @c == 2, ' -> Two entries found' )
+  or explain( $res->[2]->[0], 'Required 2, found ' . scalar @c );
+ok( $c[0] eq 'The Daleks', '  1st -> ' . $c[0] );
+ok( $c[1] eq 'Bad Guy',    '  2nd -> ' . $c[1] );
+@c = ( $res->[2]->[0] =~ m%\*%gs );
+ok( @c == 3, ' -> Three stars found' )
+  or explain( $res->[2]->[0], 'Required 3, found ' . scalar @c );
 
 my $request = '';
 ok(
@@ -74,12 +86,12 @@ ok(
 ) or explain( $res->[2]->[0], 'Search for an account' );
 ok(
     $res->[2]->[0] =~
-m%<input id="findUser_guy" name="guy" type="text" autocomplete="off" class="form-control" placeholder="Kind" />%,
+m%<input id="findUser_guy" name="guy" type="text" autocomplete="off" class="form-control" aria-label="Kind" placeholder="Kind" />%,
     'id="findUser_guy"'
 ) or explain( $res->[2]->[0], 'id="findUser_guy"' );
 ok(
     $res->[2]->[0] =~
-m%<input id="findUser_uid" name="uid" type="text" autocomplete="off" class="form-control" placeholder="Name" />%,
+m%<input id="findUser_uid" name="uid" type="text" autocomplete="off" class="form-control" aria-label="Name" placeholder="Name" />%,
     'id="findUser_uid"'
 ) or explain( $res->[2]->[0], 'id="findUser_uid"' );
 ok(

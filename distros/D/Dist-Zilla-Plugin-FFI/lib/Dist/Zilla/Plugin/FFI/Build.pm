@@ -1,8 +1,10 @@
-package Dist::Zilla::Plugin::FFI::Build 1.04 {
+package Dist::Zilla::Plugin::FFI::Build 1.05 {
 
-  use 5.014;
+  use 5.024;
   use Moose;
   use List::Util qw( first );
+
+  # ABSTRACT: Add FFI::Build to your Makefile.PL
 
 
   # TODO: also add build and test prereqs for aliens
@@ -85,7 +87,7 @@ EOF2
       $self->zilla->prune_file($file);
     }
   }
-  
+
   __PACKAGE__->meta->make_immutable;
 }
 
@@ -99,11 +101,11 @@ __END__
 
 =head1 NAME
 
-Dist::Zilla::Plugin::FFI::Build
+Dist::Zilla::Plugin::FFI::Build - Add FFI::Build to your Makefile.PL
 
 =head1 VERSION
 
-version 1.04
+version 1.05
 
 =head1 SYNOPSIS
 

@@ -76,6 +76,7 @@ META.yml
 README
 scripts/convertConfig
 scripts/convertSessions
+scripts/encryptTotpSecrets
 scripts/importMetadata
 scripts/lemonldap-ng-cli
 scripts/lemonldap-ng-sessions
@@ -89,9 +90,11 @@ t/05-Common-Conf-LDAP.t
 t/30-Common-Safelib.t
 t/35-Common-Crypto.t
 t/36-Common-Regexp.t
+t/37-Common-TOTP.pm
 t/40-Common-Session.t
 t/50-Combination-Parser.t
 t/60-Session-Cli.t
+t/60-U2F-Migrate.t
 t/99-pod.t
 tools/apache-session-mysql.sql
 tools/lmConfig.CDBI.mysql

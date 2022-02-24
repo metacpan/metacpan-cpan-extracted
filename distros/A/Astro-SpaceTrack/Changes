@@ -1,3 +1,7 @@
+0.150		2022-02-20	T. R. Wyant
+    Convert celestrak() to new API.  Additional functionality based on
+    this API to follow.
+
 0.149		2022-01-22	T. R. Wyant
     Add Celestrak Iridium Next supplemental element catalog
 

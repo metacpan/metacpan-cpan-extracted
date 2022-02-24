@@ -23,7 +23,7 @@ images, spectra, etc to be stored efficiently and manipulated quickly.
 
 =head1 VECTORIZATION 
 
-For a description of the vectorization (also called "threading"), see
+For a description of the vectorization (also called "broadcasting"), see
 L<PDL::Core>.
 
 
@@ -156,7 +156,7 @@ start-up modules.
 =cut
 
 # set the version:
-our $VERSION = '2.074';
+our $VERSION = '2.075';
 
 # Main loader of standard PDL package
 
@@ -208,7 +208,7 @@ our $no_clone_skip_warning = 0;
 sub CLONE_SKIP {
     warn <<'EOF' if !$no_clone_skip_warning;
 * If you need to share PDL data across threads, use memory mapped data, or
-* check out PDL::Parallel::threads, available on CPAN.
+* check out PDL::ParallelCPU, available on CPAN.
 * You can silence this warning by saying `$PDL::no_clone_skip_warning = 1;'
 * before you create your first thread.
 EOF

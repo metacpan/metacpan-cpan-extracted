@@ -10,7 +10,7 @@ my $client = LLNG::Manager::Test->new( {
         ini => {
             logLevel                => 'error',
             useSafeJail             => 1,
-            stayConnected           => 1,
+            stayConnected           => '$env->{REMOTE_ADDR} eq "127.0.0.1"',
             loginHistoryEnabled     => 1,
             securedCookie           => 1,
             stayConnectedTimeout    => 1000,
@@ -82,8 +82,8 @@ ok(
 );
 expectRedirection( $res, 'http://auth.example.com/' );
 my $cid = expectCookie( $res, 'llngpersistent' );
-ok( $res->[1]->[5] =~ /\bsecure\b/, ' Secured cookie found' )
-  or print STDERR Dumper( $res->[1]->[5] );
+ok( $res->[1]->[5] =~ /\bsecure\b/, ' Secure cookie found' )
+  or explain( $res->[1]->[5], 'Secure cookie found' );
 count(2);
 $client->logout($id);
 
@@ -178,8 +178,8 @@ ok( $query =~ /user/, ' Get login form' );
 expectCookie( $res, 'llngpersistent' );
 my @connexionCookie = grep /llngpersistent/, @{ $res->[1] };
 ok( $connexionCookie[0] =~ /secure/ && $connexionCookie[0] =~ /21 Oct 2015/,
-    'Found secured and expired connexion Cookie' )
-  or print STDERR Dumper( $connexionCookie[0] );
+    'Found secure and expired connexion Cookie' )
+  or explain( $connexionCookie[0], 'Secure and expired cookie' );
 count(3);
 
 # Try to authenticate with history
@@ -214,8 +214,8 @@ count(1);
 $cid = expectCookie( $res, 'llngpersistent' );
 
 ok( $res->[2]->[0] =~ qr%<img src="/static/common/logos/logo_llng_old.png"%,
-    'Found custom Main Logo' )
-  or print STDERR Dumper( $res->[2]->[0] );
+    'Found custom main Logo' )
+  or explain( $res->[2]->[0], 'Custom main logo' );
 ok( $res->[2]->[0] =~ /trspan="lastLogins"/, 'History found' )
   or explain( $res->[2]->[0], 'trspan="lastLogins"' );
 my @c = ( $res->[2]->[0] =~ /<td>127.0.0.1/gs );
@@ -236,7 +236,7 @@ ok(
 );
 ok( $res->[2]->[0] =~ m%<span trspan="yourApps">Your applications</span>%,
     ' Apps menu found' )
-  or print STDERR Dumper( $res->[2]->[0] );
+  or explain( $res->[2]->[0], 'Apps menu' );
 count(6);
 expectOK($res);
 

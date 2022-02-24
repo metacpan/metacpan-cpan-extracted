@@ -1,5 +1,5 @@
 package ExtUtils::HasCompiler;
-$ExtUtils::HasCompiler::VERSION = '0.021';
+$ExtUtils::HasCompiler::VERSION = '0.023';
 use strict;
 use warnings;
 
@@ -100,11 +100,12 @@ sub can_compile_loadable_object {
 	}
 	else {
 		my @extra;
+		my $inc = qq{"-I$incdir"};
 		if ($^O eq 'MSWin32') {
 			my $lib = '-l' . ($libperl =~ /lib([^.]+)\./)[0];
 			push @extra, "$abs_basename.def", $lib, $perllibs;
 		}
-		elsif ($^O eq 'cygwin') {
+		elsif ($^O =~ /^(cygwin|msys)$/) {
 			push @extra, catfile($incdir, $config->get('useshrplib') ? 'libperl.dll.a' : 'libperl.a');
 		}
 		elsif ($^O eq 'aix') {
@@ -114,7 +115,10 @@ sub can_compile_loadable_object {
 		elsif ($^O eq 'android') {
 			push @extra, qq{"-L$incdir"}, '-lperl', $perllibs;
 		}
-		push @commands, qq{$cc $ccflags $optimize "-I$incdir" $cccdlflags -c $source_name -o $object_file};
+		elsif ($^O eq 'darwin' && $config->get('perlpath') eq '/usr/bin/perl' && ($config->get('osvers') =~ /(\d+)/)[0] >= 18) {
+			$inc = qq{-iwithsysroot "$incdir"};
+		}
+		push @commands, qq{$cc $ccflags $optimize $inc $cccdlflags -c $source_name -o $object_file};
 		push @commands, qq{$ld $object_file -o $loadable_object $lddlflags @extra};
 	}
 
@@ -222,7 +226,7 @@ ExtUtils::HasCompiler - Check for the presence of a compiler
 
 =head1 VERSION
 
-version 0.021
+version 0.023
 
 =head1 SYNOPSIS
 

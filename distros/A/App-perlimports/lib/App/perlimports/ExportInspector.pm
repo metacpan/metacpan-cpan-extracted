@@ -4,7 +4,7 @@ use Moo;
 
 ## no critic (TestingAndDebugging::ProhibitNoStrict)
 
-our $VERSION = '0.000034';
+our $VERSION = '0.000035';
 
 use App::perlimports::Sandbox ();
 use Class::Inspector          ();
@@ -266,16 +266,13 @@ sub _build_is_oo_class {
 
     return any {
         $_ eq 'Moose::Object::BUILDALL' || $_ eq 'Moo::Object::BUILDALL'
-    }
-    @{$methods};
+    } @{$methods};
 }
 
 sub _build_isa_test_builder {
     my $self = shift;
-    if (
-        any { $_ eq 'Test::Builder::Module' }
-        @{ $self->_implicit->{class_isa} }
-    ) {
+    if ( any { $_ eq 'Test::Builder::Module' }
+        @{ $self->_implicit->{class_isa} } ) {
         return 1;
     }
 
@@ -440,8 +437,9 @@ sub _random_pkg_name {
 sub _build_is_moose_class {
     my $self = shift;
 
-    return any { $_ eq 'Moose::Object' || $_ eq 'Test::Class::Moose' }
-    @{ $self->pkg_isa };
+    return
+        any { $_ eq 'Moose::Object' || $_ eq 'Test::Class::Moose' }
+        @{ $self->pkg_isa };
 }
 
 sub _build_uses_moose {
@@ -456,12 +454,11 @@ sub _build_is_moo_class {
     my $self = shift;
     if ( $self->_maybe_require_module('Class::Inspector') ) {
         return 1
-            if any { $_ eq 'Moo::is_class' }
-        @{ Class::Inspector->methods(
+            if any { $_ eq 'Moo::is_class' } @{ Class::Inspector->methods(
                 $self->_module_name, 'full', 'public'
                 )
                 || []
-        };
+            };
     }
     return 0;
 }
@@ -471,7 +468,7 @@ sub _build_is_moose_type_class {
 
     return
         any { $_ eq 'MooseX::Types::Base' || $_ eq 'MooseX::Types::Combine' }
-    @{ $self->class_isa };
+        @{ $self->class_isa };
 }
 
 sub explicit_export_names_match_values {
@@ -522,7 +519,7 @@ App::perlimports::ExportInspector - Inspect code for exportable symbols
 
 =head1 VERSION
 
-version 0.000034
+version 0.000035
 
 =head1 SYNOPSIS
 

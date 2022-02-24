@@ -7,7 +7,7 @@ use Lemonldap::NG::Common::Session;
 use Lemonldap::NG::Common::UserAgent;
 use Lemonldap::NG::Common::FormEncode;
 use XML::Simple;
-use HTML::Entities qw(decode_entities);
+use HTML::Entities qw(decode_entities encode_entities);
 use MIME::Base64;
 use HTTP::Request;         # SOAP call
 use POSIX qw(strftime);    # Convert SAML2 date into timestamp
@@ -21,7 +21,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SAML_SLO_ERROR
 );
 
-our $VERSION = '2.0.12';
+our $VERSION = '2.0.14';
 
 # PROPERTIES
 
@@ -300,7 +300,7 @@ sub loadIDPs {
         }
         $self->logger->debug("Set encryption mode $encryption_mode on IDP $_");
 
-        # Set signature method if overriden
+        # Set signature method if overridden
         my $signature_method = $self->conf->{samlIDPMetaDataOptions}->{$_}
           ->{samlIDPMetaDataOptionsSignatureMethod};
         if ($signature_method) {
@@ -471,7 +471,7 @@ sub loadSPs {
         }
         $self->logger->debug("Set encryption mode $encryption_mode on SP $_");
 
-        # Set signature method if overriden
+        # Set signature method if overridden
         my $signature_method = $self->conf->{samlSPMetaDataOptions}->{$_}
           ->{samlSPMetaDataOptionsSignatureMethod};
         if ($signature_method) {
@@ -550,7 +550,7 @@ sub checkMessage {
             $message = $self->resolveArtifact( $profile, $artifact, $method );
 
             # Request or response ?
-            if ( $message =~ /samlp:response/i ) {
+            if ( $self->_isArtifactSamlResponse($message) ) {
                 $response = $message;
             }
             else {
@@ -598,7 +598,7 @@ sub checkMessage {
                   $self->resolveArtifact( $profile, $artifact, $method );
 
                 # Request or response ?
-                if ( $message =~ /samlp:response/i ) {
+                if ( $self->_isArtifactSamlResponse($message) ) {
                     $response = $message;
                 }
                 else {
@@ -625,6 +625,29 @@ sub checkMessage {
 
     # 4. Return values
     return ( $request, $response, $method, $relaystate, $artifact ? 1 : 0 );
+}
+
+sub _isArtifactSamlResponse {
+    my ( $self, $message ) = @_;
+
+    my $type = eval {
+        my $resp = Lasso::Samlp2ArtifactResponse->new;
+        $resp->init_from_message($message);
+        $resp->any->get_name;
+    };
+
+    if ($@) {
+        $self->logger->warn("Could not detect type of Artifact response");
+        return;
+    }
+
+    $self->logger->debug("Artifact response type is $type");
+    if ( $type eq "Response" ) {
+        return 1;
+    }
+    else {
+        return 0;
+    }
 }
 
 ## @method boolean checkLassoError(Lasso::Error error, string level)
@@ -1864,6 +1887,10 @@ sub resolveArtifact {
             $message = $soap_answer->content();
             $self->logger->debug("Get message $message");
         }
+        else {
+            $self->logger->error(
+                "Error while sending message: " . $soap_answer->status_line );
+        }
     }
 
     return $message;
@@ -2533,8 +2560,10 @@ sub sendLogoutResponseToServiceProvider {
         $req->{postFields} = { 'SAMLResponse' => $slo_body };
 
         # RelayState
-        $req->{postFields}->{'RelayState'} = $relaystate
-          if ($relaystate);
+        if ($relaystate) {
+            $req->{postFields}->{'RelayState'} = encode_entities($relaystate);
+            $req->data->{safeHiddenFormValues}->{RelayState} = 1;
+        }
 
         return $self->p->do( $req, ['autoPost'] );
     }
@@ -3011,7 +3040,7 @@ sub createAttributeValue {
 
     # Decode UTF-8
     $self->logger->debug("Decode UTF8 value $value") if $force_utf8;
-    $value = decode( "utf8", $value ) if $force_utf8;
+    $value = decode( "utf8", $value )                if $force_utf8;
     $self->logger->debug("Create attribute value $value");
 
     # SAML2 attribute value

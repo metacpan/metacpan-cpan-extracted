@@ -1,6 +1,6 @@
 package Lemonldap::NG::Handler::Main::Reload;
 
-our $VERSION = '2.0.12';
+our $VERSION = '2.0.14';
 
 package Lemonldap::NG::Handler::Main;
 
@@ -65,7 +65,8 @@ sub checkConf {
         or $class->cfgNum != $conf->{cfgNum}
         or $class->cfgDate != $conf->{cfgDate} )
     {
-        $class->logger->debug("Get configuration $conf->{cfgNum}");
+        $class->logger->debug(
+            "Get configuration $conf->{cfgNum} aged $conf->{cfgDate}");
         unless ( $class->cfgNum( $conf->{cfgNum} )
             && $class->cfgDate( $conf->{cfgDate} ) )
         {
@@ -248,6 +249,8 @@ sub defaultValuesInit {
               $conf->{vhostOptions}->{$vhost}->{vhostServiceTokenTTL};
             $class->tsv->{accessToTrace}->{$vhost} =
               $conf->{vhostOptions}->{$vhost}->{vhostAccessToTrace};
+            $class->tsv->{devOpsRulesUrl}->{$vhost} =
+              $conf->{vhostOptions}->{$vhost}->{vhostDevOpsRulesUrl};
         }
     }
     return 1;
@@ -639,7 +642,7 @@ sub oauth2Init {
 
 sub substitute {
     my ( $class, $expr ) = @_;
-    $expr ||= '';
+    $expr //= '';
 
     # substitute special vars, just for retro-compatibility
     $expr =~ s/\$date\b/&date/sg;
@@ -656,7 +659,7 @@ sub substitute {
     $expr =~ s/\binGroup\(([^)]*)\)/listMatch(\$s->{'hGroups'},$1,1)/g;
 
     # handle has2f
-    $expr =~ s/\bhas2f\(([^),]*)\)/has2f(\$s,$1)/g;
+    $expr =~ s/\bhas2f\(([^),]*)\)/has2f_internal(\$s,$1)/g;
 
     return $expr;
 }

@@ -1,3 +1,7 @@
+v1.23.18 Fri, 18 Feb 2022 17:10:21 +0100 moocow
+	+ fixes for PDL v2.073, contributed by mohawk2
+	+ shared github actions, contributed by zmughal
+
 v1.23.17 Tue, 18 Jan 2022 21:26:32 +0100 moocow
 	+ merged changes for PDL 2.066+ from mohawk2
 	  - opt in to PDL 2.058 multi-C, dep on PDL v2.019

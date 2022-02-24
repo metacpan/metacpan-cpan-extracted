@@ -83,9 +83,9 @@ my $client = LLNG::Manager::Test->new( {
             restUserDBUrl  => 'http://ws/search',
 
             #restFindUserDBUrl => 'http://ws/search',
-            findUser          => 1,
-            impersonationRule => 1,
-            useSafeJail       => 1,
+            findUser                    => 1,
+            impersonationRule           => 1,
+            useSafeJail                 => 1,
             findUserSearchingAttributes =>
               { 'uid##1' => 'Login', 'guy##1' => 'Kind', 'cn##1' => 'Name' },
             findUserExcludingAttributes =>

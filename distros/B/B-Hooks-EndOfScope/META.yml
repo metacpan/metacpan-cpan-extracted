@@ -32,13 +32,13 @@ no_index:
 provides:
   B::Hooks::EndOfScope:
     file: lib/B/Hooks/EndOfScope.pm
-    version: '0.25'
+    version: '0.26'
   B::Hooks::EndOfScope::PP:
     file: lib/B/Hooks/EndOfScope/PP.pm
-    version: '0.25'
+    version: '0.26'
   B::Hooks::EndOfScope::XS:
     file: lib/B/Hooks/EndOfScope/XS.pm
-    version: '0.25'
+    version: '0.26'
 requires:
   Module::Implementation: '0.05'
   Scalar::Util: '0'
@@ -50,10 +50,10 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=B-Hooks-EndOfScope
   homepage: https://github.com/karenetheridge/B-Hooks-EndOfScope
   repository: https://github.com/karenetheridge/B-Hooks-EndOfScope.git
-version: '0.25'
+version: '0.26'
 x_Dist_Zilla:
   perl:
-    version: '5.035003'
+    version: '5.035008'
   plugins:
     -
       class: Dist::Zilla::Plugin::Prereqs
@@ -343,10 +343,6 @@ x_Dist_Zilla:
               name: '@Author::ETHER/generate SUPPORT'
               version: '4.018'
             -
-              class: Pod::Weaver::Section::AllowOverride
-              name: '@Author::ETHER/allow override SUPPORT'
-              version: '0.05'
-            -
               class: Pod::Weaver::Section::Authors
               name: '@Author::ETHER/Authors'
               version: '4.018'
@@ -455,7 +451,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.31.1
+          git_version: 2.34.1
           include_authors: 0
           include_releaser: 1
           order_by: commits
@@ -522,7 +518,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::EnsureLatestPerl
       config:
         Dist::Zilla::Plugin::EnsureLatestPerl:
-          Module::CoreList: '5.20210920'
+          Module::CoreList: '5.20220120'
       name: '@Author::ETHER/EnsureLatestPerl'
       version: '0.008'
     -
@@ -547,7 +543,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.31.1
+          git_version: 2.34.1
           repo_root: .
       name: '@Author::ETHER/initial check'
       version: '2.048'
@@ -555,7 +551,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.31.1
+          git_version: 2.34.1
           repo_root: .
       name: '@Author::ETHER/Git::CheckFor::MergeConflicts'
       version: '0.014'
@@ -563,7 +559,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.31.1
+          git_version: 2.34.1
           repo_root: .
       name: '@Author::ETHER/Git::CheckFor::CorrectBranch'
       version: '0.014'
@@ -589,7 +585,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.31.1
+          git_version: 2.34.1
           repo_root: .
       name: '@Author::ETHER/after tests'
       version: '2.048'
@@ -673,7 +669,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.31.1
+          git_version: 2.34.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -686,11 +682,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.25'
+          tag: '0.26'
           tag_format: '%v'
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.31.1
+          git_version: 2.34.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -727,7 +723,7 @@ x_Dist_Zilla:
             - (?^:^lib/.*\.pm$)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.31.1
+          git_version: 2.34.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -749,7 +745,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.31.1
+          git_version: 2.34.1
           repo_root: .
       name: '@Author::ETHER/Git::Push'
       version: '2.048'
@@ -875,7 +871,7 @@ x_contributors:
   - 'Simon Wilper <sxw@chronowerks.de>'
   - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'
   - 'Tomas Doran <bobtfish@bobtfish.net>'
-x_generated_by_perl: v5.35.3
+x_generated_by_perl: v5.35.8
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_use_unsafe_inc: 0

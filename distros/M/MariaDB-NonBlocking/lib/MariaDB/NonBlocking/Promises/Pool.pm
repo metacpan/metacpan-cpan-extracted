@@ -89,6 +89,11 @@ sub _can_retry_error { # Override
     return 0;
 }
 
+sub _error_requires_connection_to_be_dropped { # Override
+    my ($pool, $error) = @_;
+    return 1;
+}
+
 # Must return a hashref that can be given to ->connect.
 sub _get_connection_args { # Override
     my ($pool) = @_;
@@ -272,12 +277,17 @@ sub _remove_connection_and_extend {
     return $pool->_check_and_maybe_extend_pool_size;
 }
 
+sub _connection_in_standby {
+    my ($pool, $conn) = @_;
+    return $conn->current_state eq 'STANDBY';
+}
+
 sub _add_connection_to_pool {
     my ($pool, $conn, $refaddr) = @_;
     $refaddr //= refaddr $conn;
     my $lifeline = delete $pool->{in_use_connections}{$refaddr}; # $conn & $lifeline are now the last strong refs
 
-    if ( $conn->current_state ne 'STANDBY' ) {
+    if ( !$pool->_connection_in_standby($conn) ) {
         Carp::cluck("Tried to add a broken connection to the nonblocking pool.  Thanks, but no thanks.  How did this happen?");
         $pool->_drop_connection($conn, $refaddr);
         return;
@@ -731,6 +741,21 @@ sub _run_query {
             $pending->[PENDING_RETRIES_REMAINING]--;
             $pending->[PENDING_SCHEDULED_TIME] = time;
             $pool->_add_to_pending_array($pending);
+            if ( $pool ) {
+                if (
+                    # a perl-level timeout will leave the connection in a weird state,
+                    # so we cannot reuse it:
+                    $pool->_connection_in_standby($conn)
+                        &&
+                    # some errors mean the cannot reuse the connection:
+                    !$pool->_error_requires_connection_to_be_dropped($error)
+                ) {
+                    $pool->_add_connection_to_pool( $conn );
+                }
+                else {
+                    $pool->_remove_connection_and_extend( $conn );
+                }
+            }
             return;
         }
 

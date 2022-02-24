@@ -1,3 +1,8 @@
+0.013  2022-02-18 09:51:01 CET
+  - allow for reauthentication
+  - add option authorize_params for extra authorization parameters from the config
+  - add option allowed_authorize_params for extra authorization from the url
+
 0.012  2022-02-16 11:17:28 CET
   - basic authentication requires encode_base64 with trailing =
 

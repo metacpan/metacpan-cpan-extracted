@@ -4,7 +4,7 @@ Plack::Middleware::Security::Simple - A simple security filter for Plack
 
 # VERSION
 
-version v0.5.0
+version v0.6.0
 
 # SYNOPSIS
 
@@ -100,7 +100,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2014,2018-2021 by Robert Rothenberg.
+This software is Copyright (c) 2014,2018-2022 by Robert Rothenberg.
 
 This is free software, licensed under:
 

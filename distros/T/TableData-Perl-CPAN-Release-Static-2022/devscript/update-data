@@ -1,0 +1,17 @@
+#!/usr/bin/env perl
+
+use 5.010001;
+use strict;
+use warnings;
+use FindBin '$Bin';
+use Log::ger;
+BEGIN { our $Default_Log_Level = 'info' }
+use Log::ger::Screen;
+
+use DateTime;
+use IPC::System::Options 'system', -log=>1;
+
+my $now = DateTime->now;
+my $year = $now->year;
+
+system({shell=>1, die=>1}, "list-metacpan-releases --from $year-01-01T00:00:00 --to $year-12-31T23:59:59 --sort date --format csv > '$Bin/../share/$year.csv'");

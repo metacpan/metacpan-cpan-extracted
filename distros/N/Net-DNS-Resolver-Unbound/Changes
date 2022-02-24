@@ -1,6 +1,10 @@
 Revision history for Perl extension Net::DNS::Resolver::Unbound.
 
 
+**** 1.08  Feb 21, 2022
+	Avoid ub_result leak when async handle is abandoned unread.
+
+
 **** 1.07  Feb 16, 2022
 	Avoid potential ub_result double-free vulnerability.
 	Circumvent failures emanating from ancient Unbound versions.

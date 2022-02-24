@@ -70,7 +70,7 @@
          "web" : "https://github.com/LibreCat/Plack-Auth-SSO-OIDC"
       }
    },
-   "version" : "0.012",
+   "version" : "0.013",
    "x_contributors" : [
       "Nicolas Franck <nicolas.franck@ugent.be>"
    ],

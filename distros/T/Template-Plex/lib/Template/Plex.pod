@@ -106,6 +106,8 @@ To get started after installation, copy the following lines into perl and execut
 	@vars{qw<name age>}=qw<Richard 23>;
 	say $template->render;
 
+For more examples, checkout the examples directory in this distribution.
+
 =head1 MOTIATION
 
 =over
@@ -140,8 +142,6 @@ hard work
 =item * More tests
 
 =item * Add a guide document
-
-=item * Make examples of recursion, lexical scoping, etc...
 
 =item * CLI app to render .plex files
 

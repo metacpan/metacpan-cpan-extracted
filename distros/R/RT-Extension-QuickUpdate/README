@@ -7,7 +7,7 @@ DESCRIPTION
     instead of needing to browse between tabs in order to do so.
 
 RT VERSION
-    Works with all releases of RT 4.
+    Works with RT 4.4, 5.0
 
 INSTALLATION
     perl Makefile.PL
@@ -15,7 +15,7 @@ INSTALLATION
     make install
         May need root permissions
 
-    Edit your /opt/rt4/etc/RT_SiteConfig.pm
+    Edit your /opt/rt5/etc/RT_SiteConfig.pm
         If you are using RT 4.2 or greater, add this line:
 
             Plugin('RT::Extension::QuickUpdate');
@@ -27,7 +27,7 @@ INSTALLATION
         or add RT::Extension::QuickUpdate to your existing @Plugins line.
 
     Clear your mason cache
-            rm -rf /opt/rt4/var/mason_data/obj
+            rm -rf /opt/rt5/var/mason_data/obj
 
     Restart your webserver
 
@@ -44,7 +44,7 @@ BUGS
         L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-QuickUpdate>.
 
 LICENSE AND COPYRIGHT
-    This software is Copyright (c) 2010-2016 by Best Practical Solutions
+    This software is Copyright (c) 2010-2022 by Best Practical Solutions
 
     This is free software, licensed under:
 

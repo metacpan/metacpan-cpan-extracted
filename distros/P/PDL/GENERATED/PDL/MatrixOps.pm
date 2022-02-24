@@ -21,7 +21,8 @@ use DynaLoader;
 
 
 
-#line 9 "matrixops.pd"
+#line 8 "matrixops.pd"
+
 use strict;
 use warnings;
 
@@ -75,7 +76,7 @@ includes an implicit exchange of the first two dimensions but should
 be compatible with most of these matrix operations.  TIMTOWDTI.)
 
 Matrices, row vectors, and column vectors can be multiplied with the 'x'
-operator (which is, of course, threadable):
+operator (which is, of course, broadcastable):
 
     $m3 = $m1 x $m2;
     $col_vec2 = $m1 x $col_vec1;
@@ -92,15 +93,15 @@ _row_ vectors; if you want a _column_ vector you must add a dummy dimension:
     $colvec  = $matrix x $colvec;    # left-multiplication by matrix
     $m2      = $matrix x $rowvec;    # Throws an error
 
-Implicit threading works correctly with most matrix operations, but
-you must be extra careful that you understand the dimensionality.  In 
+Implicit broadcasting works correctly with most matrix operations, but
+you must be extra careful that you understand the dimensionality.  In
 particular, matrix multiplication and other matrix ops need nx1 PDLs
 as row vectors and 1xn PDLs as column vectors.  In most cases you must
 explicitly include the trailing 'x1' dimension in order to get the expected
-results when you thread over multiple row vectors.
+results when you broadcast over multiple row vectors.
 
-When threading over matrices, it's very easy to get confused about 
-which dimension goes where. It is useful to include comments with 
+When broadcasting over matrices, it's very easy to get confused about
+which dimension goes where. It is useful to include comments with
 every expression, explaining what you think each dimension means:
 
 	$x = xvals(360)*3.14159/180;        # (angle)
@@ -129,7 +130,7 @@ document it!
 
 use Carp;
 use strict;
-#line 133 "MatrixOps.pm"
+#line 134 "MatrixOps.pm"
 
 
 
@@ -143,7 +144,8 @@ use strict;
 
 
 
-#line 124 "matrixops.pd"
+#line 123 "matrixops.pd"
+
 =head2 identity
 
 =for sig
@@ -172,11 +174,12 @@ sub identity {
   (my $tmp = $out->diagonal(0,1))++; # work around perl -d "feature"
   $out;
 }
-#line 176 "MatrixOps.pm"
+#line 178 "MatrixOps.pm"
 
 
 
-#line 157 "matrixops.pd"
+#line 156 "matrixops.pd"
+
 
 =head2 stretcher
 
@@ -188,7 +191,7 @@ sub identity {
 
   $mat = stretcher($eigenvalues);
 
-=for ref 
+=for ref
 
 Return a diagonal matrix with the specified diagonal elements
 
@@ -201,11 +204,12 @@ sub stretcher {
   ($tmp = $out->diagonal(0,1)) += $in;	
   $out;
 }
-#line 205 "MatrixOps.pm"
+#line 208 "MatrixOps.pm"
 
 
 
-#line 188 "matrixops.pd"
+#line 187 "matrixops.pd"
+
 
 =head2 inv
 
@@ -215,7 +219,7 @@ sub stretcher {
 
 =for usage
 
-  $a1 = inv($a, {$opt});                
+  $a1 = inv($a, {$opt});
 
 =for ref
 
@@ -300,11 +304,12 @@ sub inv {
   $x .= $out;
   $x;
 }
-#line 304 "MatrixOps.pm"
+#line 308 "MatrixOps.pm"
 
 
 
-#line 289 "matrixops.pd"
+#line 288 "matrixops.pd"
+
 
 =head2 det
 
@@ -360,11 +365,12 @@ sub det {
    
   ( (defined $lu) ? $lu->diagonal(0,1)->prodover * $par : 0 );
 }
-#line 364 "MatrixOps.pm"
+#line 369 "MatrixOps.pm"
 
 
 
-#line 351 "matrixops.pd"
+#line 350 "matrixops.pd"
+
 
 =head2 determinant
 
@@ -378,13 +384,13 @@ sub det {
 
 =for ref
 
-Determinant of a square matrix, using recursive descent (threadable).
+Determinant of a square matrix, using recursive descent (broadcastable).
 
 This is the traditional, robust recursive determinant method taught in
 most linear algebra courses.  It scales like C<O(n!)> (and hence is
-pitifully slow for large matrices) but is very robust because no 
+pitifully slow for large matrices) but is very robust because no
 division is involved (hence no division-by-zero errors for singular
-matrices).  It's also threadable, so you can find the determinants of 
+matrices).  It's also broadcastable, so you can find the determinants of
 a large collection of matrices all at once if you want.
 
 Matrices up to 3x3 are handled by direct multiplication; larger matrices
@@ -393,7 +399,7 @@ are handled by recursive descent to the 3x3 case.
 The LU-decomposition method L</det> is faster in isolation for
 single matrices larger than about 4x4, and is much faster if you end up
 reusing the LU decomposition of C<$a> (NOTE: check performance and
-threading benchmarks with new code).
+broadcasting benchmarks with new code).
 
 =cut
 
@@ -406,7 +412,7 @@ sub determinant {
 		      $x->getndims >= 2 &&
 		      ($n = $x->dim(0)) == $x->dim(1)
 		      );
-  
+
   return $x->clump(2) if($n==1);
   if($n==2) {
     my($y) = $x->clump(2);
@@ -414,7 +420,6 @@ sub determinant {
   }
   if($n==3) {
     my($y) = $x->clump(2);
-    
     my $y3 = $y->index(3);
     my $y4 = $y->index(4);
     my $y5 = $y->index(5);
@@ -447,11 +452,12 @@ sub determinant {
   
   return $sum;
 }
-#line 451 "MatrixOps.pm"
+#line 456 "MatrixOps.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 eigens_sym
@@ -467,7 +473,7 @@ Eigenvalues and -vectors of a symmetric square matrix.  If passed
 an asymmetric matrix, the routine will warn and symmetrize it, by taking
 the average value.  That is, it will solve for 0.5*($a+$a->transpose).
 
-It's threadable, so if C<$a> is 3x3x100, it's treated as 100 separate 3x3
+It's broadcastable, so if C<$a> is 3x3x100, it's treated as 100 separate 3x3
 matrices, and both C<$ev> and C<$e> get extra dimensions accordingly.
 
 If called in scalar context it hands back only the eigenvalues.  Ultimately,
@@ -500,11 +506,12 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 504 "MatrixOps.pm"
+#line 510 "MatrixOps.pm"
 
 
 
-#line 1060 "../../blib/lib/PDL/PP.pm"
+#line 1059 "../../blib/lib/PDL/PP.pm"
+
 
    sub PDL::eigens_sym {
       my ($x) = @_;
@@ -522,7 +529,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
       ## Get lower diagonal form 
       ## Use whichND/indexND because whereND doesn't exist (yet?) and
-      ## the combo is threadable (unlike where).  Note that for historical 
+      ## the combo is broadcastable (unlike where).  Note that for historical
       ## reasons whichND needs a scalar() around it to give back a 
       ## nice 2xn PDL index. 
       my $lt  = PDL::indexND($sym,
@@ -538,17 +545,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 	if(wantarray);
       $e;                #just eigenvalues
    }
-#line 542 "MatrixOps.pm"
+#line 549 "MatrixOps.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *eigens_sym = \&PDL::eigens_sym;
-#line 548 "MatrixOps.pm"
+#line 556 "MatrixOps.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 eigens
@@ -588,7 +597,7 @@ Not all square matrices are diagonalizable.  If you feed in a
 non-diagonalizable matrix, then one or more of the eigenvectors will
 be set to NaN, along with the corresponding eigenvalues.
 
-C<eigens> is threadable, so you can solve 100 eigenproblems by 
+C<eigens> is broadcastable, so you can solve 100 eigenproblems by
 feeding in a 3x3x100 array. Both C<$ev> and C<$e> get extra dimensions accordingly.
 
 If called in scalar context C<eigens> hands back only the eigenvalues.  This
@@ -623,11 +632,12 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 627 "MatrixOps.pm"
+#line 636 "MatrixOps.pm"
 
 
 
-#line 1060 "../../blib/lib/PDL/PP.pm"
+#line 1059 "../../blib/lib/PDL/PP.pm"
+
 
    sub PDL::eigens {
       my ($x) = @_;
@@ -674,17 +684,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
           return $e->index(0)->sever;  #just eigenvalues
       }
    }
-#line 678 "MatrixOps.pm"
+#line 688 "MatrixOps.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *eigens = \&PDL::eigens;
-#line 684 "MatrixOps.pm"
+#line 695 "MatrixOps.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 svd
@@ -702,7 +714,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 Singular value decomposition of a matrix.
 
-C<svd> is threadable.
+C<svd> is broadcastable.
 
 Given an m x n matrix C<$a> that has m rows and n columns (m >= n),
 C<svd> computes matrices C<$u> and C<$v>, and a vector of the singular
@@ -738,7 +750,7 @@ orientation of the ellipsoid of transformation:
 
     { my($r1,$s,$r2) = svd $x;
       $s++;             # fatten all singular values
-      $r2 *= $s;        # implicit threading for cheap mult.
+      $r2 *= $s;        # implicit broadcasting for cheap mult.
       $x .= $r2 x $r1;  # a gets r2 x ess x r1
     }
 
@@ -751,17 +763,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 755 "MatrixOps.pm"
+#line 767 "MatrixOps.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *svd = \&PDL::svd;
-#line 761 "MatrixOps.pm"
+#line 774 "MatrixOps.pm"
 
 
 
-#line 817 "matrixops.pd"
+#line 815 "matrixops.pd"
+
 
 =head2 lu_decomp
 
@@ -787,7 +801,7 @@ C<lu_decomp> returns an LU decomposition of a square matrix,
 using Crout's method with partial pivoting. It's ported
 from I<Numerical Recipes>. The partial pivoting keeps it
 numerically stable but means a little more overhead from
-threading.
+broadcasting.
 
 C<lu_decomp> decomposes the input matrix into matrices L and
 U such that LU = A, L is a subdiagonal matrix, and U is a
@@ -825,7 +839,7 @@ a non-pivoting version C<lu_decomp2> available which is
 from 5 to 60 percent faster for typical problems at
 the expense of failing to compute a result in some cases.
 
-Now that the C<lu_decomp> is threaded, it is the recommended
+Now that the C<lu_decomp> is broadcasted, it is the recommended
 LU decomposition routine.  It no longer falls back to C<lu_decomp2>.
 
 C<lu_decomp> is ported from I<Numerical Recipes> to PDL. It
@@ -939,11 +953,12 @@ sub lu_decomp {
    }
    $out;
 }
-#line 943 "MatrixOps.pm"
+#line 957 "MatrixOps.pm"
 
 
 
-#line 1000 "matrixops.pd"
+#line 998 "matrixops.pd"
+
 
 =head2 lu_decomp2
 
@@ -1063,11 +1078,12 @@ sub lu_decomp2 {
   }
   $out;
 }
-#line 1067 "MatrixOps.pm"
+#line 1082 "MatrixOps.pm"
 
 
 
-#line 1125 "matrixops.pd"
+#line 1123 "matrixops.pd"
+
 
 =head2 lu_backsub
 
@@ -1119,7 +1135,7 @@ Solve A x = B for matrix A, by back substitution into A's LU decomposition.
   # or with GSL
   use PDL::GSL::LINALG;
   LU_decomp(my $lu=$A->copy, my $p=null, my $signum=null);
-  # $B and $x, first dim is because GSL treats as vector, higher dims thread
+  # $B and $x, first dim is because GSL treats as vector, higher dims broadcast
   # so we transpose in and back out
   LU_solve($lu, $p, $B->transpose, my $x=null);
   $x=$x->inplace->transpose;
@@ -1136,7 +1152,7 @@ C<lu_decomp> method so that you can call the cheap C<lu_backsub>
 multiple times and not have to do the expensive LU decomposition
 more than once.
 
-C<lu_backsub> acts on single vectors and threads in the usual
+C<lu_backsub> acts on single vectors and broadcasts in the usual
 way, which means that it treats C<$y> as the I<transpose>
 of the input.  If you want to process a matrix, you must
 hand in the I<transpose> of the matrix, and then transpose
@@ -1178,8 +1194,8 @@ sub lu_backsub {
    my $n = $y->dim(0);
    my $n1 = $n; $n1--;
 
-   # Make sure threading dimensions are compatible.
-   # There are two possible sources of thread dims:
+   # Make sure broadcasting dimensions are compatible.
+   # There are two possible sources of broadcast dims:
    #
    # (1) over multiple LU (i.e., $lu,$perm) instances
    # (2) over multiple  B (i.e., $y) column instances
@@ -1209,13 +1225,13 @@ sub lu_backsub {
    my $permnumthr = $permdims->dim(0)-1;
    my $bnumthr = $bdims->dim(0)-1;
    unless ( ($lunumthr == $permnumthr) and ($ludims->slice("1:-1") == $permdims)->all )  {
-      barf "lu_backsub: \$lu and \$perm thread dims not equal! \n";
+      barf "lu_backsub: \$lu and \$perm broadcast dims not equal! \n";
    }
 
-   # (2) If X == Y then default threading is ok
+   # (2) If X == Y then default broadcasting is ok
    if ( ($bnumthr==$permnumthr) and ($bdims==$permdims)->all) {
-      print STDERR "lu_backsub: have explicit thread dims, goto THREAD_OK\n" if $PDL::debug;
-      goto THREAD_OK;
+      print STDERR "lu_backsub: have explicit broadcast dims, goto BROADCAST_OK\n" if $PDL::debug;
+      goto BROADCAST_OK;
    }
 
    # (3) If X == (x,Y) then add x dummy to lu,perm
@@ -1226,19 +1242,19 @@ sub lu_backsub {
    #     non-trivial leading dim in X (x0,x1,..)
    #     insert dummy (x0,x1) into lu and perm
 
-   # This means that threading occurs over all
+   # This means that broadcasting occurs over all
    # leading non-trivial (not length 1) dims of
-   # B unless all the thread dims are explicitly
+   # B unless all the broadcast dims are explicitly
    # matched to the LU dims.
 
-THREAD_OK:
+BROADCAST_OK:
 
    # Permute the vector and make a copy if necessary.
    my $out = $y->dummy(1,$y->dim(0))->index($perm->dummy(1));
    $out = $out->sever if !$y->is_inplace;
    print STDERR "lu_backsub: starting with \$out" . pdl($out->dims) . "\n" if $PDL::debug;
 
-   # Make sure threading over lu happens OK...
+   # Make sure broadcasting over lu happens OK...
 
    if($out->ndims < $lu->ndims-1) {
       print STDERR "lu_backsub: adjusting dims for \$out" . pdl($out->dims) . "\n" if $PDL::debug;
@@ -1262,16 +1278,16 @@ THREAD_OK:
    my $ludiag = $lu->diagonal(0,1);
    {
       my $tmp; # work around for perl -d "feature"
-      ($tmp = $out->index($n1)) /= $ludiag->index($n1)->dummy(0);        # TODO: check threading
+      ($tmp = $out->index($n1)) /= $ludiag->index($n1)->dummy(0);        # TODO: check broadcasting
    }
 
    for ($row=$n1; $row>0; $row--) {
       $r1 = $row-1;
       my $tmp; # work around for perl -d "feature"
-      ($tmp = $out->index($r1)) -= ($lu->slice("$row:$n1,$r1") *                  # TODO: check thread dims
+      ($tmp = $out->index($r1)) -= ($lu->slice("$row:$n1,$r1") *                  # TODO: check broadcast dims
          $out->slice("$row:$n1")
       )->sumover;
-      ($tmp = $out->index($r1)) /= $ludiag->index($r1)->dummy(0);        # TODO: check thread dims
+      ($tmp = $out->index($r1)) /= $ludiag->index($r1)->dummy(0);        # TODO: check broadcast dims
    }
 
    if ($y->is_inplace) {
@@ -1280,11 +1296,12 @@ THREAD_OK:
    }
    $out;
 }
-#line 1284 "MatrixOps.pm"
+#line 1300 "MatrixOps.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 simq
@@ -1325,17 +1342,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1329 "MatrixOps.pm"
+#line 1346 "MatrixOps.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *simq = \&PDL::simq;
-#line 1335 "MatrixOps.pm"
+#line 1353 "MatrixOps.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 squaretotri
@@ -1358,19 +1377,21 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1362 "MatrixOps.pm"
+#line 1381 "MatrixOps.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *squaretotri = \&PDL::squaretotri;
-#line 1368 "MatrixOps.pm"
+#line 1388 "MatrixOps.pm"
 
 
 
 
 
-#line 1420 "matrixops.pd"
+#line 1418 "matrixops.pd"
+
 
 =head1 AUTHOR
 
@@ -1382,7 +1403,7 @@ itself.  If this file is separated from the PDL distribution, then the
 PDL copyright notice should be included in this file.
 
 =cut
-#line 1386 "MatrixOps.pm"
+#line 1407 "MatrixOps.pm"
 
 
 

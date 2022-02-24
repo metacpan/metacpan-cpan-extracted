@@ -1,5 +1,7 @@
 package ODS::Table::Column::Float;
 
+use YAOO;
+
 extends 'ODS::Table::Column::Base';
 
 use ODS::Utils qw/error/;
@@ -8,12 +10,12 @@ has precision => isa(integer);
 
 has number => isa(boolean);
 
-sub validation { 
-        if (ref($_[1]) || ${$_[1]} !~ m/\d+(\.\d+)?/) {
-                croak sprintf "The value passed to the %s column does not match the float constraint.",
-                        $_[0]->name;
-        }
-	return $_[1]; 
+sub validation {
+	if (ref($_[1]) || ${$_[1]} !~ m/\d+(\.\d+)?/) {
+		croak sprintf "The value passed to the %s column does not match the float constraint.",
+			$_[0]->name;
+	}
+	return $_[1];
 }
 
 sub inflation {

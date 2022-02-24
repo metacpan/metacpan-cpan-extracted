@@ -694,8 +694,6 @@ SPVM_OP* SPVM_OP_new_op_constant_byte(SPVM_COMPILER* compiler, int8_t value, con
   
   op_constant->uv.constant = constant;
 
-  SPVM_LIST_push(compiler->op_constants, op_constant);
-  
   constant->op_constant = op_constant;
   
   return op_constant;
@@ -710,8 +708,6 @@ SPVM_OP* SPVM_OP_new_op_constant_short(SPVM_COMPILER* compiler, int16_t value, c
   constant->type = op_constant_type->uv.type;
   
   op_constant->uv.constant = constant;
-
-  SPVM_LIST_push(compiler->op_constants, op_constant);
 
   constant->op_constant = op_constant;
   
@@ -728,8 +724,6 @@ SPVM_OP* SPVM_OP_new_op_constant_int(SPVM_COMPILER* compiler, int32_t value, con
   
   op_constant->uv.constant = constant;
 
-  SPVM_LIST_push(compiler->op_constants, op_constant);
-
   constant->op_constant = op_constant;
   
   return op_constant;
@@ -744,8 +738,6 @@ SPVM_OP* SPVM_OP_new_op_constant_long(SPVM_COMPILER* compiler, int64_t value, co
   constant->type = op_constant_type->uv.type;
   
   op_constant->uv.constant = constant;
-
-  SPVM_LIST_push(compiler->op_constants, op_constant);
 
   constant->op_constant = op_constant;
   
@@ -762,8 +754,6 @@ SPVM_OP* SPVM_OP_new_op_constant_float(SPVM_COMPILER* compiler, float value, con
   
   op_constant->uv.constant = constant;
 
-  SPVM_LIST_push(compiler->op_constants, op_constant);
-
   constant->op_constant = op_constant;
   
   return op_constant;
@@ -779,8 +769,6 @@ SPVM_OP* SPVM_OP_new_op_constant_double(SPVM_COMPILER* compiler, double value, c
   
   op_constant->uv.constant = constant;
   
-  SPVM_LIST_push(compiler->op_constants, op_constant);
-  
   constant->op_constant = op_constant;
   
   return op_constant;
@@ -795,8 +783,6 @@ SPVM_OP* SPVM_OP_new_op_constant_string(SPVM_COMPILER* compiler, const char* str
   constant->type = op_constant_type->uv.type;
   constant->string_length = length;
   op_constant->uv.constant = constant;
-  
-  SPVM_LIST_push(compiler->op_constants, op_constant);
   
   constant->op_constant = op_constant;
   
@@ -1728,18 +1714,6 @@ SPVM_OP* SPVM_OP_build_convert(SPVM_COMPILER* compiler, SPVM_OP* op_convert, SPV
   return op_convert;
 }
 
-SPVM_OP* SPVM_OP_build_grammar(SPVM_COMPILER* compiler, SPVM_OP* op_classes) {
-  
-  if (!compiler->op_grammar) {
-    compiler->op_grammar = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_GRAMMAR, op_classes->file, op_classes->line);
-  }
-  
-  SPVM_OP* op_grammar = compiler->op_grammar;
-  SPVM_OP_insert_child(compiler, op_grammar, op_grammar->last, op_classes);
-
-  return op_grammar;
-}
-
 SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP* op_type, SPVM_OP* op_block, SPVM_OP* op_list_descriptors) {
   
   // Class
@@ -2160,7 +2134,7 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
         
         // Begin block
         if (op_decl->uv.method->is_init) {
-          class->op_init_method = op_decl;
+          class->has_init_block = 1;
         }
       }
       else {
@@ -2335,8 +2309,19 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
             
             method->id = compiler->methods->length;
             
+            // Add the method to the list of methods of the compiler
             SPVM_LIST_push(compiler->methods, method);
-            SPVM_HASH_insert(class->method_symtable, method->op_name->uv.name, strlen(method->op_name->uv.name), method);
+            
+            // Method absolute name
+            int32_t method_abs_name_length = strlen(class->name) + 2 + strlen(method->name);
+            char* method_abs_name = SPVM_ALLOCATOR_new_block_compile_eternal(compiler, method_abs_name_length + 1);
+            memcpy(method_abs_name, class->name, strlen(class->name));
+            memcpy(method_abs_name + strlen(class_name), "->", 2);
+            memcpy(method_abs_name + strlen(class_name) + 2, method_name, strlen(method_name));
+            method->abs_name = method_abs_name;
+
+            // Add the method to the method symtable of the class
+            SPVM_HASH_insert(class->method_symtable, method->name, strlen(method->name), method);
           }
         }
       }

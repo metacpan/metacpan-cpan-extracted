@@ -95,7 +95,7 @@ sub configTest {
 }
 
 sub sendTestMail {
-    my ($conf, $dest) = @_;
+    my ( $conf, $dest ) = @_;
     my $transport = Lemonldap::NG::Common::EmailTransport->new($conf);
     my $message   = MIME::Entity->build(
         From    => $conf->{mailFrom},
@@ -110,7 +110,7 @@ sub sendTestMail {
     # Send the mail
     eval { sendmail( $message->stringify, { transport => $transport } ); };
     if ($@) {
-        my $error   = ( $@->isa('Throwable::Error') ? $@->message : $@ );
+        my $error = ( $@->isa('Throwable::Error') ? $@->message : $@ );
         die $error;
     }
 }

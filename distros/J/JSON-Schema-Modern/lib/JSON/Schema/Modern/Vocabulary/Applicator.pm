@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::Applicator;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Applicator vocabulary
 
-our $VERSION = '0.544';
+our $VERSION = '0.546';
 
 use 5.020;
 use Moo;
@@ -259,7 +259,7 @@ sub _eval_keyword_dependencies ($self, $data, $schema, $state) {
 
 sub _traverse_keyword_prefixItems { shift->traverse_array_schemas(@_) }
 
-sub _eval_keyword_prefixItems { goto \&_eval_keyword__items_array_schemas }
+sub _eval_keyword_prefixItems { shift->_eval_keyword__items_array_schemas(@_) }
 
 sub _traverse_keyword_items ($self, $schema, $state) {
   if (is_plain_arrayref($schema->{items})) {
@@ -273,17 +273,18 @@ sub _traverse_keyword_items ($self, $schema, $state) {
 }
 
 sub _eval_keyword_items ($self, $data, $schema, $state) {
-  goto \&_eval_keyword__items_array_schemas if is_plain_arrayref($schema->{items});
+  return $self->_eval_keyword__items_array_schemas($data, $schema, $state)
+    if is_plain_arrayref($schema->{items});
 
   $state->{_last_items_index} //= -1;
-  goto \&_eval_keyword__items_schema;
+  return $self->_eval_keyword__items_schema($data, $schema, $state);
 }
 
 sub _traverse_keyword_additionalItems { shift->traverse_subschema(@_) }
 
 sub _eval_keyword_additionalItems ($self, $data, $schema, $state) {
   return 1 if not exists $state->{_last_items_index};
-  goto \&_eval_keyword__items_schema;
+  return $self->_eval_keyword__items_schema($data, $schema, $state);
 }
 
 # prefixItems (draft 2020-12), array-based items (all drafts)
@@ -575,7 +576,7 @@ JSON::Schema::Modern::Vocabulary::Applicator - Implementation of the JSON Schema
 
 =head1 VERSION
 
-version 0.544
+version 0.546
 
 =head1 DESCRIPTION
 

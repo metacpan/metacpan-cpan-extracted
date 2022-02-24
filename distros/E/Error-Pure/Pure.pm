@@ -13,7 +13,7 @@ Readonly::Array our @EXPORT_OK => qw(err);
 Readonly::Scalar my $TYPE_DEFAULT => 'Die';
 Readonly::Scalar my $LEVEL_DEFAULT => 4;
 
-our $VERSION = 0.26;
+our $VERSION = 0.27;
 
 # Type of error.
 our $TYPE = $TYPE_DEFAULT;
@@ -36,9 +36,15 @@ sub err {
 	}
 	eval "require $class";
 	if ($EVAL_ERROR) {
-		my $err = $EVAL_ERROR;
-		$err =~ s/\ at.*$//ms;
-		die $err;
+
+		# Switch to default, module doesn't exist.
+		$class = 'Error::Pure::'.$TYPE_DEFAULT;
+		eval "require $class";
+		if ($EVAL_ERROR) {
+			my $err = $EVAL_ERROR;
+			$err =~ s/\ at.*$//ms;
+			die $err;
+		}
 	}
 	eval $class.'::err @msg';
 	if ($EVAL_ERROR) {
@@ -227,12 +233,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2008-2020 Michal Josef Špaček
+© 2008-2022 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.26
+0.27
 
 =cut

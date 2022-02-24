@@ -12,6 +12,81 @@ use SPVM::Builder::CC;
 # because SPVM::Builder XS method is loaded when SPVM is loaded
 use SPVM();
 
+# Fields
+sub build_dir {
+  my $self = shift;
+  if (@_) {
+    $self->{build_dir} = $_[0];
+    return $self;
+  }
+  else {
+    return $self->{build_dir};
+  }
+}
+
+sub module_dirs {
+  my $self = shift;
+  if (@_) {
+    $self->{module_dirs} = $_[0];
+    return $self;
+  }
+  else {
+    return $self->{module_dirs};
+  }
+}
+
+sub compiler_env {
+  my $self = shift;
+  if (@_) {
+    $self->{compiler_env} = $_[0];
+    return $self;
+  }
+  else {
+    return $self->{compiler_env};
+  }
+}
+
+sub compiler {
+  my $self = shift;
+  if (@_) {
+    $self->{compiler} = $_[0];
+    return $self;
+  }
+  else {
+    return $self->{compiler};
+  }
+}
+
+sub env {
+  my $self = shift;
+  if (@_) {
+    $self->{env} = $_[0];
+    return $self;
+  }
+  else {
+    return $self->{env};
+  }
+}
+
+sub new {
+  my $class = shift;
+  
+  my $self = {
+    module_dirs => [map { "$_/SPVM" } @INC],
+    @_
+  };
+  
+  bless $self, ref $class || $class;
+  
+  # Create an environment for the compiler
+  $self->create_compiler_env;
+  
+  # Create the compiler
+  $self->create_compiler;
+  
+  return $self;
+}
+
 sub build {
   my ($self, $class_name, $file, $line) = @_;
   
@@ -46,44 +121,6 @@ sub print_error_messages {
   for my $error_message (@$error_messages) {
     printf $fh "[CompileError]$error_message\n";
   }
-}
-
-# Fields
-sub module_dirs {
-  my $self = shift;
-  if (@_) {
-    $self->{module_dirs} = $_[0];
-    return $self;
-  }
-  else {
-    return $self->{module_dirs};
-  }
-}
-
-sub build_dir {
-  my $self = shift;
-  if (@_) {
-    $self->{build_dir} = $_[0];
-    return $self;
-  }
-  else {
-    return $self->{build_dir};
-  }
-}
-
-sub new {
-  my $class = shift;
-  
-  my $self = {
-    module_dirs => [map { "$_/SPVM" } @INC],
-    @_
-  };
-  
-  bless $self, ref $class || $class;
-  
-  $self->create_compiler;
-  
-  return $self;
 }
 
 sub create_build_src_path {
@@ -217,8 +254,6 @@ sub bind_methods {
     my $class_name = $method_info->{class_name};
     my $method_name = $method_info->{method_name};
 
-    my $method_abs_name = "${class_name}::$method_name";
-    
     my $cfunc_name = SPVM::Builder::Util::create_cfunc_name($class_name, $method_name, $category);
 
     my $cfunc_address;
@@ -256,8 +291,13 @@ EOS
     else {
       confess "DLL file is not specified";
     }
-
-    $self->bind_method($class_name, $method_name, $cfunc_address, $category);
+    
+    if ($category eq 'native') {
+      $self->set_native_method_address($class_name, $method_name, $cfunc_address);
+    }
+    elsif ($category eq 'precompile') {
+      $self->set_precompile_method_address($class_name, $method_name, $cfunc_address);
+    }
   }
 
 }

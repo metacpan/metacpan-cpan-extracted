@@ -1,6 +1,6 @@
 ^HMM\.pm$
 ^HMM\.xs$
-^HMM\.c$
+^(HMM|pp-.*)\.c$
 ~$
 \.bs$
 \.o$

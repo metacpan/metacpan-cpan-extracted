@@ -40,7 +40,7 @@ sub mirror {
             'HTTP_ACCEPT_LANGUAGE' => 'fr,fr-FR;q=0.8,en-US;q=0.5,en;q=0.3',
             'HTTP_CACHE_CONTROL'   => 'max-age=0',
             ( $args{cookie} ? ( HTTP_COOKIE => $args{cookie} ) : () ),
-            'HTTP_HOST' => $args{host} || 'test1.example.com',
+            'HTTP_HOST'       => $args{host} || 'test1.example.com',
             'HTTP_USER_AGENT' =>
               'Mozilla/5.0 (VAX-4000; rv:36.0) Gecko/20350101 Firefox',
             'PATH_INFO' => $args{path} || '/',

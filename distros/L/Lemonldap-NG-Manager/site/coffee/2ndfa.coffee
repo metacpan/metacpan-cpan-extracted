@@ -73,6 +73,7 @@ llapp.controller 'SessionsExplorerCtrl', ['$scope', '$translator', '$location', 
 	$scope.U2FCheck = "1"
 	$scope.TOTPCheck = "1"
 	$scope.UBKCheck = "1"
+	$scope.WebAuthnCheck = "1"
 
 	# Import translations functions
 	$scope.translateP = $translator.translateP
@@ -201,7 +202,7 @@ llapp.controller 'SessionsExplorerCtrl', ['$scope', '$translator', '$location', 
 				subres = []
 				for attr in attrs
 					if session[attr]
-						if session[attr].toString().match(/"type":\s*"(?:TOTP|U2F|UBK)"/)
+						if session[attr].toString().match(/"type":\s*"(?:TOTP|U2F|UBK|WebAuthn)"/)
 							subres.push
 								title: "type"
 								value: "name"
@@ -295,7 +296,7 @@ llapp.controller 'SessionsExplorerCtrl', ['$scope', '$translator', '$location', 
 			over = 0
 
 		# Launch HTTP query
-		$http.get("#{scriptname}sfa/#{sessionType}?#{query}&U2FCheck=#{$scope.U2FCheck}&TOTPCheck=#{$scope.TOTPCheck}&UBKCheck=#{$scope.UBKCheck}").then (response) ->
+		$http.get("#{scriptname}sfa/#{sessionType}?#{query}&U2FCheck=#{$scope.U2FCheck}&TOTPCheck=#{$scope.TOTPCheck}&UBKCheck=#{$scope.UBKCheck}&WebAuthnCheck=#{$scope.WebAuthnCheck}").then (response) ->
 			data = response.data
 			if data.result
 				for n in data.values
@@ -346,7 +347,7 @@ llapp.controller 'SessionsExplorerCtrl', ['$scope', '$translator', '$location', 
 			over = 0
 
 		# Launch HTTP
-		$http.get("#{scriptname}sfa/#{sessionType}?_session_uid=#{$scope.searchString}*&groupBy=substr(_session_uid,#{$scope.searchString.length})&U2FCheck=#{$scope.U2FCheck}&TOTPCheck=#{$scope.TOTPCheck}&UBKCheck=#{$scope.UBKCheck}").then (response) ->
+		$http.get("#{scriptname}sfa/#{sessionType}?_session_uid=#{$scope.searchString}*&groupBy=substr(_session_uid,#{$scope.searchString.length})&U2FCheck=#{$scope.U2FCheck}&TOTPCheck=#{$scope.TOTPCheck}&UBKCheck=#{$scope.UBKCheck}&WebAuthnCheck=#{$scope.WebAuthnCheck}").then (response) ->
 			data = response.data
 			if data.result
 				for n in data.values

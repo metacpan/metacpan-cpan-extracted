@@ -1,15 +1,13 @@
 package App::SpamcupNG;
 use warnings;
 use strict;
-use LWP::UserAgent 6.05;
 use HTML::Form 6.07;
-use HTTP::Cookies 6.01;
 use Getopt::Std;
 use YAML::XS 0.62 qw(LoadFile);
 use File::Spec;
 use Hash::Util qw(lock_hash);
 use Exporter 'import';
-use Log::Log4perl 1.48 qw(get_logger :levels);
+use Log::Log4perl 1.54 qw(get_logger :levels);
 use Carp;
 
 use App::SpamcupNG::HTMLParse (
@@ -19,11 +17,12 @@ use App::SpamcupNG::HTMLParse (
     'find_message_age',   'find_header_info'
 );
 use App::SpamcupNG::Summary;
+use App::SpamcupNG::UserAgent;
 
 use constant TARGET_HTML_FORM => 'sendreport';
 
 our @EXPORT_OK
-    = qw(read_config main_loop get_browser %OPTIONS_MAP config_logger TARGET_HTML_FORM);
+    = qw(read_config main_loop %OPTIONS_MAP config_logger TARGET_HTML_FORM);
 our %OPTIONS_MAP = (
     'check_only' => 'n',
     'all'        => 'a',
@@ -36,12 +35,11 @@ our %OPTIONS_MAP = (
 my %regexes = (
     no_user_id => qr/\>No userid found\</i,
     next_id    => qr/sc\?id\=(.*?)\"\>/i,
-    http_500   => qr/500/,
-);
+    );
 
 lock_hash(%OPTIONS_MAP);
 
-our $VERSION = '0.011'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 =head1 NAME
 
@@ -112,8 +110,10 @@ sub read_config {
 }
 
 sub _report_form {
-    my ( $html_doc, $base_uri ) = @_;
-    my @forms = HTML::Form->parse( $html_doc, $base_uri );
+    my ( $html_ref, $base_uri ) = @_;
+    die 'Must receive an scalar reference of the HTML response' unless (ref($html_ref));
+
+    my @forms = HTML::Form->parse( $$html_ref, $base_uri );
 
     foreach my $form (@forms) {
         my $name = $form->attr('name');
@@ -122,28 +122,6 @@ sub _report_form {
     }
 
     return undef;
-}
-
-=pod
-
-=head2 get_browser
-
-Creates a instance of L<LWP::UserAgent> and returns it.
-
-Expects two string as parameters: one with the name to associated with the user
-agent and the another as version of it.
-
-=cut
-
-# :TODO:23/04/2017 17:21:28:ARFREITAS: Add options to configure nice things
-# like HTTP proxy
-
-sub get_browser {
-    my ( $name, $version ) = @_;
-    my $ua = LWP::UserAgent->new();
-    $ua->agent("$name/$version");
-    $ua->cookie_jar( HTTP::Cookies->new() );
-    return $ua;
 }
 
 =pod
@@ -244,6 +222,30 @@ log4perl.appender.Screen.layout = Log::Log4perl::Layout::SimpleLayout
     Log::Log4perl::init( \$conf );
 }
 
+sub _error_handling {
+    my $content_ref = shift;
+    my $logger = get_logger('SpamcupNG');
+
+    if ( my $errors_ref = find_errors( $content_ref ) ) {
+
+        foreach my $error ( @{$errors_ref} ) {
+            if ( $error->is_fatal() ) {
+                $logger->fatal($error);
+
+              # must stop processing the HTML for this report and move to next
+                return 1;
+            }
+            else {
+                $logger->error($error);
+            }
+
+        }
+
+    }
+
+    return 0;
+}
+
 =pod
 
 =head2 main_loop
@@ -297,75 +299,6 @@ Returns true if everything went right, or C<die> if a fatal error happened.
 
 =cut
 
-sub _redact_auth_req {
-    my $request  = shift;
-    my @lines    = split( "\n", $request->as_string );
-    my $secret   = ( split( /\s/, $lines[1] ) )[2];
-    my $redacted = '*' x length($secret);
-    $lines[1] =~ s/$secret/$redacted/;
-    return join( "\n", @lines );
-}
-
-sub _self_auth {
-    my ( $ua, $opts_ref ) = @_;
-    my $logger = get_logger('SpamcupNG');
-    my $req;
-    my $auth_is_ok = 0;
-
-    if ( $opts_ref->{pass} ) {
-        $req = HTTP::Request->new( GET => 'http://members.spamcop.net/' );
-        $req->authorization_basic( $opts_ref->{ident}, $opts_ref->{pass} );
-    }
-    else {
-        $req = HTTP::Request->new(
-            GET => 'http://www.spamcop.net/?code=' . $opts_ref->{ident} );
-    }
-
-    $logger->debug( "Request details:\n" . _redact_auth_req($req) )
-        if ( $logger->is_debug() );
-
-    my $res = $ua->request($req);
-
-    if ( $logger->is_debug() ) {
-        $logger->debug( "Got HTTP response:\n" . $res->as_string );
-    }
-
-    # verify response
-    if ( $res->is_success ) {
-        $auth_is_ok = 1;
-    }
-    else {
-        my $res_status = $res->status_line();
-
-        if ( $res_status =~ $regexes{http_500} ) {
-            $logger->fatal("Can\'t connect to server: $res_status");
-        }
-        else {
-            $logger->warn($res_status);
-            $logger->fatal(
-                'Cannot connect to server or invalid credentials. Please verify your username and password and try again.'
-            );
-        }
-    }
-
-    my $content = $res->content;
-
-    # Parse id for link
-    if ( $content =~ $regexes{no_user_id} ) {
-        $logger->logdie(
-            'No userid found. Please check that you have entered correct code. Also consider obtaining a password to Spamcop.net instead of using the old-style authorization token.'
-        );
-    }
-
-    if ($auth_is_ok) {
-        return $content;
-    }
-    else {
-        return undef;
-    }
-
-}
-
 sub main_loop {
     my ( $ua, $opts_ref ) = @_;
     my $logger = get_logger('SpamcupNG');
@@ -381,12 +314,14 @@ sub main_loop {
     }
 
     sleep $opts_ref->{delay};
-    my $response = _self_auth( $ua, $opts_ref );
+    my $response_ref = $ua->login( $opts_ref->{ident}, $opts_ref->{pass} );
+    return 0 if (_error_handling($response_ref));
+    $logger->info('Log in completed');
     my $next_id;
     my $summary = App::SpamcupNG::Summary->new;
 
-    if ($response) {
-        $next_id = find_next_id( \$response );
+    if ($response_ref) {
+        $next_id = find_next_id( $response_ref );
 
         if ( $logger->is_debug ) {
             $logger->debug("ID of next SPAM report found: $next_id")
@@ -403,8 +338,11 @@ sub main_loop {
     # avoid loops
     if ( ($last_seen) and ( $next_id eq $last_seen ) ) {
         $logger->fatal(
-            "I have seen this ID earlier, we do not want to report it again. This usually happens because of a bug in Spamcup. Make sure you use latest version! You may also want to go check from Spamcop what is happening: http://www.spamcop.net/sc?id=$next_id"
-        );
+            'I have seen this ID earlier, we do not want to report it again.' .
+                'This usually happens because of a bug in Spamcup.' .
+                'Make sure you use latest version!' .
+                "You may also want to go check from Spamcop what is happening: http://www.spamcop.net/sc?id=$next_id"
+            );
     }
 
     $last_seen = $next_id;    # store for comparison
@@ -417,25 +355,10 @@ sub main_loop {
     sleep $opts_ref->{delay};
 
     # Getting a SPAM report
-    my $req = HTTP::Request->new(
-        GET => 'http://www.spamcop.net/sc?id=' . $next_id );
+    $response_ref = $ua->spam_report($next_id);
+    return 0 unless($response_ref);
 
-    if ( $logger->is_debug ) {
-        $logger->debug( "Request to be sent:\n" . $req->as_string );
-    }
-
-    my $res = $ua->request($req);
-
-    if ( $logger->is_debug ) {
-        $logger->debug( "Got HTTP response:\n" . $res->as_string );
-    }
-
-    unless ( $res->is_success ) {
-        $logger->fatal("Can't connect to server. Try again later.");
-        return 0;
-    }
-
-    if ( my $age_info_ref = find_message_age( \( $res->content ) ) ) {
+    if ( my $age_info_ref = find_message_age( $response_ref ) ) {
         if ($age_info_ref) {
 
             if ( $logger->is_info ) {
@@ -453,7 +376,7 @@ sub main_loop {
         }
     }
 
-    if ( my $warns_ref = find_warnings( \( $res->content ) ) ) {
+    if ( my $warns_ref = find_warnings( $response_ref ) ) {
 
         if ( @{$warns_ref} ) {
 
@@ -467,7 +390,7 @@ sub main_loop {
         }
     }
 
-    if ( my $errors_ref = find_errors( \( $res->content ) ) ) {
+    if ( my $errors_ref = find_errors( $response_ref ) ) {
 
         foreach my $error ( @{$errors_ref} ) {
             if ( $error->is_fatal() ) {
@@ -486,7 +409,7 @@ sub main_loop {
 
     # parsing the SPAM
     my $_cancel  = 0;
-    my $base_uri = $res->base();
+    my $base_uri = $ua->base();
 
     unless ($base_uri) {
         $logger->fatal(
@@ -498,7 +421,7 @@ sub main_loop {
         $logger->debug("Base URI is $base_uri");
     }
 
-    my $best_ref = find_best_contacts( \( $res->content ) );
+    my $best_ref = find_best_contacts( $response_ref );
     $summary->set_contacts($best_ref);
     if ( $logger->is_info ) {
         if ( @{$best_ref} ) {
@@ -507,12 +430,12 @@ sub main_loop {
         }
     }
 
-    my $form = _report_form( $res->content, $base_uri );
+    my $form = _report_form( $response_ref, $base_uri );
     $logger->fatal(
         'Could not find the HTML form to report the SPAM! May be a temporary Spamcop.net error, try again later! Quitting...'
     ) unless ($form);
 
-    my $spam_header_info = find_header_info( \( $res->content ) );
+    my $spam_header_info = find_header_info( $response_ref );
     $summary->set_mailer( $spam_header_info->{mailer} );
     $summary->set_content_type( $spam_header_info->{content_type} );
 
@@ -520,11 +443,13 @@ sub main_loop {
         $logger->info( 'X-Mailer: ' . $summary->to_text('mailer') );
         $logger->info( 'Content-Type: ' . $summary->to_text('content_type') );
 
-        my $spam_header_ref = find_spam_header( \( $res->content ) );
+        my $spam_header_ref = find_spam_header( $response_ref );
 
         if ($spam_header_ref) {
             my $as_string = join( "\n", @$spam_header_ref );
             $logger->info("Head of the SPAM follows:\n$as_string");
+        } else {
+            $logger->warn('No SPAM header found');
         }
 
         if ( $logger->is_debug ) {
@@ -610,7 +535,7 @@ sub main_loop {
     }
 
 # this happens rarely, but I've seen this; spamcop does not show preview headers for some reason
-    if ( $res->content =~ /Send Spam Report\(S\) Now/gi ) {
+    if ( $$response_ref =~ /Send Spam Report\(S\) Now/gi ) {
 
         unless ( $opts_ref->{stupid} ) {
             print
@@ -633,7 +558,7 @@ sub main_loop {
         }
 
     }
-    elsif ( $res->content
+    elsif ( $$response_ref
         =~ /click reload if this page does not refresh automatically in \n(\d+) seconds/gs
         )
 
@@ -650,7 +575,7 @@ sub main_loop {
         # fake that everything is ok
         return 1;
     }
-    elsif ( $res->content
+    elsif ( $$response_ref
         =~ /No source IP address found, cannot proceed. Not full header/gs )
     {
         $logger->warn(
@@ -674,8 +599,6 @@ sub main_loop {
         exit;
     }
 
-    undef $req;
-    undef $res;
 
     # Submit the form to Spamcop OR cancel report
     unless ($_cancel) {    # SUBMIT spam
@@ -686,33 +609,25 @@ sub main_loop {
             $logger->debug(
                 'Sleeping for ' . $opts_ref->{delay} . ' seconds.' );
         }
+
         sleep $opts_ref->{delay};
-        $res = LWP::UserAgent->new->request( $form->click() )
-            ;    # click default button, submit
+
+        # click default button, submit
+        $response_ref = $ua->complete_report( $form->click());
     }
     else {       # CANCEL SPAM
         $logger->debug('About to cancel report.');
-        $res = LWP::UserAgent->new->request( $form->click('cancel') )
-            ;    # click cancel button
+        $response_ref = $ua->complete_report( $form->click('cancel') );
     }
 
-    if ( $logger->is_debug ) {
-        $logger->debug( "Got HTTP response:\n" . $res->as_string );
-    }
-
-    # Check the outcome of the response
-    unless ( $res->is_success ) {
-        $logger->fatal(
-            'Cannot connect to server. Try again later. Quitting.');
-        return 0;
-    }
+    return 0 unless($response_ref);
 
     if ($_cancel) {
         return 1;    # user decided this mail is not SPAM
     }
 
     # parse response
-    my $receivers_ref = find_receivers( \( $res->content ) );
+    my $receivers_ref = find_receivers( $response_ref );
     $summary->set_receivers($receivers_ref);
 
     if ( scalar( @{$receivers_ref} ) > 0 ) {
@@ -733,7 +648,7 @@ App-SpamcupNG homepage and provide the next lines with the HTML response
 provided by Spamcop.
 EOM
         $logger->warn($msg);
-        $logger->warn( $res->content );
+        $logger->warn( $response_ref );
     }
 
     $logger->debug( 'SPAM report summary: ' . $summary->as_text )

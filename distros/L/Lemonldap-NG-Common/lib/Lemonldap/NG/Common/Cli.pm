@@ -63,10 +63,11 @@ sub testEmail {
     eval {
         Lemonldap::NG::Common::EmailTransport::sendTestMail( $conf, $dest );
     };
-    my $error   = $@;
+    my $error = $@;
     if ($error) {
         die $error;
-    } else {
+    }
+    else {
         print STDERR "Test email successfully sent to $dest\n";
     }
 }

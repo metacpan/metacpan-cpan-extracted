@@ -11,7 +11,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
 
 extends 'Lemonldap::NG::Portal::Lib::LDAP';
 
-our $VERSION = '2.0.8';
+our $VERSION = '2.0.14';
 
 # PRIVATE METHOD
 sub modifCertificate {
@@ -49,8 +49,6 @@ sub modifCertificate {
 
     unless ( $result->code == 0 ) {
         $self->logger->debug( "LDAP modify Error: " . $result->code );
-        $self->ldap->unbind;
-        $self->{flags}->{ldapActive} = 0;
         $self->ldap->unbind;
         return PE_LDAPERROR;
     }

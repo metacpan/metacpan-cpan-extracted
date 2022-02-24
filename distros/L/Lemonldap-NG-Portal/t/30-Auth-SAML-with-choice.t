@@ -261,7 +261,7 @@ sub sp {
                         samlIDPMetaDataOptionsCheckSLOMessageSignature => 1,
                         samlIDPMetaDataOptionsForceUTF8                => 1,
                         samlIDPMetaDataOptionsSortNumber               => 2,
-                        samlIDPMetaDataOptionsDisplayName =>
+                        samlIDPMetaDataOptionsDisplayName              =>
                           'idp_Test_DisplayName',
 
                     },

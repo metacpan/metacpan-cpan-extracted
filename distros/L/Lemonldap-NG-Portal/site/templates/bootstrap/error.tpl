@@ -2,14 +2,14 @@
 
 <div id="errorcontent" class="container">
   <TMPL_IF AUTH_ERROR>
-    <div class="message message-<TMPL_VAR NAME="AUTH_ERROR_TYPE"> alert"><span trmsg="<TMPL_VAR NAME="AUTH_ERROR">"></span>
+    <div class="message message-<TMPL_VAR NAME="AUTH_ERROR_TYPE"> alert" role="<TMPL_VAR NAME="AUTH_ERROR_ROLE">"><span trmsg="<TMPL_VAR NAME="AUTH_ERROR">"></span>
       <TMPL_IF LOCKTIME>
         <TMPL_VAR NAME="LOCKTIME"> <span trspan="seconds">seconds</span>.
       </TMPL_IF>
     </div>
   </TMPL_IF>
   <TMPL_IF RAW_ERROR>
-    <div class="message message-<TMPL_VAR NAME="AUTH_ERROR_TYPE"> alert"><span trspan="<TMPL_VAR NAME="RAW_ERROR">"></span></div>
+    <div class="message message-<TMPL_VAR NAME="AUTH_ERROR_TYPE"> alert" role="<TMPL_VAR NAME="AUTH_ERROR_ROLE">"><span trspan="<TMPL_VAR NAME="RAW_ERROR">"></span></div>
   </TMPL_IF>
   <TMPL_IF ERROR403>
     <div class="message message-negative alert">

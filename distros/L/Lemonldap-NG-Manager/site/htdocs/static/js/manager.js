@@ -811,7 +811,7 @@ This file contains:
       $scope.keyWritable = function(scope) {
         var node;
         node = scope.$modelValue;
-        if (node.type && node.type.match(/^(?:s(?:aml(?:(?:ID|S)PMetaDataNod|Attribut)e|fExtra)|(?:(?:cmbMod|r)ul|authChoic)e|(?:virtualHos|keyTex)t|menu(?:App|Cat))$/)) {
+        if (node.type && node.type.match(/^(?:s(?:aml(?:(?:ID|S)PMetaDataNod|Attribut)e|fExtra)|oidcAttribute|(?:(?:cmbMod|r)ul|authChoic)e|(?:virtualHos|keyTex)t|menu(?:App|Cat))$/)) {
           return true;
         } else {
           return false;

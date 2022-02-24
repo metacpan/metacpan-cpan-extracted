@@ -21,7 +21,8 @@ use DynaLoader;
 
 
 
-#line 5 "iis.pd"
+#line 4 "iis.pd"
+
 =head1 NAME
 
 PDL::Graphics::IIS - Display PDL images on IIS devices (saoimage/ximtool)
@@ -94,7 +95,7 @@ using the module this will guarantee correct file names!
 
 use strict;
 use warnings;
-#line 98 "IIS.pm"
+#line 99 "IIS.pm"
 
 
 
@@ -102,7 +103,8 @@ use warnings;
 
 
 
-#line 85 "iis.pd"
+#line 84 "iis.pd"
+
 
 use PDL::Core '';
 use PDL::Basic '';
@@ -136,7 +138,7 @@ Displays an image on a IIS device (e.g. SAOimage/Ximtool)
  (image(m,n),[\%options]) or (image(m,n),[min(),max()])
 
 Displays image on a IIS device. If C<min()> or C<max()> are omitted they
-are autoscaled. A good demonstration of PDL threading can be had
+are autoscaled. A good demonstration of PDL broadcasting can be had
 by giving C<iis()> a data *cube* - C<iis()> will be repeatedly called
 for each plane of the cube resulting in a poor man's movie!
 
@@ -228,7 +230,7 @@ Draws a circle on a IIS device (e.g. SAOimage/Ximtool)
 
 Draws circles on the IIS device with specified points and colours. Because
 this module uses 
-L<PDL::PP> threading you can supply lists of points via
+L<PDL::PP> broadcasting you can supply lists of points via
 1D arrays, etc.
 
 An amusing PDL idiom is:
@@ -425,25 +427,28 @@ sub findfifo {
       }
    }
 1;}
-#line 429 "IIS.pm"
+#line 431 "IIS.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *_iis = \&PDL::Graphics::IIS::_iis;
-#line 435 "IIS.pm"
+#line 438 "IIS.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *_iiscirc = \&PDL::Graphics::IIS::_iiscirc;
-#line 441 "IIS.pm"
+#line 445 "IIS.pm"
 
 
 
 
 
-#line 620 "iis.pd"
+#line 619 "iis.pd"
+
 
 =head1 BUGS
 
@@ -459,7 +464,7 @@ distribution. If this file is separated from the PDL distribution,
 the copyright notice should be included in the file.
 
 =cut
-#line 463 "IIS.pm"
+#line 468 "IIS.pm"
 
 
 

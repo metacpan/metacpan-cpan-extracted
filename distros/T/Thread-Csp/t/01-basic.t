@@ -37,13 +37,12 @@ subtest 'Fourth', sub {
 	my $q = Thread::Csp::Channel->new;
 	my $r = Thread::Csp->spawn('Basic', 'Basic::basic', $q, 7);
 
-	pipe my $in, my $out or die;
-	$r->set_notify($out, "1");
+	my $in = $r->finished_fh;
 	ok(!$r->is_finished, 'is not finished');
 	$q->send(1);
 	$q->receive;
 	read $in, my $buffer, 1 or die;
-	is($buffer, "1", 'Event as expected');
+	is($buffer, "\377", 'Event as expected');
 };
 
 subtest 'Fifth', sub {

@@ -17,11 +17,6 @@ use constant hook => {
     oidcGotClientCredentialsGrant => 'oidcGotClientCredentialsGrant',
 };
 
-sub init {
-    my ($self) = @_;
-    return 1;
-}
-
 sub addClaimToIDToken {
     my ( $self, $req, $payload, $rp ) = @_;
     $payload->{"id_token_hook"} = 1;
@@ -43,7 +38,7 @@ sub addScopeToRequest {
 
 sub addHardcodedScope {
     my ( $self, $req, $scopeList, $rp ) = @_;
-    push @{$scopeList}, "myscope";
+    push @{$scopeList}, "myscope" if $rp ne "scopelessrp";
 
     return PE_OK;
 }

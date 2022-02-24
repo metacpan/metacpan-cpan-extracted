@@ -107,7 +107,7 @@ extern "C" {
 #define ASA_PRINT_MORE ASAFALSE
 #endif
 
-  char exit_msg[160];           /* temp storage for exit messages */
+  extern char exit_msg[160];           /* temp storage for exit messages */
 
   /* The state of the system in terms of parameters and function value */
   typedef struct {

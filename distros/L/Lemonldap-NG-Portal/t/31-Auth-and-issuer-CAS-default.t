@@ -170,7 +170,7 @@ count(1);
 # Query IdP with iframe src
 my $url = $1;
 $query = $2;
-expectCspChildOK($res, "auth.idp.com");
+expectCspChildOK( $res, "auth.idp.com" );
 
 switch ('issuer');
 ok(
@@ -224,7 +224,7 @@ sub issuer {
                 casAttributes => { cn => 'cn', uid => 'uid', multi => 'multi' },
                 casAccessControlPolicy => 'none',
                 multiValuesSeparator   => ';',
-                macros =>
+                macros                 =>
                   { multi => '"value1;value2"', _whatToTrace => '$uid' },
             }
         }

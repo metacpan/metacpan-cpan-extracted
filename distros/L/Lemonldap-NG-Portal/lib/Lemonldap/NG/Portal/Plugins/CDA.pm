@@ -9,7 +9,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   URIRE
 );
 
-our $VERSION = '2.0.12';
+our $VERSION = '2.0.14';
 
 extends 'Lemonldap::NG::Common::Module';
 
@@ -18,8 +18,6 @@ extends 'Lemonldap::NG::Common::Module';
 use constant endAuth     => 'changeUrldc';
 use constant forAuthUser => 'changeUrldc';
 
-sub init { 1 }
-
 # RUNNING METHOD
 
 sub changeUrldc {
@@ -27,7 +25,7 @@ sub changeUrldc {
     my $urldc = $req->{urldc} || '';
     if (    $req->id
         and $urldc =~ URIRE
-        and $3 !~ m@\Q$self->{conf}->{domain}\E$@oi
+        and $3     !~ m@\Q$self->{conf}->{domain}\E$@oi
         and $self->p->isTrustedUrl($urldc) )
     {
         my $ssl = $urldc =~ /^https/;

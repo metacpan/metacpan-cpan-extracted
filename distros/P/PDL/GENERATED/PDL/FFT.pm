@@ -21,7 +21,8 @@ use DynaLoader;
 
 
 
-#line 7 "fft.pd"
+#line 6 "fft.pd"
+
 =head1 NAME
 
 PDL::FFT - FFTs for PDL
@@ -98,7 +99,7 @@ However, unlike PDL::FFT, these modules are optional,
 and so may not be installed.
 
 =cut
-#line 102 "FFT.pm"
+#line 103 "FFT.pm"
 
 
 
@@ -112,7 +113,8 @@ and so may not be installed.
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 fft
@@ -139,11 +141,12 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 143 "FFT.pm"
+#line 145 "FFT.pm"
 
 
 
-#line 1060 "../../blib/lib/PDL/PP.pm"
+#line 1059 "../../blib/lib/PDL/PP.pm"
+
 sub PDL::fft {
 	# Convert the first argument to decimal and check for trouble.
 	my ($re, $im) = @_;
@@ -172,17 +175,19 @@ sub PDL::fft {
 		$_[0]=$re,$_[1]=$im;
 	}
 }
-#line 176 "FFT.pm"
+#line 179 "FFT.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *fft = \&PDL::fft;
-#line 182 "FFT.pm"
+#line 186 "FFT.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 ifft
@@ -209,11 +214,12 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 213 "FFT.pm"
+#line 218 "FFT.pm"
 
 
 
-#line 1060 "../../blib/lib/PDL/PP.pm"
+#line 1059 "../../blib/lib/PDL/PP.pm"
+
 sub PDL::ifft {
 	# Convert the first argument to decimal and check for trouble.
 	my ($re, $im) = @_;
@@ -242,17 +248,19 @@ sub PDL::ifft {
 		$_[0]=$re,$_[1]=$im;
 	}
 }
-#line 246 "FFT.pm"
-
-
-
-#line 1061 "../../blib/lib/PDL/PP.pm"
-*ifft = \&PDL::ifft;
 #line 252 "FFT.pm"
 
 
 
-#line 186 "fft.pd"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
+*ifft = \&PDL::ifft;
+#line 259 "FFT.pm"
+
+
+
+#line 185 "fft.pd"
+
 use Carp;
 use PDL::Core qw/:Func/;
 use PDL::Basic qw/:Func/;
@@ -453,13 +461,14 @@ sub PDL::fftconvolve {
     $_[1] = $c->im->sever;
     @_;
 }
-#line 457 "FFT.pm"
+#line 465 "FFT.pm"
 
 
 
 
 
-#line 389 "fft.pd"
+#line 388 "fft.pd"
+
 =head1 BUGS
 
 Where the source is marked `FIX', could re-implement using phase-shift
@@ -477,7 +486,7 @@ COPYING in the PDL distribution. If this file is separated from the
 PDL distribution, the copyright notice should be included in the file.
 
 =cut
-#line 481 "FFT.pm"
+#line 490 "FFT.pm"
 
 
 

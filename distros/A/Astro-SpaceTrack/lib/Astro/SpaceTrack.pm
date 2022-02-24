@@ -53,6 +53,20 @@ Track web site.
 
 =head1 FUNCTIONAL NOTICES
 
+=head2 CELESTRAK API
+
+The Celestrak web site, L<https://celestrak.com/>, is in transition from
+being simply a file based repository of TLEs to an API-based service
+providing orbital elements in a number of formats. The C<celestrak()>
+and C<celestrak_supplemental()> methods will track this, growing new
+arguments as needed.
+
+The API-based service appears not to provide OID lists. Accordingly, as
+of version 0.150 the C<direct> attribute defaults to true, and is
+deprecated. Six months from the release of 0.150 this attribute will
+warn on the first use; six months after that it will warn on all uses,
+and six months after that any use will be fatal.
+
 =head2 DEPRECATION NOTICE: IRIDIUM STATUS
 
 As of version 0.137, Iridium status format C<'mccants'> is fully
@@ -132,7 +146,7 @@ use Exporter;
 
 our @ISA = qw{ Exporter };
 
-our $VERSION = '0.149';
+our $VERSION = '0.150';
 our @EXPORT_OK = qw{
     shell
 
@@ -235,7 +249,7 @@ use constant CLASSIC_RETRIEVE_OPTIONS => [
 
 my %catalogs = (	# Catalog names (and other info) for each source.
     celestrak => {
-	'tle-new' => {name => "Last 30 Days' Launches"},
+	'last-30-days' => {name => "Last 30 Days' Launches"},
 	stations => {name => 'International Space Station'},
 	visual => {name => '100 (or so) brightest'},
 	active => { name => 'Active Satellites' },
@@ -651,7 +665,7 @@ sub new {
 
     my $self = {
 	banner => 1,	# shell () displays banner if true.
-	direct => 0,	# Do not direct-fetch from redistributors
+	direct => 1,	# Direct-fetch from redistributors
 	dump_headers => DUMP_NONE,	# No dumping.
 	fallback => 0,	# Do not fall back if primary source offline
 	filter => 0,	# Filter mode.
@@ -729,8 +743,9 @@ satellites of interest to radio amateurs, and appears to be updated
 weekly.
 
 No Space Track account is needed to access this data, even if the
-'direct' attribute is false. But if the 'direct' attribute is true,
-the setting of the 'with_name' attribute is ignored.
+'direct' attribute is false. As of version 0.150 the setting of
+the 'with_name' attribute is honored even if the 'direct' attribute is
+true.
 
 You can specify options as either command-type options (e.g.
 C<< amsat( '-file', 'foo.dat' ) >>) or as a leading hash reference (e.g.
@@ -787,7 +802,7 @@ sub amsat {
 	url	=> 'https://www.amsat.org/tle/current/nasabare.txt',
 	post_process	=> sub {
 	    my ( $self, $resp ) = @_;
-	    unless ( $self->{direct} || $self->{with_name} ) {
+	    unless ( $self->{with_name} ) {
 		my @content = split qr{ \015? \012 }smx,
 		    $resp->content();
 		@content % 3
@@ -869,7 +884,7 @@ Space Track ($url/) you must register and
 get a username and password, and you may not make the data available to
 a third party without prior permission from Space Track.
 
-Copyright 2005-2016 by T. R. Wyant (wyant at cpan dot org).
+Copyright 2005-2022 by T. R. Wyant (wyant at cpan dot org).
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text
@@ -1005,6 +1020,10 @@ There are no arguments.
 =for html <a name="celestrak"></a>
 
 =item $resp = $st->celestrak ($name);
+
+B<Note:> As of version 0.150 of this module a false value of the
+C<'direct'> attribute is unsupported. See L<CELESTRAK API|/CELESTRAK API>
+above for details.
 
 This method takes the name of a Celestrak data set and returns an
 HTTP::Response object whose content is the relevant element sets.
@@ -1257,8 +1276,22 @@ sub _celestrak_direct {
     my ( $self, undef, $name ) = @_;		# Options unused
     delete $self->{_pragmata};
 
+=begin comment
+
     my $resp = $self->_get_agent()->get (
 	"https://celestrak.com/NORAD/elements/$name.txt");
+
+=end comment
+
+=cut
+
+    my $uri = URI->new( 'https://celestrak.com/NORAD/elements/gp.php' );
+    $uri->query_form(
+	GROUP	=> $name,
+	FORMAT	=> 'tle',
+    );
+    my $resp = $self->_get_agent()->get ( $uri );
+
     if (my $check = $self->_response_check($resp, celestrak => $name, 'direct')) {
 	return $check;
     }
@@ -1316,7 +1349,12 @@ sub _celestrak_repack_iridium {
 	};
 	foreach ( _trim( split ',', $type ) ) {
 	    s/ ; .* //smx;
-	    $valid_type{$_} and return;
+	    $valid_type{$_}
+		or next;
+	    # As of February 12 2022 Celestrak does this
+	    $resp->decoded_content() =~ m/\ANo GP data found\b/
+		and last;
+	    return;
 	}
 	my $msg = "Content-Type: $type";
 	@args and $msg = "@args; $msg";

@@ -7,6 +7,7 @@ use Astro::SpaceTrack;
 use HTML::TreeBuilder;
 use LWP::UserAgent;
 use Test::More 0.96;
+use URI;
 
 my $ua = LWP::UserAgent->new ();
 
@@ -161,10 +162,19 @@ sub parse_string {
     foreach my $anchor ( $tree->look_down( _tag => 'a' ) ) {
 	my $href = $anchor->attr( 'href' )
 	    or next;
-	$href =~ s/ [.] txt \z //smx
-	    or next;
-	$href =~ m{ / }smx
-	    and next;
+	if ( $href =~ m/ \b gp\.php \b /smx ) {
+	    my $uri = URI->new( $href );
+	    # NOTE convenient in this case but technically incorrect as
+	    # it is legal for keys to repeat.
+	    my %query = $uri->query_form();
+	    $href = $query{GROUP}
+		or next;
+	} else {
+	    $href =~ s/ [.] txt \z //smx
+		or next;
+	    $href =~ m{ / }smx
+		and next;
+	}
 	$data{$href} = {
 	    name	=> $anchor->as_trimmed_text(),
 	    @extra,

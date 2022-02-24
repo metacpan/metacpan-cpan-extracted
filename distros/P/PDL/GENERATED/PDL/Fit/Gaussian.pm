@@ -21,7 +21,8 @@ use DynaLoader;
 
 
 
-#line 5 "gaussian.pd"
+#line 4 "gaussian.pd"
+
 =head1 NAME
 
 PDL::Fit::Gaussian - routines for fitting gaussians
@@ -118,7 +119,7 @@ SEE ALSO: fitgauss1d() to fit centre as well.
 
 use strict;
 use warnings;
-#line 122 "Gaussian.pm"
+#line 123 "Gaussian.pm"
 
 
 
@@ -126,19 +127,22 @@ use warnings;
 
 
 
-#line 1061 "../../../blib/lib/PDL/PP.pm"
+#line 1060 "../../../blib/lib/PDL/PP.pm"
+
 *fitgauss1d = \&PDL::fitgauss1d;
-#line 132 "Gaussian.pm"
+#line 134 "Gaussian.pm"
 
 
 
-#line 1061 "../../../blib/lib/PDL/PP.pm"
+#line 1060 "../../../blib/lib/PDL/PP.pm"
+
 *fitgauss1dr = \&PDL::fitgauss1dr;
-#line 138 "Gaussian.pm"
+#line 141 "Gaussian.pm"
 
 
 
-#line 192 "gaussian.pd"
+#line 191 "gaussian.pd"
+
 =head1 BUGS
 
 May not converge for weird data, still pretty good!
@@ -154,7 +158,7 @@ COPYING in the PDL distribution. If this file is separated from the
 PDL distribution, the copyright notice should be included in the file.
 
 =cut
-#line 158 "Gaussian.pm"
+#line 162 "Gaussian.pm"
 
 
 

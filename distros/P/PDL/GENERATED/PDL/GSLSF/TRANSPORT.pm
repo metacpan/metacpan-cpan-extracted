@@ -21,7 +21,8 @@ use DynaLoader;
 
 
 
-#line 5 "gsl_sf_transport.pd"
+#line 4 "gsl_sf_transport.pd"
+
 use strict;
 use warnings;
 
@@ -38,7 +39,7 @@ Transport function:
   J(n,x) := Integral[ t^n e^t /(e^t - 1)^2, {t,0,x}]
 
 =cut
-#line 42 "TRANSPORT.pm"
+#line 43 "TRANSPORT.pm"
 
 
 
@@ -52,7 +53,8 @@ Transport function:
 
 
 
-#line 1059 "../../../../blib/lib/PDL/PP.pm"
+#line 1058 "../../../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 gsl_sf_transport_2
@@ -72,17 +74,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 76 "TRANSPORT.pm"
+#line 78 "TRANSPORT.pm"
 
 
 
-#line 1061 "../../../../blib/lib/PDL/PP.pm"
+#line 1060 "../../../../blib/lib/PDL/PP.pm"
+
 *gsl_sf_transport_2 = \&PDL::gsl_sf_transport_2;
-#line 82 "TRANSPORT.pm"
+#line 85 "TRANSPORT.pm"
 
 
 
-#line 1059 "../../../../blib/lib/PDL/PP.pm"
+#line 1058 "../../../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 gsl_sf_transport_3
@@ -102,17 +106,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 106 "TRANSPORT.pm"
+#line 110 "TRANSPORT.pm"
 
 
 
-#line 1061 "../../../../blib/lib/PDL/PP.pm"
+#line 1060 "../../../../blib/lib/PDL/PP.pm"
+
 *gsl_sf_transport_3 = \&PDL::gsl_sf_transport_3;
-#line 112 "TRANSPORT.pm"
+#line 117 "TRANSPORT.pm"
 
 
 
-#line 1059 "../../../../blib/lib/PDL/PP.pm"
+#line 1058 "../../../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 gsl_sf_transport_4
@@ -132,17 +138,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 136 "TRANSPORT.pm"
-
-
-
-#line 1061 "../../../../blib/lib/PDL/PP.pm"
-*gsl_sf_transport_4 = \&PDL::gsl_sf_transport_4;
 #line 142 "TRANSPORT.pm"
 
 
 
-#line 1059 "../../../../blib/lib/PDL/PP.pm"
+#line 1060 "../../../../blib/lib/PDL/PP.pm"
+
+*gsl_sf_transport_4 = \&PDL::gsl_sf_transport_4;
+#line 149 "TRANSPORT.pm"
+
+
+
+#line 1058 "../../../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 gsl_sf_transport_5
@@ -162,19 +170,21 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 166 "TRANSPORT.pm"
+#line 174 "TRANSPORT.pm"
 
 
 
-#line 1061 "../../../../blib/lib/PDL/PP.pm"
+#line 1060 "../../../../blib/lib/PDL/PP.pm"
+
 *gsl_sf_transport_5 = \&PDL::gsl_sf_transport_5;
-#line 172 "TRANSPORT.pm"
+#line 181 "TRANSPORT.pm"
 
 
 
 
 
-#line 81 "gsl_sf_transport.pd"
+#line 80 "gsl_sf_transport.pd"
+
 =head1 AUTHOR
 
 This file copyright (C) 1999 Christian Pellegrin <chri@infis.univ.trieste.it>
@@ -187,7 +197,7 @@ PDL distribution, the copyright notice should be included in the file.
 The GSL SF modules were written by G. Jungman.
 
 =cut
-#line 191 "TRANSPORT.pm"
+#line 201 "TRANSPORT.pm"
 
 
 

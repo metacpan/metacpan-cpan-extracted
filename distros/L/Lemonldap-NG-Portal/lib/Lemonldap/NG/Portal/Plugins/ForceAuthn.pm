@@ -7,15 +7,13 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_MUSTAUTHN
 );
 
-our $VERSION = '2.0.10';
+our $VERSION = '2.0.14';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 
 # INITIALIZATION
 
 use constant forAuthUser => 'run';
-
-sub init { 1 }
 
 # RUNNING METHOD
 

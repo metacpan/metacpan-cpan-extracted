@@ -17,6 +17,7 @@ docs/CellResponse.md
 docs/Cells.md
 docs/CellsApi.md
 docs/LightCellsApi.md
+docs/CellsCloudFileInfo.md
 docs/CellsCloudResponse.md
 docs/CellsColor.md
 docs/CellsDocumentProperties.md
@@ -272,6 +273,7 @@ lib/AsposeCellsCloud/Object/CellArea.pm
 lib/AsposeCellsCloud/Object/CellResponse.pm
 lib/AsposeCellsCloud/Object/Cells.pm
 lib/AsposeCellsCloud/Object/CellsCloudResponse.pm
+lib/AsposeCellsCloud/Object/CellsCloudFileInfo.pm
 lib/AsposeCellsCloud/Object/CellsColor.pm
 lib/AsposeCellsCloud/Object/CellsDocumentProperties.pm
 lib/AsposeCellsCloud/Object/CellsDocumentPropertiesResponse.pm

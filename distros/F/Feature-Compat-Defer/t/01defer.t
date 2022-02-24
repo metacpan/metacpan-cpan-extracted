@@ -248,46 +248,64 @@ use Feature::Compat::Defer;
    is($e, "Oopsie\n", 'Thrown exception still occurs after defer');
 }
 
-{
-   my $sub = sub {
-      while(1) {
-         defer { return "retval" }
-         last;
-      }
-      return "wrong";
-   };
+# Core perl's diagnostic puts quotes around "defer"; SKD does not
+my $RE_DEFER = qr/"?defer"?/;
 
+# Latest SKD can detect and reject this at compiletime. Core perl currently
+# only detects it at runtime. For maximum flexibility, compile the code into
+# a coderef inside eval so we can detect it in both cases.
+
+{
    my $e = defined eval {
+      my $sub = eval(q{
+         sub {
+            while(1) {
+               defer { return "retval" }
+               last;
+            }
+         }
+      }) or die $@;
+
       my $ret = $sub->();
       diag("return value was $ret");
       1
    } ? undef : $@;
-   like($e, qr/^Can't "return" out of a defer block /,
+   like($e, qr/^Can't "return" out of a $RE_DEFER block /,
       'Cannot return out of defer block');
 }
 
 {
-   my $sub = sub {
-      while(1) {
-         defer { goto HERE }
-      }
-      HERE:
-   };
+   my $e = defined eval {
+      my $sub = eval(q{
+         sub {
+            while(1) {
+               defer { goto HERE }
+            }
+            HERE:
+         }
+      }) or die $@;
 
-   my $e = defined eval { $sub->(); 1 } ? undef : $@;
-   like($e, qr/^Can't "goto" out of a defer block /,
+      $sub->();
+      1;
+   } ? undef : $@;
+   like($e, qr/^Can't "goto" out of a $RE_DEFER block /,
       'Cannot goto out of defer block');
 }
 
 {
-   my $sub = sub {
-      LOOP: while(1) {
-         defer { last LOOP }
-      }
-   };
+   my $e = defined eval {
+      my $sub = eval(q{
+         sub {
+            LOOP: while(1) {
+               defer { last LOOP }
+            }
+         }
+      }) or die $@;
 
-   my $e = defined eval { $sub->(); 1 } ? undef : $@;
-   like($e, qr/^Can't "last" out of a defer block /,
+      $sub->();
+      1
+   } ? undef : $@;
+   like($e, qr/^Can't "last" out of a $RE_DEFER block /,
       'Cannot last out of defer block');
 }
 

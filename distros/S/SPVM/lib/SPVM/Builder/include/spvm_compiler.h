@@ -16,6 +16,15 @@ enum {
 
 // Parser information
 struct spvm_compiler {
+  // Module searching directories
+  SPVM_LIST* module_dirs;
+
+  // Class loading stack
+  SPVM_LIST* op_use_stack;
+
+  // Types
+  SPVM_LIST* op_types;
+  
   // Current parsed file name
   const char* cur_file;
   
@@ -46,6 +55,9 @@ struct spvm_compiler {
   // Before buffer position
   char* befbufptr;
 
+  // Next double quote start position
+  char* next_double_quote_start_bufptr;
+
   // Expect method name
   int8_t expect_method_name;
 
@@ -67,47 +79,26 @@ struct spvm_compiler {
   // Current class base;
   int32_t cur_class_base;
   
-  // AST grammar
-  SPVM_OP* op_grammar;
+  // Starting file the starting module is loaded
+  const char* start_file;
+  
+  // Starting line the starting module is loaded
+  int32_t start_line;
   
   // Syntax error count
   SPVM_LIST* error_messages;
   
-  // Module searching directories
-  SPVM_LIST* module_dirs;
-
   // Constant string symtable
-  SPVM_HASH* const_string_symtable;
-
-  // Class loading stack
-  SPVM_LIST* op_use_stack;
-
-  // Operation codes
-  SPVM_OPCODE_ARRAY* opcode_array;
-  
-  // Constants
-  SPVM_LIST* op_constants;
-
-  // Types
-  SPVM_LIST* op_types;
-
-  // Classes
-  SPVM_LIST* classes;
-
-  // added_class_names tmp
-  SPVM_LIST* added_class_names;
+  SPVM_HASH* name_symtable;
 
   // Used module symtable
   SPVM_HASH* used_class_symtable;
   
-  // module file symtable
-  SPVM_HASH* module_file_symtable;
+  // added_class_names tmp
+  SPVM_LIST* added_class_names;
 
-  // module source symtable
-  SPVM_HASH* module_source_symtable;
-  
-  // OP class symtable
-  SPVM_HASH* class_symtable;
+  // Operation codes
+  SPVM_OPCODE_ARRAY* opcode_array;
   
   // Single types
   SPVM_LIST* basic_types;
@@ -115,23 +106,26 @@ struct spvm_compiler {
   // Resolved type symbol table
   SPVM_HASH* basic_type_symtable;
 
-  // OP our symtable
-  SPVM_LIST* class_vars;
+  // Classes
+  SPVM_LIST* classes;
 
+  // OP class symtable
+  SPVM_HASH* class_symtable;
+  
   // Method ops
   SPVM_LIST* methods;
-  
-  // Method absolute name symbol table
-  SPVM_HASH* method_symtable;
+
+  // OP our symtable
+  SPVM_LIST* class_vars;
 
   // Field ops
   SPVM_LIST* fields;
   
-  char* next_double_quote_start_bufptr;
+  // module source symtable
+  SPVM_HASH* module_source_symtable;
 };
 
 SPVM_COMPILER* SPVM_COMPILER_new();
-int32_t SPVM_COMPILER_compile(SPVM_COMPILER* compiler);
 void SPVM_COMPILER_free(SPVM_COMPILER* compiler);
 void SPVM_COMPILER_add_basic_types(SPVM_COMPILER* compiler);
 SPVM_RUNTIME* SPVM_COMPILER_new_runtime(SPVM_COMPILER* compiler);
@@ -143,6 +137,9 @@ const char* SPVM_COMPILER_create_method_signature(SPVM_COMPILER* compiler, SPVM_
 const char* SPVM_COMPILER_create_field_signature(SPVM_COMPILER* compiler, SPVM_FIELD* field);
 const char* SPVM_COMPILER_create_class_var_signature(SPVM_COMPILER* compiler, SPVM_CLASS_VAR* class_var);
 
-int32_t SPVM_COMPILER_get_error_count(SPVM_COMPILER* compiler);
+int32_t SPVM_COMPILER_get_error_messages_length(SPVM_COMPILER* compiler);
+const char* SPVM_COMPILER_get_error_message(SPVM_COMPILER* compiler, int32_t index);
+
+int32_t SPVM_COMPILER_compile_spvm(SPVM_COMPILER* compiler, const char* class_name);
 
 #endif

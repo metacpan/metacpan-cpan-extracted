@@ -1,5 +1,5 @@
 package Thread::Csp::Promise;
-$Thread::Csp::Promise::VERSION = '0.005';
+$Thread::Csp::Promise::VERSION = '0.008';
 use strict;
 use warnings;
 
@@ -23,7 +23,7 @@ Thread::Csp::Promise - Promises for thread return values.
 
 =head1 VERSION
 
-version 0.005
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -44,9 +44,9 @@ This waits for the thread to finish, and will either return its value, or throw 
 
 This returns true if the promise is finished.
 
-=head2 set_notify($handle, $value)
+=head2 finished_fh()
 
-This will cause C<$value> to be written to $handle when the promise finishes, unless it's already being waited upon.
+This returns a handle that one byte will be written to when the promise finishes (or immediately if the promise is already finished).
 
 =head1 AUTHOR
 

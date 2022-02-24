@@ -1,8 +1,13 @@
 Revision history for this software.
 
+0.40  2022-02-19 00:00:00
+  - updated for safety and long life
+  - add MOJIBAKE samples
+  - created by INABA Hitoshi
+
 0.39  2022-02-05 00:00:00
-  - supports try/catch syntax and defer add document
-  - add and DAMEMOJI samples
+  - supports try/catch syntax
+  - add DAMEMOJI samples
   - created by INABA Hitoshi
 
 0.38  2022-01-25 00:00:00

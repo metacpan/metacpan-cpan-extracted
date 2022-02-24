@@ -1,12 +1,12 @@
 use Test::More;
 use Crypt::OpenSSL::Verify;
 use Crypt::OpenSSL::X509;
-use File::Slurp qw(read_file);
+use File::Slurper qw(read_text);
 
 my $v = Crypt::OpenSSL::Verify->new('t/cacert.pem');
 isa_ok($v, 'Crypt::OpenSSL::Verify');
 
-my $text = read_file('t/cert.pem');
+my $text = read_text('t/cert.pem');
 like($text, qr/E1dSkFDk4Jix1M19WqRGMla8/, "seems to be a pem");
 
 my $cert = Crypt::OpenSSL::X509->new_from_string($text);

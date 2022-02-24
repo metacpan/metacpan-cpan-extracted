@@ -5,13 +5,13 @@ use strict;
 use warnings;
 use base qw( Exporter );
 
-our $VERSION = '0.22';
+our $VERSION = '0.24';
 
 use Redis;
 use List::MoreUtils qw( bsearch );
 use Scalar::Util qw( looks_like_number weaken );
 use Time::HiRes;
-use Carp qw( croak );
+use Carp qw( carp croak );
 
 BEGIN {
   our @EXPORT_OK = qw( crc16 hash_slot );
@@ -83,6 +83,15 @@ sub new {
   }
   unless ( @{ $params{startup_nodes} } ) {
     croak 'Specified empty list of startup nodes';
+  }
+
+  if ( $params{fallback} ) {
+    if ( $params{lazy} ) {
+      carp 'Fallback mode revokes lazy for ' . $params{startup_nodes}->[0];
+    }
+
+    my $node = Redis->new(%params, server => $params{startup_nodes}->[0]);
+    eval { $node->cluster_info(); 1 } or return $node;
   }
 
   $self->{startup_nodes} = $params{startup_nodes};
@@ -603,6 +612,7 @@ L<http://redis.io/topics/cluster-spec>
       'localhost:7002',
     ],
     password         => 'yourpass',
+    fallback         => 1,
     cnx_timeout      => 5,
     read_timeout     => 5,
     refresh_interval => 5,
@@ -641,6 +651,13 @@ of the cluster after connection.
 
 If enabled, the client will try to send read-only commands to slave nodes.
 
+=item fallback => $boolean
+
+If enabled, perform additional quick Redis connection to C<startup_nodes[0]>
+on C<new()> call and return Redis object if it has cluster support disabled.
+
+Disabled by default.
+
 =item cnx_timeout => $fractional_seconds
 
 The C<cnx_timeout> option enables connection timeout. The client will wait at
@@ -663,7 +680,8 @@ Not set by default.
 
 If enabled, the initial connection to the startup node establishes at time when
 you will send the first command to the cluster. By default the initial
-connection establishes after calling of the C<new> method.
+connection establishes after calling of the C<new> method. C<lazy> for
+C<startup_nodes[0]> has no sense if C<fallback> is enabled.
 
 Disabled by default.
 
@@ -806,7 +824,7 @@ Sponsored by SMS Online, E<lt>dev.opensource@sms-online.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2017-2018, Eugene Ponizovsky, SMS Online. All rights reserved.
+Copyright (c) 2017-2022, Eugene Ponizovsky, SMS Online. All rights reserved.
 
 This module is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

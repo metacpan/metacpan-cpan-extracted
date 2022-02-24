@@ -5,7 +5,7 @@ use warnings;
 use FFI::ExtractSymbols qw( extract_symbols );
 use FFI::Platypus 1.00;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 =head1 NAME
 
@@ -178,6 +178,11 @@ platform does not provide C<c++filt>.  The XS module is not a
 prerequsite when C<c++filt> IS found because using C<c++filt> does not
 require invoking the compiler and may be more reliable.
 
+You can turn off the use of L<FFI::Platypus::Lang::CPP::Demangle::XS>
+completely by setting the environment varaible C<FFI_PLATYPUS_LANG_CPP_NO_XS>
+to a Perl true value.  If set at install time it will also not add it
+as a prereq.
+
 If the approach to mangling C++ names described above does not work for
 you, or if it makes you feel slightly queasy, then you can also write C
 wrapper functions around each C++ method that you want to call from
@@ -314,7 +319,7 @@ Returns a subroutine reference that will "mangle" C++ names.
 
 =cut
 
-if(eval { require FFI::Platypus::Lang::CPP::Demangle::XS })
+if((!$ENV{FFI_PLATYPUS_LANG_CPP_NO_XS}) && eval { require FFI::Platypus::Lang::CPP::Demangle::XS })
 {
   *_demangle = \&FFI::Platypus::Lang::CPP::Demangle::XS::demangle;
 }

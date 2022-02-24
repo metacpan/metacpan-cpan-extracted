@@ -26,7 +26,7 @@ extends qw(
   Lemonldap::NG::Common::Conf::AccessLib
 );
 
-has server => ( is => 'rw' );
+has server        => ( is => 'rw' );
 has configStorage => (
     is      => 'ro',
     lazy    => 1,
@@ -60,9 +60,11 @@ has exportedAttr => (
 
             # Convert @attributes into hash to remove duplicates
             my %attributes = map( { $_ => 1 } @attributes );
-            %attributes =
-              ( %attributes, %{ $conf->{exportedVars} }, %{ $conf->{macros} },
-              );
+            %attributes = (
+                %attributes,
+                %{ $conf->{exportedVars} },
+                %{ $conf->{macros} },
+            );
 
             return [ sort keys %attributes ];
         }

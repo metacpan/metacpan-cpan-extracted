@@ -31,6 +31,8 @@ use ExtUtils::MakeMaker qw();
 use ExtUtils::Manifest qw();
 use Cwd qw(cwd abs_path);
 use File::Basename qw(dirname basename);
+require PDL; # for VERSION
+use PDL::Core::Dev;
 use strict;
 
 ##----------------------------------------------------------------------
@@ -151,6 +153,11 @@ EOF
     return $inherited;
   };
   *MY::special_targets = $special_targets;
+
+  ##----------------------------
+  ## PDL v2.058 package parameters $callpack,$multi_c
+  $package = [@$package, undef, 1]
+    if (@{$package||[]} == 3 && version->parse($PDL::VERSION) >= version->parse('2.058'));
 
   ##----------------------------
   ## postamble()

@@ -19,6 +19,7 @@ note "Happy Imports";
 $test_code = <<'EOS';
 use Test::MockFile ();
 is $Test::MockFile::STRICT_MODE_STATUS, Test::MockFile::STRICT_MODE_DEFAULT, 'STRICT_MODE_DEFAULT';
+is Test::MockFile::is_strict_mode(), 1, "is_strict_mode helper is true";
 EOS
 
 tmf_test_code(
@@ -38,6 +39,7 @@ tmf_test_code(
 $test_code = <<'EOS';
 use Test::MockFile;
 is $Test::MockFile::STRICT_MODE_STATUS, Test::MockFile::STRICT_MODE_ENABLED, 'STRICT_MODE_ENABLED';
+is Test::MockFile::is_strict_mode(), 1, "is_strict_mode helper is true";
 EOS
 
 tmf_test_code(
@@ -50,6 +52,7 @@ tmf_test_code(
 $test_code = <<'EOS';
 use Test::MockFile qw< strict >;
 is $Test::MockFile::STRICT_MODE_STATUS, Test::MockFile::STRICT_MODE_ENABLED, 'STRICT_MODE_ENABLED';
+is Test::MockFile::is_strict_mode(), 1, "is_strict_mode helper is true";
 EOS
 
 tmf_test_code(
@@ -62,6 +65,7 @@ tmf_test_code(
 $test_code = <<'EOS';
 use Test::MockFile qw< nostrict >;
 is $Test::MockFile::STRICT_MODE_STATUS, Test::MockFile::STRICT_MODE_DISABLED, 'STRICT_MODE_DISABLED';
+is Test::MockFile::is_strict_mode(), 0, "is_strict_mode helper is false";
 EOS
 
 tmf_test_code(
@@ -75,6 +79,7 @@ $test_code = <<'EOS';
 use Test::MockFile qw< strict >;
 use Test::MockFile qw< strict >;
 is $Test::MockFile::STRICT_MODE_STATUS, Test::MockFile::STRICT_MODE_ENABLED, 'STRICT_MODE_ENABLED';
+is Test::MockFile::is_strict_mode(), 1, "is_strict_mode helper is true";
 EOS
 
 tmf_test_code(

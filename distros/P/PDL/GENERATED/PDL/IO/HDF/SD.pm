@@ -21,7 +21,8 @@ use DynaLoader;
 
 
 
-#line 4 "SD.pd"
+#line 3 "SD.pd"
+
 
 =head1 NAME 
 
@@ -123,7 +124,7 @@ interchangeably.
 
 use strict;
 use warnings;
-#line 127 "SD.pm"
+#line 128 "SD.pm"
 
 
 
@@ -131,7 +132,8 @@ use warnings;
 
 
 
-#line 362 "SD.pd"
+#line 361 "SD.pd"
+
 
 use PDL::Primitive;
 use PDL::Basic;
@@ -438,7 +440,7 @@ sub SDgetvariablenames
 {
     my($self) = @_;
     return sort keys %{$self->{DATASET}};
-#line 442 "SD.pm"
+#line 444 "SD.pm"
 #line 668 "SD.pd"
 } # End of SDgetvariablenames()...
 sub SDgetvariablename
@@ -482,13 +484,13 @@ sub SDgetattributenames
         return( undef )
             unless defined( $self->{DATASET}->{$name} );
         return sort keys %{ $self->{DATASET}->{$name}->{ATTRS} };
-#line 486 "SD.pm"
+#line 488 "SD.pm"
 #line 710 "SD.pd"
     }
     else 
     {
         return sort keys %{ $self->{GLOBATTR} };
-#line 492 "SD.pm"
+#line 494 "SD.pm"
 #line 714 "SD.pd"
     }
 } # End of SDgetattributenames()...
@@ -660,7 +662,7 @@ sub SDgetdimsize
         unless defined( $self->{DATASET}->{$name} );
     my @dims;
     foreach( sort keys %{ $self->{DATASET}->{$name}->{DIMS} } )
-#line 664 "SD.pm"
+#line 666 "SD.pm"
 #line 884 "SD.pd"
     { 
         push @dims, $self->{DATASET}->{$name}->{DIMS}->{$_}->{SIZE};
@@ -698,7 +700,7 @@ sub SDgetunlimiteddimsize
     
     my @dim;
     foreach( sort keys %{$self->{DATASET}{$name}{DIMS}} )
-#line 702 "SD.pm"
+#line 704 "SD.pm"
 #line 920 "SD.pd"
     {
         if( $self->{DATASET}->{$name}->{DIMS}->{$_}->{SIZE} == 0 )
@@ -750,7 +752,7 @@ sub SDgetdimnames
         
     my @dims=();
     foreach( sort keys %{ $self->{DATASET}->{$name}->{DIMS} } )
-#line 754 "SD.pm"
+#line 756 "SD.pm"
 #line 970 "SD.pd"
     {
 	push @dims,$self->{DATASET}->{$name}->{DIMS}->{$_}->{NAME};
@@ -1192,7 +1194,7 @@ sub SDsetdimname
     
     my $res = 0;
     foreach( sort keys %{$self->{DATASET}->{$name}->{DIMS}} )
-#line 1196 "SD.pm"
+#line 1198 "SD.pm"
 #line 1410 "SD.pd"
     {
         return( undef )
@@ -1380,11 +1382,12 @@ sub DESTROY
     my $self = shift;
     $self->close;
 } # End of DESTROY()...
-#line 1384 "SD.pm"
+#line 1386 "SD.pm"
 
 
 
-#line 1603 "SD.pd"
+#line 1602 "SD.pd"
+
 
 =head1 CURRENT AUTHOR & MAINTAINER
 
@@ -1401,7 +1404,7 @@ contribs of Olivier Archer olivier.archer@ifremer.fr
 perl(1), PDL(1), PDL::IO::HDF(1).
 
 =cut
-#line 1405 "SD.pm"
+#line 1408 "SD.pm"
 
 
 

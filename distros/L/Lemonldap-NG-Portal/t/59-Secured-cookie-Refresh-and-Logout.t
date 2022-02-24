@@ -119,11 +119,8 @@ ok(
 count(1);
 expectOK($res);
 
-ok(
-    $res->[2]->[0] =~
-      m%<div class="message message-positive alert"><span trmsg="47">%,
-    'Dwho has been well disconnected'
-) or print STDERR Dumper( $res->[2]->[0] );
+ok( $res->[2]->[0] =~ m%<span trmsg="47">%, 'Dwho has been well disconnected' )
+  or print STDERR Dumper( $res->[2]->[0] );
 count(1);
 
 clean_sessions();

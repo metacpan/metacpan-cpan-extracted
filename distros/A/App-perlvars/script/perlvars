@@ -1,0 +1,146 @@
+#!perl
+
+use strict;
+use warnings;
+use v5.14;
+
+use App::perlvars ();
+use Getopt::Long::Descriptive qw( describe_options );
+
+my ( $opt, $usage ) = describe_options(
+    'perlvars %o file',
+    [ 'ignore-file|i=s', 'A file containing an ignore list', ],
+    [],
+    [ 'help', 'print usage message and exit', { shortcircuit => 1 } ],
+    [
+        'verbose-help', 'print verbose usage message and exit',
+        { shortcircuit => 1 }
+    ],
+);
+
+if ( $opt->help ) {
+    say( $usage->text );
+    exit;
+}
+
+my $exit_code = 0;
+
+my @files = @ARGV;
+
+unless (@files) {
+    require Pod::Usage;
+    say $usage->text;
+    Pod::Usage::pod2usage();
+}
+
+my $vars = App::perlvars->new(
+    $opt->ignore_file ? ( ignore_file => $opt->ignore_file ) : () );
+
+for my $file (@files) {
+    say $file;
+    my ( $code, $error_message, @notes ) = $vars->validate_file($file);
+
+    if ($error_message) {
+        say STDERR $error_message;
+        exit($code);
+    }
+
+    if ( $code > 0 ) {
+        $exit_code = $code;
+        say STDERR $_ for @notes;
+    }
+}
+
+say 'All files ok' unless $exit_code;
+
+exit($exit_code);
+
+# PODNAME: perlvars
+# ABSTRACT: A command line utility for detecting unused Perl variables
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+perlvars - A command line utility for detecting unused Perl variables
+
+=head1 VERSION
+
+version 0.000004
+
+=head1 SYNOPSIS
+
+Detect unused variables in Perl code.
+
+    perlvars lib/Foo.pm lib/Foo/Bar.pm
+
+    PERL5OPT="-I." perlvars Foo.pm Baz.pm
+
+You can also ignore arbitrary variables on a per-package basis, using an ignore
+file.
+
+    perlvars --ignore-file ignore-list.txt lib/Foo.pm lib/Foo/Bar.pm
+
+See the documentation for L<App::perlvars> for the format of the ignore file.
+
+If you'd like to check every .pm file in your lib directory, you can try
+something like:
+
+    find lib | grep pm$ | xargs perlvars
+
+=head1 DESCRIPTION
+
+This script (which is based heavily on the code in
+L<Code::TidyAll::Plugin::Test::Vars>) is a wrapper around L<Test::Vars>, which
+tries to find unused variables in your Perl code. Please note that since
+L<Test::Vars> only finds unused variables contained within packages, code which
+does not have an explicit package name will not be checked.
+
+=head1 CAVEATS
+
+As noted above, there are some serious limitations to this script, due to the
+way that L<Test::Vars> works. You're strongly encouraged to consider using
+L<Perl::Critic::Policy::Variables::ProhibitUnusedVarsStricter> if that's a
+possibility for you.
+
+Your code needs an explicit package name.
+
+    package Foo::Bar;
+    ...
+    1;
+
+The package name needs to match the file name, so the package above needs to be in a file named Foo/Bar.pm.
+
+The package needs be in C<@INC> or in a C<./lib> folder. This means that for the example above, either of these should work:
+
+    perlvars lib/Foo/Bar.pm
+
+    cd lib && PERL5OPT="-I." perlvars Foo/Bar.pm
+
+=head1 ACKNOWLEDGEMENTS
+
+The code in this module is largely copied directly from L<Code::TidyAll::Plugin::Test::Vars>.
+
+=head1 SEE ALSO
+
+You may also wish to use
+L<Perl::Critic::Policy::Variables::ProhibitUnusedVarsStricter> which can find
+some cases which L<Test::Vars> is not able to detect. It also does not require
+the code to be inside a package.
+
+=head1 AUTHOR
+
+Olaf Alders <olaf@wundercounter.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022 by MaxMind, Inc.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

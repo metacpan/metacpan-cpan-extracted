@@ -21,7 +21,8 @@ use DynaLoader;
 
 
 
-#line 21 "bad.pd"
+#line 20 "bad.pd"
+
 
 =head1 NAME
 
@@ -61,7 +62,7 @@ Set to 1 as of PDL 2.035 as always available.
 =back
 
 =cut
-#line 65 "Bad.pm"
+#line 66 "Bad.pm"
 
 
 
@@ -75,7 +76,8 @@ Set to 1 as of PDL 2.035 as always available.
 
 
 
-#line 64 "bad.pd"
+#line 63 "bad.pd"
+
 
 # really should be constants
 $PDL::Bad::Status = 1;
@@ -89,11 +91,12 @@ use PDL::Primitive;
 
 ############################################################
 ############################################################
-#line 93 "Bad.pm"
+#line 95 "Bad.pm"
 
 
 
-#line 115 "bad.pd"
+#line 114 "bad.pd"
+
 ############################################################
 ############################################################
 
@@ -227,11 +230,12 @@ sub PDL::check_badflag {
     $pdl->badflag(0) if $pdl->badflag and $pdl->nbad == 0;
     return $pdl->badflag;
 } # sub: check_badflag()
-#line 231 "Bad.pm"
+#line 234 "Bad.pm"
 
 
 
-#line 326 "bad.pd"
+#line 325 "bad.pd"
+
 
 # note:
 #  if sent an ndarray, we have to change its bad values
@@ -279,11 +283,12 @@ sub PDL::orig_badvalue {
 
 ############################################################
 ############################################################
-#line 283 "Bad.pm"
+#line 287 "Bad.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 isbad
@@ -318,17 +323,19 @@ same as the input ndarray's flag.
 
 
 =cut
-#line 322 "Bad.pm"
+#line 327 "Bad.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *isbad = \&PDL::isbad;
-#line 328 "Bad.pm"
+#line 334 "Bad.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 isgood
@@ -362,17 +369,19 @@ same as the input ndarray's flag.
 
 
 =cut
-#line 366 "Bad.pm"
+#line 373 "Bad.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *isgood = \&PDL::isgood;
-#line 372 "Bad.pm"
+#line 380 "Bad.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 nbadover
@@ -408,17 +417,19 @@ flag set.
 
 
 =cut
-#line 412 "Bad.pm"
+#line 421 "Bad.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *nbadover = \&PDL::nbadover;
-#line 418 "Bad.pm"
+#line 428 "Bad.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 ngoodover
@@ -455,17 +466,19 @@ flag set.
 
 
 =cut
-#line 459 "Bad.pm"
+#line 470 "Bad.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *ngoodover = \&PDL::ngoodover;
-#line 465 "Bad.pm"
+#line 477 "Bad.pm"
 
 
 
-#line 561 "bad.pd"
+#line 560 "bad.pd"
+
 
 *nbad = \&PDL::nbad;
 sub PDL::nbad {
@@ -473,11 +486,12 @@ sub PDL::nbad {
 	$x->clump(-1)->nbadover($tmp=PDL->nullcreate($x) );
 	return $tmp;
 }
-#line 477 "Bad.pm"
+#line 490 "Bad.pm"
 
 
 
-#line 561 "bad.pd"
+#line 560 "bad.pd"
+
 
 *ngood = \&PDL::ngood;
 sub PDL::ngood {
@@ -485,11 +499,12 @@ sub PDL::ngood {
 	$x->clump(-1)->ngoodover($tmp=PDL->nullcreate($x) );
 	return $tmp;
 }
-#line 489 "Bad.pm"
+#line 503 "Bad.pm"
 
 
 
-#line 573 "bad.pd"
+#line 572 "bad.pd"
+
 
 =head2 nbad
 
@@ -565,11 +580,12 @@ sub PDL::setbadat {
     $self->badflag(1);
     return $self;
 }
-#line 569 "Bad.pm"
+#line 584 "Bad.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 setbadif
@@ -616,17 +632,19 @@ Also see L</setvaltobad> and L</setnantobad>.
 
 
 =cut
-#line 620 "Bad.pm"
+#line 636 "Bad.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *setbadif = \&PDL::setbadif;
-#line 626 "Bad.pm"
+#line 643 "Bad.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 setvaltobad
@@ -660,17 +678,19 @@ Any bad values in the input ndarrays are copied across to the output ndarray.
 
 
 =cut
-#line 664 "Bad.pm"
+#line 682 "Bad.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *setvaltobad = \&PDL::setvaltobad;
-#line 670 "Bad.pm"
+#line 689 "Bad.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 setnantobad
@@ -702,17 +722,19 @@ bad flag set.
 
 
 =cut
-#line 706 "Bad.pm"
+#line 726 "Bad.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *setnantobad = \&PDL::setnantobad;
-#line 712 "Bad.pm"
+#line 733 "Bad.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 setinftobad
@@ -743,17 +765,19 @@ bad flag set.
 
 
 =cut
-#line 747 "Bad.pm"
+#line 769 "Bad.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *setinftobad = \&PDL::setinftobad;
-#line 753 "Bad.pm"
+#line 776 "Bad.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 setnonfinitetobad
@@ -784,17 +808,19 @@ bad flag set.
 
 
 =cut
-#line 788 "Bad.pm"
+#line 812 "Bad.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *setnonfinitetobad = \&PDL::setnonfinitetobad;
-#line 794 "Bad.pm"
+#line 819 "Bad.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 setbadtonan
@@ -825,17 +851,19 @@ operation, it clears the bad flag.
 
 
 =cut
-#line 829 "Bad.pm"
+#line 855 "Bad.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *setbadtonan = \&PDL::setbadtonan;
-#line 835 "Bad.pm"
+#line 862 "Bad.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 setbadtoval
@@ -866,17 +894,19 @@ values are copied with no replacement.
 
 
 =cut
-#line 870 "Bad.pm"
+#line 898 "Bad.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *setbadtoval = \&PDL::setbadtoval;
-#line 876 "Bad.pm"
+#line 905 "Bad.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 copybad
@@ -916,17 +946,19 @@ its bad value flag set to true.
 
 
 =cut
-#line 920 "Bad.pm"
+#line 950 "Bad.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *copybad = \&PDL::copybad;
-#line 926 "Bad.pm"
+#line 957 "Bad.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 locf
@@ -949,19 +981,21 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 953 "Bad.pm"
+#line 985 "Bad.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *locf = \&PDL::locf;
-#line 959 "Bad.pm"
+#line 992 "Bad.pm"
 
 
 
 
 
-#line 1143 "bad.pd"
+#line 1142 "bad.pd"
+
 
 =head1 AUTHOR
 
@@ -978,7 +1012,7 @@ separated from the PDL distribution, the copyright notice should be
 included in the file.
 
 =cut
-#line 982 "Bad.pm"
+#line 1016 "Bad.pm"
 
 
 

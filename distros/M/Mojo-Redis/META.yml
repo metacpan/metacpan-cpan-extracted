@@ -25,7 +25,7 @@ resources:
   bugtracker: https://github.com/jhthorsen/mojo-redis/issues
   homepage: https://github.com/jhthorsen/mojo-redis
   repository: https://github.com/jhthorsen/mojo-redis.git
-version: '3.27'
+version: '3.29'
 x_contributors:
   - 'Jan Henning Thorsen <jhthorsen@cpan.org>'
   - 'Dan Book <grinnz@grinnz.com>'

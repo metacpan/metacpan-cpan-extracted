@@ -1,5 +1,8 @@
 Revision history for FFI-ExtractSymbols
 
+0.07      2022-02-18 19:05:55 -0700
+  - Don't use -D on macOS (gh#14)
+
 0.06      2021-09-21 14:47:12 -0600
   - Parse Windows DLL using internal Pure-Perl implementation instead of
     using dumpbin which typically requires Visual C++ (sanko++ gh#1, gh#13)

@@ -13,6 +13,8 @@ use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
 use Test::Deep;
 use Test::JSON::Schema::Acceptance;
 use List::Util 'sum';
+use Test::File::ShareDir -share => { -dist => { 'Test-JSON-Schema-Acceptance' => 'share' } };
+
 use lib 't/lib';
 use SchemaParser;
 

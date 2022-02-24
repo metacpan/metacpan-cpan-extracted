@@ -1,0 +1,1529 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "v1",
+    "title": "House of Commons Oral and Written Questions API",
+    "description": "An API that allows querying all tabled oral and written questions, and motions for the House of Commons.",
+    "contact": {
+      "name": "UK Parliament",
+      "url": "https://www.parliament.uk/",
+      "email": "softwareengineering@parliament.uk"
+    }
+  },
+  "host": "oralquestionsandmotions-api.parliament.uk",
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "paths": {
+    "/EarlyDayMotion/{id}": {
+      "get": {
+        "tags": [
+          "Early Day Motions"
+        ],
+        "summary": "Returns a single Early Day Motion by ID",
+        "description": "Get a single Early Day Motion which has the ID specified.",
+        "operationId": "PublishedEarlyDayMotion_Get",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Early Day Motion with the ID specified.",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "BadRequest",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse[Object]"
+            }
+          },
+          "404": {
+            "description": "NotFound",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse[Object]"
+            }
+          },
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse[List[PublishedWrittenQuestion]]"
+            }
+          }
+        }
+      }
+    },
+    "/EarlyDayMotions/list": {
+      "get": {
+        "tags": [
+          "Early Day Motions"
+        ],
+        "summary": "Returns a list of Early Day Motions",
+        "description": "Get a list of Early Day Motions which meet the specified criteria. Only supports Published and Withdrawn status.",
+        "operationId": "PublishedEarlyDayMotion_Get",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "application/xml",
+          "text/xml"
+        ],
+        "parameters": [
+          {
+            "name": "parameters.edmIds",
+            "in": "query",
+            "description": "Early Day Motions with an ID in the list provided.",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "parameters.uINWithAmendmentSuffix",
+            "in": "query",
+            "description": "Early Day Motions with an UINWithAmendmentSuffix provided.",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "parameters.searchTerm",
+            "in": "query",
+            "description": "Early Day Motions where the title includes the search term provided.",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "parameters.currentStatusDateStart",
+            "in": "query",
+            "description": "Early Day Motions where the current status has been set on or after the date provided. Date format YYYY-MM-DD.",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "parameters.currentStatusDateEnd",
+            "in": "query",
+            "description": "Early Day Motions where the current status has been set on or before the date provided. Date format YYYY-MM-DD.",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "parameters.isPrayer",
+            "in": "query",
+            "description": "Early Day Motions which are a prayer against a Negative Statutory Instrument.",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "parameters.memberId",
+            "in": "query",
+            "description": "Return Early Day Motions tabled by Member with ID provided.",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "parameters.includeSponsoredByMember",
+            "in": "query",
+            "description": "Include Early Day Motions sponsored by Member specified",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "parameters.tabledStartDate",
+            "in": "query",
+            "description": "Early Day Motions where the date tabled is on or after the date provided. Date format YYYY-MM-DD.",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "parameters.tabledEndDate",
+            "in": "query",
+            "description": "Early Day Motions where the date tabled is on or before the date provided. Date format YYYY-MM-DD.",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "parameters.statuses",
+            "in": "query",
+            "description": "Early Day Motions where current status is in the selected list.",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "Published",
+                "Withdrawn"
+              ]
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "parameters.orderBy",
+            "in": "query",
+            "description": "Order results by date tabled, title or signature count. Default is date tabled.",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "DateTabledAsc",
+              "DateTabledDesc",
+              "TitleAsc",
+              "TitleDesc",
+              "SignatureCountAsc",
+              "SignatureCountDesc"
+            ]
+          },
+          {
+            "name": "parameters.skip",
+            "in": "query",
+            "description": "The number of records to skip from the first, default is 0.",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "parameters.take",
+            "in": "query",
+            "description": "The number of records to return, default is 25, maximum is 100.",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "BadRequest",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse[Object]"
+            }
+          },
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse[List[PublishedWrittenQuestion]]"
+            }
+          }
+        }
+      }
+    },
+    "/oralquestions/list": {
+      "get": {
+        "tags": [
+          "Oral Questions"
+        ],
+        "summary": "Returns a list of oral questions",
+        "description": "A list of oral questions meeting the specified criteria.",
+        "operationId": "PublishedOralQuestion_Get",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "application/xml",
+          "text/xml"
+        ],
+        "parameters": [
+          {
+            "name": "parameters.answeringDateStart",
+            "in": "query",
+            "description": "Oral Questions where the answering date has been set on or after the date provided. Date format YYYY-MM-DD.",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "parameters.answeringDateEnd",
+            "in": "query",
+            "description": "Oral Questions where the answering date has been set on or before the date provided. Date format YYYY-MM-DD.",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "parameters.questionType",
+            "in": "query",
+            "description": "Oral Questions where the question type is the selected type, substantive or topical.",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "Substantive",
+              "Topical"
+            ]
+          },
+          {
+            "name": "parameters.oralQuestionTimeId",
+            "in": "query",
+            "description": "Oral Questions where the question is within the question time with the ID provided",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "parameters.askingMemberIds",
+            "in": "query",
+            "description": "The ID of the member asking the question. Lists of member IDs for each house are available <a href=\"http://data.parliament.uk/membersdataplatform/services/mnis/members/query/house=Commons\" target=\"_blank\">Commons</a> and <a href=\"http://data.parliament.uk/membersdataplatform/services/mnis/members/query/house=Lords\" target=\"_blank\">Lords</a>.",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "parameters.uINs",
+            "in": "query",
+            "description": "The UIN for the question - note that UINs reset at the start of each Parliamentary session.",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "parameters.answeringBodyIds",
+            "in": "query",
+            "description": "Which answering body is to respond. A list of answering bodies can be found <a target=\"_blank\" href=\"http://data.parliament.uk/membersdataplatform/services/mnis/referencedata/AnsweringBodies/\">here</a>.",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "parameters.skip",
+            "in": "query",
+            "description": "The number of records to skip from the first, default is 0.",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "parameters.take",
+            "in": "query",
+            "description": "The number of records to return, default is 25, maximum is 100.",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "BadRequest",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse[Object]"
+            }
+          },
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse[List[PublishedWrittenQuestion]]"
+            }
+          }
+        }
+      }
+    },
+    "/oralquestiontimes/list": {
+      "get": {
+        "tags": [
+          "Oral Question Times"
+        ],
+        "summary": "Returns a list of oral question times",
+        "description": "A list of oral question times meeting the specified criteria.",
+        "operationId": "PublishedOralQuestionTime_Get",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "application/xml",
+          "text/xml"
+        ],
+        "parameters": [
+          {
+            "name": "parameters.answeringDateStart",
+            "in": "query",
+            "description": "Oral Questions Time where the answering date has been set on or after the date provided. Date format YYYY-MM-DD.",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "parameters.answeringDateEnd",
+            "in": "query",
+            "description": "Oral Questions Time where the answering date has been set on or before the date provided. Date format YYYY-MM-DD.",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "parameters.deadlineDateStart",
+            "in": "query",
+            "description": "Oral Questions Time where the deadline date has been set on or after the date provided. Date format YYYY-MM-DD.",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "parameters.deadlineDateEnd",
+            "in": "query",
+            "description": "Oral Questions Time where the deadline date has been set on or before the date provided. Date format YYYY-MM-DD.",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "parameters.oralQuestionTimeId",
+            "in": "query",
+            "description": "Identifier of the OQT",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "parameters.answeringBodyIds",
+            "in": "query",
+            "description": "Which answering body is to respond. A list of answering bodies can be found <a target=\"_blank\" href=\"http://data.parliament.uk/membersdataplatform/services/mnis/referencedata/AnsweringBodies/\">here</a>.",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "parameters.skip",
+            "in": "query",
+            "description": "The number of records to skip from the first, default is 0.",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "parameters.take",
+            "in": "query",
+            "description": "The number of records to return, default is 25, maximum is 100.",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "BadRequest",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse[Object]"
+            }
+          },
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse[List[PublishedWrittenQuestion]]"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "ApiResponse[PublishedEarlyDayMotionDetails]": {
+      "type": "object",
+      "properties": {
+        "PagingInfo": {
+          "$ref": "#/definitions/PagingInfo"
+        },
+        "StatusCode": {
+          "enum": [
+            "Continue",
+            "SwitchingProtocols",
+            "OK",
+            "Created",
+            "Accepted",
+            "NonAuthoritativeInformation",
+            "NoContent",
+            "ResetContent",
+            "PartialContent",
+            "MultipleChoices",
+            "Ambiguous",
+            "MovedPermanently",
+            "Moved",
+            "Found",
+            "Redirect",
+            "SeeOther",
+            "RedirectMethod",
+            "NotModified",
+            "UseProxy",
+            "Unused",
+            "TemporaryRedirect",
+            "RedirectKeepVerb",
+            "BadRequest",
+            "Unauthorized",
+            "PaymentRequired",
+            "Forbidden",
+            "NotFound",
+            "MethodNotAllowed",
+            "NotAcceptable",
+            "ProxyAuthenticationRequired",
+            "RequestTimeout",
+            "Conflict",
+            "Gone",
+            "LengthRequired",
+            "PreconditionFailed",
+            "RequestEntityTooLarge",
+            "RequestUriTooLong",
+            "UnsupportedMediaType",
+            "RequestedRangeNotSatisfiable",
+            "ExpectationFailed",
+            "UpgradeRequired",
+            "InternalServerError",
+            "NotImplemented",
+            "BadGateway",
+            "ServiceUnavailable",
+            "GatewayTimeout",
+            "HttpVersionNotSupported"
+          ],
+          "type": "string"
+        },
+        "Success": {
+          "type": "boolean",
+          "readOnly": true
+        },
+        "Errors": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "Response": {
+          "$ref": "#/definitions/PublishedEarlyDayMotionDetails"
+        }
+      }
+    },
+    "PagingInfo": {
+      "type": "object",
+      "properties": {
+        "Skip": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "Take": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "Total": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "StatusCounts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/StatusCount"
+          }
+        }
+      }
+    },
+    "PublishedEarlyDayMotionDetails": {
+      "type": "object",
+      "properties": {
+        "Sponsors": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PublishedEarlyDayMotionSponsor"
+          }
+        },
+        "Amendments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PublishedEarlyDayMotionDetails"
+          }
+        },
+        "Id": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "Status": {
+          "enum": [
+            "Published",
+            "Withdrawn"
+          ],
+          "type": "string"
+        },
+        "StatusDate": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "MemberId": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "PrimarySponsor": {
+          "$ref": "#/definitions/MemberForDate"
+        },
+        "Title": {
+          "type": "string"
+        },
+        "MotionText": {
+          "type": "string"
+        },
+        "AmendmentToMotionId": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "UIN": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "AmendmentSuffix": {
+          "type": "string"
+        },
+        "DateTabled": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "PrayingAgainstNegativeStatutoryInstrumentId": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "StatutoryInstrumentNumber": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "StatutoryInstrumentYear": {
+          "type": "string"
+        },
+        "StatutoryInstrumentTitle": {
+          "type": "string"
+        },
+        "UINWithAmendmentSuffix": {
+          "type": "string"
+        },
+        "SponsorsCount": {
+          "format": "int32",
+          "type": "integer"
+        }
+      }
+    },
+    "StatusCount": {
+      "type": "object",
+      "properties": {
+        "StatusId": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "Count": {
+          "format": "int32",
+          "type": "integer"
+        }
+      }
+    },
+    "PublishedEarlyDayMotionSponsor": {
+      "type": "object",
+      "properties": {
+        "Id": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "MemberId": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "Member": {
+          "$ref": "#/definitions/MemberForDate"
+        },
+        "SponsoringOrder": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "CreatedWhen": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "IsWithdrawn": {
+          "type": "boolean"
+        },
+        "WithdrawnDate": {
+          "format": "date-time",
+          "type": "string"
+        }
+      }
+    },
+    "MemberForDate": {
+      "type": "object",
+      "properties": {
+        "MnisId": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "PimsId": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "Name": {
+          "type": "string"
+        },
+        "ListAs": {
+          "type": "string"
+        },
+        "Constituency": {
+          "type": "string"
+        },
+        "Status": {
+          "type": "string"
+        },
+        "Party": {
+          "type": "string"
+        },
+        "PartyId": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "PartyColour": {
+          "type": "string"
+        },
+        "PhotoUrl": {
+          "type": "string",
+          "readOnly": true
+        }
+      }
+    },
+    "ApiResponse[List[PublishedWrittenQuestion]]": {
+      "type": "object",
+      "properties": {
+        "PagingInfo": {
+          "$ref": "#/definitions/PagingInfo"
+        },
+        "StatusCode": {
+          "enum": [
+            "Continue",
+            "SwitchingProtocols",
+            "OK",
+            "Created",
+            "Accepted",
+            "NonAuthoritativeInformation",
+            "NoContent",
+            "ResetContent",
+            "PartialContent",
+            "MultipleChoices",
+            "Ambiguous",
+            "MovedPermanently",
+            "Moved",
+            "Found",
+            "Redirect",
+            "SeeOther",
+            "RedirectMethod",
+            "NotModified",
+            "UseProxy",
+            "Unused",
+            "TemporaryRedirect",
+            "RedirectKeepVerb",
+            "BadRequest",
+            "Unauthorized",
+            "PaymentRequired",
+            "Forbidden",
+            "NotFound",
+            "MethodNotAllowed",
+            "NotAcceptable",
+            "ProxyAuthenticationRequired",
+            "RequestTimeout",
+            "Conflict",
+            "Gone",
+            "LengthRequired",
+            "PreconditionFailed",
+            "RequestEntityTooLarge",
+            "RequestUriTooLong",
+            "UnsupportedMediaType",
+            "RequestedRangeNotSatisfiable",
+            "ExpectationFailed",
+            "UpgradeRequired",
+            "InternalServerError",
+            "NotImplemented",
+            "BadGateway",
+            "ServiceUnavailable",
+            "GatewayTimeout",
+            "HttpVersionNotSupported"
+          ],
+          "type": "string"
+        },
+        "Success": {
+          "type": "boolean",
+          "readOnly": true
+        },
+        "Errors": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "Response": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PublishedWrittenQuestion"
+          }
+        }
+      }
+    },
+    "PublishedWrittenQuestion": {
+      "type": "object",
+      "properties": {
+        "Id": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "QuestionType": {
+          "enum": [
+            "NamedDay",
+            "Ordinary"
+          ],
+          "type": "string"
+        },
+        "QuestionText": {
+          "type": "string"
+        },
+        "AnsweringBodyId": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "AnsweringBody": {
+          "type": "string"
+        },
+        "UIN": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "DueForAnswer": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "AnsweredWhen": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "TabledWhen": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "AskingMember": {
+          "$ref": "#/definitions/MemberForDate"
+        },
+        "AnsweringMinister": {
+          "$ref": "#/definitions/MemberForDate"
+        },
+        "Answer": {
+          "type": "string"
+        },
+        "AnsweringMinisterTitle": {
+          "type": "string"
+        },
+        "AskingMemberId": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "AnsweringMinisterId": {
+          "format": "int32",
+          "type": "integer"
+        }
+      }
+    },
+    "ApiResponse[Object]": {
+      "type": "object",
+      "properties": {
+        "PagingInfo": {
+          "$ref": "#/definitions/PagingInfo"
+        },
+        "StatusCode": {
+          "enum": [
+            "Continue",
+            "SwitchingProtocols",
+            "OK",
+            "Created",
+            "Accepted",
+            "NonAuthoritativeInformation",
+            "NoContent",
+            "ResetContent",
+            "PartialContent",
+            "MultipleChoices",
+            "Ambiguous",
+            "MovedPermanently",
+            "Moved",
+            "Found",
+            "Redirect",
+            "SeeOther",
+            "RedirectMethod",
+            "NotModified",
+            "UseProxy",
+            "Unused",
+            "TemporaryRedirect",
+            "RedirectKeepVerb",
+            "BadRequest",
+            "Unauthorized",
+            "PaymentRequired",
+            "Forbidden",
+            "NotFound",
+            "MethodNotAllowed",
+            "NotAcceptable",
+            "ProxyAuthenticationRequired",
+            "RequestTimeout",
+            "Conflict",
+            "Gone",
+            "LengthRequired",
+            "PreconditionFailed",
+            "RequestEntityTooLarge",
+            "RequestUriTooLong",
+            "UnsupportedMediaType",
+            "RequestedRangeNotSatisfiable",
+            "ExpectationFailed",
+            "UpgradeRequired",
+            "InternalServerError",
+            "NotImplemented",
+            "BadGateway",
+            "ServiceUnavailable",
+            "GatewayTimeout",
+            "HttpVersionNotSupported"
+          ],
+          "type": "string"
+        },
+        "Success": {
+          "type": "boolean",
+          "readOnly": true
+        },
+        "Errors": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "Response": {
+          "type": "object"
+        }
+      }
+    },
+    "PublishedEarlyDayMotionQueryParameters": {
+      "type": "object",
+      "properties": {
+        "EdmIds": {
+          "description": "Early Day Motions with an ID in the list provided.",
+          "type": "array",
+          "items": {
+            "format": "int32",
+            "type": "integer"
+          }
+        },
+        "UINWithAmendmentSuffix": {
+          "description": "Early Day Motions with an UINWithAmendmentSuffix provided.",
+          "type": "string"
+        },
+        "SearchTerm": {
+          "description": "Early Day Motions where the title includes the search term provided.",
+          "type": "string"
+        },
+        "CurrentStatusDateStart": {
+          "format": "date-time",
+          "description": "Early Day Motions where the current status has been set on or after the date provided. Date format YYYY-MM-DD.",
+          "type": "string"
+        },
+        "CurrentStatusDateEnd": {
+          "format": "date-time",
+          "description": "Early Day Motions where the current status has been set on or before the date provided. Date format YYYY-MM-DD.",
+          "type": "string"
+        },
+        "IsPrayer": {
+          "description": "Early Day Motions which are a prayer against a Negative Statutory Instrument.",
+          "type": "boolean"
+        },
+        "MemberId": {
+          "format": "int32",
+          "description": "Return Early Day Motions tabled by Member with ID provided.",
+          "type": "integer"
+        },
+        "IncludeSponsoredByMember": {
+          "description": "Include Early Day Motions sponsored by Member specified",
+          "type": "boolean"
+        },
+        "TabledStartDate": {
+          "format": "date-time",
+          "description": "Early Day Motions where the date tabled is on or after the date provided. Date format YYYY-MM-DD.",
+          "type": "string"
+        },
+        "TabledEndDate": {
+          "format": "date-time",
+          "description": "Early Day Motions where the date tabled is on or before the date provided. Date format YYYY-MM-DD.",
+          "type": "string"
+        },
+        "Statuses": {
+          "description": "Early Day Motions where current status is in the selected list.",
+          "type": "array",
+          "items": {
+            "enum": [
+              "Published",
+              "Withdrawn"
+            ],
+            "type": "string"
+          }
+        },
+        "OrderBy": {
+          "description": "Order results by date tabled, title or signature count. Default is date tabled.",
+          "enum": [
+            "DateTabledAsc",
+            "DateTabledDesc",
+            "TitleAsc",
+            "TitleDesc",
+            "SignatureCountAsc",
+            "SignatureCountDesc"
+          ],
+          "type": "string"
+        },
+        "Skip": {
+          "format": "int32",
+          "description": "The number of records to skip from the first, default is 0.",
+          "type": "integer"
+        },
+        "Take": {
+          "format": "int32",
+          "description": "The number of records to return, default is 25, maximum is 100.",
+          "type": "integer"
+        }
+      }
+    },
+    "ApiResponse[List[PublishedEarlyDayMotion]]": {
+      "type": "object",
+      "properties": {
+        "PagingInfo": {
+          "$ref": "#/definitions/PagingInfo"
+        },
+        "StatusCode": {
+          "enum": [
+            "Continue",
+            "SwitchingProtocols",
+            "OK",
+            "Created",
+            "Accepted",
+            "NonAuthoritativeInformation",
+            "NoContent",
+            "ResetContent",
+            "PartialContent",
+            "MultipleChoices",
+            "Ambiguous",
+            "MovedPermanently",
+            "Moved",
+            "Found",
+            "Redirect",
+            "SeeOther",
+            "RedirectMethod",
+            "NotModified",
+            "UseProxy",
+            "Unused",
+            "TemporaryRedirect",
+            "RedirectKeepVerb",
+            "BadRequest",
+            "Unauthorized",
+            "PaymentRequired",
+            "Forbidden",
+            "NotFound",
+            "MethodNotAllowed",
+            "NotAcceptable",
+            "ProxyAuthenticationRequired",
+            "RequestTimeout",
+            "Conflict",
+            "Gone",
+            "LengthRequired",
+            "PreconditionFailed",
+            "RequestEntityTooLarge",
+            "RequestUriTooLong",
+            "UnsupportedMediaType",
+            "RequestedRangeNotSatisfiable",
+            "ExpectationFailed",
+            "UpgradeRequired",
+            "InternalServerError",
+            "NotImplemented",
+            "BadGateway",
+            "ServiceUnavailable",
+            "GatewayTimeout",
+            "HttpVersionNotSupported"
+          ],
+          "type": "string"
+        },
+        "Success": {
+          "type": "boolean",
+          "readOnly": true
+        },
+        "Errors": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "Response": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PublishedEarlyDayMotion"
+          }
+        }
+      }
+    },
+    "PublishedEarlyDayMotion": {
+      "type": "object",
+      "properties": {
+        "Id": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "Status": {
+          "enum": [
+            "Published",
+            "Withdrawn"
+          ],
+          "type": "string"
+        },
+        "StatusDate": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "MemberId": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "PrimarySponsor": {
+          "$ref": "#/definitions/MemberForDate"
+        },
+        "Title": {
+          "type": "string"
+        },
+        "MotionText": {
+          "type": "string"
+        },
+        "AmendmentToMotionId": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "UIN": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "AmendmentSuffix": {
+          "type": "string"
+        },
+        "DateTabled": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "PrayingAgainstNegativeStatutoryInstrumentId": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "StatutoryInstrumentNumber": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "StatutoryInstrumentYear": {
+          "type": "string"
+        },
+        "StatutoryInstrumentTitle": {
+          "type": "string"
+        },
+        "UINWithAmendmentSuffix": {
+          "type": "string"
+        },
+        "SponsorsCount": {
+          "format": "int32",
+          "type": "integer"
+        }
+      }
+    },
+    "PublishedOralQuestionQueryParameters": {
+      "type": "object",
+      "properties": {
+        "AnsweringDateStart": {
+          "format": "date-time",
+          "description": "Oral Questions where the answering date has been set on or after the date provided. Date format YYYY-MM-DD.",
+          "type": "string"
+        },
+        "AnsweringDateEnd": {
+          "format": "date-time",
+          "description": "Oral Questions where the answering date has been set on or before the date provided. Date format YYYY-MM-DD.",
+          "type": "string"
+        },
+        "QuestionType": {
+          "description": "Oral Questions where the question type is the selected type, substantive or topical.",
+          "enum": [
+            "Substantive",
+            "Topical"
+          ],
+          "type": "string"
+        },
+        "OralQuestionTimeId": {
+          "format": "int32",
+          "description": "Oral Questions where the question is within the question time with the ID provided",
+          "type": "integer"
+        },
+        "AskingMemberIds": {
+          "description": "The ID of the member asking the question. Lists of member IDs for each house are available <a href=\"http://data.parliament.uk/membersdataplatform/services/mnis/members/query/house=Commons\" target=\"_blank\">Commons</a> and <a href=\"http://data.parliament.uk/membersdataplatform/services/mnis/members/query/house=Lords\" target=\"_blank\">Lords</a>.",
+          "type": "array",
+          "items": {
+            "format": "int32",
+            "type": "integer"
+          }
+        },
+        "UINs": {
+          "description": "The UIN for the question - note that UINs reset at the start of each Parliamentary session.",
+          "type": "array",
+          "items": {
+            "format": "int32",
+            "type": "integer"
+          }
+        },
+        "AnsweringBodyIds": {
+          "description": "Which answering body is to respond. A list of answering bodies can be found <a target=\"_blank\" href=\"http://data.parliament.uk/membersdataplatform/services/mnis/referencedata/AnsweringBodies/\">here</a>.",
+          "type": "array",
+          "items": {
+            "format": "int32",
+            "type": "integer"
+          }
+        },
+        "Skip": {
+          "format": "int32",
+          "description": "The number of records to skip from the first, default is 0.",
+          "type": "integer"
+        },
+        "Take": {
+          "format": "int32",
+          "description": "The number of records to return, default is 25, maximum is 100.",
+          "type": "integer"
+        }
+      }
+    },
+    "ApiResponse[List[PublishedOralQuestion]]": {
+      "type": "object",
+      "properties": {
+        "PagingInfo": {
+          "$ref": "#/definitions/PagingInfo"
+        },
+        "StatusCode": {
+          "enum": [
+            "Continue",
+            "SwitchingProtocols",
+            "OK",
+            "Created",
+            "Accepted",
+            "NonAuthoritativeInformation",
+            "NoContent",
+            "ResetContent",
+            "PartialContent",
+            "MultipleChoices",
+            "Ambiguous",
+            "MovedPermanently",
+            "Moved",
+            "Found",
+            "Redirect",
+            "SeeOther",
+            "RedirectMethod",
+            "NotModified",
+            "UseProxy",
+            "Unused",
+            "TemporaryRedirect",
+            "RedirectKeepVerb",
+            "BadRequest",
+            "Unauthorized",
+            "PaymentRequired",
+            "Forbidden",
+            "NotFound",
+            "MethodNotAllowed",
+            "NotAcceptable",
+            "ProxyAuthenticationRequired",
+            "RequestTimeout",
+            "Conflict",
+            "Gone",
+            "LengthRequired",
+            "PreconditionFailed",
+            "RequestEntityTooLarge",
+            "RequestUriTooLong",
+            "UnsupportedMediaType",
+            "RequestedRangeNotSatisfiable",
+            "ExpectationFailed",
+            "UpgradeRequired",
+            "InternalServerError",
+            "NotImplemented",
+            "BadGateway",
+            "ServiceUnavailable",
+            "GatewayTimeout",
+            "HttpVersionNotSupported"
+          ],
+          "type": "string"
+        },
+        "Success": {
+          "type": "boolean",
+          "readOnly": true
+        },
+        "Errors": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "Response": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PublishedOralQuestion"
+          }
+        }
+      }
+    },
+    "PublishedOralQuestion": {
+      "type": "object",
+      "properties": {
+        "Id": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "QuestionType": {
+          "enum": [
+            "Substantive",
+            "Topical"
+          ],
+          "type": "string"
+        },
+        "QuestionText": {
+          "type": "string"
+        },
+        "Status": {
+          "enum": [
+            "Submitted",
+            "Carded",
+            "Unsaved",
+            "ReadyForShuffle",
+            "ToBeAsked",
+            "ShuffleUnsuccessful",
+            "Withdrawn",
+            "Unstarred",
+            "Draft",
+            "ForReview",
+            "Unasked",
+            "Transferred"
+          ],
+          "type": "string"
+        },
+        "Number": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "TabledWhen": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "RemovedFromToBeAskedWhen": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "DeclarableInterestDetail": {
+          "type": "string"
+        },
+        "HansardLink": {
+          "type": "string"
+        },
+        "UIN": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "AnsweringWhen": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "AnsweringBodyId": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "AnsweringBody": {
+          "type": "string"
+        },
+        "AnsweringMinisterTitle": {
+          "type": "string"
+        },
+        "AskingMember": {
+          "$ref": "#/definitions/MemberForDate"
+        },
+        "AnsweringMinister": {
+          "$ref": "#/definitions/MemberForDate"
+        },
+        "AskingMemberId": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "AnsweringMinisterId": {
+          "format": "int32",
+          "type": "integer"
+        }
+      }
+    },
+    "PublishedOralQuestionTimeQueryParameters": {
+      "type": "object",
+      "properties": {
+        "AnsweringDateStart": {
+          "format": "date-time",
+          "description": "Oral Questions Time where the answering date has been set on or after the date provided. Date format YYYY-MM-DD.",
+          "type": "string"
+        },
+        "AnsweringDateEnd": {
+          "format": "date-time",
+          "description": "Oral Questions Time where the answering date has been set on or before the date provided. Date format YYYY-MM-DD.",
+          "type": "string"
+        },
+        "DeadlineDateStart": {
+          "format": "date-time",
+          "description": "Oral Questions Time where the deadline date has been set on or after the date provided. Date format YYYY-MM-DD.",
+          "type": "string"
+        },
+        "DeadlineDateEnd": {
+          "format": "date-time",
+          "description": "Oral Questions Time where the deadline date has been set on or before the date provided. Date format YYYY-MM-DD.",
+          "type": "string"
+        },
+        "OralQuestionTimeId": {
+          "format": "int32",
+          "description": "Identifier of the OQT",
+          "type": "integer"
+        },
+        "AnsweringBodyIds": {
+          "description": "Which answering body is to respond. A list of answering bodies can be found <a target=\"_blank\" href=\"http://data.parliament.uk/membersdataplatform/services/mnis/referencedata/AnsweringBodies/\">here</a>.",
+          "type": "array",
+          "items": {
+            "format": "int32",
+            "type": "integer"
+          }
+        },
+        "Skip": {
+          "format": "int32",
+          "description": "The number of records to skip from the first, default is 0.",
+          "type": "integer"
+        },
+        "Take": {
+          "format": "int32",
+          "description": "The number of records to return, default is 25, maximum is 100.",
+          "type": "integer"
+        }
+      }
+    },
+    "ApiResponse[List[PublishedOralQuestionTime]]": {
+      "type": "object",
+      "properties": {
+        "PagingInfo": {
+          "$ref": "#/definitions/PagingInfo"
+        },
+        "StatusCode": {
+          "enum": [
+            "Continue",
+            "SwitchingProtocols",
+            "OK",
+            "Created",
+            "Accepted",
+            "NonAuthoritativeInformation",
+            "NoContent",
+            "ResetContent",
+            "PartialContent",
+            "MultipleChoices",
+            "Ambiguous",
+            "MovedPermanently",
+            "Moved",
+            "Found",
+            "Redirect",
+            "SeeOther",
+            "RedirectMethod",
+            "NotModified",
+            "UseProxy",
+            "Unused",
+            "TemporaryRedirect",
+            "RedirectKeepVerb",
+            "BadRequest",
+            "Unauthorized",
+            "PaymentRequired",
+            "Forbidden",
+            "NotFound",
+            "MethodNotAllowed",
+            "NotAcceptable",
+            "ProxyAuthenticationRequired",
+            "RequestTimeout",
+            "Conflict",
+            "Gone",
+            "LengthRequired",
+            "PreconditionFailed",
+            "RequestEntityTooLarge",
+            "RequestUriTooLong",
+            "UnsupportedMediaType",
+            "RequestedRangeNotSatisfiable",
+            "ExpectationFailed",
+            "UpgradeRequired",
+            "InternalServerError",
+            "NotImplemented",
+            "BadGateway",
+            "ServiceUnavailable",
+            "GatewayTimeout",
+            "HttpVersionNotSupported"
+          ],
+          "type": "string"
+        },
+        "Success": {
+          "type": "boolean",
+          "readOnly": true
+        },
+        "Errors": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "Response": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PublishedOralQuestionTime"
+          }
+        }
+      }
+    },
+    "PublishedOralQuestionTime": {
+      "type": "object",
+      "properties": {
+        "Id": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "AnsweringWhen": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "DeadlineWhen": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "SubstantiveTime": {
+          "type": "string"
+        },
+        "TopicalTime": {
+          "type": "string"
+        },
+        "AnsweringBodyNames": {
+          "type": "string",
+          "readOnly": true
+        },
+        "AnsweringMinisterTitles": {
+          "type": "string",
+          "readOnly": true
+        }
+      }
+    }
+  }
+}

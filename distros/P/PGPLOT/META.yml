@@ -22,6 +22,6 @@ no_index:
 resources:
   bugtracker: https://github.com/PDLPorters/perl5-PGPLOT/issues
   repository: git://github.com/PDLPorters/perl5-PGPLOT.git
-version: '2.27'
+version: '2.28'
 x_IRC: irc://irc.perl.org/#pdl
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

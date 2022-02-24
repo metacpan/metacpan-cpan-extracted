@@ -4,12 +4,14 @@ author:
   - 'Graham Ollis <plicease@cpan.org>'
 build_requires:
   FFI::CheckLib: '0'
+  Test::More: '0.98'
 configure_requires:
+  ExtUtils::CBuilder: '0.27'
   ExtUtils::MakeMaker: '6.64'
   FFI::Build::MM: '1.00'
   File::Which: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,7 +28,7 @@ requires:
   perl: '5.008001'
 resources:
   IRC: irc://irc.perl.org/#native
-  bugtracker: https://github.com/PerlFFI/FFI-Platypus-Lang-Rust/issues
-  repository: https://github.com/PerlFFI/FFI-Platypus-Lang-Rust.git
-version: '0.05'
+  bugtracker: https://github.com/PerlFFI/FFI-Platypus-Lang-CPP/issues
+  repository: https://github.com/PerlFFI/FFI-Platypus-Lang-CPP.git
+version: '0.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

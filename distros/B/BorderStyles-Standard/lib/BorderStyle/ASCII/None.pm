@@ -8,9 +8,9 @@ use Role::Tiny::With;
 with 'BorderStyleRole::Spec::Basic';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-02-14'; # DATE
+our $DATE = '2022-02-20'; # DATE
 our $DIST = 'BorderStyles-Standard'; # DIST
-our $VERSION = '0.013'; # VERSION
+our $VERSION = '0.014'; # VERSION
 
 our %BORDER = (
     v => 3,
@@ -44,7 +44,7 @@ BorderStyle::ASCII::None - No borders, but row separator is still drawn using da
 
 =head1 VERSION
 
-This document describes version 0.013 of BorderStyle::ASCII::None (from Perl distribution BorderStyles-Standard), released on 2022-02-14.
+This document describes version 0.014 of BorderStyle::ASCII::None (from Perl distribution BorderStyles-Standard), released on 2022-02-20.
 
 =for Pod::Coverage ^(.+)$
 

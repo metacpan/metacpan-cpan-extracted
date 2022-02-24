@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
 
-package Syntax::Keyword::Match 0.08;
+package Syntax::Keyword::Match 0.09;
 
 use v5.14;
 use warnings;
@@ -44,7 +44,7 @@ languages), or syntax provided by L<Switch::Plain>.
 
 This is an initial, experimental implementation. Furthermore, it is built as
 a non-trivial example use-case on top of L<XS::Parse::Keyword>, which is also
-experimental. No API or compatbility guarantees are made at this time.
+experimental. No API or compatibility guarantees are made at this time.
 
 =head1 Experimental Features
 
@@ -133,7 +133,7 @@ that type will also match the base class C<case> block and the derived one
 will never match.
 
    class TheBase {}
-   class Derived extends TheBase {}
+   class Derived :isa(TheBase) {}
 
    match( $obj : isa ) {
       case(TheBase) { ... }
@@ -163,13 +163,13 @@ any of them will run the code inside the block.
 If the value is a non-constant expression, such as a variable or function
 call, it will be evaluated as part of performing the comparison every time the
 C<match> statement is executed. For best performance it is advised to extract
-values that won't need computing again into a variable that can be calculated
-just once at program startup; for example:
+values that won't need computing again into a variable or C<use constant> that
+can be calculated just once at program startup; for example:
 
-   my $condition = a_function("with", "arguments");
+   use constant CONDITION => a_function("with", "arguments");
 
    match( $var : eq ) {
-      case($condition) { ... }
+      case(CONDITION) { ... }
       ...
    }
 

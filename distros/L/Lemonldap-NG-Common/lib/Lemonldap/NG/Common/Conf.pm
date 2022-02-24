@@ -27,7 +27,7 @@ use Config::IniFiles;
 #inherits Lemonldap::NG::Common::Conf::Backends::SOAP
 #inherits Lemonldap::NG::Common::Conf::Backends::LDAP
 
-our $VERSION = '2.0.12';
+our $VERSION = '2.0.14';
 our $msg     = '';
 our $iniObj;
 
@@ -107,6 +107,7 @@ sub new {
               $self->{localStorage}->new( $self->{localStorageOptions} );
         }
     }
+
     return $self;
 }
 
@@ -189,6 +190,7 @@ sub getConf {
             eval { $r = $self->{refLocalStorage}->get('conf') }
               if ( $> and not $args->{noCache} );
             $msg .= "Warn: $@" if ($@);
+
             if (    ref($r)
                 and $r->{cfgNum}
                 and $args->{cfgNum}
@@ -240,7 +242,11 @@ sub getConf {
     return $res;
 }
 
-# Set default values
+## @method hashRef setDefault(hashRef conf, hashRef localPrm)
+# Set default params
+# @param $conf Lemonldap::NG configuration hashRef
+# @param $localPrm Local parameters
+# @return conf
 sub setDefault {
     my ( $self, $conf, $localPrm ) = @_;
     if ( defined $localPrm ) {
@@ -414,7 +420,7 @@ sub _launch {
         alarm 0;
         die $@ if $@;
     };
-    if($@) {
+    if ($@) {
         $msg .= $@;
         print STDERR "MSG $msg\n";
         return undef;

@@ -43,13 +43,56 @@
     </div>
     </TMPL_IF>
     <div class="row">
+      <TMPL_IF NAME="HISTORY">
+        <div class="card col border-secondary">
+          <div class="text-center bg-light text-dark"><b><span trspan="loginHistory">HISTORY</span></b></div>
+          <TMPL_IF NAME="SUCCESS">
+            <table class="table table-sm table-hover">
+              <thead>
+                <div class="text-center bg-light text-dark"><span trspan="lastLogins">Success</span></div>
+                <tr>
+                  <th scope="col"><span trspan="date">Date</span></th>
+                  <th scope="col"><span trspan="value">Value</span></th>
+                </tr>
+              </thead>
+              <tbody>
+                <TMPL_LOOP NAME="SUCCESS">
+                  <tr>
+                    <td class="localeDate" scope="row" val="<TMPL_VAR NAME="utime">"></td>
+                    <td scope="row"><TMPL_VAR NAME="values"></td>
+                  </tr>
+                 </TMPL_LOOP>
+              </tbody>
+            </table>
+          </TMPL_IF>
+          <TMPL_IF NAME="FAILED">
+            <table class="table table-sm table-hover">
+              <thead>
+                <div class="text-center bg-light text-dark"><span trspan="lastFailedLogins">Failed</span></div>
+                <tr>
+                  <th scope="col"><span trspan="date">Date</span></th>
+                  <th scope="col"><span trspan="value">Value</span></th>
+                </tr>
+              </thead>
+              <tbody>
+                <TMPL_LOOP NAME="FAILED">
+                  <tr>
+                    <td class="localeDate" scope="row" val="<TMPL_VAR NAME="utime">"></td>
+                    <td scope="row"><TMPL_VAR NAME="values"></td>
+                  </tr>
+                 </TMPL_LOOP>
+              </tbody>
+            </table>
+          </TMPL_IF>
+        </div> 
+      </TMPL_IF>
       <TMPL_IF NAME="GROUPS">
       <div class="card col border-secondary">
         <div class="text-center bg-light text-dark"><b><span trspan="groups_sso">SSO GROUPS</span></b></div>
         <div class="row">
           <TMPL_LOOP NAME="GROUPS">
-          <div class="w-100"></div>
-          <div class="col"><TMPL_VAR NAME="value"></div>
+            <div class="w-100"></div>
+            <div class="col"><TMPL_VAR NAME="value"></div>
           </TMPL_LOOP>
         </div>
       </div>

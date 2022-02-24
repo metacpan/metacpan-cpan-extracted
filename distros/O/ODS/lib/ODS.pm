@@ -2,7 +2,7 @@ package ODS;
 
 use strict; use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 
 use ODS::Table;
 use Blessed::Merge;
@@ -34,12 +34,22 @@ sub import {
 		}
 		$table->add_column(@args);
 	});
+	YAOO::make_keyword($called, "item",  sub {
+		my (@args) = @_;
+		if (!$table->name) {
+			$table->name([split "\:\:", $called]->[-1]);
+		}
+		$table->add_item(@args);
+	});
 	YAOO::make_keyword($called, "storage_class",  sub {
 		my (@args) = @_;
 		$table->storage_class(pop @args);
 	});
 	YAOO::make_keyword($called, "connect", sub {
 		return $table->connect(@_);
+	});
+	YAOO::make_keyword($called, "instantiate", sub {
+		return $table->instantiate(@_);
 	});
 }
 
@@ -49,7 +59,7 @@ ODS - Object Data Store
 
 =head1 VERSION
 
-Version 0.02
+Version 0.04
 
 =cut
 
@@ -99,7 +109,7 @@ Version 0.02
 
 	...
 
-	package ResultSet::Court; 
+	package ResultSet::Court;
 
 	use YAOO;
 
@@ -108,12 +118,12 @@ Version 0.02
 	has people => isa(string);
 
 	has miss_diagnosis => isa(object);
-	
+
 	sub licenced_doctors {
 		my ($self, %name) = @_;
 
 		$self->miss_diagnosis($self->find(
-			%name	
+			%name
 		));
 	}
 

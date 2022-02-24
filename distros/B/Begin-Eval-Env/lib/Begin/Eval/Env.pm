@@ -10,7 +10,7 @@ use warnings;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2022-02-05'; # DATE
 our $DIST = 'Begin-Eval-Env'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 my @envs;
 sub import {
@@ -40,7 +40,7 @@ Begin::Eval::Env - Take code from environment variable(s), then eval them
 
 =head1 VERSION
 
-This document describes version 0.001 of Begin::Eval::Env (from Perl distribution Begin-Eval-Env), released on 2022-02-05.
+This document describes version 0.003 of Begin::Eval::Env (from Perl distribution Begin-Eval-Env), released on 2022-02-05.
 
 =head1 SYNOPSIS
 
@@ -60,7 +60,39 @@ This module allows you to evaluate code(s) in environment variable(s), basically
 for convenience in one-liners. If name(s) of environment variables are not
 specified, C<PERL_BEGIN_EVAL_ENV> is the default.
 
-# INSERT_BLOCK_FROM_MODULE: End::Eval::FirstArg description
+Caveat: to run the code(s) in BEGIN block, you have to load the module in the
+BEGIN block also, e.g. via "use" not "require".
+
+The purpose of Begin::Eval::* and End::Eval::* modules is to allow you to
+evaluate some extra Perl code in addition to running your application,
+respectively at the beginning and at the end. The code can be supplied via one
+of these means: first command-line argument, environment variable(s). Previously
+there are Begin::Eval and End::Eval modules that accept code from import
+arguments, but the limited syntax provided by perl's C<-M> switch diminishes the
+usefulness of the modules. Thus the modules are removed from CPAN.
+
+Use cases include:
+
+=over
+
+=item * printing \%INC at the start of your program run
+
+ % perl -MBegin::Eval::FirstArg /path/to/your-script.pl 'print "$_\n" for sort keys %INC' script-arg1 ...
+ % PERL_BEGIN_EVAL_END='print "$_\n" for sort keys %INC' perl -MBegin::Eval::Env /path/to/your-script.pl script-arg1 ...
+
+To know which modules are loaded before your program runs.
+
+=item * printing \%INC at the beginning of your program run
+
+To know all the modules that are loaded during your program run.
+
+=item * loading a module at the beginning of your program, with some initialization
+
+=back
+
+Alternatives to using these modules include using "do":
+
+ % perl -E 'your-extra-code-before-running-program; do "/path/to/your/script.pl"; your-extra-code-after-running-program'
 
 =head1 ENVIRONMENT
 

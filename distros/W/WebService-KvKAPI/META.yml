@@ -10,13 +10,13 @@ build_requires:
   Test::Deep: '0'
   Test::Exception: '0'
   Test::Mock::One: '0'
-  Test::More: '0.96'
-  perl: '5.010'
+  Test::More: '0'
+  perl: v5.26.0
 configure_requires:
   ExtUtils::MakeMaker: '0'
-  perl: '5.006'
+  perl: v5.26.0
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
 license: open_source
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,26 +25,37 @@ name: WebService-KvKAPI
 provides:
   WebService::KvKAPI:
     file: lib/WebService/KvKAPI.pm
-    version: '0.011'
-  WebService::KvKAPI::Spoof:
-    file: lib/WebService/KvKAPI/Spoof.pm
-    version: '0.011'
+    version: '0.101'
+  WebService::KvKAPI::BasicProfile:
+    file: lib/WebService/KvKAPI/BasicProfile.pm
+    version: '0.101'
+  WebService::KvKAPI::Formatters:
+    file: lib/WebService/KvKAPI/Formatters.pm
+    version: '0.101'
+  WebService::KvKAPI::LocationProfile:
+    file: lib/WebService/KvKAPI/LocationProfile.pm
+    version: '0.101'
+  WebService::KvKAPI::Roles::OpenAPI:
+    file: lib/WebService/KvKAPI/Roles/OpenAPI.pm
+    version: '0.101'
+  WebService::KvKAPI::Search:
+    file: lib/WebService/KvKAPI/Search.pm
+    version: '0.101'
 requires:
   Carp: '0'
   Data::Dumper: '0'
+  Exporter: '0'
   Getopt::Long: '0'
-  List::Util: '0'
-  Moo: '0'
-  OpenAPI::Client: '0.17'
+  Object::Pad: '0'
+  OpenAPI::Client: '1.03'
   Pod::Usage: '0'
   Try::Tiny: '0'
-  Type::Tiny::Class: '0'
-  Types::Standard: '0'
-  namespace::autoclean: '0'
-  perl: '5.010'
+  perl: v5.26.0
 resources:
   repository: git://gitlab.com/mintlab/webservice-kvkapi.git
-version: '0.011'
-x_generated_by_perl: v5.30.3
+version: '0.101'
+x_contributors:
+  - 'Wesley Schwengle <wesley.schwengle@exxellence.nl>'
+x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: EUPL-1.1

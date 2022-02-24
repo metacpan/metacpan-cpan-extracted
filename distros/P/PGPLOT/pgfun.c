@@ -44,26 +44,26 @@ work but pacthes are welcome.
 */
 
 
-cpgfunx (float pgfun1(), int n, float xmin, float xmax, int pgflag) {
+void cpgfunx (float pgfun1(), int n, float xmin, float xmax, int pgflag) {
 
    PGFUNX(pgfun1,&n,&xmin,&xmax,&pgflag);
 }
 
 
-cpgfuny (float pgfun1(), int n, float ymin, float ymax, int pgflag) {
+void cpgfuny (float pgfun1(), int n, float ymin, float ymax, int pgflag) {
 
    PGFUNY(pgfun1,&n,&ymin,&ymax,&pgflag);
 }
 
 
-cpgfunt (float pgfun1(), float pgfun2(), int n, float tmin, float tmax, 
+void cpgfunt (float pgfun1(), float pgfun2(), int n, float tmin, float tmax,
          int pgflag) {
 
   PGFUNT(pgfun1,pgfun2,&n,&tmin,&tmax,&pgflag);
 }
 
 
-cpgconx ( float* a, int idim, int jdim, int i1, int i2, 
+void cpgconx ( float* a, int idim, int jdim, int i1, int i2,
           int j1, int j2, float* c, int nc, void pgfunplot()) {
 
    PGCONX(a,&idim,&jdim,&i1,&i2,&j1,&j2,c,&nc,pgfunplot);

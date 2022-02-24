@@ -1,4 +1,5 @@
 Changes
+CITATION.cff
 examples/placeholder.pl
 INSTALL.SKIP
 lib/Business/ISSN.pm
@@ -13,5 +14,6 @@ t/pod.t
 t/pod_coverage.t
 t/test_manifest
 xt/changes.t
+xt/citation.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

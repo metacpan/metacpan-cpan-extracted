@@ -11,13 +11,17 @@ use PDL::Exporter;
 use DynaLoader;
 
 
-   our $VERSION = '1.0.14';
+   our $VERSION = '1.0.15';
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::VectorValued::Utils $VERSION;
 
 
 
+
+
+
+#line 21 "utils.pd"
 
 
 use strict;
@@ -37,7 +41,7 @@ PDL::VectorValued::Utils - Low-level utilities for vector-valued PDLs
  ## ... stuff happens
 
 =cut
-
+#line 45 "Utils.pm"
 
 
 
@@ -51,13 +55,19 @@ PDL::VectorValued::Utils - Low-level utilities for vector-valued PDLs
 
 
 
+#line 67 "utils.pd"
+
+
 =pod
 
 =head1 Vector-Based Run-Length Encoding and Decoding
 
 =cut
+#line 67 "Utils.pm"
 
 
+
+#line 1058 "/local/home/moocow/local/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -91,15 +101,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 105 "Utils.pm"
 
 
 
-
-
+#line 1060 "/local/home/moocow/local/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *rlevec = \&PDL::rlevec;
+#line 112 "Utils.pm"
 
 
+
+#line 1058 "/local/home/moocow/local/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -127,9 +140,11 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 144 "Utils.pm"
 
 
 
+#line 1059 "/local/home/moocow/local/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 sub PDL::rldvec {
   my ($a,$b,$c) = @_;
@@ -144,11 +159,18 @@ sub PDL::rldvec {
   &PDL::_rldvec_int($a,$b,$c);
   return $c;
 }
+#line 163 "Utils.pm"
 
+
+
+#line 1060 "/local/home/moocow/local/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *rldvec = \&PDL::rldvec;
+#line 170 "Utils.pm"
 
 
+
+#line 1058 "/local/home/moocow/local/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -176,15 +198,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 202 "Utils.pm"
 
 
 
-
-
+#line 1060 "/local/home/moocow/local/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *enumvec = \&PDL::enumvec;
+#line 209 "Utils.pm"
 
 
+
+#line 1058 "/local/home/moocow/local/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -213,15 +238,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 242 "Utils.pm"
 
 
 
-
-
+#line 1060 "/local/home/moocow/local/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *enumvecg = \&PDL::enumvecg;
+#line 249 "Utils.pm"
 
 
+
+#line 1058 "/local/home/moocow/local/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -249,15 +277,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 281 "Utils.pm"
 
 
 
-
-
+#line 1060 "/local/home/moocow/local/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *rleseq = \&PDL::rleseq;
+#line 288 "Utils.pm"
 
 
+
+#line 1058 "/local/home/moocow/local/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -288,9 +319,11 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 323 "Utils.pm"
 
 
 
+#line 1059 "/local/home/moocow/local/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 sub PDL::rldseq {
   my ($a,$b,$c) = @_;
@@ -303,11 +336,18 @@ sub PDL::rldseq {
   &PDL::_rldseq_int($a,$b,$c);
   return $c;
 }
+#line 340 "Utils.pm"
 
+
+
+#line 1060 "/local/home/moocow/local/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *rldseq = \&PDL::rldseq;
+#line 347 "Utils.pm"
 
 
+
+#line 1058 "/local/home/moocow/local/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -345,15 +385,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 389 "Utils.pm"
 
 
 
-
-
+#line 1060 "/local/home/moocow/local/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *vsearchvec = \&PDL::vsearchvec;
+#line 396 "Utils.pm"
 
 
+
+#line 392 "utils.pd"
 
 
 =pod
@@ -367,8 +410,11 @@ Older versions of this module used a dedicated implementation as a workaround
 for a bug in PDL-2.4.3, which has long since been fixed.
 
 =cut
+#line 414 "Utils.pm"
 
 
+
+#line 1058 "/local/home/moocow/local/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -389,15 +435,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 439 "Utils.pm"
 
 
 
-
-
+#line 1060 "/local/home/moocow/local/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *cmpvec = \&PDL::cmpvec;
+#line 446 "Utils.pm"
 
 
+
+#line 422 "utils.pd"
 
 
 =head2 vv_qsortvec
@@ -430,8 +479,11 @@ BEGIN {
   *vv_qsortvec = *PDL::vv_qsortvec = *PDL::qsortvec;
   *vv_qsortveci = *PDL::vv_qsortveci = *PDL::qsortveci;
 }
+#line 483 "Utils.pm"
 
 
+
+#line 463 "utils.pd"
 
 
 =pod
@@ -442,8 +494,11 @@ The following functions are provided for set operations on
 sorted vector-valued PDLs.
 
 =cut
+#line 498 "Utils.pm"
 
 
+
+#line 1058 "/local/home/moocow/local/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -471,9 +526,11 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 530 "Utils.pm"
 
 
 
+#line 1059 "/local/home/moocow/local/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
  sub PDL::vv_union {
@@ -489,11 +546,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
    return ($c,$nc) if (wantarray);
    return $c->mv(-1,0)->slice("0:".($nc->sclr-1))->mv(0,-1);
  }
+#line 550 "Utils.pm"
 
+
+
+#line 1060 "/local/home/moocow/local/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *vv_union = \&PDL::vv_union;
+#line 557 "Utils.pm"
 
 
+
+#line 1058 "/local/home/moocow/local/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -520,9 +584,11 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 588 "Utils.pm"
 
 
 
+#line 1059 "/local/home/moocow/local/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
  sub PDL::vv_intersect {
@@ -540,11 +606,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
    return ($c,$nc) if (wantarray);
    return $c->mv(-1,0)->slice("0:".($nc->sclr-1))->mv(0,-1);
  }
+#line 610 "Utils.pm"
 
+
+
+#line 1060 "/local/home/moocow/local/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *vv_intersect = \&PDL::vv_intersect;
+#line 617 "Utils.pm"
 
 
+
+#line 1058 "/local/home/moocow/local/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -571,9 +644,11 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 648 "Utils.pm"
 
 
 
+#line 1059 "/local/home/moocow/local/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
  sub PDL::vv_setdiff {
@@ -591,11 +666,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
    return ($c,$nc) if (wantarray);
    return $c->mv(-1,0)->slice("0:".($nc->sclr-1))->mv(0,-1);
  }
+#line 670 "Utils.pm"
 
+
+
+#line 1060 "/local/home/moocow/local/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *vv_setdiff = \&PDL::vv_setdiff;
+#line 677 "Utils.pm"
 
 
+
+#line 674 "utils.pd"
 
 
 =pod
@@ -607,8 +689,11 @@ flat sorted PDLs with unique values.  They may be more efficient to compute
 than the corresponding implementations via PDL::Primitive::setops().
 
 =cut
+#line 693 "Utils.pm"
 
 
+
+#line 1058 "/local/home/moocow/local/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -634,9 +719,11 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 723 "Utils.pm"
 
 
 
+#line 1059 "/local/home/moocow/local/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
  sub PDL::v_union {
@@ -651,11 +738,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
    return ($c,$nc) if (wantarray);
    return $c->reshape($nc->sclr);
  }
+#line 742 "Utils.pm"
 
+
+
+#line 1060 "/local/home/moocow/local/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *v_union = \&PDL::v_union;
+#line 749 "Utils.pm"
 
 
+
+#line 1058 "/local/home/moocow/local/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -681,9 +775,11 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 779 "Utils.pm"
 
 
 
+#line 1059 "/local/home/moocow/local/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
  sub PDL::v_intersect {
@@ -700,11 +796,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
    return ($c,$nc) if (wantarray);
    return $c->reshape($nc->sclr);
  }
+#line 800 "Utils.pm"
 
+
+
+#line 1060 "/local/home/moocow/local/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *v_intersect = \&PDL::v_intersect;
+#line 807 "Utils.pm"
 
 
+
+#line 1058 "/local/home/moocow/local/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -730,9 +833,11 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 837 "Utils.pm"
 
 
 
+#line 1059 "/local/home/moocow/local/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
  sub PDL::v_setdiff {
@@ -749,11 +854,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
    return ($c,$nc) if (wantarray);
    return $c->reshape($nc->sclr);
  }
+#line 858 "Utils.pm"
 
+
+
+#line 1060 "/local/home/moocow/local/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *v_setdiff = \&PDL::v_setdiff;
+#line 865 "Utils.pm"
 
 
+
+#line 875 "utils.pd"
 
 
 =pod
@@ -761,8 +873,11 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =head1 Miscellaneous Vector-Valued Operations
 
 =cut
+#line 877 "Utils.pm"
 
 
+
+#line 1058 "/local/home/moocow/local/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 
 
@@ -796,15 +911,18 @@ piddles $a() or $b(), but BAD values will otherwise be ignored for computing the
 
 
 =cut
+#line 915 "Utils.pm"
 
 
 
-
-
+#line 1060 "/local/home/moocow/local/lib/perl5/x86_64-linux-gnu-thread-multi/PDL/PP.pm"
 
 *vv_vcos = \&PDL::vv_vcos;
+#line 922 "Utils.pm"
 
 
+
+#line 985 "utils.pd"
 
 
 ##---------------------------------------------------------------------
@@ -881,10 +999,10 @@ as Perl itself.
 perl(1), PDL(3perl)
 
 =cut
+#line 1003 "Utils.pm"
 
 
 
-;
 
 
 

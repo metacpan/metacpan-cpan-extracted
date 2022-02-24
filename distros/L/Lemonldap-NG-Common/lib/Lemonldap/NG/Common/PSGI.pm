@@ -21,8 +21,8 @@ has instanceName => ( is => 'rw', isa     => 'Str', default => '' );
 has templateDir  => ( is => 'rw', isa     => 'Str|ArrayRef' );
 has links        => ( is => 'rw', isa     => 'ArrayRef' );
 has menuLinks    => ( is => 'rw', isa     => 'ArrayRef' );
-has logger     => ( is => 'rw' );
-has userLogger => ( is => 'rw' );
+has logger       => ( is => 'rw' );
+has userLogger   => ( is => 'rw' );
 
 # INITIALIZATION
 
@@ -43,7 +43,17 @@ sub init {
         unless ( ref $self->logger ) {
             eval "require $logger";
             die $@ if ($@);
+            my $err;
+            unless ( $self->{logLevel} =~ /^(?:debug|info|notice|warn|error)$/ )
+            {
+                $err =
+                    'Bad logLevel value \''
+                  . $self->{logLevel}
+                  . "', switching to 'info'";
+                $self->{logLevel} = 'info';
+            }
             $self->logger( $logger->new($self) );
+            $self->logger->error($err) if $err;
         }
         unless ( ref $self->userLogger ) {
             $logger = $ENV{LLNG_USERLOGGER} || $args->{userLogger} || $logger;
@@ -334,8 +344,37 @@ sub run {
 sub _run {
     my $self = shift;
     return sub {
-        $self->handler( Lemonldap::NG::Common::PSGI::Request->new( $_[0] ) );
+        $self->_logAndHandle(
+            Lemonldap::NG::Common::PSGI::Request->new( $_[0] ) );
     };
+}
+
+sub _logAndHandle {
+    my ( $self, $req ) = @_;
+
+    # register the request object to the logging system
+    if ( ref( $self->logger ) and $self->logger->can('setRequestObj') ) {
+        $self->logger->setRequestObj($req);
+    }
+    if ( ref( $self->userLogger ) and $self->userLogger->can('setRequestObj') )
+    {
+        $self->userLogger->setRequestObj($req);
+    }
+
+    # Call the handler
+    my $res = $self->handler($req);
+
+    # Clear the logging system before the next request
+    if ( ref( $self->logger ) and $self->logger->can('clearRequestObj') ) {
+        $self->logger->clearRequestObj($req);
+    }
+    if ( ref( $self->userLogger )
+        and $self->userLogger->can('clearRequestObj') )
+    {
+        $self->userLogger->clearRequestObj($req);
+    }
+
+    return $res;
 }
 
 1;

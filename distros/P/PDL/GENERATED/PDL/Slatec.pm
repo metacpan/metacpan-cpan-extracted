@@ -21,7 +21,8 @@ use DynaLoader;
 
 
 
-#line 6 "slatec.pd"
+#line 5 "slatec.pd"
+
 use strict;
 use warnings;
 
@@ -93,7 +94,7 @@ data using L</chcm>.
 =back
  
 =cut
-#line 97 "Slatec.pm"
+#line 98 "Slatec.pm"
 
 
 
@@ -107,7 +108,8 @@ data using L</chcm>.
 
 
 
-#line 92 "slatec.pd"
+#line 91 "slatec.pd"
+
 =head2 eigsys
 
 =for ref
@@ -139,7 +141,7 @@ Separates supplied arguments and return values.
 =for ref
 
 Fit discrete data in a least squares sense by polynomials
-in one variable.  Handles threading correctly--one can pass in a 2D PDL (as C<$y>)
+in one variable.  Handles broadcasting correctly--one can pass in a 2D PDL (as C<$y>)
 and it will pass back a 2D PDL, the rows of which are the polynomial regression
 results (in C<$r> corresponding to the rows of $y.
 
@@ -174,7 +176,7 @@ rms error.  This usage is deprecated, and C<$eps> is an optional parameter now.
 It is still modified if present.
  
 C<$c> is a working array accessible to Slatec - you can feed it to several
-other Slatec routines to get nice things out.  It does not thread 
+other Slatec routines to get nice things out.  It does not broadcast
 correctly and should probably be fixed by someone.  If you are 
 reading this, that someone might be you.
 
@@ -241,7 +243,7 @@ Usage:
   Signature: detslatec(mat(n,m); [o] det())
 
 C<detslatec> computes the determinant of an invertible matrix and barfs if
-the matrix argument provided is non-invertible. The matrix threads as usual.
+the matrix argument provided is non-invertible. The matrix broadcasts as usual.
 
 This routine was previously known as C<det> which clashes now with
 L<det|PDL::MatrixOps/det> which is provided by L<PDL::MatrixOps>.
@@ -280,11 +282,12 @@ of C<rfft> is a data vector, similar to what is input into
 L</PDL::Slatec::fft>.
 
 =cut
-#line 284 "Slatec.pm"
+#line 286 "Slatec.pm"
 
 
 
-#line 424 "slatec.pd"
+#line 423 "slatec.pd"
+
 
 use PDL::Core;
 use PDL::Basic;
@@ -454,11 +457,12 @@ sub PDL::polyvalue {
 
 }
                                                                               
-#line 458 "Slatec.pm"
+#line 461 "Slatec.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 svdc
@@ -478,17 +482,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 482 "Slatec.pm"
+#line 486 "Slatec.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *svdc = \&PDL::svdc;
-#line 488 "Slatec.pm"
+#line 493 "Slatec.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 poco
@@ -507,17 +513,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 511 "Slatec.pm"
-
-
-
-#line 1061 "../../blib/lib/PDL/PP.pm"
-*poco = \&PDL::poco;
 #line 517 "Slatec.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
+*poco = \&PDL::poco;
+#line 524 "Slatec.pm"
+
+
+
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 geco
@@ -536,17 +544,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 540 "Slatec.pm"
+#line 548 "Slatec.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *geco = \&PDL::geco;
-#line 546 "Slatec.pm"
+#line 555 "Slatec.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 gefa
@@ -566,17 +576,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 570 "Slatec.pm"
+#line 580 "Slatec.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *gefa = \&PDL::gefa;
-#line 576 "Slatec.pm"
+#line 587 "Slatec.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 podi
@@ -596,17 +608,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 600 "Slatec.pm"
+#line 612 "Slatec.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *podi = \&PDL::podi;
-#line 606 "Slatec.pm"
+#line 619 "Slatec.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 gedi
@@ -625,17 +639,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 629 "Slatec.pm"
+#line 643 "Slatec.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *gedi = \&PDL::gedi;
-#line 635 "Slatec.pm"
+#line 650 "Slatec.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 gesl
@@ -654,17 +670,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 658 "Slatec.pm"
+#line 674 "Slatec.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *gesl = \&PDL::gesl;
-#line 664 "Slatec.pm"
+#line 681 "Slatec.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 rs
@@ -685,17 +703,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 689 "Slatec.pm"
+#line 707 "Slatec.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *rs = \&PDL::rs;
-#line 695 "Slatec.pm"
+#line 714 "Slatec.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 ezffti
@@ -718,17 +738,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 722 "Slatec.pm"
+#line 742 "Slatec.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *ezffti = \&PDL::ezffti;
-#line 728 "Slatec.pm"
+#line 749 "Slatec.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 ezfftf
@@ -748,17 +770,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 752 "Slatec.pm"
+#line 774 "Slatec.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *ezfftf = \&PDL::ezfftf;
-#line 758 "Slatec.pm"
+#line 781 "Slatec.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 ezfftb
@@ -778,17 +802,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 782 "Slatec.pm"
+#line 806 "Slatec.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *ezfftb = \&PDL::ezfftb;
-#line 788 "Slatec.pm"
+#line 813 "Slatec.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 pcoef
@@ -807,17 +833,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 811 "Slatec.pm"
+#line 837 "Slatec.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *pcoef = \&PDL::pcoef;
-#line 817 "Slatec.pm"
+#line 844 "Slatec.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 pvalue
@@ -838,17 +866,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 842 "Slatec.pm"
+#line 870 "Slatec.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *pvalue = \&PDL::pvalue;
-#line 848 "Slatec.pm"
+#line 877 "Slatec.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 chim
@@ -906,17 +936,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 910 "Slatec.pm"
+#line 940 "Slatec.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *chim = \&PDL::chim;
-#line 916 "Slatec.pm"
+#line 947 "Slatec.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 chic
@@ -1050,17 +1082,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1054 "Slatec.pm"
+#line 1086 "Slatec.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *chic = \&PDL::chic;
-#line 1060 "Slatec.pm"
+#line 1093 "Slatec.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 chsp
@@ -1171,17 +1205,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1175 "Slatec.pm"
+#line 1209 "Slatec.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *chsp = \&PDL::chsp;
-#line 1181 "Slatec.pm"
+#line 1216 "Slatec.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 chfd
@@ -1242,17 +1278,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1246 "Slatec.pm"
+#line 1282 "Slatec.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *chfd = \&PDL::chfd;
-#line 1252 "Slatec.pm"
+#line 1289 "Slatec.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 chfe
@@ -1308,17 +1346,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1312 "Slatec.pm"
+#line 1350 "Slatec.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *chfe = \&PDL::chfe;
-#line 1318 "Slatec.pm"
+#line 1357 "Slatec.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 chia
@@ -1387,17 +1427,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1391 "Slatec.pm"
+#line 1431 "Slatec.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *chia = \&PDL::chia;
-#line 1397 "Slatec.pm"
+#line 1438 "Slatec.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 chid
@@ -1454,17 +1496,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1458 "Slatec.pm"
+#line 1500 "Slatec.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *chid = \&PDL::chid;
-#line 1464 "Slatec.pm"
+#line 1507 "Slatec.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 chcm
@@ -1549,17 +1593,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1553 "Slatec.pm"
+#line 1597 "Slatec.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *chcm = \&PDL::chcm;
-#line 1559 "Slatec.pm"
+#line 1604 "Slatec.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 chbs
@@ -1651,17 +1697,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1655 "Slatec.pm"
+#line 1701 "Slatec.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *chbs = \&PDL::chbs;
-#line 1661 "Slatec.pm"
+#line 1708 "Slatec.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 polfit
@@ -1681,17 +1729,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1685 "Slatec.pm"
+#line 1733 "Slatec.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *polfit = \&PDL::polfit;
-#line 1691 "Slatec.pm"
+#line 1740 "Slatec.pm"
 
 
 
-#line 1605 "slatec.pd"
+#line 1604 "slatec.pd"
+
 
 =head1 AUTHOR
 
@@ -1704,7 +1754,7 @@ distribution. If this file is separated from the PDL distribution,
 the copyright notice should be included in the file.
 
 =cut
-#line 1708 "Slatec.pm"
+#line 1758 "Slatec.pm"
 
 
 

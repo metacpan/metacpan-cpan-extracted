@@ -69,7 +69,7 @@ conflicting TCP ports on localhost.\]
 
 ## socket\_dir
 
-Unix socket directory to use if ["unix\_socket"](#unix_socket) is true. Default is `$basedir/tmp`.
+Unix socket directory to use if ["unix\_socket"](#unix_socket) is true. Default is `$base_dir/tmp`.
 
 ## pg\_ctl
 
@@ -102,7 +102,7 @@ Extra args to be appended to ["initdb\_args"](#initdb_args). Default is empty.
 
 ## pg\_config
 
-Configuration to place in `$basedir/data/postgresql.conf`. Use this to override
+Configuration to place in `$base_dir/data/postgresql.conf`. Use this to override
 PostgreSQL configuration defaults, e.g. to speed up PostgreSQL database init
 and seeding one might use something like this:
 

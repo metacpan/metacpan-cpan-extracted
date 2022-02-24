@@ -431,9 +431,9 @@ sub rp {
                         oidcOPMetaDataOptionsJWKSTimeout  => 0,
                         oidcOPMetaDataOptionsClientSecret => "rpsecret",
                         oidcOPMetaDataOptionsScope => "openid profile email",
-                        oidcOPMetaDataOptionsStoreIDToken => 0,
-                        oidcOPMetaDataOptionsDisplay      => "",
-                        oidcOPMetaDataOptionsClientID     => "rpid",
+                        oidcOPMetaDataOptionsStoreIDToken     => 0,
+                        oidcOPMetaDataOptionsDisplay          => "",
+                        oidcOPMetaDataOptionsClientID         => "rpid",
                         oidcOPMetaDataOptionsConfigurationURI =>
                           "https://auth.sp.com/.well-known/openid-configuration"
                     }

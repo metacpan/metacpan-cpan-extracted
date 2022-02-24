@@ -18,7 +18,7 @@ my %module_build_args = (
     "Thomas Klausner <domm\@plix.at>"
   ],
   "dist_name" => "App-TimeTracker-Command-GitHub",
-  "dist_version" => "1.001",
+  "dist_version" => "1.002",
   "license" => "perl",
   "module_name" => "App::TimeTracker::Command::GitHub",
   "recursive_test_files" => 1,
@@ -26,7 +26,7 @@ my %module_build_args = (
     "App::TimeTracker::Utils" => 0,
     "Moose::Role" => 0,
     "Pithub" => 0,
-    "perl" => "5.020",
+    "perl" => "5.024",
     "strict" => 0,
     "warnings" => 0
   },

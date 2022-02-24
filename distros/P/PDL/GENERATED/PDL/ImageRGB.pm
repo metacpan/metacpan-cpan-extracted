@@ -21,7 +21,8 @@ use DynaLoader;
 
 
 
-#line 10 "imagergb.pd"
+#line 9 "imagergb.pd"
+
 use strict;
 use warnings;
 
@@ -33,7 +34,7 @@ PDL::ImageRGB -- some utility functions for RGB image data handling
 
 Collection of a few commonly used routines involved in handling of RGB, palette
 and grayscale images. Not much more than a start. Should be a good place to
-exercise some of the thread/map/clump PP stuff.
+exercise some of the broadcast/map/clump PP stuff.
 
 Other stuff that should/could go here:
 
@@ -97,7 +98,7 @@ colormap.
 
 =cut
 
-# full threading support intended
+# full broadcasting support intended
 *cquant = \&PDL::cquant;
 sub PDL::cquant {
     barf 'Usage: ($out,$olut) = cquant($image[,$ncols])'
@@ -135,7 +136,7 @@ $lut->set_dataflow_f(1)).
 
 # interlace a palette image, input as 8bit-image, RGB-lut (3,x,..) to
 # (R,G,B) format for each pixel in the image
-# should already support threading
+# should already support broadcasting
 *interlrgb=\&PDL::interlrgb;
 sub PDL::interlrgb {
     my ($pdl,$lut) = @_;
@@ -143,7 +144,7 @@ sub PDL::interlrgb {
     # for our purposes $lut should be (3,z) where z is the number
     # of colours in the lut
     barf "expecting (3,x) input" if ($lut->dims)[0] != 3;
-    # do the conversion as an implicitly threaded index lookup
+    # do the conversion as an implicitly broadcasted index lookup
     if ($lut->fflows) {
       $res = $lut->transpose->index($pdl->dummy(0));
     } else {
@@ -172,8 +173,8 @@ greyscale image (x,.....) using standard formula:
 
 # convert interlaced rgb image to grayscale
 # will convert any (3,...) dim pdl, i.e. also single lines,
-# stacks of RGB images, etc since implicit threading takes care of this
-# should already support threading
+# stacks of RGB images, etc since implicit broadcasting takes care of this
+# should already support broadcasting
 *rgbtogr = \&PDL::rgbtogr;
 sub PDL::rgbtogr {
     barf "Usage: \$im->rgbtogr" if $#_ < 0;
@@ -184,7 +185,7 @@ sub PDL::rgbtogr {
     my $type = $im->get_datatype;
     my $rgb = float([77,150,29])/256;  # vector for rgb conversion
     my $oim = null;  # flag PP we want it to allocate
-    inner($im,$rgb,$oim); # do the conversion as a threaded inner prod
+    inner($im,$rgb,$oim); # do the conversion as a broadcasted inner prod
 
     return $oim->convert($type);  # convert back to original type
 }
@@ -212,7 +213,7 @@ the min at 0 you give a negative $top value to indicate this.
 # returns scaled data with type converted to byte
 # doesn't rescale but just typecasts if data already fits into range, i.e.
 # data ist not necessarily stretched to 0..$ncols
-# needs some changes for full threading support ?? (explicit threading?)
+# needs some changes for full broadcasting support ?? (explicit broadcasting?)
 *bytescl = \&PDL::bytescl;
 sub PDL::bytescl {
     barf 'Usage: bytescl $im[,$top]' if $#_ < 0;
@@ -259,7 +260,7 @@ the copyright notice should be included in the file.
 
 
 =cut
-#line 263 "ImageRGB.pm"
+#line 264 "ImageRGB.pm"
 
 
 
@@ -267,9 +268,10 @@ the copyright notice should be included in the file.
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *cquant_c = \&PDL::cquant_c;
-#line 273 "ImageRGB.pm"
+#line 275 "ImageRGB.pm"
 
 
 

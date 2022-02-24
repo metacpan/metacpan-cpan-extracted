@@ -2,8 +2,8 @@ NAME
     App::TextTableUtils - CLI utilities related to text tables
 
 VERSION
-    This document describes version 0.006 of App::TextTableUtils (from Perl
-    distribution App-TextTableUtils), released on 2021-03-20.
+    This document describes version 0.007 of App::TextTableUtils (from Perl
+    distribution App-TextTableUtils), released on 2022-02-18.
 
 DESCRIPTION
     This distributions provides the following command-line utilities related
@@ -103,13 +103,6 @@ SOURCE
     Source repository is at
     <https://github.com/perlancar/perl-App-TextTableUtils>.
 
-BUGS
-    Please report any bugs or feature requests on the bugtracker website
-    <https://github.com/perlancar/perl-App-TextTableUtils/issues>
-
-    When submitting a bug or request, please include a test-file or a patch
-    to an existing test-file that illustrates the bug or desired feature.
-
 SEE ALSO
     App::texttable
 
@@ -118,9 +111,36 @@ SEE ALSO
 AUTHOR
     perlancar <perlancar@cpan.org>
 
+CONTRIBUTOR
+    Markus Koch <mail@markusko.ch>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
+    steps required beyond that are considered a bug and can be reported to
+    me.
+
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021, 2019, 2016 by perlancar@cpan.org.
+    This software is copyright (c) 2022, 2021, 2019, 2016 by perlancar
+    <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-TextTableUtils>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 

@@ -3,7 +3,7 @@ use Lemonldap::NG::Common::JWT qw(getAccessTokenSessionId);
 
 use strict;
 
-our $VERSION = '2.0.12';
+our $VERSION = '2.0.14';
 
 sub retrieveSession {
     my ( $class, $req, $id ) = @_;
@@ -102,8 +102,9 @@ sub fetchId {
     # Store scope and rpid for future session attributes
     if ( $infos->{rp} ) {
         my $rp = $infos->{rp};
-        $req->data->{_scope}         = $infos->{scope};
-        $req->data->{_clientConfKey} = $rp;
+        $req->data->{_scope}           = $infos->{scope};
+        $req->data->{_oidc_grant_type} = $infos->{grant_type};
+        $req->data->{_clientConfKey}   = $rp;
         if (    $class->tsv->{oauth2Options}->{$rp}
             and $class->tsv->{oauth2Options}->{$rp}->{clientId} )
         {
@@ -193,7 +194,7 @@ sub goToPortal {
 sub _getTokenAttributes {
     my ( $class, $req ) = @_;
     my %res;
-    for my $attr (qw/_scope _clientConfKey _clientId/) {
+    for my $attr (qw/_scope _clientConfKey _clientId _oidc_grant_type/) {
         if ( $req->data->{$attr} ) {
             $res{$attr} = $req->data->{$attr};
         }

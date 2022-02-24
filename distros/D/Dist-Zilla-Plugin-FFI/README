@@ -4,11 +4,12 @@ NAME
 
 VERSION
 
-    version 1.04
+    version 1.05
 
 SYNOPSIS
 
      [FFI::Build]
+     [FFI::CheckLib]
 
 DESCRIPTION
 

@@ -1,6 +1,6 @@
 use warnings;
 use strict;
-use Test::More tests => 16;
+use Test::More tests => 20;
 use Test::Exception;
 use App::SpamcupNG::HTMLParse qw(find_errors);
 
@@ -63,3 +63,14 @@ is( $errors_ref->[0]->message(),
 is( $errors_ref->[0]->is_fatal(), 1, 'Error is fatal' );
 throws_ok { find_errors('foobar') } qr/scalar\sreference/,
     'find_errors dies with invalid parameter';
+
+note('Login error');
+$errors_ref = find_errors(read_html('login_failed.html'));
+is( ref($errors_ref), 'ARRAY', 'result from find_errors is an array reference' );
+cmp_ok( scalar( @{$errors_ref} ),
+    '==', 1, 'Got the expected number of errors' );
+is( $errors_ref->[0]->is_fatal(), 1, 'Error is fatal' );
+is( $errors_ref->[0]->message(),
+    'Login failed, please try again (is your caps-lock on?). Also consider obtaining a password to Spamcop.net instead of using the old-style authorization token.',
+    'Got the expected error message');
+

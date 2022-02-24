@@ -101,3 +101,7 @@ Revision history for Perl extension B::Keywords.
   - move some @Barewords not in keywords.h to @BarewordsExtra
   - add %main, %CORE, %CORE::GLOBAL:: to @Hashes
   - fixed versions for EQ, CORE, state, break, given, when, default, UNITCHECK
+1.24 2022-02-21 10:47:08 rurban
+  - Fix for broken <archlibexp>/CORE/keywords.h test on system macOS
+    (PR #5, @nega0)
+  - finally added with 5.35.8 (RT #141406)

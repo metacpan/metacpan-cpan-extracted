@@ -192,7 +192,7 @@ $got = ndbin( $x, { step=>1, min=>1, n=>2 },
 is_pdl $got, $expected, 'variable with action = debug_action';
 $got = ndbin( axes => [ [ $x, step=>1, min=>1, n=>2 ],
 			[ $y, step=>1, min=>1, n=>4 ] ],
-	      vars => [ [ null->double, \&debug_action ] ] );
+	      vars => [ [ zeroes(0)->double, \&debug_action ] ] );
 is_pdl $got, $expected, 'variable with action = debug_action, null PDL, and full spec';
 
 # binning integer data
@@ -259,7 +259,7 @@ throws_ok { ndbin( $x, vars => [ [ null() => sub { shift->selection->min } ] ] )
 	qr/index:/, 'selection->min on empty ndarray';
 throws_ok { ndbin( $x, vars => [ [ null() => sub { shift->wrong_method } ] ] ) }
 	qr/^Can't locate object method "wrong_method"/, 'call nonexistent method';
-lives_ok { $got = ndbin( $x, vars => [ [ null->long, sub { eval { die } } ] ] ) }
+lives_ok { $got = ndbin( $x, vars => [ [ zeroes(0)->long, sub { eval { die } } ] ] ) }
 	'does not raise an exception when wrapping action in an eval block ...';
 is_pdl $got, $expected, '... and all values are unset';
 
@@ -271,7 +271,7 @@ $expected = zeroes(2,3,4)->long + 1;
 $got = ndbin( $x => { n => 2 },
 	      $y => { n => 3 },
 	      $z => { n => 4 },
-	      vars => [ [ null->long, sub { @_ } ] ] );
+	      vars => [ [ zeroes(0)->long, sub { @_ } ] ] );
 is_pdl $got, $expected, 'number of arguments for actions';
 
 # test unflattened bin numbers
@@ -282,7 +282,7 @@ $expected = sequence( 2*5*3 )->long->reshape( 2, 5, 3 );
 $got = ndbin( $x => { n => 2 },
 	      $y => { n => 5 },
 	      $z => { n => 3 },
-	      vars => [ [ null->long, sub { my @u = shift->unflatten; $u[0] + 2*$u[1] + 2*5*$u[2] } ] ] );
+	      vars => [ [ zeroes(0)->long, sub { my @u = shift->unflatten; $u[0] + 2*$u[1] + 2*5*$u[2] } ] ] );
 is_pdl $got, $expected, 'bin numbers returned from iterator';
 
 # simulate the functionality formerly known as SKIP_EMPTY
@@ -292,10 +292,10 @@ $x = pdl( 1,3,3 );		# 3 bins, but middle bin will be empty
 $expected = indx( 1,0,2 );
 $got = ndbin( $x, vars => [ [ $x => 'Count' ] ] );
 is_pdl $got, $expected, 'do not skip empty bins, action class';
-$got = ndbin( $x, vars => [ [ null->convert( indx ) => sub { shift->want->nelem } ] ] );
+$got = ndbin( $x, vars => [ [ zeroes(0)->convert( indx ) => sub { shift->want->nelem } ] ] );
 is_pdl $got, $expected, 'do not skip empty bins, action coderef';
 $expected->inplace->setvaltobad( 0 );
-$got = ndbin( $x, vars => [ [ null->convert( indx ) => sub { my $n = shift->want->nelem; return unless $n; $n } ] ] );
+$got = ndbin( $x, vars => [ [ zeroes(0)->convert( indx ) => sub { my $n = shift->want->nelem; return unless $n; $n } ] ] );
 is_pdl $got, $expected, 'skip empty bins (cannot be achieved with action class)';
 
 # this is an attempt to catch a strange test failure ...

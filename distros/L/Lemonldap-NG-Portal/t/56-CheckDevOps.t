@@ -19,7 +19,9 @@ my $file = '{
     "User": "$uid",
     "Mail": "$mail",
     "Name": "$cn",
-    "UA": "$UA"
+    "LDAP_Var": "$ldapExpVar",
+    "Groups_SSO": "$groups",
+    "UA": "$UA ? $UA : qq#FF#"
   }
 }';
 my $bad_file = '{
@@ -31,15 +33,45 @@ my $bad_file = '{
     "User": "$uid",
   }
 }';
+my $bad_file2 = qq%{
+  "rules": {
+    "default": "accept"
+  },
+  "headers": {
+    "User": "'user",
+    "Mail": "'mail'"
+  }
+}%;
+my $bad_file3 = q%{
+  "rule": {
+    "default": "accept"
+  },
+  "headers": {
+    "User": "'user",
+    "Mail": "'mail'"
+  }
+}%;
+my $bad_file4 = q%{
+  "rules": {
+    "default": "accept"
+  },
+  "headers": {
+    "test": "$none",
+    "bad": "$test ? $other : $dalek"
+  }
+}%;
+
 my $client = LLNG::Manager::Test->new( {
         ini => {
-            logLevel            => 'error',
-            authentication      => 'Demo',
-            userDB              => 'Same',
-            requireToken        => 1,
-            checkDevOps         => 1,
-            checkDevOpsDownload => 0,
-            hiddenAttributes    => 'mail UA'
+            logLevel                            => 'error',
+            authentication                      => 'Demo',
+            userDB                              => 'Same',
+            requireToken                        => 1,
+            checkDevOps                         => 1,
+            checkDevOpsDownload                 => 0,
+            checkDevOpsDisplayNormalizedHeaders => 0,
+            hiddenAttributes                    => 'mail,   UA',
+            ldapExportedVars                    => { ldapExpVar => '' }
         }
     }
 );
@@ -121,6 +153,73 @@ count(2);
 ( $host, $url, $query ) =
   expectForm( $res, undef, '/checkdevops', 'checkDevOpsFile', 'token' );
 
+# POST bad file2
+# --------------
+$query .= "&checkDevOpsFile=$bad_file2";
+ok(
+    $res = $client->_post(
+        '/checkdevops',
+        IO::String->new($query),
+        cookie => "lemonldap=$id",
+        length => length($query),
+        accept => 'text/html'
+    ),
+    'POST checkdevops with bad file2'
+);
+ok( $res->[2]->[0] =~ m%<span trspan="PE104"></span>%,
+    'Found PE_BAD_DEVOPS_FILE' )
+  or explain( $res->[2]->[0], 'trspan="PE104"' );
+count(2);
+( $host, $url, $query ) =
+  expectForm( $res, undef, '/checkdevops', 'checkDevOpsFile', 'token' );
+
+# POST bad file3
+# --------------
+$query .= "&checkDevOpsFile=$bad_file3";
+ok(
+    $res = $client->_post(
+        '/checkdevops',
+        IO::String->new($query),
+        cookie => "lemonldap=$id",
+        length => length($query),
+        accept => 'text/html'
+    ),
+    'POST checkdevops with bad file3'
+);
+ok( $res->[2]->[0] =~ m%<span trspan="PE104"></span>%,
+    'Found PE_BAD_DEVOPS_FILE' )
+  or explain( $res->[2]->[0], 'trspan="PE104"' );
+count(2);
+( $host, $url, $query ) =
+  expectForm( $res, undef, '/checkdevops', 'checkDevOpsFile', 'token' );
+
+# POST bad file4
+# --------------
+$query .= "&checkDevOpsFile=$bad_file4";
+ok(
+    $res = $client->_post(
+        '/checkdevops',
+        IO::String->new($query),
+        cookie => "lemonldap=$id",
+        length => length($query),
+        accept => 'text/html'
+    ),
+    'POST checkdevops with bad file4'
+);
+ok( $res->[2]->[0] =~ m%<span trspan="PE104"></span>%,
+    'Found PE_BAD_DEVOPS_FILE' )
+  or explain( $res->[2]->[0], 'trspan="PE104"' );
+ok( $res->[2]->[0] =~ m%<span trspan="unknownAttributes">%,
+    'Found unknownAttributes' )
+  or explain( $res->[2]->[0], 'trspan="unknownAttributes"' );
+ok( $res->[2]->[0] =~ m%dalek; none; other; test%,
+    'Found 4 unknown attributes' )
+  or explain( $res->[2]->[0], 'Unknown attributes' );
+count(4);
+
+( $host, $url, $query ) =
+  expectForm( $res, undef, '/checkdevops', 'checkDevOpsFile', 'token' );
+
 # POST file
 # ---------
 $query .= "&checkDevOpsFile=$file";
@@ -136,7 +235,7 @@ ok(
 );
 ok(
     $res->[2]->[0] =~
-m%<pre><textarea id="checkDevOpsFile" name="checkDevOpsFile" class="form-control rounded-1" rows="6" trplaceholder="pasteHere" required>%,
+m%<pre><textarea id="checkDevOpsFile" name="checkDevOpsFile" class="form-control rounded-1" rows="10" trplaceholder="pasteHere" required>%,
     'PRE required'
 ) or explain( $res->[2]->[0], 'PRE required' );
 
@@ -148,6 +247,13 @@ ok( $res->[2]->[0] =~ m%Name: Doctor Who<br/>%, 'Hearder Name found' )
   or explain( $res->[2]->[0], 'Hearder Name' );
 ok( $res->[2]->[0] =~ m%User: dwho<br/>%, 'Hearder User found' )
   or explain( $res->[2]->[0], 'Hearder User' );
+ok( $res->[2]->[0] =~ m%LDAP_Var: <br/>%, 'Hearder LDAP_Var found' )
+  or explain( $res->[2]->[0], 'Hearder LDAP_Var' );
+ok( $res->[2]->[0] =~ m%Groups_SSO: (.+?)<br/>%, 'Hearder Groups_SSO found' )
+  or explain( $res->[2]->[0], 'Hearder Groups_SSO' );
+my @groups = split '; ', $1;
+ok( scalar @groups == 3, '3 SSO groups found' )
+  or explain( $res->[2]->[0], 'SSO groups' );
 ok( $res->[2]->[0] !~ m%Mail: dwho\@badwolf.org<br/>%,
     'Hearder Mail not found' )
   or explain( $res->[2]->[0], 'No hearder Mail' );

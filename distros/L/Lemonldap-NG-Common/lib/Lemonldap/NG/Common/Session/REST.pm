@@ -5,7 +5,7 @@ use Mouse;
 use Lemonldap::NG::Common::Conf::Constants;
 use JSON qw(from_json to_json);
 
-our $VERSION = '2.0.9';
+our $VERSION = '2.0.14';
 
 has sessionTypes => ( is => 'rw' );
 
@@ -258,13 +258,13 @@ sub getApacheSession {
     my $apacheSession = Lemonldap::NG::Common::Session->new( {
             storageModule        => $mod->{module},
             storageModuleOptions => $mod->{options},
-            cacheModule =>
+            cacheModule          =>
               Lemonldap::NG::Handler::PSGI::Main->tsv->{sessionCacheModule},
             cacheModuleOptions =>
               Lemonldap::NG::Handler::PSGI::Main->tsv->{sessionCacheOptions},
             id    => $id,
             force => $force,
-            ( $id ? () : ( kind => $mod->{kind} ) ),
+            ( $id   ? ()                : ( kind => $mod->{kind} ) ),
             ( $info ? ( info => $info ) : () ),
         }
     );
@@ -291,6 +291,11 @@ sub getMod {
         $m->{kind} = $kind;
     }
     return $m;
+}
+
+sub getGlobal {
+    my ($self) = @_;
+    return $self->sessionTypes->{global};
 }
 
 1;

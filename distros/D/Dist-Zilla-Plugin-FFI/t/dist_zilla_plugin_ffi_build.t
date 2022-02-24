@@ -25,9 +25,9 @@ subtest 'basic' => sub {
     note "@{[ $file->name ]}";
     note $file->content;
   }
-  
+
   my $meta = decode_json((first { $_->name eq 'META.json' } @{ $tzil->files })->content);
-  
+
   is(
     $meta->{dynamic_config},
     T(),

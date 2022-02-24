@@ -10,12 +10,12 @@ package Lemonldap::NG::Common::Logger::Sentry;
 use strict;
 use Sentry::Raven;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.14';
 
 sub new {
-    my $self = bless {}, shift;
+    my $self   = bless {}, shift;
     my ($conf) = @_;
-    my $show = 1;
+    my $show   = 1;
     $self->{raven} = Sentry::Raven->new( sentry_dsn => $conf->{sentryDsn} );
     foreach (qw(error warn notice info debug)) {
         my $rl = $_;
@@ -31,7 +31,7 @@ qq'sub $_ {\$_[0]->{raven}->capture_message(\$_[1],level => "$rl")}';
         }
         $show = 0 if ( $conf->{logLevel} eq $_ );
     }
-    die "unknown level $conf->{logLevel}" if ($show);
+    die "Unknown logLevel $conf->{logLevel}" if ($show);
     return $self;
 }
 

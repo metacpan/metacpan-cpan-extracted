@@ -88,7 +88,7 @@ pdlok("enumvec():Nd", $k_nd, pdl(long,[0,1,2,0,1,0,0]));
 ## 13..17: test rldseq(), rleseq()
 my $lens = pdl(long,[qw(3 0 1 4 2)]);
 my $offs = (($lens->xvals+1)*100)->short;
-my $seqs = null->short;
+my $seqs = zeroes(short, 0);
 $seqs  = $seqs->append(sequence(short,$_)) foreach ($lens->list);
 $seqs += $lens->rld($offs);
 

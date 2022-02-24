@@ -31,6 +31,7 @@ LrY+vU6d9cIVPcG8yei6s7zLCDED4tcdUxL1a1XvWUr5eVglVARkGu739Qta2G5c
 ZnWPY16ZL7eafmAm8QRKMNh1So9dnEe8MzBMvHBno67JFVSWjyNY/A==
 -----END RSA PRIVATE KEY-----";
 }
+
 sub saml_key_proxy_private_sig {
     "-----BEGIN RSA PRIVATE KEY-----
 MIIEpgIBAAKCAQEAztmb1JZk/agkYYm23D4dqaLS4EKHKrjO4eBvwtWZLexAGR1K
@@ -1354,7 +1355,6 @@ entityID="http://auth.$name.com/saml/metadata">
 EOF
       ;
 }
-
 
 =head4 expectXPath($xml_string, $xpath, $namespaces, $value, $message)
 

@@ -19,7 +19,7 @@ name: Begin-Eval-Env
 provides:
   Begin::Eval::Env:
     file: lib/Begin/Eval/Env.pm
-    version: '0.001'
+    version: '0.003'
 requires:
   strict: '0'
   warnings: '0'
@@ -27,11 +27,15 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Begin-Eval-Env
   homepage: https://metacpan.org/release/Begin-Eval-Env
   repository: git://github.com/perlancar/perl-Begin-Eval-Env.git
-version: '0.001'
+version: '0.003'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
   plugins:
+    -
+      class: Dist::Zilla::Plugin::InsertBlock::FromModule
+      name: InsertBlock::FromModule
+      version: '0.103'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::CheckPendingRelease
       name: '@Author::PERLANCAR/PERLANCAR::CheckPendingRelease'

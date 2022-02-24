@@ -18,7 +18,7 @@ name: Parser-MGC
 provides:
   Parser::MGC:
     file: lib/Parser/MGC.pm
-    version: '0.20'
+    version: '0.21'
   Parser::MGC::Examples::EvaluateExpression:
     file: lib/Parser/MGC/Examples/EvaluateExpression.pm
 requires:
@@ -27,5 +27,5 @@ requires:
   perl: '5.014'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.20'
+version: '0.21'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -280,8 +280,11 @@ sub run {
 
         # Delete U2F device
         @$_2fDevices = map {
-            if ( $_->{epoch} eq $epoch ) { $keyName = $_->{name}; () }
-            else                         { $_ }
+            if ( $_->{epoch} eq $epoch and $_->{type} eq "U2F" ) {
+                $keyName = $_->{name};
+                ();
+            }
+            else { $_ }
         } @$_2fDevices;
         if ($keyName) {
             $self->logger->debug(

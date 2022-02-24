@@ -20,9 +20,10 @@ sub diff {
                 $res[$i]->{$key} = $tmp[$i] if ( $tmp[$i] );
             }
         }
-        elsif ( $key =~ $hashParameters
-            or
-            ( ref( $conf[0]->{$key} ) and ref( $conf[0]->{$key} ) eq 'HASH' ) )
+        elsif (
+            $key =~ $hashParameters
+            or ( ref( $conf[0]->{$key} ) and ref( $conf[0]->{$key} ) eq 'HASH' )
+          )
         {
             if ( ref $conf[1]->{$key} ) {
                 my @tmp =

@@ -15,7 +15,7 @@ sub checkResult {
     like( $key->{private}, qr/BEGIN/, "is PEM formatted" );
     like( $key->{public},  qr/BEGIN/, "is PEM formatted" );
     ok( $key->{hash}, "hash is non empty" ) if $expecthash;
-    count(1) if $expecthash;
+    count(1)                                if $expecthash;
     count(4);
 }
 
@@ -53,7 +53,7 @@ checkResult($res);
 ok(
     $res = &client->_post(
         '/confs/newCertificate', '', IO::String->new('{"password":"hello"}'),
-        'application/json', 20,
+        'application/json',      20,
     ),
     "Request succeed"
 );

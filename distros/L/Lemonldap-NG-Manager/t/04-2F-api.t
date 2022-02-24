@@ -20,9 +20,9 @@ sub newSession {
         $tmp = Lemonldap::NG::Common::Session->new( {
                 storageModule        => 'Apache::Session::File',
                 storageModuleOptions => {
-                    Directory     => 't/sessions',
-                    LockDirectory => 't/sessions',
-                    backend       => 'Apache::Session::File',
+                    Directory      => 't/sessions',
+                    LockDirectory  => 't/sessions',
+                    backend        => 'Apache::Session::File',
                     generateModule =>
 'Lemonldap::NG::Common::Apache::Session::Generate::SHA256',
                 },
@@ -241,7 +241,15 @@ $sfaDevices = [ {
         "type"    => "UBK",
         "_secret" => "123456",
         "epoch"   => time
-    }
+    },
+    {
+        "_credentialId"        => "abc",
+        "_credentialPublicKey" => "abc",
+        "_signCount"           => "65",
+        "epoch"                => "1643201784",
+        "name"                 => "MyFidoKey",
+        "type"                 => "WebAuthn"
+    },
 ];
 newSession( 'dwho', '127.10.0.1', 'SSO',        $sfaDevices );
 newSession( 'dwho', '127.10.0.1', 'Persistent', $sfaDevices );
@@ -304,12 +312,15 @@ newSession( 'tof', '127.10.0.1', 'Persistent', $sfaDevices );
 checkGetList( 1, 'dwho', 'U2F' );
 checkGetList( 1, 'dwho', 'TOTP' );
 checkGetList( 1, 'dwho', 'UBK' );
+checkGetList( 1, 'dwho', 'WebAuthn' );
 checkGetBadType( 'dwho', 'UBKIKI' );
-$ret = checkGetList( 3, 'dwho' );
+$ret = checkGetList( 4, 'dwho' );
 checkGetOnIds( 'dwho', $ret );
 checkDelete( 'dwho', @$ret[0]->{id} );
 checkDelete404( 'dwho', @$ret[0]->{id} );
-checkGetList( 2, 'dwho' );
+checkGetList( 3, 'dwho' );
+checkDeleteList( 1, 'dwho', 'WebAuthn' );
+checkGetList( 0, 'dwho', 'WebAuthn' );
 checkDeleteList( 2, 'dwho' );
 checkGetList( 0, 'dwho' );
 checkDeleteList( 0, 'dwho' );

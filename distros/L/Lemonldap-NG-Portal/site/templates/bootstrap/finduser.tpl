@@ -27,18 +27,23 @@
                     <option value="<TMPL_VAR NAME="key">"><TMPL_VAR NAME="value"></option>
                   </TMPL_LOOP>
                 </select>
+                <TMPL_IF NAME="null"><TMPL_ELSE>*</TMPL_IF>
               </div>
             <TMPL_ELSE>
               <div class="input-group mb-3">
                 <div class="input-group-prepend">
-                  <span class="input-group-text"><label for="<TMPL_VAR NAME="key">" class="mb-0"><i class="fa fa-binoculars"></i></label></span>
-                  <input id="findUser_<TMPL_VAR NAME="key">" name="<TMPL_VAR NAME="key">" type="text" autocomplete="off" class="form-control" placeholder="<TMPL_VAR NAME="value">" />
+                  <input id="findUser_<TMPL_VAR NAME="key">" name="<TMPL_VAR NAME="key">" type="text" autocomplete="off" class="form-control" aria-label="<TMPL_VAR NAME="value">" placeholder="<TMPL_VAR NAME="value">" />
                   <span class="input-group-text clear-finduser-field"><i class="fa fa-eraser"></i></span>
+                  <TMPL_IF NAME="null"><TMPL_ELSE>*</TMPL_IF>
                 </div>
               </div>
             </TMPL_IF>
+            </br>
           </TMPL_LOOP>
         </div>
+        <TMPL_IF NAME="MANDATORY">
+          <span trspan="mandatoryField">* Mandatory field</span>
+        </TMPL_IF>
         <div class="modal-footer justify-content-between">
           <button id="closefinduserform" type="button" class="btn btn-secondary mr-auto" data-dismiss="modal"><span trspan="close">Close</span></button>
           <button id="finduserbutton" type="submit" class="btn btn-info" data-dismiss="modal">

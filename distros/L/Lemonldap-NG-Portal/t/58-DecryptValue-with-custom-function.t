@@ -11,13 +11,13 @@ my $res;
 
 my $client = LLNG::Manager::Test->new( {
         ini => {
-            logLevel            => 'error',
-            authentication      => 'Demo',
-            userDB              => 'Same',
-            loginHistoryEnabled => 0,
-            brutForceProtection => 0,
-            requireToken        => 0,
-            decryptValueRule    => 1,
+            logLevel              => 'error',
+            authentication        => 'Demo',
+            userDB                => 'Same',
+            loginHistoryEnabled   => 0,
+            brutForceProtection   => 0,
+            requireToken          => 0,
+            decryptValueRule      => 1,
             decryptValueFunctions =>
               'Custom::empty Custom::test_uc Custom::undefined',
         }

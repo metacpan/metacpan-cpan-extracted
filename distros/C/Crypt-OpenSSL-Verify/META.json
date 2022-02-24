@@ -1,0 +1,63 @@
+{
+   "abstract" : "OpenSSL Verify certificate verification in XS.",
+   "author" : [
+      "Timothy Legge <timlegge@cpan.org>",
+      "Wesley Schwengle <waterkip@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.022, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Crypt-OpenSSL-Verify",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta::JSON" : "0.16",
+            "Test::Kwalitee" : "1.21",
+            "Test::Pod" : "1.41",
+            "Test::Spelling" : "0.12"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Crypt::OpenSSL::X509" : "0",
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Slurper" : "0.012",
+            "Test::Exception" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/perl-net-saml2/perl-Crypt-OpenSSL-Verify/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/perl-net-saml2/perl-Crypt-OpenSSL-Verify.git",
+         "web" : "https://github.com/perl-net-saml2/perl-Crypt-OpenSSL-Verify"
+      }
+   },
+   "version" : "0.34",
+   "x_generated_by_perl" : "v5.32.1",
+   "x_maintainers" : [
+      "Timothy Legge <timlegge@cpan.org>"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}
+

@@ -17,12 +17,19 @@
 SV *(*p5_callback)(PerlInterpreter *);
 MVMInstance *instance;
 MVMCompUnit *cu;
+/* Points to the current opcode. */
+MVMuint8 *cur_op = NULL;
+/* The current frame's bytecode start. */
+MVMuint8 *bytecode_start = NULL;
+/* Points to the base of the current register set for the frame we
+ * are presently in. */
+MVMRegister *reg_base = NULL;
 SV *perl6;
-const char *filename = PERL6_INSTALL_PATH "/share/perl6/runtime/perl6.moarvm";
+const char *filename = PERL6_INSTALL_PATH "/runtime/perl6.moarvm";
 
 static void toplevel_initial_invoke(MVMThreadContext *tc, void *data) {
     /* Create initial frame, which sets up all of the interpreter state also. */
-    MVM_frame_invoke(tc, (MVMStaticFrame *)data, MVM_callsite_get_common(tc, MVM_CALLSITE_ID_NULL_ARGS), NULL, NULL, NULL, -1);
+    MVM_frame_dispatch_zero_args(tc, ((MVMStaticFrame *)data)->body.static_code);
 }
 
 void init_inline_perl6_new_callback(SV *(*new_p5_callback)(PerlInterpreter *)) {
@@ -30,6 +37,13 @@ void init_inline_perl6_new_callback(SV *(*new_p5_callback)(PerlInterpreter *)) {
 }
 
 char *library_location, *helper_path;
+const char *raw_clargs[2];
+
+const char  *lib_path[3] = {
+    NQP_LIBDIR,
+    PERL6_INSTALL_PATH "/lib",
+    PERL6_INSTALL_PATH "/runtime",
+};
 
 MODULE = Inline::Perl6		PACKAGE = Inline::Perl6		
 
@@ -37,38 +51,25 @@ void setup_library_location(path, helper)
         char *path
 	char *helper
     CODE:
-        library_location = path;
-	helper_path = helper;
+        raw_clargs[0] = helper_path = helper;
+        raw_clargs[1] = library_location = path;
 
 void
 initialize()
     CODE:
-        const char  *lib_path[8];
-        const char *raw_clargs[2];
-
-        int argi         = 1;
-        int lib_path_i   = 0;
-
         MVM_crash_on_error();
 
         instance   = MVM_vm_create_instance();
-        lib_path[lib_path_i++] = PERL6_INSTALL_PATH "/share/nqp/lib";
-        lib_path[lib_path_i++] = PERL6_INSTALL_PATH "/share/perl6/lib";
-        lib_path[lib_path_i++] = PERL6_INSTALL_PATH "/share/perl6/runtime";
-        lib_path[lib_path_i++] = NQP_LIBDIR;
-        lib_path[lib_path_i++] = NULL;
-
-        for( argi = 0; argi < lib_path_i; argi++)
-            instance->lib_path[argi] = lib_path[argi];
 
         /* stash the rest of the raw command line args in the instance */
-        instance->prog_name  = PERL6_INSTALL_PATH "/share/perl6/runtime/perl6.moarvm";
-        instance->exec_name  = PERL6_EXECUTABLE;
-        instance->raw_clargs = NULL;
+        MVM_vm_set_prog_name(instance, PERL6_INSTALL_PATH "/runtime/perl6.moarvm");
+        MVM_vm_set_exec_name(instance, PERL6_EXECUTABLE);
+        MVM_vm_set_lib_path(instance, 3, (const char **)lib_path);
+        MVM_vm_set_clargs(instance, 0, NULL);
 
         /* Map the compilation unit into memory and dissect it. */
         MVMThreadContext *tc = instance->main_thread;
-        cu = MVM_cu_map_from_file(tc, filename);
+        cu = MVM_cu_map_from_file(tc, filename, 0);
 
         MVMROOT(tc, cu, {
             /* The call to MVM_string_utf8_decode() may allocate, invalidating the
@@ -78,26 +79,16 @@ initialize()
 
             /* Run deserialization frame, if there is one. */
             if (cu->body.deserialize_frame) {
-                MVM_interp_run(tc, &toplevel_initial_invoke, cu->body.deserialize_frame);
+                MVMint8 spesh_enabled_orig = tc->instance->spesh_enabled;
+                tc->instance->spesh_enabled = 0;
+                MVM_interp_run(tc, &toplevel_initial_invoke, cu->body.deserialize_frame, NULL);
+                tc->instance->spesh_enabled = spesh_enabled_orig;
             }
         });
-        instance->num_clargs = 2;
-        raw_clargs[0] = helper_path;
-        raw_clargs[1] = library_location;
-        instance->raw_clargs = (char **)raw_clargs;
+        MVM_vm_set_clargs(instance, 2, raw_clargs);
         instance->clargs = NULL; /* clear cache */
 
-        MVM_interp_run(tc, &toplevel_initial_invoke, cu->body.main_frame);
-
-        /* Points to the current opcode. */
-        MVMuint8 *cur_op = NULL;
-
-        /* The current frame's bytecode start. */
-        MVMuint8 *bytecode_start = NULL;
-
-        /* Points to the base of the current register set for the frame we
-         * are presently in. */
-        MVMRegister *reg_base = NULL;
+        MVM_interp_run(tc, &toplevel_initial_invoke, cu->body.main_frame, NULL);
 
         /* Stash addresses of current op, register base and SC deref base
          * in the TC; this will be used by anything that needs to switch

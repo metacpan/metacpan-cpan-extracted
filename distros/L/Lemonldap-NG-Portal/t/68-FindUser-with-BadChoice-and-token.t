@@ -17,11 +17,11 @@ my $client = LLNG::Manager::Test->new( {
                 '1_demo' => 'Demo;Demo;Null',
                 '2_ssl'  => 'SSL;Demo;Null',
             },
-            authChoiceFindUser => '1_dem',
-            useSafeJail        => 1,
-            requireToken       => 1,
-            findUser           => 1,
-            impersonationRule  => 1,
+            authChoiceFindUser          => '1_dem',
+            useSafeJail                 => 1,
+            requireToken                => 1,
+            findUser                    => 1,
+            impersonationRule           => 1,
             findUserSearchingAttributes =>
               { 'uid##1' => 'Login', 'guy##1' => 'Kind', 'cn##1' => 'Name' },
             findUserExcludingAttributes =>

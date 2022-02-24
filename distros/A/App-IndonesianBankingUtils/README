@@ -2,9 +2,9 @@ NAME
     App::IndonesianBankingUtils - CLIs related to Indonesian banking
 
 VERSION
-    This document describes version 0.145 of App::IndonesianBankingUtils
+    This document describes version 0.146 of App::IndonesianBankingUtils
     (from Perl distribution App-IndonesianBankingUtils), released on
-    2021-05-07.
+    2021-08-26.
 
 
     This distribution contains several CLI's related to Indonesian banking:
@@ -15,7 +15,7 @@ VERSION
 
     *   list-bca-branches
 
-    *   list-idn-bank-cards
+    *   list-id-bank-cards
 
     *   list-idn-banks
 
@@ -39,14 +39,6 @@ SOURCE
     Source repository is at
     <https://github.com/perlancar/perl-App-IndonesianBankingUtils>.
 
-BUGS
-    Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-IndonesianBanking
-    Utils>
-
-    When submitting a bug or request, please include a test-file or a patch
-    to an existing test-file that illustrates the bug or desired feature.
-
 SEE ALSO
     Finance::Bank::ID::BCA
 
@@ -57,10 +49,34 @@ SEE ALSO
 AUTHOR
     perlancar <perlancar@cpan.org>
 
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
+    steps required beyond that are considered a bug and can be reported to
+    me.
+
 COPYRIGHT AND LICENSE
     This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015
-    by perlancar@cpan.org.
+    by perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-IndonesianBanking
+    Utils>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 

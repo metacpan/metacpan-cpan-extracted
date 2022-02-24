@@ -1,5 +1,5 @@
 ---
-abstract: 'Convenient packaging of Log::ger + Log::ger::Output::Screen + Log::ger::Level::FromEnv for one-liner'
+abstract: 'Convenient packaging of Log::ger + Lg:Output::Screen + Lg:Level::FromVar + Lg:Level::FromEnv for one-liner'
 author:
   - 'perlancar <perlancar@cpan.org>'
 build_requires:
@@ -19,10 +19,11 @@ name: Log-ger-Screen
 provides:
   Log::ger::Screen:
     file: lib/Log/ger/Screen.pm
-    version: '0.003'
+    version: '0.004'
 requires:
   Log::ger: '0.038'
   Log::ger::Level::FromEnv: '0'
+  Log::ger::Level::FromVar: '0'
   Log::ger::Output: '0.005'
   Log::ger::Output::Screen: '0.018'
   strict: '0'
@@ -31,7 +32,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Log-ger-Screen
   homepage: https://metacpan.org/release/Log-ger-Screen
   repository: git://github.com/perlancar/perl-Log-ger-Screen.git
-version: '0.003'
+version: '0.004'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -122,8 +123,12 @@ x_Dist_Zilla:
       version: '0.02'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::EnsurePrereqToSpec
+      config:
+        Dist::Zilla::Role::ModuleMetadata:
+          Module::Metadata: '1.000037'
+          version: '0.006'
       name: '@Author::PERLANCAR/PERLANCAR::EnsurePrereqToSpec'
-      version: '0.062'
+      version: '0.064'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::MetaResources
       name: '@Author::PERLANCAR/PERLANCAR::MetaResources'

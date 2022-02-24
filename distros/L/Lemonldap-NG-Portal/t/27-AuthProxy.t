@@ -10,11 +10,11 @@ SKIP: {
     skip 'REMOTELLNG is not set', $maintests unless ( $ENV{REMOTELLNG} );
     my $client = LLNG::Manager::Test->new( {
             ini => {
-                logLevel        => 'error',
-                useSafeJail     => 1,
-                authentication  => 'Proxy',
-                userDB          => 'Same',
-                soapAuthService => $ENV{REMOTELLNG},
+                logLevel         => 'error',
+                useSafeJail      => 1,
+                authentication   => 'Proxy',
+                userDB           => 'Same',
+                proxyAuthService => $ENV{REMOTELLNG},
             }
         }
     );

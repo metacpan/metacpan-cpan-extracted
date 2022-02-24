@@ -4,19 +4,21 @@
 requires "Class::Accessor" => "0.51";
 requires "HTML::Form" => "6.07";
 requires "HTML::TreeBuilder::XPath" => "0.14";
+requires "HTTP::CookieJar::LWP" => "0.012";
 requires "HTTP::Cookies" => "6.01";
-requires "LWP::UserAgent" => "6.05";
-requires "Log::Log4perl" => "1.48";
+requires "HTTP::Request" => "6.35";
+requires "LWP::UserAgent" => "6.60";
+requires "Log::Log4perl" => "1.54";
+requires "Mozilla::PublicSuffix" => "v1.0.6";
 requires "YAML::XS" => "0.62";
 requires "perl" => "5.014004";
 
 on 'test' => sub {
   requires "ExtUtils::MakeMaker" => "0";
   requires "File::Spec" => "0";
-  requires "HTTP::Request" => "0";
   requires "Perl::Tidy::Sweetened" => "1.18";
   requires "Pod::Tidy" => "0.10";
-  requires "Test::Exception" => "0";
+  requires "Test::Exception" => "0.43";
   requires "Test::More" => "0";
 };
 

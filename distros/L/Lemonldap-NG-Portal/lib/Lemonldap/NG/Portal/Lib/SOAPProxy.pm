@@ -3,13 +3,20 @@ package Lemonldap::NG::Portal::Lib::SOAPProxy;
 use strict;
 use Mouse;
 use SOAP::Lite;
-use Lemonldap::NG::Portal::Main::Constants qw(PE_OK PE_ERROR PE_BADCREDENTIALS);
+use Lemonldap::NG::Portal::Main::Constants qw(
+  URIRE
+  PE_OK
+  PE_ERROR
+  PE_BADCREDENTIALS
+);
 
-our $VERSION = '2.0.12';
+our $VERSION = '2.0.14';
 
 # INITIALIZATION
 
-has urn => (
+has cookieName     => ( is => 'rw' );
+has sessionService => ( is => 'rw' );
+has urn            => (
     is      => 'rw',
     lazy    => 1,
     default => sub {
@@ -19,13 +26,24 @@ has urn => (
 
 sub init {
     my ($self) = @_;
-    $self->conf->{remoteCookieName}    ||= $self->conf->{cookieName};
-    $self->conf->{proxySessionService} ||= $self->conf->{proxyAuthService};
 
-    unless ( defined $self->conf->{proxyAuthService} ) {
-        $self->error("Missing proxyAuthService parameter");
+    unless ( defined $self->conf->{proxyAuthService}
+        && $self->conf->{proxyAuthService} =~ URIRE )
+    {
+        $self->error("Bad or missing proxyAuthService parameter");
         return 0;
     }
+
+    my $sessionService = $self->conf->{proxySessionService}
+      || $self->conf->{proxyAuthService};
+    unless ( $sessionService =~ URIRE ) {
+        $self->error("Malformed proxySessionService parameter");
+        return 0;
+    }
+    $self->sessionService($sessionService);
+    $self->cookieName( $self->conf->{proxyCookieName}
+          || $self->conf->{cookieName} );
+
     return 1;
 }
 
@@ -37,6 +55,8 @@ no warnings 'once';
 sub getUser {
     my ( $self, $req ) = @_;
     return PE_OK if ( $req->data->{_proxyQueryDone} );
+    $self->logger->debug(
+        'Proxy push auth to ' . $self->conf->{proxyAuthService} );
     my $soap =
       SOAP::Lite->proxy( $self->conf->{proxyAuthService} )->uri( $self->urn );
     my $r = $soap->getCookies( $req->{user}, $req->data->{password} );
@@ -45,6 +65,7 @@ sub getUser {
               . $r->fault->{faultstring} );
         return PE_ERROR;
     }
+    $self->logger->debug('Proxy gets a response');
     my $res = $r->result();
 
     # If authentication failed, display error
@@ -54,8 +75,7 @@ sub getUser {
         $self->setSecurity($req);
         return PE_BADCREDENTIALS;
     }
-    unless ( $req->data->{_remoteId} =
-        $res->{cookies}->{ $self->conf->{remoteCookieName} } )
+    unless ( $req->data->{_remoteId} = $res->{cookies}->{ $self->cookieName } )
     {
         $self->logger->error("No cookie named $self->{remoteCookieName}");
         return PE_ERROR;
@@ -74,16 +94,17 @@ sub findUser {
 sub setSessionInfo {
     my ( $self, $req ) = @_;
     return PE_OK if ( $req->data->{_setSessionInfoDone} );
-    my $soap = SOAP::Lite->proxy( $self->conf->{proxySessionService} )
-      ->uri( $self->urn );
-    my $r = $soap->getAttributes( $req->data->{_remoteId} );
-    if ( $r->fault ) {
-        $self->logger->error( "Unable to query authentication service"
-              . $r->fault->{faultstring} );
-    }
+    $self->logger->debug(
+        'Proxy requests sessionInfo to ' . $self->sessionService . '/global' );
+    my $soap = SOAP::Lite->proxy( $self->sessionService )->uri( $self->urn );
+    my $r    = $soap->getAttributes( $req->data->{_remoteId} );
+    $self->logger->error(
+        "Unable to query session service: " . $r->fault->{faultstring} )
+      if ( $r->fault );
+
     my $res = $r->result();
     if ( $res->{error} ) {
-        $self->userLogger->warn("Unable to get attributes for $self->{user} ");
+        $self->userLogger->warn("Unable to get attributes for $self->{user}");
         return PE_ERROR;
     }
     foreach ( keys %{ $res->{attributes} } ) {
@@ -96,6 +117,8 @@ sub setSessionInfo {
 }
 
 sub authLogout {
+
+    # Nothing to do here
     return PE_OK;
 }
 

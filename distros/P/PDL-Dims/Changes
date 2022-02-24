@@ -1,4 +1,37 @@
 Revision history for PDL-Dims
+0.019	2022-2-18
+
+	* rotations now mostly implemented, not yet in ncop/sln.
+
+	* bug fixes
+
+0.018 	2017-2-6
+
+	* some bug in vals
+
+	* hpar utility function
+
+	* is_equidistant utility function
+
+	* size has to be a perl scalar, now automatic conversion in initdim 
+
+0.016	2017-2-1
+
+	* used approx in is_sane for rotation matrix
+
+	* fixes in the handling of rotations
+
+0.015	2017-1-24
+
+	* Introduction of rotations and units; Work in progress
+
+	* Version creating a class derived from PDL. That alllows overloading operators.
+	
+	* dropped smartmatch for grep /^...$/ ,list. 
+	2016-10-21
+
+	* eval{ } around isa-> calls to avoid crashes	
+
 0.013	2015-10-1
 
 	* fixed ncop: if 1st argument had a dim with size 1, this was propagated

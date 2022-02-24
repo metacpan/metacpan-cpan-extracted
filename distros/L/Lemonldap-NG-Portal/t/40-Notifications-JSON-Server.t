@@ -98,8 +98,7 @@ my $notifs = q%[{
 
 my $content = '{"uid":"dwho"}';
 
-my $client = LLNG::Manager::Test->new(
-    {
+my $client = LLNG::Manager::Test->new( {
         ini => {
             logLevel           => 'error',
             useSafeJail        => 1,
@@ -374,10 +373,11 @@ ok(
 ) or print STDERR Dumper( $res->[2]->[0] );
 ok(
     $res->[2]->[0] =~
-      m%<input class="form-check-input" type="checkbox" name="check1x2x1" id="1x2x1" value="accepted"/>%,
+m%<input class="form-check-input" type="checkbox" name="check1x2x1" id="1x2x1" value="accepted"/>%,
     'Checkbox is displayed'
 ) or print STDERR Dumper( $res->[2]->[0] );
-my @c = ( $res->[2]->[0] =~ m%<input class="form-check-input" type="checkbox"%gs );
+my @c =
+  ( $res->[2]->[0] =~ m%<input class="form-check-input" type="checkbox"%gs );
 
 ## One entry found
 ok( @c == 1, ' -> One checkbox found' )
@@ -418,13 +418,13 @@ expectForm( $res, undef, '/notifback', 'reference1x1' );
 
 ok(
     $res->[2]->[0] =~
-      m%<input class="form-check-input" type="checkbox" name="check1x1x1" id="1x1x1" value="accepted"/>%
+m%<input class="form-check-input" type="checkbox" name="check1x1x1" id="1x1x1" value="accepted"/>%
       and m%<label class="form-check-label" for="1x1x1">I agree</label>%,
     'Checkbox is displayed'
 ) or print STDERR Dumper( $res->[2]->[0] );
 ok(
     $res->[2]->[0] =~
-      m%<input class="form-check-input" type="checkbox" name="check1x1x2" id="1x1x2" value="accepted"/>%
+m%<input class="form-check-input" type="checkbox" name="check1x1x2" id="1x1x2" value="accepted"/>%
       and m%<label class="form-check-label" for="1x1x2">I am sure</label>%,
     'Checkbox is displayed'
 ) or print STDERR Dumper( $res->[2]->[0] );

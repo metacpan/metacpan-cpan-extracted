@@ -3,9 +3,7 @@ use strict;
 use IO::String;
 use JSON;
 
-BEGIN {
-    require 't/test-lib.pm';
-}
+require 't/test-lib.pm';
 
 my $res;
 
@@ -27,9 +25,7 @@ my $client = LLNG::Manager::Test->new( {
             totp2fActivation               => 1,
             totp2fDigits                   => 6,
             totp2fAuthnLevel               => 8,
-            impersonationRule              => 1,
-
-            #hiddenAttributes               => 'test',
+            impersonationRule              => 1
         }
     }
 );

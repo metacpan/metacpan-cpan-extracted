@@ -129,7 +129,7 @@ sub checkGet {
     my $res = get( $test, $type, $confKey );
     check200( $test, $res );
     my @path = split '/', $attrPath;
-    my $key = from_json( $res->[2]->[0] );
+    my $key  = from_json( $res->[2]->[0] );
     for (@path) {
         if ( ref($key) eq 'ARRAY' ) {
             $key = $key->[$_];
@@ -326,7 +326,7 @@ checkAddFailsOnInvalidConfkey( $test, 'cat', $cat3 );
 
 checkAddFailsOnInvalidConfkey
 
-$test = "Cat - Update should succeed and keep existing values";
+  $test = "Cat - Update should succeed and keep existing values";
 $cat1->{order} = 3;
 delete $cat1->{catname};
 checkUpdate( $test, 'cat', 'mycat1', $cat1 );
@@ -419,7 +419,7 @@ $test = "App - Get app myapp1 from mycat3 should err on not found";
 checkGetNotFound( $test, 'app/mycat3', 'myapp1' );
 
 $test = "App - Add app myapp1 to mycat3 should err on not found";
-checkAddNotFound( $test, 'app/mycat3', $app1);
+checkAddNotFound( $test, 'app/mycat3', $app1 );
 
 $test = "App - Add app1 to cat1 should succeed";
 checkAdd( $test, 'app/mycat1', $app1 );

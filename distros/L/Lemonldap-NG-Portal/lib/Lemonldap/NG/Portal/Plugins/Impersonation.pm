@@ -88,10 +88,10 @@ sub run {
     my $unUser = 0;
     my $loginHistory =
       $req->{sessionInfo}->{_loginHistory};    # Store login history
-    $req->{user} ||= $req->{sessionInfo}->{_impUser};    # If 2FA is enabled
-    my $spoofId = $req->param('spoofId')       # Impersonation required
-      || $req->{sessionInfo}->{_impSpoofId}    # If 2FA is enabled
-      || $req->{user};                         # Impersonation not required
+    $req->{user} ||= $req->{sessionInfo}->{_impUser};   # If 2FA is enabled
+    my $spoofId = $req->param('spoofId')                # Impersonation required
+      || $req->{sessionInfo}->{_impSpoofId}             # If 2FA is enabled
+      || $req->{user};    # Impersonation not required
 
     $self->logger->debug("No impersonation required")
       if ( $spoofId eq $req->{user} );

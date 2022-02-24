@@ -29,7 +29,7 @@ DESCRIPTION
 
     This is an initial, experimental implementation. Furthermore, it is
     built as a non-trivial example use-case on top of XS::Parse::Keyword,
-    which is also experimental. No API or compatbility guarantees are made
+    which is also experimental. No API or compatibility guarantees are made
     at this time.
 
 Experimental Features
@@ -97,7 +97,7 @@ KEYWORDS
     the derived one will never match.
 
        class TheBase {}
-       class Derived extends TheBase {}
+       class Derived :isa(TheBase) {}
     
        match( $obj : isa ) {
           case(TheBase) { ... }
@@ -129,13 +129,13 @@ KEYWORDS
     function call, it will be evaluated as part of performing the
     comparison every time the match statement is executed. For best
     performance it is advised to extract values that won't need computing
-    again into a variable that can be calculated just once at program
-    startup; for example:
+    again into a variable or use constant that can be calculated just once
+    at program startup; for example:
 
-       my $condition = a_function("with", "arguments");
+       use constant CONDITION => a_function("with", "arguments");
     
        match( $var : eq ) {
-          case($condition) { ... }
+          case(CONDITION) { ... }
           ...
        }
 

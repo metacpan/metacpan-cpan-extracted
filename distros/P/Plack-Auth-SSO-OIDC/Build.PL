@@ -18,7 +18,7 @@ my %module_build_args = (
     "Nicolas Franck, C<< <nicolas.franck at ugent.be> >>"
   ],
   "dist_name" => "Plack-Auth-SSO-OIDC",
-  "dist_version" => "0.012",
+  "dist_version" => "0.013",
   "license" => "perl",
   "module_name" => "Plack::Auth::SSO::OIDC",
   "recursive_test_files" => 1,

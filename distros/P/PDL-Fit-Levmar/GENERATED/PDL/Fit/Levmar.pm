@@ -3,7 +3,7 @@
 #
 package PDL::Fit::Levmar;
 
-our @EXPORT_OK = qw(levmar levmar_report levmar_chkjac levmar_der_lb_ub levmar_der_lb levmar_der_ub levmar_der_ levmar_diff_lb_ub levmar_diff_lb levmar_diff_ub levmar_diff_ _levmar_chkjac _levmar_chkjac_no_t );
+our @EXPORT_OK = qw(levmar levmar_report levmar_chkjac levmar_der_ levmar_der_lb levmar_der_ub levmar_der_lb_ub levmar_diff_ levmar_diff_lb levmar_diff_ub levmar_diff_lb_ub _levmar_chkjac _levmar_chkjac_no_t );
 our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
@@ -11,7 +11,7 @@ use PDL::Exporter;
 use DynaLoader;
 
 
-   our $VERSION = '0.0105';
+   our $VERSION = '0.0106';
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::Fit::Levmar $VERSION;
@@ -1713,7 +1713,7 @@ sub levmar_chkjac {
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
-*levmar_der_lb_ub = \&PDL::levmar_der_lb_ub;
+*levmar_der_ = \&PDL::levmar_der_;
 #line 1718 "Levmar.pm"
 
 
@@ -1734,14 +1734,14 @@ sub levmar_chkjac {
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
-*levmar_der_ = \&PDL::levmar_der_;
+*levmar_der_lb_ub = \&PDL::levmar_der_lb_ub;
 #line 1739 "Levmar.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
-*levmar_diff_lb_ub = \&PDL::levmar_diff_lb_ub;
+*levmar_diff_ = \&PDL::levmar_diff_;
 #line 1746 "Levmar.pm"
 
 
@@ -1762,7 +1762,7 @@ sub levmar_chkjac {
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
-*levmar_diff_ = \&PDL::levmar_diff_;
+*levmar_diff_lb_ub = \&PDL::levmar_diff_lb_ub;
 #line 1767 "Levmar.pm"
 
 

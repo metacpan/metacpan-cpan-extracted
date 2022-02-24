@@ -4,7 +4,7 @@
       "Toby Corkindale, Kazuho Oku, Peter Mottram, Alex Tokarev, plus various contributors."
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.11",
+   "generated_by" : "Minilla/v3.1.15",
    "license" : [
       "artistic_2"
    ],
@@ -67,19 +67,21 @@
    "provides" : {
       "Test::PostgreSQL" : {
          "file" : "lib/Test/PostgreSQL.pm",
-         "version" : "1.28"
+         "version" : "1.29"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "homepage" : "https://github.com/TJC/Test-postgresql",
       "repository" : {
-         "url" : "git://github.com/TJC/Test-postgresql.git",
+         "type" : "git",
+         "url" : "https://github.com/TJC/Test-postgresql.git",
          "web" : "https://github.com/TJC/Test-postgresql"
       }
    },
-   "version" : "1.28",
+   "version" : "1.29",
    "x_contributors" : [
+      "Alex Tokarev <nohuhu@cpan.org>",
       "Alex Tokarev <nohuhu@users.noreply.github.com>",
       "Alex Tokarev <tokarev@cpan.org>",
       "Dagfinn Ilmari Mannsåker <ilmari@ilmari.org>",

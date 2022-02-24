@@ -9,7 +9,7 @@ BEGIN {
 my ( $client, $res, $id );
 
 $client = LLNG::Manager::Test->new(
-    { ini => { logLevel => 'error', restSessionServer => 0, }, } );
+    { ini => { logLevel => 'error', restSessionServer => 0 } } );
 
 # Try to authenticate
 # -------------------
@@ -54,6 +54,38 @@ ok(
 );
 count(1);
 expectOK($res);
+
+# Test myapplications endpoint
+ok(
+    $res = $client->_get(
+        '/myapplications', cookie => "lemonldap=$id"
+    ),
+    'Request for my applications'
+);
+count(1);
+expectOK($res);
+$res = eval { JSON::from_json( $res->[2]->[0] ) };
+if ($@) {
+    fail("Bad JSON response: $@");
+    count(1);
+}
+ok( $res->{result} == 1, ' Result == 1' );
+count(1);
+ok( $res->{myapplications}->[0]->{Category} eq 'Sample applications',
+    ' "Sample applications" category found' );
+ok( scalar @{ $res->{myapplications}->[0]->{Applications} } == 2,
+    ' Two applications found' );
+ok(
+    $res->{myapplications}->[0]->{Applications}->[0]->{'Application Test 1'}
+      ->{AppDesc} eq 'A simple application displaying authenticated user',
+    ' Description app1 found'
+);
+ok(
+    $res->{myapplications}->[0]->{Applications}->[1]->{'Application Test 2'}
+      ->{AppUri} =~ m#http://test2\.example\.com/#,
+    ' URI app2 found'
+);
+count(4);
 
 # Test logout
 $client->logout($id);

@@ -1,5 +1,9 @@
 Revision history for Perl module FFI::Platypus::Lang::CPP
 
+0.06 2022-02-20 05:52:09 -0700
+  - Fix dist meta to point to the correct GitHub repo (gh#17)
+  - Added support for FFI_PLATYPUS_LANG_CPP_NO_XS (gh#16, gh#19)
+
 0.05 2020-07-07 15:31:17 -0600
   - Moved to the PerlFFI GitHub org
   - Migrated to EUMM

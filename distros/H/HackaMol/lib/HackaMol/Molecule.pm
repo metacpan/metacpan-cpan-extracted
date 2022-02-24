@@ -1,5 +1,5 @@
 package HackaMol::Molecule;
-$HackaMol::Molecule::VERSION = '0.051';
+$HackaMol::Molecule::VERSION = '0.053';
 #ABSTRACT: Molecule class for HackaMol
 use 5.008;
 use Moose;
@@ -8,12 +8,13 @@ use Carp;
 use Math::Trig;
 use Scalar::Util qw(refaddr);
 use MooseX::StrictConstructor;
+
 #use MooseX::Storage;
 
 with 'HackaMol::Roles::PhysVecMVRRole',
-     'HackaMol::Roles::BondsAnglesDihedralsRole', 
-     'HackaMol::Roles::QmMolRole'; #,
- #    'HackaMol::Roles::SelectionRole';
+  'HackaMol::Roles::BondsAnglesDihedralsRole', 'HackaMol::Roles::QmMolRole';  #,
+    #    'HackaMol::Roles::SelectionRole';
+
 #, Storage( 'format' => 'JSON', 'io' => 'File' );
 
 extends 'HackaMol::AtomGroup';
@@ -25,34 +26,34 @@ has 'groups' => (
     default => sub { [] },
     lazy    => 1,
     handles => {
-        has_groups     => 'count',
-        push_groups    => 'push',
-        get_groups     => 'get',
-        set_groups     => 'set',
-        all_groups     => 'elements',
-        sort_groups    => 'sort',
-        insert_groups  => 'insert',
-        count_groups   => 'count',
-        delete_groups  => 'delete',
-        clear_groups   => 'clear',
-        select_groups  => 'grep',
-        map_groups     => 'map',
+        has_groups    => 'count',
+        push_groups   => 'push',
+        get_groups    => 'get',
+        set_groups    => 'set',
+        all_groups    => 'elements',
+        sort_groups   => 'sort',
+        insert_groups => 'insert',
+        count_groups  => 'count',
+        delete_groups => 'delete',
+        clear_groups  => 'clear',
+        select_groups => 'grep',
+        map_groups    => 'map',
     },
 );
 
 # an array to map t to some other label (e.g. model number from pdb)
 has 'model_ids' => (
-    traits  => ['Array'],
-    is      => 'ro',
-    isa     => 'ArrayRef[Str]',
-    default => sub { [] },
+    traits    => ['Array'],
+    is        => 'ro',
+    isa       => 'ArrayRef[Str]',
+    default   => sub { [] },
     predicate => 'has_models',
-    handles => {
-        "push_model_ids"   => 'push',
+    handles   => {
+        "push_model_ids"  => 'push',
         "get_model_id"    => 'get',
         "set_model_id"    => 'set',
-        "all_model_ids"    => 'elements',
-        "count_model_ids"  => 'count',
+        "all_model_ids"   => 'elements',
+        "count_model_ids" => 'count',
     },
     lazy => 1,
 );
@@ -62,41 +63,44 @@ sub BUILD {
     foreach my $bond ( $self->all_bonds ) {
         $_->inc_bond_count foreach $bond->all_atoms;
     }
+
     #all the molecule to be build from groups or atoms
     return if $self->has_atoms;
 
-    if ($self->has_groups){
-      $self->push_atoms($self->map_groups(sub{$_->all_atoms}));
+    if ( $self->has_groups ) {
+        $self->push_atoms( $self->map_groups( sub { $_->all_atoms } ) );
     }
     return;
 }
 
 after 'push_groups' => sub {
-# if you push a group onto a molecule, the atoms should be added unless they 
-# exist!
-  my $self = shift;
-  my @groups = @_;
-  foreach my $group (@groups){
-    foreach my $atom ($group->all_atoms){
-      unless (grep {$atom == $_} $self->all_atoms){
-        $self->push_atoms($atom);
-      }  
- # debug
- #     else {
- #       print "found it\n $atom \n" if grep {$atom == $_} $self->all_atoms;   
- #     }
+
+    # if you push a group onto a molecule, the atoms should be added unless they
+    # exist!
+    my $self   = shift;
+    my @groups = @_;
+    foreach my $group (@groups) {
+        foreach my $atom ( $group->all_atoms ) {
+            unless ( grep { $atom == $_ } $self->all_atoms ) {
+                $self->push_atoms($atom);
+            }
+
+     # debug
+     #     else {
+     #       print "found it\n $atom \n" if grep {$atom == $_} $self->all_atoms;
+     #     }
+        }
     }
-  }
 };
 
 sub charge {
-  my $self = shift;
-  my $t = $self->t;
-  if (@_){
-    my $new_q = shift;
-    $self->set_charges($t,$new_q);
-  }
-  return $self->get_charges($t) || 0 ; # default to 0
+    my $self = shift;
+    my $t    = $self->t;
+    if (@_) {
+        my $new_q = shift;
+        $self->set_charges( $t, $new_q );
+    }
+    return $self->get_charges($t) || 0;    # default to 0
 }
 
 # need to increase atom bond_count when push
@@ -145,8 +149,8 @@ sub _build_mass {
 
 sub fix_serial {
     my @atoms  = shift->all_atoms;
-    my $offset = shift || 1; 
-    $atoms[$_]->{serial} = $_ + $offset foreach (0 .. $#atoms);
+    my $offset = shift || 1;
+    $atoms[$_]->{serial} = $_ + $offset foreach ( 0 .. $#atoms );
 }
 
 sub all_bonds_atoms  { return ( shift->_all_these_atoms( 'bonds',  @_ ) ) }
@@ -275,7 +279,7 @@ HackaMol::Molecule - Molecule class for HackaMol
 
 =head1 VERSION
 
-version 0.051
+version 0.053
 
 =head1 SYNOPSIS
 

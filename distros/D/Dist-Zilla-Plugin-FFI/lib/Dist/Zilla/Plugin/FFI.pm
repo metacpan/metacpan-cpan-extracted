@@ -1,8 +1,8 @@
-package Dist::Zilla::Plugin::FFI 1.04 {
+package Dist::Zilla::Plugin::FFI 1.05 {
 
   use strict;
   use warnings;
-  use 5.014;
+  use 5.024;
 
   # ABSTRACT: FFI related Dist::Zilla plugins
 
@@ -23,11 +23,12 @@ Dist::Zilla::Plugin::FFI - FFI related Dist::Zilla plugins
 
 =head1 VERSION
 
-version 1.04
+version 1.05
 
 =head1 SYNOPSIS
 
  [FFI::Build]
+ [FFI::CheckLib]
 
 =head1 DESCRIPTION
 

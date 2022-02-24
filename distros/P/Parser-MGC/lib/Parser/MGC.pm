@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2010-2022 -- leonerd@leonerd.org.uk
 
-package Parser::MGC 0.20;
+package Parser::MGC 0.21;
 
 use v5.14;
 use warnings;
@@ -74,6 +74,19 @@ is given by the C<commit> method; and careful use of this method is one of the
 key advantages that C<Parser::MGC> has over more simple parsing using single
 regexps alone.
 
+=head2 Stall Detection
+
+Most of the methods in this class have bounded execution time, but some
+methods (L</list_of> and L</sequence_of>) repeatedly recuse into other code
+to build up a list of results until some ending condition is reached. A
+possible class of bug is that whatever they recurse into might successfully
+match an empty string, and thus make no progress.
+
+These methods will automatically detect this situation if they repeatedly
+encounter the same string position more than a certain number of times (given
+by the C<stallcount> argument). If this count is reached, the entire parse
+attempt will be aborted by the L</die> method.
+
 =cut
 
 =head1 CONSTRUCTOR
@@ -106,6 +119,14 @@ override the default patterns used to match tokens. See C<PATTERNS> below
 
 If true, the C<token_int> method will also accept integers with a C<0o> prefix
 as octal.
+
+=item stallcount => INT
+
+I<Since version 0.21.>
+
+The number of times that the stall-detector would have to see the same
+position before it aborts the parse attempt. If not supplied, a default of
+C<10> will apply.
 
 =back
 
@@ -167,6 +188,8 @@ use constant pattern_float   => qr/-?(?:\d*\.\d+|\d+\.)(?:e-?\d+)?|-?\d+e-?\d+/i
 use constant pattern_ident   => qr/[[:alpha:]_]\w*/;
 use constant pattern_string_delim => qr/["']/;
 
+use constant DEFAULT_STALLCOUNT => 10;
+
 sub new
 {
    my $class = shift;
@@ -181,6 +204,7 @@ sub new
       toplevel => $toplevel,
       patterns => {},
       scope_level => 0,
+      stallcount => $args{stallcount} // DEFAULT_STALLCOUNT,
    }, $class;
 
    $self->{patterns}{$_} = $args{patterns}{$_} || $self->${\"pattern_$_"} for @patterns;
@@ -198,6 +222,33 @@ sub new
 
    return $self;
 }
+
+=head1 SUBCLASSING METHODS
+
+The following optional methods may be defined by subclasses, to customise
+their parsing.
+
+=head2 on_parse_start
+
+   $parser->on_parse_start
+
+I<Since version 0.21.>
+
+If defined, is invoked by the C<from_*> method that begins a new parse
+operation, just before invoking the toplevel structure method.
+
+=head2 on_parse_end
+
+   $result = $parser->on_parse_end( $result )
+
+I<Since version 0.21.>
+
+If defined, is invoked by the C<from_*> method once it has finished the
+toplevel structure method. This is passed the tentative result from the
+structure method, and whatever it returns becomes the result of the C<from_*>
+method itself.
+
+=cut
 
 =head1 METHODS
 
@@ -220,11 +271,19 @@ sub from_string
 
    pos $self->{str} = 0;
 
+   if( my $code = $self->can( "on_parse_start" ) ) {
+      $self->$code;
+   }
+
    my $toplevel = $self->{toplevel};
    my $result = $self->$toplevel;
 
    $self->at_eos or
       $self->fail( "Expected end of input" );
+
+   if( my $code = $self->can( "on_parse_end" ) ) {
+      $result = $self->$code( $result );
+   }
 
    return $result;
 }
@@ -541,6 +600,64 @@ sub scope_level
    return $self->{scope_level};
 }
 
+=head2 include_string
+
+   $result = $parser->include_string( $str, %opts )
+
+I<Since version 0.21.>
+
+Parses a given string into the existing parser object.
+
+The current parser state is moved aside from the duration of this method, and
+is replaced by the given string. Then the toplevel parser method (or a
+different as specified) is invoked over it. Its result is returned by this
+method.
+
+This would typically be used to handle some sort of "include" or "macro
+expansion" ability, by injecting new content in as if the current parse
+location had encountered it. Other than the internal parser state, other
+object fields are not altered, so whatever effects the invoked parsing methods
+will have on it can continue to inspect and alter it as required.
+
+The following options are recognised:
+
+=over 8
+
+=item filename => STRING
+
+If set, provides a filename (or other descriptive text) to pretend for the
+source of this string. It need not be a real file on the filesystem; it could
+for example explain the source of the string in some other way. It is the
+value reported by the L</filename> method and printed in failure messages.
+
+=item toplevel => STRING | CODE
+
+If set, provides the toplevel parser method to use within this inclusion,
+overriding the object's defined default.
+
+=back
+
+=cut
+
+sub include_string
+{
+   my $self = shift;
+   my ( $str, %opts ) = @_;
+
+   # local'ize everything out of the way
+   local @{$self}{qw( str filename reader )};
+
+   $self->{str} = $str;
+   pos($self->{str}) = 0;
+
+   $self->{filename} = $opts{filename};
+
+   my $toplevel = $opts{toplevel} // $self->{toplevel};
+   my $result = $self->$toplevel;
+
+   return $result;
+}
+
 =head1 STRUCTURE-FORMING METHODS
 
 The following methods may be used to build a grammatical structure out of the
@@ -743,9 +860,17 @@ sub list_of
 
    my @ret;
 
+   my @lastpos;
+
    while( !$self->at_eos ) {
       $committed = 0;
       my $pos = pos $self->{str};
+
+      push @lastpos, $pos;
+      if( @lastpos > $self->{stallcount} ) {
+         shift @lastpos;
+         $self->die( ref($self) . " failed to make progress" ) if $lastpos[0] == $pos;
+      }
 
       try {
          push @ret, $self->$code;

@@ -11,7 +11,7 @@ use Net::DNS::Resolver::Unbound;
 my $resolver = Net::DNS::Resolver::Unbound->new( debug_level => 0 );
 
 plan skip_all => 'no local nameserver' unless $resolver->nameservers;
-plan tests    => 2;
+plan tests    => 4;
 
 
 my $handle = $resolver->bgsend('ns.net-dns.org.');
@@ -20,6 +20,8 @@ ok( $handle, '$resolver->bgsend(ns.net-dns.org.)' );
 sleep 1 if $resolver->bgbusy($handle);
 
 my $reply = $resolver->bgread($handle);
+ok( $handle->async_id(), 'handle->async_id' );
+is( $handle->err(), 0, 'no handle->err' );
 ok( $reply, '$reselver->bgread($handle)' );
 
 

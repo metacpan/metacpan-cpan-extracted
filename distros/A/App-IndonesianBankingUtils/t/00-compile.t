@@ -16,7 +16,7 @@ my @scripts = (
     'script/download-bca',
     'script/download-mandiri',
     'script/list-bca-branches',
-    'script/list-idn-bank-cards',
+    'script/list-id-bank-cards',
     'script/list-idn-banks',
     'script/list-mandiri-branches',
     'script/parse-bca-account',

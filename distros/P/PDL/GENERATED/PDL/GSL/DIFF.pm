@@ -21,7 +21,8 @@ use DynaLoader;
 
 
 
-#line 5 "gsl_diff.pd"
+#line 4 "gsl_diff.pd"
+
 
 use strict;
 use warnings;
@@ -56,7 +57,7 @@ GNU Scientific Library.
      my ($x) = @_;
      return $x**2;
    }
-#line 60 "DIFF.pm"
+#line 61 "DIFF.pm"
 
 
 
@@ -70,7 +71,8 @@ GNU Scientific Library.
 
 
 
-#line 120 "gsl_diff.pd"
+#line 119 "gsl_diff.pd"
+
 
 sub gsldiff{
   my $opt;
@@ -94,11 +96,12 @@ sub gsldiff{
   }
   return ($res,$abserr);
 }
-#line 98 "DIFF.pm"
+#line 100 "DIFF.pm"
 
 
 
-#line 1059 "../../../blib/lib/PDL/PP.pm"
+#line 1058 "../../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 diff_central
@@ -120,17 +123,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 124 "DIFF.pm"
+#line 127 "DIFF.pm"
 
 
 
-#line 1061 "../../../blib/lib/PDL/PP.pm"
+#line 1060 "../../../blib/lib/PDL/PP.pm"
+
 *diff_central = \&PDL::diff_central;
-#line 130 "DIFF.pm"
+#line 134 "DIFF.pm"
 
 
 
-#line 1059 "../../../blib/lib/PDL/PP.pm"
+#line 1058 "../../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 diff_backward
@@ -152,17 +157,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 156 "DIFF.pm"
+#line 161 "DIFF.pm"
 
 
 
-#line 1061 "../../../blib/lib/PDL/PP.pm"
+#line 1060 "../../../blib/lib/PDL/PP.pm"
+
 *diff_backward = \&PDL::diff_backward;
-#line 162 "DIFF.pm"
+#line 168 "DIFF.pm"
 
 
 
-#line 1059 "../../../blib/lib/PDL/PP.pm"
+#line 1058 "../../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 diff_forward
@@ -184,19 +191,21 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 188 "DIFF.pm"
+#line 195 "DIFF.pm"
 
 
 
-#line 1061 "../../../blib/lib/PDL/PP.pm"
+#line 1060 "../../../blib/lib/PDL/PP.pm"
+
 *diff_forward = \&PDL::diff_forward;
-#line 194 "DIFF.pm"
+#line 202 "DIFF.pm"
 
 
 
 
 
-#line 42 "gsl_diff.pd"
+#line 41 "gsl_diff.pd"
+
 =head2 gsldiff
 
 =for ref
@@ -261,7 +270,7 @@ PDL distribution, the copyright notice should be included in the file.
 The GSL differentiation routines were written by David Morrison.
 
 =cut
-#line 265 "DIFF.pm"
+#line 274 "DIFF.pm"
 
 
 

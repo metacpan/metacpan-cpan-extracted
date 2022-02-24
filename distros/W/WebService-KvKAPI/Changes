@@ -1,5 +1,17 @@
 Revision history for Webservice-KvKAPI
 
+0.101     2022-02-23 18:20:59Z
+
+    * Update POD
+    * Fix dependency on OpenAPI::Client 1.03
+
+0.100     2022-02-23 17:32:19Z
+
+    * Breaking changes:
+        * Using Object::Pad for OO system
+        * Using the new API's from KvK
+    * Update developer documentation in regards to SSL certs
+
 0.011     2020-09-02 15:52:34Z
 
     * Make RSIN work around the default

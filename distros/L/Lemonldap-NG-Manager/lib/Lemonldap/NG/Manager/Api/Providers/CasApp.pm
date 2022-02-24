@@ -1,6 +1,6 @@
 package Lemonldap::NG::Manager::Api::Providers::CasApp;
 
-our $VERSION = '2.0.10';
+our $VERSION = '2.0.14';
 
 package Lemonldap::NG::Manager::Api;
 
@@ -109,9 +109,9 @@ sub addCasApp {
     return $self->sendError( $req, 'Invalid input: service is missing', 400 )
       unless ( defined $add->{options}->{service} );
 
-    return $self->sendError( $req, 'Invalid input: service is not a string',
+    return $self->sendError( $req, 'Invalid input: service must be an array',
         400 )
-      if ( ref $add->{options}->{service} );
+      unless ( ref $add->{options}->{service} eq "ARRAY" );
 
     $self->logger->debug(
         "[API] Add CAS App with confKey $add->{confKey} requested");
@@ -125,18 +125,18 @@ sub addCasApp {
         409
     ) if ( defined $self->_getCasAppByConfKey( $conf, $add->{confKey} ) );
 
-    my $res =
-      $self->_getCasAppByServiceUrl( $conf, $add->{options}->{service} );
-    if ( defined $res ) {
-        my $conflict = $res->{options}->{service};
-        return $self->sendError(
-            $req,
-"Invalid input: A CAS application with service URL $conflict already exists",
-            409
-        );
+    for my $serviceUrl ( @{ $add->{options}->{service} } ) {
+        my $res = $self->_getCasAppByServiceUrl( $conf, $serviceUrl );
+        if ( defined $res ) {
+            return $self->sendError(
+                $req,
+"Invalid input: A CAS application with service URL $serviceUrl already exists",
+                409
+            );
+        }
     }
 
-    $res = $self->_pushCasApp( $conf, $add->{confKey}, $add, 1 );
+    my $res = $self->_pushCasApp( $conf, $add->{confKey}, $add, 1 );
 
     return $self->sendError( $req, $res->{msg}, 400 )
       unless ( $res->{res} eq 'ok' );
@@ -285,12 +285,19 @@ sub _getCasAppByServiceUrl {
 
     my ($serviceHost) = $serviceUrl =~ m#^(https?://[^/]+)(?:/.*)?$#;
     return undef unless $serviceHost;
-    foreach ( keys %{ $conf->{casAppMetaDataOptions} } ) {
-        my $url =
-          $conf->{casAppMetaDataOptions}->{$_}->{casAppMetaDataOptionsService};
-        my ($curHost) = $url =~ m#^(https?://[^/]+)(?:/.*)?$#;
-        if ( $serviceHost eq $curHost ) {
-            return $self->_getCasAppByConfKey( $conf, $_ );
+    for my $confKey ( keys %{ $conf->{casAppMetaDataOptions} } ) {
+        for my $url (
+            split(
+                /\s+/,
+                $conf->{casAppMetaDataOptions}->{$confKey}
+                  ->{casAppMetaDataOptionsService}
+            )
+          )
+        {
+            my ($curHost) = $url =~ m#^(https?://[^/]+)(?:/.*)?$#;
+            if ( $serviceHost eq $curHost ) {
+                return $self->_getCasAppByConfKey( $conf, $confKey );
+            }
         }
     }
 
@@ -301,14 +308,29 @@ sub _isNewCasAppServiceUrlUnique {
     my ( $self, $conf, $confKey, $casApp ) = @_;
     my $curServiceUrl =
       $self->_getCasAppByConfKey( $conf, $confKey )->{options}->{service};
-    my $newServiceUrl = $casApp->{options}->{service} || "";
-    if ( $newServiceUrl ne '' && $newServiceUrl ne $curServiceUrl ) {
+
+    # Check service paramater
+    unless ( ref $casApp->{options}->{service} eq "ARRAY" ) {
         return {
             res => 'ko',
-            msg =>
+            msg => "The parameter 'service' must be an array",
+        };
+    }
+
+    my $newService = $casApp->{options}->{service} || [];
+    for my $newServiceUrl (@$newService) {
+        if ( $newServiceUrl ne ''
+            && !grep( /^$newServiceUrl$/, @$curServiceUrl ) )
+        {
+            return {
+                res => 'ko',
+                msg =>
 "A CAS application with service URL '$newServiceUrl' already exists"
-          }
-          if ( defined $self->_getCasAppByServiceUrl( $conf, $newServiceUrl ) );
+              }
+              if (
+                defined $self->_getCasAppByServiceUrl( $conf, $newServiceUrl )
+              );
+        }
     }
 
     return { res => 'ok' };

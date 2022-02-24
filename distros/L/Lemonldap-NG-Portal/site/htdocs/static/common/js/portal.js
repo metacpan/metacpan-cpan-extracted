@@ -5,10 +5,26 @@ LemonLDAP::NG Portal jQuery scripts
  */
 
 (function() {
-  var datas, delKey, getCookie, getQueryParam, getValues, isHiddenFormValueSet, ping, removeOidcConsent, restoreOrder, setCookie, setKey, setOrder, setSelector, translate, translatePage, translationFields,
+  var datas, delKey, getCookie, getQueryParam, getValues, isHiddenFormValueSet, ping, removeOidcConsent, restoreOrder, setCookie, setDanger, setKey, setOrder, setSelector, translate, translatePage, translationFields,
     indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
   translationFields = {};
+
+  setDanger = function(cond, field) {
+    var result;
+    result = false;
+    if (cond) {
+      $("#" + field).addClass('fa-check text-success');
+      $("#" + field).removeClass('fa-times text-danger');
+      $("#" + field).attr('role', 'status');
+    } else {
+      $("#" + field).addClass('fa-times text-danger');
+      $("#" + field).removeClass('fa-check text-success');
+      $("#" + field).attr('role', 'alert');
+      result = true;
+    }
+    return result;
+  };
 
   translatePage = function(lang) {
     return $.getJSON(window.staticPrefix + "languages/" + lang + ".json", function(data) {
@@ -45,7 +61,10 @@ LemonLDAP::NG Portal jQuery scripts
         }
       });
       $("[trplaceholder]").each(function() {
-        return $(this).attr('placeholder', translate($(this).attr('trplaceholder')));
+        var tmp;
+        tmp = translate($(this).attr('trplaceholder'));
+        $(this).attr('placeholder', tmp);
+        return $(this).attr('aria-label', tmp);
       });
       return $("[localtime]").each(function() {
         var d;
@@ -223,11 +242,11 @@ LemonLDAP::NG Portal jQuery scripts
     return '';
   };
 
-  setCookie = function(name, value, exdays) {
+  setCookie = function(name, value, samesite, exdays) {
     var d;
     d = new Date();
     d.setTime(d.getTime() + exdays * 86400000);
-    return document.cookie = name + "=" + value + "; expires=" + (d.toUTCString()) + "; path=/";
+    return document.cookie = name + "=" + value + "; expires=" + (d.toUTCString()) + "; path=/; SameSite=" + samesite;
   };
 
   datas = {};
@@ -379,12 +398,12 @@ LemonLDAP::NG Portal jQuery scripts
       console.log('Selected lang ->', queryLang);
       if (setCookieLang) {
         console.log('Set cookie lang ->', queryLang);
-        setCookie('llnglanguage', queryLang);
+        setCookie('llnglanguage', queryLang, datas['sameSite']);
       }
       translatePage(queryLang);
     } else {
       console.log('Selected lang ->', lang);
-      setCookie('llnglanguage', lang);
+      setCookie('llnglanguage', lang, datas['sameSite']);
       translatePage(lang);
     }
     langdiv = '';
@@ -396,7 +415,7 @@ LemonLDAP::NG Portal jQuery scripts
     $('#languages').html(langdiv);
     $('.langicon').on('click', function() {
       lang = $(this).attr('title');
-      setCookie('llnglanguage', lang);
+      setCookie('llnglanguage', lang, datas['sameSite']);
       return translatePage(lang);
     });
     isAlphaNumeric = function(chr) {
@@ -411,45 +430,25 @@ LemonLDAP::NG Portal jQuery scripts
       var digit, hasforbidden, i, len, lower, nonwhitespechar, numspechar, ref3, ref4, result, upper;
       result = true;
       if (window.datas.ppolicy.minsize > 0) {
-        if (password.length >= window.datas.ppolicy.minsize) {
-          $('#ppolicy-minsize-feedback').addClass('fa-check text-success');
-          $('#ppolicy-minsize-feedback').removeClass('fa-times text-danger');
-        } else {
-          $('#ppolicy-minsize-feedback').removeClass('fa-check text-success');
-          $('#ppolicy-minsize-feedback').addClass('fa-times text-danger');
+        if (setDanger(password.length >= window.datas.ppolicy.minsize, 'ppolicy-minsize-feedback')) {
           result = false;
         }
       }
       if (window.datas.ppolicy.minupper > 0) {
         upper = password.match(/[A-Z]/g);
-        if (upper && upper.length >= window.datas.ppolicy.minupper) {
-          $('#ppolicy-minupper-feedback').addClass('fa-check text-success');
-          $('#ppolicy-minupper-feedback').removeClass('fa-times text-danger');
-        } else {
-          $('#ppolicy-minupper-feedback').removeClass('fa-check text-success');
-          $('#ppolicy-minupper-feedback').addClass('fa-times text-danger');
+        if (setDanger(upper && upper.length >= window.datas.ppolicy.minupper, 'ppolicy-minupper-feedback')) {
           result = false;
         }
       }
       if (window.datas.ppolicy.minlower > 0) {
         lower = password.match(/[a-z]/g);
-        if (lower && lower.length >= window.datas.ppolicy.minlower) {
-          $('#ppolicy-minlower-feedback').addClass('fa-check text-success');
-          $('#ppolicy-minlower-feedback').removeClass('fa-times text-danger');
-        } else {
-          $('#ppolicy-minlower-feedback').removeClass('fa-check text-success');
-          $('#ppolicy-minlower-feedback').addClass('fa-times text-danger');
+        if (setDanger(lower && lower.length >= window.datas.ppolicy.minlower, 'ppolicy-minlower-feedback')) {
           result = false;
         }
       }
       if (window.datas.ppolicy.mindigit > 0) {
         digit = password.match(/[0-9]/g);
-        if (digit && digit.length >= window.datas.ppolicy.mindigit) {
-          $('#ppolicy-mindigit-feedback').addClass('fa-check text-success');
-          $('#ppolicy-mindigit-feedback').removeClass('fa-times text-danger');
-        } else {
-          $('#ppolicy-mindigit-feedback').removeClass('fa-check text-success');
-          $('#ppolicy-mindigit-feedback').addClass('fa-times text-danger');
+        if (setDanger(digit && digit.length >= window.datas.ppolicy.mindigit, 'ppolicy-mindigit-feedback')) {
           result = false;
         }
       }
@@ -466,12 +465,7 @@ LemonLDAP::NG Portal jQuery scripts
           }
           i++;
         }
-        if (hasforbidden === false) {
-          $('#ppolicy-allowedspechar-feedback').addClass('fa-check text-success');
-          $('#ppolicy-allowedspechar-feedback').removeClass('fa-times text-danger');
-        } else {
-          $('#ppolicy-allowedspechar-feedback').removeClass('fa-check text-success');
-          $('#ppolicy-allowedspechar-feedback').addClass('fa-times text-danger');
+        if (setDanger(hasforbidden === false, 'ppolicy-allowedspechar-feedback')) {
           result = false;
         }
       }
@@ -485,12 +479,7 @@ LemonLDAP::NG Portal jQuery scripts
           }
           i++;
         }
-        if (numspechar >= window.datas.ppolicy.minspechar) {
-          $('#ppolicy-minspechar-feedback').addClass('fa-check text-success');
-          $('#ppolicy-minspechar-feedback').removeClass('fa-times text-danger');
-        } else {
-          $('#ppolicy-minspechar-feedback').removeClass('fa-check text-success');
-          $('#ppolicy-minspechar-feedback').addClass('fa-times text-danger');
+        if (setDanger(numspechar >= window.datas.ppolicy.minspechar, 'ppolicy-minspechar-feedback')) {
           result = false;
         }
       }
@@ -503,12 +492,7 @@ LemonLDAP::NG Portal jQuery scripts
           }
           i++;
         }
-        if (numspechar >= window.datas.ppolicy.minspechar) {
-          $('#ppolicy-minspechar-feedback').addClass('fa-check text-success');
-          $('#ppolicy-minspechar-feedback').removeClass('fa-times text-danger');
-        } else {
-          $('#ppolicy-minspechar-feedback').removeClass('fa-check text-success');
-          $('#ppolicy-minspechar-feedback').addClass('fa-times text-danger');
+        if (setDanger(numspechar >= window.datas.ppolicy.minspechar, 'ppolicy-minspechar-feedback')) {
           result = false;
         }
       }
@@ -687,14 +671,14 @@ LemonLDAP::NG Portal jQuery scripts
           user = data.user;
           console.log('Suggested spoofId=', user);
           $("input[name=spoofId]").each(function() {
-            return $(this).attr('value', user);
+            return $(this).val(user);
           });
           if (data.captcha) {
             $('#captcha').attr('src', data.captcha);
           }
           if (data.token) {
-            $('#finduserToken').attr('value', data.token);
-            return $('#token').attr('value', data.token);
+            $('#finduserToken').val(data.token);
+            return $('#token').val(data.token);
           }
         },
         error: function(j, status, err) {

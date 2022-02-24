@@ -38,7 +38,7 @@ SPVM_COMPILER* SPVM_COMPILER_new() {
   
   compiler->bufptr = "";
 
-  compiler->const_string_symtable = SPVM_ALLOCATOR_new_hash_compile_eternal(compiler, 0);
+  compiler->name_symtable = SPVM_ALLOCATOR_new_hash_compile_eternal(compiler, 0);
 
   // Parser information
   compiler->op_use_stack = SPVM_ALLOCATOR_new_list_compile_eternal(compiler, 0);
@@ -46,16 +46,13 @@ SPVM_COMPILER* SPVM_COMPILER_new() {
   compiler->basic_types = SPVM_ALLOCATOR_new_list_compile_eternal(compiler, 0);
   compiler->basic_type_symtable = SPVM_ALLOCATOR_new_hash_compile_eternal(compiler, 0);
   compiler->methods = SPVM_ALLOCATOR_new_list_compile_eternal(compiler, 0);
-  compiler->method_symtable = SPVM_ALLOCATOR_new_hash_compile_eternal(compiler, 0);
   compiler->fields = SPVM_ALLOCATOR_new_list_compile_eternal(compiler, 0);
   compiler->classes = SPVM_ALLOCATOR_new_list_compile_eternal(compiler, 0);
   compiler->used_class_symtable = SPVM_ALLOCATOR_new_hash_compile_eternal(compiler, 0);
   compiler->class_symtable = SPVM_ALLOCATOR_new_hash_compile_eternal(compiler, 0);
   compiler->class_vars = SPVM_ALLOCATOR_new_list_compile_eternal(compiler, 0);
-  compiler->op_constants = SPVM_ALLOCATOR_new_list_compile_eternal(compiler, 0);
   compiler->module_dirs = SPVM_ALLOCATOR_new_list_compile_eternal(compiler, 0);
   compiler->opcode_array = SPVM_OPCODE_ARRAY_new(compiler);
-  compiler->module_file_symtable = SPVM_ALLOCATOR_new_hash_compile_eternal(compiler, 0);
   compiler->module_source_symtable = SPVM_ALLOCATOR_new_hash_compile_eternal(compiler, 0);
 
   // Add basic types
@@ -327,9 +324,16 @@ void SPVM_COMPILER_add_basic_types(SPVM_COMPILER* compiler) {
   }
 }
 
-int32_t SPVM_COMPILER_get_error_count(SPVM_COMPILER* compiler) {
+int32_t SPVM_COMPILER_get_error_messages_length(SPVM_COMPILER* compiler) {
   
   return compiler->error_messages->length;
+}
+
+const char* SPVM_COMPILER_get_error_message(SPVM_COMPILER* compiler, int32_t index) {
+  
+  const char* error_message = (const char*)SPVM_LIST_fetch(compiler->error_messages, index);
+  
+  return error_message;
 }
 
 void SPVM_COMPILER_print_error_messages(SPVM_COMPILER* compiler, FILE* fh) {
@@ -340,7 +344,19 @@ void SPVM_COMPILER_print_error_messages(SPVM_COMPILER* compiler, FILE* fh) {
   }
 }
 
-int32_t SPVM_COMPILER_compile(SPVM_COMPILER* compiler) {
+int32_t SPVM_COMPILER_compile_spvm(SPVM_COMPILER* compiler, const char* class_name) {
+
+  compiler->cur_class_base = compiler->classes->length;
+
+  const char* start_file = compiler->start_file;
+  int32_t start_line = compiler->start_line;
+  
+  // push class to compiler use stack
+  SPVM_OP* op_name_class = SPVM_OP_new_op_name(compiler, class_name, start_file, start_line);
+  SPVM_OP* op_type_class = SPVM_OP_build_basic_type(compiler, op_name_class);
+  SPVM_OP* op_use_class = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_USE, start_file, start_line);
+  SPVM_OP_build_use(compiler, op_use_class, op_type_class, NULL, 0);
+  SPVM_LIST_push(compiler->op_use_stack, op_use_class);
   
   //yacc/bison debug mode. The default is off.
   SPVM_yydebug = 0;
@@ -358,39 +374,39 @@ int32_t SPVM_COMPILER_compile(SPVM_COMPILER* compiler) {
   // Initialize error messages
   compiler->error_messages = SPVM_ALLOCATOR_new_list_compile_eternal(compiler, 0);
   
-  int32_t error = 0;
+  int32_t error_code = 0;
   
   /* Tokenize and Parse */
   int32_t parse_start_memory_blocks_count_compile_tmp = compiler->allocator->memory_blocks_count_compile_tmp;
   int32_t parse_error_flag = SPVM_yyparse(compiler);
   assert(compiler->allocator->memory_blocks_count_compile_tmp == parse_start_memory_blocks_count_compile_tmp);
   if (parse_error_flag) {
-    error = 1;
+    error_code = 1;
   }
   else {
-    if (SPVM_COMPILER_get_error_count(compiler) > 0) {
-      error = 1;
+    if (SPVM_COMPILER_get_error_messages_length(compiler) > 0) {
+      error_code = 2;
     }
     else {
       // Check syntax
       int32_t check_start_memory_blocks_count_compile_tmp = compiler->allocator->memory_blocks_count_compile_tmp;
       SPVM_OP_CHECKER_check(compiler);
       assert(compiler->allocator->memory_blocks_count_compile_tmp == check_start_memory_blocks_count_compile_tmp);
-      if (SPVM_COMPILER_get_error_count(compiler) > 0) {
-        error = 1;
+      if (SPVM_COMPILER_get_error_messages_length(compiler) > 0) {
+        error_code = 3;
       }
       else {
         // Build operation code
         int32_t build_opcode_array_start_memory_blocks_count_compile_tmp = compiler->allocator->memory_blocks_count_compile_tmp;
         SPVM_OPCODE_BUILDER_build_opcode_array(compiler);
         assert(compiler->allocator->memory_blocks_count_compile_tmp == build_opcode_array_start_memory_blocks_count_compile_tmp);
-        if (SPVM_COMPILER_get_error_count(compiler) > 0) {
-          error = 1;
+        if (SPVM_COMPILER_get_error_messages_length(compiler) > 0) {
+          error_code = 4;
         }
       }
     }
   }
-  return error;
+  return error_code;
 }
 
 void SPVM_COMPILER_error(SPVM_COMPILER* compiler, const char* message_template, ...) {

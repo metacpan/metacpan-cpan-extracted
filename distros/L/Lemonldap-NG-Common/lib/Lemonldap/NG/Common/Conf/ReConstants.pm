@@ -5,7 +5,7 @@ use strict;
 use Exporter 'import';
 use base qw(Exporter);
 
-our $VERSION = '2.0.13';
+our $VERSION = '2.0.14';
 
 our %EXPORT_TAGS = ( 'all' => [qw($simpleHashKeys $doubleHashKeys $specialNodeKeys $casAppMetaDataNodeKeys $casSrvMetaDataNodeKeys $oidcOPMetaDataNodeKeys $oidcRPMetaDataNodeKeys $samlIDPMetaDataNodeKeys $samlSPMetaDataNodeKeys $virtualHostKeys $specialNodeHash $authParameters $issuerParameters $samlServiceParameters $oidcServiceParameters $casServiceParameters)] );
 our @EXPORT_OK   = ( @{ $EXPORT_TAGS{'all'} } );
@@ -16,7 +16,7 @@ our $specialNodeHash = {
     samlIDPMetaDataNodes => [qw(samlIDPMetaDataXML samlIDPMetaDataExportedAttributes samlIDPMetaDataOptions)],
     samlSPMetaDataNodes  => [qw(samlSPMetaDataXML samlSPMetaDataExportedAttributes samlSPMetaDataOptions samlSPMetaDataMacros)],
     oidcOPMetaDataNodes  => [qw(oidcOPMetaDataJSON oidcOPMetaDataJWKS oidcOPMetaDataOptions oidcOPMetaDataExportedVars)],
-    oidcRPMetaDataNodes  => [qw(oidcRPMetaDataOptions oidcRPMetaDataExportedVars oidcRPMetaDataOptionsExtraClaims oidcRPMetaDataMacros)],
+    oidcRPMetaDataNodes  => [qw(oidcRPMetaDataOptions oidcRPMetaDataExportedVars oidcRPMetaDataOptionsExtraClaims oidcRPMetaDataMacros oidcRPMetaDataScopeRules)],
     casSrvMetaDataNodes  => [qw(casSrvMetaDataOptions casSrvMetaDataExportedVars)],
     casAppMetaDataNodes  => [qw(casAppMetaDataOptions casAppMetaDataExportedVars casAppMetaDataMacros)],
 };
@@ -30,7 +30,7 @@ our $oidcOPMetaDataNodeKeys = 'oidcOPMetaData(?:Options(?:C(?:lient(?:Secret|ID)
 our $oidcRPMetaDataNodeKeys = 'oidcRPMetaData(?:Options(?:A(?:llow(?:(?:ClientCredentials|Password)Grant|Offline)|ccessToken(?:Expiration|SignAlg|Claims|JWT)|uth(?:orizationCodeExpiration|nLevel)|dditionalAudiences)|I(?:DToken(?:ForceClaims|Expiration|SignAlg)|con)|R(?:e(?:directUris|freshToken|quirePKCE)|ule)|Logout(?:SessionRequired|Type|Url)|P(?:ostLogoutRedirectUris|ublic)|UserI(?:nfoSignAlg|DAttr)|OfflineSessionExpiration|Client(?:Secret|ID)|BypassConsent|DisplayName|ExtraClaims)|(?:ExportedVar|ScopeRule|Macro)s)';
 our $samlIDPMetaDataNodeKeys = 'samlIDPMetaData(?:Options(?:(?:Check(?:S[LS]OMessageSignatur|Audienc|Tim)|EncryptionMod|UserAttribut|DisplayNam)e|S(?:ign(?:S[LS]OMessage|atureMethod)|toreSAMLToken|[LS]OBinding|ortNumber)|A(?:llow(?:LoginFromIDP|ProxiedAuthn)|daptSessionUtime)|Re(?:questedAuthnContext|solutionRule|layStateURL)|Force(?:Authn|UTF8)|I(?:sPassive|con)|NameIDFormat)|ExportedAttributes|XML)';
 our $samlSPMetaDataNodeKeys = 'samlSPMetaData(?:Options(?:S(?:ign(?:S[LS]OMessage|atureMethod)|essionNotOnOrAfterTimeout)|N(?:ameID(?:SessionKey|Format)|otOnOrAfterTimeout)|(?:CheckS[LS]OMessageSignatur|OneTimeUs|Rul)e|En(?:ableIDPInitiatedURL|cryptionMode)|AuthnLevel|ForceUTF8)|(?:ExportedAttribute|Macro)s|XML)';
-our $virtualHostKeys = '(?:vhost(?:A(?:ccessToTrace|uthnLevel|liases)|(?:Maintenanc|Typ)e|ServiceTokenTTL|Https|Port)|(?:exportedHeader|locationRule)s|post)';
+our $virtualHostKeys = '(?:vhost(?:A(?:ccessToTrace|uthnLevel|liases)|(?:Maintenanc|Typ)e|ServiceTokenTTL|DevOpsRulesUrl|Https|Port)|(?:exportedHeader|locationRule)s|post)';
 
 our $authParameters = {
   adParams => [qw(ADPwdMaxAge ADPwdExpireWarning)],
@@ -51,7 +51,7 @@ our $authParameters = {
   oidcParams => [qw(oidcAuthnLevel oidcRPCallbackGetParam oidcRPStateTimeout)],
   openidParams => [qw(openIdAuthnLevel openIdExportedVars openIdSecret openIdIDPList)],
   pamParams => [qw(pamAuthnLevel pamService)],
-  proxyParams => [qw(proxyAuthnLevel proxyAuthService proxySessionService remoteCookieName proxyUseSoap)],
+  proxyParams => [qw(proxyAuthnLevel proxyUseSoap proxyAuthService proxySessionService proxyAuthServiceChoiceParam proxyAuthServiceChoiceValue proxyCookieName proxyAuthServiceImpersonation)],
   radiusParams => [qw(radiusAuthnLevel radiusSecret radiusServer)],
   remoteParams => [qw(remotePortal remoteCookieName remoteGlobalStorage remoteGlobalStorageOptions)],
   restParams => [qw(restAuthnLevel restAuthUrl restUserDBUrl restPwdConfirmUrl restPwdModifyUrl)],
@@ -69,6 +69,6 @@ our $issuerParameters = {
   issuerOptions => [qw(issuersTimeout)],
 };
 our $samlServiceParameters = [qw(samlEntityID samlServicePrivateKeySig samlServicePrivateKeySigPwd samlServicePublicKeySig samlServicePrivateKeyEnc samlServicePrivateKeyEncPwd samlServicePublicKeyEnc samlServiceUseCertificateInResponse samlServiceSignatureMethod samlNameIDFormatMapEmail samlNameIDFormatMapX509 samlNameIDFormatMapWindows samlNameIDFormatMapKerberos samlAuthnContextMapPassword samlAuthnContextMapPasswordProtectedTransport samlAuthnContextMapTLSClient samlAuthnContextMapKerberos samlOrganizationDisplayName samlOrganizationName samlOrganizationURL samlSPSSODescriptorAuthnRequestsSigned samlSPSSODescriptorWantAssertionsSigned samlSPSSODescriptorSingleLogoutServiceHTTPRedirect samlSPSSODescriptorSingleLogoutServiceHTTPPost samlSPSSODescriptorSingleLogoutServiceSOAP samlSPSSODescriptorAssertionConsumerServiceHTTPArtifact samlSPSSODescriptorAssertionConsumerServiceHTTPPost samlSPSSODescriptorArtifactResolutionServiceArtifact samlIDPSSODescriptorWantAuthnRequestsSigned samlIDPSSODescriptorSingleSignOnServiceHTTPRedirect samlIDPSSODescriptorSingleSignOnServiceHTTPPost samlIDPSSODescriptorSingleSignOnServiceHTTPArtifact samlIDPSSODescriptorSingleLogoutServiceHTTPRedirect samlIDPSSODescriptorSingleLogoutServiceHTTPPost samlIDPSSODescriptorSingleLogoutServiceSOAP samlIDPSSODescriptorArtifactResolutionServiceArtifact samlAttributeAuthorityDescriptorAttributeServiceSOAP samlMetadataForceUTF8 samlRelayStateTimeout samlUseQueryStringSpecific samlOverrideIDPEntityID samlStorage samlStorageOptions samlCommonDomainCookieActivation samlCommonDomainCookieDomain samlCommonDomainCookieReader samlCommonDomainCookieWriter samlDiscoveryProtocolActivation samlDiscoveryProtocolURL samlDiscoveryProtocolPolicy samlDiscoveryProtocolIsPassive)];
-our $oidcServiceParameters = [qw(oidcServiceMetaDataIssuer oidcServiceMetaDataAuthorizeURI oidcServiceMetaDataTokenURI oidcServiceMetaDataUserInfoURI oidcServiceMetaDataJWKSURI oidcServiceMetaDataRegistrationURI oidcServiceMetaDataIntrospectionURI oidcServiceMetaDataEndSessionURI oidcServiceMetaDataCheckSessionURI oidcServiceMetaDataFrontChannelURI oidcServiceMetaDataBackChannelURI oidcServiceMetaDataAuthnContext oidcServicePrivateKeySig oidcServicePublicKeySig oidcServiceKeyIdSig oidcServiceAllowDynamicRegistration oidcServiceAllowOnlyDeclaredScopes oidcServiceAllowAuthorizationCodeFlow oidcServiceAllowImplicitFlow oidcServiceAllowHybridFlow oidcServiceAuthorizationCodeExpiration oidcServiceAccessTokenExpiration oidcServiceIDTokenExpiration oidcServiceOfflineSessionExpiration oidcStorage oidcStorageOptions oidcServiceDynamicRegistrationExportedVars oidcServiceDynamicRegistrationExtraClaims)];
+our $oidcServiceParameters = [qw(oidcServiceMetaDataIssuer oidcServiceMetaDataAuthorizeURI oidcServiceMetaDataTokenURI oidcServiceMetaDataUserInfoURI oidcServiceMetaDataJWKSURI oidcServiceMetaDataRegistrationURI oidcServiceMetaDataIntrospectionURI oidcServiceMetaDataEndSessionURI oidcServiceMetaDataCheckSessionURI oidcServiceMetaDataFrontChannelURI oidcServiceMetaDataBackChannelURI oidcServiceMetaDataAuthnContext oidcServiceAllowDynamicRegistration oidcServiceDynamicRegistrationExportedVars oidcServiceDynamicRegistrationExtraClaims oidcServicePrivateKeySig oidcServicePublicKeySig oidcServiceKeyIdSig oidcServiceAllowAuthorizationCodeFlow oidcServiceAllowImplicitFlow oidcServiceAllowHybridFlow oidcServiceAllowOnlyDeclaredScopes oidcServiceAuthorizationCodeExpiration oidcServiceIDTokenExpiration oidcServiceAccessTokenExpiration oidcServiceOfflineSessionExpiration oidcStorage oidcStorageOptions)];
 
 1;

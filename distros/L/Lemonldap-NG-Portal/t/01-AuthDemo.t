@@ -2,6 +2,8 @@ use Test::More;
 use strict;
 use IO::String;
 use MIME::Base64;
+use URI;
+use URI::QueryParam;
 
 require 't/test-lib.pm';
 
@@ -79,6 +81,14 @@ ok( $res->[2]->[0] =~ m%<span trspan="connect">Connect</span>%,
     'Found connect button' )
   or print STDERR Dumper( $res->[2]->[0] );
 count(3);
+
+my ( $host, $uri, $query ) =
+  expectForm( $res, undef, undef, 'user', 'password' );
+my $uri = URI->new;
+$uri->query($query);
+is( $uri->query_param("user"), 'jdoe',
+    "Login is pre-filled on second attemps" );
+count(1);
 
 # Try to authenticate with bad password
 # -------------------------------------

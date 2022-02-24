@@ -109,7 +109,7 @@ sub findUser {
         my $uid  = $demoAccounts{$_}->{uid};
         my $cn   = $demoAccounts{$_}->{cn};
         my $mail = $demoAccounts{$_}->{mail};
-        my $guy  = $demoAccounts{$_}->{guy} // 'good';
+        my $guy  = $demoAccounts{$_}->{guy}  // 'good';
         my $type = $demoAccounts{$_}->{type} // 'character';
         eval "($cond)"
           ? $_
@@ -136,8 +136,10 @@ sub findUser {
 sub setSessionInfo {
     my ( $self, $req ) = @_;
 
-    my %vars = ( %{ $self->conf->{exportedVars} },
-        %{ $self->conf->{demoExportedVars} } );
+    my %vars = (
+        %{ $self->conf->{exportedVars} },
+        %{ $self->conf->{demoExportedVars} }
+    );
     while ( my ( $k, $v ) = each %vars ) {
         $req->{sessionInfo}->{$k} = $demoAccounts{ $req->{user} }->{$v};
     }
@@ -151,7 +153,7 @@ sub setSessionInfo {
 sub setGroups {
     my ( $self, $req ) = @_;
     my $user    = $req->user;
-    my $groups  = $req->sessionInfo->{groups} || '';
+    my $groups  = $req->sessionInfo->{groups}  || '';
     my $hGroups = $req->sessionInfo->{hGroups} || {};
     for my $grp ( keys %demoGroups ) {
         if ( grep { $_ eq $user } @{ $demoGroups{$grp} } ) {

@@ -69,7 +69,7 @@ sub checkForNotifications {
     }
 
     # Transform notifications
-    my $i   = 0;                                # Files count
+    my $i   = 0;    # Files count
     my $now = strftime "%Y-%m-%d", localtime;
 
     foreach my $file ( values %$notifs ) {

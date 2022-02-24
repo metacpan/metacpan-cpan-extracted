@@ -7,11 +7,12 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_DONE
   PE_ERROR
   PE_LDAPCONNECTFAILED
+  PE_PP_ACCOUNT_LOCKED
   PE_PP_PASSWORD_EXPIRED
   PE_PP_CHANGE_AFTER_RESET
 );
 
-our $VERSION = '2.0.10';
+our $VERSION = '2.0.14';
 
 # Inheritance: UserDB::LDAP provides all needed ldap functions
 extends qw(
@@ -97,6 +98,19 @@ sub authenticate {
 
 sub authLogout {
     return PE_OK;
+}
+
+# Define which error codes will stop Combination process
+# @param res error code
+# @return result 1 if stop is needed
+sub stop {
+    my ( $self, $res ) = @_;
+
+    return 1
+      if ( $res == PE_PP_PASSWORD_EXPIRED
+        or $res == PE_PP_ACCOUNT_LOCKED
+        or $res == PE_PP_CHANGE_AFTER_RESET );
+    return 0;
 }
 
 1;

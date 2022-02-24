@@ -46,7 +46,7 @@ EOF
 
 int main(void) { struct Perl_custom_infix def; return 0; }
 EOF
-   ) if $] >= 5.035005;
+   ) if $] >= 5.035010;
 
    if( $have_pl_infix_plugin ) {
       print "Including support for core perl PL_infix_plugin\n";
@@ -60,6 +60,13 @@ my $build = Module::Build::with::XSTests->new(
    module_name => 'XS::Parse::Keyword',
    requires => {
       'perl' => $MIN_PERL,
+   },
+   build_requires => {
+      # We have multiple t/*.xs files, which requires a new enough version of
+      # ExtUtils::ParseXS to cope with.
+      # Unsure the exact version required. perl 5.14 normally ships with version
+      # 2.2210 but that fails. perl 5.16's version 3.16 works fine.
+      'ExtUtils::ParseXS' => '3.16',
    },
    test_requires => {
       'Test::More' => '0.88', # done_testing

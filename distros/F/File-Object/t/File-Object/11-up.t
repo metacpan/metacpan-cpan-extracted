@@ -2,6 +2,7 @@ use strict;
 use warnings;
 
 use English qw(-no_match_vars);
+use Error::Pure::Utils qw(clean);
 use File::Object;
 use Test::More 'tests' => 14;
 use Test::NoWarnings;
@@ -61,3 +62,4 @@ eval {
 	$obj->up;
 };
 is($EVAL_ERROR, "Cannot go up.\n", 'Cannot go to upper directory.');
+clean();

@@ -1,5 +1,12 @@
 Revision history for Syntax-Keyword-Match
 
+0.09    2022-02-20
+        [CHANGES]
+         * Use sv_numeq_flags() from perl 5.35.9
+         * Fix spelling of "compatibility"
+         * Capture t/80await+matchcase.t from Future-AsyncAwait
+         * Misc docs improvements
+
 0.08    2021-08-31
         [CHANGES]
          * Use XS::Parse::Keyword 0.14 to parse infix match operators so we

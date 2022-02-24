@@ -4,7 +4,7 @@ use strict;
 use base 'Exporter';
 
 our $VERSION = '2.0.10';
-our @EXPORT = qw(&isIPv6 &net6 &expand6);
+our @EXPORT  = qw(&isIPv6 &net6 &expand6);
 
 sub isIPv6 {
     my ($ip) = @_;

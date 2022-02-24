@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2016-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2016-2022 -- leonerd@leonerd.org.uk
 
-package Syntax::Keyword::Try 0.26;
+package Syntax::Keyword::Try 0.27;
 
 use v5.14;
 use warnings;
@@ -223,14 +223,6 @@ from disturbing the value of C<$@>. If the C<finally {}> block code throws an
 exception, this will be printed as a warning and discarded, leaving C<$@>
 containing the original exception, if one existed.
 
-Note that the C<finally> syntax is not available when using this module via
-L<Feature::Compat::Try>, as it is not expected that syntax will be added to
-the core perl C<'try'> feature. This is because a more general-purpose ability
-may be added instead, under the name C<'defer'>. If you wish to write code
-that may more easily be forward-compatible with that feature instead, you
-should consider using L<Syntax::Keyword::Defer> rather than using C<finally>
-statements.
-
 =head1 OTHER MODULES
 
 There are already quite a number of modules on CPAN that provide a
@@ -380,8 +372,9 @@ sub import_into
    $^H{"Syntax::Keyword::Try/try"}++ if delete $syms{try};
 
    # Largely for Feature::Compat::Try's benefit
-   $^H{"Syntax::Keyword::Try/no_finally"}++ if delete $syms{"-no_finally"};
-   $^H{"Syntax::Keyword::Try/require_var"}++ if delete $syms{"-require_var"};
+   $^H{"Syntax::Keyword::Try/no_finally"}++    if delete $syms{"-no_finally"};
+   $^H{"Syntax::Keyword::Try/require_catch"}++ if delete $syms{"-require_catch"};
+   $^H{"Syntax::Keyword::Try/require_var"}++   if delete $syms{"-require_var"};
 
    # stablised experiments
    delete $syms{":experimental($_)"} for qw( var );

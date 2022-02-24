@@ -40,7 +40,7 @@ is( $obj->record_name, 'HETATM', 'record_name default' );
 is( $obj->occ,         1.0,      'occ         default' );
 is( $obj->bfact,       20.0,     'bfact       default' );
 is( $obj->resname,     'UNK',    'resname     default' );
-is( $obj->chain,       ' ',      'chain       default' );
+is( $obj->chain,       '  ',     'chain       default' );
 is( $obj->altloc,      ' ',      'altloc      default' );
 is( $obj->resid,       1,        'resid       default' );
 is( $obj->iatom,       0,        'iatom       default' );

@@ -2,7 +2,7 @@ NAME
     Log::ger::App - An easy way to use Log::ger in applications
 
 VERSION
-    version 0.022
+    version 0.023
 
 SYNOPSIS
     In your script:
@@ -56,8 +56,27 @@ DESCRIPTION
 
      use Log::ger::App default_level => 'info'; # be verbose by default. unless changed by env vars
 
-    "warn". The fallback level is warn, if all the above does not provide a
-    value.
+    Via main package variable $main::Default_Log_Level. The next value to be
+    consulted is the main package variable $main::Default_Log_Level. The
+    name of the variable can be customized using the import argument
+    "default_level_var_name". Note that you need to set the variable's value
+    before loading Log::ger::App, so this does not work:
+
+     use Log::ger::App;
+     our $Default_Log_Level = 'info';
+
+    this does not also:
+
+     our $Default_Log_Level = 'info';
+     use Log::ger::App;
+
+    but this does:
+
+     BEGIN { our $Default_Log_Level = 'info' }
+     use Log::ger::App;
+
+    Fallback value "warn". The fallback level is warn, if all the above does
+    not provide a value.
 
   Setting per-output log level
     Via environment variables. You can set level for each output using
@@ -101,6 +120,14 @@ FUNCTIONS
         str|num. Instead of hard-coding level with "level", you can set a
         default level. Environment variables will be consulted first (as
         described in "DESCRIPTION") before falling back to this level.
+
+    *   default_level_var_name
+
+        str. Optional. Name of scalar variable (without the sigil) to be
+        consulted for the default level (after the "default_level" import
+        argument). If the name of the variable does not contain package
+        name, it will be assumed to be in the "main" package. The default
+        value is "main::Default_Log_Level".
 
     *   name
 
@@ -247,6 +274,23 @@ FAQS
     environment variable to "off", for example:
 
      BEGIN { $ENV{SYSLOG_LEVEL} //= "off" }
+     use Log::ger::App;
+
+  Why doesn't setting $main::Default_Log_Level work?
+    Note that you need to set the variable's value before loading
+    Log::ger::App, so this does not work:
+
+     use Log::ger::App;
+     our $Default_Log_Level = 'info';
+
+    this does not also:
+
+     our $Default_Log_Level = 'info';
+     use Log::ger::App;
+
+    but this does:
+
+     BEGIN { our $Default_Log_Level = 'info' }
      use Log::ger::App;
 
   Why doesn't re-setting log level using Log::ger::Util::set_level() work?

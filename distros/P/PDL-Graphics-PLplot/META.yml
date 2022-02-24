@@ -26,5 +26,5 @@ resources:
   IRC: irc://irc.perl.org/#pdl
   bugtracker: https://github.com/PDLPorters/pdl-graphics-plplot/issues
   repository: git://github.com/PDLPorters/pdl-graphics-plplot.git
-version: '0.80'
+version: '0.81'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

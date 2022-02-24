@@ -36,8 +36,10 @@ sub setSessionInfo {
     my ( $self, $req ) = @_;
     $req->{sessionInfo}->{_dn} = $req->data->{dn};
 
-    my %vars = ( %{ $self->conf->{exportedVars} },
-        %{ $self->conf->{ldapExportedVars} } );
+    my %vars = (
+        %{ $self->conf->{exportedVars} },
+        %{ $self->conf->{ldapExportedVars} }
+    );
     while ( my ( $k, $v ) = each %vars ) {
 
         my $value = $self->ldap->getLdapValue( $req->data->{ldapentry}, $v );
@@ -58,8 +60,8 @@ sub setSessionInfo {
 # @return Lemonldap::NG::Portal constant
 sub setGroups {
     my ( $self, $req ) = @_;
-    my $groups  = $req->{sessionInfo}->{groups};
-    my $hGroups = $req->{sessionInfo}->{hGroups};
+    my $groups  = $req->{sessionInfo}->{groups}  || '';
+    my $hGroups = $req->{sessionInfo}->{hGroups} || {};
 
     if ( $self->conf->{ldapGroupBase} ) {
 

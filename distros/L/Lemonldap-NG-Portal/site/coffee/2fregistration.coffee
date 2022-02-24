@@ -9,6 +9,7 @@ setMsg = (msg, level) ->
 	$('#color').addClass "message-#{level}"
 	level = 'success' if level == 'positive'
 	$('#color').addClass "alert-#{level}"
+	$('#color').attr "role", "status"
 
 displayError = (j, status, err) ->
 	console.log 'Error', err
@@ -27,9 +28,11 @@ delete2F = (device, epoch) ->
 			device = 'u'
 		else if device == 'UBK'
 				device = 'yubikey'
-			else if device == 'TOTP'
-					device = 'totp'
-				else setMsg 'u2fFailed', 'warning'
+		else if device == 'TOTP'
+				device = 'totp'
+		else if device == 'WebAuthn'
+				device = 'webauthn'
+		else setMsg 'u2fFailed', 'warning'
 		$.ajax
 			type: "POST"
 			url: "#{portal}2fregisters/#{device}/delete"

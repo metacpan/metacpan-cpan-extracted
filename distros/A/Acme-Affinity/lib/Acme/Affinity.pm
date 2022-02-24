@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Compute the affinity between two people
 
-our $VERSION = '0.0112';
+our $VERSION = '0.0113';
 
 use Moo;
 use strictures 2;
@@ -104,7 +104,7 @@ Acme::Affinity - Compute the affinity between two people
 
 =head1 VERSION
 
-version 0.0112
+version 0.0113
 
 =head1 SYNOPSIS
 

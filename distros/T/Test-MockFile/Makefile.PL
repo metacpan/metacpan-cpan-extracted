@@ -23,6 +23,7 @@ WriteMakefile(
         'File::Temp'                => 0,
         'File::Basename'            => 0,
         'Test2::Harness::Util::IPC' => 0,
+        'Test::MockModule'          => 0,
     },
     PREREQ_PM => {
         'Overload::FileCheck' => '0.012',

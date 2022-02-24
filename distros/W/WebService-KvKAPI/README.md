@@ -7,11 +7,18 @@ Query the KvK API via their OpenAPI definition.
     use WebService::KvKAPI;
     my $api = WebService::KvKAPI->new(
         api_key => 'foobar',
+        # optional
+        api_host => 'foo.bar', # send the request to a different host
+        spoof => 1, # enable spoof mode, uses the test api of the KvK
+
     );
 
-    $api->search();
-    $api->search_all();
-    $api->search_max();
+    $api->search(%args);
+    $api->get_location_profile($location_number);
+    $api->get_basic_profile($kvk_number);
+    $api->get_owner($kvk_number);
+    $api->get_main_location($kvk_number);
+    $api->get_locations($kvk_number);
 
 # ATTRIBUTES
 
@@ -34,55 +41,32 @@ Optional API host to allow overriding the default host `api.kvk.nl`.
 Check if you have an API host set or if you use the default. Publicly available
 for those who need it.
 
-## api\_call
-
-Directly do an API call towards the KvK API. Returns the JSON datastructure as
-an `HashRef`.
-
-## profile
-
-Retreive detailed information of one company. Dies when the company cannot be
-found. Make sure to call ["search" in WebService::KvKAPI](https://metacpan.org/pod/WebService%3A%3AKvKAPI#search) first in case you don't
-want to die.
-
 ## search
 
-Search the KVK, only retrieves the first 10 entries.
+See ["search" in WebService::KvKAPI::Search](https://metacpan.org/pod/WebService%3A%3AKvKAPI%3A%3ASearch#search) for more information.
 
-    my $results = $self->search(kvkNumber => 12345678, ...);
-    foreach (@$results) {
-        ...;
-    }
+## get\_basic\_profile
 
-## search\_all
+See ["get\_basic\_profile" in WebService::KvKAPI::BasicProfile](https://metacpan.org/pod/WebService%3A%3AKvKAPI%3A%3ABasicProfile#get_basic_profile) for more information.
 
-Search the KVK, retreives ALL entries. Potentially a very expensive call
-(money wise). Don't lookup the Albert Heijn KvK number, do more specific
-searches
+## get\_owner
 
-    my $results = $self->search_all(kvkNumber => 12345678, ...);
-    foreach (@$results) {
-        ...;
-    }
+See ["get\_owner" in WebService::KvKAPI::BasicProfile](https://metacpan.org/pod/WebService%3A%3AKvKAPI%3A%3ABasicProfile#get_owner) for more information.
 
-## search\_max
+## get\_main\_location
 
-Search the KVK, retreives a maximum of X results up the the nearest 10, eg 15
-as a max returns 20 items.
+See ["get\_main\_location" in WebService::KvKAPI::BasicProfile](https://metacpan.org/pod/WebService%3A%3AKvKAPI%3A%3ABasicProfile#get_main_location) for more information.
 
-    my $results = $self->search_max(15, kvkNumber => 12345678, ...);
-    foreach (@$results) {
-        ...;
-    }
+## get\_locations
 
-## mangle\_params
+See ["get\_locations" in WebService::KvKAPI::BasicProfile](https://metacpan.org/pod/WebService%3A%3AKvKAPI%3A%3ABasicProfile#get_locations) for more information.
 
-Helper function to always have the correct syntax for the kvkNumber and
-branchNumber. Publicly available for if you want to do calls yourself via
-["api\_call" in WebService::KvKAPI](https://metacpan.org/pod/WebService%3A%3AKvKAPI#api_call)
+## get\_location\_profile
 
-# SEE ALSO
+See ["get\_location\_profile" in WebService::KvKAPI::LocationProfile](https://metacpan.org/pod/WebService%3A%3AKvKAPI%3A%3ALocationProfile#get_location_profile) for more information.
 
-The KvK also has test endpoints. While they are supported via the direct
-`api_call` method, you can instantiate a model that works only in
-spoofmode: [WebService::KvKAPI::Spoof](https://metacpan.org/pod/WebService%3A%3AKvKAPI%3A%3ASpoof)
+# SSL certificates
+
+The KvK now uses private root certificates, please be aware of this. See the
+[KvK developer portal](https://developers.kvk.nl) for more information about
+this.

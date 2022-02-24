@@ -27,7 +27,7 @@ our %EXPORT_TAGS =
   );
 
 ## VERSION was formerly set by PDL::VectorValued::Version, now use perl-reversion from Perl::Version instead
-our $VERSION = '1.0.14';
+our $VERSION = '1.0.15';
 
 ##======================================================================
 ## pod: header

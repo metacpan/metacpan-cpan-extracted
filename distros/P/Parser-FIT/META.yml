@@ -20,7 +20,8 @@ no_index:
     - inc
 requires:
   ExtUtils::MakeMaker: '6.17'
+  ExtUtils::MakeMaker::CPANfile: '0.09'
   perl: '5.010001'
 resources: {}
-version: 0.03
+version: 0.05
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

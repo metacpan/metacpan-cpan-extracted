@@ -17,6 +17,7 @@ struct promise {
 	perl_cond condvar;
 	PerlInterpreter* owner;
 	SV* value;
+	SV* notifier;
 	enum value_type type;
 	enum state state;
 	Refcount refcount;
@@ -113,8 +114,8 @@ void promise_refcount_dec(Promise* promise) {
 static int promise_destroy(pTHX_ SV* sv, MAGIC* magic) {
 	Promise* promise = (Promise*)magic->mg_ptr;
 	MUTEX_LOCK(&promise->mutex);
+	notification_unset(&promise->notification);
 	if (promise->owner == aTHX) {
-		notification_unset(&promise->notification);
 		switch(promise->state) {
 			case HAS_WRITER:
 				COND_SIGNAL(&promise->condvar);
@@ -126,6 +127,8 @@ static int promise_destroy(pTHX_ SV* sv, MAGIC* magic) {
 				SvREFCNT_dec(promise->value);
 				break;
 		}
+		if (promise->notifier)
+			SvREFCNT_dec(promise->notifier);
 	}
 	MUTEX_UNLOCK(&promise->mutex);
 	promise_refcount_dec(promise);
@@ -142,20 +145,18 @@ static PerlIO* S_sv_to_handle(pTHX_ SV* handle) {
 }
 #define sv_to_handle(handle) S_sv_to_handle(aTHX_ handle)
 
-void S_promise_set_notify(pTHX_ SV* promise_sv, SV* handle, SV* value) {
-	MAGIC* magic = sv_to_magic(promise_sv, "Thread::Csp::Promise", &promise_magic);
-	Promise* promise = magic_to_object(magic);
-
+SV* S_promise_finished_fh(pTHX_ Promise* promise) {
 	MUTEX_LOCK(&promise->mutex);
 
-	notification_set(&promise->notification, sv_to_handle(handle), value);
-	if (promise->state == HAS_WRITER || promise->state == DONE)
-		notification_trigger(&promise->notification);
+	if (!promise->notifier) {
+		promise->notifier = notification_create(&promise->notification);
+		if (promise->state == HAS_WRITER || promise->state == DONE)
+			notification_trigger(&promise->notification);
+	}
 
 	MUTEX_UNLOCK(&promise->mutex);
 
-	magic->mg_obj = SvREFCNT_inc(handle);
-	magic->mg_flags |= MGf_REFCOUNTED;
+	return promise->notifier;
 }
 
 SV* S_promise_to_sv(pTHX_ Promise* promise) {

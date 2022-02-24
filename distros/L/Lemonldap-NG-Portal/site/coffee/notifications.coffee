@@ -10,6 +10,7 @@ setMsg = (msg, level) ->
 	$('#color').addClass "message-#{level}"
 	level = 'success' if level == 'positive'
 	$('#color').addClass "alert-#{level}"
+	$('#color').attr "role", "status"
 
 displayError = (j, status, err) ->
 	setMsg 'notificationRetrieveFailed', 'warning'

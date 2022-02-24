@@ -1,5 +1,5 @@
 package HackaMol::Roles::ReadPdbRole;
-$HackaMol::Roles::ReadPdbRole::VERSION = '0.051';
+$HackaMol::Roles::ReadPdbRole::VERSION = '0.053';
 # ABSTRACT: Read files with molecular information
 use Moose::Role;
 use HackaMol::PeriodicTable qw(_element_name _trim _qstring_num);
@@ -86,13 +86,13 @@ sub read_pdb_atoms {
                 $resName,     $chainID, $resSeq,  $icod,
                 $x,           $y,       $z,       $occ,
                 $B,           $segID,   $element, $charge
-            ) = unpack "A6A5x1A4A1A3x1A1A4A1x3A8A8A8A6A6x6A4A2A2", $_ . (" " x 12); # padded out to accommodate truncated pdbs
+            ) = unpack "A6A5x1A4A1A3A2A4A1x3A8A8A8A6A6x6A4A2A2", $_ . (" " x 12); # padded out to accommodate truncated pdbs
 
             if   ( $charge =~ m/\d/ ) { $charge = _qstring_num($charge) }
             else                      { $charge = 0 }
 
             if   ( $chainID =~ m/\w/ ) { $chainID =  _trim($chainID) }
-            else                       { $chainID = ' ' }
+            else                       { $chainID = '  ' }
 
             $name    = _trim($name);
             $resName = _trim($resName);
@@ -184,7 +184,7 @@ HackaMol::Roles::ReadPdbRole - Read files with molecular information
 
 =head1 VERSION
 
-version 0.051
+version 0.053
 
 =head1 SYNOPSIS
 

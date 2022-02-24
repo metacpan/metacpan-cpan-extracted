@@ -21,7 +21,8 @@ use DynaLoader;
 
 
 
-#line 10 "ufunc.pd"
+#line 9 "ufunc.pd"
+
 use strict;
 use warnings;
 
@@ -50,7 +51,7 @@ to many of the functions in this module.
 
 use PDL::Slices;
 use Carp;
-#line 54 "Ufunc.pm"
+#line 55 "Ufunc.pm"
 
 
 
@@ -64,7 +65,8 @@ use Carp;
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 prodover
@@ -103,17 +105,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 107 "Ufunc.pm"
+#line 109 "Ufunc.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *prodover = \&PDL::prodover;
-#line 113 "Ufunc.pm"
+#line 116 "Ufunc.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 cprodover
@@ -153,17 +157,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 157 "Ufunc.pm"
+#line 161 "Ufunc.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *cprodover = \&PDL::cprodover;
-#line 163 "Ufunc.pm"
+#line 168 "Ufunc.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 dprodover
@@ -202,17 +208,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 206 "Ufunc.pm"
-
-
-
-#line 1061 "../../blib/lib/PDL/PP.pm"
-*dprodover = \&PDL::dprodover;
 #line 212 "Ufunc.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
+*dprodover = \&PDL::dprodover;
+#line 219 "Ufunc.pm"
+
+
+
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 cumuprodover
@@ -254,17 +262,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 258 "Ufunc.pm"
+#line 266 "Ufunc.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *cumuprodover = \&PDL::cumuprodover;
-#line 264 "Ufunc.pm"
+#line 273 "Ufunc.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 dcumuprodover
@@ -306,17 +316,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 310 "Ufunc.pm"
+#line 320 "Ufunc.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *dcumuprodover = \&PDL::dcumuprodover;
-#line 316 "Ufunc.pm"
+#line 327 "Ufunc.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 sumover
@@ -355,17 +367,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 359 "Ufunc.pm"
+#line 371 "Ufunc.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *sumover = \&PDL::sumover;
-#line 365 "Ufunc.pm"
+#line 378 "Ufunc.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 csumover
@@ -405,17 +419,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 409 "Ufunc.pm"
+#line 423 "Ufunc.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *csumover = \&PDL::csumover;
-#line 415 "Ufunc.pm"
+#line 430 "Ufunc.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 dsumover
@@ -454,17 +470,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 458 "Ufunc.pm"
+#line 474 "Ufunc.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *dsumover = \&PDL::dsumover;
-#line 464 "Ufunc.pm"
+#line 481 "Ufunc.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 cumusumover
@@ -506,17 +524,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 510 "Ufunc.pm"
+#line 528 "Ufunc.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *cumusumover = \&PDL::cumusumover;
-#line 516 "Ufunc.pm"
+#line 535 "Ufunc.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 dcumusumover
@@ -558,17 +578,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 562 "Ufunc.pm"
+#line 582 "Ufunc.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *dcumusumover = \&PDL::dcumusumover;
-#line 568 "Ufunc.pm"
+#line 589 "Ufunc.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 andover
@@ -607,17 +629,19 @@ C<b()> is set bad. Otherwise C<b()> will have its bad flag cleared,
 as it will not contain any bad values.
 
 =cut
-#line 611 "Ufunc.pm"
+#line 633 "Ufunc.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *andover = \&PDL::andover;
-#line 617 "Ufunc.pm"
+#line 640 "Ufunc.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 bandover
@@ -656,17 +680,19 @@ C<b()> is set bad. Otherwise C<b()> will have its bad flag cleared,
 as it will not contain any bad values.
 
 =cut
-#line 660 "Ufunc.pm"
+#line 684 "Ufunc.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *bandover = \&PDL::bandover;
-#line 666 "Ufunc.pm"
+#line 691 "Ufunc.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 borover
@@ -705,17 +731,19 @@ C<b()> is set bad. Otherwise C<b()> will have its bad flag cleared,
 as it will not contain any bad values.
 
 =cut
-#line 709 "Ufunc.pm"
+#line 735 "Ufunc.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *borover = \&PDL::borover;
-#line 715 "Ufunc.pm"
+#line 742 "Ufunc.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 orover
@@ -754,17 +782,19 @@ C<b()> is set bad. Otherwise C<b()> will have its bad flag cleared,
 as it will not contain any bad values.
 
 =cut
-#line 758 "Ufunc.pm"
+#line 786 "Ufunc.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *orover = \&PDL::orover;
-#line 764 "Ufunc.pm"
+#line 793 "Ufunc.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 zcover
@@ -803,17 +833,19 @@ C<b()> is set bad. Otherwise C<b()> will have its bad flag cleared,
 as it will not contain any bad values.
 
 =cut
-#line 807 "Ufunc.pm"
+#line 837 "Ufunc.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *zcover = \&PDL::zcover;
-#line 813 "Ufunc.pm"
+#line 844 "Ufunc.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 intover
@@ -861,17 +893,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 865 "Ufunc.pm"
+#line 897 "Ufunc.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *intover = \&PDL::intover;
-#line 871 "Ufunc.pm"
+#line 904 "Ufunc.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 average
@@ -910,17 +944,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 914 "Ufunc.pm"
+#line 948 "Ufunc.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *average = \&PDL::average;
-#line 920 "Ufunc.pm"
+#line 955 "Ufunc.pm"
 
 
 
-#line 317 "ufunc.pd"
+#line 309 "ufunc.pd"
+
 =head2 avgover
 
 =for ref
@@ -930,11 +966,12 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =cut
 
 *PDL::avgover = *avgover = \&PDL::average;
-#line 934 "Ufunc.pm"
+#line 970 "Ufunc.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 caverage
@@ -974,17 +1011,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 978 "Ufunc.pm"
+#line 1015 "Ufunc.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *caverage = \&PDL::caverage;
-#line 984 "Ufunc.pm"
+#line 1022 "Ufunc.pm"
 
 
 
-#line 317 "ufunc.pd"
+#line 309 "ufunc.pd"
+
 =head2 cavgover
 
 =for ref
@@ -994,11 +1033,12 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =cut
 
 *PDL::cavgover = *cavgover = \&PDL::caverage;
-#line 998 "Ufunc.pm"
+#line 1037 "Ufunc.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 daverage
@@ -1038,17 +1078,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1042 "Ufunc.pm"
+#line 1082 "Ufunc.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *daverage = \&PDL::daverage;
-#line 1048 "Ufunc.pm"
+#line 1089 "Ufunc.pm"
 
 
 
-#line 317 "ufunc.pd"
+#line 309 "ufunc.pd"
+
 =head2 davgover
 
 =for ref
@@ -1058,11 +1100,12 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =cut
 
 *PDL::davgover = *davgover = \&PDL::daverage;
-#line 1062 "Ufunc.pm"
+#line 1104 "Ufunc.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 minimum
@@ -1105,17 +1148,19 @@ for ways of masking NaNs.
 
 
 =cut
-#line 1109 "Ufunc.pm"
+#line 1152 "Ufunc.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *minimum = \&PDL::minimum;
-#line 1115 "Ufunc.pm"
+#line 1159 "Ufunc.pm"
 
 
 
-#line 317 "ufunc.pd"
+#line 309 "ufunc.pd"
+
 =head2 minover
 
 =for ref
@@ -1125,11 +1170,12 @@ for ways of masking NaNs.
 =cut
 
 *PDL::minover = *minover = \&PDL::minimum;
-#line 1129 "Ufunc.pm"
+#line 1174 "Ufunc.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 minimum_ind
@@ -1148,17 +1194,19 @@ Output is set bad if all elements of the input are bad,
 otherwise the bad flag is cleared for the output ndarray.
 
 =cut
-#line 1152 "Ufunc.pm"
+#line 1198 "Ufunc.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *minimum_ind = \&PDL::minimum_ind;
-#line 1158 "Ufunc.pm"
+#line 1205 "Ufunc.pm"
 
 
 
-#line 317 "ufunc.pd"
+#line 309 "ufunc.pd"
+
 =head2 minover_ind
 
 =for ref
@@ -1168,11 +1216,12 @@ otherwise the bad flag is cleared for the output ndarray.
 =cut
 
 *PDL::minover_ind = *minover_ind = \&PDL::minimum_ind;
-#line 1172 "Ufunc.pm"
+#line 1220 "Ufunc.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 minimum_n_ind
@@ -1190,17 +1239,19 @@ Returns the index of C<m> minimum elements
 Not yet been converted to ignore bad values
 
 =cut
-#line 1194 "Ufunc.pm"
+#line 1243 "Ufunc.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *minimum_n_ind = \&PDL::minimum_n_ind;
-#line 1200 "Ufunc.pm"
+#line 1250 "Ufunc.pm"
 
 
 
-#line 317 "ufunc.pd"
+#line 309 "ufunc.pd"
+
 =head2 minover_n_ind
 
 =for ref
@@ -1210,11 +1261,12 @@ Not yet been converted to ignore bad values
 =cut
 
 *PDL::minover_n_ind = *minover_n_ind = \&PDL::minimum_n_ind;
-#line 1214 "Ufunc.pm"
+#line 1265 "Ufunc.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 maximum
@@ -1257,17 +1309,19 @@ for ways of masking NaNs.
 
 
 =cut
-#line 1261 "Ufunc.pm"
+#line 1313 "Ufunc.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *maximum = \&PDL::maximum;
-#line 1267 "Ufunc.pm"
+#line 1320 "Ufunc.pm"
 
 
 
-#line 317 "ufunc.pd"
+#line 309 "ufunc.pd"
+
 =head2 maxover
 
 =for ref
@@ -1277,11 +1331,12 @@ for ways of masking NaNs.
 =cut
 
 *PDL::maxover = *maxover = \&PDL::maximum;
-#line 1281 "Ufunc.pm"
+#line 1335 "Ufunc.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 maximum_ind
@@ -1300,17 +1355,19 @@ Output is set bad if all elements of the input are bad,
 otherwise the bad flag is cleared for the output ndarray.
 
 =cut
-#line 1304 "Ufunc.pm"
+#line 1359 "Ufunc.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *maximum_ind = \&PDL::maximum_ind;
-#line 1310 "Ufunc.pm"
+#line 1366 "Ufunc.pm"
 
 
 
-#line 317 "ufunc.pd"
+#line 309 "ufunc.pd"
+
 =head2 maxover_ind
 
 =for ref
@@ -1320,11 +1377,12 @@ otherwise the bad flag is cleared for the output ndarray.
 =cut
 
 *PDL::maxover_ind = *maxover_ind = \&PDL::maximum_ind;
-#line 1324 "Ufunc.pm"
+#line 1381 "Ufunc.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 maximum_n_ind
@@ -1342,17 +1400,19 @@ Returns the index of C<m> maximum elements
 Not yet been converted to ignore bad values
 
 =cut
-#line 1346 "Ufunc.pm"
+#line 1404 "Ufunc.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *maximum_n_ind = \&PDL::maximum_n_ind;
-#line 1352 "Ufunc.pm"
+#line 1411 "Ufunc.pm"
 
 
 
-#line 317 "ufunc.pd"
+#line 309 "ufunc.pd"
+
 =head2 maxover_n_ind
 
 =for ref
@@ -1362,11 +1422,12 @@ Not yet been converted to ignore bad values
 =cut
 
 *PDL::maxover_n_ind = *maxover_n_ind = \&PDL::maximum_n_ind;
-#line 1366 "Ufunc.pm"
+#line 1426 "Ufunc.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 minmaximum
@@ -1399,17 +1460,19 @@ Otherwise they will have their bad flags cleared,
 since they will not contain any bad values.
 
 =cut
-#line 1403 "Ufunc.pm"
+#line 1464 "Ufunc.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *minmaximum = \&PDL::minmaximum;
-#line 1409 "Ufunc.pm"
+#line 1471 "Ufunc.pm"
 
 
 
-#line 317 "ufunc.pd"
+#line 309 "ufunc.pd"
+
 =head2 minmaxover
 
 =for ref
@@ -1419,11 +1482,12 @@ since they will not contain any bad values.
 =cut
 
 *PDL::minmaxover = *minmaxover = \&PDL::minmaximum;
-#line 1423 "Ufunc.pm"
+#line 1486 "Ufunc.pm"
 
 
 
-#line 565 "ufunc.pd"
+#line 550 "ufunc.pd"
+
 =head2 avg
 
 =for ref
@@ -1448,11 +1512,12 @@ sub PDL::avg {
 	$x->clump(-1)->average( $tmp=PDL->nullcreate($x) );
 	$tmp;
 }
-#line 1452 "Ufunc.pm"
+#line 1516 "Ufunc.pm"
 
 
 
-#line 565 "ufunc.pd"
+#line 550 "ufunc.pd"
+
 =head2 sum
 
 =for ref
@@ -1477,11 +1542,12 @@ sub PDL::sum {
 	$x->clump(-1)->sumover( $tmp=PDL->nullcreate($x) );
 	$tmp;
 }
-#line 1481 "Ufunc.pm"
+#line 1546 "Ufunc.pm"
 
 
 
-#line 565 "ufunc.pd"
+#line 550 "ufunc.pd"
+
 =head2 prod
 
 =for ref
@@ -1506,11 +1572,12 @@ sub PDL::prod {
 	$x->clump(-1)->prodover( $tmp=PDL->nullcreate($x) );
 	$tmp;
 }
-#line 1510 "Ufunc.pm"
+#line 1576 "Ufunc.pm"
 
 
 
-#line 565 "ufunc.pd"
+#line 550 "ufunc.pd"
+
 =head2 davg
 
 =for ref
@@ -1535,11 +1602,12 @@ sub PDL::davg {
 	$x->clump(-1)->daverage( $tmp=PDL->nullcreate($x) );
 	$tmp;
 }
-#line 1539 "Ufunc.pm"
+#line 1606 "Ufunc.pm"
 
 
 
-#line 565 "ufunc.pd"
+#line 550 "ufunc.pd"
+
 =head2 dsum
 
 =for ref
@@ -1564,11 +1632,12 @@ sub PDL::dsum {
 	$x->clump(-1)->dsumover( $tmp=PDL->nullcreate($x) );
 	$tmp;
 }
-#line 1568 "Ufunc.pm"
+#line 1636 "Ufunc.pm"
 
 
 
-#line 565 "ufunc.pd"
+#line 550 "ufunc.pd"
+
 =head2 dprod
 
 =for ref
@@ -1593,11 +1662,12 @@ sub PDL::dprod {
 	$x->clump(-1)->dprodover( $tmp=PDL->nullcreate($x) );
 	$tmp;
 }
-#line 1597 "Ufunc.pm"
+#line 1666 "Ufunc.pm"
 
 
 
-#line 565 "ufunc.pd"
+#line 550 "ufunc.pd"
+
 =head2 zcheck
 
 =for ref
@@ -1622,11 +1692,12 @@ sub PDL::zcheck {
 	$x->clump(-1)->zcover( $tmp=PDL->nullcreate($x) );
 	$tmp;
 }
-#line 1626 "Ufunc.pm"
+#line 1696 "Ufunc.pm"
 
 
 
-#line 565 "ufunc.pd"
+#line 550 "ufunc.pd"
+
 =head2 and
 
 =for ref
@@ -1651,11 +1722,12 @@ sub PDL::and {
 	$x->clump(-1)->andover( $tmp=PDL->nullcreate($x) );
 	$tmp;
 }
-#line 1655 "Ufunc.pm"
+#line 1726 "Ufunc.pm"
 
 
 
-#line 565 "ufunc.pd"
+#line 550 "ufunc.pd"
+
 =head2 band
 
 =for ref
@@ -1680,11 +1752,12 @@ sub PDL::band {
 	$x->clump(-1)->bandover( $tmp=PDL->nullcreate($x) );
 	$tmp;
 }
-#line 1684 "Ufunc.pm"
+#line 1756 "Ufunc.pm"
 
 
 
-#line 565 "ufunc.pd"
+#line 550 "ufunc.pd"
+
 =head2 or
 
 =for ref
@@ -1709,11 +1782,12 @@ sub PDL::or {
 	$x->clump(-1)->orover( $tmp=PDL->nullcreate($x) );
 	$tmp;
 }
-#line 1713 "Ufunc.pm"
+#line 1786 "Ufunc.pm"
 
 
 
-#line 565 "ufunc.pd"
+#line 550 "ufunc.pd"
+
 =head2 bor
 
 =for ref
@@ -1738,11 +1812,12 @@ sub PDL::bor {
 	$x->clump(-1)->borover( $tmp=PDL->nullcreate($x) );
 	$tmp;
 }
-#line 1742 "Ufunc.pm"
+#line 1816 "Ufunc.pm"
 
 
 
-#line 565 "ufunc.pd"
+#line 550 "ufunc.pd"
+
 =head2 min
 
 =for ref
@@ -1767,11 +1842,12 @@ sub PDL::min {
 	$x->clump(-1)->minimum( $tmp=PDL->nullcreate($x) );
 	$tmp;
 }
-#line 1771 "Ufunc.pm"
+#line 1846 "Ufunc.pm"
 
 
 
-#line 565 "ufunc.pd"
+#line 550 "ufunc.pd"
+
 =head2 max
 
 =for ref
@@ -1796,11 +1872,12 @@ sub PDL::max {
 	$x->clump(-1)->maximum( $tmp=PDL->nullcreate($x) );
 	$tmp;
 }
-#line 1800 "Ufunc.pm"
+#line 1876 "Ufunc.pm"
 
 
 
-#line 565 "ufunc.pd"
+#line 550 "ufunc.pd"
+
 =head2 median
 
 =for ref
@@ -1825,11 +1902,12 @@ sub PDL::median {
 	$x->clump(-1)->medover( $tmp=PDL->nullcreate($x) );
 	$tmp;
 }
-#line 1829 "Ufunc.pm"
+#line 1906 "Ufunc.pm"
 
 
 
-#line 565 "ufunc.pd"
+#line 550 "ufunc.pd"
+
 =head2 mode
 
 =for ref
@@ -1854,11 +1932,12 @@ sub PDL::mode {
 	$x->clump(-1)->modeover( $tmp=PDL->nullcreate($x) );
 	$tmp;
 }
-#line 1858 "Ufunc.pm"
+#line 1936 "Ufunc.pm"
 
 
 
-#line 565 "ufunc.pd"
+#line 550 "ufunc.pd"
+
 =head2 oddmedian
 
 =for ref
@@ -1883,11 +1962,12 @@ sub PDL::oddmedian {
 	$x->clump(-1)->oddmedover( $tmp=PDL->nullcreate($x) );
 	$tmp;
 }
-#line 1887 "Ufunc.pm"
+#line 1966 "Ufunc.pm"
 
 
 
-#line 595 "ufunc.pd"
+#line 580 "ufunc.pd"
+
 
 =head2 any
 
@@ -1943,7 +2023,7 @@ Returns a list with minimum and maximum values of an ndarray.
 
  ($mn, $mx) = minmax($pdl);
 
-This routine does I<not> thread over the dimensions of C<$pdl>;
+This routine does I<not> broadcast over the dimensions of C<$pdl>;
 it returns the minimum and maximum values of the whole ndarray.
 See L</minmaximum> if this is not what is required.
 The two values are returned as Perl scalars similar to min/max,
@@ -1964,11 +2044,12 @@ sub PDL::minmax {
   my @arr = $x->clump(-1)->minmaximum;
   map $_->sclr, @arr[0,1]; # as scalars !
 }
-#line 1968 "Ufunc.pm"
+#line 2048 "Ufunc.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 medover
@@ -2007,17 +2088,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 2011 "Ufunc.pm"
+#line 2092 "Ufunc.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *medover = \&PDL::medover;
-#line 2017 "Ufunc.pm"
+#line 2099 "Ufunc.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 oddmedover
@@ -2064,17 +2147,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 2068 "Ufunc.pm"
+#line 2151 "Ufunc.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *oddmedover = \&PDL::oddmedover;
-#line 2074 "Ufunc.pm"
+#line 2158 "Ufunc.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 modeover
@@ -2123,17 +2208,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 2127 "Ufunc.pm"
+#line 2212 "Ufunc.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *modeover = \&PDL::modeover;
-#line 2133 "Ufunc.pm"
+#line 2219 "Ufunc.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 pctover
@@ -2179,17 +2266,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 2183 "Ufunc.pm"
+#line 2270 "Ufunc.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *pctover = \&PDL::pctover;
-#line 2189 "Ufunc.pm"
+#line 2277 "Ufunc.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 oddpctover
@@ -2233,17 +2322,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 2237 "Ufunc.pm"
+#line 2326 "Ufunc.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *oddpctover = \&PDL::oddpctover;
-#line 2243 "Ufunc.pm"
+#line 2333 "Ufunc.pm"
 
 
 
-#line 1008 "ufunc.pd"
+#line 985 "ufunc.pd"
+
 =head2 pct
 
 =for ref
@@ -2265,11 +2356,12 @@ sub PDL::pct {
 	$x->clump(-1)->pctover($p, my $tmp=PDL->nullcreate($x));
 	$tmp;
 }
-#line 2269 "Ufunc.pm"
+#line 2360 "Ufunc.pm"
 
 
 
-#line 1033 "ufunc.pd"
+#line 1010 "ufunc.pd"
+
 =head2 oddpct
 
 =for ref
@@ -2291,11 +2383,12 @@ sub PDL::oddpct {
 	$x->clump(-1)->oddpctover($p, my $tmp=PDL->nullcreate($x));
 	$tmp;
 }
-#line 2295 "Ufunc.pm"
+#line 2387 "Ufunc.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 qsort
@@ -2326,17 +2419,19 @@ Bad values are moved to the end of the array:
 
 
 =cut
-#line 2330 "Ufunc.pm"
+#line 2423 "Ufunc.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *qsort = \&PDL::qsort;
-#line 2336 "Ufunc.pm"
+#line 2430 "Ufunc.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 qsorti
@@ -2368,17 +2463,19 @@ Bad elements are moved to the end of the array:
 
 
 =cut
-#line 2372 "Ufunc.pm"
+#line 2467 "Ufunc.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *qsorti = \&PDL::qsorti;
-#line 2378 "Ufunc.pm"
+#line 2474 "Ufunc.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 qsortvec
@@ -2393,7 +2490,7 @@ Bad elements are moved to the end of the array:
 Sort a list of vectors lexicographically.
 
 The 0th dimension of the source ndarray is dimension in the vector;
-the 1st dimension is list order.  Higher dimensions are threaded over.
+the 1st dimension is list order.  Higher dimensions are broadcasted over.
 
 =for example
 
@@ -2424,17 +2521,19 @@ Vectors with bad components are moved to the end of the array:
 
 
 =cut
-#line 2428 "Ufunc.pm"
+#line 2525 "Ufunc.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *qsortvec = \&PDL::qsortvec;
-#line 2434 "Ufunc.pm"
+#line 2532 "Ufunc.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 qsortveci
@@ -2456,7 +2555,7 @@ containing the M-indices of original array rows, in sorted order.
 As with C<qsortvec>, the zeroth element of the vectors runs slowest in the
 sorted list.  
 
-Additional dimensions are threaded over: each plane is sorted separately,
+Additional dimensions are broadcasted over: each plane is sorted separately,
 so qsortveci may be thought of as a collapse operator of sorts (groan).
 
 
@@ -2468,19 +2567,21 @@ for L</qsortvec>.
 
 
 =cut
-#line 2472 "Ufunc.pm"
+#line 2571 "Ufunc.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *qsortveci = \&PDL::qsortveci;
-#line 2478 "Ufunc.pm"
+#line 2578 "Ufunc.pm"
 
 
 
 
 
-#line 1302 "ufunc.pd"
+#line 1280 "ufunc.pd"
+
 
 =head1 AUTHOR
 
@@ -2494,7 +2595,7 @@ from the PDL distribution, the copyright notice should be included in
 the file.
 
 =cut
-#line 2498 "Ufunc.pm"
+#line 2599 "Ufunc.pm"
 
 
 

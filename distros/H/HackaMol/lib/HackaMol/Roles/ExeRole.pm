@@ -1,5 +1,5 @@
 package HackaMol::Roles::ExeRole;
-$HackaMol::Roles::ExeRole::VERSION = '0.051';
+$HackaMol::Roles::ExeRole::VERSION = '0.053';
 #ABSTRACT:  
 use 5.008;
 use Moose::Role;
@@ -14,7 +14,7 @@ has 'exe'       => (
 
 
 #options after input filename... bleh
-# ie. dftd3 shit.xyz -func b3pw91 -bj              
+# ie. dftd3 stuff.xyz -func b3pw91 -bj              
 has 'exe_endops'       => (
                       is  => 'rw',
                       isa => 'Str',
@@ -56,7 +56,7 @@ HackaMol::Roles::ExeRole -
 
 =head1 VERSION
 
-version 0.051
+version 0.053
 
 =head1 DESCRIPTION
 

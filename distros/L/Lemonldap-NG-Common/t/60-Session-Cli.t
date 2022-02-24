@@ -62,97 +62,115 @@ my @psessionsOpts = (
     force => 1,
 );
 
-Lemonldap::NG::Common::Session->new( {
-        @sessionsOpts,
-        id   => "1b3231655cebb7a1f783eddf27d254ca",
-        info => {
-            "uid" => "rtyler",
+sub resetSessions {
+    Lemonldap::NG::Common::Session->new( {
+            @sessionsOpts,
+            id   => "1b3231655cebb7a1f783eddf27d254ca",
+            info => {
+                "uid" => "rtyler",
+            }
         }
-    }
-);
-Lemonldap::NG::Common::Session->new( {
-        @sessionsOpts,
-        id   => "9684dd2a6489bf2be2fbdd799a8028e3",
-        info => {
-            "uid" => "dwho",
+    );
+    Lemonldap::NG::Common::Session->new( {
+            @sessionsOpts,
+            id   => "9684dd2a6489bf2be2fbdd799a8028e3",
+            info => {
+                "uid" => "dwho",
+            }
         }
-    }
-);
-Lemonldap::NG::Common::Session->new( {
-        @sessionsOpts,
-        id   => "f90f597566f5cce47d9641377776c0c2",
-        info => {
-            "uid"      => "dwho",
-            "deleteme" => 1,
+    );
+    Lemonldap::NG::Common::Session->new( {
+            @sessionsOpts,
+            id   => "f90f597566f5cce47d9641377776c0c2",
+            info => {
+                "uid"      => "dwho",
+                "deleteme" => 1,
+            }
         }
-    }
-);
-Lemonldap::NG::Common::Session->new( {
-        @sessionsOpts,
-        id   => "1234",
-        info => {
-            "uid" => "foo",
+    );
+    Lemonldap::NG::Common::Session->new( {
+            @sessionsOpts,
+            id   => "1234",
+            info => {
+                "uid" => "foo",
+            }
         }
-    }
-);
-Lemonldap::NG::Common::Session->new( {
-        @sessionsOpts,
-        id   => "1235",
-        info => {
-            "uid" => "foo",
+    );
+    Lemonldap::NG::Common::Session->new( {
+            @sessionsOpts,
+            id   => "1235",
+            info => {
+                "uid" => "foo",
+            }
         }
-    }
-);
+    );
 
-Lemonldap::NG::Common::Session->new( {
-        @psessionsOpts,
-        id    => "5efe8af397fc3577e05b483aca964f1b",
-        force => 1,
-        info  => {
-            "_2fDevices" => to_json( [ {
-                        'type'     => 'UBK',
-                        'epoch'    => 1588691690,
-                        '_yubikey' => 'cccccceijfnf',
-                        'name'     => 'Imported automatically'
-                    },
-                    {
-                        'name'  => 'MyU2F',
-                        'type'  => 'U2F',
-                        'epoch' => 1588691728
-                    },
-                    {
-                        '_secret' => 'mnxkiirpswuojr47kkrty7ax34fy2ix7',
-                        'name'    => 'MyTOTP',
-                        'type'    => 'TOTP',
-                        'epoch'   => 1588691728
-                    }
-                ]
-            ),
-            "_oidcConsents" => to_json( [ {
-                        'scope' => 'openid email',
-                        'rp'    => 'rp-example',
-                        'epoch' => 1589288341
-                    },
-                    {
-                        'scope' => 'openid email',
-                        'epoch' => 1589291482,
-                        'rp'    => 'rp-example2'
-                    }
-                ]
-            ),
-            "_session_uid" => "dwho",
+    Lemonldap::NG::Common::Session->new( {
+            @psessionsOpts,
+            id    => "5efe8af397fc3577e05b483aca964f1b",
+            force => 1,
+            info  => {
+                "_2fDevices" => to_json( [ {
+                            'type'     => 'UBK',
+                            'epoch'    => 1588691690,
+                            '_yubikey' => 'cccccceijfnf',
+                            'name'     => 'Imported automatically'
+                        },
+                        {
+                            'name'  => 'MyU2F',
+                            'type'  => 'U2F',
+                            'epoch' => 1588691728
+                        },
+                        {
+                            '_secret' => 'mnxkiirpswuojr47kkrty7ax34fy2ix7',
+                            'name'    => 'MyTOTP',
+                            'type'    => 'TOTP',
+                            'epoch'   => 1588691728
+                        }
+                    ]
+                ),
+                "_oidcConsents" => to_json( [ {
+                            'scope' => 'openid email',
+                            'rp'    => 'rp-example',
+                            'epoch' => 1589288341
+                        },
+                        {
+                            'scope' => 'openid email',
+                            'epoch' => 1589291482,
+                            'rp'    => 'rp-example2'
+                        }
+                    ]
+                ),
+                "_session_uid" => "dwho",
+            }
         }
-    }
-);
-Lemonldap::NG::Common::Session->new( {
-        @psessionsOpts,
-        id    => "8d3bc3b0e14ea2a155f275aa7c07ebee",
-        force => 1,
-        info  => {
-            "_session_uid" => "rtyler",
+    );
+    Lemonldap::NG::Common::Session->new( {
+            @psessionsOpts,
+            id    => "8d3bc3b0e14ea2a155f275aa7c07ebee",
+            force => 1,
+            info  => {
+                "_session_uid" => "rtyler",
+                "_2fDevices"   => to_json( [ {
+                            'type'     => 'UBK',
+                            'epoch'    => 1588691690,
+                            '_yubikey' => 'cccccceijfnf',
+                            'name'     => 'Imported automatically'
+                        },
+                        {
+                            '_secret' => 'mnxkiirpswuojr47kkrty7ax34fy2ix7',
+                            'name'    => 'MyTOTP',
+                            'type'    => 'TOTP',
+                            'epoch'   => 1588691728
+                        }
+                    ]
+                ),
+            }
         }
-    }
-);
+    );
+}
+
+resetSessions;
 
 sub getJson {
     my @args = @_;
@@ -222,7 +240,7 @@ is( @{$res}, 2, "Found 2 psessions" );
 
 # Test search with where
 $res = getJson( "search", { where => "uid=dwho" } );
-is( @{$res}, 2, "Found 2 sessions" );
+is( @{$res},                                  2, "Found 2 sessions" );
 is( ( grep { $_->{uid} eq "dwho" } @{$res} ), 2, "Both sessions are dwho" );
 
 # Test search with where and field selection
@@ -241,7 +259,7 @@ is(
 );
 
 # Delete session
-$cli->run( 'delete', {}, "9684dd2a6489bf2be2fbdd799a8028e3" );
+$cli->run( 'delete', {},                  "9684dd2a6489bf2be2fbdd799a8028e3" );
 $cli->run( 'delete', { persistent => 1 }, "rtyler" );
 
 $res = getJson( "get", {}, "9684dd2a6489bf2be2fbdd799a8028e3" );
@@ -301,6 +319,27 @@ is( ( keys %{$res} ), 1, "Found one second factors" );
 is( ( grep { $_->{type} eq "U2F" } values %{$res} ),  0, "U2F was removed" );
 is( ( grep { $_->{type} eq "TOTP" } values %{$res} ), 1, "TOTP survived" );
 
+# Delete 2FA by type (with search)
+resetSessions;
+$cli->run( "secondfactors", { where => "_session_uid=dwho" }, "delType",
+    "U2F" );
+$res = getJson( "secondfactors", {}, "get", "dwho" );
+is( ( keys %{$res} ), 2, "Found one second factors" );
+is( ( grep { $_->{type} eq "U2F" } values %{$res} ),  0, "U2F was removed" );
+is( ( grep { $_->{type} eq "TOTP" } values %{$res} ), 1, "TOTP survived" );
+
+# Delete 2FA by type (with all)
+resetSessions;
+$cli->run( "secondfactors", { all => 1 }, "delType", "TOTP" );
+$res = getJson( "secondfactors", {}, "get", "dwho" );
+is( ( keys %{$res} ), 2, "Found two second factors for dwho" );
+is( ( grep { $_->{type} eq "TOTP" } values %{$res} ), 0, "TOTP was removed" );
+is( ( grep { $_->{type} eq "UBK" } values %{$res} ),  1, "UBK survived" );
+$res = getJson( "secondfactors", {}, "get", "rtyler" );
+is( ( keys %{$res} ), 1, "Found one second factors for rtyler" );
+is( ( grep { $_->{type} eq "TOTP" } values %{$res} ), 0, "TOTP was removed" );
+is( ( grep { $_->{type} eq "UBK" } values %{$res} ),  1, "UBK survived" );
+
 # Show consents
 $res = getJson( "consents", {}, "get", "dwho" );
 is( ( keys %{$res} ), 2, "Found two consents" );
@@ -309,7 +348,7 @@ is( ( keys %{$res} ), 2, "Found two consents" );
 
 $cli->run( "consents", {}, "delete", "dwho", "rp-example" );
 $res = getJson( "consents", {}, "get", "dwho" );
-is( ( keys %{$res} ), 1, "Found one consent" );
+is( ( keys %{$res} ),     1,     "Found one consent" );
 is( $res->{'rp-example'}, undef, "Consent for test-rp removed" );
 ok( $res->{'rp-example2'}, "Consent for test-rp2 still present" );
 

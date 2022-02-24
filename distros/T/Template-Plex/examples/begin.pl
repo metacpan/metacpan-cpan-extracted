@@ -4,6 +4,6 @@ use feature ":all";
 
 use Template::Plex;
 
-my $template='This is a template with a BEGIN block to load time: @{[time]}.  a= $a @{[ do{BEGIN {use Time::HiRes qw<time>}print "a is: ",$a}]}  Time is: @{[time]}, package is: @{[__PACKAGE__]}';
+my $template='This is a template with a BEGIN block to load time. Time before using BEGIN: @{[time]}. @{[ do{BEGIN {use Time::HiRes qw<time>}}]} Time after using BEGIN: @{[time]}';
 my $ren=plex [$template],{};
 say $ren->render();

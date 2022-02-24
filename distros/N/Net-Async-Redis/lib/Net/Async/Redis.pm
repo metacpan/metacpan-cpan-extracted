@@ -9,7 +9,7 @@ use parent qw(
     IO::Async::Notifier
 );
 
-our $VERSION = '3.020';
+our $VERSION = '3.021';
 our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 =head1 NAME
@@ -526,15 +526,6 @@ A string describing the local endpoint, usually C<host:port>.
 =cut
 
 sub local_endpoint { shift->{local_endpoint} }
-
-# Helper for XGROUP, recent versions of the API split that out into
-# separate two-word commands in the manual so this is here to support
-# any legacy code which calls `->xgroup`.
-sub xgroup {
-    my ($self, $cmd, @args) = @_;
-    my $method = "xgroup_" . lc($cmd);
-    return $self->$method(@args);
-}
 
 =head1 METHODS - Subscriptions
 

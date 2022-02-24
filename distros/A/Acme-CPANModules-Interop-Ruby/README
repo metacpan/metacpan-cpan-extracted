@@ -1,11 +1,11 @@
 NAME
-    Acme::CPANModules::Interop::Ruby - Modules/applications that help
-    interoperate with the Ruby world
+    Acme::CPANModules::Interop::Ruby - List of modules/applications that
+    help interoperate with the Ruby world
 
 VERSION
-    This document describes version 0.001 of
+    This document describes version 0.002 of
     Acme::CPANModules::Interop::Ruby (from Perl distribution
-    Acme-CPANModules-Interop-Ruby), released on 2022-01-15.
+    Acme-CPANModules-Interop-Ruby), released on 2022-02-04.
 
 DESCRIPTION
   SEE ALSO
@@ -15,28 +15,23 @@ DESCRIPTION
     Acme::CPANModules::PortedFrom::Ruby
 
 ACME::CPANMODULES ENTRIES
-    Inline::Ruby
-        Write Ruby code inside your Perl code.
+    *   Inline::Ruby - Write Ruby code inside your Perl code
 
         Author: SHLOMIF <https://metacpan.org/author/SHLOMIF>
 
-    Ruby
-        API to local Ruby interpreter.
+    *   Ruby - API to local Ruby interpreter
 
         Author: GFUJI <https://metacpan.org/author/GFUJI>
 
-    Data::Format::Pretty::Ruby
-        Like Data::Dumper but outputs Ruby code.
+    *   Data::Format::Pretty::Ruby - Like Data::Dumper but outputs Ruby code
 
         Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    mRuby
-        Binding to the embedded Ruby interpreter.
+    *   mRuby - Binding to the embedded Ruby interpreter
 
         Author: KARUPA <https://metacpan.org/author/KARUPA>
 
-    HTML::ERuby
-        Parse ERuby document.
+    *   HTML::ERuby - Parse ERuby document
 
         Author: IKEBE <https://metacpan.org/author/IKEBE>
 

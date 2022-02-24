@@ -2,8 +2,13 @@
 #define __PDLCORE_H
 
 /* version 20: memory-management changes */
-/* on 21, unify pdl_thread per_pdl_flags, par_flags */
+/* on 21, unify pdl_broadcast per_pdl_flags, par_flags; remove threadloop #defines; change creating to char */
 #define PDL_CORE_VERSION 20
+#define startbroadcastloop startthreadloop
+#define pdl_startbroadcastloop pdl_startthreadloop
+#define iterbroadcastloop iterthreadloop
+#define pdl_iterbroadcastloop pdl_iterthreadloop
+#define get_broadcastdims get_threaddims
 
 #include "EXTERN.h"   /* std perl include */
 #include "perl.h"     /* std perl include */
@@ -48,6 +53,9 @@ PDL_Anyval pdl_at( void* x, int datatype, PDL_Indx* pos, PDL_Indx* dims, /* Valu
              PDL_Indx *incs, PDL_Indx offset, PDL_Indx ndims);
 pdl_error pdl_writebackdata_vaffine(pdl *it);
 pdl_error pdl_readdata_vaffine(pdl *it);
+pdl_error pdl_dim_checks(pdl_transvtable *vtable, pdl **pdls,
+  pdl_broadcast *broadcast, PDL_Indx *creating,
+  PDL_Indx *ind_sizes, char load_only);
 
 /* pdlutil.c */
 typedef enum {
@@ -57,15 +65,15 @@ typedef enum {
 } pdl_flags;
 pdl_error pdl_croak_param(pdl_transvtable *transvtable, int paramIndex, char *pat, ...);
 void pdl_print_iarr(PDL_Indx *iarr, int n);
-void pdl_dump_thread(pdl_thread *thread);
-void pdl_dump_threading_info(
+void pdl_dump_broadcast(pdl_broadcast *broadcast);
+void pdl_dump_broadcasting_info(
   int npdls, PDL_Indx* creating, int target_pthread,
-  PDL_Indx *nthreadedDims, PDL_Indx **threadedDims, PDL_Indx **threadedDimSizes,
+  PDL_Indx *nbroadcastedDims, PDL_Indx **broadcastedDims, PDL_Indx **broadcastedDimSizes,
   int maxPthreadPDL, int maxPthreadDim, int maxPthread
 );
-void pdl_thread_mismatch_msg(
+void pdl_broadcast_mismatch_msg(
   char *s,
-  pdl **pdls, pdl_thread *thread,
+  pdl **pdls, pdl_broadcast *broadcast,
   PDL_Indx i, PDL_Indx j, PDL_Indx nimpl,
   PDL_Indx *realdims,PDL_Indx *creating
 );
@@ -88,21 +96,21 @@ void pdl_dump_anyval(PDL_Anyval v);
   X(setdims, pdl_error, ( pdl* it, PDL_Indx* dims, PDL_Indx ndims )) \
   X(at0, PDL_Anyval, ( pdl* x )) \
   X(reallocdims, pdl_error, ( pdl *it,PDL_Indx ndims )) \
-  X(reallocthreadids, pdl_error, ( pdl *it,PDL_Indx ndims )) \
+  X(reallocbroadcastids, pdl_error, ( pdl *it,PDL_Indx ndims )) \
   X(resize_defaultincs, void, ( pdl *it )) /* Make incs out of dims */ \
-  X(clearthreadstruct, void, (pdl_thread *it)) \
-  X(initthreadstruct, pdl_error, (int nobl,pdl **pdls,PDL_Indx *realdims, \
+  X(clearbroadcaststruct, void, (pdl_broadcast *it)) \
+  X(initbroadcaststruct, pdl_error, (int nobl,pdl **pdls,PDL_Indx *realdims, \
     PDL_Indx *creating,PDL_Indx npdls,pdl_transvtable *transvtable, \
-    pdl_thread *thread,PDL_Indx *ind_sizes,PDL_Indx *inc_sizes, \
+    pdl_broadcast *broadcast,PDL_Indx *ind_sizes,PDL_Indx *inc_sizes, \
     char *flags, int noPthreadFlag)) \
   X(redodims_default, pdl_error, (pdl_trans *)) \
-  X(startthreadloop, int, (pdl_thread *thread,pdl_error (*func)(pdl_trans *), \
+  X(startbroadcastloop, int, (pdl_broadcast *broadcast,pdl_error (*func)(pdl_trans *), \
     pdl_trans *, pdl_error *)) \
-  X(get_threadoffsp, PDL_Indx*, (pdl_thread *thread)) /* For pthreading */ \
-  X(get_threaddims, PDL_Indx*, (pdl_thread *thread)) /* For pthreading */ \
-  X(iterthreadloop, int, (pdl_thread *thread, PDL_Indx which)) \
-  X(freethreadstruct, void, (pdl_thread *thread)) \
-  X(thread_create_parameter, pdl_error, (pdl_thread *thread,PDL_Indx j, \
+  X(get_threadoffsp, PDL_Indx*, (pdl_broadcast *broadcast)) /* For pthreading */ \
+  X(get_broadcastdims, PDL_Indx*, (pdl_broadcast *broadcast)) /* For pthreading */ \
+  X(iterbroadcastloop, int, (pdl_broadcast *broadcast, PDL_Indx which)) \
+  X(freebroadcaststruct, void, (pdl_broadcast *broadcast)) \
+  X(broadcast_create_parameter, pdl_error, (pdl_broadcast *broadcast,PDL_Indx j, \
     PDL_Indx *dims, int temp)) \
   X(add_deletedata_magic, pdl_error,  (pdl *it,void (*func)(pdl *, Size_t param), \
     Size_t param)) /* Automagic destructor */ \

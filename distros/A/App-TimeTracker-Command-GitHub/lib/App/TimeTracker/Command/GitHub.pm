@@ -1,12 +1,12 @@
 package App::TimeTracker::Command::GitHub;
 use strict;
 use warnings;
-use 5.020;
+use 5.024;
 
 # ABSTRACT: App::TimeTracker GitHub plugin
 use App::TimeTracker::Utils qw(error_message warning_message);
 
-our $VERSION = "1.001";
+our $VERSION = "1.002";
 
 use Moose::Role;
 use Pithub;
@@ -69,8 +69,6 @@ before [ 'cmd_start', 'cmd_continue', 'cmd_append' ] => sub {
     my $issue = $response->content;
     my $name  = $issue->{title};
 
-    #use Data::Dumper; $Data::Dumper::Maxdepth=3;$Data::Dumper::Sortkeys=1;warn Data::Dumper::Dumper $data;
-
     if ( defined $self->description ) {
         $self->description( $self->description . ' ' . $name );
     }
@@ -86,55 +84,6 @@ before [ 'cmd_start', 'cmd_continue', 'cmd_append' ] => sub {
         $branch =~ s/_/-/g;
         $self->branch( lc($branch) ) unless $self->branch;
     }
-
-    ## reopen
-    #if ($self->config->{github}{reopen} && $issue->{state} eq 'closed') {
-    #    $self->_call('PUT','projects/'.$self->project_id.'/issues/'.$issue_id.'?state_event=reopen');
-    #    say "reopend closed issue";
-    #}
-    #
-    ## set assignee
-    #if ($self->config->{github}{set_assignee}) {
-    #    my $assignee;
-    #    if ($issue->{assignees} && $issue->{assignees}[0] && $issue->{assignees}[0]{username}) {
-    #        $assignee = $issue->{assignees}[0]{username};
-    #    }
-    #    elsif ( $issue->{assignee} && $issue->{assignee}{username}) {
-    #        $assignee = $issue->{assignee}{username};
-    #    }
-    #
-    #    if (my $user = $self->_call('GET','user')) {
-    #        if ($assignee) {
-    #            if ($assignee ne $user->{username}) {
-    #                warning_message("Assignee already set to ".$assignee);
-    #            }
-    #        }
-    #        else {
-    #            $self->_call('PUT','projects/'.$self->project_id.'/issues/'.$issue_id.'?assignee_id='.$user->{id});
-    #            say "Assignee set to you";
-    #        }
-    #    }
-    #    else {
-    #        error_message("Cannot get user-id, thus cannot assign issue");
-    #    }
-    #}
-    #
-    ## un/set labels
-    #if (my $on_start = $self->config->{github}{labels_on_start}) {
-    #    my %l = map {$_ => 1} @{$issue->{labels}};
-    #    if (my $add = $on_start->{add}) {
-    #        foreach my $new (@$add) {
-    #            $l{$new}=1;
-    #        }
-    #    }
-    #    if (my $remove = $on_start->{remove}) {
-    #        foreach my $remove (@$remove) {
-    #            delete $l{$remove};
-    #        }
-    #    }
-    #    $self->_call('PUT','projects/'.$self->project_id.'/issues/'.$issue_id.'?labels='.uri_escape(join(',',keys %l)));
-    #    say "Labels are now: ".join(', ',sort keys %l);
-    #}
 };
 
 sub App::TimeTracker::Data::Task::github_issue {
@@ -161,7 +110,7 @@ App::TimeTracker::Command::GitHub - App::TimeTracker GitHub plugin
 
 =head1 VERSION
 
-version 1.001
+version 1.002
 
 =head1 DESCRIPTION
 

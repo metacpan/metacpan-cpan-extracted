@@ -160,7 +160,7 @@ count(1);
 # Query IdP with iframe src
 my $url = $1;
 $query = $2;
-expectCspChildOK($res, "auth.idp.com");
+expectCspChildOK( $res, "auth.idp.com" );
 
 switch ('issuer');
 ok(

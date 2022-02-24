@@ -1,0 +1,120 @@
+#!/usr/bin/perl
+
+use 5.011 ; 
+use strict ; 
+use warnings ; 
+use autodie qw[ open ] ;
+use Fcntl qw[ :DEFAULT :flock :seek] ;
+use Getopt::Std ; getopts 'ab:d:sw:z:' , \my %o ; 
+use POSIX qw [ strftime ] ; 
+use Time::HiRes qw[ sleep gettimeofday tv_interval ] ; 
+use Time::Local qw[ timegm ] ; # タイムゾーンごとに異なる時差を算出するため
+
+& HELP_MESSAGE if @ARGV == 0 ;
+my $H = $o{b} // '=== ' ; # 出力する日時情報の先頭に付加する文字列
+my $od0 = 0 eq ( $o{d} // '' ) ; # opt_d0  
+my $ow0 = 0 eq ( $o{w} // '' ) ; # opt_w0  
+my $oz0 = 0 eq ( $o{z} // '' ) ; # opt_z0
+my @wday = qw[ sun mon tue wed thu fri sat ] ; # 7個の値は必ず文字数(バイト数)は一定とすること。
+my $zone = $oz0 ? '' : do { my $d = timegm(localtime)-timegm(gmtime) ; sprintf '%+03d:%02d', $d/3600, $d/60 % 60 } ;
+my $dfmt = $od0 ? '' : '%Y-%m-%d ' ; # stfrtime に渡す日付の部分
+my $fmt = $o{s} ? "$dfmt%H:%M:%S$zone" : "$dfmt%H:%M$zone" ;
+my $DTSTR = do {  my @T = localtime ; my $w = $ow0 ? '' : "($wday[$T[6]])"; $H . strftime( $fmt , @T ) . $w  } ; 
+my $LEN = 1 + length $DTSTR ; # 1 は改行文字の分の1バイト。
+sysopen my $FH , $ARGV[0] , O_RDWR | O_CREAT or die ; # +>> だと、最後の位置に読み書きすることを宣言。
+
+my $sflg = 0 ; # スリープフラグ
+until ( flock $FH , LOCK_SH | LOCK_NB ) { sleep 0.25 ; $sflg = 1 }  ; # 書込みロック(ブロック無し)
+sleep 0.25 if $sflg -- ; 
+flock $FH , LOCK_SH ;
+
+if (
+  ! $o{a} && sysseek $FH , -2 * $LEN , SEEK_END 
+  and do { sysread $FH , my $s1 , 2 * $LEN ; my $s2 = substr $s1 , $LEN , $LEN , '' ;
+          $s1 =~ m/^\Q$H\E.*:.*\n$/ && $s2 =~ m/^\Q$H\E.*:.*\n$/ }
+  and do { my $t = sysseek $FH , -1 , SEEK_CUR ; $t ? do { sysread $FH , my $c , 1 ; $c eq "\n" } : 1 }
+  ) { sysseek $FH , -$LEN , SEEK_END } else { sysseek $FH , 0, SEEK_END } 
+
+#my $flg = ! $o{a} && sysseek $FH , -2 * $LEN , 2  ; 
+#$flg = 0 unless do { my $t = sysseek $FH , -1 , 1 ; $t ? do { sysread $FH , my $c , 1 ; say "\$c='$c'" ;$c eq "\n" } : 1 } ; 
+#sysread $FH , my $s1 , 2 * $LEN ; 
+#my $s2 = substr $s1 , $LEN , $LEN , '' ;
+#$flg = 0 unless $s1 =~ m/^\Q$H\E.*:.*\n$/ && $s2 =~ m/^\Q$H\E.*:.*\n$/ ; 
+#$flg ? sysseek $FH , -$LEN , 1 : sysseek $FH , 0, 2 ;
+
+#my $fp = (stat($FH))[2] ; say $fp ;chmod 000, $FH ; $FH->flush ;
+print $FH "$DTSTR\n" ; # flock $FH , LOCK_UN ; 
+#$FH->flush ;chmod $fp, $FH ; 
+#sleep 5 ;
+
+close $FH ; 
+
+
+## ヘルプの扱い
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE {
+  use FindBin qw[ $Script ] ; 
+  $ARGV[1] //= '' ; # options という文字列の任意の先頭部分が含まれているかどうかを後で判定する。
+  open my $FH , '<' , $0 ; # このプログラムファイル自体を開いて、=head1から=cutまでをヘルプの文面として出力する。
+  while(<$FH>){
+    s/\$0/$Script/g ;
+    print $_ if s/^=head1// .. s/^=cut// and $ARGV[1] =~ /^o(p(t(i(o(ns?)?)?)?)?)?$/i ? m/^\s+\-/ : 1;
+  }
+  close $FH ;
+  exit 0 ;
+}
+
+=encoding utf8
+
+=head1 
+
+  $0 FILE
+  
+    - FILEは /dev/stdout が指定可能である。
+
+  引数で与えられたファイルFILE(何かのログファイルを想定)に、次のような行を末尾に付加する。
+
+  1. その時点の日時を表す文字列。たとえば「=== 2022-02-03 14:55+09:00(wed)」。
+  2. そのファイルFILEの末尾の2行が、このプログラム$0が追加したと判断される場合には、
+     そのファイルFILEの末尾の1行のみを、その時点の日時を表す文字列で置き換える。
+
+  上記のようにプログラム$0を反復実行させることで(cron等を用いる)、
+  何かのログファイルであるFILEは次の様になり、どの時点で書き込まれたのか分かり安くなる。
+
+  - LOGFILEに別のプログラムの実行結果が随時書き込まれているとする。
+  - 毎分 cronで $0 LOGFILE を実行しているとする。
+  - すると、随時LOGFILEに書き込まれた各行L1の1行前L0と1行後L2に、cronにより起動された$0が
+    日時情報を書き込まれているので、L1の書込日時は、L0とL2に書かれた2個の日時の間だと判明する。
+
+
+  オプション: 
+
+    -a      : 上記の2.の判断をして実行をすることはせず、単純に日時文字列を書き足す。
+    -b STR  : 日時情報の先頭に付加する文字列。指定無しの場合は「=== 」の4文字。
+    -d 0    : 日時情報の内、日付を出さない。日付より下の時刻情報のみになる。
+    -s      : 日時情報を秒単位にする。このオプションが無い場合は、分単位。
+    -w 0    : 曜日を出力しない。
+    -z 0    : 時差情報(例 +09:00) を出力しない。
+
+  内部動作のメモ : 
+
+    + このプログラムが多重起動された場合も想定して、ファイルロックを掛ける。ファイルロックを
+      検出したら、0.25秒間待つ。
+    + 最後の2行の文字列の検査は、簡便である。バイト数と文字列の先頭の一致とコロンの存在のみしか
+      調べていない。従って、偶然または巧妙なしかけによって、意図しない(このプログラムが想定しない)
+      動作をさせることが可能である。(従って、-aというオプションを作った。)
+
+  開発上のメモ: 
+
+    * ログファイルであるから、他のプロセスも同じファイルに同時に書込みをする可能性があるので、
+      それによって起こされる弊害を最小化する必要がある。
+
+     * このプログラムが追記する日時を表す文字列は、32バイトなどと決めた長さで書き込むようにする。
+     * このことで、上記の動作2.において、置き換える場合に、同時書込の不都合が起きなくなる。
+     * このブログラム自体を複数個起動しても問題無いように、関数flockを使う。
+     * その場合、lockが1秒以内に解除されない場合に、返り値を非正常にして、終了する。
+
+    * 標準入力から入力を受け取った場合、その入力の文字列の先頭に、日時文字列を追加することはできないか? 
+
+
+=cut

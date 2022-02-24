@@ -16,6 +16,8 @@
 #endif
 
 #include "perl-additions.c.inc"
+#include "forbid_outofblock_ops.c.inc"
+#include "newOP_CUSTOM.c.inc"
 
 static XOP xop_pushdefer;
 
@@ -63,50 +65,11 @@ static OP *pp_pushdefer(pTHX)
   return PL_op->op_next;
 }
 
-static OP *pp_return_in_defer(pTHX)
-{
-  croak("Can't \"%s\" out of a defer block", PL_op_name[PL_op->op_type]);
-}
-
-static OP *pp_loopex_in_defer(pTHX)
-{
-  /* TODO: This might be safe, depending on the target.
-   * Detect and allow the OK ones */
-  croak("Can't \"%s\" out of a defer block", PL_op_name[PL_op->op_type]);
-}
-
-static OP *pp_goto_in_defer(pTHX)
-{
-  /* TODO: This might be safe, depending on the target.
-   * Detect and allow the OK ones */
-  croak("Can't \"%s\" out of a defer block", PL_op_name[PL_op->op_type]);
-}
-
-static void forbid_ops(OP *body);
-static void forbid_ops(OP *body)
-{
-  if(body->op_type == OP_RETURN)
-    body->op_ppaddr = &pp_return_in_defer;
-  else if(body->op_type == OP_NEXT || body->op_type == OP_LAST || body->op_type == OP_REDO)
-    body->op_ppaddr = &pp_loopex_in_defer;
-  else if(body->op_type == OP_GOTO)
-    body->op_ppaddr = &pp_goto_in_defer;
-
-  if(!(body->op_flags & OPf_KIDS))
-    return;
-
-  OP *kid = cUNOPx(body)->op_first;
-  while(kid) {
-    forbid_ops(kid);
-    kid = OpSIBLING(kid);
-  }
-}
-
 static int build_defer(pTHX_ OP **out, XSParseKeywordPiece *arg0, void *hookdata)
 {
   OP *body = arg0->op;
 
-  forbid_ops(body);
+  forbid_outofblock_ops(body, "a defer block");
 
   *out = newLOGOP_CUSTOM(&pp_pushdefer, 0,
     newOP(OP_NULL, 0), body);

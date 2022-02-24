@@ -8,7 +8,7 @@ use Ref::Util qw( is_coderef is_arrayref );
 use if $^O eq 'MSWin32', 'Win32';
 
 # ABSTRACT: Basic implementation of the XDG base directory specification
-our $VERSION = '0.11'; # VERSION
+our $VERSION = '1.01'; # VERSION
 
 
 
@@ -22,7 +22,6 @@ sub new {
 
     my $api = delete $args{api};
     $api = 0 unless defined $api;
-    Carp::carp("Note: experimental use of api = 1") if $api == 1;
     Carp::croak("Unsupported api = $api") unless $api == 0 || $api == 1;
 
     my $path_class = delete $args{path_class};
@@ -266,13 +265,13 @@ File::XDG - Basic implementation of the XDG base directory specification
 
 =head1 VERSION
 
-version 0.11
+version 1.01
 
 =head1 SYNOPSIS
 
- use File::XDG;
+ use File::XDG 1.00;
  
- my $xdg = File::XDG->new(name => 'foo');
+ my $xdg = File::XDG->new( name => 'foo', api => 1 );
  
  # user config
  my $path = $xdg->config_home;
@@ -319,13 +318,11 @@ The API version to use.
 
 =item api = 0
 
-The default and original API version.
+The default and original API version.  For backward compatibility only.
 
 =item api = 1
 
-Currently experimental API version.  This will issue a warning when invoked
-until version C<1.00> is released.  At this point the version 1 API will
-be stable.
+Recommended stable API version for all new code.
 
 =back
 
@@ -511,15 +508,7 @@ according to the spec.
 
 =head2 lookup_data_file
 
- # api = 0
- my $path = $xdg->lookup_data_file($subdir, $filename);
-
-Looks up the data file by searching for C<./$subdir/$filename> relative to all base
-directories indicated by C<$XDG_DATA_HOME> and C<$XDG_DATA_DIRS>. If an environment
-variable is either not set or empty, its default value as defined by the
-specification is used instead. Returns a path class object.
-
- # api = 1
+ my $xdg = File::XDG->new( name => $name, api => 1 ); # recommended
  my $path = $xdg->lookup_data_File($filename);
 
 Looks up the data file by searching for C<./$name/$filename> (where C<$name> is
@@ -528,17 +517,17 @@ C<$XDG_DATA_HOME> and C<$XDG_DATA_DIRS>. If an environment variable is either
 not set or empty, its default value as defined by the specification is used
 instead. Returns a path class object.
 
+ my $xdg = File::XDG->new( name => $name ); # back compat only
+ my $path = $xdg->lookup_data_file($subdir, $filename);
+
+Looks up the data file by searching for C<./$subdir/$filename> relative to all base
+directories indicated by C<$XDG_DATA_HOME> and C<$XDG_DATA_DIRS>. If an environment
+variable is either not set or empty, its default value as defined by the
+specification is used instead. Returns a path class object.
+
 =head2 lookup_config_file
 
- # api = 0
- my $path = $xdg->lookup_config_file($subdir, $filename);
-
-Looks up the configuration file by searching for C<./$subdir/$filename> relative to
-all base directories indicated by C<$XDG_CONFIG_HOME> and C<$XDG_CONFIG_DIRS>. If an
-environment variable is either not set or empty, its default value as defined
-by the specification is used instead. Returns a path class object.
-
- # api = 1
+ my $xdg = File::XDG->new( name => $name, api => 1 ); # recommended
  my $path = $xdg->lookup_config_file($filename);
 
 Looks up the configuration file by searching for C<./$name/$filename> (where C<$name> is
@@ -546,6 +535,14 @@ provided by the constructor) relative to all base directories indicated by
 C<$XDG_CONFIG_HOME> and C<$XDG_CONFIG_DIRS>. If an environment variable is
 either not set or empty, its default value as defined by the specification
 is used instead. Returns a path class object.
+
+ my $xdg = File::XDG->new( name => $name ); # back compat only
+ my $path = $xdg->lookup_config_file($subdir, $filename);
+
+Looks up the configuration file by searching for C<./$subdir/$filename> relative to
+all base directories indicated by C<$XDG_CONFIG_HOME> and C<$XDG_CONFIG_DIRS>. If an
+environment variable is either not set or empty, its default value as defined
+by the specification is used instead. Returns a path class object.
 
 =head1 SEE ALSO
 

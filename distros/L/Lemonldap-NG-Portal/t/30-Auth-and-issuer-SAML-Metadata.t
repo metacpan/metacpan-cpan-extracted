@@ -21,19 +21,19 @@ SKIP: {
     # Initialization
     $issuer = register( 'issuer', \&issuer );
 
-    ok( $res = $issuer->_get('/saml/metadata'), 'Get metadata' );
+    ok( $res = $issuer->_get('/saml/metadata'),         'Get metadata' );
     ok( $res->[2]->[0] =~ m#^<\?xml version="1.0"\?>#s, 'Metadata is XML' );
 
-    ok( $res = $issuer->_get('/saml/metadata/idp'), 'Get IDP metadata' );
+    ok( $res = $issuer->_get('/saml/metadata/idp'),     'Get IDP metadata' );
     ok( $res->[2]->[0] =~ m#^<\?xml version="1.0"\?>#s, 'Metadata is XML' );
     ok(
         $res->[2]->[0] !~ m#<SPSSODescriptor#s,
         'Metadata does not contain SP information'
     );
     ok( $res->[2]->[0] =~ m#entityID="urn:example\.com"#s,
-        'IDP EntityID is overriden' );
+        'IDP EntityID is overridden' );
 
-    ok( $res = $issuer->_get('/saml/metadata/sp'), 'Get SP metadata' );
+    ok( $res = $issuer->_get('/saml/metadata/sp'),      'Get SP metadata' );
     ok( $res->[2]->[0] =~ m#^<\?xml version="1.0"\?>#s, 'Metadata is XML' );
     ok(
         $res->[2]->[0] !~ m#<IDPSSODescriptor#s,

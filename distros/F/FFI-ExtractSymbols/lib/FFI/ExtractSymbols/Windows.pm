@@ -9,7 +9,7 @@ use Path::Tiny;
 my $config = File::ShareDir::Dist::dist_config('FFI-ExtractSymbols');
 
 # ABSTRACT: Windows (and Cygwin) implementation for FFI::ExtractSymbols
-our $VERSION = '0.06'; # VERSION
+our $VERSION = '0.07'; # VERSION
 
 
 return 1 if FFI::ExtractSymbols->can('extract_symbols') || $^O !~ /^(MSWin32|cygwin)$/;
@@ -94,7 +94,7 @@ FFI::ExtractSymbols::Windows - Windows (and Cygwin) implementation for FFI::Extr
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 DESCRIPTION
 

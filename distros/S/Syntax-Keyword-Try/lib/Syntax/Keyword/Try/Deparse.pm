@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
 
-package Syntax::Keyword::Try::Deparse 0.26;
+package Syntax::Keyword::Try::Deparse 0.27;
 
 use v5.14;
 use warnings;

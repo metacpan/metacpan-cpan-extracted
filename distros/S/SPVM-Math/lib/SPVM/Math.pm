@@ -1,16 +1,16 @@
 package SPVM::Math;
 
-our $VERSION = '0.06';
+our $VERSION = '0.09';
 
 1;
 
 =head1 NAME
 
-SPVM::Math - SPVM Math Functions
+SPVM::Math - Math Functions
 
 =head1 CAUTHION
 
-B<L<SPVM> is yet before 1.0 released. L<SPVM> is changed without warnings. There will be quite a lot of changes until I feel enough good.>
+B<The SPVM::Math module depends on the L<SPVM> module. The L<SPVM> module is yet before 1.0 released. The beta tests are doing. There will be a little reasonable changes yet.>
 
 =head1 SYNOPSYS
 
@@ -28,214 +28,11 @@ B<L<SPVM> is yet before 1.0 released. L<SPVM> is changed without warnings. There
 
 =head1 DESCRIPTION
 
-L<SPVM::Math> is a L<SPVM> module that defines mathmatical functions. 
-
-=head1 EXAMPELS
-
-=begin html
-
-<h2>Complex Tutorial</h2>
-
-SPVM provides common arithmetic for complex numbers at the same level as C99.
-
-<h3>Complex Type</h3>
-
-Complex Type is Complex_2f for complex float and Complex_2d for complex double.
-
-Complex_2f and Complex_2d is <a href="/language.html#language-type-multi-numeric">Multi Numeric Type</a>. This is allocated on Method Call Stack.
-
-This is not Object Type which is allocated on Heap Memory.
-
-See <a href="https://github.com/yuki-kimoto/SPVM/tree/master/examples/matrix">SPVM Complex Examples</a> at first.
-
-<h4>Complex_2f</h4>
-
-<pre>
-# Complex float type
-use Complex_2f;
-
-my $z : Complex_2f;
-$z->{re} = 1.5f;
-$z->{im} = 1.7f;
-</pre>
-
-<h4>Complex_2d</h4>
-
-<pre>
-# Complex double type
-use Complex_2d;
-
-my $z : Complex_2d;
-$z->{re} = 1.5;
-$z->{im} = 1.7;
-</pre>
-
-<h3>New Complex Functions</h3>
-
-New Complex functions
-
-<pre>
-use Math (complexf, complex);
-
-# Complex_2f
-my $z = complexf(1.5f, 1.7f);
-
-# Complex_2d
-my $z = complex(1.5, 1.7);
-</pre>
-
-<h3>Complex Operation</h3>
-
-<h4>float Complex Addition, Subtract, Multiply, Scalar Multiply, Division</h4>
-
-float Complex Addition, Subtract, Multiply, Scalar Multiply, Division.
-
-<pre>
-# float Addition, Subtract, Multiply, Scalar Multiply, Division functions
-use Math(caddf, csubf, cmulf, cscamulf, cdivf);
-
-my $z1 = complexf(1.5f, 1.7f);
-my $z2 = complexf(2.5f, 2.7f);
-
-# Addition
-my $z_add = caddf($z1, $z2);
-
-# Subtract
-my $z_method = csubf($z1, $z2);
-
-# Multiply
-my $z_mul = cmulf($z1, $z2);
-
-# Scalar Multiply
-my $z_scamul = cscamulf(3, $z2);
-
-# Division
-my $z_div = cdivf($z1, $z2);
-</pre>
-
-<h4>double Complex Addition, Subtract, Multiply, Scalar Multiply, Division</h4>
-
-<pre>
-# double Addition, Subtract, Multiply, Scalar Multiply, Division functions
-use Math(cadd, csub, cmul, cscamul, cdiv);
-
-my $z1 = complex(1.5, 1.7);
-my $z2 = complex(2.5, 2.7);
-
-# Addition
-my $z_add = cadd($z1, $z2);
-
-# Subtract
-my $z_method = csub($z1, $z2);
-
-# Multiply
-my $z_mul = cmul($z1, $z2);
-
-# Scalar Multiply
-my $z_scamul = cscamul(3, $z2);
-
-# Division
-my $z_div = cdiv($z1, $z2);
-</pre>
-
-<h3>Trigonometric functions</h3>
-
-Trigonometric functions.
-
-<h4>float Trigonometric functions</h4>
-
-float Trigonometric functions.
-
-<pre>
-# float Trigonometric functions
-use Math(csinf, ccosf, ctanf);
-
-my $z = complexf(1.5f, 1.7f);
-
-# Addition
-my $z_sin = csinf($z);
-
-# Subtract
-my $z_cos = ccosf($z);
-
-# Multiply
-my $z_tan = ctanf($z);
-</pre>
-
-<h4>double Trigonometric functions</h4>
-
-double Trigonometric functions.
-
-<pre>
-# double Trigonometric functions
-use Math(csin, ccos, ctan);
-
-my $z = complex(1.5, 1.7);
-
-# Addition
-my $z_sin = csin($z);
-
-# Subtract
-my $z_cos = ccos($z);
-
-# Multiply
-my $z_tan = ctan($z);
-</pre>
-
-See Math for more complex functions
-
-<h3>Complex Array</h3>
-
-SPVM Array of Complex has values arranged in contiguous memory areas.
-
-<h4>Complex_2f[]</h4>
-
-<pre>
-# Complex float type
-use Complex_2f;
-
-my $zs = new Complex_2f[100];
-
-for (my $i = 0; $i < @$zs; $i++) {
-  my $z = $zs->[$i];
-  $z->{re} = 1.5f;
-  $z->{im} = 1.7f;
-}
-</pre>
-
-<h4>Complex_2d</h4>
-
-<pre>
-# Complex double type
-use Complex_2d;
-
-my $zs = new Complex_2d[100];
-
-for (my $i = 0; $i < @$zs; $i++) {
-  my $z = $zs->[$i];
-  $z->{re} = 1.5;
-  $z->{im} = 1.7;
-}
-</pre>
-
-<h3>Call complex function from Perl</h3>
-
-Call complex function from Perl. Argument is passed and return value is return.
-
-<pre>
-use SPVM 'MyComplex';
-
-my $z1 = {re => 1.7, im => 2.7};
-my $z2 = {re => 7.5, im => 2.5};
-
-my $z_ret = MyComplex->complex_call_from_perl($z1, $z2);
-
-print "($z_ret->{re}, $z_ret->{im})\n";
-</pre>
-
-=end html
+The C<Math> class defines mathmatical functions that contains C99 math functions.
 
 =head1 CLASS METHODS
+
+The list of class methods of C<Math> class.
 
 =head2 abs
 
@@ -247,223 +44,223 @@ Get the abusolute value of a int value.
 
   static method acos : double ($x : double)
 
-acos function defined in C language math.h.
+The binding to the C<acos> function of C language. This function is declared in C<math.h>.
 
 =head2 acosf
 
   static method acosf : float ($x : float)
 
-acosf function defined in C language math.h.
+The binding to the C<acosf> function of C language. This function is declared in C<math.h>.
 
 =head2 acosh
 
   static method acosh : double ($x : double)
 
-acosh function defined in C language math.h.
+The binding to the C<acosh> function of C language. This function is declared in C<math.h>.
 
 =head2 acoshf
 
   static method acoshf : float ($x : float)
 
-acoshf function defined in C language math.h.
+The binding to the C<acoshf> function of C language. This function is declared in C<math.h>.
 
 =head2 asin
 
   static method asin : double ($x : double)
 
-asin function defined in C language math.h.
+The binding to the C<asin> function of C language. This function is declared in C<math.h>.
 
 =head2 asinf
 
   static method asinf : float ($x : float)
 
-asinf function defined in C language math.h.
+The binding to the C<asinf> function of C language. This function is declared in C<math.h>.
 
 =head2 asinh
 
   static method asinh : double ($x : double)
 
-asinh function defined in C language math.h.
+The binding to the C<asinh> function of C language. This function is declared in C<math.h>.
 
 =head2 asinhf
 
   static method asinhf : float ($x : float)
 
-asinhf function defined in C language math.h.
+The binding to the C<asinhf> function of C language. This function is declared in C<math.h>.
 
 =head2 atan
 
   static method atan : double ($x : double)
 
-atan function defined in C language math.h.
+The binding to the C<atan> function of C language. This function is declared in C<math.h>.
 
 =head2 atan2
 
   static method atan2 : double ($y : double, $x : double)
 
-atan2 function defined in C language math.h.
+The binding to the C<atan2> function of C language. This function is declared in C<math.h>.
 
 =head2 atanf
 
   static method atanf : float ($x : float)
 
-atanf function defined in C language math.h.
+The binding to the C<atanf> function of C language. This function is declared in C<math.h>.
 
 =head2 atanh
 
   static method atanh : double ($x : double)
 
-atanh function defined in C language math.h.
+The binding to the C<atanh> function of C language. This function is declared in C<math.h>.
 
 =head2 atanhf
 
   static method atanhf : float ($x : float)
 
-atanhf function defined in C language math.h.
+The binding to the C<atanhf> function of C language. This function is declared in C<math.h>.
 
 =head2 cabs
 
   static method cabs : double ($z : Complex_2d)
 
-cabs function defined in C language complex.h.
+The binding to the C<cabs> function of C language. This function is declared in C<complex.h>.
 
 =head2 cabsf
 
   static method cabsf : float ($z : Complex_2f)
 
-cabsf function defined in C language complex.h.
+The binding to the C<cabsf> function of C language. This function is declared in C<complex.h>.
 
 =head2 cacos
 
   static method cacos : Complex_2d ($z : Complex_2d)
 
-cacos function defined in C language complex.h.
+The binding to the C<cacos> function of C language. This function is declared in C<complex.h>.
 
 =head2 cacosf
 
   static method cacosf : Complex_2f ($z : Complex_2f)
 
-cacosf function defined in C language complex.h.
+The binding to the C<cacosf> function of C language. This function is declared in C<complex.h>.
 
 =head2 cacosh
 
   static method cacosh : Complex_2d ($z : Complex_2d)
 
-cacosh function defined in C language complex.h.
+The binding to the C<cacosh> function of C language. This function is declared in C<complex.h>.
 
 =head2 cacoshf
 
   static method cacoshf : Complex_2f ($z : Complex_2f)
 
-cacoshf function defined in C language complex.h.
+The binding to the C<cacoshf> function of C language. This function is declared in C<complex.h>.
 
 =head2 cadd
 
   static method cadd : Complex_2d ($z1 : Complex_2d, $z2 : Complex_2d)
 
-cadd function defined in C language complex.h.
+The binding to the C<cadd> function of C language. This function is declared in C<complex.h>.
 
 =head2 caddf
 
   static method caddf : Complex_2f ($z1 : Complex_2f, $z2 : Complex_2f)
 
-caddf function defined in C language complex.h.
+The binding to the C<caddf> function of C language. This function is declared in C<complex.h>.
 
 =head2 carg
 
   static method carg : double ($z : Complex_2d)
 
-carg function defined in C language complex.h.
+The binding to the C<carg> function of C language. This function is declared in C<complex.h>.
 
 =head2 cargf
 
   static method cargf : float ($z : Complex_2f)
 
-cargf function defined in C language complex.h.
+The binding to the C<cargf> function of C language. This function is declared in C<complex.h>.
 
 =head2 casin
 
   static method casin : Complex_2d ($z : Complex_2d)
 
-casin function defined in C language complex.h.
+The binding to the C<casin> function of C language. This function is declared in C<complex.h>.
 
 =head2 casinf
 
   static method casinf : Complex_2f ($z : Complex_2f)
 
-casinf function defined in C language complex.h.
+The binding to the C<casinf> function of C language. This function is declared in C<complex.h>.
 
 =head2 casinh
 
   static method casinh : Complex_2d ($z : Complex_2d)
 
-casinh function defined in C language complex.h.
+The binding to the C<casinh> function of C language. This function is declared in C<complex.h>.
 
 =head2 casinhf
 
   static method casinhf : Complex_2f ($z : Complex_2f)
 
-casinhf function defined in C language complex.h.
+The binding to the C<casinhf> function of C language. This function is declared in C<complex.h>.
 
 =head2 catan
 
   static method catan : Complex_2d ($z : Complex_2d)
 
-catan function defined in C language complex.h.
+The binding to the C<catan> function of C language. This function is declared in C<complex.h>.
 
 =head2 catanf
 
   static method catanf : Complex_2f ($z : Complex_2f)
 
-catanf function defined in C language complex.h.
+The binding to the C<catanf> function of C language. This function is declared in C<complex.h>.
 
 =head2 catanh
 
   static method catanh : Complex_2d ($z : Complex_2d)
 
-catanh function defined in C language complex.h.
+The binding to the C<catanh> function of C language. This function is declared in C<complex.h>.
 
 =head2 catanhf
 
   static method catanhf : Complex_2f ($z : Complex_2f)
 
-catanhf function defined in C language complex.h.
+The binding to the C<catanhf> function of C language. This function is declared in C<complex.h>.
 
 =head2 cbrt
 
   static method cbrt : double ($x : double)
 
-cbrt function defined in C language math.h.
+The binding to the C<cbrt> function of C language. This function is declared in C<math.h>.
 
 =head2 cbrtf
 
   static method cbrtf : float ($x : float)
 
-cbrtf function defined in C language math.h.
+The binding to the C<cbrtf> function of C language. This function is declared in C<math.h>.
 
 =head2 ccos
 
   static method ccos : Complex_2d ($z : Complex_2d)
 
-ccos function defined in C language complex.h.
+The binding to the C<ccos> function of C language. This function is declared in C<complex.h>.
 
 =head2 ccosf
 
   static method ccosf : Complex_2f ($z : Complex_2f)
 
-ccosf function defined in C language complex.h.
+The binding to the C<ccosf> function of C language. This function is declared in C<complex.h>.
 
 =head2 ccosh
 
   static method ccosh : Complex_2d ($z : Complex_2d)
 
-ccosh function defined in C language complex.h.
+The binding to the C<ccosh> function of C language. This function is declared in C<complex.h>.
 
 =head2 ccoshf
 
   static method ccoshf : Complex_2f ($z : Complex_2f)
 
-ccoshf function defined in C language complex.h.
+The binding to the C<ccoshf> function of C language. This function is declared in C<complex.h>.
 
 =head2 cdiv
 
@@ -481,37 +278,37 @@ float complex division.
 
   static method ceil : double ($x : double)
 
-ceil function defined in C language math.h.
+The binding to the C<ceil> function of C language. This function is declared in C<math.h>.
 
 =head2 ceilf
 
   static method ceilf : float ($x : float)
 
-ceilf function defined in C language math.h.
+The binding to the C<ceilf> function of C language. This function is declared in C<math.h>.
 
 =head2 cexp
 
   static method cexp : Complex_2d ($z : Complex_2d)
 
-cexp function defined in C language complex.h.
+The binding to the C<cexp> function of C language. This function is declared in C<complex.h>.
 
 =head2 cexpf
 
   static method cexpf : Complex_2f ($z : Complex_2f)
 
-cexpf function defined in C language complex.h.
+The binding to the C<cexpf> function of C language. This function is declared in C<complex.h>.
 
 =head2 clog
 
   static method clog : Complex_2d ($z : Complex_2d)
 
-clog function defined in C language complex.h.
+The binding to the C<clog> function of C language. This function is declared in C<complex.h>.
 
 =head2 clogf
 
   static method clogf : Complex_2f ($z : Complex_2f)
 
-clogf function defined in C language complex.h.
+The binding to the C<clogf> function of C language. This function is declared in C<complex.h>.
 
 =head2 cmul
 
@@ -541,61 +338,61 @@ Create float complex value. This value is defined in L<Complex_2f|SPVM::Complex_
 
   static method conj : Complex_2d ($z : Complex_2d)
 
-conj function defined in C language complex.h.
+The binding to the C<conj> function of C language. This function is declared in C<complex.h>.
 
 =head2 conjf
 
   static method conjf : Complex_2f ($z : Complex_2f)
 
-conjf function defined in C language complex.h.
+The binding to the C<conjf> function of C language. This function is declared in C<complex.h>.
 
 =head2 copysign
 
   static method copysign : double ($x1 : double, $x2 : double)
 
-copysign function defined in C language math.h.
+The binding to the C<copysign> function of C language. This function is declared in C<math.h>.
 
 =head2 copysignf
 
   static method copysignf : float ($x1 : float, $x2 : float)
 
-copysignf function defined in C language math.h.
+The binding to the C<copysignf> function of C language. This function is declared in C<math.h>.
 
 =head2 cos
 
   static method cos : double ($x : double)
 
-cos function defined in C language math.h.
+The binding to the C<cos> function of C language. This function is declared in C<math.h>.
 
 =head2 cosf
 
   static method cosf : float ($x : float)
 
-cosf function defined in C language math.h.
+The binding to the C<cosf> function of C language. This function is declared in C<math.h>.
 
 =head2 cosh
 
   static method cosh : double ($x : double)
 
-cosh function defined in C language math.h.
+The binding to the C<cosh> function of C language. This function is declared in C<math.h>.
 
 =head2 coshf
 
   static method coshf : float ($x : float)
 
-coshf function defined in C language math.h.
+The binding to the C<coshf> function of C language. This function is declared in C<math.h>.
 
 =head2 cpow
 
   static method cpow : Complex_2d ($z1 : Complex_2d, $z2 : Complex_2d)
 
-cpow function defined in C language complex.h.
+The binding to the C<cpow> function of C language. This function is declared in C<complex.h>.
 
 =head2 cpowf
 
   static method cpowf : Complex_2f ($z1 : Complex_2f, $z2 : Complex_2f)
 
-cpowf function defined in C language complex.h.
+The binding to the C<cpowf> function of C language. This function is declared in C<complex.h>.
 
 =head2 cscamul
 
@@ -613,463 +410,463 @@ float complex scalar multiplication.
 
   static method csin : Complex_2d ($z : Complex_2d)
 
-csin function defined in C language complex.h.
+The binding to the C<csin> function of C language. This function is declared in C<complex.h>.
 
 =head2 csinf
 
   static method csinf : Complex_2f ($z : Complex_2f)
 
-csinf function defined in C language complex.h.
+The binding to the C<csinf> function of C language. This function is declared in C<complex.h>.
 
 =head2 csinh
 
   static method csinh : Complex_2d ($z : Complex_2d)
 
-csinh function defined in C language complex.h.
+The binding to the C<csinh> function of C language. This function is declared in C<complex.h>.
 
 =head2 csinhf
 
   static method csinhf : Complex_2f ($z : Complex_2f)
 
-csinhf function defined in C language complex.h.
+The binding to the C<csinhf> function of C language. This function is declared in C<complex.h>.
 
 =head2 csqrt
 
   static method csqrt : Complex_2d ($z : Complex_2d)
 
-csqrt function defined in C language complex.h.
+The binding to the C<csqrt> function of C language. This function is declared in C<complex.h>.
 
 =head2 csqrtf
 
   static method csqrtf : Complex_2f ($z : Complex_2f)
 
-csqrtf function defined in C language complex.h.
+The binding to the C<csqrtf> function of C language. This function is declared in C<complex.h>.
 
 =head2 csub
 
   static method csub : Complex_2d ($z1 : Complex_2d, $z2 : Complex_2d)
 
-csub function defined in C language complex.h.
+The binding to the C<csub> function of C language. This function is declared in C<complex.h>.
 
 =head2 csubf
 
   static method csubf : Complex_2f ($z1 : Complex_2f, $z2 : Complex_2f)
 
-csubf function defined in C language complex.h.
+The binding to the C<csubf> function of C language. This function is declared in C<complex.h>.
 
 =head2 ctan
 
   static method ctan : Complex_2d ($z : Complex_2d)
 
-ctan function defined in C language complex.h.
+The binding to the C<ctan> function of C language. This function is declared in C<complex.h>.
 
 =head2 ctanf
 
   static method ctanf : Complex_2f ($z : Complex_2f)
 
-ctanf function defined in C language complex.h.
+The binding to the C<ctanf> function of C language. This function is declared in C<complex.h>.
 
 =head2 ctanh
 
   static method ctanh : Complex_2d ($z : Complex_2d)
 
-ctanh function defined in C language complex.h.
+The binding to the C<ctanh> function of C language. This function is declared in C<complex.h>.
 
 =head2 ctanhf
 
   static method ctanhf : Complex_2f ($z : Complex_2f)
 
-ctanhf function defined in C language complex.h.
+The binding to the C<ctanhf> function of C language. This function is declared in C<complex.h>.
 
 =head2 E
 
   static method E : double ()
 
-Euler’s Number e. This value is 0x1.5bf0a8b145769p+1.
+Euler's Number e. This value is C<0x1.5bf0a8b145769p+1>.
 
 =head2 erf
 
   static method erf : double ($x : double)
 
-erf function defined in C language math.h.
+The binding to the C<erf> function of C language. This function is declared in C<math.h>.
 
 =head2 erfc
 
   static method erfc : double ($x : double)
 
-erfc function defined in C language math.h.
+The binding to the C<erfc> function of C language. This function is declared in C<math.h>.
 
 =head2 erfcf
 
   static method erfcf : float ($x : float)
 
-erfcf function defined in C language math.h.
+The binding to the C<erfcf> function of C language. This function is declared in C<math.h>.
 
 =head2 erff
 
   static method erff : float ($x : float)
 
-erff function defined in C language math.h.
+The binding to the C<erff> function of C language. This function is declared in C<math.h>.
 
 =head2 exp
 
   static method exp : double ($x : double)
 
-exp function defined in C language math.h.
+The binding to the C<exp> function of C language. This function is declared in C<math.h>.
 
 =head2 exp2
 
   static method exp2 : double ($x : double)
 
-exp2 function defined in C language math.h.
+The binding to the C<exp2> function of C language. This function is declared in C<math.h>.
 
 =head2 exp2f
 
   static method exp2f : float ($x : float)
 
-exp2f function defined in C language math.h.
+The binding to the C<exp2f> function of C language. This function is declared in C<math.h>.
 
 =head2 expf
 
   static method expf : float ($x : float)
 
-expf function defined in C language math.h.
+The binding to the C<expf> function of C language. This function is declared in C<math.h>.
 
 =head2 expm1
 
   static method expm1 : double ($x : double)
 
-expm1 function defined in C language math.h.
+The binding to the C<expm1> function of C language. This function is declared in C<math.h>.
 
 =head2 expm1f
 
   static method expm1f : float ($x : float)
 
-expm1f function defined in C language math.h.
+The binding to the C<expm1f> function of C language. This function is declared in C<math.h>.
 
 =head2 fabs
 
   static method fabs : double ($x : double)
 
-fabs function defined in C language math.h.
+The binding to the C<fabs> function of C language. This function is declared in C<math.h>.
 
 =head2 fabsf
 
   static method fabsf : float ($x : float)
 
-fabsf function defined in C language math.h.
+The binding to the C<fabsf> function of C language. This function is declared in C<math.h>.
 
 =head2 fdim
 
   static method fdim : double ($x1 : double, $x2 : double)
 
-fdim function defined in C language math.h.
+The binding to the C<fdim> function of C language. This function is declared in C<math.h>.
 
 =head2 fdimf
 
   static method fdimf : float ($x1 : float, $x2 : float)
 
-fdimf function defined in C language math.h.
+The binding to the C<fdimf> function of C language. This function is declared in C<math.h>.
 
 =head2 FE_DOWNWARD
 
   static method FE_DOWNWARD : int ()
 
-FE_DOWNWARD macro defined in C language fenv.h.
+The binding to the C<FE_DOWNWARD> macro of C language. This macro is defined in fenv.h.
 
 =head2 FE_TONEAREST
 
   static method FE_TONEAREST : int ()
 
-FE_TONEAREST macro defined in C language fenv.h.
+The binding to the C<FE_TONEAREST> macro of C language. This macro is defined in fenv.h.
 
 =head2 FE_TOWARDZERO
 
   static method FE_TOWARDZERO : int ()
 
-FE_TOWARDZERO macro defined in C language fenv.h.
+The binding to the C<FE_TOWARDZERO> macro of C language. This macro is defined in fenv.h.
 
 =head2 FE_UPWARD
 
   static method FE_UPWARD : int ()
 
-FE_UPWARD macro defined in C language fenv.h.
+The binding to the C<FE_UPWARD> macro of C language. This macro is defined in fenv.h.
 
 =head2 fesetround
 
   static method fesetround : int ($round : int)
 
-fesetround function defined in C language math.h.
+The binding to the C<fesetround> function of C language. This function is declared in C<math.h>.
 
 =head2 floor
 
   static method floor : double ($x : double)
 
-floor function defined in C language math.h.
+The binding to the C<floor> function of C language. This function is declared in C<math.h>.
 
 =head2 floorf
 
   static method floorf : float ($x : float)
 
-floorf function defined in C language math.h.
+The binding to the C<floorf> function of C language. This function is declared in C<math.h>.
 
 =head2 fma
 
   static method fma : double ($x1 : double, $x2 : double, $x3 : double)
 
-fma function defined in C language math.h.
+The binding to the C<fma> function of C language. This function is declared in C<math.h>.
 
 =head2 fmaf
 
   static method fmaf : float ($x1 : float, $x2 : float, $x3 : float)
 
-fmaf function defined in C language math.h.
+The binding to the C<fmaf> function of C language. This function is declared in C<math.h>.
 
 =head2 fmax
 
   static method fmax : double ($x1 : double, $x2 : double)
 
-fmax function defined in C language math.h.
+The binding to the C<fmax> function of C language. This function is declared in C<math.h>.
 
 =head2 fmaxf
 
   static method fmaxf : float ($x1 : float, $x2 : float)
 
-fmaxf function defined in C language math.h.
+The binding to the C<fmaxf> function of C language. This function is declared in C<math.h>.
 
 =head2 fmin
 
   static method fmin : double ($x1 : double, $x2 : double)
 
-fmin function defined in C language math.h.
+The binding to the C<fmin> function of C language. This function is declared in C<math.h>.
 
 =head2 fminf
 
   static method fminf : float ($x1 : float, $x2 : float)
 
-fminf function defined in C language math.h.
+The binding to the C<fminf> function of C language. This function is declared in C<math.h>.
 
 =head2 fmod
 
   static method fmod : double ($x1 : double, $x2 : double)
 
-fmod function defined in C language math.h.
+The binding to the C<fmod> function of C language. This function is declared in C<math.h>.
 
 =head2 fmodf
 
   static method fmodf : float ($x1 : float, $x2 : float)
 
-fmodf function defined in C language math.h.
+The binding to the C<fmodf> function of C language. This function is declared in C<math.h>.
 
 =head2 FP_ILOGB0
 
   static method FP_ILOGB0 : int ()
 
-FP_ILOGB0 macro defined in C language fenv.h.
+The binding to the C<FP_ILOGB0> macro of C language. This macro is defined in fenv.h.
 
 =head2 FP_ILOGBNAN
 
   static method FP_ILOGBNAN : int ()
 
-FP_ILOGBNAN macro defined in C language fenv.h.
+The binding to the C<FP_ILOGBNAN> macro of C language. This macro is defined in fenv.h.
 
 =head2 FP_INFINITE
 
   static method FP_INFINITE : int ()
 
-FP_INFINITE macro defined in C language fenv.h.
+The binding to the C<FP_INFINITE> macro of C language. This macro is defined in fenv.h.
 
 =head2 FP_NAN
 
   static method FP_NAN : int ()
 
-FP_NAN macro defined in C language fenv.h.
+The binding to the C<FP_NAN> macro of C language. This macro is defined in fenv.h.
 
 =head2 FP_ZERO
 
   static method FP_ZERO : int ()
 
-FP_ZERO macro defined in C language fenv.h.
+The binding to the C<FP_ZERO> macro of C language. This macro is defined in fenv.h.
 
 =head2 fpclassify
 
   static method fpclassify : int ($x : double)
 
-fpclassify macro defined in C language math.h. This method receives a double value.
+The binding to the C<fpclassify> macro of C language. This macro is defined in C<math.h>. This method receives a double value.
 
 =head2 fpclassifyf
 
   static method fpclassifyf : int ($x : float)
 
-fpclassify macro defined in C language math.h for float type. This method receives a float value.
+The binding to the C<fpclassify> macro of C language. This macro is defined in C<math.h> for float type. This method receives a float value.
 
 =head2 frexp
 
   static method frexp : double ($x : double, $exp : int*)
 
-frexp function defined in C language math.h.
+The binding to the C<frexp> function of C language. This function is declared in C<math.h>.
 
 =head2 frexpf
 
   static method frexpf : float ($x : float, $exp : int*)
 
-frexpf function defined in C language math.h.
+The binding to the C<frexpf> function of C language. This function is declared in C<math.h>.
 
 =head2 HUGE_VAL
 
   static method HUGE_VAL : double ()
 
-HUGE_VAL macro defined in C language math.h.
+The binding to the C<HUGE_VAL> macro of C language. This macro is defined in C<math.h>.
 
 =head2 HUGE_VALF
 
   static method HUGE_VALF : float ()
 
-HUGE_VALF macro defined in C language math.h.
+The binding to the C<HUGE_VALF> macro of C language. This macro is defined in C<math.h>.
 
 =head2 hypot
 
   static method hypot : double ($x : double, $y : double)
 
-hypot function defined in C language math.h.
+The binding to the C<hypot> function of C language. This function is declared in C<math.h>.
 
 =head2 hypotf
 
   static method hypotf : float ($x : float, $y : float)
 
-hypotf function defined in C language math.h.
+The binding to the C<hypotf> function of C language. This function is declared in C<math.h>.
 
 =head2 ilogb
 
   static method ilogb : int ($x : double)
 
-ilogb function defined in C language math.h.
+The binding to the C<ilogb> function of C language. This function is declared in C<math.h>.
 
 =head2 ilogbf
 
   static method ilogbf : int ($x : float)
 
-ilogbf function defined in C language math.h.
+The binding to the C<ilogbf> function of C language. This function is declared in C<math.h>.
 
 =head2 INFINITY
 
   static method INFINITY : double ()
 
-INFINITY macro defined in C language math.h. This method returns a double value.
+The binding to the C<INFINITY> macro of C language. This macro is defined in C<math.h>. This method returns a double value.
 
 =head2 INFINITYF
 
   static method INFINITYF : float ()
 
-INFINITY macro for float type defined in C language math.h. This method returns a float value.
+INFINITY macro for float type defined in C language C<math.h>. This method returns a float value.
 
 =head2 isfinite
 
   static method isfinite : int ($x : double)
 
-isfinite macro defined in C language math.h. This method receives a double value.
+The binding to the C<isfinite> macro of C language. This macro is defined in C<math.h>. This method receives a double value.
 
 =head2 isfinitef
 
   static method isfinitef : int($x : float)
 
-isfinite macro defined in C language math.h for float type. This method receives a float value.
+The binding to the C<isfinite> macro of C language. This macro is defined in C<math.h> for float type. This method receives a float value.
 
 =head2 isgreater
 
   static method isgreater : int ($x1 : double, $x2 : double)
 
-isgreater macro defined in C language math.h. This method receives two double values.
+The binding to the C<isgreater> macro of C language. This macro is defined in C<math.h>. This method receives two double values.
 
 =head2 isgreaterequal
 
   static method isgreaterequal : int ($x1 : double, $x2 : double)
 
-isgreaterequal macro defined in C language math.h. This method receives two double values.
+The binding to the C<isgreaterequal> macro of C language. This macro is defined in C<math.h>. This method receives two double values.
 
 =head2 isgreaterequalf
 
   static method isgreaterequalf : int ($x1 : float, $x2 : float)
 
-isgreaterequal macro defined in C language math.h. This method receives two float values.
+The binding to the C<isgreaterequal> macro of C language. This macro is defined in C<math.h>. This method receives two float values.
 
 =head2 isgreaterf
 
   static method isgreaterf : int ($x1 : float, $x2 : float)
 
-isgreater macro defined in C language math.h. This method receives two float values.
+The binding to the C<isgreater> macro of C language. This macro is defined in C<math.h>. This method receives two float values.
 
 =head2 isinf
 
   static method isinf : int ($x : double)
 
-isinf macro defined in C language math.h. This method receives a double value.
+The binding to the C<isinf> macro of C language. This macro is defined in C<math.h>. This method receives a double value.
 
 =head2 isinff
 
   static method isinff : int($x : float)
 
-isinf macro defined in C language math.h. This method receives a float value.
+The binding to the C<isinf> macro of C language. This macro is defined in C<math.h>. This method receives a float value.
 
 =head2 isless
 
   static method isless : int ($x1 : double, $x2 : double)
 
-isless macro defined in C language math.h. This method receives two double values.
+The binding to the C<isless> macro of C language. This macro is defined in C<math.h>. This method receives two double values.
 
 =head2 islessequal
 
   static method islessequal : int ($x1 : double, $x2 : double)
 
-islessequal macro defined in C language math.h. This method receives two double values.
+The binding to the C<islessequal> macro of C language. This macro is defined in C<math.h>. This method receives two double values.
 
 =head2 islessequalf
 
   static method islessequalf : int ($x1 : float, $x2 : float)
 
-islessequalf macro defined in C language math.h. This method receives two float values.
+The binding to the C<islessequalf> macro of C language. This macro is defined in C<math.h>. This method receives two float values.
 
 =head2 islessf
 
   static method islessf : int ($x1 : float, $x2 : float)
 
-islessf macro defined in C language math.h. This method receives two float values.
+The binding to the C<islessf> macro of C language. This macro is defined in C<math.h>. This method receives two float values.
 
 =head2 islessgreater
 
   static method islessgreater : int ($x1 : double, $x2 : double)
 
-islessgreater macro defined in C language math.h. This method receives two double values.
+The binding to the C<islessgreater> macro of C language. This macro is defined in C<math.h>. This method receives two double values.
 
 =head2 islessgreaterf
 
   static method islessgreaterf : int ($x1 : float, $x2 : float)
 
-islessgreater macro defined in C language math.h. This method receives two float values.
+The binding to the C<islessgreater> macro of C language. This macro is defined in C<math.h>. This method receives two float values.
 
 =head2 isnan
 
   static method isnan : int ($x : double)
 
-isnan macro defined in C language math.h. This method receives a double value.
+The binding to the C<isnan> macro of C language. This macro is defined in C<math.h>. This method receives a double value.
 
 =head2 isnanf
 
   static method isnanf : int ($x : float)
 
-isnanf macro defined in C language math.h. This method receives a float value.
+The binding to the C<isnanf> macro of C language. This macro is defined in C<math.h>. This method receives a float value.
 
 =head2 isunordered
 
   static method isunordered : int ($x1 : double, $x2 : double)
 
-isunordered macro defined in C language math.h. This method receives two double values.
+The binding to the C<isunordered> macro of C language. This macro is defined in C<math.h>. This method receives two double values.
 
 =head2 isunorderedf
 
   static method isunorderedf : int ($x1 : float, $x2 : float)
 
-isunorderedf macro defined in C language math.h. This method receives two float values.
+The binding to the C<isunorderedf> macro of C language. This macro is defined in C<math.h>. This method receives two float values.
 
 =head2 labs
 
@@ -1081,121 +878,121 @@ Get the abusolute value of a long value.
 
   static method ldexp : double ($x : double, $exp : int)
 
-ldexp function defined in C language math.h.
+The binding to the C<ldexp> function of C language. This function is declared in C<math.h>.
 
 =head2 ldexpf
 
   static method ldexpf : float ($x : float, $exp : int)
 
-ldexpf function defined in C language math.h.
+The binding to the C<ldexpf> function of C language. This function is declared in C<math.h>.
 
 =head2 lgamma
 
   static method lgamma : double ($x : double)
 
-lgamma function defined in C language math.h.
+The binding to the C<lgamma> function of C language. This function is declared in C<math.h>.
 
 =head2 lgammaf
 
   static method lgammaf : float ($x : float)
 
-lgammaf function defined in C language math.h.
+The binding to the C<lgammaf> function of C language. This function is declared in C<math.h>.
 
 =head2 log
 
   static method log : double ($x : double)
 
-log function defined in C language math.h.
+The binding to the C<log> function of C language. This function is declared in C<math.h>.
 
 =head2 log10
 
   static method log10 : double ($x : double)
 
-log10 function defined in C language math.h.
+The binding to the C<log10> function of C language. This function is declared in C<math.h>.
 
 =head2 log10f
 
   static method log10f : float ($x : float)
 
-log10f function defined in C language math.h.
+The binding to the C<log10f> function of C language. This function is declared in C<math.h>.
 
 =head2 log1p
 
   static method log1p : double ($x : double)
 
-log1p function defined in C language math.h.
+The binding to the C<log1p> function of C language. This function is declared in C<math.h>.
 
 =head2 log1pf
 
   static method log1pf : float ($x : float)
 
-log1pf function defined in C language math.h.
+The binding to the C<log1pf> function of C language. This function is declared in C<math.h>.
 
 =head2 log2
 
   static method log2 : double ($x : double)
 
-log2 function defined in C language math.h.
+The binding to the C<log2> function of C language. This function is declared in C<math.h>.
 
 =head2 log2f
 
   static method log2f : float ($x : float)
 
-log2f function defined in C language math.h.
+The binding to the C<log2f> function of C language. This function is declared in C<math.h>.
 
 =head2 logb
 
   static method logb : double ($x : double)
 
-logb function defined in C language math.h.
+The binding to the C<logb> function of C language. This function is declared in C<math.h>.
 
 =head2 logbf
 
   static method logbf : float ($x : float)
 
-logbf function defined in C language math.h.
+The binding to the C<logbf> function of C language. This function is declared in C<math.h>.
 
 =head2 logf
 
   static method logf : float ($x : float)
 
-logf function defined in C language math.h.
+The binding to the C<logf> function of C language. This function is declared in C<math.h>.
 
 =head2 lround
 
   static method lround : long ($x : double)
 
-llround function defined in C language math.h. Note that call llround instead of lround in C level.
+The binding to the C<llround> function of C language. This function is declared in C<math.h>. Note that call llround instead of lround in C level.
 
 =head2 lroundf
 
   static method lroundf : long ($x : float)
 
-llroundf function defined in C language math.h. Note that call llroundf instead of lroundf in C level.
+The binding to the C<llroundf> function of C language. This function is declared in C<math.h>. Note that call llroundf instead of lroundf in C level.
 
 =head2 modf
 
   static method modf : double ($x : double, $intpart : double*)
 
-modf function defined in C language math.h.
+The binding to the C<modf> function of C language. This function is declared in C<math.h>.
 
 =head2 modff
 
   static method modff : float ($x : float, $intpart : float*)
 
-modff function defined in C language math.h.
+The binding to the C<modff> function of C language. This function is declared in C<math.h>.
 
 =head2 NAN
 
   static method NAN : double ()
 
-NAN macro defined in C language math.h. This method return a double value.
+The binding to the C<NAN> macro of C language. This macro is defined in C<math.h>. This method return a double value.
 
 =head2 nan
 
   static method nan : double ($str : string)
 
-nan function defined in C language math.h.
+The binding to the C<nan> function of C language. This function is declared in C<math.h>.
 
 String must be defined, otherwise a exception occurs.
 
@@ -1203,13 +1000,13 @@ String must be defined, otherwise a exception occurs.
 
   static method NANF : float ()
 
-NAN macro defined in C language math.h. This method return a float value.
+The binding to the C<NAN> macro of C language. This macro is defined in C<math.h>. This method return a float value.
 
 =head2 nanf
 
   static method nanf : float ($str : string)
 
-nanf function defined in C language math.h.
+The binding to the C<nanf> function of C language. This function is declared in C<math.h>.
 
 String must be defined, otherwise a exception occurs.
 
@@ -1217,37 +1014,37 @@ String must be defined, otherwise a exception occurs.
 
   static method nearbyint : double ($x : double)
 
-nearbyint function defined in C language math.h.
+The binding to the C<nearbyint> function of C language. This function is declared in C<math.h>.
 
 =head2 nearbyintf
 
   static method nearbyintf : float ($x : float)
 
-nearbyintf function defined in C language math.h.
+The binding to the C<nearbyintf> function of C language. This function is declared in C<math.h>.
 
 =head2 nextafter
 
   static method nextafter : double ($x1 : double, $x2 : double)
 
-nextafter function defined in C language math.h.
+The binding to the C<nextafter> function of C language. This function is declared in C<math.h>.
 
 =head2 nextafterf
 
   static method nextafterf : float ($x1 : float, $x2 : float)
 
-nextafterf function defined in C language math.h.
+The binding to the C<nextafterf> function of C language. This function is declared in C<math.h>.
 
 =head2 nexttoward
 
   static method nexttoward : double ($x1 : double, $x2 : double)
 
-nexttoward function defined in C language math.h.
+The binding to the C<nexttoward> function of C language. This function is declared in C<math.h>.
 
 =head2 nexttowardf
 
   static method nexttowardf : float ($x1 : float, $x2 : double)
 
-nexttowardf function defined in C language math.h.
+The binding to the C<nexttowardf> function of C language. This function is declared in C<math.h>.
 
 =head2 PI
 
@@ -1259,164 +1056,164 @@ pi. This value is 0x1.921fb54442d18p+1.
 
   static method pow : double ($x : double, $y : double)
 
-pow function defined in C language math.h.
+The binding to the C<pow> function of C language. This function is declared in C<math.h>.
 
 =head2 powf
 
   static method powf : float ($x : float, $y : float)
 
-powf function defined in C language math.h.
+The binding to the C<powf> function of C language. This function is declared in C<math.h>.
 
 =head2 remainder
 
   static method remainder : double ($x1 : double, $x2 : double)
 
-remainder function defined in C language math.h.
+The binding to the C<remainder> function of C language. This function is declared in C<math.h>.
 
 =head2 remainderf
 
   static method remainderf : float ($x1 : float, $x2 : float)
 
-remainderf function defined in C language math.h.
+The binding to the C<remainderf> function of C language. This function is declared in C<math.h>.
 
 =head2 remquo
 
   static method remquo : double ($x1 : double, $x2 : double, $quo : int*)
 
-remquo function defined in C language math.h.
+The binding to the C<remquo> function of C language. This function is declared in C<math.h>.
 
 =head2 remquof
 
   static method remquof : float ($x1 : float, $x2 : float, $quo : int*)
 
-remquof function defined in C language math.h.
+The binding to the C<remquof> function of C language. This function is declared in C<math.h>.
 
 =head2 round
 
   static method round : double ($x : double)
 
-round function defined in C language math.h.
+The binding to the C<round> function of C language. This function is declared in C<math.h>.
 
 =head2 roundf
 
   static method roundf : float ($x : float)
 
-roundf function defined in C language math.h.
+The binding to the C<roundf> function of C language. This function is declared in C<math.h>.
 
 =head2 scalbln
 
   static method scalbln : double ($x : double, $exp : long)
 
-scalbln function defined in C language math.h.
+The binding to the C<scalbln> function of C language. This function is declared in C<math.h>.
 
 =head2 scalblnf
 
   static method scalblnf : float ($x : float, $exp : long)
 
-scalblnf function defined in C language math.h.
+The binding to the C<scalblnf> function of C language. This function is declared in C<math.h>.
 
 =head2 scalbn
 
   static method scalbn : double ($x : double, $exp : int)
 
-scalbn function defined in C language math.h.
+The binding to the C<scalbn> function of C language. This function is declared in C<math.h>.
 
 =head2 scalbnf
 
   static method scalbnf : float ($x : float, $exp : int)
 
-scalbnf function defined in C language math.h.
+The binding to the C<scalbnf> function of C language. This function is declared in C<math.h>.
 
 =head2 signbit
 
   static method signbit : int ($x : double)
 
-signbit function defined in C language math.h.
+The binding to the C<signbit> function of C language. This function is declared in C<math.h>.
 
 =head2 signbitf
 
   static method signbitf : int ($x : float)
 
-signbitf function defined in C language math.h.
+The binding to the C<signbitf> function of C language. This function is declared in C<math.h>.
 
 =head2 sin
 
   static method sin : double ($x : double)
 
-sin function defined in C language math.h.
+The binding to the C<sin> function of C language. This function is declared in C<math.h>.
 
 =head2 sinf
 
   static method sinf : float ($x : float)
 
-sinf function defined in C language math.h.
+The binding to the C<sinf> function of C language. This function is declared in C<math.h>.
 
 =head2 sinh
 
   static method sinh : double ($x : double)
 
-sinh function defined in C language math.h.
+The binding to the C<sinh> function of C language. This function is declared in C<math.h>.
 
 =head2 sinhf
 
   static method sinhf : float ($x : float)
 
-sinhf function defined in C language math.h.
+The binding to the C<sinhf> function of C language. This function is declared in C<math.h>.
 
 =head2 sqrt
 
   static method sqrt : double ($x : double)
 
-sqrt function defined in C language math.h.
+The binding to the C<sqrt> function of C language. This function is declared in C<math.h>.
 
 =head2 sqrtf
 
-sqrtf function defined in C language math.h.
+The binding to the C<sqrtf> function of C language. This function is declared in C<math.h>.
 
 =head2 tan
 
   static method tan : double ($x : double)
 
-tan function defined in C language math.h.
+The binding to the C<tan> function of C language. This function is declared in C<math.h>.
 
 =head2 tanf
 
   static method tanf : float ($x : float)
 
-tanf function defined in C language math.h.
+The binding to the C<tanf> function of C language. This function is declared in C<math.h>.
 
 =head2 tanh
 
   static method tanh : double ($x : double)
 
-tanh function defined in C language math.h.
+The binding to the C<tanh> function of C language. This function is declared in C<math.h>.
 
 =head2 tanhf
 
   static method tanhf : float ($x : float)
 
-tanhf function defined in C language math.h.
+The binding to the C<tanhf> function of C language. This function is declared in C<math.h>.
 
 =head2 tgamma
 
   static method tgamma : double ($x : double)
 
-tgamma function defined in C language math.h.
+The binding to the C<tgamma> function of C language. This function is declared in C<math.h>.
 
 =head2 tgammaf
 
   static method tgammaf : float ($x : float)
 
-tgammaf function defined in C language math.h.
+The binding to the C<tgammaf> function of C language. This function is declared in C<math.h>.
 
 =head2 trunc
 
   static method trunc : double ($x : double)
 
-trunc function defined in C language math.h.
+The binding to the C<trunc> function of C language. This function is declared in C<math.h>.
 
 =head2 truncf
 
   static method truncf : float ($x : float)
 
-truncf function defined in C language math.h.
+The binding to the C<truncf> function of C language. This function is declared in C<math.h>.

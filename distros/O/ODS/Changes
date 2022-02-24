@@ -3,3 +3,13 @@ Revision history for ODS
 0.01    Date/time
         First version, released on an unsuspecting world.
 
+0.03	2022-02-18
+	- Add directory storage
+	- Add data generation module
+	- Allow for specifying custom file names
+	- Refactor file serialization.
+
+0.04	2022-02-20
+	- Generate Tables, ResultSets and rows from a file.
+	- item keyword and Column::ArrayObject to handle nested objects/tables/documents inside of an array column.
+	- add validation for phone and email columns

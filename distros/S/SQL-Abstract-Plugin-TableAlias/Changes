@@ -1,0 +1,7 @@
+Revision history for SQL-Abstract-Plugin-TableAlias
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+
+0.02    2022-02-23
+	Fix aliasing of columns - { column => { -as => "thing" } }

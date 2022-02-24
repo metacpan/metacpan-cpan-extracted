@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 27 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 28 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'TableData/Perl/CPAN/Release/Static/1995.pm',
@@ -35,6 +35,7 @@ my @module_files = (
     'TableData/Perl/CPAN/Release/Static/2018.pm',
     'TableData/Perl/CPAN/Release/Static/2019.pm',
     'TableData/Perl/CPAN/Release/Static/2020.pm',
+    'TableData/Perl/CPAN/Release/Static/2021.pm',
     'TableDataBundle/Perl/CPAN/Release/Static/Older.pm'
 );
 

@@ -84,7 +84,6 @@ sub _search {
     }
 
     return $res;
-
 }
 
 sub search {
@@ -264,12 +263,86 @@ sub _del_psession_special {
     if ($deleted) {
         $data->{$specialKeyName} = to_json( [@new] );
     }
+
+    # TODO should this be in the if???
     $psession->update($data);
 }
 
+sub _migrateu2f_device {
+    my ( $self, $device ) = @_;
+
+    my $credential_id = $device->{_keyHandle};
+    my $_userKey      = $device->{_userKey};
+
+    eval { require Authen::WebAuthn };
+    if ($@) {
+        die "Missing Authen::WebAuthn dependency: $@";
+    }
+
+    my $credential_pubkey =
+      Authen::WebAuthn::convert_raw_ecc_to_cose($_userKey);
+
+    return {
+        type                 => "WebAuthn",
+        name                 => "$device->{name}",
+        _credentialId        => "$credential_id",
+        _credentialPublicKey => "$credential_pubkey",
+        _signCount           => 0,
+        epoch                => "$device->{epoch}",
+    };
+}
+
+sub _migrateu2f {
+    my $self   = shift;
+    my $target = shift;
+
+    my $psession = $self->_get_psession($target);
+    my $data     = $psession->data;
+    my $migrated = 0;
+
+    my $_2fDevices = $data->{_2fDevices} || "[]";
+    $_2fDevices = from_json($_2fDevices);
+
+    die "Expecting JSON array in _2fDevices"
+      unless ref($_2fDevices) eq "ARRAY";
+
+    my @new_2fDevices = @{$_2fDevices};
+    my @u2f_devices   = grep { $_->{type} eq "U2F" } @{$_2fDevices};
+
+    my %migrated_devices;
+    for my $u2f_device (@u2f_devices) {
+        my $migrated_device = $self->_migrateu2f_device($u2f_device);
+        $migrated_devices{ $migrated_device->{_credentialId} } =
+          $migrated_device;
+    }
+
+    for my $migrated_device ( keys %migrated_devices ) {
+
+        # If credentialId is not already present
+        unless (
+            grep {
+                      $_->{type} eq "WebAuthn"
+                  and $_->{_credentialId} eq $migrated_device
+            } @new_2fDevices
+          )
+        {
+            push @new_2fDevices, $migrated_devices{$migrated_device};
+            $migrated = 1;
+        }
+    }
+
+    if ($migrated) {
+        $data->{_2fDevices} = to_json( [@new_2fDevices] );
+        $psession->update($data);
+    }
+
+}
+
 sub consents_get {
-    my $self     = shift;
-    my $target   = shift;
+    my $self   = shift;
+    my $target = shift;
+    return 0 unless $target;
+
     my $o        = $self->stdout;
     my $consents = $self->_get_psession_special( $target, '_oidcConsents',
         sub { $_[0]->{rp} } );
@@ -278,8 +351,10 @@ sub consents_get {
 }
 
 sub secondfactors_get {
-    my $self     = shift;
-    my $target   = shift;
+    my $self   = shift;
+    my $target = shift;
+    return 0 unless $target;
+
     my $o        = $self->stdout;
     my $consents = $self->_get_psession_special( $target, '_2fDevices',
         sub { genId2F( $_[0] ) } );
@@ -290,8 +365,11 @@ sub secondfactors_get {
 sub consents_delete {
     my $self   = shift;
     my $target = shift;
-    my @ids    = @_;
-    return unless @ids;
+    return 0 unless $target;
+
+    my @ids = @_;
+    return 0 unless @ids;
+
     $self->_del_psession_special( $target, '_oidcConsents',
         sub { $_[0]->{rp} }, @ids );
     return 0;
@@ -300,21 +378,64 @@ sub consents_delete {
 sub secondfactors_delete {
     my $self   = shift;
     my $target = shift;
-    my @ids    = @_;
-    return unless @ids;
+    return 0 unless $target;
+
+    my @ids = @_;
+    return 0 unless @ids;
     $self->_del_psession_special( $target, '_2fDevices',
         sub { genId2F( $_[0] ) }, @ids );
     return 0;
 }
 
+sub _get_psession_targets {
+    my ( $self, @args ) = @_;
+
+    if ( $self->opts->{where} or $self->opts->{all} ) {
+        $self->opts->{persistent} = 1;
+
+        if ( $self->opts->{all} ) {
+            delete $self->opts->{where};
+        }
+
+        my $res = $self->_search();
+        return ( map { $res->{$_}->{_session_uid} } keys %{$res} );
+    }
+    else {
+        return @args;
+    }
+}
+
 sub secondfactors_delType {
-    my $self   = shift;
-    my $target = shift;
-    my @types  = @_;
-    return unless @types;
-    $self->_del_psession_special( $target, '_2fDevices', sub { $_[0]->{type} },
-        @types );
+    my $self = shift;
+
+    my $target;
+    unless ( $self->opts->{where} or $self->opts->{all} ) {
+        $target = shift;
+    }
+
+    my @types = @_;
+    return 0 unless @types;
+
+    my @targets = $self->_get_psession_targets($target);
+    for my $target (@targets) {
+        $self->_del_psession_special( $target, '_2fDevices',
+            sub { $_[0]->{type} }, @types );
+    }
+
     return 0;
+}
+
+sub secondfactors_migrateu2f {
+    my ( $self, @ids ) = @_;
+    my $result   = 0;
+    my @sessions = $self->_get_psession_targets(@ids);
+
+    for my $id (@sessions) {
+        if ( !$self->_migrateu2f($id) ) {
+            $result = 1;
+        }
+    }
+    return $result;
 }
 
 sub setKey {
@@ -380,8 +501,8 @@ sub run {
     # Subcommands and target
     elsif ( $action =~ /^(?:secondfactors|consents)$/ ) {
         my $subcommand = shift;
-        unless ( $subcommand and @_ ) {
-            die "Missing subcommand and target for $action";
+        unless ($subcommand) {
+            die "Missing subcommand $action";
         }
         my $func = "${action}_${subcommand}";
         if ( $self->can($func) ) {

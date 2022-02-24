@@ -63,7 +63,7 @@ SKIP: {
     Lemonldap::NG::Manager::Cli->run(@args);
     my $res = $dbh->selectrow_hashref(
         "SELECT * FROM lmConfig WHERE field='ldapSetPassword'");
-    ok( $res,                 'Key inserted' );
+    ok( $res,                          'Key inserted' );
     ok( $res and $res->{value} == '0', 'Value is 0' );
 }
 

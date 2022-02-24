@@ -10,12 +10,13 @@ my $res;
 
 my $client = LLNG::Manager::Test->new( {
         ini => {
-            logLevel            => 'error',
-            authentication      => 'Demo',
-            userDB              => 'Same',
-            loginHistoryEnabled => 1,
-            brutForceProtection => 0,
-            portalMainLogo      => 'common/logos/logo_llng_old.png',
+            logLevel              => 'error',
+            authentication        => 'Demo',
+            userDB                => 'Same',
+            loginHistoryEnabled   => 1,
+            brutForceProtection   => 0,
+            portalMainLogo        => 'common/logos/logo_llng_old.png',
+            customPlugins         => "t::HistoryPlugin",
             sessionDataToRemember =>
               { uid => 'identity', _auth => 'AuthModule' },
         }
@@ -121,18 +122,40 @@ ok( $res->[2]->[0] =~ /trspan="lastLoginsCaptionLabel"/,
 ok( $res->[2]->[0] =~ /trspan="lastFailedLoginsCaptionLabel"/,
     'Failed history array caption found' )
   or explain( $res->[2]->[0] );
-count(2);
+count(3);
+
+like(
+    $res->[2]->[0],
+    qr,<th trspan="Language">Language</th>,,
+    "Found plugin-set label"
+);
+count(1);
+
 @c = ( $res->[2]->[0] =~ /<td>127.0.0.1/gs );
 my @cf   = ( $res->[2]->[0] =~ /PE5<\/td>/gs );
 my @ccv1 = ( $res->[2]->[0] =~ /<td>dwho<\/td>/gs );
 my @ccv2 = ( $res->[2]->[0] =~ /<td>Demo<\/td>/gs );
+my @ccv3 = ( $res->[2]->[0] =~ /<td>en<\/td>/gs );
+my @ccv4 = ( $res->[2]->[0] =~ /<td>1<\/td>/gs );
 
 # History with 5 entries and 10 custom values
-ok( @c == 5,             ' -> Five entries found' );
-ok( @cf == 2,            "  -> Two 'failedLogin' entries found" );
-ok( @ccv1 + @ccv2 == 10, " -> Ten custom value entries found" )
-  or print STDERR Dumper( $res->[2]->[0] );
+ok( @c == 5,  ' -> Five entries found' );
+ok( @cf == 2, "  -> Two 'failedLogin' entries found" );
+is( @ccv1 + @ccv2 + @ccv3, 15, "Custom value entries found" );
+is( @ccv4,                 0,  "Hidden history field is missing" );
 count(4);
+
+# Check psession content
+my $psession = getPSession('dwho');
+
+is( $psession->{data}->{_loginHistory}->{successLogin}->[0]->{_language},
+    'en', "Field found in psession" );
+is(
+    $psession->{data}->{_loginHistory}->{successLogin}->[0]
+      ->{authenticationLevel},
+    '1', "Hidden field found in psession"
+);
+count(2);
 
 $client->logout($id1);
 clean_sessions();

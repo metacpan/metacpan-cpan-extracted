@@ -3,7 +3,7 @@ use warnings;
 
 use English qw(-no_match_vars);
 use Error::Pure qw(err);
-use Test::More 'tests' => 6;
+use Test::More 'tests' => 7;
 use Test::NoWarnings;
 
 # Test.
@@ -48,3 +48,10 @@ eval {
 };
 is($EVAL_ERROR, "Error.\n", 'Simple message in eval. TYPE in environment '.
 	'variable.');
+
+# Test.
+$Error::Pure::TYPE = 'BadErrorType';
+eval {
+	err 'Error.';
+};
+is($EVAL_ERROR, "Error.\n", 'Simple message in eval. TYPE for not existing Error module.');

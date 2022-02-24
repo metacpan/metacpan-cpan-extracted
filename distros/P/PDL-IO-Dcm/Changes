@@ -81,4 +81,44 @@ Revision history for PDL-IO-Dcm
 
 	* PDL::Dims in MRISiemens support improved, looks good so far, but needs testing.
 
+1.004	2017-2-22
 
+	* Added dcm_key and dim_idx to final stack as hashes
+
+	* PDL::Dims in MRISiemens support improved, especially slice groups, needs testing.
+
+	* Fixing 1-slice only case in init_dims, needs testing.
+
+1.005	2017-50-18 
+	
+	* Change in handling of poetential duplicates
+
+	* no compact over first 3 indices
+
+1.010	2021-10-21	
+	
+	* add readme
+	
+	* adding MRS support
+
+	* split stuff off Dcm.pm into plugins.
+
+	* 0-padding series number in file for easier sorting;
+
+    	* explicit switch for writeflex;
+
+	* less output, progress (.);
+
+    	* skips report files.
+
+	* Slice grops now should work.
+
+	* CSA data support
+
+	* adding sort script. Maybe useful after dicom server zip export.
+
+	* adding sort_dcms.pl to scripts.
+
+	* using Instance UID as unique identifer now.
+
+	* PDL::Dims support

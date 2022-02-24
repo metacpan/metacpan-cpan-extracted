@@ -21,7 +21,8 @@ use DynaLoader;
 
 
 
-#line 5 "gsl_linalg.pd"
+#line 4 "gsl_linalg.pd"
+
 use strict;
 use warnings;
 
@@ -42,7 +43,7 @@ PDL::GSL::LINALG - PDL interface to linear algebra routines in GSL
   ];
   my $B = sequence(2,4); # column vectors
   LU_decomp(my $lu=$A->copy, my $p=null, my $signum=null);
-  # transpose so first dim means is vector, higher dims thread
+  # transpose so first dim means is vector, higher dims broadcast
   LU_solve($lu, $p, $B->transpose, my $x=null);
   $x = $x->inplace->transpose; # now can be matrix-multiplied
 
@@ -54,7 +55,7 @@ initial C<gsl_linalg_> removed. They are provided in both real and
 complex double precision.
 
 Currently only LU decomposition interfaces here. Pull requests welcome!
-#line 58 "LINALG.pm"
+#line 59 "LINALG.pm"
 
 
 
@@ -68,7 +69,8 @@ Currently only LU decomposition interfaces here. Pull requests welcome!
 
 
 
-#line 1059 "../../../blib/lib/PDL/PP.pm"
+#line 1058 "../../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 LU_decomp
@@ -90,17 +92,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 94 "LINALG.pm"
+#line 96 "LINALG.pm"
 
 
 
-#line 1061 "../../../blib/lib/PDL/PP.pm"
+#line 1060 "../../../blib/lib/PDL/PP.pm"
+
 *LU_decomp = \&PDL::LU_decomp;
-#line 100 "LINALG.pm"
+#line 103 "LINALG.pm"
 
 
 
-#line 1059 "../../../blib/lib/PDL/PP.pm"
+#line 1058 "../../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 LU_solve
@@ -123,17 +127,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 127 "LINALG.pm"
+#line 131 "LINALG.pm"
 
 
 
-#line 1061 "../../../blib/lib/PDL/PP.pm"
+#line 1060 "../../../blib/lib/PDL/PP.pm"
+
 *LU_solve = \&PDL::LU_solve;
-#line 133 "LINALG.pm"
+#line 138 "LINALG.pm"
 
 
 
-#line 1059 "../../../blib/lib/PDL/PP.pm"
+#line 1058 "../../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 LU_det
@@ -155,17 +161,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 159 "LINALG.pm"
-
-
-
-#line 1061 "../../../blib/lib/PDL/PP.pm"
-*LU_det = \&PDL::LU_det;
 #line 165 "LINALG.pm"
 
 
 
-#line 1059 "../../../blib/lib/PDL/PP.pm"
+#line 1060 "../../../blib/lib/PDL/PP.pm"
+
+*LU_det = \&PDL::LU_det;
+#line 172 "LINALG.pm"
+
+
+
+#line 1058 "../../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 solve_tridiag
@@ -188,19 +196,21 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 192 "LINALG.pm"
+#line 200 "LINALG.pm"
 
 
 
-#line 1061 "../../../blib/lib/PDL/PP.pm"
+#line 1060 "../../../blib/lib/PDL/PP.pm"
+
 *solve_tridiag = \&PDL::solve_tridiag;
-#line 198 "LINALG.pm"
+#line 207 "LINALG.pm"
 
 
 
 
 
-#line 41 "gsl_linalg.pd"
+#line 40 "gsl_linalg.pd"
+
 =head1 SEE ALSO
 
 L<PDL>
@@ -209,7 +219,7 @@ The GSL documentation for linear algebra is online at
 L<https://www.gnu.org/software/gsl/doc/html/linalg.html>
 
 =cut
-#line 213 "LINALG.pm"
+#line 223 "LINALG.pm"
 
 
 

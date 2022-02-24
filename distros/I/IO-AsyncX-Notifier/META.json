@@ -48,7 +48,7 @@
       "runtime" : {
          "requires" : {
             "IO::Async::Notifier" : "0.79",
-            "Object::Pad" : "0.55"
+            "Object::Pad" : "0.61"
          }
       },
       "test" : {
@@ -70,7 +70,7 @@
    "provides" : {
       "IO::AsyncX::Notifier" : {
          "file" : "lib/IO/AsyncX/Notifier.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       }
    },
    "release_status" : "stable",
@@ -85,7 +85,7 @@
          "web" : "https://github.com/team-at-cpan/IO-AsyncX-Notifier"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_authority" : "cpan:TEAM",
    "x_generated_by_perl" : "v5.34.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",

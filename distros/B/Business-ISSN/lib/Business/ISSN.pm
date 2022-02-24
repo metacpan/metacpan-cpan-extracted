@@ -12,7 +12,7 @@ use Exporter qw(import);
 our @EXPORT    = qw();
 our @EXPORT_OK = qw(is_valid_checksum);
 
-our $VERSION = '1.004';
+our $VERSION = '1.005';
 
 sub new {
 	my $class       = shift;
@@ -224,7 +224,7 @@ This module is released under the terms of the Perl Artistic License.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 1999-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 1999-2021, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 You may redistribute this under the terms of the Artistic License 2.0.
 

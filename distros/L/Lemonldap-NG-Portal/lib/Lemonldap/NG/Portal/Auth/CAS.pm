@@ -255,8 +255,7 @@ sub authenticate {
 sub setAuthSessionInfo {
     my ( $self, $req ) = @_;
     $req->{sessionInfo}->{authenticationLevel} = $self->conf->{casAuthnLevel};
-    $req->{sessionInfo}->{_casSrv}  
-               = $req->data->{_casSrvCurrent};
+    $req->{sessionInfo}->{_casSrv}             = $req->data->{_casSrvCurrent};
     return PE_OK;
 }
 

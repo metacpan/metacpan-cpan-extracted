@@ -13,6 +13,7 @@ use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
 use Scalar::Util 'dualvar';
 use Test::Deep;
 use Test::JSON::Schema::Acceptance;
+use Test::File::ShareDir -share => { -dist => { 'Test-JSON-Schema-Acceptance' => 'share' } };
 
 my $key = 'a';
 
@@ -30,8 +31,10 @@ foreach my $test (
     my $str = sprintf('%d', $thing->{foo}{string});
   } ],
   [ 'integer->string type mutation, used as a string' => sub ($thing) {
-    my $str = sprintf('%s', $thing->{foo}{int});
-  } ],
+      my $str = sprintf('%s', $thing->{foo}{int});
+    },
+   "$]" >= 5.035009 ? 'on perls >= 5.35.9, reading the string form of an integer value no longer sets the flag SVf_POK' : '',
+  ],
   [ 'string->dualvar' => sub ($thing) {
     $thing->{foo}{string} = dualvar(1, 'one');
   } ],
@@ -55,9 +58,14 @@ foreach my $test (
   } ],
 )
 {
-  my ($test_name, $mutator) = @$test;
+  my ($test_name, $mutator, $skip) = @$test;
 
   foreach my $type (qw(data schema)) {
+    if ($skip) {
+      SKIP: { skip $test_name.' in '.$type.': '.$skip, 1 }
+      next;
+    }
+
     my $accepter = Test::JSON::Schema::Acceptance->new(test_dir => 't/tests/mutation');
     $accepter->json_decoder->allow_bignum;
     my $events = intercept(

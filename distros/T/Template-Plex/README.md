@@ -99,6 +99,8 @@ To get started after installation, copy the following lines into perl and execut
     say $template->render;
 ```
 
+For more examples, checkout the examples directory in this distribution.
+
 # MOTIATION
 
 - So many templating systems available, yet none use perl as the template language?
@@ -109,13 +111,12 @@ To get started after installation, copy the following lines into perl and execut
 quoted string. 
 - Other templating system are very powerful, but have huge a huge APIs and
 options. [Template::Plex](https://metacpan.org/pod/Template%3A%3APlex) could have a very minimal API with perl doing the
-hardwork
+hard work
 
 # TODO
 
 - More tests
 - Add a guide document
-- Make examples of recursion, lexical scoping, etc...
 - CLI app to render .plex files
 - Fix any bugs
 
@@ -455,7 +456,7 @@ package is created for each top level use of plex to prevent name collisions.
 - Last newline of templates are chomped
 
     Most text editors insert a newline as the last character in a file.  A chomp is
-    peformed before the template is prepared to avoid extra newlines in the output
+    performed before the template is prepared to avoid extra newlines in the output
     when using sub templates. If you really need that newline, place an empty line
     at the end of your template
 

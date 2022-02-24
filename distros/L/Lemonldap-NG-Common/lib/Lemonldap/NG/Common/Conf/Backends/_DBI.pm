@@ -36,7 +36,8 @@ sub available {
     my $sth =
       $self->_dbh->prepare( "SELECT DISTINCT cfgNum from "
           . $self->{dbiTable}
-          . " order by cfgNum" ) or $self->logError;
+          . " order by cfgNum" )
+      or $self->logError;
     $sth->execute() or $self->logError;
     my @conf;
     while ( my @row = $sth->fetchrow_array ) {
@@ -105,8 +106,8 @@ sub unlock {
 sub delete {
     my ( $self, $cfgNum ) = @_;
     my $req =
-      $self->_dbh->prepare("DELETE FROM $self->{dbiTable} WHERE cfgNum=?")
-        or $self->logError;
+         $self->_dbh->prepare("DELETE FROM $self->{dbiTable} WHERE cfgNum=?")
+      or $self->logError;
     my $res = $req->execute($cfgNum) or $self->logError;
     $Lemonldap::NG::Common::Conf::msg .=
       "Unable to find conf $cfgNum (" . $self->_dbh->errstr . ")"

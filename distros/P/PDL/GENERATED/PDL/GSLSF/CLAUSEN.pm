@@ -21,7 +21,8 @@ use DynaLoader;
 
 
 
-#line 5 "gsl_sf_clausen.pd"
+#line 4 "gsl_sf_clausen.pd"
+
 use strict;
 use warnings;
 
@@ -34,7 +35,7 @@ PDL::GSLSF::CLAUSEN - PDL interface to GSL Special Functions
 This is an interface to the Special Function package present in the GNU Scientific Library. 
 
 =cut
-#line 38 "CLAUSEN.pm"
+#line 39 "CLAUSEN.pm"
 
 
 
@@ -48,7 +49,8 @@ This is an interface to the Special Function package present in the GNU Scientif
 
 
 
-#line 1059 "../../../../blib/lib/PDL/PP.pm"
+#line 1058 "../../../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 gsl_sf_clausen
@@ -68,19 +70,21 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 72 "CLAUSEN.pm"
+#line 74 "CLAUSEN.pm"
 
 
 
-#line 1061 "../../../../blib/lib/PDL/PP.pm"
+#line 1060 "../../../../blib/lib/PDL/PP.pm"
+
 *gsl_sf_clausen = \&PDL::gsl_sf_clausen;
-#line 78 "CLAUSEN.pm"
+#line 81 "CLAUSEN.pm"
 
 
 
 
 
-#line 40 "gsl_sf_clausen.pd"
+#line 39 "gsl_sf_clausen.pd"
+
 =head1 AUTHOR
 
 This file copyright (C) 1999 Christian Pellegrin <chri@infis.univ.trieste.it>
@@ -93,7 +97,7 @@ PDL distribution, the copyright notice should be included in the file.
 The GSL SF modules were written by G. Jungman.
 
 =cut
-#line 97 "CLAUSEN.pm"
+#line 101 "CLAUSEN.pm"
 
 
 

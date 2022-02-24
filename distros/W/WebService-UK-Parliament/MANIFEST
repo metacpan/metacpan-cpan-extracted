@@ -1,0 +1,34 @@
+Changes
+ignore.txt
+lib/WebService/UK/Parliament.pm
+lib/WebService/UK/Parliament/Base.pm
+lib/WebService/UK/Parliament/Bills.pm
+lib/WebService/UK/Parliament/CommonsVotes.pm
+lib/WebService/UK/Parliament/ErskineMay.pm
+lib/WebService/UK/Parliament/LordsVotes.pm
+lib/WebService/UK/Parliament/Members.pm
+lib/WebService/UK/Parliament/Now.pm
+lib/WebService/UK/Parliament/OralQuestions.pm
+lib/WebService/UK/Parliament/StatutoryInstruments.pm
+lib/WebService/UK/Parliament/Treaties.pm
+lib/WebService/UK/Parliament/WrittenQuestions.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+swagger/bills-api.json
+swagger/commonsvotes-api.json
+swagger/erskinemay-api.json
+swagger/lordsvotes-api.json
+swagger/members-api.json
+swagger/now-api.json
+swagger/oralquestions-api.json
+swagger/statutoryinstruments-api.json
+swagger/treaties-api.json
+swagger/writtenquestions-api.json
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -61,5 +61,5 @@ SKIP: {
     expectCookie($res);
 }
 
-clean_sessions(count($mainTests));
+clean_sessions( count($mainTests) );
 done_testing();

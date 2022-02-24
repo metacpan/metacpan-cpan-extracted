@@ -50,8 +50,8 @@ my $ini = {
 };
 
 ok( $p = Lemonldap::NG::Portal::Main->new, 'Portal object' );
-ok( $p->init($ini), 'Init' );
-ok( $app = $p->run, 'App' );
+ok( $p->init($ini),                        'Init' );
+ok( $app = $p->run,                        'App' );
 
 eval { Data::Dumper::Dumper( {} ) };
 ok( $@, "Portal doesn't depend on Data::Dumper" );

@@ -1,5 +1,10 @@
 Revision history for Perl extension Test::PostgreSQL.
 
+1.29 2022-02-18T03:26:21Z
+
+1.29 2022-02-18T00:31:54Z
+    - Fix concurrent execution under Yath
+
 1.28 2021-03-12T10:50:46Z
     - Increment port by random amount when trying to find a good port
     - Allow using beta versions

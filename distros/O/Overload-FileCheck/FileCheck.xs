@@ -196,7 +196,7 @@ int _overload_ft_stat(Stat_t *stat, int *size) {
   if (count == 2) sv = POPs; /* RvAV */
   check_status = POPi; /* TOOO pop on SV* for true / false & co */
 
-  *size = 0; /* by default it fails */
+  *size = -1; /* by default it fails */
 
   if ( check_status == 1 ) {
     AV *stat_array;
@@ -218,8 +218,8 @@ int _overload_ft_stat(Stat_t *stat, int *size) {
     if ( av_size > 0 && av_size != ( STAT_T_MAX - 1 ) )
       croak( "Overload::FileCheck::_check: Array should contain 13 elements" );
 
+    *size = av_size; /* store the av_size */
     if ( av_size > 0 ) {
-      *size = av_size; /* store the av_size */
 
       ary = AvARRAY(stat_array);
 
@@ -371,22 +371,22 @@ PP(pp_overload_stat) { /* stat & lstat */
       /* copy the content of mocked_stat to PL_statcache */
       memcpy(&PL_statcache, &mocked_stat, sizeof(PL_statcache));
 
-      /* Here, we cut early when stat() returned no values
-       * In such a case, we set the statcache, but do not call
-       * the real op (CALL_REAL_OP)
-      */
-      if ( !size )
-        RETURN;
-
-      PUSHs( MUTABLE_SV( PL_defgv ) ); /* add *_ to the stack */
-
-      if ( size ) { /* yes it succeeds */
+      if ( size >=  0) { /* yes it succeeds */
         PL_laststatval = 0;
       } else { /* the stat call fails */
         PL_laststatval = -1;
       }
 
       PL_laststype   = PL_op->op_type;  /* this was for our OP */
+
+      /* Here, we cut early when stat() returned no values
+       * In such a case, we set the statcache, but do not call
+       * the real op (CALL_REAL_OP)
+      */
+      if ( size < 0 )
+        RETURN;
+
+      PUSHs( MUTABLE_SV( PL_defgv ) ); /* add *_ to the stack */
 
       /* probably not real necesseary, make warning messages nicer */
       if ( previous_stack && SvPOK(previous_stack) )

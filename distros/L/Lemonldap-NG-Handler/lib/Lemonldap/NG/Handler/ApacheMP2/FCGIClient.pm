@@ -21,7 +21,7 @@ use constant REDIRECT          => Apache2::Const::REDIRECT;
 use constant DECLINED          => Apache2::Const::DECLINED;
 use constant SERVER_ERROR      => Apache2::Const::SERVER_ERROR;
 
-our $VERSION = '2.0.6';
+our $VERSION = '2.0.14';
 
 sub handler {
     my ( $class, $r ) = @_;
@@ -43,7 +43,7 @@ sub handler {
         SERVER_PORT    => $r->get_server_port,
         REQUEST_METHOD => $r->method,
     };
-    foreach (qw(VHOSTTYPE RULES_URL)) {
+    foreach (qw(VHOSTTYPE RULES_URL HTTPS_REDIRECT PORT_REDIRECT)) {
         if ( my $t = $r->dir_config($_) ) {
             $env->{$_} = $t;
         }

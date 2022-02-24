@@ -62,7 +62,7 @@ ok( ( defined($listMatch) and ref($listMatch) eq 'CODE' ),
 ok( &$listMatch eq '0', 'Get good result' );
 
 # Test has2f method
-my $sub7  = "sub { return(has2f(\$_[0],\$_[1])) }";
+my $sub7  = "sub { return(has2f_internal(\$_[0],\$_[1])) }";
 my $has2f = $jail->jail_reval($sub7);
 ok(
     ( defined($has2f) and ref($has2f) eq 'CODE' ),

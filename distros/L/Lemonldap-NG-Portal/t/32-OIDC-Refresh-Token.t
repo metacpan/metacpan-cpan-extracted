@@ -80,7 +80,7 @@ sub runTest {
 
     $json = expectJSON( getUserinfo( $op, $access_token ) );
 
-    ok( $json->{'sub'} eq "french",              'Got User Info' );
+    ok( $json->{'sub'} eq "french",            'Got User Info' );
     ok( $json->{'name'} eq "Frédéric Accents", 'Got User Info' );
 
     # Skip ahead in time
@@ -110,7 +110,7 @@ sub runTest {
     # Try refreshed access token
     $json = expectJSON( getUserinfo( $op, $access_token ) );
 
-    ok( $json->{'sub'} eq "french",              'Got User Info' );
+    ok( $json->{'sub'} eq "french",            'Got User Info' );
     ok( $json->{'name'} eq "Frédéric Accents", 'Got User Info' );
 
     # Check failure conditions
@@ -143,17 +143,17 @@ my $baseConfig = {
         },
         oidcRPMetaDataOptions => {
             rp => {
-                oidcRPMetaDataOptionsDisplayName        => "RP",
-                oidcRPMetaDataOptionsClientID           => "rpid",
-                oidcRPMetaDataOptionsAllowOffline       => 1,
-                oidcRPMetaDataOptionsIDTokenSignAlg     => "HS512",
-                oidcRPMetaDataOptionsAccessTokenSignAlg => "RS512",
-                oidcRPMetaDataOptionsAccessTokenClaims  => 1,
-                oidcRPMetaDataOptionsClientSecret       => "rpid",
-                oidcRPMetaDataOptionsUserIDAttr         => "",
-                oidcRPMetaDataOptionsBypassConsent      => 1,
-                oidcRPMetaDataOptionsRefreshToken       => 1,
-                oidcRPMetaDataOptionsIDTokenForceClaims => 1,
+                oidcRPMetaDataOptionsDisplayName         => "RP",
+                oidcRPMetaDataOptionsClientID            => "rpid",
+                oidcRPMetaDataOptionsAllowOffline        => 1,
+                oidcRPMetaDataOptionsIDTokenSignAlg      => "HS512",
+                oidcRPMetaDataOptionsAccessTokenSignAlg  => "RS512",
+                oidcRPMetaDataOptionsAccessTokenClaims   => 1,
+                oidcRPMetaDataOptionsClientSecret        => "rpid",
+                oidcRPMetaDataOptionsUserIDAttr          => "",
+                oidcRPMetaDataOptionsBypassConsent       => 1,
+                oidcRPMetaDataOptionsRefreshToken        => 1,
+                oidcRPMetaDataOptionsIDTokenForceClaims  => 1,
                 oidcRPMetaDataOptionsAdditionalAudiences =>
                   "http://my.extra.audience/test urn:extra2",
             }

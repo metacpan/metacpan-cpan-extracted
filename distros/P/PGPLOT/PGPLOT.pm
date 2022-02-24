@@ -1,12 +1,14 @@
 package PGPLOT;
 
-$VERSION="2.27";
-
+use strict;
+use warnings;
 use Exporter;
 use DynaLoader;
 
-@ISA = qw(Exporter DynaLoader);
-@EXPORT = qw( pgarro pgask pgaxis pgband pgbbuf pgbeg pgbegin pgbin pgbox
+our $VERSION="2.28";
+
+our @ISA = qw(Exporter DynaLoader);
+our @EXPORT = qw( pgarro pgask pgaxis pgband pgbbuf pgbeg pgbegin pgbin pgbox
 pgcirc pgclos pgconb pgconf pgconl pgcons pgcont pgconx pgctab pgcurs pgcurse pgdraw
 pgebuf pgend pgenv pgeras pgerrb pgerr1 pgerrx pgerry pgetxt pgfunt pgfunx
 pgfuny pggray pghi2d pghist pgiden pgimag pglab pglabel pglcur pgldev

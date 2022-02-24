@@ -394,16 +394,17 @@ sub _oidcMetaDataNodes {
     my ( $id, $resp ) = ( 1, [] );
 
     # Handle RP Attributes
-    if ($query eq "oidcRPMetaDataExportedVars") {
+    if ( $query eq "oidcRPMetaDataExportedVars" ) {
         my $pk = eval { $self->getConfKey( $req, $query )->{$partner} } // {};
         return $self->sendError( $req, undef, 400 ) if ( $req->error );
         foreach my $h ( sort keys %$pk ) {
+
             # Set default values for type and array
             my $data = [ split /;/, $pk->{$h} ];
-            unless ( $data->[1]) {
+            unless ( $data->[1] ) {
                 $data->[1] = "string";
             }
-            unless ( $data->[2]) {
+            unless ( $data->[2] ) {
                 $data->[2] = "auto";
             }
             push @$resp,
@@ -416,6 +417,7 @@ sub _oidcMetaDataNodes {
         }
         return $self->sendJSONresponse( $req, $resp );
     }
+
     # Return all exported attributes if asked
     elsif ( $query =~
 /^(?:oidc${type}MetaDataExportedVars|oidcRPMetaDataOptionsExtraClaims|oidcRPMetaDataMacros|oidcRPMetaDataScopeRules)$/
@@ -733,9 +735,9 @@ sub combModules {
     my $res = [];
     foreach my $mod ( keys %$val ) {
         my $tmp;
-        $tmp->{title} = $mod;
-        $tmp->{id}    = "combModules/$mod";
-        $tmp->{type}  = 'cmbModule';
+        $tmp->{title}      = $mod;
+        $tmp->{id}         = "combModules/$mod";
+        $tmp->{type}       = 'cmbModule';
         $tmp->{data}->{$_} = $val->{$mod}->{$_} foreach (qw(type for));
         my $over = $val->{$mod}->{over} // {};
         $tmp->{data}->{over} = [ map { [ $_, $over->{$_} ] } keys %$over ];
@@ -809,8 +811,8 @@ sub metadata {
         }
 
         # Find next and previous conf
-        my @a  = $self->confAcc->available;
-        my $id = -1;
+        my @a     = $self->confAcc->available;
+        my $id    = -1;
         my ($ind) = map { $id++; $_ == $res->{cfgNum} ? ($id) : () } @a;
         if ($ind) { $res->{prev} = $a[ $ind - 1 ]; }
         if ( defined $ind and $ind < $#a ) {

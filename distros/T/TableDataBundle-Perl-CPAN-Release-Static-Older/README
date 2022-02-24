@@ -3,10 +3,10 @@ NAME
     TableData:: modules that contain older CPAN releases data
 
 VERSION
-    This document describes version 20210927.1 of
+    This document describes version 20220218.2 of
     TableDataBundle::Perl::CPAN::Release::Static::Older (from Perl
     distribution TableDataBundle-Perl-CPAN-Release-Static-Older), released
-    on 2021-10-05.
+    on 2022-02-18.
 
 DESCRIPTION
     This distribution contains the following TableData:: modules:
@@ -63,6 +63,8 @@ DESCRIPTION
 
     *   TableData::Perl::CPAN::Release::Static::2020
 
+    *   TableData::Perl::CPAN::Release::Static::2021
+
 HOMEPAGE
     Please visit the project's homepage at
     <https://metacpan.org/release/TableDataBundle-Perl-CPAN-Release-Static-O
@@ -70,8 +72,8 @@ HOMEPAGE
 
 SOURCE
     Source repository is at
-    <https://github.com/perlancar/perl-TableDataBundle-CPAN-Release-Static-O
-    lder>.
+    <https://github.com/perlancar/perl-TableDataBundle-Perl-CPAN-Release-Sta
+    tic-Older>.
 
 SEE ALSO
     TableData
@@ -98,7 +100,8 @@ CONTRIBUTING
     me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021 by perlancar <perlancar@cpan.org>.
+    This software is copyright (c) 2022, 2021 by perlancar
+    <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

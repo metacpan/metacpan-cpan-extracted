@@ -1,0 +1,19 @@
+one: 1
+two: second
+three: true
+number: +444444444444
+time: 1645269548
+email: email@lnation.org
+float: 10.33
+integer: 211
+thing:
+  - one: 1
+    two: second
+    three: true
+  - one: 1
+    two: second
+    three: true
+other:
+  one: 1
+  two: second
+  three: true

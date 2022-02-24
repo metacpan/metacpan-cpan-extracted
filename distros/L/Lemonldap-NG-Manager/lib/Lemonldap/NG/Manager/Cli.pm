@@ -24,8 +24,8 @@ has cfgNum => (
 
 has log    => ( is => 'rw' );
 has req    => ( is => 'ro' );
-has sep    => ( is => 'rw', isa => 'Str', default => '/' );
-has format => ( is => 'rw', isa => 'Str', default => "%-25s | %-25s | %-25s" );
+has sep    => ( is => 'rw', isa => 'Str',  default => '/' );
+has format => ( is => 'rw', isa => 'Str',  default => "%-25s | %-25s | %-25s" );
 has yes    => ( is => 'rw', isa => 'Bool', default => 0 );
 has safe   => ( is => 'rw', isa => 'Bool', default => 0 );
 has force  => ( is => 'rw', isa => 'Bool', default => 0 );
@@ -317,8 +317,8 @@ sub lastCfg {
 
 sub save {
     my ($self) = @_;
-    my $conf = $self->jsonResponse( '/confs/' . $self->cfgNum, 'full=1' );
-    my $json = JSON->new->indent->canonical;
+    my $conf   = $self->jsonResponse( '/confs/' . $self->cfgNum, 'full=1' );
+    my $json   = JSON->new->indent->canonical;
     print $json->encode($conf);
 }
 
@@ -404,9 +404,9 @@ sub _getKey {
 
 sub _setKey {
     my ( $self, $conf, $key, $value ) = @_;
-    my $sep = $self->sep;
+    my $sep    = $self->sep;
     my (@path) = split $sep, $key;
-    my $last = pop @path;
+    my $last   = pop @path;
     while ( my $next = shift @path ) {
         $conf = $conf->{$next};
     }

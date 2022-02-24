@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '0.0105';
+our $VERSION = '0.0106';
 pp_setversion( $VERSION );
 
 
@@ -1892,21 +1892,10 @@ sub make_argument_combinations {
     # result should also be used to check if a call is legal
     # This should make all leval combinations
     my $arg_combs = [];
-    if ($HAVE_LAPACK) {
-        foreach my $linear ( [ ] , [ 'A', 'b' ] ) {
-            foreach my $box ( [ ] , [ 'lb', 'ub' ] , [ 'lb' ], [ 'ub' ] ) {
-                foreach my $ineq ( [ ] , [ 'C', 'd' ] ) {
-                    push @$arg_combs, [ @$box, @$linear, @$ineq ];
-                }
-            }
-        }
-    }
-    else {
-        foreach my $linear ( [ ] ) {
-            foreach my $box ( [ ] , [ 'lb', 'ub' ] , [ 'lb' ], [ 'ub' ] ) {
-                foreach my $ineq ( [ ] ) {
-                    push @$arg_combs, [ @$box, @$linear, @$ineq ];
-                }
+    foreach my $linear ( [ ] , $HAVE_LAPACK ? [ 'A', 'b' ] : () ) {
+        foreach my $box ( [ ] , [ 'lb', 'ub' ] , [ 'lb' ], [ 'ub' ] ) {
+            foreach my $ineq ( [ ] , $HAVE_LAPACK ? [ 'C', 'd' ] : () ) {
+                push @$arg_combs, [ @$box, @$linear, @$ineq ];
             }
         }
     }
@@ -1969,11 +1958,11 @@ sub write_pp_defs {
             my $funcname = '';
             $funcname = $arg_anal->{LEVMAR_FUNCTION_NAME} unless $arg_anal->{LEVMAR_FUNCTION_NAME} eq 'none';
             $h->{CALL} = $funcname . '_' . $h->{CALL} unless $arg_anal->{LEVMAR_FUNCTION_NAME} eq 'none';
-            if ($arg_anal->{LEVMAR_FUNCTION_NAME} eq 'blec' ) {
+            if ($arg_anal->{LEVMAR_FUNCTION_NAME} eq 'blec') {
                  $h->{SIG} .= 'wghts(m); ';
                  $h->{ARG2} .= '$P(wghts), ';    
             }
-            $h->{ARG2} .= 'NULL, ' if @{$arg_anal->{ARG_COMB}}; # as of levmar-2.6, a dscl arg
+            $h->{ARG2} .= 'NULL, ' if $arg_anal->{LEVMAR_FUNCTION_NAME} eq 'bc' and @{$arg_anal->{ARG_COMB}}; # as of levmar-2.6, a dscl arg
             my $pdl_func_name;
             $pdl_func_name = $arg_anal->{PDL_FUNC_NAME_DER} if $der eq 'analytic';
             $pdl_func_name = $arg_anal->{PDL_FUNC_NAME_DIFF} if $der eq 'numeric';

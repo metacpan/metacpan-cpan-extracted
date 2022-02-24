@@ -6,7 +6,7 @@ use Exporter 'import';
 use App::SpamcupNG::Warning;
 use App::SpamcupNG::Warning::Yum;
 
-our $VERSION = '0.011'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 =head1 NAME
 

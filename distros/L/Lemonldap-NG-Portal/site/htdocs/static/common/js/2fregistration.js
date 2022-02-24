@@ -15,7 +15,8 @@ LemonLDAP::NG 2F registration script
     if (level === 'positive') {
       level = 'success';
     }
-    return $('#color').addClass("alert-" + level);
+    $('#color').addClass("alert-" + level);
+    return $('#color').attr("role", "status");
   };
 
   displayError = function(j, status, err) {
@@ -40,6 +41,8 @@ LemonLDAP::NG 2F registration script
       device = 'yubikey';
     } else if (device === 'TOTP') {
       device = 'totp';
+    } else if (device === 'WebAuthn') {
+      device = 'webauthn';
     } else {
       setMsg('u2fFailed', 'warning');
     }

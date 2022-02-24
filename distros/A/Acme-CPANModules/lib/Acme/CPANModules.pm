@@ -1,9 +1,11 @@
+# no code
+## no critic: TestingAndDebugging::RequireUseStrict
 package Acme::CPANModules;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-03-23'; # DATE
+our $DATE = '2022-02-04'; # DATE
 our $DIST = 'Acme-CPANModules'; # DIST
-our $VERSION = '0.1.9'; # VERSION
+our $VERSION = '0.1.10'; # VERSION
 
 1;
 # ABSTRACT: Categorizing CPAN modules
@@ -24,7 +26,7 @@ Acme::CPANModules - Categorizing CPAN modules
 
 =head1 VERSION
 
-This document describes version 0.1.9 of Acme::CPANModules (from Perl distribution Acme-CPANModules), released on 2021-03-23.
+This document describes version 0.1.10 of Acme::CPANModules (from Perl distribution Acme-CPANModules), released on 2022-02-04.
 
 =head1 DESCRIPTION
 
@@ -51,7 +53,8 @@ The first step is to decide on the name of your module. It must be under the
 C<Acme::CPANModules::> namespace. For example, if you create a list of your
 favorite modules, you can use C<Acme::CPANModules::YOURCPANID::Favorite>. Or if
 you are creating a list of modules that predict the future, you can choose
-C<Acme::CPANModules::PredictingTheFuture>.
+C<Acme::CPANModules::PredictingTheFuture>. See recommendations for module name
+in L</module name> under L</RECOMMENDATIONS>.
 
 Inside the module, you must declare a hash named C<$LIST>:
 
@@ -64,7 +67,7 @@ structure is this:
 
  # an example module list
  {
-     summary => 'My favorite modules',
+     summary => 'List of my favorite modules',  # for recommendation of summary, see Recommendations section
      description => <<'_',
  (Some longer description, in Markdown format)
 
@@ -192,6 +195,44 @@ L<Pod::Weaver::Plugin::Acme::CPANModules>. It will create an C<=head2 Included
 modules> section which is POD rendering of your module list so users reading
 your module's documentation can immediately read your list.
 
+=head1 RECOMMENDATIONS
+
+=head2 module name
+
+An Acme::CPANModules module is named under C<Acme::CPANModules::> namespace.
+
+A personal list should go under your CPAN ID's subnamespace, e.g.
+C<Acme::CPANModules::YOURCPANID::Favorite> or
+C<Acme::CPANModules::YOURCPANID::Avoided>.
+
+Avoid having C<Modules> in the name as it is superfluous, e.g.
+C<Acme::CPANModules::TextTable> instead of
+C<Acme::CPANModules::TextTableModules>.
+
+Verb is preferrably written in present participle form, e.g. for a list of
+modules that parse JSON: C<Acme::CPANModules::ParsingJSON> instead of
+C<Acme::CPANModules::ParseJSON>.
+
+Noun that refers to the modules (entries) is preferrably written in plural
+forms, e.g. C<Acme::CPANModules::JSONParsers> instead of
+C<Acme::CPANModules::JSONParser>.
+
+=head2 list summary
+
+The list summary normally becomes the Acme::CPANModules module's Abstract.
+
+It is recommended to start the summary with "List of modules which/that" or
+"List of my ... modules" to make it clearer that the Acme::CPANModules module
+only contains a list of other modules, instead of an actual implementation.
+
+Some preferred examples:
+
+Some non-preferred examples:
+
+=head2 entry rating
+
+Should only be used for personal lists.
+
 =head1 USING ACME::CPANMODULES MODULES
 
 You can install the L<cpanmodules> CLI script (from the L<App::cpanmodules>
@@ -217,14 +258,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Acme-CPANM
 
 Source repository is at L<https://github.com/perlancar/perl-Acme-CPANModules>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Acme-CPANModules/issues>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 C<Acme::CPANModules::*> modules
@@ -240,11 +273,36 @@ complete with L<its own website|http://acme.cpanauthors.org/>.
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2019, 2018 by perlancar@cpan.org.
+This software is copyright (c) 2022, 2021, 2019, 2018 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

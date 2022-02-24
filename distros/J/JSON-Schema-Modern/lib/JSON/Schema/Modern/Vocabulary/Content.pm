@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::Content;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Content vocabulary
 
-our $VERSION = '0.544';
+our $VERSION = '0.546';
 
 use 5.020;
 use Moo;
@@ -56,7 +56,7 @@ sub _eval_keyword_contentEncoding ($self, $data, $schema, $state) {
   return A($state, $schema->{$state->{keyword}})
 }
 
-sub _traverse_keyword_contentMediaType { goto \&_traverse_keyword_contentEncoding }
+sub _traverse_keyword_contentMediaType { shift->_traverse_keyword_contentEncoding(@_) }
 
 sub _eval_keyword_contentMediaType ($self, $data, $schema, $state) {
   return 1 if not is_type('string', $data);
@@ -111,7 +111,7 @@ JSON::Schema::Modern::Vocabulary::Content - Implementation of the JSON Schema Co
 
 =head1 VERSION
 
-version 0.544
+version 0.546
 
 =head1 DESCRIPTION
 

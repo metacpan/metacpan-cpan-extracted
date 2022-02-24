@@ -1,0 +1,13 @@
+Revision history for App-perlvars
+
+0.000004  2022-02-24 17:42:56Z
+    - Don't index test-data directory
+
+0.000003  2022-02-24 17:13:40Z
+    - Document more clearly the limitations of Test::Vars
+
+0.000002  2022-02-18 20:19:40Z
+    - Bump minimum version of Test::Script to 1.29 (GH#2) (Olaf Alders)
+
+0.000001  2022-02-17 23:33:53Z
+    - Initial release.

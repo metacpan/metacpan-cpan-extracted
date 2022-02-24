@@ -10,6 +10,8 @@
 
 #include "asa.h"
 
+char exit_msg[160];           /* temp storage for exit messages */
+
 /***********************************************************************
 * asa
 *       This procedure implements the full ASA function optimization.

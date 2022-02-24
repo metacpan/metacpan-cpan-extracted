@@ -12,7 +12,7 @@ use Carp;
 
 sub get_pdls {my($this) = @_; return ($this->{ParNames},$this->{ParObjs});}
 
-my @code_args_always = qw(BadFlag SignatureObj GenericTypes ExtraGenericSwitches HaveThreading Name);
+my @code_args_always = qw(BadFlag SignatureObj GenericTypes ExtraGenericSwitches HaveBroadcasting Name);
 sub make_args {
   my ($which) = @_;
   ("Parsed$which", [$which,\"Bad$which",@code_args_always]);
@@ -21,8 +21,8 @@ sub make_args {
 # Do the appropriate substitutions in the code.
 sub new {
     my($class,$code,$badcode,
-       $handlebad, $sig,$generictypes,$extrageneric,$havethreading,$name,
-       $dont_add_thrloop, $backcode ) = @_;
+       $handlebad, $sig,$generictypes,$extrageneric,$havebroadcasting,$name,
+       $dont_add_brcloop, $backcode ) = @_;
     my $parnames = $sig->names_sorted;
 
     die "Error: missing name argument to PDL::PP::Code->new call!\n"
@@ -34,10 +34,10 @@ sub new {
 
     # last two arguments may not be supplied
     #
-    # "backcode" is a flag to the PDL::PP::Threadloop class indicating thre threadloop
+    # "backcode" is a flag to the PDL::PP::Broadcastloop class indicating the broadcastloop
     #   is for writeback code (typically used for writeback of data from child to parent PDL
 
-    $dont_add_thrloop ||= !$havethreading; # two have identical (though inverted) meaning so only track one
+    $dont_add_brcloop ||= !$havebroadcasting; # two have identical (though inverted) meaning so only track one
 
     # C++ style comments
     #
@@ -48,7 +48,7 @@ sub new {
 
     if ($::PP_VERBOSE) {
 	print "Processing code for $name\n";
-	print "DONT_ADD_THRLOOP!\n" if $dont_add_thrloop;
+	print "DONT_ADD_BRCLOOP!\n" if $dont_add_brcloop;
 	print "EXTRAGEN: {" .
 	  join(" ",
 	       map "$_=>$$extrageneric{$_}", sort keys %$extrageneric)
@@ -73,16 +73,16 @@ sub new {
     # variable references (strings starting with $) and
     # loops (array references, 1. item = variable.
     #
-    my ( $threadloops, $coderef, $sizeprivs ) =
+    my ( $broadcastloops, $coderef, $sizeprivs ) =
 	$this->separate_code( "{\n$code\n}" );
 
-    # Now, if there is no explicit threadlooping in the code,
+    # Now, if there is no explicit broadcastlooping in the code,
     # enclose everything into it.
-    if(!$threadloops && !$dont_add_thrloop) {
-	print "Adding threadloop...\n" if $::PP_VERBOSE;
+    if(!$broadcastloops && !$dont_add_brcloop) {
+	print "Adding broadcastloop...\n" if $::PP_VERBOSE;
 	my $nc = $coderef;
 	$coderef = $backcode
-	  ? PDL::PP::BackCodeThreadLoop->new() : PDL::PP::ThreadLoop->new();
+	  ? PDL::PP::BackCodeBroadcastLoop->new() : PDL::PP::BroadcastLoop->new();
 	push @{$coderef},$nc;
     }
 
@@ -94,17 +94,17 @@ sub new {
     #
     if ( $handlebad && ($code ne $badcode || $badcode =~ /PDL_BAD_CODE|PDL_IF_BAD/) ) {
 	print "Processing 'bad' code...\n" if $::PP_VERBOSE;
-	my ( $bad_threadloops, $bad_coderef, $bad_sizeprivs ) =
+	my ( $bad_broadcastloops, $bad_coderef, $bad_sizeprivs ) =
 	    $this->separate_code( "{\n$badcode\n}" );
 
-	if(!$bad_threadloops && !$dont_add_thrloop) {
-	    print "Adding 'bad' threadloop...\n" if $::PP_VERBOSE;
+	if(!$bad_broadcastloops && !$dont_add_brcloop) {
+	    print "Adding 'bad' broadcastloop...\n" if $::PP_VERBOSE;
 	    my $nc = $bad_coderef;
-	    if( !$backcode ){ # Normal readbackdata threadloop
-		    $bad_coderef = PDL::PP::ThreadLoop->new();
+	    if( !$backcode ){ # Normal readbackdata broadcastloop
+		    $bad_coderef = PDL::PP::BroadcastLoop->new();
 	    }
-	    else{  # writebackcode threadloop
-		    $bad_coderef = PDL::PP::BackCodeThreadLoop->new();
+	    else{  # writebackcode broadcastloop
+		    $bad_coderef = PDL::PP::BackCodeBroadcastLoop->new();
 	    }
 	    push @{$bad_coderef},$nc;
 	}
@@ -150,14 +150,14 @@ sub new {
     # Then, in this form, put it together what we want the code to actually do.
     print "SIZEPRIVS: ",(join ',',%$sizeprivs),"\n" if $::PP_VERBOSE;
     $this->{Code} = (join '',sort values %$sizeprivs).
-       ($dont_add_thrloop?'':PDL::PP::pp_line_numbers __LINE__, join "\n",
-        'PDL_COMMENT("threadloop declarations")',
-        'int __thrloopval;',
+       ($dont_add_brcloop?'':PDL::PP::pp_line_numbers __LINE__, join "\n",
+        'PDL_COMMENT("broadcastloop declarations")',
+        'int __brcloopval;',
         'register PDL_Indx __tind0,__tind1; PDL_COMMENT("counters along dim")',
-        'register PDL_Indx __tnpdls = $PRIV(pdlthread).npdls;',
+        'register PDL_Indx __tnpdls = $PRIV(broadcast).npdls;',
         'PDL_COMMENT("dims here are how many steps along those dims")',
-        (map "register PDL_Indx __tinc0_$parnames->[$_] = PDL_THR_INC(\$PRIV(pdlthread).incs,__tnpdls,$_,0);", 0..$#$parnames),
-        (map "register PDL_Indx __tinc1_$parnames->[$_] = PDL_THR_INC(\$PRIV(pdlthread).incs,__tnpdls,$_,1);", 0..$#$parnames),
+        (map "register PDL_Indx __tinc0_$parnames->[$_] = PDL_BRC_INC(\$PRIV(broadcast).incs,__tnpdls,$_,0);", 0..$#$parnames),
+        (map "register PDL_Indx __tinc1_$parnames->[$_] = PDL_BRC_INC(\$PRIV(broadcast).incs,__tnpdls,$_,1);", 0..$#$parnames),
        ).
        $this->params_declare.
        join('',map $_->get_incregisters, @$pobjs{sort keys %$pobjs}).
@@ -181,13 +181,13 @@ EOF
 
 sub func_name { $_[1] ? "writebackdata" : "readdata" }
 
-sub threadloop_start {
+sub broadcastloop_start {
     my ($this, $funcname) = @_;
     my ($ord,$pdls) = $this->get_pdls;
     <<EOF;
-PDL_THREADLOOP_START(
+PDL_BROADCASTLOOP_START(
 $funcname,
-\$PRIV(pdlthread),
+\$PRIV(broadcast),
 \$PRIV(vtable),
 @{[ join "", map "\t".$pdls->{$ord->[$_]}->do_pointeraccess." += __offsp[$_];\n", 0..$#$ord ]},
 (@{[ join "", map "\t,".$pdls->{$ord->[$_]}->do_pointeraccess." += __tinc1_$ord->[$_] - __tinc0_$ord->[$_] * __tdims0\n", 0..$#$ord ]}),
@@ -196,12 +196,12 @@ $funcname,
 EOF
 }
 
-sub threadloop_end {
+sub broadcastloop_end {
     my ($this) = @_;
     my ($ord,$pdls) = $this->get_pdls();
     <<EOF;
-PDL_THREADLOOP_END(
-\$PRIV(pdlthread),
+PDL_BROADCASTLOOP_END(
+\$PRIV(broadcast),
 @{[ join "", map $pdls->{$ord->[$_]}->do_pointeraccess." -= __tinc1_$ord->[$_] * __tdims1 + __offsp[$_];\n", 0..$#$ord ]}
 )
 EOF
@@ -227,7 +227,7 @@ my %access2class = (
 );
 
 sub process {
-    my ($this, $code, $stack_ref, $threadloops_ref, $sizeprivs) = @_;
+    my ($this, $code, $stack_ref, $broadcastloops_ref, $sizeprivs) = @_;
     while($code) {
 	# Parse next statement
 	$code =~ s/^(.*?) # First, some noise is allowed. This may be bad.
@@ -235,7 +235,7 @@ sub process {
 	        |\$[a-zA-Z_]\w*\s*\([^)]*\)  # $a(...): access
 		|\bloop\s*\([^)]+\)\s*%\{   # loop(..) %{
 		|\btypes\s*\([^)]+\)\s*%\{  # types(..) %{
-		|\bthreadloop\s*%\{         # threadloop %{
+		|\b(?:thread|broadcast)loop\s*%\{         # broadcastloop %{
 		|%}                        # %}
 		|$)//xs
 		    or confess("Invalid program $code");
@@ -254,11 +254,11 @@ sub process {
 	    my $ob = PDL::PP::Types->new($1,$this);
 	    push @{$stack_ref->[-1]},$ob;
 	    push @$stack_ref,$ob;
-	} elsif($control =~ /^threadloop\s*%\{/) {
-	    my $ob = PDL::PP::ThreadLoop->new;
+	} elsif($control =~ /^(?:thread|broadcast)loop\s*%\{/) {
+	    my $ob = PDL::PP::BroadcastLoop->new;
 	    push @{$stack_ref->[-1]},$ob;
 	    push @$stack_ref,$ob;
-	    $$threadloops_ref++;
+	    $$broadcastloops_ref++;
 	} elsif($control =~ /^%}/) {
 	    pop @$stack_ref;
 	} else {
@@ -269,7 +269,7 @@ sub process {
     } # while: $code
 }
 
-# my ( $threadloops, $coderef, $sizeprivs ) = $this->separate_code( $code );
+# my ( $broadcastloops, $coderef, $sizeprivs ) = $this->separate_code( $code );
 #
 # separates the code into an array of C fragments (strings),
 # variable references (strings starting with $) and
@@ -280,10 +280,10 @@ sub separate_code {
     # First check for standard code errors:
     catch_code_errors($code);
     my @stack = my $coderef = PDL::PP::Block->new;
-    my $threadloops = 0;
+    my $broadcastloops = 0;
     my $sizeprivs = {};
-    $this->process($code, \@stack, \$threadloops, $sizeprivs);
-    ( $threadloops, $coderef, $sizeprivs );
+    $this->process($code, \@stack, \$broadcastloops, $sizeprivs);
+    ( $broadcastloops, $coderef, $sizeprivs );
 } # sub: separate_code()
 
 sub expand {
@@ -531,10 +531,10 @@ sub mypostlude {
 
 ####
 #
-# This relies on PP.pm making sure that initthreadstruct always sets
+# This relies on PP.pm making sure that initbroadcaststruct always sets
 # up the two first dimensions even when they are not necessary.
 #
-package PDL::PP::ThreadLoop;
+package PDL::PP::BroadcastLoop;
 use Carp;
 our @ISA = "PDL::PP::Block";
 
@@ -545,20 +545,19 @@ sub new {
 sub myoffs { return 0; }
 sub myprelude {
     my($this,$parent,$context, $backcode) = @_;
-    $parent->threadloop_start($parent->func_name($backcode));
+    $parent->broadcastloop_start($parent->func_name($backcode));
 }
 
-# Should possibly fold out thread.dims[0] and [1].
 sub mypostlude {my($this,$parent,$context) = @_;
-    $parent->threadloop_end;
+    $parent->broadcastloop_end;
 }
 
-# Simple subclass of ThreadLoop to implement writeback code
+# Simple subclass of BroadcastLoop to implement writeback code
 #
 #
-package PDL::PP::BackCodeThreadLoop;
+package PDL::PP::BackCodeBroadcastLoop;
 use Carp;
-our @ISA = "PDL::PP::ThreadLoop";
+our @ISA = "PDL::PP::BroadcastLoop";
 
 sub myprelude {
     my($this,$parent,$context, $backcode) = @_;

@@ -17,7 +17,7 @@
 
 package Lemonldap::NG::Manager::Build::Tree;
 
-our $VERSION = '2.0.13';
+our $VERSION = '2.0.14';
 
 # TODO: Missing:
 #  * activeTimer
@@ -367,11 +367,21 @@ sub tree {
                         {
                             title => 'proxyParams',
                             help  => 'authproxy.html',
-                            form  => 'simpleInputContainer',
                             nodes => [
-                                'proxyAuthnLevel',     'proxyAuthService',
-                                'proxySessionService', 'remoteCookieName',
-                                'proxyUseSoap'
+                                'proxyAuthnLevel',
+                                'proxyUseSoap',
+                                {
+                                    title => 'proxyInternalPortal',
+                                    form  => 'simpleInputContainer',
+                                    nodes => [
+                                        'proxyAuthService',
+                                        'proxySessionService',
+                                        'proxyAuthServiceChoiceParam',
+                                        'proxyAuthServiceChoiceValue',
+                                        'proxyCookieName',
+                                        'proxyAuthServiceImpersonation',
+                                    ]
+                                }
                             ]
                         },
                         {
@@ -615,6 +625,7 @@ sub tree {
                             form  => 'simpleInputContainer',
                             nodes => [
                                 'stayConnected',
+                                'stayConnectedBypassFG',
                                 'stayConnectedTimeout',
                                 'stayConnectedCookieName'
                             ],
@@ -798,6 +809,8 @@ sub tree {
                                         'checkUserDisplayNormalizedHeaders',
                                         'checkUserDisplayEmptyHeaders',
                                         'checkUserDisplayEmptyValues',
+                                        'checkUserDisplayHiddenAttributes',
+                                        'checkUserDisplayHistory'
                                     ]
                                 },
                             ]
@@ -806,7 +819,12 @@ sub tree {
                             title => 'devOpsCheck',
                             help  => 'checkdevops.html',
                             form  => 'simpleInputContainer',
-                            nodes => [ 'checkDevOps', 'checkDevOpsDownload' ],
+                            nodes => [
+                                'checkDevOps',
+                                'checkDevOpsDownload',
+                                'checkDevOpsDisplayNormalizedHeaders',
+                                'checkDevOpsCheckSessionAttributes'
+                            ],
                         },
                         {
                             title => 'impersonation',
@@ -866,6 +884,7 @@ sub tree {
                         'sfManagerRule',
                         'sfRequired',
                         'sfOnlyUpgrade',
+                        'sfRegisterTimeout',
                         {
                             title => 'utotp2f',
                             help  => 'utotp2f.html',
@@ -887,10 +906,11 @@ sub tree {
                                 'totp2fInterval',
                                 'totp2fRange',
                                 'totp2fDigits',
-                                'totp2fTTL',
+                                'totp2fEncryptSecret',
                                 'totp2fAuthnLevel',
                                 'totp2fLabel',
                                 'totp2fLogo',
+                                'totp2fTTL'
                             ]
                         },
                         {
@@ -899,9 +919,9 @@ sub tree {
                             form  => 'simpleInputContainer',
                             nodes => [
                                 'u2fActivation',       'u2fSelfRegistration',
-                                'u2fUserCanRemoveKey', 'u2fTTL',
-                                'u2fAuthnLevel',       'u2fLabel',
-                                'u2fLogo',
+                                'u2fUserCanRemoveKey', 'u2fAuthnLevel',
+                                'u2fLabel',            'u2fLogo',
+                                'u2fTTL'
                             ]
                         },
                         {
@@ -918,10 +938,10 @@ sub tree {
                                 'yubikey2fUrl',
                                 'yubikey2fPublicIDSize',
                                 'yubikey2fFromSessionAttribute',
-                                'yubikey2fTTL',
                                 'yubikey2fAuthnLevel',
                                 'yubikey2fLabel',
                                 'yubikey2fLogo',
+                                'yubikey2fTTL'
                             ],
                         },
                         {
@@ -931,9 +951,9 @@ sub tree {
                             nodes => [
                                 'mail2fActivation', 'mail2fCodeRegex',
                                 'mail2fTimeout',    'mail2fSubject',
-                                'mail2fBody',       'mail2fAuthnLevel',
-                                'mail2fLabel',      'mail2fLogo',
-                                'mail2fSessionKey',
+                                'mail2fBody',       'mail2fSessionKey',
+                                'mail2fAuthnLevel', 'mail2fLabel',
+                                'mail2fLogo'
                             ]
                         },
                         {
@@ -944,7 +964,7 @@ sub tree {
                                 'ext2fActivation',  'ext2fCodeActivation',
                                 'ext2FSendCommand', 'ext2FValidateCommand',
                                 'ext2fAuthnLevel',  'ext2fLabel',
-                                'ext2fLogo',
+                                'ext2fLogo'
                             ]
                         },
                         {
@@ -958,18 +978,35 @@ sub tree {
                                 'radius2fUsernameSessionKey',
                                 'radius2fTimeout',
                                 'radius2fAuthnLevel',
-                                'radius2fLogo',
                                 'radius2fLabel',
+                                'radius2fLogo'
                             ]
                         },
                         {
                             title => 'rest2f',
                             help  => 'rest2f.html',
+                            form  => 'simpleInputContainer',
                             nodes => [
                                 'rest2fActivation', 'rest2fInitUrl',
                                 'rest2fInitArgs',   'rest2fVerifyUrl',
                                 'rest2fVerifyArgs', 'rest2fAuthnLevel',
-                                'rest2fLabel',      'rest2fLogo',
+                                'rest2fLabel',      'rest2fLogo'
+                            ]
+                        },
+                        {
+                            title => 'webauthn2f',
+                            help  => 'webauthn2f.html',
+                            form  => 'simpleInputContainer',
+                            nodes => [
+                                'webauthn2fActivation',
+                                'webauthn2fSelfRegistration',
+                                'webauthn2fUserVerification',
+                                'webauthn2fUserCanRemoveKey',
+                                'webauthnRpName',
+                                'webauthnDisplayNameAttr',
+                                'webauthn2fAuthnLevel',
+                                'webauthn2fLabel',
+                                'webauthn2fLogo',
                             ]
                         },
                         'sfExtra',
@@ -980,10 +1017,9 @@ sub tree {
                             nodes => [
                                 'sfRemovedMsgRule',  'sfRemovedUseNotif',
                                 'sfRemovedNotifRef', 'sfRemovedNotifTitle',
-                                'sfRemovedNotifMsg',
+                                'sfRemovedNotifMsg'
                             ],
-                        },
-                        'sfRegisterTimeout',
+                        }
                     ]
                 },
                 {
@@ -1034,10 +1070,25 @@ sub tree {
                                 {
                                     title => 'CrowdSecPlugin',
                                     help  => 'crowdsec.html',
+                                    form  => 'simpleInputContainer',
                                     nodes => [
                                         'crowdsec',    'crowdsecAction',
                                         'crowdsecUrl', 'crowdsecKey',
                                     ],
+                                },
+                                {
+                                    title => 'newLocationWarnings',
+                                    help  => 'newlocationwarning.html',
+                                    form  => 'simpleInputContainer',
+                                    nodes => [
+                                        'newLocationWarning',
+                                        'newLocationWarningLocationAttribute',
+'newLocationWarningLocationDisplayAttribute',
+                                        'newLocationWarningMaxValues',
+                                        'newLocationWarningMailAttribute',
+                                        'newLocationWarningMailSubject',
+                                        'newLocationWarningMailBody'
+                                    ]
                                 },
                                 {
                                     title => 'bruteForceAttackProtection',
@@ -1049,6 +1100,8 @@ sub tree {
                                         'bruteForceProtectionMaxFailed',
                                         'bruteForceProtectionIncrementalTempo',
                                         'bruteForceProtectionLockTimes',
+                                        'bruteForceProtectionMaxLockTime',
+                                        'bruteForceProtectionMaxAge'
                                     ]
                                 },
                                 'lwpOpts',
@@ -1317,6 +1370,14 @@ sub tree {
                 },
                 'oidcServiceMetaDataAuthnContext',
                 {
+                    title => "oidcServiceDynamicRegistration",
+                    nodes => [
+                        'oidcServiceAllowDynamicRegistration',
+                        'oidcServiceDynamicRegistrationExportedVars',
+                        'oidcServiceDynamicRegistrationExtraClaims',
+                    ],
+                },
+                {
                     title => 'oidcServiceMetaDataSecurity',
                     nodes => [ {
                             title => 'oidcServiceMetaDataKeys',
@@ -1327,23 +1388,25 @@ sub tree {
                                 'oidcServiceKeyIdSig',
                             ],
                         },
-                        'oidcServiceAllowDynamicRegistration',
-                        'oidcServiceAllowOnlyDeclaredScopes',
                         'oidcServiceAllowAuthorizationCodeFlow',
                         'oidcServiceAllowImplicitFlow',
                         'oidcServiceAllowHybridFlow',
-                        'oidcServiceAuthorizationCodeExpiration',
-                        'oidcServiceAccessTokenExpiration',
-                        'oidcServiceIDTokenExpiration',
-                        'oidcServiceOfflineSessionExpiration',
+                        'oidcServiceAllowOnlyDeclaredScopes',
                     ],
                 },
                 {
-                    title => "oidcServiceMetaDataSessions",
-                    nodes => [ 'oidcStorage', 'oidcStorageOptions', ],
+                    title => 'oidcServiceMetaDataTimeouts',
+                    nodes => [
+                        'oidcServiceAuthorizationCodeExpiration',
+                        'oidcServiceIDTokenExpiration',
+                        'oidcServiceAccessTokenExpiration',
+                        'oidcServiceOfflineSessionExpiration',
+                    ]
                 },
-                'oidcServiceDynamicRegistrationExportedVars',
-                'oidcServiceDynamicRegistrationExtraClaims',
+                {
+                    title => "oidcServiceMetaDataSessions",
+                    nodes => [ 'oidcStorage', 'oidcStorageOptions' ],
+                },
             ]
         },
         'oidcOPMetaDataNodes',
@@ -1354,11 +1417,11 @@ sub tree {
             nodes => [
                 'casAttr',
                 'casAccessControlPolicy',
+                'casStrictMatching',
+                'casTicketExpiration',
                 'casStorage',
                 'casStorageOptions',
                 'casAttributes',
-                'casStrictMatching',
-
             ]
         },
         'casSrvMetaDataNodes',

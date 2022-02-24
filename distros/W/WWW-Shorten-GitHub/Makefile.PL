@@ -6,6 +6,10 @@ use 5.010000;
 
 use ExtUtils::MakeMaker 6.30;
 
+# Git.io has retired their service, so this module shouldn't be installable.
+# It exists to inform it's current users, rather than just disappear.
+die "OS unsupported\n";
+
 
 
 my %WriteMakefileArgs = (
@@ -31,7 +35,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.88",
     "WWW::Shorten" => "1.98"
   },
-  "VERSION" => "0.1.7",
+  "VERSION" => "0.1.8",
   "test" => {
     "TESTS" => "t/*.t"
   }

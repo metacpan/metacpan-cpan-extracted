@@ -1,7 +1,7 @@
 /*  You may distribute under the terms of either the GNU General Public License
  *  or the Artistic License (the same terms as Perl itself)
  *
- *  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
+ *  (C) Paul Evans, 2021-2022 -- leonerd@leonerd.org.uk
  */
 
 #define PERL_NO_GET_CONTEXT
@@ -107,6 +107,18 @@ void MY_lex_expect_str(pTHX_ const char *s)
     yycroakf("Expected \"%s\"", s);
 
   lex_read_to(PL_parser->bufptr + len);
+}
+
+#define parse_autosemi()  MY_parse_autosemi(aTHX)
+void MY_parse_autosemi(pTHX)
+{
+  int c = lex_peek_unichar(0);
+  if(c == ';')
+    lex_read_unichar(0);
+  else if(!c || c == '}')
+    ; /* all is good */
+  else
+    yycroak("Expected: ';' or end of block");
 }
 
 struct Registration;
@@ -363,6 +375,10 @@ static void parse_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
       lex_expect_str(piece->u.str);
       return;
 
+    case XS_PARSE_KEYWORD_AUTOSEMI:
+      parse_autosemi();
+      return;
+
     case XS_PARSE_KEYWORD_FAILURE:
       yycroak(piece->u.str);
       NOT_REACHED;
@@ -494,6 +510,8 @@ static void parse_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
     {
       /* name vs. padix begin with similar structure */
       SV *varname = lex_scan_lexvar();
+      if(!varname)
+        yycroak("Expected a lexical variable name");
       switch(SvPVX(varname)[0]) {
         case '$':
           if(!(piece->u.c & XPK_LEXVAR_SCALAR))
@@ -731,13 +749,7 @@ static int parse(pTHX_ OP **op, struct Registration *reg)
   if(hooks->flags & XPK_FLAG_AUTOSEMI) {
     lex_read_space(0);
 
-    int c = lex_peek_unichar(0);
-    if(c == ';')
-      lex_read_unichar(0);
-    else if(!c || c == '}')
-      ; /* all is good */
-    else
-      yycroak("Expected: ';' or end of block");
+    parse_autosemi();
   }
 
   XSParseKeywordPiece *args = (XSParseKeywordPiece *)SvPVX(argsv);

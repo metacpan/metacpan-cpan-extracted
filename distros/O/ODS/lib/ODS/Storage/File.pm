@@ -5,9 +5,11 @@ use Cwd qw/getcwd/;
 
 extends 'ODS::Storage::Base';
 
-use ODS::Utils qw/move error/;
+use ODS::Utils qw/load move error/;
 
 auto_build;
+
+require_has qw/serialize_class/;
 
 has file_handle => isa(fh);
 
@@ -15,7 +17,7 @@ has file => isa(string), coerce(sub {
 	my ($self, $value) = @_;
 	my $path = getcwd;
 	$value =~ s/^\///;
-	return sprintf("%s/%s.%s", $path, $value, $self->file_suffix);
+	return sprintf("%s/%s.%s", $path, $value, $self->serialize_class->file_suffix);
 }), trigger(sub {
 	my ($self, $value) = @_;
 	$value .= '.tmp';
@@ -24,9 +26,21 @@ has file => isa(string), coerce(sub {
 
 has save_file => isa(string);
 
+has custom_filename => isa(string);
+
+sub parse_data_format {
+	my ($self, $data) = @_;
+	return $self->serialize_class->parse($data);
+}
+
+sub stringify_data_format {
+	my ($self, $data) = @_;
+	return $self->serialize_class->stringify($data);
+}
+
 sub all {
 	my ($self) = @_;
-	
+
 	my $data = $self->into_rows($self->read_file());
 
 	return $data;
@@ -52,8 +66,8 @@ sub search {
 	my ($self, %params) = (shift, @_ > 1 ? @_ : %{ $_[0] });
 
 	my $data = $self->table->rows ? ODS::Iterator->new(table => $self->table) : $self->all;
-	
-	# this only works for JSON and YAML, CSS and JSONL we can stream/read rows/lines instead of reading/loading 
+
+	# this only works for JSON and YAML, CSS and JSONL we can stream/read rows/lines instead of reading/loading
 	# all into memory.
 	my $select = $data->filter(sub {
 		my $row = shift;
@@ -69,8 +83,6 @@ sub search {
 
 	my $table = $self->table->clone();
 	$table->rows($select);
-	my $table = $self->table->clone();
-	$table->rows($select);
 	ODS::Iterator->new(table => $table);
 }
 
@@ -78,8 +90,8 @@ sub find {
 	my ($self, %params) = (shift, @_ > 1 ? @_ : %{ $_[0] });
 
 	my $data = $self->table->rows ? ODS::Iterator->new(table => $self->table) : $self->all;
-	
-	# this only works for JSON and YAML, CSS and JSONL we can stream/read rows/lines instead of reading/loading 
+
+	# this only works for JSON and YAML, CSS and JSONL we can stream/read rows/lines instead of reading/loading
 	# all into memory.
 	my $select = $data->find(sub {
 		my $row = shift;
@@ -123,7 +135,7 @@ sub delete {
 	my ($self, %params) = (shift, @_ > 1 ? @_ : %{ $_[0] });
 
 	my $data = $self->table->rows ?  ODS::Iterator->new(table => $self->table) : $self->all;
-	
+
 	my $index = $data->find_index(sub {
 		my $row = shift;
 		my $select = 1;
@@ -135,7 +147,7 @@ sub delete {
 		}
 		$select;
 	});
-	
+
 	$data->splice($index, 1);
 
 	$data = $self->into_storage(1);
@@ -216,7 +228,6 @@ sub write_file {
 	$self->close_file($fh);
 	$self->close_file($self->file_handle);
 	move($self->save_file, $self->file);
-	unlink $self->save_file;
 }
 
 sub close_file {

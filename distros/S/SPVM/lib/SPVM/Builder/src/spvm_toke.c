@@ -227,9 +227,6 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                   }
                 }
 
-                // Add module file symtable
-                SPVM_HASH_insert(compiler->module_file_symtable, class_name, strlen(class_name), (void*)cur_file);
-                
                 // Open source file
                 fh = fopen(cur_file, "rb");
                 if (fh) {
@@ -352,6 +349,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
       case '\f':
       {
         compiler->bufptr++;
+        compiler->befbufptr = compiler->bufptr;
         continue;
       }
       case '\r':
@@ -364,6 +362,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
         compiler->bufptr++;
         compiler->cur_line++;
         compiler->line_start_ptr = compiler->bufptr;
+        compiler->befbufptr = compiler->bufptr;
         continue;
       }
       // Cancat
@@ -1287,14 +1286,14 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
 
         char* str;
         // String Literal
-        char* found_str = SPVM_HASH_fetch(compiler->const_string_symtable, str_tmp, str_length);
+        char* found_str = SPVM_HASH_fetch(compiler->name_symtable, str_tmp, str_length);
         if (found_str) {
           str = found_str;
         }
         else {
           str = SPVM_ALLOCATOR_new_block_compile_eternal(compiler, str_length + 1);
           memcpy(str, str_tmp, str_length);
-          SPVM_HASH_insert(compiler->const_string_symtable, str, str_length, str);
+          SPVM_HASH_insert(compiler->name_symtable, str, str_length, str);
         }
         
         SPVM_OP* op_constant = SPVM_OP_new_op_constant_string(compiler, str, str_length, compiler->cur_file, compiler->cur_line);
@@ -1355,7 +1354,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
             // Save current position
             const char* cur_token_ptr = compiler->bufptr;
             
-            // Var name
+            // Variable name
             while (
               isalnum(*compiler->bufptr)
               || (*compiler->bufptr) == '_'
@@ -1381,7 +1380,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
             int32_t var_name_length = var_name_length_without_sigil + 1;
 
             char* var_name;
-            char* found_var_name = SPVM_HASH_fetch(compiler->const_string_symtable, cur_token_ptr - 1, var_name_length);
+            char* found_var_name = SPVM_HASH_fetch(compiler->name_symtable, cur_token_ptr - 1, var_name_length);
             if (found_var_name) {
               var_name = found_var_name;
             }
@@ -1390,7 +1389,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
               var_name[0] = '$';
               memcpy(&var_name[1], cur_token_ptr, var_name_length_without_sigil);
               var_name[1 + var_name_length_without_sigil] = '\0';
-              SPVM_HASH_insert(compiler->const_string_symtable, var_name, var_name_length_without_sigil + 1, var_name);
+              SPVM_HASH_insert(compiler->name_symtable, var_name, var_name_length_without_sigil + 1, var_name);
             }
 
             if (have_brace) {
@@ -1518,41 +1517,24 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
           int32_t str_len = (compiler->bufptr - cur_token_ptr);
           
           // Ignore under line
-          int32_t num_str_tmp_memoyr_blocks_count = compiler->allocator->memory_blocks_count_compile_tmp;
-          char* num_str_tmp = (char*)SPVM_ALLOCATOR_new_block_compile_tmp(compiler, str_len + 2);
+          int32_t num_str_memoyr_blocks_count = compiler->allocator->memory_blocks_count_compile_tmp;
+          char* num_str = (char*)SPVM_ALLOCATOR_new_block_compile_tmp(compiler, str_len + 2);
           int32_t pos = 0;
           {
             int32_t i;
             for (i = 0; i < str_len; i++) {
               if (*(cur_token_ptr + i) != '_') {
-                *(num_str_tmp + pos) = *(cur_token_ptr + i);
+                *(num_str + pos) = *(cur_token_ptr + i);
                 pos++;
               }
             }
-            num_str_tmp[pos] = '\0';
+            num_str[pos] = '\0';
           }
           // Back suffix such as "f" or "F" when hex floating number
           if (is_hex_floating_number && !isdigit(*(compiler->bufptr - 1))) {
             compiler->bufptr--;
-            num_str_tmp[pos - 1] = '\0';
+            num_str[pos - 1] = '\0';
           }
-          
-          int32_t num_str_length = strlen(num_str_tmp);
-
-          // Keyword string
-          char* num_str;
-          char* found_num_str = SPVM_HASH_fetch(compiler->const_string_symtable, num_str_tmp, num_str_length);
-          if (found_num_str) {
-            num_str = found_num_str;
-          }
-          else {
-            num_str = (char*)SPVM_ALLOCATOR_new_block_compile_eternal(compiler, num_str_length + 1);
-            memcpy(num_str, num_str_tmp, num_str_length);
-            SPVM_HASH_insert(compiler->const_string_symtable, num_str, num_str_length, num_str);
-          }
-          
-          SPVM_ALLOCATOR_free_block_compile_tmp(compiler, num_str_tmp);
-          assert(compiler->allocator->memory_blocks_count_compile_tmp == num_str_tmp_memoyr_blocks_count);
 
           // Constant
           SPVM_TYPE* constant_type;
@@ -1709,8 +1691,10 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
           else {
             assert(0);
           }
-          
-          op_constant->uv.constant->num_str = num_str;
+
+          SPVM_ALLOCATOR_free_block_compile_tmp(compiler, num_str);
+          assert(compiler->allocator->memory_blocks_count_compile_tmp == num_str_memoyr_blocks_count);
+
           
           yylvalp->opval = op_constant;
           
@@ -1739,10 +1723,10 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
             }
           }
           
-          // Keyword string
+          // Keyword name
           char* keyword;
           int32_t keyword_length = (compiler->bufptr - cur_token_ptr);
-          char* found_name = SPVM_HASH_fetch(compiler->const_string_symtable, cur_token_ptr, keyword_length);
+          char* found_name = SPVM_HASH_fetch(compiler->name_symtable, cur_token_ptr, keyword_length);
           if (found_name) {
             keyword = found_name;
           }
@@ -1750,7 +1734,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
             keyword = SPVM_ALLOCATOR_new_block_compile_eternal(compiler, keyword_length + 1);
             memcpy(keyword, cur_token_ptr, keyword_length);
             keyword[keyword_length] = '\0';
-            SPVM_HASH_insert(compiler->const_string_symtable, keyword, keyword_length, keyword);
+            SPVM_HASH_insert(compiler->name_symtable, keyword, keyword_length, keyword);
           }
 
           // If following token is fat comma, keyword is manipulated as string literal

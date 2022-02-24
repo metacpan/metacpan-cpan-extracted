@@ -1,7 +1,7 @@
 /*  You may distribute under the terms of either the GNU General Public License
  *  or the Artistic License (the same terms as Perl itself)
  *
- *  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
+ *  (C) Paul Evans, 2021-2022 -- leonerd@leonerd.org.uk
  */
 #define PERL_NO_GET_CONTEXT
 
@@ -23,6 +23,10 @@
 #  define HAVE_BOOL_SvIV_please_nomg
 #endif
 
+#if HAVE_PERL_VERSION(5,35,9)
+#  define HAVE_SV_NUMEQ_FLAGS
+#endif
+
 #ifndef block_start
 #  define block_start(flags)  Perl_block_start(aTHX_ flags)
 #endif
@@ -33,6 +37,7 @@
 
 #include "dispatchop.h"
 
+#ifndef HAVE_SV_NUMEQ_FLAGS
 /* We'd like to call Perl_do_ncmp, except that isn't an exported API function
  * Here's a near-copy of it for num-equality testing purposes */
 #define do_numeq(left, right)  S_do_numeq(aTHX_ left, right)
@@ -84,6 +89,7 @@ static bool S_do_numeq(pTHX_ SV *left, SV *right)
     return lnv == rnv;
   }
 }
+#endif
 
 #define newPADSVOP(type, flags, padix)  MY_newPADSVOP(aTHX_ type, flags, padix)
 static OP *MY_newPADSVOP(pTHX_ I32 type, I32 flags, PADOFFSET padix)
@@ -110,9 +116,13 @@ static OP *pp_dispatch_numeq(pTHX)
       if(SvTRUE(ret))
         return dispatch[idx];
     }
+#ifdef HAVE_SV_NUMEQ_FLAGS
+    else if(sv_numeq_flags(TARG, val, SV_SKIP_OVERLOAD))
+#else
     /* stolen from core's pp_hot.c / pp_eq() */
     else if((SvIOK_notUV(TARG) && SvIOK_notUV(val)) ?
         SvIVX(TARG) == SvIVX(val) : (do_numeq(TARG, val)))
+#endif
       return dispatch[idx];
   }
 

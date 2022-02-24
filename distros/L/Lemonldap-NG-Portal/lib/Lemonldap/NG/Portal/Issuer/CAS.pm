@@ -15,7 +15,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   URIRE
 );
 
-our $VERSION = '2.0.12';
+our $VERSION = '2.0.14';
 
 extends 'Lemonldap::NG::Portal::Main::Issuer',
   'Lemonldap::NG::Portal::Lib::CAS';
@@ -61,8 +61,12 @@ sub init {
 
     # Add CAS Services, so we can check service= parameter on logout
     foreach my $casSrv ( keys %{ $self->casAppList } ) {
-        if ( my $serviceUrl =
-            $self->casAppList->{$casSrv}->{casAppMetaDataOptionsService} )
+        for my $serviceUrl (
+            split(
+                /\s+/,
+                $self->casAppList->{$casSrv}->{casAppMetaDataOptionsService}
+            )
+          )
         {
             push @{ $self->p->{additionalTrustedDomains} }, $serviceUrl;
             $self->logger->debug(
@@ -83,15 +87,22 @@ sub storeEnvAndCheckGateway {
       || $req->param('gateway');
 
     if ( $gateway and $gateway eq "true" ) {
-        $self->logger->debug(
-            "Gateway mode requested, redirect without authentication");
-        $req->response( [ 302, [ Location => $service ], [] ] );
-        for my $s ( $self->ipath, $self->ipath . 'Path' ) {
-            $self->logger->debug("Removing $s from pdata")
-              if delete $req->pdata->{$s};
-        }
+        if ( $self->_gatewayAllowedRedirect( $req, $service ) ) {
+            $self->logger->debug(
+                "Gateway mode requested, redirect without authentication");
+            $req->response( [ 302, [ Location => $service ], [] ] );
+            for my $s ( $self->ipath, $self->ipath . 'Path' ) {
+                $self->logger->debug("Removing $s from pdata")
+                  if delete $req->pdata->{$s};
+            }
 
-        return PE_SENDRESPONSE;
+            return PE_SENDRESPONSE;
+        }
+        else {
+            $self->logger->error(
+                "Disallowing redirection to unknown service $service");
+            return PE_CAS_SERVICE_NOT_ALLOWED;
+        }
     }
 
     if ( $service and $service =~ URIRE ) {
@@ -110,6 +121,24 @@ sub storeEnvAndCheckGateway {
     }
 
     return PE_OK;
+}
+
+sub _gatewayAllowedRedirect {
+    my ( $self, $req, $service ) = @_;
+
+    my $app                    = $self->getCasApp($service);
+    my $casAccessControlPolicy = $self->conf->{casAccessControlPolicy};
+
+    # Redirect is allowed if there is no access control or if
+    # the service is declared in CAS apps
+    if ( $casAccessControlPolicy !~ /^(error|faketicket)$/i ) {
+        return 1;
+    }
+    if ($app) {
+        return 1;
+    }
+
+    return 0;
 }
 
 # Main method (launched only for authenticated users, see Main/Issuer)
@@ -137,9 +166,6 @@ sub run {
 
     # Session ID
     my $session_id = $req->{sessionInfo}->{_session_id} || $req->id;
-
-    # Session creation timestamp
-    my $time = $req->{sessionInfo}->{_utime} || time();
 
     # 1. LOGIN
     if ( $target eq $cas_login ) {
@@ -281,12 +307,20 @@ sub run {
             $self->logger->debug(
                 "Create a CAS service ticket for service $service");
 
+            my $_utime =
+              $self->conf->{casTicketExpiration}
+              ? (
+                time +
+                  $self->conf->{casTicketExpiration} -
+                  $self->conf->{timeout} )
+              : ( $req->{sessionInfo}->{_utime} || time() );
+
             my $Sinfos;
             $Sinfos->{type}    = 'casService';
             $Sinfos->{service} = $service;
             $Sinfos->{renew}   = $casRenewFlag;
             $Sinfos->{_cas_id} = $session_id;
-            $Sinfos->{_utime}  = $time;
+            $Sinfos->{_utime}  = $_utime;
             $Sinfos->{_casApp} = $app;
 
             my $h = $self->p->processHook( $req, 'casGenerateServiceTicket',
@@ -491,6 +525,18 @@ sub validate {
         return $self->returnCasValidateError();
     }
 
+    # Make sure the token is still valid, we already compensated for
+    # different TTLs when storing _utime
+    if ( $casServiceSession->{data}->{_utime} ) {
+        if (
+            time >
+            ( $casServiceSession->{data}->{_utime} + $self->conf->{timeout} ) )
+        {
+            $self->logger->error("Session $ticket has expired");
+            return $self->returnCasValidateError();
+        }
+    }
+
     $self->logger->debug("Service ticket session $ticket found");
 
     my $service1_uri = URI->new($service);
@@ -612,11 +658,16 @@ sub proxy {
             'Error in proxy session management' );
     }
 
+    my $_utime =
+      $self->conf->{casTicketExpiration}
+      ? ( time + $self->conf->{casTicketExpiration} - $self->conf->{timeout} )
+      : $casProxyGrantingSession->data->{_utime};
+
     my $Pinfos;
     $Pinfos->{type}    = 'casProxy';
     $Pinfos->{service} = $targetService;
     $Pinfos->{_cas_id} = $casProxyGrantingSession->data->{_cas_id};
-    $Pinfos->{_utime}  = $casProxyGrantingSession->data->{_utime};
+    $Pinfos->{_utime}  = $_utime;
     $Pinfos->{proxies} = $casProxyGrantingSession->data->{proxies};
 
     $casProxySession->update($Pinfos);
@@ -686,6 +737,20 @@ sub _validate2 {
         return $self->returnCasServiceValidateError( $req, 'INVALID_TICKET',
             'Ticket not found' );
     }
+
+    # Make sure the token is still valid, we already compensated for
+    # different TTLs when storing _utime
+    if ( $casServiceSession->{data}->{_utime} ) {
+        if (
+            time >
+            ( $casServiceSession->{data}->{_utime} + $self->conf->{timeout} ) )
+        {
+            $self->logger->error("$urlType ticket session $ticket has expired");
+            return $self->returnCasServiceValidateError( $req, 'INVALID_TICKET',
+                'Ticket expired' );
+        }
+    }
+
     my $app = $casServiceSession->data->{_casApp};
 
     $self->logger->debug("$urlType ticket session $ticket found");
@@ -752,7 +817,7 @@ sub _validate2 {
         $PGinfos->{type}    = 'casProxyGranting';
         $PGinfos->{service} = $service;
         $PGinfos->{_cas_id} = $casServiceSession->data->{_cas_id};
-        $PGinfos->{_utime}  = $casServiceSession->data->{_utime};
+        $PGinfos->{_utime}  = time;
         $PGinfos->{_casApp} = $app;
 
         # Trace proxies

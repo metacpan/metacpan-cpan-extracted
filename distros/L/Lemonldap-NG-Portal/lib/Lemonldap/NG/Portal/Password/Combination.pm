@@ -50,9 +50,11 @@ sub init {
 
 sub delegate {
     my ( $self, $req, $name, @args ) = @_;
+
     # The user might want to override which password DB is used with a macro
     # This is useful when using SASL delegation in OpenLDAP
-    my $userDB = $req->sessionInfo->{_cmbPasswordDB} || $req->sessionInfo->{_userDB};
+    my $userDB =
+      $req->sessionInfo->{_cmbPasswordDB} || $req->sessionInfo->{_userDB};
     unless ( $self->mods->{$userDB} ) {
         $self->logger->error("No Password module available for $userDB");
         return PE_ERROR;

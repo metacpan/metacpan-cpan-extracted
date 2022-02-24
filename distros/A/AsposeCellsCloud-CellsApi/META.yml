@@ -20,7 +20,7 @@ provides:
     file: lib/AsposeCellsCloud/ApiFactory.pm
   AsposeCellsCloud::CellsApi:
     file: lib/AsposeCellsCloud/CellsApi.pm
-    version: 22.1
+    version: 22.2
   AsposeCellsCloud::LiteCellsApi:
     file: lib/AsposeCellsCloud/LiteCellsApi.pm
   AsposeCellsCloud::LightCellsApi:
@@ -65,6 +65,8 @@ provides:
     file: lib/AsposeCellsCloud/Object/Cells.pm
   AsposeCellsCloud::Object::CellsCloudResponse:
     file: lib/AsposeCellsCloud/Object/CellsCloudResponse.pm
+  AsposeCellsCloud::Object::CellsCloudFileInfo:
+    file: lib/AsposeCellsCloud/Object/CellsCloudFileInfo.pm
   AsposeCellsCloud::Object::CellsColor:
     file: lib/AsposeCellsCloud/Object/CellsColor.pm
   AsposeCellsCloud::Object::CellsError:
@@ -562,5 +564,5 @@ requires:
   strict: '0'
   utf8: '0'
   warnings: '0'
-version: 22.1
+version: 22.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

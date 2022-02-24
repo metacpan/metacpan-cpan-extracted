@@ -1,5 +1,45 @@
 Revision history for Perl extension XML::Generator.
 
+1.09 -- Fri Feb 18 23:06:27 AST 2022
+
+    - b31c19f Increment version
+    - 1a3fa9e Fix RT 49038: Doc bug - escaping
+    - d398d9c Fix dependency info
+
+1.08 -- Thu Feb 17 20:00:24 AST 2022
+
+    [Significant Updates since 1.04]
+
+    - Fix RT 77323: escape all characters outside the normal ASCII range
+    - Fix RT 80273 v1.04 incorrectly escaping stringified inner tags
+    - Fix RT 70986 and provides test
+    - Move to Dist::Zilla to build
+
+    [Changes since 1.07]
+
+    - 6258a3b Update version number for release
+    - c9a09d4 v1.07
+
+1.07 -- Thu Feb 17 16:58:42 AST 2022
+
+    - c70c220 Add .gitignore
+    - 124e36a Update version and Dist::Zilla settings
+    - 0f6ccd0 Fix some pod issues
+
+1.06 -- Thu Feb 17 08:04:38 AST 2022
+
+    - 7c9d6d5 v1.06
+    - a676ff3 Merge pull request #1 from perl-net-saml2/distzilla
+    - d565282 Move to Dist::Zilla
+
+1.05     Wed Feb 16 22:00:00 2022
+
+    - 1eb746e (tag: 1.05) Update for new release
+    - 0e895a0 Add github action
+    - f636f4b Fix RT 77323: escape all characters outside the normal ASCII range
+    - 423c2cf Fix RT 80273 v1.04 incorrectly escaping stringified inner tags
+    - 8ef1c52 Fixes RT 70986 and provides test
+
 1.04     Fri Jul 15 08:35:00 2011
         - Added the filter_invalid_chars option, which is turned on by default
           under strict mode.

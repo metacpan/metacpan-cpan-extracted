@@ -10,7 +10,7 @@ WriteMakefile(
     ABSTRACT_FROM    => 'lib/PDL/IO/Dcm.pm',
     LICENSE          => 'Artistic_2_0',
     PL_FILES		=>{},
-    EXE_FILES         => ['bin/read_dcm.pl'],
+    EXE_FILES         => ['bin/sort_dcms.pl','bin/read_dcm.pl'],
     MIN_PERL_VERSION => 5.006,
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => 0,
@@ -20,7 +20,9 @@ WriteMakefile(
     },
     PREREQ_PM => {
 	'PDL'=>0,
-	'List::MoreUtils'=>0,
+	'Storable'=>0,
+	#'List::MoreUtils'=>0,
+	'List::Util'=>0,
 	'DicomPack::IO::DicomReader'=>0,
 	'DicomPack::DB::DicomTagDict'=>0,
 	'DicomPack::DB::DicomVRDict'=>0,

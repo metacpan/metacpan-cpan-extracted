@@ -1,5 +1,5 @@
 {
-   "abstract" : "SPVM Math Functions",
+   "abstract" : "Math Functions",
    "author" : [
       "Yuki Kimoto<kimoto.yuki@gmail.com>"
    ],
@@ -27,13 +27,11 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "SPVM" : "0.9506"
          }
       },
       "runtime" : {
-         "requires" : {
-            "SPVM" : "0.9500"
-         }
+         "requires" : {}
       }
    },
    "release_status" : "stable",
@@ -44,6 +42,6 @@
          "web" : "https://github.com/yuki-kimoto/Perl-SPVM-Math"
       }
    },
-   "version" : "0.06",
+   "version" : "0.09",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -1,3 +1,8 @@
+0.023   2022-02-18  Released-By: PERLANCAR; Urgency: medium
+
+        - Observe $main::Default_Log_Level.
+
+
 0.022   2022-01-16  Released-By: PERLANCAR; Urgency: medium
 
 	- [ux] Enable Screen 0.018's colorize_tags option.

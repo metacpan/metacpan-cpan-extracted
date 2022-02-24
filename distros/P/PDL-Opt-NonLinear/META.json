@@ -55,7 +55,7 @@
          "web" : "https://github.com/PDLPorters/PDL-Opt-NonLinear"
       }
    },
-   "version" : "0.07",
+   "version" : "0.08",
    "x_IRC" : "irc://irc.perl.org/#pdl",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

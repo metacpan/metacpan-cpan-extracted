@@ -6,8 +6,9 @@ use Exporter 'import';
 use App::SpamcupNG::Error;
 use App::SpamcupNG::Error::Mailhost;
 use App::SpamcupNG::Error::Bounce;
+use App::SpamcupNG::Error::LoginFailed;
 
-our $VERSION = '0.011'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 =head1 NAME
 
@@ -30,6 +31,7 @@ our @EXPORT_OK = qw(create_error);
 
 my $mailhost_regex = qr/Mailhost\sconfiguration\sproblem/;
 my $bounce_regex   = qr/bounce/;
+my $login_failed_regex = qr/^Login\sfailed/;
 my @fatal_errors   = ( qr/email\sis\stoo\sold/, qr/^Nothing/ );
 
 =head1 FUNCTIONS
@@ -64,6 +66,9 @@ sub create_error {
 
     return App::SpamcupNG::Error::Bounce->new( $message_ref, 1 )
         if ( $message_ref->[0] =~ $bounce_regex );
+
+    return App::SpamcupNG::Error::LoginFailed->new( $message_ref)
+        if ( $message_ref->[0] =~ $login_failed_regex );
 
     return App::SpamcupNG::Error->new( $message_ref, $is_fatal )
         if ($is_fatal);

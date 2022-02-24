@@ -17,7 +17,7 @@ my %WriteMakefileArgs = (
   "NAME" => "IO::AsyncX::Notifier",
   "PREREQ_PM" => {
     "IO::Async::Notifier" => "0.79",
-    "Object::Pad" => "0.55"
+    "Object::Pad" => "0.61"
   },
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
@@ -29,7 +29,7 @@ my %WriteMakefileArgs = (
     "Test::Fatal" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -42,7 +42,7 @@ my %FallbackPrereqs = (
   "IO::Async::Notifier" => "0.79",
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "Object::Pad" => "0.55",
+  "Object::Pad" => "0.61",
   "Ryu::Observable" => "3.000",
   "Test::CheckDeps" => "0.010",
   "Test::Fatal" => 0,

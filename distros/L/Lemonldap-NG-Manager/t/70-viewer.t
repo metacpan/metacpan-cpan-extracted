@@ -18,7 +18,8 @@ sub body {
 
 # Test that key value is sent
 my $res = &client->jsonResponse('/view/1/portalDisplayOidcConsents');
-ok( $res->{value} eq '$_oidcConsents && $_oidcConsents =~ /\\w+/', 'Key found' );
+ok( $res->{value} eq '$_oidcConsents && $_oidcConsents =~ /\\w+/',
+    'Key found' );
 count(1);
 
 # Test that hidden key values are NOT sent

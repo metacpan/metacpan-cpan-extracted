@@ -1,0 +1,21 @@
+# This CITATION.cff file was generated with /Users/brian/bin/bmt
+# Tue Feb 15 19:55:02 2022
+
+abstract: Business::ISSN - Perl extension for International Standard Serial Numbers
+authors:
+- alias: briandfoy
+  email: bdfoy@cpan.org
+  family-names: foy
+  given-names: brian d
+  orcid: 0000-0002-0283-8283
+cff-version: 1.2.0
+date-released: 2020-03-19
+doi: 10.5281/zenodo.6098257
+license: artistic_2
+license-url: https://github.com/briandfoy/business-issn/LICENSE
+message: The GitHub page for this module provides formatted citations
+repository-code: https://github.com/briandfoy/business-issn
+title: The Business::ISSN Perl module
+type: software
+version: '1.004'
+

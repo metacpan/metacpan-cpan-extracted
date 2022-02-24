@@ -1,5 +1,10 @@
 Revision history for Syntax-Keyword-Try
 
+0.27    2022-02-22
+        [CHANGES]
+         * Updates to support Feature::Compat::Try 0.05 with new `finally {}`
+           blocks
+
 0.26    2021-10-12
         [CHANGES]
          * Many internal updates to hax/ support files

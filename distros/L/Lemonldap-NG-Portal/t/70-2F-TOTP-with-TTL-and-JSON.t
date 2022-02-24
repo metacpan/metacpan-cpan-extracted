@@ -152,11 +152,9 @@ qr%<input type="hidden" name="reference1x1" value="Remov-e-TOTP-(\d{10})"/>%,
     ) or print STDERR Dumper( $res->[2]->[0] );
     ok( time() + 295 <= $1 && $1 <= time() + 305, 'Right reference found' )
       or print STDERR Dumper( $res->[2]->[0] ), time(), " / $1";
-    ok(
-        $res->[2]->[0] =~
-qr%<p class="notifText">1 SF removed = myTOTP</p>%,
-        'Notification message found'
-    ) or print STDERR Dumper( $res->[2]->[0] );
+    ok( $res->[2]->[0] =~ qr%<p class="notifText">1 SF removed = myTOTP</p>%,
+        'Notification message found' )
+      or print STDERR Dumper( $res->[2]->[0] );
     $id = expectCookie($res);
     $client->logout($id);
 }

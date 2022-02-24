@@ -1,3 +1,10 @@
+0.002   2022-02-04  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - Tweak Abstract (Acme::CPANModules 0.1.10 recommendation).
+
+
 0.001   2022-01-15  Released-By: PERLANCAR
 
         - First release.

@@ -5,7 +5,7 @@ use Mouse;
 
 #use Lemonldap::NG::Handler::Main qw(:jailSharedVars);
 
-our $VERSION = '2.0.11';
+our $VERSION = '2.0.14';
 
 has protection => ( is => 'rw', isa => 'Str' );
 has rule       => ( is => 'rw', isa => 'Str' );
@@ -16,12 +16,12 @@ has api        => ( is => 'rw', isa => 'Str' );
 sub init {
     my ( $self, $args ) = @_;
     eval { $self->api->init($args) };
-    if ( $@ and not( $self->{protection} and $self->{protection} eq 'none' ) ) {
+    if ( $@ and not( $args->{protection} and $args->{protection} eq 'none' ) ) {
         $self->error($@);
         return 0;
     }
     unless ( $self->api->checkConf($self)
-        or ( $self->{protection} and $self->{protection} eq 'none' ) )
+        or ( $args->{protection} and $args->{protection} eq 'none' ) )
     {
         $self->error(
             "Unable to protect this server ($Lemonldap::NG::Common::Conf::msg)"
@@ -30,7 +30,7 @@ sub init {
     }
     eval { $self->portal( $self->api->tsv->{portal}->() ) };
     my $rule =
-      $self->{protection} || $self->api->localConfig->{protection} || '';
+      $args->{protection} || $self->api->localConfig->{protection} || '';
     $self->rule(
         $rule eq 'authenticate' ? 1 : $rule eq 'manager' ? '' : $rule );
     return 1;
@@ -38,7 +38,7 @@ sub init {
 
 ## @methodi void _run()
 # Check if protecton is activated then return a code ref that will launch
-# _authAndTrace() if protection in on or handler() else
+# _logAuthTrace() if protection in on or handler() else
 #@return code-ref
 sub _run {
     my $self = shift;
@@ -50,7 +50,7 @@ sub _run {
         # Handle requests
         # Developers, be careful: Only this part is executed at each request
         return sub {
-            return $self->_authAndTrace(
+            return $self->_logAuthTrace(
                 Lemonldap::NG::Common::PSGI::Request->new( $_[0] ) );
         };
     }
@@ -68,7 +68,7 @@ sub _run {
         # Handle unprotected requests
         return sub {
             my $req = Lemonldap::NG::Common::PSGI::Request->new( $_[0] );
-            my $res = $self->handler($req);
+            my $res = $self->_logAndHandle($req);
             push @{ $res->[1] }, $req->spliceHdrs;
             return $res;
         };
@@ -111,6 +111,34 @@ sub reload {
     };
 }
 
+sub _logAuthTrace {
+    my ( $self, $req, $noCall ) = @_;
+
+    # register the request object to the logging system
+    if ( ref( $self->logger ) and $self->logger->can('setRequestObj') ) {
+        $self->logger->setRequestObj($req);
+    }
+    if ( ref( $self->userLogger ) and $self->userLogger->can('setRequestObj') )
+    {
+        $self->userLogger->setRequestObj($req);
+    }
+
+    # Call the handler
+    my $res = $self->_authAndTrace( $req, $noCall );
+
+    # Clear the logging system before the next request
+    if ( ref( $self->logger ) and $self->logger->can('clearRequestObj') ) {
+        $self->logger->clearRequestObj($req);
+    }
+    if ( ref( $self->userLogger )
+        and $self->userLogger->can('clearRequestObj') )
+    {
+        $self->userLogger->clearRequestObj($req);
+    }
+
+    return $res;
+}
+
 ## @method private PSGI-Response _authAndTrace($req)
 # Launch $self->api::run() and then handler() if
 # response is 200.
@@ -128,7 +156,7 @@ sub _authAndTrace {
     eval "require $type";
     die $@ if ($@);
     my ( $res, $session ) = $type->run( $req, $self->{rule} );
-    eval { $self->portal( $type->tsv->{portal}->() ) };
+    eval { $self->portal( $type->tsv->{portal}->() ) } unless $self->portal;
     $self->logger->warn($@)  if $@;
     $req->userData($session) if ($session);
 
@@ -138,7 +166,7 @@ sub _authAndTrace {
         }
         else {
             $self->logger->debug('User authenticated, calling handler()');
-            $res = $self->handler($req);
+            $res = $self->_logAndHandle($req);
             push @{ $res->[1] }, $req->spliceHdrs;
             return $res;
         }
@@ -201,7 +229,7 @@ sub userId {
     my $userId =
       $req->userData->{ $Lemonldap::NG::Handler::Main::tsv->{whatToTrace}
           || '_whatToTrace' }
-      || $req->userData->{'_user'} # Fix 2377
+      || $req->userData->{'_user'}    # Fix 2377
       || 'anonymous';
 
     $self->logger->debug("Returned userId: $userId");

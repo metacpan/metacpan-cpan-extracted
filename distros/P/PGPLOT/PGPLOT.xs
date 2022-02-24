@@ -1,10 +1,10 @@
 
-/* 
-   PGPLOT.xs  
+/*
+   PGPLOT.xs
 
-   This file contains the routines provide the glue which 
+   This file contains the routines provide the glue which
    allow perl to call C and hence f77/pgplot via the CPGPLOT
-   library. 
+   library.
 
 */
 
@@ -21,9 +21,9 @@ typedef int   int2D;    /* So 2D arrays are handled automagically */
 typedef float float2D;  /* by typemap */
 
 /* Buffers for routines that return strings  */
-   
-static char strbuff[256]; 
-static char strbuff2[256];  
+
+static char strbuff[256];
+static char strbuff2[256];
 #define SIZEOF(X) sizeof(strbuff)
 
 void MAIN__ () {
@@ -31,10 +31,10 @@ void MAIN__ () {
    croak("This should never happen");
 }
 
-/* New struct stuff */ 
+/* New struct stuff */
 
 /* Create structure to hold pointers to PGPLOT functions */
-   
+
 struct PGPLOT_function_handle {
    I32 binversion;
    void (*cpgmove) (float x, float y);
@@ -53,7 +53,7 @@ PGPLOT_function_handle myPGPLOT_handle;
 /* See BOOT section for the rest of the struct stuff */
 
 
-MODULE = PGPLOT     PACKAGE = PGPLOT 
+MODULE = PGPLOT     PACKAGE = PGPLOT
 
 void
 pgarro(x1,y1,x2,y2)
@@ -89,7 +89,7 @@ pgaxis(opt,x1,y1,x2,y2,v1,v2,step,nsub,dmajl,dmajr,fmin,disp,orient)
   float	orient
   CODE:
     cpgaxis(opt,x1,y1,x2,y2,v1,v2,step,nsub,dmajl,dmajr,fmin,disp,orient);
- 
+
 
 
 int
@@ -98,8 +98,8 @@ pgband(mode,posn,xref,yref,x,y,ch)
   int	posn
   float	xref
   float	yref
-  float	x
-  float	y
+  float	x = NO_INIT
+  float	y = NO_INIT
   char	ch = NO_INIT
   CODE:
     RETVAL = cpgband(mode,posn,xref,yref,&x,&y,&ch);
@@ -290,8 +290,8 @@ pgctab(l,r,g,b,nc,contra,bright)
 
 int
 pgcurs(x,y,ch)
-  float	x
-  float	y
+  float	x = NO_INIT
+  float	y = NO_INIT
   char	ch = NO_INIT
   CODE:
     RETVAL = cpgcurs(&x,&y,&ch);
@@ -304,8 +304,8 @@ pgcurs(x,y,ch)
 
 int
 pgcurse(x,y,ch)
-  float	x
-  float	y
+  float	x = NO_INIT
+  float	y = NO_INIT
   char	ch = NO_INIT
   CODE:
     RETVAL = cpgcurs(&x,&y,&ch);
@@ -530,7 +530,7 @@ pglabel(xlbl,ylbl,toplbl)
 void
 pglcur(maxpt,npt,x,y)
   int	maxpt
-  int	npt
+  int	npt = NO_INIT
   float *	x = NO_INIT
   float *	y = NO_INIT
   CODE:
@@ -606,7 +606,7 @@ pgmtext(side,disp,coord,fjust,text)
 void
 pgncur(maxpt,npt,x,y,symbol)
   int	maxpt
-  int	npt
+  int	npt = NO_INIT
   float *	x = NO_INIT
   float *	y = NO_INIT
   int	symbol
@@ -625,7 +625,7 @@ pgncur(maxpt,npt,x,y,symbol)
 void
 pgncurse(maxpt,npt,x,y,symbol)
   int	maxpt
-  int	npt
+  int	npt = NO_INIT
   float *	x = NO_INIT
   float *	y = NO_INIT
   int	symbol
@@ -650,7 +650,7 @@ pgnumb(mm,pp,form,string,nc)
   int	nc = NO_INIT
   CODE:
     string = strbuff;
-           nc     = SIZEOF(string); 
+           nc     = SIZEOF(string);
     cpgnumb(mm,pp,form,string,&nc);
   OUTPUT:
   string
@@ -660,7 +660,7 @@ pgnumb(mm,pp,form,string,nc)
 void
 pgolin(maxpt,npt,x,y,symbol)
   int	maxpt
-  int	npt
+  int	npt = NO_INIT
   float *	x = NO_INIT
   float *	y = NO_INIT
   int	symbol
@@ -956,7 +956,7 @@ pgqinf(item,value,length)
   int	length = NO_INIT
   CODE:
     value = strbuff;
-    length = SIZEOF(value);  
+    length = SIZEOF(value);
     cpgqinf(item,value,&length);
   OUTPUT:
   value
@@ -1154,7 +1154,7 @@ pgsci(ci)
   int	ci
   CODE:
     cpgsci(ci);
-    
+
 
 void
 pgscir(icilo,icihi)
@@ -1414,10 +1414,10 @@ pgwnad(x1,x2,y1,y2)
   float	y2
   CODE:
     cpgwnad(x1,x2,y1,y2);
-    
+
 BOOT:
-   /* New struct stuff */ 
-   
+   /* New struct stuff */
+
    /* Initialise structure of pointers to core C routines */
 
    myPGPLOT_handle.binversion  = 20001129; /* Date structure redefined */
@@ -1426,12 +1426,10 @@ BOOT:
    myPGPLOT_handle.cpgqcir     = cpgqcir;
    myPGPLOT_handle.cpgsci      = cpgsci;
    myPGPLOT_handle.cpgpt1      = cpgpt1;
-   
+
    /*
       "Publish" pointer to this structure in perl variable for use
        by other modules
    */
 
    sv_setiv(perl_get_sv("PGPLOT::HANDLE",TRUE|GV_ADDMULTI), (IV) (void*) &myPGPLOT_handle);
-   
-

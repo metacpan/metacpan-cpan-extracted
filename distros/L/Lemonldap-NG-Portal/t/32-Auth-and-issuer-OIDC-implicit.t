@@ -160,8 +160,8 @@ count(4);
 # Check attributes in ID Token
 my $id_token_decoded = id_token_payload( $prms{id_token} );
 is( $id_token_decoded->{sub}, "dwho", 'Check sub value' );
-ok( !$id_token_decoded->{name},         'Claim name must not be in ID token' );
-is( $id_token_decoded->{azp}, 'rpid',   ' azp found' );
+ok( !$id_token_decoded->{name}, 'Claim name must not be in ID token' );
+is( $id_token_decoded->{azp}, 'rpid', ' azp found' );
 count(3);
 
 $op->logout($idpId);
@@ -237,7 +237,7 @@ sub op {
                 oidcServiceAllowAuthorizationCodeFlow => 1,
                 oidcRPMetaDataOptions                 => {
                     rp => {
-                        oidcRPMetaDataOptionsDisplayName => "RP",
+                        oidcRPMetaDataOptionsDisplayName         => "RP",
                         oidcRPMetaDataOptionsAdditionalAudiences =>
                           "http://my.extra.audience/test urn:extra2",
                         oidcRPMetaDataOptionsIDTokenExpiration => 3600,

@@ -4,6 +4,7 @@ use strict;
 use Mouse;
 use URI;
 use URI::QueryParam;
+use HTML::Entities qw(encode_entities);
 use Lemonldap::NG::Portal::Lib::SAML;
 use Lemonldap::NG::Portal::Main::Constants qw(
   PE_OK
@@ -21,7 +22,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_UNAUTHORIZEDPARTNER
 );
 
-our $VERSION = '2.0.12';
+our $VERSION = '2.0.14';
 
 extends 'Lemonldap::NG::Portal::Main::Issuer',
   'Lemonldap::NG::Portal::Lib::SAML';
@@ -280,7 +281,7 @@ sub run {
             $req->data->{_proxiedRequest}     = $request;
             $req->data->{_proxiedMethod}      = $method;
             $req->data->{_proxiedRelayState}  = $relaystate,
-              $req->data->{_proxiedArtifact}  = $artifact;
+              $req->data->{_proxiedArtifact} = $artifact;
         }
 
         # Process the request or use IDP initiated mode
@@ -596,8 +597,8 @@ sub run {
             # Get session key associated with NameIDFormat
             # Not for unspecified, transient, persistent, entity, encrypted
             my $nameIDFormatConfiguration = {
-                $self->getNameIDFormat("email") => 'samlNameIDFormatMapEmail',
-                $self->getNameIDFormat("x509")  => 'samlNameIDFormatMapX509',
+                $self->getNameIDFormat("email")   => 'samlNameIDFormatMapEmail',
+                $self->getNameIDFormat("x509")    => 'samlNameIDFormatMapX509',
                 $self->getNameIDFormat("windows") =>
                   'samlNameIDFormatMapWindows',
                 $self->getNameIDFormat("kerberos") =>
@@ -1048,8 +1049,11 @@ sub run {
                 }
 
                 # RelayState
-                $req->{postFields}->{'RelayState'} = $relaystate
-                  if ($relaystate);
+                if ($relaystate) {
+                    $req->{postFields}->{'RelayState'} =
+                      encode_entities($relaystate);
+                    $req->data->{safeHiddenFormValues}->{RelayState} = 1;
+                }
 
                 $req->steps( ['autoPost'] );
                 return PE_OK;
@@ -1515,9 +1519,15 @@ sub sloRelayPost {
     $self->logger->debug("Found relay session $relayID");
 
     # Get data to build POST form
-    $req->{postUrl}                     = $relayInfos->data->{url};
+    $req->{postUrl} = $relayInfos->data->{url};
     $req->{postFields}->{'SAMLRequest'} = $relayInfos->data->{body};
-    $req->{postFields}->{'RelayState'}  = $relayInfos->data->{relayState};
+
+    # RelayState
+    if ( $relayInfos->data->{relayState} ) {
+        $req->{postFields}->{'RelayState'} =
+          encode_entities( $relayInfos->data->{relayState} );
+        $req->data->{safeHiddenFormValues}->{RelayState} = 1;
+    }
 
     # Delete relay session
     $relayInfos->remove();

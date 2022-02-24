@@ -15,7 +15,7 @@
    <th trspan="date">Date</th>
    <th trspan="ipAddr">IP address</th>
    <TMPL_LOOP NAME="fields">
-    <th><TMPL_VAR NAME="name"></th>
+    <th trspan="<TMPL_VAR NAME="name">"><TMPL_VAR NAME="name"></th>
    </TMPL_LOOP>
    <TMPL_IF NAME="displayError">
     <th trspan="errorMsg">Error message</th>

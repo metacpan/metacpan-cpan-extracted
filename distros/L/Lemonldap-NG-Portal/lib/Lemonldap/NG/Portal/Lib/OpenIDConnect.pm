@@ -22,14 +22,14 @@ use Mouse;
 
 use Lemonldap::NG::Portal::Main::Constants qw(PE_OK PE_REDIRECT);
 
-our $VERSION = '2.0.13';
+our $VERSION = '2.0.14';
 
 # OpenID Connect standard claims
 use constant PROFILE => [
     qw/name family_name given_name middle_name nickname preferred_username
       profile picture website gender birthdate zoneinfo locale updated_at/
 ];
-use constant EMAIL => [qw/email email_verified/];
+use constant EMAIL   => [qw/email email_verified/];
 use constant ADDRESS =>
   [qw/formatted street_address locality region postal_code country/];
 use constant PHONE => [qw/phone_number phone_number_verified/];
@@ -1031,7 +1031,7 @@ sub storeState {
     # check if there are data to store
     my $infos;
     foreach (@data) {
-        $infos->{$_} = $req->{$_} if $req->{$_};
+        $infos->{$_}        = $req->{$_}       if $req->{$_};
         $infos->{"data_$_"} = $req->data->{$_} if $req->data->{$_};
     }
     return unless ($infos);
@@ -1064,7 +1064,9 @@ sub extractState {
 
     # Push values in $self
     foreach ( keys %{$stateSession} ) {
-        next if $_ =~ /(type|_session_id|_session_kind|_utime)/;
+        next
+          if $_ =~
+/^(?:type|_session_id|_session_kind|_utime|tokenTimeoutTimestamp|tokenSessionStartTimestamp)$/;
         my $tmp = $stateSession->{$_};
         if (s/^data_//) {
             $req->data->{$_} = $tmp;
@@ -1524,7 +1526,7 @@ sub getScope {
 
             # Set a magic "$requested" variable that contains true if the
             # scope was requested by the application
-            my $requested = grep { $_ eq $dynamicScope } @scope_values;
+            my $requested  = grep { $_ eq $dynamicScope } @scope_values;
             my $attributes = { %{ $req->userData }, requested => $requested };
 
             # If scope is granted by the rule
@@ -1546,7 +1548,10 @@ sub getScope {
     }
 
     $self->p->processHook( $req, 'oidcResolveScope', \@scope_values, $rp );
-    return join( ' ', @scope_values );
+
+    my $scope_str = join( ' ', @scope_values );
+    $self->logger->debug("Resolved scopes: $scope_str");
+    return $scope_str;
 }
 
 # Return Hash of UserInfo data
@@ -1647,7 +1652,7 @@ sub buildUserInfoResponseFromData {
     }
 
     my $h = $self->p->processHook( $req, 'oidcGenerateUserInfoResponse',
-        $userinfo_response );
+        $userinfo_response, $rp );
     return {} if ( $h != PE_OK );
 
     return $userinfo_response;
@@ -1745,7 +1750,7 @@ sub createJWT {
     my $jwt_payload = encode_base64url( to_json($payload), "" );
 
     # JWT header
-    my $typ = $type || "JWT";
+    my $typ             = $type || "JWT";
     my $jwt_header_hash = { typ => $typ, alg => $alg };
     if ( $alg eq "RS256" or $alg eq "RS384" or $alg eq "RS512" ) {
         $jwt_header_hash->{kid} = $self->conf->{oidcServiceKeyIdSig}

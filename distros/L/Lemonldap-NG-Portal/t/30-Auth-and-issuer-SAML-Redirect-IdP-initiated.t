@@ -117,7 +117,7 @@ m#iframe src="http://auth.sp.com(/saml/proxySingleLogout)\?(SAMLRequest=.*?)"#,
     );
     $url = $1;
     my $query = $2;
-    expectCspChildOK($res, "auth.sp.com");
+    expectCspChildOK( $res, "auth.sp.com" );
 
     my $removedCookie = expectCookie($res);
     is( $removedCookie, 0, "SSO cookie removed" );

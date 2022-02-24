@@ -80,9 +80,10 @@ typedef struct av* Net__DNS__Resolver__Unbound__Handle;
 static void async_callback(void* mydata, int err, struct ub_result* result)
 {
 	dTHX;	/* fetch context */
-	AV* av_ptr = (AV*) mydata;
-	av_push(av_ptr, newSViv(err) );
-	av_push(av_ptr, newSViv(PTR2IV(result)) );
+	SV* resobj = newSV(0);
+	sv_setref_pv(resobj, "Net::DNS::Resolver::Unbound::Result", (void*)result);
+	av_push( (AV*)mydata, newSViv(err) );
+	av_push( (AV*)mydata, resobj );
 	return;
 }
 
@@ -108,16 +109,12 @@ err(struct av* handle)
     OUTPUT:
 	RETVAL
 
-Net::DNS::Resolver::Unbound::Result
+SV*
 result(struct av* handle)
     INIT:
 	SV** index = av_fetch(handle, 2, 0);
     CODE:
-	RETVAL = NULL;
-	if ( index ) {
-		RETVAL = INT2PTR(struct ub_result*, SvIVX(*index) );
-		av_pop(handle);		/* avoid ub_result double-free vulnerability */
-	}
+	RETVAL = index ?  av_pop(handle) : NULL;
     OUTPUT:
 	RETVAL
 
@@ -129,6 +126,11 @@ waiting(struct av* handle)
 	RETVAL = index ? 0 : 1;
     OUTPUT:
 	RETVAL
+
+void
+DESTROY(struct av* handle)
+    CODE:
+	av_pop(handle);
 
 
 
@@ -280,11 +282,8 @@ VERSION(void)
 
 Net::DNS::Resolver::Unbound::Result
 ub_resolve(struct ub_ctx* ctx, SV* name, int rrtype, int rrclass)
-    INIT:
-	struct ub_result* result = NULL;
     CODE:
-	checkerr( ub_resolve(ctx, (const char*) SvPVX(name), rrtype, rrclass, &result) );
-	RETVAL = result;
+	checkerr( ub_resolve(ctx, (const char*) SvPVX(name), rrtype, rrclass, &RETVAL) );
     OUTPUT:
 	RETVAL
 
@@ -325,8 +324,7 @@ emulate_error(int async_id, int err, ...)
     CODE:
 	RETVAL = newAV();
 	av_push(RETVAL, newSViv(async_id) );
-	av_push(RETVAL, newSViv(err) );
-	av_push(RETVAL, newSViv(PTR2IV(NULL)) );
+	async_callback( (void*) RETVAL, err, NULL );
     OUTPUT:
 	RETVAL
 

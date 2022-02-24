@@ -1,7 +1,7 @@
 {
    "abstract" : "The authentication portal part of Lemonldap::NG Web-SSO system.",
    "author" : [
-      "Xavier Guimard <x.guimard@free.fr>, ClÃ©ment Oudot <clement@oodo.net>"
+      "Xavier Guimard <x.guimard@free.fr>, Clement Oudot <clement@oodo.net>, Christophe Maudoux <chrmdx@gmail.com>, Maxime Besson <maxime.besson@worteks.com>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
@@ -43,17 +43,21 @@
       },
       "runtime" : {
          "recommends" : {
+            "Authen::Radius" : "0",
+            "Authen::WebAuthn" : "0",
             "Convert::Base32" : "0",
             "DBI" : "0",
             "Email::Sender" : "1.300027",
             "GD::SecurityImage" : "0",
             "Glib" : "0",
             "HTTP::Message" : "0",
+            "IO::Socket::Timeout" : "0",
             "IPC::Run" : "0",
             "Image::Magick" : "0",
             "LWP::Protocol::https" : "0",
             "LWP::UserAgent" : "0",
             "Lasso" : "v2.3.0",
+            "List::MoreUtils" : "0",
             "MIME::Entity" : "0",
             "Net::Facebook::Oauth2" : "0",
             "Net::LDAP" : "0.38",
@@ -67,7 +71,7 @@
          },
          "requires" : {
             "Clone" : "0",
-            "Lemonldap::NG::Handler" : "v2.0.13",
+            "Lemonldap::NG::Handler" : "v2.0.14",
             "Regexp::Assemble" : "0"
          }
       }
@@ -78,12 +82,12 @@
       "bugtracker" : {
          "web" : "https://gitlab.ow2.org/lemonldap-ng/lemonldap-ng/issues"
       },
-      "homepage" : "http://lemonldap-ng.org/",
+      "homepage" : "https://lemonldap-ng.org/",
       "license" : [
          "http://opensource.org/licenses/GPL-2.0"
       ],
       "x_MailingList" : "mailto:lemonldap-ng-dev@ow2.org"
    },
-   "version" : "v2.0.13",
+   "version" : "v2.0.14",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

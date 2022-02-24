@@ -41,7 +41,7 @@
    "provides" : {
       "Syntax::Keyword::Match" : {
          "file" : "lib/Syntax/Keyword/Match.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       }
    },
    "release_status" : "stable",
@@ -51,6 +51,6 @@
       ],
       "x_IRC" : "irc://irc.perl.org/#io-async"
    },
-   "version" : "0.08",
-   "x_serialization_backend" : "JSON::PP version 4.05"
+   "version" : "0.09",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

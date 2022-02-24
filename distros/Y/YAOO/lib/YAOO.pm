@@ -4,13 +4,14 @@ use warnings;
 use Carp qw/croak/; use Tie::IxHash;
 use feature qw/state/;
 use Blessed::Merge;
-our $VERSION = '0.06';
+our $VERSION = '0.08';
 
-our (%TYPES, %object);
+our (%TYPES, %object, $LAST);
 
 sub make_keyword {
 	my ($called, $key, $cb) = @_;
 	*{"${called}::$key"} = $cb;
+	$LAST = 10000000000000000000;
 }
 
 sub import {
@@ -18,14 +19,17 @@ sub import {
 
 	my $called = caller();
 
+	strict->import();
+	warnings->import();
+
 	for my $is (qw/ro rw/) {
 		make_keyword($called, $is, sub { is => $is });
 	}
 
-	for my $key (qw/isa default coerce required trigger/) {
+	for my $key (qw/isa default coerce required trigger lazy delay build_order/) {
 		make_keyword($called, $key, sub {
 			my (@value) = @_;
-			return $key => scalar @value > 1 ? @value : $value[0];
+			return $key => scalar @value > 1 ? @value : ($value[0] || 1);
 		});
 	}
 
@@ -63,7 +67,7 @@ sub import {
 					)) {
 						$value = $object{$extend}{has}{$name}->{coerce}($self, $value, $name)
 							if ($object{$extend}{has}{$name}->{coerce});
-						$object{$extend}{has}{$name}->{required}($value, $name)
+						$object{$extend}{has}{$name}->{required}($self, $value, $name)
 							if ($object{$extend}{$name}->{required});
 						$value = $object{$extend}{has}{$name}->{isa}($value, $name);
 						$self->{$name} = $value;
@@ -112,9 +116,11 @@ sub import {
 		require_has($called);
 		require_sub($self, $called);
 		require_method($called);
+		auto_ld($self, $called, 'lazy') if ($object{$called}{lazy});
 		set_defaults($self, $called);
-		auto_build($self, @_) if ($object{$called}{auto_build});
+		auto_build($self, $called, @_) if ($object{$called}{auto_build});
 		$self->build(@_) if ($self->can('build'));
+		auto_ld($self, $called, 'delay') if ($object{$called}{delay});
 		return $self;
 	});
 }
@@ -123,13 +129,19 @@ sub build_attribute {
 	my ($called, $name, @attrs) = @_;
 
 	my $ref = ref $name || 'STRING';
+
+	my $attribute_extend;
+	if ($name =~ s/^_([a-zA-Z].*)/$1/) {
+		$attribute_extend = 1;
+	}
+
 	if ($ref eq 'ARRAY') {
 		build_attribute($called, $_, @attrs) for @{ $name };
 	} elsif ($ref eq 'HASH') {
 		build_attribute($called, $_, %{ $name->{$_} }) for keys %{ $name };
 	}
 
-	if ( $object{$called}{has}{$name} ) {
+	if ( !$attribute_extend && $object{$called}{has}{$name} ) {
 		croak sprintf "%s attribute already defined for %s object.", $name, $called;
 	}
 
@@ -157,23 +169,39 @@ sub build_attribute {
 		}
 	}
 
+	if ($object{$called}{has}{$name}{required}) {
+		$object{$called}{has}{$name}{required} = \&required;
+	}
+
+	if ($object{$called}{has}{$name}{lazy}) {
+		push @{$object{$called}{lazy}}, $name;
+	}
+
+	if ($object{$called}{has}{$name}{delay}) {
+		push @{$object{$called}{delay}}, $name;
+	}
+
 	make_keyword($called, $name, sub {
 		my ($self, $value) = @_;
-		if (defined $value && (
+		if (@_ > 1 && (
 			$object{$called}{has}{$name}->{is} eq 'rw'
 				|| [split '::', [caller(1)]->[3]]->[-1] =~ m/^new|build|set_defaults|auto_build$/
 		)) {
-			$value = $object{$called}{has}{$name}->{coerce}($self, $value, $name)
-				if ($object{$called}{has}{$name}->{coerce});
-			$object{$called}{has}{$name}{required}($value, $name)
-				if ($object{$called}{$name}->{required});
-			$value = $object{$called}{has}{$name}{isa}($value, $name);
-			$self->{$name} = $value;
-			$object{$called}{has}{$name}{trigger}($self, $value, $name)
-				if ($object{$called}{has}{$name}->{trigger});
+			if (defined $value) {
+				$value = $object{$called}{has}{$name}->{coerce}($self, $value, $name)
+					if ($object{$called}{has}{$name}->{coerce});
+				$object{$called}{has}{$name}{required}($self, $value, $name)
+					if ($object{$called}{$name}->{required});
+				$value = $object{$called}{has}{$name}{isa}($value, $name);
+				$self->{$name} = $value;
+				$object{$called}{has}{$name}{trigger}($self, $value, $name)
+					if ($object{$called}{has}{$name}->{trigger});
+			} else {
+				$self->{$name} = undef;
+			}
 		}
 		$self->{$name};
-	});
+	}) unless $attribute_extend;
 }
 
 sub require_has {
@@ -202,19 +230,33 @@ sub require_method {
 
 sub set_defaults {
 	my ($self, $called) = @_;
-	(defined $object{$called}{has}{$_}{value} && $self->$_($object{$called}{has}{$_}{type} eq 'ordered_hash'
-		? deep_clone_ordered_hash($object{$called}{has}{$_}{value})
-		: deep_clone($object{$called}{has}{$_}{value})
-	)) for keys %{$object{$called}{has}};
+	map {
+		defined $object{$called}{has}{$_}{value} && $self->$_($object{$called}{has}{$_}{type} eq 'ordered_hash'
+			? deep_clone_ordered_hash($object{$called}{has}{$_}{value})
+			: deep_clone($object{$called}{has}{$_}{value}))
+	} sort { ($object{$called}{has}{$a}{build_order} || $LAST) <=> ($object{$called}{has}{$b}{build_order} || $LAST) }
+		keys %{$object{$called}{has}};
 	return $self;
 }
 
 sub auto_build {
-	my ($self, %build) = (shift, scalar @_ == 1 ? %{ $_[0] } : @_);
+	my ($self, $called, %build) = (shift, shift, scalar @_ == 1 ? %{ $_[0] } : @_);
+	map {
+		if ($self->can($_)) {
+			$self->$_($build{$_});
+		}
+	} sort { ($object{$called}{has}{$a}{build_order} || $LAST) <=> ($object{$called}{has}{$b}{build_order} || $LAST) }
+		keys %build;
+}
 
-	for my $key (keys %build) {
-		$self->$key($build{$key}) if $self->can($key);
-	}
+sub auto_ld {
+	my ($self, $called, $type) = @_;
+	map {
+		my $cb_value = ref $object{$called}{has}{$_}{$type} || $object{$called}{has}{$_}{$type} !~ m/^1$/ ? $object{$called}{has}{$_}{$type} : $object{$called}{has}{$_}{build_default}->();
+		$self->$_($cb_value);
+	} sort {
+		($object{$called}{has}{$a}{build_order} || $LAST) <=> ($object{$called}{has}{$b}{build_order} || $LAST)
+	} @{ $object{$called}{$type} };
 }
 
 sub required {
@@ -271,7 +313,7 @@ sub scalarref {
 	return $value;
 }
 
-sub build_boolean { \0 }
+sub build_boolean { \1 }
 
 sub boolean {
 	my ($value, $name) = @_;
@@ -320,6 +362,8 @@ sub fh {
 	return $value;
 }
 
+sub build_object { { } }
+
 sub object {
 	my ($value, $name) = @_;
 	if ( ! ref $value || ref $value !~ m/SCALAR|ARRAY|HASH|GLOB/) {
@@ -366,7 +410,7 @@ YAOO - Yet Another Object Orientation
 
 =head1 VERSION
 
-Version 0.06
+Version 0.08
 
 =cut
 
@@ -378,25 +422,28 @@ Version 0.06
 
 	auto_build;
 
-	has moon => ro, isa(hash(a => "b", c => "d", e => [qw/1 2 3/], f => { 1 => { 2 => { 3 => 4 } } }));
+	has moon => ro, isa(hash(a => "b", c => "d", e => [qw/1 2 3/], f => { 1 => { 2 => { 3 => 4 } } })), lazy, build_order(3);
 
-	has stars => rw, isa(array(qw/a b c d/));
+	has stars => rw, isa(array(qw/a b c d/)), lazy, build_order(3);
 
-	has satellites => rw, isa(integer);
+	has satellites => rw, isa(integer), lazy, build_order(2);
 
 	has mind => rw, isa(ordered_hash(
 		chang => 1,
 		zante => 2,
 		oistins => 3
-	));
+	)), lazy, build_order(1);
 
-	has [qw/look up/] => isa(string);
+	has [qw/look up/] => isa(string), delay, coerce(sub {
+		my $followed = [qw/moon starts satellites/]->[int(rand(3))];
+		$_[0]->$followed;
+	});
 
 	1;
 
 	...
 
-	Synopsis->new( satelites => 5 );
+	Synopsis->new( satellites => 5 );
 
 	$synopsis->mind->{oistins};
 
@@ -414,97 +461,213 @@ Version 0.06
 
 =head1 keywords
 
+The following keywords are exported automatically when you declare the use of YAOO.
+
 =cut
 
 =head2 has
+
+Declare an attribute/accessor.
+
+	has one => ro, isa(object);
 
 =cut
 
 =head2 ro
 
+Set the attribute to read only, so it can only be set on instantiation of the YAOO object.
+
+	has two => ro;
+
 =cut
 
 =head2 rw
 
+Set the attribute tp read write, so it can be set at any time. This is the default if you do not provide ro or rw when declaring your attribute.
+
+	has three => rw;
+
 =cut
 
 =head2 isa
+
+Declare a type for the attribute, see the types below for all the current valid options.
+
+	has four => isa(any($default_value));
 
 =cut
 
 =head3 any
 
+Allow any value to be set for the attribute.
+
+	has five => isa(any);
+
 =cut
 
 =head3 string
+
+Allow only string values to be set for the attribute.
+
+	has six => isa(string);
 
 =cut
 
 =head3 scalarref
 
+Allow only scalar references to be set for the attribute.
+
+	has seven => isa(scalarref);
+
 =cut
 
 =head3 integer
+
+Allow only integer values to be be set for the attribute.
+
+	has eight => isa(integer(10));
 
 =cut
 
 =head3 float
 
+Allow only floats to be set for the attribute.
+
+	has nine => isa(float(211.11));
+
 =cut
 
 =head3 boolean
+
+Allow only boolean values to be set for the attribute.
+
+	has ten => isa(boolean(\1));
 
 =cut
 
 =head3 ordered_hash
 
+Allow only hash values to be set for the attribute, this will also assist with declaring a ordered hash which has a predicatable order for the keys based upon how it is defined.
+
+	has eleven => isa(ordered_hash( one => 1, two => 2, three => 3 ));
+
 =cut
 
 =head3 hash
+
+Allow only hash values to be set for the attribute.
+
+	has twelve => isa(hash);
 
 =cut
 
 =head3 array
 
+Allow only array values to be set for the attribute.
+
+	has thirteen => isa(array);
+
 =cut
 
 =head3 object
+
+Allow any object to be set for the attribute.
+
+	has fourteen => isa(object);
 
 =cut
 
 =head3 fh
 
-=cut
+Allow any file handle to be set for the attribute
 
-=head2 isa
+	has fifthteen => isa(fh);
 
 =cut
 
 =head2 default
 
+Set the default value for the attribute, this can also be done by passing in the isa type.
+
+	has sixteen => isa(string), default('abc');
+
 =cut
 
 =head2 coerce
+
+Define a coerce sub routine so that you can manipulate the passed value when ever it is set.
+
+	has seventeen => isa(object(1)), coerce(sub {
+		JSON->new();
+	});
 
 =cut
 
 =head2 required
 
+Define a required sub routing so that you can dynamically check for required keys/values for the given attribute.
+
+	has eighteen => isa(hash) required(sub {
+		die "the world is a terrible place" if not $_[1]->{honesty};
+	});
+
 =cut
 
 =head2 trigger
+
+Define a trigger sub which is called after the attribute has been set..
+
+	has nineteen => isa(hash) trigger(sub {
+		$_[0]->no_consent;
+	});
+
+=cut
+
+=head2 lazy
+
+Make the attribute lazy so that it is instantiated early.
+
+	has twenty => isa(string('Foo::Bar')), lazy;
+
+=cut
+
+=head2 delay
+
+Make the attribute delayed so that it is instantiated late.
+
+	has twenty_one => isa(object), delay, coerce(sub { $_[0]->twenty->new });
+
+=cut
+
+=head2 build_order
+
+Configure a build order for the attributes, this allows you to control the order in which they are 'set'.
+
+	has twenty_two => isa(string), build_order(18);
 
 =cut
 
 =head2 extends
 
+Declare inheritance.
+
+	extends 'Moonlight';
+
 =cut
 
 =head2 requires_has
 
+Decalre attributes that must exist in the inheritance of the object.
+
+	require_has qw/one two three/
+
 =cut
 
 =head2 requires_sub
+
+Declare sub routines/methods that must exist in the inheritance of the object.
+
+	require_sub qw/transparency dishonesty/
 
 =cut
 

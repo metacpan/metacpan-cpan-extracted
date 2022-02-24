@@ -20,11 +20,15 @@ use DynaLoader;
 
 
 
+
+#line 6 "plplot.pd"
+
+
 use Carp qw(confess);
 
 our $VERSION;
 BEGIN {
-$VERSION = '0.80'
+$VERSION = '0.81'
 };
 
 =head1 NAME
@@ -2310,6 +2314,7 @@ sub close {
 
   return;
 }
+#line 2318 "PLplot.pm"
 
 
 
@@ -2321,6 +2326,9 @@ sub close {
 =cut
 
 
+
+
+#line 2467 "plplot.pd"
 
 my %REORDER = (
  plaxes       => [0,1,6,2,3,7,4,5],
@@ -2371,7 +2379,11 @@ sub _reorder {
 sub plplot_use_standard_argument_order {
   $PDL::Graphics::PLplot::standard_order = shift;
 }
+#line 2383 "PLplot.pm"
 
+
+
+#line 2523 "plplot.pd"
 
 
 =pod
@@ -2441,8 +2453,11 @@ Some of the API functions implemented in PDL have other specificities in
 comparison with the C API and will be discussed below.
 
 =cut
+#line 2457 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -2465,15 +2480,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 2484 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *pladv = \&PDL::pladv;
+#line 2491 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -2496,16 +2514,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 2518 "PLplot.pm"
 
 
 
+#line 1059 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 sub PDL::plaxes { _reorder('plaxes', 'PDL::_plaxes_int', $standard_order, @_) }
+#line 2525 "PLplot.pm"
 
+
+
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plaxes = \&PDL::plaxes;
+#line 2532 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -2528,15 +2555,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 2559 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plbin = \&PDL::plbin;
+#line 2566 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -2559,16 +2589,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 2593 "PLplot.pm"
 
 
 
+#line 1059 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 sub PDL::plbox { _reorder('plbox', 'PDL::_plbox_int', $standard_order, @_) }
+#line 2600 "PLplot.pm"
 
+
+
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plbox = \&PDL::plbox;
+#line 2607 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -2591,16 +2630,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 2634 "PLplot.pm"
 
 
 
+#line 1059 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 sub PDL::plbox3 { _reorder('plbox3', 'PDL::_plbox3_int', $standard_order, @_) }
+#line 2641 "PLplot.pm"
 
+
+
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plbox3 = \&PDL::plbox3;
+#line 2648 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -2623,15 +2671,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 2675 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plcol0 = \&PDL::plcol0;
+#line 2682 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -2654,15 +2705,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 2709 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plcol1 = \&PDL::plcol1;
+#line 2716 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -2685,15 +2739,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 2743 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plcpstrm = \&PDL::plcpstrm;
+#line 2750 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -2716,15 +2773,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 2777 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *pldid2pc = \&PDL::pldid2pc;
+#line 2784 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -2747,15 +2807,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 2811 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *pldip2dc = \&PDL::pldip2dc;
+#line 2818 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -2778,15 +2841,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 2845 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plenv = \&PDL::plenv;
+#line 2852 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -2809,15 +2875,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 2879 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plenv0 = \&PDL::plenv0;
+#line 2886 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -2840,15 +2909,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 2913 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plerrx = \&PDL::plerrx;
+#line 2920 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -2871,15 +2943,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 2947 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plerry = \&PDL::plerry;
+#line 2954 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -2902,15 +2977,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 2981 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plfill3 = \&PDL::plfill3;
+#line 2988 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -2933,15 +3011,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 3015 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plfont = \&PDL::plfont;
+#line 3022 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -2964,15 +3045,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 3049 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plfontld = \&PDL::plfontld;
+#line 3056 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -2995,15 +3079,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 3083 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plgchr = \&PDL::plgchr;
+#line 3090 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -3026,15 +3113,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 3117 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plgcompression = \&PDL::plgcompression;
+#line 3124 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -3057,15 +3147,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 3151 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plgdidev = \&PDL::plgdidev;
+#line 3158 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -3088,15 +3181,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 3185 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plgdiori = \&PDL::plgdiori;
+#line 3192 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -3119,15 +3215,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 3219 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plgdiplt = \&PDL::plgdiplt;
+#line 3226 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -3150,15 +3249,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 3253 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plgfam = \&PDL::plgfam;
+#line 3260 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -3181,15 +3283,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 3287 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plglevel = \&PDL::plglevel;
+#line 3294 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -3212,15 +3317,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 3321 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plgpage = \&PDL::plgpage;
+#line 3328 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -3243,15 +3351,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 3355 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plgspa = \&PDL::plgspa;
+#line 3362 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -3274,15 +3385,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 3389 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plgvpd = \&PDL::plgvpd;
+#line 3396 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -3305,15 +3419,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 3423 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plgvpw = \&PDL::plgvpw;
+#line 3430 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -3336,15 +3453,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 3457 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plgxax = \&PDL::plgxax;
+#line 3464 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -3367,15 +3487,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 3491 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plgyax = \&PDL::plgyax;
+#line 3498 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -3398,15 +3521,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 3525 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plgzax = \&PDL::plgzax;
+#line 3532 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -3429,15 +3555,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 3559 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *pljoin = \&PDL::pljoin;
+#line 3566 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -3460,15 +3589,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 3593 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *pllightsource = \&PDL::pllightsource;
+#line 3600 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -3491,15 +3623,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 3627 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *pllsty = \&PDL::pllsty;
+#line 3634 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -3522,16 +3657,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 3661 "PLplot.pm"
 
 
 
+#line 1059 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 sub PDL::plmtex { _reorder('plmtex', 'PDL::_plmtex_int', $standard_order, @_) }
+#line 3668 "PLplot.pm"
 
+
+
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plmtex = \&PDL::plmtex;
+#line 3675 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -3554,16 +3698,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 3702 "PLplot.pm"
 
 
 
+#line 1059 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 sub PDL::plmtex3 { _reorder('plmtex3', 'PDL::_plmtex3_int', $standard_order, @_) }
+#line 3709 "PLplot.pm"
 
+
+
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plmtex3 = \&PDL::plmtex3;
+#line 3716 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -3586,15 +3739,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 3743 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plpat = \&PDL::plpat;
+#line 3750 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -3617,15 +3773,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 3777 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plprec = \&PDL::plprec;
+#line 3784 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -3648,15 +3807,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 3811 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plpsty = \&PDL::plpsty;
+#line 3818 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -3679,15 +3841,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 3845 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plptex = \&PDL::plptex;
+#line 3852 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -3710,15 +3875,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 3879 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plptex3 = \&PDL::plptex3;
+#line 3886 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -3741,15 +3909,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 3913 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plschr = \&PDL::plschr;
+#line 3920 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -3772,15 +3943,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 3947 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plscmap0n = \&PDL::plscmap0n;
+#line 3954 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -3803,15 +3977,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 3981 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plscmap1n = \&PDL::plscmap1n;
+#line 3988 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -3834,15 +4011,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 4015 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plscol0 = \&PDL::plscol0;
+#line 4022 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -3865,15 +4045,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 4049 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plscolbg = \&PDL::plscolbg;
+#line 4056 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -3896,15 +4079,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 4083 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plscolor = \&PDL::plscolor;
+#line 4090 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -3927,15 +4113,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 4117 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plscompression = \&PDL::plscompression;
+#line 4124 "PLplot.pm"
 
 
+
+#line 3103 "plplot.pd"
 
 =head2 plgDevs
 
@@ -3949,7 +4138,11 @@ Returns a HashRef of all device names (key)
 and their menu strings (value).
 
 =cut
+#line 4142 "PLplot.pm"
 
+
+
+#line 3103 "plplot.pd"
 
 =head2 plgFileDevs
 
@@ -3963,7 +4156,11 @@ Returns a HashRef of file-oriented device names (key)
 and their menu strings (value).
 
 =cut
+#line 4160 "PLplot.pm"
 
+
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -3986,15 +4183,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 4187 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plsdidev = \&PDL::plsdidev;
+#line 4194 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -4017,15 +4217,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 4221 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plsdimap = \&PDL::plsdimap;
+#line 4228 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -4048,15 +4251,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 4255 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plsdiori = \&PDL::plsdiori;
+#line 4262 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -4079,15 +4285,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 4289 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plsdiplt = \&PDL::plsdiplt;
+#line 4296 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -4110,15 +4319,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 4323 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plsdiplz = \&PDL::plsdiplz;
+#line 4330 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -4141,15 +4353,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 4357 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *pl_setcontlabelparam = \&PDL::pl_setcontlabelparam;
+#line 4364 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -4172,15 +4387,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 4391 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *pl_setcontlabelformat = \&PDL::pl_setcontlabelformat;
+#line 4398 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -4203,15 +4421,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 4425 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plsfam = \&PDL::plsfam;
+#line 4432 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -4234,15 +4455,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 4459 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plsmaj = \&PDL::plsmaj;
+#line 4466 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -4265,15 +4489,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 4493 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plsmin = \&PDL::plsmin;
+#line 4500 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -4296,15 +4523,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 4527 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plsori = \&PDL::plsori;
+#line 4534 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -4327,15 +4557,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 4561 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plspage = \&PDL::plspage;
+#line 4568 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -4358,15 +4591,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 4595 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plspause = \&PDL::plspause;
+#line 4602 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -4389,15 +4625,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 4629 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plsstrm = \&PDL::plsstrm;
+#line 4636 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -4420,15 +4659,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 4663 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plssub = \&PDL::plssub;
+#line 4670 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -4451,15 +4693,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 4697 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plssym = \&PDL::plssym;
+#line 4704 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -4482,15 +4727,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 4731 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plstar = \&PDL::plstar;
+#line 4738 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -4513,16 +4761,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 4765 "PLplot.pm"
 
 
 
+#line 1059 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 sub PDL::plstart { _reorder('plstart', 'PDL::_plstart_int', $standard_order, @_) }
+#line 4772 "PLplot.pm"
 
+
+
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plstart = \&PDL::plstart;
+#line 4779 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -4545,15 +4802,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 4806 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plstripa = \&PDL::plstripa;
+#line 4813 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -4576,15 +4836,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 4840 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plstripd = \&PDL::plstripd;
+#line 4847 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -4607,15 +4870,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 4874 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plsvpa = \&PDL::plsvpa;
+#line 4881 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -4638,15 +4904,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 4908 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plsxax = \&PDL::plsxax;
+#line 4915 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -4669,15 +4938,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 4942 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plsxwin = \&PDL::plsxwin;
+#line 4949 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -4700,15 +4972,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 4976 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plsyax = \&PDL::plsyax;
+#line 4983 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -4731,15 +5006,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 5010 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plszax = \&PDL::plszax;
+#line 5017 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -4762,15 +5040,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 5044 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plvasp = \&PDL::plvasp;
+#line 5051 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -4793,15 +5074,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 5078 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plvpas = \&PDL::plvpas;
+#line 5085 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -4824,15 +5108,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 5112 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plvpor = \&PDL::plvpor;
+#line 5119 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -4855,15 +5142,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 5146 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plw3d = \&PDL::plw3d;
+#line 5153 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -4886,15 +5176,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 5180 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plwidth = \&PDL::plwidth;
+#line 5187 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -4917,15 +5210,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 5214 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plwind = \&PDL::plwind;
+#line 5221 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -4948,15 +5244,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 5248 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plP_gpixmm = \&PDL::plP_gpixmm;
+#line 5255 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -4979,15 +5278,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 5282 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plscolbga = \&PDL::plscolbga;
+#line 5289 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -5010,15 +5312,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 5316 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plscol0a = \&PDL::plscol0a;
+#line 5323 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -5069,15 +5374,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 5378 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plline = \&PDL::plline;
+#line 5385 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -5100,15 +5408,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 5412 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plpath = \&PDL::plpath;
+#line 5419 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -5155,15 +5466,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 5470 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plcolorpoints = \&PDL::plcolorpoints;
+#line 5477 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -5186,15 +5500,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 5504 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plsmem = \&PDL::plsmem;
+#line 5511 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -5215,15 +5532,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 5536 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plfbox = \&PDL::plfbox;
+#line 5543 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -5244,15 +5564,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 5568 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plfbox1 = \&PDL::plfbox1;
+#line 5575 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -5273,15 +5596,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 5600 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plunfbox = \&PDL::plunfbox;
+#line 5607 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -5302,15 +5628,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 5632 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plunfbox1 = \&PDL::plunfbox1;
+#line 5639 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -5331,15 +5660,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 5664 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plParseOpts = \&PDL::plParseOpts;
+#line 5671 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -5360,15 +5692,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 5696 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plpoin = \&PDL::plpoin;
+#line 5703 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -5389,15 +5724,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 5728 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plpoin3 = \&PDL::plpoin3;
+#line 5735 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -5418,15 +5756,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 5760 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plline3 = \&PDL::plline3;
+#line 5767 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -5447,15 +5788,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 5792 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plpoly3 = \&PDL::plpoly3;
+#line 5799 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -5476,15 +5820,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 5824 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plhist = \&PDL::plhist;
+#line 5831 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -5505,15 +5852,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 5856 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plfill = \&PDL::plfill;
+#line 5863 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -5534,15 +5884,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 5888 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plgradient = \&PDL::plgradient;
+#line 5895 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -5563,15 +5916,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 5920 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plsym = \&PDL::plsym;
+#line 5927 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -5592,15 +5948,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 5952 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plsurf3d = \&PDL::plsurf3d;
+#line 5959 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -5621,15 +5980,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 5984 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plsurf3dl = \&PDL::plsurf3dl;
+#line 5991 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -5650,15 +6012,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 6016 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plstyl = \&PDL::plstyl;
+#line 6023 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -5681,15 +6046,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 6050 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plseed = \&PDL::plseed;
+#line 6057 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -5712,15 +6080,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 6084 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plrandd = \&PDL::plrandd;
+#line 6091 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -5741,15 +6112,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 6116 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plAllocGrid = \&PDL::plAllocGrid;
+#line 6123 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -5770,15 +6144,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 6148 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plAlloc2dGrid = \&PDL::plAlloc2dGrid;
+#line 6155 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -5802,18 +6179,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 6183 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *init_pltr = \&PDL::init_pltr;
+#line 6190 "PLplot.pm"
 
 
+
+#line 3996 "plplot.pd"
 
 init_pltr (\&pltr0, \&pltr1, \&pltr2);
+#line 6197 "PLplot.pm"
 
+
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -5834,16 +6218,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 6222 "PLplot.pm"
 
 
 
+#line 1059 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 sub PDL::plmap { _reorder('plmap', 'PDL::_plmap_int', $standard_order, @_) }
+#line 6229 "PLplot.pm"
 
+
+
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plmap = \&PDL::plmap;
+#line 6236 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -5864,15 +6257,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 6261 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plstring = \&PDL::plstring;
+#line 6268 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -5893,15 +6289,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 6293 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plstring3 = \&PDL::plstring3;
+#line 6300 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -5922,16 +6321,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 6325 "PLplot.pm"
 
 
 
+#line 1059 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 sub PDL::plmeridians { _reorder('plmeridians', 'PDL::_plmeridians_int', $standard_order, @_) }
+#line 6332 "PLplot.pm"
 
+
+
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plmeridians = \&PDL::plmeridians;
+#line 6339 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -5954,16 +6362,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 6366 "PLplot.pm"
 
 
 
+#line 1059 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 sub PDL::plshades { _reorder('plshades', 'PDL::_plshades_int', $standard_order, @_) }
+#line 6373 "PLplot.pm"
 
+
+
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plshades = \&PDL::plshades;
+#line 6380 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -5984,15 +6401,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 6405 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plcont = \&PDL::plcont;
+#line 6412 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -6013,15 +6433,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 6437 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plmesh = \&PDL::plmesh;
+#line 6444 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -6042,15 +6465,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 6469 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plmeshc = \&PDL::plmeshc;
+#line 6476 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -6071,15 +6497,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 6501 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plot3d = \&PDL::plot3d;
+#line 6508 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -6100,15 +6529,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 6533 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plot3dc = \&PDL::plot3dc;
+#line 6540 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -6129,15 +6561,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 6565 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plscmap1l = \&PDL::plscmap1l;
+#line 6572 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -6158,16 +6593,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 6597 "PLplot.pm"
 
 
 
+#line 1059 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 sub PDL::plshade1 { _reorder('plshade1', 'PDL::_plshade1_int', $standard_order, @_) }
+#line 6604 "PLplot.pm"
 
+
+
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plshade1 = \&PDL::plshade1;
+#line 6611 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -6188,15 +6632,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 6636 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plimage = \&PDL::plimage;
+#line 6643 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -6217,15 +6664,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 6668 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plimagefr = \&PDL::plimagefr;
+#line 6675 "PLplot.pm"
 
 
+
+#line 4363 "plplot.pd"
 
 =head2 plxormod
 
@@ -6241,7 +6691,11 @@ mode = 1-enter, 0-leave, status = 0 if not interactive device
 See the PLplot manual for reference.
 
 =cut
+#line 6695 "PLplot.pm"
 
+
+
+#line 4394 "plplot.pd"
 
 =head2 plGetCursor
 
@@ -6267,7 +6721,11 @@ coordinates and returns a hash with the following keys:
 Returns an empty hash if no translation to world coordinates is possible.
 
 =cut
+#line 6725 "PLplot.pm"
 
+
+
+#line 4457 "plplot.pd"
 
 =head2 plgstrm
 
@@ -6280,7 +6738,11 @@ Returns an empty hash if no translation to world coordinates is possible.
 Returns the number of the current output stream.
 
 =cut
+#line 6742 "PLplot.pm"
 
+
+
+#line 4484 "plplot.pd"
 
 =head2 plgsdev
 
@@ -6293,7 +6755,11 @@ Returns the number of the current output stream.
 Returns the current driver name.
 
 =cut
+#line 6759 "PLplot.pm"
 
+
+
+#line 4524 "plplot.pd"
 
 =head2 plmkstrm
 
@@ -6307,7 +6773,11 @@ Creates a new stream and makes it the default.  Returns the number of
 the created stream.
 
 =cut
+#line 6777 "PLplot.pm"
 
+
+
+#line 4552 "plplot.pd"
 
 =head2 plgver
 
@@ -6322,7 +6792,11 @@ Get the current library version number
 See the PLplot manual for reference.
 
 =cut
+#line 6796 "PLplot.pm"
 
+
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -6343,16 +6817,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 6821 "PLplot.pm"
 
 
 
+#line 1059 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 sub PDL::plstripc { _reorder('plstripc', 'PDL::_plstripc_int', $standard_order, @_) }
+#line 6828 "PLplot.pm"
 
+
+
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plstripc = \&PDL::plstripc;
+#line 6835 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -6373,15 +6856,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 6860 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plgriddata = \&PDL::plgriddata;
+#line 6867 "PLplot.pm"
 
 
+
+#line 4659 "plplot.pd"
 
 =head2 plarc
 
@@ -6395,7 +6881,11 @@ Draw a (possibly) filled arc centered at x, y with semimajor axis a and semimino
 See the PLplot manual for reference.
 
 =cut
+#line 6885 "PLplot.pm"
 
+
+
+#line 4691 "plplot.pd"
 
 =head2 plstransform
 
@@ -6421,7 +6911,11 @@ Sets the default transformation routine for plotting.
 See the PLplot manual for more details.
 
 =cut
+#line 6915 "PLplot.pm"
 
+
+
+#line 4732 "plplot.pd"
 
 =head2 plslabelfunc
 
@@ -6462,7 +6956,11 @@ necessary data can be used in 'perl_labelfunc'.
 See the PLplot manual for more details.
 
 =cut
+#line 6960 "PLplot.pm"
 
+
+
+#line 4787 "plplot.pd"
 
 =head2 pllegend
 
@@ -6480,7 +6978,11 @@ See the PLplot manual for more details.
 See the PLplot manual for more details.
 
 =cut
+#line 6982 "PLplot.pm"
 
+
+
+#line 4965 "plplot.pd"
 
 =head2 plspal0
 
@@ -6493,7 +6995,11 @@ See the PLplot manual for more details.
 Set color palette 0 from the input .pal file.  See the PLplot manual for more details.
 
 =cut
+#line 6999 "PLplot.pm"
 
+
+
+#line 4990 "plplot.pd"
 
 =head2 plspal1
 
@@ -6506,7 +7012,11 @@ Set color palette 0 from the input .pal file.  See the PLplot manual for more de
 Set color palette 1 from the input .pal file.  See the PLplot manual for more details.
 
 =cut
+#line 7016 "PLplot.pm"
 
+
+
+#line 5014 "plplot.pd"
 
 =head2 plbtime
 
@@ -6519,7 +7029,11 @@ Set color palette 1 from the input .pal file.  See the PLplot manual for more de
 Calculate broken-down time from continuous time for current stream.
 
 =cut
+#line 7033 "PLplot.pm"
 
+
+
+#line 5050 "plplot.pd"
 
 =head2 plconfigtime
 
@@ -6533,7 +7047,11 @@ Configure transformation between continuous and broken-down time (and
 vice versa) for current stream.
 
 =cut
+#line 7051 "PLplot.pm"
 
+
+
+#line 5086 "plplot.pd"
 
 =head2 plctime
 
@@ -6546,7 +7064,11 @@ vice versa) for current stream.
 Calculate continuous time from broken-down time for current stream.
 
 =cut
+#line 7068 "PLplot.pm"
 
+
+
+#line 5117 "plplot.pd"
 
 =head2 pltimefmt
 
@@ -6562,7 +7084,11 @@ consistent with the POSIX strpformat/strftime flags, but see the PLplot manual
 for details.
 
 =cut
+#line 7088 "PLplot.pm"
 
+
+
+#line 5143 "plplot.pd"
 
 =head2 plsesc
 
@@ -6576,7 +7102,11 @@ for details.
 Set the escape character for text strings.  See the PLplot manual for more details.
 
 =cut
+#line 7106 "PLplot.pm"
 
+
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -6597,15 +7127,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 7131 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plvect = \&PDL::plvect;
+#line 7138 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -6626,15 +7159,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 7163 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plsvect = \&PDL::plsvect;
+#line 7170 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -6657,15 +7193,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 7197 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plhlsrgb = \&PDL::plhlsrgb;
+#line 7204 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -6688,15 +7227,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 7231 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plgcol0 = \&PDL::plgcol0;
+#line 7238 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -6719,15 +7261,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 7265 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plgcolbg = \&PDL::plgcolbg;
+#line 7272 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -6750,15 +7295,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 7299 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plscmap0 = \&PDL::plscmap0;
+#line 7306 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -6781,15 +7329,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 7333 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plscmap1 = \&PDL::plscmap1;
+#line 7340 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -6812,15 +7363,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 7367 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plgcol0a = \&PDL::plgcol0a;
+#line 7374 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -6843,15 +7397,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 7401 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plgcolbga = \&PDL::plgcolbga;
+#line 7408 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -6874,15 +7431,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 7435 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plscmap0a = \&PDL::plscmap0a;
+#line 7442 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -6905,15 +7465,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 7469 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plscmap1a = \&PDL::plscmap1a;
+#line 7476 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -6934,15 +7497,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 7501 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plscmap1la = \&PDL::plscmap1la;
+#line 7508 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -6965,15 +7531,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 7535 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plgfont = \&PDL::plgfont;
+#line 7542 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -6996,15 +7565,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 7569 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plsfont = \&PDL::plsfont;
+#line 7576 "PLplot.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -7027,15 +7599,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 7603 "PLplot.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *plcalc_world = \&PDL::plcalc_world;
+#line 7610 "PLplot.pm"
 
 
+
+#line 5355 "plplot.pd"
 
 =head2 pl_cmd
 
@@ -7049,7 +7624,11 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
    Gives access to low level driver. $CMD is an integer. $data opaque data.
 
 =cut
+#line 7628 "PLplot.pm"
 
+
+
+#line 5380 "plplot.pd"
 
 =head2 pl_setCairoCtx
 
@@ -7064,7 +7643,11 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
    Uses pl_cmd underneath, but extracts the real C struct pointer from the Cairo::Context.
 
 =cut
+#line 7647 "PLplot.pm"
 
+
+
+#line 5406 "plplot.pd"
 
 
 =pod
@@ -7108,10 +7691,10 @@ The other common graphics packages include L<PDL::PGPLOT>
 and L<PDL::TriD>.
 
 =cut
+#line 7695 "PLplot.pm"
 
 
 
-;
 
 
 

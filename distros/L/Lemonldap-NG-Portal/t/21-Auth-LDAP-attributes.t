@@ -33,6 +33,7 @@ SKIP: {
             }
         }
     );
+
     # my $postString = 'user='
     #   . ( $ENV{LDAPACCOUNT} || 'dwho' )
     #   . '&password='

@@ -21,7 +21,8 @@ use DynaLoader;
 
 
 
-#line 8 "misc.pd"
+#line 7 "misc.pd"
+
 use strict;
 use warnings;
 
@@ -38,7 +39,7 @@ Some basic I/O functionality: FITS, tables, byte-swapping
  use PDL::IO::Misc;
 
 =cut
-#line 42 "Misc.pm"
+#line 43 "Misc.pm"
 
 
 
@@ -52,7 +53,8 @@ Some basic I/O functionality: FITS, tables, byte-swapping
 
 
 
-#line 48 "misc.pd"
+#line 47 "misc.pd"
+
 
 use PDL::Primitive;
 use PDL::Types;
@@ -62,11 +64,12 @@ use Carp;
 use Symbol qw/ gensym /;
 use List::Util;
 use strict;
-#line 66 "Misc.pm"
+#line 68 "Misc.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 bswap2
@@ -86,17 +89,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 90 "Misc.pm"
+#line 93 "Misc.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *bswap2 = \&PDL::bswap2;
-#line 96 "Misc.pm"
+#line 100 "Misc.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 bswap4
@@ -116,17 +121,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 120 "Misc.pm"
+#line 125 "Misc.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *bswap4 = \&PDL::bswap4;
-#line 126 "Misc.pm"
+#line 132 "Misc.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 bswap8
@@ -146,17 +153,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 150 "Misc.pm"
+#line 157 "Misc.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *bswap8 = \&PDL::bswap8;
-#line 156 "Misc.pm"
+#line 164 "Misc.pm"
 
 
 
-#line 125 "misc.pd"
+#line 124 "misc.pd"
+
 
 
 
@@ -1208,18 +1217,20 @@ of C<$1>, C<$2> etc.
   Determine endianness of machine - returns 0 or 1 accordingly
 
 =cut
-#line 1212 "Misc.pm"
+#line 1221 "Misc.pm"
 
 
 
-#line 1181 "misc.pd"
+#line 1180 "misc.pd"
+
 sub PDL::isbigendian { return 0; };
 *isbigendian = \&PDL::isbigendian;
-#line 1219 "Misc.pm"
+#line 1229 "Misc.pm"
 
 
 
-#line 1203 "misc.pd"
+#line 1202 "misc.pd"
+
 
 
 =head2 rasc
@@ -1325,19 +1336,21 @@ sub rcube {
 
       return $cube;
 }
-#line 1329 "Misc.pm"
+#line 1340 "Misc.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *_rasc = \&PDL::_rasc;
-#line 1335 "Misc.pm"
+#line 1347 "Misc.pm"
 
 
 
 
 
-#line 28 "misc.pd"
+#line 27 "misc.pd"
+
 
 =head1 AUTHOR
 
@@ -1350,7 +1363,7 @@ separated from the PDL distribution, the copyright notice
 should be included in the file.
 
 =cut
-#line 1354 "Misc.pm"
+#line 1367 "Misc.pm"
 
 
 

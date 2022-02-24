@@ -1,0 +1,10 @@
+
+## INSTALL
+
+cpanm App::timestamp
+
+
+## UNINSTALL 
+
+cpanm -U App::timestamp
+

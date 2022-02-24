@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::ConsoleMessage;
-$Playwright::ConsoleMessage::VERSION = '0.018';
+$Playwright::ConsoleMessage::VERSION = '0.019';
 use parent 'Playwright::Base';
 
 sub new {
@@ -42,21 +42,21 @@ sub args {
     );
 }
 
-sub location {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'location',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
 sub type {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
         command => 'type',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub location {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'location',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -106,7 +106,7 @@ Playwright::ConsoleMessage - Automatically generated class for Playwright::Conso
 
 =head1 VERSION
 
-version 0.018
+version 0.019
 
 =head1 CONSTRUCTOR
 
@@ -129,17 +129,17 @@ Execute the ConsoleMessage::args playwright routine.
 
 See L<https://playwright.dev/api/class-ConsoleMessage#ConsoleMessage-args> for more information.
 
-=head2 location(@args)
-
-Execute the ConsoleMessage::location playwright routine.
-
-See L<https://playwright.dev/api/class-ConsoleMessage#ConsoleMessage-location> for more information.
-
 =head2 type(@args)
 
 Execute the ConsoleMessage::type playwright routine.
 
 See L<https://playwright.dev/api/class-ConsoleMessage#ConsoleMessage-type> for more information.
+
+=head2 location(@args)
+
+Execute the ConsoleMessage::location playwright routine.
+
+See L<https://playwright.dev/api/class-ConsoleMessage#ConsoleMessage-location> for more information.
 
 =head2 on(@args)
 

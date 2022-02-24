@@ -32,7 +32,7 @@ sub authCancel         { '_authCancel' }
 sub _betweenAuthAndData { _wrapEntryPoint( @_, 'betweenAuthAndData' ); }
 sub _afterData          { _wrapEntryPoint( @_, 'afterData' ); }
 sub _endAuth            { _wrapEntryPoint( @_, 'endAuth' ); }
-sub _forAuthUser        { _wrapEntryPoint( @_, 'forAuthUser', 1 ); }
+sub _forAuthUser        { _wrapEntryPoint( @_, 'forAuthUser',  1 ); }
 sub _beforeLogout       { _wrapEntryPoint( @_, 'beforeLogout', 1 ); }
 sub _authCancel         { _wrapEntryPoint( @_, 'authCancel' ); }
 

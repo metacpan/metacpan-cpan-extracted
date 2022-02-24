@@ -107,7 +107,7 @@ sub iniCmb {
                     dbiAuthLoginCol     => 'user',
                     dbiAuthPasswordCol  => 'password',
                     dbiAuthPasswordHash => '',
-                    dbiExportedVars     => { dbi => 'user' },
+                    dbiExportedVars     => { dbi  => 'user' },
                     demoExportedVars    => { demo => 'uid' },
                 }
             }

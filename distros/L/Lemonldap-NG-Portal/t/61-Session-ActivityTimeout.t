@@ -60,11 +60,8 @@ ok(
     ),
     'Form Authentification'
 );
-ok(
-    $res->[2]->[0] =~
-      m%<div class="message message-warning alert"><span trmsg="1">%,
-    'Found PE_SESSIONEXPIRED code'
-) or print STDERR Dumper( $res->[2]->[0] );
+ok( $res->[2]->[0] =~ m%<span trmsg="1">%, 'Found PE_SESSIONEXPIRED code' )
+  or print STDERR Dumper( $res->[2]->[0] );
 count(2);
 
 $client->logout($id1);

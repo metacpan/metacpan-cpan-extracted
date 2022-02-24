@@ -11,8 +11,8 @@ extends 'Lemonldap::NG::Common::PSGI';
 
 # Properties
 has 'routes' => (
-    is  => 'rw',
-    isa => 'HashRef',
+    is      => 'rw',
+    isa     => 'HashRef',
     default =>
       sub { { GET => {}, POST => {}, PUT => {}, PATCH => {}, DELETE => {} } }
 );

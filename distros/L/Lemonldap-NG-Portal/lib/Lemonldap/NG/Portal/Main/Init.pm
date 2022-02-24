@@ -8,7 +8,7 @@
 #                  of lemonldap-ng.ini) and underlying handler configuration
 package Lemonldap::NG::Portal::Main::Init;
 
-our $VERSION = '2.0.13';
+our $VERSION = '2.0.14';
 
 package Lemonldap::NG::Portal::Main;
 
@@ -94,6 +94,10 @@ has cors => ( is => 'rw' );
 # Cookie SameSite value
 has cookieSameSite => ( is => 'rw' );
 
+# Plugins may declare the session data they want to store in login history here
+has pluginSessionDataToRemember =>
+  ( is => 'rw', isa => "HashRef", default => sub { {} } );
+
 # INITIALIZATION
 
 sub init {
@@ -124,9 +128,9 @@ sub init {
 
     # Purge loaded module list
     $self->loadedModules( {} );
-    $self->afterSub(      {} );
-    $self->aroundSub(     {} );
-    $self->hook(          {} );
+    $self->afterSub( {} );
+    $self->aroundSub( {} );
+    $self->hook( {} );
 
     # Insert `reloadConf` in handler reload stack
     Lemonldap::NG::Handler::Main->onReload( $self, 'reloadConf' );
@@ -152,10 +156,24 @@ sub init {
 
 sub setPortalRoutes {
     my ($self) = @_;
-    $self->authRoutes(
-        { GET => {}, POST => {}, PUT => {}, DELETE => {}, OPTIONS => {} } );
-    $self->unAuthRoutes(
-        { GET => {}, POST => {}, PUT => {}, DELETE => {}, OPTIONS => {} } );
+    $self->authRoutes( {
+            GET     => {},
+            POST    => {},
+            PUT     => {},
+            PATCH   => {},
+            DELETE  => {},
+            OPTIONS => {}
+        }
+    );
+    $self->unAuthRoutes( {
+            GET     => {},
+            POST    => {},
+            PUT     => {},
+            PATCH   => {},
+            DELETE  => {},
+            OPTIONS => {}
+        }
+    );
     $self
 
       # "/" or undeclared paths
@@ -210,10 +228,13 @@ sub reloadConf {
     foreach ( qw(_macros _groups), @entryPoints ) {
         $self->{$_} = [];
     }
-    $self->afterSub(  {} );
+    $self->afterSub( {} );
     $self->aroundSub( {} );
-    $self->spRules(   {} );
-    $self->hook(      {} );
+    $self->spRules( {} );
+    $self->hook( {} );
+
+    # Plugin history fields
+    $self->pluginSessionDataToRemember( {} );
 
     # Load conf in portal object
     foreach my $key ( keys %$conf ) {
@@ -560,11 +581,15 @@ sub loadModule {
         $self->logger->debug("Module $module loaded");
     };
     if ($@) {
-        $self->error("Unable to build $module object: $@");
+        $self->logger->error("Unable to build $module object: $@");
         return 0;
     }
-    unless ( $obj and $obj->init ) {
-        $self->error("$module init failed");
+    unless ($obj) {
+        $self->logger->error("$module new() method returned undef");
+        return 0;
+    }
+    if ( $obj->can("init") and ( !$obj->init ) ) {
+        $self->logger->error("$module init failed");
         return 0;
     }
 

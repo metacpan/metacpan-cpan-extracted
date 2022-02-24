@@ -9,9 +9,9 @@ with 'BorderStyleRole::Source::ASCIIArt';
 with 'BorderStyleRole::Transform::BoxChar';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-02-14'; # DATE
+our $DATE = '2022-02-20'; # DATE
 our $DIST = 'BorderStyles-Standard'; # DIST
-our $VERSION = '0.013'; # VERSION
+our $VERSION = '0.014'; # VERSION
 
 our $PICTURE = <<'_';
 lqqqqqqqwqqqwqqqk'
@@ -46,7 +46,7 @@ BorderStyle::BoxChar::SingleLine - Single line border with box-drawing character
 
 =head1 VERSION
 
-This document describes version 0.013 of BorderStyle::BoxChar::SingleLine (from Perl distribution BorderStyles-Standard), released on 2022-02-14.
+This document describes version 0.014 of BorderStyle::BoxChar::SingleLine (from Perl distribution BorderStyles-Standard), released on 2022-02-20.
 
 =head1 SYNOPSIS
 

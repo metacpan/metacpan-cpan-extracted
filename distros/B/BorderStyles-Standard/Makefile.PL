@@ -21,6 +21,7 @@ my %WriteMakefileArgs = (
     "BorderStyleRole::Spec::Basic" => 0,
     "BorderStyleRole::Transform::BoxChar" => 0,
     "BorderStyleRole::Transform::InnerOnly" => 0,
+    "Class::Method::Modifiers" => 0,
     "Role::Tiny::With" => 0,
     "strict" => 0,
     "utf8" => 0,
@@ -32,7 +33,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.013",
+  "VERSION" => "0.014",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -44,6 +45,7 @@ my %FallbackPrereqs = (
   "BorderStyleRole::Spec::Basic" => 0,
   "BorderStyleRole::Transform::BoxChar" => 0,
   "BorderStyleRole::Transform::InnerOnly" => 0,
+  "Class::Method::Modifiers" => 0,
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,

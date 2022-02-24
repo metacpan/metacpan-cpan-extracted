@@ -3,22 +3,38 @@ package Lemonldap::NG::Handler::PSGI::Try;
 use strict;
 use Mouse;
 
-our $VERSION = '2.0.6';
+our $VERSION = '2.0.14';
 
 extends 'Lemonldap::NG::Handler::PSGI::Router';
 
 has 'authRoutes' => (
-    is  => 'rw',
-    isa => 'HashRef',
-    default =>
-      sub { { GET => {}, POST => {}, PUT => {}, DELETE => {}, OPTIONS => {} } }
+    is      => 'rw',
+    isa     => 'HashRef',
+    default => sub {
+        {
+            GET     => {},
+            POST    => {},
+            PUT     => {},
+            PATCH   => {},
+            DELETE  => {},
+            OPTIONS => {}
+        }
+    }
 );
 
 has 'unAuthRoutes' => (
-    is  => 'rw',
-    isa => 'HashRef',
-    default =>
-      sub { { GET => {}, POST => {}, PUT => {}, DELETE => {}, OPTIONS => {} } }
+    is      => 'rw',
+    isa     => 'HashRef',
+    default => sub {
+        {
+            GET     => {},
+            POST    => {},
+            PUT     => {},
+            PATCH   => {},
+            DELETE  => {},
+            OPTIONS => {}
+        }
+    }
 );
 
 sub addRoute {
@@ -69,7 +85,7 @@ sub _run {
 
     return sub {
         my $req = Lemonldap::NG::Common::PSGI::Request->new( $_[0] );
-        my $res = $self->_authAndTrace( $req, 1 );
+        my $res = $self->_logAuthTrace( $req, 1 );
         if ( $res->[0] < 300 ) {
             $self->routes( $self->authRoutes );
             $req->userData( $self->api->data );
@@ -87,10 +103,11 @@ sub _run {
         else {
             return $res;
         }
-        $res = $self->handler($req);
+        $res = $self->_logAndHandle($req);
         push @{ $res->[1] }, $req->spliceHdrs;
         return $res;
     };
+
 }
 
 1;

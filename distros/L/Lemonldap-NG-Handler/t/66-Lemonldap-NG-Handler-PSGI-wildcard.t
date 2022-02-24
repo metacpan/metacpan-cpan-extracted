@@ -15,7 +15,7 @@ my $res;
 ok( $res = $client->_get( '/', undef, 'test.example.org' ),
     'Unauthentified query' );
 ok( ref($res) eq 'ARRAY', 'Response is an array' ) or explain( $res, 'array' );
-ok( $res->[0] == 302, 'Code is 302' ) or explain( $res->[0], 302 );
+ok( $res->[0] == 302,     'Code is 302' )          or explain( $res->[0], 302 );
 my %h = @{ $res->[1] };
 ok(
     $h{Location} eq 'http://auth.example.com/?url='

@@ -1,3 +1,9 @@
+0.1.8   2022-02-18
+
+    [RETIREMENT]
+    * git.io have retired their shortening service. So this module will no
+      longer function. Please use a different shotener.
+
 0.1.7   2016-01-19
 
     [ BUG FIX ]

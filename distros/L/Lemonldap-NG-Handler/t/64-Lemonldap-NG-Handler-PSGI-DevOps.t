@@ -2,7 +2,6 @@ use Test::More;
 use JSON;
 use MIME::Base64;
 use LWP::UserAgent;
-use Data::Dumper;
 
 BEGIN {
     require 't/test-psgi-lib.pm';
@@ -17,7 +16,7 @@ ok(
     $res = $client->_get(
         '/',                 undef,
         'test3.example.com', "lemonldap=$sessionId",
-        VHOSTTYPE => 'DevOps'
+        VHOSTTYPE => 'DevOps',
     ),
     'Authorized query'
 );
@@ -35,7 +34,7 @@ ok(
     $res = $client->_get(
         '/testyes',          undef,
         'test3.example.com', "lemonldap=$sessionId",
-        VHOSTTYPE => 'DevOps'
+        VHOSTTYPE => 'DevOps',
     ),
     'Authorized query'
 );
@@ -47,7 +46,7 @@ ok(
     $res = $client->_get(
         '/deny',             undef,
         'test3.example.com', "lemonldap=$sessionId",
-        VHOSTTYPE => 'DevOps'
+        VHOSTTYPE => 'DevOps',
     ),
     'Denied query'
 );
@@ -58,7 +57,7 @@ ok(
     $res = $client->_get(
         '/testno',           undef,
         'test3.example.com', "lemonldap=$sessionId",
-        VHOSTTYPE => 'DevOps'
+        VHOSTTYPE => 'DevOps',
     ),
     'Denied query'
 );
@@ -74,6 +73,12 @@ no warnings 'redefine';
 
 sub LWP::UserAgent::request {
     my ( $self, $req ) = @_;
+    ok( $req->header('host') eq 'test3.example.com', 'Host header found' )
+      or explain( $req->headers(), 'test3.example.com' );
+    ok( $req->as_string() =~ m#http://127.0.0.1:80/rules.json#,
+        'Rules file URL found' )
+      or explain( $req->as_string(), 'GET http://127.0.0.1:80/rules.json' );
+    count(2);
     my $httpResp;
     my $s = '{
   "rules": {

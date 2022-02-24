@@ -4,7 +4,7 @@ use warnings;
 
 use Symbol qw<delete_package>;
 use Carp qw<carp croak>;
-use version; our $VERSION = version->declare('v0.1.0');
+use version; our $VERSION = version->declare('v0.1.1');
 use feature qw<say state refaliasing lexical_subs>;
 no warnings "experimental";
 

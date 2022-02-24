@@ -51,7 +51,7 @@ our @EXPORT = qw(
    cqptokens tokenize
 );
 
-our $VERSION = '0.28';
+our $VERSION = '0.29';
 
 our $abrev;
 

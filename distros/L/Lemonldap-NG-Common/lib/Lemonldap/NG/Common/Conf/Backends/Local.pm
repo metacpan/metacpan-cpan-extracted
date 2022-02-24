@@ -3,7 +3,7 @@ package Lemonldap::NG::Common::Conf::Backends::Local;
 use strict;
 use Lemonldap::NG::Common::Conf::Constants;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.14';
 
 sub prereq {
     return 1;
@@ -26,21 +26,22 @@ sub unlock {
 }
 
 sub store {
-    $Lemonldap::NG::Common::Conf::msg = 'Read-only backend !';
+    $Lemonldap::NG::Common::Conf::msg = 'Read-only backend!';
     return DATABASE_LOCKED;
 }
 
 sub load {
     return {
         cfgNum    => 1,
+        cfgDate   => time,
         cfgAuthor => 'LLNG Team',
-        cfgLog =>
-q"Don't edit this configuration, Null backend uses only lemonldap-ng.ini values",
+        cfgLog    =>
+q"Do not edit this configuration, Null backend uses lemonldap-ng.ini values only",
     };
 }
 
 sub delete {
-    $Lemonldap::NG::Common::Conf::msg = 'Read-only backend !';
+    $Lemonldap::NG::Common::Conf::msg = 'Read-only backend!';
     return 0;
 }
 

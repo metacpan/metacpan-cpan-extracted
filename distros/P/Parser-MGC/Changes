@@ -1,5 +1,14 @@
 Revision history for Parser-MGC
 
+0.21    2022-02-23
+        [CHANGES]
+         * Add stall-detection to list-repeating methods, in order to detect
+           buggy grammars that can get stuck
+         * Define optional subclassing methods ->on_parse_start and
+           ->on_parse_end
+         * Added ->include_string to assist with file-inclusion,
+           macro-expansion or similar tasks
+
 0.20    2022-02-14
         [CHANGES]
          * Avoid File::Slurp::Tiny (RT137215)

@@ -6,9 +6,6 @@ use English qw(-no_match_vars);
 use Test::More 'tests' => 4;
 use Test::NoWarnings;
 
-# Default Error::Pure module to use.
-$ENV{'ERROR_PURE_TYPE'} = 'AllError';
-
 # Test.
 my $self = {
 	'key' => undef,

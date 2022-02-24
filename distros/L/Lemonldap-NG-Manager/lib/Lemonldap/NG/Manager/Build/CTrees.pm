@@ -14,7 +14,7 @@
 
 package Lemonldap::NG::Manager::Build::CTrees;
 
-our $VERSION = '2.0.12';
+our $VERSION = '2.0.14';
 
 sub cTrees {
     return {
@@ -30,7 +30,8 @@ sub cTrees {
                     'vhostPort',          'vhostHttps',
                     'vhostMaintenance',   'vhostAliases',
                     'vhostAccessToTrace', 'vhostType',
-                    'vhostAuthnLevel',    'vhostServiceTokenTTL'
+                    'vhostAuthnLevel',    'vhostDevOpsRulesUrl',
+                    'vhostServiceTokenTTL'
                 ],
             },
         ],

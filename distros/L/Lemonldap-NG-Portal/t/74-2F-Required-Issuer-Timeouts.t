@@ -142,12 +142,12 @@ SKIP: {
     );
     my $id = expectCookie($res);
     $pdata = expectCookie( $res, 'lemonldappdata' );
-    expectRedirection( $res, qr'http://auth.example.com//cas' );
+    expectRedirection( $res, qr'http://auth.example.com/cas' );
 
     # Follow redirection to TOTP form
     ok(
         $res = $client->_get(
-            '//cas',
+            '/cas',
             cookie => "lemonldap=$id; lemonldappdata=$pdata",
             accept => 'text/html',
         ),

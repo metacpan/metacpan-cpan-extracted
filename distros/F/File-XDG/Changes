@@ -1,5 +1,12 @@
 Revision history for File-XDG
 
+1.01      2022-02-23 08:06:52 -0700
+  - Production release identical to 1.00_01
+
+1.00_01   2022-01-01 15:17:34 -0700
+  - api = 1 is no longer experimental, no longer warns and is
+    better documented (gh#23)
+
 0.11      2021-12-30 05:42:19 -0700
   - Production release identical to 0.10_01
 

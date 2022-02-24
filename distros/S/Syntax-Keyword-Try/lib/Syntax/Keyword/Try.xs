@@ -412,7 +412,8 @@ static int build_try(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs, 
   OP *ret = NULL;
   HV *hints = GvHV(PL_hintgv);
 
-  bool require_var = hints && hv_fetchs(hints, "Syntax::Keyword::Try/require_var", 0);
+  bool require_catch = hints && hv_fetchs(hints, "Syntax::Keyword::Try/require_catch", 0);
+  bool require_var   = hints && hv_fetchs(hints, "Syntax::Keyword::Try/require_var", 0);
 
   U32 ncatches = args[argi++]->i;
 
@@ -528,6 +529,9 @@ static int build_try(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs, 
 
     SvREFCNT_dec(condcatch);
   }
+
+  if(require_catch && !catch)
+    croak("Expected a catch {} block");
 
   bool no_finally = hints && hv_fetchs(hints, "Syntax::Keyword::Try/no_finally", 0);
 

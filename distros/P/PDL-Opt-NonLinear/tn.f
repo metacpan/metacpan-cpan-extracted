@@ -1,7 +1,7 @@
       subroutine lmqn (ifail, n, x, f, g, w, lw, sfun,
      *            msglvl, maxit, maxfun, eta, stepmx, accrcy, xtol)
       implicit          double precision (a-h,o-z)
-      integer           msglvl, n, maxfun, ifail, lw
+      integer           msglvl, n, maxfun, ifail, lw, ipivot(1)
       double precision  x(n), g(n), w(lw), eta, xtol, stepmx, f, accrcy
 
 c
@@ -644,7 +644,7 @@ c local search could be installed here
 c
 150   f = oldf
       if (msglvl .ge. 1) call monit(n,x,
-     *     f,g,niter,nftotl,nfeval,ireset,ipivot)
+     *     f,g,niter,nftotl,nfeval,.true.,ipivot)
 c
 c set ifail
 c
@@ -681,13 +681,14 @@ c
       end
 c
 c
-      subroutine monit(n,x,f,g,niter,nftotl,nfeval,ireset,ipivot)
+      subroutine monit(n,x,f,g,niter,nftotl,nfeval,lreset,ipivot)
 c
 c print results of current iteration
 c
       implicit         double precision (a-h,o-z)
       double precision x(n),f,g(n),gtg
       integer          ipivot(n)
+      logical          lreset
 c
       gtg = 0.d0
       do 10 i = 1,n

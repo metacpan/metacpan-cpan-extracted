@@ -1,4 +1,59 @@
 Revision history for SPVM
+0.9507  2021-02-24
+        [CHANGE]
+        * SPVM don't support nmake. Already nmake test always fails until now.
+        * Add "index_len" method to the "Fn" module.
+        * Add "rindex_len" method to the "Fn" module.
+        [BUG FIX]
+        * Fix the bug that spvmcc can't detect the changes of the SPVM core header files.
+        
+0.9506  2021-02-22
+        [CHANGE]
+        * Add no_symbol_cache_flag, set_no_symbol_cache_flag, get_no_symbol_cache_flag native APIs
+        * Precompile and native method of SPVM core become reentrant if no_symbol_cache_flag is set.
+        * Fix precompile exception bugs when symbols is not found.
+        * Add print, print_stderr native APIs.
+        * env is not managed by SPVM memory allocator because env must exist before the compiler is created.
+        * Add the following native APIs for the compilation of SPVM
+          SPVM_ENV* (*new_env_raw)(SPVM_ENV* env);
+          void (*free_env_raw)(SPVM_ENV* env);
+          int32_t (*init_env)(SPVM_ENV* env);
+          void (*call_init_blocks)(SPVM_ENV* env);
+          void (*cleanup_global_vars)(SPVM_ENV* env);
+          void* (*new_compiler)(SPVM_ENV* env);
+          void (*compiler_free)(SPVM_ENV* env, void* compiler);
+          void (*compiler_set_start_line)(SPVM_ENV* env, void* compiler, int32_t start_line);
+          int32_t (*compiler_get_start_line)(SPVM_ENV* env, void* compiler);
+          void (*compiler_set_start_file)(SPVM_ENV* env, void* compiler, const char* start_file);
+          const char* (*compiler_get_start_file)(SPVM_ENV* env, void* compiler);
+          void (*compiler_add_module_dir)(SPVM_ENV* env, void* compiler, const char* module_dir);
+          int32_t (*compiler_get_module_dirs_length )(SPVM_ENV* env, void* compiler);
+          const char* (*compiler_get_module_dir )(SPVM_ENV* env, void* compiler, int32_t module_dir_id);
+          int32_t (*compiler_compile_spvm)(SPVM_ENV* env, void* compiler, const char* class_name);
+          int32_t (*compiler_get_error_messages_length)(SPVM_ENV* env, void* compiler);
+          const char* (*compiler_get_error_message)(SPVM_ENV* env, void* compiler, int32_t index);
+          int32_t (*compiler_get_class_id)(SPVM_ENV* env, void* compiler, const char* class_name);
+          int32_t (*compiler_get_classes_length)(SPVM_ENV* env, void* compiler);
+          const char* (*compiler_get_class_name)(SPVM_ENV* env, void* compiler, int32_t class_id);
+          int32_t (*compiler_is_anon_class)(SPVM_ENV* env, void* compiler, int32_t class_id);
+          int32_t (*compiler_get_methods_length)(SPVM_ENV* env, void* compiler, int32_t class_id);
+          int32_t (*compiler_get_method_id)(SPVM_ENV* env, void* compiler, int32_t class_id, int32_t method_index_of_class);
+          int32_t (*compiler_get_method_id_by_name)(SPVM_ENV* env, void* compiler, const char* class_name, const char* method_name);
+          const char* (*compiler_get_method_name)(SPVM_ENV* env, void* compiler, int32_t method_id);
+          const char* (*compiler_get_method_signature)(SPVM_ENV* env, void* compiler, int32_t method_id);
+          int32_t (*compiler_is_anon_method)(SPVM_ENV* env, void* compiler, int32_t method_id);
+          int32_t (*compiler_is_init_block_method)(SPVM_ENV* env, void* compiler, int32_t method_id);
+          int32_t (*compiler_is_native_method)(SPVM_ENV* env, void* compiler, int32_t method_id);
+          int32_t (*compiler_is_precompile_method)(SPVM_ENV* env, void* compiler, int32_t method_id);
+          void* (*compiler_get_native_method_address)(SPVM_ENV* env, void* compiler, int32_t method_id);
+          void* (*compiler_get_precompile_method_address)(SPVM_ENV* env, void* compiler, int32_t method_id);
+          void (*compiler_set_native_method_address)(SPVM_ENV* env, void* compiler, int32_t method_id, void* address);
+          void (*compiler_set_precompile_method_address)(SPVM_ENV* env, void* compiler, int32_t method_id, void* address);
+
+        [BUG FIX]
+        * Fix the line and the position of character in case that a compilation error occurs and some space character exists.
+        * Fix caching bug that the change of SPVM::Builder::Exe can't be detected.
+        
 0.9505  2021-02-16
         [CHANGE]
         * Improve the error message of getting and setting fields.

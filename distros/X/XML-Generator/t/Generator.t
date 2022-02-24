@@ -1,8 +1,9 @@
 #!/usr/bin/perl -w
 
 use Test;
+use utf8;
 
-BEGIN { $| = 1; plan tests => 100; }
+BEGIN { $| = 1; plan tests => 105; }
 
 use XML::Generator ();
 ok(1);
@@ -260,9 +261,25 @@ ok($xml, '<foo>&lt;
   </bar>
 </foo>');
 
+$x = XML::Generator->new();
+$xml = $x->foo('パスワードをお忘れの方');
+ok($xml, '<foo>パスワードをお忘れの方</foo>');
+
+$x = XML::Generator->new(':strict');
+$xml = $x->foo('パスワードをお忘れの方');
+ok($xml, '<foo>パスワードをお忘れの方</foo>');
+ok($xml, "<foo>\x{30D1}\x{30B9}\x{30EF}\x{30FC}\x{30C9}\x{3092}\x{304A}\x{5FD8}\x{308C}\x{306E}\x{65B9}</foo>");
+
+$x = XML::Generator->new(':strict', escape => 'high-bit');
+$xml = $x->foo('パスワードをお忘れの方');
+ok($xml, '<foo>&#12497;&#12473;&#12527;&#12540;&#12489;&#12434;&#12362;&#24536;&#12428;&#12398;&#26041;</foo>');
+
 $x = XML::Generator->new(':strict', escape => 'high-bit');
 $xml = $x->foo("\\<\242", $x->xmlpi('g'));
 ok($xml, '<foo><&#162;<?g?></foo>');
+
+$xml = $x->foo("\\<\x{2603}", $x->xmlpi('g'));
+ok($xml, '<foo><&#9731;<?g?></foo>');
 
 { my $w; local $SIG{__WARN__} = sub { $w .= $_[0] };
   $x = XML::Generator->new(':import');

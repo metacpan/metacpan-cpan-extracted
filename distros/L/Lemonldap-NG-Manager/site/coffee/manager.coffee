@@ -665,12 +665,13 @@ llapp.controller 'TreeCtrl', [
 			#  menuApp
 			#  menuCat
 			#  rule
+			#  oidcAttribute
 			#  samlAttribute
 			#  samlIDPMetaDataNode
 			#  samlSPMetaDataNode
 			#  sfExtra
 			#  virtualHost
-			return if node.type and node.type.match /^(?:s(?:aml(?:(?:ID|S)PMetaDataNod|Attribut)e|fExtra)|(?:(?:cmbMod|r)ul|authChoic)e|(?:virtualHos|keyTex)t|menu(?:App|Cat))$/ then true else false
+			return if node.type and node.type.match /^(?:s(?:aml(?:(?:ID|S)PMetaDataNod|Attribut)e|fExtra)|oidcAttribute|(?:(?:cmbMod|r)ul|authChoic)e|(?:virtualHos|keyTex)t|menu(?:App|Cat))$/ then true else false
 
 		# Send test Email
 		$scope.sendTestMail = ->

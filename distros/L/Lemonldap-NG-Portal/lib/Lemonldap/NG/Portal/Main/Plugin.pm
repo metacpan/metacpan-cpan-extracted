@@ -11,7 +11,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_ERROR
 );
 
-our $VERSION = '2.0.12';
+our $VERSION = '2.0.14';
 
 extends 'Lemonldap::NG::Common::Module';
 
@@ -161,6 +161,15 @@ sub canUpdateSfa {
     return $msg;
 }
 
+sub addSessionDataToRemember {
+    my ( $self, $newData ) = @_;
+    for my $sessionAttr ( keys %{ $newData || {} } ) {
+        $self->p->pluginSessionDataToRemember->{$sessionAttr} =
+          $newData->{$sessionAttr};
+    }
+    return;
+}
+
 1;
 __END__
 
@@ -269,7 +278,8 @@ constants set with method name to run. Following entry points are available.
 setting C<sessionInfo> provisionning
 
 =item C<afterData>: method called after C<sessionInfo> provisionning
-I<(macros, groups,...)>
+I<(macros, groups,...)>. This entry point is called after 'storeHistory'
+if login process fails and before 'validSession' if succeeds.
 
 =item C<endAuth>: method called when session is validated (after cookie build)
 

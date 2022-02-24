@@ -57,9 +57,9 @@
          "url" : "https://github.com/iph0/Redis-ClusterRider"
       }
    },
-   "version" : "0.22",
+   "version" : "0.24",
    "x_contributors" : [
       "Sergei Zhmylev <zhmylove@cpan.org>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

@@ -1,11 +1,11 @@
-package B::Hooks::EndOfScope; # git description: 0.24-6-gcafb435
+package B::Hooks::EndOfScope; # git description: 0.25-2-g173e4cd
 # ABSTRACT: Execute code after a scope finished compilation
 # KEYWORDS: code hooks execution scope
 
 use strict;
 use warnings;
 
-our $VERSION = '0.25';
+our $VERSION = '0.26';
 
 use 5.006001;
 
@@ -36,7 +36,7 @@ B::Hooks::EndOfScope - Execute code after a scope finished compilation
 
 =head1 VERSION
 
-version 0.25
+version 0.26
 
 =head1 SYNOPSIS
 

@@ -15,7 +15,7 @@
 #   * GET /session/my/<type>                     : get session data
 #   * GET /session/my/<type>/key                 : get session key
 #   * DELETE /session/my                         : ask for logout
-#   * DELETE /sessions/my                        : ask for global logout
+#   * DELETE /sessions/my                        : ask for global logout (if GlobalLogout plugin is on)
 #
 # - Authentication
 #   * GET /renewcaptcha                          : get token and captcha image
@@ -49,6 +49,8 @@
 #                                                            (restricted)
 #   * DELETE /mysession/<type>/key                         : delete key in data
 #                                                            (restricted)
+#   * GET    /myapplications                               : get my appplications
+#                                                            list
 #
 # There is no conflict with SOAP server, they can be used together
 
@@ -65,7 +67,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   URIRE
 );
 
-our $VERSION = '2.0.12';
+our $VERSION = '2.0.14';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Plugin
@@ -105,9 +107,11 @@ has exportedAttr => (
 
             # Convert @attributes into hash to remove duplicates
             my %attributes = map( { $_ => 1 } @attributes );
-            %attributes =
-              ( %attributes, %{ $conf->{exportedVars} }, %{ $conf->{macros} },
-              );
+            %attributes = (
+                %attributes,
+                %{ $conf->{exportedVars} },
+                %{ $conf->{macros} },
+            );
             return '[' . join( ',', keys %attributes ) . ']';
         }
     }
@@ -198,9 +202,16 @@ sub init {
           )
 
           ->addAuthRoute(
-            sessions => { my => { ':sessionType' => 'removeSessions' } },
+            session => { my => 'removeSession' },
             ['DELETE']
           );
+
+        if ( $self->conf->{globalLogoutRule} ) {
+            $self->addAuthRoute(
+                sessions => { my => 'removeSessions' },
+                ['DELETE']
+            );
+        }
     }
 
     if ( $self->conf->{restPasswordServer} ) {
@@ -247,7 +258,10 @@ sub init {
       ->addAuthRoute(
         mysession => { ':sessionType' => 'updateMySession' },
         ['PUT']
-      );
+      )
+
+      ->addAuthRoute( myapplications => 'myApplications', ['GET'] );
+
     extends @parents               if ($add);
     $self->setTypes( $self->conf ) if ( $self->conf->{restSessionServer} );
 
@@ -352,7 +366,7 @@ sub updateSession {
 
     # Get session and store info
     my $session = $self->getApacheSession( $mod, $id, $infos, $force )
-      or return $self->p->sendError( $req, 'Session id does not exists', 400 );
+      or return $self->p->sendError( $req, 'Session Id does not exist', 400 );
 
     return $self->p->sendJSONresponse( $req, { result => 1 } );
 }
@@ -365,7 +379,7 @@ sub delSession {
 
     # Get session
     my $session = $self->getApacheSession( $mod, $id )
-      or return $self->p->sendError( $req, 'Session id does not exists', 400 );
+      or return $self->p->sendError( $req, 'Session Id does not exist', 400 );
 
     # Delete it
     $self->logger->debug("REST request to delete session $id");
@@ -588,14 +602,33 @@ sub getError {
     return $self->p->sendJSONresponse(
         $req,
         {
-            result   => 1,
-            lang     => $lang,
-            errorNum => $errNum ? $errNum : 'all',
+            result        => 1,
+            lang          => $lang,
+            errorNum      => $errNum ? $errNum : 'all',
             errorsFileURL =>
               "$self->{conf}->{staticPrefix}/languages/$lang.json",
-            ( $errNum ? ( errorMsgRef => "PE$errNum" ) : () ),
+            ( $errNum ? ( errorMsgRef => "PE$errNum" ) : () )
         }
     );
+}
+
+sub removeSession {
+    my ( $self, $req ) = @_;
+    my $id = $req->userData->{_session_id};
+    return $self->p->sendError( $req, 'ID is required', 400 ) unless ($id);
+    my $mod = $self->getGlobal()
+      or return $self->p->sendError( $req, undef, 400 );
+
+    # Get session
+    my $session = $self->getApacheSession( $mod, $id )
+      or return $self->p->sendError( $req, 'Session Id does not exist', 400 );
+
+    # Delete it
+    $self->logger->debug("REST request to delete global session $id");
+    my $res = $self->p->_deleteSession( $req, $session );
+    $self->logger->debug(" Result is $res");
+
+    return $self->p->sendJSONresponse( $req, { result => $res } );
 }
 
 sub removeSessions {
@@ -698,12 +731,13 @@ sub pwdConfirm {
             400 );
     }
 
-    $req->user($user);
-    $req->data->{password}  = $password;
-    $req->data->{_pwdCheck} = 1;
+    $req->parameters->{user}     = $user;
+    $req->parameters->{password} = $password;
+    $req->data->{_pwdCheck}      = 1;
+    $req->data->{skipToken}      = 1;
 
     if ( $self->p->_userDB ) {
-        $req->steps( [ 'getUser', 'authenticate' ] );
+        $req->steps( [ $self->p->authProcess ] );
         my $result = $self->p->process($req);
         if ( $result == PE_PASSWORD_OK or $result == PE_OK ) {
             return $self->p->sendJSONresponse( $req,
@@ -743,9 +777,8 @@ sub getUser {
 
     # Search user in database
     $req->steps( [
-            'getUser',   'setSessionInfo',
-            'setMacros', 'setGroups',
-            'setLocalGroups'
+            'getUser',                 'setSessionInfo',
+            $self->p->groupsAndMacros, 'setLocalGroups'
         ]
     );
     my $error = $self->p->process( $req, ( $mail ? ( useMail => 1 ) : () ) );
@@ -761,6 +794,24 @@ sub getUser {
     else {
         return $self->p->sendJSONresponse( $req, { 'result' => JSON::false } );
     }
+}
+
+sub myApplications {
+    my ( $self, $req ) = @_;
+    my @appslist = map {
+        my @apps = map {
+            {
+                $_->{appname} => {
+                    AppUri  => $_->{appuri},
+                    AppDesc => $_->{appdesc}
+                }
+            }
+        } @{ $_->{applications} };
+        { Category => $_->{catname}, Applications => \@apps },
+    } @{ $self->p->menu->appslist($req) };
+
+    return $self->p->sendJSONresponse( $req,
+        { result => 1, myapplications => \@appslist } );
 }
 
 sub _checkSecret {

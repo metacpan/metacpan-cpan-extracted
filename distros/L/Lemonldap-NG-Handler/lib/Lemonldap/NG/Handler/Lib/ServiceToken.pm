@@ -7,7 +7,8 @@ our $VERSION = '2.0.9';
 sub fetchId {
     my ( $class, $req ) = @_;
     my $token = $req->{env}->{HTTP_X_LLNG_TOKEN};
-    return $class->Lemonldap::NG::Handler::Main::fetchId($req) unless ($token =~ /\w+/);
+    return $class->Lemonldap::NG::Handler::Main::fetchId($req)
+      unless ( $token =~ /\w+/ );
     $class->logger->debug("Found token: $token");
 
     # Decrypt token

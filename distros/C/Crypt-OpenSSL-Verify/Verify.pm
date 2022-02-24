@@ -5,7 +5,7 @@ use warnings;
 
 require 5.010;
 
-our $VERSION = '0.29';
+our $VERSION = '0.34';
 
 use Crypt::OpenSSL::X509;
 
@@ -199,7 +199,7 @@ Arguments:
 Called directly by OpenSSL and in the case of an acceptable error will
 change the response to 1 to signify no error
 
-Arguements:
+Arguments:
 
   $ok - Error (0) or Success (1) from the OpenSSL certificate verification
         results
@@ -239,7 +239,7 @@ Based on the Original Crypt::OpenSSL::VerifyX509 by
 
 =back
 
-=head1 LICENCE
+=head1 LICENSE
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as OpenSSL and is covered by the dual

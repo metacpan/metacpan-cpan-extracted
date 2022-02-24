@@ -14,7 +14,7 @@ use MIME::Base64;
 use Safe;
 use Encode;
 
-our $VERSION = '2.0.9';
+our $VERSION = '2.0.14';
 
 my $dataStart = tell(DATA);
 
@@ -26,7 +26,7 @@ sub serviceToXML {
     my ( $self, $conf, $type ) = @_;
 
     seek DATA, $dataStart, 0;
-    my $s        = join '', <DATA>;
+    my $s = join '', <DATA>;
     my $template = HTML::Template->new(
         scalarref         => \$s,
         die_on_bad_params => 0,
@@ -164,12 +164,22 @@ sub serviceToXML {
       samlIDPSSODescriptorArtifactResolutionServiceArtifact
     );
 
+    my %indexed_endpoints;
     foreach (@param_assertion) {
         my @_tab = split( /;/, $self->getValue( $_, $conf ) );
-        $template->param( $_ . 'Default', $_tab[0] ? 'true' : 'false' );
-        $template->param( $_ . 'Index',   $_tab[1] );
-        $template->param( $_ . 'Binding', $_tab[2] );
-        $template->param( $_ . 'Location', $_tab[3] );
+        $indexed_endpoints{ $_ . 'Default' }  = ( $_tab[0] ? 'true' : 'false' );
+        $indexed_endpoints{ $_ . 'Index' }    = $_tab[1];
+        $indexed_endpoints{ $_ . 'Binding' }  = $_tab[2];
+        $indexed_endpoints{ $_ . 'Location' } = $_tab[3];
+    }
+    $template->param(%indexed_endpoints);
+
+    if (
+        $indexed_endpoints{samlSPSSODescriptorAssertionConsumerServiceHTTPArtifactDefault}
+        eq 'true'
+      )
+    {
+        $template->param( "ACSArtifactDefault" => 1 );
     }
 
     # Return the XML metadata.
@@ -310,6 +320,7 @@ __DATA__
     <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:kerberos</NameIDFormat>
     <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:entity</NameIDFormat>
     <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</NameIDFormat>
+    <TMPL_IF ACSArtifactDefault>
     <AssertionConsumerService
       isDefault="<TMPL_VAR NAME="samlSPSSODescriptorAssertionConsumerServiceHTTPArtifactDefault">"
       index="<TMPL_VAR NAME="samlSPSSODescriptorAssertionConsumerServiceHTTPArtifactIndex">"
@@ -320,6 +331,18 @@ __DATA__
       index="<TMPL_VAR NAME="samlSPSSODescriptorAssertionConsumerServiceHTTPPostIndex">"
       Binding="<TMPL_VAR NAME="samlSPSSODescriptorAssertionConsumerServiceHTTPPostBinding">"
       Location="<TMPL_VAR NAME="samlSPSSODescriptorAssertionConsumerServiceHTTPPostLocation">" />
+    <TMPL_ELSE>
+    <AssertionConsumerService
+      isDefault="<TMPL_VAR NAME="samlSPSSODescriptorAssertionConsumerServiceHTTPPostDefault">"
+      index="<TMPL_VAR NAME="samlSPSSODescriptorAssertionConsumerServiceHTTPPostIndex">"
+      Binding="<TMPL_VAR NAME="samlSPSSODescriptorAssertionConsumerServiceHTTPPostBinding">"
+      Location="<TMPL_VAR NAME="samlSPSSODescriptorAssertionConsumerServiceHTTPPostLocation">" />
+    <AssertionConsumerService
+      isDefault="<TMPL_VAR NAME="samlSPSSODescriptorAssertionConsumerServiceHTTPArtifactDefault">"
+      index="<TMPL_VAR NAME="samlSPSSODescriptorAssertionConsumerServiceHTTPArtifactIndex">"
+      Binding="<TMPL_VAR NAME="samlSPSSODescriptorAssertionConsumerServiceHTTPArtifactBinding">"
+      Location="<TMPL_VAR NAME="samlSPSSODescriptorAssertionConsumerServiceHTTPArtifactLocation">" />
+    </TMPL_IF>
   </SPSSODescriptor>
   </TMPL_UNLESS>
 

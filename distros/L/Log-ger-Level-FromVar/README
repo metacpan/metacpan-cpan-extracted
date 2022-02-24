@@ -1,0 +1,42 @@
+NAME
+    Log::ger::Level::FromVar - Set log level from some variable
+
+VERSION
+    version 0.001
+
+SYNOPSIS
+     use Log::ger;
+     BEGIN { our $Default_Log_Level = 'info' }
+     use Log::ger::Level::FromVar;
+
+     log_info "blah ...";
+
+    To configure variable name:
+
+     use Log::ger;
+     BEGIN { our $Default_Level = 'info' }
+     use Log::ger::Level::FromVar var_name => 'Default_Level';
+
+     log_info "blah ...";
+
+DESCRIPTION
+    This module sets $Log::ger::Current_Level based on the value of a scalar
+    variable. The default name is "main::Default_Log_Level" but it can be
+    customized via import argument "var_name", as shown in the Synopsis.
+
+SEE ALSO
+    Log::ger::App observes the same variable.
+
+    Log::ger::Screen observes the same variable.
+
+    Log::ger::Level::FromEnv
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2022 by perlancar <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -45,7 +45,7 @@
    "provides" : {
       "Begin::Eval::Env" : {
          "file" : "lib/Begin/Eval/Env.pm",
-         "version" : "0.001"
+         "version" : "0.003"
       }
    },
    "release_status" : "stable",
@@ -60,12 +60,17 @@
          "web" : "https://github.com/perlancar/perl-Begin-Eval-Env"
       }
    },
-   "version" : "0.001",
+   "version" : "0.003",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"
       },
       "plugins" : [
+         {
+            "class" : "Dist::Zilla::Plugin::InsertBlock::FromModule",
+            "name" : "InsertBlock::FromModule",
+            "version" : "0.103"
+         },
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::CheckPendingRelease",
             "name" : "@Author::PERLANCAR/PERLANCAR::CheckPendingRelease",

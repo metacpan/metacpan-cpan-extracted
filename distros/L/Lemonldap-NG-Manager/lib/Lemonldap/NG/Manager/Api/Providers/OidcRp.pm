@@ -140,7 +140,7 @@ sub addOidcRp {
         409
     ) if ( defined $self->_getOidcRpByClientId( $conf, $add->{clientId} ) );
 
-    $add->{options} = {} unless ( defined $add->{options} );
+    $add->{options}                 = {} unless ( defined $add->{options} );
     $add->{options}->{clientId}     = $add->{clientId};
     $add->{options}->{redirectUris} = $add->{redirectUris};
 
@@ -246,8 +246,8 @@ sub replaceOidcRp {
     return $self->sendError( $req, $res->{msg}, 409 )
       unless ( $res->{res} eq 'ok' );
 
-    $replace->{options} = {} unless ( defined $replace->{options} );
-    $replace->{options}->{clientId}     = $replace->{clientId};
+    $replace->{options}             = {} unless ( defined $replace->{options} );
+    $replace->{options}->{clientId} = $replace->{clientId};
     $replace->{options}->{redirectUris} = $replace->{redirectUris};
 
     $res = $self->_pushOidcRp( $conf, $confKey, $replace, 1 );

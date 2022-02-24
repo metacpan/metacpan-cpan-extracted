@@ -11,4 +11,4 @@ Package in rec 3 @{[__PACKAGE__]}
 Package var is $my_package_var
 john is  $john
 @{[ $john . "ness"]}
-runtime $fields{runtime}
+runtime field from parent template: $fields{runtime}

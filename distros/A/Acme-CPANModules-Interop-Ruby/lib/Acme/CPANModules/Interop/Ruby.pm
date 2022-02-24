@@ -4,12 +4,12 @@ use strict;
 #use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-01-15'; # DATE
+our $DATE = '2022-02-04'; # DATE
 our $DIST = 'Acme-CPANModules-Interop-Ruby'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 our $LIST = {
-    summary => "Modules/applications that help interoperate with the Ruby world",
+    summary => "List of modules/applications that help interoperate with the Ruby world",
     entries => [
         {
             module => 'Inline::Ruby',
@@ -40,7 +40,7 @@ our $LIST = {
 };
 
 1;
-# ABSTRACT: Modules/applications that help interoperate with the Ruby world
+# ABSTRACT: List of modules/applications that help interoperate with the Ruby world
 
 __END__
 
@@ -50,11 +50,11 @@ __END__
 
 =head1 NAME
 
-Acme::CPANModules::Interop::Ruby - Modules/applications that help interoperate with the Ruby world
+Acme::CPANModules::Interop::Ruby - List of modules/applications that help interoperate with the Ruby world
 
 =head1 VERSION
 
-This document describes version 0.001 of Acme::CPANModules::Interop::Ruby (from Perl distribution Acme-CPANModules-Interop-Ruby), released on 2022-01-15.
+This document describes version 0.002 of Acme::CPANModules::Interop::Ruby (from Perl distribution Acme-CPANModules-Interop-Ruby), released on 2022-02-04.
 
 =head1 DESCRIPTION
 
@@ -69,33 +69,23 @@ L<Acme::CPANModules::PortedFrom::Ruby>
 
 =over
 
-=item L<Inline::Ruby>
-
-Write Ruby code inside your Perl code.
+=item * L<Inline::Ruby> - Write Ruby code inside your Perl code
 
 Author: L<SHLOMIF|https://metacpan.org/author/SHLOMIF>
 
-=item L<Ruby>
-
-API to local Ruby interpreter.
+=item * L<Ruby> - API to local Ruby interpreter
 
 Author: L<GFUJI|https://metacpan.org/author/GFUJI>
 
-=item L<Data::Format::Pretty::Ruby>
-
-Like Data::Dumper but outputs Ruby code.
+=item * L<Data::Format::Pretty::Ruby> - Like Data::Dumper but outputs Ruby code
 
 Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
-=item L<mRuby>
-
-Binding to the embedded Ruby interpreter.
+=item * L<mRuby> - Binding to the embedded Ruby interpreter
 
 Author: L<KARUPA|https://metacpan.org/author/KARUPA>
 
-=item L<HTML::ERuby>
-
-Parse ERuby document.
+=item * L<HTML::ERuby> - Parse ERuby document
 
 Author: L<IKEBE|https://metacpan.org/author/IKEBE>
 

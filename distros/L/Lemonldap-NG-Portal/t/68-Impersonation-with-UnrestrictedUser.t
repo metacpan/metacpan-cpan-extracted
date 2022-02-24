@@ -30,7 +30,7 @@ count(1);
 my ( $host, $url, $query ) =
   expectForm( $res, '#', undef, 'user', 'password', 'spoofId', 'token' );
 
-$query =~ s/user=/user=rtyler/;
+$query =~ s/user=[^&]*/user=rtyler/;
 $query =~ s/password=/password=rtyler/;
 $query =~ s/spoofId=/spoofId=dwho/;
 
@@ -62,7 +62,7 @@ count(1);
 ( $host, $url, $query ) =
   expectForm( $res, '#', undef, 'user', 'password', 'spoofId', 'token' );
 
-$query =~ s/user=/user=rtyler/;
+$query =~ s/user=[^&]*/user=rtyler/;
 $query =~ s/password=/password=rtyler/;
 $query =~ s/spoofId=/spoofId=msmith/;
 
@@ -75,18 +75,15 @@ ok(
     ),
     'Auth query'
 );
-ok(
-    $res->[2]->[0] =~
-      m%<div class="message message-negative alert"><span trmsg="5">%,
-    ' PE5 found'
-) or explain( $res->[2]->[0], "PE5 - Forbidden identity" );
+ok( $res->[2]->[0] =~ m%<span trmsg="5">%, ' PE5 found' )
+  or explain( $res->[2]->[0], "PE5 - Forbidden identity" );
 count(2);
 
 ## Try to Impersonate a forbidden identity with an Unrestricted user
 ( $host, $url, $query ) =
   expectForm( $res, '#', undef, 'user', 'password', 'spoofId', 'token' );
 
-$query =~ s/user=/user=dwho/;
+$query =~ s/user=[^&]*/user=dwho/;
 $query =~ s/password=/password=dwho/;
 $query =~ s/spoofId=/spoofId=msmith/;
 

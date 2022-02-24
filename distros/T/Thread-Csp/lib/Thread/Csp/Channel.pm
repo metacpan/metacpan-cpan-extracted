@@ -1,5 +1,5 @@
 package Thread::Csp::Channel;
-$Thread::Csp::Channel::VERSION = '0.005';
+$Thread::Csp::Channel::VERSION = '0.008';
 use strict;
 use warnings;
 
@@ -23,7 +23,7 @@ Thread::Csp::Channel - Channels for Communicating sequential processes
 
 =head1 VERSION
 
-version 0.005
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -51,9 +51,13 @@ This sends a value over the channel. It will block until another thread is prepa
 
 This receives a value from the channel. It will block until another thread is prepared to send the value.
 
-=head2 set_notify($handle, $value)
+=head2 receive_ready_fh()
 
-This will cause C<$value> to be written to C<$handle> whenever a new value becomes available, unless it's already being read. B<THIS METHOD IS PARTICULARLY EXPERIMENTAL>.
+This will return a filehandle that one byte will be written to when a value has been send to the channel.
+
+=head2 send_ready_fh()
+
+This will return a filehandle that one byte will be written to when a value is being received.
 
 =head2 close()
 

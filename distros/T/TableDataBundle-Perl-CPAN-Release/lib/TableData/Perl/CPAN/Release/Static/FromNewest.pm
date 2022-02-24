@@ -7,20 +7,20 @@ use warnings;
 use parent 'TableData::Munge::Concat';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-10-05'; # DATE
+our $DATE = '2022-02-18'; # DATE
 our $DIST = 'TableDataBundle-Perl-CPAN-Release'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '20220218.0'; # VERSION
 
 sub new {
     my $self = shift;
     my @tabledatalist;
-    for my $year (reverse 1995..2021) {
+    for my $year (reverse 1995..2022) {
         push @tabledatalist, "Munge::Reverse=tabledata,Perl::CPAN::Release::Static::$year";
     }
     $self->SUPER::new(tabledatalist => \@tabledatalist);
 }
 
-our %STATS = ("num_rows",350795,"num_columns",9); # STATS
+our %STATS = ("num_columns",9,"num_rows",354015); # STATS
 
 1;
 # ABSTRACT: CPAN releases (from newest to oldest)
@@ -37,7 +37,7 @@ TableData::Perl::CPAN::Release::Static::FromNewest - CPAN releases (from newest 
 
 =head1 VERSION
 
-This document describes version 0.004 of TableData::Perl::CPAN::Release::Static::FromNewest (from Perl distribution TableDataBundle-Perl-CPAN-Release), released on 2021-10-05.
+This document describes version 20220218.0 of TableData::Perl::CPAN::Release::Static::FromNewest (from Perl distribution TableDataBundle-Perl-CPAN-Release), released on 2022-02-18.
 
 =head1 SYNOPSIS
 
@@ -109,7 +109,7 @@ beyond that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2021 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

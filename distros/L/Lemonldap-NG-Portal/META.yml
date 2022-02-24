@@ -1,7 +1,7 @@
 ---
 abstract: 'The authentication portal part of Lemonldap::NG Web-SSO system.'
 author:
-  - 'Xavier Guimard <x.guimard@free.fr>, ClÃ©ment Oudot <clement@oodo.net>'
+  - 'Xavier Guimard <x.guimard@free.fr>, Clement Oudot <clement@oodo.net>, Christophe Maudoux <chrmdx@gmail.com>, Maxime Besson <maxime.besson@worteks.com>'
 build_requires:
   Convert::Base32: '0'
   Email::Sender: '0'
@@ -29,17 +29,21 @@ no_index:
     - t
     - inc
 recommends:
+  Authen::Radius: '0'
+  Authen::WebAuthn: '0'
   Convert::Base32: '0'
   DBI: '0'
   Email::Sender: '1.300027'
   GD::SecurityImage: '0'
   Glib: '0'
   HTTP::Message: '0'
+  IO::Socket::Timeout: '0'
   IPC::Run: '0'
   Image::Magick: '0'
   LWP::Protocol::https: '0'
   LWP::UserAgent: '0'
   Lasso: v2.3.0
+  List::MoreUtils: '0'
   MIME::Entity: '0'
   Net::Facebook::Oauth2: '0'
   Net::LDAP: '0.38'
@@ -52,13 +56,13 @@ recommends:
   Web::ID: '0'
 requires:
   Clone: '0'
-  Lemonldap::NG::Handler: v2.0.13
+  Lemonldap::NG::Handler: v2.0.14
   Regexp::Assemble: '0'
 resources:
   MailingList: mailto:lemonldap-ng-dev@ow2.org
   X_twitter: https://twitter.com/lemonldapng
   bugtracker: https://gitlab.ow2.org/lemonldap-ng/lemonldap-ng/issues
-  homepage: http://lemonldap-ng.org/
+  homepage: https://lemonldap-ng.org/
   license: http://opensource.org/licenses/GPL-2.0
-version: v2.0.13
+version: v2.0.14
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

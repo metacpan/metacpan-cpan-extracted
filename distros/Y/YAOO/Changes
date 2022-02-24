@@ -20,3 +20,11 @@ Revision history for YAOO
 
 0.06    2022-02-15
 	- Add support for defining multiple attributes/accessors via [qw/one two three/] and {one => {}, two => {}}
+
+0.07 	2022-02-18
+	- Add delay, lazy and build_order attribute options
+	- Automagically import strict and warnings
+	- Add mechanism to extend attributes (_attribute).
+
+0.08    2022-02-20
+	- Allow an attribute/accessor to be set as undef (cleared)

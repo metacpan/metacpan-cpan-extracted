@@ -21,7 +21,8 @@ use DynaLoader;
 
 
 
-#line 5 "gsl_sf_fermi_dirac.pd"
+#line 4 "gsl_sf_fermi_dirac.pd"
+
 use strict;
 use warnings;
 
@@ -44,7 +45,7 @@ Incomplete Fermi-Dirac Integrals:
  F_j(x,b) := 1/Gamma[j+1] Integral[ t^j /(Exp[t-x] + 1), {t,b,Infinity}]
 
 =cut
-#line 48 "FERMI_DIRAC.pm"
+#line 49 "FERMI_DIRAC.pm"
 
 
 
@@ -58,7 +59,8 @@ Incomplete Fermi-Dirac Integrals:
 
 
 
-#line 1059 "../../../../blib/lib/PDL/PP.pm"
+#line 1058 "../../../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 gsl_sf_fermi_dirac_int
@@ -78,17 +80,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 82 "FERMI_DIRAC.pm"
+#line 84 "FERMI_DIRAC.pm"
 
 
 
-#line 1061 "../../../../blib/lib/PDL/PP.pm"
+#line 1060 "../../../../blib/lib/PDL/PP.pm"
+
 *gsl_sf_fermi_dirac_int = \&PDL::gsl_sf_fermi_dirac_int;
-#line 88 "FERMI_DIRAC.pm"
+#line 91 "FERMI_DIRAC.pm"
 
 
 
-#line 1059 "../../../../blib/lib/PDL/PP.pm"
+#line 1058 "../../../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 gsl_sf_fermi_dirac_mhalf
@@ -108,17 +112,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 112 "FERMI_DIRAC.pm"
+#line 116 "FERMI_DIRAC.pm"
 
 
 
-#line 1061 "../../../../blib/lib/PDL/PP.pm"
+#line 1060 "../../../../blib/lib/PDL/PP.pm"
+
 *gsl_sf_fermi_dirac_mhalf = \&PDL::gsl_sf_fermi_dirac_mhalf;
-#line 118 "FERMI_DIRAC.pm"
+#line 123 "FERMI_DIRAC.pm"
 
 
 
-#line 1059 "../../../../blib/lib/PDL/PP.pm"
+#line 1058 "../../../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 gsl_sf_fermi_dirac_half
@@ -138,17 +144,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 142 "FERMI_DIRAC.pm"
-
-
-
-#line 1061 "../../../../blib/lib/PDL/PP.pm"
-*gsl_sf_fermi_dirac_half = \&PDL::gsl_sf_fermi_dirac_half;
 #line 148 "FERMI_DIRAC.pm"
 
 
 
-#line 1059 "../../../../blib/lib/PDL/PP.pm"
+#line 1060 "../../../../blib/lib/PDL/PP.pm"
+
+*gsl_sf_fermi_dirac_half = \&PDL::gsl_sf_fermi_dirac_half;
+#line 155 "FERMI_DIRAC.pm"
+
+
+
+#line 1058 "../../../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 gsl_sf_fermi_dirac_3half
@@ -168,17 +176,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 172 "FERMI_DIRAC.pm"
+#line 180 "FERMI_DIRAC.pm"
 
 
 
-#line 1061 "../../../../blib/lib/PDL/PP.pm"
+#line 1060 "../../../../blib/lib/PDL/PP.pm"
+
 *gsl_sf_fermi_dirac_3half = \&PDL::gsl_sf_fermi_dirac_3half;
-#line 178 "FERMI_DIRAC.pm"
+#line 187 "FERMI_DIRAC.pm"
 
 
 
-#line 1059 "../../../../blib/lib/PDL/PP.pm"
+#line 1058 "../../../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 gsl_sf_fermi_dirac_inc_0
@@ -198,19 +208,21 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 202 "FERMI_DIRAC.pm"
+#line 212 "FERMI_DIRAC.pm"
 
 
 
-#line 1061 "../../../../blib/lib/PDL/PP.pm"
+#line 1060 "../../../../blib/lib/PDL/PP.pm"
+
 *gsl_sf_fermi_dirac_inc_0 = \&PDL::gsl_sf_fermi_dirac_inc_0;
-#line 208 "FERMI_DIRAC.pm"
+#line 219 "FERMI_DIRAC.pm"
 
 
 
 
 
-#line 101 "gsl_sf_fermi_dirac.pd"
+#line 100 "gsl_sf_fermi_dirac.pd"
+
 =head1 AUTHOR
 
 This file copyright (C) 1999 Christian Pellegrin <chri@infis.univ.trieste.it>
@@ -223,7 +235,7 @@ PDL distribution, the copyright notice should be included in the file.
 The GSL SF modules were written by G. Jungman.
 
 =cut
-#line 227 "FERMI_DIRAC.pm"
+#line 239 "FERMI_DIRAC.pm"
 
 
 

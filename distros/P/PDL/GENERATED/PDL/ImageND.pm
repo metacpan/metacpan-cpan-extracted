@@ -21,7 +21,8 @@ use DynaLoader;
 
 
 
-#line 5 "imagend.pd"
+#line 4 "imagend.pd"
+
 
 =head1 NAME
 
@@ -29,9 +30,9 @@ PDL::ImageND - useful image processing in N dimensions
 
 =head1 DESCRIPTION
 
-These routines act on PDLs as N-dimensional objects, not as threaded 
+These routines act on PDLs as N-dimensional objects, not as broadcasted
 sets of 0-D or 1-D objects.  The file is sort of a catch-all for 
-broadly functional routines, most of which could legitimately 
+broadly functional routines, most of which could legitimately
 be filed elsewhere (and probably will, one day).  
 
 ImageND is not a part of the PDL core (v2.4) and hence must be explicitly
@@ -48,7 +49,7 @@ loaded.
 
 use strict;
 use warnings;
-#line 52 "ImageND.pm"
+#line 53 "ImageND.pm"
 
 
 
@@ -62,14 +63,16 @@ use warnings;
 
 
 
-#line 96 "imagend.pd"
+#line 95 "imagend.pd"
+
 
 use Carp;
-#line 69 "ImageND.pm"
+#line 71 "ImageND.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 convolve
@@ -104,11 +107,12 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 108 "ImageND.pm"
+#line 111 "ImageND.pm"
 
 
 
-#line 1060 "../../blib/lib/PDL/PP.pm"
+#line 1059 "../../blib/lib/PDL/PP.pm"
+
 
 
 # Custom Perl wrapper
@@ -130,17 +134,19 @@ sub PDL::convolve{
     }
     return $c;
 }
-#line 134 "ImageND.pm"
+#line 138 "ImageND.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *convolve = \&PDL::convolve;
-#line 140 "ImageND.pm"
+#line 145 "ImageND.pm"
 
 
 
-#line 226 "imagend.pd"
+#line 225 "imagend.pd"
+
 
 =head2 ninterpol()
 
@@ -182,11 +188,12 @@ sub PDL::ninterpol {
     for (list ($p-$ip)) { $y = interpol($_,$y->xvals,$y); }
     $y;
 }
-#line 186 "ImageND.pm"
+#line 192 "ImageND.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 rebin
@@ -228,11 +235,12 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 232 "ImageND.pm"
+#line 239 "ImageND.pm"
 
 
 
-#line 1060 "../../blib/lib/PDL/PP.pm"
+#line 1059 "../../blib/lib/PDL/PP.pm"
+
 
 
 # Custom Perl wrapper
@@ -284,17 +292,19 @@ sub PDL::rebin {
       return $x -> copy;
     }
 }
-#line 288 "ImageND.pm"
+#line 296 "ImageND.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *rebin = \&PDL::rebin;
-#line 294 "ImageND.pm"
+#line 303 "ImageND.pm"
 
 
 
-#line 379 "imagend.pd"
+#line 378 "imagend.pd"
+
 
 =head2 circ_mean_p
 
@@ -364,11 +374,12 @@ sub circ_mean {
 
  return $x;
 }
-#line 368 "ImageND.pm"
+#line 378 "ImageND.pm"
 
 
 
-#line 455 "imagend.pd"
+#line 454 "imagend.pd"
+
 
 =head2 kernctr
 
@@ -425,11 +436,12 @@ sub PDL::kernctr {
     }
     $newk;
 }
-#line 429 "ImageND.pm"
+#line 440 "ImageND.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 convolveND
@@ -450,7 +462,7 @@ Speed-optimized convolution with selectable boundary conditions
 Conolve an array with a kernel, both of which are N-dimensional.
 
 If the kernel has fewer dimensions than the array, then the extra array
-dimensions are threaded over.  There are options that control the boundary 
+dimensions are broadcasted over.  There are options that control the boundary
 conditions and method used.
 
 The kernel's origin is taken to be at the kernel's center.  If your
@@ -510,16 +522,16 @@ based on the size of the input arrays.
 
 NOTES
 
-At the moment there's no way to thread over kernels.  That could/should
+At the moment there's no way to broadcast over kernels.  That could/should
 be fixed.
 
-The threading over input is cheesy and should probably be fixed:
+The broadcasting over input is cheesy and should probably be fixed:
 currently the kernel just gets dummy dimensions added to it to match
 the input dims.  That does the right thing tersely but probably runs slower
-than a dedicated threadloop.  
+than a dedicated broadcastloop.
 
 The direct copying code uses PP primarily for the generic typing: it includes
-its own threadloops.
+its own broadcastloops.
 
 
 
@@ -530,11 +542,12 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 534 "ImageND.pm"
+#line 546 "ImageND.pm"
 
 
 
-#line 1060 "../../blib/lib/PDL/PP.pm"
+#line 1059 "../../blib/lib/PDL/PP.pm"
+
 
 use PDL::Options;
 
@@ -580,7 +593,7 @@ sub PDL::convolveND {
   my $opt = $def->options(PDL::Options::ifhref($opt0));
 
   ### 
-  # If the kernel has too few dimensions, we thread over the other
+  # If the kernel has too few dimensions, we broadcast over the other
   # dims -- this is the same as supplying the kernel with dummy dims of
   # order 1, so, er, we do that.
   $k = $k->dummy($x->dims - 1, 1)
@@ -640,19 +653,21 @@ sub PDL::convolveND {
 
   $x;
 }
-#line 644 "ImageND.pm"
+#line 657 "ImageND.pm"
 
 
 
-#line 1061 "../../blib/lib/PDL/PP.pm"
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
 *convolveND = \&PDL::convolveND;
-#line 650 "ImageND.pm"
+#line 664 "ImageND.pm"
 
 
 
 
 
-#line 35 "imagend.pd"
+#line 34 "imagend.pd"
+
 
 =head1 AUTHORS
 
@@ -664,7 +679,7 @@ distribution. If this file is separated from the PDL distribution,
 the copyright notice should be included in the file.
 
 =cut
-#line 668 "ImageND.pm"
+#line 683 "ImageND.pm"
 
 
 

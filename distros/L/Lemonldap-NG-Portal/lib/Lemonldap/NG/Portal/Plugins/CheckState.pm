@@ -7,8 +7,9 @@ package Lemonldap::NG::Portal::Plugins::CheckState;
 
 use strict;
 use Mouse;
+use Lemonldap::NG::Portal;
 
-our $VERSION = '2.0.10';
+our $VERSION = '2.0.14';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 
@@ -41,16 +42,22 @@ sub check {
 
     if ( my $user = $req->param('user') and my $pwd = $req->param('password') )
     {
-        $req->user($user);
-        $req->data->{password} = $pwd;
+        $req->parameters->{user}     = ($user);
+        $req->parameters->{password} = $pwd;
+        $req->data->{skipToken}      = 1;
+
+        # This makes Auth::Choice use authChoiceAuthBasic if defined
+        $req->data->{_pwdCheck} = 1;
 
         # Not launched methods:
-        #  - "extractFormInfo" due to "token"
         #  - "buildCookie" useless here
         $req->steps( [
-                'getUser',                         'authenticate',
-                @{ $self->p->betweenAuthAndData }, $self->p->sessionData,
-                @{ $self->p->afterData },          'storeHistory',
+                @{ $self->p->beforeAuth },
+                $self->p->authProcess,
+                @{ $self->p->betweenAuthAndData },
+                $self->p->sessionData,
+                @{ $self->p->afterData },
+                'storeHistory',
                 @{ $self->p->endAuth }
             ]
         );
@@ -61,7 +68,8 @@ sub check {
     }
 
     return $self->p->sendError( $req, join( ",\n", @rep ), 500 ) if (@rep);
-    return $self->p->sendJSONresponse( $req, { result => 1 } );
+    return $self->p->sendJSONresponse( $req,
+        { result => 1, version => $Lemonldap::NG::Portal::VERSION } );
 }
 
 1;

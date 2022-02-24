@@ -12,7 +12,7 @@ use Mouse;
 
 extends 'Lemonldap::NG::Common::Module';
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.14';
 
 # PROPERTIES
 
@@ -91,16 +91,14 @@ sub init {
 # @return SQL statement string
 sub hash_password {
     my ( $self, $password, $hash ) = @_;
-    if ( $hash =~ /^(md5|sha|sha1|encrypt)$/i ) {
+    if ($hash) {
         $self->logger->debug( "Using " . uc($hash) . " to hash password" );
         return uc($hash) . "($password)";
     }
     else {
-        $self->logger->notice(
-            "No valid password hash, using clear text for password");
+        $self->logger->debug("No password hash, using clear text for password");
         return $password;
     }
-
 }
 
 # Return hashed password for use in SQL SELECT statement

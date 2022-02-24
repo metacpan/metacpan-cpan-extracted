@@ -411,6 +411,7 @@ function templates(tpl,key) {
             "type" : "oidcAttribute"
          }
       ],
+      "help" : "idpopenidconnect.html#oidcexportedattr",
       "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataExportedVars",
       "title" : "oidcRPMetaDataExportedVars",
       "type" : "oidcAttributeContainer"
@@ -418,6 +419,7 @@ function templates(tpl,key) {
    {
       "cnodes" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsExtraClaims",
       "default" : [],
+      "help" : "idpopenidconnect.html#oidcextraclaims",
       "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsExtraClaims",
       "title" : "oidcRPMetaDataOptionsExtraClaims",
       "type" : "keyTextContainer"
@@ -1474,6 +1476,11 @@ function templates(tpl,key) {
             "id" : tpl+"s/"+key+"/"+"vhostAuthnLevel",
             "title" : "vhostAuthnLevel",
             "type" : "int"
+         },
+         {
+            "get" : tpl+"s/"+key+"/"+"vhostDevOpsRulesUrl",
+            "id" : tpl+"s/"+key+"/"+"vhostDevOpsRulesUrl",
+            "title" : "vhostDevOpsRulesUrl"
          },
          {
             "default" : -1,

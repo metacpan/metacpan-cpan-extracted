@@ -26,11 +26,11 @@ my $client = LLNG::Manager::Test->new( {
             checkUserDisplayPersistentInfo => 0,
             checkUserDisplayEmptyValues    => 0,
             impersonationMergeSSOgroups    => 0,
-            checkUserHiddenAttributes =>
+            checkUserHiddenAttributes      =>
               '_loginHistory hGroups _session_id _session_kind',
             macros => {
                 test_impersonation => '"$testPrefix__user/$_user"',
-                _whatToTrace =>
+                _whatToTrace       =>
                   '$_auth eq "SAML" ? "$_user@$_idpConfKey" : $_user',
             },
         }
@@ -81,11 +81,8 @@ ok(
     ),
     'Auth query'
 );
-ok(
-    $res->[2]->[0] =~
-      m%<div class="message message-negative alert"><span trmsg="5">%,
-    ' PE5 found'
-) or explain( $res->[2]->[0], "PE5 - Forbidden identity" );
+ok( $res->[2]->[0] =~ m%<span trmsg="5">%, ' PE5 found' )
+  or explain( $res->[2]->[0], "PE5 - Forbidden identity" );
 count(2);
 
 ok( $res = $client->_get( '/', accept => 'text/html' ), 'Get Menu', );
@@ -110,11 +107,8 @@ ok(
     ),
     'Auth query'
 );
-ok(
-    $res->[2]->[0] =~
-      m%<div class="message message-negative alert"><span trmsg="93">%,
-    ' PE93 found'
-) or explain( $res->[2]->[0], "PE93 - Impersonation service not allowed" );
+ok( $res->[2]->[0] =~ m%<span trmsg="93">%, ' PE93 found' )
+  or explain( $res->[2]->[0], "PE93 - Impersonation service not allowed" );
 count(2);
 
 ok( $res = $client->_get( '/', accept => 'text/html' ), 'Get Menu', );

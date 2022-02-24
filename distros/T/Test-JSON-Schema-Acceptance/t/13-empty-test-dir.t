@@ -11,6 +11,8 @@ use Test2::API 'intercept';
 use Test::More 0.88;
 use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
 use Test::JSON::Schema::Acceptance;
+use Test::File::ShareDir -share => { -dist => { 'Test-JSON-Schema-Acceptance' => 'share' } };
+
 use lib 't/lib';
 use SchemaParser;
 

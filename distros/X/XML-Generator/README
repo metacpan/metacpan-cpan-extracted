@@ -1,32 +1,672 @@
-XML::Generator - A module to help in generating XML documents
+NAME
+    XML::Generator - Perl extension for generating XML
 
 SYNOPSIS
---------
-Lets you do this:
+      use XML::Generator ':pretty';
 
-	use XML::Generator  ':pretty';
-	print this(is(a(document())));
+      print foo(bar({ baz => 3 }, bam()),
+                bar([ 'qux' => 'http://qux.com/' ],
+                      "Hey there, world"));
 
-To get this:
+      # OR
 
-	<this>
-	  <is>
-	    <a>
-	      <document />
-	    </a>
-	  </is>
-	</this>
+      require XML::Generator;
 
-RECENT CHANGES
------- -------
+      my $X = XML::Generator->new(':pretty');
 
-1.04     Fri Jul 15 08:35:00 2011
-        - Added the filter_invalid_chars option, which is turned on by default
-          under strict mode.
+      print $X->foo($X->bar({ baz => 3 }, $X->bam()),
+                    $X->bar([ 'qux' => 'http://qux.com/' ],
+                              "Hey there, world"));
 
+    Either of the above yield:
 
-COPYRIGHT
----------
-Copyright 1999-2011 Benjamin Holzman. All rights reserved.
-This program is free software; you can redistribute it and/or
-modify it under the same terms as Perl itself.
+       <foo xmlns:qux="http://qux.com/">
+         <bar baz="3">
+           <bam />
+         </bar>
+         <qux:bar>Hey there, world</qux:bar>
+       </foo>
+
+DESCRIPTION
+    In general, once you have an XML::Generator object, you then simply call
+    methods on that object named for each XML tag you wish to generate.
+
+    XML::Generator can also arrange for undefined subroutines in the
+    caller's package to generate the corresponding XML, by exporting an
+    "AUTOLOAD" subroutine to your package. Just supply an ':import' argument
+    to your "use XML::Generator;" call. If you already have an "AUTOLOAD"
+    defined then XML::Generator can be configured to cooperate with it. See
+    "STACKABLE AUTOLOADs".
+
+    Say you want to generate this XML:
+
+       <person>
+         <name>Bob</name>
+         <age>34</age>
+         <job>Accountant</job>
+       </person>
+
+    Here's a snippet of code that does the job, complete with pretty
+    printing:
+
+       use XML::Generator;
+       my $gen = XML::Generator->new(':pretty');
+       print $gen->person(
+                $gen->name("Bob"),
+                $gen->age(34),
+                $gen->job("Accountant")
+             );
+
+    The only problem with this is if you want to use a tag name that Perl's
+    lexer won't understand as a method name, such as "shoe-size".
+    Fortunately, since you can store the name of a method in a variable,
+    there's a simple work-around:
+
+       my $shoe_size = "shoe-size";
+       $xml = $gen->$shoe_size("12 1/2");
+
+    Which correctly generates:
+
+       <shoe-size>12 1/2</shoe-size>
+
+    You can use a hash ref as the first parameter if the tag should include
+    atributes. Normally this means that the order of the attributes will be
+    unpredictable, but if you have the Tie::IxHash module, you can use it to
+    get the order you want, like this:
+
+      use Tie::IxHash;
+      tie my %attr, 'Tie::IxHash';
+
+      %attr = (name => 'Bob', 
+               age  => 34,
+               job  => 'Accountant',
+        'shoe-size' => '12 1/2');
+
+      print $gen->person(\%attr);
+
+    This produces
+
+      <person name="Bob" age="34" job="Accountant" shoe-size="12 1/2" />
+
+    An array ref can also be supplied as the first argument to indicate a
+    namespace for the element and the attributes.
+
+    If there is one element in the array, it is considered the URI of the
+    default namespace, and the tag will have an xmlns="URI" attribute added
+    automatically. If there are two elements, the first should be the tag
+    prefix to use for the namespace and the second element should be the
+    URI. In this case, the prefix will be used for the tag and an
+    xmlns:PREFIX attribute will be automatically added. Prior to version
+    0.99, this prefix was also automatically added to each attribute name.
+    Now, the default behavior is to leave the attributes alone (although you
+    may always explicitly add a prefix to an attribute name). If the prior
+    behavior is desired, use the constructor option "qualified_attributes".
+
+    If you specify more than two elements, then each pair should correspond
+    to a tag prefix and the corresponding URL. An xmlns:PREFIX attribute
+    will be added for each pair, and the prefix from the first such pair
+    will be used as the tag's namespace. If you wish to specify a default
+    namespace, use '#default' for the prefix. If the default namespace is
+    first, then the tag will use the default namespace itself.
+
+    If you want to specify a namespace as well as attributes, you can make
+    the second argument a hash ref. If you do it the other way around, the
+    array ref will simply get stringified and included as part of the
+    content of the tag.
+
+    Here's an example to show how the attribute and namespace parameters
+    work:
+
+       $xml = $gen->account(
+                $gen->open(['transaction'], 2000),
+                $gen->deposit(['transaction'], { date => '1999.04.03'}, 1500)
+              );
+
+    This generates:
+
+       <account>
+         <open xmlns="transaction">2000</open>
+         <deposit xmlns="transaction" date="1999.04.03">1500</deposit>
+       </account>
+
+    Because default namespaces inherit, XML::Generator takes care to output
+    the xmlns="URI" attribute as few times as strictly necessary. For
+    example,
+
+       $xml = $gen->account(
+                $gen->open(['transaction'], 2000),
+                $gen->deposit(['transaction'], { date => '1999.04.03'},
+                  $gen->amount(['transaction'], 1500)
+                )
+              );
+
+    This generates:
+
+       <account>
+         <open xmlns="transaction">2000</open>
+         <deposit xmlns="transaction" date="1999.04.03">
+           <amount>1500</amount>
+         </deposit>
+       </account>
+
+    Notice how "xmlns="transaction"" was left out of the "<amount"> tag.
+
+    Here is an example that uses the two-argument form of the namespace:
+
+        $xml = $gen->widget(['wru' => 'http://www.widgets-r-us.com/xml/'],
+                            {'id'  => 123}, $gen->contents());
+
+        <wru:widget xmlns:wru="http://www.widgets-r-us.com/xml/" id="123">
+          <contents />
+        </wru:widget>
+
+    Here is an example that uses multiple namespaces. It generates the first
+    example from the RDF primer (<http://www.w3.org/TR/rdf-primer/>).
+
+        my $contactNS = [contact => "http://www.w3.org/2000/10/swap/pim/contact#"];
+        $xml = $gen->xml(
+                 $gen->RDF([ rdf     => "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+                             @$contactNS ],
+                    $gen->Person($contactNS, { 'rdf:about' => "http://www.w3.org/People/EM/contact#me" },
+                      $gen->fullName($contactNS, 'Eric Miller'),
+                      $gen->mailbox($contactNS, {'rdf:resource' => "mailto:em@w3.org"}),
+                      $gen->personalTitle($contactNS, 'Dr.'))));
+
+        <?xml version="1.0" standalone="yes"?>
+        <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+                 xmlns:contact="http://www.w3.org/2000/10/swap/pim/contact#">
+          <contact:Person rdf:about="http://www.w3.org/People/EM/contact#me">
+            <contact:fullName>Eric Miller</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:em@w3.org" />
+            <contact:personalTitle>Dr.</contact:personalTitle> 
+          </Person>
+        </rdf:RDF>
+
+CONSTRUCTOR
+    XML::Generator->new(':option', ...);
+
+    XML::Generator->new(option => 'value', ...);
+
+    (Both styles may be combined)
+
+    The following options are available:
+
+  :std, :standard
+    Equivalent to
+
+            escape      => 'always',
+            conformance => 'strict',
+
+  :strict
+    Equivalent to
+
+            conformance => 'strict',
+
+  :pretty[=N]
+    Equivalent to
+
+            escape      => 'always',
+            conformance => 'strict',
+            pretty      => N         # N defaults to 2
+
+  namespace
+    This value of this option must be an array reference containing one or
+    two values. If the array contains one value, it should be a URI and will
+    be the value of an 'xmlns' attribute in the top-level tag. If there are
+    two or more elements, the first of each pair should be the namespace tag
+    prefix and the second the URI of the namespace. This will enable
+    behavior similar to the namespace behavior in previous versions; the tag
+    prefix will be applied to each tag. In addition, an xmlns:NAME="URI"
+    attribute will be added to the top-level tag. Prior to version 0.99, the
+    tag prefix was also automatically added to each attribute name, unless
+    overridden with an explicit prefix. Now, the attribute names are left
+    alone, but if the prior behavior is desired, use the constructor option
+    "qualified_attributes".
+
+    The value of this option is used as the global default namespace. For
+    example,
+
+        my $html = XML::Generator->new(
+                     pretty    => 2,
+                     namespace => [HTML => "http://www.w3.org/TR/REC-html40"]);
+        print $html->html(
+                $html->body(
+                  $html->font({ face => 'Arial' },
+                              "Hello, there")));
+
+    would yield
+
+        <HTML:html xmlns:HTML="http://www.w3.org/TR/REC-html40">
+          <HTML:body>
+            <HTML:font face="Arial">Hello, there</HTML:font>
+          </HTML:body>
+        </HTML:html>
+
+    Here is the same example except without all the prefixes:
+
+        my $html = XML::Generator->new(
+                     pretty    => 2,
+                     namespace => ["http://www.w3.org/TR/REC-html40"]);
+        print $html->html(
+                $html->body(
+                  $html->font({ 'face' => 'Arial' },
+                                "Hello, there")));
+
+    would yield
+
+       <html xmlns="http://www.w3.org/TR/REC-html40">
+         <body>
+            <font face="Arial">Hello, there</font>
+         </body>
+       </html>
+
+  qualifiedAttributes, qualified_attributes
+    Set this to a true value to emulate the attribute prefixing behavior of
+    XML::Generator prior to version 0.99. Here is an example:
+
+        my $foo = XML::Generator->new(
+                    namespace => [foo => "http://foo.com/"],
+                    qualifiedAttributes => 1);
+        print $foo->bar({baz => 3});
+
+    yields
+
+        <foo:bar xmlns:foo="http://foo.com/" foo:baz="3" />
+
+  escape
+    The contents and the values of each attribute have any illegal XML
+    characters escaped if this option is supplied. If the value is 'always',
+    then &, < and > (and " within attribute values) will be converted into
+    the corresponding XML entity, although & will not be converted if it
+    looks like it could be part of a valid entity (but see below). If the
+    value is 'unescaped', then the escaping will be turned off
+    character-by-character if the character in question is preceded by a
+    backslash, or for the entire string if it is supplied as a scalar
+    reference. So, for example,
+
+            use XML::Generator escape => 'always';
+
+            one('<');      # <one>&lt;</one>
+            two('\&');     # <two>\&amp;</two>
+            three(\'<f>'); # <three><f></three> (scalar refs always allowed)
+            four('&lt;');  # <four>&lt;</four> (looks like an entity)
+            five('&#34;'); # <five>&#34;</five> (looks like an entity)
+
+    but
+
+            use XML::Generator escape => 'unescaped';
+
+            one('<');     # <one>&lt;</one>
+            two('\&');    # <two>&</two>
+            three(\'<f>');# <three><f></three>  (scalar refs always allowed)
+            four('&lt;'); # <four>&amp;lt;</four> (no special case for entities)
+
+    By default, high-bit data will be passed through unmodified, so that
+    UTF-8 data can be generated with pre-Unicode perls. If you know that
+    your data is ASCII, use the value 'high-bit' for the escape option and
+    bytes with the high bit set will be turned into numeric entities. You
+    can combine this functionality with the other escape options by
+    comma-separating the values:
+
+      my $a = XML::Generator->new(escape => 'always,high-bit');
+      print $a->foo("<\242>");
+
+    yields
+
+      <foo>&lt;&#162;&gt;</foo>
+
+    Because XML::Generator always uses double quotes ("") around attribute
+    values, it does not escape single quotes. If you want single quotes
+    inside attribute values to be escaped, use the value 'apos' along with
+    'always' or 'unescaped' for the escape option. For example:
+
+        my $gen = XML::Generator->new(escape => 'always,apos');
+        print $gen->foo({'bar' => "It's all good"});
+
+        <foo bar="It&apos;s all good" />
+
+    If you actually want & to be converted to &amp; even if it looks like it
+    could be part of a valid entity, use the value 'even-entities' along
+    with 'always'. Supplying 'even-entities' to the 'unescaped' option is
+    meaningless as entities are already escaped with that option.
+
+  pretty
+    To have nice pretty printing of the output XML (great for config files
+    that you might also want to edit by hand), supply an integer for the
+    number of spaces per level of indenting, eg.
+
+       my $gen = XML::Generator->new(pretty => 2);
+       print $gen->foo($gen->bar('baz'),
+                       $gen->qux({ tricky => 'no'}, 'quux'));
+
+    would yield
+
+       <foo>
+         <bar>baz</bar>
+         <qux tricky="no">quux</qux>
+       </foo>
+
+    You may also supply a non-numeric string as the argument to 'pretty', in
+    which case the indents will consist of repetitions of that string. So if
+    you want tabbed indents, you would use:
+
+         my $gen = XML::Generator->new(pretty => "\t");
+
+    Pretty printing does not apply to CDATA sections or Processing
+    Instructions.
+
+  conformance
+    If the value of this option is 'strict', a number of syntactic checks
+    are performed to ensure that generated XML conforms to the formal XML
+    specification. In addition, since entity names beginning with 'xml' are
+    reserved by the W3C, inclusion of this option enables several special
+    tag names: xmlpi, xmlcmnt, xmldecl, xmldtd, xmlcdata, and xml to allow
+    generation of processing instructions, comments, XML declarations,
+    DTD's, character data sections and "final" XML documents, respectively.
+
+    Invalid characters (http://www.w3.org/TR/xml11/#charsets) will be
+    filtered out. To disable this behavior, supply the
+    'filter_invalid_chars' option with the value 0.
+
+    See "XML CONFORMANCE" and "SPECIAL TAGS" for more information.
+
+  filterInvalidChars, filter_invalid_chars
+    Set this to a 1 to enable filtering of invalid characters, or to 0 to
+    disable the filtering. See http://www.w3.org/TR/xml11/#charsets for the
+    set of valid characters.
+
+  allowedXMLTags, allowed_xml_tags
+    If you have specified 'conformance' => 'strict' but need to use tags
+    that start with 'xml', you can supply a reference to an array containing
+    those tags and they will be accepted without error. It is not an error
+    to supply this option if 'conformance' => 'strict' is not supplied, but
+    it will have no effect.
+
+  empty
+    There are 5 possible values for this option:
+
+       self    -  create empty tags as <tag />  (default)
+       compact -  create empty tags as <tag/>
+       close   -  close empty tags as <tag></tag>
+       ignore  -  don't do anything (non-compliant!)
+       args    -  use count of arguments to decide between <x /> and <x></x>
+
+    Many web browsers like the 'self' form, but any one of the forms besides
+    'ignore' is acceptable under the XML standard.
+
+    'ignore' is intended for subclasses that deal with HTML and other SGML
+    subsets which allow atomic tags. It is an error to specify both
+    'conformance' => 'strict' and 'empty' => 'ignore'.
+
+    'args' will produce <x /> if there are no arguments at all, or if there
+    is just a single undef argument, and <x></x> otherwise.
+
+  version
+    Sets the default XML version for use in XML declarations. See "xmldecl"
+    below.
+
+  encoding
+    Sets the default encoding for use in XML declarations.
+
+  dtd
+    Specify the dtd. The value should be an array reference with three
+    values; the type, the name and the uri.
+
+IMPORT ARGUMENTS
+    use XML::Generator ':option';
+
+    use XML::Generator option => 'value';
+
+    (Both styles may be combined)
+
+  :import
+    Cause "use XML::Generator;" to export an "AUTOLOAD" to your package that
+    makes undefined subroutines generate XML tags corresponding to their
+    name. Note that if you already have an "AUTOLOAD" defined, it will be
+    overwritten.
+
+  :stacked
+    Implies :import, but if there is already an "AUTOLOAD" defined, the
+    overriding "AUTOLOAD" will still give it a chance to run. See "STACKABLE
+    AUTOLOADs".
+
+  ANYTHING ELSE
+    If you supply any other options, :import is implied and the
+    XML::Generator object that is created to generate tags will be
+    constructed with those options.
+
+XML CONFORMANCE
+    When the 'conformance' => 'strict' option is supplied, a number of
+    syntactic checks are enabled. All entity and attribute names are checked
+    to conform to the XML specification, which states that they must begin
+    with either an alphabetic character or an underscore and may then
+    consist of any number of alphanumerics, underscores, periods or hyphens.
+    Alphabetic and alphanumeric are interpreted according to the current
+    locale if 'use locale' is in effect and according to the Unicode
+    standard for Perl versions >= 5.6. Furthermore, entity or attribute
+    names are not allowed to begin with 'xml' (in any case), although a
+    number of special tags beginning with 'xml' are allowed (see "SPECIAL
+    TAGS"). Note that you can also supply an explicit list of allowed tags
+    with the 'allowed_xml_tags' option.
+
+    Also, the filter_invalid_chars option is automatically set to 1 unless
+    it is explicitly set to 0.
+
+SPECIAL TAGS
+    The following special tags are available when running under strict
+    conformance (otherwise they don't act special):
+
+  xmlpi
+    Processing instruction; first argument is target, remaining arguments
+    are attribute, value pairs. Attribute names are syntax checked, values
+    are escaped.
+
+  xmlcmnt
+    Comment. Arguments are concatenated and placed inside <!-- ... -->
+    comment delimiters. Any occurences of '--' in the concatenated arguments
+    are converted to '&#45;&#45;'
+
+  xmldecl (@args)
+    Declaration. This can be used to specify the version, encoding, and
+    other XML-related declarations (i.e., anything inside the <?xml?> tag).
+    @args can be used to control what is output, as keyword-value pairs.
+
+    By default, the version is set to the value specified in the
+    constructor, or to 1.0 if it was not specified. This can be overridden
+    by providing a 'version' key in @args. If you do not want the version at
+    all, explicitly provide undef as the value in @args.
+
+    By default, the encoding is set to the value specified in the
+    constructor; if no value was specified, the encoding will be left out
+    altogether. Provide an 'encoding' key in @args to override this.
+
+    If a dtd was set in the constructor, the standalone attribute of the
+    declaration will be set to 'no' and the doctype declaration will be
+    appended to the XML declartion, otherwise the standalone attribute will
+    be set to 'yes'. This can be overridden by providing a 'standalone' key
+    in @args. If you do not want the standalone attribute to show up,
+    explicitly provide undef as the value.
+
+  xmldtd
+    DTD <!DOCTYPE> tag creation. The format of this method is different from
+    others. Since DTD's are global and cannot contain namespace information,
+    the first argument should be a reference to an array; the elements are
+    concatenated together to form the DTD:
+
+       print $xml->xmldtd([ 'html', 'PUBLIC', $xhtml_w3c, $xhtml_dtd ])
+
+    This would produce the following declaration:
+
+       <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+            "DTD/xhtml1-transitional.dtd">
+
+    Assuming that $xhtml_w3c and $xhtml_dtd had the correct values.
+
+    Note that you can also specify a DTD on creation using the new()
+    method's dtd option.
+
+  xmlcdata
+    Character data section; arguments are concatenated and placed inside
+    <![CDATA[ ... ]]> character data section delimiters. Any occurences of
+    ']]>' in the concatenated arguments are converted to ']]&gt;'.
+
+  xml
+    "Final" XML document. Must be called with one and exactly one
+    XML::Generator-produced XML document. Any combination of
+    XML::Generator-produced XML comments or processing instructions may also
+    be supplied as arguments. Prepends an XML declaration, and re-blesses
+    the argument into a "final" class that can't be embedded.
+
+CREATING A SUBCLASS
+    For a simpler way to implement subclass-like behavior, see "STACKABLE
+    AUTOLOADs".
+
+    At times, you may find it desireable to subclass XML::Generator. For
+    example, you might want to provide a more application-specific interface
+    to the XML generation routines provided. Perhaps you have a custom
+    database application and would really like to say:
+
+       my $dbxml = new XML::Generator::MyDatabaseApp;
+       print $dbxml->xml($dbxml->custom_tag_handler(@data));
+
+    Here, custom_tag_handler() may be a method that builds a recursive XML
+    structure based on the contents of @data. In fact, it may even be named
+    for a tag you want generated, such as authors(), whose behavior changes
+    based on the contents (perhaps creating recursive definitions in the
+    case of multiple elements).
+
+    Creating a subclass of XML::Generator is actually relatively
+    straightforward, there are just three things you have to remember:
+
+       1. All of the useful utilities are in XML::Generator::util.
+
+       2. To construct a tag you simply have to call SUPER::tagname,
+          where "tagname" is the name of your tag.
+
+       3. You must fully-qualify the methods in XML::Generator::util.
+
+    So, let's assume that we want to provide a custom HTML table() method:
+
+       package XML::Generator::CustomHTML;
+       use base 'XML::Generator';
+
+       sub table {
+           my $self = shift;
+
+           # parse our args to get namespace and attribute info
+           my($namespace, $attr, @content) =
+              $self->XML::Generator::util::parse_args(@_)
+
+           # check for strict conformance
+           if ( $self->XML::Generator::util::config('conformance') eq 'strict' ) {
+              # ... special checks ...
+           }
+
+           # ... special formatting magic happens ...
+
+           # construct our custom tags
+           return $self->SUPER::table($attr, $self->tr($self->td(@content)));
+       }
+
+    That's pretty much all there is to it. We have to explicitly call
+    SUPER::table() since we're inside the class's table() method. The others
+    can simply be called directly, assuming that we don't have a tr() in the
+    current package.
+
+    If you want to explicitly create a specific tag by name, or just want a
+    faster approach than AUTOLOAD provides, you can use the tag() method
+    directly. So, we could replace that last line above with:
+
+           # construct our custom tags 
+           return $self->XML::Generator::util::tag('table', $attr, ...);
+
+    Here, we must explicitly call tag() with the tag name itself as its
+    first argument so it knows what to generate. These are the methods that
+    you might find useful:
+
+    XML::Generator::util::parse_args()
+        This parses the argument list and returns the namespace (arrayref),
+        attributes (hashref), and remaining content (array), in that order.
+
+    XML::Generator::util::tag()
+        This does the work of generating the appropriate tag. The first
+        argument must be the name of the tag to generate.
+
+    XML::Generator::util::config()
+        This retrieves options as set via the new() method.
+
+    XML::Generator::util::escape()
+        This escapes any illegal XML characters.
+
+    Remember that all of these methods must be fully-qualified with the
+    XML::Generator::util package name. This is because AUTOLOAD is used by
+    the main XML::Generator package to create tags. Simply calling
+    parse_args() will result in a set of XML tags called <parse_args>.
+
+    Finally, remember that since you are subclassing XML::Generator, you do
+    not need to provide your own new() method. The one from XML::Generator
+    is designed to allow you to properly subclass it.
+
+STACKABLE AUTOLOADs
+    As a simpler alternative to traditional subclassing, the "AUTOLOAD" that
+    "use XML::Generator;" exports can be configured to work with a
+    pre-defined "AUTOLOAD" with the ':stacked' option. Simply ensure that
+    your "AUTOLOAD" is defined before "use XML::Generator ':stacked';"
+    executes. The "AUTOLOAD" will get a chance to run first; the subroutine
+    name will be in your $AUTOLOAD as normal. Return an empty list to let
+    the default XML::Generator "AUTOLOAD" run or any other value to abort
+    it. This value will be returned as the result of the original method
+    call.
+
+    If there is no "import" defined, XML::Generator will create one. All
+    that this "import" does is export AUTOLOAD, but that lets your package
+    be used as if it were a subclass of XML::Generator.
+
+    An example will help:
+
+            package MyGenerator;
+
+            my %entities = ( copy => '&copy;',
+                             nbsp => '&nbsp;', ... );
+
+            sub AUTOLOAD {
+              my($tag) = our $AUTOLOAD =~ /.*::(.*)/;
+
+              return $entities{$tag} if defined $entities{$tag};
+              return;
+            }
+
+            use XML::Generator qw(:pretty :stacked);
+
+    This lets someone do:
+
+            use MyGenerator;
+
+            print html(head(title("My Title", copy())));
+
+    Producing:
+
+            <html>
+              <head>
+                <title>My Title&copy;</title>
+              </head>
+            </html>
+
+AUTHORS
+    Benjamin Holzman <bholzman@earthlink.net>
+        Original author and maintainer
+
+    Bron Gondwana <perlcode@brong.net>
+        First modular version
+
+    Nathan Wiger <nate@nateware.com>
+        Modular rewrite to enable subclassing
+
+LICENSE
+    This library is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    The XML::Writer module
+        http://search.cpan.org/search?mode=module&query=XML::Writer
+

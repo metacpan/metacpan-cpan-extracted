@@ -40,7 +40,7 @@ has unrestrictedUsersRule => ( is => 'rw', default => sub { 0 } );
 
 sub init {
     my ($self) = @_;
-    $self->addAuthRoute( switchcontext => 'run',  ['POST'] )
+    $self->addAuthRoute( switchcontext => 'run', ['POST'] )
       ->addAuthRoute( switchcontext => 'display', ['GET'] );
 
     # Parse ContextSwitching rules
@@ -138,10 +138,10 @@ sub display {
 
 sub run {
     my ( $self, $req ) = @_;
-    my $statut = PE_OK;
-    my $realId = $req->userData->{ $self->conf->{whatToTrace} };
+    my $statut  = PE_OK;
+    my $realId  = $req->userData->{ $self->conf->{whatToTrace} };
     my $spoofId = $req->param('spoofId') || '';    # ContextSwitching required ?
-    my $unUser = $self->unrestrictedUsersRule->( $req, $req->userData ) || 0;
+    my $unUser  = $self->unrestrictedUsersRule->( $req, $req->userData ) || 0;
 
     # Check token
     if ( $self->ottRule->( $req, {} ) ) {

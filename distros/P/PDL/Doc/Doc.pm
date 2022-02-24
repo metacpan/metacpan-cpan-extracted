@@ -24,7 +24,7 @@ sub new {
   my $parser = $class->SUPER::new(@_);
   bless $parser,$class; # just in case
 
-  $parser->select("METHODS|OPERATORS|CONTRUCTORS|FUNCTIONS|NAME");
+  $parser->select("METHODS|OPERATORS|CONSTRUCTORS|FUNCTIONS|NAME");
   $parser->{CURFUNC} = undef;
   $parser->{SYMHASH} = {};
   $parser->{INBLOCK} = 0;
@@ -45,11 +45,12 @@ sub command {
   } elsif ($this->{Mode} =~ /NAME/) {
     # do nothing (was 'last' but that was probably a mistake)
   } elsif ($cmd eq 'head2') {
+    return $this->SUPER::command($cmd,$txt,$line_num,$pod_para) if $txt =~ /^The\s/; # heuristic to deal with GSL::CDF descriptive =head2
     # A function can have multiple names (ex: zeros and zeroes),
     # so split at the commas
     my @funcs = split(',',$txt);
     # Remove parentheses (so myfunc and myfunc() both work)
-    my @names = map {$1 if m/\s*([^\s(]+)\s*/} @funcs;
+    my @names = map {$1 if m/\s*([^\s\(]+)\s*/} @funcs;
     barf "error parsing function list '$txt'"
       unless $#funcs == $#names;
     # check for signatures
@@ -409,6 +410,8 @@ alternatives.
 =cut
 
 package PDL::Doc;
+use strict;
+use warnings;
 use PDL::Core '';
 use File::Basename;
 use PDL::Doc::Config;
@@ -681,22 +684,19 @@ sub scan {
   my $file2 = $file;
   $file2 =~ s/^$ENV{BUILDROOTPREFIX}// if $ENV{BUILDROOTPREFIX};
 
-  my $parser = new PDL::PodParser;
+  my $parser = PDL::PodParser->new;
   $parser->{verbose} = $verbose;
   eval { $parser->parse_from_filehandle($infile,$outfile) };
-  warn "cannot parse '$file'" if $@;
+  warn "cannot parse '$file' ($@)" if $@;
 
   $this->{SYMS} = {} unless defined $this->{SYMS};
   my $hash = $this->{SYMS};
   my @stats = stat $file;
   $this->{FTIME}->{$file2} = $stats[9]; # store last mod time
   # print "mtime of $file: $stats[9]\n";
-  my $phash = $parser->{SYMHASH};
   my $n = 0;
-  while (my ($key,$val) = each %$phash) {
-
+  while (my ($key,$val) = each %{ $parser->{SYMHASH} }) {
     $n++;
-
     $val->{File} = $file2;
     #set up the 3-layer hash/database structure: $hash->{funcname}->{PDL::SomeModule} = $val
     if (defined($val->{Module})){
@@ -704,7 +704,7 @@ sub scan {
     } else {
 	warn "no Module for $key in $file2\n";
     }
-}
+  }
 
   # KGB pass2 - scan for module name and function
   # alright I admit this is kludgy but it works
@@ -841,26 +841,20 @@ installation script.
 
 =cut
 
-package PDL::Doc;
 sub add_module {
     my($module) = shift;
-
     use File::Copy qw{copy};
-
-    my($dir, $file, $pdldoc);
+    my($pdldoc);
     local($_);
-
   DIRECTORY:
-    for(@INC){
-	$dir = $_;
-	$file = $dir."/PDL/pdldoc.db";
+    for my $dir (@INC){
+	my $file = $dir."/PDL/pdldoc.db";
 	if( -f $file) {
 	    if(! -w "$dir/PDL") {
 		die "No write permission at $dir/PDL - not updating docs database.\n";
 	    }
-
 	    print "Found docs database $file\n";
-	    $pdldoc = new ("PDL::Doc",($file));
+	    $pdldoc = PDL::Doc->new($file);
 	    last DIRECTORY;
 	}
     }
@@ -888,8 +882,6 @@ sub add_module {
 
     die "Unable to find a .pm or .pod file in \@INC for module $module\n";
 }
-
-1;
 
 =head1 PDL::DOC EXAMPLE
 
@@ -930,7 +922,6 @@ own code.
  #Or, more concisely:
  print join("\n",map{$_->[0]}@entries);
 
-
  # Let's look at the function 'mpdl'
  @entries = $pdldoc->search('mpdl', 'Name');
  # I know there's only one:
@@ -948,7 +939,7 @@ How can you tell if you've gotten a module for one of your entries?
 The Ref entry will begin with 'Module:' if it's a module. In code:
 
  # Prints:
- #  Module: fundamental PDL functionality and vectorization/threading
+ #  Module: fundamental PDL functionality and vectorization/broadcasting
  print $pdldoc->gethash->{'PDL::Core'}->{'PDL::Core'}->{Ref}, "\n"
 
 =head1 BUGS

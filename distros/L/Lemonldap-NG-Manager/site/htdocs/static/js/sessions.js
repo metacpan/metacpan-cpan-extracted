@@ -280,7 +280,7 @@
             for (i = 0, len = attrs.length; i < len; i++) {
               attr = attrs[i];
               if (session[attr]) {
-                if (session[attr].toString().match(/"type":\s*"(?:TOTP|U2F|UBK)"/)) {
+                if (session[attr].toString().match(/"type":\s*"(?:TOTP|U2F|UBK|WebAuthn)"/)) {
                   subres.push({
                     title: "type",
                     value: "name",

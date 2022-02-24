@@ -7,7 +7,7 @@ use Mouse;
 use Clone 'clone';
 use Lemonldap::NG::Portal::Main::Constants 'URIRE';
 
-our $VERSION = '2.0.12';
+our $VERSION = '2.0.14';
 
 extends 'Lemonldap::NG::Common::Module';
 
@@ -116,6 +116,7 @@ sub params {
     $res{DISPLAY_MODULES} = $self->displayModules($req);
     $res{AUTH_ERROR_TYPE} =
       $req->error_type( $res{AUTH_ERROR} = $req->menuError );
+    $res{AUTH_ERROR_ROLE} = $req->error_role;
 
 # Display menu 2fRegisters link only if at least a 2F device is registered and rule
     $res{sfaManager} =
@@ -169,7 +170,7 @@ sub displayModules {
     foreach my $module ( @{ $self->menuModules } ) {
         $self->logger->debug("Check if $module->[0] has to be displayed");
 
-        if ( $module->[1]->( $req, $req->sessionInfo ) ) {
+        if ( $module->[1]->( $req, $req->userData ) ) {
             my $moduleHash = { $module->[0] => 1 };
             if ( $module->[0] eq 'Appslist' ) {
                 $moduleHash->{'APPSLIST_LOOP'} = $self->appslist($req);
@@ -177,16 +178,16 @@ sub displayModules {
             elsif ( $module->[0] eq 'LoginHistory' ) {
                 $moduleHash->{'SUCCESS_LOGIN'} =
                   $self->p->mkSessionArray( $req,
-                    $req->{sessionInfo}->{_loginHistory}->{successLogin},
+                    $req->{userData}->{_loginHistory}->{successLogin},
                     "", 0, 0 );
                 $moduleHash->{'FAILED_LOGIN'} =
                   $self->p->mkSessionArray( $req,
-                    $req->{sessionInfo}->{_loginHistory}->{failedLogin},
+                    $req->{userData}->{_loginHistory}->{failedLogin},
                     "", 0, 1 );
             }
             elsif ( $module->[0] eq 'OidcConsents' ) {
                 $moduleHash->{'OIDC_CONSENTS'} =
-                  $self->p->mkOidcConsent( $req, $req->sessionInfo );
+                  $self->p->mkOidcConsent( $req, $req->userData );
             }
             push @$displayModules, $moduleHash;
         }
@@ -298,7 +299,7 @@ sub _buildApplicationHash {
     my $appuri  = $apphash->{options}->{uri}  || "";
     my $appdesc = $apphash->{options}->{description};
     my $applogo = $apphash->{options}->{logo};
-    my $apptip = $apphash->{options}->{tooltip} || $appname;
+    my $apptip  = $apphash->{options}->{tooltip} || $appname;
 
     # Detect sub applications
     my $subapphash;
@@ -413,7 +414,7 @@ sub _filterHash {
                 if ( my $sub = $self->p->spRules->{$p} ) {
                     eval {
                         delete $apphash->{$key}
-                          unless ( $sub->( $req, $req->sessionInfo ) );
+                          unless ( $sub->( $req, $req->userData ) );
                     };
                     if ($@) {
                         $self->logger->error("Partner rule $p returns: $@");
@@ -438,7 +439,7 @@ sub _filterHash {
             delete $apphash->{$key}
               unless (
                 $self->p->HANDLER->grant(
-                    $req, $req->sessionInfo, $appuri, $cond, $vhost
+                    $req, $req->userData, $appuri, $cond, $vhost
                 )
               );
             next;

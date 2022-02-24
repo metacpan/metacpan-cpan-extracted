@@ -20,7 +20,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
 );
 use String::Random qw/random_string/;
 
-our $VERSION = '2.0.12';
+our $VERSION = '2.0.14';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Issuer
@@ -263,7 +263,9 @@ sub run {
 
             # Check if this RP is authorized
             if ( my $rule = $self->spRules->{$rp} ) {
-                unless ( $rule->( $req, $req->sessionInfo ) ) {
+                my $ruleVariables =
+                  { %{ $req->sessionInfo || {} }, _oidc_grant_type => $flow };
+                unless ( $rule->( $req, $ruleVariables ) ) {
                     $self->userLogger->warn( 'User '
                           . $req->sessionInfo->{ $self->conf->{whatToTrace} }
                           . " is not authorized to access to $rp" );
@@ -386,10 +388,10 @@ sub run {
 
             # Check openid scope
             unless ( $self->_hasScope( 'openid', $oidc_request->{'scope'} ) ) {
-                $self->logger->debug("No openid scope found");
+                $self->logger->error("No openid scope found");
 
                 #TODO manage standard OAuth request
-                return PE_OK;
+                return PE_ERROR;
             }
 
             # Check Request JWT signature
@@ -701,7 +703,7 @@ sub run {
 
                 # Store data in session
                 my $code_payload = {
-                    code_challenge => $oidc_request->{'code_challenge'},
+                    code_challenge        => $oidc_request->{'code_challenge'},
                     code_challenge_method =>
                       $oidc_request->{'code_challenge_method'},
                     nonce           => $oidc_request->{'nonce'},
@@ -755,6 +757,7 @@ sub run {
                             scope           => $scope,
                             rp              => $rp,
                             user_session_id => $req->id,
+                            grant_type      => $flow,
                         }
                     );
 
@@ -762,7 +765,7 @@ sub run {
                         $self->logger->error("Unable to create Access Token");
                         $self->returnRedirectError( $req,
                             $oidc_request->{'redirect_uri'},
-                            "server_error", undef, undef,
+                            "server_error",           undef, undef,
                             $oidc_request->{'state'}, 1 );
                     }
 
@@ -862,6 +865,7 @@ sub run {
                             scope           => $scope,
                             rp              => $rp,
                             user_session_id => $req->id,
+                            grant_type      => $flow,
                         }
                     );
 
@@ -869,7 +873,7 @@ sub run {
                         $self->logger->error("Unable to create Access Token");
                         return $self->returnRedirectError( $req,
                             $oidc_request->{'redirect_uri'},
-                            "server_error", undef, undef,
+                            "server_error",           undef, undef,
                             $oidc_request->{'state'}, 1 );
                     }
 
@@ -1096,6 +1100,13 @@ sub _handleClientCredentialsGrant {
     my $req_scope = $req->param('scope') || '';
     my $scope     = $self->getScope( $req, $rp, $req_scope );
 
+    unless ($scope) {
+        $self->userLogger->warn( 'Client '
+              . $client_id
+              . " was not granted any requested scopes ($req_scope) for $rp" );
+        return $self->sendOIDCError( $req, 'invalid_scope', 400 );
+    }
+
     my $infos = {
         $self->conf->{whatToTrace} => $client_id,
         _clientId                  => $client_id,
@@ -1110,7 +1121,9 @@ sub _handleClientCredentialsGrant {
 
     # Run rule against session info
     if ( my $rule = $self->spRules->{$rp} ) {
-        unless ( $rule->( $req, $infos ) ) {
+        my $ruleVariables =
+          { %{ $infos || {} }, _oidc_grant_type => "clientcredentials", };
+        unless ( $rule->( $req, $ruleVariables ) ) {
             $self->userLogger->warn(
                     "Relying party $rp did not validate the provided "
                   . "Access Rule during Client Credentials Grant" );
@@ -1131,6 +1144,7 @@ sub _handleClientCredentialsGrant {
             scope           => $scope,
             rp              => $rp,
             user_session_id => $session->id,
+            grant_type      => "clientcredentials",
         }
     );
     unless ($access_token) {
@@ -1208,7 +1222,9 @@ sub _handlePasswordGrant {
 
     ## Make sure the current user is allowed to use this RP
     if ( my $rule = $self->spRules->{$rp} ) {
-        unless ( $rule->( $req, $req->sessionInfo ) ) {
+        my $ruleVariables =
+          { %{ $req->sessionInfo || {} }, _oidc_grant_type => "password", };
+        unless ( $rule->( $req, $ruleVariables ) ) {
             $self->userLogger->warn( 'User '
                   . $req->sessionInfo->{ $self->conf->{whatToTrace} }
                   . " is not authorized to access to $rp" );
@@ -1219,6 +1235,12 @@ sub _handlePasswordGrant {
 
     # Resolve scopes
     my $scope = $self->getScope( $req, $rp, $req_scope );
+    unless ($scope) {
+        $self->userLogger->warn( 'User '
+              . $req->sessionInfo->{ $self->conf->{whatToTrace} }
+              . " was not granted any requested scopes ($req_scope) for $rp" );
+        return $self->sendOIDCError( $req, 'invalid_scope', 400 );
+    }
 
     my $user_id = $self->getUserIDForRP( $req, $rp, $req->sessionInfo );
 
@@ -1233,6 +1255,7 @@ sub _handlePasswordGrant {
         $req, $rp, $scope,
         $req->sessionInfo,
         {
+            grant_type      => "password",
             user_session_id => $req->id,
         }
     );
@@ -1256,6 +1279,7 @@ sub _handlePasswordGrant {
                 scope           => $scope,
                 client_id       => $client_id,
                 user_session_id => $req->id,
+                grant_type      => "password",
             },
             0,
         );
@@ -1304,7 +1328,7 @@ sub _handlePasswordGrant {
         access_token => "$access_token",
         token_type   => 'Bearer',
         expires_in   => $expires_in + 0,
-        ( ( $scope ne $req_scope ) ? ( scope => "$scope" ) : () ),
+        ( ( $scope ne $req_scope ) ? ( scope => "$scope" )       : () ),
         ( $refresh_token ? ( refresh_token => "$refresh_token" ) : () ),
         ( $id_token      ? ( id_token      => "$id_token" )      : () ),
     };
@@ -1385,6 +1409,7 @@ sub _handleAuthorizationCodeGrant {
         $req, $rp, $scope,
         $codeSession->data->{user_session_id},
         {
+            grant_type      => "authorizationcode",
             user_session_id => $apacheSession->id,
         }
     );
@@ -1419,6 +1444,7 @@ sub _handleAuthorizationCodeGrant {
                 client_id    => $client_id,
                 _session_uid => $apacheSession->data->{_user},
                 auth_time    => $apacheSession->data->{_lastAuthnUTime},
+                grant_type   => "authorizationcode",
             },
             1,
         );
@@ -1445,6 +1471,7 @@ sub _handleAuthorizationCodeGrant {
                 scope           => $scope,
                 client_id       => $client_id,
                 user_session_id => $codeSession->data->{user_session_id},
+                grant_type      => "authorizationcode",
             },
             0,
         );
@@ -1499,7 +1526,7 @@ sub _handleAuthorizationCodeGrant {
         expires_in   => $expires_in + 0,
         id_token     => "$id_token",
         ( $refresh_token ? ( refresh_token => "$refresh_token" ) : () ),
-        ( ( $req_scope ne $scope ) ? ( scope => "$scope" ) : () ),
+        ( ( $req_scope ne $scope ) ? ( scope => "$scope" )       : () ),
     };
 
     my $cRP = $apacheSession->data->{_oidcConnectedRP} || '';
@@ -1560,6 +1587,7 @@ sub _handleRefreshTokenGrant {
             $user_session_id,
             {
                 user_session_id => $user_session_id,
+                grant_type      => $refreshSession->data->{grant_type},
             }
         );
 
@@ -1618,6 +1646,7 @@ sub _handleRefreshTokenGrant {
             $refreshSession->data,
             {
                 offline_session_id => $refreshSession->id,
+                grant_type         => $refreshSession->data->{grant_type},
             }
         );
 
@@ -2149,6 +2178,7 @@ sub metadata {
             jwks_uri               => $baseUrl . $jwks_uri,
             authorization_endpoint => $baseUrl . $authorize_uri,
             end_session_endpoint   => $baseUrl . $endsession_uri,
+
             #check_session_iframe   => $baseUrl . $checksession_uri,
             introspection_endpoint => $baseUrl . $introspection_uri,
 
@@ -2165,10 +2195,10 @@ sub metadata {
 
             # Scopes
             scopes_supported => [qw/openid profile email address phone/],
-            response_types_supported => $response_types,
-            grant_types_supported    => $grant_types,
-            acr_values_supported     => \@acr,
-            subject_types_supported  => ["public"],
+            response_types_supported              => $response_types,
+            grant_types_supported                 => $grant_types,
+            acr_values_supported                  => \@acr,
+            subject_types_supported               => ["public"],
             token_endpoint_auth_methods_supported =>
               [qw/client_secret_post client_secret_basic/],
             introspection_endpoint_auth_methods_supported =>
@@ -2350,9 +2380,9 @@ sub _generateIDToken {
         exp       => $id_token_exp,                      # expiration
         iat       => time,                               # Issued time
         auth_time => $sessionInfo->{_lastAuthnUTime},    # Authentication time
-        acr => $id_token_acr,    # Authentication Context Class Reference
-        azp => $client_id,       # Authorized party
-                                 # TODO amr
+        acr       => $id_token_acr,    # Authentication Context Class Reference
+        azp       => $client_id,       # Authorized party
+                                       # TODO amr
     };
 
     for ( keys %{$extra_claims} ) {

@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::FrameLocator;
-$Playwright::FrameLocator::VERSION = '0.018';
+$Playwright::FrameLocator::VERSION = '0.019';
 use parent 'Playwright::Base';
 
 sub new {
@@ -22,11 +22,11 @@ sub spec {
     return $Playwright::spec->{'FrameLocator'}{members};
 }
 
-sub locator {
+sub last {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'locator',
+        command => 'last',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -42,11 +42,11 @@ sub frameLocator {
     );
 }
 
-sub last {
+sub locator {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'last',
+        command => 'locator',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -116,7 +116,7 @@ Playwright::FrameLocator - Automatically generated class for Playwright::FrameLo
 
 =head1 VERSION
 
-version 0.018
+version 0.019
 
 =head1 CONSTRUCTOR
 
@@ -127,11 +127,11 @@ Instead it should be returned to you as the result of calls on Playwright object
 
 =head1 METHODS
 
-=head2 locator(@args)
+=head2 last(@args)
 
-Execute the FrameLocator::locator playwright routine.
+Execute the FrameLocator::last playwright routine.
 
-See L<https://playwright.dev/api/class-FrameLocator#FrameLocator-locator> for more information.
+See L<https://playwright.dev/api/class-FrameLocator#FrameLocator-last> for more information.
 
 =head2 frameLocator(@args)
 
@@ -139,11 +139,11 @@ Execute the FrameLocator::frameLocator playwright routine.
 
 See L<https://playwright.dev/api/class-FrameLocator#FrameLocator-frameLocator> for more information.
 
-=head2 last(@args)
+=head2 locator(@args)
 
-Execute the FrameLocator::last playwright routine.
+Execute the FrameLocator::locator playwright routine.
 
-See L<https://playwright.dev/api/class-FrameLocator#FrameLocator-last> for more information.
+See L<https://playwright.dev/api/class-FrameLocator#FrameLocator-locator> for more information.
 
 =head2 nth(@args)
 

@@ -272,12 +272,11 @@ constriction(2);
 constriction2();
 
 # Reset arrow style to the default by passing two
-# NULL arrays
-plsvect(null, null, 0);
+# empty arrays
+plsvect(zeroes(0), zeroes(0), 0);
 
 # Example of polar plot
 
 potential ();
 
 plend ();
-

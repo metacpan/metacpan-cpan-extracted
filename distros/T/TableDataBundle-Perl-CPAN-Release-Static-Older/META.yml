@@ -11,7 +11,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   File::ShareDir::Install: '0.06'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,85 +20,88 @@ name: TableDataBundle-Perl-CPAN-Release-Static-Older
 provides:
   TableData::Perl::CPAN::Release::Static::1995:
     file: lib/TableData/Perl/CPAN/Release/Static/1995.pm
-    version: '20210927.1'
+    version: '20220218.2'
   TableData::Perl::CPAN::Release::Static::1996:
     file: lib/TableData/Perl/CPAN/Release/Static/1996.pm
-    version: '20210927.1'
+    version: '20220218.2'
   TableData::Perl::CPAN::Release::Static::1997:
     file: lib/TableData/Perl/CPAN/Release/Static/1997.pm
-    version: '20210927.1'
+    version: '20220218.2'
   TableData::Perl::CPAN::Release::Static::1998:
     file: lib/TableData/Perl/CPAN/Release/Static/1998.pm
-    version: '20210927.1'
+    version: '20220218.2'
   TableData::Perl::CPAN::Release::Static::1999:
     file: lib/TableData/Perl/CPAN/Release/Static/1999.pm
-    version: '20210927.1'
+    version: '20220218.2'
   TableData::Perl::CPAN::Release::Static::2000:
     file: lib/TableData/Perl/CPAN/Release/Static/2000.pm
-    version: '20210927.1'
+    version: '20220218.2'
   TableData::Perl::CPAN::Release::Static::2001:
     file: lib/TableData/Perl/CPAN/Release/Static/2001.pm
-    version: '20210927.1'
+    version: '20220218.2'
   TableData::Perl::CPAN::Release::Static::2002:
     file: lib/TableData/Perl/CPAN/Release/Static/2002.pm
-    version: '20210927.1'
+    version: '20220218.2'
   TableData::Perl::CPAN::Release::Static::2003:
     file: lib/TableData/Perl/CPAN/Release/Static/2003.pm
-    version: '20210927.1'
+    version: '20220218.2'
   TableData::Perl::CPAN::Release::Static::2004:
     file: lib/TableData/Perl/CPAN/Release/Static/2004.pm
-    version: '20210927.1'
+    version: '20220218.2'
   TableData::Perl::CPAN::Release::Static::2005:
     file: lib/TableData/Perl/CPAN/Release/Static/2005.pm
-    version: '20210927.1'
+    version: '20220218.2'
   TableData::Perl::CPAN::Release::Static::2006:
     file: lib/TableData/Perl/CPAN/Release/Static/2006.pm
-    version: '20210927.1'
+    version: '20220218.2'
   TableData::Perl::CPAN::Release::Static::2007:
     file: lib/TableData/Perl/CPAN/Release/Static/2007.pm
-    version: '20210927.1'
+    version: '20220218.2'
   TableData::Perl::CPAN::Release::Static::2008:
     file: lib/TableData/Perl/CPAN/Release/Static/2008.pm
-    version: '20210927.1'
+    version: '20220218.2'
   TableData::Perl::CPAN::Release::Static::2009:
     file: lib/TableData/Perl/CPAN/Release/Static/2009.pm
-    version: '20210927.1'
+    version: '20220218.2'
   TableData::Perl::CPAN::Release::Static::2010:
     file: lib/TableData/Perl/CPAN/Release/Static/2010.pm
-    version: '20210927.1'
+    version: '20220218.2'
   TableData::Perl::CPAN::Release::Static::2011:
     file: lib/TableData/Perl/CPAN/Release/Static/2011.pm
-    version: '20210927.1'
+    version: '20220218.2'
   TableData::Perl::CPAN::Release::Static::2012:
     file: lib/TableData/Perl/CPAN/Release/Static/2012.pm
-    version: '20210927.1'
+    version: '20220218.2'
   TableData::Perl::CPAN::Release::Static::2013:
     file: lib/TableData/Perl/CPAN/Release/Static/2013.pm
-    version: '20210927.1'
+    version: '20220218.2'
   TableData::Perl::CPAN::Release::Static::2014:
     file: lib/TableData/Perl/CPAN/Release/Static/2014.pm
-    version: '20210927.1'
+    version: '20220218.2'
   TableData::Perl::CPAN::Release::Static::2015:
     file: lib/TableData/Perl/CPAN/Release/Static/2015.pm
-    version: '20210927.1'
+    version: '20220218.2'
   TableData::Perl::CPAN::Release::Static::2016:
     file: lib/TableData/Perl/CPAN/Release/Static/2016.pm
-    version: '20210927.1'
+    version: '20220218.2'
   TableData::Perl::CPAN::Release::Static::2017:
     file: lib/TableData/Perl/CPAN/Release/Static/2017.pm
-    version: '20210927.1'
+    version: '20220218.2'
   TableData::Perl::CPAN::Release::Static::2018:
     file: lib/TableData/Perl/CPAN/Release/Static/2018.pm
-    version: '20210927.1'
+    version: '20220218.2'
   TableData::Perl::CPAN::Release::Static::2019:
     file: lib/TableData/Perl/CPAN/Release/Static/2019.pm
-    version: '20210927.1'
+    version: '20220218.2'
   TableData::Perl::CPAN::Release::Static::2020:
     file: lib/TableData/Perl/CPAN/Release/Static/2020.pm
-    version: '20210927.1'
+    version: '20220218.2'
+  TableData::Perl::CPAN::Release::Static::2021:
+    file: lib/TableData/Perl/CPAN/Release/Static/2021.pm
+    version: '20220218.2'
   TableDataBundle::Perl::CPAN::Release::Static::Older:
     file: lib/TableDataBundle/Perl/CPAN/Release/Static/Older.pm
-    version: '20210927.1'
+    version: '20220218.2'
 requires:
   File::Basename: '0'
   File::ShareDir: '0'
@@ -111,8 +114,8 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=TableDataBundle-Perl-CPAN-Release-Static-Older
   homepage: https://metacpan.org/release/TableDataBundle-Perl-CPAN-Release-Static-Older
-  repository: git://github.com/perlancar/perl-TableDataBundle-CPAN-Release-Static-Older.git
-version: '20210927.1'
+  repository: git://github.com/perlancar/perl-TableDataBundle-Perl-CPAN-Release-Static-Older.git
+version: '20220218.2'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -141,66 +144,66 @@ x_Dist_Zilla:
           prune_directory: []
           root: .
       name: '@Author::PERLANCAR/@Filter/GatherDir'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::PruneCruft
       name: '@Author::PERLANCAR/@Filter/PruneCruft'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@Author::PERLANCAR/@Filter/ManifestSkip'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@Author::PERLANCAR/@Filter/MetaYAML'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::License
       name: '@Author::PERLANCAR/@Filter/License'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::PodCoverageTests
       name: '@Author::PERLANCAR/@Filter/PodCoverageTests'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@Author::PERLANCAR/@Filter/PodSyntaxTests'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::ExtraTests
       name: '@Author::PERLANCAR/@Filter/ExtraTests'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Author::PERLANCAR/@Filter/ExecDir'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::ShareDir
       name: '@Author::PERLANCAR/@Filter/ShareDir'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::MakeMaker
       config:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 1
       name: '@Author::PERLANCAR/@Filter/MakeMaker'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: '@Author::PERLANCAR/@Filter/Manifest'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@Author::PERLANCAR/@Filter/ConfirmRelease'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Author::PERLANCAR/ExecDir script'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.605'
+      version: '0.606'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -211,8 +214,12 @@ x_Dist_Zilla:
       version: '0.02'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::EnsurePrereqToSpec
+      config:
+        Dist::Zilla::Role::ModuleMetadata:
+          Module::Metadata: '1.000037'
+          version: '0.006'
       name: '@Author::PERLANCAR/PERLANCAR::EnsurePrereqToSpec'
-      version: '0.062'
+      version: '0.064'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::MetaResources
       name: '@Author::PERLANCAR/PERLANCAR::MetaResources'
@@ -258,11 +265,11 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@Author::PERLANCAR/MetaJSON'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: '@Author::PERLANCAR/MetaConfig'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::MetaProvides::Package
       config:
@@ -271,7 +278,7 @@ x_Dist_Zilla:
             -
               class: Dist::Zilla::Plugin::FinderCode
               name: '@Author::PERLANCAR/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
-              version: '6.017'
+              version: '6.024'
           include_underscores: 0
         Dist::Zilla::Role::MetaProvider::Provider:
           $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
@@ -428,7 +435,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PruneFiles
       name: '@Author::PERLANCAR/PruneFiles'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::Pod2Readme
       name: '@Author::PERLANCAR/Pod2Readme'
@@ -516,7 +523,7 @@ x_Dist_Zilla:
           phase: runtime
           type: requires
       name: Prereqs
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -524,7 +531,7 @@ x_Dist_Zilla:
           phase: test
           type: requires
       name: TestRequires
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::Extras
       name: 'lint-prereqs / assume-provided'
@@ -532,52 +539,52 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: '@Author::PERLANCAR/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
-      version: '6.017'
+      version: '6.024'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
       is_trial: '0'
-    version: '6.017'
+    version: '6.024'
 x_authority: cpan:PERLANCAR
 x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.73'

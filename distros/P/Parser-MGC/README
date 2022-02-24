@@ -61,6 +61,19 @@ DESCRIPTION
     this method is one of the key advantages that Parser::MGC has over more
     simple parsing using single regexps alone.
 
+ Stall Detection
+
+    Most of the methods in this class have bounded execution time, but some
+    methods ("list_of" and "sequence_of") repeatedly recuse into other code
+    to build up a list of results until some ending condition is reached. A
+    possible class of bug is that whatever they recurse into might
+    successfully match an empty string, and thus make no progress.
+
+    These methods will automatically detect this situation if they
+    repeatedly encounter the same string position more than a certain
+    number of times (given by the stallcount argument). If this count is
+    reached, the entire parse attempt will be aborted by the "die" method.
+
 CONSTRUCTOR
 
  new
@@ -88,6 +101,14 @@ CONSTRUCTOR
 
       If true, the token_int method will also accept integers with a 0o
       prefix as octal.
+
+    stallcount => INT
+
+      Since version 0.21.
+
+      The number of times that the stall-detector would have to see the
+      same position before it aborts the parse attempt. If not supplied, a
+      default of 10 will apply.
 
 PATTERNS
 
@@ -123,6 +144,31 @@ PATTERNS
       * string_delim
 
       Pattern used to delimit a string by token_string. Defaults to /["']/.
+
+SUBCLASSING METHODS
+
+    The following optional methods may be defined by subclasses, to
+    customise their parsing.
+
+ on_parse_start
+
+       $parser->on_parse_start
+
+    Since version 0.21.
+
+    If defined, is invoked by the from_* method that begins a new parse
+    operation, just before invoking the toplevel structure method.
+
+ on_parse_end
+
+       $result = $parser->on_parse_end( $result )
+
+    Since version 0.21.
+
+    If defined, is invoked by the from_* method once it has finished the
+    toplevel structure method. This is passed the tentative result from the
+    structure method, and whatever it returns becomes the result of the
+    from_* method itself.
 
 METHODS
 
@@ -265,6 +311,41 @@ METHODS
     Since version 0.05.
 
     Returns the number of nested scope_of calls that have been made.
+
+ include_string
+
+       $result = $parser->include_string( $str, %opts )
+
+    Since version 0.21.
+
+    Parses a given string into the existing parser object.
+
+    The current parser state is moved aside from the duration of this
+    method, and is replaced by the given string. Then the toplevel parser
+    method (or a different as specified) is invoked over it. Its result is
+    returned by this method.
+
+    This would typically be used to handle some sort of "include" or "macro
+    expansion" ability, by injecting new content in as if the current parse
+    location had encountered it. Other than the internal parser state,
+    other object fields are not altered, so whatever effects the invoked
+    parsing methods will have on it can continue to inspect and alter it as
+    required.
+
+    The following options are recognised:
+
+    filename => STRING
+
+      If set, provides a filename (or other descriptive text) to pretend
+      for the source of this string. It need not be a real file on the
+      filesystem; it could for example explain the source of the string in
+      some other way. It is the value reported by the "filename" method and
+      printed in failure messages.
+
+    toplevel => STRING | CODE
+
+      If set, provides the toplevel parser method to use within this
+      inclusion, overriding the object's defined default.
 
 STRUCTURE-FORMING METHODS
 

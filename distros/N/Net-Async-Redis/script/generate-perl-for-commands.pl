@@ -56,7 +56,6 @@ for my $cmd ($html->look_down(_tag => 'span', class => 'command')) {
     };
     my @args = $info->{args}->@*;
     if(defined(my $idx = first { $args[$_] =~ /\bkey\b/ } 0..$#args)) {
-        warn "have key for $idx";
         $key_finder{$info->{command}} //= (0 + split(' ', $command)) + $idx;
     }
     $info->{summary} =~ s{\.$}{};
@@ -66,13 +65,25 @@ for my $cmd ($html->look_down(_tag => 'span', class => 'command')) {
 # This one's more complicated... so we assign manually for now
 $key_finder{XGROUP} = 2;
 
+my %partial_commands;
 for my $group (sort keys %commands_by_group) {
     $log->infof('%s', $group);
     $commands_by_group{$group} = [ sort_by { $_->{method} } $commands_by_group{$group}->@* ];
-    for($commands_by_group{$group}->@*) {
-        $log->infof(' * %s - %s', $_->{method}, $_->{summary});
+    for my $command ($commands_by_group{$group}->@*) {
+        $log->infof(' * %s - %s', $command->{method}, $command->{summary});
+        $partial_commands{$command->{method}} = $command->{method};
+        my @partial;
+        for (split '_', $command->{method}) {
+            push @partial, $_;
+            my $name = join '_', @partial;
+            $partial_commands{$name} //= $command->{method};
+            $key_finder{uc($name =~ s{_}{ }gr)} //= $key_finder{$command->{command}} + 1 if exists $key_finder{$command->{command}};
+        }
     }
 }
+
+# These are methods which need to call the real _ version
+delete @partial_commands{grep { $partial_commands{$_} eq $_ } keys %partial_commands};
 
 my $tt = Template->new;
 $tt->process(\q{[% -%]
@@ -139,6 +150,28 @@ sub [% command.method %] : method {
 
 [%  END -%]
 [% END -%]
+
+=head1 METHODS - Legacy
+
+These take a subcommand as a parameter and construct the method name by
+combining the main command with subcommand - for example, C<< ->xgroup(CREATE => ...) >>
+would call C<< ->xgroup_create >>.
+
+=cut
+
+[%  FOR method IN partial_commands.keys.sort -%]
+=head2 [% method %]
+
+=cut
+
+sub [% method %] : method {
+    my ($self, $cmd, @args) = @_;
+    $cmd =~ tr/ /_/;
+    my $method = "[% method %]_" . lc($cmd);
+    return $self->$method(@args);
+}
+
+[% END -%]
 1;
 
 __END__
@@ -156,7 +189,8 @@ The Perl code is copyright Tom Molesworth 2015-2021, and licensed under the same
 terms as Perl itself.
 
 }, {
-    commands => \%commands_by_group,
-    key_finder => \%key_finder,
+    commands      => \%commands_by_group,
+    key_finder    => \%key_finder,
+    partial_commands => \%partial_commands,
 }) or die $tt->error;
 

@@ -21,7 +21,8 @@ use DynaLoader;
 
 
 
-#line 5 "gsl_sf_airy.pd"
+#line 4 "gsl_sf_airy.pd"
+
 use strict;
 use warnings;
 
@@ -34,7 +35,7 @@ PDL::GSLSF::AIRY - PDL interface to GSL Special Functions
 This is an interface to the Special Function package present in the GNU Scientific Library. 
 
 =cut
-#line 38 "AIRY.pm"
+#line 39 "AIRY.pm"
 
 
 
@@ -48,7 +49,8 @@ This is an interface to the Special Function package present in the GNU Scientif
 
 
 
-#line 1059 "../../../../blib/lib/PDL/PP.pm"
+#line 1058 "../../../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 gsl_sf_airy_Ai
@@ -68,17 +70,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 72 "AIRY.pm"
+#line 74 "AIRY.pm"
 
 
 
-#line 1061 "../../../../blib/lib/PDL/PP.pm"
+#line 1060 "../../../../blib/lib/PDL/PP.pm"
+
 *gsl_sf_airy_Ai = \&PDL::gsl_sf_airy_Ai;
-#line 78 "AIRY.pm"
+#line 81 "AIRY.pm"
 
 
 
-#line 1059 "../../../../blib/lib/PDL/PP.pm"
+#line 1058 "../../../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 gsl_sf_airy_Bi
@@ -98,17 +102,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 102 "AIRY.pm"
+#line 106 "AIRY.pm"
 
 
 
-#line 1061 "../../../../blib/lib/PDL/PP.pm"
+#line 1060 "../../../../blib/lib/PDL/PP.pm"
+
 *gsl_sf_airy_Bi = \&PDL::gsl_sf_airy_Bi;
-#line 108 "AIRY.pm"
+#line 113 "AIRY.pm"
 
 
 
-#line 1059 "../../../../blib/lib/PDL/PP.pm"
+#line 1058 "../../../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 gsl_sf_airy_Ai_scaled
@@ -128,17 +134,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 132 "AIRY.pm"
-
-
-
-#line 1061 "../../../../blib/lib/PDL/PP.pm"
-*gsl_sf_airy_Ai_scaled = \&PDL::gsl_sf_airy_Ai_scaled;
 #line 138 "AIRY.pm"
 
 
 
-#line 1059 "../../../../blib/lib/PDL/PP.pm"
+#line 1060 "../../../../blib/lib/PDL/PP.pm"
+
+*gsl_sf_airy_Ai_scaled = \&PDL::gsl_sf_airy_Ai_scaled;
+#line 145 "AIRY.pm"
+
+
+
+#line 1058 "../../../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 gsl_sf_airy_Bi_scaled
@@ -158,17 +166,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 162 "AIRY.pm"
+#line 170 "AIRY.pm"
 
 
 
-#line 1061 "../../../../blib/lib/PDL/PP.pm"
+#line 1060 "../../../../blib/lib/PDL/PP.pm"
+
 *gsl_sf_airy_Bi_scaled = \&PDL::gsl_sf_airy_Bi_scaled;
-#line 168 "AIRY.pm"
+#line 177 "AIRY.pm"
 
 
 
-#line 1059 "../../../../blib/lib/PDL/PP.pm"
+#line 1058 "../../../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 gsl_sf_airy_Ai_deriv
@@ -188,17 +198,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 192 "AIRY.pm"
+#line 202 "AIRY.pm"
 
 
 
-#line 1061 "../../../../blib/lib/PDL/PP.pm"
+#line 1060 "../../../../blib/lib/PDL/PP.pm"
+
 *gsl_sf_airy_Ai_deriv = \&PDL::gsl_sf_airy_Ai_deriv;
-#line 198 "AIRY.pm"
+#line 209 "AIRY.pm"
 
 
 
-#line 1059 "../../../../blib/lib/PDL/PP.pm"
+#line 1058 "../../../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 gsl_sf_airy_Bi_deriv
@@ -218,17 +230,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 222 "AIRY.pm"
+#line 234 "AIRY.pm"
 
 
 
-#line 1061 "../../../../blib/lib/PDL/PP.pm"
+#line 1060 "../../../../blib/lib/PDL/PP.pm"
+
 *gsl_sf_airy_Bi_deriv = \&PDL::gsl_sf_airy_Bi_deriv;
-#line 228 "AIRY.pm"
+#line 241 "AIRY.pm"
 
 
 
-#line 1059 "../../../../blib/lib/PDL/PP.pm"
+#line 1058 "../../../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 gsl_sf_airy_Ai_deriv_scaled
@@ -248,17 +262,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 252 "AIRY.pm"
+#line 266 "AIRY.pm"
 
 
 
-#line 1061 "../../../../blib/lib/PDL/PP.pm"
+#line 1060 "../../../../blib/lib/PDL/PP.pm"
+
 *gsl_sf_airy_Ai_deriv_scaled = \&PDL::gsl_sf_airy_Ai_deriv_scaled;
-#line 258 "AIRY.pm"
+#line 273 "AIRY.pm"
 
 
 
-#line 1059 "../../../../blib/lib/PDL/PP.pm"
+#line 1058 "../../../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 gsl_sf_airy_Bi_deriv_scaled
@@ -278,19 +294,21 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 282 "AIRY.pm"
+#line 298 "AIRY.pm"
 
 
 
-#line 1061 "../../../../blib/lib/PDL/PP.pm"
+#line 1060 "../../../../blib/lib/PDL/PP.pm"
+
 *gsl_sf_airy_Bi_deriv_scaled = \&PDL::gsl_sf_airy_Bi_deriv_scaled;
-#line 288 "AIRY.pm"
+#line 305 "AIRY.pm"
 
 
 
 
 
-#line 64 "gsl_sf_airy.pd"
+#line 63 "gsl_sf_airy.pd"
+
 =head1 AUTHOR
 
 This file copyright (C) 1999 Christian Pellegrin <chri@infis.univ.trieste.it>
@@ -303,7 +321,7 @@ PDL distribution, the copyright notice should be included in the file.
 The GSL SF modules were written by G. Jungman.
 
 =cut
-#line 307 "AIRY.pm"
+#line 325 "AIRY.pm"
 
 
 

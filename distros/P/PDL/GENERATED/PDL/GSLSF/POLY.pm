@@ -21,7 +21,8 @@ use DynaLoader;
 
 
 
-#line 5 "gsl_sf_poly.pd"
+#line 4 "gsl_sf_poly.pd"
+
 use strict;
 use warnings;
 
@@ -37,7 +38,7 @@ NOTE: this should actually be PDL::POLY for consistency but I don't want to get 
 changing the directory structure at this time.  These fixes should allow things to build.
 
 =cut
-#line 41 "POLY.pm"
+#line 42 "POLY.pm"
 
 
 
@@ -51,7 +52,8 @@ changing the directory structure at this time.  These fixes should allow things 
 
 
 
-#line 1059 "../../../../blib/lib/PDL/PP.pm"
+#line 1058 "../../../../blib/lib/PDL/PP.pm"
+
 
 
 =head2 gsl_poly_eval
@@ -71,19 +73,21 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 75 "POLY.pm"
+#line 77 "POLY.pm"
 
 
 
-#line 1061 "../../../../blib/lib/PDL/PP.pm"
+#line 1060 "../../../../blib/lib/PDL/PP.pm"
+
 *gsl_poly_eval = \&PDL::gsl_poly_eval;
-#line 81 "POLY.pm"
+#line 84 "POLY.pm"
 
 
 
 
 
-#line 42 "gsl_sf_poly.pd"
+#line 41 "gsl_sf_poly.pd"
+
 =head1 AUTHOR
 
 This file copyright (C) 1999 Christian Pellegrin <chri@infis.univ.trieste.it>
@@ -96,7 +100,7 @@ PDL distribution, the copyright notice should be included in the file.
 The GSL SF modules were written by G. Jungman.
 
 =cut
-#line 100 "POLY.pm"
+#line 104 "POLY.pm"
 
 
 

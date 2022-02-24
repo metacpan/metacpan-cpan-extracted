@@ -3,9 +3,7 @@ use IO::String;
 use strict;
 use JSON qw(to_json from_json);
 
-BEGIN {
-    require 't/test-lib.pm';
-}
+require 't/test-lib.pm';
 
 my $res;
 my $client = LLNG::Manager::Test->new( {
@@ -23,6 +21,7 @@ my $client = LLNG::Manager::Test->new( {
             macros                          => {
                 emptyMacro   => '',
                 _whatToTrace => '$_user',
+                authMode     => '$authenticationLevel == 1 ? "DEMO" : "NULL"'
             },
         }
     }
@@ -201,8 +200,43 @@ ok( scalar @persistentAttr == 0, 'No persistent attribute found' )
   or print STDERR Dumper($res);
 count(6);
 
+# Refresh rights (#2179)
+# ------------------------
+ok(
+    $res = $client->_get(
+        '/refresh',
+        cookie => "lemonldap=$id_msmith",
+        accept => 'text/html'
+    ),
+    'Refresh query',
+);
+expectRedirection( $res, 'http://auth.example.com/' );
+
+Time::Fake->offset("+20s");    # Go through handler internal cache
+
+ok(
+    $res = $client->_get(
+        '/checkuser', cookie => "lemonldap=$id_msmith",
+    ),
+    'GET checkuser'
+);
+
+my $data = eval { JSON::from_json( $res->[2]->[0] ) };
+ok( not($@), ' Content is JSON' )
+  or explain( [ $@, $res->[2] ], 'JSON content' );
+my @authLevel =
+  map { $_->{key} eq 'authenticationLevel' ? $_ : () } @{ $data->{ATTRIBUTES} };
+ok( $authLevel[0]->{value} == 1, 'Good authenticationLevel found' )
+  or explain( $authLevel[0]->{value}, 'authenticationLevel' );
+my @authMode =
+  map { $_->{key} eq 'authMode' ? $_ : () } @{ $data->{MACROS} };
+ok( $authMode[0]->{value} eq 'DEMO', 'Good authMode found' )
+  or explain( $authMode[0]->{value}, 'authMode' );
+count(5);
+
 $client->logout($id_dwho);
 $client->logout($id_msmith);
 clean_sessions();
 
 done_testing( count() );
+

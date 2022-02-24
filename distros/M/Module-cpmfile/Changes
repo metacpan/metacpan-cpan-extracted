@@ -1,5 +1,8 @@
 Revision history for Module-cpmfile
 
+0.006  2022-02-20 15:08:24 JST
+    - Add JSON Schema for cpmfile (#3)
+
 0.005  2022-01-03 13:07:30 JST
     - Add from_cpanmeta method (#2)
 

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 our $VERSION;
-$VERSION = '1.07';
+$VERSION = '1.08';
 
 use Carp;
 use Net::DNS;
@@ -154,10 +154,11 @@ sub bgread {
 
 	Net::DNS::Resolver::libunbound::ub_wait( $self->{ub_ctx} ) if &bgbusy;
 
-	my $async_id = $handle->async_id;
-	my $err	     = $handle->err;
+	my $qid = $handle->async_id;
+	my $err = $handle->err;
 	$self->errorstring( Net::DNS::Resolver::libunbound::ub_strerror($err) ) if $err;
-	return $self->_decode_result( $handle->result );
+	my $result = $handle->result;
+	return $self->_decode_result($result);
 }
 
 
@@ -207,9 +208,8 @@ as backup servers.
 =cut
 
 sub set_fwd {
-	my $self = shift;
-	my $fwd	 = shift || return;
-	return $self->{ub_ctx}->set_fwd($fwd);
+	my ( $self, $fwd ) = @_;
+	return $self->{ub_ctx}->set_fwd( $fwd || return );
 }
 
 

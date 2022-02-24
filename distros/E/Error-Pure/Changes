@@ -1,3 +1,11 @@
+0.27 2022-02-23T23:55:19+01:00
+ [Common]
+ - Update copyright years.
+
+ [Error::Pure]
+ - Fix situation, when i set Error::Pure::TYPE (or via ENV variables) and
+   this module doesn't exist.
+
 0.26 2020-04-30T01:04:41+02:00
  [Common]
  - Improve LICENSE AND COPYRIGHT section in doc.

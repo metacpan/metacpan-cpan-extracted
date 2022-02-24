@@ -1,5 +1,5 @@
 package HackaMol::Roles::ReadPdbxRole;
-$HackaMol::Roles::ReadPdbxRole::VERSION = '0.051';
+$HackaMol::Roles::ReadPdbxRole::VERSION = '0.053';
 # ABSTRACT: parse PDBx/mmCIF files
 use Moose::Role;
 use HackaMol::PeriodicTable qw(_element_name _trim _qstring_num);
@@ -505,7 +505,7 @@ HackaMol::Roles::ReadPdbxRole - parse PDBx/mmCIF files
 
 =head1 VERSION
 
-version 0.051
+version 0.053
 
 =head1 SYNOPSIS
 
