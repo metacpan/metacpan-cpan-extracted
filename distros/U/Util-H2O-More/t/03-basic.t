@@ -3,7 +3,7 @@ use warnings;
 
 use Test::More q//;
 
-use Util::H2O::More qw/baptise h2o/;
+use Util::H2O::More qw/h2o/;
 
 my $self = {
     somewhere => q{over},

@@ -74,7 +74,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.16';
+our $VERSION = '0.18';
 
 #########################################################################
 
@@ -117,6 +117,8 @@ our %T =
      => "can't remove %s: no such node in %s",
      cyclic_parent_relationship_detected__1_levels_above
      => 'cyclic parent relationship detected %d levels above',
+     element__1_in_call_to__2__3_already_exists
+     => 'element %s in call to %s::%s already exists',
      enter_number_to_choose_next_step
      => 'enter number to choose next step',
      enter_selection
@@ -135,8 +137,14 @@ our %T =
      => "invalid parent '%s' (not a UI::Various::container)",
      invalid_scalar__1_in_call_to__2
      => "invalid scalar '%s' in call to %s",
+     invalid_scalar__1_in_call_to__2__3
+     => "invalid scalar '%s' in call to %s::%s",
      invalid_selection
      => "invalid selection\n",
+     invalid_value__1_for_parameter__2_in_call_to__3__4
+     => "invalid value %s for parameter '%s' in call to %s::%s",
+     leave_box
+     => 'leave box',
      leave_window
      => 'leave window',
      mandatory_parameter__1_is_missing
@@ -149,12 +157,18 @@ our %T =
      => ', <+>/<-> next/previous window',
      no_element_found_for_index__1
      => 'no element found for index %d',
+     no_free_position_for__1_in_call_to__2__3
+     => 'no free position for %s in call to %s::%s',
      odd_number_of_parameters_in_initialisation_list_of__1
      => 'odd number of parameters in initialisation list of %s',
      old_value
      => 'old value',
      options_must_be_specified_as_hash
      => 'options must be specified as {hash}',
+     parameter__1_must_be_a_positive_integer
+     => "parameter '%s' must be a positive integer",
+     parameter__1_must_be_a_positive_integer_in_call_to__2__3
+     => "parameter '%s' must be a positive integer in call to %s::%s",
      specified_implementation_missing
      => 'specified implementation missing',
      stderr_not_0_1_2_or_3
@@ -169,8 +183,8 @@ our %T =
      => "unknown option '%s'",
      unsupported_language__1
      => "unsupported language '%s'",
-     unsupported_ui_element__1
-     => "unsupported UI element '%s'",
+     unsupported_ui_element__1__2
+     => "unsupported UI element '%s': %s",
      unsupported_ui_package__1
      => "unsupported UI package '%s'",
      use_option_must_be_an_array_reference

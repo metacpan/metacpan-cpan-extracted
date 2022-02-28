@@ -1,0 +1,31 @@
+. . 1  . . .  4 . .
+. . .  1 . 6  . 9 .
+6 . .  . 8 .  . . 7
+
+. 5 .  . . 9  . 3 .
+. . 9  . . .  1 . .
+. 4 .  7 . .  . 2 .
+
+5 . .  . 9 .  . . 2
+. 1 .  6 . 7  . . .
+. . 2  . . .  6 . .
+==
+Solution
+9 8 1  2 7 3  4 6 5
+4 3 7  1 5 6  2 9 8
+6 2 5  9 8 4  3 1 7
+
+2 5 8  4 1 9  7 3 6
+7 6 9  5 3 2  1 8 4
+1 4 3  7 6 8  5 2 9
+
+5 7 6  3 9 1  8 4 2
+8 1 4  6 2 7  9 5 3
+3 9 2  8 4 5  6 7 1
+==
+Args
+use Regexp::Sudoku::Constants qw [:Diagonals];
+{diagonals => $DOUBLE}
+==
+Name: Double Diagonal Sudoku (Fun With Sudoku #184)
+URL: https://www.funwithpuzzles.com/2016/03/double-diagonal-sudoku.html

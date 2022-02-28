@@ -19,7 +19,7 @@ no multidimensional;
 
 use Cwd 'abs_path';
 
-use Test::More tests => 25;
+use Test::More tests => 26;
 use Test::Output;
 
 # define fixed environment for unit tests:
@@ -116,6 +116,7 @@ my $standard_output2 = join("\n",
 			    '',
 			    '----- enter number to choose next step: ');
 $_ = $main->window($box, $button);
+is($_->parent(), $main, 'window is child of main');
 is($_->title(), '', 'empty constructor creates empty title');
 is($box->parent(), $_, 'box has been correctly added');
 stdout_is(sub {   $_->_show();   },

@@ -1,5 +1,8 @@
 Revision history for Alien-Role-Dino
 
+0.07      2022-02-27 16:35:13 -0700
+  - Make Alien::cmake3 and Alien::Autotools test prereqs optional (gh#8)
+
 0.06      2017-09-23 06:05:29 -0400
   - Add support for Solaris (gcc and sun studio)
 

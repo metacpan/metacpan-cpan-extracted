@@ -1,4 +1,4 @@
-BEGIN { $ENV{VALIANT_DEBUG} = 2; }
+BEGIN { $ENV{VALIANT_DEBUG} = '4,Valiant::I18N'; }
 
 use Test::Most;
 use Test::Lib;

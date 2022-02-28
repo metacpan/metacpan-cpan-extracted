@@ -254,6 +254,10 @@ An SV:
 
   type: UNDEF
 
+  type: YES
+
+  type: NO
+
 SV extensions:
   PTR   SV
 

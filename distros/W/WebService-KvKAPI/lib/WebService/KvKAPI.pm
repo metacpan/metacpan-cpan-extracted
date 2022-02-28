@@ -1,7 +1,7 @@
 use utf8;
 package WebService::KvKAPI;
 
-our $VERSION = '0.101';
+our $VERSION = '0.103';
 
 # ABSTRACT: Query the Dutch Chamber of Commerence (KvK) API
 #
@@ -87,7 +87,7 @@ WebService::KvKAPI - Query the Dutch Chamber of Commerence (KvK) API
 
 =head1 VERSION
 
-version 0.101
+version 0.103
 
 =head1 SYNOPSIS
 

@@ -20,7 +20,6 @@ might_have profile => (
 
 filters username => (trim => 1);
 
-validates profile => (result=>+{validations=>1} ); # nested validations run only if the relation exists since this is optional relation
 validates username => (presence=>1, length=>[3,24], format=>'alpha_numeric', unique=>1);
 validates first_name => (presence=>1, length=>[2,24]);
 validates last_name => (presence=>1, length=>[2,48]);

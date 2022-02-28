@@ -2,7 +2,7 @@ package Bar;
 
 use strict;
 use warnings;
-use Util::H2O::More qw/baptise baptise_deeply/;
+use Util::H2O::More qw/baptise/;
 
 sub new {
     my $pkg  = shift;

@@ -421,6 +421,6 @@ under the same terms as Perl itself.  See LICENSE file for more details.
 
 =head1 AUTHOR
 
-Thomas Dorner E<lt>dorner@cpan.orgE<gt>
+Thomas Dorner E<lt>dorner (at) cpan (dot) orgE<gt>
 
 =cut

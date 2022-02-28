@@ -1,6 +1,6 @@
 use utf8;
 package WebService::KvKAPI::Roles::OpenAPI;
-our $VERSION = '0.101';
+our $VERSION = '0.103';
 # ABSTRACT: WebService::KvkAPI::Roles::OpenAPI package needs a propper abstract
 
 use v5.26;
@@ -92,7 +92,7 @@ WebService::KvKAPI::Roles::OpenAPI - WebService::KvkAPI::Roles::OpenAPI package 
 
 =head1 VERSION
 
-version 0.101
+version 0.103
 
 =head1 SYNOPSIS
 

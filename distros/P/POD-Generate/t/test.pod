@@ -1,0 +1,120 @@
+=head1 NAME
+
+Test::Memory
+
+=cut
+
+=head1 SYNOPSIS
+
+This is a code snippet.
+
+	use Test::Memory;
+
+	my $memory = Test::Memory->new();
+
+=cut
+
+=head1 DESCRIPTION
+
+A test of ones memory.
+
+=cut
+
+=head1 METHODS
+
+=cut
+
+=head2 Mind
+
+The element of a person that enables them to be aware of the world and their experiences, to think, 
+and to feel; the faculty of consciousness and thought.
+
+	$memory->Mind();
+
+=cut
+
+=head3 Intelligence
+
+A person or being with the ability to acquire and apply knowledge and skills.
+
+	$memory->Mind->Intelligence();
+
+=cut
+
+=head4 Factual
+
+Concerned with what is actually the case.
+
+	$memory->Mind->Intelligence->Factual(%params);
+
+=over
+
+=item one
+
+Oxford, Ticehurst and Potters Bar.
+
+=item two
+
+Koh Chang, Zakynthos and Barbados.
+
+=item three
+
+An event or occurrence which leaves an impression on someone.
+
+=back
+
+=cut
+
+=head1 AUTHOR
+
+LNATION, C<< <email at lnation.org> >>
+
+=cut
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-test-memory at rt.cpan.org>, or through
+the web interface at L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Test-Memory>. I will
+be notified, and then you'll automatically be notified of progress on your bug as I make changes.
+
+=cut
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+	perldoc Test::Memory
+
+You can also look for information at:
+
+=over
+
+=item * RT: CPAN's request tracker (report bugs here)
+
+L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-Memory>
+
+=item * CPAN Ratings
+
+L<https://cpanratings.perl.org/d/Test-Memory>
+
+=item * Search CPAN
+
+L<https://metacpan.org/release/Test-Memory>
+
+=back
+
+=cut
+
+=head1 ACKNOWLEDGEMENTS
+
+=cut
+
+=head1 LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2022 LNATION
+
+This is free software, licensed under:
+
+	The Artistic License 2.0 (GPL Compatible)
+
+=cut

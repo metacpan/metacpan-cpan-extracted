@@ -3,14 +3,14 @@ abstract: 'redis-server runner for tests.'
 author:
   - 'Daisuke Murase <typester@cpan.org>'
 build_requires:
-  Redis: '0'
   Test::More: '0.98'
   Test::TCP: '0'
 configure_requires:
   Module::Build::Tiny: '0.035'
+  Redis: '0'
   perl: 5.008_001
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.13, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.13, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,7 +29,7 @@ no_index:
 provides:
   Test::RedisServer:
     file: lib/Test/RedisServer.pm
-    version: '0.21'
+    version: '0.23'
 requires:
   File::Temp: '0'
   Mouse: '0'
@@ -38,13 +38,17 @@ resources:
   bugtracker: https://github.com/typester/Test-RedisServer/issues
   homepage: https://github.com/typester/Test-RedisServer
   repository: git://github.com/typester/Test-RedisServer.git
-version: '0.21'
+version: '0.23'
 x_authority: cpan:TYPESTER
 x_contributors:
   - 'Daisuke Murase <typester@gmail.com>'
+  - 'David Cantrell <david.cantrell@broadbean.com>'
+  - 'Devendranath Thadi <devendranath.thadi3@gmail.com>'
   - 'Ivan Baidakou <dmol@gmx.com>'
   - 'Jeremy Zawodny <jzawodn@craigslist.org>'
+  - 'Masayuki Matsuki <y.songmu@gmail.com>'
   - 'Robin Smidsrød <robin@smidsrod.no>'
   - 'Sean Smith <ssmith@localhost.localdomain>'
-  - 'Songmu <y.songmu@gmail.com>'
+  - 'gregor herrmann <gregoa@debian.org>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

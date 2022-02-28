@@ -44,7 +44,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.16';
+our $VERSION = '0.18';
 
 use UI::Various::core;
 use UI::Various::widget;
@@ -60,7 +60,7 @@ our @EXPORT_OK = qw();
 
 the text as string or variable reference
 
-Note that the reference will dereferenced during initialisation.  Later
+Note that the reference will be dereferenced during initialisation.  Later
 changes will be ignored, as not all possible UIs would support that change.
 
 =cut
@@ -103,7 +103,7 @@ use constant DEFAULT_ATTRIBUTES => (text => '', var => dummy_varref());
 Besides the accessors (attributes) described above and by
 L<UI::Various::widget|UI::Various::widget/Attributes> and the methods
 inherited from L<UI::Various::widget|UI::Various::widget/METHODS> only the
-constructor is provided by the abstract C<Check> class itself:
+constructor is provided by the C<Check> class itself:
 
 =cut
 
@@ -144,6 +144,6 @@ under the same terms as Perl itself.  See LICENSE file for more details.
 
 =head1 AUTHOR
 
-Thomas Dorner E<lt>dorner@cpan.orgE<gt>
+Thomas Dorner E<lt>dorner (at) cpan (dot) orgE<gt>
 
 =cut

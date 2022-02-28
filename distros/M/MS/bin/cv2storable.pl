@@ -21,6 +21,13 @@ GetOptions(
 my $terms;
 my %used;
 
+# NOTE: if you add to or change these overrides, be sure to update the
+# corresponding documentation in the MS::CV POD
+my $overrides = {
+    'MS_M+H ION' => 'M_PLUS_H_ION',
+    'MS_M-H ION' => 'M_MINUS_H_ION',
+};
+
 parse_obo($_) for (
     ['MS'   => $fn_ms  ],
     ['MI'   => $fn_mi  ],
@@ -97,7 +104,10 @@ sub parse_obo {
             my $const_name = uc($prefix . '_' . $tmp_term->{name} );
 
             if (! $is_regex && defined $const_name) {
-
+               
+                # handle special cases
+                $const_name = $overrides->{$const_name}
+                    if (defined $overrides->{$const_name});
                 $const_name =~ s/\W/_/g;
 
                 my $tmp = $const_name;

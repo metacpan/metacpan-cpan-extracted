@@ -321,4 +321,59 @@ Schema->resultset("Role")->populate([
   }
 }
 
+{
+  # just make sure we can create.
+  ok my $person = Schema
+    ->resultset('Person')
+    ->create({
+      username => 'jjn41',
+      last_name => 'napiorkowski',
+      first_name => 'john',
+      state => { abbreviation => 'TX' },
+      person_roles => [ 
+        { role_id => 1 },
+        { role_id => 2 },
+        #{ role => { label => 'user' }  },
+        #{ role => { label => 'admin' }  },
+      ]
+    });
+
+  $person->update({
+    first_name => 'd',
+    person_roles => [ 
+      { role_id => 1 },
+      { role_id => 3 },
+    ],
+  });
+
+  is_deeply +{$person->errors->to_hash(full_messages=>1)}, +{
+    first_name => [
+      "First Name is too short (minimum is 2 characters)",
+    ],
+  }, 'Got expected errors';
+
+  ok my $pr_rs = $person->person_roles;
+  {
+    my $pr = $pr_rs->next;
+    ok !$pr->is_marked_for_deletion;
+    ok $pr->in_storage;
+  }
+  {
+    my $pr = $pr_rs->next;
+    ok !$pr->is_marked_for_deletion;
+    is $pr->role_id, 3;
+    ok !$pr->in_storage;
+
+  }  
+  {
+    my $pr = $pr_rs->next;
+    ok $pr->is_marked_for_deletion;
+    ok $pr->in_storage;
+  }
+
+  #  use Devel::Dwarn;
+  #  Dwarn +{ $person->errors->to_hash(full_messages=>1) };
+
+}
+
 done_testing;

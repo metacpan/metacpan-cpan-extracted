@@ -162,7 +162,7 @@ like($@,
      'bad indirect import fails');
 
 eval {   UI::Various->import({include => 'X'});   };
-like($@, qr/^unsupported UI element 'UI::Various::X'$re_msg_tail/,
+like($@, qr/^unsupported UI element 'UI::Various::X': .*\n$re_msg_tail/,
      "indirect import of 'X' fails");
 
 $_ = _sub_perl(	<<'CODE');

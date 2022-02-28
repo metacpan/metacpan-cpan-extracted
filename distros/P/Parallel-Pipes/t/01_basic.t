@@ -26,7 +26,7 @@ my $subtest = sub {
         $ready[0]->write($i);
     }
     while (my @written = $pipes->is_written) {
-        push @back, $_->read for @written;
+        push @back, $_->read for $pipes->is_ready(@written);
     }
 
     my @file = glob "$tempdir/file*";

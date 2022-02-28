@@ -87,7 +87,7 @@ sub run_perlmv {
             elsif ($opts->{mode} eq 'l') { $cmd = "perlln" }
         }
         $cmd = "$Bin/../script/$cmd";
-        my @cmd = ($Perl, $cmd);
+        my @cmd = ($Perl, "-I", "$Bin/../lib", $cmd);
         for (keys %$opts) {
             my $v = $opts->{$_};
             if    ($_ eq 'code')          { push @cmd, "-e", $v }

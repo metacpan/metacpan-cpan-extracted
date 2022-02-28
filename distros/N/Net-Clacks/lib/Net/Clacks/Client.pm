@@ -7,7 +7,7 @@ use diagnostics;
 use mro 'c3';
 use English;
 use Carp;
-our $VERSION = 20;
+our $VERSION = 21;
 use autodie qw( close );
 use Array::Contains;
 use utf8;
@@ -118,6 +118,7 @@ sub init {
     $self->{remembrancenames} = [
         'Ivy Bdubs',
         'Terry Pratchett',
+        'Sven Guckes',
     ];
     $self->{remembranceinterval} = 3600; # One hour
     $self->{nextremembrance} = time + $self->{remembranceinterval};
@@ -1133,7 +1134,9 @@ sub sendRawCommand {
     return;
 }
 
-# Meta function that internally calls both SET and STORE
+# setAndStore combines the SET and STORE command into the SETANDSTORE server command. This is mostly done
+# for optimizing interclacks connections
+# Other clients will only get a SET notification, but the server also runs a STORE operation
 sub setAndStore {
     my ($self, $varname, $value, $forcesend) = @_;
 
@@ -1151,8 +1154,22 @@ sub setAndStore {
         $forcesend = 0;
     }
 
-    $self->set($varname, $value, $forcesend);
-    $self->store($varname, $value);
+    $self->{outbuffer} .= "SETANDSTORE $varname=$value\r\n";
+
+    if($self->{memcached_compatibility}) {
+        while(1) {
+            $self->doNetwork();
+            if($self->{needreconnect}) {
+                # Nothing we can do, really...
+                return;
+            }
+            last if(!length($self->{outbuffer}));
+            usleep(1000);
+        }
+
+        $self->autohandle_messages();
+    }
+
     return;
 }
 

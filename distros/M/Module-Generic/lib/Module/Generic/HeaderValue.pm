@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
-## Module Generic - ~/lib/Generic/HeaderValue.pm
-## Version v0.1.1
+## Module Generic - ~/lib/Module/Generic/HeaderValue.pm
+## Version v0.2.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/11/03
-## Modified 2021/12/07
+## Modified 2022/02/27
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -16,7 +16,7 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( Module::Generic );
-    our $VERSION = 'v0.1.1';
+    use vars qw( $QUOTE_REGEXP $TOKEN_REGEXP $TEXT_REGEXP );
     use overload (
         '""'     => 'as_string',
         bool     => sub{ return( $_[0] ) },  
@@ -43,14 +43,17 @@ BEGIN
     # "<any OCTET except CTLs, but including LWS>"
     # <https://datatracker.ietf.org/doc/html/rfc2616#section-2.2>
     our $TEXT_REGEXP  = qr/(?>[[:blank:]\h]|[^[:cntrl:]\"])*+/;
-    
+
     # \x21\x23-\x2B\x2D-\x3A\x3C-\x5B\x5D-\x7E
     # our $COOKIE_DATA_RE  = qr/[^[:cntrl][:blank:]\h\"\,\;\\]+/;
     # our $COOKIE_DATA_RE  = qr/[^[:cntrl:]\"\;\\]+/;
     # our $TYPE_REGEXP  = qr/(?:[!#$%&'*+.^_`|~0-9A-Za-z-]+\/[!#$%&'*+.^_`|~0-9A-Za-z-]+)|$TOKEN_REGEXP/;
     # our $TOKEN_REGEXP = qr/[!#$%&'*+.^_`|~0-9A-Za-z-]+/;
     # our $TEXT_REGEXP  = qr/[\u000b\u0020-\u007e\u0080-\u00ff]+|$COOKIE_DATA_RE/;
+    our $VERSION = 'v0.2.0';
 };
+
+use strict;
 
 sub init
 {
@@ -148,11 +151,11 @@ sub new_from_header
     # $self->message( 3, "Field parts are: ", sub{ $self->SUPER::dump( \@parts ) } );
     my $header_val = shift( @parts );
     my( $n, $v ) = split( /[[:blank:]\h]*\=[[:blank:]\h]*/, $header_val, 2 );
-    if( $self->debug )
-    {
-        my $trace = $self->_get_stack_trace;
-        $self->message( 4, "\$self is '", overload::StrVal( $self ), "' and \$DEBUG value is '$DEBUG' and debug flag is '", $self->debug, "' stack trace: ", $trace->as_string );
-    }
+#     if( $self->debug )
+#     {
+#         my $trace = $self->_get_stack_trace;
+#         $self->message( 4, "\$self is '", overload::StrVal( $self ), "' and \$DEBUG value is '$DEBUG' and debug flag is '", $self->debug, "' stack trace: ", $trace->as_string );
+#     }
     $self->message( 4, "Header value '$n' and its own value is '$v' (", defined( $v ) ? 'defined' : 'undefined', ")." );
     if( $opts->{decode} )
     {
@@ -384,7 +387,7 @@ Module::Generic::HeaderValue - Generic Header Value Parser
 
 =head1 VERSION
 
-    v0.1.1
+    v0.2.0
 
 =head1 DESCRIPTION
 

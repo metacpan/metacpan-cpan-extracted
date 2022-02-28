@@ -952,7 +952,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1569 "image2d.pd"
+#line 1563 "image2d.pd"
 
 
 
@@ -1381,7 +1381,7 @@ sub PDL::applywarp2d {
 
 
 
-#line 2004 "image2d.pd"
+#line 1998 "image2d.pd"
 
 
 =head2 warp2d
@@ -1551,7 +1551,7 @@ sub PDL::warp2d {
 
 
 
-#line 2318 "image2d.pd"
+#line 2312 "image2d.pd"
 
 
 

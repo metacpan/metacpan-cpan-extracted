@@ -1,7 +1,56 @@
 Revision history for Crypt-OpenSSL-VerifyX509
 
+0.21 -- Sun Feb 27 08:52:20 AST 2022
+
+  [Major updates since 0.16]
+
+  - Move build process to Dist::Zilla
+  - Improve GitHub automated tests
+  - Move to File::Slurper for tests
+  - Fix Expired certificate in test
+
+  Thanks to the work of Shoichi Kaji (skaji) on the Crypt::OpenSSL::X509 PR
+  that was the base of the Dist::Zilla and to Jonas Brømsø (jonasbn) for help
+  with improving the tests.
+
+  [Updates since 0.20-TRIAL]
+
+  - f6b077b Increment version for release
+  - aecaee2 Add solaris flags
+  - 17ead69 (tag: 0.20) v0.20
+
+0.20 -- Mon Feb 21 18:01:16 AST 2022
+
+  - b14022b Increment version for release
+  - 6c402c3 Cert had expired and was not considered an error
+  - 91c066a (tag: 0.19) v0.19
+
+0.19 -- Mon Feb 21 12:01:21 AST 2022
+
+  - 62837bf Update version for release
+  - b7fd8dd Don't try to tag release twice
+  - a07a241 v0.18
+  - fe205a0 (tag: 0.18) Ignore Release notes files
+
+0.18 -- Mon Feb 21 11:51:29 AST 2022
+
+  - d0d2cc2 Update version for release
+  - 434b4fe Only make warnings errors when AUTHOR_TESTING
+  - 0ca2bd8 v0.17
+
+0.17 -- Sun Feb 20 20:17:22 AST 2022
+
+  - 7775d7b Merge pull request #3 from timlegge/dist-zilla
+  - b822ba5 Update version for release
+  - 99460c2 Improve github workflow for macOS tests
+  - be52043 Move to Dist::Zilla
+  - 0627532 Add test that shows the libSSL version
+  - d3fabab Can't control the libssl error only the VerifyX509 part
+  - ea5b292 Move from File::Slurp to File::Slurper
+
 0.16 2021-06-03
-  - TBD     Update version and changes
+
+  - 643c7b6 Update version and changes
   - 8ae1bcd Croak message text changed
 
 0.15 2021-04-26

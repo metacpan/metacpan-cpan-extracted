@@ -2,7 +2,7 @@ package Foo;
 
 use strict;
 use warnings;
-use Util::H2O::More qw/baptise baptise_deeply/;
+use Util::H2O::More qw/baptise/;
 
 sub new {
     my $pkg  = shift;
@@ -14,7 +14,7 @@ sub new {
 sub new_deeply {
     my $pkg  = shift;
     my %opts = @_;
-    my $self = baptise_deeply \%opts, $pkg, qw/bar/;
+    my $self = baptise -recurse, \%opts, $pkg, qw/bar/;
     return $self;
 }
 

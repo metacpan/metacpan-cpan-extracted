@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/SharedMem.pm
-## Version v0.1.4
+## Version v0.2.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/01/18
-## Modified 2021/12/14
+## Modified 2022/02/27
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -17,6 +17,7 @@ BEGIN
     use warnings;
     use warnings::register;
     use parent qw( Module::Generic );
+    use vars qw( $SUPPORTED_RE $SYSV_SUPPORTED $SEMOP_ARGS $SHEM_REPO $ID2OBJ $N );
     use Config;
     use File::Spec ();
     use Nice::Try;
@@ -36,8 +37,8 @@ BEGIN
     use constant LOCK_UN        =>  8;
     # if( $^O =~ /^(?:Android|cygwin|dos|MSWin32|os2|VMS|riscos)/ )
     # Even better
-    our $SUPPORTED_RE = qr/\bIPC\/SysV\b/m;
-    if( $Config{extensions} =~ m/$SUPPORTED_RE/ && 
+    $SUPPORTED_RE = qr/IPC\/SysV/;
+    if( $Config{extensions} =~ /$SUPPORTED_RE/ && 
         $^O !~ /^(?:Android|dos|MSWin32|os2|VMS|riscos)/i )
     {
         require IPC::SysV;
@@ -45,7 +46,7 @@ BEGIN
                                SEM_UNDO S_IRWXU S_IRWXG S_IRWXO S_IRUSR S_IWUSR
                                GETNCNT GETZCNT GETVAL SETVAL GETPID GETALL SETALL
                                shmat shmdt memread memwrite ftok ) );
-        our $SYSV_SUPPORTED = 1;
+        $SYSV_SUPPORTED = 1;
         no strict 'subs';
         eval( <<'EOT' );
         our $SEMOP_ARGS = 
@@ -89,22 +90,26 @@ EOT
     }
     else
     {
-        our $SYSV_SUPPORTED = 0;
+        $SYSV_SUPPORTED = 0;
     }
+    # Credits IPC::SysV
+    $N = do { my $foo = eval { pack "L!", 0 }; $@ ? '' : '!' };
+    # Array to maintain the order in which shared memory object were created, so they can
+    # be removed in that order
+    $SHEM_REPO = [];
+    $ID2OBJ    = {};
+    
     our @EXPORT_OK = qw(LOCK_EX LOCK_SH LOCK_NB LOCK_UN);
     our %EXPORT_TAGS = (
             all     => [qw( LOCK_EX LOCK_SH LOCK_NB LOCK_UN )],
             lock    => [qw( LOCK_EX LOCK_SH LOCK_NB LOCK_UN )],
             'flock' => [qw( LOCK_EX LOCK_SH LOCK_NB LOCK_UN )],
     );
-    # Credits IPC::SysV
-    our $N = do { my $foo = eval { pack "L!", 0 }; $@ ? '' : '!' };
-    # Array to maintain the order in which shared memory object were created, so they can
-    # be removed in that order
-    our $SHEM_REPO = [];
-    our $ID2OBJ    = {};
-    our $VERSION = 'v0.1.4';
+    our $VERSION = 'v0.2.0';
 };
+
+use strict;
+no warnings 'redefine';
 
 sub init
 {
@@ -116,7 +121,8 @@ sub init
     # If true, this will destroy only the semaphore upon end
     $self->{destroy_semaphore} = 0;
     $self->{exclusive}  = 0;
-    $self->{key}        = IPC::SysV::IPC_PRIVATE;
+    no strict 'subs';
+    $self->{key}        = IPC::SysV::IPC_PRIVATE if( $SYSV_SUPPORTED );
     $self->{mode}       = 0666;
     $self->{serial}     = '';
     # SHM_BUFSIZ
@@ -212,6 +218,7 @@ sub exists
     }
     my $flags = $self->flags({ mode => 0644 });
     # Remove the create bit
+    no strict 'subs';
     $flags = ( $flags ^ IPC::SysV::IPC_CREAT );
     # $self->message( 3, "Checking if shared memory key \"", ( $opts->{key} || $self->key ), "\" exists with flags '$flags'." );
     my $semid;
@@ -245,18 +252,19 @@ sub flags
     my $self   = shift( @_ );
     my $opts   = $self->_get_args_as_hash( @_ );
     no warnings 'uninitialized';
+    no strict 'subs';
     # $self->message( 3, "Option mode value is '$opts->{mode}'." );
     $opts->{create} = $self->create unless( length( $opts->{create} ) );
     $opts->{exclusive} = $self->exclusive unless( length( $opts->{exclusive} ) );
     $opts->{mode} = $self->mode unless( length( $opts->{mode} ) );
     my $flags  = 0;
-    # $self->message( 3, "Adding create bit" ) if( $opts->{create} );
+    $self->message( 3, "Adding create bit '", IPC::SysV::IPC_CREAT, "'" ) if( $opts->{create} );
     $flags    |= IPC::SysV::IPC_CREAT if( $opts->{create} );
-    # $self->message( 3, "Adding exclusive bit" ) if( $opts->{exclusive} );
+    $self->message( 3, "Adding exclusive bit" ) if( $opts->{exclusive} );
     $flags    |= IPC::SysV::IPC_EXCL  if( $opts->{exclusive} );
-    # $self->message( 3, "Adding mode '", ( $opts->{mode} || 0666 ), "'" );
+    $self->message( 3, "Adding mode '", ( $opts->{mode} || 0666 ), "'" );
     $flags    |= ( $opts->{mode} || 0666 );
-    # $self->message( 3, "Returning flags value '$flags'." );
+    $self->message( 3, "Returning flags value '$flags'." );
     return( $flags );
 }
 
@@ -341,7 +349,8 @@ sub op
     return( $self->error( "No semaphore set yet. You must open the shared memory first to set the semaphore." ) ) if( !length( $id ) );
     my $data = pack( "s$N*", @_ );
     my $rv;
-    $rv = semop( $semid, $data ) || do
+    no strict 'subs';
+    $rv = semop( $id, $data ) || do
     {
         my $serial = $self->serial;
         my $semid = semget( $serial, 3, IPC_CREAT | 0666 );
@@ -366,6 +375,7 @@ sub open
     $opts->{size} = int( $opts->{size} );
     $opts->{mode} //= '';
     $opts->{key} //= '';
+    no strict 'subs';
     my $serial;
     if( length( $opts->{key} ) )
     {
@@ -396,7 +406,7 @@ sub open
         $create = $self->create;
     }
     my $flags = $self->flags( create => $create );
-    $self->message( 3, "Trying to get the shared memory segment with key '", ( $opts->{key} || $self->key ), "' with serial '$serial', size '$opts->{size}' and mode '$opts->{mode}'." );
+    $self->message( 3, "Trying to get the shared memory segment with key '", ( $opts->{key} || $self->key ), "' with serial '$serial', size '$opts->{size}' and mode '$opts->{mode}' and flags '$flags'." );
     my $id = shmget( $serial, $opts->{size}, $flags );
     if( defined( $id ) )
     {
@@ -411,7 +421,7 @@ sub open
         while( $serial <= $limit )
         {
             $id = shmget( $serial, $opts->{size}, $newflags | IPC::SysV::IPC_CREAT );
-            $self->message( 4, "Shared memory key '$serial' worked ? ", defined( $serial ) ? 'yes' : 'no' );
+            $self->message( 4, "Shared memory key '$serial' worked ? ", defined( $id ) ? 'yes' : 'no' );
             $serial++;
             last if( defined( $id ) );
         }
@@ -484,7 +494,8 @@ sub pid
     my $self = shift( @_ );
     my $sem  = shift( @_ );
     my $semid = $self->semid ||
-        return( $self->error( "No semaphore set yet. You must open the shared memory first to remove semaphore." ) ) if( !length( $id ) );
+        return( $self->error( "No semaphore set yet. You must open the shared memory first to remove semaphore." ) );
+    no strict 'subs';
     my $v = semctl( $semid, $sem, IPC::SysV::GETPID, 0 );
     return( $v ? 0 + $v : undef() );
 }
@@ -493,8 +504,8 @@ sub rand
 {
     my $self = shift( @_ );
     my $size = $self->size || 1024;
-    my $key  = shmget( IPC::SysV::IPC_PRIVATE, $size, IPC::SysV::S_IRWXU | IPC::SysV::S_IRWXG | IPC::SysV::S_IRWXO ) ||
-        return( $self->error( "Unable to generate a share memory key: $!" ) );
+    no strict 'subs';
+    my $key  = shmget( IPC::SysV::IPC_PRIVATE, $size, IPC::SysV::S_IRWXU | IPC::SysV::S_IRWXG | IPC::SysV::S_IRWXO ) || return( $self->error( "Unable to generate a share memory key: $!" ) );
     return( $key );
 }
 
@@ -577,6 +588,7 @@ sub remove
     return( $self->error( "No semaphore set yet. You must open the shared memory first to remove semaphore." ) ) if( !length( $semid ) );
     $self->message( 3, "Removing shared memory segment with id '$id' and semaphore id '$semid'." );
     $self->unlock();
+    no strict 'subs';
     # Remove share memory segment
     if( !defined( shmctl( $id, IPC::SysV::IPC_RMID, 0 ) ) )
     {
@@ -616,9 +628,10 @@ sub remove_semaphore
     return(1) if( $self->removed_semaphore );
     my $semid = $self->semid;
     return( $self->error( "No semaphore set yet. You must open the shared memory first to remove semaphore." ) ) if( !length( $semid ) );
-    $self->message( 3, "Removing semaphore with id '$semid' for shared memory segment with id '$id'." );
+    $self->message( 3, "Removing semaphore with id '$semid' for shared memory segment with id '", $self->id, "'." );
     $self->unlock();
     my $rv;
+    no strict 'subs';
     if( !defined( $rv = semctl( $semid, 0, IPC::SysV::IPC_RMID, 0 ) ) )
     {
         $self->message( 3, "Failed to remove semaphore with id '$semid': $!" );
@@ -660,6 +673,7 @@ sub shmstat
     my $self = shift( @_ );
     my $data = '';
     my $id = $self->id || return( $self->error( "No shared memory id set!" ) );
+    no strict 'subs';
     shmctl( $id, IPC::SysV::IPC_STAT, $data ) or
         return( $self->error( "Unable to stat shared memory with id '$id': $!" ) );
     return( Module::Generic::SharedStat->new->unpack( $data ) );
@@ -672,6 +686,7 @@ sub stat
     my $self = shift( @_ );
     my $id   = $self->semid;
     return( $self->error( "No semaphore set yet. You must open the shared memory first to set the semaphore." ) ) if( !length( $id ) );
+    no strict 'subs';
     if( @_ )
     {
         if( @_ == 1 )
@@ -794,6 +809,7 @@ sub _str2key
 {
     my $self = shift( @_ );
     my $key  = shift( @_ );
+    no strict 'subs';
     if( !defined( $key ) || $key eq '' )
     {
         return( IPC::SysV::IPC_PRIVATE );

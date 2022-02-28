@@ -41,13 +41,6 @@ In addition the top-level container elements may also contain a reference to
 a hash containing the reverse index of that array.  This allows any
 container to access the indices of their own children.
 
-=item _has_active [rw, optional]
-
-TODO: not needed, check before, for box this depends on column anyway
-
-Flag if a container has any active UI element as direct children.  This will
-be used to determine if a container's child will get a prefix or not.
-
 =back
 
 =cut
@@ -60,7 +53,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.16';
+our $VERSION = '0.18';
 
 use UI::Various::core;
 use UI::Various::RichTerm::base;
@@ -103,18 +96,14 @@ array with active children
 sub _all_active($)
 {
     my ($self) = @_;
-    $self->{_has_active} = 0;
     my @active = ();
     local $_;
     while ($_ = $self->child)
     {
-	# uncoverable branch false count:2 # TODO until Box
 	if ($_->can('_process'))
-	{   push @active, $_;   $self->{_has_active} = 1;   }
-	elsif (not $_->can('_all_active'))
-	{}			# TODO: invert (again) with Box
-	else
-	{   push @active, $_->_all_active();   } # uncoverable statement # TODO until Box
+	{   push @active, $_;   }
+	elsif ($_->can('_all_active'))
+	{   push @active, $_->_all_active();   }
     }
     return @active;
 }
@@ -143,9 +132,8 @@ sub _self_destruct($)
     {   delete $self->{_active};   delete $self->{_active_index};   }
     while ($_ = $self->child)
     {
-	# uncoverable branch true # TODO until Box
 	if ($_->can('_self_destruct'))
-	{   $_->_self_destruct;   }	# uncoverable statement # TODO until Box
+	{   $_->_self_destruct;   }
 	else
 	{   $self->remove($_);   }
 
@@ -172,6 +160,6 @@ under the same terms as Perl itself.  See LICENSE file for more details.
 
 =head1 AUTHOR
 
-Thomas Dorner E<lt>dorner@cpan.orgE<gt>
+Thomas Dorner E<lt>dorner (at) cpan (dot) orgE<gt>
 
 =cut

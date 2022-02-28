@@ -64,8 +64,9 @@ the default selection sequence):
 
 - (finally) `PoorTerm`
 
-    a very simple builtin query/response console interface only using the Perl
-    core module [Term::Readline](https://metacpan.org/pod/Term%3A%3AReadline)
+    a very simple builtin query/response console interface where nested
+    container elements must be selected to interact with something inside; they
+    are also simply displayed in sequence without other arrangement
 
 If the environment variable `UI` is set, contains one of the values above
 and meets all requirements for the corresponding UI, it's taking precedence
@@ -92,6 +93,13 @@ Setting an attribute of any object to `undef` will not work with Perl
 versions prior to 5.20 (see [perl5200delta](https://metacpan.org/pod/perl5200delta), bugs #7508 and #109726).  The
 only possible (and dirty!) workaround is setting the member of the internal
 hash directly.
+
+Boxes can not have visible borders in [Curses::UI](https://metacpan.org/pod/Curses%3A%3AUI) as they are currently
+"faked" and do not use a proper [Curses::UI](https://metacpan.org/pod/Curses%3A%3AUI) element.
+
+Methods, member variables, etc. starting with an underscore (`_`) are
+considered to be internal only.  Their usage and interfaces may change
+between versions in an incompatible way!
 
 # METHODS
 
@@ -282,4 +290,4 @@ under the same terms as Perl itself.  See LICENSE file for more details.
 
 # AUTHOR
 
-Thomas Dorner <dorner@cpan.org>
+Thomas Dorner &lt;dorner (at) cpan (dot) org>

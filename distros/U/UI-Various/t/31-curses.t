@@ -23,7 +23,7 @@ use Test::Output;
 BEGIN {
     eval { require Curses::UI; };
     $@  and  plan skip_all => 'Curses::UI not found';
-    plan tests => 29;
+    plan tests => 32;
 
     # define fixed environment for unit tests:
     delete $ENV{DISPLAY};
@@ -77,7 +77,7 @@ stdout_like
     # that -g is POSIX, --save is not!)
     my $tty_configuration;
     $^O eq 'linux'  and  $tty_configuration = `stty -g`;
-    $main = UI::Various::Main->new(width => 20, height => 5);
+    $main = UI::Various::Main->new(width => 20, height => 15);
     $tty_configuration  and  system('stty ' . $tty_configuration);
 }
     qr/^.*\e\[(\?\d{3,4}h|1;24r).*$/s,
@@ -209,7 +209,6 @@ $button1 =
 						     $text2, $button2); });
 $w1 = $main->window({title => 'hi', width => 10}, $text1, $button1);
 
-
 # Note that title and first text have a different sequence when running this
 # test as stand-alone (correct sequence) and within the test harness of
 # "./Build test" (wrong sequence).  So we don't care about the sequence as
@@ -222,6 +221,48 @@ combined_like
 {   $main->mainloop;   }
     qr/^$re_o1$re_o2$re_o1$re_o2$re_o1$re_o2.*$/s,
     'mainloop 2 produces correct output';
+is(@{$main->{children}}, 0, 'main no longer has children');
+
+####################################
+# test standard behaviour with 1 + 3 boxes:
+my @t = (UI::Various::Text->new(text =>  '1'),
+	 UI::Various::Text->new(text =>  "2\n2"),
+	 undef,
+	 UI::Various::Text->new(text =>  '3'),
+
+	 UI::Various::Text->new(text =>  '4'),
+	 undef,
+	 UI::Various::Text->new(text =>  '5'),
+	 UI::Various::Text->new(text =>  '6'),
+
+	 undef,
+	 UI::Various::Text->new(text =>  '7'),
+	 UI::Various::Text->new(text =>  "8\n8"),
+	 undef);
+$button1 = UI::Various::Button->new(text => 'Quit',
+				    code => sub {   $w->destroy;   });
+my $box1 = UI::Various::Box->new(rows => 2, columns => 2);
+$box1->add($t[0], $t[1], 1, 1, $t[3]);
+my $box2 = UI::Various::Box->new(rows => 2, columns => 2);
+$box2->add($t[4], 1, $t[6], $t[7]);
+my $box3 = UI::Various::Box->new(rows => 2, columns => 2,
+				 width => 3, height => 4);
+$box3->add(0, 1, $t[9], $t[10]);
+my $box = UI::Various::Box->new(rows => 2, columns => 2);
+$box->add($box1, $box2, $box3, $button1);
+is(ref($box), 'UI::Various::Curses::Box',
+   'type UI::Various::Curses::Box is correct');
+
+$w = $main->window($box);
+
+# same differences as above, difficult to test of the diverse platforms:
+my $re_output = '(?:(?:\b[1-8]|[1-8]\b).*){10}';
+
+@chars_to_read = (' ');
+combined_like
+{   $main->mainloop;   }
+    qr/^.*$re_output/s,
+    'mainloop 3 produces correct output';
 is(@{$main->{children}}, 0, 'main no longer has children');
 
 ####################################

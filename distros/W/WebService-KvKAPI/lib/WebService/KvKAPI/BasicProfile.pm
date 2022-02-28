@@ -1,6 +1,6 @@
 use utf8;
 package WebService::KvKAPI::BasicProfile;
-our $VERSION = '0.101';
+our $VERSION = '0.103';
 # ABSTRACT: Instance of OpenAPI client for Basisprofiel API of the KvK.
 
 use v5.26;
@@ -53,7 +53,7 @@ WebService::KvKAPI::BasicProfile - Instance of OpenAPI client for Basisprofiel A
 
 =head1 VERSION
 
-version 0.101
+version 0.103
 
 =head1 AUTHOR
 

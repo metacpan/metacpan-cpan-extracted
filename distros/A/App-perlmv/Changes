@@ -1,3 +1,15 @@
+0.605   2022-02-25  Released-By: PERLANCAR; Urgency: high
+
+        - Merge releases 0.604 and 0.604.2.
+
+
+0.604.2 2022-02-25  Released-By: PERLANCAR; Urgency: medium
+
+        - [test] Allow the scripts to find App::perlmv in lib/ (RT#133289).
+
+        - UPDATE: rename from 0.604 to 0.604.2.
+
+
 0.604   2020-08-18  Released-By: PERLANCAR; Urgency: medium
 
 	- Make $PERLMV available to scriptlet.

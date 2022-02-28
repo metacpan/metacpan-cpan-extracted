@@ -42,7 +42,3 @@ RangeError	O_OBJECT
 RangeError *	O_OBJECT
 WildcardError	O_OBJECT
 WildcardError *	O_OBJECT
-DatabaseNotFoundError	O_OBJECT
-DatabaseNotFoundError *	O_OBJECT
-DatabaseClosedError	O_OBJECT
-DatabaseClosedError *	O_OBJECT

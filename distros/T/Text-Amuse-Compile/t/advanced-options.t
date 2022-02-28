@@ -6,7 +6,7 @@ use warnings;
 use Text::Amuse::Compile;
 use Path::Tiny;
 use Data::Dumper;
-use Test::More tests => 141;
+use Test::More tests => 199;
 
 my $muse = <<"MUSE";
 #title My title
@@ -141,6 +141,18 @@ foreach my $options ({
                       linespacing => 'asdfasdf',
                      },
                      {
+                      parindent => undef,
+                     },
+                     {
+                      parindent => 'asdfasdf',
+                     },
+                     {
+                      parindent => 0,
+                     },
+                     {
+                      parindent => 40,
+                     },
+                     {
                       geometry_top_margin => '2cm',
                       geometry_outer_margin => '2cm',
                       areaset_height => '8cm',
@@ -222,5 +234,16 @@ foreach my $options ({
     }
     else {
         unlike $tex, qr{baselinestretch}, "No line stretching changes";
+    }
+    if (exists $options->{parindent}) {
+        if (defined $options->{parindent} and $options->{parindent} =~ m/^\d+$/) {
+            like $tex, qr/\\setlength\{\\parindent\}\{\Q$options->{parindent}\Ept}/;
+        }
+        else {
+            like $tex, qr{\\setlength\{\\parindent\}\{15pt\}};
+        }
+    }
+    else {
+        like $tex, qr{\\setlength\{\\parindent\}\{15pt\}};
     }
 }

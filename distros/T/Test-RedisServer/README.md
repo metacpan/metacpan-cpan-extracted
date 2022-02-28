@@ -68,7 +68,7 @@ Start redis-server instance manually.
 
 ## exec
 
-Just exec to redis-server instance. This method is useful to use this module with [Test::TCP](https://metacpan.org/pod/Test::TCP), [Proclet](https://metacpan.org/pod/Proclet) or etc.
+Just exec to redis-server instance. This method is useful to use this module with [Test::TCP](https://metacpan.org/pod/Test%3A%3ATCP), [Proclet](https://metacpan.org/pod/Proclet) or etc.
 
     use File::Temp;
     use Test::TCP;
@@ -115,13 +115,13 @@ Block until redis instance exited.
 
 # SEE ALSO
 
-[Test::mysqld](https://metacpan.org/pod/Test::mysqld) for mysqld.
+[Test::mysqld](https://metacpan.org/pod/Test%3A%3Amysqld) for mysqld.
 
-[Test::Memcached](https://metacpan.org/pod/Test::Memcached) for Memcached.
+[Test::Memcached](https://metacpan.org/pod/Test%3A%3AMemcached) for Memcached.
 
 This module steals lots of stuff from above modules.
 
-[Test::Mock::Redis](https://metacpan.org/pod/Test::Mock::Redis), another approach for testing redis application.
+[Test::Mock::Redis](https://metacpan.org/pod/Test%3A%3AMock%3A%3ARedis), another approach for testing redis application.
 
 # INTERNAL METHODS
 

@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/DateTime.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2021/03/20
+## Modified 2022/02/27
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -16,6 +16,12 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( Module::Generic );
+    use vars qw( $ERROR $TS_RE );
+    use DateTime;
+    use DateTime::Format::Strptime;
+    use Nice::Try dont_want => 1;
+    use Regexp::Common;
+    use Scalar::Util ();
     use overload (
         q{""}   => sub { $_[0]->{dt}->stringify },
         bool    => sub () { 1 },
@@ -29,14 +35,7 @@ BEGIN
         q{+}    => sub { &op_minus_plus( @_, '+' ) },
         fallback => 1,
     );
-    use DateTime;
-    use DateTime::Format::Strptime;
-    use Nice::Try dont_want => 1;
-    use Regexp::Common;
-    use Scalar::Util ();
-    our( $ERROR );
-    our $VERSION = 'v0.1.0';
-    our $TS_RE = qr/
+    $TS_RE = qr/
     (?<year>\d{4})
     -
     (?<month>\d{1,2})
@@ -57,7 +56,11 @@ BEGIN
         )?
     )?
     /x;
+    our $VERSION = 'v0.2.0';
 };
+
+use strict;
+no warnings 'redefine';
 
 sub new
 {
@@ -449,7 +452,7 @@ sub __set_get_unit : lvalue
     my $dur  = $self->{interval};
     my $coderef = $dur->can( $unit );
     
-    local $update_value = sub
+    my $update_value = sub
     {
         my $v = shift( @_ );
 
@@ -557,7 +560,7 @@ sub _get_other
         {
             $other = $other->{dt};
         }
-        elsif( $d2->isa( 'Module::Generic::DateTime::Interval' ) )
+        elsif( $other->isa( 'Module::Generic::DateTime::Interval' ) )
         {
             $other = $other->{interval};
         }
@@ -671,7 +674,7 @@ Module::Generic::DateTime - A DateTime wrapper for enhanced features
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 

@@ -943,6 +943,7 @@ sub latex {
 
 % given that we said footinclude=false, this should be safe
 \setlength{\footskip}{2\baselineskip}
+\setlength{\parindent}{[% safe_options.parindent %]pt}
 
 \title{[% doc.header_as_latex.title %]}
 \date{[% doc.header_as_latex.date %]}

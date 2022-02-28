@@ -7,7 +7,7 @@ use Test::More 0.88;
 use Test::EOL;
 
 my @files = (
-    'bin/query_kvk.pl',
+    'bin/query-kvk.pl',
     'lib/WebService/KvKAPI.pm',
     'lib/WebService/KvKAPI/BasicProfile.pm',
     'lib/WebService/KvKAPI/Formatters.pm',

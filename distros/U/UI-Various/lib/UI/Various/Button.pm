@@ -38,7 +38,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.16';
+our $VERSION = '0.18';
 
 use UI::Various::core;
 use UI::Various::widget;
@@ -99,7 +99,7 @@ use constant DEFAULT_ATTRIBUTES => (text => '', code => sub{} );
 Besides the accessors (attributes) described above and by
 L<UI::Various::widget|UI::Various::widget/Attributes> and the methods
 inherited from L<UI::Various::widget|UI::Various::widget/METHODS> only the
-constructore is provided by the abstract C<Button> class itself:
+constructor is provided by the C<Button> class itself:
 
 =cut
 
@@ -140,6 +140,6 @@ under the same terms as Perl itself.  See LICENSE file for more details.
 
 =head1 AUTHOR
 
-Thomas Dorner E<lt>dorner@cpan.orgE<gt>
+Thomas Dorner E<lt>dorner (at) cpan (dot) orgE<gt>
 
 =cut

@@ -1,10 +1,5 @@
 package Bencher::Formatter::CodeStartup;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-08-13'; # DATE
-our $DIST = 'Bencher-Backend'; # DIST
-our $VERSION = '1.060'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
@@ -17,6 +12,11 @@ with 'Bencher::Role::ResultMunger';
 
 use Bencher::Backend;
 use List::Util qw(first);
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-02-08'; # DATE
+our $DIST = 'Bencher-Backend'; # DIST
+our $VERSION = '1.061'; # VERSION
 
 sub munge_result {
     my ($self, $envres) = @_;
@@ -64,7 +64,7 @@ Bencher::Formatter::CodeStartup - Munge code_startup results
 
 =head1 VERSION
 
-This document describes version 1.060 of Bencher::Formatter::CodeStartup (from Perl distribution Bencher-Backend), released on 2021-08-13.
+This document describes version 1.061 of Bencher::Formatter::CodeStartup (from Perl distribution Bencher-Backend), released on 2022-02-08.
 
 =head1 DESCRIPTION
 
@@ -87,14 +87,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Bencher-Ba
 =head1 SOURCE
 
 Source repository is at L<https://github.com/perlancar/perl-Bencher-Backend>.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Bencher-Backend>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
 
 =head1 AUTHOR
 
@@ -119,9 +111,17 @@ beyond that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Bencher-Backend>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

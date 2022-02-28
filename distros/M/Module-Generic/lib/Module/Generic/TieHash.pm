@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/TieHash.pm
-## Version v1.0.0
+## Version v1.1.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2021/03/20
+## Modified 2022/02/27
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -18,8 +18,11 @@ BEGIN
     use warnings;
     use parent qw( Module::Generic );
     use Scalar::Util ();
-    our( $VERSION ) = 'v1.0.0';
+    our $VERSION = 'v1.1.0';
 };
+
+use strict;
+no warnings 'redefine';
 
 sub TIEHASH
 {
@@ -194,7 +197,7 @@ Module::Generic - Generic Tie Hash Mechanism for Object Oriented Hashes
 
 =head1 VERSION
 
-    v1.0.0
+    v1.1.0
 
 =head1 AUTHOR
 
@@ -208,4 +211,3 @@ You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.
 
 =cut
-

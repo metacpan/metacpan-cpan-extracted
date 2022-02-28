@@ -9,12 +9,6 @@ static const char  *_marpaESLIF_bootstrap_descInternals = "INTERNAL";
 static const size_t _marpaESLIF_bootstrap_descInternall = 8; /* strlen("INTERNAL") */
 static const char  *_marpaESLIF_bootstrap_lua_return_function_lparens = "return function(";
 
-/* For ord2utf */
-static const int utf8_table1[] = { 0x7f, 0x7ff, 0xffff, 0x1fffff, 0x3ffffff, 0x7fffffff};
-static const int utf8_table1_size = sizeof(utf8_table1) / sizeof(int);
-static const int utf8_table2[] = { 0,    0xc0, 0xe0, 0xf0, 0xf8, 0xfc};
-static const int utf8_table3[] = { 0xff, 0x1f, 0x0f, 0x07, 0x03, 0x01};
-
 /* For ::lua-> action prefix */
 static const char *LUA_ACTION_PREFIX = "::lua->";
 
@@ -2285,7 +2279,7 @@ static inline marpaESLIF_bootstrap_utf_string_t *_marpaESLIF_bootstrap_unquote_s
 static marpaESLIFValueRuleCallback_t _marpaESLIF_bootstrap_ruleActionResolver(void *userDatavp, marpaESLIFValue_t *marpaESLIFValuep, char *actions)
 /*****************************************************************************/
 {
-  marpaESLIFGrammar_t           *marpaESLIFGrammarp = marpaESLIFRecognizer_grammarp(marpaESLIFValue_recognizerp(marpaESLIFValuep));
+  marpaESLIFGrammar_t           *marpaESLIFGrammarp = marpaESLIFValuep->marpaESLIFRecognizerp->marpaESLIFGrammarp; /* marpaESLIFRecognizer_grammarp(marpaESLIFValue_recognizerp(marpaESLIFValuep)); */
   marpaESLIF_t                  *marpaESLIFp        = marpaESLIFGrammarp->marpaESLIFp; /* marpaESLIFGrammar_eslifp(marpaESLIFGrammarp); */
   marpaESLIFValueRuleCallback_t  marpaESLIFValueRuleCallbackp;
   int                            leveli;
@@ -5160,6 +5154,7 @@ static short _marpaESLIF_bootstrap_G1_action_terminal_3b(void *userDatavp, marpa
   size_t                            sizel;
   marpaESLIF_matcher_value_t        rci;
   short                             rcb;
+  size_t                            matchedLengthl;
 
   /* Cannot be nullable */
   if (MARPAESLIF_UNLIKELY(nullableb)) {
@@ -5210,7 +5205,7 @@ static short _marpaESLIF_bootstrap_G1_action_terminal_3b(void *userDatavp, marpa
                                                                     1, /* eofb */
                                                                     &rci,
                                                                     &marpaESLIFValueResult,
-                                                                    NULL /* matchedLengthlp */))) {
+                                                                    &matchedLengthl))) {
     goto err;
   }
   if (rci == MARPAESLIF_MATCH_OK) {
@@ -7831,6 +7826,7 @@ static inline marpaESLIF_bootstrap_utf_string_t *_marpaESLIF_bootstrap_regex_to_
   marpaESLIFValueResult_t            marpaESLIFValueResult;
   size_t                             sizel;
   marpaESLIF_matcher_value_t         rci;
+  size_t                             matchedLengthl;
 
   /* It is a non-sense to have a null lexeme */
   if (MARPAESLIF_UNLIKELY((bytep == NULL) || (bytel <= 0))) {
@@ -7868,7 +7864,7 @@ static inline marpaESLIF_bootstrap_utf_string_t *_marpaESLIF_bootstrap_regex_to_
                                                                     1, /* eofb */
                                                                     &rci,
                                                                     &marpaESLIFValueResult,
-                                                                    NULL /* matchedLengthlp */))) {
+                                                                    &matchedLengthl))) {
     goto err;
   }
   if (rci == MARPAESLIF_MATCH_OK) {
@@ -7964,6 +7960,7 @@ static inline marpaESLIF_bootstrap_utf_string_t *_marpaESLIF_bootstrap_character
   size_t                             sizel;
   marpaESLIF_matcher_value_t         rci;
   char                              *tmps;
+  size_t                             matchedLengthl;
 
   /* It is a non-sense to have a null lexeme */
   if (MARPAESLIF_UNLIKELY((bytep == NULL) || (bytel <= 0))) {
@@ -8012,7 +8009,7 @@ static inline marpaESLIF_bootstrap_utf_string_t *_marpaESLIF_bootstrap_character
                                                                     1, /* eofb */
                                                                     &rci,
                                                                     &marpaESLIFValueResult,
-                                                                    NULL /* matchedLengthlp */))) {
+                                                                    &matchedLengthl))) {
     goto err;
   }
   if (rci == MARPAESLIF_MATCH_OK) {

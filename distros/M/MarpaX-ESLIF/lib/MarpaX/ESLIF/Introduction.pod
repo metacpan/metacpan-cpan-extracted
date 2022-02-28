@@ -14,7 +14,7 @@ MarpaX::ESLIF::Introduction - MarpaX::ESLIF's Introduction
 
 =head1 VERSION
 
-version 6.0.13
+version 6.0.14
 
 =head1 DESCRIPTION
 
@@ -345,7 +345,7 @@ is translated to the UTF-8 pattern C<Black Heart Suite Character: \x{2665}>
 
 A string is always scanned character per character by MarpaX::ESLIF, and an ASCII compatible pattern is generated, using \x{...} codepoint notation whenever this is an ASCII special character or a character outside of original ASCII 7-bits character set. So MarpaX::ESLIF know if there is need for unicode support or not in PCRE2 terminology (which is: any code point greater than 255, else byte matching is enough). This is important because PCRE2 yells if a pattern is using a large codepoint and if this internal PCRE2_UTF flag is not set accordingly.
 
-The presence of this flag has an important consequence: if at least one string in the grammar implied the PCRE2_UTF flag, then the whole remaining chunk of data is translated and validated as an UTF-8 sequence of bytes. In such ca case, either the user input reader informed that this is stream of characters, then MarpaX::ESLIF prepared in advance the conversion/validation to UTF-8, either this is done lazily as soon as a match is attempted using a string requiring the PCRE2_UTF flag.
+The presence of this flag has an important consequence: if at least one string in the grammar implied the PCRE2_UTF flag, then the whole remaining chunk of data is translated and validated as an UTF-8 sequence of bytes. In such a case, either the user input reader informed that this is stream of characters, then MarpaX::ESLIF prepared in advance the conversion/validation to UTF-8, either this is done lazily as soon as a match is attempted using a string requiring the PCRE2_UTF flag.
 
 =item String modifiers
 
@@ -445,7 +445,7 @@ really mean that the sequence is embedded in the regular expression. The dump of
 
 =back
 
-In conclusion determining the need of the PCRE2_UTF8 will always be exact: either MarpaX::ESLIF will detect it correctly, either PCRE2 will yell, and you will have to explicitely set it using modifiers. Since character class is nothing else but a regular expression limited to a range of character, they both share the same possible set of modifiers.
+In conclusion determining the need of the PCRE2_UTF will always be exact: either MarpaX::ESLIF will detect it correctly, either PCRE2 will yell, and you will have to explicitely set it using modifiers. Since character class is nothing else but a regular expression limited to a range of character, they both share the same possible set of modifiers.
 
 =item Character class and Regular expression modifiers
 

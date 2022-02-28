@@ -1,7 +1,7 @@
 /*  You may distribute under the terms of either the GNU General Public License
  *  or the Artistic License (the same terms as Perl itself)
  *
- *  (C) Paul Evans, 2014 -- leonerd@leonerd.org.uk
+ *  (C) Paul Evans, 2014-2022 -- leonerd@leonerd.org.uk
  */
 
 #include "EXTERN.h"
@@ -171,6 +171,8 @@ CODE:
         Newx(ptr, 1, struct pmat_sv_glob); break;
       case 2: /* PMAT_SVtSCALAR */
       case 13: /* PMAT_SVtUNDEF */
+      case 14: /* PMAT_SVtYES */
+      case 15: /* PMAT_SVtNO */
         Newx(ptr, 1, struct pmat_sv_scalar); break;
       case 3: /* PMAT_SVtREF */
         Newx(ptr, 1, struct pmat_sv_ref); break;

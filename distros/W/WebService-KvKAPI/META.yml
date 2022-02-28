@@ -25,22 +25,22 @@ name: WebService-KvKAPI
 provides:
   WebService::KvKAPI:
     file: lib/WebService/KvKAPI.pm
-    version: '0.101'
+    version: '0.103'
   WebService::KvKAPI::BasicProfile:
     file: lib/WebService/KvKAPI/BasicProfile.pm
-    version: '0.101'
+    version: '0.103'
   WebService::KvKAPI::Formatters:
     file: lib/WebService/KvKAPI/Formatters.pm
-    version: '0.101'
+    version: '0.103'
   WebService::KvKAPI::LocationProfile:
     file: lib/WebService/KvKAPI/LocationProfile.pm
-    version: '0.101'
+    version: '0.103'
   WebService::KvKAPI::Roles::OpenAPI:
     file: lib/WebService/KvKAPI/Roles/OpenAPI.pm
-    version: '0.101'
+    version: '0.103'
   WebService::KvKAPI::Search:
     file: lib/WebService/KvKAPI/Search.pm
-    version: '0.101'
+    version: '0.103'
 requires:
   Carp: '0'
   Data::Dumper: '0'
@@ -53,7 +53,7 @@ requires:
   perl: v5.26.0
 resources:
   repository: git://gitlab.com/mintlab/webservice-kvkapi.git
-version: '0.101'
+version: '0.103'
 x_contributors:
   - 'Wesley Schwengle <wesley.schwengle@exxellence.nl>'
 x_generated_by_perl: v5.34.0

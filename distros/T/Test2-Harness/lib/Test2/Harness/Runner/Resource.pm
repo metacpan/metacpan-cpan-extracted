@@ -2,7 +2,7 @@ package Test2::Harness::Runner::Resource;
 use strict;
 use warnings;
 
-our $VERSION = '1.000109';
+our $VERSION = '1.000110';
 
 sub setup {}
 
@@ -10,6 +10,8 @@ sub new {
     my $class = shift;
     return bless({@_}, $class);
 }
+
+sub tick { }
 
 sub available { -1 }
 
@@ -106,6 +108,22 @@ example is kept simple and just always grabs the next one.
 
         # The return is ignored
     }
+
+    sub tick {
+        my $self = shift;
+
+        # This is called by only 1 process at a time and gives you a way to do
+        # extra stuff at a regular interval without other processes trying to
+        # do the same work at the same time.
+        # For example, if a database is left in a dirty state after it is
+        # released, you can fire off a cleanup action here knowing no other
+        # process will run it at the same time. You can also be sure no record
+        # messages will be sent while this sub is running as the process it
+        # runs in has a lock.
+
+        ...
+    }
+
 
     sub release {
         my $self = shift;

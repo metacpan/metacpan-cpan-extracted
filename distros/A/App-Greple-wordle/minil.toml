@@ -1,0 +1,11 @@
+name = "App-Greple-wordle"
+
+readme_from   = "lib/App/Greple/wordle.pod"
+abstract_from = "lib/App/Greple/wordle.pod"
+authors_from  = "lib/App/Greple/wordle.pod"
+license       = "perl_5"
+badges        = [ 'github-actions/test', 'metacpan' ]
+authority     = "cpan:UTASHIRO"
+
+module_maker   = "ModuleBuildTiny"
+static_install = "auto"

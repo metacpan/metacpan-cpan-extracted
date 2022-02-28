@@ -1,5 +1,8 @@
 Revision history for Parallel-Pipes
 
+0.100  2022-02-27 16:42:57 JST
+    - Introduce Parallel::Pipes::App class (#4)
+
 0.005  2019-11-10 18:20:50 JST
     - Reduce calls of sysread() (#2)
 

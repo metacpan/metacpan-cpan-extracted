@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Scalar.pm
-## Version v1.1.0
+## Version v1.2.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2021/12/28
+## Modified 2022/02/27
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -16,12 +16,13 @@ BEGIN
     use common::sense;
     use warnings;
     use warnings::register;
+    use vars qw( $DEBUG );
     use Module::Generic::Array;
     use Module::Generic::Boolean;
     use Module::Generic::Number;
     use Module::Generic::Scalar;
-    ## So that the user can say $obj->isa( 'Module::Generic::Scalar' ) and it would return true
-    ## use parent -norequire, qw( Module::Generic::Scalar );
+    # So that the user can say $obj->isa( 'Module::Generic::Scalar' ) and it would return true
+    # use parent -norequire, qw( Module::Generic::Scalar );
     use Scalar::Util ();
     use Want;
     use overload (
@@ -78,11 +79,14 @@ BEGIN
         },
         fallback => 1,
     );
-    our $DEBUG = 0;
-    our( $VERSION ) = 'v1.1.0';
+    $DEBUG = 0;
+    our $VERSION = 'v1.2.0';
 };
 
-## sub new { return( shift->_new( @_ ) ); }
+use strict;
+no warnings 'redefine';
+
+# sub new { return( shift->_new( @_ ) ); }
 sub new
 {
     my $this = shift( @_ );
@@ -319,8 +323,8 @@ sub like
 {
     my $self = shift( @_ );
     my $str = shift( @_ );
-    local @matches = ();
-    local @rv = ();
+    my @matches = ();
+    my @rv = ();
     $str = CORE::defined( $str ) 
         ? ref( $str ) eq 'Regexp'
             ? $str
@@ -361,8 +365,8 @@ sub ltrim
 sub match
 {
     my( $self, $re ) = @_;
-    local @matches = ();
-    local @rv = ();
+    my @matches = ();
+    my @rv = ();
     $re = CORE::defined( $re ) 
         ? ref( $re ) eq 'Regexp'
             ? $re
@@ -441,8 +445,8 @@ sub replace
     my( $self, $re, $replacement ) = @_;
     ## Only to test if this was a regular expression. If it was the array will contain successful match, other it will be empty
     ## @rv will contain the regexp matches or the result of the eval
-    local @matches = ();
-    local @rv = ();
+    my @matches = ();
+    my @rv = ();
     $re = CORE::defined( $re ) 
         ? ref( $re ) eq 'Regexp'
             ? $re
@@ -813,8 +817,9 @@ sub _warnings_is_enabled { return( warnings::enabled( ref( $_[0] ) || $_[0] ) );
         use strict;
         use warnings;
         use Scalar::Util ();
-        our $dummy_callback = sub{1};
     };
+
+    our $dummy_callback = sub{1};
     
     sub TIESCALAR
     {

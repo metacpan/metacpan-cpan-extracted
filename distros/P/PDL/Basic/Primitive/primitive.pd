@@ -137,7 +137,7 @@ Row vectors are represented as (N x 1) two-dimensional PDLs, or you
 may be sloppy and use a one-dimensional PDL.  Column vectors are
 represented as (1 x N) two-dimensional PDLs.
 
-Threading occurs in the usual way, but as both the 0 and 1 dimension
+Broadcasting occurs in the usual way, but as both the 0 and 1 dimension
 (if present) are included in the operation, you must be sure that
 you don't try to broadcast over either of those dims.
 
@@ -201,7 +201,6 @@ matrix-multiply them:
   [4 8]
  ]
 
-
 INTERNALS
 
 The mechanics of the multiplication are carried out by the
@@ -211,8 +210,6 @@ L</matmult> method.
 
 EOD
 
-pp_add_exported('', 'matmult');
-
 pp_def('matmult',
 	HandleBad=>0,
 	Pars => 'a(t,h); b(w,t); [o]c(w,h);',
@@ -220,47 +217,25 @@ pp_def('matmult',
 	PMCode => <<'EOPM',
 sub PDL::matmult {
     my ($x,$y,$c) = @_;
-
-    $y = pdl($y) unless eval { $y->isa('PDL') };
-    $c = PDL->null unless eval { $c->isa('PDL') };
-
+    $y = PDL->topdl($y);
+    $c = PDL->null unless do { local $@; eval { $c->isa('PDL') } };
     while($x->getndims < 2) {$x = $x->dummy(-1)}
     while($y->getndims < 2) {$y = $y->dummy(-1)}
-
     return ($c .= $x * $y) if( ($x->dim(0)==1 && $x->dim(1)==1) ||
                                ($y->dim(0)==1 && $y->dim(1)==1) );
-    if($y->dim(1) != $x->dim(0)) {
-        barf(sprintf("Dim mismatch in matmult of [%dx%d] x [%dx%d]: %d != %d",$x->dim(0),$x->dim(1),$y->dim(0),$y->dim(1),$x->dim(0),$y->dim(1)));
-    }
+    barf sprintf 'Dim mismatch in matmult of [%1$dx%2$d] x [%3$dx%4$d]: %1$d != %4$d',$x->dim(0),$x->dim(1),$y->dim(0),$y->dim(1)
+      if $y->dim(1) != $x->dim(0);
     PDL::_matmult_int($x,$y,$c);
     $c;
 }
 EOPM
 	Code => <<'EOC',
 	PDL_Indx ih, iw, it, ow, oh, ot, wlim, hlim, tlim;
-        $GENERIC() *ad, *bd;
-        PDL_Indx atdi, btdi;
-	PDL_Indx tsiz = 64;
+	PDL_Indx tsiz = 8 * sizeof(double) / sizeof($GENERIC());
 
-	// Zero the output
-	loop(w) %{
-		loop(h) %{
-			$c() = 0;
-		%}
-	%}
-
-	// Make sure we're physical
-	// (Not needed if we don't need dimincs, see below)
-	// PDL->make_physdims($PDL(a));
-	// PDL->make_physdims($PDL(b));
-
-        // Cache the dimincs to avoid constant lookups
-	// These two lines are what I wanted, but they break sometimes (dimincs not set right despite calling physdims?)
-	// I deleted them in favor of explicit offset calculation, which appears more robust.
-	//	atdi = $PDL(a)->dimincs[0];
-	//	btdi = $PDL(b)->dimincs[1];
-	atdi = &($a(t=>1, h=>0)) - &($a(t=>0,h=>0));
-	btdi = &($b(t=>1, w=>0)) - &($b(t=>0,w=>0));
+	// Cache the dimincs to avoid constant lookups
+	PDL_Indx atdi = PDL_REPRINCS($PDL(a))[0];
+	PDL_Indx btdi = PDL_REPRINCS($PDL(b))[1];
 
 	// Loop over tiles
 	for(   oh=0;   oh < $SIZE(h);   oh += tsiz   ) {
@@ -269,23 +244,26 @@ EOPM
 	   for(   ow=0;   ow < $SIZE(w);   ow += tsiz   ) {
 	      wlim = PDLMIN(ow + tsiz, $SIZE(w));
 
+	      // Zero the output for this tile
+	      for(  ih=oh; ih<hlim; ih++  )
+		 for(  iw=ow; iw<wlim; iw++  )
+		    $c(w=>iw, h=>ih) = 0;
+
 	      for(   ot=0;   ot < $SIZE(t);  ot += tsiz   ) {
 	         tlim = PDLMIN(ot + tsiz, $SIZE(t));
 
 	         for(  ih=oh; ih<hlim; ih++  ) {
 		    for(  iw=ow; iw<wlim; iw++  ) {
-		       $GENERIC() cc;
+		       // Cache the accumulated value for the output
+		       $GENERIC() cc = $c(w=>iw, h=>ih);
 
 		       // Cache data pointers before 't' run through tile
-		       ad = &($a(t=>ot, h=>ih));
-		       bd = &($b(w=>iw, t=>ot));
-
-		       // Cache the accumulated value for the output
-		       cc = $c(w=>iw, h=>ih);
+		       $GENERIC() *ad = &($a(t=>ot, h=>ih));
+		       $GENERIC() *bd = &($b(w=>iw, t=>ot));
 
 		       // Hotspot - run the 't' summation
 		       for( it=ot; it<tlim; it++  ) {
-		       	    cc += *ad * *bd;
+			    cc += *ad * *bd;
 			    ad += atdi;
 			    bd += btdi;
 		       }
@@ -1023,7 +1001,6 @@ EOD
 } # for: my $opt
 
 pp_add_exported('', 'clip');
-
 pp_addpm(<<'EOD');
 =head2 clip
 
@@ -1914,6 +1891,7 @@ sub PDL::randsym {
 EOD
 );
 
+pp_add_exported('','grandom');
 pp_addpm(<<'EOD');
 =head2 grandom
 
@@ -1945,19 +1923,15 @@ sub PDL::grandom {
    $x .= ndtri(randsym($x));
    return $x;
 }
-
 EOD
-
-pp_add_exported('','grandom');
 
 ###############################################################
 # binary searches in an ndarray; various forms
 ###############################################################
 
-pp_add_exported('','vsearch');
-
 # generic front end; defaults to vsearch_sample for backwards compatibility
 
+pp_add_exported('','vsearch');
 pp_addpm(<<'EOD');
 =head2 vsearch
 
@@ -2883,6 +2857,7 @@ sub PDL::interpND {
 
   } elsif($method =~ m/^f(ft|ourier)?/i) {
 
+     local $@;
      eval "use PDL::FFT;";
      my $fftref = $opt->{fft};
      $fftref = [] unless(ref $fftref eq 'ARRAY');
@@ -3130,6 +3105,7 @@ EOD
 	   );
 }
 
+pp_add_exported("", 'where');
 pp_addpm(<<'EOD');
 =head2 where
 
@@ -3198,8 +3174,7 @@ sub PDL::where {
 
 EOD
 
-pp_add_exported("", 'where');
-
+pp_add_exported("", 'whereND');
 pp_addpm(<<'EOD');
 =head2 whereND
 
@@ -3289,8 +3264,7 @@ sub PDL::whereND :lvalue {
 
 EOD
 
-pp_add_exported("", 'whereND');
-
+pp_add_exported("", 'whichND');
 pp_addpm(<<'EOD');
 =head2 whichND
 
@@ -3394,16 +3368,13 @@ sub PDL::whichND {
 
   return $ind;
 }
-
 EOD
-
-pp_add_exported("", 'whichND');
 
 #
 # Set operations suited for manipulation of the operations above.
 #
 
-
+pp_add_exported("", 'setops');
 pp_addpm(<<'EOD');
 =head2 setops
 
@@ -3586,8 +3557,7 @@ sub PDL::setops {
 }
 EOD
 
-pp_add_exported("", 'setops');
-
+pp_add_exported("", 'intersect');
 pp_addpm(<<'EOD');
 =head2 intersect
 
@@ -3622,10 +3592,7 @@ sub PDL::intersect {
    return setops($_[0], 'AND', $_[1]);
 
 }
-
 EOD
-
-pp_add_exported("", 'intersect');
 
 pp_addpm({At=>'Bot'},<<'EOD');
 

@@ -9,16 +9,16 @@
     : pdl_ ## default_func)(trans))
 
 #define REDODIMS(what, trans) do { \
-    if (trans->dims_redone) { \
-	FREETRANS(trans, 0); \
-	if (PDL_err.error) return PDL_err; \
-	trans->dims_redone = 0; \
-    } \
     if ((trans)->vtable->redodims) \
       what(PDL_err, pdl_dim_checks( \
 	(trans)->vtable, (trans)->pdls, \
 	NULL, NULL, \
 	(trans)->ind_sizes, 1)); \
+    if (trans->dims_redone) { \
+	FREETRANS(trans, 0); \
+	if (PDL_err.error) return PDL_err; \
+	trans->dims_redone = 0; \
+    } \
     what(PDL_err, ((trans)->vtable->redodims \
       ? (trans)->vtable->redodims \
       : pdl_redodims_default)(trans)); \
@@ -28,7 +28,7 @@
 #define FREETRANS(trans, destroy) \
     if(trans->vtable->freetrans) { \
 	PDLDEBUG_f(printf("call freetrans\n")); \
-	PDL_err = trans->vtable->freetrans(trans, destroy); \
+	PDL_ACCUMERROR(PDL_err, trans->vtable->freetrans(trans, destroy)); \
 	    /* ignore error for now as need to still free rest */ \
 	if (destroy) PDL_CLRMAGIC(trans); \
     }
@@ -57,7 +57,7 @@ pdl_error pdl__ensure_trans(pdl_trans *trans,int what,int *wd)
 		PDL_RETERROR(PDL_err, pdl_make_physvaffine(trans->pdls[j]));
 		flag |= trans->pdls[j]->state & PDL_ANYCHANGED;
 	}
-	if (flag & PDL_PARENTDIMSCHANGED) REDODIMS(PDL_ACCUMERROR, trans);
+	if (flag & PDL_PARENTDIMSCHANGED) REDODIMS(PDL_RETERROR, trans);
 	for(j=0; j<vtable->npdls; j++)
 		if(trans->pdls[j]->trans_parent == trans)
 			PDL_ENSURE_ALLOCATED(trans->pdls[j]);
@@ -387,6 +387,7 @@ pdl_error pdl_destroy(pdl *it) {
     it->state |= PDL_DESTROYING;
     /* Clear the sv field so that there will be no dangling ptrs */
     if(it->sv) {
+	    SvOBJECT_off((SV *)it->sv);
 	    sv_setiv(it->sv,0x4242);
 	    it->sv = NULL;
     }
@@ -642,7 +643,7 @@ static inline pdl_error pdl_trans_flow_null_checks(pdl_trans *trans, int *ret) {
     int state = trans->pdls[i]->state;
     if (state & PDL_NOMYDIMS)
       return pdl_make_error(PDL_EUSERERROR,
-	"Error in %s: input parameter '%s' is null\n",
+	"Error in %s: input parameter '%s' is null",
 	vtable->name, vtable->par_names[i]
       );
     if(state & PDL_DATAFLOW_ANY) pfflag++;

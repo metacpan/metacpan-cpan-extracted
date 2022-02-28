@@ -1,10 +1,10 @@
 {
    "abstract" : "simple certificate verification",
    "author" : [
-      "Chris Andrews <chrisandrews@venda.com>"
+      "Chris Andrews"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Module::Install version 1.19, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.022, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -13,55 +13,46 @@
       "version" : 2
    },
    "name" : "Crypt-OpenSSL-VerifyX509",
-   "no_index" : {
-      "directory" : [
-         "inc",
-         "t"
-      ]
-   },
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "6.59",
-            "File::Slurp" : "0",
-            "Test::Exception" : "0",
-            "Test::More" : "0.88"
-         }
-      },
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
          }
       },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta::JSON" : "0.16",
+            "Test::Kwalitee" : "1.21",
+            "Test::Pod" : "1.41",
+            "Test::Spelling" : "0.12"
+         }
+      },
       "runtime" : {
          "requires" : {
-            "Crypt::OpenSSL::X509" : "1.807",
-            "perl" : "5.008001"
+            "Crypt::OpenSSL::X509" : "0",
+            "perl" : "5.008"
          }
-      }
-   },
-   "provides" : {
-      "Crypt::OpenSSL::VerifyX509" : {
-         "file" : "VerifyX509.pm",
-         "version" : "0.16"
+      },
+      "test" : {
+         "requires" : {
+            "File::Slurper" : "0.012"
+         }
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "bugtracker" : {
-         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Crypt-OpenSSL-VerifyX509"
-      },
-      "license" : [
-         "http://dev.perl.org/licenses"
-      ],
       "repository" : {
-         "url" : "http://github.com/timlegge/perl-Crypt-OpenSSL-VerifyX509"
+         "type" : "git",
+         "url" : "git://github.com/timlegge/perl-Crypt-OpenSSL-VerifyX509.git",
+         "web" : "https://github.com/timlegge/perl-Crypt-OpenSSL-VerifyX509"
       }
    },
-   "version" : "0.16",
+   "version" : "0.21",
+   "x_generated_by_perl" : "v5.32.1",
    "x_maintainers" : [
       "Timothy Legge <timlegge@gmail.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.02",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
+

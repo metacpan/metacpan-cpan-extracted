@@ -8,7 +8,7 @@ package Devel::MAT::Dumper::Helper;
 use strict;
 use warnings;
 
-our $VERSION = '0.42';
+our $VERSION = '0.43';
 
 =head1 NAME
 

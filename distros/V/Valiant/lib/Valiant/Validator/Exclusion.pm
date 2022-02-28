@@ -10,6 +10,7 @@ has exclusion => (is=>'ro', required=>1, default=>sub {_t 'exclusion'});
 
 sub normalize_shortcut {
   my ($class, $arg) = @_;
+  $arg = [$arg] unless ref $arg;
   return +{ in => $arg };
 }
 

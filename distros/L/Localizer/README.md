@@ -5,7 +5,7 @@ Localizer - Yet another framework for localization
 
 # DESCRIPTION
 
-See [Localizer::Resource](https://metacpan.org/pod/Localizer::Resource)
+See [Localizer::Resource](https://metacpan.org/pod/Localizer%3A%3AResource)
 
 # LICENSE
 

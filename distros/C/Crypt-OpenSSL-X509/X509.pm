@@ -8,7 +8,7 @@ use base qw(Exporter);
 
 use Convert::ASN1;
 
-our $VERSION = '1.912';
+our $VERSION = '1.913';
 
 our @EXPORT_OK = qw(
   FORMAT_UNDEF FORMAT_ASN1 FORMAT_TEXT FORMAT_PEM
@@ -526,7 +526,7 @@ Dan Sully
 
 =item * Florian Schlichting @fschlich, release 1.9.11
 
-=item * Timonthy Legge, release 1.9.10
+=item * Timothy Legge, release 1.9.10
 
 =item * Patrick Cernko, release 1.9.9
 
@@ -546,7 +546,7 @@ Dan Sully
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2004-2021 by Dan Sully
+Copyright 2004-2022 by Dan Sully
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

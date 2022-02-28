@@ -59,6 +59,7 @@ is_deeply [ $user1->errors->model_messages ], [
   "test model error",
 ];
 
+
 $user1->errors->merge($user2->errors);
 is_deeply +{ $user1->errors->to_hash }, +{
     "*" => [

@@ -1,6 +1,6 @@
 use Test::Most;
 use Valiant::Error;
-
+use Valiant::I18N;
 {
   package Local::MessageRetrieval;
 

@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.83.
+signed via the Module::Signature module, version 0.87.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,15 +12,15 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA512
+Hash: RIPEMD160
 
-SHA256 ab6582c1cdd5ca7e2e0e559e1e467889920115b0bd2a9dcd876755b6d1a8a7ae Changes
-SHA256 3f41c8cf121bfcaf5394d06f66f7c054126856f14739156b0384f545b785cbff Env.pm
+SHA256 f976191acdf053d7fbe7ce26a3f356eb42162afbe342ac2b49c22864325330ce Changes
+SHA256 d88cf4c0441ca3b656d4f727cabb802a4b3b1d060526f86e2d929e68bf21e6ad Env.pm
 SHA256 9984f7b209d43761721f55f57d3b943c1d5308788d8d1818642db5deac235044 LICENSE
 SHA256 3bfc7dde09e1cb0b1e6a700a5af45a88f16ea7ec59765a4f20f31d9d7cf51c34 MANIFEST
-SHA256 e21eebe7324b3db561fbfae9abdf4994c29fe12bf3a9d0ef191d774313daa39d META.yml
-SHA256 370054c20bd3f1c414566dd0942d73cc9d8670e4bb45e4082c2382eb411591a8 Makefile.PL
-SHA256 45cdd26fc4fa5d8f10ce107c147202d7ae1821ea775ad3633fd139077240afc7 README
+SHA256 c4bfc906cba705d5d71696479e952ec71ae1663605b78893d7dcc1173380ce85 META.yml
+SHA256 1d969d7f33d94917ffd30cac04c777e5711b664a5949a1964f41d2a7bfa2cb72 Makefile.PL
+SHA256 7eccff2fc8da88910ba1361f7fd17e889e0009d74fa59cbe16da1dbb493c1d1c README
 SHA256 05520878100f4eae1f454b895a4454f4ea1db3f6e27d2f425be3ca0beb27c713 examples/ex1.pl
 SHA256 67d139199c03b8bf8447a5a62f0d0b6dc1bd5bf6dbe04de6d21998c577823ed6 inc/Module/Install.pm
 SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
@@ -34,18 +34,21 @@ SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Modu
 SHA256 26b166ff62aacdb55317d1659f160aa4935097eea9810ea980e6d747206b5dc0 inc/Module/Install/Win32.pm
 SHA256 5f73a6851a91ea44e65b924f918743ad6e860620ad7a38a39d0295e0c5652a9f inc/Module/Install/WriteAll.pm
 SHA256 f131c7c2d739e1de604da79d23366d56cce217708b1d900d9f2e44dc233df5b5 t/Plack-App-Env/01-use.t
-SHA256 8702cb5151d4ae0e4e79789a2675ce696473eda155b7bb23da56e75ad8913d6c t/Plack-App-Env/02-version.t
-SHA256 33e0f55598e14637d2b01fce14fac03ce6d948bbb07ae0f05188f265b5c83137 t/Plack-App-Env/03-general.t
+SHA256 0ca17efec919281e6bdf1e1d2e51a772f707fa605e6b6eb39a2c97e65748f031 t/Plack-App-Env/02-version.t
+SHA256 f8a983075b28eaf5485bd1da1888d929e55aaea80db80f6fbee09184223c57e1 t/Plack-App-Env/03-general.t
 SHA256 fe45efa722ca35519fa9340a215837c587e4fe65159d8a8d07b4641f7668ec45 xt/Plack-App-Env/01-pod_coverage.t
 SHA256 e7f92beabb56394a624bc7eeedcfda0a57728dad2c8761507f506148636b4a55 xt/Plack-App-Env/02-pod.t
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCgAdFiEEAxWqUSy7qDLVZJQKKyiOZjWerHYFAl/RDMsACgkQKyiOZjWe
-rHYlAQf+K97PE2jea28jjkmZ5kO8V3+XGC/BHt2Yrmw7sFRzTQPW+1mjgK20UKAi
-V/WYrDLTJ/5+mBArBkpZSFtGlHLeb4I7kNe3OSLxksaIWhGw3Z9SER7Wl6cJO/3s
-kpA0qxFjsTeef4aYgt/No5tbB8W+c8DnfXWekxlFDrFElezoLQaWPeKP4ClyMexp
-rAsg4zchpeTZ+d6JHdlAygn5AKZyeAM0rExa8Xqh7lLcEIMvUIG//PNSFh/Skp3B
-p3MnHSXU9TyUDBeT07fX1y/kZIXhLvSHcLc8GpOAa4xrJMYVHcwm/I/lqopik8pZ
-gLfa4WSQCPcrA5LXB9c62jWQeWxEHQ==
-=f08F
+iQGzBAEBAwAdFiEERTLc1QTxqWhVvPeegmqNLzlXaRcFAmIbruMACgkQgmqNLzlX
+aRdZ5gv/aEt4cKnUtVzXtnCHpSkkEOnqwImDWoW3UpgK30btag632FpstfXxrQ8V
+pFLR3LgZ0d7iB3A5mFX19UFhB9eUPZ+a1NMbzGRTlQhleL+IfqNWO/khTfa+QqQ6
+0F+JPVVCkKe6ciVZycSR2ILvBe7r2NL+C/6FU9VZxfYzkn4fXI/8VXEtrTUnVtsq
+YA125kMhKUENtC0tPa7bBoU8VrBFvAOpGJbtAwwXLN4/R5ib0zRegeq8ZkkkepkQ
+hyIgOBZ2ajiPqBBsrbkxzhGi6/wsIbCMjn7HPG26Qrt1dcNjJhutZQwL2fXQq+7B
+/FPSXQq4Lmz3FfH/SgfBNrl9ceAsC1dLeHLCKEVg8GV461cUKmVpr8gqg17gz05p
+gNsB1ic89XHefP3lenmaaXMRF4xQygoDAZ9vNjqwvD9N4IniIIWNy6fvXP9F0lGd
+3NTrg5GTcZjn9jOZ4h0KSgs6o2jpqNBejcl0rStY8p9Dsab+2Tx2AV+fbFKQ6JEd
+A57QbXIL
+=uf0J
 -----END PGP SIGNATURE-----

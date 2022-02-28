@@ -1,0 +1,15 @@
+. .  1 .
+. 2  . .
+
+3 .  . 1
+. .  4 .
+==
+Solution
+4 3  1 2
+1 2  3 4
+
+3 4  2 1
+2 1  4 3
+==
+Griddlers: https://www.griddlers.net/sudoku/-/sudoku/25764
+Name: Griddlers-25764

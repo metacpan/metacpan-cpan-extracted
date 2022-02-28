@@ -70,8 +70,8 @@ subtest 'second transformation' => sub {
     ok $svgs[1]   =~ /width="80"/,  "inner svg also has width=80";
     ok $svgs[1]   !~ /height="80"/, "inner svg does not have height=80";
     ok $groups[0] =~ /transform="translate\(0 [0-9.eE]+\)"/,             "outer group has only translate";
-    ok $groups[1] =~ /transform="translate\([^)]+\) scale\((\S+) \1\)"/, "second group has scale";
-    ok $groups[0] !~ /id="[^"]+"/, "outer group has no id";
+    ok $groups[1] =~ /transform="translate\([^)]+\) scale\((\S+) \1\)"/, "third group has scale";
+    ok $groups[0] !~ /id="[^"]+"/, "first group has no id";
     ok $groups[1] !~ /id="[^"]+"/, "second group has no id";
 };
 

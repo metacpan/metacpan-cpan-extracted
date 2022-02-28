@@ -40,7 +40,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.16';
+our $VERSION = '0.18';
 
 use UI::Various::core;
 use UI::Various::widget;
@@ -196,6 +196,7 @@ sub remove($@)
 
     my $children = $self->{children};
     my $removed = undef;
+    local $_;
  CHILD:
     foreach my $child (@_)
     {
@@ -204,7 +205,7 @@ sub remove($@)
 		      ref($child), __PACKAGE__, 'remove');
 	foreach (0..$#{$children})
 	{
-	    next unless $children->[$_] == $child;
+	    next unless $children->[$_] eq $child;
 	    $removed = splice @{$children}, $_, 1;
 	    # instead of: $child->parent(undef);
 	    # we need direct assignment for Perl < 5.20 here:
@@ -357,6 +358,6 @@ under the same terms as Perl itself.  See LICENSE file for more details.
 
 =head1 AUTHOR
 
-Thomas Dorner E<lt>dorner@cpan.orgE<gt>
+Thomas Dorner E<lt>dorner (at) cpan (dot) orgE<gt>
 
 =cut

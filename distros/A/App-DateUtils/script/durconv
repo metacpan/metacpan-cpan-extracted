@@ -1,18 +1,18 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/DateUtils/durconv
-# and generated automatically using Perinci::CmdLine::Gen version 0.495
-
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-30'; # DATE
-our $DIST = 'App-DateUtils'; # DIST
-our $VERSION = '0.126'; # VERSION
+# and generated automatically using Perinci::CmdLine::Gen version 0.500
 
 use 5.010001;
 use strict;
 use warnings;
 
 use Perinci::CmdLine::Any;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-09-06'; # DATE
+our $DIST = 'App-DateUtils'; # DIST
+our $VERSION = '0.127'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/DateUtils/durconv",
@@ -38,42 +38,13 @@ durconv - Convert duration from one format to another
 
 =head1 VERSION
 
-This document describes version 0.126 of durconv (from Perl distribution App-DateUtils), released on 2020-03-30.
+This document describes version 0.127 of durconv (from Perl distribution App-DateUtils), released on 2021-09-06.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % durconv [options] <duration>
-
-Examples:
-
-Convert "3h2m" to number of seconds:
-
- % durconv 3h2m
- 10920
-
-Convert "3h2m" to iso8601:
-
- % durconv 3h2m --to iso8601
- PT3H2M
-
-Show all possible conversions:
-
- % durconv 3h2m --to ALL
- [
-    200,
-    "OK",
-    {
-       "hash" : {
-          "hours" : 3,
-          "minutes" : 2
-       },
-       "iso8601" : "PT3H2M",
-       "secs" : 10920
-    },
-    {}
- ]
+% B<durconv> [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--to>=I<str>] [B<-a>] -- E<lt>I<duration>E<gt>
 
 =head1 OPTIONS
 
@@ -84,6 +55,8 @@ C<*> marks required options.
 =over
 
 =item B<--duration>=I<s>*
+
+Can also be specified as the 1st command-line argument.
 
 =item B<--to>=I<s>
 
@@ -144,6 +117,10 @@ you want to pipe the result for more post-processing. In this case you can use
 
 Filter output through a pager.
 
+=item B<--view-result>
+
+View output using a viewer.
+
 =back
 
 =head2 Other options
@@ -194,6 +171,35 @@ It is also recommended to install L<shcompgen> (see above).
 
 For fish and zsh, install L<shcompgen> as described above.
 
+=head1 EXAMPLES
+
+Convert "3h2m" to number of seconds:
+
+ % durconv 3h2m
+ 10920
+
+Convert "3h2m" to iso8601:
+
+ % durconv 3h2m --to iso8601
+ PT3H2M
+
+Show all possible conversions:
+
+ % durconv 3h2m --to ALL
+ [
+    200,
+    "OK",
+    {
+       "hash" : {
+          "hours" : 3,
+          "minutes" : 2
+       },
+       "iso8601" : "PT3H2M",
+       "secs" : 10920
+    },
+    {}
+ ]
+
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/App-DateUtils>.
@@ -202,6 +208,34 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-DateUt
 
 Source repository is at L<https://github.com/perlancar/perl-App-DateUtils>.
 
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021, 2020, 2019, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-DateUtils>
@@ -209,16 +243,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2020, 2019, 2017, 2016, 2015 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

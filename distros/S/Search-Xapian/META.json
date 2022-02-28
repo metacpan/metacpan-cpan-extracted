@@ -47,6 +47,6 @@
          "web" : "https://git.xapian.org/?p=xapian;a=tree;f=search-xapian;hb=refs/heads/svn/1.2"
       }
    },
-   "version" : "v1.2.25.4",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "v1.2.25.5",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

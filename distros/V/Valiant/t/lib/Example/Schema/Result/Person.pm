@@ -28,18 +28,8 @@ __PACKAGE__->validates(username => presence=>1, length=>[3,24], format=>'alpha_n
 __PACKAGE__->validates(first_name => (presence=>1, length=>[2,24]));
 __PACKAGE__->validates(last_name => (presence=>1, length=>[2,48]));
 
-__PACKAGE__->validates(
-  credit_cards => (
-    result_set=>+{validations=>1, skip_if_empty=>1, min=>2, max=>4}, 
-  )
-);
-
-#__PACKAGE__->validates(person_roles => (presence=>1, result_set=>+{validations=>1, min=>1}, on=>'profile' ));
-__PACKAGE__->validates(profile => (result=>+{validations=>1}, on=>'profile' ));
-
-
-__PACKAGE__->accept_nested_for('profile' => {update_only=>1});
-__PACKAGE__->accept_nested_for('credit_cards' => { limit=>2 });
+__PACKAGE__->validates(credit_cards => (set_size => +{skip_if_empty=>1, min=>2, max=>4}));
+__PACKAGE__->validates(person_roles => (presence=>1, on=>'profile' ));
 
 __PACKAGE__->might_have(
   profile =>
@@ -60,6 +50,9 @@ __PACKAGE__->has_many(
 );
 
 __PACKAGE__->many_to_many('roles' => 'person_roles', 'role');
+
+__PACKAGE__->accept_nested_for('profile' => {update_only=>1});
+__PACKAGE__->accept_nested_for('credit_cards' => { limit=>2 });
 
 sub registered {
   my $self = shift;

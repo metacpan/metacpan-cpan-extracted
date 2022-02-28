@@ -5,12 +5,19 @@ use 5.008004;
 use strict;
 use warnings;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 use DateTime 0.1402;
 use DateTime::Calendar::Julian 0.04;
 
 use Carp ();
+
+# We're relying on DateTime's validation, but we want Carp to report
+# errors against our caller, not ourselves. Ditto
+# DateTime::Calendar::Julian
+our @CARP_NOT = (
+    qw{ DateTime DateTime::Duration DateTime::Calendar::Julian },
+);
 
 use overload ( 'fallback' => 1,
                '<=>' => '_compare_overload',
@@ -602,6 +609,20 @@ for my $sub (
 		qw/
 		week_of_month
 		weekday_of_month
+		/,
+		# Missed in the above somehow --TRW
+		qw/
+		day_of_quarter
+		day_of_quarter_0
+		is_between
+		is_last_day_of_month
+		is_last_day_of_quarter
+		is_last_day_of_year
+		month_length
+		quarter_length
+		rfc3339
+		stringify
+		year_length
 		/,
 ) {
     no strict 'refs';

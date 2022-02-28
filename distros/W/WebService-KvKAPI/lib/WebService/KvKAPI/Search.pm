@@ -1,6 +1,6 @@
 use utf8;
 package WebService::KvKAPI::Search;
-our $VERSION = '0.101';
+our $VERSION = '0.103';
 # ABSTRACT: WebService::KvKAPI::Search package needs a propper abstract
 
 use v5.26;
@@ -58,7 +58,7 @@ WebService::KvKAPI::Search - WebService::KvKAPI::Search package needs a propper 
 
 =head1 VERSION
 
-version 0.101
+version 0.103
 
 =head1 AUTHOR
 

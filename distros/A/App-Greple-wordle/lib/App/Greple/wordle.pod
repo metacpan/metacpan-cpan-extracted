@@ -1,0 +1,65 @@
+=encoding utf-8
+
+=head1 NAME
+
+App::Greple::wordle - wordle module for greple
+
+=head1 SYNOPSIS
+
+greple -Mwordle
+
+=head1 DESCRIPTION
+
+App::Greple::wordle is a greple module which implements wordle game.
+Correctness is checked by regular expression.
+
+Rule is almost same as original wordle but answer is different.  Set
+environment C<WORDLE_COMPAT=1> to get compatible answer.
+
+=begin html
+
+<p><img width="50%" src="https://raw.githubusercontent.com/kaz-utashiro/greple-wordle/main/images/screen.png">
+
+=end html
+
+=head1 BUGS
+
+Wrong position character is colored yellow always, even if it is
+colored green in other position.
+
+=head1 ENVIRONMENT
+
+=over 7
+
+=item WORDLE_ANSWER
+
+Set answer word.
+
+=item WORDLE_RANDOM
+
+Generate random answer every time.
+
+=item WORDLE_COMPAT
+
+Generate compatible answer with the original game.
+
+=back
+
+=head1 SEE ALSO
+
+L<App::Greple>, L<https://github.com/kaz-utashiro/greple>
+
+=head1 AUTHOR
+
+Kazumasa Utashiro
+
+=head1 LICENSE
+
+Copyright 2022 Kazumasa Utashiro.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+
+#  LocalWords:  greple wordle localtime COMPAT Kazumasa Utashiro

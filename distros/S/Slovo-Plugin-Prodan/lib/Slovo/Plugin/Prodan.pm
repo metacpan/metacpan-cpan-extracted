@@ -4,7 +4,7 @@ use Mojo::Base 'Mojolicious::Plugin', -signatures;
 use Mojo::JSON qw(true false);
 
 our $AUTHORITY = 'cpan:BEROV';
-our $VERSION   = '0.03';
+our $VERSION   = '0.04';
 
 has app => sub { Slovo->new }, weak => 1;
 
@@ -18,6 +18,7 @@ sub register ($self, $app, $conf) {
   $app->javascripts('/js/cart.js');
   $app->config->{gdpr_consent_url}
     = $conf->{gdpr_consent_url} || '/ѿносно/условия.bg.html';
+  $app->config->{phone_url} = $conf->{phone_url} || '+359899999999';
 
 
   # $app->log->debug(join $/, sort keys %INC);
@@ -402,8 +403,9 @@ configures the deliverer.
     @@ img/cart-plus.svg
     @@ img/cart-remove.svg
     @@ img/econt.svg
-    @@ partials/_kniga.html.ep
+    @@ partials/_footer_right.html.ep
     @@ partials/_gdpr_consent.html.ep
+    @@ partials/_kniga.html.ep
     @@ resources/data/prodan_migrations.sql
 
 =head1 SEE ALSO
@@ -715,6 +717,12 @@ table#meta td {
   font-weight: bolder;
   border-radius: 4px;
   padding: .1rem .5rem;
+  display: inline-block;
+  vertical-align: text-top;
+}
+
+.social {
+  white-space: nowrap;
 }
 
 section.book h2 {
@@ -847,12 +855,11 @@ title="Ако желаете да добавите някакви подробн
 </div>
 `;
     const gdpr_consent_template = `
-    <p id="gdpr_consent" class="col-7" style="font-size:medium;font-family:sans-serif">
-    Ние не ви следим с бисквитки. Доставчикът ни ползва бисквитки, когато поръчвате. 
-    Съгласявате се с <a class="gdpr_consent_url text-success" href="">„Условията за ползване"</a>
+    <div id="gdpr_consent" class="col" style="font-size:medium;font-family:sans-serif">
+    Ние не ви следим. Доставчикът ни ползва бисквитки, когато поръчвате.
+    Продължавайки се съгласявате с <a class="gdpr_consent_url text-success" href="">„Условията за ползване"</a>
     на <a id="gdpr_consent_ihost" href="/" class="text-success"></a>.
-    <a class="gdpr_consent_url button primary sharer text-success" href="">Добре!</a>
-    </p>
+    </div>
 `;
     const last_order_template = `
 <div id="last_order_layer" style="display:none">
@@ -882,6 +889,7 @@ title="Ако желаете да добавите някакви подробн
     </div>
 </div>
     `;
+
     show_gdpr_consent();
     show_cart();
     /* In a regular page we present a product(book, software package,
@@ -934,8 +942,8 @@ title="Ако желаете да добавите някакви подробн
             // make the cart button to toggle the visibility of the products table
             $('#show_cart').click(toggle_order_table_visibility);
             // append the email_order_form
-            if (!$('#email_order_layer').length)
-                $('body').append(email_order_template);
+            // if (!$('#email_order_layer').length)
+            //     $('body').append(email_order_template);
             // append the econt_order_template
             if (!$('#econt_order_layer').length)
                 $('body').append(econt_order_template);
@@ -1227,13 +1235,10 @@ title="Ако желаете да добавите някакви подробн
         req.fail(function (jqXHR, textStatus, errorThrown) {
             let json = JSON.parse(jqXHR.responseText);
             alert(`
-Нещо се обърка на сървъра.
-Опитайте да изпратите поръчката си на poruchki@studio-berov.eu.
-Молим, изпратете снимка на екрана си, за да ни
-улесните в отстраняването на грешката.
 Състояние: ${jqXHR.status} ${errorThrown}
 ГРЕШКА: ${json.errors[0].path}
 ${json.errors[0].message}
+Нещо се обърка на сървъра.
 `);
         });
     } // end place_econt_order(form)
@@ -1322,7 +1327,7 @@ ${json.errors[0].message}
      * */
     function show_gdpr_consent() {
         const gdpr_consent = JSON.parse(localStorage.getItem('gdpr_consent'));
-        if (gdpr_consent !== null && gdpr_consent.clicked === true) return;
+        if (gdpr_consent !== null && gdpr_consent.visited === true) return;
         if (gdpr_consent === null)
             $.get('/api/gdpr_consent').done(function (data) {
                 set_gdpr_consent(data);
@@ -1331,18 +1336,27 @@ ${json.errors[0].message}
             });
         else
             set_gdpr_consent(gdpr_consent);
-
     } // end show_gdpr_consent()
 
     function set_gdpr_consent(gdpr_consent) {
-        let footer = $('body>footer.is-fixed');
-        footer.prepend(gdpr_consent_template);
-        $('#gdpr_consent_ihost').text(gdpr_consent.ihost);
-        $('.gdpr_consent_url').prop('href', gdpr_consent.url);
-        $('.gdpr_consent_url').click(function () {
-            gdpr_consent.clicked = true;
+        // Do not show the message and store the consent if we are on the
+        // gdpr_consent.url page.
+        let footer = $('body>footer.is-fixed')
+        if (decodeURI(window.location.pathname) === gdpr_consent.url) {
+            gdpr_consent.visited = true;
             localStorage.setItem('gdpr_consent', JSON.stringify(gdpr_consent));
-        });
+            // A button, that gets the user to where he/she was.
+            // Note! It is important to not use the window.history object so
+            // the page loads fresh with no gdpr_consent message.
+            footer.html(`<a href="${document.referrer}"
+                title="Назад, откъдето дойдох."
+                class="col outline button text-success">Добре!</a>`);
+            return;
+        }
+        footer.html(gdpr_consent_template);
+        $('#gdpr_consent_ihost').text(gdpr_consent.ihost);
+        $('.gdpr_consent_url').attr('href', gdpr_consent.url);
+        localStorage.setItem('gdpr_consent', JSON.stringify(gdpr_consent));
     } // end set_gdpr_consent(gdpr_consent) 
 
 
@@ -1428,6 +1442,7 @@ ${response}
         ev.preventDefault();
     } // end function submit_order
 });
+
 @@ img/arrow-collapse-all.svg
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="24" height="24" viewBox="0 0 24 24"><path d="M19.5,3.09L20.91,4.5L16.41,9H20V11H13V4H15V7.59L19.5,3.09M20.91,19.5L19.5,20.91L15,16.41V20H13V13H20V15H16.41L20.91,19.5M4.5,3.09L9,7.59V4H11V11H4V9H7.59L3.09,4.5L4.5,3.09M3.09,19.5L7.59,15H4V13H11V20H9V16.41L4.5,20.91L3.09,19.5Z" /></svg>
 @@ img/cart-arrow-right.svg
@@ -1451,6 +1466,62 @@ ${response}
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="24" height="24" viewBox="0 0 24 24"><path d="M14.12,8.53L12,6.41L9.88,8.54L8.46,7.12L10.59,5L8.47,2.88L9.88,1.47L12,3.59L14.12,1.46L15.54,2.88L13.41,5L15.53,7.12L14.12,8.53M7,18A2,2 0 0,1 9,20A2,2 0 0,1 7,22A2,2 0 0,1 5,20A2,2 0 0,1 7,18M17,18A2,2 0 0,1 19,20A2,2 0 0,1 17,22A2,2 0 0,1 15,20A2,2 0 0,1 17,18M7.17,14.75A0.25,0.25 0 0,0 7.42,15H19V17H7A2,2 0 0,1 5,15C5,14.65 5.09,14.32 5.25,14.04L6.6,11.59L3,4H1V2H4.27L5.21,4L6.16,6L8.4,10.73L8.53,11H15.55L18.31,6L19.41,4H19.42L21.16,4.96L17.3,11.97C16.96,12.59 16.3,13 15.55,13H8.1L7.2,14.63L7.17,14.75Z" /></svg>
 @@ img/econt.svg
 <svg version="1.1" width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg"><path style="opacity:1;fill:#234182;fill-opacity:1;stroke-width:1.24709" d="M 6.1289062 -0.001953125 C 4.6048195 -0.017998455 3.2956311 1.2947208 3.125 3.0820312 L 1.5019531 20.080078 C 1.4422923 20.705007 1.5321941 21.30588 1.734375 21.841797 C 2.0990696 23.087443 3.2446653 23.992188 4.6113281 23.992188 L 17.267578 23.992188 C 18.929578 23.992188 20.267578 22.654187 20.267578 20.992188 C 20.267578 19.330188 18.929578 17.992188 17.267578 17.992188 L 7.7382812 17.992188 L 8.8828125 6 L 19.546875 6 C 21.208875 6 22.546875 4.662 22.546875 3 C 22.546875 1.338 21.208875 0 19.546875 0 L 6.484375 0 C 6.4201955 0 6.3580767 0.0058336146 6.2949219 0.009765625 C 6.2393916 0.0056858294 6.1839178 -0.001373973 6.1289062 -0.001953125 z M 15.328125 8.0390625 A 4 4 0 0 0 11.328125 12.039062 A 4 4 0 0 0 15.328125 16.039062 A 4 4 0 0 0 19.328125 12.039062 A 4 4 0 0 0 15.328125 8.0390625 z " /></svg>
+
+@@ img/phone-classic-white.svg
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="24" height="24" viewBox="0 0 24 24"><path fill="#fff" d="M12,3C7.46,3 3.34,4.78 0.29,7.67C0.11,7.85 0,8.1 0,8.38C0,8.66 0.11,8.91 0.29,9.09L2.77,11.57C2.95,11.75 3.2,11.86 3.5,11.86C3.75,11.86 4,11.75 4.18,11.58C4.97,10.84 5.87,10.22 6.84,9.73C7.17,9.57 7.4,9.23 7.4,8.83V5.73C8.85,5.25 10.39,5 12,5C13.59,5 15.14,5.25 16.59,5.72V8.82C16.59,9.21 16.82,9.56 17.15,9.72C18.13,10.21 19,10.84 19.82,11.57C20,11.75 20.25,11.85 20.5,11.85C20.8,11.85 21.05,11.74 21.23,11.56L23.71,9.08C23.89,8.9 24,8.65 24,8.37C24,8.09 23.88,7.85 23.7,7.67C20.65,4.78 16.53,3 12,3M9,7V10C9,10 3,15 3,18V22H21V18C21,15 15,10 15,10V7H13V9H11V7H9M12,12A4,4 0 0,1 16,16A4,4 0 0,1 12,20A4,4 0 0,1 8,16A4,4 0 0,1 12,12M12,13.5A2.5,2.5 0 0,0 9.5,16A2.5,2.5 0 0,0 12,18.5A2.5,2.5 0 0,0 14.5,16A2.5,2.5 0 0,0 12,13.5Z" /></svg>
+
+@@ partials/_footer_right.html.ep
+<div class="pull-right social text-right">
+<%
+my $sharer_url = $canonical_path;
+%>
+    <a class="button outline primary sharer" href="tel:<%== app->config->{phone_url} %>"
+    title="<%== app->config->{phone_url} %>"><img style="float: left;"
+    src="/img/phone-classic-white.svg" height="24">&nbsp;<%== app->config->{phone_url} %></a><a
+
+    class="button outline primary sharer" target="_blank"
+    href="https://www.facebook.com/share.php?u=<%= $sharer_url %>" rel="noopener"
+    aria-label="Споделяне във Facebook"
+    title="Споделяне във Facebook"><img src="/css/malka/facebook.svg"></a><a
+
+    class="button outline primary sharer" target="_blank"
+    href="https://www.linkedin.com/shareArticle?mini=true&url=<%= $sharer_url %>&title=<%= title %>"
+    aria-label="Споделяне в LinkedIn"
+    title="Споделяне в LinkedIn"><img src="/css/malka/linkedin.svg"></a><a
+
+    class="button outline primary sharer" target="_blank"
+    href="https://twitter.com/intent/tweet?url=<%= $sharer_url %>&via=@kberov&title=<%= title %>"
+    aria-label="Споделяне в Twitter"
+    title="Споделяне в Twitter"><img src="/css/malka/twitter.svg"></a><a
+
+    class="button outline primary sharer" target="_blank"
+    href="mailto:?subject=<%= title %>&body=<%= $sharer_url %>"
+    aria-label="Напишете писмо на приятел"
+    title="Напишете писмо"><img src="/css/malka/email-fast-outline.svg"></a><a
+
+    class="button outline primary sharer" target="_blank"
+    href="tg://msg_url?url=<%= $sharer_url %>&text=<%= title %>"
+    aria-label="Споделяне в Telegram"
+    title="Споделяне в Telegram"><img src="/css/malka/icons8-telegram-app.svg"></a>
+</div>
+
+@@ partials/_gdpr_consent.html.ep
+<%
+# This template is practically the same as _writing.html.ep, but demosntrates a
+# good example how plugins can create their own 'data_type's and use templates
+# to display them on the site. Now if a celina has _gdpr_consent as data_type,
+# it will be rendered using this template. With this simple technique we open
+# the opportunity for content provided by plugins to get seamlesly pluged
+# anywhere in the site, by just chosing the corresponding data_type and
+# providing template for rendering this data_type.
+%>
+<!-- _gdpr_consent -->
+<section class="<%= $celina->{data_type} %>">
+    %= t 'h' . $level => $celina->{title}
+%$celina->{body} .= include 'partials/_created_tstamp';
+%==format_body($celina)
+</section>
+<!-- end _gdpr_consent -->
 
 @@ partials/_kniga.html.ep
 <%
@@ -1497,6 +1568,7 @@ return unless @$variants;
 % for my $b(@$variants) {
 <tr><th></th><td></td></tr>
 <tr><th>ISBN:</th><td><%= $b->{sku} %></td></tr>
+<tr><th>Тегло:</th><td><%= sprintf('%.3f', $b->{properties}{weight}) %> кг.</td></tr>
 <tr><th>Цена:</th><td><%= $b->{properties}{price} . ' лв. за ' . $b->{properties}{variant} %></td></tr>
 % }
 <tr><th>Откъси:</th><td><a class="primary button sharer" title="Изтегляне на откъси" href="<%= 
@@ -1513,23 +1585,6 @@ href="mailto:poruchki@studio-berov.eu?subject=Поръчка: <%=$variants->[0]{
 %$celina->{body} .= include 'partials/_created_tstamp';
 %== format_body($celina)
 </section>
-
-@@ partials/_gdpr_consent.html.ep
-<%
-# This template is practically the same as _writing.html.ep, but demosntrates a
-# good example how plugins can create their own 'data_type's and use templates
-# to display them on the site. Now if a celina has _gdpr_consent as data_type,
-# it will be rendered using this template. With this simple technique we open
-# the oportunity content provided by plugins to get seamlesly pluged anywhere
-# in the site, by just chosing the corresponding data_type.
-%>
-<!-- _gdpr_consent -->
-<section class="<%= $celina->{data_type} %>">
-    %= t 'h' . $level => $celina->{title}
-%$celina->{body} .= include 'partials/_created_tstamp';
-%==format_body($celina)
-</section>
-<!-- end _gdpr_consent -->
 
 @@ resources/data/prodan_migrations.sql
 

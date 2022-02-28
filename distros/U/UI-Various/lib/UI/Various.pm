@@ -70,8 +70,9 @@ graphics and L<Term::Readline> for the input (only Perl core modules)
 
 =item (finally) C<PoorTerm>
 
-a very simple builtin query/response console interface only using the Perl
-core module L<Term::Readline>
+a very simple builtin query/response console interface where nested
+container elements must be selected to interact with something inside; they
+are also simply displayed in sequence without other arrangement
 
 =back
 
@@ -101,6 +102,13 @@ versions prior to 5.20 (see L<perl5200delta>, bugs #7508 and #109726).  The
 only possible (and dirty!) workaround is setting the member of the internal
 hash directly.
 
+Boxes can not have visible borders in L<Curses::UI> as they are currently
+"faked" and do not use a proper L<Curses::UI> element.
+
+Methods, member variables, etc. starting with an underscore (C<_>) are
+considered to be internal only.  Their usage and interfaces may change
+between versions in an incompatible way!
+
 =cut
 
 #########################################################################
@@ -113,7 +121,7 @@ use warnings 'once';
 
 use Carp;			# may only be used in import!
 
-our $VERSION = "0.16";
+our $VERSION = "0.18";
 
 BEGIN  {  require UI::Various::core;  }
 
@@ -389,6 +397,6 @@ under the same terms as Perl itself.  See LICENSE file for more details.
 
 =head1 AUTHOR
 
-Thomas Dorner E<lt>dorner@cpan.orgE<gt>
+Thomas Dorner E<lt>dorner (at) cpan (dot) orgE<gt>
 
 =cut

@@ -16,7 +16,7 @@ UI::Various::toplevel - abstract top-level widget of L<UI::Various>
 =head1 ABSTRACT
 
 This module is the common abstract container class for the top-level UI
- elements C<L<UI::Various::Window>> and C<L<UI::Various::Dialog>>.
+elements C<L<UI::Various::Window>> and C<L<UI::Various::Dialog>>.
 
 =head1 DESCRIPTION
 
@@ -38,7 +38,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.16';
+our $VERSION = '0.18';
 
 use UI::Various::core;
 use UI::Various::container;
@@ -127,6 +127,6 @@ under the same terms as Perl itself.  See LICENSE file for more details.
 
 =head1 AUTHOR
 
-Thomas Dorner E<lt>dorner@cpan.orgE<gt>
+Thomas Dorner E<lt>dorner (at) cpan (dot) orgE<gt>
 
 =cut

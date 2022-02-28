@@ -1,3 +1,8 @@
+0.156   2022-02-26  Released-By: PERLANCAR; Urgency: high
+
+        - Update to new URL and HTML page.
+
+
 0.155   2021-02-01  Released-By: PERLANCAR; Urgency: medium
 
 	- Avoid Mojo::UserAgent deprecation warning (success() is deprecated).

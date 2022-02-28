@@ -91,12 +91,33 @@ sub accept_nested_for {
   );
 
   my @existing = @{$class->_nested};
+  my %m2m_names = map { $_=>1 } keys %{ $class->_m2m_metadata ||+{} };
+
   my $changed = 0;
   while(my $attribute = shift) {
     my $config = (ref($_[0])||'') eq 'HASH' ? shift : +{};    
     push @existing, $attribute;
     push @existing, +{ %default_config, %$config };
     $changed = 1;
+
+    ## Handed m2m, ugg
+    if($m2m_names{$attribute}) {
+      # treat it like a set
+      $class->validates($attribute => (result_set=>+{validations=>1} ));
+      next;
+    }
+
+    ## Add validation
+    my $rel_data = $class->relationship_info($attribute);
+
+    die "'$attribute' does not seem to be a relationship. There's a typo in your source or you've placed your 'accept_nested_for' statement before the relationship it's associated with (has_many, belongs_to, etc)." unless $rel_data;
+
+    my $rel_type = $rel_data->{attrs}{accessor};    
+    if($rel_type eq 'single') {
+      $class->validates($attribute => (result=>+{validations=>1} ));
+    } else {
+      $class->validates($attribute => (result_set=>+{validations=>1} ));
+    }
   }
   $class->_nested(\@existing) if $changed;
   
@@ -114,7 +135,7 @@ sub insert {
   if( (ref($args[0])||'') eq 'HASH') {
     my $ctx = delete($args[0]->{__context})||[];
     my @ctx = ref($ctx)||'' eq 'ARRAY' ? @$ctx : ($ctx);
-    push @context, @ctx unless grep { $_ eq 'update' } @context;
+    push @context, @ctx unless grep { $_ eq 'update' } @context;  ## ?? IS this a bug?  Why update
   }
 
   $args{context} = \@context;
@@ -133,7 +154,9 @@ sub insert {
     debug 2, "Skipping insert for @{[$self]} because its probably and _add";
     return $self;
   }
-  return $self->next::method(@args);
+  my $ret = $self->next::method(@args);
+  # TODO could probably do the merge errors from related here
+  return $ret;
 }
 
 sub _nested_info_for_related {
@@ -451,6 +474,7 @@ sub set_from_params_recursively {
         if($params{$param}) {
           debug 3, "Found _nop";
           delete $params{$param};
+          $self->mark_for_deletion;
         }
     } elsif($param eq '_restore' && $params{$param}) {
       if($self->in_storage) {
@@ -751,6 +775,9 @@ sub set_multi_related_from_params {
     push @related_models, $related_model;
   }
 
+  # This bit we diff between the rows loaded in the orignal cache and what it looks
+  # like after the multi update.   Rows that are no longer present are marked for
+  # deletion if deletion is allowed
   my @new_pks =  map {
     my $r = $_; 
     +{
@@ -775,7 +802,7 @@ sub set_multi_related_from_params {
     if($current->in_storage) {
       debug 2, "Marking $current for deletion";
       $current->{__valiant_allow_destroy} = 1 if $allow_destroy;
-      $current->mark_for_deletion;
+      $current->mark_for_deletion;  # might be a good idea to find a way to expose this via an override-able method
 
       # Mark its children as pruned, recursively
       my $cb; $cb = sub {
@@ -797,7 +824,12 @@ sub set_multi_related_from_params {
       $cb->($current) if $current->is_marked_for_deletion; # We check because 'mark_for_deletion' will skip unless 'allow_destroy' is set
     }
 
-    push @related_models, $current if $current->in_storage; # don't preserve unsaved previous
+    if ($current->in_storage) {
+      debug 3, "Current model is in storage so put it into cache";
+      push @related_models, $current;
+    } else {
+      debug 3, "Current model is not in storage so don't bother to cache it since its marked for delete anyway";
+    }
   }
 
   debug 3, "About to save cache for @{[ ref $self ]} related resultset $related; has @{[ scalar @related_models ]} models to cache";
@@ -1161,6 +1193,10 @@ Or just add to your base Result class
 
 =head1 DESCRIPTION
 
+Glue L<Valiant> validations into your DBIC result sources.   This package just has some basic
+API level docs, you should see L<DBIx::Class::Valiant> for a somewhat more detailed documentation
+and examples.
+
 =head1 CONTEXTS
 
 When doing an insert / create on a result, we automatically add a 'create' context which you
@@ -1225,6 +1261,12 @@ deleted and a new one inserted.  Default is false.
 
 Generally we only try to find a matching row in the DB if a primary key is given.   If you set 
 this to true then we also try to match using and unique keys establish for the related row.
+
+=back
+
+B<NOTE> Recursion warning!  You cannot currently C<accept_nested_for> for a relationship
+whose target result source is setting C<accept_nested_for> into yourself.   This is probably
+fixable, patches and use cases welcomed!
 
 =head1 METHODS
 

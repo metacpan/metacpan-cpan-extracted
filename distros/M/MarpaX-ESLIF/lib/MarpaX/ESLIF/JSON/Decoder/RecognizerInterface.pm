@@ -6,7 +6,7 @@ use Carp qw/croak/;
 
 # ABSTRACT: MarpaX::ESLIF::JSON Recognizer Interface
 
-our $VERSION = '6.0.13'; # VERSION
+our $VERSION = '6.0.14'; # VERSION
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
@@ -119,7 +119,7 @@ MarpaX::ESLIF::JSON::Decoder::RecognizerInterface - MarpaX::ESLIF::JSON Recogniz
 
 =head1 VERSION
 
-version 6.0.13
+version 6.0.14
 
 =head1 SYNOPSIS
 

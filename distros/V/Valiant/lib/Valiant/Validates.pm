@@ -62,6 +62,10 @@ sub has_errors {
   return shift->errors->size ? 1:0; 
 }
 
+sub no_errors {
+  return !shift->has_errors;
+}
+
 has 'validated' => (is=>'rw', required=>1, init_args=>undef, default=>0);
 has 'skip_validation' =>  (is=>'rw', required=>1, init_args=>undef, default=>0);
 has '_context' => (is=>'rw', required=>0, predicate=>'has_context');
@@ -332,13 +336,24 @@ sub validate {
   $self->{_inprocess} =1;
 
   $self->clear_validated if $self->validated;
+  $self->_run_validations(%args);
+  $self->_run_post_validations(%args);
+  $self->validated(1);
+  delete $self->{_inprocess};
+  return $self;
+}
+
+sub _run_validations {
+  my ($self, %args) = @_;
   foreach my $validation ($self->validations) {
     my %validation_args = (%{$validation->[1]}, %args);
     $validation->[0]($self, \%validation_args);
   }
-  $self->validated(1);
-  delete $self->{_inprocess};
-  return $self;
+}
+
+sub _run_post_validations {
+  my ($self, %args) = @_;
+  return;
 }
 
 sub inject_attribute {

@@ -47,11 +47,11 @@ files without touching the file system.
 
 =head1 VERSION
 
-Version 0.030
+Version 0.032
 
 =cut
 
-our $VERSION = '0.030';
+our $VERSION = '0.032';
 
 our %files_being_mocked;
 
@@ -273,6 +273,7 @@ sub file_arg_position_for_command {    # can also be used by user hooks
         'stat'     => 0,
         'sysopen'  => 1,
         'unlink'   => 0,
+        'readdir'  => 0,
     };
 
     return -1 unless defined $command && defined $_file_arg_post->{$command};
@@ -502,6 +503,9 @@ sub _strict_mode_violation {
 
     return unless is_strict_mode();
 
+    # These commands deal with dir handles we should have already been in violation when we opened the thing originally.
+    return if grep { $command eq $_ } qw/readdir telldir rewinddir seekdir closedir/;
+
     my @stack = _get_stack();
     return unless scalar @stack;    # skip the package
 
@@ -516,6 +520,13 @@ sub _strict_mode_violation {
 
     # Ignore stats on STDIN, STDOUT, STDERR
     return if defined $filename && $filename =~ m/^\*?(?:main::)?[<*&+>]*STD(?:OUT|IN|ERR)$/;
+
+    # The filename passed is actually a handle. This means we don't have to check if
+    # it's a violation since something else should have opened it first.
+    return if UNIVERSAL::isa( $filename, 'GLOB' );
+
+    # open >& is for file dups. this isn't a real file access.
+    return if $command eq 'open' && $at_under_ref->[1] && $at_under_ref->[1] =~ m/&/;
 
     my $path = _abs_path_to_file($filename);
 

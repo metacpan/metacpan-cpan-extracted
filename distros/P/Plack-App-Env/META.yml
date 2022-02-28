@@ -3,7 +3,6 @@ abstract: 'Plack env dump application.'
 author:
   - 'Michal Josef Spacek <skim@cpan.org>'
 build_requires:
-  CPAN::Version: 0
   Error::Pure: 0
   ExtUtils::MakeMaker: 6.59
   File::Object: 0
@@ -34,4 +33,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Plack-App-Env
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Plack-App-Env
-version: '0.07'
+version: '0.08'

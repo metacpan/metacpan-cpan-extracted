@@ -77,8 +77,9 @@ sub import_error {
   my ($self, $error, $options) = @_;
   $self->errors->push(
     Valiant::NestedError->new(
-      object => $self->object,
       inner_error => $error,
+      object => $error->object,
+      attribute => $error->attribute,
       %{ $options||+{} },
     )
   );
@@ -227,16 +228,7 @@ sub add {
   }
   $options ||= +{};
   ($attribute, $type, $options) = $self->_normalize_arguments($attribute, $type, $options);
-
-  my $error = $self->error_class
-    ->new(
-      object => $self->object,
-      attribute => $attribute,
-      type => $type,
-      i18n => $self->i18n,
-      options => $options,
-    );
-
+  my $error = $self->build_error($attribute, $type, $options);
   if(my $exception = $options->{strict}) {
     my $message = $error->full_message;
     throw_exception('Strict' => (msg=>$message)) if $exception =~m/^\d+$/ && $exception == 1;
@@ -247,6 +239,18 @@ sub add {
  
   $self->errors->push($error);
   return $error;
+}
+
+sub build_error {
+  my ($self, $attribute, $type, $options) = @_;
+  return my $error = $self->error_class
+    ->new(
+      object => $self->object,
+      attribute => $attribute,
+      type => $type,
+      i18n => $self->i18n,
+      options => $options,
+    );
 }
 
 # Returns +true+ if an error on the attribute with the given message is
@@ -435,7 +439,7 @@ Iterates through each error key, value pair in the error messages hash.
 Yields the attribute and the error for that attribute. If the attribute
 has more than one error message, yields once for each error message.
 
-    $object->errors->each*(sub {
+    $object->errors->each(sub {
       my ($attribute, $message) = @_;
     });
 

@@ -34,7 +34,7 @@ sub validate_each {
   my ($self, $record, $attribute, $value, $options) = @_;
 
   unless(ref($value) and (ref($value) eq 'ARRAY')) {
-    $record->errors->add($attribute, $self->not_array_msg, $options);
+    $record->errors->add($attribute, $self->not_array_err, $options);
     return;
   }
 

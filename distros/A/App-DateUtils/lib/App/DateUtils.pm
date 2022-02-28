@@ -1,13 +1,13 @@
 package App::DateUtils;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-30'; # DATE
-our $DIST = 'App-DateUtils'; # DIST
-our $VERSION = '0.126'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-09-06'; # DATE
+our $DIST = 'App-DateUtils'; # DIST
+our $VERSION = '0.127'; # VERSION
 
 our %SPEC;
 
@@ -48,8 +48,8 @@ my %all_modules_arg = (
 );
 
 my @parse_date_modules = (
-    'DateTime::Format::Alami::EN',
-    'DateTime::Format::Alami::ID',
+    #'DateTime::Format::Alami::EN',
+    #'DateTime::Format::Alami::ID',
     'DateTime::Format::Flexible',
     'DateTime::Format::Flexible(de)',
     'DateTime::Format::Flexible(es)',
@@ -59,8 +59,8 @@ my @parse_date_modules = (
 );
 
 my @parse_duration_modules = (
-    'DateTime::Format::Alami::EN',
-    'DateTime::Format::Alami::ID',
+    #'DateTime::Format::Alami::EN',
+    #'DateTime::Format::Alami::ID',
     'DateTime::Format::Natural',
     'Time::Duration::Parse',
 );
@@ -85,6 +85,8 @@ $SPEC{parse_date} = {
     ],
 };
 sub parse_date {
+    require DateTime::Format::ISO8601::Format;
+
     my %args = @_;
 
     my %mods; # val = 1 if installed
@@ -151,6 +153,8 @@ sub parse_date {
                     $rec->{is_parseable} = 1;
                     $rec->{as_epoch} = $res->{epoch};
                     $rec->{as_datetime_obj} = "$res->{DateTime}";
+                    $rec->{as_datetime_obj_tz_local} = DateTime::Format::ISO8601::Format->new->format_datetime($res->{DateTime}->set_time_zone("local"));
+                    $rec->{as_datetime_obj_tz_utc}   = DateTime::Format::ISO8601::Format->new->format_datetime($res->{DateTime}->set_time_zone("UTC"));
                     $rec->{pattern} = $res->{pattern};
                 }
             } elsif ($mod =~ /^DateTime::Format::Flexible/) {
@@ -166,6 +170,8 @@ sub parse_date {
                     $rec->{is_parseable} = 1;
                     $rec->{as_epoch} = $dt->epoch;
                     $rec->{as_datetime_obj} = "$dt";
+                    $rec->{as_datetime_obj_tz_local} = DateTime::Format::ISO8601::Format->new->format_datetime($dt->set_time_zone("local"));
+                    $rec->{as_datetime_obj_tz_utc}   = DateTime::Format::ISO8601::Format->new->format_datetime($dt->set_time_zone("UTC"));
                 } else {
                     $err =~ s/\n/ /g;
                     $rec->{is_parseable} = 0;
@@ -177,6 +183,8 @@ sub parse_date {
                     $rec->{is_parseable} = 1;
                     $rec->{as_epoch} = $dt->epoch;
                     $rec->{as_datetime_obj} = "$dt";
+                    $rec->{as_datetime_obj_tz_local} = DateTime::Format::ISO8601::Format->new->format_datetime($dt->set_time_zone("local"));
+                    $rec->{as_datetime_obj_tz_utc}   = DateTime::Format::ISO8601::Format->new->format_datetime($dt->set_time_zone("UTC"));
                 } else {
                     $rec->{is_parseable} = 0;
                     $rec->{error_msg} = $parser->error;
@@ -186,7 +194,10 @@ sub parse_date {
                 if (defined $time) {
                     $rec->{is_parseable} = 1;
                     $rec->{as_epoch} = $time;
-                    $rec->{as_datetime_obj} = do { my $dt = DateTime->from_epoch(epoch => $time); "$dt" };
+                    my $dt = DateTime->from_epoch(epoch => $time);
+                    $rec->{as_datetime_obj} = "$dt";
+                    $rec->{as_datetime_obj_tz_local} = DateTime::Format::ISO8601::Format->new->format_datetime($dt->set_time_zone("local"));
+                    $rec->{as_datetime_obj_tz_utc}   = DateTime::Format::ISO8601::Format->new->format_datetime($dt->set_time_zone("UTC"));
                 } else {
                     $rec->{is_parseable} = 0;
                 }
@@ -196,7 +207,7 @@ sub parse_date {
         } # for dates
     } # for mods
 
-    [200, "OK", \@res, {'table.fields'=>[qw/module original is_parseable as_epoch as_datetime_obj error_msg/]}];
+    [200, "OK", \@res, {'table.fields'=>[qw/module original is_parseable as_epoch as_datetime_obj as_datetime_obj_tz_local as_datetime_obj_tz_utc error_msg/]}];
 }
 
 $SPEC{parse_date_using_df_flexible} = {
@@ -798,7 +809,7 @@ App::DateUtils - An assortment of date-/time-related CLI utilities
 
 =head1 VERSION
 
-This document describes version 0.126 of App::DateUtils (from Perl distribution App-DateUtils), released on 2020-03-30.
+This document describes version 0.127 of App::DateUtils (from Perl distribution App-DateUtils), released on 2021-09-06.
 
 =head1 SYNOPSIS
 
@@ -856,7 +867,7 @@ Examples:
 
 =item * Convert "today" to epoch:
 
- dateconv(date => "today"); # -> [200, "OK", 1585526400]
+ dateconv(date => "today"); # -> 1630886400
 
 =item * Convert epoch to ymd:
 
@@ -876,15 +887,11 @@ Examples:
 
 Result:
 
- [
-   200,
-   "OK",
-   {
-     epoch => 1585530643,
-     iso8601 => "2020-03-30T01:10:43Z",
-     ymd => "2020-03-30",
-   },
- ]
+ {
+   epoch => 1630934937,
+   iso8601 => "2021-09-06T13:28:57Z",
+   ymd => "2021-09-06",
+ }
 
 =back
 
@@ -919,7 +926,7 @@ Examples:
 
 =item * Example #1:
 
- datediff( date1 => "2019-06-18T20:08:42", date2 => "2019-06-19T06:02:03"); # -> "PT9H53M21S"
+ datediff(date1 => "2019-06-18T20:08:42", date2 => "2019-06-19T06:02:03"); # -> "PT9H53M21S"
 
 =item * Example #2:
 
@@ -1004,15 +1011,11 @@ Examples:
 
 Result:
 
- [
-   200,
-   "OK",
-   {
-     hash    => { hours => 3, minutes => 2 },
-     iso8601 => "PT3H2M",
-     secs    => 10920,
-   },
- ]
+ {
+   hash    => { hours => 3, minutes => 2 },
+   iso8601 => "PT3H2M",
+   secs    => 10920,
+ }
 
 =back
 
@@ -1037,7 +1040,7 @@ Return value:  (any)
 
 Usage:
 
- parse_date(%args) -> [status, msg, payload, meta]
+ parse_date(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Parse date string(s) using one of several modules.
 
@@ -1047,30 +1050,50 @@ Examples:
 
 =item * Example #1:
 
- parse_date( dates => ["23 sep 2015", "tomorrow", "foo"]);
+ parse_date(dates => ["23 sep 2015", "tomorrow", "foo"]);
 
 Result:
 
  [
+   200,
+   "OK",
+   [
+     {
+       module => "DateTime::Format::Flexible",
+       original => "23 sep 2015",
+       is_parseable => 1,
+       as_epoch => 1442966400,
+       as_datetime_obj => "2015-09-23T00:00:00",
+       as_datetime_obj_tz_local => "2015-09-23T00:00:00+07:00",
+       as_datetime_obj_tz_utc => "2015-09-22T17:00:00Z",
+     },
+     {
+       module => "DateTime::Format::Flexible",
+       original => "tomorrow",
+       is_parseable => 1,
+       as_epoch => 1630972800,
+       as_datetime_obj => "2021-09-07T00:00:00",
+       as_datetime_obj_tz_local => "2021-09-07T00:00:00+07:00",
+       as_datetime_obj_tz_utc => "2021-09-06T17:00:00Z",
+     },
+     {
+       module       => "DateTime::Format::Flexible",
+       original     => "foo",
+       is_parseable => 0,
+       error_msg    => "Invalid date format: foo at /home/u1/perl5/perlbrew/perls/perl-5.34.0/lib/site_perl/5.34.0/Perinci/Access.pm line 81. ",
+     },
+   ],
    {
-     module          => "DateTime::Format::Flexible",
-     original        => "23 sep 2015",
-     is_parseable    => 1,
-     as_epoch        => 1442966400,
-     as_datetime_obj => "2015-09-23T00:00:00",
-   },
-   {
-     module          => "DateTime::Format::Flexible",
-     original        => "tomorrow",
-     is_parseable    => 1,
-     as_epoch        => 1585612800,
-     as_datetime_obj => "2020-03-31T00:00:00",
-   },
-   {
-     module       => "DateTime::Format::Flexible",
-     original     => "foo",
-     is_parseable => 0,
-     error_msg    => "Invalid date format: foo at /home/u1/perl5/perlbrew/perls/perl-5.30.0/lib/site_perl/5.30.0/Perinci/Access.pm line 81. ",
+     "table.fields" => [
+       "module",
+       "original",
+       "is_parseable",
+       "as_epoch",
+       "as_datetime_obj",
+       "as_datetime_obj_tz_local",
+       "as_datetime_obj_tz_utc",
+       "error_msg",
+     ],
    },
  ]
 
@@ -1097,12 +1120,12 @@ Parse using all installed modules and return all the result at once.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -1112,7 +1135,7 @@ Return value:  (any)
 
 Usage:
 
- parse_date_using_df_alami_en(%args) -> [status, msg, payload, meta]
+ parse_date_using_df_alami_en(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Parse date string(s) using DateTime::Format::Alami::EN.
 
@@ -1127,13 +1150,31 @@ Examples:
 Result:
 
  [
+   200,
+   "OK",
+   [
+     {
+       module => "DateTime::Format::Alami::EN",
+       original => "23 May",
+       is_parseable => 1,
+       as_epoch => 1621728000,
+       as_datetime_obj => "2021-05-23T00:00:00",
+       as_datetime_obj_tz_local => "2021-05-23T07:00:00+07:00",
+       as_datetime_obj_tz_utc => "2021-05-23T00:00:00Z",
+       pattern => "p_dateymd",
+     },
+   ],
    {
-     module          => "DateTime::Format::Alami::EN",
-     original        => "23 May",
-     is_parseable    => 1,
-     as_epoch        => 1590192000,
-     as_datetime_obj => "2020-05-23T00:00:00",
-     pattern         => "p_dateymd",
+     "table.fields" => [
+       "module",
+       "original",
+       "is_parseable",
+       "as_epoch",
+       "as_datetime_obj",
+       "as_datetime_obj_tz_local",
+       "as_datetime_obj_tz_utc",
+       "error_msg",
+     ],
    },
  ]
 
@@ -1144,10 +1185,26 @@ Result:
 Result:
 
  [
+   200,
+   "OK",
+   [
+     {
+       module => "DateTime::Format::Alami::EN",
+       original => "foo",
+       is_parseable => 0,
+     },
+   ],
    {
-     module => "DateTime::Format::Alami::EN",
-     original => "foo",
-     is_parseable => 0,
+     "table.fields" => [
+       "module",
+       "original",
+       "is_parseable",
+       "as_epoch",
+       "as_datetime_obj",
+       "as_datetime_obj_tz_local",
+       "as_datetime_obj_tz_utc",
+       "error_msg",
+     ],
    },
  ]
 
@@ -1168,12 +1225,12 @@ Arguments ('*' denotes required arguments):
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -1183,7 +1240,7 @@ Return value:  (any)
 
 Usage:
 
- parse_date_using_df_alami_id(%args) -> [status, msg, payload, meta]
+ parse_date_using_df_alami_id(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Parse date string(s) using DateTime::Format::Alami::ID.
 
@@ -1198,13 +1255,31 @@ Examples:
 Result:
 
  [
+   200,
+   "OK",
+   [
+     {
+       module => "DateTime::Format::Alami::ID",
+       original => "23 Mei",
+       is_parseable => 1,
+       as_epoch => 1621728000,
+       as_datetime_obj => "2021-05-23T00:00:00",
+       as_datetime_obj_tz_local => "2021-05-23T07:00:00+07:00",
+       as_datetime_obj_tz_utc => "2021-05-23T00:00:00Z",
+       pattern => "p_dateymd",
+     },
+   ],
    {
-     module          => "DateTime::Format::Alami::ID",
-     original        => "23 Mei",
-     is_parseable    => 1,
-     as_epoch        => 1590192000,
-     as_datetime_obj => "2020-05-23T00:00:00",
-     pattern         => "p_dateymd",
+     "table.fields" => [
+       "module",
+       "original",
+       "is_parseable",
+       "as_epoch",
+       "as_datetime_obj",
+       "as_datetime_obj_tz_local",
+       "as_datetime_obj_tz_utc",
+       "error_msg",
+     ],
    },
  ]
 
@@ -1215,10 +1290,26 @@ Result:
 Result:
 
  [
+   200,
+   "OK",
+   [
+     {
+       module => "DateTime::Format::Alami::ID",
+       original => "foo",
+       is_parseable => 0,
+     },
+   ],
    {
-     module => "DateTime::Format::Alami::ID",
-     original => "foo",
-     is_parseable => 0,
+     "table.fields" => [
+       "module",
+       "original",
+       "is_parseable",
+       "as_epoch",
+       "as_datetime_obj",
+       "as_datetime_obj_tz_local",
+       "as_datetime_obj_tz_utc",
+       "error_msg",
+     ],
    },
  ]
 
@@ -1239,12 +1330,12 @@ Arguments ('*' denotes required arguments):
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -1254,7 +1345,7 @@ Return value:  (any)
 
 Usage:
 
- parse_date_using_df_flexible(%args) -> [status, msg, payload, meta]
+ parse_date_using_df_flexible(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Parse date string(s) using DateTime::Format::Flexible.
 
@@ -1269,12 +1360,30 @@ Examples:
 Result:
 
  [
+   200,
+   "OK",
+   [
+     {
+       module => "DateTime::Format::Flexible",
+       original => "23rd Jun",
+       is_parseable => 1,
+       as_epoch => 1624406400,
+       as_datetime_obj => "2021-06-23T00:00:00",
+       as_datetime_obj_tz_local => "2021-06-23T00:00:00+07:00",
+       as_datetime_obj_tz_utc => "2021-06-22T17:00:00Z",
+     },
+   ],
    {
-     module          => "DateTime::Format::Flexible",
-     original        => "23rd Jun",
-     is_parseable    => 1,
-     as_epoch        => 1592870400,
-     as_datetime_obj => "2020-06-23T00:00:00",
+     "table.fields" => [
+       "module",
+       "original",
+       "is_parseable",
+       "as_epoch",
+       "as_datetime_obj",
+       "as_datetime_obj_tz_local",
+       "as_datetime_obj_tz_utc",
+       "error_msg",
+     ],
    },
  ]
 
@@ -1285,12 +1394,30 @@ Result:
 Result:
 
  [
+   200,
+   "OK",
+   [
+     {
+       module => "DateTime::Format::Flexible(de)",
+       original => "23 Dez",
+       is_parseable => 1,
+       as_epoch => 1640217600,
+       as_datetime_obj => "2021-12-23T00:00:00",
+       as_datetime_obj_tz_local => "2021-12-23T00:00:00+07:00",
+       as_datetime_obj_tz_utc => "2021-12-22T17:00:00Z",
+     },
+   ],
    {
-     module          => "DateTime::Format::Flexible(de)",
-     original        => "23 Dez",
-     is_parseable    => 1,
-     as_epoch        => 1608681600,
-     as_datetime_obj => "2020-12-23T00:00:00",
+     "table.fields" => [
+       "module",
+       "original",
+       "is_parseable",
+       "as_epoch",
+       "as_datetime_obj",
+       "as_datetime_obj_tz_local",
+       "as_datetime_obj_tz_utc",
+       "error_msg",
+     ],
    },
  ]
 
@@ -1301,11 +1428,27 @@ Result:
 Result:
 
  [
+   200,
+   "OK",
+   [
+     {
+       module       => "DateTime::Format::Flexible",
+       original     => "foo",
+       is_parseable => 0,
+       error_msg    => "Invalid date format: foo at /home/u1/perl5/perlbrew/perls/perl-5.34.0/lib/site_perl/5.34.0/Perinci/Access.pm line 81. ",
+     },
+   ],
    {
-     module       => "DateTime::Format::Flexible",
-     original     => "foo",
-     is_parseable => 0,
-     error_msg    => "Invalid date format: foo at /home/u1/perl5/perlbrew/perls/perl-5.30.0/lib/site_perl/5.30.0/Perinci/Access.pm line 81. ",
+     "table.fields" => [
+       "module",
+       "original",
+       "is_parseable",
+       "as_epoch",
+       "as_datetime_obj",
+       "as_datetime_obj_tz_local",
+       "as_datetime_obj_tz_utc",
+       "error_msg",
+     ],
    },
  ]
 
@@ -1328,12 +1471,12 @@ Arguments ('*' denotes required arguments):
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -1343,7 +1486,7 @@ Return value:  (any)
 
 Usage:
 
- parse_date_using_df_natural(%args) -> [status, msg, payload, meta]
+ parse_date_using_df_natural(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Parse date string(s) using DateTime::Format::Natural.
 
@@ -1358,12 +1501,30 @@ Examples:
 Result:
 
  [
+   200,
+   "OK",
+   [
+     {
+       module => "DateTime::Format::Natural",
+       original => "23rd Jun",
+       is_parseable => 1,
+       as_epoch => 1624406400,
+       as_datetime_obj => "2021-06-23T00:00:00",
+       as_datetime_obj_tz_local => "2021-06-23T00:00:00+07:00",
+       as_datetime_obj_tz_utc => "2021-06-22T17:00:00Z",
+     },
+   ],
    {
-     module          => "DateTime::Format::Natural",
-     original        => "23rd Jun",
-     is_parseable    => 1,
-     as_epoch        => 1592870400,
-     as_datetime_obj => "2020-06-23T00:00:00",
+     "table.fields" => [
+       "module",
+       "original",
+       "is_parseable",
+       "as_epoch",
+       "as_datetime_obj",
+       "as_datetime_obj_tz_local",
+       "as_datetime_obj_tz_utc",
+       "error_msg",
+     ],
    },
  ]
 
@@ -1374,11 +1535,27 @@ Result:
 Result:
 
  [
+   200,
+   "OK",
+   [
+     {
+       module       => "DateTime::Format::Natural",
+       original     => "foo",
+       is_parseable => 0,
+       error_msg    => "'foo' does not parse (perhaps you have some garbage?)",
+     },
+   ],
    {
-     module       => "DateTime::Format::Natural",
-     original     => "foo",
-     is_parseable => 0,
-     error_msg    => "'foo' does not parse (perhaps you have some garbage?)",
+     "table.fields" => [
+       "module",
+       "original",
+       "is_parseable",
+       "as_epoch",
+       "as_datetime_obj",
+       "as_datetime_obj_tz_local",
+       "as_datetime_obj_tz_utc",
+       "error_msg",
+     ],
    },
  ]
 
@@ -1399,12 +1576,12 @@ Arguments ('*' denotes required arguments):
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -1414,7 +1591,7 @@ Return value:  (any)
 
 Usage:
 
- parse_duration(%args) -> [status, msg, payload, meta]
+ parse_duration(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Parse duration string(s) using one of several modules.
 
@@ -1437,12 +1614,12 @@ Parse using all installed modules and return all the result at once.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -1452,7 +1629,7 @@ Return value:  (any)
 
 Usage:
 
- parse_duration_using_df_alami_en(%args) -> [status, msg, payload, meta]
+ parse_duration_using_df_alami_en(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Parse duration string(s) using DateTime::Format::Alami::EN.
 
@@ -1467,12 +1644,26 @@ Examples:
 Result:
 
  [
+   200,
+   "OK",
+   [
+     {
+       module       => "DateTime::Format::Alami::EN",
+       original     => "2h, 3mins",
+       is_parseable => 1,
+       as_secs      => 7380,
+       as_dtdur_obj => "PT2H3M",
+     },
+   ],
    {
-     module       => "DateTime::Format::Alami::EN",
-     original     => "2h, 3mins",
-     is_parseable => 1,
-     as_secs      => 7380,
-     as_dtdur_obj => "PT2H3M",
+     "table.fields" => [
+       "module",
+       "original",
+       "is_parseable",
+       "as_secs",
+       "as_dtdur_obj",
+       "error_msg",
+     ],
    },
  ]
 
@@ -1483,10 +1674,24 @@ Result:
 Result:
 
  [
+   200,
+   "OK",
+   [
+     {
+       module => "DateTime::Format::Alami::EN",
+       original => "foo",
+       is_parseable => 0,
+     },
+   ],
    {
-     module => "DateTime::Format::Alami::EN",
-     original => "foo",
-     is_parseable => 0,
+     "table.fields" => [
+       "module",
+       "original",
+       "is_parseable",
+       "as_secs",
+       "as_dtdur_obj",
+       "error_msg",
+     ],
    },
  ]
 
@@ -1505,12 +1710,12 @@ Arguments ('*' denotes required arguments):
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -1520,7 +1725,7 @@ Return value:  (any)
 
 Usage:
 
- parse_duration_using_df_alami_id(%args) -> [status, msg, payload, meta]
+ parse_duration_using_df_alami_id(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Parse duration string(s) using DateTime::Format::Alami::ID.
 
@@ -1535,12 +1740,26 @@ Examples:
 Result:
 
  [
+   200,
+   "OK",
+   [
+     {
+       module       => "DateTime::Format::Alami::ID",
+       original     => "2j, 3mnt",
+       is_parseable => 1,
+       as_secs      => 7380,
+       as_dtdur_obj => "PT2H3M",
+     },
+   ],
    {
-     module       => "DateTime::Format::Alami::ID",
-     original     => "2j, 3mnt",
-     is_parseable => 1,
-     as_secs      => 7380,
-     as_dtdur_obj => "PT2H3M",
+     "table.fields" => [
+       "module",
+       "original",
+       "is_parseable",
+       "as_secs",
+       "as_dtdur_obj",
+       "error_msg",
+     ],
    },
  ]
 
@@ -1551,10 +1770,24 @@ Result:
 Result:
 
  [
+   200,
+   "OK",
+   [
+     {
+       module => "DateTime::Format::Alami::ID",
+       original => "foo",
+       is_parseable => 0,
+     },
+   ],
    {
-     module => "DateTime::Format::Alami::ID",
-     original => "foo",
-     is_parseable => 0,
+     "table.fields" => [
+       "module",
+       "original",
+       "is_parseable",
+       "as_secs",
+       "as_dtdur_obj",
+       "error_msg",
+     ],
    },
  ]
 
@@ -1573,12 +1806,12 @@ Arguments ('*' denotes required arguments):
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -1588,7 +1821,7 @@ Return value:  (any)
 
 Usage:
 
- parse_duration_using_df_natural(%args) -> [status, msg, payload, meta]
+ parse_duration_using_df_natural(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Parse duration string(s) using DateTime::Format::Natural.
 
@@ -1603,14 +1836,28 @@ Examples:
 Result:
 
  [
+   200,
+   "OK",
+   [
+     {
+       module => "DateTime::Format::Natural",
+       original => "for 2 weeks",
+       is_parseable => 1,
+       as_secs => 1209600,
+       as_dtdur_obj => "P14D",
+       date1 => "2021-09-06T13:28:57",
+       date2 => "2021-09-20T13:28:57",
+     },
+   ],
    {
-     module => "DateTime::Format::Natural",
-     original => "for 2 weeks",
-     is_parseable => 1,
-     as_secs => 1209600,
-     as_dtdur_obj => "P14D",
-     date2 => "2020-04-13T01:10:43",
-     date1 => "2020-03-30T01:10:43",
+     "table.fields" => [
+       "module",
+       "original",
+       "is_parseable",
+       "as_secs",
+       "as_dtdur_obj",
+       "error_msg",
+     ],
    },
  ]
 
@@ -1621,14 +1868,28 @@ Result:
 Result:
 
  [
+   200,
+   "OK",
+   [
+     {
+       module => "DateTime::Format::Natural",
+       original => "from 23 Jun to 29 Jun",
+       is_parseable => 1,
+       as_secs => 5912937,
+       as_dtdur_obj => "P2M7DT13H28M57S",
+       date1 => "2021-09-06T13:28:57",
+       date2 => "2021-06-29T00:00:00",
+     },
+   ],
    {
-     module => "DateTime::Format::Natural",
-     original => "from 23 Jun to 29 Jun",
-     is_parseable => 1,
-     as_secs => 7847357,
-     as_dtdur_obj => "P2M29DT22H49M17S",
-     date1 => "2020-03-30T01:10:43",
-     date2 => "2020-06-29T00:00:00",
+     "table.fields" => [
+       "module",
+       "original",
+       "is_parseable",
+       "as_secs",
+       "as_dtdur_obj",
+       "error_msg",
+     ],
    },
  ]
 
@@ -1639,11 +1900,25 @@ Result:
 Result:
 
  [
+   200,
+   "OK",
+   [
+     {
+       module       => "DateTime::Format::Natural",
+       original     => "foo",
+       is_parseable => 0,
+       error_msg    => "'foo' does not parse (perhaps you have some garbage?)",
+     },
+   ],
    {
-     module       => "DateTime::Format::Natural",
-     original     => "foo",
-     is_parseable => 0,
-     error_msg    => "'foo' does not parse (perhaps you have some garbage?)",
+     "table.fields" => [
+       "module",
+       "original",
+       "is_parseable",
+       "as_secs",
+       "as_dtdur_obj",
+       "error_msg",
+     ],
    },
  ]
 
@@ -1662,12 +1937,12 @@ Arguments ('*' denotes required arguments):
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -1677,7 +1952,7 @@ Return value:  (any)
 
 Usage:
 
- parse_duration_using_td_parse(%args) -> [status, msg, payload, meta]
+ parse_duration_using_td_parse(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Parse duration string(s) using Time::Duration::Parse.
 
@@ -1692,11 +1967,25 @@ Examples:
 Result:
 
  [
+   200,
+   "OK",
+   [
+     {
+       module       => "Time::Duration::Parse",
+       original     => "2 days 13 hours",
+       is_parseable => 1,
+       as_secs      => 219600,
+     },
+   ],
    {
-     module       => "Time::Duration::Parse",
-     original     => "2 days 13 hours",
-     is_parseable => 1,
-     as_secs      => 219600,
+     "table.fields" => [
+       "module",
+       "original",
+       "is_parseable",
+       "as_secs",
+       "as_dtdur_obj",
+       "error_msg",
+     ],
    },
  ]
 
@@ -1707,11 +1996,25 @@ Result:
 Result:
 
  [
+   200,
+   "OK",
+   [
+     {
+       module       => "Time::Duration::Parse",
+       original     => "foo",
+       is_parseable => 0,
+       error_msg    => "Unknown timespec: foo at lib/App/DateUtils.pm line 385. ",
+     },
+   ],
    {
-     module       => "Time::Duration::Parse",
-     original     => "foo",
-     is_parseable => 0,
-     error_msg    => "Unknown timespec: foo at lib/App/DateUtils.pm line 374. ",
+     "table.fields" => [
+       "module",
+       "original",
+       "is_parseable",
+       "as_secs",
+       "as_dtdur_obj",
+       "error_msg",
+     ],
    },
  ]
 
@@ -1730,12 +2033,12 @@ Arguments ('*' denotes required arguments):
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -1755,11 +2058,11 @@ Examples:
 
 =item * Format current time as yyyy-mm-dd:
 
- strftime(format => "%Y-%m-%d"); # -> [200, "OK", "2020-03-30"]
+ strftime(format => "%Y-%m-%d"); # -> "2021-09-06"
 
 =item * Format a specific time as yyyy-mm-dd:
 
- strftime(format => "%Y-%m-%d", date => "tomorrow"); # -> [200, "OK", "2020-03-31"]
+ strftime(format => "%Y-%m-%d", date => "tomorrow"); # -> "2021-09-07"
 
 =back
 
@@ -1798,7 +2101,7 @@ Examples:
 
 Result:
 
- [200, "OK", "2020-03-30"]
+ "2021-09-06"
 
 =back
 
@@ -1829,6 +2132,43 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-DateUt
 
 Source repository is at L<https://github.com/perlancar/perl-App-DateUtils>.
 
+=head1 SEE ALSO
+
+
+L<dateparse>. Perinci::To::POD=HASH(0x556ac4fbeaf8).
+
+L<App::datecalc>
+
+L<App::TimeZoneUtils>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021, 2020, 2019, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-DateUtils>
@@ -1836,23 +2176,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 SEE ALSO
-
-
-L<dateparse>. Perinci::To::POD=HASH(0x56293caf21a8).
-
-L<App::datecalc>
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2020, 2019, 2017, 2016, 2015 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

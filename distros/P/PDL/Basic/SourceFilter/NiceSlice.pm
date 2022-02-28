@@ -29,7 +29,7 @@ use warnings;
 our $VERSION = '1.001';
 $VERSION = eval $VERSION;
 
-$PDL::NiceSlice::debug = defined($PDL::NiceSlice::debug) ? $PDL::NiceSlice::debug : 0;
+$PDL::NiceSlice::debug //= 0;
 # replace all occurrences of the form
 #
 #   $pdl(args);
@@ -52,6 +52,7 @@ require PDL; # get PDL version number
 
 use Text::Balanced; # used to find parenthesis-delimited blocks 
 
+BEGIN {
 # this is purely for performance reasons - patch: https://github.com/steve-m-hay/Text-Balanced/pull/5
 my %ref_not_regex = map +($_=>1), qw(CODE Text::Balanced::Extractor);
 sub my_extract_multiple (;$$$$)	# ($text, $functions_ref, $max_fields, $ignoreunknown)
@@ -153,7 +154,195 @@ sub my_extract_multiple (;$$$$)	# ($text, $functions_ref, $max_fields, $ignoreun
 	       pos $$textref = $firstpos };
 	return $fields[0];
 }
-# fixes false-positive heredoc - patch: https://github.com/steve-m-hay/Text-Balanced/pull/6
+sub my_match_codeblock($$$$$$$);
+sub my_match_codeblock($$$$$$$)
+{
+    my ($textref, $pre, $ldel_outer, $rdel_outer, $ldel_inner, $rdel_inner, $rd) = @_;
+    my $startpos = pos($$textref) = pos($$textref) || 0;
+    unless ($$textref =~ m/$pre/gc)
+    {
+        Text::Balanced::_failmsg qq{Did not match prefix /$pre/ at"} .
+                     substr($$textref,pos($$textref),20) .
+                     q{..."},
+                 pos $$textref;
+        return;
+    }
+    my $codepos = pos($$textref);
+    unless ($$textref =~ m/\G($ldel_outer)/gc)  # OUTERMOST DELIMITER
+    {
+        Text::Balanced::_failmsg qq{Did not find expected opening bracket at "} .
+                     substr($$textref,pos($$textref),20) .
+                     q{..."},
+                 pos $$textref;
+        pos $$textref = $startpos;
+        return;
+    }
+    my $closing = $1;
+       $closing =~ tr/([<{/)]>}/;
+    my $matched;
+    my $patvalid = 1;
+    while (pos($$textref) < length($$textref))
+    {
+        $matched = '';
+        if ($rd && $$textref =~ m#\G(\Q(?)\E|\Q(s?)\E|\Q(s)\E)#gc)
+        {
+            $patvalid = 0;
+            next;
+        }
+        if ($$textref =~ m/\G\s*#.*/gc)
+        {
+            next;
+        }
+        if ($$textref =~ m/\G\s*($rdel_outer)/gc)
+        {
+            unless ($matched = ($closing && $1 eq $closing) )
+            {
+                next if $1 eq '>';      # MIGHT BE A "LESS THAN"
+                Text::Balanced::_failmsg q{Mismatched closing bracket at "} .
+                             substr($$textref,pos($$textref),20) .
+                             qq{...". Expected '$closing'},
+                         pos $$textref;
+            }
+            last;
+        }
+        if (my_match_variable($textref,qr/\G(\s*)/) ||
+            my_match_quotelike($textref,'\s*',$patvalid,$patvalid) )
+        {
+            $patvalid = 0;
+            next;
+        }
+        # NEED TO COVER MANY MORE CASES HERE!!!
+        if ($$textref =~ m#\G\s*(?!$ldel_inner)
+                                ( [-+*x/%^&|.]=?
+                                | [!=]~
+                                | =(?!>)
+                                | (\*\*|&&|\|\||<<|>>)=?
+                                | split|grep|map|return
+                                | [([]
+                                )#gcx)
+        {
+            $patvalid = 1;
+            next;
+        }
+        if ( my_match_codeblock($textref, qr/\G(\s*)/, $ldel_inner, $rdel_inner, $ldel_inner, $rdel_inner, $rd) )
+        {
+            $patvalid = 1;
+            next;
+        }
+        if ($$textref =~ m/\G\s*$ldel_outer/gc)
+        {
+            Text::Balanced::_failmsg q{Improperly nested codeblock at "} .
+                         substr($$textref,pos($$textref),20) .
+                         q{..."},
+                     pos $$textref;
+            last;
+        }
+        $patvalid = 0;
+        $$textref =~ m/\G\s*(\w+|[-=>]>|.|\Z)/gc;
+    }
+    continue { $@ = undef }
+    unless ($matched)
+    {
+        Text::Balanced::_failmsg 'No match found for opening bracket', pos $$textref
+                unless $@;
+        return;
+    }
+    my $endpos = pos($$textref);
+    return ( $startpos, $codepos-$startpos,
+             $codepos, $endpos-$codepos,
+             $endpos,  length($$textref)-$endpos,
+    );
+}
+sub my_match_variable($$);
+sub my_match_variable($$)
+{
+#  $#
+#  $^
+#  $$
+    my ($textref, $pre) = @_;
+    my $startpos = pos($$textref) = pos($$textref)||0;
+    unless ($$textref =~ m/$pre/gc)
+    {
+        Text::Balanced::_failmsg "Did not find prefix: /$pre/", pos $$textref;
+        return;
+    }
+    my $varpos = pos($$textref);
+    unless ($$textref =~ m{\G\$\s*(?!::)(\d+|[][&`'+*./|,";%=~:?!\@<>()-]|\^[a-z]?)}gci)
+    {
+        unless ($$textref =~ m/\G((\$#?|[*\@\%]|\\&)+)/gc)
+        {
+            Text::Balanced::_failmsg "Did not find leading dereferencer", pos $$textref;
+            pos $$textref = $startpos;
+            return;
+        }
+        my $deref = $1;
+        unless ($$textref =~ m/\G\s*(?:::|')?(?:[_a-z]\w*(?:::|'))*[_a-z]\w*/gci
+            or my_match_codeblock($textref, qr/\G()/, '\{', '\}', '\{', '\}', 0)
+            or $deref eq '$#' or $deref eq '$$' )
+        {
+            Text::Balanced::_failmsg "Bad identifier after dereferencer", pos $$textref;
+            pos $$textref = $startpos;
+            return;
+        }
+    }
+    while (1)
+    {
+        next if $$textref =~ m/\G\s*(?:->)?\s*[{]\w+[}]/gc;
+        next if my_match_codeblock($textref,
+                                 qr/\G(\s*->\s*(?:[_a-zA-Z]\w+\s*)?)/,
+                                 qr/[({[]/, qr/[)}\]]/,
+                                 qr/[({[]/, qr/[)}\]]/, 0);
+        next if my_match_codeblock($textref,
+                                 qr/\G(\s*)/, qr/[{[]/, qr/[}\]]/,
+                                 qr/[{[]/, qr/[}\]]/, 0);
+        next if my_match_variable($textref,qr/\G(\s*->\s*)/);
+        next if $$textref =~ m/\G\s*->\s*\w+(?![\{([])/gc;
+        last;
+    }
+    my $endpos = pos($$textref);
+    return ($startpos, $varpos-$startpos,
+            $varpos,   $endpos-$varpos,
+            $endpos,   length($$textref)-$endpos
+    );
+}
+sub my_extract_variable (;$$)
+{
+    my $textref = defined $_[0] ? \$_[0] : \$_;
+    return ("","","") unless defined $$textref;
+    my $pre  = defined $_[1] ? qr/\G($_[1])/ : qr/\G(\s*)/;
+    my @match = my_match_variable($textref,$pre);
+    return Text::Balanced::_fail wantarray, $textref unless @match;
+    return Text::Balanced::_succeed wantarray, $textref,
+                    @match[2..3,4..5,0..1];        # MATCH, REMAINDER, PREFIX
+}
+sub my_extract_codeblock (;$$$$$)
+{
+    my $textref = defined $_[0] ? \$_[0] : \$_;
+    my $wantarray = wantarray;
+    my $ldel_inner = defined $_[1] ? $_[1] : '{';
+    my $pre = !defined $_[2] ? qr/\G(\s*)/ : qr/\G($_[2])/;
+    my $ldel_outer = defined $_[3] ? $_[3] : $ldel_inner;
+    my $rd         = $_[4];
+    my $rdel_inner = $ldel_inner;
+    my $rdel_outer = $ldel_outer;
+    my $posbug = pos;
+    for ($ldel_inner, $ldel_outer) { tr/[]()<>{}\0-\377/[[((<<{{/ds }
+    for ($rdel_inner, $rdel_outer) { tr/[]()<>{}\0-\377/]]))>>}}/ds }
+    for ($ldel_inner, $ldel_outer, $rdel_inner, $rdel_outer)
+    {
+        $_ = '('.join('|',map { quotemeta $_ } split('',$_)).')'
+    }
+    pos = $posbug;
+    my @match = my_match_codeblock($textref, $pre,
+                                 $ldel_outer, $rdel_outer,
+                                 $ldel_inner, $rdel_inner,
+                                 $rd);
+    return Text::Balanced::_fail($wantarray, $textref) unless @match;
+    return Text::Balanced::_succeed($wantarray, $textref,
+                    @match[2..3,4..5,0..1]    # MATCH, REMAINDER, PREFIX
+    );
+}
+# fixes false-positive heredoc and false-match {y=>1} in 2.04 - patch: https://github.com/steve-m-hay/Text-Balanced/pull/6
 my %mods   = (
     'none' => '[cgimsox]*', 'm'=>'[cgimsox]*', 's'=>'[cegimsox]*',
     'tr'=> '[cds]*', 'y'=> '[cds]*', 'qq'=> '', 'qx'=> '', 'qw'=> '',
@@ -267,9 +456,16 @@ sub my_match_quotelike($$$$)      # ($textref, $prepat, $allow_raw_match)
     $$textref =~ m/\G\s*/gc;
     $ld1pos = pos($$textref);
     $str1pos = $ld1pos+1;
-    unless ($$textref =~ m/\G(\S)/gc)   # SHOULD USE LOOKAHEAD
+    if ($$textref !~ m/\G(\S)/gc)   # SHOULD USE LOOKAHEAD
     {
         Text::Balanced::_failmsg "No block delimiter found after quotelike $op",
+                 pos $$textref;
+        pos $$textref = $startpos;
+        return;
+    }
+    elsif (substr($$textref, $ld1pos, 2) eq '=>')
+    {
+        Text::Balanced::_failmsg "quotelike $op was actually quoted by '=>'",
                  pos $$textref;
         pos $$textref = $startpos;
         return;
@@ -349,7 +545,7 @@ sub my_extract_quotelike (;$$)
   my $textref = $_[0] ? \$_[0] : \$_;
   my $wantarray = wantarray;
   my $pre  = defined $_[1] ? $_[1] : '\s*';
-  my @match = Text::Balanced::_match_quotelike($textref,$pre,0,0);        # do not match // alone as m//
+  my @match = my_match_quotelike($textref,$pre,0,0);        # do not match // alone as m//
   return Text::Balanced::_fail($wantarray, $textref) unless @match;
   return Text::Balanced::_succeed($wantarray, $textref,
                   $match[2], $match[18]-$match[2],        # MATCH
@@ -359,14 +555,60 @@ sub my_extract_quotelike (;$$)
                   @match[20,21],                          # ANY FILLET?
                  );
 }
-BEGIN {
+# fix for problem identified by Ingo - no point in submitting patch to p5p until above Text-Balanced PR is merged and released
+my $ncws = qr/\s+/;
+my $comment = qr/(?<![\$\@%])#.*/;
+my $id = qr/\b(?!([ysm]|q[rqxw]?|tr)\b)\w+/;
+my $EOP = qr/\n\n|\Z/;
+my $CUT = qr/\n=cut.*$EOP/;
+my $pod_or_DATA = qr/
+              ^=(?:head[1-4]|item) .*? $CUT
+            | ^=pod .*? $CUT
+            | ^=for .*? $CUT
+            | ^=begin .*? $CUT
+            | ^__(DATA|END)__\r?\n.*
+            /smx;
+my %extractor_for = (
+    code_no_comments
+               => [ { DONT_MATCH => $comment },
+                    $ncws, { DONT_MATCH => $pod_or_DATA }, \&my_extract_variable,
+                    $id, { DONT_MATCH => \&my_extract_quotelike }   ],
+);
+use Filter::Simple ();
+my $orig_gen_std_filter_for = \&Filter::Simple::gen_std_filter_for;
+sub my_gen_std_filter_for {
+    my ($type, $transform) = @_;
+    goto &$orig_gen_std_filter_for if !$extractor_for{$type};
+    return sub {
+        my $instr;
+        my @components;
+        for (my_extract_multiple($_,$extractor_for{$type})) {
+            if (ref())     { push @components, $_; $instr=0 }
+            elsif ($instr) { $components[-1] .= $_ }
+            else           { push @components, $_; $instr=1 }
+        }
+        my $count = 0;
+        my $extractor =      qr/\Q$;\E(.{4})\Q$;\E/s;
+        $_ = join "",
+              map { ref $_ ? $;.pack('N',$count++).$; : $_ }
+                  @components;
+        @components = grep { ref $_ } @components;
+        $transform->(@_);
+        s/$extractor/${$components[unpack('N',$1)]}/g;
+    }
+}
 # override the current extract_quotelike() routine
 # needed before using Filter::Simple to work around a bug
 # between Text::Balanced and Filter::Simple for our purpose.
 no warnings 'redefine';
+*Text::Balanced::extract_variable = \&my_extract_variable;
+*Text::Balanced::_match_variable = \&my_match_variable;
+*Text::Balanced::extract_codeblock = \&my_extract_codeblock;
+*Text::Balanced::_match_codeblock = \&my_match_codeblock;
 *Text::Balanced::extract_quotelike = \&my_extract_quotelike;
 *Text::Balanced::_match_quotelike = \&my_match_quotelike;
 *Text::Balanced::extract_multiple = \&my_extract_multiple;
+*Filter::Simple::gen_std_filter_for = \&my_gen_std_filter_for;
 }
 
 # a call stack for error processing
@@ -442,11 +684,11 @@ sub splitprotected ($$) {
 #  ->(
 #
 # used as the prefix pattern for findslice
+my $wspat = qr/(?:\s|$RE_cmt|\Q$;\E.{4}\Q$;\E)*/; # last bit Filter::Simple
 my $prefixpat = qr/.*?  # arbitrary leading stuff
                    ((?<!&)\$\w+  # $varname not preceded by '&'
                     |->)         # or just '->'
-                    (\s|$RE_cmt)* # ignore comments
-		    \s*          # more whitespace
+                   $wspat
                    (?=\()/smx;   # directly followed by open '(' (look ahead)
 
 # translates a single arg into corresponding slice format
@@ -516,9 +758,9 @@ sub findslice {
       if $verbose;
 
 #  Do final check for "for $var(LIST)" and "foreach $var(LIST)" syntax. 
-#  Process into an 'slice' call only if it's not that.
+#  Process into a 'slice' call only if it's not that.
 
-    if ($prefix =~ m/for(each)?(\s+(my|our))?\s+\$\w+(\s|$RE_cmt)*$/s ||
+    if ($prefix =~ m/for(?:each)?\b(?:$wspat(?:my|our))?$wspat\$\w+$wspat$/s ||
       # foreach statement: Don't translate
 	$prefix =~ m/->\s*\$\w+$/s) # e.g. $x->$method(args)
       # method invocation via string, don't translate either
@@ -526,7 +768,7 @@ sub findslice {
 	# note: even though we reject this one we need to call
         #       findslice on $found in case
 	#       it contains slice expressions
-      $processed .= "$prefix".findslice($found);
+      $processed .= $prefix.findslice($found,$verbose);
     } else {      # statement is a real slice and not a foreach
 
       my ($call,$pre,$post,$arg);
@@ -556,7 +798,7 @@ sub findslice {
 	    if ($mod1 eq '?') {
 	      $seen{$mod1}++ && filterdie "modifier $mod1 used twice or more";
 	      $call = 'where';
-	      $arg = "(" . findslice($slicearg) . ")";
+	      $arg = "(" . findslice($slicearg,$verbose) . ")";
 	      # $post = ''; # no post action required
 	    } elsif ($mod1 eq '_') {
 	      $seen{$mod1}++ && filterdie "modifier $mod1 used twice or more";
@@ -597,7 +839,7 @@ sub findslice {
       # assumption here: sever should be last
       # and order of other modifiers doesn't matter
       $post = join '', sort @post; # need to ensure that sever is last
-      $processed .= "$prefix". ($prefix =~ /->(\s*$RE_cmt*)*$/ ? 
+      $processed .= $prefix. ($prefix =~ /->$wspat$/ ?
 				'' : '->').
 	$pre.$call.$arg.$post.$mypostfix;
     }
@@ -609,7 +851,7 @@ sub findslice {
   # append the remaining text portion
   #     use substr only if we have had at least one pass
   #     through above loop (otherwise pos is uninitialized)
-  $processed .= $ct > 0 ? substr $src, pos($src) : $src;
+  $processed . ($ct > 0 ? substr $src, pos($src) : $src);
 }
 
 ##############################
@@ -689,7 +931,7 @@ sub perldlpp {
 	     $_="";
 	 }
 	 $_ = $data;
-	 $_ = findslice $_ ;
+	 $_ = findslice $_, $PDL::NiceSlice::debug ;
 	 $_ .= "no $class;\n" if $off;
 	 $_ .= "$end\n" if $end;
 	 $new .= "$_";

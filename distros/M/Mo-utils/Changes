@@ -1,3 +1,7 @@
+0.07 2022-02-27T12:38:59+01:00
+ - Improve errors.
+ - Skip undefined value in check_isa().
+
 0.06 2022-01-15T15:58:52+01:00
  - Add check_array().
  - Add check_bool().

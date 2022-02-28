@@ -1,6 +1,6 @@
 package DBIx::Class::Valiant;
 
-# Placeholder for now
+# Placeholder for now, not sure if there's going to be code here or not :)
 
 1;
 
@@ -57,7 +57,7 @@ that is a restriction we can figure out how to remove (patches welcomed).
 
 =head1 DESCRIPTION
 
-B<NOTE>This works as is 'it passed my existing tests'.   Feel free to use it
+B<NOTE>This works as in 'it passed my existing tests'.   Feel free to use it
 if you are willing to get into the code, review / submit test cases, etc.   Also at some
 point this will be pulled into its own distribution so please keep in mind.   I
 will feel totally free to break backward compatibility on this until it seems
@@ -85,12 +85,131 @@ feature and bug reports / test cases (or patches) welcomed.
 
 Documentation in this package only covers how L<Valiant> is glued into your result sources
 and any local differences in behavior.   If you need a comprehensive overview of how
-L<Valiant> works you should refer to that package.
+L<Valiant> works you should refer to that package.  Additionally if you are looking for how
+to generate HTML forms you should refer to L<Valiant::HTML::Form>, L<Valiant::HTML::FormTags>
+and L<Valiant::HTML::FormBuilder> (or refer to the example application under directory
+'/example' for this distribution.)
+
+=head2 Adding validations and filters
+
+Assuming a base result and resultset as described above, you can add L<Valiant> style
+validations to the result source columns or on the object as a whole.  The helpers described
+in the L<Valiant> core documentations all work the same on your DBIC result source fields; the
+main difference is that you must call these helpers as class/package methods:
+
+    package Example::Schema::Result::Profile;
+
+    use warnings;
+    use strict;
+    use base 'Example::Schema::Result';
+
+    __PACKAGE__->table("profile");
+    __PACKAGE__->add_columns(
+      id => { data_type => 'bigint', is_nullable => 0, is_auto_increment => 1 },
+      person_id => { data_type => 'integer', is_nullable => 0, is_foreign_key => 1 },
+      state_id => { data_type => 'integer', is_nullable => 0, is_foreign_key => 1 },
+      address => { data_type => 'varchar', is_nullable => 0, size => 48 },
+      city => { data_type => 'varchar', is_nullable => 0, size => 32 },
+      zip => { data_type => 'varchar', is_nullable => 0, size => 5 },
+      birthday => { data_type => 'date', is_nullable => 1, datetime_undef_if_invalid => 1 },
+      phone_number => { data_type => 'varchar', is_nullable => 1, size => 32 },
+    );
+
+    __PACKAGE__->set_primary_key("id");
+    __PACKAGE__->add_unique_constraint(['id','person_id']);
+
+    __PACKAGE__->belongs_to(
+      state =>
+      'Example::Schema::Result::State',
+      { 'foreign.id' => 'self.state_id' }
+    );
+
+    __PACKAGE__->belongs_to(
+      person =>
+      'Example::Schema::Result::Person',
+      { 'foreign.id' => 'self.person_id' }
+    );
+
+    __PACKAGE__->validates(address => (presence=>1, length=>[2,48]));
+    __PACKAGE__->validates(city => (presence=>1, length=>[2,32]));
+    __PACKAGE__->validates(zip => (presence=>1, format=>'zip'));
+    __PACKAGE__->validates(phone_number => (presence=>1, length=>[10,32]));
+    __PACKAGE__->validates(state_id => (presence=>1));
+    __PACKAGE__->validates(birthday => (
+        date => {
+          max => sub { pop->now->subtract(days=>1) }, # can't be born yesterday
+          min => sub { pop->years_ago(30) }, # Don't trust anyone over 30
+        }
+      )
+    );
+
+    1;
+
+Besides the requirement of calling C<validates>, C<validates_with> and C<filters> as class
+methods there are a few other changes from the core L<Valiant> behavior.
+
+First C<validate> is automatically run for you when you attempt to C<create> or C<insert>
+a record (or use related methods such as C<find_or_create>).  If validation fails the database
+operation will not occur but you will get a DBIC result with the records in cache along
+with any validation results.  This makes it easier to round trip things like form validation
+since you can use the database result in your form response logic.  For example:
+
+    my $person = $schema->resultset('Person')->first;
+    my $state = $schema->resultset('State')->first;
+
+    my $profile = $person->create_related('profile', +{
+        zip => "78621",
+        city => 'E',
+        address => '15604 Harry Lind Road',
+        birthday => DateTime->now->subtract(years=>55)->ymd,
+        phone_number => '2123879509',
+        state_id => $state->id,
+    });
+
+    $profile->invalid; # TRUE, so the record was NOT created!
+
+But the record does have the attempted values cached as expected, even if its not in
+the storage DB:
+
+    print $profile->zip;      # 78621 
+    print $profile->city;     # E
+
+And you can query for errors:
+    
+    Dumper $person_profile->errors->to_hash(full_messages=>1);
+
+Returns:
+
+    city => [
+      "city is too short (minimum is 2 characters)",
+    ],
+    birthday => [
+      "Birthday chosen date can't be before @{[ DateTime->now->subtract(years=>30)->ymd ]}",
+    ],
+
+It might seem strange to have a C<$profile> object with invalid data, but it greatly simplifies
+your UI layer since you can use the same model for both valid and invalid data (and to query for
+errors.
+
+=head2 validation context
+
+By default when creating a new record we add a validation context 'create', and for updating we
+add a 'update' context.  This way you can specify different validation rules for create and update
+very easily.  If you want to add a custom context youc an do so with the C<context> method which
+is part of your result API.
+
+    $person->context('registration')->update(\%records);
+
+Or you can add the context directly to your C<update> or C<create> call:
+
+    $person->update(+{ __context=>'registration', %records});
+
+See the core L<Valiant> documentation for more on validation contexts.
 
 =head2 Combining validations into column definitions
 
 If you are hand writing your table source definitions you can add validations directly
-onto a column definition.   You might perfer this if you think it looks neater and adds
+onto a column definition.   You might prefer this if you think it looks neater and adds
 fewer lines of code.
 
     package Example::Schema::Result::CreditCard;
@@ -213,7 +332,7 @@ to the DB and an object will be returned with errors:
 
 The object will have the invalid values properly populated:
 
-$person->get_column('username');  # jjn
+    $person->get_column('username');  # jjn
 
 You might find this useful for building error message responses in for example html forms or other types
 or error responses.
@@ -278,13 +397,13 @@ to consume the Valiant components as in the L</SYNOPSIS>.
     __PACKAGE__->validates(first_name => (presence=>1, length=>[2,24]));
     __PACKAGE__->validates(last_name => (presence=>1, length=>[2,48]));
 
-    __PACKAGE__->validates(credit_cards => (result_set=>+{validations=>1, min=>2, max=>4}));
+    __PACKAGE__->validates(credit_cards => (set_size=>+{min=>2, max=>4}));
     __PACKAGE__->accept_nested_for('credit_cards', +{allow_destroy=>1});
 
-    __PACKAGE__->validates(person_roles => (result_set=>+{validations=>1, min=>1}));
+    __PACKAGE__->validates(person_roles => (set_size=>+{min=>1}));
     __PACKAGE__->accept_nested_for('person_roles', {allow_destroy=>1});
 
-    __PACKAGE__->validates(profile => (result=>+{validations=>1} ));
+    __PACKAGE__->validates(profile => (presence=>1));
     __PACKAGE__->accept_nested_for('profile');
 
 So in brief we add some simple validations on fields in the C<Person> result class to validate
@@ -477,11 +596,12 @@ With this setup you could deeply validate / create a Person and its permitted re
         ],
       });
 
-If the proposed data fails validation then you won't create any recors, but the errors can
+If the proposed data fails validation then you won't create any records, but the errors can
 be viewed via the C<errors> collection.
 
-For doing nested updates / validations you need to do a bit more work.   You need to use 'prefetch'
-to locally cache all the results you are trying to validate:
+For doing validation on nested updates you need to do a bit more work to make sure you caches
+are properly populated from the database. You need to use 'prefetch' to locally cache all the
+results you are trying to validate:
 
     my $person = Schema->resultset('Person')->find(
       { 'me.id'=>$pid },
@@ -499,6 +619,10 @@ Then you can do an update:
     });
 
 As before if there's a valiation issue the update won't happen.
+
+B<NOTE> Recursion warning!  You cannot currently C<accept_nested_for> for a relationship
+whose target result source is setting C<accept_nested_for> into yourself.   This is probably
+fixable, patches and use cases welcomed!
 
 =head2 Deleting
 
@@ -539,7 +663,8 @@ particular its a bad idea to have validations on both a m2m relations and also o
 relation that it bridges.   This is likely to result in false positive validation errors due to the
 way the resultset cache works (and doesn't work) for m2m.
 
-Happy to take patches for improvements to anyone that feels strongly about it.
+Happy to take patches for improvements to anyone that feels strongly about it.  FWIW the core DBIC
+development team recommends staying away fron using the many to many code.
 
 =head1 SEE ALSO
  

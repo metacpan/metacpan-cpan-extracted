@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2017 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2022 -- leonerd@leonerd.org.uk
 
-package Devel::MAT 0.44;
+package Devel::MAT 0.45;
 
 use v5.14;
 use warnings;
@@ -639,6 +639,9 @@ sub format_sv_with_value
       return "$repr = $reprs[0] / $reprs[1]" if @reprs > 1;
 
       return "$repr = $reprs[0]" if @reprs;
+   }
+   elsif( $sv->type eq "BOOL" ) {
+      return "$repr = " . $self->format_value( $sv->uv ? "true" : "false" );
    }
    elsif( $sv->type eq "REF" ) {
       #return "REF => NULL" if !$sv->rv;

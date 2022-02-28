@@ -1,0 +1,30 @@
+6 e o  o o e  o e 9
+e 3 o  o o e  e 2 o
+e o 9  o e e  5 e o
+
+e e o  9 o 7  e o e
+o o e  e 4 o  e o o
+o e o  2 e 5  o o e
+
+o o 6  e o o  1 e e
+o 1 e  e e e  o 7 o
+9 e e  o o o  e o 4
+==
+Solution
+6 2 1  3 5 8  7 4 9
+4 3 5  7 9 6  8 2 1
+8 7 9  1 2 4  5 6 3
+
+2 6 3  9 1 7  4 5 8
+5 9 8  6 4 3  2 1 7
+1 4 7  2 8 5  3 9 6
+
+7 5 6  4 3 9  1 8 2
+3 1 4  8 6 2  9 7 5
+9 8 2  5 7 1  6 3 4
+==
+Args
+{ }
+==
+Name: Odd Even Sudoku (Fun With Sudoku #132)
+URL: https://www.funwithpuzzles.com/2015/11/odd-even-sudoku.html

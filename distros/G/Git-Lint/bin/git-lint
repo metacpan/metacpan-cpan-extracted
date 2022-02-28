@@ -1,0 +1,165 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use FindBin;
+use lib "$FindBin::RealBin/../lib";
+
+use Getopt::Long ();
+use Pod::Usage   ();
+use Git::Lint;
+
+my $VERSION = '0.009';
+
+my %opt = (
+    profile => 'default',
+);
+Getopt::Long::GetOptions(
+    \%opt,
+    'check=s',
+    'profile=s',
+    'version' => sub { print "git-lint version $VERSION\n"; exit 0 },
+    'help',
+) or Pod::Usage::pod2usage( -exitval => 1 );
+
+Pod::Usage::pod2usage( -exitval => 0, -verbose => 1 ) if ( $opt{help} );
+Pod::Usage::pod2usage( -exitval => 1, -verbose => 0 ) unless $opt{check} && ( $opt{check} eq 'commit' || $opt{check} eq 'message' );
+
+if ( $opt{check} eq 'message' ) {
+    $opt{file} = shift @ARGV;
+    Pod::Usage::pod2usage( -exitval => 1, -verbose => 0, -message => 'check message requires a filename' ) unless $opt{file};
+}
+
+delete $opt{version};
+delete $opt{help};
+
+my $lint = Git::Lint->new();
+$lint->run(\%opt);
+
+if ( $lint->{issues} ) {
+    if ($opt{check} eq 'commit') {
+        foreach my $filename ( keys %{ $lint->{issues} } ) {
+            foreach my $issue ( @{ $lint->{issues}{$filename} } ) {
+                print STDERR "git-lint: [commit] $filename - " . $issue . "\n";
+            }
+        }
+    }
+    else {
+        foreach my $issue ( @{ $lint->{issues} } ) {
+            print STDERR "git-lint: [message] " . $issue . "\n";
+        }
+    }
+
+    exit 1;
+}
+
+exit 0;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+git-lint - lint git commits and messages
+
+=head1 SYNOPSIS
+
+ git-lint [--check commit] [--check message <message_file>]
+          [--profile <name>]
+          [--version] [--help]
+
+=head1 DESCRIPTION
+
+C<git-lint> is the commandline interface to L<Git::Lint>, a pluggable framework for linting git commits and messages.
+
+=head1 OPTIONS
+
+=over
+
+=item --check
+
+Run either check mode commit or message.
+
+If check type is message, C<git-lint> expects the file path of the commit message to check as an unnamed option.
+
+=item --profile
+
+Run a specific profile of check modules.
+
+Defaults to the 'default' profile.
+
+=item --version
+
+Print the version.
+
+=item --help
+
+Print the help menu.
+
+=back
+
+=head1 CHECK MODES
+
+C<git-lint> has 2 check modes, C<commit> and C<message>.
+
+=head2 commit
+
+The C<commit> check mode checks each line of the commit diff for issues defined in the commit check modules.
+
+=head2 message
+
+The C<message> check mode checks the commit message for issues defined in the message check modules.
+
+=head1 CONFIGURATION
+
+Configuration is done through C<git config> files (F<~/.gitconfig> or F</repo/.git/config>).
+
+Only one profile, C<default>, is defined internally. C<default> contains all check modules by default.
+
+The C<default> profile can be overridden through C<git config> files (F<~/.gitconfig> or F</repo/.git/config>).
+
+To set the default profile to only run the C<Whitespace> commit check:
+
+ [lint "profiles.commit"]
+     default = Whitespace
+
+Or set the default profile to C<Whitespace> and the fictional commit check, C<Flipdoozler>:
+
+ [lint "profiles.commit"]
+     default = Whitespace, Flipdoozler
+
+Additional profiles can be added with a new name and list of checks to run.
+
+ [lint "profiles.commit"]
+     default = Whitespace, Flipdoozler
+     hardcore = Other, Module, Names
+
+Message check profiles can also be defined.
+
+ [lint "profiles.message"]
+     # override the default profile to only contain SummaryLength, SummaryEndingPeriod, and BlankLineAfterSummary
+     default = SummaryLength, SummaryEndingPeriod, BlankLineAfterSummary
+     # create a summary profile with specific modules
+     summary = SummaryEndingPeriod, SummaryLength
+
+An example configuration is provided in the C<examples> directory of this project.
+
+=head1 ENABLING CHECKS FOR REPOS
+
+To enable as a C<pre-commit> hook, copy the C<pre-commit> script from the C<example/hooks> directory into the C<.git/hooks> directory of the repo you want to check.
+
+Once copied, update the path and options to match your path and preferred profile.
+
+To enable as a C<commit-msg> hook, copy the C<commit-msg> script from the C<example/hooks> directory into the C<.git/hooks> directory of the repo you want to check.
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2022 Blaine Motsinger under the MIT license.
+
+=head1 AUTHOR
+
+Blaine Motsinger C<blaine@renderorange.com>
+
+=cut

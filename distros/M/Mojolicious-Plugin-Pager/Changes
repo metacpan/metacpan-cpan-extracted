@@ -1,5 +1,8 @@
 Revision history for perl distribution Mojolicious-Plugin-Pager
 
+0.06 2022-02-26T18:59:11+0900
+ - Removed EXPERIMENTAL
+
 0.05 2017-12-18T13:07:04+0100
  - Fix negative page values when /?page=3
 

@@ -1,4 +1,5 @@
 .perltidyrc
+.pls_cache/index
 .ship.conf
 .travis.yml
 Changes
@@ -7,6 +8,7 @@ lib/Mojolicious/Plugin/Pager.pm
 Makefile.PL
 MANIFEST			This list of files
 README
+README.md
 t/00-basic.t
 t/pager.t
 t/prev-next.t

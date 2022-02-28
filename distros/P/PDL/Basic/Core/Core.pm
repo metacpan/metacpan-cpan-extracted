@@ -106,7 +106,7 @@ type conversion, broadcasting etc.
 =head1 VECTORIZATION/BROADCASTING: METHOD AND NOMENCLATURE
 
 PDL provides vectorized operations via a built-in engine.
-Vectorization in PDL is called "broadcasting" (formerly, up to 2.075, "threading").
+Vectorization in PDL is called "broadcasting" (formerly, up to 2.074, "threading").
 The broadcasting engine implements simple rules for each operation.
 
 Each PDL object has a "shape" that is a generalized N-dimensional
@@ -2656,6 +2656,7 @@ sub PDL::convert {
   barf 'Usage: $y = convert($x, $newtype)'."\n" if @_ != 2;
   my ($pdl,$type)= @_;
   $pdl = topdl($pdl); # Allow normal numbers
+  barf "Tried to convert(null)" if $pdl->isnull;
   $type = $type->enum if ref($type) eq 'PDL::Type';
   barf 'Usage: $y = convert($x, $newtype)'."\n" unless Scalar::Util::looks_like_number($type);
   return $pdl if $pdl->get_datatype == $type;

@@ -1,3 +1,8 @@
+1.061   2022-02-08  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] Fix missing schema in format_result()'s Rinci metadata.
+
+
 1.060   2021-08-13  Released-By: PERLANCAR; Urgency: high
 
         - Merge releases 1.059 and 1.059.2.

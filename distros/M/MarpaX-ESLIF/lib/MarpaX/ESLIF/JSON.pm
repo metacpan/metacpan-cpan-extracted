@@ -9,7 +9,7 @@ use MarpaX::ESLIF::JSON::Decoder;
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
-our $VERSION = '6.0.13'; # VERSION
+our $VERSION = '6.0.14'; # VERSION
 
 
 
@@ -48,7 +48,7 @@ MarpaX::ESLIF::JSON - ESLIF's JSON interface
 
 =head1 VERSION
 
-version 6.0.13
+version 6.0.14
 
 =head1 DESCRIPTION
 

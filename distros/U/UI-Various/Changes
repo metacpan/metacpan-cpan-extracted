@@ -1,6 +1,21 @@
 Revision history for Perl extension UI-Various
 
-0.16 2022-01-31T08:28:16Z
+0.18 2022-02-28T08:14:39Z
+
+0.18 2022-02-28T08:11:45Z
+
+    - made test for Curses::Box more robust
+    - added missing file to chmod in DoD script
+
+0.17 2022-02-25T08:16:50Z
+
+    - replaced parsable email address to reduce spamming
+    - fixed some TODOs
+    - added Box widget
+    - improved "missing UI element" error message
+    - hopefully fixed coverage problems in core
+    - fixed wrong Curses imports
+    - minor documentation fixes
 
 0.16 2022-01-31T08:26:44Z
 

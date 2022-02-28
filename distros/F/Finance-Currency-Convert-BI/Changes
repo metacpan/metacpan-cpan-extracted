@@ -1,42 +1,49 @@
-0.063   2018-07-10 (PERLANCAR)
+0.064   2022-02-26  Released-By: PERLANCAR; Urgency: medium
+
+        - Update to new URLs and HTML pages.
+
+        - Update Mojo::UserAgent API usage (success() is deprecated etc).
+
+
+0.063   2018-07-10  Released-By: PERLANCAR
 
 	- Add prereq to IO::Socket::SSL 2.009 [CT].
 
 
-0.062   2018-06-24 (PERLANCAR)
+0.062   2018-06-24  Released-By: PERLANCAR
 
 	- Mojo's error doesn't give code, only message.
 
 
-0.061   2018-06-20 (PERLANCAR)
+0.061   2018-06-20  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [debug] Remove log statement.
 
 
-0.060   2018-06-17 (PERLANCAR)
+0.060   2018-06-17  Released-By: PERLANCAR
 
 	- No functional changes.
 
         - Bump version number to use x.yyy instead of x.yy scheme.
 
 
-0.05    2018-06-17 (PERLANCAR)
+0.05    2018-06-17  Released-By: PERLANCAR
 
 	- Add function: get_currencies().
 
 
-0.04    2017-07-10 (PERLANCAR)
+0.04    2017-07-10  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Replace Log::Any with Log::ger.
 
 
-0.03    2016-07-29 (PERLANCAR)
+0.03    2016-07-29  Released-By: PERLANCAR
 
-        - Spoof User-Agent header because server returns 502 (Bad Gateway)
+        - Spoof User-Agent header because server returns 502  Released-By: Bad Gateway
 	  based on User-Agent string.
 
 	- Update to Data::Sah 0.76+ (duration by default already coerced to
@@ -46,13 +53,13 @@
           in the future).
 
 
-0.02    2016-02-05 (PERLANCAR)
+0.02    2016-02-05  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Remove use of inchworm operator [RT#111787].
 
 
-0.01    2015-10-23 (PERLANCAR)
+0.01    2015-10-23  Released-By: PERLANCAR
 
         - First release.

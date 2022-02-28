@@ -4,7 +4,7 @@ use warnings;
 use English;
 use Error::Pure::Utils qw(clean);
 use Test::MockObject;
-use Test::More 'tests' => 4;
+use Test::More 'tests' => 5;
 use Test::NoWarnings;
 use Mo::utils qw(check_isa);
 
@@ -46,3 +46,10 @@ $self = {
 };
 my $ret = check_isa($self, 'key', 'Foo');
 is($ret, undef, 'Right object is present.');
+
+# Test.
+$self = {
+	'key' => undef,
+};
+$ret = check_isa($self, 'key', 'Foo');
+is($ret, undef, "Value is undefined, that's ok.");

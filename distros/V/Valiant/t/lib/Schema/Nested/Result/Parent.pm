@@ -18,11 +18,6 @@ __PACKAGE__->has_many(
 );
 
 __PACKAGE__->validates( value => (presence=>1, length=>[1,48]) );
-__PACKAGE__->validates(
-  children => (
-    result_set => +{ validations=>1 }
-  )
-);
 
 __PACKAGE__->accept_nested_for('children', {allow_destroy=>1});
 

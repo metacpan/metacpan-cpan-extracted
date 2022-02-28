@@ -18,8 +18,8 @@ my %WriteMakefileArgs = (
         'Test::More' => '0',
     },
     PREREQ_PM => {
-        'SQL::Abstract' => 0,
-	'Moo' => 0
+        'SQL::Abstract' => '2.000000',
+	'Moo' => '2.000000'
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'SQL-Abstract-Plugin-TableAlias-*' },

@@ -43,6 +43,9 @@ sub _related_limit {
   return 0, undef;
 }
 
+# This is just an alias so that we can decouple the Valiant API from DBIC
+sub build { shift->new_result( shift || +{}) }
+
 sub new_result {
   my ($self, $fields, @args) = @_;
   my $context = delete $fields->{__context};
@@ -158,6 +161,11 @@ which presets the enable or disable value.
   $schema->resultset('User')
     ->skip_validate
     ->create(\%user_args);
+
+=head2 build
+
+This is just a shortcut for "->new_result(+{})" and exists mostly to provide expected API
+for L<Valiant::HTML::FormBuilder>.
 
 =head1 AUTHOR
  

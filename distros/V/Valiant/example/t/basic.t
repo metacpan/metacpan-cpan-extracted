@@ -253,8 +253,8 @@ ERRORS_TWO: {
 
   is_deeply +{$person->errors->to_hash(full_messages=>1)}, +{
     credit_cards => [
-      "Credit Cards has too few rows (minimum is 2)",
       "Credit Cards Is Invalid",
+      "Credit Cards has too few rows (minimum is 2)",
     ],
     "credit_cards.0.expiration" => [
       "Credit Cards Expiration does not look like a datetime value",

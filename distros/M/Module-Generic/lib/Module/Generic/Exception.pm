@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Exception.pm
-## Version v1.0.1
+## Version v1.1.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2021/12/13
+## Modified 2022/02/27
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -16,6 +16,7 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( Module::Generic );
+    use vars qw( $CALLER_LEVEL $CALLER_INTERNAL );
     use Scalar::Util;
     use Devel::StackTrace;
     use overload (
@@ -25,12 +26,14 @@ BEGIN
         bool    => sub{ $_[0] },
         fallback => 1,
     );
-    our( $VERSION ) = 'v1.0.1';
-    our( $CALLER_LEVEL, $CALLER_INTERNAL );
     $CALLER_LEVEL = 0;
     $CALLER_INTERNAL->{'Module::Generic'}++;
     $CALLER_INTERNAL->{'Module::Generic::Exception'}++;
+    our $VERSION = 'v1.1.0';
 };
+
+use strict;
+no warnings 'redefine';
 
 sub init
 {
@@ -75,7 +78,7 @@ sub init
         local $CALLER_LEVEL = ( $CALLER_INTERNAL->{ $call_pack } || bless( {} => $call_pack )->isa( 'Module::Generic::Exception' ) ) 
             ? $CALLER_LEVEL 
             : $CALLER_LEVEL + 1;
-        local $error_start_frame = sub 
+        my $error_start_frame = sub 
         {
             my $i;
             my $lvl = $CALLER_LEVEL;

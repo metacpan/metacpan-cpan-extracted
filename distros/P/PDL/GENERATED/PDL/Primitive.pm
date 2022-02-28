@@ -3,7 +3,7 @@
 #
 package PDL::Primitive;
 
-our @EXPORT_OK = qw(inner outer matmult matmult innerwt inner2 inner2d inner2t crossp norm indadd conv1d in uniq uniqind uniqvec hclip lclip clip clip wtstat statsover stats histogram whistogram histogram2d whistogram2d fibonacci append axisvalues srand random randsym grandom vsearch vsearch_sample vsearch_insert_leftmost vsearch_insert_rightmost vsearch_match vsearch_bin_inclusive vsearch_bin_exclusive interpolate interpol interpND one2nd which which_both where whereND whichND setops intersect );
+our @EXPORT_OK = qw(inner outer matmult innerwt inner2 inner2d inner2t crossp norm indadd conv1d in uniq uniqind uniqvec hclip lclip clip clip wtstat statsover stats histogram whistogram histogram2d whistogram2d fibonacci append axisvalues srand random randsym grandom vsearch vsearch_sample vsearch_insert_leftmost vsearch_insert_rightmost vsearch_match vsearch_bin_inclusive vsearch_bin_exclusive interpolate interpol interpND one2nd which which_both where whereND whichND setops intersect );
 our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
@@ -173,7 +173,7 @@ Row vectors are represented as (N x 1) two-dimensional PDLs, or you
 may be sloppy and use a one-dimensional PDL.  Column vectors are
 represented as (1 x N) two-dimensional PDLs.
 
-Threading occurs in the usual way, but as both the 0 and 1 dimension
+Broadcasting occurs in the usual way, but as both the 0 and 1 dimension
 (if present) are included in the operation, you must be sure that
 you don't try to broadcast over either of those dims.
 
@@ -237,14 +237,13 @@ matrix-multiply them:
   [4 8]
  ]
 
-
 INTERNALS
 
 The mechanics of the multiplication are carried out by the
 L</matmult> method.
 
 =cut
-#line 248 "Primitive.pm"
+#line 247 "Primitive.pm"
 
 
 
@@ -282,7 +281,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 286 "Primitive.pm"
+#line 285 "Primitive.pm"
 
 
 
@@ -290,29 +289,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 sub PDL::matmult {
     my ($x,$y,$c) = @_;
-
-    $y = pdl($y) unless eval { $y->isa('PDL') };
-    $c = PDL->null unless eval { $c->isa('PDL') };
-
+    $y = PDL->topdl($y);
+    $c = PDL->null unless do { local $@; eval { $c->isa('PDL') } };
     while($x->getndims < 2) {$x = $x->dummy(-1)}
     while($y->getndims < 2) {$y = $y->dummy(-1)}
-
     return ($c .= $x * $y) if( ($x->dim(0)==1 && $x->dim(1)==1) ||
                                ($y->dim(0)==1 && $y->dim(1)==1) );
-    if($y->dim(1) != $x->dim(0)) {
-        barf(sprintf("Dim mismatch in matmult of [%dx%d] x [%dx%d]: %d != %d",$x->dim(0),$x->dim(1),$y->dim(0),$y->dim(1),$x->dim(0),$y->dim(1)));
-    }
+    barf sprintf 'Dim mismatch in matmult of [%1$dx%2$d] x [%3$dx%4$d]: %1$d != %4$d',$x->dim(0),$x->dim(1),$y->dim(0),$y->dim(1)
+      if $y->dim(1) != $x->dim(0);
     PDL::_matmult_int($x,$y,$c);
     $c;
 }
-#line 309 "Primitive.pm"
+#line 304 "Primitive.pm"
 
 
 
 #line 1060 "../../blib/lib/PDL/PP.pm"
 
 *matmult = \&PDL::matmult;
-#line 316 "Primitive.pm"
+#line 311 "Primitive.pm"
 
 
 
@@ -343,14 +338,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 347 "Primitive.pm"
+#line 342 "Primitive.pm"
 
 
 
 #line 1060 "../../blib/lib/PDL/PP.pm"
 
 *innerwt = \&PDL::innerwt;
-#line 354 "Primitive.pm"
+#line 349 "Primitive.pm"
 
 
 
@@ -382,14 +377,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 386 "Primitive.pm"
+#line 381 "Primitive.pm"
 
 
 
 #line 1060 "../../blib/lib/PDL/PP.pm"
 
 *inner2 = \&PDL::inner2;
-#line 393 "Primitive.pm"
+#line 388 "Primitive.pm"
 
 
 
@@ -422,14 +417,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 426 "Primitive.pm"
+#line 421 "Primitive.pm"
 
 
 
 #line 1060 "../../blib/lib/PDL/PP.pm"
 
 *inner2d = \&PDL::inner2d;
-#line 433 "Primitive.pm"
+#line 428 "Primitive.pm"
 
 
 
@@ -470,14 +465,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 474 "Primitive.pm"
+#line 469 "Primitive.pm"
 
 
 
 #line 1060 "../../blib/lib/PDL/PP.pm"
 
 *inner2t = \&PDL::inner2t;
-#line 481 "Primitive.pm"
+#line 476 "Primitive.pm"
 
 
 
@@ -514,14 +509,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 518 "Primitive.pm"
+#line 513 "Primitive.pm"
 
 
 
 #line 1060 "../../blib/lib/PDL/PP.pm"
 
 *crossp = \&PDL::crossp;
-#line 525 "Primitive.pm"
+#line 520 "Primitive.pm"
 
 
 
@@ -546,14 +541,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 550 "Primitive.pm"
+#line 545 "Primitive.pm"
 
 
 
 #line 1060 "../../blib/lib/PDL/PP.pm"
 
 *norm = \&PDL::norm;
-#line 557 "Primitive.pm"
+#line 552 "Primitive.pm"
 
 
 
@@ -608,14 +603,14 @@ The routine barfs if any of the indices are bad.
 
 
 =cut
-#line 612 "Primitive.pm"
+#line 607 "Primitive.pm"
 
 
 
 #line 1060 "../../blib/lib/PDL/PP.pm"
 
 *indadd = \&PDL::indadd;
-#line 619 "Primitive.pm"
+#line 614 "Primitive.pm"
 
 
 
@@ -690,7 +685,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 694 "Primitive.pm"
+#line 689 "Primitive.pm"
 
 
 
@@ -709,14 +704,14 @@ sub PDL::conv1d {
 		     lc $$opt{Boundary} eq "reflect");
    return $c;
 }
-#line 713 "Primitive.pm"
+#line 708 "Primitive.pm"
 
 
 
 #line 1060 "../../blib/lib/PDL/PP.pm"
 
 *conv1d = \&PDL::conv1d;
-#line 720 "Primitive.pm"
+#line 715 "Primitive.pm"
 
 
 
@@ -759,18 +754,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 763 "Primitive.pm"
+#line 758 "Primitive.pm"
 
 
 
 #line 1060 "../../blib/lib/PDL/PP.pm"
 
 *in = \&PDL::in;
-#line 770 "Primitive.pm"
+#line 765 "Primitive.pm"
 
 
 
-#line 784 "primitive.pd"
+#line 770 "primitive.pd"
 
 =head2 uniq
 
@@ -828,11 +823,11 @@ sub PDL::uniq {
    }
    return $answ;
 }
-#line 832 "Primitive.pm"
+#line 827 "Primitive.pm"
 
 
 
-#line 844 "primitive.pd"
+#line 830 "primitive.pd"
 
 =head2 uniqind
 
@@ -895,11 +890,11 @@ sub PDL::uniqind {
   }
   return $ansind;
 }
-#line 899 "Primitive.pm"
+#line 894 "Primitive.pm"
 
 
 
-#line 910 "primitive.pd"
+#line 896 "primitive.pd"
 
 =head2 uniqvec
 
@@ -973,7 +968,7 @@ sub PDL::uniqvec {
       $srtdice;
    return $ans->append($somebad)->append($nanvec->mv(0,-1))->mv(0,-1);
 }
-#line 977 "Primitive.pm"
+#line 972 "Primitive.pm"
 
 
 
@@ -998,7 +993,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1002 "Primitive.pm"
+#line 997 "Primitive.pm"
 
 
 
@@ -1013,14 +1008,14 @@ sub PDL::hclip {
    PDL::_hclip_int($x,$y,$c);
    return $c;
 }
-#line 1017 "Primitive.pm"
+#line 1012 "Primitive.pm"
 
 
 
 #line 1060 "../../blib/lib/PDL/PP.pm"
 
 *hclip = \&PDL::hclip;
-#line 1024 "Primitive.pm"
+#line 1019 "Primitive.pm"
 
 
 
@@ -1045,7 +1040,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1049 "Primitive.pm"
+#line 1044 "Primitive.pm"
 
 
 
@@ -1060,18 +1055,18 @@ sub PDL::lclip {
    PDL::_lclip_int($x,$y,$c);
    return $c;
 }
-#line 1064 "Primitive.pm"
+#line 1059 "Primitive.pm"
 
 
 
 #line 1060 "../../blib/lib/PDL/PP.pm"
 
 *lclip = \&PDL::lclip;
-#line 1071 "Primitive.pm"
+#line 1066 "Primitive.pm"
 
 
 
-#line 1027 "primitive.pd"
+#line 1013 "primitive.pd"
 
 =head2 clip
 
@@ -1091,7 +1086,7 @@ wrapper around L</hclip> and
 L</lclip>.
 
 =cut
-#line 1095 "Primitive.pm"
+#line 1090 "Primitive.pm"
 
 
 
@@ -1118,7 +1113,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1122 "Primitive.pm"
+#line 1117 "Primitive.pm"
 
 
 
@@ -1157,14 +1152,14 @@ sub PDL::clip {
 
   return $d;
 }
-#line 1161 "Primitive.pm"
+#line 1156 "Primitive.pm"
 
 
 
 #line 1060 "../../blib/lib/PDL/PP.pm"
 
 *clip = \&PDL::clip;
-#line 1168 "Primitive.pm"
+#line 1163 "Primitive.pm"
 
 
 
@@ -1198,14 +1193,14 @@ have its bad flag set if the output contains any bad data.
 
 
 =cut
-#line 1202 "Primitive.pm"
+#line 1197 "Primitive.pm"
 
 
 
 #line 1060 "../../blib/lib/PDL/PP.pm"
 
 *wtstat = \&PDL::wtstat;
-#line 1209 "Primitive.pm"
+#line 1204 "Primitive.pm"
 
 
 
@@ -1287,7 +1282,7 @@ the sample size.  If all data are bad then the output data are marked bad.
 
 
 =cut
-#line 1291 "Primitive.pm"
+#line 1286 "Primitive.pm"
 
 
 
@@ -1312,18 +1307,18 @@ sub PDL::statsover {
    return $mean unless wantarray;
    return ($mean, $prms, $median, $min, $max, $adev, $rms);
 }
-#line 1316 "Primitive.pm"
+#line 1311 "Primitive.pm"
 
 
 
 #line 1060 "../../blib/lib/PDL/PP.pm"
 
 *statsover = \&PDL::statsover;
-#line 1323 "Primitive.pm"
+#line 1318 "Primitive.pm"
 
 
 
-#line 1335 "primitive.pd"
+#line 1321 "primitive.pd"
 
 =head2 stats
 
@@ -1367,7 +1362,7 @@ sub PDL::stats {
 
     return PDL::statsover($data->flat,$weights);
 }
-#line 1371 "Primitive.pm"
+#line 1366 "Primitive.pm"
 
 
 
@@ -1419,14 +1414,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1423 "Primitive.pm"
+#line 1418 "Primitive.pm"
 
 
 
 #line 1060 "../../blib/lib/PDL/PP.pm"
 
 *histogram = \&PDL::histogram;
-#line 1430 "Primitive.pm"
+#line 1425 "Primitive.pm"
 
 
 
@@ -1475,14 +1470,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1479 "Primitive.pm"
+#line 1474 "Primitive.pm"
 
 
 
 #line 1060 "../../blib/lib/PDL/PP.pm"
 
 *whistogram = \&PDL::whistogram;
-#line 1486 "Primitive.pm"
+#line 1481 "Primitive.pm"
 
 
 
@@ -1536,14 +1531,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1540 "Primitive.pm"
+#line 1535 "Primitive.pm"
 
 
 
 #line 1060 "../../blib/lib/PDL/PP.pm"
 
 *histogram2d = \&PDL::histogram2d;
-#line 1547 "Primitive.pm"
+#line 1542 "Primitive.pm"
 
 
 
@@ -1597,14 +1592,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1601 "Primitive.pm"
+#line 1596 "Primitive.pm"
 
 
 
 #line 1060 "../../blib/lib/PDL/PP.pm"
 
 *whistogram2d = \&PDL::whistogram2d;
-#line 1608 "Primitive.pm"
+#line 1603 "Primitive.pm"
 
 
 
@@ -1629,7 +1624,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1633 "Primitive.pm"
+#line 1628 "Primitive.pm"
 
 
 
@@ -1644,12 +1639,12 @@ sub PDL::fibonacci{
    PDL::_fibonacci_int($in, $out);
    $out;
 }
-#line 1648 "Primitive.pm"
+#line 1643 "Primitive.pm"
 
 
 
 #line 1060 "../../blib/lib/PDL/PP.pm"
-#line 1653 "Primitive.pm"
+#line 1648 "Primitive.pm"
 
 
 
@@ -1692,14 +1687,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1696 "Primitive.pm"
+#line 1691 "Primitive.pm"
 
 
 
 #line 1059 "../../blib/lib/PDL/PP.pm"
 
 
-#line 1649 "primitive.pd"
+#line 1632 "primitive.pd"
 
 sub PDL::append {
   my ($i1, $i2, $o) = map PDL->topdl($_), @_;
@@ -1718,18 +1713,18 @@ sub PDL::append {
 }
         
 #line 1079 "../../blib/lib/PDL/PP.pm"
-#line 1722 "Primitive.pm"
+#line 1717 "Primitive.pm"
 
 
 
 #line 1060 "../../blib/lib/PDL/PP.pm"
 
 *append = \&PDL::append;
-#line 1729 "Primitive.pm"
+#line 1724 "Primitive.pm"
 
 
 
-#line 1701 "primitive.pd"
+#line 1679 "primitive.pd"
 
 =head2 glue
 
@@ -1806,14 +1801,14 @@ sub PDL::glue{
     }
     $x->xchg(0,$dim);
 }
-#line 1810 "Primitive.pm"
+#line 1805 "Primitive.pm"
 
 
 
 #line 1060 "../../blib/lib/PDL/PP.pm"
 
 *axisvalues = \&PDL::axisvalues;
-#line 1817 "Primitive.pm"
+#line 1812 "Primitive.pm"
 
 
 
@@ -1847,7 +1842,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1851 "Primitive.pm"
+#line 1846 "Primitive.pm"
 
 
 
@@ -1855,14 +1850,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 *srand = \&PDL::srand;
 sub PDL::srand { PDL::_srand_int($_[0] // PDL::Core::seed()) }
-#line 1859 "Primitive.pm"
+#line 1854 "Primitive.pm"
 
 
 
 #line 1060 "../../blib/lib/PDL/PP.pm"
 
 *srand = \&PDL::srand;
-#line 1866 "Primitive.pm"
+#line 1861 "Primitive.pm"
 
 
 
@@ -1903,7 +1898,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1907 "Primitive.pm"
+#line 1902 "Primitive.pm"
 
 
 
@@ -1916,12 +1911,12 @@ sub PDL::random {
    PDL::_random_int($x);
    return $x;
 }
-#line 1920 "Primitive.pm"
+#line 1915 "Primitive.pm"
 
 
 
 #line 1060 "../../blib/lib/PDL/PP.pm"
-#line 1925 "Primitive.pm"
+#line 1920 "Primitive.pm"
 
 
 
@@ -1961,7 +1956,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1965 "Primitive.pm"
+#line 1960 "Primitive.pm"
 
 
 
@@ -1974,16 +1969,16 @@ sub PDL::randsym {
    PDL::_randsym_int($x);
    return $x;
 }
-#line 1978 "Primitive.pm"
+#line 1973 "Primitive.pm"
 
 
 
 #line 1060 "../../blib/lib/PDL/PP.pm"
-#line 1983 "Primitive.pm"
+#line 1978 "Primitive.pm"
 
 
 
-#line 1925 "primitive.pd"
+#line 1903 "primitive.pd"
 
 =head2 grandom
 
@@ -2015,11 +2010,11 @@ sub PDL::grandom {
    $x .= ndtri(randsym($x));
    return $x;
 }
-#line 2019 "Primitive.pm"
+#line 2014 "Primitive.pm"
 
 
 
-#line 1969 "primitive.pd"
+#line 1947 "primitive.pd"
 
 =head2 vsearch
 
@@ -2166,7 +2161,7 @@ sub vsearch {
 }
 
 *PDL::vsearch = \&vsearch;
-#line 2170 "Primitive.pm"
+#line 2165 "Primitive.pm"
 
 
 
@@ -2260,14 +2255,14 @@ function to obtain cumulative probabilities from absolute probabilities.
 needs major (?) work to handles bad values
 
 =cut
-#line 2264 "Primitive.pm"
+#line 2259 "Primitive.pm"
 
 
 
 #line 1060 "../../blib/lib/PDL/PP.pm"
 
 *vsearch_sample = \&PDL::vsearch_sample;
-#line 2271 "Primitive.pm"
+#line 2266 "Primitive.pm"
 
 
 
@@ -2357,14 +2352,14 @@ leftmost (by index in array) duplicate if I<V> matches.
 needs major (?) work to handles bad values
 
 =cut
-#line 2361 "Primitive.pm"
+#line 2356 "Primitive.pm"
 
 
 
 #line 1060 "../../blib/lib/PDL/PP.pm"
 
 *vsearch_insert_leftmost = \&PDL::vsearch_insert_leftmost;
-#line 2368 "Primitive.pm"
+#line 2363 "Primitive.pm"
 
 
 
@@ -2454,14 +2449,14 @@ leftmost (by index in array) duplicate if I<V> matches.
 needs major (?) work to handles bad values
 
 =cut
-#line 2458 "Primitive.pm"
+#line 2453 "Primitive.pm"
 
 
 
 #line 1060 "../../blib/lib/PDL/PP.pm"
 
 *vsearch_insert_rightmost = \&PDL::vsearch_insert_rightmost;
-#line 2465 "Primitive.pm"
+#line 2460 "Primitive.pm"
 
 
 
@@ -2509,14 +2504,14 @@ duplicated values, I<I> may refer to any of them.
 needs major (?) work to handles bad values
 
 =cut
-#line 2513 "Primitive.pm"
+#line 2508 "Primitive.pm"
 
 
 
 #line 1060 "../../blib/lib/PDL/PP.pm"
 
 *vsearch_match = \&PDL::vsearch_match;
-#line 2520 "Primitive.pm"
+#line 2515 "Primitive.pm"
 
 
 
@@ -2604,14 +2599,14 @@ righmost (by index in array) duplicate if I<V> matches.
 needs major (?) work to handles bad values
 
 =cut
-#line 2608 "Primitive.pm"
+#line 2603 "Primitive.pm"
 
 
 
 #line 1060 "../../blib/lib/PDL/PP.pm"
 
 *vsearch_bin_inclusive = \&PDL::vsearch_bin_inclusive;
-#line 2615 "Primitive.pm"
+#line 2610 "Primitive.pm"
 
 
 
@@ -2699,14 +2694,14 @@ righmost (by index in array) duplicate if I<V> matches.
 needs major (?) work to handles bad values
 
 =cut
-#line 2703 "Primitive.pm"
+#line 2698 "Primitive.pm"
 
 
 
 #line 1060 "../../blib/lib/PDL/PP.pm"
 
 *vsearch_bin_exclusive = \&PDL::vsearch_bin_exclusive;
-#line 2710 "Primitive.pm"
+#line 2705 "Primitive.pm"
 
 
 
@@ -2754,18 +2749,18 @@ is printed rather than returning an error ndarray.
 needs major (?) work to handles bad values
 
 =cut
-#line 2758 "Primitive.pm"
+#line 2753 "Primitive.pm"
 
 
 
 #line 1060 "../../blib/lib/PDL/PP.pm"
 
 *interpolate = \&PDL::interpolate;
-#line 2765 "Primitive.pm"
+#line 2760 "Primitive.pm"
 
 
 
-#line 2645 "primitive.pd"
+#line 2623 "primitive.pd"
 
 =head2 interpol
 
@@ -2806,11 +2801,11 @@ sub interpol ($$$;$) {
 
 } # sub: interpol()
 *PDL::interpol = \&interpol;
-#line 2810 "Primitive.pm"
+#line 2805 "Primitive.pm"
 
 
 
-#line 2689 "primitive.pd"
+#line 2667 "primitive.pd"
 
 =head2 interpND
 
@@ -3016,6 +3011,7 @@ sub PDL::interpND {
 
   } elsif($method =~ m/^f(ft|ourier)?/i) {
 
+     local $@;
      eval "use PDL::FFT;";
      my $fftref = $opt->{fft};
      $fftref = [] unless(ref $fftref eq 'ARRAY');
@@ -3052,11 +3048,11 @@ sub PDL::interpND {
      barf("interpND: unknown method '$method'; valid ones are 'linear' and 'sample'.\n");
  }
 }
-#line 3056 "Primitive.pm"
+#line 3052 "Primitive.pm"
 
 
 
-#line 2938 "primitive.pd"
+#line 2917 "primitive.pd"
 
 =head2 one2nd
 
@@ -3104,7 +3100,7 @@ sub PDL::one2nd {
   }
   return @index;
 }
-#line 3108 "Primitive.pm"
+#line 3104 "Primitive.pm"
 
 
 
@@ -3167,7 +3163,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 3171 "Primitive.pm"
+#line 3167 "Primitive.pm"
 
 
 
@@ -3180,14 +3176,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 		return $out;
    }
    *PDL::which = \&which;
-#line 3184 "Primitive.pm"
+#line 3180 "Primitive.pm"
 
 
 
 #line 1060 "../../blib/lib/PDL/PP.pm"
 
 *which = \&PDL::which;
-#line 3191 "Primitive.pm"
+#line 3187 "Primitive.pm"
 
 
 
@@ -3230,7 +3226,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 3234 "Primitive.pm"
+#line 3230 "Primitive.pm"
 
 
 
@@ -3244,18 +3240,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 		return wantarray ? ($outi,$outni) : $outi;
    }
    *PDL::which_both = \&which_both;
-#line 3248 "Primitive.pm"
+#line 3244 "Primitive.pm"
 
 
 
 #line 1060 "../../blib/lib/PDL/PP.pm"
 
 *which_both = \&PDL::which_both;
-#line 3255 "Primitive.pm"
+#line 3251 "Primitive.pm"
 
 
 
-#line 3142 "primitive.pd"
+#line 3120 "primitive.pd"
 
 =head2 where
 
@@ -3321,11 +3317,11 @@ sub PDL::where {
     }
 }
 *where = \&PDL::where;
-#line 3325 "Primitive.pm"
+#line 3321 "Primitive.pm"
 
 
 
-#line 3212 "primitive.pd"
+#line 3190 "primitive.pd"
 
 =head2 whereND
 
@@ -3412,11 +3408,11 @@ sub PDL::whereND :lvalue {
    return (@to_return == 1) ? $to_return[0] : @to_return;
 }
 *whereND = \&PDL::whereND;
-#line 3416 "Primitive.pm"
+#line 3412 "Primitive.pm"
 
 
 
-#line 3303 "primitive.pd"
+#line 3281 "primitive.pd"
 
 =head2 whichND
 
@@ -3520,11 +3516,11 @@ sub PDL::whichND {
 
   return $ind;
 }
-#line 3524 "Primitive.pm"
+#line 3520 "Primitive.pm"
 
 
 
-#line 3416 "primitive.pd"
+#line 3394 "primitive.pd"
 
 =head2 setops
 
@@ -3705,11 +3701,11 @@ sub PDL::setops {
   }
 
 }
-#line 3709 "Primitive.pm"
+#line 3705 "Primitive.pm"
 
 
 
-#line 3600 "primitive.pd"
+#line 3578 "primitive.pd"
 
 =head2 intersect
 
@@ -3744,13 +3740,13 @@ sub PDL::intersect {
    return setops($_[0], 'AND', $_[1]);
 
 }
-#line 3748 "Primitive.pm"
+#line 3744 "Primitive.pm"
 
 
 
 
 
-#line 3639 "primitive.pd"
+#line 3617 "primitive.pd"
 
 
 =head1 AUTHOR
@@ -3768,7 +3764,7 @@ the copyright notice should be included in the file.
 Updated for CPAN viewing compatibility by David Mertens.
 
 =cut
-#line 3772 "Primitive.pm"
+#line 3768 "Primitive.pm"
 
 
 

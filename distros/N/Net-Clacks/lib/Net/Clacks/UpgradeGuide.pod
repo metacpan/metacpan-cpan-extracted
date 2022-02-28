@@ -231,6 +231,18 @@ Bugfix release: Fix package name in Net/Clacks.pm
 
 Net::Clacks is dummy class for documentation purposes, so there should be no functional changes (except to fix "cpan install Net::Clacks" and some issues with MetaCPAN)
 
+=head2 VERSION 21
+
+WARNING: BREAKING CHANGES! It is required to update all servers and clients at the same time.
+
+This version implements a network-optimized change on how setAndStore works by introducing a decicated SETANDSTORE command. This halfs the network load for all
+setAndStore operations, because the command and payload gets only send once instead of twice. This is especially useful on slow links with larger payloads.
+
+This version is dedicated to Sven Guckes, who passed away on 20th February 2022. Accordingly, his name will now occasionally passed
+in the overhead of the Clacks protocol.
+
+"Do you not know that man is not dead while his name is still spoken?"
+(Terry Prattchet, Going Postal)
 
 =head1 AUTHOR
 

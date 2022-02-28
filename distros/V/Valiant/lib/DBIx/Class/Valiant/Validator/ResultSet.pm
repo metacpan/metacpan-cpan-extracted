@@ -2,18 +2,11 @@ package DBIx::Class::Valiant::Validator::ResultSet;
 
 use Moo;
 use Valiant::I18N;
-use Module::Runtime 'use_module';
 use namespace::autoclean;
 
 with 'Valiant::Validator::Each';
 
-has min => (is=>'ro', required=>0, predicate=>'has_min');
-has max => (is=>'ro', required=>0, predicate=>'has_max');
-has skip_if_empty => (is=>'ro', required=>1, default=>sub {0});
-has too_few_msg => (is=>'ro', required=>1, default=>sub {_t 'too_few'});
-has too_many_msg => (is=>'ro', required=>1, default=>sub {_t 'too_many'});
 has invalid_msg => (is=>'ro', required=>1, default=>sub {_t 'invalid'});
-
 has validations => (is=>'ro', required=>1, default=>sub {0});
 
 sub normalize_shortcut {
@@ -29,12 +22,6 @@ sub validate_each {
   # If a row is marked to be deleted then don't bother to validate it
   my @rows = grep { not $_->is_removed } @{$value->get_cache||[]};
   
-  # If there's zero $count and skip_if_empty is true (default is false) then
-  # don't bother doing any more validations.
-  if(!@rows) {
-    return if $self->skip_if_empty;
-  }
-
   # Ok, now run validations.  If we find even one row is invalid, then we need
   # to mark the attribute as invalid.
   my $found_errors = 0;
@@ -47,32 +34,12 @@ sub validate_each {
   if($self->validations) {
     my $rowidx = 0;
     foreach my $row (@rows) {
-      if($row->errors->size) {
-        my $errors = $row->errors;
-        $errors->each(sub {
-          my ($index, $message) = @_;
-          $record->errors->add("${attribute}.${rowidx}.${index}", $message);
-        });
+      foreach my $importable_error ($row->errors->errors->all) {
+        my $local_attribute = "${attribute}.${rowidx}.@{[ $importable_error->attribute||'*' ]}";
+        $record->errors->import_error($importable_error, +{attribute=>$local_attribute});
       }
       $rowidx++;
     }
-  }
-
-  if($self->has_min || $self->has_max) {
-
-    # If a row is not in storage and can't be saved since its invalid, we don't count it
-    # toward mins or maxes.  Otherwise we could mark good rows for deletion but still pass
-    # the count tests with new not stored but invalid rows.  If however the new rows are
-    # valid then they will get saved so we can count them.  We also don't count it if its
-    # marked not to be inserted (generally this is the case with _add.
-
-    my $count = scalar(grep { !$_->{__valiant_donot_insert} } grep { $_->in_storage || !$_->errors->size } @rows);
-
-    $record->errors->add($attribute, $self->too_few_msg, +{%$opts, count=>$count, min=>$self->min})
-      if $self->has_min and $count < $self->min;
-
-    $record->errors->add($attribute, $self->too_many_msg, +{%$opts, count=>$count, max=>$self->max})
-      if $self->has_max and $count > $self->max;
   }
 
   $record->errors->add($attribute, $self->invalid_msg, $opts) if $found_errors;
@@ -127,6 +94,9 @@ Validations on related resultsets. Used to apply constraints on the resultset as
 (such as total number of rows) or to trigger running validations on any related row objects.
 Any errors from related resultsets will be added as sub errors on the parent result.
 
+B<NOTE>: This gets added automatically for you if you setup C<accepts_nested> on the parent
+object.  So you shouldn't really ever need to use this code directly.  
+
 =head1 ATTRIBUTES
 
 This validator supports the following attributes:
@@ -144,25 +114,6 @@ object.
 
 Error message returned on the current object if we find any errors inside related objects.
 defaults to tag 'invalid_msg'.
-
-=head2 skip_if_empty
-
-Allows you to skip validations if the resultset is empty (has zero rows).  Useful if you want
-to do validations only if there are rows found, such as when you have an optional relationship.
-Defaults to false.
-
-=head2 min
-
-=head2 max
-
-The minimum or maximum number of rows that the resultset can contain.  Optional.
-
-=head2 too_few_msg
-
-=head2 too_many_msg
-
-Error messages associated with the 'min' or 'max' constraints. Defaults to 'too_few' or 'too_many'
-translation tags.
 
 =head1 SHORTCUT FORM
 

@@ -1,5 +1,28 @@
 			Revision history for Perl module Mail::Alias.
 
+1.15 28 February 2022
+
+  Fix RT#141577: Add missing test file to package so that tests don't fail.
+
+1.14 27 February 2022
+
+  Fix `make test` so it actually fails if there's a test failure.
+
+  Fix RT#20388: Support whitespace after :include: in Sendmail format.
+  
+  Fix Sendmail format so it no longer ignores the last alias in the file if it
+  ends with a continuation line and there aren't any blank lines or comments
+  after it.
+
+  Fix RT#19419: Don't mask INC in _include_file.
+
+1.13 26 February 2022
+
+  New maintainer: Jonathan Kamens <jik@kamens.us>
+
+  Fix syntax error under recent versions of Perl, i.e., make the module work
+  again.
+
 1.12 21 October 2000
 	Removed requirement to use Mail::Address which was never actually used
 	delete() - changed matching so blank lines (^\s*$) are skipped in alias checking

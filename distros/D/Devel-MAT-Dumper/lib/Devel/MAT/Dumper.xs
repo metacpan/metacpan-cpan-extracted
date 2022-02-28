@@ -1,7 +1,7 @@
 /*  You may distribute under the terms of either the GNU General Public License
  *  or the Artistic License (the same terms as Perl itself)
  *
- *  (C) Paul Evans, 2013-2019 -- leonerd@leonerd.org.uk
+ *  (C) Paul Evans, 2013-2022 -- leonerd@leonerd.org.uk
  */
 
 #include "EXTERN.h"
@@ -85,6 +85,8 @@ static uint8_t sv_sizes[] = {
   0,                          0,     0,     /* FORMAT */
   0,                          0,     0,     /* INVLIST */
   0,                          0,     0,     /* UNDEF */
+  0,                          0,     0,     /* YES */
+  0,                          0,     0,     /* NO */
 };
 
 static uint8_t svx_sizes[] = {
@@ -123,6 +125,8 @@ enum PMAT_SVt {
   PMAT_SVtFORMAT,
   PMAT_SVtINVLIST,
   PMAT_SVtUNDEF,
+  PMAT_SVtYES,
+  PMAT_SVtNO,
 
   /* TODO: emit these in DMD_helper.h */
   PMAT_SVxMAGIC = 0x80,
@@ -753,6 +757,11 @@ static void write_sv(FILE *fh, const SV *sv)
 
   if(type == PMAT_SVtSCALAR && !SvOK(sv))
     type = PMAT_SVtUNDEF;
+#if (PERL_REVISION == 5) && (PERL_VERSION >= 35)
+  if(type == PMAT_SVtSCALAR && SvIsBOOL(sv))
+    /* SvTRUE() et al. might mutate; but it's OK we know this is one of the bools */
+    type = (SvIVX(sv)) ? PMAT_SVtYES : PMAT_SVtNO;
+#endif
 
   write_u8(fh, type);
 
@@ -773,6 +782,8 @@ static void write_sv(FILE *fh, const SV *sv)
     case PMAT_SVtFORMAT: write_common_sv(fh, sv, sizeof(XPVFM)); break;
     case PMAT_SVtINVLIST: write_common_sv(fh, sv, sizeof(XPV) + SvLEN(sv)); break;
     case PMAT_SVtUNDEF:  write_common_sv(fh, sv, 0); break;
+    case PMAT_SVtYES:    write_common_sv(fh, sv, 0); break;
+    case PMAT_SVtNO:     write_common_sv(fh, sv, 0); break;
   }
 
   if(SvMAGICAL(sv)) {
@@ -1152,6 +1163,7 @@ static void dumpfh(FILE *fh)
       case SAVEt_BOOL:
       case SAVEt_COMPPAD:
       case SAVEt_FREEOP:
+      case SAVEt_FREEPV:
       case SAVEt_FREESV:
       case SAVEt_I16:
       case SAVEt_I32_SMALL:

@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
+use Test::Exception;
 use PDL::LiteF;
 use PDL::Types;
 
@@ -284,10 +285,56 @@ ok(tapprox($statsRes[4],13), "stats: trivial weights max" );
 ok(tapprox($statsRes[6],4.462), "stats: trivial weights rms");
 
 # complex matmult
-my $cm1 = cdouble(1, czip(1, 1), 1);
-my $cm2 = cdouble(2, 3, i());
-my $got = $cm1 x $cm2->dummy(0);
-ok all(approx $got, czip(5, 4)), 'complex matmult' or diag $got;
+my $cm1 = pdl('1 1+i 1');
+my $cm2 = pdl('2 3 i')->transpose;
+my $got = $cm1 x $cm2;
+ok all(approx $got, pdl('5+4i')), 'complex matmult' or diag $got;
+throws_ok { scalar $cm1->transpose x $cm2 } qr/mismatch/, 'good error on mismatch matmult';
+
+{
+my $pa = pdl [[ 1,  2,  3,  0],
+      [ 1, -1,  2,  7],
+      [ 1,  0,  0,  1]];
+my $pb = pdl [[1, 1],
+     [0, 2],
+     [0, 2],
+     [1, 1]];
+my $pc = pdl [[ 1, 11],
+      [ 8, 10],
+      [ 2,  2]];
+my $res = $pa x $pb;
+ok(all approx($pc,$res)) or diag "got: $res";
+$res = null;
+matmult($pa, $pb, $res);
+ok(all(approx $pc,$res), 'res=null') or diag "got: $res";
+my $pa_sliced = $pa->dummy(0, 3)->dummy(-1, 3)->make_physical->slice('(1),,,(1)');
+$res = $pa_sliced x $pb;
+ok(all approx($pc,$res)) or diag "got: $res";
+$res = zeroes(2, 3);
+matmult($pa, $pb, $res);
+ok(all(approx $pc,$res), 'res=zeroes') or diag "got: $res";
+$res = ones(2, 3);
+matmult($pa, $pb, $res);
+ok(all(approx $pc,$res), 'res=ones') or diag "got: $res";
+my $eq = float [[1,1,1,1]];  # a 4,1-matrix ( 1 1 1 1 )
+# Check collapse: output should be a 1x2...
+ok(all approx($eq x $pb  , pdl([[2,6]]) )); # ([4x1] x [2x4] -> [1x2])
+# Check dimensional exception: mismatched dims should throw an error
+dies_ok {
+	my $pz = $pb x $eq; # [2x4] x [4x1] --> error (2 != 1)
+};
+{
+# Check automatic scalar multiplication
+my $pz;
+lives_ok { $pz = $pb x 2; };
+ok( all approx($pz,$pb * 2));
+}
+{
+my $pz;
+lives_ok { $pz = pdl(3) x $pb; };
+ok( all approx($pz,$pb * 3));
+}
+}
 
 # which ND test
 my $a1 = PDL->sequence(10,10,3,4);  

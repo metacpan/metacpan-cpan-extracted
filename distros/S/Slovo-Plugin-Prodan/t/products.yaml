@@ -4,13 +4,14 @@
 # load the structure and Dump it to convert it to a hash and then do whatewer
 # it is going to do.
 - {sku: 9786199169025, alias: лечителката, title: 'Лечителката и рунтавата ѝ котка', p_type: book,
-  properties: {
+    properties: {
       price: 14.00, weight: 0.300, series: Паралелен свят (първа книга), dimensions: 115×165 мм. (джобен),
       author: Контадин Кременски,
       images: [/img/korica-lechitelkata-96dpi-200x288.webp,],
       button_icon: /css/malka/book-open-page-variant-outline.svg,
       exerpts_url: /books/lechitelkata-otkusi.pdf, variant: книжно издание,
-      }}
+    }
+  }
 - {sku: 9786199169032, alias: лечителката, title: 'PDF Лечителката и рунтавата ѝ котка', p_type: book, 
   properties: {
       price: 9.81, weight: 0.0,

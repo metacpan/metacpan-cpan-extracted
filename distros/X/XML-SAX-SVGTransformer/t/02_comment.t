@@ -57,7 +57,7 @@ subtest 'second transformation' => sub {
     is $group_ct => 1, 'has only one group';
 
     my ($group) = $output =~ /($group_re)/;
-    like $group => qr/transform="translate\(150 100\) rotate\(180\)"/, 'has transform';
+    like $group => qr/transform="translate\(110 100\) rotate\(180\)"/, 'has transform';
 };
 
 done_testing;

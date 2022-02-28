@@ -1,3 +1,7 @@
+0.113		2022-02-27	T. R. Wyant
+    Try to collect variable uses from signatures.  Thanks to Olaf Alders
+    for pointing out this issue.
+
 0.112		2021-10-04	T. R. Wyant
     Tweak 'provides' and 'no_index' metadata.
 

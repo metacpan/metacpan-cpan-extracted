@@ -18,7 +18,7 @@ my @module_files = (
 );
 
 my @scripts = (
-    'bin/query_kvk.pl'
+    'bin/query-kvk.pl'
 );
 
 # no fake home requested

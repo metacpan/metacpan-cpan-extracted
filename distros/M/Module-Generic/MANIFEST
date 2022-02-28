@@ -1,5 +1,15 @@
 CHANGES
 CONTRIBUTING.md
+lib/Class.pm
+lib/Class/Array.pm
+lib/Class/Assoc.pm
+lib/Class/Boolean.pm
+lib/Class/Exception.pm
+lib/Class/File.pm
+lib/Class/Finfo.pm
+lib/Class/NullChain.pm
+lib/Class/Number.pm
+lib/Class/Scalar.pm
 lib/Module/Generic.pm
 lib/Module/Generic/Array.pm
 lib/Module/Generic/Array.pod
@@ -53,6 +63,7 @@ t/12.sharedmem.pl
 t/12.sharedmem.t
 t/13.header_value.t
 t/14.core.t
+t/15.class.t
 t/90.coverage.t
 t/99.kwalitee.t
 t/test.bat

@@ -32,8 +32,8 @@
       },
       "runtime" : {
          "requires" : {
-            "Moo" : "0",
-            "SQL::Abstract" : "0",
+            "Moo" : "2.000000",
+            "SQL::Abstract" : "2.000000",
             "perl" : "5.006"
          }
       },
@@ -46,7 +46,7 @@
    "provides" : {
       "SQL::Abstract::Plugin::TableAlias" : {
          "file" : "lib/SQL/Abstract/Plugin/TableAlias.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -57,6 +57,6 @@
          "web" : "https://github.com/ThisUsedToBeAnEmail/SQL-Abstract-Plugin-TableAlias"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

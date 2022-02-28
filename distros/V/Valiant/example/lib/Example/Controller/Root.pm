@@ -2,7 +2,7 @@ package Example::Controller::Root;
 
 use Moose;
 use MooseX::MethodAttributes;
-use Example::Base;
+use Example::Syntax;
 
 extends 'Catalyst::Controller';
 
@@ -30,14 +30,14 @@ sub root :Chained(/) PathPart('') CaptureArgs(0) Does(CurrentView) View(HTML) { 
         'username', 'first_name', 'last_name', 
         'password', 'password_confirmation'
       )->to_hash;
-    
+
       $c->stash(person => my $model = $c->model->create(\%params));
       $c->redirect_to_action('login') if $model->valid;
     }
 
     sub home :Chained(auth) PathPart('home') Args(0) ($self, $c) { }
 
-    sub profile :Chained(auth) PathPart('profile') Args(0) Does(Verbs) Allow(GET,POST) ($self, $c) {
+    sub profile :Chained(auth) PathPart('profile') Args(0) Does(Verbs) Allow(GET,PATCH) ($self, $c) {
       $c->stash(states => $c->model('Schema::State'));
       $c->stash(roles => $c->model('Schema::Role'));
       $c->stash(person => my $model = $c->model('Schema::Person')
@@ -47,18 +47,19 @@ sub root :Chained(/) PathPart('') CaptureArgs(0) Does(CurrentView) View(HTML) { 
         )
       );
       $model->build_related_if_empty('profile'); # Needed since the relationship is optional
-      return;
     }
 
-      sub POST_profile :Action ($self, $c) {
+      sub PATCH_profile :Action ($self, $c) {
         my %params = $c->structured_body(
           ['person'], 'username', 'first_name', 'last_name', 
           'profile' => [qw/id address city state_id zip phone_number birthday/],
-          +{'person_roles' =>[qw/person_id role_id _delete/] },
+          +{'person_roles' =>[qw/person_id role_id _delete _nop/] },
           +{'credit_cards' => [qw/id card_number expiration _delete _add/]},
         )->to_hash;
 
+        $c->session(form=>\%params);
         $c->stash->{person}->context('profile')->update(\%params);
+        Dwarn +{ $c->stash->{person}->errors->to_hash(full_messages=>1) };
       }
 
     sub logout : Chained(auth) PathPart(logout) Args(0) ($self, $c) {
@@ -66,7 +67,7 @@ sub root :Chained(/) PathPart('') CaptureArgs(0) Does(CurrentView) View(HTML) { 
       $c->redirect_to_action('login');
     }
 
-  sub login : Chained(root) PathPart(login) Args(0) Does(Verbs) Allow(GET,POST) ($self, $c) {
+  sub login : Chained(root) PathPart(login) Args(0) Does(Verbs) ($self, $c) {
     $c->redirect_to_action('home') if $c->user; # Don't bother if already logged in
   }
 
@@ -79,7 +80,7 @@ sub root :Chained(/) PathPart('') CaptureArgs(0) Does(CurrentView) View(HTML) { 
 
     sub POST_login :Action ($self, $c) {
       my ($username, $password) = $c
-        ->structured_body('username', 'password')
+        ->structured_body(['person'], 'username', 'password')
         ->get('username', 'password');
 
       $c->stash(person => my $person = $c->authenticate($username, $password));

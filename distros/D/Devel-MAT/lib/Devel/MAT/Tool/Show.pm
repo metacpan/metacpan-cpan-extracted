@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2016-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2016-2022 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Tool::Show 0.44;
+package Devel::MAT::Tool::Show 0.45;
 
 use v5.14;
 use warnings;
@@ -169,6 +169,16 @@ sub show_SCALAR
       );
       Devel::MAT::Cmd->printf( "  PVLEN %d\n", $sv->pvlen );
    }
+}
+
+sub show_BOOL
+{
+   my $self = shift;
+   my ( $sv, $opts ) = @_;
+
+   Devel::MAT::Cmd->printf( "  BOOL=%s\n",
+      Devel::MAT::Cmd->format_value( $sv->uv ? "true" : "false" )
+   );
 }
 
 sub show_REF

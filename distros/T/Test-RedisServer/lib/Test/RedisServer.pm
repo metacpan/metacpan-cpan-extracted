@@ -3,13 +3,14 @@ use strict;
 use warnings;
 use Mouse;
 
-our $VERSION = '0.21';
+our $VERSION = '0.23';
 
 use Carp;
 use File::Temp;
 use POSIX qw(SIGTERM WNOHANG);
 use Time::HiRes qw(sleep);
 use Errno ();
+use Redis;
 
 has auto_start => (
     is      => 'rw',
@@ -34,6 +35,11 @@ has timeout => (
 has tmpdir  => (
     is         => 'rw',
     lazy_build => 1,
+);
+
+has _redis => (
+    is  => 'rw',
+    isa => 'Redis',
 );
 
 no Mouse;
@@ -133,6 +139,13 @@ sub start {
         };
     }
 
+    # This is sometimes needed to send commands to RedisServer during the stop process.
+    # Generally, we would like to generate it lazily and not have it as a property
+    # of the object. However, if you try to create the object at the stop,
+    # the object generation may fail, such as missing the socket file. Therefore,
+    # we will make the object and store it as property here.
+    $self->_redis( Redis->new($self->connect_info) );
+
     $self->pid($pid);
 }
 
@@ -162,6 +175,18 @@ sub stop {
 
     local $?; # waitpid may change this value :/
     return unless defined $self->pid;
+
+    # If the tmpdir has disappeared, clear the save config to prevent saving
+    # in the server terminating process. The newer Redis will save on stop
+    # for robustness, but will keep blocking if the directory is missing.
+    #
+    # It is unlikely that tmpdir will disappear first, but if both the RedisServer
+    # object and the tmpdir are defined globally, it may happen because the order
+    # in which they are DESTLOYed is uncertain.
+    if (! -f $self->tmpdir) {
+        $self->_redis->config_set('appendonly', 'no');
+        $self->_redis->config_set('save', '');
+    }
 
     $sig ||= SIGTERM;
 

@@ -11,6 +11,7 @@ subtest 'gettext style' => sub {
         dictionary => +{
             'Hello, World!'                  => 'Hallo, Welt!',
             'Double %dubbil(%1)'             => 'Doppelt %dubbil(%1)',
+            'Double %dubbil(%1) %dubbil(%2)' => 'Doppelt %dubbil(%1) %dubbil(%2)',
             'You have %*(%1,piece) of mail.' => 'Sie haben %*(%1,Poststueck,Poststuecken).',
             'Price: %#(%1)'                  => 'Preis: %#(%1)',
             '%1()'                           => '%1()',
@@ -35,6 +36,7 @@ subtest 'gettext style' => sub {
 
     is $de->maketext('Hello, World!'), 'Hallo, Welt!', 'simple case';
     is $de->maketext('Double %dubbil(%1)', 7), 'Doppelt 14';
+    is $de->maketext('Double %dubbil(%1) %dubbil(%2)', 7, 5), 'Doppelt 14 10';
     is $de->maketext('You have %*(%1,piece) of mail.', 1), 'Sie haben 1 Poststueck.';
     is $de->maketext('You have %*(%1,piece) of mail.', 10), 'Sie haben 10 Poststuecken.';
     is $de->maketext('Price: %#(%1)', 1000000), 'Preis: 1,000,000';

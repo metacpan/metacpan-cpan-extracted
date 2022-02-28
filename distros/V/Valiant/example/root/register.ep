@@ -1,36 +1,35 @@
 % layout 'layout.ep', title => 'Register';
-
-
 %= form_for $person => +{ style=>'width:27em; margin:auto' }, begin
+  % my $fb = shift;
   <fieldset>
-    <legend><%= human_model_name %></legend>
-    %= model_errors  +{class=>'alert alert-danger', role=>'alert', default_msg=>'Please fix validation errors'};
+    %== $fb->legend;
+    %== $fb->model_errors(+{class=>'alert alert-danger', role=>'alert', show_message_on_field_errors=>'Please fix validation errors' });
     <div class='form-group'>
-      %= label 'first_name'
-      %= input 'first_name', +{ class=>'form-control', errors_classes=>'is-invalid' }
-      %= errors_for 'first_name', +{ class=>'invalid-feedback' }
+      %== $fb->label('first_name');
+      %== $fb->input('first_name', +{ class=>'form-control', errors_classes=>'is-invalid' });
+      %== $fb->errors_for('first_name', +{ class=>'invalid-feedback' });
     </div>
     <div class='form-group'>
-      %= label 'last_name'
-      %= input 'last_name', +{ class=>'form-control', errors_classes=>'is-invalid'  }
-      %= errors_for 'last_name', +{ class=>'invalid-feedback' }
+      %== $fb->label('last_name');
+      %== $fb->input('last_name', +{ class=>'form-control', errors_classes=>'is-invalid' });
+      %== $fb->errors_for('last_name', +{ class=>'invalid-feedback' });
     </div>
     <div class='form-group'>
-      %= label 'username'
-      %= input 'username', +{ class=>'form-control', errors_classes=>'is-invalid'  }
-      %= errors_for 'username', +{ class=>'invalid-feedback' }
+      %== $fb->label('username');
+      %== $fb->input('username', +{ class=>'form-control', errors_classes=>'is-invalid' });
+      %== $fb->errors_for('username', +{ class=>'invalid-feedback' });
     </div>
     <div class='form-group'>
-      %= label 'password'
-      %= password 'password', +{ class=>'form-control', errors_classes=>'is-invalid' }
-      %= errors_for 'password', +{ class=>'invalid-feedback' }
+      %== $fb->label('password');
+      %== $fb->password('password', +{ autocomplete=>'new-password', class=>'form-control', errors_classes=>'is-invalid' });
+      %== $fb->errors_for('password', +{ class=>'invalid-feedback' });
     </div>
     <div class='form-group'>
-      %= label 'password_confirmation'
-      %= password 'password_confirmation', +{ class=>'form-control', errors_classes=>'is-invalid' }
-      %= errors_for 'password_confirmation', +{ class=>'invalid-feedback' }
+      %== $fb->label('password_confirmation');
+      %== $fb->password('password_confirmation', +{ class=>'form-control', errors_classes=>'is-invalid' });
+      %== $fb->errors_for('password_confirmation', +{ class=>'invalid-feedback' });
     </div>
-    %= button_tag { class=>'btn btn-lg btn-primary btn-block', value=>'Register' }, 'Register for Account'
+    %== $fb->button('Register for Account', +{class=>'btn btn-lg btn-primary btn-block'})
   </fieldset>
 %= end
 

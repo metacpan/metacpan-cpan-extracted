@@ -98,6 +98,8 @@ SUBROUTINES
 ERRORS
      check_array():
              Parameter '%s' must be a array.
+                     Value: %s
+                     Reference: %s
 
      check_array_object():
              Parameter '%s' must be a array.
@@ -105,15 +107,20 @@ ERRORS
 
      check_bool():
              Parameter '%s' must be a bool (0/1).
+                     Value: %s
 
      check_isa():
              Parameter '%s' must be a '%s' object.
+                     Value: %s
+                     Reference: %s
 
      check_length():
              Parameter '%s' has length greater than '%s'.
+                            'Value', $self->{$key},
 
      check_number():
              Parameter '%s' must a number.
+                     Value: %s
 
      check_number_of_items():
              %s for %s '%s' has multiple values.
@@ -452,5 +459,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.06
+    0.07
 

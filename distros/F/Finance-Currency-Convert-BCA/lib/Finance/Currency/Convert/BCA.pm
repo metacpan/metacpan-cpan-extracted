@@ -1,8 +1,5 @@
 package Finance::Currency::Convert::BCA;
 
-our $DATE = '2021-02-01'; # DATE
-our $VERSION = '0.155'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
@@ -11,11 +8,17 @@ use Log::ger;
 use List::Util qw(min);
 
 use Exporter 'import';
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-02-26'; # DATE
+our $DIST = 'Finance-Currency-Convert-BCA'; # DIST
+our $VERSION = '0.156'; # VERSION
+
 our @EXPORT_OK = qw(get_currencies convert_currency);
 
 our %SPEC;
 
-my $url = "https://www.bca.co.id/id/Individu/Sarana/Kurs-dan-Suku-Bunga/Kurs-dan-Kalkulator";
+my $url = "https://www.bca.co.id/en/informasi/kurs?";
 
 $SPEC{':package'} = {
     v => 1.1,
@@ -72,36 +75,44 @@ sub get_currencies {
         $page = $res->body;
     }
 
-    my $dom  = Mojo::DOM->new($page);
+    #my $dom  = Mojo::DOM->new($page);
 
     my %currencies;
-    my $tbody = $dom->find("tbody.text-right")->[0];
-    $tbody->find("tr")->each(
-        sub {
-            my $row0 = shift;
-            my $row = $row0->find("td")->map(
-                sub { $_->text })->to_array;
-            #use DD; dd $row;
-            return unless $row->[0] =~ /\A[A-Z]{3}\z/;
-            $currencies{$row->[0]} = {
-                sell_er  => Parse::Number::ID::parse_number_id(text=>$row->[1]),
-                buy_er   => Parse::Number::ID::parse_number_id(text=>$row->[2]),
-                sell_ttc => Parse::Number::ID::parse_number_id(text=>$row->[3]),
-                buy_ttc  => Parse::Number::ID::parse_number_id(text=>$row->[4]),
-                sell_bn  => Parse::Number::ID::parse_number_id(text=>$row->[5]),
-                buy_bn   => Parse::Number::ID::parse_number_id(text=>$row->[6]),
-            };
-        }
-    );
-
+    while ($page =~ m!<tr code="(\w{3})">!g) {
+        $currencies{$1} //= {};
+    }
     if (keys %currencies < 3) {
-        return [543, "Check: no/too few currencies found"];
+        return [543, "Check: no/too few currencies (".scalar(keys %currencies).") found"];
+    }
+
+    for my $currency (keys %currencies) {
+        my ($tr) = $page =~ m!<tr code="$currency">(.+?)</tr>!s;
+        $tr =~ m!<p[^>]*rate-type="ERate-sell">([0-9,.]+)</p>!
+            and defined($currencies{$currency}{sell_er} = Parse::Number::ID::parse_number_id(text=>$1))
+            or return [543, "Can't extract sell_er rate for $currency"];
+        $tr =~ m!<p[^>]*rate-type="ERate-buy">([0-9,.]+)</p>!
+            and defined($currencies{$currency}{buy_er} = Parse::Number::ID::parse_number_id(text=>$1))
+            or return [543, "Can't extract buy_er rate for $currency"];
+
+        $tr =~ m!<p[^>]*rate-type="TT-sell">([0-9,.]+)</p>!
+            and defined($currencies{$currency}{sell_ttc} = Parse::Number::ID::parse_number_id(text=>$1))
+            or return [543, "Can't extract sell_ttc rate for $currency"];
+        $tr =~ m!<p[^>]*rate-type="TT-buy">([0-9,.]+)</p>!
+            and defined($currencies{$currency}{buy_ttc} = Parse::Number::ID::parse_number_id(text=>$1))
+            or return [543, "Can't extract buy_ttc rate for $currency"];
+
+        $tr =~ m!<p[^>]*rate-type="BN-sell">([0-9,.]+)</p>!
+            and defined($currencies{$currency}{sell_bn} = Parse::Number::ID::parse_number_id(text=>$1))
+            or return [543, "Can't extract sell_bn rate for $currency"];
+        $tr =~ m!<p[^>]*rate-type="BN-buy">([0-9,.]+)</p>!
+            and defined($currencies{$currency}{buy_bn} = Parse::Number::ID::parse_number_id(text=>$1))
+            or return [543, "Can't extract buy_bn rate for $currency"];
     }
 
     my ($mtime, $mtime_er, $mtime_ttc, $mtime_bn);
   GET_MTIME_ER:
     {
-        unless ($page =~ m!<th[^>]*>e-Rate\*?<br />((\d+) (\w+) (\d{4}) / (\d+):(\d+) WIB)</th>!) {
+        unless ($page =~ m!e-Rate <br /><span[^>]+>((\d+) (\w+) (\d{4}) / (\d+):(\d+) WIB)</span>!) {
             log_warn "Cannot extract last update time for e-Rate";
             last;
         }
@@ -113,8 +124,8 @@ sub get_currencies {
     }
   GET_MTIME_TTC:
     {
-        unless ($page =~ m!<th[^>]*>TT Counter\*?<br />((\d+) (\w+) (\d{4}) / (\d+):(\d+) WIB)</th>!) {
-            log_warn "Cannot extract last update time for TT Counter";
+        unless ($page =~ m!TT Counter <br /><span[^>]+>((\d+) (\w+) (\d{4}) / (\d+):(\d+) WIB)</span>!) {
+            log_warn "Cannot extract last update time for TT";
             last;
         }
         my $mon = Parse::Date::Month::ID::parse_date_month_id(text=>$3) or do {
@@ -125,8 +136,8 @@ sub get_currencies {
     }
   GET_MTIME_BN:
     {
-        unless ($page =~ m!<th[^>]*>Bank Notes\*?<br />((\d+) (\w+) (\d{4}) / (\d+):(\d+) WIB)</th>!) {
-            log_warn "Cannot extract last update time for Bank Note";
+        unless ($page =~ m!Bank Notes <br /><span[^>]+>((\d+) (\w+) (\d{4}) / (\d+):(\d+) WIB)</span>!) {
+            log_warn "Cannot extract last update time for BN";
             last;
         }
         my $mon = Parse::Date::Month::ID::parse_date_month_id(text=>$3) or do {
@@ -213,11 +224,11 @@ sub convert_currency {
         $_get_res = get_currencies();
         unless ($_get_res->[0] == 200) {
             warn "Can't get currencies: $_get_res->[0] - $_get_res->[1]\n";
-            return undef;
+            return;
         }
     }
 
-    my $c = $_get_res->[2]{currencies}{uc $from} or return undef;
+    my $c = $_get_res->[2]{currencies}{uc $from} or return;
 
     my $rate;
     if ($which =~ /\Aavg_(.+)/) {
@@ -244,7 +255,7 @@ Finance::Currency::Convert::BCA - Convert currency using BCA (Bank Central Asia)
 
 =head1 VERSION
 
-This document describes version 0.155 of Finance::Currency::Convert::BCA (from Perl distribution Finance-Currency-Convert-BCA), released on 2021-02-01.
+This document describes version 0.156 of Finance::Currency::Convert::BCA (from Perl distribution Finance-Currency-Convert-BCA), released on 2022-02-26.
 
 =head1 SYNOPSIS
 
@@ -258,7 +269,7 @@ This document describes version 0.155 of Finance::Currency::Convert::BCA (from P
 This module can extract currency rates from the BCA/KlikBCA (Bank Central Asia's
 internet banking) website:
 
- https://www.bca.co.id/id/Individu/Sarana/Kurs-dan-Suku-Bunga/Kurs-dan-Kalkulator
+ https://www.bca.co.id/en/informasi/kurs?
 
 Currently only conversions from a few currencies to Indonesian Rupiah (IDR) are
 supported.
@@ -315,7 +326,7 @@ Return value:  (any)
 
 Usage:
 
- get_currencies() -> [status, msg, payload, meta]
+ get_currencies() -> [$status_code, $reason, $payload, \%result_meta]
 
 Extract data from KlikBCAE<sol>BCA page.
 
@@ -325,12 +336,12 @@ No arguments.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -351,23 +362,46 @@ Please visit the project's homepage at L<https://metacpan.org/release/Finance-Cu
 
 Source repository is at L<https://github.com/perlancar/perl-Finance-Currency-Convert-BCA>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Finance-Currency-Convert-BCA/issues>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <stevenharyanto@gmail.com>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2018, 2017, 2016, 2015, 2014, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2022, 2021, 2018, 2017, 2016, 2015, 2014, 2012 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Finance-Currency-Convert-BCA>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

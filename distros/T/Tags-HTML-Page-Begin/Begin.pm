@@ -13,7 +13,7 @@ Readonly::Hash my %LANG => (
 	'title' => 'Page title',
 );
 
-our $VERSION = 0.11;
+our $VERSION = 0.12;
 
 # Constructor.
 sub new {
@@ -228,9 +228,11 @@ sub process {
 	}
 
 	$self->{'tags'}->put(
-		['b', 'title'],
-		['d', $self->{'lang'}->{'title'}],
-		['e', 'title'],
+		defined $self->{'lang'}->{'title'} ? (
+			['b', 'title'],
+			['d', $self->{'lang'}->{'title'}],
+			['e', 'title'],
+		) : (),
 
 		(
 			defined $css ? (
@@ -627,6 +629,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.11
+0.12
 
 =cut

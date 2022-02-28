@@ -130,6 +130,7 @@ sub full_message {
   my $attr_name = do {
     my $human_attr = $attribute;
     $human_attr =~s/\./ /g;
+    $human_attr =~s/_id$//; # remove trailing _id
     $human_attr =~s/_/ /g;
     $human_attr = autoformat $human_attr, {case=>'title'};
     $human_attr =~s/[\n]//g; # Is this a bug in Text::Autoformat???
@@ -244,9 +245,8 @@ sub message {
     );
     delete @options{@CALLBACKS_OPTIONS, @MESSAGE_OPTIONS};
 
-    # TODO this has an error when $args{$1} is 0 Change to TT::String I guess
     my $translated = $$type;
-    $translated =~ s/\{\{([^}]+)\}\}/ $options{$1} || '' /gex;
+    $translated =~ s/\{\{([^}]+)\}\}/ defined($options{$1}) ? $options{$1} : '' /gex;
     return $translated;
   } else {
     # Its just a plain string

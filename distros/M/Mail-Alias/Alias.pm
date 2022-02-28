@@ -1,14 +1,14 @@
 # Mail::Alias.pm
 #
-# Version 1.12 		Date: 21 October 2000 
+# Version 1.15 		Date: 26 February 2022
 #
-# Copyright (c) 2000 Tom Zeltwanger <perlename.com>. All rights reserved.
+# Copyright (c) 2022 Jonathan Kamens <jik@kamens.us>. All rights reserved.
 # This program is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
-
-#  The format(), expand(), read(), and write() methods are Copyright by
-#  Graham Barr, and modified by T. Zeltwanger
 #
+# Portions of earlier versions of this program were copyrighted by Tom
+# Zeltwanger and Graham Barr. The current copyright holder extends full
+# authorship rights to both of the previous authors.
 
 # PERLDOC documentation is found at the end of this file
 
@@ -21,7 +21,7 @@ package Mail::Alias;             #
 use Carp;
 use vars qw($VERSION);
 
-$VERSION = do { my @r=(q$Revision: 1.12 $=~/\d+/g); sprintf "%d."."%02d"x$#r,@r};
+$VERSION = 1.15;
 sub Version { $VERSION }
 
 
@@ -82,7 +82,7 @@ sub format {
  my $pkg = "Mail::Alias::" . $fmt;
 
  croak "Unknown format '$fmt'"
-  unless defined @{$pkg . "::ISA"};
+  unless @{$pkg . "::ISA"};
 
  bless $me, $pkg;
 }
@@ -532,12 +532,12 @@ sub write {
 #-----------------------------------------------------------#
 sub _include_file {
  my $file = shift;
- local *INC;
+ local *INCLUDE;
  my @ln;
  local $_;
- open(INC,$file) or carp "Cannot open file '$file'" and return "";
- @ln = grep(/^[^#]/,<INC>);
- close(INC);
+ open(INCLUDE,$file) or carp "Cannot open file '$file'" and return "";
+ @ln = grep(/^[^#]/,<INCLUDE>);
+ close(INCLUDE);
  chomp(@ln);
  join(",",@ln);
 }
@@ -556,18 +556,20 @@ sub read {
  my $group = undef;
  my $line = undef;
 
- while(<ALIAS>) {
-  chomp;
-  if(defined $line && /^\s/) {		
-   $line .= $_;
+ while(defined($_ = <ALIAS>) or defined($line)) {
+  if(defined $_) {
+   chomp;
+   if(defined $line && /^\s/) {		
+    $line .= $_;
+    next;
+   }
   }
-  else {
-   if(defined $line) {
+  if(defined $line) {
     if($line =~ s/^([^:]+)://) {	
      my @resp;
      $group = $1;
      $group =~ s/(\A\s+|\s+\Z)//g;	
-     $line =~ s/\"?:include:(\S+)\"?/_include_file($1)/eg;	
+     $line =~ s/\"?:include:\s*(\S+)\"?/_include_file($1)/eg;	
      $line =~ s/(\A[\s,]+|[\s,]+\Z)//g;
 
      while(length($line)) {
@@ -578,10 +580,10 @@ sub read {
      $me->{$group} = \@resp;
     }
     undef $line;
-   }
-   next if (/^#/ || /^\s*$/);		
-   $line = $_;
   }
+  last if (! defined $_);
+  next if (/^#/ || /^\s*$/);		
+  $line = $_;
  }
  close(ALIAS);
 }
@@ -767,19 +769,19 @@ Sets the working mode to use files (direct access). Use append() and delete()
 
 =back
 
-=head1 AUTHOR
+=head1 MAINTAINER
 
-Tom Zeltwanger <perl@ename.com> (CPAN author ID: ZELT)
+Jonathan Kamens <jik@kamens.us> (CPAN author ID: JIK)
 
 =head1 COPYRIGHT
 
-Copyright (c) 2000 Tom Zeltwanger. All rights reserved. This program is free
-software; you can redistribute it and/or modify it under the same terms
-as Perl itself.
+Copyright (c) 2022 Jonathan Kamens <jik@kamens.us>. All rights reserved. This
+program is free software; you can redistribute it and/or modify it under the
+same terms as Perl itself.
 
-Versions up to 1.06, Copyright (c) 1995-1997 Graham Barr. All rights reserved.
-This program is free software; you can distribute it and/or modify it under
-the same terms as Perl itself.
+Portions of earlier versions of this program were copyrighted by Tom Zeltwanger
+and Graham Barr. The current copyright holder extends full authorship rights to
+both of the previous authors.
 
 =cut
 

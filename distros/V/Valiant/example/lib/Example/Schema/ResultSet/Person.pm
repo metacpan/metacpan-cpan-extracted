@@ -1,7 +1,11 @@
 package Example::Schema::ResultSet::Person;
 
-use Example::Base;
+use Example::Syntax;
 use base 'Example::Schema::ResultSet';
+
+sub find_by_id($self, $id) {
+  return $self->find({id=>$id});
+}
 
 sub authenticate($self, $username='', $password='') {
   my $user = $self->find_or_new({username=>$username});

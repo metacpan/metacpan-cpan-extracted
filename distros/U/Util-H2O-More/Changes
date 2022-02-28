@@ -1,16 +1,27 @@
-0.0.1  Sat Dec 11 11:05:09 2021
+0.0.1 Sat Dec 11 11:05:09 2021
     - initial module
 
-0.0.2  Mon Dec 13 11:05:09 2021
+0.0.2 Mon Dec 13 11:05:09 2021
     - bump to 0.0.2 without TRIAL so
       it can be installed via cpanm
 
-0.0.3  Mon Dec 13 12:05:09 2021
+0.0.3 Mon Dec 13 12:05:09 2021
     - `h2o` can now be properly exported
       via Util::H2O::More qw/h2o/;
 
-0.0.4   Sun Jan 2 12:05:09 2021
+0.0.4 Sun Jan 2 12:05:09 2022
     - no functional change, build only impacts
     - specified minimal Util::H2O version
       due to "-isa" not being supported
       before v0.14
+
+0.0.5 Thu Feb 24 12:05:08 2022 
+    - deprecating baptise_deeply in favor of
+      supporting -recurse in the baptise command
+    - add opt2h2o for efficiently using h2o with
+      Getopt::Long (examples included)
+    - added o2h, to be the "inverse" operation of
+      h2o; it supports the -recurse option.
+
+0.0.6 Thu Feb 24 12:07:08 2022 
+    - POD fixes

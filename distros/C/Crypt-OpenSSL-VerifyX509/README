@@ -1,11 +1,56 @@
-Crypt::OpenSSL::VerifyX509 - simple verify-cert module, in XS.
+NAME
+    Crypt::OpenSSL::VerifyX509 - simple certificate verification
 
-This module provides certificate verification, along the lines of
-"openssl verify". While Crypt::OpenSSL::CA can do this, and is
-fully-featured, it uses Inline::C, which can present deployment
-problems.
+SYNOPSIS
+      use Crypt::OpenSSL::VerifyX509;
+      use Crypt::OpenSSL::X509;
 
-Major dependency:
- * Crypt::OpenSSL::X509
+      my $ca = Crypt::OpenSSL::VerifyX509->new('t/cacert.pem');
 
+      my $cert = Crypt::OpenSSL::X509->new(...);
+      $ca->verify($cert);
+
+DESCRIPTION
+    Given a CA certificate and another untrusted certificate, will show
+    whether the CA signs the certificate. This is a useful thing to have if
+    you're signing with X509 certificates, but outside of SSL.
+
+    A specific example is where you're working with XML signatures, and need
+    to verify that the signing certificate is valid.
+
+    You could use Crypt::OpenSSL::CA to do this, but it is based on
+    Inline::C, which can be troublesome in some situations. This module
+    provides an XS alternative for the certificate verify feature.
+
+METHODS
+  new($ca_path)
+    Constructor. Returns a VerifyX509 instance, set up with the given CA.
+
+    Arguments:
+
+     * $ca_path - path to a file containing the CA certificate
+
+  verify($cert)
+    Verify the certificate is signed by the CA. Returns true if so, and
+    croaks with the verification error if not.
+
+    Arguments:
+
+     * $cert - a Crypt::OpenSSL::X509 object for the certificate to verify.
+
+AUTHOR
+    Chris Andrews <chrisandrews@venda.com>
+
+MAINTAINER
+    Timothy Legge <timlegge@gmail.com>
+
+COPYRIGHT
+    The following copyright notice applies to all the files provided in this
+    distribution, including binary files, unless explicitly noted otherwise.
+
+    Copyright 2010 Venda Ltd.
+
+LICENCE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
 

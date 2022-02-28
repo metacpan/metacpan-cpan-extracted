@@ -40,10 +40,14 @@ sub validate_each {
   $record->errors->add($attribute, $self->invalid_msg, $opts) if $result->errors->size;
 
   # Not sure if this should be default behavior or not...
-  $result->errors->each(sub {
-    my ($attr, $message) = @_;
-    $record->errors->add("${attribute}.${attr}", $message);
-  });
+  #$result->errors->each(sub {
+  #  my ($attr, $message) = @_;
+  #  $record->errors->add("${attribute}.${attr}", $message);
+  #});
+
+  foreach my $importable_error ($result->errors->errors->all) {
+    $record->errors->import_error($importable_error, +{attribute=>"${attribute}.@{[ $importable_error->attribute||'*' ]}"});
+  }
 }
 
 1;
@@ -90,6 +94,9 @@ DBIx::Class::Valiant::Validator::Result - Verify a DBIC related result
 
 Trigger validations on a related result and aggregates any errors as nested errors
 on the parent class.
+
+B<NOTE>: This gets added automatically for you if you setup C<accepts_nested> on the parent
+object.  So you shouldn't really ever need to use this code directly.  
 
 =head1 ATTRIBUTES
 

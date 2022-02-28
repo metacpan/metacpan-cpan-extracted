@@ -1,0 +1,74 @@
+{
+   "abstract" : "lint git commits and messages",
+   "author" : [
+      "Blaine Motsinger <blaine@renderorange.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Git-Lint",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "FindBin" : "0",
+            "Getopt::Long" : "2.45",
+            "List::MoreUtils" : "0",
+            "Module::Loader" : "0",
+            "Pod::Usage" : "1.67",
+            "Try::Tiny" : "0",
+            "constant" : "0",
+            "lib" : "0",
+            "parent" : "0",
+            "perl" : "5.010001",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "Test::Deep" : "0",
+            "Test::Exception" : "0.42",
+            "Test::More" : "0.98",
+            "Test::Warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/renderorange/Git-Lint/issues"
+      },
+      "homepage" : "https://github.com/renderorange/Git-Lint",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/renderorange/Git-Lint.git",
+         "web" : "https://github.com/renderorange/Git-Lint"
+      }
+   },
+   "version" : "0.009",
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

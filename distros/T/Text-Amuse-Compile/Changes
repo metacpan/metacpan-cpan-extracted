@@ -1,5 +1,9 @@
 Revision history for perl module Text::Amuse::Compile
 
+1.83 2022-02-26
+
+ - Add option to set the paragraph indentation
+
 1.82 2022-02-13
 
  - Disable the babel shorthands

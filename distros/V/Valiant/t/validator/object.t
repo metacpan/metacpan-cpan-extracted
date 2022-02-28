@@ -67,8 +67,6 @@ use Test::Most;
     }
   );
 
-  #accept_nested_for 'address', sub { my ($self, %params) = @_ };
-
   validates car => (
     object => 'nested',
     allow_blank => 1,
@@ -81,6 +79,7 @@ use Test::Most;
     },
     allow_blank => 1,
   );
+
 }
 
 {
@@ -135,7 +134,6 @@ use Test::Most;
   );
 
   ok $person->validate->invalid;
-
   is_deeply +{ $person->errors->to_hash(full_messages=>1) },
     {
       address => [

@@ -69,7 +69,7 @@ sub _compile {
 
             my $code = q!$functions->{'! . $function_name . q!'}->(!;
             for my $arg (split(/,/, $4)) {
-                if (my $num = $arg =~ /%(.+)/) {
+                if (my ($num) = $arg =~ /%(\d+)/) {
                     $code .= '$_[' . $num . '], ';
                 }
                 else {

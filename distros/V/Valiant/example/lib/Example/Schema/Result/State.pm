@@ -18,13 +18,13 @@ __PACKAGE__->set_primary_key("id");
 __PACKAGE__->add_unique_constraint(['name']);
 __PACKAGE__->add_unique_constraint(['abbreviation']);
 
-__PACKAGE__->validates(name => (presence=>1, length=>[2,18], with=>'isa_state_name'));
-
 __PACKAGE__->has_many(
    profiles =>
   'Example::Schema::Result::Profile',
   { 'foreign.state_id' => 'self.id' }
 );
+
+__PACKAGE__->validates(name => (presence=>1, length=>[2,18], with=>'isa_state_name'));
 
 sub isa_state_name {
   my ($self, $attribute_name, $value) = @_;

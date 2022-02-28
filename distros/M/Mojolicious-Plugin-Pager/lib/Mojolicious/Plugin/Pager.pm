@@ -6,7 +6,7 @@ use POSIX ();
 use constant PAGE_PARAM         => 'page_param_name';
 use constant SHOW_PREV_AND_NEXT => 'pager.show_prev_next';
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 sub pager_link {
   my ($self, $c, $page, @args) = @_;
@@ -129,8 +129,6 @@ Mojolicious::Plugin::Pager - Pagination plugin for Mojolicious
 L<Mojolicious::Plugin::Pager> is a L<Mojolicious> plugin for creating paged
 navigation, without getting in the way. There are other plugins which ship with
 complete markup, but this is often not the markup that I<you> want.
-
-Note that this plugin is currently EXPERIMENTAL.
 
 =head1 HELPERS
 

@@ -31,7 +31,7 @@ time ${0%.sh}.pl "$@" |& \
 	--expression="s/^(# Looks like you failed .*)\$/$BRED\1$RESET/"
 if [[ -n "$*" ]]; then
     chmod --recursive --changes a+rX \
-	  Build.PL Changes LICENSE META.json README.md \
+	  Build.PL Changes CONTRIBUTING.md LICENSE META.json README.md \
 	  builder cpanfile examples lib minil.toml t
     chmod --changes 444 UI-Various-[0-9].[0-9][0-9].tar.gz
 fi

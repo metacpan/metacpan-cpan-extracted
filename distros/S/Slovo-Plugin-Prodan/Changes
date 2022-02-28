@@ -1,7 +1,12 @@
 Revision history for Slovo plugin Slovo::Plugin::Prodan
 
+0.04 Added variant for partials/_footer_right.html.ep with phone number.
+     Improved gdpr_consent feature to store consent when the users visit the
+     page, not when they click on a link to it. Added "Ok!" button which
+     returns the user where he was after visiting gdpr_consent_url.
+
 0.03 Implemented gdpr_consent feature. Improved documentation. Requires Slovo
-2022.2.16.
+     2022.2.16.
 
 0.02 Improved shopping cart. One click less.
 

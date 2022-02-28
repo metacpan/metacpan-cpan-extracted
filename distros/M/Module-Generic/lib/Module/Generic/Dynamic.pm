@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Dynamic.pm
-## Version v1.0.2
+## Version v1.1.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2021/09/01
+## Modified 2022/02/27
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -19,8 +19,11 @@ BEGIN
     use warnings::register;
     use Scalar::Util ();
     # use Class::ISA;
-    our( $VERSION ) = 'v1.0.2';
+    our $VERSION = 'v1.1.0';
 };
+
+use strict;
+no warnings 'redefine';
 
 sub new
 {
@@ -28,7 +31,7 @@ sub new
     my $class = ref( $this ) || $this;
     my $self = bless( {} => $class );
     my $data = $self->{_data} = {};
-    ## A Module::Generic object standard parameter
+    # A Module::Generic object standard parameter
     $self->{_data_repo} = '_data';
     my $hash = {};
     @_ = () if( scalar( @_ ) == 1 && !defined( $_[0] ) );
@@ -40,9 +43,9 @@ sub new
     {
         CORE::warn( "Parameter provided is not an hash reference: '", join( "', '", @_ ), "'\n" ) if( $this->_warnings_is_enabled );
     }
-    ## $self->message( 3, "Data provided are: ", sub{ $self->dumper( $hash ) } );
-    ## print( STDERR __PACKAGE__, "::new(): Got for hash: '", join( "', '", sort( keys( %$hash ) ) ), "'\n" );
-    local $make_class = sub
+    # $self->message( 3, "Data provided are: ", sub{ $self->dumper( $hash ) } );
+    # print( STDERR __PACKAGE__, "::new(): Got for hash: '", join( "', '", sort( keys( %$hash ) ) ), "'\n" );
+    my $make_class = sub
     {
         my $k = shift( @_ );
         my $new_class = $k;
@@ -80,13 +83,13 @@ EOT
     {
         if( ref( $hash->{ $k } ) eq 'HASH' )
         {
-            my $clean_field = $k;
-            $clean_field =~ tr/-/_/;
-            $clean_field =~ s/\_{2,}/_/g;
-            $clean_field =~ s/[^a-zA-Z0-9\_]+//g;
-            $clean_field =~ s/^\d+//g;
+            # my $clean_field = $k;
+            # $clean_field =~ tr/-/_/;
+            # $clean_field =~ s/\_{2,}/_/g;
+            # $clean_field =~ s/[^a-zA-Z0-9\_]+//g;
+            # $clean_field =~ s/^\d+//g;
+            my( $new_class, $clean_field ) = $make_class->( $k );
             next unless( length( $clean_field ) );
-#             my( $new_class, $clean_field ) = $make_class->( $k );
             # print( STDERR __PACKAGE__, "::new(): Is hash looping? ", ( $hash->{ $k }->{_looping} ? 'yes' : 'no' ), " (", ref( $hash->{ $k }->{_looping} ), ")\n" );
 #             my $o = $hash->{ $k }->{_looping} ? $hash->{ $k }->{_looping} : $new_class->new( $hash->{ $k } );
 #             $data->{ $clean_field } = $o;
@@ -139,7 +142,7 @@ EOT
             {
                 $func_name = '_set_get_uri';
             }
-            eval( "sub ${new_class}::${clean_field} { return( shift->${func_name}( '$clean_field', \@_ ) ); }" );
+            eval( "sub ${class}::${clean_field} { return( shift->${func_name}( '$clean_field', \@_ ) ); }" );
             $self->$clean_field( $hash->{ $k } );
         }
         else

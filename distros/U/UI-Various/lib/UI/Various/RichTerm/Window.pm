@@ -32,7 +32,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.16';
+our $VERSION = '0.18';
 
 use UI::Various::core;
 use UI::Various::Window;
@@ -91,6 +91,9 @@ sub _show($)
 	$pre_len += 3;
 	$pre_passive = ' ' x $pre_len;
     }
+    my $own_active = 0;
+    while ($_ = $self->child)
+    {   $own_active++ if $_->can('_process');   }
 
     # 3. determine space requirements of children:
     my $my_width = $self->{width};		# Don't use inheritance here!
@@ -104,7 +107,7 @@ sub _show($)
     $self->{_total_height} = 2;
     while ($_ = $self->child)
     {
-	my ($w, $h) = $_->_prepare($content_width);
+	my ($w, $h) = $_->_prepare($content_width, $pre_len);
 	$my_width >= $w  or  $my_width = $w;
 	$self->{_total_height} += $h;
 	push @{$self->{_space}}, [$w, $h];
@@ -116,14 +119,18 @@ sub _show($)
     while ($_ = $self->child)
     {
 	my ($w, $h) = @{$self->{_space}[$i++]};
-	my $prefix = $pre_passive;
-	$_->can('_process')  and
-	    $prefix = sprintf($pre_active, $self->{_active_index}{$_});
-	push @output, split(m/\n/, $_->_show($prefix, $w, $h));
+	my $prefix = '';
+	if (0 < $own_active)
+	{
+	    $prefix = $pre_passive;
+	    if ($_->can('_process'))
+	    {   $prefix = sprintf($pre_active, $self->{_active_index}{$_});   }
+	}
+	push @output, split(m/\n/, $_->_show($prefix, $w, $h, $pre_active));
     }
 
     # 5. print full window (text box plus frame):
-    $my_width += $pre_len;
+    $my_width += $pre_len if $own_active;
     my $title = $self->title ? ' ' . $self->title . ' ' : $D{W8} x 2;
     print $D{W7}, $D{W8}, $title;
     $_ = $my_width - $title_len;
@@ -223,6 +230,6 @@ under the same terms as Perl itself.  See LICENSE file for more details.
 
 =head1 AUTHOR
 
-Thomas Dorner E<lt>dorner@cpan.orgE<gt>
+Thomas Dorner E<lt>dorner (at) cpan (dot) orgE<gt>
 
 =cut

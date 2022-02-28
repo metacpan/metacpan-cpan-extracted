@@ -48,7 +48,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.16';
+our $VERSION = '0.18';
 
 use UI::Various::core;
 use UI::Various::container;
@@ -272,7 +272,7 @@ sub window($@)
 
 The main event loop of the application, handling every
 C<L<Window|UI::Various::Window>> and C<L<Dialog|UI::Various::Dialog>> until
-none is left or the application exists.
+none is left or the application exits.
 
 =cut
 
@@ -299,6 +299,6 @@ under the same terms as Perl itself.  See LICENSE file for more details.
 
 =head1 AUTHOR
 
-Thomas Dorner E<lt>dorner@cpan.orgE<gt>
+Thomas Dorner E<lt>dorner (at) cpan (dot) orgE<gt>
 
 =cut

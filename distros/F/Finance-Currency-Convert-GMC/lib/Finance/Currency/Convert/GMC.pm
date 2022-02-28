@@ -1,14 +1,17 @@
 package Finance::Currency::Convert::GMC;
 
-our $DATE = '2018-07-10'; # DATE
-our $VERSION = '0.006'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
 use Log::ger;
 
 use Exporter 'import';
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-02-26'; # DATE
+our $DIST = 'Finance-Currency-Convert-GMC'; # DIST
+our $VERSION = '0.007'; # VERSION
+
 our @EXPORT_OK = qw(get_currencies convert_currency);
 
 our %SPEC;
@@ -61,57 +64,34 @@ sub get_currencies {
     } else {
         require Mojo::UserAgent;
         my $ua = Mojo::UserAgent->new;
-        my $tx = $ua->get($url);
-        unless ($tx->success) {
-            my $err = $tx->error;
-            return [500, "Can't retrieve GMC page ($url): $err->{message}"];
+        my $res = $ua->get($url)->result;
+        unless ($res->is_success) {
+            return [500, "Can't retrieve URL $url: ".$res->code." - ".$res->message];
         }
-        $page = $tx->res->body;
+        $page = $res->body;
     }
 
-    my $dom  = Mojo::DOM->new($page);
+    #my $dom  = Mojo::DOM->new($page);
 
     my %currencies;
-    my $tbody = $dom->find("table#rate-table tbody")->[0];
-    $tbody->find("tr")->each(
-        sub {
-            my $row0 = shift;
-            my $row = $row0->find("td")->map(
-                sub { $_->text })->to_array;
-            #use DD; dd $row;
-            next unless $row->[0] =~ /\A[A-Z]{3}\z/;
-            $currencies{$row->[0]} = {
-                buy  => Parse::Number::EN::parse_number_en(text=>$row->[1]),
-                sell => Parse::Number::EN::parse_number_en(text=>$row->[2]),
-            };
-        }
-    );
+    while ($page =~ m!{"bid":([0-9.]+),"ask":([0-9.]+),"currency":"(\w{3})"!g) {
+        $currencies{$3} = {
+            buy  => $1,
+            sell => $2,
+        };
+    }
 
     if (keys %currencies < 3) {
-        return [543, "Check: no/too few currencies found"];
+        return [543, "Check: no/too few currencies (".scalar(keys %currencies).") found"];
     }
 
     my $mtime;
   GET_MTIME: {
-        unless ($page =~ m!</table>\s*<br>\s*<a>((\d+)-(\w+) (\d+):(\d+))</a>!s) {
+        unless ($page =~ m!"updatedAt":(\d+)!s) {
             log_warn "Cannot extract last update time";
             last;
         }
-        my $mon = Parse::Date::Month::ID::parse_date_month_id(text=>$3) or do {
-            log_warn "Cannot recognize month name '$3' in last update time '$1'";
-            last;
-        };
-        my $now = time();
-        my $year = (localtime $now)[5];
-        # the web page doesn't show year, pick year that will result in nearest
-        # time to current time
-        my $time1 = Time::Local::timegm(0, $5, $4, $2, $mon-1, $year  ) - 7*3600;
-        my $time2 = Time::Local::timegm(0, $5, $4, $2, $mon-1, $year-1) - 7*3600;
-        if (abs($time1 - $now) < abs($time2 - $now)) {
-            $mtime = $time1;
-        } else {
-            $mtime = $time2;
-        }
+        $mtime = $1/1000;
     }
 
     # XXX parse update dates (mtime_er, mtime_ttc, mtime_bn)
@@ -182,11 +162,11 @@ sub convert_currency {
         $_get_res = get_currencies();
         unless ($_get_res->[0] == 200) {
             warn "Can't get currencies: $_get_res->[0] - $_get_res->[1]\n";
-            return undef;
+            return;
         }
     }
 
-    my $c = $_get_res->[2]{currencies}{uc $from} or return undef;
+    my $c = $_get_res->[2]{currencies}{uc $from} or return;
 
     my $rate;
     #if ($which =~ /\Aavg_(.+)/) {
@@ -213,7 +193,7 @@ Finance::Currency::Convert::GMC - Convert currency using GMC (Golden Money Chang
 
 =head1 VERSION
 
-This document describes version 0.006 of Finance::Currency::Convert::GMC (from Perl distribution Finance-Currency-Convert-GMC), released on 2018-07-10.
+This document describes version 0.007 of Finance::Currency::Convert::GMC (from Perl distribution Finance-Currency-Convert-GMC), released on 2022-02-26.
 
 =head1 SYNOPSIS
 
@@ -270,16 +250,18 @@ Arguments ('*' denotes required arguments):
 
 Select which rate to use (default is `sell`).
 
+
 =back
 
 Return value:  (any)
+
 
 
 =head2 get_currencies
 
 Usage:
 
- get_currencies() -> [status, msg, result, meta]
+ get_currencies() -> [$status_code, $reason, $payload, \%result_meta]
 
 Extract data from GMC page.
 
@@ -289,12 +271,12 @@ No arguments.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -313,6 +295,34 @@ Please visit the project's homepage at L<https://metacpan.org/release/Finance-Cu
 
 Source repository is at L<https://github.com/perlancar/perl-Finance-Currency-Convert-GMC>.
 
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022, 2018, 2017, 2016 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Finance-Currency-Convert-GMC>
@@ -320,16 +330,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2018, 2017, 2016 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

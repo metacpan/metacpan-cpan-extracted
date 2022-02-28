@@ -1,0 +1,63 @@
+Revision history for perl module Git::Lint
+
+0.009 2022-02-26
+ - Fix documentation for message check modules
+ - Fix double installation sections in documentation
+ - Add cpanm to installation instructions
+ - Rename Config new to load
+ - Rename report method to format_issue
+ - Update MANIFEST for report method rename
+ - Remove GoFmt commit check module
+ - Update MANIFEST for GoFmt removal
+ - Fix message test for non-English locales
+ - Remove Config new test from MANIFEST
+
+0.008 2022-02-25
+ - Move config and hook examples into examples dir
+ - Documentation update
+ - Add initial build and install tooling
+
+0.007 2022-02-25
+ - Simplify issue output
+
+0.006 2022-02-25
+ - Add opt message output if not filename
+ - Remove incorrect exit in diff method
+ - Add BlankLineAfterSummary.pm message check module
+ - Add SummaryEndingPeriod.pm message check module
+ - Add check message tests
+ - Remove t/data from gitignore
+ - Add tests for Check::Message->message
+ - Add input verification for Check::Message->message
+
+0.005 2022-02-20
+ - Update usage output
+ - Update documentation
+ - Add body line length message check
+ - Rename Summary check to SummaryLength
+ - Add documentation for check modes
+ - Add description var to GoFmt.pm
+
+0.004 2022-02-16
+ - Add GoFmt.pm check module
+ - Add the get_filename method
+ - Add MIT license
+
+0.003 2022-02-13
+ - Move loader out of new method
+ - Add message check mode
+ - Add commit-msg hook
+ - Update docs and pod
+ - Update pre-commit hook for new syntax
+ - Fix Config/new.t test for message check changes
+ - Update perlcritic config
+ - Update gitignore
+
+0.002 2020-09-13
+ - Add defined loop var instead of internal var
+ - Skip lines denoting the files being diff'd
+ - Add program name to output
+ - Add documentation to the README
+
+0.001 2020-06-30
+ - Initial version

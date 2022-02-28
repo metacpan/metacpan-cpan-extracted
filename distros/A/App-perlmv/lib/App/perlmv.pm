@@ -3,9 +3,9 @@
 package App::perlmv;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-08-18'; # DATE
+our $DATE = '2022-02-25'; # DATE
 our $DIST = 'App-perlmv'; # DIST
-our $VERSION = '0.604'; # VERSION
+our $VERSION = '0.605'; # VERSION
 
 use 5.010001;
 use strict;
@@ -644,7 +644,7 @@ App::perlmv - Rename files using Perl code
 
 =head1 VERSION
 
-This document describes version 0.604 of App::perlmv (from Perl distribution App-perlmv), released on 2020-08-18.
+This document describes version 0.605 of App::perlmv (from Perl distribution App-perlmv), released on 2022-02-25.
 
 =for Pod::Coverage ^(.*)$
 
@@ -656,14 +656,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-perlmv
 
 Source repository is at L<https://github.com/perlancar/perl-App-perlmv>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-perlmv>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<App::RenameUtils>
@@ -672,11 +664,56 @@ L<App::RenameUtils>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTORS
+
+=for stopwords Sawyer X Steven Haryanto
+
+=over 4
+
+=item *
+
+Sawyer X <xsawyerx@cpan.org>
+
+=item *
+
+Steven Haryanto <stevenharyanto@gmail.com>
+
+=item *
+
+Steven Haryanto <steven@masterweb.net>
+
+=back
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2015, 2014, 2013, 2012, 2011, 2010 by perlancar@cpan.org.
+This software is copyright (c) 2022, 2020, 2015, 2014, 2013, 2012, 2011, 2010 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-perlmv>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

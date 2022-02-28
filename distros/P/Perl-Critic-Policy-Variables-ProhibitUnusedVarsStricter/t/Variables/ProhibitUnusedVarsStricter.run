@@ -675,6 +675,42 @@ try {
 
 #-----------------------------------------------------------------------------
 
+## name Signatures (thanks to oalders)
+## failures 0
+## cut
+
+const my $THING => 99;
+
+sub something ( $arg = $THING ) {
+    print "got $arg\n";
+}
+
+#-----------------------------------------------------------------------------
+
+## name Signature with unused argument
+## failures 1
+## TODO variable definitions in sub-documents not recognized
+## cut
+
+const my $THING => 99;
+
+sub something ( $arg = $THING ) {
+}
+
+#-----------------------------------------------------------------------------
+
+## name Signature with ignored arguments
+## failures 1
+## TODO variable definitions in sub-documents not recognized
+## cut
+
+const my $THING => 99;
+
+sub something ( $=, $arg = $THING, @ ) {
+}
+
+#-----------------------------------------------------------------------------
+
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4

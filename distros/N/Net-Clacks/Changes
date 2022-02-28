@@ -1,5 +1,30 @@
-@  changeset:   144:55ed1ba21267
+@  changeset:   149:5307bcb221bd
 |  tag:         tip
+|  user:        Rene Schickbauer <cavac@venera>
+|  date:        Sat Feb 26 00:19:22 2022 +0100
+|  summary:     Bump to Version 21
+|
+o  changeset:   148:d2c2ecd0a6dc
+|  user:        Rene Schickbauer <cavac@venera>
+|  date:        Sat Feb 26 00:18:19 2022 +0100
+|  summary:     GNU Sven Guckes
+|
+o  changeset:   147:1d07118e9a50
+|  user:        Rene Schickbauer <cavac@venera>
+|  date:        Sat Feb 26 00:12:22 2022 +0100
+|  summary:     Add a SETANDSTORE command to reduce network bandwidth in certain cases
+|
+o  changeset:   146:cabc49c054b6
+|  user:        Rene Schickbauer <cavac@earthrise>
+|  date:        Fri Jan 14 15:44:46 2022 +0100
+|  summary:     BF
+|
+o  changeset:   145:069c272fe02d
+|  user:        Rene Schickbauer <cavac@earthrise>
+|  date:        Fri Jan 14 15:43:01 2022 +0100
+|  summary:     Update docs for release
+|
+o  changeset:   144:55ed1ba21267
 |  user:        Rene Schickbauer <cavac@earthrise>
 |  date:        Fri Jan 14 15:40:40 2022 +0100
 |  summary:     Bugfix: Wrong package name in Net::Clacks.pm

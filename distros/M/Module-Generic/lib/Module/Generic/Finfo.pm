@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Finfo.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/20
-## Modified 2021/05/24
+## Modified 2022/02/27
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -63,8 +63,11 @@ BEGIN
     use constant FILETYPE_UNKFILE => 127;
     our %EXPORT_TAGS = ( all => [qw( FILETYPE_NOFILE FILETYPE_REG FILETYPE_DIR FILETYPE_CHR FILETYPE_BLK FILETYPE_PIPE FILETYPE_LNK FILETYPE_SOCK FILETYPE_UNKFILE )] );
     our @EXPORT_OK = qw( FILETYPE_NOFILE FILETYPE_REG FILETYPE_DIR FILETYPE_CHR FILETYPE_BLK FILETYPE_PIPE FILETYPE_LNK FILETYPE_SOCK FILETYPE_UNKFILE );
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.2.0';
 };
+
+use strict;
+no warnings 'redefine';
 
 sub init
 {
@@ -499,7 +502,7 @@ Module::Generic::Finfo - File Info Object Class
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 

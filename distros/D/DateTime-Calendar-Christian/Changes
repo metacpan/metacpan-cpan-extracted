@@ -1,3 +1,14 @@
+0.14		2022-02-26	T. R. Wyant
+    Report DateTime validation errors relative to caller, not the point
+    at which DateTime was called.
+
+    Add missing DateTime methods, and xt/author/interface_coverage.t to
+    ensure the interface stays complete.
+
+    Require DateTime 1.53 for all the additional methods.  Thanks to
+    Slaven Rezić, not only for running the CPAN tester that found the
+    problem, but filing an RT ticket on it. CPAN TESTERS ROCK!
+
 0.13		2022-02-04	T. R. Wyant
     Add julian_deviation().  This is like gregorian_deviation(), but
     increments on March 1 Gregorian rather than March 1 Julian. Thanks

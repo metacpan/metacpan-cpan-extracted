@@ -1,3 +1,11 @@
+0.127   2021-09-06  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] [cli parse-date] Show datetime object in local as well as
+	  UTC time zones in addition to original.
+
+	- [doc] Mention App::TimeZoneUtils.
+
+
 0.126   2020-03-30  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

@@ -3,7 +3,7 @@ requires 'Catalyst::Model::DBIC::Schema', '0.65';
 requires 'Catalyst::Plugin::ConfigLoader', '0.34';
 requires 'Catalyst::Plugin::RedirectTo', '0.003';
 requires 'Catalyst::ControllerRole::At', '0.006';
-requires 'CatalystX::Errors', '0.001006';
+requires 'CatalystX::Errors', '0.001007';
 requires 'Catalyst::Plugin::URI';
 requires 'Catalyst::View::MojoTemplate', '0.004';
 requires 'Catalyst::Plugin::Session';

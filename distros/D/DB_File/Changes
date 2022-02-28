@@ -1,4 +1,9 @@
 
+1.857 25 February 2022
+
+   * Silence gcc12 'empty-body' warning
+     https://github.com/pmqs/DB_File/issues/10
+     22c4850b70d0c32eb4acb9c987868274a61072ec
 
 1.856 22 June 2021
 

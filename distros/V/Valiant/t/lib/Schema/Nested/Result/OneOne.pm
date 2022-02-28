@@ -9,6 +9,7 @@ __PACKAGE__->add_columns(
 );
 
 __PACKAGE__->set_primary_key("id");
+__PACKAGE__->add_unique_constraint(['value']);
 
 __PACKAGE__->has_one(
   one =>
@@ -16,9 +17,8 @@ __PACKAGE__->has_one(
   { 'foreign.one_id' => 'self.id' }
 );
 
-__PACKAGE__->accept_nested_for('one', {update_only=>1});
-__PACKAGE__->add_unique_constraint(['value']);
 __PACKAGE__->validates(value => ( presence=>1, length=>[3,24], unique=>1 ));
-__PACKAGE__->validates(one => ( presence=>1, result=>+{validations=>1} ));
+__PACKAGE__->accept_nested_for('one', {update_only=>1});
+__PACKAGE__->validates(one => ( presence=>1));
 
 1;

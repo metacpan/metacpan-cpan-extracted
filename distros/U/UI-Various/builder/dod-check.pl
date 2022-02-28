@@ -270,9 +270,7 @@ skip_or_run('test coverage', 'improve test coverage',
 		     '^-----.*',
 		     '^File .*',
 		     '^-----.*',
-		     # 1 uncoverable statement in core.pm missing for 100%:
-		     '(.* 100.0|.*/core.pm +99\.[6-9] .* 99\.[89]|'
-		     . 'Total .* 99\.9)$+',
+		     '^.* 100\.0$+',
 		     '^-----.*',
 		     '^$+',
 		     '^HTML output written to .*',
@@ -333,9 +331,8 @@ check_fixmes_todos();
 
 =head3 description:
 
-This function prints the given text in  with a corresponding prefix and
-followed by a newline using the standard Perl error / warning
-functions otherwise.
+This function prints the given error, warning or information on the standard
+error output using markup specific for each message type.
 
 =cut
 
@@ -595,16 +592,14 @@ sub check_own_links()
 
 #########################################################################
 
-=head2 check_uncoverable - check that all tests are correctly planned
+=head2 check_uncoverable - check that all uncoverable items are confessed
 
     check_uncoverable();
 
 =head3 description:
 
-This function checks the Perl test sources for the following ... and reports
-
- missing test plans and
-reports them.
+This function checks that all C<uncoverable> code markers in the Perl
+sources are correctly confessed in the list of uncoverable code.
 
 =head3 returns:
 
@@ -685,9 +680,7 @@ sub check_uncoverable()
 
 =head3 description:
 
-This function checks the Perl test sources for the following ... and reports
-
- missing test plans and
+This function checks the Perl test sources for missing test plans and
 reports them.
 
 =head3 returns:
@@ -754,6 +747,6 @@ under the same terms as Perl itself.  See LICENSE file for more details.
 
 =head1 AUTHOR
 
-Thomas Dorner E<lt>dorner@cpan.orgE<gt>
+Thomas Dorner E<lt>dorner (at) cpan (dot) orgE<gt>
 
 =cut

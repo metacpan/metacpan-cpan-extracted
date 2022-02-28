@@ -176,23 +176,36 @@ following terms:
 
 =over 1
     
-=item MOD_DESMOSINE
-    
-MOD:00949 ("desmosine") becomes MOD_DESMOSINE_1
-
-MOD:01933 ("desmosine") becomes MOD_DESMOSINE_2
-
 =item MI_TEXT_MINING
     
 MI:0110 ("text mining") becomes MI_TEXT_MINING_1
 
 MI:1056 ("text-mining") becomes MI_TEXT_MINING_2
 
-=item MI_OPPOSING_EPISTASIS
-    
-MI:1276 ("opposing epistasis") becomes MI_OPPOSING_EPISTASIS_1
+=item UO_MILLI
 
-MI:1285 ("opposing epistasis") becomes MI_OPPOSING_EPISTASIS_2
+UO:0000297 ("milli") becomes UO_MILLI_1
+
+UO:0010009 ("milli") becomes UO_MILLI_2
+
+=item UO_RATIO
+
+UO:0000190 ("ratio") becomes UO_RATIO_1
+
+UO:0010006 ("ratio") becomes UO_RATIO_2
+
+=back
+
+In rare cases, we have chosen to override the above suffixing for colliding
+terms. As of this writing, the following terms are overridden:
+
+=over 1
+
+=item MS_M_H_ION
+
+MS:1002820 ("M+H ion") becomes M_PLUS_H_ION
+
+MS:1002821 ("M-H ion") becomes M_MINUS_H_ION
 
 =back
 

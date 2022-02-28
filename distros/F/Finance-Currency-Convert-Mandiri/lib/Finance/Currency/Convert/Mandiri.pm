@@ -1,21 +1,44 @@
 package Finance::Currency::Convert::Mandiri;
 
-our $DATE = '2018-07-15'; # DATE
-our $VERSION = '0.001'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
 use Log::ger;
 
+use Exporter 'import';
 use List::Util qw(min);
 
-use Exporter 'import';
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-02-27'; # DATE
+our $DIST = 'Finance-Currency-Convert-Mandiri'; # DIST
+our $VERSION = '0.002'; # VERSION
+
 our @EXPORT_OK = qw(get_currencies convert_currency);
+
+our %STATS = (
+    supported_pairs => [qw(
+                              AUD/IDR IDR/AUD
+                              CAD/IDR IDR/CAD
+                              CHF/IDR IDR/CHF
+                              CNY/IDR IDR/CNY
+                              DKK/IDR IDR/DKK
+                              EUR/IDR IDR/EUR
+                              GBP/IDR IDR/GBP
+                              HKD/IDR IDR/HKD
+                              JPY/IDR IDR/JPY
+                              MYR/IDR IDR/MYR
+                              NOK/IDR IDR/NOK
+                              NZD/IDR IDR/NZD
+                              SAR/IDR IDR/SAR
+                              SGD/IDR IDR/SGD
+                              THB/IDR IDR/THB
+                              USD/IDR IDR/USD
+                      )],
+);
 
 our %SPEC;
 
-my $url = "https://www.bankmandiri.co.id/kurs";
+my $url = "https://www.bankmandiri.co.id/kurs/";
 
 $SPEC{':package'} = {
     v => 1.1,
@@ -49,7 +72,8 @@ _
     },
 };
 sub get_currencies {
-    require Mojo::DOM;
+    #require Mojo::DOM;
+    require HTTP::Tiny::Plugin;
     require Parse::Number::ID;
     require Time::Local;
 
@@ -61,37 +85,48 @@ sub get_currencies {
     if ($args{_page_content}) {
         $page = $args{_page_content};
     } else {
-        require Mojo::UserAgent;
-        my $ua = Mojo::UserAgent->new;
-        my $tx = $ua->get($url);
-        unless ($tx->success) {
-            my $err = $tx->error;
-            return [500, "Can't retrieve URL $url: $err->{message}"];
+        #require Mojo::UserAgent;
+        #my $ua = Mojo::UserAgent->new;
+        #my $res = $ua->get($url)->result;
+        #unless ($res->is_success) {
+        #    return [500, "Can't retrieve URL $url: ".$res->code." - ".$res->message];
+        #}
+        #$page = $res->body;
+
+        require HTTP::Tiny::Plugin;
+        my @old_plugins = HTTP::Tiny::Plugin->set_plugins('NewestFirefox');
+        my $res = HTTP::Tiny::Plugin->new->get($url);
+        unless ($res->{success}) {
+            return [500, "Can't retrieve URL $url: ".$res->{status}." - ".$res->{reason}];
         }
-        $page = $tx->res->body;
+        $page = $res->{content};
+        HTTP::Tiny::Plugin->set_plugins(@old_plugins);
     }
 
-    my $dom  = Mojo::DOM->new($page);
+    #my $dom  = Mojo::DOM->new($page);
 
     my %currencies;
-    my $tbody = $dom->find("table.table-kurs tbody")->[0];
-    $tbody->find("tr")->each(
-        sub {
-            my $row0 = shift;
-            my $row = $row0->find("td")->map(
-                sub { $_->to_string })->to_array;
-            for (@$row) { s/<[^>]+>//g }
-            next unless $row->[0] =~ /\A[A-Z]{3}\z/;
-            $currencies{$row->[0]} = {
-                buy_sr    => Parse::Number::ID::parse_number_id(text=>$row->[1]),
-                sell_sr   => Parse::Number::ID::parse_number_id(text=>$row->[2]),
-                buy_ttc   => Parse::Number::ID::parse_number_id(text=>$row->[3]),
-                sell_ttc  => Parse::Number::ID::parse_number_id(text=>$row->[4]),
-                buy_bn    => Parse::Number::ID::parse_number_id(text=>$row->[5]),
-                sell_bn   => Parse::Number::ID::parse_number_id(text=>$row->[6]),
-            };
-        }
-    );
+
+    while ($page =~ m!
+                     <tr>\s*
+                     <td\s*>([A-Z]{3})</td>\s*
+                     <td\s*>([0-9,.]+)</td>\s*
+                     <td\s*><strong>([0-9,.]+)</strong></td>\s*
+                     <td\s*>([0-9,.]+)</td>\s*
+                     <td\s*><strong>([0-9,.]+)</strong></td>\s*
+                     <td\s*>([0-9,.]+)</td>\s*
+                     <td\s*><strong>([0-9,.]+)</strong></td>\s*
+                     </tr>
+                     !gsx) {
+        $currencies{$1} = {
+            buy_sr    => Parse::Number::ID::parse_number_id(text=>$2),
+            sell_sr   => Parse::Number::ID::parse_number_id(text=>$3),
+            buy_ttc   => Parse::Number::ID::parse_number_id(text=>$4),
+            sell_ttc  => Parse::Number::ID::parse_number_id(text=>$5),
+            buy_bn    => Parse::Number::ID::parse_number_id(text=>$6),
+            sell_bn   => Parse::Number::ID::parse_number_id(text=>$7),
+        };
+    }
 
     if (keys %currencies < 3) {
         return [543, "Check: no/too few currencies found"];
@@ -100,7 +135,7 @@ sub get_currencies {
     my ($mtime, $mtime_sr, $mtime_ttc, $mtime_bn);
   GET_MTIME_SR:
     {
-        unless ($page =~ m!<strong>Special Rate\*?</strong> <br/> ((\d+)/(\d+)/(\d{2}) - (\d+):(\d+) WIB) </th>!) {
+        unless ($page =~ m!<strong>Special Rate\*?</strong>\s*<br/>\s*((\d+)/(\d+)/(\d{2}) - (\d+):(\d+) WIB)\s*</th>!s) {
             log_warn "Cannot extract last update time for Special Rate";
             last;
         }
@@ -108,7 +143,7 @@ sub get_currencies {
     }
   GET_MTIME_TTC:
     {
-        unless ($page =~ m!<strong>TT Counter\*?</strong> <br/> ((\d+)/(\d+)/(\d{2}) - (\d+):(\d+) WIB) </th>!) {
+        unless ($page =~ m!<strong>TT Counter\*?</strong>\s*<br/>\s*((\d+)/(\d+)/(\d{2}) - (\d+):(\d+) WIB)\s*</th>!s) {
             log_warn "Cannot extract last update time for TT Counter";
             last;
         }
@@ -116,7 +151,7 @@ sub get_currencies {
     }
   GET_MTIME_BN:
     {
-        unless ($page =~ m!<strong>Bank Notes\*?</strong> <br/> ((\d+)/(\d+)/(\d{2}) - (\d+):(\d+) WIB) </th>!) {
+        unless ($page =~ m!<strong>Bank Notes\*?</strong>\s*<br/>\s*((\d+)/(\d+)/(\d{2}) - (\d+):(\d+) WIB)\s*</th>!) {
             log_warn "Cannot extract last update time for Bank Notes";
             last;
         }
@@ -200,11 +235,11 @@ sub convert_currency {
         $_get_res = get_currencies();
         unless ($_get_res->[0] == 200) {
             warn "Can't get currencies: $_get_res->[0] - $_get_res->[1]\n";
-            return undef;
+            return;
         }
     }
 
-    my $c = $_get_res->[2]{currencies}{uc $from} or return undef;
+    my $c = $_get_res->[2]{currencies}{uc $from} or return;
 
     my $rate;
     if ($which =~ /\Aavg_(.+)/) {
@@ -231,7 +266,7 @@ Finance::Currency::Convert::Mandiri - Convert currency using Bank Mandiri
 
 =head1 VERSION
 
-This document describes version 0.001 of Finance::Currency::Convert::Mandiri (from Perl distribution Finance-Currency-Convert-Mandiri), released on 2018-07-15.
+This document describes version 0.002 of Finance::Currency::Convert::Mandiri (from Perl distribution Finance-Currency-Convert-Mandiri), released on 2022-02-27.
 
 =head1 SYNOPSIS
 
@@ -244,10 +279,31 @@ This document describes version 0.001 of Finance::Currency::Convert::Mandiri (fr
 
 This module can extract currency rates from the Bank Mandiri website:
 
- https://www.bankmandiri.co.id/kurs
+ https://www.bankmandiri.co.id/kurs/
 
 Currently only conversions from a few currencies to Indonesian Rupiah (IDR) are
 supported.
+
+=head1 CURRENCY MODULE STATISTICS
+
+Supported pairs:
+
+                              AUD/IDR IDR/AUD
+                              CAD/IDR IDR/CAD
+                              CHF/IDR IDR/CHF
+                              CNY/IDR IDR/CNY
+                              DKK/IDR IDR/DKK
+                              EUR/IDR IDR/EUR
+                              GBP/IDR IDR/GBP
+                              HKD/IDR IDR/HKD
+                              JPY/IDR IDR/JPY
+                              MYR/IDR IDR/MYR
+                              NOK/IDR IDR/NOK
+                              NZD/IDR IDR/NZD
+                              SAR/IDR IDR/SAR
+                              SGD/IDR IDR/SGD
+                              THB/IDR IDR/THB
+                              USD/IDR IDR/USD
 
 =head1 FUNCTIONS
 
@@ -290,16 +346,18 @@ Select which rate to use (default is average buy+sell for e-Rate).
 
 {buy,sell,avg}_{bn,er,ttc}.
 
+
 =back
 
 Return value:  (any)
+
 
 
 =head2 get_currencies
 
 Usage:
 
- get_currencies() -> [status, msg, result, meta]
+ get_currencies() -> [$status_code, $reason, $payload, \%result_meta]
 
 Extract data from Bank Mandiri page.
 
@@ -309,12 +367,12 @@ No arguments.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -335,6 +393,34 @@ Please visit the project's homepage at L<https://metacpan.org/release/Finance-Cu
 
 Source repository is at L<https://github.com/perlancar/perl-Finance-Currency-Convert-Mandiri>.
 
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022, 2018 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Finance-Currency-Convert-Mandiri>
@@ -342,16 +428,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2018 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

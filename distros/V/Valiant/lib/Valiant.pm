@@ -1,13 +1,13 @@
 package Valiant;
 
-our $VERSION = '0.001011';
+our $VERSION = '0.001012';
 $VERSION = eval $VERSION;
 
 1;
 
 =head1 NAME
 
-Valiant - Ruby on Rails-like validation framework.
+Valiant - Object validation inspired by Ruby on Rails and more.
 
 =begin html
 
@@ -15,7 +15,7 @@ Valiant - Ruby on Rails-like validation framework.
 <a href="https://github.com/jjn1056/valiant/actions"><img src="https://github.com/jjn1056/valiant/workflows/macos/badge.svg"></a>
 <a href="https://github.com/jjn1056/valiant/actions"><img src="https://github.com/jjn1056/valiant/workflows/windows/badge.svg"></a>
 <a href="https://metacpan.org/pod/Valiant"><img src="https://badge.fury.io/pl/Valiant.svg"></a>
-<a href="https://codecov.io/github/jjn1056/Valiant/?branch=master"><img alt="Coverage" src="https://codecov.io/github/jjn1056/Valiant/coverage.svg?branch=master"></a>
+<a href="https://codecov.io/github/jjn1056/Valiant/?branch=main"><img alt="Coverage" src="https://codecov.io/github/jjn1056/Valiant/coverage.svg?branch=main"></a>
 
 =end html
 
@@ -1361,6 +1361,60 @@ For now please see L<Valiant::Filters> and L<Valiant::Filters> for API level doc
 filters as well as some examples. Also see L<Valiant::Filter> for a list of the prepackaged filter
 that ship with L<Valiant>
 
+=head1 HTML FORM GENERATION
+
+HTML Form generation is not specifically added to the L<Valiant> validation code, but there is
+a set of packages designed to work with L<Valiant> as well as L<DBIx::Class::Valiant> ORM integration:
+L<Valiant::HTML::FormBuilder>, L<Valiant::HTML::Form> and L<Valiant::HTML::FormTags>.  This code
+is currently under active development although I expect that the publically documented API
+is very likely to remain stable.  Here's a simple example of what this form integration looks like;
+for now you'll need to refer to the API docs and the example application for more on how to use
+this.
+
+Given a model like:
+
+    package Local::Person;
+
+    use Moo;
+    use Valiant::Validations;
+
+    has first_name => (is=>'ro');
+    has last_name => (is=>'ro');
+
+    validates ['first_name', 'last_name'] => (
+      length => {
+        maximum => 20,
+        minimum => 3,
+      }
+    );
+
+Wrap a formbuilder object around it and generate HTML form field controls:
+
+    use Valiant::HTML::Form 'form_for';
+
+    my $person = Local::Person->new(first_name=>'J', last_name=>'Napiorkowski');
+    $person->validate;
+
+    print form_for($person, sub {
+      my $fb = shift;
+      return  $fb->label('first_name'),
+              $fb->input('first_name'),
+              $fb->errors_for('first_name', +{ class=>'invalid-feedback' }),
+              $fb->label('last_name'),
+              $fb->input('last_name'),
+              $fb->errors_for('last_name'+{ class=>'invalid-feedback' });
+    });
+
+Generates something like:
+
+    <form accept-charset="UTF-8" id="new_person" method="post">
+      <label for="person_first_name">First Name</label>
+      <input id="person_first_name" name="person.first_name" type="text" value="John"/>
+      <div class='invalid-feedback'>First Name is too short (minimum is 3 characters).</div>
+      <label for="person_last_name">Last Name</label>
+      <input id="person_last_name" name="person.last_name" type="text" value="Napiorkowski"/>
+    </form>
+
 =head1 DEBUGGING
 
 You can set the %ENV variable C<VALIANT_DEBUG> to a number ranging 1 to 3 which will give
@@ -1368,13 +1422,6 @@ increasing more detailed debugging output that should assist you if things are n
 as expected.  Debug level 1 only returns messages during the startup / compile stage so its
 reasonable safe to run even in a production environment since it should not impact run time
 performance.
-
-=head1 DEDICATIONS
-
-This module is eternally dedicated to the memory of my Bernese Mountain Dog 'Tornado' who we
-lost to cancer in 16 August 2020.   If you find this code useful, if it helps your company
-or makes you money please consider a donation to help other owners of this dog breed or
-to help the dogs themselves: L<http://www.berner.org/pages/charities.php>
 
 =head1 SEE ALSO
 
@@ -1387,9 +1434,28 @@ either used or reviewed.
 L<Valiant>, L<Valiant::Validations>, L<Valiant::Validates>, L<Valiant::Filters>,
 L<Valiant::Filterable>
 
+=head1 DEDICATIONS
+
+This module is eternally dedicated to the memory of my beloved animal companions; our Bernese 
+Mountain Dog 'Tornado' who we lost to cancer in 16 August 2020; our Akita 'Sunshine' who passed
+from complications due to age on July 14th, 2021 and their pup 'Squeaker' also lost to cancer on
+December 18th, 2021.
+
+The distribution as a whole is dedicated in their memory, but specifically the core L<Valiant>
+code is dedicated to Tornado, the DBIC integration work to Sunshine and the HTML form generation
+and templating code to Squeaker.
+
+If you find this code useful, if it helps your company or makes you money please consider a donation
+to help other owners of these dog breeds or aid in the quest to end dog cancer: 
+
+L<http://www.berner.org/pages/charities.php>, L<https://akitarescue.rescuegroups.org/info/donate>,
+L<https://wearethecure.org/donations/>.
+
+Or to any dog charity that fits best with your personal beliefs and economic means.
+
 =head1 COPYRIGHT & LICENSE
  
-Copyright 2021, John Napiorkowski L<email:jjnapiork@cpan.org>
+Copyright 2022, John Napiorkowski L<email:jjnapiork@cpan.org>
  
 This library is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

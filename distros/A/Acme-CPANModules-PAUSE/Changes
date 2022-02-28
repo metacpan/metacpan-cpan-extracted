@@ -1,3 +1,9 @@
+0.002   2021-09-12  Released-By: PERLANCAR; Urgency: medium
+
+	- Add entries: Dist::Zilla::Plugin::UploadToCPAN::WWWPAUSESimple,
+	  WWW::PAUSE::CleanUpHomeDir.
+
+
 0.001   2021-05-23  Released-By: PERLANCAR
 
         - First release.

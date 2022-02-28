@@ -129,6 +129,13 @@ Use a subroutine reference to provide filtering.
 
 See L<Valiant::Filter::With> for details.
 
+=head2 Template
+
+Given a hashref value, return a string based on a template.
+
+See L<Valiant::Filter::Template> for details.
+
+
 =head2 Special Validators
 
 The following validators are not considered for end users but have documentation you might

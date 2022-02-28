@@ -132,7 +132,7 @@ my $product_command = sub {
 
       # get the price
       ->text_like(
-      'table#meta tr:nth-child(7) td' => qr/$paper_prices[$_]/ => 'right paper price')
+      'table#meta tr:nth-child(8) td' => qr/$paper_prices[$_]/ => 'right paper price')
       ->tx->res->body;
 
     #note $body;
@@ -174,7 +174,7 @@ my $product_command = sub {
       ->text_is('table#meta tr:first-child td' => $_->{title} => 'right title')
 
       # get the price
-      ->text_like('table#meta tr:nth-child(7) td' => qr/$_->{properties}{price} лв. за/ =>
+      ->text_like('table#meta tr:nth-child(8) td' => qr/$_->{properties}{price} лв. за/ =>
         'right paper price')->tx->res->body;
   }
 };

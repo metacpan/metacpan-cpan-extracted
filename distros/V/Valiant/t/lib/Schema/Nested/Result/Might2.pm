@@ -23,6 +23,5 @@ __PACKAGE__->belongs_to(
 );
 
 __PACKAGE__->accept_nested_for('one');
-__PACKAGE__->validates(one => ( result=>+{validations=>1} ));
 
 1;

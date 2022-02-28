@@ -1,31 +1,36 @@
-0.006   2018-07-10 (PERLANCAR)
+0.007   2022-02-26  Released-By: PERLANCAR; Urgency: high
+
+        - Update to new HTML.
+
+
+0.006   2018-07-10  Released-By: PERLANCAR
 
 	- Add prereq to IO::Socket::SSL 2.009 [CT].
 
 
-0.005   2018-06-24 (PERLANCAR)
+0.005   2018-06-24  Released-By: PERLANCAR
 
 	- Mojo's error doesn't give code, only message.
 
 
-0.004   2018-06-17 (PERLANCAR)
+0.004   2018-06-17  Released-By: PERLANCAR
 
 	- Extract last update information from the website.
 
 
-0.003   2017-07-10 (PERLANCAR)
+0.003   2017-07-10  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Replace Log::Any with Log::ger.
 
 
-0.002   2016-10-14 (PERLANCAR)
+0.002   2016-10-14  Released-By: PERLANCAR
 
 	- [ux] Bail earlier when to is not 'IDR' before actually retrieving
 	  the currencies.
 
 
-0.001   2016-10-14 (PERLANCAR)
+0.001   2016-10-14  Released-By: PERLANCAR
 
         - First release.

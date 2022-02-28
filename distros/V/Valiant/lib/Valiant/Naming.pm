@@ -81,6 +81,7 @@ has _human => (
   default =>  sub {
     my $self = shift;
     my $name = $self->element;
+    $name =~s/_id$//; # remove trailing _id
     $name =~s/_/ /g;
     my $formated = autoformat $name, {case=>'title'};
     $formated=~s/\n//g; # some sort of bug in autoformat?

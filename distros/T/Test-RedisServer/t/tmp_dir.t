@@ -8,14 +8,13 @@ use Test::RedisServer;
 
 eval { Test::RedisServer->new } or plan skip_all => 'redis-server is required in PATH to run this test';
 
-my $tmp_dir = File::Temp->newdir( CLEANUP => 1 );
-
-my $tmp_root_dir = File::Spec->tmpdir();
+my $tmp_root_dir = File::Temp->newdir( CLEANUP => 1 );
+my $tmp_dir = File::Temp->newdir( CLEANUP => 1, DIR => $tmp_root_dir );
 
 my @initial_files = <$tmp_root_dir/*>;
 my $initial_children_count = @initial_files;
 
-$ENV{TMPDIR} = $tmp_root_dir;
+local $ENV{TMPDIR} = $tmp_root_dir;
 
 my $server = Test::TCP->new(
     code => sub {

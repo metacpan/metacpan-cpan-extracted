@@ -960,7 +960,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1319 "slices.pd"
+#line 1327 "slices.pd"
 
 
 =head2 reorder
@@ -1132,7 +1132,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1495 "slices.pd"
+#line 1503 "slices.pd"
 
 
 =head2 using
@@ -1320,11 +1320,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-Splits a dimension in the parent ndarray (opposite of L<clump|PDL::Core/clump>)
-
-After
+Splits a dimension in the parent ndarray (opposite of L<clump|PDL::Core/clump>).
+As of 2.076, throws exception if non-divisible C<nsp> given, and can
+give negative C<nthdim> which then counts backwards.
 
 =for example
+
+After
 
  $y = $x->splitdim(2,3);
 
@@ -1342,14 +1344,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1346 "Slices.pm"
+#line 1348 "Slices.pm"
 
 
 
 #line 1060 "../../blib/lib/PDL/PP.pm"
 
 *splitdim = \&PDL::splitdim;
-#line 1353 "Slices.pm"
+#line 1355 "Slices.pm"
 
 
 
@@ -1375,14 +1377,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1379 "Slices.pm"
+#line 1381 "Slices.pm"
 
 
 
 #line 1060 "../../blib/lib/PDL/PP.pm"
 
 *rotate = \&PDL::rotate;
-#line 1386 "Slices.pm"
+#line 1388 "Slices.pm"
 
 
 
@@ -1415,14 +1417,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1419 "Slices.pm"
+#line 1421 "Slices.pm"
 
 
 
 #line 1060 "../../blib/lib/PDL/PP.pm"
 
 *broadcastI = \&PDL::broadcastI;
-#line 1426 "Slices.pm"
+#line 1428 "Slices.pm"
 
 
 
@@ -1450,18 +1452,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1454 "Slices.pm"
+#line 1456 "Slices.pm"
 
 
 
 #line 1060 "../../blib/lib/PDL/PP.pm"
 
 *unbroadcast = \&PDL::unbroadcast;
-#line 1461 "Slices.pm"
+#line 1463 "Slices.pm"
 
 
 
-#line 1935 "slices.pd"
+#line 1948 "slices.pd"
 
 
 =head2 dice
@@ -1608,12 +1610,12 @@ slice will change the parent.
 
 sub PDL::dice_axis {
   my($self,$axis,$idx) = @_;
-  my $ix = ref($self)->topdl($idx);
+  my $ix = PDL->topdl($idx);
   barf("dice_axis: index must be <=1D") if $ix->getndims > 1;
   return $self->mv($axis,0)->index1d($ix)->mv(0,$axis);
 }
 *dice_axis = \&PDL::dice_axis;
-#line 1617 "Slices.pm"
+#line 1619 "Slices.pm"
 
 
 
@@ -1791,7 +1793,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1795 "Slices.pm"
+#line 1797 "Slices.pm"
 
 
 
@@ -1833,20 +1835,20 @@ sub PDL::slice {
     PDL::_slice_int($source,my $o=$source->initialize,\@others);
     $o;
 }
-#line 1837 "Slices.pm"
+#line 1839 "Slices.pm"
 
 
 
 #line 1060 "../../blib/lib/PDL/PP.pm"
 
 *slice = \&PDL::slice;
-#line 1844 "Slices.pm"
+#line 1846 "Slices.pm"
 
 
 
 
 
-#line 2426 "slices.pd"
+#line 2439 "slices.pd"
 
 
 =head1 BUGS
@@ -1872,7 +1874,7 @@ distribution. If this file is separated from the PDL distribution,
 the copyright notice should be included in the file.
 
 =cut
-#line 1876 "Slices.pm"
+#line 1878 "Slices.pm"
 
 
 

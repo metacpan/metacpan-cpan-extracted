@@ -1,7 +1,5 @@
 #!/usr/bin/perl
-
 # t/02.num.t - check for number object
-
 BEGIN
 {
     use Test::More qw( no_plan );

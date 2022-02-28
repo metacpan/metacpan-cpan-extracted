@@ -7,7 +7,7 @@ use IO::Select;
 
 use constant WIN32 => $^O eq 'MSWin32';
 
-our $VERSION = '0.005';
+our $VERSION = '0.100';
 
 {
     package Parallel::Pipe::Impl;
@@ -269,7 +269,10 @@ Parallel::Pipes - parallel processing using pipe(2) for communication and synchr
 
 =head1 DESCRIPTION
 
-B<THIS IS EXPERIMENTAL>.
+B<NOTE>: Parallel::Pipes provides low-level interfaces.
+If you are interested in using Parallel::Pipes,
+you may want to look at L<Parallel::Pipes::App> instead,
+which provides more friendly interfaces.
 
 Parallel processing is essential, but it is also difficult:
 
@@ -288,53 +291,14 @@ More precisely, how to collect results of tasks.
 Parallel::Pipes tries to solve these problems with C<pipe(2)> and C<select(2)>.
 
 L<App::cpm>, a fast CPAN module installer, uses Parallel::Pipes.
-Please look at L<App::cpm|https://github.com/skaji/cpm/blob/master/lib/App/cpm.pm>
-or L<eg directory|https://github.com/skaji/Parallel-Pipes/tree/master/eg> for real world usages.
+Please look at L<App::cpm|https://github.com/skaji/cpm/blob/master/lib/App/cpm/CLI.pm>
+or L<eg directory|https://github.com/skaji/Parallel-Pipes/tree/main/eg> for real world usages.
 
 =begin html
 
-<a href="https://raw.githubusercontent.com/skaji/Parallel-Pipes/master/author/image.png"><img src="https://raw.githubusercontent.com/skaji/Parallel-Pipes/master/author/image.png" alt="image" class="img-responsive"></a>
+<a href="https://raw.githubusercontent.com/skaji/Parallel-Pipes/main/author/image.png"><img src="https://raw.githubusercontent.com/skaji/Parallel-Pipes/main/author/image.png" alt="image" class="img-responsive"></a>
 
 =end html
-
-=head1 METHOD
-
-=head2 new
-
-  my $pipes = Parallel::Pipes->new($number, $code);
-
-The constructor, which takes
-
-=over 4
-
-=item number
-
-The number of workers.
-
-=item code
-
-Worker's code.
-
-=back
-
-=head2 is_ready
-
-  my @ready = $pipes->is_ready;
-  my @ready = $pipes->is_ready(@pipes);
-
-Get pipes which are ready to write.
-
-=head2 is_written
-
-  my @written = $pipes->is_written;
-
-Get pipes which are written.
-
-=head2 close
-
-  $pipes->close;
-
-Close pipes (also shutdown workers).
 
 =head1 AUTHOR
 

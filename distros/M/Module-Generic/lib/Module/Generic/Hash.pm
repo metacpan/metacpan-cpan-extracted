@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Hash.pm
-## Version v1.0.2
+## Version v1.1.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2021/11/13
+## Modified 2022/02/27
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -17,6 +17,15 @@ BEGIN
     use warnings;
     use warnings::register;
     use parent qw( Module::Generic );
+    use Clone ();
+    use Data::Dumper;
+    use JSON;
+    use Module::Generic::Array;
+    use Module::Generic::Number;
+    use Module::Generic::Scalar;
+    use Module::Generic::TieHash;
+    use Regexp::Common;
+    use Want;
     use overload (
         ## '""'    => 'as_string',
         'eq'    => sub { _obj_eq(@_) },
@@ -33,17 +42,11 @@ BEGIN
         'ge'     => sub { _obj_comp( @_, 'ge') },
         fallback => 1,
     );
-    use Clone ();
-    use Data::Dumper;
-    use JSON;
-    use Module::Generic::Array;
-    use Module::Generic::Number;
-    use Module::Generic::Scalar;
-    use Module::Generic::TieHash;
-    use Regexp::Common;
-    use Want;
-    our( $VERSION ) = 'v1.0.2';
+    our( $VERSION ) = 'v1.1.0';
 };
+
+use strict;
+no warnings 'redefine';
 
 sub new
 {
@@ -146,7 +149,7 @@ sub get { return( $_[0]->{ $_[1] } ); }
 
 sub has { return( shift->exists( @_ ) ); }
 
-sub is_empty { return( scalar( keys( %{$_[0]} ) ) ? 0 : 1 ); }
+sub is_empty { return( scalar( CORE::keys( %{$_[0]} ) ) ? 0 : 1 ); }
 
 sub json
 {
@@ -215,7 +218,8 @@ sub merge
     $self->_tie_object->enable(0);
     my $data = $self->{data};
     my $seen = {};
-    local $copy = sub
+    my $copy;
+    $copy = sub
     {
         my $this = shift( @_ );
         my $to = shift( @_ );

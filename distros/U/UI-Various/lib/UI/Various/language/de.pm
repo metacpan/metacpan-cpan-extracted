@@ -32,7 +32,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.16';
+our $VERSION = '0.18';
 
 #########################################################################
 
@@ -55,8 +55,12 @@ our %T =
      => "Attribut '%s' muß %s Referenz sein",
      _1_element_must_be_accompanied_by_parent
      => '%s Element benötigt Elternelement',
+     _1_may_not_be_empty
+     => "'%s' darf nicht leer sein",
      _1_may_only_be_called_from_itself
      => '%s darf nur innerhalb der Klasse benutzt werden',
+     _1_to_cancel
+     => '%s bricht ab',
      bad_debug_level__1
      => "unzulässiges Debug Level '%s'",
      bad_usage_of__1_as__2
@@ -69,6 +73,8 @@ our %T =
      => "kann '%s' nicht entfernen: existiert nicht in %s",
      cyclic_parent_relationship_detected__1_levels_above
      => 'zyklische Abhängigkeit %d Ebenen höher gefunden',
+     element__1_in_call_to__2__3_already_exists
+     => 'Element %s in Aufruf von %s::%s existiert bereits',
      enter_number_to_choose_next_step
      => 'Nummer für nächste Aktion eingeben',
      enter_selection
@@ -87,10 +93,18 @@ our %T =
      => "ungültiges Elternelement '%s' (kein UI::Various::container)",
      invalid_scalar__1_in_call_to__2
      => "ungültiger Skalar '%s' in Aufruf von %s",
+     invalid_scalar__1_in_call_to__2__3
+     => "ungültiger Skalar '%s' in Aufruf von %s::%s",
      invalid_selection
      => "Auswahl ungültig",
+     invalid_value__1_for_parameter__2_in_call_to__3__4
+     => "ungültiger Wert %s für Parameter '%s' in Aufruf von %s::%s",
+     leave_box
+     => 'Box verlassen',
      leave_window
      => 'Fenster verlassen',
+     mandatory_parameter__1_is_missing
+     => "notwendiger Parameter '%s' fehlt",
      message__1_missing_in__2
      => "text '%s' fehlt in '%s'",
      new_value
@@ -99,12 +113,18 @@ our %T =
      => ', <+>/<-> nächstes/vorheriges Fenster',
      no_element_found_for_index__1
      => 'Element für index %d fehlt',
+     no_free_position_for__1_in_call_to__2__3
+     => 'keine freie Position für %s in Aufruf von %s::%s',
      odd_number_of_parameters_in_initialisation_list_of__1
      => 'ungerade Anzahl von Parametern in Initialisierungsliste von %s',
      old_value
      => 'alter Wert',
      options_must_be_specified_as_hash
      => 'Optionen müssen als {hash} spezifiziert werden',
+     parameter__1_must_be_a_positive_integer
+     => "parameter '%s' muß positive ganze Zahl sein",
+     parameter__1_must_be_a_positive_integer_in_call_to__2__3
+     => "parameter '%s' in Aufruf von %s::%s muß positive ganze Zahl sein",
      specified_implementation_missing
      => 'spezifische Implementierung fehlt',
      stderr_not_0_1_2_or_3
@@ -119,8 +139,8 @@ our %T =
      => "unbekannte Option '%s'",
      unsupported_language__1
      => "'%s' ist kein unterstützte Sprache",
-     unsupported_ui_element__1
-     => "'%s' ist kein unterstütztes UI Element",
+     unsupported_ui_element__1__2
+     => "'%s' ist kein unterstütztes UI Element: %s",
      unsupported_ui_package__1
      => "'%s' ist kein unterstütztes UI Paket",
      use_option_must_be_an_array_reference

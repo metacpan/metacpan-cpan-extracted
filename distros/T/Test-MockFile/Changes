@@ -1,5 +1,11 @@
 Revision history for Test-MockFile
 
+0.032   2/24/2022
+- Less strict mode - Don't complain about commands not opening or directly interacting with a file.
+
+0.031   2/24/2022
+- Fix for Plugin::FileTemp when calling tempfile in scalar context
+
 0.030   2/22/2022
 - Simplify _strict_mode_violation
 - Introduce new_dir() to allow older dir() syntax.

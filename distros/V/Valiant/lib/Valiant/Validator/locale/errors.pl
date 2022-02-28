@@ -54,6 +54,8 @@
         not_zip => 'is not a zip code',
         not_zip5 => 'is not a zip code',
         not_zip9 => 'is not a zip code',
+        not_ascii => 'must be ASCII characters',
+        not_word => 'must be a single word',
         # confirmation
         confirmation => "doesn't match '{{attribute}}'",
         #only_of

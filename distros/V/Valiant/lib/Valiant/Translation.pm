@@ -51,6 +51,7 @@ sub human_attribute_name {
   @defaults = map { $self->i18n->make_tag($_) } (@defaults, "attributes.${attribute}");
 
   # Not sure if this should move up above the preceeding map...
+
   if(exists $options->{default}) {
     my $default = delete $options->{default};
     my @default = ref($default) ? @$default : ($default);
@@ -61,6 +62,7 @@ sub human_attribute_name {
   # to localize it.
   push @defaults, do {
     my $human_attr = $attribute;
+    $human_attr =~s/_id$//; # remove trailing _id
     $human_attr =~s/_/ /g;
     $human_attr = autoformat($human_attr, +{case=>'title'});
     $human_attr =~s/[\n]//g; # Is this a bug in Text::Autoformat???

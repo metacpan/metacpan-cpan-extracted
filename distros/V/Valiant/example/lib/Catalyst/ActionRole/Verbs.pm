@@ -1,5 +1,5 @@
-package # hide
-Catalyst::ActionRole::Verbs;
+package # hide from PAUSE
+  Catalyst::ActionRole::Verbs;
 
 {
   package Catalyst::ActionRole::Verbs::Utils::MethodNotAllowed;
@@ -27,7 +27,7 @@ use Moose::Role;
 use Catalyst::ActionRole::Verbs::Utils::MethodNotAllowed;
 use Catalyst::Utils;
 
-requires 'attributes';
+requires 'attributes', 'list_extra_info', 'execute', 'dispatch';
 
 our $VERSION = '0.001';
 our @VERBS = qw(GET POST PUT DELETE HEAD OPTIONS PATCH TRACE CONNECT);

@@ -1,0 +1,240 @@
+NAME
+    Plack::Component::Tags::HTML - Plack component for Tags with HTML
+    output.
+
+SYNOPSIS
+     package App;
+
+     use base qw(Plack::Component::Tags::HTML);
+
+     sub _css {
+            my $self = shift;
+            $self->{'css'}->put(
+                    # Structure defined by CSS::Struct
+            );
+            return;
+     }
+
+     sub _prepare_app {
+            my $self = shift;
+            # Preparation of app, before Plack::Component::call().
+            return;
+     }
+
+     sub _process_actions {
+            my ($self, $env) = @_;
+            # Process actions in Plack::Component::call() before output.
+            return;
+     }
+
+     sub _tags_middle {
+            my $self = shift;
+            $self->{'tags'}->put(
+                    # Structure defined by Tags
+            );
+            return;
+     }
+
+DESCRIPTION
+    This component is helper for creating Plack application with Tags. It is
+    based on Plack::Component.
+
+ACCESSOR METHODS
+  "author"
+    Author string to HTML head. Default value is undef.
+
+  "content_type"
+    Content type for output. Default value is 'text/html;
+    charset=__ENCODING__'.
+
+  "css"
+    CSS::Struct::Output object. Default value is
+    CSS::Struct::Output::Raw->new.
+
+  "encoding"
+    Set encoding for output. Default value is 'utf-8'.
+
+  "favicon"
+    Link to favicon. Default value is undef.
+
+  "flag_begin"
+    Flag that means begin of html writing via Tags::HTML::Page::Begin.
+    Example is in EXAMPLE2. Default value is 1.
+
+  "flag_end"
+    Flag that means end of html writing via Tags::HTML::Page::End. Example
+    is in EXAMPLE2. Default value is 1.
+
+  "generator"
+    Generator string to HTML head. Default value is undef.
+
+  "psgi_app"
+    PSGI application to run instead of normal process. Intent of this is
+    change application in "_process_actions" method. Default value is undef.
+
+  "status_code"
+    HTTP status code. Default value is 200.
+
+  "title"
+    Title of page. Default value is undef.
+
+  "tags"
+    Tags::Output object. Default value is
+
+     Tags::Output::Raw->new(
+             'xml' => 1,
+             'no_simple' => ['textarea'],
+             'preserved' => ['pre'],
+     ));
+
+METHODS TO OVERWRITE
+  "_css"
+    Method to set css via "$self-"{'css'}> object. Argument is $self only.
+
+  "_prepare_app"
+    Method to set app preparation part. Called only once on start. Argument
+    is $self only.
+
+  "_process_actions"
+    Method to set app processing part. Called in each call before creating
+    of output. Argument is $self and $env.
+
+  "_tags_middle"
+    Method to set tags via "$self-"{'tags'}> object. Argument is $self only.
+
+METHODS IMPLEMENTED
+  "call"
+    Inherited from Plack::Component. There is run of:
+
+     $self->_process_actions($env);
+     $self->_css;
+     $self->_tags;
+
+    After it Generate and encode output from Tags to output with HTTP code.
+    HTTP status code is defined by "status_code()" method and Content-Type
+    is defined by "content_type" method.
+
+  "prepare_app"
+    Initialize default values for:
+
+     tags()
+     css()
+     encoding()
+     content_type()
+     status_code()
+
+    and run _prepare_app().
+
+EXAMPLE1
+     package App;
+
+     use base qw(Plack::Component::Tags::HTML);
+     use strict;
+     use warnings;
+
+     sub _tags_middle {
+             my $self = shift;
+
+             $self->{'tags'}->put(
+                     ['d', 'Hello world'],
+             );
+
+             return;
+     }
+
+     package main;
+
+     use Plack::Runner;
+
+     my $app = App->new(
+             'title' => 'My app',
+     )->to_app;
+     my $runner = Plack::Runner->new;
+     $runner->run($app);
+
+     # Output:
+     # HTTP::Server::PSGI: Accepting connections at http://0:5000/
+
+     # Output by HEAD to http://localhost:5000/:
+     # 200 OK
+     # Date: Sun, 31 Oct 2021 10:35:33 GMT
+     # Server: HTTP::Server::PSGI
+     # Content-Length: 166
+     # Content-Type: text/html; charset=utf-8
+     # Client-Date: Sun, 31 Oct 2021 10:35:33 GMT
+     # Client-Peer: 127.0.0.1:5000
+     # Client-Response-Num: 1
+
+     # Output by GET to http://localhost:5000/:
+     # <!DOCTYPE html>
+     # <html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>My app</title></head><body>Hello world</body></html>
+
+EXAMPLE2
+     package App;
+
+     use base qw(Plack::Component::Tags::HTML);
+     use strict;
+     use warnings;
+
+     sub _tags_middle {
+             my $self = shift;
+
+             $self->{'tags'}->put(
+                     ['d', 'Hello world'],
+             );
+
+             return;
+     }
+
+     package main;
+
+     use Plack::Runner;
+
+     my $app = App->new(
+             'flag_begin' => 0,
+             'flag_end' => 0,
+             'title' => 'My app',
+     )->to_app;
+     my $runner = Plack::Runner->new;
+     $runner->run($app);
+
+     # HTTP::Server::PSGI: Accepting connections at http://0:5000/
+
+     # Output by HEAD to http://localhost:5000/:
+     # 200 OK
+     # Date: Sun, 27 Feb 2022 18:52:59 GMT
+     # Server: HTTP::Server::PSGI
+     # Content-Length: 11
+     # Content-Type: text/html; charset=utf-8
+     # Client-Date: Sun, 27 Feb 2022 18:52:59 GMT
+     # Client-Peer: 127.0.0.1:5000
+     # Client-Response-Num: 1
+
+     # Output by GET to http://localhost:5000/:
+     # Hello world
+
+DEPENDENCIES
+    CSS::Struct::Output::Raw, Encode, Plack::Component,
+    Plack::Util::Accessor, Tags::HTML::Page::Begin, Tags::HTML::Page::End,
+    Tags::Output::Raw.
+
+SEE ALSO
+    Plack::Component
+        Base class for PSGI endpoints
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Plack-Component-Tags-HTML>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © Michal Josef Špaček 2021-2022
+
+    BSD 2-Clause License
+
+VERSION
+    0.02
+

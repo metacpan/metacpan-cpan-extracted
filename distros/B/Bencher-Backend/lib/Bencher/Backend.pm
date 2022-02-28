@@ -1,9 +1,5 @@
+## no critic: Subroutines::ProhibitExplicitReturnUndef InputOutput::ProhibitInteractiveTest
 package Bencher::Backend;
-
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-08-13'; # DATE
-our $DIST = 'Bencher-Backend'; # DIST
-our $VERSION = '1.060'; # VERSION
 
 use 5.010001;
 use strict;
@@ -15,6 +11,12 @@ use List::MoreUtils qw(all);
 use List::Util qw(first);
 
 use Exporter qw(import);
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-02-08'; # DATE
+our $DIST = 'Bencher-Backend'; # DIST
+our $VERSION = '1.061'; # VERSION
+
 our @EXPORT_OK = qw(
                        bencher
                        format_result
@@ -426,7 +428,7 @@ sub _get_scenario {
             unshift @INC, $_ for @{ $pargs->{include_path} // [] };
             require $mp;
         }
-        no strict 'refs';
+        no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
         $scenario = ${"$m\::scenario"};
     } elsif (defined $pargs->{cpanmodules_module}) {
         require Acme::CPANModulesUtil::Bencher;
@@ -1190,7 +1192,7 @@ sub _gen_items {
                     }
                     $code_str .= q[die "Command failed (child error=$?, os error=$!)\\n" if $?];
                     $code_str .= "}";
-                    $code = eval $code_str;
+                    $code = eval $code_str; ## no critic: BuiltinFunctions::ProhibitStringyEval
                     die "BUG: Can't produce code for cmdline: $@ (code string is: $code_str)" if $@;
                 };
             } elsif ($p->{type} eq 'perl_code') {
@@ -1263,7 +1265,7 @@ sub _gen_items {
                     }
                     $code_str .= _fill_template($template, $template_vars, 'dmp') . " }";
                     log_debug("Item #%d: code=%s", $item_seq, $code_str);
-                    $code = eval $code_str;
+                    $code = eval $code_str; ## no critic: BuiltinFunctions::ProhibitStringyEval
                     return [400, "Item #$item_seq: code compile error: $@ (code: $code_str)"] if $@;
                 }
             } else {
@@ -2085,6 +2087,7 @@ $SPEC{format_result} = {
             'x.name.is_plural' => 1,
             'x.name.singular' => 'exclude_formatter',
             summary => 'Exclude Formatters specification',
+            schema => ['array*', of=>'str*'],
         },
         options => {
             'x.name.is_plural' => 1,
@@ -3679,12 +3682,12 @@ sub bencher {
         $envres->[3]{'func.code_startup'}   = $code_startup;
         $envres->[3]{'func.module_versions'}{perl} = "$^V" if $return_meta;
         {
-            no strict 'refs';
+            no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
             $envres->[3]{'func.module_versions'}{__PACKAGE__} = ${__PACKAGE__.'::VERSION'} if $return_meta;
         }
 
         my $code_load = sub {
-            no strict 'refs';
+            no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
             my ($mod, $optional) = @_;
             log_trace("Loading module: %s", $mod);
             if ($optional) {
@@ -3772,7 +3775,7 @@ sub bencher {
                 # from _code_str
                 if (!$it->{_code}) {
                     if (defined $it->{_code_str}) {
-                        $it->{_code} = eval $it->{_code_str};
+                        $it->{_code} = eval $it->{_code_str}; ## no critic: BuiltinFunctions::ProhibitStringyEval
                         die "Can't compile _code_str '$it->{_code_str}': $@" if $@;
                     } else {
                         die "BUG: Item doesn't have _code or _code_str";
@@ -4023,7 +4026,7 @@ sub bencher {
                 $envres->[3]{'func.scenario_file_sha1sum'} = $digests->{sha1};
                 $envres->[3]{'func.scenario_file_sha256sum'} = $digests->{sha256};
             } elsif (my $mod = $args{scenario_module}) {
-                no strict 'refs';
+                no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
                 $mod = "Bencher::Scenario::$mod" unless $mod =~ /\ABencher::Scenario::/;
                 $envres->[3]{'func.scenario_module'} = $mod;
                 (my $mod_pm = "$mod.pm") =~ s!::!/!g;
@@ -4037,7 +4040,7 @@ sub bencher {
                 $envres->[3]{'func.module_versions'}{$mod} =
                     ${"$mod\::VERSION"};
             } elsif (my $mod0 = $args{cpanmodules_module}) {
-                no strict 'refs';
+                no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
                 my $mod = "Acme::CPANModules::$mod0";
                 $envres->[3]{'func.cpanmodules_module'} = $mod;
                 (my $mod_pm = "$mod.pm") =~ s!::!/!g;
@@ -4149,7 +4152,7 @@ sub bencher {
         } else {
             my $tres;
             my $doit = sub {
-                no strict 'refs';
+                no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
                 $tres = &{"$runner\::_timethese_guts"}(
                     $precision,
                     {
@@ -4373,7 +4376,7 @@ Bencher::Backend - Backend for Bencher
 
 =head1 VERSION
 
-This document describes version 1.060 of Bencher::Backend (from Perl distribution Bencher-Backend), released on 2021-08-13.
+This document describes version 1.061 of Bencher::Backend (from Perl distribution Bencher-Backend), released on 2022-02-08.
 
 =head1 FUNCTIONS
 
@@ -4930,7 +4933,7 @@ Arguments ('*' denotes required arguments):
 
 Enveloped result from bencher.
 
-=item * B<exclude_formatters> => I<any>
+=item * B<exclude_formatters> => I<array[str]>
 
 Exclude Formatters specification.
 
@@ -5047,14 +5050,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Bencher-Ba
 
 Source repository is at L<https://github.com/perlancar/perl-Bencher-Backend>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Bencher-Backend>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<bencher>
@@ -5086,9 +5081,17 @@ beyond that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Bencher-Backend>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

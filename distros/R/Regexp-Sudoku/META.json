@@ -1,0 +1,82 @@
+{
+   "abstract" : "Solve Sudokus with regular expressions.",
+   "author" : [
+      "Abigail <cpan@abigail.freedom.nl>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "keywords" : [],
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Regexp-Sudoku",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Exporter" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "List::Util" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0.88",
+            "experimental" : "0",
+            "lib" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Exporter" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "List::Util" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0.88",
+            "experimental" : "0",
+            "lib" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "Hash::Util::FieldHash" : "0",
+            "List::Util" : "0",
+            "Math::Sequence::DeBruijn" : "0",
+            "experimental" : "0",
+            "perl" : "5.028",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/Abigail/Regexp-Sudoku.git"
+      }
+   },
+   "version" : "2022022401",
+   "x_serialization_backend" : "JSON::PP version 2.97001",
+   "x_test_requires" : {
+      "Exporter" : 0,
+      "List::Util" : 0,
+      "Test::Exception" : 0,
+      "Test::More" : 0.88,
+      "experimental" : 0,
+      "lib" : 0,
+      "strict" : 0,
+      "warnings" : 0
+   }
+}

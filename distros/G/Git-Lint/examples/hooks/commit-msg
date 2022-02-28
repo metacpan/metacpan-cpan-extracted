@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# To enable as a commit-msg hook, copy this file into the .git/hooks directory
+# of the repo you want to check.
+# Then update the path and options to match your path and preferred profile.
+
+./git-lint --check message --profile default $1

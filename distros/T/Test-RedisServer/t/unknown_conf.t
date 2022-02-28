@@ -14,6 +14,7 @@ eval {
 };
 
 ok !$server, 'server did not initialize ok';
-like $@, qr/\*\*\* FATAL CONFIG FILE ERROR \*\*\*/, 'error msg ok';
+
+like $@, qr/\*\*\* FATAL CONFIG FILE ERROR( \([^\)]+\))? \*\*\*/, 'error msg ok';
 
 done_testing;

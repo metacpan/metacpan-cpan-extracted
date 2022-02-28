@@ -4,3 +4,9 @@ test_alias1:	address1@org1.com
 
 test_alias2:	donaldduck@notdisney.net
 
+test_alias5: :include: test_include_file
+
+# For this test to be valid, this alias needs to be the last one in the test
+# file, and there can't be any blank lines or comments following it.
+test_alias4: address1@example.com,
+  address2@example.com

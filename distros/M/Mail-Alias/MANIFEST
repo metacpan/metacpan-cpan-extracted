@@ -9,3 +9,6 @@ testscripts/delete_test.pl
 testscripts/expand_test.pl
 testscripts/update_test.pl
 test_alias_file					a file with a few aliases for testing
+test_include_file
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -47,6 +47,7 @@ my @config_requires
                     version
                     ExtUtils::MakeMaker
                     File::Basename
+                    File::Temp
                     List::Util
                 )
             ),
@@ -139,7 +140,7 @@ WriteMakefile
         NAME            FindBin::libs
         LICENSE         perl
     ),
-    VERSION         => 'v2.21.0',
+    VERSION         => 'v3.0.1',
     AUTHOR          => 'Steven Lembark <lembark@wrkhors.com>',
     PREREQ_PM       =>
     {

@@ -1,3 +1,10 @@
+0.004   2021-09-26  Released-By: PERLANCAR; Urgency: medium
+
+	- Switch to new backend
+	  TableData::Lingua::Word::EN::Noun::TalkEnglish (renamed from
+	  Tables::Words::EN::Nouns::TalkEnglish).
+
+
 0.003   2021-03-05  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

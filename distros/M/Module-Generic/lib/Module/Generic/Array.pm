@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Array.pm
-## Version v1.2.0
+## Version v1.3.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2021/12/27
+## Modified 2022/02/27
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -16,15 +16,11 @@ BEGIN
     use common::sense;
     use warnings;
     use warnings::register;
+    use vars qw( $DEBUG $ERROR $RETURN $TRUE $FALSE );
     use List::Util ();
-    use Module::Generic::Boolean;
-    use Module::Generic::Hash;
-    use Module::Generic::Iterator;
-    use Module::Generic::Null;
-    use Module::Generic::Number;
-    use Module::Generic::Scalar;
     use Scalar::Util ();
     use Want;
+    no warnings;
     use overload (
         # Turned out to be not such a good ide as it create unexpected results, especially when this is an array of overloaded objects
         # '""'  => 'as_string',
@@ -35,15 +31,23 @@ BEGIN
         '%{}' => 'as_hash',
         fallback => 1,
     );
-    our $DEBUG  = 0;
-    our $ERROR;
-    our $RETURN = {};
-    our $TRUE  = ${"Module::Generic::Boolean::true"};
-    our $FALSE = ${"Module::Generic::Boolean::false"};
-    our( $VERSION ) = 'v1.2.0';
+    $DEBUG  = 0;
+    $RETURN = {};
+    no strict 'refs';
+    $TRUE  = ${"Module::Generic::Boolean::true"};
+    $FALSE = ${"Module::Generic::Boolean::false"};
+    our $VERSION = 'v1.3.0';
 };
 
+use strict;
 no warnings 'redefine';
+require Module::Generic::Boolean;
+require Module::Generic::Hash;
+require Module::Generic::Iterator;
+require Module::Generic::Null;
+require Module::Generic::Number;
+require Module::Generic::Scalar;
+
 sub new
 {
     my $this = CORE::shift( @_ );
@@ -77,9 +81,9 @@ sub as_hash
     if( $opts->{start_from} )
     {
         my $start = CORE::int( $opts->{start_from} );
-        for my $i ( 0..$#offsets )
+        for my $i ( 0..$#$offsets )
         {
-            $offsets[ $i ] += $start;
+            $offsets->[ $i ] += $start;
         }
     }
     @$ref{ @$self } = @$offsets;
@@ -263,7 +267,7 @@ sub filter
     my $n = -1;
     return( $self->map(sub
     {
-        local $_ = shift( @_ );
+        local $_ = CORE::shift( @_ );
         my $rv = $code->( ( defined( $this ) ? $this : () ), $_, ++$n, $self );
         return if( !$rv );
         return( $_ );
@@ -435,7 +439,7 @@ sub intersection
 
 sub is_empty { CORE::return( CORE::scalar( @{$_[0]} ) ? $FALSE : $TRUE ) }
 
-sub iterator { CORE::return( Module::Generic::Iterator->new( $self ) ); }
+sub iterator { CORE::return( Module::Generic::Iterator->new( CORE::shift( @_ ) ) ); }
 
 sub join
 {
@@ -886,8 +890,9 @@ sub _warnings_is_enabled { CORE::return( warnings::enabled( ref( $_[0] ) || $_[0
         use strict;
         use warnings;
         use Scalar::Util ();
-        our $dummy_callback = sub{1};
     };
+
+    our $dummy_callback = sub{1};
     
     sub TIEARRAY
     {

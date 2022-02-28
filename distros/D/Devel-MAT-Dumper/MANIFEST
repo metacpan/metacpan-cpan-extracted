@@ -4,11 +4,11 @@ doc/format.txt
 lib/Devel/MAT/Dumper.pm
 lib/Devel/MAT/Dumper.xs
 lib/Devel/MAT/Dumper/Helper.pm
-LICENSE
 MANIFEST			This list of files
-META.json
-META.yml
 README
 t/00use.t
 t/01header.t
 t/99pod.t
+LICENSE
+META.yml
+META.json

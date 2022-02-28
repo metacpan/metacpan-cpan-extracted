@@ -1,6 +1,6 @@
 package Example::Schema::Result::Person;
 
-use Example::Base;
+use Example::Syntax;
 use base 'Example::Schema::Result';
 
 __PACKAGE__->table("person");
@@ -17,25 +17,6 @@ __PACKAGE__->add_columns(
     bcrypt => 1,
   },
 );
-
-__PACKAGE__->validates(username => presence=>1, length=>[3,24], format=>'alpha_numeric', unique=>1);
-__PACKAGE__->validates( password => (presence=>1, confirmation => 1,  on=>'create' ));
-__PACKAGE__->validates( password => (confirmation => { 
-    on => 'update',
-    if => 'is_column_changed', # This method defined by DBIx::Class::Row
-  }));
-
-__PACKAGE__->validates(first_name => (presence=>1, length=>[2,24]));
-__PACKAGE__->validates(last_name => (presence=>1, length=>[2,48]));
-
-__PACKAGE__->validates(credit_cards => (result_set=>+{validations=>1, min=>2, max=>4}, on=>'profile' ));
-__PACKAGE__->accept_nested_for('credit_cards', +{allow_destroy=>1});
-
-__PACKAGE__->validates(person_roles => (result_set=>+{validations=>1, min=>1}, on=>'profile' ));
-__PACKAGE__->accept_nested_for('person_roles', {allow_destroy=>1});
-
-__PACKAGE__->validates(profile => (result=>+{validations=>1}, allow_blank=>1 ));
-__PACKAGE__->accept_nested_for('profile');
 
 __PACKAGE__->set_primary_key("id");
 __PACKAGE__->add_unique_constraint(['username']);
@@ -58,9 +39,23 @@ __PACKAGE__->has_many(
   { 'foreign.person_id' => 'self.id' }
 );
 
-__PACKAGE__->many_to_many('roles' => 'person_roles', 'role');
+__PACKAGE__->validates(username => presence=>1, length=>[3,24], format=>'alpha_numeric', unique=>1);
+__PACKAGE__->validates( password => (presence=>1, confirmation => 1,  on=>'create' ));
+__PACKAGE__->validates( password => (confirmation => { 
+    on => 'update',
+    if => 'is_column_changed', # This method defined by DBIx::Class::Row
+  }));
 
-__PACKAGE__->accept_nested_for('roles', {allow_destroy=>1});
+__PACKAGE__->validates(first_name => (presence=>1, length=>[2,24]));
+__PACKAGE__->validates(last_name => (presence=>1, length=>[2,48]));
+
+__PACKAGE__->validates(credit_cards => (set_size=>{min=>2, max=>4}, on=>'profile' ));
+__PACKAGE__->accept_nested_for('credit_cards', +{allow_destroy=>1});
+
+__PACKAGE__->validates(person_roles => (set_size=>{min=>1}, on=>'profile' ));
+__PACKAGE__->accept_nested_for('person_roles', {allow_destroy=>1});
+
+__PACKAGE__->accept_nested_for('profile');
 
 # TODO: I think these can be removed
 sub registered {

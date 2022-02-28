@@ -2,7 +2,7 @@ package Test2::Harness::Runner::State;
 use strict;
 use warnings;
 
-our $VERSION = '1.000109';
+our $VERSION = '1.000110';
 
 use Carp qw/croak/;
 
@@ -104,6 +104,8 @@ sub next_task {
 sub advance {
     my $self = shift;
     $self->poll();
+
+    $_->tick() for @{$self->{+RESOURCES} //= []};
 
     $self->advance_run();
     return 0 unless $self->{+RUN};

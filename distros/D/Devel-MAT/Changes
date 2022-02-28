@@ -1,5 +1,10 @@
 Revision history for Devel-MAT
 
+0.45    2022-02-26
+        [CHANGES]
+         * Add support for perl 5.35's boolean types
+         * Added a nice shiney new icon for BOOL SV type
+
 0.44    2021-03-27
         [CHANGES]
          * Rename `find lexical --all` to `--inactive`

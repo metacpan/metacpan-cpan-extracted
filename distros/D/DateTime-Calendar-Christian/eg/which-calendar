@@ -9,7 +9,7 @@ use DateTime::Calendar::Christian;
 use Getopt::Long 2.33 qw{ :config auto_version };
 use Pod::Usage;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 my %opt = (
     method	=> 'calendar_name',

@@ -22,5 +22,4 @@ __PACKAGE__->has_many(
   { 'foreign.role_id' => 'self.id' }
 );
 
-
 1;

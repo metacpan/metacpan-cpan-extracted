@@ -168,8 +168,7 @@ struct marpaESLIF_regex {
   pcre2_code            *patternp;     /* Compiled pattern */
   pcre2_match_data      *match_datap;  /* Match data */
 #ifdef PCRE2_CONFIG_JIT
-  short                  jitCompleteb; /* Eventual optimized JIT */
-  short                  jitPartialb;
+  short                  jitb;         /* Eventual optimized JIT */
 #endif
   short                  isAnchoredb;  /* Remember if pattern was allocated with PCRE2_ANCHORED (set automatically or not) */
   short                  utfb;         /* Is UTF mode enabled in that pattern ? */
@@ -496,6 +495,7 @@ struct marpaESLIFValue {
   short                        previousPassWasPassthroughb;
   int                          previousArg0i;
   int                          previousArgni;
+  genericStack_t              _valueResultStack;
   genericStack_t              *valueResultStackp;
   short                        inValuationb;
   marpaESLIF_symbol_t         *symbolp;

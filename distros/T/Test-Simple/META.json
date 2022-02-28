@@ -51,7 +51,7 @@
          "url" : "http://github.com/Test-More/test-more/"
       }
    },
-   "version" : "1.302188",
+   "version" : "1.302189",
    "x_breaks" : {
       "Log::Dispatch::Config::TestLog" : "<= 0.02",
       "Net::BitTorrent" : "<= 0.052",

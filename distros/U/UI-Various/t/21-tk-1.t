@@ -32,7 +32,7 @@ BEGIN {
     $ENV{DISPLAY}  or  plan skip_all => 'DISPLAY not found';
     eval { require Tk; };
     $@  and  plan skip_all => 'Perl/Tk not found';
-    plan tests => 18;
+    plan tests => 27;
 
     # define fixed environment for unit tests:
     delete $ENV{UI};
@@ -97,6 +97,11 @@ my $rvar = 'r';
 my $radio =
     UI::Various::Radio->new(buttons => [r => 'red', g => 'green', b => 'blue'],
 			    var => \$rvar);
+is(ref($radio), 'UI::Various::Tk::Radio',
+   'type UI::Various::Tk::Radio is correct');
+my $box1 = UI::Various::Box->new(border => 1, columns => 2, rows => 3);
+is(ref($box1), 'UI::Various::Tk::Box',
+   'type UI::Various::Tk::Box is correct');
 
 stderr_like
 {   $text1->_prepare(0, 0);   }
@@ -118,18 +123,29 @@ stderr_like
 {   $radio->_prepare(0, 0);   }
     qr/^UI::.*::Tk::Radio element must be accompanied by parent$re_msg_tail/,
     'orphaned Check causes error';
+stderr_like
+{   $box1->_prepare(0, 0);   }
+    qr/^UI::.*::Tk::Box element must be accompanied by parent$re_msg_tail/,
+    'orphaned Check causes error';
+
+$box1->add(0, 1, $input, $check, $text2, $radio);
 
 my $button2 = UI::Various::Button->new(text => 'Quit');
+my $box2 = UI::Various::Box->new(columns => 2);
+$box2->add($button1, $button2);
 my $w = $main->window({title => 'Hello', height => 12, width => 42},
-		      $text1, $button1, $input, $check, $text2, $radio,
-		      $button2);
+		      $text1, $box1, $box2);
 is(ref($w), 'UI::Various::Tk::Window',
    'type UI::Various::Tk::Window is correct');
 $button2->code(sub { $w->destroy(); });
 
+my @internal_types = ();
 combined_is
 {
     $main->_mainloop_prepare;
+    push @internal_types,
+	$text1->_tk(), $button1->_tk(), $input->_tk(), $check->_tk(),
+	@{$radio->_tk()}[0], @{$box1->_tk()}[0];
     $button1->_tk()->invoke;
     $input->_tk()->insert(0, 'some');
     $check->_tk()->invoke;
@@ -140,6 +156,14 @@ combined_is
     "OK!\n",
     'mainloop produces correct output';
 is(@{$main->{children}}, 0, 'main no longer has children');
+is(ref($internal_types[0]), 'Tk::Label', 'Text had correct internal type');
+is(ref($internal_types[1]), 'Tk::Button', 'Button had correct internal type');
+is(ref($internal_types[2]), 'Tk::Entry', 'Input had correct internal type');
+is(ref($internal_types[3]), 'Tk::Checkbutton',
+   'Check had correct internal type');
+is(ref($internal_types[4]), 'Tk::Radiobutton',
+   'Radio had correct internal type');
+is(ref($internal_types[5]), 'Tk::Frame', 'Box had correct internal type');
 is($ivar, 'something', 'input variable has correct new value');
 is($cvar, 1, 'checkbox variable has correct new value of 1');
 is($rvar, 'b', 'radio button variable has correct new value of "b"(lue)');

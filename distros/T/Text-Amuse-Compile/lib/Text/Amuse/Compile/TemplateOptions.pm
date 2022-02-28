@@ -251,6 +251,11 @@ has linespacing => (is => 'rw',
                     default => sub { '' }
                    );
 
+has parindent => (is => 'rw',
+                  isa => Int,
+                  default => sub { 15 }
+                 );
+
 has mainfont   => (is => 'rw',
                    isa => StrMatch[ qr{\A[a-zA-Z0-9 ]+\z} ],
                    default => sub { __PACKAGE__->default_mainfont },
@@ -423,6 +428,10 @@ be placed on the next recto page).
 =item * linespacing (float, tipically 1.5 or 2)
 
 Set the linespacing instead of the default value.
+
+=item * parindent (integer)
+
+Paragraph indentation in points (pt).
 
 =item * headings
 
@@ -778,6 +787,7 @@ sub config_setters {
                headings
                ignore_cover
                linespacing
+               parindent
                cover coverwidth nocoverpage notoc
                nofinalpage
                impressum sansfontsections

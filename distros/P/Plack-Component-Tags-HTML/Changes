@@ -1,0 +1,6 @@
+0.02 2022-02-28T12:38:08+01:00
+ - Fix minimal dependency for Tags::HTML::Page::Begin. There is fix for
+   situation without CSS. Fixes GH#1 (Thanks Slaven Rezić).
+
+0.01 2022-02-27T19:55:18+01:00
+ - First version.

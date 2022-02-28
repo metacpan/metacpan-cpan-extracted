@@ -233,7 +233,7 @@ pdl_error pdl_dim_checks(
     printf("  ind_sizes: "); pdl_print_iarr(ind_sizes, vtable->ninds);printf("\n"));
   for (i=0; i<vtable->npdls; i++) {
     PDL_Indx ninds = vtable->par_realdims[i];
-    PDLDEBUG_f(printf("pdl_dim_checks pdl %"IND_FLAG" (creating=%"IND_FLAG" ninds=%"IND_FLAG"): ", i, creating[i], ninds));
+    PDLDEBUG_f(printf("pdl_dim_checks pdl %"IND_FLAG" (creating=%"IND_FLAG" ninds=%"IND_FLAG"): ", i, creating ? creating[i] : -99, ninds));
     pdl *pdl = pdls[i];
     PDL_Indx ndims = pdl->ndims;
     PDLDEBUG_f(pdl_dump(pdl));
@@ -249,7 +249,7 @@ pdl_error pdl_dim_checks(
       ));
     } else {
       PDL_Indx *dims = pdl->dims;
-      if ((load_only || !creating[i]) && ninds > PDLMAX(0,ndims)) {
+      if ((load_only || (creating && !creating[i])) && ninds > PDLMAX(0,ndims)) {
 	/* Dimensional promotion when number of dims is less than required: */
 	for (j=0; j<ninds; j++) {
 	  ind_id = PDL_IND_ID(vtable, i, j);
@@ -259,7 +259,10 @@ pdl_error pdl_dim_checks(
       /* Now, the real check. */
       for (j=0; j<ninds; j++) {
 	ind_id = PDL_IND_ID(vtable, i, j);
-	if (load_only || !creating[i]) {
+	if (
+	  (load_only && !((vtable->par_flags[i] & PDL_PARAM_ISCREAT) && (pdl->state & PDL_MYDIMS_TRANS))) ||
+	  (creating && !creating[i])
+	) {
 	  if (ind_sizes[ind_id] == -1 || (ndims > j && ind_sizes[ind_id] == 1))
 	    ind_sizes[ind_id] = dims[j];
 	  else if (ndims > j && ind_sizes[ind_id] != dims[j] && dims[j] != 1)

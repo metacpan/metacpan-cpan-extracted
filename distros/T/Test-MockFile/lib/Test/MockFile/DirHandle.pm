@@ -10,6 +10,8 @@ package Test::MockFile::DirHandle;
 use strict;
 use warnings;
 
+our $VERSION = '0.032';
+
 =head1 NAME
 
 Test::MockFile::DirHandle - Provides a class object for
@@ -17,7 +19,7 @@ L<Test::MockFile> to give out for opendir calls.
 
 =head1 VERSION
 
-Version 0.030
+Version 0.032
 
 =cut
 

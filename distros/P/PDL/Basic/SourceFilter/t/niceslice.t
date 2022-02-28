@@ -2,6 +2,7 @@ use strict;
 use warnings;
 use Test::More;
 use PDL::LiteF;
+#BEGIN { $PDL::NiceSlice::debug = $PDL::NiceSlice::debug_filter = 1 }
 require PDL::NiceSlice;
 
 # these are accessible inside sub
@@ -11,16 +12,26 @@ my $c = PDL->pdl(7,6);
 my $idx = pdl 1,4,5;
 my $rg = pdl(2,7,2);
 
+require Filter::Simple;
+require PDL::NiceSlice::FilterSimple;
+my $fs_like = Filter::Simple::gen_std_filter_for(code_no_comments => \&PDL::NiceSlice::FilterSimple::code_no_comments);
+$fs_like = sub { $_ = PDL::NiceSlice::findslice($_, $PDL::NiceSlice::debug_filter) } if $::UC;
+
 sub translate_and_run {
   local $Test::Builder::Level = $Test::Builder::Level + 1;
   my ($txt, $expected_error) = @_;
   $expected_error ||= qr/^$/;
   my $retval = eval {
-    my $etxt = PDL::NiceSlice::findslice($txt);
-    note "$txt -> \n\t$etxt\n";
-    eval $etxt;
+    local $_ = $txt;
+    $fs_like->('main');
+    my $etxt = $_;
+#    note "$txt -> \n\t$etxt\n";
+    $etxt =~ s/^\s*print\b/die/;
+    my $retval = eval $etxt;
+    die $@ if $@;
+    $retval;
   };
-  like $@, $expected_error;
+  like $@, $expected_error, 'error as expected';
   $retval;
 }
 
@@ -126,9 +137,14 @@ $pa = pdl(5,3,2);
 $c = translate_and_run 'my $method = "dim"; $pa->$method(0)';
 is($c, $pa->dim(0));
 
-#$PDL::NiceSlice::debug_filter = 1;
-eval { require './t/bitshift.pm' };
-is $@, '', '<<= followed by >>= not blow up NiceSlice';
+translate_and_run <<'EOF';
+sub f {
+  my ($pa, $pb) = @_;
+  $pa <<= 2;
+  $pb >>= 1;
+}
+EOF
+pass '<<= followed by >>= not blow up NiceSlice';
 
 #
 # todo ones
@@ -161,13 +177,9 @@ is($c, $pa->at(0));
 
 $pa = ''; # foreach and whitespace + comments
 translate_and_run << 'EOT';
-
 foreach  my $pb # a random comment thrown in
-
 (1,2,3,4) {$pa .= $pb;}
-
 EOT
-
 is($pa, '1234');
 
 # test for correct header propagation
@@ -191,21 +203,30 @@ $pa = ones(10);
 my $ai = translate_and_run 'my $i = which $pa < 0; $pa($i);';
 ok(isempty $ai );
 
-{
-my $expected = q{
-CREATE TABLE $table (
-CHECK ( yr = $yr )
-) INHERITS ($schema.master_table)
-};
-use PDL::NiceSlice;
-my $got = q{
-CREATE TABLE $table (
-CHECK ( yr = $yr )
-) INHERITS ($schema.master_table)
-};
-is $got, $expected, 'NiceSlice leaves strings along';
+translate_and_run <<'EOF';
+my $p = {y => 1};
+{ $pa=ones(3,3,3); my $f = do { my $i=1; my $v=$$p{y}-$i; $pb = $pa(,$i,) }; }
+EOF
+pass 'obscure bug where "y" treated as tr/// in 2-deep {}';
 
-if (!($::UC = $::UC)) {
+if (!$::UC) {
+  # this is broken in the FilterUtilCall module so don't test it
+  my $expected = q{
+  CREATE TABLE $table (
+  CHECK ( yr = $yr )
+  ) INHERITS ($schema.master_table)
+  };
+  my $got = translate_and_run 'q{
+  CREATE TABLE $table (
+  CHECK ( yr = $yr )
+  ) INHERITS ($schema.master_table)
+  }';
+  is $got, $expected, 'NiceSlice leaves strings along';
+}
+
+{
+use PDL::NiceSlice;
+if (!$::UC) {
 my $data = join '', <DATA>;
 like $data, qr/we've got data/, "we've got data";
 }

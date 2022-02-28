@@ -22,4 +22,3 @@ INCLUDE: XS/DatabaseCreateError.xs
 INCLUDE: XS/DatabaseLockError.xs
 INCLUDE: XS/DatabaseModifiedError.xs
 INCLUDE: XS/DatabaseOpeningError.xs
-INCLUDE: XS/DatabaseClosedError.xs

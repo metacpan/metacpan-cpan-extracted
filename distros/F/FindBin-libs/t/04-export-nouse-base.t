@@ -43,7 +43,7 @@ for my $base ( @basz )
                     noprint
                     export
                     nouse
-                    ignore=
+                    noignore
                 )
             );
 

@@ -48,12 +48,11 @@ DESTROY(sv)
   PREINIT:
     pdl *self;
   CODE:
-    if (  !(  (SvROK(sv) && SvTYPE(SvRV(sv)) == SVt_PVHV) )  ) {
-       self = pdl_SvPDLV(sv);
-       PDLDEBUG_f(printf("DESTROYING %p\n",(void*)self);)
-       if (self != NULL)
-          pdl_barf_if_error(pdl_destroy(self));
-    }
+    if (SvROK(sv) && SvTYPE(SvRV(sv)) == SVt_PVHV) return;
+    self = pdl_SvPDLV(sv);
+    PDLDEBUG_f(printf("DESTROYING %p\n",(void*)self);)
+    if (self != NULL)
+      pdl_barf_if_error(pdl_destroy(self));
 
 # Return the transformation object or an undef otherwise.
 pdl_trans *
@@ -555,6 +554,7 @@ _convert_int(self, new_dtype)
 	int new_dtype;
 	CODE:
 		RETVAL = pdl_get_convertedpdl(self, new_dtype);
+		if (!RETVAL) barf("convert error");
 	OUTPUT:
 		RETVAL
 

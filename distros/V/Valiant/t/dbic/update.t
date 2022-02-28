@@ -37,4 +37,19 @@ ok $person->valid;
   ok $first->is_changed;
 }
 
+{
+  ok my $profile = $person->create_related('profile', +{
+    address => '123 Hello Street',
+    city => "Smalltown",
+    zip => '78621',
+    birthday => '2000-01-01',
+  });
+
+  ok $person->valid;
+  ok ref($profile->birthday), 'DateTime';
+  ok ref($person->profile->birthday), 'DateTime';
+}
+
+
+
 done_testing;

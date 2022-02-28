@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/File.pm
-## Version v0.2.1
+## Version v0.3.0
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/20
-## Modified 2022/01/17
+## Modified 2022/02/27
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -19,6 +19,7 @@ BEGIN
     use warnings::register;
     use version;
     use parent qw( Module::Generic );
+    use vars qw( $OS2SEP $DIR_SEP $MODE_BITS $DEFAULT_MMAP_SIZE $FILES_TO_REMOVE $MMAP_USE_FILE_MAP );
     use Data::UUID ();
     use Fcntl qw( :DEFAULT :flock SEEK_SET SEEK_CUR SEEK_END );
     use File::Copy ();
@@ -42,7 +43,6 @@ BEGIN
         fallback => 1,
     );
     use constant HAS_PERLIO_MMAP => ( version->parse($]) >= version->parse('v5.16.0') ? 1 : 0 );
-    our $VERSION = 'v0.2.1';
     # https://en.wikipedia.org/wiki/Path_(computing)
     # perlport
     our $OS2SEP  =
@@ -102,9 +102,9 @@ BEGIN
     vos         => '>',
     win32       => "\\",
     };
-    our $DIR_SEP = $OS2SEP->{ lc( $^O ) };
+    $DIR_SEP = $OS2SEP->{ lc( $^O ) };
     # Credits: David Golden for code borrowed from Path::Tiny;
-    our $MODE_BITS = 
+    $MODE_BITS = 
     {
     om => 0007,
     gm => 0070,
@@ -112,14 +112,16 @@ BEGIN
     };
     my $m = 0;
     $MODE_BITS->{ $_ } = ( 1 << $m++ ) for( qw( ox ow or gx gw gr ux uw ur ) );
-    our $DEFAULT_MMAP_SIZE = 10240;
+    $DEFAULT_MMAP_SIZE = 10240;
     # Default to use PerlIO mmap layer if possible
-    our $MMAP_USE_FILE_MAP = 0;
+    $MMAP_USE_FILE_MAP = 0;
     # Bug #92 <https://github.com/libwww-perl/URI/issues/92>
     # $URI::file::DEFAULT_AUTHORITY = undef;
+    $FILES_TO_REMOVE = {};
+    our $VERSION = 'v0.3.0';
 };
 
-my $FILES_TO_REMOVE = {};
+use strict;
 no warnings 'redefine';
 
 sub init
@@ -1319,9 +1321,17 @@ sub is_part_of
     return( CORE::index( $file, "${parent}${dir_sep}" ) == 0 ? $self->true : $self->false );
 }
 
-sub is_relative { return( !$self->_spec_file_name_is_absolute( shift->filepath ) ); }
+sub is_relative
+{
+    my $self = shift( @_ );
+    return( !$self->_spec_file_name_is_absolute( $self->filepath ) );
+}
 
-sub is_rootdir { return( shift->filepath eq $self->_spec_rootdir ); }
+sub is_rootdir
+{
+    my $self = shift( @_ );
+    return( $self->filepath eq $self->_spec_rootdir );
+}
 
 sub iterator
 {
@@ -1331,7 +1341,8 @@ sub iterator
     return( $self->error( "No code reference was provided as a callback for each element found." ) ) if( ref( $cb ) ne 'CODE' );
     return( $self ) if( !$self->is_dir );
     my $seen = {};
-    local $crawl = sub
+    my $crawl;
+    $crawl = sub
     {
         my $dir = shift( @_ );
         return if( !$dir->finfo->can_read );
@@ -1632,7 +1643,8 @@ sub mkpath
     # return( $self->error( "No path to create was provided." ) ) if( !scalar( @args ) );
     my $max_recursion = $self->max_recursion;
     
-    local $process = sub
+    my $process;
+    $process = sub
     {
         my $path = shift( @_ );
         $path = $path->filepath if( $self->_is_object( $path ) && $path->isa( 'Module::Generic::File' ) );
@@ -2139,11 +2151,11 @@ sub rmdir
 {
     my $self = shift( @_ );
     return( $self ) if( !$self->is_dir );
+    my $dir = $self->filename;
     try
     {
-        my $dir = $self->filename;
         CORE::rmdir( $dir ) ||
-            return( $self->error( "Unable to remove directory \"$dir\": $e. Is it empty?" ) );
+            return( $self->error( "Unable to remove directory \"$dir\": $!. Is it empty?" ) );
         return( $self );
     }
     catch( $e )
@@ -2337,7 +2349,7 @@ sub rmtree
     # we chdir to the previous directory if any or default system one
     if( $cwd eq $self || $cwd->contains( $self ) )
     {
-        local $go_there = sub
+        my $go_there = sub
         {
             my $where = shift( @_ );
             try
@@ -2346,7 +2358,7 @@ sub rmtree
             }
             catch( $e )
             {
-                warnings::warn( "Unable to chdir to ", ( defined( $prev_cwd ) ? "\"${prev_cwd}\"" : 'default system location (if any)' ), ": $e\n" ) if( warnings::enabled() );
+                warnings::warn( "Unable to chdir to ", ( defined( $where ) ? "\"${where}\"" : 'default system location (if any)' ), ": $e\n" ) if( warnings::enabled() );
             }
         };
         
@@ -2414,7 +2426,11 @@ sub rewind { return( shift->_filehandle_method( 'rewind', 'directory', @_ ) ); }
 
 sub rewinddir { return( shift->rewind( @_ ) ); }
 
-sub root_dir { return( shift->new( $self->_spec_rootdir, { os => $self->{os} }) ); }
+sub root_dir
+{
+    my $self = shift( @_ );
+    return( $self->new( $self->_spec_rootdir, { os => $self->{os} }) );
+}
 
 sub rootdir { return( shift->root_dir ); }
 
@@ -2653,7 +2669,7 @@ sub tmpdir
         $parent = $sys_tmpdir;
     }
     
-    unless( defined( $dir ) )
+    unless( defined( $parent ) )
     {
         $parent = $sys_tmpdir;
     }
@@ -2736,7 +2752,7 @@ sub unlink
     return( $self->error( "Cannot call unlink on a directory." ) ) if( $self->is_dir );
     my $file = $self->filepath;
     # Would only remove the most recent version on VMS
-    CORE::unlink( $file ) || return( $self->error( "Unable to remove file \"${file}\": $e" ) );
+    CORE::unlink( $file ) || return( $self->error( "Unable to remove file \"${file}\": $!" ) );
     return( $self );
 }
 
@@ -2750,6 +2766,7 @@ sub unload
     my $opts = $self->_get_args_as_hash( @_ );
     $opts->{append} //= 0;
     my $file = $self->filepath;
+    my $io;
     my $opened = $io = $self->opened;
     if( !$opened )
     {
@@ -3291,7 +3308,7 @@ sub _spec_class
     my $os = shift( @_ );
     # _spec_class object property would have been set upon object instantiation
     # but if $os is specified, or _spec_class is not set yet, we go on
-    return( $self->{_spec_class} ) if( $self->{_spec_class} && !defined( $os ) );
+    return( $self->{_spec_class} ) if( Scalar::Util::blessed( $self ) && $self->{_spec_class} && !defined( $os ) );
     $os = $^O if( !defined( $os ) );
     my $os_map = 
     {
@@ -3322,6 +3339,7 @@ sub _spec_class
 sub _spec_curdir
 {
     my $self = shift( @_ );
+    my $os = shift( @_ );
     my $class = $self->_spec_class( $os );
     return( $class->curdir );
 }
@@ -3345,6 +3363,7 @@ sub _spec_rel2abs
 sub _spec_rootdir
 {
     my $self = shift( @_ );
+    my $os = shift( @_ );
     my $class = $self->_spec_class( $os );
     return( $class->rootdir );
 }
@@ -3368,6 +3387,7 @@ sub _spec_splitpath
 sub _spec_tmpdir
 {
     my $self = shift( @_ );
+    my $os = shift( @_ );
     my $class = $self->_spec_class( $os );
     return( $class->tmpdir );
 }
@@ -3375,6 +3395,7 @@ sub _spec_tmpdir
 sub _spec_updir
 {
     my $self = shift( @_ );
+    my $os = shift( @_ );
     my $class = $self->_spec_class( $os );
     return( $class->updir );
 }
@@ -3531,6 +3552,7 @@ sub _uri_file_os_map
             warn( "No file path was provided.\n" );
             return;
         };
+        no strict 'refs';
         my $ref = \$file;
         ${$$ref} = $opts;
         return( bless( $ref => $class ) );
@@ -3539,6 +3561,7 @@ sub _uri_file_os_map
     sub FETCH
     {
         my $self = shift( @_ );
+        no strict 'refs';
         my $fh = ${$$self}->{fh} || do
         {
             warn( "Filehandle is gone!\n" );
@@ -3564,6 +3587,7 @@ sub _uri_file_os_map
     sub STORE
     {
         my $self = shift( @_ );
+        no strict 'refs';
         my $fh = ${$$self}->{fh} || do
         {
             warn( "Filehandle is gone!\n" );
@@ -3612,6 +3636,7 @@ sub _uri_file_os_map
     sub message
     {
         my $self = shift( @_ );
+        no strict 'refs';
         my $parent = ${$$self}->{me};
         return( $parent->message( @_ ) );
     }
@@ -3707,7 +3732,7 @@ Module::Generic::File - File Object Abstraction Class
 
 =head1 VERSION
 
-    v0.2.1
+    v0.3.0
 
 =head1 DESCRIPTION
 

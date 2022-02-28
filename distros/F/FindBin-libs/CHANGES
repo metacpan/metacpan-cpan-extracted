@@ -1,3 +1,22 @@
+-   3.0.1 Thu Feb 24 04:39:00 PM EST 2022
+
+    Remove extraneous breakpoints
+
+-   3.0.0 Thu Feb 24 04:39:00 PM EST 2022
+
+    Rewerite the search to use a saner, multi-stage 
+    process. Still uses abs_path to avoid duplicates
+    working up the stack due to multi-level symlinks,
+    skips things earlier in the process & is a bit 
+    easier to read. 
+
+    noignore is handled properly, as is ignore=
+
+    taint extraction on $Bin uses m{^ (.+) /? }x
+    to strip the trailing '/' in some RHEL versions
+    of catpath. 
+
+
 -   2.21.0 Mon Mar  8 01:04:13 PM EST 2021
 
     Minor change in taint extraction: Check for non-whitespace

@@ -1,5 +1,11 @@
 Revision history for Devel-MAT-Dumper
 
+0.43    2022-02-26
+        [CHANGES]
+         * Ignore SAVEt_FREEPV on the savestack
+         * Add support for perl 5.35's boolean types, as indicated by
+           SvIsBOOL()
+
 0.42    2020-04-24
         [CHANGES]
          * Support a -dump_at_WARN flag

@@ -3,9 +3,9 @@ NAME
     Indonesian Central Bank (BI)
 
 VERSION
-    This document describes version 0.063 of Finance::Currency::Convert::BI
+    This document describes version 0.064 of Finance::Currency::Convert::BI
     (from Perl distribution Finance-Currency-Convert-BI), released on
-    2018-07-10.
+    2022-02-26.
 
 SYNOPSIS
      use Finance::Currency::Convert::BI qw(get_currencies get_jisdor_rates);
@@ -17,7 +17,7 @@ FUNCTIONS
   get_currencies
     Usage:
 
-     get_currencies() -> [status, msg, result, meta]
+     get_currencies() -> [$status_code, $reason, $payload, \%result_meta]
 
     Extract currency data from Bank Indonesia's page.
 
@@ -27,12 +27,15 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: (any)
 
@@ -46,7 +49,7 @@ FUNCTIONS
   get_jisdor_rates
     Usage:
 
-     get_jisdor_rates(%args) -> [status, msg, result, meta]
+     get_jisdor_rates(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     Get JISDOR USD-IDR rates.
 
@@ -60,12 +63,15 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: (any)
 
@@ -77,6 +83,35 @@ SOURCE
     Source repository is at
     <https://github.com/perlancar/perl-Finance-Currency-Convert-BI>.
 
+SEE ALSO
+    <http://www.bi.go.id/>
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
+    steps required beyond that are considered a bug and can be reported to
+    me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2022, 2018, 2017, 2016, 2015 by perlancar
+    <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
 BUGS
     Please report any bugs or feature requests on the bugtracker website
     <https://rt.cpan.org/Public/Dist/Display.html?Name=Finance-Currency-Conv
@@ -84,17 +119,4 @@ BUGS
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
-
-SEE ALSO
-    <http://www.bi.go.id/>
-
-AUTHOR
-    perlancar <perlancar@cpan.org>
-
-COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018, 2017, 2016, 2015 by
-    perlancar@cpan.org.
-
-    This is free software; you can redistribute it and/or modify it under
-    the same terms as the Perl 5 programming language system itself.
 

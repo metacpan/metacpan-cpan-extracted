@@ -37,7 +37,7 @@ use warnings 'once';
 use Carp;
 use Storable ();
 
-our $VERSION = '0.16';
+our $VERSION = '0.18';
 
 use UI::Various::language::en;
 
@@ -68,7 +68,7 @@ our @EXPORT = qw(language logging stderr using
 
 use constant _ROOT_PACKAGE_ => substr(__PACKAGE__, 0, rindex(__PACKAGE__, "::"));
 
-use constant UI_ELEMENTS => qw(Button Check Input Main Radio Text Window);
+use constant UI_ELEMENTS => qw(Box Button Check Input Main Radio Text Window);
 
 our @CARP_NOT =
     (	_ROOT_PACKAGE_,
@@ -273,7 +273,7 @@ Otherwise this method just exports the core functions to our other modules.
 	{
 	    $_ = _ROOT_PACKAGE_ . '::' . $_;
 	    unless (eval "require $_")
-	    {   fatal('unsupported_ui_element__1', $_);   }
+	    {   fatal('unsupported_ui_element__1__2', $_, $@);   }
 	    $_->import;
 	}
     }
@@ -384,8 +384,10 @@ get or set currently used handling of output>
 		    # uncoverable branch true
 		    if ($rc == 0)
 		    {
-			# errors can't use standard messaging here:
-			# uncoverable statement
+			# errors can't use standard messaging here (like
+			# above we have a paradox; the statement is covered
+			# while the branch is not):
+			# uncoverable not statement
 			print "\n***** can't redirect STDERR: $! *****\n";
 		    }
 		    binmode(STDERR, ':utf8');
@@ -546,7 +548,7 @@ sub _message($$;@)
 
 =head3 example:
 
-    debug(1, TODO);
+    debug(1, __PACKAGE__, '::new');
 
 =head3 parameters:
 
@@ -1105,6 +1107,6 @@ under the same terms as Perl itself.  See LICENSE file for more details.
 
 =head1 AUTHOR
 
-Thomas Dorner E<lt>dorner@cpan.orgE<gt>
+Thomas Dorner E<lt>dorner (at) cpan (dot) orgE<gt>
 
 =cut

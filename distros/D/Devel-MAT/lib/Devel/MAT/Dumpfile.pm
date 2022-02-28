@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2013-2019 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Dumpfile 0.44;
+package Devel::MAT::Dumpfile 0.45;
 
 use v5.14;
 use warnings;

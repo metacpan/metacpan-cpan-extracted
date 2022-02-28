@@ -27,10 +27,8 @@ __PACKAGE__->might_have(
 __PACKAGE__->add_unique_constraint(['value']);
 
 __PACKAGE__->validates(value => (presence=>1, length=>[2,48]));
-__PACKAGE__->validates(oneone => ( result=>+{validations=>1} ));
 
 __PACKAGE__->accept_nested_for('might');
-
 __PACKAGE__->accept_nested_for('oneone');
 
 1;

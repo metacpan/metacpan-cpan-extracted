@@ -14,6 +14,7 @@ t/001_load.t
 t/002_products.t
 t/003_cart.t
 t/004_gdpr_consent.t
+t/005_footer_right.t
 t/manifest.t
 t/perl-critic.t
 t/perltidy.t

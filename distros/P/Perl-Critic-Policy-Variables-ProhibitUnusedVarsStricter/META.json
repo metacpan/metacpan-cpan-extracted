@@ -46,6 +46,7 @@
       "runtime" : {
          "requires" : {
             "English" : "0",
+            "PPI::Document" : "0",
             "PPIx::QuoteLike" : "0.011",
             "PPIx::QuoteLike::Constant" : "0.011",
             "PPIx::Regexp" : "0.071",
@@ -64,7 +65,7 @@
    "provides" : {
       "Perl::Critic::Policy::Variables::ProhibitUnusedVarsStricter" : {
          "file" : "lib/Perl/Critic/Policy/Variables/ProhibitUnusedVarsStricter.pm",
-         "version" : "0.112"
+         "version" : "0.113"
       }
    },
    "release_status" : "stable",
@@ -82,6 +83,6 @@
          "web" : "https://github.com/trwyant/perl-Perl-Critic-Policy-Variables-ProhibitUnusedVarsStricter"
       }
    },
-   "version" : "0.112",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "0.113",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

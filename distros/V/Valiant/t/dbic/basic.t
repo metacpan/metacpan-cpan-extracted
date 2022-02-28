@@ -112,8 +112,12 @@ ok $state->id;
       ],
     }), 'created fixture';
 
+  is $person->model_name->param_key, 'person';
+  is $person->profile->model_name->param_key, 'profile';
+
   ok $person->invalid, 'attempted record invalid multi context';
   ok !$person->in_storage, 'record was not saved';
+
   is_deeply +{$person->errors->to_hash(full_messages=>1)}, +{
     credit_cards => [
       "Credit Cards has too few rows (minimum is 2)",
@@ -144,7 +148,7 @@ ok $state->id;
       "Profile Phone Number is too short (minimum is 10 characters)",
     ],
     "profile.state_id" => [
-      "Profile State Id can't be blank",
+      "Profile State can't be blank",
     ],
   }, 'Got expected errors';
 
@@ -163,7 +167,7 @@ ok $state->id;
       "Phone Number is too short (minimum is 10 characters)",
     ],
     state_id => [
-      "State Id can't be blank",
+      "State can't be blank",
     ],
   }, 'Got expected errors';
 
@@ -294,9 +298,11 @@ ok $state->id;
 
   ok $person_invalid->invalid, 'attempted record was valid';
   ok ! $person_invalid->in_storage, 'record has not been saved 4';
+
+  is scalar($person_invalid->credit_cards->all), 2;
+
   is_deeply +{$person_invalid->errors->to_hash(full_messages=>1)}, +{
     credit_cards => [
-      "Credit Cards has too few rows (minimum is 2)",
       "Credit Cards Is Invalid",
     ],
     "credit_cards.1.expiration" => [
@@ -369,7 +375,7 @@ ok $state->id;
       "Profile Phone Number is too short (minimum is 10 characters)",
     ],
     "profile.state_id" => [
-      "Profile State Id can't be blank",
+      "Profile State can't be blank",
     ],
   };
 
@@ -393,7 +399,7 @@ ok $state->id;
       "Phone Number is too short (minimum is 10 characters)",
     ],
     state_id => [
-      "State Id can't be blank",
+      "State can't be blank",
     ],
   }, 'Got expected errors';
 
@@ -538,10 +544,10 @@ ok $state->id;
 
   ok $person->invalid, 'attempted record invalid 3';
   ok $person->is_changed, 'record has unsaved changes';
+  is scalar($person->credit_cards->all), 2;
 
   is_deeply +{ $person->errors->to_hash }, +{
     credit_cards => [
-      'has too few rows (minimum is 2)',
       "Is Invalid",
     ],
     "credit_cards.0.card_number" => [

@@ -18,4 +18,3 @@ void
 DatabaseOpeningError::DESTROY()
 
 INCLUDE: XS/DatabaseVersionError.xs
-INCLUDE: XS/DatabaseNotFoundError.xs

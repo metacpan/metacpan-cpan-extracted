@@ -1,0 +1,10 @@
+#!/bin/bash
+
+set -ex
+
+cip sudo apt-get update
+cip sudo apt-get install g++ cmake m4
+
+if [[ ! -z "$CIP_PACKAGES" ]]; then
+  cip exec cpanm -n $CIP_PACKAGES
+fi

@@ -4,7 +4,7 @@
       "perlancar <perlancar@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -28,7 +28,7 @@
             "Test::Rinci" : "0.151"
          },
          "x_spec" : {
-            "Rinci" : "v1.1.96",
+            "Rinci" : "v1.1.100",
             "Sah::Schemas" : "v0.1.0"
          }
       },
@@ -48,7 +48,7 @@
             "Data::Clone" : "0",
             "Data::Dmp" : "0.241",
             "Data::Dump" : "0",
-            "Data::TableData::Object::aohos" : "0.112",
+            "Data::TableData::Object::aohos" : "0.114",
             "Devel::Platform::Info" : "0",
             "Devel::Size" : "0",
             "Exporter" : "5.57",
@@ -59,7 +59,7 @@
             "IPC::System::Options" : "0.339",
             "JSON::MaybeXS" : "0",
             "List::MoreUtils" : "0",
-            "List::Util" : "1.45",
+            "List::Util" : "1.54",
             "List::Util::Uniq" : "0.003",
             "Log::ger" : "0.038",
             "Math::ScientificNotation::Util" : "0",
@@ -68,7 +68,7 @@
             "Module::XSOrPP" : "0",
             "PERLANCAR::Module::List" : "0.004004",
             "POSIX" : "0",
-            "Perinci::Result::Format::Lite" : "0.280",
+            "Perinci::Result::Format::Lite" : "0.285",
             "Permute::Named::Iter" : "0",
             "Proc::ChildError" : "0",
             "Role::Tiny" : "0",
@@ -88,7 +88,7 @@
       },
       "test" : {
          "requires" : {
-            "Data::Sah::Coerce" : "0.048",
+            "Data::Sah::Coerce" : "0.050",
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
@@ -99,103 +99,103 @@
    "provides" : {
       "Bencher::Backend" : {
          "file" : "lib/Bencher/Backend.pm",
-         "version" : "1.060"
+         "version" : "1.061"
       },
       "Bencher::Formatter" : {
          "file" : "lib/Bencher/Formatter.pm",
-         "version" : "1.060"
+         "version" : "1.061"
       },
       "Bencher::Formatter::AddComparisonFields" : {
          "file" : "lib/Bencher/Formatter/AddComparisonFields.pm",
-         "version" : "1.060"
+         "version" : "1.061"
       },
       "Bencher::Formatter::CodeStartup" : {
          "file" : "lib/Bencher/Formatter/CodeStartup.pm",
-         "version" : "1.060"
+         "version" : "1.061"
       },
       "Bencher::Formatter::DeleteConstantFields" : {
          "file" : "lib/Bencher/Formatter/DeleteConstantFields.pm",
-         "version" : "1.060"
+         "version" : "1.061"
       },
       "Bencher::Formatter::DeleteNotesFieldIfEmpty" : {
          "file" : "lib/Bencher/Formatter/DeleteNotesFieldIfEmpty.pm",
-         "version" : "1.060"
+         "version" : "1.061"
       },
       "Bencher::Formatter::DeleteSeqField" : {
          "file" : "lib/Bencher/Formatter/DeleteSeqField.pm",
-         "version" : "1.060"
+         "version" : "1.061"
       },
       "Bencher::Formatter::ModuleStartup" : {
          "file" : "lib/Bencher/Formatter/ModuleStartup.pm",
-         "version" : "1.060"
+         "version" : "1.061"
       },
       "Bencher::Formatter::RenderAsBenchmarkPm" : {
          "file" : "lib/Bencher/Formatter/RenderAsBenchmarkPm.pm",
-         "version" : "1.060"
+         "version" : "1.061"
       },
       "Bencher::Formatter::RenderAsTextTable" : {
          "file" : "lib/Bencher/Formatter/RenderAsTextTable.pm",
-         "version" : "1.060"
+         "version" : "1.061"
       },
       "Bencher::Formatter::RoundNumbers" : {
          "file" : "lib/Bencher/Formatter/RoundNumbers.pm",
-         "version" : "1.060"
+         "version" : "1.061"
       },
       "Bencher::Formatter::ScaleRate" : {
          "file" : "lib/Bencher/Formatter/ScaleRate.pm",
-         "version" : "1.060"
+         "version" : "1.061"
       },
       "Bencher::Formatter::ScaleSize" : {
          "file" : "lib/Bencher/Formatter/ScaleSize.pm",
-         "version" : "1.060"
+         "version" : "1.061"
       },
       "Bencher::Formatter::ScaleTime" : {
          "file" : "lib/Bencher/Formatter/ScaleTime.pm",
-         "version" : "1.060"
+         "version" : "1.061"
       },
       "Bencher::Formatter::ShowEnv" : {
          "file" : "lib/Bencher/Formatter/ShowEnv.pm",
-         "version" : "1.060"
+         "version" : "1.061"
       },
       "Bencher::Formatter::Sort" : {
          "file" : "lib/Bencher/Formatter/Sort.pm",
-         "version" : "1.060"
+         "version" : "1.061"
       },
       "Bencher::Role::FieldMunger" : {
          "file" : "lib/Bencher/Role/FieldMunger.pm",
-         "version" : "1.060"
+         "version" : "1.061"
       },
       "Bencher::Role::ResultMunger" : {
          "file" : "lib/Bencher/Role/ResultMunger.pm",
-         "version" : "1.060"
+         "version" : "1.061"
       },
       "Bencher::Role::ResultRenderer" : {
          "file" : "lib/Bencher/Role/ResultRenderer.pm",
-         "version" : "1.060"
+         "version" : "1.061"
       },
       "Bencher::Scenario::Example" : {
          "file" : "lib/Bencher/Scenario/Example.pm",
-         "version" : "1.060"
+         "version" : "1.061"
       },
       "Bencher::Scenario::Example::CmdLineTemplate" : {
          "file" : "lib/Bencher/Scenario/Example/CmdLineTemplate.pm",
-         "version" : "1.060"
+         "version" : "1.061"
       },
       "Bencher::Scenario::Example::CommandNotFound" : {
          "file" : "lib/Bencher/Scenario/Example/CommandNotFound.pm",
-         "version" : "1.060"
+         "version" : "1.061"
       },
       "Bencher::Scenario::Example::MultipleArgValues::Array" : {
          "file" : "lib/Bencher/Scenario/Example/MultipleArgValues/Array.pm",
-         "version" : "1.060"
+         "version" : "1.061"
       },
       "Bencher::Scenario::Example::MultipleArgValues::Hash" : {
          "file" : "lib/Bencher/Scenario/Example/MultipleArgValues/Hash.pm",
-         "version" : "1.060"
+         "version" : "1.061"
       },
       "Benchmark::Dumb::SimpleTime" : {
          "file" : "lib/Benchmark/Dumb/SimpleTime.pm",
-         "version" : "1.060"
+         "version" : "1.061"
       }
    },
    "release_status" : "stable",
@@ -210,7 +210,7 @@
          "web" : "https://github.com/perlancar/perl-Bencher-Backend"
       }
    },
-   "version" : "1.060",
+   "version" : "1.061",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"
@@ -235,52 +235,52 @@
                }
             },
             "name" : "@Filter/@Filter/GatherDir",
-            "version" : "6.017"
+            "version" : "6.024"
          },
          {
             "class" : "Dist::Zilla::Plugin::PruneCruft",
             "name" : "@Filter/@Filter/PruneCruft",
-            "version" : "6.017"
+            "version" : "6.024"
          },
          {
             "class" : "Dist::Zilla::Plugin::ManifestSkip",
             "name" : "@Filter/@Filter/ManifestSkip",
-            "version" : "6.017"
+            "version" : "6.024"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaYAML",
             "name" : "@Filter/@Filter/MetaYAML",
-            "version" : "6.017"
+            "version" : "6.024"
          },
          {
             "class" : "Dist::Zilla::Plugin::License",
             "name" : "@Filter/@Filter/License",
-            "version" : "6.017"
+            "version" : "6.024"
          },
          {
             "class" : "Dist::Zilla::Plugin::PodCoverageTests",
             "name" : "@Filter/@Filter/PodCoverageTests",
-            "version" : "6.017"
+            "version" : "6.024"
          },
          {
             "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
             "name" : "@Filter/@Filter/PodSyntaxTests",
-            "version" : "6.017"
+            "version" : "6.024"
          },
          {
             "class" : "Dist::Zilla::Plugin::ExtraTests",
             "name" : "@Filter/@Filter/ExtraTests",
-            "version" : "6.017"
+            "version" : "6.024"
          },
          {
             "class" : "Dist::Zilla::Plugin::ExecDir",
             "name" : "@Filter/@Filter/ExecDir",
-            "version" : "6.017"
+            "version" : "6.024"
          },
          {
             "class" : "Dist::Zilla::Plugin::ShareDir",
             "name" : "@Filter/@Filter/ShareDir",
-            "version" : "6.017"
+            "version" : "6.024"
          },
          {
             "class" : "Dist::Zilla::Plugin::MakeMaker",
@@ -290,27 +290,27 @@
                }
             },
             "name" : "@Filter/@Filter/MakeMaker",
-            "version" : "6.017"
+            "version" : "6.024"
          },
          {
             "class" : "Dist::Zilla::Plugin::Manifest",
             "name" : "@Filter/@Filter/Manifest",
-            "version" : "6.017"
+            "version" : "6.024"
          },
          {
             "class" : "Dist::Zilla::Plugin::ConfirmRelease",
             "name" : "@Filter/@Filter/ConfirmRelease",
-            "version" : "6.017"
+            "version" : "6.024"
          },
          {
             "class" : "Dist::Zilla::Plugin::ExecDir",
             "name" : "@Filter/ExecDir script",
-            "version" : "6.017"
+            "version" : "6.024"
          },
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::BeforeBuild",
             "name" : "@Filter/PERLANCAR::BeforeBuild",
-            "version" : "0.605"
+            "version" : "0.606"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AbstractFromMeta",
@@ -375,7 +375,7 @@
          {
             "class" : "Dist::Zilla::Plugin::CopyrightYearFromGit",
             "name" : "@Filter/CopyrightYearFromGit",
-            "version" : "0.006"
+            "version" : "0.009"
          },
          {
             "class" : "Dist::Zilla::Plugin::IfBuilt",
@@ -385,12 +385,12 @@
          {
             "class" : "Dist::Zilla::Plugin::MetaJSON",
             "name" : "@Filter/MetaJSON",
-            "version" : "6.017"
+            "version" : "6.024"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaConfig",
             "name" : "@Filter/MetaConfig",
-            "version" : "6.017"
+            "version" : "6.024"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaProvides::Package",
@@ -400,7 +400,7 @@
                      {
                         "class" : "Dist::Zilla::Plugin::FinderCode",
                         "name" : "@Filter/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
-                        "version" : "6.017"
+                        "version" : "6.024"
                      }
                   ],
                   "include_underscores" : 0
@@ -602,7 +602,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PruneFiles",
             "name" : "@Filter/PruneFiles",
-            "version" : "6.017"
+            "version" : "6.024"
          },
          {
             "class" : "Dist::Zilla::Plugin::Pod2Readme",
@@ -664,7 +664,7 @@
                }
             },
             "name" : "@Filter/Test::Perl::Critic::Subset",
-            "version" : "3.001.005"
+            "version" : "3.001.006"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::Rinci",
@@ -705,7 +705,7 @@
                }
             },
             "name" : "TestRequires",
-            "version" : "6.017"
+            "version" : "6.024"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs",
@@ -716,7 +716,7 @@
                }
             },
             "name" : "Prereqs",
-            "version" : "6.017"
+            "version" : "6.024"
          },
          {
             "class" : "Dist::Zilla::Plugin::OSPrereqs",
@@ -737,7 +737,7 @@
                }
             },
             "name" : "RuntimeRecommends",
-            "version" : "6.017"
+            "version" : "6.024"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs",
@@ -748,7 +748,7 @@
                }
             },
             "name" : "DevelopX_spec",
-            "version" : "6.017"
+            "version" : "6.024"
          },
          {
             "class" : "Dist::Zilla::Plugin::Acme::CPANModules::Whitelist",
@@ -758,57 +758,57 @@
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":InstallModules",
-            "version" : "6.017"
+            "version" : "6.024"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":IncModules",
-            "version" : "6.017"
+            "version" : "6.024"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":TestFiles",
-            "version" : "6.017"
+            "version" : "6.024"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ExtraTestFiles",
-            "version" : "6.017"
+            "version" : "6.024"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ExecFiles",
-            "version" : "6.017"
+            "version" : "6.024"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":PerlExecFiles",
-            "version" : "6.017"
+            "version" : "6.024"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ShareFiles",
-            "version" : "6.017"
+            "version" : "6.024"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":MainModule",
-            "version" : "6.017"
+            "version" : "6.024"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":AllFiles",
-            "version" : "6.017"
+            "version" : "6.024"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":NoFiles",
-            "version" : "6.017"
+            "version" : "6.024"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : "@Filter/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
-            "version" : "6.017"
+            "version" : "6.024"
          }
       ],
       "zilla" : {
@@ -816,7 +816,7 @@
          "config" : {
             "is_trial" : 0
          },
-         "version" : "6.017"
+         "version" : "6.024"
       }
    },
    "x_authority" : "cpan:PERLANCAR",

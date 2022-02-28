@@ -43,7 +43,7 @@ use Text::Wrap;
 $Text::Wrap::huge = 'overflow';
 $Text::Wrap::unexpand = 0;
 
-our $VERSION = '0.16';
+our $VERSION = '0.18';
 
 use UI::Various::core;
 
@@ -56,8 +56,9 @@ our @EXPORT_OK = qw(%D);
 =item B<%D>
 
 a hash of decoration characters for window borders (C<W1> to C<W9> without
-C<W5>), box borders (C<B1> to C<B9> without C<B5>), check boxes (C<CL> and
-C<CR>), radio buttons (C<RL> and C<RR>) and normal buttons (C<BL> and C<BR>)
+C<W5>), box borders (C<B*>, C<b*> and C<c5>), check boxes (C<CL> and C<CR>),
+radio buttons (C<RL> and C<RR>), normal buttons (C<BL> and C<BR>) and
+underline (C<UL1> and C<UL0>).
 
 =cut
 
@@ -65,20 +66,29 @@ use constant DECO_ASCII => (W7 => '#', W8 => '=', W9 => '#',
 			    W4 => '"',		  W6 => '"',
 			    W1 => '#', W2 => '=', W3 => '#',
 			    B7 => '+', B8 => '-', B9 => '+',
-			    B4 => '|',		  B6 => '|',
+				       b8 => '+',
+			    B4 => '|', B5 => '|', B6 => '|',
+			    b4 => '+', b5 => '+', b6 => '+',
+				       c5 => '-',
 			    B1 => '+', B2 => '-', B3 => '+',
+				       b2 => '+',
 			    BL => '[', BR => ']',
 			    CL => '[', CR => ']',
 			    RL => '(', RR => ')',
 			    UL1 => "\e[4m", UL0 => "\e[24m");
 
-# not yet supported:
+# https://www.utf8-chartable.de/unicode-utf8-table.pl?start=9472&number=128
+# (not yet supported, we'll probably check I18N::Langinfo::langinfo):
 use constant DECO_UTF8 => (W7 => "\x{2554}", W8 => "\x{2550}", W9 => "\x{2557}",
 			   W4 => "\x{2551}",		       W6 => "\x{2551}",
 			   W1 => "\x{255a}", W2 => "\x{2550}", W3 => "\x{255d}",
 			   B7 => "\x{250c}", B8 => "\x{2500}", B9 => "\x{2510}",
-			   B4 => "\x{2502}",		       B6 => "\x{2502}",
+					     b8 => "\x{252C}",
+			   B4 => "\x{2502}", B5 => "\x{2502}", B6 => "\x{2502}",
+			   b4 => "\x{251C}", b5 => "\x{253C}", b6 => "\x{2524}",
+					     c5 => "\x{2500}",
 			   B1 => "\x{2514}", B2 => "\x{2500}", B3 => "\x{2518}",
+					     b2 => "\x{2534}",
 			   BL => "\x{2503}", BR => "\x{2503}",
 			   CL => '[', CR => ']',
 			   RL => '(', RR => ')',
@@ -288,6 +298,6 @@ under the same terms as Perl itself.  See LICENSE file for more details.
 
 =head1 AUTHOR
 
-Thomas Dorner E<lt>dorner@cpan.orgE<gt>
+Thomas Dorner E<lt>dorner (at) cpan (dot) orgE<gt>
 
 =cut

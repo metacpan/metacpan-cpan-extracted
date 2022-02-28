@@ -15,7 +15,8 @@
     use constant _MATH_GMPq_T   => 7;
     use constant _MATH_GMPz_T   => 8;
     use constant _MATH_GMP_T    => 9;
-    use constant _MATH_MPC_T    => 10;
+    use constant _MATH_MPC_T 	=> 10;
+    use constant GMPF_PV_NV_BUG => Math::GMPf::Random::_has_pv_nv_bug();
 
 use subs qw( __GNU_MP_VERSION __GNU_MP_VERSION_MINOR __GNU_MP_VERSION_PATCHLEVEL
              __GNU_MP_RELEASE __GMP_CC __GMP_CFLAGS GMP_LIMB_BITS GMP_NAIL_BITS);
@@ -50,6 +51,7 @@ use overload
     @Math::GMPf::EXPORT_OK = qw(
 __GNU_MP_VERSION __GNU_MP_VERSION_MINOR __GNU_MP_VERSION_PATCHLEVEL
 __GNU_MP_RELEASE __GMP_CC __GMP_CFLAGS
+GMPF_PV_NV_BUG
 IOK_flag NOK_flag POK_flag
 Rmpf_abs Rmpf_add Rmpf_add_ui Rmpf_ceil Rmpf_clear Rmpf_clear_mpf Rmpf_clear_ptr
 Rmpf_cmp Rmpf_cmp_d Rmpf_cmp_si Rmpf_cmp_ui Rmpf_cmp_NV Rmpf_cmp_IV
@@ -81,12 +83,13 @@ fgmp_urandomb_ui fgmp_urandomm_ui
 Rmpf_get_NV Rmpf_set_NV Rmpf_get_NV_rndn Rmpf_get_d_rndn
 Rmpf_get_IV Rmpf_set_IV Rmpf_fits_IV_p
     );
-    our $VERSION = '0.46';
+    our $VERSION = '0.47';
     #$VERSION = eval $VERSION;
 
     Math::GMPf->DynaLoader::bootstrap($VERSION);
 
     %Math::GMPf::EXPORT_TAGS =(mpf => [qw(
+GMPF_PV_NV_BUG
 Rmpf_abs Rmpf_add Rmpf_add_ui Rmpf_ceil Rmpf_clear Rmpf_clear_mpf Rmpf_clear_ptr
 Rmpf_cmp Rmpf_cmp_d Rmpf_cmp_si Rmpf_cmp_ui Rmpf_cmp_NV Rmpf_cmp_IV
 Rmpf_deref2 Rmpf_div Rmpf_div_2exp Rmpf_div_ui
@@ -183,6 +186,16 @@ sub new {
 
     if($type == _NOK_T) {
       if(@_ ) {die "Too many arguments supplied to new() - expected only one"}
+
+      if(GMPF_PV_NV_BUG) {
+        if(_SvPOK($arg1)) {
+          set_nok_pok(nok_pokflag() + 1);
+          if($Math::GMPf::NOK_POK) {
+            warn "Scalar passed to new() is both NV and PV. Using NV (numeric) value";
+          }
+        }
+      }
+
       return Rmpf_init_set_NV($arg1);
     }
 

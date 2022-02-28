@@ -1,13 +1,15 @@
 package Org::Element;
 
-our $DATE = '2021-06-27'; # DATE
-our $VERSION = '0.555'; # VERSION
-
 use 5.010;
 use locale;
 use Log::ger;
 use Moo;
 use Scalar::Util qw(refaddr);
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-02-08'; # DATE
+our $DIST = 'Org-Parser'; # DIST
+our $VERSION = '0.556'; # VERSION
 
 has document => (is => 'rw');
 has parent => (is => 'rw');
@@ -43,14 +45,14 @@ sub seniority {
     for (my $i=0; $i < @$c; $i++) {
         return $i if refaddr($c->[$i]) == $addr;
     }
-    return undef;
+    return undef; ## no critic: Subroutines::ProhibitExplicitReturnUndef
 }
 
 sub prev_sibling {
     my ($self) = @_;
 
     my $sen = $self->seniority;
-    return undef unless defined($sen) && $sen > 0;
+    return undef unless defined($sen) && $sen > 0; ## no critic: Subroutines::ProhibitExplicitReturnUndef
     my $c = $self->parent->children;
     $c->[$sen-1];
 }
@@ -59,9 +61,9 @@ sub next_sibling {
     my ($self) = @_;
 
     my $sen = $self->seniority;
-    return undef unless defined($sen);
+    return undef unless defined($sen); ## no critic: Subroutines::ProhibitExplicitReturnUndef
     my $c = $self->parent->children;
-    return undef unless $sen < @$c-1;
+    return undef unless $sen < @$c-1; ## no critic: Subroutines::ProhibitExplicitReturnUndef
     $c->[$sen+1];
 }
 
@@ -140,6 +142,21 @@ sub headlines {
     @res;
 }
 
+sub settings {
+    my ($self, $criteria) = @_;
+
+    my @settings = grep { $_->isa("Org::Element::Setting") }
+        @{ $self->children };
+    if ($criteria) {
+        if (ref $criteria eq 'CODE') {
+            @settings = grep { $criteria->($_) } @settings;
+        } else {
+            @settings = grep { $_->name eq $criteria } @settings;
+        }
+    }
+    @settings;
+}
+
 sub field_name {
     my ($self) = @_;
 
@@ -186,7 +203,7 @@ Org::Element - Base class for Org document elements
 
 =head1 VERSION
 
-This document describes version 0.555 of Org::Element (from Perl distribution Org-Parser), released on 2021-06-27.
+This document describes version 0.556 of Org::Element (from Perl distribution Org-Parser), released on 2022-02-08.
 
 =head1 SYNOPSIS
 
@@ -263,6 +280,19 @@ Get current headline (in the first element of the result list), its parent, its
 parent's parent, and so on until the topmost headline. Return empty list if
 element is not under any headline.
 
+=head2 $el->settings(CRITERIA) => ELEMENTS
+
+Get L<Org::Element::Setting> nodes directly under the element. Equivalent to:
+
+ my @settings = grep { $_->isa("Org::Element::Setting") } @{ $el->children };
+
+If CRITERIA is specified, will filter based on some criteria. CRITERIA can be a
+coderef, or a string to filter by setting's name, example:
+
+ my ($doc_title) = $doc->settings('TITLE');
+
+Take note of the list operator on the left because C<settings()> return a list.
+
 =head2 $el->field_name() => STR
 
 Try to extract "field name", being defined as either some text on the left side:
@@ -285,6 +315,34 @@ Please visit the project's homepage at L<https://metacpan.org/release/Org-Parser
 
 Source repository is at L<https://github.com/perlancar/perl-Org-Parser>.
 
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022, 2021, 2020, 2019, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Org-Parser>
@@ -292,16 +350,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2021, 2020, 2019, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

@@ -1,18 +1,18 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/DateUtils/parse_date
-# and generated automatically using Perinci::CmdLine::Gen version 0.495
-
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-30'; # DATE
-our $DIST = 'App-DateUtils'; # DIST
-our $VERSION = '0.126'; # VERSION
+# and generated automatically using Perinci::CmdLine::Gen version 0.500
 
 use 5.010001;
 use strict;
 use warnings;
 
 use Perinci::CmdLine::Any;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-09-06'; # DATE
+our $DIST = 'App-DateUtils'; # DIST
+our $VERSION = '0.127'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/DateUtils/parse_date",
@@ -38,24 +38,13 @@ parse-date - Parse date string(s) using one of several modules
 
 =head1 VERSION
 
-This document describes version 0.126 of parse-date (from Perl distribution App-DateUtils), released on 2020-03-30.
+This document describes version 0.127 of parse-date (from Perl distribution App-DateUtils), released on 2021-09-06.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % parse-date [options] <dates> ...
-
-Examples:
-
- % parse-date '23 sep 2015' tomorrow foo
- +----------------------------+-------------+--------------+------------+---------------------+------------------------------------------------------------------------------------------------------------------------------+
- | module                     | original    | is_parseable | as_epoch   | as_datetime_obj     | error_msg                                                                                                                    |
- +----------------------------+-------------+--------------+------------+---------------------+------------------------------------------------------------------------------------------------------------------------------+
- | DateTime::Format::Flexible | 23 sep 2015 | 1            | 1442966400 | 2015-09-23T00:00:00 |                                                                                                                              |
- | DateTime::Format::Flexible | tomorrow    | 1            | 1585612800 | 2020-03-31T00:00:00 |                                                                                                                              |
- | DateTime::Format::Flexible | foo         | 0            |            |                     | Invalid date format: foo at /home/u1/perl5/perlbrew/perls/perl-5.30.0/lib/site_perl/5.30.0/Perinci/CmdLine/POD.pm line 480.  |
- +----------------------------+-------------+--------------+------------+---------------------+------------------------------------------------------------------------------------------------------------------------------+
+% B<parse-date> [B<--all-modules>|B<-a>] [B<--format>=I<name>|B<--json>] [B<--module>=I<str>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--time-zone>=I<str>] [B<-m>=I<str>] [B<--timezone>=I<str>] -- E<lt>I<dates>E<gt> ...
 
 =head1 OPTIONS
 
@@ -71,11 +60,15 @@ Parse using all installed modules and return all the result at once.
 
 =item B<--date>=I<s@>*
 
+Can also be specified as the 1st command-line argument and onwards.
+
 Can be specified multiple times.
 
 =item B<--dates-json>=I<s>
 
 See C<--date>.
+
+Can also be specified as the 1st command-line argument and onwards.
 
 =item B<--module>=I<s>, B<-m>
 
@@ -85,7 +78,7 @@ Default value:
 
 Valid values:
 
- ["DateTime::Format::Alami::EN","DateTime::Format::Alami::ID","DateTime::Format::Flexible","DateTime::Format::Flexible(de)","DateTime::Format::Flexible(es)","DateTime::Format::Natural","Date::Parse"]
+ ["DateTime::Format::Flexible","DateTime::Format::Flexible(de)","DateTime::Format::Flexible(es)","DateTime::Format::Natural","Date::Parse"]
 
 =item B<--time-zone>=I<s>, B<--timezone>
 
@@ -131,6 +124,10 @@ you want to pipe the result for more post-processing. In this case you can use
 =item B<--page-result>
 
 Filter output through a pager.
+
+=item B<--view-result>
+
+View output using a viewer.
 
 =back
 
@@ -182,6 +179,17 @@ It is also recommended to install L<shcompgen> (see above).
 
 For fish and zsh, install L<shcompgen> as described above.
 
+=head1 EXAMPLES
+
+ % parse-date '23 sep 2015' tomorrow foo
+ +----------------------------+-------------+--------------+------------+---------------------+---------------------------+------------------------+------------------------------------------------------------------------------------------------------------------------------+
+ | module                     | original    | is_parseable | as_epoch   | as_datetime_obj     | as_datetime_obj_tz_local  | as_datetime_obj_tz_utc | error_msg                                                                                                                    |
+ +----------------------------+-------------+--------------+------------+---------------------+---------------------------+------------------------+------------------------------------------------------------------------------------------------------------------------------+
+ | DateTime::Format::Flexible | 23 sep 2015 | 1            | 1442966400 | 2015-09-23T00:00:00 | 2015-09-23T00:00:00+07:00 | 2015-09-22T17:00:00Z   |                                                                                                                              |
+ | DateTime::Format::Flexible | tomorrow    | 1            | 1630972800 | 2021-09-07T00:00:00 | 2021-09-07T00:00:00+07:00 | 2021-09-06T17:00:00Z   |                                                                                                                              |
+ | DateTime::Format::Flexible | foo         | 0            |            |                     |                           |                        | Invalid date format: foo at /home/u1/perl5/perlbrew/perls/perl-5.34.0/lib/site_perl/5.34.0/Perinci/CmdLine/POD.pm line 939.  |
+ +----------------------------+-------------+--------------+------------+---------------------+---------------------------+------------------------+------------------------------------------------------------------------------------------------------------------------------+
+
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/App-DateUtils>.
@@ -190,6 +198,34 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-DateUt
 
 Source repository is at L<https://github.com/perlancar/perl-App-DateUtils>.
 
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021, 2020, 2019, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-DateUtils>
@@ -197,16 +233,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2020, 2019, 2017, 2016, 2015 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

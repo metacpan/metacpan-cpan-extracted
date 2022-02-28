@@ -24,6 +24,9 @@ under the L<DBIx::Class::Valiant::Validator> namespace.  It adds this namespace
 to the top of the call list, that way we can if needed override core validators
 with versions that work properly under L<DBIx::Class>.
 
+You shouldn't need to use this code directly yourself, it gets added automatically
+for you.
+
 =head1 SEE ALSO
  
 See L<Valiant>, L<DBIx::Class::Valiant>

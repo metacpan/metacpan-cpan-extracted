@@ -7,7 +7,7 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Validation Library",
+  "ABSTRACT" => "Validation Library and more",
   "AUTHOR" => "John Napiorkowski <jjnapiork\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -27,6 +27,7 @@ my %WriteMakefileArgs = (
     "Devel::StackTrace" => "2.03",
     "File::Spec" => 0,
     "FreezeThaw" => 0,
+    "HTML::Escape" => 0,
     "Lingua::EN::Inflexion" => 0,
     "Module::Runtime" => 0,
     "Moo" => "2.004004",
@@ -35,6 +36,7 @@ my %WriteMakefileArgs = (
     "String::CamelCase" => 0,
     "Sub::Util" => 0,
     "Text::Autoformat" => 0,
+    "URI" => 0,
     "namespace::autoclean" => 0,
     "overload" => 0
   },
@@ -52,9 +54,9 @@ my %WriteMakefileArgs = (
     "Test::Needs" => "0.002006",
     "Type::Tiny" => "1.012001"
   },
-  "VERSION" => "0.001011",
+  "VERSION" => "0.001012",
   "test" => {
-    "TESTS" => "t/*.t t/dbic/*.t t/examples/*.t t/filters/*.t t/validator/*.t"
+    "TESTS" => "t/*.t t/dbic/*.t t/examples/*.t t/filters/*.t t/html/*.t t/validator/*.t"
   }
 );
 
@@ -72,6 +74,7 @@ my %FallbackPrereqs = (
   "Devel::StackTrace" => "2.03",
   "File::Spec" => 0,
   "FreezeThaw" => 0,
+  "HTML::Escape" => 0,
   "Lingua::EN::Inflexion" => 0,
   "Module::Runtime" => 0,
   "Moo" => "2.004004",
@@ -87,6 +90,7 @@ my %FallbackPrereqs = (
   "Test::Needs" => "0.002006",
   "Text::Autoformat" => 0,
   "Type::Tiny" => "1.012001",
+  "URI" => 0,
   "namespace::autoclean" => 0,
   "overload" => 0
 );

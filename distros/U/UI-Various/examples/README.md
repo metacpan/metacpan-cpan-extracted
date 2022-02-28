@@ -44,4 +44,4 @@ under the same terms as Perl itself.  See LICENSE file for more details.
 
 # AUTHOR
 
-Thomas Dorner <dorner@cpan.org>
+Thomas Dorner <dorner (at) cpan (dot) org>

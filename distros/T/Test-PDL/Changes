@@ -1,5 +1,9 @@
 Revision history for Test::PDL
 
+0.20      2022-02-26
+
+ - strip out badvals before comparing ndarrays - https://github.com/PDLPorters/pdl/issues/388
+
 0.19      2022-02-02
 
  - actually check if either value is empty

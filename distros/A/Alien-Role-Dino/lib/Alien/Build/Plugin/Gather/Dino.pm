@@ -8,7 +8,7 @@ use FFI::CheckLib qw( find_lib );
 use Path::Tiny qw( path );
 
 # ABSTRACT: Experimental support for dynamic share Alien install
-our $VERSION = '0.06'; # VERSION
+our $VERSION = '0.07'; # VERSION
 
 
 sub init
@@ -45,7 +45,7 @@ Alien::Build::Plugin::Gather::Dino - Experimental support for dynamic share Alie
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 

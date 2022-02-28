@@ -8,6 +8,7 @@ lib/Test/RedisServer.pm
 minil.toml
 t/basic.t
 t/manual_start.t
+t/no_save.t
 t/no_server.t
 t/tmp_dir.t
 t/unknown_conf.t

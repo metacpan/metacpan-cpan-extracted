@@ -6,11 +6,14 @@ use warnings;
 
 use English qw{ -no_match_vars };
 
+use PPI::Document;
 use PPIx::QuoteLike 0.011;
 use PPIx::QuoteLike::Constant 0.011 qw{
     LOCATION_LINE
+    LOCATION_LOGICAL_FILE
     LOCATION_LOGICAL_LINE
     LOCATION_CHARACTER
+    LOCATION_COLUMN
 };
 use PPIx::Regexp 0.071;
 use Readonly;
@@ -21,7 +24,7 @@ use Perl::Critic::Utils qw< :booleans :characters hashify :severities >;
 
 use base 'Perl::Critic::Policy';
 
-our $VERSION = '0.112';
+our $VERSION = '0.113';
 
 #-----------------------------------------------------------------------------
 
@@ -794,6 +797,8 @@ sub _returned_lexical {
 
         $self->_get_double_quotish_string_uses( $document );
 
+        $self->_get_subroutine_signature_uses( $document );
+
         return;
     }
 
@@ -998,11 +1003,11 @@ sub _get_regexp_symbol_uses {
 
         foreach my $regex ( @{ $document->find( $class ) || [] } ) {
 
-            my $ppix = $self->_get_ppix_regexp( $regex )
+            my $pre = $self->_get_ppix_regexp( $regex )
                 or next;
 
             foreach my $code ( @{
-                $ppix->find( 'PPIx::Regexp::Token::Code' ) || [] } ) {
+                $pre->find( 'PPIx::Regexp::Token::Code' ) || [] } ) {
 
                 my $subdoc = $self->_get_derived_ppi_document( $code,
                     $regex );
@@ -1012,6 +1017,60 @@ sub _get_regexp_symbol_uses {
 
         }
 
+    }
+
+    return;
+}
+
+#-----------------------------------------------------------------------------
+
+# Stolen shamelessly from OALDERS' App::perlimports::Include
+sub _get_subroutine_signature_uses {
+    my ( $self, $document ) = @_;
+
+    # FIXME as of PPI 1.272, signatures are parsed as prototypes.
+    foreach my $class ( qw{ PPI::Token::Prototype } ) {
+        foreach my $elem ( @{ $document->find( $class ) || [] } ) {
+            my $sig = $elem->content();
+
+            # Skip over things that might actually be prototypes. Some
+            # of them may actually be signatures, but if so they specify
+            # only ignored variables, or maybe magic variables like $_
+            # or @_.
+            $sig =~ m/ [[:alpha:]\d] /smx
+                or next;
+
+            # Strip leading and trailing parens. OALDERS' comments say
+            # that sometimes the trailing one is missing.
+            $sig =~ s/ \A \s* [(] \s* //smx;
+            $sig =~ s/ \s* [)] \s* \z //smx;
+
+            # Rewrite the signature as statements.
+            my @args;
+            foreach ( split / , /smx, $sig ) {
+                s/ \s+ \z //smx;
+                s/ \A \s+ //smx;
+                # Skip unused arguments, since we're not interested in
+                # their position in the argument list.
+                m/ \A [\$\@%] (?: \s* = | \z ) /smx
+                    and next;
+                # Ignore empty defaults.
+                s/ = \z //smx;
+                # FIXME there ought to be a 'my' in front, but because
+                # this policy has no way to find the uses of this
+                # variable it results in false positives. MAYBE I could
+                # fix this by calling _get_symbol_declarations() on
+                # $subdoc (in _element_to_ppi() so it only gets called
+                # once), but I don't think I want that in the same
+                # commit, or even the same release, as the bug fix.
+                push @args, "$_;";
+            }
+
+            my $subdoc = $self->_element_to_ppi( $elem, "@args" )
+                or next;
+
+            $self->_get_symbol_uses( $subdoc, $elem );
+        }
     }
 
     return;
@@ -1218,6 +1277,65 @@ sub _location_is_in_right_hand_side_of_assignment {
 
 #-----------------------------------------------------------------------------
 
+# Cribbed shamelessly from PPIx::Regexp::Token::Code->ppi().
+# FIXME duplicate code should be consolidated somewhere, but I don't
+# know where. Maybe in the above scope code, since that's what I'm
+# trying to solve.
+sub _element_to_ppi {
+    my ( $self, $elem, $content ) = @_;
+
+    exists $self->{$PACKAGE}{sub_document}{ refaddr( $elem ) }
+        and return $self->{$PACKAGE}{sub_document}{ refaddr( $elem ) };
+
+    defined $content
+        or $content = $self->content();
+
+    my $doc_content;
+
+    my $location = $elem->location();
+    if ( $location ) {
+        my $fn;
+        if( defined( $fn = $location->[LOCATION_LOGICAL_FILE] ) ) {
+            $fn =~ s/ (?= [\\"] ) /\\/smxg;
+            $doc_content = qq{#line $location->[LOCATION_LOGICAL_LINE] "$fn"\n};
+        } else {
+            $doc_content = qq{#line $location->[LOCATION_LOGICAL_LINE]\n};
+        }
+        $doc_content .= q< > x ( $location->[LOCATION_COLUMN] - 1 );
+    }
+
+    $doc_content .= $content;
+
+    my $doc = PPI::Document->new( \$doc_content );
+
+    if ( $location ) {
+        # Generate locations now.
+        $doc->location();
+        # Remove the stuff we originally injected. NOTE that we can
+        # only get away with doing this if the removal does not
+        # invalidate the locations of the other tokens that we just
+        # generated.
+        my $annotation;
+        # Remove the '#line' directive if we find it
+        $annotation = $doc->child( 0 )
+            and $annotation->isa( 'PPI::Token::Comment' )
+            and $annotation->content() =~ m/ \A \#line\b /smx
+            and $annotation->remove();
+        # Remove the white space if we find it, and if it in fact
+        # represents only the white space we injected to get the
+        # column numbers right.
+        my $wid = $location->[LOCATION_COLUMN] - 1;
+        $wid
+            and $annotation = $doc->child( 0 )
+            and $annotation->isa( 'PPI::Token::Whitespace' )
+            and $wid == length $annotation->content()
+            and $annotation->remove();
+    }
+
+    $self->{$PACKAGE}{parent_element}{ refaddr( $doc ) } = $elem;
+    return ( $self->{$PACKAGE}{sub_document}{ refaddr( $elem ) } = $doc );
+}
+
 1;
 
 __END__
@@ -1268,6 +1386,9 @@ double-quotish strings (including regexes) and here documents.
 expression C<(?{...})> and C<(??{...})> constructions, and in the
 replacement portion of C<s/.../.../e>.
 
+* An attempt is made to find variables which are used in subroutine
+signatures.
+
 This policy intentionally does not report variables as unused if the
 code takes a reference to the variable, even if it is otherwise unused.
 For example things like
@@ -1288,6 +1409,7 @@ various odd corners such as
     qr{(??{...})}
     "@{[ ... ]}"
     ( $foo, my $bar ) = ( 1, 2 )
+    sub ( $foo = $bar ) { ... } # Signature, not prototype
 
 Most of these are because the PPI parse of the original document does
 not include the declarations. The list assignment is missed because PPI
@@ -1477,7 +1599,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2012-2021 Thomas R. Wyant, III
+Copyright (C) 2012-2022 Thomas R. Wyant, III
 
 =head1 LICENSE
 

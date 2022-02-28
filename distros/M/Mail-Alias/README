@@ -1,26 +1,35 @@
 INTRODUCTION
 This is the README file for the PERL module Mail::Alias
-for Version 1.12  13 September2000
+for Version 1.15  26 February 2022
 
 Mail::Alias is avaiable for download at www.CPAN.org under Mail modules
-or under the CPAN author ID: ZELT
+or under the CPAN author ID: JIK. Source code is available at
+https://github.com/jikamens/Mail-Alias.
 
 You require perl 5.001 or later to use this library
 	This is a legacy of the previous version of Mail::Alias that was
 	included in MailTools. This module may actually work with earlier
 	versions of PERL
 
-All files contained in this installation are Copyright (c) 2000
-Tom Zeltwanger. All rights reserved. This library is free software; you may
+All files contained in this installation are Copyright (c) 2022 Jonathan
+Kamens. All rights reserved. This library is free software; you may
 redistribute it and/or modify it under the same terms as Perl itself.
 
-Note: There is breif Mail::Alias documentation embedded in the Mail::Alias module,
+Copyright (c) 2022 Jonathan Kamens <jik@kamens.us>. All rights reserved. This
+program is free software; you can redistribute it and/or modify it under the
+same terms as Perl itself.
+
+Portions of earlier versions of this program were copyrighted by Tom Zeltwanger
+and Graham Barr. The current copyright holder extends full authorship rights to
+both of the previous authors.
+
+Note: There is brief Mail::Alias documentation embedded in the Mail::Alias module,
 which can be accessed by typing "man Mail::Alias" after installation or by typing
 "perldoc Alias.pm" in the directory containing Alias.pm
 
 -----------------------------------------------------------------------------
 Any questions or comments (Please send your feeback) should be addressed to -
-Tom Zeltwanger <perl@ename.com>                                             -
+Jonathan Kamens <jik@kamens.us>                                             -
 -----------------------------------------------------------------------------
 
 
@@ -45,10 +54,19 @@ convert between various alias file formats.
 
 
 HISTORY
+
+From Jonathan Kamens in 2022:
+
+I took over maintenance of this module in 2022 to fix a breaking
+incompatibility with the current version of Perl going back several years. To
+date no changes have been made to the module except that one fix.
+
+From Tom Zeltwanger in 2000:
+
 The capabilities provided in this module were developed as part of the
-development of an E-mail Forwarding service (desibed in more detail at www.ename.com).
-The service is  based on SENDMAIL and uses PERL for automatic processing of Alias
-files. This code is being provided to the PERL community in appreciation for the
+development of a now-defunct E-mail Forwarding service.
+The service was based on SENDMAIL and used PERL for automatic processing of Alias
+files. This code has been provided to the PERL community in appreciation for the
 free PERL software and the incredible support network that comes with PERL at no
 charge.
 

@@ -18,8 +18,10 @@ examples/hello-two-windows.pl
 examples/hello-variable-content.pl
 examples/hello.pl
 lib/UI/Various.pm
+lib/UI/Various/Box.pm
 lib/UI/Various/Button.pm
 lib/UI/Various/Check.pm
+lib/UI/Various/Curses/Box.pm
 lib/UI/Various/Curses/Button.pm
 lib/UI/Various/Curses/Check.pm
 lib/UI/Various/Curses/Input.pm
@@ -30,6 +32,7 @@ lib/UI/Various/Curses/Window.pm
 lib/UI/Various/Curses/base.pm
 lib/UI/Various/Input.pm
 lib/UI/Various/Main.pm
+lib/UI/Various/PoorTerm/Box.pm
 lib/UI/Various/PoorTerm/Button.pm
 lib/UI/Various/PoorTerm/Check.pm
 lib/UI/Various/PoorTerm/Input.pm
@@ -40,6 +43,7 @@ lib/UI/Various/PoorTerm/Window.pm
 lib/UI/Various/PoorTerm/base.pm
 lib/UI/Various/PoorTerm/container.pm
 lib/UI/Various/Radio.pm
+lib/UI/Various/RichTerm/Box.pm
 lib/UI/Various/RichTerm/Button.pm
 lib/UI/Various/RichTerm/Check.pm
 lib/UI/Various/RichTerm/Input.pm
@@ -50,6 +54,7 @@ lib/UI/Various/RichTerm/Window.pm
 lib/UI/Various/RichTerm/base.pm
 lib/UI/Various/RichTerm/container.pm
 lib/UI/Various/Text.pm
+lib/UI/Various/Tk/Box.pm
 lib/UI/Various/Tk/Button.pm
 lib/UI/Various/Tk/Check.pm
 lib/UI/Various/Tk/Input.pm
@@ -80,10 +85,12 @@ t/14-window.t
 t/15-input.t
 t/16-check.t
 t/17-radio.t
+t/18-box.t
 t/21-tk-1.t
 t/22-tk-2.t
 t/31-curses.t
 t/41-rich-term.t
+t/42-rich-term-box.t
 t/functions/call_with_stdin.pl
 t/functions/run_in_fork.pl
 t/functions/sub_perl.pl

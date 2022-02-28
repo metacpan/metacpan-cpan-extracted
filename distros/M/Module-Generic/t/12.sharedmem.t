@@ -32,7 +32,6 @@ SKIP:
     );
     # Clean up
 
-
     ok( $shem->create == 0, 'create default value' );
     $shem->create(1);
     ok( $shem->create == 1, 'create updated value' );
@@ -46,7 +45,10 @@ SKIP:
         $shem->open->remove;
     }
     ok( defined( $exists ) && !$exists, 'exists' );
-    my $s = $shem->open;
+    my $s = $shem->open({ mode => 'w' }) || do
+    {
+        diag( "Failed to open shared memory: ", $shem->error ) if( $DEBUG );
+    };
     local $SIG{__DIE__} = sub
     {
         diag( "Got error: ", join( '', @_ ), ". Cleaning up shared memory." ) if( $DEBUG );

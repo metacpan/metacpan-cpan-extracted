@@ -28,11 +28,16 @@ sub _create_order ($c, $o) {
   my $orders = $c->poruchki;
 
   # POST to Econt to create order
-  my $eco_res = $app->ua->request_timeout(5)->post(
+  my $_order_struct = $c->_order_struct($o);
+  my $eco_res       = $app->ua->request_timeout(5)->post(
     $shop->{crupdate_order_endpoint} =>
       {'Content-Type' => 'application/json', Authorization => $shop->{private_key}},
-    json => $c->_order_struct($o))->res;
-
+    json => $_order_struct
+  )->res;
+  $c->debug(
+    'req_url: '        => $shop->{crupdate_order_endpoint},
+    ' $_order_struct:' => $_order_struct
+  );
   $c->debug('$eco_res->json:' => $eco_res->json);
   if ($eco_res->is_success) {
     $o->{deliverer_id} = $eco_res->json->{id} + 0;
@@ -50,17 +55,20 @@ sub _create_order ($c, $o) {
 
   # Something is wrong if we get to here. Log the error and inform the user
   # that something is wrong with the communication between us and Econt.
-  $app->log->error('Error from Econt: Status:'
+  $app->log->error('Error from _create_order($c,$o): Econt Status:'
       . $eco_res->code
       . $/
-      . 'Response:'
-      . decode(utf8 => $eco_res->body));
+      . 'Econt Response:'
+      . decode(utf8 => $eco_res->body)
+      . $/
+      . __FILE__ . ':'
+      . __LINE__);
 
   $c->render(
     openapi => {
       errors => [{
         path    => $c->url_for . '',
-        message => 'Нещо не се разбрахме с доставчика.'
+        message => 'Изпращането на поръчката към доставчика се провали.'
           . $/
           . 'Състояние: '
           . $eco_res->code
@@ -82,10 +90,16 @@ sub _create_way_bill ($c, $o, $id) {
 
   # $c->debug('Poruchka:' => $o);
   # POST to Econt to create order
-  my $eco_res = $c->app->ua->request_timeout(5)->post(
+  my $_order_struct = $c->_order_struct($o);
+  my $eco_res       = $c->app->ua->request_timeout(5)->post(
     $shop->{create_awb_endpoint} =>
       {'Content-Type' => 'application/json', Authorization => $shop->{private_key}},
-    json => $c->_order_struct($o))->res;
+    json => $_order_struct
+  )->res;
+  $c->debug(
+    'req_url: '        => $shop->{create_awb_endpoint},
+    ' $_order_struct:' => $_order_struct
+  );
   my $way_bill = $eco_res->json;
   $c->debug('товарителница $eco_res->json:' => $way_bill);
   if ($eco_res->is_success) {
@@ -106,17 +120,22 @@ sub _create_way_bill ($c, $o, $id) {
     return 1;
   }
 
-  $app->log->error('Error from Econt: Status:'
+  $app->log->error('Error from _create_way_bill($c,$o): Econt Status:'
       . $eco_res->code
       . $/
-      . 'Response:'
-      . decode(utf8 => $eco_res->body));
+      . 'Econt Response:'
+      . decode(utf8 => $eco_res->body)
+      . $/
+      . __FILE__ . ':'
+      . __LINE__);
 
   $c->render(
     openapi => {
       errors => [{
         path    => $c->url_for . '',
-        message => 'Нещо не се разбрахме с доставчика.'
+        message => "Създаването на товарителница се провали, но поръчката ви "
+          . "($o->{deliverer_id}) е приета."
+          . " Ще се свържем с вас на предоствения от вас телефон."
           . $/
           . 'Състояние: '
           . $eco_res->code
@@ -128,13 +147,12 @@ sub _create_way_bill ($c, $o, $id) {
   );
 
   return;
-
 }
 
 # Returns a structure for JSON body for a create/update query and a way bill (товарителница) to Econt.
 # First time this is passed without id to create one at deliverer site.
 # Second time the deliverer_id is passed as id.
-# 1. $shop->{update_order_endpoint}
+# 1. $shop->{crupdate_order_endpoint}
 # 2. $shop->{create_awb_endpoint}
 sub _order_struct ($c, $o) {
   my $items = $o->{items};
@@ -144,7 +162,10 @@ sub _order_struct ($c, $o) {
 
     #id => $o->{id},
     #orderNumber         => $o->{id},
-    cod           => 1,
+    cod => 1,
+
+    # NOTE!!! TODO: Implement automatic Invoice creation from order!
+    # Which field is for "invoice_num" as reported in the error from Econt???
     declaredValue => $o->{sum},
     currency      => $o->{shipping_price_currency},
 
@@ -153,7 +174,7 @@ sub _order_struct ($c, $o) {
       'книг' . (@$items > 1 ? 'и' : 'а') . ' ISBN: ' . join ';',
       map {"$_->{sku}: $_->{quantity}бр."} @$items
     ),
-    receiverShareAmount => $o->{shipping_price_cod},
+    receiverShareAmount => $o->{shipping_price_cod} || 0,
     customerInfo        => {
       name        => $o->{name},
       face        => $o->{face},
@@ -163,7 +184,7 @@ sub _order_struct ($c, $o) {
       cityName    => $o->{city_name},
       postCode    => $o->{post_code},
       officeCode  => $o->{office_code},
-      address     => ($o->{office_code} && $o->{address}),
+      address     => ($o->{office_code} ? "" : $o->{address}),
       quarter     => $o->{quarter},
       street      => $o->{street},
       num         => $o->{num},

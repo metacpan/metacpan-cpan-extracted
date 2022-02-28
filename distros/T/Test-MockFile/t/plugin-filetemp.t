@@ -20,7 +20,7 @@ BEGIN {
 use Test::MockFile 'strict', plugin => 'FileTemp';
 
 ok !$has_filetemp_before_load, "File::Temp is not loaded before Test::MockFile";
-ok $INC{'File/Temp.pm'}, 'File::Temp is loaded';
+ok $INC{'File/Temp.pm'},       'File::Temp is loaded';
 
 require File::Temp;    # not really needed
 
@@ -37,11 +37,18 @@ require File::Temp;    # not really needed
         ok lives { open( my $fh, ">", "$tempdir/here" ) }, "we can open a tempfile under a tempdir";
     }
 
+    # scalar context
+
+    {
+        my $fh = File::Temp::tempfile;
+        ok lives { print {$fh} "test" }, "print to a tempfile - scalar context";
+    }
+
 }
 
 {
     my $dir = File::Temp->newdir();
-    ok opendir( my $dh, "$dir" ), "opendir - newdir";
+    ok opendir( my $dh, "$dir" ),             "opendir - newdir";
     ok open( my $f, '>', "$dir/myfile.txt" ), "open a file created under newdir";
 }
 

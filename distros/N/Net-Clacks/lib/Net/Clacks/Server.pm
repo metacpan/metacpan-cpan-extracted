@@ -7,7 +7,7 @@ use diagnostics;
 use mro 'c3';
 use English;
 use Carp;
-our $VERSION = 20;
+our $VERSION = 21;
 use autodie qw( close );
 use Array::Contains;
 use utf8;
@@ -1043,6 +1043,17 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
                     $clackscache{$1} = $2;
                     $clackscachetime{$1} = time;
                     $savecache = 1;
+                } elsif($inmsg =~ /^SETANDSTORE\ (.+?)\=(.*)/) {
+                    my %tmp = (
+                        sender => $cid,
+                        type => 'SETANDSTORE',
+                        name => $1,
+                        value => $2,
+                    );
+                    push @outbox, \%tmp;
+                    $clackscache{$tmp{name}} = $tmp{value};
+                    $clackscachetime{$tmp{name}} = time;
+                    $savecache = 1;
                 } elsif($inmsg =~ /^RETRIEVE\ (.+)/) {
                     #$clients{$cid}->{outbuffer} .= "SET ". $line->{name} . "=" . $line->{value} . "\r\n";
                     my $ckey = $1;
@@ -1178,10 +1189,14 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
                         $clients{$cid}->{outbuffer} .= "NOTIFY ". $line->{name} . "\r\n";
                     } elsif($line->{type} eq 'SET') {
                         $clients{$cid}->{outbuffer} .= "SET ". $line->{name} . "=" . $line->{value} . "\r\n";
-                        #} elsif($line->{type} eq 'STORE' && $clients{$cid}->{interclacks}) {
-                        #    $clients{$cid}->{outbuffer} .= "STORE ". $line->{name} . "=" . $line->{value} . "\r\n";
-                        #} elsif($line->{type} eq 'REMOVE' && $clients{$cid}->{interclacks}) {
-                        #    $clients{$cid}->{outbuffer} .= "REMOVE ". $line->{name} . "\r\n";
+                    } elsif($line->{type} eq 'SETANDSTORE') {
+                        # We forward SETANDSTORE as such only over interclacks connections. Basic clients don't have a cache,
+                        # so we only send a SET command
+                        if($clients{$cid}->{interclacks}) {
+                            $clients{$cid}->{outbuffer} .= "SETANDSTORE ". $line->{name} . "=" . $line->{value} . "\r\n";
+                        } else {
+                            $clients{$cid}->{outbuffer} .= "SET ". $line->{name} . "=" . $line->{value} . "\r\n";
+                        }
                     }
                 }
             }

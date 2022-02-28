@@ -14,7 +14,7 @@ __PACKAGE__->add_columns(
   id => { data_type => 'integer', is_nullable => 0, is_auto_increment => 1 },
   person_id => { data_type => 'integer', is_nullable => 0, is_foreign_key => 1 },
   card_number => { data_type => 'varchar', is_nullable => 0, size => '20' },
-  expiration => { data_type => 'date', is_nullable => 0 },
+  expiration => { data_type => 'date', is_nullable => 0, datetime_undef_if_invalid => 1  },
 );
 
 __PACKAGE__->set_primary_key("id");

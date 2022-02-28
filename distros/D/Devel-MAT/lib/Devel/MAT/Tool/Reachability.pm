@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2013-2018 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Tool::Reachability 0.44;
+package Devel::MAT::Tool::Reachability 0.45;
 
 use v5.14;
 use warnings;
@@ -263,7 +263,7 @@ sub mark_reachable
 
                push @more_internal, $lv->target if $lv->target;
             }
-            elsif( $_ =~ m/^(?:UNDEF|SCALAR|IO|REGEXP|FORMAT)$/ ) { } # ignore
+            elsif( $_ =~ m/^(?:UNDEF|BOOL|SCALAR|IO|REGEXP|FORMAT)$/ ) { } # ignore
 
             else { warn "Not sure what to do with user data item ".$sv->desc_addr."\n"; }
          }

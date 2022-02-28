@@ -1,5 +1,5 @@
 package SQL::Abstract::Plugin::TableAlias;
-use strict; use warnings; our $VERSION = '0.02';
+use strict; use warnings; our $VERSION = '0.03';
 use Moo;
 
 with 'SQL::Abstract::Role::Plugin';
@@ -237,7 +237,7 @@ SQL::Abstract::Plugin::TableAlias - automagical table aliasing
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 

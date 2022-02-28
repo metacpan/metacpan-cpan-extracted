@@ -4,9 +4,9 @@ use warnings;
 package Util::H2O::More;
 use parent q/Exporter/;
 
-our $VERSION = q{0.0.4};
+our $VERSION = q{0.0.6};
 
-our @EXPORT_OK = (qw/baptise baptise_deeply h2o/);
+our @EXPORT_OK = (qw/baptise baptise_deeply opt2h2o o2h o2h_deeply h2o/);
 
 use Util::H2O ();
 
@@ -29,30 +29,78 @@ sub _uuid {
 
 # non-recursive option
 sub baptise ($$@) {
-    my ( $ref, $pkg, @default_accessors ) = @_;
+    my ( $ref, $pkg, @default_accessors );
+    my $pos0 = shift;
+
+    # check pos0 for '-recurse'
+    if ( $pos0 eq q{-recurse} ) {
+        ( $ref, $pkg, @default_accessors ) = @_;
+    }
+    else {
+        $ref = $pos0;
+        ( $pkg, @default_accessors ) = @_;
+    }
 
     my $self;
     my $real_pkg = sprintf qq{%s::_%s}, $pkg, _uuid;
 
     # uses -isa to inherit from $pkg; -class to bless with a package name
     # derived from $pkg
-    $self = h2o -isa => $pkg, -class => $real_pkg, $ref, @default_accessors;
+    if ( $pos0 eq q{-recurse} ) {
+        $self = h2o -recurse, -isa => $pkg, -class => $real_pkg, $ref, @default_accessors;
+    }
+    else {
+        $self = h2o -isa => $pkg, -class => $real_pkg, $ref, @default_accessors;
+    }
 
     return $self;
 }
 
-# recursive option
+# DEPRECATED recursive option - now just a wrapper around `baptise -recurse, ...`
 sub baptise_deeply ($$@) {
     my ( $ref, $pkg, @default_accessors ) = @_;
+    return baptise -recurse, $ref, $pkg, @default_accessors;
+}
 
-    my $self;
-    my $real_pkg = sprintf qq{%s::_%s}, $pkg, _uuid;
+# preconditioner for use with Getopt::Long flags; returns just the flag name given
+# a list of option descriptors, e.g., qw/option1=s option2=i option3/;
 
-    # uses -isa to inherit from $pkg; -class to bless with a package name
-    # derived from $pkg
-    $self = h2o -recurse, -isa => $pkg, -class => $real_pkg, $ref, @default_accessors;
+# flags to keys
+sub opt2h2o(@) {
+    my @getopt_def = @_;
+    my @flags_only = map { m/([^=|\s]+)/g; $1 } @getopt_def;
+    return @flags_only;
+}
 
-    return $self;
+# return a dereferences hash (non-recursive); reverse of `h2o'
+sub o2h ($;$) {
+    my $pos0 = shift;
+    if ( $pos0 eq q{-recurse} ) {
+        my $hash_ref = shift;
+        return _o2h_deeply($hash_ref);
+    }
+    my $ref      = ref $pos0;
+    if ( grep { /$ref/ } qw/ARRAY|CODE|FORMAT|GLOB|HASH|SCALAR|undef/ ) {
+        die qq{First argument must be a blessed reference when "-recurse" is not in use!\n};
+    }
+    # like h2o, updates the hash reference in place ("by reference");
+    # and also returns the reference to the anonymous hash
+    return { %$pos0 }; 
+}
+
+# implements depth-first traversal of object, or hash ref for that matter
+sub _o2h_deeply ($;$);    # PROTO needed due to recursion
+
+sub _o2h_deeply ($;$) {
+    my ( $h, $fin ) = @_;
+    my $ref = ref $h;
+    if ( grep { /$ref/ } qw/ARRAY|CODE|FORMAT|GLOB|SCALAR|undef/ ) {
+        return $h;
+    }
+    foreach my $k ( keys %$h ) {
+        $fin->{$k} = _o2h_deeply( $h->{$k}, $fin->{$k} );
+    }
+    return $fin;
 }
 
 1;
@@ -73,9 +121,12 @@ This is a new module and still exploring the value and
 presentation of the interface. It may change (until noted here
 otherwise); it may also hopefully attract more C<h2o>-based
 utility methods. C<h2o> has a lot of other options, currently
-the only one exposed via C<baptise_deeply> is the C<-recurse>
-flag; as far as I know this is unique among the C<hash to
+the only one exposed via C<baptise> is the C<-recurse> flag;
+as far as I know this is unique among the C<hash to
 object> modules on CPAN.
+
+NOTE: C<baptise_deeply> is being deprecated in favour of properly
+handling the C<-recurse> subroutine flag.
 
 =head1 SYNOPSIS
 
@@ -175,7 +226,7 @@ Takes the same first 2 parameters as C<bless>; with the addition
 of a list that defines a set of default accessors that do not
 rely on the top level keys of the provided hash reference.
 
-=item C<baptise_deeply $hash_ref, $pkg, LIST>
+=item C<baptise -recurse, $hash_ref, $pkg, LIST>
 
 Like C<baptise>, but creates accessors recursively for a nested
 hash reference. Uses C<h2o>'s C<-recurse> flag.
@@ -186,8 +237,89 @@ that they will necessarily be blessed using the unchangable
 behavior of C<h2o>, which maintains the name space of C<Util::H2O::_$hash>
 even if C<h2o> is passed with the C<-isa> and C<-class> flags,
 which are both utilized to achieve the effective outcome of
-C<baptise> and C<bastise_deeply>.
+C<baptise> and C<bastise -recurse>.
 
+=item C<opt2h2o LIST>
+
+Handy function for working with C<Getopt::Long>, which takes
+a list of options meant for C<Getopt::Long>; and extracts the
+flag names so that they may be used to create default accessors
+without having more than one list. E.g.,
+
+    use Getopt::Long qw//;
+    my @opts = (qw/option1=s options2=s@ option3 option4=i o5|option5=s/);
+    my $o = h2o {}, opt2h2o(@opts);
+    Getopt::Long::GetOptionsFromArray( @ARGV, $o, @opts );
+    
+    # now options are all available as accessors, e.g.:
+    if ($o->option3) {
+      do_the_thing();
+    }
+
+Note: default values for options may still be placed inside
+of the anonymous hash being I<objectified> via C<h2o>. This
+will work perfectly well with C<baptise> and friends.
+
+    use Getopt::Long qw//;
+    my @opts = (qw/option1=s options2=s@ option3 option4=i o5|option5=s/);
+    my $o = h2o { option1 => q{foo} }, opt2h2o(@opts);
+    Getopt::Long::GetOptionsFromArray( @ARGV, $o, @opts );
+    # ...
+    # now $o can be used to query all possible options, even if they were
+    # never passed at the commandline 
+
+=item C<o2h REF>
+
+Effectively, the inverse of C<h2o> or C<baptise>; please
+note that it only returns the hash keys and their values;
+it doesn't do anything with accessors that have not caused
+keys to autovivify in the underlying hash reference.
+
+Note: although the blessed reference is passed I<by reference>,
+the unblessed hash is B<return>; leaving the original reference
+unaffected. See examples below.
+
+Given a non-nested object reference; such as one created by
+C<h2o> or C<baptise>, returns a reference to a pure hash void
+of the virtually indelible mark of the package name.
+
+    my $origin_ref    = { ... };
+    h2o -recurse, $origin_ref;             # Note: h2o affects the hash reference, but also returns it
+    my $pure_hash_ref = o2h $object_ref;   # Note: original reference is unaffected
+    
+    # Test::More
+    is_deeply $origin_ref, $pure_hash_ref, q{o2h completely undoes h2o};
+
+=item C<o2h -recurse, REF>
+
+Like C<o2h>, but for nested objects created with C<h2o -recurse>
+or C<baptise -recurse>.
+
+    my $origin_ref    = { ... };
+    h2o -recurse, $origin_ref;                     # Note: h2o affects the hash reference, but also returns it
+    my $pure_hash_ref = o2h -recurse, $object_ref; # Note: original reference is unaffected
+    
+    # Test::More ..
+    is_deeply $origin_ref, $pure_hash_ref, q{o2h completely undoes h2o};
+
+Again, this is inverse operation of C<h2o -recurse> or
+C<baptise -recurse>. Same caveat regarding accessors and hash
+keys applies.
+
+Final Note, because this might be on someone's mind. A common
+thing to do for Perl classes that are used for web services (and
+thus need to be serialized into JSON for transport) is to often
+implement a C<TO_JSON> method that provides an unblessed hash
+reference that most JSON encoding methods will happly serialize
+(or C<encode>). That is not unlike what is being done with
+C<o2h>, so future enhancements to C<o2h> may include detecting
+and calling C<TO_JSON> if the package blessing the reference
+C<can('TO_JSON').
+
+=item C<baptise_deeply, $hash_ref, $pkg, LIST>
+
+B<Deprecated>. Will be removed in future versions of this module.
+Use C<baptise -recurse> instead. See above.
 
 =back
 

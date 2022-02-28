@@ -54,7 +54,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.16';
+our $VERSION = '0.18';
 
 use UI::Various::core;
 
@@ -247,6 +247,34 @@ sub _inherited_access($$@)
     return undef;
 }
 
+#########################################################################
+
+=head2 B<_toplevel> - return visible toplevel UI element
+
+    $ui_element->_toplevel;
+
+=head3 description:
+
+Return the toplevel parent UI element of any UI container.  While above
+C<L<top|/top - determine top UI element of hierarchy>> usually returns the
+L<UI::Various::Main> element this call usually returns a
+L<UI::Various::Window> or L<UI::Various::Dialog>.  In addition it does not
+have sanity checks.
+
+=cut
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+sub _toplevel($)
+{
+    local ($_) = @_;
+    while (defined $_  and  not $_->isa('UI::Various::toplevel'))
+    {
+	$_ = $_->parent;
+    }
+    return $_;
+}
+
 # TODO: Debug?, terminal_color
 
 1;
@@ -267,6 +295,6 @@ under the same terms as Perl itself.  See LICENSE file for more details.
 
 =head1 AUTHOR
 
-Thomas Dorner E<lt>dorner@cpan.orgE<gt>
+Thomas Dorner E<lt>dorner (at) cpan (dot) orgE<gt>
 
 =cut

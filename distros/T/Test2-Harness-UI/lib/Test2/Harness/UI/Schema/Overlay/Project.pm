@@ -9,7 +9,7 @@ use Carp qw/confess/;
 confess "You must first load a Test2::Harness::UI::Schema::NAME module"
     unless $Test2::Harness::UI::Schema::LOADED;
 
-our $VERSION = '0.000108';
+our $VERSION = '0.000110';
 
 sub last_covered_run {
     my $self = shift;
@@ -18,11 +18,10 @@ sub last_covered_run {
     my $query = {
         status => 'complete',
         project_id => $self->project_id,
-        'coverages.run_id' => { 'IS NOT' => undef },
+        has_coverage => 1,
     };
 
     my $attrs = {
-        join => ['coverages'],
         order_by => {'-desc' => 'run_ord'},
         rows => 1,
     };

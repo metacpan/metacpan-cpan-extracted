@@ -1,5 +1,14 @@
 Revision history for Perl extension Localizer
 
+0.07 2022-02-25T00:55:21Z
+
+    commit 80caa0b63321e5647e4d34804fe10321ae6ddcfc
+    Author: diegok <diego@freekeylabs.com>
+    Date:   Tue Feb 22 19:08:14 2022 +0100
+
+        Fixed Gettext parsing of function args
+
+
 0.06 2019-11-15T04:24:54Z
 
     - Lexicon class to wrap dictionaries #5

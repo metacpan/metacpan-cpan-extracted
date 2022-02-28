@@ -140,6 +140,8 @@ our %prebuilt_formats = (
   zip             => [ qr/^\d{5}(?:[- ]\d{4})?$/,     _t('not_zip') ],
   zip5            => [ qr/^\d\d\d\d\d$/,              _t('not_zip5') ],
   zip9            => [ qr/^\d\d\d\d\d[- ]\d\d\d\d$/,  _t('not_zip9') ],
+  ascii           => [qr/^\p{IsASCII}*\z/,            _t('not_ascii') ],
+  word            => [qr/^\w*\z/,                     _t('not_word') ],
 );
 
 sub prebuilt_formats { return \%prebuilt_formats }
@@ -282,6 +284,10 @@ tag C<not_alpha_numeric>.
 
 Only letters and spaces.  Error message default is translation tag C<not_words>.
 
+=item word
+
+Must contain only a single word.  Adds error C<not_word> if fails.
+
 =item zip
 
 =item zip5
@@ -294,6 +300,10 @@ digit zipcode and return C<not_zip5> translation tag if not.  C<zip9> looks for 
 'Zip +4' extended zipcode, such as 11111-2222 (the separator can be either '-' or a
 space).  Adds errors C<not_zip9> if not.  Finally C<zip> will match either zip or zip +4
 and add error C<not_zip> on failure to match.
+
+=item ascii
+
+Must contain only ASCII characters.  Adds error C<not_ascii> if fails.
 
 =cut
 

@@ -2,73 +2,25 @@
 # housekeeping
 ########################################################################
 
-package FindBin::libs   v2.20.2;
+package FindBin::libs   v3.0.0;
 use v5.28;
 
 use FindBin;
 use File::Basename;
 
 use Carp    qw( croak                   );
+use Cwd     qw( abs_path                );
 use Symbol  qw( qualify qualify_to_ref  );
 
 use File::Spec::Functions
 qw
 (
-    &splitpath
-    &splitdir
-    &catpath
-    &catdir
-    &canonpath
+    splitpath
+    splitdir
+    catpath
+    catdir
+    canonpath
 );
-
-BEGIN
-{
-    # however... there have been complaints of 
-    # places where abs_path does not work. 
-    #
-    # if abs_path fails on the working directory
-    # then replace it with rel2abs and live with 
-    # possibly slower, redundant directories.
-    #
-    # the abs_path '//' hack allows for testing 
-    # broken abs_path on primitive systems that
-    # cannot handle the rooted system being linked
-    # back to itself.
-
-    use Cwd qw( &abs_path &cwd );
-
-    if
-    (
-        # abs_path has a fixed bug dealing with infinite
-        # recursion. if upping the version of Cwd does 
-        # not fix this then the only other test I can 
-        # think of is ( -e '/.' && -e '/..' && -e '/../.' )
-
-        eval 
-        {
-            abs_path '//';
-            abs_path cwd
-        }
-    )
-    {
-        # abs_path seems clean on this platform.
-    }
-    else
-    {
-        # abs_path seems to be having problems,
-        # fix is to stub it out.
-        #
-        # undef avoids nastygram.
-
-        my $ref = qualify_to_ref 'abs_path', __PACKAGE__;
-
-        my $sub = File::Spec::Functions->can( 'rel2abs' );
-
-        undef &{ $ref };
-
-        *$ref = $sub
-    };
-}
 
 ########################################################################
 # package variables 
@@ -76,32 +28,25 @@ BEGIN
 
 my %defaultz = 
 (
-    base    => 'lib',
-    use     => undef,
-    blib    => undef,   # prefer ./blib at the first level
+    base    => 'lib'
+  , use     => undef
+  , blib    => undef    # prefer ./blib at the first level
 
-    subdir  => '',      # add this subdir also if found.
-    subonly => undef,   # leave out lib's, use only subdir.
-    export  => undef,   # push variable into caller's space.
-    append  => undef,   # push onto existing array (vs. overwrite)
-    verbose => undef,   # boolean: print inputs, results.
-    debug   => undef,   # boolean: set internal breakpoints.
+  , subdir  => '',      # add this subdir also if found.
+  , subonly => undef    # leave out lib's, use only subdir.
+  , export  => undef    # push variable into caller's space.
+  , append  => undef    # push onto existing array (vs. overwrite)
+  , verbose => undef    # boolean: print inputs, results.
+  , debug   => undef    # boolean: set internal breakpoints.
 
-    print   => 1,       # display the results
+  , print   => 1        # display the results
 
-    p5lib   => undef,   # prefix PERL5LIB with the results
+  , p5lib   => undef    # prefix PERL5LIB with the results
 
-    ignore => '/,/usr', # dir's to skip looking for ./lib
+  # dir's to skip looking for ./lib
+  , ignore => [ qw( / /usr ) ]
 );
 
-# only new directories are used, ignore pre-loads
-# this with unwanted values.
-
-my %found = ();
-
-# saves passing this between import and $handle_args.
-
-my $verbose = '';
 my $empty   = q{};
 
 ########################################################################
@@ -113,14 +58,48 @@ my $empty   = q{};
 # directory path for it on VMS. Fix is to unshift a leading
 # '' into @dirpath where the leading entry is true.
 
-my $find_libs
+my $find_dirs
 = sub
 {
     my $argz    = shift;
     my $base    = basename $argz->{ base };
-    my $subdir  = canonpath $argz->{ subdir } || '';
+    my $subdir  
+    = $argz->{ subdir }
+    ? canonpath $argz->{ subdir }
+    : ''
+    ;
+    my $subonly = $argz->{ subonly } // '';
+    my %seen    = ();
+    my @libz    = ();
 
-    my $subonly = defined $argz->{ subonly };
+    my $onepass = $argz->{ export } && $argz->{ scalar };
+    my $ignore  
+    = do
+    {
+        # ignoring nothing may be used with export,
+        # mainly for testing.
+
+        my $dirz    = $argz->{ ignore };
+        
+        if( @$dirz )
+        {
+            my $altz    
+            = join '|' =>
+            map
+            {
+                catdir $_, $base
+            }
+            @$dirz;
+
+            qr{^ (?: $altz ) $}x
+        }
+        else
+        {
+            qr{^$}
+        }
+    };
+
+    my $verbose = $argz->{ verbose };
 
     # for some reason, RH Enterprise V/4 has a 
     # trailing '/'; I havn't seen another copy of 
@@ -134,9 +113,9 @@ my $find_libs
     # after that splitpath can grab the directory 
     # portion for future use.
 
-    my ( $Bin ) = ( $argz->{ Bin } =~ m{^ (.+) }xs );
+    my ( $Bin ) = ( $argz->{ Bin } =~ m{^ (.+) /? $}xs );
 
-    print STDERR "\nSearching $Bin for '$base'...\n"
+    print STDERR "\nSearching $Bin for '$base' ($subdir)...\n"
     if $verbose;
 
     my( $vol, $dir ) = splitpath $Bin, 1;
@@ -149,8 +128,6 @@ my $find_libs
 
     unshift @dirpath, '' if $dirpath[ 0 ];
 
-    my @libz    = ();
-
     PATH:
     for( 1 .. @dirpath )
     {
@@ -158,40 +135,53 @@ my $find_libs
         # volume only means something on DOS- & VMS-based
         # filesystems, and adding an empty basename on 
         # *nix is unnecessary.
-        #
-        # HAK ALERT: the poor slobs stuck on windog have an
-        # abs_path that croaks on missing directories. have
-        # to eval the check for subdir's. 
 
-        my $abs
-        = eval
+        my $dir = catpath $vol, ( catdir @dirpath, $base ), $empty;
+
+        $dir    =~ $ignore
+        and next;
+
+        -d $dir or next;
+
+        # regardless of how things are symlinked, the abspath
+        # check only puts each directory on the list once.
+
+        my @dirz
+        = do
         {
-            abs_path
-            catpath $vol, ( catdir @dirpath, $base ), $empty
-        }
-        || '';
-
-        my $sub
-        = $subdir
-        ? eval { abs_path ( catpath '', $abs, $subdir ) } || ''
-        : ''
-        ;
-
-        my @search = $subonly ? ( $sub ) : ( $abs, $sub );
-
-        for my $dir ( @search )
-        {
-            if( $dir && -d $dir && ! exists $found{ $dir } )
+            if( $subdir )
             {
-                $found{ $dir } = ();
+                my $sub = catpath $vol, ( catdir $dir, $subdir ), $empty;
 
-                push @libz, $dir;
-
-                last if $argz->{ scalar };
+                if( -d $sub )
+                {
+                    $subonly
+                    ? ( $sub )
+                    : ( $sub, $dir )
+                }
+                else
+                {
+                    ()
+                }
+            }
+            else
+            {
+                ( $dir )
             }
         }
+        or next;
 
-        pop @dirpath
+        for my $dir ( @dirz )
+        {
+            $seen{ abs_path $dir } 
+            ||= push @libz, $dir;
+        }
+
+        last if $onepass;
+    }
+    continue
+    {
+        pop @dirpath;
     }
 
     # caller gets back the existing lib paths 
@@ -271,6 +261,23 @@ my $handle_args
     : $FindBin::Bin
     ;
 
+    if( exists $argz{ ignore } )
+    {
+        # ignore is different: it requires a bit of 
+        # compilation.
+        #
+        # ignore may be empty, mainly for testing.
+
+        if( my $dirz = $argz{ ignore } )
+        {
+            $argz{ ignore } = [ split ',' => $dirz ];
+        }
+        else
+        {
+            $argz{ ignore } = [];
+        }
+    }
+
     # now apply the defaults, then sanity check the result.
     # base is a special case since it always has to exist.
     #
@@ -294,41 +301,14 @@ my $handle_args
     and
     $argz{ export } //= $argz{ base };
 
-    $argz{ ignore } =
-    [
-        grep { $_ } split /\s*,\s*/, $argz{ ignore }
-    ];
-
-    $verbose = defined $argz{ verbose };
-
-    my $base = $argz{ base };
-
-    # now locate the libraries.
-    #
-    # %found contains the abs_path results for each directory to 
-    # avoid double-including directories.
-    #
-    # note: loop short-curcuts for the (usually) list.
-
-    %found = ();
-
-    for( @{ $argz{ ignore } } )
-    {
-        if( my $dir = eval { abs_path catdir $_, $base } )
-        {
-            if( -d $dir )
-            {
-                $found{ $dir } = 1;
-            }
-        }
-    }
+    $argz{ verbose } //= '';
 
     %argz
 };
 
 sub import
 {
-    # map used here for -T checks. everything from find_libs has
+    # map used here for -T checks. everything from find_dirs has
     # already been through abs_path, not much more to check here.
 
     my %argz    = &$handle_args;
@@ -341,10 +321,11 @@ sub import
         ? $path
         : ()
     }
-    $find_libs->( \%argz )
+    $find_dirs->( \%argz )
     ;
 
-    my $caller = caller;
+    my $verbose = $argz{ verbose };
+    my $caller  = caller;
 
     if( $verbose || defined $argz{ print } )
     {
@@ -1070,18 +1051,9 @@ bug, this is obviously a somewhat kludgy workaround
 and should be removed (with an added test for a 
 working version) once the File::Spec is fixed.
 
-=item 
-
-The hack for older versions of perl is 
-messy, but is the only I've found that works for
-the moment on *NIX, VMS, and MSW. I am not sure
-whether any of these systems are normally configured
-to share perl modules between versions. If the 
-modules are not shared on multiple platforms then
-I can make this work by managing the installation
-rather than checking this every time at startup.
-
-For the moment, at least, this seems to work.
+Note that I have no way to test this on VMS at this
+point so the only thing I can think of is declaring
+the fix a feature.
 
 =back
 
@@ -1102,11 +1074,11 @@ Steven Lembark, Workhorse Computing <lembark@wrkhors.com>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2003-2020, Steven Lembark, Workhorse Computing.
+Copyright (C) 2003-2022, Steven Lembark, Workhorse Computing.
 This code is released under the same terms as Perl-5.28
 or any later version of Perl.
 
 =head1 LICENSE
 
-This code is released under the same terms as Perl-5.28
+This code is released under the same terms as Perl-5.34
 or any later version of Perl.

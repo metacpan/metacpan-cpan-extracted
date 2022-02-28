@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2017-2019 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Tool::Callers 0.44;
+package Devel::MAT::Tool::Callers 0.45;
 
 use v5.14;
 use warnings;

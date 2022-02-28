@@ -34,12 +34,11 @@ __PACKAGE__->has_many(
 
 __PACKAGE__->many_to_many('roles' => 'person_roles', 'role');
 __PACKAGE__->accept_nested_for('state');
-__PACKAGE__->validates(state => (presence=>1, result=>1));
-__PACKAGE__->validates(person_roles => (presence=>1, result_set=>1));
-__PACKAGE__->validates(roles => (presence=>1, ResultSet=>1));
+__PACKAGE__->validates(state => (presence=>1));
+__PACKAGE__->validates(person_roles => (presence=>1));
 
-__PACKAGE__->validates(person_roles => (presence=>1, ResultSet=>+{validations=>1, min=>1}), on=>'min');
-__PACKAGE__->validates(roles => (presence=>1, ResultSet=>+{validations=>1, min=>1}), on=>'min');
+__PACKAGE__->validates(person_roles => (presence=>1, set_size=>{min=>1}, on=>'min'));
+__PACKAGE__->validates(roles => (presence=>1, set_size=>{min=>1}, on=>'min'));
 
 
 __PACKAGE__->accept_nested_for('person_roles', +{find_with_uniques=>1, allow_destroy=>1});

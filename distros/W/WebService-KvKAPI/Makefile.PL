@@ -14,7 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "WebService-KvKAPI",
   "EXE_FILES" => [
-    "bin/query_kvk.pl"
+    "bin/query-kvk.pl"
   ],
   "LICENSE" => "open_source",
   "MIN_PERL_VERSION" => "5.026000",
@@ -39,7 +39,7 @@ my %WriteMakefileArgs = (
     "Test::Mock::One" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.101",
+  "VERSION" => "0.103",
   "test" => {
     "TESTS" => "t/*.t"
   }

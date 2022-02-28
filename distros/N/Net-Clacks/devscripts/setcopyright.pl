@@ -7,7 +7,7 @@ use diagnostics;
 use mro 'c3';
 use English;
 use Carp;
-our $VERSION = 20;
+our $VERSION = 21;
 use autodie qw( close );
 use Array::Contains;
 use utf8;

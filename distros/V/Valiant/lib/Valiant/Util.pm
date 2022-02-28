@@ -6,7 +6,7 @@ use warnings;
 use Module::Runtime;
 use Moo::_Utils;
 
-our @DEFAULT_EXPORTS = qw( throw_exception debug DEBUG_FLAG );
+our @DEFAULT_EXPORTS = qw( throw_exception debug DEBUG_FLAG process_template );
 
 sub default_exports { @DEFAULT_EXPORTS }
 
@@ -38,6 +38,12 @@ sub debug {
     return unless $target eq ($package_pattern||'');
   }
   warn "$target: @args\n" if $level  >= $target_level;
+}
+
+sub process_template {
+  my ($class, $target, $template, %values) = @_;
+  $template =~ s/\{\{([^}]+)\}\}/ defined($values{$1}) ? $values{$1}: '' /gex;
+  return $template;
 }
 
 1;
@@ -72,6 +78,10 @@ Send debuggin info to STDERR if $level is greater or equal to the current log le
     throw_exception 'MissingMethod' => (object=>$self, method=>'if');
 
 Used to encapsulate exception types.  Maybe someday we can do continuations instead :)
+
+=head2 process_template
+
+process a very simple string template
 
 =head1 SEE ALSO
  

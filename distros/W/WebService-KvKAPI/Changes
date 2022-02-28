@@ -1,5 +1,14 @@
 Revision history for Webservice-KvKAPI
 
+0.103     2022-02-25 17:45:50Z
+
+    * Update POD for query_kvk.pl
+    * Rename query_kvk.pl to query-kvk.pl
+
+0.102     2022-02-25 16:07:22Z
+
+    * Fix query_kvk for location-profile
+
 0.101     2022-02-23 18:20:59Z
 
     * Update POD

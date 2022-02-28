@@ -40,8 +40,8 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "DateTime" : "0.1402",
-            "DateTime::Calendar::Julian" : "0.04",
+            "DateTime" : "1.53",
+            "DateTime::Calendar::Julian" : "0.107",
             "constant" : "0",
             "overload" : "0",
             "perl" : "5.008004",
@@ -53,7 +53,7 @@
    "provides" : {
       "DateTime::Calendar::Christian" : {
          "file" : "lib/DateTime/Calendar/Christian.pm",
-         "version" : "0.13"
+         "version" : "0.14"
       }
    },
    "release_status" : "stable",
@@ -71,6 +71,6 @@
          "web" : "https://github.com/trwyant/perl-DateTime-Calendar-Christian"
       }
    },
-   "version" : "0.13",
+   "version" : "0.14",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

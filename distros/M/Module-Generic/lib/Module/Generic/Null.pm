@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Null.pm
-## Version v1.0.2
+## Version v1.1.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2021/08/31
+## Modified 2022/02/27
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -26,8 +26,11 @@ BEGIN
                  );
     use Scalar::Util ();
     use Want;
-    our( $VERSION ) = 'v1.0.2';
+    our( $VERSION ) = 'v1.1.0';
 };
+
+use strict;
+no warnings 'redefine';
 
 sub new
 {
