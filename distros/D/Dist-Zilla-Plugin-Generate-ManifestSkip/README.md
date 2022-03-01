@@ -4,7 +4,7 @@ Dist::Zilla::Plugin::Generate::ManifestSkip - Generate a MANIFEST.SKIP file for 
 
 # VERSION
 
-version v0.1.5
+version v0.1.6
 
 # SYNOPSIS
 
@@ -49,7 +49,7 @@ will be added.
 ## remove
 
 This removes a regular expression from the ["skipfile"](#skipfile). Note that it
-must exactly match the expression used by [Module::Manifest::Skip](https://metacpan.org/pod/Module::Manifest::Skip).
+must exactly match the expression used by [Module::Manifest::Skip](https://metacpan.org/pod/Module%3A%3AManifest%3A%3ASkip).
 
 By default, the following files are already removed from the skipfile:
 
@@ -63,9 +63,9 @@ them with ["add"](#add).
 
 # SEE ALSO
 
-[Module::Manifest::Skip](https://metacpan.org/pod/Module::Manifest::Skip)
+[Module::Manifest::Skip](https://metacpan.org/pod/Module%3A%3AManifest%3A%3ASkip)
 
-[Dist::Zilla::Plugin::ManifestSkip](https://metacpan.org/pod/Dist::Zilla::Plugin::ManifestSkip)
+[Dist::Zilla::Plugin::ManifestSkip](https://metacpan.org/pod/Dist%3A%3AZilla%3A%3APlugin%3A%3AManifestSkip)
 
 # SOURCE
 
@@ -85,11 +85,11 @@ feature.
 
 Robert Rothenberg <rrwo@cpan.org>
 
-Some of the code and tests have been borrowed from [Dist::Zilla::Plugin::InstallGuide](https://metacpan.org/pod/Dist::Zilla::Plugin::InstallGuide).
+Some of the code and tests have been borrowed from [Dist::Zilla::Plugin::InstallGuide](https://metacpan.org/pod/Dist%3A%3AZilla%3A%3APlugin%3A%3AInstallGuide).
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Robert Rothenberg.
+This software is Copyright (c) 2018-2022 by Robert Rothenberg.
 
 This is free software, licensed under:
 

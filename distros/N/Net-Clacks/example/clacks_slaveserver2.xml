@@ -3,7 +3,7 @@
     <ip>127.0.0.1</ip>
     <port>18887</port>
     <pingtimeout>600</pingtimeout>
-    <interclackspingtimeout>10</interclackspingtimeout>
+    <interclackspingtimeout>60</interclackspingtimeout>
     <ssl>
         <cert>exampleserver.crt</cert>
         <key>exampleserver.key</key>

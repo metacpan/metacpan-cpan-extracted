@@ -7,7 +7,7 @@ use diagnostics;
 use mro 'c3';
 use English;
 use Carp;
-our $VERSION = 21;
+our $VERSION = 22;
 use autodie qw( close );
 use Array::Contains;
 use utf8;
@@ -46,6 +46,8 @@ my %overheadflags = (
     N => "no_logging",
     S => "shutdown_service", # value: positive number (number in seconds before shutdown). If interclacks clients are present, should be high
                              # enough to flush all buffers to them
+
+    T => 'timestamp',        # Used before KEYSYNC to compensate for time drift between different systems
     U => "return_to_sender",
     Z => "no_flags", # Only sent when no other flags are set
 );
@@ -79,6 +81,17 @@ sub new {
 
     $self->{isDebugging} = $isDebugging;
     $self->{configfile} = $configfile;
+
+    $self->{timeoffset} = 0;
+
+    if(defined($ENV{CLACKS_SIMULATED_TIME_OFFSET})) {
+        $self->{timeoffset} = 0 + $ENV{CLACKS_SIMULATED_TIME_OFFSET};
+        print "****** RUNNING WITH A SIMULATED TIME OFFSET OF ", $self->{timeoffset}, " seconds ******\n";
+    }
+
+    $self->{clackscache} = {};
+    $self->{clackscachetime} = {};
+    $self->{clackscacheaccesstime} = {};
 
     return $self;
 }
@@ -188,6 +201,9 @@ sub init {
     if(!defined($self->{config}->{deletedcachetime})) {
         $self->{config}->{deletedcachetime} = 60 * 60; # 1 hour
     }
+    if(!defined($self->{config}->{stalecachetime})) {
+        $self->{config}->{stalecachetime} = 60 * 60 * 24; # 1 day
+    }
 
     my @tcpsockets;
 
@@ -275,15 +291,24 @@ sub loadPersistanceFile {
 
     my %clackscache;
     my %clackscachetime;
+    my %clackscacheaccesstime;
 
     if(open(my $ifh, '<', $fname)) {
         my $line = <$ifh>;
         my $timestampline = <$ifh>;
+        my $accesstimeline = <$ifh>;
         my $endline = <$ifh>;
+        my $needupgrade = 0;
         close $ifh;
 
-        if(!defined($endline)) {
-            $endline = '';
+        chomp $line;
+        chomp $timestampline;
+        chomp $accesstimeline;
+
+        if(!defined($endline) && $accesstimeline eq 'ENDBYTES') {
+            $endline = 'ENDBYTES';
+            $accesstimeline = '';
+            $needupgrade = 1;
         } else {
             chomp $endline;
         }
@@ -293,8 +318,6 @@ sub loadPersistanceFile {
             return; # Fail
         }
 
-        chomp $line;
-        chomp $timestampline;
         my $loadok = 0;
 
         if($line ne '') {
@@ -311,7 +334,7 @@ sub loadPersistanceFile {
         %clackscache = %{$line};
 
         # Mark all data as current as a fallback
-        my $now = time;
+        my $now = $self->getTime();
         foreach my $key (keys %clackscache) {
             $clackscachetime{$key} = $now;
         }
@@ -328,11 +351,29 @@ sub loadPersistanceFile {
                 return; # Fail
             } else {
                 my %clackstemp = %{$timestampline};
-                foreach my $key (keys %clackscache) {
-                    if(defined($clackstemp{$key})) {
-                        $clackscachetime{$key} = $clackstemp{$key};
-                    }
+                foreach my $key (keys %clackstemp) {
+                    $clackscachetime{$key} = $clackstemp{$key};
                 }
+            }
+        }
+
+        if($needupgrade) {
+            print "Pre-Version 22 persistance file detected. Upgrading automatically.\n";
+            foreach my $key (keys %clackscache) {
+                $clackscacheaccesstime{$key} = $now;
+            }
+        } elsif($accesstimeline ne '') {
+            $loadok = 0;
+            eval {
+                $accesstimeline = decode_base64($accesstimeline);
+                $accesstimeline = Load($accesstimeline);
+                $loadok = 1;
+            };
+            if(!$loadok) {
+                carp("Invalid persistance file " . $fname . "! Failed to decode timestamp line, using current time!");
+                return; # Fail
+            } else {
+                %clackscacheaccesstime = %{$accesstimeline};
             }
         }
     } else {
@@ -340,7 +381,7 @@ sub loadPersistanceFile {
         return;
     }
 
-    return \%clackscache, \%clackscachetime;
+    return \%clackscache, \%clackscachetime, \%clackscacheaccesstime;
 }
 
 
@@ -363,8 +404,6 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
     my @outbox;
     my %clients;
 
-    my %clackscache;
-    my %clackscachetime;
     my $shutdowntime;
     my $selector = IO::Select->new();
     my $interclackslock = 0;
@@ -375,16 +414,17 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
     $SIG{TERM} = sub { $keepRunning = 0; };
 
     # Restore persistance file if required
-    my $previousfname = $self->{config}->{persistancefile} . '_bck';
-    my $tempfname = $self->{config}->{persistancefile} . '_';
     if($self->{persistance}) {
+        my $previousfname = $self->{config}->{persistancefile} . '_bck';
+        my $tempfname = $self->{config}->{persistancefile} . '_';
         my $loadok = 0;
         if(-f $self->{config}->{persistancefile}) {
             print "Trying to load persistance file ", $self->{config}->{persistancefile}, "\n";
-            my ($cc, $cct) = $self->loadPersistanceFile($self->{config}->{persistancefile});
+            my ($cc, $cct, $cca) = $self->loadPersistanceFile($self->{config}->{persistancefile});
             if(defined($cc) && ref $cc eq 'HASH') {
-                %clackscache = %{$cc};
-                %clackscachetime = %{$cct};
+                $self->{clackscache} = $cc;
+                $self->{clackscachetime} = $cct;
+                $self->{clackscacheaccesstime} = $cca;
                 $savecache = 1; # Force saving a new persistance file
                 $loadok = 1;
             }
@@ -392,20 +432,22 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
 
         if(!$loadok && -f $previousfname) {
             print "Trying to load backup (previous) persistance file ", $previousfname, "\n";
-            my ($cc, $cct) = $self->loadPersistanceFile($previousfname);
+            my ($cc, $cct, $cca) = $self->loadPersistanceFile($previousfname);
             if(defined($cc) && ref $cc eq 'HASH') {
-                %clackscache = %{$cc};
-                %clackscachetime = %{$cct};
+                $self->{clackscache} = $cc;
+                $self->{clackscachetime} = $cct;
+                $self->{clackscacheaccesstime} = $cca;
                 $savecache = 2; # Force saving a new persistance file plus a new backup
                 $loadok = 1;
             }
         }
         if(!$loadok && -f $tempfname) {
             print "Oh no. As a final, desperate solution, trying to load a 'temporary file while saving' persistance file ", $tempfname, "\n";
-            my ($cc, $cct) = $self->loadPersistanceFile($tempfname);
+            my ($cc, $cct, $cca) = $self->loadPersistanceFile($tempfname);
             if(defined($cc) && ref $cc eq 'HASH') {
-                %clackscache = %{$cc};
-                %clackscachetime = %{$cct};
+                $self->{clackscache} = $cc;
+                $self->{clackscachetime} = $cct;
+                $self->{clackscacheaccesstime} = $cca;
                 $savecache = 2; # Force saving a new persistance file plus a new backup
                 $loadok = 1;
             }
@@ -428,35 +470,10 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
             $keepRunning = 0;
         }
 
-        if($savecache && time > ($lastsavecache + $self->{persistanceinterval})) {
-            print "Saving persistance file\n";
-            $lastsavecache = time;
-            if($self->{persistance}) {
-                my $line = Dump(\%clackscache);
-                $line = encode_base64($line, '');
-                my $timestampline = Dump(\%clackscachetime);
-                $timestampline = encode_base64($timestampline, '');
-
-                my $tempfname = $self->{config}->{persistancefile} . '_';
-                my $backfname = $self->{config}->{persistancefile} . '_bck';
-                if($savecache == 1) {
-                    # Normal savecache operation only
-                    copy($self->{config}->{persistancefile}, $backfname);
-                }
-
-                if(open(my $ofh, '>', $tempfname)) {
-                    print $ofh $line, "\n";
-                    print $ofh $timestampline, "\n";
-                    print $ofh "ENDBYTES\n";
-                    close $ofh;
-                }
-                move($tempfname, $self->{config}->{persistancefile});
-
-                if($savecache == 2) {
-                    # Need to make sure we have a valid backup file, since we had a general problem while loading
-                    copy($self->{config}->{persistancefile}, $backfname);
-                }
-            }
+        my $now = $self->getTime();
+        if($savecache && $now > ($lastsavecache + $self->{persistanceinterval})) {
+            $lastsavecache = $now;
+            $self->savePersistanceFile($savecache);
             $savecache = 0;
         }
 
@@ -468,8 +485,8 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
             } else {
                 $mcid = $self->{config}->{master}->{ip}->[0] . ':' . $self->{config}->{master}->{port};
             }
-            if(!defined($clients{$mcid}) && $nextinterclackscheck < time) {
-                $nextinterclackscheck = time + $self->{config}->{interclacksreconnecttimeout} + int(rand(10));
+            if(!defined($clients{$mcid}) && $nextinterclackscheck < $now) {
+                $nextinterclackscheck = $now + $self->{config}->{interclacksreconnecttimeout} + int(rand(10));
 
                 print "Connect to master\n";
                 my $msocket;
@@ -511,17 +528,18 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
                         charbuffer => [],
                         listening => {},
                         socket => $msocket,
-                        lastping => time,
+                        lastping => $now,
                         mirror => 0,
                         outbuffer => "CLACKS PageCamel $VERSION in interclacks client mode\r\n" .  # Tell the server we are using PageCamel Interclacks...
                                      "OVERHEAD A " . $self->{authtoken} . "\r\n" .              # ...send Auth token
                                      "OVERHEAD I 1\r\n",                                        # ...and turn interclacks master mode ON on remote side
                         clientinfo => 'Interclacks link',
+                        client_timeoffset => 0,
                         interclacks => 1,
                         interclacksclient => 1,
-                        lastinterclacksping => time,
-                        lastmessage => time,
-                        authtimeout => time + $self->{config}->{authtimeout},
+                        lastinterclacksping => $now,
+                        lastmessage => $now,
+                        authtimeout => $now + $self->{config}->{authtimeout},
                         authok => 0,
                         failcount => 0,
                         outmessages => [],
@@ -551,7 +569,7 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
                 my ($cid, $chost, $cport);
                 if(ref $tcpsocket eq 'IO::Socket::UNIX') {
                     $chost = 'unixdomainsocket';
-                    $cport = time . ':' . int(rand(1_000_000));
+                    $cport = $now . ':' . int(rand(1_000_000));
                 } else {
                     ($chost, $cport) = ($clientsocket->peerhost, $clientsocket->peerport);
                 }
@@ -598,18 +616,19 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
                     charbuffer => [],
                     listening => {},
                     socket => $clientsocket,
-                    lastping => time,
+                    lastping => $now,
                     mirror => 0,
                     outbuffer => "CLACKS PageCamel $VERSION\r\n" .
                                  "OVERHEAD M Authentication required\r\n",  # Informal message
                     clientinfo => 'UNKNOWN',
+                    client_timeoffset => 0,
                     host => $chost,
                     port => $cport,
                     interclacks => 0,
                     interclacksclient => 0,
                     lastinterclacksping => 0,
-                    lastmessage => time,
-                    authtimeout => time + $self->{config}->{authtimeout},
+                    lastmessage => $now,
+                    authtimeout => $now + $self->{config}->{authtimeout},
                     authok => 0,
                     failcount => 0,
                     outmessages => [],
@@ -630,9 +649,9 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
 
         # Check if there are any clients to disconnect...
 
-        my $pingtime = time - $self->{config}->{pingtimeout};
-        my $interclackspingtime = time - $self->{config}->{interclackspingtimeout};
-        my $interclackspinginterval = time - int($self->{config}->{interclackspingtimeout} / 3);
+        my $pingtime = $now - $self->{config}->{pingtimeout};
+        my $interclackspingtime = $now - $self->{config}->{interclackspingtimeout};
+        my $interclackspinginterval = $now - int($self->{config}->{interclackspingtimeout} / 3);
         foreach my $cid (keys %clients) {
             if(!$clients{$cid}->{socket}->connected) {
                 push @toremove, $cid;
@@ -653,11 +672,11 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
             }
 
             if($clients{$cid}->{interclacks} && $clients{$cid}->{lastinterclacksping} < $interclackspinginterval) {
-                $clients{$cid}->{lastinterclacksping} = time;
+                $clients{$cid}->{lastinterclacksping} = $now;
                 $clients{$cid}->{outbuffer} .= "PING\r\n";
             }
 
-            if(!$clients{$cid}->{authok} && $clients{$cid}->{authtimeout} < time) {
+            if(!$clients{$cid}->{authok} && $clients{$cid}->{authtimeout} < $now) {
                 # Authentication timeout!
                 push @toremove, $cid;
             }
@@ -763,7 +782,7 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
 
                     my %inmsg = (
                         message => $clients{$cid}->{buffer},
-                        releasetime => time + $clients{$cid}->{inmessagedelay},
+                        releasetime => $now + $clients{$cid}->{inmessagedelay},
                     );
                     push @{$clients{$cid}->{inmessages}}, \%inmsg;
                     $clients{$cid}->{buffer} = '';
@@ -787,7 +806,7 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
             # ******************************************************************************
             # ******************************************************************************
             while(scalar @{$clients{$cid}->{inmessages}}) {
-                last if($clients{$cid}->{inmessages}->[0]->{releasetime} > time);
+                last if($clients{$cid}->{inmessages}->[0]->{releasetime} > $now);
                 my $inmsgtmp = shift @{$clients{$cid}->{inmessages}};
                 my $inmsg = $inmsgtmp->{message};
 
@@ -823,12 +842,12 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
                         if($value eq $self->{authtoken}) {
                             $clients{$cid}->{authok} = 1;
                             #$clients{$cid}->{outbuffer} .= "OVERHEAD O Welcome!\r\n";
-                            push @{$clients{$cid}->{outmessages}}, {releasetime => time + $clients{$cid}->{outmessagedelay}, message => 'OVERHEAD O Welcome!'};
+                            push @{$clients{$cid}->{outmessages}}, {releasetime => $now + $clients{$cid}->{outmessagedelay}, message => 'OVERHEAD O Welcome!'};
                         } else {
                             $clients{$cid}->{authok} = 0;
                             #$clients{$cid}->{outbuffer} .= "OVERHEAD F Login failed!\r\n";
-                            push @{$clients{$cid}->{outmessages}}, {releasetime => time + $clients{$cid}->{outmessagedelay}, message => 'OVERHEAD F Login failed!'};
-                            push @{$clients{$cid}->{outmessages}}, {releasetime => time + $clients{$cid}->{outmessagedelay}, message => 'EXIT'};
+                            push @{$clients{$cid}->{outmessages}}, {releasetime => $now + $clients{$cid}->{outmessagedelay}, message => 'OVERHEAD F Login failed!'};
+                            push @{$clients{$cid}->{outmessages}}, {releasetime => $now + $clients{$cid}->{outmessagedelay}, message => 'EXIT'};
                             push @toremove, $cid; # Disconnect the client
                             last;
                         }
@@ -836,6 +855,13 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
 
                     # Ignore other command when not authenticated
                     if(!$clients{$cid}->{authok}) {
+                        next;
+                    }
+
+                    if($parsedflags{timestamp}) {
+                        $now = $self->getTime(); # Make sure we are at the "latest" $now. This is one of the very few critical sections
+                        $clients{$cid}->{client_timeoffset} = $now - $value;
+                        print "**** CLIENT TIME OFFSET: ", $clients{$cid}->{client_timeoffset}, "\n";
                         next;
                     }
 
@@ -848,14 +874,13 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
                             $interclackslock = 0;
 
                             # Send server our keys AFTER we got everything FROM the server (e.g. after unlock)
-                            foreach my $ckey (sort keys %clackscache) {
-                                $clients{$cid}->{outbuffer} .= "KEYSYNC " . $clackscachetime{$ckey} . " U $ckey=" . $clackscache{$ckey} . "\r\n";
-                                $clients{$cid}->{outbuffer} .= "PING\r\n";
+                            $clients{$cid}->{outbuffer} .= "OVERHEAD T " . $self->getTime() . "\r\n"; # Send local time to server for offset calculation
+                            foreach my $ckey (sort keys %{$self->{clackscache}}) {
+                                $clients{$cid}->{outbuffer} .= "KEYSYNC " . $self->{clackscachetime}->{$ckey} . " " . $self->{clackscacheaccesstime}->{$ckey} . " U $ckey=" . $self->{clackscache}->{$ckey} . "\r\n";
                             }
-                            foreach my $ckey (sort keys %clackscachetime) {
-                                next if(defined($clackscache{$ckey}));
-                                $clients{$cid}->{outbuffer} .= "KEYSYNC " . $clackscachetime{$ckey} . " D $ckey=REMOVED\r\n";
-                                $clients{$cid}->{outbuffer} .= "PING\r\n";
+                            foreach my $ckey (sort keys %{$self->{clackscachetime}}) {
+                                next if(defined($self->{clackscache}->{$ckey}));
+                                $clients{$cid}->{outbuffer} .= "KEYSYNC " . $self->{clackscachetime}->{$ckey} . " 0 D $ckey=REMOVED\r\n";
                             }
                         }
                         $parsedflags{forward_message} = 0; # Don't forward
@@ -876,7 +901,7 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
                     if($parsedflags{shutdown_service}) {
                         $value = 0 + $value;
                         if($value > 0) {
-                            $shutdowntime = $value + time;
+                            $shutdowntime = $value + $now;
                             print STDERR "Shutting down in $value seconds\n";
                         }
                     }
@@ -897,31 +922,30 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
 
                         if($value) {
                             $clients{$cid}->{interclacks} = 1;
-                            $clients{$cid}->{lastping} = time;
+                            $clients{$cid}->{lastping} = $now;
 
 
                             $clients{$cid}->{outbuffer} .= "CLACKS PageCamel $VERSION in interclacks master mode\r\n" .  # Tell client we are in interclacks master mode
                                                            "OVERHEAD M Authentication required\r\n" .                 # Informal message
                                                            "OVERHEAD A " . $self->{authtoken} . "\r\n" .              # ...and send Auth token...
-                                                           "OVERHEAD L 1\r\n";                                            # ...and lock client for sync
+                                                           "OVERHEAD L 1\r\n" .                                       # ...and lock client for sync
+                                                           "OVERHEAD T " . time . "\r\n";                             # ... and send local timestamp
 
                             # Make sure our new interclacks client has an *exact* copy of our buffer
                             #$clients{$cid}->{outbuffer} .= "CLEARCACHE\r\n";
-                            foreach my $ckey (sort keys %clackscache) {
-                                $clients{$cid}->{outbuffer} .= "KEYSYNC " . $clackscachetime{$ckey} . " U $ckey=" . $clackscache{$ckey} . "\r\n";
-                                $clients{$cid}->{outbuffer} .= "PING\r\n";
+                            foreach my $ckey (sort keys %{$self->{clackscache}}) {
+                                $clients{$cid}->{outbuffer} .= "KEYSYNC " . $self->{clackscachetime}->{$ckey} . " " . $self->{clackscacheaccesstime}->{$ckey} . " U $ckey=" . $self->{clackscache}->{$ckey} . "\r\n";
                             }
-                            foreach my $ckey (sort keys %clackscachetime) {
-                                next if(defined($clackscache{$ckey}));
-                                $clients{$cid}->{outbuffer} .= "KEYSYNC " . $clackscachetime{$ckey} . " D $ckey=REMOVED\r\n";
-                                $clients{$cid}->{outbuffer} .= "PING\r\n";
+                            foreach my $ckey (sort keys %{$self->{clackscachetime}}) {
+                                next if(defined($self->{clackscache}->{$ckey}));
+                                $clients{$cid}->{outbuffer} .= "KEYSYNC " . $self->{clackscachetime}->{$ckey} . " 0 D $ckey=REMOVED\r\n";
                             }
                             $clients{$cid}->{outbuffer} .= "OVERHEAD L 0\r\n"; # unlock client after sync
                             $clients{$cid}->{outbuffer} .= "PING\r\n";
-                            $clients{$cid}->{lastinterclacksping} = time;
+                            $clients{$cid}->{lastinterclacksping} = $now;
                         } else {
                             $clients{$cid}->{interclacks} = 0;
-                            $clients{$cid}->{lastping} = time;
+                            $clients{$cid}->{lastping} = $now;
                         }
                     }
 
@@ -991,7 +1015,7 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
                     push @toremove, $cid;
                     $sendinterclacks = 0;
                 } elsif($inmsg =~ /^PING/) {
-                    $clients{$cid}->{lastping} = time;
+                    $clients{$cid}->{lastping} = $now;
                     $sendinterclacks = 0;
                 } elsif($inmsg =~ /^NOPING/) {
                     # Disable PING check until next PING recieved
@@ -1012,27 +1036,32 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
                         value => $2,
                     );
                     push @outbox, \%tmp;
-                } elsif($inmsg =~ /^KEYSYNC\ (.+?)\ (.+?)\ (.+?)\=(.*)/) {
-                    print $inmsg, "\n";
-                    $clients{$cid}->{lastping} = time;
-                    my ($ctimestamp, $cmode, $ckey, $cval) = ($1, $2, $3, $4);
+                } elsif($inmsg =~ /^KEYSYNC\ (.+?)\ (.+?)\ (.+?)\ (.+?)\=(.*)/) {
+                    #print "***** ", $inmsg, "\n";
+                    my ($ctimestamp, $atimestamp, $cmode, $ckey, $cval) = ($1, $2, $3, $4, $5);
+                    $clients{$cid}->{lastping} = $now; # KEYSYNC acts as a PING as well
 
-                    if(!defined($clackscachetime{$ckey})) {
-                        $clackscachetime{$ckey} = 0;
+                    $ctimestamp += $clients{$cid}->{client_timeoffset}; # Take client time offset into account
+                    if($atimestamp) {
+                        $atimestamp += $clients{$cid}->{client_timeoffset}; # Take client time offset into account
                     }
-                    if($cmode eq "U") { # "Update"
-                        if($ctimestamp > $clackscachetime{$ckey}) {
-                            $clackscache{$ckey} = $cval;
-                            $clackscachetime{$ckey} = $ctimestamp;
-                        }
-                    } else { # REMOVE request from server
-                        if($ctimestamp > $clackscachetime{$ckey}) {
-                            delete $clackscache{$ckey};
-                            $clackscachetime{$ckey} = $ctimestamp;
-                        } else { # check if we have a value that happened after deletion at the server end
-                            if(!defined($clackscache{$ckey})) {
-                                delete $clackscache{$ckey};
-                                $clackscachetime{$ckey} = $ctimestamp;
+
+                    if(!defined($self->{clackscachetime}->{$ckey})) {
+                        $self->{clackscachetime}->{$ckey} = 0;
+                    }
+                    if(!defined($self->{clackscachetime}->{$ckey}) || $ctimestamp > $self->{clackscachetime}->{$ckey}) {
+                        # If *we* have the older entry (or none at all), *only* then work on the keysync command
+                        if($cmode eq "U") { # "Update"
+                            $self->{clackscache}->{$ckey} = $cval;
+                            $self->{clackscachetime}->{$ckey} = $ctimestamp;
+                            $self->{clackscacheaccesstime}->{$ckey} = $atimestamp;
+                        } else { # REMOVE request from server
+                            $self->{clackscachetime}->{$ckey} = $ctimestamp;
+                            if(defined($self->{clackscache}->{$ckey})) {
+                                delete $self->{clackscache}->{$ckey};
+                            }
+                            if(defined($self->{clackscacheaccesstime}->{$ckey})) {
+                                delete $self->{clackscacheaccesstime}->{$ckey};
                             }
                         }
                     }
@@ -1040,8 +1069,9 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
                     $savecache = 1;
                     $sendinterclacks = 1;
                 } elsif($inmsg =~ /^STORE\ (.+?)\=(.*)/) {
-                    $clackscache{$1} = $2;
-                    $clackscachetime{$1} = time;
+                    $self->{clackscache}->{$1} = $2;
+                    $self->{clackscachetime}->{$1} = $now;
+                    $self->{clackscacheaccesstime}->{$1} = $now;
                     $savecache = 1;
                 } elsif($inmsg =~ /^SETANDSTORE\ (.+?)\=(.*)/) {
                     my %tmp = (
@@ -1051,23 +1081,29 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
                         value => $2,
                     );
                     push @outbox, \%tmp;
-                    $clackscache{$tmp{name}} = $tmp{value};
-                    $clackscachetime{$tmp{name}} = time;
+                    $self->{clackscache}->{$tmp{name}} = $tmp{value};
+                    $self->{clackscachetime}->{$tmp{name}} = $now;
+                    $self->{clackscacheaccesstime}->{$tmp{name}} = $now;
                     $savecache = 1;
                 } elsif($inmsg =~ /^RETRIEVE\ (.+)/) {
                     #$clients{$cid}->{outbuffer} .= "SET ". $line->{name} . "=" . $line->{value} . "\r\n";
                     my $ckey = $1;
-                    if(defined($clackscache{$ckey})) {
-                        $clients{$cid}->{outbuffer} .= "RETRIEVED $ckey=" . $clackscache{$ckey} . "\r\n";
+                    if(defined($self->{clackscache}->{$ckey})) {
+                        $clients{$cid}->{outbuffer} .= "RETRIEVED $ckey=" . $self->{clackscache}->{$ckey} . "\r\n";
+                        $self->{clackscacheaccesstime}->{$ckey} = $now;
+                        $savecache = 1;
                     } else {
                         $clients{$cid}->{outbuffer} .= "NOTRETRIEVED $ckey\r\n";
                     }
                     $sendinterclacks = 0;
                 } elsif($inmsg =~ /^REMOVE\ (.+)/) {
                     my $ckey = $1;
-                    if(defined($clackscache{$ckey})) {
-                        delete $clackscache{$ckey};
-                        $clackscachetime{$ckey} = time;
+                    if(defined($self->{clackscache}->{$ckey})) {
+                        delete $self->{clackscache}->{$ckey};
+                        $self->{clackscachetime}->{$ckey} = $now;
+                    }
+                    if(defined($self->{clackscacheaccesstime}->{$ckey})) {
+                        delete $self->{clackscacheaccesstime}->{$ckey};
                     }
                     $savecache = 1;
                 } elsif($inmsg =~ /^INCREMENT\ (.+)/) {
@@ -1077,12 +1113,13 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
                         ($ckey, $cval) = ($1, $2);
                         $cval = 0 + $cval;
                     }
-                    if(defined($clackscache{$ckey})) {
-                        $clackscache{$ckey} += $cval;
+                    if(defined($self->{clackscache}->{$ckey})) {
+                        $self->{clackscache}->{$ckey} += $cval;
                     } else {
-                        $clackscache{$ckey} = $cval;
+                        $self->{clackscache}->{$ckey} = $cval;
                     }
-                    $clackscachetime{$ckey} = time;
+                    $self->{clackscachetime}->{$ckey} = $now;
+                    $self->{clackscacheaccesstime}->{$ckey} = $now;
                     $savecache = 1;
                 } elsif($inmsg =~ /^DECREMENT\ (.+)/) {
                     my $ckey = $1;
@@ -1091,23 +1128,25 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
                         ($ckey, $cval) = ($1, $2);
                         $cval = 0 + $cval;
                     }
-                    if(defined($clackscache{$ckey})) {
-                        $clackscache{$ckey} -= $cval;
+                    if(defined($self->{clackscache}->{$ckey})) {
+                        $self->{clackscache}->{$ckey} -= $cval;
                     } else {
-                        $clackscache{$ckey} = 0 - $cval;
+                        $self->{clackscache}->{$ckey} = 0 - $cval;
                     }
-                    $clackscachetime{$ckey} = time;
+                    $self->{clackscachetime}->{$ckey} = $now;
+                    $self->{clackscacheaccesstime}->{$ckey} = $now;
                     $savecache = 1;
                 } elsif($inmsg =~ /^KEYLIST/) {
                     $clients{$cid}->{outbuffer} .= "KEYLISTSTART\r\n";
-                    foreach my $ckey (sort keys %clackscache) {
+                    foreach my $ckey (sort keys %{$self->{clackscache}}) {
                         $clients{$cid}->{outbuffer} .= "KEY $ckey\r\n";
                     }
                     $clients{$cid}->{outbuffer} .= "KEYLISTEND\r\n";
                     $sendinterclacks = 0;
                 } elsif($inmsg =~ /^CLEARCACHE/) {
-                    %clackscache = ();
-                    %clackscachetime = ();
+                    %{$self->{clackscache}} = ();
+                    %{$self->{clackscachetime}} = ();
+                    %{$self->{clackscacheaccesstime}} = ();
                     $savecache = 1;
 
                 # local managment commands
@@ -1161,12 +1200,35 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
         }
 
         # clean up very old "deleted" entries
-        my $stillvalidtime = time - $self->{config}->{deletedcachetime};
-        foreach my $key (keys %clackscachetime) {
-            next if($clackscachetime{$key} > $stillvalidtime);
-            next if(defined($clackscache{$key})); # Still has data
-            delete $clackscachetime{$key};
+        my $stillvalidtime = $now - $self->{config}->{deletedcachetime};
+        foreach my $key (keys %{$self->{clackscachetime}}) {
+            next if($self->{clackscachetime}->{$key} > $stillvalidtime);
+            if(defined($self->{clackscache}->{$key})) { # Still has data? Fix clackscachetime entry
+                $self->{clackscachetime}->{$key} = $now;
+            }
+            delete $self->{clackscachetime}->{$key};
             $savecache = 1;
+        }
+
+        # Clean up (forget) stale cached entries
+        $stillvalidtime = $now - $self->{config}->{stalecachetime};
+        foreach my $key (keys %{$self->{clackscacheaccesstime}}) {
+            next if($self->{clackscacheaccesstime}->{$key} > $stillvalidtime);
+            delete $self->{clackscacheaccesstime}->{$key};
+            if(defined($self->{clackscache})) {
+                delete $self->{clackscache}->{$key};
+            }
+            if(defined($self->{clackscachetime})) {
+                delete $self->{clackscachetime}->{$key};
+            }
+
+            my %tmp = (
+                sender => 'SERVERCACHE',
+                type => 'DEBUG',
+                data => 'FORGET=' . $key,
+            );
+
+            push @outbox, \%tmp;
         }
 
 
@@ -1206,7 +1268,7 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
         # Push all messages that can be released at this time into the corresponding char based output for each client
         foreach my $cid (keys %clients) {
             while(scalar @{$clients{$cid}->{outmessages}}) {
-                last if($clients{$cid}->{outmessages}->[0]->{releasetime} > time);
+                last if($clients{$cid}->{outmessages}->[0]->{releasetime} > $now);
 
                 my $outmsg = shift @{$clients{$cid}->{outmessages}};
                 if($outmsg->{message} eq 'EXIT') {
@@ -1228,9 +1290,9 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
         # Send as much as possible
         foreach my $cid (keys %clients) {
             if(length($clients{$cid}->{outbuffer})) {
-                $clients{$cid}->{lastmessage} = time;
-            } elsif(($clients{$cid}->{lastmessage} + 60) < time) {
-                $clients{$cid}->{lastmessage} = time;
+                $clients{$cid}->{lastmessage} = $now;
+            } elsif(($clients{$cid}->{lastmessage} + 60) < $now) {
+                $clients{$cid}->{lastmessage} = $now;
                 $clients{$cid}->{outbuffer} .= "NOP\r\n"; # send "No OPerations" command, just to
                                                           # check if socket is still open
             }
@@ -1274,6 +1336,10 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
     }
 
     print "Shutting down...\n";
+
+    # Make sure we save the latest version of the persistance file
+    $self->savePersistanceFile($savecache);
+
     sleep(0.5);
     foreach my $cid (keys %clients) {
         print "Removing client $cid\n";
@@ -1284,6 +1350,44 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
     }
     print "All clients removed\n";
 
+
+    return;
+}
+sub savePersistanceFile {
+    my ($self, $savecache) = @_;
+
+    if(!$self->{persistance}) {
+        return;
+    }
+
+    print "Saving persistance file\n";
+    my $line = Dump($self->{clackscache});
+    $line = encode_base64($line, '');
+    my $timestampline = Dump($self->{clackscachetime});
+    $timestampline = encode_base64($timestampline, '');
+    my $accesstimeline = Dump($self->{clackscacheaccesstime});
+    $accesstimeline = encode_base64($accesstimeline, '');
+
+    my $tempfname = $self->{config}->{persistancefile} . '_';
+    my $backfname = $self->{config}->{persistancefile} . '_bck';
+    if($savecache == 1) {
+        # Normal savecache operation only
+        copy($self->{config}->{persistancefile}, $backfname);
+    }
+
+    if(open(my $ofh, '>', $tempfname)) {
+        print $ofh $line, "\n";
+        print $ofh $timestampline, "\n";
+        print $ofh $accesstimeline, "\n";
+        print $ofh "ENDBYTES\n";
+        close $ofh;
+    }
+    move($tempfname, $self->{config}->{persistancefile});
+
+    if($savecache == 2) {
+        # Need to make sure we have a valid backup file, since we had a general problem while loading
+        copy($self->{config}->{persistancefile}, $backfname);
+    }
 
     return;
 }
@@ -1318,6 +1422,14 @@ sub evalsyswrite {
     }
 
     return $written;
+}
+
+sub getTime {
+    my ($self) = @_;
+
+    my $now = time + $self->{timeoffset};
+
+    return $now;
 }
 
 sub slurpBinFile {

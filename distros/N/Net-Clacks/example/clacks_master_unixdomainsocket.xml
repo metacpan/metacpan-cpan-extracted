@@ -15,7 +15,7 @@
 
 
     <pingtimeout>600</pingtimeout>
-    <interclackspingtimeout>10</interclackspingtimeout>
+    <interclackspingtimeout>60</interclackspingtimeout>
     <persistancefile>clackspersistance.dat</persistancefile>
     <ssl>
         <cert>exampleserver.crt</cert>

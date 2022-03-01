@@ -1,5 +1,9 @@
 Revision history for Parser-FIT
 
+0.06    2022-03-01
+        - Fix MYMETA.* generation
+        - Include bugtracker URL
+
 0.05    2022-02-22
         - Implement/Fix unknown global message handling
         

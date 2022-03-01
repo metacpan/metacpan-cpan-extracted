@@ -5,7 +5,7 @@ use warnings;
 
 use parent 'Test::More';
 
-our $VERSION = '0.009';
+our $VERSION = '0.010';
 
 sub import {
     my $class = shift;

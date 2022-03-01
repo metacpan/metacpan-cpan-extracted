@@ -1,0 +1,291 @@
+use strict;
+use warnings;
+
+our @Queues = (
+    {
+        Name              => 'Change Management',
+        Description       => 'Queue for change management requests',
+        Lifecycle         => 'Change Management',
+        CorrespondAddress => "",
+        CommentAddress    => "",
+    },
+);
+
+our @CustomFields = (
+    {
+        Name        => 'Change Category',
+        EntryHint   => 'High-level categorization of the requested change',
+        Type        => 'SelectSingle',
+        LookupType  => 'RT::Queue-RT::Ticket',
+        ApplyTo     => ['Change Management'],
+        MaxValues   => 1,
+        RenderType  => 'Dropdown',
+        Values      => [
+            { Name => 'Configuration Change',   SortOrder => 1 },
+            { Name => 'OS Patching',            SortOrder => 2 },
+            { Name => 'Firmware Update',        SortOrder => 3 },
+            { Name => 'Software Update',        SortOrder => 4 },
+            { Name => 'New Software Install',   SortOrder => 5 },
+            { Name => 'Hardware Repair',        SortOrder => 6 },
+            { Name => 'New Hardware Install',   SortOrder => 7 },
+            { Name => 'Project Implementation', SortOrder => 7 },
+        ],
+        SortOrder   => 1
+    },
+    {
+        Name        => 'Change Type',
+        EntryHint   => 'Kind of service change being requested',
+        LookupType  => 'RT::Queue-RT::Ticket',
+        Type        => 'SelectSingle',
+        ApplyTo     => ['Change Management'],
+        MaxValues   => 1,
+        RenderType  => 'Dropdown',
+        Values      => [
+            { Name => 'Standard',  SortOrder => 1 },
+            { Name => 'Normal',    SortOrder => 2 },
+            { Name => 'Emergency', SortOrder => 3 },
+        ],
+        SortOrder   => 2
+    },
+    {
+        Name        => 'Rollback Plan',
+        EntryHint   => 'Explain the backout plan to restore normal operations',
+        LookupType  => 'RT::Queue-RT::Ticket',
+        Type        => 'Text',
+        ApplyTo     => ['Change Management'],
+        MaxValues   => 1,
+        SortOrder   => 3,
+    },
+    {
+        Name        => 'Change Started',
+        EntryHint   => 'Date when this change was started',
+        LookupType  => 'RT::Queue-RT::Ticket',
+        Type        => 'DateTime',
+        ApplyTo     => ['Change Management'],
+        MaxValues   => 1,
+        SortOrder   => 4,
+    },
+    {
+        Name        => 'Change Completed',
+        EntryHint   => 'Date when this change was completed',
+        LookupType  => 'RT::Queue-RT::Ticket',
+        Type        => 'DateTime',
+        ApplyTo     => ['Change Management'],
+        MaxValues   => 1,
+        SortOrder   => 5,
+    },
+);
+
+our @Groups = (
+    {
+        Name        => 'Change Management',
+        Description => 'People who can create change management tickets, approve requests, and work in change management lifecycle',
+    },
+);
+
+our @CustomRoles = (
+    {
+        Name        => 'Change Reviewer',
+        Description => 'The person asked to review the change request',
+        ApplyTo     => 'Change Management',
+    },
+    {
+        Name        => 'Change Implementor',
+        Description => 'The person asked to implement the change request',
+        ApplyTo     => 'Change Management',
+    },
+);
+
+our @ScripConditions = (
+    {
+        Name        => 'On Change Started',
+        Description => 'When an approved change is started',
+        ExecModule  => 'StatusChange',
+        Argument    => 'old: approved; new: in progress, partially deployed',
+        ApplicableTransTypes => 'Any'
+    },
+    {
+        Name        => 'On Change Completed',
+        Description => 'When an approved change is completed',
+        ExecModule  => 'StatusChange',
+        Argument    => 'new: deployed',
+        ApplicableTransTypes => 'Any'
+    },
+);
+
+our @ScripActions = (
+    {
+        Name        => 'Set Change Started to Today',
+        Description => '',
+        ExecModule  => 'SetCustomFieldDate',
+        Argument    => 'Change Started'
+    },
+    {
+        Name        => 'Set Change Completed to Today',
+        Description => '',
+        ExecModule  => 'SetCustomFieldDate',
+        Argument    => 'Change Completed'
+    },
+);
+
+our @Scrips = (
+    {
+        Queue           => ['Change Management'],
+        Description     => 'On Change Started Set Change Started to Today',
+        ScripCondition  => 'On Change Started',
+        ScripAction     => 'Set Change Started to Today',
+        Template        => 'Blank',
+        Stage           => 'TransactionCreate',
+    },
+    {
+        Queue           => ['Change Management'],
+        Description     => 'On Change Completed Set Change Completed to Today',
+        ScripCondition  => 'On Change Completed',
+        ScripAction     => 'Set Change Completed to Today',
+        Template        => 'Blank',
+        Stage           => 'TransactionCreate',
+    },
+);
+
+my @EveryoneRights = qw/CreateTicket ReplyToTicket SeeQueue ShowTicket SetInitialCustomField/;
+our @ACL = map {
+    {
+        Right       => $_,
+        Queue       => 'Change Management',
+        GroupDomain => 'SystemInternal',
+        GroupType   => 'Everyone'
+    }
+} @EveryoneRights;
+
+# Anyone in this group can see the entirety of change management tickets,
+# and if assigned to one of the change management roles, they can perform
+# the appropriate actions.
+my @ChangeManagementRights = qw/CommentOnTicket Watch SeeCustomField
+  SeeQueue ShowTicket OwnTicket WatchAsAdminCC StealTicket TakeTicket
+  ShowTicketComments ModifyTicket ModifyCustomField ShowOutgoingEmail
+/;
+push @ACL, map {
+    {
+        Right       => $_,
+        Queue       => 'Change Management',
+        GroupDomain => 'UserDefined',
+        GroupId     => 'Change Management',
+    }
+} @ChangeManagementRights;
+
+push @ACL,
+    {
+        Right       => 'Approve Requests',
+        Queue       => 'Change Management',
+        GroupDomain => 'RT::Queue-Role',
+        CustomRole  => 'Change Reviewer',
+    },
+    {
+        Right       => 'Implement Changes',
+        Queue       => 'Change Management',
+        GroupDomain => 'RT::Queue-Role',
+        CustomRole  => 'Change Implementor',
+    };
+
+our @Attributes = (
+    { Name => 'Search - Changes Scheduled, Next 7 Days',
+      Description => 'Change management requests due in the next 7 days', # loc
+      Content     =>
+      { Format =>  q{'<a href="__WebPath__/Ticket/Display.html?id=__id__">__id__</a>/TITLE:#',}
+                 . q{'<a href="__WebPath__/Ticket/Display.html?id=__id__">__Subject__</a>/TITLE:Subject',}
+                 . q{Due,'CF.{Change Type}', 'CF.{Change Category}',Priority,'CustomRole.{Change Reviewer}.Name','CustomRole.{Change Implementor}.Name','CF.{Change Started}'},
+        Query    => 'Queue = \'Change Management\' AND ( Status = \'approved\' OR Status = \'in progress\' OR Status = \'partially deployed\' ) AND \'due\' <= \'7 days\'',
+        OrderBy  => 'due ASC',
+      },
+    },
+    { Name => 'Search - Changes Deployed, Last 30 Days',
+      Description => 'Change management requests completed in the last 30 days', # loc
+      Content     =>
+      { Format =>  q{'<a href="__WebPath__/Ticket/Display.html?id=__id__">__id__</a>/TITLE:#',}
+                 . q{'<a href="__WebPath__/Ticket/Display.html?id=__id__">__Subject__</a>/TITLE:Subject',}
+                 . q{'CF.{Change Type}', 'CF.{Change Category}',Priority,'CustomRole.{Change Reviewer}.Name','CustomRole.{Change Implementor}.Name','CF.{Change Completed}',},
+        Query    => 'Queue = \'Change Management\' AND Status = \'deployed\' AND \'CF.{Change Completed}\' >= \'30 days ago\'',
+        OrderBy  => 'due ASC',
+      },
+    },
+);
+
+our @Final = sub {
+    # Set some default values for custom fields
+    my $queue_obj = RT::Queue->new(RT->SystemUser);
+    my $queue     = 'Change Management';
+    $queue_obj->Load($queue);
+    die "Failed to load queue $queue" unless $queue_obj->Id;
+
+    my $cf = RT::CustomField->new(RT->SystemUser);
+    my ($ret, $msg) = $cf->Load('Change Type');
+    die $msg unless $ret;
+
+    if ( $cf->id && $cf->SupportDefaultValues ) {
+        ($ret, $msg) = $cf->SetDefaultValues(
+            Object => $queue_obj,
+            Values => 'Standard',
+        );
+        die $msg unless $ret;
+    } else {
+        die "Could not set default for: ".$cf->Name;
+    }
+
+    my $GroupName = 'Change Management';
+    my $group     = RT::Group->new( RT->SystemUser );
+
+    ( $ret, $msg ) = $group->LoadUserDefinedGroup( $GroupName );
+    die $msg unless $ret;
+
+    my $root = RT::User->new( RT->SystemUser );
+    $root->Load( 'root' );
+
+    ($ret, $msg) = $group->AddMember( $root->PrincipalObj->Id );
+    print "Could not load root user: $msg\n" unless $ret;
+
+    foreach my $right ( qw/SeeGroupDashboard ShowSavedSearches EditSavedSearches ModifyGroupDashboard/ ) {
+        ($ret, $msg) = $group->PrincipalObj->GrantRight( Right => $right, Object => $group );
+        print "Failed to grant right $right: $msg\n" unless $ret;
+    }
+
+    my $dashboard = RT::Dashboard->new( RT->SystemUser );
+    ( $ret, $msg ) = $dashboard->Save(
+        Name    => 'Change Management',
+        Privacy => 'RT::Group-'.$group->Id,
+    );
+
+    if ($ret) {
+        my @searches;
+        for my $search_name ( 'Changes Scheduled, Next 7 Days', 'Changes Deployed, Last 30 Days' ) {
+            my ($search) = RT::System->new( RT->SystemUser )->Attributes->Named( 'Search - ' . $search_name );
+            if ($search) {
+                push @searches,
+                    {
+                    pane         => 'body',
+                    portlet_type => 'search',
+                    id           => $search->Id,
+                    description  => "Saved Search: $search_name",
+                    privacy      => join( '-', ref( RT->System ), RT->System->Id ),
+                    };
+            }
+            else {
+                RT->Logger->error("Couldn't find search $search_name");
+            }
+        }
+
+        my $panes = {
+            body => [
+                @searches,
+            ],
+        };
+
+        # fill content
+        my ( $ret, $msg ) = $dashboard->Update( Panes => $panes );
+        if ( !$ret ) {
+            RT->Logger->error("Couldn't update content for dashboard Change Management: $msg");
+        }
+    }
+    else {
+        RT->Logger->error("Couldn't create dashboard Change Management: $msg");
+    }
+};

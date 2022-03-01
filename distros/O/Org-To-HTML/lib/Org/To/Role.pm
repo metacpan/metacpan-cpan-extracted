@@ -1,6 +1,6 @@
 package Org::To::Role;
 
-use 5.010;
+use 5.010001;
 use strict;
 use warnings;
 use Log::ger;
@@ -9,9 +9,9 @@ use Moo::Role;
 use String::Escape qw/elide printable/;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-01-21'; # DATE
+our $DATE = '2022-02-12'; # DATE
 our $DIST = 'Org-To-HTML'; # DIST
-our $VERSION = '0.234'; # VERSION
+our $VERSION = '0.235'; # VERSION
 
 requires 'export_document';
 requires 'export_block';
@@ -49,7 +49,7 @@ Org::To::Role - Role for Org exporters
 
 =head1 VERSION
 
-This document describes version 0.234 of Org::To::Role (from Perl distribution Org-To-HTML), released on 2022-01-21.
+This document describes version 0.235 of Org::To::Role (from Perl distribution Org-To-HTML), released on 2022-02-12.
 
 =head1 HOMEPAGE
 

@@ -1,5 +1,6 @@
 bin/git-lint
 Changes
+CONTRIBUTING.md
 examples/.gitconfig.example
 examples/hooks/commit-msg
 examples/hooks/pre-commit

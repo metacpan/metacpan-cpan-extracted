@@ -77410,3 +77410,17 @@ O/OO/OODLER/Util-H2O-More-0.0.6.tar.gz
 W/WA/WATERKIP/WebService-KvKAPI-0.103.tar.gz
 P/PE/PERLANCAR/WordLists-EN-Noun-0.004.tar.gz
 I/IS/ISHIGAKI/XML-SAX-SVGTransformer-0.05.tar.gz
+B/BI/BIGFOOT/Amazon-API-1.2.1.tar.gz
+P/PE/PEVANS/App-eachperl-0.05.tar.gz
+O/OL/OLIVER/App-Netdisco-2.052002.tar.gz
+R/RR/RRWO/Dist-Zilla-Plugin-Generate-ManifestSkip-v0.1.6.tar.gz
+F/FA/FAYLAND/Dist-Zilla-Plugin-GitHubREADME-Badge-0.34.tar.gz
+U/UT/UTASHIRO/Getopt-EX-v1.27.0.tar.gz
+B/BL/BLAINEM/Git-Lint-0.010.tar.gz
+P/PE/PERLANCAR/Module-Load-Util-0.007.tar.gz
+L/LT/LTM/Mojolicious-Plugin-Route-0.02.tar.gz
+C/CA/CAVAC/Net-Clacks-22.tar.gz
+P/PE/PERLANCAR/Org-To-HTML-0.235.tar.gz
+L/LE/LEMBARK/Parallel-Queue-v4.0.1.tar.gz
+G/GH/GHANDI/Parser-FIT-0.06.tar.gz
+B/BP/BPS/RT-Extension-ChangeManagement-0.01.tar.gz

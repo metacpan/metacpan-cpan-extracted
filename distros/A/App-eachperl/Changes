@@ -1,5 +1,11 @@
 Revision history for App-eachperl
 
+0.05    2022-02-28
+        [CHANGES]
+         * Added `--only-if` option
+         * Fix oneline output format for things like `modversion` command
+         * Updated for Object::Pad 0.54
+
 0.04    2021-09-11
         [CHANGES]
          * Have `eachperl list` show which perls are thready

@@ -2,12 +2,12 @@
 # first sanity check: is the module usable.
 ########################################################################
 
-use v5.10;
+use v5.24;
 use strict;
 
 my $package = 'Parallel::Queue';
 
-use Test::More qw( tests 3 );
+use Test::More;
 
 use_ok $package;
 
@@ -17,4 +17,5 @@ ok $version , "$package has version ($version)";
 
 ok __PACKAGE__->can( 'runqueue' ), "Installed 'runqueue'";
 
+done_testing;
 __END__

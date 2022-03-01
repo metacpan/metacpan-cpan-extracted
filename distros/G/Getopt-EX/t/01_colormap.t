@@ -66,14 +66,14 @@ is(ansi_code("W/R"), "\e[37;41m", "background");
     local $Getopt::EX::Colormap::SPLIT_ANSI = 1;
     is(ansi_code("W/R"), "\e[37m\e[41m", "background (SPLIT_ANSI)");
 }
-is(ansi_code("RDPIUFQSVX"), "\e[31;1;2;3;4;5;6;7;8;9m", "effect");
+is(ansi_code("RDPIUFQSHX"), "\e[31;1;2;3;4;5;6;7;8;9m", "effect");
 
 is(ansi_code("ABCDEF"), "\e[38;5;152m", "hex24");
 rgb24 {
     is(ansi_code("ABCDEF"), "\e[38;2;171;205;239m", "hex24 24bit");
 };
 
-is(ansi_code("~D~P~I~U~F~Q~S~V~X"), "\e[21;22;23;24;25;26;27;28;29m", "negate effect");
+is(ansi_code("~D~P~I~U~F~Q~S~H~X"), "\e[21;22;23;24;25;26;27;28;29m", "negate effect");
 
 is(ansi_code("#AABBCC"), "\e[38;5;146m", "hex24 with #");
 is(ansi_code("#ABC"),    "\e[38;5;146m", "hex12");

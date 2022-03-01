@@ -1,10 +1,16 @@
 package App::example::example_test;
 use strict;
 use warnings;
+no  warnings 'redefine';
 
 our $opt_number;
 our @opt_list;
 our %opt_hash;
+our $opt_string;
+
+sub opt_string {
+    $opt_string = $_[1];
+}
 
 1;
 
@@ -13,6 +19,7 @@ __DATA__
 builtin set-number=i $opt_number
 builtin set-list=s   @opt_list
 builtin set-hash=s   %opt_hash
+builtin set-str=s    &opt_string
 
 option default --default
 

@@ -68,7 +68,7 @@ $worker->run;
     <ip>127.0.0.1</ip>
     <port>18888</port>
     <pingtimeout>600</pingtimeout>
-    <interclackspingtimeout>10</interclackspingtimeout>
+    <interclackspingtimeout>60</interclackspingtimeout>
     <ssl>
         <cert>exampleserver.crt</cert>
         <key>exampleserver.key</key>
@@ -367,7 +367,7 @@ server). All we need is an additional XML config file:</p>
     <ip>127.0.0.1</ip>
     <port>18889</port>
     <pingtimeout>600</pingtimeout>
-    <interclackspingtimeout>10</interclackspingtimeout>
+    <interclackspingtimeout>60</interclackspingtimeout>
     <ssl>
         <cert>exampleserver.crt</cert>
         <key>exampleserver.key</key>

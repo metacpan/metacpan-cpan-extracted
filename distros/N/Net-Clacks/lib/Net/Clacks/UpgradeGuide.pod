@@ -242,7 +242,25 @@ This version is dedicated to Sven Guckes, who passed away on 20th February 2022.
 in the overhead of the Clacks protocol.
 
 "Do you not know that man is not dead while his name is still spoken?"
-(Terry Prattchet, Going Postal)
+(Terry Pratchett, Going Postal)
+
+=head2 VERSION 22
+
+WARNING: BREAKING CHANGES! It is REQUIRED to update all servers and clients at the same time. 
+
+Version 22 fixes some warnings and wrong print statements regarding persistance files.
+
+This version also makes sure that the persistance file is saved on exit, to make sure we have the latest data on file, instead
+of something potentially outdated.
+
+Another important change is the way interclacks sync works. Before sending the keys to the interclacks partner, every interclacks node sends an "OVERHEAD T" timestamp. This allows the
+other side to calculate (roughly) the time offset between the nodes and adjust the recieved timestamps accordingly. If the nodes are both synced to the same system time, this is pretty
+much of no importance. But if one of the nodes has a large offset (think "Raspberry Pi when it can't reach a time server during boot"), syncing via time stamps can get messed up. Version 22
+of Net::Clacks tries its best to rectify that. Of course, this can't replace proper time sync of the interclacks nodes, but it's better than nothing, i guess.
+
+This version also implements "forget stale entries". That means, it removes cached entries which have not been accessed (STORE, SETANDSTORE, INCREMENT, DECREMENT, RETRIEVE) in a long time. The
+default timeframe if 24 hours, but this can be configured with the "stalecachetime" parameter (in seconds). This means that the persistancefile format changes, but this will be upgraded transparently
+by the software during startup. This changes the interclacks KEYSYNC command to include the last access time.
 
 =head1 AUTHOR
 

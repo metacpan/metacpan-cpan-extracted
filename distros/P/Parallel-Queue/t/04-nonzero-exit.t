@@ -2,12 +2,12 @@
 # test job failure
 ########################################################################
 
-use v5.10;
+use v5.24;
 use strict;
 
 use Test::More;
 
-use Parallel::Queue;
+use Parallel::Queue qw( nofork nofinish );
 
 # depending on intra-job timing, there may be 
 # one or two items left in @pass1 after the 
@@ -15,13 +15,16 @@ use Parallel::Queue;
 
 my @queue =
 (
-    sub {  0 },
-    sub {  0 },
+    sub {  0 }
+  , sub {  0 }
 
-    sub {  1 },  # non-zero exit == failure.
-
-    sub {  0 },  # these two are left on @pass1
-    sub {  0 },
+  , sub   # non-zero exit == failure.
+    {
+        $DB::single = 1;
+        1 
+    }
+  , sub {  0 }   # these two are left on @pass1
+  , sub {  0 } 
 );
 
 

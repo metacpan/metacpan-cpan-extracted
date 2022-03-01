@@ -4,9 +4,9 @@
 #  (C) Paul Evans, 2020 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.43;
+use Object::Pad 0.54;  # slot init BLOCK
 
-package App::eachperl 0.04;
+package App::eachperl 0.05;
 class App::eachperl;
 
 use Config::Tiny;
@@ -61,18 +61,17 @@ has $_no_system_perl :param;
 has $_no_test        :param;
 has $_since_version  :param;
 has $_until_version  :param;
+has $_only_if        :param;
 has $_reverse        :param;
 has $_stop_on_fail   :param;
 
-has $_io_term;
+has $_io_term { IO::Term::Status->new_for_stdout };
 
 ADJUST
 {
    $self->maybe_apply_config( "./.eachperlrc" );
    $self->maybe_apply_config( "$ENV{HOME}/.eachperlrc" );
    $self->postprocess_config;
-
-   $_io_term = IO::Term::Status->new_for_stdout;
 }
 
 method maybe_apply_config ( $path )
@@ -86,6 +85,7 @@ method maybe_apply_config ( $path )
    $_perls         //= $config->{_}{perls};
    $_since_version //= $config->{_}{since_version};
    $_until_version //= $config->{_}{until_version};
+   $_only_if       //= $config->{_}{only_if};
 }
 
 method postprocess_config ()
@@ -128,6 +128,13 @@ method perls ()
       $selected = 0 if $_since_version and $ver lt $_since_version;
       $selected = 0 if $_until_version and $ver gt $_until_version;
       $selected = 0 if $_no_system_perl and $perl->fullpath eq $^X;
+
+      if( $selected and defined $_only_if ) {
+         IPC::Run::run(
+            [ $perl->fullpath, "-Mstrict", "-Mwarnings", "-MConfig",
+               "-e", "exit !do {$_only_if}" ]
+         ) == 0 and $selected = 0;
+      }
 
       $perl->selected = $selected;
 
@@ -196,11 +203,11 @@ method run_exec ( @argv )
             ->apply_tag( 0, -1, bg => Convert::Color->new( "vga:blue" ) )
       );
 
-      $opts{oneline} ?
-         print "$BOLD$perl:$RESET " :
-         $_io_term->print_line( "\n$BOLD  --- $perl --- $RESET" );
+      $opts{oneline}
+         ? $_io_term->more_partial( "$BOLD$perl:$RESET " )
+         : $_io_term->print_line( "\n$BOLD  --- $perl --- $RESET" );
 
-      my $has_partial = 0;
+      my $has_partial = $opts{oneline};
       IPC::Run::run [ $path, @argv ], ">pty>", sub {
          my @lines = split m/\r?\n/, $_[0], -1;
 
@@ -230,6 +237,10 @@ method run_exec ( @argv )
             $has_partial = 1;
          }
       };
+
+      if( $has_partial ) {
+         $_io_term->finish_partial;
+      }
 
       if( $? & 127 ) {
          # Exited via signal

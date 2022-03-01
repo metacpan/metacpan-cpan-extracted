@@ -13,6 +13,7 @@ GetOptions(
    'no-test'        => \( my $NO_TEST ),
    'since=s'        => \( my $SINCE_VERSION ),
    'until=s'        => \( my $UNTIL_VERSION ),
+   'only-if=s'      => \( my $ONLY_IF ),
    'reverse|r'      => \( my $REVERSE ),
    'stop-on-fail|s' => \( my $STOP_ON_FAIL ),
 ) or exit 1;
@@ -22,6 +23,7 @@ exit App::eachperl->new(
    no_test        => $NO_TEST,
    since_version  => $SINCE_VERSION,
    until_version  => $UNTIL_VERSION,
+   only_if        => $ONLY_IF,
    reverse        => $REVERSE,
    stop_on_fail   => $STOP_ON_FAIL,
 )->run( @ARGV );
@@ -161,6 +163,17 @@ Any perl binaries older than this will be skipped.
 Selects only perl versions that are at least as old as the requested version.
 Any perl binaries newer than this will be skipped.
 
+=head2 --only-if EXPR
+
+An additional perl expression that will be evaluated within the target perl
+which must additionally return true, to select that perl version. If it
+returns false then this version will be skipped.
+
+The L<Config> module will already be loaded here; this is useful for
+expressions like
+
+   --only-if '$Config{usethreads}'
+
 =head2 --reverse, -r
 
 Reverses the order in which perl versions are invoked.
@@ -208,6 +221,7 @@ Default values for the following commandline options can also be supplied:
 
    since_version = 5.16
    until_version = 5.30
+   only_if = EXPR
 
 =head1 AUTHOR
 

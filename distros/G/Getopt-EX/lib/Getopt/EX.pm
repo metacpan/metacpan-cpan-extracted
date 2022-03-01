@@ -1,6 +1,6 @@
 package Getopt::EX;
 use 5.014;
-use version; our $VERSION = version->declare("v1.26.0");
+use version; our $VERSION = version->declare("v1.27.0");
 
 1;
 
@@ -11,14 +11,14 @@ Getopt::EX - Getopt Extender
 
 =head1 VERSION
 
-Version v1.26.0
+Version v1.27.0
 
 
 =head1 DESCRIPTION
 
-L<Getopt::EX> extends the basic function of L<Getopt> family to
-support user-definable option aliases, and dynamic module which works
-together with the script through option interface.
+L<Getopt::EX> extends basic function of L<Getopt> family to support
+user-definable option aliases, and dynamic module which works together
+with a script through option interface.
 
 =head1 INTERFACES
 
@@ -230,6 +230,24 @@ C<end>, C<step> and C<length>, like this:
     1:20:5	1,     6,     11,       16
     1:20:5:3	1,2,3, 6,7,8, 11,12,13, 16,17,18
 
+=head1 SEE ALSO
+
+=head2 L<Getopt::EX::Hashed>
+
+B<Getopt::EX::Hashed> is a module to automate a hash object to store
+command line option values for B<Getopt::Long> and compatible modules
+including B<Getopt::EX::Long>.
+
+=head2 L<Getopt::EX::i18n>
+
+L<Getopt::EX::i18n> provides an easy way to set locale environment
+before executing command.
+
+=head2 L<Getopt::EX::termcolor>
+
+L<Getopt::EX::termcolor> is a common module to manipulate system
+dependent terminal color.
+
 =head1 AUTHOR
 
 Kazumasa Utashiro
@@ -240,7 +258,7 @@ The following copyright notice applies to all the files provided in
 this distribution, including binary files, unless explicitly noted
 otherwise.
 
-Copyright 2015-2021 Kazumasa Utashiro
+Copyright 2015-2022 Kazumasa Utashiro
 
 =head1 LICENSE
 
@@ -250,5 +268,5 @@ it under the same terms as Perl itself.
 =cut
 
 #  LocalWords:  Getopt colormap perl foo bar buz colorize BASECLASS
-#  LocalWords:  rc examplerc ENV ARGV getoptions builtins func
-#  LocalWords:  GetOptions
+#  LocalWords:  rc examplerc ENV ARGV getoptions builtins func linux
+#  LocalWords:  GetOptions redhat Kazumasa Utashiro

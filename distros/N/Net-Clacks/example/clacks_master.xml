@@ -3,8 +3,9 @@
     <ip>127.0.0.1</ip>
     <port>18888</port>
     <pingtimeout>600</pingtimeout>
-    <interclackspingtimeout>10</interclackspingtimeout>
+    <interclackspingtimeout>60</interclackspingtimeout>
     <persistancefile>clackspersistance.dat</persistancefile>
+        <!--<stalecachetime>30</stalecachetime>-->
     <ssl>
         <cert>exampleserver.crt</cert>
         <key>exampleserver.key</key>

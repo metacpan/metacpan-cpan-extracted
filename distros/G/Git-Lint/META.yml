@@ -40,5 +40,5 @@ resources:
   bugtracker: https://github.com/renderorange/Git-Lint/issues
   homepage: https://github.com/renderorange/Git-Lint
   repository: https://github.com/renderorange/Git-Lint.git
-version: '0.009'
+version: '0.010'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

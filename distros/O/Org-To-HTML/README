@@ -2,8 +2,8 @@ NAME
     Org::To::HTML - Export Org document to HTML
 
 VERSION
-    This document describes version 0.234 of Org::To::HTML (from Perl
-    distribution Org-To-HTML), released on 2022-01-21.
+    This document describes version 0.235 of Org::To::HTML (from Perl
+    distribution Org-To-HTML), released on 2022-02-12.
 
 SYNOPSIS
      use Org::To::HTML qw(org_to_html);
@@ -30,7 +30,7 @@ DESCRIPTION
     A command-line utility org-to-html is available in the distribution
     App::OrgUtils.
 
-    Note that this module is just a simple exporter, for "serious" works
+    Note that this module is just a simple exporter, for "serious" work
     you'll probably want to use the exporting features or org-mode
     <http://orgmode.org>.
 
@@ -129,14 +129,22 @@ ATTRIBUTES
     wrapping element. Default is false.
 
   html_title => STR
-    Title to use in TITLE element. If unset, defaults to "(no title)" when
-    exporting.
+    Title to use in TITLE HTML element, to override "#+TITLE" setting in the
+    Org document. If unset and document does not have "#+TITLE" setting,
+    will default to the name of the source file, or "(source string)".
 
   css_url => STR
     If set, export_document() will output a LINK element pointing to this
     CSS.
 
 METHODS
+FAQ
+  Why would one want to use this instead of org-mode's built-in exporting features?
+    This module might come in handy if you want to customize the Org-to-HTML
+    translation with Perl, for example when you want to customize the
+    default HTML title when there's no "#+TITLE" setting, change translation
+    of table element to an ASCII table, etc.
+
 HOMEPAGE
     Please visit the project's homepage at
     <https://metacpan.org/release/Org-To-HTML>.

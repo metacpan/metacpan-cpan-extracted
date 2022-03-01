@@ -57,3 +57,6 @@
 
 # Avoid Devel::Cover files.
 \bcover_db\b
+
+# Avoid clacks persistance files
+example\/clackspersistance\.dat

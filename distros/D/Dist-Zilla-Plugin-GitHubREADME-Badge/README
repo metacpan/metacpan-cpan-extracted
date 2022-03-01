@@ -29,6 +29,7 @@ SYNOPSIS
         badges = cpancover
         place = bottom
         phase = release
+        branch = main
 
 DESCRIPTION
 
@@ -49,6 +50,13 @@ CONFIG
         badges = coveralls
         badges = gitter
         badges = cpants
+
+ branch
+
+        [GitHubREADME::Badge]
+        branch = main
+
+    defaults to 'master'. you need set to 'main' for new github repos
 
  place
 

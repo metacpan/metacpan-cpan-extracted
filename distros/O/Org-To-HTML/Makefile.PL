@@ -38,12 +38,12 @@ my %WriteMakefileArgs = (
     "FindBin" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
-    "Org::Parser" => "0.553",
+    "Org::Parser" => "0.556",
     "Test::Differences" => 0,
     "Test::More" => "0.96",
     "lib" => 0
   },
-  "VERSION" => "0.234",
+  "VERSION" => "0.235",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -64,7 +64,7 @@ my %FallbackPrereqs = (
   "Moo" => 0,
   "Moo::Role" => 0,
   "Org::Document" => "0.18",
-  "Org::Parser" => "0.553",
+  "Org::Parser" => "0.556",
   "String::Escape" => 0,
   "Test::Differences" => 0,
   "Test::More" => "0.96",

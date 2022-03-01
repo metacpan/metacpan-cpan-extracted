@@ -1,0 +1,49 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 233148b71e8a8be7b9ba1e761a65a39d08f2a5e5 Changes
+SHA1 6e9fa8dcc409b7b61b05d4429b108b0e05570be4 MANIFEST
+SHA1 46884968327942c098d8701f6b6292d505002b3c META.yml
+SHA1 d38971148b9bf62bcbd110f23b55a7e46440b5a0 Makefile.PL
+SHA1 342caa2d7c83d0a9f37109569652cd7f3245dae5 README
+SHA1 5153ef7fdab1a756488c9228160807d05fcf5ecc etc/ChangeManagement_Config.pm
+SHA1 6952cb9eadd7d8d4ed8dd6d08bf42321cc6cb849 etc/initialdata
+SHA1 c3f8f9f2a209f80b7ca3c8af3a6b1b7b408ad620 inc/Module/Install.pm
+SHA1 de30b539a326675c42e6ad360fddb05902d621be inc/Module/Install/Base.pm
+SHA1 81fffeca82bcd7100d8435b139f0780fcc5cdf9c inc/Module/Install/Can.pm
+SHA1 b4dd9cb3cf0cb60390c575bd3405e2297d4a0b1a inc/Module/Install/Fetch.pm
+SHA1 85254e101a40b265981d7165d2b8cf0277ebfed2 inc/Module/Install/Include.pm
+SHA1 b84cf97b12f8e5ef37bea54e33ddce32dff804d1 inc/Module/Install/Makefile.pm
+SHA1 0d9fd69718198fcd1560214c4f23fcaa44f8395e inc/Module/Install/Metadata.pm
+SHA1 e57f647aba7b4624a6155c03fb524bfeba8f0894 inc/Module/Install/RTx.pm
+SHA1 a17d6d01c9da7a5bed6fcef0038727e63d9b932a inc/Module/Install/RTx/Runtime.pm
+SHA1 8d19f4485276b987b7838d4ec01909f8055a4724 inc/Module/Install/ReadmeFromPod.pm
+SHA1 99b8179fbd9e05422b161cf91abe198744188064 inc/Module/Install/Win32.pm
+SHA1 6a91e14bbecc64e9c8e2261dfa4b360641d152e4 inc/Module/Install/WriteAll.pm
+SHA1 61eb6159a86c81ec77f4a7ae9a177e187cad4634 inc/YAML/Tiny.pm
+SHA1 e543751ef485dcccc30188777e95874909622a72 lib/RT/Action/SetCustomFieldDate.pm
+SHA1 c11c8b88c5cba30b22df668d55ee9023e2be22b4 lib/RT/Extension/ChangeManagement.pm
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEFelFwSnB+u9xCpouFedxUadmpRQFAmIeGooACgkQFedxUadm
+pRQ5CQf/VbusCeBTLbEa6O+muAmeBPEbl/44ZQhGJteh3nBVyREJLlh4CVaWwtLF
+OfpC915x4G6j/3Gfx9Q0nlJdreZ8w/LyyVMKlss/+I3Xmhc67KhH56177KONnos3
+z8zBRGnw0faBmFhYXDcY3WZr1agSWimUMnfzJj0/K4GQDpurd6vW1wg1BF95eTx0
+OF4rog+itp1yyIb0KLcjUdhbrvReHpm5RlHf2NTUvKWbvA+FV/IRnQDg0eYohTcF
+SByMPSR/B87H6RfsYL1QC0goDyu9ukMcihDU0/Denj3ivDvKll5UIPuEf//+4/0u
+GsZ5wJYIaOHcyQWfqh/VIcn/cFLbEw==
+=7JxC
+-----END PGP SIGNATURE-----

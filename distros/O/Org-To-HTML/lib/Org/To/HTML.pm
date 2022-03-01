@@ -17,9 +17,9 @@ with 'Org::To::Role';
 extends 'Org::To::Base';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-01-21'; # DATE
+our $DATE = '2022-02-12'; # DATE
 our $DIST = 'Org-To-HTML'; # DIST
-our $VERSION = '0.234'; # VERSION
+our $VERSION = '0.235'; # VERSION
 
 our @EXPORT_OK = qw(org_to_html);
 
@@ -124,11 +124,12 @@ sub org_to_html {
     }
 
     my $obj = ($args{_class} // __PACKAGE__)->new(
+        source_file   => $args{source_file} // '(source string)',
         include_tags  => $args{include_tags},
         exclude_tags  => $args{exclude_tags},
         css_url       => $args{css_url},
         naked         => $args{naked},
-        html_title    => $args{html_title} // $args{source_file},
+        html_title    => $args{html_title},
         inline_images => $args{inline_images} // 1,
     );
 
@@ -156,8 +157,17 @@ sub export_document {
             " on ".scalar(localtime)." -->\n\n");
 
         push @$html, "<head>\n";
-        push @$html, "<title>",
-            ($self->html_title // "(no title)"), "</title>\n";
+
+        {
+            my @title_settings = $doc->settings('TITLE');
+            my $title_from_setting;
+            $title_from_setting = $title_settings[0]->raw_arg
+                if @title_settings;
+            push @$html, "<title>",
+                ($self->html_title // $title_from_setting // $self->source_file // '(no title)'),
+                "</title>\n";
+        }
+
         if ($self->css_url) {
             push @$html, (
                 "<link rel=\"stylesheet\" type=\"text/css\" href=\"",
@@ -455,7 +465,7 @@ Org::To::HTML - Export Org document to HTML
 
 =head1 VERSION
 
-This document describes version 0.234 of Org::To::HTML (from Perl distribution Org-To-HTML), released on 2022-01-21.
+This document describes version 0.235 of Org::To::HTML (from Perl distribution Org-To-HTML), released on 2022-02-12.
 
 =head1 SYNOPSIS
 
@@ -484,7 +494,7 @@ Export Org format to HTML. To customize, you can subclass this module.
 A command-line utility L<org-to-html> is available in the distribution
 L<App::OrgUtils>.
 
-Note that this module is just a simple exporter, for "serious" works you'll
+Note that this module is just a simple exporter, for "serious" work you'll
 probably want to use the exporting features or L<org-mode|http://orgmode.org>.
 
 =head1 new(%args)
@@ -591,14 +601,24 @@ element. Default is false.
 
 =head2 html_title => STR
 
-Title to use in TITLE element. If unset, defaults to "(no title)" when
-exporting.
+Title to use in TITLE HTML element, to override C<#+TITLE> setting in the Org
+document. If unset and document does not have C<#+TITLE> setting, will default
+to the name of the source file, or C<(source string)>.
 
 =head2 css_url => STR
 
 If set, export_document() will output a LINK element pointing to this CSS.
 
 =head1 METHODS
+
+=head1 FAQ
+
+=head2 Why would one want to use this instead of org-mode's built-in exporting features?
+
+This module might come in handy if you want to customize the Org-to-HTML
+translation with Perl, for example when you want to customize the default HTML
+title when there's no C<#+TITLE> setting, change translation of table element to
+an ASCII table, etc.
 
 =head1 HOMEPAGE
 

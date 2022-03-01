@@ -1,5 +1,9 @@
 Revision history for Perl extension Getopt-EX
 
+v1.27.0 2022-03-01T01:33:03Z
+
+    - Support builtin subroutine call.
+
 v1.26.0 2021-10-29T16:17:14Z
 
     - Change concealing effect mark V to H in Colormap.pm.

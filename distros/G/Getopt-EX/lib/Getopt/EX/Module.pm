@@ -1,5 +1,5 @@
 package Getopt::EX::Module;
-use version; our $VERSION = version->declare("v1.26.0");
+use version; our $VERSION = version->declare("v1.27.0");
 
 use v5.14;
 use warnings;
@@ -355,14 +355,15 @@ sub parseline {
     }
     elsif ($arg[0] eq "builtin") {
 	$obj->setopt($optname, BUILTIN);
-	if ($arg[2] =~ /^\\?(?<mark>[\$\@\%])(?<name>[\w:]+)/) {
+	if ($arg[2] =~ /^\\?(?<mark>[\$\@\%\&])(?<name>[\w:]+)/) {
 	    my($mark, $name) = @+{"mark", "name"};
 	    my $mod = $obj->module;
 	    /:/ or s/^/$mod\::/ for $name;
 	    no strict 'refs';
 	    $obj->builtin($arg[1] => {'$' => \${$name},
 				      '@' => \@{$name},
-				      '%' => \%{$name}}->{$mark});
+				      '%' => \%{$name},
+				      '&' => \&{$name}}->{$mark});
 	}
     }
     elsif ($arg[0] eq "autoload") {
@@ -541,8 +542,8 @@ example exchange following two arguments.
     option --exch $<move(1,1)>
 
 You can use recently introduced C<< $<ignore> >> to ignore the
-argument.  Because C<< $<move(0,0)> >> does nothing, it effectively
-equivalent and existing module sometimes use it.
+argument.  Some existing module uses C<< $<move(0,0)> >> for the same
+purpose, because it effectively do nothing.
 
     option --deprecated $<ignore>
     option --deprecated $<move(0,0)>

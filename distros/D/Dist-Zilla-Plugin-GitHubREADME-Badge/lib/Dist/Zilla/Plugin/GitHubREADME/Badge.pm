@@ -3,7 +3,7 @@ package Dist::Zilla::Plugin::GitHubREADME::Badge;
 use strict;
 use warnings;
 use 5.008_005;
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 
 use Moose;
 use Moose::Util::TypeConstraints qw(enum);
@@ -26,6 +26,7 @@ has badges => (
 sub mvp_multivalue_args { ('badges') }
 
 has 'place' => ( is => 'rw', isa => 'Str', default => sub { 'top' } );
+has 'branch' => (is => 'rw', isa => 'Str', default => sub { 'master' });
 
 has phase => (
     is      => 'ro',
@@ -91,16 +92,18 @@ sub add_badges {
     my ($base_url, $user_name, $repository_name) = ($repository =~ m{^\w+://(.*)/([^\/]+)/(.*?)(\.git|\/|$)});
     return unless $repository_name;
 
+    my $branch = $self->branch || 'master'; # backwards
+
     my @badges;
     foreach my $badge (@{$self->badges}) {
         if ($badge eq 'travis' or $badge eq 'travis-ci.org') {
-            push @badges, "[![Build Status](https://travis-ci.org/$user_name/$repository_name.svg?branch=master)](https://travis-ci.org/$user_name/$repository_name)";
+            push @badges, "[![Build Status](https://travis-ci.org/$user_name/$repository_name.svg?branch=$branch)](https://travis-ci.org/$user_name/$repository_name)";
         } elsif ($badge eq 'travis-ci.com') {
-            push @badges, "[![Build Status](https://travis-ci.com/$user_name/$repository_name.svg?branch=master)](https://travis-ci.com/$user_name/$repository_name)";
+            push @badges, "[![Build Status](https://travis-ci.com/$user_name/$repository_name.svg?branch=$branch)](https://travis-ci.com/$user_name/$repository_name)";
         } elsif ($badge eq 'appveyor') {
-            push @badges, "[![AppVeyor Status](https://ci.appveyor.com/api/projects/status/github/$user_name/$repository_name?branch=master&svg=true)](https://ci.appveyor.com/project/$user_name/$repository_name)";
+            push @badges, "[![AppVeyor Status](https://ci.appveyor.com/api/projects/status/github/$user_name/$repository_name?branch=$branch&svg=true)](https://ci.appveyor.com/project/$user_name/$repository_name)";
         } elsif ($badge eq 'coveralls') {
-            push @badges, "[![Coverage Status](https://coveralls.io/repos/$user_name/$repository_name/badge.svg?branch=master)](https://coveralls.io/r/$user_name/$repository_name?branch=master)"
+            push @badges, "[![Coverage Status](https://coveralls.io/repos/$user_name/$repository_name/badge.svg?branch=$branch)](https://coveralls.io/r/$user_name/$repository_name?branch=$branch)"
         } elsif ($badge eq 'gitter') {
             push @badges, "[![Gitter chat](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/$user_name/$repository_name)";
         } elsif ($badge eq 'cpants') {
@@ -114,11 +117,11 @@ sub add_badges {
         } elsif ($badge eq 'version') {
             push @badges, "[![Cpan version](https://img.shields.io/cpan/v/$distname.svg)](https://metacpan.org/release/$distname)";
         } elsif ($badge eq 'codecov') {
-            push @badges, "[![codecov](https://codecov.io/gh/$user_name/$repository_name/branch/master/graph/badge.svg)](https://codecov.io/gh/$user_name/$repository_name)";
+            push @badges, "[![codecov](https://codecov.io/gh/$user_name/$repository_name/branch/$branch/graph/badge.svg)](https://codecov.io/gh/$user_name/$repository_name)";
         } elsif ($badge eq 'gitlab_ci') {
-            push @badges, "[![build status](https://$base_url/$user_name/$repository_name/badges/master/build.svg)]($repository/$user_name/$repository_name/commits/master)";
+            push @badges, "[![build status](https://$base_url/$user_name/$repository_name/badges/$branch/build.svg)]($repository/$user_name/$repository_name/commits/$branch)";
         } elsif ($badge eq 'gitlab_cover') {
-            push @badges, "[![coverage report](https://$base_url/$user_name/$repository_name/badges/master/coverage.svg)]($repository/$user_name/$repository_name/commits/master)";
+            push @badges, "[![coverage report](https://$base_url/$user_name/$repository_name/badges/$branch/coverage.svg)]($repository/$user_name/$repository_name/commits/$branch)";
         } elsif ($badge eq 'docker_automated') {
             push @badges, "[![Docker Automated Build](https://img.shields.io/docker/automated/\L$user_name/$repository_name\E.svg)](https://github.com/$user_name/$repository_name)";
         } elsif ($badge eq 'docker_build') {
@@ -183,6 +186,7 @@ Dist::Zilla::Plugin::GitHubREADME::Badge - Dist::Zilla - add badges to github RE
     badges = cpancover
     place = bottom
     phase = release
+    branch = main
 
 =head1 DESCRIPTION
 
@@ -202,6 +206,13 @@ The default goes to travis, coveralls and cpants.
     badges = coveralls
     badges = gitter
     badges = cpants
+
+=head2 branch
+
+    [GitHubREADME::Badge]
+    branch = main
+
+defaults to 'master'. you need set to 'main' for new github repos
 
 =head2 place
 

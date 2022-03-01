@@ -2,7 +2,7 @@ NAME
     Module::Load::Util - Some utility routines related to module loading
 
 VERSION
-    This document describes version 0.006 of Module::Load::Util (from Perl
+    This document describes version 0.007 of Module::Load::Util (from Perl
     distribution Module-Load-Util), released on 2021-09-30.
 
 SYNOPSIS
@@ -25,10 +25,13 @@ DESCRIPTION
     Currently what it offers now are the two functions
     "load_module_with_optional_args" and
     "instantiate_class_with_optional_args". These functions are designed for
-    use with command-line and/or plugin-based applications. You can specify
-    module/class/plugin to load in a flexible format, as a string or
-    2-element array. Please see the function's documentation for more
-    details.
+    use with command-line and/or plugin-based applications, because you can
+    specify module/class/plugin to load in a flexible format, as a string or
+    2-element array. See wordlist (from App::wordlist), tabledata (from
+    App::tabledata), or ColorTheme for some of the applications that use
+    this module.
+
+    Please see the functions' documentation for more details.
 
 FUNCTIONS
   load_module_with_optional_args

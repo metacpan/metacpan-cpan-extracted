@@ -7,7 +7,7 @@ build_requires:
   FindBin: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
-  Org::Parser: '0.553'
+  Org::Parser: '0.556'
   Test::Differences: '0'
   Test::More: '0.96'
   lib: '0'
@@ -23,13 +23,13 @@ name: Org-To-HTML
 provides:
   Org::To::Base:
     file: lib/Org/To/Base.pm
-    version: '0.234'
+    version: '0.235'
   Org::To::HTML:
     file: lib/Org/To/HTML.pm
-    version: '0.234'
+    version: '0.235'
   Org::To::Role:
     file: lib/Org/To/Role.pm
-    version: '0.234'
+    version: '0.235'
 requires:
   Exporter: '5.57'
   File::Slurper: '0'
@@ -51,7 +51,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Org-To-HTML
   homepage: https://metacpan.org/release/Org-To-HTML
   repository: git://github.com/perlancar/perl-Org-To-HTML.git
-version: '0.234'
+version: '0.235'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

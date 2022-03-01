@@ -23,7 +23,7 @@ name: Module-Load-Util
 provides:
   Module::Load::Util:
     file: lib/Module/Load/Util.pm
-    version: '0.006'
+    version: '0.007'
 requires:
   Exporter: '5.57'
   Regexp::Pattern::Perl::Module: '0'
@@ -32,7 +32,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Module-Load-Util
   homepage: https://metacpan.org/release/Module-Load-Util
   repository: git://github.com/perlancar/perl-Module-Load-Util.git
-version: '0.006'
+version: '0.007'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

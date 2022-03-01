@@ -1,5 +1,5 @@
 package Getopt::EX::Colormap;
-use version; our $VERSION = version->declare("v1.26.0");
+use version; our $VERSION = version->declare("v1.27.0");
 
 use v5.14;
 use warnings;
@@ -360,9 +360,9 @@ sub apply_color {
 	my($s, $e, $el) = @{ $cache->{$color} //= [ ansi_pair($color) ] };
 	state $reset = qr{ \e\[[0;]*m (?: \e\[[0;]*[Km] )* }x;
 	if ($el) {
-	    $text =~ s/(^|$reset)([^\e\r\n]*)/${1}${s}${2}${e}/mg;
+	    $text =~ s/(\A|\n|$reset)([^\e\r\n]*)/${1}${s}${2}${e}/g;
 	} else {
-	    $text =~ s/(^|$reset)([^\e\r\n]+)/${1}${s}${2}${e}/mg;
+	    $text =~ s/(\A|\n|$reset)([^\e\r\n]+)/${1}${s}${2}${e}/g;
 	}
 	return $text;
     }
@@ -1144,7 +1144,7 @@ The following copyright notice applies to all the files provided in
 this distribution, including binary files, unless explicitly noted
 otherwise.
 
-Copyright 2015-2021 Kazumasa Utashiro
+Copyright 2015-2022 Kazumasa Utashiro
 
 =head1 LICENSE
 

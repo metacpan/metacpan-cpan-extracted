@@ -28,6 +28,7 @@ unshift @INC, $app_lib;
 		     --set-number 42
 		     --set-list dont --set-list panic
 		     --set-hash dont=panic
+		     --set-str  dontpanic
 	);
     my %hash;
     my $parser = Getopt::EX::Long::Parser->new;
@@ -56,6 +57,8 @@ unshift @INC, $app_lib;
 	      "Builtin List");
     is_deeply(\%App::example::example_test::opt_hash, { qw(dont panic) },
 	      "Builtin Hash");
+    is_deeply($App::example::example_test::opt_string, q(dontpanic),
+	      "Builtin Sub");
 }
 
 done_testing;

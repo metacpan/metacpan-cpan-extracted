@@ -1,16 +1,21 @@
-lib/Parallel/Queue.pm
+./lib/Parallel/Queue.pm
+./lib/Parallel/Queue/Manager.pm
 MANIFEST
 Changes
 Makefile.PL
 t/00-usable.t
 t/01-export-name.t
 t/02-debug-mode.t
-t/03-fork.t
 t/04-nonzero-exit.t
 t/05-nonzero-with-finish.t
 t/06-iterator-package-nofork.t
-t/07-iterator-package-fork.t
-t/08-iterator-objects-nofork.t
-t/09-iterator-objects-fork.t
+t/10-construct.t
+t/11-export-name.t
+t/03-runqueue.t
+t/13-runqueue-new.t
+t/14-runqueue-arg.t
+t/19-nonzero-with-finish.t
+t/18-nonzero-exit.t
+t/15-runqueue-assign.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -31,7 +31,7 @@
             "Test::Rinci" : "0.151"
          },
          "x_spec" : {
-            "Rinci" : "v1.1.99"
+            "Rinci" : "v1.1.100"
          }
       },
       "runtime" : {
@@ -60,7 +60,7 @@
             "FindBin" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
-            "Org::Parser" : "0.553",
+            "Org::Parser" : "0.556",
             "Test::Differences" : "0",
             "Test::More" : "0.96",
             "lib" : "0"
@@ -70,15 +70,15 @@
    "provides" : {
       "Org::To::Base" : {
          "file" : "lib/Org/To/Base.pm",
-         "version" : "0.234"
+         "version" : "0.235"
       },
       "Org::To::HTML" : {
          "file" : "lib/Org/To/HTML.pm",
-         "version" : "0.234"
+         "version" : "0.235"
       },
       "Org::To::Role" : {
          "file" : "lib/Org/To/Role.pm",
-         "version" : "0.234"
+         "version" : "0.235"
       }
    },
    "release_status" : "stable",
@@ -93,7 +93,7 @@
          "web" : "https://github.com/perlancar/perl-Org-To-HTML"
       }
    },
-   "version" : "0.234",
+   "version" : "0.235",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

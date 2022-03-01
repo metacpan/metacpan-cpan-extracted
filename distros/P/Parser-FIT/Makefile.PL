@@ -11,12 +11,16 @@ my %WriteMakefileArgs = (
     LICENSE          => 'artistic_2',
     MIN_PERL_VERSION => '5.010001',
     META_MERGE => {
+        "meta-spec" => { version => 2 },
         resources => {
             repository => {
                 type => 'git',
                 url => 'git@github.com:ghandmann/parser-fit.git',
                 web => 'https://github.com/ghandmann/parser-fit',
             },
+            bugtracker => {
+                web => 'https://github.com/ghandmann/parser-fit/issues',
+            }
         },
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },

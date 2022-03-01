@@ -10,14 +10,14 @@ use constant BASE => {
     references => {}
 };
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 sub register {
     my ($self, $app, $conf) = @_;
 
-    my $moniker     = $self->_get_moniker($app, $conf);
-    my $namespace   = $conf->{namespace} // 'Route';
-    my $path_routes = $app->home . '/lib/' . $moniker;
+    my ($moniker, $moniker_path) = $self->_get_moniker($app, $conf);
+    my $namespace                = $conf->{namespace} // 'Route';
+    my $path_routes              = $app->home . '/lib/' . $moniker_path;
 
     croak "Routes path ($path_routes) does not exist!" unless -d $path_routes;
 
@@ -74,6 +74,12 @@ sub _load_routes {
     }
 }
 
+sub test {
+    my $self = shift;
+
+
+}
+
 sub _any {
     my ($self, $app, $ref, $file, $base) = @_;
 
@@ -81,7 +87,7 @@ sub _any {
 
     my $any = $ref->any(
         $ref_name && defined BASE->{references}->{$ref_name}
-        ? BASE->{references}->{$ref_name}
+        ? (BASE->{references}->{$ref_name}, $app->routes)
         : $app->routes
     );
 
@@ -95,7 +101,7 @@ sub _under {
 
     my $under = $ref->under(
         $ref_name && defined BASE->{references}->{$ref_name}
-        ? BASE->{references}->{$ref_name}
+        ? (BASE->{references}->{$ref_name}, $app->routes)
         : $app->routes
     );
 
@@ -106,11 +112,20 @@ sub _route {
     my ($self, $app, $ref, $file, $base) = @_;
 
     my ($name, $ref_name) = $self->_ref_name($file, $base);
+    
+    warn 1 if defined BASE->{references}->{$ref_name ? $ref_name . '::' . $name : $name};
 
     $ref->route(
-        $ref_name && defined BASE->{references}->{$ref_name}
-        ? BASE->{references}->{$ref_name}
-        : $app->routes
+        (
+            defined BASE->{references}->{$ref_name ? $ref_name . '::' . $name : $name}
+            ? BASE->{references}->{$ref_name ? $ref_name . '::' . $name : $name}
+            : ( 
+                $ref_name && defined BASE->{references}->{$ref_name}
+                ? BASE->{references}->{$ref_name}
+                : $app->routes
+            )
+        ),
+        $app->routes
     );
 }
 
@@ -141,13 +156,18 @@ sub _get_moniker {
     my $path = $app->home . '/lib/';
 
     # check if moniker is defined
-    return $conf->{moniker} if $conf->{moniker} && -d $path . $conf->{moniker};
+    return ($conf->{moniker}, $conf->{moniker}) if $conf->{moniker} && -d $path . $conf->{moniker};
 
     # check if need camelize moniker
     my $moniker = camelize($app->moniker);
-    $moniker    = $app->moniker unless -d $path . $moniker;
+    
+    # generate moniker path
+    my $moniker_path = $moniker;
+    $moniker_path    =~ s/::/\//g;
+    
+    return ($app->moniker, $app->moniker) unless -d $path . $moniker_path;
 
-    return $moniker;
+    return ($moniker, $moniker_path);
 }
 
 1;

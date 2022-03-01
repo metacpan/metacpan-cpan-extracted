@@ -44,7 +44,15 @@
       }
    },
    "release_status" : "stable",
-   "resources" : {},
-   "version" : 0.05,
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ghandmann/parser-fit/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/ghandmann/parser-fit"
+      }
+   },
+   "version" : 0.06,
    "x_serialization_backend" : "JSON::PP version 4.05"
 }

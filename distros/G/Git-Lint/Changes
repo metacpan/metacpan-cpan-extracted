@@ -1,5 +1,10 @@
 Revision history for perl module Git::Lint
 
+0.010 2022-02-28
+ - Override user_config in new.t
+ - Add CONTRIBUTING.md file
+ - Move _config out of the Git::Lint object
+
 0.009 2022-02-26
  - Fix documentation for message check modules
  - Fix double installation sections in documentation

@@ -6,7 +6,7 @@ use Regexp::Pattern::Perl::Module ();
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-09-30'; # DATE
 our $DIST = 'Module-Load-Util'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 use Exporter 'import';
 our @EXPORT_OK = qw(
@@ -117,7 +117,7 @@ Module::Load::Util - Some utility routines related to module loading
 
 =head1 VERSION
 
-This document describes version 0.006 of Module::Load::Util (from Perl distribution Module-Load-Util), released on 2021-09-30.
+This document describes version 0.007 of Module::Load::Util (from Perl distribution Module-Load-Util), released on 2021-09-30.
 
 =head1 SYNOPSIS
 
@@ -139,9 +139,13 @@ See more examples in each function's documentation in the L</FUNCTIONS> section.
 This module provides some utility routines related to module loading. Currently
 what it offers now are the two functions L</load_module_with_optional_args> and
 L</instantiate_class_with_optional_args>. These functions are designed for use
-with command-line and/or plugin-based applications. You can specify
+with command-line and/or plugin-based applications, because you can specify
 module/class/plugin to load in a flexible format, as a string or 2-element
-array. Please see the function's documentation for more details.
+array. See L<wordlist> (from L<App::wordlist>), L<tabledata> (from
+L<App::tabledata>), or L<ColorTheme> for some of the applications that use this
+module.
+
+Please see the functions' documentation for more details.
 
 =head1 FUNCTIONS
 

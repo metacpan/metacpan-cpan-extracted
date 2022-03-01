@@ -19,7 +19,7 @@ use Types::Standard -types;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.1.5';
+our $VERSION = 'v0.1.6';
 
 
 sub mvp_multivalue_args { qw/ add remove / }
@@ -67,6 +67,7 @@ sub gather_files {
     $mms->remove('^dist.ini$');
     $mms->remove('^weaver.ini$');
     $mms->remove('^xt/');
+    $mms->remove('^\w$'); # RT#141565
 
     if ( any { $_->name eq 'cpanfile' } @files ) {
         $mms->add('cpanfile\.snapshot$');
@@ -111,7 +112,7 @@ Dist::Zilla::Plugin::Generate::ManifestSkip - Generate a MANIFEST.SKIP file for 
 
 =head1 VERSION
 
-version v0.1.5
+version v0.1.6
 
 =head1 SYNOPSIS
 
@@ -210,7 +211,7 @@ Some of the code and tests have been borrowed from L<Dist::Zilla::Plugin::Instal
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Robert Rothenberg.
+This software is Copyright (c) 2018-2022 by Robert Rothenberg.
 
 This is free software, licensed under:
 
