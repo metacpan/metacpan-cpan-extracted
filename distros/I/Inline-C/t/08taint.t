@@ -4,6 +4,8 @@ BEGIN {
   my $fail = '';
   $fail = "Skipped for perl 5.6.x" if $] < 5.007;
   $fail = "Skipping for Android (tests fail)" if lc($^O) eq 'android';
+  $fail = "No Test::Warn - maybe running with local::lib"
+    if !eval { require Test::Warn; 1 };
   if ($fail) {
     print "1..1\nok 1\n";
     warn "$fail\n";

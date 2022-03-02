@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2020-2022 -- leonerd@leonerd.org.uk
 
-package Object::Pad::MOP::Class 0.61;
+package Object::Pad::MOP::Class 0.62;
 
 use v5.14;
 use warnings;
@@ -210,11 +210,23 @@ Adds a new C<BUILD> block to the class, as a CODE reference.
 
 =head2 add_method
 
-   $metamethod = $metaclass->add_method( $name, $code )
+   $metamethod = $metaclass->add_method( $name, %args, $code )
 
 Adds a new named method to the class under the given name, as CODE reference.
 
 Returns an instance of L<Object::Pad::MOP::Method> to represent it.
+
+Recognises the following additional named arguments:
+
+=over 4
+
+=item common => BOOL
+
+I<Since version 0.62.>
+
+If true, the method is a class-common method.
+
+=back
 
 =head2 get_direct_method
 

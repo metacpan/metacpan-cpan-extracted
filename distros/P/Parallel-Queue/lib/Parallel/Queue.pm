@@ -200,8 +200,12 @@ my $fork_job
         $debug->( "\tExecuting: '$job'" );
 
         my $exitval = eval { $job->() } || 0;
-        $@ and die;
-        exit $exitval
+
+        # either way, this process needs to exit.
+
+        $@
+        ? die
+        : exit $exitval
     }
     else
     {

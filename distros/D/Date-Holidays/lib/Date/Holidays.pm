@@ -11,7 +11,7 @@ use Scalar::Util qw(blessed);
 
 use base 'Date::Holidays::Adapter';
 
-$VERSION = '1.29';
+$VERSION = '1.30';
 
 sub new {
     my ( $class, %params ) = @_;
@@ -310,6 +310,8 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =begin markdown
 
 # Date::Holidays
@@ -332,7 +334,7 @@ Date::Holidays - Date::Holidays::* adapter and aggregator for all your holiday n
 
 =head1 VERSION
 
-The documentation describes version 1.25 of Date::Holidays
+The documentation describes version 1.30 of Date::Holidays
 
 =head1 FEATURES
 
@@ -962,6 +964,8 @@ Please see L<Task::Date::Holidays|https://metacpan.org/pod/Task::Date::Holidays>
 
 =over
 
+=item * @qorron for PR patching the US adapter, resulting in 1.30
+
 =item * Wesley Schwengle (WATERKIP) author of Date::Holidays::NL and Date::Holidays::AW for reaching out and letting me know of their existance
 
 =item * Karen Etheridge (ETHER)
@@ -1013,7 +1017,7 @@ Jonas B., (jonasbn) - C<< <jonasbn@cpan.org> >>
 =head1 LICENSE AND COPYRIGHT
 
 Date-Holidays and related modules are (C) by Jonas B., (jonasbn)
-2004-2020
+2004-2022
 
 Date-Holidays and related modules are released under the Artistic License 2.0
 

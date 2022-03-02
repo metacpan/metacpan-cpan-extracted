@@ -1,5 +1,10 @@
 Changes file for Date-Holidays
 
+1.30 2022-03-01 Bug fix release, update not required
+
+- PR from @qorron (#53) fixes issue with initialization of US calendar via the adapter. The official calendar module is called: Date::Holidays::USFederal.
+
+
 1.29 2020-11-13 Maintenance release, update not required
 
 - Added contribution guidelines for meta.cpan.org

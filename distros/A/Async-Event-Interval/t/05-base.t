@@ -9,13 +9,14 @@ my $mod = 'Async::Event::Interval';
 
 my $file = 't/test.data';
 
-my $e = $mod->new(1, \&perform, 10);
+my $e = $mod->new(0.2, \&perform, 10);
 
 $e->start;
 
 is -e $file, undef, "event is asynchronious";
 
 sleep 2;
+
 $e->stop;
 
 my $data;

@@ -26,7 +26,7 @@ no_index:
 provides:
   Dist::Zilla::Plugin::GitHubREADME::Badge:
     file: lib/Dist/Zilla/Plugin/GitHubREADME/Badge.pm
-    version: '0.34'
+    version: '0.35'
 requires:
   Dist::Zilla: '0'
   Dist::Zilla::Plugin::MetaProvides::Package: '0'
@@ -39,7 +39,7 @@ resources:
   bugtracker: https://github.com/fayland/perl-Dist-Zilla-Plugin-GitHubREADME-Badge/issues
   homepage: https://github.com/fayland/perl-Dist-Zilla-Plugin-GitHubREADME-Badge
   repository: https://github.com/fayland/perl-Dist-Zilla-Plugin-GitHubREADME-Badge.git
-version: '0.34'
+version: '0.35'
 x_contributors:
   - 'Alex Efros <powerman@powerman.name>'
   - 'Chase Whitener <cwhitener@gmail.com>'

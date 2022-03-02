@@ -298,6 +298,10 @@ Start the guest CPUs after reverting to the snapshot state
 
 Force the snapshot to revert, even if it is risky to do so
 
+=item Sys::Virt::DomainSnapshot::REVERT_RESET_NVRAM
+
+Reset the firmware NVRAM state from its original template
+
 =back
 
 =over 4

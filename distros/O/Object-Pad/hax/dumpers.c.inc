@@ -330,7 +330,12 @@ static void S_debug_print_cxstack(pTHX)
       case CXt_LOOP_ARY:   name = "CXt_LOOP_ARY";   break;
       default: fprintf(stderr, "[type=%d]", CxTYPE(cx)); break;
     }
-    fprintf(stderr, "  *-[%d] %s", cxix, name);
+    fprintf(stderr, "  *-[%d] %s in ", cxix, name);
+    switch(cx->blk_gimme) {
+      case G_VOID:   fprintf(stderr, "G_VOID "); break;
+      case G_SCALAR: fprintf(stderr, "G_SCALAR "); break;
+      case G_ARRAY:  fprintf(stderr, "G_LIST "); break;
+    }
     switch(CxTYPE(cx)) {
       case CXt_SUB: {
         CV *cv = cx->blk_sub.cv;

@@ -10,7 +10,7 @@ use vars qw($VERSION);
 
 my $format = '%#:%m%d';
 
-$VERSION = '1.29';
+$VERSION = '1.30';
 
 # Lifted from Date::Holidays::AT source code
 # Ref: https://metacpan.org/source/MDIETRICH/Date-Holidays-AT-v0.1.4/lib/Date/Holidays/AT.pm
@@ -97,13 +97,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Date::Holidays::Adapter::AT - an adapter class for Date::Holidays::AT
 
 =head1 VERSION
 
-This POD describes version 1.25 of Date::Holidays::Adapter::AT
+This POD describes version 1.30 of Date::Holidays::Adapter::AT
 
 =head1 DESCRIPTION
 
@@ -172,12 +174,12 @@ Please refer to BUG REPORTING in L<Date::Holidays>
 
 =head1 AUTHOR
 
-Jonas B. Nielsen, (jonasbn) - C<< <jonasbn@cpan.org> >>
+Jonas Brømsø, (jonasbn) - C<< <jonasbn@cpan.org> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-L<Date::Holidays> and related modules are (C) by Jonas B. Nielsen, (jonasbn)
-2004-2020
+L<Date::Holidays> and related modules are (C) by Jonas Brømsø, (jonasbn)
+2004-2022
 
 Date-Holidays and related modules are released under the Artistic License 2.0
 

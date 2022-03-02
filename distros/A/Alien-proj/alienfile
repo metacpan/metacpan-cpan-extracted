@@ -76,19 +76,17 @@ share {
   $ENV{SQLITE3_LIBS} = Alien::sqlite->libs;
   say "sqlite cflags: " . Alien::sqlite->cflags;
   say "sqlite libs: " . Alien::sqlite->libs;
-  if ($have{'Alien::libtiff'}) {
-    my $p = path ('Alien::libtiff'->dist_dir, 'lib');
-    $ENV{TIFF_LIBS}
-      ||= (-e $p
-            ? "-L$p "
-            : ''
-          )
-          . 'Alien::libtiff'->libs;
-    say "libtiff libs: $ENV{TIFF_LIBS}";
-  }
+  #if ($have{'Alien::libtiff'}) {
+  #  my $p = path ('Alien::libtiff'->dist_dir, 'lib');
+  #  $ENV{TIFF_LIBS}
+  #    ||= (-e $p
+  #          ? "-L$p "
+  #          : ''
+  #        )
+  #        . 'Alien::libtiff'->libs;
+  #  say "libtiff libs: $ENV{TIFF_LIBS}";
+  #}
 
-  my $with_local = '';
-  my $with_cpp11 = '';
 
   if ($on_windows) {
     #  there are issues with strawberry perl's gcc
@@ -114,12 +112,8 @@ share {
   plugin Extract => (format => 'tar.gz');
 
 
-  plugin 'Build::Autoconf' => ();
-
-  my $build_static = $on_windows ? '' : '--disable-shared';
-  $build_static = '';
-  $build_static = '--enable-static=no';  #  override - needed?  leftover from gdal
-  $build_static = '' if $ENV{FORCE_DYNAMIC};
+  plugin 'Build::CMake' => ();
+  plugin 'Build::MSYS';
   
   
   if ($^O =~ /bsd|dragonfly/) {
@@ -129,6 +123,9 @@ share {
          . 'you might need to install the sqlite package for your system, '
          . 'or install a share version of Alien::sqlite';
     }
+  }
+  elsif ($^O eq 'MSWin32') {
+    plugin 'Build::Make' => 'gmake';
   }
 
   my $make_cmd = '%{make}';
@@ -159,59 +156,111 @@ share {
   
   my $config_args = $ENV{ALIEN_PROJ_CONFIG_ARGS} // '';
   $config_args =~ s/[^-\s\w,=]//g;  #  overkill?
-  my $with_tiff = '';  #  only needed for proj 7+
-  my $with_curl = '';  #  only needed for proj 7+
+  my $enable_tiff = 'OFF';
+  my $enable_curl = 'OFF';
+  my @curl_extra_args;
+  my @tiff_extra_args;
   if ($proj_version ge 7) {
-    if (!$have{'Alien::libtiff'}) {
-      $with_tiff = '--disable-tiff';
+    if (!$have{'Alien::libtiff'} or $config_args =~ /--(without-tiff|with-tiff=no)/) {
+      $enable_tiff = 'OFF';
       say 'Disabling TIFF support';
     }
     else {
-      $with_tiff = '--enable-tiff';
+      $enable_tiff = 'ON';
       say 'Enabling TIFF support';
+      #  might need this but it depends on a few things
+      if (Alien::libtiff->install_type ('share')) {
+        my $libtiff_include = path ('Alien::libtiff'->dist_dir . '/include')->stringify;
+        #  grab the first one - could cause trouble later?
+        my @libtiffs = File::Find::Rule
+                  ->file()
+                  ->name( 'libtiff*' )
+                  ->in( path ('Alien::libtiff'->dist_dir) );
+        push @curl_extra_args, (
+          "-DTIFF_LIBRARY=$libtiffs[0]",
+          "-DTIFF_INCLUDE_DIR=$libtiff_include",
+        );
+      }
     }
-    if (!$have{'Alien::curl'}) {
-      $with_curl = '--without-curl';
+    if (!$have{'Alien::curl'} or $config_args =~ /--(without-curl|with-curl=no)/ ) {
+      $enable_curl = 'OFF';
     }
     else {
       my $dynamic_config = path ('Alien::curl'->dist_dir . '/dynamic/curl-config');
       if (-e $dynamic_config) {
-        say 'Adding curl support';
-        $with_curl = "--with-curl=$dynamic_config";
+        say 'Adding curl support from dynamic dir does not yet work';
+        $enable_curl = "ON";
+        push @PATH, path ('Alien::curl'->dist_dir . '/dynamic');
+        my $curl_include = path ('Alien::curl'->dist_dir . '/include')->stringify;
+        #  grab the first one - could cause trouble?
+        my $libcurl = (glob path ('Alien::curl'->dist_dir . '/dynamic/libcurl*'))[0];
+        push @curl_extra_args, (
+          "-DCURL_LIBRARY=$libcurl",
+          "-DCURL_INCLUDE_DIR=$curl_include",
+        );
       }
       elsif ('Alien::curl'->install_type eq 'system') {
         if ('Alien::curl'->cflags =~ /STATIC_LIB/) {
-          $with_curl = '--without-curl';
+          $enable_curl = 'OFF';
           say 'Disabling curl support.  You have Alien::curl, but it lacks a dynamic curl-config.';
         }
         else {
-          say 'Adding curl support';
-          $with_curl = "--with-curl";
+          say 'Adding curl support from system';
+          $enable_curl = "ON";
         }
       }
       else {
         say 'Disabling curl support.  You have Alien::curl, but it lacks a dynamic curl-config.';
         #  until we depend on an Alien::libcurl that provides a dynamic curl-config
-        $with_curl = '--without-curl';  
+        $enable_curl = 'OFF';  
       }
     }
   }
-  $config_args = "$with_local $with_cpp11 $with_tiff $with_curl $build_static $config_args";
 
   #meta->around_hook( build => \&_pkgconf_wrapper );
   plugin 'PkgConfig::PPWrapper';
   meta->around_hook( build => \&remove_gitfw_from_path );
+  meta->around_hook( build => \&update_cmake_lists_file );
 
   #  silence an undef warning
   say 'PKG_CONFIG_PATH:' . join ' ', grep {defined} @PKG_CONFIG_PATH;
-  
+
+  foreach my $env_var (qw /LD_LIBRARY_PATH LDFLAGS CFLAGS CXXFLAGS/) {
+    say "ENV: $env_var is " . ($ENV{$env_var} // '');
+  }
+
+  my $cmake_cmd = [
+    '%{cmake}',
+    -G => '%{cmake_generator}',
+    '-DCMAKE_MAKE_PROGRAM=%{make}',
+    #'-DBUILD_DOCUMENTATION=NO',
+    '-DBUILD_TESTING=OFF',
+    '-DBUILD_SHARED_LIBS=ON',
+    #'-DSQLITE3_INCLUDE_DIR=??',
+    #'-DSQLITE3_LIBRARY=??',
+    "-DENABLE_CURL=$enable_curl",
+    @curl_extra_args,
+    "-DENABLE_TIFF=$enable_tiff",
+    $enable_tiff ? () : (),
+    '-DBUILD_PROJSYNC=OFF',
+    #'-DENABLE_IPO=ON',
+    #'-DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=true',
+    '-DCMAKE_INSTALL_PREFIX:PATH=%{.install.prefix}',
+    '-DCMAKE_BUILD_TYPE=Release',
+    #'-DCMAKE_VERBOSE=ON',
+    '..'
+  ];
+    
   build [
     #\&pause,
-    "%{configure} $config_args",
+    'mkdir _build',
+    'cd _build',
+    $cmake_cmd,
     $make_cmd,
+    #($run_tests ? '%{make} test' : ()),
     $make_inst_cmd,
-    \&rename_la_files,
   ];
+
 
 };
 
@@ -315,23 +364,6 @@ sub update_pkg_conf_path {
     return;
 }
 
-sub rename_la_files {
-    #  need to return if not share
-    return if !$on_windows;
-    
-    use File::Find::Rule;
-    my @la_files
-      = File::Find::Rule->file()
-                        ->name( '*.la' )
-                        ->in( $base_dir );
-    foreach my $file (@la_files) {
-        say "Renaming $file so it will not interfere with gdal compilation";
-        rename $file, $file . '.bak';
-    }
-
-}
-
-
 sub pause {
     return;  #  re-enable in case of debug
     return if $on_automated_rig;
@@ -343,6 +375,56 @@ sub pause {
         $response = <>;
     }
 }
+
+sub update_cmake_lists_file {
+    my ($orig, $build, @args) = @_;
+
+    #  only needed on windows for v9.0.0 or earlier
+    return $orig->($build, @args)
+      if $on_windows and versioncmp (get_proj_version(), '9.0.0') < 0; 
+
+    $build->log ('updating CMakeLists.txt to properly handle proj.pc');
+    
+    #my $h = $build->install_prop;
+    #use Data::Printer;
+    #p $h;
+    
+    use File::Find::Rule;
+    my ($cmake_lists_file)
+      = File::Find::Rule
+                ->file()
+                ->name( 'CMakeLists.txt' )
+                ->in( $build->install_prop->{extract} );
+    #$build->log ("====\ncmake file: $cmake_lists_file \n ====");
+    open my $fh , '<', $cmake_lists_file
+      or die "Could not open $cmake_lists_file for reading, $!";
+    my $file_contents;
+
+    my $define_check = <<EOD
+if(NOT DEFINED CMAKE_INSTALL_LIBDIR)
+  set(CMAKE_INSTALL_LIBDIR lib)
+endif(NOT DEFINED CMAKE_INSTALL_LIBDIR)
+EOD
+  ;
+  
+    while (my $line = <$fh>) {
+        if ($line =~ /^\s*configure_proj_pc/) {
+#say STDERR "ADDING TO CMAKE LISTS"; 
+          $line .= $define_check;
+        }
+        $file_contents .= $line;
+    }
+    $fh->close;
+
+    rename $cmake_lists_file, "$cmake_lists_file.bak";
+    open my $ofh, '>', $cmake_lists_file
+      or die "Could not open $cmake_lists_file for writing, $!";
+    print {$ofh} $file_contents;
+    $ofh->close or die $!;
+
+    $orig->($build, @args);
+}
+
 
 
 sub get_proj_version {

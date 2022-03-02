@@ -27,4 +27,4 @@ Please note that accepted contributions are included in the repository and hence
 
 Please note that all contributions are acknowledged and contributors are mentioned by available identification, if you as a contributor would prefer not to be mentioned explicitly please indicate this, PR mechanics cannot be ignored.
 
-If you prefer to be mentioned in a specific manner other than by GitHub handle or similar please indicate this and accommodation will be attempted, limited only be the means available,
+If you prefer to be mentioned in a specific manner other than by GitHub handle or similar please indicate this and accommodation will be attempted, limited only by the means available,

@@ -1,5 +1,15 @@
 Change history for Sodium-FFI
 
+0.002     2022-03-01
+    - Added crypto_aead_aes256gcm_is_available
+    - Added crypto_aead_aes256gcm_keygen
+    - Added crypto_aead_aes256gcm_decrypt
+    - Added crypto_aead_aes256gcm_encrypt
+    - Added constants:
+      crypto_aead_aes256gcm_KEYBYTES,
+      crypto_aead_aes256gcm_ABYTES,
+      crypto_aead_aes256gcm_NPUBBYTES
+
 0.001     2022-01-20
     - Initial release
     - Helper functions

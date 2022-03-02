@@ -1,9 +1,7 @@
 ########################################################################
 # first sanity check: is the module usable.
 ########################################################################
-
 use v5.24;
-use strict;
 
 my $madness = 'Parallel::Queue::Manager';
 my $method  = 'new';

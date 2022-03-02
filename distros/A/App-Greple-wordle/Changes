@@ -1,5 +1,9 @@
 Revision history for Perl extension App-Greple-wordle
 
+0.03 2022-03-02T15:12:22Z
+
+    - implement showing keymap capability
+
 0.02 2022-02-26T03:46:50Z
 
     - use color same as original game

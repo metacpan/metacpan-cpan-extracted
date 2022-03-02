@@ -39,12 +39,21 @@ class AClass {
          'different' =~ m/^(.*)$/;
          is( $methodmeta->name, 'magic', '->add_method captures FETCH magic' );
       }
+
+      $classmeta->add_method( 'cmethod', common => 1, sub {
+         return "Classy result";
+      } );
    }
 }
 
 {
    my $obj = AClass->new;
    is( $obj->method, "result", '->method works' );
+}
+
+# common method
+{
+   is( AClass->cmethod, "Classy result", '->cmethod works' );
 }
 
 done_testing;

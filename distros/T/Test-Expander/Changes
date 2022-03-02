@@ -1,16 +1,19 @@
 Changelog for Test-Expander
 
+1.0.6 2022-03-02 11:32:43 UTC
+    - throws_ok fixed properly considering the difference between RegEx and scalar as expected value.
+
 1.0.5 2021-11-11 20:45:16 UTC
     - Skip unit tests of $METHOD / $METHOD_REF if these variables are undefined.
-		- Improve logging of $METHOD_REF.
+    - Improve logging of $METHOD_REF.
 
 1.0.4 2021-11-10 19:54:36 UTC
     - Make unit tests independent from directory structure (avoid automated determination of $METHOD / $METHOD_REF).
-		- Log exported and environment variables to STDOUT after their setup.
+    - Log exported and environment variables to STDOUT after their setup.
 
 1.0.3 2021-11-07 14:39:27 UTC
     - Use 'IO::Select' instead of self-implemented dummy class for testing.
-		- Propagate $VERSION to the submodule.
+    - Propagate $VERSION to the submodule.
 
 1.0.2 2021-11-05 19:54:23 UTC
     - Deactivate experimental features depending on Perl version.

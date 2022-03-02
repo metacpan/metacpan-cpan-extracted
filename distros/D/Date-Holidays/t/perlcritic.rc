@@ -372,14 +372,6 @@ verbose = 8
 # severity                           = 1
 # maximum_violations_per_document    = no_limit
 
-
-# Provide text to display with your pod links.
-[Documentation::RequirePodLinksIncludeText]
-# set_themes                         = core maintenance
-# add_themes                         =
-# severity                           = 2
-# maximum_violations_per_document    = no_limit
-
 # Allow external sections without text.
 # allow_external_sections = 1
 

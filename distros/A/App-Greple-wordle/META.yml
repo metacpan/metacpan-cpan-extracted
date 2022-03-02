@@ -26,7 +26,9 @@ no_index:
 provides:
   App::Greple::wordle:
     file: lib/App/Greple/wordle.pm
-    version: '0.02'
+    version: '0.03'
+  App::Greple::wordle::hint:
+    file: lib/App/Greple/wordle/hint.pm
   App::Greple::wordle::word_all:
     file: lib/App/Greple/wordle/word_all.pm
   App::Greple::wordle::word_hidden:
@@ -34,12 +36,15 @@ provides:
 requires:
   App::Greple: '8.5602'
   Date::Calc: '0'
+  Getopt::EX: v1.27.0
+  List::MoreUtils: '0'
+  List::Util: '0'
   perl: v5.14.0
 resources:
   bugtracker: https://github.com/kaz-utashiro/greple-wordle/issues
   homepage: https://github.com/kaz-utashiro/greple-wordle
   repository: https://github.com/kaz-utashiro/greple-wordle.git
-version: '0.02'
+version: '0.03'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'

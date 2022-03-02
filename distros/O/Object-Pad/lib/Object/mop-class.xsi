@@ -185,12 +185,17 @@ add_BUILD(self, code)
   }
 
 SV *
-add_method(self, mname, code)
+add_method(self, mname, ...)
     SV *self
     SV *mname
-    CV *code
   CODE:
   {
+    if(items < 3)
+      croak_xs_usage(cv, "self, mname, ..., code");
+    CV *code = (CV *)ST(items-1); items--;
+
+    dKWARG(2);
+
     /* Take a copy now to run FETCH magic */
     mname = sv_2mortal(newSVsv(mname));
 
@@ -201,6 +206,18 @@ add_method(self, mname, code)
     }
 
     MethodMeta *methodmeta = mop_class_add_method(meta, mname);
+
+    static const char *args[] = {
+      "common",
+      NULL
+    };
+    while(KWARG_NEXT(args)) {
+      switch(kwarg) {
+        case 0: /* common */
+          methodmeta->is_common = SvTRUE(kwval);
+          break;
+      }
+    }
 
     I32 klen = SvCUR(mname);
     if(SvUTF8(mname))

@@ -39,12 +39,12 @@
 #include "class.h"
 #include "field.h"
 
-typedef void AttributeHandler(pTHX_ void *target, const char *value, void *data);
+typedef void MethodAttributeHandler(pTHX_ MethodMeta *meta, const char *value, void *data);
 
-struct AttributeDefinition {
+struct MethodAttributeDefinition {
   char *attrname;
   /* TODO: int flags */
-  AttributeHandler *apply;
+  MethodAttributeHandler *apply;
   void *applydata;
 };
 
@@ -211,6 +211,28 @@ OP *ObjectPad_newMETHSTARTOP(pTHX_ U32 flags)
   return op;
 }
 
+static XOP xop_commonmethstart;
+static OP *pp_commonmethstart(pTHX)
+{
+  SV *self = av_shift(GvAV(PL_defgv));
+
+  if(SvROK(self))
+    /* TODO: Should handle this somehow */
+    croak("Cannot invoke common method on an instance");
+
+  save_clearsv(&PAD_SVl(PADIX_SELF));
+  sv_setsv(PAD_SVl(PADIX_SELF), self);
+
+  return PL_op->op_next;
+}
+
+OP *ObjectPad_newCOMMONMETHSTARTOP(pTHX_ U32 flags)
+{
+  OP *op = newOP_CUSTOM(&pp_commonmethstart, flags);
+  op->op_private = (U8)(flags >> 8);
+  return op;
+}
+
 static XOP xop_fieldpad;
 static OP *pp_fieldpad(pTHX)
 {
@@ -369,20 +391,26 @@ void inplace_trim_whitespace(SV *sv)
   dst[SvCUR(sv)] = 0;
 }
 
-static void S_check_method_override(pTHX_ struct XSParseSublikeContext *ctx, const char *val, void *_data)
+static void S_apply_method_common(pTHX_ MethodMeta *meta, const char *val, void *_data)
 {
-  if(!ctx->name)
+  meta->is_common = true;
+}
+
+static void S_apply_method_override(pTHX_ MethodMeta *meta, const char *val, void *_data)
+{
+  if(!meta->name)
     croak("Cannot apply :override to anonymous methods");
 
-  GV *gv = gv_fetchmeth_sv(compclassmeta->stash, ctx->name, 0, 0);
+  GV *gv = gv_fetchmeth_sv(compclassmeta->stash, meta->name, 0, 0);
   if(gv && GvCV(gv))
     return;
 
-  croak("Superclass does not have a method named '%" SVf "'", SVfARG(ctx->name));
+  croak("Superclass does not have a method named '%" SVf "'", SVfARG(meta->name));
 }
 
-static struct AttributeDefinition method_attributes[] = {
-  { "override", (AttributeHandler *)&S_check_method_override, NULL },
+static struct MethodAttributeDefinition method_attributes[] = {
+  { "common",   &S_apply_method_common,   NULL },
+  { "override", &S_apply_method_override, NULL },
   { 0 }
 };
 
@@ -730,7 +758,7 @@ static void setup_parse_has_initexpr(pTHX_ void *hookdata)
 }
 
 static const struct XSParseKeywordHooks kwhooks_has = {
-  .flags = XPK_FLAG_STMT|XPK_FLAG_AUTOSEMI,
+  .flags = XPK_FLAG_STMT,
   .permit_hintkey = "Object::Pad/has",
 
   .check = &check_has,
@@ -739,7 +767,7 @@ static const struct XSParseKeywordHooks kwhooks_has = {
     XPK_LEXVARNAME(XPK_LEXVAR_ANY),
     XPK_ATTRIBUTES,
     XPK_CHOICE(
-      XPK_SEQUENCE(XPK_EQUALS, XPK_TERMEXPR),
+      XPK_SEQUENCE(XPK_EQUALS, XPK_TERMEXPR, XPK_AUTOSEMI),
       XPK_PREFIXED_BLOCK_ENTERLEAVE(XPK_SETUP(&setup_parse_has_initexpr)),
       {0}
     ),
@@ -766,7 +794,7 @@ static const char *phasertypename[] = {
   [PHASER_ADJUSTPARAMS] = "ADJUSTPARAMS",
 };
 
-static bool parse_permit(pTHX_ void *hookdata)
+static bool parse_method_permit(pTHX_ void *hookdata)
 {
   if(!have_compclassmeta)
     croak("Cannot 'method' outside of 'class'");
@@ -778,7 +806,7 @@ static bool parse_permit(pTHX_ void *hookdata)
   return true;
 }
 
-static void parse_pre_subparse(pTHX_ struct XSParseSublikeContext *ctx, void *hookdata)
+static void parse_method_pre_subparse(pTHX_ struct XSParseSublikeContext *ctx, void *hookdata)
 {
   enum PhaserType type = PTR2UV(hookdata);
   U32 i;
@@ -855,19 +883,31 @@ static void parse_pre_subparse(pTHX_ struct XSParseSublikeContext *ctx, void *ho
 
   intro_my();
 
+  MethodMeta *compmethodmeta;
+  Newx(compmethodmeta, 1, MethodMeta);
+
+  compmethodmeta->name = SvREFCNT_inc(ctx->name);
+  compmethodmeta->class = NULL;
+  compmethodmeta->role  = NULL;
+  compmethodmeta->is_common = false;
+
+  hv_stores(ctx->moddata, "Object::Pad/compmethodmeta", newSVuv(PTR2UV(compmethodmeta)));
+
   LEAVE;
 }
 
-static bool parse_filter_attr(pTHX_ struct XSParseSublikeContext *ctx, SV *attr, SV *val, void *hookdata)
+static bool parse_method_filter_attr(pTHX_ struct XSParseSublikeContext *ctx, SV *attr, SV *val, void *hookdata)
 {
-  struct AttributeDefinition *def;
+  MethodMeta *compmethodmeta = NUM2PTR(MethodMeta *, SvUV(*hv_fetchs(ctx->moddata, "Object::Pad/compmethodmeta", 0)));
+
+  struct MethodAttributeDefinition *def;
   for(def = method_attributes; def->attrname; def++) {
     if(!strEQ(SvPVX(attr), def->attrname))
       continue;
 
     /* TODO: We might want to wrap the CV in some sort of MethodMeta struct
      * but for now we'll just pass the XSParseSublikeContext context */
-    (*def->apply)(aTHX_ ctx, SvPOK(val) ? SvPVX(val) : NULL, def->applydata);
+    (*def->apply)(aTHX_ compmethodmeta, SvPOK(val) ? SvPVX(val) : NULL, def->applydata);
 
     return true;
   }
@@ -876,8 +916,10 @@ static bool parse_filter_attr(pTHX_ struct XSParseSublikeContext *ctx, SV *attr,
   return false;
 }
 
-static void parse_post_blockstart(pTHX_ struct XSParseSublikeContext *ctx, void *hookdata)
+static void parse_method_post_blockstart(pTHX_ struct XSParseSublikeContext *ctx, void *hookdata)
 {
+  MethodMeta *compmethodmeta = NUM2PTR(MethodMeta *, SvUV(*hv_fetchs(ctx->moddata, "Object::Pad/compmethodmeta", 0)));
+
   /* Splice in the field scope CV in */
   CV *methodscope = compclassmeta->methodscope;
 
@@ -889,7 +931,17 @@ static void parse_post_blockstart(pTHX_ struct XSParseSublikeContext *ctx, void 
 
   CvOUTSIDE(PL_compcv) = methodscope;
 
-  extend_pad_vars(compclassmeta);
+  if(!compmethodmeta->is_common)
+    /* instance method */
+    extend_pad_vars(compclassmeta);
+  else {
+    /* :common method */
+    PADOFFSET padix;
+
+    padix = pad_add_name_pvs("$class", 0, NULL, NULL);
+    if(padix != PADIX_SELF)
+      croak("ARGH: Expected that padix[$class] = 1");
+  }
 
   if(compclassmeta->type == METATYPE_ROLE) {
     PAD *pad1 = PadlistARRAY(CvPADLIST(PL_compcv))[1];
@@ -908,7 +960,7 @@ static void parse_post_blockstart(pTHX_ struct XSParseSublikeContext *ctx, void 
   intro_my();
 }
 
-static void parse_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx, void *hookdata)
+static void parse_method_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx, void *hookdata)
 {
   enum PhaserType type = PTR2UV(hookdata);
   PADNAMELIST *fieldnames = PadlistNAMES(CvPADLIST(compclassmeta->methodscope));
@@ -917,10 +969,12 @@ static void parse_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx, void *ho
   PADNAME **padnames = PadnamelistARRAY(PadlistNAMES(CvPADLIST(PL_compcv)));
   OP *fieldops = NULL;
 
+  MethodMeta *compmethodmeta = NUM2PTR(MethodMeta *, SvUV(*hv_fetchs(ctx->moddata, "Object::Pad/compmethodmeta", 0)));
+
   /* If we have no ctx->body that means this was a bodyless method
    * declaration; a required method for a role
    */
-  if(ctx->body) {
+  if(ctx->body && !compmethodmeta->is_common) {
 #if HAVE_PERL_VERSION(5, 22, 0)
     U32 cop_seq_low = COP_SEQ_RANGE_LOW(padnames[PADIX_SELF]);
 #endif
@@ -1007,6 +1061,12 @@ static void parse_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx, void *ho
 
     ctx->body = op_append_list(OP_LINESEQ, fieldops, ctx->body);
   }
+  else if(ctx->body && compmethodmeta->is_common) {
+    ctx->body = op_append_list(OP_LINESEQ,
+      newCOMMONMETHSTARTOP(0 |
+        (compclassmeta->repr << 8)),
+      ctx->body);
+  }
 
   compclassmeta->methodscope = NULL;
 
@@ -1047,9 +1107,16 @@ static void parse_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx, void *ho
     ctx->actions &= ~XS_PARSE_SUBLIKE_ACTION_INSTALL_SYMBOL;
 }
 
-static void parse_post_newcv(pTHX_ struct XSParseSublikeContext *ctx, void *hookdata)
+static void parse_method_post_newcv(pTHX_ struct XSParseSublikeContext *ctx, void *hookdata)
 {
   enum PhaserType type = PTR2UV(hookdata);
+
+  MethodMeta *compmethodmeta;
+  {
+    SV *tmpsv = *hv_fetchs(ctx->moddata, "Object::Pad/compmethodmeta", 0);
+    compmethodmeta = NUM2PTR(MethodMeta *, SvUV(tmpsv));
+    sv_setuv(tmpsv, 0);
+  }
 
   if(ctx->cv)
     CvMETHOD_on(ctx->cv);
@@ -1066,8 +1133,11 @@ static void parse_post_newcv(pTHX_ struct XSParseSublikeContext *ctx, void *hook
 
   switch(type) {
     case PHASER_NONE:
-      if(ctx->cv && ctx->name && (ctx->actions & XS_PARSE_SUBLIKE_ACTION_INSTALL_SYMBOL))
-        mop_class_add_method(compclassmeta, ctx->name);
+      if(ctx->cv && ctx->name && (ctx->actions & XS_PARSE_SUBLIKE_ACTION_INSTALL_SYMBOL)) {
+        MethodMeta *meta = mop_class_add_method(compclassmeta, ctx->name);
+
+        meta->is_common = compmethodmeta->is_common;
+      }
       break;
 
     case PHASER_BUILD:
@@ -1100,6 +1170,9 @@ static void parse_post_newcv(pTHX_ struct XSParseSublikeContext *ctx, void *hook
   if(type != PHASER_NONE)
     /* Do not generate REFGEN/ANONCODE optree, do not yield expression */
     ctx->actions &= ~(XS_PARSE_SUBLIKE_ACTION_REFGEN_ANONCODE|XS_PARSE_SUBLIKE_ACTION_RET_EXPR);
+
+  SvREFCNT_dec(compmethodmeta->name);
+  Safefree(compmethodmeta);
 }
 
 static struct XSParseSublikeHooks parse_method_hooks = {
@@ -1107,22 +1180,22 @@ static struct XSParseSublikeHooks parse_method_hooks = {
                      XS_PARSE_SUBLIKE_COMPAT_FLAG_DYNAMIC_ACTIONS |
                      XS_PARSE_SUBLIKE_FLAG_BODY_OPTIONAL,
   .permit_hintkey  = "Object::Pad/method",
-  .permit          = parse_permit,
-  .pre_subparse    = parse_pre_subparse,
-  .filter_attr     = parse_filter_attr,
-  .post_blockstart = parse_post_blockstart,
-  .pre_blockend    = parse_pre_blockend,
-  .post_newcv      = parse_post_newcv,
+  .permit          = parse_method_permit,
+  .pre_subparse    = parse_method_pre_subparse,
+  .filter_attr     = parse_method_filter_attr,
+  .post_blockstart = parse_method_post_blockstart,
+  .pre_blockend    = parse_method_pre_blockend,
+  .post_newcv      = parse_method_post_newcv,
 };
 
 static struct XSParseSublikeHooks parse_phaser_hooks = {
   .flags           = XS_PARSE_SUBLIKE_COMPAT_FLAG_DYNAMIC_ACTIONS,
   .skip_parts      = XS_PARSE_SUBLIKE_PART_NAME|XS_PARSE_SUBLIKE_PART_ATTRS,
   /* no permit */
-  .pre_subparse    = parse_pre_subparse,
-  .post_blockstart = parse_post_blockstart,
-  .pre_blockend    = parse_pre_blockend,
-  .post_newcv      = parse_post_newcv,
+  .pre_subparse    = parse_method_pre_subparse,
+  .post_blockstart = parse_method_post_blockstart,
+  .pre_blockend    = parse_method_pre_blockend,
+  .post_newcv      = parse_method_post_newcv,
 };
 
 static int parse_phaser(pTHX_ OP **out, void *hookdata)
@@ -1188,14 +1261,51 @@ static int dump_fieldmeta(pTHX_ const SV *sv, FieldMeta *fieldmeta)
   sv_setpvf(label, "the Object::Pad field %s default value", name);
   ret += DMD_ANNOTATE_SV(sv, mop_field_get_default_sv(fieldmeta), SvPVX(label));
 
+  /* TODO: Maybe hunt for constants in the defaultexpr optree fragment? */
+
+  if(fieldmeta->paramname) {
+    sv_setpvf(label, "the Object::Pad field %s :param name", name);
+    ret += DMD_ANNOTATE_SV(sv, fieldmeta->paramname, SvPVX(label));
+  }
+
+  /* There's really nothing we can do about 'hooks' as in general we can't
+   * know what the hookfuncs are storing in there 
+   */
+
   SvREFCNT_dec(label);
+
+  return ret;
+}
+
+static int dump_methodmeta(pTHX_ const SV *sv, MethodMeta *methodmeta)
+{
+  int ret = 0;
+
+  const char *name = SvPVX(methodmeta->name);
+  SV *label = newSV(0);
+
+  sv_setpvf(label, "the Object::Pad method %s name", name);
+  ret += DMD_ANNOTATE_SV(sv, methodmeta->name, SvPVX(label));
+
+  SvREFCNT_dec(label);
+
+  return ret;
+}
+
+static int dump_adjustblock(pTHX_ const SV *sv, AdjustBlock *adjustblock)
+{
+  int ret = 0;
+
+  ret += DMD_ANNOTATE_SV(sv, (SV *)adjustblock->cv, "an Object::Pad adjustblock CV");
 
   return ret;
 }
 
 static int dumppackage_class(pTHX_ const SV *sv)
 {
+  I32 i;
   int ret = 0;
+
   ClassMeta *meta = NUM2PTR(ClassMeta *, SvUV((SV *)sv));
 
   ret += DMD_ANNOTATE_SV(sv, meta->name, "the Object::Pad class name");
@@ -1203,15 +1313,26 @@ static int dumppackage_class(pTHX_ const SV *sv)
   if(meta->pending_submeta)
     ret += DMD_ANNOTATE_SV(sv, (SV *)meta->pending_submeta, "the Object::Pad pending submeta AV");
 
-  I32 i;
+  ret += DMD_ANNOTATE_SV(sv, (SV *)meta->direct_fields, "the Object::Pad direct_fields AV");
   for(i = 0; i < av_count(meta->direct_fields); i++)
     ret += dump_fieldmeta(aTHX_ sv, (FieldMeta *)AvARRAY(meta->direct_fields)[i]);
+
+  ret += DMD_ANNOTATE_SV(sv, (SV *)meta->direct_methods, "the Object::Pad direct methods AV");
+  for(i = 0; i < av_count(meta->direct_methods); i++)
+    ret += dump_methodmeta(aTHX_ sv, (MethodMeta *)AvARRAY(meta->direct_methods)[i]);
+
+  ret += DMD_ANNOTATE_SV(sv, (SV *)meta->parammap, "the Object::Pad parammap HV");
 
   ret += DMD_ANNOTATE_SV(sv, (SV *)meta->initfields, "the Object::Pad initfields CV");
 
   ret += DMD_ANNOTATE_SV(sv, (SV *)meta->buildblocks, "the Object::Pad BUILD blocks AV");
+  /* elems are CVs directly */
 
-  ret += DMD_ANNOTATE_SV(sv, (SV *)meta->adjustblocks, "the Object::Pad ADJUST blocks AV");
+  if(meta->adjustblocks) {
+    ret += DMD_ANNOTATE_SV(sv, (SV *)meta->adjustblocks, "the Object::Pad ADJUST blocks AV");
+    for(i = 0; i < av_count(meta->adjustblocks); i++)
+      ret += dump_adjustblock(aTHX_ sv, (AdjustBlock *)AvARRAY(meta->adjustblocks)[i]);
+  }
 
   ret += DMD_ANNOTATE_SV(sv, (SV *)meta->methodscope, "the Object::Pad temporary method scope");
 
@@ -1224,6 +1345,7 @@ static int dumppackage_class(pTHX_ const SV *sv)
       break;
 
     case METATYPE_ROLE:
+      ret += DMD_ANNOTATE_SV(sv, (SV *)meta->role.superroles, "the Object::Pad role superroles AV");
       ret += DMD_ANNOTATE_SV(sv, (SV *)meta->role.applied_classes, "the Object::Pad role applied classes HV");
       break;
   }
@@ -1328,9 +1450,14 @@ register(class, name, ...)
 
 BOOT:
   XopENTRY_set(&xop_methstart, xop_name, "methstart");
-  XopENTRY_set(&xop_methstart, xop_desc, "methstart()");
+  XopENTRY_set(&xop_methstart, xop_desc, "enter method");
   XopENTRY_set(&xop_methstart, xop_class, OA_BASEOP);
   Perl_custom_op_register(aTHX_ &pp_methstart, &xop_methstart);
+
+  XopENTRY_set(&xop_commonmethstart, xop_name, "commonmethstart");
+  XopENTRY_set(&xop_commonmethstart, xop_desc, "enter method :common");
+  XopENTRY_set(&xop_commonmethstart, xop_class, OA_BASEOP);
+  Perl_custom_op_register(aTHX_ &pp_commonmethstart, &xop_commonmethstart);
 
   XopENTRY_set(&xop_fieldpad, xop_name, "fieldpad");
   XopENTRY_set(&xop_fieldpad, xop_desc, "fieldpad()");
@@ -1346,7 +1473,7 @@ BOOT:
   DMD_SET_PACKAGE_HELPER("Object::Pad::MOP::Class", &dumppackage_class);
 #endif
 
-  boot_xs_parse_keyword(0.10); /* XPK_OPTIONAL(XPK_CHOICE...) */
+  boot_xs_parse_keyword(0.22); /* XPK_AUTOSEMI */
 
   register_xs_parse_keyword("class", &kwhooks_class, (void *)METATYPE_CLASS);
   register_xs_parse_keyword("role",  &kwhooks_role,  (void *)METATYPE_ROLE);

@@ -5,22 +5,25 @@ use Async::Event::Interval;
 use Test::More;
 
 my $event = Async::Event::Interval->new(
-    2,
+    0.3,
     sub {
         kill 9, $$;
     },
 );
 
 $event->start;
+
 is $event->status > 0, 1, "status ok at start";
 
-sleep 1;
+select(undef, undef, undef, 0.6);
 
-is $event->status, -1, "upon crash, status return ok";
+is $event->status, 0, "upon crash, status return ok";
+is $event->error, 1, "upon crash, error return ok";
 
-if ($event->status == -1){
+if ($event->error){
     $event->restart;
     is $event->status > 0, 1, "after restart, status ok again";
+    is $event->error, 0, "...so is error";
 }
 
 done_testing();

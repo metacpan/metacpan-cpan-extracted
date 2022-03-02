@@ -5,7 +5,7 @@ use warnings;
 
 use parent 'Git::Lint::Check::Message';
 
-our $VERSION = '0.010';
+our $VERSION = '0.012';
 
 my $check_name        = 'summary ending period';
 my $check_description = 'summary must not end with a period';

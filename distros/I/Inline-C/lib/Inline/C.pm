@@ -1,6 +1,6 @@
 use strict; use warnings;
 package Inline::C;
-our $VERSION = '0.81';
+our $VERSION = '0.82';
 
 use Inline 0.56;
 use Config;
@@ -896,7 +896,8 @@ sub makefile_pl {
         or ($perl = $^X)
         or croak "Can't locate your perl binary";
     $perl = qq{"$perl"} if $perl =~ m/\s/;
-    $o->system_call("$perl Makefile.PL", 'out.Makefile_PL');
+    my @_inc = map qq{"-I$_"}, $o->derive_minus_I;
+    $o->system_call("$perl @_inc Makefile.PL", 'out.Makefile_PL');
     $o->fix_make;
 }
 sub make {

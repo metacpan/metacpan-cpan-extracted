@@ -10,7 +10,7 @@ use Scalar::Util qw(blessed);
 
 use vars qw($VERSION);
 
-$VERSION = '1.29';
+$VERSION = '1.30';
 
 sub new {
     my ($class, %params) = @_;
@@ -246,13 +246,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Date::Holidays::Adapter - an adapter class for Date::Holidays::* modules
 
 =head1 VERSION
 
-This POD describes version 1.25 of Date::Holidays::Adapter
+This POD describes version 1.30 of Date::Holidays::Adapter
 
 =head1 SYNOPSIS
 
@@ -418,12 +420,12 @@ Please refer to BUG REPORTING in L<Date::Holidays>
 
 =head1 AUTHOR
 
-Jonas B. Nielsen, (jonasbn) - C<< <jonasbn@cpan.org> >>
+Jonas Brømsø, (jonasbn) - C<< <jonasbn@cpan.org> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-L<Date::Holidays> and related modules are (C) by Jonas B. Nielsen, (jonasbn)
-2004-2020
+L<Date::Holidays> and related modules are (C) by Jonas Brømsø, (jonasbn)
+2004-2022
 
 Date-Holidays and related modules are released under the Artistic License 2.0
 

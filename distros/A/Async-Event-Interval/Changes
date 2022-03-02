@@ -1,4 +1,9 @@
-Revision history for Fork-Event-Interval
+Revision history for Async-Event-Interval
+
+1.05    2022-03-01
+    - We now wait interval time before executing the event for the first time
+    - Added error(), returns error status instead of using status() == -1
+    - status() no longer sets -1. We now use error() for that
 
 1.04    2021-05-11
     - Fix issue in t/45-params.t where done_testing() may have been called

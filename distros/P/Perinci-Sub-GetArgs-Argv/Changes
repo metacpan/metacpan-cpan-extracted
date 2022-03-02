@@ -1,3 +1,9 @@
+0.848   2022-03-02  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux] Order elements in 'func.missing_args' result metadata key
+          according to argument position.
+
+
 0.847   2021-09-30  Released-By: PERLANCAR; Urgency: medium
 
 	- [ux] Turn off warning about failing to parse as JSON/YAML.

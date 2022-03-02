@@ -7,7 +7,7 @@ use IPC::Shareable;
 use Test::More;
 
 my $mod = 'Async::Event::Interval';
-my $e = $mod->new(1, \&perform);
+my $e = $mod->new(0.5, \&perform);
 my $x = $mod->new(0, \&multi);
 
 my $scalar_a = $e->shared_scalar;
@@ -42,9 +42,5 @@ sub perform {
 sub multi {
     $$scalar_a = 'hello, world';
 }
-
-print Dumper Async::Event::Interval::events();
-
-print Dumper $e->info;
 
 done_testing();

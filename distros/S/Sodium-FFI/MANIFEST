@@ -16,6 +16,7 @@ t/00-report-prereqs.t
 t/10-versions.t
 t/11-utils.t
 t/12-random.t
+t/aead/aes256gcm.t
 xt/author/00-compile.t
 xt/author/pod-coverage.t
 xt/author/pod-spell.t

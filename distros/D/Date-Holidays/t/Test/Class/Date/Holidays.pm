@@ -1,13 +1,18 @@
 package Test::Class::Date::Holidays;
 
+## no critic (Subroutines::RequireFinalReturn, ValuesAndExpressions::ProhibitMagicNumbers)
+
 use strict;
 use warnings;
 use base qw(Test::Class);
 use Test::More; # done_testing
 use Test::Fatal qw(dies_ok);
-use Env qw($TEST_VERBOSE);
+use Env qw($TEST_VERBOSE $EXTENDED_TESTING);
 use Locale::Country; # all_country_codes
 use Test::MockModule;
+use English qw(-no_match_vars);
+
+our $VERSION = '1.29';
 
 #run prior and once per suite
 sub startup : Test(startup => 1) {
@@ -22,9 +27,9 @@ sub constructor : Test(5) {
     # Date::Holidays::DK
     SKIP: {
         eval { require Date::Holidays::DK };
-        skip "Date::Holidays::DK not installed", 5 if $@;
+        skip 'Date::Holidays::DK not installed', 5 if $EVAL_ERROR;
 
-        ok( my $dh = Date::Holidays->new( countrycode => 'DK', nocheck => 1 ) );
+        ok( my $dh = Date::Holidays->new( countrycode => 'DK', nocheck => 1 ), 'calling contructor with dk and nocheck' );
 
         isa_ok( $dh, 'Date::Holidays', 'checking wrapper object' );
 
@@ -42,9 +47,9 @@ sub _fetch : Test(2) {
     # Date::Holidays::DK
     SKIP: {
         eval { require Date::Holidays::DK };
-        skip "Date::Holidays::DK not installed", 2 if $@;
+        skip 'Date::Holidays::DK not installed', 2 if $EVAL_ERROR;
 
-        ok( my $dh = Date::Holidays->new( countrycode => 'DK' ) );
+        ok( my $dh = Date::Holidays->new( countrycode => 'DK' ), 'calling constructor with dk' );
 
         can_ok( $dh, '_fetch' );
     }
@@ -53,15 +58,15 @@ sub _fetch : Test(2) {
 sub _load : Test(1) {
 
     #Testing load with something from own distribution
-    ok(my $mod = Date::Holidays->_load('Date::Holidays::Adapter'));
+    ok(my $mod = Date::Holidays->_load('Date::Holidays::Adapter'), 'loading adapter');
 }
 
 sub is_holiday_dt : Test(3) {
     SKIP: {
         eval { require Date::Holidays::DK };
-        skip "Date::Holidays::DK not installed", 3 if $@;
+        skip 'Date::Holidays::DK not installed', 3 if $EVAL_ERROR;
 
-        ok( my $dh = Date::Holidays->new( countrycode => 'dk' ) );
+        ok( my $dh = Date::Holidays->new( countrycode => 'dk' ), 'calling constructor with dk' );
 
         my $dt = DateTime->new(
             year  => 2004,
@@ -70,7 +75,7 @@ sub is_holiday_dt : Test(3) {
         );
 
         #test 2
-        ok( $dh->is_holiday_dt($dt) );
+        ok( $dh->is_holiday_dt($dt), 'testing is_holiday_dt with DateTime object');
 
         $dt = DateTime->new(
             year  => 2004,
@@ -78,16 +83,16 @@ sub is_holiday_dt : Test(3) {
             day   => 15,
         );
 
-        ok( !$dh->is_holiday_dt($dt) );
+        ok( !$dh->is_holiday_dt($dt), 'testing is_holiday_dt with DateTime object');
     }
 }
 
 sub holidays_dt : Test(17) {
     SKIP: {
         eval { require Date::Holidays::DK };
-        skip "Date::Holidays::DK not installed", 17 if $@;
+        skip 'Date::Holidays::DK not installed', 17 if $EVAL_ERROR;
 
-        ok( my $dh = Date::Holidays->new( countrycode => 'dk' ) );
+        ok( my $dh = Date::Holidays->new( countrycode => 'dk' ), 'Calling constructor with dk' );
 
         my $dt = DateTime->new(
             year  => 2004,
@@ -95,12 +100,12 @@ sub holidays_dt : Test(17) {
             day   => 24,
         );
 
-        ok( my $hashref = $dh->holidays_dt( year => 2004 ) );
+        ok( my $hashref = $dh->holidays_dt( year => 2004 ), 'testing holidays_dt with DateTime object' );
 
-        is( keys %{$hashref}, 14 );
+        is( keys %{$hashref}, 14, 'asserting number of keys' );
 
         foreach my $dt ( keys %{$hashref} ) {
-            is( ref $hashref->{$dt}, 'DateTime' );
+            is( ref $hashref->{$dt}, 'DateTime', 'asserting type of result' );
         }
     }
 }
@@ -114,14 +119,15 @@ sub test_issue45 : Test(1) {
     $mock->redefine('_fetch', sub {
         my ($self, $params) = @_;
 
-        if ($params->{countrycode} eq 'SK') {
+        if ($params->{countrycode} and $params->{countrycode} eq 'SK') {
             return 'Date::Holidays::Adapter';
         } else {
             return $mock->original('_fetch')->($self, $params);
         }
     });
 
-    my @country_codes = all_country_codes();
+
+    my @country_codes = qw(SK);
 
     # Using the most common holiday
     my $holidays_hashref = Date::Holidays->is_holiday(
@@ -138,9 +144,9 @@ sub test_issue45 : Test(1) {
 sub test_at : Test(5) {
     SKIP: {
         eval { require Date::Holidays::AT };
-        skip "Date::Holidays::AT not installed", 5 if $@;
+        skip 'Date::Holidays::AT not installed', 5 if $EVAL_ERROR;
 
-        ok(! Date::Holidays::AT->can('is_holiday'));
+        ok(! Date::Holidays::AT->can('is_holiday'), 'Date::Holidays::AT does not implement is_holiday');
         can_ok('Date::Holidays::AT', qw(holidays));
 
         ok( my $dh = Date::Holidays->new( countrycode => 'at' ),
@@ -164,7 +170,7 @@ sub test_at : Test(5) {
 sub test_au : Test(7) {
     SKIP: {
         eval { require Date::Holidays::AU };
-        skip "Date::Holidays::AU not installed", 7 if $@;
+        skip 'Date::Holidays::AU not installed', 7 if $EVAL_ERROR;
 
         can_ok('Date::Holidays::AU', qw(holidays is_holiday));
 
@@ -191,7 +197,7 @@ sub test_au : Test(7) {
         ok( $holidays_hashref->{'au'},
             'Checking for Australian christmas' );
 
-        ok(my $au = Date::Holidays->new(countrycode => 'au'));
+        ok(my $au = Date::Holidays->new(countrycode => 'au'), 'calling constructor with au');
 
         ok($au->is_holiday(
             day   => 9,
@@ -205,7 +211,7 @@ sub test_au : Test(7) {
 sub test_aw : Test(7) {
     SKIP: {
         eval { require Date::Holidays::AW };
-        skip "Date::Holidays::AW not installed", 7 if $@;
+        skip 'Date::Holidays::AW not installed', 7 if $EVAL_ERROR;
 
         can_ok('Date::Holidays::AW', qw(holidays is_holiday));
 
@@ -234,7 +240,7 @@ sub test_aw : Test(7) {
 sub test_br : Test(4) {
     SKIP: {
         eval { require Date::Holidays::BR };
-        skip "Date::Holidays::BR not installed", 4 if $@;
+        skip 'Date::Holidays::BR not installed', 4 if $EVAL_ERROR;
 
         can_ok('Date::Holidays::BR', qw(holidays is_holiday));
 
@@ -259,7 +265,7 @@ sub test_br : Test(4) {
 sub test_by : Test(4) {
     SKIP: {
         eval { require Date::Holidays::BY };
-        skip "Date::Holidays::BY not installed", 4 if $@;
+        skip 'Date::Holidays::BY not installed', 4 if $EVAL_ERROR;
 
         can_ok('Date::Holidays::BY', qw(holidays is_holiday));
 
@@ -283,7 +289,7 @@ sub test_by : Test(4) {
 sub test_ca : Test(3) {
     SKIP: {
         eval { require Date::Holidays::CA };
-        skip "Date::Holidays::CA not installed", 3 if $@;
+        skip 'Date::Holidays::CA not installed', 3 if $EVAL_ERROR;
 
         can_ok('Date::Holidays::CA', qw(holidays is_holiday));
 
@@ -298,10 +304,10 @@ sub test_ca : Test(3) {
 sub test_cn : Test(6) {
     SKIP: {
         eval { require Date::Holidays::CN };
-        skip "Date::Holidays::CN not installed", 6 if $@;
+        skip 'Date::Holidays::CN not installed', 6 if $EVAL_ERROR;
 
-        ok(! Date::Holidays::CN->can('holidays'));
-        ok(! Date::Holidays::CN->can('is_holiday'));
+        ok(! Date::Holidays::CN->can('holidays'), 'Date::Holidays::CN does not implement holidays');
+        ok(! Date::Holidays::CN->can('is_holiday'), 'Date::Holidays::CN does not implement is_holiday');
 
         ok( my $dh = Date::Holidays->new( countrycode => 'cn' ),
             'Testing Date::Holidays::CN' );
@@ -331,7 +337,7 @@ sub test_cn : Test(6) {
 sub test_cz : Test(6) {
     SKIP: {
         eval { require Date::Holidays::CZ };
-        skip "Date::Holidays::CZ not installed", 6 if $@;
+        skip 'Date::Holidays::CZ not installed', 6 if $EVAL_ERROR;
 
         ok(Date::Holidays::CZ->can('holidays'), 'Is holidays method implemented');
         ok(! Date::Holidays::CZ->can('is_holiday'), 'Is is_holiday method implemented');
@@ -363,7 +369,7 @@ sub test_cz : Test(6) {
 sub test_de : Test(8) {
     SKIP: {
         eval { require Date::Holidays::DE };
-        skip "Date::Holidays::DE not installed", 8 if $@;
+        skip 'Date::Holidays::DE not installed', 8 if $EVAL_ERROR;
 
         ok(Date::Holidays::DE->can('holidays'), 'Is holidays method implemented');
         ok(! Date::Holidays::DE->can('is_holiday'), 'Is is_holiday method implemented');
@@ -397,7 +403,7 @@ sub test_de : Test(8) {
 sub test_dk : Test(6) {
     SKIP: {
         eval { require Date::Holidays::DK };
-        skip "Date::Holidays::DK not installed", 6 if $@;
+        skip 'Date::Holidays::DK not installed', 6 if $EVAL_ERROR;
 
         ok(! Date::Holidays::DK->can('holidays'), 'Is holidays method implemented');
         ok(! Date::Holidays::DK->can('is_holiday'), 'Is is_holiday method implemented');
@@ -429,7 +435,7 @@ sub test_dk : Test(6) {
 sub test_es : Test(11) {
     SKIP: {
         eval { require Date::Holidays::ES; require Date::Holidays::CA_ES; };
-        skip "Date::Holidays::ES or Date::Holidays::CA_ES not installed", 11 if $@;
+        skip 'Date::Holidays::ES or Date::Holidays::CA_ES not installed', 11 if $EVAL_ERROR;
 
         can_ok('Date::Holidays::ES', qw(holidays is_holiday));
         can_ok('Date::Holidays::CA_ES', qw(holidays is_holiday));
@@ -487,10 +493,10 @@ sub test_es : Test(11) {
 sub test_fr : Test(6) {
     SKIP: {
         eval { require Date::Holidays::FR };
-        skip "Date::Holidays::FR not installed", 6 if $@;
+        skip 'Date::Holidays::FR not installed', 6 if $EVAL_ERROR;
 
-        ok(! Date::Holidays::FR->can('holidays'));
-        ok(! Date::Holidays::FR->can('is_holiday'));
+        ok(! Date::Holidays::FR->can('holidays'), 'Date::Holidays::FR does not implement holidays');
+        ok(! Date::Holidays::FR->can('is_holiday'), 'Date::Holidays::FR does not implement is_holidays');
 
         ok( my $dh = Date::Holidays->new( countrycode => 'fr' ),
             'Testing Date::Holidays::FR' );
@@ -515,7 +521,7 @@ sub test_fr : Test(6) {
 sub test_gb : Test(10) {
     SKIP: {
         eval { require Date::Holidays::GB };
-        skip "Date::Holidays::GB not installed", 10 if $@;
+        skip 'Date::Holidays::GB not installed', 10 if $EVAL_ERROR;
 
         can_ok('Date::Holidays::GB', qw(holidays is_holiday));
 
@@ -530,13 +536,13 @@ sub test_gb : Test(10) {
 
         can_ok('Date::Holidays::GB', qw(holidays is_holiday));
 
-        ok( my $holidays_hashref_sct = Date::Holidays::GB::holidays(year => 2014, regions => ['SCT']));
+        ok( my $holidays_hashref_sct = Date::Holidays::GB::holidays(year => 2014, regions => ['SCT']), 'testing regional calendar SCT');
 
-        ok( my $holidays_hashref_eaw = Date::Holidays::GB::holidays(year => 2014, regions => ['EAW']));
+        ok( my $holidays_hashref_eaw = Date::Holidays::GB::holidays(year => 2014, regions => ['EAW']), 'testing regional calendar EAW');
 
-        ok( keys %{$holidays_hashref_eaw} != keys %{$holidays_hashref_sct});
+        ok( keys %{$holidays_hashref_eaw} != keys %{$holidays_hashref_sct}, 'asserting key count');
 
-        ok(my $gb = Date::Holidays->new(countrycode => 'gb'));
+        ok(my $gb = Date::Holidays->new(countrycode => 'gb'), 'calling constructor with gb');
 
         ok($gb->is_holiday(
             day   => 17,
@@ -550,7 +556,7 @@ sub test_gb : Test(10) {
 sub test_nl : Test(6) {
     SKIP: {
         eval { require Date::Holidays::NL };
-        skip "Date::Holidays::NL not installed", 6 if $@;
+        skip 'Date::Holidays::NL not installed', 6 if $EVAL_ERROR;
 
         can_ok('Date::Holidays::NL', qw(holidays is_holiday));
 
@@ -573,7 +579,7 @@ sub test_nl : Test(6) {
 sub test_no : Test(4) {
     SKIP: {
         eval { require Date::Holidays::NO };
-        skip "Date::Holidays::NO not installed", 4 if $@;
+        skip 'Date::Holidays::NO not installed', 4 if $EVAL_ERROR;
 
         can_ok('Date::Holidays::NO', qw(holidays is_holiday));
 
@@ -594,10 +600,10 @@ sub test_no : Test(4) {
 sub test_nz : Test(7) {
     SKIP: {
         eval { require Date::Holidays::NZ };
-        skip "Date::Holidays::NZ not installed", 7 if $@;
+        skip 'Date::Holidays::NZ not installed', 7 if $EVAL_ERROR;
 
-        ok(! Date::Holidays::NZ->can('holidays'));
-        ok(! Date::Holidays::NZ->can('is_holiday'));
+        ok(! Date::Holidays::NZ->can('holidays'), 'Date::Holidays::NZ does not implement holidays');
+        ok(! Date::Holidays::NZ->can('is_holiday'), 'Date::Holidays::NZ does not implement is_holiday');
 
         ok( my $dh = Date::Holidays->new( countrycode => 'nz' ),
             'Testing Date::Holidays::NZ' );
@@ -624,7 +630,7 @@ sub test_nz : Test(7) {
 sub test_pl : Test(5) {
     SKIP: {
         eval { require Date::Holidays::PL };
-        skip "Date::Holidays::PL not installed", 5 if $@;
+        skip 'Date::Holidays::PL not installed', 5 if $EVAL_ERROR;
 
         can_ok('Date::Holidays::PL', qw(holidays is_holiday));
 
@@ -652,7 +658,7 @@ sub test_pl : Test(5) {
 sub test_pt : Test(4) {
     SKIP: {
         eval { require Date::Holidays::PT };
-        skip "Date::Holidays::PT not installed", 4 if $@;
+        skip 'Date::Holidays::PT not installed', 4 if $EVAL_ERROR;
 
         can_ok('Date::Holidays::PT', qw(holidays is_holiday));
 
@@ -677,7 +683,7 @@ sub test_pt : Test(4) {
 sub test_ru : Test(4) {
     SKIP: {
         eval { require Date::Holidays::RU };
-        skip "Date::Holidays::RU not installed", 4 if $@;
+        skip 'Date::Holidays::RU not installed', 4 if $EVAL_ERROR;
 
         can_ok('Date::Holidays::RU', qw(holidays is_holiday));
 
@@ -701,10 +707,10 @@ sub test_ru : Test(4) {
 sub test_sk : Test(6) {
     SKIP: {
         eval { require Date::Holidays::SK };
-        skip "Date::Holidays::SK not installed", 6 if $@;
+        skip 'Date::Holidays::SK not installed', 6 if $EVAL_ERROR;
 
-        ok(! Date::Holidays::SK->can('is_holiday'));
-        ok(! Date::Holidays::SK->can('holidays'));
+        ok(! Date::Holidays::SK->can('is_holiday'), 'Date::Holidays::SK does not implement is_holiday');
+        ok(! Date::Holidays::SK->can('holidays'), 'Date::Holidays::SK does not implement holidays');
 
         ok( my $dh = Date::Holidays->new( countrycode => 'sk' ),
             'Testing Date::Holidays::SK' );
@@ -729,7 +735,7 @@ sub test_sk : Test(6) {
 sub test_uk : Test(4) {
     SKIP: {
         eval { require Date::Holidays::GB };
-        skip "Date::Holidays::GB not installed", 4 if $@;
+        skip 'Date::Holidays::GB not installed', 4 if $EVAL_ERROR;
 
         can_ok('Date::Holidays::GB', qw(holidays is_holiday));
 
@@ -747,10 +753,10 @@ sub test_uk : Test(4) {
 sub test_jp : Test(5) {
     SKIP: {
         eval { require Date::Japanese::Holiday };
-        skip "Date::Japanese::Holiday not installed", 5 if $@;
+        skip 'Date::Japanese::Holiday not installed', 5 if $EVAL_ERROR;
 
-        ok(!Date::Japanese::Holiday->can('holidays') );
-        ok( Date::Japanese::Holiday->can('is_holiday') );
+        ok(!Date::Japanese::Holiday->can('holidays'), 'Date::Japanese::Holiday does not implement holidays' );
+        can_ok('Date::Japanese::Holiday', qw(is_holiday) );
 
         ok( my $dh = Date::Holidays->new( countrycode => 'jp' ),
             'Testing Date::Japanese::Holiday' );
@@ -766,7 +772,7 @@ sub test_jp : Test(5) {
 sub test_kr : Test(5) {
     SKIP: {
         eval { require Date::Holidays::KR };
-        skip "Date::Holidays::KR not installed", 5 if $@;
+        skip 'Date::Holidays::KR not installed', 5 if $EVAL_ERROR;
 
         can_ok('Date::Holidays::KR', qw(holidays is_holiday));
 
@@ -793,7 +799,7 @@ sub test_kr : Test(5) {
 sub test_kz : Test(5) {
     SKIP: {
         eval { require Date::Holidays::KZ };
-        skip "Date::Holidays::KZ not installed", 5 if $@;
+        skip 'Date::Holidays::KZ not installed', 5 if $EVAL_ERROR;
 
         ok( Date::Holidays::KZ->can('holidays') );
         ok( Date::Holidays::KZ->can('is_holiday') );
@@ -818,7 +824,7 @@ sub test_kz : Test(5) {
 sub test_us : Test(8) {
     SKIP: {
         eval { require Date::Holidays::USFederal };
-        skip "Date::Holidays::USFederal not installed", 8 if $@;
+        skip 'Date::Holidays::USFederal not installed', 8 if $EVAL_ERROR;
 
         ok(! Date::Holidays::USFederal->can('holidays') );
         ok(! Date::Holidays::USFederal->can('is_holiday') );
@@ -859,7 +865,7 @@ sub test_us : Test(8) {
 sub test_ua : Test(5) {
     SKIP: {
         eval { require Date::Holidays::UA };
-        skip "Date::Holidays::UA not installed", 5 if $@;
+        skip 'Date::Holidays::UA not installed', 5 if $EVAL_ERROR;
 
         can_ok('Date::Holidays::UA', qw(holidays is_holiday));
 
@@ -878,10 +884,10 @@ sub test_ua : Test(5) {
 sub test_norway_and_denmark_combined : Test(6) {
     SKIP: {
         eval { load Date::Holidays::DK };
-        skip "Date::Holidays::DK not installed", 6 if ($@);
+        skip 'Date::Holidays::DK not installed', 6 if ($EVAL_ERROR);
 
         eval { load Date::Holidays::NO };
-        skip "Date::Holidays::NO not installed", 6 if ($@);
+        skip "Date::Holidays::NO not installed", 6 if ($EVAL_ERROR);
 
         my $dh = Date::Holidays->new( countrycode => 'dk' );
 
@@ -915,16 +921,18 @@ sub test_norway_and_denmark_combined : Test(6) {
 }
 
 sub test_without_object : Test(1) {
+    SKIP: {
+        skip 'Author test not enabled', 1 unless ($EXTENDED_TESTING);
+        my $holidays_hashref;
 
-    my $holidays_hashref;
-
-    ok( $holidays_hashref = Date::Holidays->is_holiday(
-            year  => 2014,
-            month => 12,
-            day   => 25,
-        ),
-        'Testing is_holiday called without an object'
-    );
+        ok( $holidays_hashref = Date::Holidays->is_holiday(
+                year  => 2014,
+                month => 12,
+                day   => 25,
+            ),
+            'Testing is_holiday called without an object'
+        );
+    }
 }
 
 1;

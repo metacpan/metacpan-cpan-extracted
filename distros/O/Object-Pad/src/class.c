@@ -18,6 +18,7 @@
 #include "force_list_keeping_pushmark.c.inc"
 #include "optree-additions.c.inc"
 #include "newOP_CUSTOM.c.inc"
+#include "cv_copy_flags.c.inc"
 
 #ifdef DEBUGGING
 #  define DEBUG_OVERRIDE_PLCURCOP
@@ -285,7 +286,10 @@ static CV *S_embed_cv(pTHX_ CV *cv, RoleEmbedding *embedding)
   assert(cv);
   assert(CvOUTSIDE(cv));
 
-  CV *embedded_cv = cv_clone(cv);
+  /* Perl core's cv_clone() would break in some situation here; see
+   *   https://rt.cpan.org/Ticket/Display.html?id=141483
+   */
+  CV *embedded_cv = cv_copy_flags(cv, 0);
   SV *embeddingsv = embedding->embeddingsv;
 
   assert(SvTYPE(embeddingsv) == SVt_PV && SvLEN(embeddingsv) >= sizeof(RoleEmbedding));
@@ -542,6 +546,7 @@ static RoleEmbedding *S_embed_role(pTHX_ ClassMeta *classmeta, ClassMeta *roleme
     {
       MethodMeta *dstmethodmeta = mop_class_add_method(classmeta, mname);
       dstmethodmeta->role = rolemeta;
+      dstmethodmeta->is_common = methodmeta->is_common;
     }
 
     GV **gvp = (GV **)hv_fetch(dststash, SvPVX(mname), SvCUR(mname), GV_ADD);

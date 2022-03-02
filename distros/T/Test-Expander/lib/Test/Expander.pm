@@ -1,7 +1,8 @@
 ## no critic (ProhibitStringyEval ProhibitSubroutinePrototypes RequireLocalizedPunctuationVars)
 package Test::Expander;
 
-our $VERSION = '1.0.5';                                     ## no critic (RequireUseStrict, RequireUseWarnings)
+# The versioning is conform with https://semver.org
+our $VERSION = '1.0.6';                                     ## no critic (RequireUseStrict, RequireUseWarnings)
 
 use v5.14;
 use warnings
@@ -175,8 +176,11 @@ sub throws_ok (&$;$) {
   my ($coderef, $expecting, $description) = @_;
 
   eval { $coderef->() };
+  my $exception    = $@;
+  my $expectedType = ref($expecting);
 
-  return like($@, qr/$expecting/, $description);
+  return $expectedType eq 'Regexp' ? like  ($exception,   $expecting,   $description)
+                                   : isa_ok($exception, [ $expecting ], $description);
 }
 
 sub use_ok ($;@) {

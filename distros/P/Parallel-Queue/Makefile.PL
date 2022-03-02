@@ -7,7 +7,7 @@ WriteMakefile
     qw
     (
         NAME            Parallel::Queue
-        VERSION         v4.0.1
+        VERSION         v4.0.2
         ABSTRACT_FROM   lib/Parallel/Queue.pm
         LICENSE         perl
     )

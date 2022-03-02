@@ -7,7 +7,7 @@ use Git::Lint::Config;
 use Try::Tiny;
 use Module::Loader;
 
-our $VERSION = '0.010';
+our $VERSION = '0.012';
 
 my $config;
 
@@ -30,6 +30,20 @@ sub config {
 sub run {
     my $self = shift;
     my $opt  = shift;
+
+    foreach my $required (qw{profile check}) {
+        die "git-lint: $required is required\n"
+            unless defined $opt->{$required};
+    }
+
+    if ( $opt->{check} ne 'message' && $opt->{check} ne 'commit' ) {
+        die "git-lint: check must be either message or commit\n";
+    }
+
+    if ( $opt->{check} eq 'message' ) {
+        die "git-lint: file is required if check is message\n"
+            unless defined $opt->{file};
+    }
 
     die 'git-lint: profile ' . $opt->{profile} . ' was not found' . "\n"
         unless exists $self->config->{profiles}{ $opt->{check} }{ $opt->{profile} };
@@ -86,7 +100,8 @@ Git::Lint - lint git commits and messages
  use Git::Lint;
 
  my $lint = Git::Lint->new();
- $lint->run({ profile => 'default' });
+ $lint->run({ check => 'commit', profile => 'default' });
+ $lint->run({ check => 'message', file => 'file_path', profile => 'default' });
 
  git-lint [--check commit] [--check message <message_file>]
           [--profile <name>]
@@ -118,11 +133,19 @@ Returns a reference to a new C<Git::Lint> object.
 
 Loads the check modules as defined by C<profile>.
 
-C<run> accepts the following arguments:
+C<run> expects the following arguments:
 
 B<profile>
 
 The name of a defined set of check modules to run.
+
+B<check>
+
+Either C<commit> or C<message>.
+
+B<file>
+
+If C<check> is C<message>, C<file> is required.
 
 =item config
 

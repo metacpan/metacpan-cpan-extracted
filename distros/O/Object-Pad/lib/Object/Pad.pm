@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2019-2022 -- leonerd@leonerd.org.uk
 
-package Object::Pad 0.61;
+package Object::Pad 0.62;
 
 use v5.14;
 use warnings;
@@ -420,7 +420,7 @@ the role.
 
    has $var = EXPR;
 
-   has $var { BLOCK };
+   has $var { BLOCK }
 
 Declares that the instances of the class or role have a member field of the
 given name. This member field will be accessible as a lexical variable within
@@ -659,6 +659,16 @@ I<Since version 0.29.>
 Marks that this method expects to override another of the same name from a
 superclass. It is an error at compiletime if the superclass does not provide
 such a method.
+
+=head3 :common
+
+I<Since version 0.62.>
+
+Marks that this method is a class-common method, instead of a regular instance
+method. A class-common method may be invoked on class names instead of
+instances. Within the method body there is a lexical C<$class> available,
+rather than C<$self>. Because it is not associated with a particular object
+instance, a class-common method cannot see instance fields.
 
 =head2 method (lexical)
 

@@ -3,7 +3,7 @@ package Async::Event::Interval;
 use warnings;
 use strict;
 
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 use Carp qw(croak);
 use IPC::Shareable;
@@ -31,6 +31,11 @@ sub new {
     $events{$self->id} = {};
 
     return $self;
+}
+sub error {
+    my ($self) = @_;
+    $self->status;
+    return $self->_pid && $self->_pid == -99 ? 1 : 0;
 }
 sub events {
     return \%events;
@@ -78,7 +83,7 @@ sub start {
     $self->_event;
 }
 sub status {
-    my $self = shift;
+    my ($self) = @_;
 
     if ($self->_started){
         if (! $self->_pid){
@@ -93,11 +98,9 @@ sub status {
                 # proc must have crashed
                 $self->_started(0);
                 $self->_pid(-99);
-                return -1;
             }
         }
     }
-    return -1 if defined $self->_pid && $self->_pid == -99;
     return 0;
 }
 sub stop {
@@ -120,7 +123,7 @@ sub stop {
 }
 sub waiting {
     my ($self) = @_;
-    return 1 if ! $self->status || $self->status == -1;
+    return 1 if $self->error || ! $self->status;
     return 0;
 }
 
@@ -145,7 +148,7 @@ sub _cb {
 }
 sub _event {
     my $self = shift;
-    
+
     for (0..1){
         my $pid = $self->_pm->start;
         if ($pid){
@@ -162,8 +165,8 @@ sub _event {
 
         if ($self->_interval) {
             while (1) {
-                $self->_cb->(@{$self->_args});
                 select(undef, undef, undef, $self->_interval);
+                $self->_cb->(@{$self->_args});
             }
         }
         else {
@@ -258,6 +261,8 @@ See L</EXAMPLES> for other various functionality of this module.
         print "$$shared_scalar_json\n" if defined $$shared_scalar_json;
 
         # Do other things
+
+        $event->restart if $event->error;
     }
 
     sub callback {
@@ -267,8 +272,8 @@ See L</EXAMPLES> for other various functionality of this module.
 =head1 DESCRIPTION
 
 Very basic implementation of asynchronous events with shared variables that are
-triggered by a timed interval. If no time is specified, we'll run the event only
-once.
+triggered by a timed interval. If a time of zero is specified, we'll run the
+event only once.
 
 =head1 METHODS
 
@@ -314,7 +319,12 @@ Alias for C<start()>. Re-starts a C<stop()>ped event.
 =head2 status
 
 Returns the event's process ID (true) if it is running, C<0> (false) if it
-isn't, and C<-1> if the event has crashed.
+isn't.
+
+=head2 error
+
+Returns true if an event crashed unexpectedly in the background, and false
+otherwise.
 
 =head2 waiting
 
@@ -431,13 +441,13 @@ shared variables, see L</shared_scalar>.
 
     use Async::Event::Interval;
 
-    my $event = Async::Event::Interval->new(2, sub { kill 9, $$; });
+    my $event = Async::Event::Interval->new(0.5, sub { kill 9, $$; });
 
     $event->start;
 
     sleep 1; # Do stuff
 
-    if ($event->status == -1){
+    if ($event->error){
         print "Event crashed, restarting\n";
         $event->restart;
     }
@@ -449,13 +459,13 @@ shared variables, see L</shared_scalar>.
 
     use Async::Event::Interval;
 
-    my $event = Async::Event::Interval->new(1.7, sub { kill 9, $$; });
+    my $event = Async::Event::Interval->new(0.5, sub { kill 9, $$; });
 
     $event->start;
 
     sleep 1; # Do stuff
 
-    die "Event crashed, can't continue" if $event->status == -1;
+    die "Event crashed, can't continue" if $event->error;
 
 =head1 AUTHOR
 
@@ -463,7 +473,7 @@ Steve Bertrand, C<< <steveb at cpan.org> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2021 Steve Bertrand.
+Copyright 2022 Steve Bertrand.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

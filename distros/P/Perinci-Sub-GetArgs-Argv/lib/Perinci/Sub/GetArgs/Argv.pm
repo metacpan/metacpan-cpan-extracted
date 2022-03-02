@@ -14,9 +14,9 @@ use Perinci::Sub::GetArgs::Array qw(get_args_from_array);
 use Perinci::Sub::Util qw(err);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-09-30'; # DATE
+our $DATE = '2022-03-02'; # DATE
 our $DIST = 'Perinci-Sub-GetArgs-Argv'; # DIST
-our $VERSION = '0.847'; # VERSION
+our $VERSION = '0.848'; # VERSION
 
 use Exporter;
 our @ISA = qw(Exporter);
@@ -1086,8 +1086,11 @@ sub get_args_from_argv {
 
     # 4. check missing required args
 
-    my %missing_args;
-    for my $arg (keys %$args_prop) {
+    my %missing_args; # value = order
+    my $i = 0;
+    for my $arg (sort {
+        (($args_prop->{$a}{pos}//9999) <=> ($args_prop->{$b}{pos}//9999)) ||
+            ($a cmp $b) } keys %$args_prop) {
         my $arg_spec = $args_prop->{$arg};
         if (!exists($rargs->{$arg})) {
             next unless $arg_spec->{req};
@@ -1096,7 +1099,7 @@ sub get_args_from_argv {
                 next if $on_missing->(arg=>$arg, args=>$rargs, spec=>$arg_spec);
             }
             next if exists $rargs->{$arg};
-            $missing_args{$arg} = 1;
+            $missing_args{$arg} = ++$i;
         }
     }
 
@@ -1119,7 +1122,7 @@ sub get_args_from_argv {
     #$log->tracef("<- get_args_from_argv(), args=%s, remaining argv=%s",
     #             $rargs, $argv);
     [200, "OK", $rargs, {
-        "func.missing_args" => [sort keys %missing_args],
+        "func.missing_args" => [sort {$missing_args{$a} <=> $missing_args{$b} } keys %missing_args],
         "func.gen_getopt_long_spec_result" => $genres,
     }];
 }
@@ -1139,7 +1142,7 @@ Perinci::Sub::GetArgs::Argv - Get subroutine arguments from command line argumen
 
 =head1 VERSION
 
-This document describes version 0.847 of Perinci::Sub::GetArgs::Argv (from Perl distribution Perinci-Sub-GetArgs-Argv), released on 2021-09-30.
+This document describes version 0.848 of Perinci::Sub::GetArgs::Argv (from Perl distribution Perinci-Sub-GetArgs-Argv), released on 2022-03-02.
 
 =head1 SYNOPSIS
 
@@ -1477,7 +1480,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Olivier Mengué Steven Haryanto (on PC)
+=for stopwords Olivier Mengué Steven Haryanto
 
 =over 4
 
@@ -1487,7 +1490,7 @@ Olivier Mengué <dolmen@cpan.org>
 
 =item *
 
-Steven Haryanto (on PC) <stevenharyanto@gmail.com>
+Steven Haryanto <stevenharyanto@gmail.com>
 
 =back
 
@@ -1510,7 +1513,7 @@ beyond that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2021, 2020, 2019, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

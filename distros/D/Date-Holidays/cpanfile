@@ -13,4 +13,5 @@ on test => sub {
     'Test::More', 0;
     'FindBin', 0;
     'Test::MockModule', 0;
+    'Test::Pod::Coverage', 0;
 };

@@ -1,3 +1,10 @@
+0.82 Wed  2 Mar 15:36:50 GMT 2022
+ - full release of -I to sub-Perls
+ - doc improvements from @oodler577
+
+0.81_001 Sun Jan 12 12:07:20 PST 2020
+ - Pass on correct -I flags to sub-Perls
+
 0.81 Sat 11 May 2019 12:46:41 PM CEST
  - test - Adjust excpected number of lines in log to Inline-0.82_001 (PR#89
    @ppisar++)

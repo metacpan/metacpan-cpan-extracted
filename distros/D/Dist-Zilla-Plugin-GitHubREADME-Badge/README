@@ -25,7 +25,7 @@ SYNOPSIS
         badges = gitlab_cover
         badges = docker_automated
         badges = docker_build
-        badges = github_actions/test
+        badges = github_actions/test.yml
         badges = cpancover
         place = bottom
         phase = release

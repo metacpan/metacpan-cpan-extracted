@@ -10,6 +10,19 @@
 #define _sint(name) c->set_sint(#name, name)
 #define _uint(name) c->set_uint(#name, name)
 
+#if (defined(__amd64) || defined(__amd64__) || defined(__x86_64__) ||          \
+     defined(__i386__) || defined(_M_AMD64) || defined(_M_IX86))
+#define HAVE_AESGCM 1
+#else
+#define HAVE_AESGCM 0
+#endif
+#if SODIUM_LIBRARY_VERSION_MAJOR > 9 ||                                        \
+  (SODIUM_LIBRARY_VERSION_MAJOR == 9 && SODIUM_LIBRARY_VERSION_MINOR >= 2)
+#define HAVE_AEAD_DETACHED 1
+#else
+#define HAVE_AEAD_DETACHED 0
+#endif
+
 void
 ffi_pl_bundle_constant(const char* package, ffi_platypus_constant_t* c)
 {
@@ -25,6 +38,13 @@ ffi_pl_bundle_constant(const char* package, ffi_platypus_constant_t* c)
     _sint(sodium_base64_VARIANT_ORIGINAL_NO_PADDING);
     _sint(sodium_base64_VARIANT_URLSAFE);
     _sint(sodium_base64_VARIANT_URLSAFE_NO_PADDING);
+
+    /* AESGCM stuff */
+    _sint(HAVE_AESGCM);
+    _sint(HAVE_AEAD_DETACHED);
+    _uint(crypto_aead_aes256gcm_KEYBYTES);
+    _uint(crypto_aead_aes256gcm_NPUBBYTES);
+    _uint(crypto_aead_aes256gcm_ABYTES);
 }
 
 void

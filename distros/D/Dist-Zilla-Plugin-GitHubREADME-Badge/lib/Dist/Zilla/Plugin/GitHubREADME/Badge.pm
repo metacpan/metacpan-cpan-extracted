@@ -3,7 +3,7 @@ package Dist::Zilla::Plugin::GitHubREADME::Badge;
 use strict;
 use warnings;
 use 5.008_005;
-our $VERSION = '0.34';
+our $VERSION = '0.35';
 
 use Moose;
 use Moose::Util::TypeConstraints qw(enum);
@@ -127,7 +127,7 @@ sub add_badges {
         } elsif ($badge eq 'docker_build') {
             push @badges, "[![Docker Build Status](https://img.shields.io/docker/build/\L$user_name/$repository_name\E.svg)](https://hub.docker.com/r/\L$user_name/$repository_name\E/)";
         } elsif ($badge =~ m{^github_actions/(.+)}) {
-            push @badges, "[![Actions Status](https://github.com/$user_name/$repository_name/workflows/$1/badge.svg)](https://github.com/$user_name/$repository_name/actions)";
+            push @badges, "[![Actions Status](https://github.com/$user_name/$repository_name/actions/workflows/$1/badge.svg)](https://github.com/$user_name/$repository_name/actions)";
         } elsif ($badge eq 'cpancover') {
             push @badges, "[![CPAN Cover Status](https://cpancoverbadge.perl-services.de/$distname-$dist_version)](https://cpancoverbadge.perl-services.de/$distname-$dist_version)";
         }
@@ -182,7 +182,7 @@ Dist::Zilla::Plugin::GitHubREADME::Badge - Dist::Zilla - add badges to github RE
     badges = gitlab_cover
     badges = docker_automated
     badges = docker_build
-    badges = github_actions/test
+    badges = github_actions/test.yml
     badges = cpancover
     place = bottom
     phase = release

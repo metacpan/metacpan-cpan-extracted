@@ -2,9 +2,10 @@ package Test::Class::Date::Holidays::Nonpolymorphic;
 
 use strict;
 use warnings;
-
 use base qw(Test::Class);
 use Test::More;
+
+our $VERSION = '1.29';
 
 my $month = 12;
 my $day   = 24;

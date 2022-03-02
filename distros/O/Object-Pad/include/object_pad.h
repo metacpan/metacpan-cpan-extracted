@@ -117,6 +117,9 @@ void ObjectPad_extend_pad_vars(pTHX_ const ClassMeta *meta);
 #define newMETHSTARTOP(flags)  ObjectPad_newMETHSTARTOP(aTHX_ flags)
 OP *ObjectPad_newMETHSTARTOP(pTHX_ U32 flags);
 
+#define newCOMMONMETHSTARTOP(flags)  ObjectPad_newCOMMONMETHSTARTOP(aTHX_ flags)
+OP *ObjectPad_newCOMMONMETHSTARTOP(pTHX_ U32 flags);
+
 /* op_private flags on FIELDPAD ops */
 enum {
   OPpFIELDPAD_SV,  /* has $x */

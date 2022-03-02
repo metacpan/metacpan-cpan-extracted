@@ -106,7 +106,7 @@ PDL::Graphics::Gnuplot - Gnuplot-based plotting for PDL
 
 This module allows PDL data to be plotted using Gnuplot as a backend
 for 2D and 3D plotting and image display.  Gnuplot (not affiliated
-with the Gnu project) is a venerable, open-source program that
+with the GNU project) is a venerable, open-source program that
 produces both interactive and publication-quality plots on many
 different output devices.  It is available through most Linux
 repositories, on MacOS, and from its website
@@ -116,6 +116,12 @@ It is not necessary to understand the gnuplot syntax to generate
 basic, or even complex, plots - though the full syntax is available
 for advanced users who want the full flexibility of the Gnuplot
 backend.
+
+For a very quick demonstration of the power of this module, see
+L<this YouTube demo video|https://www.youtube.com/watch?v=hUXDQL3rZ_0>,
+and others on visualisation of
+L<tesseract assembly|https://www.youtube.com/watch?v=ykQmNrSKqGQ> and
+L<rotation|https://www.youtube.com/watch?v=6tpsPYBrHy0>.
 
 Gnuplot recognizes both hard-copy and interactive plotting devices,
 and on interactive devices (like X11) it is possible to pan, scale,
@@ -2020,7 +2026,7 @@ our $echo_eating = 0;                             # Older versions of gnuplot on
 our $debug_echo = 0;                              # If set, mock up Losedows half-duplex pipes
 
 
-our $VERSION = '2.020';
+our $VERSION = '2.021';
 $VERSION = eval $VERSION;
 
 our $gp_version = undef;    # eventually gets the extracted gnuplot(1) version number.
@@ -7945,7 +7951,7 @@ sub _checkpoint {
 		barf <<"EOM";
 Hmmm, my $suffix Gnuplot process didn't respond for $delay seconds.
 I've kicked it with an interrupt signal, which should help with the
-next thing you try to do.  If you expect slow response fron gnuplot,
+next thing you try to do.  If you expect slow response from gnuplot,
 you can adjust the timeout with the "wait" terminal option.
 EOM
 	    }

@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2020 -- leonerd@leonerd.org.uk
 
-package Object::Pad::MOP::Method 0.61;
+package Object::Pad::MOP::Method 0.62;
 
 use v5.14;
 use warnings;
@@ -37,6 +37,15 @@ Returns the name of the method, as a plain string.
 
 Returns the L<Object::Pad::MOP::Class> instance representing the class of
 which this method is a member.
+
+=head2 is_common
+
+   $bool = $metamethod->is_common
+
+I<Since version 0.62.>
+
+Returns true if the method is a class-common method, or false for a regular
+instance method.
 
 =cut
 

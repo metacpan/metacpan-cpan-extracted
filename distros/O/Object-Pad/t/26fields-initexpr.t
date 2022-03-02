@@ -11,7 +11,7 @@ use Object::Pad;
 {
    class SerialNumbered {
       my $next_seq = 1;
-      has $seq :reader { $next_seq++ };
+      has $seq :reader { $next_seq++ }
    }
 
    is( SerialNumbered->new->seq, 1, 'first instance 1' );
@@ -32,9 +32,9 @@ use Object::Pad;
 {
    my @inited;
    class WithThreeFields {
-      has $x { push @inited, "x" };
-      has $y { push @inited, "y" };
-      has $z { push @inited, "z" };
+      has $x { push @inited, "x" }
+      has $y { push @inited, "y" }
+      has $z { push @inited, "z" }
    }
 
    WithThreeFields->new;
@@ -45,8 +45,8 @@ use Object::Pad;
 {
    my %init_called;
    class WithParams {
-      has $one :param :reader { $init_called{one} = 1 };
-      has $two :param :reader { $init_called{two} = 2 };
+      has $one :param :reader { $init_called{one} = 1 }
+      has $two :param :reader { $init_called{two} = 2 }
    }
 
    my $obj = WithParams->new( one => 11 );

@@ -4,9 +4,11 @@ LICENSE
 META.json
 README.md
 cpanfile
+images/screen-2.png
 images/screen.png
 lib/App/Greple/wordle.pm
 lib/App/Greple/wordle.pod
+lib/App/Greple/wordle/hint.pm
 lib/App/Greple/wordle/word_all.pm
 lib/App/Greple/wordle/word_hidden.pm
 minil.toml

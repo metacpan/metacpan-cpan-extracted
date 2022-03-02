@@ -93,4 +93,15 @@ class EClass :does(ERole) {
    is( $obj->two, 2, 'EClass has a ->two method' );
 }
 
+role FRole {
+   method onetwothree :common { 123 }
+}
+
+class FClass :does(FRole) {
+}
+
+{
+   is( FClass->onetwothree, 123, 'FClass has a :common ->onetwothree method' );
+}
+
 done_testing;

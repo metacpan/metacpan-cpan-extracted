@@ -1,5 +1,12 @@
 Revision history for perl module Git::Lint
 
+0.012 2022-03-02
+ - Correct missing changelog entry
+
+0.011 2022-03-01
+ - Update documentation
+ - Add argument verification for run method
+
 0.010 2022-02-28
  - Override user_config in new.t
  - Add CONTRIBUTING.md file

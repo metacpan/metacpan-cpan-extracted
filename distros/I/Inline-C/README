@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    This document describes Inline::C version 0.81.
+    This document describes Inline::C version 0.82.
 
 DESCRIPTION
 
@@ -515,7 +515,7 @@ EXAMPLES
     as a SV* (pointer to Scalar Value) rather than a string (char*). That
     means we need to convert the SV to a string ourselves. This is
     accomplished using the SvPVX function which is part of the Perl
-    internal API. See perldoc perlapi for more info.
+    internal API. See perldocperlapi for more info.
 
     One problem is that SvPVX doesn't automatically convert strings to
     numbers, so we get a little surprise when we try to greet 42. The
@@ -580,7 +580,7 @@ AUTHORS
 
 COPYRIGHT AND LICENSE
 
-    Copyright 2000-2019. Ingy döt Net.
+    Copyright 2000-2022. Ingy döt Net.
 
     Copyright 2008, 2010-2014. Sisyphus.
 

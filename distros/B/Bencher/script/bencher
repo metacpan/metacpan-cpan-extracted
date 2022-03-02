@@ -1,13 +1,15 @@
 #!perl
 
-our $DATE = '2021-08-13'; # DATE
-our $VERSION = '1.060'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
 
 use Perinci::CmdLine::Any;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-02-08'; # DATE
+our $DIST = 'Bencher'; # DIST
+our $VERSION = '1.061'; # VERSION
 
 binmode(STDOUT, ":encoding(utf8)");
 Perinci::CmdLine::Any->new(
@@ -32,9 +34,143 @@ bencher - A benchmark framework (CLI)
 
 =head1 VERSION
 
-This document describes version 1.060 of bencher (from Perl distribution Bencher), released on 2021-08-13.
+This document describes version 1.061 of bencher (from Perl distribution Bencher), released on 2022-02-08.
 
 =head1 SYNOPSIS
+
+=head2 Examples
+
+First, install scenario module L<Bencher::Scenario::StringFunctions::Trim> to
+run the examples.
+
+Let's see which participants (functions, in this case) are included in the
+scenario:
+
+ % bencher -m StringFunctions::Trim --list-participants
+ String::Trim::More::trim
+ String::Trim::NonRegex::trim
+ String::Trim::Regex::trim
+ String::Util::trim
+ Text::Minify::XS::minify
+
+What datasets are used?
+
+ % bencher -m StringFunctions/Trim --list-datasets
+ empty
+ len10ws1
+ len100ws1
+ len100ws10
+ len100ws100
+ len1000ws1
+ len1000ws10
+ len1000ws100
+ len1000ws1000
+
+To see the scenario in more detail, let's dump it:
+
+ % bencher -m StringFunctions::Trim --dump-parsed-scenario
+ ...
+
+Let's see how the functions will trim the data C<len100ws10>:
+
+ % bencher -m StringFunctions/Trim --show-items-codes --include-dataset-name len10ws1
+ #0 (participant=String::Trim::More::trim):
+ package main; sub { String::Trim::More::trim(" xxxxxxxxxx ") }
+
+ #1 (participant=String::Trim::NonRegex::trim):
+ package main; sub { String::Trim::NonRegex::trim(" xxxxxxxxxx ") }
+
+ #2 (participant=String::Trim::Regex::trim):
+ package main; sub { String::Trim::Regex::trim(" xxxxxxxxxx ") }
+
+ #3 (participant=String::Util::trim):
+ package main; sub { String::Util::trim(" xxxxxxxxxx ") }
+
+ #4 (participant=Text::Minify::XS::minify):
+ package main; sub { Text::Minify::XS::minify(" xxxxxxxxxx ") }
+
+Let's first check whether those functions do the job correctly:
+
+ % bencher -m StringFunctions/Trim --show-items-results --include-dataset-name len10ws1
+ #0 (participant=String::Trim::More::trim):
+ "xxxxxxxxxx"
+
+ #1 (participant=String::Trim::NonRegex::trim):
+ "xxxxxxxxxx"
+
+ #2 (participant=String::Trim::Regex::trim):
+ "xxxxxxxxxx"
+
+ #3 (participant=String::Util::trim):
+ "xxxxxxxxxx"
+
+ #4 (participant=Text::Minify::XS::minify):
+ "xxxxxxxxxx"
+
+Let's do the actual benchmark:
+
+ % bencher -m StringFunctions/Trim --include-dataset-name len10ws1
+ # Run on: perl v5.34.0, CPU Intel(R) Core(TM) i5-7200U CPU @ 2.50GHz (2 cores), OS GNU/Linux Ubuntu version 20.04, OS kernel: Linux version 5.4.0-91-generic
+ # Elapsed time: 0.13s
+ +------------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+ | participant                  | rate (/s) | time (ns) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
+ +------------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+ | String::Util::trim           |    802126 |  1246.69  |                 0.00% |               651.62% |   0     |      20 |
+ | String::Trim::Regex::trim    |    813180 |  1229.7   |                 1.38% |               641.40% | 1.1e-11 |      20 |
+ | String::Trim::NonRegex::trim |    971000 |  1030     |                21.07% |               520.80% | 3.5e-10 |      28 |
+ | String::Trim::More::trim     |   1250860 |   799.448 |                55.94% |               381.98% |   0     |      20 |
+ | Text::Minify::XS::minify     |   6030000 |   166     |               651.62% |                 0.00% | 1.1e-10 |      20 |
+ +------------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+
+Let's see how Text::Minify::XS::minify perform on the different datasets:
+
+ % bencher -m StringFunctions/Trim --include-participant-name Text::Minify::XS::minify
+ # Run on: perl v5.34.0, CPU Intel(R) Core(TM) i5-7200U CPU @ 2.50GHz (2 cores), OS GNU/Linux Ubuntu version 20.04, OS kernel: Linux version 5.4.0-91-generic
+ # Elapsed time: 0.18s
+ +---------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+ | dataset       | rate (/s) | time (μs) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
+ +---------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+ | len1000ws1000 |    194823 |   5.13285 |                 0.00% |              3974.38% |   0     |      20 |
+ | len1000ws100  |    426100 |   2.347   |               118.72% |              1762.85% | 3.9e-11 |      27 |
+ | len1000ws10   |    500000 |   2       |               154.42% |              1501.46% | 2.5e-09 |      20 |
+ | len1000ws1    |    520000 |   1.9     |               164.59% |              1439.91% | 6.4e-09 |      22 |
+ | len100ws100   |   1528000 |   0.6545  |               684.30% |               419.49% | 4.6e-11 |      20 |
+ | len100ws10    |   2690000 |   0.372   |              1279.83% |               195.28% | 4.6e-11 |      27 |
+ | len100ws1     |   2950000 |   0.339   |              1413.54% |               169.20% | 4.4e-11 |      20 |
+ | len10ws1      |   6130000 |   0.163   |              3045.75% |                29.52% | 1.1e-10 |      20 |
+ | empty         |   7940000 |   0.126   |              3974.38% |                 0.00% | 6.3e-11 |      30 |
+ +---------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+
+The result data is actually a data structure. You can show it as JSON and save it somewhere:
+
+ % bencher -m StringFunctions/Trim --include-participant-name Text::Minify::XS::minify --format json
+ % bencher -m StringFunctions/Trim --include-participant-name Text::Minify::XS::minify --json         ;# same thing
+ [
+    200,
+    "OK",
+    [
+      {
+         "dataset" : "empty",
+         "ds_tags" : "",
+         "errors" : 1.99650629822291e-10,
+         "notes" : "",
+         "p_tags" : "",
+         "participant" : "Text::Minify::XS::minify",
+         "perl" : "perl",
+         "rate" : 7666873.39865677,
+         "samples" : 34,
+         "seq" : 0,
+         "time" : 1.30431265524118e-07
+      },
+      ...
+
+ % bencher -m StringFunctions/Trim --include-participant-name Text::Minify::XS::minify --json > /path/to/result1.json
+
+Later when you want to display it again, you can use L<bencher-fmt>:
+
+ % bencher-fmt < /path/to/result1.json
+
+=head2 Available subcommands
 
 List all scenario modules (Bencher::Scenario::*) installed locally on your
 system:
@@ -1288,7 +1424,7 @@ For fish and zsh, install L<shcompgen> as described above.
 
 This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
 
-By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F<~/.config/bencher.conf>, F<~/bencher.conf>, or F</etc/bencher.conf>.
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F</home/u1/.config/xbqEe1pUBq.conf>, F</home/u1/xbqEe1pUBq.conf>, or F</etc/xbqEe1pUBq.conf>.
 
 All found files will be read and merged.
 
@@ -1399,7 +1535,7 @@ List of available configuration parameters:
 
 =head1 ENVIRONMENT
 
-=head2 BENCHER_OPT => str
+=head2 XBQEE1PUBQ_OPT => str
 
 Specify additional command-line options.
 
@@ -1409,11 +1545,11 @@ Set default for C<--results-dir>.
 
 =head1 FILES
 
-F<~/.config/bencher.conf>
+F</home/u1/.config/xbqEe1pUBq.conf>
 
-F<~/bencher.conf>
+F</home/u1/xbqEe1pUBq.conf>
 
-F</etc/bencher.conf>
+F</etc/xbqEe1pUBq.conf>
 
 =head1 HOMEPAGE
 
@@ -1422,14 +1558,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Bencher>.
 =head1 SOURCE
 
 Source repository is at L<https://github.com/perlancar/perl-Bencher>.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Bencher>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
 
 =head1 SEE ALSO
 
@@ -1464,9 +1592,17 @@ beyond that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Bencher>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

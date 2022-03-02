@@ -78,6 +78,7 @@ struct MethodMeta {
   ClassMeta *class;
   ClassMeta *role;   /* set if inherited from a role */
   /* We don't store the method body CV; leave that in the class stash */
+  unsigned int is_common : 1;
 };
 
 typedef struct ParamMeta {

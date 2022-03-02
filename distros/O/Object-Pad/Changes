@@ -1,16 +1,28 @@
 Revision history for Object-Pad
 
+0.62    2022-03-01
+        [CHANGES]
+         * Add "common" methods:
+            + Implement `:common` attribute for methods
+            + Take 'common' argument to `$metaclass->add_method`
+            + Added `$metamethod->is_common` accessor
+         * Don't require a terminating semicolon after `has $field { EXPR }`
+
+        [BUGFIXES]
+         * Better handling of role method embeddings that include lexical
+           captures (RT141483)
+
 0.61    2022-02-16
         [CHANGES]
          * Added Object::Pad::MOP::Class->create_{class,role}
-         * Added $metaclass->seal (RT131294)
+         * Added $metaclass->seal (RT141294)
          * Added $metaclass->add_required_method and ->required_method_names
            (RT141314)
          * Accept bodyless `method NAME;` declarations to declare a required
            role method
 
         [BUGFIXES]
-         * Assert when compclassmeta->name doesn't match PL_curstname (RT131293)
+         * Assert when compclassmeta->name doesn't match PL_curstname (RT141293)
 
 0.60    2022-02-01
         [CHANGES]

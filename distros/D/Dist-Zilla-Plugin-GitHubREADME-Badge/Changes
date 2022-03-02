@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-Plugin-GitHubREADME-Badge
 
+0.35  2022-03-02 10:42:50 CST
+        - fix GitHub actions link (oalders)
+
 0.34  2022-03-01 12:02:26 CST
         - add 'branch' in config
 

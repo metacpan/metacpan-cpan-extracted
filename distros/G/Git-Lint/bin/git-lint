@@ -10,7 +10,7 @@ use Getopt::Long ();
 use Pod::Usage   ();
 use Git::Lint;
 
-my $VERSION = '0.010';
+my $VERSION = '0.012';
 
 my %opt = (
     profile => 'default',
@@ -80,9 +80,11 @@ C<git-lint> is the commandline interface to L<Git::Lint>, a pluggable framework 
 
 =item --check
 
-Run either check mode commit or message.
+Run either check type C<commit> or C<message>.
 
-If check type is message, C<git-lint> expects the file path of the commit message to check as an unnamed option.
+If check type is C<message>, C<git-lint> expects the file path of the commit message to check as an unnamed option.
+
+ git-lint --check message message_file
 
 =item --profile
 

@@ -194,7 +194,7 @@ Please report any bugs or feature requests through the web interface at
 
 # COPYRIGHT AND LICENSE
 
-Copyright (c) 2021 Jurij Fajnberg
+Copyright (c) 2021, 2022 Jurij Fajnberg
 
 This program is free software; you can redistribute it and/or modify it under the same terms
 as the Perl 5 programming language system itself.

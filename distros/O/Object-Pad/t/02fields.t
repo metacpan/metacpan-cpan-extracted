@@ -13,7 +13,7 @@ use constant HAVE_DATA_DUMP => defined eval { require Data::Dump; };
 class Counter {
    has $count = 0;
 
-   method inc { $count++ };
+   method inc { $count++ }
 
    method describe { "Count is now $count" }
 }
@@ -68,9 +68,9 @@ class Counter {
 
 {
    class AllTheTypesByBlock {
-      has $scalar { "one" };
-      has @array  { "two", "three" };
-      has %hash   { four => "five" };
+      has $scalar { "one" }
+      has @array  { "two", "three" }
+      has %hash   { four => "five" }
 
       method test {
          Test::More::is( $scalar, "one", '$scalar field' );
@@ -114,7 +114,7 @@ class Holder {
    class Sequencing {
       has $at_BEGIN = "BEGIN";
       has $at_class = ::seq("class");
-      has $at_construct { ::seq("construct") };
+      has $at_construct { ::seq("construct") }
 
       method test {
          ::is( $at_BEGIN, "BEGIN", '$at_BEGIN set correctly' );

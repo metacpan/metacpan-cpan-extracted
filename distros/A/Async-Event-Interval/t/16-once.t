@@ -15,7 +15,9 @@ $e->start;
 
 sleep 1;
 
-is $e->status, -1, "Zero as interval runs event only once";
+is $e->status, 0, "Zero as interval sets status to complete (0)";
+is $e->error, 1, "Zero as interval sets error to true";
+is $e->_pid, -99, "Zero as interval sets _pid to -99";
 is $e->waiting, 1, "Zero as interval sets waiting to true";
 
 $e->start;

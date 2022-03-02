@@ -23,12 +23,21 @@ typedef AV PADNAMELIST;
 typedef SV PADNAME;
 #  define PadnamePV(pn)           (SvPOKp(pn) ? SvPVX(pn) : NULL)
 #  define PadnameLEN(pn)          SvCUR(pn)
+#  define PadnameIsSTATE(pn)      (!!SvPAD_STATE(pn))
 #  define PadnameOUTER(pn)        (SvFAKE(pn) && !SvPAD_STATE(pn))
 #  define PadnamelistARRAY(pnl)   AvARRAY(pnl)
 #  define PadnamelistMAX(pnl)     AvFILLp(pnl)
 
 #  define PadARRAY(p)             AvARRAY(p)
 #  define PadMAX(pad)             AvFILLp(pad)
+#endif
+
+#if !HAVE_PERL_VERSION(5, 22, 0)
+#  define CvPADLIST_set(cv, padlist)  (CvPADLIST(cv) = padlist)
+#endif
+
+#ifndef av_count
+#  define av_count(av)           (AvFILL(av) + 1)
 #endif
 
 #ifndef av_top_index

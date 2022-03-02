@@ -3,9 +3,9 @@ NAME
     arguments (@ARGV)
 
 VERSION
-    This document describes version 0.847 of Perinci::Sub::GetArgs::Argv
+    This document describes version 0.848 of Perinci::Sub::GetArgs::Argv
     (from Perl distribution Perinci-Sub-GetArgs-Argv), released on
-    2021-09-30.
+    2022-03-02.
 
 SYNOPSIS
      use Perinci::Sub::GetArgs::Argv;
@@ -339,7 +339,7 @@ AUTHOR
 CONTRIBUTORS
     *   Olivier Mengué <dolmen@cpan.org>
 
-    *   Steven Haryanto (on PC) <stevenharyanto@gmail.com>
+    *   Steven Haryanto <stevenharyanto@gmail.com>
 
 CONTRIBUTING
     To contribute, you can send patches by email/via RT, or send pull
@@ -358,8 +358,8 @@ CONTRIBUTING
     me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021, 2020, 2019, 2017, 2016, 2015, 2014,
-    2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
+    This software is copyright (c) 2022, 2021, 2020, 2019, 2017, 2016, 2015,
+    2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

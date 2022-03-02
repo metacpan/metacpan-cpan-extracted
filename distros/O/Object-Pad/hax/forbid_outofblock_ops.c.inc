@@ -1,5 +1,9 @@
 /* vi: set ft=c : */
 
+#if !HAVE_PERL_VERSION(5, 16, 0)
+#  define CopLABEL_len_flags(c,len,flags)    Perl_fetch_cop_label(aTHX_ (c), len, flags)
+#endif
+
 enum {
   FORBID_LOOPEX_DEFAULT = (1<<0),
 };
@@ -37,8 +41,10 @@ static void walk_ops_forbid(pTHX_ OP *o, U32 flags, HV *permittedloops, const ch
         goto forbid;
 
       SV *target = newSVpv(cPVOPo->op_pv, strlen(cPVOPo->op_pv));
+#if HAVE_PERL_VERSION(5, 16, 0)
       if(cPVOPo->op_private & OPpPV_IS_UTF8)
         SvUTF8_on(target);
+#endif
       SAVEFREESV(target);
 
       if(hv_fetch_ent(permittedloops, target, FALSE, 0))

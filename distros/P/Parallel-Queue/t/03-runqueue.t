@@ -1,11 +1,8 @@
-
 ########################################################################
 # test whether the debug-mode dispatcher works properly (via jobcount
 # of zero).
 ########################################################################
-
 use v5.24;
-use strict;
 
 use Test::More;
 

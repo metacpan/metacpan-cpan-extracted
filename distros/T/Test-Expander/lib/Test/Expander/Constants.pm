@@ -1,14 +1,19 @@
 ## no critic (RequireVersionVar)
 package Test::Expander::Constants;
 
+our $VERSION = '1.0.6';                                     ## no critic (RequireUseStrict, RequireUseWarnings)
+
 use v5.14;
 use warnings
   FATAL    => qw(all),
   NONFATAL => qw(deprecated exec internal malloc newline portable recursion);
 
 use Const::Fast;
-use Exporter  qw(import);
-use PadWalker qw(peek_our);
+use Exporter         qw(import);
+use PadWalker        qw(peek_our);
+use Scalar::Readonly qw(readonly_on);
+
+readonly_on($VERSION);
 
 const our $ANY_EXTENSION          => qr/ \. [^.]+ $/x;
 const our $CLASS_HIERARCHY_LEVEL  => qr/^( \w+ ) (?: :: ( .+ ) )?/x;

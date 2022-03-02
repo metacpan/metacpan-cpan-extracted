@@ -68,6 +68,6 @@
          "web" : "https://github.com/jsf116/Test-Expander"
       }
    },
-   "version" : "v1.0.5",
+   "version" : "v1.0.6",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }
