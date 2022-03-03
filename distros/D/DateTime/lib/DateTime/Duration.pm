@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '1.55';
+our $VERSION = '1.57';
 
 use Carp ();
 use DateTime;
@@ -362,7 +362,7 @@ DateTime::Duration - Duration objects for date math
 
 =head1 VERSION
 
-version 1.55
+version 1.57
 
 =head1 SYNOPSIS
 
@@ -688,7 +688,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2003 - 2021 by Dave Rolsky.
+This software is Copyright (c) 2003 - 2022 by Dave Rolsky.
 
 This is free software, licensed under:
 

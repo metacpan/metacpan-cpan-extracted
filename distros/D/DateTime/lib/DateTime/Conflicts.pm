@@ -25,6 +25,7 @@ use Dist::CheckConflicts
         Specio::Library::Builtins
         Specio::Library::Numeric
         Specio::Library::String
+        Specio::Subs
         Try::Tiny
         XSLoader
         base

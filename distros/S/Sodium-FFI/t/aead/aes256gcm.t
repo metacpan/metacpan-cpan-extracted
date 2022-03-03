@@ -17,7 +17,9 @@ ok(crypto_aead_aes256gcm_ABYTES, 'crypto_aead_aes256gcm_ABYTES: got the constant
 ok(crypto_aead_aes256gcm_NPUBBYTES, 'crypto_aead_aes256gcm_NPUBBYTES: got the constant');
 
 my $key = crypto_aead_aes256gcm_keygen();
+ok($key, 'crypto_aead_aes256gcm_keygen: got a key');
 my $nonce = randombytes_buf(crypto_aead_aes256gcm_NPUBBYTES);
+ok($nonce, 'nonce: got it');
 my $msg = randombytes_buf(12); # just 12 bytes of random data
 my $additional_data = randombytes_buf(12);
 

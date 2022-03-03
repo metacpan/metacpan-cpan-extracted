@@ -1,6 +1,6 @@
 package Valiant;
 
-our $VERSION = '0.001012';
+our $VERSION = '0.001013';
 $VERSION = eval $VERSION;
 
 1;
@@ -1426,10 +1426,10 @@ performance.
 =head1 SEE ALSO
 
 There's no lack of validation systems on CPAN.   I've used (and contributed) to
-L<HTML::FormHandler> and <Data::MuForm>.   I've also used L<HTML::FormFu>.  Recently I 
-spotted L<Form::Tiny> which is a similar DSL style system as Valiant but with a smaller
-footprint and sane looking sort code.  This list is not exhaustive, just stuff I've
-either used or reviewed.
+L<HTML::FormHandler> and L<Data::MuForm>.   I've also used L<HTML::FormFu>.  Recently I 
+spotted L<Form::Tiny> which is a similar DSL style system as L<Valiant> but with a smaller
+footprint and sane looking code.  This list is not exhaustive, just stuff I've either used or 
+reviewed.
 
 L<Valiant>, L<Valiant::Validations>, L<Valiant::Validates>, L<Valiant::Filters>,
 L<Valiant::Filterable>

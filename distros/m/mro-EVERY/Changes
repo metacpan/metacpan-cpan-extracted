@@ -1,3 +1,7 @@
+- 0.1.0 Wed Mar  2 02:29:52 PM EST 2022
+
+    Use class rather than object to resolve
+    mro::get_linear_isa. 
 
 - 0.1.0 Sat Feb 19 02:29:44 PM EST 2022
 

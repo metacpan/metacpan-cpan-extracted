@@ -1,5 +1,11 @@
 The following logs changes for the CPAN distribution Valiant
 
+0.001013 2022 March 3
+          - Minor changes to improve backward compatibility with older versions of Perl.
+          - Changed debugging to help try to fix the Windows incompatibility issue.
+          - Tweaks to the distribution meta data to try to surpress debugging / testing
+            files from getting indexed.
+
 0.001012 2022 February 27
           - Added packages under Valiant::HTML for HTML form generation and templating.
           - Lots of changes and bugfixs to how nested models and collections work for

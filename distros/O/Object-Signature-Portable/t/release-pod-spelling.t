@@ -7,7 +7,7 @@ use Test::More;
 
 use Const::Fast;
 use English qw( -no_match_vars );
-use File::Slurp;
+use File::Slurper qw/ read_text / ;
 
 unless ( $ENV{RELEASE_TESTING} ) {
     plan( skip_all => "Author tests not required for installation" );
@@ -29,9 +29,7 @@ const my $dictionary => 'xt/etc/custom-dictionary.txt';
 
 Test::Pod::Spelling->import(
     spelling => {
-	allow_words => [
-	    (map { chomp($ARG); $ARG } read_file($dictionary))
-	],
+        allow_words => [ ( map { chomp($ARG); $ARG } read_text($dictionary) ) ],
     },
 );
 

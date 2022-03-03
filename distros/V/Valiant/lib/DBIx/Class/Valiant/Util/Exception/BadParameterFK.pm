@@ -15,7 +15,7 @@ sub _build_message {
 
 =head1 NAME
 
-DBIx::Class::Valiant::Util::Exception - A non categorized exception
+DBIx::Class::Valiant::Util::Exception - Bad value for a foreign key
 
 =head1 SYNOPSIS
 

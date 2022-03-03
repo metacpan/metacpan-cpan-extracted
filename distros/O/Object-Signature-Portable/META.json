@@ -4,7 +4,7 @@
       "Robert Rothenberg <rrwo@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "digest",
       "signature",
@@ -28,9 +28,6 @@
       },
       "develop" : {
          "requires" : {
-            "Const::Fast" : "0",
-            "English" : "0",
-            "File::Slurp" : "0",
             "Pod::Coverage::TrustPod" : "0",
             "Test::EOF" : "0",
             "Test::EOL" : "0",
@@ -49,7 +46,7 @@
       "runtime" : {
          "requires" : {
             "Crypt::Digest" : "0",
-            "Exporter::Lite" : "0",
+            "Exporter" : "5.57",
             "JSON::MaybeXS" : "0",
             "perl" : "v5.10.0"
          }
@@ -70,7 +67,7 @@
    "provides" : {
       "Object::Signature::Portable" : {
          "file" : "lib/Object/Signature/Portable.pm",
-         "version" : "v1.0.0"
+         "version" : "v1.1.0"
       }
    },
    "release_status" : "stable",
@@ -84,10 +81,10 @@
          "web" : "https://github.com/robrwo/Object-Signature-Portable"
       }
    },
-   "version" : "v1.0.0",
+   "version" : "v1.1.0",
    "x_authority" : "cpan:RRWO",
-   "x_generated_by_perl" : "v5.28.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.11",
+   "x_generated_by_perl" : "v5.34.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
    "x_spdx_expression" : "Artistic-2.0"
 }
 

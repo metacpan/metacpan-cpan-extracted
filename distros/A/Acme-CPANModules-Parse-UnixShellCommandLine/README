@@ -3,13 +3,17 @@ NAME
     command-line like Unix shells
 
 VERSION
-    This document describes version 0.001 of
+    This document describes version 0.002 of
     Acme::CPANModules::Parse::UnixShellCommandLine (from Perl distribution
     Acme-CPANModules-Parse-UnixShellCommandLine), released on 2021-10-01.
 
 DESCRIPTION
     Sometimes you need to parse a Unix shell command-line string, e.g. when
     you want to break it into "words".
+
+    In general I recommend Text::ParseWords as it is a core module. If you
+    want a little more speed, try Parse::CommandLine::Regexp (see reference
+    to benchmark in See Also).
 
 ACME::MODULES ENTRIES
     *   Complete::Bash

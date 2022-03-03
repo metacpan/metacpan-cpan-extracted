@@ -66,6 +66,7 @@ my @files = (
     't/46warnings.t',
     't/47default-time-zone.t',
     't/48rt-115983.t',
+    't/49-without-sub-util.t',
     't/zzz-check-breaks.t'
 );
 

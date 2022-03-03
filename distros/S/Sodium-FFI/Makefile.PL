@@ -22,7 +22,6 @@ my %WriteMakefileArgs = (
     "Alien::Sodium" => "2.000",
     "Carp" => 0,
     "Cwd" => 0,
-    "Data::Dumper" => 0,
     "Exporter" => "5.57",
     "FFI::Platypus" => "1.00",
     "File::Basename" => 0,
@@ -41,7 +40,7 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "Test::More" => "0.88"
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t t/aead/*.t"
   }
@@ -52,7 +51,6 @@ my %FallbackPrereqs = (
   "Alien::Sodium" => "2.000",
   "Carp" => 0,
   "Cwd" => 0,
-  "Data::Dumper" => 0,
   "Exporter" => "5.57",
   "ExtUtils::MakeMaker" => 0,
   "FFI::Platypus" => "1.00",

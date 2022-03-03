@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Utilities;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Internal utilities for JSON::Schema::Modern
 
-our $VERSION = '0.546';
+our $VERSION = '0.547';
 
 use 5.020;
 use strictures 2;
@@ -264,11 +264,9 @@ sub A ($state, $annotation) {
 # errors (consider if we were in the middle of evaluating a "not" or "if").
 # Therefore this is only appropriate during the evaluation phase, not the traverse phase.
 sub abort ($state, $error_string, @args) {
-  ()= E($state, $error_string, @args);
+  ()= E({ %$state, exception => 1 }, $error_string, @args);
   croak 'abort() called during traverse' if $state->{traverse};
-  my $error = pop $state->{errors}->@*;
-  $error->exception(1);
-  die $error;
+  die pop $state->{errors}->@*;
 }
 
 sub assert_keyword_exists ($state, $schema) {
@@ -361,7 +359,7 @@ JSON::Schema::Modern::Utilities - Internal utilities for JSON::Schema::Modern
 
 =head1 VERSION
 
-version 0.546
+version 0.547
 
 =head1 SYNOPSIS
 

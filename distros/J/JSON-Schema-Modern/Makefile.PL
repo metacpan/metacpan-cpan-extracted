@@ -141,11 +141,12 @@ my %WriteMakefileArgs = (
     "Test::JSON::Schema::Acceptance" => "1.014",
     "Test::Memory::Cycle" => 0,
     "Test::More" => "0.96",
+    "Test::Needs" => 0,
     "Test::Warnings" => 0,
     "lib" => 0,
     "utf8" => 0
   },
-  "VERSION" => "0.546",
+  "VERSION" => "0.547",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -188,6 +189,7 @@ my %FallbackPrereqs = (
   "Test::JSON::Schema::Acceptance" => "1.014",
   "Test::Memory::Cycle" => 0,
   "Test::More" => "0.96",
+  "Test::Needs" => 0,
   "Test::Warnings" => 0,
   "Types::Standard" => "1.010002",
   "constant" => 0,

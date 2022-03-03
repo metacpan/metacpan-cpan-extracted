@@ -61,7 +61,11 @@ sub _module_path {
   my @parts = split '::', $class_name;
   my $path = File::Spec->catfile(@parts);
   debug 3, "trying to find module path for class '$class_name' via 'INC{${path}.pm}'";
-  return $INC{"${path}.pm"};
+  my $inc = $INC{"${path}.pm"};
+  unless($inc) {
+    debug 3, "Can't find ${path}.pm from parts: @{[ join ', ', @parts ]} in INC keys: @{[ join ', ', keys %INC ]}";
+  }
+  return $inc;
 }
 
 sub _locale_path_from_module {

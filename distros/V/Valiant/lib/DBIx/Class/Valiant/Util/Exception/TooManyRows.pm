@@ -15,7 +15,7 @@ sub _build_message {
 
 =head1 NAME
 
-DBIx::Class::Valiant::Util::Exception - A non categorized exception
+DBIx::Class::Valiant::Util::Exception - More rows attempted than you are permitted to create
 
 =head1 SYNOPSIS
 

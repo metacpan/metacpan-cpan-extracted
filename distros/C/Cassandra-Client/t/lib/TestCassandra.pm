@@ -18,7 +18,6 @@ sub new {
         tls              => $ENV{CASSANDRA_TLS},
         port             => $ENV{CASSANDRA_PORT},
         anyevent         => ((rand() < 0.5) ? 1 : 0),
-        protocol_version => ((rand() < 0.5) ? 4 : 3),
         %args
     );
 }

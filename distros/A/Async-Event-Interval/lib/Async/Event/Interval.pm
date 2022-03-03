@@ -3,7 +3,7 @@ package Async::Event::Interval;
 use warnings;
 use strict;
 
-our $VERSION = '1.05';
+our $VERSION = '1.06';
 
 use Carp qw(croak);
 use IPC::Shareable;
@@ -16,7 +16,22 @@ $SIG{__WARN__} = sub {
 };
 
 my $id = 0;
+
 my %events;
+my $shared_memory_segment_created;
+
+while (! $shared_memory_segment_created) {
+    $shared_memory_segment_created = eval {
+        tie %events, 'IPC::Shareable', {
+            key         => _rand_shm_key(),
+            create      => 1,
+            exclusive   => 1,
+            mode        => 0600,
+            destroy     => 1
+        };
+        1;
+    };
+}
 
 *restart = \&start;
 
@@ -37,6 +52,14 @@ sub error {
     $self->status;
     return $self->_pid && $self->_pid == -99 ? 1 : 0;
 }
+sub errors {
+    my ($self) = @_;
+    return $self->_errors;
+}
+sub error_message {
+    my ($self) = @_;
+    return $self->_error_message;
+}
 sub events {
     return \%events;
 }
@@ -48,6 +71,22 @@ sub id {
 sub info {
     my ($self) = @_;
     return $self->events()->{$self->id};
+}
+sub interval {
+    my ($self, $interval) = @_;
+
+    if (defined $interval) {
+        if ($interval !~ /^\d+$/ && $interval !~ /^(\d+)?\.\d+$/) {
+            croak "\$interval must be an integer or float";
+        }
+        $self->{interval} = $interval;
+    }
+
+    return $self->{interval};
+}
+sub runs {
+    my ($self) = @_;
+    return $self->_runs;
 }
 sub shared_scalar {
     my ($self) = @_;
@@ -74,7 +113,7 @@ sub shared_scalar {
     return \$scalar;
 }
 sub start {
-    my $self = shift;
+    my ($self) = @_;
     if ($self->_started){
         warn "Event already running...\n";
         return;
@@ -98,6 +137,7 @@ sub status {
                 # proc must have crashed
                 $self->_started(0);
                 $self->_pid(-99);
+                $self->error;
             }
         }
     }
@@ -146,8 +186,18 @@ sub _cb {
 
     return $self->{cb};
 }
+sub _errors {
+    my ($self, $increment) = @_;
+    $events{$self->id}->{errors}++ if defined $increment;
+    return $events{$self->id}->{errors};
+}
+sub _error_message {
+    my ($self, $msg) = @_;
+    $events{$self->id}->{error_message} = $msg if defined $msg;
+    return $events{$self->id}->{error_message};
+}
 sub _event {
-    my $self = shift;
+    my ($self) = @_;
 
     for (0..1){
         my $pid = $self->_pm->start;
@@ -163,27 +213,48 @@ sub _event {
 
         # if no interval, run only once
 
-        if ($self->_interval) {
+        if ($self->interval) {
             while (1) {
-                select(undef, undef, undef, $self->_interval);
-                $self->_cb->(@{$self->_args});
+                select(undef, undef, undef, $self->interval);
+
+                my $callback_success = eval {
+                    $self->_cb->(@{ $self->_args });
+                    1;
+                };
+
+                if (! $callback_success) {
+                    $self->_errors(1);
+                    $self->_error_message($@);
+                    $self->_runs(1);
+                    $self->status;
+                    croak $@;
+                }
+
+                $self->_runs(1);
+                $self->status;
             }
         }
         else {
-            $self->_cb->(@{$self->_args});
+
+            my $callback_success = eval {
+                $self->_cb->(@{$self->_args});
+                1;
+            };
+
+            if (! $callback_success) {
+                $self->_errors(1);
+                $self->_error_message($@);
+                $self->_runs(1);
+                $self->status;
+                croak $@;
+            }
+
+            $self->_runs(1);
+            $self->status;
         }
 
         $self->_pm->finish;
     }
-}
-sub _interval {
-    my ($self, $interval) = @_;
-
-    if (defined $interval) {
-        $self->{interval} = $interval;
-    }
-
-    return $self->{interval};
 }
 sub _pm {
     my ($self) = @_;
@@ -197,21 +268,26 @@ sub _pm {
 sub _pid {
     my ($self, $pid) = @_;
     $self->{pid} = $pid if defined $pid;
-    $events{$self->id}->{pid} = $self->{pid};
+    $events{$self->id}->{pid} = $self->{pid} if $self->{pid};
     return $self->{pid} || undef;
 }
 sub _rand_shm_key {
     my $key_str;
 
-    for (0..3) {
+    for (0..11) {
         $key_str .= ('A'..'Z')[rand(26)];
     }
 
    return $key_str;
 }
+sub _runs {
+    my ($self, $increment) = @_;
+    $events{$self->id}->{runs}++ if defined $increment;
+    return $events{$self->id}->{runs};
+}
 sub _setup {
     my ($self, $interval, $cb, @args) = @_;
-    $self->_interval($interval);
+    $self->interval($interval);
     $self->_cb($cb);
     $self->_args(\@args);
 }
@@ -231,7 +307,7 @@ __END__
 
 =head1 NAME
 
-Async::Event::Interval - Timed and one-off asynchronous events
+Async::Event::Interval - Scheduled and one-off asynchronous events
 
 =for html
 <a href="https://github.com/stevieb9/async-event-interval/actions"><img src="https://github.com/stevieb9/async-event-interval/workflows/CI/badge.svg"/></a>
@@ -260,7 +336,16 @@ See L</EXAMPLES> for other various functionality of this module.
     while (1) {
         print "$$shared_scalar_json\n" if defined $$shared_scalar_json;
 
-        # Do other things
+        #... do other things
+
+        if ($event->errors > 5) {
+            printf(
+                "Runs: %d, Runs errored: %d, Last error message: %s\n",
+                $event->runs,
+                $event->errors,
+                $event->error_message;
+            );
+        }
 
         $event->restart if $event->error;
     }
@@ -275,7 +360,7 @@ Very basic implementation of asynchronous events with shared variables that are
 triggered by a timed interval. If a time of zero is specified, we'll run the
 event only once.
 
-=head1 METHODS
+=head1 METHODS - EVENT OPERATION
 
 =head2 new($delay, $callback, @params)
 
@@ -321,15 +406,34 @@ Alias for C<start()>. Re-starts a C<stop()>ped event.
 Returns the event's process ID (true) if it is running, C<0> (false) if it
 isn't.
 
-=head2 error
-
-Returns true if an event crashed unexpectedly in the background, and false
-otherwise.
-
 =head2 waiting
 
 Returns true if the event is dormant and is ready for a C<start()> or C<restart>
 command. Returns false if the event is already running.
+
+=head2 error
+
+Returns true if an event crashed unexpectedly in the background, and is ready
+for a C<start()> or C<restart()> command. Returns false if no errors have been
+encountered.
+
+otherwise.
+
+=head2 interval($seconds)
+
+Gets/sets the delay time (in seconds) between each execution of the event's
+callback code. You can use this method to change the delay between calls
+during the event's lifecycle.
+
+Parameters:
+
+    $seconds
+
+Optional, Integer: The number of seconds (can be floating point) to delay
+between executions.
+
+Return: Integer, the number of seconds between execution runs. If we're in
+a run-once scenario, the return will be zero C<0>.
 
 =head2 shared_scalar
 
@@ -339,6 +443,40 @@ multiple shared scalars can be created by each event.
 
 To read from or assign to the returned scalar, you must dereference it. Eg.
 C<$$shared_scalar = 1;>.
+
+=head1 METHODS - EVENT INFORMATION
+
+=head2 errors
+
+Returns the number of times a started or restarted event has crashed
+unexpectedly.
+
+=head2 error_message
+
+Returns the error message (if any) that caused the most recent event crash.
+
+=head2 events
+
+This is a class method that returns a hash reference that contains the data of
+all existing events.
+
+    $VAR1 = {
+        '0' => {
+            'shared_scalars' => {
+                '0x555A4654' => \'hello, world',
+                '0x4C534758' => \98
+             },
+            'pid'    => 11859,
+            'runs'   => 16,
+            'errors' => 0,
+        },
+        '1' => {
+            'pid' => 11860,
+            'runs'  => 447,
+            'errors' => 2,
+            'error_message' => 'File notes.txt not found at scripts/write_file.pl line 227',
+        }
+    };
 
 =head2 id
 
@@ -353,30 +491,18 @@ Returns a hash reference containing various data about the event. Eg.
             '0x55435449' => \'hello, world!,
             '0x43534644' => \98
          },
-        'pid' => 6841,
+        'pid'    => 6841,
+        'runs'   => 4077,
+        'errors' => 0,
     };
 
-=head2 events
+=head2 runs
 
-This is a class method that returns a hash reference that contains the data of
-all existing events. Call it with C<Async::Event::Interval::events()>.
+Returns the number of executions of the event's callback routine.
 
-    $VAR1 = {
-        '0' => {
-            'shared_scalars' => {
-                '0x555A4654' => \'hello, world',
-                '0x4C534758' => \98
-             },
-            'pid' => 11859,
-        },
-        '1' => {
-            'pid' => 11860
-        }
-    };
+=head1 SCENARIOS/EXAMPLES
 
-=head1 EXAMPLES
-
-=head2 Run Once
+=head2 Run once
 
 Send in an interval of zero (C<0>) to have your event run a single time. Call
 C<start()> repeatedly for numerous individual/one-off runs.
@@ -391,7 +517,63 @@ C<start()> repeatedly for numerous individual/one-off runs.
 
     $event->start if $event->waiting;
 
-=head2 Event Suicidal Timeout
+=head2 Change delay interval during run
+
+    use Async::Event::Interval
+
+    my $event = Async::Event::Interval->new(5, sub {print "hey\n";});
+
+    $event->start;
+
+    my $loop_count = 0;
+
+    while (1) {
+        if ($loop_count > 100) {
+            $event->stop;
+            $event->interval(600);
+            $event->restart;
+        }
+
+        #... do stuff
+
+        $loop_count++;
+    }
+
+=head2 Event error management
+
+    # If an event crashes, print out error information and restart
+    # the event. If an event crashes five or more times, print the
+    # most recent error message and halt the program so you can figure
+    # out what's wrong with your callback code.
+
+    use Async::Event::Interval
+
+    my $event = Async::Event::Interval->new(5, sub {print "hey\n";});
+
+    $event->start;
+
+    while (1) {
+
+        #... do stuff
+
+        if ($event->error) {
+            printf(
+                "Runs: %d, Runs errored: %d, Last error message: %s\n",
+                $event->runs,
+                $event->errors,
+                $event->error_message;
+            );
+
+            $event->restart;
+        }
+
+        if ($event->errors >= 5) {
+            print $event->error_message;
+            exit;
+        }
+    }
+
+=head2 Event suicidal timeout
 
 You can have your callback commit suicide if it takes too long to run. We use
 Perl's C<$SIG{ALRM}> and C<alarm()> to do this. In your main application, you
@@ -412,7 +594,7 @@ can check the status of the event and restart it or whatever else you need.
         },
     );
 
-=head2 Event Parameters
+=head2 Event parameters
 
 You can send in a list of parameters to the event callback. Changing these
 within the main program will have no effect on the values sent into the

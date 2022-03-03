@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-# Copyright (c) 2010-2021 Sullivan Beck.  All rights reserved.
+# Copyright (c) 2010-2022 Sullivan Beck.  All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
@@ -23,7 +23,7 @@ use Mojo::DOM;
 use lib "./internal";
 
 our $VERSION;
-$VERSION='3.69';
+$VERSION='3.70';
 
 # Some required executables
 my @exe     = qw( wget xls2csv );
@@ -119,8 +119,9 @@ require "data.currency.pl";
 ########################################
 # SCRIPT
 
-our $script_iso_url    = "http://www.unicode.org/iso15924/iso15924.txt.zip";
-our $script_iso_zip    = qr/^iso15924/;
+#our $script_iso_url    = "http://www.unicode.org/iso15924/iso15924.txt.zip";
+#our $script_iso_zip    = qr/^iso15924/;
+our $script_iso_url    = "http://www.unicode.org/iso15924/iso15924.txt";
 
 our $script_iana_url   = $language_iana_url;
 
@@ -1094,15 +1095,13 @@ sub do_script {
 
 # We'll first read data from the official ISO 15924.
 #
-# Data available consists of the script names and 2-letter and
-# 3-letter codes. Script names include non-ASCII characters encoded in
+# Data available consists of the script names and 4-letter and
+# 3-digit codes. Script names include non-ASCII characters encoded in
 # UTF-8. And (amazingly enough) it's available in a field delimited file!!!
 #
-# The zip file contains a series of lines in the form:
+# The text file contains a series of lines in the form:
 #   alpha;numeric;english;...
 # The data is in UTF-8.
-#
-# Every line has an unprintable character at the end.
 #
 
 {
@@ -1111,8 +1110,8 @@ sub do_script {
    sub _init_script_iso {
       $in = _read_file('url'       => $script_iso_url,
                        'as_list'   => 1,
-                       'type'      => 'zip',
-                       'file'      => $script_iso_zip,
+                       'type'      => 'text',
+                       #'file'      => $script_iso_zip,
                        'chop'      => 1,
                   );
    }
@@ -1725,7 +1724,7 @@ use warnings;
 use utf8;
 
 our(\$VERSION);
-\$VERSION='3.69';
+\$VERSION='3.70';
 
 \$Locale::Codes::Data{'$type'}{'id'} = '$ID';
 

@@ -18,6 +18,7 @@ GCM
 Sodium
 Whitener
 capoeirab
+chacha
 cwhitener
 decrypt
 lib

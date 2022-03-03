@@ -17,7 +17,7 @@ is ref $events, 'HASH', 'Class events() returns a hash ref ok';
 is keys %$events, 2, "Two events have been created ok";
 
 for (keys %$events) {
-    like $_, qr/^\d+$/, "Events key $_ is an integer ok";
+    like $_, qr/^\w+$/, "Events key $_ is a word ok";
     is ref $events->{$_}, 'HASH', "Event $_ is a hash ref ok";
     is keys %{ $events->{$_} }, 0, "After creation, event $_ hash is empty";
 }
@@ -25,12 +25,15 @@ for (keys %$events) {
 $one->start;
 $two->start;
 
+select(undef, undef, undef, 0.2);
+
 $events = Async::Event::Interval::events();
 
 for (keys %$events) {
     like $_, qr/^\d+$/, "Events key $_ is still an integer ok";
+    is $events->{$_}{runs} > 0, 1, "Event $_ has a 'runs' key set ok";
     is ref $events->{$_}, 'HASH', "Event $_ is still a hash ref ok";
-    is keys %{ $events->{$_} }, 1, "After creation, event $_ hash has a single key";
+    is keys %{ $events->{$_} }, 2, "After creation, event $_ hash has a single key";
     like $events->{$_}{pid}, qr/^\d+$/, "Event $_ has pid key with a proper PID";
 }
 
@@ -44,13 +47,14 @@ $events = Async::Event::Interval::events();
 for (keys %$events) {
     like $_, qr/^\d+$/, "Events key $_ is still an integer ok";
     is ref $events->{$_}, 'HASH', "Event $_ is still a hash ref ok";
-    is keys %{ $events->{$_} }, 2, "After creation, event $_ hash has a single key";
+    is keys %{ $events->{$_} }, 3, "After creation, event $_ hash has proper number of keys ok";
     like $events->{$_}{pid}, qr/^\d+$/, "Event $_ has pid key with a proper PID";
     is ref $events->{$_}{shared_scalars}, 'HASH', "Event $_ has shared_scalars href";
     is keys %{ $events->{$_}{shared_scalars} }, 2, "Event $_ has two shared scalars";
+    is $events->{$_}{runs} > 0, 1, "Event $_ has a 'runs' key set ok";
 
     for my $shared_key (keys %{ $events->{$_}{shared_scalars} }) {
-        like $shared_key, qr/^[A-Z]{4}$/, "Shared scalar key $shared_key is an int ok";
+        like $shared_key, qr/^[A-Z]{12}$/, "Shared scalar key $shared_key is a string of 12 letters ok";
         is ref $events->{$_}{shared_scalars}{$shared_key}, 'SCALAR', "Shared scalar $shared_key is a scalar ref";
         is ${ $events->{$_}{shared_scalars}{$shared_key} }, undef, "...and is undef";
     }
@@ -62,7 +66,7 @@ for ($one, $two) {
     is $_->info()->{pid}, $events->{$id}{pid}, "info() pid matches for event $id";
 
     for my $shared_key (keys %{$_->info->{shared_scalars}}) {
-        like $shared_key, qr/^[A-Z]{4}$/, "Shared scalar key $shared_key is an int ok";
+        like $shared_key, qr/^[A-Z]{12}$/, "Shared scalar key $shared_key is a string of 12 letters ok";
         is ref $_->info->{shared_scalars}{$shared_key}, 'SCALAR', "Shared scalar $shared_key is a scalar ref";
         is ${$_->info->{shared_scalars}{$shared_key}}, undef, "...and is undef";
     }

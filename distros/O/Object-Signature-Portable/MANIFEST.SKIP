@@ -97,7 +97,7 @@
 \.rej$
 \.tdy$
 \.tmp$
-^\w$
+# ^\w$
 \.ttc$
 \.pmc$
 

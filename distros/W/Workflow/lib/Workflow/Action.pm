@@ -12,7 +12,7 @@ use Workflow::Validator::HasRequiredField;
 use Workflow::Factory qw( FACTORY );
 use Carp qw(croak);
 
-$Workflow::Action::VERSION = '1.59';
+$Workflow::Action::VERSION = '1.60';
 
 my @PROPS    = qw( name class description group );
 my @INTERNAL = qw( _factory );
@@ -80,7 +80,7 @@ sub validate {
         my @runtime_args = ($wf);
         foreach my $arg ( @{$args} ) {
             if ( $arg =~ /^\$(.*)$/ ) {
-                push @runtime_args, $context->param($1);
+                push @runtime_args, scalar $context->param($1);
             } else {
                 push @runtime_args, $arg;
             }
@@ -167,7 +167,7 @@ Workflow::Action - Base class for Workflow actions
 
 =head1 VERSION
 
-This documentation describes version 1.59 of this package
+This documentation describes version 1.60 of this package
 
 =head1 SYNOPSIS
 

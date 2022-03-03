@@ -5,7 +5,7 @@ requires 'Data::Perl::Collection::Array';
 requires 'DateTime::Format::Strptime';
 requires 'DateTime';
 requires 'FreezeThaw';
-requires 'Lingua::EN::Inflexion';
+requires 'Lingua::EN::Inflexion', '0.002007';
 requires 'Module::Runtime';
 requires 'Role::Tiny::With';
 requires 'Scalar::Util' => '1.55';
@@ -36,4 +36,3 @@ on test => sub {
   requires 'DBIx::Class::Candy';
   requires 'Test::DBIx::Class'=> '0.52';
 };
-

@@ -1,0 +1,107 @@
+{
+   "abstract" : "Dist::Zilla configuration the way AJNN does it",
+   "author" : [
+      "Arne Johannessen <ajnn@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unrestricted"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Dist-Zilla-PluginBundle-Author-AJNN",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::MinimumVersion" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dist::Zilla" : "0",
+            "Dist::Zilla::File::FromCode" : "0",
+            "Dist::Zilla::Plugin::CheckChangeLog" : "0",
+            "Dist::Zilla::Plugin::Git" : "0",
+            "Dist::Zilla::Plugin::GithubMeta" : "0",
+            "Dist::Zilla::Plugin::MetaProvides::Package" : "0",
+            "Dist::Zilla::Plugin::PodWeaver" : "0",
+            "Dist::Zilla::Plugin::RunExtraTests" : "0",
+            "Dist::Zilla::Plugin::Test::MinimumVersion" : "0",
+            "Dist::Zilla::Role::FileGatherer" : "0",
+            "Dist::Zilla::Role::FilePruner" : "0",
+            "Dist::Zilla::Role::PluginBundle::Easy" : "0",
+            "Encode" : "0",
+            "Moose" : "0",
+            "Pod::Elemental" : "0",
+            "Pod::Elemental::Element::Nested" : "0",
+            "Pod::Elemental::Element::Pod5::Ordinary" : "0",
+            "Pod::Text" : "0",
+            "Pod::Weaver" : "4.009",
+            "Pod::Weaver::Config::Assembler" : "0",
+            "Pod::Weaver::Role::Section" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "5.026"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::DZil" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "Test::Warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Dist::Zilla::PluginBundle::Author::AJNN" : {
+         "file" : "lib/Dist/Zilla/PluginBundle/Author/AJNN.pm",
+         "version" : "0.01"
+      },
+      "Dist::Zilla::PluginBundle::Author::AJNN::PruneAliases" : {
+         "file" : "lib/Dist/Zilla/PluginBundle/Author/AJNN/PruneAliases.pm",
+         "version" : "0.01"
+      },
+      "Dist::Zilla::PluginBundle::Author::AJNN::Readme" : {
+         "file" : "lib/Dist/Zilla/PluginBundle/Author/AJNN/Readme.pm",
+         "version" : "0.01"
+      },
+      "Pod::Weaver::PluginBundle::Author::AJNN" : {
+         "file" : "lib/Pod/Weaver/PluginBundle/Author/AJNN.pm",
+         "version" : "0.01"
+      },
+      "Pod::Weaver::PluginBundle::Author::AJNN::Author" : {
+         "file" : "lib/Pod/Weaver/PluginBundle/Author/AJNN/Author.pm",
+         "version" : "0.01"
+      },
+      "Pod::Weaver::PluginBundle::Author::AJNN::License" : {
+         "file" : "lib/Pod/Weaver/PluginBundle/Author/AJNN/License.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/johannessen/dzil-pluginbundle/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/johannessen/dzil-pluginbundle.git",
+         "web" : "https://github.com/johannessen/dzil-pluginbundle"
+      }
+   },
+   "version" : "0.01",
+   "x_generated_by_perl" : "v5.34.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
+   "x_spdx_expression" : "CC0-1.0"
+}
+

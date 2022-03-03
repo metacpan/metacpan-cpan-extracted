@@ -1,6 +1,6 @@
 package Cassandra::Client::Connection;
 our $AUTHORITY = 'cpan:TVDW';
-$Cassandra::Client::Connection::VERSION = '0.18';
+$Cassandra::Client::Connection::VERSION = '0.19';
 use 5.010;
 use strict;
 use warnings;
@@ -932,57 +932,56 @@ READ:
         }
 
 READ_NEXT:
-        goto READ_MORE if $bufsize < 9;
-        my ($version, $flags, $stream_id, $opcode, $bodylen)= unpack('CCsCN', substr($BUFFER, 0, 9));
-        if ($bufsize < $bodylen+9) {
-            goto READ_MORE;
-        }
-
-        substr($BUFFER, 0, 9, '');
-        my $body= substr($BUFFER, 0, $bodylen, '');
-        $bufsize -= 9 + $bodylen;
-
-        if (($flags & 1) && $body) {
-            # Decompress if needed
-            $self->{decompress_func}->($body);
-        }
-        if ($flags & 4) {
-            # FIXME: If we reach this (we shouldn't!), we're corrupting the user's data.
-            warn 'BUG: unexpectedly received custom QueryHandler payload';
-        }
-        if ($flags & 8) {
-            # Warnings were sent from the server. Relay them.
-            my $warnings= unpack_stringlist($body);
-            for my $warning (@$warnings) {
-                warn $warning;
+        while (1) {
+            last READ_NEXT if $bufsize < 9;
+            my ($version, $flags, $stream_id, $opcode, $bodylen)= unpack('CCsCN', substr($BUFFER, 0, 9));
+            if ($bufsize < $bodylen+9) {
+                last READ_NEXT;
             }
-        }
 
-        if ($stream_id != -1) {
-            my $stream_cb= delete $self->{pending_streams}{$stream_id};
-            if (!$stream_cb) {
-                warn 'BUG: received response for unknown stream';
+            substr($BUFFER, 0, 9, '');
+            my $body= substr($BUFFER, 0, $bodylen, '');
+            $bufsize -= 9 + $bodylen;
 
-            } elsif ($opcode == OPCODE_ERROR) {
-                my ($cb, $dl)= @$stream_cb;
-                $$dl= 1;
+            if (($flags & 1) && $body) {
+                # Decompress if needed
+                $self->{decompress_func}->($body);
+            }
+            if ($flags & 4) {
+                # FIXME: If we reach this (we shouldn't!), we're corrupting the user's data.
+                warn 'BUG: unexpectedly received custom QueryHandler payload';
+            }
+            if ($flags & 8) {
+                # Warnings were sent from the server. Relay them.
+                my $warnings= unpack_stringlist($body);
+                for my $warning (@$warnings) {
+                    warn $warning;
+                }
+            }
 
-                my $error= unpack_errordata($body);
-                $cb->($error);
+            if ($stream_id != -1) {
+                my $stream_cb= delete $self->{pending_streams}{$stream_id};
+                if (!$stream_cb) {
+                    warn 'BUG: received response for unknown stream';
+
+                } elsif ($opcode == OPCODE_ERROR) {
+                    my ($cb, $dl)= @$stream_cb;
+                    $$dl= 1;
+
+                    my $error= unpack_errordata($body);
+                    $cb->($error);
+
+                } else {
+                    my ($cb, $dl)= @$stream_cb;
+                    $$dl= 1;
+                    $cb->(undef, $opcode, $body);
+                }
 
             } else {
-                my ($cb, $dl)= @$stream_cb;
-                $$dl= 1;
-                $cb->(undef, $opcode, $body);
+                $self->handle_event($body);
             }
-
-        } else {
-            $self->handle_event($body);
         }
 
-        goto READ_NEXT;
-
-READ_MORE:
         last READ unless $should_read_more;
     }
 
@@ -1191,7 +1190,7 @@ Cassandra::Client::Connection
 
 =head1 VERSION
 
-version 0.18
+version 0.19
 
 =head1 AUTHOR
 
@@ -1199,7 +1198,7 @@ Tom van der Woerdt <tvdw@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Tom van der Woerdt.
+This software is copyright (c) 2022 by Tom van der Woerdt.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

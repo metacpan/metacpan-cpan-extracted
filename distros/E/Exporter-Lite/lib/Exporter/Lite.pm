@@ -4,7 +4,7 @@ require 5.006;
 use warnings;
 use strict;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 our @EXPORT = qw(import);
 
 
@@ -20,7 +20,7 @@ sub import {
     else {
         # Because @EXPORT_OK = () would indicate that nothing is
         # to be exported, we cannot simply check the length of @EXPORT_OK.
-        # We must to oddness to see if the variable exists at all as
+        # We must do oddness to see if the variable exists at all as
         # well as avoid autovivification.
         # XXX idea stolen from base.pm, this might be all unnecessary
         my $eokglob;
@@ -110,13 +110,30 @@ of the most commonly-used functionality.
 It supports C<import()>, C<@EXPORT> and
 C<@EXPORT_OK> and not a whole lot else.
 
-Unlike Exporter, it is not necessary to inherit from Exporter::Lite;
-Ie you don't need to write:
-
- @ISA = qw(Exporter::Lite);
-
 Exporter::Lite simply exports its import() function into your namespace.
 This might be called a "mix-in" or a "role".
+
+When C<Exporter::Lite> was written, if you wanted to use C<Exporter>
+you had to write something like this:
+
+ use Exporter;
+ our @ISA = qw/ Exporter /;
+
+C<Exporter::Lite> saved you from writing that second line.
+But since before 2010 you've been able to write:
+
+ use Exporter qw/ import /;
+
+Which imports the C<import> function into your namespace from C<Exporter>.
+As a result, I would recommend that you use C<Exporter> now,
+as it's a core module (shipped with Perl).
+
+To make sure you get a version of C<Exporter> that supports the
+above usage, specify a minimum version when you C<use> it:
+
+ use Exporter 5.57 qw/ import /;
+
+=head2 Back to C<Exporter::Lite>
 
 Setting up a module to export its variables and functions is simple:
 

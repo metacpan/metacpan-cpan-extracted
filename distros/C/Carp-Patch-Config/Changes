@@ -1,3 +1,10 @@
+0.007   2022-02-06  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Mention Carp::Patch::Verbose.
+
+
 0.006   2020-06-19  Released-By: PERLANCAR; Urgency: medium
 
 	- Add another value for -Dump: 3/Data::Dump::ObjectAsString.

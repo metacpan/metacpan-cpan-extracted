@@ -2,12 +2,13 @@
 # housekeeping
 ########################################################################
 
-package mro::EVERY v0.1.3;
+package mro::EVERY v0.1.4;
 use v5.24;
 use mro;
 
 use Carp            qw( croak           );
 use List::Util      qw( uniq            );
+use Scalar::Util    qw( blessed         );
 use Symbol          qw( qualify_to_ref  );
 
 ########################################################################
@@ -28,15 +29,19 @@ my $find_name
     my $proto   = shift;
     my $auto    = shift;
     my ($name)  = $auto =~ m{ (\w+) $}x;
+    my $class   = blessed $proto || $proto;
 
     $proto->can( $name )
     or croak "Botched EVERY: '$proto' cannot '$name'";
 
     # if they handle this via AUTOLOAD then we have 
     # problem at this point, see find_with_autoload.
+    #
+    # if the dispatching class has no ancestors then 
+    # treat it as its own ancestor.
     
     local $"    = ',';
-    my @isa     = $proto->mro::get_linear_isa->@*;
+    my @isa     = $class->mro::get_linear_isa->@*;
 
     # uniq avoids case of multiple-dispatch of 
     # hardwired inherited methods at multiple 

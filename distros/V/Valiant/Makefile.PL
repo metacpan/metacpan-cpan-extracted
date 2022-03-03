@@ -28,7 +28,7 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "FreezeThaw" => 0,
     "HTML::Escape" => 0,
-    "Lingua::EN::Inflexion" => 0,
+    "Lingua::EN::Inflexion" => "0.002007",
     "Module::Runtime" => 0,
     "Moo" => "2.004004",
     "Role::Tiny::With" => 0,
@@ -54,7 +54,7 @@ my %WriteMakefileArgs = (
     "Test::Needs" => "0.002006",
     "Type::Tiny" => "1.012001"
   },
-  "VERSION" => "0.001012",
+  "VERSION" => "0.001013",
   "test" => {
     "TESTS" => "t/*.t t/dbic/*.t t/examples/*.t t/filters/*.t t/html/*.t t/validator/*.t"
   }
@@ -75,7 +75,7 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "FreezeThaw" => 0,
   "HTML::Escape" => 0,
-  "Lingua::EN::Inflexion" => 0,
+  "Lingua::EN::Inflexion" => "0.002007",
   "Module::Runtime" => 0,
   "Moo" => "2.004004",
   "MooseX::MarkAsMethods" => 0,

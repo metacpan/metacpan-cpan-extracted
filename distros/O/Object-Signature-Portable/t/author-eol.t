@@ -28,10 +28,12 @@ my @files = (
     't/author-pod-syntax.t',
     't/author-portability.t',
     't/basic.t',
+    't/etc/custom-dictionary.txt',
     't/object-signature.t',
     't/release-check-manifest.t',
     't/release-fixme.t',
     't/release-kwalitee.t',
+    't/release-pod-spelling.t',
     't/release-trailing-space.t',
     't/yaml.t'
 );

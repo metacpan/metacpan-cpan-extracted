@@ -38,6 +38,7 @@ do { my $x = {
                                       'Test::Spelling' => '0.12',
                                       'Test::Version' => '2.05',
                                       'Test::Warnings' => '0.005',
+                                      'Test::Without::Module' => '0',
                                       'autodie' => '0',
                                       'utf8' => '0'
                                     }
@@ -57,6 +58,7 @@ do { my $x = {
                                       'Specio::Library::Builtins' => '0',
                                       'Specio::Library::Numeric' => '0',
                                       'Specio::Library::String' => '0',
+                                      'Specio::Subs' => '0',
                                       'Try::Tiny' => '0',
                                       'XSLoader' => '0',
                                       'base' => '0',
@@ -83,6 +85,7 @@ do { my $x = {
                                    'Test::Fatal' => '0',
                                    'Test::More' => '0.96',
                                    'Test::Warnings' => '0.005',
+                                   'Test::Without::Module' => '0',
                                    'utf8' => '0'
                                  }
                  }

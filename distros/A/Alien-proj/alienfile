@@ -72,10 +72,10 @@ plugin 'PkgConfig' => (
 share {
 
   #  see if this helps with cirrus bsd builds
-  $ENV{SQLITE3_CFLAGS} = Alien::sqlite->cflags;
-  $ENV{SQLITE3_LIBS} = Alien::sqlite->libs;
-  say "sqlite cflags: " . Alien::sqlite->cflags;
-  say "sqlite libs: " . Alien::sqlite->libs;
+  #$ENV{SQLITE3_CFLAGS} = Alien::sqlite->cflags;
+  #$ENV{SQLITE3_LIBS} = Alien::sqlite->libs;
+  #say "sqlite cflags: " . Alien::sqlite->cflags;
+  #say "sqlite libs: " . Alien::sqlite->libs;
   #if ($have{'Alien::libtiff'}) {
   #  my $p = path ('Alien::libtiff'->dist_dir, 'lib');
   #  $ENV{TIFF_LIBS}
@@ -172,7 +172,7 @@ share {
       if (Alien::libtiff->install_type ('share')) {
         my $libtiff_include = path ('Alien::libtiff'->dist_dir . '/include')->stringify;
         #  grab the first one - could cause trouble later?
-        my @libtiffs = File::Find::Rule
+        my @libtiffs = File::Find::Rule  #  should use FFI::CheckLib instead
                   ->file()
                   ->name( 'libtiff*' )
                   ->in( path ('Alien::libtiff'->dist_dir) );
@@ -216,6 +216,24 @@ share {
       }
     }
   }
+  my @sqlite_extra_args;
+  if (Alien::sqlite->install_type ('share')) {
+    say 'Shared Alien::sqlite found, adding sqlite3 components to configure call';
+    #  system install should have these in the relevant paths
+    my $sqlite_include = path ('Alien::sqlite'->dist_dir . '/include')->stringify;
+    #  grab the first one - could cause trouble later?
+    my @libsqlite = File::Find::Rule  #  should use FFI::CheckLib instead
+              ->file()
+              ->name( 'libsqlite*' )
+              ->in( path ('Alien::sqlite'->dist_dir) );
+    my $exe_extension = ($on_windows ? '.exe' : '');
+    my $sqlite_exe = path ('Alien::sqlite'->dist_dir . "/bin/sqlite3$exe_extension");
+    push @sqlite_extra_args, (
+      "-DEXE_SQLITE3=$sqlite_exe",
+      "-DSQLITE3_LIBRARY=$libsqlite[0]",
+      "-DSQLITE3_INCLUDE_DIR=$sqlite_include",
+    );
+  }
 
   #meta->around_hook( build => \&_pkgconf_wrapper );
   plugin 'PkgConfig::PPWrapper';
@@ -236,6 +254,7 @@ share {
     #'-DBUILD_DOCUMENTATION=NO',
     '-DBUILD_TESTING=OFF',
     '-DBUILD_SHARED_LIBS=ON',
+    @sqlite_extra_args,
     #'-DSQLITE3_INCLUDE_DIR=??',
     #'-DSQLITE3_LIBRARY=??',
     "-DENABLE_CURL=$enable_curl",

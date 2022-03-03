@@ -16,6 +16,7 @@
     use constant _MATH_GMPz_T   => 8;
     use constant _MATH_GMP_T    => 9;
     use constant _MATH_MPC_T    => 10;
+    use constant GMPQ_PV_NV_BUG => Math::GMPq::Random::_has_pv_nv_bug();
 
 use subs qw( __GNU_MP_VERSION __GNU_MP_VERSION_MINOR __GNU_MP_VERSION_PATCHLEVEL
              __GNU_MP_RELEASE __GMP_CC __GMP_CFLAGS GMP_LIMB_BITS GMP_NAIL_BITS);
@@ -48,6 +49,7 @@ use overload
     'abs'  => \&overload_abs;
 
     @Math::GMPq::EXPORT_OK = qw(
+GMPQ_PV_NV_BUG
 __GNU_MP_VERSION __GNU_MP_VERSION_MINOR __GNU_MP_VERSION_PATCHLEVEL
 __GNU_MP_RELEASE __GMP_CC __GMP_CFLAGS
 IOK_flag NOK_flag POK_flag
@@ -73,12 +75,13 @@ qgmp_randinit_set qgmp_randinit_default_nobless qgmp_randinit_mt_nobless
 qgmp_randinit_lc_2exp_nobless qgmp_randinit_lc_2exp_size_nobless qgmp_randinit_set_nobless
 qgmp_urandomb_ui qgmp_urandomm_ui
     );
-    our $VERSION = '0.49';
+    our $VERSION = '0.51';
     #$VERSION = eval $VERSION;
 
     Math::GMPq->DynaLoader::bootstrap($VERSION);
 
     %Math::GMPq::EXPORT_TAGS =(mpq => [qw(
+GMPQ_PV_NV_BUG
 Rmpq_abs Rmpq_add Rmpq_canonicalize Rmpq_clear Rmpq_cmp Rmpq_cmp_si Rmpq_cmp_ui
 Rmpq_cmp_z Rmpq_add_z Rmpq_sub_z Rmpq_z_sub Rmpq_mul_z Rmpq_div_z Rmpq_z_div
 Rmpq_pow_ui

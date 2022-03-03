@@ -1,5 +1,11 @@
 Revision history for Cassandra-Client
 
+0.19    2022/03/03
+
+      * Fix bug with multiple async requests returning result for other
+        requests
+      * Update tests to prefer Cassandra 4.x
+
 0.18    2020/11/12
 
       * Improve SASL interface

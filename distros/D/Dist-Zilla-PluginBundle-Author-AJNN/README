@@ -1,0 +1,41 @@
+Dist::Zilla::PluginBundle::Author::AJNN 0.01
+
+This is the configuration I use for Dist::Zilla.
+
+More information about this software:
+https://metacpan.org/release/Dist-Zilla-PluginBundle-Author-AJNN
+
+
+INSTALLATION
+
+The recommended way to install this Perl module distribution is directly
+from CPAN with whichever tool you use to manage your installation of Perl.
+For example:
+
+  cpanm Dist::Zilla::PluginBundle::Author::AJNN
+
+If you already have downloaded the distribution, you can alternatively
+point your tool directly at the archive file or the directory:
+
+  cpanm .
+
+You can also install the module manually by following these steps:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+See https://www.cpan.org/modules/INSTALL.html for general information
+on installing CPAN modules.
+
+
+COPYRIGHT AND LICENSE
+
+Arne Johannessen has dedicated the work to the Commons by waiving all of his
+or her rights to the work worldwide under copyright law and all related or
+neighboring legal rights he or she had in the work, to the extent allowable by
+law.
+
+Works under CC0 do not require attribution. When citing the work, you should
+not imply endorsement by the author.

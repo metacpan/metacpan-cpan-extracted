@@ -15,7 +15,7 @@ use Data::Dumper;
 
 my $mod = 'Async::Event::Interval';
 
-tie my $scalar, 'IPC::Shareable', undef;
+tie my $scalar, 'IPC::Shareable', { destroy => 1 };
 
 $scalar = -1;
 

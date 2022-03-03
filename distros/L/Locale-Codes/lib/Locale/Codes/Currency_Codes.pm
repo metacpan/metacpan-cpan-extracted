@@ -3,7 +3,7 @@ Locale::Codes::Currency_Codes;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'harvest_data' is run.
-#    Generated on: Wed Dec  1 13:43:33 EST 2021
+#    Generated on: Wed Mar  2 14:51:10 EST 2022
 
 use strict;
 require 5.006;
@@ -11,7 +11,7 @@ use warnings;
 use utf8;
 
 our($VERSION);
-$VERSION='3.69';
+$VERSION='3.70';
 
 $Locale::Codes::Data{'currency'}{'id'} = '0178';
 

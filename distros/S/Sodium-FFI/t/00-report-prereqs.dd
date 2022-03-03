@@ -27,7 +27,6 @@ do { my $x = {
                                       'Alien::Sodium' => '2.000',
                                       'Carp' => '0',
                                       'Cwd' => '0',
-                                      'Data::Dumper' => '0',
                                       'Exporter' => '5.57',
                                       'FFI::Platypus' => '1.00',
                                       'File::Basename' => '0',

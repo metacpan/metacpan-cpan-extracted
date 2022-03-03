@@ -2,10 +2,9 @@ package Sodium::FFI;
 use strict;
 use warnings;
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 use Carp qw(croak);
-use Data::Dumper::Concise qw(Dumper);
 use Exporter qw(import);
 
 use Alien::Sodium;
@@ -17,6 +16,7 @@ use Sub::Util qw(set_subname);
 our @EXPORT_OK = qw(
     randombytes_random randombytes_uniform
     sodium_version_string sodium_library_version_minor sodium_base64_encoded_len
+    crypto_aead_aes256gcm_keygen crypto_aead_chacha20poly1305_keygen
 );
 
 # add the various C Constants
@@ -27,6 +27,8 @@ push @EXPORT_OK, qw(
     sodium_base64_VARIANT_URLSAFE sodium_base64_VARIANT_URLSAFE_NO_PADDING
     crypto_aead_aes256gcm_KEYBYTES crypto_aead_aes256gcm_NPUBBYTES crypto_aead_aes256gcm_ABYTES
     HAVE_AEAD_DETACHED HAVE_AESGCM
+    crypto_aead_chacha20poly1305_KEYBYTES crypto_aead_chacha20poly1305_NPUBBYTES
+    crypto_aead_chacha20poly1305_ABYTES
 );
 
 our $ffi;
@@ -42,7 +44,106 @@ $ffi->attach('sodium_library_version_major' => [] => 'int');
 $ffi->attach('sodium_library_version_minor' => [] => 'int');
 $ffi->attach('sodium_base64_encoded_len' => ['size_t', 'int'] => 'size_t');
 
+sub crypto_aead_aes256gcm_keygen {
+    my $len = Sodium::FFI::crypto_aead_aes256gcm_KEYBYTES;
+    return Sodium::FFI::randombytes_buf($len);
+}
+
+sub crypto_aead_chacha20poly1305_keygen {
+    my $len = Sodium::FFI::crypto_aead_chacha20poly1305_KEYBYTES;
+    return Sodium::FFI::randombytes_buf($len);
+}
+
 our %function = (
+    # int
+    # crypto_aead_chacha20poly1305_decrypt(unsigned char *m,
+        # unsigned long long *mlen_p,
+        # unsigned char *nsec,
+        # const unsigned char *c,
+        # unsigned long long clen,
+        # const unsigned char *ad,
+        # unsigned long long adlen,
+        # const unsigned char *npub,
+        # const unsigned char *k);
+    'crypto_aead_chacha20poly1305_decrypt' => [
+        ['string', 'size_t*', 'string', 'string', 'size_t', 'string', 'size_t', 'string', 'string'] => 'int',
+        sub {
+            my ($xsub, $ciphertext, $ad, $nonce, $key) = @_;
+            my $ciphertext_len = length($ciphertext);
+            my $ad_len = length($ad);
+            my $nonce_len = length($nonce);
+            my $key_len = length($key);
+            my $SIZE_MAX = Sodium::FFI::SIZE_MAX;
+
+            unless ($nonce_len == Sodium::FFI::crypto_aead_chacha20poly1305_NPUBBYTES) {
+                croak("Nonce length should be crypto_aead_chacha20poly1305_NPUBBYTES bytes");
+            }
+            unless($key_len == Sodium::FFI::crypto_aead_chacha20poly1305_KEYBYTES) {
+                croak("Secret key length should be crypto_aead_chacha20poly1305_KEYBYTES bytes");
+            }
+            if ($ciphertext_len < Sodium::FFI::crypto_aead_chacha20poly1305_ABYTES) {
+                croak("cipher text length not right");
+            }
+            my $msg_len = $ciphertext_len;
+            if ($msg_len > $SIZE_MAX) {
+                croak("Message length greater than max size");
+            }
+            my $msg = "\0" x $msg_len;
+            my $real_len = 0;
+            my $ret = $xsub->($msg, \$real_len, undef, $ciphertext, $ciphertext_len, $ad, $ad_len, $nonce, $key);
+            croak("Internal error") unless $ret == 0;
+            if ($real_len <= 0 || $real_len >= $SIZE_MAX || $real_len > $msg_len) {
+                croak("Invalid resultant length");
+            }
+            if ($real_len >= $SIZE_MAX || $real_len > $msg_len) {
+                croak("arithmetic overflow");
+            }
+            return substr($msg, 0, $real_len);
+        }
+    ],
+
+    # int
+    # crypto_aead_chacha20poly1305_encrypt(unsigned char *c,
+    #     unsigned long long *clen_p,
+    #     const unsigned char *m,
+    #     unsigned long long mlen,
+    #     const unsigned char *ad,
+    #     unsigned long long adlen,
+    #     const unsigned char *nsec,
+    #     const unsigned char *npub,
+    #     const unsigned char *k)
+    'crypto_aead_chacha20poly1305_encrypt' => [
+        ['string', 'size_t*', 'string', 'size_t', 'string', 'size_t', 'string', 'string', 'string'] => 'int',
+        sub {
+            my ($xsub, $msg, $ad, $nonce, $key) = @_;
+            my $msg_len = length($msg);
+            my $ad_len = length($ad);
+            my $nonce_len = length($nonce);
+            my $key_len = length($key);
+            my $SIZE_MAX = Sodium::FFI::SIZE_MAX;
+
+            unless ($nonce_len == Sodium::FFI::crypto_aead_chacha20poly1305_NPUBBYTES) {
+                croak("Nonce length should be crypto_aead_chacha20poly1305_NPUBBYTES bytes");
+            }
+            unless($key_len == Sodium::FFI::crypto_aead_chacha20poly1305_KEYBYTES) {
+                croak("Secret key length should be crypto_aead_chacha20poly1305_KEYBYTES bytes");
+            }
+            if ($SIZE_MAX - $msg_len <= Sodium::FFI::crypto_aead_chacha20poly1305_ABYTES) {
+                croak("arithmetic overflow");
+            }
+
+            my $ciphertext_len = $msg_len + Sodium::FFI::crypto_aead_chacha20poly1305_ABYTES;
+            my $ciphertext = "\0" x $ciphertext_len;
+            my $real_len = 0;
+            my $ret = $xsub->($ciphertext, \$real_len, $msg, $msg_len, $ad, $ad_len, undef, $nonce, $key);
+            croak("Internal error") unless $ret == 0;
+            if ($real_len <= 0 || $real_len > $SIZE_MAX || $real_len > $ciphertext_len) {
+                croak("Invalid resultant length");
+            }
+            return substr($ciphertext, 0, $real_len);
+        }
+    ],
+
     # int
     # crypto_aead_aes256gcm_encrypt(unsigned char *c,
         # unsigned long long *clen_p,
@@ -146,17 +247,6 @@ our %function = (
                 return $xsub->();
             }
             return 0;
-        }
-    ],
-
-    # void
-    # crypto_aead_aes256gcm_keygen(unsigned char k[crypto_aead_aes256gcm_KEYBYTES]);
-    'crypto_aead_aes256gcm_keygen' => [
-        ['string'] => 'void',
-        sub {
-            my ($xsub) = @_;
-            my $len = Sodium::FFI::crypto_aead_aes256gcm_KEYBYTES;
-            return Sodium::FFI::randombytes_buf($len);
         }
     ],
 
@@ -621,6 +711,74 @@ function returns C<1> if the current CPU supports the AES256-GCM implementation,
 
 The L<crypto_aead_aes256gcm_keygen|https://doc.libsodium.org/secret-key_cryptography/aead/aes-256-gcm#detached-mode>
 function returns a byte string of C<crypto_aead_aes256gcm_KEYBYTES> bytes.
+
+=head1 chacha20poly1305 Crypto Functions
+
+LibSodium provides a few
+L<chacha20poly1305 functions|https://doc.libsodium.org/secret-key_cryptography/aead/chacha20-poly1305/original_chacha20-poly1305_construction>
+to encrypt or decrypt a message with a nonce and key.
+
+=head2 crypto_aead_chacha20poly1305_decrypt
+
+    use Sodium::FFI qw(
+        randombytes_buf crypto_aead_chacha20poly1305_decrypt
+        crypto_aead_chacha20poly1305_keygen crypto_aead_chacha20poly1305_NPUBBYTES
+    );
+
+    # you'd really need to already have the nonce and key, but here
+    my $key = crypto_aead_chacha20poly1305_keygen();
+    my $nonce = randombytes_buf(crypto_aead_chacha20poly1305_NPUBBYTES);
+    # your encrypted data would come from a call to crypto_aead_chacha20poly1305_encrypt
+    my $encrypted; # assume this is full of bytes
+    # any additional data bytes that were encrypted should also be included
+    # they can be undef
+    my $additional_data = undef; # we don't care to add anything extra
+    # let's decrypt!
+    my $decrypted_bytes = crypto_aead_chacha20poly1305_decrypt(
+        $encrypted, $additional_data, $nonce, $key
+    );
+    say $decrypted_bytes;
+
+The L<crypto_aead_chacha20poly1305_decrypt|https://doc.libsodium.org/secret-key_cryptography/aead/chacha20-poly1305/original_chacha20-poly1305_construction#combined-mode>
+function returns a string of bytes after verifying that the ciphertext
+includes a valid tag using a secret key, a public nonce, and additional data.
+
+=head2 crypto_aead_chacha20poly1305_encrypt
+
+    use Sodium::FFI qw(
+        randombytes_buf crypto_aead_chacha20poly1305_encrypt
+        crypto_aead_chacha20poly1305_keygen crypto_aead_chacha20poly1305_NPUBBYTES
+    );
+    # First, let's create a key and nonce
+    my $key = crypto_aead_chacha20poly1305_keygen();
+    my $nonce = randombytes_buf(crypto_aead_chacha20poly1305_NPUBBYTES);
+    # let's encrypt 12 bytes of random data... for fun
+    my $message = randombytes_buf(12);
+    # any additional data bytes that were encrypted should also be included
+    # they can be undef
+    my $additional_data = undef; # we don't care to add anything extra
+    $additional_data = randombytes_buf(12); # or some random byte string
+    my $encrypted_bytes = crypto_aead_chacha20poly1305_encrypt(
+        $message, $additional_data, $nonce, $key
+    );
+    say $encrypted_bytes;
+
+The L<crypto_aead_chacha20poly1305_encrypt|https://doc.libsodium.org/secret-key_cryptography/aead/chacha20-poly1305/original_chacha20-poly1305_construction#combined-mode>
+function encrypts a message using a secret key and a public nonce and returns that message
+as a string of bytes.
+
+=head2 crypto_aead_chacha20poly1305_keygen
+
+    use Sodium::FFI qw(
+        crypto_aead_chacha20poly1305_keygen
+    );
+    my $key = crypto_aead_chacha20poly1305_keygen();
+    # this could also be written:
+    use Sodium::FFI qw(randombytes_buf crypto_aead_chacha20poly1305_KEYBYTES);
+    my $key = randombytes_buf(crypto_aead_chacha20poly1305_KEYBYTES);
+
+The L<crypto_aead_chacha20poly1305_keygen|https://doc.libsodium.org/secret-key_cryptography/aead/chacha20-poly1305/original_chacha20-poly1305_construction#detached-mode>
+function returns a byte string of C<crypto_aead_chacha20poly1305_KEYBYTES> bytes.
 
 =head1 Random Number Functions
 

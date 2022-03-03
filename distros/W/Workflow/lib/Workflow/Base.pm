@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use base qw( Class::Accessor );
 use Log::Log4perl;
-$Workflow::Base::VERSION = '1.59';
+$Workflow::Base::VERSION = '1.60';
 
 sub new {
     my ( $class, @params ) = @_;
@@ -42,10 +42,7 @@ sub param {
     }
 
     unless ( defined $value ) {
-        if ( exists $self->{PARAMS}{$name} ) {
-            return $self->{PARAMS}{$name};
-        }
-        return;
+        return $self->{PARAMS}{$name};
     }
     return $self->{PARAMS}{$name} = $value;
 }
@@ -99,7 +96,7 @@ Workflow::Base - Base class with constructor
 
 =head1 VERSION
 
-This documentation describes version 1.59 of this package
+This documentation describes version 1.60 of this package
 
 =head1 SYNOPSIS
 

@@ -6,9 +6,6 @@ do { my $x = {
                       },
        'develop' => {
                       'requires' => {
-                                      'Const::Fast' => '0',
-                                      'English' => '0',
-                                      'File::Slurp' => '0',
                                       'Pod::Coverage::TrustPod' => '0',
                                       'Test::EOF' => '0',
                                       'Test::EOL' => '0',
@@ -27,7 +24,7 @@ do { my $x = {
        'runtime' => {
                       'requires' => {
                                       'Crypt::Digest' => '0',
-                                      'Exporter::Lite' => '0',
+                                      'Exporter' => '5.57',
                                       'JSON::MaybeXS' => '0',
                                       'perl' => 'v5.10.0'
                                     }

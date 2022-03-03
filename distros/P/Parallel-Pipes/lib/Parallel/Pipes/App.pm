@@ -4,7 +4,7 @@ use warnings;
 
 use Parallel::Pipes;
 
-our $VERSION = '0.100';
+our $VERSION = '0.101';
 
 sub _min { $_[0] < $_[1] ? $_[0] : $_[1] }
 
@@ -18,13 +18,18 @@ sub run {
     my $before_work = $argv{before_work};
     my $after_work = $argv{after_work};
 
+    my @result;
     my $pipes = Parallel::Pipes->new($num, $work);
     while (1) {
         my @ready = $pipes->is_ready;
         if (my @written = grep { $_->is_written } @ready) {
             for my $written (@written) {
                 my $result = $written->read;
-                $after_work->($result) if $after_work;
+                if ($after_work) {
+                    $after_work->($result);
+                } else {
+                    push @result, $result;
+                }
             }
         }
         if (@$tasks) {
@@ -42,7 +47,11 @@ sub run {
                     my @ready = $pipes->is_ready(@written);
                     for my $written (@ready) {
                         my $result = $written->read;
-                        $after_work->($result) if $after_work;
+                        if ($after_work) {
+                            $after_work->($result);
+                        } else {
+                            push @result, $result;
+                        }
                     }
                 } else {
                     die "unexpected";
@@ -51,14 +60,7 @@ sub run {
         }
     }
     $pipes->close;
-    1;
-}
-
-sub once {
-    my ($class, %argv) = @_;
-    my @result;
-    $class->run(%argv, after_work => sub { push @result, $_[0] });
-    @result;
+    $after_work ? 1 : @result;
 }
 
 1;
@@ -72,7 +74,7 @@ Parallel::Pipes::App - friendly interface for Parallel::Pipes
 
   use Parallel::Pipes::App;
 
-  my @result = Parallel::Pipes::App->once(
+  my @result = Parallel::Pipes::App->run(
     num => 3,
     work => sub { my $task = shift; $task * 2 },
     tasks => [1, 2, 3, 4, 5],
@@ -85,24 +87,24 @@ Parallel::Pipes::App provides friendly interfaces for L<Parallel::Pipes>.
 
 =head1 METHODS
 
-Parallel::Pipes::App provides 2 class methods:
+Parallel::Pipes::App provides only 1 class method C<run>:
 
 =head2 run
 
+  # Simple usage - process @task, and get @result of $work
+  my @result = Parallel::Pipes::App->run(
+    num => $num,
+    work => $work,
+    tasks => \@task,
+  );
+
+  # General usage
   Parallel::Pipes::App->run(
     num => $num,
     work => $work,
     tasks => \@task,
     before_work => $before_work,
     after_work => $after_work,
-  );
-
-=head2 once
-
-  my @result = Parallel::Pipes::App->once(
-    num => $num,
-    work => $work,
-    tasks => \@task,
   );
 
 =head1 AUTHOR

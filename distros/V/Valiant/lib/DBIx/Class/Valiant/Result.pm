@@ -751,7 +751,7 @@ sub set_multi_related_from_params {
       
       # Don't set params for the found keys (waste of time, no change)
       my %params_for_recursive = %$param_row;
-      delete %params_for_recursive{ keys %keys_used_to_find} if %keys_used_to_find;
+      delete @params_for_recursive{ keys %keys_used_to_find} if %keys_used_to_find;
       $related_model->set_from_params_recursively(%params_for_recursive);
 
       # Ok, so after set_from_params_recursively if the $related_model is not in storage

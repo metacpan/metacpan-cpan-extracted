@@ -1,5 +1,30 @@
 Revision history for perl distribution Object-Signature-Portable:
 
+v1.1.0    2022-03-03 16:15:39+00:00 Europe/London
+  [Enhancements]
+  - Switched from Exporter::Lite to Exporter.
+
+  [Documentation]
+  - Fix encoding of links in README.
+
+  - Removed reference to Object::Serializer, since it seems to have
+    disappeared from CPAN.
+
+  - Bump copyright year.
+
+  [Toolchain]
+  - Removed Travis-CI.
+
+  [Other]
+  - Removed bad rule from MANIFEST.SKIP.
+
+  [Tests]
+  - Remove legacy author tests from xt directory.
+
+  - Change Pod::Spelling test to use File::Slurper.
+
+  - Report version of JSON::PP, Object::Signature and File::Slurper, if installed.
+
 v1.0.0    2020-12-11 14:10:46+00:00 Europe/London
   [Documentation]
   - Updated notes about encodings and numification.

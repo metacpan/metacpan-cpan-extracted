@@ -6,7 +6,7 @@ use warnings;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-10-01'; # DATE
 our $DIST = 'Acme-CPANModules-Parse-UnixShellCommandLine'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 our $LIST = {
     summary => "Modules that parse command-line like Unix shells",
@@ -14,6 +14,10 @@ our $LIST = {
 
 Sometimes you need to parse a Unix shell command-line string, e.g. when you want
 to break it into "words".
+
+In general I recommend <pm:Text::ParseWords> as it is a core module. If you want
+a little more speed, try <pm:Parse::CommandLine::Regexp> (see reference to
+benchmark in See Also).
 
 _
     entries => [
@@ -71,12 +75,16 @@ Acme::CPANModules::Parse::UnixShellCommandLine - Modules that parse command-line
 
 =head1 VERSION
 
-This document describes version 0.001 of Acme::CPANModules::Parse::UnixShellCommandLine (from Perl distribution Acme-CPANModules-Parse-UnixShellCommandLine), released on 2021-10-01.
+This document describes version 0.002 of Acme::CPANModules::Parse::UnixShellCommandLine (from Perl distribution Acme-CPANModules-Parse-UnixShellCommandLine), released on 2021-10-01.
 
 =head1 DESCRIPTION
 
 Sometimes you need to parse a Unix shell command-line string, e.g. when you want
 to break it into "words".
+
+In general I recommend L<Text::ParseWords> as it is a core module. If you want
+a little more speed, try L<Parse::CommandLine::Regexp> (see reference to
+benchmark in See Also).
 
 =head1 ACME::MODULES ENTRIES
 

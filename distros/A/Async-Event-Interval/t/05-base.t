@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 use Async::Event::Interval;
-use Time::HiRes qw(usleep);
+use Data::Dumper;
 use Test::More;
 
 my $mod = 'Async::Event::Interval';
@@ -20,6 +20,7 @@ sleep 2;
 $e->stop;
 
 my $data;
+
 {
     local $/;
     open my $fh, '<', $file or die $!;

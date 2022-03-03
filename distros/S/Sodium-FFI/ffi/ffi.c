@@ -45,6 +45,11 @@ ffi_pl_bundle_constant(const char* package, ffi_platypus_constant_t* c)
     _uint(crypto_aead_aes256gcm_KEYBYTES);
     _uint(crypto_aead_aes256gcm_NPUBBYTES);
     _uint(crypto_aead_aes256gcm_ABYTES);
+
+    /* chacha20poly1305 */
+    _uint(crypto_aead_chacha20poly1305_KEYBYTES);
+    _uint(crypto_aead_chacha20poly1305_NPUBBYTES);
+    _uint(crypto_aead_chacha20poly1305_ABYTES);
 }
 
 void

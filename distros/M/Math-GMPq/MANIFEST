@@ -32,6 +32,7 @@ t/out_str.t
 t/printf.t
 t/TRmpq_out_str.t
 t/pod.t
+t/PV_NV_BUG.t
 t/Rmpq_integer_p.t
 t/test1.t
 t/z_arith.t

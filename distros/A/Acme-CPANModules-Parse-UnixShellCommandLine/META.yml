@@ -19,7 +19,7 @@ name: Acme-CPANModules-Parse-UnixShellCommandLine
 provides:
   Acme::CPANModules::Parse::UnixShellCommandLine:
     file: lib/Acme/CPANModules/Parse/UnixShellCommandLine.pm
-    version: '0.001'
+    version: '0.002'
 requires:
   strict: '0'
   warnings: '0'
@@ -27,7 +27,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Parse-UnixShellCommandLine
   homepage: https://metacpan.org/release/Acme-CPANModules-Parse-UnixShellCommandLine
   repository: git://github.com/perlancar/perl-Acme-CPANModules-Parse-UnixShellCommandLine.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

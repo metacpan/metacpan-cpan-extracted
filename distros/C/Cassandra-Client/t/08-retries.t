@@ -33,7 +33,7 @@ $client->connect();
     $client->execute("drop keyspace if exists $keyspace");
     local $SIG{__WARN__} = sub {
         my $warning = shift;
-        like($warning, qr/Aggregation query used without partition key at/, "expected warning.");
+        ok(1) if $warning =~ qr/Aggregation query used without partition key at/;
     };
     my ($res) = $client->execute("SELECT * FROM system.peers");
     my $node_count = 1 + @{$res->rows};

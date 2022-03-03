@@ -236,7 +236,6 @@ sorted by version> for that information.)
     gv_stashpvn
     gv_stashpvs
     GvSVn
-    __has_builtin
     HEf_SVKEY
     HeUTF8
     hv_fetchs
@@ -528,6 +527,7 @@ sorted by version> for that information.)
     PERL_SHORT_MAX
     PERL_SHORT_MIN
     PERL_SIGNALS_UNSAFE_FLAG
+    PERL_STATIC_INLINE
     PERL_UCHAR_MAX
     PERL_UCHAR_MIN
     PERL_UINT_MAX
@@ -2546,6 +2546,7 @@ backported, first send mail to L<mailto:perl5-porters@perl.org>.
   SvIOK_only_UV
   SvIOK_UV
   sv_len_utf8
+  sv_len_utf8_nomg
   SvPOK_only_UTF8
   sv_pos_b2u
   sv_pos_u2b
@@ -3911,7 +3912,6 @@ backported, first send mail to L<mailto:perl5-porters@perl.org>.
 
 =item Backported version unknown
 
- __has_builtin  (undocumented)
  LC_NUMERIC_LOCK  (undocumented)
  LC_NUMERIC_UNLOCK  (undocumented)
  LOCK_NUMERIC_STANDARD  (undocumented)
@@ -3978,7 +3978,7 @@ package Devel::PPPort;
 use strict;
 use vars qw($VERSION $data);
 
-$VERSION = '3.64';
+$VERSION = '3.66';
 
 sub _init_data
 {
@@ -5099,7 +5099,6 @@ BOL_tb_pb|5.033003||Viu
 BOM_UTF8|5.025005|5.003007|p
 BOM_UTF8_FIRST_BYTE|5.019004||Viu
 BOM_UTF8_TAIL|5.019004||Viu
-bool|5.003007||Viu
 boolSV|5.004000|5.003007|p
 boot_core_builtin|5.035007||Viu
 boot_core_mro|5.009005||Viu
@@ -6166,7 +6165,6 @@ DEBUG_M_FLAG|5.027008||Viu
 DEBUG_m_TEST|5.007001||Viu
 DEBUG_M_TEST|5.027008||Viu
 DEBUG_o|5.003007||Viu
-DEBUG_OFFSETS_r|5.009002||Viu
 DEBUG_o_FLAG|5.007001||Viu
 DEBUG_OPTIMISE_MORE_r|5.009005||Viu
 DEBUG_OPTIMISE_r|5.009002||Viu
@@ -7353,10 +7351,8 @@ HASATTRIBUTE_PURE|5.009003|5.009003|Vn
 HASATTRIBUTE_UNUSED|5.009003|5.009003|Vn
 HASATTRIBUTE_WARN_UNUSED_RESULT|5.009003|5.009003|Vn
 HAS_BACKTRACE|5.021001|5.021001|Vn
-HAS_BOOL|5.003007||Viu
 HAS_BUILTIN_CHOOSE_EXPR|5.009004|5.009004|Vn
 HAS_BUILTIN_EXPECT|5.010001|5.010001|Vn
-__has_builtin|||piu
 HAS_BUILTIN_UNREACHABLE|5.033003||Viu
 HAS_C99|5.021004||Viu
 HAS_C99_VARIADIC_MACROS|5.009004|5.009004|Vn
@@ -9076,6 +9072,13 @@ LONGJMP_tb_p8|5.033003||Viu
 LONGJMP_tb_pb|5.033003||Viu
 LONGLONGSIZE|5.005000|5.005000|Vn
 LONGSIZE|5.004000|5.003007|oVn
+LOOKBEHIND_END_t8_p8|||Viu
+LOOKBEHIND_END_t8_pb|||Viu
+LOOKBEHIND_END_t8|||Viu
+LOOKBEHIND_END_tb_p8|||Viu
+LOOKBEHIND_END_tb_pb|||Viu
+LOOKBEHIND_END_tb|||Viu
+LOOKBEHIND_END|||Viu
 looks_like_bool|5.027008||Viu
 looks_like_number|5.003007|5.003007|
 LOOP_PAT_MODS|5.009005||Viu
@@ -9349,7 +9352,6 @@ MINMOD_tb_p8|5.033003||Viu
 MINMOD_tb_pb|5.033003||Viu
 minus_v|5.015006||Viu
 missingterm|5.005000||Viu
-MJD_OFFSET_DEBUG|5.009004||Viu
 Mkdir|5.004000||Viu
 mkdir|5.005000||Viu
 mktemp|5.005000||Viu
@@ -11079,7 +11081,7 @@ Perl_sqrt|5.006000|5.006000|n
 PERL_STACK_OVERFLOW_CHECK|5.006000||Viu
 PERL_STATIC_FORCE_INLINE|5.031011||Viu
 PERL_STATIC_FORCE_INLINE_NO_RET|5.031011||Viu
-PERL_STATIC_INLINE|5.013004|5.013004|Vn
+PERL_STATIC_INLINE|5.013004|5.013004|poVn
 PERL_STATIC_INLINE_NO_RET|5.017005||Viu
 PERL_STATIC_NO_RET|5.017005||Viu
 PERL_STRLEN_EXPAND_SHIFT|5.013004||Viu
@@ -11425,6 +11427,7 @@ PL_pidstatus|5.005000||Viu
 PL_Posix_ptrs|5.029000||Viu
 PL_ppaddr||5.003007|ponu
 PL_preambleav|5.005000||Viu
+PL_prevailing_version|5.035009||Viu
 PL_Private_Use|5.029009||Viu
 PL_Proc|5.006000||Viu
 PL_profiledata|5.005000||Viu
@@ -11875,8 +11878,6 @@ RE_DEBUG_EXTRA_BUFFERS|5.009005||Viu
 RE_DEBUG_EXTRA_DUMP_PRE_OPTIMIZE|5.031004||Viu
 RE_DEBUG_EXTRA_GPOS|5.011000||Viu
 RE_DEBUG_EXTRA_MASK|5.009004||Viu
-RE_DEBUG_EXTRA_OFFDEBUG|5.009005||Viu
-RE_DEBUG_EXTRA_OFFSETS|5.009004||Viu
 RE_DEBUG_EXTRA_OPTIMISE|5.009005||Viu
 RE_DEBUG_EXTRA_STACK|5.009005||Viu
 RE_DEBUG_EXTRA_STATE|5.009004||Viu
@@ -12097,6 +12098,9 @@ reginitcolors|5.006000||cVu
 reginsert|5.005000||Viu
 REG_INTFLAGS_NAME_SIZE|5.020000||Viu
 register|5.003007||Viu
+reg_la_NOTHING|||Viu
+reg_la_OPFAIL|||Viu
+REG_LB_SEEN|||Viu
 REG_LOOKBEHIND_SEEN|5.019009||Viu
 REG_MAGIC|5.006000||Viu
 regmatch|5.005000||Viu
@@ -12112,6 +12116,7 @@ reg_named_buff_scalar|5.009005||cVu
 regnext|5.003007||cVu
 reg_node|5.005000||Viu
 regnode_guts|5.021005||Viu
+regnode_guts_debug|||Viu
 REGNODE_MAX|5.009004||Viu
 REGNODE_SIMPLE|5.013002||Viu
 REGNODE_VARIES|5.013002||Viu
@@ -12173,7 +12178,6 @@ RE_SV_TAIL|5.009004||Viu
 RETPUSHNO|5.003007||Viu
 RETPUSHUNDEF|5.003007||Viu
 RETPUSHYES|5.003007||Viu
-RE_TRACK_PATTERN_OFFSETS|5.009005||Viu
 RE_TRIE_MAXBUF_INIT|5.009002||Viu
 RE_TRIE_MAXBUF_NAME|5.009002||Viu
 RETSETNO|5.003007||Viu
@@ -13231,7 +13235,7 @@ sv_len|5.003007|5.003007|
 SvLEN|5.003007|5.003007|
 SvLEN_set|5.003007|5.003007|
 sv_len_utf8|5.006000|5.006000|p
-sv_len_utf8_nomg|5.017004||pViu
+sv_len_utf8_nomg||5.006000|p
 SvLENx|5.003007||Viu
 SvLOCK|5.007003|5.007003|
 sv_magic|5.003007|5.003007|
@@ -13333,6 +13337,7 @@ SvPOK_off|5.003007|5.003007|
 SvPOK_on|5.003007|5.003007|
 SvPOK_only|5.003007|5.003007|
 SvPOK_only_UTF8|5.006000|5.006000|
+SvPOK_or_cached_IV|||Viu
 SvPOKp|5.003007|5.003007|
 SvPOKp_on|5.003007||Viu
 SvPOK_pure_nogthink|5.017003||Viu
@@ -14129,9 +14134,9 @@ USE_THREAD_SAFE_LOCALE|5.025004||Viu
 USE_TM64|5.011000||Viu
 USE_UTF8_IN_NAMES|5.007003||Viu
 utf16_textfilter|5.011001||Viu
+utf16_to_utf8|5.035004||cViu
 utf16_to_utf8_base|5.035004||cViu
-utf16_to_utf8|||ciu
-utf16_to_utf8_reversed|||ciu
+utf16_to_utf8_reversed|5.035004||cViu
 UTF8_ACCUMULATE|5.007001||Viu
 UTF8_ALLOW_ANY|5.007001||Viu
 UTF8_ALLOW_ANYUV|5.007001||Viu
@@ -15548,7 +15553,7 @@ __DATA__
 #define DPPP_CAT2(x,y) CAT2(x,y)
 #define DPPP_(name) DPPP_CAT2(DPPP_NAMESPACE, name)
 
-#define D_PPP_RELEASE_DATE 1643673600 /* 2022-02-01 */
+#define D_PPP_RELEASE_DATE 1646179200 /* 2022-03-02 */
 
 #if ! defined(PERL_REVISION) && ! defined(PERL_VERSION_MAJOR)
 #  if   !   defined(__PATCHLEVEL_H_INCLUDED__)                                  \
@@ -16479,6 +16484,18 @@ DPPP_(my_newCONSTSUB)(HV *stash, const char *name, SV *sv)
 #ifndef PERL_MAGIC_ext
 #  define PERL_MAGIC_ext                 '~'
 #endif
+
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
+#ifndef PERL_STATIC_INLINE
+#  define PERL_STATIC_INLINE             static inline
+#endif
+
+#else
+#ifndef PERL_STATIC_INLINE
+#  define PERL_STATIC_INLINE             static
+#endif
+
+#endif
 #ifndef cBOOL
 #  define cBOOL(cbool)                   ((cbool) ? (bool)1 : (bool)0)
 #endif
@@ -16777,7 +16794,9 @@ typedef NVTYPE NV;
 #  endif
 #endif
 
-#if defined(__GNUC__) && !defined(PERL_GCC_BRACE_GROUPS_FORBIDDEN) && !defined(__cplusplus)
+#if  ! defined(__GNUC__) || defined(PERL_GCC_BRACE_GROUPS_FORBIDDEN) || defined(__cplusplus)
+#    undef PERL_USE_GCC_BRACE_GROUPS
+#else
 #  ifndef PERL_USE_GCC_BRACE_GROUPS
 #    define PERL_USE_GCC_BRACE_GROUPS
 #  endif
@@ -19435,9 +19454,22 @@ DPPP_(my_croak_xs_usage)(const CV *const cv, const char *const params)
 #endif
 
 #if defined(PERL_USE_GCC_BRACE_GROUPS)
-# define D_PPP_CROAK_IF_ERROR(cond) ({ SV *_errsv; ((cond) && (_errsv = ERRSV) && (SvROK(_errsv) || SvTRUE(_errsv)) && (croak_sv(_errsv), 1)); })
+# define D_PPP_CROAK_IF_ERROR(cond) ({              \
+    SV *_errsv;                                     \
+    (   (cond)                                      \
+     && (_errsv = ERRSV)                            \
+     && (SvROK(_errsv) || SvTRUE(_errsv))           \
+     && (croak_sv(_errsv), 1));                     \
+  })
 #else
-# define D_PPP_CROAK_IF_ERROR(cond) ((cond) && (SvROK(ERRSV) || SvTRUE(ERRSV)) && (croak_sv(ERRSV), 1))
+  PERL_STATIC_INLINE void D_PPP_CROAK_IF_ERROR(int cond) {
+    dTHX;
+    SV *errsv;
+    if (!cond) return;
+    errsv = ERRSV;
+    if (SvROK(errsv) || SvTRUE(errsv)) croak_sv(errsv);
+  }
+# define D_PPP_CROAK_IF_ERROR(cond) D_PPP_CROAK_IF_ERROR(cond)
 #endif
 
 #ifndef G_METHOD
@@ -19831,11 +19863,25 @@ DPPP_(my_load_module)(U32 flags, SV *name, SV *ver, ...)
 #endif
 
 #ifndef newSVpvn_flags
-#if defined(PERL_USE_GCC_BRACE_GROUPS)
-# define newSVpvn_flags(s, len, flags) ({ SV *_sv = newSVpvn(D_PPP_CONSTPV_ARG((s)), (len)); SvFLAGS(_sv) |= ((flags) & SVf_UTF8); ((flags) & SVs_TEMP) ? sv_2mortal(_sv) : _sv; })
-#else
-# define newSVpvn_flags(s, len, flags) ((PL_Sv = newSVpvn(D_PPP_CONSTPV_ARG((s)), (len))), SvFLAGS(PL_Sv) |= ((flags) & SVf_UTF8), (((flags) & SVs_TEMP) ? sv_2mortal(PL_Sv) : PL_Sv))
-#endif
+#  if defined(PERL_USE_GCC_BRACE_GROUPS)
+#    define newSVpvn_flags(s, len, flags)                       \
+        ({                                                      \
+            SV * sv = newSVpvn(D_PPP_CONSTPV_ARG(s), (len));    \
+            SvFLAGS(sv) |= ((flags) & SVf_UTF8);                \
+            if ((flags) & SVs_TEMP) sv = sv_2mortal(sv);        \
+            sv;                                                 \
+        })
+#  else
+     PERL_STATIC_INLINE SV* D_PPP_newSVpvn_flags(const char *const s, const STRLEN len, const U32 flags)
+     {
+        dTHX;
+        SV * sv = newSVpvn(s, len));
+        SvFLAGS(sv) |= (flags & SVf_UTF8);
+        if (flags & SVs_TEMP) return sv_2mortal(sv);
+        return sv;
+     }
+#    define newSVpvn_flags(s, len, flags) D_PPP_newSVpvn_flags((s), (len), (flags));
+#  endif
 #endif
 #ifndef SV_NOSTEAL
 #  define SV_NOSTEAL                     16
@@ -19855,6 +19901,7 @@ DPPP_(my_load_module)(U32 flags, SV *name, SV *ver, ...)
     }                                                                              \
   } STMT_END
 #else
+#define sv_setsv_flags(dstr, sstr, flags)                                          \
   (                                                                                \
     (((flags) & SV_NOSTEAL) && (sstr) && (SvFLAGS((SV *)(sstr)) & SVs_TEMP)) ? (   \
       SvTEMP_off((SV *)(sstr)),                                                    \
@@ -19928,16 +19975,24 @@ DPPP_(my_load_module)(U32 flags, SV *name, SV *ver, ...)
 
 #endif
 
-#if defined(PERL_USE_GCC_BRACE_GROUPS)
 #ifndef newSVsv_flags
-#  define newSVsv_flags(sv, flags)       ({ SV *_sv = newSV(0); sv_setsv_flags(_sv, (sv), (flags)); _sv; })
-#endif
-
-#else
-#ifndef newSVsv_flags
-#  define newSVsv_flags(sv, flags)       ((PL_Sv = newSV(0)), sv_setsv_flags(PL_Sv, (sv), (flags)), PL_Sv)
-#endif
-
+#  if defined(PERL_USE_GCC_BRACE_GROUPS)
+#    define  newSVsv_flags(sv, flags)                       \
+        ({                                                  \
+            SV *new = newSV(0);                             \
+            sv_setsv_flags(new, (sv), (flags));             \
+            new;                                            \
+        })
+#  else
+    PERL_STATIC_INLINE SV* D_PPP_newSVsv_flags(SV *const old, I32 flags)
+        {
+            dTHX;
+            SV *new = newSV(0);
+            sv_setsv_flags(new, old, flags);
+            return new;
+        }
+#    define  newSVsv_flags(sv, flags) D_PPP_newSVsv_flags(sv, flags)
+#  endif
 #endif
 #ifndef newSVsv_nomg
 #  define newSVsv_nomg(sv)               newSVsv_flags((sv), SV_NOSTEAL)
@@ -20139,8 +20194,10 @@ DPPP_(my_newSVpvn_share)(pTHX_ const char *s, I32 len, U32 hash)
 #ifndef get_cvs
 #  define get_cvs(name, flags)           get_cvn_flags(name "", sizeof(name)-1, flags)
 #endif
+
+#undef  SvGETMAGIC
 #ifndef SvGETMAGIC
-#  define SvGETMAGIC(x)                  STMT_START { if (SvGMAGICAL(x)) mg_get(x); } STMT_END
+#  define SvGETMAGIC(x)                  ((void)(UNLIKELY(SvGMAGICAL(x)) && mg_get(x)))
 #endif
 
 /* That's the best we can do... */
@@ -21928,29 +21985,80 @@ DPPP_(my_utf8_to_uvchr_buf)(pTHX_ const U8 *s, const U8 *send, STRLEN *retlen)
 /* Replace utf8_to_uvchr with utf8_to_uvchr_buf */
 
 #ifdef sv_len_utf8
-   /* Older Perl versions have broken sv_len_utf8() when passed sv does not have SVf_UTF8 flag set */
-   /* Also note that SvGETMAGIC() may change presence of SVf_UTF8 flag */
-#  if (PERL_BCDVERSION < 0x5017005)
+#  if (PERL_BCDVERSION >= 0x5017005)
+#    ifndef  sv_len_utf8_nomg
+#      if defined(PERL_USE_GCC_BRACE_GROUPS)
+#        define sv_len_utf8_nomg(sv)                                    \
+            ({                                                          \
+                SV *sv_ = (sv);                                         \
+                sv_len_utf8(!SvGMAGICAL(sv_)                            \
+                            ? sv_                                       \
+                            : sv_mortalcopy_flags(sv_, SV_NOSTEAL));    \
+            })
+#      else
+         PERL_STATIC_INLINE STRLEN D_PPP_sv_len_utf8_nomg(SV * sv)
+         {
+             dTHX;
+             if (SvGMAGICAL(sv))
+                 return sv_len_utf8(sv_mortalcopy_flags(sv,
+                                                        SV_NOSTEAL));
+             else return sv_len_utf8(sv);
+         }
+#        define  sv_len_utf8_nomg(sv) D_PPP_sv_len_utf8_nomg(sv)
+#      endif
+#    endif
+#  else /* < 5.17.5 */
+    /* Older Perl versions have broken sv_len_utf8() when passed sv does not
+     * have SVf_UTF8 flag set */
+    /* Also note that SvGETMAGIC() may change presence of SVf_UTF8 flag */
 #    undef sv_len_utf8
 #    if defined(PERL_USE_GCC_BRACE_GROUPS)
-#      define sv_len_utf8_nomg(sv) ({ SV *_sv2 = (sv); (SvUTF8(_sv2) ? Perl_sv_len_utf8(aTHX_ (!SvGMAGICAL(_sv2) ? _sv2 : sv_mortalcopy_flags(_sv2, SV_NOSTEAL))) : ({ STRLEN _len; SvPV_nomg(_sv2, _len); _len; })); })
-#      define sv_len_utf8(sv) ({ SV *_sv1 = (sv); SvGETMAGIC(_sv1); sv_len_utf8_nomg(_sv1); })
-#    else
-#      define sv_len_utf8_nomg(sv) (PL_Sv = (sv), (SvUTF8(PL_Sv) ? Perl_sv_len_utf8(aTHX_ (!SvGMAGICAL(PL_Sv) ? PL_Sv : sv_mortalcopy_flags(PL_Sv, SV_NOSTEAL))) : (SvPV_nomg(PL_Sv, PL_na), PL_na)))
-#      define sv_len_utf8(sv) (PL_Sv = (sv), SvGETMAGIC(PL_Sv), sv_len_utf8_nomg(PL_Sv))
+#      define sv_len_utf8_nomg(sv)                                          \
+        ({                                                                  \
+            SV *sv2 = (sv);                                                 \
+            STRLEN len;                                                     \
+            if (SvUTF8(sv2)) {                                              \
+                if (SvGMAGICAL(sv2))                                        \
+                    len = Perl_sv_len_utf8(aTHX_                            \
+                                           sv_mortalcopy_flags(sv2,         \
+                                                               SV_NOSTEAL));\
+                else                                                        \
+                    len = Perl_sv_len_utf8(aTHX_ sv2);                      \
+             }                                                              \
+             else SvPV_nomg(sv2, len);                                      \
+             len;                                                           \
+       })
+#      define sv_len_utf8(sv) ({ SV *_sv1 = (sv);                           \
+                                 SvGETMAGIC(_sv1);                          \
+                                 sv_len_utf8_nomg(_sv1);                    \
+                              })
+#    else   /* Below is no brace groups */
+       PERL_STATIC_INLINE STRLEN D_PPP_sv_len_utf8_nomg(SV * sv)
+       {
+          dTHX;
+          STRLEN len;
+          if (SvUTF8(sv)) {
+              if (SvGMAGICAL(sv))
+                  len = Perl_sv_len_utf8(aTHX_
+                                         sv_mortalcopy_flags(sv,
+                                                             SV_NOSTEAL));
+              else
+                  len = Perl_sv_len_utf8(aTHX_ sv);
+          }
+          else SvPV_nomg(sv, len);
+          return len;
+       }
+#      define sv_len_utf8_nomg(sv) D_PPP_sv_len_utf8_nomg(sv)
+
+       PERL_STATIC_INLINE STRLEN D_PPP_sv_len_utf8(SV * sv)
+       {
+          dTHX;
+          SvGETMAGIC(sv);
+          return sv_len_utf8_nomg(sv);
+       }
+#      define sv_len_utf8(sv) D_PPP_sv_len_utf8(sv)
 #    endif
-#  endif
-#  if defined(PERL_USE_GCC_BRACE_GROUPS)
-#ifndef sv_len_utf8_nomg
-#  define sv_len_utf8_nomg(sv)           ({ SV *_sv = (sv); sv_len_utf8(!SvGMAGICAL(_sv) ? _sv : sv_mortalcopy_flags(_sv, SV_NOSTEAL)); })
-#endif
-
-#  else
-#ifndef sv_len_utf8_nomg
-#  define sv_len_utf8_nomg(sv)           ((PL_Sv = (sv)), sv_len_utf8(!SvGMAGICAL(PL_Sv) ? PL_Sv : sv_mortalcopy_flags(PL_Sv, SV_NOSTEAL)))
-#endif
-
-#  endif
+#  endif    /* End of < 5.17.5 */
 #endif
 #ifndef PERL_PV_ESCAPE_QUOTE
 #  define PERL_PV_ESCAPE_QUOTE           0x0001

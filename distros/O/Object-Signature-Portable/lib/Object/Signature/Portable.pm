@@ -9,10 +9,10 @@ use warnings;
 
 use Carp;
 use Crypt::Digest;
-use Exporter::Lite;
+use Exporter 5.57 qw/ import /;
 use JSON::MaybeXS;
 
-our $VERSION = 'v1.0.0';
+our $VERSION = 'v1.1.0';
 
 our @EXPORT    = qw/ signature /;
 our @EXPORT_OK = @EXPORT;
@@ -67,7 +67,7 @@ Object::Signature::Portable - generate portable fingerprints of objects
 
 =head1 VERSION
 
-version v1.0.0
+version v1.1.0
 
 =head1 SYNOPSIS
 
@@ -224,25 +224,25 @@ subclassesing them.
 One solution is to use a different serializer that can handle the
 object.
 
-Alternatively, you can write a wrapper function that uses a module
-such as L<Object::Serializer> to translate an object into a hash
-reference that can then be passed to the C<signature> function, e.g.
+Alternatively, you can write a wrapper function that translates an
+object into a hash reference that can then be passed to the
+C<signature> function, e.g.
 
     package Foo;
-
-    use parent 'Object::Serializer';
 
     use Object::Signature::Portable ();
 
     sub signature {
         my $self = shift;
         return Object::Signature::Portable::signature(
-          data => $self->serialize
+          data => $self->_serialize
         );
     }
 
-Note that L<Object::Serializer> allows you to define custom
-serialization strategies for various reference types.
+    sub _serialize { # returns a hash reference of the object
+       my $self = shift;
+       ...
+    }
 
 =head2 Portability
 
@@ -339,7 +339,7 @@ L<Sereal::Encoder>.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2013-2014, 2019-2020 by Robert Rothenberg.
+This software is Copyright (c) 2013-2014, 2019-2022 by Robert Rothenberg.
 
 This is free software, licensed under:
 

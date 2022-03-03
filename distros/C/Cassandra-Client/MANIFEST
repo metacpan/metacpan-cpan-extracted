@@ -55,12 +55,12 @@ t/07-named-parameters.t
 t/08-retries.t
 t/10-queue.t
 t/20-memleak.t
+t/40-multiple-async-queries-response.t
 t/50-bench.t
 t/99-long-loop.t
 t/author-pod-syntax.t
 t/lib/InstrumentedRetry.pm
 t/lib/TestCassandra.pm
-t/test.pl
 type.c
 type.h
 weaver.ini

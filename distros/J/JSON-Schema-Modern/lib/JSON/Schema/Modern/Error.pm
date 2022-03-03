@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Error;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Contains a single error from a JSON Schema evaluation
 
-our $VERSION = '0.546';
+our $VERSION = '0.547';
 
 use 5.020;
 use Moo;
@@ -46,7 +46,7 @@ has keyword => (
 );
 
 has exception => (
-  is => 'rw',
+  is => 'ro',
   isa => InstanceOf['JSON::PP::Boolean'],
   coerce => sub { $_[0] ? JSON::PP::true : JSON::PP::false },
 );
@@ -82,7 +82,7 @@ JSON::Schema::Modern::Error - Contains a single error from a JSON Schema evaluat
 
 =head1 VERSION
 
-version 0.546
+version 0.547
 
 =head1 SYNOPSIS
 
@@ -128,6 +128,10 @@ schema never declared an absolute base URI (containing a scheme), this URI won't
 =head2 error
 
 The actual error string.
+
+=head2 exception
+
+Indicates the error's severity is sufficient to stop evaluation.
 
 =head1 METHODS
 

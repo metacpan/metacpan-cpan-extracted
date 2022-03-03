@@ -91,7 +91,7 @@ foreach my $add_schema (@{$opt->add_schema//[]}) {
     $js->add_schema($encoder->decode(path($add_schema)->slurp_utf8));
   }
   catch ($e) {
-    say $e->$_isa('JSON::Schema::Modern::Result') ? $encoder->encode($e->TO_JSON) : $e;
+    say $e->$_isa('JSON::Schema::Modern::Result') ? $encoder->encode($e->TO_JSON) : '"'.$e.'"';
     exit 2;
   }
 }
@@ -114,7 +114,7 @@ json-schema-eval - A command-line interface to JSON::Schema::Modern::evaluate()
 
 =head1 VERSION
 
-version 0.546
+version 0.547
 
 =head1 SYNOPSIS
 

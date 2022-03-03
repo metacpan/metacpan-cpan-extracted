@@ -7,7 +7,6 @@ on 'runtime' => sub {
     requires 'Alien::Sodium' => '2.000';
     requires 'Carp';
     requires 'Cwd';
-    requires 'Data::Dumper';
     requires 'Exporter' => '5.57';
     requires 'FFI::Platypus' => '1.00';
     requires 'File::Basename';

@@ -1,5 +1,5 @@
 {
-   "abstract" : "Timed and one-off asynchronous events",
+   "abstract" : "Scheduled and one-off asynchronous events",
    "author" : [
       "Steve Bertrand <steveb@cpan.org>"
    ],
@@ -50,6 +50,6 @@
          "web" : "https://github.com/stevieb9/async-event-interval"
       }
    },
-   "version" : "1.05",
+   "version" : "1.06",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

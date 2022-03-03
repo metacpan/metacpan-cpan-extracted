@@ -234,4 +234,5 @@ t/integration/coverage/x.tx
 t/lib/Test2/Harness/DB/Postgresql.pm
 t/simple.json
 t/simple.t
+t/util.t
 xt/author/pod-syntax.t

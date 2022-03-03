@@ -15,7 +15,7 @@ my $subtest = sub {
         print {$fh} "$num\n";
         $num;
     };
-    my @back = Parallel::Pipes::App->once(
+    my @back = Parallel::Pipes::App->run(
         work => $work,
         num => $number_of_pipes,
         tasks => [0..30],
@@ -33,6 +33,10 @@ my $subtest = sub {
     is @file, $number_of_pipes;
     is_deeply \@num, [0..30];
     is_deeply \@back, [0..30];
+
+    if ($number_of_pipes == 1) {
+        is $file[0], "$tempdir/file.$$";
+    }
 };
 
 subtest number_of_pipes1 => sub { $subtest->(1) };
