@@ -316,6 +316,8 @@ enum {
 enum {
   // ARRAY_INIT flag
   SPVM_OP_C_FLAG_TYPE_MUTABLE = 1,
+  SPVM_OP_C_FLAG_TYPE_IS_MAYBE_CLASS_ALIAS = 2,
+  SPVM_OP_C_FLAG_TYPE_IS_SELF = 4,
 };
 
 /* Binary operation */
@@ -325,32 +327,31 @@ struct spvm_op {
   SPVM_OP* sibparent;
   const char* file;
   union {
-    const char* name;
-    SPVM_MY* my;
-    SPVM_METHOD* method;
-    SPVM_CONSTANT* constant;
-    SPVM_TYPE* type;
-    SPVM_VAR* var;
-    SPVM_FIELD* field;
-    SPVM_CLASS* class;
-    SPVM_ENUMERATION* enumeration;
-    SPVM_SWITCH_INFO* switch_info;
-    SPVM_CASE_INFO* case_info;
+    SPVM_BLOCK* block;
+    SPVM_DESCRIPTOR* descriptor;
     SPVM_USE* use;
     SPVM_ALLOW* allow;
     SPVM_IMPLEMENT* implement;
-    SPVM_CALL_METHOD* call_method;
-    SPVM_FIELD_ACCESS* field_access;
-    SPVM_ARRAY_FIELD_ACCESS* array_field_access;
-    SPVM_CLASS_VAR* class_var;
     SPVM_CLASS_VAR_ACCESS* class_var_access;
-    SPVM_BLOCK* block;
-    SPVM_DESCRIPTOR* descriptor;
+    SPVM_ARRAY_FIELD_ACCESS* array_field_access;
+    SPVM_FIELD_ACCESS* field_access;
+    SPVM_CALL_METHOD* call_method;
+    SPVM_CONSTANT* constant;
+    SPVM_VAR* var;
+    SPVM_MY* my;
+    SPVM_TYPE* type;
+    const char* name;
+    SPVM_CLASS* class;
+    SPVM_CLASS_VAR* class_var;
+    SPVM_FIELD* field;
+    SPVM_METHOD* method;
+    SPVM_SWITCH_INFO* switch_info;
+    SPVM_CASE_INFO* case_info;
   } uv;
   int32_t id;
   int32_t flag;
   int32_t line;
-  int32_t keyword_start_pos;
+  int32_t column;
   int8_t moresib;
   int8_t is_lvalue;
   int8_t is_assigned_to_var;
@@ -388,7 +389,7 @@ SPVM_OP* SPVM_OP_build_binary_op(SPVM_COMPILER* compiler, SPVM_OP* op_call_op, S
 SPVM_OP* SPVM_OP_build_basic_type(SPVM_COMPILER* compiler, SPVM_OP* op_type_name);
 SPVM_OP* SPVM_OP_build_array_type(SPVM_COMPILER* compiler, SPVM_OP* op_type, SPVM_OP* op_term);
 SPVM_OP* SPVM_OP_build_ref_type(SPVM_COMPILER* compiler, SPVM_OP* op_type_original);
-SPVM_OP* SPVM_OP_build_field_access(SPVM_COMPILER* compiler, SPVM_OP* op_name_class, SPVM_OP* op_name_field);
+SPVM_OP* SPVM_OP_build_field_access(SPVM_COMPILER* compiler, SPVM_OP* op_field_access, SPVM_OP* op_term, SPVM_OP* op_name_field);
 SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP* op_name_class, SPVM_OP* op_block, SPVM_OP* op_list_descriptors);
 SPVM_OP* SPVM_OP_build_method(SPVM_COMPILER* compiler, SPVM_OP* op_method, SPVM_OP* op_methodname, SPVM_OP* op_return_type, SPVM_OP* op_args, SPVM_OP* op_descriptors, SPVM_OP* op_block, SPVM_OP* op_list_captures, SPVM_OP* op_dot3, int32_t is_init, int32_t is_new_callback_object, int32_t can_precompile);
 SPVM_OP* SPVM_OP_build_CONSTVALUE(SPVM_COMPILER* compiler, SPVM_OP* op_const);
@@ -399,7 +400,7 @@ SPVM_OP* SPVM_OP_build_arg(SPVM_COMPILER* compiler, SPVM_OP* op_var, SPVM_OP* op
 SPVM_OP* SPVM_OP_build_use(SPVM_COMPILER* compiler, SPVM_OP* op_use, SPVM_OP* op_type, SPVM_OP* op_type_alias, int32_t is_require);
 SPVM_OP* SPVM_OP_build_allow(SPVM_COMPILER* compiler, SPVM_OP* op_use, SPVM_OP* op_type);
 SPVM_OP* SPVM_OP_build_implement(SPVM_COMPILER* compiler, SPVM_OP* op_use, SPVM_OP* op_type);
-SPVM_OP* SPVM_OP_build_call_method(SPVM_COMPILER* compiler, SPVM_OP* op_invocant, SPVM_OP* op_methodname, SPVM_OP* op_terms);
+SPVM_OP* SPVM_OP_build_call_method(SPVM_COMPILER* compiler, SPVM_OP* op_call_method, SPVM_OP* op_invocant, SPVM_OP* op_name_method, SPVM_OP* op_list_terms);
 SPVM_OP* SPVM_OP_build_convert(SPVM_COMPILER* compiler, SPVM_OP* op_convert, SPVM_OP* op_type, SPVM_OP* op_term, SPVM_OP* op_descriptors);
 SPVM_OP* SPVM_OP_build_enumeration(SPVM_COMPILER* compiler, SPVM_OP* op_enumeration, SPVM_OP* op_enumeration_block, SPVM_OP* op_descripters);
 SPVM_OP* SPVM_OP_build_unary_op(SPVM_COMPILER* compiler, SPVM_OP* op_unary, SPVM_OP* op_first);
@@ -412,11 +413,10 @@ SPVM_OP* SPVM_OP_build_array_init(SPVM_COMPILER* compiler, SPVM_OP* op_array_ini
 SPVM_OP* SPVM_OP_build_inc(SPVM_COMPILER* compiler, SPVM_OP* op_inc, SPVM_OP* op_first);
 SPVM_OP* SPVM_OP_build_dec(SPVM_COMPILER* compiler, SPVM_OP* op_dec, SPVM_OP* op_first);
 SPVM_OP* SPVM_OP_build_special_assign(SPVM_COMPILER* compiler, SPVM_OP* op_special_assign, SPVM_OP* op_term_dist, SPVM_OP* op_term_src);
-SPVM_OP* SPVM_OP_build_class_var_access(SPVM_COMPILER* compiler, SPVM_OP* op_class_var_name);
 SPVM_OP* SPVM_OP_build_make_read_only(SPVM_COMPILER* compiler, SPVM_OP* op_make_read_only, SPVM_OP* op_term);
 
 SPVM_OP* SPVM_OP_new_op_assign_bool(SPVM_COMPILER* compiler, SPVM_OP* op_operand, const char* file, int32_t line);
-SPVM_OP* SPVM_OP_new_op_my(SPVM_COMPILER* compiler, SPVM_MY* my, const char* file, int32_t line);
+SPVM_OP* SPVM_OP_new_op_my(SPVM_COMPILER* compiler, const char* file, int32_t line);
 SPVM_OP* SPVM_OP_new_op_type(SPVM_COMPILER* compiler, SPVM_TYPE* type, const char* file, int32_t line);
 SPVM_OP* SPVM_OP_new_op_block(SPVM_COMPILER* compiler, const char* file, int32_t line);
 SPVM_OP* SPVM_OP_new_op_name(SPVM_COMPILER* compiler, const char* name, const char* file, int32_t line);
@@ -499,5 +499,16 @@ SPVM_OP* SPVM_OP_build_is_read_only(SPVM_COMPILER* compiler, SPVM_OP* op_has_imp
 SPVM_OP* SPVM_OP_build_has_implement(SPVM_COMPILER* compiler, SPVM_OP* op_has_implement, SPVM_OP* op_var, SPVM_OP* op_name);
 
 const char* SPVM_OP_get_op_name(int32_t op_id);
+
+SPVM_OP* SPVM_OP_new_op_use(SPVM_COMPILER* compiler, const char* file, int32_t line);
+
+SPVM_OP* SPVM_OP_new_op_constant(SPVM_COMPILER* compiler, const char* file, int32_t line);
+
+SPVM_OP* SPVM_OP_new_op_array_field_access(SPVM_COMPILER* compiler, const char* file, int32_t line);
+
+SPVM_OP* SPVM_OP_new_op_field_access(SPVM_COMPILER* compiler, const char* file, int32_t line);
+SPVM_OP* SPVM_OP_new_op_call_method(SPVM_COMPILER* compiler, const char* file, int32_t line);
+
+SPVM_OP* SPVM_OP_build_mutable_type(SPVM_COMPILER* compiler, SPVM_OP* op_type_child);
 
 #endif

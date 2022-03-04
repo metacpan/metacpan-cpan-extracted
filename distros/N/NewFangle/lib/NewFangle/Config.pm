@@ -1,10 +1,11 @@
-package NewFangle::Config 0.07 {
+package NewFangle::Config 0.08 {
 
   use strict;
   use warnings;
   use 5.014;
   use NewFangle::FFI;
   use FFI::C::Util ();
+  use Carp ();
 
 # ABSTRACT: NewRelic Configuration class.
 
@@ -13,7 +14,7 @@ package NewFangle::Config 0.07 {
     my($xsub, $class, %config) = @_;
     my $app_name    = delete $config{app_name}    // $ENV{NEWRELIC_APP_NAME}    // 'AppName';
     my $license_key = delete $config{license_key} // $ENV{NEWRELIC_LICENSE_KEY} // '';
-    my $config = $xsub->($app_name, $license_key);
+    my $config = $xsub->($app_name, $license_key) // Carp::croak("Error creating $class, bad license key");
     FFI::C::Util::perl_to_c($config, \%config);
     bless {
       config => $config,
@@ -48,7 +49,7 @@ NewFangle::Config - NewRelic Configuration class.
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -121,7 +122,11 @@ Convert the configuration back to a Perl hash reference.  This may be useful to 
 
 =head1 AUTHOR
 
-Graham Ollis <plicease@cpan.org>
+Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+Owen Allsopp (ALLSOPP)
 
 =head1 COPYRIGHT AND LICENSE
 

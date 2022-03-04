@@ -1,4 +1,4 @@
-package NewFangle::App 0.07 {
+package NewFangle::App 0.08 {
 
   use strict;
   use warnings;
@@ -74,7 +74,7 @@ NewFangle::App - NewRelic application class
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -148,7 +148,11 @@ Returns true if the app class was able to connect to the local NewRelic daemon o
 
 =head1 AUTHOR
 
-Graham Ollis <plicease@cpan.org>
+Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+Owen Allsopp (ALLSOPP)
 
 =head1 COPYRIGHT AND LICENSE
 

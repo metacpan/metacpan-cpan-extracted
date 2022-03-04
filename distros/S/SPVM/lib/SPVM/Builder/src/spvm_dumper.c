@@ -15,9 +15,7 @@
 #include "spvm_my.h"
 #include "spvm_var.h"
 #include "spvm_op.h"
-#include "spvm_enumeration_value.h"
 #include "spvm_type.h"
-#include "spvm_enumeration.h"
 #include "spvm_class.h"
 #include "spvm_type.h"
 #include "spvm_opcode.h"
@@ -81,7 +79,7 @@ void SPVM_DUMPER_dump_ast(SPVM_COMPILER* compiler, SPVM_OP* op_base) {
     }
     else if (id == SPVM_OP_C_ID_VAR) {
       SPVM_VAR* var = op_cur->uv.var;
-      printf(" \"%s\"", var->op_name->uv.name);
+      printf(" \"%s\"", var->name);
       if (var->my) {
         printf(" (my->id:%d) declaration : %d", var->my->id, op_cur->uv.var->is_declaration);
       }
@@ -405,25 +403,12 @@ void SPVM_DUMPER_dump_field(SPVM_COMPILER* compiler, SPVM_FIELD* field) {
 }
 
 
-void SPVM_DUMPER_dump_enumeration_value(SPVM_COMPILER* compiler, SPVM_ENUMERATION_VALUE* enumeration_value) {
-  (void)compiler;
-  
-  if (enumeration_value) {
-    printf("      name => \"%s\"\n", enumeration_value->op_name->uv.name);
-    // TODO add types
-    printf("      value => %" PRId32 "\n", enumeration_value->op_constant->uv.constant->value.ival);
-  }
-  else {
-    printf("      None\n");
-  }
-}
-
 void SPVM_DUMPER_dump_my(SPVM_COMPILER* compiler, SPVM_MY* my) {
   (void)compiler;
 
   if (my) {
     printf("\n");
-    printf("          name => %s\n", my->op_name->uv.name);
+    printf("          name => %s\n", my->var->name);
     printf("          type => ");
     SPVM_TYPE* type = my->type;
     printf("%s", SPVM_TYPE_new_type_name(compiler, type->basic_type->id, type->dimension, type->flag));

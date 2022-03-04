@@ -1,3 +1,12 @@
+0.008   2021-10-01  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [formatting][pod Perinci::Manual::HowTo::FunctionMetadata] Make
+	  the subtopics as =head2 instead of =head1 to avoid potential POD
+	  section ordering issues.
+
+
 0.007   2021-07-31  Released-By: PERLANCAR; Urgency: medium
 
 	- Add

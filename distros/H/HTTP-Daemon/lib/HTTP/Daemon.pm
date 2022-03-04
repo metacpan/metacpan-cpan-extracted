@@ -1,11 +1,11 @@
-package HTTP::Daemon; # git description: v6.12-4-g68bdf73
+package HTTP::Daemon; # git description: v6.13-4-ge6492b6
 
 # ABSTRACT: A simple http server class
 
 use strict;
 use warnings;
 
-our $VERSION = '6.13';
+our $VERSION = '6.14';
 
 use Socket ();
 use IO::Socket::IP;
@@ -603,7 +603,7 @@ HTTP::Daemon - A simple http server class
 
 =head1 VERSION
 
-version 6.13
+version 6.14
 
 =head1 SYNOPSIS
 
@@ -915,7 +915,7 @@ Gisle Aas <gisle@activestate.com>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Olaf Alders Ville Skyttä Karen Etheridge Mark Stosberg Shoichi Kaji Chase Whitener Slaven Rezic Petr Písař Zefram Alexey Tourbin Bron Gondwana Mike Schilli Tom Hukins Adam Kennedy Sjogren Alex Kapranoff amire80 Andreas J. Koenig Bill Mann Daniel Hedlund David E. Wheeler DAVIDRW Father Chrysostomos Ferenc Erki FWILES Gavin Peters Graeme Thompson Hans-H. Froehlich Ian Kilgore Jacob J jefflee john9art murphy Ondrej Hanak Perlover Peter Rabbitson phrstbrn Robert Stone Rolf Grossmann ruff sasao Sean M. Burke Spiros Denaxas Steve Hay Todd Lipcon Tony Finch Toru Yamaguchi Yuri Karaban
+=for stopwords Olaf Alders Ville Skyttä Karen Etheridge Mark Stosberg Shoichi Kaji Chase Whitener Slaven Rezic Petr Písař Zefram Alexey Tourbin Bron Gondwana Michal Josef Špaček Mike Schilli Tom Hukins Adam Kennedy Sjogren Alex Kapranoff amire80 Andreas J. Koenig Bill Mann Daniel Hedlund David E. Wheeler DAVIDRW Father Chrysostomos Ferenc Erki FWILES Gavin Peters Graeme Thompson Hans-H. Froehlich Ian Kilgore Jacob J jefflee john9art murphy Ondrej Hanak Perlover Peter Rabbitson phrstbrn Robert Stone Rolf Grossmann ruff sasao Sean M. Burke Spiros Denaxas Steve Hay Todd Lipcon Tony Finch Toru Yamaguchi Yuri Karaban
 
 =over 4
 
@@ -962,6 +962,10 @@ Alexey Tourbin <at@altlinux.ru>
 =item *
 
 Bron Gondwana <brong@fastmail.fm>
+
+=item *
+
+Michal Josef Špaček <mspacek@redhat.com>
 
 =item *
 

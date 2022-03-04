@@ -1,4 +1,4 @@
-# Copyright (C) 2011-2021 A S Lewis
+# Copyright (C) 2011-2022 A S Lewis
 #
 # This program is free software: you can redistribute it and/or modify it under the terms of the GNU
 # General Public License as published by the Free Software Foundation, either version 3 of the
@@ -17760,7 +17760,7 @@
 
             # Check that no other exits in this room are allocated to the same map direction
             $matchFlag = FALSE;
-            foreach my $otherExitNum ($roomObj->ivValues('exitNumHash')) {
+            OUTER: foreach my $otherExitNum ($roomObj->ivValues('exitNumHash')) {
 
                 my $otherExitObj = $self->ivShow('exitModelHash', $otherExitNum);
 
@@ -23203,8 +23203,6 @@
                     last OUTER;
                 }
             }
-
-
         }
 
         # If it's a portable or decoration, we need to set its type
@@ -24916,6 +24914,40 @@
         } else {
             $self->ivPoke('showTreeViewFlag', FALSE);
         }
+
+        return 1;
+    }
+
+    sub add_teleport {
+
+        # Called by GA::Cmd::AddTeleport
+
+        my ($self, $room, $cmd, $check) = @_;
+
+        # Check for improper arguments
+        if (! defined $room || ! defined $cmd || defined $check) {
+
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->add_teleport', @_);
+        }
+
+        $self->ivAdd('teleportHash', $room, $cmd);
+
+        return 1;
+    }
+
+    sub del_teleport {
+
+        # Called by GA::Cmd::DeleteTeleport
+
+        my ($self, $room, $check) = @_;
+
+        # Check for improper arguments
+        if (! defined $room || defined $check) {
+
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->del_teleport', @_);
+        }
+
+        $self->ivDelete('teleportHash', $room);
 
         return 1;
     }

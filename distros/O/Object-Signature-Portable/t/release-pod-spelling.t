@@ -5,7 +5,6 @@ use warnings;
 
 use Test::More;
 
-use Const::Fast;
 use English qw( -no_match_vars );
 use File::Slurper qw/ read_text / ;
 
@@ -25,7 +24,7 @@ plan skip_all => 'Lingua::Ispell required' if $@;
 eval "require Test::Pod::Spelling";
 plan skip_all => 'Test::Pod::Spelling required' if $@;
 
-const my $dictionary => 'xt/etc/custom-dictionary.txt';
+my $dictionary => 'xt/etc/custom-dictionary.txt';
 
 Test::Pod::Spelling->import(
     spelling => {

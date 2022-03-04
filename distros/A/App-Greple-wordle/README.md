@@ -16,26 +16,41 @@ Rule is almost same as original wordle but answer is different.  Use
 **--compat** option to get compatible answer.
 
 <div>
-    <p><img width="50%" src="https://raw.githubusercontent.com/kaz-utashiro/greple-wordle/main/images/screen-2.png">
+    <p><img width="75%" src="https://raw.githubusercontent.com/kaz-utashiro/greple-wordle/main/images/screen-4.png">
 </div>
 
 # OPTIONS
 
-- **--answer**=_word_
+- **--compat**
 
-    Set answer word.
+    Generate compatible answer with the original game.  Otherwise, this
+    game uses unique sequence using same answer word set as the original
+    Wordle.
 
-- **--count**=_number_
+- **--**\[**no-**\]**result**
 
-    Set try count.
+    Show result when succeeded.  Default true.
+
+- **--index**=_number_
+
+    Specify index. Index is calculated from days from 2021/06/19.  If the
+    value is negative and you can get yesterday's question by giving -1.
+
+- **--series**=_number_
+
+    Choose different series of answers.  Default zero.
 
 - **--random**
 
-    Generate random answer every time.
+    Generate random index every time.
 
-- **--compat**
+- **--count**=_number_
 
-    Generate compatible answer with the original game.
+    Set try count.  Default 6.
+
+- **--answer**=_word_
+
+    Set answer word.  For debug purpose.
 
 # BUGS
 

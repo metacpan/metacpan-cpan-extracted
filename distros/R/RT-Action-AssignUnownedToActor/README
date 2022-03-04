@@ -2,6 +2,9 @@ NAME
     RT-Action-AssignUnownedToActor - Assigns unowned tickets to the
     transaction actor
 
+RT VERSION
+    Works with RT 4, 5.0
+
 DESCRIPTION
     Assigns tickets to the actor of the transaction that triggered the
     scrip, if all the conditions below are met:
@@ -29,7 +32,7 @@ INSTALLATION
         If you are upgrading this module, check for upgrading instructions
         in case changes need to be made to your database.
 
-    Edit your /opt/rt4/etc/RT_SiteConfig.pm
+    Edit your /opt/rt5/etc/RT_SiteConfig.pm
         If you are using RT 4.2 or greater, add this line:
 
             Plugin('RT::Action::AssignUnownedToActor');
@@ -56,7 +59,7 @@ BUGS
         L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Action-AssignUnownedToActor>.
 
 LICENSE AND COPYRIGHT
-    This software is Copyright (c) 2011-2014 by Best Pracical Solutions,
+    This software is Copyright (c) 2011-2022 by Best Pracical Solutions,
     LLC.
 
     This is free software, licensed under:

@@ -72,19 +72,19 @@
    "provides" : {
       "HTML::Spelling::Site" : {
          "file" : "lib/HTML/Spelling/Site.pm",
-         "version" : "v0.8.0"
+         "version" : "v0.10.0"
       },
       "HTML::Spelling::Site::Checker" : {
          "file" : "lib/HTML/Spelling/Site/Checker.pm",
-         "version" : "v0.8.0"
+         "version" : "v0.10.0"
       },
       "HTML::Spelling::Site::Finder" : {
          "file" : "lib/HTML/Spelling/Site/Finder.pm",
-         "version" : "v0.8.0"
+         "version" : "v0.10.0"
       },
       "HTML::Spelling::Site::Whitelist" : {
          "file" : "lib/HTML/Spelling/Site/Whitelist.pm",
-         "version" : "v0.8.0"
+         "version" : "v0.10.0"
       }
    },
    "release_status" : "stable",
@@ -99,10 +99,10 @@
          "web" : "https://github.com/shlomif/HTML-Spelling-Site"
       }
    },
-   "version" : "0.8.0",
+   "version" : "0.10.0",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.032001"
+         "version" : "5.034000"
       },
       "plugins" : [
          {
@@ -583,8 +583,8 @@
          "version" : "6.024"
       }
    },
-   "x_generated_by_perl" : "v5.32.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
+   "x_generated_by_perl" : "v5.34.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
    "x_spdx_expression" : "MIT"
 }
 

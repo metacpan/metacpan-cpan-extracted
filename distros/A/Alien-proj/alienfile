@@ -3,6 +3,7 @@ use alienfile;
 use Sort::Versions;
 use Path::Tiny qw /path/;
 use File::Which qw /which/;
+use FFI::CheckLib;
 
 my $on_windows = $^O =~ /mswin/i;
 my $on_automated_rig
@@ -171,13 +172,12 @@ share {
       #  might need this but it depends on a few things
       if (Alien::libtiff->install_type ('share')) {
         my $libtiff_include = path ('Alien::libtiff'->dist_dir . '/include')->stringify;
-        #  grab the first one - could cause trouble later?
-        my @libtiffs = File::Find::Rule  #  should use FFI::CheckLib instead
-                  ->file()
-                  ->name( 'libtiff*' )
-                  ->in( path ('Alien::libtiff'->dist_dir) );
+        my $libfile = find_lib_file (
+          lib   => 'tiff',
+          alien => 'Alien::libtiff',
+        );
         push @curl_extra_args, (
-          "-DTIFF_LIBRARY=$libtiffs[0]",
+          "-DTIFF_LIBRARY=$libfile",
           "-DTIFF_INCLUDE_DIR=$libtiff_include",
         );
       }
@@ -192,10 +192,12 @@ share {
         $enable_curl = "ON";
         push @PATH, path ('Alien::curl'->dist_dir . '/dynamic');
         my $curl_include = path ('Alien::curl'->dist_dir . '/include')->stringify;
-        #  grab the first one - could cause trouble?
-        my $libcurl = (glob path ('Alien::curl'->dist_dir . '/dynamic/libcurl*'))[0];
+        my $libfile = find_lib_file (
+          lib   => 'curl',
+          alien => 'Alien::curl',
+        );
         push @curl_extra_args, (
-          "-DCURL_LIBRARY=$libcurl",
+          "-DCURL_LIBRARY=$libfile",
           "-DCURL_INCLUDE_DIR=$curl_include",
         );
       }
@@ -221,16 +223,15 @@ share {
     say 'Shared Alien::sqlite found, adding sqlite3 components to configure call';
     #  system install should have these in the relevant paths
     my $sqlite_include = path ('Alien::sqlite'->dist_dir . '/include')->stringify;
-    #  grab the first one - could cause trouble later?
-    my @libsqlite = File::Find::Rule  #  should use FFI::CheckLib instead
-              ->file()
-              ->name( 'libsqlite*' )
-              ->in( path ('Alien::sqlite'->dist_dir) );
+    my $libfile = find_lib_file (
+        lib   => 'sqlite3',
+        alien => 'Alien::sqlite',
+    );
     my $exe_extension = ($on_windows ? '.exe' : '');
     my $sqlite_exe = path ('Alien::sqlite'->dist_dir . "/bin/sqlite3$exe_extension");
     push @sqlite_extra_args, (
       "-DEXE_SQLITE3=$sqlite_exe",
-      "-DSQLITE3_LIBRARY=$libsqlite[0]",
+      "-DSQLITE3_LIBRARY=$libfile",
       "-DSQLITE3_INCLUDE_DIR=$sqlite_include",
     );
   }
@@ -445,6 +446,20 @@ EOD
 }
 
 
+sub find_lib_file {
+  my %args = @_;
+  
+  my(@lib_files) = find_lib(
+      %args,
+      system_path => [],  #  only search the alien
+  );
+  #  we grab the first, assuming they are
+  #  all the same or point to the same origin
+  my $libfile = $lib_files[0];
+  $libfile =~ s|\\|/|g if $on_windows;
+  say "Found $args{lib} dynamic lib: $libfile";
+  return $libfile;
+}
 
 sub get_proj_version {
     my $h = get_alien_state_hash();

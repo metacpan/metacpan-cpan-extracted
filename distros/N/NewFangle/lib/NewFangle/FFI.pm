@@ -1,9 +1,9 @@
-package NewFangle::FFI 0.07 {
+package NewFangle::FFI 0.08 {
 
   use strict;
   use warnings;
   use 5.014;
-  use FFI::CheckLib 0.27 ();
+  use NewFangle::Lib;
   use FFI::Platypus 1.26;
   use FFI::C 0.08;
   use base qw( Exporter );
@@ -13,18 +13,9 @@ package NewFangle::FFI 0.07 {
 # ABSTRACT: Private class for NewFangle.pm
 
 
-  sub _lib {
-    my $lib = FFI::CheckLib::find_lib lib => 'newrelic';
-    $lib
-      ? $lib
-      : FFI::CheckLib::find_lib lib => 'newrelic', alien => 'Alien::libnewrelic'
-    ;
-  }
-
-
   our $ffi = FFI::Platypus->new(
     api => 1,
-    lib => [_lib],
+    lib => [NewFangle::Lib->lib],
   );
   $ffi->mangler(sub { "newrelic_$_[0]" });
   $ffi->load_custom_type('::PtrObject', 'newrelic_segment_t', 'NewFangle::Segment',
@@ -37,7 +28,7 @@ package NewFangle::FFI 0.07 {
 
   FFI::C->ffi($ffi);
 
-  package NewFangle::NewrelicLoglevel 0.07 {
+  package NewFangle::NewrelicLoglevel 0.08 {
     FFI::C->enum([
       'error',
       'warning',
@@ -46,14 +37,14 @@ package NewFangle::FFI 0.07 {
     ], { prefix => 'NEWRELIC_LOG_' });
   }
 
-  package NewFangle::NewrelicTransactionTracerThreshold 0.07 {
+  package NewFangle::NewrelicTransactionTracerThreshold 0.08 {
     FFI::C->enum([
       'is_apdex_failing',
       'is_over_duration',
     ], { prefix => 'NEWRELIC_THRESHOLD_' });
   }
 
-  package NewFangle::NewrelicTtRecordsql 0.07 {
+  package NewFangle::NewrelicTtRecordsql 0.08 {
     FFI::C->enum([
       'off',
       'raw',
@@ -61,7 +52,7 @@ package NewFangle::FFI 0.07 {
     ], { prefix => 'NEWRELIC_SQL_' });
   }
 
-  package NewFangle::DatastoreReporting 0.07 {
+  package NewFangle::DatastoreReporting 0.08 {
     FFI::C->struct([
       enabled      => 'bool',
       record_sql   => 'newrelic_tt_recordsql_t',
@@ -69,7 +60,7 @@ package NewFangle::FFI 0.07 {
     ]);
   };
 
-  package NewFangle::NewrelicTransactionTracerConfig 0.07 {
+  package NewFangle::NewrelicTransactionTracerConfig 0.08 {
     FFI::C->struct([
       enabled                  => 'bool',
       threshold                => 'newrelic_transaction_tracer_threshold_t',
@@ -79,26 +70,26 @@ package NewFangle::FFI 0.07 {
     ]);
   }
 
-  package NewFangle::NewrelicDatastoreSegmentConfig 0.07 {
+  package NewFangle::NewrelicDatastoreSegmentConfig 0.08 {
     FFI::C->struct([
       instance_reporting      => 'bool',
       database_name_reporting => 'bool',
     ]);
   }
 
-  package NewFangle::NewrelicDistributedTracingConfig 0.07 {
+  package NewFangle::NewrelicDistributedTracingConfig 0.08 {
     FFI::C->struct([
       enabled => 'bool',
     ]);
   }
 
-  package NewFangle::NewrelicSpanEventConfig 0.07 {
+  package NewFangle::NewrelicSpanEventConfig 0.08 {
     FFI::C->struct([
       enabled => 'bool',
     ]);
   }
 
-  package NewFangle::NewrelicAppConfig 0.07 {
+  package NewFangle::NewrelicAppConfig 0.08 {
     FFI::C->struct([
       app_name            => 'string(255)',
       license_key         => 'string(255)',
@@ -128,7 +119,7 @@ NewFangle::FFI - Private class for NewFangle.pm
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -148,7 +139,11 @@ This is part of the internal workings for L<NewFangle>.
 
 =head1 AUTHOR
 
-Graham Ollis <plicease@cpan.org>
+Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+Owen Allsopp (ALLSOPP)
 
 =head1 COPYRIGHT AND LICENSE
 

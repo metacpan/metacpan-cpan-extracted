@@ -87,7 +87,7 @@ EOW
         "Gisle Aas <gisle\@activestate.com>"
       ],
       "dist_name" => "HTTP-Daemon",
-      "dist_version" => "6.13",
+      "dist_version" => "6.14",
       "license" => "perl",
       "module_name" => "HTTP::Daemon",
       "recursive_test_files" => 1,

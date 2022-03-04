@@ -1,0 +1,32 @@
+Changes
+ICU.xs
+MANIFEST
+Makefile.PL
+README.md
+cpanfile
+lib/Unicode/ICU.pm
+lib/Unicode/ICU/IDN.pm
+lib/Unicode/ICU/ListFormatter.pm
+lib/Unicode/ICU/Locale.pm
+lib/Unicode/ICU/MessageFormat.pm
+lib/Unicode/ICU/MessagePattern.pm
+lib/Unicode/ICU/MessagePatternPart.pm
+lib/Unicode/ICU/X.pm
+lib/Unicode/ICU/X/BadIDN.pm
+lib/Unicode/ICU/X/Base.pm
+lib/Unicode/ICU/X/ICU.pm
+ppport.h
+t/basic.t
+t/format.t
+t/format_just_icu_loaded.t
+t/idn.t
+t/listformatter.t
+t/locale.t
+t/parse.t
+unicode_icu.cc
+unicode_icu.h
+unicode_icu_argtypelist_hack.hh
+unicode_icu_messagepattern.cc
+unicode_icu_messagepattern.h
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

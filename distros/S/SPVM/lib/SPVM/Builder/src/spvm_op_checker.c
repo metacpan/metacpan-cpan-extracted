@@ -5,7 +5,6 @@
 #include <assert.h>
 #include <ctype.h>
 
-
 #include "spvm_compiler.h"
 #include "spvm_list.h"
 #include "spvm_hash.h"
@@ -17,14 +16,11 @@
 #include "spvm_field.h"
 #include "spvm_my.h"
 #include "spvm_var.h"
-#include "spvm_enumeration_value.h"
 #include "spvm_type.h"
-#include "spvm_enumeration.h"
 #include "spvm_class.h"
 #include "spvm_field_access.h"
 #include "spvm_call_method.h"
 #include "spvm_type.h"
-
 #include "spvm_switch_info.h"
 #include "spvm_limit.h"
 #include "spvm_class_var.h"
@@ -37,11 +33,14 @@
 #include "spvm_string_buffer.h"
 #include "spvm_use.h"
 #include "spvm_implement.h"
+#include "spvm_string.h"
 
 void SPVM_OP_CHECKER_free_mem_id(SPVM_COMPILER* compiler, SPVM_LIST* mem_stack, SPVM_MY* my) {
   (void)compiler;
   
-  int32_t width = my->type_width;
+  SPVM_TYPE* my_type = my->type;
+  
+  int32_t width = SPVM_TYPE_get_width(compiler, my_type->basic_type->id, my_type->dimension, my_type->flag);
 
   for (int32_t mem_id = 0; mem_id < mem_stack->length; mem_id++) {
     int32_t my_id = (intptr_t)SPVM_LIST_fetch(mem_stack, mem_id);
@@ -58,7 +57,9 @@ int32_t SPVM_OP_CHECKER_get_mem_id(SPVM_COMPILER* compiler, SPVM_LIST* mem_stack
   
   int32_t found_mem_id = -1;
   
-  int32_t width = my->type_width;
+  SPVM_TYPE* my_type = my->type;
+
+  int32_t width = SPVM_TYPE_get_width(compiler, my_type->basic_type->id, my_type->dimension, my_type->flag);
   
   // Search free memory
   int32_t found = 0;
@@ -107,8 +108,7 @@ SPVM_OP* SPVM_OP_CHECKER_new_op_var_tmp(SPVM_COMPILER* compiler, SPVM_METHOD* me
   SPVM_OP* op_name = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_NAME, file, line);
   op_name->uv.name = name;
   SPVM_OP* op_var = SPVM_OP_build_var(compiler, op_name);
-  SPVM_MY* my = SPVM_MY_new(compiler);
-  SPVM_OP* op_my = SPVM_OP_new_op_my(compiler, my, file, line);
+  SPVM_OP* op_my = SPVM_OP_new_op_my(compiler, file, line);
   assert(type);
   SPVM_OP* op_type = SPVM_OP_new_op_type(compiler, type, file, line);
   
@@ -118,30 +118,6 @@ SPVM_OP* SPVM_OP_CHECKER_new_op_var_tmp(SPVM_COMPILER* compiler, SPVM_METHOD* me
   op_var->uv.var->is_initialized = 1;
   
   return op_var;
-}
-
-void SPVM_OP_CHECKER_add_no_dup_basic_type(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP* op_type) {
-
-  if (SPVM_TYPE_is_object_type(compiler, op_type->uv.type->basic_type->id, op_type->uv.type->dimension, op_type->uv.type->flag)) {
-    SPVM_CLASS* class = op_class->uv.class;
-
-    SPVM_TYPE* type = op_type->uv.type;
-
-    // Runtime type
-    int32_t runtime_basic_type_id;
-    int32_t runtime_type_dimension;
-    const char* runtime_basic_type_name;
-    runtime_basic_type_id = type->basic_type->id;
-    runtime_type_dimension = type->dimension;
-    runtime_basic_type_name = type->basic_type->name;
-    
-    // No duplicate basic type id
-    SPVM_BASIC_TYPE* found_basic_type = SPVM_HASH_fetch(class->info_basic_type_id_symtable, runtime_basic_type_name, strlen(runtime_basic_type_name));
-    if (found_basic_type == NULL) {
-      SPVM_LIST_push(class->info_basic_type_ids, (void*)(intptr_t)runtime_basic_type_id);
-      SPVM_HASH_insert(class->info_basic_type_id_symtable, runtime_basic_type_name, strlen(runtime_basic_type_name), type->basic_type);
-    }
-  }
 }
 
 void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_CHECK_AST_INFO* check_ast_info) {
@@ -252,39 +228,23 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                 SPVM_TYPE* type_term_element = SPVM_OP_get_type(compiler, op_term_element);
 
                 // Create element type
-                SPVM_TYPE* type_element = SPVM_TYPE_new(compiler);
-                type_element->basic_type = type_term_element->basic_type;
-                type_element->dimension = type_term_element->dimension;
-                op_type_element = SPVM_OP_new_op_type(compiler, type_element, file, line);
+                op_type_element = SPVM_OP_new_op_type(compiler, type_term_element, file, line);
                 
-                // Register basic type
-                if (!SPVM_TYPE_is_numeric_type(compiler, op_type_element->uv.type->basic_type->id,op_type_element->uv.type->dimension, op_type_element->uv.type->flag)) {
-                  SPVM_OP_CHECKER_add_no_dup_basic_type(compiler, class->op_class, op_type_element);
-                }
-                                        
                 // Create array type
-                SPVM_TYPE* type_new = SPVM_TYPE_new(compiler);
-                type_new->basic_type = type_term_element->basic_type;
-                type_new->dimension = type_term_element->dimension + 1;
+                SPVM_TYPE* type_new = SPVM_TYPE_new(compiler, type_term_element->basic_type->id, type_term_element->dimension + 1, 0);
                 op_type_new = SPVM_OP_new_op_type(compiler, type_new, file, line);
               }
               else if (length == 0) {
                 op_type_element = SPVM_OP_new_op_any_object_type(compiler, op_cur->file, op_cur->line);
                 SPVM_TYPE* type_element = op_type_element->uv.type;
-                SPVM_TYPE* type_new = SPVM_TYPE_new(compiler);
-                type_new->basic_type = type_element->basic_type;
-                type_new->dimension = type_element->dimension + 1;
+                SPVM_TYPE* type_new = SPVM_TYPE_new(compiler, type_element->basic_type->id, type_element->dimension + 1, 0);
                 op_type_new = SPVM_OP_new_op_type(compiler, type_new, file, line);
               }
               else {
                 assert(0);
               }
               
-              SPVM_TYPE* type_var_tmp_new = SPVM_TYPE_new(compiler);
-              type_var_tmp_new->basic_type =op_type_new->uv.type->basic_type;
-              type_var_tmp_new->dimension = op_type_new->uv.type->dimension;
-              type_var_tmp_new->flag = op_type_new->uv.type->flag;
-              SPVM_OP* op_var_tmp_new = SPVM_OP_CHECKER_new_op_var_tmp(compiler, method, type_var_tmp_new, file, line);
+              SPVM_OP* op_var_tmp_new = SPVM_OP_CHECKER_new_op_var_tmp(compiler, method, op_type_new->uv.type, file, line);
               
               SPVM_OP_build_assign(compiler, op_assign_new, op_var_tmp_new, op_new);
               SPVM_OP_insert_child(compiler, op_sequence, op_sequence->last, op_assign_new);
@@ -477,7 +437,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
 
                   // Upgrade byte to int
                   if (constant->type->basic_type->id == SPVM_BASIC_TYPE_C_ID_BYTE) {
-                    constant->type = SPVM_TYPE_create_int_type(compiler);
+                    constant->type = SPVM_TYPE_new_int_type(compiler);
                     constant->value.ival = (int32_t)constant->value.bval;
                   }
                   
@@ -507,8 +467,8 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               
               SPVM_LIST_pop(check_ast_info->op_switch_stack);
 
-              op_cur->uv.switch_info->switch_id = class->info_switch_infos->length;
-              SPVM_LIST_push(class->info_switch_infos, op_cur->uv.switch_info);
+              op_cur->uv.switch_info->switch_id = compiler->switch_infos->length;
+              SPVM_LIST_push(compiler->switch_infos, op_cur->uv.switch_info);
               
               // Min
               SPVM_CASE_INFO* case_info_mini = SPVM_LIST_fetch(switch_info->case_infos, 0);
@@ -1017,10 +977,19 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                 
                 SPVM_OP* op_stab = SPVM_OP_cut_op(compiler, op_cur);
                 
-                char* concat_string = SPVM_ALLOCATOR_new_block_compile_eternal(compiler, string1_length + string2_length + 1);
-                memcpy(concat_string, string1, string1_length);
-                memcpy(concat_string + string1_length, string2, string2_length);
+                int32_t memory_blocks_count_compile_tmp = compiler->allocator->memory_blocks_count_compile_tmp;
+                char* concat_string_tmp = SPVM_ALLOCATOR_new_block_compile_tmp(compiler, string1_length + string2_length + 1);
+                memcpy(concat_string_tmp, string1, string1_length);
+                memcpy(concat_string_tmp + string1_length, string2, string2_length);
                 int32_t concant_string_length = string1_length + string2_length;
+                
+                SPVM_STRING* concat_string_string = SPVM_STRING_new(compiler, concat_string_tmp, concant_string_length);
+                const char* concat_string = concat_string_string->value;
+                
+                SPVM_ALLOCATOR_free_block_compile_tmp(compiler, concat_string_tmp);
+                
+                assert(compiler->allocator->memory_blocks_count_compile_tmp == memory_blocks_count_compile_tmp);
+                
                 SPVM_OP* op_concat_constant_string = SPVM_OP_new_op_constant_string(compiler, concat_string, concant_string_length, op_cur->file, op_cur->line);
                 
                 SPVM_OP_replace_op(compiler, op_stab, op_concat_constant_string);
@@ -1076,11 +1045,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                     
                     SPVM_OP* op_sequence = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_SEQUENCE, file, line);
                     SPVM_OP* op_assign_new = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ASSIGN, file, line);
-                    SPVM_TYPE* type_var_tmp_new = SPVM_TYPE_new(compiler);
-                    type_var_tmp_new->basic_type = op_type->uv.type->basic_type;
-                    type_var_tmp_new->dimension = op_type->uv.type->dimension;
-                    type_var_tmp_new->flag = op_type->uv.type->flag;
-                    SPVM_OP* op_var_tmp_new = SPVM_OP_CHECKER_new_op_var_tmp(compiler, method, type_var_tmp_new, file, line);
+                    SPVM_OP* op_var_tmp_new = SPVM_OP_CHECKER_new_op_var_tmp(compiler, method, op_type->uv.type, file, line);
                     
                     SPVM_OP_build_assign(compiler, op_assign_new, op_var_tmp_new, op_new);
 
@@ -1089,13 +1054,13 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                     // Check capture variable exists
                     for (int32_t caputre_index = 0; caputre_index < anon_method->captures->length; caputre_index++) {
                       SPVM_MY* capture_my = SPVM_LIST_fetch(anon_method->captures, caputre_index);
-                      const char* capture_name = capture_my->op_name->uv.name;
+                      const char* capture_name = capture_my->var->name;
 
                       // Search same name variable
                       SPVM_MY* found_my = NULL;
                       for (int32_t stack_my_index = check_ast_info->my_stack->length - 1; stack_my_index >= 0; stack_my_index--) {
                         SPVM_MY* my = SPVM_LIST_fetch(check_ast_info->my_stack, stack_my_index);
-                        if (strcmp(capture_name, my->op_name->uv.name) == 0) {
+                        if (strcmp(capture_name, my->var->name) == 0) {
                           found_my = my;
                           break;
                         }
@@ -1106,17 +1071,19 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                       }
                       
                       // Create field assignment
-                      SPVM_OP* op_name_invoker = SPVM_OP_new_op_name(compiler, op_var_tmp_new->uv.var->op_name->uv.name , op_cur->file, op_cur->line);
+                      SPVM_OP* op_name_invoker = SPVM_OP_new_op_name(compiler, op_var_tmp_new->uv.var->name , op_cur->file, op_cur->line);
                       SPVM_OP* op_term_invoker = SPVM_OP_new_op_var(compiler, op_name_invoker);
                       op_term_invoker->uv.var->my = found_my;
-                      SPVM_OP* op_name_field = SPVM_OP_new_op_name(compiler, found_my->op_name->uv.name + 1, op_cur->file, op_cur->line);
-                      SPVM_OP* op_field_access = SPVM_OP_build_field_access(compiler, op_term_invoker, op_name_field);
+                      SPVM_OP* op_name_field = SPVM_OP_new_op_name(compiler, found_my->var->name + 1, op_cur->file, op_cur->line);
                       
-                      SPVM_OP* op_name_var_capture = SPVM_OP_new_op_name(compiler, found_my->op_name->uv.name, op_cur->file, op_cur->line);
+                      SPVM_OP* op_field_access = SPVM_OP_new_op_field_access(compiler, op_cur->file, op_cur->line);
+                      SPVM_OP_build_field_access(compiler, op_field_access, op_term_invoker, op_name_field);
+                      
+                      SPVM_OP* op_name_var_capture = SPVM_OP_new_op_name(compiler, found_my->var->name, op_cur->file, op_cur->line);
                       SPVM_OP* op_var_capture = SPVM_OP_new_op_var(compiler, op_name_var_capture);
                       op_var_capture->uv.var->my = found_my;
 
-                      SPVM_FIELD* capture_field = SPVM_HASH_fetch(new_class->field_symtable, found_my->op_name->uv.name + 1, strlen(found_my->op_name->uv.name) - 1);
+                      SPVM_FIELD* capture_field = SPVM_HASH_fetch(new_class->field_symtable, found_my->var->name + 1, strlen(found_my->var->name) - 1);
                       op_field_access->uv.field_access->field = capture_field;
                       
                       SPVM_OP* op_assign_field_access = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ASSIGN, op_cur->file, op_cur->line);
@@ -1135,9 +1102,6 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                     if (SPVM_COMPILER_get_error_messages_length(compiler) > 0) {
                       return;
                     }
-
-                    // Add type info to constant pool
-                    SPVM_OP_CHECKER_add_no_dup_basic_type(compiler, class->op_class, op_type);
                   }
                 }
                 // Array type
@@ -1217,9 +1181,6 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                 else {
                   assert(0);
                 }
-                
-                // Add type info to constant pool
-                SPVM_OP_CHECKER_add_no_dup_basic_type(compiler, class->op_class, op_type);
               }
               else {
                 assert(0);
@@ -1303,9 +1264,6 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                   SPVM_COMPILER_error(compiler, "The right operand of the isa operator must be a object type at %s line %d", op_cur->file, op_cur->line);
                   return;
                 }
-
-                // Add type info to constant pool
-                SPVM_OP_CHECKER_add_no_dup_basic_type(compiler, class->op_class, op_type);
               }
               
               break;
@@ -1773,7 +1731,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               if (op_term_dist->id == SPVM_OP_C_ID_ARRAY_ACCESS && op_term_dist->flag & SPVM_OP_C_FLAG_ARRAY_ACCESS_STRING) {
                 SPVM_OP* op_array = op_term_dist->first;
                 SPVM_TYPE* array_type = SPVM_OP_get_type(compiler, op_array);
-                int32_t is_mutable = array_type->is_mutable;
+                int32_t is_mutable = array_type->flag & SPVM_TYPE_C_FLAG_MUTABLE;
 
                 if(!is_mutable) {
                   SPVM_COMPILER_error(compiler, "Can't set the character of non-mutable string at %s line %d", op_term_dist->file, op_term_dist->line);
@@ -2354,9 +2312,9 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                   for (i = block_my_base; i < check_ast_info->my_stack->length; i++) {
                     SPVM_MY* bef_my = SPVM_LIST_fetch(check_ast_info->my_stack, i);
                     
-                    if (strcmp(my->op_name->uv.name, bef_my->op_name->uv.name) == 0) {
+                    if (strcmp(my->var->name, bef_my->var->name) == 0) {
                       // Temporaly variable is not duplicated
-                      if (my->op_name->uv.name[0] != '@') {
+                      if (my->var->name[0] != '@') {
                         found = 1;
                       }
                       break;
@@ -2365,7 +2323,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                 }
                 
                 if (found) {
-                  SPVM_COMPILER_error(compiler, "redeclaration of my \"%s\" at %s line %d", my->op_name->uv.name, my->op_my->file, my->op_my->line);
+                  SPVM_COMPILER_error(compiler, "redeclaration of my \"%s\" at %s line %d", my->var->name, my->op_my->file, my->op_my->line);
                   return;
                 }
                 else {
@@ -2390,7 +2348,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                 for (i = check_ast_info->my_stack->length - 1; i >= 0; i--) {
                   SPVM_MY* my = SPVM_LIST_fetch(check_ast_info->my_stack, i);
                   assert(my);
-                  if (strcmp(var->op_name->uv.name, my->op_name->uv.name) == 0) {
+                  if (strcmp(var->name, my->var->name) == 0) {
                     found_my = my;
                     break;
                   }
@@ -2403,17 +2361,19 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               }
               else {
                 // Variable is capture var
-                SPVM_FIELD* found_capture_field = SPVM_HASH_fetch(class->field_symtable, var->op_name->uv.name + 1, strlen(var->op_name->uv.name) - 1);
+                SPVM_FIELD* found_capture_field = SPVM_HASH_fetch(class->field_symtable, var->name + 1, strlen(var->name) - 1);
                 if (found_capture_field && found_capture_field->is_captured) {
                   
                   // Capture var is converted to field access
                   SPVM_MY* arg_first_my = SPVM_LIST_fetch(method->args, 0);
                   assert(arg_first_my);
-                  SPVM_OP* op_name_invoker = SPVM_OP_new_op_name(compiler, arg_first_my->op_name->uv.name, op_cur->file, op_cur->line);
+                  SPVM_OP* op_name_invoker = SPVM_OP_new_op_name(compiler, arg_first_my->var->name, op_cur->file, op_cur->line);
                   SPVM_OP* op_term_invoker = SPVM_OP_new_op_var(compiler, op_name_invoker);
                   op_term_invoker->uv.var->my = arg_first_my;
-                  SPVM_OP* op_name_field = SPVM_OP_new_op_name(compiler, op_cur->uv.var->op_name->uv.name + 1, op_cur->file, op_cur->line);
-                  SPVM_OP* op_field_access = SPVM_OP_build_field_access(compiler, op_term_invoker, op_name_field);
+                  SPVM_OP* op_name_field = SPVM_OP_new_op_name(compiler, op_cur->uv.var->name + 1, op_cur->file, op_cur->line);
+                  
+                  SPVM_OP* op_field_access = SPVM_OP_new_op_field_access(compiler, op_cur->file, op_cur->line);
+                  SPVM_OP_build_field_access(compiler, op_field_access, op_term_invoker, op_name_field);
                   op_field_access->uv.field_access->field = found_capture_field;
 
                   op_field_access->is_lvalue = op_cur->is_lvalue;
@@ -2435,8 +2395,8 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                 }
                 else {
                   // Variable is class var
-                  SPVM_OP* op_name_class_var = SPVM_OP_new_op_name(compiler, op_cur->uv.var->op_name->uv.name, op_cur->file, op_cur->line);
-                  SPVM_OP* op_class_var_access = SPVM_OP_build_class_var_access(compiler, op_name_class_var);
+                  SPVM_OP* op_name_class_var = SPVM_OP_new_op_name(compiler, op_cur->uv.var->name, op_cur->file, op_cur->line);
+                  SPVM_OP* op_class_var_access = SPVM_OP_new_op_class_var_access(compiler, op_name_class_var);
                   
                   op_class_var_access->is_lvalue = op_cur->is_lvalue;
                   op_class_var_access->is_assigned_to_var = op_cur->is_assigned_to_var;
@@ -2459,7 +2419,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                     }
                   }
                   else {
-                    SPVM_COMPILER_error(compiler, "Local variable %s is not declared at %s line %d", var->op_name->uv.name, op_cur->file, op_cur->line);
+                    SPVM_COMPILER_error(compiler, "Local variable %s is not declared at %s line %d", var->name, op_cur->file, op_cur->line);
                     return;
                   }
                 }
@@ -2552,27 +2512,16 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                 SPVM_TYPE* vaarg_last_arg_type = vaarg_last_arg_my->type;
 
                 // Create new type
-                SPVM_TYPE* type_new = SPVM_TYPE_new(compiler);
-                type_new->basic_type = vaarg_last_arg_type->basic_type;
-                type_new->dimension = vaarg_last_arg_type->dimension;
-                type_new->flag = vaarg_last_arg_type->flag;
-                SPVM_OP* op_type_new = SPVM_OP_new_op_type(compiler, type_new, op_cur->file, op_cur->line);
+                SPVM_OP* op_type_new = SPVM_OP_new_op_type(compiler, vaarg_last_arg_type, op_cur->file, op_cur->line);
                 
                 // Create element type
-                SPVM_TYPE* type_element = SPVM_TYPE_new(compiler);
-                type_element->basic_type = vaarg_last_arg_type->basic_type;
-                type_element->dimension = vaarg_last_arg_type->dimension - 1;
-                type_element->flag = vaarg_last_arg_type->flag;
+                SPVM_TYPE* type_element = SPVM_TYPE_new(compiler, vaarg_last_arg_type->basic_type->id, vaarg_last_arg_type->dimension - 1, vaarg_last_arg_type->flag);
                 SPVM_OP* op_type_element = SPVM_OP_new_op_type(compiler, type_element, op_cur->file, op_cur->line);
                 
                 // Sequence
                 SPVM_OP* op_sequence = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_SEQUENCE, file, line);
                 SPVM_OP* op_assign_new = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ASSIGN, file, line);
-                SPVM_TYPE* type_var_tmp_new = SPVM_TYPE_new(compiler);
-                type_var_tmp_new->basic_type = type_new->basic_type;
-                type_var_tmp_new->dimension = type_new->dimension;
-                type_var_tmp_new->flag = type_new->flag;
-                SPVM_OP* op_var_tmp_new = SPVM_OP_CHECKER_new_op_var_tmp(compiler, method, type_var_tmp_new, file, line);
+                SPVM_OP* op_var_tmp_new = SPVM_OP_CHECKER_new_op_var_tmp(compiler, method, op_type_new->uv.type, file, line);
                 
                 SPVM_OP_build_assign(compiler, op_assign_new, op_var_tmp_new, op_new);
 
@@ -2650,7 +2599,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                   }
                   
                   SPVM_MY* method_arg_my = SPVM_LIST_fetch(call_method->method->args, call_method_args_count - 1);
-                  SPVM_TYPE* method_arg_my_type = SPVM_OP_get_type(compiler, method_arg_my->op_my);
+                  SPVM_TYPE* method_arg_my_type = method_arg_my->type;
                   
                   // Check if source can be assigned to dist
                   // If needed, numeric convertion op is added
@@ -2678,13 +2627,6 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               char method_id_string[sizeof(int32_t)];
               memcpy(method_id_string, &op_cur->uv.call_method->method->id, sizeof(int32_t));
 
-              // No duplicate sub access sub id
-              SPVM_METHOD* found_method = SPVM_HASH_fetch(class->info_method_id_symtable, method_id_string, sizeof(int32_t));
-              if (found_method == NULL) {
-                SPVM_LIST_push(class->info_method_ids, (void*)(intptr_t)op_cur->uv.call_method->method->id);
-                SPVM_HASH_insert(class->info_method_id_symtable, method_id_string, sizeof(int32_t), op_cur->uv.call_method->method);
-              }
-              
               if (call_method->method->flag & SPVM_METHOD_C_FLAG_DESTRUCTOR) {
                 SPVM_COMPILER_error(compiler, "Can't call DESTROY in yourself at %s line %d", op_cur->file, op_cur->line);
                 return;
@@ -2695,20 +2637,26 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                 // Enum is replaced to constant value
                 if (call_method->method->flag & SPVM_METHOD_C_FLAG_ENUM) {
                   // Replace sub to constant
-                  op_cur->id = SPVM_OP_C_ID_CONSTANT;
-                  op_cur->uv.constant = call_method->method->op_inline->uv.constant;
+                  SPVM_OP* op_stab = SPVM_OP_cut_op(compiler, op_cur);
                   
-                  op_cur->first = NULL;
-                  op_cur->last = NULL;
+                  int32_t value = call_method->method->op_inline->uv.constant->value.ival;
+                  SPVM_OP* op_constant = SPVM_OP_new_op_constant_int(compiler, value, op_cur->file, op_cur->line);
+                  
+                  SPVM_OP_replace_op(compiler, op_stab, op_constant);
+                  
+                  op_cur = op_constant;
                 }
-                // Constant sub is replaced to constant value
+                // Constant method is replaced to constant value
                 else if (call_method->method->is_constant) {
-                  // Replace sub to constant
-                  op_cur->id = SPVM_OP_C_ID_CONSTANT;
-                  op_cur->uv.constant = call_method->method->op_inline->uv.constant;
+                  // Replace method to constant
+                  SPVM_OP* op_stab = SPVM_OP_cut_op(compiler, op_cur);
                   
-                  op_cur->first = NULL;
-                  op_cur->last = NULL;
+                  int32_t value = call_method->method->op_inline->uv.constant->value.ival;
+                  SPVM_OP* op_constant = SPVM_OP_new_op_constant_int(compiler, value, op_cur->file, op_cur->line);
+                  
+                  SPVM_OP_replace_op(compiler, op_stab, op_constant);
+                  
+                  op_cur = op_constant;
                 }
                 // Simple constructor is inlined
                 else if (call_method->method->is_simple_constructor) {
@@ -2722,12 +2670,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                   SPVM_OP* op_new = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_NEW, op_cur->file, op_cur->line);
                   op_new->flag |= SPVM_OP_C_FLAG_NEW_INLINE;
                   
-                  SPVM_TYPE* type = SPVM_TYPE_new(compiler);
-                  type->basic_type = type_original->basic_type;
-                  type->dimension = type_original->dimension;
-                  type->flag = type_original->flag;
-                  
-                  SPVM_OP* op_type = SPVM_OP_new_op_type(compiler, type, op_cur->file, op_cur->line);
+                  SPVM_OP* op_type = SPVM_OP_new_op_type(compiler, type_original, op_cur->file, op_cur->line);
                   op_new = SPVM_OP_build_new(compiler, op_new, op_type, NULL);
                   
                   SPVM_OP_CHECKER_check_tree(compiler, op_new, check_ast_info);
@@ -2765,7 +2708,8 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                     SPVM_OP_cut_op(compiler, call_method->op_invocant);
 
                     SPVM_OP* op_name_field_access = SPVM_OP_new_op_name(compiler, field_name, op_cur->file, op_cur->line);
-                    SPVM_OP* op_field_access = SPVM_OP_build_field_access(compiler, call_method->op_invocant, op_name_field_access);
+                    SPVM_OP* op_field_access = SPVM_OP_new_op_field_access(compiler, op_cur->file, op_cur->line);
+                    SPVM_OP_build_field_access(compiler, op_field_access, call_method->op_invocant, op_name_field_access);
                     op_field_access->uv.field_access->inline_expansion = 1;
 
                     SPVM_OP_replace_op(compiler, op_stab, op_field_access);
@@ -2795,7 +2739,8 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                   
                   const char* field_name = call_method->method->accessor_original_name;
                   SPVM_OP* op_name_field_access = SPVM_OP_new_op_name(compiler, field_name, op_cur->file, op_cur->line);
-                  SPVM_OP* op_field_access = SPVM_OP_build_field_access(compiler, call_method->op_invocant, op_name_field_access);
+                  SPVM_OP* op_field_access = SPVM_OP_new_op_field_access(compiler, op_cur->file, op_cur->line);
+                  SPVM_OP_build_field_access(compiler, op_field_access, call_method->op_invocant, op_name_field_access);
                   op_field_access->uv.field_access->inline_expansion = 1;
                   
                   SPVM_OP* op_assign = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ASSIGN, op_cur->file, op_cur->line);
@@ -2824,7 +2769,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                   memcpy(class_var_name + 1 + strlen(class_name), "::", 2);
                   memcpy(class_var_name + 1 + strlen(class_name) + 2, class_var_base_name + 1, strlen(class_var_base_name) - 1);
                   SPVM_OP* op_class_var_name = SPVM_OP_new_op_name(compiler, class_var_name, op_cur->file, op_cur->line);
-                  SPVM_OP* op_class_var_access = SPVM_OP_build_class_var_access(compiler, op_class_var_name);
+                  SPVM_OP* op_class_var_access = SPVM_OP_new_op_class_var_access(compiler, op_class_var_name);
                   op_class_var_access->uv.class_var_access->inline_expansion = 1;
                   
                   SPVM_OP_replace_op(compiler, op_stab, op_class_var_access);
@@ -2859,7 +2804,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                   memcpy(class_var_name + 1 + strlen(class_name), "::", 2);
                   memcpy(class_var_name + 1 + strlen(class_name) + 2, class_var_base_name + 1, strlen(class_var_base_name) - 1);
                   SPVM_OP* op_class_var_name = SPVM_OP_new_op_name(compiler, class_var_name, op_cur->file, op_cur->line);
-                  SPVM_OP* op_class_var_access = SPVM_OP_build_class_var_access(compiler, op_class_var_name);
+                  SPVM_OP* op_class_var_access = SPVM_OP_new_op_class_var_access(compiler, op_class_var_name);
                   op_class_var_access->uv.class_var_access->inline_expansion = 1;
                   
                   SPVM_OP* op_assign = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ASSIGN, op_cur->file, op_cur->line);
@@ -2895,13 +2840,6 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               // Field accesss constant pool id
               char class_var_id_string[sizeof(int32_t)];
               memcpy(class_var_id_string, &op_cur->uv.class_var_access->class_var->id, sizeof(int32_t));
-
-              // No duplicate class_var access class_var id
-              SPVM_FIELD* found_class_var = SPVM_HASH_fetch(class->info_class_var_id_symtable, class_var_id_string, sizeof(int32_t));
-              if (found_class_var == NULL) {
-                SPVM_LIST_push(class->info_class_var_ids, (void*)(intptr_t)op_cur->uv.class_var_access->class_var->id);
-                SPVM_HASH_insert(class->info_class_var_id_symtable, class_var_id_string, sizeof(int32_t), op_cur->uv.class_var_access->class_var);
-              }
 
               int32_t is_private;
               // Public flag
@@ -3092,13 +3030,6 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               char field_id_string[sizeof(int32_t)];
               memcpy(field_id_string, &op_cur->uv.field_access->field->id, sizeof(int32_t));
 
-              // No duplicate field access field id
-              SPVM_FIELD* found_field = SPVM_HASH_fetch(class->info_field_id_symtable, field_id_string, sizeof(int32_t));
-              if (found_field == NULL) {
-                SPVM_LIST_push(class->info_field_ids, (void*)(intptr_t)op_cur->uv.field_access->field->id);
-                SPVM_HASH_insert(class->info_field_id_symtable, field_id_string, sizeof(int32_t), op_cur->uv.field_access->field);
-              }
-              
               // If invocker is array access and array access object is mulnum_t, this op become array field access
               if (op_term_invocker->id == SPVM_OP_C_ID_ARRAY_ACCESS) {
                 SPVM_OP* op_array_access = op_term_invocker;
@@ -3114,14 +3045,13 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                   else {
                     SPVM_OP* op_stab = SPVM_OP_cut_op(compiler, op_cur);
                     
-                    SPVM_OP* op_array_field_access = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ARRAY_FIELD_ACCESS, op_cur->file, op_cur->line);
+                    SPVM_OP* op_array_field_access = SPVM_OP_new_op_array_field_access(compiler, op_cur->file, op_cur->line);
                     op_array_field_access->is_lvalue = op_cur->is_lvalue;
 
                     op_cur = op_array_field_access;
                     
-                    SPVM_ARRAY_FIELD_ACCESS* array_field_access = SPVM_ARRAY_FIELD_ACCESS_new(compiler);
+                    SPVM_ARRAY_FIELD_ACCESS* array_field_access = op_array_field_access->uv.array_field_access;
                     array_field_access->field = field;
-                    op_array_field_access->uv.array_field_access = array_field_access;
                     
                     SPVM_OP* op_array = op_array_access->first;
                     SPVM_OP* op_index = op_array_access->last;
@@ -3423,9 +3353,6 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                 SPVM_COMPILER_error(compiler, "Can't convert %s to %s in type conversion at %s line %d", src_type_name, dist_type_name, op_src->file, op_src->line);
                 return;
               }
-              
-              // Add type info to constant pool
-              SPVM_OP_CHECKER_add_no_dup_basic_type(compiler, class->op_class, op_dist);
             }
             break;
           }
@@ -3552,8 +3479,8 @@ void SPVM_OP_CHECKER_apply_binary_numeric_convertion(SPVM_COMPILER* compiler, SP
 
 void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
   
-  // Resolve types
-  SPVM_OP_CHECKER_resolve_types(compiler);
+  // Resolve type ops
+  SPVM_OP_CHECKER_resolve_op_types(compiler);
   if (SPVM_COMPILER_get_error_messages_length(compiler) > 0) {
     return;
   }
@@ -3570,6 +3497,9 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
     return;
   }
   
+  // Resolve types
+  SPVM_OP_CHECKER_resolve_types(compiler);
+
   // Check trees
   {
     int32_t class_index;
@@ -3582,7 +3512,7 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
           
           SPVM_METHOD* method = SPVM_LIST_fetch(methods, method_index);
           SPVM_CLASS* class = method->class;
-          SPVM_TYPE* class_type = class->op_type->uv.type;
+          SPVM_TYPE* class_type = class->type;
           
           // Destructor must receive own class object
           if (method->flag & SPVM_METHOD_C_FLAG_DESTRUCTOR) {
@@ -3593,7 +3523,7 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
             }
             else {
               SPVM_MY* arg_my = SPVM_LIST_fetch(method->args, 0);
-              SPVM_TYPE* arg_type = SPVM_OP_get_type(compiler, arg_my->op_my);
+              SPVM_TYPE* arg_type = arg_my->type;
               
               if (!(arg_type->basic_type->id == class_type->basic_type->id && arg_type->dimension == class_type->dimension)) {
                 error = 1;
@@ -3610,7 +3540,7 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
             int32_t arg_index;
             for (arg_index = 0 ; arg_index < method->args->length; arg_index++) {
               SPVM_MY* arg_my = SPVM_LIST_fetch(method->args, arg_index);
-              SPVM_TYPE* arg_type = SPVM_OP_get_type(compiler, arg_my->op_my);
+              SPVM_TYPE* arg_type = arg_my->type;
               if (SPVM_TYPE_is_object_type(compiler, arg_type->basic_type->id, arg_type->dimension, arg_type->flag)) {
                 SPVM_LIST_push(method->object_arg_ids, (void*)(intptr_t)arg_index);
               }
@@ -3680,13 +3610,6 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                         break;
                       case SPVM_OP_C_ID_CONSTANT: {
                         SPVM_TYPE* type = SPVM_OP_get_type(compiler, op_cur);
-                        
-                        // String
-                        if (SPVM_TYPE_is_string_type(compiler, type->basic_type->id, type->dimension, type->flag)) {
-                          // Add string constant
-                          op_cur->uv.constant->constant_id = class->info_constants->length;
-                          SPVM_LIST_push(class->info_constants, op_cur->uv.constant);
-                        }
                         break;
                       }
                     }
@@ -3981,32 +3904,6 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
             }
           }
 
-          // Resolve my type width
-          for (int32_t my_index = 0; my_index < method->mys->length; my_index++) {
-            SPVM_MY* my = SPVM_LIST_fetch(method->mys, my_index);
-            SPVM_TYPE* my_type = SPVM_OP_get_type(compiler, my->op_my);
-            
-            int32_t type_width;
-            if (SPVM_TYPE_is_multi_numeric_type(compiler, my_type->basic_type->id, my_type->dimension, my_type->flag)) {
-              SPVM_CLASS* value_class =  my_type->basic_type->class;
-              type_width = value_class->fields->length;
-            }
-            else {
-              type_width = 1;
-            }
-            my->type_width = type_width;
-          }
-
-          // Resolve my runtime type
-          for (int32_t my_index = 0; my_index < method->mys->length; my_index++) {
-            SPVM_MY* my = SPVM_LIST_fetch(method->mys, my_index);
-            SPVM_TYPE* my_type = SPVM_OP_get_type(compiler, my->op_my);
-            my->type_category = SPVM_TYPE_get_type_category(compiler, my_type->basic_type->id, my_type->dimension, my_type->flag);
-          }
-
-          // Resolve return runtime type
-          method->return_type_category = SPVM_TYPE_get_type_category(compiler, method->return_type->basic_type->id, method->return_type->dimension, method->return_type->flag);
-          
           // Arg alloc length
           int32_t args_alloc_length = SPVM_METHOD_get_arg_alloc_length(compiler, method);
           method->args_alloc_length = args_alloc_length;
@@ -4318,7 +4215,7 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                               }
                               case SPVM_BASIC_TYPE_C_ID_INT: {
                                 mem_id = SPVM_OP_CHECKER_get_mem_id(compiler, int_mem_stack, my);
-                                if (strcmp(my->op_name->uv.name, "@condition_flag") == 0) {
+                                if (strcmp(my->var->name, "@condition_flag") == 0) {
                                   assert(mem_id == 0);
                                 }
                                 break;
@@ -4381,7 +4278,7 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                   }
                 }
               }
-
+              
               method->byte_vars_alloc_length = byte_mem_stack->length;
               method->short_vars_alloc_length = short_mem_stack->length;
               method->int_vars_alloc_length = int_mem_stack->length;
@@ -4727,7 +4624,7 @@ SPVM_OP* SPVM_OP_CHECKER_check_assign(SPVM_COMPILER* compiler, SPVM_TYPE* dist_t
   }
   
   // Mutable check
-  if(dist_type->is_mutable && !src_type->is_mutable) {
+  if(dist_type->flag & SPVM_TYPE_C_FLAG_MUTABLE && !(src_type->flag & SPVM_TYPE_C_FLAG_MUTABLE)) {
     SPVM_COMPILER_error(compiler, "Can't assign a non-mutable to a mutable type in %s, at %s line %d", place, file, line);
   }
     
@@ -4758,7 +4655,7 @@ SPVM_OP* SPVM_OP_CHECKER_check_assign(SPVM_COMPILER* compiler, SPVM_TYPE* dist_t
   return op_src;
 }
 
-void SPVM_OP_CHECKER_resolve_types(SPVM_COMPILER* compiler) {
+void SPVM_OP_CHECKER_resolve_op_types(SPVM_COMPILER* compiler) {
 
   SPVM_LIST* op_types = compiler->op_types;
   
@@ -4768,13 +4665,10 @@ void SPVM_OP_CHECKER_resolve_types(SPVM_COMPILER* compiler) {
     
     SPVM_TYPE* type = op_type->uv.type;
 
-    if (type->is_self) {
+    if (op_type->flag & SPVM_OP_C_FLAG_TYPE_IS_SELF) {
       continue;
     }
-    else if (type->is_class_alias) {
-      continue;
-    }
-    else if (type->is_maybe_class_alias) {
+    else if (op_type->flag & SPVM_OP_C_FLAG_TYPE_IS_MAYBE_CLASS_ALIAS) {
       continue;
     }
     
@@ -4808,10 +4702,22 @@ void SPVM_OP_CHECKER_resolve_types(SPVM_COMPILER* compiler) {
     }
 
     // mutable only allow string type
-    if (type->is_mutable && !(type->basic_type->id == SPVM_BASIC_TYPE_C_ID_STRING && type->dimension == 0)) {
+    if (type->flag & SPVM_TYPE_C_FLAG_MUTABLE && !(type->basic_type->id == SPVM_BASIC_TYPE_C_ID_STRING && type->dimension == 0)) {
       SPVM_COMPILER_error(compiler, "The mutable type qualifier can use only string type at %s line %d", op_type->file, op_type->line);
       return;
     }
+  }
+}
+
+void SPVM_OP_CHECKER_resolve_types(SPVM_COMPILER* compiler) {
+
+  SPVM_LIST* types = compiler->types;
+  
+  // Check type names
+  for (int32_t i = 0; i < types->length; i++) {
+    SPVM_TYPE* type = SPVM_LIST_fetch(types, i);
+    type->category = SPVM_TYPE_get_type_category(compiler, type->basic_type->id, type->dimension, type->flag);
+    type->width = SPVM_TYPE_get_width(compiler, type->basic_type->id, type->dimension, type->flag);
   }
 }
 
@@ -5204,7 +5110,7 @@ void SPVM_OP_CHECKER_resolve_classes(SPVM_COMPILER* compiler) {
       for (int32_t arg_index = 0; arg_index < method->args->length; arg_index++) {
         SPVM_MY* arg_my = SPVM_LIST_fetch(method->args, arg_index);
 
-        SPVM_TYPE* arg_type = SPVM_OP_get_type(compiler, arg_my->op_my);
+        SPVM_TYPE* arg_type = arg_my->type;
         
         int32_t is_arg_type_is_multi_numeric_type = SPVM_TYPE_is_multi_numeric_type(compiler, arg_type->basic_type->id, arg_type->dimension, arg_type->flag);
         int32_t is_arg_type_is_value_ref_type = SPVM_TYPE_is_multi_numeric_ref_type(compiler, arg_type->basic_type->id, arg_type->dimension, arg_type->flag);
@@ -5301,10 +5207,10 @@ void SPVM_OP_CHECKER_resolve_classes(SPVM_COMPILER* compiler) {
     SPVM_CLASS* class = SPVM_LIST_fetch(compiler->classes, class_index);
     
     // Add the interfaces to the class
-    for (int32_t i = 0; i < class->op_implements->length; i++) {
-      SPVM_OP* op_implement = SPVM_LIST_fetch(class->op_implements, i);
-      
-      SPVM_IMPLEMENT* implement = op_implement->uv.implement;
+    for (int32_t i = 0; i < class->implements->length; i++) {
+      SPVM_IMPLEMENT* implement =  SPVM_LIST_fetch(class->implements, i);
+
+      SPVM_OP* op_implement = implement->op_implement;
       
       SPVM_OP* op_type_implement = implement->op_type;
       SPVM_TYPE* implement_type = op_type_implement->uv.type;

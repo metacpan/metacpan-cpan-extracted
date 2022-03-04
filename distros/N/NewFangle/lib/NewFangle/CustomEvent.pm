@@ -1,4 +1,4 @@
-package NewFangle::CustomEvent 0.07 {
+package NewFangle::CustomEvent 0.08 {
 
   use strict;
   use warnings;
@@ -42,7 +42,7 @@ NewFangle::CustomEvent - NewRelic custom event class
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -100,7 +100,11 @@ Creates a NewRelic application custom event.
 
 =head1 AUTHOR
 
-Graham Ollis <plicease@cpan.org>
+Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+Owen Allsopp (ALLSOPP)
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -187,7 +187,7 @@ use
     {
       $$ = SPVM_OP_build_use(compiler, $1, $2, NULL, 0);
     }
-  | USE basic_type AS basic_type';'
+  | USE basic_type AS NAME ';'
     {
       $$ = SPVM_OP_build_use(compiler, $1, $2, $4, 0);
     }
@@ -195,12 +195,12 @@ use
 require
   : REQUIRE basic_type
     {
-      SPVM_OP* op_use = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_USE, compiler->cur_file, compiler->cur_line);
+      SPVM_OP* op_use = SPVM_OP_new_op_use(compiler, compiler->cur_file, compiler->cur_line);
       $$ = SPVM_OP_build_use(compiler, op_use, $2, NULL, 1);
     }
   | REQUIRE basic_type AS basic_type';'
     {
-      SPVM_OP* op_use = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_USE, compiler->cur_file, compiler->cur_line);
+      SPVM_OP* op_use = SPVM_OP_new_op_use(compiler, compiler->cur_file, compiler->cur_line);
       $$ = SPVM_OP_build_use(compiler, op_use, $2, $4, 1);
     }
 
@@ -995,7 +995,7 @@ new
       SPVM_OP_build_class(compiler, op_class, NULL, op_class_block, NULL);
 
       // Type
-      SPVM_OP* op_type = SPVM_OP_new_op_type(compiler, op_class->uv.class->op_type->uv.type, op_method->file, op_method->line);
+      SPVM_OP* op_type = SPVM_OP_new_op_type(compiler, op_class->uv.class->type, op_method->file, op_method->line);
       
       // New
       SPVM_OP* op_new = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_NEW, op_method->file, op_method->line);
@@ -1047,68 +1047,82 @@ array_access
 call_spvm_method
   : CURRENT_CLASS NAME '(' opt_expressions  ')'
     {
-      $$ = SPVM_OP_build_call_method(compiler, $1, $2, $4);
+      SPVM_OP* op_call_method = SPVM_OP_new_op_call_method(compiler, compiler->cur_file, compiler->cur_line);
+      $$ = SPVM_OP_build_call_method(compiler, op_call_method, $1, $2, $4);
     }
   | CURRENT_CLASS NAME
     {
+      SPVM_OP* op_call_method = SPVM_OP_new_op_call_method(compiler, compiler->cur_file, compiler->cur_line);
       SPVM_OP* op_expressions = SPVM_OP_new_op_list(compiler, $1->file, $2->line);
-      $$ = SPVM_OP_build_call_method(compiler, $1, $2, op_expressions);
+      $$ = SPVM_OP_build_call_method(compiler, op_call_method, $1, $2, op_expressions);
     }
   | basic_type ARROW method_name '(' opt_expressions  ')'
     {
-      $$ = SPVM_OP_build_call_method(compiler, $1, $3, $5);
+      SPVM_OP* op_call_method = SPVM_OP_new_op_call_method(compiler, compiler->cur_file, compiler->cur_line);
+      $$ = SPVM_OP_build_call_method(compiler, op_call_method, $1, $3, $5);
     }
   | basic_type ARROW method_name
     {
+      SPVM_OP* op_call_method = SPVM_OP_new_op_call_method(compiler, compiler->cur_file, compiler->cur_line);
       SPVM_OP* op_expressions = SPVM_OP_new_op_list(compiler, $1->file, $2->line);
-      $$ = SPVM_OP_build_call_method(compiler, $1, $3, op_expressions);
+      $$ = SPVM_OP_build_call_method(compiler, op_call_method, $1, $3, op_expressions);
     }
   | expression ARROW method_name '(' opt_expressions ')'
     {
-      $$ = SPVM_OP_build_call_method(compiler, $1, $3, $5);
+      SPVM_OP* op_call_method = SPVM_OP_new_op_call_method(compiler, compiler->cur_file, compiler->cur_line);
+      $$ = SPVM_OP_build_call_method(compiler, op_call_method, $1, $3, $5);
     }
   | expression ARROW method_name
     {
+      SPVM_OP* op_call_method = SPVM_OP_new_op_call_method(compiler, compiler->cur_file, compiler->cur_line);
       SPVM_OP* op_expressions = SPVM_OP_new_op_list(compiler, $1->file, $2->line);
-      $$ = SPVM_OP_build_call_method(compiler, $1, $3, op_expressions);
+      $$ = SPVM_OP_build_call_method(compiler, op_call_method, $1, $3, op_expressions);
     }
   | expression ARROW '(' opt_expressions ')'
     {
+      SPVM_OP* op_call_method = SPVM_OP_new_op_call_method(compiler, compiler->cur_file, compiler->cur_line);
       SPVM_OP* op_method_name = SPVM_OP_new_op_name(compiler, "", $2->file, $2->line);
-      $$ = SPVM_OP_build_call_method(compiler, $1, op_method_name, $4);
+      $$ = SPVM_OP_build_call_method(compiler, op_call_method, $1, op_method_name, $4);
     }
+
 field_access
   : expression ARROW '{' field_name '}'
     {
-      $$ = SPVM_OP_build_field_access(compiler, $1, $4);
+      SPVM_OP* op_field_access = SPVM_OP_new_op_field_access(compiler, compiler->cur_file, compiler->cur_line);
+      $$ = SPVM_OP_build_field_access(compiler, op_field_access, $1, $4);
     }
   | field_access '{' field_name '}'
     {
-      $$ = SPVM_OP_build_field_access(compiler, $1, $3);
+      SPVM_OP* op_field_access = SPVM_OP_new_op_field_access(compiler, compiler->cur_file, compiler->cur_line);
+      $$ = SPVM_OP_build_field_access(compiler, op_field_access, $1, $3);
     }
   | array_access '{' field_name '}'
     {
-      $$ = SPVM_OP_build_field_access(compiler, $1, $3);
+      SPVM_OP* op_field_access = SPVM_OP_new_op_field_access(compiler, compiler->cur_file, compiler->cur_line);
+      $$ = SPVM_OP_build_field_access(compiler, op_field_access, $1, $3);
     }
 
 weaken_field
   : WEAKEN var ARROW '{' field_name '}'
     {
-      SPVM_OP* op_field_access = SPVM_OP_build_field_access(compiler, $2, $5);
+      SPVM_OP* op_field_access = SPVM_OP_new_op_field_access(compiler, compiler->cur_file, compiler->cur_line);
+      SPVM_OP_build_field_access(compiler, op_field_access, $2, $5);
       $$ = SPVM_OP_build_weaken_field(compiler, $1, op_field_access);
     }
 
 unweaken_field
   : UNWEAKEN var ARROW '{' field_name '}'
     {
-      SPVM_OP* op_field_access = SPVM_OP_build_field_access(compiler, $2, $5);
+      SPVM_OP* op_field_access = SPVM_OP_new_op_field_access(compiler, compiler->cur_file, compiler->cur_line);
+      SPVM_OP_build_field_access(compiler, op_field_access, $2, $5);
       $$ = SPVM_OP_build_unweaken_field(compiler, $1, op_field_access);
     }
 
 isweak_field
   : ISWEAK var ARROW '{' field_name '}'
     {
-      SPVM_OP* op_field_access = SPVM_OP_build_field_access(compiler, $2, $5);
+      SPVM_OP* op_field_access = SPVM_OP_new_op_field_access(compiler, compiler->cur_file, compiler->cur_line);
+      SPVM_OP_build_field_access(compiler, op_field_access, $2, $5);
       $$ = SPVM_OP_build_isweak_field(compiler, $1, op_field_access);
     }
 
@@ -1159,8 +1173,7 @@ var
 qualified_type
   : type
   | MUTABLE type {
-    $2->uv.type->is_mutable = 1;
-    $$ = $2;
+    $$ = SPVM_OP_build_mutable_type(compiler, $2);
   }
 
 type

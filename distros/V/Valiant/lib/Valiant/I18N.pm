@@ -59,7 +59,7 @@ sub add_locale_path {
 sub _module_path {
   my $class_name = shift;
   my @parts = split '::', $class_name;
-  my $path = File::Spec->catfile(@parts);
+  my $path = join '/', @parts;
   debug 3, "trying to find module path for class '$class_name' via 'INC{${path}.pm}'";
   my $inc = $INC{"${path}.pm"};
   unless($inc) {

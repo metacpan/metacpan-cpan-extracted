@@ -5,6 +5,7 @@ requires 'Getopt::EX', 'v1.27.0';
 requires 'List::Util';
 requires 'List::MoreUtils';
 requires 'Date::Calc';
+requires 'Text::VisualWidth::PP', '0.05';
 
 on 'test' => sub {
     requires 'Test::More', '0.98';

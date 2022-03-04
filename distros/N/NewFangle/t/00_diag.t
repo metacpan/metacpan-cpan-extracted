@@ -30,9 +30,12 @@ $modules{$_} = $_ for qw(
 
 $post_diag = sub {
   eval {
-    require NewFangle;
-    diag 'newrelic_version = ', NewFangle::newrelic_version();
+    require NewFangle::Lib;
     diag 'lib              = ', $_ for NewFangle::FFI::_lib();
+  };
+  eval {
+    require NewFangle::FFI;
+    diag 'newrelic_version = ', NewFangle::newrelic_version();
   };
  };
 

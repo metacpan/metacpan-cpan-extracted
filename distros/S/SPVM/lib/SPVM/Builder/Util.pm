@@ -21,6 +21,52 @@ sub need_generate {
   my $config_force = $opt->{config_force};
   my $input_files = $opt->{input_files};
   my $output_file = $opt->{output_file};
+  
+  # SPVM::Builder modules
+  my @spvm_core_files;
+  my $spvm_core_files_mtime_max;
+  if (my $builder_loaded_file = $INC{'SPVM/Builder.pm'}) {
+    my $builder_loaded_dir = $builder_loaded_file;
+    $builder_loaded_dir =~ s|SPVM/Builder\.pm$||;
+    
+    # SPVM::Builder module files
+    my $spvm_builder_module_file_names = &get_spvm_builder_module_file_names();
+    for my $spvm_builder_module_file_name (@$spvm_builder_module_file_names) {
+      my $module_file = "$builder_loaded_dir/$spvm_builder_module_file_name";
+      unless (-f $module_file) {
+        confess 'Unexpected';
+      }
+      push @spvm_core_files, $module_file;
+    }
+    
+    # SPVM core header files
+    my $spvm_core_header_file_names = &get_spvm_core_header_file_names();
+    for my $spvm_core_header_file_name (@$spvm_core_header_file_names) {
+      my $spvm_core_header_file = "$builder_loaded_dir/SPVM/Builder/include/$spvm_core_header_file_name";
+      unless (-f $spvm_core_header_file) {
+        confess 'Unexpected';
+      }
+      push @spvm_core_files, $spvm_core_header_file;
+    }
+    
+    # SPVM core source files
+    my $spvm_core_source_file_names  = &get_spvm_core_source_file_names();
+    for my $spvm_core_source_file_name (@$spvm_core_source_file_names) {
+      my $spvm_core_source_file = "$builder_loaded_dir/SPVM/Builder/src/$spvm_core_source_file_name";
+      unless (-f $spvm_core_source_file) {
+        confess 'Unexpected';
+      }
+      push @spvm_core_files, $spvm_core_source_file;
+    }
+    
+    $spvm_core_files_mtime_max = 0;
+    for my $spvm_core_file (@spvm_core_files) {
+      my $spvm_core_file_mtime = (stat($spvm_core_file))[9];
+      if ($spvm_core_file_mtime > $spvm_core_files_mtime_max) {
+        $spvm_core_files_mtime_max = $spvm_core_file_mtime;
+      }
+    }
+  }
 
   my $need_generate;
   if ($global_force) {
@@ -47,6 +93,13 @@ sub need_generate {
       }
       if ($exists_input_file_at_least_one) {
         my $output_file_mtime = (stat($output_file))[9];
+        
+        if (defined $spvm_core_files_mtime_max) {
+          if ($spvm_core_files_mtime_max > $input_files_mtime_max) {
+            $input_files_mtime_max = $spvm_core_files_mtime_max;
+          }
+        }
+        
         if ($input_files_mtime_max > $output_file_mtime) {
           $need_generate = 1;
         }
@@ -284,6 +337,24 @@ sub create_class_make_rule {
   return $make_rule;
 }
 
+sub get_spvm_builder_module_file_names {
+  my @spvm_builder_module_file_names = qw(
+    SPVM/Builder/Exe.pm
+    SPVM/Builder/API.pm
+    SPVM/Builder/Util/API.pm
+    SPVM/Builder/Config/Exe.pm
+    SPVM/Builder/LinkInfo.pm
+    SPVM/Builder/Generator/Lib.pm
+    SPVM/Builder/Config.pm
+    SPVM/Builder/CC.pm
+    SPVM/Builder/ObjectFileInfo.pm
+    SPVM/Builder/Util.pm
+    SPVM/Builder.pm
+  );
+  
+  return \@spvm_builder_module_file_names;
+}
+
 sub get_spvm_core_source_file_names {
   
   my @spvm_core_source_file_names = qw(
@@ -304,8 +375,6 @@ sub get_spvm_core_source_file_names {
     spvm_csource_builder_precompile.c
     spvm_descriptor.c
     spvm_dumper.c
-    spvm_enumeration.c
-    spvm_enumeration_value.c
     spvm_field_access.c
     spvm_field.c
     spvm_hash.c
@@ -317,6 +386,7 @@ sub get_spvm_core_source_file_names {
     spvm_opcode_array.c
     spvm_opcode_builder.c
     spvm_opcode.c
+    spvm_string.c
     spvm_string_buffer.c
     spvm_switch_info.c
     spvm_toke.c
@@ -351,8 +421,6 @@ sub get_spvm_core_header_file_names {
     spvm_csource_builder_precompile.h
     spvm_descriptor.h
     spvm_dumper.h
-    spvm_enumeration.h
-    spvm_enumeration_value.h
     spvm_field_access.h
     spvm_field.h
     spvm_hash.h
@@ -369,6 +437,7 @@ sub get_spvm_core_header_file_names {
     spvm_opcode_builder.h
     spvm_opcode.h
     spvm_op.h
+    spvm_string.h
     spvm_string_buffer.h
     spvm_switch_info.h
     spvm_toke.h

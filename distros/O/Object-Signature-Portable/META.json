@@ -67,7 +67,7 @@
    "provides" : {
       "Object::Signature::Portable" : {
          "file" : "lib/Object/Signature/Portable.pm",
-         "version" : "v1.1.0"
+         "version" : "v1.1.1"
       }
    },
    "release_status" : "stable",
@@ -81,7 +81,7 @@
          "web" : "https://github.com/robrwo/Object-Signature-Portable"
       }
    },
-   "version" : "v1.1.0",
+   "version" : "v1.1.1",
    "x_authority" : "cpan:RRWO",
    "x_generated_by_perl" : "v5.34.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",

@@ -1,6 +1,11 @@
 Changelog for HealthCheck-Diagnostic-SFTP
 
-v1.4.1 2022-02-10T17:18:25
+v1.4.2 2022-03-03T23:08:05
+ - Update README (Andrew Hewus Fresh)
+ - Pull request #5: SM-3529 (Mitch McCracken)
+ - Call alarm(0) after connection failure exceptions (Mitch McCracken)
+
+v1.4.1 2022-02-10T17:18:09
  - Update README (Andrew Hewus Fresh)
  - Pull request #4: SM-3514 (Mitch McCracken)
  - Show port in output if one was given (Mitch McCracken)

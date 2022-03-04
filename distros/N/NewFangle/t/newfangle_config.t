@@ -8,4 +8,13 @@ my $config = NewFangle::Config->new;
 isa_ok $config, 'NewFangle::Config';
 note Dump($config->to_perl);
 
+like(
+    dies {
+        local $ENV{NEWRELIC_LICENSE_KEY} = 'a' x 39;
+        NewFangle::Config->new;
+    },
+    qr/Error creating NewFangle::Config, bad license key/,
+    'constructor dies when create_app_config returns NULL pointer',
+);
+
 done_testing;

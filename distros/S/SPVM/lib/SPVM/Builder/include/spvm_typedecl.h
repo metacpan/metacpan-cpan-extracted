@@ -4,6 +4,10 @@
 #include <stdint.h>
 #include <stddef.h>
 
+// spvm_string.h
+struct spvm_string;
+typedef struct spvm_string SPVM_STRING;
+
 // spvm_implement.h
 struct spvm_implement;
 typedef struct spvm_implement SPVM_IMPLEMENT;
@@ -149,14 +153,6 @@ typedef struct spvm_type SPVM_TYPE;
 // spvm_type_component_array.h
 struct spvm_type_part;
 typedef struct spvm_type_part SPVM_TYPE_PART;
-
-// spvm_enum.h
-struct spvm_enumeration;
-typedef struct spvm_enumeration SPVM_ENUMERATION;
-
-// spvm_enumeration_value.h
-struct spvm_enumeration_value;
-typedef struct spvm_enumeration_value SPVM_ENUMERATION_VALUE;
 
 // spvm_var.h
 struct spvm_var;

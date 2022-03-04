@@ -9,10 +9,8 @@ struct spvm_constant {
   SPVM_TYPE* type;
   SPVM_VALUE value;
   int32_t string_length;
-  int32_t constant_id;
 };
 
 SPVM_CONSTANT* SPVM_CONSTANT_new(SPVM_COMPILER* compiler);
-SPVM_CONSTANT* SPVM_CONSTANT_create_int_1(SPVM_COMPILER* compiler);
 
 #endif

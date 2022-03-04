@@ -151,6 +151,7 @@ lib/AsposeSlidesCloud/Object/ScatterChartDataPoint.pm
 lib/AsposeSlidesCloud/Object/ScatterSeries.pm
 lib/AsposeSlidesCloud/Object/Section.pm
 lib/AsposeSlidesCloud/Object/Sections.pm
+lib/AsposeSlidesCloud/Object/SectionZoomFrame.pm
 lib/AsposeSlidesCloud/Object/Series.pm
 lib/AsposeSlidesCloud/Object/SeriesMarker.pm
 lib/AsposeSlidesCloud/Object/Shape.pm
@@ -180,6 +181,8 @@ lib/AsposeSlidesCloud/Object/SplitDocumentResult.pm
 lib/AsposeSlidesCloud/Object/StorageExist.pm
 lib/AsposeSlidesCloud/Object/StorageFile.pm
 lib/AsposeSlidesCloud/Object/SubscriptElement.pm
+lib/AsposeSlidesCloud/Object/SummaryZoomFrame.pm
+lib/AsposeSlidesCloud/Object/SummaryZoomSection.pm
 lib/AsposeSlidesCloud/Object/SuperscriptElement.pm
 lib/AsposeSlidesCloud/Object/SvgExportOptions.pm
 lib/AsposeSlidesCloud/Object/SwfExportOptions.pm
@@ -189,6 +192,7 @@ lib/AsposeSlidesCloud/Object/TableColumn.pm
 lib/AsposeSlidesCloud/Object/TableRow.pm
 lib/AsposeSlidesCloud/Object/Task.pm
 lib/AsposeSlidesCloud/Object/TextElement.pm
+lib/AsposeSlidesCloud/Object/TextFrameFormat.pm
 lib/AsposeSlidesCloud/Object/TextItem.pm
 lib/AsposeSlidesCloud/Object/TextItems.pm
 lib/AsposeSlidesCloud/Object/Theme.pm
@@ -196,12 +200,16 @@ lib/AsposeSlidesCloud/Object/ThreeDFormat.pm
 lib/AsposeSlidesCloud/Object/TiffExportOptions.pm
 lib/AsposeSlidesCloud/Object/UpdateBackground.pm
 lib/AsposeSlidesCloud/Object/UpdateShape.pm
+lib/AsposeSlidesCloud/Object/VideoExportOptions.pm
 lib/AsposeSlidesCloud/Object/VideoFrame.pm
 lib/AsposeSlidesCloud/Object/ViewProperties.pm
 lib/AsposeSlidesCloud/Object/WaterfallChartDataPoint.pm
 lib/AsposeSlidesCloud/Object/WaterfallSeries.pm
 lib/AsposeSlidesCloud/Object/XamlExportOptions.pm
 lib/AsposeSlidesCloud/Object/XpsExportOptions.pm
+lib/AsposeSlidesCloud/Object/XYSeries.pm
+lib/AsposeSlidesCloud/Object/ZoomFrame.pm
+lib/AsposeSlidesCloud/Object/ZoomObject.pm
 lib/AsposeSlidesCloud/SlidesApi.pm
 LICENSE
 MakeFile.pl

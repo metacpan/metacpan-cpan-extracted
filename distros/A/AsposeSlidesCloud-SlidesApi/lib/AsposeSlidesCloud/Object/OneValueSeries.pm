@@ -219,34 +219,6 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
-    'number_format_of_y_values' => {
-    	datatype => 'string',
-    	base_name => 'NumberFormatOfYValues',
-    	description => 'The number format for the series y values.',
-    	format => '',
-    	read_only => '',
-    		},
-    'number_format_of_x_values' => {
-    	datatype => 'string',
-    	base_name => 'NumberFormatOfXValues',
-    	description => 'The number format for the series x values.',
-    	format => '',
-    	read_only => '',
-    		},
-    'number_format_of_values' => {
-    	datatype => 'string',
-    	base_name => 'NumberFormatOfValues',
-    	description => 'The number format for the series values.',
-    	format => '',
-    	read_only => '',
-    		},
-    'number_format_of_bubble_sizes' => {
-    	datatype => 'string',
-    	base_name => 'NumberFormatOfBubbleSizes',
-    	description => 'The number format for the series bubble sizes.',
-    	format => '',
-    	read_only => '',
-    		},
     'invert_if_negative' => {
     	datatype => 'boolean',
     	base_name => 'InvertIfNegative',
@@ -303,6 +275,13 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'number_format_of_values' => {
+    	datatype => 'string',
+    	base_name => 'NumberFormatOfValues',
+    	description => 'The number format for the series values.',
+    	format => '',
+    	read_only => '',
+    		},
 });
 
 __PACKAGE__->swagger_types( {
@@ -313,10 +292,6 @@ __PACKAGE__->swagger_types( {
     'smooth' => 'boolean',
     'plot_on_second_axis' => 'boolean',
     'order' => 'int',
-    'number_format_of_y_values' => 'string',
-    'number_format_of_x_values' => 'string',
-    'number_format_of_values' => 'string',
-    'number_format_of_bubble_sizes' => 'string',
     'invert_if_negative' => 'boolean',
     'explosion' => 'int',
     'marker' => 'SeriesMarker',
@@ -324,7 +299,8 @@ __PACKAGE__->swagger_types( {
     'effect_format' => 'EffectFormat',
     'line_format' => 'LineFormat',
     'data_point_type' => 'string',
-    'data_points' => 'ARRAY[OneValueChartDataPoint]'
+    'data_points' => 'ARRAY[OneValueChartDataPoint]',
+    'number_format_of_values' => 'string'
 } );
 
 __PACKAGE__->attribute_map( {
@@ -335,10 +311,6 @@ __PACKAGE__->attribute_map( {
     'smooth' => 'Smooth',
     'plot_on_second_axis' => 'PlotOnSecondAxis',
     'order' => 'Order',
-    'number_format_of_y_values' => 'NumberFormatOfYValues',
-    'number_format_of_x_values' => 'NumberFormatOfXValues',
-    'number_format_of_values' => 'NumberFormatOfValues',
-    'number_format_of_bubble_sizes' => 'NumberFormatOfBubbleSizes',
     'invert_if_negative' => 'InvertIfNegative',
     'explosion' => 'Explosion',
     'marker' => 'Marker',
@@ -346,7 +318,8 @@ __PACKAGE__->attribute_map( {
     'effect_format' => 'EffectFormat',
     'line_format' => 'LineFormat',
     'data_point_type' => 'DataPointType',
-    'data_points' => 'DataPoints'
+    'data_points' => 'DataPoints',
+    'number_format_of_values' => 'NumberFormatOfValues'
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

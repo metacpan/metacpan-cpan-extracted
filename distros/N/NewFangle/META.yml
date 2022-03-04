@@ -5,16 +5,16 @@ author:
 build_requires:
   Test2::Tools::AsyncSubtest: '0'
   Test2::Tools::JSON::Pointer: '0'
-  Test2::V0: '0.000060'
+  Test2::V0: '0.000121'
   YAML: '0'
   perl: '5.014'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-  FFI::CheckLib: '0.27'
+  FFI::CheckLib: '0.28'
   FFI::Platypus::Type::PtrObject: '0.02'
   perl: '5.014'
 dynamic_config: 1
-generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,7 +25,7 @@ recommends:
 requires:
   FFI::C: '0.08'
   FFI::C::Util: '0'
-  FFI::CheckLib: '0.27'
+  FFI::CheckLib: '0.28'
   FFI::Platypus: '1.26'
   FFI::Platypus::Memory: '0'
   JSON::MaybeXS: '0'
@@ -36,8 +36,11 @@ resources:
   bugtracker: https://github.com/uperl/NewFangle/issues
   homepage: https://metacpan.org/pod/NewFangle
   repository: git://github.com/uperl/NewFangle.git
-version: '0.07'
-x_generated_by_perl: v5.34.0
+version: '0.08'
+x_contributors:
+  - 'Graham Ollis <plicease@cpan.org>'
+  - 'Owen Allsopp (ALLSOPP)'
+x_generated_by_perl: v5.35.9
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_use_unsafe_inc: 0

@@ -5,11 +5,6 @@ if ($^O eq "MacOS") {
     exit(0);
 }
 
-unless (-f "CAN_TALK_TO_OURSELF") {
-    print "1..0 # Skipped: Can't talk to ourself (misconfigured system)\n";
-    exit;
-}
-
 $| = 1;               # autoflush
 require IO::Socket::IP;   # make sure this work before we try to make a HTTP::Daemon
 
@@ -19,7 +14,7 @@ if ($D eq 'daemon') {
 
     require HTTP::Daemon;
 
-    my $d = HTTP::Daemon->new(Timeout => 10);
+    my $d = HTTP::Daemon->new(Timeout => 10, LocalAddr => '127.0.0.1');
 
     print "Please to meet you at: <URL:", $d->url, ">\n";
     open(STDOUT,
@@ -49,7 +44,7 @@ else {
     use Config;
     my $perl = $Config{'perlpath'};
     $perl = $^X if $^O eq 'VMS' or -x $^X and $^X =~ m,^([a-z]:)?/,i;
-    open(DAEMON, "$perl robot/ua.t daemon |") or die "Can't exec daemon: $!";
+    open(DAEMON, "$perl t/robot/ua.t daemon |") or die "Can't exec daemon: $!";
 }
 
 print "1..8\n";

@@ -3,11 +3,13 @@ abstract: 'Password attribute from a encrypted file.'
 author:
   - unknown
 build_requires:
-  ExtUtils::MakeMaker: '0'
+  Test::Fatal: '0'
+  Test::Simple: '0.94'
+  Test::Warnings: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.143240'
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,12 +20,15 @@ no_index:
     - t
     - inc
 requires:
-  Crypt::CBC: '0'
+  Crypt::CBC: '2.35'
   Crypt::Rijndael: '0'
   Moo: '2'
-  Test::NoWarnings: '0'
+  Test::Fatal: '0'
   Test::Simple: '0.94'
+  Test::Warnings: '0'
   autodie: '0'
+  perl: '5.010001'
 resources: {}
-version: '0.01'
+version: '0.02'
 x_IRC: irc://irc.perl.org/#amsterdam.pm
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

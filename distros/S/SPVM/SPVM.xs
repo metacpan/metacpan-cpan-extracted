@@ -33,7 +33,6 @@
 #include "spvm_use.h"
 #include "spvm_limit.h"
 #include "spvm_allocator.h"
-#include "spvm_my.h"
 
 static const char* MFILE = "SPVM.xs";
 
@@ -270,11 +269,14 @@ call_spvm_method(...)
     
     // Argument information
     SPVM_MY* arg = SPVM_LIST_fetch(method->args, args_index);
-    int32_t arg_basic_type_id = arg->type->basic_type->id;
-    int32_t arg_type_dimension = arg->type->dimension;
+    
+    SPVM_TYPE* arg_type = SPVM_LIST_fetch(method->arg_types, args_index);
+    
+    int32_t arg_basic_type_id = arg_type->basic_type->id;
+    int32_t arg_type_dimension = arg_type->dimension;
     
     // Process argument corresponding to the type category
-    switch (arg->type_category) {
+    switch (arg_type->category) {
       // Perl scalar to SPVM byte
       case SPVM_TYPE_C_TYPE_CATEGORY_BYTE : {
         int8_t value = (int8_t)SvIV(sv_value);
@@ -737,7 +739,7 @@ call_spvm_method(...)
                   break;
                 }
                 default: {
-                  if (arg->type_category == SPVM_TYPE_C_TYPE_CATEGORY_MULNUM_ARRAY) {
+                  if (arg_type->category == SPVM_TYPE_C_TYPE_CATEGORY_MULNUM_ARRAY) {
                     SV* sv_error = NULL;
                     SPVM_BASIC_TYPE* arg_basic_type = SPVM_LIST_fetch(compiler->basic_types, arg_basic_type_id);
                     const char* arg_basic_type_name = arg_basic_type->name;
@@ -1105,7 +1107,7 @@ call_spvm_method(...)
 
   SV* sv_return_value = NULL;
   int32_t excetpion_flag = 0;
-  switch (method->return_type_category) {
+  switch (method->return_type->category) {
     case SPVM_TYPE_C_TYPE_CATEGORY_VOID: {
       excetpion_flag = env->call_spvm_method(env, method->id, args_stack);
       break;
@@ -1259,14 +1261,14 @@ call_spvm_method(...)
     for (int32_t args_index = 0; args_index < method->args->length; args_index++) {
       SV* sv_value = ST(spvm_args_base + args_index);
       
-      SPVM_MY* arg = SPVM_LIST_fetch(method->args, args_index);
+      SPVM_TYPE* arg_type = SPVM_LIST_fetch(method->arg_types, args_index);
       
       // Convert to runtime type
-      int32_t arg_basic_type_id = arg->type->basic_type->id;
-      int32_t arg_type_dimension = arg->type->dimension;
-
+      int32_t arg_basic_type_id = arg_type->basic_type->id;
+      int32_t arg_type_dimension = arg_type->dimension;
+      
       int32_t ref_stack_index = ref_stack_indexes[args_index];
-      switch (arg->type_category) {
+      switch (arg_type->category) {
         case SPVM_TYPE_C_TYPE_CATEGORY_REF_BYTE : {
           SV* sv_value_deref = SvRV(sv_value);
           sv_setiv(sv_value_deref, ref_stack[ref_stack_index].bval);
@@ -1402,7 +1404,7 @@ call_spvm_method(...)
   // Success
   else {
     int32_t return_count;
-    if (method->return_type_category == SPVM_TYPE_C_TYPE_CATEGORY_VOID) {
+    if (method->return_type->category == SPVM_TYPE_C_TYPE_CATEGORY_VOID) {
       return_count = 0;
     }
     else {
@@ -3803,7 +3805,7 @@ get_error_messages(...)
 }
 
 SV*
-get_added_class_names(...)
+get_classes_length(...)
   PPCODE:
 {
   (void)RETVAL;
@@ -3816,47 +3818,11 @@ get_added_class_names(...)
   SV** sv_compiler_ptr = hv_fetch(hv_self, "compiler", strlen("compiler"), 0);
   SV* sv_compiler = sv_compiler_ptr ? *sv_compiler_ptr : &PL_sv_undef;
   compiler = INT2PTR(SPVM_COMPILER*, SvIV(SvRV(sv_compiler)));
-
-  AV* av_added_class_names = (AV*)sv_2mortal((SV*)newAV());
-  SV* sv_added_class_names = sv_2mortal(newRV_inc((SV*)av_added_class_names));
   
-  for (int32_t added_class_index = 0; added_class_index < compiler->added_class_names->length; added_class_index++) {
-    const char* added_class_name = SPVM_LIST_fetch(compiler->added_class_names, added_class_index);
-    if (!strstr(added_class_name, "::anon")) {
-      SV* sv_added_class_name = sv_2mortal(newSVpv(added_class_name, 0));
-      av_push(av_added_class_names, SvREFCNT_inc(sv_added_class_name));
-    }
-  }
+  int32_t classes_length = compiler->classes->length;
+  SV* sv_classes_length = sv_2mortal(newSViv(classes_length));
   
-  XPUSHs(sv_added_class_names);
-  XSRETURN(1);
-}
-
-SV*
-get_added_class_names_including_anon(...)
-  PPCODE:
-{
-  (void)RETVAL;
-  
-  SV* sv_self = ST(0);
-
-  HV* hv_self = (HV*)SvRV(sv_self);
-
-  SPVM_COMPILER* compiler;
-  SV** sv_compiler_ptr = hv_fetch(hv_self, "compiler", strlen("compiler"), 0);
-  SV* sv_compiler = sv_compiler_ptr ? *sv_compiler_ptr : &PL_sv_undef;
-  compiler = INT2PTR(SPVM_COMPILER*, SvIV(SvRV(sv_compiler)));
-
-  AV* av_added_class_names = (AV*)sv_2mortal((SV*)newAV());
-  SV* sv_added_class_names = sv_2mortal(newRV_inc((SV*)av_added_class_names));
-  
-  for (int32_t added_class_index = 0; added_class_index < compiler->added_class_names->length; added_class_index++) {
-    const char* added_class_name = SPVM_LIST_fetch(compiler->added_class_names, added_class_index);
-    SV* sv_added_class_name = sv_2mortal(newSVpv(added_class_name, 0));
-    av_push(av_added_class_names, SvREFCNT_inc(sv_added_class_name));
-  }
-  
-  XPUSHs(sv_added_class_names);
+  XPUSHs(sv_classes_length);
   XSRETURN(1);
 }
 

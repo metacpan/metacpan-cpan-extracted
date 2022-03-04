@@ -1,6 +1,6 @@
 package Valiant;
 
-our $VERSION = '0.001013';
+our $VERSION = '0.001014';
 $VERSION = eval $VERSION;
 
 1;
@@ -11,9 +11,9 @@ Valiant - Object validation inspired by Ruby on Rails and more.
 
 =begin html
 
-<a href="https://github.com/jjn1056/valiant/actions"><img src="https://github.com/jjn1056/valiant/workflows/linux/badge.svg"></a>
-<a href="https://github.com/jjn1056/valiant/actions"><img src="https://github.com/jjn1056/valiant/workflows/macos/badge.svg"></a>
-<a href="https://github.com/jjn1056/valiant/actions"><img src="https://github.com/jjn1056/valiant/workflows/windows/badge.svg"></a>
+<a href="https://github.com/jjn1056/valiant/actions"><img src="https://github.com/jjn1056/valiant/actions/workflows/linux.yml/badge.svg"></a>
+<a href="https://github.com/jjn1056/valiant/actions"><img src="https://github.com/jjn1056/valiant/actions/workflows/macos.yml/badge.svg"></a>
+<a href="https://github.com/jjn1056/valiant/actions"><img src="https://github.com/jjn1056/valiant/actions/workflows/windows.yml/badge.svg"></a>
 <a href="https://metacpan.org/pod/Valiant"><img src="https://badge.fury.io/pl/Valiant.svg"></a>
 <a href="https://codecov.io/github/jjn1056/Valiant/?branch=main"><img alt="Coverage" src="https://codecov.io/github/jjn1056/Valiant/coverage.svg?branch=main"></a>
 

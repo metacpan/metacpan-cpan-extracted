@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package RT::Action::AssignUnownedToActor;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 use base qw(RT::Action);
 
@@ -47,6 +47,10 @@ sub Commit {
 
 RT-Action-AssignUnownedToActor - Assigns unowned tickets to the transaction actor
 
+=head1 RT VERSION
+
+Works with RT 4, 5.0
+
 =head1 DESCRIPTION
 
 Assigns tickets to the actor of the transaction that triggered the
@@ -89,7 +93,7 @@ in your database.
 If you are upgrading this module, check for upgrading instructions
 in case changes need to be made to your database.
 
-=item Edit your F</opt/rt4/etc/RT_SiteConfig.pm>
+=item Edit your F</opt/rt5/etc/RT_SiteConfig.pm>
 
 If you are using RT 4.2 or greater, add this line:
 
@@ -121,7 +125,7 @@ or via the web at
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2011-2014 by Best Pracical Solutions, LLC.
+This software is Copyright (c) 2011-2022 by Best Pracical Solutions, LLC.
 
 This is free software, licensed under:
 

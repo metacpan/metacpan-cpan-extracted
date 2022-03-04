@@ -1,27 +1,33 @@
-#! perl -w
-use strict;
+#! perl -I. -w
+use t::Test::abeltje;
 use autodie;
-
-use Test::More;
-use Test::NoWarnings ();
+use File::Temp qw( tempdir );
+use File::Spec::Functions;
 
 use Crypt::CBC;
 
-subtest 'Basic test' => sub {
+note('Basic test');
+{
     my $obj = WithPwd->new(password => 'Secret-as-hell', username => 'abeltje');
     isa_ok($obj, 'WithPwd');
     ok($obj->DOES('MooX::Role::CryptedPassword'), "role consumed");
 
     is($obj->password, 'Secret-as-hell', "Plain text password");
     is($obj->username, 'ABELTJE', "Username is uppercased");
-};
+}
 
-subtest 'Encrypted password' => sub {
-    my $private = 't/a_password.priv';
+note('Encrypted password');
+{
+    my $tmp_dir = tempdir(CLEANUP => 1);
+    my $private = catfile($tmp_dir, 'a_password.priv');
     my $to_protect = 'Dit-is-een-lang-en-zeer-geheim-zinnetje.';
     {
-        open my $fh, '>', $private;
-        my $c = Crypt::CBC->new(cypher => 'Rijndael', key => 'BlahBlahBlahBlah');
+        open my $fh, '>:raw', $private;
+        my $c = Crypt::CBC->new(
+            -cipher => 'Rijndael',
+            -key    => 'BlahBlahBlahBlah',
+            -pbkdf  => 'pbkdf2',
+        );
         print $fh $c->encrypt($to_protect);
         close($fh);
     }
@@ -31,11 +37,9 @@ subtest 'Encrypted password' => sub {
     is($obj->username, 'ABELTJE', "Username is uppercased");
 
     unlink($private);
-};
+}
 
-Test::NoWarnings::had_no_warnings();
-$Test::NoWarnings::do_end_test = 0;
-done_testing;
+abeltje_done_testing();
 
 BEGIN {
     package WithPwd;

@@ -47,6 +47,7 @@
             "Getopt::EX" : "v1.27.0",
             "List::MoreUtils" : "0",
             "List::Util" : "0",
+            "Text::VisualWidth::PP" : "0.05",
             "perl" : "v5.14.0"
          }
       },
@@ -59,7 +60,7 @@
    "provides" : {
       "App::Greple::wordle" : {
          "file" : "lib/App/Greple/wordle.pm",
-         "version" : "0.03"
+         "version" : "0.05"
       },
       "App::Greple::wordle::hint" : {
          "file" : "lib/App/Greple/wordle/hint.pm"
@@ -83,7 +84,7 @@
          "web" : "https://github.com/kaz-utashiro/greple-wordle"
       }
    },
-   "version" : "0.03",
+   "version" : "0.05",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"

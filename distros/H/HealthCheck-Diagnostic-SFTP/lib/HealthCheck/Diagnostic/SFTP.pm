@@ -3,7 +3,7 @@ use parent 'HealthCheck::Diagnostic';
 
 # ABSTRACT: Check for SFTP access and operations in a HealthCheck
 use version;
-our $VERSION = 'v1.4.1'; # VERSION
+our $VERSION = 'v1.4.2'; # VERSION
 
 use strict;
 use warnings;
@@ -80,13 +80,13 @@ sub run {
     $args{ssh_args} = $ssh_args;
 
     local $@;
+    local $SIG{ALRM} = sub { die "timeout after $timeout seconds.\n" };
+    alarm $timeout;
     eval {
         local $SIG{__DIE__};
-        local $SIG{ALRM} = sub { die "timeout after $timeout seconds.\n" };
-        alarm $timeout;
         $sftp = Net::SFTP->new( $host, %args );
-        alarm 0;
     };
+    alarm 0;
     return {
         status => 'CRITICAL',
         info   => "Error for $description: $@",
@@ -131,7 +131,7 @@ HealthCheck::Diagnostic::SFTP - Check for SFTP access and operations in a Health
 
 =head1 VERSION
 
-version v1.4.1
+version v1.4.2
 
 =head1 SYNOPSIS
 

@@ -1,7 +1,7 @@
 package Template::Mustache;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: Drawing Mustaches on Perl for fun and profit
-$Template::Mustache::VERSION = '1.3.4';
+$Template::Mustache::VERSION = '1.4.0';
 use 5.12.0;
 
 use Moo;
@@ -385,7 +385,7 @@ Template::Mustache - Drawing Mustaches on Perl for fun and profit
 
 =head1 VERSION
 
-version 1.3.4
+version 1.4.0
 
 =head1 SYNOPSIS
 
@@ -394,20 +394,20 @@ version 1.3.4
     # one-shot rendering
 
     print Template::Mustache->render(
-        "Hello {{planet}}", 
+        "Hello {{planet}}",
     );
 
     # compile and re-use template
 
     my $mustache = Template::Mustache->new(
-        template => "Hello {{planet}}", 
+        template => "Hello {{planet}}",
     );
 
     print $mustache->render( { planet => "World!" } );
 
 =head1 DESCRIPTION
 
-Template::Mustache is an implementation of the fabulous 
+Template::Mustache is an implementation of the fabulous
 L<Mustache|https://mustache.github.io/> templating
 language for Perl.
 
@@ -418,16 +418,16 @@ Templates can be compiled and rendered on the spot via the
 use of C<render> called as a class method.
 
     print Template::Mustache->render(
-        "Hello {{planet}}", 
+        "Hello {{planet}}",
     );
 
-If you are considering re-using the same template many times, it's 
+If you are considering re-using the same template many times, it's
 recommended to create a C<Template::Mustache> object instead,
 which will compile the template only once, and allow to render
 it with different contexts.
 
     my $mustache = Template::Mustache->new(
-        template => "Hello {{planet}}", 
+        template => "Hello {{planet}}",
     );
 
     print $mustache->render( { planet => "World!" } );
@@ -441,7 +441,7 @@ it with different contexts.
         delimiters => [ qw/ ! ! / ],
     );
 
-Constructor.  
+Constructor.
 
 =head3 arguments
 
@@ -479,11 +479,11 @@ An optional hashref of partials to assign to the object. See
 the method C<partials> for more details on its format.
 
 By default, if C<partials_path> (or C<template_path> is defined,
-the template will try to resolve the partials as filenames with 
+the template will try to resolve the partials as filenames with
 the file extension C<.mustache>
 relative to that path.
 
-    my $mustache = Template::Mustache->new( 
+    my $mustache = Template::Mustache->new(
         partials => './root',
         template => '{{ > ./my/partial }}',  # => file ./root/my/partial.mustache
     );
@@ -494,10 +494,10 @@ relative to that path.
 
     print $mustache->render( $context );
 
-Returns the rendered template, given the optionally provided context. Uses 
+Returns the rendered template, given the optionally provided context. Uses
 the object's C<context attribute> if not provided.
 
-=head3 Context 
+=head3 Context
 
 =head4 as a hashref
 
@@ -507,20 +507,20 @@ If the value is a coderef, it will be invoked to generate the value
 to be inserted in the template.
 
     Template::Mustache->render(
-        'it is {{ time }}', 
-        { time => sub { scalar localtime } } 
+        'it is {{ time }}',
+        { time => sub { scalar localtime } }
     );
 
-If you want the value returned by the coderef to be 
+If you want the value returned by the coderef to be
 interpolated as a Mustache template, a helper function is passed
 as the last argument to the coderef.
 
     Template::Mustache->render(
-        'hello {{ place }}', 
+        'hello {{ place }}',
         {
             place => sub { pop->('{{ planet }}') },
             planet => 'World',
-        } 
+        }
     );
 
 The two previous interpolations work both for C<{{variable}}>
@@ -542,8 +542,8 @@ definitions, but also for C<{{#section}}>s.
 
 =head4 as an object
 
-    my $object = Something->new( ... );  
-    
+    my $object = Something->new( ... );
+
     Template::Mustache->render( 'Hello {{ thing }}', $object );  # thing resolves to $object->thing
 
 =head4 as a scalar
@@ -581,8 +581,8 @@ resolved recursively on the context.
     print Template::Mustache->render( $template, $context, $partials );
 
     # equivalent to
-    Template::Mustache->new->( 
-        template => $template, partials => $partials 
+    Template::Mustache->new->(
+        template => $template, partials => $partials
     )->render( $context );
 
 If invoked as a class method, C<render> takes in the mustache template, and
@@ -599,16 +599,16 @@ Accessor to the C<template> attribute.
 
 =head2 template_path( $path )
 
-Accessor to the C<template_path> attribute. If this attribute is 
-set, the template will be set to the content of the provided file 
-(if C<$path> is a directory, the file is assumed to be the 
+Accessor to the C<template_path> attribute. If this attribute is
+set, the template will be set to the content of the provided file
+(if C<$path> is a directory, the file is assumed to be the
 C<Mustache.mustache> file local to that directory).
 
-=head2 partials_path( $path ) 
+=head2 partials_path( $path )
 
 Accessor the C<partials_path> attribute. If partials were
 not given as part of the object construction, when encountered
-partials will be attempted to be read from that directory. 
+partials will be attempted to be read from that directory.
 The filename for a partial is its name with C<.mustache> appended to it.
 
 If C<template_path> is defined, C<partials_path> defaults to it.
@@ -641,7 +641,7 @@ Returns the instance of L<Template::Mustache::Parser> used by the object.
 
     print $mustache->render; # => partials rock!
 
-Add partial templates to the object. 
+Add partial templates to the object.
 
 Partial values can be
 strings holding Mustache templates;
@@ -662,6 +662,25 @@ sub with the name of the partial as its argument.
     print $Template::Mustache::GRAMMAR;
 
 The L<Parse::RecDescent> grammar used to parse Mustache templates.
+
+=head1 Interpolation of numbers and HTML entities
+
+By default and as ddictated by its specs, Mustache format numbers
+into their canonical form.
+
+    print Template::Mustache->render("{{.}}", "00.120" ); # prints '0.12'
+
+If you rather want a value to be printed as-is, pass it as a reference.
+
+    print Template::Mustache->render("{{.}}", \"00.120" ); # prints '00.120'
+
+Ditto for HTML entities:
+
+    my $value = "<stuff>";
+
+    Template::Mustache->render("{{.}}", $value );  # "&lt;stuff&gt;"
+
+    Template::Mustache->render("{{.}}", \$value ); # "<stuff>"
 
 =head1 SEE ALSO
 
@@ -706,7 +725,7 @@ Ricardo Signes <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2019, 2018, 2017, 2016, 2015, 2011 by Pieter van de Bruggen.
+This software is copyright (c) 2022, 2021, 2019, 2018, 2017, 2016, 2015, 2011 by Pieter van de Bruggen.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

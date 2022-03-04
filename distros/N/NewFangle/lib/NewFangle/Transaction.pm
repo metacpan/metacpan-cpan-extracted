@@ -1,4 +1,4 @@
-package NewFangle::Transaction 0.07 {
+package NewFangle::Transaction 0.08 {
 
   use strict;
   use warnings;
@@ -123,7 +123,7 @@ NewFangle::Transaction - NewRelic application class
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -240,7 +240,7 @@ C<$event> should be an instance of L<NewFangle::CustomEvent>.
 
 (csdk: newrelic_set_transaction_name)
 
-=head2 newrelic_create_distributed_trace_payload
+=head2 create_distributed_trace_payload
 
  my $payload = $txn->create_distributed_trace_payload;
  my $payload = $txn->create_distributed_trace_payload($seg);
@@ -252,7 +252,7 @@ the configuration.  You can do this like:
 
 (csdk: newrelic_create_distributed_trace_payload)
 
-=head2 newrelic_create_distributed_trace_payload_httpsafe
+=head2 create_distributed_trace_payload_httpsafe
 
  my $payload = $txn->create_distributed_trace_payload_httpsafe;
  my $payload = $txn->create_distributed_trace_payload_httpsafe($seg);
@@ -310,7 +310,11 @@ from C<create_distributed_trace_payload_httpsafe>.
 
 =head1 AUTHOR
 
-Graham Ollis <plicease@cpan.org>
+Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+Owen Allsopp (ALLSOPP)
 
 =head1 COPYRIGHT AND LICENSE
 

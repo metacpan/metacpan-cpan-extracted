@@ -10,9 +10,9 @@ use parent 'Perinci::CmdLine::PluginBase';
 
 # put global variables alphabetically here
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-12-11'; # DATE
+our $DATE = '2022-01-29'; # DATE
 our $DIST = 'Perinci-CmdLine-Lite'; # DIST
-our $VERSION = '1.916'; # VERSION
+our $VERSION = '1.917'; # VERSION
 
 sub meta {
     return {
@@ -47,7 +47,7 @@ Perinci::CmdLine::Plugin::Debug::DumpR - Dump request stash ($r), by default aft
 
 =head1 VERSION
 
-This document describes version 1.916 of Perinci::CmdLine::Plugin::Debug::DumpR (from Perl distribution Perinci-CmdLine-Lite), released on 2021-12-11.
+This document describes version 1.917 of Perinci::CmdLine::Plugin::Debug::DumpR (from Perl distribution Perinci-CmdLine-Lite), released on 2022-01-29.
 
 =head1 SYNOPSIS
 
@@ -110,7 +110,7 @@ beyond that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

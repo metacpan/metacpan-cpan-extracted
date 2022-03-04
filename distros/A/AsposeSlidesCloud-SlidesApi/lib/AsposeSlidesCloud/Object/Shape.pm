@@ -43,6 +43,7 @@ use AsposeSlidesCloud::Object::GeometryShape;
 use AsposeSlidesCloud::Object::Hyperlink;
 use AsposeSlidesCloud::Object::LineFormat;
 use AsposeSlidesCloud::Object::ResourceUri;
+use AsposeSlidesCloud::Object::TextFrameFormat;
 use AsposeSlidesCloud::Object::ThreeDFormat;
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
@@ -325,6 +326,13 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'text_frame_format' => {
+    	datatype => 'TextFrameFormat',
+    	base_name => 'TextFrameFormat',
+    	description => 'Returns TextFrame&#39;s formatting properties.',
+    	format => '',
+    	read_only => '',
+    		},
 });
 
 __PACKAGE__->swagger_types( {
@@ -349,7 +357,8 @@ __PACKAGE__->swagger_types( {
     'type' => 'string',
     'shape_type' => 'string',
     'text' => 'string',
-    'paragraphs' => 'ResourceUri'
+    'paragraphs' => 'ResourceUri',
+    'text_frame_format' => 'TextFrameFormat'
 } );
 
 __PACKAGE__->attribute_map( {
@@ -374,7 +383,8 @@ __PACKAGE__->attribute_map( {
     'type' => 'Type',
     'shape_type' => 'ShapeType',
     'text' => 'Text',
-    'paragraphs' => 'Paragraphs'
+    'paragraphs' => 'Paragraphs',
+    'text_frame_format' => 'TextFrameFormat'
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

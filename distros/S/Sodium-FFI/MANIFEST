@@ -18,6 +18,7 @@ t/11-utils.t
 t/12-random.t
 t/aead/aes256gcm.t
 t/aead/chacha20poly1305.t
+t/aead/chacha20poly1305_ietf.t
 xt/author/00-compile.t
 xt/author/pod-coverage.t
 xt/author/pod-spell.t

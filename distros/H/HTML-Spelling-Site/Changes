@@ -1,5 +1,8 @@
 Revision history for HTML-Spelling-Site
 
+0.10.0      2022-03-04
+    - add MAXSIZE.
+
 0.8.0       2021-10-27
     - get_sorted_text now merges duplicate-by-filenames records.
 

@@ -1,7 +1,9 @@
 use Test::Most;
 use Test::Lib;
 
-eval "use OP::Person; 1" || do { plan skip_all => "Can't run Object::Pad tests: $@"};
+#eval "use OP::Person; 1" || do { plan skip_all => "Can't run Object::Pad tests: $@"};
+
+plan skip_all => 'Object::Pad not yet supported';
 
 ok my $p = OP::Person->new(
   name=>'B',

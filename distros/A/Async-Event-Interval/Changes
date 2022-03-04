@@ -1,5 +1,15 @@
 Revision history for Async-Event-Interval
 
+1.08    2022-03-03
+    - Added pid(), getter-only wrapper for _pid()
+    - Added example of using shared data with IPC::Shareable
+
+1.07    2022-03-03
+    - interval() no longer requires stop/start of event to take effect
+    - Re-arranged initialization routine to allow for the above
+    - Interval is now stored in the %events shared hash so that the event can
+      access it directly
+
 1.06    2022-03-03
     - Class level hash that contains information about all existing events
       now lives in shared memory so we can track operation informtion from

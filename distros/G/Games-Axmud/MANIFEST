@@ -98,6 +98,8 @@ nsis/axmud_icon.ico
 nsis/axmud_install.nsi
 nsis/axmud_wizard.bmp
 nsis/ipc_run/README
+nsis/ipc_run/Run.pm
+nsis/ipc_run/Win32Helper.pm
 nsis/license.txt
 nsis/README
 pack/axmud.desktop

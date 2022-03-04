@@ -102,8 +102,8 @@ my $tests = @TESTS;
 my $tport = 8334;
 
 my %addresses = (
-    AF_INET6() => {server => '::',      client => '::1'},
-    AF_INET()  => {server => '0.0.0.0', client => '127.0.0.1'}
+    AF_INET6() => {server => '::1',      client => '::1'},
+    AF_INET()  => {server => '127.0.0.1', client => '127.0.0.1'}
 );
 my $family;
 my $tsock = IO::Socket::IP->new(

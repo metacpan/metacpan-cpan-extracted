@@ -25,5 +25,5 @@ requires:
 resources:
   bugtracker: https://github.com/stevieb9/async-event-interval/issues
   repository: https://github.com/stevieb9/async-event-interval.git
-version: '1.06'
+version: '1.08'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

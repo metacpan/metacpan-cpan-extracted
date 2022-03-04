@@ -3,31 +3,36 @@ use v5.14;
 use warnings;
 use utf8;
 
-our $VERSION = "0.03";
+our $VERSION = "0.05";
 
 use Data::Dumper;
-use List::Util qw(shuffle);
-use Date::Calc qw(Delta_Days);
-use charnames ':full';
+use List::Util qw(shuffle min max);
 use Getopt::EX::Colormap qw(colorize ansi_code);
+use Text::VisualWidth::PP 0.05 'vwidth';
 use App::Greple::wordle::word_all    qw(%word_all);
 use App::Greple::wordle::word_hidden qw(@word_hidden);
-use App::Greple::wordle::hint qw(&keymap);
+use App::Greple::wordle::hint qw(&keymap &result);
 
 our %opt = ( answer  => \( our $answer      = $ENV{WORDLE_ANSWER} ),
-	     count   => \( our $try         = 6 ),
+	     index   => \( our $index       = $ENV{WORDLE_INDEX} ),
+	     count   => \( our $count       = 6 ),
 	     max     => \( our $max         = 30 ),
 	     random  => \( our $random      = 0 ),
-	     seed    => \( our $seed        = 42 ),
+	     seed    => \( our $seed        = 0 ),
 	     compat  => \( our $compat      = 0 ),
 	     keymap  => \( our $keymap      = 1 ),
-	     correct => \( our $msg_correct = "\N{PARTY POPPER}" ),
-	     wrong   => \( our $msg_wrong   = "\N{COLLISION SYMBOL}" ),
+	     result  => \( our $result      = 1 ),
+	     correct => \( our $msg_correct = "\N{U+1F389}" ), # PARTY POPPER
+	     wrong   => \( our $msg_wrong   = "\N{U+1F4A5}" ), # COLLISION SYMBOL
 	   );
+my $try = 0;
 my @answers;
 
 sub respond {
-    print ansi_code("{CUU}{CUF(8)}");
+    local $_ = $_;
+    my $chomped = chomp;
+    print ansi_code("{CHA}{CUU}") if $chomped;
+    print ansi_code(sprintf("{CHA}{CUF(%d)}", max(8, vwidth($_) + 2)));
     print s/(?<=.)\z/\n/r for @_;
 }
 
@@ -50,11 +55,18 @@ sub finalize {
 	if -t STDIN;
 }
 
-sub wordle_patterns {
+sub days {
+    use Date::Calc qw(Delta_Days);
     my($mday, $mon, $year, $yday) = (localtime(time))[3,4,5,7];
-    my $index = Delta_Days(2021, 6, 19, $year + 1900, $mon + 1, $mday);
+    Delta_Days(2021, 6, 19, $year + 1900, $mon + 1, $mday);
+}
+
+sub wordle_patterns {
+    $index   = rand(@word_hidden) if $random;
+    $index //= days;
+    $index  += days if $index < 0;
     if (not $compat) {
-	srand($seed) if not $random;
+	srand($seed);
 	@word_hidden = shuffle @word_hidden;
     }
     $answer ||= $word_hidden[ $index ];
@@ -71,29 +83,39 @@ sub show_answer {
     say colorize('#6aaa64', uc $answer);
 }
 
+sub show_result {
+    printf("\n%s %d%s %d/%d\n\n",
+	   $compat ? 'Wordle?' : 'Greple::wordle',
+	   $index,
+	   $compat || $seed == 0 ? '' : "($seed)",
+	   $try + 1, $count);
+    say result($answer, @answers);
+}
+
 sub check {
-    chomp;
-    if (not $word_all{lc $_}) {
+    my $it = lc s/\n//r;
+    if (not $word_all{$it}) {
 	respond $msg_wrong;
 	$_ = '';
     } else {
-	push @answers, $_;
-	$try--;
+	push @answers, $it;
+	print ansi_code '{CUU}';
     }
 }
 
 sub inspect {
-    if (lc $_ eq $answer) {
-	respond $msg_correct;
+    my $it = lc s/\n//r;
+    if (lc $it eq lc $answer) {
+	respond $msg_correct x ($count - $try);
+	show_result if $result;
 	exit 0;
     }
-    if ($try <= 0) {
+    length or return;
+    if (++$try >= $count) {
 	show_answer;
 	exit 1;
     }
-    if (length and $keymap) {
-	respond keymap($answer, @answers);
-    }
+    $keymap and respond keymap($answer, @answers);
 }
 
 1;
@@ -102,11 +124,14 @@ __DATA__
 
 mode function
 
+builtin count=i $count
 builtin keymap! $keymap
+builtin result! $result
 
 option --wordle &wordle_patterns
 option --answer &setopt(answer=$<shift>)
-option --count  &setopt(count=$<shift>)
+option --index  &setopt(index=$<shift>)
+option --series &setopt(seed=$<shift>)
 option --random &setopt(random=1)
 option --compat &setopt(compat=1)
 

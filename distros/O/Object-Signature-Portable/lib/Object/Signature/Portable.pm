@@ -12,7 +12,7 @@ use Crypt::Digest;
 use Exporter 5.57 qw/ import /;
 use JSON::MaybeXS;
 
-our $VERSION = 'v1.1.0';
+our $VERSION = 'v1.1.1';
 
 our @EXPORT    = qw/ signature /;
 our @EXPORT_OK = @EXPORT;
@@ -67,7 +67,7 @@ Object::Signature::Portable - generate portable fingerprints of objects
 
 =head1 VERSION
 
-version v1.1.0
+version v1.1.1
 
 =head1 SYNOPSIS
 

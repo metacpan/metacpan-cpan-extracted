@@ -645,7 +645,7 @@ sub convert {
     }
 
     # verify enum value
-    if (!grep(/^$args{'format'}$/i, ( 'Pdf', 'Xps', 'Tiff', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Pot', 'Potx', 'Potm', 'Html', 'Html5', 'Swf', 'Svg', 'Jpeg', 'Png', 'Gif', 'Bmp', 'Fodp', 'Xaml' ))) {
+    if (!grep(/^$args{'format'}$/i, ( 'Pdf', 'Xps', 'Tiff', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Pot', 'Potx', 'Potm', 'Html', 'Html5', 'Swf', 'Svg', 'Jpeg', 'Png', 'Gif', 'Bmp', 'Fodp', 'Xaml', 'Mpeg4' ))) {
       croak("Invalid value for 'format': " . $args{'format'});
     }
 
@@ -790,7 +790,7 @@ sub convert_and_save {
     }
 
     # verify enum value
-    if (!grep(/^$args{'format'}$/i, ( 'Pdf', 'Xps', 'Tiff', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Pot', 'Potx', 'Potm', 'Html', 'Html5', 'Swf', 'Svg', 'Jpeg', 'Png', 'Gif', 'Bmp', 'Fodp', 'Xaml' ))) {
+    if (!grep(/^$args{'format'}$/i, ( 'Pdf', 'Xps', 'Tiff', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Pot', 'Potx', 'Potm', 'Html', 'Html5', 'Swf', 'Svg', 'Jpeg', 'Png', 'Gif', 'Bmp', 'Fodp', 'Xaml', 'Mpeg4' ))) {
       croak("Invalid value for 'format': " . $args{'format'});
     }
 
@@ -14573,6 +14573,176 @@ sub delete_subshapes {
 }
 
 #
+# delete_unused_layout_slides
+#
+# Removes unused layout slides.
+# 
+# @param string $name Document name. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'delete_unused_layout_slides' } = { 
+    	summary => 'Removes unused layout slides.',
+        params => $params,
+        returns => 'LayoutSlides',
+        };
+}
+# @return LayoutSlides
+#
+sub delete_unused_layout_slides {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling delete_unused_layout_slides");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/layoutSlides';
+
+    my $_method = 'DELETE';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files = [];
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('LayoutSlides', $response);
+    return $_response_object;
+}
+
+#
+# delete_unused_layout_slides_online
+#
+# Removes unused layout slides.
+# 
+# @param File $document Document data (required)
+# @param string $password Document password. (optional)
+{
+    my $params = {
+    'document' => {
+        data_type => 'File',
+        description => 'Document data',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'delete_unused_layout_slides_online' } = { 
+    	summary => 'Removes unused layout slides.',
+        params => $params,
+        returns => 'File',
+        };
+}
+# @return File
+#
+sub delete_unused_layout_slides_online {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'document' is set
+    unless (exists $args{'document'} && $args{'document'}) {
+      croak("Missing the required parameter 'document' when calling delete_unused_layout_slides_online");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/layoutSlides/delete';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('multipart/form-data');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('multipart/form-data');
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    my $_body_data;
+    my $files = [];
+    if ( exists $args{'document'} && $args{'document'}) {
+        push(@$files, $args{'document'});
+    }
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('File', $response);
+    return $_response_object;
+}
+
+#
 # delete_watermark
 #
 # Removes shapes with name \"watermark\" from the presentation.
@@ -16257,7 +16427,7 @@ sub download_presentation {
     }
 
     # verify enum value
-    if (!grep(/^$args{'format'}$/i, ( 'Pdf', 'Xps', 'Tiff', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Pot', 'Potx', 'Potm', 'Html', 'Html5', 'Swf', 'Svg', 'Jpeg', 'Png', 'Gif', 'Bmp', 'Fodp', 'Xaml' ))) {
+    if (!grep(/^$args{'format'}$/i, ( 'Pdf', 'Xps', 'Tiff', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Pot', 'Potx', 'Potm', 'Html', 'Html5', 'Swf', 'Svg', 'Jpeg', 'Png', 'Gif', 'Bmp', 'Fodp', 'Xaml', 'Mpeg4' ))) {
       croak("Invalid value for 'format': " . $args{'format'});
     }
 
@@ -25631,6 +25801,382 @@ sub get_view_properties {
 }
 
 #
+# highlight_shape_regex
+#
+# Highlight all matches of sample in text frame text using specified color.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $shape_index Shape index. (required)
+# @param string $regex Regular expression. (required)
+# @param string $color Highlighting color. (required)
+# @param boolean $whole_words_only Match only whole words. (optional, default to false)
+# @param boolean $ignore_case True to search ignoring char case. (optional, default to false)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'regex' => {
+        data_type => 'string',
+        description => 'Regular expression.',
+        required => '1',
+    },
+    'color' => {
+        data_type => 'string',
+        description => 'Highlighting color.',
+        required => '1',
+    },
+    'whole_words_only' => {
+        data_type => 'boolean',
+        description => 'Match only whole words.',
+        required => '0',
+    },
+    'ignore_case' => {
+        data_type => 'boolean',
+        description => 'True to search ignoring char case.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'highlight_shape_regex' } = { 
+    	summary => 'Highlight all matches of sample in text frame text using specified color.',
+        params => $params,
+        returns => 'Shape',
+        };
+}
+# @return Shape
+#
+sub highlight_shape_regex {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling highlight_shape_regex");
+    }
+
+    # verify the required parameter 'slide_index' is set
+    unless (exists $args{'slide_index'}) {
+      croak("Missing the required parameter 'slide_index' when calling highlight_shape_regex");
+    }
+
+    # verify the required parameter 'shape_index' is set
+    unless (exists $args{'shape_index'}) {
+      croak("Missing the required parameter 'shape_index' when calling highlight_shape_regex");
+    }
+
+    # verify the required parameter 'regex' is set
+    unless (exists $args{'regex'} && $args{'regex'}) {
+      croak("Missing the required parameter 'regex' when calling highlight_shape_regex");
+    }
+
+    # verify the required parameter 'color' is set
+    unless (exists $args{'color'} && $args{'color'}) {
+      croak("Missing the required parameter 'color' when calling highlight_shape_regex");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/{shapeIndex}/highlightRegex';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'regex'} && defined $args{'regex'}) {
+        $query_params->{'regex'} = $self->{api_client}->to_query_value($args{'regex'});
+    }
+
+    # query params
+    if (exists $args{'color'} && defined $args{'color'}) {
+        $query_params->{'color'} = $self->{api_client}->to_query_value($args{'color'});
+    }
+
+    # query params
+    if (exists $args{'whole_words_only'} && defined $args{'whole_words_only'}) {
+        $query_params->{'wholeWordsOnly'} = $self->{api_client}->to_boolean_query_value($args{'whole_words_only'});
+    }
+
+    # query params
+    if (exists $args{'ignore_case'} && defined $args{'ignore_case'}) {
+        $query_params->{'ignoreCase'} = $self->{api_client}->to_boolean_query_value($args{'ignore_case'});
+    }
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'slide_index'}) {
+        my $_base_variable = "{" . "slideIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'shape_index'}) {
+        my $_base_variable = "{" . "shapeIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'shape_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files = [];
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('Shape', $response);
+    return $_response_object;
+}
+
+#
+# highlight_shape_text
+#
+# Highlight all matches of sample in text frame text using specified color.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $shape_index Shape index. (required)
+# @param string $text Text sample to highlight. (required)
+# @param string $color Highlighting color. (required)
+# @param boolean $whole_words_only Match only whole words. (optional, default to false)
+# @param boolean $ignore_case True to search ignoring char case. (optional, default to false)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'text' => {
+        data_type => 'string',
+        description => 'Text sample to highlight.',
+        required => '1',
+    },
+    'color' => {
+        data_type => 'string',
+        description => 'Highlighting color.',
+        required => '1',
+    },
+    'whole_words_only' => {
+        data_type => 'boolean',
+        description => 'Match only whole words.',
+        required => '0',
+    },
+    'ignore_case' => {
+        data_type => 'boolean',
+        description => 'True to search ignoring char case.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'highlight_shape_text' } = { 
+    	summary => 'Highlight all matches of sample in text frame text using specified color.',
+        params => $params,
+        returns => 'Shape',
+        };
+}
+# @return Shape
+#
+sub highlight_shape_text {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling highlight_shape_text");
+    }
+
+    # verify the required parameter 'slide_index' is set
+    unless (exists $args{'slide_index'}) {
+      croak("Missing the required parameter 'slide_index' when calling highlight_shape_text");
+    }
+
+    # verify the required parameter 'shape_index' is set
+    unless (exists $args{'shape_index'}) {
+      croak("Missing the required parameter 'shape_index' when calling highlight_shape_text");
+    }
+
+    # verify the required parameter 'text' is set
+    unless (exists $args{'text'} && $args{'text'}) {
+      croak("Missing the required parameter 'text' when calling highlight_shape_text");
+    }
+
+    # verify the required parameter 'color' is set
+    unless (exists $args{'color'} && $args{'color'}) {
+      croak("Missing the required parameter 'color' when calling highlight_shape_text");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/{shapeIndex}/highlightText';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'text'} && defined $args{'text'}) {
+        $query_params->{'text'} = $self->{api_client}->to_query_value($args{'text'});
+    }
+
+    # query params
+    if (exists $args{'color'} && defined $args{'color'}) {
+        $query_params->{'color'} = $self->{api_client}->to_query_value($args{'color'});
+    }
+
+    # query params
+    if (exists $args{'whole_words_only'} && defined $args{'whole_words_only'}) {
+        $query_params->{'wholeWordsOnly'} = $self->{api_client}->to_boolean_query_value($args{'whole_words_only'});
+    }
+
+    # query params
+    if (exists $args{'ignore_case'} && defined $args{'ignore_case'}) {
+        $query_params->{'ignoreCase'} = $self->{api_client}->to_boolean_query_value($args{'ignore_case'});
+    }
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'slide_index'}) {
+        my $_base_variable = "{" . "slideIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'shape_index'}) {
+        my $_base_variable = "{" . "shapeIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'shape_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files = [];
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('Shape', $response);
+    return $_response_object;
+}
+
+#
 # import_from_html
 #
 # Create presentation document from html.
@@ -28017,7 +28563,7 @@ sub save_presentation {
     }
 
     # verify enum value
-    if (!grep(/^$args{'format'}$/i, ( 'Pdf', 'Xps', 'Tiff', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Pot', 'Potx', 'Potm', 'Html', 'Html5', 'Swf', 'Svg', 'Jpeg', 'Png', 'Gif', 'Bmp', 'Fodp', 'Xaml' ))) {
+    if (!grep(/^$args{'format'}$/i, ( 'Pdf', 'Xps', 'Tiff', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Pot', 'Potx', 'Potm', 'Html', 'Html5', 'Swf', 'Svg', 'Jpeg', 'Png', 'Gif', 'Bmp', 'Fodp', 'Xaml', 'Mpeg4' ))) {
       croak("Invalid value for 'format': " . $args{'format'});
     }
 

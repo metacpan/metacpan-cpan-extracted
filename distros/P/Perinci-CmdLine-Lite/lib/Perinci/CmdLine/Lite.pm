@@ -2,8 +2,8 @@ package Perinci::CmdLine::Lite;
 
 # put pragmas + Log::ger here
 use 5.010001;
-# use strict; # already enabled by Mo
-# use warnings; # already enabled by Mo
+# use strict; # already enabled by Moo
+# use warnings; # already enabled by Moo
 use Log::ger;
 
 # put other modules alphabetically here
@@ -16,13 +16,9 @@ extends 'Perinci::CmdLine::Base';
 
 # put global variables alphabetically here
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-12-11'; # DATE
+our $DATE = '2022-01-29'; # DATE
 our $DIST = 'Perinci-CmdLine-Lite'; # DIST
-our $VERSION = '1.916'; # VERSION
-
-# when debugging, use this instead of the above because Mo doesn't give clear
-# error message if base class has errors.
-#use parent 'Perinci::CmdLine::Base';
+our $VERSION = '1.917'; # VERSION
 
 has default_prompt_template => (
     is=>'rw',
@@ -651,7 +647,7 @@ Perinci::CmdLine::Lite - A Rinci/Riap-based command-line application framework
 
 =head1 VERSION
 
-This document describes version 1.916 of Perinci::CmdLine::Lite (from Perl distribution Perinci-CmdLine-Lite), released on 2021-12-11.
+This document describes version 1.917 of Perinci::CmdLine::Lite (from Perl distribution Perinci-CmdLine-Lite), released on 2022-01-29.
 
 =head1 SYNOPSIS
 
@@ -899,7 +895,7 @@ beyond that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

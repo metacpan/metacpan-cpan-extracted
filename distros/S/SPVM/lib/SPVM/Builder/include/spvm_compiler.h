@@ -16,6 +16,9 @@ enum {
 
 // Parser information
 struct spvm_compiler {
+  // OPs
+  SPVM_LIST* ops;
+  
   // Module searching directories
   SPVM_LIST* module_dirs;
 
@@ -88,24 +91,30 @@ struct spvm_compiler {
   // Syntax error count
   SPVM_LIST* error_messages;
   
-  // Constant string symtable
-  SPVM_HASH* name_symtable;
-
+  // Strings - string literals and symbol names
+  SPVM_LIST* strings;
+  
+  // String symtable
+  SPVM_HASH* string_symtable;
+  
   // Used module symtable
   SPVM_HASH* used_class_symtable;
   
-  // added_class_names tmp
-  SPVM_LIST* added_class_names;
-
   // Operation codes
   SPVM_OPCODE_ARRAY* opcode_array;
   
-  // Single types
+  // Basic types
   SPVM_LIST* basic_types;
   
-  // Resolved type symbol table
+  // Basic type symbol table
   SPVM_HASH* basic_type_symtable;
-
+  
+  // Types
+  SPVM_LIST* types;
+  
+  // Types symbol table
+  SPVM_HASH* type_symtable;
+  
   // Classes
   SPVM_LIST* classes;
 
@@ -120,6 +129,9 @@ struct spvm_compiler {
 
   // Field ops
   SPVM_LIST* fields;
+  
+  // Switch 
+  SPVM_LIST* switch_infos;
   
   // module source symtable
   SPVM_HASH* module_source_symtable;

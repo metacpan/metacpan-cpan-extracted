@@ -1,0 +1,62 @@
+{
+   "abstract" : "L<ICU|https://icu.unicode.org/> in Perl",
+   "author" : [
+      "cPanel, L.L.C. (CPANEL)"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Unicode-ICU",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker::CPANfile" : "0.09",
+            "ExtUtils::PkgConfig" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "X::Tiny" : "0.21",
+            "parent" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::Plugin::NoWarnings" : "0",
+            "Test2::Tools::Compare" : "0.000138",
+            "Test2::Tools::Explain" : "0",
+            "Test2::V0" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/cpanel/p5-Unicode-ICU/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/cpanel/p5-Unicode-ICU.git",
+         "web" : "https://github.com/cpanel/p5-Unicode-ICU"
+      }
+   },
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::PP version 4.07"
+}

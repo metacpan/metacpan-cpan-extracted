@@ -6,7 +6,6 @@ META.json
 META.yml
 Makefile.PL
 README
-devscripts/bench-startup
 dist.ini
 lib/Perinci/CmdLine/Base.pm
 lib/Perinci/CmdLine/Lite.pm

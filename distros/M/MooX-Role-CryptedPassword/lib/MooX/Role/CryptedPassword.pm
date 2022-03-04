@@ -1,7 +1,7 @@
 package MooX::Role::CryptedPassword;
 use Moo::Role;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use Crypt::CBC;
 use constant CIPHER => 'Rijndael';
@@ -27,7 +27,11 @@ around BUILDARGS => sub {
         my $crypted_password = do {local $/; <$fh>};
         close($fh);
 
-        my $cipher = Crypt::CBC->new(cypher => $cipher_name, key => $cipher_key);
+        my $cipher = Crypt::CBC->new(
+            -cipher => $cipher_name,
+            -key    => $cipher_key,
+            -pbkdf => 'pbkdf2',
+        );
         $args{password} = $cipher->decrypt($crypted_password);
     }
 
@@ -91,6 +95,15 @@ plain-text password directly by passing it as the C<password> parameter.
 
 =head1 AUTHOR
 
-(c) MMXVII - Abe Timmerman <abeltje@cpan.org>
+E<copy> MMXVII - Abe Timmerman <abeltje@cpan.org>
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 =cut

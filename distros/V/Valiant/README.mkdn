@@ -3,9 +3,9 @@
 Valiant - Object validation inspired by Ruby on Rails and more.
 
 <div>
-    <a href="https://github.com/jjn1056/valiant/actions"><img src="https://github.com/jjn1056/valiant/workflows/linux/badge.svg"></a>
-    <a href="https://github.com/jjn1056/valiant/actions"><img src="https://github.com/jjn1056/valiant/workflows/macos/badge.svg"></a>
-    <a href="https://github.com/jjn1056/valiant/actions"><img src="https://github.com/jjn1056/valiant/workflows/windows/badge.svg"></a>
+    <a href="https://github.com/jjn1056/valiant/actions"><img src="https://github.com/jjn1056/valiant/actions/workflows/linux.yml/badge.svg"></a>
+    <a href="https://github.com/jjn1056/valiant/actions"><img src="https://github.com/jjn1056/valiant/actions/workflows/macos.yml/badge.svg"></a>
+    <a href="https://github.com/jjn1056/valiant/actions"><img src="https://github.com/jjn1056/valiant/actions/workflows/windows.yml/badge.svg"></a>
     <a href="https://metacpan.org/pod/Valiant"><img src="https://badge.fury.io/pl/Valiant.svg"></a>
     <a href="https://codecov.io/github/jjn1056/Valiant/?branch=main"><img alt="Coverage" src="https://codecov.io/github/jjn1056/Valiant/coverage.svg?branch=main"></a>
 </div>
@@ -1405,10 +1405,10 @@ performance.
 # SEE ALSO
 
 There's no lack of validation systems on CPAN.   I've used (and contributed) to
-[HTML::FormHandler](https://metacpan.org/pod/HTML%3A%3AFormHandler) and <Data::MuForm>.   I've also used [HTML::FormFu](https://metacpan.org/pod/HTML%3A%3AFormFu).  Recently I 
-spotted [Form::Tiny](https://metacpan.org/pod/Form%3A%3ATiny) which is a similar DSL style system as Valiant but with a smaller
-footprint and sane looking sort code.  This list is not exhaustive, just stuff I've
-either used or reviewed.
+[HTML::FormHandler](https://metacpan.org/pod/HTML%3A%3AFormHandler) and [Data::MuForm](https://metacpan.org/pod/Data%3A%3AMuForm).   I've also used [HTML::FormFu](https://metacpan.org/pod/HTML%3A%3AFormFu).  Recently I 
+spotted [Form::Tiny](https://metacpan.org/pod/Form%3A%3ATiny) which is a similar DSL style system as [Valiant](https://metacpan.org/pod/Valiant) but with a smaller
+footprint and sane looking code.  This list is not exhaustive, just stuff I've either used or 
+reviewed.
 
 [Valiant](https://metacpan.org/pod/Valiant), [Valiant::Validations](https://metacpan.org/pod/Valiant%3A%3AValidations), [Valiant::Validates](https://metacpan.org/pod/Valiant%3A%3AValidates), [Valiant::Filters](https://metacpan.org/pod/Valiant%3A%3AFilters),
 [Valiant::Filterable](https://metacpan.org/pod/Valiant%3A%3AFilterable)

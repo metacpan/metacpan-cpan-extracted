@@ -1,4 +1,4 @@
-#! /usr/bin/perl -w
+#! perl -I. -w
 use strict;
 
 use Test::Pod;

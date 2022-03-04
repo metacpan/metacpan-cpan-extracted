@@ -30,6 +30,7 @@ my %WriteMakefileArgs = (
     "BUILD_REQUIRES" => {
         %common_reqs,
         "File::Find::Rule" => 0,
+        "FFI::CheckLib" => "0.23",
     },
     "TEST_REQUIRES" => {
         "Test::Alien" => 0,

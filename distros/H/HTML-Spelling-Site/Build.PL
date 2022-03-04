@@ -18,7 +18,7 @@ my %module_build_args = (
     "Shlomi Fish <shlomif\@cpan.org>"
   ],
   "dist_name" => "HTML-Spelling-Site",
-  "dist_version" => "0.8.0",
+  "dist_version" => "0.10.0",
   "license" => "mit",
   "module_name" => "HTML::Spelling::Site",
   "recursive_test_files" => 1,

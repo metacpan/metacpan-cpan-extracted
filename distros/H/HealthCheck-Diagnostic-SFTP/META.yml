@@ -22,7 +22,7 @@ name: HealthCheck-Diagnostic-SFTP
 provides:
   HealthCheck::Diagnostic::SFTP:
     file: lib/HealthCheck/Diagnostic/SFTP.pm
-    version: v1.4.1
+    version: v1.4.2
 requires:
   Carp: '0'
   HealthCheck::Diagnostic: '0'
@@ -34,7 +34,7 @@ requires:
 resources:
   bugtracker: https://github.com/GrantStreetGroup/p5-HealthCheck-Diagnostic-SFTP/issues
   repository: git://github.com/GrantStreetGroup/p5-HealthCheck-Diagnostic-SFTP.git
-version: v1.4.1
+version: v1.4.2
 x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: Artistic-2.0

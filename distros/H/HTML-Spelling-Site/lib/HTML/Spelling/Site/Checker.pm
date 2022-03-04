@@ -1,5 +1,5 @@
 package HTML::Spelling::Site::Checker;
-$HTML::Spelling::Site::Checker::VERSION = '0.8.0';
+$HTML::Spelling::Site::Checker::VERSION = '0.10.0';
 use strict;
 use warnings;
 use autodie;
@@ -111,8 +111,7 @@ FILENAMES_LOOP:
                 any
                 {
                     exists( $self->_inside->{$_} ) and $self->_inside->{$_} > 0
-                }
-                qw(script style)
+                } qw(script style)
                 )
             {
                 return;
@@ -222,6 +221,8 @@ sub test_spelling
 {
     my ( $self, $args ) = @_;
 
+    my $MAXLEN       = ( $args->{'MAXLEN'}  || 1000 );
+    my $MAXSIZE      = ( $args->{'MAXSIZE'} || 20 );
     my $misspellings = $self->_calc_mispellings($args);
 
     if ( $args->{light} )
@@ -231,16 +232,27 @@ sub test_spelling
         my $ret = Test::More::is( scalar( @{ $misspellings->{misspellings} } ),
             0, $args->{blurb} );
 
+        my $output_text = '';
+    DIAGLOOP:
         foreach my $error ( @{ $misspellings->{misspellings} } )
         {
-            Test::More::diag( $self->_format_error($error) );
+            $output_text .= $self->_format_error($error) . "\n";
+            if ( length($output_text) >= $MAXLEN )
+            {
+                $output_text = substr( $output_text, 0, $MAXLEN );
+                last DIAGLOOP;
+            }
         }
+        Test::More::diag($output_text);
         return $ret;
     }
     require Test::Differences;
-
-    return Test::Differences::eq_or_diff( $misspellings->{misspellings},
-        [], $args->{blurb}, );
+    my @arr = @{ $misspellings->{misspellings} };
+    if ( @arr > $MAXSIZE )
+    {
+        $#arr = $MAXSIZE - 1;
+    }
+    return Test::Differences::eq_or_diff( ( \@arr ), [], $args->{blurb}, );
 }
 1;
 
@@ -256,7 +268,7 @@ HTML::Spelling::Site::Checker - does the actual checking.
 
 =head1 VERSION
 
-version 0.8.0
+version 0.10.0
 
 =head1 SYNOPSIS
 
@@ -441,6 +453,10 @@ A spell check function compatible with L<Test::More> . Emits one assertion.
 Since version 0.2.0, if a C<<< light => 1 >>> key is specified and is true, it
 will not use L<Test::Differences>, which tends to consume a lot of RAM when
 there are many messages.
+
+Since version 0.10.0, C<'MAXLEN'> argument was added.
+
+Since version 0.10.0, C<'MAXSIZE'> argument was added.
 
 =head2 $finder->whitelist_parser()
 

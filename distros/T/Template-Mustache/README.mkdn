@@ -4,7 +4,7 @@ Template::Mustache - Drawing Mustaches on Perl for fun and profit
 
 # VERSION
 
-version 1.3.4
+version 1.4.0
 
 # SYNOPSIS
 
@@ -14,13 +14,13 @@ use Template::Mustache;
 # one-shot rendering
 
 print Template::Mustache->render(
-    "Hello {{planet}}", 
+    "Hello {{planet}}",
 );
 
 # compile and re-use template
 
 my $mustache = Template::Mustache->new(
-    template => "Hello {{planet}}", 
+    template => "Hello {{planet}}",
 );
 
 print $mustache->render( { planet => "World!" } );
@@ -28,7 +28,7 @@ print $mustache->render( { planet => "World!" } );
 
 # DESCRIPTION
 
-Template::Mustache is an implementation of the fabulous 
+Template::Mustache is an implementation of the fabulous
 [Mustache](https://mustache.github.io/) templating
 language for Perl.
 
@@ -40,18 +40,18 @@ use of `render` called as a class method.
 
 ```
 print Template::Mustache->render(
-    "Hello {{planet}}", 
+    "Hello {{planet}}",
 );
 ```
 
-If you are considering re-using the same template many times, it's 
+If you are considering re-using the same template many times, it's
 recommended to create a `Template::Mustache` object instead,
 which will compile the template only once, and allow to render
 it with different contexts.
 
 ```perl
 my $mustache = Template::Mustache->new(
-    template => "Hello {{planet}}", 
+    template => "Hello {{planet}}",
 );
 
 print $mustache->render( { planet => "World!" } );
@@ -68,7 +68,7 @@ my $mustache = Template::Mustache->new(
 );
 ```
 
-Constructor.  
+Constructor.
 
 ### arguments
 
@@ -104,12 +104,12 @@ Constructor.
     the method `partials` for more details on its format.
 
     By default, if `partials_path` (or `template_path` is defined,
-    the template will try to resolve the partials as filenames with 
+    the template will try to resolve the partials as filenames with
     the file extension `.mustache`
     relative to that path.
 
     ```perl
-    my $mustache = Template::Mustache->new( 
+    my $mustache = Template::Mustache->new(
         partials => './root',
         template => '{{ > ./my/partial }}',  # => file ./root/my/partial.mustache
     );
@@ -121,10 +121,10 @@ Constructor.
 print $mustache->render( $context );
 ```
 
-Returns the rendered template, given the optionally provided context. Uses 
+Returns the rendered template, given the optionally provided context. Uses
 the object's `context attribute` if not provided.
 
-### Context 
+### Context
 
 #### as a hashref
 
@@ -137,22 +137,22 @@ to be inserted in the template.
 
 ```perl
 Template::Mustache->render(
-    'it is {{ time }}', 
-    { time => sub { scalar localtime } } 
+    'it is {{ time }}',
+    { time => sub { scalar localtime } }
 );
 ```
 
-If you want the value returned by the coderef to be 
+If you want the value returned by the coderef to be
 interpolated as a Mustache template, a helper function is passed
 as the last argument to the coderef.
 
 ```perl
 Template::Mustache->render(
-    'hello {{ place }}', 
+    'hello {{ place }}',
     {
         place => sub { pop->('{{ planet }}') },
         planet => 'World',
-    } 
+    }
 );
 ```
 
@@ -180,7 +180,7 @@ Template::Mustache->render( 'Hello {{ 1 }}', [ 'Earth', 'World!' ] );
 #### as an object
 
 ```perl
-my $object = Something->new( ... );  
+my $object = Something->new( ... );
 
 Template::Mustache->render( 'Hello {{ thing }}', $object );  # thing resolves to $object->thing
 ```
@@ -227,8 +227,8 @@ Template::Mustache->render( '{{ bar.baz.0 }}', $foo );  # => 'quux'
 print Template::Mustache->render( $template, $context, $partials );
 
 # equivalent to
-Template::Mustache->new->( 
-    template => $template, partials => $partials 
+Template::Mustache->new->(
+    template => $template, partials => $partials
 )->render( $context );
 ```
 
@@ -248,16 +248,16 @@ Accessor to the `template` attribute.
 
 ## template\_path( $path )
 
-Accessor to the `template_path` attribute. If this attribute is 
-set, the template will be set to the content of the provided file 
-(if `$path` is a directory, the file is assumed to be the 
+Accessor to the `template_path` attribute. If this attribute is
+set, the template will be set to the content of the provided file
+(if `$path` is a directory, the file is assumed to be the
 `Mustache.mustache` file local to that directory).
 
-## partials\_path( $path ) 
+## partials\_path( $path )
 
 Accessor the `partials_path` attribute. If partials were
 not given as part of the object construction, when encountered
-partials will be attempted to be read from that directory. 
+partials will be attempted to be read from that directory.
 The filename for a partial is its name with `.mustache` appended to it.
 
 If `template_path` is defined, `partials_path` defaults to it.
@@ -294,7 +294,7 @@ my $mustache = Template::Mustache->new(
 print $mustache->render; # => partials rock!
 ```
 
-Add partial templates to the object. 
+Add partial templates to the object.
 
 Partial values can be
 strings holding Mustache templates;
@@ -319,6 +319,31 @@ print $Template::Mustache::GRAMMAR;
 ```
 
 The [Parse::RecDescent](https://metacpan.org/pod/Parse%3A%3ARecDescent) grammar used to parse Mustache templates.
+
+# Interpolation of numbers and HTML entities
+
+By default and as ddictated by its specs, Mustache format numbers
+into their canonical form.
+
+```
+print Template::Mustache->render("{{.}}", "00.120" ); # prints '0.12'
+```
+
+If you rather want a value to be printed as-is, pass it as a reference.
+
+```
+print Template::Mustache->render("{{.}}", \"00.120" ); # prints '00.120'
+```
+
+Ditto for HTML entities:
+
+```perl
+my $value = "<stuff>";
+
+Template::Mustache->render("{{.}}", $value );  # "&lt;stuff&gt;"
+
+Template::Mustache->render("{{.}}", \$value ); # "<stuff>"
+```
 
 # SEE ALSO
 
@@ -347,7 +372,7 @@ The [Parse::RecDescent](https://metacpan.org/pod/Parse%3A%3ARecDescent) grammar 
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2019, 2018, 2017, 2016, 2015, 2011 by Pieter van de Bruggen.
+This software is copyright (c) 2022, 2021, 2019, 2018, 2017, 2016, 2015, 2011 by Pieter van de Bruggen.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

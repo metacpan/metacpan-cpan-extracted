@@ -1,3 +1,9 @@
+1.917   2022-01-29  Released-By: PERLANCAR; Urgency: medium
+
+	- Bump prereq versions (particularly, Perinci::Sub::GetArgs::Argv
+	  to 0.846 to adjust with newest Data::Sah::Resolve.
+
+
 1.916   2021-12-11  Released-By: PERLANCAR; Urgency: medium
 
 	- [bugfix] Forgot to adjust method call.
@@ -32,6 +38,10 @@
 
 	- [incompatible change] Remove support for PERINCI_CMDLINE_DUMP_ARGS &
           PERINCI_CMDLINE_DUMP_CONFIG.
+
+        - [incompatible change] Remove support for the deprecated
+          PERINCI_CMDLINE_DUMP; only PERINCI_CMDLINE_DUMP_OBJECT is supported.
+          See the plugin Run::DumpObject.
 
 
 1.914   2021-12-10  Released-By: PERLANCAR; Urgency: medium

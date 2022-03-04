@@ -36,45 +36,42 @@ my $mod = 'Async::Event::Interval';
 
 # Test timed interval
 
-my $e = $mod->new(0.2, \&perform);
+my $e = $mod->new(0.2, sub {});
 
-my $x = $e->shared_scalar;
-$$x = 0;
-
-is $$x, 0, "baseline var ok";
+is $e->runs, 0, "Baseline ok";
 
 $e->start;
 
 sleep 1;
 
-is $$x >= 20, 1, "event is async and correct";
+is $e->runs >= 4, 1, "event is async and correct";
 
 $e->stop;
 
 # Change interval
-my $e1 = $mod->new(0.2, \&change_interval);
-
-my $y = $e1->shared_scalar;
-$$y = 0;
+my $e1 = $mod->new(0.2, sub {});
 
 $e1->start;
+
 select(undef, undef, undef, 0.3);
-is $$y > 0, 1, "With interval of 0.2, execution runs at the right time";
+is $e1->runs, 1, "With interval of 0.2, execution runs at the right time";
+
+select(undef, undef, undef, 0.7);
+
+my $runs_02 = $e1->runs;
+is $runs_02 > 3, 1, "With interval of 0.2, execution happens at the proper rate";
+
+$e1->interval(2);
+
+select(undef, undef, undef, 1.8);
+my $runs_2 = $e1->runs;
+my $runs_diff = $runs_2 - $runs_02;
+
+is
+    $runs_diff,
+    1,
+    "Changing interval to 2, execution waits properly";
 
 $e1->stop;
-$e1->interval(1);
-$e1->start;
 
-$$y = 0;
-select(undef, undef, undef, 0.8);
-is $$y, 0, "Changing interval to 1 second, execution waits properly";
-
-$e1->stop;
-
-sub perform {
-    $$x += 10;
-}
-sub change_interval {
-    $$y++;
-}
 done_testing();

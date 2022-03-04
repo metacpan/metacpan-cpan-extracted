@@ -31,26 +31,16 @@ SPVM_CLASS* SPVM_CLASS_new(SPVM_COMPILER* compiler) {
   // Class variables
   class->class_vars = SPVM_ALLOCATOR_new_list_compile_eternal(compiler, 0);
   class->class_var_symtable = SPVM_ALLOCATOR_new_hash_compile_eternal(compiler, 0);
-
+  
+  // Methods
   class->methods = SPVM_ALLOCATOR_new_list_compile_eternal(compiler, 0);
   class->method_symtable = SPVM_ALLOCATOR_new_hash_compile_eternal(compiler, 0);
-  class->class_vars = SPVM_ALLOCATOR_new_list_compile_eternal(compiler, 0);
-  class->class_var_symtable = SPVM_ALLOCATOR_new_hash_compile_eternal(compiler, 0);
+  
+  // Interfaces
   class->interface_class_symtable = SPVM_ALLOCATOR_new_hash_compile_eternal(compiler, 0);
   
-  class->info_class_var_ids = SPVM_ALLOCATOR_new_list_compile_eternal(compiler, 0);
-  class->info_class_var_id_symtable = SPVM_ALLOCATOR_new_hash_compile_eternal(compiler, 0);
-  class->info_method_ids = SPVM_ALLOCATOR_new_list_compile_eternal(compiler, 0);
-  class->info_method_id_symtable = SPVM_ALLOCATOR_new_hash_compile_eternal(compiler, 0);
-  class->info_field_ids = SPVM_ALLOCATOR_new_list_compile_eternal(compiler, 0);
-  class->info_field_id_symtable = SPVM_ALLOCATOR_new_hash_compile_eternal(compiler, 0);
-  class->info_basic_type_ids = SPVM_ALLOCATOR_new_list_compile_eternal(compiler, 0);
-  class->info_basic_type_id_symtable = SPVM_ALLOCATOR_new_hash_compile_eternal(compiler, 0);
-  class->info_switch_infos = SPVM_ALLOCATOR_new_list_compile_eternal(compiler, 0);
-  class->op_uses = SPVM_ALLOCATOR_new_list_compile_eternal(compiler, 0);
-  class->op_allows = SPVM_ALLOCATOR_new_list_compile_eternal(compiler, 0);
-  class->op_implements = SPVM_ALLOCATOR_new_list_compile_eternal(compiler, 0);
-  class->info_constants = SPVM_ALLOCATOR_new_list_compile_eternal(compiler, 0);
+  class->allows = SPVM_ALLOCATOR_new_list_compile_eternal(compiler, 0);
+  class->implements = SPVM_ALLOCATOR_new_list_compile_eternal(compiler, 0);
   class->anon_methods = SPVM_ALLOCATOR_new_list_compile_eternal(compiler, 0);
   class->class_alias_symtable = SPVM_ALLOCATOR_new_hash_compile_eternal(compiler, 0);
 

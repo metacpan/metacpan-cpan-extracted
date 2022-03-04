@@ -31,7 +31,7 @@
             "ShellQuote::Any::Tiny" : "0.003"
          },
          "x_spec" : {
-            "Rinci" : "v1.1.99"
+            "Rinci" : "v1.1.100"
          }
       },
       "runtime" : {
@@ -60,20 +60,18 @@
             "Getopt::Long" : "2.50",
             "IO::Interactive" : "0",
             "JSON::MaybeXS" : "0",
-            "JSON::PP" : "0",
             "List::Util" : "1.54",
             "Log::ger" : "0.038",
             "Log::ger::App" : "0.018",
-            "Log::ger::Output::Screen" : "0.015",
             "MIME::Base64" : "0",
             "Moo" : "0",
             "Perinci::Access::Lite" : "0.09",
             "Perinci::CmdLine::Help" : "0.172",
             "Perinci::CmdLine::Util::Config" : "1.724",
             "Perinci::Object" : "0.311",
-            "Perinci::Result::Format::Lite" : "0.282",
+            "Perinci::Result::Format::Lite" : "0.285",
             "Perinci::Sub::Complete" : "0.935",
-            "Perinci::Sub::GetArgs::Argv" : "0.845",
+            "Perinci::Sub::GetArgs::Argv" : "0.846",
             "PerlIO::locale" : "0",
             "Progress::Any::Output" : "0",
             "Progress::Any::Output::TermProgressBarColor" : "0.17",
@@ -102,51 +100,51 @@
    "provides" : {
       "Perinci::CmdLine::Base" : {
          "file" : "lib/Perinci/CmdLine/Base.pm",
-         "version" : "1.916"
+         "version" : "1.917"
       },
       "Perinci::CmdLine::Lite" : {
          "file" : "lib/Perinci/CmdLine/Lite.pm",
-         "version" : "1.916"
+         "version" : "1.917"
       },
       "Perinci::CmdLine::Plugin::Debug::DumpArgs" : {
          "file" : "lib/Perinci/CmdLine/Plugin/Debug/DumpArgs.pm",
-         "version" : "1.916"
+         "version" : "1.917"
       },
       "Perinci::CmdLine::Plugin::Debug::DumpR" : {
          "file" : "lib/Perinci/CmdLine/Plugin/Debug/DumpR.pm",
-         "version" : "1.916"
+         "version" : "1.917"
       },
       "Perinci::CmdLine::Plugin::Debug::DumpRes" : {
          "file" : "lib/Perinci/CmdLine/Plugin/Debug/DumpRes.pm",
-         "version" : "1.916"
+         "version" : "1.917"
       },
       "Perinci::CmdLine::Plugin::Flow::Exit" : {
          "file" : "lib/Perinci/CmdLine/Plugin/Flow/Exit.pm",
-         "version" : "1.916"
+         "version" : "1.917"
       },
       "Perinci::CmdLine::Plugin::Plugin::Disable" : {
          "file" : "lib/Perinci/CmdLine/Plugin/Plugin/Disable.pm",
-         "version" : "1.916"
+         "version" : "1.917"
       },
       "Perinci::CmdLine::Plugin::Run::Completion" : {
          "file" : "lib/Perinci/CmdLine/Plugin/Run/Completion.pm",
-         "version" : "1.916"
+         "version" : "1.917"
       },
       "Perinci::CmdLine::Plugin::Run::DebugCompletion" : {
          "file" : "lib/Perinci/CmdLine/Plugin/Run/DebugCompletion.pm",
-         "version" : "1.916"
+         "version" : "1.917"
       },
       "Perinci::CmdLine::Plugin::Run::DumpObject" : {
          "file" : "lib/Perinci/CmdLine/Plugin/Run/DumpObject.pm",
-         "version" : "1.916"
+         "version" : "1.917"
       },
       "Perinci::CmdLine::Plugin::Run::Normal" : {
          "file" : "lib/Perinci/CmdLine/Plugin/Run/Normal.pm",
-         "version" : "1.916"
+         "version" : "1.917"
       },
       "Perinci::CmdLine::PluginBase" : {
          "file" : "lib/Perinci/CmdLine/PluginBase.pm",
-         "version" : "1.916"
+         "version" : "1.917"
       }
    },
    "release_status" : "stable",
@@ -161,7 +159,7 @@
          "web" : "https://github.com/perlancar/perl-Perinci-CmdLine-Lite"
       }
    },
-   "version" : "1.916",
+   "version" : "1.917",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

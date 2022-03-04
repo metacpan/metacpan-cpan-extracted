@@ -19,23 +19,6 @@ enum {
   SPVM_METHOD_C_FLAG_PRIVATE = 128,
 };
 
-enum {
-  SPVM_METHOD_C_RETURN_TYPE_CATEGORY_ID_VOID,
-  SPVM_METHOD_C_RETURN_TYPE_CATEGORY_ID_BYTE,
-  SPVM_METHOD_C_RETURN_TYPE_CATEGORY_ID_SHORT,
-  SPVM_METHOD_C_RETURN_TYPE_CATEGORY_ID_INT,
-  SPVM_METHOD_C_RETURN_TYPE_CATEGORY_ID_LONG,
-  SPVM_METHOD_C_RETURN_TYPE_CATEGORY_ID_FLOAT,
-  SPVM_METHOD_C_RETURN_TYPE_CATEGORY_ID_DOUBLE,
-  SPVM_METHOD_C_RETURN_TYPE_CATEGORY_ID_OBJECT,
-  SPVM_METHOD_C_RETURN_TYPE_CATEGORY_ID_MULNUM_BYTE,
-  SPVM_METHOD_C_RETURN_TYPE_CATEGORY_ID_MULNUM_SHORT,
-  SPVM_METHOD_C_RETURN_TYPE_CATEGORY_ID_MULNUM_INT,
-  SPVM_METHOD_C_RETURN_TYPE_CATEGORY_ID_MULNUM_LONG,
-  SPVM_METHOD_C_RETURN_TYPE_CATEGORY_ID_MULNUM_FLOAT,
-  SPVM_METHOD_C_RETURN_TYPE_CATEGORY_ID_MULNUM_DOUBLE,
-};
-
 // Method information
 struct spvm_method {
   SPVM_OP* op_method;
@@ -51,6 +34,8 @@ struct spvm_method {
   void* native_address;
   SPVM_TYPE* return_type;
   SPVM_LIST* args;
+  SPVM_LIST* arg_types;
+  SPVM_LIST* arg_mem_ids;
   const char* name;
   const char* abs_name;
   const char* signature;
@@ -64,7 +49,6 @@ struct spvm_method {
   int32_t eval_stack_max_length;
   int32_t mortal_stack_length;
   int32_t id;
-  int32_t return_type_category_id;
   int32_t flag;
   int32_t args_alloc_length;
   int32_t vars_alloc_length;
@@ -76,7 +60,6 @@ struct spvm_method {
   int32_t double_vars_alloc_length;
   int32_t object_vars_alloc_length;
   int32_t ref_vars_alloc_length;
-  int32_t return_type_category;
   int32_t tmp_vars_length;
   int8_t have_vaarg;
   int8_t is_class_var_setter;

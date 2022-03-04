@@ -1,4 +1,4 @@
-package NewFangle 0.07 {
+package NewFangle 0.08 {
 
   use strict;
   use warnings;
@@ -46,7 +46,7 @@ NewFangle - Unofficial Perl NewRelic SDK
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -202,7 +202,11 @@ instead of C<Perl>.
 
 =head1 AUTHOR
 
-Graham Ollis <plicease@cpan.org>
+Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+Owen Allsopp (ALLSOPP)
 
 =head1 COPYRIGHT AND LICENSE
 

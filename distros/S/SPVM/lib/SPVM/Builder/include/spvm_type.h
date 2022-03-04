@@ -7,6 +7,7 @@
 
 enum {
   SPVM_TYPE_C_FLAG_REF = 1,
+  SPVM_TYPE_C_FLAG_MUTABLE = 2,
 };
 
 enum {
@@ -45,18 +46,13 @@ enum {
 };
 
 struct spvm_type {
-  SPVM_OP* op_type;
+  const char* type_name;
   SPVM_BASIC_TYPE* basic_type;
   int32_t dimension;
   int32_t flag;
-  int32_t info_constant_id;
-  int8_t is_self;
-  int8_t is_class_alias;
-  int8_t is_maybe_class_alias;
-  int8_t is_mutable;
+  int32_t category;
+  int32_t width;
 };
-
-SPVM_TYPE* SPVM_TYPE_new(SPVM_COMPILER* compiler);
 
 int32_t SPVM_TYPE_has_callback(
   SPVM_COMPILER* compiler,
@@ -74,25 +70,25 @@ int32_t SPVM_TYPE_get_type_category(SPVM_COMPILER* compiler, int32_t basic_type_
 
 const char* SPVM_TYPE_new_type_name(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
 
-SPVM_TYPE* SPVM_TYPE_create_void_type(SPVM_COMPILER* compiler);
-SPVM_TYPE* SPVM_TYPE_create_undef_type(SPVM_COMPILER* compiler);
-SPVM_TYPE* SPVM_TYPE_create_byte_type(SPVM_COMPILER* compiler);
-SPVM_TYPE* SPVM_TYPE_create_short_type(SPVM_COMPILER* compiler);
-SPVM_TYPE* SPVM_TYPE_create_int_type(SPVM_COMPILER* compiler);
-SPVM_TYPE* SPVM_TYPE_create_long_type(SPVM_COMPILER* compiler);
-SPVM_TYPE* SPVM_TYPE_create_float_type(SPVM_COMPILER* compiler);
-SPVM_TYPE* SPVM_TYPE_create_double_type(SPVM_COMPILER* compiler);
-SPVM_TYPE* SPVM_TYPE_create_string_type(SPVM_COMPILER* compiler);
-SPVM_TYPE* SPVM_TYPE_create_object_type(SPVM_COMPILER* compiler);
+SPVM_TYPE* SPVM_TYPE_new_void_type(SPVM_COMPILER* compiler);
+SPVM_TYPE* SPVM_TYPE_new_undef_type(SPVM_COMPILER* compiler);
+SPVM_TYPE* SPVM_TYPE_new_byte_type(SPVM_COMPILER* compiler);
+SPVM_TYPE* SPVM_TYPE_new_short_type(SPVM_COMPILER* compiler);
+SPVM_TYPE* SPVM_TYPE_new_int_type(SPVM_COMPILER* compiler);
+SPVM_TYPE* SPVM_TYPE_new_long_type(SPVM_COMPILER* compiler);
+SPVM_TYPE* SPVM_TYPE_new_float_type(SPVM_COMPILER* compiler);
+SPVM_TYPE* SPVM_TYPE_new_double_type(SPVM_COMPILER* compiler);
+SPVM_TYPE* SPVM_TYPE_new_string_type(SPVM_COMPILER* compiler);
+SPVM_TYPE* SPVM_TYPE_new_object_type(SPVM_COMPILER* compiler);
 
 
-SPVM_TYPE* SPVM_TYPE_create_byte_ref_type(SPVM_COMPILER* compiler);
-SPVM_TYPE* SPVM_TYPE_create_short_ref_type(SPVM_COMPILER* compiler);
-SPVM_TYPE* SPVM_TYPE_create_int_ref_type(SPVM_COMPILER* compiler);
-SPVM_TYPE* SPVM_TYPE_create_long_ref_type(SPVM_COMPILER* compiler);
-SPVM_TYPE* SPVM_TYPE_create_float_ref_type(SPVM_COMPILER* compiler);
-SPVM_TYPE* SPVM_TYPE_create_double_ref_type(SPVM_COMPILER* compiler);
-SPVM_TYPE* SPVM_TYPE_create_any_object_type(SPVM_COMPILER* compiler);
+SPVM_TYPE* SPVM_TYPE_new_byte_ref_type(SPVM_COMPILER* compiler);
+SPVM_TYPE* SPVM_TYPE_new_short_ref_type(SPVM_COMPILER* compiler);
+SPVM_TYPE* SPVM_TYPE_new_int_ref_type(SPVM_COMPILER* compiler);
+SPVM_TYPE* SPVM_TYPE_new_long_ref_type(SPVM_COMPILER* compiler);
+SPVM_TYPE* SPVM_TYPE_new_float_ref_type(SPVM_COMPILER* compiler);
+SPVM_TYPE* SPVM_TYPE_new_double_ref_type(SPVM_COMPILER* compiler);
+SPVM_TYPE* SPVM_TYPE_new_any_object_type(SPVM_COMPILER* compiler);
 
 int32_t SPVM_TYPE_is_void_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
 int32_t SPVM_TYPE_is_byte_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
@@ -103,13 +99,13 @@ int32_t SPVM_TYPE_is_float_type(SPVM_COMPILER* compiler, int32_t basic_type_id, 
 int32_t SPVM_TYPE_is_double_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
 int32_t SPVM_TYPE_is_numeric_object_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
 
-SPVM_TYPE* SPVM_TYPE_create_byte_object_type(SPVM_COMPILER* compiler);
-SPVM_TYPE* SPVM_TYPE_create_short_object_type(SPVM_COMPILER* compiler);
-SPVM_TYPE* SPVM_TYPE_create_int_object_type(SPVM_COMPILER* compiler);
-SPVM_TYPE* SPVM_TYPE_create_long_object_type(SPVM_COMPILER* compiler);
-SPVM_TYPE* SPVM_TYPE_create_float_object_type(SPVM_COMPILER* compiler);
-SPVM_TYPE* SPVM_TYPE_create_double_object_type(SPVM_COMPILER* compiler);
-SPVM_TYPE* SPVM_TYPE_create_bool_object_type(SPVM_COMPILER* compiler);
+SPVM_TYPE* SPVM_TYPE_new_byte_object_type(SPVM_COMPILER* compiler);
+SPVM_TYPE* SPVM_TYPE_new_short_object_type(SPVM_COMPILER* compiler);
+SPVM_TYPE* SPVM_TYPE_new_int_object_type(SPVM_COMPILER* compiler);
+SPVM_TYPE* SPVM_TYPE_new_long_object_type(SPVM_COMPILER* compiler);
+SPVM_TYPE* SPVM_TYPE_new_float_object_type(SPVM_COMPILER* compiler);
+SPVM_TYPE* SPVM_TYPE_new_double_object_type(SPVM_COMPILER* compiler);
+SPVM_TYPE* SPVM_TYPE_new_bool_object_type(SPVM_COMPILER* compiler);
 
 int32_t SPVM_TYPE_is_byte_object_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
 int32_t SPVM_TYPE_is_short_object_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
@@ -149,10 +145,10 @@ int32_t SPVM_TYPE_get_type_name_length(SPVM_COMPILER* compiler, int32_t basic_ty
 
 int32_t SPVM_TYPE_get_width(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
 
-SPVM_TYPE* SPVM_TYPE_clone_type(SPVM_COMPILER* compiler, SPVM_TYPE* type);
-
 int32_t SPVM_TYPE_is_embedded_class_name(SPVM_COMPILER* compiler, const char* type_name);
 
 int32_t SPVM_TYPE_get_elem_byte_size(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
+
+SPVM_TYPE* SPVM_TYPE_new(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
 
 #endif

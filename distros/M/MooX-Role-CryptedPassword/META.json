@@ -4,13 +4,13 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "MooX-Role-CryptedPassword",
    "no_index" : {
@@ -22,7 +22,9 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "Test::Fatal" : "0",
+            "Test::Simple" : "0.94",
+            "Test::Warnings" : "0"
          }
       },
       "configure" : {
@@ -32,12 +34,14 @@
       },
       "runtime" : {
          "requires" : {
-            "Crypt::CBC" : "0",
+            "Crypt::CBC" : "2.35",
             "Crypt::Rijndael" : "0",
             "Moo" : "2",
-            "Test::NoWarnings" : "0",
+            "Test::Fatal" : "0",
             "Test::Simple" : "0.94",
-            "autodie" : "0"
+            "Test::Warnings" : "0",
+            "autodie" : "0",
+            "perl" : "5.010001"
          }
       }
    },
@@ -47,6 +51,7 @@
          "type" : "git"
       }
    },
-   "version" : "0.01",
-   "x_IRC" : "irc://irc.perl.org/#amsterdam.pm"
+   "version" : "0.02",
+   "x_IRC" : "irc://irc.perl.org/#amsterdam.pm",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }
