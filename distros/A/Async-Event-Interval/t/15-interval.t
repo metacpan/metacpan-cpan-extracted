@@ -2,33 +2,35 @@ use strict;
 use warnings;
 
 use Async::Event::Interval;
+use Data::Dumper;
 use Test::More;
 
 my $mod = 'Async::Event::Interval';
+my $events_hold = $mod->new(0, sub {});
 
 # Throws
-{
-    my $ok = eval {
-        $mod->new('a', sub {});
-        1;
-    };
-    is $ok, undef, "croaks if interval isn't an int or float";
-    like
-        $@,
-        qr/must be an integer or float/,
-        "...and error is sane";
-}
+#{
+#    my $ok = eval {
+#        my $e = $mod->new('a', sub {});
+#        1;
+#    };
+#    is $ok, undef, "croaks if interval isn't an int or float";
+#    like
+#        $@,
+#        qr/must be an integer or float/,
+#        "...and error is sane";
+#}
 # OK
 {
+
     my $ok_int = eval {
-        $mod->new(1, sub {});
+        my $e = $mod->new(1, sub {});
         1;
     };
     is $ok_int, 1, "interval() succeeds with int ok";
 
-    $mod->new(0.15, sub {});
     my $ok_float = eval {
-        $mod->new(0.15, sub {});
+        my $e = $mod->new(0.15, sub {});
         1;
     };
     is $ok_float, 1, "interval() succeeds with float ok";

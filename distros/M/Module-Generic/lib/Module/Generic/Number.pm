@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Number.pm
-## Version v1.1.0
-## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Version v1.1.1
+## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2022/02/27
+## Modified 2022/03/05
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -64,6 +64,7 @@ BEGIN
         {
             my( $self, $other, $swap ) = @_;
             my $op = '.=';
+            no strict;
             my $operation = $swap ? "${other} ${op} \$self->{_number}" : "\$self->{_number} ${op} ${other}";
             my $res = eval( $operation );
             warn( "Error with formula \"$operation\": $@" ) if( $@ && $self->_warnings_is_enabled );
@@ -446,10 +447,10 @@ BEGIN
     thousands_sep       => ',',
     };
 
-    our( $VERSION ) = 'v1.1.0';
+    our( $VERSION ) = 'v1.1.1';
 };
 
-use strict;
+# use strict;
 no warnings 'redefine';
 
 my $map =
@@ -715,6 +716,7 @@ sub compute
     my $other_val = Scalar::Util::blessed( $other ) ? $other : "\"$other\"";
     my $operation = $swap ? "${other_val} $opts->{op} \$self->{_number}" : "\$self->{_number} $opts->{op} ${other_val}";
     no warnings 'uninitialized';
+    no strict;
     if( $opts->{return_object} )
     {
         my $res = eval( $operation );
@@ -1157,13 +1159,14 @@ sub _func
 {
     my $self = shift( @_ );
     my $func = shift( @_ ) || return( $self->error( "No function was provided." ) );
-    ## $self->message( 3, "Arguments received are: '", join( "', '", @_ ), "'." );
+    # $self->message( 3, "Arguments received are: '", join( "', '", @_ ), "'." );
     my $opts = {};
+    no strict;
     $opts = pop( @_ ) if( ref( $_[-1] ) eq 'HASH' );
     my $namespace = $opts->{posix} ? 'POSIX' : 'CORE';
     my $val  = @_ ? shift( @_ ) : undef;
     my $expr = defined( $val ) ? "${namespace}::${func}( \$self->{_number}, $val )" : "${namespace}::${func}( \$self->{_number} )";
-    ## $self->message( 3, "Evaluating '$expr'" );
+    # $self->message( 3, "Evaluating '$expr'" );
     my $res = eval( $expr );
     ## $self->message( 3, "Result for number '$self->{_number}' is '$res'" );
     $self->message( 3, "Error: $@" ) if( $@ );
@@ -1278,6 +1281,7 @@ sub length { return( CORE::length( shift->{_number} ) ); }
 sub _catchall
 {
     my( $self, $other, $swap, $op ) = @_;
+    no strict;
     my $expr = $swap ? "$other $op $self->{_number}" : "$self->{_number} $op $other";
     my $res = eval( $expr );
     ## print( ref( $self ), "::_catchall: evaluating $expr => $res\n" );
@@ -1294,6 +1298,7 @@ sub _func
     my $self = shift( @_ );
     my $func = shift( @_ ) || return( $self->error( "No function was provided." ) );
     my $opts = {};
+    no strict;
     $opts = pop( @_ ) if( ref( $_[-1] ) eq 'HASH' );
     my $namespace = $opts->{posix} ? 'POSIX' : 'CORE';
     my $val  = @_ ? shift( @_ ) : undef;

@@ -4,7 +4,7 @@ use 5.008;
 use strict;
 use warnings;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 =encoding utf-8
 
@@ -12,10 +12,13 @@ our $VERSION = '1.01';
 
 RT::Extension::ReportSpam - mark tickets as spam with one click
 
+=head1 RT VERSION
+
+Works with RT 4.4 and 5.0
+
 =head1 DESCRIPTION
 
-A simple extension that works with RT 4.2 and 4.4 which allows users
-to report a ticket as a spam message.
+A simple extension that allows users to report a ticket as a spam message.
 
 =head1 INSTALLATION
 
@@ -29,7 +32,7 @@ to report a ticket as a spam message.
 
 May need root permissions
 
-=item Edit your F</opt/rt4/etc/RT_SiteConfig.pm>
+=item Edit your F</opt/rt5/etc/RT_SiteConfig.pm>
 
     Plugin('RT::Extension::ReportSpam');
 
@@ -41,7 +44,7 @@ is disabled by leaving C<$SpamAutoDeleteThreshold> unset or setting it to 0.
 
 =item Clear your mason cache
 
-    rm -rf /opt/rt4/var/mason_data/obj
+    rm -rf /opt/rt5/var/mason_data/obj
 
 =item Restart your webserver
 
@@ -91,7 +94,7 @@ or via the web at
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2014 by Best Practical Solutions
+This software is Copyright (c) 2014-2022 by Best Practical Solutions
 
 This is free software, licensed under:
 

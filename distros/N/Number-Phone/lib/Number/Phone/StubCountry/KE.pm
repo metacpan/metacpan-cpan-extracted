@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20211206222446;
+our $VERSION = 1.20220305001842;
 
 my $formatters = [
                 {
@@ -91,37 +91,37 @@ my $validators = {
                 'pager' => '',
                 'personal_number' => '',
                 'specialrate' => '(900[02-9]\\d{5})',
-                'toll_free' => '800[24-8]\\d{5,6}',
+                'toll_free' => '800[2-8]\\d{5,6}',
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"25462", "Nanyuki",
-"25468", "Embu",
-"25459", "Homabay\/Migori",
-"25442", "Malindi\/Lamu\/Garsen",
-"25461", "Nyeri\/Karatina",
-"25440", "Kwale\/Ukunda\/Msambweni\/Lungalunga",
-"25460", "Muranga\/Kerugoya",
-"25441", "Mombasa\/Mariakani\/Kilifi",
-"25464", "Meru\/Maua\/Chuka",
-"25444", "Machakos\/Makueni\/Mwingi\/Kitui",
-"25443", "Voi\/Wundanyi\/Mwatate\/Taveta",
-"25457", "Kisumu\/Siaya\/Maseno",
-"25465", "Nyahururu\/Maralal",
-"25466", "Thika\/Ruiru",
-"2542", "Nairobi",
+$areanames{en} = {"25440", "Kwale\/Ukunda\/Msambweni\/Lungalunga",
 "25445", "Kajiado\/Ngong\/Loitokitok\/Athi\ River",
-"25446", "Garissa\/Hola\/Wajir\/Mandera",
-"25455", "Bungoma\/Busia",
 "25456", "Kakamega\/Mbale\/Butere\/Mumias\/Vihiga",
-"25454", "Kitale\/Moi\'s\ Bridge\/Kapenguria\/Lodwar",
-"25453", "Eldoret\/Turbo\/Kapsabet\/Iten\/Kabarnet",
-"25467", "Kiambu\/Kikuyu",
+"25444", "Machakos\/Makueni\/Mwingi\/Kitui",
 "25451", "Nakuru\/Njoro\/Molo",
+"25441", "Mombasa\/Mariakani\/Kilifi",
+"25455", "Bungoma\/Busia",
+"25458", "Kisii\/Kilgoris\/Oyugis\/Nyamira",
 "25450", "Naivasha\/Narok\/Gilgil",
+"25446", "Garissa\/Hola\/Wajir\/Mandera",
+"25454", "Kitale\/Moi\'s\ Bridge\/Kapenguria\/Lodwar",
+"25457", "Kisumu\/Siaya\/Maseno",
 "25452", "Kericho\/Bomet",
+"2542", "Nairobi",
+"25442", "Malindi\/Lamu\/Garsen",
 "25469", "Marsabit\/Moyale",
-"25458", "Kisii\/Kilgoris\/Oyugis\/Nyamira",};
+"25462", "Nanyuki",
+"25467", "Kiambu\/Kikuyu",
+"25459", "Homabay\/Migori",
+"25466", "Thika\/Ruiru",
+"25453", "Eldoret\/Turbo\/Kapsabet\/Iten\/Kabarnet",
+"25461", "Nyeri\/Karatina",
+"25443", "Voi\/Wundanyi\/Mwatate\/Taveta",
+"25464", "Meru\/Maua\/Chuka",
+"25468", "Embu",
+"25460", "Muranga\/Kerugoya",
+"25465", "Nyahururu\/Maralal",};
 
     sub new {
       my $class = shift;

@@ -1,5 +1,14 @@
 Revision history for Text-Minify-XS:
 
+v0.6.1    2022-03-04 19:30:24+00:00 Europe/London
+  [Documentation]
+  - Fix encoding of links in README.
+
+  [Other]
+  - Use modern calling style for Exporter and XSLoader.
+
+  - Bump version of Devel::PPPort to 3.36.
+
 v0.6.0    2022-02-15 14:23:40+00:00 Europe/London
   [Documentation]
   - Updated documentation of minify_ascii to mention encoding issues.

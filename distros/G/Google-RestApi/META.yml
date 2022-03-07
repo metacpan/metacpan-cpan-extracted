@@ -13,7 +13,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -43,7 +43,6 @@ requires:
   Scalar::Util: '0'
   Storable: '0'
   Tie::Hash: '0'
-  Time::Out: '0'
   ToolSet: '0'
   Try::Tiny: '0'
   Type::Params: '1.004004'
@@ -58,5 +57,5 @@ requires:
   constant: '0'
 resources:
   repository: https://github.com/mvsjes2/p5-google-restapi.git
-version: v1.0.0
+version: v1.0.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

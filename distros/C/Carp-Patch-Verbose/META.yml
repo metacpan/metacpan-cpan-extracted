@@ -19,7 +19,7 @@ name: Carp-Patch-Verbose
 provides:
   Carp::Patch::Verbose:
     file: lib/Carp/Patch/Verbose.pm
-    version: '0.001'
+    version: '0.002'
 requires:
   Carp: '1.12'
   Module::Patch: '0.276'
@@ -31,7 +31,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Carp-Patch-Verbose
   homepage: https://metacpan.org/release/Carp-Patch-Verbose
   repository: git://github.com/perlancar/perl-Carp-Patch-Verbose.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

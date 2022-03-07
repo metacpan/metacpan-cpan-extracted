@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Net::OpenNebula::VM;
-$Net::OpenNebula::VM::VERSION = '0.316.0';
+$Net::OpenNebula::VM::VERSION = '0.317.0';
 use Net::OpenNebula::RPC;
 push our @ISA , qw(Net::OpenNebula::RPC);
 
@@ -113,7 +113,7 @@ sub get_data {
 # define all generic actions
 no strict 'refs'; ## no critic
 foreach my $i (qw(shutdown shutdown_hard reboot reboot_hard poweroff poweroff_hard 
-                  suspend resume restart stop delete delete_recreate hold release 
+                  suspend resume restart stop delete delete_recreate terminate hold release 
                   boot resched unresched undeploy undeploy_hard)) {
     *{$i} = sub {
         my $self = shift;

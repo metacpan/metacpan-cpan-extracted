@@ -4,4 +4,4 @@
 # of the repo you want to check.
 # Then update the path and options to match your path and preferred profile.
 
-./git-lint --check message --profile default $1
+git-lint --check message --profile default $1

@@ -2,7 +2,7 @@
 # housekeeping
 ########################################################################
 
-package Parallel::Queue v4.0.0;
+package Parallel::Queue v4.0.2;
 use v5.24;
 use mro qw( c3 );
 
@@ -63,6 +63,8 @@ my $format
     local $Data::Dumper::Deepcopy   = 0;
     local $Data::Dumper::Quotekeys  = 0;
 
+    my $head    = shift;
+
     say join "\n" =>
     map
     {
@@ -70,7 +72,7 @@ my $format
         ? $_->$dumper
         : $_
     }
-    @_;
+    ( "($$) $head" => @_ );
 
     return;
 };

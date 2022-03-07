@@ -29,6 +29,7 @@ my %WriteMakefileArgs = (
     "LWP::UserAgent" => "6.60",
     "Log::Log4perl" => "1.54",
     "Mozilla::PublicSuffix" => "1.0.6",
+    "Set::Tiny" => "0.04",
     "YAML::XS" => "0.62"
   },
   "TEST_REQUIRES" => {
@@ -39,7 +40,7 @@ my %WriteMakefileArgs = (
     "Test::Exception" => "0.43",
     "Test::More" => 0
   },
-  "VERSION" => "0.012",
+  "VERSION" => "0.013",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -60,6 +61,7 @@ my %FallbackPrereqs = (
   "Mozilla::PublicSuffix" => "1.0.6",
   "Perl::Tidy::Sweetened" => "1.18",
   "Pod::Tidy" => "0.10",
+  "Set::Tiny" => "0.04",
   "Test::Exception" => "0.43",
   "Test::More" => 0,
   "YAML::XS" => "0.62"

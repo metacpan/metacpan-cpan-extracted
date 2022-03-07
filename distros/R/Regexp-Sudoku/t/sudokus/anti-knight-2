@@ -23,9 +23,8 @@ Solution
 2 1 8  6 5 9  7 4 3
 4 7 6  3 1 2  8 5 9
 ==
-Args
-use Regexp::Sudoku::Constants qw [:Constraints];
-{constraints => $ANTI_KNIGHT}
+Create
+Regexp::Sudoku:: -> new -> init -> set_anti_knight_constraint
 ==
 Name: Anti Knight Sudoku (Fun With Puzzles #265)
 URL: https://www.funwithpuzzles.com/2018/02/no-knight-step-sudoku-puzzles.html

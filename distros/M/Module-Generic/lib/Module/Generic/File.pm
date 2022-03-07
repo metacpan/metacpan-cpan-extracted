@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/File.pm
-## Version v0.3.0
+## Version v0.3.2
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/20
-## Modified 2022/02/27
+## Modified 2022/03/06
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -118,7 +118,7 @@ BEGIN
     # Bug #92 <https://github.com/libwww-perl/URI/issues/92>
     # $URI::file::DEFAULT_AUTHORITY = undef;
     $FILES_TO_REMOVE = {};
-    our $VERSION = 'v0.3.0';
+    our $VERSION = 'v0.3.2';
 };
 
 use strict;
@@ -505,6 +505,33 @@ sub changed
     my $file = $self->filename;
     return(0) if( !$time && !-e( $file ) );
     return( $time != [CORE::stat( $file)]->[9] );
+}
+
+sub checksum_md5
+{
+    my $self = shift( @_ );
+    return( $self->error( "File ", $self->filename, " does not exist." ) ) if( !$self->exists );
+    return( $self->error( "File ", $self->filename, " is not a file." ) ) if( !$self->is_file );
+    $self->_load_class( 'Crypt::Digest::MD5' ) || return( $self->pass_error );
+    return( Crypt::Digest::MD5::md5_file_hex( $self->filename ) );
+}
+
+sub checksum_sha256
+{
+    my $self = shift( @_ );
+    return( $self->error( "File ", $self->filename, " does not exist." ) ) if( !$self->exists );
+    return( $self->error( "File ", $self->filename, " is not a file." ) ) if( !$self->is_file );
+    $self->_load_class( 'Crypt::Digest::SHA256' ) || return( $self->pass_error );
+    return( Crypt::Digest::SHA256::sha256_file_hex( $self->filename ) );
+}
+
+sub checksum_sha512
+{
+    my $self = shift( @_ );
+    return( $self->error( "File ", $self->filename, " does not exist." ) ) if( !$self->exists );
+    return( $self->error( "File ", $self->filename, " is not a file." ) ) if( !$self->is_file );
+    $self->_load_class( 'Crypt::Digest::SHA512' ) || return( $self->pass_error );
+    return( Crypt::Digest::SHA512::sha512_file_hex( $self->filename ) );
 }
 
 sub chdir
@@ -1477,6 +1504,50 @@ sub lines
     }
     
     $a = $self->new_array( \@lines );
+    if( $opts->{chomp} )
+    {
+        if( ref( $opts->{chomp} ) eq 'Regexp' )
+        {
+            s/$opts->{chomp}$//gs for( @$a );
+        }
+        # Much faster
+        else
+        {
+            # Reference: <https://en.wikipedia.org/wiki/Newline>
+            my $map = 
+            {
+            aix     => "\n",
+            amigaos => "\n",
+            beos    => "\n",
+            darwin  => "\n",
+            dos     => "\r\n",
+            freebsd => "\n",
+            linux   => "\n",
+            netbsd  => "\n",
+            openbsd => "\n",
+            # Different from macos which is MacOS v9, before it moved to FreeBSD
+            mac     => "\n",
+            macos   => "\r",
+            macosx  => "\n",
+            mswin32 => "\r\n",
+            os390   => "\025",
+            os400   => "\025",
+            riscos  => "\n",
+            solaris => "\n",
+            sunos   => "\n",
+            symbian => "\r\n",
+            unix    => "\n",
+            vms     => "\n",
+            windows => "\r\n",
+            win32   => "\r\n",
+            };
+            foreach my $os ( split( /[[:blank:]]*\|[[:blank:]]*/, $opts->{chomp} ) )
+            {
+                local $/ = $map->{ $os } if( exists( $map->{ $os } ) );
+                CORE::chomp( @$a );
+            }
+        }
+    }
     return( $a );
 }
 
@@ -1529,6 +1600,24 @@ sub load
     catch( $e )
     {
         return( $self->error( "An error occured while trying to open and read file \"$file\": $e" ) );
+    }
+}
+
+sub load_json
+{
+    my $self = shift( @_ );
+    # Inherited from Module::Generic
+    my $j = $self->new_json || return( $self->pass_error );
+    my $json = $self->load_utf8;
+    return( $self->pass_error ) if( !CORE::defined( $json ) );
+    return( '' ) if( !CORE::length( $json ) );
+    try
+    {
+        return( $j->decode( $json ) );
+    }
+    catch( $e )
+    {
+        return( $self->error( "Error while decoding ", CORE::length( $json ), " bytes of json data: $e" ) );
     }
 }
 
@@ -2785,6 +2874,25 @@ sub unload
     return( $self );
 }
 
+sub unload_json
+{
+    my $self = shift( @_ );
+    my $data = shift( @_ );
+    my $opts = $self->_get_args_as_hash( @_ );
+    my $j = $self->new_json->new || return( $self->pass_error );
+    try
+    {
+        $j->pretty(1) if( $opts->{pretty} );
+        $j->canonical(1) if( $opts->{ordered} || $opts->{canonical} );
+        my $json = $j->encode( $data );
+        $self->unload_utf8( $json );
+    }
+    catch( $e )
+    {
+        return( $self->error( "Unable to encode perl data to json: $e" ) );
+    }
+}
+
 sub unload_utf8
 {
     my $self = shift( @_ );
@@ -3732,7 +3840,7 @@ Module::Generic::File - File Object Abstraction Class
 
 =head1 VERSION
 
-    v0.3.0
+    v0.3.2
 
 =head1 DESCRIPTION
 
@@ -3995,6 +4103,30 @@ Note that you can also use the shortcut C<cp> instead of C<copy>
 =head2 cp
 
 Shorthand for L</copy>
+
+=head2 checksum_md5
+
+This uses L<Crypt::Digest::MD5> to perform a md5 checksum as an hex value and returns it.
+
+It requires this module L<Crypt::Digest::MD5> to be installed, and also the file to be a plain text file and not a directory, other this sets and L<error|Module::Generic/error> and return C<undef>
+
+On success, this returns a md5 hex digest of the underlying file.
+
+=head2 checksum_sha256
+
+This uses L<Crypt::Digest::SHA256> to perform a sha256 checksum as an hex value and returns it.
+
+It requires this module L<Crypt::Digest::SHA256> to be installed, and also the file to be a plain text file and not a directory, other this sets and L<error|Module::Generic/error> and return C<undef>
+
+On success, this returns a md5 hex digest of the underlying file.
+
+=head2 checksum_sha512
+
+This uses L<Crypt::Digest::SHA512> to perform a sha512 checksum as an hex value and returns it.
+
+It requires this module L<Crypt::Digest::SHA512> to be installed, and also the file to be a plain text file and not a directory, other this sets and L<error|Module::Generic/error> and return C<undef>
+
+On success, this returns a md5 hex digest of the underlying file.
 
 =head2 ctime
 
@@ -4297,6 +4429,68 @@ If a directory object is called, or the element does not exist or the file eleme
 
 If an error occurred, C<undef> is returned and an exception is set.
 
+This method takes an optional hash or hash reference of parameters, which is passed to the L</open> method when opening the file.
+
+Also the additional following parameters are recognised:
+
+=over 4
+
+=item I<chomp>
+
+    # will perform a regular chomp
+    my $array = $f->lines( chomp => 1 );
+    # will do a chomp after setting locally $/ to \r\n
+    my $array = $f->lines( chomp => 'windows' );
+    # will do a chomp (not a regular expression) for both unix and window system types
+    my $array = $f->lines( chomp => 'unix|windows' );
+    my $array = $f->lines( chomp => qr/[\r]/ );
+    my $array = $f->lines({ chomp => 1 });
+    my $array = $f->lines({ chomp => windows });
+    my $array = $f->lines({ chomp => 'unix|windows' });
+    my $array = $f->lines({ chomp => qr/[\r]/ });
+
+This can be either just a string, a true value or a regular expression, for example using L<perlfunc/qr>
+
+If a regular expression is provided, it will be used to weed out end of line carriage returns (multiple times) that will be captured using this regular expression you provide explicitly.
+
+Otherwise, if you merely provide a true value, such as C<1>, then, by default, this will use L<perlfunc/chomp> and remove the trailing new line based on the value of C<$/>.
+
+If the value of I<chomp> is C<windows> or C<macos> (i.e. MacOS v9, the old one) or C<unix>, then this will set a local value of C<$/> to the corresponding line feed and carriage return sequence, typically C<\r\n> for Windows and C<\r> for MacOS and C<\n> for unix and then call L<perlfunc/chomp>. This is very fast, but will remove only the specific sequence. This means if you have a line such as:
+
+    Double whammy\r
+
+But you call L</lines> as:
+
+    my $lines = $f->lines( chomp => 'windows' );
+
+It will not work, because Windows sequence is C<\r\n>, so here you would need to use C<mac> instead.
+
+Also the following line:
+
+    Double whammy\n\n
+
+Then, you are on a Linux system and call:
+
+    my $lines = $f->lines( chomp => 1 );
+
+This will return:
+
+    Double whammy\n
+
+Because L<perlfunc/chomp> only remove one sequence. If you want to remove all occurrences, you need to specify your regular expression.
+
+    my $lines = $f->lines( chomp => qr/[\r\n]/ );
+
+And this will be applied on each line for multiple occurrences, but note that on large file, it will be slow.
+
+Alternatively you can provide more than one os by separating them with a pipe (C<|>), such as:
+
+    my $lines = $f->lines( chomp => 'unix|windows' );
+
+Supported os names are: aix, amigaos, beos, darwin, dos, freebsd, linux, netbsd, openbsd, mac, macos, macosx, mswin32, os390, os400, riscos, solaris, sunos, symbian, unix, vms, windows, and win32
+
+=back
+
 =head2 load
 
 Assuming this element is an existing file, this will load its content and return it as a regular string.
@@ -4304,6 +4498,14 @@ Assuming this element is an existing file, this will load its content and return
 If the C<binmode> used on the file is C<:unix>, then this will call L<perlfunc/read> to load the file content, otherwise it localises the input record separator C<$/> and read the entire content in one go. See L<perlvar/$INPUT_RECORD_SEPARATOR>
 
 If this method is called on a directory object, it will return undef.
+
+=head2 load_json
+
+This will load the file data, which is assumed to be json in utf8, then decode it using L<JSON> and return the resulting perl data.
+
+This requires the L<JSON> module to be installed or it will set an L<error|Module::Generic/error> and return undef.
+
+If an eror occurs during decoding, this will set an L<error|Module::Generic/error> and return undef.
 
 =head2 load_utf8
 
@@ -4621,7 +4823,7 @@ If an error occurred, this returns undef and set an exception object.
 
 =head2 relative
 
-Returns a relative path representation of the current element.
+Provided a base directory or using L</base_dir> by default and this returns a relative path representation of the current element, as a new L<Module::Generic::File> object.
 
 =head2 rename
 
@@ -4967,6 +5169,26 @@ If true and assuming the file is not already opened, the file will be opened usi
 Other options are the same as the ones used in L</open>
 
 It returns the current object upon success, or undef and sets an exception object if an error occurred.
+
+=head2 unload_json
+
+Provided some perl data and an optional hash or hash reference of options and this will encode those data and save it as utf8 data to the file.
+
+If the L<JSON> module is not installed or an error occurs during JSON encoding, this sets an L<error|Module::Generic/error> and returns undef.
+
+Supported options are:
+
+=over 4
+
+=item canonical or ordered
+
+Boolean value. If true, the JSON data will be ordered. Note that it will be slower, especially on a large set of data.
+
+=item pretty
+
+Boolean value. If true, the JSON data will be generated in a human readable format. Note that this will take considerably more space.
+
+=back
 
 =head2 unload_utf8
 

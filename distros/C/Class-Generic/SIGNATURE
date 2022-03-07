@@ -1,0 +1,40 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.88.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 6a1b55d43cb7293d4629c79be96e98753f5e43bf9835c8f212f24eef154045a2 CHANGES
+SHA256 1878f1a265b7c1f0778e20a2846917e2d7dc81bb4c388096c4023151712f7233 CONTRIBUTING.md
+SHA256 798c55a833704d0fb6921f476bded466512cae00bf4297b305b11a38f726b2fe MANIFEST
+SHA256 10e4aa697af380606f25f9cdd3df83bed7549340dce42c748786de6c68c3d6bf META.json
+SHA256 f88c447c123c976ebcd5164242ee5e1a796ead5873bd68faf43f0951ec2271af META.yml
+SHA256 1d1de7df2889d13e17329ecd91fbb07b29219268f832f53b0a329380aa506681 Makefile.PL
+SHA256 5b54bccb26d5b2e54d3bb8bc40642ea075820e2b5026e0d29f7f596ffd641ec4 README
+SHA256 0c9b8e3b73b04c0c6662a4cce05aa2a0c6a0c12b6ea58fca4e50bf5ce1764837 README.md
+SHA256 d7ee0d19e5c5184382373961ec1b85589fa4036eff6f47f125b68fb3ef0d3193 lib/Class/Array.pm
+SHA256 4d9bf05f068167e2b24da9a9860ef638bc272b0f5a1b7fc62df01509b8deb8c7 lib/Class/Assoc.pm
+SHA256 6300c42a31de028f0457a9c970a2426b706b28b56860ee683453c069e7b7bbfa lib/Class/Boolean.pm
+SHA256 54dba7d8a7928935cbb30a69c1c94549e69e00e3c4d1ebd0ba9ec991a240b58c lib/Class/Exception.pm
+SHA256 3ac5cd2566a981cc7181b65647d683dfbc57cf0367fe166db0f050119cabeda6 lib/Class/File.pm
+SHA256 1df972b38244b1e50104b2e1a5f1f7372c97c436d60f03f91e2ff6731598c469 lib/Class/Finfo.pm
+SHA256 4dfe786a8f2e42ebf8e1fdae8a64ee9f0d54afe8c9ed48b8d814ae8fbe0f2dc2 lib/Class/Generic.pm
+SHA256 30784d299a8e25057b7fc0ab41389856ba73e9f50996d95213aee09e6d402615 lib/Class/NullChain.pm
+SHA256 5a8d566da70237fa61c3af999be5759858e6472606171154a3378b8d63b87854 lib/Class/Number.pm
+SHA256 15d9b33611c866be5b03f4a02a3c75b397685c20a6616a599a4e40952eed3933 lib/Class/Scalar.pm
+SHA256 64e814a0d0388a94035330a9c8141270f26bfffa87cf75d261bdbd0f4e993cdd t/0-signature.t
+SHA256 645e31ec71ae7d4673a92671b2077dfe328d6cabc5388a535dfc00ca8592109c t/00.load.t
+SHA256 6101e4104fd7f11e38db82466db63c959ca6958a038fa646f030a14d9bed9b0b t/01.core.t
+SHA256 17ca2d59b6e3b0cfe2f502fdf768cfb3370e1333d263fae10ccfb4fd448107fe t/90.coverage.t
+SHA256 b428eaadec8f15711801252eb283963c2a1c3ac29a272e4fb82d77014919b535 t/91.pod.t
+SHA256 7a418ce0ef2d6be8ccaf059a31ad7367c2731e251894d83a2525dcaafb71ab5a t/99.kwalitee.t

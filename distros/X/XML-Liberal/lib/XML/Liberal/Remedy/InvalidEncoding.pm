@@ -11,7 +11,7 @@ sub apply {
     my($driver, $error, $xml_ref) = @_;
 
     return 0 if $error->message !~
-        /^(?:(?:i18n |encoding )?error : )?input conversion failed due to input error/;
+        /^\s*(?:(?:i18n |encoding )?error : )?input conversion failed due to input error/;
 
     my (undef, $encoding) = $$xml_ref =~ $RX;
     unless ($encoding) {

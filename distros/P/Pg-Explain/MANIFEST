@@ -427,6 +427,7 @@ t/73-node-id.t
 t/74-hinter-no-hints.t
 t/75-hinter-disk-sort.t
 t/76-hinter-indexable-seqscan-simple.t
+t/77-hinter-indexable-seqscan-multi-equal-and.t
 t/99-manifest.t
 t/perlcriticrc
 t/perltidyrc

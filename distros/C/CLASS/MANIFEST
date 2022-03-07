@@ -1,7 +1,10 @@
 Changes
-MANIFEST
-Makefile.PL
 lib/CLASS.pm
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+README
+SIGNATURE			Public-key signature (added by MakeMaker)
+t/0-signature.t
 t/CLASS.t
-META.yml                                 Module meta-data (added by MakeMaker)
-SIGNATURE                                Public-key signature (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

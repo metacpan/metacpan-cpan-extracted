@@ -13,15 +13,13 @@ use Test::More 0.88;
 our $r = eval "require Test::NoWarnings; 1";
 
 use Regexp::Sudoku;
-use Regexp::Sudoku::Constants qw [:Constraints];
-
 
 my $size     = 9;
 my $box_size = 3;
-my $sudoku_n = Regexp::Sudoku:: -> new -> init (size        => $size,
-                                                constraints => $ANTI_KNIGHT);
-my $sudoku_k = Regexp::Sudoku:: -> new -> init (size        => $size,
-                                                constraints => $ANTI_KING);
+my $sudoku_n = Regexp::Sudoku:: -> new -> init
+                                       -> set_anti_knight_constraint;
+my $sudoku_k = Regexp::Sudoku:: -> new -> init
+                                       -> set_anti_king_constraint;
 foreach my $r1 (1 .. $size) {
     foreach my $c1 (1 .. $size) {
         my $cell1 = "R${r1}C${c1}";

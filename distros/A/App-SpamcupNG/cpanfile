@@ -10,6 +10,7 @@ requires "HTTP::Request" => "6.35";
 requires "LWP::UserAgent" => "6.60";
 requires "Log::Log4perl" => "1.54";
 requires "Mozilla::PublicSuffix" => "v1.0.6";
+requires "Set::Tiny" => "0.04";
 requires "YAML::XS" => "0.62";
 requires "perl" => "5.014004";
 

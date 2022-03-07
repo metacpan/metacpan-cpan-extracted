@@ -1,9 +1,14 @@
 Revision history for Perl module CBOR::Free
 
-0.31
+0.32 4 March 2022
+- Fix compatibility with big-endian systems.
+- Add Test::Pod requirement for testing.
+- Internal: Use Easy XS for boilerplate.
+
+0.31 2 May 2020
 - Fix 5.10.0 compatibility.
 
-0.30
+0.30 28 April 2020
 - BUG FIX: The decoder no longer leaks an extra reference on indirect values.
 - BUG FIX: The decoder no longer leaks a scalar on indefinite-length strings.
 - BUG FIX: The decoder no longer leaks arrays or hashes on errant input.

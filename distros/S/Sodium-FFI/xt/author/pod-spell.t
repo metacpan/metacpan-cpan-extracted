@@ -10,6 +10,7 @@ set_spell_cmd('aspell list');
 add_stopwords(<DATA>);
 all_pod_files_spelling_ok( qw( bin lib ) );
 __DATA__
+Auth
 CPAN
 Chase
 Crypto
@@ -21,6 +22,7 @@ capoeirab
 chacha
 cwhitener
 decrypt
+deterministically
 lib
 libsodium
 unpadded

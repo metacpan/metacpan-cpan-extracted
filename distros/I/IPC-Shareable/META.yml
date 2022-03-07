@@ -4,12 +4,13 @@ author:
   - 'Steve Bertrand <steveb@cpan.org>'
 build_requires:
   IPC::Semaphore: '0'
+  Mock::Sub: '0'
   Test::More: '0'
   Test::SharedFork: '0.35'
 configure_requires:
   ExtUtils::MakeMaker: '6.72'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.58, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -24,9 +25,9 @@ requires:
   Scalar::Util: '0'
   Storable: '0.607'
   String::CRC32: '0'
-  perl: '5.010'
+  perl: '5.01'
 resources:
   bugtracker: https://github.com/stevieb9/ipc-shareable/issues
   repository: https://github.com/stevieb9/ipc-shareable.git
-version: '1.06'
+version: '1.09'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

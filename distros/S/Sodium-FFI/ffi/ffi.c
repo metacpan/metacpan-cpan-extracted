@@ -39,6 +39,10 @@ ffi_pl_bundle_constant(const char* package, ffi_platypus_constant_t* c)
     _sint(sodium_base64_VARIANT_URLSAFE);
     _sint(sodium_base64_VARIANT_URLSAFE_NO_PADDING);
 
+    /* Crypto Generics */
+    _uint(crypto_auth_BYTES);
+    _uint(crypto_auth_KEYBYTES);
+
     /* AESGCM stuff */
     _sint(HAVE_AESGCM);
     _sint(HAVE_AEAD_DETACHED);
@@ -55,6 +59,12 @@ ffi_pl_bundle_constant(const char* package, ffi_platypus_constant_t* c)
     _uint(crypto_aead_chacha20poly1305_IETF_KEYBYTES);
     _uint(crypto_aead_chacha20poly1305_IETF_NPUBBYTES);
     _uint(crypto_aead_chacha20poly1305_IETF_ABYTES);
+
+    /* Public key Crypt - Pub Key Signatures */
+    _uint(crypto_sign_PUBLICKEYBYTES);
+    _uint(crypto_sign_SECRETKEYBYTES);
+    _uint(crypto_sign_BYTES);
+    _uint(crypto_sign_SEEDBYTES);
 }
 
 void

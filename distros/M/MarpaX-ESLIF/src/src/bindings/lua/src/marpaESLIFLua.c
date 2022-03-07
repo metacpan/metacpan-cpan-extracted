@@ -4610,7 +4610,7 @@ static inline short marpaESLIFLua_importb(lua_State *L, marpaESLIFValueResult_t 
     /* We received elements importer callbacks in order; i.e. 1, then 2, then 3... */
     /* We pushed that in lua stack, i.e. the lua stack then contains:  1 imported, then 2 imported, then 3 imported... */
     if (marpaESLIFValueResultp->u.r.sizel > INT_MAX) {
-      marpaESLIFLua_luaL_errorf(L, "table size %ld too big, maximum is %d", (unsigned long) marpaESLIFValueResultp->u.r.sizel, INT_MAX);
+      marpaESLIFLua_luaL_errorf(L, "table size %d too big, maximum is %d", (lua_Integer) marpaESLIFValueResultp->u.r.sizel, INT_MAX);
       goto err;
     }
 
@@ -4637,7 +4637,7 @@ static inline short marpaESLIFLua_importb(lua_State *L, marpaESLIFValueResult_t 
     /* fprintf(stdout, "import table\n"); fflush(stdout); fflush(stderr); */
     /* We received elements importer callbacks in order; i.e. key0, val0, ..., keyn, valn */
     if (marpaESLIFValueResultp->u.t.sizel > INT_MAX) {
-      marpaESLIFLua_luaL_errorf(L, "table size %ld too big, maximum is %d", (unsigned long) marpaESLIFValueResultp->u.t.sizel, INT_MAX);
+      marpaESLIFLua_luaL_errorf(L, "table size %d too big, maximum is %d", (lua_Integer) marpaESLIFValueResultp->u.t.sizel, (lua_Integer) INT_MAX);
       goto err;
     }
 
@@ -10929,7 +10929,7 @@ static inline short marpaESLIFLua_xstring_check_from_and_tob(lua_State *L, lua_I
     }
   }
   if ((fromi < 1) || (fromi > sizei)) {
-    marpaESLIFLua_luaL_errorf(L, "Invalid from indice: must be in the range [1..%ld] or [-%ld..-1]", sizei, sizei);
+    marpaESLIFLua_luaL_errorf(L, "Invalid from indice: must be in the range [1..%d] or [-%d..-1]", sizei, sizei);
     goto err;
   }
 
@@ -10943,7 +10943,7 @@ static inline short marpaESLIFLua_xstring_check_from_and_tob(lua_State *L, lua_I
     }
   }
   if ((toi < 1) || (toi > sizei)) {
-    marpaESLIFLua_luaL_errorf(L, "Invalid to indice: must be in the range [1..%ld] or [-%ld..-1]", sizei, sizei);
+    marpaESLIFLua_luaL_errorf(L, "Invalid to indice: must be in the range [1..%d] or [-%d..-1]", sizei, sizei);
     goto err;
   }
 

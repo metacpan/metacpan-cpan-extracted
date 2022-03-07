@@ -1,6 +1,6 @@
 package Google::RestApi::SheetsApi4::Worksheet;
 
-our $VERSION = '1.0.0';
+our $VERSION = '1.0.1';
 
 use Google::RestApi::Setup;
 
@@ -23,8 +23,8 @@ sub new {
   my $qr_worksheet_uri = SheetsApi4->Worksheet_Uri;
   state $check = compile_named(
     spreadsheet => HasApi,
-    id          => Str, { optional => 1 },
-    name        => Str, { optional => 1 },
+    id          => Str, { optional => 1 },    # the worksheet id (1, 2, 3 etc).
+    name        => Str, { optional => 1 },    # the name of the worksheet.
     uri         => StrMatch[qr|$qr_worksheet_uri|], { optional => 1 },
   );
   my $self = $check->(@_);
@@ -36,6 +36,7 @@ sub new {
   return $self->spreadsheet()->_register_worksheet($self);
 }
 
+# work out the id from the uri or the name.
 sub worksheet_id {
   my $self = shift;
   if (!defined $self->{id}) {
@@ -163,6 +164,8 @@ sub cells {
   return $range_group->submit_values();
 }
 
+# the 'ranges' key is poorly named since we can also submit requests for
+# worksheets and spreadsheets. minor since this is all internal anyway.
 sub submit_requests {
   my $self = shift;
   return $self->spreadsheet()->submit_requests(ranges => [ $self ], @_);
@@ -291,12 +294,13 @@ sub normalize_named {
   return $range;
 }
 
+# create a hash of name => value pairs from two columns in a worksheet.
 sub name_value_pairs {
   my $self = shift;
 
   state $check = compile(
-    Defined, { default => 1 },
-    Defined, { default => 2 },
+    Defined, { default => 1 },   # column of names (hash keys).
+    Defined, { default => 2 },   # column of values.
   );
   my ($name_col, $value_col) = $check->(@_);
 
@@ -361,6 +365,7 @@ sub range_group_cells {
   return $self->spreadsheet()->range_group(@cells);
 }
 
+# an arbitrary mix of ranges.
 sub range_group {
   my $self = shift;
   state $check = compile(ArrayRef[Defined]);

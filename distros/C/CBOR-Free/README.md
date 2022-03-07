@@ -10,10 +10,14 @@ CBOR::Free - Fast CBOR for everyone
 
     my $tagged = CBOR::Free::tag( 1, '2019-01-02T00:01:02Z' );
 
-Also see [CBOR::Free::Decoder](https://metacpan.org/pod/CBOR::Free::Decoder) for an object-oriented interface
+Also see [CBOR::Free::Decoder](https://metacpan.org/pod/CBOR%3A%3AFree%3A%3ADecoder) for an object-oriented interface
 to the decoder.
 
 # DESCRIPTION
+
+<div>
+    <a href='https://coveralls.io/github/FGasper/p5-CBOR-Free?branch=master'><img src='https://coveralls.io/repos/github/FGasper/p5-CBOR-Free/badge.svg?branch=master' alt='Coverage Status' /></a>
+</div>
 
 This library implements [CBOR](https://tools.ietf.org/html/rfc7049)
 via XS under a license that permits commercial usage with no “strings
@@ -31,8 +35,8 @@ please always check the changelog before upgrading.
 
 Encodes a data structure or non-reference scalar to CBOR.
 The encoder recognizes and encodes integers, floats, byte and character
-strings, array and hash references, [CBOR::Free::Tagged](https://metacpan.org/pod/CBOR::Free::Tagged) instances,
-[Types::Serialiser](https://metacpan.org/pod/Types::Serialiser) booleans, and undef (encoded as null).
+strings, array and hash references, [CBOR::Free::Tagged](https://metacpan.org/pod/CBOR%3A%3AFree%3A%3ATagged) instances,
+[Types::Serialiser](https://metacpan.org/pod/Types%3A%3ASerialiser) booleans, and undef (encoded as null).
 
 The encoder currently does not handle any other blessed references.
 
@@ -59,7 +63,7 @@ in the below descriptions applies equally to hash keys.)
 
         - Be sure to use character-decoding logic that always
         sets the string’s UTF8 flag, even if the input is plain ASCII.
-        (As of this writing, [Encode](https://metacpan.org/pod/Encode) and [Unicode::UTF8](https://metacpan.org/pod/Unicode::UTF8) work this way.)
+        (As of this writing, [Encode](https://metacpan.org/pod/Encode) and [Unicode::UTF8](https://metacpan.org/pod/Unicode%3A%3AUTF8) work this way.)
         - Whatever consumes your Perl-sourced CBOR should probably accept
         “mis-typed” strings.
 
@@ -124,7 +128,7 @@ your Perl-sourced CBOR **MUST** account for the prospect of numbers that
 are in CBOR as strings, or vice-versa.
 - Perl hash keys are serialized as strings, either binary or text
 (according to the `string_encode_mode`).
-- [Types::Serialiser](https://metacpan.org/pod/Types::Serialiser) booleans are encoded as CBOR booleans.
+- [Types::Serialiser](https://metacpan.org/pod/Types%3A%3ASerialiser) booleans are encoded as CBOR booleans.
 Perl undef is encoded as CBOR null. (NB: No Perl value encodes as CBOR
 undefined.)
 - Scalar references (including references to other references) are
@@ -133,7 +137,7 @@ optionally tell CBOR::Free to encode them via the `scalar_references` flag.
 - Via the optional `preserve_references` flag, circular and shared
 references may be preserved. Without this flag, circular references cause an
 exception, and other shared references are not preserved.
-- Instances of [CBOR::Free::Tagged](https://metacpan.org/pod/CBOR::Free::Tagged) are encoded as tagged values.
+- Instances of [CBOR::Free::Tagged](https://metacpan.org/pod/CBOR%3A%3AFree%3A%3ATagged) are encoded as tagged values.
 
 An error is thrown on excess recursion or an unrecognized object.
 
@@ -148,14 +152,14 @@ Notes on mapping CBOR to Perl:
 - `decode()` decodes CBOR text strings as UTF-8-decoded Perl strings.
 CBOR binary strings become undecoded Perl strings.
 
-    (See [CBOR::Free::Decoder](https://metacpan.org/pod/CBOR::Free::Decoder) and [CBOR::Free::SequenceDecoder](https://metacpan.org/pod/CBOR::Free::SequenceDecoder) for more
+    (See [CBOR::Free::Decoder](https://metacpan.org/pod/CBOR%3A%3AFree%3A%3ADecoder) and [CBOR::Free::SequenceDecoder](https://metacpan.org/pod/CBOR%3A%3AFree%3A%3ASequenceDecoder) for more
     character-decoding options.)
 
     Notes:
 
     - Invalid UTF-8 in a CBOR text string is usually considered
     invalid input and will thus prompt a thrown exception. (See
-    [CBOR::Free::Decoder](https://metacpan.org/pod/CBOR::Free::Decoder) and [CBOR::Free::SequenceDecoder](https://metacpan.org/pod/CBOR::Free::SequenceDecoder) if you want
+    [CBOR::Free::Decoder](https://metacpan.org/pod/CBOR%3A%3AFree%3A%3ADecoder) and [CBOR::Free::SequenceDecoder](https://metacpan.org/pod/CBOR%3A%3AFree%3A%3ASequenceDecoder) if you want
     to tolerate invalid UTF-8.)
     - You can reliably use `utf8::is_utf8()` to determine if a given Perl
     string came from CBOR text or binary, but **ONLY** if you test the scalar as
@@ -168,14 +172,14 @@ An exception is thrown if the decoder finds anything else as a map key.
 Note that, because Perl does not distinguish between binary and text strings,
 if two keys of the same map contain the same bytes, Perl will consider these
 a duplicate key and prefer the latter.
-- CBOR booleans become the corresponding [Types::Serialiser](https://metacpan.org/pod/Types::Serialiser) values.
+- CBOR booleans become the corresponding [Types::Serialiser](https://metacpan.org/pod/Types%3A%3ASerialiser) values.
 Both CBOR null and undefined become Perl undef.
 - [CBOR’s “indirection” tag](https://www.iana.org/assignments/cbor-tags/cbor-tags.xhtml) is interpreted as a scalar reference. This behavior is always
 active; unlike with the encoder, there is no need to enable it manually.
 - `preserve_references()` mode complements the same flag
 given to the encoder.
 - This function does not interpret any other tags. If you need to
-decode other tags, look at [CBOR::Free::Decoder](https://metacpan.org/pod/CBOR::Free::Decoder). Any unhandled tags that
+decode other tags, look at [CBOR::Free::Decoder](https://metacpan.org/pod/CBOR%3A%3AFree%3A%3ADecoder). Any unhandled tags that
 this function sees prompt a warning but are otherwise ignored.
 
 ## $obj = tag( $NUMBER, $DATA )
@@ -187,7 +191,7 @@ tag number. (Include $obj, not $DATA, in the data structure that
 # BOOLEANS
 
 `CBOR::Free::true()` and `CBOR::Free::false()` are defined as
-convenience aliases for the equivalent [Types::Serialiser](https://metacpan.org/pod/Types::Serialiser) functions.
+convenience aliases for the equivalent [Types::Serialiser](https://metacpan.org/pod/Types%3A%3ASerialiser) functions.
 (Note that there are no equivalent scalar aliases.)
 
 # FRACTIONAL (FLOATING-POINT) NUMBERS
@@ -213,22 +217,22 @@ represented with 32 bits. This means:
 Note that even 64-bit Perls can’t parse negatives that are less than
 \-0x8000\_0000\_0000\_0000 (-9,223,372,036,854,775,808); these also prompt an
 exception since Perl can’t handle them. (It would be possible to load
-[Math::BigInt](https://metacpan.org/pod/Math::BigInt) to handle these; if that’s desirable for you,
+[Math::BigInt](https://metacpan.org/pod/Math%3A%3ABigInt) to handle these; if that’s desirable for you,
 file a feature request.)
 
 # ERROR HANDLING
 
 Most errors are represented via instances of subclasses of
-[CBOR::Free::X](https://metacpan.org/pod/CBOR::Free::X), which subclasses [X::Tiny::Base](https://metacpan.org/pod/X::Tiny::Base).
+[CBOR::Free::X](https://metacpan.org/pod/CBOR%3A%3AFree%3A%3AX), which subclasses [X::Tiny::Base](https://metacpan.org/pod/X%3A%3ATiny%3A%3ABase).
 
 # SPEED
 
 CBOR::Free is pretty snappy. I find that it keeps pace with or
-surpasses [CBOR::XS](https://metacpan.org/pod/CBOR::XS), [Cpanel::JSON::XS](https://metacpan.org/pod/Cpanel::JSON::XS), [JSON::XS](https://metacpan.org/pod/JSON::XS), [Sereal](https://metacpan.org/pod/Sereal),
-and [Data::MessagePack](https://metacpan.org/pod/Data::MessagePack).
+surpasses [CBOR::XS](https://metacpan.org/pod/CBOR%3A%3AXS), [Cpanel::JSON::XS](https://metacpan.org/pod/Cpanel%3A%3AJSON%3A%3AXS), [JSON::XS](https://metacpan.org/pod/JSON%3A%3AXS), [Sereal](https://metacpan.org/pod/Sereal),
+and [Data::MessagePack](https://metacpan.org/pod/Data%3A%3AMessagePack).
 
 It’s also quite light. Its only “heavy” dependency is
-[Types::Serialiser](https://metacpan.org/pod/Types::Serialiser), which is only loaded when you actually need it.
+[Types::Serialiser](https://metacpan.org/pod/Types%3A%3ASerialiser), which is only loaded when you actually need it.
 This keeps memory usage low for when, e.g., you’re using CBOR for
 IPC between Perl processes and have no need for true booleans.
 
@@ -242,9 +246,9 @@ This code is licensed under the same license as Perl itself.
 
 # SEE ALSO
 
-[CBOR::PP](https://metacpan.org/pod/CBOR::PP) is a pure-Perl CBOR library.
+[CBOR::PP](https://metacpan.org/pod/CBOR%3A%3APP) is a pure-Perl CBOR library.
 
-[CBOR::XS](https://metacpan.org/pod/CBOR::XS) is an older CBOR module on CPAN. It’s got more bells and
+[CBOR::XS](https://metacpan.org/pod/CBOR%3A%3AXS) is an older CBOR module on CPAN. It’s got more bells and
 whistles, so check it out if CBOR::Free lacks a feature you’d like.
 Note that [its maintainer has abandoned support for Perl versions from 5.22
 onward](http://blog.schmorp.de/2015-06-06-stableperl-faq.html), though,

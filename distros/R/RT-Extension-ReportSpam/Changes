@@ -1,3 +1,6 @@
+1.02 2022-03-04
+ - Add RT 5 support
+
 1.01 2018-03-06
 
  - Allow superusers to unmark tickets as spam for all users on Reported.html

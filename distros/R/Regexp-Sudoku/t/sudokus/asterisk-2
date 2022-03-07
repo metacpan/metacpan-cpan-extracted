@@ -23,9 +23,8 @@ Solution
 6 2 9  1 4 3  5 8 7
 4 8 7  5 6 2  3 1 9
 ==
-Args
-use Regexp::Sudoku::Constants qw [:Houses];
-{houses => $ASTERISK}
+Create
+Regexp::Sudoku:: -> new -> init -> set_asterisk_house
 ==
 Name: Asterisk
 URL: https://www.sudopedia.org/wiki/Asterisk

@@ -1,5 +1,10 @@
 Revision history for Dist-Zilla-PluginBundle-Author-AJNN
 
+0.02  2022-03-06
+
+ - Fix PruneAliases test failure on non-Mac systems
+ - Add cpanfile to repository to aid bootstrapping
+
 0.01  2022-03-03
 
  - initial release

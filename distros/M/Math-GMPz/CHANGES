@@ -1,5 +1,11 @@
 Revision history for Perl module Math::GMPz
 
+0.54
+ - Fix bug re inconsistent settings of POK and NOK flag, which manifests itself as (eg):
+   http://www.cpantesters.org/cpan/report/dc4f8aec-900b-11ec-bfc9-d1f1448276d4
+   It's a bug that rarely bites, and applies mainly (but not only) to perl-5.18.x and
+   earlier.
+
 0.53
  - Fix https://github.com/sisyphus/math-decimal64/pull/1 (also aplies to Math::GMPz)
    Thanks to @hiratara

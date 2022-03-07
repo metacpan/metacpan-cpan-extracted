@@ -7,6 +7,12 @@ use Test::More;
 
 use IPC::Shareable;
 
+BEGIN {
+    if (! $ENV{CI_TESTING}) {
+        plan skip_all => "Not on a legit CI platform...";
+    }
+}
+
 {
     # exclusive duplicate
 

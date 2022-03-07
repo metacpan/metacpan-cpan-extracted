@@ -20,6 +20,54 @@ DESCRIPTION
     intend to fix up Crypt::NaCl::Sodium so that it can use newer versions
     of LibSodium, the FFI method is faster to build and release.
 
+Crypto Auth Functions
+    LibSodium provides a few Crypto Auth Functions
+    <https://doc.libsodium.org/secret-key_cryptography/secret-key_authentica
+    tion> to encrypt and verify messages with a key.
+
+  crypto_auth
+        use Sodium::FFI qw(randombytes_buf crypto_auth crypto_auth_keygen);
+        # First, let's create a key
+        my $key = crypto_auth_keygen();
+        # let's encrypt 12 bytes of random data... for fun
+        my $message = randombytes_buf(12);
+        my $encrypted_bytes = crypto_auth($message, $key);
+        say $encrypted_bytes;
+
+    The crypto_auth
+    <https://doc.libsodium.org/secret-key_cryptography/secret-key_authentica
+    tion#usage> function encrypts a message using a secret key and returns
+    that message as a string of bytes.
+
+  crypto_auth_verify
+        use Sodium::FFI qw(randombytes_buf crypto_auth_verify crypto_auth_keygen);
+
+        my $message = randombytes_buf(12);
+        # you'd really need to already have the key, but here
+        my $key = crypto_auth_keygen();
+        # your encrypted data would come from a call to crypto_auth
+        my $encrypted; # assume this is full of bytes
+        # let's verify
+        my $boolean = crypto_auth_verify($encrypted, $message, $key);
+        say $boolean;
+
+    The crypto_auth_verify
+    <https://doc.libsodium.org/secret-key_cryptography/secret-key_authentica
+    tion#usage> function returns a boolean letting us know if the encrypted
+    message and the original message are verified with the secret key.
+
+  crypto_auth_keygen
+        use Sodium::FFI qw(crypto_auth_keygen);
+        my $key = crypto_auth_keygen();
+        # this could also be written:
+        use Sodium::FFI qw(randombytes_buf crypto_auth_KEYBYTES);
+        my $key = randombytes_buf(crypto_auth_KEYBYTES);
+
+    The crypto_auth_keygen
+    <https://doc.libsodium.org/secret-key_cryptography/secret-key_authentica
+    tion#usage> function returns a byte string of "crypto_auth_KEYBYTES"
+    bytes.
+
 AES256-GCM Crypto Functions
     LibSodium provides a few AES256-GCM functions
     <https://doc.libsodium.org/secret-key_cryptography/aead/aes-256-gcm> to
@@ -255,6 +303,81 @@ chacha20poly1305_ietf Crypto Functions
     <https://doc.libsodium.org/secret-key_cryptography/aead/chacha20-poly130
     5/ietf_chacha20-poly1305_construction#detached-mode> function returns a
     byte string of "crypto_aead_chacha20poly1305_IETF_KEYBYTES" bytes.
+
+Public Key Cryptography - Public Key Signatures
+    LibSodium provides a few Public Key Signature Functions
+    <https://doc.libsodium.org/public-key_cryptography/public-key_signatures
+    > where a signer generates a key pair (public key and secret key) and
+    appends the secret key to any number of messages. The one doing the
+    verification will need to know and trust the public key before messages
+    signed using it can be verified. This is not authenticated encryption.
+
+  crypto_sign
+        use Sodium::FFI qw(crypto_sign_keypair crypto_sign);
+        my $msg = "Let's sign this and stuff!";
+        my ($public_key, $secret_key) = crypto_sign_keypair();
+        my $signed_msg = crypto_sign($msg, $secret_key);
+
+    The crypto_sign
+    <https://doc.libsodium.org/public-key_cryptography/public-key_signatures
+    #combined-mode> function prepends a signature to an unaltered message.
+
+  crypto_sign_detached
+        use Sodium::FFI qw(crypto_sign_keypair crypto_sign_detached);
+        my $msg = "Let's sign this and stuff!";
+        my ($public_key, $secret_key) = crypto_sign_keypair();
+        my $signature = crypto_sign_detached($msg, $secret_key);
+
+    The crypto_sign_detached
+    <https://doc.libsodium.org/public-key_cryptography/public-key_signatures
+    #detached-mode> function signs the message with the secret key and
+    returns the signature.
+
+  crypto_sign_keypair
+        use Sodium::FFI qw(crypto_sign_keypair);
+        my ($public_key, $secret_key) = crypto_sign_keypair();
+
+    The crypto_sign_keypair
+    <https://doc.libsodium.org/public-key_cryptography/public-key_signatures
+    #key-pair-generation> function randomly generates a secret key and a
+    corresponding public key.
+
+  crypto_sign_open
+        use Sodium::FFI qw(crypto_sign_open);
+        # we should have the public key and signed message to open
+        my $signed_msg = ...;
+        my $public_key = ...;
+        my $msg = crypto_sign_open($signed_msg, $public_key);
+
+    The crypto_sign_open
+    <https://doc.libsodium.org/public-key_cryptography/public-key_signatures
+    #combined-mode> function checks that a signed message has a valid
+    signature for the public key. If so, it returns that message and if not,
+    it will throw.
+
+  crypto_sign_seed_keypair
+        use Sodium::FFI qw(crypto_sign_seed_keypair crypto_sign_SEEDBYTES randombytes_buf);
+        my $seed = randombytes_buf(crypto_sign_SEEDBYTES);
+        my ($public_key, $secret_key) = crypto_sign_seed_keypair($seed);
+
+    The crypto_sign_seed_keypair
+    <https://doc.libsodium.org/public-key_cryptography/public-key_signatures
+    #key-pair-generation> function randomly generates a secret key
+    deterministically derived from a single key seed and a corresponding
+    public key.
+
+  crypto_sign_verify_detached
+        use Sodium::FFI qw(crypto_sign_verify_detached);
+        my $signature = ...;
+        my $message = ...;
+        my $public_key = ...;
+        my $boolean = crypto_sign_verify_detached($signature, $message, $public_key);
+
+    The crypto_sign_verify_detached
+    <https://doc.libsodium.org/public-key_cryptography/public-key_signatures
+    #detached-mode> function verifies that a signature is valid for the
+    supplied message with public key. It returns a boolean value, 1 for
+    true, 0 for false.
 
 Random Number Functions
     LibSodium provides a few Random Number Generator Functions

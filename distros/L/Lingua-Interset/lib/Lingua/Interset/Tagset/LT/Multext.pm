@@ -4,7 +4,7 @@
 package Lingua::Interset::Tagset::LT::Multext;
 use strict;
 use warnings;
-our $VERSION = '3.014';
+our $VERSION = '3.015';
 
 use utf8;
 use open ':utf8';
@@ -36,35 +36,68 @@ sub _create_atoms
     my $self = shift;
     # Most atoms can be inherited but some have to be redefined.
     my $atoms = $self->SUPER::_create_atoms();
-    # Croatian verbform feature is a merger of verbform, mood, tense and voice.
-    # VERB FORM ####################
-    $atoms->{verbform} = $self->create_atom
+    # PART OF SPEECH ####################
+    # We must redefine the part-of-speech atom because unlike other Multext
+    # drivers, in Lithuanian we need to convert certain verb forms to non-verb
+    # categories and back.
+    $atoms->{pos} = $self->create_atom
     (
-        'surfeature' => 'verbform',
+        'surfeature' => 'pos',
         'decode_map' =>
         {
-            'n' => ['verbform' => 'inf'],                                     # biti, bit
-            'p' => ['verbform' => 'part'],                                    # bio, bila, bilo, bili, bile, bila
-            'r' => ['verbform' => 'fin', 'mood' => 'ind', 'tense' => 'pres'], # sam, si, je, smo, ste, su
-            'f' => ['verbform' => 'fin', 'mood' => 'ind', 'tense' => 'fut'],  # no occurrence? these forms are also tagged as present: budem, budeš, bude, budemo, budete, budu
-            'm' => ['verbform' => 'fin', 'mood' => 'imp'],                    # budi, budimo, budite
-            'a' => ['verbform' => 'fin', 'mood' => 'ind', 'tense' => 'aor'],  # bih, bi, bi, bismo, biste, bi
-            'e' => ['verbform' => 'fin', 'mood' => 'ind', 'tense' => 'imp']   # bijah, bijaše, bijaše, bijasmo, bijaste, bijahu
+            # noun
+            'N' => ['pos' => 'noun'],
+            # adjective
+            'A' => ['pos' => 'adj'],
+            # pronoun
+            'P' => ['pos' => 'noun', 'prontype' => 'prn'],
+            # determiner (but not article)
+            'D' => ['pos' => 'adj', 'prontype' => 'prn'],
+            # article
+            'T' => ['pos' => 'adj', 'prontype' => 'art', 'other' => {'prontype' => 'art'}],
+            # numeral
+            'M' => ['pos' => 'num'],
+            # entity; used in [ro]; not documented at the Multext-East website
+            'E' => ['pos' => 'num', 'nountype' => 'prop'],
+            # verb
+            'V' => ['pos' => 'verb'],
+            # adverb
+            'R' => ['pos' => 'adv'],
+            # adposition
+            'S' => ['pos' => 'adp', 'adpostype' => 'prep'],
+            # conjunction
+            'C' => ['pos' => 'conj'],
+            # particle
+            'Q' => ['pos' => 'part'],
+            # interjection
+            'I' => ['pos' => 'int'],
+            # abbreviation
+            'Y' => ['abbr' => 'yes'],
+            # punctuation
+            # examples: , .
+            'Z' => ['pos' => 'punc'],
+            # residual
+            'X' => []
         },
         'encode_map' =>
-
-            { 'mood' => { 'imp' => 'm',
-                          '@'   => { 'verbform' => { 'part'  => 'p',
-                                                     'trans' => 't',
-                                                     'inf'   => 'n',
-                                                     '@'     => { 'tense' => { 'pres' => 'r',
-                                                                               'fut'  => 'f',
-                                                                               'aor'  => 'a',
-                                                                               'imp'  => 'e',
-                                                                               'past' => 'a',
-                                                                               'narr' => 'a',
-                                                                               'pqp'  => 'a',
-                                                                               '@'    => 'n' }}}}}}
+        {
+            'abbr' => { 'yes' => 'Y',
+                        '@'    => { 'numtype' => { ''  => { 'verbform' => { ''  => { 'pos' => { 'noun' => { 'prontype' => { ''  => 'N',
+                                                                                                                            '@' => 'P' }},
+                                                                                                'adj'  => { 'prontype' => { ''  => 'A',
+                                                                                                                            '@' => 'P' }},
+                                                                                                'num'  => 'M',
+                                                                                                'verb' => 'V',
+                                                                                                'adv'  => 'R',
+                                                                                                'adp'  => 'S',
+                                                                                                'conj' => 'C',
+                                                                                                'part' => 'Q',
+                                                                                                'int'  => 'I',
+                                                                                                'punc' => 'Z',
+                                                                                                '@'    => 'X' }},
+                                                                            '@' => 'V' }},
+                                                   '@' => 'M' }}}
+        }
     );
     # ADJTYPE ####################
     $atoms->{adjtype} = $self->create_atom
@@ -216,19 +249,24 @@ sub _create_atoms
         'surfeature' => 'verbform',
         'decode_map' =>
         {
-            'm' => ['verbform' => 'fin'],
-            'i' => ['verbform' => 'inf'],
+            'm' => ['pos' => 'verb', 'verbform' => 'fin'],
+            'i' => ['pos' => 'verb', 'verbform' => 'inf'],
             # Vgp ... adjectival participle
-            'p' => ['verbform' => 'part'],
+            'p' => ['pos' => 'verb', 'verbform' => 'part'],
             # Vga ... padalyvis ... adverbial participle describing an action performed by one that causes or otherwise relates to the action of another.
             #                       The subject of a padalyvis participle is required to be in the dative case.
-            'a' => ['verbform' => 'gdv'],
+            # The tentative conversion by the authors of ALKSNIS maps padalyvis to gerund and pusdalyvis to converb.
+            'a' => ['pos' => 'verb', 'verbform' => 'ger'],
             # Vgh ... pusdalyvis ... a special adverbial participle that is declined for number and gender
             #                       and describes secondary actions performed alongside primary actions.
-            'h' => ['verbform' => 'conv'],
+            'h' => ['pos' => 'verb', 'verbform' => 'conv'],
             # Vgb ... būdinys ... adverbial participle describing manner of action
             # Examples: prašyte, kniedyte
-            'b' => ['verbform' => 'ger']
+            # The authors of ALKSNIS tentatively converted these forms to UD as adverbs.
+            # They did not include the VerbForm feature. We can tag it as adverb too,
+            # to distinguish it from the other converbs, but we will keep the verbform
+            # feature, to distinguish it from other adverbs.
+            'b' => ['pos' => 'adv', 'verbform' => 'conv']
             # http://www.lituanus.org/1987/87_1_04.htm
             # dirbant - 'while working' ... padalyvis ... Vgap
             # dirbus - 'after having worked' ... padalyvis ... Vgaa
@@ -244,9 +282,10 @@ sub _create_atoms
             'verbform' => { 'fin'  => 'm',
                             'inf'  => 'i',
                             'part' => 'p',
-                            'conv' => 'h',
+                            'conv' => { 'pos' => { 'adv' => 'b',
+                                                   '@'   => 'h' }},
                             'gdv'  => 'a',
-                            'ger'  => 'b' }
+                            'ger'  => 'a' }
         }
     );
     # TENSE ####################
@@ -298,7 +337,10 @@ sub _create_atoms
         'simple_decode_map' =>
         {
             'i' => 'ind',
-            's' => 'sub',
+            # 's' means 'subjunctive' in MULTEXT-EAST.
+            # We change it here to 'conditional' in order to make it parallel
+            # to other Baltic tagsets in UD.
+            's' => 'cnd',
             'm' => 'imp'
         },
         'encode_default' => '-'
@@ -1055,22 +1097,22 @@ Lingua::Interset::Tagset::LT::Multext - Driver for the Lithuanian Multext-EAST-l
 
 =head1 VERSION
 
-version 3.014
+version 3.015
 
 =head1 SYNOPSIS
 
-  use Lingua::Interset::Tagset::CS::Multext;
-  my $driver = Lingua::Interset::Tagset::CS::Multext->new();
-  my $fs = $driver->decode('Ncmsn');
+  use Lingua::Interset::Tagset::LT::Multext;
+  my $driver = Lingua::Interset::Tagset::LT::Multext->new();
+  my $fs = $driver->decode('Ncmsnn');
 
 or
 
   use Lingua::Interset qw(decode);
-  my $fs = decode('cs::multext', 'Ncmsn');
+  my $fs = decode('lt::multext', 'Ncmsnn');
 
 =head1 DESCRIPTION
 
-Interset driver for the Czech tagset of the Multext-EAST project.
+Interset driver for the Lithuanian tagset of the Multext-EAST project.
 
 =head1 SEE ALSO
 

@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/DateTime.pm
-## Version v0.2.0
-## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Version v0.2.1
+## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2022/02/27
+## Modified 2022/03/06
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -17,8 +17,9 @@ BEGIN
     use warnings;
     use parent qw( Module::Generic );
     use vars qw( $ERROR $TS_RE );
-    use DateTime;
-    use DateTime::Format::Strptime;
+    use DateTime 1.57;
+    use DateTime::Format::Strptime 1.79;
+    use DateTime::TimeZone 2.51;
     use Nice::Try dont_want => 1;
     use Regexp::Common;
     use Scalar::Util ();
@@ -56,10 +57,10 @@ BEGIN
         )?
     )?
     /x;
-    our $VERSION = 'v0.2.0';
+    our $VERSION = 'v0.2.1';
 };
 
-use strict;
+# use strict;
 no warnings 'redefine';
 
 sub new
@@ -73,6 +74,7 @@ sub op
 {
     no overloading;
     my( $self, $other, $swap, $op ) = @_;
+    no strict;
     my $dt1 = $self->{dt};
     my $dt2;
     if( Scalar::Util::blessed( $other ) && $other->isa( 'DateTime' ) )
@@ -83,12 +85,12 @@ sub op
     {
         $dt2 = $other->{dt};
     }
-    ## Might trigger an error if this does not work with DateTime, but that's the developer's problem
+    # Might trigger an error if this does not work with DateTime, but that's the developer's problem
     elsif( Scalar::Util::blessed( $other ) )
     {
         $dt2 = $other;
     }
-    ## Unix time
+    # Unix time
     elsif( $other =~ /^\d{10}$/ )
     {
         $dt2 = DateTime->from_epoch( epoch => $other, time_zone => 'local' );
@@ -674,7 +676,7 @@ Module::Generic::DateTime - A DateTime wrapper for enhanced features
 
 =head1 VERSION
 
-    v0.2.0
+    v0.2.1
 
 =head1 DESCRIPTION
 

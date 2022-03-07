@@ -1,5 +1,8 @@
 Revision history for Perl extension Date::Japanese::Era.
 
+0.08  2022-03-04 11:57:40 PST
+        - Support 元年 as an alias for the 1st year (skaji) #3
+
 0.07  2019-03-31 20:30:40 PDT
         - Updated the table to support 令和/Reiwa era
 

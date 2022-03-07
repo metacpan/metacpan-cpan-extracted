@@ -6,7 +6,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = 1.003;
+our $VERSION = 1.004;
 
 use parent qw(Alien::Base);
 
@@ -21,7 +21,7 @@ Alien::libmaxminddb - Find or download and install libmaxminddb
 
 =head1 VERSION
 
-version 1.003
+version 1.004
 
 =head1 SYNOPSIS
 
@@ -66,12 +66,11 @@ None.
 
 =head1 DEPENDENCIES
 
-Requires L<Alien::Build> from CPAN.
+Requires L<Alien::Build> from CPAN.  On Windows, L<Alien::MSYS> needs to be
+installed manually.
 
 Install the package C<libmaxminddb-devel> or C<libmaxminddb-dev> if you would
 like to use your operating system's libmaxminddb library.
-
-Windows is not supported.  Please do not ask for Windows support.
 
 =head1 INCOMPATIBILITIES
 
@@ -87,7 +86,11 @@ Andreas Vögele E<lt>voegelas@cpan.orgE<gt>
 
 =head1 BUGS AND LIMITATIONS
 
-libmaxminddb uses 64-bit integers.
+If libmaxminddb and its development files aren't present, the library is
+fetched from GitHub and built with L<Alien::Build>, which requires the build
+tools from L<Alien::MSYS> on Windows.  If Alien::Build fails to build
+libmaxminddb, make sure that you have a clean build environment with nothing
+but Perl and the build tools in your path.
 
 =head1 LICENSE AND COPYRIGHT
 

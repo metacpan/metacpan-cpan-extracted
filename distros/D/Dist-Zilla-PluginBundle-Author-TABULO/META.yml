@@ -48,22 +48,22 @@ no_index:
 provides:
   Dist::Zilla::MintingProfile::Author::TABULO:
     file: lib/Dist/Zilla/MintingProfile/Author/TABULO.pm
-    version: '1.000006'
+    version: '1.000011'
   Dist::Zilla::PluginBundle::Author::TABULO:
     file: lib/Dist/Zilla/PluginBundle/Author/TABULO.pm
-    version: '1.000006'
+    version: '1.000011'
   Pod::Weaver::PluginBundle::Author::TABULO:
     file: lib/Pod/Weaver/PluginBundle/Author/TABULO.pm
-    version: '1.000006'
+    version: '1.000011'
   Pod::Wordlist::Author::TABULO:
     file: lib/Pod/Wordlist/Author/TABULO.pm
-    version: '1.000006'
+    version: '1.000011'
   Zest::Author::TABULO::Util::List:
     file: lib/Zest/Author/TABULO/Util/List.pm
-    version: '1.000006'
+    version: '1.000011'
   Zest::Author::TABULO::Util::Mayhap:
     file: lib/Zest/Author/TABULO/Util/Mayhap.pm
-    version: '1.000006'
+    version: '1.000011'
 requires:
   Class::Tiny: '0'
   Data::OptList: '0'
@@ -142,7 +142,7 @@ resources:
   bugtracker: https://github.com/tabulon-perl/p5-Dist-Zilla-PluginBundle-Author-TABULO/issues
   homepage: https://github.com/tabulon-perl/p5-Dist-Zilla-PluginBundle-Author-TABULO
   repository: https://github.com/tabulon-perl/p5-Dist-Zilla-PluginBundle-Author-TABULO.git
-version: '1.000006'
+version: '1.000011'
 x_authority: cpan:TABULO
 x_contributors:
   - 'Tabulo <dev-git.perl@tabulo.net>'

@@ -3,7 +3,15 @@ use strict;
 
 use Carp;
 use IPC::Shareable;
-use Test::More tests => 8;
+use Test::More;
+
+BEGIN {
+    if (! $ENV{CI_TESTING}) {
+        plan skip_all => "Not on a legit CI platform...";
+    }
+}
+
+plan tests => 8;
 
 my %shareOpts = (
 		 create =>       'yes',

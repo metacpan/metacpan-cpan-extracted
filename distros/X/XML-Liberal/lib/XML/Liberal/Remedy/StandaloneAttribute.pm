@@ -8,7 +8,7 @@ sub apply {
     my($driver, $error, $xml_ref) = @_;
 
     my ($attr) = $error->message =~
-        /^parser error : Specification mandate value for attribute (\w+)/
+        /^parser error : Specification mandates? value for attribute (\w+)/
             or return 0;
 
     # In input like "<hr noshade />", the error location points to the slash

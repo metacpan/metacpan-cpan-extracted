@@ -10,6 +10,7 @@ use File::ShareDir::Install;
 $File::ShareDir::Install::INCLUDE_DOTFILES = 1;
 $File::ShareDir::Install::INCLUDE_DOTDIRS = 1;
 install_share dist => "share";
+install_share module => "Dist::Zilla::MintingProfile::Author::TABULO", "share\/profiles";
 
 
 my %WriteMakefileArgs = (
@@ -110,7 +111,7 @@ my %WriteMakefileArgs = (
     "Test::Pod" => 0,
     "Test::Pod::Content" => 0
   },
-  "VERSION" => "1.000006",
+  "VERSION" => "1.000011",
   "test" => {
     "TESTS" => "t/*.t"
   }

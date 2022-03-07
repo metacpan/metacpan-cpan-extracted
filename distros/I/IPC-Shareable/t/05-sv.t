@@ -4,6 +4,12 @@ use strict;
 use IPC::Shareable;
 use Test::More;
 
+BEGIN {
+    if (! $ENV{CI_TESTING}) {
+        plan skip_all => "Not on a legit CI platform...";
+    }
+}
+
 tie my $sv, 'IPC::Shareable', {destroy => 1};
 
 $sv = 'foo';

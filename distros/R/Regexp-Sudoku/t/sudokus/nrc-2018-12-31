@@ -23,9 +23,8 @@ Solution
 7 3 2  1 4 5  9 8 6
 1 4 9  6 8 3  7 2 5
 ==
-Args
-use Regexp::Sudoku::Constants qw [:Houses];
-{houses => $NRC}
+Create
+Regexp::Sudoku:: -> new -> init -> set_nrc_houses
 ==
 URL: https://www.nrc.nl/nieuws/2018/12/31/sudoku-a3127391
 Name: NRC

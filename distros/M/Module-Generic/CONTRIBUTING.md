@@ -1,7 +1,7 @@
 ## How to contribute
  
 Thank you for considering contributing to this distribution.
-I welcome any contribution to Class, including, but not limited to bug reports, feature requests, general comments, and patches.
+I welcome any contribution to Module::Generic, including, but not limited to bug reports, feature requests, general comments, and patches.
 
 Feel free to clone it from its gitlab repository at <https://git.deguest.jp/jack/Module-Generic> and issue a pull request.
 
@@ -43,7 +43,7 @@ Issues are currently reported using CPAN [bug tracker](https://git.deguest.jp/ja
 
 ## More information
 
-Please refer to the [README](https://metacpan.org/source/JDEGUEST/Class-v1.1.1/README.md)
+Please refer to the [README](https://metacpan.org/source/JDEGUEST/Module-Generic-v0.21.6/README.md)
 
 ## Author
 

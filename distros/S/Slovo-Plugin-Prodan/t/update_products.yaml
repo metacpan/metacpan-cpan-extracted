@@ -7,15 +7,17 @@
   properties: {
       price: 14.00, weight: 0.300, series: Паралелен свят (първа книга), dimensions: 115×165 мм. (джобен),
       author: Контадин Кременски,
+      publisher: Студио Беров,
       images: [/img/korica-lechitelkata-96dpi-200x288.webp,],
       button_icon: /css/malka/book-open-page-variant-outline.svg,
-      exerpts_url: /books/lechitelkata-otkusi.pdf, variant: книжно издание,
+      exerpts_url: /books/lechitelkata-otkusi.pdf, variant: книжно издание, in_store: true
       }}
 
 - alias: матере-нашѧ-параскеви
   p_type: book
   properties:
     author: Красимир Беров – съставител
+    publisher: Студио Беров
     dimensions: 148×210 мм.(A5)
     exerpts_url: /books/PetkaZograf074-exerpts.pdf
     images: [/img/PetkaZograf074_250x355x96.jpg]
@@ -23,5 +25,7 @@
     price: 7.00
     weight: 0.050
     variant: книжно издание
+    in_store: false
   sku: 9786199169001
   title: Житие на света Петка Българска
+

@@ -1,6 +1,6 @@
 package Net::OpenSSH;
 
-our $VERSION = '0.80';
+our $VERSION = '0.82';
 
 use strict;
 use warnings;
@@ -1371,7 +1371,8 @@ sub make_remote_command {
     my $ssh_flags = '';
     $ssh_flags .= ($tty ? 'qtt' : 'T') if defined $tty;
     if ($self->{_forward_agent}) {
-        my $forward_agent = delete $opts{forward_agent};
+	my $forward_always = (($self->{_forward_agent} eq 'always') ? 1 : undef);
+        my $forward_agent = _first_defined(delete($opts{forward_agent}), $forward_always);
         $ssh_flags .= ($forward_agent ? 'A' : 'a') if defined $forward_agent;
     }
     if ($self->{_forward_X11}) {
@@ -1534,9 +1535,9 @@ sub open_ex {
     my $ssh_opts = delete $opts{ssh_opts};
     $ssh_opts = $self->{_default_ssh_opts} unless defined $ssh_opts;
     my @ssh_opts = $self->_expand_vars(_array_or_scalar_to_list $ssh_opts);
-
     if ($self->{_forward_agent}) {
-        my $forward_agent = delete $opts{forward_agent};
+	my $forward_always = (($self->{_forward_agent} eq 'always') ? 1 : undef);
+        my $forward_agent = _first_defined(delete($opts{forward_agent}), $forward_always);
         $ssh_flags .= ($forward_agent ? 'A' : 'a') if defined $forward_agent;
     }
     if ($self->{_forward_X11}) {
@@ -2314,9 +2315,9 @@ my %rsync_opt_with_arg = map { $_ => 1 } qw(chmod suffix backup-dir rsync-path m
                                             skip-compress filter exclude exclude-from include include-from
                                             out-format log-file log-file-format bwlimit protocol iconv checksum-seed files-from);
 
-my %rsync_opt_forbidden = map { $_ => 1 } qw(rsh address port sockopts blocking-io password-file write-batch
+my %rsync_opt_forbidden = map { $_ => 1 } qw(rsh address port sockopts password-file write-batch
                                             only-write-batch read-batch ipv4 ipv6 version help daemon config detach
-                                            blocking-io protect-args list-only);
+                                            protect-args list-only);
 
 $rsync_opt_forbidden{"no-$_"} = 1 for (keys %rsync_opt_with_arg, keys %rsync_opt_forbidden);
 
@@ -2357,7 +2358,7 @@ sub _rsync {
     my $timeout = delete $opts{timeout};
     $quiet = 1 unless (defined $quiet or $verbose);
 
-    my @opts = qw(--blocking-io) ;
+    my @opts;
     push @opts, '-q' if $quiet;
     push @opts, '-pt' if $copy_attrs;
     push @opts, '-' . ($verbose =~ /^\d+$/ ? 'v' x $verbose : 'v') if $verbose;
@@ -2850,7 +2851,15 @@ For instance:
 
 =item forward_agent => 1
 
+=item forward_agent => 'always'
+
 Enables forwarding of the authentication agent.
+
+When C<always> is passed as the argument, agent forwarding will be
+enabled by default in all the channels created from the
+object. Otherwise, it will have to be explicitly requested when
+calling the channel creating methods (i.e. C<open_ex> and its
+derivations).
 
 This option can not be used when passing a passphrase (via
 L</passphrase>) to unlock the login private key.
@@ -3879,6 +3888,7 @@ passphrase from the user.
 In asynchronous mode, this method requires the connection to be
 terminated before it gets called. Afterwards, C<wait_for_master>
 should be called repeaptly until the new connection is stablished.
+For instance:
 
   my $async = 1;
   $ssh->disconnect($async);
@@ -3893,7 +3903,7 @@ should be called repeaptly until the new connection is stablished.
   while (1) {
     defined $ssh->wait_for_master($async)
       and last;
-    do_somethin_else();
+    do_something_else();
   }
 
 
@@ -5278,7 +5288,7 @@ I always welcome documentation corrections and improvements.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2020 by Salvador FandiE<ntilde>o
+Copyright (C) 2008-2022 by Salvador FandiE<ntilde>o
 (sfandino@yahoo.com)
 
 This library is free software; you can redistribute it and/or modify

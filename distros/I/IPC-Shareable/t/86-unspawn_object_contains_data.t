@@ -6,6 +6,9 @@ use lib 't/';
 use Test::More;
 
 BEGIN {
+    if (! $ENV{CI_TESTING}) {
+        plan skip_all => "Not on a legit CI platform...";
+    }
     if (!$ENV{IPC_SPAWN_TEST}) {
         plan skip_all => "IPC_SPAWN_TEST env var not set";
     }

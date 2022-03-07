@@ -12,7 +12,7 @@ use App::SpamcupNG
   qw(main_loop read_config %OPTIONS_MAP config_logger);
 use App::SpamcupNG::UserAgent;
 
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.013'; # VERSION
 # Delay between HTTP requests. Adjust this if Spamcop.net asks!
 use constant DELAY => 5;
 
@@ -77,6 +77,8 @@ if ( ( $opts{n} ) and ( $logger->is_info() ) ) {
 'Running with -n. Not actually reporting SPAM, just showing what is about to happen.'
     );
 }
+
+$logger->info("spamcup version $VERSION");
 
 if ( $logger->is_info() ) {
     $logger->info("Running with logger in $opts{V} mode.");

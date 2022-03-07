@@ -2,7 +2,7 @@ NAME
     App::ImageMagickUtils - Utilities related to ImageMagick
 
 VERSION
-    This document describes version 0.011 of App::ImageMagickUtils (from
+    This document describes version 0.012 of App::ImageMagickUtils (from
     Perl distribution App-ImageMagickUtils), released on 2022-02-10.
 
 DESCRIPTION

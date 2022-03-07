@@ -10,6 +10,7 @@ do { my $x = {
                                       'Dist::Zilla' => '5',
                                       'Dist::Zilla::Plugin::Bootstrap::lib' => '0',
                                       'Dist::Zilla::Plugin::MetaNoIndex' => '0',
+                                      'Dist::Zilla::Plugin::ModuleShareDirs' => '0',
                                       'File::Spec' => '0',
                                       'File::Temp' => '0',
                                       'IO::Handle' => '0',

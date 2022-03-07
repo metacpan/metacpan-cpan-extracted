@@ -57,6 +57,7 @@ t/overload.t
 t/overload_cross_class.t
 t/overload_switch.t
 t/printf.t
+t/PV_NV_BUG.t
 t/set_uj_sj.t
 t/TRmpz_out_str.t
 t/use64bitint.t

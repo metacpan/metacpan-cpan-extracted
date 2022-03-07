@@ -2,6 +2,7 @@
 * ppi_version change $old_version $new_version
 * git grep $old_version, update anything remaining
 * perl Makefile.PL
+* make clean
 * make manifest
 * make distcheck to check manifest
 * git commit -a

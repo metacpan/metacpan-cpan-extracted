@@ -3,7 +3,7 @@ use warnings;
 
 package Dist::Zilla::PluginBundle::Author::AJNN::PruneAliases;
 # ABSTRACT: Prune macOS aliases
-$Dist::Zilla::PluginBundle::Author::AJNN::PruneAliases::VERSION = '0.01';
+$Dist::Zilla::PluginBundle::Author::AJNN::PruneAliases::VERSION = '0.02';
 
 use Dist::Zilla;
 use Moose;
@@ -51,7 +51,7 @@ Dist::Zilla::PluginBundle::Author::AJNN::PruneAliases - Prune macOS aliases
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 DESCRIPTION
 

@@ -1,8 +1,18 @@
 use warnings;
 use strict;
 
+use Config;
 use IPC::Shareable;
 use Test::More;
+
+BEGIN {
+    if (! $ENV{CI_TESTING}) {
+        plan skip_all => "Not on a legit CI platform...";
+    }
+    if ($Config{ivsize} < 8) {
+        plan skip_all => "This test script can't be run on a perl < 64-bit";
+    }
+}
 
 use constant BYTES => 2000000; # ~2MB
 

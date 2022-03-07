@@ -1,3 +1,31 @@
+1.000011                2022-03-05 05:17:26+00:00 UTC TABULO
+
+    [REVISION]
+    - Minting : We now take the version from the main module; not from "dist.ini"
+
+1.000010                2022-03-05 04:03:12+00:00 UTC TABULO
+
+    [REVISION]
+    - Release new version on CPAN
+
+1.000009                2022-03-05 04:01:51+00:00 UTC AUTHORID
+
+    [BUG FIXES]
+    - Minting profiles should now work
+
+1.000008                2022-03-04 20:48:15+00:00 UTC TABULO
+
+    [REVISION]
+    - Actually release on CPAN
+
+1.000007                2022-03-04 20:45:18+00:00 UTC AUTHORID
+
+    [REVISION]
+    - Ignore the contents of the "releases/" directory (the default target for [ArchiveRelease])
+
+    [BUG FIXES]
+    - Fix dist_dir() wrongly assuming to be in a development repo in some cases
+
 1.000006                2021-10-19 15:39:49+00:00 UTC TABULO
 
     [BUG FIXES]

@@ -30,37 +30,39 @@ BEGIN
         bool     => sub () { 1 },
         fallback => 1,
     );
-    use constant FINFO_DEV        => 0;
-    use constant FINFO_INODE      => 1;
-    use constant FINFO_MODE       => 2;
-    use constant FINFO_NLINK      => 3;
-    use constant FINFO_UID        => 4;
-    use constant FINFO_GID        => 5;
-    use constant FINFO_RDEV       => 6;
-    use constant FINFO_SIZE       => 7;
-    use constant FINFO_ATIME      => 8;
-    use constant FINFO_MTIME      => 9;
-    use constant FINFO_CTIME      => 10;
-    use constant FINFO_BLOCK_SIZE => 11;
-    use constant FINFO_BLOCKS     => 12;
-    ##  the file type is undetermined.
-    use constant FILETYPE_NOFILE => 0;
-    ## a file is a regular file.
-    use constant FILETYPE_REG => 1;
-    ## a file is a directory
-    use constant FILETYPE_DIR => 2;
-    ## a file is a character device
-    use constant FILETYPE_CHR => 3;
-    ## a file is a block device
-    use constant FILETYPE_BLK => 4;
-    ## a file is a FIFO or a pipe.
-    use constant FILETYPE_PIPE => 5;
-    ## a file is a symbolic link
-    use constant FILETYPE_LNK => 6;
-    ## a file is a [unix domain] socket.
-    use constant FILETYPE_SOCK => 7;
-    ## a file is of some other unknown type or the type cannot be determined.
-    use constant FILETYPE_UNKFILE => 127;
+    use constant {
+        FINFO_DEV        => 0,
+        FINFO_INODE      => 1,
+        FINFO_MODE       => 2,
+        FINFO_NLINK      => 3,
+        FINFO_UID        => 4,
+        FINFO_GID        => 5,
+        FINFO_RDEV       => 6,
+        FINFO_SIZE       => 7,
+        FINFO_ATIME      => 8,
+        FINFO_MTIME      => 9,
+        FINFO_CTIME      => 10,
+        FINFO_BLOCK_SIZE => 11,
+        FINFO_BLOCKS     => 12,
+        #  the file type is undetermined.
+        FILETYPE_NOFILE => 0,
+        # a file is a regular file.
+        FILETYPE_REG => 1,
+        # a file is a directory
+        FILETYPE_DIR => 2,
+        # a file is a character device
+        FILETYPE_CHR => 3,
+        # a file is a block device
+        FILETYPE_BLK => 4,
+        # a file is a FIFO or a pipe.
+        FILETYPE_PIPE => 5,
+        # a file is a symbolic link
+        FILETYPE_LNK => 6,
+        # a file is a [unix domain] socket.
+        FILETYPE_SOCK => 7,
+        # a file is of some other unknown type or the type cannot be determined.
+        FILETYPE_UNKFILE => 127,
+    };
     our %EXPORT_TAGS = ( all => [qw( FILETYPE_NOFILE FILETYPE_REG FILETYPE_DIR FILETYPE_CHR FILETYPE_BLK FILETYPE_PIPE FILETYPE_LNK FILETYPE_SOCK FILETYPE_UNKFILE )] );
     our @EXPORT_OK = qw( FILETYPE_NOFILE FILETYPE_REG FILETYPE_DIR FILETYPE_CHR FILETYPE_BLK FILETYPE_PIPE FILETYPE_LNK FILETYPE_SOCK FILETYPE_UNKFILE );
     our $VERSION = 'v0.2.0';

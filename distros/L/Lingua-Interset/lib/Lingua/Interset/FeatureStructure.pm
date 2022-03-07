@@ -4,7 +4,7 @@
 package Lingua::Interset::FeatureStructure;
 use strict;
 use warnings;
-our $VERSION = '3.014';
+our $VERSION = '3.015';
 
 use utf8;
 use open ':utf8';
@@ -1009,8 +1009,13 @@ my %matrix = @_matrix =
         ],
         'uname' => 'Aspect'
     },
-    ###!!! Experimental for ro::multext and its conversion to UD!
-    ###!!! Not yet fully accepted and documented!
+    # Distinguishes between strong and weak forms of adjectives or pronouns.
+    # Used e.g. in Romanian UD. See also the 'variant' feature. Some tagsets
+    # use variant=long instead of strength=strong, and variant=short instead
+    # of strength=weak. However, the 'strength' feature has been tentatively
+    # added to Interset because it is slightly more specific and also because
+    # we want to be able to seamlessly read the features from the UD corpora
+    # that use it.
     'strength' =>
     {
         'priority' => 437,
@@ -1027,7 +1032,7 @@ my %matrix = @_matrix =
     'variant' =>
     {
         'priority' => 440,
-        'values' => ['short', 'long', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ''],
+        'values' => ['short', 'long', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', ''],
         'replacements' =>
         [
             ['0'],
@@ -1040,6 +1045,9 @@ my %matrix = @_matrix =
             ['7'],
             ['8'],
             ['9'],
+            ['a'],
+            ['b'],
+            ['c'],
             ['short'],
             ['long']
         ],
@@ -1952,7 +1960,7 @@ sub get_ufeatures
         my $value = join(',', @values);
         my $pair = "$uname=$value";
         # Some values of some features became obsolete because the distinction was moved to the POS tag level.
-        next if($pair =~ m/^(PronType=Prn|ConjType=(Coor|Sub)|NounType=(Com|Prop)|VerbType=Aux|Variant=[0-9])$/);
+        next if($pair =~ m/^(PronType=Prn|ConjType=(Coor|Sub)|NounType=(Com|Prop)|VerbType=Aux|Variant=[0-9A-C])$/);
         push(@pairs, $pair);
     }
     # Check whether there are language-specific features or values that Interset
@@ -2980,7 +2988,7 @@ Lingua::Interset::FeatureStructure - Definition of morphosyntactic features and 
 
 =head1 VERSION
 
-version 3.014
+version 3.015
 
 =head1 SYNOPSIS
 

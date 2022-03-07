@@ -13,7 +13,7 @@ WriteMakefile(
 	MIN_PERL_VERSION => '5.24.0',		#for switch and ref aliasing
 	PREREQ_PM => {
 		enum=>0,
-		"common::sense"=>0
+		"Template::Plex"=>0,
 	},
 	AUTHOR => 'Ruben Westerberg <drclaw@mac.com>',
 	LICENSE => 'mit',

@@ -5,6 +5,12 @@ use Data::Dumper;
 use Test::More;
 use IPC::Shareable;
 
+BEGIN {
+    if (! $ENV{CI_TESTING}) {
+        plan skip_all => "Not on a legit CI platform...";
+    }
+}
+
 my $mod = 'IPC::Shareable';
 
 my $knot = tie my %hv, $mod, {

@@ -44,7 +44,7 @@ cmp_deeply(
         re( qr<array> ),    # major type label
     ) ],
     'warning about unrecognized tag',
-);
+) or diag explain \@w;
 
 is_deeply($decoded, [], '… and the value is correct' );
 

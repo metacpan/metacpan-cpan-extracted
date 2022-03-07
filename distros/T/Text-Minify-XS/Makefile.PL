@@ -17,7 +17,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.009003",
   "NAME" => "Text::Minify::XS",
   "PREREQ_PM" => {
-    "Exporter" => 0,
+    "Exporter" => "5.57",
     "XSLoader" => 0,
     "strict" => 0,
     "warnings" => 0
@@ -31,7 +31,7 @@ my %WriteMakefileArgs = (
     "Test::Warnings" => 0,
     "utf8" => 0
   },
-  "VERSION" => "v0.6.0",
+  "VERSION" => "v0.6.1",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -40,7 +40,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Encode" => 0,
-  "Exporter" => 0,
+  "Exporter" => "5.57",
   "File::Spec" => 0,
   "Module::Metadata" => 0,
   "Test::Exception" => "0.41",

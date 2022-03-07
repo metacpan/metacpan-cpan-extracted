@@ -3,13 +3,13 @@ package Async::Event::Interval;
 use warnings;
 use strict;
 
-our $VERSION = '1.08';
+our $VERSION = '1.09';
 
 use Carp qw(croak);
 use IPC::Shareable;
 use Parallel::ForkManager;
 
-$SIG{CHLD} = "IGNORE";
+$SIG{CHLD} = 'IGNORE';
 $SIG{__WARN__} = sub {
     my $warn = shift;
     warn $warn if $warn !~ /^child process/;
@@ -18,6 +18,8 @@ $SIG{__WARN__} = sub {
 my $id = 0;
 
 my %events;
+my $shared_memory_protect_lock = _rand_shm_lock();
+
 my $shared_memory_segment_created;
 
 while (! $shared_memory_segment_created) {
@@ -26,6 +28,7 @@ while (! $shared_memory_segment_created) {
             key         => _rand_shm_key(),
             create      => 1,
             exclusive   => 1,
+            protected   => _shm_lock(),
             mode        => 0600,
             destroy     => 1
         };
@@ -81,8 +84,7 @@ sub interval {
         if ($interval !~ /^\d+$/ && $interval !~ /^(\d+)?\.\d+$/) {
             croak "\$interval must be an integer or float";
         }
-
-        $events{$self->id}->{interval} = $interval;
+        $events{$self->id}{interval} = $interval;
     }
 
     return $events{$self->id}->{interval};
@@ -282,10 +284,17 @@ sub _rand_shm_key {
     my $key_str;
 
     for (0..11) {
+        srand();
         $key_str .= ('A'..'Z')[rand(26)];
     }
 
    return $key_str;
+}
+sub _rand_shm_lock {
+    # Used for the 'protected' option in the %events hash creation
+
+    srand();
+    return int(rand(1_000_000));
 }
 sub _runs {
     my ($self, $increment) = @_;
@@ -298,6 +307,9 @@ sub _setup {
     $self->_cb($cb);
     $self->_args(\@args);
 }
+sub _shm_lock {
+    return $shared_memory_protect_lock;
+}
 sub _started {
     my ($self, $started) = @_;
     $self->{started} = $started if defined $started;
@@ -305,6 +317,24 @@ sub _started {
 }
 sub DESTROY {
     $_[0]->stop if $_[0]->pid;
+
+    # On events with interval of zero, ForkManager runs finish(), which
+    # calls our destroy method. We only want to blow away the %events
+    # hash if we truly go out of scope
+
+    return if (caller())[0] eq 'Parallel::ForkManager::Child';
+
+    delete $events{$_[0]->id};
+}
+sub _end {
+    if (keys %events) {
+        warn "The following events remain: " . join(', ', keys %events);
+    }
+
+    IPC::Shareable::clean_up_protected(_shm_lock());
+}
+END {
+    _end();
 }
 sub _vim{}
 
@@ -660,30 +690,19 @@ Here's an example that uses a hash that's stored in shared memory, where the
 parent process (the script) and two other processes (the two events) all share
 and update the same hash.
 
-The very last line removes the shared memory segments. You can remove this line
-if you want to reuse the same data later, or access it from other scripts.
-
     use Async::Event::Interval;
     use IPC::Shareable;
 
     tie my %shared_data, 'IPC::Shareable', {
         key         => '123456789',
         create      => 1,
-        exclusive   => 0,
         destroy     => 1
     };
 
-    $shared_data{$$}++;
+    $shared_data{$$}{called_count}++;
 
-    my $event_one = Async::Event::Interval->new(
-        0.2,
-        sub { $shared_data{$$}++; }
-    );
-
-    my $event_two = Async::Event::Interval->new(
-        1,
-        sub { $shared_data{$$}++; }
-    );
+    my $event_one = Async::Event::Interval->new(0.2, \&update);
+    my $event_two = Async::Event::Interval->new(1, \&update);
 
     $event_one->start;
     $event_two->start;
@@ -694,7 +713,11 @@ if you want to reuse the same data later, or access it from other scripts.
     $event_two->stop;
 
     for my $pid (keys %shared_data) {
-        printf("Process ID %d executed %d times\n", $pid, $shared_data{$pid});
+        printf(
+            "Process ID %d executed %d times\n",
+            $pid,
+            $shared_data{$pid}{called_count}
+        );
     }
 
     for my $event ($event_one, $event_two) {
@@ -709,7 +732,13 @@ if you want to reuse the same data later, or access it from other scripts.
         );
     }
 
-    (tied %shared_data)->remove;
+    sub update {
+        # Because each event runs in its own process, $$ will be set to the
+        # process ID of the calling event, even though they both call this
+        # same function
+
+        $shared_data{$$}{called_count}++;
+    }
 
 =head1 AUTHOR
 

@@ -1,0 +1,49 @@
+MacOS seems to be very greedy when allowing access to shared memory.
+
+By default, it has the following:
+
+	shmmax: 4194304	(max shared memory segment size)
+	shmmin:       1	(min shared memory segment size)
+	shmmni:      32	(max number of shared memory identifiers)
+	shmseg:       8	(max shared memory segments per process)
+	shmall:    1024	(max amount of shared memory in pages)
+
+4MB for a segment size, with only 8 segments per process and globally, just 32.
+That makes things very difficult when running unit tests for IPC::Shareable, as
+there could be a couple dozen segments in use at any time, and when adding new
+features, they are bound to leak segments all over the place until things are
+stabilized and polished.
+
+You can modify the kern.sysv parameters in the below file to your liking, then
+put the file into a ""/Library/LaunchDaemons/SharedMemory.plist" file and reboot.
+
+---
+
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd";>
+
+<plist version="1.0">
+<dict>
+ <key>Label</key>
+ <string>shmemsetup</string>
+ <key>UserName</key>
+ <string>root</string>
+ <key>GroupName</key>
+ <string>wheel</string>
+ <key>ProgramArguments</key>
+ <array>
+ <string>/usr/sbin/sysctl</string>
+ <string>-w</string>
+ <string>kern.sysv.shmmax=4194304</string>
+ <string>kern.sysv.shmmni=32</string>
+ <string>kern.sysv.shmseg=8</string>
+ <string>kern.sysv.shmall=1024</string>
+ <string>kern.sysv.shmmin=1</string>
+ </array>
+ <key>KeepAlive</key>
+ <false/>
+ <key>RunAtLoad</key>
+ <true/>
+</dict>
+</plist>

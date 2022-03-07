@@ -246,20 +246,18 @@ sub shop ($c) {
   # Copy data without private_key.
   state $shop = {map { $_ eq 'private_key' ? () : ($_ => $c->config->{shop}{$_}) }
       keys %{$c->config->{shop}}};
-  return $c->render(openapi => $shop, status => 200);
+  return $c->render(openapi => $shop);
 }
 
 # GET /api/gdpr_consent
-# Provides the url for the page where are described the detailed conditions to
-# use the site and the cookies policy - GDPR.
-# In the future it may also return the last modification date so the JavaScipt
-# can show the message again to the users, to notify them that there are
-# changes, even if the already greed to them.
-sub gdpr_consent ($c) {
-  return $c->render(
-    openapi => {ihost => $c->ihost_only, url => $c->config('gdpr_consent_url')},
-    status  => 200
-  );
+# Provides various settings to the client side like the url for the page where
+# are described the detailed conditions to use the site and the cookies policy
+# - GDPR.
+sub consents ($c) {
+  state $consents = $c->config('consents');
+  $consents->{ihost} //= $c->ihost_only;
+  return $c->render(openapi => $consents);
 }
+
 1;
 

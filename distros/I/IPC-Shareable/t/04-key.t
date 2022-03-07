@@ -3,7 +3,14 @@ use strict;
 
 use Data::Dumper;
 use IPC::Shareable;
+use Mock::Sub;
 use Test::More;
+
+BEGIN {
+    if (! $ENV{CI_TESTING}) {
+        plan skip_all => "Not on a legit CI platform...";
+    }
+}
 
 # deprecated string key param
 {
@@ -147,4 +154,28 @@ use Test::More;
     }
 }
 
+# _shm_key_rand() collisions (in _mg_tie())
+{
+
+    my $m = Mock::Sub->new;
+    my $sub = $m->mock('IPC::Shareable::_shm_key_rand_int');
+    $sub->return_value(555555);
+
+    my $no_collision = eval {
+        tie my %h, 'IPC::Shareable', { key => 'rand key gen', create => 1, destroy => 1 };
+
+        $h{a} = 1;
+        $h{b}{c} = 2;
+        $h{b}{d}{e} = 5;
+
+        IPC::Shareable::clean_up_all;
+        1;
+    };
+
+    is $no_collision, undef, "_shm_key_rand() fails if it can't find an available shm slot";
+    like
+        $@,
+        qr/available key after 10 tries/,
+        "...the error shows it attempted multiple times";
+}
 done_testing();

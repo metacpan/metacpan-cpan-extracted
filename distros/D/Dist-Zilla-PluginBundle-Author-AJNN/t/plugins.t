@@ -37,7 +37,7 @@ sub has_plugin {
 
 ok has_plugin('::GatherDir'), 'plugin GatherDir';
 ok has_plugin('::PruneCruft'), 'plugin PruneCruft';
-ok has_plugin('Bundle::Author::AJNN::PruneAliases'), 'plugin PruneAliases';
+is !! has_plugin('Bundle::Author::AJNN::PruneAliases'), $^O eq 'darwin', 'plugin PruneAliases';
 
 ok has_plugin('::CPANFile'), 'plugin CPANFile';
 ok has_plugin('::MetaJSON'), 'plugin MetaJSON';

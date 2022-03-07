@@ -1,6 +1,6 @@
 package Git::CPAN::Patch::Import;
 our $AUTHORITY = 'cpan:YANICK';
-$Git::CPAN::Patch::Import::VERSION = '2.4.0';
+$Git::CPAN::Patch::Import::VERSION = '2.5.0';
 use 5.10.0;
 
 use strict;
@@ -27,7 +27,6 @@ use Path::Class qw/ file /;
 use Cwd qw/ getcwd /;
 use version;
 use Git::Repository;
-use CLASS;
 use DateTime;
 
 use CPANPLUS;
@@ -201,7 +200,7 @@ sub import_one_backpan_release {
     local %ENV = %ENV;
     $ENV{GIT_AUTHOR_DATE}  ||= $release->date;
 
-    my $author = $CLASS->cpanplus->author_tree($release->cpanid);
+    my $author = __PACKAGE__->cpanplus->author_tree($release->cpanid);
     $ENV{GIT_AUTHOR_NAME}  ||= $author->author;
     $ENV{GIT_AUTHOR_EMAIL} ||= $author->email;
 
@@ -264,7 +263,7 @@ sub import_from_backpan {
 
     local $CWD = $repo_dir;
 
-    my $backpan = $CLASS->backpan_index;
+    my $backpan = __PACKAGE__->backpan_index;
     my $dist = $backpan->dist($distname)
       or die "Error: no distributions found. ",
              "Are you sure you spelled the module name correctly?\n";
@@ -469,7 +468,7 @@ sub main {
 
                 if ( $opts->{backpan} ) {
                     # we need the backpan index for dates
-                    my $backpan = $CLASS->backpan_index;
+                    my $backpan = __PACKAGE__->backpan_index;
 
                     %dists = map { $_->filename => $_ }
                     $backpan->releases($release->{name});
@@ -536,7 +535,7 @@ Git::CPAN::Patch::Import
 
 =head1 VERSION
 
-version 2.4.0
+version 2.5.0
 
 =head1 DESCRIPTION
 
@@ -553,7 +552,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011, 2010, 2009 by Yanick Champoux.
+This software is copyright (c) 2022, 2021, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011, 2010, 2009 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

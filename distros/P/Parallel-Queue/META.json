@@ -33,6 +33,7 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
+            "Cwd" : "0",
             "File::Basename" : "0",
             "File::Temp" : "0",
             "FindBin" : "0",
@@ -45,6 +46,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v4.0.2",
+   "version" : "v4.0.5",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

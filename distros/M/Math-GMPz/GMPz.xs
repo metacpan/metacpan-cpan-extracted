@@ -2063,7 +2063,13 @@ SV * overload_mul(pTHX_ SV * a, SV * b, SV * third) {
      }
 #endif
 
+#if defined(GMPZ_PV_NV_BUG)
+     if( (SV_IS_POK(b) && !SV_IS_NOK(b))
+           ||
+         (SV_IS_POK(b) && SV_IS_NOK(b) && SvIOKp(b)) ) {
+#else
      if(SV_IS_POK(b)) {
+#endif
        if(mpz_set_str(*mpz_t_obj, SvPV_nolen(b), 0))
          croak(" Invalid string (%s) supplied to Math::GMPz::overload_mul", SvPV_nolen(b));
        mpz_mul(*mpz_t_obj, *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *mpz_t_obj);
@@ -2206,7 +2212,13 @@ SV * overload_add(pTHX_ SV * a, SV * b, SV * third) {
      }
 #endif
 
+     #if defined(GMPZ_PV_NV_BUG)
+     if( (SV_IS_POK(b) && !SV_IS_NOK(b))
+           ||
+         (SV_IS_POK(b) && SV_IS_NOK(b) && SvIOKp(b)) ) {
+#else
      if(SV_IS_POK(b)) {
+#endif
        if(mpz_set_str(*mpz_t_obj, SvPV_nolen(b), 0))
          croak(" Invalid string (%s) supplied to Math::GMPz::overload_add", SvPV_nolen(b));
        mpz_add(*mpz_t_obj, *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *mpz_t_obj);
@@ -2364,7 +2376,13 @@ SV * overload_sub(pTHX_ SV * a, SV * b, SV * third) {
      }
 #endif
 
+     #if defined(GMPZ_PV_NV_BUG)
+     if( (SV_IS_POK(b) && !SV_IS_NOK(b))
+           ||
+         (SV_IS_POK(b) && SV_IS_NOK(b) && SvIOKp(b)) ) {
+#else
      if(SV_IS_POK(b)) {
+#endif
        if(mpz_set_str(*mpz_t_obj, SvPV_nolen(b), 0))
          croak(" Invalid string (%s) supplied to Math::GMPz::overload_sub", SvPV_nolen(b));
        if(SWITCH_ARGS) mpz_sub(*mpz_t_obj, *mpz_t_obj, *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))));
@@ -2532,7 +2550,13 @@ SV * overload_div(pTHX_ SV * a, SV * b, SV * third) {
      }
 #endif
 
+     #if defined(GMPZ_PV_NV_BUG)
+     if( (SV_IS_POK(b) && !SV_IS_NOK(b))
+           ||
+         (SV_IS_POK(b) && SV_IS_NOK(b) && SvIOKp(b)) ) {
+#else
      if(SV_IS_POK(b)) {
+#endif
        if(mpz_set_str(*mpz_t_obj, SvPV_nolen(b), 0))
           croak(" Invalid string (%s) supplied to Math::GMPz::overload_div", SvPV_nolen(b));
        if(SWITCH_ARGS) Rmpz_tdiv_q(mpz_t_obj, mpz_t_obj, INT2PTR(mpz_t *, SvIVX(SvRV(a))));
@@ -2682,7 +2706,13 @@ SV * overload_mod (pTHX_ mpz_t * a, SV * b, SV * third) {
      }
 #endif
 
+     #if defined(GMPZ_PV_NV_BUG)
+     if( (SV_IS_POK(b) && !SV_IS_NOK(b))
+           ||
+         (SV_IS_POK(b) && SV_IS_NOK(b) && SvIOKp(b)) ) {
+#else
      if(SV_IS_POK(b)) {
+#endif
        if(mpz_set_str(*mpz_t_obj, SvPV_nolen(b), 0))
           croak(" Invalid string (%s) supplied to Math::GMPz::overload_mod", SvPV_nolen(b));
        if(SWITCH_ARGS) {
@@ -2895,7 +2925,7 @@ SV * overload_pow(pTHX_ SV * a, SV * b, SV * third) {
      if(SV_IS_IOK(b)) {
        if(SvUOK(b)) {
          if(SWITCH_ARGS) {
-           if(ui) {
+           if(ui && SvUVX(b) <= (UV)ULONG_MAX) {
              mpz_ui_pow_ui(*mpz_t_obj, (unsigned long)SvUVX(b), ui);
              return obj_ref;
            }
@@ -3007,7 +3037,13 @@ SV * overload_and(pTHX_ mpz_t * a, SV * b, SV * third, ...) {
      }
 #endif
 
+     #if defined(GMPZ_PV_NV_BUG)
+     if( (SV_IS_POK(b) && !SV_IS_NOK(b))
+           ||
+         (SV_IS_POK(b) && SV_IS_NOK(b) && SvIOKp(b)) ) {
+#else
      if(SV_IS_POK(b)) {
+#endif
        if(mpz_set_str(*mpz_t_obj, SvPV_nolen(b), 0))
          croak("Invalid string (%s) supplied to Math::GMPz::overload_and", SvPV_nolen(b));
        mpz_and(*mpz_t_obj, *a, *mpz_t_obj);
@@ -3142,7 +3178,13 @@ SV * overload_ior(pTHX_ mpz_t * a, SV * b, SV * third, ...) {
      }
 #endif
 
+     #if defined(GMPZ_PV_NV_BUG)
+     if( (SV_IS_POK(b) && !SV_IS_NOK(b))
+           ||
+         (SV_IS_POK(b) && SV_IS_NOK(b) && SvIOKp(b)) ) {
+#else
      if(SV_IS_POK(b)) {
+#endif
        if(mpz_set_str(*mpz_t_obj, SvPV_nolen(b), 0))
          croak("Invalid string (%s) supplied to Math::GMPz::overload_ior", SvPV_nolen(b));
        mpz_ior(*mpz_t_obj, *a, *mpz_t_obj);
@@ -3277,7 +3319,13 @@ SV * overload_xor(pTHX_ mpz_t * a, SV * b, SV * third, ...) {
      }
 #endif
 
+     #if defined(GMPZ_PV_NV_BUG)
+     if( (SV_IS_POK(b) && !SV_IS_NOK(b))
+           ||
+         (SV_IS_POK(b) && SV_IS_NOK(b) && SvIOKp(b)) ) {
+#else
      if(SV_IS_POK(b)) {
+#endif
        if(mpz_set_str(*mpz_t_obj, SvPV_nolen(b), 0))
          croak("Invalid string (%s) supplied to Math::GMPz::overload_xor", SvPV_nolen(b));
        mpz_xor(*mpz_t_obj, *a, *mpz_t_obj);
@@ -3404,7 +3452,13 @@ SV * overload_gt(pTHX_ mpz_t * a, SV * b, SV * third) {
      }
 
 
+     #if defined(GMPZ_PV_NV_BUG)
+     if( (SV_IS_POK(b) && !SV_IS_NOK(b))
+           ||
+         (SV_IS_POK(b) && SV_IS_NOK(b) && SvIOKp(b)) ) {
+#else
      if(SV_IS_POK(b)) {
+#endif
        ret = _is_infstring(SvPV_nolen(b));
        if(ret) {
          if(ret > 0) return newSViv(0);
@@ -3492,7 +3546,13 @@ SV * overload_gte(pTHX_ mpz_t * a, SV * b, SV * third) {
        return newSViv(0);
      }
 
+     #if defined(GMPZ_PV_NV_BUG)
+     if( (SV_IS_POK(b) && !SV_IS_NOK(b))
+           ||
+         (SV_IS_POK(b) && SV_IS_NOK(b) && SvIOKp(b)) ) {
+#else
      if(SV_IS_POK(b)) {
+#endif
        ret = _is_infstring(SvPV_nolen(b));
        if(ret) {
          if(ret > 0) return newSViv(0);
@@ -3580,7 +3640,13 @@ SV * overload_lt(pTHX_ mpz_t * a, SV * b, SV * third) {
        return newSViv(0);
      }
 
+     #if defined(GMPZ_PV_NV_BUG)
+     if( (SV_IS_POK(b) && !SV_IS_NOK(b))
+           ||
+         (SV_IS_POK(b) && SV_IS_NOK(b) && SvIOKp(b)) ) {
+#else
      if(SV_IS_POK(b)) {
+#endif
        ret = _is_infstring(SvPV_nolen(b));
        if(ret) {
          if(ret > 0) return newSViv(1);
@@ -3668,7 +3734,13 @@ SV * overload_lte(pTHX_ mpz_t * a, SV * b, SV * third) {
        return newSViv(0);
      }
 
+     #if defined(GMPZ_PV_NV_BUG)
+     if( (SV_IS_POK(b) && !SV_IS_NOK(b))
+           ||
+         (SV_IS_POK(b) && SV_IS_NOK(b) && SvIOKp(b)) ) {
+#else
      if(SV_IS_POK(b)) {
+#endif
        ret = _is_infstring(SvPV_nolen(b));
        if(ret) {
          if(ret > 0) return newSViv(1);
@@ -3755,7 +3827,13 @@ SV * overload_spaceship(pTHX_ mpz_t * a, SV * b, SV * third) {
        return newSViv(ret);
      }
 
+     #if defined(GMPZ_PV_NV_BUG)
+     if( (SV_IS_POK(b) && !SV_IS_NOK(b))
+           ||
+         (SV_IS_POK(b) && SV_IS_NOK(b) && SvIOKp(b)) ) {
+#else
      if(SV_IS_POK(b)) {
+#endif
        ret = _is_infstring(SvPV_nolen(b));
        if(ret) return newSViv(ret * -1);
 
@@ -3831,7 +3909,13 @@ SV * overload_equiv(pTHX_ mpz_t * a, SV * b, SV * third) {
        return newSViv(0);
      }
 
+     #if defined(GMPZ_PV_NV_BUG)
+     if( (SV_IS_POK(b) && !SV_IS_NOK(b))
+           ||
+         (SV_IS_POK(b) && SV_IS_NOK(b) && SvIOKp(b)) ) {
+#else
      if(SV_IS_POK(b)) {
+#endif
        if(_is_infstring(SvPV_nolen(b))) return newSViv(0);
        if(mpz_init_set_str(t, SvPV_nolen(b), 0))
          croak("Invalid string (%s) supplied to Math::GMPz::overload_equiv", SvPV_nolen(b));
@@ -3910,7 +3994,13 @@ SV * overload_not_equiv(pTHX_ mpz_t * a, SV * b, SV * third) {
        return newSViv(0);
      }
 
+     #if defined(GMPZ_PV_NV_BUG)
+     if( (SV_IS_POK(b) && !SV_IS_NOK(b))
+           ||
+         (SV_IS_POK(b) && SV_IS_NOK(b) && SvIOKp(b)) ) {
+#else
      if(SV_IS_POK(b)) {
+#endif
        if(_is_infstring(SvPV_nolen(b))) return newSViv(1);
        if(mpz_init_set_str(t, SvPV_nolen(b), 0))
          croak("Invalid string (%s) supplied to Math::GMPz::overload_not_equiv", SvPV_nolen(b));
@@ -4032,7 +4122,13 @@ SV * overload_xor_eq(pTHX_ SV * a, SV * b, SV * third, ...) {
      }
 #endif
 
+     #if defined(GMPZ_PV_NV_BUG)
+     if( (SV_IS_POK(b) && !SV_IS_NOK(b))
+           ||
+         (SV_IS_POK(b) && SV_IS_NOK(b) && SvIOKp(b)) ) {
+#else
      if(SV_IS_POK(b)) {
+#endif
        if(mpz_init_set_str(t, SvPV_nolen(b), 0)) {
          SvREFCNT_dec(a);
          croak("Invalid string (%s) supplied to Math::GMPz::overload_xor_eq", SvPV_nolen(b));
@@ -4200,7 +4296,13 @@ SV * overload_ior_eq(pTHX_ SV * a, SV * b, SV * third, ...) {
      }
 #endif
 
+     #if defined(GMPZ_PV_NV_BUG)
+     if( (SV_IS_POK(b) && !SV_IS_NOK(b))
+           ||
+         (SV_IS_POK(b) && SV_IS_NOK(b) && SvIOKp(b)) ) {
+#else
      if(SV_IS_POK(b)) {
+#endif
        if(mpz_init_set_str(t, SvPV_nolen(b), 0)) {
          SvREFCNT_dec(a);
          croak("Invalid string (%s) supplied to Math::GMPz::overload_ior_eq", SvPV_nolen(b));
@@ -4367,7 +4469,13 @@ SV * overload_and_eq(pTHX_ SV * a, SV * b, SV * third, ...) {
      }
 #endif
 
+     #if defined(GMPZ_PV_NV_BUG)
+     if( (SV_IS_POK(b) && !SV_IS_NOK(b))
+           ||
+         (SV_IS_POK(b) && SV_IS_NOK(b) && SvIOKp(b)) ) {
+#else
      if(SV_IS_POK(b)) {
+#endif
        if(mpz_init_set_str(t, SvPV_nolen(b), 0)) {
          SvREFCNT_dec(a);
          croak("Invalid string (%s) supplied to Math::GMPz::overload_and_eq", SvPV_nolen(b));
@@ -4629,7 +4737,13 @@ SV * overload_mod_eq(pTHX_ SV * a, SV * b, SV * third) {
      }
 #endif
 
+     #if defined(GMPZ_PV_NV_BUG)
+     if( (SV_IS_POK(b) && !SV_IS_NOK(b))
+           ||
+         (SV_IS_POK(b) && SV_IS_NOK(b) && SvIOKp(b)) ) {
+#else
      if(SV_IS_POK(b)) {
+#endif
        if(mpz_init_set_str(t, SvPV_nolen(b), 0)) {
          SvREFCNT_dec(a);
          croak("Invalid string (%s) supplied to Math::GMPz::overload_mod_eq", SvPV_nolen(b));
@@ -4795,7 +4909,13 @@ SV * overload_div_eq(pTHX_ SV * a, SV * b, SV * third) {
      }
 #endif
 
+     #if defined(GMPZ_PV_NV_BUG)
+     if( (SV_IS_POK(b) && !SV_IS_NOK(b))
+           ||
+         (SV_IS_POK(b) && SV_IS_NOK(b) && SvIOKp(b)) ) {
+#else
      if(SV_IS_POK(b)) {
+#endif
        if(mpz_init_set_str(t, SvPV_nolen(b), 0)) {
          SvREFCNT_dec(a);
          croak("Invalid string (%s) supplied to Math::GMPz::overload_div_eq", SvPV_nolen(b));
@@ -4957,7 +5077,13 @@ SV * overload_sub_eq(pTHX_ SV * a, SV * b, SV * third) {
      }
 #endif
 
+     #if defined(GMPZ_PV_NV_BUG)
+     if( (SV_IS_POK(b) && !SV_IS_NOK(b))
+           ||
+         (SV_IS_POK(b) && SV_IS_NOK(b) && SvIOKp(b)) ) {
+#else
      if(SV_IS_POK(b)) {
+#endif
        if(mpz_init_set_str(t, SvPV_nolen(b), 0)) {
          SvREFCNT_dec(a);
          croak("Invalid string (%s) supplied to Math::GMPz::overload_sub_eq", SvPV_nolen(b));
@@ -5124,7 +5250,13 @@ SV * overload_add_eq(pTHX_ SV * a, SV * b, SV * third) {
      }
 #endif
 
+     #if defined(GMPZ_PV_NV_BUG)
+     if( (SV_IS_POK(b) && !SV_IS_NOK(b))
+           ||
+         (SV_IS_POK(b) && SV_IS_NOK(b) && SvIOKp(b)) ) {
+#else
      if(SV_IS_POK(b)) {
+#endif
        if(mpz_init_set_str(t, SvPV_nolen(b), 0)) {
          SvREFCNT_dec(a);
          croak("Invalid string (%s) supplied to Math::GMPz::overload_add_eq", SvPV_nolen(b));
@@ -5286,7 +5418,13 @@ SV * overload_mul_eq(pTHX_ SV * a, SV * b, SV * third) {
      }
 #endif
 
+     #if defined(GMPZ_PV_NV_BUG)
+     if( (SV_IS_POK(b) && !SV_IS_NOK(b))
+           ||
+         (SV_IS_POK(b) && SV_IS_NOK(b) && SvIOKp(b)) ) {
+#else
      if(SV_IS_POK(b)) {
+#endif
        if(mpz_init_set_str(t, SvPV_nolen(b), 0)) {
          SvREFCNT_dec(a);
          croak(" Invalid string (%s) supplied to Math::GMPz::overload_mul_eq", SvPV_nolen(b));
@@ -5489,7 +5627,13 @@ SV * wrap_gmp_printf(pTHX_ SV * a, SV * b) {
        return newSViv(ret);
      }
 
+     #if defined(GMPZ_PV_NV_BUG)
+     if( (SV_IS_POK(b) && !SV_IS_NOK(b))
+           ||
+         (SV_IS_POK(b) && SV_IS_NOK(b) && SvIOKp(b)) ) {
+#else
      if(SV_IS_POK(b)) {
+#endif
        ret = gmp_printf(SvPV_nolen(a), SvPV_nolen(b));
        fflush(stdout);
        return newSViv(ret);
@@ -5543,7 +5687,13 @@ SV * wrap_gmp_fprintf(pTHX_ FILE * stream, SV * a, SV * b) {
        return newSViv(ret);
      }
 
+     #if defined(GMPZ_PV_NV_BUG)
+     if( (SV_IS_POK(b) && !SV_IS_NOK(b))
+           ||
+         (SV_IS_POK(b) && SV_IS_NOK(b) && SvIOKp(b)) ) {
+#else
      if(SV_IS_POK(b)) {
+#endif
        ret = gmp_fprintf(stream, SvPV_nolen(a), SvPV_nolen(b));
        fflush(stream);
        return newSViv(ret);
@@ -5608,7 +5758,13 @@ SV * wrap_gmp_sprintf(pTHX_ SV * s, SV * a, SV * b, int buflen) {
        return newSViv(ret);
      }
 
+     #if defined(GMPZ_PV_NV_BUG)
+     if( (SV_IS_POK(b) && !SV_IS_NOK(b))
+           ||
+         (SV_IS_POK(b) && SV_IS_NOK(b) && SvIOKp(b)) ) {
+#else
      if(SV_IS_POK(b)) {
+#endif
        ret = gmp_sprintf(stream, SvPV_nolen(a), SvPV_nolen(b));
        sv_setpv(s, stream);
        Safefree(stream);
@@ -5675,7 +5831,13 @@ SV * wrap_gmp_snprintf(pTHX_ SV * s, SV * bytes, SV * a, SV * b, int buflen) {
        return newSViv(ret);
      }
 
+     #if defined(GMPZ_PV_NV_BUG)
+     if( (SV_IS_POK(b) && !SV_IS_NOK(b))
+           ||
+         (SV_IS_POK(b) && SV_IS_NOK(b) && SvIOKp(b)) ) {
+#else
      if(SV_IS_POK(b)) {
+#endif
        ret = gmp_snprintf(stream, (size_t)SvUV(bytes), SvPV_nolen(a), SvPV_nolen(b));
        sv_setpv(s, stream);
        Safefree(stream);
@@ -5697,7 +5859,13 @@ SV * _itsa(pTHX_ SV * a) {
        if(SvUOK(a)) return newSViv(1);
        return newSViv(2);
      }
-     if(SV_IS_POK(a)) return newSViv(4);
+     if(SV_IS_POK(a)) {
+#if defined(GMPZ_PV_NV_BUG)        /* perl can set the POK flag when it should not */
+       if(SvNOK(a) && !SvIOKp(a))
+         return newSViv(3);                 /* designate it as NV */
+#endif
+       return newSViv(4);                   /* designate it as PV */
+     }
      if(SV_IS_NOK(a)) return newSViv(3);
      if(sv_isobject(a)) {
        const char *h = HvNAME(SvSTASH(SvRV(a)));
@@ -6059,7 +6227,7 @@ int Rlong_run(mpz_t * bitstream) {
         }
 
     if(init < 34 && count < 34) return 1;
-    else warn("init: %u count: %u", init, count);
+    else warn("init: %u count: %u", (int)init, (int)count);
     return 0;
 
 }
@@ -6396,6 +6564,14 @@ int _gmp_index_overflow(void) {
   return 1;
 #else
   return 0;
+#endif
+}
+
+int _has_pv_nv_bug(void) {
+#if defined(GMPZ_PV_NV_BUG)
+     return 1;
+#else
+     return 0;
 #endif
 }
 
@@ -9493,5 +9669,9 @@ OUTPUT:  RETVAL
 
 int
 _gmp_index_overflow ()
+
+
+int
+_has_pv_nv_bug ()
 
 

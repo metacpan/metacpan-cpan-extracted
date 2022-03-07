@@ -2,7 +2,7 @@
 # housekeeping
 ########################################################################
 
-package Parallel::Queue::Manager;
+package Parallel::Queue::Manager v4.0.2;
 use v5.24;
 use mro qw( c3 );
 
@@ -152,7 +152,7 @@ sub cleanup
         my $qmgr    = shift;
         my $queue   = $qmgr->queue;
 
-        say STDERR join "\n\t", 'Incomplete jobs:', @$queue
+        say STDERR join "\n\t", "($$) Incomplete jobs:", @$queue
         if @$queue;
     }
     else

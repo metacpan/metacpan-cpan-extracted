@@ -13,7 +13,7 @@ sub _post_load {
 
     my ($self) = @_;
 
-    $self->{__curr_list} = $self->{msms_run_summary}->[0];
+    $self->{__curr_list} = 0;
     $self->SUPER::_post_load();
 
 }
@@ -78,14 +78,20 @@ sub _pre_load {
 sub fetch_result {
 
     my ($self, $idx, %args) = @_;
-    return $self->fetch_record( $self->{__curr_list}, $idx, %args);
+    my $ref = $self->{msms_run_summary}->[
+        $self->{__curr_list}
+    ];
+    return $self->fetch_record( $ref, $idx, %args);
 
 }
 
 sub next_result {
 
     my ($self) = @_;
-    return $self->next_record( $self->{__curr_list} );
+    my $ref = $self->{msms_run_summary}->[
+        $self->{__curr_list}
+    ];
+    return $self->next_record( $ref );
 
 }
 
@@ -99,16 +105,22 @@ sub n_lists {
 sub goto_list {
 
     my ($self, $idx) = @_;
-    my $ref = $self->{msms_run_summary}->[$idx];
+    $self->{__curr_list} = $idx;
+    my $ref = $self->{msms_run_summary}->[
+        $self->{__curr_list}
+    ];
     $ref->{__pos} = 0;
-    $self->{__curr_list} = $ref;
+    return(1); # otherwise returns zero, causing tests to fail
 
 }
 
 sub result_count {
 
     my ($self) = @_;
-    return $self->record_count( $self->{__curr_list} );
+    my $ref = $self->{msms_run_summary}->[
+        $self->{__curr_list}
+    ];
+    return $self->record_count( $ref );
 
 }
 

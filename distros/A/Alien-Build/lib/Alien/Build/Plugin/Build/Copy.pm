@@ -7,7 +7,7 @@ use Alien::Build::Plugin;
 use Path::Tiny ();
 
 # ABSTRACT: Copy plugin for Alien::Build
-our $VERSION = '2.46'; # VERSION
+our $VERSION = '2.47'; # VERSION
 
 
 sub init
@@ -62,7 +62,7 @@ Alien::Build::Plugin::Build::Copy - Copy plugin for Alien::Build
 
 =head1 VERSION
 
-version 2.46
+version 2.47
 
 =head1 SYNOPSIS
 

@@ -46,6 +46,12 @@
   </helper>
   <helper>
     <foaf:Person>
+      <foaf:name>Graham Knop</foaf:name>
+      <foaf:mbox rdf:resource="mailto:haarg@haarg.org" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
       <foaf:name>Lisa Hare</foaf:name>
       <foaf:mbox rdf:resource="mailto:lhare@inview.co.uk" />
     </foaf:Person>
@@ -440,6 +446,12 @@
     <Version>
       <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2.3.4</revision>
       <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2018-08-24</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2.4.0</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2021-09-19</dc:issued>
     </Version>
   </release>
   <programming-language>Perl</programming-language>

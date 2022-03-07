@@ -4,7 +4,7 @@ use Mojo::Base 'Mojolicious::Plugin', -signatures;
 use Mojo::JSON qw(true false);
 
 our $AUTHORITY = 'cpan:BEROV';
-our $VERSION   = '0.04';
+our $VERSION   = '0.05';
 
 has app => sub { Slovo->new }, weak => 1;
 
@@ -16,10 +16,10 @@ sub register ($self, $app, $conf) {
   unshift @{$app->static->classes},   __PACKAGE__;
   $app->stylesheets('/css/cart.css');
   $app->javascripts('/js/cart.js');
-  $app->config->{gdpr_consent_url}
-    = $conf->{gdpr_consent_url} || '/ѿносно/условия.bg.html';
-  $app->config->{phone_url} = $conf->{phone_url} || '+359899999999';
-
+  $app->config->{consents}{gdpr_url}
+    = $conf->{consents}{gdpr_url} || '/ѿносно/условия.bg.html';
+  $app->config->{consents}{phone_url} = $conf->{consents}{phone_url} || '+359899999999';
+  $app->config->{consents}{delivery_prices_url} ||= '/ѿносно/цени-доставка.bg.html';
 
   # $app->log->debug(join $/, sort keys %INC);
   # $app->debug('Prodan $config', $conf);
@@ -32,7 +32,7 @@ sub register ($self, $app, $conf) {
 
   # Add new data_type for celina. Now a corresponding partial template can be
   # used to render the new data_type.
-  push @{$spec->{parameters}{data_type}{enum}}, '_gdpr_consent';
+  push @{$spec->{parameters}{data_type}{enum}}, '_consents';
   $app->plugin(OpenAPI => {spec => $spec});
 
   # $app->debug($spec);
@@ -122,14 +122,14 @@ sub _paths {
         'x-mojo-to' => 'poruchki#shop',
         responses   => {default => {'$ref' => '#/definitions/ErrorResponse'}}}
     },
-    '/gdpr_consent' => {
+    '/consents' => {
       get => {
         description => 'Page URL for GDPR concent',
-        'x-mojo-to' => 'poruchki#gdpr_consent',
+        'x-mojo-to' => 'poruchki#consents',
         responses   => {
           200 => {
             description => 'The URL to the detailed usage conditions, GDPR, cookies.',
-            schema      => {'$ref' => '#/definitions/GdprUrl'}
+            schema      => {'$ref' => '#/definitions/Consents'}
           },
           default => {'$ref' => '#/definitions/ErrorResponse'}}}
     },
@@ -191,9 +191,13 @@ sub _definitions {
         price    => {type      => 'number'},
       }
     },
-    GdprUrl => {
-      properties => {ihost => {type => 'string'}, url => {type => 'string'}},
-      required   => [qw(url ihost)],
+    Consents => {
+      properties => {
+        ihost               => {type => 'string'},
+        gdpr_url            => {type => 'string'},
+        delivery_prices_url => {type => 'string'}
+      },
+      required => [qw(gdpr_url ihost delivery_prices_url)],
     },
   );
 }
@@ -268,9 +272,13 @@ Slovo::Plugin::Prodan - Make and manage sales in your Slovo-based site
     'Themes::Malka',
     {
       Prodan => {
-        migrate          => 1,
-        gdpr_consent_url => '/ѿносно/условия.bg.html',
-        econt            => {
+        migrate  => 1,
+        consents => {
+          gdpr_url    => '/ѿносно/условия.bg.html',
+          phone_url           => $ENV{SLOVO_PRODAN_PHONE_URL},
+          delivery_prices_url => '/ѿносно/цени-доставки.bg.html',
+        },
+        econt => {
           shop_id                 => $ENV{SLOVO_PRODAN_SHOP_ID},
           private_key             => $ENV{SLOVO_PRODAN_PRIVATE_KEY},
           shippment_calc_url      => 'https://delivery.econt.com/customer_info.php',
@@ -332,13 +340,13 @@ Bulgarian)|https://www.econt.com/developers/43-kakvo-e-dostavi-s-ekont.html>.
 
 Products - a products SQL table to populate your pages with products. You
 create a page with several articles (celini) in it. These celini will be the
-pages for the products. You prepare a YAML file with products. Each product
-C<alias> property must match exactly the celina C<alias> and C<data_type>
-on wich this product  will be placed. See C<t/products.yaml>
-and C<t/update_products.yaml> for examples. See
-L<Slovo::Command::prodan::products> on how to add and update products.
+web-pages for the products. You prepare a YAML file with products. Each product
+C<alias> property must match exactly the celina C<alias> and C<data_type> on
+wich this product will be placed. See C<t/products.yaml> and
+C<t/update_products.yaml> for examples. See L<Slovo::Command::prodan::products>
+on how to add and update products.
 
-=head2 Products template
+=head2 Products template for books
 
 A template for displaying products within a C<celina>. You can modify this
 template as you wish to display other types of products - not just books as it
@@ -352,16 +360,42 @@ products table, including the button mentioned above already.
     -t --path domove/xn--b1arjbl.xn--90ae/templates/themes/malka
 
 
-=head2 GDPR and Cookies consent
+=head2 Consents
+
+A section in the Prodan configuration for different settings - only urls for
+now. C<$app-E<gt>config('consents')> may contain any settings needed for the
+client side of the plugin not related dierctly to integration with deliverers
+or payment providers.
+
+=head3 GDPR and Cookies consent
 
 A GDPR and cookies consent alert in the footer which upon click leads to the
 page (celina) where all conditions on using the site can be described. When the
 user clicks on the link to the I<Consent> page a flag in C<localStorage> is put
 so the alert is not shown any more. This flag disappears if the user clears any
-site data and the alert will appear again if the user vists the  site again.
+site data and the alert will appear again if the user vists the site again.
 The Consent celina is created automatically in the localhost domain as an
 example. Search for C<gdpr_consent> in the source of this module to see how it
 is implemented.
+
+Settings:
+
+    Keys        Default Values
+    --------------------------------------------
+    gdpr_url    '/ѿносно/условия.bg.html'
+    ihost       punycode_decode(ed) current host
+
+=head3 Delivery prices URL
+
+This is just a setting for this plugin - C<delivery_prices_url>. Defaults to
+'/ѿносно/цени-доставка.bg.html'. This is a place where the prices for delivery
+are described. The link is displayed at the bottom of the shopping cart widget.
+It is created automatically for localhost as the C<gdpr_url>
+
+=head3 phone_url
+
+Currently displayed as a link in the _footer_right.html.ep template.
+
 
 =head2 TODO some day
 
@@ -404,7 +438,7 @@ configures the deliverer.
     @@ img/cart-remove.svg
     @@ img/econt.svg
     @@ partials/_footer_right.html.ep
-    @@ partials/_gdpr_consent.html.ep
+    @@ partials/_consents.html.ep
     @@ partials/_kniga.html.ep
     @@ resources/data/prodan_migrations.sql
 
@@ -696,21 +730,40 @@ section.book figure>figcaption {
 }
 
 section.book table#meta {
-  margin-bottom: 2rem;
-  display: inline-table;
-  max-width: 75%;
-  min-width: 50%;
+  width: 100%;
 }
 
 section.book table#meta th {
-  max-width: 15rem;
+  max-width: 7rem;
+  min-width: 5rem;
 }
 
 section.book table#meta th,
 table#meta td {
   vertical-align: top;
   border-bottom: 1px solid #ddd;
-  padding: 0.4rem 0.4rem;
+  padding: 0.4rem 0.8rem;
+}
+
+section.book table#meta tr:last-child th,
+table#meta tr:last-child td {
+  border-bottom: none;
+}
+
+section.book table#meta tr.separator {
+  border-top: 2px solid var(--color-lightGrey);
+}
+
+/* other books */
+
+section.book div.row.text-left div.col.card {
+  height: 128px;
+  min-width: 12rem;
+  max-width: 12rem;
+}
+
+section.book div.row.text-left div.col.card img {
+  height: 110px;
 }
 
 .button.primary.sharer {
@@ -729,6 +782,10 @@ section.book h2 {
   margin: 0;
 }
 
+.referrer {
+  color: var(--color-primary);
+}
+
 /* end books (products) */
 
 @@ js/cart.js
@@ -737,6 +794,7 @@ section.book h2 {
  */
 jQuery(function ($) {
     'use strict';
+    let consents = localStorage.consents ? JSON.parse(localStorage.getItem('consents')) : {};
     // cart will go finally to order.items
     let cart = localStorage.cart ? JSON.parse(localStorage.cart) : {};
     let order = localStorage.order ? JSON.parse(localStorage.order) : {};
@@ -774,8 +832,9 @@ jQuery(function ($) {
             src="/img/cart-check.svg" width="32" /></button> -->
 </th>
 </tr>
-<tr title="* При поръчка над 35 лв. до офис на Еконт или Еконтомат, доставката е за наша сметка.">
-<th colspan="4">* При поръчка над 35 лв. до офис на Еконт или Еконтомат, доставката е за наша сметка.</th>
+<tr>
+<th colspan="4"><a id="delivery_prices_url" title="Вижте подробности на страницата за цени на доставките."
+href="">Ние поемаме част от доставката!</a></th>
 </tfoot>
 </table>
 </div>
@@ -856,9 +915,9 @@ title="Ако желаете да добавите някакви подробн
 `;
     const gdpr_consent_template = `
     <div id="gdpr_consent" class="col" style="font-size:medium;font-family:sans-serif">
-    Ние не ви следим. Доставчикът ни ползва бисквитки, когато поръчвате.
+    Ние не ви следим. Доставчикът ни ползва бисквитки, когато поръчвате. 
     Продължавайки се съгласявате с <a class="gdpr_consent_url text-success" href="">„Условията за ползване"</a>
-    на <a id="gdpr_consent_ihost" href="/" class="text-success"></a>.
+    на <a id="consents_ihost" href="/" class="text-success"></a>.
     </div>
 `;
     const last_order_template = `
@@ -947,6 +1006,7 @@ title="Ако желаете да добавите някакви подробн
             // append the econt_order_template
             if (!$('#econt_order_layer').length)
                 $('body').append(econt_order_template);
+            $('#delivery_prices_url').attr('href', consents.delivery_prices_url);
         }
         //else update it
         else {
@@ -1043,7 +1103,7 @@ title="Ако желаете да добавите някакви подробн
             e.preventDefault();
         });
         get_set_shop_data();
-
+        handle_econt_order_form();
     } // end function show_econt_order()
 
     function get_set_shop_data() {
@@ -1056,9 +1116,9 @@ title="Ако желаете да добавите някакви подробн
         Object.keys(cart).forEach((key) => items.push(cart[key]));
         inline_order_items('#econt_order_items', items);
         order.items = items;
-        // Get fresh shop_data not older than 2 hours and do not get shop data
+        // Get fresh shop_data not older than 1 hour and do not get shop data
         // on each display of order checkout, because shop_data may change on the server.
-        if ((now - shop_data.retrieved) < 3600 * 2) {
+        if ((now - shop_data.retrieved) < 3600 * 1) {
             if (!eco_shipment.prop('src').match(new RegExp(shop_data.shop_id))) {
                 eco_shipment.prop('src', prepare_shipment_url(shop_data));
             }
@@ -1074,8 +1134,6 @@ title="Ако желаете да добавите някакви подробн
                     'ГРЕШКА: \n' + errorThrown);
             });
         }
-        handle_econt_order_form();
-
     }
 
     // https://www.econt.com/developers/44-implementirane-na-dostavi-s-ekont-v-elektronniya-vi-magazin.html
@@ -1171,8 +1229,8 @@ title="Ако желаете да добавите някакви подробн
         $('#econt_order_items tfoot>tr:last-child>td').replaceWith(`${shippmentPrice.toFixed(2)} ${currency[data['shipping_price_currency']]}`);
         let confirmMessage =
             `Куриерската ви услуга е на стройност ${shippmentPrice} ${currency[data['shipping_price_currency']]}
-Наложеният платеж е на стойност ${order.sum} ${currency[data['shipping_price_currency']]}
-Общо: ${shippmentPrice + order.sum} ${currency[data['shipping_price_currency']]}
+Наложеният платеж е на стойност ${order.sum.toFixed(2)} ${currency[data['shipping_price_currency']]}
+Общо: ${(shippmentPrice + order.sum).toFixed(2)} ${currency[data['shipping_price_currency']]}
 Потвърждавате ли покупката?`;
         if (confirm(confirmMessage)) {
             //customerInfoIdInput.value = data['id'];
@@ -1326,25 +1384,24 @@ ${json.errors[0].message}
      * Show in the footer a line stating that we do not use cookies except for...
      * */
     function show_gdpr_consent() {
-        const gdpr_consent = JSON.parse(localStorage.getItem('gdpr_consent'));
-        if (gdpr_consent !== null && gdpr_consent.visited === true) return;
-        if (gdpr_consent === null)
-            $.get('/api/gdpr_consent').done(function (data) {
+        if (consents.visited === true) return;
+        if (consents.gdpr_url === undefined)
+            $.get('/api/consents').done(function (data) {
                 set_gdpr_consent(data);
             }).fail(function (jqXHR, textStatus, errorThrown) {
                 console.log(jqXHR, textStatus, errorThrown);
             });
         else
-            set_gdpr_consent(gdpr_consent);
+            set_gdpr_consent(consents);
     } // end show_gdpr_consent()
 
-    function set_gdpr_consent(gdpr_consent) {
+    function set_gdpr_consent(consents) {
         // Do not show the message and store the consent if we are on the
-        // gdpr_consent.url page.
+        // consents.gdpr_url page.
         let footer = $('body>footer.is-fixed')
-        if (decodeURI(window.location.pathname) === gdpr_consent.url) {
-            gdpr_consent.visited = true;
-            localStorage.setItem('gdpr_consent', JSON.stringify(gdpr_consent));
+        if (decodeURI(window.location.pathname) === consents.gdpr_url) {
+            consents.visited = true;
+            localStorage.setItem('consents', JSON.stringify(consents));
             // A button, that gets the user to where he/she was.
             // Note! It is important to not use the window.history object so
             // the page loads fresh with no gdpr_consent message.
@@ -1354,10 +1411,10 @@ ${json.errors[0].message}
             return;
         }
         footer.html(gdpr_consent_template);
-        $('#gdpr_consent_ihost').text(gdpr_consent.ihost);
-        $('.gdpr_consent_url').attr('href', gdpr_consent.url);
-        localStorage.setItem('gdpr_consent', JSON.stringify(gdpr_consent));
-    } // end set_gdpr_consent(gdpr_consent) 
+        $('#consents_ihost').text(consents.ihost);
+        $('.gdpr_consent_url').attr('href', consents.gdpr_url);
+        localStorage.setItem('consents', JSON.stringify(consents));
+    } // end set_gdpr_consent(consents) 
 
 
     /* All code below relates to email order and is not used currently. */
@@ -1474,10 +1531,11 @@ ${response}
 <div class="pull-right social text-right">
 <%
 my $sharer_url = $canonical_path;
+my $phone_url =  app->config->{consents}{phone_url};
 %>
-    <a class="button outline primary sharer" href="tel:<%== app->config->{phone_url} %>"
-    title="<%== app->config->{phone_url} %>"><img style="float: left;"
-    src="/img/phone-classic-white.svg" height="24">&nbsp;<%== app->config->{phone_url} %></a><a
+    <a class="button outline primary sharer" href="tel:<%== $phone_url %>"
+    title="<%== $phone_url %>"><img style="float: left;"
+    src="/img/phone-classic-white.svg" height="24">&nbsp;<%== $phone_url %></a><a
 
     class="button outline primary sharer" target="_blank"
     href="https://www.facebook.com/share.php?u=<%= $sharer_url %>" rel="noopener"
@@ -1505,23 +1563,29 @@ my $sharer_url = $canonical_path;
     title="Споделяне в Telegram"><img src="/css/malka/icons8-telegram-app.svg"></a>
 </div>
 
-@@ partials/_gdpr_consent.html.ep
+@@ partials/_consents.html.ep
 <%
 # This template is practically the same as _writing.html.ep, but demosntrates a
 # good example how plugins can create their own 'data_type's and use templates
-# to display them on the site. Now if a celina has _gdpr_consent as data_type,
+# to display them on the site. Now if a celina has _consents as data_type,
 # it will be rendered using this template. With this simple technique we open
 # the opportunity for content provided by plugins to get seamlesly pluged
 # anywhere in the site, by just chosing the corresponding data_type and
 # providing template for rendering this data_type.
 %>
-<!-- _gdpr_consent -->
+<!-- _consents -->
 <section class="<%= $celina->{data_type} %>">
     %= t 'h' . $level => $celina->{title}
+<p><a href="<%== $c->req->headers->referrer %>"
+    title="Към страницата, от която дойдох."
+    class="outline button sharer referrer">&#8592;</a></p>
 %$celina->{body} .= include 'partials/_created_tstamp';
 %==format_body($celina)
+<p><a href="<%== $c->req->headers->referrer %>"
+    title="Към страницата, от която дойдох."
+    class="outline button sharer referrer">&#8592;</a></p>
 </section>
-<!-- end _gdpr_consent -->
+<!-- end _consents -->
 
 @@ partials/_kniga.html.ep
 <%
@@ -1530,7 +1594,8 @@ my $sharer_url = $canonical_path;
 # maybe a better idea to create a new data_type and use a new corresponding
 # template. See the next template as an example of this simple technique to
 # plug anywhere in the site.
-my $variants = $c->products->all({
+my $books = $c->products;
+my $variants = $books->all({
   columns => '*',
   where   => {alias => $celina->{alias}, p_type => $celina->{data_type}}
 })->each(sub {
@@ -1546,44 +1611,78 @@ return unless @$variants;
 %# with the same alias like the page alias and with p_type same like celina
 %# data_type
     %= t 'h' . $level => $celina->{title}
-<figure class="pull-left">
-    <img title="<%= $variants->[0]{title} %>" src="<%= $variants->[0]{properties}{images}[0] %>">
-    <figcaption class="text-center">
-    За покупка<br>
-    % for my $b(@$variants) {
-    % my $props = $b->{properties};
-        <a class="primary sharer button add-to-cart" href="#show_cart" title="<%= $props->{variant} %>"
-            data-sku="<%= $b->{sku} %>" data-title="<%= $b->{title} %>"
-            data-weight="<%= $props->{weight} %>" data-price="<%= $props->{price} %>"
-                ><img src="<%= $props->{button_icon} %>"> <img src="/img/cart-plus-white.svg"></a>
-    % }
-    </figcaption>
-</figure>
-<table id="meta">
-<tbody>
-<tr><th>Заглавие:</th><td><%= $variants->[0]{title} %></td></tr>
-<tr><th>Автор:</th><td><%= $variants->[0]{properties}{author} %></td></tr>
-<tr><th>Поредица:</th><td><%= $variants->[0]{properties}{series} %></td></tr>
-<tr><th>Размери:</th><td><%= $variants->[0]{properties}{dimensions} %></td></tr>
-% for my $b(@$variants) {
-<tr><th></th><td></td></tr>
-<tr><th>ISBN:</th><td><%= $b->{sku} %></td></tr>
-<tr><th>Тегло:</th><td><%= sprintf('%.3f', $b->{properties}{weight}) %> кг.</td></tr>
-<tr><th>Цена:</th><td><%= $b->{properties}{price} . ' лв. за ' . $b->{properties}{variant} %></td></tr>
-% }
-<tr><th>Откъси:</th><td><a class="primary button sharer" title="Изтегляне на откъси" href="<%= 
-    $variants->[0]{properties}{exerpts_url}
-%>"><img src="/css/malka/file-pdf-box.svg"><img src="/css/malka/download.svg"></a></td></tr>
-<tr><th>Е-поща:</th><td><a class="primary button sharer" title="Поръчка по е-поща"
-href="mailto:poruchki@studio-berov.eu?subject=Поръчка: <%=$variants->[0]{title}%>">
-<img src="/css/malka/email-fast-outline.svg">
-<img src="/css/malka/book-open-page-variant-outline.svg">
-Поръчка по е-поща
-</a></td></tr>
-</tbody>
-</table>
-%$celina->{body} .= include 'partials/_created_tstamp';
+<div class="row">
+    <figure class="col-3 text-center">
+        <img title="<%= $variants->[0]{title} %>" src="<%= $variants->[0]{properties}{images}[0] %>">
+        <figcaption class="text-center">
+        %= $variants->first(sub {$_->{properties}{in_store}}) ? 'За покупка' : 'Изчерпана';
+        <br />
+        % for my $b(@$variants) {
+        % my $props = $b->{properties}; next unless $props->{in_store};
+            <a class="primary sharer button add-to-cart" href="#show_cart" title="<%= $props->{variant} %>"
+                data-sku="<%= $b->{sku} %>" data-title="<%= $b->{title} %>"
+                data-weight="<%= $props->{weight} %>" data-price="<%= $props->{price} %>"
+                    ><img src="<%= $props->{button_icon} %>"> <img src="/img/cart-plus-white.svg"></a>
+        % }
+        </figcaption>
+    </figure>
+    <table id="meta" class="col card">
+        <tbody>
+        <tr><th>Заглавие:</th><td><%= $variants->[0]{title} %></td></tr>
+        <tr><th>Автор:</th><td><%= $variants->[0]{properties}{author} %></td></tr>
+        % if($variants->[0]{properties}{translator}) {
+        <tr><th>Преводач:</th><td><%= $variants->[0]{properties}{translator} %></td></tr>
+        % }
+        % if($variants->[0]{properties}{series}) {
+        <tr><th>Поредица:</th><td><%= $variants->[0]{properties}{series} %></td></tr>
+        % }
+        <tr><th>Размери:</th><td><%= $variants->[0]{properties}{dimensions} %></td></tr>
+        % for my $b(@$variants) {
+        % my $props = $b->{properties};
+        <tr class="separator">
+        <th>Издание:</th><td><%= $props->{variant} %></td></tr>
+        <tr><th>ISBN:</th><td><%= $b->{sku} %></td></tr>
+        <tr><th>Тегло:</th><td><%= sprintf('%.3f', $props->{weight}) %> кг.</td></tr>
+        <tr class="price"><th>Цена:</th><td><%= $props->{price} . ' лв. за ' . $props->{variant} %></td></tr>
+        % }
+        <tr class="separator">
+        % if($variants->[0]{properties}{exerpts_url}) {
+        <th>Откъси:</th><td><a class="primary button sharer" title="Изтегляне на откъси" href="<%= 
+            $variants->[0]{properties}{exerpts_url}
+        %>"><img src="/css/malka/file-pdf-box.svg"><img src="/css/malka/download.svg"></a></td></tr>
+        % }
+        <tr><th>Е-поща:</th><td><a class="primary button sharer" title="Заявка по е-поща"
+        href="mailto:poruchki@studio-berov.eu?subject=Заявка: <%=$variants->[0]{title}%>">
+        <img src="/css/malka/email-fast-outline.svg">
+        <img src="/css/malka/book-open-page-variant-outline.svg">
+        Заявка по е-поща
+        </a></td></tr>
+        </tbody>
+    </table>
+</div><!-- end class="row" -->
+
+% $celina->{body} .= include 'partials/_created_tstamp';
 %== format_body($celina)
+
+%# all celini which have books in them in the same page
+% my $others = $books->others($celina);
+% if(@$others) {
+<h4>Други книги</h4>
+<div class="row text-left">
+<%
+# $c->debug('other books: ' => $others);
+foreach my $b(@{$others->shuffle}) {
+    my $props = $b->{properties};
+%>
+<div class="col card text-center">
+    <a href="<%= url_for(page_alias => $page->{alias}, paragraph_alias => $b->{alias}, lang => $b->{language}) %>"
+        title="<%= "$b->{title}, $props->{author}" %>">
+        <img src="<%=$props->{images}[0]%>" style="<%= $props->{in_store} ? '' : 'filter:opacity(0.2)' %>">
+    </a>
+</div>
+% } # end foreach
+</div>
+% } #end if @$others
 </section>
 
 @@ resources/data/prodan_migrations.sql
@@ -1696,6 +1795,41 @@ VALUES(
 );
 -- 202202170000 down
 DELETE from celini WHERE alias='условия' 
+AND pid=(SELECT id from celini WHERE page_id=(
+    SELECT id FROM stranici WHERE alias='ѿносно' AND dom_id=0) AND data_type='title');
+
+
+
+-- 202203030000 up
+
+INSERT OR IGNORE INTO celini
+(alias, pid, page_id, user_id, group_id,  data_type, data_format, created_at,
+tstamp, title, description, keywords, body, box, language, published)
+VALUES(
+    'цени-доставка',
+    (SELECT id from celini WHERE page_id=(
+            SELECT id FROM stranici WHERE alias='ѿносно' AND dom_id=0) AND data_type='title'),
+    (SELECT id FROM stranici WHERE alias='ѿносно'),
+    (SELECT user_id FROM stranici WHERE alias='ѿносно'),
+    (SELECT group_id FROM stranici WHERE alias='ѿносно'),
+    '_consents',
+    'html',
+    1646317805,
+    1646317805,
+    'Цени за доставка',
+    'Ние поемаме тридесет на сто (30%) от доставката…',
+    'условия,доставка,цени,поръчки',
+    '<p>Ние поемаме тридесет на сто (30%) от доставката, а при по-големи поръчки поемаме цялата доставка.</p>',
+    'main', 'bg', 2
+);
+
+UPDATE celini set data_type='_consents' where alias='условия'
+    AND pid = (SELECT id from celini WHERE page_id=(
+        SELECT id FROM stranici WHERE alias='ѿносно' AND dom_id=0)
+            AND data_type='title');
+
+-- 202203030000 down
+DELETE from celini WHERE alias='цени-доставка' 
 AND pid=(SELECT id from celini WHERE page_id=(
     SELECT id FROM stranici WHERE alias='ѿносно' AND dom_id=0) AND data_type='title');
 

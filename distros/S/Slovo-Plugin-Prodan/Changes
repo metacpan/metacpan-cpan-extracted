@@ -1,5 +1,12 @@
 Revision history for Slovo plugin Slovo::Plugin::Prodan
 
+0.05 Reorganised 'gdpr_consent' into 'consents' configuration section.
+     Here urls for common consent related pages will be put. Added setting
+     delivery_prices_url - the page where the delivery prices are.
+     Fixed small bug in formatting of the order amount.
+     Added section for listing other books in partials/_kniga.html.ep.
+     See also newly added and used properties in the template.
+
 0.04 Added variant for partials/_footer_right.html.ep with phone number.
      Improved gdpr_consent feature to store consent when the users visit the
      page, not when they click on a link to it. Added "Ok!" button which

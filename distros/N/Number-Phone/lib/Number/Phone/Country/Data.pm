@@ -2,7 +2,7 @@
     # automatically generated file, don't edit
 
     package Number::Phone::Country::Data;
-    $VERSION = '2.20211206222341';
+    $VERSION = '2.20220305001730';
         %Number::Phone::Country::idd_codes = (
     20 => 'EG',
 211 => 'SS',
@@ -543,11 +543,11 @@ $Number::Phone::Country::idd_codes{882} = 'InternationalNetworks';
 $Number::Phone::Country::idd_codes{88213} = 'Telespazio';
 $Number::Phone::Country::idd_codes{88216} = 'Thuraya';
 $Number::Phone::Country::idd_codes{88220} = 'GarudaMobile';
+$Number::Phone::Country::idd_codes{88234} = 'AQ';
 $Number::Phone::Country::idd_codes{883} = 'InternationalNetworks';
 $Number::Phone::Country::idd_codes{883120} = 'Telenor';
 $Number::Phone::Country::idd_codes{883130} = 'Mobistar';
 $Number::Phone::Country::idd_codes{883140} = 'MTTGlobalNetworks';
-$Number::Phone::Country::idd_codes{8835100} = 'VOXBON';
 $Number::Phone::Country::idd_codes{888} = 'TelecomsForDisasterRelief';
 $Number::Phone::Country::idd_codes{979} = 'InternationalPremiumRate';
 $Number::Phone::Country::idd_codes{991} = 'ITPCS';

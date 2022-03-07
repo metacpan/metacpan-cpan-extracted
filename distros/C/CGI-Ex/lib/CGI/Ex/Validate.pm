@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use Carp qw(croak);
 
-our $VERSION = '2.50'; # VERSION
+our $VERSION = '2.51'; # VERSION
 our $QR_EXTRA = qr/^(\w+_error|as_(array|string|hash)_\w+|no_\w+)/;
 our @UNSUPPORTED_BROWSERS = (qr/MSIE\s+5.0\d/i);
 our $JS_URI_PATH;
@@ -736,6 +736,7 @@ sub generate_form {
     $args->{'header'}    ||= "<table class=\"form_table\">\n";
     $args->{'header'}    .=  "  <tr class=\"header\"><th colspan=\"$cols\">\$title</th></tr>\n" if $args->{'title'};
     $args->{'footer'}    ||= "  <tr class=\"submit_row\"><th colspan=\"2\">\$submit</th></tr>\n</table>\n";
+    $args->{'extra_form_attrs'} ||= '';
     $args->{'row_template'} ||= "  <tr class=\"\$oddeven\" id=\"\$field_row\">\n"
         ."    <td class=\"field\">\$name</td>\n"
         ."    <td class=\"input\">\$input"

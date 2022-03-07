@@ -1,0 +1,39 @@
+NAME
+    CLASS - Alias for __PACKAGE__
+
+SYNOPSIS
+      package Foo;
+      use CLASS;
+
+      print CLASS;                  # Foo
+      print "My class is $CLASS\n"; # My class is Foo
+
+      sub bar { 23 }
+
+      print CLASS->bar;     # 23
+      print $CLASS->bar;    # 23
+
+DESCRIPTION
+    CLASS and $CLASS are both synonyms for __PACKAGE__. Easier to type.
+
+    $CLASS has the additional benefit of working in strings.
+
+NOTES
+    CLASS is a constant, not a subroutine call. $CLASS is a plain variable,
+    it is not tied. There is no performance loss for using CLASS over
+    __PACKAGE__ except the loading of the module. (Thanks Juerd)
+
+AUTHOR
+    From February 2022 onward: Jacques Deguest <jack@deguest.jp>
+
+    Michael G Schwern <schwern@pobox.com>
+
+LICENSE
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See <http://www.perl.com/perl/misc/Artistic.html>
+
+SEE ALSO
+    perlmod(1)
+

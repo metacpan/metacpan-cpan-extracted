@@ -27,8 +27,7 @@ sub _post_load {
 
     my ($self) = @_;
 
-    $self->{__curr_ident_list} = $self->{DataCollection}->{AnalysisData}
-        ->{SpectrumIdentificationList}->[0];
+    $self->{__curr_ident_list} = 0;
     $self->SUPER::_post_load();
 
 }
@@ -140,7 +139,9 @@ sub _pre_load {
 sub fetch_spectrum_result {
 
     my ($self, $idx) = @_;
-    return $self->fetch_record($self->{__curr_ident_list} => $idx);
+    my $ref = $self->{DataCollection}->{AnalysisData}
+        ->{SpectrumIdentificationList}->[ $self->{__curr_ident_list} ];
+    return $self->fetch_record($ref => $idx);
 
 }
 
@@ -165,7 +166,9 @@ sub _fetch_seqitem_by_id {
 sub next_spectrum_result {
 
     my ($self) = @_;
-    return $self->next_record($self->{__curr_ident_list});
+    my $ref = $self->{DataCollection}->{AnalysisData}
+        ->{SpectrumIdentificationList}->[ $self->{__curr_ident_list} ];
+    return $self->next_record($ref);
 
 }
 
@@ -189,8 +192,11 @@ sub n_ident_lists {
 sub goto_ident_list {
 
     my ($self, $idx) = @_;
-    $self->{__curr_ident_list} = $self->{DataCollection}->{AnalysisData}
-        ->{SpectrumIdentificationList}->[$idx];
+    $self->{__curr_ident_list} = $idx;
+    my $ref = $self->{DataCollection}->{AnalysisData}
+        ->{SpectrumIdentificationList}->[ $self->{__curr_ident_list} ];
+    $ref->{__pos} = 0;
+    return(1); # otherwise returns zero, causing tests to fail
 
 }
 

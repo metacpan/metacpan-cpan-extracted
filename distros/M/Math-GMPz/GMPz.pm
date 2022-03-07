@@ -16,6 +16,7 @@
     use constant _MATH_GMPz_T   => 8;
     use constant _MATH_GMP_T    => 9;
     use constant _MATH_MPC_T    => 10;
+    use constant GMPZ_PV_NV_BUG => Math::GMPz::Random::_has_pv_nv_bug();
 
 use subs qw( __GNU_MP_VERSION __GNU_MP_VERSION_MINOR __GNU_MP_VERSION_PATCHLEVEL
              __GNU_MP_RELEASE __GMP_CC __GMP_CFLAGS GMP_LIMB_BITS GMP_NAIL_BITS
@@ -61,6 +62,7 @@ use overload
     'abs'  => \&overload_abs;
 
     @Math::GMPz::EXPORT_OK = qw(
+GMPZ_PV_NV_BUG
 __GNU_MP_VERSION __GNU_MP_VERSION_MINOR __GNU_MP_VERSION_PATCHLEVEL
 __GNU_MP_RELEASE __GMP_CC __GMP_CFLAGS MATH_GMPz_IV_MAX MATH_GMPz_IV_MIN
 MATH_GMPz_UV_MAX
@@ -115,7 +117,7 @@ zgmp_randinit_set zgmp_randinit_default_nobless zgmp_randinit_mt_nobless
 zgmp_randinit_lc_2exp_nobless zgmp_randinit_lc_2exp_size_nobless zgmp_randinit_set_nobless
 zgmp_urandomb_ui zgmp_urandomm_ui
     );
-    our $VERSION = '0.53';
+    our $VERSION = '0.54';
     #$VERSION = eval $VERSION;
 
     Math::GMPz->DynaLoader::bootstrap($VERSION);
@@ -129,6 +131,7 @@ zgmp_urandomb_ui zgmp_urandomm_ui
                                         #          utf8::downgrade fails in Rmpz_import.
 
     %Math::GMPz::EXPORT_TAGS =(mpz => [qw(
+GMPZ_PV_NV_BUG
 MATH_GMPz_IV_MAX MATH_GMPz_IV_MIN MATH_GMPz_UV_MAX
 Rmpz_abs Rmpz_add Rmpz_add_ui Rmpz_addmul Rmpz_addmul_ui Rmpz_and Rmpz_bin_ui
 Rmpz_bin_uiui Rmpz_bin_si Rmpz_cdiv_q Rmpz_cdiv_q_2exp Rmpz_cdiv_q_ui Rmpz_cdiv_qr

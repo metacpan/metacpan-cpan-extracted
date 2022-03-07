@@ -1,6 +1,6 @@
 package Google::RestApi::SheetsApi4;
 
-our $VERSION = '1.0.0';
+our $VERSION = '1.0.1';
 
 use Google::RestApi::Setup;
 
@@ -25,23 +25,26 @@ sub new {
   my $class = shift;
 
   state $check = compile_named(
-    api           => HasApi,
-    drive         => HasMethods[qw(filter_files)], { optional => 1 },
-    endpoint      => Str, { default => Sheets_Endpoint },
+    api           => HasApi,                                           # the G::RestApi object that will be used to send http calls.
+    drive         => HasMethods[qw(filter_files)], { optional => 1 },  # a drive instnace, could be your own, defaults to G::R::DriveApi3.
+    endpoint      => Str, { default => Sheets_Endpoint },              # this gets tacked on to the api uri to reach the sheets endpoint.
   );
   my $self = $check->(@_);
 
   return bless $self, $class;
 }
 
+# this gets called by lower-level classes like worksheet and range objects. they
+# will have passed thier own uri with params and possible body, we tack on the
+# sheets endpoint and pass it up the line to G::RestApi to make the actual call.
 sub api {
   my $self = shift;
   state $check = compile_named(
     uri     => Str, { default => '' },
-    _extra_ => slurpy Any,
+    _extra_ => slurpy Any,              # just pass through any extra params to G::RestApi::api call.
   );
   my $p = named_extra($check->(@_));
-  my $uri = $self->{endpoint};
+  my $uri = $self->{endpoint};          # tack on the uri endpoint and pass the buck.
   $uri .= "/$p->{uri}" if $p->{uri};
   return $self->rest_api()->api(%$p, uri => $uri);
 }
@@ -55,6 +58,7 @@ sub create_spreadsheet {
     _extra_ => slurpy Any,
   );
   my $p = named_extra($check->(@_));
+  # we allow name and title to be synonymous for convenience. it's actuall title in the google api.
   $p->{title} || $p->{name} or LOGDIE "Either 'title' or 'name' should be supplied";
   $p->{title} ||= $p->{name};
   delete $p->{name};
@@ -95,6 +99,7 @@ sub delete_spreadsheet {
   return $self->drive()->file(id => $spreadsheet_id)->delete();
 }
 
+# delete all the spreadsheets by the names passed.
 sub delete_all_spreadsheets {
   my $self = shift;
 
@@ -111,6 +116,7 @@ sub delete_all_spreadsheets {
   return $count;
 }
 
+# list all spreadsheets.
 sub spreadsheets {
   my $self = shift;
   my $drive = $self->drive();

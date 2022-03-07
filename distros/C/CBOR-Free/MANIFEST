@@ -12,6 +12,15 @@ cbor_free_decode.c
 cbor_free_decode.h
 cbor_free_encode.c
 cbor_free_encode.h
+easyxs/LICENSE
+easyxs/README.md
+easyxs/easyxs.h
+easyxs/easyxs_debug.h
+easyxs/easyxs_numeric.h
+easyxs/easyxs_perlcall.h
+easyxs/easyxs_string.h
+easyxs/init.h
+easyxs/ppport.h
 lib/CBOR/Free.pm
 lib/CBOR/Free/AddOne.pm
 lib/CBOR/Free/Decoder.pm
@@ -29,7 +38,6 @@ lib/CBOR/Free/X/NegativeIntTooLow.pm
 lib/CBOR/Free/X/Recursion.pm
 lib/CBOR/Free/X/Unrecognized.pm
 lib/CBOR/Free/X/WideCharacter.pm
-ppport.h
 t/32bit.t
 t/add_one.t
 t/against_cbor_xs.t

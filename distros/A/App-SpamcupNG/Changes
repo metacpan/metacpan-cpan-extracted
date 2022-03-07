@@ -1,10 +1,47 @@
 ==================================================
-Changes from 2021-02-24 00:00:00 +0000 to present.
+Changes from 2021-03-06 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.012 at 2022-02-24 17:59:37 +0000
+version 0.013 at 2022-03-06 15:17:23 +0000
 ------------------------------------------
+
+  Change: cf5dcef4e10605484f640ca245f7e997dd49462d
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-03-06 12:16:10 +0000
+
+    Merge pull request #7 from glasswalk3r/bugfix/spam_info
+
+    Bugfix/spam info 
+
+  Change: abc917d56ba7f463083efa6f1c0a54684aa3a409
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-03-06 12:15:10 +0000
+
+    chore: version bump 
+
+  Change: 0ad2ef05fae18bfdfb63065616a6cb89921c149d
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-03-05 00:37:03 +0000
+
+    refactor: getting fields as "private" 
+
+  Change: 3f6bbd2ca810182215c1c48bbf28944364ef5cbb
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-03-05 00:32:18 +0000
+
+    fix: zero is an expected age
+
+    Also validating the expected number of members/attributes the Summary
+    class is expected to have. 
+
+  Change: 0766d9794aef2ebc50caf2005ab08cf6d3d1b508
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-03-05 00:31:42 +0000
+
+    fix: normalizing charset
+
+    Sometimes charset comes with double quotes, sometimes not. 
 
   Change: 085511fffe983fe0371f719a514db199fe14d9b4
   Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>

@@ -21,13 +21,13 @@ my $app = $t->app;
 
 note $app->home;
 
-# The gdpr_consent celina must have been already inserted by the migrations mechanism.
-# let's invoke the api endpoint which should give us $app->config->{gdpr_consent_url}
-my $json = $t->get_ok($app->url_for('/api/gdpr_consent'))->status_is(200)
+# The _gdpr_consent celina must have been already inserted by the migrations mechanism.
+# let's invoke the api endpoint which should give us $app->config->{consents}{gdpr_url}
+my $json = $t->get_ok($app->url_for('/api/consents'))->status_is(200)
   ->json_is('/ihost' => '127.0.0.1')->tx->res->json;
 
-# note explain $json;
-$t->get_ok($json->{url})->status_is(200)
-  ->text_like('section._gdpr_consent p:first-child' => qr/^Щом/);
+note explain $json;
+$t->get_ok($json->{gdpr_url})->status_is(200)
+  ->text_like('section._consents p:first-child' => qr/^Щом/);
 
 done_testing;

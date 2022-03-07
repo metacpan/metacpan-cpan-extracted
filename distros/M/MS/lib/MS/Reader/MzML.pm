@@ -81,7 +81,12 @@ sub _load_new {
 
     $self->SUPER::_load_new();
 
-    if (defined $self->{indexedmzML}->{fileChecksum}) {
+    if (
+           defined $self->{indexedmzML}->{fileChecksum}
+        && defined $self->{indexedmzML}->{fileChecksum}->{pcdata}
+        && length $self->{indexedmzML}->{fileChecksum}->{pcdata}
+        && $self->{indexedmzML}->{fileChecksum}->{pcdata} ne '0'
+    ) {
 
         # compare supplied and calculated SHA1 sums to validate
         my $sha1_given = $self->{indexedmzML}->{fileChecksum}->{pcdata};

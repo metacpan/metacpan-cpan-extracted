@@ -8,9 +8,9 @@ use Module::Patch qw();
 use base qw(Module::Patch);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-01-21'; # DATE
+our $DATE = '2022-02-06'; # DATE
 our $DIST = 'Carp-Patch-Verbose'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 my $old_MaxArgLen;
 my $old_MaxArgNums;
@@ -49,7 +49,7 @@ Carp::Patch::Verbose - Set some Carp variables so stack trace is more verbose
 
 =head1 VERSION
 
-This document describes version 0.001 of Carp::Patch::Verbose (from Perl distribution Carp-Patch-Verbose), released on 2022-01-21.
+This document describes version 0.002 of Carp::Patch::Verbose (from Perl distribution Carp-Patch-Verbose), released on 2022-02-06.
 
 =head1 SYNOPSIS
 
@@ -58,10 +58,12 @@ This document describes version 0.001 of Carp::Patch::Verbose (from Perl distrib
 =head1 DESCRIPTION
 
 This is not so much a "patch" for L<Carp>, but just a convenient way to set some
-Carp package variables from the command-line. Currently can set these variables:
+Carp package variables from the command-line. Currently these variables are set:
 
  $Carp::MaxArgLen  # from the default 64 to 0 (print all)
  $Carp::MaxArgNums # from the default  8 to 0 (print all)
+
+This setting makes full dumps of arguments instead of just partial ones.
 
 =head1 PATCH CONTENTS
 

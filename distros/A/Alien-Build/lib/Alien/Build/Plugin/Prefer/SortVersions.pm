@@ -6,7 +6,7 @@ use 5.008004;
 use Alien::Build::Plugin;
 
 # ABSTRACT: Plugin to sort candidates by most recent first
-our $VERSION = '2.46'; # VERSION
+our $VERSION = '2.47'; # VERSION
 
 
 has 'filter'   => undef;
@@ -57,7 +57,7 @@ Alien::Build::Plugin::Prefer::SortVersions - Plugin to sort candidates by most r
 
 =head1 VERSION
 
-version 2.46
+version 2.47
 
 =head1 SYNOPSIS
 

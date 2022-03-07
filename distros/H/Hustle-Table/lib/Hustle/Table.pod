@@ -46,6 +46,7 @@ Hustle::Table - Pattern dispatch to code with optional optimisation
   #5. Offline optimisation is also possible
   
 
+
 =head1 DESCRIPTION
 
 This module provides a small class to constructs a dispatch table and builds a
@@ -60,13 +61,6 @@ Notable features include:
  
 =over 
 
-=item *
-
-Non exact (regexp) and exact (string) matching in the same table
-
-=item *
-
-Uses built-in Perl features  (regex, given/when, smart-match)
 
 =item *
 
@@ -74,7 +68,8 @@ Captures in regex are available in dispatched subs
 
 =item *
 
-Arguments supplied to dispatcher (except first) are available to executed vector sub
+Arguments supplied to dispatcher (except first) are available to executed
+vector sub
 
 =item *
 
@@ -98,12 +93,34 @@ Conceptually the list is looped over, applying the matchers sequentially to the
 input until a match is found. In practice it isn't a loop, but generated code
 reference with potentially optimised ordering of the entries.
 
-In the case of no successful match, a default catch all dispatch vector is called.
+In the case of no successful match, a default catch all dispatch vector is
+called.
  
 Matching performance is optionally boosted by using a hash as a cache. Hash
 lookup is much quicker than repeated conditional testing. Controlling which
 inputs are removed from the cached is dictated by the return value of the
 dispatch vector/sub
+
+=head1 VERSION DIFFERENCES
+
+B<Version 0.4.0 and later>
+C<given>/C<when> and thus the use of smart matching is removed. This gives a
+nice performance improvement of up to 20% over previous versions, however does
+mean the features of smart matching (i.e.  allowing string equality test ) is
+no longer supported. To match an exact string you will need to make a regex
+matcher like C<^exact$>.
+
+B<Version 0.3.0 and later>
+The input string (the first arg to the dispatcher) is removed and replaced with
+the matching table entry when calling a dispatched sub. In Previous versions,
+all arguments would be passed to the dispatched sub unchanged.
+
+If you need the input string that was being tested, pass it a second time to the dispatcher:
+
+		#From v0.3.0 Onwards
+			$dispatcher->($input, $input, $another, $arg. ..._)
+
+
 
 =head1 CREATING A TABLE
 
@@ -141,7 +158,8 @@ this module is on strings and regular expressions
  "match exaclty this stirng"
  qr|match and capture (this|that)|
 
-When C<matcher> is a regex, any capturing is accessible in the target C<sub> via the dynamically scoped numbered capture group variables (i.e. C<$1> et al.)
+When C<matcher> is a regex, any capturing is accessible in the target C<sub>
+via the dynamically scoped numbered capture group variables (i.e. C<$1> et al.)
 
 =item sub
 
@@ -162,14 +180,14 @@ useful for saving/loading from configuration files etc.
 
 =item count
 
-C<count> This is a dual purpose attributes. When adding entries to the list,
-it is used as a priority. Higher numeric values are a higher priority. The list
-is sorted in descending order of priority, meaning the highest priority is the
+C<count> This is a dual purpose attributes. When adding entries to the list, it
+is used as a priority. Higher numeric values are a higher priority. The list is
+sorted in descending order of priority, meaning the highest priority is the
 first element in the list.
 
 During running of the dispatch, this is a tally recording how many times,the
-entry has been matched. This information can be then used as a priority
-later to reorder the list.
+entry has been matched. This information can be then used as a priority later
+to reorder the list.
 
 =item ctx
 
@@ -289,11 +307,13 @@ The hash ref to use as the dispatchers cache
 
 =item reorder
 
-Flag indicating the table should be reordered/optimised before building the dispatcher.
+Flag indicating the table should be reordered/optimised before building the
+dispatcher.
 
 =item reset
 
-Flag specifying if counter statistics should be reset before building a dispatcher
+Flag specifying if counter statistics should be reset before building a
+dispatcher
 
 =back
 
@@ -344,10 +364,8 @@ On the other hand when the distributing becomes 'centred', the reordering of
 the table can greatly improve the search time.
 
 On my laptop, the simple benchmark script, (with 6 dispatch entries) (regex and
-string) shows around 1.2M dispatches/s for non cached and over 2M dispatches/s
+string) shows around 1.4M dispatches/s for non cached and over 2M dispatches/s
 for cached dispatcher. Your results may vary.
-
-
 
 
 =head1 COMPARISON TO OTHER MODULES

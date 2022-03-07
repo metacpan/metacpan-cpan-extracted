@@ -69,6 +69,6 @@
          "web" : "https://github.com/renderorange/Git-Lint"
       }
    },
-   "version" : "0.012",
+   "version" : "0.014",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

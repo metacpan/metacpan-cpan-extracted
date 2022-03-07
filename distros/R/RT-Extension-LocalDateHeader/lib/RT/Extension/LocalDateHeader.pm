@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package RT::Extension::LocalDateHeader;
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 =head1 NAME
 
@@ -23,7 +23,7 @@ syntax of mail Date: headers.
 
 =head1 RT VERSION
 
-Compatible with RT 4.0 and 4.2.
+Compatible with RT 4 and 5.0.
 
 =head1 INSTALLATION
 
@@ -37,7 +37,7 @@ Compatible with RT 4.0 and 4.2.
 
 May need root permissions
 
-=item Edit your F</opt/rt4/etc/RT_SiteConfig.pm>
+=item Edit your F</opt/rt5/etc/RT_SiteConfig.pm>
 
 If you are using RT 4.2 or greater, add this line:
 
@@ -51,7 +51,7 @@ or add C<RT::Extension::LocalDateHeader> to your existing C<@Plugins> line.
 
 =item Clear your mason cache
 
-    rm -rf /opt/rt4/var/mason_data/obj
+    rm -rf /opt/rt5/var/mason_data/obj
 
 =item Restart your webserver
 
@@ -73,7 +73,7 @@ or via the web at
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2014 by Best Practical Solutions
+This software is Copyright (c) 2014-2022 by Best Practical Solutions
 
 This is free software, licensed under:
 

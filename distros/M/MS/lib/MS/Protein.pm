@@ -130,6 +130,7 @@ sub digest {
     my $enzymes = $args{enzymes} // croak "enzyme must be specified";
     my $missed  = $args{missed}  // 0;
     my $min_len = $args{min_len} // 1;
+    my $nme     = $args{nme}     // 0;
 
     my @re = map {regex_for($_)} @$enzymes;
     croak "one or more enzyme CVs are not valid" if (any {! defined $_} @re);
@@ -145,6 +146,9 @@ sub digest {
     my $seq_len = length $seq;
     push @cut_sites, $seq_len;
     @cut_sites = sort {$a <=> $b} uniq @cut_sites;
+   
+    # need to know later, only calculate once
+    my $starts_M = substr($seq, 0, 1) eq 'M';
 
     my @peptides;
     for my $i (0..$#cut_sites) {
@@ -152,21 +156,32 @@ sub digest {
         for my $a (1..$missed+1) {
             $a = $i + $a;
             last A if ($a > $#cut_sites);
-            my $str = substr $seq, $cut_sites[$i],
-                $cut_sites[$a]-$cut_sites[$i];
-            next if (length($str) < $min_len);
-            if ($as_method) {
-
-                push @peptides, $arg1->range(
-                    $cut_sites[$i]+1,
-                    $cut_sites[$a],
-                );
-                
+            my @cuts = ($cut_sites[$i]);
+            # If N-terminal methionine excision is requested,
+            # add an extra first peptide if we're at the first cut site
+            # and the peptide starts with M
+            if ($nme && $starts_M && $i == 0) {
+                push @cuts, $cut_sites[$i] + 1;
             }
-            else {
+            for my $start (@cuts) {
 
-                #return simple strings
-                push @peptides, $str;
+                my $str = substr $seq, $start,
+                    $cut_sites[$a]-$start;
+                next if (length($str) < $min_len);
+                if ($as_method) {
+
+                    push @peptides, $arg1->range(
+                        $start+1,
+                        $cut_sites[$a],
+                    );
+                    
+                }
+                else {
+
+                    #return simple strings
+                    push @peptides, $str;
+
+                }
 
             }
         }
@@ -408,8 +423,9 @@ Methods specific to L<MS::Protein> are:
         enzymes => [
            MS_TRYPSIN,
         ],
-        missed => 1,
+        missed  => 1,
         min_len => 6,
+        nme     => 1,
     );
 
 Performs an I<in silico>  hydrolytic cleavage on a protein sequence based on
@@ -427,7 +443,10 @@ enzymes. See details below on finding valid IDs to use. Required.
 peptides satisfying this criterion will be reported. Default: 0.
 
 =item * C<min_len> — the minimum length of peptide to be returned. Default: 1.
-be left undefined if not known.
+
+=item * C<nme> — if true, and the protein sequence starts with Met, an
+additional version of each N-terminal peptide will be included lacking the
+terminal Met. Default: 0.
 
 =back
 

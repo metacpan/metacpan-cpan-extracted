@@ -79,7 +79,7 @@ package Google::RestApi::SheetsApi4::Range;
 # too complex, and the simple workaround is to just A1:B2.
 # [A1, B2]
 
-our $VERSION = '1.0.0';
+our $VERSION = '1.0.1';
 
 use Google::RestApi::Setup;
 
@@ -102,6 +102,8 @@ Readonly::Scalar our $RANGE_EXPANDED => 1;
 
 # this routine returns the best fitting object for the range specified.
 # A5:A10 will return a Col object. A5:J5 will return a Row object. Etc.
+# this grew organically into something more complicated that it was worth,
+# but i got it working reliably so, whatever...
 sub factory {
   my %original_range_args = @_;
   my $original_range = $original_range_args{range};

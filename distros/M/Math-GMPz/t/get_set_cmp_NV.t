@@ -97,14 +97,15 @@ for(1 .. 5000) {
 
   Rmpz_set_NV($z, $n);
 
-  if($use_mpfr) {
+  # Rmpfr_set_NV() not implemented until version 3.22.
+  if($use_mpfr && $Math::MPFR::VERSION >= 3.22) {
+
     # With Math-MPFR-4.17 and earlier, Rmpfr_set_NV() croaks
     # unless the NOK flag of $n is set.
     # In some instances here, $n's IOK flag  could be set,
     # and the NOK flag unset.
     # We skip further testing of this $n if those 2 conditions
     # are met :
-
     next if($Math::MPFR::VERSION < 4.18 && Math::MPFR::_itsa($n) != 3);
 
     Rmpfr_set_NV($mpfr_obj, $n, 0);

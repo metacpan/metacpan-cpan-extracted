@@ -6,6 +6,7 @@ MANIFEST.SKIP
 README
 t/00-load.t
 t/05-base.t
+t/06-destroy.t
 t/10-shared.t
 t/11-dup_shm_key.t
 t/12-ipc_shareable.t
@@ -21,6 +22,10 @@ t/45-params.t
 t/50-info_events.t
 t/55-shared_event_state.t
 t/60-error_handling.t
+t/65-protected_option_for_events_hash_default.t
+t/66-protected_option_for_events_hash_mock.t
+t/67-protected_option_for_events_hash_cleanup.t
+t/99-end.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

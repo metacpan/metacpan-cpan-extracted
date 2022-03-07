@@ -23,9 +23,8 @@ Solution
 8 1 4  6 2 7  9 5 3
 3 9 2  8 4 5  6 7 1
 ==
-Args
-use Regexp::Sudoku::Constants qw [:Diagonals];
-{diagonals => $DOUBLE}
+Create
+Regexp::Sudoku:: -> new -> init -> set_diagonal_double
 ==
 Name: Double Diagonal Sudoku (Fun With Sudoku #184)
 URL: https://www.funwithpuzzles.com/2016/03/double-diagonal-sudoku.html

@@ -28,6 +28,7 @@ do { my $x = {
                                       'LWP::UserAgent' => '6.60',
                                       'Log::Log4perl' => '1.54',
                                       'Mozilla::PublicSuffix' => 'v1.0.6',
+                                      'Set::Tiny' => '0.04',
                                       'YAML::XS' => '0.62',
                                       'perl' => '5.014004'
                                     }

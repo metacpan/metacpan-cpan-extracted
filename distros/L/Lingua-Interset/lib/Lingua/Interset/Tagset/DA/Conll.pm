@@ -4,7 +4,7 @@
 package Lingua::Interset::Tagset::DA::Conll;
 use strict;
 use warnings;
-our $VERSION = '3.014';
+our $VERSION = '3.015';
 
 use utf8;
 use open ':utf8';
@@ -632,7 +632,7 @@ Lingua::Interset::Tagset::DA::Conll - Driver for the Danish tagset of the CoNLL 
 
 =head1 VERSION
 
-version 3.014
+version 3.015
 
 =head1 SYNOPSIS
 

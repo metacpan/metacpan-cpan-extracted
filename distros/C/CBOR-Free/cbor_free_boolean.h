@@ -1,11 +1,7 @@
-#define PERL_NO_GET_CONTEXT
-
 #ifndef CBOR_FREE_BOOLEAN
 #define CBOR_FREE_BOOLEAN
 
-#include "EXTERN.h"
-#include "perl.h"
-#include "XSUB.h"
+#include "easyxs/init.h"
 
 #define LOAD_BOOLEAN_CLASS   "Types::Serialiser"
 #define BOOLEAN_CLASS   "Types::Serialiser::Boolean"

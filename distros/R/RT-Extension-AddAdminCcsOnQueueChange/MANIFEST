@@ -1,3 +1,4 @@
+Changes
 etc/initialdata
 inc/Module/Install.pm
 inc/Module/Install/Base.pm
@@ -11,7 +12,6 @@ inc/Module/Install/RTx.pm
 inc/Module/Install/RTx/Runtime.pm
 inc/Module/Install/Win32.pm
 inc/Module/Install/WriteAll.pm
-inc/unicore/Name.pm
 inc/YAML/Tiny.pm
 lib/RT/Action/AddQueueAdminCcs.pm
 lib/RT/Extension/AddAdminCcsOnQueueChange.pm
@@ -20,4 +20,3 @@ MANIFEST			This list of files
 META.yml
 README
 xt/01-require.t
-SIGNATURE                                Public-key signature (added by MakeMaker)

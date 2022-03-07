@@ -73,19 +73,6 @@ SKIP:
             ;
         }
 
-        do
-        {
-            my $buffer  = '';
-            open my $fh, '>', \$buffer;
-
-            local *STDERR = $fh;
-
-            $qmgr->DESTROY;
-
-            like $buffer, qr{^ Incomplete \s jobs: \n }x,
-            'Found incomplete jobs.';
-        };
-
         1
     }
     or

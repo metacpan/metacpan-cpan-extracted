@@ -4,13 +4,13 @@
       "Felipe Gasper (FELIPE)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "CBOR-Free",
    "no_index" : {
@@ -38,7 +38,7 @@
             "X::Tiny" : "0",
             "XSLoader" : "0.24",
             "parent" : "0",
-            "perl" : "5.01"
+            "perl" : "5.010"
          }
       },
       "test" : {
@@ -51,6 +51,7 @@
             "Test::Exception" : "0",
             "Test::FailWarnings" : "0",
             "Test::More" : "1.302133",
+            "Test::Pod" : "1",
             "autodie" : "0"
          }
       }
@@ -66,6 +67,6 @@
          "web" : "https://github.com/FGasper/p5-CBOR-Free"
       }
    },
-   "version" : "0.31",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "0.32",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

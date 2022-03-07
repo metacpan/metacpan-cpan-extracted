@@ -4,7 +4,7 @@ Text::Minify::XS - remove indentation and trailing whitespace
 
 # VERSION
 
-version v0.6.0
+version v0.6.1
 
 # SYNOPSIS
 
@@ -76,28 +76,28 @@ whitespace/comment-removal modules on CPAN.  Some of them are:
 
 ## CSS
 
-- [CSS::Minifier](https://metacpan.org/pod/CSS::Minifier)
-- [CSS::Minifier::XS](https://metacpan.org/pod/CSS::Minifier::XS)
-- [CSS::Packer](https://metacpan.org/pod/CSS::Packer)
+- [CSS::Minifier](https://metacpan.org/pod/CSS%3A%3AMinifier)
+- [CSS::Minifier::XS](https://metacpan.org/pod/CSS%3A%3AMinifier%3A%3AXS)
+- [CSS::Packer](https://metacpan.org/pod/CSS%3A%3APacker)
 
 ## HTML
 
-- [HTML::Packer](https://metacpan.org/pod/HTML::Packer)
+- [HTML::Packer](https://metacpan.org/pod/HTML%3A%3APacker)
 
 ## JavaScript
 
-- [JavaScript::Minifier](https://metacpan.org/pod/JavaScript::Minifier)
-- [JavaScript::Minifier::XS](https://metacpan.org/pod/JavaScript::Minifier::XS)
-- [JavaScript::Packer](https://metacpan.org/pod/JavaScript::Packer)
+- [JavaScript::Minifier](https://metacpan.org/pod/JavaScript%3A%3AMinifier)
+- [JavaScript::Minifier::XS](https://metacpan.org/pod/JavaScript%3A%3AMinifier%3A%3AXS)
+- [JavaScript::Packer](https://metacpan.org/pod/JavaScript%3A%3APacker)
 
 ## Plain Text
 
-- [String::Strip](https://metacpan.org/pod/String::Strip)
-- [String::Trim](https://metacpan.org/pod/String::Trim)
+- [String::Strip](https://metacpan.org/pod/String%3A%3AStrip)
+- [String::Trim](https://metacpan.org/pod/String%3A%3ATrim)
 - String::Trim::Regex
-- [String::Trim::NonRegex](https://metacpan.org/pod/String::Trim::NonRegex)
-- [String::Util](https://metacpan.org/pod/String::Util)
-- [Text::Trim](https://metacpan.org/pod/Text::Trim)
+- [String::Trim::NonRegex](https://metacpan.org/pod/String%3A%3ATrim%3A%3ANonRegex)
+- [String::Util](https://metacpan.org/pod/String%3A%3AUtil)
+- [Text::Trim](https://metacpan.org/pod/Text%3A%3ATrim)
 
 This list does not include specialised template filters or plugins to
 web frameworks.

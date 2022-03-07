@@ -9,7 +9,7 @@ use File::Temp ();
 use Capture::Tiny qw( capture_merged capture );
 
 # ABSTRACT: Probe for system libraries by guessing with ExtUtils::CBuilder
-our $VERSION = '2.46'; # VERSION
+our $VERSION = '2.47'; # VERSION
 
 
 has options => sub { {} };
@@ -96,7 +96,7 @@ sub init
       {
         $build->log("compile failed: $error");
         $build->log("compile failed: $out1");
-        die $@;
+        die $error;
       }
 
       my($out2, $exe) = capture_merged { eval {
@@ -110,7 +110,7 @@ sub init
       {
         $build->log("link failed: $error");
         $build->log("link failed: $out2");
-        die $@;
+        die $error;
       }
 
       my($out, $err, $ret) = capture { system($^O eq 'MSWin32' ? $exe : "./$exe") };
@@ -167,7 +167,7 @@ Alien::Build::Plugin::Probe::CBuilder - Probe for system libraries by guessing w
 
 =head1 VERSION
 
-version 2.46
+version 2.47
 
 =head1 SYNOPSIS
 

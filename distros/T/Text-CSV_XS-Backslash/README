@@ -1,0 +1,76 @@
+NAME
+    Text::CSV_XS::Backslash - Set Text::CSV_XS default options to use
+    backslash as escape character
+
+VERSION
+    This document describes version 0.001 of Text::CSV_XS::Backslash (from
+    Perl distribution Text-CSV_XS-Backslash), released on 2022-02-18.
+
+SYNOPSIS
+    Use like you would use Text::CSV_XS with the object interface:
+
+     use Text::CSV_XS::TSV;
+     my $csv = Text::CSV_XS::TSV->new({binary=>1});
+     # ...
+
+DESCRIPTION
+    This class is a simple subclass of Text::CSV_XS to set the default of
+    these options (if unspecified):
+
+    *   sep_char
+
+        To ',' (comma), which is already the default of Text::CSV_XS.
+
+    *   quote_char
+
+        To '"' (double-quote), which is already the default of Text::CSV_XS.
+
+    *   escape_char
+
+        To "\\" (backslash). Text::CSV_XS's default is double-doublequote
+        ('""').
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Text-CSV_XS-Backslash>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Text-CSV_XS-Backslash>.
+
+SEE ALSO
+    Text::CSV_XS
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
+    steps required beyond that are considered a bug and can be reported to
+    me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2022 by perlancar <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Text-CSV_XS-Backslash
+    >
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+

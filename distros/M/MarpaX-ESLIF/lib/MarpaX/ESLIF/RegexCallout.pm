@@ -7,7 +7,7 @@ package MarpaX::ESLIF::RegexCallout;
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
-our $VERSION = '6.0.14'; # VERSION
+our $VERSION = '6.0.15'; # VERSION
 
 
 use constant PCRE2_ERROR_NOMATCH => -1;
@@ -213,44 +213,44 @@ use constant PCRE2_ERROR_INTERNAL_DUPMATCH => -65;
 #
 
 
-sub getCalloutNumber { return shift->{callout_number} }
+sub getCalloutNumber { return $_[0]->{callout_number} }
 
 
 
-sub getCalloutString { return shift->{callout_string} }
+sub getCalloutString { return $_[0]->{callout_string} }
 
 
-sub getSubject { return shift->{subject} }
+sub getSubject { return $_[0]->{subject} }
 
 
-sub getPattern { return shift->{pattern} }
+sub getPattern { return $_[0]->{pattern} }
 
 
-sub getCaptureTop { return shift->{capture_top} }
+sub getCaptureTop { return $_[0]->{capture_top} }
 
 
-sub getCaptureLast { return shift->{capture_last} }
+sub getCaptureLast { return $_[0]->{capture_last} }
 
 
-sub getOffsetVector { return shift->{offset_vector} }
+sub getOffsetVector { return $_[0]->{offset_vector} }
 
 
-sub getMark { return shift->{mark} }
+sub getMark { return $_[0]->{mark} }
 
 
-sub getStartMatch { return shift->{start_match} }
+sub getStartMatch { return $_[0]->{start_match} }
 
 
-sub getCurrentPosition { return shift->{current_position} }
+sub getCurrentPosition { return $_[0]->{current_position} }
 
 
-sub getNextItem { return shift->{next_item} }
+sub getNextItem { return $_[0]->{next_item} }
 
 
-sub getGrammarLevel { return shift->{grammar_level} }
+sub getGrammarLevel { return $_[0]->{grammar_level} }
 
 
-sub getSymbolId { return shift->{symbol_id} }
+sub getSymbolId { return $_[0]->{symbol_id} }
 
 
 1;
@@ -267,7 +267,7 @@ MarpaX::ESLIF::RegexCallout - ESLIF Regex Callout
 
 =head1 VERSION
 
-version 6.0.14
+version 6.0.15
 
 =head1 SYNOPSIS
 

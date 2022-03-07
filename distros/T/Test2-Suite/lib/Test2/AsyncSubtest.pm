@@ -4,7 +4,7 @@ use warnings;
 
 use Test2::IPC;
 
-our $VERSION = '0.000144';
+our $VERSION = '0.000145';
 
 our @CARP_NOT = qw/Test2::Util::HashBase/;
 
@@ -265,7 +265,7 @@ sub start {
     croak "Subtest is already complete"
         if $self->{+FINISHED};
 
-    $self->{+START_STAMP} = time unless defined $self->{+START_STAMP};
+    $self->{+START_STAMP} = Time::HiRes::time() unless defined $self->{+START_STAMP};
 
     $self->{+ACTIVE}++;
 
@@ -286,7 +286,7 @@ sub stop {
     croak "AsyncSubtest stack mismatch"
         unless @STACK && $self == $STACK[-1];
 
-    $self->{+STOP_STAMP} = time;
+    $self->{+STOP_STAMP} = Time::HiRes::time();
 
     pop @STACK;
 
@@ -312,7 +312,7 @@ sub finish {
         if $self->{+ACTIVE};
 
     $self->wait;
-    $self->{+STOP_STAMP} = time unless defined $self->{+STOP_STAMP};
+    $self->{+STOP_STAMP} = Time::HiRes::time() unless defined $self->{+STOP_STAMP};
     my $stop_stamp = $self->{+STOP_STAMP};
 
     my $todo       = $params{todo};

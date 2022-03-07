@@ -1,4 +1,25 @@
-3.014
+3.015
+
+Features:
+* Added feature 'strength' because of UD corpora that use it (Romanian,
+  Gothic, Old Church Slavonic).
+* Feature 'variant': added values 'a', 'b', 'c' (abbreviations in PDT-C).
+
+Drivers:
+* CS::Pdtc
+* CS::Ridics
+* LT::Jablonskis
+* LT::Multext: Subjunctive mood changed to conditional, in order to make it
+  more parallel to other Lithuanian and Latvian corpora in UD.
+* Changed mapping of Lithuanian non-finite verb forms:
+  * dalyvis (participle) = verb, participle
+  * padalyvis (same subject converb) = verb, gerund
+  * pusdalyvis (different subject converb) = verb, converb
+  * būdinys (adverbial participle of manner) = adverb, converb
+
+
+
+3.014     2019-01-31 14:30:16+01:00 Europe/Prague
 
 Drivers:
 * LT::Multext: The sixth character of nouns is not adjform. It is probably

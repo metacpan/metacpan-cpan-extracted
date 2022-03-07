@@ -30,6 +30,6 @@ resources:
   bugtracker: https://github.com/dan-zeman/interset/issues
   homepage: http://ufal.mff.cuni.cz/interset
   repository: https://github.com/dan-zeman/interset
-version: '3.014'
+version: '3.015'
 x_generated_by_perl: v5.26.2
 x_serialization_backend: 'YAML::Tiny version 1.73'

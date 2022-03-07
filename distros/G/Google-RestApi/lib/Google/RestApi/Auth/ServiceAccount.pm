@@ -1,6 +1,6 @@
 package Google::RestApi::Auth::ServiceAccount;
 
-our $VERSION = '1.0.0';
+our $VERSION = '1.0.1';
 
 use Google::RestApi::Setup;
 
@@ -16,7 +16,7 @@ sub new {
   resolve_config_file_path(\%p, 'config_file');
   resolve_config_file_path(\%p, 'account_file');
   
-  my $self = config_file(%p);
+  my $self = merge_config_file(%p);
   state $check = compile_named(
     config_dir   => ReadableDir, { optional => 1 },
     config_file  => ReadableFile, { optional => 1 },

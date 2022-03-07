@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Zest::Author::TABULO::Util::ShareDir;
-our $VERSION = '1.000006';
+our $VERSION = '1.000011';
 
 use Path::Tiny;
 use File::ShareDir ();
@@ -28,6 +28,7 @@ sub dist_dir {
     my $pth = $INC{$inc} || '';          # e.g.: $BUILD(/blib)?/lib/Pod/Wordlist/Author/TABULO.pm'
     $pth =~ s/$inc$//;                   # e.g.: $BUILD(/blib)?/lib'
 
+    # Handle the case where t looks like we are in a build directory or a in a development repo
     for ( $pth || () ) {
 
         my $path = path($pth);                               # convert to Path::Tiny object
@@ -35,7 +36,14 @@ sub dist_dir {
         $path = $path->parent if $path->basename eq "blib";  # In case the module might have been loaded from blib/lib.
          # $path should now refer to $BUILD (or $REPO), hopefully.
         next unless $path;
-        next unless $path->child("lib")->is_dir;
+
+        # Does it look like we are in a development repo (rather than in an installed location) ?
+        my $in_repo;
+        foreach (qw/.gitignore Changes META.json Meta.yml README README.md dist.ini/) {
+            $path->child($_)->exists and do { $in_repo=1; last };
+        }
+        next unless $in_repo // 0;
+
         next unless ($path = $path->child("share"))->is_dir;
         return $path;
     }
@@ -61,7 +69,7 @@ Zest::Author::TABULO::Util::ShareDir - DZIL-related utility functions used by TA
 
 =head1 VERSION
 
-version 1.000006
+version 1.000011
 
 =for Pod::Coverage dist_file dist_dir
 
@@ -71,7 +79,7 @@ Tabulo[n] <dev@tabulo.net>
 
 =head1 LEGAL
 
-This software is copyright (c) 2021 by Tabulo[n].
+This software is copyright (c) 2022 by Tabulo[n].
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

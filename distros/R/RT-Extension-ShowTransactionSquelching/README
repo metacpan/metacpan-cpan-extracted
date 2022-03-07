@@ -9,7 +9,7 @@ DESCRIPTION
     extension adds that information.
 
 RT VERSION
-    Works with RT 4.2.
+    Works with RT 4.2 and greater versions.
 
 INSTALLATION
     perl Makefile.PL
@@ -17,13 +17,13 @@ INSTALLATION
     make install
         May need root permissions
 
-    Edit your /opt/rt4/etc/RT_SiteConfig.pm
+    Edit your /opt/rt5/etc/RT_SiteConfig.pm
         Add this line:
 
             Plugin('RT::Extension::ShowTransactionSquelching');
 
     Clear your mason cache
-            rm -rf /opt/rt4/var/mason_data/obj
+            rm -rf /opt/rt5/var/mason_data/obj
 
     Restart your webserver
 
@@ -40,7 +40,8 @@ BUGS
         L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-ShowTransactionSquelching>.
 
 LICENSE AND COPYRIGHT
-    This software is Copyright (c) 2014 by Best Practical Solutions, LLC
+    This software is Copyright (c) 2014-2022 by Best Practical Solutions,
+    LLC
 
     This is free software, licensed under:
 

@@ -22,7 +22,7 @@ my $tmpl8   = "$base0.XXXX";
 my $madness = 'Parallel::Queue';
 my $method  = 'runqueue';
 
-my $work_d  = dirname $0;
+my $work_d  = dirname dirname $0;
 my $temp_d  = "$work_d/tmp";
 
 my @argz =

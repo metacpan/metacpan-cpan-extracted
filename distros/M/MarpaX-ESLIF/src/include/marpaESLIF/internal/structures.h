@@ -176,6 +176,7 @@ struct marpaESLIF_regex {
   short                  calloutb;     /* Do this regex have any callout ? */
   pcre2_match_context   *match_contextp;    /* Match context */
   marpaESLIF_pcre2_callout_context_t callout_context; /* Callout match */
+  short                  characterClassb; /* Origin is a character class */
 };
 
 struct marpaESLIF_terminal {
@@ -192,6 +193,8 @@ struct marpaESLIF_terminal {
   size_t                         bytel;               /* i.e. when this is a string terminal without modifier */
   short                          pseudob;             /* Pseudo terminal */
   int                            eventSeti;           /* Remember eventSeti */
+  short                          byte2failureb;       /* True if the willfailb array is filled */
+  short                          willfailb[256];      /* For string and character class terminals, pre-computation of expected failure for the 256 ASCII bytes */
 };
 
 /* Matcher return values */

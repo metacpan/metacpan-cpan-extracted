@@ -13,7 +13,7 @@ use Getopt::EX::Colormap qw(colorize);
 # keymap
 ######################################################################
 
-push @EXPORT_OK, qw(&keymap);
+push @EXPORT_OK, qw(&get_keymap);
 
 my %cmap = (
     G => '555/#6aaa64',
@@ -22,7 +22,7 @@ my %cmap = (
     _ => '555/#787c7e',
     );
 
-sub keymap {
+sub get_keymap {
     my %keys = make_keymap(map lc, @_);
     my $keys = join '', map colorize($cmap{$keys{$_}//'_'}, $_), 'a'..'z';
     $keys;
@@ -44,7 +44,7 @@ sub make_keymap {
 # result
 ######################################################################
 
-push @EXPORT_OK, qw(&result);
+push @EXPORT_OK, qw(&get_result);
 
 my %square = (
     G => "\N{U+1F7E9}", # LARGE GREEN SQUARE
@@ -52,7 +52,7 @@ my %square = (
     K => "\N{U+2B1C}",  # WHITE LARGE SQUARE
     );
 
-sub result {
+sub get_result {
     my @result = make_result(map lc, @_);
     my $result = join "\n", map s/([GYK])/$square{$1}/ger, @result;
     $result;

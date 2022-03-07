@@ -1,3 +1,16 @@
+4.0.5
+
+ - Add PID to first line of progress messages in Queue & Manager.
+ - Push ./tmp dir for testing up from t to main dir.
+
+4.0.4 Sun Mar  6 12:37:11 AM EST 2022
+
+ - test cleanups.
+
+4.0.3 Wed Mar  2 11:34:30 AM EST 2022
+
+ - Add PID's to debug messages. q
+
 4.0.2 Tue Mar  1 10:29:41 AM EST 2022
 
  - Minor test cleanups.

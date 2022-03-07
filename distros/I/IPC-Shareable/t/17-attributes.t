@@ -5,6 +5,12 @@ use Data::Dumper;
 use IPC::Shareable;
 use Test::More;
 
+BEGIN {
+    if (! $ENV{CI_TESTING}) {
+        plan skip_all => "Not on a legit CI platform...";
+    }
+}
+
 my $k = tie my $sv, 'IPC::Shareable', 'testing', {create => 1, destroy => 1};
 
 my $attrs_tied = (tied $sv)->attributes;
@@ -20,12 +26,14 @@ my @attr_list = qw(
     key
     serializer
     size
+    protected
     limit
     magic
     mode
     create
     owner
     graceful
+    tidy
     destroy
 );
 
@@ -40,12 +48,14 @@ is $attrs->{exclusive}, 0, "exclusive is set ok";
 is $attrs->{key},       'testing', "key is set ok";
 is $attrs->{serializer},'storable', "serializer is set ok";
 is $attrs->{size},      65536, "size is set ok";
+is $attrs->{protected}, 0, "protected is set ok";
 is $attrs->{limit},     1, "limit is set ok";
 is $attrs->{magic},     0, "magic is set ok";
 is $attrs->{mode},      438, "mode is set ok";
 is $attrs->{create},    1, "create is set ok";
 is $attrs->{owner},     $$, "owner is set ok";
 is $attrs->{graceful},  0, "graceful is set ok";
+is $attrs->{tidy},      0, "tidy is set ok";
 is $attrs->{destroy},   1, "destroy is set ok";
 
 is $k->attributes('no_exist'), undef, "attributes() on an undefined attr is undef";

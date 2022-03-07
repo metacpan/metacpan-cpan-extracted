@@ -2,7 +2,7 @@ package Sodium::FFI;
 use strict;
 use warnings;
 
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 
 use Carp qw(croak);
 use Exporter qw(import);
@@ -17,11 +17,12 @@ our @EXPORT_OK = qw(
     randombytes_random randombytes_uniform
     sodium_version_string sodium_library_version_minor sodium_base64_encoded_len
     crypto_aead_aes256gcm_keygen crypto_aead_chacha20poly1305_keygen
-    crypto_aead_chacha20poly1305_ietf_keygen
+    crypto_aead_chacha20poly1305_ietf_keygen crypto_auth_keygen
 );
 
 # add the various C Constants
 push @EXPORT_OK, qw(
+    crypto_auth_BYTES crypto_auth_KEYBYTES
     SODIUM_VERSION_STRING SIZE_MAX randombytes_SEEDBYTES SODIUM_LIBRARY_MINIMAL
     SODIUM_LIBRARY_VERSION_MAJOR SODIUM_LIBRARY_VERSION_MINOR
     sodium_base64_VARIANT_ORIGINAL sodium_base64_VARIANT_ORIGINAL_NO_PADDING
@@ -32,6 +33,7 @@ push @EXPORT_OK, qw(
     crypto_aead_chacha20poly1305_ABYTES
     crypto_aead_chacha20poly1305_IETF_KEYBYTES crypto_aead_chacha20poly1305_IETF_NPUBBYTES
     crypto_aead_chacha20poly1305_IETF_ABYTES
+    crypto_sign_SEEDBYTES crypto_sign_BYTES crypto_sign_SECRETKEYBYTES crypto_sign_PUBLICKEYBYTES
 );
 
 our $ffi;
@@ -62,7 +64,59 @@ sub crypto_aead_chacha20poly1305_keygen {
     return Sodium::FFI::randombytes_buf($len);
 }
 
+sub crypto_auth_keygen {
+    my $len = Sodium::FFI::crypto_auth_KEYBYTES;
+    return Sodium::FFI::randombytes_buf($len);
+}
+
 our %function = (
+    # int
+    # crypto_auth(unsigned char *out, const unsigned char *in,
+    #     unsigned long long inlen, const unsigned char *k);
+    'crypto_auth' => [
+        ['string', 'string', 'size_t', 'string'] => 'int',
+        sub {
+            my ($xsub, $msg, $key) = @_;
+            my $msg_len = length($msg);
+            my $key_len = length($key);
+
+            unless($key_len == Sodium::FFI::crypto_auth_KEYBYTES) {
+                croak("Secret key length should be crypto_auth_KEYBYTES bytes");
+            }
+
+            my $mac = "\0" x Sodium::FFI::crypto_auth_BYTES;
+            my $real_len = 0;
+            my $ret = $xsub->($mac, $msg, $msg_len, $key);
+            croak("Internal error") unless $ret == 0;
+            return $mac;
+        }
+    ],
+
+    # int
+    # crypto_auth_verify(const unsigned char *h, const unsigned char *in,
+    #     unsigned long long inlen, const unsigned char *k);
+    'crypto_auth_verify' => [
+        ['string', 'string', 'size_t', 'string'] => 'int',
+        sub {
+            my ($xsub, $mac, $msg, $key) = @_;
+            my $mac_len = length($mac);
+            my $msg_len = length($msg);
+            my $key_len = length($key);
+            my $SIZE_MAX = Sodium::FFI::SIZE_MAX;
+
+            unless ($key_len == Sodium::FFI::crypto_auth_KEYBYTES) {
+                croak("Secret key length should be crypto_auth_KEYBYTES bytes");
+            }
+            unless ($mac_len == Sodium::FFI::crypto_auth_BYTES) {
+                croak("authentication tag length should be crypto_auth_BYTES bytes");
+            }
+
+            my $ret = $xsub->($mac, $msg, $msg_len, $key);
+            return 1 if $ret == 0;
+            return 0;
+        }
+    ],
+
     # int
     # crypto_aead_chacha20poly1305_ietf_decrypt(unsigned char *m,
     #     unsigned long long *mlen_p,
@@ -343,6 +397,155 @@ our %function = (
             if (Sodium::FFI::HAVE_AESGCM) {
                 return $xsub->();
             }
+            return 0;
+        }
+    ],
+
+    # int
+    # crypto_sign_keypair(unsigned char *pk, unsigned char *sk);
+    'crypto_sign_keypair' => [
+        ['string', 'string'] => 'int',
+        sub {
+            my ($xsub) = @_;
+            my $pubkey = "\0" x Sodium::FFI::crypto_sign_PUBLICKEYBYTES;
+            my $seckey = "\0" x Sodium::FFI::crypto_sign_SECRETKEYBYTES;
+            my $ret = $xsub->($pubkey, $seckey);
+            if ($ret != 0) {
+                croak("Some internal error happened");
+            }
+            return ($pubkey, $seckey);
+        }
+    ],
+
+    # int
+    # crypto_sign_seed_keypair(unsigned char *pk, unsigned char *sk, const unsigned char *seed);
+    'crypto_sign_seed_keypair' => [
+        ['string', 'string', 'string'] => 'int',
+        sub {
+            my ($xsub, $seed) = @_;
+            my $seed_len = length($seed);
+            unless ($seed_len == Sodium::FFI::crypto_sign_SEEDBYTES) {
+                croak("Seed length must be crypto_sign_SEEDBYTES in length");
+            }
+            my $pubkey = "\0" x Sodium::FFI::crypto_sign_PUBLICKEYBYTES;
+            my $seckey = "\0" x Sodium::FFI::crypto_sign_SECRETKEYBYTES;
+            my $ret = $xsub->($pubkey, $seckey, $seed);
+            if ($ret != 0) {
+                croak("Some internal error happened");
+            }
+            return ($pubkey, $seckey);
+        }
+    ],
+
+    # int
+    # crypto_sign(unsigned char *sm, unsigned long long *smlen_p,
+    #     const unsigned char *m, unsigned long long mlen,
+    #     const unsigned char *sk);
+    'crypto_sign' => [
+        ['string', 'size_t*', 'string', 'size_t', 'string'] => 'int',
+        sub {
+            my ($xsub, $msg, $key) = @_;
+            my $SIZE_MAX = Sodium::FFI::SIZE_MAX;
+            my $msg_len = length($msg);
+            my $key_len = length($key);
+            unless ($key_len == Sodium::FFI::crypto_sign_SECRETKEYBYTES) {
+                croak("Secret Key length must be crypto_sign_SECRETKEYBYTES in length");
+            }
+            if ($SIZE_MAX - $msg_len <= Sodium::FFI::crypto_sign_BYTES) {
+                croak("Arithmetic overflow");
+            }
+            my $real_len = 0;
+            my $signed_len = $msg_len + Sodium::FFI::crypto_sign_BYTES;
+            my $signed = "\0" x $signed_len;
+            my $ret = $xsub->($signed, \$real_len, $msg, $msg_len, $key);
+            if ($ret != 0) {
+                croak("Some internal error happened");
+            }
+            if ($real_len >= $SIZE_MAX || $real_len > $signed_len) {
+                croak("Arithmetic overflow");
+            }
+            return substr($signed, 0, $real_len);
+        }
+    ],
+
+    # int
+    # crypto_sign_detached(unsigned char *sig, unsigned long long *siglen_p,
+    #     const unsigned char *m, unsigned long long mlen,
+    #     const unsigned char *sk);
+    'crypto_sign_detached' => [
+        ['string', 'size_t*', 'string', 'size_t', 'string'] => 'int',
+        sub {
+            my ($xsub, $msg, $key) = @_;
+            my $SIZE_MAX = Sodium::FFI::SIZE_MAX;
+            my $msg_len = length($msg);
+            my $key_len = length($key);
+            unless ($key_len == Sodium::FFI::crypto_sign_SECRETKEYBYTES) {
+                croak("Secret Key length must be crypto_sign_SECRETKEYBYTES in length");
+            }
+            my $signature = "\0" x Sodium::FFI::crypto_sign_BYTES;
+            my $real_len = 0;
+            my $ret = $xsub->($signature, \$real_len, $msg, $msg_len, $key);
+            if ($ret != 0) {
+                croak("Signature creation failed.");
+            }
+            if ($real_len <= 0 || $real_len > Sodium::FFI::crypto_sign_BYTES) {
+                croak("Signature size isn't correct.");
+            }
+            return substr($signature, 0, $real_len);
+        }
+    ],
+
+    # int
+    # crypto_sign_open(unsigned char *m, unsigned long long *mlen_p,
+    #     const unsigned char *sm, unsigned long long smlen,
+    #     const unsigned char *pk);
+    'crypto_sign_open' => [
+        ['string', 'size_t*', 'string', 'size_t', 'string'] => 'int',
+        sub {
+            my ($xsub, $msg, $key) = @_;
+            my $SIZE_MAX = Sodium::FFI::SIZE_MAX;
+            my $msg_len = length($msg);
+            my $key_len = length($key);
+            unless ($key_len == Sodium::FFI::crypto_sign_PUBLICKEYBYTES) {
+                croak("Public Key length must be crypto_sign_PUBLICKEYBYTES in length");
+            }
+            if ($SIZE_MAX - $msg_len <= Sodium::FFI::crypto_sign_BYTES) {
+                croak("Arithmetic overflow");
+            }
+            my $real_len = 0;
+            my $open = "\0" x $msg_len;
+            my $ret = $xsub->($open, \$real_len, $msg, $msg_len, $key);
+            if ($ret != 0) {
+                croak("Some internal error happened");
+            }
+            if ($real_len >= $SIZE_MAX || $real_len > $msg_len) {
+                croak("Arithmetic overflow");
+            }
+            return substr($open, 0, $real_len);
+        }
+    ],
+
+    # int
+    # crypto_sign_verify_detached(const unsigned char *sig,
+    #     const unsigned char *m,
+    #     unsigned long long mlen,
+    #     const unsigned char *pk);
+    'crypto_sign_verify_detached' => [
+        ['string', 'string', 'size_t', 'string'] => 'int',
+        sub {
+            my ($xsub, $sig, $msg, $key) = @_;
+            my $SIZE_MAX = Sodium::FFI::SIZE_MAX;
+            my $sig_len = length($sig);
+            my $msg_len = length($msg);
+            my $key_len = length($key);
+            unless ($sig_len == Sodium::FFI::crypto_sign_BYTES) {
+                croak("Signature length must be crypto_sign_BYTES in length");
+            }
+            unless ($key_len == Sodium::FFI::crypto_sign_PUBLICKEYBYTES) {
+                croak("Public Key length must be crypto_sign_PUBLICKEYBYTES in length");
+            }
+            my $ret = $xsub->($sig, $msg, $msg_len, $key);
+            return 1 if ($ret == 0);
             return 0;
         }
     ],
@@ -722,6 +925,53 @@ building and maintaining the bindings easier than was done via L<Crypt::NaCl::So
 While we also intend to fix up L<Crypt::NaCl::Sodium> so that it can use newer versions
 of LibSodium, the FFI method is faster to build and release.
 
+=head1 Crypto Auth Functions
+
+LibSodium provides a few
+L<Crypto Auth Functions|https://doc.libsodium.org/secret-key_cryptography/secret-key_authentication>
+to encrypt and verify messages with a key.
+
+=head2 crypto_auth
+
+    use Sodium::FFI qw(randombytes_buf crypto_auth crypto_auth_keygen);
+    # First, let's create a key
+    my $key = crypto_auth_keygen();
+    # let's encrypt 12 bytes of random data... for fun
+    my $message = randombytes_buf(12);
+    my $encrypted_bytes = crypto_auth($message, $key);
+    say $encrypted_bytes;
+
+The L<crypto_auth|https://doc.libsodium.org/secret-key_cryptography/secret-key_authentication#usage>
+function encrypts a message using a secret key and returns that message as a string of bytes.
+
+=head2 crypto_auth_verify
+
+    use Sodium::FFI qw(randombytes_buf crypto_auth_verify crypto_auth_keygen);
+
+    my $message = randombytes_buf(12);
+    # you'd really need to already have the key, but here
+    my $key = crypto_auth_keygen();
+    # your encrypted data would come from a call to crypto_auth
+    my $encrypted; # assume this is full of bytes
+    # let's verify
+    my $boolean = crypto_auth_verify($encrypted, $message, $key);
+    say $boolean;
+
+The L<crypto_auth_verify|https://doc.libsodium.org/secret-key_cryptography/secret-key_authentication#usage>
+function returns a boolean letting us know if the encrypted message and the original message are verified with the
+secret key.
+
+=head2 crypto_auth_keygen
+
+    use Sodium::FFI qw(crypto_auth_keygen);
+    my $key = crypto_auth_keygen();
+    # this could also be written:
+    use Sodium::FFI qw(randombytes_buf crypto_auth_KEYBYTES);
+    my $key = randombytes_buf(crypto_auth_KEYBYTES);
+
+The L<crypto_auth_keygen|https://doc.libsodium.org/secret-key_cryptography/secret-key_authentication#usage>
+function returns a byte string of C<crypto_auth_KEYBYTES> bytes.
+
 =head1 AES256-GCM Crypto Functions
 
 LibSodium provides a few
@@ -947,6 +1197,75 @@ as a string of bytes.
 
 The L<crypto_aead_chacha20poly1305_ietf_keygen|https://doc.libsodium.org/secret-key_cryptography/aead/chacha20-poly1305/ietf_chacha20-poly1305_construction#detached-mode>
 function returns a byte string of C<crypto_aead_chacha20poly1305_IETF_KEYBYTES> bytes.
+
+=head1 Public Key Cryptography - Public Key Signatures
+
+LibSodium provides a few
+L<Public Key Signature Functions|https://doc.libsodium.org/public-key_cryptography/public-key_signatures>
+where a signer generates a key pair (public key and secret key) and appends the secret
+key to any number of messages. The one doing the verification will need to know and trust the public key
+before messages signed using it can be verified. This is not authenticated encryption.
+
+=head2 crypto_sign
+
+    use Sodium::FFI qw(crypto_sign_keypair crypto_sign);
+    my $msg = "Let's sign this and stuff!";
+    my ($public_key, $secret_key) = crypto_sign_keypair();
+    my $signed_msg = crypto_sign($msg, $secret_key);
+
+The L<crypto_sign|https://doc.libsodium.org/public-key_cryptography/public-key_signatures#combined-mode>
+function prepends a signature to an unaltered message.
+
+=head2 crypto_sign_detached
+
+    use Sodium::FFI qw(crypto_sign_keypair crypto_sign_detached);
+    my $msg = "Let's sign this and stuff!";
+    my ($public_key, $secret_key) = crypto_sign_keypair();
+    my $signature = crypto_sign_detached($msg, $secret_key);
+
+The L<crypto_sign_detached|https://doc.libsodium.org/public-key_cryptography/public-key_signatures#detached-mode>
+function signs the message with the secret key and returns the signature.
+
+=head2 crypto_sign_keypair
+
+    use Sodium::FFI qw(crypto_sign_keypair);
+    my ($public_key, $secret_key) = crypto_sign_keypair();
+
+The L<crypto_sign_keypair|https://doc.libsodium.org/public-key_cryptography/public-key_signatures#key-pair-generation>
+function randomly generates a secret key and a corresponding public key.
+
+=head2 crypto_sign_open
+
+    use Sodium::FFI qw(crypto_sign_open);
+    # we should have the public key and signed message to open
+    my $signed_msg = ...;
+    my $public_key = ...;
+    my $msg = crypto_sign_open($signed_msg, $public_key);
+
+The L<crypto_sign_open|https://doc.libsodium.org/public-key_cryptography/public-key_signatures#combined-mode>
+function checks that a signed message has a valid signature for the public key. If so, it returns that message
+and if not, it will throw.
+
+=head2 crypto_sign_seed_keypair
+
+    use Sodium::FFI qw(crypto_sign_seed_keypair crypto_sign_SEEDBYTES randombytes_buf);
+    my $seed = randombytes_buf(crypto_sign_SEEDBYTES);
+    my ($public_key, $secret_key) = crypto_sign_seed_keypair($seed);
+
+The L<crypto_sign_seed_keypair|https://doc.libsodium.org/public-key_cryptography/public-key_signatures#key-pair-generation>
+function randomly generates a secret key deterministically derived from a single key seed and a corresponding public key.
+
+=head2 crypto_sign_verify_detached
+
+    use Sodium::FFI qw(crypto_sign_verify_detached);
+    my $signature = ...;
+    my $message = ...;
+    my $public_key = ...;
+    my $boolean = crypto_sign_verify_detached($signature, $message, $public_key);
+
+The L<crypto_sign_verify_detached|https://doc.libsodium.org/public-key_cryptography/public-key_signatures#detached-mode>
+function verifies that a signature is valid for the supplied message with public key. It returns
+a boolean value, C<1> for true, C<0> for false.
 
 =head1 Random Number Functions
 

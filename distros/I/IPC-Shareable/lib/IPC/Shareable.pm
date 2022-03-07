@@ -21,28 +21,29 @@ use Scalar::Util;
 use String::CRC32;
 use Storable 0.6 qw(freeze thaw);
 
-our $VERSION = '1.06';
-
-$SIG{CHLD} = 'IGNORE';
+our $VERSION = '1.09';
 
 use constant {
-    LOCK_SH      => 1,
-    LOCK_EX      => 2,
-    LOCK_NB      => 4,
-    LOCK_UN      => 8,
+    LOCK_SH               => 1,
+    LOCK_EX               => 2,
+    LOCK_NB               => 4,
+    LOCK_UN               => 8,
 
-    DEBUGGING    => ($ENV{SHAREABLE_DEBUG} or 0),
-    SHM_BUFSIZ   => 65536,
-    SEM_MARKER   => 0,
-    SHM_EXISTS   => 1,
+    DEBUGGING             => ($ENV{SHAREABLE_DEBUG} or 0),
 
-    SHMMAX_BYTES => 1073741824, # 1 GB
+    SHM_BUFSIZ            => 65536,
+    SEM_MARKER            => 0,
+    SHM_EXISTS            => 1,
+
+    SHMMAX_BYTES          => 1073741824, # 1 GB
 
     # Perl sends in a double as opposed to an integer to shmat(), and on some
     # systems, this causes the IPC system to round down to the maximum integer
     # size of 0x80000000 we correct that when generating keys with CRC32
 
-    MAX_KEY_INT_SIZE => 0x80000000,
+    MAX_KEY_INT_SIZE      => 0x80000000,
+
+    EXCLUSIVE_CHECK_LIMIT => 10, # Number of times we'll check for existing segs
 };
 
 require Exporter;
@@ -97,9 +98,11 @@ my %default_options = (
     destroy    => 0,
     mode       => 0666,
     size       => SHM_BUFSIZ,
+    protected  => 0,
     limit      => 1,
     graceful   => 0,
     warn       => 0,
+    tidy       => 0,
     serializer => 'storable',
 );
 
@@ -425,6 +428,8 @@ sub spawn {
 
     $opts{mode} = 0666 if ! defined $opts{mode};
 
+    $SIG{CHLD} = 'IGNORE';
+
     _spawn(
         key     => $opts{key},
         mode    => $opts{mode},
@@ -470,6 +475,8 @@ sub unspawn {
     };
 
     $h{__ipc}->{run} = 0;
+
+    $SIG{CHLD} = undef;
 
     sleep 1;
 
@@ -521,17 +528,47 @@ sub clean_up {
 
     for my $s (values %process_register) {
         next unless $s->attributes('owner') == $$;
+        next if $s->attributes('protected');
         remove($s);
     }
 }
 sub clean_up_all {
     my $class = shift;
     for my $s (values %process_register) {
+        next if $s->attributes('protected');
         remove($s);
     }
 
     for my $s (values %global_register) {
+        next if $s->attributes('protected');
         remove($s);
+    }
+}
+sub clean_up_protected {
+    my ($knot, $protect_key);
+
+    if (scalar @_ == 2) {
+        ($knot, $protect_key) = @_;
+    }
+    if (scalar @_ == 1) {
+        ($protect_key) = @_;
+    }
+
+    if (! defined $protect_key) {
+        croak "clean_up_protected() requires a \$protect_key param";
+    }
+
+    if ($protect_key !~ /^\d+$/) {
+        croak
+            "clean_up_protected() \$protect_key must be an integer. You sent $protect_key";
+    }
+
+    for my $s (values %global_register) {
+        my $stored_key = $s->attributes('protected');
+
+        if ($stored_key && $stored_key == $protect_key) {
+            remove($s);
+        }
     }
 }
 sub remove {
@@ -581,8 +618,9 @@ sub singleton {
 END {
     for my $s (values %process_register) {
         unlock($s);
-        next unless $s->attributes('destroy');
-        next unless $s->attributes('owner') == $$;
+        next if $s->attributes('protected');
+        next if ! $s->attributes('destroy');
+        next if $s->attributes('owner') != $$;
         remove($s);
     }
 }
@@ -844,13 +882,50 @@ sub _shm_key {
 sub _shm_key_rand {
     my $key;
 
-    do {
-        $key = int(rand(1_000_000));
-    } while ($used_ids{$key});
+    # Unfortunatly, the only way I know how to check if a segment exists is
+    # to actually create it. We must do that here, then remove it just to
+    # ensure the slot is available
+
+    my $verified_exclusive = 0;
+
+    my $check_count = 0;
+
+    while (! $verified_exclusive && $check_count < EXCLUSIVE_CHECK_LIMIT) {
+        $check_count++;
+
+        $key = _shm_key_rand_int();
+
+        next if $used_ids{$key};
+
+        my $flags;
+        $flags |= IPC_CREAT;
+        $flags |= IPC_EXCL;
+
+        my $seg;
+
+        my $shm_slot_available = eval {
+            $seg = IPC::Shareable::SharedMem->new($key, 1, $flags);
+            1;
+        };
+
+        if ($shm_slot_available) {
+            $verified_exclusive = 1;
+            $seg->remove if $seg;
+        }
+    }
+
+    if (! $verified_exclusive) {
+        croak
+            "_shm_key_rand() can't get an available key after $check_count tries";
+    }
 
     $used_ids{$key}++;
 
     return $key;
+}
+sub _shm_key_rand_int {
+    srand();
+    return int(rand(1_000_000));
 }
 sub _shm_flags {
     # --- Parses the anonymous hash passed to constructors; returns a list
@@ -1056,12 +1131,17 @@ IPC::Shareable - Use shared memory backed variables across processes
 
     (tied VARIABLE)->remove;
 
-    IPC::Shareable->clean_up;
-    IPC::Shareable->clean_up_all;
+    IPC::Shareable::clean_up;
+    IPC::Shareable::clean_up_all;
+    IPC::Shareable::clean_up_protected;
 
     # Ensure only one instance of a script can be run at any time
 
     IPC::Shareable->singleton('UNIQUE SCRIPT LOCK STRING');
+
+    # Get the actual IPC::Shareable tied object
+
+    my $knot = tied VARIABLE; # Dereference first if necessary
 
 =head1 DESCRIPTION
 
@@ -1176,6 +1256,18 @@ override this default.
 
 Default: C<IPC::Shareable::SHM_BUFSIZ()> (ie. B<65536>)
 
+=head2 protected
+
+If set, the C<clean_up()> and C<clean_up_all()> routines will not remove the
+segments or semaphores related to the tied object.
+
+Set this to a specific integer so we can pass the value to any child objects
+created under the main one.
+
+To clean up protected objects, call C<< (tied %object)->clean_protected >>.
+
+Default: B<0>
+
 =head2 limit
 
 This field will allow you to set a segment size larger than the default maximum
@@ -1198,6 +1290,9 @@ removed.
 Use this option with care. In particular you should not use this option in a
 program that will fork after binding the data.  On the other hand, shared memory
 is a finite resource and should be released if it is not needed.
+
+B<NOTE>: If the segment was created with its L</protected> attribute set,
+it will not be removed upon program completion, even if C<destroy> is set.
 
 Default: B<false>
 
@@ -1223,11 +1318,12 @@ Default: B<storable>
 
 Default values for options are:
 
-    key         => IPC_PRIVATE,
+    key         => IPC_PRIVATE, # 0
     create      => 0,
     exclusive   => 0,
-    mode        => 0,
+    mode        => 0666,
     size        => IPC::Shareable::SHM_BUFSIZ(),
+    protected   => 0,
     limit       => 1,
     destroy     => 0,
     graceful    => 0,
@@ -1406,6 +1502,8 @@ Parameters:
 Optional, String: The name of the attribute. If sent in, we'll return the value
 of this specific attribute. Returns C<undef> if the attribute isn't found.
 
+Attributes are the C<OPTIONS> that were used to create the object.
+
 Returns: A hash reference of all attributes if C<$attributes> isn't sent in, the
 value of the specific attribute if it is.
 
@@ -1496,6 +1594,9 @@ shared memory segment when the process calling C<tie()> exits gracefully.
 B<NOTE>: The destruction is handled in an C<END> block. Only those memory
 segments that are tied to the current process will be removed.
 
+B<NOTE>: If the segment was created with its L</protected> attribute set,
+it will not be removed in the C<END> block, even if C<destroy> is set.
+
 =head2 remove
 
     tied($var)->remove;
@@ -1525,6 +1626,8 @@ This is a class method that provokes L<IPC::Shareable> to remove all
 shared memory segments created by the process.  Segments not created
 by the calling process are not removed.
 
+This method will not clean up segments created with the C<protected> option.
+
 =head2 clean_up_all
 
     IPC::Shareable->clean_up_all;
@@ -1540,6 +1643,24 @@ by the calling process are not removed.
 This is a class method that provokes L<IPC::Shareable> to remove all
 shared memory segments encountered by the process.  Segments are
 removed even if they were not created by the calling process.
+
+This method will not clean up segments created with the C<protected> option.
+
+=head2 clean_up_protected($protect_key)
+
+If a segment is created with the C<protected> option, it, nor its children will
+be removed during calls of C<clean_up()> or C<clean_up_all()>.
+
+When setting L</protected>, you specified a lock key integer. When calling this
+method, you must send that integer in as a parameter so we know which segments
+to clean up.
+
+Parameters:
+
+    $protect_key
+
+Mandatory, Integer: The integer protect key you assigned wit the C<protected>
+option
 
 =head1 RETURN VALUES
 

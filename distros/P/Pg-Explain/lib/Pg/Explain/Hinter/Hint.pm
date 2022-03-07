@@ -25,11 +25,11 @@ Pg::Explain::Hinter::Hint - Single hint for Pg::Explain plan
 
 =head1 VERSION
 
-Version 2.0
+Version 2.1
 
 =cut
 
-our $VERSION = '2.0';
+our $VERSION = '2.1';
 
 =head1 SYNOPSIS
 
@@ -130,6 +130,30 @@ Details:
 =over
 
 =item * Column name that the index should be made on
+
+=back
+
+=head2 INDEXABLE_SEQSCAN_MULTI_EQUAL_AND
+
+Node that the hint is for us using sequential scan, and it should be possible to add index(es) to make it go faster.
+
+This happens only for scans that have multiple equality checks joined with AND operator, like:
+
+=over
+
+=item * a = 1 and b = 2
+
+=item * x = 'abc' and z = 12
+
+=back
+
+Details are arrayref where each element is hashref with two keys:
+
+=over
+
+=item * column : column name that was checked
+
+=item * value : the value that the check was using
 
 =back
 

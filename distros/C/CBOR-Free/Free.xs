@@ -1,10 +1,4 @@
-#define PERL_NO_GET_CONTEXT
-
-#include "EXTERN.h"
-#include "perl.h"
-#include "XSUB.h"
-
-#include "ppport.h"
+#include "easyxs/init.h"
 
 #include <stdbool.h>
 #include <stdlib.h>
@@ -153,55 +147,6 @@ BOOT:
     cbf_stash = gv_stashpv(_PACKAGE, FALSE);
     newCONSTSUB(cbf_stash, "_MAX_RECURSION", newSVuv( MAX_ENCODE_RECURSE ));
 
-# Used in tests; useful to refactor to its own module?
-SV *
-_hash_keys_2_sv( SV * hashref )
-    CODE:
-        if (SVt_PVHV != SvTYPE(SvRV(hashref))) {
-            croak("need hashref");
-        }
-
-        HV *hash = (HV *)SvRV(hashref);
-
-        HE *stored = hv_store_ent(
-            hash,
-            newSVpvs("Hello"),
-            newSVpvs("There"),
-            0
-        );
-        fprintf(stderr, "HeSVKEY after store_ent: %p, %p\n", stored, HeSVKEY(stored));
-
-        HE *entry1 = hv_fetch_ent(hash, newSVpvs("Hello"), 0, 0);
-        if (NULL == entry1) {
-            croak("huh?");
-        }
-        else {
-            fprintf(stderr, "HeSVKEY after store_ent/fetch_ent: %p, %p\n", entry1, HeSVKEY(entry1));
-        }
-
-        HE *h_entry;
-
-        while ( (h_entry = hv_iternext(hash)) ) {
-            if (NULL == HeSVKEY(h_entry)) {
-fprintf(stderr, "no SV key\n");
-                // continue;
-                SV *keysv = HeSVKEY_force(h_entry);
-                keysv = newSVsv(keysv);
-//                SvREFCNT_inc(keysv);
-sv_dump(keysv);
-                HeSVKEY_set(h_entry, keysv);
-fprintf(stderr, "after set: %p\n", HeSVKEY(h_entry));
-            }
-else {
-fprintf(stderr, "entry has SV key\n");
-}
-        }
-sv_dump(hashref);
-
-        RETVAL = newSVsv(hashref);
-
-    OUTPUT:
-        RETVAL
 
 SV *
 encode( SV * value, ... )

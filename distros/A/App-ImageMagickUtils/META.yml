@@ -19,7 +19,7 @@ name: App-ImageMagickUtils
 provides:
   App::ImageMagickUtils:
     file: lib/App/ImageMagickUtils.pm
-    version: '0.011'
+    version: '0.012'
 requires:
   Data::Sah::Compiler::perl::TH::array: '0.911'
   Data::Sah::Compiler::perl::TH::bool: '0.911'
@@ -46,7 +46,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-ImageMagickUtils
   homepage: https://metacpan.org/release/App-ImageMagickUtils
   repository: git://github.com/perlancar/perl-App-ImageMagickUtils.git
-version: '0.011'
+version: '0.012'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

@@ -18,7 +18,6 @@ do { my $x = {
                                       'Archive::Any' => '0',
                                       'Archive::Extract' => '0',
                                       'BackPAN::Index' => '0',
-                                      'CLASS' => '0',
                                       'CPAN::Meta' => '0',
                                       'CPAN::ParseDistribution' => '0',
                                       'CPANPLUS' => '0',

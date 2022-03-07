@@ -7,11 +7,14 @@ use Module::Loader;
 use List::MoreUtils ();
 use Git::Lint::Command;
 
-our $VERSION = '0.012';
+our $VERSION = '0.014';
 
 sub load {
     my $class = shift;
     my $self  = { profiles => undef };
+
+    $self->{profiles}{commit}{default}  = [];
+    $self->{profiles}{message}{default} = [];
 
     # all check modules are added to the default profile
     my $loader        = Module::Loader->new;

@@ -57,21 +57,21 @@ sub run_sudoku ($file) {
     my ($solution) = grep {/^Solution/} @chunks;
 
     #
-    # Find args, if any
-    #
-    my ($arg_section) = grep {/^Args/} @chunks;
-    my  $args = {};
-    if ($arg_section) {
-        $arg_section =~ s/^.*\n//;
-        $args = eval $arg_section;
-        die $@ if $@;
-    }
-
-    #
     # Find the size
     #
     my ($first) = split /\n/ => $clues;
     my  $size   = () = $first =~ /\S+/g;
+
+    #
+    # Find create, if any
+    #
+    my ($create_section) = grep {/^Create/} @chunks;
+    if ($create_section) {
+        $create_section =~ s/^.*\n//;
+    }
+    else {
+        $create_section = "Regexp::Sudoku:: -> new -> init (size => $size)";
+    }
 
     #
     # Find the name, if any
@@ -83,47 +83,48 @@ sub run_sudoku ($file) {
     }
 
     subtest $name => sub {
-        #
-        # Sudoku object
-        #
-        my $sudoku = Regexp::Sudoku:: -> new -> init (size  => $size,
-                                                      clues => $clues,
-                                                      %$args);
+        SKIP: {
+            #
+            # Sudoku object
+            #
+            my $sudoku = eval $create_section;
 
-        ok $sudoku, "Regexp::Sudoku object";
-        return unless $sudoku;
+            ok $sudoku, "Regexp::Sudoku object";
+            skip "No Regexp::Sudoku object", 3 + $size * $size unless $sudoku;
 
-        #
-        # Get the subject and pattern
-        #
-        my $subject = $sudoku -> subject;
-        my $pattern = $sudoku -> pattern;
+            $sudoku -> set_clues ($clues);
 
-        ok $subject, "Got a subject";
-        ok $pattern, "Got a pattern";
-        return unless $subject && $pattern;
+            #
+            # Get the subject and pattern
+            #
+            my $subject = $sudoku -> subject;
+            my $pattern = $sudoku -> pattern;
 
-        #
-        # Do the actual match
-        #
-        my $r = $subject =~ $pattern;
-        ok $r, "Match";
-        return unless $r;
+            ok $subject, "Got a subject";
+            ok $pattern, "Got a pattern";
 
-        my %plus = %+;
+            #
+            # Do the actual match
+            #
+            my $r = $subject =~ $pattern;
+            ok $r, "Match";
+            skip "No match", $size * $size unless $r;
 
-        if ($solution) {
-            $solution =~ s/^.*\n//;
-            my @exp  = map {[/\S+/g]} grep {/\S/} split /\n/ => $solution;
-            my $pass = 1;
-            foreach my $r (1 .. $size) {
-                foreach my $c (1 .. $size) {
-                    my $cell = "R${r}C${c}";
-                    is $plus {$cell}, $exp [$r - 1] [$c - 1], "Cell $cell";
-                    $pass &&= $plus {$cell} eq $exp [$r - 1] [$c - 1];
+            my %plus = %+;
+
+            if ($solution) {
+                $solution =~ s/^.*\n//;
+                my @exp  = map {[/\S+/g]} grep {/\S/} split /\n/ => $solution;
+                my $pass = 1;
+                foreach my $r (1 .. $size) {
+                    foreach my $c (1 .. $size) {
+                        my $cell = "R${r}C${c}";
+                        is $plus {$cell}, $exp [$r - 1] [$c - 1], "Cell $cell";
+                        $pass &&= $plus {$cell} eq $exp [$r - 1] [$c - 1];
+                    }
                 }
+                show $size, \%plus unless $pass;
             }
-            show $size, \%plus unless $pass;
         }
     }
 }

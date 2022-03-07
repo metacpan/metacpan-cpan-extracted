@@ -1,8 +1,4 @@
-#define PERL_NO_GET_CONTEXT
-
-#include "EXTERN.h"
-#include "perl.h"
-#include "XSUB.h"
+#include "easyxs/init.h"
 
 #include "cbor_free_common.h"
 #include "cbor_free_decode.h"
@@ -248,11 +244,9 @@ static inline void _validate_utf8_string_if_needed( pTHX_ decode_ctx* decstate, 
 
 // Sets incomplete_by.
 static inline UV _parse_for_uint_len2( pTHX_ decode_ctx* decstate ) {
-    union control_byte *control = (union control_byte *) decstate->curbyte;
-
     UV ret;
 
-    switch (control->pieces.length_type) {
+    switch (CONTROL_BYTE_LENGTH_TYPE(*decstate->curbyte)) {
         case CBOR_LENGTH_SMALL:
 
             _RETURN_IF_INCOMPLETE( decstate, 2, 0 );
@@ -312,7 +306,7 @@ static inline UV _parse_for_uint_len2( pTHX_ decode_ctx* decstate ) {
             return 0; // Silence compiler warning.
 
         default:
-            ret = (uint8_t) control->pieces.length_type;
+            ret = CONTROL_BYTE_LENGTH_TYPE(*decstate->curbyte);
 
             decstate->curbyte++;
     }
@@ -324,14 +318,12 @@ static inline UV _parse_for_uint_len2( pTHX_ decode_ctx* decstate ) {
 
 // Sets incomplete_by.
 SV *_decode_array( pTHX_ decode_ctx* decstate ) {
-    union control_byte *control = (union control_byte *) decstate->curbyte;
-
     AV *array = newAV();
     sv_2mortal( (SV *) array );
 
     SV *cur = NULL;
 
-    if (control->pieces.length_type == CBOR_LENGTH_INDEFINITE) {
+    if (CONTROL_BYTE_LENGTH_TYPE(*decstate->curbyte) == CBOR_LENGTH_INDEFINITE) {
         ++decstate->curbyte;
 
         while (1) {
@@ -373,9 +365,8 @@ SV *_decode_array( pTHX_ decode_ctx* decstate ) {
 
 // Sets incomplete_by.
 UV _decode_uint( pTHX_ decode_ctx* decstate ) {
-    union control_byte *control = (union control_byte *) decstate->curbyte;
 
-    if (control->pieces.length_type == CBOR_LENGTH_INDEFINITE) {
+    if (CONTROL_BYTE_LENGTH_TYPE(*decstate->curbyte) == CBOR_LENGTH_INDEFINITE) {
         _croak_invalid_control( aTHX_ decstate );
     }
 
@@ -384,9 +375,8 @@ UV _decode_uint( pTHX_ decode_ctx* decstate ) {
 
 // Sets incomplete_by.
 IV _decode_negint( pTHX_ decode_ctx* decstate ) {
-    union control_byte *control = (union control_byte *) decstate->curbyte;
 
-    if (control->pieces.length_type == CBOR_LENGTH_INDEFINITE) {
+    if (CONTROL_BYTE_LENGTH_TYPE(*decstate->curbyte) == CBOR_LENGTH_INDEFINITE) {
         _croak_invalid_control( aTHX_ decstate );
     }
 
@@ -401,7 +391,7 @@ IV _decode_negint( pTHX_ decode_ctx* decstate ) {
     if (positive >= 0x80000000U) {
         STRLEN offset = decstate->curbyte - decstate->start;
 
-        if (control->pieces.length_type == 0x1a) {
+        if (CONTROL_BYTE_LENGTH_TYPE(*decstate->curbyte) == CBOR_LENGTH_LARGE) {
             offset -= 4;
         }
         else {
@@ -418,9 +408,8 @@ IV _decode_negint( pTHX_ decode_ctx* decstate ) {
 // Sets incomplete_by.
 // Return indicates whether string_h has SV.
 bool _decode_str( pTHX_ decode_ctx* decstate, union numbuf_or_sv* string_u ) {
-    union control_byte *control = (union control_byte *) decstate->curbyte;
 
-    if (control->pieces.length_type == CBOR_LENGTH_INDEFINITE) {
+    if (CONTROL_BYTE_LENGTH_TYPE(*decstate->curbyte) == CBOR_LENGTH_INDEFINITE) {
         ++decstate->curbyte;
 
         SV *string = newSVpvs("");  /* 5.10.0 lacks newSVpvs_flags() */
@@ -467,8 +456,6 @@ bool _decode_str( pTHX_ decode_ctx* decstate, union numbuf_or_sv* string_u ) {
 void _decode_hash_entry( pTHX_ decode_ctx* decstate, HV *hash ) {
     _RETURN_IF_INCOMPLETE( decstate, 1,  );
 
-    union control_byte *control = (union control_byte *) decstate->curbyte;
-
     union numbuf_or_sv my_key;
     my_key.numbuf.buffer = NULL;
 
@@ -479,7 +466,9 @@ void _decode_hash_entry( pTHX_ decode_ctx* decstate, HV *hash ) {
 
     bool my_key_has_sv = false;
 
-    switch (control->pieces.major_type) {
+    uint8_t major_type = CONTROL_BYTE_MAJOR_TYPE(*decstate->curbyte);
+
+    switch (major_type) {
         case CBOR_TYPE_UINT:
             my_key.numbuf.num.uv = _decode_uint( aTHX_ decstate );
             _RETURN_IF_SET_INCOMPLETE(decstate, );
@@ -511,7 +500,7 @@ void _decode_hash_entry( pTHX_ decode_ctx* decstate, HV *hash ) {
 
                 keystr = my_key.numbuf.buffer;
 
-                if (SHOULD_VALIDATE_UTF8(decstate, control->pieces.major_type)) {
+                if (SHOULD_VALIDATE_UTF8(decstate, major_type)) {
                     _validate_utf8_string_if_needed( aTHX_ decstate, keystr, my_key.numbuf.num.uv );
 
                     keylen = decstate->string_decode_mode == CBF_STRING_DECODE_NEVER ? my_key.numbuf.num.uv : -my_key.numbuf.num.uv;
@@ -545,12 +534,11 @@ void _decode_hash_entry( pTHX_ decode_ctx* decstate, HV *hash ) {
 
 // Sets incomplete_by.
 SV *_decode_map( pTHX_ decode_ctx* decstate ) {
-    union control_byte *control = (union control_byte *) decstate->curbyte;
 
     HV *hash = newHV();
     sv_2mortal( (SV *) hash );
 
-    if (control->pieces.length_type == CBOR_LENGTH_INDEFINITE) {
+    if (CONTROL_BYTE_LENGTH_TYPE(*decstate->curbyte) == CBOR_LENGTH_INDEFINITE) {
         ++decstate->curbyte;
 
         while (1) {
@@ -646,11 +634,11 @@ SV *cbf_decode_one( pTHX_ decode_ctx* decstate ) {
 
     _RETURN_IF_INCOMPLETE( decstate, 1, NULL );
 
-    union control_byte *control = (union control_byte *) decstate->curbyte;
+    uint8_t control_byte = *decstate->curbyte;
 
     // fprintf(stderr, "major type: %d\n", control->pieces.major_type);
 
-    switch (control->pieces.major_type) {
+    switch (CONTROL_BYTE_MAJOR_TYPE(control_byte)) {
         case CBOR_TYPE_UINT:
             ret = newSVuv( _decode_uint( aTHX_ decstate ) );
             if ( decstate->incomplete_by ) {
@@ -672,7 +660,7 @@ SV *cbf_decode_one( pTHX_ decode_ctx* decstate ) {
             ret = _decode_str_to_sv( aTHX_ decstate );
             _RETURN_IF_SET_INCOMPLETE(decstate, NULL);
 
-            if (SHOULD_VALIDATE_UTF8(decstate, control->pieces.major_type)) {
+            if (SHOULD_VALIDATE_UTF8(decstate, CONTROL_BYTE_MAJOR_TYPE(control_byte))) {
                 _validate_utf8_string_if_needed( aTHX_ decstate, SvPV_nolen(ret), SvCUR(ret));
 
                 // Always set the UTF8 flag, even if it’s not needed.
@@ -694,14 +682,14 @@ SV *cbf_decode_one( pTHX_ decode_ctx* decstate ) {
             break;
         case CBOR_TYPE_TAG:
 
-            if (control->pieces.length_type == CBOR_LENGTH_INDEFINITE) {
+            if (CONTROL_BYTE_LENGTH_TYPE(control_byte) == CBOR_LENGTH_INDEFINITE) {
                 _croak_invalid_control( aTHX_ decstate );
             }
 
             UV tagnum = _parse_for_uint_len2( aTHX_ decstate );
             _RETURN_IF_SET_INCOMPLETE(decstate, NULL);
 
-            U8 value_major_type = ((union control_byte *) decstate->curbyte)->pieces.major_type;
+            uint8_t value_major_type = CONTROL_BYTE_MAJOR_TYPE(*decstate->curbyte);
 
             if (tagnum == CBOR_TAG_SHAREDREF && decstate->reflist) {
                 if (value_major_type != CBOR_TYPE_UINT) {
@@ -753,7 +741,7 @@ SV *cbf_decode_one( pTHX_ decode_ctx* decstate ) {
 
             break;
         case CBOR_TYPE_OTHER:
-            switch (control->u8) {
+            switch (control_byte) {
                 case CBOR_FALSE:
                     ret = newSVsv( cbf_get_false() );
                     ++decstate->curbyte;

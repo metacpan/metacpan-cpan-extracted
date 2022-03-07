@@ -3,7 +3,7 @@ use warnings;
 use utf8;
 
 package Pod::Weaver::PluginBundle::Author::TABULO;
-our $VERSION = '1.000006';
+our $VERSION = '1.000011';
 
 use Pod::Weaver 4;
 use Pod::Weaver::Config::Assembler;
@@ -116,7 +116,7 @@ Pod::Weaver::PluginBundle::Author::TABULO - TABULO's bundle for Pod::Weaver (pro
 
 =head1 VERSION
 
-version 1.000006
+version 1.000011
 
 =head1 FOREWORD
 
@@ -273,7 +273,7 @@ Tabulo[n] <dev@tabulo.net>
 
 =head1 LEGAL
 
-This software is copyright (c) 2021 by Tabulo[n].
+This software is copyright (c) 2022 by Tabulo[n].
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

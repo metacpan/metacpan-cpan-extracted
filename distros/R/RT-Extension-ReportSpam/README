@@ -1,9 +1,12 @@
 NAME
     RT::Extension::ReportSpam - mark tickets as spam with one click
 
+RT VERSION
+    Works with RT 4.4 and 5.0
+
 DESCRIPTION
-    A simple extension that works with RT 4.2 and 4.4 which allows users to
-    report a ticket as a spam message.
+    A simple extension that allows users to report a ticket as a spam
+    message.
 
 INSTALLATION
     perl Makefile.PL
@@ -11,7 +14,7 @@ INSTALLATION
     make install
         May need root permissions
 
-    Edit your /opt/rt4/etc/RT_SiteConfig.pm
+    Edit your /opt/rt5/etc/RT_SiteConfig.pm
             Plugin('RT::Extension::ReportSpam');
 
         You may also want to set the $SpamAutoDeleteThreshold config option
@@ -22,7 +25,7 @@ INSTALLATION
         leaving $SpamAutoDeleteThreshold unset or setting it to 0.
 
     Clear your mason cache
-            rm -rf /opt/rt4/var/mason_data/obj
+            rm -rf /opt/rt5/var/mason_data/obj
 
     Restart your webserver
 
@@ -65,7 +68,7 @@ BUGS
         L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-ReportSpam>.
 
 LICENSE AND COPYRIGHT
-    This software is Copyright (c) 2014 by Best Practical Solutions
+    This software is Copyright (c) 2014-2022 by Best Practical Solutions
 
     This is free software, licensed under:
 

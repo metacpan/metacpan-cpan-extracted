@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Net::OpenNebula::RPC;
-$Net::OpenNebula::RPC::VERSION = '0.316.0';
+$Net::OpenNebula::RPC::VERSION = '0.317.0';
 use Data::Dumper;
 
 use constant ONERPC => 'rpc';

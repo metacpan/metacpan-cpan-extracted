@@ -1,5 +1,8 @@
 Revision history for Parallel-Pipes
 
+0.102  2022-03-06 03:05:54 JST
+    - Add Parallel::Pipes::App->map method (#6)
+
 0.101  2022-03-03 21:28:50 JST
     - Remove Parallel::Pipes::App->once method; just use Parallel::Pipes::App->run instead (#5)
 

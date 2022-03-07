@@ -1,9 +1,5 @@
 use ExtUtils::MakeMaker;
 
-use Devel::PPPort;
-
-Devel::PPPort::WriteFile();
-
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
 WriteMakefile1(
@@ -69,6 +65,7 @@ WriteMakefile1(
         'Test::Deep'      => 0,
         'Test::Differences' => 0,
         'Test::Class::Tiny' => 0.02,
+        'Test::Pod' => 1,
     },
 
     # SIGN => 1,

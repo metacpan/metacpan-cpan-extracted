@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20211206222445;
+our $VERSION = 1.20220305001841;
 
 my $formatters = [
                 {
@@ -52,7 +52,7 @@ my $validators = {
             1\\d|
             2[013-79]|
             3[0-8]|
-            4[0135689]
+            4[013-689]
           )\\d{6}
         ',
                 'geographic' => '
@@ -61,7 +61,7 @@ my $validators = {
             1\\d|
             2[013-79]|
             3[0-8]|
-            4[0135689]
+            4[013-689]
           )\\d{6}
         ',
                 'mobile' => '
@@ -85,19 +85,20 @@ my $validators = {
                 'voip' => '98[23]\\d{6}'
               };
 my %areanames = ();
-$areanames{en} = {"21327", "Chlef",
-"21334", "Béjaïa\/Jijel",
-"21321", "Algiers",
-"21333", "Batna\/Beskra",
-"21341", "Oran",
-"21335", "Bordj\ Bou\ Arreridj",
+$areanames{en} = {"21331", "Constantine",
 "21329", "Ghardaia\/Illizi\/Tamanrasset",
+"21321", "Algiers",
 "21338", "Annaba\/Skikda",
+"21335", "Bordj\ Bou\ Arreridj",
 "21343", "Tlemcen",
-"21332", "El\ Oued",
+"21334", "Béjaïa\/Jijel",
 "21349", "Adrar\/Béchar\/Tindouf",
+"21333", "Batna\/Beskra",
 "21337", "Tebessa",
-"21331", "Constantine",};
+"21332", "El\ Oued",
+"21344", "Blida",
+"21327", "Chlef",
+"21341", "Oran",};
 
     sub new {
       my $class = shift;

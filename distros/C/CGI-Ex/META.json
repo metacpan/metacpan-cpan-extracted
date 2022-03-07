@@ -4,7 +4,7 @@
       "Paul Seamons"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -85,55 +85,55 @@
    "provides" : {
       "CGI::Ex" : {
          "file" : "lib/CGI/Ex.pm",
-         "version" : "2.50"
+         "version" : "2.51"
       },
       "CGI::Ex::App" : {
          "file" : "lib/CGI/Ex/App.pm",
-         "version" : "2.50"
+         "version" : "2.51"
       },
       "CGI::Ex::App::Constants" : {
          "file" : "lib/CGI/Ex/App/Constants.pm",
-         "version" : "2.50"
+         "version" : "2.51"
       },
       "CGI::Ex::Auth" : {
          "file" : "lib/CGI/Ex/Auth.pm",
-         "version" : "2.50"
+         "version" : "2.51"
       },
       "CGI::Ex::Auth::Data" : {
          "file" : "lib/CGI/Ex/Auth.pm",
-         "version" : "2.50"
+         "version" : "2.51"
       },
       "CGI::Ex::Conf" : {
          "file" : "lib/CGI/Ex/Conf.pm",
-         "version" : "2.50"
+         "version" : "2.51"
       },
       "CGI::Ex::Die" : {
          "file" : "lib/CGI/Ex/Die.pm",
-         "version" : "2.50"
+         "version" : "2.51"
       },
       "CGI::Ex::Dump" : {
          "file" : "lib/CGI/Ex/Dump.pm",
-         "version" : "2.50"
+         "version" : "2.51"
       },
       "CGI::Ex::Fill" : {
          "file" : "lib/CGI/Ex/Fill.pm",
-         "version" : "2.50"
+         "version" : "2.51"
       },
       "CGI::Ex::JSONDump" : {
          "file" : "lib/CGI/Ex/JSONDump.pm",
-         "version" : "2.50"
+         "version" : "2.51"
       },
       "CGI::Ex::Template" : {
          "file" : "lib/CGI/Ex/Template.pm",
-         "version" : "2.50"
+         "version" : "2.51"
       },
       "CGI::Ex::Validate" : {
          "file" : "lib/CGI/Ex/Validate.pm",
-         "version" : "2.50"
+         "version" : "2.51"
       },
       "CGI::Ex::Validate::Error" : {
          "file" : "lib/CGI/Ex/Validate.pm",
-         "version" : "2.50"
+         "version" : "2.51"
       }
    },
    "release_status" : "stable",
@@ -148,17 +148,18 @@
          "web" : "https://github.com/ljepson/CGI-Ex"
       }
    },
-   "version" : "2.50",
+   "version" : "2.51",
    "x_contributors" : [
       "Lonny <jiskiras@gmail.com>",
       "Charles McGarvey <chazmcgarvey@brokenzipper.com>",
       "Alexandr Ciornii <alexchorny@gmail.com>",
       "Paul Seamons <paul.seamons@endurance.com>",
       "Petr P\u00edsa\u0159 <ppisar@redhat.com>",
-      "Matt Devey <mdevey91@gmail.com>"
+      "Matt Devey <mdevey91@gmail.com>",
+      "Prashanth BJ <prashanth.b@endurance.com>"
    ],
-   "x_generated_by_perl" : "v5.31.11",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "x_generated_by_perl" : "v5.26.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.08",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

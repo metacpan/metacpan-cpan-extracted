@@ -23,9 +23,8 @@ Solution
 5 7 2  4 3 9  6 1 8
 6 4 3  8 1 5  9 2 7
 ==
-Args
-use Regexp::Sudoku::Constants qw [:Diagonals];
-{diagonals => $ARGYLE}
+Create
+Regexp::Sudoku:: -> new -> init -> set_argyle
 ==
 Name: Argyle
 URL: https://www.funwithpuzzles.com/2016/01/argyle-sudoku.html

@@ -39,3 +39,7 @@ Revision history for Perl extension Google::RestApi.
 1.0.0 Sat Nov 27 2021
         - Minor integration test fix, improved documentation
         - Stable release, no further major changes to api's expected.
+
+1.0.1 Mar 6 2022
+        - Comments in code
+        - Remove Time::Out since Time::HiRes::alarm is not available in windows

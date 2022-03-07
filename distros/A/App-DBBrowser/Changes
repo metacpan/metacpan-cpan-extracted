@@ -1,6 +1,9 @@
 Revision history for App-DBBrowser
 
 
+2.292    2022-03-06
+       - Update menu "Reset DB".
+
 2.291    2022-01-20
        - Plugin 'mysql': utf8mb4 requires DBD::mysql 4.041 or greater.
        - Update year copyright.

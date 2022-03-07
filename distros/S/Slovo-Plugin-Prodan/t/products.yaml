@@ -9,14 +9,14 @@
       author: Контадин Кременски,
       images: [/img/korica-lechitelkata-96dpi-200x288.webp,],
       button_icon: /css/malka/book-open-page-variant-outline.svg,
-      exerpts_url: /books/lechitelkata-otkusi.pdf, variant: книжно издание,
+      exerpts_url: /books/lechitelkata-otkusi.pdf, variant: книжно издание, in_store: true
     }
   }
 - {sku: 9786199169032, alias: лечителката, title: 'PDF Лечителката и рунтавата ѝ котка', p_type: book, 
   properties: {
       price: 9.81, weight: 0.0,
       button_icon: /css/malka/file-pdf-box.svg, 
-      exerpts_url: /books/lechitelkata-otkusi.pdf, variant: PDF,
+      exerpts_url: /books/lechitelkata-otkusi.pdf, variant: PDF,in_store: true
       }}
 
 - alias: матере-нашѧ-параскеви
@@ -30,6 +30,7 @@
     price: 7.00
     weight: 0.050
     variant: книжно издание
+    in_store: true
   sku: 9786199169001
   title: Житие на света Петка Българска от свети патриарх Евтимий
 
@@ -40,6 +41,7 @@
     price: 5.00
     weight: 0.0
     variant: PDF
+    in_store: true
   sku: 9786199169018 
   title: PDF Житие на света Петка Българска от свети патриарх Евтимий
 

@@ -11,7 +11,7 @@ DESCRIPTION
     performance impact for some installations.
 
 RT VERSION
-    Works with RT 4.0, 4.2 and 4.4
+    Works with RT 4 and 5.0
 
 INSTALLATION
     perl Makefile.PL
@@ -19,7 +19,7 @@ INSTALLATION
     make install
         May need root permissions
 
-    Edit your /opt/rt4/etc/RT_SiteConfig.pm
+    Edit your /opt/rt5/etc/RT_SiteConfig.pm
         If you are using RT 4.2 or greater, add this line:
 
             Plugin('RT::Extension::QuickAssign');
@@ -31,7 +31,7 @@ INSTALLATION
         or add RT::Extension::QuickAssign to your existing @Plugins line.
 
     Clear your mason cache
-            rm -rf /opt/rt4/var/mason_data/obj
+            rm -rf /opt/rt5/var/mason_data/obj
 
     Restart your webserver
 
@@ -48,7 +48,7 @@ BUGS
         L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-QuickAssign>.
 
 LICENSE AND COPYRIGHT
-    This software is Copyright (c) 2014-2019 by Best Practical Solutions,
+    This software is Copyright (c) 2014-2022 by Best Practical Solutions,
     LLC
 
     This is free software, licensed under:

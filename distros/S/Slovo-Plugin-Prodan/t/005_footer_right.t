@@ -20,8 +20,8 @@ my $t            = Test::Mojo->with_roles('+Slovo')->install(
 my $app = $t->app;
 
 note $app->home;
-my $phone = $app->config->{phone_url};
-$t->get_ok($app->config->{gdpr_consent_url})->status_is(200)
+my $phone = $app->config->{consents}{phone_url};
+$t->get_ok($app->config->{consents}{gdpr_url})->status_is(200)
 
 # In a regular browser like Firefox, the function set_gdpr_consent from cart.js
 # replaces the content on all pages except gdpr_consent_url with

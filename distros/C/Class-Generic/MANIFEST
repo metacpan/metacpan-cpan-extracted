@@ -1,0 +1,25 @@
+CHANGES
+CONTRIBUTING.md
+lib/Class/Array.pm
+lib/Class/Assoc.pm
+lib/Class/Boolean.pm
+lib/Class/Exception.pm
+lib/Class/File.pm
+lib/Class/Finfo.pm
+lib/Class/Generic.pm
+lib/Class/NullChain.pm
+lib/Class/Number.pm
+lib/Class/Scalar.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml			Module meta-data (added by MakeMaker)
+README
+README.md
+SIGNATURE			Public-key signature (added by MakeMaker)
+t/0-signature.t
+t/00.load.t
+t/01.core.t
+t/90.coverage.t
+t/91.pod.t
+t/99.kwalitee.t
+META.json                                Module JSON meta-data (added by MakeMaker)

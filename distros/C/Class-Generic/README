@@ -1,0 +1,49 @@
+NAME
+    Class::Generic - Class Generic
+
+SYNOPSIS
+        use parent qw( Class::Generic )
+
+        sub init
+        {
+            my $self = shift( @_ );
+            return( $self->SUPER::init( @_ ) );
+        }
+
+        my $array = Class::Array->new( $something );
+        my $array = Class::Array->new( [$something] );
+        my $hash  = Class::Assoc->new;
+        my $bool  = Class::Boolean->new;
+        my $ex    = Class::Exception->new( message => "Oh no", code => 500 );
+        my $file  = Class::File->new( '/some/where/file.txt' );
+        my $finfo = Class::Finfo->new( '/some/where/file.txt' );
+        my $null  = Class::NullChain->new;
+        my $num   = Class::Number->new( 10 );
+        my $str   = Class::Scalar->new( 'Some string' );
+
+        # For details on the api provided, please check each of the module documentation.
+
+VERSION
+        v0.1.0
+
+DESCRIPTION
+    This package inherits all its features from Module::Generic and provides
+    a generic framework of methods to inherit from and speed up development.
+
+METHODS
+    See Module::Generic
+
+AUTHOR
+    Jacques Deguest <jack@deguest.jp>
+
+SEE ALSO
+    Class::Generic, Class::Array, Class::Scalar, Class::Number,
+    Class::Boolean, Class::Assoc, Class::File, Class::DateTime,
+    Class::Exception, Class::Finfo, Class::NullChain
+
+COPYRIGHT & LICENSE
+    Copyright(c) 2022 DEGUEST Pte. Ltd.
+
+    You can use, copy, modify and redistribute this package and associated
+    files under the same terms as Perl itself.
+

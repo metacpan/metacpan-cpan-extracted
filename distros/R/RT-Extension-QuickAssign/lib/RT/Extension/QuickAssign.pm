@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package RT::Extension::QuickAssign;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 =head1 NAME
 
@@ -20,7 +20,7 @@ performance impact for some installations.
 
 =head1 RT VERSION
 
-Works with RT 4.0, 4.2 and 4.4
+Works with RT 4 and 5.0
 
 =head1 INSTALLATION
 
@@ -34,7 +34,7 @@ Works with RT 4.0, 4.2 and 4.4
 
 May need root permissions
 
-=item Edit your F</opt/rt4/etc/RT_SiteConfig.pm>
+=item Edit your F</opt/rt5/etc/RT_SiteConfig.pm>
 
 If you are using RT 4.2 or greater, add this line:
 
@@ -48,7 +48,7 @@ or add C<RT::Extension::QuickAssign> to your existing C<@Plugins> line.
 
 =item Clear your mason cache
 
-    rm -rf /opt/rt4/var/mason_data/obj
+    rm -rf /opt/rt5/var/mason_data/obj
 
 =item Restart your webserver
 
@@ -70,7 +70,7 @@ or via the web at
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2014-2019 by Best Practical Solutions, LLC
+This software is Copyright (c) 2014-2022 by Best Practical Solutions, LLC
 
 This is free software, licensed under:
 

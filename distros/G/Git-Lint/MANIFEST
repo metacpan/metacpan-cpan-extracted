@@ -36,6 +36,7 @@ t/unit/lib-Git-Lint-Check/new.t
 t/unit/lib-Git-Lint-Command/run.t
 t/unit/lib-Git-Lint-Config/load.t
 t/unit/lib-Git-Lint-Config/user_config.t
+t/unit/lib-Git-Lint/config.t
 t/unit/lib-Git-Lint/new.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,13 +1,10 @@
 Build.PL
 Changes
 LICENSE
+MANIFEST.SKIP
 META.json
 README.md
 cpanfile
-images/screen-2.png
-images/screen-3.png
-images/screen-4.png
-images/screen.png
 lib/App/Greple/wordle.pm
 lib/App/Greple/wordle.pod
 lib/App/Greple/wordle/hint.pm

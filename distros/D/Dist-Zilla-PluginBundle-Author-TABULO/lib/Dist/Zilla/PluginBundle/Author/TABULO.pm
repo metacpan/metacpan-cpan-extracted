@@ -1,7 +1,7 @@
 package Dist::Zilla::PluginBundle::Author::TABULO;
 ### ex: set ft=perl noai ts=4 sw=4:
 
-our $VERSION = '1.000006';
+our $VERSION = '1.000011';
 
 use 5.026; # Indented HEREDOC.
 use Data::Printer qw(p np);
@@ -952,7 +952,7 @@ Dist::Zilla::PluginBundle::Author::TABULO - A Dist::Zilla plugin bundle à la TA
 
 =head1 VERSION
 
-version 1.000006
+version 1.000011
 
 =head1 SYNOPSIS
 
@@ -1698,7 +1698,7 @@ Tabulo <dev-git.perl@tabulo.net>
 
 =head1 LEGAL
 
-This software is copyright (c) 2021 by Tabulo[n].
+This software is copyright (c) 2022 by Tabulo[n].
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

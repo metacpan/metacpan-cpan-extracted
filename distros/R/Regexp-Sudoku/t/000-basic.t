@@ -1,12 +1,15 @@
 #!/usr/bin/perl
 
-use 5.010;
+use 5.028;
 
 use strict;
 use warnings;
 no  warnings 'syntax';
 
+use lib qw [lib ../lib];
+
 use Test::More 0.88;
+use Test::Exception;
 
 our $r = eval "require Test::NoWarnings; 1";
 

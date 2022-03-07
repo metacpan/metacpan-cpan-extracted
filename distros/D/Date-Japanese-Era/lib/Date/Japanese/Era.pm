@@ -1,7 +1,7 @@
 package Date::Japanese::Era;
 
 use strict;
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 use Carp;
 use constant END_OF_LUNAR => 1872;
@@ -119,6 +119,7 @@ sub _dwim {
 sub _number {
     my $str = shift;
 
+    $str = "1" if $str eq "\x{5143}"; # gan
     $str =~ s/([\x{FF10}-\x{FF19}])/;ord($1)-0xff10/eg;
 
     if ($str =~ /^\d+$/) {
@@ -269,6 +270,49 @@ returns year as Gregorian.
   # to Gregorian
   my $era = Date::Japanese::Era->new("平成", 13); # HEISEI 13
   print $era->gregorian_year;	# 2001
+
+=head2 ERA NAME VALIDATION AND CONVERSION
+
+When you construct a new object from Japanese Era and year, this module does not
+handle if the year does not exist for the given era, such as 平成32, since the
+era ended in 31. This might be problematic if you want to allow the year number
+to exceed its end and automatically convert to the correct era i.e. 令和2.
+
+To do this, you can use an offset-based calculation first to get the Gregorian
+year, and then construct a Date::Japanese::Era object from Gregorian year, month
+and day, such as:
+
+  my %offset = (
+      "昭和" => 1925,
+      "平成" => 1988,
+      "令和" => 2018,
+  );
+
+  my $name  = "平成";
+  my $year  = 33;
+  my $month = 4;
+  my $day   = 1;
+
+  my $gregorian_year = $offset{$name} + $year;
+  my $era = Date::Japanese::Era->new( $gregorian_year, $month, $day );
+
+  # $era is now Reiwa 3, since Heisei 33 doesn't exist.
+
+Similarly, to validate if the given Japanese era is valid for the given date,
+you can compare the era after round-tripping with Gregorian year:
+
+  sub is_valid_era {
+      my( $name, $year, $month, $day ) = @_;
+
+      my $ok;
+      eval {
+          my $era1 = Date::Japanese::Era->new($name, $year);
+          my $era2 = Date::Japanese::Era->new($era1->gregorian_year, $month, $day);
+          $ok = $era1->name eq $era2->name;
+      };
+
+      return $ok;
+  }
 
 =head1 CAVEATS
 

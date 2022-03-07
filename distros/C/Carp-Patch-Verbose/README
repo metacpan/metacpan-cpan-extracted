@@ -3,19 +3,21 @@ NAME
     verbose
 
 VERSION
-    This document describes version 0.001 of Carp::Patch::Verbose (from Perl
-    distribution Carp-Patch-Verbose), released on 2022-01-21.
+    This document describes version 0.002 of Carp::Patch::Verbose (from Perl
+    distribution Carp-Patch-Verbose), released on 2022-02-06.
 
 SYNOPSIS
      % perl -MCarp::Patch::Verbose -d:Confess ...
 
 DESCRIPTION
     This is not so much a "patch" for Carp, but just a convenient way to set
-    some Carp package variables from the command-line. Currently can set
-    these variables:
+    some Carp package variables from the command-line. Currently these
+    variables are set:
 
      $Carp::MaxArgLen  # from the default 64 to 0 (print all)
      $Carp::MaxArgNums # from the default  8 to 0 (print all)
+
+    This setting makes full dumps of arguments instead of just partial ones.
 
 PATCH CONTENTS
 HOMEPAGE

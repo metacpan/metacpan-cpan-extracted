@@ -4,10 +4,11 @@ use strict;
 use parent qw(Class::Accessor);
 use Hash::Util 'lock_keys';
 use Carp 'confess';
+use Set::Tiny 0.04;
 
 use App::SpamcupNG::Summary::Receiver;
 
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 =pod
 
@@ -55,12 +56,14 @@ will not be used for the report, but only for Spamcop statistics.
 =cut
 
 __PACKAGE__->follow_best_practice;
-my @fields = (
-    'tracking_id', 'mailer', 'content_type', 'age',
-    'age_unit',    'contacts'
-    );
-__PACKAGE__->mk_accessors(@fields);
-__PACKAGE__->mk_ro_accessors(qw(receivers));
+my $fields = Set::Tiny->new((
+        'tracking_id', 'mailer', 'content_type', 'age',
+        'age_unit',    'contacts', 'receivers'
+    ));
+my $ro_fields = Set::Tiny->new(qw(receivers));
+
+__PACKAGE__->mk_accessors(($fields->difference($ro_fields))->members);
+__PACKAGE__->mk_ro_accessors($ro_fields->members);
 
 =head1 METHODS
 
@@ -97,15 +100,25 @@ instead.
 
 sub as_text {
     my $self = shift;
-    my @scalars;
+    my @simple;
+
+# Set::Tiny->members is not ordered and we need that to have deterministic text
+    my @fields = sort($fields->members);
+    my $complex = Set::Tiny->new(qw(contacts receivers age));
 
     foreach my $field (@fields) {
-        next if ( $field eq 'contacts' );
-        next if ( $field eq 'receivers' );
-        push( @scalars, $field );
+        next if ( $complex->has(($field)) );
+        push( @simple, $field );
     }
 
-    my @dump = map { $_ . '=' . ( $self->{$_} || $self->na ) } @scalars;
+    my @dump = map { $_ . '=' . ( $self->{$_} || $self->na ) } @simple;
+
+    # age can be zero
+    if (defined($self->{age})) {
+        push(@dump, 'age=' . $self->{age});
+    } else {
+        push(@dump, 'age=' . $self->na);
+    }
 
     foreach my $key (qw(receivers contacts)) {
         if ( $self->{$key} ) {
@@ -182,6 +195,11 @@ Returns the "not available" string. Can be used as class method.
 
 sub na {
     return 'not available';
+}
+
+sub _fields {
+    my @fields = sort($fields->members);
+    return \@fields;
 }
 
 =head2 set_receivers

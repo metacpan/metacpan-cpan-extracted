@@ -1,6 +1,6 @@
 package Google::RestApi;
 
-our $VERSION = '1.0.0';
+our $VERSION = '1.0.1';
 
 use Google::RestApi::Setup;
 
@@ -13,8 +13,6 @@ use Module::Load qw( load );
 use Scalar::Util qw( blessed );
 use Retry::Backoff qw( retry );
 use Storable qw( dclone );
-use Time::HiRes;   # prevent 'unimplmented in this platform' for windows, for time::out below. order is important.
-use Time::Out qw( timeout );
 use Try::Tiny qw( catch try );
 use URI ();
 use URI::QueryParam ();
@@ -139,11 +137,8 @@ sub _api {
   # default is exponential backoff, initial delay 1.
   my $tries = 0;
   my $last_error;
-  my $response = retry
-    sub {
-      # timeout is in the ua too, but i've seen requests to spreadsheets
-      # completely hang if the request isn't constructed correctly.
-      timeout $self->{timeout} => sub { $self->{ua}->request($req); };
+  my $response = retry sub {
+      $self->{ua}->request($req);
     },
     retry_if => sub {
       my $h = shift;
@@ -227,9 +222,13 @@ sub stats {
   return $stats;
 }
 
+# this is built for every api call so the entire api call can be examined,
+# params, body content, http codes, etc etc.
 sub transaction { shift->{transaction} || {}; }
 
-# used for debugging/logging purposes.
+# used for debugging/logging purposes. tries to dig out a useful caller
+# so api calls can be traced back. skips some stuff that we use internally
+# like cache.
 sub _caller_internal {
   my ($package, $subroutine, $line, $i) = ('', '', 0);
   do {

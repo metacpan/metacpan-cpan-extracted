@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Zest::Author::TABULO::Util::Text;
-our $VERSION = '1.000006';
+our $VERSION = '1.000011';
 
 use Exporter::Shiny qw( lines_utf8_from strip_comments);
 
@@ -58,7 +58,7 @@ Zest::Author::TABULO::Util::Text - DZIL-related utility functions used by TABULO
 
 =head1 VERSION
 
-version 1.000006
+version 1.000011
 
 =for Pod::Coverage lines_utf8_from strip_comments
 
@@ -68,7 +68,7 @@ Tabulo[n] <dev@tabulo.net>
 
 =head1 LEGAL
 
-This software is copyright (c) 2021 by Tabulo[n].
+This software is copyright (c) 2022 by Tabulo[n].
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

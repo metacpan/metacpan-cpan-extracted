@@ -19,7 +19,7 @@ name: MS
 provides:
   MS:
     file: lib/MS.pm
-    version: '0.207001'
+    version: '0.207002'
   MS::CV:
     file: lib/MS/CV.pm
   MS::Mass:
@@ -109,5 +109,5 @@ requires:
 resources:
   license: http://www.gnu.org/licenses/gpl-3.0.txt
   repository: https://github.com/jvolkening/p5-MS
-version: '0.207001'
+version: '0.207002'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -27,8 +27,10 @@ docs/Lingua-Interset-Tagset-CS-Conll.html
 docs/Lingua-Interset-Tagset-CS-Conll2009.html
 docs/Lingua-Interset-Tagset-CS-Multext.html
 docs/Lingua-Interset-Tagset-CS-Pdt.html
+docs/Lingua-Interset-Tagset-CS-Pdtc.html
 docs/Lingua-Interset-Tagset-CS-Pmk.html
 docs/Lingua-Interset-Tagset-CS-Pmkkr.html
+docs/Lingua-Interset-Tagset-CS-Ridics.html
 docs/Lingua-Interset-Tagset-Conll.html
 docs/Lingua-Interset-Tagset-DA-Conll.html
 docs/Lingua-Interset-Tagset-DE-Conll.html
@@ -57,6 +59,7 @@ docs/Lingua-Interset-Tagset-JA-Ipadic.html
 docs/Lingua-Interset-Tagset-LA-Conll.html
 docs/Lingua-Interset-Tagset-LA-It.html
 docs/Lingua-Interset-Tagset-LA-Itconll.html
+docs/Lingua-Interset-Tagset-LT-Jablonskis.html
 docs/Lingua-Interset-Tagset-LT-Multext.html
 docs/Lingua-Interset-Tagset-MT-Mlss.html
 docs/Lingua-Interset-Tagset-MUL-Google.html
@@ -108,8 +111,10 @@ lib/Lingua/Interset/Tagset/CS/Conll.pm
 lib/Lingua/Interset/Tagset/CS/Conll2009.pm
 lib/Lingua/Interset/Tagset/CS/Multext.pm
 lib/Lingua/Interset/Tagset/CS/Pdt.pm
+lib/Lingua/Interset/Tagset/CS/Pdtc.pm
 lib/Lingua/Interset/Tagset/CS/Pmk.pm
 lib/Lingua/Interset/Tagset/CS/Pmkkr.pm
+lib/Lingua/Interset/Tagset/CS/Ridics.pm
 lib/Lingua/Interset/Tagset/Conll.pm
 lib/Lingua/Interset/Tagset/DA/Conll.pm
 lib/Lingua/Interset/Tagset/DE/Conll.pm
@@ -138,6 +143,7 @@ lib/Lingua/Interset/Tagset/JA/Ipadic.pm
 lib/Lingua/Interset/Tagset/LA/Conll.pm
 lib/Lingua/Interset/Tagset/LA/It.pm
 lib/Lingua/Interset/Tagset/LA/Itconll.pm
+lib/Lingua/Interset/Tagset/LT/Jablonskis.pm
 lib/Lingua/Interset/Tagset/LT/Multext.pm
 lib/Lingua/Interset/Tagset/MT/Mlss.pm
 lib/Lingua/Interset/Tagset/MUL/Google.pm

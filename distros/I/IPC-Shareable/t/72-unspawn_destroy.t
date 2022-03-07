@@ -6,8 +6,13 @@ use Data::Dumper;
 use IPC::Shareable;
 use Test::More;
 
-if ($Config{nvsize} != 8) {
-    plan skip_all => "Storable not compatible with long doubles";
+BEGIN {
+    if (! $ENV{CI_TESTING}) {
+        plan skip_all => "Not on a legit CI platform...";
+    }
+    if ($Config{nvsize} != 8) {
+        plan skip_all => "Storable not compatible with long doubles";
+    }
 }
 
 tie my %h, 'IPC::Shareable', {

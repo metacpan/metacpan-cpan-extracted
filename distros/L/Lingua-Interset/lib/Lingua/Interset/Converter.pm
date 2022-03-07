@@ -4,7 +4,7 @@
 package Lingua::Interset::Converter;
 use strict;
 use warnings;
-our $VERSION = '3.014';
+our $VERSION = '3.015';
 
 use utf8;
 use open ':utf8';
@@ -55,7 +55,7 @@ Lingua::Interset::Converter - Implements a converter between two physical tagset
 
 =head1 VERSION
 
-version 3.014
+version 3.015
 
 =head1 SYNOPSIS
 

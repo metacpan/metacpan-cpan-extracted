@@ -1,5 +1,18 @@
 Revision history for Async-Event-Interval
 
+1.09    2022-03-05
+    - Bump prereq IPC::Shareable to 1.08 due to a fix in creating random SHM
+      keys in forked environments, major improvements of its _shm_key_rand()
+      function, and its ability to set a 'protected' option so our global shared
+      %events hash doesn't get cleaned up automatically
+    - Modified examples/shared.pl so it doesn't leak segments and semaphores
+      after completion
+    - We now remove %events hash in END instead of DESTROY. This way we can have
+      objects go out of scope in a script without blowing away the global shared
+      data
+    - Added _end() so that we can test the END block in unit tests. END{} calls
+      _end() upon program termination
+
 1.08    2022-03-03
     - Added pid(), getter-only wrapper for _pid()
     - Added example of using shared data with IPC::Shareable

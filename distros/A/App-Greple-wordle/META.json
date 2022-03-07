@@ -4,7 +4,7 @@
       "Kazumasa Utashiro"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.15",
+   "generated_by" : "Minilla/v3.1.12",
    "license" : [
       "perl_5"
    ],
@@ -45,6 +45,7 @@
             "App::Greple" : "8.5602",
             "Date::Calc" : "0",
             "Getopt::EX" : "v1.27.0",
+            "Getopt::EX::Hashed" : "1.03",
             "List::MoreUtils" : "0",
             "List::Util" : "0",
             "Text::VisualWidth::PP" : "0.05",
@@ -60,7 +61,7 @@
    "provides" : {
       "App::Greple::wordle" : {
          "file" : "lib/App/Greple/wordle.pm",
-         "version" : "0.05"
+         "version" : "0.07"
       },
       "App::Greple::wordle::hint" : {
          "file" : "lib/App/Greple/wordle/hint.pm"
@@ -79,16 +80,15 @@
       },
       "homepage" : "https://github.com/kaz-utashiro/greple-wordle",
       "repository" : {
-         "type" : "git",
-         "url" : "https://github.com/kaz-utashiro/greple-wordle.git",
+         "url" : "git://github.com/kaz-utashiro/greple-wordle.git",
          "web" : "https://github.com/kaz-utashiro/greple-wordle"
       }
    },
-   "version" : "0.05",
+   "version" : "0.07",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.02",
+   "x_serialization_backend" : "JSON::PP version 4.07",
    "x_static_install" : 1
 }

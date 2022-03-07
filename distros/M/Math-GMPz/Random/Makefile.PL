@@ -3,15 +3,17 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 our $LIBS;
+our $DEFS;
 
 my %options = %{
 {
   'TYPEMAPS' => [
     '../typemap'
   ],
-  'NAME' => 'Math::GMPz::Random',
-  'LIBS' => $LIBS,
-  'INC' => $INC,
+  'NAME'         => 'Math::GMPz::Random',
+  'LIBS'         => $LIBS,
+  'INC'          => $INC,
+  'DEFINE'       => $DEFS,
   'VERSION_FROM' => 'Random.pm'
 }
 };

@@ -35,7 +35,6 @@ WriteMakefile(
       'Scalar::Util'                    => 0,
       'Storable'                        => 0,
       'Tie::Hash'                       => 0,
-      'Time::Out'                       => 0,
       'Try::Tiny'                       => 0,
       'ToolSet'                         => 0,
       'Type::Params'                    => 1.004004, # minimum version, not sure why

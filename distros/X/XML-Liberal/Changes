@@ -1,5 +1,12 @@
 Revision history for Perl extension XML::Liberal
 
+0.32  2022-03-05 11:23:36 PST
+        - Fix test dependency for Test::Base
+
+0.31  2022-03-04 15:44:49 PST
+        - Fix errors with newer versions of libxml2 (#4)
+        - Switch dist to use Milla
+
 0.30  Thu Jan 24 21:28:14 PST 2013
         - Make this a non-devel release
 

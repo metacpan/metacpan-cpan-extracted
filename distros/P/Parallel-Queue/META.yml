@@ -19,6 +19,7 @@ no_index:
     - inc
 requires:
   Carp: '0'
+  Cwd: '0'
   File::Basename: '0'
   File::Temp: '0'
   FindBin: '0'
@@ -27,5 +28,5 @@ requires:
   autodie: '0'
   mro::EVERY: '0'
   strict: '0'
-version: v4.0.2
+version: v4.0.5
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

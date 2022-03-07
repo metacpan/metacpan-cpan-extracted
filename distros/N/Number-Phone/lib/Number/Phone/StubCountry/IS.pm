@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20211206222446;
+our $VERSION = 1.20220305001842;
 
 my $formatters = [
                 {
@@ -44,7 +44,7 @@ my $validators = {
               1[0-24-69]|
               2[0-7]|
               [37][0-8]|
-              4[0-245]|
+              4[0-24589]|
               5[0-68]|
               6\\d|
               8[0-36-8]
@@ -68,7 +68,7 @@ my $validators = {
               1[0-24-69]|
               2[0-7]|
               [37][0-8]|
-              4[0-245]|
+              4[0-24589]|
               5[0-68]|
               6\\d|
               8[0-36-8]
@@ -92,7 +92,7 @@ my $validators = {
             6(?:
               1[1-8]|
               2[0-6]|
-              3[027-9]|
+              3[026-9]|
               4[014679]|
               5[0159]|
               6[0-69]|
@@ -125,15 +125,15 @@ my $validators = {
             8[0-35-7]
           )\\d{3}
         )|(809\\d{4})',
-                'toll_free' => '80[08]\\d{4}',
+                'toll_free' => '80[0-8]\\d{4}',
                 'voip' => '49[0-24-79]\\d{4}'
               };
 my %areanames = ();
-$areanames{en} = {"35442", "Keflavík",
+$areanames{en} = {"35455", "Reykjavík\/Vesturbær\/Miðbærinn",
 "35446", "Akureyri",
-"3545", "Reykjavík",
+"35442", "Keflavík",
 "35456", "Reykjavík\/Vesturbær\/Miðbærinn",
-"35455", "Reykjavík\/Vesturbær\/Miðbærinn",};
+"3545", "Reykjavík",};
 
     sub new {
       my $class = shift;

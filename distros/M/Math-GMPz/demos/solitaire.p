@@ -36,6 +36,8 @@
 #										#
 # When played with a full deck of 52 standard playing cards, the game is known	#
 # as "frustration solitaire".							#
+# But that's a bit different to the exercise described above, because the	#
+# standard deck of playing cards contains 4 cards for each of the 13 values.	#
 #################################################################################
 
 use strict;
@@ -92,7 +94,7 @@ for(1 .. $its) {
 }
 
 Rmpq_inv($e_q, $e_q);
-print "With $count cards, chance of winning is ",Rmpq_get_d($e_q), "\n$chance / $factorial\n";
+print "With $count cards, chance of winning is ",sprintf(" %.16e ",Rmpq_get_d($e_q)), "\n$chance / $factorial\n";
 
 __END__
 

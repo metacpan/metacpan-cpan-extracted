@@ -1,8 +1,4 @@
-#define PERL_NO_GET_CONTEXT
-
-#include "EXTERN.h"
-#include "perl.h"
-#include "XSUB.h"
+#include "easyxs/init.h"
 
 #include <stdlib.h>
 
@@ -177,36 +173,36 @@ static inline void _COPY_INTO_ENCODE( encode_ctx *encode_state, const unsigned c
 
 // TODO? This could be a macro … it’d just be kind of unwieldy as such.
 static inline void _init_length_buffer( pTHX_ UV num, enum CBOR_TYPE major_type, encode_ctx *encode_state ) {
-    union control_byte *scratch0 = (void *) encode_state->scratch;
-    scratch0->pieces.major_type = major_type;
+    uint8_t* control_byte_p = (void *) encode_state->scratch;
+    *control_byte_p = major_type << CONTROL_BYTE_MAJOR_TYPE_SHIFT;
 
     if ( num < CBOR_LENGTH_SMALL ) {
-        scratch0->pieces.length_type = (uint8_t) num;
+        *control_byte_p |= (uint8_t) num;
 
         _COPY_INTO_ENCODE(encode_state, encode_state->scratch, 1);
     }
     else if ( num <= 0xff ) {
-        scratch0->pieces.length_type = CBOR_LENGTH_SMALL;
+        *control_byte_p |= CBOR_LENGTH_SMALL;
         encode_state->scratch[1] = (uint8_t) num;
 
         _COPY_INTO_ENCODE(encode_state, encode_state->scratch, 2);
     }
     else if ( num <= 0xffff ) {
-        scratch0->pieces.length_type = CBOR_LENGTH_MEDIUM;
+        *control_byte_p |= CBOR_LENGTH_MEDIUM;
 
         _u16_to_buffer( num, 1 + encode_state->scratch );
 
         _COPY_INTO_ENCODE(encode_state, encode_state->scratch, 3);
     }
     else if ( num <= 0xffffffffU ) {
-        scratch0->pieces.length_type = CBOR_LENGTH_LARGE;
+        *control_byte_p |= CBOR_LENGTH_LARGE;
 
         _u32_to_buffer( num, 1 + encode_state->scratch );
 
         _COPY_INTO_ENCODE(encode_state, encode_state->scratch, 5);
     }
     else {
-        scratch0->pieces.length_type = CBOR_LENGTH_HUGE;
+        *control_byte_p |= CBOR_LENGTH_HUGE;
 
         _u64_to_buffer( num, 1 + encode_state->scratch );
 
@@ -405,7 +401,7 @@ void _encode( pTHX_ SV *value, encode_ctx *encode_state ) {
 
                 _COPY_INTO_ENCODE(encode_state, encode_state->scratch, 9);
 #else
-                char bytes[9] = { CBOR_DOUBLE, valptr[0], valptr[1], valptr[2], valptr[3], valptr[4], valptr[5], valptr[6], valptr[7] };
+                unsigned char bytes[9] = { CBOR_DOUBLE, valptr[0], valptr[1], valptr[2], valptr[3], valptr[4], valptr[5], valptr[6], valptr[7] };
                 _COPY_INTO_ENCODE(encode_state, bytes, 9);
 #endif
             }

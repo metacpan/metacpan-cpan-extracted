@@ -7,7 +7,7 @@ use Log::Log4perl 1.54 qw(get_logger :levels);
 use HTTP::CookieJar::LWP 0.012;
 use Mozilla::PublicSuffix v1.0.6;
 
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 =head1 NAME
 

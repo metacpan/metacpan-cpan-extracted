@@ -69,5 +69,12 @@ for my $fail (@fail) {
     }
 }
 
+{
+    my $era = Date::Japanese::Era->new('令和元年');
+    is $era->name, '令和';
+    is $era->year, 1;
+    is $era->gregorian_year, 2019;
+}
+
 done_testing;
 

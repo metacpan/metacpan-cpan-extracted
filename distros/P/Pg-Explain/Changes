@@ -1,5 +1,10 @@
 Revision history for Pg-Explain
 
+2.1     2022/03/07
+        - Add hints for seq scans with multiple conditions joined with AND, if
+          the conditions are equality checks
+          (INDEXABLE_SEQSCAN_MULTI_EQUAL_AND)
+
 2.0     2022/02/11
         - Add Pg::Explain::Hinter to look through Pg::Explain plans, and
           suggest optimizations.

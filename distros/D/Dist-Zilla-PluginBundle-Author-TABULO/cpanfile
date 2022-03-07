@@ -103,6 +103,7 @@ on 'develop' => sub {
   requires "Dist::Zilla" => "5";
   requires "Dist::Zilla::Plugin::Bootstrap::lib" => "0";
   requires "Dist::Zilla::Plugin::MetaNoIndex" => "0";
+  requires "Dist::Zilla::Plugin::ModuleShareDirs" => "0";
   requires "File::Spec" => "0";
   requires "File::Temp" => "0";
   requires "IO::Handle" => "0";

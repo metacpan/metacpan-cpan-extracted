@@ -1,0 +1,12 @@
+1.01 2022-03-04
+ - Add RT 5 support
+
+1.00 2014-12-15
+ - Add docs
+
+0.03 2011-05-18
+ - Add RT 4 support
+ - Move t/ to xt/ for author-only tests
+
+0.02 2005-06-15
+ - Initial release

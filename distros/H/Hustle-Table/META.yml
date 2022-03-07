@@ -19,10 +19,10 @@ no_index:
     - t
     - inc
 requires:
-  common::sense: '0'
+  Template::Plex: '0'
   enum: '0'
   perl: '5.024000'
 resources:
   repository: git://github.com/drclaw1394/perl5-hustle-table.git
-version: v0.3.0
+version: v0.4.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,8 +1,4 @@
-#define PERL_NO_GET_CONTEXT
-
-#include "EXTERN.h"
-#include "perl.h"
-#include "XSUB.h"
+#include "easyxs/init.h"
 
 SV *cbf_call_scalar_with_arguments( pTHX_ SV* cb, const U8 count, SV** args ) {
     // --- Almost all copy-paste from “perlcall” … blegh!

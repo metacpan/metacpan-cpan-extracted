@@ -1,5 +1,13 @@
 Revision history for perl module Git::Lint
 
+0.014 2022-03-05
+ - Add config.t to MANIFEST
+
+0.013 2022-03-05
+ - Correct path for hook examples
+ - Add test for Git::Lint config
+ - Build profiles hashref regardless of found modules
+
 0.012 2022-03-02
  - Correct missing changelog entry
 

@@ -5,6 +5,12 @@ use Carp;
 use IPC::Shareable qw(:lock);
 use Test::More;
 
+BEGIN {
+    if (! $ENV{CI_TESTING}) {
+        plan skip_all => "Not on a legit CI platform...";
+    }
+}
+
 my $t = tie my $sv, 'IPC::Shareable', {
     create => 1,
     key => 'data', 

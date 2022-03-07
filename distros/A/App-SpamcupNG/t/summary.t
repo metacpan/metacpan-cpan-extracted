@@ -1,14 +1,17 @@
 use warnings;
 use strict;
-use Test::More tests => 19;
+use Test::More tests => 22;
 
 use App::SpamcupNG::Summary;
 
 my $instance = new_ok('App::SpamcupNG::Summary');
-can_ok( $instance, qw(new as_text tracking_url to_text set_receivers) );
+can_ok( $instance, qw(new as_text tracking_url to_text set_receivers _fields) );
+is(ref($instance->_fields), 'ARRAY', '_fields method returns the expected reference type');
+my @expected_fields = sort(('tracking_id', 'mailer', 'content_type', 'age', 'age_unit', 'contacts', 'receivers'));
+is_deeply($instance->_fields, \@expected_fields, 'fields returns all expected members');
 note('summary with nothing set');
 is( $instance->as_text,
-    'tracking_id=not available,mailer=not available,content_type=not available,age=not available,age_unit=not available,receivers=(),contacts=()',
+    'age_unit=not available,content_type=not available,mailer=not available,tracking_id=not available,age=not available,receivers=(),contacts=()',
     'as_text returns the expected empty instance'
     );
 is( $instance->to_text('mailer'),
@@ -47,18 +50,25 @@ is( $instance->to_text('contacts'),
     );
 note('summary with everything set');
 is( $instance->as_text,
-    "tracking_id=$tracking_id"
-        . ',mailer=Foobar Mailer,content_type=text/plain;charset=utf-8,age=2,age_unit=hour,receivers=((john@gmail.com,7164185195);(doe@gmail.com,7164185196)),contacts=(john@gmail.com;doe@gmail.com)',
+    "age_unit=hour,content_type=text/plain;charset=utf-8,mailer=Foobar Mailer,tracking_id=$tracking_id,age=2,receivers=((john\@gmail.com,7164185195);(doe\@gmail.com,7164185196)),contacts=(john\@gmail.com;doe\@gmail.com)",
     'as_text returns the expected string'
     );
 
+note('summary with reports with age less than one hour');
+$instance->set_age(0);
+is( $instance->as_text,
+    "age_unit=hour,content_type=text/plain;charset=utf-8,mailer=Foobar Mailer,tracking_id=$tracking_id,age=0,receivers=((john\@gmail.com,7164185195);(doe\@gmail.com,7164185196)),contacts=(john\@gmail.com;doe\@gmail.com)",
+    'as_text returns the expected string'
+    );
+
+# undoing
+$instance->set_age(2);
 note('summary with missing sent reports ID');
 @receivers = ();
 @receivers = map { [ $_, undef ] } @{$emails_ref};
 ok( $instance->set_receivers( \@receivers ), 'set receivers' );
 is( $instance->as_text,
-    "tracking_id=$tracking_id"
-        . ',mailer=Foobar Mailer,content_type=text/plain;charset=utf-8,age=2,age_unit=hour,receivers=((john@gmail.com,not available);(doe@gmail.com,not available)),contacts=(john@gmail.com;doe@gmail.com)',
+    "age_unit=hour,content_type=text/plain;charset=utf-8,mailer=Foobar Mailer,tracking_id=$tracking_id,age=2,receivers=((john\@gmail.com,not available);(doe\@gmail.com,not available)),contacts=(john\@gmail.com;doe\@gmail.com)",
     'as_text returns the expected string'
     );
 

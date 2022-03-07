@@ -8,7 +8,7 @@
 package Lingua::Interset::Tagset::CS::Ajka;
 use strict;
 use warnings;
-our $VERSION = '3.014';
+our $VERSION = '3.015';
 
 use utf8;
 use open ':utf8';
@@ -2896,7 +2896,7 @@ Lingua::Interset::Tagset::CS::Ajka - Driver for the tagset of the Czech morpholo
 
 =head1 VERSION
 
-version 3.014
+version 3.015
 
 =head1 SYNOPSIS
 

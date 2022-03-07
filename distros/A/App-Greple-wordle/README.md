@@ -12,54 +12,62 @@ greple -Mwordle
 App::Greple::wordle is a greple module which implements wordle game.
 Correctness is checked by regular expression.
 
-Rule is almost same as original wordle but answer is different.  Use
+Rule is almost same as the original game but answer is different.  Use
 **--compat** option to get compatible answer.
 
 <div>
-    <p><img width="75%" src="https://raw.githubusercontent.com/kaz-utashiro/greple-wordle/main/images/screen-4.png">
+    <p><img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/greple-wordle/main/images/screen-5.png">
 </div>
 
 # OPTIONS
 
+- **--series**=_number_,  **-s**_number_
 - **--compat**
 
-    Generate compatible answer with the original game.  Otherwise, this
-    game uses unique sequence using same answer word set as the original
-    Wordle.
+    Choose different series of answer.  Default 1.  Series zero is same as
+    the original game and option **--compat** is a short cut for
+    **--series=0**.  If it is not zero, original answer word set is
+    shuffled by pseudo random numbers using series number as an initial
+    seed.
 
 - **--**\[**no-**\]**result**
 
     Show result when succeeded.  Default true.
 
-- **--index**=_number_
+- **--index**=_number_, **-n**_number_
 
-    Specify index. Index is calculated from days from 2021/06/19.  If the
-    value is negative and you can get yesterday's question by giving -1.
-
-- **--series**=_number_
-
-    Choose different series of answers.  Default zero.
+    Specify index. Default index is calculated from days from 2021/06/19.
+    If the value is negative and you can get yesterday's question by
+    giving -1.
 
 - **--random**
 
     Generate random index every time.
 
-- **--count**=_number_
+- **--try**=_number_
 
     Set try count.  Default 6.
-
-- **--answer**=_word_
-
-    Set answer word.  For debug purpose.
 
 # BUGS
 
 Wrong position character is colored yellow always, even if it is
 colored green in other position.
 
+# INSTALL
+
+## CPANMINUS
+
+    $ cpanm App::Greple::wordle
+    or
+    $ curl -sL http://cpanmin.us | perl - App::Greple::wordle
+
 # SEE ALSO
 
+[App::Greple::wordle](https://metacpan.org/pod/App%3A%3AGreple%3A%3Awordle), [https://github.com/kaz-utashiro/greple-wordle](https://github.com/kaz-utashiro/greple-wordle)
+
 [App::Greple](https://metacpan.org/pod/App%3A%3AGreple), [https://github.com/kaz-utashiro/greple](https://github.com/kaz-utashiro/greple)
+
+[https://qiita.com/kaz-utashiro/items/ba6696187f2ce902aa39](https://qiita.com/kaz-utashiro/items/ba6696187f2ce902aa39)
 
 [https://github.com/alex1770/wordle](https://github.com/alex1770/wordle)
 

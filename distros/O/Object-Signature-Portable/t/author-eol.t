@@ -33,7 +33,6 @@ my @files = (
     't/release-check-manifest.t',
     't/release-fixme.t',
     't/release-kwalitee.t',
-    't/release-pod-spelling.t',
     't/release-trailing-space.t',
     't/yaml.t'
 );

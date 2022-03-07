@@ -1,7 +1,9 @@
 Revision history for CGI-Ex.
 
-2.50      2020-07-07 22:03:55-06:00 America/Denver
+2.51      2022-03-07 09:27:24-07:00 America/Denver
+  * Fix an uninitialized value issue (thank you Prashanth BJ)
 
+2.50      2020-07-07 22:03:55-06:00 America/Denver
   * Allow for optionally using multi_param if the object supports it
 
 2.49      2020-03-05 10:42:23-07:00 America/Denver
@@ -423,7 +425,7 @@ Revision history for CGI-Ex.
   * Allow for duplicate field definitions
 
 0.96      2003-11-26
-	* Fix for pos not resetting in CGI::Ex::Fill
+  * Fix for pos not resetting in CGI::Ex::Fill
   * Fix for general items set in self not being passed to generate_js
   * Workaround for yaml_load.js |- not properly trimming whitespace
 

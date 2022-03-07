@@ -22,8 +22,9 @@ WriteMakefile(
         'Data::Dump'    => '1.23',
         'Data::UUID'    => '1.226',
         'Data::Dumper'  => 0,
-        'DateTime'      => '1.50',
-        'DateTime::Format::Strptime' => '1.77',
+        'DateTime'      => '1.57',
+        'DateTime::Format::Strptime' => '1.79',
+        'DateTime::TimeZone'    => '2.51',
         'Devel::StackTrace' => 0,
         'Exporter'      => '5.70',
         # Used to require 1.13, but removed any requirement

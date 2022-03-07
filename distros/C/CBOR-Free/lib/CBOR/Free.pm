@@ -11,7 +11,7 @@ our ($VERSION);
 use XSLoader ();
 
 BEGIN {
-    $VERSION = '0.31';
+    $VERSION = '0.32';
     XSLoader::load();
 }
 
@@ -35,6 +35,12 @@ Also see L<CBOR::Free::Decoder> for an object-oriented interface
 to the decoder.
 
 =head1 DESCRIPTION
+
+=begin html
+
+<a href='https://coveralls.io/github/FGasper/p5-CBOR-Free?branch=master'><img src='https://coveralls.io/repos/github/FGasper/p5-CBOR-Free/badge.svg?branch=master' alt='Coverage Status' /></a>
+
+=end html
 
 This library implements L<CBOR|https://tools.ietf.org/html/rfc7049>
 via XS under a license that permits commercial usage with no “strings

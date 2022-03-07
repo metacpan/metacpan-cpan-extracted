@@ -1,0 +1,53 @@
+# GENERAL
+-w          # Show all warnings
+-se         # Send all error messages to STDERR     # default: OFF (-nse)
+--converge  # Try to converge in max 4 iterations
+
+# Text file format
+-utf8
+-ole=unix   # --output-line-ending=win|dos|unix|mac   # default: <native OS>
+
+# Lines & line width
+-l=140      # max line length (target)
+-vmll       # variable maximum line length
+-wc=30      # depth to reduce indentation levels
+-mbl=2      # --maximum-consecutive-blank-lines       # defaulk: n=1          
+
+# Indentation
+-i=4        # 4 columns per indentation level         # (default: n=4)          # Use n columns per indentation level
+-ci=2       # 2 columns for continuation-indentation  # (default: n=2).         # best: ci <= i/2  (or else tun ON -xci)
+-cti=2      # one extra indentation level if the line looks like: 
+              #    );  or  ];  or  };
+-xci        # --extended-continuation-indentation     # default: OFF            # Improves things when ci > i/2. "There are no significant disadvantages to using this flag"
+
+# White-space, cuddling, tightness, etc.
+#-iob     # Ignore old breakpoints
+-bar        # opening brace always on right
+# -cab=2
+-cb         #, --cuddled-blocks                       #  cuddle "}" followed by : else, elsif, continue, catch, finally
+-cbl="sort map grep"  # Add these to the types of blocks that may be cuddled (controlled by -cb / -ncb)
+-kis        #, --keep-interior-semicolons             # default: OFF       
+-otr        #, --opening-token-right
+-tso        #, --tight-secret-operators               # default: OFF           # Format "secret operators" tightly (without spaces)
+-wn         #, --weld-nested-containers
+-sot        #, --stack-opening-tokens
+-xs         #, --extended-syntax                      # default: OFF           # Handle certain common extensions to the standard syntax without complaint.
+
+
+# Comments & POD
+-iscl       #, --ignore-side-comment-lengths
+-msc=1      #, --minimum-space-to-comment
+-sbc        #, --static-block-comments
+#-sbcp="^#{2,}[^-=.\s#]"
+-ssc        #, --static-side-comments
+-trp        #, --trim-pod                             # default: OFF 
+
+# Outdents
+-nolq       # Don't outdent long quoted strings
+-nola       # Don't outdent labels
+-nolc       # Don't outdent long comments
+-nokw       # Don't outdent keywords
+
+
+
+

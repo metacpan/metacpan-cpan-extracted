@@ -6,7 +6,7 @@ do { my $x = {
                       },
        'develop' => {
                       'requires' => {
-                                      'Devel::PPPort' => '3.64',
+                                      'Devel::PPPort' => '3.66',
                                       'Pod::Coverage::TrustPod' => '0',
                                       'Test::CleanNamespaces' => '0.15',
                                       'Test::EOF' => '0',
@@ -28,7 +28,7 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
-                                      'Exporter' => '0',
+                                      'Exporter' => '5.57',
                                       'XSLoader' => '0',
                                       'perl' => 'v5.9.3',
                                       'strict' => '0',

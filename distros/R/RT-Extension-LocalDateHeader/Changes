@@ -1,5 +1,8 @@
 Revision history for RT-Extension-LocalDateHeader
 
+1.01 2022-03-04
+ - Add RT 5 support
+
 1.00 2014-12-16
  - Packaging updates
 

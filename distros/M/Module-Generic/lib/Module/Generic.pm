@@ -1,11 +1,11 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic.pm
-## Version v0.21.3
+## Version v0.21.7
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/08/24
-## Modified 2022/02/28
+## Modified 2022/03/06
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -40,7 +40,7 @@ BEGIN
     our @EXPORT      = qw( );
     our @EXPORT_OK   = qw( subclasses );
     our %EXPORT_TAGS = ();
-    our $VERSION     = 'v0.21.3';
+    our $VERSION     = 'v0.21.7';
     # local $^W;
     # mod_perl/2.0.10
     if( exists( $ENV{MOD_PERL} )
@@ -71,7 +71,7 @@ BEGIN
     use constant HAS_THREADS  => ( $Config{useithreads} && $INC{'threads.pm'} );
 };
 
-use strict;
+# use strict;
 
 # We put it here to avoid 'redefine' error
 require Module::Generic::Array;
@@ -119,7 +119,7 @@ sub import
     if( defined( $path ) )
     {
         ## Try absolute path name
-        $path =~ s/^(.*)$dir\.pm$/$1auto\/$dir\/autosplit.ix/;
+        $path =~ s/^(.*)$dir\.pm$/${1}auto\/$dir\/autosplit.ix/;
         eval
         {
             local $SIG{ '__DIE__' }  = sub{ };
@@ -1930,6 +1930,14 @@ sub new_hash
 {
     my $self = shift( @_ );
     return( Module::Generic::Hash->new( @_ ) );
+}
+
+sub new_json
+{
+    my $self = shift( @_ );
+    $self->_load_class( 'JSON' ) || return( $self->pass_error );
+    my $j = JSON->new->allow_nonref->allow_blessed->convert_blessed->relaxed;
+    return( $j );
 }
 
 sub new_null
@@ -5150,7 +5158,7 @@ Module::Generic - Generic Module to inherit from
 
 =head1 VERSION
 
-    v0.21.3
+    v0.21.7
 
 =head1 DESCRIPTION
 
@@ -5722,6 +5730,24 @@ Instantiate a new L<Module::Generic::File> object. If any arguments are provided
 =head2 new_hash
 
 Instantiate a new L<Module::Generic::Hash> object. If any arguments are provided, it will pass it to L<Module::Generic::Hash/new> and return the object.
+
+=head2 new_json
+
+This method tries to load L<JSON> and create a new object.
+
+By default it enables the following L<JSON> object properties:
+
+=over 4
+
+=item L<JSON/allow_blessed>
+
+=item L<JSON/allow_nonref>
+
+=item L<JSON/convert_blessed>
+
+=item L<JSON/relaxed>
+
+=back
 
 =head2 new_null
 

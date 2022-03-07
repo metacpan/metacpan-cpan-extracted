@@ -1,4 +1,4 @@
-Dist::Zilla::PluginBundle::Author::AJNN 0.01
+Dist::Zilla::PluginBundle::Author::AJNN 0.02
 
 This is the configuration I use for Dist::Zilla.
 

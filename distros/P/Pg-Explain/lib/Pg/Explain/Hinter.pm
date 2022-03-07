@@ -25,11 +25,11 @@ Pg::Explain::Hinter - Review Pg::Explain plans and return hints, if there are an
 
 =head1 VERSION
 
-Version 2.0
+Version 2.1
 
 =cut
 
-our $VERSION = '2.0';
+our $VERSION = '2.1';
 
 =head1 SYNOPSIS
 
@@ -116,6 +116,7 @@ sub calculate_hints {
 
         $self->check_hint_disk_sort( $node );
         $self->check_hint_indexable_seqscan_simple( $node );
+        $self->check_hint_indexable_seqscan_multi_equal_and( $node );
 
     }
 
@@ -190,6 +191,78 @@ sub check_hint_indexable_seqscan_simple {
             'node'    => $node,
             'type'    => 'INDEXABLE_SEQSCAN_SIMPLE',
             'details' => [ $column_used, $operator ],
+        );
+        last;
+
+    }
+    my @filter_lines = grep { /^Filter:/ } @{ $node->extra_info };
+    return if 1 != scalar @filter_lines;
+
+}
+
+=head2 check_hint_indexable_seqscan_multi_equal_and
+
+Check if given node matches criteria for INDEXABLE_SEQSCAN_MULTI_EQUAL_AND hint
+
+=cut
+
+sub check_hint_indexable_seqscan_multi_equal_and {
+    my $self = shift;
+    my $node = shift;
+
+    return unless $node->type =~ m{\A(?:Parallel )?Seq Scan\z};
+    return unless $node->estimated_row_width;
+    return unless $node->total_rows_removed;
+    return unless $node->extra_info;
+
+    # At least 3 pages worth of data is processed
+    return unless ( $node->total_rows + $node->total_rows_removed ) * $node->estimated_row_width > 3 * 8192;
+
+    # At least 2/3rd of rows were removed
+    return unless $node->total_rows_removed > $node->total_rows * 2;
+
+    # Filter: ((projet = 10317) AND (section = 29) AND (zone = 4))
+    my $single_condition = qr{
+        \(
+        ("[^"]+"|[a-z0-9_]+)
+        \s+
+        =
+        \s+
+        (
+            ' (?: [^'] | '' ) * '
+            (?: :: (?: "[^"]+" | [a-z0-9_ ]+ ) )?
+            |
+            \d+
+        )
+        \)
+    }xmso;
+
+    for my $line ( @{ $node->extra_info } ) {
+        next unless $line =~ m{
+            \A
+            Filter: \s+ \(
+                (
+                    ${single_condition}
+                    (?:
+                        \s+
+                        AND
+                        \s+
+                        ${single_condition}
+                    )+
+                )
+            \)
+            \z
+        }xms;
+        my $all_conditions = $1;
+        my @cols           = ();
+        while ( $all_conditions =~ m{ ${single_condition} (?= \s+ AND \s+ | \z ) }xg ) {
+            push @cols, { 'column' => $1, 'value' => $2 };
+        }
+        push @{ $self->{ 'hints' } }, Pg::Explain::Hinter::Hint->new(
+            'plan'    => $self->plan,
+            'node'    => $node,
+            'type'    => 'INDEXABLE_SEQSCAN_MULTI_EQUAL_AND',
+            'details' => [ sort { $a->{ 'column' } cmp $b->{ 'column' } } @cols ],
         );
         last;
 

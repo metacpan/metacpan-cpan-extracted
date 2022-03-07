@@ -8,6 +8,12 @@ use IPC::Shareable::SharedMem;
 use Test::More;
 use Test::SharedFork;
 
+BEGIN {
+    if (! $ENV{CI_TESTING}) {
+        plan skip_all => "Not on a legit CI platform...";
+    }
+}
+
 sub shm_cleaned {
     # --- shmread should barf if the segment has really been cleaned
     my $id = shift;

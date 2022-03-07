@@ -48,13 +48,11 @@ sub extract_error {
     my $self = shift;
     my($exn, $xml_ref) = @_;
 
-    # for XML::LibXML > 1.69
+    # for XML::LibXML > 1.69. Some time between lixml2 2.9.4 and 2.9.12,
+    # multiple errors are returned as an array you need to unwind using
+    # _prev. Stringifying the root error still gives the combined errors,
+    # joined by newlines.
     if (ref $exn eq 'XML::LibXML::Error') {
-        while($exn->_prev) {
-            last if $exn->message =~/Unregistered error message/;
-            last if $exn->message =~/internal error/;
-            $exn =  $exn->_prev
-        }
         $exn = $exn->as_string;
     }
     my @errors = split /\n/, $exn;

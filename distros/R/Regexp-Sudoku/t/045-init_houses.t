@@ -9,7 +9,6 @@ no  warnings 'syntax';
 use lib qw [lib ../lib];
 
 use Test::More 0.88;
-use Test::Exception;
 
 our $r = eval "require Test::NoWarnings; 1";
 
@@ -83,10 +82,6 @@ foreach my $size (sort {$a <=> $b} keys %$boxes) {
         }
     };
 }
-
-throws_ok {
-    Regexp::Sudoku:: -> new -> init (houses => 1 << 20)
-} qr /^Unknown house\(s\)/, "Do not accept unknown houses";
 
 
 Test::NoWarnings::had_no_warnings () if $r;

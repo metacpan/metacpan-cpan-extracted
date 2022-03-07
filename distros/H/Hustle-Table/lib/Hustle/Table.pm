@@ -1,8 +1,10 @@
 package Hustle::Table;
-use version; our $VERSION=version->declare("v0.3.0");
+use version; our $VERSION=version->declare("v0.4.1");
 
 use strict;
 use warnings;
+
+use Template::Plex;
 
 use feature "refaliasing";
 no warnings "experimental";
@@ -213,130 +215,117 @@ sub _reorder{
 
 
 sub _prepare_online {
-        \my @table=shift; #self
-        my $d="sub {\n";
-	$d.='	my $entry;'."\n";
-        $d.='	given (shift) {'."\n";		#Shift out first argument
-        for (0..@table-2) {
-		#$d.='		$entry=$table['.$_.']'."\n";
-		#my $pre='$table['.$_.']';
+	my $sub_template=
+	'	 
+	\$entry=\$table->[$index];
+	\$matcher=\$entry->[Hustle::Table::matcher_];
+	(/\$matcher/o)
+		and (++\$entry->[Hustle::Table::count_])
+		and unshift(\@_, \$entry)
+		and return \&{\$entry->[Hustle::Table::sub_]};
+	';
 
-                $d.='		when (($entry=$table['.$_.'])->[matcher_]){'."\n";
-                $d.='			$entry->[count_]++;'."\n";
-		$d.="			unshift \@_, \$entry;\n";	#First argument is the match entry
-                $d.='			&{$entry->[sub_]};'."\n";
-                $d.="		}\n";
-        }
-        $d.="		default {\n";
-        $d.='			$table[$#table][count_]++;'."\n";
-	$d.='			unshift @_,$table[$#table];'."\n";	#First argument is the match entry
-        $d.='			&{$table[$#table][sub_]};'."\n";
-        $d.="		}\n";
-        $d.="	}\n}\n";
-	#print $d;
-        my $s=eval($d);
-	$s
-	
+	my $template=
+	'sub {
+		my \$entry;
+		#my \$input=shift;
+		my \$matcher;
+		for(shift){
+		@{[do {
+		my $index=0;
+		my $base={index=>0};
+
+		my $sub=plex [$sub], $base;
+		map {$base->{index}=$_; $sub->render } 0..$table->@*-2;
+
+		}]}
+		#default
+		\$table->[\@\$table-1][Hustle::Table::count_]++;
+		unshift \@_, \$table->[\@\$table-1];
+		\&{\$table->[\@\$table-1][Hustle::Table::sub_]};
+		}
+	}
+	';
+
+	my $table=shift;
+	my $top_level=plex [$template],{table=>$table, sub=>$sub_template};
+	my $s=$top_level->render;
+	#print $s, "\n";
+	eval $s;
 }
 
-sub _prepare_goto_online {
-        \my @table=shift; #self
-        my $d="sub {\n";
-        #$d.='my ($dut)=@_;'."\n";
-        $d.=' given ($_[0]) {'."\n";
-        for (0..@table-2) {
-                my $pre='$table['.$_.']';
 
-                $d.='when ('.$pre."[matcher_]){\n";
-                $d.=$pre."[count_]++;\n";
-                $d.='goto '.$pre.'[sub_];'."\n";
-                $d.="}\n";
-        }
-        $d.="default {\n";
-        $d.='$table[$#table][count_]++;'."\n";
-        $d.='goto $table[$#table][sub_];'."\n";
-        $d.="}\n";
-        $d.="}\n}\n";
-        eval($d);
-}
 
-sub _prepare_online_2 {
-        \my @table=shift; #self
-        my $d="sub {\n";
-        #$d.='my ($dut)=@_;'."\n";
-	$d.= 'my $tmp;'."\n";
-        $d.=' given ($_[0]) {'."\n";
-        for (0..@table-2) {
-                my $pre='$table['.$_.']';
-		$d.='$tmp='.$pre.";\n";
-                $d.='when ($tmp->[matcher_]){'."\n";
-                $d.='$tmp->[count_]++;'."\n";
-                $d.='&{$tmp->[sub_]};'."\n";
-                $d.="}\n";
-        }
-        $d.="default {\n";
-        $d.='$table[$#table][count_]++;'."\n";
-        $d.='&{$table[$#table][sub_]};'."\n";
-        $d.="}\n";
-        $d.="}\n}\n";
-        eval($d);
-}
 
 sub _prepare_online_cached {
-	\my @table=shift; #self
+	my $table=shift; #self
 	my $cache=shift;
 	if(ref $cache ne "HASH"){
 		carp "Cache provided isn't a hash. Using internal cache with no size limits";
 		$cache={};
 	}
 
-	
-	my $d="sub {\n";
-	$d.='my $input=shift @_;'."\n";
-	$d.='given($input){
-		my $rhit=$cache->{$_};
-		if($rhit){
-			\my @hit=$rhit;
+	my $sub_template=
+	'	 
+	\$entry=\$table->[$index];
+	\$matcher=\$entry->[Hustle::Table::matcher_];
+	if(\$input=~/\$matcher/o){
+		++\$entry->[Hustle::Table::count_];
+		unshift(\@_, \$entry);
+		\$cache->{\$input}=\$entry unless \&{\$entry->[Hustle::Table::sub_]};
+		return;
+	}
+	';
+
+	my $template=
+	' sub {
+		my \$input=shift;
+		my \$rhit=\$cache->{\$input};
+		my \$matcher;
+		my \$entry;
+		if(\$rhit){
+			\\\my \@hit=\$rhit;
 			#normal case, acutally executes potental regex
-			when($hit[matcher_]){
-				$hit[count_]++;
-				unshift @_, $rhit;
-				delete $cache->{$_} if &{$hit[sub_]}; #delete if return is true
+			\$matcher=\$hit[Hustle::Table::matcher_];
+			if(\$input=~/\$matcher/o){
+				++\$hit[Hustle::Table::count_];
+				unshift \@_, \$rhit;
+				delete \$cache->{\$input} if \&{\$hit[Hustle::Table::sub_]}; #delete if return is true
 				return;
 
 			}
 			#if the first case does ot match, its because the cached entry is the default (undef matcher)
-			default{
-				$hit[count_]++;
-				unshift @_, $rhit;
-				delete $cache->{$_} if &{$hit[sub_]}; #delete if return is true
+			else{
+				++\$hit[Hustle::Table::count_];
+				unshift \@_, \$rhit;
+				delete \$cache->{\$input} if \&{\$hit[Hustle::Table::sub_]}; #delete if return is true
 				return;
 			}
 		}
-	}';
-	$d.="\n".'	my $entry;';
-	$d.="\n".'	given ($input) {'."\n";
+		@{[do {
+			my $index=0;
+			my $base={index=>0};
 
+			my $sub=plex [$sub], $base;
+			map {$base->{index}=$_; $sub->render } 0..$table->@*-2;
+		}]}
 
-	for (0..@table-2) {
-		#my $pre='$table['.$_.']';
+		\$entry=\$table->[\@\$table-1];
+		unshift \@_, \$entry;
+		\$cache->{\$input}=\$entry unless \&{\$entry->[Hustle::Table::sub_]};
+        	++\$entry->[Hustle::Table::count_];
+	} ';
 
-		$d.='		when (($entry=$table['.$_.'])->[matcher_]){'."\n";
-		$d.='			$entry->[count_]++;'."\n";
-		$d.='			unshift @_, $entry;'."\n";
-		$d.='			$cache->{$input}=$entry unless &{$entry->[sub_]};'."\n";
-		$d.="			return;\n";
-		$d.="		}\n";
-	}
-	$d.="	}\n";
-	$d.='	$entry=$table[$#table];'."\n";
-	$d.='	unshift @_, $entry;'."\n";
-	$d.='	$cache->{$input}=$entry unless &{$entry->[sub_]};'."\n";
-        $d.='	$entry->[count_]++;'."\n";
-	$d.="}\n";
-	#print $d;
-	eval($d);
+	my $top_level=plex [$template],{table=>$table, cache=>$cache, sub=>$sub_template};
+	my $s=$top_level->render;
+
+	#my $line=1;
+	#print map $line++.$_."\n", split "\n", $s;
+	my $ss=eval $s;
+	#print $@;
+	$ss;
 }
+
 
 
 *hustle_add=*add;

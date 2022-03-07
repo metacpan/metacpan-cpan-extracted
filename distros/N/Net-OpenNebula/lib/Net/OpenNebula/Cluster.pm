@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Net::OpenNebula::Cluster;
-$Net::OpenNebula::Cluster::VERSION = '0.316.0';
+$Net::OpenNebula::Cluster::VERSION = '0.317.0';
 use Net::OpenNebula::RPC;
 push our @ISA , qw(Net::OpenNebula::RPC);
 

@@ -1,5 +1,26 @@
 Change history for Sodium-FFI
 
+0.006     2022-03-06
+    - Added crypto_sign_keypair
+    - Added crypto_sign_seed_keypair
+    - Added crypto_sign
+    - Added crypto_sign_open
+    - Added crypto_sign_detached
+    - Added crypto_sign_verify_detached
+    - Added constants:
+      crypto_sign_PUBLICKEYBYTES,
+      crypto_sign_SECRETKEYBYTES,
+      crypto_sign_BYTES,
+      crypto_sign_SEEDBYTES
+
+0.005     2022-03-04
+    - Added crypto_auth
+    - Added crypto_auth_verify
+    - Added crypto_auth_keygen
+    - Added constants:
+      crypto_auth_BYTES,
+      crypto_auth_KEYBYTES
+
 0.004     2022-03-03
     - Added crypto_aead_chacha20poly1305_ietf_decrypt
     - Added crypto_aead_chacha20poly1305_ietf_encrypt

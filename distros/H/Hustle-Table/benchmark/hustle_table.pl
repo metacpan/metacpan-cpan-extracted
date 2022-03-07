@@ -30,7 +30,6 @@ say "Cold table";
 say Dumper $table;
 
 
-
 my $hot=$table->prepare_dispatcher(type=>"online",reset=>1, cache=>{}, reorder=>1);
 timethis 200, sub {
 	for my $sample (@$samples){

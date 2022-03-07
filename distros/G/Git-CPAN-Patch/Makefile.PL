@@ -23,7 +23,6 @@ my %WriteMakefileArgs = (
     "Archive::Any" => 0,
     "Archive::Extract" => 0,
     "BackPAN::Index" => 0,
-    "CLASS" => 0,
     "CPAN::Meta" => 0,
     "CPAN::ParseDistribution" => 0,
     "CPANPLUS" => 0,
@@ -69,7 +68,7 @@ my %WriteMakefileArgs = (
     "Test::MockObject" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "2.4.0",
+  "VERSION" => "2.5.0",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -80,7 +79,6 @@ my %FallbackPrereqs = (
   "Archive::Any" => 0,
   "Archive::Extract" => 0,
   "BackPAN::Index" => 0,
-  "CLASS" => 0,
   "CPAN::Meta" => 0,
   "CPAN::ParseDistribution" => 0,
   "CPANPLUS" => 0,

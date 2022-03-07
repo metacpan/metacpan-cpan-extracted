@@ -33,7 +33,7 @@
       },
       "runtime" : {
          "requires" : {
-            "IPC::Shareable" : "0",
+            "IPC::Shareable" : "1.08",
             "Parallel::ForkManager" : "0",
             "perl" : "5.006"
          }
@@ -50,6 +50,6 @@
          "web" : "https://github.com/stevieb9/async-event-interval"
       }
    },
-   "version" : "1.08",
+   "version" : "1.09",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -24,8 +24,13 @@ $tzil->mint_dist;
 
 my @expected_files = sort qw(
   .gitignore
+  .perltidyrc
+  Changes
   dist.ini
   lib/DZT/Minty.pm
+  perlcritic.rc
+  stopwords
+  tidyall.ini
 );
 
 my $mint_dir = path($tzil->tempdir)->child('mint');
@@ -49,9 +54,9 @@ like $pm, qr/^our \$VERSION = '0\.001(000)?';$/m, 'module version is set';
 like $pm, qr/^=head1 NAME\n\nDZT::Minty - /m, 'right name section in pod';
 
 like $distini, qr/^name\s*=\s*DZT-Minty$/m, 'right dist name';
-like $distini, qr/^version\s*=\s*0\.001$/m, 'dist version is set';
-like $distini, qr/^\[\@Author::TABULO\]$/m, 'starter bundle included';
-# like $distini, qr/^revision\s*=\s*5$/m, 'revision set to 5';
+# like $distini, qr/^version\s*=\s*0\.001$/m, 'dist version is set';    # [TAU]: We now take the version from the main module; not from 'dist.ini'
+like $distini, qr/^\[\@Author::TABULO\]$/m, 'author bundle included';
+# like $distini, qr/^revision\s*=\s*5$/m, 'revision set to 5';          # [TAU]: revisions seem to be too much to maintain for an author bundle
 
 like $gitignore, qr/^\/DZT-Minty-\*$/m, 'builds ignored in git';
 

@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.55.
+signed via the Module::Signature module, version 0.88.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,18 +12,14 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: RIPEMD160
 
-SHA1 b8ba9c799722a08c6cef0155fc4c3a965fcc0867 Changes
-SHA1 c51815d9a4fe047a704263c2620d661e5ecc436a MANIFEST
-SHA1 6c38201dffc8cd299ffea8f8593399cd2d1ff525 META.yml
-SHA1 87babfcf4e52547d81a18cd633fbaa94ed585a95 Makefile.PL
-SHA1 21da58e9d12fab889ca5ea316fb6afb6da8bef47 lib/CLASS.pm
-SHA1 dcc1fb792f2a3838362583d9d70e019d35b1aa01 t/CLASS.t
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.5 (Darwin)
-
-iD8DBQFFKvSYWMohlhD1QycRAj9XAJ9fxEF29ZrRO6GH/wposuId3Y9p4ACbBNaU
-DYb1cIxTMzkZikqbjha4CNY=
-=YsdZ
------END PGP SIGNATURE-----
+SHA256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 Changes
+SHA256 cf47e178ac34fc7340f3c0e17ce2f51e30ec6ddc331964ba343817efdfb5a344 MANIFEST
+SHA256 d54e341df30be9e6c970b3ec5426a50cd36bff743e66766153400e506ee8121f META.json
+SHA256 026c1fd8ea41d823dac5aefec603ff4f96b611b7b661269fdc99109033903361 META.yml
+SHA256 592950012c5dd884838e1560038b4c20c3f635686ea5fa4357a660e1e51c52a9 Makefile.PL
+SHA256 b9ff25631d66d99af7f55f9f6221cc3a97ae543f071d5a5262ceb4ccca7b6bfa README
+SHA256 da9afca8ba90a88c69211f271403f7cf5b2bc22bb5452b657f267a5355a0317c lib/CLASS.pm
+SHA256 2a3b9dd39559384b198a48549880ccf30d6a576bfb93481458ec5312d3a6fa71 t/0-signature.t
+SHA256 5989f5121b6a8d1ccd2333b9af925fd4343431c95d6dda95dd1c9d60611aed2f t/CLASS.t

@@ -8,7 +8,7 @@ use strict;
 use warnings;
 
 package Net::OpenNebula::Datastore;
-$Net::OpenNebula::Datastore::VERSION = '0.316.0';
+$Net::OpenNebula::Datastore::VERSION = '0.317.0';
 use Net::OpenNebula::RPC;
 push our @ISA , qw(Net::OpenNebula::RPC);
 

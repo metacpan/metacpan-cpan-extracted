@@ -1,11 +1,39 @@
 Revision history for Perl extension IPC::Shareable.
 
+1.09    2022-03-06
+    - Made 81-fork_dup_rand_keys.t developer only (but still need to figure out
+      why it only fails on FreeBSD)
+
+1.08    2022-03-04
+    - Added 'protected' option and clean_up_protected(). If set, the cleanup
+      methods, nor the automatic 'destroy' functionality will remove the segment
+      the option was set in, nor any children created underneath of it. A call
+      to clean_up_protected() is required to remove them
+    - Updated attribute tests to include all available options
+    - _shm_key_rand() now checks EXCLUSIVE_CHECK_LIMIT times to find a key for
+      a free segment. It croaks if not
+    - Added _shm_key_rand_int() so we can mock it to test the dup random key
+      checks
+    - Added build prereq of Mock::Sub to test the random key function
+
+1.07    2022-03-04
+    - When running in forked environments, _shm_key_rand() was consistently
+      returning the same 'random' key to each forked process. We've fixed this
+      issue, and added tests for it (fixed by adding a call to srand() before
+      rand)
+    - Move $SIG{CHLD} handlers to spawn() and unspawn() instead of having them
+      global (fixes #15)
+    - t/65-seg_size.t fails on 32-bit perls; Add a check and bail if we're on
+      a perl < 64-bit (fixes #14)
+
 1.06    2021-09-08
     - Fix significant bug where at least on MacOS, if we generated a CRC of a
       key that was greater than 0x80000000, it would round down the key to that
-      number exactly, casuing duplicates, and incorrect segment access
+      number exactly, causing duplicates, and incorrect segment access
     - Added new() method, returns a reference (default hash) without having to
       do the tie() directly
+    - Fix issue in JSON decoder where an empty JSON string may have caused
+      decode failure
     - Modify t/65-seg_size.t beyond RAM max test to cover varying error messages
       on differing OSs
     - Renamed t/67-out_of_memory.t as the tests are related to exhausting SHM

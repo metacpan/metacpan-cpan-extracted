@@ -26,8 +26,8 @@ e  o  e  4  1  9  e  o  5
 o  e  e  o  8  e  o  7  9
 --
 
-my $sudoku = Regexp::Sudoku:: -> new -> init (size  => 9,
-                                              clues => $test);
+my $sudoku = Regexp::Sudoku:: -> new -> init      (size  => 9)
+                                     -> set_clues ($test);
 
 my $exp_clues = {};
 my @rows = split /\n/ => $test;

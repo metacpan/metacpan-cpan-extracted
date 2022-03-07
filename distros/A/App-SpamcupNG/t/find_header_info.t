@@ -20,7 +20,7 @@ $result = find_header_info( read_html($source) );
 is( ref($result),      'HASH', 'result is a hash reference' );
 is( $result->{mailer}, undef,  'mailer has the expected value' );
 is( $result->{content_type},
-    'multipart/alternative;charset="utf-8"',
+    'multipart/alternative;charset=utf-8',
     'content_type has the expected value'
     );
 

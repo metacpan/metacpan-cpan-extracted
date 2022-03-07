@@ -27,9 +27,9 @@ my $t            = Test::Mojo->with_roles('+Slovo')->install(
 )->new('Slovo');
 my $app  = $t->app;
 my $shop = $app->config->{shop};
-is $shop->{shop_id}          => $ENV{SLOVO_PRODAN_SHOP_ID},     'right shop id';
-is $shop->{private_key}      => $ENV{SLOVO_PRODAN_PRIVATE_KEY}, 'right private key';
-is $app->config->{phone_url} => $ENV{SLOVO_PRODAN_PHONE_URL},   'right phone';
+is $shop->{shop_id}     => $ENV{SLOVO_PRODAN_SHOP_ID},     'right shop id';
+is $shop->{private_key} => $ENV{SLOVO_PRODAN_PRIVATE_KEY}, 'right private key';
+is $app->config->{consents}{phone_url} => $ENV{SLOVO_PRODAN_PHONE_URL}, 'right phone';
 
 # /api/shop endpoind is accessed by function get_set_shop_data() in cart.js
 $t->get_ok('/api/shop')->status_is(200)->json_is('',

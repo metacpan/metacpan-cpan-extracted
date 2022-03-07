@@ -3,7 +3,7 @@ use warnings;
 
 package Dist::Zilla::PluginBundle::Author::AJNN;
 # ABSTRACT: Dist::Zilla configuration the way AJNN does it
-$Dist::Zilla::PluginBundle::Author::AJNN::VERSION = '0.01';
+$Dist::Zilla::PluginBundle::Author::AJNN::VERSION = '0.02';
 
 use Dist::Zilla;
 use Moose;
@@ -50,7 +50,10 @@ sub configure {
 	my @prune_aliases = ( $^O eq 'darwin' ? [ $AJNN . '::PruneAliases' => 'PruneAliases' ] : () );
 	$self->add_plugins(
 		[ 'GatherDir' => {
-			exclude_filename => ['README.md'],
+			exclude_filename => [qw(
+				README.md
+				cpanfile
+			)],
 			exclude_match => [qw(
 				~
 				\.webloc$
@@ -150,7 +153,7 @@ Dist::Zilla::PluginBundle::Author::AJNN - Dist::Zilla configuration the way AJNN
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 
@@ -189,6 +192,7 @@ This plugin bundle is nearly equivalent to the following C<dist.ini> config:
 
  [GatherDir]
  exclude_filename = README.md
+ exclude_filename = cpanfile
  exclude_match = ~|\.webloc$
  prune_directory = ^cover_db$|^Stuff$|\.bbprojectd$
  [PruneCruft]

@@ -4,7 +4,7 @@ Dist::Zilla::PluginBundle::Author::TABULO - A Dist::Zilla plugin bundle à la TA
 
 # VERSION
 
-version 1.000006
+version 1.000011
 
 # SYNOPSIS
 
@@ -746,7 +746,7 @@ Tabulo <dev-git.perl@tabulo.net>
 
 # LEGAL
 
-This software is copyright (c) 2021 by Tabulo\[n\].
+This software is copyright (c) 2022 by Tabulo\[n\].
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

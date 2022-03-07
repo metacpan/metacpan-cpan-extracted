@@ -12,9 +12,13 @@ Slovo::Plugin::Prodan - Make and manage sales in your Slovo-based site
     'Themes::Malka',
     {
       Prodan => {
-        migrate          => 1,
-        gdpr_consent_url => '/ѿносно/условия.bg.html',
-        econt            => {
+        migrate  => 1,
+        consents => {
+          gdpr_url    => '/ѿносно/условия.bg.html',
+          phone_url           => $ENV{SLOVO_PRODAN_PHONE_URL},
+          delivery_prices_url => '/ѿносно/цени-доставки.bg.html',
+        },
+        econt => {
           shop_id                 => $ENV{SLOVO_PRODAN_SHOP_ID},
           private_key             => $ENV{SLOVO_PRODAN_PRIVATE_KEY},
           shippment_calc_url      => 'https://delivery.econt.com/customer_info.php',
@@ -76,13 +80,13 @@ Bulgarian)|https://www.econt.com/developers/43-kakvo-e-dostavi-s-ekont.html>.
 
 Products - a products SQL table to populate your pages with products. You
 create a page with several articles (celini) in it. These celini will be the
-pages for the products. You prepare a YAML file with products. Each product
-C<alias> property must match exactly the celina C<alias> and C<data_type>
-on wich this product  will be placed. See C<t/products.yaml>
-and C<t/update_products.yaml> for examples. See
-L<Slovo::Command::prodan::products> on how to add and update products.
+web-pages for the products. You prepare a YAML file with products. Each product
+C<alias> property must match exactly the celina C<alias> and C<data_type> on
+wich this product will be placed. See C<t/products.yaml> and
+C<t/update_products.yaml> for examples. See L<Slovo::Command::prodan::products>
+on how to add and update products.
 
-=head2 Products template
+=head2 Products template for books
 
 A template for displaying products within a C<celina>. You can modify this
 template as you wish to display other types of products - not just books as it
@@ -96,16 +100,42 @@ products table, including the button mentioned above already.
     -t --path domove/xn--b1arjbl.xn--90ae/templates/themes/malka
 
 
-=head2 GDPR and Cookies consent
+=head2 Consents
+
+A section in the Prodan configuration for different settings - only urls for
+now. C<$app-E<gt>config('consents')> may contain any settings needed for the
+client side of the plugin not related dierctly to integration with deliverers
+or payment providers.
+
+=head3 GDPR and Cookies consent
 
 A GDPR and cookies consent alert in the footer which upon click leads to the
 page (celina) where all conditions on using the site can be described. When the
 user clicks on the link to the I<Consent> page a flag in C<localStorage> is put
 so the alert is not shown any more. This flag disappears if the user clears any
-site data and the alert will appear again if the user vists the  site again.
+site data and the alert will appear again if the user vists the site again.
 The Consent celina is created automatically in the localhost domain as an
 example. Search for C<gdpr_consent> in the source of this module to see how it
 is implemented.
+
+Settings:
+
+    Keys        Default Values
+    --------------------------------------------
+    gdpr_url    '/ѿносно/условия.bg.html'
+    ihost       punycode_decode(ed) current host
+
+=head3 Delivery prices URL
+
+This is just a setting for this plugin - C<delivery_prices_url>. Defaults to
+'/ѿносно/цени-доставка.bg.html'. This is a place where the prices for delivery
+are described. The link is displayed at the bottom of the shopping cart widget.
+It is created automatically for localhost as the C<gdpr_url>
+
+=head3 phone_url
+
+Currently displayed as a link in the _footer_right.html.ep template.
+
 
 =head2 TODO some day
 
@@ -147,8 +177,9 @@ configures the deliverer.
     @@ img/cart-plus.svg
     @@ img/cart-remove.svg
     @@ img/econt.svg
+    @@ partials/_footer_right.html.ep
+    @@ partials/_consents.html.ep
     @@ partials/_kniga.html.ep
-    @@ partials/_gdpr_consent.html.ep
     @@ resources/data/prodan_migrations.sql
 
 =head1 SEE ALSO

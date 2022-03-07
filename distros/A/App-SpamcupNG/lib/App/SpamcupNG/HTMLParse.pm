@@ -20,7 +20,7 @@ my %regexes = (
     message_age => qr/^Message\sis\s(\d+)\s(\w+)\sold/
 );
 
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 =head1 NAME
 
@@ -97,6 +97,7 @@ sub find_header_info {
                     my $encoding = lc( $wanted[0] );
                     my $charset  = lc( $wanted[1] );
                     $charset =~ s/^\s+//;
+                    $charset =~ tr/"//d;
 
                     my $not_useful = 'boundary';
 

@@ -48,6 +48,7 @@
             "Dist::Zilla" : "5",
             "Dist::Zilla::Plugin::Bootstrap::lib" : "0",
             "Dist::Zilla::Plugin::MetaNoIndex" : "0",
+            "Dist::Zilla::Plugin::ModuleShareDirs" : "0",
             "File::Spec" : "0",
             "File::Temp" : "0",
             "IO::Handle" : "0",
@@ -172,27 +173,27 @@
    "provides" : {
       "Dist::Zilla::MintingProfile::Author::TABULO" : {
          "file" : "lib/Dist/Zilla/MintingProfile/Author/TABULO.pm",
-         "version" : "1.000006"
+         "version" : "1.000011"
       },
       "Dist::Zilla::PluginBundle::Author::TABULO" : {
          "file" : "lib/Dist/Zilla/PluginBundle/Author/TABULO.pm",
-         "version" : "1.000006"
+         "version" : "1.000011"
       },
       "Pod::Weaver::PluginBundle::Author::TABULO" : {
          "file" : "lib/Pod/Weaver/PluginBundle/Author/TABULO.pm",
-         "version" : "1.000006"
+         "version" : "1.000011"
       },
       "Pod::Wordlist::Author::TABULO" : {
          "file" : "lib/Pod/Wordlist/Author/TABULO.pm",
-         "version" : "1.000006"
+         "version" : "1.000011"
       },
       "Zest::Author::TABULO::Util::List" : {
          "file" : "lib/Zest/Author/TABULO/Util/List.pm",
-         "version" : "1.000006"
+         "version" : "1.000011"
       },
       "Zest::Author::TABULO::Util::Mayhap" : {
          "file" : "lib/Zest/Author/TABULO/Util/Mayhap.pm",
-         "version" : "1.000006"
+         "version" : "1.000011"
       }
    },
    "release_status" : "stable",
@@ -207,7 +208,7 @@
          "web" : "https://github.com/tabulon-perl/p5-Dist-Zilla-PluginBundle-Author-TABULO"
       }
    },
-   "version" : "1.000006",
+   "version" : "1.000011",
    "x_authority" : "cpan:TABULO",
    "x_contributors" : [
       "Tabulo <dev-git.perl@tabulo.net>"

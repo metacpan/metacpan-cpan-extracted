@@ -6,9 +6,10 @@ use strict;
 use warnings;
 no warnings 'once';
 
+use Term::ANSIColor qw(:constants);
 use Module::Install::Base;
 use base 'Module::Install::Base';
-our $VERSION = '0.36';
+our $VERSION = '0.43';
 
 use FindBin;
 use File::Glob     ();
@@ -37,6 +38,13 @@ sub RTx {
     }
     $self->add_metadata("x_module_install_rtx_version", $VERSION );
 
+    my $installdirs = $ENV{INSTALLDIRS};
+    for ( @ARGV ) {
+        if ( /INSTALLDIRS=(.*)/ ) {
+            $installdirs = $1;
+        }
+    }
+
     # Try to find RT.pm
     my @prefixes = qw( /opt /usr/local /home /usr /sw /usr/share/request-tracker4);
     $ENV{RTHOME} =~ s{/RT\.pm$}{} if defined $ENV{RTHOME};
@@ -46,7 +54,7 @@ sub RTx {
         my @look = @INC;
         unshift @look, grep {defined and -d $_} @try;
         push @look, grep {defined and -d $_}
-            map { ( "$_/rt4/lib", "$_/lib/rt4", "$_/lib" ) } @prefixes;
+            map { ( "$_/rt5/lib", "$_/lib/rt5", "$_/rt4/lib", "$_/lib/rt4", "$_/lib" ) } @prefixes;
         last if eval {local @INC = @look; require RT; $RT::LocalLibPath};
 
         warn
@@ -69,9 +77,31 @@ sub RTx {
         $self->requires_rt('4.0.0');
     }
 
+    my $package = $name;
+    $package =~ s/-/::/g;
+    if ( $RT::CORED_PLUGINS{$package} ) {
+        my ($base_version) = $RT::VERSION =~ /(\d+\.\d+\.\d+)/;
+        die RED, <<"EOT";
+
+**** Error: Your installed version of RT ($RT::VERSION) already
+            contains this extension in core, so you don't need to
+            install it.
+
+            Check https://docs.bestpractical.com/rt/$base_version/RT_Config.html
+            to configure it.
+
+EOT
+    }
+
     # Installation locations
     my %path;
-    $path{$_} = $RT::LocalPluginPath . "/$name/$_"
+    my $plugin_path;
+    if ( $installdirs && $installdirs eq 'vendor' ) {
+        $plugin_path = $RT::PluginPath;
+    } else {
+        $plugin_path = $RT::LocalPluginPath;
+    }
+    $path{$_} = $plugin_path . "/$name/$_"
         foreach @DIRS;
 
     # Copy RT 4.2.0 static files into NoAuth; insufficient for
@@ -85,7 +115,7 @@ sub RTx {
     my %index = map { $_ => 1 } @INDEX_DIRS;
     $self->no_index( directory => $_ ) foreach grep !$index{$_}, @DIRS;
 
-    my $args = join ', ', map "q($_)", map { ($_, $path{$_}) }
+    my $args = join ', ', map "q($_)", map { ($_, "\$(DESTDIR)$path{$_}") }
         sort keys %path;
 
     printf "%-10s => %s\n", $_, $path{$_} for sort keys %path;
@@ -100,11 +130,29 @@ lexicons ::
 .
     }
 
+    my $remove_files;
+    if( $extra_args->{'remove_files'} ){
+        $self->include('Module::Install::RTx::Remove');
+        our @remove_files;
+        eval { require "./etc/upgrade/remove_files" }
+          or print "No remove file located, no files to remove\n";
+        $remove_files = join ",", map {"q(\$(DESTDIR)$plugin_path/$name/$_)"} @remove_files;
+    }
+
     $self->include('Module::Install::RTx::Runtime') if $self->admin;
     $self->include_deps( 'YAML::Tiny', 0 ) if $self->admin;
     my $postamble = << ".";
 install ::
 \t\$(NOECHO) \$(PERL) -Ilib -I"$local_lib_path" -I"$lib_path" -Iinc -MModule::Install::RTx::Runtime -e"RTxPlugin()"
+.
+
+    if( $remove_files ){
+        $postamble .= << ".";
+\t\$(NOECHO) \$(PERL) -MModule::Install::RTx::Remove -e \"RTxRemove([$remove_files])\"
+.
+    }
+
+    $postamble .= << ".";
 \t\$(NOECHO) \$(PERL) -MExtUtils::Install -e \"install({$args})\"
 .
 
@@ -123,7 +171,7 @@ install ::
         $has_etc{acl}++;
     }
     if ( -e 'etc/initialdata' ) { $has_etc{initialdata}++; }
-    if ( grep { /\d+\.\d+(\.\d+)?.*$/ } glob('etc/upgrade/*.*') ) {
+    if ( grep { /\d+\.\d+\.\d+.*$/ } glob('etc/upgrade/*.*.*') ) {
         $has_etc{upgrade}++;
     }
 
@@ -131,6 +179,7 @@ install ::
     if ( $path{lib} ) {
         $self->makemaker_args( INSTALLSITELIB => $path{'lib'} );
         $self->makemaker_args( INSTALLARCHLIB => $path{'lib'} );
+        $self->makemaker_args( INSTALLVENDORLIB => $path{'lib'} )
     } else {
         $self->makemaker_args( PM => { "" => "" }, );
     }
@@ -138,6 +187,13 @@ install ::
     $self->makemaker_args( INSTALLSITEMAN1DIR => "$RT::LocalPath/man/man1" );
     $self->makemaker_args( INSTALLSITEMAN3DIR => "$RT::LocalPath/man/man3" );
     $self->makemaker_args( INSTALLSITEARCH => "$RT::LocalPath/man" );
+
+    # INSTALLDIRS=vendor should install manpages into /usr/share/man.
+    # That is the default path in most distributions. Need input from
+    # Redhat, Centos etc.
+    $self->makemaker_args( INSTALLVENDORMAN1DIR => "/usr/share/man/man1" );
+    $self->makemaker_args( INSTALLVENDORMAN3DIR => "/usr/share/man/man3" );
+    $self->makemaker_args( INSTALLVENDORARCH => "/usr/share/man" );
 
     if (%has_etc) {
         print "For first-time installation, type 'make initdb'.\n";
@@ -184,7 +240,7 @@ sub requires_rt {
     my @sorted = sort RT::Handle::cmp_version $version,$RT::VERSION;
 
     if ($sorted[-1] eq $version) {
-        die <<"EOT";
+        die RED, <<"EOT";
 
 **** Error: This extension requires RT $version. Your installed version
             of RT ($RT::VERSION) is too old.
@@ -210,12 +266,12 @@ sub requires_rt_plugin {
         unshift @INC, $path;
     } else {
         my $name = $self->name;
-        warn <<"EOT";
+        my $msg = <<"EOT";
 
 **** Warning: $name requires that the $plugin plugin be installed and
               enabled; it does not appear to be installed.
-
 EOT
+        warn RED, $msg, RESET, "\n";
     }
     $self->requires(@_);
 }
@@ -225,9 +281,8 @@ sub rt_too_new {
     my $name = $self->name;
     $msg ||= <<EOT;
 
-**** Error: Your installed version of RT (%s) is too new; this extension
-            only works with versions older than %s.
-
+**** Warning: Your installed version of RT (%s) is too new; this extension
+              has not been tested on your version of RT and may not work as expected.
 EOT
     $self->add_metadata("x_rt_too_new", $version) if $self->is_admin;
 
@@ -235,7 +290,7 @@ EOT
     my @sorted = sort RT::Handle::cmp_version $version,$RT::VERSION;
 
     if ($sorted[0] eq $version) {
-        die sprintf($msg,$RT::VERSION,$version);
+        warn RED, sprintf($msg,$RT::VERSION), RESET, "\n";
     }
 }
 
@@ -258,4 +313,4 @@ sub _load_rt_handle {
 
 __END__
 
-#line 390
+#line 484

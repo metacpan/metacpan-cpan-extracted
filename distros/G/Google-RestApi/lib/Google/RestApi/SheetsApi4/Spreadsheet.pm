@@ -1,6 +1,6 @@
 package Google::RestApi::SheetsApi4::Spreadsheet;
 
-our $VERSION = '1.0.0';
+our $VERSION = '1.0.1';
 
 use Google::RestApi::Setup;
 
@@ -18,6 +18,7 @@ sub new {
 
   my $qr_id = SheetsApi4->Spreadsheet_Id;
   my $qr_uri = SheetsApi4->Spreadsheet_Uri;
+  # pass one of id/name/title/uri and this will work out the others.
   state $check = compile_named(
     sheets_api => HasApi,
     # https://developers.google.com/sheets/api/guides/concepts
@@ -38,17 +39,20 @@ sub new {
   return $self;
 }
 
+# take the passed uri from worksheet/range/rangegroup etc, and tack on the spreadsheet id,
+# then pass it up to G::R::SheetsApi4 which will tack on the endpoint.
 sub api {
   my $self = shift;
   state $check = compile_named(
     uri     => Str, { default => '' },
-    _extra_ => slurpy Any,
+    _extra_ => slurpy Any,             # we'll just pass the params/content etc up for processing.
   );
   my $p = named_extra($check->(@_));
   $p->{uri} = $self->spreadsheet_id() . $p->{uri};
   return $self->sheets_api()->api(%$p);
 }
 
+# work out the id from the uri or the name/title.
 sub spreadsheet_id {
   my $self = shift;
 
@@ -73,6 +77,7 @@ sub spreadsheet_id {
 }
 
 # when 'api' is eventually called, id will be worked out if we don't already have it.
+# the resolving of id/name/title/uri is deferred until the first api call.
 sub spreadsheet_name {
   my $self = shift;
   $self->{name} ||= $self->properties('title')->{title}
@@ -81,7 +86,7 @@ sub spreadsheet_name {
 }
 sub spreadsheet_title { spreadsheet_name(@_); }
 
-# when 'api' is eventually called, id will be worked out if we don't already have it.
+# see above routine.
 sub spreadsheet_uri {
   my $self = shift;
   $self->{uri} ||= $self->attrs('spreadsheetUrl')->{spreadsheetUrl}
@@ -90,6 +95,7 @@ sub spreadsheet_uri {
   return $self->{uri};
 }
 
+# return one of the attributes of the spreadsheet.
 sub attrs {
   my $self = shift;
   my $fields = shift;
@@ -98,6 +104,7 @@ sub attrs {
   });
 }
 
+# return one of the property attributes of the spreadsheet.
 sub properties {
   my $self = shift;
   state $check = compile(Str);
@@ -128,6 +135,8 @@ sub _fields {
   return $fields;
 }
 
+# if multiple attributes are called for, it can hammer the api unnecessarily, so cache the results
+# for a few seconds (default 5).
 sub _cache {
   my $self = shift;
 
@@ -148,7 +157,10 @@ sub _cache_delete {
   return;
 }
 
-# sets the number of seconds that things will be cached.
+# sets the number of seconds that attrs will be cached. this can be adjusted
+# to suit your use-case. if there are lots of people updating things, then a 
+# lower cache value would suit. if you know you are the only one using it, then
+# a higher cache value will prevent unnecessary calls to the api.
 sub cache_seconds {
   my $self = shift;
 
@@ -189,6 +201,7 @@ sub range_group {
   );
 }
 
+# ties a key => range set of pairs to this spreadsheet.
 sub tie {
   my $self = shift;
   my %ranges = @_;
@@ -211,6 +224,7 @@ sub _register_worksheet {
   return $worksheet;
 }
 
+# sends batch values to the api.
 sub submit_values {
   my $self = shift;
 
@@ -229,7 +243,7 @@ sub submit_values {
   $p->{content}->{valueInputOption} //= 'USER_ENTERED';
   $p->{method} = 'post';
   $p->{uri} = "/values:batchUpdate";
-  my $api = $self->api(%$p);
+  my $api = $self->api(%$p);             # this is where the rubber hits the road.
 
   # each range that had values should strip off the response from the api's
   # responses array. if everything is in sync, there should be no responses left.
@@ -241,6 +255,7 @@ sub submit_values {
   return $api;
 }
 
+# sends batch requests (formatting etc) to the api.
 sub submit_requests {
   my $self = shift;
 
@@ -299,6 +314,7 @@ sub named_ranges {
   return $named_range;
 }
 
+# takes a named range and works out the actual range it represents.
 sub normalize_named {
   my $self = shift;
 
@@ -420,7 +436,7 @@ Creates a new instance of a Spreadsheet object.
 
 =back
 
-You would not normally call this directly, you would obtain it from the Sheets::open_spreadsheet routine.
+You would not normally call this directly, you would obtain it from the SheetsApi4::open_spreadsheet routine.
 
 Only one of id/name/title/uri should be specified and this API will derive the others as necessary.
 

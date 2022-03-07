@@ -1,5 +1,16 @@
 Revision history for Perl extension Hustle::Table
 
+0.4.1   Mon  7 Mar 2022 17:27:52 AEST
+	- Remove debugging output which should not have been active
+	- Remove more unused code
+
+0.4.0   Sat  5 Mar 2022 10:29:11 AEST
+	- Removed usages of given/when and replaced with if/else/and in generated code
+	- Matching is now always performed via a regex.
+	- Uncached "online" dispatcher gained a 10-20% performance boost
+	- Using Template::Plex template to make the code more readable
+	- Removed unused code
+
 0.3.0	Fri 10 Sep 2021 11:54:43 AEST
 	- First argument to dispatched code ref is table entry not string being matched (< v0.2.3) 
 	- Updated test to utilise new first argument

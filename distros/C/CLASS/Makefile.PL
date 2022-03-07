@@ -1,35 +1,34 @@
-# A template for Makefile.PL used by Arena Networks.
-# - Set the $PACKAGE variable to the name of your module.
-# - Set $LAST_API_CHANGE to reflect the last version you changed the API 
-#   of your module.
-# - Fill in your dependencies in PREREQ_PM
-# Alternatively, you can say the hell with this and use h2xs.
-
 use 5.004;
-
 use ExtUtils::MakeMaker;
 
-$PACKAGE = 'CLASS';
-($PACKAGE_FILE = $PACKAGE) =~ s|::|/|g;
-$LAST_API_CHANGE = 0;
-
-eval "require $PACKAGE";
-
-unless ($@) { # Make sure we did find the module.
-    print <<"CHANGE_WARN" if ${$PACKAGE.'::VERSION'} < $LAST_API_CHANGE;
-
-NOTE: There have been API changes between this version and any older
-than version $LAST_API_CHANGE!  Please read the Changes file if you
-are upgrading from a version older than $LAST_API_CHANGE.
-
-CHANGE_WARN
-}
-
 WriteMakefile(
-    NAME            => $PACKAGE,
-    VERSION_FROM    => "lib/$PACKAGE_FILE.pm", # finds $VERSION
-    ABSTRACT_FROM   => "lib/$PACKAGE_FILE.pm",
-    PREREQ_PM       => { Test::More => 0.07  },
-
-    $ExtUtils::MakeMaker::VERSION >= 6.31 ? (LICENSE         => 'perl') : ()
+    NAME                => 'CLASS',
+    AUTHOR              => 'Jacques Deguest <jack@deguest.jp>',
+    VERSION_FROM        => 'lib/CLASS.pm',
+    ABSTRACT_FROM       => 'lib/CLASS.pm',
+    PL_FILES            => {},
+    PREREQ_PM           => {},
+    TEST_REQUIRES =>
+    {
+        'Test::More'    => '0.07',
+    },
+    LICENSE             => 'perl_5',
+    (MM->can('signature_target') ? (SIGN => 1) : ()),
+    dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
+    clean               => { FILES => 'CLASS-*' },
+    ( eval { ExtUtils::MakeMaker->VERSION(6.46) } ? ( META_MERGE => {
+        'meta-spec' => { version => 2 },
+        dynamic_config => 1,
+        resources => {
+        #    homepage    => undef,
+            repository  => {
+                url         => 'git@github.com:jackdeguest/CLASS.git',
+                web         => 'https://github.com/jackdeguest/CLASS',
+                type        => 'git',
+            },
+            bugtracker => {
+                web         => 'https://github.com/jackdeguest/CLASS/issues',
+            },
+        },
+    }) : ()),
 );

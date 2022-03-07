@@ -8,7 +8,7 @@ use strict;
 use warnings;
 
 package Net::OpenNebula::VM::NIC;
-$Net::OpenNebula::VM::NIC::VERSION = '0.316.0';
+$Net::OpenNebula::VM::NIC::VERSION = '0.317.0';
 sub new {
    my $that = shift;
    my $proto = ref($that) || $that;
