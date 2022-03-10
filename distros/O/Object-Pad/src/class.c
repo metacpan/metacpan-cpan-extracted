@@ -28,23 +28,8 @@
 #  define DEBUG_SET_CURCOP_LINE(line)
 #endif
 
-#define need_PLparser()  S_need_PLparser(aTHX)
-static void S_need_PLparser(pTHX)
-{
-  if(!PL_parser) {
-    /* We need to generate just enough of a PL_parser to keep newSTATEOP()
-     * happy, otherwise it will SIGSEGV (RT133258)
-     */
-    SAVEVPTR(PL_parser);
-    Newxz(PL_parser, 1, yy_parser);
-    SAVEFREEPV(PL_parser);
-
-    PL_parser->copline = NOLINE;
-#if HAVE_PERL_VERSION(5, 20, 0)
-    PL_parser->preambling = NOLINE;
-#endif
-  }
-}
+#define need_PLparser()  ObjectPad__need_PLparser(aTHX)
+void ObjectPad__need_PLparser(pTHX); /* in Object/Pad.xs */
 
 /* Empty MGVTBL simply for locating instance backing AV */
 static MGVTBL vtbl_backingav = {};

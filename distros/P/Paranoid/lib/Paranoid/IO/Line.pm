@@ -1,12 +1,12 @@
 # Paranoid::IO::Line -- Paranoid Line-based I/O functions
 #
-# $Id: lib/Paranoid/IO/Line.pm, 2.09 2021/12/28 15:46:49 acorliss Exp $
+# $Id: lib/Paranoid/IO/Line.pm, 2.10 2022/03/08 00:01:04 acorliss Exp $
 #
 # This software is free software.  Similar to Perl, you can redistribute it
 # and/or modify it under the terms of either:
 #
 #   a)     the GNU General Public License
-#          <https://www.gnu.org/licenses/gpl-1.0.html> as published by the 
+#          <https://www.gnu.org/licenses/gpl-1.0.html> as published by the
 #          Free Software Foundation <http://www.fsf.org/>; either version 1
 #          <https://www.gnu.org/licenses/gpl-1.0.html>, or any later version
 #          <https://www.gnu.org/licenses/license-list.html#GNUGPL>, or
@@ -43,7 +43,7 @@ use Paranoid::Debug qw(:all);
 use Paranoid::IO qw(:all);
 use Paranoid::Input qw(:all);
 
-($VERSION) = ( q$Revision: 2.09 $ =~ /(\d+(?:\.\d+)+)/sm );
+($VERSION) = ( q$Revision: 2.10 $ =~ /(\d+(?:\.\d+)+)/sm );
 
 @EXPORT      = qw(sip nlsip tailf nltailf slurp nlslurp piolClose);
 @EXPORT_OK   = ( @EXPORT, qw(PIOMAXLNSIZE) );
@@ -95,8 +95,7 @@ use constant PBF_DELETE => -1;
         my $rv   = 0;
         my ( $fh, $fpos, @fstat, @fhstat );
 
-        pdebug( 'entering w/(%s)', PDLEVEL3, $file );
-        pIn();
+        subPreamble( PDLEVEL3, '$', $file );
 
         # Check to see if we can get a valid file handle
         if ( defined( $fh = popen( $file, O_RDONLY ) ) ) {
@@ -138,8 +137,7 @@ use constant PBF_DELETE => -1;
             pdebug( 'invalid/non-existent file', PDLEVEL3 );
         }
 
-        pOut();
-        pdebug( 'leaving w/rv: %s', PDLEVEL3, $rv );
+        subPostamble( PDLEVEL3, '$', $rv );
 
         return $rv;
     }
@@ -173,8 +171,7 @@ use constant PBF_DELETE => -1;
         my $rv      = 1;
         my ( $buffer, $bflag, $in, $content, $bread, $irv, @tmp, $line );
 
-        pdebug( 'entering w/(%s)(%s)(%s)', PDLEVEL1, $file, $aref, $doChomp );
-        pIn();
+        subPreamble( PDLEVEL1, '$\@;$$', $file, $aref, $doChomp, $noLocks );
 
         @$aref = ();
 
@@ -307,8 +304,7 @@ use constant PBF_DELETE => -1;
 
         pdebug( 'returning %s lines', PDLEVEL2, scalar @$aref );
 
-        pOut();
-        pdebug( 'leaving w/rv: %s', PDLEVEL1, $rv );
+        subPostamble( PDLEVEL1, '$', $rv );
 
         return $rv;
     }
@@ -344,9 +340,8 @@ sub tailf ($\@;$$$) {
     my $noLocks = shift;
     my ( $rv, $ofsb, @lines );
 
-    pdebug( 'entering w/(%s)(%s)(%s)(%s)',
-        PDLEVEL1, $file, $aref, $doChomp, $offset );
-    pIn();
+    subPreamble( PDLEVEL1, '$\@;$$$', $file, $aref, $doChomp, $offset,
+        $noLocks );
 
     @$aref = ();
 
@@ -399,8 +394,7 @@ sub tailf ($\@;$$$) {
             : sip( $file, @$aref, $doChomp );
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL1, $rv );
+    subPostamble( PDLEVEL1, '$', $rv );
 
     return $rv;
 }
@@ -433,8 +427,7 @@ sub slurp ($\@;$$) {
     my $rv      = 1;
     my @fstat;
 
-    pdebug( 'entering w/(%s)(%s)(%s)', PDLEVEL1, $file, $aref, $doChomp );
-    pIn();
+    subPreamble( PDLEVEL1, '$\@;$$', $file, $aref, $doChomp, $noLocks );
 
     # Start sipping
     $rv = sip( $file, @$aref, $doChomp, $noLocks );
@@ -454,8 +447,7 @@ sub slurp ($\@;$$) {
     # Close everything out
     piolClose($file);
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL1, $rv );
+    subPostamble( PDLEVEL1, '$', $rv );
 
     return $rv;
 }
@@ -484,7 +476,7 @@ Paranoid::IO::Line - Paranoid Line-based I/O functions
 
 =head1 VERSION
 
-$Id: lib/Paranoid/IO/Line.pm, 2.09 2021/12/28 15:46:49 acorliss Exp $
+$Id: lib/Paranoid/IO/Line.pm, 2.10 2022/03/08 00:01:04 acorliss Exp $
 
 =head1 SYNOPSIS
 
@@ -501,6 +493,11 @@ $Id: lib/Paranoid/IO/Line.pm, 2.09 2021/12/28 15:46:49 acorliss Exp $
   piolClose($filename);
 
   $nlines = slurp($filename, @lines);
+
+  # Non-locking variants
+  $nlines = nlsip($filename, @lines);
+  $nlines = nltailf($filename, @lines);
+  $nlines = nlslurp($filename, @lines);
 
 =head1 DESCRIPTION
 

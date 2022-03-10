@@ -21,6 +21,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Test2-Harness-UI",
   "EXE_FILES" => [
+    "scripts/yath-ui-backfill.pl",
     "scripts/yath-ui-importer.pl",
     "scripts/yath-ui-sweeper.pl"
   ],
@@ -89,7 +90,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "HTTP::Tiny::UNIX" => 0
   },
-  "VERSION" => "0.000112",
+  "VERSION" => "0.000115",
   "test" => {
     "TESTS" => "t/*.t t/UI/*.t t/integration/*.t"
   }

@@ -10,11 +10,11 @@ use Capture::Tiny 'capture_stdout';
 use Carp;
 use File::Basename 'basename';
 use File::Temp 'tempfile';
-use List::Util qw(uniq);
+use List::Util 1.44 qw(uniq);
 use Moo;
 use Types::Standard qw( ArrayRef Bool Int Str);
 
-our $VERSION = '0.5';
+our $VERSION = '0.6';
 
 #
 # Moo attributes
@@ -191,7 +191,7 @@ sub run {
         my $file_text = $self->_run( 'git', 'show', "${current_target}:$file" )
           or next FILE;
         if ( $self->max_file_size ) {
-            # we want the lenght in bytes, not characters
+            # we want the length in bytes, not characters
             use bytes;
             next FILE
               unless length($file_text) <= $self->max_file_size;    # large files are very slow
@@ -282,7 +282,7 @@ Git::Critic - Only run Perl::Critic on lines changed in the current branch
 
 =head1 VERSION
 
-version 0.5
+version 0.6
 
 =head1 SYNOPSIS
 

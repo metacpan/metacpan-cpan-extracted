@@ -80,6 +80,7 @@ sub run_one_test {
 
     (my $expected = $test_code) =~ s/\b(?:my|our)\b\s*//mg;
     $expected =~ s/^.*?# omit\n//mg;  # remove lines that don't deparse to anything
+    $expected =~ s/^.*?# deparsed: (.*?\n)/$1/mg; # Lines that are expected to deparse differently
     $expected =~ s/\s*(?<!\$)#.*?$//mg;  # remove comments and don't match $#something
     $expected =~ s/^\n//mg; # remove empty lines
 

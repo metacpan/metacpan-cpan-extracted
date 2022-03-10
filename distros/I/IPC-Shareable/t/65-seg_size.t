@@ -14,6 +14,8 @@ BEGIN {
     }
 }
 
+warn "Segs Before: " . IPC::Shareable::ipcs() . "\n" if $ENV{PRINT_SEGS};
+
 use constant BYTES => 2000000; # ~2MB
 
 # limit
@@ -104,5 +106,8 @@ if ($^O eq 'linux') {
 }
 
 $k->clean_up_all;
+
+IPC::Shareable::_end;
+warn "Segs After: " . IPC::Shareable::ipcs() . "\n" if $ENV{PRINT_SEGS};
 
 done_testing();

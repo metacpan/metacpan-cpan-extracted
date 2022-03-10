@@ -1,10 +1,16 @@
+Changes
+CONTRIBUTING.md
+lib/Promise/Me.pm
+LICENSE
+Makefile.PL
 MANIFEST
 README
-LICENSE
-Todo
-Changes
-Makefile.PL
-lib/Promise/Me.pm
+README.md
+SIGNATURE
 t/001_load.t
+t/002_promise.t
+t/090_pod.t
+t/091.signature.t
+t/099_kwalitee.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

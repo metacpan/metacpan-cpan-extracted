@@ -1,5 +1,5 @@
 package Hash::Typed;
-use strict; use warnings; our $VERSION = '0.03';
+use strict; use warnings; our $VERSION = '0.04';
 use Carp qw/croak/; use Tie::Hash; our (@ISA);
 
 BEGIN { 
@@ -65,7 +65,7 @@ sub STORE {
 	} elsif ($self->[4] && defined $self->[4]{ordered_keys}{$key} && $self->[4]{ordered_keys}{$key} <= scalar @{$self->[1]}) {
 		my $i = $self->[4]{ordered_keys}{$key};
 		my $before = $self->[1]->[$i - 1];
-		$i = $i == 0 ? $i : --$i if ($before && $self->[4]{ordered_keys}{$before} >= $i);
+		$i = $i == 0 ? $i : --$i if ($before && ($self->[4]{ordered_keys}{$before} || -1) >= $i);
 		splice(@{$self->[1]}, $i, 0, $key);
 		splice(@{$self->[2]}, $i, 0, $value);
 		$self->[0]{$key} = $i;
@@ -148,7 +148,7 @@ Hash::Typed - Ordered typed tied hashes.
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 

@@ -7,6 +7,10 @@ use IPC::Shareable;
 use Mock::Sub;
 use Test::More;
 
+if (! $ENV{CI_TESTING}) {
+    plan skip_all => "Not on a valid CI testing platform..."
+}
+
 my $mod = 'Async::Event::Interval';
 
 # Proper cleanup

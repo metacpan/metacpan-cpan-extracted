@@ -1,6 +1,6 @@
 # Paranoid::Data::AVLTree::AVLNode -- AVL Tree Node Object Class
 #
-# $Id: lib/Paranoid/Data/AVLTree/AVLNode.pm, 2.09 2021/12/28 15:46:49 acorliss Exp $
+# $Id: lib/Paranoid/Data/AVLTree/AVLNode.pm, 2.10 2022/03/08 00:01:04 acorliss Exp $
 #
 # This software is free software.  Similar to Perl, you can redistribute it
 # and/or modify it under the terms of either:
@@ -40,7 +40,7 @@ use base qw(Exporter);
 use Paranoid;
 use Carp;
 
-($VERSION) = ( q$Revision: 2.09 $ =~ /(\d+(?:\.\d+)+)/sm );
+($VERSION) = ( q$Revision: 2.10 $ =~ /(\d+(?:\.\d+)+)/sm );
 
 use constant AVLKEY     => 0;
 use constant AVLVAL     => 1;
@@ -48,8 +48,6 @@ use constant AVLRIGHT   => 2;
 use constant AVLLEFT    => 3;
 use constant AVLRHEIGHT => 4;
 use constant AVLLHEIGHT => 5;
-
-use constant AVLNHEADER => 'AVLNODE:v1:';
 
 #####################################################################
 #
@@ -81,29 +79,6 @@ sub new {
     }
 
     return $self;
-}
-
-sub ioRecord {
-
-    # Purpose:  Returns a string record representation of the node
-    # Returns:  String
-    # Usage:    $record = $obj->ioRecord;
-
-    my $self = shift;
-    my $rv   = AVLNHEADER;
-    my ( $ksize, $vsize );
-
-    {
-        use bytes;
-        $ksize = length $$self[AVLKEY];
-        $vsize = defined $$self[AVLVAL] ? length $$self[AVLVAL] : -1;
-    }
-
-    $rv .= "$ksize:$vsize:";
-    $rv .= $$self[AVLKEY];
-    $rv .= $$self[AVLVAL] if defined $$self[AVLVAL];
-
-    return $rv;
 }
 
 sub key {
@@ -375,12 +350,11 @@ Paranoid::Data::AVLTree::AVLNode - AVL Tree Node Object Class
 
 =head1 VERSION
 
-$Id: lib/Paranoid/Data/AVLTree/AVLNode.pm, 2.09 2021/12/28 15:46:49 acorliss Exp $
+$Id: lib/Paranoid/Data/AVLTree/AVLNode.pm, 2.10 2022/03/08 00:01:04 acorliss Exp $
 
 =head1 SYNOPSIS
 
     $node   = Paranoid::Data::AVLTree::AVLNode->new($key, $val);
-    $record = $node->ioRecord;
     $key    = $node->key;
     $val    = $node->val;
     $rv     = $node->setVal($val);
@@ -415,13 +389,6 @@ This class provides the core data objects that comprise an AVL-balanced tree.
 This method creates a new AVLNode object.  Like hashes, the key must be
 defined, but it cannot be a zero-length string.  In those cases, this method
 will return undef.
-
-=head2 ioRecord
-
-    $record = $node->ioRecord;
-
-This method creates a string representation of the node for use in spooling to
-disk.
 
 =head2 key
 

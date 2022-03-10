@@ -4,7 +4,7 @@ lib::projectroot - easier loading of a project's local libs
 
 # VERSION
 
-version 1.008
+version 1.009
 
 # SYNOPSIS
 
@@ -76,7 +76,7 @@ In each script, I just have to say:
 
     use lib::projectroot qw(lib local::lib=local);
 
-`lib` is added to the beginning of <@INC>, and `local` is loaded via
+`lib` is added to the beginning of `@INC`, and `local` is loaded via
 `local::lib`, without me having to know how deep in `bin` the
 current script is located.
 
@@ -124,9 +124,9 @@ Some ideas for future releases:
 
 # THANKS
 
-Thanks to `eserte`, `Smylers` & Ca&lt;abraxxa> for providing feedback
-at [http://prepan.org/module/nY4oajhgzJN|prepan.org](http://prepan.org/module/nY4oajhgzJN|prepan.org). Meta-thanks to
-[http://twitter.com/kentaro|kentaro](http://twitter.com/kentaro|kentaro) for running prepan, a very handy
+Thanks to `eserte`, `Smylers` & `abraxxa` for providing feedback
+at [prepan.org](http://prepan.org/module/nY4oajhgzJN). Meta-thanks to
+[kentaro](http://twitter.com/kentaro) for running prepan, a very handy
 service!
 
 Thanks to `koki`, `farhad` and `Jozef` for providing face-to-face

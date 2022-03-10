@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2020 -- leonerd@leonerd.org.uk
 
-package Object::Pad::MOP::Method 0.62;
+package Object::Pad::MOP::Method 0.63;
 
 use v5.14;
 use warnings;
@@ -20,8 +20,10 @@ C<Object::Pad::MOP::Method> - meta-object representation of a method of a C<Obje
 Instances of this class represent a method of a class implemented by
 L<Object::Pad>. Accessors provide information about the method.
 
-This API should be considered experimental even within the overall context in
-which C<Object::Pad> is expermental.
+This API should be considered B<experimental>, and will emit warnings to that
+effect. They can be silenced with
+
+   use Object::Pad qw( :experimental(mop) );
 
 =cut
 

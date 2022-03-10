@@ -7,7 +7,7 @@ use warnings;
 
 # VERSION
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 # AUTHORITY
 
@@ -103,7 +103,7 @@ OO Standard Library for Perl 5
 
 =head1 VERSION
 
-0.07
+0.08
 
 =cut
 

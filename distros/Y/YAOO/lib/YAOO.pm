@@ -4,7 +4,8 @@ use warnings;
 use Carp qw/croak/; use Tie::IxHash;
 use feature qw/state/;
 use Blessed::Merge;
-our $VERSION = '0.08';
+use Hash::Typed;
+our $VERSION = '0.09';
 
 our (%TYPES, %object, $LAST);
 
@@ -47,6 +48,32 @@ sub import {
 		});
 	}
 
+	make_keyword($called, 'typed_hash', sub {
+		my (@args) = @_;
+		my $spec = shift @args;
+		if (! scalar $spec) {
+			die 'Invalid declaration of a typed_hash no Hash::Typed spec passed'
+		}
+		if (caller(1)) {
+			return Hash::Typed->new(
+				deep_clone($spec),
+				%{ deep_clone_ordered_hash(@args) }
+			);
+		}
+		my @return = (
+			\&{"${package}::typed_hash"},
+			type => 'typed_hash',
+		);
+		push @return, default => sub {
+			Hash::Typed->new(
+				deep_clone($spec), 
+				%{ deep_clone_ordered_hash(@args) }
+			);
+		};
+		@return 
+	});
+
+
 	make_keyword($called, 'auto_build', sub { $object{$called}{auto_build} = 1; });
 
 	make_keyword($called, 'extends', sub {
@@ -69,7 +96,7 @@ sub import {
 							if ($object{$extend}{has}{$name}->{coerce});
 						$object{$extend}{has}{$name}->{required}($self, $value, $name)
 							if ($object{$extend}{$name}->{required});
-						$value = $object{$extend}{has}{$name}->{isa}($value, $name);
+						$value = $object{$extend}{has}{$name}->{isa}($value, $name, $called);
 						$self->{$name} = $value;
 						$object{$extend}{has}{$name}->{trigger}($self, $value, $name)
 							if ($object{$extend}{has}{$name}->{trigger});
@@ -192,7 +219,7 @@ sub build_attribute {
 					if ($object{$called}{has}{$name}->{coerce});
 				$object{$called}{has}{$name}{required}($self, $value, $name)
 					if ($object{$called}{$name}->{required});
-				$value = $object{$called}{has}{$name}{isa}($value, $name);
+				$value = $object{$called}{has}{$name}{isa}($value, $name, $called);
 				$self->{$name} = $value;
 				$object{$called}{has}{$name}{trigger}($self, $value, $name)
 					if ($object{$called}{has}{$name}->{trigger});
@@ -331,6 +358,46 @@ sub build_ordered_hash { { } }
 
 sub ordered_hash { hash(@_); }
 
+sub typed_hash { 
+	my ($value, $name, $called) = @_;
+
+	if (ref $value ne 'Hash::Typed') {
+		my $hash = $object{$called}{has}{$name}{value};
+
+		if (!$hash) {
+			croak sprintf "The value passed to the %s attribute does not match the typed_hash constraint.",
+				$name;
+		}
+
+		set_typed_hash($hash, $value);
+
+		$value = $hash;
+	}
+
+	return $value;
+}
+
+sub set_typed_hash {
+	my ($hash, $value) = @_;
+
+	for my $k (keys %{$value}) {
+		if (ref $hash->{$k} eq 'Hash::Typed') {
+			$hash->{$k} = set_typed_hash($hash->{$k}, $value->{$k});
+		} else {
+			$hash->{$k} = $value->{$k};
+		}
+	}
+	
+	for my $k (keys %{ $hash }) {
+		if (! exists $value->{$k}) {
+			delete $hash->{$k};
+		}
+	}
+	
+	return $hash;
+}
+
+
 sub build_hash { {} }
 
 sub hash {
@@ -410,7 +477,7 @@ YAOO - Yet Another Object Orientation
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =cut
 
@@ -438,6 +505,23 @@ Version 0.08
 		my $followed = [qw/moon starts satellites/]->[int(rand(3))];
 		$_[0]->$followed;
 	});
+
+	has clouds => isa(
+		typed_hash(
+			[
+				strict => 1, 
+				required => [qw/a b c/], 
+				keys => [
+					moon => Int, 
+					stars => Str, 
+					satellites => typed_hash([keys => [ mind => Str ]], %{$_[0]})
+				], 
+			],
+			moon => 211, 
+			stars => 'test'
+			satellites => { custom => 'after', mind => 'abc', },
+		)
+	);
 
 	1;
 

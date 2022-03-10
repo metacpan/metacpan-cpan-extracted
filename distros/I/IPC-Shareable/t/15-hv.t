@@ -11,6 +11,8 @@ BEGIN {
     }
 }
 
+warn "Segs Before: " . IPC::Shareable::ipcs() . "\n" if $ENV{PRINT_SEGS};
+
 my $mod = 'IPC::Shareable';
 
 my $knot = tie my %hv, $mod, {
@@ -78,6 +80,9 @@ is keys(%hv), 0, "clearing a hash works ok";
 IPC::Shareable->clean_up_all;
 
 is %hv, '', "hash deleted after clean_up()";
+
+IPC::Shareable::_end;
+warn "Segs After: " . IPC::Shareable::ipcs() . "\n" if $ENV{PRINT_SEGS};
 
 done_testing();
 

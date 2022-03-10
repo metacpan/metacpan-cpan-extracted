@@ -3,7 +3,6 @@
 #include "perl.h"
 #include "XSUB.h"
 
-#include <stdlib.h>
 #include <maxminddb.h>
 
 #ifdef MULTIPLICITY

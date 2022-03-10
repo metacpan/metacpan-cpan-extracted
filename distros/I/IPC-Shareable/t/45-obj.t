@@ -11,6 +11,8 @@ BEGIN {
     }
 }
 
+warn "Segs Before: " . IPC::Shareable::ipcs() . "\n" if $ENV{PRINT_SEGS};
+
 my $t  = 1;
 my $ok = 1;
 
@@ -48,6 +50,9 @@ is $d->second('second'), 'second', "shared obj second() returns ok";
 
 is $d->first('foo'), 'foo', "shared obj first() returns ok, again";
 is $d->second('bar'), 'bar', "shared obj second() returns ok, again";
+
+IPC::Shareable::_end;
+warn "Segs After: " . IPC::Shareable::ipcs() . "\n" if $ENV{PRINT_SEGS};
 
 done_testing();
 

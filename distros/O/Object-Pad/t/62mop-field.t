@@ -7,6 +7,7 @@ use Test::More;
 use Test::Fatal;
 
 use Object::Pad;
+use Object::Pad qw( :experimental(mop) );
 
 class Example {
    has $field :mutator :param(initial_field) = undef;

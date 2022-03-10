@@ -65,9 +65,21 @@
 <div id="SimpleSearchForm">
 <form action="SimpleSearch.html" method="get">
 
+% if ( RT::Handle::cmp_version($RT::VERSION, '5.0.0') >= 0 ) {
+    <div class="form-row justify-content-center">
+      <div class="col-4">
+        <input class="form-control" type="text" name="q" />
+      </div>
+      <div class="col-auto">
+        <input type="submit" class="button btn btn-primary form-control" value="<&|/l&>Search</&>" />
+      </div>
+    </div>
+% }
+% else {
 <div align="center">
 <input name="q" size="60" /><input type="submit" class="button" value="<&|/l&>Search</&>" />
 </div>
+% }
 
 % my @strong = qw(<strong> </strong>);
 

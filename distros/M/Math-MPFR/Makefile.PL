@@ -8,6 +8,7 @@ use ExtUtils::MakeMaker;
 our %args = map { split /\s*=\s*/ } @ARGV;
 our $LIBS = $args{ LIBS } || "-lmpfr -lgmp";
 our $INC = $args{ INC };
+our $DEFS = '';
 
 my $use_64_bit_int  = 0; # Let perl decide whether to include 64-bit 'long long' support
 my $use_long_double = 0; # Let perl decide whether to include 'long double' support
@@ -17,6 +18,8 @@ my $have_decimal128 = undef; # Default value
 my $have_float128   = undef; # Default value
 my $want_float128   = undef; # Default value
 my $checklib        = 1;     # Check for availability of mpfr and gmp libraries.
+
+print " Running some (possibly noisy) pre-build checks\n to see what's available ....\n";
 
 my $SAVE;
 my $save = open $SAVE, '>', 'save_config.txt';
@@ -174,11 +177,16 @@ for(@ARGV) {
    $have_float128 = 0 if $_ eq 'F128=0';
 }
 
-if(!defined($have_float128)) { # __float128 support still undetermined
+if(!defined($have_float128)) { # __float128 support, having not yet been
+                               # specified by the user, is still undetermined
 
   print $SAVE "\n\n" if $save;
 
   my $mylibs = $mklib . " " . $mylibpth . " -lquadmath";
+
+  # First up, build have_f128.exe from have_f128.c.
+  # This simply establishes whether the __float128 type is available.
+  # The gmp and mpfr libraries are not needed for this'
 
   my $out = `$mycc -o have_f128.exe -x c have_f128.in 2>&1`;
 
@@ -187,10 +195,33 @@ if(!defined($have_float128)) { # __float128 support still undetermined
     if($save) {print $SAVE "have_f128 build: $out\n"}
   }
 
+  # If have_f128.exe does not exist, we assume that the __float128
+  # type is unavailable, and that __float128  supportis therefore
+  # impossible. The messages written to 'save_config.txt' should
+  # confirm the correctness of this assessment.
+
   unless(-e 'have_f128.exe') {$have_float128 = 0}
 
+  # But if have_f128.exe exists then we need to establish whether
+  # the mpfr library has been built with support for the __float128
+  # type. For this we attempt to build try_flt128.exe from
+  # try_flt128.in. This build *does* require the gmp and mpfr headers
+  # and libraries.
+  # If the execution of try_flt128.exe produces output of 42, then
+  # we know that the mpfr library has been built with --enable-float128,
+  # we set $have_float128 to 1, and Math::MPFR will then be built to
+  # utilise that __float128 support.
+  # Otherwise we leave $have_float128 as undef, and no __float128
+  # support will be built into Math::MPFR.
+
   else {
-    my $out = `$mycc -o try_flt128.exe -x c try_flt128.in $mkinc $mylibs 2>&1`;
+    # $Config{ccflags} might include the '-I' switch needed to
+    # locate the gmp and mpfr header files. We therefore include
+    # those ccflags inthe command:
+
+    my $ccflags = $Config{ccflags};
+
+    my $out = `$mycc $ccflags -o try_flt128.exe -x c try_flt128.in $mkinc $mylibs 2>&1`;
 
     if($out) {
       print "$out\n";
@@ -205,13 +236,58 @@ if(!defined($have_float128)) { # __float128 support still undetermined
   }
 }
 
+close $SAVE or warn "Couldn't close save_config.txt";
+
+print "Pre-build checks completed\n";
 
 my $float128_message = $have_float128 ? "Attempting to build with Math::Float128 support\n"
                                       : "Building without Math::Float128 support\n";
 
 ####################################
+# Next, we check to see whether there's some unhelpful beaviour regarding
+# the setting of the POK flag.
+# This typically occurs in versions of perl prior to 5.22.0, but it can
+# arise elsewhere, eg:
+# http://www.cpantesters.org/cpan/report/dc17e330-900b-11ec-bfc9-d1f1448276d4
+# This procedure is stolen from:
+# https://metacpan.org/release/HAARG/Sub-Quote-2.006006/source/t/quotify.t
+# Thank you, Haarg.
 
-close $SAVE or warn "Couldn't close save_config.txt";
+use B qw(svref_2object);
+
+my %flags;
+{
+  no strict 'refs';
+  for my $flag (qw(
+    SVf_IOK
+    SVf_NOK
+    SVf_POK
+    SVp_IOK
+    SVp_NOK
+    SVp_POK
+            )) {
+    if (defined &{'B::'.$flag}) {
+      $flags{$flag} = &{'B::'.$flag};
+    }
+  }
+}
+
+sub flags {
+  my $flags = B::svref_2object(\($_[0]))->FLAGS;
+  join ' ', sort grep $flags & $flags{$_}, keys %flags;
+}
+
+my $pv_nv_bug = 0;
+my $test_nv = 1.3;
+my $buggery = "$test_nv";
+my $f = flags($test_nv);
+
+if($f =~ /SVf_POK/) {
+  print "Dealing with unhelpful setting of POK flag\n";
+  $pv_nv_bug = 1;
+}
+
+####################################
 
 my $defines = $] < 5.008 ? "-DOLDPERL" : "-DNEWPERL";
 
@@ -228,6 +304,7 @@ $defines .= " -DMPFR_WANT_DECIMAL_FLOATS" if ($have_decimal64 || $have_decimal12
 $defines .= " -DMPFR_WANT_DECIMAL64"  if $have_decimal64;
 $defines .= " -DMPFR_WANT_DECIMAL128" if $have_decimal128;
 $defines .= " -DMPFR_WANT_FLOAT128"   if $have_float128;
+
 
 print "\nThis module requires the following C libraries:\n";
 print " gmp-4.2.0 (or later)\n mpfr-3.0.0 (or later)\n\n";
@@ -284,6 +361,15 @@ if($Config{nvsize} == 8) {
     print "\ndoubletoa() fallback notification ENABLED (default)\n\n";
   }
   else { print "\ndoubletoa() fallback notification DISABLED\n\n" }
+}
+
+if($pv_nv_bug) {
+  $defines .= " -DMPFR_PV_NV_BUG";
+  $DEFS    .= " -DMPFR_PV_NV_BUG";
+  print "Defining MPFR_PV_NV_BUG\n\n";
+}
+else {
+  print "Not defining MPFR_PV_NV_BUG\n\n";
 }
 
 # The following defines serve as debugging

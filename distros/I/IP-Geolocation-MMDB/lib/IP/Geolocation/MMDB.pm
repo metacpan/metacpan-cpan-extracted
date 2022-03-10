@@ -6,7 +6,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = 1.003;
+our $VERSION = 1.004;
 
 use IP::Geolocation::MMDB::Metadata;
 use Math::BigInt 1.999806;
@@ -68,7 +68,7 @@ IP::Geolocation::MMDB - Read MaxMind DB files
 
 =head1 VERSION
 
-version 1.003
+version 1.004
 
 =head1 SYNOPSIS
 
@@ -214,14 +214,11 @@ None.
 =head1 DEPENDENCIES
 
 Requires L<Alien::libmaxminddb> from CPAN.  Requires L<Math::BigInt> version
-1.999806, which is distributed with Perl 5.26 and newer.
-
-Requires libmaxminddb 1.2.0 or newer.
+1.999806, which is distributed with Perl 5.26 and newer.  Requires
+libmaxminddb 1.2.0 or newer.
 
 Requires an IP to country, city or ASN database in the MaxMind DB file format
 from L<MaxMind|https://www.maxmind.com/> or L<DP-IP.com|https://db-ip.com/>.
-
-Windows is not supported.  Please do not ask for Windows support.
 
 =head1 INCOMPATIBILITIES
 

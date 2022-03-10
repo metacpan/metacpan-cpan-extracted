@@ -3,19 +3,24 @@ BEGIN
 {
     use strict;
     use lib './lib';
-    use Test::More qw( no_plan );
-    use File::Find;
+    # use Test2::V0;
+    use Test::More;
+    use Module::Generic::File qw( file );
+    # use Test::More qw( no_plan );
+    # use File::Find;
     our @modules;
-    File::Find::find(sub
+    my $lib = file( './lib' );
+    $lib->find(sub
     {
-        next unless( /\.pm$/ );
-        # print( "Checking file '$_' ($File::Find::name)\n" );
-        $_ = $File::Find::name;
-        s,^./lib/,,;
-        s,\.pm$,,;
-        s,/,::,g;
-        push( @modules, $_ );
-    }, qw( ./lib ) );
+        return unless( /\.pm$/ );
+        # print( "Checking file '$_' ($File::Find::name) -> ", overload::StrVal( $_ ), "\n" );
+        # $_ = $File::Find::name;
+        $_ = $_->extension( '' );
+        my $rel = $_->relative( $lib );
+        $rel =~ s,/,::,g;
+        # $rel->extension( undef );
+        push( @modules, $rel );
+    });
     our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 };
 

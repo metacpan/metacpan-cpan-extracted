@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Finfo.pm
-## Version v0.2.0
-## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Version v0.2.1
+## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/20
-## Modified 2022/02/27
+## Modified 2022/03/08
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -65,7 +65,7 @@ BEGIN
     };
     our %EXPORT_TAGS = ( all => [qw( FILETYPE_NOFILE FILETYPE_REG FILETYPE_DIR FILETYPE_CHR FILETYPE_BLK FILETYPE_PIPE FILETYPE_LNK FILETYPE_SOCK FILETYPE_UNKFILE )] );
     our @EXPORT_OK = qw( FILETYPE_NOFILE FILETYPE_REG FILETYPE_DIR FILETYPE_CHR FILETYPE_BLK FILETYPE_PIPE FILETYPE_LNK FILETYPE_SOCK FILETYPE_UNKFILE );
-    our $VERSION = 'v0.2.0';
+    our $VERSION = 'v0.2.1';
 };
 
 use strict;
@@ -352,12 +352,22 @@ sub _datetime
     my $t = shift( @_ );
     return( $self->error( "No epoch time was provided." ) ) if( !length( $t ) );
     return( $self->error( "Invalid epoch time provided \"$t\"." ) ) if( $t !~ /^\d+$/ );
+    my $class = ref( $self ) || $self;
     try
     {
-        my $dt = DateTime->from_epoch( epoch => $t, time_zone => 'local' );
+        my $dt;
+        try
+        {
+            $dt = DateTime->from_epoch( epoch => $t, time_zone => 'local' );
+        }
+        catch( $e )
+        {
+            warn( "Your system is missing key timezone components. ${class}::_datetime is reverting to UTC instead of local time zone.\n" );
+            $dt = DateTime->from_epoch( epoch => $t, time_zone => 'UTC' );
+        }
+        
         my $fmt = DateTime::Format::Strptime->new(
             pattern => '%s',
-            time_zone => 'local',
         );
         $dt->set_formatter( $fmt );
         my $o = Module::Generic::DateTime->new( $dt ) ||
@@ -504,7 +514,7 @@ Module::Generic::Finfo - File Info Object Class
 
 =head1 VERSION
 
-    v0.2.0
+    v0.2.1
 
 =head1 DESCRIPTION
 

@@ -1,12 +1,24 @@
-# http://module-build.sourceforge.net/META-spec.html
-#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
-name:         Template-Plugin-Cache
-version:      0.13
-version_from: Cache.pm
-installdirs:  site
+---
+abstract: unknown
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.16, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Template-Plugin-Cache
+no_index:
+  directory:
+    - t
+    - inc
 requires:
-    Cache::Cache:                  1.02
-    Template:                      2.07
-
-distribution_type: module
-generated_by: ExtUtils::MakeMaker version 6.30
+  Cache::Cache: '1.02'
+  Template: '2.07'
+version: '0.14'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

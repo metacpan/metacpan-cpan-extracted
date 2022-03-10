@@ -1,0 +1,15 @@
+Build.PL
+Changes
+hax/perl-backcompat.c.inc
+lib/Syntax/Keyword/Inplace.pm
+lib/Syntax/Keyword/Inplace.xs
+MANIFEST			This list of files
+t/00use.t
+t/01inplace.t
+t/02funcs.t
+t/03targets.t
+t/99pod.t
+README
+LICENSE
+META.yml
+META.json

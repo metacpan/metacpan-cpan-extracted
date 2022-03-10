@@ -66,9 +66,6 @@ is( scalar %test, 0, 'tie clear/scalar - 14' );
 $rv = untie %test and untie %test2;
 ok( $rv, 'untie - 15' );
 
-# Cleanup
-system 'rm -rf t/db*';
-
 # forked tests
 
 # Prep

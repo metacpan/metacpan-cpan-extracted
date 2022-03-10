@@ -72,7 +72,7 @@ sub __tests__ {
                 field is_require => DF();
                 field autoload   => U();
                 field subname    => '(eval)';
-                field args       => [];
+                field args       => U();
                 field serial     => T();
                 field bitmask    => T();
                 field callsite   => $expected_callsite;
@@ -92,7 +92,7 @@ sub __tests__ {
                 field is_require => U();
                 field autoload   => U();
                 field subname    => '(eval)';
-                field args       => [];
+                field args       => U();
                 field serial     => T();
                 field bitmask    => T();
                 field callsite   => $expected_callsite;

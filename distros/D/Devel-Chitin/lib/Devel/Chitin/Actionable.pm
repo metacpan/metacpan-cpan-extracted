@@ -3,7 +3,7 @@ package Devel::Chitin::Actionable;
 use strict;
 use warnings;
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 use Digest::MD5 qw(md5);
 use Carp;

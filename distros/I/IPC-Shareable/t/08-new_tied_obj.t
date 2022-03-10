@@ -11,6 +11,8 @@ BEGIN {
     }
 }
 
+warn "Segs Before: " . IPC::Shareable::ipcs() . "\n" if $ENV{PRINT_SEGS};
+
 my $mod = 'IPC::Shareable';
 
 my $ph = $mod->new(
@@ -23,5 +25,8 @@ my $k = tied %$ph;
 
 is ref $k, 'IPC::Shareable', "tied() returns a proper IPC::Shareable object ok";
 is exists $k->{attributes}, 1, "...and it has proper attributes ok";
+
+IPC::Shareable::_end;
+warn "Segs After: " . IPC::Shareable::ipcs() . "\n" if $ENV{PRINT_SEGS};
 
 done_testing();

@@ -1,6 +1,6 @@
 # Paranoid::IO -- Paranoid IO support
 #
-# $Id: lib/Paranoid/IO.pm, 2.09 2021/12/28 15:46:49 acorliss Exp $
+# $Id: lib/Paranoid/IO.pm, 2.10 2022/03/08 00:01:04 acorliss Exp $
 #
 # This software is free software.  Similar to Perl, you can redistribute it
 # and/or modify it under the terms of either:
@@ -44,7 +44,7 @@ use Paranoid::Debug qw(:all);
 use Paranoid::Input;
 use IO::Handle;
 
-($VERSION) = ( q$Revision: 2.09 $ =~ /(\d+(?:\.\d+)+)/sm );
+($VERSION) = ( q$Revision: 2.10 $ =~ /(\d+(?:\.\d+)+)/sm );
 
 @EXPORT = qw(pclose pcloseAll popen preopen ptell pseek pflock pread
     pnlread pwrite pnlwrite pappend pnlappend ptruncate pnltruncate);
@@ -72,7 +72,7 @@ use constant PIGNMFLAGS => O_TRUNC | O_CREAT | O_EXCL;
 
         # Purpose:  Gets/sets default block size for I/O
         # Returns:  $mblksz
-        # Usage:    PIOBLKSIZE
+        # Usage:    PIOBLKSIZE = $bytes;
 
         $mblksz;
     }
@@ -83,7 +83,7 @@ use constant PIGNMFLAGS => O_TRUNC | O_CREAT | O_EXCL;
 
         # Purpose:  Gets/sets default max file size for I/O
         # Returns:  $mfsz
-        # Usage:    PIOBLKSIZE
+        # Usage:    PIOMAXFSIZE = bytes;
 
         $mfsz;
     }
@@ -95,7 +95,7 @@ use constant PIGNMFLAGS => O_TRUNC | O_CREAT | O_EXCL;
 
         # Purpose:  Enables/disables the flock lock stack
         # Returns:  $lsflag
-        # Usage:    PIOLOCKSTACK
+        # Usage:    PIOLOCKSTACK = 1;
 
         $lsflag;
     }
@@ -120,8 +120,7 @@ use constant PIGNMFLAGS => O_TRUNC | O_CREAT | O_EXCL;
         my $fh = shift;
         my $rv;
 
-        pdebug( 'entering w/%s', PDLEVEL2, $fh );
-        pIn();
+        subPreamble( PDLEVEL4, '$', $fh );
 
         if ( defined $fh and ref $fh eq 'GLOB' ) {
             foreach ( keys %files ) {
@@ -131,13 +130,12 @@ use constant PIGNMFLAGS => O_TRUNC | O_CREAT | O_EXCL;
             }
         }
 
-        pOut();
-        pdebug( 'leaving w/rv: %s', PDLEVEL2, $rv );
+        subPostamble( PDLEVEL4, '$', $rv );
 
         return $rv;
     }
 
-    sub pclose {
+    sub pclose ($) {
 
         # Purpose:  Closes a cached file handle
         # Returns:  Boolean
@@ -148,8 +146,7 @@ use constant PIGNMFLAGS => O_TRUNC | O_CREAT | O_EXCL;
         my $rv       = 1;
         my $fh;
 
-        pdebug( 'entering w/%s', PDLEVEL2, $filename );
-        pIn();
+        subPreamble( PDLEVEL1, '$', $filename );
 
         if ( defined $filename ) {
 
@@ -178,8 +175,7 @@ use constant PIGNMFLAGS => O_TRUNC | O_CREAT | O_EXCL;
                 unless $rv;
         }
 
-        pOut();
-        pdebug( 'leaving w/rv: %s', PDLEVEL2, $rv );
+        subPostamble( PDLEVEL1, '$', $rv );
 
         return $rv;
     }
@@ -193,16 +189,14 @@ use constant PIGNMFLAGS => O_TRUNC | O_CREAT | O_EXCL;
         my @files = @_;
         my $rv    = 1;
 
-        pdebug( 'entering', PDLEVEL3 );
-        pIn();
+        subPreamble( PDLEVEL1, '@', @files );
 
         @files = keys %files unless @files;
         foreach (@files) {
             $rv = 0 unless pclose($_);
         }
 
-        pOut();
-        pdebug( 'leaving w/rv: %s', PDLEVEL3, $rv );
+        subPostamble( PDLEVEL1, '$', $rv );
 
         return $rv;
     }
@@ -220,9 +214,7 @@ use constant PIGNMFLAGS => O_TRUNC | O_CREAT | O_EXCL;
         my $perms    = shift;
         my ( %tmp, $f, $fh, $rv );
 
-        pdebug( 'entering w/(%s)(%s)(%s)',
-            PDLEVEL3, $filename, $mode, $perms );
-        pIn();
+        subPreamble( PDLEVEL3, '$;$$', $filename, $mode, $perms );
 
         if ( defined $filename ) {
 
@@ -275,8 +267,7 @@ use constant PIGNMFLAGS => O_TRUNC | O_CREAT | O_EXCL;
             }
         }
 
-        pOut();
-        pdebug( 'leaving w/rv: %s', PDLEVEL3, $rv );
+        subPostamble( PDLEVEL3, '$', $rv );
 
         return $rv;
     }
@@ -291,8 +282,7 @@ use constant PIGNMFLAGS => O_TRUNC | O_CREAT | O_EXCL;
         my $filename = shift;
         my ( %tmp, $fh, $pos, $rv, $af );
 
-        pdebug( 'entering w/(%s)', PDLEVEL3, $filename );
-        pIn();
+        subPreamble( PDLEVEL3, '$', $filename );
 
         if ( defined $filename and exists $files{$filename} ) {
 
@@ -330,8 +320,7 @@ use constant PIGNMFLAGS => O_TRUNC | O_CREAT | O_EXCL;
             }
         }
 
-        pOut();
-        pdebug( 'leaving w/rv: %s', PDLEVEL3, $rv );
+        subPostamble( PDLEVEL3, '$', $rv );
 
         return $rv;
     }
@@ -347,9 +336,7 @@ use constant PIGNMFLAGS => O_TRUNC | O_CREAT | O_EXCL;
         my $perms    = shift;
         my ( %tmp, $fh, $f, $pos, $rv );
 
-        pdebug( 'entering w/(%s)(%s)(%s)',
-            PDLEVEL2, $filename, $mode, $perms );
-        pIn();
+        subPreamble( PDLEVEL2, '$;$$', $filename, $mode, $perms );
 
         # Make sure we weren't passed a file handle, but if we
         # were attempt to find the actual filename
@@ -405,8 +392,7 @@ use constant PIGNMFLAGS => O_TRUNC | O_CREAT | O_EXCL;
                 PDLEVEL1 );
         }
 
-        pOut();
-        pdebug( 'leaving w/rv: %s', PDLEVEL2, $rv );
+        subPostamble( PDLEVEL2, '$', $rv );
 
         return $rv;
     }
@@ -421,14 +407,12 @@ use constant PIGNMFLAGS => O_TRUNC | O_CREAT | O_EXCL;
         my @files = @_;
         my $rv    = 1;
 
-        pdebug( 'entering w/%s', PDLEVEL2, @files );
-        pIn();
+        subPreamble( PDLEVEL2, '@', @files );
 
         @files = keys %files unless @files;
         foreach (@files) { $rv = 0 unless _reopen($_) }
 
-        pOut();
-        pdebug( 'leaving w/rv: %s', PDLEVEL2, $rv );
+        subPostamble( PDLEVEL2, '$', $rv );
 
         return $rv;
     }
@@ -444,8 +428,7 @@ use constant PIGNMFLAGS => O_TRUNC | O_CREAT | O_EXCL;
         my ( $rv, $fh, $rl );
         local $!;
 
-        pdebug( 'entering w/(%s)(%s)', PDLEVEL2, $filename, $lock );
-        pIn();
+        subPreamble( PDLEVEL3, '$$', $filename, $lock );
 
         if ( defined $filename ) {
 
@@ -484,8 +467,7 @@ use constant PIGNMFLAGS => O_TRUNC | O_CREAT | O_EXCL;
             }
         }
 
-        pOut();
-        pdebug( 'leaving w/rv: %s', PDLEVEL2, $rv );
+        subPostamble( PDLEVEL3, '$', $rv );
 
         return $rv;
     }
@@ -496,8 +478,7 @@ use constant PIGNMFLAGS => O_TRUNC | O_CREAT | O_EXCL;
         my $lock     = shift;
         my ( $fh, $stack, $rl, $ll, $lsl, $rv );
 
-        pdebug( 'entering w/(%s)(%s)', PDLEVEL2, $filename, $lock );
-        pIn();
+        subPreamble( PDLEVEL3, '$$', $filename, $lock );
 
         # Var Key:
         #   lock:   lock passed to function (can include LOCK_NB)
@@ -572,7 +553,7 @@ use constant PIGNMFLAGS => O_TRUNC | O_CREAT | O_EXCL;
                 push @$stack, $rl;
                 $rv = $ll == $rl ? 1 : _pflock( $filename, $lock );
             } else {
-                pdebug( 'unknown lock type: %x', PDLEVEL2, $lock );
+                pdebug( 'unknown lock type: %x', PDLEVEL1, $lock );
             }
 
             # Report some diagnostics
@@ -596,12 +577,11 @@ use constant PIGNMFLAGS => O_TRUNC | O_CREAT | O_EXCL;
                 $rv = _pflock( $fh, $lock );
             } else {
                 pdebug( 'file %s is unknown to Paranoid::IO so far',
-                    PDLEVEL2, $filename );
+                    PDLEVEL1, $filename );
             }
         }
 
-        pOut();
-        pdebug( 'leaving w/rv: %s', PDLEVEL2, $rv );
+        subPostamble( PDLEVEL3, '$', $rv );
 
         return $rv;
     }
@@ -616,8 +596,7 @@ use constant PIGNMFLAGS => O_TRUNC | O_CREAT | O_EXCL;
         my $lock     = shift;
         my ( $rv, $fh );
 
-        pdebug( 'entering w/(%s)(%s)', PDLEVEL2, $filename );
-        pIn();
+        subPreamble( PDLEVEL2, '$$', $filename, $lock );
 
         # NOTE:  retrieving the file handle might seem silly, but if a process
         # is forked, and the first thing they do on a file is apply an flock,
@@ -634,8 +613,7 @@ use constant PIGNMFLAGS => O_TRUNC | O_CREAT | O_EXCL;
                 : _pflock( $filename, $lock );
         }
 
-        pOut();
-        pdebug( 'leaving w/rv: %s', PDLEVEL2, $rv );
+        subPostamble( PDLEVEL2, '$', $rv );
 
         return $rv;
     }
@@ -650,8 +628,7 @@ use constant PIGNMFLAGS => O_TRUNC | O_CREAT | O_EXCL;
         my $filename = shift;
         my $rv;
 
-        pdebug( 'entering w/(%s)(%s)', PDLEVEL2, $filename );
-        pIn();
+        subPreamble( PDLEVEL2, '$', $filename );
 
         if ( defined $filename ) {
 
@@ -668,8 +645,7 @@ use constant PIGNMFLAGS => O_TRUNC | O_CREAT | O_EXCL;
             }
         }
 
-        pOut();
-        pdebug( 'leaving w/rv: %s', PDLEVEL2, $rv );
+        subPostamble( PDLEVEL2, '$', $rv );
 
         return $rv;
     }
@@ -685,8 +661,7 @@ sub ptell {
     my ( $rv, $fh );
     local $!;
 
-    pdebug( 'entering w/%s', PDLEVEL2, $filename );
-    pIn();
+    subPreamble( PDLEVEL2, '$', $filename );
 
     if ( defined $filename ) {
 
@@ -699,8 +674,7 @@ sub ptell {
         }
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL2, $rv );
+    subPostamble( PDLEVEL2, '$', $rv );
 
     return $rv;
 }
@@ -717,9 +691,7 @@ sub pseek {
     my ( $rv, $fh );
     local $!;
 
-    pdebug( 'entering w/(%s)(%s)(%s)', PDLEVEL2, $filename, $setpos,
-        $whence );
-    pIn();
+    subPreamble( PDLEVEL2, '$$;$', $filename, $setpos, $whence );
 
     if ( defined $filename ) {
 
@@ -733,8 +705,7 @@ sub pseek {
         }
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL2, $rv );
+    subPostamble( PDLEVEL2, '$', $rv );
 
     return $rv;
 }
@@ -756,9 +727,8 @@ sub pwrite {
     my $bytes    = defined $out ? length $out : 0;
     my ( $fh, $rv );
 
-    pdebug( 'entering w/(%s)(%s bytes)(%s)(%s)(%s)',
-        PDLEVEL2, $filename, $bytes, $wlen, $offset, $nolock );
-    pIn();
+    subPreamble( PDLEVEL2, '$$;$$$', $filename, $bytes, $wlen, $offset,
+        $nolock );
 
     if ( defined $filename and defined $out and length $out ) {
 
@@ -784,8 +754,7 @@ sub pwrite {
         }
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL2, $rv );
+    subPostamble( PDLEVEL2, '$', $rv );
 
     return $rv;
 }
@@ -821,9 +790,8 @@ sub pappend {
     my $nolock   = shift;
     my ( $fh, $pos, $rv );
 
-    pdebug( 'entering w/(%s)(%s)(%s)(%s)(%s)',
-        PDLEVEL2, $filename, $out, $wlen, $offset, $nolock );
-    pIn();
+    subPreamble( PDLEVEL2, '$$;$$', $filename, $out, $wlen, $offset,
+        $nolock );
 
     if ( defined $filename and defined $out and length $out ) {
 
@@ -864,8 +832,7 @@ sub pappend {
         }
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL2, $rv );
+    subPostamble( PDLEVEL2, '$', $rv );
 
     return $rv;
 }
@@ -899,9 +866,8 @@ sub pread ($\$;@) {
     my $nolock   = shift;
     my ( $fh, $rv );
 
-    pdebug( 'entering w/(%s)(%s)(%s)(%s)',
-        PDLEVEL2, $filename, $sref, $rlen, $offset );
-    pIn();
+    subPreamble( PDLEVEL2, '$\$;$$$', $filename, $sref, $rlen, $offset,
+        $nolock );
 
     if ( defined $filename ) {
 
@@ -927,8 +893,7 @@ sub pread ($\$;@) {
         }
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL2, $rv );
+    subPostamble( PDLEVEL2, '$', $rv );
 
     return $rv;
 }
@@ -954,14 +919,14 @@ sub ptruncate {
     # Returns:  RV of truncate
     # Usage:    $rv = ptruncate($filename);
     # Usage:    $rv = ptruncate($filename, $pos);
+    # Usage:    $rv = ptruncate($filename, $pos, 1);
 
     my $filename = shift;
     my $pos      = shift;
     my $nolock   = shift;
     my ( $rv, $fh, $cpos );
 
-    pdebug( 'entering w/(%s)(%s)', PDLEVEL2, $filename, $pos );
-    pIn();
+    subPreamble( PDLEVEL2, '$;$$', $filename, $pos, $nolock );
 
     if ( defined $filename ) {
         $pos = 0 unless defined $pos;
@@ -983,8 +948,7 @@ sub ptruncate {
         }
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL2, $rv );
+    subPostamble( PDLEVEL2, '$', $rv );
 
     return $rv;
 }
@@ -1005,12 +969,12 @@ Paranoid::IO - Paranoid IO support
 
 =head1 VERSION
 
-$Id: lib/Paranoid/IO.pm, 2.09 2021/12/28 15:46:49 acorliss Exp $
+$Id: lib/Paranoid/IO.pm, 2.10 2022/03/08 00:01:04 acorliss Exp $
 
 =head1 SYNOPSIS
 
   use Fcntl qw(:DEFAULT :flock :mode :seek);
-  use Paranoid::IO;
+  use Paranoid::IO qw(:all);
 
   # Implicit open
   $chars = pread("./foo.log", $in, 2048);
@@ -1028,17 +992,27 @@ $Id: lib/Paranoid/IO.pm, 2.09 2021/12/28 15:46:49 acorliss Exp $
   # Enable flock lock stack
   PIOLOCKSTACK = 1;
 
-  # Explicit open
+  # Explicit open with explicit locking
   $fh = popen($filename, O_RDWR | O_CREAT | O_TRUNC, 0600);
   $rv = pseek($filename, 0, SEEK_END);
   $rv = pflock($filename, LOCK_EX);
   if ($rv > 0) {
     pseek($filename, 0, SEEK_SET) && ptruncate($filename);
   }
-  $rv = pwrite($fileanme, $text) && pclose($filename);
+  $rv = pwrite($filename, $text)
+  $rv = ptell($filename);
   $rv = plockstat($filename);
 
+  # Calls that ignore file locks
+  $rv = pnlwrite($filename, $text)
+  $rv = pnlappend($filename, $text)
+  $rv = pnlread($filename, $text)
+
+  # After fork
+  $rv = preopen();
+
   $rv = pclose($filename);
+  $rv = pcloseAll();
 
 =head1 DESCRIPTION
 
@@ -1078,8 +1052,7 @@ The features provided by this module are:
 
 =item * Inherent file locking
 
-=item * O_APPEND access patterns where needed even for files not opened with
-O_APPEND
+=item * O_APPEND access patterns where needed even for files not opened with O_APPEND
 
 =item * Intelligent file tracking
 
@@ -1100,8 +1073,8 @@ by the type of call) as needed.  Only where more complicated access patterns
 (such as read/write file handles) should an explicit I<popen> call be needed.
 
 Opportunism is limited to where it makes sense, however.  Files are not
-opportunistically opened if the first I/O call is to I<pseek>, I<ptell>, or
-I<pflock>.  The intent of the file I/O (in regards to read/write file modes)
+opportunistically opened if the first I/O call is to I<pseek> or I<ptell>.
+The intent of the file I/O (in regards to read/write file modes)
 is impossible to tell within those calls.
 
 =head2 File handle caching

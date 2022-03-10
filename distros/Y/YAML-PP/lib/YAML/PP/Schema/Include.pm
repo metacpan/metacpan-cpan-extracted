@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package YAML::PP::Schema::Include;
 
-our $VERSION = '0.031'; # VERSION
+our $VERSION = '0.032'; # VERSION
 
 use Carp qw/ croak /;
 use Scalar::Util qw/ weaken /;

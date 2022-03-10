@@ -2041,9 +2041,9 @@ B<example 1>
 
 =over 4
 
-=item operation: C<(<)>
+=item operation: C<(E<lt>)>
 
-This package overloads the C<<> operator.
+This package overloads the C<E<lt>> operator.
 
 B<example 1>
 
@@ -2057,9 +2057,9 @@ B<example 1>
 
 =over 4
 
-=item operation: C<(<=)>
+=item operation: C<(E<lt>=)>
 
-This package overloads the C<<=> operator.
+This package overloads the C<E<lt>=> operator.
 
 B<example 1>
 
@@ -2089,9 +2089,9 @@ B<example 1>
 
 =over 4
 
-=item operation: C<(>)>
+=item operation: C<(E<gt>)>
 
-This package overloads the C<>> operator.
+This package overloads the C<E<gt>> operator.
 
 B<example 1>
 
@@ -2105,9 +2105,9 @@ B<example 1>
 
 =over 4
 
-=item operation: C<(>=)>
+=item operation: C<(E<gt>=)>
 
-This package overloads the C<>=> operator.
+This package overloads the C<E<gt>=> operator.
 
 B<example 1>
 

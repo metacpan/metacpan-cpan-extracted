@@ -1,9 +1,11 @@
+# minimalism
+## no critic: TestingAndDebugging::RequireUseStrict
 package Log::ger::Level::FromEnv;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-10'; # DATE
+our $DATE = '2022-02-18'; # DATE
 our $DIST = 'Log-ger-Level-FromEnv'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use Log::ger::Util;
 
@@ -34,7 +36,7 @@ Log::ger::Level::FromEnv - Set default log level from some environment variables
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -56,9 +58,11 @@ This is convenient for CLI programs or one-liners.
 
 =head1 SEE ALSO
 
-L<Log::ger::App>
+L<Log::ger::App> also observes the same set of environment variables.
 
-L<Log::ger::Screen>
+L<Log::ger::Screen> uses us.
+
+L<Log::ger::Level::FromVar>
 
 =head1 AUTHOR
 
@@ -66,7 +70,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2018, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2022, 2020, 2018, 2017 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

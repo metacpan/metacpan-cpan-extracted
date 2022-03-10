@@ -10,7 +10,7 @@ use Log::ger::Output 'Screen' => (colorize_tags=>1);
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2022-02-18'; # DATE
 our $DIST = 'Log-ger-Screen'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 sub import {
     my ($package, %per_target_conf) = @_;
@@ -35,7 +35,7 @@ Log::ger::Screen - Convenient packaging of Log::ger + Lg:Output::Screen + Lg:Lev
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -53,6 +53,22 @@ details):
 
  % TRACE=1 perl ...
 
+But you can certainly use this module in your CLI script, as a more lightweight
+alternative to L<Log::ger::App> when you only want to output log to screen:
+
+ #!perl
+ use strict;
+ use warnings;
+ BEGIN { our $Default_Log_Level = 'info' }
+ use Log::ger::Screen;
+ use Log::ger;
+
+ use Getopt::Long;
+
+ log_debug "Starting program ...";
+ ...
+ log_debug "Ending program ...";
+
 =head1 DESCRIPTION
 
 This is just a convenient packaging of:
@@ -62,7 +78,8 @@ This is just a convenient packaging of:
  use Log::ger::Output 'Screen';
  use Log::ger; # in the caller's package
 
-mostly for one-liner usage.
+mostly for one-liner usage, but you are also welcome to use it in your CLI
+scripts.
 
 =head1 SEE ALSO
 

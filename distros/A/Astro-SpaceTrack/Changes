@@ -1,3 +1,8 @@
+0.151		2022-03-08	T. R. Wyant
+    The deprecated spaceflight() method now warns on every use.  It also
+    returns a 403 error, since the web site it scrapes has gone the way
+    of the dodo.
+
 0.150		2022-02-20	T. R. Wyant
     Convert celestrak() to new API.  Additional functionality based on
     this API to follow.

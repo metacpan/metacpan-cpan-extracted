@@ -3,6 +3,8 @@ package YAML::PP::Ref;
 use strict;
 use warnings;
 
+our $VERSION = '0.02'; # VERSION
+
 use base 'YAML::PP';
 use YAML::PP::Ref::Parser;
 

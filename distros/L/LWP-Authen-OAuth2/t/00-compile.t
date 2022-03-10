@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 11 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 12 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'LWP/Authen/OAuth2.pm',
@@ -19,6 +19,7 @@ my @module_files = (
     'LWP/Authen/OAuth2/ServiceProvider/Line.pm',
     'LWP/Authen/OAuth2/ServiceProvider/Line/AccessToken.pm',
     'LWP/Authen/OAuth2/ServiceProvider/Strava.pm',
+    'LWP/Authen/OAuth2/ServiceProvider/Withings.pm',
     'LWP/Authen/OAuth2/ServiceProvider/Yahoo.pm'
 );
 

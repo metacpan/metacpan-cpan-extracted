@@ -38,6 +38,7 @@
     use constant LITTLE_ENDIAN          => $Config{byteorder} =~ /^1/ ? 1 : 0;
     use constant MM_HP                  => LITTLE_ENDIAN ? 'h*' : 'H*';
     use constant MPFR_3_1_6_OR_LATER    => Math::MPFR::Random::_MPFR_VERSION() > 196869 ? 1 : 0;
+    use constant MPFR_PV_NV_BUG         => Math::MPFR::Random::_has_pv_nv_bug();
 
     use subs qw(MPFR_VERSION MPFR_VERSION_MAJOR MPFR_VERSION_MINOR
                 MPFR_VERSION_PATCHLEVEL MPFR_VERSION_STRING
@@ -90,7 +91,7 @@ MPFR_DBL_DIG MPFR_FLT128_DIG MPFR_LDBL_DIG
 MPFR_FLAGS_ALL MPFR_FLAGS_DIVBY0 MPFR_FLAGS_ERANGE MPFR_FLAGS_INEXACT MPFR_FLAGS_NAN
 MPFR_FLAGS_OVERFLOW MPFR_FLAGS_UNDERFLOW
 MPFR_FREE_LOCAL_CACHE MPFR_FREE_GLOBAL_CACHE
-MPFR_RNDA MPFR_RNDD MPFR_RNDF MPFR_RNDN MPFR_RNDU MPFR_RNDZ
+MPFR_RNDA MPFR_RNDD MPFR_RNDF MPFR_RNDN MPFR_RNDU MPFR_RNDZ MPFR_PV_NV_BUG
 MPFR_VERSION MPFR_VERSION_MAJOR MPFR_VERSION_MINOR MPFR_VERSION_PATCHLEVEL MPFR_VERSION_STRING
 RMPFR_PREC_MAX RMPFR_PREC_MIN RMPFR_VERSION_NUM
 
@@ -181,7 +182,7 @@ fr_cmp_q_rounded mpfr_max_orig_len mpfr_min_inter_prec mpfrtoa numtoa nvtoa prec
 q_add_fr q_cmp_fr q_div_fr q_mul_fr q_sub_fr rndna
 );
 
-    our $VERSION = '4.19';
+    our $VERSION = '4.21';
     #$VERSION = eval $VERSION;
 
     Math::MPFR->DynaLoader::bootstrap($VERSION);
@@ -195,7 +196,7 @@ MPFR_DBL_DIG MPFR_FLT128_DIG MPFR_LDBL_DIG
 MPFR_FLAGS_ALL MPFR_FLAGS_DIVBY0 MPFR_FLAGS_ERANGE MPFR_FLAGS_INEXACT MPFR_FLAGS_NAN
 MPFR_FLAGS_OVERFLOW MPFR_FLAGS_UNDERFLOW
 MPFR_FREE_LOCAL_CACHE MPFR_FREE_GLOBAL_CACHE
-MPFR_RNDA MPFR_RNDD MPFR_RNDF MPFR_RNDN MPFR_RNDU MPFR_RNDZ
+MPFR_RNDA MPFR_RNDD MPFR_RNDF MPFR_RNDN MPFR_RNDU MPFR_RNDZ MPFR_PV_NV_BUG
 MPFR_VERSION MPFR_VERSION_MAJOR MPFR_VERSION_MINOR MPFR_VERSION_PATCHLEVEL MPFR_VERSION_STRING
 RMPFR_PREC_MAX RMPFR_PREC_MIN RMPFR_VERSION_NUM
 
@@ -465,6 +466,16 @@ sub new {
 
     if($type == _NOK_T) {
       if(@_ ) {die "Too many arguments supplied to new() - expected only one"}
+
+      if(MPFR_PV_NV_BUG) {
+        if(_SvPOK($arg1)) {
+          set_nok_pok(nok_pokflag() + 1);
+          if($Math::MPFR::NOK_POK) {
+            warn "Scalar passed to new() is both NV and PV. Using NV (numeric) value";
+          }
+        }
+      }
+
       my $ret = Rmpfr_init();
       Rmpfr_set_NV($ret, $arg1, Rmpfr_get_default_rounding_mode());
       return $ret;

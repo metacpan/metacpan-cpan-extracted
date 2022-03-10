@@ -5,7 +5,7 @@ use warnings;
 use vars qw($VERSION);
 use 5.006;
 
-$VERSION = '0.10';
+$VERSION = '0.11';
 
 1;
 
@@ -19,7 +19,6 @@ __END__
 
 [![CPAN version](https://badge.fury.io/pl/Task-Date-Holidays.svg)](http://badge.fury.io/pl/Task-Date-Holidays)
 [![Build Status](https://travis-ci.org/jonasbn/perl-Task-Date-Holidays.svg?branch=master)](https://travis-ci.org/jonasbn/perl-Task-Date-Holidays)
-[![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/perl-date-holidays)
 
 =end markdown
 
@@ -29,9 +28,9 @@ Task::Date::Holidays - Work distribution for holiday modules in the Date::Holida
 
 =head1 SYNOPSIS
 
-    $ tar xvzf Task-Date-Holidays-0.01.tgz
+    $ tar xvzf Task-Date-Holidays-0.11.tgz
 
-    $ cd Task-Date-Holidays-0.01
+    $ cd Task-Date-Holidays-0.11
 
     $ perl Build.PL
 
@@ -139,7 +138,7 @@ Please report any bugs or feature requests using Github
 
 =over
 
-=item * L<Github Issues|https://github.com/jonasbn/perl-test-timer/issues>
+=item * L<Github Issues|https://github.com/jonasbn/perl-task-date-holidays/issues>
 
 =back
 
@@ -162,7 +161,7 @@ Jonas B., (jonasbn) - C<< <jonasbn@cpan.org> >>
 =head1 LICENSE AND COPYRIGHT
 
 Task-Date-Holidays and related modules are (C) by Jonas B., (jonasbn)
-2014-2020
+2014-2022
 
 Task-Date-Holidays and related modules are released under the Artistic License 2.0
 

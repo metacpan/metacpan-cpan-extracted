@@ -12,6 +12,8 @@ BEGIN {
     }
 }
 
+warn "Segs Before: " . IPC::Shareable::ipcs() . "\n" if $ENV{PRINT_SEGS};
+
 my $sv;
 
 my $awake = 0;
@@ -51,5 +53,8 @@ if ($pid == 0) {
     }
     is $sv, 200, "in parent: locked and updated SV to 200";
 }
+
+IPC::Shareable::_end;
+warn "Segs After: " . IPC::Shareable::ipcs() . "\n" if $ENV{PRINT_SEGS};
 
 done_testing();

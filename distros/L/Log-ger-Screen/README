@@ -3,7 +3,7 @@ NAME
     + Lg:Level::FromVar + Lg:Level::FromEnv for one-liner
 
 VERSION
-    version 0.004
+    version 0.005
 
 SYNOPSIS
     Mostly in one-liners:
@@ -20,6 +20,23 @@ SYNOPSIS
 
      % TRACE=1 perl ...
 
+    But you can certainly use this module in your CLI script, as a more
+    lightweight alternative to Log::ger::App when you only want to output
+    log to screen:
+
+     #!perl
+     use strict;
+     use warnings;
+     BEGIN { our $Default_Log_Level = 'info' }
+     use Log::ger::Screen;
+     use Log::ger;
+
+     use Getopt::Long;
+
+     log_debug "Starting program ...";
+     ...
+     log_debug "Ending program ...";
+
 DESCRIPTION
     This is just a convenient packaging of:
 
@@ -28,7 +45,8 @@ DESCRIPTION
      use Log::ger::Output 'Screen';
      use Log::ger; # in the caller's package
 
-    mostly for one-liner usage.
+    mostly for one-liner usage, but you are also welcome to use it in your
+    CLI scripts.
 
 SEE ALSO
     Log::ger::App

@@ -5,8 +5,7 @@ use_ok $_ for qw(
     App::Greple::wordle
     App::Greple::wordle::word_all
     App::Greple::wordle::word_hidden
-    App::Greple::wordle::hint
+    App::Greple::wordle::game
 );
 
 done_testing;
-

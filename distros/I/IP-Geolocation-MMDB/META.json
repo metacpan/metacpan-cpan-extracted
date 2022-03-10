@@ -52,11 +52,11 @@
    "provides" : {
       "IP::Geolocation::MMDB" : {
          "file" : "lib/IP/Geolocation/MMDB.pm",
-         "version" : "1.003"
+         "version" : "1.004"
       },
       "IP::Geolocation::MMDB::Metadata" : {
          "file" : "lib/IP/Geolocation/MMDB/Metadata.pm",
-         "version" : "1.003"
+         "version" : "1.004"
       }
    },
    "release_status" : "stable",
@@ -71,7 +71,7 @@
          "web" : "https://gitlab.com/voegelas/ip-geolocation-mmdb/-/tree/main"
       }
    },
-   "version" : "1.003",
+   "version" : "1.004",
    "x_generated_by_perl" : "v5.34.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

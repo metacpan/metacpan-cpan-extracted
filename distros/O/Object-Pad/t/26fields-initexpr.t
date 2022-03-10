@@ -6,6 +6,7 @@ use warnings;
 use Test::More;
 
 use Object::Pad;
+use Object::Pad qw( :experimental(init_expr) );
 
 # initexprs can capture regular class-level lexicals
 {

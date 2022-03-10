@@ -1,0 +1,31 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.88.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 84879964e0ae340eee4eba7fd24476b58e7fca6c4a2a3f0c2a94803926bbf87b CONTRIBUTING.md
+SHA256 e034fb2421e47aecebb78440039479b608475326ead2865f12fb156dffebb536 Changes
+SHA256 4bb36edd2bcafef11ca615f69607953a31ee05ae172b69990aee317e95653456 LICENSE
+SHA256 49a299622d9ee88e59a4481447ca0f51d59f23c7fcbe61621f2422b946abaf31 MANIFEST
+SHA256 aeb7209d3dd96eb69d94e95533016c0ed69d20ab326e8874bfe1a236c4db6652 META.json
+SHA256 20ca7689e79942cc81f0df466c478912bf5b0de4cb067d54e40b44604377e9aa META.yml
+SHA256 ecfe48661ff19c7218390cb26ebdc24c35add36bb3fc7edeead372ba8abfc422 Makefile.PL
+SHA256 6d534865569624af006aaf68d297c4c3b750741e55b76bb77db39a998534f735 README
+SHA256 bd190274ae902ecaac0f22e9ed69c00f7d486831d990a6b405be9908ef20c04c README.md
+SHA256 186d59dd51c7f0688fc5b755846a2a71394d8ecff3e886065d57b2d592b8df66 lib/Promise/Me.pm
+SHA256 cb047a6a576d4e72ff7a6c6a2b21b98ba58c372b057a0fa5c2be07b458b92a4e t/001_load.t
+SHA256 a53765423d60620847dd2e290092bddb18cc3099545919a7fa116be6f4293d98 t/002_promise.t
+SHA256 c29ce7f730f220dae92328376bc59d4cfe5b7dc4b29c792a3de22bc0a3570c96 t/090_pod.t
+SHA256 566e79c08955e1d9f7682e822a6df51009438091fde033a0929655655d8ee6e7 t/091.signature.t
+SHA256 c153544578cb1a3a40f80d97f7712103ab9987e644529bab1571de52e205bf82 t/099_kwalitee.t

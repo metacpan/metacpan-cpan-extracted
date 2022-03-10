@@ -15,6 +15,8 @@ BEGIN {
     }
 }
 
+warn "Segs Before: " . IPC::Shareable::ipcs() . "\n" if $ENV{PRINT_SEGS};
+
 tie my %h, 'IPC::Shareable', {
     key       => 'aaaa',
     destroy   => 1,
@@ -26,5 +28,8 @@ is $h{t70}->[1], 5, "hash element ok";
 IPC::Shareable->unspawn('aaaa', 1);
 
 is %h, '', "hash deleted after calling unspawn() with destroy => 1";
+
+IPC::Shareable::_end;
+warn "Segs After: " . IPC::Shareable::ipcs() . "\n" if $ENV{PRINT_SEGS};
 
 done_testing();

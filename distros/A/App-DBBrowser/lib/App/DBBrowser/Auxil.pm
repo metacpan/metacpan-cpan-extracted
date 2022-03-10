@@ -418,7 +418,7 @@ sub write_json {
         close $fh;
         return;
     }
-    my $json = JSON::MaybeXS->new->pretty->canonical->encode( $ref );
+    my $json = JSON::MaybeXS->new->utf8->pretty->canonical->encode( $ref );
     open my $fh, '>', $file_fs or die "$file_fs: $!";
     print $fh $json;
     close $fh;

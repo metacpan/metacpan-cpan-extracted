@@ -1,8 +1,11 @@
 # -*- perl -*-
 BEGIN
 {
-    use Test::More tests => 1;
-    use_ok( 'Promise::Me' );
+    use Test2::V0;
+    use ok( 'Promise::Me' );
 };
 
+done_testing();
+
+__END__
 

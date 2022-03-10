@@ -12,14 +12,11 @@ information such as country and city names.
 ## DEPENDENCIES
 
 Requires Alien::libmaxminddb from CPAN.  Requires Math::BigInt version
-1.999806, which is distributed with Perl 5.26 and newer.
-
-Requires libmaxminddb 1.2.0 or newer.
+1.999806, which is distributed with Perl 5.26 and newer.  Requires libmaxminddb
+1.2.0 or newer.
 
 Requires an IP to country, city or ASN database in the MaxMind DB file format
 from [MaxMind](https://www.maxmind.com/) or [DP-IP.com](https://db-ip.com/).
-
-Windows is not supported.  Please do not ask for Windows support.
 
 ## INSTALLATION
 

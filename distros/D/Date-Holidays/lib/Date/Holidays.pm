@@ -11,7 +11,7 @@ use Scalar::Util qw(blessed);
 
 use base 'Date::Holidays::Adapter';
 
-$VERSION = '1.30';
+$VERSION = '1.31';
 
 sub new {
     my ( $class, %params ) = @_;
@@ -334,7 +334,7 @@ Date::Holidays - Date::Holidays::* adapter and aggregator for all your holiday n
 
 =head1 VERSION
 
-The documentation describes version 1.30 of Date::Holidays
+The documentation describes version 1.31 of Date::Holidays
 
 =head1 FEATURES
 
@@ -964,7 +964,7 @@ Please see L<Task::Date::Holidays|https://metacpan.org/pod/Task::Date::Holidays>
 
 =over
 
-=item * @qorron for PR patching the US adapter, resulting in 1.30
+=item * @qorron for PR patching the US adapter, resulting in 1.31
 
 =item * Wesley Schwengle (WATERKIP) author of Date::Holidays::NL and Date::Holidays::AW for reaching out and letting me know of their existance
 

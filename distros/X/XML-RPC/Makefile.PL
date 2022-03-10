@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker;
 
 WriteMakefile(
-    AUTHOR              =>  'Rene Schickbauer  <maplat@cavac.at>',
+    AUTHOR              =>  'Rene Schickbauer  <cavac@cpan.org>',
     ABSTRACT            =>  'Pure Perl implementation for an XML-RPC client and server',
     NAME                =>  'XML::RPC',
     VERSION_FROM        =>  'lib/XML/RPC.pm',

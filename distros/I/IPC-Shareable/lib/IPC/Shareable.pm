@@ -21,7 +21,7 @@ use Scalar::Util;
 use String::CRC32;
 use Storable 0.6 qw(freeze thaw);
 
-our $VERSION = '1.09';
+our $VERSION = '1.11';
 
 use constant {
     LOCK_SH               => 1,
@@ -126,9 +126,9 @@ sub TIEHASH {
 sub STORE {
     my $knot = shift;
 
-    my $sid = $knot->seg->{_id};
-
-    $global_register{$sid} ||= $knot;
+    if (! exists $global_register{$knot->seg->id}) {
+        $global_register{$knot->seg->id} = $knot;
+    }
 
     $knot->{_data} = $knot->_decode($knot->seg) unless ($knot->{_lock});
 
@@ -164,9 +164,9 @@ sub STORE {
 sub FETCH {
     my $knot = shift;
 
-    my $sid = $knot->seg->{_id};
-
-    $global_register{$sid} ||= $knot;
+    if (! exists $global_register{$knot->seg->id}) {
+        $global_register{$knot->seg->id} = $knot;
+    }
 
     my $data;
     if ($knot->{_lock} || $knot->{_iterating}) {
@@ -286,7 +286,10 @@ sub EXTEND {
 sub PUSH {
     my $knot = shift;
 
-    $global_register{$knot->seg->id} ||= $knot;
+    if (! exists $global_register{$knot->seg->id}) {
+        $global_register{$knot->seg->id} = $knot;
+    }
+
     $knot->{_data} = $knot->_decode($knot->seg, $knot->{_data}) unless $knot->{_lock};
 
     push @{$knot->{_data}}, @_;
@@ -398,6 +401,19 @@ sub new {
     }
 }
 sub global_register {
+     # This is a ridiculous way to do this, but if we don't call Dumper, hashes
+    # that are created in a separate process than the parent hash don't
+    # show up properly in the global register. t/90
+
+    local $SIG{__WARN__} = sub {
+        my ($warning) = @_;
+        if ($warning !~ /hash after insertion/) {
+            warn $warning;
+        }
+    };
+
+    Dumper \%global_register;
+
     return \%global_register;
 }
 sub process_register {
@@ -419,7 +435,7 @@ sub attributes {
 sub ipcs {
     my $count = `ipcs -m | wc -l`;
     chomp $count;
-    return $count;
+    return int($count);
 }
 sub spawn {
     my ($knot, %opts) = @_;
@@ -526,7 +542,8 @@ sub unlock {
 sub clean_up {
     my $class = shift;
 
-    for my $s (values %process_register) {
+    for my $id (keys %process_register) {
+        my $s = $process_register{$id};
         next unless $s->attributes('owner') == $$;
         next if $s->attributes('protected');
         remove($s);
@@ -534,12 +551,13 @@ sub clean_up {
 }
 sub clean_up_all {
     my $class = shift;
-    for my $s (values %process_register) {
-        next if $s->attributes('protected');
-        remove($s);
-    }
 
-    for my $s (values %global_register) {
+    my $global_register = __PACKAGE__->global_register;
+
+    my %deleted = %$global_register;
+
+    for my $id (keys %deleted) {
+        my $s = $deleted{$id};
         next if $s->attributes('protected');
         remove($s);
     }
@@ -616,13 +634,7 @@ sub singleton {
 }
 
 END {
-    for my $s (values %process_register) {
-        unlock($s);
-        next if $s->attributes('protected');
-        next if ! $s->attributes('destroy');
-        next if $s->attributes('owner') != $$;
-        remove($s);
-    }
+    _end();
 }
 
 # --- Private methods below
@@ -640,6 +652,15 @@ sub _encode {
     }
 
     return undef;
+}
+sub _end {
+    for my $s (values %process_register) {
+        unlock($s);
+        next if $s->attributes('protected');
+        next if ! $s->attributes('destroy');
+        next if $s->attributes('owner') != $$;
+        remove($s);
+    }
 }
 sub _decode {
     my ($knot, $seg) = @_;
@@ -814,7 +835,11 @@ sub _tie {
     $knot->{_data} = _thaw($seg);
 
     if ($sem->getval(SEM_MARKER) != SHM_EXISTS) {
-        $global_register{$knot->seg->id} ||= $knot;
+
+        if (! exists $global_register{$knot->seg->id}) {
+            $global_register{$knot->seg->id} = $knot;
+        }
+
         $process_register{$knot->seg->id} ||= $knot;
         if (! $sem->setval(SEM_MARKER, SHM_EXISTS)){
             croak "Couldn't set semaphore during object creation: $!";

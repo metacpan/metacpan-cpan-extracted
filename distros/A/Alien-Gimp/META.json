@@ -51,7 +51,7 @@
    "provides" : {
       "Alien::Gimp" : {
          "file" : "lib/Alien/Gimp.pm.PL",
-         "version" : "0.09"
+         "version" : "0.10"
       }
    },
    "release_status" : "stable",
@@ -62,6 +62,6 @@
          "web" : "https://github.com/mohawk2/Alien-Gimp"
       }
    },
-   "version" : "0.09",
+   "version" : "0.10",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

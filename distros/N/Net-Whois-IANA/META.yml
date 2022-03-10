@@ -11,7 +11,7 @@ build_requires:
   List::MoreUtils: '0'
   Test2::Bundle::Extended: '0'
   Test2::Plugin::NoWarnings: '0'
-  Test2::Suite: '0'
+  Test2::Suite: '0.000071'
   Test2::Tools::Explain: '0'
   Test::Builder: '0'
   Test::CPAN::Meta: '0'
@@ -29,7 +29,7 @@ name: Net-Whois-IANA
 provides:
   Net::Whois::IANA:
     file: lib/Net/Whois/IANA.pm
-    version: '0.47'
+    version: '0.49'
 requires:
   IO::Socket: '0'
   Net::CIDR: '0'
@@ -37,10 +37,10 @@ requires:
 resources:
   bugtracker: https://github.com/atoomic/Net-Whois-IANA/issues
   repository: git://github.com/atoomic/Net-Whois-IANA.git
-version: '0.47'
+version: '0.49'
 x_Dist_Zilla:
   perl:
-    version: '5.032000'
+    version: '5.032001'
   plugins:
     -
       class: Dist::Zilla::Plugin::PkgVersion
@@ -87,67 +87,67 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::EnsurePod5
               name: '@CorePrep/EnsurePod5'
-              version: '4.015'
+              version: '4.018'
             -
               class: Pod::Weaver::Plugin::H1Nester
               name: '@CorePrep/H1Nester'
-              version: '4.015'
+              version: '4.018'
             -
               class: Pod::Weaver::Plugin::SingleEncoding
               name: '@Default/SingleEncoding'
-              version: '4.015'
+              version: '4.018'
             -
               class: Pod::Weaver::Section::Name
               name: '@Default/Name'
-              version: '4.015'
+              version: '4.018'
             -
               class: Pod::Weaver::Section::Version
               name: '@Default/Version'
-              version: '4.015'
+              version: '4.018'
             -
               class: Pod::Weaver::Section::Region
               name: '@Default/prelude'
-              version: '4.015'
+              version: '4.018'
             -
               class: Pod::Weaver::Section::Generic
               name: SYNOPSIS
-              version: '4.015'
+              version: '4.018'
             -
               class: Pod::Weaver::Section::Generic
               name: DESCRIPTION
-              version: '4.015'
+              version: '4.018'
             -
               class: Pod::Weaver::Section::Generic
               name: OVERVIEW
-              version: '4.015'
+              version: '4.018'
             -
               class: Pod::Weaver::Section::Collect
               name: ATTRIBUTES
-              version: '4.015'
+              version: '4.018'
             -
               class: Pod::Weaver::Section::Collect
               name: METHODS
-              version: '4.015'
+              version: '4.018'
             -
               class: Pod::Weaver::Section::Collect
               name: FUNCTIONS
-              version: '4.015'
+              version: '4.018'
             -
               class: Pod::Weaver::Section::Leftovers
               name: '@Default/Leftovers'
-              version: '4.015'
+              version: '4.018'
             -
               class: Pod::Weaver::Section::Region
               name: '@Default/postlude'
-              version: '4.015'
+              version: '4.018'
             -
               class: Pod::Weaver::Section::Authors
               name: '@Default/Authors'
-              version: '4.015'
+              version: '4.018'
             -
               class: Pod::Weaver::Section::Legal
               name: '@Default/Legal'
-              version: '4.015'
+              version: '4.018'
       name: PodWeaver
       version: '4.009'
     -
@@ -202,10 +202,10 @@ x_Dist_Zilla:
             - 'gh HEAD:refs/heads/released'
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: '2.30.1 (Apple Git-130)'
+          git_version: '2.32.0 (Apple Git-132)'
           repo_root: .
       name: Git::Push
-      version: '2.047'
+      version: '2.048'
     -
       class: Dist::Zilla::Plugin::TestRelease
       name: TestRelease
@@ -230,10 +230,10 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: '2.30.1 (Apple Git-130)'
+          git_version: '2.32.0 (Apple Git-132)'
           repo_root: .
       name: '@Git/Check'
-      version: '2.047'
+      version: '2.048'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
@@ -252,12 +252,12 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: '2.30.1 (Apple Git-130)'
+          git_version: '2.32.0 (Apple Git-132)'
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Git/Commit'
-      version: '2.047'
+      version: '2.048'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -265,16 +265,16 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.47
+          tag: v0.49
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
-          git_version: '2.30.1 (Apple Git-130)'
+          git_version: '2.32.0 (Apple Git-132)'
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Git/Tag'
-      version: '2.047'
+      version: '2.048'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -284,10 +284,10 @@ x_Dist_Zilla:
             - 'gh HEAD:refs/heads/released'
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: '2.30.1 (Apple Git-130)'
+          git_version: '2.32.0 (Apple Git-132)'
           repo_root: .
       name: '@Git/Push'
-      version: '2.047'
+      version: '2.048'
     -
       class: Dist::Zilla::Plugin::Git::NextVersion
       config:
@@ -296,10 +296,10 @@ x_Dist_Zilla:
           version_by_branch: 0
           version_regexp: (?^:^v(.+)$)
         Dist::Zilla::Role::Git::Repo:
-          git_version: '2.30.1 (Apple Git-130)'
+          git_version: '2.32.0 (Apple Git-132)'
           repo_root: .
       name: Git::NextVersion
-      version: '2.047'
+      version: '2.048'
     -
       class: Dist::Zilla::Plugin::PruneCruft
       name: '@Filter/PruneCruft'
@@ -455,6 +455,6 @@ x_Dist_Zilla:
     config:
       is_trial: '0'
     version: '6.024'
-x_generated_by_perl: v5.32.0
+x_generated_by_perl: v5.32.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

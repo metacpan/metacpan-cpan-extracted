@@ -1,7 +1,7 @@
 package OX::RouteBuilder::REST;
 
 # ABSTRACT: OX::RouteBuilder which routes to an action method in a controller class based on HTTP verbs
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use Moose;
 use namespace::autoclean;
@@ -90,7 +90,7 @@ OX::RouteBuilder::REST - OX::RouteBuilder which routes to an action method in a 
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -154,8 +154,8 @@ defaults for the route, as well as C<name> (which will be set to
 C<"REST.$controller.$action">).
 
 To generate a link to an action, use C<uri_for> with either the name
-(eg C<"REST.$controller.$action">), or by passing a HashRef C<{
-    controller => $controller, action => $action }>. See F<t/test.t>
+(eg C<"REST.$controller.$action">), or by passing a HashRef C<<{
+    controller => $controller, action => $action }>>. See F<t/test.t>
     for some examples.
 
 =for Pod::Coverage import

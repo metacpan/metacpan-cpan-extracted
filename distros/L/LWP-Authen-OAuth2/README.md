@@ -4,7 +4,7 @@ LWP::Authen::OAuth2 - Make requests to OAuth2 APIs.
 
 # VERSION
 
-version 0.18
+version 0.19
 
 # SYNOPSIS
 
@@ -50,6 +50,12 @@ Currently [LWP::Authen::OAuth2](https://metacpan.org/pod/LWP%3A%3AAuthen%3A%3AOA
     [LWP::Authen::OAuth2::ServiceProvider::Strava](https://metacpan.org/pod/LWP%3A%3AAuthen%3A%3AOAuth2%3A%3AServiceProvider%3A%3AStrava)
 
     implemented by [Leon Wright](https://github.com/techman83)
+
+- Withings
+
+    [LWP::Authen::OAuth2::ServiceProvider::Withings](https://metacpan.org/pod/LWP%3A%3AAuthen%3A%3AOAuth2%3A%3AServiceProvider%3A%3AWithings)
+
+    implemented by [Brian Foley](https://github.com/foleybri)
 
 - Yahoo
 
@@ -463,7 +469,7 @@ specified
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 - 2021 by Ben Tilly, Rent.com, Thomas Klausner.
+This software is copyright (c) 2013 - 2022 by Ben Tilly, Rent.com, Thomas Klausner.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

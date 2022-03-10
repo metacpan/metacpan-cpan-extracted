@@ -16,11 +16,13 @@ my %WriteMakefileArgs = (
     },
     TEST_REQUIRES => {
         'Test::More' => '0',
+	'Type::Tiny' => '0'
     },
     PREREQ_PM => {
 	'Tie::IxHash' => 0,
 	'Carp' => 0,
     	'Blessed::Merge' => 0,
+	'Hash::Typed' => '0.04',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'YAOO-*' },

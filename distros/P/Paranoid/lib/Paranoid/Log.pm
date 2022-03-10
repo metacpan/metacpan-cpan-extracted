@@ -1,12 +1,12 @@
 # Paranoid::Log -- Log support for paranoid programs
 #
-# $Id: lib/Paranoid/Log.pm, 2.09 2021/12/28 15:46:49 acorliss Exp $
+# $Id: lib/Paranoid/Log.pm, 2.10 2022/03/08 00:01:04 acorliss Exp $
 #
 # This software is free software.  Similar to Perl, you can redistribute it
 # and/or modify it under the terms of either:
 #
 #   a)     the GNU General Public License
-#          <https://www.gnu.org/licenses/gpl-1.0.html> as published by the 
+#          <https://www.gnu.org/licenses/gpl-1.0.html> as published by the
 #          Free Software Foundation <http://www.fsf.org/>; either version 1
 #          <https://www.gnu.org/licenses/gpl-1.0.html>, or any later version
 #          <https://www.gnu.org/licenses/license-list.html#GNUGPL>, or
@@ -41,7 +41,7 @@ use Paranoid::Debug qw(:all);
 use Paranoid::Module;
 use Paranoid::Input;
 
-($VERSION) = ( q$Revision: 2.09 $ =~ /(\d+(?:\.\d+)+)/sm );
+($VERSION) = ( q$Revision: 2.10 $ =~ /(\d+(?:\.\d+)+)/sm );
 
 @EXPORT = qw(
     PL_DEBUG     PL_INFO      PL_NOTICE    PL_WARN
@@ -106,8 +106,7 @@ our @_levels = (
         my $mname  = $module;
         my ( $sref, $aref, $dref, $rv );
 
-        pdebug( 'entering w/(%s)', PDLEVEL2, $module );
-        pIn();
+        subPreamble( PDLEVEL2, '$', $module );
 
         # Was module already loaded (or a load attempted)?
         if ( exists $loaded{$module} ) {
@@ -168,8 +167,7 @@ our @_levels = (
             }
         }
 
-        pOut();
-        pdebug( 'leaving w/rv: %s', PDLEVEL2, $rv );
+        subPostamble( PDLEVEL2, '$', $rv );
 
         return $rv;
     }
@@ -227,9 +225,8 @@ our @_levels = (
         my $mopts = shift;
         my $rv    = 1;
 
-        pdebug( 'entering w/(%s)(%s)(%s)(%s)(%s)',
-            PDLEVEL3, $name, $mech, $level, $scope, $mopts );
-        pIn();
+        subPreamble( PDLEVEL3, '$$$$\%', $name, $mech, $level, $scope,
+            $mopts );
 
         # Set defaults for optional arguments that were left undefined
         $level = PL_NOTICE unless defined $level;
@@ -292,8 +289,7 @@ our @_levels = (
             }
         }
 
-        pOut();
-        pdebug( 'leaving w/rv: %s', PDLEVEL3, $rv );
+        subPostamble( PDLEVEL3, '$', $rv );
 
         return $rv;
     }
@@ -343,8 +339,7 @@ our @_levels = (
             );
         my ( $logger, $sref, $plevel );
 
-        pdebug( 'entering w/(%s)(%s)', PDLEVEL1, $level, $message );
-        pIn();
+        subPreamble( PDLEVEL1, '$$;@', $level, $message, @margs );
 
         # Validate level and message
         $rv = 0
@@ -422,8 +417,7 @@ our @_levels = (
             $rv = 0;
         }
 
-        pOut();
-        pdebug( 'leaving w / rv : %s', PDLEVEL1, $rv );
+        subPostamble( PDLEVEL1, '$', $rv );
 
         return $rv;
     }
@@ -431,7 +425,7 @@ our @_levels = (
 
 sub plverbosity {
 
-    # Purpose:  Sets Stdout/Stderr verbosity according to passed leve.
+    # Purpose:  Sets Stdout/Stderr verbosity according to passed level.
     #           Supports levels 1 - 3, with 4 being the most verbose
     # Returns:  Boolean
     # Usage:    $rv = plverbosity($level);
@@ -442,8 +436,7 @@ sub plverbosity {
     my $erridx = PL_CRIT;
     my $rv     = 1;
 
-    pdebug( 'entering w/(%s)', PDLEVEL3, $level );
-    pIn();
+    subPreamble( PDLEVEL3, '$', $level );
 
     # Make sure a positive integer was passed
     $rv = 0 unless $level > -1;
@@ -475,8 +468,7 @@ sub plverbosity {
         $level--;
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL3, $rv );
+    subPostamble( PDLEVEL3, '$', $rv );
 
     return $rv;
 }
@@ -491,7 +483,7 @@ Paranoid::Log - Log Functions
 
 =head1 VERSION
 
-$Id: lib/Paranoid/Log.pm, 2.09 2021/12/28 15:46:49 acorliss Exp $
+$Id: lib/Paranoid/Log.pm, 2.10 2022/03/08 00:01:04 acorliss Exp $
 
 =head1 SYNOPSIS
 
@@ -501,6 +493,8 @@ $Id: lib/Paranoid/Log.pm, 2.09 2021/12/28 15:46:49 acorliss Exp $
   $rv = stopLogger($name);
 
   $rv = plog($severity, $message);
+
+  $rv = plverbosity(3);
 
 =head1 DESCRIPTION
 

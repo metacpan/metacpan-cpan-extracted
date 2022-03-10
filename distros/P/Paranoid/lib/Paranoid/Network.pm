@@ -1,12 +1,12 @@
 # Paranoid::Network -- Network functions for paranoid programs
 #
-# $Id: lib/Paranoid/Network.pm, 2.09 2021/12/28 15:46:49 acorliss Exp $
+# $Id: lib/Paranoid/Network.pm, 2.10 2022/03/08 00:01:04 acorliss Exp $
 #
 # This software is free software.  Similar to Perl, you can redistribute it
 # and/or modify it under the terms of either:
 #
 #   a)     the GNU General Public License
-#          <https://www.gnu.org/licenses/gpl-1.0.html> as published by the 
+#          <https://www.gnu.org/licenses/gpl-1.0.html> as published by the
 #          Free Software Foundation <http://www.fsf.org/>; either version 1
 #          <https://www.gnu.org/licenses/gpl-1.0.html>, or any later version
 #          <https://www.gnu.org/licenses/license-list.html#GNUGPL>, or
@@ -43,7 +43,7 @@ use Paranoid::Network::Socket;
 use Paranoid::Network::IPv4 qw(:all);
 use Paranoid::Network::IPv6 qw(:all);
 
-($VERSION) = ( q$Revision: 2.09 $ =~ /(\d+(?:\.\d+)+)/sm );
+($VERSION) = ( q$Revision: 2.10 $ =~ /(\d+(?:\.\d+)+)/sm );
 
 @EXPORT      = qw(ipInNetworks hostInDomains extractIPs netIntersect);
 @EXPORT_OK   = ( @EXPORT, qw(NETMATCH HOSTNAME_REGEX) );
@@ -80,8 +80,7 @@ sub ipInNetworks {
     my $rv       = 0;
     my ( $family, @tmp );
 
-    pdebug( 'entering w/(%s)(%s)', PDLEVEL1, $ip, @networks );
-    pIn();
+    subPreamble( PDLEVEL1, '$@', $ip, @networks );
 
     NETMATCH = undef;
 
@@ -132,8 +131,7 @@ sub ipInNetworks {
         }
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL1, $rv );
+    subPostamble( PDLEVEL1, '$', $rv );
 
     return $rv;
 }
@@ -149,8 +147,7 @@ sub hostInDomains {
     my $rv      = 0;
     my $domain;
 
-    pdebug( 'entering w/(%s)(%s)', PDLEVEL1, $host, @domains );
-    pIn();
+    subPreamble( PDLEVEL1, '$@', $host, @domains );
 
     NETMATCH = undef;
 
@@ -172,8 +169,7 @@ sub hostInDomains {
         }
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL1, $rv );
+    subPostamble( PDLEVEL1, '$', $rv );
 
     return $rv;
 }
@@ -187,8 +183,7 @@ sub extractIPs {
     my @strings = @_;
     my ( $string, @ips, $ip, @tmp, @rv );
 
-    pdebug( 'entering w/%d strings', PDLEVEL1, scalar @strings );
-    pIn();
+    subPreamble( PDLEVEL1, '@', @strings );
 
     foreach $string (@strings) {
         next unless defined $string;
@@ -206,8 +201,8 @@ sub extractIPs {
         # for IPv6 addresses
         if ( has_ipv6() or $] >= 5.012 ) {
 
-            @ips = ( $string =~
-                    m/(@{[ IPV6CIDRRGX ]}|@{[ IPV6REGEX ]})/sogix );
+            @ips =
+                ( $string =~ m/(@{[ IPV6CIDRRGX ]}|@{[ IPV6REGEX ]})/sogix );
 
             # Filter out addresses with more than one ::
             @ips = grep { scalar(m/(::)/sg) <= 1 } @ips;
@@ -221,8 +216,7 @@ sub extractIPs {
         }
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL1, @rv );
+    subPostamble( PDLEVEL1, '@', @rv );
 
     return @rv;
 }
@@ -243,8 +237,7 @@ sub netIntersect {
     my $dest   = shift;
     my $rv     = 0;
 
-    pdebug( 'entering w/(%s)(%s)', PDLEVEL1, $target, $dest );
-    pIn();
+    subPreamble( PDLEVEL1, '$$', $target, $dest );
 
     if ( defined $target and defined $dest ) {
         if ( $target =~ m/^(?:@{[ IPV4CIDRRGX ]}|@{[ IPV4REGEX ]})$/s ) {
@@ -265,8 +258,7 @@ sub netIntersect {
         pdebug( 'one or both arguments are not defined', PDLEVEL1 );
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL1, $rv );
+    subPostamble( PDLEVEL1, '$', $rv );
 
     return $rv;
 }
@@ -281,7 +273,7 @@ Paranoid::Network - Network functions for paranoid programs
 
 =head1 VERSION
 
-$Id: lib/Paranoid/Network.pm, 2.09 2021/12/28 15:46:49 acorliss Exp $
+$Id: lib/Paranoid/Network.pm, 2.10 2022/03/08 00:01:04 acorliss Exp $
 
 =head1 SYNOPSIS
 

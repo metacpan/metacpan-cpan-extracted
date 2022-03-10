@@ -25,6 +25,7 @@ t/60-error_handling.t
 t/65-protected_option_for_events_hash_default.t
 t/66-protected_option_for_events_hash_mock.t
 t/67-protected_option_for_events_hash_cleanup.t
+t/90-two_events_leak_seg.t
 t/99-end.t
 t/manifest.t
 t/pod-coverage.t

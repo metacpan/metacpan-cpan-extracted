@@ -1,3 +1,9 @@
+0.063   2022-02-14  Released-By: PERLANCAR; Urgency: medium
+
+        - Allow dists that do not have BorderStyle/*pm to specify a spec
+          prereq to BorderStyle, e.g. Text-Table-TinyBorderStyle.
+
+
 0.062   2020-06-11  Released-By: PERLANCAR; Urgency: medium
 
 	- Add BorderStyle.

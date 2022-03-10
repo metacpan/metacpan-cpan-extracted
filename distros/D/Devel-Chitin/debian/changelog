@@ -1,3 +1,9 @@
+libdevel-chitin-perl (0.19-1) unstable; urgency=low
+
+    * Fix dual-var deparse bug exposed in 5.35.10
+
+ -- Anthony Brummett <brummett@cpan.org>   Mon, 7 Mar 2022  14:45:00 -0500
+
 libdevel-chitin-perl (0.18-1) unstable; urgency=low
 
     * Test fixes to work on threaded perls, and to force minimum required versions of some modules

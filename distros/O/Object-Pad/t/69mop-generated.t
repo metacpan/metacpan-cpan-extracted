@@ -6,14 +6,14 @@ use warnings;
 use Test::More;
 
 use Object::Pad;
+use Object::Pad qw( :experimental(mop) );
 
 # An attempt to programmatically generate everything
-BEGIN {
-   # we don't need `package Point` here any more
+{
    my $classmeta = Object::Pad::MOP::Class->create_class( "Point" );
 
-   my $xfieldmeta = $classmeta->add_field( '$x' );
-   my $yfieldmeta = $classmeta->add_field( '$y' );
+   my $xfieldmeta = $classmeta->add_field( '$x', reader => 'x' );
+   my $yfieldmeta = $classmeta->add_field( '$y', reader => 'y' );
 
    $classmeta->add_BUILD( sub {
       my $self = shift;
@@ -35,6 +35,7 @@ BEGIN {
    my $point = Point->new( 10, 20 );
    is( $point->describe, "Point(10, 20)",
       '$point->describe' );
+   is( $point->x, 10, '$point->x' );
 }
 
 done_testing;

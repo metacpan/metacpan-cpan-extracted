@@ -1,7 +1,7 @@
 package LWP::Authen::OAuth2::ServiceProvider::Line;
 
 # ABSTRACT: Access Line OAuth2 API v2
-our $VERSION = '0.18'; # VERSION
+our $VERSION = '0.19'; # VERSION
 
 use strict;
 use warnings;
@@ -80,7 +80,7 @@ LWP::Authen::OAuth2::ServiceProvider::Line - Access Line OAuth2 API v2
 
 =head1 VERSION
 
-version 0.18
+version 0.19
 
 =head1 SYNOPSIS
 
@@ -147,7 +147,7 @@ C<verify> is designed for verifying pre-existing access tokens. Instead of using
 
 The server seems to ignore the C<Authorization> header for this request, so including it is probably not a problem. If you want to avoid sending the access token in the header, it's necessary to manually construct the request and decode the response.
 
-See L</SYNOPSYS> for usage examples.
+See L</SYNOPSIS> for usage examples.
 
 =item C<revoke>
 
@@ -179,7 +179,7 @@ Thomas Klausner <domm@plix.at>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 - 2021 by Ben Tilly, Rent.com, Thomas Klausner.
+This software is copyright (c) 2013 - 2022 by Ben Tilly, Rent.com, Thomas Klausner.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

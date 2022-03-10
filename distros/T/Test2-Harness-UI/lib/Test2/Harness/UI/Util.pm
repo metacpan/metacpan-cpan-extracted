@@ -2,7 +2,7 @@ package Test2::Harness::UI::Util;
 use strict;
 use warnings;
 
-our $VERSION = '0.000112';
+our $VERSION = '0.000115';
 
 use Carp qw/croak/;
 
@@ -12,7 +12,7 @@ use Test2::Harness::Util qw/mod2file/;
 
 use Importer Importer => 'import';
 
-our @EXPORT = qw/share_dir share_file qdb_driver dbd_driver config_from_settings find_job format_duration parse_duration/;
+our @EXPORT = qw/share_dir share_file qdb_driver dbd_driver config_from_settings find_job format_duration parse_duration is_invalid_subtest_name/;
 
 my %SCHEMA_TO_QDB_DRIVER = (
     mariadb => 'MySQL',
@@ -25,6 +25,19 @@ my %SCHEMA_TO_DBD_DRIVER = (
     mysql      => 'DBD::mysql',
     postgresql => 'DBD::postgresql',
 );
+
+my %BAD_ST_NAME = (
+    '__ANON__'            => 1,
+    'unnamed'             => 1,
+    'unnamed subtest'     => 1,
+    'unnamed summary'     => 1,
+    '<UNNAMED ASSERTION>' => 1,
+);
+
+sub is_invalid_subtest_name {
+    my ($name) = @_;
+    return $BAD_ST_NAME{$name} // 0;
+}
 
 sub find_job {
     my ($schema, $uuid, $try) = @_;

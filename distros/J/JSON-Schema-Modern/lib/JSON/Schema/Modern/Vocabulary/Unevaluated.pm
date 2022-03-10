@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::Unevaluated;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Unevaluated vocabulary
 
-our $VERSION = '0.547';
+our $VERSION = '0.548';
 
 use 5.020;
 use Moo;
@@ -97,9 +97,10 @@ sub _eval_keyword_unevaluatedItems ($self, $data, $schema, $state) {
     last if $state->{short_circuit};
   }
 
-  return E($state, 'subschema is not valid against all additional items') if not $valid;
   push $state->{annotations}->@*, @new_annotations;
-  return A($state, true);
+  A($state, true);
+  return E($state, 'subschema is not valid against all additional items') if not $valid;
+  return 1;
 }
 
 sub _traverse_keyword_unevaluatedProperties ($self, $schema, $state) {
@@ -128,16 +129,13 @@ sub _eval_keyword_unevaluatedProperties ($self, $data, $schema, $state) {
 
   my $valid = 1;
   my @orig_annotations = $state->{annotations}->@*;
-  my (@valid_properties, @new_annotations);
+  my (@properties, @new_annotations);
   foreach my $property (sort keys %$data) {
     next if any { $_ eq $property } @evaluated_properties;
+    push @properties, $property;
 
     if (is_type('boolean', $schema->{unevaluatedProperties})) {
-      if ($schema->{unevaluatedProperties}) {
-        push @valid_properties, $property;
-        next;
-      }
-
+      next if $schema->{unevaluatedProperties};
       $valid = E({ %$state, data_path => jsonp($state->{data_path}, $property) },
         'additional property not permitted');
     }
@@ -147,7 +145,6 @@ sub _eval_keyword_unevaluatedProperties ($self, $data, $schema, $state) {
           +{ %$state, annotations => \@annotations,
             data_path => jsonp($state->{data_path}, $property),
             schema_path => $state->{schema_path}.'/unevaluatedProperties' })) {
-        push @valid_properties, $property;
         push @new_annotations, @annotations[$#orig_annotations+1 .. $#annotations];
         next;
       }
@@ -157,9 +154,10 @@ sub _eval_keyword_unevaluatedProperties ($self, $data, $schema, $state) {
     last if $state->{short_circuit};
   }
 
-  return E($state, 'not all additional properties are valid') if not $valid;
   push $state->{annotations}->@*, @new_annotations;
-  return A($state, \@valid_properties);
+  A($state, \@properties);
+  return E($state, 'not all additional properties are valid') if not $valid;
+  return 1;
 }
 
 1;
@@ -176,7 +174,7 @@ JSON::Schema::Modern::Vocabulary::Unevaluated - Implementation of the JSON Schem
 
 =head1 VERSION
 
-version 0.547
+version 0.548
 
 =head1 DESCRIPTION
 

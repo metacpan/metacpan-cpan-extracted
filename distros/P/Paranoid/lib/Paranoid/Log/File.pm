@@ -1,12 +1,12 @@
 # Paranoid::Log::File -- File Log support for paranoid programs
 #
-# $Id: lib/Paranoid/Log/File.pm, 2.09 2021/12/28 15:46:49 acorliss Exp $
+# $Id: lib/Paranoid/Log/File.pm, 2.10 2022/03/08 00:01:04 acorliss Exp $
 #
 # This software is free software.  Similar to Perl, you can redistribute it
 # and/or modify it under the terms of either:
 #
 #   a)     the GNU General Public License
-#          <https://www.gnu.org/licenses/gpl-1.0.html> as published by the 
+#          <https://www.gnu.org/licenses/gpl-1.0.html> as published by the
 #          Free Software Foundation <http://www.fsf.org/>; either version 1
 #          <https://www.gnu.org/licenses/gpl-1.0.html>, or any later version
 #          <https://www.gnu.org/licenses/license-list.html#GNUGPL>, or
@@ -42,7 +42,7 @@ use Paranoid::Input;
 use Paranoid::IO;
 use Fcntl qw(:DEFAULT :flock :mode :seek);
 
-($VERSION) = ( q$Revision: 2.09 $ =~ /(\d+(?:\.\d+)+)/sm );
+($VERSION) = ( q$Revision: 2.10 $ =~ /(\d+(?:\.\d+)+)/sm );
 
 #####################################################################
 #
@@ -76,7 +76,7 @@ use Fcntl qw(:DEFAULT :flock :mode :seek);
         }
 
         # Do a little sanitizing...
-        if (defined $hostname and length $hostname) {
+        if ( defined $hostname and length $hostname ) {
             $hostname =~ s/\..*$//so;
         } else {
             $hostname = 'localhost';
@@ -120,8 +120,7 @@ use Fcntl qw(:DEFAULT :flock :mode :seek);
         my %record = @_;
         my ( $mode, $perm, $rv );
 
-        pdebug( 'entering w/%s', PDLEVEL1, %record );
-        pIn();
+        subPreamble( PDLEVEL1, '%', %record );
 
         # Get mode and permissions
         $mode =
@@ -139,8 +138,7 @@ use Fcntl qw(:DEFAULT :flock :mode :seek);
                 PDLEVEL1, $record{options}{file} );
         }
 
-        pOut();
-        pdebug( 'leaving w/rv: %s', PDLEVEL1, $rv );
+        subPostamble( PDLEVEL1, '$', $rv );
 
         return $rv;
     }
@@ -163,10 +161,9 @@ use Fcntl qw(:DEFAULT :flock :mode :seek);
         # Usage:    $rv = logMsg(%record);
 
         my %record = @_;
-        my ( $fh, $message, $rv );
+        my ( $message, $rv );
 
-        pdebug( 'entering w/%s', PDLEVEL1, %record );
-        pIn();
+        subPreamble( PDLEVEL1, '%', %record );
 
         # Get the message and make sure it's terminated by a single newline
         $message = $record{message};
@@ -181,8 +178,7 @@ use Fcntl qw(:DEFAULT :flock :mode :seek);
 
         $rv = pappend( $record{options}{file}, $message );
 
-        pOut();
-        pdebug( 'leaving w/rv: %s', PDLEVEL1, $rv );
+        subPostamble( PDLEVEL1, '$', $rv );
 
         return $rv;
     }
@@ -198,7 +194,7 @@ Paranoid::Log::File - File Logging Functions
 
 =head1 VERSION
 
-$Id: lib/Paranoid/Log/File.pm, 2.09 2021/12/28 15:46:49 acorliss Exp $
+$Id: lib/Paranoid/Log/File.pm, 2.10 2022/03/08 00:01:04 acorliss Exp $
 
 =head1 SYNOPSIS
 

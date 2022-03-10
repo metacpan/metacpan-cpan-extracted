@@ -883,18 +883,14 @@ rules.
 
 =cut
 
-SKIP: {
-if ($^O =~ /Win32/i) {
-  skip '=example-1 format';
-}
 $test->for('example', 1, 'format', sub {
+  plan skip_all => 'skip Date#format on win32' if $^O =~ /win32/i;
   my ($tryable) = @_;
   ok my $result = $tryable->result;
-  like $result, qr/^[^\s]+, [^\s]+ [\s0]1, 1988$/;
+  like $result, qr/^.+, .+ [\s0]1, 1988$/a;
 
   $result
 });
-}
 
 =example-2 format
 
@@ -906,18 +902,14 @@ $test->for('example', 1, 'format', sub {
 
 =cut
 
-SKIP: {
-if ($^O =~ /Win32/i) {
-  skip '=example-2 format';
-}
 $test->for('example', 2, 'format', sub {
+  plan skip_all => 'skip Date#format on win32' if $^O =~ /win32/i;
   my ($tryable) = @_;
   ok my $result = $tryable->result;
-  like $result, qr/^[^\s]+ [\s0]1 [^\s]+$/;
+  like $result, qr/^.+[\s0]1.+$/a;
 
   $result
 });
-}
 
 =method hms
 
@@ -1199,7 +1191,7 @@ The rfc822 method returns the date and time formatted as an RFC822 string.
 $test->for('example', 1, 'rfc822', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
-  like $result, qr/^[^\s]+, 01 [^\s]+ 1988 00:00:00 [-+]\d{4}$/;
+  like $result, qr/^.+, 01 .+ 1988 00:00:00 [-+]\d{4}$/a;
 
   $result
 });
@@ -1228,18 +1220,14 @@ The rfc1123 method returns the date and time formatted as an RFC1123 string.
 
 =cut
 
-SKIP: {
-if ($^O =~ /Win32/i) {
-  skip '=example-1 rfc1132';
-}
 $test->for('example', 1, 'rfc1123', sub {
+  plan skip_all => 'skip Date#rfc1123 on win32' if $^O =~ /win32/i;
   my ($tryable) = @_;
   ok my $result = $tryable->result;
-  like $result, qr/^[^\s]+, 01 [^\s]+ 1988 00:00:00 GMT$/;
+  like $result, qr/^.+, 01 .+ 1988 00:00:00 GMT$/a;
 
   $result
 });
-}
 
 =method rfc3339
 
@@ -1300,7 +1288,7 @@ The rfc7231 method returns the date and time formatted as an RFC7231 string.
 $test->for('example', 1, 'rfc7231', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
-  like $result, qr/^[^\s]+, 01 [^\s]+ 1988 00:00:00 UTC$/;
+  like $result, qr/^.+, 01 .+ 1988 00:00:00 UTC$/a;
 
   $result
 });
@@ -2330,15 +2318,15 @@ $test->for('example', 1, '(0+)', sub {
   $result
 });
 
-=operator (<)
+=operator (E<lt>)
 
-This package overloads the C<<> operator.
+This package overloads the C<E<lt>> operator.
 
 =cut
 
-$test->for('operator', '(<)');
+$test->for('operator', '(E<lt>)');
 
-=example-1 (<)
+=example-1 (E<lt>)
 
   # given: synopsis;
 
@@ -2348,7 +2336,7 @@ $test->for('operator', '(<)');
 
 =cut
 
-$test->for('example', 1, '(<)', sub {
+$test->for('example', 1, '(E<lt>)', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result == 1;
@@ -2356,15 +2344,15 @@ $test->for('example', 1, '(<)', sub {
   $result
 });
 
-=operator (<=)
+=operator (E<lt>=)
 
-This package overloads the C<<=> operator.
+This package overloads the C<E<lt>=> operator.
 
 =cut
 
-$test->for('operator', '(<=)');
+$test->for('operator', '(E<lt>=)');
 
-=example-1 (<=)
+=example-1 (E<lt>=)
 
   # given: synopsis;
 
@@ -2374,7 +2362,7 @@ $test->for('operator', '(<=)');
 
 =cut
 
-$test->for('example', 1, '(<=)', sub {
+$test->for('example', 1, '(E<lt>=)', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result == 1;
@@ -2408,15 +2396,15 @@ $test->for('example', 1, '(==)', sub {
   $result
 });
 
-=operator (>)
+=operator (E<gt>)
 
-This package overloads the C<>> operator.
+This package overloads the C<E<gt>> operator.
 
 =cut
 
-$test->for('operator', '(>)');
+$test->for('operator', '(E<gt>)');
 
-=example-1 (>)
+=example-1 (E<gt>)
 
   # given: synopsis;
 
@@ -2426,7 +2414,7 @@ $test->for('operator', '(>)');
 
 =cut
 
-$test->for('example', 1, '(>)', sub {
+$test->for('example', 1, '(E<gt>)', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result == 1;
@@ -2434,15 +2422,15 @@ $test->for('example', 1, '(>)', sub {
   $result
 });
 
-=operator (>=)
+=operator (E<gt>=)
 
-This package overloads the C<>=> operator.
+This package overloads the C<E<gt>=> operator.
 
 =cut
 
-$test->for('operator', '(>=)');
+$test->for('operator', '(E<gt>=)');
 
-=example-1 (>=)
+=example-1 (E<gt>=)
 
   # given: synopsis;
 
@@ -2452,7 +2440,7 @@ $test->for('operator', '(>=)');
 
 =cut
 
-$test->for('example', 1, '(>=)', sub {
+$test->for('example', 1, '(E<gt>=)', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result == 1;

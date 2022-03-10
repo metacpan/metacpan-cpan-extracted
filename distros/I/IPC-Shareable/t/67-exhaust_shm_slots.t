@@ -10,6 +10,8 @@ BEGIN {
     }
 }
 
+warn "Segs Before: " . IPC::Shareable::ipcs() . "\n" if $ENV{PRINT_SEGS};
+
 my $mod = 'IPC::Shareable';
 
 my $knot = tie my %hv, $mod, {
@@ -33,5 +35,8 @@ is $ok, undef, "If we try to use all available shm slots, we croak()";
 like $@, qr/No space left on device/, "...and error is sane";
 
 IPC::Shareable->clean_up_all;
+
+IPC::Shareable::_end;
+warn "Segs After: " . IPC::Shareable::ipcs() . "\n" if $ENV{PRINT_SEGS};
 
 done_testing();

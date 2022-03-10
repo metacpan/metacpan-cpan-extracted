@@ -10,6 +10,8 @@ BEGIN {
     }
 }
 
+warn "Segs Before: " . IPC::Shareable::ipcs() . "\n" if $ENV{PRINT_SEGS};
+
 # singleton no exit notice
 my ($proc, $warning);
 
@@ -33,6 +35,9 @@ END {
         $warning,
         qr/exited due to exclusive shared memory collision/,
         "singleton() warns if warn is enabled";
+
+    IPC::Shareable::_end;
+    warn "Segs After: " . IPC::Shareable::ipcs() . "\n" if $ENV{PRINT_SEGS};
 
     done_testing;
 };

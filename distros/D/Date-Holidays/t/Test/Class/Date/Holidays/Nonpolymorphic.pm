@@ -5,7 +5,7 @@ use warnings;
 use base qw(Test::Class);
 use Test::More;
 
-our $VERSION = '1.29';
+our $VERSION = '1.31';
 
 my $month = 12;
 my $day   = 24;

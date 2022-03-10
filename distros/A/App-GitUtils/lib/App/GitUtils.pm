@@ -1,10 +1,5 @@
 package App::GitUtils;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-08-14'; # DATE
-our $DIST = 'App-GitUtils'; # DIST
-our $VERSION = '0.083'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
@@ -12,6 +7,11 @@ use Log::ger;
 
 use Cwd qw(getcwd abs_path);
 use File::chdir;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-02-12'; # DATE
+our $DIST = 'App-GitUtils'; # DIST
+our $VERSION = '0.084'; # VERSION
 
 our %SPEC;
 
@@ -86,6 +86,18 @@ sub _search_git_dir {
 $SPEC{info} = {
     v => 1.1,
     summary => 'Return information about git repository',
+    description => <<'_',
+
+Information include:
+- Path of the git directory
+- Repository name
+- Current/active branch
+
+Will return status 412 if working directory is not inside a git repository. Will
+return status 500 on errors, e.g. if `git` command cannot recognize the
+repository.
+
+_
     args => {
         %args_common,
     },
@@ -100,9 +112,14 @@ sub info {
     my ($repo_name) = $git_dir =~ m!.+/(.+)/\.git\z!
         or return [500, "Can't extract repo name from git dir '$git_dir'"];
 
+    my $current_branch = `git branch --show-current`;
+    return [500, "Can't execute git to find out current branch: $!"] if $?;
+    chomp $current_branch;
+
     [200, "OK", {
         git_dir => $git_dir,
         repo_name => $repo_name,
+        current_branch => $current_branch,
         # more information in the future
     }];
 }
@@ -262,7 +279,7 @@ App::GitUtils - Day-to-day command-line utilities for git
 
 =head1 VERSION
 
-This document describes version 0.083 of App::GitUtils (from Perl distribution App-GitUtils), released on 2021-08-14.
+This document describes version 0.084 of App::GitUtils (from Perl distribution App-GitUtils), released on 2022-02-12.
 
 =head1 SYNOPSIS
 
@@ -332,6 +349,15 @@ Usage:
  info(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Return information about git repository.
+
+Information include:
+- Path of the git directory
+- Repository name
+- Current/active branch
+
+Will return status 412 if working directory is not inside a git repository. Will
+return status 500 on errors, e.g. if C<git> command cannot recognize the
+repository.
 
 This function is not exported.
 
@@ -545,14 +571,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-GitUti
 
 Source repository is at L<https://github.com/perlancar/perl-App-GitUtils>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-GitUtils>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<App::GitHubUtils>
@@ -563,9 +581,9 @@ perlancar <perlancar@cpan.org>
 
 =head1 CONTRIBUTOR
 
-=for stopwords Steven Haryanto (on PC, Jakarta)
+=for stopwords Steven Haryanto
 
-Steven Haryanto (on PC, Jakarta) <stevenharyanto@gmail.com>
+Steven Haryanto <stevenharyanto@gmail.com>
 
 =head1 CONTRIBUTING
 
@@ -586,9 +604,17 @@ beyond that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2018, 2015, 2014 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2021, 2020, 2018, 2015, 2014 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-GitUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

@@ -1,8 +1,8 @@
 # Paranoid::BerkeleyDB::Db -- BerkeleyDB Db Wrapper
 #
-# (c) 2005 - 2017, Arthur Corliss <corliss@digitalmages.com>
+# (c) 2005 - 2022, Arthur Corliss <corliss@digitalmages.com>
 #
-# $Id: lib/Paranoid/BerkeleyDB/Db.pm, 2.03 2017/02/06 02:49:24 acorliss Exp $
+# $Id: lib/Paranoid/BerkeleyDB/Db.pm, 2.06 2022/03/08 22:26:06 acorliss Exp $
 #
 #    This software is licensed under the same terms as Perl, itself.
 #    Please see http://dev.perl.org/licenses/ for more information.
@@ -31,7 +31,7 @@ use BerkeleyDB;
 use Cwd qw(getcwd realpath);
 use Carp;
 
-($VERSION) = ( q$Revision: 2.03 $ =~ /(\d+(?:\.\d+)+)/sm );
+($VERSION) = ( q$Revision: 2.06 $ =~ /(\d+(?:\.\d+)+)/sm );
 
 use vars qw(@ISA @_properties @_methods);
 
@@ -62,8 +62,7 @@ use vars qw(@ISA @_properties @_methods);
         my %params = @_;
         my ( $db, $fn, $fnp, $env, $rv );
 
-        pdebug( 'entering w/%s', PDLEVEL2, %params );
-        pIn();
+        subPreamble(PDLEVEL2, '%', %params);
 
         # Validate filename
         $rv = defined $params{'-Filename'};
@@ -73,19 +72,21 @@ use vars qw(@ISA @_properties @_methods);
             # Create the path
             ($fnp) = ( $fn =~ m#^(.*/)#s );
             if ( defined $fnp and length $fnp and pmkdir($fnp) ) {
-                if ( pmkdir($fnp) ) {
-
-                    # Make canonical and save
-                    $params{'-Filename'} = $fn = realpath($fn);
-                    pdebug( 'canonical filename: %s', PDLEVEL3, $fn );
-
-                } else {
+                unless ( pmkdir($fnp) ) {
                     carp pdebug(
                         'failed to create/access the requisite directory',
                         PDLEVEL1 );
                     $rv = 0;
                 }
+            } else {
+                $fnp = './';
             }
+
+            # TODO: Get path from Env
+
+            # Make canonical and save
+            $params{'-Filename'} = $fn = realpath($fn);
+            pdebug( 'canonical filename: %s', PDLEVEL3, $fn );
 
         } else {
             carp pdebug( 'invalid filename specified: %s',
@@ -169,8 +170,7 @@ use vars qw(@ISA @_properties @_methods);
 
         $obj->set( 'filename', $fn ) if defined $db;
 
-        pOut();
-        pdebug( 'leaving w/rv: %s', PDLEVEL2, $db );
+        subPostamble(PDLEVEL2, '$', $db);
 
         return $db;
     }
@@ -183,8 +183,7 @@ use vars qw(@ISA @_properties @_methods);
 
         my $fn = shift;
 
-        pdebug( 'entering w/%s', PDLEVEL2, $fn );
-        pIn();
+        subPreamble(PDLEVEL2, '$', $fn);
 
         if ( defined $fn and exists $dbh{$fn} ) {
             if ( $dbc{$fn} == 1 ) {
@@ -205,8 +204,7 @@ use vars qw(@ISA @_properties @_methods);
             }
         }
 
-        pOut();
-        pdebug( 'leaving w/rv: 1', PDLEVEL2 );
+        subPostamble(PDLEVEL2, '$', 1);
 
         return 1;
     }
@@ -220,8 +218,7 @@ use vars qw(@ISA @_properties @_methods);
         my $obj = shift;
         my $rv;
 
-        pdebug( 'entering', PDLEVEL1 );
-        pIn();
+        subPreamble(PDLEVEL1);
 
         if ( !$obj->isStale ) {
 
@@ -235,8 +232,7 @@ use vars qw(@ISA @_properties @_methods);
             carp pdebug( 'filename method called on stale object', PDLEVEL1 );
         }
 
-        pOut();
-        pdebug( 'leaving w/rv: %s', PDLEVEL1, $rv );
+        subPostamble(PDLEVEL1, '$', $rv);
 
         return $rv;
     }
@@ -250,8 +246,7 @@ use vars qw(@ISA @_properties @_methods);
         my $obj = shift;
         my ( $fn, %rv );
 
-        pdebug( 'entering', PDLEVEL1 );
-        pIn();
+        subPreamble(PDLEVEL1);
 
         if ( !$obj->isStale ) {
             $fn = $obj->filename;
@@ -267,6 +262,7 @@ use vars qw(@ISA @_properties @_methods);
 
         pOut();
         pdebug( 'leaving w/rv: %s', PDLEVEL1, %rv );
+        subPostamble(PDLEVEL1, '%', %rv);
 
         return %rv;
     }
@@ -280,8 +276,7 @@ use vars qw(@ISA @_properties @_methods);
         my $obj = shift;
         my ( $fn, $rv );
 
-        pdebug( 'entering', PDLEVEL1 );
-        pIn();
+        subPreamble(PDLEVEL1);
 
         if ( !$obj->isStale ) {
             $fn = $obj->filename;
@@ -295,8 +290,7 @@ use vars qw(@ISA @_properties @_methods);
             carp pdebug( 'refc method called on stale object', PDLEVEL1 );
         }
 
-        pOut();
-        pdebug( 'leaving w/rv: %s', PDLEVEL1, $rv );
+        subPostamble(PDLEVEL1, '$', $rv);
 
         return $rv;
     }
@@ -310,8 +304,7 @@ use vars qw(@ISA @_properties @_methods);
         my $obj = shift;
         my ( $fn, $rv );
 
-        pdebug( 'entering', PDLEVEL1 );
-        pIn();
+        subPreamble(PDLEVEL1);
 
         if ( !$obj->isStale ) {
             $fn = $obj->filename;
@@ -325,8 +318,7 @@ use vars qw(@ISA @_properties @_methods);
             pdebug( 'dbh method called on stale object', PDLEVEL1 );
         }
 
-        pOut();
-        pdebug( 'leaving w/rv: %s', PDLEVEL1, $rv );
+        subPostamble(PDLEVEL1, '$', $rv);
 
         return $rv;
     }
@@ -337,9 +329,7 @@ sub _initialize {
     my %params = @_;
     my ( $db, $env, $rv );
 
-    # Make sure minimal parameters are preset
-    pdebug( 'entering', PDLEVEL1 );
-    pIn();
+    subPreamble(PDLEVEL1);
 
     if ( exists $params{'-Filename'} ) {
         $db = _openDb( $obj, %params );
@@ -361,8 +351,7 @@ sub _initialize {
             pdebug( 'caller didn\'t specify -Filename', PDLEVEL1 );
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL1, $rv );
+    subPostamble(PDLEVEL1, '$', $rv);
 
     return $rv;
 }
@@ -371,14 +360,12 @@ sub _deconstruct {
     my $obj = shift;
     my ( $env, $db, $rv );
 
-    pdebug( 'entering', PDLEVEL1 );
-    pIn();
+    subPreamble(PDLEVEL1);
 
     # Close database
     $rv = _closeDb( $obj->filename ) if !$obj->isStale;
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL1, $rv );
+    subPostamble(PDLEVEL1, '$', $rv);
 
     return $rv;
 }
@@ -393,7 +380,7 @@ Paranoid::BerkeleyDB::Db -- BerkeleyDB Db Wrapper
 
 =head1 VERSION
 
-$Id: lib/Paranoid/BerkeleyDB/Db.pm, 2.03 2017/02/06 02:49:24 acorliss Exp $
+$Id: lib/Paranoid/BerkeleyDB/Db.pm, 2.06 2022/03/08 22:26:06 acorliss Exp $
 
 =head1 SYNOPSIS
 
@@ -549,5 +536,5 @@ Arthur Corliss (corliss@digitalmages.com)
 This software is licensed under the same terms as Perl, itself. 
 Please see http://dev.perl.org/licenses/ for more information.
 
-(c) 2005 - 2017, Arthur Corliss (corliss@digitalmages.com)
+(c) 2005 - 2022, Arthur Corliss (corliss@digitalmages.com)
 

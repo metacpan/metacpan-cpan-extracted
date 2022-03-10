@@ -7,10 +7,18 @@ use Carp;
 
 use base 'Date::Holidays::Adapter';
 
-$VERSION = '1.30';
+$VERSION = '1.31';
 
 sub holidays {
-    croak "holidays is unimplemented for ".__PACKAGE__;
+    my ($self, %params) = @_;
+
+    my $sub = $self->{_adaptee}->can('fr_holidays');
+
+    if ($sub) {
+        return &{$sub}($params{'year'});
+    } else {
+        return;
+    }
 }
 
 sub is_holiday {
@@ -39,7 +47,7 @@ Date::Holidays::Adapter::FR - an adapter class for Date::Holidays::FR
 
 =head1 VERSION
 
-This POD describes version 1.30 of Date::Holidays::Adapter::FR
+This POD describes version 1.31 of Date::Holidays::Adapter::FR
 
 =head1 DESCRIPTION
 

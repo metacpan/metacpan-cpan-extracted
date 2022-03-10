@@ -5,6 +5,7 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
   Test::More: '0'
+  Type::Tiny: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -21,13 +22,14 @@ no_index:
 provides:
   YAOO:
     file: lib/YAOO.pm
-    version: '0.08'
+    version: '0.09'
 requires:
   Blessed::Merge: '0'
   Carp: '0'
+  Hash::Typed: '0.04'
   Tie::IxHash: '0'
   perl: '5.006'
 resources:
   repository: https://github.com/ThisUsedToBeAnEmail/YAOO.git
-version: '0.08'
+version: '0.09'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

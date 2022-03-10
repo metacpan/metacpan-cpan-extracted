@@ -69,6 +69,7 @@ conf/GSLAL032003003
 
 # Downloaded databases
 \bdatabases/*.txt$
+\b\.zip-\b
 \.zip$
 \.db$
 \.sql$

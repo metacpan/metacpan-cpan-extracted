@@ -1,5 +1,9 @@
 Revision history for Perl module Date::WeekNumber
 
+0.08 2022-03-09 NEILB
+    - Fixed copy&paste error in the cpan_week_number() section of the doc.
+      Thanks to Rob Clark for reporting it.
+
 0.07 2021-04-11 NEILB
     - Merged PR from MANWAR with working URL for Chris Madsen's once-a-week.
     - Updated my interest in this, to refer to CPAN Regulars.

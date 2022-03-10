@@ -1,12 +1,12 @@
 # Paranoid::Glob -- Paranoid Glob objects
 #
-# $Id: lib/Paranoid/Glob.pm, 2.09 2021/12/28 15:46:49 acorliss Exp $
+# $Id: lib/Paranoid/Glob.pm, 2.10 2022/03/08 00:01:04 acorliss Exp $
 #
 # This software is free software.  Similar to Perl, you can redistribute it
 # and/or modify it under the terms of either:
 #
 #   a)     the GNU General Public License
-#          <https://www.gnu.org/licenses/gpl-1.0.html> as published by the 
+#          <https://www.gnu.org/licenses/gpl-1.0.html> as published by the
 #          Free Software Foundation <http://www.fsf.org/>; either version 1
 #          <https://www.gnu.org/licenses/gpl-1.0.html>, or any later version
 #          <https://www.gnu.org/licenses/license-list.html#GNUGPL>, or
@@ -44,7 +44,7 @@ use File::Glob qw(bsd_glob);
 use Paranoid;
 use Paranoid::Debug qw(:all);
 
-($VERSION) = ( q$Revision: 2.09 $ =~ /(\d+(?:\.\d+)+)/s );
+($VERSION) = ( q$Revision: 2.10 $ =~ /(\d+(?:\.\d+)+)/s );
 
 #####################################################################
 #
@@ -90,6 +90,8 @@ sub new {
     my $self = [];
     my $rv   = 1;
 
+    subPreamble( PDLEVEL1, '%', %args );
+
     # Validate arguments
     if ( exists $args{globs} ) {
         croak 'Optional key/value pair "globs" not properly defined'
@@ -99,9 +101,6 @@ sub new {
         croak 'Optional key/value pair "literals" not properly defined'
             unless ref $args{literals} eq 'ARRAY';
     }
-
-    pdebug( 'entering w/keys %s', PDLEVEL1, keys %args );
-    pIn();
 
     bless $self, $class;
 
@@ -119,8 +118,7 @@ sub new {
         $self = undef;
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL1, $self );
+    subPostamble( PDLEVEL1, '$', $self );
 
     return $self;
 }
@@ -136,11 +134,10 @@ sub addGlobs {
     my $rv = 1;
     my @tmp;
 
+    subPreamble( PDLEVEL1, '@' );
+
     # Silently remove undefs and zero strings
     @globs = grep { defined $_ and length $_ } @globs;
-
-    pdebug( 'entering w/%d globs', PDLEVEL1, scalar @globs );
-    pIn();
 
     # Make sure all glob entries are sane
     $rv = _sanitize(@globs);
@@ -162,8 +159,7 @@ sub addGlobs {
         push @$self, splice @tmp;
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL1, $rv );
+    subPostamble( PDLEVEL1, '$', $rv );
 
     return $rv;
 }
@@ -177,19 +173,17 @@ sub addLiterals {
     my ( $self, @globs ) = splice @_;
     my $rv = 1;
 
+    subPreamble( PDLEVEL1, '@' );
+
     # Silently remove undefs and zero strings
     @globs = grep { defined $_ and length $_ } @globs;
-
-    pdebug( 'entering w/%d literals', PDLEVEL1, scalar @globs );
-    pIn();
 
     # Make sure all glob entries are sane
     $rv = _sanitize(@globs);
 
     push @$self, splice @globs if $rv;
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL1, $rv );
+    subPostamble( PDLEVEL1, '$', $rv );
 
     return $rv;
 }
@@ -204,11 +198,13 @@ sub consolidate {
     my (%tmp);
 
     pdebug( 'entering w/%d entries', PDLEVEL1, scalar @$self );
+    subPreamble(PDLEVEL1);
 
     %tmp = map { $_ => 1 } @$self;
     @$self = sort keys %tmp;
 
     pdebug( 'leaving w/%d entries', PDLEVEL1, scalar @$self );
+    subPostamble( PDLEVEL1, '$', 1 );
 
     return 1;
 }
@@ -222,7 +218,8 @@ sub exists {
     my ($self) = @_;
     my @entries = grep { scalar lstat $_ } @$self;
 
-    pdebug( 'leaving w/rv: %s', PDLEVEL1, @entries );
+    subPreamble(PDLEVEL1);
+    subPostamble( PDLEVEL1, '@', @entries );
 
     return @entries;
 }
@@ -237,7 +234,8 @@ sub readable {
     my ($self) = @_;
     my @entries = grep { -r $_ } $self->exists;
 
-    pdebug( 'leaving w/rv: %s', PDLEVEL1, @entries );
+    subPreamble(PDLEVEL1);
+    subPostamble( PDLEVEL1, '@', @entries );
 
     return @entries;
 }
@@ -252,7 +250,8 @@ sub writable {
     my ($self) = @_;
     my @entries = grep { -w $_ } $self->exists;
 
-    pdebug( 'leaving w/rv: %s', PDLEVEL1, @entries );
+    subPreamble(PDLEVEL1);
+    subPostamble( PDLEVEL1, '@', @entries );
 
     return @entries;
 }
@@ -267,7 +266,8 @@ sub executable {
     my ($self) = @_;
     my @entries = grep { -x $_ } $self->exists;
 
-    pdebug( 'leaving w/rv: %s', PDLEVEL1, @entries );
+    subPreamble(PDLEVEL1);
+    subPostamble( PDLEVEL1, '@', @entries );
 
     return @entries;
 }
@@ -282,7 +282,8 @@ sub owned {
     my ($self) = @_;
     my @entries = grep { -o $_ } $self->exists;
 
-    pdebug( 'leaving w/rv: %s', PDLEVEL1, @entries );
+    subPreamble(PDLEVEL1);
+    subPostamble( PDLEVEL1, '@', @entries );
 
     return @entries;
 }
@@ -296,7 +297,8 @@ sub directories {
     my ($self) = @_;
     my @dirs = grep { -d $_ } $self->exists;
 
-    pdebug( 'leaving w/rv: %s', PDLEVEL1, @dirs );
+    subPreamble(PDLEVEL1);
+    subPostamble( PDLEVEL1, '@', @dirs );
 
     return @dirs;
 }
@@ -310,7 +312,8 @@ sub files {
     my ($self) = @_;
     my @files = grep { -f $_ } $self->exists;
 
-    pdebug( 'leaving w/rv: %s', PDLEVEL1, @files );
+    subPreamble(PDLEVEL1);
+    subPostamble( PDLEVEL1, '@', @files );
 
     return @files;
 }
@@ -324,7 +327,8 @@ sub symlinks {
     my ($self) = @_;
     my @symlinks = grep { -l $_ } $self->exists;
 
-    pdebug( 'leaving w/rv: %s', PDLEVEL1, @symlinks );
+    subPreamble(PDLEVEL1);
+    subPostamble( PDLEVEL1, '@', @symlinks );
 
     return @symlinks;
 }
@@ -338,7 +342,8 @@ sub pipes {
     my ($self) = @_;
     my @pipes = grep { -p $_ } $self->exists;
 
-    pdebug( 'leaving w/rv: %s', PDLEVEL1, @pipes );
+    subPreamble(PDLEVEL1);
+    subPostamble( PDLEVEL1, '@', @pipes );
 
     return @pipes;
 }
@@ -352,7 +357,8 @@ sub sockets {
     my ($self) = @_;
     my @sockets = grep { -S $_ } $self->exists;
 
-    pdebug( 'leaving w/rv: %s', PDLEVEL1, @sockets );
+    subPreamble(PDLEVEL1);
+    subPostamble( PDLEVEL1, '@', @sockets );
 
     return @sockets;
 }
@@ -366,7 +372,8 @@ sub blockDevs {
     my ($self) = @_;
     my @bdevs = grep { -b $_ } $self->exists;
 
-    pdebug( 'leaving w/rv: %s', PDLEVEL1, @bdevs );
+    subPreamble(PDLEVEL1);
+    subPostamble( PDLEVEL1, '@', @bdevs );
 
     return @bdevs;
 }
@@ -380,7 +387,8 @@ sub charDevs {
     my ($self) = @_;
     my @cdevs = grep { -c $_ } $self->exists;
 
-    pdebug( 'leaving w/rv: %s', PDLEVEL1, @cdevs );
+    subPreamble(PDLEVEL1);
+    subPostamble( PDLEVEL1, '@', @cdevs );
 
     return @cdevs;
 }
@@ -404,8 +412,7 @@ sub recurse {
     my $rv = 1;
     my ( %seen, @crawl, $lindex, $slindex );
 
-    pdebug( 'entering', PDLEVEL1 );
-    pIn();
+    subPreamble(PDLEVEL1);
 
     # Define our dirFilter sub, who's sole purpose is to extract a list of
     # directories from the passed list of entries
@@ -505,8 +512,7 @@ sub recurse {
     # Final consolidation
     $self->consolidate;
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL1, $rv );
+    subPostamble( PDLEVEL1, '$', $rv );
 
     return $rv;
 }
@@ -521,7 +527,7 @@ Paranoid::Glob - Paranoid Glob objects
 
 =head1 VERSION
 
-$Id: lib/Paranoid/Glob.pm, 2.09 2021/12/28 15:46:49 acorliss Exp $
+$Id: lib/Paranoid/Glob.pm, 2.10 2022/03/08 00:01:04 acorliss Exp $
 
 =head1 SYNOPSIS
 

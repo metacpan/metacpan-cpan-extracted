@@ -1,6 +1,6 @@
 #!/usr/bin/perl -T
 
-use Test::More tests => 43;
+use Test::More tests => 59;
 use Paranoid;
 use Paranoid::Data::AVLTree;
 use Paranoid::Debug;
@@ -12,7 +12,7 @@ psecureEnv();
 use strict;
 use warnings;
 
-my ( $obj );
+my ($obj);
 my @data = (
     [ foo => "bar foo" ],
     [ goo => "bar goo" ],
@@ -62,6 +62,35 @@ ok( $obj->delNode('foo'), 'avltree delete 4' );
 is( $obj->count,  5, 'avltree count 6' );
 is( $obj->height, 3, 'avltree height 6' );
 
+# Test save/load functionality and profiling
+ok( $obj->save2File('t/avl.dump'), 'avltree save2File 1' );
+my $obj2 = new Paranoid::Data::AVLTree;
+ok( $obj2->profile(1),             'avltree profile 1' );
+ok( $obj2->loadFromFile('t/avl.dump'), 'avltree loadFile 1' );
+is( $obj2->count,  5, 'avltree loadFile count 1' );
+is( $obj2->height, 3, 'avltree loadFile height 1' );
+
+#warn "\nKEYS: @{[ $obj2->nodeKeys ]}\n";
+#$obj2->dumpKeys;
+
+foreach my $key ( $obj->nodeKeys ) {
+    ok( $obj2->nodeExists($key), "avltree loadFile key $key exists" );
+    is( $obj->fetchVal($key), $obj2->fetchVal($key),
+        "avltree loadFile $key value check" );
+}
+
+my %stats = $obj2->stats;
+is( scalar keys %stats, 4, 'avltree stats entries check 1' );
+foreach ( keys %stats ) {
+    warn "Stat $_: $stats{$_}\n";
+}
+
+#warn" First object:\n";
+#$obj->dumpKeys;
+#warn" Second object:\n";
+#$obj2->dumpKeys;
+
+# Test purge
 ok( $obj->purgeNodes, 'avltree purge 1' );
 is( $obj->count,  0, 'avltree count 7' );
 is( $obj->height, 0, 'avltree height 7' );
@@ -71,8 +100,8 @@ my %test;
 $obj = undef;
 $obj = tie %test, 'Paranoid::Data::AVLTree';
 ok( defined $obj, 'avltree tie 1' );
-is( scalar keys %test,   0, 'avltree keys 1' );
-is( $obj->height,        0, 'avltree height 8' );
+is( scalar keys %test, 0, 'avltree keys 1' );
+is( $obj->height,      0, 'avltree height 8' );
 ok( !exists $test{'foo'}, 'avltree exists 1' );
 $test{'foo'} = 'bar';
 is( $test{foo},        'bar', 'avltree fetch val 2' );

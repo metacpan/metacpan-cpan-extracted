@@ -1,7 +1,7 @@
 package LWP::Authen::OAuth2;
 
 # ABSTRACT: Make requests to OAuth2 APIs.
-our $VERSION = '0.18'; # VERSION
+our $VERSION = '0.19'; # VERSION
 
 use 5.006;
 use strict;
@@ -346,7 +346,7 @@ LWP::Authen::OAuth2 - Make requests to OAuth2 APIs.
 
 =head1 VERSION
 
-version 0.18
+version 0.19
 
 =head1 SYNOPSIS
 
@@ -394,6 +394,12 @@ implemented by L<Adam Millerchip|https://github.com/amillerchip>
 L<LWP::Authen::OAuth2::ServiceProvider::Strava>
 
 implemented by L<Leon Wright|https://github.com/techman83>
+
+=item * Withings
+
+L<LWP::Authen::OAuth2::ServiceProvider::Withings>
+
+implemented by L<Brian Foley|https://github.com/foleybri>
 
 =item * Yahoo
 
@@ -870,7 +876,7 @@ Thomas Klausner <domm@plix.at>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 - 2021 by Ben Tilly, Rent.com, Thomas Klausner.
+This software is copyright (c) 2013 - 2022 by Ben Tilly, Rent.com, Thomas Klausner.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

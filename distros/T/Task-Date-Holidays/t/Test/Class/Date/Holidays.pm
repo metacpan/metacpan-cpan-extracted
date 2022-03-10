@@ -297,7 +297,7 @@ sub test_de : Test(8) {
 sub test_dk : Test(6) {
     SKIP: {
         eval { require Date::Holidays::DK };
-        skip "Date::Holidays::DK not installed", 4 if $@;
+        skip "Date::Holidays::DK not installed", 6 if $@;
 
         ok(! Date::Holidays::DK->can('holidays'), 'Is holidays method implemented');
         ok(! Date::Holidays::DK->can('is_holiday'), 'Is is_holiday method implemented');
@@ -389,8 +389,8 @@ sub test_fr : Test(6) {
         eval { require Date::Holidays::FR };
         skip "Date::Holidays::FR not installed", 6 if $@;
 
-        ok(! Date::Holidays::FR->can('holidays'));
-        ok(! Date::Holidays::FR->can('is_holiday'));
+        ok(Date::Holidays::FR->can('holidays'));
+        ok(Date::Holidays::FR->can('is_holiday'));
 
         ok( my $dh = Date::Holidays->new( countrycode => 'fr' ),
             'Testing Date::Holidays::FR' );
@@ -759,7 +759,7 @@ sub test_us : Test(8) {
 sub test_ua : Test(5) {
     SKIP: {
         eval { require Date::Holidays::UA };
-        skip "Date::Holidays::UA not installed", 4 if $@;
+        skip "Date::Holidays::UA not installed", 5 if $@;
 
         can_ok('Date::Holidays::UA', qw(holidays is_holiday));
 

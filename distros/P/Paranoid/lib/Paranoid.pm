@@ -1,6 +1,6 @@
 # Paranoid -- Paranoia support for safer programs
 #
-# $Id: lib/Paranoid.pm, 2.09 2021/12/28 15:46:49 acorliss Exp $
+# $Id: lib/Paranoid.pm, 2.10 2022/03/08 00:01:04 acorliss Exp $
 #
 # (c) 2005 - 2020, Arthur Corliss (corliss@digitalmages.com)
 # (tm) 2008 - 2020, Paranoid Inc. (www.paranoid.com)
@@ -8,7 +8,7 @@
 # and/or modify it under the terms of either:
 #
 #   a)     the GNU General Public License
-#          <https://www.gnu.org/licenses/gpl-1.0.html> as published by the 
+#          <https://www.gnu.org/licenses/gpl-1.0.html> as published by the
 #          Free Software Foundation <http://www.fsf.org/>; either version 1
 #          <https://www.gnu.org/licenses/gpl-1.0.html>, or any later version
 #          <https://www.gnu.org/licenses/license-list.html#GNUGPL>, or
@@ -40,13 +40,14 @@ use warnings;
 use vars qw($VERSION @EXPORT @EXPORT_OK %EXPORT_TAGS);
 use base qw(Exporter);
 
-($VERSION) = ( q$Revision: 2.09 $ =~ /(\d+(?:\.\d+)+)/sm );
+($VERSION) = ( q$Revision: 2.10 $ =~ /(\d+(?:\.\d+)+)/sm );
 
 @EXPORT      = qw(psecureEnv);
 @EXPORT_OK   = ( @EXPORT, qw(PTRUE_ZERO) );
 %EXPORT_TAGS = ( all => [@EXPORT_OK], );
 
-use constant PTRUE_ZERO => '0 but true';
+use constant PTRUE_ZERO   => '0 but true';
+use constant DEFAULT_PATH => '/bin:/sbin:/usr/bin:/usr/sbin';
 
 #####################################################################
 #
@@ -77,7 +78,7 @@ sub psecureEnv (;$) {
 
     my $path = shift;
 
-    $path = '/bin:/usr/bin' unless defined $path;
+    $path = DEFAULT_PATH unless defined $path;
 
     delete @ENV{qw(IFS CDPATH ENV BASH_ENV)};
     $ENV{PATH} = $path;
@@ -116,7 +117,7 @@ Paranoid - Paranoia support for safer programs
 
 =head1 VERSION
 
-$Id: lib/Paranoid.pm, 2.09 2021/12/28 15:46:49 acorliss Exp $
+$Id: lib/Paranoid.pm, 2.10 2022/03/08 00:01:04 acorliss Exp $
 
 =head1 SYNOPSIS
 
@@ -125,6 +126,13 @@ $Id: lib/Paranoid.pm, 2.09 2021/12/28 15:46:49 acorliss Exp $
   $errMsg = Paranoid::ERROR;
 
   psecureEnv("/bin:/usr/bin");
+
+  sub foo {
+    # this function can return '0' as a valid return value
+    # that should be construed as a boolean true value
+
+    return PTRUE_ZERO;
+  }
 
 =head1 DESCRIPTION
 
@@ -162,7 +170,14 @@ The following specialized import lists also exist:
 This function deletes some of the dangerous environment variables that can be
 used to subvert perl when being run in setuid applications.  It also sets the
 path, either to the passed argument (if passed) or a default of
-"/bin:/usr/bin".
+"/bin:/sbin:/usr/bin:/usr/sbin".
+
+B<NOTE:> I did explicitly exclude I</usr/local> directories from the default
+path for the following reason:  I</usr/local> is often used by admins to stash
+random scripts and programs which may not have undergone any serious scrutiny
+and review for security issues.  Only the base OS directories are presumed as
+safe, and even that may be stretching the truth as it is.  You can override
+the defaults as desired.
 
 =head2 Paranoid::ERROR
 
@@ -171,6 +186,11 @@ path, either to the passed argument (if passed) or a default of
 
 This lvalue function is not exported and must be referenced via the 
 B<Paranoid> namespace.
+
+=head2 PTRUE_ZERO
+
+This is a constant that evaluates to '0 but true', which allows I<0> to be
+passed for boolean true use-cases.
 
 =head1 TAINT NOTES
 
@@ -230,6 +250,26 @@ L<Paranoid::Glob>: Paranoid Glob objects
 =item o
 
 L<Paranoid::IO>: File I/O wrappers for sysopen, etc.
+
+=item o 
+
+L<Paranoid::IO::FileMultiplexer>: File Multiplexer Object
+
+=item o 
+
+L<Paranoid::IO::FileMultiplexer::Block>: Block-level Allocator/Accessor
+
+=item o 
+
+L<Paranoid::IO::FileMultiplexer::Block::BATHeader>: BAT Header Block
+
+=item o 
+
+L<Paranoid::IO::FileMultiplexer::Block::FileHeader>: File Header Block
+
+=item o 
+
+L<Paranoid::IO::FileMultiplexer::Block::StreamHeader>: Stream Header Block
 
 =item o
 

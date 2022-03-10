@@ -6,7 +6,7 @@ use warnings;
 use Exporter 'import';
 our @EXPORT_OK = qw(@word_all %word_all);
 
-our   @word_all = <DATA>;
+our   @word_all = sort <DATA>;
 chomp @word_all;
 our   %word_all = map { $_ => 1 } @word_all;
 

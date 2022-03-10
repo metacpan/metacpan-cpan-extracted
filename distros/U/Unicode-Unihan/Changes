@@ -1,22 +1,28 @@
 # Revision history for Perl extension Unicode::Unihan.
-#
-# $Id: Changes,v 0.4 2008/06/11 14:40:27 dankogai Exp $
-#
 
-$Revision: 0.4 $ $Date: 2008/06/11 14:40:27 $
-! Unihan.pm
-  POD streamlined.
-! srctxt/*
-  Updated with Unihan 5.1.0
-- bin/splitdb.pl
-+ util/splitdb.pl
-  renamed.
+0.043 2022-03-08T01:18:31Z
+	* Makefile.PL is more careful about the DBM files it creates. This
+	responds to GitHub #2, and RT-125349 and RT-75802.
+	* brian d foy (bdfoy@cpan.org) is the new maintainer, but he knows
+	nothing about Unihan. If you think you an modernize this module,
+	please take it over (see https://github.com/briandfoy/unicode-unihan/issues/1)
 
-0.03  2007/03/25 23:18:53
-! *
-  Now based upon Unihan 5.0.0
+0.042_02 2022-02-17T16:04:20Z
+	* Final check before a user release
 
-0.02 2007/03/25 21:39:11
+0.042_01 2022-01-08T00:02:10Z
+	* Legacy release: this merely updates the module to work with
+	Unicode::Tussle. Don't start using this module to do new
+	work. Or, if you want it, volunteer to maintain it!
 
-First version to be CPANized.
+0.04 2008-06-11T14:40:27
+	* streamlined docs
+	* updated to Unihan 5.1.0
+	* renamed bin/splitdb.pl to util/splitdb.pl
+
+0.03  2007-03-25T23:18:53
+	* Now based upon Unihan 5.0.0
+
+0.02 2007-03-25T21:39:11
+	* First version to be CPANized.
 

@@ -1,12 +1,12 @@
 # Paranoid::IO::Lockfile -- Paranoid Lockfile support
 #
-# $Id: lib/Paranoid/IO/Lockfile.pm, 2.09 2021/12/28 15:46:49 acorliss Exp $
+# $Id: lib/Paranoid/IO/Lockfile.pm, 2.10 2022/03/08 00:01:04 acorliss Exp $
 #
 # This software is free software.  Similar to Perl, you can redistribute it
 # and/or modify it under the terms of either:
 #
 #   a)     the GNU General Public License
-#          <https://www.gnu.org/licenses/gpl-1.0.html> as published by the 
+#          <https://www.gnu.org/licenses/gpl-1.0.html> as published by the
 #          Free Software Foundation <http://www.fsf.org/>; either version 1
 #          <https://www.gnu.org/licenses/gpl-1.0.html>, or any later version
 #          <https://www.gnu.org/licenses/license-list.html#GNUGPL>, or
@@ -42,7 +42,7 @@ use Paranoid;
 use Paranoid::Debug qw(:all);
 use Paranoid::IO;
 
-($VERSION) = ( q$Revision: 2.09 $ =~ /(\d+(?:\.\d+)+)/sm );
+($VERSION) = ( q$Revision: 2.10 $ =~ /(\d+(?:\.\d+)+)/sm );
 
 @EXPORT      = qw(plock pexclock pshlock punlock);
 @EXPORT_OK   = @EXPORT;
@@ -69,8 +69,7 @@ sub plock {
     my $perms    = shift;
     my ( $rv, $fh );
 
-    pdebug( 'entering w/(%s)(%s)(%s)', PDLEVEL1, $filename, $type, $perms );
-    pIn();
+    subPreamble( PDLEVEL1, '$;$$', $filename, $type, $perms );
 
     # Set the defaults
     $perms = PRIV_UMASK unless defined $perms;
@@ -81,8 +80,7 @@ sub plock {
         || popen( $filename, O_RDWR, $perms );
     $rv = pflock( $filename, $type ) if defined $fh;
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL1, $rv );
+    subPostamble( PDLEVEL1, '$', $rv );
 
     return $rv;
 }
@@ -98,13 +96,11 @@ sub pexclock {
     my $rv       = 1;
     my $fh;
 
-    pdebug( 'entering w/(%s)(%s)', PDLEVEL1, $filename, $mode );
-    pIn();
+    subPreamble( PDLEVEL1, '$;$', $filename, $mode );
 
     $rv = plock( $filename, LOCK_EX, $mode );
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL1, $rv );
+    subPostamble( PDLEVEL1, '$', $rv );
 
     return $rv;
 }
@@ -120,13 +116,11 @@ sub pshlock {
     my $rv       = 1;
     my $fh;
 
-    pdebug( 'entering w/(%s)(%s)', PDLEVEL1, $filename, $mode );
-    pIn();
+    subPreamble( PDLEVEL1, '$;$', $filename, $mode );
 
     $rv = plock( $filename, LOCK_SH, $mode );
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL1, $rv );
+    subPostamble( PDLEVEL1, '$', $rv );
 
     return $rv;
 }
@@ -142,13 +136,11 @@ sub punlock {
     my $rv       = 1;
     my $fh;
 
-    pdebug( 'entering w/(%s)(%s)', PDLEVEL1, $filename, $mode );
-    pIn();
+    subPreamble( PDLEVEL1, '$;$', $filename, $mode );
 
     $rv = plock( $filename, LOCK_UN, $mode );
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL1, $rv );
+    subPostamble( PDLEVEL1, '$', $rv );
 
     return $rv;
 }
@@ -163,7 +155,7 @@ Paranoid::IO::Lockfile - Paranoid Lockfile support
 
 =head1 VERSION
 
-$Id: lib/Paranoid/IO/Lockfile.pm, 2.09 2021/12/28 15:46:49 acorliss Exp $
+$Id: lib/Paranoid/IO/Lockfile.pm, 2.10 2022/03/08 00:01:04 acorliss Exp $
 
 =head1 SYNOPSIS
 

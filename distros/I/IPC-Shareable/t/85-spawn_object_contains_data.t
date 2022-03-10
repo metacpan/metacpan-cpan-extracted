@@ -13,6 +13,8 @@ BEGIN {
     }
 }
 
+warn "Segs Before: " . IPC::Shareable::ipcs() . "\n" if $ENV{PRINT_SEGS};
+
 use SpawnTest;
 use IPC::Shareable;
 
@@ -38,5 +40,8 @@ for (0..10){
 
 $obj->push(99);
 is $obj->{data}{array}[11], 99, "push() pushes 99 into last elem ok";
+
+IPC::Shareable::_end;
+warn "Segs After: " . IPC::Shareable::ipcs() . "\n" if $ENV{PRINT_SEGS};
 
 done_testing();

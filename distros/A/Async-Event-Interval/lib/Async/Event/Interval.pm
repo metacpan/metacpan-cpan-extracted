@@ -3,7 +3,7 @@ package Async::Event::Interval;
 use warnings;
 use strict;
 
-our $VERSION = '1.09';
+our $VERSION = '1.11';
 
 use Carp qw(croak);
 use IPC::Shareable;
@@ -384,9 +384,8 @@ See L</EXAMPLES> for other various functionality of this module.
 
 =head1 DESCRIPTION
 
-Very basic implementation of asynchronous events with shared variables that are
-triggered by a timed interval. If a time of zero is specified, we'll run the
-event only once.
+Very basic implementation of asynchronous events triggered by a timed interval.
+If a time of zero is specified, we'll run the event only once.
 
 =head1 METHODS - EVENT OPERATION
 
@@ -436,16 +435,14 @@ isn't.
 
 =head2 waiting
 
-Returns true if the event is dormant and is ready for a C<start()> or C<restart>
-command. Returns false if the event is already running.
+Returns true if the event is dormant and is ready for a C<start()> or
+C<restart()> command. Returns false if the event is already running.
 
 =head2 error
 
 Returns true if an event crashed unexpectedly in the background, and is ready
-for a C<start()> or C<restart()> command. Returns false if no errors have been
-encountered.
-
-otherwise.
+for a C<start()> or C<restart()> command. Returns false if the event is not in
+an error state.
 
 =head2 interval($seconds)
 
@@ -564,7 +561,7 @@ times
     $event->start;
 
     while (1) {
-        if ($event->runs == 100) {
+        if ($event->runs > 99 && $event->interval != 600) {
             $event->interval(600);
         }
 
@@ -587,6 +584,11 @@ the program so you can figure out what's wrong with your callback code.
 
         #... do stuff
 
+        if ($event->errors >= 5) {
+            print $event->error_message;
+            exit;
+        }
+
         if ($event->error) {
             printf(
                 "Runs: %d, Runs errored: %d, Last error message: %s\n",
@@ -596,11 +598,6 @@ the program so you can figure out what's wrong with your callback code.
             );
 
             $event->restart;
-        }
-
-        if ($event->errors >= 5) {
-            print $event->error_message;
-            exit;
         }
     }
 

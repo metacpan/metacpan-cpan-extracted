@@ -11,6 +11,8 @@ BEGIN {
     }
 }
 
+warn "Segs Before: " . IPC::Shareable::ipcs() . "\n" if $ENV{PRINT_SEGS};
+
 my $t  = 1;
 my $ok = 1;
 
@@ -77,5 +79,8 @@ if ($pid == 0) {
     }
     IPC::Shareable->clean_up_all;
 }
+
+IPC::Shareable::_end;
+warn "Segs After: " . IPC::Shareable::ipcs() . "\n" if $ENV{PRINT_SEGS};
 
 done_testing();

@@ -1,5 +1,20 @@
 Revision history for Perl module Module::Generic
 
+v0.21.11 2022-03-10T23:50:16+0900
+    - Correction of a minor, but annoying bug in Module::Generic::Array with $TRUE and $FALSE not properly set.
+
+v0.21.10 2022-03-10T17:25:56+0900
+    - Correction to unit test with DateTime and system missing components
+
+v0.21.9 2022-03-09T17:37:34+0900
+    - Improvements with Module::Generic::SharedMem encoding and decoding of JSON data
+
+v0.21.8 2022-03-08T14:47:21+0900
+    - Corrected a minor bug in resolve() whereby 'base_dir' was not taken under account
+    - Updated documentation in Module::Generic::DateTime and added new documentation for Module::Generic::DateTime::Interval
+    - Allowed Module::Generic::DateTime to instantiate a default DateTime object when provided no argument
+    - Updated method _datetime in Module::Generic::Finfo, and _parse_timestamp and _set_get_datetime in Module::Generic to trap issues DateTime::TimeZone::Local exceptions triggered when system lacks proper time zone components.
+
 v0.21.7 2022-03-06T16:50:58+0900
     - Added methods load_json and unlaod_json in Module::Generic::File and new_json in Module::Generic
     - Added methods checksum_md5, checksum_256 and checksum512 in Module::Generic::File

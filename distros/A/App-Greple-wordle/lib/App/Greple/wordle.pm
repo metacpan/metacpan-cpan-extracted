@@ -3,31 +3,31 @@ use v5.14;
 use warnings;
 use utf8;
 
-our $VERSION = "0.07";
+our $VERSION = "0.10";
 
 use Data::Dumper;
-use List::Util qw(shuffle);
+use List::Util qw(shuffle max);
+use Try::Tiny;
 use Getopt::EX::Colormap qw(colorize ansi_code);
 use Text::VisualWidth::PP 0.05 'vwidth';
-use App::Greple::wordle::word_all    qw(%word_all);
+use App::Greple::wordle::word_all    qw(@word_all %word_all);
 use App::Greple::wordle::word_hidden qw(@word_hidden);
-use App::Greple::wordle::hint qw(&get_keymap &get_result);
+use App::Greple::wordle::game;
+use App::Greple::wordle::util qw(uniqword);
 
 use Getopt::EX::Hashed; {
-    has answer  => ' =s   ' , default => $ENV{WORDLE_ANSWER} ;
-    has index   => ' =s n ' , default => $ENV{WORDLE_INDEX} , any => qr/^[-+]?\d+$/;
-    has try     => ' =i   ' , default => 6 ;
-    has total   => ' =i   ' , default => 30 ;
-    has random  => ' !    ' , default => 0 ;
-    has series  => ' =s s ' , default => 1 ;
+    has answer  => '   =s ' , default => $ENV{WORDLE_ANSWER} ;
+    has index   => ' n =i ' , default => $ENV{WORDLE_INDEX} ;
+    has try     => ' x =i ' , default => 6 ;
+    has total   => '   =i ' , default => 30 ;
+    has random  => '   !  ' , default => 0 ;
+    has series  => ' s =i ' , default => 1 ;
     has compat  => '      ' , action  => sub { $_->{series} = 0 } ;
-    has keymap  => ' !    ' , default => 1 ;
-    has result  => ' !    ' , default => 1 ;
-    has correct => ' =s   ' , default => "\N{U+1F389}" ; # PARTY POPPER
-    has wrong   => ' =s   ' , default => "\N{U+1F4A5}" ; # COLLISION SYMBOL
-
-    has attempt => default => 0;
-    has answers => default => [];
+    has keymap  => '   !  ' , default => 1 ;
+    has result  => '   !  ' , default => 1 ;
+    has correct => '   =s ' , default => "\N{U+1F389}" ; # PARTY POPPER
+    has wrong   => '   =s ' , default => "\N{U+1F4A5}" ; # COLLISION SYMBOL
+    has debug   => '   !  ' ;
 }
 no Getopt::EX::Hashed;
 
@@ -37,95 +37,163 @@ sub parseopt {
     use Getopt::Long qw(GetOptionsFromArray Configure);
     Configure qw(bundling no_getopt_compat pass_through);
     $app->getopt($argv) || die "Option parse error.\n";
+    $app;
 }
 
-my $app = __PACKAGE__->new or die;
-
-sub initialize {
-    my($mod, $argv) = @_;
-    $app->parseopt($argv);
-}
-
-sub finalize {
-    my($mod, $argv) = @_;
-    push @$argv, '--interactive', ('/dev/stdin') x $app->{total}
-	if -t STDIN;
-}
-
-sub respond {
-    local $_ = $_;
-    my $chomped = chomp;
-    use List::Util qw(max);
-    print ansi_code("{CHA}{CUU}") if $chomped;
-    print ansi_code(sprintf("{CHA}{CUF(%d)}", max(8, vwidth($_) + 2)));
-    print s/(?<=.)\z/\n/r for @_;
-}
-
-sub days {
+sub _days {
     use Date::Calc qw(Delta_Days);
     my($mday, $mon, $year, $yday) = (localtime(time))[3,4,5,7];
     Delta_Days(2021, 6, 19, $year + 1900, $mon + 1, $mday);
 }
 
-sub wordle_patterns {
+sub setup {
+    my $app = shift;
     for ($app->{index}) {
 	$_   = int rand @word_hidden if $app->{random};
-	$_ //= days;
-	$_  += days if /^[-+]/;
+	$_ //= _days;
+	$_  += _days if /^[-+]/;
     }
-    if ($app->{series} > 0) {
-	srand($app->{series});
-	@word_hidden = shuffle @word_hidden;
+    if (my $answer = $app->{answer}) {
+	$app->{index} = undef;
+	$word_all{$answer} or die "$answer: wrong word\n";
+    } else {
+	if ($app->{series} > 0) {
+	    srand($app->{series});
+	    @word_hidden = shuffle @word_hidden;
+	}
+	$app->{answer} = $word_hidden[ $app->{index} ];
     }
-    my $answer = $app->{answer};
-    $answer ||= $word_hidden[ $app->{index} ];
-    $answer =~ /^[a-z]{5}$/i or die "$answer: wrong word\n";
+}
 
-    my $green  = join '|', map sprintf("(?<=^.{%d})%s", $_, substr($answer, $_, 1)), 0..4;
+sub patterns {
+    my $app = shift;
+    my $answer = $app->{answer};
+    my @re = map
+	    { sprintf "(?<=^.{%d})%s", $_, substr($answer, $_, 1) }
+	    0 .. length($answer) - 1;
+    my $green  = join '|', @re;
     my $yellow = "[$answer]";
     my $black  = "(?=[a-z])[^$answer]";
-
-    $app->{answer} = $answer;
     map { ( '--re' => $_ ) } $green, $yellow, $black;
 }
 
+sub title {
+    my $app = shift;
+    my $label = 'Greple::wordle';
+    return $label if not defined $app->{index};
+    sprintf('%s %s%s',
+	    $label,
+	    $app->{series} == 0 ? '' : sprintf("%d-", $app->{series}),
+	    $app->{index});
+}
+
+######################################################################
+
+my $app = __PACKAGE__->new or die;
+my $game;
+my $interactive;
+
+sub prompt {
+    sprintf '%d: ', $game->attempt + 1;
+}
+
+sub initialize {
+    my($mod, $argv) = @_;
+    $app->parseopt($argv)->setup;
+    $game = App::Greple::wordle::game->new(answer => $app->{answer});
+    push @$argv, $app->patterns;
+    if ($interactive = -t STDIN) {
+	push @$argv, '--interactive', ('/dev/stdin') x $app->{total};
+	select->autoflush;
+	say $app->title;
+	print prompt();
+    }
+}
+
+sub respond {
+    local $_ = $_;
+    my $chomped = chomp;
+    print ansi_code("{CHA}{CUU}") if $chomped;
+    print ansi_code(sprintf("{CHA(%d)}",
+			    max(11, vwidth($_) + length(prompt()) + 2)));
+    print s/(?<=.)\z/\n/r for @_;
+}
+
 sub show_answer {
-    say colorize('#6aaa64', uc $app->{answer});
+    say colorize('#6aaa64', uc $game->answer);
 }
 
 sub show_result {
-    printf("\n%s %s%s %d/%d\n\n",
-	   'Greple::wordle',
-	   $app->{series} == 0 ? '' : sprintf("%d-", $app->{series}),
-	   $app->{index},
-	   $app->{attempt} + 1, $app->{try});
-    say get_result($app->{answer}, @{$app->{answers}});
+    printf "\n%s %d/%d\n\n", $app->title, $game->attempt, $app->{try};
+    say $game->result;
 }
 
 sub check {
-    my $it = lc s/\n//r;
-    if (not $word_all{$it}) {
-	respond $app->{wrong};
+    my $word = lc s/\n//r;
+    if (not $word_all{$word}) {
+	command($word) or respond $app->{wrong};
 	$_ = '';
     } else {
-	push @{$app->{answers}}, $it;
-	print ansi_code '{CUU}';
+	$game->try($word);
     }
 }
 
+sub command {
+    my $word = shift;
+    my @cmd = split ' ', $word or return;
+    my @word = @word_all;
+    state @remember;
+    $cmd[0] =~ /^u(niq)?$/ and unshift @cmd, 'hint';
+
+    for (@cmd) {
+	try {
+	    if    ($_ eq '|')   {}
+	    elsif (/^d$/)       { $app->{debug} ^= 1 }
+	    elsif (/^!!$/)      { @word = @remember }
+	    elsif (/^h(int)?$/) { @word = choose($game->hint, @word) }
+	    elsif (/^u(niq)?$/) { @word = uniqword(@word) }
+	    elsif (/^=(.+)/)    { @word = choose(includes($1), @word) }
+	    elsif (/^!(.+)/)    { @word = choose("^(?!.*[$1])", @word) }
+	    elsif (/\W/)        { @word = choose($_, @word); }
+	    else  { return }
+	    1;
+	} or return;
+    }
+    if (@word == 0) {
+	warn "No match\n";
+	return 1;
+    }
+    @remember = @word;
+    do {
+	local $, = ' ';
+	say $game->hint_color(@word);
+    };
+    1;
+}
+
+sub includes {
+    '^' . join '', map { "(?=.*$_)" } $_[0] =~ /./g;
+}
+
+sub choose {
+    my $p = shift;
+    grep /$p/, @_;
+}
+
 sub inspect {
-    my $it = lc s/\n//r;
-    if (lc $it eq lc $app->{answer}) {
-	respond $app->{correct} x ($app->{try} - $app->{attempt});
+    if ($game->solved) {
+	respond $app->{correct} x ($app->{try} - $game->attempt + 1);
 	show_result if $app->{result};
 	exit 0;
     }
-    length or return;
-    if (++$app->{attempt} >= $app->{try}) {
-	show_answer;
-	exit 1;
+    if (length) {
+	if ($game->attempt >= $app->{try}) {
+	    show_answer;
+	    exit 1;
+	}
+	$app->{keymap} and respond $game->keymap;
     }
-    $app->{keymap} and respond get_keymap($app->{answer}, @{$app->{answers}});
+    print prompt();
 }
 
 1;
@@ -133,8 +201,6 @@ sub inspect {
 __DATA__
 
 mode function
-
-option --wordle &wordle_patterns
 
 define GREEN  #6aaa64
 define YELLOW #c9b458
@@ -144,9 +210,7 @@ option default \
 	-i --need 1 --no-filename \
 	--cm 555/GREEN  \
 	--cm 555/YELLOW \
-	--cm 555/BLACK  \
-	$<move> \
-	--wordle
+	--cm 555/BLACK
 
 # --interactive is set in initialize() when stdin is a tty
 

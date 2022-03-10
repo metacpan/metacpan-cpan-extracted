@@ -11,15 +11,13 @@ use warnings;
 use strict;
 
 use Math::MPFR qw(:mpfr);
-use POSIX; # Needed by dd_str() and dd_obj() to deal
-           # with 2 specific cases.
 
 die "Must provide at least one command line argument" if !@ARGV;
 
 for my $float(@ARGV) {
   my($msd, $lsd) = dd_str($float);
   print "$float\n";
-  printf "%.14e %.14e\n", $msd, $lsd;
+  printf "%.17g %.17g\n", $msd, $lsd;
   print internal_hex($msd) .  " ";
   print internal_hex($lsd) .  "\n";
 
@@ -52,16 +50,7 @@ sub dd_str {
   $val -= $msd;
   my $lsd = Rmpfr_get_d($val, MPFR_RNDN);
 
-  # At this point, we could simply return ($msd, $lsd)
-  # if not for the possibility that $msd and $lsd have
-  # the same sign && abs($msd) == POSIX::DBL_MAX &&
-  # abs($lsd) == 2 ** 970
-
-  return ($msd, $lsd)
-    unless ($msd ==  POSIX::DBL_MAX && $lsd ==   2 ** 970) ||
-           ($msd == -POSIX::DBL_MAX && $lsd == -(2 ** 970));
-
-  return ($msd + $lsd, 0); # ie return (Inf, 0) or (-Inf, 0) as appropriate
+  return ($msd, $lsd);
 }
 
 # sub dd_obj takes a Math::MPFR object (with 2098-bit precision) as its arg
@@ -75,16 +64,7 @@ sub dd_obj {
   $obj -= $msd;
   my $lsd = Rmpfr_get_d($obj, MPFR_RNDN);
 
-  # At this point, we could simply return ($msd, $lsd)
-  # if not for the possibility that $msd and $lsd have
-  # the same sign && abs($msd) == POSIX::DBL_MAX &&
-  # abs($lsd) == 2 ** 970
-
-  return ($msd, $lsd)
-    unless ($msd ==  POSIX::DBL_MAX && $lsd ==   2 ** 970) ||
-           ($msd == -POSIX::DBL_MAX && $lsd == -(2 ** 970));
-
-  return ($msd + $lsd, 0); # ie return (Inf, 0) or (-Inf, 0) as appropriate
+  return ($msd, $lsd);
 }
 
 # sub dd2dd takes 2 doubles as arguments. It returns the 2 doubles (msd, lsd) that form the

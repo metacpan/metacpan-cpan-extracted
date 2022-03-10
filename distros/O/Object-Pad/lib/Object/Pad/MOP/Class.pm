@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2020-2022 -- leonerd@leonerd.org.uk
 
-package Object::Pad::MOP::Class 0.62;
+package Object::Pad::MOP::Class 0.63;
 
 use v5.14;
 use warnings;
@@ -25,8 +25,10 @@ allow a program to extend existing classes.
 
 Where possible, this API is designed to be compatible with L<MOP::Class>.
 
-This API should be considered experimental even within the overall context in
-which C<Object::Pad> is expermental.
+This API should be considered B<experimental>, and will emit warnings to that
+effect. They can be silenced with
+
+   use Object::Pad qw( :experimental(mop) );
 
 =cut
 
@@ -46,6 +48,15 @@ sub for_class
 {
    shift;
    my ( $targetclass ) = @_;
+
+   my $level = 0;
+   $level++ while (caller $level)[0] eq __PACKAGE__;
+
+   my $callerhints = (caller $level)[10];
+   if( !$callerhints or !$callerhints->{"Object::Pad/experimental(mop)"} ) {
+      warnings::warnif experimental =>
+        "Object::Pad::MOP is experimental and may be changed or removed without notice";
+   }
 
    return $targetclass->META;
 }
@@ -193,7 +204,7 @@ those inherited from the superclass), as L<Object::Pad::MOP::Class> instances.
    $metaclass->add_role( $rolename )
    $metaclass->add_role( $rolemeta )
 
-I<Since verison 0.56.>
+I<Since version 0.56.>
 
 Adds a new role to the list of those implemented by the class.
 

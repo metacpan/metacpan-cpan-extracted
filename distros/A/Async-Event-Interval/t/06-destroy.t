@@ -5,6 +5,10 @@ use Async::Event::Interval;
 use Data::Dumper;
 use Test::More;
 
+if (! $ENV{CI_TESTING}) {
+    plan skip_all => "Not on a valid CI testing platform..."
+}
+
 my $mod = 'Async::Event::Interval';
 
 {

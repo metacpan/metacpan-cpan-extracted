@@ -1,0 +1,62 @@
+{
+   "abstract" : "The Unihan Data Base 5.1.0",
+   "author" : [
+      "Dan Kogai <dankogai@dan.co.jp>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "keywords" : [
+      "unicode",
+      "unihan"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Unicode-Unihan",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64",
+            "File::Basename" : "0",
+            "File::Spec::Functions" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "1"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/briandfoy/unicode-unihan/issues"
+      },
+      "homepage" : "https://github.com/briandfoy/unicode-unihan",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/briandfoy/unicode-unihan.git",
+         "web" : "https://github.com/briandfoy/unicode-unihan"
+      }
+   },
+   "version" : "0.043",
+   "x_serialization_backend" : "JSON::PP version 4.07"
+}

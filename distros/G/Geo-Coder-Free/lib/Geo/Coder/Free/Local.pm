@@ -21,11 +21,11 @@ L<https://github.com/nigelhorne/NJH-Snippets/blob/master/bin/geotag>.
 
 =head1 VERSION
 
-Version 0.29
+Version 0.30
 
 =cut
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 use constant	LIBPOSTAL_UNKNOWN => 0;
 use constant	LIBPOSTAL_INSTALLED => 1;
 use constant	LIBPOSTAL_NOT_INSTALLED => -1;
@@ -253,8 +253,10 @@ sub geocode {
 
 		# Hack to find "name, street, town, state, US"
 		my @addr = split(/,\s*/, $location);
+		# ::diag(__PACKAGE__, ': ', __LINE__, ' ', scalar(@addr));
 		if(scalar(@addr) == 5) {
 			# ::diag(__PACKAGE__, ': ', __LINE__, ": $location");
+			# ::diag(Data::Dumper->new([\@addr])->Dump());
 			my $state = $addr[3];
 			if(length($state) > 2) {
 				if(my $twoletterstate = Locale::US->new()->{state2code}{uc($state)}) {
@@ -263,16 +265,39 @@ sub geocode {
 			}
 			if(length($state) == 2) {
 				my %addr = (
-					number => $addr[0],
-					road => $addr[1],
 					city => $addr[2],
 					state => $state,
 					country => 'US'
 				);
-				if(my $rc = $self->_search(\%addr, ('number', 'road', 'city', 'state', 'country'))) {
-					# ::diag(Data::Dumper->new([$rc])->Dump());
-					$rc->{'country'} = 'US';
-					return $rc;
+				# ::diag(__PACKAGE__, ': ', __LINE__);
+				if($addr[0] !~ /^\d/) {
+					# ::diag(__PACKAGE__, ': ', __LINE__);
+					$addr{'name'} = $addr[0];
+					if($addr[1] =~ /^(\d+)\s+(.+)/) {
+						# ::diag(__PACKAGE__, ': ', __LINE__);
+						$addr{'number'} = $1;
+						$addr{'road'} = Geo::Coder::Free::_normalize($2);
+						if(my $rc = $self->_search(\%addr, ('name', 'number', 'road', 'city', 'state', 'country'))) {
+							# ::diag(Data::Dumper->new([$rc])->Dump());
+							$rc->{'country'} = 'US';
+							return $rc;
+						}
+					} else {
+						$addr{'road'} = Geo::Coder::Free::_normalize($addr[1]);
+						if(my $rc = $self->_search(\%addr, ('name', 'road', 'city', 'state', 'country'))) {
+							# ::diag(Data::Dumper->new([$rc])->Dump());
+							$rc->{'country'} = 'US';
+							return $rc;
+						}
+					}
+				} else {
+					$addr{'number'} = $addr[0];
+					$addr{'road'} = Geo::Coder::Free::_normalize($addr[1]);
+					if(my $rc = $self->_search(\%addr, ('number', 'road', 'city', 'state', 'country'))) {
+						# ::diag(Data::Dumper->new([$rc])->Dump());
+						$rc->{'country'} = 'US';
+						return $rc;
+					}
 				}
 			}
 		}
@@ -400,8 +425,8 @@ sub _search {
 
 	# FIXME: linear search is slow
 	# ::diag(__LINE__, ': ', Data::Dumper->new([\@columns, $data])->Dump());
-	print Data::Dumper->new([\@columns, $data])->Dump();
-	my @call_details = caller(0);
+	# print Data::Dumper->new([\@columns, $data])->Dump();
+	# my @call_details = caller(0);
 	# ::diag(__LINE__, ': called from ', $call_details[2]);
 	foreach my $row(@{$self->{'data'}}) {
 		my $match = 1;
@@ -546,7 +571,7 @@ it under the same terms as Perl itself.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2020 Nigel Horne.
+Copyright 2020-2022 Nigel Horne.
 
 The program code is released under the following licence: GPL2 for personal use on a single computer.
 All other users (including Commercial, Charity, Educational, Government)
@@ -573,6 +598,9 @@ __DATA__
 "",,"WESTCLIFF PROMENADE","RAMSGATE",,"KENT","GB",51.32711,1.406806
 "TOWER OF LONDON",35,"TOWER HILL","LONDON",,"LONDON","GB",51.5082675,-0.0754225
 "",5350,"CHILLUM PLACE NE","WASHINGTON",,"DC","US",38.955403,-76.996241
+"WALTER E. WASHINGTON CONVENTION CENTER",801,"MT VERNON PL NW","WASHINGTON","","DC","US",38.904022,-77.023113
+"",7,"JORDAN MILL COURT","WHITE HALL","BALTIMORE","MD","US",39.6852333333333,-76.6071166666667
+"ALL SAINTS EPISCOPAL CHURCH",203,"E CHATSWORTH RD","REISTERSTOWN","BALTIMORE","MD","US",39.467270,-76.823947
 "NCBI",,"MEDLARS DR","BETHESDA","MONTGOMERY","MD","US",38.99516556,-77.09943963
 "",,"CENTER DR","BETHESDA","MONTGOMERY","MD","US",38.99698114,-77.10031119
 "",,"NORFOLK AVE","BETHESDA","MONTGOMERY","MD","US",38.98939358,-77.09819543
@@ -580,6 +608,7 @@ __DATA__
 "THE ATRIUM AT ROCK SPRING PARK",6555,"ROCKLEDGE DR","BETHESDA","MONTGOMERY","MD","US",39.028326,-77.136774
 "","","MOUTH OF MONOCACY RD","DICKERSON","MONTGOMERY","MD","US",39.2244603797302,-77.449615439877
 "PATAPSCO VALLEY STATE PARK'",8020,"BALTIMORE NATIONAL PK","ELLICOTT CITY","HOWARD","MD","US",39.29491,-76.78051
+"",,"ANNANDALE RD","EMMITSBURG","FREDERICK","MD","US",39.683529,-77.349405
 "UTICA DISTRICT PARK",,,"FREDERICK","FREDERICK","MD","US",39.5167883333333,-77.4015166666667
 "ALBERT EINSTEIN HIGH SCHOOL",11135,"NEWPORT MILL RD","KENSINGTON","MONTGOMERY","MD","US",39.03869019,-77.0682871
 "POST OFFICE",10325,"KENSINGTON PKWY","KENSINGTON","MONTGOMERY","MD","US",39.02554455,-77.07178215
@@ -587,7 +616,10 @@ __DATA__
 "SAFEWAY",10541,"HOWARD AVE","KENSINGTON","MONTGOMERY","MD","US",39.02822438,-77.0755196
 "HAIR CUTTERY",3731,"CONNECTICUT AVE","KENSINGTON","MONTGOMERY","MD","US",39.03323865,-77.07368044
 "STROSNIDERS",10504,"CONNECTICUT AVE","KENSINGTON","MONTGOMERY","MD","US",39.02781493,-77.07740792
+"DOWNS PARK",,"CHESAPEAKE BAY DRIVE","PASADENA","ANNE ARUNDEL","MD","US",39.110711,-76.434062
+"",1559,"GUERDON CT","PASADENA","ANNE ARUNDEL","MD","US",39.102637,-76.456384
 "ARCOLA HEALTH AND REHABILITATION CENTER",901,"ARCOLA AVE","SILVER SPRING","MONTGOMERY","MD","US",39.036439,-77.025502
+"ADVENTIST HOSPITAL",11886,"HEALING WAY","SILVER SPRING","MONTGOMERY","MD","US",39.049570,-76.956882
 "",9904,"GARDINER AVE","SILVER SPRING","MONTGOMERY","MD","US",39.017633,-77.049551
 "",2232,"HILDAROSE DR","SILVER SPRING","MONTGOMERY","MD","US",39.019385,-77.049779,
 "FOREST GLEN MEDICAL CENTER",9801,"GEORGIA AVE","SILVER SPRING","MONTGOMERY","MD","US",39.016042,-77.042148
@@ -616,6 +648,8 @@ __DATA__
 "TOWPATH TRAVEL PLAZA",,,"BROADVIEW HEIGHTS","CUYAHOGA","OH","US",41.291654,-81.675815
 "NEW STANTON SERVICE PLAZA",,,"HEMPFIELD",,"PA","US",40.206267,-79.565682
 "SOUTH SOMERSET SERVICE PLAZA",,,"SOMERSET","SOMERSET","PA","US",39.999154,-79.046526
+"HUNTLEY MEADOWS PARK",3701,"LOCKHEED BLVD","ALEXANDRIA","","VA","US",38.75422, -77.1058666666667
 "",14900,"CONFERENCE CENTER DR","CHANTILLY","FAIRFAX","VA","US",38.873934,-77.461939
 "THE PURE PASTY COMPANY",128C,"MAPLE AVE W","VIENNA","FAIRFAX","VA","US",44.40662476,-68.59610059
 "THE CAPITAL GRILLE RESTAURANT",1861,,"MCLEAN","FAIRFAX","VA","US",38.915635,-77.22573
+"",,"","COLONIAL BEACH","WESTMORELAND","VA","US",38.25075,-76.9602533333333

@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Utilities;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Internal utilities for JSON::Schema::Modern
 
-our $VERSION = '0.547';
+our $VERSION = '0.548';
 
 use 5.020;
 use strictures 2;
@@ -236,7 +236,7 @@ sub E ($state, $error_string, @args) {
 # - annotations
 # - collect_annotations
 sub A ($state, $annotation) {
-  return 1 if not $state->{collect_annotations};
+  return 1 if not $state->{collect_annotations} or $state->{spec_version} eq 'draft7';
 
   my $uri = canonical_uri($state, $state->{keyword}, $state->{_schema_path_suffix})
     ->to_abs($state->{effective_base_uri});
@@ -359,7 +359,7 @@ JSON::Schema::Modern::Utilities - Internal utilities for JSON::Schema::Modern
 
 =head1 VERSION
 
-version 0.547
+version 0.548
 
 =head1 SYNOPSIS
 

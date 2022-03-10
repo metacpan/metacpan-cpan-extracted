@@ -146,7 +146,7 @@ use Exporter;
 
 our @ISA = qw{ Exporter };
 
-our $VERSION = '0.150';
+our $VERSION = '0.151';
 our @EXPORT_OK = qw{
     shell
 
@@ -4018,10 +4018,11 @@ sub spaceflight {
     $opt->{all} = 0 if $opt->{last5} || $opt->{start_epoch};
     $opt->{sort} ||= _validate_sort( $opt->{sort} );
 
+    $self->_deprecation_notice( 'spaceflight' );
+
     my @list;
     if (@args) {
 	foreach (@args) {
-	    $self->_deprecation_notice( spaceflight => lc $_ );
 	    my $info = $catalogs{spaceflight}{lc $_} or
 		return $self->_no_such_catalog (spaceflight => $_);
 	    exists $info->{url}
@@ -4038,7 +4039,6 @@ sub spaceflight {
     my $html = '';
     my $now = time ();
     my %tle;
-    $DB::single = 1;	# Debug
     foreach my $url (@list) {
 	my $resp = $self->_get_agent()->get ($url);
 	__tweak_response( $resp );
@@ -4957,7 +4957,7 @@ sub _check_cookie_generic {
 #	celestrak => {
 #	    sts	=> 3,
 #	},
-	spaceflight => 1,
+	spaceflight => 2,
 	attribute	=> {
 	    url_iridium_status_mccants	=> 3,
 	},

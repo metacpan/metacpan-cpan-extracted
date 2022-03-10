@@ -13,6 +13,9 @@ SYNOPSIS
         my $array = Class::Array->new( [$something] );
         my $hash  = Class::Assoc->new;
         my $bool  = Class::Boolean->new;
+        my $dt    = Class::DateTime->new( $datetime_object );
+        # Sets implicitly a default DateTime object
+        my $dt    = Class::DateTime->new;
         my $ex    = Class::Exception->new( message => "Oh no", code => 500 );
         my $file  = Class::File->new( '/some/where/file.txt' );
         my $finfo = Class::Finfo->new( '/some/where/file.txt' );
@@ -25,7 +28,7 @@ SYNOPSIS
 VERSION
 =======
 
-        v0.1.0
+        v0.1.1
 
 DESCRIPTION
 ===========
@@ -44,7 +47,7 @@ See
 AUTHOR
 ======
 
-Jacques Deguest \<`jack@deguest.jp`{classes="ARRAY(0x556662ebc9d8)"}\>
+Jacques Deguest \<`jack@deguest.jp`{classes="ARRAY(0x55c6103be298)"}\>
 
 SEE ALSO
 ========
@@ -59,7 +62,8 @@ SEE ALSO
 [Class::DateTime](https://metacpan.org/pod/Class::DateTime){.perl-module},
 [Class::Exception](https://metacpan.org/pod/Class::Exception){.perl-module},
 [Class::Finfo](https://metacpan.org/pod/Class::Finfo){.perl-module},
-[Class::NullChain](https://metacpan.org/pod/Class::NullChain){.perl-module}
+[Class::NullChain](https://metacpan.org/pod/Class::NullChain){.perl-module},
+[Class::DateTime](https://metacpan.org/pod/Class::DateTime){.perl-module}
 
 COPYRIGHT & LICENSE
 ===================

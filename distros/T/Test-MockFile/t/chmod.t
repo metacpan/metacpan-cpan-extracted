@@ -10,6 +10,8 @@ use Test2::Tools::Exception qw< lives dies >;
 use Test2::Tools::Warnings qw< warning >;
 use Test::MockFile qw< nostrict >;
 
+use File::Temp qw< tempfile >;
+
 my $filename = __FILE__;
 my $file     = Test::MockFile->file( $filename, 'whatevs' );
 
@@ -87,6 +89,39 @@ subtest(
             '0777',
             'File /foo/bar is now set to 0600',
         );
+    }
+);
+
+subtest(
+    'Changing mode filehandle' => sub {
+      SKIP: {
+
+            if ( $^V lt 5.28.0 ) {
+                skip "Skipped: need Perl >= 5.28.0", 1;
+                return;
+            }
+
+            my $test_string = "abcd\nefgh\n";
+            my ( $fh_real, $filename ) = tempfile();
+            print $fh_real $test_string;
+            {
+                note "-------------- REAL MODE --------------";
+                ok chmod( 0700, $filename ), 'chmod on file';
+                open( my $fh, '>', $filename );
+                ok chmod( 0711, $fh ), 'chmod on filehandle';
+            }
+
+            {
+                note "-------------- MOCK MODE --------------";
+                my $bar = Test::MockFile->file( $filename, $test_string );
+                ok chmod( 0700, $filename ), 'chmod on file';
+                open( my $fh, '>', $filename );
+                ok chmod( 0711, $fh ), 'chmod on filehandle';
+            }
+
+        }
+
+        return;
     }
 );
 

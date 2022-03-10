@@ -137,6 +137,7 @@ lib/Catmandu/Fix/join_field.pm
 lib/Catmandu/Fix/log.pm
 lib/Catmandu/Fix/lookup.pm
 lib/Catmandu/Fix/lookup_in_store.pm
+lib/Catmandu/Fix/mapping.pm
 lib/Catmandu/Fix/move.pm
 lib/Catmandu/Fix/move_field.pm
 lib/Catmandu/Fix/mv.pm
@@ -327,6 +328,7 @@ t/Catmandu-Fix-join_field.t
 t/Catmandu-Fix-log.t
 t/Catmandu-Fix-lookup.t
 t/Catmandu-Fix-lookup_in_store.t
+t/Catmandu-Fix-mapping.t
 t/Catmandu-Fix-move.t
 t/Catmandu-Fix-move_field.t
 t/Catmandu-Fix-mv.t
@@ -410,6 +412,7 @@ t/data2/000/000/001/test.txt
 t/data2/000/000/002/test.pdf
 t/data2/000/000/002/test.txt
 t/data2/000/000/003/test.txt
+t/field_mapping.csv
 t/fix-include-glob/fix-1.fix
 t/fix-include-glob/fix-2.fix
 t/fix-include-glob/fix-3.fix

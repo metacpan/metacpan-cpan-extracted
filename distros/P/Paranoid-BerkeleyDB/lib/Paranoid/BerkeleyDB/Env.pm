@@ -1,8 +1,8 @@
 # Paranoid::BerkeleyDB::Env -- BerkeleyDB CDS Env
 #
-# (c) 2005 - 2015, Arthur Corliss <corliss@digitalmages.com>
+# (c) 2005 - 2022, Arthur Corliss <corliss@digitalmages.com>
 #
-# $Id: lib/Paranoid/BerkeleyDB/Env.pm, 2.03 2017/02/06 02:49:24 acorliss Exp $
+# $Id: lib/Paranoid/BerkeleyDB/Env.pm, 2.06 2022/03/08 22:26:06 acorliss Exp $
 #
 #    This software is licensed under the same terms as Perl, itself.
 #    Please see http://dev.perl.org/licenses/ for more information.
@@ -32,7 +32,7 @@ use BerkeleyDB;
 use Cwd qw(realpath);
 use Carp;
 
-($VERSION) = ( q$Revision: 2.03 $ =~ /(\d+(?:\.\d+)+)/sm );
+($VERSION) = ( q$Revision: 2.06 $ =~ /(\d+(?:\.\d+)+)/sm );
 
 use vars qw(@ISA @_properties);
 
@@ -63,8 +63,7 @@ use vars qw(@ISA @_properties);
         my %params = @_;
         my ( $env, $home, $rv, $fh );
 
-        pdebug( 'entering w/%s', PDLEVEL2, %params );
-        pIn();
+        subPreamble(PDLEVEL2, '%', %params);
 
         # Validate home
         $rv = defined $params{'-Home'};
@@ -151,8 +150,7 @@ use vars qw(@ISA @_properties);
 
         $obj->set( 'home', $home ) if defined $env;
 
-        pOut();
-        pdebug( 'leaving w/rv: %s', PDLEVEL2, $env );
+        subPostamble(PDLEVEL1, '$', $env);
 
         return $env;
     }
@@ -165,8 +163,7 @@ use vars qw(@ISA @_properties);
 
         my $home = shift;
 
-        pdebug( 'entering w/%s', PDLEVEL2, $home );
-        pIn();
+        subPreamble(PDLEVEL3, '$', $home);
 
         if ( defined $home and exists $dbe{$home} ) {
             if ( $dbc{$home} == 1 ) {
@@ -181,8 +178,7 @@ use vars qw(@ISA @_properties);
             }
         }
 
-        pOut();
-        pdebug( 'leaving w/rv: 1', PDLEVEL2 );
+        subPostamble(PDLEVEL3, '$', 1);
 
         return 1;
     }
@@ -196,8 +192,7 @@ use vars qw(@ISA @_properties);
         my $obj = shift;
         my $rv;
 
-        pdebug( 'entering', PDLEVEL1 );
-        pIn();
+        subPreamble(PDLEVEL1);
 
         if ( !$obj->isStale ) {
 
@@ -211,8 +206,7 @@ use vars qw(@ISA @_properties);
             carp pdebug( 'home method called on stale object', PDLEVEL1 );
         }
 
-        pOut();
-        pdebug( 'leaving w/rv: %s', PDLEVEL1, $rv );
+        subPostamble(PDLEVEL1, '$', $rv);
 
         return $rv;
     }
@@ -226,8 +220,7 @@ use vars qw(@ISA @_properties);
         my $obj = shift;
         my ( $home, %rv );
 
-        pdebug( 'entering', PDLEVEL1 );
-        pIn();
+        subPreamble(PDLEVEL1);
 
         if ( !$obj->isStale ) {
             $home = $obj->home;
@@ -241,8 +234,7 @@ use vars qw(@ISA @_properties);
             carp pdebug( 'params method called on stale object', PDLEVEL1 );
         }
 
-        pOut();
-        pdebug( 'leaving w/rv: %s', PDLEVEL1, %rv );
+        subPostamble(PDLEVEL1, '%', %rv);
 
         return %rv;
     }
@@ -256,8 +248,7 @@ use vars qw(@ISA @_properties);
         my $obj = shift;
         my ( $home, $rv );
 
-        pdebug( 'entering', PDLEVEL1 );
-        pIn();
+        subPreamble(PDLEVEL1);
 
         if ( !$obj->isStale ) {
             $home = $obj->home;
@@ -271,8 +262,7 @@ use vars qw(@ISA @_properties);
             carp pdebug( 'refc method called on stale object', PDLEVEL1 );
         }
 
-        pOut();
-        pdebug( 'leaving w/rv: %s', PDLEVEL1, $rv );
+        subPostamble(PDLEVEL1, '$', $rv);
 
         return $rv;
     }
@@ -286,8 +276,7 @@ use vars qw(@ISA @_properties);
         my $obj = shift;
         my ( $home, $rv );
 
-        pdebug( 'entering', PDLEVEL1 );
-        pIn();
+        subPreamble(PDLEVEL1);
 
         if ( !$obj->isStale ) {
             $home = $obj->home;
@@ -300,8 +289,7 @@ use vars qw(@ISA @_properties);
             pdebug( 'env method called on a stale object', PDLEVEL1 );
         }
 
-        pOut();
-        pdebug( 'leaving w/rv: %s', PDLEVEL1, $rv );
+        subPostamble(PDLEVEL1, '$', $rv);
 
         return $rv;
     }
@@ -312,9 +300,7 @@ sub _initialize {
     my %params = @_;
     my $rv;
 
-    # Make sure minimal parameters are preset
-    pdebug( 'entering', PDLEVEL1 );
-    pIn();
+    subPreamble(PDLEVEL1);
 
     if ( exists $params{'-Home'} ) {
         $rv = 1 if defined _openDbe( $obj, %params );
@@ -322,8 +308,7 @@ sub _initialize {
         Paranoid::ERROR = pdebug( 'caller didn\'t specify -Home', PDLEVEL1 );
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL1, $rv );
+    subPostamble(PDLEVEL1, '$', $rv);
 
     return $rv;
 }
@@ -332,14 +317,12 @@ sub _deconstruct {
     my $obj = shift;
     my $rv;
 
-    pdebug( 'entering', PDLEVEL1 );
-    pIn();
+    subPreamble(PDLEVEL1);
 
     # Close the environment
     $rv = _closeDbe( $obj->home ) if !$obj->isStale;
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL1, $rv );
+    subPostamble(PDLEVEL1, '$', $rv);
 
     return $rv;
 }
@@ -354,7 +337,7 @@ Paranoid::BerkeleyDB::Env -- BerkeleyDB CDS Env Object
 
 =head1 VERSION
 
-$Id: lib/Paranoid/BerkeleyDB/Env.pm, 2.03 2017/02/06 02:49:24 acorliss Exp $
+$Id: lib/Paranoid/BerkeleyDB/Env.pm, 2.06 2022/03/08 22:26:06 acorliss Exp $
 
 =head1 SYNOPSIS
 
@@ -512,5 +495,5 @@ Arthur Corliss (corliss@digitalmages.com)
 This software is licensed under the same terms as Perl, itself. 
 Please see http://dev.perl.org/licenses/ for more information.
 
-(c) 2005 - 2016, Arthur Corliss (corliss@digitalmages.com)
+(c) 2005 - 2022, Arthur Corliss (corliss@digitalmages.com)
 

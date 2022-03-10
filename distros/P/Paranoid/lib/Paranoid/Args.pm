@@ -1,12 +1,12 @@
 # Paranoid::Args -- Command-line argument parsing functions
 #
-# $Id: lib/Paranoid/Args.pm, 2.09 2021/12/28 15:46:49 acorliss Exp $
+# $Id: lib/Paranoid/Args.pm, 2.10 2022/03/08 00:01:04 acorliss Exp $
 #
 # This software is free software.  Similar to Perl, you can redistribute it
 # and/or modify it under the terms of either:
 #
 #   a)     the GNU General Public License
-#          <https://www.gnu.org/licenses/gpl-1.0.html> as published by the 
+#          <https://www.gnu.org/licenses/gpl-1.0.html> as published by the
 #          Free Software Foundation <http://www.fsf.org/>; either version 1
 #          <https://www.gnu.org/licenses/gpl-1.0.html>, or any later version
 #          <https://www.gnu.org/licenses/license-list.html#GNUGPL>, or
@@ -40,7 +40,7 @@ use base qw(Exporter);
 use Paranoid;
 use Paranoid::Debug qw(:all);
 
-($VERSION) = ( q$Revision: 2.09 $ =~ /(\d+(?:\.\d+)+)/sm );
+($VERSION) = ( q$Revision: 2.10 $ =~ /(\d+(?:\.\d+)+)/sm );
 
 @EXPORT      = qw(parseArgs);
 @EXPORT_OK   = ( @EXPORT, qw(PA_DEBUG PA_VERBOSE PA_HELP PA_VERSION) );
@@ -224,8 +224,7 @@ sub _tLint {
     my $rv   = 1;
     my ( $oname, @at );
 
-    pdebug( 'entering w/(%s)', PDLEVEL2, $tref );
-    pIn();
+    subPreamble( PDLEVEL2, '$', $tref );
 
     # Get the option name for reporting purposes (should have been populated
     # within parseArgs below)
@@ -332,8 +331,7 @@ sub _tLint {
         }
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL2, $rv );
+    subPostamble( PDLEVEL2, '$', $rv );
 
     return $rv;
 }
@@ -353,9 +351,7 @@ sub _getArgs ($$\@) {
     my $argRef      = _getArgRef();
     my @tmp;
 
-    pdebug( 'entering w/(%s)(%s)(%s)',
-        PDLEVEL2, $option, $argTemplate, $lref );
-    pIn();
+    subPreamble( PDLEVEL2, '$$$', $option, $argTemplate, $lref );
 
     # Empty the array
     @$lref = ();
@@ -473,8 +469,7 @@ sub _getArgs ($$\@) {
         pdebug( 'sublisted arguments into: %s', PDLEVEL3, @$lref );
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL2, $rv );
+    subPostamble( PDLEVEL2, '$', $rv );
 
     return $rv;
 }
@@ -491,8 +486,7 @@ sub _storeArgs ($$\@) {
     my $argTemplate = shift;
     my $lref        = shift;
 
-    pdebug( 'entering w/(%s)(%s)(%s)', PDLEVEL2, $tref, $argTemplate, $lref );
-    pIn();
+    subPreamble( PDLEVEL2, '$$$', $tref, $argTemplate, $lref );
 
     pdebug( 'adding values to %s', PDLEVEL3, $$tref{Name} );
 
@@ -551,8 +545,7 @@ sub _storeArgs ($$\@) {
         }
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: 1', PDLEVEL2 );
+    subPostamble( PDLEVEL1, '$', 1 );
 
     return 1;
 }
@@ -572,11 +565,10 @@ sub parseArgs (\@\%;\@) {
     my ( $tref, $oname, $argRef, $arg, $argTemplate );
     my ( @tmp, @oargs, $regex );
 
+    subPreamble( PDLEVEL1, '$$$', $tlref, $oref, $paref );
+
     # Validate arguments
     $paref = \@ARGV unless defined $paref;
-
-    pdebug( 'entering w/(%s)(%s)(%s)', PDLEVEL1, $tlref, $oref, $paref );
-    pIn();
 
     # Clear all internal data structures and reset flag
     clearMemory();
@@ -907,8 +899,7 @@ sub parseArgs (\@\%;\@) {
         $$oref{$_} = $$tref{Value};
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL1, $rv );
+    subPostamble( PDLEVEL1, '$', $rv );
 
     return $rv;
 }
@@ -923,7 +914,7 @@ Paranoid::Args - Command-line argument parsing functions
 
 =head1 VERSION
 
-$Id: lib/Paranoid/Args.pm, 2.09 2021/12/28 15:46:49 acorliss Exp $
+$Id: lib/Paranoid/Args.pm, 2.10 2022/03/08 00:01:04 acorliss Exp $
 
 =head1 SYNOPSIS
 

@@ -1,6 +1,9 @@
 Revision history for Perl module Promise::Me
 
-0.1.1 2021-06-20T12:11:08+0900
+v0.1.2 2021-10-07T22:21:38+0900
+    - Documentation improvement
+
+v0.1.1 2021-06-20T12:11:08+0900
     - Correcting typos in the documentation
 
 v0.1.0 2021-06-20T10:06:37+0900

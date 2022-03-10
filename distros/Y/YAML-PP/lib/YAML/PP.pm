@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package YAML::PP;
 
-our $VERSION = '0.031'; # VERSION
+our $VERSION = '0.032'; # VERSION
 
 use YAML::PP::Schema;
 use YAML::PP::Schema::JSON;
@@ -706,7 +706,7 @@ This option is for loading and dumping.
 
 Preserving scalar styles is still experimental.
 
-    use YAML::PP::Common qw/ PRESERVE_ORDER PRESERVE_SCALAR_STYLE /;
+    use YAML::PP::Common qw/ :PRESERVE /;
 
     # Preserve the order of hash keys
     my $yp = YAML::PP->new( preserve => PRESERVE_ORDER );
@@ -1378,7 +1378,7 @@ The Perl Foundation L<https://www.perlfoundation.org/> sponsored this project
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2017-2020 by Tina Müller
+Copyright 2017-2022 by Tina Müller
 
 This library is free software and may be distributed under the same terms
 as perl itself.

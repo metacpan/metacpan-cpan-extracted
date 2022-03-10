@@ -65,10 +65,11 @@ sub callback {
     my $invocant = $self->invocant;
     my $method = $invocant ? $invocant->can($callback) : $self->can($callback);
 
-    require Venus::Error;
-    Venus::Error->new(sprintf(
-      qq(Can't locate object method "%s" on package "%s"),
-      ($callback, $invocant ? ref($invocant) : ref($self))))->throw if !$method;
+    $self->throw->error({
+      message => sprintf(qq(Can't locate object method "%s" on package "%s"),
+        ($callback, $invocant ? ref($invocant) : ref($self)))
+    })
+    if !$method;
 
     $callback = sub {goto $method};
   }
@@ -201,8 +202,13 @@ sub result {
         die $caught;
       }
       else {
-        require Venus::Error;
-        Venus::Error->new($caught)->throw;
+        if (UNIVERSAL::isa($caught, 'Venus::Error')) {
+          $caught->throw;
+        }
+        else {
+          require Venus::Error;
+          Venus::Error->throw($caught);
+        }
       }
     }
   }
@@ -447,6 +453,22 @@ I<Since C<0.01>>
   my $callback = $try->callback('test');
 
   # sub { ... }
+
+=back
+
+=over 4
+
+=item callback example 3
+
+  package main;
+
+  use Venus::Try;
+
+  my $try = Venus::Try->new;
+
+  my $callback = $try->callback('missing_method');
+
+  # Exception! Venus::Try::Error (isa Venus::Error)
 
 =back
 
@@ -902,6 +924,24 @@ I<Since C<0.01>>
   my $result = $try->result(1..5);
 
   # [1..5]
+
+=back
+
+=over 4
+
+=item result example 3
+
+  package main;
+
+  use Venus::Try;
+
+  my $try = Venus::Try->new;
+
+  $try->call(sub {die});
+
+  my $result = $try->result;
+
+  # Exception! Venus::Error
 
 =back
 

@@ -98,11 +98,13 @@ sub call {
   my $class = $self->load;
 
   unless ($func) {
-    require Venus::Error;
-
-    my $text = qq[Attempt to call undefined class method in package "$class"];
-
-    Venus::Error->throw($text);
+    my $throw;
+    my $error = qq(Attempt to call undefined class method in package "$class");
+    $throw = $self->throw;
+    $throw->message($error);
+    $throw->stash(package => $self->package);
+    $throw->stash(routine => $func);
+    $throw->error;
   }
 
   my $next = $class->can($func);
@@ -114,11 +116,13 @@ sub call {
   }
 
   unless ($next) {
-    require Venus::Error;
-
-    my $text = qq[Unable to locate class method "$func" via package "$class"];
-
-    Venus::Error->throw($text);
+    my $throw;
+    my $error = qq(Unable to locate class method "$func" via package "$class");
+    $throw = $self->throw;
+    $throw->message($error);
+    $throw->stash(package => $self->package);
+    $throw->stash(routine => $func);
+    $throw->error;
   }
 
   @_ = @args; goto $next;
@@ -185,21 +189,25 @@ sub cop {
   my $class = $self->load;
 
   unless ($func) {
-    require Venus::Error;
-
-    my $text = qq[Attempt to cop undefined object method from package "$class"];
-
-    Venus::Error->throw($text);
+    my $throw;
+    my $error = qq(Attempt to cop undefined object method from package "$class");
+    $throw = $self->throw;
+    $throw->message($error);
+    $throw->stash(package => $self->package);
+    $throw->stash(routine => $func);
+    $throw->error;
   }
 
   my $next = $class->can($func);
 
   unless ($next) {
-    require Venus::Error;
-
-    my $text = qq[Unable to locate object method "$func" via package "$class"];
-
-    Venus::Error->throw($text);
+    my $throw;
+    my $error = qq(Unable to locate object method "$func" via package "$class");
+    $throw = $self->throw;
+    $throw->message($error);
+    $throw->stash(package => $self->package);
+    $throw->stash(routine => $func);
+    $throw->error;
   }
 
   return sub { $next->(@args ? (@args, @_) : @_) };
@@ -251,9 +259,13 @@ sub eval {
 
   my $result = eval join ' ', map "$_", "package @{[$self->package]};", @args;
 
-  require Venus::Error;
-
-  Venus::Error->throw($@) if $@;
+  if (my $error = $@) {
+    my $throw;
+    $throw = $self->throw;
+    $throw->message($error);
+    $throw->stash(package => $self->package);
+    $throw->error;
+  }
 
   return $result;
 }
@@ -375,11 +387,12 @@ sub load {
   if !$failed;
 
   do {
-    require Venus::Error;
-
-    my $message = $error || 'cause unknown';
-
-    Venus::Error->throw("Error attempting to load $class: $message");
+    my $throw;
+    $error = qq(Error attempting to load $class: @{[$error || 'cause unknown']});
+    $throw = $self->throw;
+    $throw->message($error);
+    $throw->stash(package => $self->package);
+    $throw->error;
   }
   if $error
   or $failed
@@ -1120,6 +1133,22 @@ I<Since C<0.01>>
 
 =back
 
+=over 4
+
+=item call example 3
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo');
+
+  my $result = $space->call('missing');
+
+  # Exception! Venus::Space::Error (isa Venus::Error)
+
+=back
+
 =cut
 
 =head2 chain
@@ -1294,6 +1323,22 @@ I<Since C<0.01>>
 
 =back
 
+=over 4
+
+=item cop example 2
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo/bar');
+
+  my $code = $space->cop('missing', $space->blessed);
+
+  # Exception! Venus::Space::Error (isa Venus::Error)
+
+=back
+
 =cut
 
 =head2 data
@@ -1371,6 +1416,22 @@ I<Since C<0.01>>
   my $eval = $space->eval('our $VERSION = 0.01');
 
   # 0.01
+
+=back
+
+=over 4
+
+=item eval example 2
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo');
+
+  my $eval = $space->eval('die');
+
+  # Exception! Venus::Space::Error (isa Venus::Error)
 
 =back
 
@@ -1646,6 +1707,22 @@ I<Since C<0.01>>
   my $load = $space->load;
 
   # "CPAN"
+
+=back
+
+=over 4
+
+=item load example 2
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('no/thing');
+
+  my $load = $space->load;
+
+  # Exception! Venus::Space::Error (isa Venus::Error)
 
 =back
 

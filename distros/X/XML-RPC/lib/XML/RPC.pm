@@ -29,6 +29,12 @@ create an XML-RPC service:
         return { you_called => $methodname, with_params => \@params };
     }
 
+=head1 WARNING
+
+Very little maintainance goes into this module. While it continues to work, is has certain quirks that may or may not be fixable without breaking backward compatibility.
+
+I strongly recommend that, before deciding what to use in a new project, you look into Randy Ray's L<RPC::XML> module. This seems to be a much more modern approach.
+
 =head1 DESCRIPTION
 
 XML::RPC module provides simple Pure Perl methods for XML-RPC communication.
@@ -80,11 +86,50 @@ Returns the last XML that went in the client.
 
 Returns the last XML that went out the client.
 
+=head2 $xmlrpc->indent(indentsize);
+
+Sets the xmlout indentation
+
 =head1 CUSTOM TYPES
 
 =head2 $xmlrpc->call( 'method_name', { data => sub { { 'base64' => encode_base64($data) } } } );
 
 When passing a CODEREF to a value XML::RPC will simply use the returned hashref as a type => value pair.
+
+=head1 TYPECASTING
+
+Sometimes a value type might not be clear from the value alone, typecasting provides a way to "force" a value to a certain type
+
+=head2 as_string
+
+Forces a value to be cast as string.
+
+    $xmlrpc->call( 'gimmeallyourmoney', { cardnumber => as_string( 12345 ) } );
+
+=head2 as_int
+
+Forces a value to be cast as int
+
+=head2 as_i4
+
+Forces a value to be cast as i4
+
+=head2 as_double
+
+Forces a value to be cast as double
+
+=head2 as_boolean
+
+Forces a value to be cast as boolean
+
+=head2 as_base64
+
+Forces a value to be cast as base64
+
+=head2 as_dateTime_iso8601
+
+Forces a value to be cast as ISO8601 Datetime
+
 
 =head1 ERROR HANDLING
 
@@ -107,13 +152,13 @@ CODE ref to create these types.
 =head1 AUTHOR
 
 Original author: Niek Albers, http://www.daansystems.com/
-Current author: Rene Schickbauer, https://www.cavac.at
+Current author: Rene Schickbauer, https://cavac.at
 
 =head1 COPYRIGHT AND LICENSE
 
 Copyright (c) 2007-2008 Niek Albers.  All rights reserved.  This program
 
-Copyright (c) 2012-2017 Rene Schickbauer
+Copyright (c) 2012-2022 Rene Schickbauer
 
 This program is free software; you can redistribute it and/or modify it under the same
 terms as Perl itself.
@@ -124,10 +169,11 @@ package XML::RPC;
 use strict;
 use XML::TreePP;
 use MIME::Base64;
+use Time::Local;
 use vars qw($VERSION $faultCode);
 no strict 'refs';
 
-$VERSION   = 1.1;
+$VERSION   = 2.0;
 $faultCode = 0;
 
 sub new {
@@ -137,6 +183,11 @@ sub new {
     $self->{url} = shift;
     $self->{tpp} = XML::TreePP->new(@_);
     return $self;
+}
+
+sub indent {
+  my $self = shift || return;
+  $self->{tpp}->set( indent => shift );
 }
 
 sub credentials {
@@ -362,5 +413,48 @@ sub list {
 sub xml_in { shift->{xml_in} }
 
 sub xml_out { shift->{xml_out} }
+
+# private helper function to create specialised closure
+sub _cast {
+    my ($type, $val) = @_;
+    return sub { return { "$type" => $val }; };
+}
+
+sub as_string {
+    return _cast( 'string', shift );
+}
+
+sub as_int {
+    return _cast( 'int', int shift );
+}
+
+sub as_i4 {
+    return _cast( 'i4',      int shift );
+}
+
+sub as_double  {
+    return _cast( 'double',  sprintf('%g', shift) );
+}
+
+sub as_boolean {
+    return _cast( 'boolean', (shift) ? '1' : '0' );
+}
+
+sub as_base64 {
+    chomp( my $base64 = encode_base64( shift ) );
+    return _cast( 'base64', $base64 );
+}
+
+# converts epoch (or current time if undef) to dateTime.iso8601 (UTC)
+sub as_dateTime_iso8601 {
+  my $epoch = shift;
+  $epoch = time() unless defined $epoch; # could be: "shift // time" with modern perl versions
+  my ($sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst) = gmtime( $epoch );
+
+  return _cast( 'dateTime.iso8601',
+                sprintf('%4d%02d%02dT%02d:%02d:%02dZ',
+                        $year + 1900, $mon + 1, $mday, $hour, $min, $sec)
+              );
+}
 
 1;

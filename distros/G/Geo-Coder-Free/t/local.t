@@ -2,7 +2,7 @@
 
 use warnings;
 use strict;
-use Test::Most tests => 76;
+use Test::Most tests => 108;
 use Test::Number::Delta;
 use Test::Carp;
 use Test::Deep;
@@ -51,6 +51,20 @@ LOCAL: {
 		# delta_within($location->{latitude}, 39.00, 1e-2);
 		# delta_within($location->{longitude}, -77.10, 1e-2);
 	}
+
+	check($geo_coder,
+		'All Saints Episcopal Church, 203 E Chatsworth Road, Reisterstown, Maryland, USA',
+		39.467270,
+		-76.823947,
+		'All Saints Episcopal Church, 203 E Chatsworth Rd, Reisterstown, Baltimore, MD, USA',
+	);
+
+	check($geo_coder,
+		'E Chatsworth Road, Reisterstown, Maryland, USA',
+		39.467270,
+		-76.823947,
+		'All Saints Episcopal Church, 203 E Chatsworth Rd, Reisterstown, Baltimore, MD, USA',
+	);
 
 	check($geo_coder,
 		'Minster Cemetery, 116 Tothill Street, Minster, Thanet, Kent, England',
@@ -110,7 +124,7 @@ sub check {
 	# diag($location);
 	my @rc = $geo_coder->geocode({ location => $location });
 	diag(Data::Dumper->new([$location, \@rc])->Dump()) if($ENV{'TEST_VERBOSE'});
-	ok(scalar(@rc) > 0);
+	cmp_ok(scalar(@rc), '>', 0);
 
 	cmp_deeply(@rc,
 		methods('lat' => num($lat, 1e-2), 'long' => num($long, 1e-2)));
@@ -143,8 +157,8 @@ sub check {
 	}
 
 	if(!$found) {
-		diag(__LINE__, ": failed reverse lookup $expect");
-		diag(Data::Dumper->new([\@rc])->Dump());
+		diag(__LINE__, ": failed reverse lookup expected: $expect");
+		diag('got: ', Data::Dumper->new([\@rc])->Dump());
 	}
 	ok($found);
 

@@ -7,6 +7,7 @@ use strict;
 use warnings;
 
 use CHI;
+use DBI;
 use Error;
 use Log::Any::Adapter;
 
@@ -78,7 +79,14 @@ sub create_disc_cache {
 		);
 		$chi_args{'redis_options'} = \%redis_options;
 	} elsif($driver eq 'DBI') {
-		$chi_args{'dbh'} = DBI->connect($config->{disc_cache}->{connect});
+		# Use the cache connection details in the configuration file
+                $chi_args{'dbh'} = DBI->connect($config->{disc_cache}->{connect});
+                if(!defined($chi_args{'dbh'})) {
+                        if($logger) {
+                                $logger->error($DBI::errstr);
+                        }
+                        throw Error::Simple($DBI::errstr);
+                }
 		$chi_args{'create_table'} = 1;
 	}
 	return CHI->new(%chi_args);

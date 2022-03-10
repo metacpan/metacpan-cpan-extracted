@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Promise - ~/lib/Promise/Me.pm
-## Version v0.1.1
+## Version v0.1.2
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/28
-## Modified 2021/06/20
+## Modified 2022/03/09
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -20,9 +20,10 @@ BEGIN
     use parent qw( Module::Generic );
     use Clone;
     use Filter::Util::Call ();
-    use Module::Generic::SharedMem qw( :all );
+    use Module::Generic::SharedMem v0.2.2 qw( :all );
     use Nice::Try;
     use POSIX qw( WNOHANG WIFEXITED WEXITSTATUS WIFSIGNALED );
+    use PPI;
     use Scalar::Util;
     use Want;
     our $KIDS = {};
@@ -104,7 +105,7 @@ BEGIN
     use constant SHARED_MEMORY_BLOCK => ( 64 * 1024 );
     our $SHARED  = {};
     our @TIED    = ();
-    our $VERSION = 'v0.1.1';
+    our $VERSION = 'v0.1.2';
 };
 
 sub import
@@ -294,7 +295,8 @@ sub init
     # Because this is stored in a global variable, we use the caller's package name as namespace
     my $pack = caller(1);
     $self->{_shared_from} = $pack;
-    unless( want( 'OBJECT' ) )
+
+    unless( Want::want( 'OBJECT' ) )
     {
         $self->no_more_chaining(1);
         $self->exec;
@@ -516,7 +518,7 @@ sub catch
     
     # Is there more chaining, or is this the end of the chain?
     # If the latter, we then start executing our codes
-    unless( want( 'OBJECT' ) )
+    unless( Want::want( 'OBJECT' ) )
     {
         $self->no_more_chaining(1);
         $self->exec;
@@ -535,9 +537,6 @@ sub exec
         return( $self->error( "Cannot block SIGINT for fork: $!" ) );
     select((select(STDOUT), $|=1)[0]);
     select((select(STDERR), $|=1)[0]);
-    
-    # If there is any variables to share, do it now, just before forking
-    # $self->_set_shared_global();
     
     my $pid = fork();
     # Parent
@@ -918,7 +917,7 @@ sub then
     
     # Is there more chaining, or is this the end of the chain?
     # If the latter, we then start executing our codes
-    unless( want( 'OBJECT' ) )
+    unless( Want::want( 'OBJECT' ) )
     {
         $self->no_more_chaining(1);
         $self->exec;
@@ -994,12 +993,12 @@ sub wait
     }
     # In chaining, without argument, we set this implicitly to true
     # $prom->then(sub{})->wait->catch(sub{})
-    elsif( want( 'OBJECT' ) )
+    elsif( Want::want( 'OBJECT' ) )
     {
 #         $self->message( 3, "Implicitly setting wait to true." );
         $self->_set_get_boolean( 'wait', 1 );
     }
-    elsif( want( 'VOID' ) || want( 'SCALAR' ) )
+    elsif( Want::want( 'VOID' ) || Want::want( 'SCALAR' ) )
     {
 #         $self->message( 3, "Implicitly setting wait to true." );
         $self->_set_get_boolean( 'wait', 1 );
@@ -2158,9 +2157,114 @@ Promise::Me - Fork Based Promise with Asynchronous Execution, Async, Await and S
 
 =head1 VERSION
 
-    v0.1.1
+    v0.1.2
 
 =head1 DESCRIPTION
+
+L<Promise::Me> is an implementation of the JavaScript promise using fork for asynchronous tasks. Fork is great, because it is well supported by all operating systems and effectively allows for asynchronous execution.
+
+While JavaScript has asynchronous execution at its core, which means that two consecutive lines of code will execute simultaneously, under perl, those two lines would be executed one after the other. For example:
+
+    # Assuming the function getRemote makes an http query of a remote resource that takes time
+    let response = getRemote('https://example.com/api');
+    console.log(response);
+
+Under JavaScript, this would yield: C<undefined>, but in perl
+
+    my $resp = $ua->get('https://example.com/api');
+    say( $resp );
+
+Would correctly return the response object, but it will hang until it gets the returned object whereas in JavaScript, it would not wait.
+
+In JavaScript, because of this asynchronous execution, before people were using callback hooks, which resulted in "callback from hell", i.e. something like this[1]:
+
+    getData(function(x){
+        getMoreData(x, function(y){
+            getMoreData(y, function(z){ 
+                ...
+            });
+        });
+    });
+
+[1] Taken from this L<StackOverflow discussion|https://stackoverflow.com/questions/25098066/what-is-callback-hell-and-how-and-why-does-rx-solve-it>
+
+And then, they came up with L<Promise|https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise>, so that instead of wrapping your code in a callback function you get instead a promise object that gets called when certain events get triggered, like so[2]:
+
+    const myPromise = new Promise((resolve, reject) => {
+      setTimeout(() => {
+        resolve('foo');
+      }, 300);
+    });
+
+    myPromise
+      .then(handleResolvedA, handleRejectedA)
+      .then(handleResolvedB, handleRejectedB)
+      .then(handleResolvedC, handleRejectedC);
+
+[2] Taken from L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise>
+
+Chaining is easy to implement in perl and L<Promise::Me> does it too. Where it gets more tricky is returning a promise immediately without waiting for further execution, i.e. a deferred promise, like so:
+
+    function getRemote(url)
+    {
+        let promise = new Promise((resolve, reject) => 
+        {
+            setTimeout(() => reject(new Error("Whoops!")), 1000);
+        });
+        // Maybe do some other stuff here
+        return( promise );
+    }
+
+In this example, under JavaScript, the C<promise> will be returned immediately. However, under perl, the equivalent code would be executed sequentially. For example, using the excellent module L<Promise::ES6>:
+
+    sub get_remote
+    {
+        my $url = shift( @_ );
+        my $p = Promise::ES6->new(sub($res)
+        {
+            $res->( Promise::ES6->resolve(123) );
+        });
+        # Do some more work that would take some time
+        return( $p );
+    }
+
+In the example above, the promise C<$p> would not be returned until all the tasks are completed before the C<return> statement, contrary to JavaScript where it would be returned immediately.
+
+So, in perl people have started to use loop such as L<AnyEvent> or L<IO::Async> with "conditional variable" to get that asynchronous execution, but you need to use loops. For example (taken from L<Promise::AsyncAwait>):
+
+    use Promise::AsyncAwait;
+    use Promise::XS;
+
+    sub delay {
+        my $secs = shift;
+
+        my $d = Promise::XS::deferred();
+
+        my $timer; $timer = AnyEvent->timer(
+            after => $secs,
+            cb => sub {
+                undef $timer;
+                $d->resolve($secs);
+            },
+        );
+
+        return $d->promise();
+    }
+
+    async sub wait_plus_1 {
+        my $num = await delay(0.01);
+
+        return 1 + $num;
+    }
+
+    my $cv = AnyEvent->condvar();
+    wait_plus_1()->then($cv, sub { $cv->croak(@_) });
+
+    my ($got) = $cv->recv();
+
+So, in the midst of this, I have tried to provide something without event loop by using fork instead as exemplified in the L</SYNOPSIS>
+
+For a framework to do asynchronous tasks, you might also be interested in L<Coro>, from L<Marc A. Lehmann|https://metacpan.org/author/MLEHMANN> original author of L<AnyEvent> event loop.
 
 =head1 METHODS
 
@@ -2233,7 +2337,7 @@ This is typically set by L</resolve> and you should not call this directly, but 
 
 This sets or gets the result returned by the asynchronous process. The data is exchanged through shared memory.
 
-This method is used internally n combination with L</await>, L</all> and L</race>
+This method is used internally in combination with L</await>, L</all> and L</race>
 
 The value returned is always a reference, such as array, hash or scalar reference.
 
@@ -2243,7 +2347,7 @@ Thus, unless the value returned is 1 element and it is a reference, it will be m
 
 =head2 timeout
 
-Sets gets a timeout. This is currently no used. There is no timeout for the asynchronous process.
+Sets gets a timeout. This is currently not used. There is no timeout for the asynchronous process.
 
 If you want to set a timeout, you can use L</wait>, or L</await>
 
@@ -2663,6 +2767,6 @@ L<Mozilla documentation on promises|https://developer.mozilla.org/en-US/docs/Web
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright(c) 2021 DEGUEST Pte. Ltd. DEGUEST Pte. Ltd.
+Copyright(c) 2021-2022 DEGUEST Pte. Ltd. DEGUEST Pte. Ltd.
 
 =cut

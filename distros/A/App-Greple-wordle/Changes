@@ -1,5 +1,20 @@
 Revision history for Perl extension App-Greple-wordle
 
+0.10 2022-03-10T07:47:21Z
+
+    - implement filter command pipeline
+    - show prompt
+
+0.09 2022-03-08T08:38:52Z
+
+    - fixed bugs in 0.08
+      * option --random did not make random answer
+      * wrong cursor movement
+
+0.08 2022-03-08T01:05:18Z
+
+    - use oo interface to keep game status
+
 0.07 2022-03-07T02:34:04Z
 
     - implement original option parser

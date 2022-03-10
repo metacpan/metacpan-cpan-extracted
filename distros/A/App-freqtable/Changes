@@ -1,3 +1,17 @@
+0.005   2022-02-11  Released-By: PERLANCAR; Urgency: high
+
+        - Merge releases 0.004 and 0.004.2.
+
+
+0.004.2 2022-02-10  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+        - [doc] Mention csv-freqtable.
+
+        - UPDATE: rename release from 0.004 to 0.004.2 due to conflict.
+
+
 0.004   2020-10-19  Released-By: PERLANCAR; Urgency: medium
 
 	- [doc] Show how to do the same task using Unix commands uniq &

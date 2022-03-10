@@ -6,7 +6,7 @@ CGI::Ex::Fill - Fast but compliant regex based form filler
 
 =head1 VERSION
 
-version 2.51
+version 2.52
 
 =cut
 
@@ -19,7 +19,7 @@ use strict;
 use warnings;
 use Exporter qw(import);
 
-our $VERSION = '2.51'; # VERSION
+our $VERSION = '2.52'; # VERSION
 our @EXPORT    = qw(form_fill);
 our @EXPORT_OK = qw(fill form_fill html_escape get_tagval_by_key swap_tagval_by_key);
 

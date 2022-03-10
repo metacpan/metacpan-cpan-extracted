@@ -5,7 +5,7 @@ use warnings;
 use YAML::PP;
 use YAML::PP::Dumper;
 use YAML::PP::Common qw/
-    PRESERVE_ORDER PRESERVE_SCALAR_STYLE PRESERVE_FLOW_STYLE PRESERVE_ALIAS
+    :PRESERVE
 /;
 use Encode;
 use Getopt::Long;
@@ -20,7 +20,7 @@ GetOptions(
     'boolean=s' => \my $boolean,
     'merge' => \my $merge,
     'perl' => \my $perl,
-    'preserve=s' => \my $preserve,
+    'preserve|P=s' => \my $preserve,
     'module|M=s' => \my $module,
     'dump-module|D=s' => \my $dump_module,
     'include' => \my $include,
@@ -37,6 +37,9 @@ $footer ||= 0;
 $indent ||= 2;
 $yaml_version ||= 1.2;
 $dump_module ||= $module;
+if ($dump_module eq 'YAML::PP::Ref') {
+    $dump_module = 'YAML::PP';
+}
 my @yaml_versions = split m/,/, $yaml_version;
 my @schema = ('+');
 if ($merge) {
@@ -87,6 +90,7 @@ $yaml = decode_utf8($yaml) if $decode;
 my %load_modules = (
     'YAML::PP' => \&yamlpp,
     'YAML::PP::LibYAML' => \&yamlpplibyaml,
+    'YAML::PP::Ref' => \&yamlppref,
     'YAML::XS' => \&yamlxs,
     'YAML::Tiny' => \&yamltiny,
     'YAML::Syck' => \&yamlsyck,
@@ -148,6 +152,10 @@ sub yamlpp_dump {
 sub yamlpplibyaml {
     eval { require YAML::PP::LibYAML };
     _yamlpp('YAML::PP::LibYAML' => @_);
+}
+sub yamlppref {
+    eval { require YAML::PP::Ref };
+    _yamlpp('YAML::PP::Ref' => @_);
 }
 sub yamlpplibyaml_dump {
     eval { require YAML::PP::LibYAML };
@@ -243,7 +251,7 @@ sub json_xs_dump { require JSON::XS; _json_dump('JSON::XS', @_) }
 sub cpanel_json_xs_dump { require Cpanel::JSON::XS; _json_dump('Cpanel::JSON::XS', @_) }
 sub _json_dump {
     my ($class, $docs) = @_;
-    my $coder = $class->new->ascii->pretty->allow_nonref;
+    my $coder = $class->new->ascii->pretty->allow_nonref->space_before(0);
     $coder = $coder->indent_length($indent) if $coder->can('indent_length');
     $coder = $coder->canonical unless $preserve_order;
     my $out = '';
@@ -275,10 +283,11 @@ Options:
     --merge               Enable loading merge keys '<<'
     --perl                Enable loading perl types and objects (use only
                           on trusted input!)
-    --preserve            Comma separated: 'order', 'scalar', 'flow', 'alias'.
+    --preserve, -P        Comma separated: 'order', 'scalar', 'flow', 'alias'.
+                          Set to 0 to preserve nothing.
                           By default all things are preserved
     --module -M           YAML::PP (default), YAML, YAML::PP::LibYAML,
-                          YAML::Syck, YAML::Tiny, YAML::XS
+                          YAML::Syck, YAML::Tiny, YAML::XS, YAML::PP::Ref
     --dump-module -D      All of the above plus Data::Dumper, JSON::PP,
                           JSON::XS, Cpanel::JSON::XS
     --yaml-version=       '1.2' (default), '1.1', '1.2,1.1', '1.1,1.2'

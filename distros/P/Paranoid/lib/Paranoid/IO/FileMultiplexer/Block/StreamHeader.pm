@@ -1,6 +1,6 @@
 # Paranoid::IO::FileMultiplexer::Block::StreamHeader -- Stream Header Block
 #
-# $Id: lib/Paranoid/IO/FileMultiplexer/Block/StreamHeader.pm, 2.09 2021/12/28 15:46:49 acorliss Exp $
+# $Id: lib/Paranoid/IO/FileMultiplexer/Block/StreamHeader.pm, 2.10 2022/03/08 00:01:04 acorliss Exp $
 #
 # This software is free software.  Similar to Perl, you can redistribute it
 # and/or modify it under the terms of either:
@@ -37,12 +37,13 @@ use strict;
 use warnings;
 use vars qw($VERSION);
 use base qw(Exporter);
-use Paranoid;
+use Paranoid qw(:all);
 use Paranoid::IO qw(:all);
 use Paranoid::Debug qw(:all);
+use Paranoid::Data;
 use Fcntl qw(:DEFAULT :flock :mode :seek);
 
-($VERSION) = ( q$Revision: 2.09 $ =~ /(\d+(?:\.\d+)+)/sm );
+($VERSION) = ( q$Revision: 2.10 $ =~ /(\d+(?:\.\d+)+)/sm );
 
 use base qw(Paranoid::IO::FileMultiplexer::Block);
 
@@ -84,9 +85,7 @@ sub new {
     my $sname = shift;
     my $self;
 
-    pdebug( 'entering w/(%s)(%s)(%s)(%s)',
-        PDLEVEL3, $file, $bnum, $bsize, $sname );
-    pIn();
+    subPreamble( PDLEVEL3, '$$$$', $file, $bnum, $bsize, $sname );
 
     if ( defined $sname and length $sname and length $sname <= 20 ) {
         $self = __PACKAGE__->SUPER::new( $file, $bnum, $bsize );
@@ -101,8 +100,7 @@ sub new {
         $$self{maxBATs} = int( ( $$self{blockSize} - SIG_LEN ) / BAT_LEN );
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL3, $self );
+    subPostamble( PDLEVEL3, '$', $self );
 
     return $self;
 }
@@ -173,15 +171,13 @@ sub writeSig {
     my $sname = $$self{streamName};
     my $eos   = $$self{eos};
     my $rv    = 0;
-    my $sig   = pack SIGNATURE, SIG_TYPE, $sname, $self->splitInt($eos);
+    my $sig   = pack SIGNATURE, SIG_TYPE, $sname, quad2Longs($eos);
 
-    pdebug( 'entering', PDLEVEL3 );
-    pIn();
+    subPreamble(PDLEVEL3);
 
     $rv = $self->bwrite($sig);
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL3, $rv );
+    subPostamble( PDLEVEL3, '$', $rv );
 
     return $rv;
 }
@@ -197,8 +193,7 @@ sub readSig {
     my $rv   = 0;
     my ( $raw, $type, $sname, $eos, $leos, $ueos );
 
-    pdebug( 'entering', PDLEVEL3 );
-    pIn();
+    subPreamble(PDLEVEL3);
 
     if ( pflock( $file, LOCK_SH ) ) {
         if ( $self->bread( \$raw, 0, SIG_LEN ) == SIG_LEN ) {
@@ -222,7 +217,7 @@ sub readSig {
             }
 
             # Make sure eos is legitimate
-            $eos = $self->joinInt( $leos, $ueos );
+            $eos = longs2Quad( $leos, $ueos );
             unless ( defined $eos ) {
                 pdebug( 'this platform does not support 64b values for eos',
                     PDLEVEL1 );
@@ -243,8 +238,7 @@ sub readSig {
         pflock( $file, LOCK_UN );
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL3, $rv );
+    subPostamble( PDLEVEL3, '$', $rv );
 
     return $rv;
 }
@@ -259,11 +253,10 @@ sub writeEOS {
     my $eos  = shift;
     my ( $raw, $rv );
 
-    pdebug( 'entering w/%s', PDLEVEL3, $eos );
-    pIn();
+    subPreamble( PDLEVEL3, '$', $eos );
 
     if ( defined $eos ) {
-        $raw = pack 'NN', $self->splitInt($eos);
+        $raw = pack 'NN', quad2Longs($eos);
         if ( $self->bwrite( $raw, EOS_POS ) == 8 ) {
             $$self{eos} = $eos;
             $rv = 1;
@@ -272,8 +265,7 @@ sub writeEOS {
         pdebug( 'invalid value for eos (%s)', PDLEVEL1, $eos );
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL3, $rv );
+    subPostamble( PDLEVEL3, '$', $rv );
 
     return $rv;
 }
@@ -287,16 +279,14 @@ sub readEOS {
     my $self = shift;
     my ( $rv, $raw );
 
-    pdebug( 'entering', PDLEVEL3 );
-    pIn();
+    subPreamble(PDLEVEL3);
 
     if ( $self->bread( \$raw, EOS_POS, 8 ) == 8 ) {
-        $rv = $self->joinInt( unpack 'NN', $raw );
-        $rv = '0 but true' if defined $rv and $rv == 0;
+        $rv = longs2Quad( unpack 'NN', $raw );
+        $rv = PTRUE_ZERO if defined $rv and $rv == 0;
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL3, $rv );
+    subPostamble( PDLEVEL3, '$', $rv );
 
     return $rv;
 }
@@ -310,13 +300,11 @@ sub validateEOS {
     my $self = shift;
     my $rv   = 0;
 
-    pdebug( 'entering', PDLEVEL3 );
-    pIn();
+    subPreamble(PDLEVEL3);
 
     $rv = 1 if $$self{eos} == $self->readEOS;
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL3, $rv );
+    subPostamble( PDLEVEL3, '$', $rv );
 
     return $rv;
 }
@@ -332,8 +320,7 @@ sub writeBATs {
     my $rv   = 0;
     my ( $rec, $i, $pos );
 
-    pdebug( 'entering', PDLEVEL3 );
-    pIn();
+    subPreamble(PDLEVEL3);
 
     # Hold an exclusive lock for the entire transaction
     if ( pflock( $file, LOCK_EX ) ) {
@@ -343,8 +330,8 @@ sub writeBATs {
         foreach $rec ( @{ $$self{bats} } ) {
             $pos = BATS_POS + $i * BAT_LEN;
             $rv  = 0
-                unless $self->bwrite( pack( BATIDX, $self->splitInt($rec) ),
-                $pos ) == BAT_LEN;
+                unless $self->bwrite( pack( BATIDX, quad2Longs($rec) ), $pos )
+                    == BAT_LEN;
             $i++;
             last unless $rv;
         }
@@ -356,8 +343,7 @@ sub writeBATs {
         PDLEVEL1 )
         unless $rv;
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL3, $rv );
+    subPostamble( PDLEVEL3, '$', $rv );
 
     return $rv;
 }
@@ -373,8 +359,7 @@ sub readBATs {
     my ( $raw, @sraw, $bn, $lbn, $ubn, $prev );
     my @bats;
 
-    pdebug( 'entering', PDLEVEL3 );
-    pIn();
+    subPreamble(PDLEVEL3);
 
     # Read the BATs section of the block
     if ( $self->bread( \$raw, BATS_POS ) ) {
@@ -384,7 +369,7 @@ sub readBATs {
 
             $lbn = shift @sraw;
             $ubn = shift @sraw;
-            $bn  = $self->joinInt( $lbn, $ubn );
+            $bn  = longs2Quad( $lbn, $ubn );
 
             # Stop processing when it looks like we're not getting legitmate
             # values
@@ -412,8 +397,7 @@ sub readBATs {
         $rv = 0;
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL3, $rv );
+    subPostamble( PDLEVEL3, '$', $rv );
 
     return $rv;
 }
@@ -428,8 +412,7 @@ sub addBAT {
     my $bn   = shift;
     my $rv   = 1;
 
-    pdebug( 'entering w/(%s)', PDLEVEL3, $bn );
-    pIn();
+    subPreamble( PDLEVEL3, '$', $bn );
 
     if ( defined $bn and $bn > $$self{blockNum} ) {
 
@@ -450,7 +433,7 @@ sub addBAT {
             push @{ $$self{bats} }, $bn;
             $rv = 0
                 unless $self->bwrite(
-                pack( BATIDX, $self->splitInt($bn) ),
+                pack( BATIDX, quad2Longs($bn) ),
                 BATS_POS + BAT_LEN * $#{ $$self{bats} } ) == BAT_LEN;
         }
 
@@ -459,8 +442,7 @@ sub addBAT {
         $rv = 0;
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL3, $rv );
+    subPostamble( PDLEVEL3, '$', $rv );
 
     return $rv;
 }
@@ -475,7 +457,7 @@ Paranoid::IO::FileMultiplexer::Block::StreamHeader - Stream Header Block
 
 =head1 VERSION
 
-$Id: lib/Paranoid/IO/FileMultiplexer/Block/StreamHeader.pm, 2.09 2021/12/28 15:46:49 acorliss Exp $
+$Id: lib/Paranoid/IO/FileMultiplexer/Block/StreamHeader.pm, 2.10 2022/03/08 00:01:04 acorliss Exp $
 
 =head1 SYNOPSIS
 
@@ -635,6 +617,10 @@ L<Paranoid>
 =item o
 
 L<Paranoid::Debug>
+
+=item o
+
+L<Paranoid::Data>
 
 =item o
 

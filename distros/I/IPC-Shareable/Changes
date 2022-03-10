@@ -1,5 +1,19 @@
 Revision history for Perl extension IPC::Shareable.
 
+1.11    2022-03-07
+    - Fix certain tests so they don't throw if we bail early
+
+1.10    2022-03-07
+    - Fix issue where if segments were created underneath of a parent by an
+      external process other than the process that created the parent, the
+      global register wasn't being updated, therefore those segments weren't
+      being removed when calling clean_up_all()
+    - All test files now check number of segments before and after the entire
+      script has run, verifying that all segments were cleaned up ok
+    - The test suite itself in its entirety makes sure that all segments
+      created during the suite run are cleaned up properly
+    - Added CI_TESTING=1 to coverage CI tests
+
 1.09    2022-03-06
     - Made 81-fork_dup_rand_keys.t developer only (but still need to figure out
       why it only fails on FreeBSD)

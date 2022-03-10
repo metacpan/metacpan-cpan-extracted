@@ -1,5 +1,12 @@
 Revision history for Perl module YAML::PP::Ref
 
+0.02 2022-03-08 19:34:59+01:00
+
+    - Add $VERSION variable
+    - Require YAML::PP 0.027
+    - Make events compatible with YAML::PP
+    - Support receiver coderefs
+
 0.01 2021-12-28 00:56:50+01:00
 
     - First Release

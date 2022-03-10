@@ -1,5 +1,9 @@
 Revision history for Git-Critic
 
+0.6       2022-03-10 17:23:19 CET
+          - Assert minimum version of List::Util as 1.44 to ensure we don't
+            get an older version which does not have `uniq`
+
 0.5       2022-02-10 09:51:01 CET
 
           - Bugfix: initialised `%reported` hash once per file to avoid

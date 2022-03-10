@@ -13,13 +13,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 archive_devel_cover.pl - script to archive Devel::Cover reports
 
 =head1 VERSION
 
-version 1.002
+version 1.004
 
 =head1 SYNOPSIS
 
@@ -53,11 +55,11 @@ The name of the project you're archiving. Currently only used in the generated H
 
 =head1 AUTHOR
 
-Thomas Klausner <domm@cpan.org>
+Thomas Klausner <domm@plix.at>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by Thomas Klausner.
+This software is copyright (c) 2012 - 2022 by Thomas Klausner.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

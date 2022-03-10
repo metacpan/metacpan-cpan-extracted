@@ -38,6 +38,10 @@ sub _fork {
   CORE::fork();
 }
 
+sub _forkable {
+  $Config::Config{d_pseudofork} ? 0 : 1;
+}
+
 sub _kill {
   CORE::kill(@_);
 }
@@ -136,7 +140,7 @@ sub explain {
 sub fork {
   my ($self, $code, @args) = @_;
 
-  if ($Config::Config{d_pseudofork}) {
+  if (not(_forkable())) {
     my $throw;
     my $error = "Can't fork process @{[_pid()]}: Fork emulation not supported";
     $throw = $self->throw;
@@ -442,7 +446,7 @@ I<Since C<0.06>>
 
   $parent = $parent->chdir('/xyz');
 
-  # Exception!
+  # Exception! Venus::Process::Error (isa Venus::Error)
 
 =back
 
@@ -728,6 +732,22 @@ I<Since C<0.06>>
 
 =back
 
+=over 4
+
+=item fork example 4
+
+  # given: synopsis;
+
+  $process = $parent->fork(sub{});
+
+  # simulate fork failure
+
+  # no forking attempted if NOT supported
+
+  # Exception! Venus::Process:Error (isa Venus::Error)
+
+=back
+
 =cut
 
 =head2 forks
@@ -872,6 +892,18 @@ I<Since C<0.06>>
 
 =back
 
+=over 4
+
+=item setsid example 2
+
+  # given: synopsis;
+
+  my $setsid = $parent->setsid;
+
+  # Exception! Venus::Process::Error (isa Venus::Error)
+
+=back
+
 =cut
 
 =head2 stderr
@@ -893,6 +925,18 @@ I<Since C<0.06>>
   $parent = $parent->stderr;
 
   # bless({...}, 'Venus::Process')
+
+=back
+
+=over 4
+
+=item stderr example 2
+
+  # given: synopsis;
+
+  $parent = $parent->stderr('/nowhere');
+
+  # Exception! Venus::Process:Error (isa Venus::Error)
 
 =back
 
@@ -920,6 +964,18 @@ I<Since C<0.06>>
 
 =back
 
+=over 4
+
+=item stdin example 2
+
+  # given: synopsis;
+
+  $parent = $parent->stdin('/nowhere');
+
+  # Exception! Venus::Process::Error (isa Venus::Error)
+
+=back
+
 =cut
 
 =head2 stdout
@@ -941,6 +997,18 @@ I<Since C<0.06>>
   $parent = $parent->stdout;
 
   # bless({...}, 'Venus::Process')
+
+=back
+
+=over 4
+
+=item stdout example 2
+
+  # given: synopsis;
+
+  $parent = $parent->stdout('/nowhere');
+
+  # Exception! Venus::Process::Error (isa Venus::Process)
 
 =back
 

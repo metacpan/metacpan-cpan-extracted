@@ -10,6 +10,7 @@ Makefile.PL
 MANIFEST			This list of files
 README
 t/00-load.t
+t/chmod-filetemp.t
 t/chmod.t
 t/chown-chmod-nostrict.t
 t/chown.t

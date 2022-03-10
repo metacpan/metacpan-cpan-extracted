@@ -416,8 +416,9 @@ sub db_continue_to {
 }
 
 sub db_stepout {
+    my @args = @_;
     push @TEST_QUEUE, sub {
-        __PACKAGE__->stepout;
+        __PACKAGE__->stepout(@args);
         no warnings 'exiting';
         last TEST_QUEUE_LOOP;
     }

@@ -1,12 +1,12 @@
 # Paranoid::Process -- Process management support for paranoid programs
 #
-# $Id: lib/Paranoid/Process.pm, 2.09 2021/12/28 15:46:49 acorliss Exp $
+# $Id: lib/Paranoid/Process.pm, 2.10 2022/03/08 00:01:04 acorliss Exp $
 #
 # This software is free software.  Similar to Perl, you can redistribute it
 # and/or modify it under the terms of either:
 #
 #   a)     the GNU General Public License
-#          <https://www.gnu.org/licenses/gpl-1.0.html> as published by the 
+#          <https://www.gnu.org/licenses/gpl-1.0.html> as published by the
 #          Free Software Foundation <http://www.fsf.org/>; either version 1
 #          <https://www.gnu.org/licenses/gpl-1.0.html>, or any later version
 #          <https://www.gnu.org/licenses/license-list.html#GNUGPL>, or
@@ -42,7 +42,7 @@ use Paranoid::Debug qw(:all);
 use POSIX qw(getuid setuid setgid WNOHANG setsid);
 use Carp;
 
-($VERSION) = ( q$Revision: 2.09 $ =~ /(\d+(?:\.\d+)+)/sm );
+($VERSION) = ( q$Revision: 2.10 $ =~ /(\d+(?:\.\d+)+)/sm );
 
 @EXPORT    = qw(switchUser daemonize);
 @EXPORT_OK = (
@@ -97,15 +97,13 @@ use Carp;
 
         my $sig;
 
-        pdebug( 'entering', PDLEVEL1 );
-        pIn();
+        subPreamble(PDLEVEL1);
 
         foreach $sig ( keys %signals ) {
             $SIG{$sig} = \&_sigHandler if scalar @{ $signals{$sig} };
         }
 
-        pOut();
-        pdebug( 'leaving w/rv: 1', PDLEVEL1 );
+        subPostamble( PDLEVEL1, '$', 1 );
 
         return 1;
     }
@@ -116,8 +114,7 @@ use Carp;
         # Returns:  Boolean
         # Usage:    $rv = uninstallSIGD();
 
-        pdebug( 'entering', PDLEVEL1 );
-        pIn();
+        subPreamble(PDLEVEL1);
 
         foreach ( keys %original ) {
             $SIG{$_} = $original{$_}
@@ -125,8 +122,7 @@ use Carp;
                     and $SIG{$_} eq \&_sigHandler;
         }
 
-        pOut();
-        pdebug( 'leaving w/rv: 1', PDLEVEL1 );
+        subPostamble( PDLEVEL1, '$', 1 );
 
         return 1;
     }
@@ -140,8 +136,7 @@ use Carp;
         my ( $signal, $sref ) = @_;
         my $rv = 1;
 
-        pdebug( 'entering w/%s, %s', PDLEVEL1, $signal, $sref );
-        pIn();
+        subPreamble( PDLEVEL1, '$\&', $signal, $sref );
 
         if ( exists $signals{$signal} ) {
             if ( grep { $_ eq $sref } @{ $signals{$signal} } ) {
@@ -155,8 +150,7 @@ use Carp;
             $rv = 0;
         }
 
-        pOut();
-        pdebug( 'leaving w/rv: %s', PDLEVEL1, $rv );
+        subPostamble( PDLEVEL1, '$', $rv );
 
         return $rv;
     }
@@ -171,8 +165,7 @@ use Carp;
         my $rv = 1;
         my ( $sigh, $i );
 
-        pdebug( 'entering w/%s, %s', PDLEVEL1, $signal, $sref );
-        pIn();
+        subPreamble( PDLEVEL1, '$\&', $signal, $sref );
 
         if ( exists $signals{$signal} ) {
             if ( grep { $_ eq $sref } @{ $signals{$signal} } ) {
@@ -193,8 +186,7 @@ use Carp;
             $rv = 0;
         }
 
-        pOut();
-        pdebug( 'leaving w/rv: %s', PDLEVEL1, $rv );
+        subPostamble( PDLEVEL1, '$', $rv );
 
         return $rv;
     }
@@ -288,8 +280,7 @@ sub daemonize {
 
     my ( $rv, $pid );
 
-    pdebug( 'entering', PDLEVEL1 );
-    pIn();
+    subPreamble(PDLEVEL1);
 
     $pid = fork;
 
@@ -305,7 +296,7 @@ sub daemonize {
         unless ($rv) {
             setsid();
             $rv = open STDERR, '>&STDOUT';
-            die "Can't dup stdout: $!" unless $rv;
+            croak "Can't dup stdout: $!" unless $rv;
             chdir '/';
         }
 
@@ -315,8 +306,7 @@ sub daemonize {
         $rv = 0;
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL1, $rv );
+    subPostamble( PDLEVEL1, '$', $rv );
 
     return $rv;
 }
@@ -332,8 +322,7 @@ sub pfork {
     my $max = MAXCHILDREN();
     my $rv;
 
-    pdebug( 'entering', PDLEVEL1 );
-    pIn();
+    subPreamble(PDLEVEL1);
 
     # Check children limits and wait, if necessary
     if ($max) {
@@ -351,8 +340,7 @@ sub pfork {
         }
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL1, $rv );
+    subPostamble( PDLEVEL1, '$', $rv );
 
     return $rv;
 }
@@ -368,8 +356,7 @@ sub pcommFork (\$\$) {
     my ( $procr, $procw ) = @_;
     my ( $tp, $fp, $tc, $fc, $sfd, $rv );
 
-    pdebug( 'entering', PDLEVEL1 );
-    pIn();
+    subPreamble( PDLEVEL1, '\*\*', $procr, $procw );
 
     if ( pipe( $fc, $tp ) and pipe( $fp, $tc ) ) {
         $sfd = select $tc;
@@ -403,8 +390,7 @@ sub pcommFork (\$\$) {
         pdebug( 'failed to create pipes: %s', PDLEVEL1, $! );
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL1, $rv );
+    subPostamble( PDLEVEL1, '$', $rv );
 
     return $rv;
 }
@@ -418,8 +404,7 @@ sub ptranslateUser {
     my $user = shift;
     my ( $uuid, @pwentry, $rv );
 
-    pdebug( 'entering w/(%s)', PDLEVEL1, $user );
-    pIn();
+    subPreamble( PDLEVEL1, '$', $user );
 
     if ( defined $user and length $user ) {
 
@@ -432,8 +417,7 @@ sub ptranslateUser {
         $rv = $uuid if defined $uuid;
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL1, $rv );
+    subPostamble( PDLEVEL1, '$', $rv );
 
     return $rv;
 }
@@ -447,8 +431,7 @@ sub ptranslateGroup {
     my $group = shift;
     my ( $ugid, @pwentry, $rv );
 
-    pdebug( 'entering w/(%s)', PDLEVEL1, $group );
-    pIn();
+    subPreamble( PDLEVEL1, '$', $group );
 
     if ( defined $group and length $group ) {
 
@@ -461,8 +444,7 @@ sub ptranslateGroup {
         $rv = $ugid if defined $ugid;
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL1, $rv );
+    subPostamble( PDLEVEL1, '$', $rv );
 
     return $rv;
 }
@@ -479,12 +461,11 @@ sub switchUser {
     my $rv    = 1;
     my ( @pwentry, $duid, $dgid );
 
+    subPreamble( PDLEVEL1, '$;$', $user, $group );
+
     # Validate arguments
     croak 'Mandatory argument of either user or group must be passed'
         unless defined $user || defined $group;
-
-    pdebug( 'entering w/(%s)(%s)', PDLEVEL1, $user, $group );
-    pIn();
 
     # First switch the group
     if ( defined $group ) {
@@ -535,8 +516,7 @@ sub switchUser {
         }
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL1, $rv );
+    subPostamble( PDLEVEL1, '$', $rv );
 
     return $rv;
 }
@@ -554,6 +534,7 @@ sub pcapture ($\$\$) {
     my $rv   = -1;
     my ( $sigchld, $cored, $signal );
 
+    subPreamble( PDLEVEL1, '$\$\$', $cmd, $cref, $oref );
     pdebug( 'entering w/(%s)(%s)(%s)', PDLEVEL1, $cmd, $cref, $oref );
     pIn();
 
@@ -603,8 +584,7 @@ sub pcapture ($\$\$) {
             pdebug( 'command exited with rv: %s', PDLEVEL1, $$cref );
         }
 
-        pOut();
-        pdebug( 'leaving w/rv: %s', PDLEVEL1, $rv );
+        subPostamble( PDLEVEL1, '$', $rv );
 
         return $rv;
     }
@@ -620,7 +600,7 @@ Paranoid::Process - Process Management Functions
 
 =head1 VERSION
 
-$Id: lib/Paranoid/Process.pm, 2.09 2021/12/28 15:46:49 acorliss Exp $
+$Id: lib/Paranoid/Process.pm, 2.10 2022/03/08 00:01:04 acorliss Exp $
 
 =head1 SYNOPSIS
 
@@ -818,6 +798,10 @@ This installs another subroutine in the queue for the specified signal.
 Subroutines are called in the order that they're added to the queue.  Adding
 a specific subroutine more than once is filtered out so each subroutine in the
 queue is unique.
+
+B<NOTE:> Installing handlers for various signals just populates a signal queue
+with code references.  In order for the queue to actuall act upon a signal,
+however, one must always install the signal dispatcher via B<installSIGD>.
 
 =head2 uninstallSIGH
 

@@ -4,9 +4,12 @@ author:
   - 'Jacques Deguest <jack@deguest.jp>'
 build_requires:
   ExtUtils::MakeMaker: '0'
-  File::Find: '0'
+  Nice::Try: v1.1.2
+  Test2::IPC: '1.302190'
+  Test2::V0: '0.000145'
   Test::More: '1.302162'
   Test::Pod: '1.52'
+  Time::HiRes: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -21,7 +24,8 @@ no_index:
     - t
     - inc
 requires:
-  Module::Generic: v0.21.7
+  Module::Generic: v0.21.9
+  Promise::Me: v0.1.2
   parent: '0'
   perl: '5.026001'
   strict: '0'
@@ -30,5 +34,5 @@ requires:
 resources:
   bugtracker: https://git.deguest.jp/jack/Class-Generic/issues
   repository: https://git.deguest.jp/jack/Class-Generic
-version: v0.1.0
+version: v0.1.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

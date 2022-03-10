@@ -9,6 +9,11 @@ BEGIN {
     use_ok( 'Async::Event::Interval' ) || print "Bail out!\n";
 }
 
+if (! $ENV{CI_TESTING}) {
+    done_testing();
+    exit;
+}
+
 tie my %store, 'IPC::Shareable', {key => 'async_tests', destroy => 1};
 
 my $start_segs = $store{segs};

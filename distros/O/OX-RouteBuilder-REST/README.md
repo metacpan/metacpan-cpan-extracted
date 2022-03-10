@@ -4,7 +4,7 @@ OX::RouteBuilder::REST - OX::RouteBuilder which routes to an action method in a 
 
 # VERSION
 
-version 0.004
+version 0.005
 
 # SYNOPSIS
 
@@ -68,8 +68,8 @@ defaults for the route, as well as `name` (which will be set to
 `"REST.$controller.$action"`).
 
 To generate a link to an action, use `uri_for` with either the name
-(eg `"REST.$controller.$action"`), or by passing a HashRef `{
-    controller =` $controller, action => $action }>. See `t/test.t`
+(eg `"REST.$controller.$action"`), or by passing a HashRef `<{
+    controller =` $controller, action => $action }>>. See `t/test.t`
     for some examples.
 
 # AUTHORS

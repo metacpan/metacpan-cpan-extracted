@@ -29,14 +29,14 @@ my %WriteMakefileArgs = (
     "List::MoreUtils" => 0,
     "Test2::Bundle::Extended" => 0,
     "Test2::Plugin::NoWarnings" => 0,
-    "Test2::Suite" => 0,
+    "Test2::Suite" => "0.000071",
     "Test2::Tools::Explain" => 0,
     "Test::Builder" => 0,
     "Test::CPAN::Meta" => 0,
     "Test::MockModule" => "0.175",
     "Test::More" => 0
   },
-  "VERSION" => "0.47",
+  "VERSION" => "0.49",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -54,7 +54,7 @@ my %FallbackPrereqs = (
   "Net::CIDR" => 0,
   "Test2::Bundle::Extended" => 0,
   "Test2::Plugin::NoWarnings" => 0,
-  "Test2::Suite" => 0,
+  "Test2::Suite" => "0.000071",
   "Test2::Tools::Explain" => 0,
   "Test::Builder" => 0,
   "Test::CPAN::Meta" => 0,

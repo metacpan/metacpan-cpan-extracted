@@ -1,5 +1,5 @@
 package Koha::Contrib::Tamil::Claimer;
-$Koha::Contrib::Tamil::Claimer::VERSION = '0.066';
+$Koha::Contrib::Tamil::Claimer::VERSION = '0.067';
 # ABSTRACT: Claim overdues
 use Moose;
 
@@ -230,7 +230,7 @@ Koha::Contrib::Tamil::Claimer - Claim overdues
 
 =head1 VERSION
 
-version 0.066
+version 0.067
 
 =head1 AUTHOR
 
@@ -238,7 +238,7 @@ Frédéric Demians <f.demians@tamil.fr>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2021 by Fréderic Démians.
+This software is Copyright (c) 2022 by Fréderic Démians.
 
 This is free software, licensed under:
 

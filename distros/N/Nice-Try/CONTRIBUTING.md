@@ -11,7 +11,7 @@ All contributions are assumed to be provided under the terms of [perl5 license](
 
 ### Issues
 
-File [an issue on CPAN bug tracker](https://git.deguest.jp/jack/Nice-Try/issues) if you think you've found a bug. Please describe
+File [an issue on bug tracker](https://git.deguest.jp/jack/Nice-Try/issues) if you think you've found a bug. Please describe
 
 1. How can it be reproduced
 
@@ -43,7 +43,7 @@ Issues are currently reported using CPAN [bug tracker](https://git.deguest.jp/ja
 
 ## More information
 
-Please refer to the [README](https://metacpan.org/source/JDEGUEST/Nice-Try-v1.1.1/README.md)
+Please refer to the [README](https://metacpan.org/source/JDEGUEST/Nice-Try-v1.1.3/README.md)
 
 ## Author
 

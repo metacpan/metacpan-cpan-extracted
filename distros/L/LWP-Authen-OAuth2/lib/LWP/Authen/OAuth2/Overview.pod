@@ -13,7 +13,7 @@ LWP::Authen::OAuth2::Overview - Overview of accessing OAuth2 APIs with LWP::Auth
 
 =head1 VERSION
 
-version 0.18
+version 0.19
 
 =head1 NAME
 
@@ -661,7 +661,7 @@ Thomas Klausner <domm@plix.at>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 - 2021 by Ben Tilly, Rent.com, Thomas Klausner.
+This software is copyright (c) 2013 - 2022 by Ben Tilly, Rent.com, Thomas Klausner.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

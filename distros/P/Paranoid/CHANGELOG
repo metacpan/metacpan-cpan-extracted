@@ -1,5 +1,18 @@
 CHANGELOG
 
+v2.10 (2022/??/??)
+==================
+--Added subPre/Postamble convenience functions to Paranoid::Debug, 
+  along with argument summarization
+--Changed pdebug output to make it easier to match entrance/exit 
+  points in subroutine messages
+--Added file import/export functionality to Paranoid::Data::AVLTree
+--Added basic internal profiling support to Paranoid::Data::AVLTree
+--Modified default PATH for pSecureEnv to include sbin directories
+--Added quad/long conversion functions to Paranoid::Data, along with 
+  a boolean function to detect native quad support
+--Various documentation fixes/enhancements
+
 v2.09 (2021/12/28)
 ==================
 --Added new export options for Paranoid::IO

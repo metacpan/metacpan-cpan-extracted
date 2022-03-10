@@ -97,7 +97,7 @@ sub database_setting {
             );
             return;
         }
-        push @groups, [ 'reset_databases', "  Reset DB" ] if ! defined $db;
+        push @groups, [ 'reset_db_dummy_str', "  Reset DB" ] if ! defined $db;
         my $prompt = defined $db ? 'DB: ' . $db . '' : '' . $plugin . '';
         my $db_opt_get = App::DBBrowser::Opt::DBGet->new( $sf->{i}, $sf->{o} );
         my $db_opt = $db_opt_get->read_db_config_files();
@@ -129,7 +129,7 @@ sub database_setting {
                 $old_idx_group = $idx_group;
             }
             my $group  = $groups[$idx_group-@pre][0];
-            if ( $group eq 'reset_databases' ) {
+            if ( $group eq 'reset_db_dummy_str' ) {
                 my $tu = Term::Choose::Util->new( $sf->{i}{tcu_default} );
                 my @databases;
                 for my $section ( keys %$db_opt ) {

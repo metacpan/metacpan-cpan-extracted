@@ -1,5 +1,18 @@
 Revision history for Object-Pad
 
+0.63    2022-03-07
+        [CHANGES]
+         * Deleted long-deprecated Object::Pad->begin_class
+         * No longer declare the entire module as "experimental"
+         * Add experimental warnings to still-experimental features; recognise
+           `:experimental` import tags to silence them
+
+        [BUGFIXES]
+         * Ensure that generated accessors work correctly regardless of the
+           prevailing package when they were generated (RT141599)
+         * Ensure that classes and accessors can be generated entirely outside
+           of a BEGIN block (RT141677)
+
 0.62    2022-03-01
         [CHANGES]
          * Add "common" methods:

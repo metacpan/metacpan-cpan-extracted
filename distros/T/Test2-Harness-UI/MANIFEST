@@ -19,6 +19,7 @@ lib/App/Yath/Tester/UI.pm
 lib/Test2/Harness/Renderer/UI.pm
 lib/Test2/Harness/Renderer/UIDB.pm
 lib/Test2/Harness/UI.pm
+lib/Test2/Harness/UI/BackFill.pm
 lib/Test2/Harness/UI/CPANImporter.pm
 lib/Test2/Harness/UI/Config.pm
 lib/Test2/Harness/UI/Controller.pm
@@ -59,6 +60,7 @@ lib/Test2/Harness/UI/Schema/MySQL/LogFile.pm
 lib/Test2/Harness/UI/Schema/MySQL/Permission.pm
 lib/Test2/Harness/UI/Schema/MySQL/PrimaryEmail.pm
 lib/Test2/Harness/UI/Schema/MySQL/Project.pm
+lib/Test2/Harness/UI/Schema/MySQL/Reporting.pm
 lib/Test2/Harness/UI/Schema/MySQL/Run.pm
 lib/Test2/Harness/UI/Schema/MySQL/RunField.pm
 lib/Test2/Harness/UI/Schema/MySQL/Session.pm
@@ -80,6 +82,7 @@ lib/Test2/Harness/UI/Schema/MySQL56/LogFile.pm
 lib/Test2/Harness/UI/Schema/MySQL56/Permission.pm
 lib/Test2/Harness/UI/Schema/MySQL56/PrimaryEmail.pm
 lib/Test2/Harness/UI/Schema/MySQL56/Project.pm
+lib/Test2/Harness/UI/Schema/MySQL56/Reporting.pm
 lib/Test2/Harness/UI/Schema/MySQL56/Run.pm
 lib/Test2/Harness/UI/Schema/MySQL56/RunField.pm
 lib/Test2/Harness/UI/Schema/MySQL56/Session.pm
@@ -100,6 +103,7 @@ lib/Test2/Harness/UI/Schema/Overlay/LogFile.pm
 lib/Test2/Harness/UI/Schema/Overlay/Permission.pm
 lib/Test2/Harness/UI/Schema/Overlay/PrimaryEmail.pm
 lib/Test2/Harness/UI/Schema/Overlay/Project.pm
+lib/Test2/Harness/UI/Schema/Overlay/Reporting.pm
 lib/Test2/Harness/UI/Schema/Overlay/Run.pm
 lib/Test2/Harness/UI/Schema/Overlay/RunField.pm
 lib/Test2/Harness/UI/Schema/Overlay/Session.pm
@@ -121,6 +125,7 @@ lib/Test2/Harness/UI/Schema/PostgreSQL/LogFile.pm
 lib/Test2/Harness/UI/Schema/PostgreSQL/Permission.pm
 lib/Test2/Harness/UI/Schema/PostgreSQL/PrimaryEmail.pm
 lib/Test2/Harness/UI/Schema/PostgreSQL/Project.pm
+lib/Test2/Harness/UI/Schema/PostgreSQL/Reporting.pm
 lib/Test2/Harness/UI/Schema/PostgreSQL/Run.pm
 lib/Test2/Harness/UI/Schema/PostgreSQL/RunField.pm
 lib/Test2/Harness/UI/Schema/PostgreSQL/Session.pm
@@ -141,6 +146,7 @@ lib/Test2/Harness/UI/Schema/Result/LogFile.pm
 lib/Test2/Harness/UI/Schema/Result/Permission.pm
 lib/Test2/Harness/UI/Schema/Result/PrimaryEmail.pm
 lib/Test2/Harness/UI/Schema/Result/Project.pm
+lib/Test2/Harness/UI/Schema/Result/Reporting.pm
 lib/Test2/Harness/UI/Schema/Result/Run.pm
 lib/Test2/Harness/UI/Schema/Result/RunField.pm
 lib/Test2/Harness/UI/Schema/Result/Session.pm
@@ -155,6 +161,7 @@ lib/Test2/Harness/UI/Util.pm
 lib/Test2/Harness/UI/Util/Errors.pm
 lib/Test2/Harness/UI/Util/HashBase.pm
 lib/Test2/Harness/UI/Util/ImportModes.pm
+scripts/yath-ui-backfill.pl
 scripts/yath-ui-importer.pl
 scripts/yath-ui-sweeper.pl
 share/css/dashboard.css

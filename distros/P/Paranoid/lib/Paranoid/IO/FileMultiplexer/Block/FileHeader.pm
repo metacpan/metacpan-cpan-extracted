@@ -1,6 +1,6 @@
 # Paranoid::IO::FileMultiplexer::Block::FileHeader -- File Header Block
 #
-# $Id: lib/Paranoid/IO/FileMultiplexer/Block/FileHeader.pm, 2.09 2021/12/28 15:46:49 acorliss Exp $
+# $Id: lib/Paranoid/IO/FileMultiplexer/Block/FileHeader.pm, 2.10 2022/03/08 00:01:04 acorliss Exp $
 #
 # This software is free software.  Similar to Perl, you can redistribute it
 # and/or modify it under the terms of either:
@@ -37,15 +37,16 @@ use strict;
 use warnings;
 use vars qw($VERSION);
 use base qw(Exporter);
-use Paranoid;
+use Paranoid qw(:all);
 use Paranoid::IO qw(:all);
 use Paranoid::Debug qw(:all);
+use Paranoid::Data;
 use Fcntl qw(:DEFAULT :flock :mode :seek);
 use Paranoid::IO::FileMultiplexer::Block;
 use Paranoid::IO::FileMultiplexer::Block::StreamHeader;
 use Paranoid::IO::FileMultiplexer::Block::BATHeader;
 
-($VERSION) = ( q$Revision: 2.09 $ =~ /(\d+(?:\.\d+)+)/sm );
+($VERSION) = ( q$Revision: 2.10 $ =~ /(\d+(?:\.\d+)+)/sm );
 
 use base qw(Paranoid::IO::FileMultiplexer::Block);
 
@@ -87,8 +88,7 @@ sub new {
     my $bsize = shift;
     my $self;
 
-    pdebug( 'entering w/(%s)(%s)', PDLEVEL3, $file, $bsize );
-    pIn();
+    subPreamble( PDLEVEL3, '$$', $file, $bsize );
 
     $self = __PACKAGE__->SUPER::new( $file, 0, $bsize );
 
@@ -100,8 +100,7 @@ sub new {
         $$self{maxStreams} = int( ( $bsize - SIG_LEN ) / STRM_LEN );
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL3, $self );
+    subPostamble( PDLEVEL3, '$', $self );
 
     return $self;
 }
@@ -234,8 +233,8 @@ sub writeSig {
     my $ver  = $$self{version};
     my $rv   = 0;
     my $sig  = pack SIGNATURE, SIG_TYPE, PIOFMVER,
-        $self->splitInt( $$self{blockSize} ),
-        $self->splitInt( $$self{blocks} );
+        quad2Longs( $$self{blockSize} ),
+        quad2Longs( $$self{blocks} );
 
     pdebug( 'entering', PDLEVEL3 );
     pIn();
@@ -260,8 +259,7 @@ sub readSig {
     my ( $raw, $type, $ver, $bs, $bc, $tblock );
     my ( $lbs, $ubs, $lbc, $ubc );
 
-    pdebug( 'entering', PDLEVEL3 );
-    pIn();
+    subPreamble(PDLEVEL3);
 
     if ( pflock( $file, LOCK_SH ) ) {
         if ( $self->bread( \$raw, 0, SIG_LEN ) == SIG_LEN ) {
@@ -285,7 +283,7 @@ sub readSig {
             }
 
             # Make sure block size is legitimate
-            $bs = $self->joinInt( $lbs, $ubs );
+            $bs = longs2Quad( $lbs, $ubs );
             if ( defined $bs ) {
                 $tblock = __PACKAGE__->new( $file, $bs );
                 unless ( defined $tblock ) {
@@ -302,7 +300,7 @@ sub readSig {
             }
 
             # Validate end of file matches block count
-            $bc = $self->joinInt( $lbc, $ubc );
+            $bc = longs2Quad( $lbc, $ubc );
             if ( defined $bc ) {
                 pseek( $file, 0, SEEK_END );
                 unless ( ptell($file) == $bc * $bs ) {
@@ -337,8 +335,7 @@ sub readSig {
         pflock( $file, LOCK_UN );
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL3, $rv );
+    subPostamble( PDLEVEL3, '$', $rv );
 
     return $rv;
 }
@@ -353,11 +350,10 @@ sub writeBlocks {
     my $bcount = shift;
     my ( $raw, $rv );
 
-    pdebug( 'entering w/%s', PDLEVEL3, $bcount );
-    pIn();
+    subPreamble( PDLEVEL3, '$', $bcount );
 
     if ( defined $bcount and $bcount > 0 ) {
-        $raw = pack 'NN', $self->splitInt($bcount);
+        $raw = pack 'NN', quad2Longs($bcount);
         if ( $self->bwrite( $raw, BLOCKC_POS ) == 8 ) {
             $$self{blocks} = $bcount;
             $rv = 1;
@@ -366,8 +362,7 @@ sub writeBlocks {
         pdebug( 'invalid value for blocks (%s)', PDLEVEL1, $bcount );
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL3, $rv );
+    subPostamble( PDLEVEL3, '$', $rv );
 
     return $rv;
 }
@@ -381,16 +376,14 @@ sub readBlocks {
     my $self = shift;
     my ( $rv, $raw );
 
-    pdebug( 'entering', PDLEVEL3 );
-    pIn();
+    subPreamble(PDLEVEL3);
 
     if ( $self->bread( \$raw, BLOCKC_POS, 8 ) == 8 ) {
-        $rv = $self->joinInt( unpack 'NN', $raw );
-        $rv = '0 but true' if defined $rv and $rv == 0;
+        $rv = longs2Quad( unpack 'NN', $raw );
+        $rv = PTRUE_ZERO if defined $rv and $rv == 0;
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL3, $rv );
+    subPostamble( PDLEVEL3, '$', $rv );
 
     return $rv;
 }
@@ -415,13 +408,11 @@ sub validateBlocks {
     my $self = shift;
     my $rv   = 0;
 
-    pdebug( 'entering', PDLEVEL3 );
-    pIn();
+    subPreamble(PDLEVEL3);
 
     $rv = 1 if $$self{blocks} == $self->readBlocks;
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL3, $rv );
+    subPostamble( PDLEVEL3, '$', $rv );
 
     return $rv;
 }
@@ -437,15 +428,14 @@ sub writeStreams {
     my $rv   = 0;
     my ( $rec, $i, $pos );
 
-    pdebug( 'entering', PDLEVEL3 );
-    pIn();
+    subPreamble(PDLEVEL3);
 
     # Hold an exclusive lock for the entire transaction
     if ( pflock( $file, LOCK_EX ) ) {
         $rv = 1;
         $i  = 0;
         foreach $rec ( @{ $$self{streams} } ) {
-            @$rec = ( $$rec[0], $self->splitInt( $$rec[1] ) );
+            @$rec = ( $$rec[0], quad2Longs( $$rec[1] ) );
             $pos  = STREAMS_POS + $i * STRM_LEN;
             $rv   = 0
                 unless $self->bwrite( pack( STRMIDX, @$rec ), $pos ) ==
@@ -461,8 +451,7 @@ sub writeStreams {
         PDLEVEL1 )
         unless $rv;
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL3, $rv );
+    subPostamble( PDLEVEL3, '$', $rv );
 
     return $rv;
 }
@@ -478,8 +467,7 @@ sub readStreams {
     my ( $raw, $sname, $bn, @sraw, $prev );
     my ( %sidx, @streams, %model, $maxstreams );
 
-    pdebug( 'entering', PDLEVEL3 );
-    pIn();
+    subPreamble(PDLEVEL3);
 
     # Read the streams section of the block
     if ( $self->bread( \$raw, STREAMS_POS ) ) {
@@ -491,7 +479,7 @@ sub readStreams {
         @sraw = unpack '(' . STRMIDX . ")$maxstreams", $raw;
         while (@sraw) {
             $sname = shift @sraw;
-            $bn = $self->joinInt( shift @sraw, shift @sraw );
+            $bn = longs2Quad( shift @sraw, shift @sraw );
 
             # Stop processing when it looks like we're not getting legitmate
             # values
@@ -529,8 +517,7 @@ sub readStreams {
         $rv = 0;
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL3, $rv );
+    subPostamble( PDLEVEL3, '$', $rv );
 
     return $rv;
 }
@@ -547,8 +534,7 @@ sub addStream {
     my %sidx  = %{ $$self{streamidx} };
     my $rv    = 1;
 
-    pdebug( 'entering w/(%s)(%s)', PDLEVEL3, $sname, $bn );
-    pIn();
+    subPreamble( PDLEVEL3, '$$', $sname, $bn );
 
     if ( defined $sname and length $sname ) {
         if ( exists $sidx{$sname} ) {
@@ -571,8 +557,7 @@ sub addStream {
             ${ $$self{streamidx} }{$sname} = $#{ $$self{streams} };
             $rv = 0
                 unless $self->bwrite( pack( STRMIDX, $sname, $bn ),
-                STREAMS_POS + STRM_LEN * $#{ $$self{streams} } ) ==
-                STRM_LEN;
+                STREAMS_POS + STRM_LEN * $#{ $$self{streams} } ) == STRM_LEN;
         }
 
     } else {
@@ -580,8 +565,7 @@ sub addStream {
         $rv = 0;
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL3, $rv );
+    subPostamble( PDLEVEL3, '$', $rv );
 
     return $rv;
 }
@@ -596,7 +580,7 @@ Paranoid::IO::FileMultiplexer::Block::FileHeader - File Header Block
 
 =head1 VERSION
 
-$Id: lib/Paranoid/IO/FileMultiplexer/Block/FileHeader.pm, 2.09 2021/12/28 15:46:49 acorliss Exp $
+$Id: lib/Paranoid/IO/FileMultiplexer/Block/FileHeader.pm, 2.10 2022/03/08 00:01:04 acorliss Exp $
 
 =head1 SYNOPSIS
 
@@ -691,6 +675,8 @@ follows:
     maxFileSize     Maximum file size supported with Perl
     maxFSHuman      Maximum file size expressed w/unit suffixes
     maxStreams      Maximum number of streams that can be allocated
+    maxStreamSize   Maximum stream size
+    maxSSHuman      Maximum stream size expressed w/unit suffixes
 
 =head2 writeSig
 
@@ -780,6 +766,10 @@ L<Paranoid>
 =item o
 
 L<Paranoid::Debug>
+
+=item o
+
+L<Paranoid::Data>
 
 =item o
 

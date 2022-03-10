@@ -86,7 +86,7 @@ OPENADDR: {
 				$location = $geo_coder->geocode(location => 'Edmonton, Alberta, Canada');
 				ok(defined($location));
 				cmp_deeply($location,
-					methods('lat' => num(53.57, 1e-2), 'long' => num(-113.51, 1e-2)));
+					methods('lat' => num(53.5, 1e-1), 'long' => num(-113.4, 1e-1)));
 
 				$location = $geo_coder->geocode('London, England');
 				TODO: {
@@ -162,11 +162,11 @@ OPENADDR: {
 
 				$location = $geo_coder->geocode({ location => 'St. Louis, Missouri, USA' });
 				cmp_deeply($location,
-					methods('lat' => num(38.63, 1e-2), 'long' => num(-90.25, 1e-2)));
+					methods('lat' => num(38.63, 1e-2), 'long' => num(-90.20, 1e-1)));
 
 				$location = $geo_coder->geocode({ location => 'St Louis, Missouri, USA' });
 				cmp_deeply($location,
-					methods('lat' => num(38.63, 1e-2), 'long' => num(-90.25, 1e-2)));
+					methods('lat' => num(38.63, 1e-2), 'long' => num(-90.20, 1e-1)));
 
 				$location = $geo_coder->geocode({ location => 'Saint Louis, Missouri, USA' });
 				cmp_deeply($location,
@@ -179,7 +179,7 @@ OPENADDR: {
 				$location = $geo_coder->geocode(location => 'Caboolture, Queensland, Australia');
 				ok(defined($location));
 				cmp_deeply($location,
-					methods('lat' => num(-27.06, 1e-2), 'long' => num(152.97, 1e-2)));
+					methods('lat' => num(-27.0, 1e-1), 'long' => num(152.9, 1e-1)));
 
 				$location = $geo_coder->geocode(location => 'Whitley, Indiana, USA');
 				ok(defined($location));

@@ -10,6 +10,8 @@ BEGIN {
     }
 }
 
+warn "Segs Before: " . IPC::Shareable::ipcs() . "\n" if $ENV{PRINT_SEGS};
+
 tie my $sv, 'IPC::Shareable', {destroy => 1};
 
 $sv = 'foo';
@@ -29,5 +31,8 @@ for my $mod (qw/HASH SCALAR ARRAY/){
     $sv = $mod.'foo';
     is $sv, $mod.'foo', "SCALAR regression store/fetch ok";
 }
+
+IPC::Shareable::_end;
+warn "Segs After: " . IPC::Shareable::ipcs() . "\n" if $ENV{PRINT_SEGS};
 
 done_testing();

@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021-2022 -- leonerd@leonerd.org.uk
 
-package Object::Pad::MOP::FieldAttr 0.62;
+package Object::Pad::MOP::FieldAttr 0.63;
 
 use v5.14;
 use warnings;
@@ -24,6 +24,11 @@ extra metadata onto fields, that can be queried by other code.
 
 Primilarily this is done by using the L<Object::Pad::MOP::Field/get_attribute_value>
 accessor method on a field metadata instance.
+
+This API should be considered B<experimental>, and will emit warnings to that
+effect. They can be silenced with
+
+   use Object::Pad qw( :experimental(custom_field_attr) );
 
 =cut
 

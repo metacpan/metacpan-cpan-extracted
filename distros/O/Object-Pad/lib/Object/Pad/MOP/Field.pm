@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2020-2022 -- leonerd@leonerd.org.uk
 
-package Object::Pad::MOP::Field 0.62;
+package Object::Pad::MOP::Field 0.63;
 
 use v5.14;
 use warnings;
@@ -22,8 +22,10 @@ L<Object::Pad>. Accessors provide information about the field. The special
 C<value> method allows access to the value of the given field on instances of
 its class, letting the meta-object be used as a proxy to it.
 
-This API should be considered experimental even within the overall context in
-which C<Object::Pad> is expermental.
+This API should be considered B<experimental>, and will emit warnings to that
+effect. They can be silenced with
+
+   use Object::Pad qw( :experimental(mop) );
 
 =cut
 

@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20220305001843;
+our $VERSION = 1.20220307120120;
 
 my $formatters = [
                 {
@@ -46,45 +46,45 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"371651", "Aizkraukle",
-"371633", "Kuldiga",
-"371641", "Cēsis",
-"371684", "Liepāja",
-"371654", "Daugavpils",
-"371650", "Ogre",
-"371644", "Gulbene",
-"371640", "Limbaži",
-"371649", "Aizkraukle",
-"371659", "Cēsis",
-"371642", "Valmiera",
-"371652", "Jēkabpils",
-"371682", "Valmiera",
-"371648", "Madona",
-"371658", "Daugavpils",
-"371686", "Jelgava",
-"371655", "Ogre",
-"371656", "Krāslava",
-"37169", "Riga",
-"371637", "Dobele",
-"371646", "Rēzekne",
+$areanames{en} = {"371654", "Daugavpils",
 "371645", "Balvi",
-"37162", "Valmiera",
-"37167", "Riga",
+"371651", "Aizkraukle",
+"371650", "Ogre",
+"371633", "Kuldiga",
+"371686", "Jelgava",
+"371642", "Valmiera",
+"371659", "Cēsis",
+"371636", "Ventspils",
+"371649", "Aizkraukle",
 "371638", "Saldus",
+"371683", "Jēkabpils",
+"371637", "Dobele",
+"37162", "Valmiera",
+"371652", "Jēkabpils",
+"371640", "Limbaži",
+"371644", "Gulbene",
+"371641", "Cēsis",
+"371655", "Ogre",
+"371643", "Alūksne",
+"371632", "Talsi",
 "371657", "Ludza",
 "371635", "Ventspils",
-"371636", "Ventspils",
-"371647", "Valka",
-"371632", "Talsi",
-"371634", "Liepaja",
-"37161", "Jūrmala",
-"371630", "Jelgava",
+"371684", "Liepāja",
+"371658", "Daugavpils",
+"371656", "Krāslava",
+"371682", "Valmiera",
+"371646", "Rēzekne",
 "371639", "Bauska",
+"371648", "Madona",
+"37161", "Jūrmala",
 "37166", "Riga",
-"371683", "Jēkabpils",
-"371653", "Preiļi",
+"371630", "Jelgava",
 "371631", "Tukums",
-"371643", "Alūksne",};
+"371634", "Liepaja",
+"37169", "Riga",
+"37167", "Riga",
+"371647", "Valka",
+"371653", "Preiļi",};
 
     sub new {
       my $class = shift;

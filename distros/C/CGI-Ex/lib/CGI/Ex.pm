@@ -6,7 +6,7 @@ CGI::Ex - CGI utility suite - makes powerful application writing fun and easy
 
 =head1 VERSION
 
-version 2.51
+version 2.52
 
 =for markdown [![master](https://travis-ci.org/ljepson/CGI-Ex.svg?branch=master)](https://travis-ci.org/ljepson/CGI-Ex)
 
@@ -23,7 +23,7 @@ version 2.51
 
 use 5.006;
 use strict;
-our $VERSION = '2.51'; # VERSION
+our $VERSION = '2.52'; # VERSION
 
 our ($PREFERRED_CGI_MODULE,
      $PREFERRED_CGI_REQUIRED,
@@ -332,6 +332,7 @@ sub location_bounce {
         } else {
             $r->headers_out->add("Location", $loc);
             $r->content_type('text/html');
+            $r->print("Bounced to $html_loc\n");
             $r->rflush;
         }
 

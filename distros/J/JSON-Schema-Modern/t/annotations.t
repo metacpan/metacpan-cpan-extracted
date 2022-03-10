@@ -28,7 +28,7 @@ my $initial_state = {
   spec_version => 'draft2019-09',
   vocabularies => [
     (map use_module($_)->new,
-      map 'JSON::Schema::Modern::Vocabulary::'.$_, qw(Applicator MetaData)),
+      map 'JSON::Schema::Modern::Vocabulary::'.$_, qw(Applicator Validation MetaData Unevaluated)),
   ],
   evaluator => $js,
 };
@@ -37,7 +37,7 @@ subtest 'allOf' => sub {
   my $state = {
     %$initial_state,
     keyword => 'allOf',
-    annotations => [ 'a previous annotation' ],
+    annotations => [],
     errors => [],
   };
 
@@ -58,7 +58,13 @@ subtest 'allOf' => sub {
     my $new_state = {
       %$state,
       initial_schema_uri => str(''),
-      annotations => [ 'a previous annotation' ], # annotation from /allOf/1 is not saved
+      annotations => [
+        methods(TO_JSON => {
+          instanceLocation => '',
+          keywordLocation => '/allOf/1/title',
+          annotation => 'allOf title',
+        }),
+      ],
       errors => [
         methods(TO_JSON => { instanceLocation => '', keywordLocation => '/allOf/0', error => 'subschema is false' }),
         methods(TO_JSON => { instanceLocation => '', keywordLocation => '/allOf', error => 'subschema 0 is not valid' }),
@@ -74,6 +80,8 @@ subtest 'allOf' => sub {
       true,
     ],
   };
+  $state->{annotations} = [];
+  $state->{errors} = [];
 
   ok(
     $state->{vocabularies}[0]->_eval_keyword_allOf(1, $pass_schema, $state),
@@ -85,13 +93,13 @@ subtest 'allOf' => sub {
     {
       %$new_state,
       annotations => [
-        'a previous annotation',
         methods(TO_JSON => {
           instanceLocation => '',
           keywordLocation => '/allOf/1/title',
           annotation => 'allOf title',
         }),
       ],
+      errors => [],
     },
     'passing allOf: state is correct after evaluating',
   );
@@ -128,7 +136,7 @@ subtest 'oneOf' => sub {
   my $state = {
     %$initial_state,
     keyword => 'oneOf',
-    annotations => [ 'a previous annotation' ],
+    annotations => [],
     errors => [],
   };
 
@@ -150,7 +158,18 @@ subtest 'oneOf' => sub {
     my $new_state = {
       %$state,
       initial_schema_uri => str(''),
-      annotations => [ 'a previous annotation' ], # annotations from /oneOf/1, /oneOf/2 are not saved
+      annotations => [
+        methods(TO_JSON => {
+          instanceLocation => '',
+          keywordLocation => '/oneOf/1/title',
+          annotation => 'oneOf title',
+        }),
+        methods(TO_JSON => {
+          instanceLocation => '',
+          keywordLocation => '/oneOf/2/title',
+          annotation => 'oneOf title2',
+        }),
+      ],
       errors => [
         methods(TO_JSON => { instanceLocation => '', keywordLocation => '/oneOf', error => 'multiple subschemas are valid: 1, 2' }),
       ],
@@ -166,6 +185,9 @@ subtest 'oneOf' => sub {
     ],
   };
 
+  $state->{annotations} = [];
+  $state->{errors} = [];
+
   ok(
     $state->{vocabularies}[0]->_eval_keyword_oneOf(1, $pass_schema, $state),
     'evaluation of the oneOf keyword succeeds',
@@ -176,13 +198,13 @@ subtest 'oneOf' => sub {
     {
       %$new_state,
       annotations => [
-        'a previous annotation',
         methods(TO_JSON => {
           instanceLocation => '',
           keywordLocation => '/oneOf/1/title',
           annotation => 'oneOf title',
         }),
       ],
+      errors => [],
     },
     'passing oneOf: state is correct after evaluating',
   );
@@ -192,7 +214,7 @@ subtest 'not' => sub {
   my $state = {
     %$initial_state,
     keyword => 'not',
-    annotations => [ 'a previous annotation' ],
+    annotations => [],
     errors => [],
   };
 
@@ -210,7 +232,13 @@ subtest 'not' => sub {
     my $new_state = {
       %$state,
       initial_schema_uri => str(''),
-      annotations => [ 'a previous annotation' ], # annotation from /not is not saved
+      annotations => [
+        methods(TO_JSON => {
+          instanceLocation => '',
+          keywordLocation => '/not/title',
+          annotation => 'not title',
+        }),
+      ],
       errors => [
         methods(TO_JSON => { instanceLocation => '', keywordLocation => '/not', error => 'subschema is valid' }),
       ],
@@ -222,6 +250,9 @@ subtest 'not' => sub {
     not => { not => { title => 'not title' } },
   };
 
+  $state->{annotations} = [];
+  $state->{errors} = [];
+
   ok(
     $state->{vocabularies}[0]->_eval_keyword_not(1, $pass_schema, $state),
     'evaluation of the not keyword succeeds',
@@ -231,9 +262,8 @@ subtest 'not' => sub {
     $state,
     {
       %$new_state,
-      annotations => [
-        'a previous annotation',
-      ],
+      annotations => [],
+      errors => [],
     },
     'passing not: state is correct after evaluating',
   );
@@ -258,6 +288,692 @@ subtest 'not' => sub {
       valid => true,
     },
     'annotations are still collected inside a "not", otherwise the unevaluatedProperties would have returned false',
+  );
+};
+
+subtest 'prefixItems' => sub {
+  my $state = {
+    %$initial_state,
+    keyword => 'prefixItems',
+    annotations => [],
+    errors => [],
+  };
+
+  ok(
+    $state->{vocabularies}[0]->_eval_keyword_prefixItems([], { prefixItems => [ true ] }, $state),
+    'no items means that "prefixItems" succeeds',
+  );
+
+  cmp_deeply(
+    $state,
+    my $new_state = {
+      %$state,
+      initial_schema_uri => str(''),
+      annotations => [],
+      errors => [],
+    },
+    'no items: no annotation is produced by prefixItems',
+  );
+
+  $state = {
+    %$initial_state,
+    keyword => 'prefixItems',
+    annotations => [],
+    errors => [],
+  };
+
+  ok(
+    $state->{vocabularies}[0]->_eval_keyword_prefixItems([ 1 ], { prefixItems => [ true ] }, $state),
+    'one item',
+  );
+
+  cmp_deeply(
+    $state,
+    {
+      %$state,
+      initial_schema_uri => str(''),
+      annotations => [
+        methods(TO_JSON => {
+          instanceLocation => '',
+          keywordLocation => '/prefixItems',
+          annotation => true,
+        }),
+      ],
+      errors => [],
+    },
+    'passing prefixItems: one item is annotated',
+  );
+
+  $state = {
+    %$initial_state,
+    keyword => 'prefixItems',
+    annotations => [],
+    errors => [],
+  };
+
+  ok(
+    !$state->{vocabularies}[0]->_eval_keyword_prefixItems(
+      [ 1, 5, 9 ],
+      { prefixItems => [ { title => 'hi', maximum => 3 }, { title => 'hi', maximum => 3 } ] },
+      $state),
+    'two items, one failing',
+  );
+
+  cmp_deeply(
+    $state,
+    {
+      %$state,
+      initial_schema_uri => str(''),
+      annotations => [
+        methods(TO_JSON => {
+          instanceLocation => '/0',
+          keywordLocation => '/prefixItems/0/title',
+          annotation => 'hi',
+        }),
+        methods(TO_JSON => {
+          instanceLocation => '',
+          keywordLocation => '/prefixItems',
+          annotation => 1,
+        }),
+      ],
+      errors => [
+        methods(TO_JSON => {
+          instanceLocation => '/1',
+          keywordLocation => '/prefixItems/1/maximum',
+          error => 'value is larger than 3',
+        }),
+        methods(TO_JSON => {
+          instanceLocation => '',
+          keywordLocation => '/prefixItems',
+          error => 'not all items are valid',
+        }),
+      ],
+    },
+    'failing prefixItems still collects annotations',
+  );
+};
+
+subtest 'schema-items' => sub {
+  my $state = {
+    %$initial_state,
+    keyword => 'items',
+    annotations => [],
+    errors => [],
+  };
+
+  ok(
+    $state->{vocabularies}[0]->_eval_keyword_items([], { items => true }, $state),
+    'no items means that "items" succeeds',
+  );
+
+  cmp_deeply(
+    $state,
+    my $new_state = {
+      %$state,
+      initial_schema_uri => str(''),
+      annotations => [],
+      errors => [],
+    },
+    'no items: no annotation is produced by items',
+  );
+
+  $state = {
+    %$initial_state,
+    keyword => 'items',
+    annotations => [],
+    errors => [],
+  };
+
+  ok(
+    $state->{vocabularies}[0]->_eval_keyword_items([ 1 ], { items => true }, $state),
+    'one item',
+  );
+
+  cmp_deeply(
+    $state,
+    {
+      %$state,
+      initial_schema_uri => str(''),
+      annotations => [
+        methods(TO_JSON => {
+          instanceLocation => '',
+          keywordLocation => '/items',
+          annotation => true,
+        }),
+      ],
+      errors => [],
+    },
+    'passing items: one item is annotated',
+  );
+
+  $state = {
+    %$initial_state,
+    keyword => 'items',
+    annotations => [],
+    errors => [],
+  };
+
+  ok(
+    !$state->{vocabularies}[0]->_eval_keyword_items(
+      [ 1, 5 ],
+      { items => { title => 'hi', maximum => 3 } },
+      $state),
+    'two items, one failing',
+  );
+
+  cmp_deeply(
+    $state,
+    {
+      %$state,
+      initial_schema_uri => str(''),
+      annotations => [
+        methods(TO_JSON => {
+          instanceLocation => '/0',
+          keywordLocation => '/items/title',
+          annotation => 'hi',
+        }),
+        methods(TO_JSON => {
+          instanceLocation => '',
+          keywordLocation => '/items',
+          annotation => true,
+        }),
+      ],
+      errors => [
+        methods(TO_JSON => {
+          instanceLocation => '/1',
+          keywordLocation => '/items/maximum',
+          error => 'value is larger than 3',
+        }),
+        methods(TO_JSON => {
+          instanceLocation => '',
+          keywordLocation => '/items',
+          error => 'subschema is not valid against all items',
+        }),
+      ],
+    },
+    'failing items still collects annotations',
+  );
+};
+
+subtest 'additionalItems' => sub {
+  my $state = {
+    %$initial_state,
+    keyword => 'additionalItems',
+    annotations => [],
+    errors => [],
+  };
+
+  ok(
+    $state->{vocabularies}[0]->_eval_keyword_items([], { additionalItems => true }, $state),
+    'no items means that "additionalItems" succeeds',
+  );
+
+  cmp_deeply(
+    $state,
+    my $new_state = {
+      %$state,
+      initial_schema_uri => str(''),
+      annotations => [],
+      errors => [],
+    },
+    'no items: no annotation is produced by additionaltems',
+  );
+
+  $state = {
+    %$initial_state,
+    keyword => 'additionalItems',
+    annotations => [],
+    errors => [],
+  };
+
+  ok(
+    $state->{vocabularies}[0]->_eval_keyword_additionalItems([ 1 ], { additionalItems => false }, $state),
+    'one item',
+  );
+
+  cmp_deeply(
+    $state,
+    {
+      %$state,
+      initial_schema_uri => str(''),
+      annotations => [],
+      errors => [],
+    },
+    'additionalItems does nothing without items',
+  );
+};
+
+subtest 'properties' => sub {
+  my $state = {
+    %$initial_state,
+    keyword => 'properties',
+    annotations => [],
+    errors => [],
+  };
+
+  ok(
+    $state->{vocabularies}[0]->_eval_keyword_properties({}, { properties => { foo => true } }, $state),
+    'no items means that "properties" succeeds',
+  );
+
+  cmp_deeply(
+    $state,
+    my $new_state = {
+      %$state,
+      initial_schema_uri => str(''),
+      annotations => [
+        methods(TO_JSON => {
+          instanceLocation => '',
+          keywordLocation => '/properties',
+          annotation => [],
+        }),
+      ],
+      errors => [],
+    },
+    'no properties: annotation is still produced by properties',
+  );
+
+  $state = {
+    %$initial_state,
+    keyword => 'properties',
+    annotations => [],
+    errors => [],
+  };
+
+  ok(
+    $state->{vocabularies}[0]->_eval_keyword_properties({ foo => 1 }, { properties => { foo => true } }, $state),
+    'one property',
+  );
+
+  cmp_deeply(
+    $state,
+    {
+      %$state,
+      initial_schema_uri => str(''),
+      annotations => [
+        methods(TO_JSON => {
+          instanceLocation => '',
+          keywordLocation => '/properties',
+          annotation => [ 'foo' ],
+        }),
+      ],
+      errors => [],
+    },
+    'passing properties: one property is annotated',
+  );
+
+  $state = {
+    %$initial_state,
+    keyword => 'properties',
+    annotations => [],
+    errors => [],
+  };
+
+  ok(
+    !$state->{vocabularies}[0]->_eval_keyword_properties(
+      { foo => 1, bar => 5 },
+      { properties => {
+          foo => { title => 'hi', maximum => 3 },
+          bar => { title => 'hi', maximum => 3 },
+        },
+      },
+      $state),
+    'two properties, one failing',
+  );
+
+  cmp_deeply(
+    $state,
+    {
+      %$state,
+      initial_schema_uri => str(''),
+      annotations => [
+        methods(TO_JSON => {
+          instanceLocation => '/foo',
+          keywordLocation => '/properties/foo/title',
+          annotation => 'hi',
+        }),
+        methods(TO_JSON => {
+          instanceLocation => '',
+          keywordLocation => '/properties',
+          annotation => [ qw(bar foo) ],
+        }),
+      ],
+      errors => [
+        methods(TO_JSON => {
+          instanceLocation => '/bar',
+          keywordLocation => '/properties/bar/maximum',
+          error => 'value is larger than 3',
+        }),
+        methods(TO_JSON => {
+          instanceLocation => '',
+          keywordLocation => '/properties',
+          error => 'not all properties are valid',
+        }),
+      ],
+    },
+    'failing properties still collects annotations',
+  );
+};
+
+subtest 'patternProperties' => sub {
+  my $state = {
+    %$initial_state,
+    keyword => 'patternProperties',
+    annotations => [],
+    errors => [],
+  };
+
+  ok(
+    $state->{vocabularies}[0]->_eval_keyword_patternProperties({}, { patternProperties => { foo => true } }, $state),
+    'no items means that "patternProperties" succeeds',
+  );
+
+  cmp_deeply(
+    $state,
+    my $new_state = {
+      %$state,
+      initial_schema_uri => str(''),
+      annotations => [
+        methods(TO_JSON => {
+          instanceLocation => '',
+          keywordLocation => '/patternProperties',
+          annotation => [],
+        }),
+      ],
+      errors => [],
+    },
+    'no pProperties: annotation is still produced by patternProperties',
+  );
+
+  $state = {
+    %$initial_state,
+    keyword => 'patternProperties',
+    annotations => [],
+    errors => [],
+  };
+
+  ok(
+    $state->{vocabularies}[0]->_eval_keyword_patternProperties({ foo => 1 }, { patternProperties => { foo => true } }, $state),
+    'one property',
+  );
+
+  cmp_deeply(
+    $state,
+    {
+      %$state,
+      initial_schema_uri => str(''),
+      annotations => [
+        methods(TO_JSON => {
+          instanceLocation => '',
+          keywordLocation => '/patternProperties',
+          annotation => [ 'foo' ],
+        }),
+      ],
+      errors => [],
+    },
+    'passing properties: one property is annotated',
+  );
+
+  $state = {
+    %$initial_state,
+    keyword => 'patternProperties',
+    annotations => [],
+    errors => [],
+  };
+
+  ok(
+    !$state->{vocabularies}[0]->_eval_keyword_patternProperties(
+      { foo => 1, bar => 5 },
+      { patternProperties => {
+          foo => { title => 'hi', maximum => 3 },
+          bar => { title => 'hi', maximum => 3 },
+        },
+      },
+      $state),
+    'two properties, one failing',
+  );
+
+  cmp_deeply(
+    $state,
+    {
+      %$state,
+      initial_schema_uri => str(''),
+      annotations => [
+        methods(TO_JSON => {
+          instanceLocation => '/foo',
+          keywordLocation => '/patternProperties/foo/title',
+          annotation => 'hi',
+        }),
+        methods(TO_JSON => {
+          instanceLocation => '',
+          keywordLocation => '/patternProperties',
+          annotation => [ qw(bar foo) ],
+        }),
+      ],
+      errors => [
+        methods(TO_JSON => {
+          instanceLocation => '/bar',
+          keywordLocation => '/patternProperties/bar/maximum',
+          error => 'value is larger than 3',
+        }),
+        methods(TO_JSON => {
+          instanceLocation => '',
+          keywordLocation => '/patternProperties',
+          error => 'not all properties are valid',
+        }),
+      ],
+    },
+    'failing patternProperties still collects annotations',
+  );
+};
+
+subtest 'additionalProperties' => sub {
+  my $state = {
+    %$initial_state,
+    keyword => 'additionalProperties',
+    annotations => [],
+    errors => [],
+  };
+
+  ok(
+    $state->{vocabularies}[0]->_eval_keyword_additionalProperties([], { additionalProperties => true }, $state),
+    'no items means that "additionalProperties" succeeds',
+  );
+
+  cmp_deeply(
+    $state,
+    my $new_state = {
+      %$state,
+      initial_schema_uri => str(''),
+      annotations => [],
+      errors => [],
+    },
+    'no properties: no annotation is produced by additionalProperties',
+  );
+
+  $state = {
+    %$initial_state,
+    keyword => 'additionalProperties',
+    annotations => [],
+    errors => [],
+  };
+
+  ok(
+    $state->{vocabularies}[0]->_eval_keyword_additionalProperties({ foo => 1 }, { additionalProperties => true }, $state),
+    'one property',
+  );
+
+  cmp_deeply(
+    $state,
+    {
+      %$state,
+      initial_schema_uri => str(''),
+      annotations => [
+        methods(TO_JSON => {
+          instanceLocation => '',
+          keywordLocation => '/additionalProperties',
+          annotation => [ 'foo' ],
+        }),
+      ],
+      errors => [],
+    },
+    'passing additionalProperties: one property is annotated',
+  );
+
+  $state = {
+    %$initial_state,
+    keyword => 'additionalProperties',
+    annotations => [],
+    errors => [],
+  };
+
+  ok(
+    !$state->{vocabularies}[0]->_eval_keyword_additionalProperties(
+      { foo => 1, bar => 3, baz => 5 },
+      {
+        properties => { foo => true },
+        additionalProperties => { title => 'hi', maximum => 3 },
+      },
+      $state),
+    'two properties, one failing',
+  );
+
+  cmp_deeply(
+    $state,
+    {
+      %$state,
+      initial_schema_uri => str(''),
+      annotations => [
+        methods(TO_JSON => {
+          instanceLocation => '/bar',
+          keywordLocation => '/additionalProperties/title',
+          annotation => 'hi',
+        }),
+        methods(TO_JSON => {
+          instanceLocation => '',
+          keywordLocation => '/additionalProperties',
+          annotation => [ qw(bar baz) ],
+        }),
+      ],
+      errors => [
+        methods(TO_JSON => {
+          instanceLocation => '/baz',
+          keywordLocation => '/additionalProperties/maximum',
+          error => 'value is larger than 3',
+        }),
+        methods(TO_JSON => {
+          instanceLocation => '',
+          keywordLocation => '/additionalProperties',
+          error => 'not all additional properties are valid',
+        }),
+      ],
+    },
+    'failing properties still collects annotations',
+  );
+};
+
+subtest 'unevaluatedProperties' => sub {
+  my $state = {
+    %$initial_state,
+    keyword => 'unevaluatedProperties',
+    annotations => [],
+    errors => [],
+  };
+
+  ok(
+    $state->{vocabularies}[0]->_eval_keyword_unevaluatedProperties([], { unevaluatedProperties => true }, $state),
+    'no items means that "unevaluatedProperties" succeeds',
+  );
+
+  cmp_deeply(
+    $state,
+    my $new_state = {
+      %$state,
+      initial_schema_uri => str(''),
+      annotations => [],
+      errors => [],
+    },
+    'no properties: no annotation is produced by unevaluatedProperties',
+  );
+
+  $state = {
+    %$initial_state,
+    keyword => 'unevaluatedProperties',
+    annotations => [],
+    errors => [],
+  };
+
+  ok(
+    $state->{vocabularies}[0]->_eval_keyword_unevaluatedProperties({ foo => 1 }, { unevaluatedProperties => true }, $state),
+    'one property',
+  );
+
+  cmp_deeply(
+    $state,
+    {
+      %$state,
+      initial_schema_uri => str(''),
+      annotations => [
+        methods(TO_JSON => {
+          instanceLocation => '',
+          keywordLocation => '/unevaluatedProperties',
+          annotation => [ 'foo' ],
+        }),
+      ],
+      errors => [],
+    },
+    'passing unevaluatedProperties: one property is annotated',
+  );
+
+  $state = {
+    %$initial_state,
+    keyword => 'unevaluatedProperties',
+    annotations => [],
+    errors => [],
+  };
+
+  ok(
+    !$state->{vocabularies}[0]->_eval_keyword_unevaluatedProperties(
+      { foo => 1, bar => 3, baz => 5 },
+      {
+        properties => { foo => true },
+        unevaluatedProperties => { title => 'hi', maximum => 3 },
+      },
+      $state),
+    'two properties, one failing',
+  );
+
+  cmp_deeply(
+    $state,
+    {
+      %$state,
+      initial_schema_uri => str(''),
+      annotations => [
+        (map methods(TO_JSON => {
+          instanceLocation => '/'.$_,
+          keywordLocation => '/unevaluatedProperties/title',
+          annotation => 'hi',
+        }), qw(bar foo)),
+        methods(TO_JSON => {
+          instanceLocation => '',
+          keywordLocation => '/unevaluatedProperties',
+          annotation => [ qw(bar baz foo) ],
+        }),
+      ],
+      errors => [
+        methods(TO_JSON => {
+          instanceLocation => '/baz',
+          keywordLocation => '/unevaluatedProperties/maximum',
+          error => 'value is larger than 3',
+        }),
+        methods(TO_JSON => {
+          instanceLocation => '',
+          keywordLocation => '/unevaluatedProperties',
+          error => 'not all additional properties are valid',
+        }),
+      ],
+    },
+    'failing unevaluatedProperties still collects annotations',
   );
 };
 
@@ -479,7 +1195,7 @@ subtest 'collect_annotations and unevaluated keywords' => sub {
   );
 };
 
-subtest 'annotate_unknown_keywords' => sub {
+subtest 'annotate unknown keywords' => sub {
   my $data = {
     item => [ 1 ],
     property => { foo => 1 },
@@ -487,7 +1203,7 @@ subtest 'annotate_unknown_keywords' => sub {
   my $schema = {
     properties => {
       item => {
-        prefixItems => [ true, true ],
+        items => true,
         unevaluatedItems => false,
         bloop => 5,
       },
@@ -501,18 +1217,18 @@ subtest 'annotate_unknown_keywords' => sub {
   };
 
   cmp_deeply(
-    JSON::Schema::Modern->new(annotate_unknown_keywords => 1)->evaluate(
+    JSON::Schema::Modern->new->evaluate(
       $data,
       $schema,
     )->TO_JSON,
     {
       valid => true,
     },
-    'no annotations even when config value is true but collect_annotations is false',
+    'no annotations even when collect_annotations is false',
   );
 
   cmp_deeply(
-    (my $result = JSON::Schema::Modern->new(collect_annotations => 1, annotate_unknown_keywords => 1)->evaluate(
+    (my $result = JSON::Schema::Modern->new(collect_annotations => 1)->evaluate(
       $data,
       $schema,
     ))->TO_JSON,
@@ -521,7 +1237,7 @@ subtest 'annotate_unknown_keywords' => sub {
       annotations => [
         {
           instanceLocation => '/item',
-          keywordLocation => '/properties/item/prefixItems',
+          keywordLocation => '/properties/item/items',
           annotation => true,
         },
         {
@@ -562,7 +1278,7 @@ subtest 'annotate_unknown_keywords' => sub {
   cmp_deeply(
     [ $result->annotations ],
     [
-      methods(keyword => 'prefixItems', unknown => bool(0)),
+      methods(keyword => 'items', unknown => bool(0)),
       methods(keyword => 'bloop', unknown => bool(1)),
       methods(keyword => 'properties', unknown => bool(0)),
       methods(keyword => 'unevaluatedProperties', unknown => bool(0)),
@@ -572,9 +1288,46 @@ subtest 'annotate_unknown_keywords' => sub {
     ],
     '"unknown" keyword is set on the annotation objects for unknown keywords',
   );
+
+  cmp_deeply(
+    $result = JSON::Schema::Modern->new(specification_version => 'draft2019-09', collect_annotations => 1)
+        ->evaluate(
+      $data,
+      $schema,
+    )->TO_JSON,
+    {
+      valid => true,
+      annotations => [
+        {
+          instanceLocation => '/item',
+          keywordLocation => '/properties/item/items',
+          annotation => true,
+        },
+        # no bloop
+        {
+          instanceLocation => '/property',
+          keywordLocation => '/properties/property/properties',
+          annotation => [ 'foo' ],
+        },
+        {
+          instanceLocation => '/property',
+          keywordLocation => '/properties/property/unevaluatedProperties',
+          annotation => [],
+        },
+        # no blap
+        {
+          instanceLocation => '',
+          keywordLocation => '/properties',
+          annotation => [ 'item', 'property' ],
+        },
+        # no blip
+      ],
+    },
+    'no annotations from unknown keywords in draft2019-09',
+  );
 };
 
-subtest 'draft2019-09: items + additionalItems' => sub {
+subtest 'items + additionalItems, prefixItems + items' => sub {
   cmp_deeply(
     JSON::Schema::Modern->new(specification_version => 'draft2019-09', collect_annotations => 1)
         ->evaluate(
@@ -599,10 +1352,10 @@ subtest 'draft2019-09: items + additionalItems' => sub {
   );
 
   cmp_deeply(
-    $js->evaluate(
-      [],
+    my $result = JSON::Schema::Modern->new(collect_annotations => 1)->evaluate(
+      [ 1, 2, 3 ],
       {
-        prefixItems => [ { maximum => 5 } ],
+        prefixItems => [ { maximum => 5 }, { maximum => 5 }, { maximum => 5 } ],
         items => { maximum => 0 },
       }
     )->TO_JSON,
@@ -614,10 +1367,10 @@ subtest 'draft2019-09: items + additionalItems' => sub {
           keywordLocation => '/prefixItems',
           annotation => true,
         },
-        # no error nor annotation from additionalItems
+        # no error nor annotation from items
       ],
     },
-    'schema-based items + additionalItems',
+    'prefixItems + schema-based items',
   );
 };
 

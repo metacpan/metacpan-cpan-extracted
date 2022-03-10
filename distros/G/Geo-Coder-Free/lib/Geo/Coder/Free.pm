@@ -21,11 +21,11 @@ Geo::Coder::Free - Provides a Geo-Coding functionality using free databases
 
 =head1 VERSION
 
-Version 0.29
+Version 0.30
 
 =cut
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 our $alternatives;
 our $abbreviations;
@@ -76,7 +76,7 @@ The database also will include data from Who's On First
 L<https://whosonfirst.org>.
 
 Takes one optional parameter, directory,
-which tells the library where to find the MaxMind and GeoNames files admin1db,
+which tells the object where to find the MaxMind and GeoNames files admin1db,
 admin2.db and cities.[sql|csv.gz].
 If that parameter isn't given,
 the module will attempt to find the databases,
@@ -329,7 +329,7 @@ sub _normalize($) {
 	$street = uc($street);
 	if($street =~ /(.+)\s+(.+)\s+(.+)/) {
 		my $a;
-		if($a = $abbreviations->abbreviate($2)) {
+		if((lc($2) ne 'cross') && ($a = $abbreviations->abbreviate($2))) {
 			$street = "$1 $a $3";
 		} elsif($a = $abbreviations->abbreviate($3)) {
 			$street = "$1 $2 $a";
@@ -462,7 +462,7 @@ L<http://search.cpan.org/dist/Geo-Coder-Free/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017-2020 Nigel Horne.
+Copyright 2017-2022 Nigel Horne.
 
 The program code is released under the following licence: GPL for personal use on a single computer.
 All other users (including Commercial, Charity, Educational, Government)

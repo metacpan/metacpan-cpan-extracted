@@ -87,6 +87,7 @@ t/overload_switch.t
 t/P_specifier.t
 t/pod.t
 t/printf.t
+t/PV_NV_BUG.t
 t/q_arith.t
 t/remainder.t
 t/Rmpfr_asinu.t

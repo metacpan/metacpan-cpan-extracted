@@ -12,6 +12,8 @@ BEGIN {
     }
 }
 
+warn "Segs Before: " . IPC::Shareable::ipcs() . "\n" if $ENV{PRINT_SEGS};
+
 my $mod = 'IPC::Shareable';
 
 my $awake = 0;
@@ -60,6 +62,8 @@ if ($pid == 0) {
     is $$ps, 'parent', 'parent set the scalar value ok';
 
     IPC::Shareable->clean_up_all;
+
+    warn "Segs After: " . IPC::Shareable::ipcs() . "\n" if $ENV{PRINT_SEGS};
 
     done_testing();
 }

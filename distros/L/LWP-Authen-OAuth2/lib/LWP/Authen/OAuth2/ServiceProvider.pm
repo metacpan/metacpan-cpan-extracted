@@ -1,7 +1,7 @@
 package LWP::Authen::OAuth2::ServiceProvider;
 
 # ABSTRACT: ServiceProvider base class
-our $VERSION = '0.18'; # VERSION
+our $VERSION = '0.19'; # VERSION
 
 use 5.006;
 use strict;
@@ -423,7 +423,7 @@ LWP::Authen::OAuth2::ServiceProvider - ServiceProvider base class
 
 =head1 VERSION
 
-version 0.18
+version 0.19
 
 =head1 SYNOPSIS
 
@@ -479,6 +479,8 @@ hopefully useful configuration and documentation:
 =item L<LWP::Authen::OAuth2::ServiceProvider::Line|Line>
 
 =item L<LWP::Authen::OAuth2::ServiceProvider::Strava|Strava>
+
+=item L<LWP::Authen::OAuth2::ServiceProvider::Withings|Withings>
 
 =item L<LWP::Authen::OAuth2::ServiceProvider::Yahoo|Yahoo>
 
@@ -586,8 +588,10 @@ both required and optional, or appearing multiple times.
 
 These three methods list parameters that B<must> be included in the
 authorization url, the post to request tokens, and the post to refresh
-tokens respectively.  Supplying these can give better error messages if
-they are left out.
+tokens respectively. If you explicitly provide these lists of required
+parameters, and a user fails to provide one (or more) of the
+parameters, the generated error message can tell the user which
+parameters are missing.
 
 =item C<{authorization,request,refresh}_optional_params>
 
@@ -732,7 +736,7 @@ Thomas Klausner <domm@plix.at>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 - 2021 by Ben Tilly, Rent.com, Thomas Klausner.
+This software is copyright (c) 2013 - 2022 by Ben Tilly, Rent.com, Thomas Klausner.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

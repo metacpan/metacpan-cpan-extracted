@@ -2323,7 +2323,7 @@ sub resolve
         $curr->push( $dir );
     }
     $self->message( 3, "Returning ", sub{ $self->_spec_catpath( $vol, $self->_spec_catdir( [ @$curr ] ), $fname ) });
-    return( $self->new( $self->_spec_catpath( $vol, $self->_spec_catdir( [ @$curr ] ), $fname ), { resolved => 1, os => $self->{os} }) );
+    return( $self->new( $self->_spec_catpath( $vol, $self->_spec_catdir( [ @$curr ] ), $fname ), { resolved => 1, os => $self->{os}, ( $self->{base_dir} ? ( base_dir => $self->{base_dir} ) : () ) }) );
 }
 
 sub resolved { return( shift->_set_get_boolean( 'resolved', @_ ) ); }
@@ -2879,7 +2879,7 @@ sub unload_json
     my $self = shift( @_ );
     my $data = shift( @_ );
     my $opts = $self->_get_args_as_hash( @_ );
-    my $j = $self->new_json->new || return( $self->pass_error );
+    my $j = $self->new_json || return( $self->pass_error );
     try
     {
         $j->pretty(1) if( $opts->{pretty} );

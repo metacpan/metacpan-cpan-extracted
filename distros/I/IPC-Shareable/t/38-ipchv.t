@@ -11,6 +11,8 @@ BEGIN {
     }
 }
 
+warn "Segs Before: " . IPC::Shareable::ipcs() . "\n" if $ENV{PRINT_SEGS};
+
 plan tests => 8;
 
 my %shareOpts = (
@@ -90,5 +92,8 @@ if ($pid == 0) {
         is $hv{$_}, $$, "parent: HV $_ has val $$";
     }
 }
+
+IPC::Shareable::_end;
+warn "Segs After: " . IPC::Shareable::ipcs() . "\n" if $ENV{PRINT_SEGS};
 
 #done_testing();

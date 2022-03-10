@@ -26,9 +26,11 @@ no_index:
 provides:
   App::Greple::wordle:
     file: lib/App/Greple/wordle.pm
-    version: '0.07'
-  App::Greple::wordle::hint:
-    file: lib/App/Greple/wordle/hint.pm
+    version: '0.10'
+  App::Greple::wordle::game:
+    file: lib/App/Greple/wordle/game.pm
+  App::Greple::wordle::util:
+    file: lib/App/Greple/wordle/util.pm
   App::Greple::wordle::word_all:
     file: lib/App/Greple/wordle/word_all.pm
   App::Greple::wordle::word_hidden:
@@ -40,13 +42,15 @@ requires:
   Getopt::EX::Hashed: '1.03'
   List::MoreUtils: '0'
   List::Util: '0'
+  Mo: '0'
   Text::VisualWidth::PP: '0.05'
+  Try::Tiny: '0'
   perl: v5.14.0
 resources:
   bugtracker: https://github.com/kaz-utashiro/greple-wordle/issues
   homepage: https://github.com/kaz-utashiro/greple-wordle
   repository: git://github.com/kaz-utashiro/greple-wordle.git
-version: '0.07'
+version: '0.10'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'

@@ -5,6 +5,7 @@ package Geo::Coder::Free::OpenAddresses;
 use strict;
 use warnings;
 
+use Geo::Coder::Free;	# for _abbreviate
 use Geo::Coder::Free::DB::OpenAddr;	# SQLite database
 use Geo::Coder::Free::DB::openaddresses;	# The original CSV files
 use Geo::Location::Point;
@@ -46,18 +47,23 @@ Provides a geocoding functionality to a local SQLite database containing geo-cod
 
 =head1 VERSION
 
-Version 0.29
+Version 0.30
 
 =cut
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 =head1 SYNOPSIS
 
     use Geo::Coder::Free::OpenAddresses;
 
     # Use a local download of http://results.openaddresses.io/
-    my $geocoder = Geo::Coder::Free::OpenAddresses->new(openaddr => $ENV{'OPENADDR_HOME'});
+    my $geocoder;
+    if(my $openaddr = $ENV{'OPENADDR_HOME'}) {
+    	$geocoder = Geo::Coder::Free::OpenAddresses->new(openaddr => $openaddr);
+    } else {
+    	$geocoder = Geo::Coder::Free::OpenAddresses->new(openaddr => '/usr/share/geo-coder-free/data');
+    }
     $location = $geocoder->geocode(location => '1600 Pennsylvania Avenue NW, Washington DC, USA');
 
     my @matches = $geocoder->geocode({ scantext => 'arbitrary text', region => 'GB' });
@@ -981,13 +987,16 @@ included.  So these will print the same.
 When I added the WhosOnFirst data I should have renamed this as it contains
 data from both sources.
 
+The database shouldn't be called $OPENADDR_HOME/openaddresses.sql,
+since the datbase now also includes data from WhosOnFirst.
+
 =head1 SEE ALSO
 
 VWF, openaddresses.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017-2020 Nigel Horne.
+Copyright 2017-2022 Nigel Horne.
 
 The program code is released under the following licence: GPL for personal use on a single computer.
 All other users (including Commercial, Charity, Educational, Government)

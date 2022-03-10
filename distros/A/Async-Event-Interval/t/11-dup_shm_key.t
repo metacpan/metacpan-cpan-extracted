@@ -7,6 +7,10 @@ use IPC::Shareable;
 use Mock::Sub;
 use Test::More;
 
+if (! $ENV{CI_TESTING}) {
+    plan skip_all => "Not on a valid CI testing platform..."
+}
+
 my $mock = Mock::Sub->new;
 my $shm_key = $mock->mock('Async::Event::Interval::_rand_shm_key');
 

@@ -1,12 +1,12 @@
 # Paranoid::Network::IPv6 -- IPv6-specific network functions
 #
-# $Id: lib/Paranoid/Network/IPv6.pm, 2.09 2021/12/28 15:46:49 acorliss Exp $
+# $Id: lib/Paranoid/Network/IPv6.pm, 2.10 2022/03/08 00:01:04 acorliss Exp $
 #
 # This software is free software.  Similar to Perl, you can redistribute it
 # and/or modify it under the terms of either:
 #
 #   a)     the GNU General Public License
-#          <https://www.gnu.org/licenses/gpl-1.0.html> as published by the 
+#          <https://www.gnu.org/licenses/gpl-1.0.html> as published by the
 #          Free Software Foundation <http://www.fsf.org/>; either version 1
 #          <https://www.gnu.org/licenses/gpl-1.0.html>, or any later version
 #          <https://www.gnu.org/licenses/license-list.html#GNUGPL>, or
@@ -46,7 +46,7 @@ my @constants = qw(MAXIPV6CIDR IPV6REGEX IPV6CIDRRGX IPV6BASE IPV6BRDCST
     IPV6MASK);
 my @ipv6sort = qw(ipv6StrSort ipv6PackedSort ipv6NumSort);
 
-($VERSION) = ( q$Revision: 2.09 $ =~ /(\d+(?:\.\d+)+)/sm );
+($VERSION) = ( q$Revision: 2.10 $ =~ /(\d+(?:\.\d+)+)/sm );
 @EXPORT      = @base;
 @EXPORT_OK   = ( @base, @constants, @ipv6sort );
 %EXPORT_TAGS = (
@@ -92,8 +92,7 @@ sub ipv6NetConvert {
     my $netAddr = shift;
     my ( $bnet, $bmask, $t, @tmp, @rv );
 
-    pdebug( 'entering w/%s', PDLEVEL1, $netAddr );
-    pIn();
+    subPreamble( PDLEVEL1, '$', $netAddr );
 
     if ( has_ipv6() or $] >= 5.012 ) {
 
@@ -179,8 +178,7 @@ sub ipv6NetConvert {
         pdebug( 'IPv6 support not present', PDLEVEL1 );
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL1, @rv );
+    subPostamble( PDLEVEL1, '@', @rv );
 
     return @rv;
 }
@@ -195,16 +193,14 @@ sub ipv6NetPacked {
     my $netAddr = shift;
     my @rv;
 
-    pdebug( 'entering w/%s', PDLEVEL1, $netAddr );
-    pIn();
+    subPreamble( PDLEVEL1, '$', $netAddr );
 
     @rv = ipv6NetConvert($netAddr);
     foreach (@rv) {
         $_ = pack 'NNNN', @$_;
     }
 
-    pOut();
-    pdebug( 'leaving w/%s', PDLEVEL1, @rv );
+    subPostamble( PDLEVEL1, '@', @rv );
 
     return @rv;
 }
@@ -221,8 +217,7 @@ sub _cmpArrays {
     my $aref2 = shift;
     my $rv    = 0;
 
-    pdebug( 'entering w/%s, %s', PDLEVEL2, $aref1, $aref2 );
-    pIn();
+    subPreamble( PDLEVEL2, '\@\@', $aref1, $aref2 );
 
     while ( scalar @$aref1 ) {
         unless ( $$aref1[0] == $$aref2[0] ) {
@@ -233,8 +228,7 @@ sub _cmpArrays {
         shift @$aref2;
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL2, $rv );
+    subPostamble( PDLEVEL2, '$', $rv );
 
     return $rv;
 }
@@ -256,8 +250,7 @@ sub ipv6NetIntersect {
     my $rv   = 0;
     my ( @tnet, @dnet );
 
-    pdebug( 'entering w/%s, %s', PDLEVEL1, $tgt, $dest );
-    pIn();
+    subPreamble( PDLEVEL1, '$$', $tgt, $dest );
 
     # Bypas if one or both isn't defined -- obviously no intersection
     unless ( !defined $tgt or !defined $dest ) {
@@ -297,8 +290,7 @@ sub ipv6NetIntersect {
         }
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL1, $rv );
+    subPostamble( PDLEVEL1, '$', $rv );
 
     return $rv;
 }
@@ -374,7 +366,7 @@ Paranoid::Network::IPv6 - IPv6-related functions
 
 =head1 VERSION
 
-$Id: lib/Paranoid/Network/IPv6.pm, 2.09 2021/12/28 15:46:49 acorliss Exp $
+$Id: lib/Paranoid/Network/IPv6.pm, 2.10 2022/03/08 00:01:04 acorliss Exp $
 
 =head1 SYNOPSIS
 

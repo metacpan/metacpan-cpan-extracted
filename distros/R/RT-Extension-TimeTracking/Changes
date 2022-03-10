@@ -1,5 +1,8 @@
 Revision history for RT-Extension-TimeTracking
 
+0.22 2022-03-08
+ - Confirm $Object is defined before checking type
+
 0.21 2020-08-13
  - Add "Time Search" page
 

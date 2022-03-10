@@ -1,7 +1,7 @@
 package lib::projectroot;
 
 # ABSTRACT: easier loading of a project's local libs
-our $VERSION = '1.008'; # VERSION
+our $VERSION = '1.009'; # VERSION
 
 use strict;
 use warnings;
@@ -126,7 +126,7 @@ lib::projectroot - easier loading of a project's local libs
 
 =head1 VERSION
 
-version 1.008
+version 1.009
 
 =head1 SYNOPSIS
 
@@ -198,7 +198,7 @@ In each script, I just have to say:
 
   use lib::projectroot qw(lib local::lib=local);
 
-C<lib> is added to the beginning of <@INC>, and C<local> is loaded via
+C<lib> is added to the beginning of C<@INC>, and C<local> is loaded via
 C<local::lib>, without me having to know how deep in C<bin> the
 current script is located.
 
@@ -259,9 +259,9 @@ Some ideas for future releases:
 
 =head1 THANKS
 
-Thanks to C<eserte>, C<Smylers> & Ca<abraxxa> for providing feedback
-at L<http://prepan.org/module/nY4oajhgzJN|prepan.org>. Meta-thanks to
-L<http://twitter.com/kentaro|kentaro> for running prepan, a very handy
+Thanks to C<eserte>, C<Smylers> & C<abraxxa> for providing feedback
+at L<prepan.org|http://prepan.org/module/nY4oajhgzJN>. Meta-thanks to
+L<kentaro|http://twitter.com/kentaro> for running prepan, a very handy
 service!
 
 Thanks to C<koki>, C<farhad> and C<Jozef> for providing face-to-face

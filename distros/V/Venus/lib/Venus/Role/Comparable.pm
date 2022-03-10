@@ -1,0 +1,736 @@
+package Venus::Role::Comparable;
+
+use 5.018;
+
+use strict;
+use warnings;
+
+use Moo::Role;
+
+require Scalar::Util;
+require Venus::Type;
+
+# METHODS
+
+sub eq {
+  my ($self, $data) = @_;
+
+  $data = Venus::Type->new(value => $data)->deduce;
+
+  if (Scalar::Util::refaddr($self) eq Scalar::Util::refaddr($data)) {
+    return 1;
+  }
+  if (Scalar::Util::blessed($data) && !$data->isa('Venus::Kind')) {
+    return 0;
+  }
+  if ($self->comparer('eq') eq 'numified') {
+    return $self->numified == $data->numified ? 1 : 0;
+  }
+  elsif ($self->comparer('eq') eq 'stringified') {
+    return $self->stringified eq $data->stringified ? 1 : 0;
+  }
+  elsif (my $method = $self->comparer('eq')) {
+    return $self->$method eq $data->$method ? 1 : 0;
+  }
+  else {
+    return 0;
+  }
+}
+
+sub ge {
+  my ($self, $data) = @_;
+
+  if ($self->gt($data) || $self->eq($data)) {
+    return 1;
+  }
+  else {
+    return 0;
+  }
+}
+
+sub gele {
+  my ($self, $ge, $le) = @_;
+
+  if ($self->ge($ge) && $self->le($le)) {
+    return 1;
+  }
+  else {
+    return 0;
+  }
+}
+
+sub gt {
+  my ($self, $data) = @_;
+
+  $data = Venus::Type->new(value => $data)->deduce;
+
+  if (Scalar::Util::refaddr($self) eq Scalar::Util::refaddr($data)) {
+    return 0;
+  }
+  if (Scalar::Util::blessed($data) && !$data->isa('Venus::Kind')) {
+    return 0;
+  }
+  if ($self->comparer('gt') eq 'numified') {
+    return $self->numified > $data->numified ? 1 : 0;
+  }
+  elsif ($self->comparer('gt') eq 'stringified') {
+    return $self->stringified gt $data->stringified ? 1 : 0;
+  }
+  elsif (my $method = $self->comparer('gt')) {
+    return $self->$method gt $data->$method ? 1 : 0;
+  }
+  else {
+    return 0;
+  }
+}
+
+sub gtlt {
+  my ($self, $gt, $lt) = @_;
+
+  if ($self->gt($gt) && $self->lt($lt)) {
+    return 1;
+  }
+  else {
+    return 0;
+  }
+}
+
+sub lt {
+  my ($self, $data) = @_;
+
+  $data = Venus::Type->new(value => $data)->deduce;
+
+  if (Scalar::Util::refaddr($self) eq Scalar::Util::refaddr($data)) {
+    return 0;
+  }
+  if (Scalar::Util::blessed($data) && !$data->isa('Venus::Kind')) {
+    return 0;
+  }
+  if ($self->comparer('lt') eq 'numified') {
+    return $self->numified < $data->numified ? 1 : 0;
+  }
+  elsif ($self->comparer('lt') eq 'stringified') {
+    return $self->stringified lt $data->stringified ? 1 : 0;
+  }
+  elsif (my $method = $self->comparer('lt')) {
+    return $self->$method lt $data->$method ? 1 : 0;
+  }
+  else {
+    return 0;
+  }
+}
+
+sub le {
+  my ($self, $data) = @_;
+
+  if ($self->lt($data) || $self->eq($data)) {
+    return 1;
+  }
+  else {
+    return 0;
+  }
+}
+
+sub ne {
+  my ($self, $data) = @_;
+
+  return $self->eq($data) ? 0 : 1;
+}
+
+sub tv {
+  my ($self, $data) = @_;
+
+  if (!Scalar::Util::blessed($data)) {
+    return 0;
+  }
+  if (Scalar::Util::refaddr($self) eq Scalar::Util::refaddr($data)) {
+    return 1;
+  }
+  if ($data->isa($self->class)) {
+    return $self->eq($data);
+  }
+  else {
+    return 0;
+  }
+}
+
+1;
+
+
+
+=head1 NAME
+
+Venus::Role::Comparable - Comparable Role
+
+=cut
+
+=head1 ABSTRACT
+
+Comparable Role for Perl 5
+
+=cut
+
+=head1 SYNOPSIS
+
+  package Example;
+
+  use Venus::Class;
+
+  extends 'Venus::Kind';
+
+  with 'Venus::Role::Comparable';
+
+  sub numified {
+    return 2;
+  }
+
+  package main;
+
+  my $example = Example->new;
+
+  # my $result = $example->eq(2);
+
+=cut
+
+=head1 DESCRIPTION
+
+This package modifies the consuming package and provides methods for performing
+numerical and stringwise comparision operations or any object or raw data type.
+
+=cut
+
+=head1 METHODS
+
+This package provides the following methods:
+
+=cut
+
+=head2 eq
+
+  eq(Any $arg) (Bool)
+
+The eq method performs an I<"equals"> operation using the invocant and the
+argument provided. The operation will be performed as either a numerical or
+stringwise operation based upon the preference (i.e. the return value of the
+L</comparer> method) of the invocant.
+
+I<Since C<0.08>>
+
+=over 4
+
+=item eq example 1
+
+  package main;
+
+  my $example = Example->new;
+
+  my $result = $example->eq($example);
+
+  # 1
+
+=back
+
+=over 4
+
+=item eq example 2
+
+  package main;
+
+  my $example = Example->new;
+
+  my $result = $example->eq([1,2]);
+
+  # 0
+
+=back
+
+=over 4
+
+=item eq example 3
+
+  package main;
+
+  my $example = Example->new;
+
+  my $result = $example->eq({1..4});
+
+  # 0
+
+=back
+
+=cut
+
+=head2 ge
+
+  ge(Any $arg) (Bool)
+
+The ge method performs a I<"greater-than-or-equal-to"> operation using the
+invocant and argument provided. The operation will be performed as either a
+numerical or stringwise operation based upon the preference (i.e. the return
+value of the L</comparer> method) of the invocant.
+
+I<Since C<0.08>>
+
+=over 4
+
+=item ge example 1
+
+  package main;
+
+  my $example = Example->new;
+
+  my $result = $example->ge(3);
+
+  # 0
+
+=back
+
+=over 4
+
+=item ge example 2
+
+  package main;
+
+  my $example = Example->new;
+
+  my $result = $example->ge($example);
+
+  # 1
+
+=back
+
+=over 4
+
+=item ge example 3
+
+  package main;
+
+  my $example = Example->new;
+
+  my $result = $example->ge([1,2,3]);
+
+  # 0
+
+=back
+
+=cut
+
+=head2 gele
+
+  gele(Any $arg1, Any $arg2) (Bool)
+
+The gele method performs a I<"greater-than-or-equal-to"> operation on the 1st
+argument, and I<"lesser-than-or-equal-to"> operation on the 2nd argument. The
+operation will be performed as either a numerical or stringwise operation based
+upon the preference (i.e. the return value of the L</comparer> method) of the
+invocant.
+
+I<Since C<0.08>>
+
+=over 4
+
+=item gele example 1
+
+  package main;
+
+  my $example = Example->new;
+
+  my $result = $example->gele(1, 3);
+
+  # 1
+
+=back
+
+=over 4
+
+=item gele example 2
+
+  package main;
+
+  my $example = Example->new;
+
+  my $result = $example->gele(2, []);
+
+  # 0
+
+=back
+
+=over 4
+
+=item gele example 3
+
+  package main;
+
+  my $example = Example->new;
+
+  my $result = $example->gele(0, '3');
+
+  # 1
+
+=back
+
+=cut
+
+=head2 gt
+
+  gt(Any $arg) (Bool)
+
+The gt method performs a I<"greater-than"> operation using the invocant and
+argument provided. The operation will be performed as either a numerical or
+stringwise operation based upon the preference (i.e. the return value of the
+L</comparer> method) of the invocant.
+
+I<Since C<0.08>>
+
+=over 4
+
+=item gt example 1
+
+  package main;
+
+  my $example = Example->new;
+
+  my $result = $example->gt({1..2});
+
+  # 0
+
+=back
+
+=over 4
+
+=item gt example 2
+
+  package main;
+
+  my $example = Example->new;
+
+  my $result = $example->gt(1.9998);
+
+  # 1
+
+=back
+
+=over 4
+
+=item gt example 3
+
+  package main;
+
+  my $example = Example->new;
+
+  my $result = $example->gt(\1_000_000);
+
+  # 0
+
+=back
+
+=cut
+
+=head2 gtlt
+
+  gtlt(Any $arg1, Any $arg2) (Bool)
+
+The gtlt method performs a I<"greater-than"> operation on the 1st argument, and
+I<"lesser-than"> operation on the 2nd argument. The operation will be performed
+as either a numerical or stringwise operation based upon the preference (i.e.
+the return value of the L</comparer> method) of the invocant.
+
+I<Since C<0.08>>
+
+=over 4
+
+=item gtlt example 1
+
+  package main;
+
+  my $example = Example->new;
+
+  my $result = $example->gtlt('1', 3);
+
+  # 1
+
+=back
+
+=over 4
+
+=item gtlt example 2
+
+  package main;
+
+  my $example = Example->new;
+
+  my $result = $example->gtlt({1..2}, {1..4});
+
+  # 0
+
+=back
+
+=over 4
+
+=item gtlt example 3
+
+  package main;
+
+  my $example = Example->new;
+
+  my $result = $example->gtlt('.', ['.']);
+
+  # 1
+
+=back
+
+=cut
+
+=head2 le
+
+  le(Any $arg) (Bool)
+
+The le method performs a I<"lesser-than-or-equal-to"> operation using the
+invocant and argument provided. The operation will be performed as either a
+numerical or stringwise operation based upon the preference (i.e. the return
+value of the L</comparer> method) of the invocant.
+
+I<Since C<0.08>>
+
+=over 4
+
+=item le example 1
+
+  package main;
+
+  my $example = Example->new;
+
+  my $result = $example->le('9');
+
+  # 1
+
+=back
+
+=over 4
+
+=item le example 2
+
+  package main;
+
+  my $example = Example->new;
+
+  my $result = $example->le([1..2]);
+
+  # 1
+
+=back
+
+=over 4
+
+=item le example 3
+
+  package main;
+
+  my $example = Example->new;
+
+  my $result = $example->le(\1);
+
+  # 0
+
+=back
+
+=cut
+
+=head2 lt
+
+  lt(Any $arg) (Bool)
+
+The lt method performs a I<"lesser-than"> operation using the invocant and
+argument provided. The operation will be performed as either a numerical or
+stringwise operation based upon the preference (i.e. the return value of the
+L</comparer> method) of the invocant.
+
+I<Since C<0.08>>
+
+=over 4
+
+=item lt example 1
+
+  package main;
+
+  my $example = Example->new;
+
+  my $result = $example->lt(qr/.*/);
+
+  # 1
+
+=back
+
+=over 4
+
+=item lt example 2
+
+  package main;
+
+  my $example = Example->new;
+
+  my $result = $example->lt('.*');
+
+  # 0
+
+=back
+
+=over 4
+
+=item lt example 3
+
+  package main;
+
+  my $example = Example->new;
+
+  my $result = $example->lt('5');
+
+  # 1
+
+=back
+
+=cut
+
+=head2 ne
+
+  ne(Any $arg) (Bool)
+
+The ne method performs a I<"not-equal-to"> operation using the invocant and
+argument provided. The operation will be performed as either a numerical or
+stringwise operation based upon the preference (i.e. the return value of the
+L</comparer> method) of the invocant.
+
+I<Since C<0.08>>
+
+=over 4
+
+=item ne example 1
+
+  package main;
+
+  my $example = Example->new;
+
+  my $result = $example->ne([1,2]);
+
+  # 1
+
+=back
+
+=over 4
+
+=item ne example 2
+
+  package main;
+
+  my $example = Example->new;
+
+  my $result = $example->ne([2]);
+
+  # 1
+
+=back
+
+=over 4
+
+=item ne example 3
+
+  package main;
+
+  my $example = Example->new;
+
+  my $result = $example->ne(qr/2/);
+
+  # 1
+
+=back
+
+=cut
+
+=head2 tv
+
+  tv(Any $arg) (Bool)
+
+The tv method performs a I<"type-and-value-equal-to"> operation using the
+invocant and argument provided. The operation will be performed as either a
+numerical or stringwise operation based upon the preference (i.e. the return
+value of the L</comparer> method) of the invocant.
+
+I<Since C<0.08>>
+
+=over 4
+
+=item tv example 1
+
+  package main;
+
+  my $example = Example->new;
+
+  my $result = $example->tv($example);
+
+  # 1
+
+=back
+
+=over 4
+
+=item tv example 2
+
+  package main;
+
+  use Venus::Number;
+
+  my $example = Example->new;
+
+  my $result = $example->tv(Venus::Number->new(2));
+
+  # 0
+
+=back
+
+=over 4
+
+=item tv example 3
+
+  package main;
+
+  use Venus::String;
+
+  my $example = Example->new;
+
+  my $result = $example->tv(Venus::String->new('2'));
+
+  # 0
+
+=back
+
+=over 4
+
+=item tv example 4
+
+  package main;
+
+  use Venus::String;
+
+  my $example = Example->new;
+
+  my $result = $example->tv(Example->new);
+
+  # 1
+
+=back
+
+=cut
+
+=head1 AUTHORS
+
+Cpanery, C<cpanery@cpan.org>
+
+=cut
+
+=head1 LICENSE
+
+Copyright (C) 2021, Cpanery
+
+Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
+
+=cut

@@ -6,6 +6,7 @@ lib/Module/Generic/Array.pod
 lib/Module/Generic/Boolean.pm
 lib/Module/Generic/Boolean.pod
 lib/Module/Generic/DateTime.pm
+lib/Module/Generic/DateTime/Interval.pod
 lib/Module/Generic/Dynamic.pm
 lib/Module/Generic/Dynamic.pod
 lib/Module/Generic/Exception.pm
@@ -37,6 +38,7 @@ MANIFEST
 META.yml
 README
 README.md
+SIGNATURE
 t/00.load.t
 t/01.pod.t
 t/02.num.t
@@ -54,6 +56,7 @@ t/12.sharedmem.t
 t/13.header_value.t
 t/14.core.t
 t/90.coverage.t
+t/91.signature.t
 t/99.kwalitee.t
 t/test.bat
 t/test.pl

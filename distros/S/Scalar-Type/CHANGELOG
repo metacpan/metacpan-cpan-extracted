@@ -1,3 +1,7 @@
+0.3.2    2022-03-10
+
+- bugfix: cope with some BOOL changes in blead-perl
+
 0.3.1    2022-01-07
 
 - add the bool_supported method that can be used to detect

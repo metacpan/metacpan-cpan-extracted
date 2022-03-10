@@ -3,7 +3,7 @@ NAME
     branch
 
 VERSION
-    version 0.5
+    version 0.6
 
 SYNOPSIS
         my $critic = Git::Critic->new( primary_target => 'main' );

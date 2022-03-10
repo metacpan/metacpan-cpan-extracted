@@ -26,12 +26,12 @@ no_index:
     - t
     - inc
 requires:
-  Overload::FileCheck: '0.012'
+  Overload::FileCheck: '0.013'
   Text::Glob: '0'
   perl: '5.006'
 resources:
   bugtracker: https://github.com/cpanelinc/Test-MockFile/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/cpanelinc/Test-MockFile
-version: '0.032'
+version: '0.033'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

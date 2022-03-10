@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20220305001842;
+our $VERSION = 1.20220307120119;
 
 my $formatters = [
                 {
@@ -240,41 +240,41 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"962539", "Zarqa",
+$areanames{en} = {"962533", "Balqa",
+"962262", "Mafraq",
+"962325", "Maan",
+"962322", "Tafileh",
+"962265", "Irbid",
+"962264", "Ajloun",
+"962538", "Zarqa",
+"96227", "Irbid",
+"962536", "Zarqa",
+"962324", "Aqaba",
+"962321", "Ma\’an",
+"96263", "Amman",
+"962320", "Aqaba",
+"962647", "Greater\ Amman",
+"962269", "Irbid",
+"962537", "Zarqa",
+"962535", "Balqa",
+"962532", "Madaba",
 "962625", "Amman",
+"9623260", "Tafileh",
+"9623262", "Southern\ Region",
+"962323", "Karak",
+"96265", "Amman",
+"962263", "Jarash",
+"962622", "Greater\ Amman",
+"96264", "Amman",
 "962267", "Jarash",
+"962620", "Amman",
+"962327", "Karak",
+"962539", "Zarqa",
+"962268", "Ajloun",
+"962531", "Madaba",
 "962534", "Balqa",
 "962530", "Zarqa",
-"962325", "Maan",
-"96263", "Amman",
-"9623262", "Southern\ Region",
-"962322", "Tafileh",
-"962622", "Greater\ Amman",
-"962531", "Madaba",
-"96227", "Irbid",
-"962320", "Aqaba",
-"962536", "Zarqa",
-"962535", "Balqa",
-"962324", "Aqaba",
-"962538", "Zarqa",
-"962620", "Amman",
-"962321", "Ma\’an",
-"962263", "Jarash",
-"962532", "Madaba",
-"962647", "Greater\ Amman",
-"962323", "Karak",
-"962537", "Zarqa",
-"962264", "Ajloun",
-"962269", "Irbid",
-"962262", "Mafraq",
-"962533", "Balqa",
-"962268", "Ajloun",
-"9623260", "Tafileh",
-"96264", "Amman",
-"962266", "Mafraq",
-"962327", "Karak",
-"962265", "Irbid",
-"96265", "Amman",};
+"962266", "Mafraq",};
 
     sub new {
       my $class = shift;

@@ -1,6 +1,6 @@
 package Koha::Contrib::Tamil::RecordReader;
 #ABSTRACT: Koha biblio/authority records reader
-$Koha::Contrib::Tamil::RecordReader::VERSION = '0.066';
+$Koha::Contrib::Tamil::RecordReader::VERSION = '0.067';
 use Moose;
 
 with 'MooseX::RW::Reader';
@@ -12,8 +12,8 @@ use Moose::Util::TypeConstraints;
 use MARC::Record;
 use MARC::File::XML;
 use C4::Context;
-use C4::Biblio;
-use C4::Items;
+use C4::Biblio qw/ GetMarcFromKohaField /;
+use C4::Items qw/ Item2Marc /;
 
 
 subtype 'Koha::RecordType'
@@ -294,7 +294,7 @@ Koha::Contrib::Tamil::RecordReader - Koha biblio/authority records reader
 
 =head1 VERSION
 
-version 0.066
+version 0.067
 
 =head1 SYNOPSYS
 
@@ -323,7 +323,7 @@ Frédéric Demians <f.demians@tamil.fr>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2021 by Fréderic Démians.
+This software is Copyright (c) 2022 by Fréderic Démians.
 
 This is free software, licensed under:
 

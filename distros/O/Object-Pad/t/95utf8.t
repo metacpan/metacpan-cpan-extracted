@@ -9,6 +9,7 @@ BEGIN { binmode STDOUT, ":encoding(UTF-8)" }
 use Test::More;
 
 use Object::Pad;
+use Object::Pad qw( :experimental(mop) );
 
 # A bunch of test cases with non-ASCII, non-Latin1. Esperanto is good for that
 # as the accented characters are not in Latin1.

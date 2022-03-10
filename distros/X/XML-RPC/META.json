@@ -1,10 +1,10 @@
 {
    "abstract" : "Pure Perl implementation for an XML-RPC client and server",
    "author" : [
-      "Rene Schickbauer  <maplat@cavac.at>"
+      "Rene Schickbauer  <cavac@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -41,6 +41,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : 1.1,
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "version" : 2,
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

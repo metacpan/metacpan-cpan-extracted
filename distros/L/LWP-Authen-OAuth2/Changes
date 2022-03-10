@@ -1,5 +1,12 @@
 Revision history for LWP-Authen-OAuth2
 
+0.19      2022-03-10 16:43:24+01:00
+    - Add Withings Service Provider (Brian Foley)
+    - replace explicit gibberisch with a hopeful better explanation (Thomas Klausner)
+    - Make meaningless doc explicitly meaningless. (Tamas TEVESZ)
+    - Fixed broken link as reported by CPANTS. (Mohammad S Anwar)
+
+
 0.18      2021-01-10 22:49:23+01:00
     - dist housekeeping, Dist::Zilla::PluginBundle::Author::DOMM
 

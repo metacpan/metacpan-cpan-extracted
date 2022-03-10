@@ -1,9 +1,7 @@
 package Alien::ffmpeg;
-BEGIN {
-  $Alien::ffmpeg::AUTHORITY = 'cpan:GETTY';
-}
+our $AUTHORITY = 'cpan:GETTY';
 # ABSTRACT: Easy installation of ffmpeg
-$Alien::ffmpeg::VERSION = '0.103';
+$Alien::ffmpeg::VERSION = '0.104';
 use parent 'Alien::Base';
 
 1;
@@ -18,7 +16,7 @@ Alien::ffmpeg - Easy installation of ffmpeg
 
 =head1 VERSION
 
-version 0.103
+version 0.104
 
 =head1 AUTHOR
 

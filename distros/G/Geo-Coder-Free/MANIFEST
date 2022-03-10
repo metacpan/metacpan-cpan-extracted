@@ -1,3 +1,4 @@
+bin/add_record
 bin/address_lookup
 bin/create_db
 bin/create_sqlite
@@ -42,8 +43,10 @@ t/admin1.t
 t/admin2.t
 t/bin.t
 t/cities.t
+t/comment-spelling.t
 t/coverage.t
 t/critic.t
+t/eof.t
 t/eol.t
 t/fixme.t
 t/gv.t
@@ -59,12 +62,12 @@ t/noopentickets.t
 t/noplan.t
 t/openaddr.t
 t/pod-cm.t
+t/pod-spelling.t
 t/pod.t
 t/port.t
 t/prereq.t
 t/scantext.t
 t/snippets.t
-t/spelling.t
 t/strict.t
 t/unused.t
 t/used.t

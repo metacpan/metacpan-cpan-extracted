@@ -52,4 +52,9 @@ require File::Temp;    # not really needed
     ok open( my $f, '>', "$dir/myfile.txt" ), "open a file created under newdir";
 }
 
+{
+    my $fh = File::Temp::tempfile();
+    is( scalar( ( stat $fh )[3] ), 0, "tempfile in scalar context" );
+}
+
 done_testing;

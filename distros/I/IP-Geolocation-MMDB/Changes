@@ -1,5 +1,9 @@
 Revision history for IP::Geolocation::MMDB
 
+1.004  2022-03-07 17:32:21 CET
+
+  - Reintroduce the Windows support
+
 1.003  2022-01-25 15:13:30 CET
 
   - Windows is no longer supported

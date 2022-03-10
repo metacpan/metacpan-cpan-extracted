@@ -4,6 +4,10 @@ use strict;
 use Async::Event::Interval;
 use Test::More;
 
+if (! $ENV{CI_TESTING}) {
+    plan skip_all => "Not on a valid CI testing platform..."
+}
+
 my @params = qw(1 2 3);
 
 my $event = Async::Event::Interval->new(

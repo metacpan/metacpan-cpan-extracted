@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/DateTime.pm
-## Version v0.2.1
+## Version v0.2.2
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2022/03/06
+## Modified 2022/03/08
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -57,7 +57,7 @@ BEGIN
         )?
     )?
     /x;
-    our $VERSION = 'v0.2.1';
+    our $VERSION = 'v0.2.2';
 };
 
 # use strict;
@@ -66,7 +66,69 @@ no warnings 'redefine';
 sub new
 {
     my $this = shift( @_ );
-    my $dt   = shift( @_ ) || return;
+    my $dt;
+    # Module::Generic::DateTime->new( $datetime_object );
+    # Module::Generic::DateTime->new( $datetime_object, $hash_ref_of_options );
+    # Module::Generic::DateTime->new( $datetime_object, %hash_of_options );
+    # Module::Generic::DateTime->new( $datetime_object, %hash_of_options );
+    # Module::Generic::DateTime->new( $hash_ref_of_options );
+    # Module::Generic::DateTime->new( %hash_of_options );
+    if( ( 
+            ( @_ % 2 ) && 
+            (
+                ( scalar( @_ ) == 1 && ref( $_[0] ) ne 'HASH' ) || 
+                scalar( @_ ) > 1
+            )
+        ) || 
+        ( scalar( @_ ) == 2 && ref( $_[1] ) eq 'HASH' ) )
+    {
+        $dt = shift( @_ );
+    }
+    my $opts = $this->_get_args_as_hash( @_ );
+    
+    if( defined( $dt ) && length( $dt ) )
+    {
+        if( Scalar::Util::blessed( $dt ) )
+        {
+            if( !$dt->isa( 'DateTime' ) )
+            {
+                return( $this->error( "Object provided is not a DateTime object." ) );
+            }
+        }
+        else
+        {
+            return( $this->error( "First argument provided, among the odd number of parameters received, is not a DateTime object." ) );
+        }
+    }
+    else
+    {
+        try
+        {
+            if( !exists( $opts->{formatter} ) )
+            {
+                $opts->{formatter} = DateTime::Format::Strptime->new(
+                    pattern => "%FT%T%z",
+                    locale => "en_GB",
+                );
+            }
+            $dt = DateTime->now( %$opts );
+        }
+        catch( $e where { /Cannot[[:blank:]\h]+determine[[:blank:]\h]+local[[:blank:]\h]+time[[:blank:]\h]+zone/i } )
+        {
+            warn( "Warning: Your system is missing key timezone components. Module::Generic::DateTime is reverting to UTC instead of local time zone." );
+            $opts->{time_zone} = 'UTC';
+            $today = DateTime->now( %$opts );
+            my $dt_fmt = DateTime::Format::Strptime->new(
+                pattern => '%FT%T%z',
+                locale => 'en_GB',
+            );
+            $today->set_formatter( $dt_fmt );
+        }
+        catch( $e )
+        {
+            return( $this->error( "Error while creating a DateTime object: $e" ) );
+        }
+    }
     return( bless( { dt => $dt->clone } => ( ref( $this ) || $this ) )->init( @_ ) );
 }
 
@@ -74,6 +136,7 @@ sub op
 {
     no overloading;
     my( $self, $other, $swap, $op ) = @_;
+    my $class = ref( $self ) || $self;
     no strict;
     my $dt1 = $self->{dt};
     my $dt2;
@@ -93,7 +156,15 @@ sub op
     # Unix time
     elsif( $other =~ /^\d{10}$/ )
     {
-        $dt2 = DateTime->from_epoch( epoch => $other, time_zone => 'local' );
+        try
+        {
+            $dt2 = DateTime->from_epoch( epoch => $other, time_zone => 'local' );
+        }
+        catch( $e )
+        {
+            warn( "Your system is missing key timezone components. ${class} is reverting to UTC instead of local time zone.\n" );
+            $dt2 = DateTime->from_epoch( epoch => $other, time_zone => 'UTC' );
+        }
         $dt2->set_formatter( $self->formatter );
     }
     elsif( $other =~ /^$TS_RE$/ )
@@ -137,6 +208,7 @@ sub op_minus_plus
 {
     no overloading;
     my( $self, $other, $swap, $op ) = @_;
+    my $class = ref( $self ) || $self;
     my $dt1 = $self->{dt};
     $other = $self->_get_other( $other );
     use overloading;
@@ -193,7 +265,15 @@ sub op_minus_plus
             {
                 my $clone = $dt1->clone;
                 my $ts = $clone->epoch;
-                $clone->set_time_zone( 'local' );
+                try
+                {
+                    $clone->set_time_zone( 'local' );
+                }
+                catch( $e )
+                {
+                    $clone->set_time_zone( 'UTC' );
+                    warn( "Your system is missing key timezone components. ${class} is reverting to UTC instead of local time zone.\n" );
+                }
                 my $new_ts = $v - $ts;
                 $new_dt = DateTime->from_epoch( epoch => $new_ts, time_zone => $dt1->time_zone );
                 my $strp = DateTime::Format::Strptime->new(
@@ -632,8 +712,12 @@ Module::Generic::DateTime - A DateTime wrapper for enhanced features
 =head1 SYNOPSIS
 
     use Module::Generic::DateTime;
+
     my $dt = DateTime->new;
     my $gdt = Module::Generic::DateTime->new( $dt );
+    # or directly will instantiate a default DateTime value based on DateTime->now
+    my $gdt = Module::Generic::DateTime->new;
+
     # Now you can do operations that are not normally possible with DateTime
     # Compare a dt object with a unix timestamp
     if( $gdt > time() )
@@ -676,12 +760,73 @@ Module::Generic::DateTime - A DateTime wrapper for enhanced features
 
 =head1 VERSION
 
-    v0.2.1
+    v0.2.2
 
 =head1 DESCRIPTION
 
-=encoding utf-8
+L<Module::Generic::DateTime> is a thin wrapper around L<DateTime> to provide additional features as exemplified above.
 
-=head1 NAME - Module::Generic::DateTime
+It also enables the L<DateTime> object to be thawed and frozen and converted to L<JSON> with the respective methods C<STORABLE_freeze>, C<STORABLE_thaw>, C<TO_JSON>
+
+All other method calls not in this API are passed to L<DateTime> using C<AUTOLOAD> with the added benefit that, if a method called triggers a fatal exception, it is caught using L<Nice::Try> try-catch block and an L<error|Module::Generic/error> is set and C<return> is returned instead.
+
+=head1 CONSTRUCTOR
+
+=head2 new
+
+Provided with an optional L<DateTime> object and this returns a new instance of L<Module::Generic::DateTime>.
+
+If no L<DateTime> object was provided, this will instantiate one implicitly and set the formatter to stringify it to an iso8601 string, such as: C<2022-03-08T14:22:10+0000>. By default the instantiated L<DateTime> object use the default time zone, which is C<GMT>. You can change the time zone afterward using L<DateTime/set_time_zone>:
+
+    $dt->set_time_zone( 'Asia/Tokyo' );
+
+=head1 METHODS
+
+=head2 op
+
+This method is called to overload the following operations:
+
+=over 4
+
+=item * C<""> stringification
+
+=item * C<bool>
+
+=item * C<>> greater than
+
+=item * C<>=> greater or equal than
+
+=item * C<<> lower than
+
+=item * C<<=> lower or equal than
+
+=item * C<==> euqal
+
+=item * C<!=> not equal
+
+=item * C<-> minus
+
+=item * C<+> plus
+
+=back
+
+=head2 op_minus_plus
+
+This methods handles cases of overloading for C<minus> and C<plus>
+
+=head1 SEE ALSO
+
+L<Module::Generic>, L<Module::Generic::DateTime::Interval>, L<DateTime>, L<DateTime::Format::Strptime>, L<DatetTime::TimeZone>
+
+=head1 AUTHOR
+
+Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright (c) 2000-2022 DEGUEST Pte. Ltd.
+
+You can use, copy, modify and redistribute this package and associated
+files under the same terms as Perl itself.
 
 =cut

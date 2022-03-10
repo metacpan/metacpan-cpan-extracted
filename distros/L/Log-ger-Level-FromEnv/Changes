@@ -1,3 +1,10 @@
+0.005   2022-02-18  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Mention Log::ger::Level::FromVar.
+
+
 0.004   2020-03-10  Released-By: PERLANCAR; Urgency: medium
 
 	- Use Log::ger::Util::set_level and be more flexible (pass any

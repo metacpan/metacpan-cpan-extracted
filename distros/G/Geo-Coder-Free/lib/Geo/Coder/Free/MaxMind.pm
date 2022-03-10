@@ -7,7 +7,7 @@ package Geo::Coder::Free::MaxMind;
 
 # FIXME: If you search for something like "Sheppy, Kent, England" in list
 #	context, it returns them all.  That's a lot! Should limit to, say
-#	10 results (that number should be tunable, and be a LIMIT in DB.pm)
+#	10 results (that number should be tuneable, and be a LIMIT in DB.pm)
 #	And as the correct spelling in Sheppey, arguably it should return nothing
 
 use strict;
@@ -45,11 +45,11 @@ Geo::Coder::Free::MaxMind - Provides a geocoding functionality using the MaxMind
 
 =head1 VERSION
 
-Version 0.29
+Version 0.30
 
 =cut
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 =head1 SYNOPSIS
 
@@ -95,7 +95,7 @@ Here's the method to find the location of Sittingbourne, Kent, England:
    Note that GB has counties
    A typical line is:
     GB.ENG.G5	Kent	Kent	3333158
-   So a look up of 'Kent' with a contacatenated code to start with 'GB.ENG' will code the region G5 for use in cities.sql
+   So a look up of 'Kent' with a concatenated code to start with 'GB.ENG' will code the region G5 for use in cities.sql
 3) cities.sql contains the latitude and longitude of the place we want, so a search for 'sittingbourne' in
    region 'g5' will give
      gb,sittingbourne,Sittingbourne,G5,41148,51.333333,.75
@@ -455,81 +455,81 @@ sub geocode {
 		$confidence = 0.1;
 	}
 	# ::diag(__PACKAGE__, ': ', __LINE__, ': ', Data::Dumper->new([$options])->Dump());
-	# This case nonsense is because DBD::CSV changes the columns to lowercase, wherease DBD::SQLite does not
+	# This case nonsense is because DBD::CSV changes the columns to lowercase, whereas DBD::SQLite does not
 	# if(wantarray && (!$options->{'City'}) && !$region_only) {
-	if(0) {	# We don't need to find all the cities in a state, which is what this would do
-		# ::diag(__PACKAGE__, ': ', __LINE__);
-		my @rc = $self->{'cities'}->selectall_hash($options);
-		if(scalar(@rc) == 0) {
-			if((!defined($region)) && !defined($param{'region'})) {
-				# Add code for this area to Makefile.PL and rebuild
-				Carp::carp(__PACKAGE__, ": didn't determine region from $location");
-				return;
-			}
-			# This would return all of the cities in the wrong region
-			if($countrycode) {
-				@rc = $self->{'cities'}->selectall_hash('Region' => ($region || $param{'region'}), 'Country' => $countrycode);
-				if(scalar(@rc) == 0) {
-					# ::diag(__PACKAGE__, ': ', __LINE__, ': no matches: ', Data::Dumper->new([$options])->Dump());
-					return;
-				}
-			}
-			# ::diag(__LINE__, ': ', Data::Dumper->new([\@rc])->Dump());
-		}
-	 	# ::diag(__LINE__, ': ', Data::Dumper->new([\@rc])->Dump());
-		foreach my $city(@rc) {
-			if($city->{'Latitude'}) {
-				$city->{'latitude'} = delete $city->{'Latitude'};
-				$city->{'longitude'} = delete $city->{'Longitude'};
-			}
-			if($city->{'Country'}) {
-				$city->{'country'} = uc(delete $city->{'Country'});
-			}
-			if($city->{'Region'}) {
-				$city->{'state'} = uc(delete $city->{'Region'});
-			}
-			if($city->{'City'}) {
-				$city->{'city'} = uc(delete $city->{'AccentCity'});
-				delete $city->{'City'};
-				# Less likely to get false positives with long words
-				if(length($city->{'city'}) > 10) {
-					if($confidence <= 0.8) {
-						$confidence += 0.2;
-					} else {
-						$confidence = 1.0;
-					}
-				}
-			}
-			$city->{'confidence'} = $confidence;
-			my $l = $options->{'City'};
-			if($options->{'Region'}) {
-				$l .= ', ' . $options->{'Region'};
-			}
-			if($options->{'Country'}) {
-				$l .= ', ' . ucfirst($options->{'Country'});
-			}
-			$city->{'location'} = $l;
-		}
-		# return @rc;
-		my @locations;
-
-		foreach my $l(@rc) {
-			if(exists($l->{'latitude'})) {
-				push @locations, Geo::Location::Point->new({
-					'lat' => $l->{'latitude'},
-					'long' => $l->{'longitude'},
-					'location' => $location,
-					'database' => 'MaxMind',
-					'maxmind' => $l,
-				});
-			# } else {
-				# Carp::carp(__PACKAGE__, ": $location has latitude of 0");
+	# if(0) {	# We don't need to find all the cities in a state, which is what this would do
+		# # ::diag(__PACKAGE__, ': ', __LINE__);
+		# my @rc = $self->{'cities'}->selectall_hash($options);
+		# if(scalar(@rc) == 0) {
+			# if((!defined($region)) && !defined($param{'region'})) {
+				# # Add code for this area to Makefile.PL and rebuild
+				# Carp::carp(__PACKAGE__, ": didn't determine region from $location");
 				# return;
-			}
-		}
-
-		return @locations;
-	}
+			# }
+			# # This would return all of the cities in the wrong region
+			# if($countrycode) {
+				# @rc = $self->{'cities'}->selectall_hash('Region' => ($region || $param{'region'}), 'Country' => $countrycode);
+				# if(scalar(@rc) == 0) {
+					# # ::diag(__PACKAGE__, ': ', __LINE__, ': no matches: ', Data::Dumper->new([$options])->Dump());
+					# return;
+				# }
+			# }
+			# # ::diag(__LINE__, ': ', Data::Dumper->new([\@rc])->Dump());
+		# }
+	 	# # ::diag(__LINE__, ': ', Data::Dumper->new([\@rc])->Dump());
+		# foreach my $city(@rc) {
+			# if($city->{'Latitude'}) {
+				# $city->{'latitude'} = delete $city->{'Latitude'};
+				# $city->{'longitude'} = delete $city->{'Longitude'};
+			# }
+			# if($city->{'Country'}) {
+				# $city->{'country'} = uc(delete $city->{'Country'});
+			# }
+			# if($city->{'Region'}) {
+				# $city->{'state'} = uc(delete $city->{'Region'});
+			# }
+			# if($city->{'City'}) {
+				# $city->{'city'} = uc(delete $city->{'AccentCity'});
+				# delete $city->{'City'};
+				# # Less likely to get false positives with long words
+				# if(length($city->{'city'}) > 10) {
+					# if($confidence <= 0.8) {
+						# $confidence += 0.2;
+					# } else {
+						# $confidence = 1.0;
+					# }
+				# }
+			# }
+			# $city->{'confidence'} = $confidence;
+			# my $l = $options->{'City'};
+			# if($options->{'Region'}) {
+				# $l .= ', ' . $options->{'Region'};
+			# }
+			# if($options->{'Country'}) {
+				# $l .= ', ' . ucfirst($options->{'Country'});
+			# }
+			# $city->{'location'} = $l;
+		# }
+		# # return @rc;
+		# my @locations;
+		# 
+		# foreach my $l(@rc) {
+			# if(exists($l->{'latitude'})) {
+				# push @locations, Geo::Location::Point->new({
+					# 'lat' => $l->{'latitude'},
+					# 'long' => $l->{'longitude'},
+					# 'location' => $location,
+					# 'database' => 'MaxMind',
+					# 'maxmind' => $l,
+				# });
+			# # } else {
+				# # Carp::carp(__PACKAGE__, ": $location has latitude of 0");
+				# # return;
+			# }
+		# }
+		# 
+		# return @locations;
+	# }
 	# ::diag(__PACKAGE__, ': ', __LINE__, ': ', Data::Dumper->new([$options])->Dump());
 	my $city = $self->{'cities'}->fetchrow_hashref($options);
 	if(!defined($city)) {
@@ -677,13 +677,13 @@ The GeoNames admin databases are in this class, they should be in Geo::Coder::Ge
 The data at
 L<https://github.com/apache/commons-csv/blob/master/src/test/resources/org/apache/commons/csv/perf/worldcitiespop.txt.gz?raw=true>
 are 7 years out of date,
-and are unconsistent with the Geonames database.
+and are inconsistent with the Geonames database.
 
 If you search for something like "Sheppy, Kent, England" in list context,
 it returns them all.
 That's a lot!
 It should limit to,
-say 10 results (that number should be tunable, and be a LIMIT in DB.pm),
+say 10 results (that number should be tuneable, and be a LIMIT in DB.pm),
 and as the correct spelling in Sheppey, arguably it should return nothing.
 
 =head1 SEE ALSO
@@ -692,7 +692,7 @@ VWF, MaxMind and geonames.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017-2020 Nigel Horne.
+Copyright 2017-2022 Nigel Horne.
 
 The program code is released under the following licence: GPL for personal use on a single computer.
 All other users (including Commercial, Charity, Educational, Government)

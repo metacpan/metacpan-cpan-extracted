@@ -5,7 +5,7 @@ use vars qw( $VERSION );
 use base qw( Template::Plugin );
 use Template::Plugin;
 
-$VERSION = '0.13';
+$VERSION = '0.14';
 
 #------------------------------------------------------------------------
 # new(\%options)
@@ -59,7 +59,7 @@ sub _cached_action {
             ':',
             (
                 $params->{template},
-                map { "$_=$cache_keys->{$_}" } keys %{$cache_keys}
+                map { "$_=$cache_keys->{$_}" } sort keys %{$cache_keys}
             )
         );
     }

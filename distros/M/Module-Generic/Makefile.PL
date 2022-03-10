@@ -71,6 +71,7 @@ WriteMakefile(
     },
     LICENSE             => 'perl_5',
     MIN_PERL_VERSION    => 'v5.26.1',
+    (MM->can('signature_target') ? (SIGN => 1) : ()),
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'Module-Generic-*' },
     ( eval { ExtUtils::MakeMaker->VERSION(6.46) } ? ( META_MERGE => {

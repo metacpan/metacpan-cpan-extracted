@@ -9,7 +9,7 @@ my @needfull;
 # Install Pre-requisites
 BEGIN {
 	my @modules = (
-		'File::HomeDir', 'LWP::Protocol::https', 'LWP::Simple::WithCache'
+		'LWP::Protocol::https'
 	);
 
 	foreach my $module(@modules) {
@@ -21,7 +21,7 @@ BEGIN {
 
 	if(scalar(@needfull)) {
 		my $list = join(' ', @needfull);
-		if($ENV{'AUTOMATED_TESTING'}) {
+		if($ENV{'AUTOMATED_TESTING'} && !defined($ENV{'TRAVIS_PERL_VERSION'})) {
 			die "You need $list to test this package";
 		}
 		print "Installing $list\n";
@@ -86,12 +86,15 @@ if(eval { require HTTP::Cache::Transparent; }) {
 	if(my $e = $ENV{'CACHEDIR'}) {
 		$cachedir = File::Spec->catfile($e, 'http-cache-transparent');
 	} else {
+		require File::HomeDir;
+		File::HomeDir->import();
+
 		# $cachedir = File::Spec->catfile(File::Spec->tmpdir(), 'cache', 'http-cache-transparent');
 		$cachedir = File::Spec->catfile(File::HomeDir->my_home(), '.cache', 'http-cache-transparent');
 	}
 
 	if(!-d $cachedir) {
-		print "Creating the download directory $cachedir\n";
+		print "Creating the cache directory $cachedir\n";
 		mkdir $cachedir || die "$cachedir: $@";
 	}
 	HTTP::Cache::Transparent::init({
@@ -105,16 +108,48 @@ if(eval { require HTTP::Cache::Transparent; }) {
 	print "Consider installing HTTP::Cache::Transparent to reduce downloads\n";
 }
 
+my $use_withcache;
+if(eval { require LWP::Simple::WithCache; }) {
+	LWP::Simple::WithCache->import();
+	$use_withcache = 1;
+} else {
+	require LWP::Simple;
+	LWP::Simple->import();
+
+	print "Consider installing LWP::Simple::WithCache to reduce downloads\n";
+}
+
 foreach my $url(keys %urls) {
 	my $file = $urls{$url};
+	my $use_mirror = 0;
+
 	if(-r $file) {
-		# Don't bother downloading if the file is less than a week old
+		# Don't bother checking for a download if the file is less than a week old
 		next if(-M $file < 7);
+		# I get errors with mirror with L:S:WithCache
+		#	that the temporary file is unavailable
+		if(!$use_withcache) {
+			# Only download if a newer version is available
+			$use_mirror = 1;
+		}
 	}
 
-	print "Downloading $url to $file\n";
-	if(LWP::Simple::WithCache::is_error(my $rc = LWP::Simple::WithCache::mirror($url, $file))) {
-		die "$url: LWP error $rc";
+	if($use_mirror) {
+		print "Downloading $url to $file if a newer version is available\n";
+		if($use_withcache &&
+		   LWP::Simple::WithCache::is_error(my $rc = LWP::Simple::WithCache::mirror($url, $file))) {
+			die "$url: LWP error $rc";
+		} elsif(LWP::Simple::is_error($rc = LWP::Simple::mirror($url, $file))) {
+			die "$url: LWP error $rc";
+		}
+	} else {
+		print "Downloading $url to $file\n";
+		if($use_withcache &&
+		   LWP::Simple::WithCache::is_error(my $rc = LWP::Simple::WithCache::getstore($url, $file))) {
+			die "$url: LWP error $rc";
+		} elsif(LWP::Simple::is_error($rc = LWP::Simple::getstore($url, $file))) {
+			die "$url: LWP error $rc";
+		}
 	}
 	die $file if(!-r $file);
 }
@@ -162,6 +197,7 @@ if($ENV{'AUTHOR_TESTING'}) {
 	$test_requires->{'IPC::System::Simple'} = 0;
 	$test_requires->{'Template::Plugin::EnvHash'} = 0;
 	$test_requires->{'Test::Pod::LinkCheck'} = 0;
+	$test_requires->{'Taint::Runtime'} = 0;
 }
 
 WriteMakefile(
@@ -193,8 +229,7 @@ WriteMakefile(
 		'LWP::UserAgent::Throttled' => 0,
 		'Try::Tiny' => 0,
 		'XML::LibXML::Reader' => 0,	# FIXME: only if $OSM_HOME is set
-	},
-	TEST_REQUIRES => $test_requires,
+	}, TEST_REQUIRES => $test_requires,
 	PREREQ_PM => {
 		'Carp' => 0,
 		'DBI' => 0,

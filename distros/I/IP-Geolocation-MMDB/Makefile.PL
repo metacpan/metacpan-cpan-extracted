@@ -8,7 +8,7 @@ use warnings;
 use 5.016;
 use ExtUtils::MakeMaker;
 
-die "OS unsupported\n" if $^O eq 'MSWin32';
+die "OS unsupported\n" if $^O eq 'MSWin32' && !eval { require Alien::MSYS };
 use Config;
 use Alien::libmaxminddb;
 die "OS unsupported\n" if Alien::libmaxminddb->version =~ m{^(0|1\.[01])\.};
@@ -34,7 +34,7 @@ my %WriteMakefileArgs = (
     "File::Spec::Functions" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "1.003",
+  "VERSION" => "1.004",
   "test" => {
     "TESTS" => "t/*.t"
   }

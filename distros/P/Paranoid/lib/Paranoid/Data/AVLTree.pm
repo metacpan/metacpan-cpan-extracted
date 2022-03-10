@@ -1,6 +1,6 @@
 # Paranoid::Data::AVLTree -- AVL-Balanced Tree Class
 #
-# $Id: lib/Paranoid/Data/AVLTree.pm, 2.09 2021/12/28 15:46:49 acorliss Exp $
+# $Id: lib/Paranoid/Data/AVLTree.pm, 2.10 2022/03/08 00:01:04 acorliss Exp $
 #
 # This software is free software.  Similar to Perl, you can redistribute it
 # and/or modify it under the terms of either:
@@ -38,14 +38,35 @@ use warnings;
 use vars qw($VERSION);
 use base qw(Exporter);
 use Paranoid;
+use Paranoid::Data;
 use Paranoid::Debug qw(:all);
 use Paranoid::Data::AVLTree::AVLNode;
+use Paranoid::IO;
+use Fcntl qw(:DEFAULT :flock :mode :seek);
 use Carp;
 
-($VERSION) = ( q$Revision: 2.09 $ =~ /(\d+(?:\.\d+)+)/sm );
+($VERSION) = ( q$Revision: 2.10 $ =~ /(\d+(?:\.\d+)+)/sm );
 
-use constant AVLROOT => 0;
-use constant AVLKEYS => 1;
+use constant AVLROOT  => 0;
+use constant AVLKEYS  => 1;
+use constant AVLPROF  => 2;
+use constant AVLSTATS => 3;
+
+use constant STAT_INSERTS   => 0;
+use constant STAT_DELETES   => 1;
+use constant STAT_REBALANCE => 2;
+use constant STAT_ROTATIONS => 3;
+
+use constant AVLZEROLS => 1;
+use constant AVLUNDEF  => 2;
+
+# Record signature format:
+#   PDAVL KFLAG VFLAG KLEN VLEN
+#   Z6    Cx    Cx    NNx  NNx
+#     28 bytes
+use constant SIGNATURE => 'Z6CxCxNNxNNx';
+use constant SIG_LEN   => 28;
+use constant SIG_TYPE  => 'PDAVL';
 
 #####################################################################
 #
@@ -62,15 +83,64 @@ sub new {
     my ( $class, %args ) = splice @_;
     my $self = [undef];
 
-    pdebug( 'entering w/%s', PDLEVEL1, %args );
-    pIn();
+    subPreamble( PDLEVEL1, '%', %args );
 
     bless $self, $class;
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL1, $self );
+    subPostamble( PDLEVEL1, '$', $self );
 
     return $self;
+}
+
+sub profile {
+
+    # Purpose:  Enables/disables performance profiling
+    # Returns:  Boolean
+    # Usage:    $rv = $obj->profile(1);
+
+    my $self   = shift;
+    my $enable = shift;
+
+    $$self[AVLPROF] = $enable;
+    if ($enable) {
+
+        # Reset counters
+        $$self[AVLSTATS]                 = [];
+        $$self[AVLSTATS][STAT_INSERTS]   = 0;
+        $$self[AVLSTATS][STAT_DELETES]   = 0;
+        $$self[AVLSTATS][STAT_REBALANCE] = 0;
+        $$self[AVLSTATS][STAT_ROTATIONS] = 0;
+    }
+
+    return 1;
+}
+
+sub stats {
+
+    # Purpose:  Returns the values of the current perf counters
+    # Returns:  Hash
+    # Usage:    %stats = $obj->stats;
+
+    my $self = shift;
+    my %stats;
+
+    if ( defined $$self[AVLSTATS] ) {
+        %stats = (
+            insertions => $$self[AVLSTATS][STAT_INSERTS],
+            deletions  => $$self[AVLSTATS][STAT_DELETES],
+            rebalances => $$self[AVLSTATS][STAT_REBALANCE],
+            rotations  => $$self[AVLSTATS][STAT_ROTATIONS],
+            );
+    } else {
+        %stats = (
+            insertions => 0,
+            deletions  => 0,
+            rebalances => 0,
+            rotations  => 0,
+            );
+    }
+
+    return %stats;
 }
 
 sub count {
@@ -132,7 +202,8 @@ sub dumpKeys {
     my $line = '<empty>';
 
     $line = _printKeys( 1, $$self[AVLROOT] ) if defined $$self[AVLROOT];
-    warn "Key Dump:\n$line";
+
+    pderror($line);
 
     return 1;
 }
@@ -185,8 +256,7 @@ sub _findNode {
     my $rv   = 0;
     my ( @path, $node );
 
-    pdebug( 'entering w/(%s)(%s)(%s)', PDLEVEL4, $key, $nref, $pref );
-    pIn();
+    subPreamble( PDLEVEL4, '$$$', $key, $nref, $pref );
 
     $$nref = undef;
     @$pref = ();
@@ -207,8 +277,7 @@ sub _findNode {
         pdebug( 'path to node position: %s', PDLEVEL4, @$pref );
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL4, $rv );
+    subPostamble( PDLEVEL4, '$', $rv );
 
     return $rv;
 }
@@ -248,8 +317,7 @@ sub fetchVal {
     my $key  = shift;
     my ( @path, $node, $val );
 
-    pdebug( 'entering w/%s', PDLEVEL3, $key );
-    pIn();
+    subPreamble( PDLEVEL3, '$', $key );
 
     if ( defined $key ) {
         $self->_findNode( $key, \$node, \@path );
@@ -257,11 +325,7 @@ sub fetchVal {
         $val = $node->val if defined $node;
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s bytes',
-        PDLEVEL3, defined $val
-        ? length $val
-        : 0 );
+    subPostamble( PDLEVEL3, 'b', $val );
 
     return $val;
 }
@@ -279,8 +343,7 @@ sub _addNode {
     my $rv   = 1;
     my ( @path, $nn, $node, $parent );
 
-    pdebug( 'entering w/ %s => %s', PDLEVEL3, $key, $val );
-    pIn();
+    subPreamble( PDLEVEL3, '$b', $key, $val );
 
     # Validation check
     $nn = Paranoid::Data::AVLTree::AVLNode->new( $key, $val );
@@ -306,6 +369,7 @@ sub _addNode {
                     $path[-1]->setLeft($nn);
                 }
                 pdebug( 'added node at the end of the branch', PDLEVEL4 );
+                $$self[AVLSTATS][STAT_INSERTS]++ if $$self[AVLPROF];
 
             }
 
@@ -313,6 +377,7 @@ sub _addNode {
             $$self[AVLROOT] = $nn;
             pdebug( 'adding node as the tree root: %s',
                 PDLEVEL4, $$self[AVLROOT] );
+            $$self[AVLSTATS][STAT_INSERTS]++ if $$self[AVLPROF];
         }
 
     } else {
@@ -320,8 +385,7 @@ sub _addNode {
         pdebug( 'invalid key submitted: %s', PDLEVEL1, $key );
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL3, $rv );
+    subPostamble( PDLEVEL3, '$', $rv );
 
     return $rv;
 }
@@ -376,8 +440,7 @@ sub _rrr {
     my $z    = $x->left;
     my $rv;
 
-    pdebug( 'entering w/(%s)(%s)', PDLEVEL4, $root, $x );
-    pIn();
+    subPreamble( PDLEVEL4, '$$', $root, $x );
 
     # Update root node as a prerequisite to continuing
     $rv = defined $x and defined $z and $self->_updtRootRef( $root, $x, $z );
@@ -395,10 +458,10 @@ sub _rrr {
         } else {
             $$self[AVLROOT]->updtHeights;
         }
+        $$self[AVLSTATS][STAT_ROTATIONS]++ if $$self[AVLPROF];
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL4, $rv );
+    subPostamble( PDLEVEL4, '$', $rv );
 
     return $rv;
 }
@@ -415,8 +478,7 @@ sub _rll {
     my $z    = $x->right;
     my $rv;
 
-    pdebug( 'entering w/(%s)(%s)', PDLEVEL4, $root, $x );
-    pIn();
+    subPreamble( PDLEVEL4, '$$', $root, $x );
 
     # Update root node as a prerequisite to continuing
     $rv = defined $x and defined $z and $self->_updtRootRef( $root, $x, $z );
@@ -434,10 +496,10 @@ sub _rll {
         } else {
             $$self[AVLROOT]->updtHeights;
         }
+        $$self[AVLSTATS][STAT_ROTATIONS]++ if $$self[AVLPROF];
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL4, $rv );
+    subPostamble( PDLEVEL4, '$', $rv );
 
     return $rv;
 }
@@ -455,8 +517,7 @@ sub _rrl {
     my $y    = $z->left;
     my $rv   = 0;
 
-    pdebug( 'entering w/(%s)(%s)', PDLEVEL4, $root, $x );
-    pIn();
+    subPreamble( PDLEVEL4, '$$', $root, $x );
 
     $rv = $self->_rrr( $x, $z );
     if ($rv) {
@@ -471,8 +532,7 @@ sub _rrl {
         pdebug( 'double rotation failed on first rotation', PDLEVEL1 );
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL4, $rv );
+    subPostamble( PDLEVEL4, '$', $rv );
 
     return $rv;
 }
@@ -490,8 +550,7 @@ sub _rlr {
     my $y    = $z->right;
     my $rv   = 0;
 
-    pdebug( 'entering w/(%s)(%s)', PDLEVEL4, $root, $x );
-    pIn();
+    subPreamble( PDLEVEL4, '$$', $root, $x );
 
     $rv = $self->_rll( $x, $z );
     if ($rv) {
@@ -506,8 +565,7 @@ sub _rlr {
         pdebug( 'double rotation failed on first rotation', PDLEVEL1 );
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL4, $rv );
+    subPostamble( PDLEVEL4, '$', $rv );
 
     return $rv;
 }
@@ -525,8 +583,7 @@ sub _rotate {
     my $x    = shift;
     my $rv   = 1;
 
-    pdebug( 'entering w/(%s)(%s)', PDLEVEL4, $root, $x );
-    pIn();
+    subPreamble( PDLEVEL4, '$$', $root, $x );
 
     if ( $x->balance > 1 ) {
 
@@ -557,8 +614,7 @@ sub _rotate {
         }
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL4, $rv );
+    subPostamble( PDLEVEL4, '$', $rv );
 
     return $rv;
 }
@@ -575,8 +631,7 @@ sub _rebalance {
     my $key  = $node->key;
     my ( @path, $parent, $n );
 
-    pdebug( 'entering w/%s', PDLEVEL4, $node );
-    pIn();
+    subPreamble( PDLEVEL4, '$', $node );
 
     if ( $self->_findNode( $key, \$node, \@path ) ) {
 
@@ -586,6 +641,7 @@ sub _rebalance {
 
         # Find number of nodes that are unbalanced
         $n = scalar grep { abs( $_->balance ) > 1 } @path;
+        $$self[AVLSTATS][STAT_REBALANCE]++ if $$self[AVLPROF] and $n;
         while ($n) {
             pdebug( 'found %s node(s) in the branch that are unbalanced',
                 PDLEVEL4, $n );
@@ -610,8 +666,7 @@ sub _rebalance {
         }
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: 1', PDLEVEL4 );
+    subPostamble( PDLEVEL4, '$', 1 );
 
     return 1;
 }
@@ -628,8 +683,7 @@ sub addPair {
     my $rv   = 1;
     my ( @path, $node );
 
-    pdebug( 'entering w/ %s => %s', PDLEVEL3, $key, $val );
-    pIn();
+    subPreamble( PDLEVEL3, '$b', $key, $val );
 
     $rv = $self->_addNode( $key, $val );
     if ($rv) {
@@ -637,8 +691,7 @@ sub addPair {
         $rv = $self->_rebalance($node);
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL3, $rv );
+    subPostamble( PDLEVEL3, '$', $rv );
 
     return $rv;
 }
@@ -656,8 +709,7 @@ sub _splice {
     my $node = shift;
     my ( $rv, $ln, $rn, $cn, @path, $height );
 
-    pdebug( 'entering w/(%s)(%s)', PDLEVEL4, $root, $node );
-    pIn();
+    subPreamble( PDLEVEL4, '$$', $root, $node );
 
     $ln = $node->left;
     $rn = $node->right;
@@ -730,8 +782,7 @@ sub _splice {
             PDLEVEL4 );
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL4, $rv );
+    subPostamble( PDLEVEL4, '$', $rv );
 
     return $rv;
 }
@@ -747,8 +798,7 @@ sub delNode {
     my $rv   = 0;
     my ( $root, $node, @path, $height );
 
-    pdebug( 'entering w/%s', PDLEVEL4, $key );
-    pIn();
+    subPreamble( PDLEVEL3, '$', $key );
 
     if ( $self->_findNode( $key, \$node, \@path ) ) {
         $root = $path[-1];
@@ -791,14 +841,14 @@ sub delNode {
             }
 
         }
+        $$self[AVLSTATS][STAT_DELETES]++ if $$self[AVLSTATS] and $rv;
 
         # Rebalance
         $root = $$self[AVLROOT] unless defined $root;
         $rv = $self->_rebalance($root) if defined $root and $rv;
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL4, $rv );
+    subPostamble( PDLEVEL3, '$', $rv );
 
     return $rv;
 }
@@ -812,13 +862,237 @@ sub purgeNodes {
 
     my $self = shift;
 
-    pdebug( 'entering', PDLEVEL4 );
+    subPreamble(PDLEVEL3);
 
     $$self[AVLROOT] = undef;
 
-    pdebug( 'leaving w/rv: 1', PDLEVEL4 );
+    subPostamble( PDLEVEL3, '$', 1 );
 
     return 1;
+}
+
+sub _writeRecord {
+
+    # Purpose:  Writes the passed node to file
+    # Returns:  Boolean
+    # Usage:    $rv = _writeRecord($filename, $node);
+
+    my $file = shift;
+    my $node = shift;
+    my ( $rv, $rec, $k, $v, $kf, $vf );
+
+    # Get key/val
+    $k = $node->key;
+    $v = $node->val;
+
+    # Set flag values
+    $kf =
+         !defined $k ? AVLUNDEF
+        : length $k  ? 0
+        :              AVLZEROLS;
+    $vf =
+         !defined $v ? AVLUNDEF
+        : length $v  ? 0
+        :              AVLZEROLS;
+
+    {
+        use bytes;
+        $rec = pack SIGNATURE, SIG_TYPE, $kf, $vf,
+            quad2Longs( $kf ? 0 : length $k ),
+            quad2Longs( $vf ? 0 : length $v );
+        $rec .= $k unless $kf;
+        $rec .= $v unless $vf;
+
+        $rv = pwrite( $file, $rec ) == length $rec ? 1 : 0;
+    }
+
+    pdebug( 'failed to write record', PDLEVEL1 ) unless $rv;
+
+    return $rv;
+}
+
+sub save2File {
+
+    # Purpose:  Saves binary tree to a file
+    # Returns:  Boolean
+    # Usage:    $rv = $obj->save($file);
+
+    my $self = shift;
+    my $file = shift;
+    my $rv;
+    my ( @lc, @rc, @ln, @rn, $node );
+
+    subPreamble( PDLEVEL1, '$', $file );
+
+    if ( defined $file and length $file ) {
+        if ( popen( $file, O_RDWR | O_CREAT ) ) {
+            pseek( $file, 0, SEEK_SET );
+            ptruncate($file);
+
+            # Start descending the tree one level at a time
+            if ( defined $$self[AVLROOT] ) {
+                $rv = _writeRecord( $file, $$self[AVLROOT] );
+                @lc = ( grep {defined} $$self[AVLROOT]->left );
+                @rc = ( grep {defined} $$self[AVLROOT]->right );
+
+                # Note:  the whole point of this is to attempt to retrieve
+                # nodes from both sides of the tree in a way that, when read,
+                # will require minimal rebalances.
+
+                # Start descending and writing
+                while ( $rv and ( @lc or @rc ) ) {
+
+                    # Extract a list of all left and right nodes
+                    @ln = grep {defined} map { $_->left } @lc;
+                    push @ln, grep {defined} map { $_->right } @lc;
+                    @rn = grep {defined} map { $_->left } @rc;
+                    push @rn, grep {defined} map { $_->right } @rc;
+
+                    # Record all of the current level of children
+                    while ( $rv and ( @lc or @rc ) ) {
+
+                        # Shift off of the left side
+                        $node = shift @lc;
+                        $rv = _writeRecord( $file, $node ) if defined $node;
+
+                        # Shift off of the right side
+                        $node = shift @rc;
+                        $rv = _writeRecord( $file, $node )
+                            if $rv and defined $node;
+
+                        # Pop off of the left side
+                        $node = pop @lc;
+                        $rv = _writeRecord( $file, $node )
+                            if $rv and defined $node;
+
+                        # Pop off of the right side
+                        $node = pop @rc;
+                        $rv = _writeRecord( $file, $node )
+                            if $rv and defined $node;
+
+                    }
+
+                    # Start with the next level
+                    @lc = @ln;
+                    @rc = @rn;
+                }
+
+            } else {
+                pdebug( 'nothing in the tree to write', PDLEVEL2 );
+                $rv = 1;
+            }
+
+            pclose($file);
+        }
+    }
+
+    subPostamble( PDLEVEL1, '$', $rv );
+
+    return $rv;
+}
+
+sub _readRecord {
+
+    # Purpose:  Reads the node from the file
+    # Returns:  Boolean
+    # Usage:    $rv = _readRecord($self, $filename);
+
+    my $self = shift;
+    my $file = shift;
+    my ( $rv,    $node, $sig, $content );
+    my ( $stype, $kf,   $vf,  $kl, $vl, $kv, $vv );
+    my ( $kl1,   $kl2,  $vl1, $vl2 );
+
+    # Read Signature
+    if ( pread( $file, $sig, SIG_LEN ) == SIG_LEN ) {
+        ( $stype, $kf, $vf, $kl1, $kl2, $vl1, $vl2 ) = unpack SIGNATURE, $sig;
+        if ( $stype eq SIG_TYPE ) {
+            $rv = 1;
+            $kl = longs2Quad( $kl1, $kl2 );
+            $vl = longs2Quad( $vl1, $vl2 );
+
+            if ( !defined $kl or !defined $vl ) {
+                $rv = 0;
+                pdebug( '64-bit values not supported on 32-bit platforms',
+                    PDLEVEL1 );
+            }
+        } else {
+            pdebug( 'PDAVL signature failed basic validation: %s',
+                PDLEVEL1, $sig );
+        }
+    } else {
+        pdebug( 'failed to read PDAVL signature', PDLEVEL1 );
+    }
+
+    # Extract key/val lengths/values
+    if ($rv) {
+        if ($kf) {
+            $kv = '' if $kf == AVLZEROLS;
+        }
+        if ($vf) {
+            $vv = '' if $vf == AVLZEROLS;
+        }
+    }
+
+    # Read key
+    if ( $rv and $kl ) {
+        if ( pread( $file, $content, $kl ) == $kl ) {
+            $kv = $content;
+        } else {
+            pdebug( 'failed to read full length of key content', PDLEVEL1 );
+            $rv = 0;
+        }
+    }
+
+    # Read value
+    if ( $rv and $vl ) {
+        if ( pread( $file, $content, $vl ) == $vl ) {
+            $vv = $content;
+        } else {
+            pdebug( 'failed to read full length of key content', PDLEVEL1 );
+            $rv = 0;
+        }
+    }
+
+    # Add the key/pair
+    $rv = $self->addPair( $kv, $vv ) if $rv;
+
+    pdebug( 'failed to read record', PDLEVEL1 ) unless $rv;
+
+    return $rv;
+}
+
+sub loadFromFile {
+
+    # Purpose:  Loads content from file
+    # Returns:  Boolean
+    # Usage:    $rv = $obj->loadFromFile($file);
+
+    my $self = shift;
+    my $file = shift;
+    my ( $rv, $eof );
+
+    subPreamble( PDLEVEL1, '$', $file );
+
+    # Purge current hash contents
+    $self->purgeNodes;
+
+    # Make sure file is open and at the beginning
+    if ( defined popen( $file, O_RDWR ) ) {
+        $eof = pseek( $file, 0, SEEK_END );
+        pseek( $file, 0, SEEK_SET );
+
+        # Read records
+        do {
+            $rv = _readRecord( $self, $file );
+        } while $rv and ptell($file) != $eof;
+
+        pclose($file);
+    }
+
+    subPostamble( PDLEVEL1, '$', $rv );
+
+    return $rv;
 }
 
 sub TIEHASH {
@@ -909,7 +1183,7 @@ Paranoid::Data::AVLTree - AVL-Balanced Tree Class
 
 =head1 VERSION
 
-$Id: lib/Paranoid/Data/AVLTree.pm, 2.09 2021/12/28 15:46:49 acorliss Exp $
+$Id: lib/Paranoid/Data/AVLTree.pm, 2.10 2022/03/08 00:01:04 acorliss Exp $
 
 =head1 SYNOPSIS
 
@@ -926,13 +1200,24 @@ $Id: lib/Paranoid/Data/AVLTree.pm, 2.09 2021/12/28 15:46:49 acorliss Exp $
     $rv     = $tree->addPair($key, $value);
     $rv     = $tree->delNode($key);
     $rv     = $tree->purgeNodes;
+
     $tree->dumpKeys;
+    $tree->profile(1);
+    %stats = $tree->stats;
+
+    $rv = $tree->save2File($filename);
+    $rv = $tree->loadFromFile($filename);
 
 =head1 DESCRIPTION
 
 This class provides an AVL-balance tree implementation, that can work both as
 an independent object or as a tied hash.  Future versions will include methods
 to allow for simple spooling to and from disk.
+
+B<NOTE:> while these objects do support assignment of any arbitrary value to
+each node, spooling to and from files only supports the use of scalar values.
+Any object/code references, globs, or nested data structures will not survive
+save/load functionality.
 
 =head1 SUBROUTINES/METHODS
 
@@ -941,6 +1226,29 @@ to allow for simple spooling to and from disk.
     $tree   = new Paranoid::Data::AVLTree;
 
 This creates a new tree object.
+
+=head2 profile
+
+    $rv     = $obj->profile(1);
+    $rv     = $obj->profile(0);
+
+This method enables or disables performance profiling, which can provide some
+basic statistics on internal operations.  Whenever profiling is enabled the
+counters are reset.
+
+=head2 stats
+
+    %stats = $obj->stats;
+
+This method returns a hash of various performance counters.  The contents of
+the hash at this time consists of the following:
+
+    key         purpose
+    ------------------------------------------------
+    insertions  number of node insertions
+    deletions   number of node deletions
+    rebalances  number of rebalances triggered
+    rotations   number of branch rotations triggered
 
 =head2 count
 
@@ -1003,6 +1311,25 @@ This method exists purely for diagnostic purposes.  It dumps a formatted tree
 structure to B<STDERR> showing all keys in the tree, along with the relative
 branch height and balance of every node, along with what side of the tree each
 node is attached.
+
+=head2 save2File
+
+    $rv = $tree->save2File($filename);
+
+This method saves the current contents of the AVL Tree to the specified file.
+It attempts to save the nodes in an order which minimizes the number of
+rotations when read to maximize loading performance.
+
+=head2 loadFromFile
+
+    $rv = $tree->loadFromFile($filename);
+
+This method loads the contents of the named file into memory.  It does only the
+most rudimentary validation of records upon loading.  Note that the current
+contents of the AVL Tree is purged prior to loading to ensure the contents
+after loading reflect precisely what is in the file.  That said, if there is
+any kind of file corruption in the middle of the file, it can mean the AVL
+Tree is only partially loaded after a failed attempt.
 
 =head2 TIE METHODS
 

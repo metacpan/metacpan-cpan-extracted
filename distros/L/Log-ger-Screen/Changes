@@ -1,3 +1,11 @@
+0.005   2022-02-18  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Mention and give exammple that Log::ger::Screen is also
+          usable in CLI scripts.
+
+
 0.004   2022-02-18  Released-By: PERLANCAR; Urgency: medium
 
         - Use Log::ger::Level::FromVar.

@@ -26,7 +26,7 @@ WriteMakefile(
         'Test::MockModule'          => 0,
     },
     PREREQ_PM => {
-        'Overload::FileCheck' => '0.012',
+        'Overload::FileCheck' => '0.013',
         'Text::Glob'          => 0,
     },
     dist       => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },

@@ -1,5 +1,5 @@
 package Mojo::DOM::Role::Restrict;
-use strict; use warnings; our $VERSION = 0.04;
+use strict; use warnings; our $VERSION = 0.05;
 use Mojo::Base -role;
 use Mojo::Util qw(xml_escape);
 use File::Spec;
@@ -205,13 +205,15 @@ sub _restrict {
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
 Mojo::DOM::Role::Restrict - Restrict tags and attributes
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 

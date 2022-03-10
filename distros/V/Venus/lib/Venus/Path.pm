@@ -211,7 +211,7 @@ sub open {
 sub mkcall {
   my ($self, $args) = @_;
 
-  my $path = $self->get;
+  my $path = File::Spec->catfile(File::Spec->splitdir($self->get));
 
   my $result;
 
@@ -905,7 +905,7 @@ I<Since C<0.01>>
 
   # given: synopsis;
 
-  my $find = $path->find('[:\/\\\.]+m.*$');
+  my $find = $path->find('[:\/\\\.]+m[^:\/\\\.]*$');
 
   # [
   #   bless({ value => "t/data/planets/makemake" }, "Venus::Path"),
@@ -1117,11 +1117,27 @@ I<Since C<0.01>>
 
   use Venus::Path;
 
-  my $path = Venus::Path->new('t/data/sun');
+  my $path = Venus::Path->new($^X);
 
-  my ($call_output, $exit_code) = $path->mkcall('--heat-death');
+  my ($call_output, $exit_code) = $path->mkcall('t/data/sun --heat-death');
 
   # ("", 256)
+
+=back
+
+=over 4
+
+=item mkcall example 3
+
+  package main;
+
+  use Venus::Path;
+
+  my $path = Venus::Path->new('.help');
+
+  my $output = $path->mkcall;
+
+  # Exception! Venus::Path::Error (isa Venus::Error)
 
 =back
 
@@ -1148,6 +1164,22 @@ I<Since C<0.01>>
   $path = $path->mkdir;
 
   # bless({ value => "t/data/systems" }, "Venus::Path")
+
+=back
+
+=over 4
+
+=item mkdir example 2
+
+  package main;
+
+  use Venus::Path;
+
+  my $path = Venus::Path->new('/path/to/xyz');
+
+  $path = $path->mkdir;
+
+  # Exception! Venus::Path::Error (isa Venus::Error)
 
 =back
 
@@ -1222,6 +1254,22 @@ I<Since C<0.01>>
   $path = $path->mkfile;
 
   # bless({ value => "t/data/moon" }, "Venus::Path")
+
+=back
+
+=over 4
+
+=item mkfile example 2
+
+  package main;
+
+  use Venus::Path;
+
+  my $path = Venus::Path->new('/path/to/xyz');
+
+  $path = $path->mkfile;
+
+  # Exception! Venus::Path::Error (isa Venus::Error)
 
 =back
 
@@ -1302,6 +1350,22 @@ I<Since C<0.01>>
   my $fh = $path->open('>');
 
   # bless(..., "IO::File");
+
+=back
+
+=over 4
+
+=item open example 4
+
+  package main;
+
+  use Venus::Path;
+
+  my $path = Venus::Path->new('/path/to/xyz');
+
+  my $fh = $path->open('>');
+
+  # Exception! Venus::Path::Error (isa Venus::Error)
 
 =back
 
@@ -1399,6 +1463,22 @@ I<Since C<0.01>>
 
 =back
 
+=over 4
+
+=item read example 2
+
+  package main;
+
+  use Venus::Path;
+
+  my $path = Venus::Path->new('/path/to/xyz');
+
+  my $content = $path->read;
+
+  # Exception! Venus::Path::Error (isa Venus::Error)
+
+=back
+
 =cut
 
 =head2 relative
@@ -1466,6 +1546,22 @@ I<Since C<0.01>>
   my $rmdir = $path->mkdir->rmdir;
 
   # bless({ value => "t/data/stars" }, "Venus::Path")
+
+=back
+
+=over 4
+
+=item rmdir example 2
+
+  package main;
+
+  use Venus::Path;
+
+  my $path = Venus::Path->new('/path/to/xyz');
+
+  my $rmdir = $path->mkdir->rmdir;
+
+  # Exception! Venus::Path::Error (isa Venus::Error)
 
 =back
 
@@ -1660,6 +1756,22 @@ I<Since C<0.01>>
 
 =back
 
+=over 4
+
+=item unlink example 2
+
+  package main;
+
+  use Venus::Path;
+
+  my $path = Venus::Path->new('/path/to/xyz');
+
+  my $unlink = $path->unlink;
+
+  # Exception! Venus::Path::Error (isa Venus::Error)
+
+=back
+
 =cut
 
 =head2 write
@@ -1681,6 +1793,22 @@ I<Since C<0.01>>
   my $path = Venus::Path->new('t/data/asteroid');
 
   my $write = $path->write('asteroid');
+
+=back
+
+=over 4
+
+=item write example 2
+
+  package main;
+
+  use Venus::Path;
+
+  my $path = Venus::Path->new('/path/to/xyz');
+
+  my $write = $path->write('nothing');
+
+  # Exception! Venus::Path::Error (isa Venus::Error)
 
 =back
 

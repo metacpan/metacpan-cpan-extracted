@@ -745,6 +745,11 @@ field_array_hash_common:
 static void setup_parse_has_initexpr(pTHX_ void *hookdata)
 {
   CV *was_compcv = PL_compcv;
+  HV *hints = GvHV(PL_hintgv);
+
+  if(!hints || !hv_fetchs(hints, "Object::Pad/experimental(init_expr)", 0))
+    Perl_ck_warner(aTHX_ packWARN(WARN_EXPERIMENTAL),
+      "field initialiser expression is experimental and may be changed or removed without notice");
 
   resume_compcv_and_save(&compclassmeta->initfields_compcv);
 
@@ -1395,6 +1400,24 @@ static bool fieldhook_custom_apply(pTHX_ FieldMeta *fieldmeta, SV *value, SV **h
   return TRUE;
 }
 
+/* internal function shared by various *.c files */
+void ObjectPad__need_PLparser(pTHX)
+{
+  if(!PL_parser) {
+    /* We need to generate just enough of a PL_parser to keep newSTATEOP()
+     * happy, otherwise it will SIGSEGV (RT133258)
+     */
+    SAVEVPTR(PL_parser);
+    Newxz(PL_parser, 1, yy_parser);
+    SAVEFREEPV(PL_parser);
+
+    PL_parser->copline = NOLINE;
+#if HAVE_PERL_VERSION(5, 20, 0)
+    PL_parser->preambling = NOLINE;
+#endif
+  }
+}
+
 MODULE = Object::Pad    PACKAGE = Object::Pad::MOP::Class
 
 INCLUDE: mop-class.xsi
@@ -1417,6 +1440,12 @@ register(class, name, ...)
   {
     PERL_UNUSED_VAR(class);
     dKWARG(2);
+
+    {
+      if(!cophh_exists_pvs(CopHINTHASH_get(PL_curcop), "Object::Pad/experimental(custom_field_attr)", 0))
+        Perl_ck_warner(aTHX_ packWARN(WARN_EXPERIMENTAL),
+          "Object::Pad::MOP::FieldAttr is experimental and may be changed or removed without notice");
+    }
 
     struct FieldHookFuncs *funcs;
     Newxz(funcs, 1, struct FieldHookFuncs);

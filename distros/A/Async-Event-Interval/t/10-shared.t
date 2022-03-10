@@ -6,6 +6,10 @@ use Data::Dumper;
 use IPC::Shareable;
 use Test::More;
 
+if (! $ENV{CI_TESTING}) {
+    plan skip_all => "Not on a valid CI testing platform..."
+}
+
 my $mod = 'Async::Event::Interval';
 my $e = $mod->new(0.5, \&perform);
 my $x = $mod->new(0, \&multi);

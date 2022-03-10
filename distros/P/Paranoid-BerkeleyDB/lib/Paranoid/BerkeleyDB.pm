@@ -1,8 +1,8 @@
 # Paranoid::BerkeleyDB -- BerkeleyDB Wrapper
 #
-# (c) 2005 - 2015, Arthur Corliss <corliss@digitalmages.com>
+# (c) 2005 - 2022, Arthur Corliss <corliss@digitalmages.com>
 #
-# $Id: lib/Paranoid/BerkeleyDB.pm, 2.03 2017/02/06 02:49:24 acorliss Exp $
+# $Id: lib/Paranoid/BerkeleyDB.pm, 2.06 2022/03/08 22:26:06 acorliss Exp $
 #
 #    This software is licensed under the same terms as Perl, itself.
 #    Please see http://dev.perl.org/licenses/ for more information.
@@ -32,7 +32,7 @@ use Paranoid::BerkeleyDB::Db;
 use Carp;
 use Cwd;
 
-($VERSION) = ( q$Revision: 2.03 $ =~ /(\d+(?:\.\d+)+)/sm );
+($VERSION) = ( q$Revision: 2.06 $ =~ /(\d+(?:\.\d+)+)/sm );
 
 use vars qw(@ISA @_properties);
 
@@ -59,9 +59,7 @@ sub _initialize {
     my $rv     = 0;
     my ( $db, $env, $fpath );
 
-    # Make sure minimal parameters are preset
-    pdebug( 'entering w/%s', PDLEVEL1, %params );
-    pIn();
+    subPreamble( PDLEVEL1, '%', %params );
 
     # Set db46 flag
     $db46 = 1
@@ -120,8 +118,7 @@ sub _initialize {
         }
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL1, $rv );
+    subPostamble( PDLEVEL1, '$', $rv );
 
     return $rv;
 }
@@ -134,13 +131,11 @@ sub _deconstruct {
 
     my $obj = shift;
 
-    pdebug( 'entering', PDLEVEL1 );
-    pIn();
+    subPreamble(PDLEVEL1);
 
     $obj->set( 'cursor', undef ) if !$obj->isStale;
 
-    pOut();
-    pdebug( 'leaving w/rv: 1', PDLEVEL1 );
+    subPostamble( PDLEVEL1, '$', 1 );
 
     return 1;
 }
@@ -154,8 +149,7 @@ sub dbh {
     my $obj = shift;
     my ( $rv, @children );
 
-    pdebug( 'entering', PDLEVEL3 );
-    pIn();
+    subPreamble(PDLEVEL3);
 
     if ( !$obj->isStale ) {
         $rv = $obj->getByAlias('db')->dbh;
@@ -163,8 +157,7 @@ sub dbh {
         pdebug( 'dbh method called on stale object', PDLEVEL1 );
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL3, $rv );
+    subPostamble( PDLEVEL1, '$', $rv );
 
     return $rv;
 }
@@ -196,8 +189,7 @@ sub FETCH {
     my $key = shift;
     my ( $dbh, $val, $rv );
 
-    pdebug( 'entering w/(%s)', PDLEVEL3, $key );
-    pIn();
+    subPreamble( PDLEVEL3, '$', $key );
 
     if ( !$obj->isStale ) {
         $dbh = $obj->dbh;
@@ -209,8 +201,7 @@ sub FETCH {
         carp $@;
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL3, $rv );
+    subPostamble( PDLEVEL3, '$', $rv );
 
     return $rv;
 }
@@ -221,8 +212,7 @@ sub STORE {
     my $val = shift;
     my $rv;
 
-    pdebug( 'entering w/(%s)(%s)', PDLEVEL3, $key, $val );
-    pIn();
+    subPreamble( PDLEVEL3, '$$', $key, $val );
 
     if ( !$obj->isStale ) {
         $rv = !$obj->dbh->db_put( $key, $val );
@@ -231,8 +221,7 @@ sub STORE {
         carp $@;
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL3, $rv );
+    subPostamble( PDLEVEL3, '$', $rv );
 
     return $rv;
 }
@@ -242,8 +231,7 @@ sub EXISTS {
     my $key = shift;
     my ( $dbh, $val, $rv );
 
-    pdebug( 'entering w/(%s)', PDLEVEL3, $key );
-    pIn();
+    subPreamble( PDLEVEL3, '$', $key );
 
     if ( !$obj->isStale ) {
         $dbh = $obj->dbh;
@@ -256,8 +244,7 @@ sub EXISTS {
         carp $@;
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL3, $rv );
+    subPostamble( PDLEVEL3, '$', $rv );
 
     return $rv;
 }
@@ -267,8 +254,7 @@ sub DELETE {
     my $key = shift;
     my $rv;
 
-    pdebug( 'entering w/(%s)', PDLEVEL3, $key );
-    pIn();
+    subPreamble( PDLEVEL3, '$', $key );
 
     if ( !$obj->isStale ) {
         $rv = !$obj->dbh->db_del($key);
@@ -277,8 +263,7 @@ sub DELETE {
         carp $@;
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL3, $rv );
+    subPostamble( PDLEVEL3, '$', $rv );
 
     return $rv;
 }
@@ -288,8 +273,7 @@ sub CLEAR {
     my $rv  = 0;
     my ( $dbh, $lock );
 
-    pdebug( 'entering', PDLEVEL3 );
-    pIn();
+    subPreamble(PDLEVEL3);
 
     if ( !$obj->isStale ) {
         $dbh = $obj->dbh;
@@ -301,8 +285,7 @@ sub CLEAR {
         carp $@;
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL3, $rv );
+    subPostamble( PDLEVEL3, '$', $rv );
 
     return $rv;
 }
@@ -312,8 +295,7 @@ sub FIRSTKEY {
     my ( $key, $val ) = ( '', '' );
     my ( $cursor, %o );
 
-    pdebug( 'entering', PDLEVEL3 );
-    pIn();
+    subPreamble(PDLEVEL3);
 
     if ( !$obj->isStale ) {
         $cursor = $obj->dbh->db_cursor;
@@ -328,8 +310,7 @@ sub FIRSTKEY {
         carp $@;
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL3, %o );
+    subPostamble( PDLEVEL3, '$$', %o );
 
     return each %o;
 }
@@ -340,8 +321,7 @@ sub NEXTKEY {
     my ( $key, $val ) = ( '', '' );
     my (%o);
 
-    pdebug( 'entering', PDLEVEL3 );
-    pIn();
+    subPreamble(PDLEVEL3);
 
     if ( !$obj->isStale ) {
         if ( defined $cursor ) {
@@ -356,8 +336,7 @@ sub NEXTKEY {
         carp $@;
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL3, %o );
+    subPostamble( PDLEVEL3, '$$', %o );
 
     return each %o;
 }
@@ -366,8 +345,7 @@ sub SCALAR {
     my $obj = shift;
     my ( $key, $rv );
 
-    pdebug( 'entering', PDLEVEL3 );
-    pIn();
+    subPreamble(PDLEVEL3);
 
     if ( !$obj->isStale ) {
         if ( defined( $key = $obj->FIRSTKEY ) ) {
@@ -381,8 +359,7 @@ sub SCALAR {
         carp $@;
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL3, $rv );
+    subPostamble( PDLEVEL3, '$', $rv );
 
     return $rv;
 }
@@ -391,8 +368,7 @@ sub UNTIE {
     my $obj = shift;
     my $rv  = 1;
 
-    pdebug( 'entering', PDLEVEL3 );
-    pIn();
+    subPreamble(PDLEVEL3);
 
     if ( !$obj->isStale ) {
         $obj->set( 'cursor', undef );
@@ -401,8 +377,7 @@ sub UNTIE {
         carp $@;
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL3, $rv );
+    subPostamble( PDLEVEL1, '$', $rv );
 
     return $rv;
 }
@@ -417,11 +392,11 @@ Paranoid::BerkeleyDB -- BerkeleyDB Wrapper
 
 =head1 VERSION
 
-$Id: lib/Paranoid/BerkeleyDB.pm, 2.03 2017/02/06 02:49:24 acorliss Exp $
+$Id: lib/Paranoid/BerkeleyDB.pm, 2.06 2022/03/08 22:26:06 acorliss Exp $
 
 =head1 SYNOPSIS
 
-  tie %db, Paranoid::BerkeleyDB, Filename => './dbdir/data.db';
+  tie %db, 'Paranoid::BerkeleyDB', Filename => './dbdir/data.db';
 
   # Normal hash activities...
 
@@ -464,9 +439,9 @@ module.  The primary differences are as follows:
 
 =head2 new
 
-  tie %db, Paranoid::BerkeleyDB, 
+  tie %db, 'Paranoid::BerkeleyDB', 
     Filename => './dbdir/data.db';
-  tie %db, Paranoid::BerkeleyDB, 
+  tie %db, 'Paranoid::BerkeleyDB', 
     Home     => './dbenv';
     Filename => './dbdir/data.db';
 
@@ -480,7 +455,7 @@ Alternately, you can provide it with B<Filename> and a
 L<Paranoid::BerkeleyDB::Env(3)> object (or subclassed object) that you
 instantiated yourself:
 
-  tie %db, Paranoid::BerkeleyDB, 
+  tie %db, 'Paranoid::BerkeleyDB', 
     Env      => $env,
     Filename => 'data.db';
 
@@ -488,7 +463,7 @@ Finally, you can provide it with two hash options to fully control the
 environment and database instantiation of L<Paranoid::BerkeleyDB::Env(3)> and
 L<Paranoid::BerkeleyDB::Db(3)>:
 
-  tie %db, Paranoid::BerkeleyDB, 
+  tie %db, 'Paranoid::BerkeleyDB', 
     Env      => { %envOpts },
     Db       => { %dbOpts };
 
@@ -578,5 +553,5 @@ Arthur Corliss (corliss@digitalmages.com)
 This software is licensed under the same terms as Perl, itself. 
 Please see http://dev.perl.org/licenses/ for more information.
 
-(c) 2005 - 2016, Arthur Corliss (corliss@digitalmages.com)
+(c) 2005 - 2022, Arthur Corliss (corliss@digitalmages.com)
 

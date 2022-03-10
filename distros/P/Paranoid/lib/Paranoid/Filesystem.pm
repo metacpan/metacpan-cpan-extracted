@@ -1,12 +1,12 @@
 # Paranoid::Filesystem -- Filesystem support for paranoid programs
 #
-# $Id: lib/Paranoid/Filesystem.pm, 2.09 2021/12/28 15:46:49 acorliss Exp $
+# $Id: lib/Paranoid/Filesystem.pm, 2.10 2022/03/08 00:01:04 acorliss Exp $
 #
 # This software is free software.  Similar to Perl, you can redistribute it
 # and/or modify it under the terms of either:
 #
 #   a)     the GNU General Public License
-#          <https://www.gnu.org/licenses/gpl-1.0.html> as published by the 
+#          <https://www.gnu.org/licenses/gpl-1.0.html> as published by the
 #          Free Software Foundation <http://www.fsf.org/>; either version 1
 #          <https://www.gnu.org/licenses/gpl-1.0.html>, or any later version
 #          <https://www.gnu.org/licenses/license-list.html#GNUGPL>, or
@@ -47,7 +47,7 @@ use Paranoid::Input;
 use Paranoid::IO;
 use Paranoid::Glob;
 
-($VERSION) = ( q$Revision: 2.09 $ =~ /(\d+(?:\.\d+)+)/sm );
+($VERSION) = ( q$Revision: 2.10 $ =~ /(\d+(?:\.\d+)+)/sm );
 
 @EXPORT = qw(
     preadDir     psubdirs    pfiles
@@ -86,8 +86,7 @@ sub pmkdir ($;$\%) {
     my ( $dirs, $directory, $subdir, @parts, $i );
     my $rv = 1;
 
-    pdebug( 'entering w/(%s)(%s)', PDLEVEL1, $path, $mode );
-    pIn();
+    subPreamble( PDLEVEL1, '$;$\%', $path, $mode, $eref );
 
     # Create a glob object if we weren't handed one.
     if ( defined $path ) {
@@ -147,8 +146,7 @@ sub pmkdir ($;$\%) {
         }
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL1, $rv );
+    subPostamble( PDLEVEL1, '$', $rv );
 
     return $rv;
 }
@@ -166,8 +164,7 @@ sub prm ($;\%) {
     my $rv     = 1;
     my ( $glob, $tglob, @fstat );
 
-    pdebug( 'entering w/(%s)(%s)', PDLEVEL1, $target, $errRef );
-    pIn();
+    subPreamble( PDLEVEL1, '$;\%', $target, $errRef );
 
     # Prep error hash
     $errRef = {} unless defined $errRef;
@@ -236,8 +233,7 @@ sub prm ($;\%) {
         }
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL1, $rv );
+    subPostamble( PDLEVEL1, '$', $rv );
 
     return $rv;
 }
@@ -257,8 +253,7 @@ sub prmR ($;$\%) {
     my $rv     = 1;
     my ( $glob, $tglob );
 
-    pdebug( 'entering w/(%s)(%s)(%s)', PDLEVEL1, $target, $follow, $errRef );
-    pIn();
+    subPreamble( PDLEVEL1, '$;$\%', $target, $follow, $errRef );
 
     # Prep error hash
     $errRef = {} unless defined $errRef;
@@ -279,8 +274,7 @@ sub prmR ($;$\%) {
         $rv = $glob->recurse( $follow, 1 ) && prm( $glob, %$errRef );
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL1, $rv );
+    subPostamble( PDLEVEL1, '$', $rv );
 
     return $rv;
 }
@@ -299,8 +293,7 @@ sub preadDir ($\@;$) {
     my $rv = 1;
     my $fh;
 
-    pdebug( 'entering w/(%s)(%s)(%s)', PDLEVEL1, $dir, $aref, $noLinks );
-    pIn();
+    subPreamble( PDLEVEL1, '$\@;$', $dir, $aref, $noLinks );
     @$aref = ();
 
     # Validate directory and exit early, if need be
@@ -340,8 +333,7 @@ sub preadDir ($\@;$) {
 
     pdebug( 'returning %d entries', PDLEVEL2, scalar @$aref );
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL1, $rv );
+    subPostamble( PDLEVEL1, '$', $rv );
 
     return $rv;
 }
@@ -359,11 +351,10 @@ sub psubdirs ($\@;$) {
     my ( $dir, $aref, $noLinks ) = @_;
     my $rv = 0;
 
+    subPreamble( PDLEVEL1, '$\@;$', $dir, $aref, $noLinks );
+
     # Validate arguments
     $noLinks = 0 unless defined $noLinks;
-
-    pdebug( 'entering w/(%s)(%s)(%s)', PDLEVEL1, $dir, $aref, $noLinks );
-    pIn();
 
     # Empty target array and retrieve list
     $rv = preadDir( $dir, @$aref, $noLinks );
@@ -373,8 +364,7 @@ sub psubdirs ($\@;$) {
 
     pdebug( 'returning %d entries', PDLEVEL2, scalar @$aref );
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL1, $rv );
+    subPostamble( PDLEVEL1, '$', $rv );
 
     return $rv;
 }
@@ -392,11 +382,10 @@ sub pfiles ($\@;$) {
     my ( $dir, $aref, $noLinks ) = @_;
     my $rv = 0;
 
+    subPreamble( PDLEVEL1, '$\@;$', $dir, $aref, $noLinks );
+
     # Validate arguments
     $noLinks = 0 unless defined $noLinks;
-
-    pdebug( 'entering w/(%s)(%s)', PDLEVEL1, $dir, $aref );
-    pIn();
 
     # Empty target array and retrieve list
     @$aref = ();
@@ -407,13 +396,12 @@ sub pfiles ($\@;$) {
 
     pdebug( 'returning %d entries', PDLEVEL2, scalar @$aref );
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL1, $rv );
+    subPostamble( PDLEVEL1, '$', $rv );
 
     return $rv;
 }
 
-sub pcleanPath {
+sub pcleanPath ($) {
 
     # Purpose:  Removes/resolves directory artifacts like '/../', etc.
     # Returns:  Filtered string
@@ -421,8 +409,7 @@ sub pcleanPath {
 
     my $filename = shift;
 
-    pdebug( 'entering w/(%s)', PDLEVEL1, $filename );
-    pIn();
+    subPreamble( PDLEVEL1, '$', $filename );
 
     if ( defined $filename ) {
 
@@ -447,13 +434,12 @@ sub pcleanPath {
         }
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL1, $filename );
+    subPostamble( PDLEVEL1, '$', $filename );
 
     return $filename;
 }
 
-sub ptranslateLink {
+sub ptranslateLink ($;$) {
 
     # Purpose:  Performs either a full (realpath) or a partial one (last
     #           filename element only) on the passed filename
@@ -467,8 +453,7 @@ sub ptranslateLink {
     my $nLinks         = 0;
     my ( $i, $target );
 
-    pdebug( 'entering w/(%s)(%s)', PDLEVEL1, $link, $fullyTranslate );
-    pIn();
+    subPreamble( PDLEVEL1, '$;$', $link, $fullyTranslate );
 
     # Validate link and exit early, if need be
     unless ( defined $link and scalar lstat $link ) {
@@ -526,8 +511,7 @@ sub ptranslateLink {
 
     $link = pcleanPath($link) if defined $link;
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL1, $link );
+    subPostamble( PDLEVEL1, '$', $link );
 
     return $link;
 }
@@ -548,8 +532,7 @@ sub ptouch ($;$\%) {
     my $irv    = 1;
     my ( $glob, $tglob, $fh );
 
-    pdebug( 'entering w/(%s)(%s)(%s)', PDLEVEL1, $target, $stamp, $errRef );
-    pIn();
+    subPreamble( PDLEVEL1, '$;$\%', $target, $stamp, $errRef );
 
     # Prep error hash
     $errRef = {} unless defined $errRef;
@@ -610,8 +593,7 @@ sub ptouch ($;$\%) {
         }
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL1, $rv );
+    subPostamble( PDLEVEL1, '$', $rv );
 
     return $rv;
 }
@@ -633,9 +615,7 @@ sub ptouchR ($;$$\%) {
     my $rv     = 1;
     my ( $glob, $tglob );
 
-    pdebug( 'entering w/(%s)(%s)(%s)(%s)',
-        PDLEVEL1, $target, $stamp, $follow, $errRef );
-    pIn();
+    subPreamble( PDLEVEL1, '$;$$\%', $target, $stamp, $follow, $errRef );
 
     # Prep error hash
     $errRef = {} unless defined $errRef;
@@ -657,13 +637,12 @@ sub ptouchR ($;$$\%) {
             && ptouch( $glob, $stamp, %$errRef );
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL1, $rv );
+    subPostamble( PDLEVEL1, '$', $rv );
 
     return $rv;
 }
 
-sub ptranslatePerms {
+sub ptranslatePerms ($) {
 
     # Purpose:  Translates symbolic permissions (as supported by userland
     #           chmod, etc.) into the octal permissions.
@@ -675,8 +654,7 @@ sub ptranslatePerms {
     my $rv   = undef;
     my ( @tmp, $o, $p );
 
-    pdebug( 'entering w/(%s)', PDLEVEL1, $perm );
-    pIn();
+    subPreamble( PDLEVEL1, '$', $perm );
 
     # Validate permissions string
     if ( defined $perm and $perm =~ /^\d+$/s ) {
@@ -723,14 +701,7 @@ sub ptranslatePerms {
     }
     $rv = $p;
 
-    pOut();
-    pdebug( (
-            defined $rv
-            ? sprintf( 'leaving w/rv: %04o', $rv )
-            : 'leaving w/rv: undef'
-        ),
-        PDLEVEL1
-        );
+    subPostamble( PDLEVEL1, '$', defined $rv ? sprintf( '%04o', $rv ) : $rv );
 
     return $rv;
 }
@@ -750,8 +721,7 @@ sub pchmod ($$;\%) {
     my ( $glob, $tglob, @fstat );
     my ( $ptrans, $cperms, $addPerms, @tmp );
 
-    pdebug( 'entering w/(%s)(%s)(%s)', PDLEVEL1, $target, $perms, $errRef );
-    pIn();
+    subPreamble( PDLEVEL1, '$$;\%', $target, $perms, $errRef );
 
     # Prep error hash
     $errRef = {} unless defined $errRef;
@@ -861,8 +831,7 @@ sub pchmod ($$;\%) {
         }
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL1, $rv );
+    subPostamble( PDLEVEL1, '$', $rv );
 
     return $rv;
 }
@@ -883,9 +852,7 @@ sub pchmodR ($$;$\%) {
     my $rv     = 1;
     my ( $glob, $tglob );
 
-    pdebug( 'entering w/(%s)(%s)(%s)(%s)',
-        PDLEVEL1, $target, $perms, $follow, $errRef );
-    pIn();
+    subPreamble( PDLEVEL1, '$$;$\%', $target, $perms, $follow, $errRef );
 
     # Prep error hash
     $errRef = {} unless defined $errRef;
@@ -907,8 +874,7 @@ sub pchmodR ($$;$\%) {
             && pchmod( $glob, $perms, %$errRef );
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL1, $rv );
+    subPostamble( PDLEVEL1, '$', $rv );
 
     return $rv;
 }
@@ -929,9 +895,7 @@ sub pchown ($$;$\%) {
     my $rv     = 1;
     my ( $glob, $tglob, @fstat );
 
-    pdebug( 'entering w/(%s)(%s)(%s)(%s)',
-        PDLEVEL1, $target, $user, $group, $errRef );
-    pIn();
+    subPreamble( PDLEVEL1, '$$;$\%', $target, $user, $group, $errRef );
 
     # Translate to UID/GID
     $user  = -1 unless defined $user;
@@ -980,8 +944,7 @@ sub pchown ($$;$\%) {
         }
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL1, $rv );
+    subPostamble( PDLEVEL1, '$', $rv );
 
     return $rv;
 }
@@ -1004,9 +967,8 @@ sub pchownR ($$;$$\%) {
     my $rv     = 1;
     my ( $glob, $tglob );
 
-    pdebug( 'entering w/(%s)(%s)(%s)(%s)(%s)',
-        PDLEVEL1, $target, $user, $group, $follow, $errRef );
-    pIn();
+    subPreamble( PDLEVEL1, '$$;$$\%', $target, $user, $group, $follow,
+        $errRef );
 
     # Prep error hash
     $errRef = {} unless defined $errRef;
@@ -1028,13 +990,12 @@ sub pchownR ($$;$$\%) {
             && pchown( $glob, $user, $group, %$errRef );
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL1, $rv );
+    subPostamble( PDLEVEL1, '$', $rv );
 
     return $rv;
 }
 
-sub pwhich {
+sub pwhich ($) {
 
     # Purpose:  Simulates a "which" command in pure Perl
     # Returns:  The full path to the requested program if successful
@@ -1045,8 +1006,7 @@ sub pwhich {
     my @directories = grep /^.+$/s, split /:/s, $ENV{PATH};
     my $match       = undef;
 
-    pdebug( 'entering w/(%s)', PDLEVEL1, $binary );
-    pIn();
+    subPreamble( PDLEVEL1, '$', $binary );
 
     # Try to detaint filename
     if ( detaint( $binary, 'filename', $b ) ) {
@@ -1067,8 +1027,7 @@ sub pwhich {
         Paranoid::ERROR = pdebug( 'failed to detaint %s', PDLEVEL1, $binary );
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL1, $match );
+    subPostamble( PDLEVEL1, '$', $match );
 
     return $match;
 }
@@ -1083,7 +1042,7 @@ Paranoid::Filesystem - Filesystem Functions
 
 =head1 VERSION
 
-$Id: lib/Paranoid/Filesystem.pm, 2.09 2021/12/28 15:46:49 acorliss Exp $
+$Id: lib/Paranoid/Filesystem.pm, 2.10 2022/03/08 00:01:04 acorliss Exp $
 
 =head1 SYNOPSIS
 
@@ -1109,6 +1068,8 @@ $Id: lib/Paranoid/Filesystem.pm, 2.09 2021/12/28 15:46:49 acorliss Exp $
   $cleaned  = pcleanPath($filename);
   $noLinks  = ptranslateLink("/etc/foo/bar.conf");
   $rv       = ptranslatePerms("ug+rwx");
+
+  $filename = pwhich('ls');
 
 =head1 DESCRIPTION
 

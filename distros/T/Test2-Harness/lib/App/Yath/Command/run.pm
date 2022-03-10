@@ -2,7 +2,7 @@ package App::Yath::Command::run;
 use strict;
 use warnings;
 
-our $VERSION = '1.000110';
+our $VERSION = '1.000111';
 
 use App::Yath::Options;
 
@@ -99,10 +99,6 @@ sub start_runner {
     my $self = shift;
 
     my $data = $self->pfile_data;
-
-    if ($data->{version} ne $VERSION) {
-        die "Version mismatch, persistent runner is version $data->{version}, runner is version $VERSION.\n";
-    }
 
     $self->{+RUNNER_PID} = $data->{pid};
 }

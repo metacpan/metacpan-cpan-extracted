@@ -1,0 +1,15 @@
+Makefile
+Makefile.old
+*.tar.gz
+*.bak
+*.swp
+pm_to_blib
+blib/
+WWW-Twitch-*
+WWW-Twitch-*/
+.releaserc
+cover_db
+MYMETA.*
+*.pl
+.prove
+.patch

@@ -26,7 +26,7 @@ B<--compat> option to get compatible answer.
 
 =over 7
 
-=item B<--series>=I<number>,  B<-s>I<number>
+=item B<--series>=#,  B<-s>#
 
 =item B<--compat>
 
@@ -36,21 +36,23 @@ B<--series=0>.  If it is not zero, original answer word set is
 shuffled by pseudo random numbers using series number as an initial
 seed.
 
-=item B<-->[B<no->]B<result>
-
-Show result when succeeded.  Default true.
-
-=item B<--index>=I<number>, B<-n>I<number>
+=item B<--index>=#, B<-n>#
 
 Specify index. Default index is calculated from days from 2021/06/19.
 If the value is negative and you can get yesterday's question by
 giving -1.
 
+Answer for option B<-s0n0> is C<cigar>.
+
+=item B<-->[B<no->]B<result>
+
+Show result when succeeded.  Default true.
+
 =item B<--random>
 
 Generate random index every time.
 
-=item B<--try>=I<number>
+=item B<--try>=#, B<-x>=#
 
 Set try count.  Default 6.
 
@@ -63,6 +65,68 @@ Set answer word.  For debug purpose.
 =end comment
 
 =back
+
+=head1 COMMANDS
+
+Five letter word is processed as an answer.  Some other input is taken
+as a command.
+
+=over 7
+
+=item B<h>, B<hint>
+
+List possible words.
+
+=item B<u>, B<uniq>
+
+List possible words made of unique characters.
+
+=item B<=>I<chars>
+
+If start with slash, list words which include all of I<chars>.
+
+=item B<!>I<chars>
+
+If start with exclamation mark, list words which does not include any
+of I<chars>.
+
+=item I<regex>
+
+Any other string include non-alphabetical character is taken as a
+regular expression to filter words.
+
+=item B<!!>
+
+Get word list produced by the last command execution.
+
+=back
+
+These commands can be connected in series.  For example, next command
+show possible words start with letter C<z>.
+
+    hint ^z
+
+Next shows all words which does not incude any letter of C<audio> and
+C<rents>, and made of unique characters.
+
+    !audio !rents u
+
+=head1 EXAMPLE
+
+    1: solid                    # try word "solid"
+    2: panic                    # try word "panic"
+    3: hint                     # show hint
+    3: !solid !panic =eft uniq  # search word exclude(solidpanic) include(eft)
+    3: wheft                    # try word "wheft"
+    4: hint                     # show hint
+    4: datum                    # try word "datum"
+    5: tardy                    # try word "tardy"
+
+=begin html
+
+<p><img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/greple-wordle/main/images/hint-1.png">
+
+=end html
 
 =head1 BUGS
 

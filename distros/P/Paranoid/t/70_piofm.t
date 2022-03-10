@@ -21,6 +21,8 @@ my $tfile = 't/piofm-test1';
 
 unlink $tfile if -f $tfile;
 
+#PDEBUG = 20;
+
 # Test for invalid sizes
 unlink $tfile if -t $tfile;
 ok( !defined(
@@ -313,7 +315,7 @@ my $blocks = $obj->header->blocks;
 is( $obj->_growStream( "a", $obj->_calcAddr(0) ), 1, 'piofm growStream 1' );
 is( $obj->_growStream( "a", $obj->_calcAddr( $obj->header->blockSize * 4 ) ),
     $blocks + 3,
-    'piofm growStream 1'
+    'piofm growStream 2'
     );
 
 # Test strmWrite

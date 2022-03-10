@@ -30,6 +30,7 @@ my %WriteMakefileArgs = (
     },
     LICENSE				=> 'perl_5',
     MIN_PERL_VERSION	=> 'v5.16.0',
+    (MM->can('signature_target') ? (SIGN => 1) : ()),
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'Nice-Try-*' },
     ( eval { ExtUtils::MakeMaker->VERSION(6.46) } ? ( META_MERGE => {

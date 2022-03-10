@@ -1,8 +1,6 @@
+# Paranoid::IO::FileMultiplexer::Block -- Block-level Allocator/Accessor
 #
-#
-#   # Will need to zero out all data between old eos and new eosParanoid::IO::FileMultiplexer::Block -- PIOFM Base Block Class
-#
-# $Id: lib/Paranoid/IO/FileMultiplexer/Block.pm, 2.09 2021/12/28 15:46:49 acorliss Exp $
+# $Id: lib/Paranoid/IO/FileMultiplexer/Block.pm, 2.10 2022/03/08 00:01:04 acorliss Exp $
 #
 # This software is free software.  Similar to Perl, you can redistribute it
 # and/or modify it under the terms of either:
@@ -39,17 +37,15 @@ use strict;
 use warnings;
 use vars qw($VERSION);
 use base qw(Exporter);
-use Paranoid;
+use Paranoid qw(:all);
 use Paranoid::IO qw(:all);
 use Paranoid::Debug qw(:all);
 use Fcntl qw(:DEFAULT :flock :mode :seek);
 
-($VERSION) = ( q$Revision: 2.09 $ =~ /(\d+(?:\.\d+)+)/sm );
+($VERSION) = ( q$Revision: 2.10 $ =~ /(\d+(?:\.\d+)+)/sm );
 
-use constant MINBSIZE  => 4_096;
-use constant MAXBSIZE  => 1_048_576;
-use constant TEST32INT => 1 << 32;
-use constant MAX32VAL  => 0b11111111_11111111_11111111_11111111;
+use constant MINBSIZE => 4_096;
+use constant MAXBSIZE => 1_048_576;
 
 #####################################################################
 #
@@ -76,8 +72,7 @@ sub new {
         maxPos    => MINBSIZE - 1,
         };
 
-    pdebug( 'entering w/(%s)(%s)(%s)', PDLEVEL3, $file, $bnum, $bsize );
-    pIn();
+    subPreamble( PDLEVEL3, '$$$', $file, $bnum, $bsize );
 
     bless $self, $class;
 
@@ -106,8 +101,7 @@ sub new {
         pdebug( 'invalid block size', PDLEVEL1 ) unless defined $self;
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL3, $self );
+    subPostamble( PDLEVEL3, '$', $self );
 
     return $self;
 }
@@ -179,8 +173,7 @@ sub allocate {
     my $maxPos = $$self{maxPos};
     my $rv     = 0;
 
-    pdebug( 'entering', PDLEVEL3 );
-    pIn();
+    subPreamble(PDLEVEL3);
 
     if ( pflock( $$self{file}, LOCK_EX ) ) {
 
@@ -197,8 +190,7 @@ sub allocate {
         pflock( $$self{file}, LOCK_UN );
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL3, $rv );
+    subPostamble( PDLEVEL3, '$', $rv );
 
     return $rv;
 }
@@ -220,10 +212,9 @@ sub bread {
     my $bsize = $$self{blockSize};
     my $minp  = $$self{minPos};
     my $maxp  = $$self{maxPos};
-    my $rv    = '0 but true';
+    my $rv    = PTRUE_ZERO;
 
-    pdebug( 'entering w/(%s)(%s)(%s)', PDLEVEL3, $cref, $start, $bytes );
-    pIn();
+    subPreamble( PDLEVEL3, '$;$$', $cref, $start, $bytes );
 
     # NOTE:  This method intentionally allows reads of a length greater than
     # the block size, but it will only return content from within the block
@@ -261,8 +252,7 @@ sub bread {
         }
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL3, $rv );
+    subPostamble( PDLEVEL3, '$', $rv );
 
     return $rv;
 }
@@ -285,13 +275,11 @@ sub bwrite {
     my $bsize   = $$self{blockSize};
     my $minp    = $$self{minPos};
     my $maxp    = $$self{maxPos};
-    my $rv      = '0 but true';
+    my $rv      = PTRUE_ZERO;
     my $cdata   = defined $content ? ( length $content ) . ' bytes' : undef;
     my $blkLeft;
 
-    pdebug( 'entering w/(%s)(%s)(%s)(%s)',
-        PDLEVEL3, $cdata, $start, $length, $offset );
-    pIn();
+    subPreamble( PDLEVEL3, '$;$$$', $cdata, $start, $length, $offset );
 
     # NOTE:  This method intentionally allows writes of a length greater than
     # the block size, but it will only write content from within the block
@@ -330,56 +318,7 @@ sub bwrite {
         }
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL3, $rv );
-
-    return $rv;
-}
-
-sub has64bInt {
-
-    # Purpose:  Returns whether the current platform supports 64b integers
-    # Returns:  Boolean
-    # Usage:    $rv = $obj->has64bInt;
-
-    return TEST32INT == 1 ? 0 : 1;
-}
-
-sub splitInt {
-
-    # Purpose:  Splits the passed integer into two 32b integers
-    # Returns:  Two integers (lower, upper)
-    # Usage:    @split = $obj->splitInt($num);
-
-    my $self = shift;
-    my $num  = shift;
-    my ( $upper, $lower );
-
-    # Extract lower 32 bits
-    $lower = $num & MAX32VAL;
-
-    # Extract upper 32 bits
-    $upper = $self->has64bInt ? ( $num & ~MAX32VAL ) >> 32 : 0;
-
-    return ( $lower, $upper );
-}
-
-sub joinInt {
-
-    # Purpose:  Joins to 32b integers into a single 64b integer
-    # Returns:  Integer/undef
-    # Usage:    $i = $obj->joinInt($lower, $upper);
-
-    my $self  = shift;
-    my $lower = shift;
-    my $upper = shift;
-    my $rv;
-
-    if ( $self->has64bInt ) {
-        $rv = $lower | ( $upper << 32 );
-    } else {
-        $rv = $lower if $upper == 0;
-    }
+    subPostamble( PDLEVEL3, '$', $rv );
 
     return $rv;
 }
@@ -394,7 +333,7 @@ Paranoid::IO::FileMultiplexer::Block - Block-level Allocator/Accessor
 
 =head1 VERSION
 
-$Id: lib/Paranoid/IO/FileMultiplexer/Block.pm, 2.09 2021/12/28 15:46:49 acorliss Exp $
+$Id: lib/Paranoid/IO/FileMultiplexer/Block.pm, 2.10 2022/03/08 00:01:04 acorliss Exp $
 
 =head1 SYNOPSIS
 
@@ -415,8 +354,6 @@ $Id: lib/Paranoid/IO/FileMultiplexer/Block.pm, 2.09 2021/12/28 15:46:49 acorliss
     $bytesRead    = $obj->bread(\$content, $start, $bytes);
     $bytesRead    = $obj->bread(\$content, undef, $bytes);
     $bytesRead    = $obj->bread(\$content, $start, $bytes);
-
-    $support64 = $obj->test64;
 
     $rv = $obj->recalibrate;
 
@@ -521,29 +458,6 @@ This method is also intentionally designed to allow you to request more data
 than can fit within the block, yet returning only what the block contains.
 The calling code should use the return value to figure out what remains to be
 read from other blocks, as needed.
-
-=head2 has64bInt
-
-    $rv = $obj->has64bInt;
-
-this method returns a boolean value denoting whether the running platform 
-supports 64b integers.
-
-=head2 splitInt
-
-    ($lower, $upper) = $obj->splitInt($num);
-
-This method splits an integer into two 32b values, the first being the lower 
-32b, and the second being the upper 32b.  The second value will always be zero 
-if the running platform does not support 64b integers.
-
-=head2 joinInt
-
-    $i = $obj->joinInt($lower, $upper);
-
-This method takes two 32b integers and joins them into a single 64b integer.
-If the running platform only supports 32b integers and the upper value is
-non-zero, this method will return undef.
 
 =head1 DEPENDENCIES
 

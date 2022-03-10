@@ -521,16 +521,24 @@ return my $x = 'foo';
 
 return ( my $y = 42 );
 
+return state $z = 86;
+
+return ( state $halloween = 31 );
+
 #-----------------------------------------------------------------------------
 
 ## name prohibit temporary lvalue
 ## parms { prohibit_returned_lexicals => '1' }
-## failures 2
+## failures 4
 ## cut
 
 return my $x = 'foo';
 
 return ( my $y = 42 );
+
+return state $z = 86;
+
+return ( state $halloween = 31 );
 
 #-----------------------------------------------------------------------------
 
@@ -708,6 +716,25 @@ const my $THING => 99;
 
 sub something ( $=, $arg = $THING, @ ) {
 }
+
+#-----------------------------------------------------------------------------
+
+## name State with post-increment or -decrement, allowed (thanks to oalders)
+## parms { allow_state_in_expression => '1' }
+## failures 0
+## cut
+
+say state $foo++ for 0 .. 9;
+say state $bar-- for 0 .. 9;
+
+#-----------------------------------------------------------------------------
+
+## name State with post-increment or -decrement
+## failures 2
+## cut
+
+say state $foo++ for 0 .. 9;
+say state $bar-- for 0 .. 9;
 
 #-----------------------------------------------------------------------------
 

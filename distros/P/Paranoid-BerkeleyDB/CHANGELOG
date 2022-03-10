@@ -1,5 +1,20 @@
 CHANGELOG
 
+v2.06 (03/08/2022)
+==================
+--Needed to bump minimum Paranoid version dependency to 2.10
+
+v2.05 (03/08/2022)
+==================
+--Adapted to new pdebug functionality
+--Fixed errant test for ties
+
+v2.04 (07/23/2017)
+==================
+--Databases opened with no directory component at all tend to
+  open lock files in the current working directory, even if the
+  environment dictates that the database are elsewhere.  This is fixed.
+
 v2.03 (07/23/2017)
 ==================
 --Rewrite to adapt to new Class::EHierarchy API

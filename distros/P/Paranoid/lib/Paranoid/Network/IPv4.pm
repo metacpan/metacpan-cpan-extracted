@@ -1,12 +1,12 @@
 # Paranoid::Network::IPv4 -- IPv4-specific network functions
 #
-# $Id: lib/Paranoid/Network/IPv4.pm, 2.09 2021/12/28 15:46:49 acorliss Exp $
+# $Id: lib/Paranoid/Network/IPv4.pm, 2.10 2022/03/08 00:01:04 acorliss Exp $
 #
 # This software is free software.  Similar to Perl, you can redistribute it
 # and/or modify it under the terms of either:
 #
 #   a)     the GNU General Public License
-#          <https://www.gnu.org/licenses/gpl-1.0.html> as published by the 
+#          <https://www.gnu.org/licenses/gpl-1.0.html> as published by the
 #          Free Software Foundation <http://www.fsf.org/>; either version 1
 #          <https://www.gnu.org/licenses/gpl-1.0.html>, or any later version
 #          <https://www.gnu.org/licenses/license-list.html#GNUGPL>, or
@@ -46,7 +46,7 @@ my @constants = qw(MAXIPV4CIDR IPV4REGEX IPV4CIDRRGX IPV4BASE IPV4BRDCST
     IPV4MASK);
 my @ipv4sort = qw(ipv4NumSort ipv4StrSort ipv4PackedSort);
 
-($VERSION) = ( q$Revision: 2.09 $ =~ /(\d+(?:\.\d+)+)/sm );
+($VERSION) = ( q$Revision: 2.10 $ =~ /(\d+(?:\.\d+)+)/sm );
 @EXPORT      = @base;
 @EXPORT_OK   = ( @base, @constants, @ipv4sort );
 %EXPORT_TAGS = (
@@ -85,8 +85,7 @@ sub ipv4NetConvert {
     my $netAddr = shift;
     my ( $bnet, $bmask, $t, @rv );
 
-    pdebug( 'entering w/%s', PDLEVEL1, $netAddr );
-    pIn();
+    subPreamble( PDLEVEL1, '$', $netAddr );
 
     # Extract net address, mask
     if ( defined $netAddr ) {
@@ -135,8 +134,7 @@ sub ipv4NetConvert {
         pdebug( 'failed to extract an IPv4 address', PDLEVEL1 );
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL1, @rv );
+    subPostamble( PDLEVEL1, '@', @rv );
 
     return @rv;
 }
@@ -158,8 +156,7 @@ sub ipv4NetIntersect {
     my $rv   = 0;
     my ( @tnet, @dnet );
 
-    pdebug( 'entering w/%s, %s', PDLEVEL1, $tgt, $dest );
-    pIn();
+    subPreamble( PDLEVEL1, '$$', $tgt, $dest );
 
     # Bypas if one or both isn't defined -- obviously no intersection
     unless ( !defined $tgt or !defined $dest ) {
@@ -193,8 +190,7 @@ sub ipv4NetIntersect {
         }
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL1, $rv );
+    subPostamble( PDLEVEL1, '$', $rv );
 
     return $rv;
 }
@@ -258,7 +254,7 @@ Paranoid::Network::IPv4 - IPv4-related functions
 
 =head1 VERSION
 
-$Id: lib/Paranoid/Network/IPv4.pm, 2.09 2021/12/28 15:46:49 acorliss Exp $
+$Id: lib/Paranoid/Network/IPv4.pm, 2.10 2022/03/08 00:01:04 acorliss Exp $
 
 =head1 SYNOPSIS
 

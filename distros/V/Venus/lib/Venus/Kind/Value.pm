@@ -17,6 +17,16 @@ with 'Venus::Role::Valuable';
 
 # METHODS
 
+sub cast {
+  my ($self, @args) = @_;
+
+  require Venus::Type;
+
+  my $value = $self->can('value') ? $self->value : $self;
+
+  return Venus::Type->new(value => $value)->cast(@args);
+}
+
 sub defined {
   my ($self) = @_;
 
@@ -101,6 +111,64 @@ L<Venus::Role::Valuable>
 =head1 METHODS
 
 This package provides the following methods:
+
+=cut
+
+=head2 cast
+
+  cast(Str $kind) (Object | Undef)
+
+The cast method converts L<"value"|Venus::Kind::Value> objects between
+different I<"value"> object types, based on the name of the type provided. This
+method will return C<undef> if the invocant is not a L<Venus::Kind::Value>.
+
+I<Since C<0.08>>
+
+=over 4
+
+=item cast example 1
+
+  package main;
+
+  my $example = Example->new;
+
+  my $cast = $example->cast;
+
+  # bless({value => undef}, "Venus::Undef")
+
+=back
+
+=over 4
+
+=item cast example 2
+
+  package main;
+
+  my $example = Example->new(
+    value => 123.45,
+  );
+
+  my $cast = $example->cast('array');
+
+  # bless({value => [123.45]}, "Venus::Array")
+
+=back
+
+=over 4
+
+=item cast example 3
+
+  package main;
+
+  my $example = Example->new(
+    value => 123.45,
+  );
+
+  my $cast = $example->cast('hash');
+
+  # bless({value => {'123.45' => 123.45}, "Venus::Hash")
+
+=back
 
 =cut
 

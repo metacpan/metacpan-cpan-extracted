@@ -9,7 +9,7 @@ package Geo::Coder::Free::Config;
 #	logger
 #	default_config_directory - used when the configuration directory can't be worked out
 #	config (ref to hash to of values to override in the config file
-# Values in the file are overriden by what's in the environment
+# Values in the file are overridden by what's in the environment
 
 use warnings;
 use strict;
@@ -119,13 +119,13 @@ sub new {
 		throw Error::Simple("$config_file: configuration error: $@");
 	}
 
-	# The values in config are defaults which can be overriden by
+	# The values in config are defaults which can be overridden by
 	# the values in args{config}
 	if(defined($args{'config'})) {
 		$config = { %{$config}, %{$args{'config'}} };
 	}
 
-	# Allow variables to be overriden by the environment
+	# Allow variables to be overridden by the environment
 	foreach my $key(keys %{$config}) {
 		if($ENV{$key}) {
 			$config->{$key} = $ENV{$key};

@@ -4,7 +4,7 @@ use 5.008003;
 # Required modules
 my %reqMods = (
     'BerkeleyDB'        => 0.49,
-    'Paranoid'          => 2.05,
+    'Paranoid'          => 2.10,
     'Class::EHierarchy' => 2.00,
     'Cwd'               => 0,
     );

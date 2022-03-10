@@ -1,5 +1,8 @@
 Revision history for CGI-Ex.
 
+2.52      2022-03-09 16:45:04-07:00 America/Denver
+  * Fix for HTTP2 stream crashing on certain browsers (thank you oaxlin)
+
 2.51      2022-03-07 09:27:24-07:00 America/Denver
   * Fix an uninitialized value issue (thank you Prashanth BJ)
 

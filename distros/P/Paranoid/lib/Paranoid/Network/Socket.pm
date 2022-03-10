@@ -1,6 +1,6 @@
 # Paranoid::Network::Socket -- Socket wrapper for seemless IPv6 support
 #
-# $Id: lib/Paranoid/Network/Socket.pm, 2.09 2021/12/28 15:46:49 acorliss Exp $
+# $Id: lib/Paranoid/Network/Socket.pm, 2.10 2022/03/08 00:01:04 acorliss Exp $
 #
 # This software is free software.  Similar to Perl, you can redistribute it
 # and/or modify it under the terms of either:
@@ -39,7 +39,7 @@ use vars qw($VERSION @EXPORT @EXPORT_OK %EXPORT_TAGS);
 use base qw(Exporter);
 use Socket qw(:all);
 
-($VERSION) = ( q$Revision: 2.09 $ =~ /(\d+(?:\.\d+)+)/sm );
+($VERSION) = ( q$Revision: 2.10 $ =~ /(\d+(?:\.\d+)+)/sm );
 
 #####################################################################
 #
@@ -115,7 +115,7 @@ Paranoid::Network::Socket - Socket wrapper for seemless IPv6 support
 
 =head1 VERSION
 
-$Id: lib/Paranoid/Network/Socket.pm, 2.09 2021/12/28 15:46:49 acorliss Exp $
+$Id: lib/Paranoid/Network/Socket.pm, 2.10 2022/03/08 00:01:04 acorliss Exp $
 
 =head1 SYNOPSIS
 

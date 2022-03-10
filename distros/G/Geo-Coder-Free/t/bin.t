@@ -6,7 +6,7 @@ use Test::Most tests => 22;
 
 BIN: {
 	SKIP: {
-		eval 'use Test::Script';
+		eval 'use Test::Script 1.12';
 
 		if($@) {
 			skip('Test::Script required for testing scripts', 22);

@@ -5,7 +5,7 @@ use warnings;
 use base qw(Test::Class);
 use Test::More;
 
-our $VERSION = '1.29';
+our $VERSION = '1.31';
 
 #run prior and once per suite
 sub startup : Test(startup => 1) {

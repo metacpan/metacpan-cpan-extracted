@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package YAML::PP::Parser;
 
-our $VERSION = '0.031'; # VERSION
+our $VERSION = '0.032'; # VERSION
 
 use constant TRACE => $ENV{YAML_PP_TRACE} ? 1 : 0;
 use constant DEBUG => ($ENV{YAML_PP_DEBUG} || $ENV{YAML_PP_TRACE}) ? 1 : 0;
@@ -1455,7 +1455,7 @@ sub cb_set_yaml_version_directive {
         croak "Found duplicate YAML directive";
     }
     my ($version) = $token->{value} =~ m/^%YAML[ \t]+(1\.[12])/;
-    $self->set_yaml_version($version);
+    $self->set_yaml_version($version || '1.2');
     $self->set_yaml_version_directive(1);
 }
 

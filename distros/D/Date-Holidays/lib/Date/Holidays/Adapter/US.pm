@@ -8,7 +8,7 @@ use Data::Dumper;
 
 use base 'Date::Holidays::Adapter';
 
-$VERSION = '1.30';
+$VERSION = '1.31';
 
 sub new {
     my ( $class, %params ) = @_;
@@ -49,7 +49,7 @@ Date::Holidays::Adapter::US - an adapter class for Date::Holidays::USFederal
 
 =head1 VERSION
 
-This POD describes version 1.30 of Date::Holidays::Adapter::US
+This POD describes version 1.31 of Date::Holidays::Adapter::US
 
 =head1 DESCRIPTION
 

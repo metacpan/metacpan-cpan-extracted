@@ -8,7 +8,10 @@ use DateTime;
 use DateTime::Duration;
 use DateTime::Format::Strptime;
 
-BEGIN { use_ok( 'Module::Generic::DateTime' ) || BAIL_OUT( "Unable to load Module::Generic::DateTime" ); }
+BEGIN
+{
+    use_ok( 'Module::Generic::DateTime' ) || BAIL_OUT( "Unable to load Module::Generic::DateTime" );
+};
 
 my $hash =
 {
@@ -24,7 +27,6 @@ my $dt = DateTime->new( %$hash );
 my $fmt = DateTime::Format::Strptime->new(
     pattern => '%Y-%m-%d %H:%M:%S',
     locale => 'en_GB',
-    time_zone => 'local',
 );
 $dt->set_formatter( $fmt );
 # my $dt2 = DateTime->now( time_zone => 'local' );
@@ -37,7 +39,7 @@ my $dt2 = DateTime->new(
     hour => 12,
     minute => 8,
     second => 15,
-    time_zone => 'GMT',
+    time_zone => 'UTC',
 );
 $dt2->set_formatter( $fmt );
 my $now = $dt2->epoch;
@@ -88,5 +90,13 @@ $dbt1 -= 2;
 # diag( "Adding back 4..." );
 $dbt1 += 4;
 # diag( "After addition assignment: $dbt1" );
+
+my $dt_now2 = DateTime->now;
+my $now2 = Module::Generic::DateTime->new;
+isa_ok( $now2 => 'Module::Generic::DateTime' );
+is( $now2->year, $dt_now2->year, 'default year' );
+is( $now2->month, $dt_now2->month, 'default month' );
+is( $now2->day, $dt_now2->day, 'default day' );
+is( $now2->time_zone->name, $dt_now2->time_zone->name, 'default time zone' );
 
 done_testing;

@@ -4,6 +4,10 @@ use warnings;
 use Async::Event::Interval;
 use Test::More;
 
+if (! $ENV{CI_TESTING}) {
+    plan skip_all => "Not on a valid CI testing platform..."
+}
+
 my $mod = 'Async::Event::Interval';
 
 my $e = $mod->new(1, \&perform, 10);

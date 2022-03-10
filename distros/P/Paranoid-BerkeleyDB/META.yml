@@ -21,5 +21,5 @@ requires:
   BerkeleyDB: 0.49
   Class::EHierarchy: 2
   Cwd: 0
-  Paranoid: 2.05
-version: 2.03
+  Paranoid: 2.1
+version: 2.06

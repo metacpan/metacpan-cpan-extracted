@@ -14,6 +14,9 @@ SYNOPSIS
         my $array = Class::Array->new( [$something] );
         my $hash  = Class::Assoc->new;
         my $bool  = Class::Boolean->new;
+        my $dt    = Class::DateTime->new( $datetime_object );
+        # Sets implicitly a default DateTime object
+        my $dt    = Class::DateTime->new;
         my $ex    = Class::Exception->new( message => "Oh no", code => 500 );
         my $file  = Class::File->new( '/some/where/file.txt' );
         my $finfo = Class::Finfo->new( '/some/where/file.txt' );
@@ -24,7 +27,7 @@ SYNOPSIS
         # For details on the api provided, please check each of the module documentation.
 
 VERSION
-        v0.1.0
+        v0.1.1
 
 DESCRIPTION
     This package inherits all its features from Module::Generic and provides
@@ -39,7 +42,7 @@ AUTHOR
 SEE ALSO
     Class::Generic, Class::Array, Class::Scalar, Class::Number,
     Class::Boolean, Class::Assoc, Class::File, Class::DateTime,
-    Class::Exception, Class::Finfo, Class::NullChain
+    Class::Exception, Class::Finfo, Class::NullChain, Class::DateTime
 
 COPYRIGHT & LICENSE
     Copyright(c) 2022 DEGUEST Pte. Ltd.

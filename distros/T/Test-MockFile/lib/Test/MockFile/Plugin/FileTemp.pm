@@ -9,7 +9,7 @@ use Test::MockModule qw{strict};
 
 use Carp qw(croak);
 
-our $VERSION = '0.032';
+our $VERSION = '0.033';
 
 sub register {
     my ($self) = @_;
@@ -35,7 +35,10 @@ sub register {
 
             Test::MockFile::add_strict_rule_for_filename( $out[1] => 1 );
 
-            return wantarray ? @out : $out[0];
+            return @out if wantarray;
+
+            File::Temp::unlink0( $out[0], $out[1] );
+            return $out[0];
         }
     );
 

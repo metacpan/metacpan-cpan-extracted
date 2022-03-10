@@ -2,7 +2,7 @@ package Test2::Harness::UI::Sweeper;
 use strict;
 use warnings;
 
-our $VERSION = '0.000112';
+our $VERSION = '0.000115';
 
 use Test2::Harness::UI::Util::HashBase qw{
     <config
@@ -62,6 +62,7 @@ sub sweep {
             $counts{jobs}++;
             if ($params{events}) {
                 if ($params{subtests}) {
+                    $job->reportings->update({event_id => undef});
                     $job->events->delete;
                 }
                 else {
@@ -73,7 +74,10 @@ sub sweep {
                 $job->job_fields->delete;
             }
 
-            $job->delete if $params{jobs};
+            if ($params{jobs}) {
+                $job->reportings->delete;
+                $job->delete;
+            }
         }
 
         if ($params{run_fields}) {
@@ -84,7 +88,11 @@ sub sweep {
             $run->coverages->delete;
             $run->update({has_coverage => 0}) unless $params{runs};
         }
-        $run->delete if $params{runs};
+
+        if ($params{runs}) {
+            $run->reportings->delete;
+            $run->delete;
+        }
     }
 
     if ($db_type =~ m/mysql/i) {

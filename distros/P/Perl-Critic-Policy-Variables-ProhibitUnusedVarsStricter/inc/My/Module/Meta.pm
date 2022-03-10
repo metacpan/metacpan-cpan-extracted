@@ -7,7 +7,7 @@ use warnings;
 
 use Carp;
 
-our $VERSION = '0.113';
+our $VERSION = '0.114';
 
 sub new {
     my ( $class ) = @_;
@@ -149,10 +149,11 @@ sub requires {
     return {
 	'English'		    => 0,
 	# 'Perl::Critic::Document'    => 1.119,   # need 1.119 here
+	'Perl::Critic::Exception::Fatal::Internal'	=> 1.119,
 	'Perl::Critic::Exception::Fatal::PolicyDefinition' => 1.119,
         'Perl::Critic::Policy'      => 1.119,
         'Perl::Critic::Utils'       => 1.119,
-	'PPI::Document'			=> 0,
+	'PPI::Document'		    => 0,
 	# 'PPI::Token::Symbol'        => 0,
         'PPIx::QuoteLike'           => 0.011,   # For full scope inside ""
 	'PPIx::QuoteLike::Constant' => 0.011,

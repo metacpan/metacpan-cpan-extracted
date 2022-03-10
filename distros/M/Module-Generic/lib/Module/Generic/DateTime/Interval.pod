@@ -1,0 +1,140 @@
+=encoding utf8
+
+=head1 NAME
+
+Module::Generic::DateTime::Interval - An Enhanced DateTime::Duration Object
+
+=head1 SYNOPSIS
+
+    use Module::Generic::DateTime::Interval;
+    my $int = Module::Generic::DateTime::Interval->new( $duration );
+    # Inspect by returning a formatted string showing year, month, etc
+    print( $int->dump, "\n" );
+    $int->days = 10;
+    my $days = $int->days;
+    $int->hours = 10;
+    my $hours = $int->hours;
+    $int->minutes = 10;
+    my $minutes = $int->minutes;
+    $int->months = 10;
+    my $months = $int->months;
+    $int->nanoseconds = 10;
+    my $nano = $int->nanoseconds;
+    $int->seconds = 10;
+    my $seconds = $int->seconds;
+    $int->weeks = 10;
+    my $weeks = $int->weeks;
+    $int->years = 10;
+    my $years = $int->years;
+
+    my $dt = DateTime->now;
+    my $dt2 = DateTime->now->add( days => 10 );
+    # Get an Module::Generic::DateTime::Interval object
+    my $int = $dt2 - $dt;
+    print $int->days, "\n"; # 10
+
+=head1 DESCRIPTION
+
+L<Module::Generic::DateTime::Interval> is a thin wrapper around L<DateTime::Duration> to provide enhance features. All other regular method calls of L<DateTime::Duration> are passed through to it via C<AUTOLOAD>.
+
+This interval object is overloaded and allows the following operations: C<+>, C<->, C<*>, C<comparison>
+
+=head1 METHODS
+
+=head2 days
+
+This is an lvalue method to set or get the number of days in this interval object.
+
+Example:
+
+    $int->days = 10;
+    $int->days( 10 );
+    my $days = $int->days;
+
+=head2 hours
+
+This is an lvalue method to set or get the number of hours in this interval object.
+
+Example:
+
+    $int->hours = 10;
+    $int->hours( 10 );
+    my $hours = $int->hours;
+
+=head2 minutes
+
+This is an lvalue method to set or get the number of minutes in this interval object.
+
+Example:
+
+    $int->minutes = 10;
+    $int->minutes( 10 );
+    my $minutes = $int->minutes;
+
+=head2 months
+
+This is an lvalue method to set or get the number of months in this interval object.
+
+Example:
+
+    $int->months = 10;
+    $int->months( 10 );
+    my $months = $int->months;
+
+=head2 nanoseconds
+
+This is an lvalue method to set or get the nanoseconds of days in this interval object.
+
+Example:
+
+    $int->nanoseconds = 10;
+    $int->nanoseconds( 10 );
+    my $nanoseconds = $int->nanoseconds;
+
+=head2 seconds
+
+This is an lvalue method to set or get the seconds of days in this interval object.
+
+Example:
+
+    $int->seconds = 10;
+    $int->seconds( 10 );
+    my $seconds = $int->seconds;
+
+=head2 weeks
+
+This is an lvalue method to set or get the weeks of days in this interval object.
+
+Example:
+
+    $int->weeks = 10;
+    $int->weeks( 10 );
+    my $weeks = $int->weeks;
+
+=head2 years
+
+This is an lvalue method to set or get the years of days in this interval object.
+
+Example:
+
+    $int->years = 10;
+    $int->years( 10 );
+    my $years = $int->years;
+
+=head1 SEE ALSO
+
+L<Module::Generic>, L<Module::Generic::DateTime>, L<DateTime>, L<DateTime::Format::Strptime>, L<DateTime::TimeZone>
+
+=head1 AUTHOR
+
+Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright (c) 2000-2020 DEGUEST Pte. Ltd.
+
+You can use, copy, modify and redistribute this package and associated
+files under the same terms as Perl itself.
+
+=cut
+

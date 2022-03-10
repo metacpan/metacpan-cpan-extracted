@@ -1,7 +1,7 @@
 package LWP::Authen::OAuth2::ServiceProvider::Yahoo;
 
 # ABSTRACT: Access Yahoo using OAuth2
-our $VERSION = '0.18'; # VERSION
+our $VERSION = '0.19'; # VERSION
 
 our @ISA = qw(LWP::Authen::OAuth2::ServiceProvider);
 
@@ -62,7 +62,7 @@ LWP::Authen::OAuth2::ServiceProvider::Yahoo - Access Yahoo using OAuth2
 
 =head1 VERSION
 
-version 0.18
+version 0.19
 
 =head1 SYNOPSIS
 
@@ -92,7 +92,7 @@ Thomas Klausner <domm@plix.at>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 - 2021 by Ben Tilly, Rent.com, Thomas Klausner.
+This software is copyright (c) 2013 - 2022 by Ben Tilly, Rent.com, Thomas Klausner.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

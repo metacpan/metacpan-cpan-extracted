@@ -1,6 +1,6 @@
 # Paranoid::IO::FileMultiplexer -- File Multiplexer Object
 #
-# $Id: lib/Paranoid/IO/FileMultiplexer.pm, 2.09 2021/12/28 15:46:49 acorliss Exp $
+# $Id: lib/Paranoid/IO/FileMultiplexer.pm, 2.10 2022/03/08 00:01:04 acorliss Exp $
 #
 # This software is free software.  Similar to Perl, you can redistribute it
 # and/or modify it under the terms of either:
@@ -37,7 +37,7 @@ use strict;
 use warnings;
 use vars qw($VERSION);
 use base qw(Exporter);
-use Paranoid;
+use Paranoid qw(:all);
 use Paranoid::IO qw(:all);
 use Paranoid::Debug qw(:all);
 use Carp;
@@ -46,7 +46,7 @@ use Paranoid::IO::FileMultiplexer::Block::FileHeader;
 use Paranoid::IO::FileMultiplexer::Block::StreamHeader;
 use Paranoid::IO::FileMultiplexer::Block::BATHeader;
 
-($VERSION) = ( q$Revision: 2.09 $ =~ /(\d+(?:\.\d+)+)/sm );
+($VERSION) = ( q$Revision: 2.10 $ =~ /(\d+(?:\.\d+)+)/sm );
 
 use constant PIOFMVER => '1.0';
 use constant PERMMASK => 0666;
@@ -113,8 +113,7 @@ sub new {
         pdebug( 'invalid file name: %s', PDLEVEL1, $args{file} );
     }
 
-    pOut();
-    pdebug( 'leaving w/%s', PDLEVEL1, $self );
+    subPostamble( PDLEVEL1, '$', $self );
 
     return $self;
 }
@@ -131,8 +130,7 @@ sub _newFile {
     my $rv    = 0;
     my $header;
 
-    pdebug( 'entering', PDLEVEL2 );
-    pIn();
+    subPreamble(PDLEVEL2);
 
     if ( !$$self{readOnly} ) {
 
@@ -161,8 +159,7 @@ sub _newFile {
         pdebug( 'cannot create a new file in readOnly mode', PDLEVEL1 );
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL2, $rv );
+    subPostamble( PDLEVEL2, '$', $rv );
 
     return $rv;
 }
@@ -179,8 +176,7 @@ sub _oldFile {
     my $rv    = 0;
     my $header;
 
-    pdebug( 'entering', PDLEVEL2 );
-    pIn();
+    subPreamble(PDLEVEL2);
 
     # Allocate the header object (it will fail on invalid block sizes)
     $header = Paranoid::IO::FileMultiplexer::Block::FileHeader->new( $file,
@@ -207,8 +203,7 @@ sub _oldFile {
         }
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL2, $rv );
+    subPostamble( PDLEVEL2, '$', $rv );
 
     return $rv;
 }
@@ -235,8 +230,7 @@ sub _reload {
     my $header = $$self{header};
     my $rv     = 1;
 
-    pdebug( 'entering', PDLEVEL4 );
-    pIn();
+    subPreamble(PDLEVEL4);
 
     if ( pflock( $file, LOCK_SH ) ) {
         if ( $header->readSig && $header->readStreams ) {
@@ -248,8 +242,7 @@ sub _reload {
         pflock( $file, LOCK_UN );
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL4, $rv );
+    subPostamble( PDLEVEL4, '$', $rv );
 
     return $rv;
 }
@@ -266,8 +259,7 @@ sub _getStream {
     my $file   = $$self{file};
     my ( $rv, %streams, $stream );
 
-    pdebug( 'entering w/%s', PDLEVEL2, $sname );
-    pIn();
+    subPreamble( PDLEVEL2, '$$', $sname, $header );
 
     if ( defined $sname and length $sname ) {
 
@@ -321,8 +313,7 @@ sub _getStream {
         }
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL4, $rv );
+    subPostamble( PDLEVEL4, '$', $rv );
 
     return $rv;
 }
@@ -339,8 +330,7 @@ sub _getBAT {
     my $file  = $$self{file};
     my ( $rv, $stream, @bats, $bat );
 
-    pdebug( 'entering w/(%s)(%s)', PDLEVEL4, $sname, $seq );
-    pIn();
+    subPreamble( PDLEVEL4, '$$', $sname, $seq );
 
     $stream = $self->_getStream($sname);
     if ( defined $stream ) {
@@ -364,8 +354,7 @@ sub _getBAT {
         }
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL4, $rv );
+    subPostamble( PDLEVEL4, '$', $rv );
 
     return $rv;
 }
@@ -382,8 +371,7 @@ sub _chkData {
     my $bsize = $$self{blockSize};
     my ( $rv, $block, $raw );
 
-    pdebug( 'entering w/%s', PDLEVEL4, $bn );
-    pIn();
+    subPreamble( PDLEVEL4, '$', $bn );
 
     $block = Paranoid::IO::FileMultiplexer::Block->new( $file, $bn, $bsize );
     $rv = ( defined $block and $block->bread( \$raw, 0, 1 ) == 1 );
@@ -395,8 +383,7 @@ sub _chkData {
         $$self{corrupted} = 1;
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL4, $rv );
+    subPostamble( PDLEVEL4, '$', $rv );
 
     return $rv;
 }
@@ -415,8 +402,7 @@ sub _chkBAT {
     my $bsize = $$self{blockSize};
     my ( $rv, $block, @data );
 
-    pdebug( 'entering w/%s', PDLEVEL4, $bn );
-    pIn();
+    subPreamble( PDLEVEL4, '$$$', $bn, $sname, $seq );
 
     $block = Paranoid::IO::FileMultiplexer::Block::BATHeader->new( $file, $bn,
         $bsize, $sname, $seq );
@@ -433,8 +419,7 @@ sub _chkBAT {
         foreach (@data) { $rv = 0 unless $self->_chkData($_) }
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL4, $rv );
+    subPostamble( PDLEVEL4, '$', $rv );
 
     return $rv;
 }
@@ -452,8 +437,7 @@ sub _chkStream {
     my $bsize = $$self{blockSize};
     my ( $rv, $i, $block, @bats );
 
-    pdebug( 'entering w/%s', PDLEVEL4, $bn );
-    pIn();
+    subPreamble( PDLEVEL4, '$$', $bn, $sname );
 
     $block =
         Paranoid::IO::FileMultiplexer::Block::StreamHeader->new( $file, $bn,
@@ -476,8 +460,7 @@ sub _chkStream {
         }
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL4, $rv );
+    subPostamble( PDLEVEL4, '$', $rv );
 
     return $rv;
 }
@@ -495,8 +478,7 @@ sub chkConsistency {
     my $rv     = 1;
     my %streams;
 
-    pdebug( 'entering', PDLEVEL1 );
-    pIn();
+    subPreamble(PDLEVEL1);
 
     # TODO:  There is one major flaw in this consistency check, in that is
     # TODO:  possible to list a header block as a data block in a BAT.
@@ -546,8 +528,7 @@ sub chkConsistency {
         pdebug( 'error - setting corrupted flag to true', PDLEVEL1 );
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL1, $rv );
+    subPostamble( PDLEVEL1, '$', $rv );
 
     return $rv;
 }
@@ -562,8 +543,7 @@ sub _addBlock {
     my $header = $$self{header};
     my ( $rv, $bn, $data );
 
-    pdebug( 'entering', PDLEVEL2 );
-    pIn();
+    subPreamble(PDLEVEL2);
 
     $bn = $header->blocks;
     $data =
@@ -571,8 +551,7 @@ sub _addBlock {
         $$self{blockSize} );
     $rv = $bn if defined $data and $data->allocate and $header->incrBlocks;
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL2, $rv );
+    subPostamble( PDLEVEL2, '$', $rv );
 
     return $rv;
 }
@@ -590,8 +569,7 @@ sub _addBAT {
     my $header = $$self{header};
     my ( $rv, $bn, $bat );
 
-    pdebug( 'entering', PDLEVEL2 );
-    pIn();
+    subPreamble( PDLEVEL2, '$$', $sname, $seq );
 
     $bn = $header->blocks;
     $bat =
@@ -605,8 +583,7 @@ sub _addBAT {
 
     $bat->addData( $self->_addBlock ) if defined $rv;
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL2, $rv );
+    subPostamble( PDLEVEL2, '$', $rv );
 
     return $rv;
 }
@@ -623,8 +600,7 @@ sub _addStream {
     my $header = $$self{header};
     my ( $rv, $bn, $stream );
 
-    pdebug( 'entering', PDLEVEL2 );
-    pIn();
+    subPreamble( PDLEVEL2, '$', $sname );
 
     $bn = $header->blocks;
     $stream =
@@ -638,8 +614,7 @@ sub _addStream {
 
     $stream->addBAT( $self->_addBAT( $sname, 0 ) ) if defined $rv;
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL2, $rv );
+    subPostamble( PDLEVEL2, '$', $rv );
 
     return $rv;
 }
@@ -657,8 +632,7 @@ sub addStream {
     my $bypass = $$self{readOnly} || $$self{corrupted};
     my $rv     = 0;
 
-    pdebug( 'entering w/(%s)', PDLEVEL1, $sname );
-    pIn();
+    subPreamble( PDLEVEL1, '$', $sname );
 
     unless ($bypass) {
 
@@ -734,8 +708,7 @@ sub strmSeek {
     my $cur    = 0;
     my $rv     = 1;
 
-    pdebug( 'entering w/(%s)(%s)(%s)', PDLEVEL2, $sname, $pos, $whence );
-    pIn();
+    subPreamble( PDLEVEL2, '$$$', $sname, $pos, $whence );
 
     $whence = SEEK_SET unless defined $whence;
     $pos    = 0        unless defined $whence;
@@ -759,10 +732,9 @@ sub strmSeek {
     $$self{streamPos}{$sname} = 0 if $$self{streamPos}{$sname} < 0;
 
     $rv = $$self{streamPos}{$sname} if defined $rv;
-    $rv = '0 but true' if $rv == 0;
+    $rv = PTRUE_ZERO if $rv == 0;
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL2, $rv );
+    subPostamble( PDLEVEL2, '$', $rv );
 
     return $rv;
 }
@@ -796,8 +768,7 @@ sub _growStream {
     my $rv    = 1;
     my ( $max, $stream, $bat, @bats, @blocks );
 
-    pdebug( 'entering w/(%s)(%s, %s, %s)', PDLEVEL3, $sname, @addr );
-    pIn();
+    subPreamble( PDLEVEL3, '$@', $sname, @addr );
 
     # Get the stream and list of bats
     $stream = $self->_getStream($sname);
@@ -842,8 +813,7 @@ sub _growStream {
 
     pdebug( 'failed to grow the stream (%s)', PDLEVEL1, $sname ) unless $rv;
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL3, $rv );
+    subPostamble( PDLEVEL3, '$', $rv );
 
     return $rv;
 }
@@ -862,12 +832,7 @@ sub _strmWrite {
     my ( $rv, $stream, $bat, $block, $pos );
     my ( @addr, @blocks, $bn, $blkLeft, $offset, $clength, $chunk, $bw );
 
-    pdebug(
-        'entering w/(%s)(%s)',
-        PDLEVEL2, $sname,
-        ( defined $content ? "@{[ length $content ]} bytes" : $content ),
-        );
-    pIn();
+    subPreamble( PDLEVEL1, '$$', $sname, $content );
 
     if ( pflock( $file, LOCK_EX ) ) {
 
@@ -952,8 +917,7 @@ sub _strmWrite {
         pflock( $file, LOCK_UN );
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL1, $rv );
+    subPostamble( PDLEVEL1, '$', $rv );
 
     return $rv;
 }
@@ -991,8 +955,7 @@ sub _strmRead {
     my ( $stream, $pos, $eos, @addr, $content );
     my ( $bat, @blocks, $block, $ctr, $br, $offset );
 
-    pdebug( 'entering w/(%s)(%s)(%s)', PDLEVEL2, $sname, $cref, $btr );
-    pIn();
+    subPreamble( PDLEVEL1, '$$$', $sname, $cref, $btr );
 
     if ( pflock( $file, LOCK_SH ) ) {
 
@@ -1069,8 +1032,7 @@ sub _strmRead {
         pflock( $file, LOCK_UN );
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL1, $rv );
+    subPostamble( PDLEVEL1, '$', $rv );
 
     return $rv;
 }
@@ -1103,10 +1065,7 @@ sub strmAppend {
     my $file    = $$self{file};
     my ( $rv, $stream, $pos );
 
-    pdebug( 'entering w/(%s)(%s)',
-        PDLEVEL1, $sname,
-        ( defined $content ? "@{[ length $content ]} bytes" : $content ) );
-    pIn();
+    subPreamble( PDLEVEL1, '$$', $sname, $content );
 
     if ( pflock( $file, LOCK_EX ) ) {
         $stream = $self->_getStream($sname);
@@ -1119,8 +1078,7 @@ sub strmAppend {
         }
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL1, $rv );
+    subPostamble( PDLEVEL1, '$', $rv );
 
     return $rv;
 }
@@ -1138,8 +1096,7 @@ sub _strmTruncate {
     my $file  = $$self{file};
     my ( $rv, $stream, $eos, $zeroes, $zl );
 
-    pdebug( 'entering w/(%s)(%s)', PDLEVEL1, $sname, $neos );
-    pIn();
+    subPreamble( PDLEVEL1, '$$', $sname, $neos );
 
     if ( pflock( $file, LOCK_EX ) ) {
         $stream = $self->_getStream($sname);
@@ -1159,8 +1116,7 @@ sub _strmTruncate {
         }
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL1, $rv );
+    subPostamble( PDLEVEL1, '$', $rv );
 
     return $rv;
 }
@@ -1202,7 +1158,7 @@ Paranoid::IO::FileMultiplexer - File Multiplexer
 
 =head1 VERSION
 
-$Id: lib/Paranoid/IO/FileMultiplexer.pm, 2.09 2021/12/28 15:46:49 acorliss Exp $
+$Id: lib/Paranoid/IO/FileMultiplexer.pm, 2.10 2022/03/08 00:01:04 acorliss Exp $
 
 =head1 SYNOPSIS
 
@@ -1277,6 +1233,14 @@ capabilities on a 32-bit platform, but on a 64-bit platform, you are still
 artificially capped on how much data can be stored in an individual stream.
 The number of streams will always limited identically on both platforms based
 on the block size.
+
+B<NOTE:> The actual limits of file sizes aren't dependent upon the native size
+of longs or quads, but the file system design, itself.  Some file systems
+designed for 32-bit processors reserved the highest bit, which made the
+highest addressable space in a file 2GB instead of 4GB.  Other filesystems had
+limits that were a function of inode size and other aspects of the formatted
+file system.  End sum, the true limit for file size may be outside of the
+ability for this module to detect and accomodate gracefully.
 
 One final caveat should be noted regarding I/O performance.  The supported
 block sizes are intentionally limited in hopes of avoiding double-write

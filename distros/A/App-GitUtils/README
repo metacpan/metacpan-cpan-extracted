@@ -2,8 +2,8 @@ NAME
     App::GitUtils - Day-to-day command-line utilities for git
 
 VERSION
-    This document describes version 0.083 of App::GitUtils (from Perl
-    distribution App-GitUtils), released on 2021-08-14.
+    This document describes version 0.084 of App::GitUtils (from Perl
+    distribution App-GitUtils), released on 2022-02-12.
 
 SYNOPSIS
     This distribution provides the following command-line utilities:
@@ -60,6 +60,13 @@ FUNCTIONS
      info(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     Return information about git repository.
+
+    Information include: - Path of the git directory - Repository name -
+    Current/active branch
+
+    Will return status 412 if working directory is not inside a git
+    repository. Will return status 500 on errors, e.g. if "git" command
+    cannot recognize the repository.
 
     This function is not exported.
 
@@ -249,13 +256,6 @@ SOURCE
     Source repository is at
     <https://github.com/perlancar/perl-App-GitUtils>.
 
-BUGS
-    Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-GitUtils>
-
-    When submitting a bug or request, please include a test-file or a patch
-    to an existing test-file that illustrates the bug or desired feature.
-
 SEE ALSO
     App::GitHubUtils
 
@@ -263,7 +263,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 CONTRIBUTOR
-    Steven Haryanto (on PC, Jakarta) <stevenharyanto@gmail.com>
+    Steven Haryanto <stevenharyanto@gmail.com>
 
 CONTRIBUTING
     To contribute, you can send patches by email/via RT, or send pull
@@ -282,9 +282,16 @@ CONTRIBUTING
     me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021, 2020, 2018, 2015, 2014 by perlancar
-    <perlancar@cpan.org>.
+    This software is copyright (c) 2022, 2021, 2020, 2018, 2015, 2014 by
+    perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-GitUtils>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 

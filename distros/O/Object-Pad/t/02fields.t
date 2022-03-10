@@ -7,6 +7,7 @@ use Test::More;
 use Test::Refcount;
 
 use Object::Pad;
+use Object::Pad qw( :experimental(init_expr) );
 
 use constant HAVE_DATA_DUMP => defined eval { require Data::Dump; };
 

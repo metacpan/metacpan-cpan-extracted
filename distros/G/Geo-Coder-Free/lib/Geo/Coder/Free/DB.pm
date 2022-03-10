@@ -1,7 +1,7 @@
 package Geo::Coder::Free::DB;
 
 # Author Nigel Horne: njh@bandsman.co.uk
-# Copyright (C) 2015-2020, Nigel Horne
+# Copyright (C) 2015-2022, Nigel Horne
 
 # Usage is subject to licence terms.
 # The licence terms of this software are as follows:
@@ -39,7 +39,7 @@ package Geo::Coder::Free::DB;
 # reasons it's enabled by default
 # TODO: Switch that to off by default, and enable by passing 'entry'
 
-# TODO: support a directory hierachy of databases
+# TODO: support a directory hierarchy of databases
 # TODO: consider returning an object or array of objects, rather than hashes
 # TODO:	Add redis database - could be of use for Geo::Coder::Free
 #	use select() to select a database - use the table arg
@@ -67,15 +67,15 @@ sub new {
 	my $class = ref($proto) || $proto;
 
 	if($class eq __PACKAGE__) {
-		die "$class: abstract class";
+		croak("$class: abstract class");
 	}
 
-	die "$class: where are the files?" unless($directory || $args{'directory'});
+	croak("$class: where are the files?") unless($directory || $args{'directory'});
 	# init(\%args);
 
 	return bless {
 		logger => $args{'logger'} || $logger,
-		directory => $args{'directory'} || $directory,	# The directory conainting the tables in XML, SQLite or CSV format
+		directory => $args{'directory'} || $directory,	# The directory containing the tables in XML, SQLite or CSV format
 		cache => $args{'cache'} || $cache,
 		table => $args{'table'},	# The name of the file containing the table, defaults to the class name
 		no_entry => $args{'no_entry'} || 0,
@@ -107,6 +107,8 @@ sub set_logger {
 	}
 
 	$self->{'logger'} = $args{'logger'};
+
+	return $self;
 }
 
 # Open the database.
@@ -255,7 +257,7 @@ sub _open {
 				file => $slurp_file
 			)};
 
-			# Don't use blank lines or comments
+			# Ignore blank lines or lines starting with # in the CSV file
 			unless($self->{no_entry}) {
 				@data = grep { $_->{'entry'} !~ /^\s*#/ } grep { defined($_->{'entry'}) } @data;
 			}
@@ -288,6 +290,8 @@ sub _open {
 	$self->{$table} = $dbh;
 	my @statb = stat($slurp_file);
 	$self->{'_updated'} = $statb[9];
+
+	return $self;
 }
 
 # Returns a reference to an array of hash references of all the data meeting
@@ -369,12 +373,13 @@ sub selectall_hash {
 			$self->{'logger'}->debug("selectall_hash $query");
 		}
 	}
-	my $key = $query;
-	if(defined($query_args[0])) {
-		$key .= ' ' . join(', ', @query_args);
-	}
+	my $key;
 	my $c;
 	if($c = $self->{cache}) {
+		$key = $query;
+		if(defined($query_args[0])) {
+			$key .= ' ' . join(', ', @query_args);
+		}
 		if(my $rc = $c->get($key)) {
 			# This use of a temporary variable is to avoid
 			#	"Implicit scalar context for array in return"
@@ -454,7 +459,7 @@ sub fetchrow_hashref {
 		if(defined($query_args[0])) {
 			my @call_details = caller(0);
 			$self->{'logger'}->debug("fetchrow_hashref $query: ", join(', ', @query_args),
-				' called from ', $call_details[2] . ' of ' . $call_details[1]);
+				' called from ', $call_details[2], ' of ', $call_details[1]);
 		} else {
 			$self->{'logger'}->debug("fetchrow_hashref $query");
 		}
@@ -527,12 +532,12 @@ sub updated {
 	return $self->{'_updated'};
 }
 
-# Return the contents of an arbiratary column in the database which match the
+# Return the contents of an arbitrary column in the database which match the
 #	given criteria
 # Returns an array of the matches, or just the first entry when called in
 #	scalar context
 
-# Set distinct to 1 if you're after a uniq list
+# Set distinct to 1 if you're after a unique list
 sub AUTOLOAD {
 	our $AUTOLOAD;
 	my $column = $AUTOLOAD;
@@ -541,7 +546,7 @@ sub AUTOLOAD {
 
 	return if($column eq 'DESTROY');
 
-	my $self = shift or return undef;
+	my $self = shift or return;
 
 	my $table = $self->{table} || ref($self);
 	$table =~ s/.*:://;
@@ -581,6 +586,12 @@ sub AUTOLOAD {
 			if($self->{'logger'}) {
 				$self->{'logger'}->debug("AUTOLOAD params $key isn't defined");
 			}
+			if($done_where) {
+				$query .= " AND $key IS NULL";
+			} else {
+				$query .= " WHERE $key IS NULL";
+				$done_where = 1;
+			}
 		}
 	}
 	$query .= " ORDER BY $column";
@@ -611,6 +622,9 @@ sub DESTROY {
 
 	if($self->{'temp'}) {
 		unlink delete $self->{'temp'};
+	}
+	if(my $table = delete $self->{'table'}) {
+		$table->finish();
 	}
 }
 

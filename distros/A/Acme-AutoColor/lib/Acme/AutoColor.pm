@@ -6,7 +6,7 @@ use warnings;
 
 use Graphics::ColorNames 0.32;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 our $Colors;
 
@@ -40,7 +40,7 @@ sub AUTOLOAD {
      }
   }
 
-  my $value = $Acme::AutoColor::Colors->FETCH($1);
+  my $value = $Acme::AutoColor::Colors->hex($1);
   if (defined $value) {
     return wantarray ? hex2tuple($value) : $value;
   } else {

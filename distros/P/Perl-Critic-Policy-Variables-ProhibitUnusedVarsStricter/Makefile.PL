@@ -64,7 +64,8 @@ if ( $mmv >= 6.52 ) {
 WriteMakefile( %args );
 
 sub MY::postamble {
-    my ( $self, @args ) = @_;
+    # my ( $self, @args ) = @_;
+    my ( $self ) = @_;
 
     my $authortest = $self->test_via_harness(
 	'$(FULLPERLRUN)', '$(AUTHORTEST_FILES)' );

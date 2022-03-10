@@ -1,11 +1,11 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic.pm
-## Version v0.21.7
+## Version v0.21.11
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/08/24
-## Modified 2022/03/06
+## Modified 2022/03/10
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -40,7 +40,7 @@ BEGIN
     our @EXPORT      = qw( );
     our @EXPORT_OK   = qw( subclasses );
     our %EXPORT_TAGS = ();
-    our $VERSION     = 'v0.21.7';
+    our $VERSION     = 'v0.21.11';
     # local $^W;
     # mod_perl/2.0.10
     if( exists( $ENV{MOD_PERL} )
@@ -1920,6 +1920,12 @@ sub new_array
     return( Module::Generic::Array->new( @_ ) );
 }
 
+sub new_datetime
+{
+    my $self = shift( @_ );
+    return( Module::Generic::DateTime->new( @_ ) );
+}
+
 sub new_file
 {
     my $self = shift( @_ );
@@ -2553,7 +2559,18 @@ sub _parse_timestamp
     return if( !length( $str ) );
     $str = "$str";
     my $this = $self->_obj2h;
-    my $tz = DateTime::TimeZone->new( name => 'local' );
+    my $class = ref( $self ) || $self;
+    my $tz;
+    try
+    {
+        $tz = DateTime::TimeZone->new( name => 'local' );
+    }
+    catch( $e )
+    {
+        $tz = DateTime::TimeZone->new( name => 'UTC' );
+        warn( "Your system is missing key timezone components. ${class}::_parse_timestamp is reverting to UTC instead of local time zone.\n" );
+    }
+    
     # my $tz = DateTime::TimeZone->new( name => 'Europe/Berlin' );
     unless( DateTime->can( 'TO_JSON' ) )
     {
@@ -2908,7 +2925,16 @@ sub _parse_timestamp
             try
             {
                 require DateTime::Format::JP;
-                my $parser = DateTime::Format::JP->new( pattern => '%E%Y年%m月%d日', time_zone => 'local' );
+                my $parser;
+                try
+                {
+                    $parser = DateTime::Format::JP->new( pattern => '%E%Y年%m月%d日', time_zone => 'local' );
+                }
+                catch( $e )
+                {
+                    warn( "Your system is missing key timezone components. ${class}::_parse_timestamp is reverting to UTC instead of local time zone.\n" );
+                    $parser = DateTime::Format::JP->new( pattern => '%E%Y年%m月%d日', time_zone => 'UTC' );
+                }
                 my $dt = $parser->parse_datetime( $str );
                 $dt->set_formatter( $parser );
                 return( $dt );
@@ -2933,7 +2959,16 @@ sub _parse_timestamp
         try
         {
             # $self->message( 4, "Got here for epoch '$str'" );
-            my $dt = DateTime->from_epoch( epoch => $str, time_zone => 'local' );
+            my $dt;
+            try
+            {
+                $dt = DateTime->from_epoch( epoch => $str, time_zone => 'local' );
+            }
+            catch( $e )
+            {
+                warn( "Your system is missing key timezone components. ${class}::_parse_timestamp is reverting to UTC instead of local time zone.\n" );
+                $dt = DateTime->from_epoch( epoch => $str, time_zone => 'UTC' );
+            }
             $opt->{pattern} = ( CORE::index( $str, '.' ) != -1 ? '%s.%N' : '%s' );
             my $strp = DateTime::Format::Strptime->new( %$opt );
             $dt->set_formatter( $strp );
@@ -2964,7 +2999,14 @@ sub _parse_timestamp
         my $ts = time() + $offset;
         try
         {
-            my $dt = DateTime->from_epoch( epoch => $ts, time_zone => 'local' );
+            $dt = DateTime->from_epoch( epoch => $ts, time_zone => 'local' );
+            return( $dt );
+        }
+        # Exception raised by DateTime::TimeZone::Local
+        catch( $e where { /Cannot[[:blank:]\h]+determine[[:blank:]\h]+local[[:blank:]\h]+time[[:blank:]\h]+zone/i } )
+        {
+            warn( "Your system is missing key timezone components. ${class}::_parse_timestamp is reverting to UTC instead of local time zone.\n" );
+            $dt = DateTime->from_epoch( epoch => $ts, time_zone => 'UTC' );
             return( $dt );
         }
         catch( $e )
@@ -2975,7 +3017,15 @@ sub _parse_timestamp
     elsif( lc( $str ) eq 'now' )
     {
         # $self->message( 3, "\tValue is actually the special keyword: '$str'" );
-        my $dt = DateTime->now( time_zone => 'local' );
+        try
+        {
+            $dt = DateTime->now( time_zone => 'local' );
+        }
+        catch( $e )
+        {
+            warn( "Your system is missing key timezone components. ${class}::_parse_timestamp is reverting to UTC instead of local time zone.\n" );
+            $dt = DateTime->now( time_zone => 'UTC' );
+        }
         return( $dt );
     }
     else
@@ -3510,6 +3560,7 @@ sub _set_get_datetime : lvalue
     my $field = shift( @_ );
     my $this  = $self->_obj2h;
     my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
+    my $class = ref( $self ) || $self;
     my $has_arg = 0;
     my $arg;
     if( want( qw( LVALUE ASSIGN ) ) )
@@ -3556,11 +3607,23 @@ sub _set_get_datetime : lvalue
             unless( Scalar::Util::blessed( $now ) && ( $now->isa( 'DateTime' ) || $now->isa( 'Module::Generic::DateTime' ) ) )
             {
                 require DateTime;
-                $now = DateTime->from_epoch(
-                    epoch => $time,
-                    time_zone => 'local',
-                );
+                try
+                {
+                    $now = DateTime->from_epoch(
+                        epoch => $time,
+                        time_zone => 'local',
+                    );
+                }
+                catch( $e )
+                {
+                    warn( "Your system is missing key timezone components. ${class}::_set_get_datetime is reverting to UTC instead of local time zone.\n" );
+                    $now = DateTime->from_epoch(
+                        epoch => $time,
+                        time_zone => 'UTC',
+                    );
+                }
             }
+            
             # We only set a default formatter if one was not set already
             unless( $now->formatter )
             {
@@ -3568,7 +3631,6 @@ sub _set_get_datetime : lvalue
                 my $strp = DateTime::Format::Strptime->new(
                     pattern => '%s',
                     locale => 'en_GB',
-                    time_zone => 'local',
                 );
                 $now->set_formatter( $strp );
             }
@@ -5158,7 +5220,7 @@ Module::Generic - Generic Module to inherit from
 
 =head1 VERSION
 
-    v0.21.7
+    v0.21.11
 
 =head1 DESCRIPTION
 
@@ -5722,6 +5784,20 @@ It returns the current log file handle, if any.
 =head2 new_array
 
 Instantiate a new L<Module::Generic::Array> object. If any arguments are provided, it will pass it to L<Module::Generic::Array/new> and return the object.
+
+=head2 new_datetime
+
+Provided with some optional arguments and this will instantiate a new L<Module::Generic::DateTime> object, passing it whatever argument was provided.
+
+Example:
+
+    my $dt = DateTime->now( time_zone => 'Asia/Tokyo' );
+    # Returns a new Module::Generic::DateTime object
+    my $d = $o->new_datetime( $dt );
+
+    # Returns a new Module::Generic::DateTime object with DateTime initiated automatically
+    # to now with time zone set by default to UTC
+    my $d = $o->new_datetime;
 
 =head2 new_file
 

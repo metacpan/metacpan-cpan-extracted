@@ -61,17 +61,26 @@ sub error {
   }
 
   local $@;
-  if (!$package->can('new')) {
-    Venus::Error->new(message => "$@")->throw
-      if !eval "package $package; use base '$parent'; 1";
+  if (!$package->can('new') and !eval "package $package; use base '$parent'; 1") {
+    my $throw = Venus::Throw->new(package => 'Venus::Throw::Error');
+    $throw->message($@);
+    $throw->stash(package => $package);
+    $throw->stash(parent => $parent);
+    $throw->error;
   }
   if (!$parent->isa('Venus::Error')) {
-    my $message = "Parent '$parent' doesn't derive from 'Venus::Error'";
-    Venus::Error->new(message => $message)->throw;
+    my $throw = Venus::Throw->new(package => 'Venus::Throw::Error');
+    $throw->message(qq(Parent '$parent' doesn't derive from 'Venus::Error'));
+    $throw->stash(package => $package);
+    $throw->stash(parent => $parent);
+    $throw->error;
   }
   if (!$package->isa('Venus::Error')) {
-    my $message = "Package '$package' doesn't derive from 'Venus::Error'";
-    Venus::Error->new(message => $message)->throw;
+    my $throw = Venus::Throw->new(package => 'Venus::Throw::Error');
+    $throw->message(qq(Package '$package' doesn't derive from 'Venus::Error'));
+    $throw->stash(package => $package);
+    $throw->stash(parent => $parent);
+    $throw->error;
   }
 
   @_ = ($package->new($data ? $data : ()));
@@ -291,6 +300,27 @@ I<Since C<0.01>>
   #   "context"  => "(eval)",
   #   "message"  => "Example error (unknown)!",
   # }, "Example::Error::Unknown")
+
+=back
+
+=over 4
+
+=item error example 6
+
+  package main;
+
+  use Venus::Throw;
+
+  my $throw = Venus::Throw->new(
+    package => 'Example::Error::NoThing',
+    parent => 'No::Thing',
+  );
+
+  my $error = $throw->error({
+    message => 'Example error (no thing)!',
+  });
+
+  # Exception! Venus::Throw::Error (isa Venus::Error)
 
 =back
 

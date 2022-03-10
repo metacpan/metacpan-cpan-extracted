@@ -14,6 +14,8 @@ BEGIN {
     }
 }
 
+warn "Segs Before: " . IPC::Shareable::ipcs() . "\n" if $ENV{PRINT_SEGS};
+
 sub shm_cleaned {
     # --- shmread should barf if the segment has really been cleaned
     my $id = shift;
@@ -192,5 +194,8 @@ my ($z, $y, $x, $w);
         is keys %{ $s->process_register }, 0, "Process register cleaned with clean_up_all()";
     }
 }
+
+IPC::Shareable::_end;
+warn "Segs After: " . IPC::Shareable::ipcs() . "\n" if $ENV{PRINT_SEGS};
 
 done_testing();

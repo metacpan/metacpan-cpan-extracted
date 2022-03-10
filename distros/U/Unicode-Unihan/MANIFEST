@@ -1,22 +1,22 @@
+.releaserc
 Changes
-MANIFEST			This list of files
+lib/Unicode/Unihan.pm
 Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml			Module meta-data (added by MakeMaker)
 NOTES
 README
-Unihan.pm
-util/splitdb.pl
-t/0-useme.t
-t/1-autoload.t
 srctxt/AccountingNumeric.txt
 srctxt/BigFive.txt
-srctxt/CCCII.txt
-srctxt/CNS1986.txt
-srctxt/CNS1992.txt
 srctxt/Cangjie.txt
 srctxt/Cantonese.txt
+srctxt/CCCII.txt
 srctxt/CheungBauer.txt
 srctxt/CheungBauerIndex.txt
 srctxt/CihaiT.txt
+srctxt/CNS1986.txt
+srctxt/CNS1992.txt
 srctxt/CompatibilityVariant.txt
 srctxt/Cowles.txt
 srctxt/DaeJaweon.txt
@@ -32,20 +32,16 @@ srctxt/GB3.txt
 srctxt/GB5.txt
 srctxt/GB7.txt
 srctxt/GB8.txt
-srctxt/GSR.txt
 srctxt/GradeLevel.txt
+srctxt/GSR.txt
+srctxt/Hangul.txt
+srctxt/HanYu.txt
+srctxt/HanyuPinlu.txt
 srctxt/HDZRadBreak.txt
 srctxt/HKGlyph.txt
 srctxt/HKSCS.txt
-srctxt/HanYu.txt
-srctxt/Hangul.txt
-srctxt/HanyuPinlu.txt
 srctxt/IBMJapan.txt
 srctxt/IICore.txt
-srctxt/IRGDaeJaweon.txt
-srctxt/IRGDaiKanwaZiten.txt
-srctxt/IRGHanyuDaZidian.txt
-srctxt/IRGKangXi.txt
 srctxt/IRG_GSource.txt
 srctxt/IRG_HSource.txt
 srctxt/IRG_JSource.txt
@@ -54,18 +50,22 @@ srctxt/IRG_KSource.txt
 srctxt/IRG_TSource.txt
 srctxt/IRG_USource.txt
 srctxt/IRG_VSource.txt
-srctxt/JIS0213.txt
+srctxt/IRGDaeJaweon.txt
+srctxt/IRGDaiKanwaZiten.txt
+srctxt/IRGHanyuDaZidian.txt
+srctxt/IRGKangXi.txt
 srctxt/JapaneseKun.txt
 srctxt/JapaneseOn.txt
 srctxt/Jis0.txt
+srctxt/JIS0213.txt
 srctxt/Jis1.txt
+srctxt/KangXi.txt
+srctxt/Karlgren.txt
+srctxt/Korean.txt
 srctxt/KPS0.txt
 srctxt/KPS1.txt
 srctxt/KSC0.txt
 srctxt/KSC1.txt
-srctxt/KangXi.txt
-srctxt/Karlgren.txt
-srctxt/Korean.txt
 srctxt/Lau.txt
 srctxt/MainlandTelegraph.txt
 srctxt/Mandarin.txt
@@ -79,8 +79,8 @@ srctxt/PrimaryNumeric.txt
 srctxt/PseudoGB1.txt
 srctxt/RSAdobe_Japan1_6.txt
 srctxt/RSJapanese.txt
-srctxt/RSKanWa.txt
 srctxt/RSKangXi.txt
+srctxt/RSKanWa.txt
 srctxt/RSKorean.txt
 srctxt/RSUnicode.txt
 srctxt/SBGY.txt
@@ -92,7 +92,10 @@ srctxt/Tang.txt
 srctxt/TotalStrokes.txt
 srctxt/TraditionalVariant.txt
 srctxt/Vietnamese.txt
-srctxt/XHC1983.txt
 srctxt/Xerox.txt
+srctxt/XHC1983.txt
 srctxt/ZVariant.txt
-META.yml                                 Module meta-data (added by MakeMaker)
+t/0-useme.t
+t/1-autoload.t
+util/splitdb.pl
+META.json                                Module JSON meta-data (added by MakeMaker)

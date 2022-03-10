@@ -11,6 +11,8 @@ BEGIN {
     }
 }
 
+warn "Segs Before: " . IPC::Shareable::ipcs() . "\n" if $ENV{PRINT_SEGS};
+
 my $k = tie my $sv, 'IPC::Shareable', 'testing', {create => 1, destroy => 1};
 
 my $attrs_tied = (tied $sv)->attributes;
@@ -59,5 +61,8 @@ is $attrs->{tidy},      0, "tidy is set ok";
 is $attrs->{destroy},   1, "destroy is set ok";
 
 is $k->attributes('no_exist'), undef, "attributes() on an undefined attr is undef";
+
+IPC::Shareable::_end;
+warn "Segs After: " . IPC::Shareable::ipcs() . "\n" if $ENV{PRINT_SEGS};
 
 done_testing;

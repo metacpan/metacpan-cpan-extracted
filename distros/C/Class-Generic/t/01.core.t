@@ -1,25 +1,25 @@
 #!perl
 BEGIN
 {
-    use 5.004;
     use strict;
     use warnings;
     use lib './lib';
-    use Test::More qw( no_plan );
+    use Test2::V0;
 };
 
 BEGIN
 {
-    use_ok( 'Class::Generic' );
-    use_ok( 'Class::Array' );
-    use_ok( 'Class::Assoc' );
-    use_ok( 'Class::Boolean' );
-    use_ok( 'Class::Exception' );
-    use_ok( 'Class::File', qw( cwd file rootdir stdin stderr stdout sys_tmpdir tempfile tempdir ) );
-    use_ok( 'Class::Finfo', qw( :all ) );
-    use_ok( 'Class::NullChain' );
-    use_ok( 'Class::Number' );
-    use_ok( 'Class::Scalar' );
+    use ok( 'Class::Generic' );
+    use ok( 'Class::Array' );
+    use ok( 'Class::Assoc' );
+    use ok( 'Class::Boolean' );
+    use ok( 'Class::DateTime' );
+    use ok( 'Class::Exception' );
+    use ok( 'Class::File', qw( cwd file rootdir stdin stderr stdout sys_tmpdir tempfile tempdir ) );
+    use ok( 'Class::Finfo', qw( :all ) );
+    use ok( 'Class::NullChain' );
+    use ok( 'Class::Number' );
+    use ok( 'Class::Scalar' );
 };
 
 #use strict;
@@ -27,26 +27,28 @@ BEGIN
 subtest 'inheritance' => sub
 {
     my $obj = Class::Generic->new;
-    isa_ok( $obj => 'Module::Generic' );
+    isa_ok( $obj => ['Module::Generic'] );
     my $arr = Class::Array->new;
-    isa_ok( $arr => 'Module::Generic::Array' );
+    isa_ok( $arr => ['Module::Generic::Array'] );
     my $bool = Class::Boolean->new;
-    isa_ok( $bool => 'Module::Generic::Boolean' );
+    isa_ok( $bool => ['Module::Generic::Boolean'] );
+    my $dt = Class::DateTime->new;
+    isa_ok( $dt => ['Module::Generic::DateTime'] );
     my $ex = Class::Exception->new;
-    isa_ok( $ex => 'Module::Generic::Exception' );
+    isa_ok( $ex => ['Module::Generic::Exception'] );
     my $file = Class::File->new( 'test.txt' );
-    isa_ok( $file => 'Module::Generic::File' );
+    isa_ok( $file => ['Module::Generic::File'] );
     is( $file->basename, 'test.txt' );
     my $finfo = Class::Finfo->new( __FILE__ );
-    isa_ok( $finfo, 'Module::Generic::Finfo' );
+    isa_ok( $finfo, ['Module::Generic::Finfo'] );
     my $hash = Class::Assoc->new;
-    isa_ok( $hash, 'Module::Generic::Hash' );
+    isa_ok( $hash, ['Module::Generic::Hash'] );
     my $null = Class::NullChain->new;
-    isa_ok( $null, 'Module::Generic::Null' );
+    isa_ok( $null, ['Module::Generic::Null'] );
     my $num = Class::Number->new(10);
-    isa_ok( $num, 'Module::Generic::Number' );
+    isa_ok( $num, ['Module::Generic::Number'] );
     my $str = Class::Scalar->new( 'test' );
-    isa_ok( $str, 'Module::Generic::Scalar' );
+    isa_ok( $str, ['Module::Generic::Scalar'] );
     
     foreach my $sub ( qw( cwd file rootdir stdin stderr stdout sys_tmpdir tempfile tempdir ) )
     {
@@ -93,6 +95,8 @@ subtest 'constants' => sub
         }
     }
 };
+
+done_testing();
 
 __END__
 

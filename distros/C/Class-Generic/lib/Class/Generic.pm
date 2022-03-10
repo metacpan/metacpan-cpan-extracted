@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
-## Class Bundle - ~/lib/Class/Generic.pm
-## Version v0.1.0
+## Class Generic - ~/lib/Class/Generic.pm
+## Version v0.1.1
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/03/07
-## Modified 2022/03/07
+## Modified 2022/03/08
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -16,7 +16,7 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( Module::Generic );
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.1.1';
 };
 
 1;
@@ -43,6 +43,9 @@ Class::Generic - Class Generic
     my $array = Class::Array->new( [$something] );
     my $hash  = Class::Assoc->new;
     my $bool  = Class::Boolean->new;
+    my $dt    = Class::DateTime->new( $datetime_object );
+    # Sets implicitly a default DateTime object
+    my $dt    = Class::DateTime->new;
     my $ex    = Class::Exception->new( message => "Oh no", code => 500 );
     my $file  = Class::File->new( '/some/where/file.txt' );
     my $finfo = Class::Finfo->new( '/some/where/file.txt' );
@@ -54,7 +57,7 @@ Class::Generic - Class Generic
 
 =head1 VERSION
 
-    v0.1.0
+    v0.1.1
 
 =head1 DESCRIPTION
 
@@ -70,7 +73,7 @@ Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 
 =head1 SEE ALSO
 
-L<Class::Generic>, L<Class::Array>, L<Class::Scalar>, L<Class::Number>, L<Class::Boolean>, L<Class::Assoc>, L<Class::File>, L<Class::DateTime>, L<Class::Exception>, L<Class::Finfo>, L<Class::NullChain>
+L<Class::Generic>, L<Class::Array>, L<Class::Scalar>, L<Class::Number>, L<Class::Boolean>, L<Class::Assoc>, L<Class::File>, L<Class::DateTime>, L<Class::Exception>, L<Class::Finfo>, L<Class::NullChain>, L<Class::DateTime>
 
 =head1 COPYRIGHT & LICENSE
 

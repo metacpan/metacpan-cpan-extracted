@@ -12,6 +12,8 @@ BEGIN {
     }
 }
 
+warn "Segs Before: " . IPC::Shareable::ipcs() . "\n" if $ENV{PRINT_SEGS};
+
 # scalar ref
 
 tie my $sv, 'IPC::Shareable', { destroy => 1 };
@@ -89,5 +91,8 @@ is
     "crazy deep nested struct ok";
 
 IPC::Shareable->clean_up_all;
+
+IPC::Shareable::_end;
+warn "Segs After: " . IPC::Shareable::ipcs() . "\n" if $ENV{PRINT_SEGS};
 
 done_testing();

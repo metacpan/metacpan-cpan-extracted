@@ -20,11 +20,12 @@ use Readonly;
 use Scalar::Util qw{ refaddr };
 
 use Perl::Critic::Exception::Fatal::PolicyDefinition;
+use Perl::Critic::Exception::Fatal::Internal qw{ throw_internal };
 use Perl::Critic::Utils qw< :booleans :characters hashify :severities >;
 
 use base 'Perl::Critic::Policy';
 
-our $VERSION = '0.113';
+our $VERSION = '0.114';
 
 #-----------------------------------------------------------------------------
 
@@ -58,6 +59,7 @@ Readonly::Scalar my $PACKAGE    => '_' . __PACKAGE__;
 Readonly::Scalar my $LEFT_BRACE => q<{>;    # } Seems P::C::U should have
 
 Readonly::Hash my %IS_COMMA     => hashify( $COMMA, $FATCOMMA );
+Readonly::Hash my %IS_INC_DEC   => hashify( qw{ ++ -- } );
 Readonly::Hash my %LOW_PRECEDENCE_BOOLEAN => hashify( qw{ and or xor } );
 
 Readonly::Array my @DOUBLE_QUOTISH => qw{
@@ -226,11 +228,12 @@ sub _dump {
                 $fn = 'undef';
             }
             printf { *STDERR }
-                "    %s line %d column %d used %d\n",
+                "    %s line %d column %d: used %d; returned %d\n",
                 $fn,
                 $sym->logical_line_number(),
                 $sym->column_number(),
-                $decl->{used};
+                $decl->{used},
+                $decl->{returned_lexical} || 0,
         }
     }
     return;
@@ -398,7 +401,7 @@ sub _get_catch_declarations {
 #-----------------------------------------------------------------------------
 
 # Sorry, but this is just basicly hard.
-sub _get_variable_declarations {    ## no critic (ProhibitExcessComplexity)
+sub _get_variable_declarations {
     my ( $self, $document ) = @_;
 
     foreach my $declaration ( $self->_get_ppi_statement_variable( $document ) ) {
@@ -446,26 +449,8 @@ sub _get_variable_declarations {    ## no critic (ProhibitExcessComplexity)
             }
 
             my ( $assign, $is_allowed_computation,
-                $is_state_in_expression );
-
-            while ( $elem = $elem->snext_sibling() ) {
-                $elem->isa( 'PPI::Token::Operator' )
-                    or next;
-                my $content = $elem->content();
-                $IS_COMMA{$content}
-                    and last;
-                if ( $EQUAL eq $content ) {
-                    $assign = $elem;
-
-                    $is_allowed_computation = $self->_is_allowed_computation(
-                        $assign );
-
-                    $is_state_in_expression = $self->_is_state_in_expression(
-                        $declaration, $assign );
-
-                    last;
-                }
-            }
+                $is_state_in_expression ) =
+                    $self->_get_allowed_and_state( $elem, $declaration );
 
             foreach my $symbol ( @symbol_list ) {
 
@@ -499,6 +484,46 @@ sub _get_variable_declarations {    ## no critic (ProhibitExcessComplexity)
     }
 
     return;
+}
+
+# FIXME this is a God-awful mish-mash forced on me by the fact that PPI
+# does not in fact parse all variable declarations as
+# PPI::Statement::Variable objects, so this code needs to be shared
+# among multiple code paths. The arguments are:
+#   $self
+#   $elem - the relevant element of the statement
+#   $declaration - the statement that declares the variable
+#   $type - 'my', 'our', 'state'. Forbidden (but not enforcded) if
+#     $declaration isa PPI::Statement::Variable, otherwise required.
+sub _get_allowed_and_state {
+    my ( $self, $elem, $declaration, $type ) = @_;
+
+    my ( $assign, $is_allowed_computation,
+        $is_state_in_expression );
+
+    while ( $elem = $elem->snext_sibling() ) {
+        $elem->isa( 'PPI::Token::Operator' )
+            or next;
+        my $content = $elem->content();
+        $IS_COMMA{$content}
+            and last;
+        if ( $EQUAL eq $content ) {
+            $assign = $elem;
+
+            $is_allowed_computation = $self->_is_allowed_computation(
+                $assign );
+
+            $is_state_in_expression = $self->_is_state_in_expression(
+                $declaration, $assign, $type );
+
+            last;
+        } elsif ( $IS_INC_DEC{$content} ) {
+            $is_state_in_expression = 1;
+            last;
+        }
+    }
+
+    return ( $assign, $is_allowed_computation, $is_state_in_expression );
 }
 
 #-----------------------------------------------------------------------------
@@ -620,10 +645,17 @@ sub _is_allowed_computation {
 #   $foo and state $bar = 42
 # because PPI does not parse this as a PPI::Statement::Variable.
 sub _is_state_in_expression {
-    my ( $self, $declaration, $operator ) = @_;
+    my ( $self, $declaration, $operator, $type ) = @_;
+
+    unless ( defined $type ) {  ## no critic (ProhibitUnlessBlocks)
+        $declaration->can( 'type' )
+            or throw_internal
+                'BUG - $type required if $declaration->type() does not exist';  ## no critic (RequireInterpolationOfMetachars)
+        $type = $declaration->type();
+    }
 
     # We're only interested in state declarations.
-    q<state> eq $declaration->type()
+    q<state> eq $type
         or return $FALSE;
 
     # We accept things like
@@ -867,8 +899,8 @@ sub _record_symbol_use {
             or return;
         $prev->isa( 'PPI::Token::Word' )
             or return;
-        my $content = $prev->content();
-        exists $GLOBAL_DECLARATION{$content}
+        my $type = $prev->content();
+        exists $GLOBAL_DECLARATION{$type}
             or return;
 
         # Yup. It's a declaration. Record it.
@@ -881,10 +913,17 @@ sub _record_symbol_use {
                 and $cast = $parent->sprevious_sibling();
         }
 
+        my ( undef, $is_allowed_computation,
+            $is_state_in_expression ) =
+                $self->_get_allowed_and_state( $symbol, $declaration,
+                    $type );
+
         $self->_record_symbol_definition(
             $symbol, $declaration,
-            is_global           => $GLOBAL_DECLARATION{$content},
-            taking_reference    => _element_takes_reference( $cast ),
+            is_allowed_computation  => $is_allowed_computation,
+            is_global               => $GLOBAL_DECLARATION{$type},
+            is_state_in_expression  => $is_state_in_expression,
+            taking_reference        => _element_takes_reference( $cast ),
         );
 
         return;
@@ -1344,6 +1383,8 @@ __END__
 
 =pod
 
+=for stopwords pre
+
 =head1 NAME
 
 Perl::Critic::Policy::Variables::ProhibitUnusedVarsStricter - Don't ask for storage you don't need.
@@ -1450,14 +1491,17 @@ F<.perlcriticrc> file:
 
 =head2 prohibit_returned_lexicals
 
-By default, this policy allows otherwise-unused variables if they are
-being returned from a subroutine, under the presumption that they are
-going to be used as lvalues by the caller. If you wish to declare a
-violation in this case, you can add a block like this to your
-F<.perlcriticrc> file:
+By default, this policy allows otherwise-unused lexical variables
+(either C<'my'> or C<'state'>) if they are being returned from a
+subroutine, under the presumption that they are going to be used as
+lvalues by the caller. If you wish to declare a violation in this case,
+you can add a block like this to your F<.perlcriticrc> file:
 
     [Variables::ProhibitUnusedVarsStricter]
     prohibit_returned_lexicals = 1
+
+B<Note> that only explicit C<'return'> statements are covered by this
+setting. No attempt is made to detect and allow implicit returns.
 
 =head2 allow_if_computed_by
 
@@ -1503,6 +1547,14 @@ by any operator. The latter means that something like
  my $bar = ( state $foo = compute_foo() ) + 42;
 
 will be accepted.
+
+This will also cause post-increment and post-decrement to be accepted,
+allowing code like
+
+ do_something() unless state $foo++;
+
+Pre-increment and pre-decrement are ignored, since as of Perl 5.34.0
+they are syntax errors.
 
 =head2 check_catch
 

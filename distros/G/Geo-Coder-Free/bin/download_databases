@@ -11,7 +11,7 @@ export DR5HN_HOME=~/src/countries-states-cities-database
 # export https_proxy=http://zack:3128
 export http_proxy=
 export https_proxy=
-export no_proxy=localhost,127.0.0.0/8,192.168.1.0/8,utilite
+export no_proxy=localhost,127.0.0.0/8,192.168.1.0/16,utilite
 export REDIS_SERVER=
 
 cd ~/src/njh/Geo-Coder-Free && git pull

@@ -2,7 +2,7 @@ package Catmandu::Fix::lookup;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.2016';
+our $VERSION = '1.2018';
 
 use Catmandu::Importer::CSV;
 use Catmandu::Util::Path qw(as_path);
@@ -101,6 +101,6 @@ looking up its value in a dictionary
 
 =head1 SEE ALSO
 
-L<Catmandu::Fix>
+L<Catmandu::Fix>, L<Catmandu::Fix::mapping>
 
 =cut

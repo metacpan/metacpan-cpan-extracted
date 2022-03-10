@@ -1,0 +1,5 @@
+# dual-vars where the upgraded-type is invalid
+use constant dualvar_PVIV => do { my $val = "One"; $val = 1; $val }; # omit
+use constant dualvar_PVNV => do { my $val = "OnePointOne"; $val = 1.1; $val }; # omit
+my $foo = dualvar_PVIV; # deparsed: my $foo = 1;
+my $bar = dualvar_PVNV # deparsed: my $bar = 1.1

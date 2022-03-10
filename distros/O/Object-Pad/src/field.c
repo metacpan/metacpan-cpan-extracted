@@ -18,6 +18,9 @@
 #include "make_argcheck_ops.c.inc"
 #include "newOP_CUSTOM.c.inc"
 
+#define need_PLparser()  ObjectPad__need_PLparser(aTHX)
+void ObjectPad__need_PLparser(pTHX); /* in Object/Pad.xs */
+
 FieldMeta *ObjectPad_mop_create_field(pTHX_ SV *fieldname, ClassMeta *classmeta)
 {
   FieldMeta *fieldmeta;
@@ -314,6 +317,14 @@ static void S_generate_field_accessor_method(pTHX_ FieldMeta *fieldmeta, SV *mna
   char sigil = SvPVX(fieldmeta->name)[0];
 
   SV *mname_fq = newSVpvf("%" SVf "::%" SVf, classmeta->name, mname);
+
+  if(PL_curstash != classmeta->stash) {
+    /* RT141599 */
+    SAVESPTR(PL_curstash);
+    PL_curstash = classmeta->stash;
+  }
+
+  need_PLparser();
 
   I32 floor_ix = start_subparse(FALSE, 0);
   SAVEFREESV(PL_compcv);

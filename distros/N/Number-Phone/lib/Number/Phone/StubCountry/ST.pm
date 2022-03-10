@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20220305001844;
+our $VERSION = 1.20220307120123;
 
 my $formatters = [
                 {
@@ -49,26 +49,26 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{pt} = {"2392251", "Região\ Autonoma\ do\ Príncipe",};
-$areanames{en} = {"2392227", "Água\ Grande",
-"2392271", "Trindade",
-"239228", "Água\ Grande",
+$areanames{en} = {"2392261", "Angolares\,\ Porto\ Alegre",
+"239229", "Água\ Grande",
+"2392220", "Santo\ Amaro",
 "2392222", "Água\ Grande",
-"2392265", "Santana\,\ Ribeira\ Afonso",
-"2392224", "Água\ Grande",
+"2392223", "Água\ Grande",
 "2392233", "Neves\,\ Santa\ Catarina",
+"2392226", "Água\ Grande",
+"239228", "Água\ Grande",
+"239224", "Água\ Grande",
+"2392271", "Trindade",
+"2392225", "Água\ Grande",
+"2392251", "Autonomous\ Region\ of\ Príncipe",
+"2392228", "Água\ Grande",
+"2392231", "Guadalupe",
+"2392224", "Água\ Grande",
+"2392227", "Água\ Grande",
 "2392221", "Água\ Grande",
 "2392272", "Madalena",
-"2392226", "Água\ Grande",
-"2392251", "Autonomous\ Region\ of\ Príncipe",
-"2392261", "Angolares\,\ Porto\ Alegre",
-"239224", "Água\ Grande",
-"2392228", "Água\ Grande",
-"2392223", "Água\ Grande",
-"239229", "Água\ Grande",
-"2392231", "Guadalupe",
-"2392225", "Água\ Grande",
-"2392220", "Santo\ Amaro",};
+"2392265", "Santana\,\ Ribeira\ Afonso",};
+$areanames{pt} = {"2392251", "Região\ Autonoma\ do\ Príncipe",};
 
     sub new {
       my $class = shift;

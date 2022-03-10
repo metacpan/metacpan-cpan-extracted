@@ -35,5 +35,5 @@ eval 'Paranoid->import;';
 ok( psecureEnv('/bin:/sbin'), 'psecureEnv 1' );
 is( $ENV{PATH}, '/bin:/sbin', 'Validated PATH' );
 ok( psecureEnv(), 'psecureEnv 2' );
-is( $ENV{PATH}, '/bin:/usr/bin', 'Validated PATH' );
+is( $ENV{PATH}, '/bin:/sbin:/usr/bin:/usr/sbin', 'Validated PATH' );
 

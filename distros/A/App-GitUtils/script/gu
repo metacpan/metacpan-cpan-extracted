@@ -1,16 +1,16 @@
 #!perl
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-08-14'; # DATE
-our $DIST = 'App-GitUtils'; # DIST
-our $VERSION = '0.083'; # VERSION
-
-use 5.010;
+use 5.010001;
 use strict;
 use warnings;
 
 use App::GitUtils;
 use Perinci::CmdLine::Any;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-02-12'; # DATE
+our $DIST = 'App-GitUtils'; # DIST
+our $VERSION = '0.084'; # VERSION
 
 my $p = '/App/GitUtils/'; # prefix
 Perinci::CmdLine::Any->new(
@@ -43,23 +43,23 @@ gu - Day-to-day command-line utilities for git
 
 =head1 VERSION
 
-This document describes version 0.083 of gu (from Perl distribution App-GitUtils), released on 2021-08-14.
+This document describes version 0.084 of gu (from Perl distribution App-GitUtils), released on 2022-02-12.
 
 =head1 SYNOPSIS
 
 Usage:
 
-% B<gu clone-to-bare> [B<--cmd>=I<subcommand_name>] [B<--config-path>=I<path>|B<-c>] [B<--config-profile>=I<profile>|B<-P>] [B<--dir>=I<dirname>] [B<--format>=I<name>] [B<--json>] [B<--(no)naked-res>] [B<--no-config>|B<-C>] [B<--no-env>] [B<--page-result>[=I<program>]] [B<--target-dir>=I<dirname>] [B<--view-result>[=I<program>]]
+% B<gu clone-to-bare> [B<--cmd>=I<subcommand_name>] [B<--config-path>=I<path>|B<-c>|B<--no-config>|B<-C>] [B<--config-profile>=I<profile>|B<-P>] [B<--dir>=I<dirname>] [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--no-env>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--target-dir>=I<dirname>]
 
-% B<gu info> [B<--cmd>=I<subcommand_name>] [B<--config-path>=I<path>|B<-c>] [B<--config-profile>=I<profile>|B<-P>] [B<--dir>=I<dirname>] [B<--format>=I<name>] [B<--json>] [B<--(no)naked-res>] [B<--no-config>|B<-C>] [B<--no-env>] [B<--page-result>[=I<program>]] [B<--view-result>[=I<program>]]
+% B<gu info> [B<--cmd>=I<subcommand_name>] [B<--config-path>=I<path>|B<-c>|B<--no-config>|B<-C>] [B<--config-profile>=I<profile>|B<-P>] [B<--dir>=I<dirname>] [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--no-env>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]]
 
-% B<gu post-commit> [B<--cmd>=I<subcommand_name>] [B<--config-path>=I<path>|B<-c>] [B<--config-profile>=I<profile>|B<-P>] [B<--dir>=I<dirname>] [B<--format>=I<name>] [B<--json>] [B<--(no)naked-res>] [B<--no-config>|B<-C>] [B<--no-env>] [B<--page-result>[=I<program>]] [B<--view-result>[=I<program>]]
+% B<gu post-commit> [B<--cmd>=I<subcommand_name>] [B<--config-path>=I<path>|B<-c>|B<--no-config>|B<-C>] [B<--config-profile>=I<profile>|B<-P>] [B<--dir>=I<dirname>] [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--no-env>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]]
 
-% B<gu pre-commit> [B<--cmd>=I<subcommand_name>] [B<--config-path>=I<path>|B<-c>] [B<--config-profile>=I<profile>|B<-P>] [B<--dir>=I<dirname>] [B<--format>=I<name>] [B<--json>] [B<--(no)naked-res>] [B<--no-config>|B<-C>] [B<--no-env>] [B<--page-result>[=I<program>]] [B<--view-result>[=I<program>]]
+% B<gu pre-commit> [B<--cmd>=I<subcommand_name>] [B<--config-path>=I<path>|B<-c>|B<--no-config>|B<-C>] [B<--config-profile>=I<profile>|B<-P>] [B<--dir>=I<dirname>] [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--no-env>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]]
 
-% B<gu rh> [B<--cmd>=I<subcommand_name>] [B<--config-path>=I<path>|B<-c>] [B<--config-profile>=I<profile>|B<-P>] [B<--dir>=I<dirname>] [B<--format>=I<name>] [B<--json>] [B<--(no)naked-res>] [B<--no-config>|B<-C>] [B<--no-env>] [B<--page-result>[=I<program>]] [B<--view-result>[=I<program>]] -- E<lt>I<name>E<gt>
+% B<gu rh> [B<--cmd>=I<subcommand_name>] [B<--config-path>=I<path>|B<-c>|B<--no-config>|B<-C>] [B<--config-profile>=I<profile>|B<-P>] [B<--dir>=I<dirname>] [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--no-env>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] -- E<lt>I<name>E<gt>
 
-% B<gu run-hook> [B<--cmd>=I<subcommand_name>] [B<--config-path>=I<path>|B<-c>] [B<--config-profile>=I<profile>|B<-P>] [B<--dir>=I<dirname>] [B<--format>=I<name>] [B<--json>] [B<--(no)naked-res>] [B<--no-config>|B<-C>] [B<--no-env>] [B<--page-result>[=I<program>]] [B<--view-result>[=I<program>]] -- E<lt>I<name>E<gt>
+% B<gu run-hook> [B<--cmd>=I<subcommand_name>] [B<--config-path>=I<path>|B<-c>|B<--no-config>|B<-C>] [B<--config-profile>=I<profile>|B<-P>] [B<--dir>=I<dirname>] [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--no-env>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] -- E<lt>I<name>E<gt>
 
 =head1 SUBCOMMANDS
 
@@ -70,6 +70,16 @@ Clone repository to a bare repository.
 =head2 B<info>
 
 Return information about git repository.
+
+Information include:
+- Path of the git directory
+- Repository name
+- Current/active branch
+
+Will return status 412 if working directory is not inside a git repository. Will
+return status 500 on errors, e.g. if C<git> command cannot recognize the
+repository.
+
 
 =head2 B<post-commit>
 
@@ -338,7 +348,7 @@ For fish and zsh, install L<shcompgen> as described above.
 
 This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
 
-By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F<~/.config/gu.conf>, F<~/gu.conf>, or F</etc/gu.conf>.
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F</home/u1/.config/W6YpRHJBn3.conf>, F</home/u1/W6YpRHJBn3.conf>, or F</etc/W6YpRHJBn3.conf>.
 
 All found files will be read and merged.
 
@@ -403,17 +413,17 @@ List of available configuration parameters:
 
 =head1 ENVIRONMENT
 
-=head2 GU_OPT => str
+=head2 W6YPRHJBN3_OPT => str
 
 Specify additional command-line options.
 
 =head1 FILES
 
-F<~/.config/gu.conf>
+F</home/u1/.config/W6YpRHJBn3.conf>
 
-F<~/gu.conf>
+F</home/u1/W6YpRHJBn3.conf>
 
-F</etc/gu.conf>
+F</etc/W6YpRHJBn3.conf>
 
 =head1 HOMEPAGE
 
@@ -422,14 +432,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-GitUti
 =head1 SOURCE
 
 Source repository is at L<https://github.com/perlancar/perl-App-GitUtils>.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-GitUtils>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
 
 =head1 AUTHOR
 
@@ -454,9 +456,17 @@ beyond that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2018, 2015, 2014 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2021, 2020, 2018, 2015, 2014 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-GitUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

@@ -1,3 +1,8 @@
+0.084   2022-02-12  Released-By: PERLANCAR; Urgency: medium
+
+        - [subcommand info] Return current_branch.
+
+
 0.083   2021-08-14  Released-By: PERLANCAR; Urgency: medium
 
 	- Add script: this-repo.

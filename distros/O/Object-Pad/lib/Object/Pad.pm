@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2019-2022 -- leonerd@leonerd.org.uk
 
-package Object::Pad 0.62;
+package Object::Pad 0.63;
 
 use v5.14;
 use warnings;
@@ -81,9 +81,9 @@ Or, for older perls that lack signatures:
 This module provides a simple syntax for creating object classes, which uses
 private variables that look like lexicals as object member fields.
 
-B<WARNING> This module is still experimental. The parts that currently exist
-do seem to work reliably but much of the design is still evolving, and many
-features and have yet to be implemented. I don't yet guarantee I won't have to
+While most of this module has evolved into a stable state in practice, parts
+remain B<experimental> because the design is still evolving, and many features
+and ideas have yet to implemented. I don't yet guarantee I won't have to
 change existing details in order to continue its development. Feel free to try
 it out in experimental or newly-developed code, but don't complain if a later
 version is incompatible with your current code and you'll have to change it.
@@ -92,6 +92,29 @@ That all said, please do get in contact if you find the module overall useful.
 The more feedback you provide in terms of what features you are using, what
 you find works, and what doesn't, will help the ongoing development and
 hopefully eventual stability of the design. See the L</FEEDBACK> section.
+
+=head2 Experimental Features
+
+Some of the features of this module are currently marked as experimental. They
+will provoke warnings in the C<experimental> category, unless silenced.
+
+You can silence this with C<no warnings 'experimental'> but then that will
+silence every experimental warning, which may hide others unintentionally. For
+a more fine-grained approach you can instead use the import line for this
+module to only silence the module's warnings selectively:
+
+   use Object::Pad qw( :experimental(init_expr) );
+
+   use Object::Pad qw( :experimental(mop) );
+
+   use Object::Pad qw( :experimental(custom_field_attr) );
+
+   use Object::Pad qw( :experimental );  # all of the above
+
+It is best to do this on a separate line from the main C<use Object::Pad;> or
+else you'll have to specify all the keywords individually:
+
+   use Object::Pad qw( class role method has requires :experimental(init_expr) );
 
 =head2 Automatic Construction
 
@@ -268,7 +291,7 @@ following values:
    :repr(native)
 
 The native representation. This is an opaque representation type whose
-contents are not specified. It only works for classes whose entire inheritence
+contents are not specified. It only works for classes whose entire inheritance
 hierarchy is built only from classes based on C<Object::Pad>.
 
    :repr(HASH)
@@ -338,7 +361,7 @@ C<BUILD> blocks are present.
 I<Since version 0.32.>
 
 Similar to C<class>, but provides a package that defines a new role. A role
-acts simliar to a class in some respects, and differently in others.
+acts similar to a class in some respects, and differently in others.
 
 Like a class, a role can have a version, and named methods.
 
@@ -446,10 +469,15 @@ version 0.54> this is also permitted on array and hash fields.
 =head3 Field Initialiser Blocks
 
 I<Since version 0.54> a deferred statement block is also permitted, on any
-field variable type. This is an B<experimental> feature that permits code to
-be executed as part of the instance constructor, rather than running just
-once when the class is set up. Code in a field initialisation block is
-roughly equivalent to being placed in a C<BUILD> or C<ADJUST> block.
+field variable type. This permits code to be executed as part of the instance
+constructor, rather than running just once when the class is set up. Code in a
+field initialisation block is roughly equivalent to being placed in a C<BUILD>
+or C<ADJUST> block.
+
+This feature should be considered B<experimental>, and will emit warnings to
+that effect. They can be silenced with
+
+   use Object::Pad qw( :experimental(init_expr) );
 
 Control flow that attempts to leave a field initialiser block is not
 permitted. This includes any C<return> expression, any C<next/last/redo>
@@ -959,6 +987,8 @@ sub import
    $class->import_into( $caller, @_ );
 }
 
+my @EXPERIMENTAL = qw( init_expr mop custom_field_attr );
+
 sub import_into
 {
    my $class = shift;
@@ -969,17 +999,13 @@ sub import_into
    my %syms = map { $_ => 1 } @syms;
    delete $syms{$_} and $^H{"Object::Pad/$_"}++ for qw( class role method has requires );
 
+   my $all_experimental = delete $syms{":experimental"};
+
+   foreach ( @EXPERIMENTAL ) {
+      $^H{"Object::Pad/experimental($_)"}++ if delete $syms{":experimental($_)"} or $all_experimental;
+   }
+
    croak "Unrecognised import symbols @{[ keys %syms ]}" if keys %syms;
-}
-
-sub begin_class
-{
-   my $class = shift;
-   my ( $name, %args ) = @_;
-
-   Carp::carp "Object::Pad->begin_class is deprecated; use Object::Pad::MOP::Class->begin_class instead";
-
-   Object::Pad::MOP::Class->begin_class( $name, %args );
 }
 
 # The universal base-class methods
@@ -1051,7 +1077,7 @@ systems in general:
 
 =item *
 
-Is multiple inheritence actually required, if role composition is implemented
+Is multiple inheritance actually required, if role composition is implemented
 including giving roles the ability to use private fields?
 
 =item *
@@ -1074,7 +1100,7 @@ These points are more about this particular module's implementation:
 
 =item *
 
-Consider multiple inheritence of subclassing, if that is still considered
+Consider multiple inheritance of subclassing, if that is still considered
 useful after adding roles.
 
 =item *

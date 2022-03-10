@@ -1,5 +1,10 @@
 Revision history for Geo-Coder-Free
 
+0.30	Wed Mar  9 09:47:33 EST 2022
+	Fix treating "30 Cross Street" as "30 X St"
+	Latest DB.pm from VWF
+	Improved handling of house numbers in Local.pm
+
 0.29	Thu Nov 26 14:19:56 EST 2020
 	Started work on importing data from OpenStreetMaps
 		using planet.osm.bz2 files in $OSM_HOME

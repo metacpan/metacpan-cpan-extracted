@@ -18,7 +18,7 @@ my $mocked_cidr = Test::MockModule->new('Net::CIDR')    # .
   ->redefine(
     cidrlookup => sub {
         @args_cidrlookup = @_;
-        note "mocked: cidrlookup : ", join( ', ', @args_cidrlookup ), " => ", $cidrlookup_answer;
+        note "mocked: cidrlookup : ", join( ', ', grep { defined $_ } @args_cidrlookup ), " => ", $cidrlookup_answer;
         return $cidrlookup_answer;
     }
   );

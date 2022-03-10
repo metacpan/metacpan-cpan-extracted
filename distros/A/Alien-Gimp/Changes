@@ -1,0 +1,29 @@
+0.10 2022-03-09
+- include Changes in distro
+
+0.09 2021-04-17
+- Use version checking from ExtUtils::PkgConfig - thanks @zmughal
+
+0.08 2019-04-11
+ - update metadata - thanks @manwar
+
+0.07 2016-05-02
+ - update metadata
+
+0.06 2016-05-01
+ - implement Inline "with"
+
+0.05 2014-12-15
+ - update build to use one source of version truth
+
+0.04 2014-12-15
+ - externalise version-getting
+
+0.03 2014-12-15
+ - separate build stage
+
+0.02 2014-12-15
+ - Try "provides" to make PAUSE index it
+
+0.01 2014-12-15
+ - initial

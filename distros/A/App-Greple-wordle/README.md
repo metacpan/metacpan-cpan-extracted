@@ -21,7 +21,7 @@ Rule is almost same as the original game but answer is different.  Use
 
 # OPTIONS
 
-- **--series**=_number_,  **-s**_number_
+- **--series**=#,  **-s**#
 - **--compat**
 
     Choose different series of answer.  Default 1.  Series zero is same as
@@ -30,23 +30,81 @@ Rule is almost same as the original game but answer is different.  Use
     shuffled by pseudo random numbers using series number as an initial
     seed.
 
-- **--**\[**no-**\]**result**
-
-    Show result when succeeded.  Default true.
-
-- **--index**=_number_, **-n**_number_
+- **--index**=#, **-n**#
 
     Specify index. Default index is calculated from days from 2021/06/19.
     If the value is negative and you can get yesterday's question by
     giving -1.
 
+    Answer for option **-s0n0** is `cigar`.
+
+- **--**\[**no-**\]**result**
+
+    Show result when succeeded.  Default true.
+
 - **--random**
 
     Generate random index every time.
 
-- **--try**=_number_
+- **--try**=#, **-x**=#
 
     Set try count.  Default 6.
+
+# COMMANDS
+
+Five letter word is processed as an answer.  Some other input is taken
+as a command.
+
+- **h**, **hint**
+
+    List possible words.
+
+- **u**, **uniq**
+
+    List possible words made of unique characters.
+
+- **=**_chars_
+
+    If start with slash, list words which include all of _chars_.
+
+- **!**_chars_
+
+    If start with exclamation mark, list words which does not include any
+    of _chars_.
+
+- _regex_
+
+    Any other string include non-alphabetical character is taken as a
+    regular expression to filter words.
+
+- **!!**
+
+    Get word list produced by the last command execution.
+
+These commands can be connected in series.  For example, next command
+show possible words start with letter `z`.
+
+    hint ^z
+
+Next shows all words which does not incude any letter of `audio` and
+`rents`, and made of unique characters.
+
+    !audio !rents u
+
+# EXAMPLE
+
+    1: solid                    # try word "solid"
+    2: panic                    # try word "panic"
+    3: hint                     # show hint
+    3: !solid !panic =eft uniq  # search word exclude(solidpanic) include(eft)
+    3: wheft                    # try word "wheft"
+    4: hint                     # show hint
+    4: datum                    # try word "datum"
+    5: tardy                    # try word "tardy"
+
+<div>
+    <p><img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/greple-wordle/main/images/hint-1.png">
+</div>
 
 # BUGS
 

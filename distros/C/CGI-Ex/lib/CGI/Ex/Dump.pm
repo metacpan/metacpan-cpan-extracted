@@ -6,7 +6,7 @@ CGI::Ex::Dump - A debug utility
 
 =head1 VERSION
 
-version 2.51
+version 2.52
 
 =cut
 
@@ -19,7 +19,7 @@ use vars qw($CALL_LEVEL $ON $SUB $QR1 $QR2 $full_filename $DEPARSE);
 use strict;
 use Exporter qw(import);
 
-our $VERSION = '2.51'; # VERSION
+our $VERSION = '2.52'; # VERSION
 our @EXPORT    = qw(dex dex_warn dex_text dex_html ctrace dex_trace);
 our @EXPORT_OK = qw(dex dex_warn dex_text dex_html ctrace dex_trace debug caller_trace);
 

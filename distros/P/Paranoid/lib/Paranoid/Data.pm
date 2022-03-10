@@ -1,12 +1,12 @@
 # Paranoid::Data -- Misc. Data Manipulation Functions
 #
-# $Id: lib/Paranoid/Data.pm, 2.09 2021/12/28 15:46:49 acorliss Exp $
+# $Id: lib/Paranoid/Data.pm, 2.10 2022/03/08 00:01:04 acorliss Exp $
 #
 # This software is free software.  Similar to Perl, you can redistribute it
 # and/or modify it under the terms of either:
 #
 #   a)     the GNU General Public License
-#          <https://www.gnu.org/licenses/gpl-1.0.html> as published by the 
+#          <https://www.gnu.org/licenses/gpl-1.0.html> as published by the
 #          Free Software Foundation <http://www.fsf.org/>; either version 1
 #          <https://www.gnu.org/licenses/gpl-1.0.html>, or any later version
 #          <https://www.gnu.org/licenses/license-list.html#GNUGPL>, or
@@ -41,11 +41,14 @@ use Paranoid;
 use Paranoid::Debug qw(:all);
 use Carp;
 
-($VERSION) = ( q$Revision: 2.09 $ =~ /(\d+(?:\.\d+)+)/sm );
+($VERSION) = ( q$Revision: 2.10 $ =~ /(\d+(?:\.\d+)+)/sm );
 
-@EXPORT      = qw(deepCopy deepCmp);
+@EXPORT      = qw(deepCopy deepCmp has64bInt quad2Longs longs2Quad);
 @EXPORT_OK   = @EXPORT;
 %EXPORT_TAGS = ( all => [@EXPORT_OK], );
+
+use constant MAX32VAL  => 0b11111111_11111111_11111111_11111111;
+use constant TEST32INT => 1 << 32;
 
 #####################################################################
 #
@@ -70,11 +73,10 @@ sub deepCopy (\[$@%]\[$@%]) {
     my $tref    = defined $target ? ref $target : 'undef';
     my ( @refs, $recurseSub );
 
+    subPreamble( PDLEVEL1, '$$', $source, $target );
+
     croak 'source and target must be identical data types'
         unless ref $sref eq ref $tref;
-
-    pdebug( 'entering w/(%s)(%s)', PDLEVEL1, $source, $target );
-    pIn();
 
     $recurseSub = sub {
         my $s    = shift;
@@ -161,8 +163,7 @@ sub deepCopy (\[$@%]\[$@%]) {
 
     $rv = $counter if $rv;
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL1, $rv );
+    subPostamble( PDLEVEL1, '$', $rv );
 
     return $rv;
 }
@@ -179,8 +180,7 @@ sub _cmpArray (\@\@) {
     my $i    = 0;
     my ( $n, $d1, $d2, $t1, $t2 );
 
-    pdebug( 'entering w/%s %s', PDLEVEL2, $ref1, $ref2 );
-    pIn();
+    subPreamble( PDLEVEL2, '$$', $ref1, $ref2 );
 
     $rv = scalar @$ref1 == scalar @$ref2;
     $n  = scalar @$ref1;
@@ -237,8 +237,7 @@ sub _cmpArray (\@\@) {
     # A little explicit sanitizing of input for false returns
     $rv = 0 unless $rv;
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL2, $rv );
+    subPostamble( PDLEVEL2, '$', $rv );
 
     return $rv;
 }
@@ -254,8 +253,7 @@ sub _cmpHash (\%\%) {
     my $rv   = 1;
     my ( @k1, @k2, @v1, @v2 );
 
-    pdebug( 'entering w/%s %s', PDLEVEL2, $ref1, $ref2 );
-    pIn();
+    subPreamble( PDLEVEL2, '$$', $ref1, $ref2 );
 
     @k1 = sort keys %$ref1;
     @k2 = sort keys %$ref2;
@@ -273,8 +271,7 @@ sub _cmpHash (\%\%) {
         $rv = _cmpArray( @v1, @v2 );
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL2, $rv );
+    subPostamble( PDLEVEL2, '$', $rv );
 
     return $rv;
 }
@@ -290,8 +287,7 @@ sub deepCmp (\[$@%]\[$@%]) {
     my $ref2 = shift;
     my $rv   = 1;
 
-    pdebug( 'entering w/%s %s', PDLEVEL1, $ref1, $ref2 );
-    pIn();
+    subPreamble( PDLEVEL1, '$$', $ref1, $ref2 );
 
     unless ( ref $ref1 eq ref $ref1 ) {
         $rv = 0;
@@ -311,10 +307,55 @@ sub deepCmp (\[$@%]\[$@%]) {
             pdebug( 'called with non-simple data types', PDLEVEL1 );
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PDLEVEL1, $rv );
+    subPostamble( PDLEVEL1, '$', $rv );
 
     return $rv;
+}
+
+sub has64bInt {
+
+    # Purpose:  Returns whether the current platform supports 64b integers
+    # Returns:  Boolean
+    # Usage:    $rv = has64bInt();
+
+    return TEST32INT == 1 ? 0 : 1;
+}
+
+sub quad2Longs {
+
+    # Purpose:  Splits a quad into long integers
+    # Returns:  Array of Longs (low bytes, high bytes)
+    # Usage:    ($low, $high) = quad2Longs($quad);
+
+    my $quad = shift;
+    my ( $upper, $lower );
+
+    # Extract lower 32 bits
+    $lower = $quad & MAX32VAL;
+
+    # Extract upper 32 bits
+    $upper = has64bInt() ? ( $quad & ~MAX32VAL ) >> 32 : 0;
+
+    return ( $lower, $upper );
+}
+
+sub longs2Quad {
+
+    # Purpose:  Joins two longs into a quad (if supported)
+    # Returns:  Quad Integer/undef
+    # Usage:    $quad = longs2Quad($low, $high);
+
+    my $low  = shift;
+    my $high = shift;
+    my $quad;
+
+    if ( has64bInt() ) {
+        $quad = $low | ( $high << 32 );
+    } else {
+        $quad = $low if $high == 0;
+    }
+
+    return $quad;
 }
 
 1;
@@ -327,7 +368,7 @@ Paranoid::Data - Misc. Data Manipulation Functions
 
 =head1 VERSION
 
-$Id: lib/Paranoid/Data.pm, 2.09 2021/12/28 15:46:49 acorliss Exp $
+$Id: lib/Paranoid/Data.pm, 2.10 2022/03/08 00:01:04 acorliss Exp $
 
 =head1 SYNOPSIS
 
@@ -339,16 +380,19 @@ $Id: lib/Paranoid/Data.pm, 2.09 2021/12/28 15:46:49 acorliss Exp $
     $rv = deepCmp(@source, @target);
     $rv = deepCmp(%source, %target);
 
+    $rv = has64bInt();
+    ($low, $high) = quad2Longs($quad);
+    $quad         = longs2Quad($low, $high);
+
 =head1 DESCRIPTION
 
-This module provides data manipulation functions, which at this time only
-consists of B<deepCopy> and B<deepCmp>.
+This module provides data manipulation functions.
 
 =head1 IMPORT LISTS
 
 This module exports the following symbols by default:
 
-    deepCopy deepCmp
+    deepCopy deepCmp has64bInt
 
 The following specialized import lists also exist:
 
@@ -390,6 +434,34 @@ B<deepCopy> function there are no provisions for evaluating objects beyond
 what their values are when coerced as scalar types.
 
 End sum, the same caveats that applied to B<deepCopy> apply here.
+
+=head2 has64bInt
+
+    $rv = has64bInt();
+
+This function returns a boolean value denoting whether the platform has native
+64bit integers or not.
+
+=head2 quad2Longs
+
+    ($low, $high) = quad2Longs($quad);
+
+This function takes any 64bit integer and splits it into two native longs, in
+the order of low order long, high order long.  This function will still work
+on platforms that don't support native quads.  In that case, it will just be
+assumed that the high order bytes equal zero.
+
+=head2 longs2Quad
+
+    $quad = longs2Quad($low, $high);
+
+This function takes two longs and combines them into a single native quad.
+This function will still work on platforms without native quad support, but
+only if the value of the quad is small enough to fit into a long, which is
+what's actually returned in that scenario.
+
+In the case of the high order bytes are not zero on a platform without native
+quad support, this function will return undef.
 
 =head1 DEPENDENCIES
 

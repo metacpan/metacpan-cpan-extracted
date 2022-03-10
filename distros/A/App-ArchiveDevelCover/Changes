@@ -1,5 +1,13 @@
 Changes for App-ArchiveDevelCover
 
+1.004     2022-03-10 17:05:55+01:00
+    - more dist housekeeping, Dist::Zilla::PluginBundle::Author::DOMM
+
+1.003     2022-03-10 17:01:20+01:00
+    - Enable experimental switch. (Håkon Hægland)
+    - dist housekeeping, Dist::Zilla::PluginBundle::Author::DOMM
+
+
 1.002   2012-11-21T22:01:11+0100
     - Better links in archive (Henrik Hald Nørgaard, CPAN-RT#81092)
     - Quote tempfile name in regexps (Pedro Melo)

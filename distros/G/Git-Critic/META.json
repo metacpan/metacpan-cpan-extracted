@@ -45,7 +45,7 @@
             "File::Basename" : "0",
             "File::Temp" : "0",
             "Getopt::Long" : "0",
-            "List::Util" : "0",
+            "List::Util" : "1.44",
             "Moo" : "0",
             "Pod::Usage" : "0",
             "Types::Standard" : "0",
@@ -71,7 +71,7 @@
    "provides" : {
       "Git::Critic" : {
          "file" : "lib/Git/Critic.pm",
-         "version" : "0.5"
+         "version" : "0.6"
       }
    },
    "release_status" : "stable",
@@ -86,7 +86,7 @@
          "web" : "https://github.com/Ovid/git-critic"
       }
    },
-   "version" : "0.5",
+   "version" : "0.6",
    "x_generated_by_perl" : "v5.26.3",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
    "x_spdx_expression" : "Artistic-2.0"

@@ -5,6 +5,10 @@ use Async::Event::Interval;
 use Time::HiRes qw(usleep);
 use Test::More;
 
+if (! $ENV{CI_TESTING}) {
+    plan skip_all => "Not on a valid CI testing platform..."
+}
+
 my $mod = 'Async::Event::Interval';
 
 my $e = $mod->new(0, sub {select(undef, undef, undef, 0.5)});

@@ -13,6 +13,10 @@ use Data::Dumper;
 # multiple scalars per event
 # class or object based?
 
+if (! $ENV{CI_TESTING}) {
+    plan skip_all => "Not on a valid CI testing platform..."
+}
+
 my $mod = 'Async::Event::Interval';
 
 tie my $scalar, 'IPC::Shareable', { destroy => 1 };

@@ -12,6 +12,8 @@ BEGIN {
     }
 }
 
+warn "Segs Before: " . IPC::Shareable::ipcs() . "\n" if $ENV{PRINT_SEGS};
+
 # deprecated string key param
 {
     my $k;
@@ -178,4 +180,9 @@ BEGIN {
         qr/available key after 10 tries/,
         "...the error shows it attempted multiple times";
 }
+
+IPC::Shareable::_end;
+
+warn "Segs After: " . IPC::Shareable::ipcs() . "\n" if $ENV{PRINT_SEGS};
+
 done_testing();

@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Array.pm
-## Version v1.3.0
-## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Version v1.3.1
+## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2022/02/27
+## Modified 2022/03/10
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -33,10 +33,7 @@ BEGIN
     );
     $DEBUG  = 0;
     $RETURN = {};
-    no strict 'refs';
-    $TRUE  = ${"Module::Generic::Boolean::true"};
-    $FALSE = ${"Module::Generic::Boolean::false"};
-    our $VERSION = 'v1.3.0';
+    our $VERSION = 'v1.3.1';
 };
 
 use strict;
@@ -47,6 +44,11 @@ require Module::Generic::Iterator;
 require Module::Generic::Null;
 require Module::Generic::Number;
 require Module::Generic::Scalar;
+{
+    no strict 'refs';
+    $TRUE  = ${"Module::Generic::Boolean::true"};
+    $FALSE = ${"Module::Generic::Boolean::false"};
+}
 
 sub new
 {

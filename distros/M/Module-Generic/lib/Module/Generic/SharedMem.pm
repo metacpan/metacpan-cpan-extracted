@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/SharedMem.pm
-## Version v0.2.1
+## Version v0.2.2
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/01/18
-## Modified 2022/03/06
+## Modified 2022/03/09
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -105,7 +105,7 @@ EOT
             lock    => [qw( LOCK_EX LOCK_SH LOCK_NB LOCK_UN )],
             'flock' => [qw( LOCK_EX LOCK_SH LOCK_NB LOCK_UN )],
     );
-    our $VERSION = 'v0.2.1';
+    our $VERSION = 'v0.2.2';
 };
 
 # use strict;
@@ -538,9 +538,7 @@ sub read
     }
     # Get rid of nulls end padded
     $buffer = unpack( "A*", $buffer );
-    my $j;
     my $packing = $self->_packing_method;
-    $j = JSON->new->utf8->relaxed->allow_nonref if( $packing eq 'json' );
     my $data;
     if( CORE::length( $buffer ) )
     {
@@ -548,7 +546,7 @@ sub read
         {
             if( $packing eq 'json' )
             {
-                $data = $j->decode( $buffer );
+                $data = $self->_decode_json( $buffer );
             }
             else
             {
@@ -760,15 +758,13 @@ sub write
     # my @callinfo = caller;
     # $self->message( 3, "Called from file $callinfo[1] at line $callinfo[2]" );
     # $self->message( 3, "Size limit set to '$size'" );
-    my $j;
     my $packing = $self->_packing_method;
-    $j = JSON->new->utf8->relaxed->allow_nonref->convert_blessed if( $packing eq 'json' );
     my $encoded;
     try
     {
         if( $packing eq 'json' )
         {
-            $encoded = $j->encode( $data );
+            $encoded = $self->_encode_json( $data );
         }
         else
         {
@@ -801,6 +797,122 @@ sub write
     }
     # $self->message( 3, "Successfully wrote ", length( $encoded ), " bytes of data to memory." );
     return( $self );
+}
+
+sub _decode_json
+{
+    my $self = shift( @_ );
+    my $data = shift( @_ );
+    # Nothing to do
+    return( $data ) if( !defined( $data ) || !CORE::length( $data ) );
+    my $j = JSON->new->utf8->relaxed->allow_nonref;
+    my $seen = {};
+    my $crawl;
+    $crawl = sub
+    {
+        my $this = shift( @_ );
+        my $type = Scalar::Util::reftype( $this );
+        return( $hits ) if( ( $type eq 'HASH' || $type eq 'ARRAY' ) && ++$seen->{ Scalar::Util::refaddr( $this ) } > 1 );
+        if( $type eq 'HASH' )
+        {
+            # Found a former scalar reference, restore it
+            if( CORE::exists( $this->{__scalar_gen_shm} ) )
+            {
+                return( \$this->{__scalar_gen_shm} );
+            }
+            
+            foreach my $k ( keys( %$this ) )
+            {
+                next if( !ref( $this->{ $k } ) );
+                $this->{ $k } = $crawl->( $this->{ $k } );
+            }
+        }
+        elsif( $type eq 'ARRAY' )
+        {
+            for( my $i = 0; $i < scalar( @$this ); $i++ )
+            {
+                next if( !ref( $this->[$i] ) );
+                $this->[$i] = $crawl->( $this->[$i] );
+            }
+        }
+        return( $this );
+    };
+    
+    try
+    {
+        my $decoded = $j->decode( $data );
+        my $result = $crawl->( $decoded );
+        return( $result );
+    }
+    catch( $e )
+    {
+        return( $self->error( "An error occurred while trying to decode JSON data: $e" ) );
+    }
+}
+
+# Purpose of this method is to recursively check the given data and change scalar reference if they are anything else than 1 or 0, otherwise JSON would complain
+sub _encode_json
+{
+    my $self = shift( @_ );
+    my $data = shift( @_ );
+    my $seen = {};
+    my $crawl;
+    $crawl = sub
+    {
+        my $this = shift( @_ );
+        my $type = Scalar::Util::reftype( $this );
+        # Skip this reference if it is either hash or array and we have already seen it in order to avoid looping.
+        return( $this ) if( ( $type eq 'HASH' || $type eq 'ARRAY' ) && ++$seen->{ Scalar::Util::refaddr( $this ) } > 1 );
+        if( $type eq 'HASH' )
+        {
+            foreach my $k ( keys( %$this ) )
+            {
+                next if( !ref( $this->{ $k } ) );
+                $this->{ $k } = $crawl->( $this->{ $k } );
+            }
+        }
+        elsif( $type eq 'ARRAY' )
+        {
+            for( my $i = 0; $i < scalar( @$this ); $i++ )
+            {
+                next if( !ref( $this->[$i] ) );
+                $this->[$i] = $crawl->( $this->[$i] );
+            }
+        }
+        elsif( $type eq 'SCALAR' )
+        {
+            # The only supported value by JSON for a scalar reference
+            return( $this ) if( $$this eq "1" or $$this eq "0" );
+            my $pkg;
+            if( ( $pkg = Scalar::Util::blessed( $this ) ) )
+            {
+                if( overload::Method( $this => '""' ) )
+                {
+                    $this = { __scalar_gen_shm => "$this", __package => $pkg };
+                }
+                else
+                {
+                    $this = { __scalar_gen_shm => $$this, __package => $pkg };
+                }
+            }
+            else
+            {
+                $this = { __scalar_gen_shm => $$this };
+            }
+        }
+        return( $this );
+    };
+    my $ref = $crawl->( $data );
+    my $j = JSON->new->utf8->relaxed->allow_nonref->convert_blessed;
+    try
+    {
+        my $encoded = $j->encode( $ref );
+        return( $encoded );
+    }
+    catch( $e )
+    {
+        return( $self->error( "An error occurred while trying to JSON encode data: $e" ) );
+    }
 }
 
 sub _packing_method { return( shift->_set_get_scalar( '_packing_method', @_ ) ); }
@@ -861,7 +973,7 @@ END
     }
 };
 
-# XXX Module::Generic::SharedStat class
+# NOTE: Module::Generic::SharedStat class
 {
     package
         Module::Generic::SharedStat;
@@ -931,7 +1043,7 @@ END
     sub uid { return( shift->[UID] ); }
 }
 
-# XXX Module::Generic::SemStat class
+# NOTE: Module::Generic::SemStat class
 {
     package
         Module::Generic::SemStat;

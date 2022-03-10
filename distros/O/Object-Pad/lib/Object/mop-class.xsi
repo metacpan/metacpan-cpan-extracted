@@ -13,6 +13,29 @@ _create_class(pkg, name, ...)
     SV *superclassname = NULL;
     bool set_compclassmeta = false;
 
+    {
+      const COP *cop;
+
+      const HV *mystash = CopSTASH(PL_curcop);
+
+      for(int level = 0; level < 20; level++) {
+        const PERL_CONTEXT *cx = caller_cx(level, NULL);
+        if(!cx)
+          break;
+
+        cop = cx->blk_oldcop;
+
+        if(CopSTASH(cop) != mystash)
+          break;
+
+        cop = NULL;
+      }
+
+      if(cop && !cophh_exists_pvs(CopHINTHASH_get(cop), "Object::Pad/experimental(mop)", 0))
+        Perl_ck_warner(aTHX_ packWARN(WARN_EXPERIMENTAL),
+          "Object::Pad::MOP is experimental and may be changed or removed without notice");
+    }
+
     static const char *args[] = {
       "extends",
       "isa",

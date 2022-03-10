@@ -3,17 +3,25 @@ package Scalar::Type;
 use strict;
 use warnings;
 
-our $BOOL_SUPPORTED;
+our $IS_BOOL_FN;
 
-BEGIN { $BOOL_SUPPORTED = ($] >= 5.035007) }
-sub bool_supported { $BOOL_SUPPORTED; }
+# these shenanigans can be pared back a bit once 5.36 is out
+BEGIN {
+    $IS_BOOL_FN = $] >= 5.035010 ? 'builtin::is_bool' :
+                  $] >= 5.035007 ? 'builtin::isbool'  :
+                                   0
+}
+sub bool_supported { $IS_BOOL_FN; }
 
-use if bool_supported(), qw(builtin isbool);
+# 5.35.7 has this without the underscore, and it's not yet marked experimental
+use if bool_supported() eq 'builtin::isbool',  qw(builtin);
+# 5.35.10-to-be has the underscore, and it's experimental
+use if bool_supported() eq 'builtin::is_bool', qw(experimental builtin);
 
 use Carp qw(croak);
 use Config;
 
-our $VERSION = '0.3.1';
+our $VERSION = '0.3.2';
 
 require XSLoader;
 XSLoader::load(__PACKAGE__, $VERSION);
@@ -113,11 +121,12 @@ perl version is 5.35.7 or later) and false otherwise.
 sub type {
     croak(__PACKAGE__."::type requires an argument") if($#_ == -1);
     my $arg = shift;
-    return blessed($arg)                    ? blessed($arg)       :
-           ref($arg)                        ? 'REF_TO_'.ref($arg) :
-           !defined($arg)                   ? 'UNDEF'             :
-           (bool_supported && isbool($arg)) ? 'BOOL'              :
-                                              _scalar_type($arg);
+    no strict 'refs';
+    return blessed($arg)                            ? blessed($arg)       :
+           ref($arg)                                ? 'REF_TO_'.ref($arg) :
+           !defined($arg)                           ? 'UNDEF'             :
+           (bool_supported && &{$IS_BOOL_FN}($arg)) ? 'BOOL'              :
+                                                      _scalar_type($arg);
 }
 
 =head2 sizeof
@@ -299,7 +308,7 @@ to any fan of classic literature that "007" and 7 are very different things.
 In perl 5.35.7 and later, Boolean values - ie the results of comparisons -
 have some extra magic. As well as their value, which is either C<1> (true,
 an integer) or C<''> (false, an empty string), they have a flag to indicate
-their Booleanness. This is exposed via the C<builtin::isbool> perl function
+their Booleanness. This is exposed via the C<builtin::is_bool> perl function
 so we don't need to do XS voodoo to interrogate it.
 
 =head2 WHAT Scalar::Type DOES (at least in version 0.1.0)

@@ -9,6 +9,15 @@ use PPI::Document;
 use Perl::Critic::Utils qw{ is_function_call is_method_call };
 use Test::More 0.88;	# Because of done_testing();
 
+note <<'EOD';
+
+Because we make little sub-PPI::Document objects to sort out stuff that
+is opaque to PPI itself, there are PPI methods that have to be called
+via wrapper methods for things to work out. A failure here means that
+one of the methods that should be wrapped was called directly.
+
+EOD
+
 open my $fh, '<:encoding(utf-8)', 'MANIFEST'
     or plan skip_all => "Unable to open MANIFEST: $!";
 while ( <$fh> ) {
@@ -44,13 +53,15 @@ sub require_wrapper {
 	    my $caller_name = $caller_elem->name()
 		or next;
 	    $arg{$sub_name}{$caller_name}
-		or $pass = fail format_miscall( $file, $sub_elem, $caller_name );
+		or $pass = fail format_miscall( $file, $sub_elem, $caller_name )
+		or diag possible_wrappers( $sub_elem, $arg{$sub_name} );
 	    next WORD_LOOP;
 	} continue {
 	    $caller_elem = $caller_elem->parent()
 		or last;
 	}
-	$pass = fail format_miscall( $file, $sub_elem, 'mainline' );
+	$pass = fail format_miscall( $file, $sub_elem, 'mainline' )
+	    or diag possible_wrappers( $sub_elem, $arg{$sub_name} );
     }
     $pass
 	and pass $file;
@@ -63,6 +74,15 @@ sub format_miscall {
 	$sub_elem->content(), $caller_name, $file,
 	$sub_elem->logical_line_number(),
 	$sub_elem->column_number();
+}
+
+sub possible_wrappers {
+    my ( $wrapped, $hash ) = @_;
+    my @arg = sort keys %{ $hash }
+	or die 'BUG - no wrappers specified';
+    @arg == 1
+	and return "Wrapper for $wrapped(): $arg[0]()";
+    return "Wrappers for $wrapped(): " . join ', ', map { "$_()" } @arg;
 }
 
 done_testing;

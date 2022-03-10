@@ -1,12 +1,12 @@
 # Paranoid::Module -- Paranoid Module Loading Routines
 #
-# $Id: lib/Paranoid/Module.pm, 2.09 2021/12/28 15:46:49 acorliss Exp $
+# $Id: lib/Paranoid/Module.pm, 2.10 2022/03/08 00:01:04 acorliss Exp $
 #
 # This software is free software.  Similar to Perl, you can redistribute it
 # and/or modify it under the terms of either:
 #
 #   a)     the GNU General Public License
-#          <https://www.gnu.org/licenses/gpl-1.0.html> as published by the 
+#          <https://www.gnu.org/licenses/gpl-1.0.html> as published by the
 #          Free Software Foundation <http://www.fsf.org/>; either version 1
 #          <https://www.gnu.org/licenses/gpl-1.0.html>, or any later version
 #          <https://www.gnu.org/licenses/license-list.html#GNUGPL>, or
@@ -42,7 +42,7 @@ use Paranoid::Debug qw(:all);
 use Paranoid::Input;
 use Carp;
 
-($VERSION) = ( q$Revision: 2.09 $ =~ /(\d+(?:\.\d+)+)/sm );
+($VERSION) = ( q$Revision: 2.10 $ =~ /(\d+(?:\.\d+)+)/sm );
 
 @EXPORT      = qw(loadModule);
 @EXPORT_OK   = @EXPORT;
@@ -78,8 +78,7 @@ use Carp;
         croak 'Mandatory first argument must be a defined module name'
             unless defined $module;
 
-        pdebug( 'entering w/(%s)(%s)', PDLEVEL1, $module, @args );
-        pIn();
+        subPreamble( PDLEVEL1, '$;@', $module, @args );
 
         # Check to see if module has been loaded already
         unless ( exists $modules{$module} ) {
@@ -138,8 +137,7 @@ EOF
             $rv = $imports{$cm};
         }
 
-        pOut();
-        pdebug( 'leaving w/rv: %s', PDLEVEL1, $modules{$module} );
+        subPostamble( PDLEVEL1, '$', $modules{$module} );
 
         # Return result
         return $modules{$module};
@@ -156,7 +154,7 @@ Paranoid::Module -- Paranoid Module Loading Routines
 
 =head1 VERSION
 
-$Id: lib/Paranoid/Module.pm, 2.09 2021/12/28 15:46:49 acorliss Exp $
+$Id: lib/Paranoid/Module.pm, 2.10 2022/03/08 00:01:04 acorliss Exp $
 
 =head1 SYNOPSIS
 

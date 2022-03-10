@@ -1,5 +1,15 @@
 Revision history for Async-Event-Interval
 
+1.11    2022-03-09
+    - Modified tests to run only on valid CI platforms
+
+1.10    2022-03-07
+    - Add tests to ensure that all shared memory segments created during the
+      unit test suite run get cleaned up ok
+    - Bump prereq of IPC::Shareable to 1.11 due to bug fix where child shared
+      memory segments created under one process weren't being registered if the
+      parent was created in a different process
+
 1.09    2022-03-05
     - Bump prereq IPC::Shareable to 1.08 due to a fix in creating random SHM
       keys in forked environments, major improvements of its _shm_key_rand()

@@ -11,6 +11,8 @@ BEGIN {
     }
 }
 
+warn "Segs Before: " . IPC::Shareable::ipcs() . "\n" if $ENV{PRINT_SEGS};
+
 my $protect_lock = 292;
 
 # Exception testing
@@ -85,5 +87,8 @@ IPC::Shareable::clean_up_protected($protect_lock);
 
 $segs = keys %{ IPC::Shareable::global_register() };
 is $segs, 0, "After clean_up_protected(), global register has 0 segments ok";
+
+IPC::Shareable::_end;
+warn "Segs After: " . IPC::Shareable::ipcs() . "\n" if $ENV{PRINT_SEGS};
 
 done_testing();

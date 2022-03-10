@@ -52,10 +52,19 @@ sub build_proxy {
 
   if (not(Scalar::Util::blessed($value))) {
     require Venus::Error;
-    Venus::Error->throw("$package can only operate on objects, not $value");
+    return Venus::Error->throw(
+      "$package can only operate on objects, not $value"
+    );
   }
-  if (not($value->can($method) || $value->can('AUTOLOAD'))) {
-    return undef;
+  if (!$value->can($method)) {
+    if (lc($method) eq 'unbox') {
+      return sub {
+        $self->{value}
+      };
+    }
+    elsif (!$value->can('AUTOLOAD')) {
+      return undef;
+    }
   }
   return sub {
     my $result = [
@@ -74,16 +83,6 @@ sub build_proxy {
       );
     }
   };
-}
-
-# METHODS
-
-sub unbox {
-  my ($self) = @_;
-
-  my $value = $self->{value};
-
-  return $value;
 }
 
 1;

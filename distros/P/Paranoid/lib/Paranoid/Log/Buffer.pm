@@ -1,12 +1,12 @@
 # Paranoid::Log::Buffer -- Log buffer support for paranoid programs
 #
-# $Id: lib/Paranoid/Log/Buffer.pm, 2.09 2021/12/28 15:46:49 acorliss Exp $
+# $Id: lib/Paranoid/Log/Buffer.pm, 2.10 2022/03/08 00:01:04 acorliss Exp $
 #
 # This software is free software.  Similar to Perl, you can redistribute it
 # and/or modify it under the terms of either:
 #
 #   a)     the GNU General Public License
-#          <https://www.gnu.org/licenses/gpl-1.0.html> as published by the 
+#          <https://www.gnu.org/licenses/gpl-1.0.html> as published by the
 #          Free Software Foundation <http://www.fsf.org/>; either version 1
 #          <https://www.gnu.org/licenses/gpl-1.0.html>, or any later version
 #          <https://www.gnu.org/licenses/license-list.html#GNUGPL>, or
@@ -38,7 +38,7 @@ use warnings;
 use vars qw($VERSION);
 use Paranoid::Debug qw(:all);
 
-($VERSION) = ( q$Revision: 2.09 $ =~ /(\d+(?:\.\d+)+)/sm );
+($VERSION) = ( q$Revision: 2.10 $ =~ /(\d+(?:\.\d+)+)/sm );
 
 use constant DEFAULT_BUFFSIZE => 20;
 
@@ -87,8 +87,7 @@ use constant DEFAULT_BUFFSIZE => 20;
         my %record = @_;
         my ( $rv, $size, $buffer );
 
-        pdebug( 'entering w/%s', PDLEVEL1, %record );
-        pIn();
+        subPreamble( PDLEVEL1, '%' );
 
         if ( exists $buffers{ $record{name} } ) {
             $size =
@@ -108,8 +107,7 @@ use constant DEFAULT_BUFFSIZE => 20;
             $rv = 1;
         }
 
-        pOut();
-        pdebug( 'leaving w/rv: %s', PDLEVEL1, $rv );
+        subPostamble( PDLEVEL1, '$', $rv );
 
         return $rv;
     }
@@ -140,7 +138,7 @@ Paranoid::Log::Buffer - Log Buffer Functions
 
 =head1 VERSION
 
-$Id: lib/Paranoid/Log/Buffer.pm, 2.09 2021/12/28 15:46:49 acorliss Exp $
+$Id: lib/Paranoid/Log/Buffer.pm, 2.10 2022/03/08 00:01:04 acorliss Exp $
 
 =head1 SYNOPSIS
 

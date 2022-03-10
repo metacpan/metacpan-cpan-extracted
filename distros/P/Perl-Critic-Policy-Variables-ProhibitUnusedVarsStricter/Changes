@@ -1,3 +1,11 @@
+0.114		2022-03-09	T. R. Wyant
+    Clarify POD for prohibit_returned_lexicals to make clear (I hope)
+    that it applies to 'state' varables as well as 'my' variables, but
+    does NOT detect or handle implicit returns.
+
+    allow_state_in_expression now accepts post-increment and -decrement.
+    Thanks to Olaf Alders for finding this.
+
 0.113		2022-02-27	T. R. Wyant
     Try to collect variable uses from signatures.  Thanks to Olaf Alders
     for pointing out this issue.

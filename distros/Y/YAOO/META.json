@@ -34,20 +34,22 @@
          "requires" : {
             "Blessed::Merge" : "0",
             "Carp" : "0",
+            "Hash::Typed" : "0.04",
             "Tie::IxHash" : "0",
             "perl" : "5.006"
          }
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0"
+            "Test::More" : "0",
+            "Type::Tiny" : "0"
          }
       }
    },
    "provides" : {
       "YAOO" : {
          "file" : "lib/YAOO.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       }
    },
    "release_status" : "stable",
@@ -58,6 +60,6 @@
          "web" : "https://github.com/ThisUsedToBeAnEmail/YAOO"
       }
    },
-   "version" : "0.08",
+   "version" : "0.09",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

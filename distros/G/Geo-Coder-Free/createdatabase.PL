@@ -2,6 +2,12 @@
 
 # Import geo-coding data into an SQLite database.
 
+# Copyright 2020-2022 Nigel Horne.
+
+# The program code is released under the following licence: GPL2 for personal use on a single computer.
+# All other users (including Commercial, Charity, Educational, Government)
+# must apply in writing for a licence for use from Nigel Horne at <njh at nigelhorne.com>.
+
 # Set OSM_HOME, OPENADDR_HOME, DR5HN_HOME and WHOSONFIRST_HOME to the directories where the data will be downloaded
 
 # see bin/download_databases which will download the databases and call this script
@@ -178,6 +184,27 @@ my %known_places = (	# Places I've checked with my GPS
 		},
 	], 'us/md/statewide.csv' => [
 		{
+			'LAT' => 39.467270,
+			'LON' => -76.823947,
+			'NAME' => 'ALL SAINTS EPISCOPAL CHURCH',
+			'NUMBER' => 203,
+			'STREET' => 'E CHATSWORTH RD',
+			'CITY' => 'REISTERSTOWN',
+			'COUNTY' => 'BALTIMORE',
+			'STATE' => 'MD',
+			'COUNTRY' => 'US',
+			'POSTCODE' => 21136
+		}, {
+			'LAT' => 39.6852333333333,
+			'LON' => -76.6071166666667,
+			'NUMBER' => 7,
+			'STREET' => 'JORDAN MILL COURT',
+			'CITY' => 'WHITE HALL',
+			'COUNTY' => 'BALTIMORE',
+			'STATE' => 'MD',
+			'COUNTRY' => 'US',
+			'POSTCODE' => 21161
+		}, {
 			'NAME' => 'NCBI',
 			'LAT' => 38.99516556,
 			'LON' => -77.09943963,
@@ -235,6 +262,15 @@ my %known_places = (	# Places I've checked with my GPS
 			'STATE' => 'MD',
 			'COUNTRY' => 'US',
 			'POSTCODE' => 21043,
+		}, {
+			'LAT' => 39.683529,
+			'LON' => -77.349405,
+			'STREET' => 'ANNANDALE RD',
+			'CITY' => 'EMMITSBURG',
+			'COUNTY' => 'FREDERICK',
+			'STATE' => 'MD',
+			'COUNTRY' => 'US',
+			'POSTCODE' => 21727
 		}, {
 			'NAME' => 'UTICA DISTRICT PARK',
 			'LAT' => 39.5167883333333,
@@ -308,6 +344,37 @@ my %known_places = (	# Places I've checked with my GPS
 			'COUNTY' => 'MONTGOMERY',
 			'STATE' => 'MD',
 			'COUNTRY' => 'US',
+		}, {
+			'LAT' => 39.110711,
+			'LON' => -76.434062,
+			'NAME' => 'DOWNS PARK',
+			'STREET' => 'CHESAPEAKE BAY DRIVE',
+			'CITY' => 'PASADENA',
+			'COUNTY' => 'ANNE ARUNDEL',
+			'STATE' => 'MD',
+			'COUNTRY' => 'US',
+			'POSTCODE' => 21122
+		}, {
+			'LAT' => 39.102637,
+			'LON' => -76.456384,
+			'NUMBER' => 1559,
+			'STREET' => 'GUERDON CT',
+			'CITY' => 'PASADENA',
+			'COUNTY' => 'ANNE ARUNDEL',
+			'STATE' => 'MD',
+			'COUNTRY' => 'US',
+			'POSTCODE' => 21122
+		}, {
+			'NAME' => 'ADVENTIST HOSPITAL',
+			'LAT' => 39.049570,
+			'LON' => -76.956882,
+			'NUMBER' => 11886,
+			'STREET' => 'HEALING WAY',
+			'CITY' => 'SILVER SPRING',
+			'COUNTY' => 'MONTGOMERY',
+			'STATE' => 'MD',
+			'COUNTRY' => 'US',
+			'POSTCODE' => 20904,
 		}, {
 			'LAT' => 39.017633,
 			'LON' => -77.049551,
@@ -530,6 +597,16 @@ my %known_places = (	# Places I've checked with my GPS
 			'STATE' => 'DC',
 			'COUNTRY' => 'US',
 			'POSTCODE' => 20011
+		}, {
+			'LAT' => 38.904022,
+			'LON' => -77.023113,
+			'NAME' => 'WALTER E. WASHINGTON CONVENTION CENTER',
+			'NUMBER' => 801,
+			'STREET' => 'MT VERNON PL NW',
+			'CITY' => 'WASHINGTON',
+			'STATE' => 'DC',
+			'COUNTRY' => 'US',
+			'POSTCODE' => 20001
 		}
 	], 'us/id/statewide.csv' => [
 		{
@@ -624,16 +701,15 @@ my %known_places = (	# Places I've checked with my GPS
 		}
 	], 'us/va/statewide.csv' => [
 		{
-			'LAT' => 44.40662476,
-			'LON' => -68.59610059,
-			'NAME' => 'THE PURE PASTY COMPANY',
-			'NUMBER' => '128C',
-			'STREET' => 'MAPLE AVE W',
-			'CITY' => 'VIENNA',
-			'COUNTY' => 'FAIRFAX',
+			'LAT' => 38.75422,
+			'LON' =>  -77.1058666666667,
+			'NAME' => 'HUNTLEY MEADOWS PARK',
+			'NUMBER' => 3701,
+			'STREET' => 'LOCKHEED BLVD',
+			'CITY' => 'ALEXANDRIA',
 			'STATE' => 'VA',
 			'COUNTRY' => 'US',
-			'POSTCODE' => 22180
+			'POSTCODE' => 22306
 		}, {
 			'LAT' => 38.873934,
 			'LON' => -77.461939,
@@ -655,6 +731,26 @@ my %known_places = (	# Places I've checked with my GPS
 			'STATE' => 'VA',
 			'COUNTRY' => 'US',
 			'POSTCODE' => 22102
+		}, {
+			'LAT' => 44.40662476,
+			'LON' => -68.59610059,
+			'NAME' => 'THE PURE PASTY COMPANY',
+			'NUMBER' => '128C',
+			'STREET' => 'MAPLE AVE W',
+			'CITY' => 'VIENNA',
+			'COUNTY' => 'FAIRFAX',
+			'STATE' => 'VA',
+			'COUNTRY' => 'US',
+			'POSTCODE' => 22180
+		}, {
+			'LAT' => 38.25075,
+			'LON' => -76.9602533333333,
+			'STREET' => '',
+			'CITY' => 'COLONIAL BEACH',
+			'COUNTY' => 'WESTMORELAND',
+			'STATE' => 'VA',
+			'COUNTRY' => 'US',
+			'POSTCODE' => 22443
 		}
 	], 'other' => [
 		{
@@ -803,15 +899,18 @@ my $city_sequence;
 my %cities;
 my %unknown_zips;
 my %state_parent_md5s;
-if(!-r 'lib/Geo/Coder/Free/MaxMind/databases/cities.sql') {
+
+my $cities_sql = 'lib/Geo/Coder/Free/MaxMind/databases/cities.sql';
+
+if(!-r $cities_sql) {
 	(system('bash bin/create_sqlite') == 0)
 		or warn "Can't create the SQLite database (perhaps you don't have sqlite3 installed) - expect poor performance";
 
-	if(-r 'lib/Geo/Coder/Free/MaxMind/databases/cities.sql') {
-		if(-r 'blib/lib/Geo/Coder/Free/MaxMind/databases/cities.sql') {
-			unlink('blib/lib/Geo/Coder/Free/MaxMind/databases/cities.sql');
+	if(-r $cities_sql) {
+		if(-r "blib/$cities_sql") {
+			unlink("blib/$cities_sql");
 		}
-		copy('lib/Geo/Coder/Free/MaxMind/databases/cities.sql', 'blib/lib/Geo/Coder/Free/MaxMind/databases/cities.sql')
+		copy($cities_sql, "blib/$cities_sql")
 			or die "Can't copy SQLite file to blib: $!";
 	}
 }
@@ -995,7 +1094,7 @@ if((-r 'lib/Geo/Coder/Free/GeoNames/databases/allCountries.txt') &&
    # open(my $fin, '<', 'lib/Geo/Coder/Free/GeoNames/databases/allCountries.txt') &&
    # open(my $fin1, '<', 'lib/Geo/Coder/Free/MaxMind/databases/admin1.db') &&
    (my $all_countries = File::Open::NoCache::ReadOnly->new('lib/Geo/Coder/Free/GeoNames/databases/allCountries.txt')) &&
-   (my $admin1 = File::Open::NoCache::ReadOnly->new('lib/Geo/Coder/Free/MaxMind/databases/admin2.db')) &&
+   (my $admin1 = File::Open::NoCache::ReadOnly->new('lib/Geo/Coder/Free/MaxMind/databases/admin1.db')) &&
    (my $admin2 = File::Open::NoCache::ReadOnly->new('lib/Geo/Coder/Free/MaxMind/databases/admin2.db'))) {
    # open(my $fin2, '<', 'lib/Geo/Coder/Free/MaxMind/databases/admin2.db')) {
 	my $fin = $all_countries->fd();
@@ -1235,7 +1334,7 @@ if(my $whosonfirst = $ENV{'WHOSONFIRST_HOME'}) {
 					# print "Saved state = $state\n" if(DEBUG&DEBUG_ALL);
 				} else {
 					next if($region < 0);
-					print "Getting state from hierachy:\n\t", Data::Dumper->new([$properties])->Dump() if(DEBUG&DEBUG_DETERMINE_LOCATION);
+					print "Getting state from hierarchy:\n\t", Data::Dumper->new([$properties])->Dump() if(DEBUG&DEBUG_DETERMINE_LOCATION);
 					$state = get_wof($properties, $region);
 					if($state) {
 						print "\tGot $state\n" if(DEBUG&DEBUG_DETERMINE_LOCATION);
@@ -1777,10 +1876,10 @@ if(my $osm = $ENV{'OSM_HOME'}) {
 	$inserts = 0;
 }
 
-$| = 1;
-printf "%-70s\r", 'creating cities';
-print "\n" if(DEBUG);
-$| = 0;
+# $| = 1;
+# printf "%-70s\r", 'creating cities';
+# print "\n" if(DEBUG);
+# $| = 0;
 # foreach my $key(keys %cities) {
 	# my ($city, $county, $state, $country) = split(/,/, $key);
 	# my $sequence = $cities{$key};
@@ -1970,7 +2069,7 @@ sub import {
 				# print "\n", Data::Dumper->new([\$row])->Dump();
 				return 0;
 			}
-			my $place = @{$rc->{'places'}}[0];
+			my $place = $rc->{'places'}->[0];
 			if(!$place) {
 				# print "\n", Data::Dumper->new([\$row])->Dump();
 				return 0;
@@ -2049,7 +2148,7 @@ sub import {
 		$street = uc($street);
 		if($street =~ /(.+)\s+(.+)\s+(.+)/) {
 			my $a;
-			if($a = $abbr->abbreviate($2)) {
+			if((lc($2) ne 'cross') && ($a = $abbr->abbreviate($2))) {
 				$street = "$1 $a $3";
 			} elsif($a = $abbr->abbreviate($3)) {
 				$street = "$1 $2 $a";

@@ -12,7 +12,7 @@ use Locale::Country; # all_country_codes
 use Test::MockModule;
 use English qw(-no_match_vars);
 
-our $VERSION = '1.29';
+our $VERSION = '1.31';
 
 #run prior and once per suite
 sub startup : Test(startup => 1) {
@@ -495,17 +495,17 @@ sub test_fr : Test(6) {
         eval { require Date::Holidays::FR };
         skip 'Date::Holidays::FR not installed', 6 if $EVAL_ERROR;
 
-        ok(! Date::Holidays::FR->can('holidays'), 'Date::Holidays::FR does not implement holidays');
-        ok(! Date::Holidays::FR->can('is_holiday'), 'Date::Holidays::FR does not implement is_holidays');
+        ok(Date::Holidays::FR->can('holidays'), 'Date::Holidays::FR implements holidays');
+        ok(Date::Holidays::FR->can('is_holiday'), 'Date::Holidays::FR implements is_holidays');
 
         ok( my $dh = Date::Holidays->new( countrycode => 'fr' ),
             'Testing Date::Holidays::FR' );
 
-        dies_ok { $dh->holidays(); }
-            'Testing holidays with no arguments for Date::Holidays::FR';
+        ok($dh->holidays(),
+            'Testing holidays with no arguments for Date::Holidays::FR');
 
-        dies_ok { $dh->holidays( year => 2017 ); }
-            'Testing holidays with argument for Date::Holidays::FR';
+        ok($dh->holidays( year => 2017 ),
+            'Testing holidays with argument for Date::Holidays::FR');
 
         my $holidays_hashref = Date::Holidays->is_holiday(
             year  => 2017,

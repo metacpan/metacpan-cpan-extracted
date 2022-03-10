@@ -5,9 +5,10 @@ use MooseX::Types::Path::Class;
 use DateTime;
 use File::Copy;
 use HTML::TableExtract;
+use experimental qw(switch);
 
 # ABSTRACT: Archive Devel::Cover reports
-our $VERSION = '1.002';
+our $VERSION = '1.004'; # VERSION
 
 with 'MooseX::Getopt';
 
@@ -290,13 +291,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 App::ArchiveDevelCover - Archive Devel::Cover reports
 
 =head1 VERSION
 
-version 1.002
+version 1.004
 
 =head1 SYNOPSIS
 
@@ -304,11 +307,11 @@ Backend for the C<archive_devel_cover.pl> command. See L<archive_devel_cover.pl>
 
 =head1 AUTHOR
 
-Thomas Klausner <domm@cpan.org>
+Thomas Klausner <domm@plix.at>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by Thomas Klausner.
+This software is copyright (c) 2012 - 2022 by Thomas Klausner.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

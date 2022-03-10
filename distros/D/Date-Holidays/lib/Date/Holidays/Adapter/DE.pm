@@ -10,7 +10,7 @@ use vars qw($VERSION);
 
 my $format = '%#:%m%d';
 
-$VERSION = '1.30';
+$VERSION = '1.31';
 
 # Lifted from Date::Holidays::DE example: feiertage.pl
 # Ref: https://metacpan.org/source/MSCHMITT/Date-Holidays-DE-1.9/example/feiertage.pl
@@ -129,7 +129,7 @@ Date::Holidays::Adapter::DE - an adapter class for Date::Holidays::DE
 
 =head1 VERSION
 
-This POD describes version 1.30 of Date::Holidays::Adapter::DE
+This POD describes version 1.31 of Date::Holidays::Adapter::DE
 
 =head1 DESCRIPTION
 

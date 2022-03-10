@@ -1,5 +1,9 @@
 Revision history for Perl module Koha::Contrib::Tamil
 
+0.067 2022-03-10
+
+  - Fix for Koha 21.11
+
 0,066 2020-07-25
 
   - Fix marcxml biblio data retrieving from biblio_metadata
