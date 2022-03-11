@@ -122,6 +122,8 @@ sub apply_to_event ($self, $event, $hint = undef) {
   $event->{transaction} = $self->transaction if $self->transaction_name;
 
   if ($self->span) {
+    $event->{request} = $self->span->request;
+
     $event->{contexts} = {
       trace => $self->span->get_trace_context(),
       ($event->{contexts} // {})->%*

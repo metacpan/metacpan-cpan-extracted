@@ -417,6 +417,8 @@ Set or return the element's accept attribute, containing comma-separated list of
 
 Sets or gets the element's attribute representing a string containing a single character that switches input focus to the control when pressed.
 
+=for Pod::Coverage align
+
 =head2 allowdirs
 
 Set or get a boolean value. This does not do anything otherwise since this is not an attribute.
@@ -455,9 +457,37 @@ Set or returns a boolean value that represents the element's autofocus attribute
 
 Set or returns a boolean value the current state of the element when type is checkbox or radio.
 
+=for Pod::Coverage compact
+
+=head2 crossOrigin
+
+A string of a keyword specifying the CORS mode to use when fetching the image resource. If you do not specify crossOrigin, the underlying element is fetched without CORS (the fetch no-cors mode).
+
+Permitted values are:
+
+=over 4
+
+=item * C<anonymous>
+
+Requests by the underlying element have their mode set to cors and their credentials mode set to same-origin. This means that CORS is enabled and credentials are sent if the underlying element is fetched from the same origin from which the document was loaded.
+
+=item * C<use-credentials>
+
+Requests by the L<HTML::Object::DOM::Element> will use the cors mode and the include credentials mode; all underlying element requests by the element will use CORS, regardless of what domain the fetch is from.
+
+=back
+
+If crossOrigin is an empty string (""), the anonymous mode is selected. 
+
+See L<Mozilla documentation for more information|https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/crossorigin>
+
+=for Pod::Coverage currentSrc
+
 =head2 defaultChecked
 
 Set or returns a boolean value that sets the default state of a radio button or checkbox as originally specified in HTML that created this object.
+
+=for Pod::Coverage defaultValue
 
 =head2 dirName
 
@@ -467,11 +497,19 @@ Sets or gets the directionality of the element.
 
 Set or returns a boolean value that represents the element's disabled attribute, indicating that the control is not available for interaction. The input values will not be submitted with the form. See also L</readonly>
 
+=for Pod::Coverage download
+
 =head2 files
 
 This returns a L<HTML::Object::DOM::FileList> object.
 
 Under JavaScript, this returns or accepts a C<FileList> object, which contains a list of C<File> objects representing the files selected for upload.
+
+=head2 form
+
+The C<form> HTML element represents a document section containing interactive controls for submitting information.
+
+See also L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/HTML/Element/form>
 
 =head2 formAction
 
@@ -513,9 +551,37 @@ This is used by L<HTML::Object::DOM::Element::Input>
 
 See also L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/HTMLButtonElement/formTarget>
 
+=head2 hash
+
+The hash property of the Location interface returns a string containing a '#' followed by the fragment identifier of the URL — the ID on the page that the URL is trying to target.
+
+The fragment is not percent-decoded. If the URL does not have a fragment identifier, this property contains an empty string, "". 
+
+See also L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/Location/hash>
+
 =head2 height
 
 Sets or returns the element's height attribute, which defines the height of the image displayed for the button, if the value of type is image.
+
+=head2 host
+
+The host property of the Location interface is a string containing the host, that is the hostname, and then, if the port of the URL is nonempty, a ':', and the port of the URL. 
+
+See also L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/Location/host>
+
+=head2 hostname
+
+The hostname property of the Location interface is a string containing the domain of the URL.
+
+See also L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/Location/hostname>
+
+=head2 href
+
+The href property of the Location interface is a stringifier that returns a string containing the whole URL, and allows the href to be updated. 
+
+See also L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/Location/href>
+
+=for Pod::Coverage hreflang
 
 =head2 indeterminate
 
@@ -557,6 +623,20 @@ Sets or returns a boolean that represents the element's multiple attribute, indi
 
 Set or returns the element's name attribute, containing a name that identifies the element when submitting the form.
 
+=for Pod::Coverage origin
+
+=head2 password
+
+The password property of the Location interface is a string containing the password specified before the domain name.
+
+See also L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/Location/password>
+
+=head2 pathname
+
+The pathname property of the Location interface is a USVString containing the path of the URL for the location, which will be the empty string if there is no path. 
+
+See also L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/Location/pathname>
+
 =head2 pattern
 
 Set or returns a string that represents the element's C<pattern> attribute, containing a regular expression that the control's value is checked against. Use the C<title> attribute to describe the pattern to help the user. This attribute applies when the value of the type attribute is C<text>, C<search>, C<tel>, C<url> or C<email>; otherwise it is ignored.
@@ -565,14 +645,34 @@ Set or returns a string that represents the element's C<pattern> attribute, cont
 
 Set or returns a string that represents the element's C<placeholder> attribute, containing a hint to the user of what can be entered in the control. The C<placeholder> text must not contain carriage returns or line-feeds. This attribute applies when the value of the type attribute is C<text>, C<search>, C<tel>, C<url> or C<email>; otherwise it is ignored.
 
+=for Pod::Coverage port
+
+=for Pod::Coverage protocol
+
 =head2 readOnly
 
 Set or returns a boolean that represents the element's C<readonly> attribute, indicating that the user cannot modify the value of the control.
 This is ignored if the value of the type attribute is C<hidden>, C<range>, C<color>, C<checkbox>, C<radio>, C<file>, or a C<button> type.
 
+=for Pod::Coverage referrerPolicy
+
+=head2 rel
+
+The rel attribute defines the relationship between a linked resource and the current document. 
+
+See also L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/rel>
+
+=for Pod::Coverage relList
+
 =head2 required
 
 Set or returns a boolean value that represents the element's required attribute, indicating that the user must fill in a value before submitting a form.
+
+=head2 search
+
+The search property of the Location interface is a search string, also called a query string; that is, a USVString containing a '?' followed by the parameters of the URL. 
+
+See also L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/Location/search>
 
 =head2 selectionDirection
 
@@ -602,6 +702,8 @@ Set or returns an integer that represents the end index of the selected text. Wh
 
 Set or returns an integer that represents the beginning index of the selected text. When nothing is selected, this returns the position of the text input cursor (caret) inside of the <input> element.
 
+=for Pod::Coverage setCustomValidity
+
 =head2 size
 
 Set or returns an integer that represents the element's C<size> attribute, containing visual size of the control. This value is in pixels unless the value of type is text or password, in which case, it is an integer number of characters. Applies only when type is set to C<text>, C<search>, C<tel>, C<url>, C<email>, or C<password>; otherwise it is ignored.
@@ -614,9 +716,15 @@ Set or returns the element's step attribute, which works with C<min> and C<max> 
 
 Sets or returns the element's src attribute, which specifies a URI for the location of an image to display on the graphical submit button, if the value of type is image; otherwise it is ignored.
 
+=for Pod::Coverage target
+
 =head2 type
 
 Set or returns the element's type attribute, indicating the type of control to display. See type attribute of C<<input>> for possible values.
+
+=for Pod::Coverage useMap
+
+=for Pod::Coverage username
 
 =head2 value
 

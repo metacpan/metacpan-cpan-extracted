@@ -30,6 +30,7 @@ t/release-dist-manifest.t
 t/release-kwalitee.t
 t/release-meta-json.t
 t/release-unused-vars.t
+xt/get_challenges.t
 xt/get_leaderboard.t
 xt/get_profile.t
 xt/get_workouts.t

@@ -8,13 +8,14 @@ use Moose;
 use namespace::autoclean;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-02-14'; # DATE
+our $DATE = '2022-02-16'; # DATE
 our $DIST = 'Dist-Zilla-Plugin-PERLANCAR-EnsurePrereqToSpec'; # DIST
-our $VERSION = '0.063'; # VERSION
+our $VERSION = '0.064'; # VERSION
 
 with (
     'Dist::Zilla::Role::AfterBuild',
     'Dist::Zilla::Role::Rinci::CheckDefinesMeta',
+    'Dist::Zilla::Role::ModuleMetadata',
     'Dist::Zilla::Role::FileFinderUser' => {
         default_finders => [':InstallModules'],
     },
@@ -65,15 +66,33 @@ sub _prereq_none {
     $num_any == 0;
 }
 
+my $_cache_packages;
+sub _module_in_cur_dist {
+    my ($self, $mod) = @_;
+
+    unless ($_cache_packages) {
+        $_cache_packages = {};
+        for my $file (@{ $self->found_files }) {
+            $self->log_fatal([ 'Could not decode %s: %s', $file->name, $file->added_by ])
+                if $file->can('encoding') and $file->encoding eq 'bytes';
+
+            my @packages = $self->module_metadata_for_file($file)->packages_inside;
+            $_cache_packages->{$_}++ for @packages;
+        }
+    }
+    $_cache_packages->{$mod};
+}
+
 sub after_build {
     my $self = shift;
 
     my $prereqs_hash = $self->zilla->prereqs->as_string_hash;
+    my $curdist = $self->zilla->name;
 
     # Rinci
     if ($self->check_dist_defines_rinci_meta || -f ".tag-implements-Rinci") {
         $self->log_fatal(["Dist defines Rinci metadata or implements Rinci, but there is no prereq phase=develop rel=x_spec to Rinci"])
-            unless $self->_prereq_only_in($prereqs_hash, "Rinci", "develop", "x_spec");
+            unless $self->_prereq_only_in($prereqs_hash, "Rinci", "develop", "x_spec") || $self->_module_in_cur_dist('Rinci');
     } else {
         $self->log_fatal(["Dist does not define Rinci metadata, but there is a phase=develop rel=xpec prereq to Rinci"])
             if $self->_has_prereq($prereqs_hash, "Rinci", "develop", "x_spec");
@@ -82,17 +101,22 @@ sub after_build {
     # ColorTheme
     if (grep { $_->name =~ m!(?:\A|/)ColorTheme/.+\.pm! } @{ $self->found_files }) {
         $self->log_fatal(["Dist has ColorTheme/* .pm file but there is no prereq phase=develop, rel=x_spec to ColorTheme"])
-            unless $self->_prereq_only_in($prereqs_hash, "ColorTheme", "develop", "x_spec");
+            unless $self->_prereq_only_in($prereqs_hash, "ColorTheme", "develop", "x_spec") || $self->_module_in_cur_dist('ColorTheme');
     } else {
-        $self->log_fatal(["Dist does not have ColorTheme/* .pm file, but there is a phase=develop rel=xpec prereq to ColorTheme"])
-            if $self->_has_prereq($prereqs_hash, "ColorTheme", "develop", "x_spec");
+        # other dists can actually declare following the spec
+
+        #$self->log_fatal(["Dist does not have ColorTheme/* .pm file, but there is a phase=develop rel=xpec prereq to ColorTheme"])
+        #    if $self->_has_prereq($prereqs_hash, "ColorTheme", "develop", "x_spec");
     }
 
     # BorderStyle
     if (grep { $_->name =~ m!(?:\A|/)BorderStyle/.+\.pm! } @{ $self->found_files }) {
         $self->log_fatal(["Dist has BorderStyle/* .pm file but there is no prereq phase=develop, rel=x_spec to BorderStyle"])
-            unless $self->_prereq_only_in($prereqs_hash, "BorderStyle", "develop", "x_spec");
+            unless $self->_prereq_only_in($prereqs_hash, "BorderStyle", "develop", "x_spec") || $self->_module_in_cur_dist('BorderStyle');
     } else {
+        # other dists can actually declare following the spec, e.g.
+        # Text-Table-TinyBorderStyle, etc.
+
         #$self->log_fatal(["Dist does not have BorderStyle/* .pm file, but there is a phase=develop rel=xpec prereq to BorderStyle"])
         #    if $self->_has_prereq($prereqs_hash, "BorderStyle", "develop", "x_spec");
     }
@@ -115,7 +139,7 @@ Dist::Zilla::Plugin::PERLANCAR::EnsurePrereqToSpec - Ensure prereq to spec modul
 
 =head1 VERSION
 
-This document describes version 0.063 of Dist::Zilla::Plugin::PERLANCAR::EnsurePrereqToSpec (from Perl distribution Dist-Zilla-Plugin-PERLANCAR-EnsurePrereqToSpec), released on 2022-02-14.
+This document describes version 0.064 of Dist::Zilla::Plugin::PERLANCAR::EnsurePrereqToSpec (from Perl distribution Dist-Zilla-Plugin-PERLANCAR-EnsurePrereqToSpec), released on 2022-02-16.
 
 =head1 SYNOPSIS
 

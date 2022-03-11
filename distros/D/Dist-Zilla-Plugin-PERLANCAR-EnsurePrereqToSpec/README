@@ -3,10 +3,10 @@ NAME
     spec modules
 
 VERSION
-    This document describes version 0.063 of
+    This document describes version 0.064 of
     Dist::Zilla::Plugin::PERLANCAR::EnsurePrereqToSpec (from Perl
     distribution Dist-Zilla-Plugin-PERLANCAR-EnsurePrereqToSpec), released
-    on 2022-02-14.
+    on 2022-02-16.
 
 SYNOPSIS
     In "dist.ini":

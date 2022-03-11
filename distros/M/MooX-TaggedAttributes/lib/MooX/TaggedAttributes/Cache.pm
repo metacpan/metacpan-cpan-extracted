@@ -9,7 +9,7 @@ use warnings;
 
 use Hash::Util;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 use overload '%{}' => \&tag_hash, fallback => 1;
 
@@ -37,7 +37,7 @@ use overload '%{}' => \&tag_hash, fallback => 1;
 sub new {
     my ( $class, $target ) = @_;
 
-    return bless { list => $target->_tag_list } , $class;
+    return bless { list => $target->_tag_list }, $class;
 }
 
 
@@ -90,7 +90,8 @@ sub attr_hash {
         my %attrs;
         for my $tuple ( @{ $self->{list} } ) {
             # my ( $tag, $attrs, $value ) = @$tuple;
-            ($attrs{$_} ||= {})->{$tuple->[0]} = $tuple->[2] for @{ $tuple->[1] };
+            ( $attrs{$_} ||= {} )->{ $tuple->[0] } = $tuple->[2]
+              for @{ $tuple->[1] };
         }
         Hash::Util::lock_hash( %attrs );
         \%attrs;
@@ -116,14 +117,14 @@ sub tags {
 
     no overloading;
 
-    if ( ! defined $attr ) {
+    if ( !defined $attr ) {
         return $self->{tags} ||= [ keys %{ $self->tag_hash } ];
     }
 
-    return ($self->{attr} ||= {})->{$attr} ||= do {
+    return ( $self->{attr} ||= {} )->{$attr} ||= do {
         my $attrs = $self->attr_hash;
         [ keys %{ $attrs->{$attr} || {} } ];
-     };
+    };
 }
 
 
@@ -163,7 +164,7 @@ MooX::TaggedAttributes::Cache - Extract information from a Tagged Attribute Cach
 
 =head1 VERSION
 
-version 0.11
+version 0.12
 
 =head1 SYNOPSIS
 

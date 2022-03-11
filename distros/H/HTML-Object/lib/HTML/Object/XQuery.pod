@@ -12,7 +12,7 @@ HTML::Object::XQuery - HTML XQuery Extension
 
 =head1 VERSION
 
-    v0.1.0
+    v0.1.1
 
 =head1 DESCRIPTION
 
@@ -20,13 +20,13 @@ This class extends L<HTML::Object::DOM::Element> and provided jQuery-like method
 
 By calling C<use HTML::Object::DOM global_dom => 1;>, this will instantiate a global DOM mimicking the one on a web page. This, in turns, enables calls such as:
 
-    $("li").addClass("hello");
+    $("li")->addClass("hello");
 
 Without the need to specify any context like:
 
     my $p = HTML::Object::DOM->new;
     my $context = $p->parse_file( "/path/to/some/file.html" );
-    $("li", $context).addClass("hello");
+    $("li", $context)->addClass("hello");
 
 Calling C<use HTML::Object::DOM global_dom => 1;> also enables the use of the special function C<$()>, which is, normally, not possible in perl.
 
@@ -82,18 +82,18 @@ For example, consider:
     </ul>
     <p>a paragraph</p>
 
-    $( "li" ).add( "p" ).css( "background-color", "red" );
+    $( "li" )->add( "p" )->css( "background-color", "red" );
 
 This will select the C<li> tags, then add the C<p> tag to the collection set of elements objects and finally will apply the css change of background colour.
 
 If we pass an HTML snippet as argument, such as:
 
-    $( "li" ).add( "<p id='new'>new paragraph</p>" )
-      .css( "background-color", "red" );
+    $( "li" )->add( "<p id='new'>new paragraph</p>" )
+      ->css( "background-color", "red" );
 
 The paragraph will have been created dynamically and added to the set, but is not yet part of the dom until some methods are used to insert it.
 
-    $( "p" ).clone().add( "<span>Again</span>" ).appendTo( "body" );
+    $( "p" )->clone()->add( "<span>Again</span>" )->appendTo( "body" );
 
 B<Note>: To reverse the L</add> you can use C<$e->not( elements | selector )> to remove elements from the collection results, or L</end> to return to the selection before you added.
 
@@ -245,10 +245,10 @@ Similar to other content-adding methods such as L</prepend> and L</before>, L</a
 For example, the following will insert two new <div>s and an existing <div> as the last three child nodes of the body:
 
     my $newdiv1 = $( "<div id='object1'></div>" ),
-    newdiv2 = document.createElement( "div" ),
-    existingdiv1 = document.getElementById( "foo" );
+    my $newdiv2 = $doc->createElement( "div" ),
+    my $existingdiv1 = $doc->getElementById( "foo" );
     
-    $( "body" ).append( $newdiv1, [ newdiv2, existingdiv1 ] );
+    $( "body" )->append( $newdiv1, [ newdiv2, existingdiv1 ] );
 
 L<https://api.jquery.com/append/>
 
@@ -270,11 +270,11 @@ L<https://api.jquery.com/attr/>
 
 L</before> and L</insertBefore> methods perform the same task. The major difference is in the syntax—specifically, in the placement of the content and target. With L</before>, the content to be inserted comes from the method's argument: 
 
-    xq(target)->before( contentToBeInserted )
+    xq($target)->before( $contentToBeInserted )
 
 With L</insertBefore>, on the other hand, the content precedes the method and is inserted before the target, which in turn is passed as the L</insertBefore> method's argument:
 
-    xq(contentToBeInserted)->insertBefore( target );
+    xq($contentToBeInserted)->insertBefore( $target );
 
     <div class="container">
       <h2>Greetings</h2>
@@ -287,7 +287,7 @@ With L</insertBefore>, on the other hand, the content precedes the method and is
 
 You can create content and insert it before several elements at once:
 
-    xq( ".inner", $doc ).before( "<p>Test</p>" );
+    xq( ".inner", $doc )->before( "<p>Test</p>" );
 
 Each inner E<lt>divE<gt> element gets this new content:
 
@@ -301,7 +301,7 @@ Each inner E<lt>divE<gt> element gets this new content:
 
 You can also select an element on the page and insert it before another:
 
-    xq( ".container", $doc ).before( xq( "h2", $doc ) );
+    xq( ".container", $doc )->before( xq( "h2", $doc ) );
 
 If an element selected this way is inserted into a single location elsewhere in the DOM, it will be moved before the target (not cloned):
 
@@ -591,7 +591,7 @@ For example, consider the following html:
 
 If we retrieve one of the three list items (for example, through one of the element object's functions), L</index> can search for this list item within the set of matched elements:
 
-    my $listItem = $document.getElementById( "bar" );
+    my $listItem = $document->getElementById( "bar" );
     say( "Index: " + xq( "li", $document )->index( $listItem ) );
 
 We get back the zero-based position of the list item:
@@ -1103,7 +1103,7 @@ a new HTML::Object::DOM::Text element if it is a plain string
 
 Takes another element and compares the current one to it. Returns true if they are the same, false otherwise.
 
-It achieves this by check if the current element L</eif>is same, of if the element is a collection it check it is of the same size and the other element is among the collection.
+It achieves this by check if the current element L<HTML::Object::Element/eid> is same, of if the element is a collection it check it is of the same size and the other element is among the collection.
 
 =head2 _css_object
 

@@ -1,0 +1,17 @@
+Revision history for Image-DecodeQR-WeChat
+
+0.01    2022-03-09/19:00
+        First version, released on an unsuspecting world.
+        Tests include checking for multiple QR codes in same image,
+        and supports utf8 filenames and utf8 payloads.
+        Note that for some images OpenCV's code crashes.
+        Small QR codes or fuzzy ones. Avoid them.
+        QR codes less than 55x55 px may have problems.
+        Thank you OpenCV and WeChat.
+
+0.02    2022-03-11/17:50
+	Fixed pod in WeChat.pm
+
+0.03    2022-03-11/18:30
+	Added more tests for rotated QR codes.
+	Fixes and additions to the documentation.

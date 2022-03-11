@@ -7,7 +7,7 @@ sub name {
 
     my $re = join( '|', reverse sort { length $a <=> length $b } keys %$map );
 
-    1 while( $desc =~ s/($re)(?!\()/"$1($map->{$1})"/ge );
+    1 while ( $desc =~ s/($re)(?!\()/"$1($map->{$1})"/ge );
 
     $map->{$class} = $desc;
 

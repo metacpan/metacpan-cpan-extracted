@@ -1,3 +1,9 @@
+0.005           2022-03-10
+    - POD improvements
+    - Add get_challenges
+    - Dist::Zilla changes
+    - Change the required Perl version in module to match dist
+
 0.004           2022-03-06
     - Add get_leaderboard method (as per the Ranking page on smartrow.fit)
     - Improve the POD and add POD for get_leaderboard

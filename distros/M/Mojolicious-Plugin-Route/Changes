@@ -1,3 +1,9 @@
+0.03 2022-03-10T23:38:00Z
+    - Improved the code logic to remove parameter ambiguity.
+    - Removed debug code.
+    - Added namespace option in pod.
+    - Added example using under and route in the same file in pod.
+
 0.02 2022-02-28T03:38:00Z
     - Resolved error with passing reference.
 

@@ -1,5 +1,8 @@
 Revision history for Perl extension Crypt::OpenSSL::PKCS10.
 
+0.17  Thu Mar 10 17:31:59 PST 2022
+        - Improve Makefile.PL to detect LIBS and INC values automatically (thanks Michal Josef Špacek)
+
 0.16  Mon Oct 17 09:36:48 PDT 2016
         - OpenSSL 1.1.0 support (thanks Petr Písar)
 

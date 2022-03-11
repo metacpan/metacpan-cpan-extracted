@@ -19,6 +19,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Dist::Zilla::Role::AfterBuild" => 0,
     "Dist::Zilla::Role::FileFinderUser" => 0,
+    "Dist::Zilla::Role::ModuleMetadata" => 0,
     "Dist::Zilla::Role::Rinci::CheckDefinesMeta" => 0,
     "Moose" => 0,
     "namespace::autoclean" => 0,
@@ -31,7 +32,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.063",
+  "VERSION" => "0.064",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -41,6 +42,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Dist::Zilla::Role::AfterBuild" => 0,
   "Dist::Zilla::Role::FileFinderUser" => 0,
+  "Dist::Zilla::Role::ModuleMetadata" => 0,
   "Dist::Zilla::Role::Rinci::CheckDefinesMeta" => 0,
   "File::Spec" => 0,
   "IO::Handle" => 0,

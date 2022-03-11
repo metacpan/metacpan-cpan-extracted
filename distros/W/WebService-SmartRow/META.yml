@@ -17,6 +17,10 @@ meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: WebService-SmartRow
+provides:
+  WebService::SmartRow:
+    file: lib/WebService/SmartRow.pm
+    version: '0.005'
 requires:
   Cpanel::JSON::XS: '4.27'
   HTTP::Tiny: '0.080'
@@ -27,7 +31,7 @@ resources:
   bugtracker: https://github.com/lancew/WebService-SmartRow/issues
   homepage: https://metacpan.org/pod/WebService::SmartRow
   repository: git://github.com/lancew/WebService-SmartRow.git
-version: '0.004'
+version: '0.005'
 x_generated_by_perl: v5.35.4
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: MIT

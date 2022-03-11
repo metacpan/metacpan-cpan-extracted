@@ -372,7 +372,7 @@ Note: Automatically playing audio when the user does not expect or desire it is 
 Example:
 
     <video id="video" autoplay="" controls>
-        <source src="https://player->vimeo->com/external/250688977->sd->mp4?s=d14b1f1a971dde13c79d6e436b88a6a928dfe26b&profile_id=165">
+        <source src="https://player.vimeo.com/external/250688977.sd.mp4?s=d14b1f1a971dde13c79d6e436b88a6a928dfe26b&profile_id=165">
     </video>
 
     # *** Disable autoplay (recommended) ***
@@ -587,7 +587,7 @@ Set or get an integer (enumeration) indicating the current state of fetching the
 Example:
 
     <audio id="example" preload="auto">
-        <source src="sound->ogg" type="audio/ogg" />
+        <source src="sound.ogg" type="audio/ogg" />
     </audio>
 
     # Export constants
@@ -658,7 +658,7 @@ Set or get an integer (enumeration) indicating the readiness state of the media.
 Example:
 
     <audio id="example" preload="auto">
-        <source src="sound->ogg" type="audio/ogg" />
+        <source src="sound.ogg" type="audio/ogg" />
     </audio>
 
     use HTML::Object::DOM::Element::Media qw( :all );
@@ -727,8 +727,8 @@ Returns the list of L<TextTrack|HTML::Object::DOM::TextTrack> objects contained 
 Example:
 
     <video controls poster="/images/sample.gif">
-        <source src="sample->mp4" type="video/mp4">
-        <source src="sample->ogv" type="video/ogv">
+        <source src="sample.mp4" type="video/mp4">
+        <source src="sample.ogv" type="video/ogv">
         <track kind="captions" src="sampleCaptions.vtt" srclang="en">
         <track kind="descriptions" src="sampleDescriptions.vtt" srclang="en">
         <track kind="chapters" src="sampleChapters.vtt" srclang="en">
@@ -821,7 +821,8 @@ Normally, under JavaScript, this returns C<MediaStream>, captures a stream of th
 
 Example:
 
-    $doc->querySelector('.playAndRecord')->addEventListener('click', sub {
+    $doc->querySelector('.playAndRecord')->addEventListener( click => sub
+    {
         my $playbackElement = $doc->getElementById("playback");
         my $captureStream = $playbackElement->captureStream();
         $playbackElement->play();

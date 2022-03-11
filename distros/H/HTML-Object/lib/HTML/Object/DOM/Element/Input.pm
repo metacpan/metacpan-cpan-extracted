@@ -1259,8 +1259,8 @@ A string reflecting the usemap HTML attribute, containing the page-local URL of 
 Example:
 
     <map name="mainmenu-map">
-        <area shape="circle" coords="25, 25, 75" href="/index->html" alt="Return to home page">
-        <area shape="rect" coords="25, 25, 100, 150" href="/index->html" alt="Shop">
+        <area shape="circle" coords="25, 25, 75" href="/index.html" alt="Return to home page">
+        <area shape="rect" coords="25, 25, 100, 150" href="/index.html" alt="Shop">
     </map>
 
     <input usemap="#mainmenu-map" />

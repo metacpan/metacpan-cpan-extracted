@@ -81,8 +81,11 @@ sub _new_event_id ($self) {
   return $self->_last_event_id;
 }
 
-sub capture_message ($self, $message, $level = Sentry::Severity->Info,
-  $hint = undef) {
+sub capture_message (
+  $self, $message,
+  $level = Sentry::Severity->Info,
+  $hint = undef
+) {
   my $event_id = $self->_new_event_id();
 
   $self->_invoke_client('capture_message', $message, $level,

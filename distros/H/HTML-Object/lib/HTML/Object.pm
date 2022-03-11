@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object.pm
-## Version v0.1.1
-## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Version v0.1.3
+## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/04/20
-## Modified 2022/01/18
+## Modified 2022/03/11
 ## All rights reserved
 ## 
 ## 
@@ -34,7 +34,7 @@ BEGIN
     use Module::Generic::File qw( file );
     use Nice::Try;
     use Scalar::Util ();
-    our $VERSION = 'v0.1.1';
+    our $VERSION = 'v0.1.3';
     our $DICT = {};
     our $LINK_ELEMENTS = {};
     our $FATAL_ERROR = 0;
@@ -885,7 +885,7 @@ To enable fatal error and also implement try-catch (using L<Nice::Try>) :
 
 =head1 VERSION
 
-    v0.1.1
+    v0.1.3
 
 =head1 DESCRIPTION
 

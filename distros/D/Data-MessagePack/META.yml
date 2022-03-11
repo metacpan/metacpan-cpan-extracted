@@ -10,7 +10,7 @@ configure_requires:
   Module::Build: '0.4005'
   Module::Build::XSUtil: '0'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.9, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.15, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,7 +29,7 @@ no_index:
 provides:
   Data::MessagePack:
     file: lib/Data/MessagePack.pm
-    version: '1.01'
+    version: '1.02'
   Data::MessagePack::Boolean:
     file: lib/Data/MessagePack/Boolean.pm
   Data::MessagePack::PP:
@@ -40,8 +40,8 @@ requires:
 resources:
   bugtracker: https://github.com/msgpack/msgpack-perl/issues
   homepage: https://github.com/msgpack/msgpack-perl
-  repository: git://github.com/msgpack/msgpack-perl.git
-version: '1.01'
+  repository: https://github.com/msgpack/msgpack-perl.git
+version: '1.02'
 x_authority: cpan:TOKUHIROM
 x_contributors:
   - 'Brian Ketelsen <bketelsen@gmail.com>'

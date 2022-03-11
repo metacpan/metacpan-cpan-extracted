@@ -14,6 +14,7 @@ my @files = (
     't/00-report-prereqs.t',
     't/cache.t',
     't/class_role_inherited.t',
+    't/custom_import.t',
     't/late_role_to_object.t',
     't/lib/B1.pm',
     't/lib/B2.pm',

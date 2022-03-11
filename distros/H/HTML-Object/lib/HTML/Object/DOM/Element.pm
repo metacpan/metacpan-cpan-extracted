@@ -2606,6 +2606,8 @@ Returns the appended object.
 
 See L<for more information|https://developer.mozilla.org/en-US/docs/Web/API/Node/appendChild>
 
+=for assignedSlot
+
 =head2 before
 
 Inserts a set of L<element|HTML::Object::Element> or HTML strings in the L<children|/children> list of the L<element|HTML::Object::Element>'s parent, just before the L<element|HTML::Object::Element>.
@@ -2659,6 +2661,8 @@ For example:
 
 See L<for more information|https://developer.mozilla.org/en-US/docs/Web/API/Element/closest>
 
+=for cmp
+
 =head2 compareDocumentPosition
 
 Compares the position of the current element against another element in any other document.
@@ -2683,6 +2687,14 @@ Returns true or false value indicating whether or not an element is a descendant
 
 See L<for more information|https://developer.mozilla.org/en-US/docs/Web/API/Node/contains>
 
+=for css
+
+=for css_cache_check
+
+=for css_cache_store
+
+=for data
+
 =head2 dispatchEvent
 
 Dispatches an event to this element in the DOM and returns a boolean value that indicates whether no handler canceled the event.
@@ -2690,6 +2702,16 @@ Dispatches an event to this element in the DOM and returns a boolean value that 
 This is inherited from L<HTML::Object::EventTarget>
  
 See L<HTML::Object::EventTarget/dispatchEvent> for more information.
+
+=for each
+
+=for empty
+
+=for eq
+
+=for even
+
+=for exists
 
 =head2 getAttribute
 
@@ -2841,9 +2863,13 @@ Provided with a space-separated string of tag names, or an array reference of ta
 
 This is a non-standard method, courtesy of L<John Resig|https://johnresig.com/blog/comparing-document-position/#postcomment>
 
+=for getLocalName
+
 =head2 getNextSibling
 
 This non-standard method is an alias for the property L</nextSibling>
+
+=for getNodePath
 
 =head2 getPreviousSibling
 
@@ -2854,6 +2880,8 @@ This non-standard method is an alias for the property L</previousSibling>
 Returns the context object's root which optionally includes the shadow root if it is available.
 
 See L<for more information|https://developer.mozilla.org/en-US/docs/Web/API/Node/getRootNode>
+
+=for getValue
 
 =head2 hasAttribute
 
@@ -2877,7 +2905,7 @@ Returns a boolean value indicating if the element has the specified attribute, i
 
 =head2 hasAttributes
 
-Returns a boolean value indicating whether the current element has any attributes or not. 
+Returns a boolean value indicating if the element has one or more HTML attributes present.
 
 Example:
 
@@ -2895,11 +2923,13 @@ Normally, under JavaScript, this would return a boolean value indicating whether
 
 See L<for more information|https://developer.mozilla.org/en-US/docs/Web/API/Node/hasChildNodes>
 
-=head2 hasAttributes
+=for hasClass
 
-Returns a boolean value indicating if the element has one or more HTML attributes present.
+=for hide
 
-See L<for more information|https://developer.mozilla.org/en-US/docs/Web/API/Element/hasAttributes>
+=for html
+
+=for index
 
 =head2 insertAdjacentElement
 
@@ -3014,6 +3044,10 @@ Inserts an element before the reference element as a child of a specified parent
 
 See L<for more information|https://developer.mozilla.org/en-US/docs/Web/API/Node/insertBefore>
 
+=for isa_collection
+
+=for isa_element
+
 =head2 isDefaultNamespace
 
 Accepts a namespace URI as an argument and returns a boolean value with a value of true if the namespace is the default namespace on the given element or false if not.
@@ -3034,6 +3068,10 @@ Returns a boolean value indicating whether or not the two elements are the same 
 
 See L<for more information|https://developer.mozilla.org/en-US/docs/Web/API/Node/isSameNode>
 
+=for length
+
+=for load
+
 =head2 lookupNamespaceURI
 
 Accepts a prefix and returns the namespace URI associated with it on the given element if found (and C<undef> if not). Supplying C<undef> for the prefix will return the default namespace.
@@ -3049,6 +3087,8 @@ This always returns C<undef>.
 Returns a string containing the prefix for a given namespace URI, if present, and C<undef> if not.
 
 See L<for more information|https://developer.mozilla.org/en-US/docs/Web/API/Node/lookupPrefix>
+
+=for map
 
 =head2 matches
 
@@ -3074,6 +3114,8 @@ Example:
     # The Philippine eagle is endangered!
 
 See L<for more information|https://developer.mozilla.org/en-US/docs/Web/API/Element/matches>
+
+=for name
 
 =head2 new_attribute
 
@@ -3123,6 +3165,8 @@ Returns a new L<HTML::Object::DOM> object, passing it whatever arguments were pr
 
 If an error occurred, this returns C<undef> and sets an L<error|Module::Generic/error>
 
+=for new_root
+
 =head2 new_space
 
 Returns a new L<HTML::Object::DOM::Space> object, passing it whatever arguments were provided and return the newly instantiated object.
@@ -3140,6 +3184,8 @@ If an error occurred, this returns C<undef> and sets an L<error|Module::Generic/
 Clean up all the text elements under this element (merge adjacent, remove empty).
 
 See L<for more information|https://developer.mozilla.org/en-US/docs/Web/API/Node/normalize>
+
+=for odd
 
 =head2 prepend
 
@@ -3187,6 +3233,12 @@ Prepending both an element and some text
     my $list = $div->childNodes;
 
 See L<for more information|https://developer.mozilla.org/en-US/docs/Web/API/Element/prepend>
+
+=for prependTo
+
+=for promise
+
+=for prop
 
 =head2 querySelector
 
@@ -3302,6 +3354,8 @@ In perl, there is no such elaborate CSS engine that would allow us this level of
 
 See L<for more information|https://developer.mozilla.org/en-US/docs/Web/API/Element/querySelectorAll>
 
+=for rank
+
 =head2 remove
 
 Removes the element from the children list of its parent.
@@ -3323,6 +3377,8 @@ Example:
     $el->remove(); # Removes the div with the 'div-02' id
 
 See L<for more information|https://developer.mozilla.org/en-US/docs/Web/API/Element/remove>
+
+=for removeAttr
 
 =head2 removeAttribute
 
@@ -3371,6 +3427,8 @@ See L<for more information|https://developer.mozilla.org/en-US/docs/Web/API/Elem
 Removes a child element from the current element, which must be a child of the current element.
 
 See L<for more information|https://developer.mozilla.org/en-US/docs/Web/API/Node/removeChild>
+
+=for removeClass
 
 =head2 removeEventListener
 
@@ -3423,6 +3481,8 @@ Example:
     # "<div><span></span></div>"
 
 See L<for more information|https://developer.mozilla.org/en-US/docs/Web/API/Element/replaceWith>
+
+=for set_namespace
 
 =head2 setAttribute
 
@@ -3488,6 +3548,12 @@ Under JavaScript, this would set the L<node|HTML::Object::DOM::Attribute> repres
 
 See L<for more information|https://developer.mozilla.org/en-US/docs/Web/API/Element/setAttributeNS>
 
+=for show
+
+=for string_value
+
+=for tagname
+
 =head2 toggleAttribute
 
 Provided with an attribute name and an optiona C<force> value, and this toggles a boolean attribute, removing it if it is present and adding it if it is not present, on the specified element.
@@ -3515,6 +3581,8 @@ To toggle the C<disabled> attribute of an input field
 
 See L<for more information|https://developer.mozilla.org/en-US/docs/Web/API/Element/toggleAttribute>
 
+=for toggleClass
+
 =head2 toString
 
 Returns a string representation for this element.
@@ -3522,6 +3590,8 @@ Returns a string representation for this element.
 =head2 to_number
 
 Returns a L<HTML::Object::DOM::Number> object representing the text value of this element.
+
+=for xq
 
 =head1 EVENTS
 

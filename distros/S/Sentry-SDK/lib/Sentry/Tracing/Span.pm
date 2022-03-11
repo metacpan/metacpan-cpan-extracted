@@ -112,10 +112,6 @@ sub set_http_status ($self, $status) {
   $self->status(Sentry::Tracing::Status->from_http_code($status));
 }
 
-sub to_hash ($self) {
-  return { 'sentry-trace' => $self->to_sentry_trace };
-}
-
 sub finish ($self) {
   $self->timestamp(time);
 }

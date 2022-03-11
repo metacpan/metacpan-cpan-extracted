@@ -60,8 +60,10 @@ t/dsn.t
 t/lib/Mock/Sentry/Client.pm
 t/pod-coverage.t
 t/pod.t
+t/scope.t
 t/sdk.t
 t/sentry-status.t
+t/sentry-tracing-span.t
 t/severity.t
 t/snapshots/sdk_t/client_options
 t/snapshots/sdk_t/client_options_env_

@@ -158,14 +158,14 @@ Example:
     my $anchor = $document->createElement("a");
 
     $anchor->href = "https://example.org/some/where"
-    $anchor->host == "example.org"
+    $anchor->host = "example.org"
 
     $anchor->href = "https://example.org:443/some/where"
-    $anchor->host == "example.org"
+    $anchor->host = "example.org"
     # The port number is not included because 443 is the scheme's default port
 
     $anchor->href = "https://example.org:4097/some/where"
-    $anchor->host == "example.org:4097"
+    $anchor->host = "example.org:4097"
 
 See L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/HTMLAnchorElement/host>
 

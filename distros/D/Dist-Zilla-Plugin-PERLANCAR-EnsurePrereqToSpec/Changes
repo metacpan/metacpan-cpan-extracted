@@ -1,3 +1,9 @@
+0.064   2022-02-16  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] Handle prereq to spec when the spec module is in the
+          current dist.
+
+
 0.063   2022-02-14  Released-By: PERLANCAR; Urgency: medium
 
         - Allow dists that do not have BorderStyle/*pm to specify a spec

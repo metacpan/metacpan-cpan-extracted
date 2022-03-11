@@ -6,6 +6,7 @@ META.yml
 README.md
 t/load.t
 t/lite.t
+t/Lite/Route/Admin.pm
 t/Lite/Route/Bar.pm
 t/Lite/Route/Bar/Qux.pm
 t/Lite/Route/Bar/Qux/B.pm

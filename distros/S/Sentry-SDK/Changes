@@ -1,6 +1,10 @@
 Revision history for Sentry-SDK
 
 
+v1.0.16  2022-03-11 13:14:04 CET
+
+  - Fix: Even if tracing is disabled, send the request payload
+
 v1.0.15  2022-02-05 12:43:38 CET
 
   - Fix: Too few arguments for subroutine 'Sentry::Tracing::Span::set_http_status'

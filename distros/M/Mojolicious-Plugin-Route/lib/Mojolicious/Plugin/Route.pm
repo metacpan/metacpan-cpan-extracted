@@ -10,7 +10,7 @@ use constant BASE => {
     references => {}
 };
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 sub register {
     my ($self, $app, $conf) = @_;
@@ -74,12 +74,6 @@ sub _load_routes {
     }
 }
 
-sub test {
-    my $self = shift;
-
-
-}
-
 sub _any {
     my ($self, $app, $ref, $file, $base) = @_;
 
@@ -112,20 +106,17 @@ sub _route {
     my ($self, $app, $ref, $file, $base) = @_;
 
     my ($name, $ref_name) = $self->_ref_name($file, $base);
-    
-    warn 1 if defined BASE->{references}->{$ref_name ? $ref_name . '::' . $name : $name};
 
     $ref->route(
         (
             defined BASE->{references}->{$ref_name ? $ref_name . '::' . $name : $name}
-            ? BASE->{references}->{$ref_name ? $ref_name . '::' . $name : $name}
+            ? (BASE->{references}->{$ref_name ? $ref_name . '::' . $name : $name}, $app->routes)
             : ( 
                 $ref_name && defined BASE->{references}->{$ref_name}
-                ? BASE->{references}->{$ref_name}
+                ? (BASE->{references}->{$ref_name}, $app->routes)
                 : $app->routes
             )
-        ),
-        $app->routes
+        )
     );
 }
 
@@ -281,6 +272,47 @@ Reference of the method any will be saved to be used in the files with the same 
     1;
 
 Similar to method any, the reference of the method under will be saved to be used in the files with the same namespace, not to be saved you need return undef.
+
+=head1 OPTIONS
+
+    # Mojolicious::Lite
+    plugin Route => {namespace => 'Foo'}; # $moniker::Foo
+
+Namespace to load routes from, defaults to $moniker::Route.
+
+=head1 EXAMPLES
+
+    package MyApp::Route::Admin;
+    use Mojo::Base 'MojoX::Route';
+
+    sub under {
+        my ($self, $r) = @_;
+
+        my $under = $r->under('/admin' => sub {
+            my $c = shift;
+
+            return 1 if $c->req->url->to_abs->userinfo eq 'Admin:Password';
+            
+            $c->res->headers->www_authenticate('Basic');
+            $c->render(text => 'Authentication required!', status => 401);
+            
+            return;
+        });
+    }
+
+    sub route {
+        my ($self, $under_above, $r) = @_;
+        
+        $r->get('/login' => sub {
+            shift->render(text => 'Login');
+        });
+        
+        $under_above->get('/' => sub {
+            shift->render(text => 'Admin');
+        });
+    }
+
+    1;
 
 =head1 SEE ALSO
 

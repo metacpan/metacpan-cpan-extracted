@@ -471,7 +471,7 @@ Stops the propagation of events further along in the DOM.
 
 Returns the subroutine where this event was called from.
 
-=head2 CONSTANTS
+=head1 CONSTANTS
 
 =head2 NONE (0)
 

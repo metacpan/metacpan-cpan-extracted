@@ -4,7 +4,7 @@
       "Tokuhiro Matsuno"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.9",
+   "generated_by" : "Minilla/v3.1.15",
    "license" : [
       "perl_5"
    ],
@@ -59,7 +59,7 @@
    "provides" : {
       "Data::MessagePack" : {
          "file" : "lib/Data/MessagePack.pm",
-         "version" : "1.01"
+         "version" : "1.02"
       },
       "Data::MessagePack::Boolean" : {
          "file" : "lib/Data/MessagePack/Boolean.pm"
@@ -75,11 +75,12 @@
       },
       "homepage" : "https://github.com/msgpack/msgpack-perl",
       "repository" : {
-         "url" : "git://github.com/msgpack/msgpack-perl.git",
+         "type" : "git",
+         "url" : "https://github.com/msgpack/msgpack-perl.git",
          "web" : "https://github.com/msgpack/msgpack-perl"
       }
    },
-   "version" : "1.01",
+   "version" : "1.02",
    "x_authority" : "cpan:TOKUHIROM",
    "x_contributors" : [
       "Brian Ketelsen <bketelsen@gmail.com>",
@@ -144,6 +145,6 @@
       "tokuhirom <tokuhirom@users.sourceforge.jp>",
       "xanxys <xanxys@gmail.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.02",
+   "x_serialization_backend" : "JSON::PP version 4.07",
    "x_static_install" : 0
 }

@@ -1,20 +1,29 @@
 package Dist::Zilla::Role::RequireFromBuild;
 
-our $DATE = '2017-01-09'; # DATE
-our $VERSION = '0.006'; # VERSION
-
+use strict;
+use warnings;
 use 5.010001;
 use Moose::Role;
 
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-02-19'; # DATE
+our $DIST = 'Dist-Zilla-Role-RequireFromBuild'; # DIST
+our $VERSION = '0.007'; # VERSION
+
 sub require_from_build {
-    my ($self, $name) = @_;
+    my $self = shift;
+    my $opts = ref $_[0] eq 'HASH' ? shift : {};
+    my ($name) = @_;
 
     if ($name =~ /::/) {
         $name =~ s!::!/!g;
         $name .= ".pm";
     }
 
-    return if exists $INC{$name};
+    if (exists $INC{$name} && !$opts->{reload}) {
+        $self->log_debug(["Module %s has been loaded(%%INC entry: %s), skipped require-ing", $name, $INC{$name}]);
+        return;
+    }
 
     my @files = grep { $_->name eq "lib/$name" } @{ $self->zilla->files };
     @files    = grep { $_->name eq $name }       @{ $self->zilla->files }
@@ -23,7 +32,7 @@ sub require_from_build {
 
     my $file = $files[0];
     my $filename = $file->name;
-    eval "# line 1 \"$filename (from dist build)\"\n" . $file->encoded_content;
+    eval "# line 1 \"$filename (from dist build)\"\n" . $file->encoded_content; ## no critic: BuiltinFunctions::ProhibitStringyEval
     die if $@;
     $INC{$name} = "(set by ".__PACKAGE__.", from build files)";
 }
@@ -44,7 +53,7 @@ Dist::Zilla::Role::RequireFromBuild - Role to require() from build files
 
 =head1 VERSION
 
-This document describes version 0.006 of Dist::Zilla::Role::RequireFromBuild (from Perl distribution Dist-Zilla-Role-RequireFromBuild), released on 2017-01-09.
+This document describes version 0.007 of Dist::Zilla::Role::RequireFromBuild (from Perl distribution Dist-Zilla-Role-RequireFromBuild), released on 2022-02-19.
 
 =head1 SYNOPSIS
 
@@ -80,9 +89,20 @@ like:
 
  $INC{"Foo/Bar.pm"} = "(set by Dist::Zilla::Role::RequireFromBuild, loaded from build file)";
 
-=head1 METHODS
+=head1 PROVIDED METHODS
 
-=head2 $obj->require_from_build($file)
+=head2 $obj->require_from_build( [ \%opts , ] $file)
+
+Known options:
+
+=over
+
+=item * reload
+
+Bool. Optional, default false. If set to true, will reload the module even if
+it's already loaded.
+
+=back
 
 =head1 HOMEPAGE
 
@@ -92,6 +112,40 @@ Please visit the project's homepage at L<https://metacpan.org/release/Dist-Zilla
 
 Source repository is at L<https://github.com/perlancar/perl-Dist-Zilla-Role-RequireFromBuild>.
 
+=head1 SEE ALSO
+
+L<Require::Hook::DzilBuild>
+
+L<Pod::Weaver::Role::RequireFromBuild>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022, 2017 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Role-RequireFromBuild>
@@ -99,20 +153,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 SEE ALSO
-
-L<Require::Hook::DzilBuild>
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2017 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

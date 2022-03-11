@@ -1,11 +1,12 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/XQuery.pm
-## Version v0.1.0
+## Version v0.1.1
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/01
-## Modified 2021/08/23
+## Modified 2022/01/22
 ## All rights reserved
+## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
@@ -17,7 +18,7 @@ BEGIN
     use warnings;
     use parent qw( HTML::Object::DOM );
     our @EXPORT = qw( xq );
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.1.1';
 };
 
 {
@@ -3302,4 +3303,3 @@ sub _xpath_value { shift( @_ ); return( ref( $_[0] ) ? ${$_[0]} : HTML::Selector
 1;
 # XXX POD
 __END__
-

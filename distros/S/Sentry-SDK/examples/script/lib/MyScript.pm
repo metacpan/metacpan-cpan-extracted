@@ -45,10 +45,13 @@ sub main {
 
   # Sentry::SDK->capture_message('ich bin eine separate message');
 
-  my $transaction
-    = Sentry::SDK->start_transaction(
-      { name    => 'MyScript', op => 'http.server', },
-      { request => { url => '/foo/bar', query => { bla => 'blubb' } } });
+  my $transaction = Sentry::SDK->start_transaction(
+    {
+      name    => 'MyScript',
+      op      => 'http.server',
+      request => { url => '/foo/bar', query => { bla => 'blubb' } }
+    },
+  );
   Sentry::SDK->configure_scope(sub ($scope) {
     $scope->set_span($transaction);
   });

@@ -1,0 +1,40 @@
+---
+abstract: 'Decode QR code(s) from images using the OpenCV/WeChat library via XS'
+author:
+  - 'Andreas Hadjiprocopis <bliako@cpan.org>'
+build_requires:
+  Data::Roundtrip: '0.11'
+  Encode: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Copy: '0'
+  File::ShareDir::Install: '0'
+  File::Spec: '0'
+  FindBin: '0'
+  Test::More: '0'
+configure_requires:
+  Devel::CheckLib: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Copy: '0'
+  File::ShareDir::Install: '0'
+  File::Spec: '0'
+  FindBin: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Image-DecodeQR-WeChat
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Data::Roundtrip: '0.11'
+  Getopt::Long: '0'
+  perl: '5.006'
+resources:
+  homepage: https://metacpan.org/module/Image::DecodeQR::WeChat
+  repository: https://github.com/hadjiprocopis/perl-image-decodeqr-wechat
+version: '0.3'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

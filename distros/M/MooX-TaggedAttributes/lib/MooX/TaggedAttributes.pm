@@ -7,7 +7,7 @@ use v5.10.1;
 use strict;
 use warnings;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 use Carp;
 use MRO::Compat;
@@ -22,6 +22,14 @@ our %TAGCACHE;
 
 my %ARGS = ( -tags => [] );
 
+our $_role_import = sub {
+    my $class = shift;
+    return unless Moo::Role->is_role( $class );
+    my $target = caller;
+    Moo::Role->apply_roles_to_package( $target, $class );
+    _install_tags( $target, $TAGSTORE{$class} );
+};
+
 sub import {
 
     my ( $class, @args ) = @_;
@@ -34,7 +42,6 @@ sub import {
     my %args = %ARGS;
 
     while ( @args ) {
-
         my $arg = shift @args;
 
         croak( "unknown argument to ", __PACKAGE__, ": $arg" )
@@ -49,29 +56,8 @@ sub import {
     _install_tags( $target, $args{-tags} )
       if @{ $args{-tags} };
 
-    _install_role_import( $target );
-}
-
-# this needs to be accessible by tag role import() methods, but don't want it
-# to pollute the namespace
-our $_role_import = sub {
-    my $class = shift;
-    return unless Moo::Role->is_role( $class );
-
-    my $target = caller;
-    Moo::Role->apply_roles_to_package( $target, $class );
-    _install_tags( $target, $TAGSTORE{$class} );
-};
-
-
-sub _install_role_import {
-    my $target = shift;
-
-    ## no critic (ProhibitStringyEval)
-
-    croak( "error installing import routine into $target\n" )
-      unless eval
-      "package $target; sub import { goto \$MooX::TaggedAttributes::_role_import }; 1;";
+    no strict 'refs';    ## no critic
+    *${ \"${target}::import" } = $_role_import;
 }
 
 
@@ -99,8 +85,7 @@ sub _install_tag_handler {
     # so that if namespace::clean is called on the target class
     # we don't lose access to it.
 
-    ## no critic (ProhibitStringyEval)
-    my $around = eval( "package $target; sub { goto &around }" );
+    my $around = \&${ \"${target}::around" };
 
     install_modifier(
         $target,
@@ -118,7 +103,7 @@ sub _install_tag_handler {
                     ## no critic (ProhibitAccessOfPrivateData)
                     return [
                         @{&$orig},
-                        map { [ $_, $attrs, $attr{$_} ] }
+                        map    { [ $_, $attrs, $attr{$_} ] }
                           grep { exists $attr{$_} } @tags,
                     ];
 
@@ -134,7 +119,7 @@ use Moo::Role;
 
 use Sub::Name 'subname';
 
-my $can = sub { ( shift )->next::can };
+my $maybe_next_method = sub { ( shift )->maybe::next::method };
 
 # this modifier is run once for each composition of a tag role into
 # the class.  role composition is orthogonal to class inheritance, so we
@@ -144,16 +129,17 @@ my $can = sub { ( shift )->next::can };
 # but note that djerius' published solution was incomplete.
 around _tag_list => sub {
 
-    # 1. call &$orig to handle tag role compositions into the current class
-    # 2. call up the inheritance stack to handle parent class tag role compositions.
+# 1. call &$orig to handle tag role compositions into the current class
+# 2. call up the inheritance stack to handle parent class tag role compositions.
 
     my $orig    = shift;
     my $package = caller;
 
     # create the proper environment context for next::can
-    my $next = ( subname "${package}::_tag_list" => $can )->( $_[0] );
+    my $code = subname( "${package}::_tag_list" => $maybe_next_method );
+    my $next = $_[0]->$code;
 
-    return [ @{&$orig}, $next ? @{&$next} : () ];
+    return [ @{&$orig}, $next ? @{$next} : () ];
 };
 
 
@@ -178,7 +164,7 @@ sub _class_tags {
     # return cached values if available.  They are stored in %TAGCACHE
     # on the first object method call to _tags(), at which point we've
     # decreed the class as being complete.
-    return $TAGCACHE{$class} || MooX::TaggedAttributes::Cache->new( $class )
+    return $TAGCACHE{$class} || MooX::TaggedAttributes::Cache->new( $class );
 }
 
 use namespace::clean -except => qw( import  );
@@ -194,7 +180,7 @@ sub _tag_list { [] }
 sub _tags {
     my $class = blessed $_[0];
     $class
-      ? $TAGCACHE{ $class } ||= _class_tags( $class )
+      ? $TAGCACHE{$class} ||= _class_tags( $class )
       : _class_tags( $_[0] );
 }
 
@@ -222,7 +208,7 @@ MooX::TaggedAttributes - Add a tag with an arbitrary value to a an attribute
 
 =head1 VERSION
 
-version 0.11
+version 0.12
 
 =head1 SYNOPSIS
 
@@ -377,11 +363,9 @@ The tag structure returned by  C<< C->_tags >>
 
  bless({ t1 => { a => 2 }, t2 => { b => "foo" } }, "MooX::TaggedAttributes::Cache")
 
-
 and C<< C->new->_tags >>
 
  bless({ t1 => { a => 2 }, t2 => { b => "foo" } }, "MooX::TaggedAttributes::Cache")
-
 
 are identical.
 

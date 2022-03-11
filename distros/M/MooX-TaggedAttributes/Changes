@@ -1,5 +1,12 @@
 Revision history for MooX-TaggedAttributes
 
+0.12      2022-03-10 16:42:46-05:00 America/New_York
+
+  [ENHANCEMENT]
+
+   * access symbol table directly rather than through eval
+   * slightly more efficient lookup of inherited tags
+
 0.11      2021-06-21 21:31:30-04:00 America/New_York
 
   [ BUILD ]

@@ -1,4 +1,11 @@
-0.006   2017-01-09 (PERLANCAR)
+0.007   2022-02-19  Released-By: PERLANCAR; Urgency: medium
+
+        - Add option 'reload'.
+
+        - [doc] Mention Pod::Weaver::Role:RequireFromBuild.
+
+
+0.006   2017-01-09  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -6,29 +13,29 @@
 	  Require::Hook::DzilBuild.
 
 
-0.005   2017-01-09 (PERLANCAR)
+0.005   2017-01-09  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [doc] Mention lib::dzil::build.
 
 
-0.004   2017-01-09 (PERLANCAR)
+0.004   2017-01-09  Released-By: PERLANCAR
 
 	- [Bugfix] Check and set entry in %INC, to behave more like
 	  require().
 
 
-0.003   2017-01-09 (PERLANCAR)
+0.003   2017-01-09  Released-By: PERLANCAR
 
 	- [Bugfix] Forgot to dereference.
 
 
-0.002   2017-01-08 (PERLANCAR)
+0.002   2017-01-08  Released-By: PERLANCAR
 
         - Do away with temporary file, we can directly eval() the source code.
 
 
-0.001   2017-01-08 (PERLANCAR)
+0.001   2017-01-08  Released-By: PERLANCAR
 
         - First release.

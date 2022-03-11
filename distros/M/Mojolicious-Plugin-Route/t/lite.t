@@ -14,5 +14,16 @@ $t->get_ok('/baz/a')->status_is(200)->content_is('Baz::A');
 
 $t->get_ok('/bar/qux/b')->status_is(200)->content_is('Bar::Qux::B');
 
-ok(1, 'Test');
+$t->get_ok('/b')->status_is(200)->content_is('B');
+
+$t->get_ok('/login')->status_is(200)->content_is('Login');
+
+$t->get_ok('//Admin:Password@/admin')
+  ->status_is(200)
+  ->content_is('Admin');
+  
+$t->get_ok('//Foo:Baz@/admin')
+  ->status_is(401)
+  ->content_is('Authentication required!');  
+
 done_testing;

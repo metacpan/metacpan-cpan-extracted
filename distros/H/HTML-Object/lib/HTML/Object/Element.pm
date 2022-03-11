@@ -227,7 +227,6 @@ sub as_string
         }
         else
         {
-            $self->message( 4, "\$a contains '", $a->join( ',' )->scalar, "'" );
             $res->push( $a->join( ' ' )->scalar );
             $res->push( '>' ) unless( $self->original->defined && $hash1 eq $hash2 );
             # If it has a parent, the parent will contain the closing tag, but
@@ -1698,6 +1697,62 @@ For a more elaborate interface and a close implementation of the Web Document Ob
 
 =head1 METHODS
 
+=for Pod::Coverage add
+
+=for Pod::Coverage addClass
+
+=for Pod::Coverage appendTo
+
+=for Pod::Coverage align
+
+=for Pod::Coverage compact
+
+=for Pod::Coverage crossOrigin
+
+=for Pod::Coverage currentSrc
+
+=for Pod::Coverage defaultValue
+
+=for Pod::Coverage download
+
+=for Pod::Coverage form
+
+=for Pod::Coverage hash
+
+=for Pod::Coverage host
+
+=for Pod::Coverage hostname
+
+=for Pod::Coverage href
+
+=for Pod::Coverage hreflang
+
+=for Pod::Coverage origin
+
+=for Pod::Coverage password
+
+=for Pod::Coverage pathname
+
+=for Pod::Coverage port
+
+=for Pod::Coverage protocol
+
+=for Pod::Coverage referrerPolicy
+
+=for Pod::Coverage rel
+
+=for Pod::Coverage relList
+
+=for Pod::Coverage search
+
+=for Pod::Coverage setCustomValidity
+
+=for Pod::Coverage target
+
+=for Pod::Coverage useMap
+
+=for Pod::Coverage username
+
 =head2 address
 
 This method is purely for compatibility with L<HTML::Element/address>. Please, refer to its documentation for its use.
@@ -1964,7 +2019,24 @@ This is the method that does the heavy work for L</look_down> and L</look_up>
 
 =head2 look_down
 
-Provided with some criterias, and this will crawl down the current element hierarchy to find any matching element.
+Provided with some criterias, and an optional hash reference of options, and this will crawl down the current element hierarchy to find any matching element.
+
+    my $list = $e->look_down( _tag => 'div' ); # returns an Module::Generic::Array object
+    my $list = $e->look_down( class => qr/\bclass_name\b/, { max_level => 3, max_match => 1 });
+
+The options you can specify are:
+
+=over 4
+
+=item I<max_level>
+
+Takes an integer that sets the maximum lower or upper level beyond which, this wil stop searching.
+
+=item I<max_match>
+
+Takes an integer that sets the maximum number of matches after which, this will stop recurring and return the result.
+
+=back
 
 There are three kinds of criteria you can specify:
 
@@ -2034,7 +2106,9 @@ This is provided as a compatibility with C<HTML::Element>
 
 =head2 look_up
 
-Provided with an hash or an hash reference of criteria, and this will crawl up the current element ascendants starting with its parent to find any matching element.
+Provided with some criterias, and an optional hash reference of options, and this will crawl up the current element ascendants starting with its parent to find any matching element.
+
+The options that can be used are the same ones that for L</look_down>, i.e. C<max_level> and C<max_match>
 
 It returns an L<array object|Module::Generic::Array> of all the elements found.
 

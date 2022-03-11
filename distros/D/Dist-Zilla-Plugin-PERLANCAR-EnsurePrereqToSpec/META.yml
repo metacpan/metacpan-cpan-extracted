@@ -19,10 +19,11 @@ name: Dist-Zilla-Plugin-PERLANCAR-EnsurePrereqToSpec
 provides:
   Dist::Zilla::Plugin::PERLANCAR::EnsurePrereqToSpec:
     file: lib/Dist/Zilla/Plugin/PERLANCAR/EnsurePrereqToSpec.pm
-    version: '0.063'
+    version: '0.064'
 requires:
   Dist::Zilla::Role::AfterBuild: '0'
   Dist::Zilla::Role::FileFinderUser: '0'
+  Dist::Zilla::Role::ModuleMetadata: '0'
   Dist::Zilla::Role::Rinci::CheckDefinesMeta: '0'
   Moose: '0'
   namespace::autoclean: '0'
@@ -33,7 +34,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-PERLANCAR-EnsurePrereqToSpec
   homepage: https://metacpan.org/release/Dist-Zilla-Plugin-PERLANCAR-EnsurePrereqToSpec
   repository: git://github.com/perlancar/perl-Dist-Zilla-Plugin-PERLANCAR-EnsurePrereqToSpec.git
-version: '0.063'
+version: '0.064'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -124,8 +125,12 @@ x_Dist_Zilla:
       version: '0.02'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::EnsurePrereqToSpec
+      config:
+        Dist::Zilla::Role::ModuleMetadata:
+          Module::Metadata: '1.000037'
+          version: '0.006'
       name: '@Author::PERLANCAR/PERLANCAR::EnsurePrereqToSpec'
-      version: '0.062'
+      version: '0.063'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::MetaResources
       name: '@Author::PERLANCAR/PERLANCAR::MetaResources'

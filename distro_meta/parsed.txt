@@ -77602,3 +77602,13 @@ C/CA/CAVAC/XML-RPC-2.tar.gz
 T/TI/TINITA/YAML-PP-0.032.tar.gz
 T/TI/TINITA/YAML-PP-Ref-0.02.tar.gz
 L/LN/LNATION/YAOO-0.09.tar.gz
+P/PM/PMB/Sentry-SDK-v1.0.16.tar.gz
+J/JO/JONOZZZ/Crypt-OpenSSL-PKCS10-0.17.tar.gz
+S/SY/SYOHEX/Data-MessagePack-1.02.tar.gz
+P/PE/PERLANCAR/Dist-Zilla-Plugin-PERLANCAR-EnsurePrereqToSpec-0.064.tar.gz
+P/PE/PERLANCAR/Dist-Zilla-Role-RequireFromBuild-0.007.tar.gz
+J/JD/JDEGUEST/HTML-Object-v0.1.3.tar.gz
+B/BL/BLIAKO/Image-DecodeQR-WeChat-0.3.tar.gz
+L/LT/LTM/Mojolicious-Plugin-Route-0.03.tar.gz
+D/DJ/DJERIUS/MooX-TaggedAttributes-0.12.tar.gz
+L/LA/LANCEW/WebService-SmartRow-0.005.tar.gz
