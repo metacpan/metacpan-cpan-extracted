@@ -248,6 +248,7 @@ lib/Alien/Build/Util.pm
 lib/Alien/Build/Version/Basic.pm
 lib/Alien/Build/rc.pm
 lib/Alien/Role.pm
+lib/Alien/Util.pm
 lib/Test/Alien.pm
 lib/Test/Alien/Build.pm
 lib/Test/Alien/CanCompile.pm
@@ -336,6 +337,7 @@ t/alien_build_tempdir.t
 t/alien_build_util.t
 t/alien_build_version_basic.t
 t/alien_role.t
+t/alien_util.t
 t/alienfile.t
 t/bin/ftpd
 t/bin/httpd

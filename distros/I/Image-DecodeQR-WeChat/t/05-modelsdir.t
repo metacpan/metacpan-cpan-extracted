@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-our $VERSION = '0.3';
+our $VERSION = '0.7';
 
 use Test::More;
 

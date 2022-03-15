@@ -6,7 +6,7 @@
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "unknown"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -22,21 +22,35 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "0",
+            "Test" : "0"
          }
       },
       "configure" : {
          "requires" : {
+            "Crypt::OpenSSL::Guess" : "0.11",
             "ExtUtils::MakeMaker" : "0"
          }
       },
       "runtime" : {
+         "recommends" : {
+            "Crypt::OpenSSL::Bignum" : "0"
+         },
          "requires" : {
             "Crypt::OpenSSL::RSA" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.17",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Crypt-OpenSSL-PKCS10"
+      },
+      "homepage" : "https://metacpan.org/pod/Crypt::OpenSSL::PKCS10",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.18",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

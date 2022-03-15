@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Test::More;
 
-our $VERSION = '0.3';
+our $VERSION = '0.7';
 
 BEGIN {
     use_ok( 'Image::DecodeQR::WeChat' ); # || print "Bail out!\n";

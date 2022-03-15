@@ -52,6 +52,7 @@ my @files = (
     'lib/Dancer2/Core/Session.pm',
     'lib/Dancer2/Core/Time.pm',
     'lib/Dancer2/Core/Types.pm',
+    'lib/Dancer2/DeprecationPolicy.pod',
     'lib/Dancer2/FileUtils.pm',
     'lib/Dancer2/Handler/AutoPage.pm',
     'lib/Dancer2/Handler/File.pm',

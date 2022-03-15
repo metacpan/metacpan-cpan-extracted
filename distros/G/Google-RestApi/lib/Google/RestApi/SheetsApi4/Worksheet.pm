@@ -1,6 +1,6 @@
 package Google::RestApi::SheetsApi4::Worksheet;
 
-our $VERSION = '1.0.1';
+our $VERSION = '1.0.2';
 
 use Google::RestApi::Setup;
 
@@ -25,10 +25,14 @@ sub new {
     spreadsheet => HasApi,
     id          => Str, { optional => 1 },    # the worksheet id (1, 2, 3 etc).
     name        => Str, { optional => 1 },    # the name of the worksheet.
+    title       => Str, { optional => 1 },
     uri         => StrMatch[qr|$qr_worksheet_uri|], { optional => 1 },
   );
   my $self = $check->(@_);
   $self = bless $self, $class;
+
+  $self->{name} ||= $self->{title};
+  delete $self->{title};
 
   defined $self->{id} || defined $self->{name} || $self->{uri}
     or LOGDIE "At least one of id, name, or uri must be specified";
@@ -60,6 +64,7 @@ sub worksheet_name {
   $self->{name} //= $self->properties('title')->{title};
   return $self->{name};
 }
+sub worksheet_title { worksheet_name(@_); }
 
 # https://docs.google.com/spreadsheets/d/spreadsheetId/edit#gid=0
 sub worksheet_uri {

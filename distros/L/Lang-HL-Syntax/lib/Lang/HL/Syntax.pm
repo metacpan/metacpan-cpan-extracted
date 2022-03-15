@@ -568,6 +568,17 @@ sub printError {
       $currentFunctionName, "\nnextTokens: ", $nextTokens, "\n";
 }
 
+sub putTokensInReverse {
+    my ($class, $tokens) = @_;
+    my @tokens = @{$tokens};
+
+    my @tokensList = @{ $class->{"ParserHelpers"}->{"Tokens"} };
+    foreach my $token (@tokens) {
+        unshift @tokensList, $token;
+    }
+
+    $class->{"ParserHelpers"}->{"Tokens"} = \@tokensList;
+}
 1;
 
 #####################################################################
@@ -605,7 +616,7 @@ sub Lang {
     my $lang = "";
 
     my $classString = $class->Class();
-    if ($class) {
+    if ($classString) {
         $lang .= $classString;
     }
     else {
@@ -652,20 +663,7 @@ sub Class {
         return 0;
     }
 
-    return $classBlock;
-}
-
-sub TokenClass {
-    my ($class) = @_;
-
-    my $currentToken = $class->getToken();
-    if ( $currentToken->{"value"} eq "class" ) {
-        return "class";
-    }
-    else {
-        $class->putToken($currentToken);
-        return 0;
-    }
+    return $classString;
 }
 
 sub ClassName {
@@ -702,6 +700,7 @@ sub ClassBlock {
         return 0;
     }
 
+    $currentToken = $class->getToken();
     if ( $currentToken->{"value"} eq "}" ) {
         $classBlock .= "\n}";
     }
@@ -1124,6 +1123,7 @@ sub PackageName {
         $packageName .= $currentToken->{"value"};
     }
     else {
+        $class->putToken($currentToken);
         return $packageName;
     }
 
@@ -1138,7 +1138,7 @@ sub PackageName {
     return $packageName;
 }
 
-sub PackageWithConstructor {
+sub PackageWithoutConstructor {
     my ($class) = @_;
     my $packageWithConstructor = "";
 
@@ -1175,6 +1175,7 @@ sub QW {
         $qw .= $currentToken->{"value"};
     }
     else {
+        $class->putToken($currentToken);
         return 0;
     }
 
@@ -1191,6 +1192,7 @@ sub QW {
         $qw .= $currentToken->{"value"};
     }
     else {
+        $class->putToken($currentToken);
         return 0;
     }
 
@@ -1237,6 +1239,7 @@ sub Constructor {
         $constructor .= $currentToken->{"value"};
     }
     else {
+        $class->putToken($currentToken);
         return 0;
     }
 
@@ -1252,6 +1255,7 @@ sub Object {
         $object .= $currentToken->{"value"};
     }
     else {
+        $class->putToken($currentToken);
         return 0;
     }
 
@@ -1267,6 +1271,7 @@ sub PackageDir {
         $packageDir .= $currentToken->{"value"};
     }
     else {
+        $class->putToken($currentToken);
         return 0;
     }
 
@@ -1286,6 +1291,7 @@ sub Function {
     }
 
     my $functionName = $class->FunctionName();
+    $class->setCurrentFunction($functionName);
     if ($functionName) {
         $function .= $functionName;
     }
@@ -1298,22 +1304,24 @@ sub Function {
         $function .= $currentToken->{"value"};
     }
     else {
+        $class->putToken($currentToken);
         return 0;
     }
 
     my $functionParamList = $class->FunctionParamList();
     if ($functionParamList) {
         $function .= $functionParamList;
-    }
-    else {
+    } else {
         return 0;
     }
 
-    my $currentToken = $class->getToken();
+
+    $currentToken = $class->getToken();
     if ( $currentToken->{"value"} eq ")" ) {
         $function .= $currentToken->{"value"};
     }
     else {
+        $class->putToken($currentToken);
         return 0;
     }
 
@@ -1335,8 +1343,10 @@ sub FunctionName {
     my $currentToken = $class->getToken();
     if ( $currentToken->{"type"} eq "Symbol" ) {
         $functionName .= $currentToken->{"value"};
+        #$class->setCurrentFunction($functionName);
     }
     else {
+        $class->putToken($currentToken);
         return 0;
     }
 
@@ -1345,19 +1355,14 @@ sub FunctionName {
 
 sub FunctionParamList {
     my ($class) = @_;
-    my $functionParamList = "";
-
-    my $emptyParamList = $class->EmptyParamList();
-    if ($emptyParamList) {
-        return $emptyParamList;
-    }
+    my $functionParamList = "none";
 
     my $functionParams = $class->FunctionParams();
     if ($functionParams) {
         return $functionParams;
     }
 
-    return 0;
+    return $functionParamList;
 }
 
 sub EmptyParamList {
@@ -1405,6 +1410,7 @@ sub Arg {
         $arg .= $currentToken->{"value"};
     }
     else {
+        $class->putToken($currentToken);
         return 0;
     }
 
@@ -1416,10 +1422,11 @@ sub CodeBlock {
     my $codeBlock = "";
 
     my $currentToken = $class->getToken();
-    if ( $currentToken->{"type"} eq "{" ) {
+    if ( $currentToken->{"value"} eq "{" ) {
         $codeBlock .= $currentToken->{"value"};
     }
     else {
+        $class->putToken($currentToken);
         return 0;
     }
 
@@ -1431,11 +1438,12 @@ sub CodeBlock {
         return 0;
     }
 
-    my $currentToken = $class->getToken();
-    if ( $currentToken->{"type"} eq "}" ) {
+    $currentToken = $class->getToken();
+    if ( $currentToken->{"value"} eq "}" ) {
         $codeBlock .= $currentToken->{"value"};
     }
     else {
+        $class->putToken($currentToken);
         return 0;
     }
 
@@ -1451,7 +1459,7 @@ sub Blocks {
         $blocks .= $block;
     }
     else {
-        return $blocks;
+        return 0;
     }
 
     my $rightBlock = $class->Blocks();
@@ -1459,7 +1467,7 @@ sub Blocks {
         $blocks .= $rightBlock;
     }
     else {
-        return 0;
+        return $blocks;
     }
 
     return $blocks;
@@ -1578,6 +1586,7 @@ sub EmbedBegin {
         $embedBegin .= $currentToken->{"value"};
     }
     else {
+        $class->putToken($currentToken);
         return 0;
     }
 
@@ -1593,6 +1602,7 @@ sub EmbedEnd {
         $embedEnd .= $currentToken->{"value"};
     }
     else {
+        $class->putToken($currentToken);
         return 0;
     }
 
@@ -1613,13 +1623,14 @@ sub EmbeddedCode {
 
     my $currentToken = $class->getToken();
     if ( $currentToken->{"type"} eq "EmbedBlock" ) {
-        $embedEnd .= $currentToken->{"value"};
+        $embeddedCode .= $currentToken->{"value"};
     }
     else {
+        $class->putToken($currentToken);
         return 0;
     }
 
-    return $embedEnd;
+    return $embeddedCode;
 }
 
 sub While {
@@ -1830,7 +1841,7 @@ sub ForRange {
         return 0;
     }
 
-    my $dot = $class->Dot();
+    $dot = $class->Dot();
     if ($dot) {
         $forRange .= $dot;
     }
@@ -1838,7 +1849,7 @@ sub ForRange {
         return 0;
     }
 
-    my $dot = $class->Dot();
+    $dot = $class->Dot();
     if ($dot) {
         $forRange .= $dot;
     }
@@ -2017,7 +2028,7 @@ sub BoolExpression {
 
     my $booleanExpression = $class->BooleanExpression();
     if ($booleanExpression) {
-        $boolExpression .= $codeBlock;
+        $boolExpression .= $booleanExpression;
     }
     else {
         return 0;
@@ -2292,7 +2303,6 @@ sub Else {
 
 sub Statement {
     my ($class) = @_;
-    my $statement = "";
 
     my $variableDeclaration = $class->VariableDeclaration();
     if ($variableDeclaration) {
@@ -2304,7 +2314,7 @@ sub Statement {
         return $functionCall;
     }
 
-    my $calssFunctionCall = $class->ClassFunctionCall();
+    my $classFunctionCall = $class->ClassFunctionCall();
     if ($classFunctionCall) {
         return $classFunctionCall;
     }
@@ -2358,7 +2368,7 @@ sub ClassFunctionCall {
     }
 
     my $functionName = $class->FunctionName();
-    if ($funcitonName) {
+    if ($functionName) {
         return $functionName;
     }
     else {
@@ -2389,7 +2399,7 @@ sub ObjectCall {
     return $objectCall;
 }
 
-sub variableDeclaration {
+sub VariableDeclaration {
     my ($class) = @_;
 
     my $arrayDeclaration = $class->ArrayDeclaration();
@@ -2410,7 +2420,7 @@ sub variableDeclaration {
     return 0;
 }
 
-sub scalarDeclaration {
+sub ScalarDeclaration {
     my ($class) = @_;
     my $scalarDeclaration = "";
 
@@ -2466,6 +2476,7 @@ sub Var {
         $var .= $currentToken->{"value"};
     }
     else {
+        $class->putToken($currentToken);
         return 0;
     }
 
@@ -2481,6 +2492,7 @@ sub VariableName {
         $variableName .= $currentToken->{"value"};
     }
     else {
+        $class->putToken($currentToken);
         return 0;
     }
 
@@ -2511,6 +2523,7 @@ sub Number {
         $number .= $currentToken->{"value"};
     }
     else {
+        $class->putToken($currentToken);
         return 0;
     }
 
@@ -2526,6 +2539,7 @@ sub RealNumber {
         $realNumber .= $currentToken->{"value"};
     }
     else {
+        $class->putToken($currentToken);
         return 0;
     }
 
@@ -2536,27 +2550,12 @@ sub String {
     my ($class) = @_;
     my $string = "";
 
-    my $lQuote = $class->LQuote();
-    if ($lQuote) {
-        $string .= $lQuote;
+    my $currentToken = $class->getToken();
+    if($currentToken->{"type"} eq "String") {
+        $string .= $currentToken->{"value"};
     }
     else {
-        return 0;
-    }
-
-    my $stringValue = $class->StringValue();
-    if ($stringValue) {
-        $string .= $stringValue;
-    }
-    else {
-        return 0;
-    }
-
-    my $rQuote = $class->RQuote();
-    if ($rQuote) {
-        $string .= $rQuote;
-    }
-    else {
+        $class->putToken($currentToken);
         return 0;
     }
 
@@ -2602,6 +2601,7 @@ sub StringValue {
         $stringValue .= $currentToken->{"value"};
     }
     else {
+        $class->putToken($currentToken);
         return 0;
     }
 
@@ -2668,8 +2668,8 @@ sub ArrayList {
     }
 
     my $listElements = $class->ListElements();
-    if ($semiColon) {
-        $arrayList .= $semiColon;
+    if ($listElements) {
+        $arrayList .= $listElements;
     }
     else {
         return 0;
@@ -2724,7 +2724,7 @@ sub ListElement {
         return $string;
     }
 
-    my $classfunctionReturn = $class->ClassFunctionReturn();
+    my $classFunctionReturn = $class->ClassFunctionReturn();
     if ($classFunctionReturn) {
         return $classFunctionReturn;
     }
@@ -2915,7 +2915,7 @@ sub PairKey {
         return $number;
     }
 
-    my $stirng = $class->String();
+    my $string = $class->String();
     if ($string) {
         return $string;
     }
@@ -2951,7 +2951,7 @@ sub PairValue {
         return $realNumber;
     }
 
-    my $stirng = $class->String();
+    my $string = $class->String();
     if ($string) {
         return $string;
     }
@@ -3001,11 +3001,12 @@ sub PairValue {
 
 sub FunctionCall {
     my ($class) = @_;
-    my $funcitonCall;
+    my $functionCall = "";
+
 
     my $functionName = $class->FunctionName();
-    if ($funcitonName) {
-        $functionCall .= $funcitonName;
+    if ($functionName) {
+        $functionCall .= $functionName;
     }
     else {
         return 0;
@@ -3045,7 +3046,7 @@ sub FunctionCall {
 
 sub Parameters {
     my ($class) = @_;
-    my $parameters;
+    my $parameters = "";
 
     my $param .= $class->Param();
     if ($param) {
@@ -3082,7 +3083,7 @@ sub Param {
         return $realNumber;
     }
 
-    my $stirng = $class->String();
+    my $string = $class->String();
     if ($string) {
         return $string;
     }
@@ -3204,6 +3205,7 @@ sub ScalarVariable {
         $scalarVariable .= $currentToken->{"value"};
     }
     else {
+        $class->putToken($currentToken);
         return 0;
     }
 
@@ -3218,7 +3220,7 @@ sub RHS {
         return $realNumber;
     }
 
-    my $stirng = $class->String();
+    my $string = $class->String();
     if ($string) {
         return $string;
     }
@@ -3387,6 +3389,7 @@ sub ArrayName {
         $arrayName .= $currentToken->{"value"};
     }
     else {
+        $class->putToken($currentToken);
         return 0;
     }
 
@@ -3458,6 +3461,7 @@ sub HashName {
         $hashName .= $currentToken->{"value"};
     }
     else {
+        $class->putToken($currentToken);
         return 0;
     }
 
@@ -3520,6 +3524,7 @@ sub HashKeyStringValue {
         $hashKeyStringValue .= $currentToken->{"value"};
     }
     else {
+        $class->putToken($currentToken);
         return 0;
     }
 
@@ -3535,6 +3540,7 @@ sub HashKeyNumber {
         $hashKeyNumber .= $currentToken->{"value"};
     }
     else {
+        $class->putToken($currentToken);
         return 0;
     }
 
@@ -3710,7 +3716,7 @@ sub ClassFunctionReturn {
     return $classFunctionReturn;
 }
 
-class ArrayAssignment {
+sub ArrayAssignment {
     my ($class) = @_;
     my $arrayAssignment = "";
 
@@ -3800,7 +3806,7 @@ sub Calc {
         return 0;
     }
 
-    return $calc .;
+    return $calc;
 }
 
 sub CalcExpression {
@@ -3945,7 +3951,7 @@ sub Return {
 
     my $semiColon = $class->SemiColon();
     if ($semiColon) {
-        $return .= $semiColon ();
+        $return .= $semiColon;
     }
     else {
         return 0;
@@ -3968,7 +3974,7 @@ sub Last {
 
     my $semiColon = $class->SemiColon();
     if ($semiColon) {
-        $last .= $semiColon ();
+        $last .= $semiColon;
     }
     else {
         return 0;
@@ -3991,7 +3997,7 @@ sub Next {
 
     my $semiColon = $class->SemiColon();
     if ($semiColon) {
-        $next .= $semiColon ();
+        $next .= $semiColon;
     }
     else {
         return 0;
@@ -4061,6 +4067,7 @@ sub TokenReturn {
         $tokenReturn .= $currentToken->{"value"};
     }
     else {
+        $class->putToken($currentToken);
         return 0;
     }
 
@@ -4076,6 +4083,7 @@ sub TokenNext {
         $tokenNext .= $currentToken->{"value"};
     }
     else {
+        $class->putToken($currentToken);
         return 0;
     }
 
@@ -4088,13 +4096,14 @@ sub TokenLast {
 
     my $currentToken = $class->getToken();
     if ( $currentToken->{"value"} eq "last" ) {
-        $tokenNext .= $currentToken->{"value"};
+        $tokenLast .= $currentToken->{"value"};
     }
     else {
+        $class->putToken($currentToken);
         return 0;
     }
 
-    return $tokenNext;
+    return $tokenLast;
 }
 
 sub TokenElse {
@@ -4106,6 +4115,7 @@ sub TokenElse {
         $tokenElse .= $currentToken->{"value"};
     }
     else {
+        $class->putToken($currentToken);
         return 0;
     }
 
@@ -4121,6 +4131,7 @@ sub TokenElsIf {
         $tokenElseIf .= $currentToken->{"value"};
     }
     else {
+        $class->putToken($currentToken);
         return 0;
     }
 
@@ -4136,6 +4147,7 @@ sub TokenIf {
         $if .= $currentToken->{"value"};
     }
     else {
+        $class->putToken($currentToken);
         return 0;
     }
 
@@ -4151,6 +4163,7 @@ sub TokenFor {
         $for .= $currentToken->{"value"};
     }
     else {
+        $class->putToken($currentToken);
         return 0;
     }
 
@@ -4166,6 +4179,7 @@ sub TokenForEach {
         $forEach .= $currentToken->{"value"};
     }
     else {
+        $class->putToken($currentToken);
         return 0;
     }
 
@@ -4181,6 +4195,7 @@ sub TokenWhile {
         $tokenWhile .= $currentToken->{"value"};
     }
     else {
+        $class->putToken($currentToken);
         return 0;
     }
 
@@ -4196,6 +4211,7 @@ sub TokenFunction {
         $tokenFunction .= $currentToken->{"value"};
     }
     else {
+        $class->putToken($currentToken);
         return 0;
     }
 
@@ -4211,6 +4227,7 @@ sub TokenParent {
         $tokenParent .= $currentToken->{"value"};
     }
     else {
+        $class->putToken($currentToken);
         return 0;
     }
 
@@ -4226,6 +4243,7 @@ sub TokenClass {
         $tokenClass .= $currentToken->{"value"};
     }
     else {
+        $class->putToken($currentToken);
         return 0;
     }
 
@@ -4241,6 +4259,7 @@ sub TokenEmbedBlock {
         $tokenEmbedBlock .= $currentToken->{"value"};
     }
     else {
+        $class->putToken($currentToken);
         return 0;
     }
 
@@ -4256,6 +4275,7 @@ sub TokenSTDIN {
         $tokenSTDIN .= $currentToken->{"value"};
     }
     else {
+        $class->putToken($currentToken);
         return 0;
     }
 
@@ -4271,6 +4291,7 @@ sub Modulus {
         $modulus .= $currentToken->{"value"};
     }
     else {
+        $class->putToken($currentToken);
         return 0;
     }
 
@@ -4286,6 +4307,7 @@ sub Exponent {
         $exponent .= $currentToken->{"value"};
     }
     else {
+        $class->putToken($currentToken);
         return 0;
     }
 
@@ -4301,6 +4323,7 @@ sub LogicalAnd {
         $logicalAnd .= $currentToken->{"value"};
     }
     else {
+        $class->putToken($currentToken);
         return 0;
     }
 
@@ -4316,6 +4339,7 @@ sub LogicalOr {
         $logicalOr .= $currentToken->{"value"};
     }
     else {
+        $class->putToken($currentToken);
         return 0;
     }
 
@@ -4331,6 +4355,7 @@ sub NotEqulas {
         $notEquals .= $currentToken->{"value"};
     }
     else {
+        $class->putToken($currentToken);
         return 0;
     }
 
@@ -4343,9 +4368,10 @@ sub StringNotEquals {
 
     my $currentToken = $class->getToken();
     if ( $currentToken->{"value"} eq "ne" ) {
-        $stingNotEquals .= $currentToken->{"value"};
+        $stringNotEquals .= $currentToken->{"value"};
     }
     else {
+        $class->putToken($currentToken);
         return 0;
     }
 
@@ -4358,9 +4384,10 @@ sub StringEquals {
 
     my $currentToken = $class->getToken();
     if ( $currentToken->{"value"} eq "eq" ) {
-        $stingEquals .= $currentToken->{"value"};
+        $stringEquals .= $currentToken->{"value"};
     }
     else {
+        $class->putToken($currentToken);
         return 0;
     }
 
@@ -4376,6 +4403,7 @@ sub LessThanEquals {
         $lessThanEquals .= $currentToken->{"value"};
     }
     else {
+        $class->putToken($currentToken);
         return 0;
     }
 
@@ -4391,6 +4419,7 @@ sub GreaterThanEquals {
         $greaterThanEquals .= $currentToken->{"value"};
     }
     else {
+        $class->putToken($currentToken);
         return 0;
     }
 
@@ -4406,6 +4435,7 @@ sub GreaterThan {
         $greaterThan .= $currentToken->{"value"};
     }
     else {
+        $class->putToken($currentToken);
         return 0;
     }
 
@@ -4421,6 +4451,7 @@ sub LessThan {
         $lessThan .= $currentToken->{"value"};
     }
     else {
+        $class->putToken($currentToken);
         return 0;
     }
 
@@ -4436,6 +4467,7 @@ sub Equals {
         $equals .= $currentToken->{"value"};
     }
     else {
+        $class->putToken($currentToken);
         return 0;
     }
 
@@ -4451,6 +4483,7 @@ sub Plus {
         $plus .= $currentToken->{"value"};
     }
     else {
+        $class->putToken($currentToken);
         return 0;
     }
 
@@ -4466,6 +4499,7 @@ sub Minus {
         $minus .= $currentToken->{"value"};
     }
     else {
+        $class->putToken($currentToken);
         return 0;
     }
 
@@ -4481,6 +4515,7 @@ sub Multiply {
         $multiply .= $currentToken->{"value"};
     }
     else {
+        $class->putToken($currentToken);
         return 0;
     }
 
@@ -4496,6 +4531,7 @@ sub Divide {
         $divide .= $currentToken->{"value"};
     }
     else {
+        $class->putToken($currentToken);
         return 0;
     }
 
@@ -4511,6 +4547,7 @@ sub Quote {
         $quote .= $currentToken->{"value"};
     }
     else {
+        $class->putToken($currentToken);
         return 0;
     }
 
@@ -4526,13 +4563,14 @@ sub SemiColon {
         $semiColon .= $currentToken->{"value"};
     }
     else {
+        $class->putToken($currentToken);
         return 0;
     }
 
     return $semiColon;
 }
 
-sub SemiColon {
+sub Colon {
     my ($class) = @_;
     my $colon = "";
 
@@ -4541,6 +4579,7 @@ sub SemiColon {
         $colon .= $currentToken->{"value"};
     }
     else {
+        $class->putToken($currentToken);
         return 0;
     }
 
@@ -4556,6 +4595,7 @@ sub Dot {
         $dot .= $currentToken->{"value"};
     }
     else {
+        $class->putToken($currentToken);
         return 0;
     }
 
@@ -4571,6 +4611,7 @@ sub Equal {
         $equal .= $currentToken->{"value"};
     }
     else {
+        $class->putToken($currentToken);
         return 0;
     }
 
@@ -4586,6 +4627,7 @@ sub Comma {
         $comma .= $currentToken->{"value"};
     }
     else {
+        $class->putToken($currentToken);
         return 0;
     }
 
@@ -4601,6 +4643,7 @@ sub LParen {
         $lParen .= $currentToken->{"value"};
     }
     else {
+        $class->putToken($currentToken);
         return 0;
     }
 
@@ -4616,6 +4659,7 @@ sub RParen {
         $rParen .= $currentToken->{"value"};
     }
     else {
+        $class->putToken($currentToken);
         return 0;
     }
 
@@ -4631,6 +4675,7 @@ sub LBrace {
         $lBrace .= $currentToken->{"value"};
     }
     else {
+        $class->putToken($currentToken);
         return 0;
     }
 
@@ -4646,6 +4691,7 @@ sub RBrace {
         $rBrace .= $currentToken->{"value"};
     }
     else {
+        $class->putToken($currentToken);
         return 0;
     }
 
@@ -4661,6 +4707,7 @@ sub LBracket {
         $lBracket .= $currentToken->{"value"};
     }
     else {
+        $class->putToken($currentToken);
         return 0;
     }
 
@@ -4676,6 +4723,7 @@ sub RBracket {
         $rBracket .= $currentToken->{"value"};
     }
     else {
+        $class->putToken($currentToken);
         return 0;
     }
 
@@ -4689,8 +4737,11 @@ package Lang::HL::Syntax;
 use strict;
 use warnings;
 use utf8;
+use Data::Printer;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
+
+our @ISA = qw(Lexer Parser);
 
 sub new {
     my ($class) = @_;
@@ -4703,6 +4754,7 @@ sub syntax {
     $program =~ s/[\t\r\n\f]+//g;
 
     my @tokens = $class->lexer($program);
+    #p(@tokens);
     my $code   = $class->parse( \@tokens );
     return $code;
 }

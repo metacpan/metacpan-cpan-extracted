@@ -6,7 +6,7 @@ package PerlX::Maybe;
 
 BEGIN {
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '1.201';
+	our $VERSION   = '1.202';
 	
 	our @EXPORT      = qw/ maybe /;
 	our @EXPORT_OK   = qw/ maybe provided provided_deref provided_deref_with_maybe/;
@@ -218,8 +218,6 @@ at all when they are undefined, ugly looking code like this is often used:
  );
 
 or:
-
- use PerlX::Maybe;
 
  my $bob = Person->new(
     (name => $name) x!!(defined $name),

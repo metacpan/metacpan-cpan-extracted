@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use FindBin;
+use File::Spec::Functions qw( catfile );
 use Module::Load qw( load );
 
 use Exporter qw(import);
@@ -17,10 +18,10 @@ our @EXPORT_OK = qw(
 );
 our %EXPORT_TAGS = (all => [ @EXPORT_OK ]);
 
-sub fake_uri_responses_file { "$FindBin::RealBin/etc/uri_responses/" . shift . ".yaml"; }
-sub fake_response_json_file { "$FindBin::RealBin/etc/uri_responses/" . shift . ".json"; }
-sub fake_config_file { "$FindBin::RealBin/etc/rest_config.yaml"; }
-sub fake_token_file { "$FindBin::RealBin/etc/rest_config.token"; }
+sub fake_uri_responses_file { catfile( $FindBin::RealBin, qw(etc uri_responses), (shift . ".yaml") ); }
+sub fake_response_json_file { catfile( $FindBin::RealBin, qw(etc uri_responses), (shift . ".json") ); }
+sub fake_config_file { catfile($FindBin::RealBin, qw(etc rest_config.yaml)); }
+sub fake_token_file { catfile($FindBin::RealBin, qw(etc rest_config.token)); }
 sub fake_spreadsheet_id { 'fake_spreadsheet_id1'; }
 sub fake_spreadsheet_name { 'fake_spreadsheet1'; }
 sub fake_spreadsheet_name2 { 'fake_spreadsheet2'; }

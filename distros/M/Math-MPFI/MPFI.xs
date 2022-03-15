@@ -209,7 +209,7 @@ SV * Rmpfi_init(pTHX) {
      mpfi_t * mpfi_t_obj;
      SV * obj_ref, * obj;
 
-     New(1, mpfi_t_obj, 1, mpfi_t);
+     Newxz(mpfi_t_obj, 1, mpfi_t);
      if(mpfi_t_obj == NULL) croak("Failed to allocate memory in Rmpfi_init function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, "Math::MPFI");
@@ -224,7 +224,7 @@ SV * Rmpfi_init_nobless(pTHX) {
      mpfi_t * mpfi_t_obj;
      SV * obj_ref, * obj;
 
-     New(1, mpfi_t_obj, 1, mpfi_t);
+     Newxz(mpfi_t_obj, 1, mpfi_t);
      if(mpfi_t_obj == NULL) croak("Failed to allocate memory in Rmpfi_init_nobless function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, NULL);
@@ -239,7 +239,7 @@ SV * Rmpfi_init2(pTHX_ SV * prec) {
      mpfi_t * mpfi_t_obj;
      SV * obj_ref, * obj;
 
-     New(1, mpfi_t_obj, 1, mpfi_t);
+     Newxz(mpfi_t_obj, 1, mpfi_t);
      if(mpfi_t_obj == NULL) croak("Failed to allocate memory in Rmpfi_init2 function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, "Math::MPFI");
@@ -254,7 +254,7 @@ SV * Rmpfi_init2_nobless(pTHX_ SV * prec) {
      mpfi_t * mpfi_t_obj;
      SV * obj_ref, * obj;
 
-     New(1, mpfi_t_obj, 1, mpfi_t);
+     Newxz(mpfi_t_obj, 1, mpfi_t);
      if(mpfi_t_obj == NULL) croak("Failed to allocate memory in Rmpfi_init2_nobless function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, NULL);
@@ -425,7 +425,7 @@ void Rmpfi_init_set(pTHX_ mpfi_t * q) {
      SV * obj_ref, * obj;
      int ret;
 
-     New(1, mpfi_t_obj, 1, mpfi_t);
+     Newxz(mpfi_t_obj, 1, mpfi_t);
      if(mpfi_t_obj == NULL) croak("Failed to allocate memory in Rmpfi_init_set function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, "Math::MPFI");
@@ -444,7 +444,7 @@ void Rmpfi_init_set_ui(pTHX_ SV * q) {
      SV * obj_ref, * obj;
      int ret;
 
-     New(1, mpfi_t_obj, 1, mpfi_t);
+     Newxz(mpfi_t_obj, 1, mpfi_t);
      if(mpfi_t_obj == NULL) croak("Failed to allocate memory in Rmpfi_init_set_ui function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, "Math::MPFI");
@@ -463,7 +463,7 @@ void Rmpfi_init_set_si(pTHX_ SV * q) {
      SV * obj_ref, * obj;
      int ret;
 
-     New(1, mpfi_t_obj, 1, mpfi_t);
+     Newxz(mpfi_t_obj, 1, mpfi_t);
      if(mpfi_t_obj == NULL) croak("Failed to allocate memory in Rmpfi_init_set_si function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, "Math::MPFI");
@@ -482,7 +482,7 @@ void Rmpfi_init_set_d(pTHX_ SV * q) {
      SV * obj_ref, * obj;
      int ret;
 
-     New(1, mpfi_t_obj, 1, mpfi_t);
+     Newxz(mpfi_t_obj, 1, mpfi_t);
      if(mpfi_t_obj == NULL) croak("Failed to allocate memory in Rmpfi_init_set_d function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, "Math::MPFI");
@@ -501,7 +501,7 @@ void Rmpfi_init_set_z(pTHX_ mpz_t * q) {
      SV * obj_ref, * obj;
      int ret;
 
-     New(1, mpfi_t_obj, 1, mpfi_t);
+     Newxz(mpfi_t_obj, 1, mpfi_t);
      if(mpfi_t_obj == NULL) croak("Failed to allocate memory in Rmpfi_init_set_z function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, "Math::MPFI");
@@ -520,7 +520,7 @@ void Rmpfi_init_set_q(pTHX_ mpq_t * q) {
      SV * obj_ref, * obj;
      int ret;
 
-     New(1, mpfi_t_obj, 1, mpfi_t);
+     Newxz(mpfi_t_obj, 1, mpfi_t);
      if(mpfi_t_obj == NULL) croak("Failed to allocate memory in Rmpfi_init_set_q function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, "Math::MPFI");
@@ -539,7 +539,7 @@ void Rmpfi_init_set_fr(pTHX_ mpfr_t * q) {
      SV * obj_ref, * obj;
      int ret;
 
-     New(1, mpfi_t_obj, 1, mpfi_t);
+     Newxz(mpfi_t_obj, 1, mpfi_t);
      if(mpfi_t_obj == NULL) croak("Failed to allocate memory in Rmpfi_init_set_fr function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, "Math::MPFI");
@@ -561,7 +561,7 @@ void Rmpfi_init_set_str(pTHX_ SV * q, SV * base) {
 
      if(ret < 0 || ret > 36 || ret == 1) croak("2nd argument supplied to Rmpfi_init_set str is out of allowable range");
 
-     New(1, mpfi_t_obj, 1, mpfi_t);
+     Newxz(mpfi_t_obj, 1, mpfi_t);
      if(mpfi_t_obj == NULL) croak("Failed to allocate memory in Rmpfi_init_set_str function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, "Math::MPFI");
@@ -602,7 +602,7 @@ void Rmpfi_init_set_nobless(pTHX_ mpfi_t * q) {
      SV * obj_ref, * obj;
      int ret;
 
-     New(1, mpfi_t_obj, 1, mpfi_t);
+     Newxz(mpfi_t_obj, 1, mpfi_t);
      if(mpfi_t_obj == NULL) croak("Failed to allocate memory in Rmpfi_init_set_nobless function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, NULL);
@@ -621,7 +621,7 @@ void Rmpfi_init_set_ui_nobless(pTHX_ SV * q) {
      SV * obj_ref, * obj;
      int ret;
 
-     New(1, mpfi_t_obj, 1, mpfi_t);
+     Newxz(mpfi_t_obj, 1, mpfi_t);
      if(mpfi_t_obj == NULL) croak("Failed to allocate memory in Rmpfi_init_set_ui_nobless function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, NULL);
@@ -640,7 +640,7 @@ void Rmpfi_init_set_si_nobless(pTHX_ SV * q) {
      SV * obj_ref, * obj;
      int ret;
 
-     New(1, mpfi_t_obj, 1, mpfi_t);
+     Newxz(mpfi_t_obj, 1, mpfi_t);
      if(mpfi_t_obj == NULL) croak("Failed to allocate memory in Rmpfi_init_set_si_nobless function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, NULL);
@@ -659,7 +659,7 @@ void Rmpfi_init_set_d_nobless(pTHX_ SV * q) {
      SV * obj_ref, * obj;
      int ret;
 
-     New(1, mpfi_t_obj, 1, mpfi_t);
+     Newxz(mpfi_t_obj, 1, mpfi_t);
      if(mpfi_t_obj == NULL) croak("Failed to allocate memory in Rmpfi_init_set_d_nobless function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, NULL);
@@ -678,7 +678,7 @@ void Rmpfi_init_set_z_nobless(pTHX_ mpz_t * q) {
      SV * obj_ref, * obj;
      int ret;
 
-     New(1, mpfi_t_obj, 1, mpfi_t);
+     Newxz(mpfi_t_obj, 1, mpfi_t);
      if(mpfi_t_obj == NULL) croak("Failed to allocate memory in Rmpfi_init_set_z_nobless function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, NULL);
@@ -697,7 +697,7 @@ void Rmpfi_init_set_q_nobless(pTHX_ mpq_t * q) {
      SV * obj_ref, * obj;
      int ret;
 
-     New(1, mpfi_t_obj, 1, mpfi_t);
+     Newxz(mpfi_t_obj, 1, mpfi_t);
      if(mpfi_t_obj == NULL) croak("Failed to allocate memory in Rmpfi_init_set_q_nobless function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, NULL);
@@ -716,7 +716,7 @@ void Rmpfi_init_set_fr_nobless(pTHX_ mpfr_t * q) {
      SV * obj_ref, * obj;
      int ret;
 
-     New(1, mpfi_t_obj, 1, mpfi_t);
+     Newxz(mpfi_t_obj, 1, mpfi_t);
      if(mpfi_t_obj == NULL) croak("Failed to allocate memory in Rmpfi_init_set_fr_nobless function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, NULL);
@@ -737,7 +737,7 @@ void Rmpfi_init_set_str_nobless(pTHX_ SV * q, SV * base) {
 
      if(ret < 0 || ret > 36 || ret == 1) croak("2nd argument supplied to Rmpfi_init_set str is out of allowable range");
 
-     New(1, mpfi_t_obj, 1, mpfi_t);
+     Newxz(mpfi_t_obj, 1, mpfi_t);
      if(mpfi_t_obj == NULL) croak("Failed to allocate memory in Rmpfi_init_set_str_nobless function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, NULL);
@@ -1491,7 +1491,15 @@ SV * _itsa(pTHX_ SV * a) {
        if(SvUOK(a)) return newSVuv(1);
        return newSVuv(2);
      }
-     if(SV_IS_POK(a)) return newSVuv(4);
+
+     if(SV_IS_POK(a)) {
+#if defined(MPFI_PV_NV_BUG)        /* perl can set the POK flag when it should not */
+       if(SV_IS_NOK(a) && !SvIOKp(a))
+         return newSVuv(3);        /* designate it as NV */
+#endif
+       return newSVuv(4);          /* designate it as PV */
+     }
+
      if(SV_IS_NOK(a)) return newSVuv(3);
      if(sv_isobject(a)) {
        const char *h = HvNAME(SvSTASH(SvRV(a)));
@@ -1551,7 +1559,13 @@ SV * overload_spaceship(pTHX_ mpfi_t * a, SV * b, SV * third) {
 
 #endif
 
-     if(SV_IS_POK(b)) { /* assign string with default precision */
+#if defined(MPFI_PV_NV_BUG)
+     if( (SV_IS_POK(b) && !SV_IS_NOK(b))
+           ||
+         (SV_IS_POK(b) && SV_IS_NOK(b) && SvIOKp(b)) ) {
+#else
+     if(SV_IS_POK(b)) {
+#endif
 
        NOK_POK_DUALVAR_CHECK , "Math::MPFI::overload_spaceship");}
 
@@ -1581,6 +1595,10 @@ SV * overload_spaceship(pTHX_ mpfi_t * a, SV * b, SV * third) {
      }
 
      if(SV_IS_NOK(b)) {
+
+#if defined(MPFI_PV_NV_BUG)
+       NOK_POK_DUALVAR_CHECK , "overload_spaceship");}
+#endif
        if(SvNVX(b) != SvNVX(b)) return &PL_sv_undef; /* NaN */
 
 #ifdef NV_IS_DOUBLE
@@ -1659,7 +1677,13 @@ SV * overload_gte(pTHX_ mpfi_t * a, SV * b, SV * third) {
 
 #endif
 
-     if(SV_IS_POK(b)) { /* assign string with default precision */
+#if defined(MPFI_PV_NV_BUG)
+     if( (SV_IS_POK(b) && !SV_IS_NOK(b))
+           ||
+         (SV_IS_POK(b) && SV_IS_NOK(b) && SvIOKp(b)) ) {
+#else
+     if(SV_IS_POK(b)) {
+#endif
 
        NOK_POK_DUALVAR_CHECK , "Math::MPFI::overload_gte");}
 
@@ -1690,6 +1714,10 @@ SV * overload_gte(pTHX_ mpfi_t * a, SV * b, SV * third) {
      }
 
      if(SV_IS_NOK(b)) {
+
+#if defined(MPFI_PV_NV_BUG)
+       NOK_POK_DUALVAR_CHECK , "overload_gte");}
+#endif
        if(SvNVX(b) != SvNVX(b)) return 0; /* NaN */
 
 #ifdef NV_IS_DOUBLE
@@ -1769,7 +1797,13 @@ SV * overload_lte(pTHX_ mpfi_t * a, SV * b, SV * third) {
      }
 #endif
 
-     if(SV_IS_POK(b)) { /* assign string with default precision */
+#if defined(MPFI_PV_NV_BUG)
+     if( (SV_IS_POK(b) && !SV_IS_NOK(b))
+           ||
+         (SV_IS_POK(b) && SV_IS_NOK(b) && SvIOKp(b)) ) {
+#else
+     if(SV_IS_POK(b)) {
+#endif
 
        NOK_POK_DUALVAR_CHECK , "Math::MPFI::overload_lte");}
 
@@ -1801,6 +1835,10 @@ SV * overload_lte(pTHX_ mpfi_t * a, SV * b, SV * third) {
      }
 
      if(SV_IS_NOK(b)) {
+
+#if defined(MPFI_PV_NV_BUG)
+       NOK_POK_DUALVAR_CHECK , "overload_lte");}
+#endif
        if(SvNVX(b) != SvNVX(b)) return 0;
 
 #ifdef NV_IS_DOUBLE
@@ -1879,7 +1917,13 @@ SV * overload_gt(pTHX_ mpfi_t * a, SV * b, SV * third) {
      }
 #endif
 
-     if(SV_IS_POK(b)) { /* assign string with default precision */
+#if defined(MPFI_PV_NV_BUG)
+     if( (SV_IS_POK(b) && !SV_IS_NOK(b))
+           ||
+         (SV_IS_POK(b) && SV_IS_NOK(b) && SvIOKp(b)) ) {
+#else
+     if(SV_IS_POK(b)) {
+#endif
 
        NOK_POK_DUALVAR_CHECK , "Math::MPFI::overload_gt");}
 
@@ -1911,6 +1955,10 @@ SV * overload_gt(pTHX_ mpfi_t * a, SV * b, SV * third) {
      }
 
      if(SV_IS_NOK(b)) {
+
+#if defined(MPFI_PV_NV_BUG)
+       NOK_POK_DUALVAR_CHECK , "overload_gt");}
+#endif
        if(SvNVX(b) != SvNVX(b)) return 0;
 
 #ifdef NV_IS_DOUBLE
@@ -1989,7 +2037,13 @@ SV * overload_lt(pTHX_ mpfi_t * a, SV * b, SV * third) {
      }
 #endif
 
-     if(SV_IS_POK(b)) { /* assign string with default precision */
+#if defined(MPFI_PV_NV_BUG)
+     if( (SV_IS_POK(b) && !SV_IS_NOK(b))
+           ||
+         (SV_IS_POK(b) && SV_IS_NOK(b) && SvIOKp(b)) ) {
+#else
+     if(SV_IS_POK(b)) {
+#endif
 
        NOK_POK_DUALVAR_CHECK , "Math::MPFI::overload_lt");}
 
@@ -2020,6 +2074,10 @@ SV * overload_lt(pTHX_ mpfi_t * a, SV * b, SV * third) {
      }
 
      if(SV_IS_NOK(b)) {
+
+#if defined(MPFI_PV_NV_BUG)
+       NOK_POK_DUALVAR_CHECK , "overload_lt");}
+#endif
        if(SvNVX(b) != SvNVX(b)) return 0;
 
 #ifdef NV_IS_DOUBLE
@@ -2094,7 +2152,13 @@ SV * overload_equiv(pTHX_ mpfi_t * a, SV * b, SV * third) {
      }
 #endif
 
-     if(SV_IS_POK(b)) { /* assign string with default precision */
+#if defined(MPFI_PV_NV_BUG)
+     if( (SV_IS_POK(b) && !SV_IS_NOK(b))
+           ||
+         (SV_IS_POK(b) && SV_IS_NOK(b) && SvIOKp(b)) ) {
+#else
+     if(SV_IS_POK(b)) {
+#endif
 
        NOK_POK_DUALVAR_CHECK , "Math::MPFI::overload_equiv");}
 
@@ -2124,6 +2188,10 @@ SV * overload_equiv(pTHX_ mpfi_t * a, SV * b, SV * third) {
      }
 
      if(SV_IS_NOK(b)) {
+
+#if defined(MPFI_PV_NV_BUG)
+       NOK_POK_DUALVAR_CHECK , "overload_equiv");}
+#endif
 
 #ifdef NV_IS_DOUBLE
 
@@ -2174,7 +2242,7 @@ SV * overload_add(pTHX_ mpfi_t * a, SV * b, SV * third) {
      SV * obj_ref, * obj;
      int ret;
 
-     New(1, mpfi_t_obj, 1, mpfi_t);
+     Newxz(mpfi_t_obj, 1, mpfi_t);
      if(mpfi_t_obj == NULL) croak("%s", "Failed to allocate memory in overload_add function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, "Math::MPFI");
@@ -2202,7 +2270,13 @@ SV * overload_add(pTHX_ mpfi_t * a, SV * b, SV * third) {
      }
 #endif
 
-     if(SV_IS_POK(b)) { /* assign string with default precision */
+#if defined(MPFI_PV_NV_BUG)
+     if( (SV_IS_POK(b) && !SV_IS_NOK(b))
+           ||
+         (SV_IS_POK(b) && SV_IS_NOK(b) && SvIOKp(b)) ) {
+#else
+     if(SV_IS_POK(b)) {
+#endif
 
        NOK_POK_DUALVAR_CHECK , "Math::MPFI::overload_add");}
 
@@ -2231,6 +2305,10 @@ SV * overload_add(pTHX_ mpfi_t * a, SV * b, SV * third) {
      }
 
      if(SV_IS_NOK(b)) {
+
+#if defined(MPFI_PV_NV_BUG)
+       NOK_POK_DUALVAR_CHECK , "overload_add");}
+#endif
 
 #ifdef NV_IS_DOUBLE
 
@@ -2279,7 +2357,7 @@ SV * overload_mul(pTHX_ mpfi_t * a, SV * b, SV * third) {
      SV * obj_ref, * obj;
      int ret;
 
-     New(1, mpfi_t_obj, 1, mpfi_t);
+     Newxz(mpfi_t_obj, 1, mpfi_t);
      if(mpfi_t_obj == NULL) croak("%s", "Failed to allocate memory in overload_mul function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, "Math::MPFI");
@@ -2306,7 +2384,13 @@ SV * overload_mul(pTHX_ mpfi_t * a, SV * b, SV * third) {
      }
 #endif
 
-     if(SV_IS_POK(b)) { /* assign string with default precision */
+#if defined(MPFI_PV_NV_BUG)
+     if( (SV_IS_POK(b) && !SV_IS_NOK(b))
+           ||
+         (SV_IS_POK(b) && SV_IS_NOK(b) && SvIOKp(b)) ) {
+#else
+     if(SV_IS_POK(b)) {
+#endif
 
        NOK_POK_DUALVAR_CHECK , "Math::MPFI::overload_mul");}
 
@@ -2335,6 +2419,10 @@ SV * overload_mul(pTHX_ mpfi_t * a, SV * b, SV * third) {
      }
 
      if(SV_IS_NOK(b)) {
+
+#if defined(MPFI_PV_NV_BUG)
+       NOK_POK_DUALVAR_CHECK , "overload_mul");}
+#endif
 
 #ifdef NV_IS_DOUBLE
 
@@ -2383,7 +2471,7 @@ SV * overload_sub(pTHX_ mpfi_t * a, SV * b, SV * third) {
      SV * obj_ref, * obj;
      int ret;
 
-     New(1, mpfi_t_obj, 1, mpfi_t);
+     Newxz(mpfi_t_obj, 1, mpfi_t);
      if(mpfi_t_obj == NULL) croak("%s", "Failed to allocate memory in overload_sub function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, "Math::MPFI");
@@ -2422,7 +2510,13 @@ SV * overload_sub(pTHX_ mpfi_t * a, SV * b, SV * third) {
      }
 #endif
 
-     if(SV_IS_POK(b)) { /* assign string with default precision */
+#if defined(MPFI_PV_NV_BUG)
+     if( (SV_IS_POK(b) && !SV_IS_NOK(b))
+           ||
+         (SV_IS_POK(b) && SV_IS_NOK(b) && SvIOKp(b)) ) {
+#else
+     if(SV_IS_POK(b)) {
+#endif
 
        NOK_POK_DUALVAR_CHECK , "Math::MPFI::overload_sub");}
 
@@ -2452,6 +2546,11 @@ SV * overload_sub(pTHX_ mpfi_t * a, SV * b, SV * third) {
      }
 
      if(SV_IS_NOK(b)) {
+
+#if defined(MPFI_PV_NV_BUG)
+       NOK_POK_DUALVAR_CHECK , "overload_sub");}
+#endif
+
 
 #ifdef NV_IS_DOUBLE
 
@@ -2504,7 +2603,7 @@ SV * overload_div(pTHX_ mpfi_t * a, SV * b, SV * third) {
      SV * obj_ref, * obj;
      int ret;
 
-     New(1, mpfi_t_obj, 1, mpfi_t);
+     Newxz(mpfi_t_obj, 1, mpfi_t);
      if(mpfi_t_obj == NULL) croak("%s", "Failed to allocate memory in overload_div function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, "Math::MPFI");
@@ -2545,7 +2644,13 @@ SV * overload_div(pTHX_ mpfi_t * a, SV * b, SV * third) {
 
 #endif
 
-     if(SV_IS_POK(b)) { /* assign string with default precision */
+#if defined(MPFI_PV_NV_BUG)
+     if( (SV_IS_POK(b) && !SV_IS_NOK(b))
+           ||
+         (SV_IS_POK(b) && SV_IS_NOK(b) && SvIOKp(b)) ) {
+#else
+     if(SV_IS_POK(b)) {
+#endif
 
        NOK_POK_DUALVAR_CHECK , "Math::MPFI::overload_div");}
 
@@ -2575,6 +2680,10 @@ SV * overload_div(pTHX_ mpfi_t * a, SV * b, SV * third) {
      }
 
      if(SV_IS_NOK(b)) {
+
+#if defined(MPFI_PV_NV_BUG)
+       NOK_POK_DUALVAR_CHECK , "overload_div");}
+#endif
 
 #ifdef NV_IS_DOUBLE
 
@@ -2646,7 +2755,13 @@ SV * overload_add_eq(pTHX_ SV * a, SV * b, SV * third) {
      }
 #endif
 
-     if(SV_IS_POK(b)) { /* assign string with default precision */
+#if defined(MPFI_PV_NV_BUG)
+     if( (SV_IS_POK(b) && !SV_IS_NOK(b))
+           ||
+         (SV_IS_POK(b) && SV_IS_NOK(b) && SvIOKp(b)) ) {
+#else
+     if(SV_IS_POK(b)) {
+#endif
 
        NOK_POK_DUALVAR_CHECK , "Math::MPFI::overload_add_eq");}
 
@@ -2679,6 +2794,10 @@ SV * overload_add_eq(pTHX_ SV * a, SV * b, SV * third) {
      }
 
      if(SV_IS_NOK(b)) {
+
+#if defined(MPFI_PV_NV_BUG)
+       NOK_POK_DUALVAR_CHECK , "overload_add_eq");}
+#endif
 
 #ifdef NV_IS_DOUBLE
 
@@ -2748,7 +2867,13 @@ SV * overload_mul_eq(pTHX_ SV * a, SV * b, SV * third) {
      }
 #endif
 
-     if(SV_IS_POK(b)) { /* assign string with default precision */
+#if defined(MPFI_PV_NV_BUG)
+     if( (SV_IS_POK(b) && !SV_IS_NOK(b))
+           ||
+         (SV_IS_POK(b) && SV_IS_NOK(b) && SvIOKp(b)) ) {
+#else
+     if(SV_IS_POK(b)) {
+#endif
 
        NOK_POK_DUALVAR_CHECK , "Math::MPFI::overload_mul_eq");}
 
@@ -2781,6 +2906,10 @@ SV * overload_mul_eq(pTHX_ SV * a, SV * b, SV * third) {
      }
 
      if(SV_IS_NOK(b)) {
+
+#if defined(MPFI_PV_NV_BUG)
+       NOK_POK_DUALVAR_CHECK , "overload_mul_eq");}
+#endif
 
 #ifdef NV_IS_DOUBLE
 
@@ -2849,7 +2978,13 @@ SV * overload_sub_eq(pTHX_ SV * a, SV * b, SV * third) {
      }
 #endif
 
-     if(SV_IS_POK(b)) { /* assign string with default precision */
+#if defined(MPFI_PV_NV_BUG)
+     if( (SV_IS_POK(b) && !SV_IS_NOK(b))
+           ||
+         (SV_IS_POK(b) && SV_IS_NOK(b) && SvIOKp(b)) ) {
+#else
+     if(SV_IS_POK(b)) {
+#endif
 
        NOK_POK_DUALVAR_CHECK , "Math::MPFI::overload_sub_eq");}
 
@@ -2882,6 +3017,10 @@ SV * overload_sub_eq(pTHX_ SV * a, SV * b, SV * third) {
      }
 
      if(SV_IS_NOK(b)) {
+
+#if defined(MPFI_PV_NV_BUG)
+       NOK_POK_DUALVAR_CHECK , "overload_sub_eq");}
+#endif
 
 #ifdef NV_IS_DOUBLE
 
@@ -2950,7 +3089,13 @@ SV * overload_div_eq(pTHX_ SV * a, SV * b, SV * third) {
      }
 #endif
 
-     if(SV_IS_POK(b)) { /* assign string with default precision */
+#if defined(MPFI_PV_NV_BUG)
+     if( (SV_IS_POK(b) && !SV_IS_NOK(b))
+           ||
+         (SV_IS_POK(b) && SV_IS_NOK(b) && SvIOKp(b)) ) {
+#else
+     if(SV_IS_POK(b)) {
+#endif
 
        NOK_POK_DUALVAR_CHECK , "Math::MPFI::overload_div_eq");}
 
@@ -2983,6 +3128,10 @@ SV * overload_div_eq(pTHX_ SV * a, SV * b, SV * third) {
      }
 
      if(SV_IS_NOK(b)) {
+
+#if defined(MPFI_PV_NV_BUG)
+       NOK_POK_DUALVAR_CHECK , "overload_div_eq");}
+#endif
 
 #ifdef NV_IS_DOUBLE
 
@@ -3030,7 +3179,7 @@ SV * overload_sqrt(pTHX_ mpfi_t * p, SV * second, SV * third) {
      mpfi_t * mpfi_t_obj;
      SV * obj_ref, * obj;
 
-     New(1, mpfi_t_obj, 1, mpfi_t);
+     Newxz(mpfi_t_obj, 1, mpfi_t);
      if(mpfi_t_obj == NULL) croak("Failed to allocate memory in overload_sqrt function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, "Math::MPFI");
@@ -3106,7 +3255,7 @@ SV * overload_abs(pTHX_ mpfi_t * op, SV * second, SV * third) {
      mpfi_t * mpfi_t_obj;
      SV * obj_ref, * obj;
 
-     New(1, mpfi_t_obj, 1, mpfi_t);
+     Newxz(mpfi_t_obj, 1, mpfi_t);
      if(mpfi_t_obj == NULL) croak("Failed to allocate memory in Rmpfi_abs function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, "Math::MPFI");
@@ -3122,7 +3271,7 @@ SV * overload_sin(pTHX_ mpfi_t * op, SV * second, SV * third) {
      mpfi_t * mpfi_t_obj;
      SV * obj_ref, * obj;
 
-     New(1, mpfi_t_obj, 1, mpfi_t);
+     Newxz(mpfi_t_obj, 1, mpfi_t);
      if(mpfi_t_obj == NULL) croak("Failed to allocate memory in Rmpfi_sin function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, "Math::MPFI");
@@ -3138,7 +3287,7 @@ SV * overload_cos(pTHX_ mpfi_t * op, SV * second, SV * third) {
      mpfi_t * mpfi_t_obj;
      SV * obj_ref, * obj;
 
-     New(1, mpfi_t_obj, 1, mpfi_t);
+     Newxz(mpfi_t_obj, 1, mpfi_t);
      if(mpfi_t_obj == NULL) croak("Failed to allocate memory in Rmpfi_cos function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, "Math::MPFI");
@@ -3154,7 +3303,7 @@ SV * overload_log(pTHX_ mpfi_t * op, SV * second, SV * third) {
      mpfi_t * mpfi_t_obj;
      SV * obj_ref, * obj;
 
-     New(1, mpfi_t_obj, 1, mpfi_t);
+     Newxz(mpfi_t_obj, 1, mpfi_t);
      if(mpfi_t_obj == NULL) croak("Failed to allocate memory in Rmpfi_log function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, "Math::MPFI");
@@ -3170,7 +3319,7 @@ SV * overload_exp(pTHX_ mpfi_t * op, SV * second, SV * third) {
      mpfi_t * mpfi_t_obj;
      SV * obj_ref, * obj;
 
-     New(1, mpfi_t_obj, 1, mpfi_t);
+     Newxz(mpfi_t_obj, 1, mpfi_t);
      if(mpfi_t_obj == NULL) croak("Failed to allocate memory in Rmpfi_exp function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, "Math::MPFI");
@@ -3188,7 +3337,7 @@ SV * overload_atan2(pTHX_ mpfi_t * a, SV * b, SV * third) {
      SV * obj_ref, * obj;
      int ret;
 
-     New(1, mpfi_t_obj, 1, mpfi_t);
+     Newxz(mpfi_t_obj, 1, mpfi_t);
      if(mpfi_t_obj == NULL) croak("Failed to allocate memory in overload_atan2 function");
      obj_ref = newSV(0);
      obj = newSVrv(obj_ref, "Math::MPFI");
@@ -3229,7 +3378,13 @@ SV * overload_atan2(pTHX_ mpfi_t * a, SV * b, SV * third) {
      }
 #endif
 
-     if(SV_IS_POK(b)) { /* assign string with default precision */
+#if defined(MPFI_PV_NV_BUG)
+     if( (SV_IS_POK(b) && !SV_IS_NOK(b))
+           ||
+         (SV_IS_POK(b) && SV_IS_NOK(b) && SvIOKp(b)) ) {
+#else
+     if(SV_IS_POK(b)) {
+#endif
 
        NOK_POK_DUALVAR_CHECK , "Math::MPFI::overload_atan2");}
 
@@ -3267,6 +3422,11 @@ SV * overload_atan2(pTHX_ mpfi_t * a, SV * b, SV * third) {
      }
 
      if(SV_IS_NOK(b)) {
+
+#if defined(MPFI_PV_NV_BUG)
+       NOK_POK_DUALVAR_CHECK , "overload_atan2");}
+#endif
+
 
 #ifdef NV_IS_DOUBLE
 
@@ -3389,6 +3549,14 @@ void clear_nok_pok(void){
 
 void set_nok_pok(int x) {
   nok_pok = x;
+}
+
+int _has_pv_nv_bug(void) {
+#if defined(MPFI_PV_NV_BUG)
+     return 1;
+#else
+     return 0;
+#endif
 }
 MODULE = Math::MPFI  PACKAGE = Math::MPFI
 
@@ -5185,4 +5353,8 @@ set_nok_pok (x)
         }
         /* must have used dXSARGS; list context implied */
         return; /* assume stack size is correct */
+
+int
+_has_pv_nv_bug ()
+
 

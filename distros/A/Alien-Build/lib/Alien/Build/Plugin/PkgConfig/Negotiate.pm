@@ -11,7 +11,7 @@ use Alien::Build::Util qw( _perl_config );
 use Carp ();
 
 # ABSTRACT: Package configuration negotiation plugin
-our $VERSION = '2.47'; # VERSION
+our $VERSION = '2.48'; # VERSION
 
 
 has '+pkg_name' => sub {
@@ -119,7 +119,7 @@ Alien::Build::Plugin::PkgConfig::Negotiate - Package configuration negotiation p
 
 =head1 VERSION
 
-version 2.47
+version 2.48
 
 =head1 SYNOPSIS
 

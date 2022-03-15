@@ -14,6 +14,7 @@ cpanfile
 dist.ini
 json-formatter.LICENSE
 lib/App/Yath/Command/ui.pm
+lib/App/Yath/Command/upload.pm
 lib/App/Yath/Plugin/YathUIDB.pm
 lib/App/Yath/Tester/UI.pm
 lib/Test2/Harness/Renderer/UI.pm
@@ -27,7 +28,7 @@ lib/Test2/Harness/UI/Controller/Coverage.pm
 lib/Test2/Harness/UI/Controller/Download.pm
 lib/Test2/Harness/UI/Controller/Durations.pm
 lib/Test2/Harness/UI/Controller/Events.pm
-lib/Test2/Harness/UI/Controller/Failed.pm
+lib/Test2/Harness/UI/Controller/Files.pm
 lib/Test2/Harness/UI/Controller/Interactions.pm
 lib/Test2/Harness/UI/Controller/Job.pm
 lib/Test2/Harness/UI/Controller/JobField.pm

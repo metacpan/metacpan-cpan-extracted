@@ -1,5 +1,9 @@
 Changes for lib::projectroot
 
+1.010     2022-03-14 11:44:33+01:00
+    - make test more flexible to paths used in cpantesters
+
+
 1.009     2022-03-10 16:48:22+01:00
     - Minor pod improvements (Mohammad S Anwar)
 

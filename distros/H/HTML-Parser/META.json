@@ -4,7 +4,7 @@
       "Gisle Aas <gaas@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -90,32 +90,32 @@
    "provides" : {
       "HTML::Entities" : {
          "file" : "lib/HTML/Entities.pm",
-         "version" : "3.76"
+         "version" : "3.77"
       },
       "HTML::Filter" : {
          "file" : "lib/HTML/Filter.pm",
-         "version" : "3.76",
+         "version" : "3.77",
          "x_deprecated" : 1
       },
       "HTML::HeadParser" : {
          "file" : "lib/HTML/HeadParser.pm",
-         "version" : "3.76"
+         "version" : "3.77"
       },
       "HTML::LinkExtor" : {
          "file" : "lib/HTML/LinkExtor.pm",
-         "version" : "3.76"
+         "version" : "3.77"
       },
       "HTML::Parser" : {
          "file" : "lib/HTML/Parser.pm",
-         "version" : "3.76"
+         "version" : "3.77"
       },
       "HTML::PullParser" : {
          "file" : "lib/HTML/PullParser.pm",
-         "version" : "3.76"
+         "version" : "3.77"
       },
       "HTML::TokeParser" : {
          "file" : "lib/HTML/TokeParser.pm",
-         "version" : "3.76"
+         "version" : "3.77"
       }
    },
    "release_status" : "stable",
@@ -130,7 +130,7 @@
          "web" : "https://github.com/libwww-perl/HTML-Parser"
       }
    },
-   "version" : "3.76",
+   "version" : "3.77",
    "x_contributors" : [
       "Antonio Radici <antonio@dyne.org>",
       "Barbie <barbie@missbarbell.co.uk>",
@@ -142,6 +142,7 @@
       "Fran\u00e7ois Perrad <francois.perrad@gadz.org>",
       "Gisle Aas <gisle@aas.no>",
       "Jacques Germishuys <jacquesg@striata.com>",
+      "Jess Robinson <castaway@desert-island.me.uk>",
       "Jon Jensen <jon@endpoint.com>",
       "Mike South <msouth@gmail.com>",
       "Nicholas Clark <nick@ccl4.org>",
@@ -153,8 +154,8 @@
       "Yves Orton <demerphq@gmail.com>",
       "Zefram <zefram@fysh.org>"
    ],
-   "x_generated_by_perl" : "v5.30.3",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "x_generated_by_perl" : "v5.34.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

@@ -4,6 +4,8 @@ use Config;
 use ExtUtils::MakeMaker;
 use ExtUtils::Liblist qw();
 
+our $DEFS = '';
+
 # Attempt to avoid the incorrect 'FAIL' reports from Chris Williams' broken NetBSD smoker(s).
 # Comment out the 'exit 0;' (26 lines further down) if this causes problems.
 
@@ -63,8 +65,9 @@ if($Config{nvtype} eq 'long double') {
 # https://github.com/Perl-Toolchain-Gang/ExtUtils-MakeMaker/issues/277
 # https://rt.cpan.org/Ticket/Display.html?id=116520
 #
-# This simply assumes any such stripping is wrong and optimisitically reinserts them.
-if ( defined &ExtUtils::Liblist::ext ) {
+# This simply assumes any such stripping is wrong and optimisitically
+# reinserts them -  unless (as of version 0.15) $^O is MSWin32.
+if ( defined(&ExtUtils::Liblist::ext) && $^O !~ /MSWin/ ) {
   warn "Patching ExtUtils::Liblist::ext\n";
   my $orig = \&ExtUtils::Liblist::ext;
   no warnings 'redefine';
@@ -87,6 +90,60 @@ if ( defined &ExtUtils::Liblist::ext ) {
 if($^O =~ /MSWin32/i && $] < 5.022) {
   $defines .= " -D_WIN32_BIZARRE_INFNAN";
 }
+
+####################################
+# Next, we check to see whether there's some unhelpful beaviour regarding
+# the setting of the POK flag.
+# This typically occurs in versions of perl prior to 5.22.0, but it can
+# arise elsewhere, eg:
+# http://www.cpantesters.org/cpan/report/dc17e330-900b-11ec-bfc9-d1f1448276d4
+# This procedure is stolen from:
+# https://metacpan.org/release/HAARG/Sub-Quote-2.006006/source/t/quotify.t
+# Thank you, Haarg.
+
+use B qw(svref_2object);
+
+my %flags;
+{
+  no strict 'refs';
+  for my $flag (qw(
+    SVf_IOK
+    SVf_NOK
+    SVf_POK
+    SVp_IOK
+    SVp_NOK
+    SVp_POK
+            )) {
+    if (defined &{'B::'.$flag}) {
+      $flags{$flag} = &{'B::'.$flag};
+    }
+  }
+}
+
+sub flags {
+  my $flags = B::svref_2object(\($_[0]))->FLAGS;
+  join ' ', sort grep $flags & $flags{$_}, keys %flags;
+}
+
+my $pv_nv_bug = 0;
+my $test_nv = 1.3;
+my $buggery = "$test_nv";
+my $f = flags($test_nv);
+
+if($f =~ /SVf_POK/) {
+  print "Dealing with unhelpful setting of POK flag\n";
+  $pv_nv_bug = 1;
+}
+
+if($pv_nv_bug) {
+  $defines .= " -DF128_PV_NV_BUG";
+  $DEFS    .= " -DF128_PV_NV_BUG";
+  print "Defining F128_PV_NV_BUG\n\n";
+}
+else {
+  print "Not defining F128_PV_NV_BUG\n\n";
+}
+####################################
 
 my %options = %{
 {

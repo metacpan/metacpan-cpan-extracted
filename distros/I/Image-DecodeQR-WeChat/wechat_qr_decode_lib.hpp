@@ -18,6 +18,8 @@ int wechat_qr_decode(
 	size_t *payloads_sz
 );
 
+int opencv_has_highgui(void);
+
 /* Exactly as above but with C linkage
    so as to avoid name mangling of C++
    Use this when it complains that it can not
@@ -40,6 +42,9 @@ int wechat_qr_decode_with_C_linkage(
 	// this is the size of both bboxes and payloads
 	size_t *payloads_sz
 );
+
+int opencv_has_highgui_with_C_linkage(void);
+
 #ifdef __cplusplus
 } // extern "C" {
 #endif

@@ -26892,6 +26892,128 @@ sub cells_workbook_post_autofit_workbook_rows {
 }
 
 #
+# cells_workbook_post_digital_signature
+#
+# Add digital signature.
+# 
+# @param string $name Workbook name. (required)
+# @param string $digitalsignaturefile Digital signature file parameters. (required)
+# @param string $password  (required)
+# @param string $folder Workbook&#39;s folder. (optional)
+# @param string $storage_name storage name. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Workbook name.',
+        required => '1',
+    },
+    'digitalsignaturefile' => {
+        data_type => 'string',
+        description => 'Digital signature file parameters.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => '',
+        required => '1',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Workbook&#39;s folder.',
+        required => '0',
+    },
+    'storage_name' => {
+        data_type => 'string',
+        description => 'storage name.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'cells_workbook_post_digital_signature' } = { 
+    	summary => 'Add digital signature.',
+        params => $params,
+        returns => 'CellsCloudResponse',
+        };
+}
+# @return CellsCloudResponse
+#
+sub cells_workbook_post_digital_signature {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling cells_workbook_post_digital_signature");
+    }
+
+    # verify the required parameter 'digitalsignaturefile' is set
+    unless (exists $args{'digitalsignaturefile'}) {
+      croak("Missing the required parameter 'digitalsignaturefile' when calling cells_workbook_post_digital_signature");
+    }
+
+    # verify the required parameter 'password' is set
+    unless (exists $args{'password'}) {
+      croak("Missing the required parameter 'password' when calling cells_workbook_post_digital_signature");
+    }
+
+    # parse inputs
+    my $_resource_path = '/cells/{name}/digitalsignature';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if ( exists $args{'digitalsignaturefile'}) {
+        $query_params->{'digitalsignaturefile'} = $self->{api_client}->to_query_value($args{'digitalsignaturefile'});
+    }
+
+    # query params
+    if ( exists $args{'password'}) {
+        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
+    }
+
+    # query params
+    if ( exists $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    $self->{api_client}->check_access_token();
+    my $_body_data;
+    # authentication setting, if any
+    my $auth_settings = [qw()];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
 # cells_workbook_post_encrypt_document
 #
 # Encript document.

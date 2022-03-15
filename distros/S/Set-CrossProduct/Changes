@@ -1,5 +1,9 @@
 Revision history for Perl module Set::CrossProduct
 
+2.008 2022-03-15T17:50:35Z
+	* Guard for possible future autovivification of string filehandle targets.
+	This updates a test, but the rest of the code is the smae.
+
 2.007 2022-01-08T22:17:43Z
 	* No code changes. Fixed a link in README.pod.
 

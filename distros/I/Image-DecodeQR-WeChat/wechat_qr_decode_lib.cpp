@@ -5,6 +5,10 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/wechat_qrcode.hpp>
 
+#if HAS_HIGHGUI == 1
+#include <opencv2/highgui.hpp>
+#endif
+
 #include <string.h>
 
 /* for getopt */
@@ -183,27 +187,29 @@ int wechat_qr_decode(
 		}
 
 		if( graphicaldisplayresult > 0 ){
-			if( verbosity > 0 ){ fprintf(stdout, "wechat_qr_decode() : displaying detected images to window (mileage may vary especially if running through shell) ...\n"); }
-			// Iterate through the vector and convert to Mat. Required,
-			// as we need to access the elements while drawing the box.
-			for(i=0;i<res.size();i++){
-				Mat img2 = img.clone();
-				Mat1f matBbox;
-				for(j=0;j<points[i].size().height;j++){
-					matBbox.push_back(points[i].row(j));
+			if( opencv_has_highgui() ==  0 ){
+				fprintf(stderr, "wechat_qr_decode() : there's no highgui support for current OpenCV installation, graphical presentation  of results is not possible.\n");
+			} else {
+				if( verbosity > 0 ){ fprintf(stdout, "wechat_qr_decode() : displaying detected images to window (mileage may vary especially if running through shell) ...\n"); }
+				// Iterate through the vector and convert to Mat. Required,
+				// as we need to access the elements while drawing the box.
+				for(i=0;i<res.size();i++){
+					Mat img2 = img.clone();
+					Mat1f matBbox;
+					for(j=0;j<points[i].size().height;j++){
+						matBbox.push_back(points[i].row(j));
+					}
+					cout << "Time taken : "  << duration.count() <<
+					    " milliseconds" << endl;
+					cout << matBbox << endl;
+					// Display bounding box. 
+					display(img2, matBbox);
 				}
-				cout << "Time taken : "  << duration.count() <<
-				    " milliseconds" << endl;
-				cout << matBbox << endl;
-				// Display bounding box. 
-				display(img2, matBbox);
-				cout << "wechat_qr_decode() : press a key to continue ..." << endl;
-				waitKey(0);
 			}
 		}
 	} else {
 		// if( res.size() > 0 ...
-		fprintf(stderr, "wechat_qr_decode() : no QR code was found in image '%s' or failed to dected one.\n", infilename);
+		fprintf(stderr, "wechat_qr_decode() : no QR code was found in image '%s' or failed to detect one.\n", infilename);
 		return 0; // success but no qr-codes detected, nothing has been allocated, payloads_sz is 0
 	}
 	if( verbosity > 0 ){ fprintf(stdout, "wechat_qr_decode() : done, returning %zu payload(s) and bbox(es) (memory location: %p, %p).\n", *payloads_sz, payloads); }
@@ -241,6 +247,7 @@ int save_image_with_framed_qrcodes_and_metadata(
 }
 
 void display(Mat &im, Mat &bbox){
+#if HAS_HIGHGUI == 1
 	int n = bbox.rows;
 	for(int i = 0; i < n; i++)
 	{
@@ -249,6 +256,11 @@ void display(Mat &im, Mat &bbox){
 		 bbox.at<float>((i+1) % n,1)), Scalar(0,255,0), 3);
 	}
 	imshow("Image", im);
+	cout << "display() : press a key to continue ..." << endl;
+	waitKey(0);
+#else
+	fprintf(stderr, "display() : opencv was not compiled with highgui, can not display images. No worries, just save them to file.\n");
+#endif
 }
 
 /* Exactly as wechat_qr_decode(), above, but with C linkage
@@ -283,3 +295,16 @@ int wechat_qr_decode_with_C_linkage(
 		payloads_sz
 	);
 }
+
+int opencv_has_highgui(void){
+#if HAS_HIGHGUI == 0
+        return(0);
+#else
+        return(1);
+#endif
+}
+
+int opencv_has_highgui_with_C_linkage(void){
+	return opencv_has_highgui();
+}
+

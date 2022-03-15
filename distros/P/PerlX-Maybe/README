@@ -46,8 +46,6 @@ DESCRIPTION
 
     or:
 
-     use PerlX::Maybe;
-
      my $bob = Person->new(
         (name => $name) x!!(defined $name),
         (age  => $age)  x!!(defined $age),

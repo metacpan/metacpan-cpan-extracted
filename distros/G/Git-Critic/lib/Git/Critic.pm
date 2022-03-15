@@ -4,6 +4,9 @@ package Git::Critic;
 use v5.10.0;
 use strict;
 use warnings;
+# we don't use this directly, but it's an attempt to fix this issue:
+# IPC::System::Simple required for Fatalised/autodying system() at .../lib/Git/Critic.pm line 7.
+use IPC::System::Simple;
 use autodie ":all";
 
 use Capture::Tiny 'capture_stdout';
@@ -14,7 +17,7 @@ use List::Util 1.44 qw(uniq);
 use Moo;
 use Types::Standard qw( ArrayRef Bool Int Str);
 
-our $VERSION = '0.6';
+our $VERSION = '0.7';
 
 #
 # Moo attributes
@@ -282,7 +285,7 @@ Git::Critic - Only run Perl::Critic on lines changed in the current branch
 
 =head1 VERSION
 
-version 0.6
+version 0.7
 
 =head1 SYNOPSIS
 

@@ -55,7 +55,7 @@ $opt_for{verbose}  ||= 0;
 pod2usage( -verbose => 1 ) if ( $opt_for{help} );
 pod2usage( -verbose => 2 ) if ( $opt_for{man} );
 
-our $VERSION = '0.6';
+our $VERSION = '0.7';
 use Git::Critic;
 my $critic = Git::Critic->new(
     primary_target => $primary,
@@ -80,7 +80,7 @@ git-perl-critic - Command-line interface for Perl Git::Critic module
 
 =head1 VERSION
 
-version 0.6
+version 0.7
 
 =head1 SYNOPSIS
 

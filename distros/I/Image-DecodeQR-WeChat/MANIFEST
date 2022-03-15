@@ -32,6 +32,7 @@ typemap
 WeChat.xs
 wechat_qr_decode_lib.cpp
 wechat_qr_decode_lib.hpp
+xt/50-decode-with-graphicaldisplayresult.t
 xt/boilerplate.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

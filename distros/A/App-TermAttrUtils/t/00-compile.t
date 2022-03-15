@@ -6,13 +6,15 @@ use warnings;
 
 use Test::More;
 
-plan tests => 6 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 8 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/TermAttrUtils.pm'
 );
 
 my @scripts = (
+    'script/ff',
+    'script/form-feed',
     'script/term-attrs',
     'script/term-detect-software',
     'script/term-encoding',

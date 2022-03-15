@@ -16,7 +16,7 @@ no if "$]" >= 5.020, feature => qw{ signatures };
 # This occurs in both inc/My/Module/Meta.pm and inc/My/Module/Test.pm
 use constant CAN_USE_UNICODE	=> "$]" >= 5.008004;
 
-our $VERSION = '0.102';
+our $VERSION = '0.103';
 
 our @EXPORT =		## no critic (ProhibitAutomaticExportation)
 qw{

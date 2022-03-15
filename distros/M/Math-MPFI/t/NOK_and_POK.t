@@ -3,7 +3,7 @@ use warnings;
 use Math::MPFR qw(:mpfr);
 use Math::MPFI qw(:mpfi);
 
-print "1..26\n";
+print "1..27\n";
 
 my $n = '98765' x 80;
 my $r = '98765' x 80;
@@ -265,6 +265,21 @@ else {
   warn "\n", Math::MPFI::nok_pokflag(), " != $check\n";
   print "not ok 26\n";
 }
+
+my $nv = 1.3;
+my $s  = "$nv"; # $nv should be POK && NOK if MPFR_PV_NV_BUG is 1
+                # Else (ie MPFR_NV_BUG is 0) $nv should be POK only.
+
+$z = Math::MPFI->new($nv);
+
+$check++ if MPFI_PV_NV_BUG;
+
+if(Math::MPFI::nok_pokflag() == $check) {print "ok 27\n"}
+else {
+  warn "\n", Math::MPFI::nok_pokflag(), " != $check\n";
+  print "not ok 27\n";
+}
+
 
 ########
 

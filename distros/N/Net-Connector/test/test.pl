@@ -1,11 +1,14 @@
-
 #!/usr/bin/perl
-use strict;
+use 5.016;
 use warnings FATAL => 'all';
 
-use Net::Connector::Cisco::Nxos;
+use Net::Connector::Cisco::Ios;
 use Data::Printer;
 use Data::Dumper;
 
-$device = Net::Connector::Cisco::Nxos->new( host => '127.0.0.1' );
-say Dumper $device->getConfig;
+my $device = Net::Connector::Cisco::Ios->new(
+  host     => '192.168.8.80',
+  username => "cisco",
+  password => "cisco"
+);
+say Dumper $device->healthCheckConfig;

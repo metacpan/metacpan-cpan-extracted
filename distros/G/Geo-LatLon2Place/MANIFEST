@@ -1,0 +1,15 @@
+MANIFEST
+Makefile.PL
+README
+Changes
+COPYING
+
+perlmulticore.h
+LatLon2Place.pm
+LatLon2Place.xs
+
+bin/geo-latlon2place-makedb
+
+t/00_load.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,5 +1,21 @@
 Revision history for Perl module DNS::Unbound
 
+0.29 Sat, 12 Mar 2022
+- Reject NULs in input strings where relevant.
+- Tweak memory handling. This hopefully will stop the random
+  (unreproducible?) segfaults seen in occasional CPAN Testers runs.
+- Stop needlessly exporting non-XS C functions from the XS module.
+- Tweak documentation; add reference to alternative implementation.
+- Fix tests on 5.8. It really shouldn’t matter since X::Tiny requires 5.10,
+  but some CPAN installers happily install X::Tiny anyway when installing
+  DNS::Unbound on 5.8. It’s an easy enough fix, though, and it usefully
+  tests the object properties of the thrown errors. So hey.
+- Fix install with old libunbound (e.g., 1.4.17).
+- Require a new-ish X::Tiny (since tests assume it).
+- Fix trivial warning in Makefile.PL.
+- Make feature-detection logic mimic build configuration better.
+- Test suite is now much “quieter”.
+
 0.28 Wed, 15 Dec 2021
 - Make all Unbound-created errors X::Tiny::Base instances.
 - Import error codes from unbound.h.

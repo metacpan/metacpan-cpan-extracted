@@ -2,7 +2,7 @@ package App::Yath::Options::Finder;
 use strict;
 use warnings;
 
-our $VERSION = '1.000111';
+our $VERSION = '1.000112';
 
 use Test2::Harness::Util qw/mod2file/;
 
@@ -51,6 +51,24 @@ option_group {prefix => 'finder', category => "Finder Options", builds => 'Test2
     option changed_only => (
         description => "Only search for tests for changed files (Requires a coverage data source, also requires a list of changes either from the --changed option, or a plugin that implements changed_files() or changed_diff())",
         applicable => \&changes_applicable,
+    );
+
+    option rerun => (
+        type => 'd',
+        description => "Re-Run tests from a previous run from a log file (or last log file). Plugins can intercept this, such as YathUIDB which will grab a run UUID and derive tests to re-run from that.",
+        long_examples => ['', '=path/to/log.jsonl', '=plugin_specific_string'],
+    );
+
+    option rerun_failed => (
+        type => 'd',
+        description => "Re-Run failed tests from a previous run from a log file (or last log file). Plugins can intercept this, such as YathUIDB which will grab a run UUID and derive tests to re-run from that.",
+        long_examples => ['', '=path/to/log.jsonl', '=plugin_specific_string'],
+    );
+
+    option rerun_plugin => (
+        type => 'm',
+        description => "What plugin(s) should be used for rerun (will fallback to other plugins if the listed ones decline the value, this is just used ot set an order of priority)",
+        long_examples => [' Foo', ' +App::Yath::Plugin::Foo'],
     );
 
     option changed => (
@@ -521,6 +539,39 @@ Do not run tests that have their duration flag set to 'LONG'
 =item --no-only-long
 
 Only run tests that have their duration flag set to 'LONG'
+
+
+=item --rerun
+
+=item --rerun=path/to/log.jsonl
+
+=item --rerun=plugin_specific_string
+
+=item --no-rerun
+
+Re-Run tests from a previous run from a log file (or last log file). Plugins can intercept this, such as YathUIDB which will grab a run UUID and derive tests to re-run from that.
+
+
+=item --rerun-failed
+
+=item --rerun-failed=path/to/log.jsonl
+
+=item --rerun-failed=plugin_specific_string
+
+=item --no-rerun-failed
+
+Re-Run failed tests from a previous run from a log file (or last log file). Plugins can intercept this, such as YathUIDB which will grab a run UUID and derive tests to re-run from that.
+
+
+=item --rerun-plugin Foo
+
+=item --rerun-plugin +App::Yath::Plugin::Foo
+
+=item --no-rerun-plugin
+
+What plugin(s) should be used for rerun (will fallback to other plugins if the listed ones decline the value, this is just used ot set an order of priority)
+
+Can be specified multiple times
 
 
 =item --search ARG

@@ -5,7 +5,7 @@ use ExtUtils::MakeMaker::CPANfile;
 
 my $pkgconfig_name = 'libunbound';
 
-my ($cflags, $ldflags);
+my ($cflags, $ldflags, $libdir);
 
 use Config;
 use File::Temp;
@@ -22,6 +22,7 @@ if ( eval { require ExtUtils::PkgConfig } ) {
     # didn’t include a pkg-config file.
     $cflags = ExtUtils::PkgConfig->cflags($pkgconfig_name);
     $ldflags = ExtUtils::PkgConfig->libs($pkgconfig_name);
+    $libdir = ExtUtils::PkgConfig->libs_only_L($pkgconfig_name);
 }
 else {
     print "Hmm. You don’t seem to have ExtUtils::PkgConfig.\n";
@@ -37,10 +38,13 @@ else {
         print "Cool. It looks like pkg-config works.\n";
 
         $ldflags = `pkg-config --libs $pkgconfig_name`;
+        $libdir = `pkg-config --libs-only-L $pkgconfig_name`;
     }
 
-    chomp for $cflags, $ldflags;
+    $_ && chomp for $cflags, $ldflags, $libdir;
 }
+
+$libdir =~ s<\A-L><>;
 
 # In case pkg-config didn’t give us anything.
 if (!$ldflags) {
@@ -54,9 +58,9 @@ if (!$ldflags) {
 
         my @pieces = File::Spec->splitdir($where_ar->[0]);
         pop @pieces;
-        my $dir = File::Spec->catdir(@pieces);
+        $libdir = File::Spec->catdir(@pieces);
 
-        $ldflags = "-L$dir -lunbound";
+        $ldflags = "-L$libdir -lunbound";
 
         if (!$cflags) {
             print "Looking for unbound.h …$/";
@@ -150,6 +154,7 @@ my @checks = (
             '#include <unbound.h>',
             'int main() {',
             '   struct ub_result myresult;',
+            '   (void)(myresult);',
             '   return 0;',
             '}',
         ),
@@ -181,8 +186,8 @@ my @checks = (
             '#include <unbound.h>',
             'int main() {',
             '   struct ub_result myresult;',
-            '   myresult.ttl = 123;',
-            '   return 0;',
+            '   myresult.ttl = 0;',
+            '   return myresult.ttl;',
             '}',
         ),
         perl => sub {
@@ -196,6 +201,7 @@ my @checks = (
             '#include <unbound.h>',
             'int main() {',
             '   int foo = UB_NOERROR;',
+            '   (void)(foo);',
             '   return 0;',
             '}',
         ),
@@ -208,9 +214,11 @@ my @checks = (
         c => join(
             $/,
             '#include <unbound.h>',
+            '#include <stdio.h>',
             'int main() {',
             '   struct ub_result myresult;',
             '   myresult.why_bogus = "123";',
+            '   fprintf(stdout, "%s", myresult.why_bogus);',
             '   return 0;',
             '}',
         ),
@@ -224,7 +232,7 @@ my @checks = (
             $/,
             '#include <unbound.h>',
             'int main() {',
-            '   struct ub_ctx* myctx;',
+            '   struct ub_ctx* myctx = ub_ctx_create();',
             '   ub_cancel(myctx, 0);',
             '   return 0;',
             '}',
@@ -239,7 +247,7 @@ my @checks = (
             $/,
             '#include <unbound.h>',
             'int main() {',
-            '   struct ub_ctx* myctx;',
+            '   struct ub_ctx* myctx = ub_ctx_create();',
             '   ub_ctx_add_ta_autr(myctx, "/faux");',
             '   return 0;',
             '}',
@@ -263,9 +271,9 @@ for my $check (@checks) {
 
     # Some compilers care about order here:
     #   compile flags, compile source, linker flags, then linker source.
-    my $cmd = "$ccpath $cflags $cpath $ldflags -o $progpath";
+    my $cmd = "$ccpath $Config{'ccflags'} $cflags $cpath -o $progpath $Config{ccdlflags} $ldflags";
 
-    # print "Compiling test program: `$cmd`\n";
+    print "Compiling test program: `$cmd`\n";
     system($cmd);
 
     my $success = -s $progpath ? 1 : 0;
@@ -275,6 +283,11 @@ for my $check (@checks) {
 }
 
 _generate_includes();
+
+my @extra_makefile_args;
+if ($libdir) {
+    push @extra_makefile_args, LDDLFLAGS => "-Wl,-rpath,$libdir $Config{lddlflags}",
+}
 
 WriteMakefile(
     NAME           => 'DNS::Unbound',
@@ -294,6 +307,9 @@ WriteMakefile(
         "-DHAS_TTL=$HAS_TTL",
         "-DHAS_UB_CONSTANTS=$HAS_UB_CONSTANTS",
     ),
+
+    @extra_makefile_args,
+
     LIBS           => [ $ldflags ],
     LICENSE        => 'perl',
 

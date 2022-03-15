@@ -2,7 +2,7 @@ package App::Yath::Command::test;
 use strict;
 use warnings;
 
-our $VERSION = '1.000111';
+our $VERSION = '1.000112';
 
 use App::Yath::Options;
 
@@ -40,6 +40,7 @@ use Test2::Harness::Util::HashBase qw/
 
     +renderers
     +logger
+    +last_log
 
     +tests_seen
     +asserts_seen
@@ -424,8 +425,11 @@ sub stop {
         printf("\nKeeping work dir: %s\n", $self->workdir)
             if $settings->debug->keep_dirs;
 
-        print "\nWrote log file: " . $settings->logging->log_file . "\n"
-            if $settings->logging->log;
+        if ($settings->logging->log) {
+            print "\n";
+            print "Wrote log file: " . $settings->logging->log_file . "\n";
+            print " (Symlinked to: " . $self->{+LAST_LOG} . ")\n";
+        }
 
         $self->finalize_plugins();
     }
@@ -703,16 +707,35 @@ sub logger {
         no warnings 'once';
         require IO::Compress::Bzip2;
         $self->{+LOGGER} = IO::Compress::Bzip2->new($file) or die "Could not open log file '$file': $IO::Compress::Bzip2::Bzip2Error";
-        return $self->{+LOGGER};
     }
     elsif ($settings->logging->gzip) {
         no warnings 'once';
         require IO::Compress::Gzip;
         $self->{+LOGGER} = IO::Compress::Gzip->new($file) or die "Could not open log file '$file': $IO::Compress::Gzip::GzipError";
-        return $self->{+LOGGER};
+    }
+    else {
+        $self->{+LOGGER} = open_file($file, '>');
     }
 
-    return $self->{+LOGGER} = open_file($file, '>');
+    for my $ext ('jsonl', 'jsonl.bz2', 'jsonl.gz') {
+        my $name = "./lastlog.$ext";
+        next unless -f $name;
+        local ($!, $@) = (0, '');
+        eval { unlink($name) } or warn "Could not unlink '$name': ($!) $@";
+    }
+
+    if ($file =~ m/\.(jsonl(?:\.(?:bz2|gz))?)$/) {
+        my $ext = $1;
+        my $name = "./lastlog.$ext";
+        if (eval { symlink($file, $name); 1 }) {
+            $self->{+LAST_LOG} = $name;
+        }
+        else {
+            warn "Could not symlink the log file to '$name': $@";
+        }
+    }
+
+    return $self->{+LOGGER};
 }
 
 sub renderers {
@@ -1501,6 +1524,39 @@ Do not run tests that have their duration flag set to 'LONG'
 =item --no-only-long
 
 Only run tests that have their duration flag set to 'LONG'
+
+
+=item --rerun
+
+=item --rerun=path/to/log.jsonl
+
+=item --rerun=plugin_specific_string
+
+=item --no-rerun
+
+Re-Run tests from a previous run from a log file (or last log file). Plugins can intercept this, such as YathUIDB which will grab a run UUID and derive tests to re-run from that.
+
+
+=item --rerun-failed
+
+=item --rerun-failed=path/to/log.jsonl
+
+=item --rerun-failed=plugin_specific_string
+
+=item --no-rerun-failed
+
+Re-Run failed tests from a previous run from a log file (or last log file). Plugins can intercept this, such as YathUIDB which will grab a run UUID and derive tests to re-run from that.
+
+
+=item --rerun-plugin Foo
+
+=item --rerun-plugin +App::Yath::Plugin::Foo
+
+=item --no-rerun-plugin
+
+What plugin(s) should be used for rerun (will fallback to other plugins if the listed ones decline the value, this is just used ot set an order of priority)
+
+Can be specified multiple times
 
 
 =item --search ARG

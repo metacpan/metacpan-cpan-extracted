@@ -1,3 +1,9 @@
+0.006   2022-02-19  Released-By: PERLANCAR; Urgency: medium
+
+        - [cli list-metacpan-releases] Add option --date as an alternative
+          to --from-date (& --to-date).
+
+
 0.005   2021-04-14  Released-By: PERLANCAR; Urgency: medium
 
 	- Add CLIs: open-metacpan-{dist,module}-page.

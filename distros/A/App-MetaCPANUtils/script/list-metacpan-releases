@@ -1,12 +1,7 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/MetaCPANUtils/list_metacpan_releases
-# and generated automatically using Perinci::CmdLine::Gen version 0.498
-
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-04-14'; # DATE
-our $DIST = 'App-MetaCPANUtils'; # DIST
-our $VERSION = '0.005'; # VERSION
+# and generated automatically using Perinci::CmdLine::Gen version 0.501
 
 use 5.010001;
 use strict;
@@ -14,6 +9,11 @@ use warnings;
 use Log::ger;
 
 use Perinci::CmdLine::Any;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-02-24'; # DATE
+our $DIST = 'App-MetaCPANUtils'; # DIST
+our $VERSION = '0.006'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/MetaCPANUtils/list_metacpan_releases",
@@ -40,28 +40,13 @@ list-metacpan-releases - list-metacpan-releases
 
 =head1 VERSION
 
-This document describes version 0.005 of list-metacpan-releases (from Perl distribution App-MetaCPANUtils), released on 2021-04-14.
+This document describes version 0.006 of list-metacpan-releases (from Perl distribution App-MetaCPANUtils), released on 2022-02-24.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % list-metacpan-releases [--author=s] [--backpan] [--cpan] [--debug]
-     [--distribution=s] [-f=s+] [--fields-json=s] [--fields=s+] [--first]
-     [--format=name] [--from-date=s] [--json] [--latest]
-     [--log-level=level] [--(no)naked-res] [--no-first] [--nofirst]
-     [--page-result[=program]] [--quiet] [--sort=s] [--status=s]
-     [--to-date=s] [--trace] [--verbose] [--view-result[=program]]
-
-Examples:
-
-Show releases in December 2020:
-
- % list-metacpan-releases --from-date 2020-12-01 --to-date 2020-12-31
-
-Show PERLANCAR's releases, show only their distribution, version, first (whether the release is the first release for the distribution), and download URL:
-
- % list-metacpan-releases --author PERLANCAR -f distribution -f version -f first -f download_url
+% B<list-metacpan-releases> [B<--author>=I<cpan::pause_id>] [B<--date>=I<date>] [B<--debug>|B<--log-level>=I<level>|B<--quiet>|B<--trace>|B<--verbose>] [B<--distribution>=I<cpan::distname>] [(B<--fields>=I<str>)+] [B<--first>|B<--no-first>|B<--nofirst>] [B<--format>=I<name>|B<--json>] [B<--from-date>=I<date>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--sort>=I<str>] [B<--status>=I<str>] [B<--to-date>=I<date>] [B<--fields-json>=I<json>|(B<-f>=I<str>)+] [B<--backpan>|B<--cpan>|B<--latest>]
 
 =head1 OPTIONS
 
@@ -100,6 +85,10 @@ See C<--status>.
 Shortcut for --status=cpan.
 
 See C<--status>.
+
+=item B<--date>=I<s>
+
+Select a single day, alternative to `from_date` + `to_date`.
 
 =item B<--distribution>=I<s>
 
@@ -262,6 +251,16 @@ It is also recommended to install L<shcompgen> (see above).
 
 For fish and zsh, install L<shcompgen> as described above.
 
+=head1 EXAMPLES
+
+Show releases in December 2020:
+
+ % list-metacpan-releases --from-date 2020-12-01 --to-date 2020-12-31
+
+Show PERLANCAR's releases, show only their distribution, version, first (whether the release is the first release for the distribution), and download URL:
+
+ % list-metacpan-releases --author PERLANCAR -f distribution -f version -f first -f download_url
+
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/App-MetaCPANUtils>.
@@ -270,23 +269,40 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-MetaCP
 
 Source repository is at L<https://github.com/perlancar/perl-App-MetaCPANUtils>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-MetaCPANUtils/issues>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
+This software is copyright (c) 2022, 2021, 2020 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-MetaCPANUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

@@ -52,6 +52,6 @@
          "web" : "https://github.com/briandfoy/set-crossproduct"
       }
    },
-   "version" : "2.007",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "2.008",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

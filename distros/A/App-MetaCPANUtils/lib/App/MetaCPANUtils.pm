@@ -1,14 +1,14 @@
 package App::MetaCPANUtils;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-04-14'; # DATE
-our $DIST = 'App-MetaCPANUtils'; # DIST
-our $VERSION = '0.005'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
 use Log::ger;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-02-24'; # DATE
+our $DIST = 'App-MetaCPANUtils'; # DIST
+our $VERSION = '0.006'; # VERSION
 
 our %SPEC;
 
@@ -114,6 +114,13 @@ our %argoptf_from_date = (
 );
 our %argoptf_to_date = (
     to_date => {
+        schema => ["date*", "x.perl.coerce_to" => "DateTime"],
+        tags => ['category:filtering'],
+    },
+);
+our %argoptf_date = (
+    date => {
+        summary => 'Select a single day, alternative to `from_date` + `to_date`',
         schema => ["date*", "x.perl.coerce_to" => "DateTime"],
         tags => ['category:filtering'],
     },
@@ -236,6 +243,7 @@ $SPEC{list_metacpan_releases} = {
         %argoptf_distribution,
         %argoptf_from_date,
         %argoptf_to_date,
+        %argoptf_date,
         %argoptf_release_status,
         %argoptf_first,
     },
@@ -255,6 +263,12 @@ $SPEC{list_metacpan_releases} = {
             'x.doc.show_result' => 0,
         },
     ],
+    args_rels => {
+        'choose_one&' => [
+            ['from_date', 'date'],
+            ['to_date', 'date'],
+        ],
+    },
 };
 sub list_metacpan_releases {
     require MetaCPAN::Client;
@@ -272,8 +286,13 @@ sub list_metacpan_releases {
 
     my $params = {};
     $params->{_source} = _fields_to_source($args{fields}, $release_fields);
-    $params->{es_filter}{range}{date}{from} = $args{from_date}->ymd if defined $args{from_date};
-    $params->{es_filter}{range}{date}{to}   = $args{to_date}  ->ymd if defined $args{to_date};
+    if (defined $args{date}) {
+        $params->{es_filter}{range}{date}{from} = $args{date}->ymd;
+        $params->{es_filter}{range}{date}{to}   = $args{date}->ymd;
+    } else {
+        $params->{es_filter}{range}{date}{from} = $args{from_date}->ymd if defined $args{from_date};
+        $params->{es_filter}{range}{date}{to}   = $args{to_date}  ->ymd if defined $args{to_date};
+    }
     if (defined $args{sort}) {
         $params->{sort} = [{date=>{order=>'asc'}}]  if $args{sort} eq 'date';
         $params->{sort} = [{date=>{order=>'desc'}}] if $args{sort} eq '-date';
@@ -424,7 +443,7 @@ App::MetaCPANUtils - CLI utilities related to MetaCPAN
 
 =head1 VERSION
 
-This document describes version 0.005 of App::MetaCPANUtils (from Perl distribution App-MetaCPANUtils), released on 2021-04-14.
+This document describes version 0.006 of App::MetaCPANUtils (from Perl distribution App-MetaCPANUtils), released on 2022-02-24.
 
 =head1 DESCRIPTION
 
@@ -451,7 +470,7 @@ This distribution contains CLI utilities related to MetaCPAN:
 
 Usage:
 
- list_metacpan_distributions(%args) -> [status, msg, payload, meta]
+ list_metacpan_distributions(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 This function is not exported.
 
@@ -470,12 +489,12 @@ Arguments ('*' denotes required arguments):
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -485,7 +504,7 @@ Return value:  (any)
 
 Usage:
 
- list_metacpan_modules(%args) -> [status, msg, payload, meta]
+ list_metacpan_modules(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 This function is not exported.
 
@@ -510,12 +529,12 @@ Arguments ('*' denotes required arguments):
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -525,7 +544,7 @@ Return value:  (any)
 
 Usage:
 
- list_metacpan_releases(%args) -> [status, msg, payload, meta]
+ list_metacpan_releases(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 This function is not exported.
 
@@ -534,6 +553,10 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<author> => I<cpan::pause_id>
+
+=item * B<date> => I<date>
+
+Select a single day, alternative to `from_date` + `to_date`.
 
 =item * B<distribution> => I<cpan::distname>
 
@@ -554,12 +577,12 @@ Arguments ('*' denotes required arguments):
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -569,7 +592,7 @@ Return value:  (any)
 
 Usage:
 
- list_recent_metacpan_releases(%args) -> [status, msg, payload, meta]
+ list_recent_metacpan_releases(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 This function is not exported.
 
@@ -586,12 +609,12 @@ Arguments ('*' denotes required arguments):
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -601,7 +624,7 @@ Return value:  (any)
 
 Usage:
 
- open_metacpan_dist_page(%args) -> [status, msg, payload, meta]
+ open_metacpan_dist_page(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 This function is not exported.
 
@@ -616,12 +639,12 @@ Arguments ('*' denotes required arguments):
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -631,7 +654,7 @@ Return value:  (any)
 
 Usage:
 
- open_metacpan_module_page(%args) -> [status, msg, payload, meta]
+ open_metacpan_module_page(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 This function is not exported.
 
@@ -646,12 +669,12 @@ Arguments ('*' denotes required arguments):
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -669,14 +692,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-MetaCP
 
 Source repository is at L<https://github.com/perlancar/perl-App-MetaCPANUtils>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-MetaCPANUtils/issues>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<https://metacpan.org>
@@ -693,11 +708,36 @@ L<App::ThisDist::OnMetaCPAN>.
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
+This software is copyright (c) 2022, 2021, 2020 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-MetaCPANUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

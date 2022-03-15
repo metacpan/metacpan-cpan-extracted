@@ -1,5 +1,9 @@
 Revision history for Git-Critic
 
+0.7       2022-03-12 14:56:11 CET
+          - Explicitly use IPC::System::Simple to work around a bug where we
+            die if it's not installed.
+
 0.6       2022-03-10 17:23:19 CET
           - Assert minimum version of List::Util as 1.44 to ensure we don't
             get an older version which does not have `uniq`

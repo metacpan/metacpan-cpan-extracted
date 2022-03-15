@@ -125,7 +125,7 @@ BEGIN {
     die "Neither YAML nor Data::Dumper available.\n";
 }
 
-our $VERSION = '0.102';
+our $VERSION = '0.103';
 our $ALPHA_VERSION = $VERSION;
 $VERSION =~ s/_//g;
 

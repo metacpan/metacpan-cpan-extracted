@@ -1,9 +1,12 @@
 package Net::Connector::Juniper::Firewall;
 
-use 5.016;
+#------------------------------------------------------------------------------
+# 加载扩展模块
+#------------------------------------------------------------------------------
 use Moose;
-use Expect;
+use namespace::autoclean;
 
 extends('Net::Connector::Juniper::Srx');
 
+__PACKAGE__->meta->make_immutable;
 1;

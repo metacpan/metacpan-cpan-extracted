@@ -6,6 +6,7 @@ use warnings;
 use Test::More;
 use Test::FailWarnings;
 use Test::Exception;
+use Test::Deep;
 
 use DNS::Unbound ();
 
@@ -36,14 +37,34 @@ use DNS::Unbound ();
 
     throws_ok(
         sub { $dns->get_option( 'hahaha' ) },
-        qr<hahaha>,
+        'DNS::Unbound::X::Unbound',
         'set_option(): handling of unrecognized argument',
+    );
+
+    my $err = $@;
+
+    cmp_deeply(
+        $err,
+        methods(
+            get_message => re( qr<hahaha> ),
+        ),
+        'error message',
     );
 
     throws_ok(
         sub { $dns->set_option( hahaha => 3 ) },
-        qr<hahaha>,
+        'DNS::Unbound::X::Unbound',
         'set_option(): handling of unrecognized argument',
+    ) or diag explain $@;
+
+    $err = $@;
+
+    cmp_deeply(
+        $err,
+        methods(
+            get_message => re( qr<hahaha> ),
+        ),
+        'error message',
     );
 
     undef $dns;

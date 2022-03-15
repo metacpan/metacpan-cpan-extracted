@@ -1,11 +1,11 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic.pm
-## Version v0.21.11
+## Version v0.21.12
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/08/24
-## Modified 2022/03/10
+## Modified 2022/03/11
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -18,7 +18,9 @@ BEGIN
     use strict;
     use warnings;
     use warnings::register;
-    use vars qw( $MOD_PERL $AUTOLOAD $ERROR $PARAM_CHECKER_LOAD_ERROR $VERBOSE $DEBUG $SILENT_AUTOLOAD $PARAM_CHECKER_LOADED $CALLER_LEVEL $COLOUR_NAME_TO_RGB $true $false $DEBUG_LOG_IO %RE $stderr $stderr_raw );
+    use vars qw( $MOD_PERL $AUTOLOAD $ERROR $PARAM_CHECKER_LOAD_ERROR $VERBOSE $DEBUG 
+                 $SILENT_AUTOLOAD $PARAM_CHECKER_LOADED $CALLER_LEVEL $COLOUR_NAME_TO_RGB 
+                 $true $false $DEBUG_LOG_IO %RE $stderr $stderr_raw $SERIALISER );
     use Config;
     use Class::Load ();
     use Clone ();
@@ -40,7 +42,7 @@ BEGIN
     our @EXPORT      = qw( );
     our @EXPORT_OK   = qw( subclasses );
     our %EXPORT_TAGS = ();
-    our $VERSION     = 'v0.21.11';
+    our $VERSION     = 'v0.21.12';
     # local $^W;
     # mod_perl/2.0.10
     if( exists( $ENV{MOD_PERL} )
@@ -66,6 +68,8 @@ BEGIN
     $COLOUR_NAME_TO_RGB   = {};
     no strict 'refs';
     $DEBUG_LOG_IO = undef();
+    # Can use Sereal also
+    $SERIALISER = 'Storable';
     use constant COLOUR_OPEN  => '<';
     use constant COLOUR_CLOSE => '>';
     use constant HAS_THREADS  => ( $Config{useithreads} && $INC{'threads.pm'} );
@@ -916,6 +920,95 @@ sub coloured
         return( '' );
     }
 }
+
+sub deserialise
+{
+    my $self = shift( @_ );
+    my $opts = $self->_get_args_as_hash( @_ );
+    my $class = $opts->{serialiser} || $opts->{serializer} || $SERIALISER;
+    return( $self->error( "No serialiser class was provided nor set in \$Module::Generic::SERIALISER" ) ) if( !defined( $class ) || !length( $class ) );
+    $self->_load_class( $class ) || return( $self->pass_error );
+    if( $class eq 'Sereal' )
+    {
+        my @options = qw( refuse_snappy refuse_objects no_bless_objects validate_utf8 max_recursion_depth max_num_hash_entries max_num_array_entries max_string_length max_uncompressed_size incremental alias_smallint alias_varint_under use_undef set_readonly set_readonly_scalars );
+        my $ref = {};
+        for( @options )
+        {
+            $ref->{ $_ } = $opts->{ $_ } if( exists( $opts->{ $_ } ) );
+        }
+        
+        try
+        {
+            my $code;
+            my $dec = Sereal::Decoder->new( $ref );
+            if( exists( $opts->{file} ) && $opts->{file} )
+            {
+                return( $self->error( "File provided \"$opts->{file}\" does not exist." ) ) if( !-e( "$opts->{file}" ) );
+                return( $self->error( "File provided \"$opts->{file}\" is actually a directory." ) ) if( -d( "$opts->{file}" ) );
+                return( $self->error( "File provided \"$opts->{file}\" to deserialise is empty." ) ) if( -z( "$opts->{file}" ) );
+                return( $dec->decode_from_file( "$opts->{file}" => $code ) );
+            }
+            elsif( exists( $opts->{data} ) )
+            {
+                return( $self->error( "Data provided to deserialise is empty." ) ) if( !defined( $opts->{data} ) || !length( $opts->{data} ) );
+                $dec->decode( $opts->{data} => $code );
+            }
+            else
+            {
+                return( $self->error( "No file and no data was provided to deserialise." ) );
+            }
+            return( $code );
+        }
+        catch( $e )
+        {
+            return( $self->error( "Error trying to serialise data with $class: $e" ) );
+        }
+    }
+    elsif( $class eq 'Storable' )
+    {
+        try
+        {
+            if( exists( $opts->{file} ) && $opts->{file} )
+            {
+                return( $self->error( "File provided \"$opts->{file}\" does not exist." ) ) if( !-e( "$opts->{file}" ) );
+                return( $self->error( "File provided \"$opts->{file}\" is actually a directory." ) ) if( -d( "$opts->{file}" ) );
+                return( $self->error( "File provided \"$opts->{file}\" to deserialise is empty." ) ) if( -z( "$opts->{file}" ) );
+                if( $opts->{lock} )
+                {
+                    return( Storable::lock_retrieve( "$opts->{file}" ) );
+                }
+                else
+                {
+                    return( Storable::retrieve( "$opts->{file}" ) );
+                }
+            }
+            elsif( exists( $opts->{data} ) )
+            {
+                return( $self->error( "Data provided to deserialise is empty." ) ) if( !defined( $opts->{data} ) || !length( $opts->{data} ) );
+                return( Storable::thaw( $opts->{data} ) );
+            }
+            elsif( exists( $opts->{io} ) )
+            {
+                return( $self->error( "File handle provided ($opts->{io}) is not an actual file handle to get data to deserialise." ) ) if( Scalar::Util::reftype( $opts->{io} ) ne 'GLOB' );
+                return( Storable::fd_retrieve( $opts->{io} ) );
+            }
+            else
+            {
+                return( $self->error( "No file and no data was provided to deserialise." ) );
+            }
+        }
+        catch( $e )
+        {
+            return( $self->error( "Error trying to serialise data with $class: $e" ) );
+        }
+    }
+    else
+    {
+        return( $self->error( "Unsupporterd serialiser \"$class\"." ) );
+    }
+}
+
+sub deserialize { return( shift->deserialise( @_ ) ); }
 
 sub debug
 {
@@ -2132,6 +2225,79 @@ sub save
     my $bytes = -s( $opts->{file} );
     return( $bytes );
 }
+
+sub serialise
+{
+    my $self = shift( @_ );
+    my $data = shift( @_ );
+    return( $self->error( "No data to serialise was provided." ) ) if( !defined( $data ) || !length( $data ) );
+    my $opts = $self->_get_args_as_hash( @_ );
+    my $class = $opts->{serialiser} || $opts->{serializer} || $SERIALISER;
+    return( $self->error( "No serialiser class was provided nor set in \$Module::Generic::SERIALISER" ) ) if( !defined( $class ) || !length( $class ) );
+    $self->_load_class( $class ) || return( $self->pass_error );
+    if( $class eq 'Sereal' )
+    {
+        my @options = qw( compress compress_threshold compress_level snappy snappy_incr snappy_threshold croak_on_bless freeze_callbacks no_bless_objects undef_unknown stringify_unknown warn_unknown max_recursion_depth  canonical canonical_refs sort_keys no_shared_hashkeys dedupe_strings aliased_dedupe_strings protocol_version use_protocol_v1 );
+        my $ref = {};
+        for( @options )
+        {
+            $ref->{ $_ } = $opts->{ $_ } if( exists( $opts->{ $_ } ) );
+        }
+        
+        try
+        {
+            my $enc = Sereal::Encoder->new( $ref );
+            if( exists( $opts->{file} ) && $opts->{file} )
+            {
+                return( $enc->encode_to_file( "$opts->{file}", $data, ( exists( $opts->{append} ) ? $opts->{append} : 0 ) ) );
+            }
+            else
+            {
+                return( $enc->encode( $data ) );
+            }
+        }
+        catch( $e )
+        {
+            return( $self->error( "Error trying to serialise data with $class: $e" ) );
+        }
+    }
+    elsif( $class eq 'Storable' )
+    {
+        try
+        {
+            if( exists( $opts->{file} ) && $opts->{file} )
+            {
+                if( $opts->{lock} )
+                {
+                    return( Storable::lock_store( $data => "$opts->{file}" ) );
+                }
+                else
+                {
+                    return( Storable::store( $data => "$opts->{file}" ) );
+                }
+            }
+            elsif( exists( $opts->{io} ) )
+            {
+                return( $self->error( "File handle provided ($opts->{io}) is not an actual file handle to serialise data to." ) ) if( Scalar::Util::reftype( $opts->{io} ) ne 'GLOB' );
+                return( Storable::store_fd( $data => $opts->{io} ) );
+            }
+            else
+            {
+                return( Storable::freeze( $data ) );
+            }
+        }
+        catch( $e )
+        {
+            return( $self->error( "Error trying to serialise data with $class: $e" ) );
+        }
+    }
+    else
+    {
+        return( $self->error( "Unsupporterd serialiser \"$class\"." ) );
+    }
+}
+
+sub serialize { return( shift->serialise( @_ ) ); }
 
 sub set
 {
@@ -5220,7 +5386,7 @@ Module::Generic - Generic Module to inherit from
 
 =head1 VERSION
 
-    v0.21.11
+    v0.21.12
 
 =head1 DESCRIPTION
 
@@ -5393,6 +5559,58 @@ Based on the value, L</"message"> will or will not print out messages. For examp
 Since C<2> used in L</"message"> is equal to the debug value, the debugging message is printed.
 
 If the debug value is switched to 1, the message will be silenced.
+
+=head2 deserialise
+
+This method use a specified serialiser class and deserialise the given data either directly from a specified file or being provided, and returns the perl data.
+
+The 2 serialisers currently supported are: L<Sereal> and L<Storable>. They are not required by L<Module::Generic>, so you must install them yourself. If the serialiser chosen is not installed, this will set an L<errr|Module::Generic/error> and return C<undef>.
+
+This method takes some parameters as an hash or hash reference. It can then:
+
+=over 4
+
+=item * retrieve data directly from File
+
+=item * retrieve data from a file handle (only with L<Storable>)
+
+=item * Return the deserialised data
+
+=back
+
+The supported parameters are:
+
+=over 4
+
+=item * I<data>
+
+String of data to deserialise.
+
+=item * I<file>
+
+String. A file path where to store the serialised data.
+
+=item * I<io>
+
+A file handle. This is used when the serialiser is L<Storable> to call its function L<Storable/store_fd> and L<Storable/fd_retrieve>
+
+=item * I<lock>
+
+Boolean. If true, this will lock the file before reading from it. This works only in conjonction with I<file> and the serialiser L<Storable>
+
+=item * I<serialiser> or I<serializer>
+
+A string being the class of the serialiser to use. This can be only either L<Sereal> or L<Storable>
+
+=back
+
+Additionally the following options are supported and passed through directly to L<Sereal::Decoder/decode> if the serialiser is L<Sereal>: I<alias_smallint>, I<alias_varint_under>, I<incremental>, I<max_num_array_entries>, I<max_num_hash_entries>, I<max_recursion_depth>, I<max_string_length>, I<max_uncompressed_size>, I<no_bless_objects>, I<refuse_objects>, I<refuse_snappy>, I<set_readonly>, I<set_readonly_scalars>, I<use_undef>, I<validate_utf8>
+
+If an error occurs, this sets an L<error|Module::Generic/error> and return C<undef>
+
+=head2 deserialize
+
+Alias for L</deserialise>
 
 =head2 dump
 
@@ -5966,6 +6184,58 @@ Provided with some data and a file path, or alternatively an hash reference of o
 This is designed to simplify the tedious task of write to files.
 
 If it cannot open the file in write mode, or cannot print to it, this will set an error and return undef. Otherwise this returns the size of the file in bytes.
+
+=head2 serialise
+
+This method use a specified serialiser class and serialise the given data either by returning it or by saving it directly to a given file.
+
+The 2 serialisers currently supported are: L<Sereal> and L<Storable>. They are not required by L<Module::Generic>, so you must install them yourself. If the serialiser chosen is not installed, this will set an L<errr|Module::Generic/error> and return C<undef>.
+
+This method takes some data and an optional hash or hash reference of parameters. It can then:
+
+=over 4
+
+=item * save data directly to File
+
+=item * save data to a file handle (only with L<Storable>)
+
+=item * Return the serialised data
+
+=back
+
+The supported parameters are:
+
+=over 4
+
+=item * I<append>
+
+Boolean. If true, the serialised data will be appended to the given file. This works only in conjonction with I<file>
+
+=item * I<file>
+
+String. A file path where to store the serialised data.
+
+=item * I<io>
+
+A file handle. This is used when the serialiser is L<Storable> to call its function L<Storable/store_fd> and L<Storable/fd_retrieve>
+
+=item * I<lock>
+
+Boolean. If true, this will lock the file before writing to it. This works only in conjonction with I<file> and the serialiser L<Storable>
+
+=item * I<serialiser> or I<serializer>
+
+A string being the class of the serialiser to use. This can be only either L<Sereal> or L<Storable>
+
+=back
+
+Additionally the following options are supported and passed through directly to L<Sereal::Decoder/decode> if the serialiser is L<Sereal>: I<aliased_dedupe_strings>, I<canonical>, I<canonical_refs>, I<compress>, I<compress_level>, I<compress_threshold>, I<croak_on_bless>, I<dedupe_strings>, I<freeze_callbacks>, I<max_recursion_depth>, I<no_bless_objects>, I<no_shared_hashkeys>, I<protocol_version>, I<snappy>, I<snappy_incr>, I<snappy_threshold>, I<sort_keys>, I<stringify_unknown>, I<undef_unknown>, I<use_protocol_v1>, I<warn_unknown>
+
+If an error occurs, this sets an L<error|Module::Generic/error> and return C<undef>
+
+=head2 serialize
+
+Alias for L</serialise>
 
 =head2 set
 

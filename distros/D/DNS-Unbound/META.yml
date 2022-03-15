@@ -30,10 +30,10 @@ requires:
   Class::XSAccessor: '0.10'
   Net::DNS: '0'
   Promise::ES6: '0.11'
-  X::Tiny: '0'
+  X::Tiny: '0.21'
   XSLoader: '0.24'
 resources:
   bugtracker: https://github.com/FGasper/p5-DNS-Unbound/issues
   repository: https://github.com/FGasper/p5-DNS-Unbound.git
-version: '0.28'
+version: '0.29'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

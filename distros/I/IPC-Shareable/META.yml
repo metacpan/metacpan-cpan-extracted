@@ -29,5 +29,5 @@ requires:
 resources:
   bugtracker: https://github.com/stevieb9/ipc-shareable/issues
   repository: https://github.com/stevieb9/ipc-shareable.git
-version: '1.11'
+version: '1.12'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

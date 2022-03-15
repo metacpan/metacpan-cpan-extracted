@@ -9,26 +9,31 @@ use Try::Tiny;
 use Expect;
 use Moose::Role;
 use namespace::autoclean;
-use Mojo::Util qw/dumper/;
+
+# 调试模式
+# use Data::Printer;
+# use Data::Dumper;
 
 #------------------------------------------------------------------------------
 # 继承 Net::Connector::Role 必须实现的方法
 #------------------------------------------------------------------------------
-requires '_buildPrompt';
-requires '_buildCommands';
-requires '_buildErrorCode';
-requires '_buildBufferCode';
+requires '_prompt';
+requires '_errorCodes';
+requires '_bufferCodes';
 requires 'runCommands';
+# 运行相关配置
+requires '_startupCommands';
+requires '_runningCommands';
+requires '_healthCheckCommands';
+requires 'truncateCommand';
 
 #------------------------------------------------------------------------------
-# 定义设备联结 Net::Connector::Role 方法属性
+# 定义生成登录脚本字串的相关状态和变量 spawn
 #------------------------------------------------------------------------------
 has exp => (
   is      => 'ro',
   isa     => 'Expect',
   default => sub { Expect->new },
-
-  # Expect 方法权限下放，该属性将代理响应
   handles => [ 'spawn', 'expect', 'interact' ]
 );
 
@@ -39,19 +44,19 @@ has host => (
 
 has tftp_server => (
   is      => 'ro',
-  default => 'tftp://192.168.8.160/',
+  default => 'tftp://192.168.8.105/',
 );
 
 has username => (
   is       => 'ro',
   required => 0,
-  default  => 'root'
+  default  => 'cisco'
 );
 
 has password => (
   is       => 'ro',
   required => 0,
-  default  => 'Cisc0123',
+  default  => 'cisco',
 );
 
 has port => (
@@ -59,10 +64,10 @@ has port => (
   predicate => 'hasPort'
 );
 
-# 缺省设置为 password
 has enPassword => (
-  is       => 'ro',
-  required => 0
+  is        => 'ro',
+  required  => 0,
+  predicate => 'hasEnPassword'
 );
 
 has proto => (
@@ -73,7 +78,6 @@ has proto => (
   default  => 'ssh',
 );
 
-# 登录成功更新状态为 1
 has status => (
   is      => 'ro',
   isa     => 'Int',
@@ -81,48 +85,69 @@ has status => (
   writer  => 'setStatus'
 );
 
-# 判断 enable 状态 还需要推敲
 has enabled => (
   is      => 'ro',
   isa     => 'Int',
+  default => 0,
   writer  => 'setEnabled',
-  default => 0
 );
 
+#------------------------------------------------------------------------------
+#  定义设备登录后自动交互逻辑，细节由各厂商实现
+#------------------------------------------------------------------------------
 has prompt => (
   is       => 'ro',
-  builder  => "_buildPrompt",
+  builder  => "_prompt",
   required => 1
 );
 
 has enPrompt => (
-  is        => 'ro',
-  writer    => 'setEnablePrompt',
-  predicate => 'definedEnablePrompt'
+  is => 'ro',
+  # builder   => "_enPrompt",
+  predicate => 'hasEnPrompt',
+  writer    => 'setEnPrompt',
+  required  => 0
 );
 
-has commands => (
-  is      => 'rw',
-  isa     => 'ArrayRef[Str]',
-  writer  => 'setCommands',
-  traits  => ['Array'],
-  handles => {
-    addCommand  => 'unshift',
-    pushCommand => 'push'
-  }
-);
-
-has getEnableCommand => (
+has enableCommand => (
   is       => 'ro',
   isa      => 'Str',
+  default  => 'enable',
   required => 0,
 );
 
-has getCommands => (
+has errorCodes => (
+  is      => 'ro',
+  builder => '_errorCodes'
+);
+
+has bufferCodes => (
+  is      => 'ro',
+  builder => '_bufferCodes'
+);
+
+#------------------------------------------------------------------------------
+# 定义不同厂商需要加载的临时变量和脚本修正逻辑
+#------------------------------------------------------------------------------
+has startupCommands => (
   is       => 'ro',
   isa      => 'ArrayRef',
-  builder  => "_buildCommands",
+  builder  => "_startupCommands",
   required => 1,
+);
+
+has runningCommands => (
+  is       => 'ro',
+  isa      => 'ArrayRef',
+  builder  => "_runningCommands",
+  required => 1,
+);
+
+has healthCheckCommands => (
+  is       => 'ro',
+  isa      => 'ArrayRef',
+  builder  => "_healthCheckCommands",
+  required => 0,
 );
 
 has timeout => (
@@ -132,34 +157,20 @@ has timeout => (
   writer  => 'setTimeout'
 );
 
-# 命令行代码
-has errorCode => (
-  is      => 'ro',
-  builder => '_buildErrorCode'
-);
-
-# 交互式执行脚本
-has bufferCode => (
-  is      => 'ro',
-  builder => '_buildBufferCode'
-);
-
 #------------------------------------------------------------------------------
-# login 设备登陆函数入口
+# login 登录网络设备，支持异常重连
 #------------------------------------------------------------------------------
 sub login {
   my $self = shift;
-
   # 检查是否已经登录过 | 边界条件检查
-  return {success => 1} if $self->status == 1;
+  return { success => 1 } if $self->status == 1;
 
   # 尝试连接设备,支持异常重连机制
   try {
-    # 需要等待这里执行完，才会跳转后面的代码
     $self->connect();
   }
   catch {
-    if (/RSA modulus too small/mi) {
+    if (/RSA modulus too small/i) {
       try { $self->connect('-v -1 -c des ') }
       catch {
         return {
@@ -168,7 +179,7 @@ sub login {
         };
       }
     }
-    elsif (/Selected cipher type <unknown> not supported/mi) {
+    elsif (/Selected cipher type <.*> not supported/i) {
       try {
         $self->connect('-c des ');
       }
@@ -179,7 +190,7 @@ sub login {
         };
       }
     }
-    elsif (/IDENTIFICATION CHANGED!/mi) {
+    elsif (/IDENTIFICATION CHANGED!/i) {
       try {
         `/usr/bin/ssh-keygen -R $self->{host}`;
         $self->connect();
@@ -205,8 +216,6 @@ sub login {
 #------------------------------------------------------------------------------
 sub _spawn_command {
   my ( $self, $args ) = @_;
-
-  # set empty if not provide
   $args ||= "";
 
   # 初始化变量
@@ -242,23 +251,23 @@ sub _spawn_command {
 #------------------------------------------------------------------------------
 sub connect {
   my ( $self, $args ) = @_;
-
   # 初始化变量
   my $username = $self->{username};
   my $password = $self->{password};
 
   # 初始化 Expect 函数
-  my $exp = Expect->new;
+  my $exp = Expect->new();
   $exp->raw_pty(1);
   $exp->debug(0);
   $exp->restart_timeout_upon_receive(1);
 
+  # setting exp attribute
   $self->{exp} = $exp;
 
   # 是否打印日志，一般用于排错
   $exp->log_stdout(0);
 
-  # 设置登录逻辑
+  # 设置登录逻辑生成登录脚本
   my $status  = 1;
   my $command = $self->_spawn_command($args);
 
@@ -270,42 +279,56 @@ sub connect {
     30,
 
     # 自动输入 yes
-    [ qr/continue connecting \(yes\/no/mi => sub {
+    [
+      qr/continue connecting \(yes\/no/i => sub {
         $exp->send("yes\n");
         exp_continue();
       }
     ],
 
     # 自动输入密码,且仅输入一次
-    [ qr/password:/mi => sub {
+    [
+      qr/password:/i => sub {
         if ( $status == 1 ) {
           $status = 0;
           $exp->send("$password\n");
         }
         else {
-          confess __PACKAGE__
-            . " case1) connect | Login ($self->{host}) failed, please provide the correct account password;";
+          confess __PACKAGE__ . " case1) connect | Login ($self->{host}) failed, please provide the correct account password;";
         }
         exp_continue();
       }
     ],
 
     # 自动输入账号 | 脚本已经绑定用户名
-    [ qr/(ogin|name):\s*$/mi => sub {
+    [
+      qr/(ogin|name):\s*$/i => sub {
         $exp->send("$username\n");
         exp_continue();
       }
     ],
-    [ qr/REMOTE HOST IDENTIFICATION/ => sub { croak("IDENTIFICATION CHANGED!"); } ],
+    [
+      qr/(REMOTE HOST IDENTIFICATION|HOST IDENTIFICATION HAS CHANGED)/i => sub {
+        croak("IDENTIFICATION CHANGED!");
+      }
+    ],
 
     # 捕捉到脚本下发正常提示符
-    [ qr/$self->{prompt}/ => sub {
+    [
+      qr/$self->{prompt}/ => sub {
         $self->setStatus(1);
 
         # 缺省情况下 没有 enable 模式
-        $self->setEnabled(1) unless $self->definedEnablePrompt;
+        $self->setEnabled(1) if $self->{prompt} eq $self->{enPrompt};
       }
     ],
+
+    # 捕捉到脚本下发正常提示符
+    [
+      qr/$self->{enPrompt}/ => sub {
+        $self->enable();
+      }
+    ]
   );
 
   # Expect是否异常
@@ -326,10 +349,7 @@ sub connect {
 #------------------------------------------------------------------------------
 sub send {
   my ( $self, $command ) = @_;
-
-  # 执行脚本
-  my $exp = $self->{exp};
-  $exp->send($command);
+  $self->{exp}->send($command);
 }
 
 #------------------------------------------------------------------------------
@@ -337,7 +357,6 @@ sub send {
 #------------------------------------------------------------------------------
 sub waitfor {
   my $self = shift;
-
   # 初始化变量
   my $buff = "";
 
@@ -346,7 +365,7 @@ sub waitfor {
 
   # 初始化缓存代码
   my $codeARef = [];
-  my $mapping  = $self->bufferCode();
+  my $mapping  = $self->bufferCodes();
 
   # 捕捉 more 交互式 code
   push $codeARef->@*, [
@@ -374,7 +393,7 @@ sub waitfor {
       $buff .= $exp->before() . $exp->match();
     }
   ];
-  say dumper $codeARef;
+  # say dumper $codeARef;
 
   # 动态加载交互式代码
   my @ret = $self->expect( 30, $codeARef->@* );
@@ -384,43 +403,17 @@ sub waitfor {
     confess __PACKAGE__ . " case 9) waitfor |  Exception caught when waitfor ($self->{host}) results：$ret[3] . $ret[1]";
   }
 
-  # 字符串修正处理
-  # $buff =~ s/\x1b\[\d+D\s+\x1b\[\d+D//g;
-  # $buff =~ s/\r\n|\n+\n/\n/g;
-  # $buff =~ s/^%.+$//mg;
-  # $buff =~ s/^\s*$//mg;
-
   # 返回修正后的脚本
-  return $buff;
+  return $buff ? $self->truncateCommand($buff) : "";
 }
 
+# TODO 这里逻辑需要优化
 #------------------------------------------------------------------------------
-# getConfig 获取设备运行配置
-#------------------------------------------------------------------------------
-sub getConfig {
-  my $self = shift;
-
-  # 抓取设备命令脚本，输入不分页命令加速输出
-  my $commands = $self->getCommands;
-  my $ret      = $self->execCommands( $commands->@* );
-
-  # 判断是否执行成功
-  if ( $ret->{success} == 1 ) {
-    return {
-      success => 1,
-      config  => $ret->{result}
-    };
-  }
-
-  # 兜底的返回结果
-  return $ret;
-}
-
-#------------------------------------------------------------------------------
-# execCommands 执行批量下发脚本
+# execCommands 执行批量下发脚本 || 如果未设置脚本，则默认返回运行配置
 #------------------------------------------------------------------------------
 sub execCommands {
   my ( $self, @commands ) = @_;
+  @commands = $self->runningCommands->@* unless scalar(@commands) > 0;
 
   # 判断是否已登陆设备
   if ( $self->status == 0 ) {
@@ -430,7 +423,7 @@ sub execCommands {
     return {
       success     => 0,
       failCommand => join( "\n", @commands ),
-      reason      => "case 7) execCommands | Login host($self->{host}) failure when deploy task"
+      reason      => "case 7) execCommands | Login host($self->{host}) failure when attempting login and deploy task"
       }
       if ( $self->status == 0 );
 
@@ -453,14 +446,12 @@ sub execCommands {
   # 初始化 result 变量，并开始执行命令
   my $result = "";
 
-  # 初始化 commands 属性
-  $self->setCommands( \@commands );
-
   # 遍历接受到的命令行
-  while ( my $cmd = shift $self->commands->@* ) {
+  while ( my $cmd = shift @commands ) {
 
-    # 自动跳过空白行
+    # 自动跳过空白行和注释行
     next if $cmd =~ /^\s*$/;
+    next if $cmd =~ /^[#|!]/;
 
     # 执行具体的脚本
     $self->send("$cmd\n");
@@ -469,7 +460,7 @@ sub execCommands {
     my $buff = $self->waitfor();
 
     # 异常拦截，基于正则表达式判断是否匹配错误码
-    foreach my $error ( $self->errorCode->@* ) {
+    foreach my $error ( $self->errorCodes->@* ) {
       return {
         success     => 0,
         failCommand => $cmd,
@@ -484,8 +475,53 @@ sub execCommands {
   # 输出计算结果
   return {
     success => 1,
-    result  => $result
+    config  => $result
   };
+}
+
+#------------------------------------------------------------------------------
+# getConfig 执行脚本调度基础组件
+#------------------------------------------------------------------------------
+sub getConfig {
+  my ( $self, $flag ) = @_;
+  # 抓取设备命令脚本，输入不分页命令加速输出
+  my $commands = $self->${flag};
+  my $ret      = $self->execCommands( $commands->@* );
+
+  # 判断是否执行成功
+  if ( $ret->{success} == 1 ) {
+    return {
+      success => 1,
+      config  => $ret->{config}
+    };
+  }
+
+  # 兜底的返回结果
+  return $ret;
+}
+
+#------------------------------------------------------------------------------
+# startupConfig 获取设备运行配置
+#------------------------------------------------------------------------------
+sub startupConfig {
+  my $self = shift;
+  $self->getConfig("startupCommands");
+}
+
+#------------------------------------------------------------------------------
+# runningConfig 获取设备运行配置
+#------------------------------------------------------------------------------
+sub runningConfig {
+  my $self = shift;
+  $self->getConfig("runningCommands");
+}
+
+#------------------------------------------------------------------------------
+# healthCheck 获取设备运行配置
+#------------------------------------------------------------------------------
+sub healthCheckConfig {
+  my $self = shift;
+  $self->getConfig("healthCheckCommands");
 }
 
 #------------------------------------------------------------------------------
@@ -498,20 +534,21 @@ sub enable {
   return if $self->enable == 1;
 
   # 异常拦截
-  confess "Please configure enablePrompt correctly, it needs to be set to regular expression"
-    unless $self->definedEnablePrompt;
+  confess "Please configure enablePrompt correctly, usually is a regular expression"
+    unless $self->hasEnPrompt;
 
   # 初始化变量
   my $username = $self->{username};
-  my $enPasswd = $self->{enPassword} // $self->{password};
+  my $enPasswd = $self->{enPassword} || $self->{password};
   my $exp      = $self->{exp};
 
   # 判断需要进入 enable 后执行
-  $exp->send( $self->getEnableCommand . "\n" );
+  $exp->send( $self->enableCommand . "\n" );
   my $status = 1;
   my @ret    = $self->expect(
     15,
-    [ qr/assword:\s*$/mi => sub {
+    [
+      qr/assword:\s*$/mi => sub {
         if ( $status == 1 ) {
           $status = 0;
           $exp->send("$enPasswd\n");
@@ -522,12 +559,14 @@ sub enable {
         exp_continue();
       }
     ],
-    [ qr/(ogin|name):\s*$/mi => sub {
+    [
+      qr/(ogin|name):\s*$/mi => sub {
         $exp->send("$username\n");
         exp_continue();
       }
     ],
-    [ qr/$self->enPrompt/ => sub {
+    [
+      qr/$self->enPrompt/ => sub {
         $self->setEnabled(1);
       }
     ]
@@ -535,8 +574,7 @@ sub enable {
 
   # 异常回显信号捕捉
   if ( defined $ret[1] ) {
-    confess __PACKAGE__
-      . " case6) enable | during interactive authenticate enable password, got errors：$ret[3] . $ret[1]";
+    confess __PACKAGE__ . " case6) enable | during interactive authenticate enable password, got errors：$ret[3] . $ret[1]";
   }
 }
 
@@ -544,18 +582,18 @@ sub enable {
 # 定义 deploy 执行现有的命令行脚本
 #------------------------------------------------------------------------------
 sub deploy {
-  my $self = shift;
+  my ( $self, @commands ) = @_;
 
   # 异常拦截 | 命令行为空直接返回
   return {
     success     => 0,
     failCommand => "Not defined commands.",
-    reason      => "Must define deploy task with specific configs.",
+    reason      => "Must provide specific configs.",
     }
-    if scalar $self->commands->@* == 0;
+    if scalar @commands == 0;
 
   # 遍历已有的 commands
-  return $self->execCommands( $self->commands->@* );
+  return $self->execCommands(@commands);
 }
 
 #------------------------------------------------------------------------------
@@ -595,6 +633,15 @@ sub generate_vendor_connector {
       return "Net::Connector::H3c::Comware";
     }
   }
+}
+
+#------------------------------------------------------------------------------
+# 对象构造后的钩子函数，修正数据
+#------------------------------------------------------------------------------
+sub BUILD {
+  my $self = shift;
+  # 设置enPrompt缺省值: $self->prompt
+  $self->setEnPrompt( $self->prompt ) unless $self->hasEnPrompt;
 }
 
 1;

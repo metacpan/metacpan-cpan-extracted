@@ -1,10 +1,12 @@
 package Net::Connector::Huawei::Switch;
 
-use 5.016;
+#------------------------------------------------------------------------------
+# 加载扩展模块
+#------------------------------------------------------------------------------
 use Moose;
-use Expect;
 use namespace::autoclean;
 
 extends('Net::Connector::Huawei::Vrp');
 
+__PACKAGE__->meta->make_immutable;
 1;

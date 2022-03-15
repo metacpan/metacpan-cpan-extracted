@@ -65,9 +65,13 @@ use constant {
 # Note that fields used only in dpkg's available file are not listed
 # Deprecated fields of dpkg's status file are also not listed
 our %FIELDS = (
+    'acquire-by-hash' => {
+        name => 'Acquire-By-Hash',
+        allowed => CTRL_REPO_RELEASE,
+    },
     'architecture' => {
         name => 'Architecture',
-        allowed => (ALL_PKG | ALL_SRC | CTRL_FILE_BUILDINFO | CTRL_FILE_CHANGES) & (~CTRL_INFO_SRC),
+        allowed => (ALL_PKG | ALL_SRC | CTRL_FILE_BUILDINFO | CTRL_FILE_CHANGES | CTRL_TESTS) & (~CTRL_INFO_SRC),
         separator => FIELD_SEP_SPACE,
     },
     'architectures' => {
@@ -193,6 +197,10 @@ our %FIELDS = (
         separator => FIELD_SEP_COMMA,
         dependency => 'union',
         dep_order => 10,
+    },
+    'butautomaticupgrades' => {
+        name => 'ButAutomaticUpgrades',
+        allowed => CTRL_REPO_RELEASE,
     },
     'changed-by' => {
         name => 'Changed-By',
@@ -371,6 +379,14 @@ our %FIELDS = (
     'multi-arch' => {
         name => 'Multi-Arch',
         allowed => ALL_PKG,
+    },
+    'no-support-for-architecture-all' => {
+        name => 'No-Support-for-Architecture-all',
+        allowed => CTRL_REPO_RELEASE,
+    },
+    'notautomatic' => {
+        name => 'NotAutomatic',
+        allowed => CTRL_REPO_RELEASE,
     },
     'package' => {
         name => 'Package',
@@ -598,89 +614,400 @@ our %FIELDS = (
     },
     'version' => {
         name => 'Version',
-        allowed => (ALL_PKG | ALL_SRC | CTRL_FILE_BUILDINFO | ALL_CHANGES) &
+        allowed => (ALL_PKG | ALL_SRC | CTRL_FILE_BUILDINFO | ALL_CHANGES | CTRL_REPO_RELEASE) &
                     (~(CTRL_INFO_SRC | CTRL_INFO_PKG)),
     },
 );
 
-my @src_dep_fields = qw(build-depends build-depends-arch build-depends-indep
-    build-conflicts build-conflicts-arch build-conflicts-indep);
-my @bin_dep_fields = qw(pre-depends depends recommends suggests enhances
-    conflicts breaks replaces provides built-using);
-my @src_checksums_fields = qw(checksums-md5 checksums-sha1 checksums-sha256);
-my @bin_checksums_fields = qw(md5sum sha1 sha256);
+my @src_vcs_fields = qw(
+    vcs-browser
+    vcs-arch
+    vcs-bzr
+    vcs-cvs
+    vcs-darcs
+    vcs-git
+    vcs-hg
+    vcs-mtn
+    vcs-svn
+);
+
+my @src_dep_fields = qw(
+    build-depends
+    build-depends-arch
+    build-depends-indep
+    build-conflicts
+    build-conflicts-arch
+    build-conflicts-indep
+);
+my @bin_dep_fields = qw(
+    pre-depends
+    depends
+    recommends
+    suggests
+    enhances
+    conflicts
+    breaks
+    replaces
+    provides
+    built-using
+);
+
+my @src_test_fields = qw(
+    testsuite
+    testsuite-triggers
+);
+
+my @src_checksums_fields = qw(
+    checksums-md5
+    checksums-sha1
+    checksums-sha256
+);
+my @bin_checksums_fields = qw(
+    md5sum
+    sha1
+    sha256
+);
 
 our %FIELD_ORDER = (
-    CTRL_PKG_DEB() => [
-        qw(package package-type source version built-using kernel-version
-        built-for-profiles auto-built-package architecture subarchitecture
-        installer-menu-item build-essential essential protected origin bugs
-        maintainer installed-size), @bin_dep_fields,
-        qw(section priority multi-arch homepage description tag task)
+    CTRL_INFO_SRC() => [
+        qw(
+            source
+            section
+            priority
+            maintainer
+            uploaders
+            origin
+            bugs
+        ),
+        @src_vcs_fields,
+        qw(
+            homepage
+            standards-version
+            rules-requires-root
+        ),
+        @src_dep_fields,
+        @src_test_fields,
+        qw(
+            description
+        ),
     ],
-    CTRL_INDEX_PKG() => [
-        qw(package package-type source version built-using kernel-version
-        built-for-profiles auto-built-package architecture subarchitecture
-        installer-menu-item build-essential essential protected origin bugs
-        maintainer installed-size), @bin_dep_fields,
-        qw(filename size), @bin_checksums_fields,
-        qw(section priority multi-arch homepage description tag task)
+    CTRL_INFO_PKG() => [
+        qw(
+            package
+            package-type
+            section
+            priority
+            architecture
+            subarchitecture
+            multi-arch
+            essential
+            protected
+            build-essential
+            build-profiles
+            built-for-profiles
+            kernel-version
+        ),
+        @bin_dep_fields,
+        qw(
+            homepage
+            installer-menu-item
+            task
+            tag
+            description
+        ),
     ],
     CTRL_PKG_SRC() => [
-        qw(format source binary architecture version origin maintainer
-        uploaders homepage description standards-version vcs-browser
-        vcs-arch vcs-bzr vcs-cvs vcs-darcs vcs-git vcs-hg vcs-mtn
-        vcs-svn testsuite testsuite-triggers), @src_dep_fields,
-        qw(package-list), @src_checksums_fields, qw(files)
+        qw(
+            format
+            source
+            binary
+            architecture
+            version
+            origin
+            maintainer
+            uploaders
+            homepage
+            description
+            standards-version
+        ),
+        @src_vcs_fields,
+        @src_test_fields,
+        @src_dep_fields,
+        qw(
+            package-list
+        ),
+        @src_checksums_fields,
+        qw(
+            files
+        ),
+    ],
+    CTRL_PKG_DEB() => [
+        qw(
+            package
+            package-type
+            source
+            version
+            built-using
+            kernel-version
+            built-for-profiles
+            auto-built-package
+            architecture
+            subarchitecture
+            installer-menu-item
+            build-essential
+            essential
+            protected
+            origin
+            bugs
+            maintainer
+            installed-size
+        ),
+        @bin_dep_fields,
+        qw(
+            section
+            priority
+            multi-arch
+            homepage
+            description
+            tag
+            task
+        ),
     ],
     CTRL_INDEX_SRC() => [
-        qw(format package binary architecture version priority section origin
-        maintainer uploaders homepage description standards-version vcs-browser
-        vcs-arch vcs-bzr vcs-cvs vcs-darcs vcs-git vcs-hg vcs-mtn vcs-svn
-        testsuite testsuite-triggers), @src_dep_fields,
-        qw(package-list directory), @src_checksums_fields, qw(files)
-    ],
-    CTRL_FILE_BUILDINFO() => [
-        qw(format source binary architecture version binary-only-changes),
+        qw(
+            format
+            package
+            binary
+            architecture
+            version
+            priority
+            section
+            origin
+            maintainer
+            uploaders
+            homepage
+            description
+            standards-version
+        ),
+        @src_vcs_fields,
+        @src_test_fields,
+        @src_dep_fields,
+        qw(
+            package-list
+            directory
+        ),
         @src_checksums_fields,
-        qw(build-origin build-architecture build-kernel-version build-date
-        build-path build-tainted-by installed-build-depends environment),
+        qw(
+            files
+        ),
     ],
-    CTRL_FILE_CHANGES() => [
-        qw(format date source binary binary-only built-for-profiles architecture
-        version distribution urgency maintainer changed-by description
-        closes changes), @src_checksums_fields, qw(files)
+    CTRL_INDEX_PKG() => [
+        qw(
+            package
+            package-type
+            source
+            version
+            built-using
+            kernel-version
+            built-for-profiles
+            auto-built-package
+            architecture
+            subarchitecture
+            installer-menu-item
+            build-essential
+            essential
+            protected
+            origin
+            bugs
+            maintainer
+            installed-size
+        ),
+        @bin_dep_fields,
+        qw(
+            filename
+            size
+        ),
+        @bin_checksums_fields,
+        qw(
+            section
+            priority
+            multi-arch
+            homepage
+            description
+            tag
+            task
+        ),
+    ],
+    CTRL_REPO_RELEASE() => [
+        qw(
+            origin
+            label
+            suite
+            version
+            codename
+            changelogs
+            date
+            valid-until
+            notautomatic
+            butautomaticupgrades
+            acquire-by-hash
+            no-support-for-architecture-all
+            architectures
+            components
+            description
+        ),
+        @bin_checksums_fields
     ],
     CTRL_CHANGELOG() => [
-        qw(source binary-only version distribution urgency maintainer
-        timestamp date closes changes)
+        qw(
+            source
+            binary-only
+            version
+            distribution
+            urgency
+            maintainer
+            timestamp
+            date
+            closes
+            changes
+        ),
+    ],
+    CTRL_COPYRIGHT_HEADER() => [
+        qw(
+            format
+            upstream-name
+            upstream-contact
+            source
+            disclaimer
+            comment
+            license
+            copyright
+        ),
+    ],
+    CTRL_COPYRIGHT_FILES() => [
+        qw(
+            files
+            copyright
+            license
+            comment
+        ),
+    ],
+    CTRL_COPYRIGHT_LICENSE() => [
+        qw(
+            license
+            comment
+        ),
+    ],
+    CTRL_FILE_BUILDINFO() => [
+        qw(
+            format
+            source
+            binary
+            architecture
+            version
+            binary-only-changes
+        ),
+        @src_checksums_fields,
+        qw(
+            build-origin
+            build-architecture
+            build-kernel-version
+            build-date
+            build-path
+            build-tainted-by
+            installed-build-depends
+            environment
+        ),
+    ],
+    CTRL_FILE_CHANGES() => [
+        qw(
+            format
+            date
+            source
+            binary
+            binary-only
+            built-for-profiles
+            architecture
+            version
+            distribution
+            urgency
+            maintainer
+            changed-by
+            description
+            closes
+            changes
+        ),
+        @src_checksums_fields,
+        qw(
+            files
+        ),
+    ],
+    CTRL_FILE_VENDOR() => [
+        qw(
+            vendor
+            vendor-url
+            bugs
+            parent
+        ),
     ],
     CTRL_FILE_STATUS() => [
         # Same as fieldinfos in lib/dpkg/parse.c
-        qw(package essential protected status priority section installed-size
-        origin
-        maintainer bugs architecture multi-arch source version config-version
-        replaces provides depends pre-depends recommends suggests breaks
-        conflicts enhances conffiles description triggers-pending
-        triggers-awaited),
+        qw(
+            package
+            essential
+            protected
+            status
+            priority
+            section
+            installed-size
+            origin
+            maintainer
+            bugs
+            architecture
+            multi-arch
+            source
+            version
+            config-version
+            replaces
+            provides
+            depends
+            pre-depends
+            recommends
+            suggests
+            breaks
+            conflicts
+            enhances
+            conffiles
+            description
+            triggers-pending
+            triggers-awaited
+        ),
         # These are allowed here, but not tracked by lib/dpkg/parse.c.
-        qw(auto-built-package build-essential built-for-profiles built-using
-        homepage installer-menu-item kernel-version package-type
-        subarchitecture tag task)
+        qw(
+            auto-built-package
+            build-essential
+            built-for-profiles
+            built-using
+            homepage
+            installer-menu-item
+            kernel-version
+            package-type
+            subarchitecture
+            tag
+            task
+        ),
     ],
-    CTRL_REPO_RELEASE() => [
-        qw(origin label suite codename changelogs date valid-until
-        architectures components description), @bin_checksums_fields
-    ],
-    CTRL_COPYRIGHT_HEADER() => [
-        qw(format upstream-name upstream-contact source disclaimer comment
-        license copyright)
-    ],
-    CTRL_COPYRIGHT_FILES() => [
-        qw(files copyright license comment)
-    ],
-    CTRL_COPYRIGHT_LICENSE() => [
-        qw(license comment)
+    CTRL_TESTS() => [
+        qw(
+            test-command
+            tests
+            tests-directory
+            architecture
+            restrictions
+            features
+            classes
+            depends
+        ),
     ],
 );
 

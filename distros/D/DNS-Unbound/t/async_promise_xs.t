@@ -36,7 +36,7 @@ for my $use_threads_yn ( 0, 1 ) {
 
                 isa_ok( $result, 'DNS::Unbound::Result', 'promise resolution' );
 
-                diag explain [ passed => $result ];
+                diag "passed: $name";
             },
             sub { diag explain [ failed => @_ ] },
         );
@@ -46,7 +46,7 @@ for my $use_threads_yn ( 0, 1 ) {
         vec( my $rin = q<>, $fd, 1 ) = 1;
         select( my $rout = $rin, undef, undef, undef );
 
-        diag "Ready vvvvvvvvvvvvv";
+        diag __FILE__ . ": Waiting on $name: vvvvvvvvvvvvv";
         $dns->process();
     }
 
@@ -58,13 +58,19 @@ for my $use_threads_yn ( 0, 1 ) {
         my $done_count = 0;
 
         my @queries = map {
+            my $name = $_;
+
             $dns->resolve_async( $_, 'NS' )->then(
-                sub { diag explain [ passed => @_ ] },
+                sub { diag "passed: $name" },
                 sub { diag explain [ failed => @_ ] },
             )->then( sub { $done_count++ } );
         } @tlds;
 
-        $dns->wait() while $done_count < @tlds;
+        diag __FILE__ . ": Waiting on: @tlds";
+        while ($done_count < @tlds) {
+            diag "wait()ing …";
+            $dns->wait();
+        }
     }
 }
 

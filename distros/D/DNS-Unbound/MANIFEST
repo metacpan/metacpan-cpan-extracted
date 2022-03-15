@@ -1,8 +1,3 @@
-.github/workflows/cygwin.yml
-.github/workflows/linux.yml
-.github/workflows/macos.yml
-.gitignore
-.travis.yml
 Changes
 LICENSE
 MANIFEST
@@ -10,6 +5,15 @@ Makefile.PL
 README.md
 Unbound.xs
 cpanfile
+easyxs/LICENSE
+easyxs/README.md
+easyxs/easyxs.h
+easyxs/easyxs_debug.h
+easyxs/easyxs_numeric.h
+easyxs/easyxs_perlcall.h
+easyxs/easyxs_string.h
+easyxs/init.h
+easyxs/ppport.h
 errcodes.jsonc
 examples/anyevent.pl
 examples/io_async.pl

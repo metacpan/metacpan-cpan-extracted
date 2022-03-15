@@ -1,3 +1,20 @@
+0.400000  2022-03-13 22:16:13-04:00 America/New_York
+
+    [ BUG FIXES ]
+    * PR #1634: Fix CI push setting to run tests on branches with / in the 
+      name (Stefan Hornburg - Racke)
+    * PR #1641: Fix uninitialized warnings from parsing routes with mixed
+      regex/splats (Russell @veryrusty Jenkins)
+
+    [ ENHANCEMENTS ]
+    * PR #1627: Set minimum Perl to 5.10.1 (Peter Mottram - SysPete)
+    * PR #1643: Set minimum Perl to 5.12.5 (Jason A. Crome)
+
+    [ DOCUMENTATION ]
+    * PR #1633: Fix YAML example in the tutorial (Tina Müller)
+    * PR #1644: Add deprecation policy to docs; link git guide (Jason A. 
+      Crome)
+
 0.301004  2021-06-06 13:30:28-04:00 America/New_York
 
     [ BUG FIXES ]

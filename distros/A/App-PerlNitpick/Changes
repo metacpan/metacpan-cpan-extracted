@@ -1,3 +1,8 @@
+v0.2.0
+	- Released at 2022-03-13T20:09:59+0900
+	- add rule: RemoveUnnecessaryScalarKeyword
+        - various minor fixes of distribution metadata.
+
 0.01
         - Released at 2021-03-15T23:29:21+0900
         - first CPAN release

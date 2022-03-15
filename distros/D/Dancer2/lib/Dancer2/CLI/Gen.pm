@@ -1,6 +1,6 @@
 package Dancer2::CLI::Gen;
 # ABSTRACT: Create new Dancer2 application
-$Dancer2::CLI::Gen::VERSION = '0.301004';
+$Dancer2::CLI::Gen::VERSION = '0.400000';
 use Moo;
 use URI;
 use HTTP::Tiny;
@@ -461,7 +461,7 @@ Dancer2::CLI::Gen - Create new Dancer2 application
 
 =head1 VERSION
 
-version 0.301004
+version 0.400000
 
 =head1 AUTHOR
 
@@ -469,7 +469,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Alexis Sukrieh.
+This software is copyright (c) 2022 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

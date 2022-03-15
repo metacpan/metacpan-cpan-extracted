@@ -71,7 +71,7 @@ my $class = Module::Build->subclass(
 
             local $ENV{LANG} = 'C';
             local $ENV{LC_ALL} = 'C';
-            local $ENV{PERL} = $Config{perlpath} || $^X || 'perl';
+            local $ENV{PERL} = $Config::Config{perlpath} || $^X || 'perl';
             local $ENV{DPKG_TEST_MODE} = 'cpan';
             local $ENV{DPKG_DATADIR} = 'data';
             local $ENV{DPKG_ORIGINS_DIR} = 't/origins';
@@ -85,7 +85,7 @@ my $class = Module::Build->subclass(
 my $build = $class->new(
     dist_name       => 'Dpkg',
     dist_abstract   => 'Debian Package Manager Perl modules',
-    dist_version    => '1.21.1',
+    dist_version    => '1.21.2',
     dist_author     => 'Dpkg Developers <debian-dpkg@lists.debian.org>',
     license         => 'GPL_2',
 

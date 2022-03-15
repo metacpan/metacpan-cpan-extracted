@@ -60,7 +60,7 @@ is(
     'name2ascii() rejects invalid Unicode',
 );
 
-for my $const ( qw(
+my @consts = qw(
     UIDNA_DEFAULT
     UIDNA_ALLOW_UNASSIGNED
     UIDNA_USE_STD3_RULES
@@ -68,8 +68,13 @@ for my $const ( qw(
     UIDNA_CHECK_CONTEXTJ
     UIDNA_NONTRANSITIONAL_TO_ASCII
     UIDNA_NONTRANSITIONAL_TO_UNICODE
-    UIDNA_CHECK_CONTEXTO
-) ) {
+);
+
+if (Unicode::ICU::ICU_MAJOR_VERSION() >= 49) {
+    push @consts, 'UIDNA_CHECK_CONTEXTO';
+}
+
+for my $const ( @consts ) {
     can_ok( 'Unicode::ICU::IDN', $const );
 }
 

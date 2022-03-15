@@ -4,7 +4,8 @@ BEGIN
     use strict;
     use lib './lib';
     use Module::Generic::SharedMem;
-    our $DEBUG = 3;
+    # our $DEBUG = 0;
+    our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 };
 
 {
@@ -16,7 +17,6 @@ BEGIN
         size => 2048,
         destroy => 0,
         mode => 0666,
-        debug => 0,
     );
     # For debugging only
     # $shem->create(1);

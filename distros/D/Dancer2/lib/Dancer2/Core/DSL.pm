@@ -1,7 +1,7 @@
 # ABSTRACT: Dancer2's Domain Specific Language (DSL)
 
 package Dancer2::Core::DSL;
-$Dancer2::Core::DSL::VERSION = '0.301004';
+$Dancer2::Core::DSL::VERSION = '0.400000';
 use Moo;
 use Carp;
 use Module::Runtime 'require_module';
@@ -281,8 +281,7 @@ sub status {
 }
 
 sub push_header {
-    # TODO: deprecate old keyword after we have a period of stability
-    # carp "DEPRECATED: please use the 'push_response_header' keyword instead of 'push_header'";
+    carp "DEPRECATED: push_header keyword. Please use the 'push_response_header' keyword instead of 'push_header'";
     goto &push_response_header;
 }
 
@@ -292,8 +291,7 @@ sub push_response_header {
 }
 
 sub header {
-    # TODO: deprecate keyword after a period of stability
-    # carp "DEPRECATED: please use the 'response_header' keyword instead of 'header'";
+    carp "DEPRECATED: header keyword. Please use the 'response_header' keyword instead of 'header'";
     goto &response_header;
 }
 
@@ -303,8 +301,7 @@ sub response_header {
 }
 
 sub headers {
-    # TODO: deprecate keyword after a period of stability
-    # carp "DEPRECATED: please use the 'response_headers' keyword instead of 'headers'";
+    carp "DEPRECATED: headers keyword. Please use the 'response_headers' keyword instead of 'headers'";
     goto &response_headers;
 }
 
@@ -405,7 +402,7 @@ sub pass         { shift->app->pass }
 #
 
 sub context {
-    carp "DEPRECATED: please use the 'app' keyword instead of 'context'";
+    carp "DEPRECATED: context keyword. Please use the 'app' keyword instead of 'context'";
     shift->app;
 }
 
@@ -522,7 +519,7 @@ Dancer2::Core::DSL - Dancer2's Domain Specific Language (DSL)
 
 =head1 VERSION
 
-version 0.301004
+version 0.400000
 
 =head1 FUNCTIONS
 
@@ -553,7 +550,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Alexis Sukrieh.
+This software is copyright (c) 2022 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

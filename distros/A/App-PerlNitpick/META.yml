@@ -17,7 +17,7 @@ name: App-PerlNitpick
 provides:
   App::PerlNitpick:
     file: lib/App/PerlNitpick.pm
-    version: '0.01'
+    version: v0.2.0
   App::PerlNitpick::Nitpicker:
     file: lib/App/PerlNitpick/Nitpicker.pm
   App::PerlNitpick::PCPWrap:
@@ -34,6 +34,8 @@ provides:
     file: lib/App/PerlNitpick/Rule/RemoveEffectlessUTF8Pragma.pm
   App::PerlNitpick::Rule::RemoveTrailingWhitespace:
     file: lib/App/PerlNitpick/Rule/RemoveTrailingWhitespace.pm
+  App::PerlNitpick::Rule::RemoveUnnecessaryScalarKeyword:
+    file: lib/App/PerlNitpick/Rule/RemoveUnnecessaryScalarKeyword.pm
   App::PerlNitpick::Rule::RemoveUnusedImport:
     file: lib/App/PerlNitpick/Rule/RemoveUnusedImport.pm
   App::PerlNitpick::Rule::RemoveUnusedInclude:
@@ -55,6 +57,11 @@ requires:
   Perl::Critic: '0'
   Perl::Critic::TooMuchCode: '0'
   String::PerlQuote: '0'
-version: '0.01'
+resources:
+  bugtracker: https://github.com/gugod/App-PerlNitpick/issues
+  homepage: https://github.com/gugod/App-PerlNitpick
+  repository: git://github.com/gugod/App-PerlNitpick.git
+version: v0.2.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_spdx_expression: MIT
+x_static_install: '1'

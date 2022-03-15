@@ -15,6 +15,9 @@ plan tests => (2 * @tests + 10);
 
 my $WITH_FEATURE = ("$]" >= 5.022);
 
+# work around Test::Builder bug if needed
+monkey_patch() if $Test::More::VERSION < 1.302189;
+
 LINES:
 foreach my $line (@data) {
 	chomp $line;
@@ -270,6 +273,39 @@ foreach my $line (@data) {
 }
 
 # all done
+
+#
+# Until v1.302189, Test::Builder::_unoverload() tries to invoke
+# an overload method wrongly. We try it here, and if it fails we monkey
+# patch it to a version that should work.
+#
+sub monkey_patch {
+	my $tb = Test::Builder->new;
+	my $z = Math::GMP->new(17);
+	eval { $tb->_unoverload(q{""}, \$z) };
+
+	# do nothing if it worked: $z should have been replaced with its string
+	return if !$@ && $z eq '17' && !ref($z);
+
+	# patch if it failed
+	use Scalar::Util qw{ blessed };
+	no warnings qw{ redefine };
+	*Test::Builder::_unoverload = sub {
+		my ($self, $type, $thing) = @_;
+		return unless ref $$thing;
+		return unless blessed($$thing) || scalar $self->_try(sub{ $$thing->isa('UNIVERSAL') });
+		{
+	        local ($!, $@);
+        	require overload;
+    	}
+    	my $string_meth = overload::Method( $$thing, $type ) || return;
+
+		# this is the fix - the interface requires two args passed in
+		#$$thing = $$thing->$string_meth();
+    	$$thing = $$thing->$string_meth(undef, 0);
+	};
+	return;
+}
 
 __END__
 &bcmp

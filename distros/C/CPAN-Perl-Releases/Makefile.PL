@@ -23,7 +23,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => "0.47"
   },
-  "VERSION" => "5.20220306",
+  "VERSION" => "5.20220313",
   "test" => {
     "TESTS" => "t/*.t"
   }

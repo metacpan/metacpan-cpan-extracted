@@ -39,6 +39,10 @@ if ($args{h} || (0 == keys %args)) {
 
 __END__
 
+=head1 NAME
+
+perlnitpick - rewrite Perl code according to App::PerlNitpick's rules
+
 =head1 USAGE
 
 perlnitpick [options] [paths]

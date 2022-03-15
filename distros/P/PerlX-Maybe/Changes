@@ -6,6 +6,11 @@ Home page:    <https://metacpan.org/release/PerlX-Maybe>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=PerlX-Maybe>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+1.202	2022-03-14	Pi Day
+
+ - Fix code example.
+   Daniel Böhmer++
+
 1.201	2018-11-25
 
  - Improve documentation for `provided_deref`.

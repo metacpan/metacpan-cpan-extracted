@@ -1,4 +1,5 @@
 Build.PL
+CONTRIBUTING.md
 Changes
 LICENSE
 MANIFEST
@@ -15,6 +16,7 @@ lib/App/PerlNitpick/Rule/MoreOrLessSpaces.pm
 lib/App/PerlNitpick/Rule/QuoteSimpleStringWithSingleQuote.pm
 lib/App/PerlNitpick/Rule/RemoveEffectlessUTF8Pragma.pm
 lib/App/PerlNitpick/Rule/RemoveTrailingWhitespace.pm
+lib/App/PerlNitpick/Rule/RemoveUnnecessaryScalarKeyword.pm
 lib/App/PerlNitpick/Rule/RemoveUnusedImport.pm
 lib/App/PerlNitpick/Rule/RemoveUnusedInclude.pm
 lib/App/PerlNitpick/Rule/RemoveUnusedVariables.pm
@@ -28,4 +30,5 @@ t/RemoveUnusedVariables.t
 t/RewriteWithAssignmentOperators.t
 t/append-unimport-statement.t
 t/remove-effectless-utf8-pragma.t
+t/remove-unnecessary-scalar-keyword.t
 t/remove-unused-import.t

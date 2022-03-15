@@ -79,7 +79,7 @@
          "web" : "https://github.com/heiseonline/perl-sentry-sdk"
       }
    },
-   "version" : "v1.0.16",
+   "version" : "v1.0.17",
    "x_contributors" : [
       "bsd <bsd@heise.de>",
       "pmb0 <2140915+pmb0@users.noreply.github.com>",

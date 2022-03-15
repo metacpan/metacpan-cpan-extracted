@@ -7,9 +7,10 @@ use Alien::Build::Plugin;
 use File::chdir;
 use File::Temp ();
 use Capture::Tiny qw( capture_merged capture );
+use Alien::Util qw( version_cmp );
 
 # ABSTRACT: Probe for system libraries by guessing with ExtUtils::CBuilder
-our $VERSION = '2.47'; # VERSION
+our $VERSION = '2.48'; # VERSION
 
 
 has options => sub { {} };
@@ -25,6 +26,9 @@ has program => 'int main(int argc, char *argv[]) { return 0; }';
 
 
 has version => undef;
+
+
+has 'atleast_version' => undef;
 
 
 has aliens => [];
@@ -130,6 +134,13 @@ sub init
       if(defined $self->version)
       {
         my($version) = $out =~ $self->version;
+        if (defined $self->atleast_version)
+        {
+          if(version_cmp ($version, $self->atleast_version) < 0)
+          {
+            die "CBuilder probe found version $version, but at least @{[ $self->atleast_version ]} is required.";
+          }
+        }
         $build->hook_prop->{version} = $version;
         $build->install_prop->{plugin_probe_cbuilder_gather}->{$self->instance_id}->{version} = $version;
       }
@@ -167,7 +178,7 @@ Alien::Build::Plugin::Probe::CBuilder - Probe for system libraries by guessing w
 
 =head1 VERSION
 
-version 2.47
+version 2.48
 
 =head1 SYNOPSIS
 
@@ -214,6 +225,10 @@ The program to use in the test.
 
 This is a regular expression to parse the version out of the output from the
 test program.
+
+=head2 atleast_version
+
+The minimum required version as provided by the system.
 
 =head2 aliens
 

@@ -1,3 +1,7 @@
+#if defined(__clang__) && defined(__clang_major__) && __clang_major__ > 11
+#pragma clang diagnostic ignored "-Wcompound-token-split-by-macro"
+#endif
+
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
@@ -508,7 +512,7 @@ xs_pbl_all( void *pbref, SV *sv_id, int want_data, SV *sv_conforms_to )
 		SvTAINTED_on( data );
 		( void ) ( hv_store( flvr, "data", 4, data , 0) );
 	    }
-	    PUSHs (newRV ((SV *) flvr));
+	    PUSHs (newRV_inc ((SV *) flvr));
 	}
 	pbl_free_all (resp, num_resp);
 #else	/* def USE_PBL_BACKEND */
@@ -571,7 +575,7 @@ xs_pbl_all( void *pbref, SV *sv_id, int want_data, SV *sv_conforms_to )
 
 		HV *flvr;
 		flvr = ( HV * ) sv_2mortal( ( SV * ) newHV() );
-		PUSHs( newRV( ( SV * ) flvr ) );
+		PUSHs( newRV_inc( ( SV * ) flvr ) );
 
 		( void ) hv_stores( flvr, "flags", newSVuv( flags ) );
 

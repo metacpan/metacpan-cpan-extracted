@@ -4,12 +4,14 @@ use 5.010001;
 use Moose::Role;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-09-27'; # DATE
+our $DATE = '2022-02-19'; # DATE
 our $DIST = 'Pod-Weaver-Role-RequireFromBuild'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 sub require_from_build {
-    my ($self, $input, $name) = @_;
+    my $self = shift;
+    my $opts = ref $_[0] eq 'HASH' ? shift : {};
+    my ($input, $name) = @_;
 
     my $zilla = $input->{zilla} or die "Can't get Dist::Zilla object";
 
@@ -18,7 +20,10 @@ sub require_from_build {
         $name .= ".pm";
     }
 
-    return if exists $INC{$name};
+    if (exists $INC{$name} && !$opts->{reload}) {
+        $self->log_debug(["Module %s has been loaded(%%INC entry: %s), skipped require-ing", $name, $INC{$name}]);
+        return;
+    }
 
     my @files = grep { $_->name eq "lib/$name" } @{ $zilla->files };
     @files    = grep { $_->name eq $name }       @{ $zilla->files }
@@ -48,7 +53,7 @@ Pod::Weaver::Role::RequireFromBuild - Role to require() from Dist::Zilla build f
 
 =head1 VERSION
 
-This document describes version 0.001 of Pod::Weaver::Role::RequireFromBuild (from Perl distribution Pod-Weaver-Role-RequireFromBuild), released on 2021-09-27.
+This document describes version 0.002 of Pod::Weaver::Role::RequireFromBuild (from Perl distribution Pod-Weaver-Role-RequireFromBuild), released on 2022-02-19.
 
 =head1 SYNOPSIS
 
@@ -60,6 +65,21 @@ This document describes version 0.001 of Pod::Weaver::Role::RequireFromBuild (fr
 =head1 PROVIDED METHODS
 
 =head2 require_from_build
+
+Usage:
+
+ $obj->require_from_build( [ \%opts , ] $file)
+
+Known options:
+
+=over
+
+=item * reload
+
+Bool. Optional, default false. If set to true, will reload the module even if
+it's already loaded.
+
+=back
 
 =head1 HOMEPAGE
 
@@ -96,7 +116,7 @@ beyond that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2021 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

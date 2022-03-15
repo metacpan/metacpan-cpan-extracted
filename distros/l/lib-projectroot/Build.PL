@@ -18,7 +18,7 @@ my %module_build_args = (
     "Thomas Klausner <domm\@plix.at>"
   ],
   "dist_name" => "lib-projectroot",
-  "dist_version" => "1.009",
+  "dist_version" => "1.010",
   "license" => "perl",
   "module_name" => "lib::projectroot",
   "recursive_test_files" => 1,

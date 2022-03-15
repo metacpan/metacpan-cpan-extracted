@@ -17,12 +17,20 @@ configure_requires:
   ExtUtils::MakeMaker: '6.52'
   perl: '5.013002'
 dynamic_config: 1
-generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Alien-LIBSVM
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
 requires:
   Alien::Base: '0.038'
   parent: '0'
@@ -32,9 +40,9 @@ requires:
 resources:
   homepage: https://github.com/EntropyOrg/p5-Alien-LIBSVM
   repository: https://github.com/EntropyOrg/p5-Alien-LIBSVM.git
-version: '0.004'
+version: '0.005'
 x_alienfile:
-  generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.31'
+  generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.32'
   requires:
     share:
       Alien::gmake: '0.14'

@@ -1,11 +1,14 @@
 ##----------------------------------------------------------------------------
 ## Getopt::Long with Class - ~/lib/Getopt/Class.pm
-## Version v0.102.5
+## Version v0.102.6
 ## Copyright(c) 2020 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
+## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/04/25
-## Modified 2020/05/26
+## Modified 2022/03/12
+## All rights reserved
 ## 
+## This program is free software; you can redistribute  it  and/or  modify  it
+## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
 package Getopt::Class;
 BEGIN
@@ -13,13 +16,14 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( Module::Generic );
-    use Getopt::Long;
-    use Nice::Try;
     use DateTime;
     use DateTime::Format::Strptime;
-    use Scalar::Util;
 	use Devel::Confess;
-    our $VERSION = 'v0.102.5';
+    use Getopt::Long;
+    use Module::Generic::File qw( file );
+    use Nice::Try;
+    use Scalar::Util;
+    our $VERSION = 'v0.102.6';
 };
 
 sub init
@@ -120,10 +124,11 @@ sub init
         {
             $suff = '=s%';
         }
-        elsif( $def->{type} eq 'array' )
+        elsif( $def->{type} eq 'array' || $def->{type} eq 'file-array' )
         {
             $suff = '=s@';
             $opts->{ $k2_under } = [] unless( length( $def->{default} ) );
+            $def->{min} = 1 if( !exists( $def->{min} ) && !exists( $def->{max} ) );
         }
         elsif( $def->{type} eq 'boolean' )
         {
@@ -156,11 +161,15 @@ sub init
             return( $self->error( "Type is code, but the property code is not a code reference for this option \"$k\"." ) ) if( ref( $def->{code} ) ne 'CODE' );
             $opts->{ $k2_under } = $def->{code};
         }
+        elsif( $def->{type} eq 'file' )
+        {
+            $suff = '=s';
+        }
         
         if( $def->{min} )
         {
-            ## If there is no max, it would be for example s{1,}
-            ## 2nd formatter is %s because it could be blank. %d would translate to 0 when blank.
+            # If there is no max, it would be for example s{1,}
+            # 2nd formatter is %s because it could be blank. %d would translate to 0 when blank.
             $suff .= sprintf('{%d,%s}', @$def{ qw( min max ) } );
         }
         
@@ -396,7 +405,7 @@ sub exec
         }
     }
     $self->message( 3, "Enabling aliasing." );
-    $tie->enable( 1 );
+    $tie->enable(1);
     
     $self->messagef( 3, "%d option keys found in dictionary.", scalar( keys( %$dict ) ) );
     foreach my $k ( sort( keys( %$dict ) ) )
@@ -500,7 +509,7 @@ sub exec
         }
         elsif( $def->{type} eq 'integer' || $def->{decimal} )
         {
-            ## Even though this is a number, this was set as a scalar reference, so we need to dereference it
+            # Even though this is a number, this was set as a scalar reference, so we need to dereference it
             if( $self->_is_scalar( $opts->{ $k } ) )
             {
                 $opts->{ $k } = Module::Generic::Scalar->new( $opts->{ $k } );
@@ -509,6 +518,19 @@ sub exec
             {
                 $opts->{ $k } = $self->_set_get_number( $k, $opts->{ $k } );
             }
+        }
+        elsif( $def->{type} eq 'file' )
+        {
+            $opts->{ $k } = file( $opts->{ $k } );
+        }
+        elsif( $def->{type} eq 'file-array' )
+        {
+            my $arr = Module::Generic::Array->new;
+            foreach( @{$opts->{ $k }} )
+            {
+                push( @$arr, file( $_ ) );
+            }
+            $opts->{ $k } = $arr;
         }
    }
     
@@ -1018,10 +1040,13 @@ Getopt::Class - Extended dictionary version of Getopt::Long
         langs           => { type => 'array', class => [qw( person product )], re => qr/^[a-z]{2}([_|-][A-Z]{2})?/, min => 1, default => [qw(en)] },
         currency        => { type => 'string', class => [qw(product)], name => 'currency', re => qr/^[a-z]{3}$/, error => "must be a three-letter iso 4217 value" },
         age             => { type => 'integer', class => [qw(person)], name => 'age', },
+        path            => { type => 'file' },
+        skip            => { type => 'file-array' },
     };
     
     # Assuming command line arguments like:
-    prog.pl --create-user --name Bob --langs fr ja --age 30 --created now --debug 3
+    prog.pl --create-user --name Bob --langs fr ja --age 30 --created now --debug 3 \
+            --path ./here/some/where --skip ./bad/directory ./not/here ./avoid/me/
 
     my $opt = Getopt::Class->new({
         dictionary => $dict,
@@ -1049,13 +1074,13 @@ Getopt::Class - Extended dictionary version of Getopt::Long
     # Or you can also access those values as object methods
     if( $opts->create_product )
     {
-        $opts->langs->push( 'en_GB' ) if( !$opts->langs->lang );
+        $opts->langs->push( 'en_GB' ) if( !$opts->langs->length );
         printf( "Created on %s\n", $opts->created->iso8601 );
     }
 
 =head1 VERSION
 
-    v0.102.5
+    v0.102.6
 
 =head1 DESCRIPTION
 
@@ -1125,6 +1150,26 @@ A string to be used to set an error by L</"check_class_data">. Typically the str
     {
     currency => { type => 'string', class => [qw(product)], name => 'currency', re => qr/^[a-z]{3}$/, error => "must be a three-letter iso 4217 value" },
     };
+
+=item I<file>
+
+This type will mark the value as a directory or file path and will become a L<Module::Generic::File> object.
+
+This is particularly convenient when the user provided you with a relative path, such as:
+
+    ./my_prog.pl --debug 3 --path ./here/
+
+And if you are not very careful and inadvertently change directory like when using L<File::Find>, then this relative path could lead to some unpleasant surprise.
+
+Setting this argument type to C<file> ensure the resulting value is a L<Module::Generic::File>, whose underlying file or directory will be resolved to their absolute path.
+
+=item I<file-array>
+
+Same as I<file> argument type, but allows multiple value saved as an array. For example:
+
+    ./my_prog.pl --skip ./not/here ./avoid/me/ ./skip/this/directory
+
+This would result in the option property I<skip> being an L<array object|Module::Generic::Array> containing 3 entries.
 
 =item I<max>
 
@@ -1396,7 +1441,7 @@ Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 
 =head1 SEE ALSO
 
-L<Getopt::Longs>
+L<Getopt::Long>
 
 =head1 COPYRIGHT & LICENSE
 

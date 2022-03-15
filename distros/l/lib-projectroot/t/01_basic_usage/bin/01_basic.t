@@ -12,7 +12,7 @@ use lib::projectroot qw(lib);
 
 my @post_inc = @INC;
 is(scalar @post_inc, scalar @pre_inc + 1, 'added one element to @INC');
-is(cleanup($post_inc[0]), 't/01_basic_usage/lib', 'lib added to @INC');
+like(cleanup($post_inc[0]), qr{/01_basic_usage/lib$}, 'lib added to @INC');
 
 done_testing();
 

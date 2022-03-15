@@ -1,6 +1,6 @@
 package Dancer2::Core::Route;
 # ABSTRACT: Dancer2's route handler
-$Dancer2::Core::Route::VERSION = '0.301004';
+$Dancer2::Core::Route::VERSION = '0.400000';
 use Moo;
 use Dancer2::Core::Types;
 use Module::Runtime 'use_module';
@@ -95,12 +95,8 @@ sub match {
     return unless @values;
 
     # if some named captures are found, return captures
-    # no warnings is for perl < 5.10
     # - Note no @values implies no named captures
-    if (my %captures =
-        do { no warnings; %+ }
-      )
-    {
+    if (my %captures = %+ ) {
         return $self->_match_data( { captures => \%captures } );
     }
 
@@ -118,28 +114,30 @@ sub match {
         my @splat;
         for ( my $i = 0; $i < @values; $i++ ) {
             # Is this value from a token?
-            if ( $token_or_splat[$i] eq 'typed_token' ) {
-                my ( $token, $type ) = @{ shift @typed_tokens };
+            if ( defined $token_or_splat[$i] ) {
+                if ( $token_or_splat[$i] eq 'typed_token' ) {
+                    my ( $token, $type ) = @{ shift @typed_tokens };
 
-                if (defined $values[$i]) {
-                    # undef value mean that token was marked as optional so
-                    # we only do type check on defined value
-                    return
-                      unless $type->check($values[$i]);
+                    if (defined $values[$i]) {
+                        # undef value mean that token was marked as optional so
+                        # we only do type check on defined value
+                        return
+                          unless $type->check($values[$i]);
+                    }
+                    $params{$token} = $values[$i];
+                    next;
                 }
-                $params{$token} = $values[$i];
-                next;
-            }
-            if ( $token_or_splat[$i] eq 'token' ) {
-                $params{ shift @tokens } = $values[$i];
-                 next;
-            }
+                if ( $token_or_splat[$i] eq 'token' ) {
+                    $params{ shift @tokens } = $values[$i];
+                     next;
+                }
 
-            # megasplat values are split on '/'
-            if ($token_or_splat[$i] eq 'megasplat') {
-                $values[$i] = [
-                    defined $values[$i] ? split( m{/} , $values[$i], -1 ) : ()
-                ];
+                # megasplat values are split on '/'
+                if ($token_or_splat[$i] eq 'megasplat') {
+                    $values[$i] = [
+                        defined $values[$i] ? split( m{/} , $values[$i], -1 ) : ()
+                    ];
+                }
             }
             push @splat, $values[$i];
         }
@@ -320,7 +318,7 @@ Dancer2::Core::Route - Dancer2's route handler
 
 =head1 VERSION
 
-version 0.301004
+version 0.400000
 
 =head1 ATTRIBUTES
 
@@ -365,7 +363,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Alexis Sukrieh.
+This software is copyright (c) 2022 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

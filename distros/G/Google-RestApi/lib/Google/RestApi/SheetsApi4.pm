@@ -1,6 +1,6 @@
 package Google::RestApi::SheetsApi4;
 
-our $VERSION = '1.0.1';
+our $VERSION = '1.0.2';
 
 use Google::RestApi::Setup;
 
@@ -156,8 +156,9 @@ Google::RestApi::SheetsApi4 - API to Google Sheets API V4.
 
  $rest_api = RestApi->new(%config);
  $sheets_api = SheetsApi4->new(api => $rest_api);
- $sheet = $sheets->create_spreadsheet(title => 'my_name');
+ $sheet = $sheets_api->create_spreadsheet(title => 'my_name');
  $ws0 = $sheet->open_worksheet(id => 0);
+ $sw1 = $sheet->add_worksheet(name => 'Fred');
 
  # sub Worksheet::cell/col/cols/row/rows immediately get/set
  # values. this is less efficient but the simplest way to

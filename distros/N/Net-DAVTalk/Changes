@@ -1,5 +1,12 @@
 Revision history for Net-DAVTalk
 
+0.22    Mon 14 Mar 12:33 2022
+  - set the useragent to the module version rather than always 0.01
+
+0.21    Tue  4 May 12:52 2021
+  - uri_decode the homeset when doing discovery
+    (makes shortpath work correctly)
+
 0.20    Thu Apr 15 02:29 2021
   - add support for setting custom headers, thanks Hernan Lopes
 
@@ -8,8 +15,6 @@ Revision history for Net-DAVTalk
 
 0.18    Tue Apr  7 15:54 2020
   - remove FATAL warnings from DAVTalk module
-
-0.17    Fri Nov  8 17:28 2019
   - don't double-decode XML (thanks tadzik) PR#1
   - provide the 'ua()' method to get/set the user agent after creation
   - use the UA's own timeout support rather than duplicating it

@@ -3,9 +3,9 @@ NAME
     build files
 
 VERSION
-    This document describes version 0.001 of
+    This document describes version 0.002 of
     Pod::Weaver::Role::RequireFromBuild (from Perl distribution
-    Pod-Weaver-Role-RequireFromBuild), released on 2021-09-27.
+    Pod-Weaver-Role-RequireFromBuild), released on 2022-02-19.
 
 SYNOPSIS
      $self->require_from_build($input, 'Foo/Bar.pm');
@@ -14,6 +14,17 @@ SYNOPSIS
 DESCRIPTION
 PROVIDED METHODS
   require_from_build
+    Usage:
+
+     $obj->require_from_build( [ \%opts , ] $file)
+
+    Known options:
+
+    *   reload
+
+        Bool. Optional, default false. If set to true, will reload the
+        module even if it's already loaded.
+
 HOMEPAGE
     Please visit the project's homepage at
     <https://metacpan.org/release/Pod-Weaver-Role-RequireFromBuild>.
@@ -45,7 +56,8 @@ CONTRIBUTING
     me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021 by perlancar <perlancar@cpan.org>.
+    This software is copyright (c) 2022, 2021 by perlancar
+    <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

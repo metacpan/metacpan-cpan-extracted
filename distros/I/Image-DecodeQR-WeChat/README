@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    Version 0.3
+    Version 0.4
 
 SYNOPSIS
 
@@ -98,6 +98,10 @@ SYNOPSIS
     
         # pre-trained models location (installed with this module)
         print "my models are in here: ".Image::DecodeQR::WeChat::modelsdir()."\n"
+    
+        # returns 1 or 0 when OpenCV was compiled with highgui or not
+        # and supports GUI display like imshow() which displays an image in a window
+        my $has_highgui_support = opencv_has_highgui_xs();
 
     This code calls functions and methods from OpenCV/WeChat library
     (written in C++) for decoding one or more QR codes found embedded in
@@ -122,11 +126,13 @@ SYNOPSIS
 
 EXPORT
 
-    decode()
+      * decode()
 
-    decode_xs()
+      * decode_xs()
 
-    modelsdir()
+      * modelsdir()
+
+      * opencv_has_highgui_xs()
 
 COMMAND LINE SCRIPT
 
@@ -139,8 +145,8 @@ COMMAND LINE SCRIPT
 
 SUBROUTINES/METHODS
 
-   Image::DecodeQR::WeChat::decode_xs(infile, modelsdir, outbase,
-  verbosity, graphicaldisplayresult, dumpqrimagestofile) 
+   decode_xs(infile, modelsdir, outbase, verbosity, graphicaldisplayresult,
+  dumpqrimagestofile) 
 
     It takes in the filename of an input image which may contain one or
     more QR codes and returns back an ARRAYref of strings containing all
@@ -153,47 +159,50 @@ SUBROUTINES/METHODS
     codes were found or decoded successfully.
 
     These are the parameters it requires. They must all be present, with
-    optinal parameters allowed to be undef:
+    optional parameters allowed to be undef:
 
-    infile : the input image with zero or more QR codes. All the image
-    formats of OpenCV's imread()
-    <https://docs.opencv.org/4.5.5/d4/da8/group__imgcodecs.html> are
-    supported.
+      * infile : the input image with zero or more QR codes. All the image
+      formats of OpenCV's imread()
+      <https://docs.opencv.org/4.5.5/d4/da8/group__imgcodecs.html> are
+      supported.
 
-    modelsdir : the location of the directory holding all model files (CNN
-    trained models) required for QR code detection. These models are
-    already included with this package and will be installed in a shared
-    dir during installation. Their total size is about 1MB. They have been
-    kindly contributed by WeChat along with their library for QR Code
-    detection. They can be found
-    https://github.com/WeChatCV/opencv_3rdparty|here. The installed models
-    location is returned by modelsdir(). If you do not want to experiment
-    with your own models then just plug the output of modelsdir() to this
-    parameter, else specify your own.
+      * modelsdir : the location of the directory holding all model files
+      (CNN trained models) required for QR code detection. These models are
+      already included with this package and will be installed in a shared
+      dir during installation. Their total size is about 1MB. They have
+      been kindly contributed by WeChat along with their library for QR
+      Code detection. They can be found
+      https://github.com/WeChatCV/opencv_3rdparty|here. The installed
+      models location is returned by modelsdir(). If you do not want to
+      experiment with your own models then just plug the output of
+      modelsdir() to this parameter, else specify your own.
 
-    outbase : optionally specify output files basename which will contain
-    detected QR-codes' payloads, bounding boxes and QR-code images
-    extracted from the input image (one set of files for each QR-code
-    detected). If dumpqrimagestofile is set to 1 all the aforementioned
-    files will be created. If it is set to 0 then only the payloads will be
-    saved in a single file (all in one file). If outbase is left undef then
-    nothing is written to a file. As usual all detected codes' data is
-    returned back via the returned value of decode_xs().
+      * outbase : optionally specify output files basename which will
+      contain detected QR-codes' payloads, bounding boxes and QR-code
+      images extracted from the input image (one set of files for each
+      QR-code detected). If dumpqrimagestofile is set to 1 all the
+      aforementioned files will be created. If it is set to 0 then only the
+      payloads will be saved in a single file (all in one file). If outbase
+      is left undef then nothing is written to a file. As usual all
+      detected codes' data is returned back via the returned value of
+      decode_xs().
 
-     verbosity	levels: 0 is mute, 1 is only for C code, 10 is for C+XS
-    code.
+      *  verbosity  levels: 0 is mute, 1 is only for C code, 10 is for C+XS
+      code.
 
-     graphicaldisplayresult : if set to 1, it will display a window with
-    the input image and the detected QR-code(s) outlined.
+      *  graphicaldisplayresult : if set to 1, it will display a window
+      with the input image and the detected QR-code(s) outlined. This is
+      subject to whether current OpenCV installation was compiled to
+      support  imshow()  (with C < highgui > enabled).
 
-    dumpqrimagestofile : if set to 0, and outbase is specified, then all
-    payloads are written to a single file using the basename specified. If
-    set to 1 a lot more information is written to separate files, one for
-    each detected code. This is mainly for debugging purposes because the
-    returned value contains the payloads and their corresponding QR-codes'
-    bounding boxes. See outbase above.
+      * dumpqrimagestofile : if set to 0, and outbase is specified, then
+      all payloads are written to a single file using the basename
+      specified. If set to 1 a lot more information is written to separate
+      files, one for each detected code. This is mainly for debugging
+      purposes because the returned value contains the payloads and their
+      corresponding QR-codes' bounding boxes. See outbase above.
 
-   Image::DecodeQR::WeChat::decode(\%params) 
+   decode(\%params) 
 
     This is a Perl wrapper to the decode_xs() so that user can specify only
     a minimal set of parameters and the will be filled in by defaults.
@@ -205,39 +214,73 @@ SUBROUTINES/METHODS
 
     The  params  hashref:
 
-    input : the name of the input image file which can contain one or more
-    QR codes.
+      * input : the name of the input image file which can contain one or
+      more QR codes.
 
-    outbase : optional, if specified payloads (QR-code text) will be dumped
-    to a text file. If further, dumpqrimagestofile is set to 1 then image
-    files with the detected QR-codes will be dumped one for each QR-code as
-    well as text files with payloads and bounding boxes wrt the input
-    imaghe.
+      * outbase : optional, if specified payloads (QR-code text) will be
+      dumped to a text file. If further, dumpqrimagestofile is set to 1
+      then image files with the detected QR-codes will be dumped one for
+      each QR-code as well as text files with payloads and bounding boxes
+      wrt the input imaghe.
 
-    modelsdir : optional, use it only if you want to use your own model
-    files (for their format have a look at
-    https://docs.opencv.org/4.x/d5/d04/classcv_1_1wechat__qrcode_1_1WeChatQRCode.html,
-    they are CNN training files). This package has included the model files
-    kindly submitted by WeChat as a contribution to OpenCV and will be
-    installed in your system with all other files. Use modelsdir() to see
-    the location of installed model files. Their total size is about 1MB.
+      * modelsdir : optional, use it only if you want to use your own model
+      files (for their format have a look at
+      https://docs.opencv.org/4.x/d5/d04/classcv_1_1wechat__qrcode_1_1WeChatQRCode.html,
+      they are CNN training files). This package has included the model
+      files kindly submitted by WeChat as a contribution to OpenCV and will
+      be installed in your system with all other files. Use modelsdir() to
+      see the location of installed model files. Their total size is about
+      1MB.
 
-    verbosity : default is 0 which is muted. 1 is for verbose C code and 10
-    is for verbose C and XS code.
+      * verbosity : default is 0 which is muted. 1 is for verbose C code
+      and 10 is for verbose C and XS code.
 
-    dumpqrimagestofile : default is 0, set to 1 to have lots of image and
-    text files dumped (relative to outbase) for each QR code detected.
+      * dumpqrimagestofile : default is 0, set to 1 to have lots of image
+      and text files dumped (relative to outbase) for each QR code
+      detected.
 
-    graphicaldisplayresult : default is 0, set to 1 to have a window
-    popping up with the input image and the QR-code detected highlighted,
-    once for each code detected.
+      * graphicaldisplayresult : default is 0, set to 1 to have a window
+      popping up with the input image and the QR-code detected highlighted,
+      once for each code detected. This is subject to whether current
+      OpenCV installation was compiled to support  imshow()  (with C <
+      highgui > enabled).
 
-   Image::DecodeQR::WeChat::modelsdir() 
+   modelsdir() 
 
     It returns the path where the models included in this package have been
     installed. This is useful when you want to use decode_xs() and need to
     specify the modelsdir. Just pass the output of this to decode_xs() as
     its modelsdir parameter.
+
+   opencv_has_highgui_xs() 
+
+    It returns 1 or 0 depending on whether current OpenCV installation has
+    support for graphical display of images (the imshow() function). This
+    affects the option graphicaldisplayresult to decode() and decode_xs()
+    which will be ignored if there is no highgui support.
+
+    Caveat: checking for whether current OpenCV installation has highgui
+    support is very lame, it merely tries to find the include file
+    opencv2/highgui.hpp in the Include dirs. I have tried several methods
+    (see ```Makefile.PL```), for example DynaLoader or FFI::CheckLib can
+    search for symbols in any library (e.g. searching for imshow() in
+    libopencv_highgui or libopencv_world). This would have been the most
+    straight-forward way but alas, these are C++ libraries and function
+    names are mangled to weird function names like:
+
+        ZN2cv3viz6imshowERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERKNS_11_InputArrayERKNS_5Size_IiEE()
+
+    There's an imshow() in there but without a regex symbol-name search the
+    symbol can not be detected.
+
+    Another take is with Devel::CheckLib which supports compiling code
+    snippets when searching for a particular library. This fails because
+    they ... allow only a C compiler but we need a C++ compiler.
+
+    Finally, using Inline::CPP to compile our own snippet is totally in
+    vain because of its useless form of running as use Inline CPP = ... >.
+    I could not find any way of telling it to use specific CFLAGS and
+    LDFLAGS with this useless use Inline CPP form.
 
 IMPLEMENTATION DETAILS
 
@@ -276,37 +319,58 @@ IMPLEMENTATION DETAILS
         } //extern "C" {
         #endif
 
-    This only need happen in the header file:  wechat_qr_decode_lib.hpp .
+    This only need happen in the header file:  wechat_qr_decode_lib.hpp 
+    and in the XS file where the Perl headers are included.
 
 INSTALLING OpenCV
 
     In my case downloading OpenCV using Linux's package manager was not
     successful.It required to add another repository which wanted to
-    install its own versions of packages I already had.
+    install its own versions of packages I already had. So I prefered to
+    install OpenCV from sources. This is the procedure I followed:
 
-    Download OpenCV sources and also its contributed modules.
+    1. Download OpenCV sources and also its contributed modules.
 
-    Extract the sources and changed to the source dir.
+    2. Extract the sources and change to the source dir.
 
-    From within the source dir extract the contrib archive.
+    3. From within the source dir extract the contrib archive.
 
-    Create a build dir and change to it.
+    4. Create a build dir and change to it.
 
-    There are two ways to make cmake just tolerable: cmake-gui and ccmake.
-    The former is a full-gui interface to setting the billion cmake
+    5. There are two ways to make cmake just tolerable: cmake-gui and
+    ccmake. The former is a full-gui interface to setting the billion cmake
     variables. Use it if you are on a machine which offers a GUI: cmake-gui
-    .. . If you are on a remote host possibly over telnet or ssh then do
-    not despair because c<ccmake> is the CLI, curses-based equivalent to
-    cmake-gui, use it like: ccmake .. .
+    .. If you are on a headless or remote host possibly over telnet or ssh
+    then do not despair because c<ccmake> is the CLI, curses-based
+    equivalent to cmake-gui, use it like: ccmake .. (from within the build
+    dir).
 
-    Once on the interface first configure, then check the list of all
-    variables (you can search on both, for searching in the CLI one press /
-    and then n for next hit) to suit you and then generate, quit and
-    VERBOSE=1 make -j4 all
+    6. Once on either of the cmake GUIs, first do a configure, then check
+    the list of all variables (you can search on both, for searching in the
+    CLI, press </> and then n for next hit) to suit you and then generate,
+    quit and VERBOSE=1 make -j4 all
 
-    I guess, variables you want to change are OPENCV_EXTRA_MODULES_PATH and
-    OPENCV_ENABLE_NONFREE and anything that has to do with CNN or DNN. But
-    I only guess.
+    7. I guess, cmake variables you want to modify are
+    OPENCV_EXTRA_MODULES_PATH and OPENCV_ENABLE_NONFREE and anything that
+    has to do with CNN or DNN. If you have CUDA installed and a
+    CUDA-capable GPU then enable CUDA (search for CUDA string to find the
+    variable(s)). Also, VTK, Ceres Solver, Eigen3, Intel's TBB, CNN, DNN
+    etc. You need to install all these additional packages to get OpenCV
+    support with them.
+
+    8. I had a problem with compiling OpenCV with a GUI (the highgui) on a
+    headless host. So, I just disabled it. That's easy to achieve during
+    the above.
+
+    9. I have both installed this on a CUDA-capable GPU (with CUDA 10.2
+    installed) host and on a headless remote host with no GPU or basic.
+    CUDA is not required for building this module.
+
+    Your mileage may vary.
+
+    If you are seriously in need of installing this module then consider
+    migrating to a serious operating system such as Linux as your first
+    action.
 
 AUTHOR
 
@@ -342,19 +406,19 @@ SUPPORT
 
 ACKNOWLEDGEMENTS
 
-    The great Open Source OpenCV <https://opencv.org/> image processing
-    library and its contributed module WeChat QRDetector
-    <https://docs.opencv.org/4.x/dd/d63/group__wechat__qrcode.html> which
-    form the backbone of this module and do all the heavy lifting.
+      * The great Open Source OpenCV <https://opencv.org/> image processing
+      library and its contributed module WeChat QRDetector
+      <https://docs.opencv.org/4.x/dd/d63/group__wechat__qrcode.html> which
+      form the backbone of this module and do all the heavy lifting.
 
-    Botje and xenu at #perl for help.
+      * Botje and xenu at #perl for help.
 
-    Jiro Nishiguchi (JIRO ) whose (obsolete with modern - at the time of
-    writing - OpenCV) module Image::DecodeQR serves as the skeleton for
-    this module.
+      * Jiro Nishiguchi (JIRO ) whose (obsolete with modern - at the time
+      of writing - OpenCV) module Image::DecodeQR serves as the skeleton
+      for this module.
 
-    Thank you! to all those who responded to this SO question
-    https://stackoverflow.com/questions/71402095/perl-xs-create-and-return-array-of-strings-char-taken-from-calling-a-c-funct
+      * Thank you! to all those who responded to this SO question
+      https://stackoverflow.com/questions/71402095/perl-xs-create-and-return-array-of-strings-char-taken-from-calling-a-c-funct
 
 LICENSE AND COPYRIGHT
 

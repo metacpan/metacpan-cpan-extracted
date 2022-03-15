@@ -1,5 +1,11 @@
 Revision history for CGI-Ex.
 
+2.54      2022-03-11 15:00:51-07:00 America/Denver
+  * Fix sending cookies on location_bounce, if mod_perl 2 (thank you csjewell and oaxlin)
+
+2.53      2022-03-11 13:06:31-07:00 America/Denver
+  * Prevent Apache sending a default page after content on location_bounce (thank you csjewell)
+
 2.52      2022-03-09 16:45:04-07:00 America/Denver
   * Fix for HTTP2 stream crashing on certain browsers (thank you oaxlin)
 

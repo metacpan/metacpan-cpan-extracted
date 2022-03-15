@@ -1,6 +1,6 @@
 package Dancer2::Core::Role::Logger;
 # ABSTRACT: Role for logger engines
-$Dancer2::Core::Role::Logger::VERSION = '0.301004';
+$Dancer2::Core::Role::Logger::VERSION = '0.400000';
 use Dancer2::Core::Types;
 
 use Moo::Role;
@@ -191,7 +191,7 @@ Dancer2::Core::Role::Logger - Role for logger engines
 
 =head1 VERSION
 
-version 0.301004
+version 0.400000
 
 =head1 DESCRIPTION
 
@@ -324,7 +324,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Alexis Sukrieh.
+This software is copyright (c) 2022 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

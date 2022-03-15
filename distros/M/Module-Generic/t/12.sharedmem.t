@@ -45,7 +45,8 @@ SKIP:
         $shem->open->remove;
     }
     ok( defined( $exists ) && !$exists, 'exists' );
-    my $s = $shem->open({ mode => 'w' }) || do
+    my $s = $shem->open({ mode => 'w' });
+    defined( $s ) || do
     {
         diag( "Failed to open shared memory: ", $shem->error ) if( $DEBUG );
     };
@@ -56,9 +57,9 @@ SKIP:
         $s->remove;
     };
     skip( "Failed to create shared memory object. Your system does not seem to support shared memory: $!", 21 ) if( !defined( $s ) );
-    ok( defined( $s ), 'Shared memory object' );
+    ok( defined( $s ), 'open return value' );
 
-    isa_ok( $s, 'Module::Generic::SharedMem' );
+    isa_ok( $s, 'Module::Generic::SharedMem', 'Shared memory object' );
     my $id = $s->id;
     ok( defined( $id ) && $id =~ /\S+/, "shared memory id is \"$id\"" );
     my $semid = $s->semid;
@@ -80,9 +81,13 @@ SKIP:
     {
         fail( 'read data check' );
     }
+    # Give it time to write data to memory
+    sleep(1);
     my $result = qx( $^X ./t/12.sharedmem.pl 2>&1 );
+    diag( "Result from calling sharedmem.pl is: $result" ) if( $DEBUG );
     chomp( $result );
-    if( $result eq 'ok' )
+    # if( $result eq 'ok' )
+    if( scalar( grep( /^ok$/, split( /\n/, $result ) ) ) )
     {
         pass( 'shared data with separate process' );
     }

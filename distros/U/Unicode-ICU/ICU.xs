@@ -12,12 +12,20 @@
 
 #pragma clang diagnostic ignored "-Wcompound-token-split-by-macro"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define PERL_NO_GET_CONTEXT
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
 
 #include "ppport.h"
+
+#ifdef __cplusplus
+}
+#endif
 
 #include <stdbool.h>
 #include <string.h>
@@ -90,8 +98,8 @@ static void _throw_typed_error_xs( pTHX_ const char* type, SV** args ) {
     SAVETMPS;
 
     PUSHMARK(SP);
-    XPUSHs( newSVpvs_flags(PERL_ERROR_NAMESPACE, SVs_TEMP) );
-    XPUSHs( newSVpvn_flags(type, strlen(type), SVs_TEMP) );
+    mXPUSHs( newSVpvs(PERL_ERROR_NAMESPACE) );
+    mXPUSHs( newSVpvn(type, strlen(type)) );
     SV* arg;
     while ( (arg = *args++) ) {
         XPUSHs( sv_mortalcopy(arg) );
@@ -139,7 +147,7 @@ static SV* _my_new_blessedstruct_f (pTHX_ unsigned size, const char* classname) 
 
 static void __handle_uerr( pTHX_ UErrorCode uerr, const char* funcname, const char* msg, ... ) {
     if (U_FAILURE(uerr)) {
-        SV* funcname_sv = newSVpvn_flags( funcname, strlen(funcname), SVs_TEMP );
+        SV* funcname_sv = sv_2mortal( newSVpvn( funcname, strlen(funcname) ) );
         SV* args[] = {
             funcname_sv,
             sv_2mortal( newSViv(uerr) ),
@@ -151,7 +159,7 @@ static void __handle_uerr( pTHX_ UErrorCode uerr, const char* funcname, const ch
             va_list ap;
             va_start(ap, msg);
 
-            SV* msgsv = newSVpvs_flags("", SVs_TEMP);
+            SV* msgsv = sv_2mortal( newSVpvs("") );
             sv_vcatpvf(msgsv, msg, &ap);
 
             args[2] = msgsv;
@@ -263,7 +271,7 @@ static void* _from_svuvptr (pTHX_ SV* self_sv) {
     return (void *) SvUV( SvRV(self_sv) );
 }
 
-static inline void _svs_to_uchar_and_lengths(pTHX_ SV** svs, I32 svs_len, const UChar** ustrings, I32 *ustrlens) {
+static inline void _svs_to_uchar_and_lengths(pTHX_ SV** svs, I32 svs_len, const UChar** ustrings, int32_t *ustrlens) {
     for (I32 i=0; i<svs_len; i++) {
         SV* curitem = svs[i];
 
@@ -302,7 +310,7 @@ SV* _format_list(pTHX_ SV* locale_sv, SV** args, I32 argslen) {
     const char* locale = _loc_id_from_sv(locale_sv);
 
     MAKE_VLA_VIA_VECTOR(ustrings, argslen, const UChar*);
-    MAKE_VLA_VIA_VECTOR(ustrlens, argslen, I32);
+    MAKE_VLA_VIA_VECTOR(ustrlens, argslen, int32_t);
 
     _svs_to_uchar_and_lengths(aTHX_ args, argslen, ustrings, ustrlens);
 
@@ -350,7 +358,7 @@ static inline const UChar* _mpat_string(pTHX_ perl_uicu_mpat_part_struct* mystru
 
     perl_uicu_messagepattern *mpat = _from_svuvptr(aTHX_ msgpattern_sv);
 
-    I32 len;
+    int32_t len;
     return perl_uicu_mpat_get_pattern_string(mpat, &len);
 }
 #endif
@@ -407,7 +415,7 @@ static SV* __idn_convert_fn (pTHX_ SV* self_sv, SV* unicode_name, idna_converter
     SvPOK_on(retval);
     sv_2mortal(retval);
 
-    uinfo = UIDNA_INFO_INITIALIZER;
+    UIDNAInfo uinfo2 = UIDNA_INFO_INITIALIZER;
     status = U_ZERO_ERROR;
 
     converter_func(
@@ -416,7 +424,7 @@ static SV* __idn_convert_fn (pTHX_ SV* self_sv, SV* unicode_name, idna_converter
         utf8len,
         SvPVX(retval),
         asciilen,
-        &uinfo,
+        &uinfo2,
         &status
     );
 
@@ -775,7 +783,7 @@ format (SV* self_sv, SV* pattern, SV* args=NULL)
 
         if (args_count) {
             if (!args || !SvOK(args)) {
-                croak("This phrase needs %d argument%s", args_count, args_count == 1 ? "" : "s");
+                croak("This phrase needs %d argument%s", (int) args_count, args_count == 1 ? "" : "s");
             }
 
             if (!SvROK(args) || (SvTYPE(SvRV(args)) != SVt_PVAV)) {
@@ -791,19 +799,19 @@ format (SV* self_sv, SV* pattern, SV* args=NULL)
             }
 
             if (given_args_count != args_count) {
-                croak("ICU arguments mismatch: Need %d, got %ld", args_count, given_args_count);
+                croak("ICU arguments mismatch: Need %d, got %ld", (int) args_count, (long) given_args_count);
             }
 
             for (I32 a=0; a<args_count; a++) {
                 SV* curarg = *(av_fetch(args_array, a, 0));
 
                 if (!SvOK(curarg)) {
-                    croak("undef (argument index %d) is forbidden", a);
+                    croak("undef (argument index %d) is forbidden", (int) a);
                 }
 
                 switch (arg_types[a]) {
                     case PERL_UICU_FORMATTABLE_OBJECT:
-                        croak("Unused argument (index %d)", a);
+                        croak("Unused argument (index %d)", (int) a);
 
                     case PERL_UICU_FORMATTABLE_DATE:
                     case PERL_UICU_FORMATTABLE_DOUBLE:
@@ -836,7 +844,7 @@ format (SV* self_sv, SV* pattern, SV* args=NULL)
                         sv_utf8_upgrade(curarg);
 
                         if (memchr(SvPVX(curarg), 0, SvCUR(curarg))) {
-                            croak("NUL bytes (argument index %d) are forbidden", a);
+                            croak("NUL bytes (argument index %d) are forbidden", (int) a);
                         }
 
                         args_ptrs[a] = &SvPVX(curarg);
@@ -929,7 +937,7 @@ get_part (SV* self_sv, UV part_index)
         if (part_index >= (U32) perl_uicu_mpat_count_parts(mpat)) {
             int32_t max = perl_uicu_mpat_count_parts(mpat) - 1;
 
-            croak("Given part index (%" UVf ") exceeds maximum (%d)", part_index, max);
+            croak("Given part index (%" UVf ") exceeds maximum (%d)", part_index, (int) max);
         }
 
         perl_uicu_messagepattern_part* part = perl_uicu_mpat_get_part(mpat, part_index);
@@ -937,10 +945,9 @@ get_part (SV* self_sv, UV part_index)
         RETVAL = my_new_blessedstruct(perl_uicu_mpat_part_struct, PERL_NAMESPACE "::MessagePatternPart");
         perl_uicu_mpat_part_struct* mystruct = (perl_uicu_mpat_part_struct*) my_get_blessedstruct_ptr(RETVAL);
 
-        *mystruct = (perl_uicu_mpat_part_struct) {
-            .ptr = part,
-            .msg_pattern_sv = SvREFCNT_inc(self_sv),
-        };
+        /* Struct literal assignment breaks oddly in old gcc, e.g., 4.2.1. */
+        mystruct->ptr = part;
+        mystruct->msg_pattern_sv = SvREFCNT_inc(self_sv);
 
     OUTPUT:
         RETVAL
@@ -986,7 +993,9 @@ BOOT:
     _add_umsgpat_arg_type(umsgpat_arg_type, CHOICE);
     _add_umsgpat_arg_type(umsgpat_arg_type, PLURAL);
     _add_umsgpat_arg_type(umsgpat_arg_type, SELECT);
+#ifdef UMSGPAT_ARG_TYPE_SELECTORDINAL
     _add_umsgpat_arg_type(umsgpat_arg_type, SELECTORDINAL);
+#endif
 
 I32
 type (SV* self_sv)
@@ -1117,7 +1126,9 @@ BOOT:
     _define_idn_uv_constsub(CHECK_CONTEXTJ);
     _define_idn_uv_constsub(NONTRANSITIONAL_TO_ASCII);
     _define_idn_uv_constsub(NONTRANSITIONAL_TO_UNICODE);
+#ifdef UICU_HAS_UIDNA_CHECK_CONTEXTO
     _define_idn_uv_constsub(CHECK_CONTEXTO);
+#endif
 
     HV* error_hv = get_hv(PERL_NAMESPACE "::IDN::ERROR", GV_ADD);
     _add_uidna_error(error_hv, EMPTY_LABEL);
@@ -1133,8 +1144,10 @@ BOOT:
     _add_uidna_error(error_hv, INVALID_ACE_LABEL);
     _add_uidna_error(error_hv, BIDI);
     _add_uidna_error(error_hv, CONTEXTJ);
+#ifdef UICU_HAS_UIDNA_CHECK_CONTEXTO
     _add_uidna_error(error_hv, CONTEXTO_PUNCTUATION);
     _add_uidna_error(error_hv, CONTEXTO_DIGITS);
+#endif
 
 SV*
 new (const char* classname, U32 options=UIDNA_DEFAULT)

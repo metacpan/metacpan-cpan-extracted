@@ -17,7 +17,7 @@ use Test::File::ShareDir -share => { -dist => { 'OpenAPI-Modern' => 'share' } };
 use constant { true => JSON::PP::true, false => JSON::PP::false };
 
 # the document where most constraints are defined
-use constant SCHEMA => 'https://spec.openapis.org/oas/3.1/schema/2021-09-28';
+use constant SCHEMA => 'https://spec.openapis.org/oas/3.1/schema/2022-02-27';
 
 subtest 'basic construction' => sub {
   my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
@@ -110,7 +110,6 @@ subtest 'top level document fields' => sub {
         absoluteKeywordLocation => SCHEMA.'#/properties',
         error => 'not all properties are valid',
       },
-      (ignore)x4, # useless unevaluatedProperties errors
     ],
     'missing /info properties',
   );
@@ -243,7 +242,6 @@ subtest 'top level document fields' => sub {
         absoluteKeywordLocation => SCHEMA.'#/properties',
         error => 'not all properties are valid',
       },
-      (ignore)x7, # useless unevaluatedProperties errors
     ],
     'missing paths (etc), and bad types for top level fields',
   );
@@ -275,7 +273,6 @@ subtest 'top level document fields' => sub {
         absoluteKeywordLocation => SCHEMA.'#/properties',
         error => 'not all properties are valid',
       },
-      (ignore)x6, # useless unevaluatedProperties errors
     ],
     'bad types for paths, webhooks, components',
   );

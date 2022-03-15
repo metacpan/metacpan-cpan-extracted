@@ -1,5 +1,9 @@
 Revision history for OpenAPI-Modern
 
+0.023     2022-03-12 00:25:21Z
+          - get_operationId has been renamed to get_operationId_path
+          - updated bundled schemas from 2021-09-28 versions to 2022-02-27
+
 0.022     2022-02-16 06:00:37Z
           - construction with an invalid document is handled more nicely
           - added new dialect schema share/strict-schema.json to the list of

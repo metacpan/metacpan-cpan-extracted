@@ -26,8 +26,8 @@ my $meta = {
                           test      => { requires => { "Test::More" => 0.61 } },
                         },
   "provides"         => {
-                          "PerlX::Maybe" => { file => "lib/PerlX/Maybe.pm", version => 1.201 },
-                          "Syntax::Feature::Maybe" => { file => "lib/Syntax/Feature/Maybe.pm", version => 1.201 },
+                          "PerlX::Maybe" => { file => "lib/PerlX/Maybe.pm", version => 1.202 },
+                          "Syntax::Feature::Maybe" => { file => "lib/Syntax/Feature/Maybe.pm", version => 1.202 },
                         },
   "release_status"   => "stable",
   "resources"        => {
@@ -41,7 +41,7 @@ my $meta = {
                                           },
                           x_identifier => "http://purl.org/NET/cpan-uri/dist/PerlX-Maybe/project",
                         },
-  "version"          => 1.201,
+  "version"          => 1.202,
   "x_static_install" => 1,
 };
 
@@ -116,28 +116,8 @@ else
 	}
 }
 
-sub FixMakefile
-{
-	return unless -d 'inc';
-	my $file = shift;
-	
-	local *MAKEFILE;
-	open MAKEFILE, "< $file" or die "FixMakefile: Couldn't open $file: $!; bailing out";
-	my $makefile = do { local $/; <MAKEFILE> };
-	close MAKEFILE or die $!;
-	
-	$makefile =~ s/\b(test_harness\(\$\(TEST_VERBOSE\), )/$1'inc', /;
-	$makefile =~ s/( -I\$\(INST_ARCHLIB\))/ -Iinc$1/g;
-	$makefile =~ s/( "-I\$\(INST_LIB\)")/ "-Iinc"$1/g;
-	$makefile =~ s/^(FULLPERL = .*)/$1 "-Iinc"/m;
-	$makefile =~ s/^(PERL = .*)/$1 "-Iinc"/m;
-	
-	open  MAKEFILE, "> $file" or die "FixMakefile: Couldn't open $file: $!; bailing out";
-	print MAKEFILE $makefile or die $!;
-	close MAKEFILE or die $!;
-}
 
 my $mm = WriteMakefile(%WriteMakefileArgs);
-FixMakefile($mm->{FIRST_MAKEFILE} || 'Makefile');
+
 exit(0);
 

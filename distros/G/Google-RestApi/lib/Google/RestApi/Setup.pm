@@ -3,7 +3,7 @@ package Google::RestApi::Setup;
 use strict;
 use warnings;
 
-our $VERSION = '1.0.1';
+our $VERSION = '1.0.2';
 
 use parent 'ToolSet';
 
@@ -18,7 +18,7 @@ ToolSet->export(
   'Log::Log4perl'                      => ':easy',
   'namespace::autoclean'               =>  [],
   'Type::Params'                       => 'compile compile_named multisig validate',
-  'Types::Standard'                    => 'Undef Defined Value Bool Str StrMatch Int ArrayRef HashRef Dict CodeRef Object HasMethods slurpy Any Maybe',
+  'Types::Standard'                    => 'Undef Defined Value Bool Str StrMatch Int Num ArrayRef HashRef Dict CodeRef Object HasMethods slurpy Any Maybe Optional',
   'Types::Common::Numeric'             => 'PositiveNum PositiveOrZeroNum PositiveInt PositiveOrZeroInt',
   'YAML::Any'                          => 'Dump',
   'Google::RestApi::Utils'             => ':all',

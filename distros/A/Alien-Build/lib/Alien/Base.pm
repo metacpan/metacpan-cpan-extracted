@@ -8,9 +8,10 @@ use Path::Tiny ();
 use Scalar::Util qw/blessed/;
 use Capture::Tiny 0.17 qw/capture_stdout/;
 use Text::ParseWords qw/shellwords/;
+use Alien::Util;
 
 # ABSTRACT: Base classes for Alien:: modules
-our $VERSION = '2.47'; # VERSION
+our $VERSION = '2.48'; # VERSION
 
 
 sub import {
@@ -202,34 +203,9 @@ sub max_version {
 }
 
 
-# Sort::Versions isn't quite the same algorithm because it differs in
-# behaviour with leading zeroes.
-#   See also  https://dev.gentoo.org/~mgorny/pkg-config-spec.html#version-comparison
 sub version_cmp {
   shift;
-  my @x = (shift =~ m/([0-9]+|[a-z]+)/ig);
-  my @y = (shift =~ m/([0-9]+|[a-z]+)/ig);
-
-  while(@x and @y) {
-    my $x = shift @x; my $x_isnum = $x =~ m/[0-9]/;
-    my $y = shift @y; my $y_isnum = $y =~ m/[0-9]/;
-
-    if($x_isnum and $y_isnum) {
-      # Numerical comparison
-      return $x <=> $y if $x != $y;
-    }
-    elsif(!$x_isnum && !$y_isnum) {
-      # Alphabetic comparison
-      return $x cmp $y if $x ne $y;
-    }
-    else {
-      # Of differing types, the numeric one is newer
-      return $x_isnum - $y_isnum;
-    }
-  }
-
-  # Equal so far; the longer is newer
-  return @x <=> @y;
+  goto &Alien::Util::version_cmp;
 }
 
 
@@ -626,7 +602,7 @@ Alien::Base - Base classes for Alien:: modules
 
 =head1 VERSION
 
-version 2.47
+version 2.48
 
 =head1 SYNOPSIS
 
@@ -1221,5 +1197,4 @@ the same terms as the Perl 5 programming language system itself.
 
 __END__
 __POD__
-
 

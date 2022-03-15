@@ -106,6 +106,7 @@ my %WriteMakefileArgs = (
     "lib/Alien/Build/Version/Basic.pm"                   => "\$(INST_LIB)/Alien/Build/Version/Basic.pm",
     "lib/Alien/Build/rc.pm"                              => "\$(INST_LIB)/Alien/Build/rc.pm",
     "lib/Alien/Role.pm"                                  => "\$(INST_LIB)/Alien/Role.pm",
+    "lib/Alien/Util.pm"                                  => "\$(INST_LIB)/Alien/Util.pm",
     "lib/Test/Alien.pm"                                  => "\$(INST_LIB)/Test/Alien.pm",
     "lib/Test/Alien/Build.pm"                            => "\$(INST_LIB)/Test/Alien/Build.pm",
     "lib/Test/Alien/CanCompile.pm"                       => "\$(INST_LIB)/Test/Alien/CanCompile.pm",
@@ -135,7 +136,7 @@ my %WriteMakefileArgs = (
     "Test2::API" => "1.302096",
     "Test2::V0"  => "0.000121"
   },
-  "VERSION" => "2.47",
+  "VERSION" => "2.48",
   "test"    => {
     "TESTS" => "t/*.t"
   }

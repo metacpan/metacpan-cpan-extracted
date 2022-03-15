@@ -42,10 +42,12 @@ for my $use_threads_yn ( 0, 1 ) {
 
                 isa_ok( $result, 'DNS::Unbound::Result', 'promise resolution' );
 
-                diag explain [ passed => $result ];
+                diag "passed: $name";
             },
             sub { diag explain [ failed => @_ ] },
         );
+
+        diag __FILE__ . ": Waiting on $name vvvvvvvvvvvvv";
 
         my $cv = AnyEvent->condvar();
         $query->then($cv);
@@ -58,11 +60,15 @@ for my $use_threads_yn ( 0, 1 ) {
         my @tlds = qw( example.com in-addr.arpa ip6.arpa com org );
 
         my @queries = map {
+            my $name = $_;
+
             $dns->resolve_async( $_, 'NS' )->then(
-                sub { diag explain [ passed => @_ ] },
+                sub { diag "passed: $name" },
                 sub { diag explain [ failed => @_ ] },
             );
         } @tlds;
+
+        diag __FILE__ . ": Waiting on: @tlds";
 
         my $cv = AnyEvent->condvar();
         AnyEvent::XSPromises::collect(@queries)->then($cv);

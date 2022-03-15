@@ -17,9 +17,10 @@ my %WriteMakefileArgs = (
   "NAME" => "Net::Connector",
   "PREREQ_PM" => {
     "Expect" => "1.35",
-    "Moose" => "2.2201"
+    "Moose" => "2.2201",
+    "MooseX::Enumeration" => "0.010"
   },
-  "VERSION" => "0.009",
+  "VERSION" => "0.011",
   "test" => {
     "TESTS" => ""
   }
@@ -28,7 +29,8 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Expect" => "1.35",
-  "Moose" => "2.2201"
+  "Moose" => "2.2201",
+  "MooseX::Enumeration" => "0.010"
 );
 
 

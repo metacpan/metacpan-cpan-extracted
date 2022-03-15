@@ -2,7 +2,7 @@ package Test2::Harness::UI::Controller::Run;
 use strict;
 use warnings;
 
-our $VERSION = '0.000115';
+our $VERSION = '0.000117';
 
 use Data::GUID;
 use List::Util qw/max/;
@@ -52,6 +52,7 @@ sub handle {
             die error(400 => "Cannot delete a pinned run") if $run->pinned;
 
             $run->coverages->delete;
+            $run->reportings->delete;
 
             my $jobs = $run->jobs;
 

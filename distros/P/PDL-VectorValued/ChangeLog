@@ -2,6 +2,18 @@
 ##
 ## Change log for perl distribution PDL::VectorValued
 
+v1.0.17_TODO Sun, 13 Mar 2022 17:43:18 +0100 moocow
+	* overhaul set operations implicit threading, part 2
+	  - use RedoDimsCode for setting default dimensions (adapted from PDL::Primitive::append)
+	  - drop klunky (& sometimes wrong) dimension-wrangling stuff in setops PMCode
+	  - add PP code to explicitly zero out unpopulated portions of set-op result piddles ($c)
+	    + might be worth allowing user to specify "missing" value here (a la PDL::CCS)
+	* added more tests from https://github.com/moocow-the-bovine/PDL-VectorValued/issues/4
+
+v1.0.16 Sat, 12 Mar 2022 15:48:13 +0100 moocow
+	* overhaul set operations implicit threading/broadcasting dimensions and empty results
+	  - should hopefully fix https://github.com/moocow-the-bovine/PDL-VectorValued/issues/4
+
 v1.0.15 Sun, 20 Feb 2022 13:40:45 +0100 moocow
 	* fix for PDL v2.075
 	  - PDL::null() is no longer a valid input PDL, even for conversions

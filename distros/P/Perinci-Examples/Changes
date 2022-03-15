@@ -1,3 +1,8 @@
+0.822   2022-02-27  Released-By: PERLANCAR; Urgency: medium
+
+        - [module Perinci::Examples::Table] add function sales().
+
+
 0.821   2021-01-30  Released-By: PERLANCAR; Urgency: medium; Backward-Compatible: no
 
 	- [incompatible change] Rename functions (remove 'test_' prefix).

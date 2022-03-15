@@ -7,15 +7,7 @@ Files: Changes
  META.json
  META.yml
  doap.ttl
- t/04provided_deref.t
- t/05provided_deref_with_maybe.t
-Copyright: Copyright 2018 Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
-Files: Makefile.PL
- dist.ini
- t/03provided.t
-Copyright: Copyright 2013 Toby Inkster.
+Copyright: Copyright 2022 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: COPYRIGHT
@@ -34,6 +26,16 @@ Files: INSTALL
 Copyright: Unknown
 License: Unknown
 
+Files: dist.ini
+ t/03provided.t
+Copyright: Copyright 2013 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/04provided_deref.t
+ t/05provided_deref_with_maybe.t
+Copyright: Copyright 2018 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
 Files: README
  lib/PerlX/Maybe.pm
 Copyright: This software is copyright (c) 2012-2013, 2018 by Toby Inkster.
@@ -43,15 +45,19 @@ Files: lib/Syntax/Feature/Maybe.pm
 Copyright: This software is copyright (c) 2012-2013 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
+Files: Makefile.PL
+Copyright: Copyright 2020 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
 License: Artistic-1.0
- This software is Copyright (c) 2018 by the copyright holder(s).
+ This software is Copyright (c) 2022 by the copyright holder(s).
  
  This is free software, licensed under:
  
    The Artistic License 1.0
 
 License: GPL-1.0
- This software is Copyright (c) 2018 by the copyright holder(s).
+ This software is Copyright (c) 2022 by the copyright holder(s).
  
  This is free software, licensed under:
  

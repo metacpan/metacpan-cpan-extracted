@@ -11,7 +11,7 @@ use Tie::DataUUID qw{$uuid};
 use XML::Spice;
 use Net::DAVTalk::XMLParser;
 use MIME::Base64 qw(encode_base64);
-use Encode qw(encode_utf8 decode_utf8);
+use Encode qw(encode);
 use URI::Escape qw(uri_escape uri_unescape);
 use URI;
 
@@ -21,11 +21,11 @@ Net::DAVTalk - Interface to talk to DAV servers
 
 =head1 VERSION
 
-Version 0.20
+Version 0.22
 
 =cut
 
-our $VERSION = '0.20';
+our $VERSION = '0.22';
 
 =head1 SYNOPSIS
 
@@ -140,7 +140,7 @@ sub ua {
   }
   else {
     $Self->{ua} ||= HTTP::Tiny->new(
-      agent => "Net-DAVTalk/0.01",
+      agent => "Net-DAVTalk/$VERSION",
     );
   }
   return $Self->{ua};
@@ -259,7 +259,7 @@ sub Request {
   # setup request {{{
 
   $Content = '' unless defined $Content;
-  my $Bytes = encode_utf8($Content);
+  my $Bytes = encode('UTF-8', $Content);
 
   my $ua = $Self->ua();
 
@@ -506,7 +506,7 @@ sub GetHomeSet {
   my $HomeSet     = $Args{homeset};
 
   if (my $Homeset = $Self->GetProps('', [ "$Args{homesetns}:$HomeSet", 'D:href' ])) {
-    $Self->SetURL($Homeset);
+    $Self->SetURL(uri_unescape($Homeset));
     return $Self->{url};
   }
 

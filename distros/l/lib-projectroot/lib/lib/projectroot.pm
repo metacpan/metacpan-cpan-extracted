@@ -1,7 +1,7 @@
 package lib::projectroot;
 
 # ABSTRACT: easier loading of a project's local libs
-our $VERSION = '1.009'; # VERSION
+our $VERSION = '1.010'; # VERSION
 
 use strict;
 use warnings;
@@ -126,7 +126,7 @@ lib::projectroot - easier loading of a project's local libs
 
 =head1 VERSION
 
-version 1.009
+version 1.010
 
 =head1 SYNOPSIS
 

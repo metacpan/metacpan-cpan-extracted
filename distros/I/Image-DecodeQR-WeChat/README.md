@@ -4,7 +4,7 @@ Image::DecodeQR::WeChat - Decode QR code(s) from images using the OpenCV/WeChat 
 
 # VERSION
 
-Version 0.3
+Version 0.4
 
 # SYNOPSIS
 
@@ -99,6 +99,10 @@ Here is some code to get you started:
     # pre-trained models location (installed with this module)
     print "my models are in here: ".Image::DecodeQR::WeChat::modelsdir()."\n"
 
+    # returns 1 or 0 when OpenCV was compiled with highgui or not
+    # and supports GUI display like imshow() which displays an image in a window
+    my $has_highgui_support = opencv_has_highgui_xs();
+
 This code calls functions and methods from OpenCV/WeChat library (written in C++)
 for decoding one or more QR codes found embedded in images.
 It's just that: a very thin wrapper of a C++ library written in XS. It only interfaces
@@ -125,6 +129,7 @@ interface other parts of the OpenCV library:
 - `decode()`
 - `decode_xs()`
 - `modelsdir()`
+- `opencv_has_highgui_xs()`
 
 # COMMAND LINE SCRIPT
 
@@ -136,7 +141,7 @@ A CLI script is provided and will be installed by this module. Basic usage is as
 
 # SUBROUTINES/METHODS
 
-### ` Image::DecodeQR::WeChat::decode_xs(infile, modelsdir, outbase, verbosity, graphicaldisplayresult, dumpqrimagestofile) `
+### ` decode_xs(infile, modelsdir, outbase, verbosity, graphicaldisplayresult, dumpqrimagestofile) `
 
 It takes in the filename of an input image which may contain
 one or more QR codes and returns back an ARRAYref of
@@ -180,7 +185,7 @@ is written to separate files, one for each detected code. This is mainly for deb
 because the returned value contains the payloads and their corresponding QR-codes' bounding
 boxes. See `outbase` above.
 
-### ` Image::DecodeQR::WeChat::decode(\%params) `
+### ` decode(\%params) `
 
 This is a Perl wrapper to the `decode_xs()` so that user can specify
 only a minimal set of parameters and the will be filled in by defaults.
@@ -208,11 +213,40 @@ for each QR code detected.
 - `graphicaldisplayresult` : default is 0, set to 1 to have a window popping up with the input image
 and the QR-code detected highlighted, once for each code detected.
 
-### ` Image::DecodeQR::WeChat::modelsdir() `
+### ` modelsdir() `
 
 It returns the path where the models included in this package have been installed.
 This is useful when you want to use `decode_xs()` and need to specify
 the `modelsdir`. Just pass the output of this to `decode_xs()` as its `modelsdir` parameter.
+
+### ` opencv_has_highgui_xs() `
+
+It returns 1 or 0 depending on whether current OpenCV installation has
+support for graphical display of images (the `imshow()` function). This
+affects the option `graphicaldisplayresult` to [decode()](https://metacpan.org/pod/decode%28%29) and [decode\_xs()](https://metacpan.org/pod/decode_xs%28%29)
+which will be ignored if there is no highgui support.
+
+Caveat: checking for whether current OpenCV installation has highgui
+support is very lame, it merely tries to find the include file `opencv2/highgui.hpp`
+in the Include dirs. I have tried several methods (see \`\`\`Makefile.PL\`\`\`), for
+example [DynaLoader](https://metacpan.org/pod/DynaLoader) or [FFI::CheckLib](https://metacpan.org/pod/FFI%3A%3ACheckLib) can search for symbols in any library
+(e.g. searching for `imshow()` in `libopencv_highgui` or  `libopencv_world`).
+This would have been the most straight-forward way but alas, these are C++ libraries
+and function names are mangled to weird function names like:
+
+    ZN2cv3viz6imshowERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERKNS_11_InputArrayERKNS_5Size_IiEE()
+
+There's an imshow() in there but without a regex symbol-name search
+the symbol can not be detected.
+
+Another take is with [Devel::CheckLib](https://metacpan.org/pod/Devel%3A%3ACheckLib) which supports compiling code
+snippets when searching for a particular library. This fails because they
+... allow only a C compiler but we need a C++ compiler.
+
+Finally, using [Inline::CPP](https://metacpan.org/pod/Inline%3A%3ACPP) to compile our own snippet is totally in vain
+because of its useless form of running as `use Inline CPP =` ... >. I could
+not find any way of telling it to use specific CFLAGS and LDFLAGS with this
+useless `use Inline CPP` form.
 
 # IMPLEMENTATION DETAILS
 
@@ -251,34 +285,54 @@ and
     } //extern "C" {
     #endif
 
-This only need happen in the header file: ` wechat_qr_decode_lib.hpp `.
+This only need happen in the header file: ` wechat_qr_decode_lib.hpp `
+and in the XS file where the Perl headers are included.
 
 # INSTALLING OpenCV
 
 In my case downloading OpenCV using Linux's package
 manager was not successful.It required to add another
 repository which wanted to install its own versions
-of packages I already had.
+of packages I already had. So I prefered to install
+OpenCV from sources. This is the procedure I followed:
 
 - Download OpenCV sources and also its contributed modules.
-- Extract the sources and changed to the source dir.
+- Extract the sources and change to the source dir.
 - From within the source dir extract the contrib archive.
 - Create a `build` dir and change to it.
 - There are two ways to make `cmake` just tolerable:
 `cmake-gui` and `ccmake`. The former is a full-gui interface
 to setting the billion `cmake` variables. Use it
 if you are on a machine which offers a GUI: `cmake-gui ..`
- . If you are on a remote host possibly over telnet or ssh
+ . If you are on a headless or remote host possibly over telnet or ssh
 then do not despair because c&lt;ccmake> is the CLI, curses-based
-equivalent to `cmake-gui`,  use it like: `ccmake ..` .
-- Once on the interface first `configure`, then check the
+equivalent to `cmake-gui`,  use it like: `ccmake ..` (from within the build dir).
+- Once on either of the cmake GUIs, first do a
+`configure`, then check the
 list of all variables (you can search on both, for searching
-in the CLI one press `/` and then `n` for next hit)
+in the CLI, press `</`> and then `n` for next hit)
 to suit you and then `generate`, quit
 and  `VERBOSE=1 make -j4 all`
-- I guess, variables you want to change are `OPENCV_EXTRA_MODULES_PATH`
+- I guess, cmake variables you want to modify
+are `OPENCV_EXTRA_MODULES_PATH`
 and `OPENCV_ENABLE_NONFREE` and anything that has to do with `CNN` or `DNN`.
-But I only guess.
+If you have CUDA installed and a CUDA-capable GPU then enable CUDA
+(search for CUDA string to find the variable(s)). Also, VTK, Ceres Solver,
+Eigen3, Intel's TBB, CNN, DNN etc. You need to install all these
+additional packages to get OpenCV support with them.
+- I had a problem with compiling OpenCV with a GUI (the `highgui`)
+on a headless host. So, I just disabled it. That's easy to achieve
+during the above.
+- I have both installed this on a CUDA-capable GPU (with CUDA 10.2 installed)
+host and on a headless remote host with no GPU or basic. CUDA is
+not required for building this module.
+
+    Your mileage may vary.
+
+    If you are seriously in need of installing
+    this module then consider migrating to a serious operating system
+    such as Linux first. M$-Windows will always present problems and
+    I don't have the patience of keeping track of them ...
 
 # AUTHOR
 

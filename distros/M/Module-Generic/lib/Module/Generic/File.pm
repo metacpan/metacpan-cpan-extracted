@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/File.pm
-## Version v0.3.2
+## Version v0.3.3
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/20
-## Modified 2022/03/06
+## Modified 2022/03/11
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -19,7 +19,7 @@ BEGIN
     use warnings::register;
     use version;
     use parent qw( Module::Generic );
-    use vars qw( $OS2SEP $DIR_SEP $MODE_BITS $DEFAULT_MMAP_SIZE $FILES_TO_REMOVE $MMAP_USE_FILE_MAP );
+    use vars qw( $OS2SEP $DIR_SEP $MODE_BITS $DEFAULT_MMAP_SIZE $FILES_TO_REMOVE $MMAP_USE_FILE_MAP $GLOBBING );
     use Data::UUID ();
     use Fcntl qw( :DEFAULT :flock SEEK_SET SEEK_CUR SEEK_END );
     use File::Copy ();
@@ -118,7 +118,8 @@ BEGIN
     # Bug #92 <https://github.com/libwww-perl/URI/issues/92>
     # $URI::file::DEFAULT_AUTHORITY = undef;
     $FILES_TO_REMOVE = {};
-    our $VERSION = 'v0.3.2';
+    $GLOBBING = 0;
+    our $VERSION = 'v0.3.3';
 };
 
 use strict;
@@ -146,6 +147,12 @@ sub init
     # Should we collapse dots? In most of the cases, it is ok, but there might be
     # symbolic links in the path that could complicate things and even create recursion
     $self->{collapse}       = 1;
+    # Do glob on file upon resolve so that any shell meta characters are resolved
+    # e.g. ~joe/some/file.txt would be resolved to /home/joe/some/file.txt
+    # otherwise the filename would remain "~joe/some/file.txt"
+    # This is useful when you have filename with meta characters in their file path, like:
+    # /some/where/A [A-12] file.pdf
+    $self->{glob}           = $GLOBBING;
     $self->{max_recursion}  = 12;
     $self->{os}             = undef;
     $self->{resolved}       = 0;
@@ -1204,6 +1211,38 @@ sub find
         local $_ = $self->new( $File::Find::name, { base_dir => $File::Find::dir, os => $self->{os} } ) || return( $self->pass_error );
         $cb->( $_ );
     };
+    my $cwd = $self->cwd();
+    my $skip = {};
+    # It can be files or directories to skip
+    if( $opts->{skip} )
+    {
+        return( $self->error( "Parameter \"skip\" was provided, but it is not an array reference." ) ) if( Scalar::Util::reftype( $opts->{skip} ) ne 'ARRAY' );
+        $self->messagef( 4, "%d files to skip: %s", scalar( @{$opts->{skip}} ), CORE::join( ', ', @{$opts->{skip}} ) );
+        foreach my $f ( @{$opts->{skip}} )
+        {
+            my $this = file( $f );
+            $skip->{ "$this" } = $this;
+        }
+    }
+    
+    $p->{preprocess} = sub
+    {
+        my @files = @_;
+        my $curr_dir = $File::Find::dir;
+        $self->messagef( 4, "Preprocessing for directory $curr_dir for %d files.", scalar( @files ) );
+        for( my $i = 0; $i <= $#files; $i++ )
+        {
+            my $curr_file = CORE::join( '/', $curr_dir, $files[$i] );
+            $self->message( 5, "Checking file \"$curr_file\"." );
+            if( CORE::exists( $skip->{ $curr_file } ) || $files[$i] CORE::eq '.' || $files[$i] CORE::eq '..' )
+            {
+                CORE::splice( @files, $i, 1 );
+                $i--;
+            }
+        }
+        @files = sort( @files ) if( $opts->{sort} );
+        return( @files );
+    };
     
     try
     {
@@ -1211,7 +1250,7 @@ sub find
     }
     catch( $e )
     {
-        return( $self->error( "An unexpected error has occurred in File::Find::find(): $!" ) );
+        return( $self->error( "An unexpected error has occurred in File::Find::find(): $e" ) );
     }
     return( $self );
 }
@@ -1286,6 +1325,31 @@ sub getlines { return( shift->_filehandle_method( 'getlines', 'file', @_ ) ); }
 
 sub gid { return( shift->finfo->gid ); }
 
+sub glob
+{
+    my $self = shift( @_ );
+    my $os = $self->{os} || $^O;
+    my $path = $self->filename;
+    $self->message( 4, "Resolving file '$path' for  provided os value '$os' and real os '$^O'." );
+    # Those do not work in virtualisation
+    if( $os eq $^O )
+    {
+        if( $os =~ /^(mswin32|win32|vms|riscos)$/i )
+        {
+            require File::DosGlob;
+            $path = File::DosGlob::glob( $path );
+        }
+        else
+        {
+            $path = File::Glob::bsd_glob( $path );
+        }
+    }
+    return( $path ) if( !CORE::length( $path ) );
+    return( $self->new( $path, { resolved => 1, os => $self->{os} } ) );
+}
+
+sub globbing { return( shift->_set_get_boolean( 'globbing', @_ ) ); }
+
 sub gobble { return( shift->load( @_ ) ); }
 
 sub gush { return( shift->unload( @_ ) ); }
@@ -1320,6 +1384,7 @@ sub is_empty
     }
     else
     {
+        $self->finfo->reset;
         return( $self->finfo->size == 0 );
     }
 }
@@ -2266,8 +2331,10 @@ sub resolve
     my $max_recursion = $self->max_recursion;
     return( $self->error( "Too many recursion. Exceeded the threshold of $max_recursion" ) ) if( $max_recursion > 0 && $opts->{recurse} >= $max_recursion );
     my $os = $self->{os} || $^O;
+    $self->message( 4, "Resolving file '$path' for  provided os value '$os' and real os '$^O'." );
+    my $globbing = CORE::exists( $opts->{globbing} ) ? $opts->{globbing} : $self->{globbing};
     # Those do not work in virtualisation
-    if( $os eq $^O )
+    if( $globbing && $os eq $^O )
     {
         if( $os =~ /^(mswin32|win32|vms|riscos)$/i )
         {
@@ -2322,7 +2389,17 @@ sub resolve
         }
         $curr->push( $dir );
     }
-    $self->message( 3, "Returning ", sub{ $self->_spec_catpath( $vol, $self->_spec_catdir( [ @$curr ] ), $fname ) });
+    $self->message( 3, "Returning '", sub{ $self->_spec_catpath( $vol, $self->_spec_catdir( [ @$curr ] ), $fname ) }, "'" );
+    # XXX Remove debugging
+    if( $self->debug >= 4 )
+    {
+        my $test = $self->_spec_catpath( $vol, $self->_spec_catdir( [ @$curr ] ), $fname );
+        if( !CORE::length( $test ) )
+        {
+            $self->message( 4, "New resolved file resulted into an empty string!!" );
+            $self->message( 4, "Volume is '$vol', \$fname is '$fname' and directories are: '", CORE::join( "', '", @$curr ), "'." );
+        }
+    }
     return( $self->new( $self->_spec_catpath( $vol, $self->_spec_catdir( [ @$curr ] ), $fname ), { resolved => 1, os => $self->{os}, ( $self->{base_dir} ? ( base_dir => $self->{base_dir} ) : () ) }) );
 }
 
@@ -2867,6 +2944,10 @@ sub unload
         {
             $io = $self->open( '>', $opts ) || return( $self->pass_error );
         }
+    }
+    elsif( !$self->can_write )
+    {
+        return( $self->error( "File \"$file\" is opened, but not in write mode. Cannot unload data into it." ) );
     }
     $io->print( ref( $data ) ? $$data : $data ) || return( $self->error( "Unable to print ", CORE::length( ref( $data ) ? $$data : $data ), " bytes of data to file \"${file}\": $!" ) );
     # close it if it were close before we opened it
@@ -3769,7 +3850,7 @@ sub _uri_file_os_map
 
 1;
 
-# XXX POD
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -3838,9 +3919,14 @@ Module::Generic::File - File Object Abstraction Class
     my $u = $f->uri;
     say $u; # file:///Documents/Some/File.pdf
 
+    # Enable globbing globally for all future objects:
+    $Module::Generic::File::GLOBBING = 1;
+    # or by object:
+    my $f = file( "~john/some/where/file.txt", { globbing => 1 } );
+
 =head1 VERSION
 
-    v0.3.2
+    v0.3.3
 
 =head1 DESCRIPTION
 
@@ -3878,6 +3964,18 @@ Enables or disables the collapsing of dots in the file path.
 This will attempt to resolve and remove the dots to provide an absolute file path without dots. For example:
 
 C</../a/b/../c/./d.html> would become C</a/c/d.html>
+
+=item I<globbing>
+
+Boolean value, by default set to the value of the package variable C<$GLOBBING>, which itself is false by default.
+
+If enabled, this will allow L</resolve> to do globbing on the filename, so that any shell meta characters are resolved. For example C<~joe/some/file.txt> would be resolved to C</home/joe/some/file.txt>
+
+Otherwise the filename would remain C<~joe/some/file.txt>
+
+This is useful when you have filename with meta characters in their file path, like C</some/where/A [A-12] file.pdf>
+
+See also L</globbing> to change the parameter for the current object, and also the L</glob> and L</resolve>
 
 =item I<max_recursion>
 
@@ -4218,9 +4316,27 @@ This is an alias for L</filename>
 
 =head2 find
 
-Assuming the current object represents an existing directory, this takes one parameter which must be a code reference. This is used as a callback with the module L<File::Find/find>
+Assuming the current object represents an existing directory, this takes an optional hash or hash reference of options followed by a code reference. This is used as a callback with the module L<File::Find/find>
+
+The callback can be provided with the I<callback> option.
 
 It returns whatever L<File::Find/find> returns or undef and sets an exception object if an error occurred.
+
+The currently supported options are:
+
+=over 4
+
+=item * I<callback>
+
+A code reference representing the callback called for each element found while crawling directories.
+
+=item * I<skip>
+
+An array reference of files or directories path to skip.
+
+Each of the file or directories path thus provided will be converted into an L<Module::Generic::File> with an absolute file path to avoid unpleasant surprise, since L<File::Find> L<perlfunc/chdir> into each new directory it finds.
+
+=back
 
 =head2 finfo
 
@@ -4284,6 +4400,30 @@ This is a thin wrapper around L<IO::Handle> method of the same name.
 =head2 gid
 
 This is a shortcut to L<Module::Generic::Finfo/gid>
+
+=head2 glob
+
+Provided with a file name with meta characters, or using the current object underlying filename by default, and this will call L<perlfunc/glob> to resolve those meta characters, if any. For example:
+
+C<~joe/some/file.txt> would be resolved to C</home/joe/some/file.txt>
+
+otherwise the filename would remain C<~joe/some/file.txt>
+
+This is useful when you have filename with meta characters in their file path, like:
+
+C</some/where/A [A-12] file.pdf>
+
+If the resulting value is empty, which means that nothing was found, it returns an empty string (not C<undef>), otherwise, it returns a new L<Module::Generic::File> object of the resolved file.
+
+This method uses L<File::DosGlob> for windows-related platforms and L<File::Glob> for all other cases to perform globbing.
+
+=head2 globbing
+
+Set or get the boolean value of the current object.
+
+If enabled, globbing will be enabled and this will have the effect of performing L</glob> upon resolving the filename.
+
+Returns the current boolean value.
 
 =head2 gobble
 
@@ -4839,9 +4979,19 @@ Provided with a path and a list or hash reference of optional parameters and thi
 
 It returns a new L<Module::Generic::File> object or undef and sets an exception object if an error occurred.
 
-The only parameter supported is:
+The parameter supported are:
 
 =over 4
+
+=item I<glob>
+
+A boolean, which, if true, will use L<perlfunc/glob> to resolve any meta characters.
+
+If glob is turned on and the glob results into an empty string, implying nothing was found, then this will set an L<error|Module::Generic/error> with code C<404> and return C<undef>.
+
+If no I<glob> parameter is provided, this reverts to the I<globbing> property of the object set upon instantiation.
+
+See L</glob> for more information and L</new> for the I<globbing> object property.
 
 =item I<recurse>
 

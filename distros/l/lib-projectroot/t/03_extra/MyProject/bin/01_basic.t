@@ -13,9 +13,9 @@ lib::projectroot->load_extra(qw(DarkPAN));
 
 my @post_inc = @INC;
 is(scalar @post_inc, scalar @pre_inc + 2, 'added 2 element to @INC (1 lib, 1 extra)');
-is(cleanup($post_inc[0]), 't/03_extra/MyProject/lib', 'lib added to @INC');
+like(cleanup($post_inc[0]), qr{/03_extra/MyProject/lib$}, 'lib added to @INC');
 
-is(cleanup($post_inc[-1]), 't/03_extra/DarkPAN/lib', 'extra added to @INC');
+like(cleanup($post_inc[-1]), qr{/03_extra/DarkPAN/lib$}, 'extra added to @INC');
 
 done_testing();
 

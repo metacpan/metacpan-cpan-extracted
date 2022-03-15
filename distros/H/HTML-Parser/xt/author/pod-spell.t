@@ -37,6 +37,7 @@ Isindex
 Ivanov
 Jacques
 Jensen
+Jess
 Jon
 LinkExtor
 MSIE
@@ -51,6 +52,7 @@ Perrad
 PullParser
 Radici
 Rinaldo
+Robinson
 Salvatore
 Salzenberg
 Skyttä
@@ -72,6 +74,7 @@ argspecs
 barbie
 bulk88
 capoeirab
+castaway
 chip
 demerphq
 dmn

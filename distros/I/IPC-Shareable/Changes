@@ -1,5 +1,14 @@
 Revision history for Perl extension IPC::Shareable.
 
+1.12    2022-03-13
+    - Add tests in t/07-new.t to test how using tied() against a dereferenced
+      variable returned from new() allows access to the underlying
+      IPC::Shareable object
+    - Reworked how spawn() and unspawn() manage things internally
+    - POD updates, fixes and clarifications
+    - Removed spawn() and unspawn(). There's really no need for these as one
+      can simply create but not destroy
+
 1.11    2022-03-07
     - Fix certain tests so they don't throw if we bail early
 

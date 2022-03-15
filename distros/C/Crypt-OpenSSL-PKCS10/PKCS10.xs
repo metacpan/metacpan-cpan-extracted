@@ -356,6 +356,8 @@ new(class, keylen = 1024)
 	
 	X509_REQ_set_pubkey(x,pk);
 	X509_REQ_set_version(x,0L);
+	if (!X509_REQ_sign(x,pk,EVP_sha256()))
+		croak ("%s - X509_REQ_sign", class);
 	
 	RETVAL = make_pkcs10_obj(class, x, pk, NULL, NULL);
   
@@ -404,6 +406,8 @@ new_from_rsa(class, p_rsa)
 	
 	X509_REQ_set_pubkey(x,pk);
 	X509_REQ_set_version(x,0L);
+	if (!X509_REQ_sign(x,pk,EVP_sha256()))
+		croak ("%s - X509_REQ_sign", class);
 	
 	RETVAL = make_pkcs10_obj(class, x, pk, NULL, &rsa->rsa);
 
@@ -623,7 +627,8 @@ add_custom_ext_raw(pkcs10, oid_SV, ext_SV)
   	if(!pkcs10->exts)
 		pkcs10->exts = sk_X509_EXTENSION_new_null();
 
-	nid = OBJ_create(oid, "MyAlias", "My Test Alias Extension");
+	if ((nid = OBJ_create(oid, oid, oid)) == NID_undef)
+        croak ("add_custom_ext_raw: OBJ_create() for OID %s failed", oid);
 	RETVAL = add_ext_raw(pkcs10->exts, nid, ext, ext_length);
 
 	if (!RETVAL)
@@ -651,7 +656,8 @@ add_custom_ext(pkcs10, oid_SV, ext_SV)
 	if(!pkcs10->exts)
 		pkcs10->exts = sk_X509_EXTENSION_new_null();
 
-	nid = OBJ_create(oid, "MyAlias", "My Test Alias Extension");
+	if ((nid = OBJ_create(oid, oid, oid)) == NID_undef)
+        croak ("add_custom_ext_raw: OBJ_create() for OID %s failed", oid);
 	X509V3_EXT_add_alias(nid, NID_netscape_comment);
 	RETVAL = add_ext(pkcs10->exts, pkcs10->req, nid, ext);
 

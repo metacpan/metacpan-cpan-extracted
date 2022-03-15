@@ -1666,7 +1666,13 @@ SV * overload_mul(pTHX_ mpc_t * a, SV * b, SV * third) {
      }
 #endif
 
-     if(SV_IS_POK(b)) { /* assign the string with default precision */
+#if defined(MPC_PV_NV_BUG)
+     if( (SV_IS_POK(b) && !SV_IS_NOK(b))
+           ||
+         (SV_IS_POK(b) && SV_IS_NOK(b) && SvIOKp(b)) ) {
+#else
+     if(SV_IS_POK(b)) {
+#endif
 
        NOK_POK_DUALVAR_CHECK , "Math::MPC::overload_mul");}
 
@@ -1697,6 +1703,11 @@ SV * overload_mul(pTHX_ mpc_t * a, SV * b, SV * third) {
      }
 
      if(SV_IS_NOK(b)) {
+
+#if defined(MPC_PV_NV_BUG)
+       NOK_POK_DUALVAR_CHECK , "overload_mul");}
+#endif
+
 #if defined(NV_IS_FLOAT128)
        mpfr_init2(t, FLT128_MANT_DIG);
        _mpfr_set_NV(aTHX_ &t, b, GMP_RNDN);
@@ -1770,7 +1781,13 @@ SV * overload_add(pTHX_ mpc_t* a, SV * b, SV * third) {
      }
 #endif
 
-     if(SV_IS_POK(b)) { /* assign string with default precision */
+#if defined(MPC_PV_NV_BUG)
+     if( (SV_IS_POK(b) && !SV_IS_NOK(b))
+           ||
+         (SV_IS_POK(b) && SV_IS_NOK(b) && SvIOKp(b)) ) {
+#else
+     if(SV_IS_POK(b)) {
+#endif
 
        NOK_POK_DUALVAR_CHECK , "Math::MPC::overload_add");}
 
@@ -1801,6 +1818,11 @@ SV * overload_add(pTHX_ mpc_t* a, SV * b, SV * third) {
      }
 
      if(SV_IS_NOK(b)) {
+
+#if defined(MPC_PV_NV_BUG)
+       NOK_POK_DUALVAR_CHECK , "overload_");}
+#endif
+
 #if defined(NV_IS_FLOAT128)
        mpfr_init2(t, FLT128_MANT_DIG);
        _mpfr_set_NV(aTHX_ &t, b, GMP_RNDN);
@@ -1889,7 +1911,14 @@ SV * overload_sub(pTHX_ mpc_t * a, SV * b, SV * third) {
      }
 #endif
 
-     if(SV_IS_POK(b)) { /* assign with default precision */
+#if defined(MPC_PV_NV_BUG)
+     if( (SV_IS_POK(b) && !SV_IS_NOK(b))
+           ||
+         (SV_IS_POK(b) && SV_IS_NOK(b) && SvIOKp(b)) ) {
+#else
+     if(SV_IS_POK(b)) {
+#endif
+
 
        NOK_POK_DUALVAR_CHECK , "Math::MPC::overload_sub");}
 
@@ -1921,6 +1950,11 @@ SV * overload_sub(pTHX_ mpc_t * a, SV * b, SV * third) {
      }
 
      if(SV_IS_NOK(b)) {
+
+#if defined(MPC_PV_NV_BUG)
+       NOK_POK_DUALVAR_CHECK , "overload_sub");}
+#endif
+
 #if defined(NV_IS_FLOAT128)
        mpfr_init2(t, FLT128_MANT_DIG);
        _mpfr_set_NV(aTHX_ &t, b, GMP_RNDN);
@@ -2012,7 +2046,13 @@ SV * overload_div(pTHX_ mpc_t * a, SV * b, SV * third) {
      }
 #endif
 
-     if(SV_IS_POK(b)) { /* assign with default precision */
+#if defined(MPC_PV_NV_BUG)
+     if( (SV_IS_POK(b) && !SV_IS_NOK(b))
+           ||
+         (SV_IS_POK(b) && SV_IS_NOK(b) && SvIOKp(b)) ) {
+#else
+     if(SV_IS_POK(b)) {
+#endif
 
        NOK_POK_DUALVAR_CHECK , "Math::MPC::overload_div");}
 
@@ -2044,6 +2084,11 @@ SV * overload_div(pTHX_ mpc_t * a, SV * b, SV * third) {
      }
 
      if(SV_IS_NOK(b)) {
+
+#if defined(MPC_PV_NV_BUG)
+       NOK_POK_DUALVAR_CHECK , "overload_div");}
+#endif
+
 #if defined(NV_IS_FLOAT128)
        mpfr_init2(t, FLT128_MANT_DIG);
        _mpfr_set_NV(aTHX_ &t, b, GMP_RNDN);
@@ -2115,7 +2160,13 @@ SV * overload_div_eq(pTHX_ SV * a, SV * b, SV * third) {
      }
 #endif
 
+#if defined(MPC_PV_NV_BUG)
+     if( (SV_IS_POK(b) && !SV_IS_NOK(b))
+           ||
+         (SV_IS_POK(b) && SV_IS_NOK(b) && SvIOKp(b)) ) {
+#else
      if(SV_IS_POK(b)) {
+#endif
 
        NOK_POK_DUALVAR_CHECK , "Math::MPC::overload_div_eq");}
 
@@ -2153,6 +2204,11 @@ SV * overload_div_eq(pTHX_ SV * a, SV * b, SV * third) {
      }
 
      if(SV_IS_NOK(b)) {
+
+#if defined(MPC_PV_NV_BUG)
+       NOK_POK_DUALVAR_CHECK , "overload_div_eq");}
+#endif
+
 #if defined(NV_IS_FLOAT128)
        mpfr_init2(t, FLT128_MANT_DIG);
        _mpfr_set_NV(aTHX_ &t, b, GMP_RNDN);
@@ -2221,8 +2277,13 @@ SV * overload_sub_eq(pTHX_ SV * a, SV * b, SV * third) {
        return a;
      }
 #endif
-
+#if defined(MPC_PV_NV_BUG)
+     if( (SV_IS_POK(b) && !SV_IS_NOK(b))
+           ||
+         (SV_IS_POK(b) && SV_IS_NOK(b) && SvIOKp(b)) ) {
+#else
      if(SV_IS_POK(b)) {
+#endif
 
        NOK_POK_DUALVAR_CHECK , "Math::MPC::overload_sub_eq");}
 
@@ -2261,6 +2322,11 @@ SV * overload_sub_eq(pTHX_ SV * a, SV * b, SV * third) {
      }
 
      if(SV_IS_NOK(b)) {
+
+#if defined(MPC_PV_NV_BUG)
+       NOK_POK_DUALVAR_CHECK , "overload_sub_eq");}
+#endif
+
 #if defined(NV_IS_FLOAT128)
        mpfr_init2(t, FLT128_MANT_DIG);
        _mpfr_set_NV(aTHX_ &t, b, GMP_RNDN);
@@ -2329,7 +2395,13 @@ SV * overload_add_eq(pTHX_ SV * a, SV * b, SV * third) {
      }
 #endif
 
+#if defined(MPC_PV_NV_BUG)
+     if( (SV_IS_POK(b) && !SV_IS_NOK(b))
+           ||
+         (SV_IS_POK(b) && SV_IS_NOK(b) && SvIOKp(b)) ) {
+#else
      if(SV_IS_POK(b)) {
+#endif
 
        NOK_POK_DUALVAR_CHECK , "Math::MPC::overload_add_eq");}
 
@@ -2367,6 +2439,11 @@ SV * overload_add_eq(pTHX_ SV * a, SV * b, SV * third) {
      }
 
      if(SV_IS_NOK(b)) {
+
+#if defined(MPC_PV_NV_BUG)
+       NOK_POK_DUALVAR_CHECK , "overload_add_eq");}
+#endif
+
 #if defined(NV_IS_FLOAT128)
        mpfr_init2(t, FLT128_MANT_DIG);
       _mpfr_set_NV(aTHX_ &t, b, GMP_RNDN);
@@ -2433,7 +2510,13 @@ SV * overload_mul_eq(pTHX_ SV * a, SV * b, SV * third) {
 
 #endif
 
+#if defined(MPC_PV_NV_BUG)
+     if( (SV_IS_POK(b) && !SV_IS_NOK(b))
+           ||
+         (SV_IS_POK(b) && SV_IS_NOK(b) && SvIOKp(b)) ) {
+#else
      if(SV_IS_POK(b)) {
+#endif
 
        NOK_POK_DUALVAR_CHECK , "Math::MPC::overload_mul_eq");}
 
@@ -2471,6 +2554,11 @@ SV * overload_mul_eq(pTHX_ SV * a, SV * b, SV * third) {
      }
 
      if(SV_IS_NOK(b)) {
+
+#if defined(MPC_PV_NV_BUG)
+       NOK_POK_DUALVAR_CHECK , "overload_mul_eq");}
+#endif
+
 #if defined(NV_IS_FLOAT128)
        mpfr_init2(t, FLT128_MANT_DIG);
        _mpfr_set_NV(aTHX_ &t, b, GMP_RNDN);
@@ -2557,7 +2645,13 @@ SV * overload_pow(pTHX_ mpc_t * a, SV * b, SV * third) {
      }
 #endif
 
+#if defined(MPC_PV_NV_BUG)
+     if( (SV_IS_POK(b) && !SV_IS_NOK(b))
+           ||
+         (SV_IS_POK(b) && SV_IS_NOK(b) && SvIOKp(b)) ) {
+#else
      if(SV_IS_POK(b)) {
+#endif
 
        NOK_POK_DUALVAR_CHECK , "Math::MPC::overload_pow");}
 
@@ -2591,6 +2685,11 @@ SV * overload_pow(pTHX_ mpc_t * a, SV * b, SV * third) {
      }
 
      if(SV_IS_NOK(b)) {
+
+#if defined(MPC_PV_NV_BUG)
+       NOK_POK_DUALVAR_CHECK , "overload_pow");}
+#endif
+
 #if defined(NV_IS_FLOAT128)
        mpc_init2(t, FLT128_MANT_DIG);
        Rmpc_set_NV(aTHX_ &t, b, MPC_RNDNN);
@@ -2659,7 +2758,13 @@ SV * overload_pow_eq(pTHX_ SV * a, SV * b, SV * third) {
 
 #endif
 
+#if defined(MPC_PV_NV_BUG)
+     if( (SV_IS_POK(b) && !SV_IS_NOK(b))
+           ||
+         (SV_IS_POK(b) && SV_IS_NOK(b) && SvIOKp(b)) ) {
+#else
      if(SV_IS_POK(b)) {
+#endif
 
        NOK_POK_DUALVAR_CHECK , "Math::MPC::overload_pow_eq");}
 
@@ -2697,6 +2802,11 @@ SV * overload_pow_eq(pTHX_ SV * a, SV * b, SV * third) {
      }
 
      if(SV_IS_NOK(b)) {
+
+#if defined(MPC_PV_NV_BUG)
+       NOK_POK_DUALVAR_CHECK , "overload_pow_eq");}
+#endif
+
 #if defined(NV_IS_FLOAT128)
        mpfr_init2(t, FLT128_MANT_DIG);
        _mpfr_set_NV(aTHX_ &t, b, GMP_RNDN);
@@ -2767,7 +2877,13 @@ SV * overload_equiv(pTHX_ mpc_t * a, SV * b, SV * third) {
      }
 #endif
 
+#if defined(MPC_PV_NV_BUG)
+     if( (SV_IS_POK(b) && !SV_IS_NOK(b))
+           ||
+         (SV_IS_POK(b) && SV_IS_NOK(b) && SvIOKp(b)) ) {
+#else
      if(SV_IS_POK(b)) {
+#endif
 
        NOK_POK_DUALVAR_CHECK , "Math::MPC::overload_equiv");}
 
@@ -2804,6 +2920,11 @@ SV * overload_equiv(pTHX_ mpc_t * a, SV * b, SV * third) {
      }
 
      if(SV_IS_NOK(b)) {
+
+#if defined(MPC_PV_NV_BUG)
+       NOK_POK_DUALVAR_CHECK , "overload_equiv");}
+#endif
+
 #if defined(NV_IS_FLOAT128)
        mpc_init2(t, FLT128_MANT_DIG);
        Rmpc_set_NV(aTHX_ &t, b, MPC_RNDNN);
@@ -3024,7 +3145,15 @@ SV * _itsa(pTHX_ SV * a) {
        if(SvUOK(a)) return newSVuv(1);
        return newSVuv(2);
      }
-     if(SV_IS_POK(a)) return newSVuv(4);
+
+     if(SV_IS_POK(a)) {
+#if defined(MPC_PV_NV_BUG)        /* perl can set the POK flag when it should not */
+       if(SV_IS_NOK(a) && !SvIOKp(a))
+         return newSVuv(3);        /* designate it as NV */
+#endif
+       return newSVuv(4);          /* designate it as PV */
+     }
+
      if(SV_IS_NOK(a)) return newSVuv(3);
      if(sv_isobject(a)) {
        const char *h = HvNAME(SvSTASH(SvRV(a)));
@@ -3681,6 +3810,14 @@ SV * Rmpc_sum(pTHX_ mpc_t * rop, SV * avref, SV * len, SV * round) {
      return newSViv(ret);
 #else
     croak("The Rmpc_sum function requires mpc-1.1.1 or later");
+#endif
+}
+
+int _has_pv_nv_bug(void) {
+#if defined(MPC_PV_NV_BUG)
+     return 1;
+#else
+     return 0;
 #endif
 }
 
@@ -6331,6 +6468,10 @@ Rmpc_sum (rop, avref, len, round)
 CODE:
   RETVAL = Rmpc_sum (aTHX_ rop, avref, len, round);
 OUTPUT:  RETVAL
+
+int
+_has_pv_nv_bug ()
+
 
 void
 CLONE (x, ...)

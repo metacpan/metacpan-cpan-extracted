@@ -195,7 +195,7 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
    Rmpc_set_default_prec($p);
    Rmpc_set_default_prec2($p_re, $p_im);
     Rmpc_set_default_prec sets the default precision to exactly $p
-    bits for both the real and imaginary parts. Rmpc_set_default_prec
+    bits for both the real and imaginary parts. Rmpc_set_default_prec2
     sets the default precision to be *exactly* $p_re bits for the real
     part, and *exactly* $p_im bits for the imaginary part. The
     precision of a variable means the number of bits used to store its

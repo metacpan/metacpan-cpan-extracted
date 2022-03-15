@@ -1,6 +1,11 @@
 Revision history for Term::Choose
 
 
+1.746   2022-03-13
+    - Char-width-tables: Arabic numbers in category 'Cf' to print-width 1.
+    - Char-width-tables: update to Unicode 14.
+    - Update year copyright.
+
 1.745   2021-11-11
     - Raised Perl minimum version to 5.10.0.
     - Use '\v' and '\R'.

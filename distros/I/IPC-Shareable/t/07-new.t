@@ -42,8 +42,16 @@ if ($pid == 0) {
     # parent
 
     my $ph = $mod->new(key => 'hash2', create => 1, destroy => 1);
+    like tied(%$ph), qr/IPC::Shareable/, "new() tied hash is proper object ok";
+    like tied(%$ph)->can('ipcs'), qr/CODE/, "...and it can call its methods ok";
+
     my $pa = $mod->new(key => 'array2', create => 1, destroy => 1, var => 'ARRAY');
+    like tied(@$pa), qr/IPC::Shareable/, "new() tied array is proper object ok";
+    like tied(@$pa)->can('ipcs'), qr/CODE/, "...and it can call its methods ok";
+
     my $ps = $mod->new(key => 'scalar2', create => 1, destroy => 1, var => 'SCALAR');
+    like tied($$ps), qr/IPC::Shareable/, "new() tied scalar is proper object ok";
+    like tied($$ps)->can('ipcs'), qr/CODE/, "...and it can call its methods ok";
 
     kill ALRM => $pid;
     waitpid($pid, 0);

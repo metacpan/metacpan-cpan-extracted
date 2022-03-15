@@ -2,12 +2,13 @@ package Math::MPFI;
 use strict;
 use warnings;
 use Math::MPFR;
+use Math::MPFI::Constant;
 
 require Exporter;
 *import = \&Exporter::import;
 require DynaLoader;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 #$VERSION = eval $VERSION;
 
 Math::MPFI->DynaLoader::bootstrap($VERSION);
@@ -28,6 +29,7 @@ Math::MPFI->DynaLoader::bootstrap($VERSION);
     use constant  _MATH_GMP_T    => 9;
     use constant  _MATH_MPC_T    => 10;
     use constant  _MATH_MPFI_T    => 11;
+    use constant  MPFI_PV_NV_BUG => Math::MPFI::Constant::_has_pv_nv_bug();
 
     use subs qw(MPFI_VERSION_MAJOR MPFI_VERSION_MINOR
                 MPFI_VERSION_PATCHLEVEL MPFI_VERSION_STRING);
@@ -61,6 +63,7 @@ Math::MPFI->DynaLoader::bootstrap($VERSION);
 
 @Math::MPFI::EXPORT = ();
 @Math::MPFI::EXPORT_OK = qw(
+MPFI_PV_NV_BUG
 BOTH_ENDPOINTS_EXACT LEFT_ENDPOINT_INEXACT
 RIGHT_ENDPOINT_INEXACT BOTH_ENDPOINTS_INEXACT
 RMPFI_BOTH_ARE_EXACT RMPFI_LEFT_IS_INEXACT
@@ -116,6 +119,7 @@ Rmpfi_get_NV Rmpfi_set_NV
 );
 
 %Math::MPFI::EXPORT_TAGS =(mpfi => [qw(
+MPFI_PV_NV_BUG
 BOTH_ENDPOINTS_EXACT LEFT_ENDPOINT_INEXACT
 RIGHT_ENDPOINT_INEXACT BOTH_ENDPOINTS_INEXACT
 RMPFI_BOTH_ARE_EXACT RMPFI_LEFT_IS_INEXACT
@@ -243,11 +247,21 @@ sub new {
 
     if($type == _NOK_T) {
       if(@_ ) {die "Too many arguments supplied to new() - expected only one"}
-       if(_has_longdouble()) {
-         $ret[0] = Math::MPFI->new();
-         Rmpfi_set_NV($ret[0], $arg1);
-       }
-       else {@ret = Rmpfi_init_set_d($arg1)}
+
+      if(MPFI_PV_NV_BUG) {
+        if(_SvPOK($arg1)) {
+          set_nok_pok(nok_pokflag() + 1);
+          if($Math::MPFI::NOK_POK) {
+            warn "Scalar passed to new() is both NV and PV. Using NV (numeric) value";
+          }
+        }
+      }
+
+      if(_has_longdouble()) {
+        $ret[0] = Math::MPFI->new();
+        Rmpfi_set_NV($ret[0], $arg1);
+      }
+      else {@ret = Rmpfi_init_set_d($arg1)}
       return $ret[0];
     }
 
@@ -255,12 +269,14 @@ sub new {
       if(@_ > 1) {die "Too many arguments supplied to new() - expected no more than two"}
       $base = shift if @_;
       if($base < 0 || $base == 1 || $base > 36) {die "Invalid value for base"}
+
       if(_SvNOK($arg1)) {
         set_nok_pok(nok_pokflag() + 1);
         if($Math::MPFI::NOK_POK) {
           warn "Scalar passed to new() is both NV and PV. Using PV (string) value";
         }
       }
+
       @ret = Rmpfi_init_set_str($arg1, $base);
       if($ret[1]) {warn "string supplied to new() contained invalid characters"}
       return $ret[0];

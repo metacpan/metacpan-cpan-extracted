@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/SharedMem.pm
-## Version v0.2.2
+## Version v0.2.3
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/01/18
-## Modified 2022/03/09
+## Modified 2022/03/13
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -85,7 +85,7 @@ BEGIN
 EOT
         if( $@ )
         {
-            warn( "Error while trying to evel \$SEMOP_ARGS: $@\n" );
+            warn( "Error while trying to eval \$SEMOP_ARGS: $@\n" );
         }
     }
     else
@@ -105,7 +105,7 @@ EOT
             lock    => [qw( LOCK_EX LOCK_SH LOCK_NB LOCK_UN )],
             'flock' => [qw( LOCK_EX LOCK_SH LOCK_NB LOCK_UN )],
     );
-    our $VERSION = 'v0.2.2';
+    our $VERSION = 'v0.2.3';
 };
 
 # use strict;
@@ -224,7 +224,7 @@ sub exists
     my $semid;
     try
     {
-        $semid = semget( $serial, 3, $flags );
+        $semid = semget( $serial, 0, $flags );
         # $self->message( 3, "Found the shared memory? ", defined( $semid ) ? 'yes' : 'no' );
         if( defined( $semid ) )
         {
@@ -405,7 +405,7 @@ sub open
     {
         $create = $self->create;
     }
-    my $flags = $self->flags( create => $create );
+    my $flags = $self->flags( create => $create, ( $opts->{mode} =~ /^\d+$/ ? $opts->{mode} : () ) );
     $self->message( 3, "Trying to get the shared memory segment with key '", ( $opts->{key} || $self->key ), "' with serial '$serial', size '$opts->{size}' and mode '$opts->{mode}' and flags '$flags'." );
     my $id = shmget( $serial, $opts->{size}, $flags );
     if( defined( $id ) )
@@ -435,8 +435,9 @@ sub open
     $self->serial( $serial );
     
     # $self->message( 3, "Shared memory created with id \"$id\"." );
-    # The value 3 can be anything above 0 and below the limit set by SEMMSL. On Linux system, this is usually 32,000. Seem semget(2) man page
-    my $semid = semget( $serial, 3, $flags );
+    # The value 3 can be anything above 0 and below the limit set by SEMMSL. On Linux system, this is usually 32,000. Seem semget(2) man page:
+    # "The argument nsems can be 0 (a don't care) when a semaphore set is  not being  created.   Otherwise, nsems must be greater than 0 and less than or equal  to  the  maximum  number  of  semaphores  per  semaphore  set (SEMMSL)."
+    my $semid = semget( $serial, ( $create ? 3 : 0 ), $flags );
     if( !defined( $semid ) )
     {
         # $self->message( 3, "Could not get a semaphore, trying again with creating it." );

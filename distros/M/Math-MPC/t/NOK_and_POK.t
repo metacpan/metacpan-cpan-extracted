@@ -3,7 +3,7 @@ use warnings;
 use Math::MPC qw(:mpc);
 use Math::MPFR qw(:mpfr);
 
-print "1..126\n";
+print "1..129\n";
 
 # $Math::MPC::NOK_POK = 1; # Uncomment to display warnings
 
@@ -11,11 +11,11 @@ my $n = '98765' x 80;
 my $r = '98765' x 80;
 my $z;
 my $count = 0;
-
+print Math::MPC::nok_pokflag(), "\n";
 if($n > 0) { # sets NV slot to inf, and turns on the NOK flag
   $z = Math::MPC->new($n);
 }
-
+print Math::MPC::nok_pokflag(), "\n";
 adj($n, \$count, 1);
 
 if(Math::MPC::nok_pokflag() == $count) {print "ok 1\n"}
@@ -1172,7 +1172,46 @@ else {
   }
 }
 
-#print $count, "\n";
+#print Math::MPC::nok_pokflag(), " $count\n";
+
+my $nv = 1.3;
+my $s  = "$nv"; # $nv should be POK && NOK if MPC_PV_NV_BUG is 1
+                # Else (ie MPC_NV_BUG is 0) and $nv should be POK only.
+
+$z = Math::MPC->new($nv, 0);
+
+if(MPC_PV_NV_BUG) { $count++ }
+
+if(Math::MPC::nok_pokflag() == $count) {print "ok 127\n"}
+else {
+  warn "\n", Math::MPC::nok_pokflag(), " != $count\n";
+  print "not ok 127\n";
+}
+
+$z = Math::MPC->new($nv, $nv);
+
+if(MPC_PV_NV_BUG) { $count += 2 }
+
+if(Math::MPC::nok_pokflag() == $count) {print "ok 128\n"}
+else {
+  warn "\n", Math::MPC::nok_pokflag(), " != $count\n";
+  print "not ok 128\n";
+}
+
+my $s2 = '1.3';
+
+if($s2 > 0) {  # True
+  $z = Math::MPC->new($s2, $s2);
+
+  $count += 2;
+
+  if(Math::MPC::nok_pokflag() == $count) {print "ok 129\n"}
+  else {
+    warn "\n", Math::MPC::nok_pokflag(), " != $count\n";
+    print "not ok 129\n";
+  }
+}
+
 
 ##########
 

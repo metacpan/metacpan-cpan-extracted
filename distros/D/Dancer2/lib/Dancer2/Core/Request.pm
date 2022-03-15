@@ -1,6 +1,6 @@
 package Dancer2::Core::Request;
 # ABSTRACT: Interface for accessing incoming requests
-$Dancer2::Core::Request::VERSION = '0.301004';
+$Dancer2::Core::Request::VERSION = '0.400000';
 use strict;
 use warnings;
 use parent 'Plack::Request';
@@ -276,7 +276,7 @@ sub uri_base {
 }
 
 sub dispatch_path {
-    warn q{request->dispatch_path is deprecated};
+    warn q{DEPRECATED: request->dispatch_path. Please use request->path instead};
     return shift->path;
 }
 
@@ -631,7 +631,7 @@ Dancer2::Core::Request - Interface for accessing incoming requests
 
 =head1 VERSION
 
-version 0.301004
+version 0.400000
 
 =head1 SYNOPSIS
 
@@ -1157,7 +1157,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Alexis Sukrieh.
+This software is copyright (c) 2022 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

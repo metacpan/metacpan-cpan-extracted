@@ -33,6 +33,7 @@ do { my $x = {
                    'requires' => {
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
+                                   'IPC::Run' => '20200505.0',
                                    'Test::Compile' => 'v2.3.1',
                                    'Test::More' => '0'
                                  }

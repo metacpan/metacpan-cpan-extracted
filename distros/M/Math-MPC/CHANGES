@@ -1,3 +1,9 @@
+1.15
+ - Fix bug re inconsistent settings of POK and NOK flag, which manifests itself as (eg):
+   http://www.cpantesters.org/cpan/report/dc17e330-900b-11ec-bfc9-d1f1448276d4
+   It's a bug that rarely bites, and applies mainly (but not only) to perl-5.18.x and
+   earlier.
+
 1.14
  - Fix https://github.com/sisyphus/math-decimal64/pull/1 (also aplies to Math::MPC)
    Thanks to @hiratara

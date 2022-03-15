@@ -4,7 +4,7 @@ use strict;
 use Math::MPFR qw(:mpfr);
 use Math::MPFI qw(:mpfi);
 
-print "1..9\n";
+print "1..10\n";
 
 print STDERR "\n# Using Math::MPFI version ", $Math::MPFI::VERSION, "\n";
 print STDERR "# Math::MPFI uses mpfi library version ", Rmpfi_get_version(), "\n";
@@ -14,7 +14,7 @@ print STDERR "# Math::MPFR uses gmp library version ", Math::MPFR::gmp_v(), "\n"
 print STDERR "# Math::MPFI uses gmp library version ", Math::MPFI::gmp_v(), "\n";
 print STDERR "# Using gmp library version ", Math::MPFI::gmp_v(), "\n";
 
-if($Math::MPFI::VERSION eq '0.10' && Math::MPFI::_get_xs_version() eq $Math::MPFI::VERSION) {print "ok 1\n"}
+if($Math::MPFI::VERSION eq '0.11' && Math::MPFI::_get_xs_version() eq $Math::MPFI::VERSION) {print "ok 1\n"}
 else {print "not ok 1 $Math::MPFI::VERSION ", Math::MPFI::_get_xs_version(), "\n"}
 
 my $prec = 101;
@@ -125,4 +125,10 @@ else {
     warn "\$\@: $@";
     print "not ok 9\n";
   }
+}
+
+if($Math::MPFI::VERSION eq $Math::MPFI::Constant::VERSION) {print "ok 10\n"}
+else {
+  warn "\$Math::MPFI::VERSION: $Math::MPFI::VERSION\n\$Math::MPFI::Constant::VERSION: $Math::MPFI::Constant::VERSION\n";
+  print "not ok 10\n";
 }

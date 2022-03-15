@@ -2,7 +2,7 @@ package App::Yath::Command::abort;
 use strict;
 use warnings;
 
-our $VERSION = '1.000111';
+our $VERSION = '1.000112';
 
 use Time::HiRes qw/sleep/;
 use Term::Table;
@@ -678,6 +678,39 @@ Do not run tests that have their duration flag set to 'LONG'
 =item --no-only-long
 
 Only run tests that have their duration flag set to 'LONG'
+
+
+=item --rerun
+
+=item --rerun=path/to/log.jsonl
+
+=item --rerun=plugin_specific_string
+
+=item --no-rerun
+
+Re-Run tests from a previous run from a log file (or last log file). Plugins can intercept this, such as YathUIDB which will grab a run UUID and derive tests to re-run from that.
+
+
+=item --rerun-failed
+
+=item --rerun-failed=path/to/log.jsonl
+
+=item --rerun-failed=plugin_specific_string
+
+=item --no-rerun-failed
+
+Re-Run failed tests from a previous run from a log file (or last log file). Plugins can intercept this, such as YathUIDB which will grab a run UUID and derive tests to re-run from that.
+
+
+=item --rerun-plugin Foo
+
+=item --rerun-plugin +App::Yath::Plugin::Foo
+
+=item --no-rerun-plugin
+
+What plugin(s) should be used for rerun (will fallback to other plugins if the listed ones decline the value, this is just used ot set an order of priority)
+
+Can be specified multiple times
 
 
 =item --search ARG

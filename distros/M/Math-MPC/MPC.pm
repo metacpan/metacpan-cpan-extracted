@@ -2,6 +2,7 @@
     use strict;
     use warnings;
     use Math::MPFR;
+    use Math::MPC::Constant;
 
     use constant  MPC_RNDNN => 0;
     use constant  MPC_RNDZN => 1;
@@ -33,6 +34,8 @@
     use constant  _MATH_GMPz_T   => 8;
     use constant  _MATH_GMP_T    => 9;
     use constant  _MATH_MPC_T    => 10;
+
+    use constant MPC_PV_NV_BUG => Math::MPC::Constant::_has_pv_nv_bug();
 
     use subs qw(MPC_VERSION MPC_VERSION_MAJOR MPC_VERSION_MINOR
                 MPC_VERSION_PATCHLEVEL MPC_VERSION_STRING
@@ -68,6 +71,7 @@
     require DynaLoader;
 
     @Math::MPC::EXPORT_OK = qw(
+MPC_PV_NV_BUG
 MPC_RNDNN MPC_RNDND MPC_RNDNU MPC_RNDNZ MPC_RNDDN MPC_RNDUN MPC_RNDZN MPC_RNDDD
 MPC_RNDDU MPC_RNDDZ MPC_RNDZD MPC_RNDUD MPC_RNDUU MPC_RNDUZ MPC_RNDZU MPC_RNDZZ
 MPC_VERSION_MAJOR MPC_VERSION_MINOR MPC_VERSION_PATCHLEVEL MPC_VERSION_STRING
@@ -126,12 +130,13 @@ Rmpc_set_nan Rmpc_swap
 Rmpc_mul_sj Rmpc_mul_ld Rmpc_mul_d Rmpc_div_sj Rmpc_sj_div Rmpc_div_ld Rmpc_ld_div Rmpc_div_d Rmpc_d_div
 );
 
-    our $VERSION = '1.14';
+    our $VERSION = '1.15';
     #$VERSION = eval $VERSION;
 
     Math::MPC->DynaLoader::bootstrap($VERSION);
 
     %Math::MPC::EXPORT_TAGS =(mpc => [qw(
+MPC_PV_NV_BUG
 MPC_RNDNN MPC_RNDND MPC_RNDNU MPC_RNDNZ MPC_RNDDN MPC_RNDUN MPC_RNDZN MPC_RNDDD
 MPC_RNDDU MPC_RNDDZ MPC_RNDZD MPC_RNDUD MPC_RNDUU MPC_RNDUZ MPC_RNDZU MPC_RNDZZ
 MPC_VERSION_MAJOR MPC_VERSION_MINOR MPC_VERSION_PATCHLEVEL MPC_VERSION_STRING

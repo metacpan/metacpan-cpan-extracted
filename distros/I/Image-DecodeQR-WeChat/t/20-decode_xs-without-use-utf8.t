@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-our $VERSION = '0.3';
+our $VERSION = '0.7';
 
 # this is an exact copy of t/01-decode.t but assuming that we did not
 # use utf8

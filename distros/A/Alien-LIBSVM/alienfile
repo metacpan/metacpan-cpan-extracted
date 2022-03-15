@@ -10,7 +10,7 @@ share {
 
 	# http://www.csie.ntu.edu.tw/~cjlin/libsvm/
 	plugin Download => (
-		url => 'https://github.com/cjlin1/libsvm/releases',
+		url => 'https://github.com/cjlin1/libsvm/tags',
 		version => qr/v([\d\.]+)\.tar\.gz/,
 	);
 

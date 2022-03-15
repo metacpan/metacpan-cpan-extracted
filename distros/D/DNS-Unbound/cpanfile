@@ -1,7 +1,7 @@
 requires 'Class::XSAccessor' => '0.10';
 requires 'Net::DNS';
 requires 'Promise::ES6' => 0.11;
-requires 'X::Tiny';
+requires 'X::Tiny' => 0.21;
 requires 'XSLoader' => 0.24;
 
 test_requires 'Test::DescribeMe';

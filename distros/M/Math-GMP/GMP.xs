@@ -101,6 +101,24 @@ sv2gmp(SV* sv)
 }
 
 
+SV *
+stringify(mpz_t *n)
+{
+    char *buf;
+    char *pv;
+    int len;
+    SV *sv;
+
+    len = mpz_sizeinbase(*n, 10);
+    buf = malloc(len + 2);
+
+    mpz_get_str(buf, 10, *n);
+    sv = newSVpv(buf, strlen(buf));
+    free(buf);
+    return sv;
+}
+
+
 MODULE = Math::GMP		PACKAGE = Math::GMP
 PROTOTYPES: ENABLE
 
@@ -157,18 +175,8 @@ SV *
 stringify(n)
 	mpz_t *	n
 
-  PREINIT:
-    int len;
-
   CODE:
-    len = mpz_sizeinbase(*n, 10);
-    {
-      char *buf;
-      buf = malloc(len + 2);
-      mpz_get_str(buf, 10, *n);
-      RETVAL = newSVpv(buf, strlen(buf));
-      free(buf);
-    }
+    RETVAL = stringify(n);
   OUTPUT:
     RETVAL
 
@@ -291,6 +299,49 @@ mod_2exp_gmp(in, cnt)
     RETVAL = malloc (sizeof(mpz_t));
     mpz_init(*RETVAL);
     mpz_mod_2exp(*RETVAL, *in, cnt);
+  OUTPUT:
+    RETVAL
+
+
+SV *
+op_stringify(m,n,swap)
+	mpz_t *		m
+	SV *		n
+	bool		swap
+
+  CODE:
+	/* 'n' and 'swap' are dummy variables */
+	RETVAL = stringify(m);
+  OUTPUT:
+    RETVAL
+
+
+SV *
+op_numify(m,n,swap)
+	mpz_t *		m
+	SV *		n
+	bool		swap
+
+  CODE:
+	/* 'n' and 'swap' are dummy variables */
+	if (mpz_sgn(*m) < 0) {
+		RETVAL = newSViv(mpz_get_si(*m));
+	} else {
+		RETVAL = newSVuv(mpz_get_ui(*m));
+	}
+  OUTPUT:
+    RETVAL
+
+
+SV *
+op_bool(m,n,swap)
+	mpz_t *		m
+	SV *		n
+	bool		swap
+
+  CODE:
+	/* 'n' and 'swap' are dummy variables */
+	RETVAL = mpz_sgn(*m) ? &PL_sv_yes : &PL_sv_no;
   OUTPUT:
     RETVAL
 

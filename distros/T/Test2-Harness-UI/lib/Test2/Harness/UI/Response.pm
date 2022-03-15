@@ -2,7 +2,7 @@ package Test2::Harness::UI::Response;
 use strict;
 use warnings;
 
-our $VERSION = '0.000115';
+our $VERSION = '0.000117';
 
 use Carp qw/croak/;
 use Time::HiRes qw/sleep time/;
@@ -145,9 +145,10 @@ sub error {
     $msg ||= $DEFAULT_ERRORS{$code} || 'Error';
 
     my $self = $class->new($code);
-    $self->body($msg);
+    $self->add_error($msg);
     $self->is_error(1);
     $self->title($msg ? "error: $code - $msg" : "error: $code");
+    $self->body($msg);
 
     return $self;
 }

@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-our $VERSION = '0.3';
+our $VERSION = '0.7';
 
 use utf8; # allow for utf8 in code (we have strings in utf8, filenames)
 

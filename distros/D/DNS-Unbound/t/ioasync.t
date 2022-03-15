@@ -25,7 +25,7 @@ DNS::Unbound::IOAsync->new($loop)->resolve_async($name, 'NS')->then(
 
         isa_ok( $result, 'DNS::Unbound::Result', 'promise resolution' );
 
-        diag explain [ passed => $result ];
+        diag "passed: $result";
     },
     sub {
         my $why = shift;

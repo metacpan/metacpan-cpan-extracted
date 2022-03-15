@@ -11,11 +11,11 @@ BEGIN {
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::Perl::Critic::Subset 3.001.005
+# this test was generated with Dist::Zilla::Plugin::Test::Perl::Critic::Subset 3.001.006
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/App/TermAttrUtils.pm','script/term-attrs','script/term-detect-software','script/term-encoding','script/term-size','script/term-terminfo'];
+my $filenames = ['lib/App/TermAttrUtils.pm','script/ff','script/form-feed','script/term-attrs','script/term-detect-software','script/term-encoding','script/term-size','script/term-terminfo'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

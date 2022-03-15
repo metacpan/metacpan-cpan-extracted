@@ -1,0 +1,44 @@
+NAME
+
+    Data::Password::Top10000 - Check if a given string is in the Top 10000
+    list of common passwords
+
+VERSION
+
+    version 1.0.1
+
+SYNOPSIS
+
+        use v5.24;
+        use Data::Password::Top10000 (is_in_top10000);
+    
+        my $password = '12345';
+        if ( is_in_top10000( $password ) ) {
+            say 'please use an other password';
+        }
+
+DESCRIPTION
+
+    At https://github.com/danielmiessler/SecLists a "security tester's
+    companion" is curated. Part of this companion is a list of the Top
+    10000 used passwords. It is good practice to disallow users to use
+    those passwords.
+
+FUNCTIONS
+
+ is_in_top10000
+
+    Checks
+
+AUTHOR
+
+    Renee Baecker <reneeb@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2022 by Renee Baecker.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+

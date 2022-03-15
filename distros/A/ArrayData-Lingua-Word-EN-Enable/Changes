@@ -1,0 +1,11 @@
+0.002   2022-03-06  Released-By: PERLANCAR; Urgency: medium
+
+        - Fix Abstract.
+
+        - Rename module/dist from ArrayData::{,Lingua}::Word::EN::Enable to
+          follow convention.
+
+
+0.001   2022-02-05  Released-By: PERLANCAR
+
+        - First release.

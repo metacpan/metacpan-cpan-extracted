@@ -4,7 +4,7 @@ lib::projectroot - easier loading of a project's local libs
 
 # VERSION
 
-version 1.009
+version 1.010
 
 # SYNOPSIS
 

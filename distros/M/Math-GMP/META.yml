@@ -8,6 +8,7 @@ build_requires:
   File::Temp: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
+  Scalar::Util: '0'
   Test::More: '0'
 configure_requires:
   Alien::GMP: '1.08'
@@ -22,7 +23,7 @@ name: Math-GMP
 provides:
   Math::GMP:
     file: lib/Math/GMP.pm
-    version: '2.24'
+    version: '2.25'
 requires:
   AutoLoader: '0'
   Carp: '0'
@@ -36,7 +37,7 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Math-GMP
   repository: https://github.com/turnstep/Math-GMP.git
-version: '2.24'
-x_generated_by_perl: v5.32.1
+version: '2.25'
+x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: LGPL-2.1

@@ -1,6 +1,10 @@
 Revision history for Sentry-SDK
 
 
+v1.0.17  2022-03-15 08:21:52 CET
+
+  - Feat: support release info
+
 v1.0.16  2022-03-11 13:14:04 CET
 
   - Fix: Even if tracing is disabled, send the request payload

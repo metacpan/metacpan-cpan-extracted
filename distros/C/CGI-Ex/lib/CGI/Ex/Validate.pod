@@ -4,7 +4,7 @@ CGI::Ex::Validate - The "Just Right" form validator with javascript in parallel
 
 =head1 VERSION
 
-version 2.52
+version 2.54
 
 =head1 SYNOPSIS
 

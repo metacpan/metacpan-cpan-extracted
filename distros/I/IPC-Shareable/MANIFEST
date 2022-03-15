@@ -8,6 +8,7 @@ COPYING
 CREDITS
 DISCLAIMER
 'docs/Shared Memory Configuration.txt'
+examples/new.pl
 lib/IPC/Shareable.pm
 lib/IPC/Shareable/SharedMem.pm
 Makefile.PL
@@ -41,8 +42,6 @@ t/64-nested_segs_untidy.t
 t/65-seg_size.t
 t/66-size_exceeded.t
 t/67-exhaust_shm_slots.t
-t/71-unspawn.t
-t/72-unspawn_destroy.t
 t/75-graceful.t
 t/76-singleton.t
 t/77-singleton_warn.t
@@ -50,16 +49,11 @@ t/80-exceptions.t
 t/81-fork_dup_rand_keys.t
 t/82-sig_child_ignore.t
 t/83-clean_protected.t
-t/85-spawn_object_contains_data.t
-t/86-unspawn_object_contains_data.t
 t/90-pod_coverage.t
 t/91-pod_linkcheck.t
 t/92-pod.t
 t/93-manifest.t
 t/99-end.t
-t/_spawn
-t/_spawn_class
-t/SpawnTest.pm
 testing/new_one.pl
 testing/new_two.pl
 testing/one_deep_hash.pl

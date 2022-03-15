@@ -11,11 +11,11 @@ Lingua::String - Class to contain a string in many different languages
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use overload (
         # '==' => \&equal,
@@ -43,6 +43,8 @@ Hold many strings in one object.
     $LANG{'LANG'} = 'de_DE';
     print "$str\n";	# Prints nothing
 
+    $string = Lingua::String->new('hello');	# Initialises the 'current' language
+
 =cut
 
 =head1 METHODS
@@ -63,14 +65,17 @@ sub new {
 
 	# Use Lingua::String->new, not Lingua::String::new
 	if(!defined($class)) {
-		# https://github.com/nigelhorne/Lingua-String/issues/1
-		Carp::carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
-		return;
+		# Using Lingua::String->new(), not Lingua::String::new()
+		# carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
+		# return;
+		$class = __PACKAGE__;
 	}
 
 	my %params;
 	if(ref($_[0]) eq 'HASH') {
 		%params = %{$_[0]};
+	} elsif((scalar(@_) == 1) && (my $lang = _get_language())) {
+		%params = ($lang => $_[0]);
 	} elsif(scalar(@_) % 2 == 0) {
 		%params = @_;
 	} else {
@@ -145,6 +150,9 @@ sub _get_language {
 		if($val =~ /^([a-z]{2})/i) {
 			return lc($1);
 		}
+	}
+	if(defined($ENV{'LANG'}) && (($ENV{'LANG'} =~ /^C\./) || ($ENV{'LANG'} eq 'C'))) {
+		return 'en';
 	}
 	return;	# undef
 }
@@ -262,10 +270,6 @@ L<http://cpants.cpanauthors.org/dist/Lingua-String>
 
 L<http://matrix.cpantesters.org/?dist=Lingua-String>
 
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Lingua-String>
-
 =item * CPAN Testers Dependencies
 
 L<http://deps.cpantesters.org/?module=Lingua-String>
@@ -274,7 +278,7 @@ L<http://deps.cpantesters.org/?module=Lingua-String>
 
 =head1 LICENCE AND COPYRIGHT
 
-Copyright 2021 Nigel Horne.
+Copyright 2021-2022 Nigel Horne.
 
 This program is released under the following licence: GPL2 for personal use on
 a single computer.

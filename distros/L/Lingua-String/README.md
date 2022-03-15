@@ -4,7 +4,7 @@ Lingua::String - Class to contain a string in many different languages
 
 # VERSION
 
-Version 0.01
+Version 0.03
 
 # SYNOPSIS
 
@@ -23,6 +23,8 @@ Hold many strings in one object.
     print "$str\n";     # Prints Bonjour Tout le Monde
     $LANG{'LANG'} = 'de_DE';
     print "$str\n";     # Prints nothing
+
+    $string = Lingua::String->new('hello');     # Initialises the 'current' language
 
 # METHODS
 
@@ -96,17 +98,13 @@ You can also look for information at:
 
     [http://matrix.cpantesters.org/?dist=Lingua-String](http://matrix.cpantesters.org/?dist=Lingua-String)
 
-- CPAN Ratings
-
-    [http://cpanratings.perl.org/d/Lingua-String](http://cpanratings.perl.org/d/Lingua-String)
-
 - CPAN Testers Dependencies
 
     [http://deps.cpantesters.org/?module=Lingua-String](http://deps.cpantesters.org/?module=Lingua-String)
 
 # LICENCE AND COPYRIGHT
 
-Copyright 2021 Nigel Horne.
+Copyright 2021-2022 Nigel Horne.
 
 This program is released under the following licence: GPL2 for personal use on
 a single computer.

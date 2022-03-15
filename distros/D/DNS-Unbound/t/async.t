@@ -40,7 +40,7 @@ for my $use_threads_yn ( 0, 1 ) {
                     'to_net_dns_rrs() - DEPRECATED',
                 );
 
-                diag explain [ passed => $result ];
+                diag "passed: $name";
             },
             sub { diag explain [ failed => @_ ] },
         );
@@ -50,7 +50,7 @@ for my $use_threads_yn ( 0, 1 ) {
         vec( my $rin = q<>, $fd, 1 ) = 1;
         select( my $rout = $rin, undef, undef, undef );
 
-        diag "Ready vvvvvvvvvvvvv";
+        diag __FILE__ . ": Waiting on $name vvvvvvvvvvvvv";
         $dns->process();
     }
 
@@ -62,8 +62,10 @@ for my $use_threads_yn ( 0, 1 ) {
         my $done_count = 0;
 
         my @queries = map {
+            my $name = $_;
+
             $dns->resolve_async( $_, 'NS' )->then(
-                sub { diag explain [ passed => @_ ] },
+                sub { diag "passed: $name" },
                 sub { diag explain [ failed => @_ ] },
             )->then( sub {
                 $done_count++;
@@ -76,14 +78,23 @@ for my $use_threads_yn ( 0, 1 ) {
             } );
         } @tlds;
 
+        diag __FILE__ . ": Waiting on: @tlds";
+
         my $fd = $dns->fd();
         my $rin = q<>;
         vec( $rin, $fd, 1 ) = 1;
+
+        diag "Polling";
         select($rin, undef, undef, undef);
+
+        diag __FILE__ . ": Done polling";
+
         ok(
             $dns->poll(),
             'poll() gives truthy when there’s something to read',
         );
+
+        diag __FILE__ . ": Waiting for all queries to finish";
 
         $dns->wait() while $done_count < @tlds;
 

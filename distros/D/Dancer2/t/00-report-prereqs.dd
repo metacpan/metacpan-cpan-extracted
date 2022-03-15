@@ -92,7 +92,8 @@ do { my $x = {
                                       'Types::Standard' => '0',
                                       'URI::Escape' => '0',
                                       'YAML' => '0.86',
-                                      'parent' => '0'
+                                      'parent' => '0',
+                                      'perl' => '5.012005'
                                     },
                       'suggests' => {
                                       'Fcntl' => '0',

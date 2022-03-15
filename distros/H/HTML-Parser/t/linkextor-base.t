@@ -14,7 +14,9 @@ $p->parse(<<HTML)->eof;
 <head>
 <base href="http://www.sn.no/">
 </head>
-<body background="http://www.sn.no/sn.gif">
+<body>
+<form action="/post_here">
+</form>
 
 This is <A HREF="link.html">link</a> and an <img SRC="img.jpg"
 lowsrc="img.gif" alt="Image">.

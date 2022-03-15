@@ -145,6 +145,7 @@ sub _apply_client_options ($self, $event) {
 
   $event->{environment} //= $options->{environment} // 'production';
   $event->{dist}        //= $options->{dist};
+  $event->{release}     //= $options->{release} if $options->{release};
 
   $event->{message} = truncate($event->{message}, $max_value_length)
     if $event->{message};

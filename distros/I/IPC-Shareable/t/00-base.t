@@ -2,9 +2,14 @@ use warnings;
 use strict;
 
 use Data::Dumper;
-use Test::More tests => 4;
+use Test::More;
 
-BEGIN { use_ok('IPC::Shareable') };
+BEGIN {
+    if (!$ENV{CI_TESTING}) {
+        plan skip_all => "Not on a valid CI platform...";
+    }
+    use_ok('IPC::Shareable');
+};
 
 warn "Segs Before: " . IPC::Shareable::ipcs() . "\n" if $ENV{PRINT_SEGS};
 my $segs = IPC::Shareable::ipcs();
@@ -19,11 +24,6 @@ is $segs, $segs, "Initial test ok";
     is $a->{_key}, 0, "tie with no glue or options is IPC_PRIVATE ok";
     is $b->{_key}, 0, "tie with no glue but with options is IPC_PRIVATE ok";
 
-    if (!$ENV{CI_TESTING}) {
-        done_testing();
-        exit;
-    }
-
     $a->remove;
 
     # Store existing segments in a shared hash to test against
@@ -36,3 +36,5 @@ is $segs, $segs, "Initial test ok";
 
 IPC::Shareable::_end;
 warn "Segs After: " . IPC::Shareable::ipcs() . "\n" if $ENV{PRINT_SEGS};
+
+done_testing();

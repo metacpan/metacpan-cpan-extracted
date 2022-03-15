@@ -1,6 +1,6 @@
 package Google::RestApi::SheetsApi4::Request::Spreadsheet;
 
-our $VERSION = '1.0.1';
+our $VERSION = '1.0.2';
 
 use Google::RestApi::Setup;
 
@@ -19,6 +19,31 @@ sub delete_protected_range {
       protectedRangeId => $id,
     },
   );
+
+  return $self;
+}
+
+sub add_worksheet {
+  my $self = shift;
+
+  state $check = compile_named(
+    name            => Optional[Str],
+    title           => Optional[Str],
+    grid_properties => Optional[Dict[ rows => Optional[Int], cols => Optional[Int] ]],
+    tab_color       => Optional[Dict[ red => Optional[Num], blue => Optional[Num], green => Optional[Num] ]],
+  );
+  my $p = $check->(@_);
+
+  my %properties;
+  $properties{title} = $p->{title} if $p->{title};
+  $properties{title} = $p->{name} if $p->{name};
+  $properties{tabColor} = $p->{tab_color} if $p->{tab_color};
+  
+  $p->{grid_properties}->{rowCount} = delete $p->{grid_properties}->{rows} if $p->{grid_properties}->{rows};
+  $p->{grid_properties}->{columnCount} = delete $p->{grid_properties}->{cols} if $p->{grid_properties}->{cols};
+  $properties{gridProperties} = $p->{grid_properties} if $p->{grid_properties};
+  
+  $self->batch_requests(addSheet => { properties => \%properties });
 
   return $self;
 }

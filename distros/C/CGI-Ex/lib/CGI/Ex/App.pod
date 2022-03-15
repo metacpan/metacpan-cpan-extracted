@@ -4,7 +4,7 @@ CGI::Ex::App - Anti-framework application framework.
 
 =head1 VERSION
 
-version 2.52
+version 2.54
 
 =head1 SYNOPSIS
 

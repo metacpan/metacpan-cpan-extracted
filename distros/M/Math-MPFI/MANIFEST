@@ -8,6 +8,9 @@ README
 MPFI.xs
 typemap
 ad_hoc/consistency.p
+Constant/Constant.pm
+Constant/Constant.xs
+Constant/Makefile.PL
 t/_itsa.t
 t/aaa_compat.t
 t/aab_basic.t
@@ -39,6 +42,7 @@ t/overload_mul.t
 t/overload_switch.t
 t/pod.t
 t/pi.t
+t/PV_NV_BUG.t
 t/raise_2exp.t
 t/root.t
 t/swap.t

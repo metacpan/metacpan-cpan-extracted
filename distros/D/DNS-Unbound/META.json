@@ -44,7 +44,7 @@
             "Class::XSAccessor" : "0.10",
             "Net::DNS" : "0",
             "Promise::ES6" : "0.11",
-            "X::Tiny" : "0",
+            "X::Tiny" : "0.21",
             "XSLoader" : "0.24"
          }
       },
@@ -70,6 +70,6 @@
          "web" : "https://github.com/FGasper/p5-DNS-Unbound"
       }
    },
-   "version" : "0.28",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "0.29",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

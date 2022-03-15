@@ -10,7 +10,7 @@
 # ABSTRACT: Run a cme script
 
 package App::Cme::Command::run ;
-$App::Cme::Command::run::VERSION = '1.037';
+$App::Cme::Command::run::VERSION = '1.038';
 use strict;
 use warnings;
 use v5.20;
@@ -108,23 +108,39 @@ sub find_script_file ($self, $script_name) {
     return $script;
 }
 
+## no critic (Subroutines::ProhibitManyArgs)
+sub replace_var_in_value ($user_args, $script_var, $data, $value) {
+    state $var_pattern = qr~(?<!\\) \$([a-zA-Z]\w+) (?!\s*{)~x;
+
+    # change $var but not \$var, not $var{} and not $1
+    $value =~ s~ $var_pattern
+               ~ $user_args->{$1} // $script_var->{$1} // $ENV{$1} // $data->{default}{$1} // '$'.$1 ~xeg;
+
+    # register vars without replacements
+    foreach my $var ($value =~ m~ $var_pattern ~xg) {
+        $data->{missing}{$var} = 1 ;
+    }
+
+    # now change \$var in $var
+    $value =~ s!\\\$!\$!g;
+
+    return $value;
+}
+
 # replace variables with command arguments or eval'ed variables or env variables
 ## no critic (Subroutines::ProhibitManyArgs)
-sub replace_var_in_value ($user_args, $script_var, $default, $missing, $vars) {
-    my $var_pattern = qr~(?<!\\) \$([a-zA-Z]\w+) (?!\s*{)~x;
-
-    foreach ($vars->@*) {
-        # change $var but not \$var, not $var{} and not $1
-        s~ $var_pattern
-         ~ $user_args->{$1} // $script_var->{$1} // $ENV{$1} // $default->{$1} // '$'.$1 ~xeg;
-
-        # register vars without replacements
-        foreach my $var (m~ $var_pattern ~xg) {
-            $missing->{$var} = 1 ;
+sub replace_vars ($user_args, $script_var, $data, @items) {
+    foreach my $item (@items) {
+        if (ref $data->{$item}  eq 'ARRAY') {
+            my @new;
+            foreach my $value ($data->{$item}->@*) {
+                push @new, replace_var_in_value ($user_args, $script_var, $data, $value);
+            }
+            $data->{$item} = \@new;
         }
-
-        # now change \$var in $var
-        s!\\\$!\$!g;
+        elsif ($data->{$item}) {
+            $data->{$item} = replace_var_in_value ($user_args, $script_var, $data, $data->{$item});
+        }
     }
     return;
 }
@@ -237,8 +253,7 @@ sub process_script_vars ($user_args, $data) {
         }
     }
 
-    replace_var_in_value($user_args, \%var, $data->{default},$data->{missing}, $data->{doc});
-    replace_var_in_value($user_args, \%var, $data->{default},$data->{missing}, $data->{load});
+    replace_vars($user_args, \%var, $data, 'doc', 'load', 'commit_msg');
 
     $data->{values} = {$data->{default}->%*, %var, $user_args->%*};
 
@@ -381,7 +396,7 @@ sub execute {
 }
 
 package App::Cme::Run::Var; ## no critic (Modules::ProhibitMultiplePackages)
-$App::Cme::Run::Var::VERSION = '1.037';
+$App::Cme::Run::Var::VERSION = '1.038';
 require Tie::Hash;
 
 ## no critic (ClassHierarchies::ProhibitExplicitISA)
@@ -409,7 +424,7 @@ App::Cme::Command::run - Run a cme script
 
 =head1 VERSION
 
-version 1.037
+version 1.038
 
 =head1 SYNOPSIS
 
@@ -675,7 +690,7 @@ C<$arg> is a hash containing the arguments passed to C<cme run> with C<-arg> opt
 The C<sub> parameter value must be a sub ref. Its parameters are
 C<$root> (a L<Config::Model::Node> object containing the root of the
 configuration tree) and C<$arg> (a hash ref containing the keys and
-values passed to C<cme run> wiht C<--arg> options).
+values passed to C<cme run> with C<--arg> options).
 
 Note that this format does not support C<var>, C<default> and C<load>
 parameters as you can easily achieve the same result with Perl code.

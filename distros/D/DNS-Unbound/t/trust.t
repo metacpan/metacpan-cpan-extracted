@@ -16,11 +16,13 @@ my $dns = DNS::Unbound->new();
 
 $dns->resolve('localhost', 'A');
 
-for my $method (
+my @methods_to_check = grep { DNS::Unbound->can($_) } (
     'trustedkeys',
     'add_ta_file',
     'add_ta_autr',
-) {
+);
+
+for my $method ( @methods_to_check ) {
     dies_ok(
         sub { $dns->$method('////////qqqq' . rand) },
         "$method after finalization",

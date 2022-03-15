@@ -24,7 +24,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "PerlX-Maybe";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/PerlX-Maybe/v_0-001>, <http://purl.org/NET/cpan-uri/dist/PerlX-Maybe/v_0-002>, <http://purl.org/NET/cpan-uri/dist/PerlX-Maybe/v_0-003>, <http://purl.org/NET/cpan-uri/dist/PerlX-Maybe/v_0-004>, <http://purl.org/NET/cpan-uri/dist/PerlX-Maybe/v_0-999_01>, <http://purl.org/NET/cpan-uri/dist/PerlX-Maybe/v_0-999_02>, <http://purl.org/NET/cpan-uri/dist/PerlX-Maybe/v_1-000>, <http://purl.org/NET/cpan-uri/dist/PerlX-Maybe/v_1-001>, <http://purl.org/NET/cpan-uri/dist/PerlX-Maybe/v_1-200>, <http://purl.org/NET/cpan-uri/dist/PerlX-Maybe/v_1-201>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/PerlX-Maybe/v_0-001>, <http://purl.org/NET/cpan-uri/dist/PerlX-Maybe/v_0-002>, <http://purl.org/NET/cpan-uri/dist/PerlX-Maybe/v_0-003>, <http://purl.org/NET/cpan-uri/dist/PerlX-Maybe/v_0-004>, <http://purl.org/NET/cpan-uri/dist/PerlX-Maybe/v_0-999_01>, <http://purl.org/NET/cpan-uri/dist/PerlX-Maybe/v_0-999_02>, <http://purl.org/NET/cpan-uri/dist/PerlX-Maybe/v_1-000>, <http://purl.org/NET/cpan-uri/dist/PerlX-Maybe/v_1-001>, <http://purl.org/NET/cpan-uri/dist/PerlX-Maybe/v_1-200>, <http://purl.org/NET/cpan-uri/dist/PerlX-Maybe/v_1-201>, <http://purl.org/NET/cpan-uri/dist/PerlX-Maybe/v_1-202>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-perlx-maybe>;
@@ -174,6 +174,23 @@
 	];
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/PerlX-Maybe-1.201.tar.gz>;
 	doap:revision        "1.201"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/PerlX-Maybe/v_1-202>
+	a                    doap:Version;
+	rdfs:label           "Pi Day";
+	dc:issued            "2022-03-14"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentaion;
+			rdfs:label "Fix code example."@en;
+			doap-changeset:thanks [
+				foaf:homepage <https://www.daniel-boehmer.de/>;
+				foaf:name "Daniel Böhmer";
+			];
+		];
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/PerlX-Maybe-1.202.tar.gz>;
+	doap:revision        "1.202"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/tobyink>
 	a                    foaf:Person;

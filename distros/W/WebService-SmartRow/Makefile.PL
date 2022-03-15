@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.006000;
+use 5.010000;
 
 use ExtUtils::MakeMaker;
 
@@ -14,11 +14,11 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "WebService-SmartRow",
   "LICENSE" => "mit",
-  "MIN_PERL_VERSION" => "5.006000",
+  "MIN_PERL_VERSION" => "5.010000",
   "NAME" => "WebService::SmartRow",
   "PREREQ_PM" => {
-    "Cpanel::JSON::XS" => "4.27",
     "HTTP::Tiny" => "0.080",
+    "JSON::MaybeXS" => "1.004003",
     "Moo" => "2.005004",
     "namespace::clean" => "0.27"
   },
@@ -29,7 +29,7 @@ my %WriteMakefileArgs = (
     "Test2::V0" => "0.000145",
     "Test::More" => 0
   },
-  "VERSION" => "0.005",
+  "VERSION" => "0.006",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -37,11 +37,11 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Cpanel::JSON::XS" => "4.27",
   "File::Spec" => 0,
   "HTTP::Tiny" => "0.080",
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
+  "JSON::MaybeXS" => "1.004003",
   "Moo" => "2.005004",
   "Test2::V0" => "0.000145",
   "Test::More" => 0,

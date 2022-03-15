@@ -3,9 +3,9 @@
 package Perinci::Examples;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-30'; # DATE
+our $DATE = '2022-03-08'; # DATE
 our $DIST = 'Perinci-Examples'; # DIST
-our $VERSION = '0.821'; # VERSION
+our $VERSION = '0.822'; # VERSION
 
 use 5.010001;
 use strict;
@@ -1178,7 +1178,7 @@ Perinci::Examples - Various examples of Rinci metadata
 
 =head1 VERSION
 
-This document describes version 0.821 of Perinci::Examples (from Perl distribution Perinci-Examples), released on 2021-01-30.
+This document describes version 0.822 of Perinci::Examples (from Perl distribution Perinci-Examples), released on 2022-03-08.
 
 =head1 DESCRIPTION
 
@@ -1206,7 +1206,7 @@ Another paragraph with I<bold>, I<italic> text.
 
 Usage:
 
- arg_default(%args) -> [status, msg, payload, meta]
+ arg_default(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Demonstrate argument default value from default andE<sol>or schema.
 
@@ -1254,12 +1254,12 @@ Default from "default" property as well as schema.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -1269,7 +1269,7 @@ Return value:  (any)
 
 Usage:
 
- args_as_array($a0, $a1, $a2) -> [status, msg, payload, meta]
+ args_as_array($a0, $a1, $a2) -> [$status_code, $reason, $payload, \%result_meta]
 
 This function's metadata sets C<args_as> property to C<array>. This means it wants
 to accept argument as an array, like a regular Perl subroutine accepting
@@ -1292,12 +1292,12 @@ Arguments ('*' denotes required arguments):
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -1307,7 +1307,7 @@ Return value:  (any)
 
 Usage:
 
- args_as_arrayref([$a0, $a1, $a2]) -> [status, msg, payload, meta]
+ args_as_arrayref([$a0, $a1, $a2]) -> [$status_code, $reason, $payload, \%result_meta]
 
 This function's metadata sets C<args_as> property to C<arrayref>. This is just
 like C<array>, except the whole argument list is passed in C<$_[0]>.
@@ -1329,12 +1329,12 @@ Arguments ('*' denotes required arguments):
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -1344,7 +1344,7 @@ Return value:  (any)
 
 Usage:
 
- args_as_hashref(\%args) -> [status, msg, payload, meta]
+ args_as_hashref(\%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 This function's metadata sets C<args_as> property to C<hashref>. This is just like
 C<hash>, except the whole argument hash is passed in C<$_[0]>.
@@ -1364,12 +1364,12 @@ Arguments ('*' denotes required arguments):
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -1379,7 +1379,7 @@ Return value:  (any)
 
 Usage:
 
- binary(%args) -> [status, msg, payload, meta]
+ binary(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Accept and send binary data.
 
@@ -1426,12 +1426,12 @@ Arguments ('*' denotes required arguments):
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (buf)
 
@@ -1441,7 +1441,7 @@ Return value:  (buf)
 
 Usage:
 
- call_gen_array(%args) -> [status, msg, payload, meta]
+ call_gen_array(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Call gen_array().
 
@@ -1462,12 +1462,12 @@ Array length.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (array[int])
 
@@ -1477,7 +1477,7 @@ Return value:  (array[int])
 
 Usage:
 
- call_randlog(%args) -> [status, msg, payload, meta]
+ call_randlog(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Call randlog().
 
@@ -1506,12 +1506,12 @@ Number of log messages to produce.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -1521,7 +1521,7 @@ Return value:  (any)
 
 Usage:
 
- comment_fruit(%args) -> [status, msg, payload, meta]
+ comment_fruit(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Comment on a fruit.
 
@@ -1542,12 +1542,12 @@ Arguments ('*' denotes required arguments):
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -1557,7 +1557,7 @@ Return value:  (any)
 
 Usage:
 
- common_opts(%args) -> [status, msg, payload, meta]
+ common_opts(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 This function has arguments with the same name as Perinci::CmdLine common options.
 
@@ -1602,12 +1602,12 @@ Arguments ('*' denotes required arguments):
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -1617,7 +1617,7 @@ Return value:  (any)
 
 Usage:
 
- completion(%args) -> [status, msg, payload, meta]
+ completion(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Do nothing, return args.
 
@@ -1734,12 +1734,12 @@ just provide no completion.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -1749,7 +1749,7 @@ Return value:  (any)
 
 Usage:
 
- delay(%args) -> [status, msg, payload, meta]
+ delay(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Sleep, by default for 10 seconds.
 
@@ -1774,12 +1774,12 @@ Whether to sleep(1) for n times instead of sleep(n).
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -1789,7 +1789,7 @@ Return value:  (any)
 
 Usage:
 
- dies() -> [status, msg, payload, meta]
+ dies() -> [$status_code, $reason, $payload, \%result_meta]
 
 Dies tragically.
 
@@ -1801,12 +1801,12 @@ No arguments.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -1816,7 +1816,7 @@ Return value:  (any)
 
 Usage:
 
- dry_run() -> [status, msg, payload, meta]
+ dry_run() -> [$status_code, $reason, $payload, \%result_meta]
 
 Will return 'wet' if not run under dry run mode, or 'dry' if dry run.
 
@@ -1842,12 +1842,12 @@ Pass -dry_run=E<gt>1 to enable simulation mode.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -1857,7 +1857,7 @@ Return value:  (any)
 
 Usage:
 
- dry_run_default() -> [status, msg, payload, meta]
+ dry_run_default() -> [$status_code, $reason, $payload, \%result_meta]
 
 Will return 'wet' if not run under dry run mode, or 'dry' if dry run.
 
@@ -1885,12 +1885,12 @@ Pass -dry_run=E<gt>1 to enable simulation mode.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -1900,7 +1900,7 @@ Return value:  (any)
 
 Usage:
 
- err(%args) -> [status, msg, payload, meta]
+ err(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Return error response.
 
@@ -1919,12 +1919,12 @@ Error code to return.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -1934,7 +1934,7 @@ Return value:  (any)
 
 Usage:
 
- gen_array(%args) -> [status, msg, payload, meta]
+ gen_array(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Generate an array of specified length.
 
@@ -1955,12 +1955,12 @@ Array length.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (array[int])
 
@@ -1970,7 +1970,7 @@ Return value:  (array[int])
 
 Usage:
 
- gen_hash(%args) -> [status, msg, payload, meta]
+ gen_hash(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Generate a hash with specified number of pairs.
 
@@ -1991,12 +1991,12 @@ Number of pairs.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (array[int])
 
@@ -2006,7 +2006,7 @@ Return value:  (array[int])
 
 Usage:
 
- gen_random_bytes(%args) -> [status, msg, payload, meta]
+ gen_random_bytes(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Generate random bytes of specified length.
 
@@ -2027,12 +2027,12 @@ Arguments ('*' denotes required arguments):
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (buf)
 
@@ -2042,7 +2042,7 @@ Return value:  (buf)
 
 Usage:
 
- gen_sample_data(%args) -> [status, msg, payload, meta]
+ gen_sample_data(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Generate sample data of various form.
 
@@ -2078,12 +2078,12 @@ The C<aoaos> and C<aohos> forms are commonly used for table data.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -2093,7 +2093,7 @@ Return value:  (any)
 
 Usage:
 
- merge_hash(%args) -> [status, msg, payload, meta]
+ merge_hash(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Merge two hashes.
 
@@ -2125,12 +2125,12 @@ First hash (right-hand side).
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (hash)
 
@@ -2140,7 +2140,7 @@ Return value:  (hash)
 
 Usage:
 
- multi_status(%args) -> [status, msg, payload, meta]
+ multi_status(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Example for result metadata property `results`.
 
@@ -2161,12 +2161,12 @@ Arguments ('*' denotes required arguments):
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -2176,7 +2176,7 @@ Return value:  (any)
 
 Usage:
 
- noop(%args) -> [status, msg, payload, meta]
+ noop(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Do nothing, return original argument.
 
@@ -2204,12 +2204,12 @@ Argument.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -2219,7 +2219,7 @@ Return value:  (any)
 
 Usage:
 
- noop2(%args) -> [status, msg, payload, meta]
+ noop2(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Just like noop, but accepts several arguments.
 
@@ -2263,12 +2263,12 @@ Argument.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -2278,7 +2278,7 @@ Return value:  (any)
 
 Usage:
 
- randlog(%args) -> [status, msg, payload, meta]
+ randlog(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Produce some random Log::Any log messages.
 
@@ -2305,12 +2305,12 @@ Number of log messages to produce.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -2349,7 +2349,7 @@ Return value:  (any)
 
 Usage:
 
- return_args(%args) -> [status, msg, payload, meta]
+ return_args(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Return arguments.
 
@@ -2372,12 +2372,12 @@ Argument.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -2387,7 +2387,7 @@ Return value:  (any)
 
 Usage:
 
- sum(%args) -> [status, msg, payload, meta]
+ sum(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Sum numbers in array.
 
@@ -2401,7 +2401,7 @@ Examples:
 
 =item * Second example, using argv:
 
- sum( array => [1.1, 2.1, 3.1], round => 1); # -> [200, "OK", 6, {}]
+ sum(array => [1.1, 2.1, 3.1], round => 1); # -> [200, "OK", 6, {}]
 
 =item * Third example, invalid arguments:
 
@@ -2439,12 +2439,12 @@ Whether to round result to integer.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -2454,7 +2454,7 @@ Return value:  (any)
 
 Usage:
 
- undescribed_args(%args) -> [status, msg, payload, meta]
+ undescribed_args(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 This function has several undescribed args.
 
@@ -2480,12 +2480,12 @@ Arguments ('*' denotes required arguments):
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -2495,7 +2495,7 @@ Return value:  (any)
 
 Usage:
 
- validate_args(%args) -> [status, msg, payload, meta]
+ validate_args(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Does nothing, only here to test # VALIDATE_ARGS.
 
@@ -2516,12 +2516,12 @@ Arguments ('*' denotes required arguments):
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (str)
 
@@ -2533,14 +2533,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Perinci-Ex
 
 Source repository is at L<https://github.com/perlancar/perl-Perinci-Examples>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Examples>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<Perinci>
@@ -2551,11 +2543,42 @@ L<Perinci::Examples::Bin>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <stevenharyanto@gmail.com>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2022, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Examples>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

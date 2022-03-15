@@ -22,12 +22,12 @@ if( ! Getopt::Long::GetOptions(
 ) ){ print STDERR usage($0) . "\n$0 : something wrong with command line parameters.\n"; exit(1); }
 
 my $ret = Image::DecodeQR::WeChat::decode(\%params);
-die Data::Roundtrip(\%params)."\ncall to Image::DecodeQR::WeChat::decode() has failed for above parameters." unless $ret;
+die Data::Roundtrip::perl2dump(\%params)."\ncall to Image::DecodeQR::WeChat::decode() has failed for above parameters."
+	unless $ret and scalar @{$ret->[0]};
 
-my ($payloads, $bboxes) = @$ret;
+#my ($payloads, $bboxes) = @$ret;
 
-print "\n$0 : results:\n".Data::Roundtrip::perl2dump($ret);
-
+print "\n$0 : results (payloads and their bounding boxes):\n".Data::Roundtrip::perl2dump($ret);
 
 sub	usage {
 	print "Usage : $0 <options>\noptions:\n"

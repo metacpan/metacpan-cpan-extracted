@@ -6,9 +6,9 @@ our @EXPORT = qw(
     get_version
     version_exists
     verify_version
-    is_version_broken
+    is_version_broken is_version_path_broken
     is_registered_version
-    get_version_path
+    get_version_path clean_version_path
     get_shell_version
     get_local_version set_local_version
     get_global_version set_global_version
@@ -86,20 +86,22 @@ sub get_local_version {
 sub is_version_broken {
     my $version = shift;
     return 0 if $version eq 'system';
-    my $retval = 1;
-    try {
-        my $path = get_version_path($version);
-        for my $exec ('raku', 'raku.bat', 'raku.exe', 'perl6', 'perl6.bat', 'perl6.exe') {
-            if (-f catfile($path, 'bin', $exec)) {
-                $retval = 0;
-                last;
-            }
+    my $path = get_version_path($version, 1);
+    return 1 if !$path;
+    return 0 if !is_version_path_broken($path);
+    return 1;
+}
+
+sub is_version_path_broken {
+    my $path = shift;
+    $path = clean_version_path($path);
+    return 1 if !$path;
+    for my $exec ('raku', 'raku.bat', 'raku.exe', 'perl6', 'perl6.bat', 'perl6.exe', 'rakudo', 'rakudo.bat', 'rakudo.exe') {
+        if (-f catfile($path, 'bin', $exec)) {
+            return 0;
         }
     }
-    catch {
-        # Fall through
-    };
-    return $retval;
+    return 1;
 }
 
 sub verify_version {
@@ -218,17 +220,24 @@ sub is_registered_version {
     }
 }
 
-sub get_version_path {
-    my $version = shift;
-    my $version_path = catdir($versions_dir, $version);
-    $version_path = trim(slurp($version_path)) if -f $version_path;
+sub clean_version_path {
+    my $path = shift;
 
-    my @cands = ($version_path, catdir($version_path, 'install'));
-
+    my @cands = (catdir($path, 'install'), $path);
     for my $cand (@cands) {
         return $cand if -d catdir($cand, 'bin')
     }
+    return undef;
+}
 
+sub get_version_path {
+    my $version = shift;
+    my $no_error = shift || 0;
+    my $version_path = catdir($versions_dir, $version);
+    $version_path = trim(slurp($version_path)) if -f $version_path;
+
+    $version_path = clean_version_path($version_path);
+    return $version_path if $version_path || $no_error;
     die "Installation is broken: $version";
 }
 
@@ -405,7 +414,9 @@ sub whence {
 sub get_bin_paths {
     my $version = shift;
     my $program = scalar(shift) || undef;
-    my $version_path = get_version_path($version);
+    my $no_error = shift || undef;
+    my $version_path = get_version_path($version, 1);
+    return () if $no_error && !$version_path;
 
     return (
         catfile($version_path, 'bin', $program // ()),
@@ -441,6 +452,8 @@ sub rehash {
         # - We want rakubrew to work even when the .pl ending is not associated with the perl program and we do not want to put `perl` before every call to a shim.
         # - exec() in perl on Windows behaves differently from running the target program directly (output ends up on the console differently).
         # It retrieves the target executable (only consuming STDOUT of rakubrew) and calls it with the given arguments. STDERR still ends up on the console. The return value is checked and if an error occurs that error values is returned.
+        # `IF ERRORLEVEL 1` is true for all exit codes >= 1.
+        # See https://stackoverflow.com/a/8254331 for an explanation of the `SETLOCAL` / `ENDLOCAL` mechanics.
         @bins = map { my ($basename, undef, undef) = my_fileparse($_); $basename } @bins;
         @bins = uniq(@bins);
         for (@bins) {
@@ -449,15 +462,14 @@ sub rehash {
 SETLOCAL
 SET brew_cmd="$brew_exec" internal_win_run \%~n0
 FOR /F "delims=" \%\%i IN ('\%brew_cmd\%') DO SET command=\%\%i
-IF NOT ERRORLEVEL 0 EXIT /B \%errorlevel\%
-IF     ERRORLEVEL 1 EXIT /B \%errorlevel\%
-"\%command\%" \%*
+IF ERRORLEVEL 1 EXIT /B \%errorlevel\%
+ENDLOCAL & "\%command\%" \%*
 EOT
         }
     }
     else {
         for (@bins) {
-            link $0, catfile($shim_dir, $_);
+            symlink $0, catfile($shim_dir, $_);
         }
     }
 }

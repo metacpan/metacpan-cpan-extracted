@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package OpenAPI::Modern; # git description: v0.021-12-g3f7dbee
+package OpenAPI::Modern; # git description: v0.022-6-g2e04a6d
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate HTTP requests and responses against an OpenAPI document
 # KEYWORDS: validation evaluation JSON Schema OpenAPI Swagger HTTP request response
 
-our $VERSION = '0.022';
+our $VERSION = '0.023';
 
 use 5.020;
 use Moo;
@@ -71,6 +71,7 @@ around BUILDARGS => sub ($orig, $class, @args) {
       evaluator => $args->{evaluator},
     );
 
+    # if there were errors, this will die with a JSON::Schema::Modern::Result object
     $args->{evaluator}->add_schema($args->{openapi_document});
   }
 
@@ -265,7 +266,7 @@ sub find_path ($self, $request, $options) {
 
   # path_template and method from operation_id from options
   if (exists $options->{operation_id}) {
-    my $operation_path = $self->openapi_document->get_operationId($options->{operation_id});
+    my $operation_path = $self->openapi_document->get_operationId_path($options->{operation_id});
     return E({ %$state, keyword => 'paths' }, 'unknown operation_id "%s"', $options->{operation_id})
       if not $operation_path;
     return E({ %$state, schema_path => $operation_path, keyword => 'operationId' },
@@ -644,7 +645,7 @@ OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI docume
 
 =head1 VERSION
 
-version 0.022
+version 0.023
 
 =head1 SYNOPSIS
 

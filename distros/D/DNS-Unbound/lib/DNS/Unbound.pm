@@ -8,7 +8,7 @@ use XSLoader ();
 our ($VERSION);
 
 BEGIN {
-    $VERSION = '0.28';
+    $VERSION = '0.29';
     XSLoader::load( __PACKAGE__, $VERSION );
 }
 
@@ -212,7 +212,7 @@ sub new {
       shift();
 }
 
-=head2 $result_hr = I<OBJ>->resolve( $NAME, $TYPE [, $CLASS ] )
+=head2 $result_obj = I<OBJ>->resolve( $NAME, $TYPE [, $CLASS ] )
 
 Runs a synchronous query for a given $NAME and $TYPE. $TYPE may be
 expressed numerically or, for convenience, as a string. $CLASS is
@@ -272,7 +272,7 @@ sub _create_unbound_error {
 
 #----------------------------------------------------------------------
 
-=head2 $query = I<OBJ>->resolve_async( $NAME, $TYPE [, $CLASS ] );
+=head2 $query_obj = I<OBJ>->resolve_async( $NAME, $TYPE [, $CLASS ] );
 
 Like C<resolve()> but starts an asynchronous query rather than a
 synchronous one.
@@ -282,8 +282,9 @@ thereof, to be precise).
 
 If you’re using one of the special event interface subclasses
 (e.g., L<DNS::Unbound::IOAsync>) then the returned promise will resolve
-on its own. Otherwise, L<see below|/"CUSTOM EVENT LOOP INTEGRATION">
-for the methods you’ll need to use in tandem with this one.
+as part of the event loop’s normal operation. Otherwise,
+L<see below|/"CUSTOM EVENT LOOP INTEGRATION"> for the methods you’ll need
+to use in tandem with this one to get your query result.
 
 =cut
 
@@ -647,20 +648,24 @@ sub add_ta {
 
 =head2 I<OBJ>->add_ta_autr( $PATH )
 
-Z<>
+(Available only if libunbound supports it.)
 
 =cut
 
-sub add_ta_autr {
-    my ($self, $path) = @_;
+BEGIN {
+    if (__PACKAGE__->can('_ub_ctx_add_ta_autr')) {
+        *add_ta_autr = sub {
+            my ($self, $path) = @_;
 
-    my $err = $self->{'_ub'}->_ub_ctx_add_ta_autr( $path );
+            my $err = $self->{'_ub'}->_ub_ctx_add_ta_autr( $path );
 
-    if ($err) {
-        die _create_unbound_error("Failed to add managed trust anchor file", $err);
+            if ($err) {
+                die _create_unbound_error("Failed to add managed trust anchor file", $err);
+            }
+
+            return $self;
+        }
     }
-
-    return $self;
 }
 
 =head2 I<OBJ>->add_ta_file( $PATH )
@@ -721,8 +726,9 @@ L<Socket> provides the C<inet_ntoa()> and C<inet_ntop()>
 functions for decoding the values of C<A> and C<AAAA> records.
 
 B<NOTE:> Consider parsing L<DNS::Unbound::Result>’s C<answer_packet()>
-with L<Net::DNS::Packet> as a more robust, albeit heavier, way to
-parse query result data.
+as a more robust, albeit heavier, way to parse query result data.
+L<Net::DNS::Packet> and L<AnyEvent::DNS>’s C<dns_unpack()> are two good
+ways to parse DNS packets.
 
 =head2 $decoded = decode_name($encoded)
 
@@ -772,11 +778,15 @@ sub DESTROY {
 =head1 SEE ALSO
 
 L<Net::DNS::Resolver::Recurse> provides comparable logic to this module
-in pure Perl. Like Unbound, it is maintained by L<NLnet Labs|https://nlnetlabs.nl/>.
+in pure Perl. Like Unbound, it is maintained by
+L<NLnet Labs|https://nlnetlabs.nl/>.
+
+L<Net::DNS::Resolver::Unbound> is another XS binding to Unbound,
+implemented as a subclass of L<Net::DNS::Resolver>.
 
 =head1 LICENSE & COPYRIGHT
 
-Copyright 2019-2021 Gasper Software Consulting.
+Copyright 2019-2022 Gasper Software Consulting.
 
 This library is licensed under the same terms as Perl itself.
 

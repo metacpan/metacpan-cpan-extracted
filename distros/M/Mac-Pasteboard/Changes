@@ -1,3 +1,9 @@
+0.103		2022-03-13	T. R. Wyant
+    Use guarded #pragma to suppress clang warnings.  The warnings ("...
+    tokens introducing statement expression appear in different macro
+    expansion contexts ...") come from deep in Perl, and my research
+    says they are new with clang 12.0.
+
 0.102		2022-02-03	T. R. Wyant
     Fix (I hope) build problem.  It appears that, beginning with v00.100
     the Makefile required Constant.PM, which was not included in the

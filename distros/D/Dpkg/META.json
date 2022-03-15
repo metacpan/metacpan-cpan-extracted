@@ -231,7 +231,7 @@
       },
       "Dpkg::Index" : {
          "file" : "lib/Dpkg/Index.pm",
-         "version" : "2.01"
+         "version" : "3.00"
       },
       "Dpkg::Interface::Storable" : {
          "file" : "lib/Dpkg/Interface/Storable.pm",
@@ -379,6 +379,6 @@
          "web" : "https://git.dpkg.org/cgit/dpkg/dpkg.git"
       }
    },
-   "version" : "v1.21.1",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "v1.21.2",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

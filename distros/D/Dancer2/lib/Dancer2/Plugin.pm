@@ -1,6 +1,6 @@
 package Dancer2::Plugin;
 # ABSTRACT: base class for Dancer2 plugins
-$Dancer2::Plugin::VERSION = '0.301004';
+$Dancer2::Plugin::VERSION = '0.400000';
 use strict;
 use warnings;
 
@@ -433,32 +433,32 @@ END
 
             # FIXME: AUTOLOAD might pick up on this
             sub dancer_app {
-                Carp::carp "Plugin DSL method 'dancer_app' is deprecated. "
-                         . "Use '\\\$self->app' instead'.\n";
+                Carp::carp "DEPRECATED: Plugin DSL method 'dancer_app'. "
+                         . "Please use '\\\$self->app' instead'.\n";
 
                 \$_[0]->app;
             }
 
             # FIXME: AUTOLOAD might pick up on this
             sub request {
-                Carp::carp "Plugin DSL method 'request' is deprecated. "
-                         . "Use '\\\$self->app->request' instead'.\n";
+                Carp::carp "DEPRECATED: Plugin DSL method 'request'. "
+                         . "Please use '\\\$self->app->request' instead'.\n";
 
                 \$_[0]->app->request;
             }
 
             # FIXME: AUTOLOAD might pick up on this
             sub var {
-                Carp::carp "Plugin DSL method 'var' is deprecated. "
-                         . "Use '\\\$self->app->request->var' instead'.\n";
+                Carp::carp "DEPRECATED: Plugin DSL method 'var'. "
+                         . "Please use '\\\$self->app->request->var' instead'.\n";
 
                 shift->app->request->var(\@_);
             }
 
             # FIXME: AUTOLOAD might pick up on this
             sub hook {
-                Carp::carp "Plugin DSL method 'hook' is deprecated. "
-                         . "Use '\\\$self->app->add_hook' instead'.\n";
+                Carp::carp "DEPRECATED: Plugin DSL method 'hook'. "
+                         . "Please use '\\\$self->app->add_hook' instead'.\n";
 
                 shift->app->add_hook(
                     Dancer2::Core::Hook->new( name => shift, code => shift ) );
@@ -636,7 +636,7 @@ Dancer2::Plugin - base class for Dancer2 plugins
 
 =head1 VERSION
 
-version 0.301004
+version 0.400000
 
 =head1 SYNOPSIS
 
@@ -1099,7 +1099,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Alexis Sukrieh.
+This software is copyright (c) 2022 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

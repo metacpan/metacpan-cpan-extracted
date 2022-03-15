@@ -1,0 +1,29 @@
+---
+abstract: 'Check if a given string is in the Top 10000 list of common passwords'
+author:
+  - 'Renee Baecker <reneeb@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-Password-Top10000
+provides:
+  Data::Password::Top10000:
+    file: lib/Data/Password/Top10000.pm
+    version: v1.0.1
+requires:
+  perl: '5.024'
+resources:
+  homepage: https://github.com/perlservices/Data-Password-Top10000
+  repository: https://github.com/perlservices/Data-Password-Top10000/issues
+version: 1.0.1
+x_contributors:
+  - 'reneeb <info@perl-services.de>'
+x_generated_by_perl: v5.30.0
+x_serialization_backend: 'YAML::Tiny version 1.73'

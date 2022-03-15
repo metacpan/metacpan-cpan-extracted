@@ -10,7 +10,7 @@
 #ABSTRACT: Common methods for App::Cme
 
 package App::Cme::Common;
-$App::Cme::Common::VERSION = '1.037';
+$App::Cme::Common::VERSION = '1.038';
 use strict;
 use warnings;
 use 5.10.1;
@@ -269,7 +269,7 @@ App::Cme::Common - Common methods for App::Cme
 
 =head1 VERSION
 
-version 1.037
+version 1.038
 
 =head1 SYNOPSIS
 

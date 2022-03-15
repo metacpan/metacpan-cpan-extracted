@@ -2,7 +2,7 @@ package App::Rakubrew;
 use strict;
 use warnings;
 use 5.010;
-our $VERSION = '26';
+our $VERSION = '27';
 
 use Encode::Locale qw(env);
 if (-t) {
@@ -110,7 +110,7 @@ EOL
             $version_line .= 'BROKEN ' if is_version_broken($_);
             $version_line .= $_ eq $cur ? '* ' : '  ';
             $version_line .= $_;
-            $version_line .= ' -> ' . get_version_path($_) if is_registered_version($_);
+            $version_line .= ' -> ' . (get_version_path($_, 1) || '') if is_registered_version($_);
             say $version_line;
         } get_versions();
 
@@ -301,13 +301,8 @@ EOL
             exit 1;
         }
         $path = rel2abs($path);
-        invalid($path) if !-d $path;
-        if (!-f catfile($path, 'bin', 'perl6') && !-f catfile($path, 'bin', 'raku')) {
-            $path = catdir($path, 'install');
-            if (!-f catfile($path, 'bin', 'perl6') && !-f catfile($path, 'bin', 'raku')) {
-                invalid($path);
-            }
-        }
+        invalid($path) if is_version_path_broken($path);
+        $path = clean_version_path($path);
 
         spurt(catfile($versions_dir, $name), $path);
 
@@ -565,10 +560,35 @@ sub init {
     }
 }
 
+sub de_par_environment {
+    # The PAR packager modifies the environment.
+    # We undo those modifications here.
+
+    # The following code was kindly provided by Roderich Schupp
+    # via email.
+    my $ldlibpthname = $Config::Config{ldlibpthname};
+    my $path_sep = $Config::Config{path_sep};
+    $ENV{$ldlibpthname} =~ s/^ \Q$ENV{PAR_TEMP}\E $path_sep? //x;
+
+    delete $ENV{PAR_0};
+    delete $ENV{PAR_INITIALIZED};
+    delete $ENV{PAR_PROGNAME};
+    delete $ENV{PAR_TEMP};
+}
+
 sub do_exec {
     my ($self, $program, $args) = @_;
 
     my $target = which($program, get_version());
+
+    # Undo PAR env modifications.
+    # Only need to do this on MacOS, as only there
+    # PAR is used and rakubrew itself does the `exec`.
+    # (Windows also uses PAR, but has a .bat shim that
+    # does the `exec`.)
+    if ($distro_format eq 'macos') {
+        de_par_environment;
+    }
     
     # Run.
     exec { $target } ($target, @$args);

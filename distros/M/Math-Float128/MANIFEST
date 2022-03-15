@@ -7,6 +7,9 @@ Float128.xs
 Makefile.PL
 math_float128_include.h
 quad.in
+Constant/Constant.pm
+Constant/Constant.xs
+Constant/Makefile.PL
 typemap
 t/01load.t
 t/02abs.t
@@ -23,6 +26,7 @@ t/NOK_and_POK.t
 t/pod.t
 t/10pow.t
 t/prec.t
+t/PV_NV_BUG.t
 t/11stringification.t
 t/12trig.t
 t/13constants.t

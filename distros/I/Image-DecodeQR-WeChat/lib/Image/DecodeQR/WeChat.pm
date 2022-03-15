@@ -18,11 +18,11 @@ our @EXPORT_OK = qw(
 	modelsdir
 ); # symbols to export on request (WHY?)
 
-our $VERSION = '0.3';
+our $VERSION = '0.7';
 
 
 BEGIN {
-    $VERSION = '0.3';
+    $VERSION = '0.7';
     if ($] > 5.006) {
         require XSLoader;
         XSLoader::load(__PACKAGE__, $VERSION);
@@ -56,13 +56,20 @@ sub decode {
 
 	if( ! exists($params->{'graphicaldisplayresult'}) || ! defined($m=$params->{'graphicaldisplayresult'}) ){
 		push @params, 0;
-	} else { push @params, $m }
+	} else {
+		# we were asked for displaying graphical output
+		# do we have highgui? was Opencv compiled with that option?
+		if( ($m == 1) && (opencv_has_highgui_xs() == 0) ){
+			print STDERR "decode() : warning, it seems that the current OpenCV installation does not support 'highgui' (which is optional), so parameter 'graphicaldisplayresult=1' will be ignored.\n";
+			push @params, 0;
+		} else { push @params, $m }
+	}
 
 	if( ! exists($params->{'dumpqrimagestofile'}) || ! defined($m=$params->{'dumpqrimagestofile'}) ){
 		push @params, 0;
 	} else { push @params, $m }
 
-	print "calling with these params: @params\n";
+	print "calling with these params: '".join("','", map { defined($_) ? $_ : '<undef>' } @params)."'.\n";
 
 	return decode_xs(
 		$params[0],
@@ -84,7 +91,7 @@ Image::DecodeQR::WeChat - Decode QR code(s) from images using the OpenCV/WeChat 
 
 =head1 VERSION
 
-Version 0.3
+Version 0.7
 
 
 =head1 SYNOPSIS
@@ -93,8 +100,9 @@ This module provides a Perl interface to the OpenCV/WeChat QR code
 decoder via XS code.
 OpenCV/WeChat library uses CNN to do this with pre-trained models.
 
-This module has been tested with OpenCV v4.5.5 and Perl v5.32 on
-Linux.
+This module has been tested by myself with OpenCV v4.5.5 and Perl v5.32 on
+Linux. But check the CPANtesters matrix on the left for all the tests done
+on this module.
 
 The library is relatively successful even for rotated codes. It remains
 to be tested on the minimum size ofthe code images (60px in my case).
@@ -111,11 +119,11 @@ Here is some code to get you started:
 	'an-input-image.png',
 
 	# the dir with model parameters required by the library.
-	# These come with this package and are curtesy of WeChat
-	# which is part of OpenCV contrib packages
-        # They are installed with this package and their default location
+	# Model files come with this Perl module and are curtesy of WeChat
+	# which is part of OpenCV contrib packages.
+        # They are installed with this module and their default location
         # is given by Image::DecodeQR::WeChat::modelsdir()
-        # Alternatively, specify your own model files:
+        # Alternatively, you specify here your own model files:
 	Image::DecodeQR::WeChat::modelsdir(),
 
 	# outbase for all output files, optional
@@ -180,6 +188,9 @@ Here is some code to get you started:
     # pre-trained models location (installed with this module)
     print "my models are in here: ".Image::DecodeQR::WeChat::modelsdir()."\n"
 
+    # returns 1 or 0 when OpenCV was compiled with highgui or not
+    # and supports GUI display like imshow() which displays an image in a window
+    my $has_highgui_support = opencv_has_highgui_xs();
 
 This code calls functions and methods from OpenCV/WeChat library (written in C++)
 for decoding one or more QR codes found embedded in images.
@@ -207,11 +218,13 @@ interface other parts of the OpenCV library:
 
 =over
 
-=item C<decode()>
+=item * C<decode()>
 
-=item C<decode_xs()>
+=item * C<decode_xs()>
 
-=item C<modelsdir()>
+=item * C<modelsdir()>
+
+=item * C<opencv_has_highgui_xs()>
 
 =back
 
@@ -228,7 +241,7 @@ A CLI script is provided and will be installed by this module. Basic usage is as
 =head1 SUBROUTINES/METHODS
 
 
-=head3 C< Image::DecodeQR::WeChat::decode_xs(infile, modelsdir, outbase, verbosity, graphicaldisplayresult, dumpqrimagestofile) >
+=head3 C< decode_xs(infile, modelsdir, outbase, verbosity, graphicaldisplayresult, dumpqrimagestofile) >
 
 It takes in the filename of an input image which may contain
 one or more QR codes and returns back an ARRAYref of
@@ -242,17 +255,17 @@ It returns an empty ARRAYref (i.e. a ref to an empty array)
 if no QR codes were found or decoded successfully.
 
 These are the parameters it requires. They must all be present, with
-optinal parameters allowed to be C<undef>:
+optional parameters allowed to be C<undef>:
 
 
 =over
 
-=item C<infile> : the input image with zero or more QR codes.
+=item * C<infile> : the input image with zero or more QR codes.
 All the image formats of OpenCV's L<imread()|https://docs.opencv.org/4.5.5/d4/da8/group__imgcodecs.html>
 are supported.
 
-=item C<modelsdir> : the location of the directory holding all model files (CNN trained models)
-required for QR code detection. These models are already included with this package and will be
+=item * C<modelsdir> : the location of the directory holding all model files (CNN trained models)
+required for QR code detection. These models are already included with this Perl module and will be
 installed in a shared dir during installation. Their total size is about 1MB.
 They have been kindly contributed by WeChat along with their library for QR Code detection.
 They can be found L<https://github.com/WeChatCV/opencv_3rdparty|here>. The installed
@@ -260,7 +273,7 @@ models location is returned by L<modelsdir()>. If you do not want to experiment 
 your own models then just plug the output of L<modelsdir()> to this parameter, else
 specify your own.
 
-=item C<outbase> : optionally specify output files basename which will contain
+=item * C<outbase> : optionally specify output files basename which will contain
 detected QR-codes' payloads, bounding boxes and QR-code images extracted from
 the input image (one set of files for each QR-code detected).
 If C<dumpqrimagestofile> is set to 1 all the aforementioned files will
@@ -269,12 +282,14 @@ file (all in one file). If C<outbase> is left C<undef> then nothing is written t
 a file. As usual all detected codes' data is returned back via the returned
 value of L<decode_xs()>.
 
-=item C< verbosity > levels: 0 is mute, 1 is only for C code, 10 is for C+XS code.
+=item * C< verbosity > levels: 0 is mute, 1 is only for C code, 10 is for C+XS code.
 
-=item C< graphicaldisplayresult> : if set to 1, it will display a window with the input image
-and the detected QR-code(s) outlined.
+=item * C< graphicaldisplayresult> : if set to 1, it will display a window with the input image
+and the detected QR-code(s) outlined. This
+is subject to whether current OpenCV installation was compiled to support
+C< imshow() > (with C < highgui > enabled).
 
-=item C<dumpqrimagestofile> : if set to 0, and C<outbase> is specified, then all payloads
+=item * C<dumpqrimagestofile> : if set to 0, and C<outbase> is specified, then all payloads
 are written to a single file using the basename specified. If set to 1 a lot more information
 is written to separate files, one for each detected code. This is mainly for debugging purposes
 because the returned value contains the payloads and their corresponding QR-codes' bounding
@@ -283,54 +298,89 @@ boxes. See C<outbase> above.
 =back
 
 
-=head3 C< Image::DecodeQR::WeChat::decode(\%params) >
+=head3 C< decode(\%params) >
 
 
-This is a Perl wrapper to the C<decode_xs()> so that user can specify
-only a minimal set of parameters and the will be filled in by defaults.
+This is a Perl wrapper to the C<decode_xs()> and allows a user to specify
+only a minimal set of parameters with the rest to be filled in by defaults.
 
-Like L<decode_xs()>, it returns undef on failure.
+Like L<decode_xs()>, it returns undef on failure. Or an arrayref of
+two arrays. The C<payloads> array and the C<bounding-boxes> array.
+Each has a number of items equal to the QR codes detected.
 
-It returns an empty ARRAYref (i.e. a ref to an empty array)
+An ARRAYref of two empty arrays will be returned
 if no QR codes were found or decoded successfully.
 
 The C< params > hashref:
 
 =over
 
-=item C<input> : the name of the input image file which can contain one or more QR codes.
+=item * C<input> : the name of the input image file which can contain one or more QR codes.
 
-=item C<outbase> : optional, if specified payloads (QR-code text) will be dumped to a text file.
+=item * C<outbase> : optional, if specified payloads (QR-code text) will be dumped to a text file.
 If further, C<dumpqrimagestofile> is set to 1 then image files with the detected QR-codes will
 be dumped one for each QR-code as well as text files with payloads and bounding boxes wrt the
-input imaghe.
+input image.
 
-=item C<modelsdir> : optional, use it only if you want to use your own model files (for their
+=item * C<modelsdir> : optional, use it only if you want to use your own model files (for their
 format have a look at L<https://docs.opencv.org/4.x/d5/d04/classcv_1_1wechat__qrcode_1_1WeChatQRCode.html>, they are CNN training files).
-This package has included the model files kindly submitted by WeChat as a contribution to OpenCV
+This Perl module has included the model files kindly submitted by WeChat as a contribution to OpenCV
 and will be installed in your system with all other files. Use C<modelsdir()> to see the location
 of installed model files. Their total size is about 1MB.
 
-=item C<verbosity> : default is 0 which is muted. 1 is for verbose C code and 10 is for verbose C and XS code.
+=item * C<verbosity> : default is 0 which is muted. 1 is for verbose C code and 10 is for verbose C and XS code.
 
-=item C<dumpqrimagestofile> : default is 0, set to 1 to have lots of image and text files dumped (relative to C<outbase>)
+=item * C<dumpqrimagestofile> : default is 0, set to 1 to have lots of image and text files dumped (relative to C<outbase>)
 for each QR code detected.
 
-=item C<graphicaldisplayresult> : default is 0, set to 1 to have a window popping up with the input image
-and the QR-code detected highlighted, once for each code detected.
+=item * C<graphicaldisplayresult> : default is 0, set to 1 to have a window popping up with the input image
+and the QR-code detected highlighted, once for each code detected. This
+is subject to whether current OpenCV installation was compiled to support
+C< imshow() > (with C < highgui > enabled).
 
 =back
 
 
-=head3 C< Image::DecodeQR::WeChat::modelsdir() >
+=head3 C< modelsdir() >
 
-It returns the path where the models included in this package have been installed.
+It returns the path where the models included in this Perl module
+have been installed.
 This is useful when you want to use C<decode_xs()> and need to specify
-the C<modelsdir>. Just pass the output of this to C<decode_xs()> as its C<modelsdir> parameter.
+the C<modelsdir>.
+Just pass the output of this to C<decode_xs()> as its C<modelsdir> parameter.
+However, you can not set the location of your own modelsdir using C< modelsdir() >.
+
+=head3 C< opencv_has_highgui_xs() >
+
+It returns 1 or 0 depending on whether current OpenCV installation has
+support for graphical display of images (the C<imshow()> function). This
+affects the option C<graphicaldisplayresult> to L<decode()> and L<decode_xs()>
+which will be ignored if there is no highgui support.
+
+Caveat: checking for whether current OpenCV installation has highgui
+support is currently very lame, it merely tries to find the include file C<< opencv2/highgui.hpp >>
+in the Include dirs. I have tried several methods (see ```Makefile.PL```), for
+example L<DynaLoader> or L<FFI::CheckLib> can search for symbols in any library
+(e.g. searching for C<imshow()> in C<libopencv_highgui> or  C<libopencv_world>).
+This would have been the most straight-forward way but alas, these are C++ libraries
+and function names are mangled to weird function names like:
+
+    ZN2cv3viz6imshowERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERKNS_11_InputArrayERKNS_5Size_IiEE()
+
+There's an imshow() in there but without a regex symbol-name search
+the symbol can not be detected.
+
+Another take is with L<Devel::CheckLib> which supports compiling code
+snippets when searching for a particular library. This fails because they
+... allow only a C compiler but we need a C++ compiler.
+
+Finally, using L<Inline::CPP> to compile our own snippet is totally in vain
+because of its useless form of running as C<use Inline CPP => ... >. I could
+not find any way of telling it to use specific CFLAGS and LDFLAGS with this
+useless C<use Inline CPP> form.
 
 
 =head1 IMPLEMENTATION DETAILS
-
 
 This code demonstrates how to call OpenCV (modern OpenCV v4) C++ methods using the
 technique suggested by C<Botje @ #perl> in order to avoid all the
@@ -367,46 +417,66 @@ and
     } //extern "C" {
     #endif
 
-This only need happen in the header file: C< wechat_qr_decode_lib.hpp >.
+This only need happen in the header file: C< wechat_qr_decode_lib.hpp >
+and in the XS file where the Perl headers are included.
 
 
 =head1 INSTALLING OpenCV
 
-
 In my case downloading OpenCV using Linux's package
 manager was not successful.It required to add another
 repository which wanted to install its own versions
-of packages I already had.
+of packages I already had. So I prefered to install
+OpenCV from sources. This is the procedure I followed:
 
 =over
 
-=item Download OpenCV sources and also its contributed modules.
+=item * Download OpenCV sources and also its contributed modules.
 
-=item Extract the sources and changed to the source dir.
+=item * Extract the sources and change to the source dir.
 
-=item From within the source dir extract the contrib archive.
+=item * From within the source dir extract the contrib archive.
 
-=item Create a C<build> dir and change to it.
+=item * Create a C<build> dir and change to it.
 
-=item There are two ways to make C<cmake> just tolerable:
+=item * There are two ways to make C<cmake> just tolerable:
 C<cmake-gui> and C<ccmake>. The former is a full-gui interface
 to setting the billion C<cmake> variables. Use it
 if you are on a machine which offers a GUI: C<cmake-gui ..>
- . If you are on a remote host possibly over telnet or ssh
+If you are on a headless or remote host possibly over telnet or ssh
 then do not despair because c<ccmake> is the CLI, curses-based
-equivalent to C<cmake-gui>,  use it like: C<ccmake ..> .
+equivalent to C<cmake-gui>,  use it like: C<ccmake ..> (from within the build dir).
 
-=item Once on the interface first C<configure>, then check the
+=item * Once on either of the cmake GUIs, first do a
+C<configure>, then check the
 list of all variables (you can search on both, for searching
-in the CLI one press C</> and then C<n> for next hit)
+in the CLI, press C<</>> and then C<n> for next hit)
 to suit you and then C<generate>, quit
 and  C<VERBOSE=1 make -j4 all>
 
-=item I guess, variables you want to change are C<OPENCV_EXTRA_MODULES_PATH>
+=item * I guess, cmake variables you want to modify
+are C<OPENCV_EXTRA_MODULES_PATH>
 and C<OPENCV_ENABLE_NONFREE> and anything that has to do with C<CNN> or C<DNN>.
-But I only guess.
+If you have CUDA installed and a CUDA-capable GPU then enable CUDA
+(search for CUDA string to find the variable(s)). Also, VTK, Ceres Solver,
+Eigen3, Intel's TBB, CNN, DNN etc. You need to install all these
+additional packages to get OpenCV support with them.
+
+=item * I had a problem with compiling OpenCV with a GUI (the C<highgui>)
+on a headless host. So, I just disabled it. That's easy to achieve
+during the above.
+
+=item * I have both installed this on a CUDA-capable GPU (with CUDA 10.2 installed)
+host and on a headless remote host with no GPU or basic. CUDA is
+not required for building this module.
 
 =back
+
+Your mileage may vary.
+
+If you are seriously in need of installing
+this module then consider migrating to a serious operating system
+such as Linux as your first action.
 
 
 =head1 AUTHOR
@@ -450,19 +520,19 @@ L<https://metacpan.org/release/Image-DecodeQR-WeChat>
 
 =over
 
-=item The great Open Source L<OpenCV|https://opencv.org/>
+=item * The great Open Source L<OpenCV|https://opencv.org/>
 image processing library
 and its contributed module
 L<WeChat QRDetector|https://docs.opencv.org/4.x/dd/d63/group__wechat__qrcode.html>
 which form the backbone of this module and do all the heavy lifting.
 
-=item Botje and xenu at #perl for help.
+=item * Botje and xenu at #perl for help.
 
-=item Jiro Nishiguchi (L<JIRO | https://metacpan.org/author/JIRO>) whose
+=item * Jiro Nishiguchi (L<JIRO | https://metacpan.org/author/JIRO>) whose
 (obsolete with modern - at the time of writing - OpenCV)
 module L<Image::DecodeQR> serves as the skeleton for this module.
 
-=item Thank you! to all those who responded to this SO question L<https://stackoverflow.com/questions/71402095/perl-xs-create-and-return-array-of-strings-char-taken-from-calling-a-c-funct>
+=item * Thank you! to all those who responded to this SO question L<https://stackoverflow.com/questions/71402095/perl-xs-create-and-return-array-of-strings-char-taken-from-calling-a-c-funct>
 
 =back
 

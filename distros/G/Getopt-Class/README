@@ -28,10 +28,13 @@ SYNOPSIS
             langs           => { type => 'array', class => [qw( person product )], re => qr/^[a-z]{2}([_|-][A-Z]{2})?/, min => 1, default => [qw(en)] },
             currency        => { type => 'string', class => [qw(product)], name => 'currency', re => qr/^[a-z]{3}$/, error => "must be a three-letter iso 4217 value" },
             age             => { type => 'integer', class => [qw(person)], name => 'age', },
+            path            => { type => 'file' },
+            skip            => { type => 'file-array' },
         };
     
         # Assuming command line arguments like:
-        prog.pl --create-user --name Bob --langs fr ja --age 30 --created now --debug 3
+        prog.pl --create-user --name Bob --langs fr ja --age 30 --created now --debug 3 \
+                --path ./here/some/where --skip ./bad/directory ./not/here ./avoid/me/
 
         my $opt = Getopt::Class->new({
             dictionary => $dict,
@@ -55,9 +58,16 @@ SYNOPSIS
         {
             # etc...
         }
+    
+        # Or you can also access those values as object methods
+        if( $opts->create_product )
+        {
+            $opts->langs->push( 'en_GB' ) if( !$opts->langs->length );
+            printf( "Created on %s\n", $opts->created->iso8601 );
+        }
 
 VERSION
-        v0.1.1
+        v0.102.6
 
 DESCRIPTION
     Getopt::Class is a lightweight wrapper around Getopt::Long that
@@ -133,6 +143,31 @@ CONSTRUCTOR
                     {
                     currency => { type => 'string', class => [qw(product)], name => 'currency', re => qr/^[a-z]{3}$/, error => "must be a three-letter iso 4217 value" },
                     };
+
+        *file*  This type will mark the value as a directory or file path
+                and will become a Module::Generic::File object.
+
+                This is particularly convenient when the user provided you
+                with a relative path, such as:
+
+                    ./my_prog.pl --debug 3 --path ./here/
+
+                And if you are not very careful and inadvertently change
+                directory like when using File::Find, then this relative
+                path could lead to some unpleasant surprise.
+
+                Setting this argument type to "file" ensure the resulting
+                value is a Module::Generic::File, whose underlying file or
+                directory will be resolved to their absolute path.
+
+        *file-array*
+                Same as *file* argument type, but allows multiple value
+                saved as an array. For example:
+
+                    ./my_prog.pl --skip ./not/here ./avoid/me/ ./skip/this/directory
+
+                This would result in the option property *skip* being an
+                array object containing 3 entries.
 
         *max*   This is well explained in "Options with multiple values" in
                 Getopt::Long
@@ -307,13 +342,49 @@ METHODS
         --create-user
 
     because a duplicate entry with the underscore replaced by a dash is
-    created. So you can say in your program:
+    created (actually it's an alias of one to another). So you can say in
+    your program:
 
         my $opts = $opt->exec || die( $opt->error );
         if( $opts->{create_user} )
         {
             # do something
         }
+
+    "exec" returns an hash reference whose properties can be accessed
+    directly, but those properties can also be accessed as methods.
+
+    This is made possible because the hash reference returned is a blessed
+    object from Getopt::Class::Values and provides an object oriented access
+    to all the option values.
+
+    A string is an object from Module::Generic::Scalar
+
+        $opts->customer_name->index( 'Doe' ) != -1
+
+    A boolean is an object from Module::Generic::Boolean
+
+    An integer or decimal is an object from Text::Number
+
+    A date/dateime value is an object from DateTime
+
+        $opts->created->iso8601 # 2020-05-01T17:10:20
+
+    An hash reference is an object created with "_set_get_hash_as_object" in
+    Module::Generic
+
+        $opts->metadata->transaction_id
+
+    An array reference is an object created with "_set_get_array_as_object"
+    in Module::Generic
+
+        $opts->langs->push( 'en_GB' ) if( !$opts->langs->exists( 'en_GB' ) );
+        $opts->langs->forEach(sub{
+            $self->active_user_lang( shift( @_ ) );
+        });
+
+    Whatever the object type of the option value is based on the dictionary
+    definitions you provide to "new"
 
   get_class_values
     Provided with a string representing a property class, and this returns
@@ -394,7 +465,7 @@ AUTHOR
     Jacques Deguest <jack@deguest.jp>
 
 SEE ALSO
-    Net::API::Stripe::Number::Format
+    Getopt::Long
 
 COPYRIGHT & LICENSE
     Copyright (c) 2019-2020 DEGUEST Pte. Ltd.

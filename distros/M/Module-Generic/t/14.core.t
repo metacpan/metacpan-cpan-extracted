@@ -265,6 +265,80 @@ isnt( $now3, $now );
 # diag( "Is ", overload::StrVal( $now ), " same as ", overload::StrVal( $now3 ) );
 # ok( $now3 ne $now );
 
+subtest "serialisation" => sub
+{
+    my $test = { name => 'John', age => 22, location => 'Somewhere' };
+    SKIP:
+    {
+        if( !$o->_load_class( 'Sereal' ) )
+        {
+            skip( "Sereal serialiser is not installed", 6 );
+        }
+        my $bin = $o->serialise( $test, serialiser => 'Sereal' );
+        # diag( "Serialised data is '$bin'" ) if( $DEBUG );
+        ok( defined( $bin ) && length( $bin ), "hash is serialised with Sereal" );
+        my $orig = $o->deserialise( data => $bin, serialiser => 'Sereal' );
+        # diag( "Deserialised data is '$orig'" ) if( $DEBUG );
+        ok( defined( $orig ) && ref( $orig ) eq 'HASH', "data is deserialised with Sereal" );
+        is_deeply( $orig => $test, 'deserialised data is identical' );
+        my $tmp_file = $o->new_tempfile;
+        my $rv = $o->serialise( $test, file => $tmp_file, serialiser => 'Sereal' );
+        ok( $rv, "Hash is serialised to $tmp_file" );
+        undef( $orig );
+        $orig = $o->deserialise( file => $tmp_file, serialiser => 'Sereal' );
+        ok( defined( $orig ) && ref( $orig ) eq 'HASH', 'data is deserialised from file' );
+        is_deeply( $orig => $test, 'deserialised data from file is identical' );
+        $tmp_file->remove;
+    };
+    
+    SKIP:
+    {
+        if( !$o->_load_class( 'Storable' ) )
+        {
+            skip( "Storable serialiser is not installed", 9 );
+        }
+        my $bin = $o->serialise( $test, serialiser => 'Storable' );
+        if( !defined( $bin ) )
+        {
+            BAIL_OUT( $o->error );
+        }
+        diag( "Serialised data is '$bin'" ) if( $DEBUG );
+        ok( defined( $bin ) && length( $bin ), "hash is serialised with Storable" );
+        my $orig = $o->deserialise( data => $bin, serialiser => 'Storable' );
+        diag( "Deserialised data is '$orig'" ) if( $DEBUG );
+        ok( defined( $orig ) && ref( $orig ) eq 'HASH', "data is deserialised with Storable" );
+        is_deeply( $orig => $test, 'deserialised data is identical' );
+        my $tmp_file = $o->new_tempfile;
+        my $rv = $o->serialise( $test, file => $tmp_file, serialiser => 'Storable' );
+        ok( $rv, "Hash is serialised to $tmp_file" );
+        undef( $orig );
+        $orig = $o->deserialise( file => $tmp_file, serialiser => 'Storable' );
+        ok( defined( $orig ) && ref( $orig ) eq 'HASH', 'data is deserialised from file' );
+        is_deeply( $orig => $test, 'deserialised data from file is identical' );
+        $rv = $o->serialise( $test, file => $tmp_file, serialiser => 'Storable', lock => 1 );
+        ok( $rv, "Hash is serialised to $tmp_file using lock" );
+        undef( $orig );
+        $orig = $o->deserialise( file => $tmp_file, serialiser => 'Storable', lock => 1 );
+        ok( defined( $orig ) && ref( $orig ) eq 'HASH', 'data is deserialised from file using lock' );
+        is_deeply( $orig => $test, 'deserialised data from file with lock is identical' );
+        undef( $orig );
+        my $fh = $tmp_file->open( '>', { binmode => 'raw', autoflush => 1 }) || do
+        {
+            fail( "Cannot write to temporary file \"$tmp_file\"." );
+            skip( "Fail writing to file", 2 );
+        };
+        $rv = $o->serialise( $test, io => $fh, serialiser => 'Storable' );
+        $tmp_file->flush;
+        # diag( "Temp file $tmp_file size is ", $tmp_file->length, " bytes." ) if( $DEBUG );
+        ok( !$tmp_file->is_empty, "writing serialised data using file handle" );
+        $fh->close;
+        $fh = $tmp_file->open( '<', { binmode => 'raw' });
+        $orig = $o->deserialise( io => $fh, serialiser => 'Storable' );
+        is_deeply( $orig => $test, 'deserialised data from file handle is identical' );
+        $tmp_file->remove;
+    };
+};
+
 done_testing();
 
 package MyObject;

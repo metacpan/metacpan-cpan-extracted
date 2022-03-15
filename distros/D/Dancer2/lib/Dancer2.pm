@@ -1,7 +1,8 @@
 package Dancer2;
-$Dancer2::VERSION = '0.301004';
+$Dancer2::VERSION = '0.400000';
 # ABSTRACT: Lightweight yet powerful web application framework
 
+use 5.12.0;
 use strict;
 use warnings;
 use List::Util 'first';
@@ -128,7 +129,7 @@ Dancer2 - Lightweight yet powerful web application framework
 
 =head1 VERSION
 
-version 0.301004
+version 0.400000
 
 =head1 DESCRIPTION
 
@@ -198,6 +199,24 @@ For information on how to author a plugin, see L<Dancer2::Plugin/Writing the plu
 
 L<Dancer2::Manual::Migration> provides the most up-to-date instruction on
 how to convert a Dancer (1) based application to Dancer2.
+
+=back
+
+=head3 Other Documentation
+
+=over
+
+=item * Git Guide
+
+The L<Git guide|GitGuide> describes how to set up your development environment to contribute
+to the development of Dancer2, Dancer2's Git workflow, submission guidelines, and
+various coding standards.
+
+=item * Deprecation Policy
+
+The L<deprecation policy|Dancer2::DeprecationPolicy> defines the process for removing old,
+broken, unused, or outdated code from the Dancer2 codebase. This policy is critical
+for guiding and shaping future development of Dancer2.
 
 =back
 
@@ -396,7 +415,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Alexis Sukrieh.
+This software is copyright (c) 2022 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

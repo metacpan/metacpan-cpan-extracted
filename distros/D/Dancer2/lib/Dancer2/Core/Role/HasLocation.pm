@@ -1,6 +1,6 @@
 package Dancer2::Core::Role::HasLocation;
 # ABSTRACT: Role for application location "guessing"
-$Dancer2::Core::Role::HasLocation::VERSION = '0.301004';
+$Dancer2::Core::Role::HasLocation::VERSION = '0.400000';
 use Moo::Role;
 use Dancer2::Core::Types;
 use Dancer2::FileUtils;
@@ -88,7 +88,7 @@ Dancer2::Core::Role::HasLocation - Role for application location "guessing"
 
 =head1 VERSION
 
-version 0.301004
+version 0.400000
 
 =head1 AUTHOR
 
@@ -96,7 +96,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Alexis Sukrieh.
+This software is copyright (c) 2022 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

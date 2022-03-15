@@ -43,3 +43,7 @@ Revision history for Perl extension Google::RestApi.
 1.0.1 Mar 6 2022
         - Comments in code
         - Remove Time::Out since Time::HiRes::alarm is not available in windows
+
+1.0.2 Mar 13 2022
+        - Add support for renaming a worksheet
+        - Fix test for win32 file comparisons

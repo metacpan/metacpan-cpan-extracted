@@ -13,7 +13,7 @@ Dancer2::Tutorial - An example to get you dancing
 
 =head1 VERSION
 
-version 0.301004
+version 0.400000
 
 =head1 Tutorial Overview
 
@@ -1171,11 +1171,11 @@ of this tutorial. Let's edit the C<development.yml> file and add our database
 configuration there. Below the last line in that file, add the following lines,
 being careful to keep the indentation as you see it here:
 
-  plugins:                 ; all plugin configuration settings go in this section
-    Database:              ; the name of our plugin
-      driver: "SQLite"     ; driver we want to use
-      database: "dancr.db" ; where the database will go in our app
-                           ; run a query when connecting to the datbase:
+  plugins:                 # all plugin configuration settings go in this section
+    Database:              # the name of our plugin
+      driver: "SQLite"     # driver we want to use
+      database: "dancr.db" # where the database will go in our app
+                           # run a query when connecting to the datbase:
       on_connect_do: [ "create table if not exists entries (id integer primary key autoincrement, title string not null, text string not null)" ]
 
 Here, we direct our database plugin to use the "SQLite" driver and to
@@ -1455,7 +1455,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Alexis Sukrieh.
+This software is copyright (c) 2022 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

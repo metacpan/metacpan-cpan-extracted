@@ -3,6 +3,8 @@ package Math::Float128;
 use warnings;
 use strict;
 
+use Math::Float128::Constant;
+
 require Exporter;
 *import = \&Exporter::import;
 require DynaLoader;
@@ -41,17 +43,20 @@ use overload
   '--'    => \&_overload_dec,
 ;
 
+use constant F128_PV_NV_BUG => Math::Float128::Constant::_has_pv_nv_bug();
+
 use subs qw(FLT128_DIG FLT128_MANT_DIG FLT128_MIN_EXP FLT128_MAX_EXP FLT128_MIN_10_EXP FLT128_MAX_10_EXP
             M_Eq M_LOG2Eq M_LOG10Eq M_LN2q M_LN10q M_PIq M_PI_2q M_PI_4q M_1_PIq M_2_PIq
             M_2_SQRTPIq M_SQRT2q M_SQRT1_2q
             FLT128_MAX FLT128_MIN FLT128_EPSILON FLT128_DENORM_MIN);
 
-$Math::Float128::VERSION = '0.14';
+$Math::Float128::VERSION = '0.15';
 
 Math::Float128->DynaLoader::bootstrap($Math::Float128::VERSION);
 
 @Math::Float128::EXPORT = ();
 @Math::Float128::EXPORT_OK = qw(
+    F128_PV_NV_BUG
     flt128_set_prec flt128_get_prec InfF128 NaNF128 ZeroF128 UnityF128 is_NaNF128
     is_InfF128 is_InfF128 is_ZeroF128 STRtoF128 NVtoF128 IVtoF128 UVtoF128 F128toSTR
     F128toSTRP F128toF128 F128toNV
@@ -72,6 +77,7 @@ Math::Float128->DynaLoader::bootstrap($Math::Float128::VERSION);
     );
 
 %Math::Float128::EXPORT_TAGS = (all => [qw(
+    F128_PV_NV_BUG
     flt128_set_prec flt128_get_prec InfF128 NaNF128 ZeroF128 UnityF128 is_NaNF128
     is_InfF128 is_InfF128 is_ZeroF128 STRtoF128 NVtoF128 IVtoF128 UVtoF128 F128toSTR
     F128toSTRP F128toF128 F128toNV
@@ -152,7 +158,7 @@ sub new {
     if($type == 4) { #PV
       if(_SvNOK($arg)) {
         set_nok_pok(nok_pokflag() + 1);
-        if($Math::MPFR::NOK_POK) {
+        if($Math::Float128::NOK_POK) {
           warn "Scalar passed to new() is both NV and PV. Using PV (string) value";
         }
       }
@@ -160,6 +166,16 @@ sub new {
     }
 
     if($type == 3) {                      # NV
+
+      if(F128_PV_NV_BUG) {
+        if(_SvPOK($arg)) {
+          set_nok_pok(nok_pokflag() + 1);
+          if($Math::Float128::NOK_POK) {
+            warn "Scalar passed to new() is both NV and PV. Using NV (numeric) value";
+          }
+        }
+      }
+
       if($arg == 0) {return NVtoF128($arg)}
       if($arg != $arg) { return NaNF128()}
       if(($arg / $arg) != 1) { # Inf

@@ -1,0 +1,10 @@
+Revision history for Data-Password-Top10000
+-------------------------------------------
+
+1.0.1   2022-03-13 07:38
+
+  state variables in list context weren't allowed until Perl v5.28 (thanks @CPANTesters)
+
+1.0.0   2022-03-12 08:00
+
+  initial release

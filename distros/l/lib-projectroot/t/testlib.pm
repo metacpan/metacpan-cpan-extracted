@@ -13,8 +13,6 @@ sub cleanup {
         $drin=0 if $part=~/lib-projectroot/;
         push(@clean, $part) if $drin;
     }
-
     return join('/',reverse @clean);
 }
-
-
+1;

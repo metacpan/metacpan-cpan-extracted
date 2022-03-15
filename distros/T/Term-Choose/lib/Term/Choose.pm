@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '1.745';
+our $VERSION = '1.746';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -108,8 +108,8 @@ sub _defaults {
         #max_cols           => undef,
         #max_height         => undef,
         #max_width          => undef,
-        mouse               => 0,
         #meta_items         => undef,
+        mouse               => 0,
         #no_spacebar        => undef,
         order               => 1,
         pad                 => 2,
@@ -1222,7 +1222,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.745
+Version 1.746
 
 =cut
 
@@ -1876,7 +1876,7 @@ L<stackoverflow|http://stackoverflow.com> for the help.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2012-2021 Matthäus Kiem.
+Copyright (C) 2012-2022 Matthäus Kiem.
 
 This library is free software; you can redistribute it and/or modify it under the same terms as Perl 5.10.0. For
 details, see the full text of the licenses in the file LICENSE.

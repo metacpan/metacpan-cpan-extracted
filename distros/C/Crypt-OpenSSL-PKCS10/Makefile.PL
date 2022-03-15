@@ -13,4 +13,30 @@ WriteMakefile(
     LIBS              => [openssl_lib_paths().' -lcrypto'],
     DEFINE            => '-DPERL5 -Wall',
     INC               => openssl_inc_paths(),
+    
+    'dist'  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
+    'clean' => { FILES    => 'Crypt-OpenSSL-PKCS10-*' },
+    ( $ExtUtils::MakeMaker::VERSION >= 6.3002 ? ( 'LICENSE' => 'perl', ) : () ),
+    (
+        $ExtUtils::MakeMaker::VERSION >= 6.46
+        ? (
+            'META_MERGE' => {
+                recommends => {
+                    'Crypt::OpenSSL::Bignum' => 0,
+                },
+                configure_requires => {
+                    'Crypt::OpenSSL::Guess' => '0.11',
+                },
+                build_requires => {
+                    'Test' => 0,    # For testing
+                },
+                resources => {
+                    'license'    => 'http://dev.perl.org/licenses/',
+                    'homepage'   => 'https://metacpan.org/pod/Crypt::OpenSSL::PKCS10',
+                    'bugtracker' => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Crypt-OpenSSL-PKCS10',
+                }
+            }
+          )
+        : ()
+    ),
 );

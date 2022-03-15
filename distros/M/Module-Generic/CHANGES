@@ -1,5 +1,14 @@
 Revision history for Perl module Module::Generic
 
+v0.21.12 2022-03-11T21:41:04+0900
+    - Added the 'skip' parameter to find() in Module::Generic::File
+    - Added the 'glob' parameter to resolve() in Module::Generic::File
+    - Added the 'globbing' parameter to new() in Module::Generic::File
+    - Added the $GLOBBING in Module::Generic::File
+    - Added the glob() method in Module::Generic::File
+    - Made minor improvements to Module::Generic::SharedMem
+    - Added serialise/serialize and deserialise/deserialize to Module::Generic
+
 v0.21.11 2022-03-10T23:50:16+0900
     - Correction of a minor, but annoying bug in Module::Generic::Array with $TRUE and $FALSE not properly set.
 

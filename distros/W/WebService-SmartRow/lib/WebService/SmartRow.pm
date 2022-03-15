@@ -4,11 +4,11 @@ use warnings;
 use v5.010;
 
 package WebService::SmartRow;
-$WebService::SmartRow::VERSION = '0.005';
+$WebService::SmartRow::VERSION = '0.006';
 # ABSTRACT: Connect and get data from SmartRow API
 
 use HTTP::Tiny;
-use Cpanel::JSON::XS;
+use JSON::MaybeXS;
 
 use Moo;
 use namespace::clean;
@@ -138,7 +138,7 @@ WebService::SmartRow - Connect and get data from SmartRow API
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 

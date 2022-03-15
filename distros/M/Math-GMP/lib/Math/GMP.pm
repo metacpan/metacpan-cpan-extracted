@@ -33,9 +33,9 @@ use Carp;
 use vars qw(@ISA @EXPORT @EXPORT_OK $AUTOLOAD);
 
 use overload (
-	'""'  =>   sub { stringify($_[0]) },
-	'0+'  =>   sub { $_[0] >= 0 ? uintify($_[0]) : intify($_[0]) },
-	'bool' =>  sub { $_[0] != 0 },
+	'""'  =>   \&op_stringify,
+	'0+'  =>   \&op_numify,
+	'bool' =>  \&op_bool,
 
 	'<=>' =>   \&op_spaceship,
 	'=='  =>   \&op_eq,
@@ -65,7 +65,7 @@ require AutoLoader;
 # names by default without a very good reason. Use EXPORT_OK instead.
 # Do not simply export all your public functions/methods/constants.
 
-our $VERSION = '2.24';
+our $VERSION = '2.25';
 
 
 bootstrap Math::GMP $VERSION;
@@ -118,7 +118,7 @@ Math::GMP - High speed arbitrary size integer math
 
 =head1 VERSION
 
-version 2.24
+version 2.25
 
 =head1 SYNOPSIS
 
@@ -523,6 +523,10 @@ For internal use. B<Do not use directly>.
 
 For internal use. B<Do not use directly>.
 
+=head2 op_bool
+
+For internal use. B<Do not use directly>.
+
 =head2 op_div
 
 For internal use. B<Do not use directly>.
@@ -539,11 +543,19 @@ For internal use. B<Do not use directly>.
 
 For internal use. B<Do not use directly>.
 
+=head2 op_numify
+
+For internal use. B<Do not use directly>.
+
 =head2 op_pow
 
 For internal use. B<Do not use directly>.
 
 =head2 op_spaceship
+
+For internal use. B<Do not use directly>.
+
+=head2 op_stringify
 
 For internal use. B<Do not use directly>.
 

@@ -33,13 +33,13 @@ my @todofiles = qw(
 );
 my @files = qw(
     autogen
-    get-version
-    run-script
+    build-aux/get-version
+    build-aux/run-script
     debian/dpkg.cron.daily
     debian/dpkg.postrm
-    scripts/dpkg-db-backup.sh
-    scripts/dpkg-maintscript-helper.sh
-    scripts/dpkg-realpath.sh
+    src/dpkg-db-backup.sh
+    src/dpkg-maintscript-helper.sh
+    src/dpkg-realpath.sh
 );
 my @shellcheck_opts = (
     '--external-sources', # Allow checking external source files.

@@ -1,9 +1,11 @@
 Changes
+CONTRIBUTING.md
 lib/Getopt/Class.pm
 LICENSE
 Makefile.PL
 MANIFEST
 README
+README.md
 t/001_basic.t
 t/002_help.t
 t/003_man.t
@@ -11,6 +13,7 @@ t/004_missing.t
 t/005_regexp_mismatch.t
 t/006_pod.t
 t/007_object.t
+t/999_kwalitee.t
 t/dictionary.pl
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

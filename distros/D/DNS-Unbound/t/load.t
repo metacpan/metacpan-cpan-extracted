@@ -44,7 +44,7 @@ warn if !eval {
     is( $result->canonname(), undef, 'canonname()' );
     is( $result->{canonname}, undef, '{canonname}' );
 
-    diag explain $result;
+    #diag explain $result;
 
     # There often is a packet, even if there’s no data in it.
     # is_deeply( $result->answer_packet(), q<>, 'answer_packet() when there’s no data' );
@@ -60,7 +60,7 @@ warn if !eval {
 
     $_ = $dns->decode_name($_) for @data;
 
-    diag explain \@data;
+    #diag explain \@data;
 
     is( $result->qtype(), Net::DNS::Parameters::typebyname('NS'), 'qtype()' );
     is( $result->{qtype}, Net::DNS::Parameters::typebyname('NS'), '{qtype}' );

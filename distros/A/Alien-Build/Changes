@@ -1,5 +1,10 @@
 Revision history for Alien-Build
 
+2.48      2022-03-13 11:20:19 -0600
+  - Added atleast_version to Probe::CommandLine and Probe::CBuilder plugins
+    (gh#299, gh#300, shawnlaffan++)
+  - Added Alien::Util module (gh#301)
+
 2.47      2022-03-07 07:03:52 -0700
   - Fixed bug where Probe::CBuilder plugin could report the wrong diagnostic
     when throwing an exception (gh#296, gh#297, shawnlaffan++)

@@ -1,0 +1,258 @@
+#!/opt/bin/perl
+
+# usage: geonames2cdb geonames.txt database.cdb
+# you can use allCountries.zp, or cities500.zip and so on
+# from https://download.geonames.org/export/dump/
+
+=head1 NAME
+
+geo-latlon2place-makedb - generate database for use with Geo::LatLon2Place
+
+=head1 SYNOPSIS
+
+geo-latlon2place-makedb [OPTION]... inputfile.txt outputfile.cdb
+
+=head1 DESCRIPTION
+
+abc
+
+=head1 OPTIONS AND ARGUMENTS
+
+geo-latlon2place-makedb requires two arguments: a text file with geo data
+and the name of the database file to be written.
+
+By default, the input file is considered to be in geonames gazetteer
+format, but this can be customized using B<--extract>.
+
+=over
+
+=item B<--cellsize> km (default C<20>)
+
+The (minimum) size of a single grid cell in km - the data is binned into
+cells of at least this size. It should not be larger than the search
+radius.
+
+=item B<--extract> C<geonames>|C<geonames-postalcodes>|perl...
+
+The extraction method: the default is C<geonames>, which expects a
+geonames database (L<https://download.geonames.org/export/dump/>, for
+example F<DE.txt>, F<cities500.txt> or F<allCountries.txt>) and extracts
+I<placename, countrycode> strings from it.
+
+The method C<geonames-postalcodes> (not yet implemented)
+does the same, but for a geonames postal code database
+L<https://download.geonames.org/export/zip>.
+
+Lastly, you can specify a perl fragment that implements your own filtering
+and extraction.
+
+=back
+
+=head1 FILTERING AND EXTRACTION
+
+Record selection and the returned data are not fixed - you can filter your records
+yourself and associate any (reasonably short, the maximum is a bit above 200 octets)
+binary blob with a coordinate pair.
+
+To do this, you have to provide a perl fragment that extracts latitude,
+longitude, a weight and the associated data blob from an input line stored
+in C<$_>. The file is opened using the C<:perlio> layer, so if your input
+file is in UTF-8, so will be C<$_>.
+
+For example, the following would expect an input file with space separated
+latitude, longitude, weight and name, where name can contain spaces, which
+is useful when you wat to provide your own input data:
+
+   geo-latlon2place-makedb --extract 'chomp; split / /, 4' input output
+
+A slighly more verbose example expecting only latitude, longitude and a
+name would be:
+
+   geo-latlon2place-makedb --extract '
+      chomp;
+      my ($lat, $lon, $name) = split / /, 4;
+      ($lat, $lon, 1, $name)
+   ' input output
+
+If you want to skip certain lines without adding anything to the database,
+you can return nothing:
+
+   geo-latlon2place-makedb --extract '
+      chomp;
+      my ($lat, $lon, $name) = split / /;
+      return unless $lat < 0; # only add southern hemisphere points
+      ($lat, $lon, 1, $name)
+   ' input output
+
+In general, the fragment should return either an empty list, or a
+four-tuple with decimal latitude, longitude, a weight (integer 0..255)
+and the binary data to be associated with the coordinate. Other than the
+weight, these should be self-explaining. The weight is used during search
+and will be multiplied to the square of the distance, and is used to make
+larger cities win over small ones when the coordinate is somewhere between
+them.
+
+The C<geonames> filter looks similar to this fragment, which shows off
+more possibilities:
+
+   my ($id, $name, undef, undef, $lat, $lon, $t1, $t2, $cc, undef, $a1, $s2, $a3, $a4, $pop, undef) = split /\t/;
+
+   return if $t1 ne "P"; # only places
+
+   # minimum population 200, or it is a populated place with no known population
+   $pop => 200
+      or ($pop eq "" and $t2 eq "PPL")
+      or return;
+
+   # skip certain places we are not interested in
+   return if $t2 eq "PPLX"; # section of populated place
+   return if $t2 eq "PPLW"; # destroyed populated place
+   return if $t2 eq "PPLH"; # historical populated place
+   return if $t2 eq "PPLQ"; # abandoned populated place
+
+   # geonames has a lot of very long place names which aren't
+   # actually place names, so ignore very long names
+   60 > length $name
+      or return;
+
+   # we estimate a weight by dividing 25 by the radius of the place,
+   # which we get by assuming a fixed population density of 5000 people/km²,
+   # which is almost always a considerable over-estimate.
+   # 25 and 5000 are pretty much made-up, feel free to improve and
+   # send me the results.
+   my $w = 25 / (1 + sqrt $pop / 5000);
+
+   # administrative centers get a fixed low weight
+   if ($t2 =~ /^PPLA(\d*)/) {
+      $w = $1 || 1;
+   }
+
+   ($lat, $lon, $w, "$name, $cc")
+
+=head1 AUTHOR
+
+Marc Lehmann <schmorp@schmorp.de>
+
+=cut
+
+use common::sense;
+use Getopt::Long;
+use Geo::LatLon2Place ();
+use Pod::Usage ();
+
+GetOptions
+   "help|h"     => sub { Pod::Usage::pod2usage -exittval => 0, verbose => 1 },
+   "extract=s"  => \my $extract,
+   "cellsize=i" => \my $km,
+   or Pod::Usage::pod2usage
+      -exitval => 1,
+;
+
+@ARGV == 2
+   or die "need exactly two paths: inputfile.txt outputdatabase.cdb\n";
+
+$km ||= 20;
+$extract ||= "geonames";
+
+if ($extract eq "geonames") {
+   $extract = sub {
+      my ($id, $name, undef, undef, $lat, $lon, $t1, $t2, $cc, undef, $a1, $s2, $a3, $a4, $pop, undef) = split /\t/;
+
+      return if $t1 ne "P"; # only places
+
+      $pop => 200
+         or ($pop eq "" and $t2 eq "PPL")
+         or return;
+
+      return if $t2 eq "PPLX"; # section of populated place
+      return if $t2 eq "PPLW"; # destroyed populated place
+      return if $t2 eq "PPLH"; # historical populated place
+      return if $t2 eq "PPLQ"; # abandoned populated place
+
+      # geonames has a lot of very long place names which aren't
+      # actually place names, so ignore very long names
+      60 > length $name
+         or return;
+
+      my $w = 25 / (1 + sqrt $pop / 5000);
+
+      if ($t2 =~ /^PPLA(\d+)/) {
+         $w = $1 || 1;
+      }
+
+      ($lat, $lon, $w, "$name, $cc")
+   };
+} elsif ($extract eq "geonames-postalcodes") {
+   $extract = sub {
+      my ($cc, $zip, $name, undef, undef, undef, undef, undef, undef, $lat, $lon, undef) = split /\t/;
+
+      ($lat, $lon, 1, "$zip $name, $cc")
+   };
+} else {
+   $extract = eval "#line 1 \"extract fragment\"\nsub { $extract; }";
+   die "$@" if $@;
+}
+
+my $torad = (atan2 1,0) / 180;
+
+my $boxes = int 6378 * 2 * 2 * (atan2 1,0) / $km; # equator radius / cell size
+
+open my $fh, "<:perlio", $ARGV[0];
+
+my @grid;
+
+while (<$fh>) {
+   my ($lat, $lon, $w, $payload) = $extract->()
+      or next;
+
+   unless (255 - (2+2+1) >= length $payload) {
+      $payload =~ s/([^(\x20-\x7e])/sprintf "\\x%02x", ord $1/ge;
+      warn "payload too long, skipping: $payload\n";
+      next;
+   }
+
+   # higher latitudes get a (much) lower resolution, so we always get at least $km cells
+   my $blat = int $boxes * cos abs $lat * $torad;
+   my $x = int (($lon + 180) * $blat  / 360);
+   my $y = int (($lat +  90) * $boxes / 180);
+
+   # we use 16 bit for lat/lon, 8 bi8t for the weight, BER-id, counted name and CC
+   push @{ $grid[$y][$x] }, pack "C/a*", pack "s< s< C a*", $lat * 32767 / 90, $lon * 32767 / 180, $w, $payload;
+}
+
+my ($max, $sum, $cnt);
+
+open my $cdb, ">", $ARGV[1]
+   or die;
+Geo::LatLon2Place::cdb_make_start fileno $cdb
+   and die "cdb_make_start failure";
+
+Geo::LatLon2Place::cdb_make_add "", pack "a4VVV", "SRGL", 1, $km, $boxes;
+
+for my $y (0 .. $#grid) {
+   my $r = $grid[$y];
+   for my $x (0 .. $#$r) {
+      my $c = $r->[$x]
+         or next;
+
+      # statistics
+      $sum += scalar @$c;
+      $cnt++;
+      $max = [(scalar @$c), $x, $y] if @$c > $max->[0];
+
+      Geo::LatLon2Place::cdb_make_add
+            +(pack "s< s<", $x, $y),
+            +(join "", @$c)
+         and "cdb_make_add failure";
+   }
+}
+
+Geo::LatLon2Place::cdb_make_finish
+   and die "cdb_make_finish failed";
+close $cdb;
+
+$max->[2] = $max->[2] * 180 / $boxes - 90;
+my $blat = int $boxes * cos abs $max->[2] * $torad;
+$max->[1] = $max->[1] * 360 / $blat - 180;
+print "cell size: $km km, grid size: $boxes, non-empty cell count: $cnt\naverage cell size: ", int $sum/$cnt, ", maximum cell size: $max->[0] (at $max->[2] $max->[1])\n";
+

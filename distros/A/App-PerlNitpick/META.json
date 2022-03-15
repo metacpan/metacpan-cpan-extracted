@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "App-PerlNitpick",
    "prereqs" : {
@@ -48,7 +48,7 @@
    "provides" : {
       "App::PerlNitpick" : {
          "file" : "lib/App/PerlNitpick.pm",
-         "version" : "0.01"
+         "version" : "v0.2.0"
       },
       "App::PerlNitpick::Nitpicker" : {
          "file" : "lib/App/PerlNitpick/Nitpicker.pm"
@@ -74,6 +74,9 @@
       "App::PerlNitpick::Rule::RemoveTrailingWhitespace" : {
          "file" : "lib/App/PerlNitpick/Rule/RemoveTrailingWhitespace.pm"
       },
+      "App::PerlNitpick::Rule::RemoveUnnecessaryScalarKeyword" : {
+         "file" : "lib/App/PerlNitpick/Rule/RemoveUnnecessaryScalarKeyword.pm"
+      },
       "App::PerlNitpick::Rule::RemoveUnusedImport" : {
          "file" : "lib/App/PerlNitpick/Rule/RemoveUnusedImport.pm"
       },
@@ -91,7 +94,19 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.01",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/gugod/App-PerlNitpick/issues"
+      },
+      "homepage" : "https://github.com/gugod/App-PerlNitpick",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/gugod/App-PerlNitpick.git",
+         "web" : "https://github.com/gugod/App-PerlNitpick"
+      }
+   },
+   "version" : "v0.2.0",
    "x_serialization_backend" : "JSON::PP version 4.04",
-   "x_spdx_expression" : "MIT"
+   "x_spdx_expression" : "MIT",
+   "x_static_install" : "1"
 }

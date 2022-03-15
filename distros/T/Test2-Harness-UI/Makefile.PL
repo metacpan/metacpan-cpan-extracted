@@ -70,7 +70,7 @@ my %WriteMakefileArgs = (
     "Test2" => "1.302164",
     "Test2::API" => "1.302166",
     "Test2::Formatter::Test2::Composer" => 0,
-    "Test2::Harness" => "1.000104",
+    "Test2::Harness" => "1.000112",
     "Test2::Harness::Util::HashBase" => 0,
     "Test2::Harness::Util::JSON" => 0,
     "Test2::Harness::Util::UUID" => 0,
@@ -90,7 +90,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "HTTP::Tiny::UNIX" => 0
   },
-  "VERSION" => "0.000115",
+  "VERSION" => "0.000117",
   "test" => {
     "TESTS" => "t/*.t t/UI/*.t t/integration/*.t"
   }
@@ -140,7 +140,7 @@ my %FallbackPrereqs = (
   "Test2" => "1.302164",
   "Test2::API" => "1.302166",
   "Test2::Formatter::Test2::Composer" => 0,
-  "Test2::Harness" => "1.000104",
+  "Test2::Harness" => "1.000112",
   "Test2::Harness::Util::HashBase" => 0,
   "Test2::Harness::Util::JSON" => 0,
   "Test2::Harness::Util::UUID" => 0,

@@ -21,8 +21,10 @@ end("Spreadsheet successfully opened, enter url '$uri' in your browser to follow
 $sheets_api->rest_api()->api_callback(\&show_api);
 
 start("Now we will open the spreadsheet and worksheet");
-my $ws0 = $ss->open_worksheet(id => 0);
-end_go("Worksheet is now open.");
+$ss->add_worksheet(name => 'Fred')->submit_requests();
+my $ws0 = $ss->open_worksheet(name => 'Fred');
+$ws0->ws_rename('Joe');
+end_go("Worksheet 'Joe' is now open.");
 
 # resets the spreadsheet. collects up a bunch of batch requests, then
 # gets the spreadsheet to run them. running 'submit_requests' against

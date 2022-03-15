@@ -14,18 +14,18 @@ use namespace::autoclean;
 with 'Net::Connector::Role';
 
 #------------------------------------------------------------------------------
-# 具体实现 _buildPrompt,设置设备脚本执行成功回显
+# 具体实现 _prompt,设置设备脚本执行成功回显
 #------------------------------------------------------------------------------
-sub _buildPrompt {
+sub _prompt {
   my $self   = shift;
   my $prompt = '[\w\d\-\_]+\#\s*$';
   return $prompt;
 }
 
 #------------------------------------------------------------------------------
-# 具体实现 _buildCommands,设置抓取设备运行配置的脚本
+# 具体实现 _runningCommands,设置抓取设备运行配置的脚本
 #------------------------------------------------------------------------------
-sub _buildCommands {
+sub _runningCommands {
   my $self = shift;
 
   # my $commands = ["terminal length 0", "how running-config"];
@@ -34,9 +34,9 @@ sub _buildCommands {
 }
 
 #------------------------------------------------------------------------------
-# 具体实现 _buildErrorCode,设置命令下发错误码 -> 用于拦截配置下发
+# 具体实现 _errorCodes,设置命令下发错误码 -> 用于拦截配置下发
 #------------------------------------------------------------------------------
-sub _buildErrorCode {
+sub _errorCodes {
   my $self  = shift;
   my $codes = [
     'for a list of subcommands',
@@ -52,9 +52,9 @@ sub _buildErrorCode {
 }
 
 #------------------------------------------------------------------------------
-# 具体实现 _buildBufferCode,设置交互式执行脚本 -> 用于交互式下发配置
+# 具体实现 _bufferCodes,设置交互式执行脚本 -> 用于交互式下发配置
 #------------------------------------------------------------------------------
-sub _buildBufferCode {
+sub _bufferCodes {
   my $self    = shift;
   my %mapping = (
     more     => '--More--',

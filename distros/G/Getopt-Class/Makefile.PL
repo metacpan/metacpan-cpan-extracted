@@ -12,14 +12,14 @@ my %WriteMakefileArgs = (
     ABSTRACT            => 'A class based approach for options of Getopt::Long',
     INSTALLDIRS         => ($] < 5.011 ? 'perl' : 'site'),
     PREREQ_PM           => {
-        'strict'        => '1.11',
-        'warnings'      => '1.44',
-        'parent'        => '0.237',
+        'strict'        => 0,
+        'warnings'      => 0,
+        'parent'        => 0,
         'DateTime'      => '1.51',
         'DateTime::Format::Strptime' => '1.76',
         'Devel::Confess'=> '0.009004',
         'Getopt::Long'  => '0.44',
-        'Module::Generic' => 'v0.12.6',
+        'Module::Generic' => 'v0.21.12',
         'Scalar::Util'  => '1.54',
     	'Tie::Hash'     => '1.05',
 		'Nice::Try'		=> 'v0.1.3',
@@ -33,7 +33,7 @@ my %WriteMakefileArgs = (
     MIN_PERL_VERSION    => 5.6.0,
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'Getlong-Class-*' },
-    ( eval { ExtUtils::MakeMaker->VERSION(6.46) } ? () : ( META_MERGE => {
+    ( eval { ExtUtils::MakeMaker->VERSION(6.46) } ? ( META_MERGE => {
         'meta-spec' => { version => 2 },
         dynamic_config => 1,
         resources => {
@@ -48,7 +48,7 @@ my %WriteMakefileArgs = (
                 mailto      => 'cpan-bug@deguest.jp',
             },
         },
-    })),
+    }) : ()),
 );
 
 WriteMakefile(%WriteMakefileArgs);

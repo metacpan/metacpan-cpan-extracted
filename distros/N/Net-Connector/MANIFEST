@@ -4,6 +4,7 @@ MANIFEST
 META.yml
 Makefile.PL
 README
+_Deparsed_XSubs.pm
 dist.ini
 lib/Net/Connector.pm
 lib/Net/Connector/Cisco/Ios.pm
@@ -12,12 +13,15 @@ lib/Net/Connector/Cisco/Wlc.pm
 lib/Net/Connector/H3c/Comware.pm
 lib/Net/Connector/H3c/Switch.pm
 lib/Net/Connector/Hillstone/Firewall.pm
+lib/Net/Connector/Hillstone/Stoneos.pm
 lib/Net/Connector/Huawei/Switch.pm
 lib/Net/Connector/Huawei/Vrp.pm
 lib/Net/Connector/Juniper/Firewall.pm
 lib/Net/Connector/Juniper/Srx.pm
 lib/Net/Connector/Paloalto/Firewall.pm
+lib/Net/Connector/Paloalto/Panos.pm
 lib/Net/Connector/Radware/LoadBalance.pm
 lib/Net/Connector/Role.pm
+lib/Net/perltidy.pl
 perltidy.pl
 test/test.pl
