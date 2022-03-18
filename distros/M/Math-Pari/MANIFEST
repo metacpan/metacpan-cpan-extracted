@@ -7,6 +7,7 @@ INSTALL
 Makefile.PL
 README
 TODO
+TODO-inprogress
 func_codes.h
 libPARI/Makefile.PL
 libPARI/gphelp
@@ -14,6 +15,8 @@ libPARI/gphelp-ini
 libPARI/extract_codes.pl
 libPARI/expected_codes
 libPARI/codes_2014
+libPARI/pre-noinline.h
+libPARI/post-noinline.h
 patches/diff_2.1.2_gccism
 patches/diff_2.1.3_interface
 patches/diff_2.1.4_interface
@@ -29,11 +32,29 @@ patches/diff_2.1.6_align_power_of_2
 patches/diff_2.1.7_mingw-w64
 patches/diff_2.3.5_mingw-w64
 patches/diff_2.3.5_stderr_clobber
+patches/diff_add_gnuplotNeeded
+patches/diff_add_gnuplotAdd
+patches/diff_add_gnuplotAll
+patches/diff-2.5.0-x-prototype
+patches/diff-2.5.0-exceptions
+patches/diff-2.5.5-exceptions
+patches/diff-2.5.0-tune_opt
+patches/diff-2.7.0-x-prototype
+patches/diff-2.7.0-exceptions
+patches/diff-2.7.0-reinstall-foreigh
+patches/diff-2.7.0-reinstall-foreigh-full
+patches/diff-2.9.0-all
+patches/diff-2.9.5-all
+patches/diff-2.11.0-all
+patches/diff-2.13.3-all
+patches/diff_2.3.5_mingw_longlong
 t/000_load-problem.t
 t/00_Pari.t
 t/01_no_extra_newlines.t
+t/02_sections.t
 t/PlotRect.t
 t/zz_leak.t
+t/zzz_debug-crash.t
 test_eng/Testout.pm
 test_eng/ex.t
 typemap
@@ -49,3 +70,11 @@ utils/inc_h.diff
 utils/01_no_extra_newlines.test
 META.yml                                 Module meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
+gdbinit-my
+auto-dbg/auto-debug-module.pl		Source level machine code debug crashes
+auto-dbg/auto-debug-module.example-dbx
+auto-dbg/auto-debug-module.example-dbx-2_00
+auto-dbg/auto-debug-module.example-gdb
+auto-dbg/auto-debug-module.example-gdb-2_00
+auto-dbg/auto-debug-module.example-gdb-2_03_win
+auto-dbg/README

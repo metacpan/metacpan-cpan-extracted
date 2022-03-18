@@ -1,0 +1,83 @@
+
+[![Travis Build Status](https://travis-ci.org/Corion/GitHub-RSS.svg?branch=master)](https://travis-ci.org/Corion/GitHub-RSS)
+[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/Corion/GitHub-RSS?branch=master&svg=true)](https://ci.appveyor.com/project/Corion/GitHub-RSS)
+
+# NAME
+
+GitHub::RSS - collect data from Github.com for feeding into RSS
+
+# SYNOPSIS
+
+    my $gh = GitHub::RSS->new(
+        dbh => {
+            dsn => "dbi:SQLite:dbname=$store",
+        },
+    );
+
+    my $last_updated = $gh->last_check;
+    $gh->fetch_and_store( $github_user => $github_repo, $last_updated );
+    if( $verbose ) {
+        print "Updated from $last_updated to " . $gh->last_check, "\n";
+    };
+
+# DESCRIPTION
+
+This module provides a cache database for GitHub issues and scripts to
+periodically update the database from GitHub.
+
+This is mainly used for creating an RSS feed from the database, hence the
+name.
+
+# METHODS
+
+## `->new`
+
+    my $gh = GitHub::RSS->new(
+        dbh => {
+            dsn => 'dbi:SQLite:dbname=db/issues.sqlite',
+        },
+    );
+
+Constructs a new GitHub::RSS instance
+
+- **gh** - instance of [Net::GitHub](https://metacpan.org/pod/Net%3A%3AGitHub)
+- **token\_file** - name and path of the JSON-format token file containing the
+GitHub API token By default, that file is searched for under the name
+`github.credentials` in `.`, `$ENV{XDG_DATA_HOME}`, `$ENV{USERPROFILE}`
+and `$ENV{HOME}`.
+- **token** - GitHub API token. If this is missing, it will be attempted to read
+it from the `token_file`.
+- **default\_user** - name of the GitHub user whose repos will be read
+- **default\_repo** - name of the GitHub repo whose issues will be read
+- **dbh** - premade database handle or alternatively a hashref containing
+the [DBI](https://metacpan.org/pod/DBI) arguments
+
+        dbh => $dbh,
+
+    or alternatively
+
+        dbh => {
+            user     => 'scott',
+            password => 'tiger',
+            dsn      => 'dbi:SQLite:dbname=db/issues.sqlite',
+        }
+
+- **fetch\_additional\_pages** - number of additional pages to fetch from GitHub.
+This is relevant when catching up a database for a repository with many issues.
+
+## `->fetch_issue_comments`
+
+## `->fetch_and_store($user, $repo, $since)`
+
+    my $since = $gh->last_check;
+    $gh->fetch_and_store($user, $repo, $since)
+
+Fetches all issues and comments modified after the `$since` timestamp.
+If `$since` is missing or `undef`, all issues will be retrieved.
+
+## `->last_check`
+
+    my $since = $gh->last_check;
+
+Returns the timestamp of the last stored modification or `undef`
+if no issue or comment is stored.

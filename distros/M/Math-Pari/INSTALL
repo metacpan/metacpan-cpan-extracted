@@ -96,15 +96,21 @@ Other recognized options:
   paridir=PATH_TO_DIST_DIR	Use the directory with Pari distribution
   pari_tgz=PATH_TO_TAR_GZ	To extract a local pari*.tar.gz and patch
 		(if needed) the resulting directory tree.
-  version23_ok=NUMBER		If 0 (default), will skip versions 2.3.* of
-		PARI in automatic search (N/A if `paridir' is given).
+				(If not a file, is considered as a filter on
+				 files to download; "pari-2.3.5.tar.gz" or
+				 "2.1" would work.)
+
+Obsolete:
+  version23_ok=NUMBER		Unless 1 (default), will skip versions 2.3.*
+		of PARI in automatic search (N/A if `paridir' is given).
 
 ==================================================================
 Here is the manual procedure which is somewhat similar to what
 Makefile.PL does.
 
-  a) Get the latest PARI distribution from
+  a) Get the latest supported PARI distribution from
 	ftp://megrez.math.u-bordeaux.fr/pub/pari/unix/
+     or from OLD directory.
 
   b) uncompress the distribution; optionally run 'Configure' script
 	sh ./Configure
@@ -118,7 +124,12 @@ Makefile.PL does.
 
   d) uncompress the Math::Pari archive into a separate directory (for
      best results make it a sibling of GP/PARI's root directory; kid
-     or parent should do as well);
+     or parent should do as well).
+
+     However, note that Math::Pari build will ignore GP/PARI directories
+     with unsupported PARI versions - unless GP/PARI is in a subdirectory
+     of Math::Pari build directory, or a GP/PARI directory is given
+     manually via command-line arguments of Makefile.PL.
 
   e) _Optionally_ find the architecture of your processor (if it is not
      known/supported and recognized automatically, the slower 'port' code
@@ -127,7 +138,7 @@ Makefile.PL does.
 	sun3 sparcv7 sparcv8micro sparcv8super alpha hppa i386 port
 
      (many more for v2.3.0 and later) the current version should
-     autorecognize them in most situations;
+     autorecognize them in most situations (if not, let me know!);
 
   f) do (assuming your architecture is hppa)
 
@@ -152,14 +163,14 @@ Makefile.PL does.
 
      should make this extension available to the perl programs.
 
-x) Patches to some versions of GP/PARI may be needed (in `patches11',
-   or 'patch12', etc.  depending on the version of GP/PARI 2.*.*).
+x) Patches to some versions of GP/PARI may be needed (in ./patches;
+   the list depends on the version of GP/PARI, see utils/Math/PariBuild.pm).
    This may be done automatically during auto-download of GP/PARI.
 
 x) We skip "compatibility" tests, and do not support "compatibility" mode
    (with very old versions of GP/PARI).
 
-x) dmake on Win32 is buggy.  The symptom is a message about not being
+x) old dmake on Win32 is buggy.  The symptom is a message about not being
    able to find the target 'all'.  The workaround is to run `dmake
    -i'.  One must watch for errors (with "Ignored" in the error
    message), since in this regime dmake won't stop on an error.
@@ -177,7 +188,7 @@ Here are the typical failure modes of the tests:
 =======================================================
 Sometimes the server ftp://megrez.math.u-bordeaux.fr/pub/pari/unix/
 goes off line for a couple of days (mostly in August).  Then you can try
-downloading from some mirror: google, e.g., for pari-2.1.7.tgz.
+downloading from some mirror: google, e.g., for pari-2.3.5.tgz.
 
 =======================================================
 KNOWN PROBLEMS:
@@ -190,7 +201,7 @@ KNOWN PROBLEMS:
       Try applying the patch in patches/diff_2.1.6_no-common (we apply it
 		automatically on Darwin if auto-patching is used).
 
-=======================================================
+======================================================= (Obsolete!!!)
 If you get problems with `overflow' and `hiremainder' symbols not defined:
 there may be (at least) two reasons:
 

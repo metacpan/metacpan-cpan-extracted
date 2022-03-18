@@ -3,7 +3,7 @@ NAME
     Signatures
 
 VERSION
-    version 0.55
+    version 0.56
 
 SYNOPSIS
        my $xml = '<foo ID="abc">123</foo>';
@@ -290,7 +290,7 @@ AUTHORS
     *   Timothy Legge <timlegge@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021 by Byrne Reese, Chris Andrews and
+    This software is copyright (c) 2022 by Byrne Reese, Chris Andrews and
     Others; in detail:
 
       Copyright 2009       Byrne, Michael Hendricks

@@ -1,5 +1,9 @@
 [% page_title = 'Mark Round out for Teams' %]
 
+ [% IF is_admin;
+    INCLUDE 'admin/links.tt';
+ END %]
+
 <div style="font-size: 0.88em;">
 <form id="round_out" name="round_out" action="" method="post">
 <input type="submit" value="Save" />

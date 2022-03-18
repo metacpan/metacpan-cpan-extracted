@@ -10,7 +10,7 @@ use Carp;
 
 
 
-our $VERSION = "0.028";
+our $VERSION = "0.029";
 
 =head1 NAME
 
@@ -201,7 +201,8 @@ May be negative to rise the text.
 In Pango conformance mode, rises the text by I<NUM> units from the baseline.
 May be negative to lower the text.
 
-Note: C<rise> does not accumulate. Use C<baseline_shift> instead.
+Note: In Pango conformance mode, C<rise> does B<not> accumulate.
+ Use C<baseline_shift> instead.
 
 =item rise=C<NUM>pt   rise=C<NUM>%
 
@@ -513,6 +514,7 @@ sub set_markup {
     my $ovcl = $fcol;
     my $strk;
     my $stcl = $fcol;
+    my $bcol;
     my $base = 0;
 
     my $try_size = sub {
@@ -618,7 +620,7 @@ sub set_markup {
 
 		# <span background="red">
 		elsif ( $k =~ /^(background|bgcolor)$/ ) {
-		    # NYI.
+		    $bcol = $v;
 		}
 
 		# <span underline="double">
@@ -640,16 +642,15 @@ sub set_markup {
 		# <span rise=324>
 		elsif ( $k eq "rise" ) {
 		    if ( $v =~ /^(-?\d+(?:\.\d*)?)pt$/ ) {
-			$base = $1;
+			$base = -$1;
 		    }
 		    elsif ( !$self->{_pango} && $v =~ /^(-?\d+(?:\.\d*)?)\%$/ ) {
-			$base = $1 * $fsiz / 100;
+			$base = -$1 * $fsiz / 100;
 		    }
 		    else {
 			$v /= PANGO_SCALE;
-			$base = $self->{_pango} ? $v : -$v * $fsiz;
+			$base = $self->{_pango} ? -$v : $base + $v * $fsiz;
 		    }
-		    $base = -$base;
 		}
 
 		# <span baseline_shift=324>
@@ -721,7 +722,7 @@ sub set_markup {
 		    # Restore.
 		    ( undef,
 		      $fcur, $fsiz, $fcol, $undl, $uncl, $ovrl, $ovcl,
-		      $strk, $stcl, $base, $href ) = @{$stack[-1]};
+		      $bcol, $strk, $stcl, $base, $href ) = @{$stack[-1]};
 		    pop(@stack);
 		}
 		else {
@@ -744,7 +745,7 @@ sub set_markup {
 	    # Save.
 	    push( @stack, [ "<$k".lc($v).">",
 			    $fcur, $fsiz, $fcol, $undl, $uncl, $ovrl, $ovcl,
-			    $strk, $stcl, $base, $href ] );
+			    $bcol, $strk, $stcl, $base, $href ] );
 
 	    # <b> <strong>
 	    if ( $k =~ /^(b|strong)$/ ) {
@@ -808,6 +809,7 @@ sub set_markup {
 		    font		     => $fcur,
 		    size		     => $fsiz,
 		    color		     => $fcol,
+		    bgcolor		     => $bcol,
 		    underline		     => $undl,
 		    underline_color	     => $uncl,
 		    overline		     => $ovrl,

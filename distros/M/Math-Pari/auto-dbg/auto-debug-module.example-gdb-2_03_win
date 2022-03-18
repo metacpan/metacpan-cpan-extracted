@@ -1,0 +1,379 @@
+"K:\get\strawberry-perl-5.22.2.1-32bit-PDL\perl\bin\perl.exe" -MExtUtils::Command::MM -e cp_nonempty -- FindChunks.bs blib\arch\auto\Audio\FindChunks\FindChunks.bs 644
+"K:\get\strawberry-perl-5.22.2.1-32bit-PDL\perl\bin\perl.exe" "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness(0, 'blib\lib', 'blib\arch')" t/*.t
+t/Audio-FindChunks.t .. 
+Dubious, test returned 5 (wstat 1280, 0x500)
+Failed 31/37 subtests 
+# reporting ./Makefile header:
+# ==========================
+#     ABSTRACT_FROM => q[FindChunks.pm]
+#     AUTHOR => [q[Ilya Zakharevich <cpan@ilyaz.org>]]
+#     BUILD_REQUIRES => {  }
+#     CONFIGURE_REQUIRES => {  }
+#     DEFINE => q[ -DNATIVE_LE_SHORTS]
+#     INC => q[-I.]
+#     LIBS => [q[]]
+#     NAME => q[Audio::FindChunks]
+#     OBJECT => q[$(O_FILES)]
+#     PREREQ_PM => { Data::Flow=>q[0.09] }
+#     TEST_REQUIRES => {  }
+#     VERSION_FROM => q[FindChunks.pm]
+#     clean => { FILES=>q[*.tmp tmp.*] }
+# ==========================
+Checking if your kit is complete...
+Looks good
+Generating a dmake-style Makefile
+Writing Makefile for Audio::FindChunks
+Writing MYMETA.yml and MYMETA.json
+cp FindChunks.pm blib\lib\Audio\FindChunks.pm
+Running Mkbootstrap for FindChunks ()
+"K:\get\strawberry-perl-5.22.2.1-32bit-PDL\perl\bin\perl.exe" -MExtUtils::Command -e chmod -- 644 "FindChunks.bs"
+"K:\get\strawberry-perl-5.22.2.1-32bit-PDL\perl\bin\perl.exe" -MExtUtils::Command::MM -e cp_nonempty -- FindChunks.bs blib\arch\auto\Audio\FindChunks\FindChunks.bs 644
+"K:\get\strawberry-perl-5.22.2.1-32bit-PDL\perl\bin\perl.exe" "K:\get\strawberry-perl-5.22.2.1-32bit-PDL\perl\lib\ExtUtils\xsubpp"  -typemap K:\get\strawberry-perl-5.22.2.1-32bit-PDL\perl\lib\ExtUtils\typemap -typemap D:\tmp\perl-modules\Audio-FindChunks-2.02-to-crash\dbg-bld\typemap  FindChunks.xs > FindChunks.xsc
+"K:\get\strawberry-perl-5.22.2.1-32bit-PDL\perl\bin\perl.exe" -MExtUtils::Command -e mv -- FindChunks.xsc FindChunks.c
+gcc -c  -I. 	-DWIN32  -DPERL_TEXTMODE_SCRIPTS -DPERL_IMPLICIT_CONTEXT -DPERL_IMPLICIT_SYS -fwrapv -fno-strict-aliasing -mms-bitfields -g 	  -DVERSION=\"2.03\" 	-DXS_VERSION=\"2.03\"  "-IK:\get\strawberry-perl-5.22.2.1-32bit-PDL\perl\lib\CORE"  -DNATIVE_LE_SHORTS FindChunks.c 
+gcc -c  -I. 	-DWIN32  -DPERL_TEXTMODE_SCRIPTS -DPERL_IMPLICIT_CONTEXT -DPERL_IMPLICIT_SYS -fwrapv -fno-strict-aliasing -mms-bitfields -g 	  -DVERSION=\"2.03\" 	-DXS_VERSION=\"2.03\"  "-IK:\get\strawberry-perl-5.22.2.1-32bit-PDL\perl\lib\CORE"  -DNATIVE_LE_SHORTS wavestats.c 
+"K:\get\strawberry-perl-5.22.2.1-32bit-PDL\perl\bin\perl.exe" -MExtUtils::Mksymlists \
+     -e "Mksymlists('NAME'=>\"Audio::FindChunks\", 'DLBASE' => 'FindChunks', 'DL_FUNCS' => {  }, 'FUNCLIST' => [], 'IMPORTS' => {  }, 'DL_VARS' => []);"
+g++.exe FindChunks.def -o blib\arch\auto\Audio\FindChunks\FindChunks.xs.dll -mdll  -LK:\get\strawberry-perl-5.22.2.1-32bit-PDL\perl\lib\CORE -LK:\get\strawberry-perl-5.22.2.1-32bit-PDL\c\lib FindChunks.o 	wavestats.o   "K:\get\strawberry-perl-5.22.2.1-32bit-PDL\perl\lib\CORE\libperl522.a" -lmoldname -lkernel32 -luser32 -lgdi32 -lwinspool -lcomdlg32 -ladvapi32 -lshell32 -lole32 -loleaut32 -lnetapi32 -luuid -lws2_32 -lmpr -lwinmm -lversion -lodbc32 -lodbccp32 -lcomctl32 -Wl,--enable-auto-image-base
+"K:\get\strawberry-perl-5.22.2.1-32bit-PDL\perl\bin\perl.exe" -MExtUtils::Command -e chmod -- 755 blib\arch\auto\Audio\FindChunks\FindChunks.xs.dll
+[New Thread 3504.0x2580]
+1..37
+# Running under perl version 5.022002 for MSWin32
+# Current time local: Sat May 21 17:46:03 2016
+# Current time GMT:   Sun May 22 00:46:03 2016
+# Using Test.pm version 1.26
+ok 1
+ok 2
+ok 3
+ok 4
+ok 5
+ok 6
+
+Program received signal SIGSEGV, Segmentation fault.
+0x6f383144 in le_short_sample_stats (buf=0x281f000 <error: Cannot access memory at address 0x281f000>, stride=4, samples=1792, stat=0x5f8064) at wavestats.c:17
+17		elt = *(short*)(void*)buf;	/* Avoid a warning about change of alignment */
+
+=====================================
+
+#0  0x6f383144 in le_short_sample_stats (buf=0x281f000 <error: Cannot access memory at address 0x281f000>, stride=4, samples=1792, stat=0x5f8064) at wavestats.c:17
+#1  0x6f382aa5 in XS_Audio__FindChunks_le_short_sample_stats (my_perl=0x503794, cv=0x26476f4) at FindChunks.c:347
+#2  0x65b57e40 in perl522!Perl_find_runcv () from K:\get\strawberry-perl-5.22.2.1-32bit-PDL\perl\bin\perl522.dll
+#3  0x00503794 in ?? ()
+#4  0x026b937c in ?? ()
+#5  0x00000001 in ?? ()
+#6  0x00023306 in ?? ()
+#7  0x00000000 in ?? ()
+
+=====================================
+
+eax            0x281f000	42070016
+ecx            0x5f8064	6258788
+edx            0x1000	4096
+ebx            0x26b92d4	40604372
+esp            0x28fae0	0x28fae0
+ebp            0x28faf8	0x28faf8
+esi            0x0	0
+edi            0x26476f4	40138484
+eip            0x6f383144	0x6f383144 <le_short_sample_stats+24>
+eflags         0x10216	[ PF AF IF RF ]
+cs             0x23	35
+ss             0x2b	43
+ds             0x2b	43
+es             0x2b	43
+fs             0x53	83
+gs             0x2b	43
+st0            0	(raw 0x00000000000000000000)
+st1            0	(raw 0x00000000000000000000)
+st2            0	(raw 0x00000000000000000000)
+st3            0	(raw 0x00000000000000000000)
+st4            5	(raw 0x4001a000000000000000)
+st5            4	(raw 0x40018000000000000000)
+st6            16777216	(raw 0x40178000000000000000)
+st7            6088566340	(raw 0x401fb574132200000000)
+fctrl          0x37f	895
+fstat          0x420	1056
+ftag           0xffff	65535
+fiseg          0x23	35
+fioff          0x6f3831a7	1865953703
+foseg          0x2b	43
+fooff          0x5f8064	6258788
+fop            0x0	0
+xmm0           {v4_float = {0x0, 0x0, 0x0, 0x0}, v2_double = {0x8000000000000000, 0x8000000000000000}, v16_int8 = {0xff, 0xff, 0xff, 0xff, 0xf7, 0xff, 0xf7, 0xff, 0xef, 0xff, 0xef, 0xff, 0xe9, 0xff, 0xe9, 0xff}, v8_int16 = {0xffff, 0xffff, 0xfff7, 0xfff7, 0xffef, 0xffef, 0xffe9, 0xffe9}, v4_int32 = {0xffffffff, 0xfff7fff7, 0xffefffef, 0xffe9ffe9}, v2_int64 = {0xfff7fff7ffffffff, 0xffe9ffe9ffefffef}, uint128 = 0xffe9ffe9ffefffeffff7fff7ffffffff}
+xmm1           {v4_float = {0x0, 0x0, 0x0, 0x0}, v2_double = {0x8000000000000000, 0x8000000000000000}, v16_int8 = {0xe5, 0xff, 0xe5, 0xff, 0xe3, 0xff, 0xe3, 0xff, 0xe3, 0xff, 0xe3, 0xff, 0xe6, 0xff, 0xe6, 0xff}, v8_int16 = {0xffe5, 0xffe5, 0xffe3, 0xffe3, 0xffe3, 0xffe3, 0xffe6, 0xffe6}, v4_int32 = {0xffe5ffe5, 0xffe3ffe3, 0xffe3ffe3, 0xffe6ffe6}, v2_int64 = {0xffe3ffe3ffe5ffe5, 0xffe6ffe6ffe3ffe3}, uint128 = 0xffe6ffe6ffe3ffe3ffe3ffe3ffe5ffe5}
+xmm2           {v4_float = {0x0, 0x0, 0x0, 0x0}, v2_double = {0x8000000000000000, 0x0}, v16_int8 = {0xea, 0xff, 0xea, 0xff, 0xf1, 0xff, 0xf1, 0xff, 0xf9, 0xff, 0xf9, 0xff, 0x0, 0x0, 0x0, 0x0}, v8_int16 = {0xffea, 0xffea, 0xfff1, 0xfff1, 0xfff9, 0xfff9, 0x0, 0x0}, v4_int32 = {0xffeaffea, 0xfff1fff1, 0xfff9fff9, 0x0}, v2_int64 = {0xfff1fff1ffeaffea, 0xfff9fff9}, uint128 = 0x00000000fff9fff9fff1fff1ffeaffea}
+xmm3           {v4_float = {0x0, 0x0, 0x0, 0x0}, v2_double = {0x0, 0x0}, v16_int8 = {0x9, 0x0, 0x9, 0x0, 0x10, 0x0, 0x10, 0x0, 0x17, 0x0, 0x17, 0x0, 0x1b, 0x0, 0x1b, 0x0}, v8_int16 = {0x9, 0x9, 0x10, 0x10, 0x17, 0x17, 0x1b, 0x1b}, v4_int32 = {0x90009, 0x100010, 0x170017, 0x1b001b}, v2_int64 = {0x10001000090009, 0x1b001b00170017}, uint128 = 0x001b001b001700170010001000090009}
+xmm4           {v4_float = {0x0, 0x0, 0x0, 0x0}, v2_double = {0x0, 0x0}, v16_int8 = {0x1d, 0x0, 0x1d, 0x0, 0x1d, 0x0, 0x1d, 0x0, 0x1a, 0x0, 0x1a, 0x0, 0x16, 0x0, 0x16, 0x0}, v8_int16 = {0x1d, 0x1d, 0x1d, 0x1d, 0x1a, 0x1a, 0x16, 0x16}, v4_int32 = {0x1d001d, 0x1d001d, 0x1a001a, 0x160016}, v2_int64 = {0x1d001d001d001d, 0x160016001a001a}, uint128 = 0x00160016001a001a001d001d001d001d}
+xmm5           {v4_float = {0x0, 0x0, 0x0, 0x0}, v2_double = {0x0, 0x8000000000000000}, v16_int8 = {0xf, 0x0, 0xf, 0x0, 0x7, 0x0, 0x7, 0x0, 0x0, 0x0, 0x0, 0x0, 0xf7, 0xff, 0xf7, 0xff}, v8_int16 = {0xf, 0xf, 0x7, 0x7, 0x0, 0x0, 0xfff7, 0xfff7}, v4_int32 = {0xf000f, 0x70007, 0x0, 0xfff7fff7}, v2_int64 = {0x70007000f000f, 0xfff7fff700000000}, uint128 = 0xfff7fff70000000000070007000f000f}
+xmm6           {v4_float = {0x0, 0x0, 0x0, 0x0}, v2_double = {0x8000000000000000, 0x8000000000000000}, v16_int8 = {0xf0, 0xff, 0xf0, 0xff, 0xe9, 0xff, 0xe9, 0xff, 0xe5, 0xff, 0xe5, 0xff, 0xe3, 0xff, 0xe3, 0xff}, v8_int16 = {0xfff0, 0xfff0, 0xffe9, 0xffe9, 0xffe5, 0xffe5, 0xffe3, 0xffe3}, v4_int32 = {0xfff0fff0, 0xffe9ffe9, 0xffe5ffe5, 0xffe3ffe3}, v2_int64 = {0xffe9ffe9fff0fff0, 0xffe3ffe3ffe5ffe5}, uint128 = 0xffe3ffe3ffe5ffe5ffe9ffe9fff0fff0}
+xmm7           {v4_float = {0x0, 0x0, 0x0, 0x0}, v2_double = {0x8000000000000000, 0x8000000000000000}, v16_int8 = {0xe3, 0xff, 0xe3, 0xff, 0xe5, 0xff, 0xe5, 0xff, 0xea, 0xff, 0xea, 0xff, 0xf1, 0xff, 0xf1, 0xff}, v8_int16 = {0xffe3, 0xffe3, 0xffe5, 0xffe5, 0xffea, 0xffea, 0xfff1, 0xfff1}, v4_int32 = {0xffe3ffe3, 0xffe5ffe5, 0xffeaffea, 0xfff1fff1}, v2_int64 = {0xffe5ffe5ffe3ffe3, 0xfff1fff1ffeaffea}, uint128 = 0xfff1fff1ffeaffeaffe5ffe5ffe3ffe3}
+mxcsr          0x1f80	[ IM DM ZM OM UM PM ]
+mm0            {uint64 = 0x0, v2_int32 = {0x0, 0x0}, v4_int16 = {0x0, 0x0, 0x0, 0x0}, v8_int8 = {0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}}
+mm1            {uint64 = 0x0, v2_int32 = {0x0, 0x0}, v4_int16 = {0x0, 0x0, 0x0, 0x0}, v8_int8 = {0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}}
+mm2            {uint64 = 0x0, v2_int32 = {0x0, 0x0}, v4_int16 = {0x0, 0x0, 0x0, 0x0}, v8_int8 = {0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}}
+mm3            {uint64 = 0x0, v2_int32 = {0x0, 0x0}, v4_int16 = {0x0, 0x0, 0x0, 0x0}, v8_int8 = {0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}}
+mm4            {uint64 = 0xa000000000000000, v2_int32 = {0x0, 0xa0000000}, v4_int16 = {0x0, 0x0, 0x0, 0xa000}, v8_int8 = {0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0xa0}}
+mm5            {uint64 = 0x8000000000000000, v2_int32 = {0x0, 0x80000000}, v4_int16 = {0x0, 0x0, 0x0, 0x8000}, v8_int8 = {0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x80}}
+mm6            {uint64 = 0x8000000000000000, v2_int32 = {0x0, 0x80000000}, v4_int16 = {0x0, 0x0, 0x0, 0x8000}, v8_int8 = {0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x80}}
+mm7            {uint64 = 0xb574132200000000, v2_int32 = {0x0, 0xb5741322}, v4_int16 = {0x0, 0x0, 0x1322, 0xb574}, v8_int8 = {0x0, 0x0, 0x0, 0x0, 0x22, 0x13, 0x74, 0xb5}}
+
+=====================================
+
+Dump of assembler code for function le_short_sample_stats:
+   0x6f38312c <+0>:	push   %ebp
+   0x6f38312d <+1>:	mov    %esp,%ebp
+   0x6f38312f <+3>:	sub    $0x18,%esp
+   0x6f383132 <+6>:	movl   $0x80000001,-0x4(%ebp)
+   0x6f383139 <+13>:	jmp    0x6f3831a9 <le_short_sample_stats+125>
+   0x6f38313b <+15>:	mov    0xc(%ebp),%eax
+   0x6f38313e <+18>:	add    %eax,0x8(%ebp)
+   0x6f383141 <+21>:	mov    0x8(%ebp),%eax
+=> 0x6f383144 <+24>:	movzwl (%eax),%eax
+   0x6f383147 <+27>:	mov    %ax,-0x6(%ebp)
+   0x6f38314b <+31>:	movswl -0x6(%ebp),%edx
+   0x6f38314f <+35>:	mov    0x14(%ebp),%eax
+   0x6f383152 <+38>:	mov    0x10(%eax),%eax
+   0x6f383155 <+41>:	cmp    %eax,%edx
+   0x6f383157 <+43>:	jge    0x6f383163 <le_short_sample_stats+55>
+   0x6f383159 <+45>:	movswl -0x6(%ebp),%edx
+   0x6f38315d <+49>:	mov    0x14(%ebp),%eax
+   0x6f383160 <+52>:	mov    %edx,0x10(%eax)
+   0x6f383163 <+55>:	movswl -0x6(%ebp),%edx
+   0x6f383167 <+59>:	mov    0x14(%ebp),%eax
+   0x6f38316a <+62>:	mov    0x14(%eax),%eax
+   0x6f38316d <+65>:	cmp    %eax,%edx
+   0x6f38316f <+67>:	jle    0x6f38317b <le_short_sample_stats+79>
+   0x6f383171 <+69>:	movswl -0x6(%ebp),%edx
+   0x6f383175 <+73>:	mov    0x14(%ebp),%eax
+   0x6f383178 <+76>:	mov    %edx,0x14(%eax)
+   0x6f38317b <+79>:	mov    0x14(%ebp),%eax
+   0x6f38317e <+82>:	fldl   0x8(%eax)
+   0x6f383181 <+85>:	fild   -0x6(%ebp)
+   0x6f383184 <+88>:	faddp  %st,%st(1)
+   0x6f383186 <+90>:	mov    0x14(%ebp),%eax
+   0x6f383189 <+93>:	fstpl  0x8(%eax)
+   0x6f38318c <+96>:	mov    0x14(%ebp),%eax
+   0x6f38318f <+99>:	fldl   (%eax)
+   0x6f383191 <+101>:	movswl -0x6(%ebp),%edx
+   0x6f383195 <+105>:	movswl -0x6(%ebp),%eax
+   0x6f383199 <+109>:	imul   %edx,%eax
+   0x6f38319c <+112>:	mov    %eax,-0x14(%ebp)
+   0x6f38319f <+115>:	fildl  -0x14(%ebp)
+   0x6f3831a2 <+118>:	faddp  %st,%st(1)
+   0x6f3831a4 <+120>:	mov    0x14(%ebp),%eax
+   0x6f3831a7 <+123>:	fstpl  (%eax)
+   0x6f3831a9 <+125>:	addl   $0x1,-0x4(%ebp)
+   0x6f3831ad <+129>:	mov    -0x4(%ebp),%eax
+   0x6f3831b0 <+132>:	cmp    0x10(%ebp),%eax
+   0x6f3831b3 <+135>:	jle    0x6f38313b <le_short_sample_stats+15>
+   0x6f3831b5 <+137>:	leave  
+   0x6f3831b6 <+138>:	ret    
+End of assembler dump.
+
+=====================================
+
+#0  0x6f383144 in le_short_sample_stats (buf=0x281f000 <error: Cannot access memory at address 0x281f000>, stride=4, samples=1792, stat=0x5f8064) at wavestats.c:17
+        elt = 4096
+        i = -2147474268
+#1  0x6f382aa5 in XS_Audio__FindChunks_le_short_sample_stats (my_perl=0x503794, cv=0x26476f4) at FindChunks.c:347
+        buf = 0x2815d74 ""
+        stride = 4
+        samples = 1792
+        stat = 0x5f8064
+        sp = 0x5042d0
+        ax = 6
+        mark = 0x5042c0
+        items = 4
+#2  0x65b57e40 in perl522!Perl_find_runcv () from K:\get\strawberry-perl-5.22.2.1-32bit-PDL\perl\bin\perl522.dll
+No symbol table info available.
+#3  0x00503794 in ?? ()
+No symbol table info available.
+#4  0x026b937c in ?? ()
+No symbol table info available.
+
+=====================================
+
+Dump of assembler code for function le_short_sample_stats:
+6	{
+   0x6f38312c <+0>:	push   %ebp
+   0x6f38312d <+1>:	mov    %esp,%ebp
+   0x6f38312f <+3>:	sub    $0x18,%esp
+
+7	    long i = -0x7fffffff;
+   0x6f383132 <+6>:	movl   $0x80000001,-0x4(%ebp)
+
+8	#if WAVESTATS_DEBUG
+9	    char *ibuf = buf;
+10	#endif
+11	    while (++i <= samples) {
+   0x6f383139 <+13>:	jmp    0x6f3831a9 <le_short_sample_stats+125>
+   0x6f3831a9 <+125>:	addl   $0x1,-0x4(%ebp)
+   0x6f3831ad <+129>:	mov    -0x4(%ebp),%eax
+   0x6f3831b0 <+132>:	cmp    0x10(%ebp),%eax
+   0x6f3831b3 <+135>:	jle    0x6f38313b <le_short_sample_stats+15>
+
+12		short elt;
+13	
+14		buf += stride;
+   0x6f38313b <+15>:	mov    0xc(%ebp),%eax
+   0x6f38313e <+18>:	add    %eax,0x8(%ebp)
+
+15	#if NATIVE_LE_SHORTS
+16	#  define NAT 1
+17		elt = *(short*)(void*)buf;	/* Avoid a warning about change of alignment */
+   0x6f383141 <+21>:	mov    0x8(%ebp),%eax
+=> 0x6f383144 <+24>:	movzwl (%eax),%eax
+   0x6f383147 <+27>:	mov    %ax,-0x6(%ebp)
+
+18	#else
+19	#  define NAT 0
+20		{
+21		    unsigned int u = *(unsigned char*)buf;
+22		    u += (*(unsigned char*)(buf+1))<<8;
+23		    if (u >= 0x8000)
+24			elt = u - 0x10000;
+25		    else
+26			elt = u;
+27		}
+28	#endif
+29	#if WAVESTATS_DEBUG
+30		if (elt > 40 && buf >= ibuf + 4) {
+31		    char b[512];
+32		    sprintf(b, "@%#lx: %d, NAT=%d; %#x %#x %#x %#x | %#x %#x %#x %#x\n",
+33			    (long)(buf - ibuf), (int)elt, NAT,
+34			    (int)buf[-4], (int)buf[-3], (int)buf[-2], (int)buf[-1],
+35			    (int)buf[0], (int)buf[1], (int)buf[2], (int)buf[3]);
+36		    write(2,b,strlen(b));
+37		}
+38	#endif
+39		if (elt < stat->min)
+   0x6f38314b <+31>:	movswl -0x6(%ebp),%edx
+   0x6f38314f <+35>:	mov    0x14(%ebp),%eax
+   0x6f383152 <+38>:	mov    0x10(%eax),%eax
+   0x6f383155 <+41>:	cmp    %eax,%edx
+   0x6f383157 <+43>:	jge    0x6f383163 <le_short_sample_stats+55>
+
+40		    stat->min = elt;
+   0x6f383159 <+45>:	movswl -0x6(%ebp),%edx
+   0x6f38315d <+49>:	mov    0x14(%ebp),%eax
+   0x6f383160 <+52>:	mov    %edx,0x10(%eax)
+
+41		if (elt > stat->max)
+   0x6f383163 <+55>:	movswl -0x6(%ebp),%edx
+   0x6f383167 <+59>:	mov    0x14(%ebp),%eax
+   0x6f38316a <+62>:	mov    0x14(%eax),%eax
+   0x6f38316d <+65>:	cmp    %eax,%edx
+   0x6f38316f <+67>:	jle    0x6f38317b <le_short_sample_stats+79>
+
+42		    stat->max = elt;
+   0x6f383171 <+69>:	movswl -0x6(%ebp),%edx
+   0x6f383175 <+73>:	mov    0x14(%ebp),%eax
+   0x6f383178 <+76>:	mov    %edx,0x14(%eax)
+
+43		stat->sum += elt;
+   0x6f38317b <+79>:	mov    0x14(%ebp),%eax
+   0x6f38317e <+82>:	fldl   0x8(%eax)
+   0x6f383181 <+85>:	fild   -0x6(%ebp)
+   0x6f383184 <+88>:	faddp  %st,%st(1)
+   0x6f383186 <+90>:	mov    0x14(%ebp),%eax
+   0x6f383189 <+93>:	fstpl  0x8(%eax)
+
+44		stat->sum_square += elt*elt;
+   0x6f38318c <+96>:	mov    0x14(%ebp),%eax
+   0x6f38318f <+99>:	fldl   (%eax)
+   0x6f383191 <+101>:	movswl -0x6(%ebp),%edx
+   0x6f383195 <+105>:	movswl -0x6(%ebp),%eax
+   0x6f383199 <+109>:	imul   %edx,%eax
+   0x6f38319c <+112>:	mov    %eax,-0x14(%ebp)
+   0x6f38319f <+115>:	fildl  -0x14(%ebp)
+   0x6f3831a2 <+118>:	faddp  %st,%st(1)
+   0x6f3831a4 <+120>:	mov    0x14(%ebp),%eax
+   0x6f3831a7 <+123>:	fstpl  (%eax)
+
+45	    }
+46	}
+   0x6f3831b5 <+137>:	leave  
+   0x6f3831b6 <+138>:	ret    
+
+End of assembler dump.
+
+=====================================
+
+Thread Information Block Thread 3504.0x2580 at 0x7efdd000
+ current_seh                  is 0x0028ffc4
+ current_top_of_stack         is 0x00290000
+ current_bottom_of_stack      is 0x0028b000
+ sub_system_tib               is 0x00000000
+ fiber_data                   is 0x00001e00
+ arbitrary_data_slot          is 0x00000000
+ linear_address_tib           is 0x7efdd000
+ environment_pointer          is 0x00000000
+ process_id                   is 0x00000db0
+ current_thread_id            is 0x00002580
+ active_rpc_handle            is 0x00000000
+ thread_local_storage         is 0x00736db8
+ process_environment_block    is 0x7efde000
+ last_error_number            is 0x00000006
+
+=====================================
+
+From        To          Syms Read   Shared Object Library
+0x77050000  0x771b4d1c  Yes (*)     C:\Windows\SysWOW64\ntdll.dll
+0x74b60000  0x74c5ad58  Yes (*)     C:\Windows\syswow64\kernel32.dll
+0x74a71000  0x74ab5a08  Yes (*)     C:\Windows\syswow64\KernelBase.dll
+0x65ac1000  0x65c94678  Yes (*)     K:\get\strawberry-perl-5.22.2.1-32bit-PDL\perl\bin\perl522.dll
+0x753a1000  0x7543f04c  Yes (*)     C:\Windows\syswow64\advapi32.dll
+0x75981000  0x75a2b2c4  Yes (*)     C:\Windows\syswow64\msvcrt.dll
+0x75a31000  0x75a48ed8  Yes (*)     C:\Windows\SysWOW64\sechost.dll
+0x75800000  0x758d4e04  Yes (*)     C:\Windows\syswow64\rpcrt4.dll
+0x74730000  0x747711f0  Yes (*)     C:\Windows\syswow64\sspicli.dll
+0x74711000  0x7471b474  Yes (*)     C:\Windows\syswow64\cryptbase.dll
+0x71091000  0x7122d18c  Yes (*)     C:\Windows\WinSxS\x86_microsoft.windows.common-controls_6595b64144ccf1df_6.0.7601.17514_none_41e6975e2bd6f2b2\comctl32.dll
+0x75210000  0x7528192c  Yes (*)     C:\Windows\syswow64\gdi32.dll
+0x74950000  0x74a33198  Yes (*)     C:\Windows\syswow64\user32.dll
+0x75331000  0x753392f8  Yes (*)     C:\Windows\syswow64\lpk.dll
+0x74781000  0x7481c9fc  Yes (*)     C:\Windows\syswow64\usp10.dll
+0x751a1000  0x751f6b60  Yes (*)     C:\Windows\syswow64\shlwapi.dll
+0x6d0c1000  0x6d0de494  Yes         K:\get\strawberry-perl-5.22.2.1-32bit-PDL\perl\bin\libgcc_s_sjlj-1.dll
+0x64941000  0x64952574  Yes (*)     K:\get\strawberry-perl-5.22.2.1-32bit-PDL\perl\bin\libwinpthread-1.dll
+0x74c61000  0x74c94784  Yes (*)     C:\Windows\syswow64\ws2_32.dll
+0x74cc1000  0x74cc5058  Yes (*)     C:\Windows\syswow64\nsi.dll
+0x6fe41000  0x6ff28628  Yes (*)     K:\get\strawberry-perl-5.22.2.1-32bit-PDL\perl\bin\libstdc++-6.dll
+0x74e50000  0x74e90ce0  Yes (*)     C:\Windows\SysWOW64\imm32.dll
+0x75561000  0x7562bebc  Yes (*)     C:\Windows\syswow64\msctf.dll
+0x61dc1000  0x61dcb324  Yes (*)     K:\get\strawberry-perl-5.22.2.1-32bit-PDL\perl\lib\auto\Cwd\Cwd.xs.dll
+0x64ec1000  0x64ed2824  Yes (*)     K:\get\strawberry-perl-5.22.2.1-32bit-PDL\perl\lib\auto\Win32\Win32.xs.dll
+0x75041000  0x7519b0cc  Yes (*)     C:\Windows\syswow64\ole32.dll
+0x74191000  0x7419831c  Yes (*)     C:\Windows\SysWOW64\version.dll
+0x6f381000  0x6f38c494  Yes         D:\tmp\perl-modules\Audio-FindChunks-2.02-to-crash\dbg-bld\blib\arch\auto\Audio\FindChunks\FindChunks.xs.dll
+0x63a81000  0x63a8b2d4  Yes (*)     K:\get\strawberry-perl-5.22.2.1-32bit-PDL\perl\lib\auto\PerlIO\scalar\scalar.xs.dll
+(*): Shared library is missing debugging information.
+A debugging session is active.
+
+	Inferior 1 [process 3504] will be killed.
+
+Quit anyway? (y or n) [answered Y; input not from terminal]
+GNU gdb (GDB) 7.8.1
+Copyright (C) 2014 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "i686-w64-mingw32".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>.
+Find the GDB manual and other documentation resources online at:
+<http://www.gnu.org/software/gdb/documentation/>.
+For help, type "help".
+Type "apropos word" to search for commands related to "word".
+t/zzz_debug-crash.t ... ok
+
+Test Summary Report
+-------------------
+t/Audio-FindChunks.t (Wstat: 1280 Tests: 6 Failed: 0)
+  Non-zero exit status: 5
+  Parse errors: Bad plan.  You planned 37 tests but ran 6.
+Files=2, Tests=7, 16 wallclock secs ( 0.06 usr +  0.00 sys =  0.06 CPU)
+Result: FAIL
+Failed 1/2 test programs. 0/7 subtests failed.
+dmake:  Error code 255, while making 'test_dynamic'

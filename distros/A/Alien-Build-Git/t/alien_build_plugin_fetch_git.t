@@ -9,7 +9,7 @@ use Test2::Tools::URL 0.02;
 
 my $build = alienfile_ok q{
   use alienfile;
-  
+
   plugin 'Fetch::Git';
 };
 
@@ -23,12 +23,12 @@ subtest 'fetch with tag' => sub {
   my $ret;
   my $error;
   my $out;
-  
+
   note $out = capture_merged {
     $ret = eval { $build->fetch("$example1#0.02") };
     $error = $@;
   };
-  
+
   is $error, '';
   diag $out if $error;
 
@@ -40,12 +40,12 @@ subtest 'fetch with tag' => sub {
       field type     => 'file';
     },
   );
-  
+
   is(
     path($ret->{path})->child('content.txt')->slurp,
     "This is version 0.02\n",
   );
-    
+
 };
 
 subtest 'fetch without tag' => sub {
@@ -53,12 +53,12 @@ subtest 'fetch without tag' => sub {
   my $ret;
   my $error;
   my $out;
-  
+
   note $out = capture_merged {
     $ret = eval { $build->fetch("$example1") };
     $error = $@;
   };
-  
+
   is $error, '';
   diag $out if $error;
 

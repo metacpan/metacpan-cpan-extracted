@@ -14,8 +14,8 @@ use Sentry::Util qw(uuid4 truncate);
 use Time::HiRes;
 use Try::Tiny;
 
-has _dsn       => sub ($self) { Sentry::DSN->parse($self->_options->{dsn}) };
-has _options   => sub { {} };
+has _dsn     => sub ($self) { Sentry::DSN->parse($self->_options->{dsn}) };
+has _options => sub { {} };
 has _transport =>
   sub ($self) { Sentry::Transport::Http->new(dsn => $self->_dsn) };
 has scope        => sub { Sentry::Hub::Scope->new };
@@ -83,6 +83,8 @@ sub event_from_exception ($self, $exception, $hint = undef, $scope = undef) {
   });
 
   return {
+    event_id  => $hint && $hint->{event_id},
+    level     => Sentry::Severity->Error,
     exception => {
       values => [{
         type  => ref($exception),

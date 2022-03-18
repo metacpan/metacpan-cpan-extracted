@@ -40,7 +40,7 @@
    "provides" : {
       "Syntax::Keyword::Dynamically" : {
          "file" : "lib/Syntax/Keyword/Dynamically.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       }
    },
    "release_status" : "stable",
@@ -50,6 +50,6 @@
       ],
       "x_IRC" : "irc://irc.perl.org/#io-async"
    },
-   "version" : "0.09",
-   "x_serialization_backend" : "JSON::PP version 4.05"
+   "version" : "0.10",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

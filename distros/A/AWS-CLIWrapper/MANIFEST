@@ -7,6 +7,7 @@ t/00_compile.t
 t/01_new.t
 t/03_awscli_path.t
 t/03_awscli_version.t
+t/04_errors.t
 xt/01_podspell.t
 xt/02_perlcritic.t
 xt/03_pod.t

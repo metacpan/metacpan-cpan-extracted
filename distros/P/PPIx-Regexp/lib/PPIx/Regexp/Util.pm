@@ -10,7 +10,6 @@ use PPIx::Regexp::Constant qw{
     @CARP_NOT
 };
 use Scalar::Util qw{ blessed };
-use Text::Tabs ();
 
 use base qw{ Exporter };
 
@@ -20,10 +19,11 @@ our @EXPORT_OK = qw{
     __instance
     __is_ppi_regexp_element
     __ns_can
+    __post_rebless_error
     __to_ordinal_en
 };
 
-our $VERSION = '0.082';
+our $VERSION = '0.083';
 
 sub is_ppi_regexp_element {
     my ( $elem ) = @_;
@@ -65,6 +65,22 @@ sub __ns_can {
     my $fqn = join '::', ref $class || $class, $name;
     no strict qw{ refs };
     return defined &$fqn ? \&$fqn : undef;
+}
+
+sub __post_rebless_error {
+    my ( $self, %arg ) = @_;
+    my $rslt = 0;
+    unless ( defined( $self->{error} = $arg{error} ) ) {
+	my $class = ref $self;
+	Carp::cluck( "Making $class with no error message" );
+	$self->{error} = 'Unspecified error';
+	$rslt++;
+    }
+    $self->{explanation} = defined $arg{explanation} ?
+	$arg{explanation} :
+	$arg{error};
+    return $rslt;
+
 }
 
 sub __to_ordinal_en {
@@ -153,6 +169,17 @@ This subroutine is B<private> to the C<PPIx-Regexp> package.
 This method is analogous to C<can()>, but returns a reference to the
 code only if it is actually implemented by the invoking name space.
 
+=head2 __post_rebless_error
+
+This method is B<private> to the C<PPIx-Regexp> package. The intended
+use is to alias it to C<__PPIX_ELEM__post_reblessing()>.
+
+It takes arguments as name/value pairs. Argument C<{error}> is the error
+message; if it is omitted you get a warning with stack trace. Argument
+C<{explanation}> defaults to C<{error}>.
+
+It returns the number of errors to add to the parse.
+
 =head2 __to_ordinal_en
 
 This subroutine is B<private> to the C<PPIx-Regexp> package.
@@ -162,8 +189,6 @@ representing its ordinal in English. For example
 
  say __to_ordinal_en( 17 );
  # 17th
-
-=cut
 
 =head1 SEE ALSO
 
@@ -185,7 +210,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2010-2021 by Thomas R. Wyant, III
+Copyright (C) 2010-2022 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

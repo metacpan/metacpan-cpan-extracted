@@ -1,4 +1,4 @@
 export REF_TAG=0.00
 export REF_UNSUPPORTED=3.1.2
 export REF_OLDEST=3.2.0
-export REF_LATEST=3.5.1
+export REF_LATEST=3.6.0

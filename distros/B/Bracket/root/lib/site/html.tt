@@ -5,7 +5,8 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="initial-scale=1.0, width=device-width" />
-<title>[% page_head_title or page_title or template.title or site.title %] : Bracket [% c.config.year %]</title>
+[% site_title = c.config.name _ " " _ c.config.year %]
+<title>[% page_head_title or page_title or template.title %] : [% site_title %]</title>
 [%- INCLUDE lib/site/javascripts.tt -%]
 [%- INCLUDE lib/site/style_sheets.tt -%]
 </head>

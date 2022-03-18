@@ -1,3 +1,30 @@
+1.200 2022-03-15
+================
+
+[Quiq::Html::Verbatim]
+* margin: 0 in <pre> gesetzt
+
+[Quiq::PlotlyJs::XY::DiagramGroup]
+* Attribut xAxisHoverFormat einstellbar gemacht
+* Bedienelemente downloadPng, fillArea, scaleY einstellbar gemacht
+
+[Quiq::Sdoc::Producer]
+* Tabellengenerierung erweitert
+
+[Quiq::Epoch]
+* new(): Konstruktor erweitert um start-of-month etc.
+* month(): hinzugefügt
+
+[Quiq::Properties]
+* width(): zum Setter erweitert
+* format(): refakturiert
+
+[Quiq::Shell]
+* exec(): Option -capture korrigiert
+
+[Quiq::Table]
+* asAsciiTable(): hinzugefügt
+
 1.199 2022-02-13
 ================
 

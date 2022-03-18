@@ -13,7 +13,7 @@ use DynaLoader;
 
 
 
-   $PDL::VectorValued::Utils::VERSION = 1.0.17;
+   $PDL::VectorValued::Utils::VERSION = 1.0.18;
    @ISA    = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::VectorValued::Utils $VERSION;
@@ -489,7 +489,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
    $nc = PDL->null if (!defined($nc));
    &PDL::_vv_union_int($a,$b,$c,$nc);
    return ($c,$nc) if (wantarray);
-   return $c->mv(1,0)->slice("0:".($nc->max-1))->mv(0,1);
+   return $c->slice(",0:".($nc->max-1));
  }
 
 
@@ -535,7 +535,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
    return ($c,$nc) if (wantarray);
    my $nc_max = $nc->max;
    return ($nc_max > 0
-	   ? $c->mv(1,0)->slice("0:".($nc_max-1))->mv(0,1)
+	   ? $c->slice(",0:".($nc_max-1))
 	   : $c->reshape($c->dim(0), 0, ($c->dims)[2..($c->ndims-1)]));
  }
 
@@ -582,7 +582,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
   return ($c,$nc) if (wantarray);
   my $nc_max = $nc->max;
   return ($nc_max > 0
-	  ? $c->mv(1,0)->slice("0:".($nc_max-1))->mv(0,1)
+	  ? $c->slice(",0:".($nc_max-1))
 	  : $c->reshape($c->dim(0), 0, ($c->dims)[2..($c->ndims-1)]));
  }
 
@@ -851,7 +851,7 @@ the file.
 
 =item *
 
-All other parts copyright (c) 2007-2021, Bryan Jurish.  All rights reserved.
+All other parts copyright (c) 2007-2022, Bryan Jurish.  All rights reserved.
 
 This package is free software, and entirely without warranty.
 You may redistribute it and/or modify it under the same terms

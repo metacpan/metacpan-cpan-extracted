@@ -36,7 +36,7 @@
 #  -raw   use internal format for output with @x markers, -detex is implicit
 #         (for the TeX-to-pod converter)
 #
-#  -to_pod file		convert file to POD (should be the only args)
+#  -to_pod file		convert file to POD (should be the first arg, only --pari-version=... is allowed after)
 #
 #  -to_dumb_pod file	same, but without nested formating
 #
@@ -62,10 +62,13 @@ $zcat = "$gzip -dc";
 
 $refcard = (@ARGV and $ARGV[-1] =~ /refcard/i);
 
-$dumb_pod=1, $ARGV[0] = '-to_pod' if @ARGV && $ARGV[0] eq '-to_dumb_pod';
-&to_pod() if @ARGV == 2 && $ARGV[0] eq '-to_pod';
+$to_pod = shift if @ARGV && $ARGV[0] =~ /^-to_(dumb_)?pod$/;
+&options(); 
 
-&options(); &init();
+$dumb_pod=1 if ($to_pod || '') eq '-to_dumb_pod';
+&to_pod() if $to_pod;
+
+&init();
 if ($#ARGV < 0) { &treat($_); cleanexit(); }
 
 &pretex() if (!$detex);
@@ -116,6 +119,8 @@ sub options
       { $cb = &color(shift(@ARGV)); }
     elsif ($_ eq "-color_underline" || $_ eq "-cu")
       { $cu = &color(shift(@ARGV)); }
+    elsif ($_ =~ /^-pari-version=(.*)/)
+      { $version = $1; }
     else
       { &help(); }
   }
@@ -955,7 +960,7 @@ sub TeXprint_topod {
   s/(\\(?:section|subsec(?:ref|idx|op)?)\s*{(?:(?:[^{}]+(?=[{}])|{[^{}]+})+)})\.?\s*\\(label|(kbd)?sidx)/$1\n\\$2/;
 
   # last if /\\subsec[\\{}ref]*[\\\${]$help[}\\\$]/o;
-  s/\\chapter\s*{((?:[^{}]|\{[^{}]*\})*)}\s*/\n\n$tr{podleader}head1 NAME\n\nlibPARI - $1\n\n$tr{podleader}head1 DESCRIPTION\n\n/;
+  s/\\chapter\s*{((?:[^{}]|\{[^{}]*\})*)}\s*/package Math::libPARI;\n1;\n\n$tr{podleader}head1 NAME\n\nMath::libPARI - $1\n\n$tr{podleader}head1 DESCRIPTION\n\n/;
   s/\\appendix\s*{((?:[^{}]|\{[^{}]*\})*)}\s*/\n\n$tr{podleader}head1 NAME\n\nAppendix - $1\n\n$tr{podleader}head1 DESCRIPTION\n\n/;
   s/\\section\s*{((?:[^{}]|\{[^{}]*\})*)}\s*/"\n\n$tr{podleader}head1 " . indexify($1) . "\n\n"/e;
 
@@ -1119,7 +1124,7 @@ sub TeXprint
 }
 
 sub to_pod {
-  $to_pod = $ARGV[1];
+  $to_pod = $ARGV[0];
   inittr();
   $parifile = $to_pod;
   %compress = ('.gz', 'gzip -cd',

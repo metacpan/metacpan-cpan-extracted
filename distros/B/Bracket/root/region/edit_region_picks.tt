@@ -1,4 +1,8 @@
-[% page_title = "Edit Regional Picks - Men's Basketball - NCAA Tournament " _  c.config.year  %]
+[% page_title = "Edit Regional Picks - Men's Basketball - NCAA Tournament" %]
+
+ [% IF is_admin;
+    INCLUDE 'admin/links.tt';
+ END %]
 
 <div class="container">
 <h1>
@@ -72,6 +76,6 @@ for player: <em>[% player_name %]</em><br />
 [% team = teams.next %]
 		<tr>  <td><p>[% team.seed %]. [% team.name %]<span id="r0-t[% team.id %]-rg[% region %]"></span></p></td>  </tr> 
 	</table> 
-	<input type="submit" value="Save Picks" />
+	<input class="save_picks" type="submit" value="Save Picks" />
 	</form>
 </div>

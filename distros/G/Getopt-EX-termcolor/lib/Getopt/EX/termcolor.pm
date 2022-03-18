@@ -4,10 +4,6 @@
 
 Getopt::EX::termcolor - Getopt::EX termcolor module
 
-=head1 VERSION
-
-Version 1.07
-
 =head1 SYNOPSIS
 
     use Getopt::EX::Loader;
@@ -24,6 +20,10 @@ Version 1.07
 
     $ command -Mtermcolor::bg=
 
+=head1 VERSION
+
+Version 1.08
+
 =head1 DESCRIPTION
 
 This is a common module for command using L<Getopt::EX> to manipulate
@@ -35,9 +35,9 @@ such as L<Getopt::EX::termcolor::Apple_Terminal>.
 Each sub-module is expected to have C<&get_color> function which
 return the list of RGB values for requested name, but currently name
 C<background> is only supported.  Each RGB values are expected in a
-range of 0 to 255 by default.  If the list first entry is a HASH
-reference, it may include maximum number indication like C<< { max =>
-65535 } >>.
+range of 0 to 255 by default.  If the first entry of the list is a
+HASH reference, it may include maximum number indication like C<< {
+max => 65535 } >>.
 
 Terminal luminance is calculated from RGB values by this equation and
 produces decimal value from 0 to 100.
@@ -113,7 +113,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright (C) 2020 Kazumasa Utashiro.
+Copyright 2020-2021 Kazumasa Utashiro.
 
 You can redistribute it and/or modify it under the same terms
 as Perl itself.
@@ -123,7 +123,7 @@ as Perl itself.
 use v5.14;
 package Getopt::EX::termcolor;
 
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 
 use warnings;
 use Carp;
@@ -131,8 +131,8 @@ use Data::Dumper;
 
 use Exporter 'import';
 our @EXPORT      = qw();
-our %EXPORT_TAGS = ();
 our @EXPORT_OK   = qw(rgb_to_luminance rgb_to_brightness luminance bgcolor);
+our %EXPORT_TAGS = (all => [ @EXPORT_OK ]);
 
 #
 # For backward compatibility.

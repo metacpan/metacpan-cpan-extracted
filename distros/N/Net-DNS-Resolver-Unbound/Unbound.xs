@@ -91,6 +91,13 @@ static void async_callback(void* mydata, int err, struct ub_result* result)
 
 MODULE = Net::DNS::Resolver::Unbound	PACKAGE = Net::DNS::Resolver::Unbound::Handle
 
+PROTOTYPES: ENABLE
+
+void
+DESTROY(struct av* handle)
+    CODE:
+	av_pop(handle);
+
 int
 async_id(struct av* handle)
     INIT:
@@ -100,12 +107,13 @@ async_id(struct av* handle)
     OUTPUT:
 	RETVAL
 
-int
+SV*
 err(struct av* handle)
     INIT:
 	SV** index = av_fetch(handle, 1, 0);
+	int err = index ? SvIVX(*index) : 0;
     CODE:
-	RETVAL = index ? SvIVX(*index) : 0;
+	RETVAL = newSVpvf( err ? "%s (%d)" : "", ub_strerror(err), err );
     OUTPUT:
 	RETVAL
 
@@ -127,14 +135,14 @@ waiting(struct av* handle)
     OUTPUT:
 	RETVAL
 
-void
-DESTROY(struct av* handle)
-    CODE:
-	av_pop(handle);
-
 
 
 MODULE = Net::DNS::Resolver::Unbound	PACKAGE = Net::DNS::Resolver::Unbound::Result
+
+void
+DESTROY(struct ub_result* result)
+    CODE:
+	ub_resolve_free(result);
 
 SV*
 answer_packet(struct ub_result* result)
@@ -164,11 +172,6 @@ why_bogus(struct ub_result* result)
     OUTPUT:
 	RETVAL
 
-void
-DESTROY(struct ub_result* result)
-    CODE:
-	ub_resolve_free(result);
-
 
 
 MODULE = Net::DNS::Resolver::Unbound	PACKAGE = Net::DNS::Resolver::Unbound::Context
@@ -179,6 +182,11 @@ new(void)
 	RETVAL = ub_ctx_create();
     OUTPUT:
 	RETVAL
+
+void
+DESTROY(struct ub_ctx* context)
+    CODE:
+	ub_ctx_delete(context);
 
 void
 set_option(struct ub_ctx* ctx, SV* opt, SV* val)
@@ -261,24 +269,6 @@ async(struct ub_ctx* ctx, int dothread)
     CODE:
 	checkerr( ub_ctx_async(ctx, dothread) );
 
-void
-DESTROY(struct ub_ctx* context)
-    CODE:
-	ub_ctx_delete(context);
-
-
-
-MODULE = Net::DNS::Resolver::Unbound	PACKAGE = Net::DNS::Resolver::libunbound
-
-PROTOTYPES: ENABLE
-
-SV*
-VERSION(void)
-    CODE:
-	RETVAL = newSVpv( ub_version(), 0 );
-    OUTPUT:
-	RETVAL
-
 
 Net::DNS::Resolver::Unbound::Result
 ub_resolve(struct ub_ctx* ctx, SV* name, int rrtype, int rrclass)
@@ -311,13 +301,20 @@ ub_wait(struct ub_ctx* ctx)
 	checkerr( ub_wait(ctx) );
 
 
-const char*
-ub_strerror(int err)
+
+MODULE = Net::DNS::Resolver::Unbound	PACKAGE = Net::DNS::Resolver::libunbound
+
+SV*
+VERSION(void)
+    CODE:
+	RETVAL = newSVpv( ub_version(), 0 );
+    OUTPUT:
+	RETVAL
 
 
-####################
-# TEST PURPOSES ONLY
-####################
+########################
+## TEST PURPOSES ONLY ##
+########################
 
 Net::DNS::Resolver::Unbound::Handle
 emulate_error(int async_id, int err, ...)
@@ -336,12 +333,5 @@ emulate_wait(int async_id)
     OUTPUT:
 	RETVAL
 
-
-#ifdef croak_memory_wrap
-void
-croak_memory_wrap()
-
-#endif
-
-####################
+########################
 

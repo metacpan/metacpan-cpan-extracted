@@ -9,6 +9,7 @@ use lib Mojo::File->new(Cwd::realpath((caller)[1]))->sibling('lib')->to_string;
 
 use Mojo::Util 'dumper';
 use Sentry::Hub::Scope;
+use Sentry::Severity;
 use Sentry::Tracing::Span;
 use Sentry::Tracing::Transaction;
 use Test::Spec;
@@ -32,6 +33,22 @@ describe 'Sentry::Hub::Scope' => sub {
 
       is_deeply $event->{request}, { url => 'http://example.com' };
     };
+
+    describe 'level' => sub {
+      it 'defaults to level "info"' => sub {
+        my $event = $scope->apply_to_event({});
+
+        is_deeply $event->{level}, Sentry::Severity->Info;
+      };
+
+      it 'does not override the event level' => sub {
+        my $event
+          = $scope->apply_to_event({ level => Sentry::Severity->Fatal });
+
+        is_deeply $event->{level}, Sentry::Severity->Fatal;
+      };
+    };
+
   };
 };
 

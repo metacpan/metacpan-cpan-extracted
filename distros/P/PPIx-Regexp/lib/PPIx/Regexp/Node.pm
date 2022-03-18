@@ -49,7 +49,7 @@ use PPIx::Regexp::Constant qw{
 use PPIx::Regexp::Util qw{ __instance };
 use Scalar::Util qw{ refaddr };
 
-our $VERSION = '0.082';
+our $VERSION = '0.083';
 
 use constant ELEMENT_UNKNOWN	=> NODE_UNKNOWN;
 
@@ -526,8 +526,7 @@ sub __error {
     my ( $self, $msg, %arg ) = @_;
     defined $msg
 	or $msg = 'Was class ' . ref $self;
-    $self->{error} = $msg;
-    bless $self, $self->ELEMENT_UNKNOWN();
+    $self->ELEMENT_UNKNOWN()->__PPIX_ELEM__rebless( $self, error => $msg );
     foreach my $key ( keys %arg ) {
 	$self->{$key} = $arg{$key};
     }
@@ -572,7 +571,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2009-2021 by Thomas R. Wyant, III
+Copyright (C) 2009-2022 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

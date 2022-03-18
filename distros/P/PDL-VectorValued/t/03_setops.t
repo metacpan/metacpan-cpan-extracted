@@ -218,7 +218,7 @@ sub test_vv_intersect_implicit_dims {
 
   intersect_ok('vv_intersect - implicit dims - needles8x&haystack8',
 	       $needles8x, $haystack8,
-	       $c_want8, $nc_want8, undef
+	       $c_want8, $nc_want8, $c_want8
 	      );
 }
 test_vv_intersect_implicit_dims();

@@ -1,14 +1,12 @@
 AsyncAwait.h
 Build.PL
 Changes
+hax/newOP_CUSTOM.c.inc
 hax/perl-additions.c.inc
+hax/perl-backcompat.c.inc
 lib/Syntax/Keyword/Dynamically.pm
 lib/Syntax/Keyword/Dynamically.xs
-LICENSE
 MANIFEST			This list of files
-META.json
-META.yml
-README
 t/00use.t
 t/01dynamically.t
 t/02tiescalar.t
@@ -19,4 +17,7 @@ t/80dynamically+Object-Pad.t
 t/80dynamically+Sentinel.t
 t/81async-method+dynamically.t
 t/99pod.t
-tom-test.pl
+README
+LICENSE
+META.yml
+META.json

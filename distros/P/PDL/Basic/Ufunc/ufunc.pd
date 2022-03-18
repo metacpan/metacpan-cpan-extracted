@@ -361,30 +361,19 @@ for my $which (
 	    '$GENERIC() cur = 0;
 	     int flag = 0;
 	     loop(n) %{
-		if( !flag || ($a() '.$op.' cur ) || PDL_ISNAN_$PPSYM()(cur) ) { cur = $a(); flag = 1;}
-	     %}
-	     if(flag && !PDL_ISNAN_$PPSYM()(cur)) {
-		     $c() = cur;
-             } else {
-	             $SETBAD(c());
-		     $PDLSTATESETBAD(c);
-             }
-		     ',
-	    BadCode =>
-	    '$GENERIC() cur = 0;
-             int flag = 0;
-	     loop(n) %{
-		if( $ISGOOD(a()) && ($a()*0 == 0) && (!flag || $a() '.$op.' cur)) {cur = $a(); flag = 1;}
+		PDL_IF_BAD(if ($ISBAD(a())) continue;,)
+		if( !flag || ($a() '.$op.' cur ) || PDL_ISNAN_$PPSYM()(cur) )
+                  {cur = $a(); flag = 1;}
 	     %}
              if ( flag ) { $c() = cur; }
              else        { $SETBAD(c()); $PDLSTATESETBAD(c); }',
 	    CopyBadStatusCode => '',
 	    Doc => projectdocs($name,$name,''),
 	    BadDoc =>
-'Output is set bad if all elements of the input are bad,
+'Output is set bad if no elements of the input are non-bad,
 otherwise the bad flag is cleared for the output ndarray.
 
-Note that C<NaNs> are considered to be valid values;
+Note that C<NaNs> are considered to be valid values and will "win" over non-C<NaN>;
 see L<isfinite|PDL::Math/isfinite> and L<badmask|PDL::Math/badmask>
 for ways of masking NaNs.
 ',
@@ -399,40 +388,45 @@ for ways of masking NaNs.
 	    '$GENERIC() cur = 0;
              PDL_Indx curind = -1;
 	     loop(n) %{
+		PDL_IF_BAD(if ($ISBAD(a())) continue;,)
 		if(curind == -1 || $a() '.$op.' cur || PDL_ISNAN_$PPSYM()(cur))
 		   {cur = $a(); curind = n;}
 	     %}
-	     if(curind != -1 && !PDL_ISNAN_$PPSYM()(cur)) {
-	       $c() = curind;
-	     } else {
-	          $SETBAD(c());
-                  $PDLSTATESETBAD(c);
-	     }
-	       ',
-	    BadCode =>
-	    '$GENERIC() cur = 0;
-             PDL_Indx curind = -1;
-	     loop(n) %{
-		if( $ISGOOD(a()) && (curind == -1 || $a() '.$op.' cur))
-                   {cur = $a(); curind = n;}
-	     %}
-             if ( curind != -1 && !PDL_ISNAN_$PPSYM()(cur) ) { $c() = curind; }
+             if ( curind != -1 ) { $c() = curind; }
              else        { $SETBAD(c()); $PDLSTATESETBAD(c); }',
 	    CopyBadStatusCode => '',
 	    Doc => "Like $name but returns the index rather than the value",
 	    BadDoc =>
-'Output is set bad if all elements of the input are bad,
-otherwise the bad flag is cleared for the output ndarray.',
+'Output is set bad if no elements of the input are non-bad,
+otherwise the bad flag is cleared for the output ndarray.
+
+Note that C<NaNs> are considered to be valid values and will "win" over non-C<NaN>;
+see L<isfinite|PDL::Math/isfinite> and L<badmask|PDL::Math/badmask>
+for ways of masking NaNs.
+',
 	    );
     synonym("${name}_ind", "${synonym}_ind");
 
     pp_def(
 	    "${name}_n_ind",
-	    HandleBad => 0,   # just a marker
+	    HandleBad => 1,
 	    Pars => 'a(n); indx [o]c(m);',
+	    OtherPars => 'PDL_Indx m_size => m;',
+	    PMCode => PDL::PP::pp_line_numbers(__LINE__, <<EOF),
+sub PDL::${name}_n_ind {
+  my (\$a, \$c, \$m_size) = \@_;
+  \$m_size //= ref(\$c) ? \$c->dim(0) : \$c; # back-compat with pre-2.077
+  my \$set_out = 1;
+  \$set_out = 0, \$c = null if !ref \$c;
+  \$c = \$c->indx if !\$c->isnull;
+  PDL::_${name}_n_ind_int(\$a, \$c, \$m_size);
+  \$set_out ? \$_[1] = \$c : \$c;
+}
+EOF
 	    Code =>
 	    '$GENERIC() cur = 0; PDL_Indx curind; register PDL_Indx ns = $SIZE(n);
-	     if($SIZE(m) > $SIZE(n)) $CROAK("n_ind: m_size > n_size");
+	     if($SIZE(m) > $SIZE(n)) $CROAK("m_size > n_size");
+	     $PDLSTATESETGOOD(c);
 	     loop(m) %{
 		 curind = ns;
 		 loop(n) %{
@@ -441,13 +435,37 @@ otherwise the bad flag is cleared for the output ndarray.',
 				if($c(m=>nm) == n) {flag=1; break;}
 			}
 			if(!flag &&
+			   PDL_IF_BAD($ISGOOD(a()) &&,)
 			   ((curind == ns) || $a() '.$op.' cur || PDL_ISNAN_$PPSYM()(cur)))
 				{cur = $a(); curind = n;}
 		 %}
-		 $c() = curind;
+		 if (curind != ns) { $c() = curind; }
+		 else              { $SETBAD(c()); $PDLSTATESETBAD(c); }
 	     %}',
-	    Doc => "Returns the index of C<m> $name elements",
-	    BadDoc => 'Not yet been converted to ignore bad values',
+	    CopyBadStatusCode => '',
+	    Doc => <<EOF,
+=for ref
+
+Returns the index of C<m_size> $name elements. As of 2.077, you can
+specify how many by either passing in an ndarray of the given size
+(DEPRECATED - will be converted to indx if needed and the input arg will
+be set to that), or just the size, or a null and the size.
+
+=for usage
+
+  ${name}_n_ind(\$pdl, \$out = zeroes(5)); # DEPRECATED
+  \$out = ${name}_n_ind(\$pdl, 5);
+  ${name}_n_ind(\$pdl, \$out = null, 5);
+
+EOF
+	    BadDoc =>
+'Output bad flag is cleared for the output ndarray if sufficient non-bad elements found,
+else remaining slots in C<$c()> are set bad.
+
+Note that C<NaNs> are considered to be valid values and will "win" over non-C<NaN>;
+see L<isfinite|PDL::Math/isfinite> and L<badmask|PDL::Math/badmask>
+for ways of masking NaNs.
+',
 	    );
     synonym("${name}_n_ind", "${synonym}_n_ind");
 } # foreach: $which
@@ -636,7 +654,7 @@ Returns a list with minimum and maximum values of an ndarray.
 This routine does I<not> broadcast over the dimensions of C<$pdl>;
 it returns the minimum and maximum values of the whole ndarray.
 See L</minmaximum> if this is not what is required.
-The two values are returned as Perl scalars similar to min/max,
+The two values are returned as Perl scalars,
 and therefore ignore whether the values are bad.
 
 =for example

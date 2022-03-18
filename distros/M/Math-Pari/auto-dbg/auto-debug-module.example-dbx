@@ -1,0 +1,236 @@
+PERL_DL_NONLAZY=1 /usr/local/bin/perl "-MExtUtils::Command::MM" "-e" "test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+t/Audio-FindChunks....dubious
+	Test returned status 0 (wstat 11, 0xb)
+DIED. FAILED tests 4-32
+	Failed 29/32 tests, 9.38% okay
+t/zzz_debug-crash.....# reporting ./Makefile header:
+# ==========================
+#     ABSTRACT_FROM => q[FindChunks.pm]
+#     AUTHOR => q[Ilya Zakharevich <cpan@ilyaz.org>]
+#     DEFINE => q[]
+#     INC => q[-I.]
+#     LIBS => [q[]]
+#     NAME => q[Audio::FindChunks]
+#     OBJECT => q[$(O_FILES)]
+#     PREREQ_PM => { Data::Flow=>q[0.09] }
+#     VERSION_FROM => q[FindChunks.pm]
+#     clean => { FILES=>q[*.tmp tmp.*] }
+# ==========================
+Can't exec "gdb": No such file or directory at utils/auto-debug-module.pl line 123.
+cannot bind, not a tty
+cannot bind, not a tty
+cannot bind, not a tty
+cannot bind, not a tty
+cannot bind, not a tty
+cannot bind, not a tty
+cannot bind, not a tty
+cannot bind, not a tty
+cannot bind, not a tty
+cannot bind, not a tty
+cannot bind, not a tty
+Checking if your kit is complete...
+Looks good
+Writing Makefile for Audio::FindChunks
+make[1]: Entering directory `/tmp/Audio-FindChunks-1.04/dbg-bld'
+cp FindChunks.pm blib/lib/Audio/FindChunks.pm
+/usr/local/bin/perl /local/sol/9/depot/perl-5.8.7/lib/5.8.7/ExtUtils/xsubpp  -typemap /local/sol/9/depot/perl-5.8.7/lib/5.8.7/ExtUtils/typemap -typemap typemap  FindChunks.xs > FindChunks.xsc && mv FindChunks.xsc FindChunks.c
+cc -c  -I. -I/usr/local/include -I/opt/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -g   -DVERSION=\"1.04\" -DXS_VERSION=\"1.04\" -KPIC "-I/local/sol/9/depot/perl-5.8.7/lib/5.8.7/sun4-solaris/CORE"   FindChunks.c
+cc -c  -I. -I/usr/local/include -I/opt/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -g   -DVERSION=\"1.04\" -DXS_VERSION=\"1.04\" -KPIC "-I/local/sol/9/depot/perl-5.8.7/lib/5.8.7/sun4-solaris/CORE"   wavestats.c
+Running Mkbootstrap for Audio::FindChunks ()
+chmod 644 FindChunks.bs
+rm -f blib/arch/auto/Audio/FindChunks/FindChunks.so
+LD_RUN_PATH="" cc  -G -L/usr/lib -L/usr/ccs/lib -L/local/sol/2.6/depot/ForteDeveloper-6u2/SUNWspro/WS6U2/lib -L/usr/local/lib -L/opt/local/lib FindChunks.o wavestats.o  -o blib/arch/auto/Audio/FindChunks/FindChunks.so      
+chmod 755 blib/arch/auto/Audio/FindChunks/FindChunks.so
+cp FindChunks.bs blib/arch/auto/Audio/FindChunks/FindChunks.bs
+chmod 644 blib/arch/auto/Audio/FindChunks/FindChunks.bs
+Manifying blib/man3/Audio::FindChunks.3
+make[1]: Leaving directory `/tmp/Audio-FindChunks-1.04/dbg-bld'
+cannot bind, not a tty
+cannot bind, not a tty
+cannot bind, not a tty
+cannot bind, not a tty
+cannot bind, not a tty
+cannot bind, not a tty
+cannot bind, not a tty
+cannot bind, not a tty
+cannot bind, not a tty
+cannot bind, not a tty
+cannot bind, not a tty
+Reading /usr/local/bin/perl
+Reading /usr/lib/ld.so.1
+Reading /usr/lib/libsocket.so.1
+Reading /usr/lib/libnsl.so.1
+Reading /usr/lib/libdl.so.1
+Reading /usr/lib/libm.so.1
+Reading /usr/lib/libc.so.1
+Reading /usr/lib/libmp.so.2
+Reading /usr/platform/sun4u/lib/libc_psr.so.1
+Running: /usr/local/bin/perl -Mblib t/Audio-FindChunks.t 
+(process id 4340)
+Reading /local/sol/9/depot/perl-5.8.7/lib/5.8.7/sun4-solaris/auto/Cwd/Cwd.so
+1..32
+# Running under perl version 5.008007 for solaris
+# Current time local: Thu Aug 26 20:38:07 2010
+# Current time GMT:   Fri Aug 27 03:38:07 2010
+# Using Test.pm version 1.25
+Reading blib/arch/auto/Audio/FindChunks/FindChunks.so
+ok 1
+ok 2
+ok 3
+signal SEGV (no mapping at the fault address) in le_short_sample_stats at line 13 in file "wavestats.c"
+   13   	buf[100000000] = 1;	
+
+=================================
+
+=>[1] le_short_sample_stats(buf = 0x284274 "^H", stride = 4, samples = 1792, stat = 0x23b468), line 13 in "wavestats.c"
+  [2] XS_Audio__FindChunks_le_short_sample_stats(cv = 0x22edcc), line 158 in "FindChunks.c"
+  [3] Perl_pp_entersub(0x80, 0x1, 0x22edcc, 0x135000, 0x27e674, 0x13a27c), at 0x984ec
+  [4] Perl_runops_standard(0x238dc8, 0x135000, 0x8e67c, 0x238dc8, 0x13c800, 0x13a000), at 0x8e6c8
+  [5] S_run_body(0x1, 0x0, 0x13c800, 0x13cc00, 0x0, 0x0), at 0x28cdc
+  [6] perl_run(0x1, 0x0, 0x1, 0x13a400, 0x13cc00, 0x13a400), at 0x28988
+  [7] main(0x3, 0xffbff694, 0xffbff6a4, 0x12d800, 0x0, 0x0), at 0x24dcc
+
+=================================
+
+elt = 0
+samples = 1792
+ibuf = 0x284270 ""
+stat = 0x23b468
+stride = 4
+buf = 0x284274 "^H"
+i = 1
+__func__ = "le_short_sample_stats"
+
+=================================
+
+current frame:  [1]
+g0-g3	 0x00000000 0x000000f4 0x00000045 0x00000001
+g4-g7	 0x00000000 0x00000000 0x00000000 0x00000000
+o0-o3	 0x00000301 0x00000003 0x00151f48 0x00800000
+o4-o7	 0x00000300 0x00000000 0xffbff2b0 0x7f9f3e4c
+l0-l3	 0x00284274 0x05f5e100 0x00000001 0x00000000
+l4-l7	 0x00000004 0x00000000 0x00000000 0x7fa04f2c
+i0-i3	 0x00284270 0x00000004 0x00000700 0x0023b468
+i4-i7	 0x00000096 0x0013c800 0xffbff328 0x7f9f30f4
+y	 0x00000000
+ccr	 0x00000099
+pc	 0x7f9f3ebc:le_short_sample_stats+0x84	stb     %l2, [%l0 + %l1]
+npc	 0x7f9f3ec0:le_short_sample_stats+0x88	ld      [%fp + 0x44], %l0
+
+=================================
+
+   13   	buf[100000000] = 1;	
+0x7f9f3eac: le_short_sample_stats+0x0074:	mov     0x1, %l2
+0x7f9f3eb0: le_short_sample_stats+0x0078:	ld      [%fp + 0x44], %l0
+0x7f9f3eb4: le_short_sample_stats+0x007c:	sethi   %hi(0x5f5e000), %l1
+0x7f9f3eb8: le_short_sample_stats+0x0080:	or      %l1, 0x100, %l1
+0x7f9f3ebc: le_short_sample_stats+0x0084:	stb     %l2, [%l0 + %l1]
+
+=================================
+
+    4   void
+    5   le_short_sample_stats(char *buf, int stride, long samples, array_stats_t *stat)
+    6   {
+    7       long i = 0;
+0x7f9f3e38: le_short_sample_stats       :	save    %sp, -0x78, %sp
+0x7f9f3e3c: le_short_sample_stats+0x0004:	st      %i3, [%fp + 0x50]
+0x7f9f3e40: le_short_sample_stats+0x0008:	st      %i2, [%fp + 0x4c]
+0x7f9f3e44: le_short_sample_stats+0x000c:	st      %i1, [%fp + 0x48]
+0x7f9f3e48: le_short_sample_stats+0x0010:	st      %i0, [%fp + 0x44]
+0x7f9f3e4c: le_short_sample_stats+0x0014:	call    le_short_sample_stats+0x1c
+0x7f9f3e50: le_short_sample_stats+0x0018:	sethi   %hi(0x0), %l0
+0x7f9f3e54: le_short_sample_stats+0x001c:	or      %l0, 0x0, %l0
+0x7f9f3e58: le_short_sample_stats+0x0020:	add     %o7, %l0, %l0
+0x7f9f3e5c: le_short_sample_stats+0x0024:	st      %l0, [%fp - 0x14]
+0x7f9f3e60: le_short_sample_stats+0x0028:	sethi   %hi(0x11000), %l1
+0x7f9f3e64: le_short_sample_stats+0x002c:	or      %l1, 0xe0, %l1
+0x7f9f3e68: le_short_sample_stats+0x0030:	add     %l0, %l1, %l7
+0x7f9f3e6c: le_short_sample_stats+0x0034:	add     %l0, %l1, %l7
+0x7f9f3e70: le_short_sample_stats+0x0038:	st      %g0, [%fp - 0x4]
+    8       char *ibuf = buf;
+0x7f9f3e74: le_short_sample_stats+0x003c:	ld      [%fp + 0x44], %l0
+0x7f9f3e78: le_short_sample_stats+0x0040:	st      %l0, [%fp - 0x8]
+    9       while (++i <= samples) {
+0x7f9f3e7c: le_short_sample_stats+0x0044:	ld      [%fp - 0x4], %l0
+0x7f9f3e80: le_short_sample_stats+0x0048:	add     %l0, 0x1, %l0
+0x7f9f3e84: le_short_sample_stats+0x004c:	st      %l0, [%fp - 0x4]
+0x7f9f3e88: le_short_sample_stats+0x0050:	ld      [%fp - 0x4], %l1
+0x7f9f3e8c: le_short_sample_stats+0x0054:	ld      [%fp + 0x4c], %l0
+0x7f9f3e90: le_short_sample_stats+0x0058:	cmp     %l1, %l0
+0x7f9f3e94: le_short_sample_stats+0x005c:	bg      le_short_sample_stats+0x1a0
+0x7f9f3e98: le_short_sample_stats+0x0060:	nop     
+   10   	short elt;
+   11   
+   12   	buf += stride;
+0x7f9f3e9c: le_short_sample_stats+0x0064:	ld      [%fp + 0x44], %l0
+0x7f9f3ea0: le_short_sample_stats+0x0068:	ld      [%fp + 0x48], %l1
+0x7f9f3ea4: le_short_sample_stats+0x006c:	add     %l0, %l1, %l0
+0x7f9f3ea8: le_short_sample_stats+0x0070:	st      %l0, [%fp + 0x44]
+   13   	buf[100000000] = 1;	
+0x7f9f3eac: le_short_sample_stats+0x0074:	mov     0x1, %l2
+0x7f9f3eb0: le_short_sample_stats+0x0078:	ld      [%fp + 0x44], %l0
+0x7f9f3eb4: le_short_sample_stats+0x007c:	sethi   %hi(0x5f5e000), %l1
+0x7f9f3eb8: le_short_sample_stats+0x0080:	or      %l1, 0x100, %l1
+0x7f9f3ebc: le_short_sample_stats+0x0084:	stb     %l2, [%l0 + %l1]
+
+=================================
+
+============== up 1:
+Current function is XS_Audio__FindChunks_le_short_sample_stats
+  158   	le_short_sample_stats(buf, stride, samples, stat);
+samples = 1792
+stat = 0x23b468
+stride = 4
+buf = 0x284270 ""
+ax = 6
+mark = 0x27e664
+cv = 0x22edcc
+items = 4
+sp = 0x27e674
+__func__ = "XS_Audio__FindChunks_le_short_sample_stats"
+
+============== up 2:
+0x000984ec: Perl_pp_entersub+0x066c:	jmpl    %l1, %o7
+
+============== up 3:
+0x0008e6c8: Perl_runops_standard+0x004c:	jmpl    %g3, %o7
+
+============== up 4:
+0x00028cdc: S_run_body+0x01b0:	jmpl    %o2, %o7
+==============
+4340:	/usr/local/bin/perl -Mblib t/Audio-FindChunks.t
+00010000    1080K r-x--  /local/sol/9/depot/perl-5.8.7/bin/perl
+0012C000      64K rwx--  /local/sol/9/depot/perl-5.8.7/bin/perl
+0013C000    1344K rwx--    [ heap ]
+7F900000     688K r-x--  /usr/lib/libc.so.1
+7F9BC000      24K rwx--  /usr/lib/libc.so.1
+7F9C2000       8K rwx--  /usr/lib/libc.so.1
+7F9E0000       8K rwx--    [ anon ]
+7F9F0000      24K r-x--  /tmp/Audio-FindChunks-1.04/dbg-bld/blib/arch/auto/Audio/FindChunks/FindChunks.so
+7FA04000       8K rwx--  /tmp/Audio-FindChunks-1.04/dbg-bld/blib/arch/auto/Audio/FindChunks/FindChunks.so
+7FA10000       8K r-x--  /local/sol/9/depot/perl-5.8.7/lib/5.8.7/sun4-solaris/auto/Cwd/Cwd.so
+7FA20000       8K rwx--  /local/sol/9/depot/perl-5.8.7/lib/5.8.7/sun4-solaris/auto/Cwd/Cwd.so
+7FA30000     224K r-x--  /usr/lib/libm.so.1
+7FA76000       8K rwx--  /usr/lib/libm.so.1
+7FA80000     568K r-x--  /usr/lib/libnsl.so.1
+7FB1E000      40K rwx--  /usr/lib/libnsl.so.1
+7FB28000      24K rwx--  /usr/lib/libnsl.so.1
+7FB50000      16K r-x--  /usr/lib/libmp.so.2
+7FB64000       8K rwx--  /usr/lib/libmp.so.2
+7FB70000       8K rwx--    [ anon ]
+7FB80000       8K rwx--  /usr/lib/libdl.so.1
+7FB90000      40K r-x--  /usr/lib/libsocket.so.1
+7FBAA000       8K rwx--  /usr/lib/libsocket.so.1
+7FBB0000      16K r-x--  /usr/platform/sun4u/lib/libc_psr.so.1
+7FBC0000     192K r-x--  /usr/lib/ld.so.1
+7FBF0000       8K rwx--  /usr/lib/ld.so.1
+7FBF2000       8K rwx--  /usr/lib/ld.so.1
+FFBFA000      24K rw---    [ stack ]
+ total      4464K
+Sun WorkShop 6 update 2 Dbx Debugger 6.2 Patch 111683-08 2002/08/03
+ok
+Failed Test          Stat Wstat Total Fail  Failed  List of Failed
+-------------------------------------------------------------------------------
+t/Audio-FindChunks.t    0    11    32   58 181.25%  4-32
+Failed 1/2 test scripts, 50.00% okay. 29/33 subtests failed, 12.12% okay.
+make: *** [test_dynamic] Error 29

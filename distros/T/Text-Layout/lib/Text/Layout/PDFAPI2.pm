@@ -88,6 +88,7 @@ sub render {
 	    }
 	}
     }
+    my $upem = 1000;
 
     foreach my $fragment ( @{ $self->{_content} } ) {
 	next unless length($fragment->{text});
@@ -112,6 +113,28 @@ sub render {
 	    $hb->set_language( $f->{language} ) if $f->{language};
 	    my $info = $hb->shaper($fp);
 	    my $y = $y - $fragment->{base} - $bl;
+	    my $sz = $fragment->{size} || $self->{_currentsize};
+	    my $w = 0;
+	    $w += $_->{ax} for @$info;
+
+	    if ( $fragment->{bgcolor} ) {
+		my $y = $y0;
+		my $h = -$sz*($font->ascender-$font->descender)/$upem;
+		my $x = $x0;
+		$text->add(PDF::API2::Content::_save());
+
+		$text->add($text->_fillcolor($fragment->{bgcolor}));
+		$text->add($text->_strokecolor($fragment->{bgcolor}));
+		$text->add(PDF::API2::Content::_linewidth(2));
+		$text->add(PDF::API2::Content::_move($x, $y));
+		$text->add(PDF::API2::Content::_line($x+$w, $y));
+		$text->add(PDF::API2::Content::_line($x+$w, $y+$h));
+		$text->add(PDF::API2::Content::_line($x, $y+$h));
+		$text->add('h'); # close
+		$text->add('B'); # fillstroke
+		$text->add(PDF::API2::Content::_restore());
+	    }
+
 	    foreach my $g ( @$info ) {
 		$text->translate( $x + $g->{dx}, $y - $g->{dy} );
 		$text->glyph_by_CId( $g->{g} );
@@ -136,9 +159,29 @@ sub render {
 	    if ( $t ne "" ) {
 		my $y = $y-$fragment->{base}-$bl;
 		my $sz = $fragment->{size} || $self->{_currentsize};
+		my $w = $font->width($t) * $sz;
+
+		if ( $fragment->{bgcolor} ) {
+		    my $y = $y0;
+		    my $h = -$sz*($font->ascender-$font->descender)/$upem;
+		    my $x = $x0;
+		    $text->add(PDF::API2::Content::_save());
+
+		    $text->add($text->_fillcolor($fragment->{bgcolor}));
+		    $text->add($text->_strokecolor($fragment->{bgcolor}));
+		    $text->add(PDF::API2::Content::_linewidth(2));
+		    $text->add(PDF::API2::Content::_move($x, $y));
+		    $text->add(PDF::API2::Content::_line($x+$w, $y));
+		    $text->add(PDF::API2::Content::_line($x+$w, $y+$h));
+		    $text->add(PDF::API2::Content::_line($x, $y+$h));
+		    $text->add('h'); # close
+		    $text->add('B'); # fillstroke
+		    $text->add(PDF::API2::Content::_restore());
+		}
+
 		$text->translate( $x, $y );
 		$text->text($t);
-		$x += $font->width($t) * $sz;
+		$x += $w;
 	    }
 	}
 
@@ -282,7 +325,7 @@ sub bbox {
 	elsif ( $all && $font->can("extents") ) {
 	    my $e = $font->extents( $_->{text}, $size );
 	    printf STDERR ("(%.2f,%.2f)(%.2f,%.2f) -> ",
-			   $xMin//0, $yMin//0, $xMax//0, $yMax//0 ) if 0&&$all;
+			   $xMin//0, $yMin//0, $xMax//0, $yMax//0 ) if $all && 0;
 	    $xMax = $w + $e->{xMax} if $all;
 	    $w += $e->{wx};
 #	    warn("W \"", $_->{text}, "\" $w, ", $e->{width}, "\n");
@@ -442,7 +485,7 @@ sub PDF::API2::Resource::CIDFont::extents_cid {
         $lastglyph = $n;
 	my $ex = $glyphs->[$n];
 	unless ( defined $ex && %$ex ) {
-	    # warn("Missing glyph: $n\n");
+	    warn("Missing glyph: $n\n");
 	    next;
 	}
 	$ex->read;
@@ -513,9 +556,9 @@ sub showbb {
     my $bl = $bb->{bl};
     # Bounding box, top-left coordinates.
     printf( "Ink:    %6.2f %6.2f %6.2f %6.2f\n",
-	    @$ink{qw( x y width height )} ) if 0;
+	    @$ink{qw( x y width height )} );
     printf( "Layout: %6.2f %6.2f %6.2f %6.2f  BL %.2f\n",
-	    @$bb{qw( x y width height )}, $bl ) if 0;
+	    @$bb{qw( x y width height )}, $bl );
 
     # NOTE: Some fonts include natural spacing in the bounding box.
     # NOTE: Some fonts exclude accents on capitals from the bounding box.

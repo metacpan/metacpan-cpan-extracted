@@ -1,3 +1,20 @@
+2.077 2022-03-16
+- Ufunc::{min,max}over{,_ind} behaviour for NaNs fixed to match docs
+- Ufunc::{min,max}over_n_ind can handle badvals
+- single badval as boolean is now an error (#388)
+- IO::FlexRaw::readflex can take last dim as undef (#322)
+- add IO::(Fast|Flex)Raw::glue\L\1 (#322)
+- PDL::Demos::Routines replaced with PDL::Demos, update demos (#42)
+- switch pdl_destroy to use mg_free not SvOBJECT_off, needed by Perl ithreads (#385)
+- implement Ctrl-C handling in perldl (#269)
+- add with_time command to shells
+- fix shell history getting lost if OpenGL loaded before listed (#337)
+- fix TriD objects being off-centre (#337)
+- fix Primitive::which_both docs to match behaviour
+- add Primitive::where_both
+- PP now checks data pointers for NULL if nvals > 0 except in RedoDimsCode
+- add Core::dup{,N}
+
 2.076 2022-02-25
 - fix long-standing bug in dice that broke with PDL subclasses (#363)
 - remove docs for {type,map}fld

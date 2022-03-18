@@ -2,7 +2,7 @@ use strict;
 use warnings qw/FATAL/;
 use utf8;
 
-use Test::Simple tests => 11;
+use Test::Simple tests => 12;
 use Regex::Object;
 
 $|=1;
@@ -16,10 +16,10 @@ $re = Regex::Object->new(
 );
 
 ## TEST 1
-# Test match
+# Test match.
 
 $expected = 'regex';
-$result = $re->match('full regex expression')->match;
+$result   = $re->match('full regex expression')->match;
 
 ok($result eq $expected,
     sprintf('Returns wrong value: %s, expected: %s',
@@ -29,10 +29,10 @@ ok($result eq $expected,
 );
 
 ## TEST 2
-# Test prematch
+# Test prematch.
 
 $expected = 'full ';
-$result = $re->match('full regex expression')->prematch;
+$result   = $re->match('full regex expression')->prematch;
 
 ok($result eq $expected,
     sprintf('Returns wrong value: %s, expected: %s',
@@ -42,10 +42,10 @@ ok($result eq $expected,
 );
 
 ## TEST 3
-# Test postmatch
+# Test postmatch.
 
 $expected = ' expression';
-$result = $re->match('full regex expression')->postmatch;
+$result   = $re->match('full regex expression')->postmatch;
 
 ok($result eq $expected,
     sprintf('Returns wrong value: %s, expected: %s',
@@ -55,7 +55,7 @@ ok($result eq $expected,
 );
 
 ## TEST 4
-# Test unmatched
+# Test unmatched.
 
 $result = $re->match('full expression')->match;
 
@@ -64,7 +64,7 @@ ok(!$result,
 );
 
 ## TEST 5
-# Test global matching with global regex
+# Test global matching with global regex.
 
 $expected = 'John Doe Eric Lide Hans Zimmermann';
 
@@ -82,14 +82,14 @@ ok($result eq $expected,
 );
 
 ## TEST 6
-# Test global matching with scoped regex
+# Test global matching with scoped regex.
 
 $re = Regex::Object->new(
     regex  => qr/(\w+?) (\w+)/,
 );
 
 $expected = 'John Doe Eric Lide Hans Zimmermann';
-$result = join "\040", @{ $re->match_all($expected)->match_all };
+$result   = join "\040", @{ $re->match_all($expected)->match_all };
 
 ok($result eq $expected,
     sprintf('Returns wrong value: %s, expected: %s',
@@ -99,14 +99,14 @@ ok($result eq $expected,
 );
 
 ## TEST 7
-# Test global matching with scoped regex with modifiers: match_all method
+# Test global matching with scoped regex with modifiers: match_all method.
 
 $re = Regex::Object->new(
     regex  => qr/([A-Z]+?) ([A-Z]+)/i,
 );
 
 $expected = 'John Doe Eric Lide Hans Zimmermann';
-$result = join "\040", @{ $re->match_all($expected)->match_all };
+$result   = join "\040", @{ $re->match_all($expected)->match_all };
 
 ok($result eq $expected,
     sprintf('Returns wrong value: %s, expected: %s',
@@ -116,14 +116,14 @@ ok($result eq $expected,
 );
 
 ## TEST 8
-# Test global matching with scoped regex with modifiers: captures_all
+# Test global matching with scoped regex with modifiers: captures_all.
 
 $re = Regex::Object->new(
     regex  => qr/([A-Z]+?) ([A-Z]+)/i,
 );
 
 $expected = 'John Doe Eric Lide Hans Zimmermann';
-$result = join "\040", map { join "\040", @$_ } @{ $re->match_all($expected)->captures_all };
+$result   = join "\040", map { join "\040", @$_ } @{ $re->match_all($expected)->captures_all };
 
 ok($result eq $expected,
     sprintf('Returns wrong value: %s, expected: %s',
@@ -133,9 +133,9 @@ ok($result eq $expected,
 );
 
 ## TEST 9
-# Test unsuccessful matching
+# Test unsuccessful matching.
 
-$re = Regex::Object->new(regex => qr/\d+/);
+$re     = Regex::Object->new(regex => qr/\d+/);
 $result = $re->match('foo')->success;
 
 ok(!$result,
@@ -146,14 +146,14 @@ ok(!$result,
 
 
 ## TEST 10
-# Test global matching with scoped regex: count unsuccessfully
+# Test global matching with scoped regex: count unsuccessfully.
 
 $re = Regex::Object->new(
     regex  => qr/(\d+?) (\d+)/,
 );
 
 $expected = 0;
-$result = $re->match_all('John Doe Eric Lide')->count;
+$result   = $re->match_all('John Doe Eric Lide')->count;
 
 ok($result == $expected,
     sprintf('Returns wrong value: %s, expected: %s',
@@ -163,18 +163,36 @@ ok($result == $expected,
 );
 
 ## TEST 11
-# Test global matching with scoped regex: count successfully
+# Test global matching with scoped regex: count successfully.
 
 $re = Regex::Object->new(
     regex  => qr/(\w+?) (\w+)/,
 );
 
 $expected = 2;
-$result = $re->match_all('John Doe Eric Lide')->count;
+$result   = $re->match_all('John Doe Eric Lide')->count;
 
 ok($result == $expected,
     sprintf('Returns wrong value: %s, expected: %s',
         $result,
         $expected,
+    )
+);
+
+## TEST 12
+# Test global match than Regex::Object unmatch to see what's there with $MATH global var.
+
+'test-string' =~ /test-string/;
+
+$re = Regex::Object->new(
+    regex  => qr/nest-string/,
+);
+
+$expected = undef;
+$result   = $re->match('test-string')->match;
+
+ok(!$result,
+    sprintf('Returns wrong value: %s, expected: undef',
+        $result || 'undef',
     )
 );

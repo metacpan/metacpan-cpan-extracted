@@ -38,9 +38,8 @@ use PPIx::QuoteLike::Utils qw{
     __matching_delimiter
 };
 use Scalar::Util ();
-use Text::Tabs ();
 
-our $VERSION = '0.019';
+our $VERSION = '0.020';
 
 use constant CLASS_CONTROL       => 'PPIx::QuoteLike::Token::Control';
 use constant CLASS_DELIMITER     => 'PPIx::QuoteLike::Token::Delimiter';
@@ -460,21 +459,42 @@ sub _update_location {
     $loc->{location}
 	or return;
     $token->{location} = [ @{ $loc->{location} } ];
+
     if ( defined( my $content = $token->content() ) ) {
-	if ( my $newlines = $content =~ tr/\n/\n/ ) {
-	    $loc->{location}[LOCATION_LINE] += $newlines;
-	    $loc->{location}[LOCATION_LOGICAL_LINE] += $newlines;
-	    $content =~ s/ .* \n //smx;
+
+	my $lines;
+	pos( $content ) = 0;
+	$lines++ while $content =~ m/ \n /smxgc;
+	if ( pos $content ) {
+	    $loc->{location}[LOCATION_LINE] += $lines;
+	    $loc->{location}[LOCATION_LOGICAL_LINE] += $lines;
 	    $loc->{location}[LOCATION_CHARACTER] =
 		$loc->{location}[LOCATION_COLUMN] = 1;
-	    $loc->{line_content} = '';
 	}
-	$loc->{location}[LOCATION_CHARACTER] += length $content;
-	$loc->{line_content} .= $content;
-	local $Text::Tabs::tabstop = $loc->{tab_width};
-	$loc->{location}[LOCATION_COLUMN] = 1 + length Text::Tabs::expand(
-	    $loc->{line_content} );
+
+	if ( my $chars = length( $content ) - pos( $content ) ) {
+	    $loc->{location}[LOCATION_CHARACTER] += $chars;
+	    if ( $loc->{tab_width} > 1 && $content =~ m/ \t /smx ) {
+		my $pos = $loc->{location}[LOCATION_COLUMN];
+		my $tab_width = $loc->{tab_width};
+		# Stolen shamelessly from PPI::Document::_visual_length
+		my ( $vis_inc );
+		foreach my $part ( split /(\t)/, $content ) {
+		    if ($part eq "\t") {
+			$vis_inc = $tab_width - ($pos-1) % $tab_width;
+		    } else {
+			$vis_inc = length $part;
+		    }
+		    $pos    += $vis_inc;
+		}
+		$loc->{location}[LOCATION_COLUMN] = $pos;
+	    } else {
+		$loc->{location}[LOCATION_COLUMN] += $chars;
+	    }
+	}
+
     }
+
     return;
 }
 
@@ -1420,7 +1440,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2016-2021 by Thomas R. Wyant, III
+Copyright (C) 2016-2022 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

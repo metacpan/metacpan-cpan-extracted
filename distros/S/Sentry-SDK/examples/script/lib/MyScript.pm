@@ -10,7 +10,6 @@ use Sentry::Severity;
 use Try::Tiny;
 
 Sentry::SDK->init({
-  dsn          => 'http://b61a335479ff48529d773343287bcdad@localhost:9000/2',
   environment  => 'my environment',
   release      => '1.0.0',
   dist         => '12345',
@@ -59,6 +58,7 @@ sub main {
     my $s = MyLib->new(foo => 'my foo');
     $s->foo1('foo1 value');
   } catch {
+
     Sentry::SDK->capture_exception($_);
   };
 

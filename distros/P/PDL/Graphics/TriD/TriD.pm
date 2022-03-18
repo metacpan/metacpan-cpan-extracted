@@ -14,7 +14,7 @@ PDL::Graphics::TriD -- PDL 3D interface
  $colors = cat($red, $green, $blue)->transpose;
  
  # After each graph, let the user rotate and
- # wait for him to press 'q', then make new graph
+ # wait for them to press 'q', then make new graph
  line3d($coords);       # $coords = (3,n,...)
  line3d($coords,$colors);  # $colors = (3,n,...)
  line3d([$x,$y,$z]);
@@ -122,7 +122,7 @@ where C<CONTEXT> is a string describing in which context you wish these
 ndarrays to be interpreted. Each routine specifies a default context
 which is explained in the routines documentation.
 Context is usually used only to understand what the user wants
-when he/she specifies less than 3 ndarrays.
+when they specify less than 3 ndarrays.
 
 The following contexts are currently supported:
 
@@ -519,11 +519,17 @@ user explicitly presses 'q'.
 Wait for the user to rotate the image in 3D space.
 
 Let the user rotate the image in 3D space, either for one step
-or until (s)he presses 'q', depending on the 'keeptwiddling3d'
+or until they press 'q', depending on the 'keeptwiddling3d'
 setting. If 'keeptwiddling3d' is not set the routine returns
 immediately and indicates that a 'q' event was received by
 returning 1. If the only events received were mouse events,
 returns 0.
+
+=head2 close3d
+
+=for ref
+
+Close the currently-open 3D window.
 
 =head1 CONCEPTS
 
@@ -634,7 +640,6 @@ $PDL::Graphics::TriD::verbose //= 0;
 # $PDL::Graphics::TriD::keeptwiddling
 # $PDL::Graphics::TriD::hold_on
 # $PDL::Graphics::TriD::curgraph
-# $PDL::Graphics::TriD::cur
 # $PDL::Graphics::TriD::create_window_sub
 # $PDL::Graphics::TriD::current_window
 # 
@@ -649,7 +654,7 @@ use PDL::Core '';  # barf
 our @ISA = qw/PDL::Exporter/;
 our @EXPORT_OK = qw/imag3d_ns imag3d line3d mesh3d lattice3d points3d
   spheres3d describe3d imagrgb imagrgb3d hold3d release3d
-  keeptwiddling3d nokeeptwiddling3d
+  keeptwiddling3d nokeeptwiddling3d close3d
   twiddle3d grabpic3d tridsettings/;
 our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 our $verbose;
@@ -688,7 +693,7 @@ BEGIN {
 		(barf "Invalid PDL 3D device '$_' specified!");
 	}
 	my $mod = $dv;
-	$mod =~ s|::|//|g;
+	$mod =~ s|::|/|g;
 	print "dev = $dev mod=$mod\n" if($verbose);
  
 	require "$mod.pm";
@@ -779,20 +784,25 @@ sub PDL::twiddle3d {
 	twiddle_current();
 }
 
+*close3d = *close3d = \&PDL::close3d;
+sub PDL::close3d {
+  return if !ref $PDL::Graphics::TriD::current_window;
+  return if !$PDL::Graphics::TriD::current_window->can('close');
+  $PDL::Graphics::TriD::current_window->close;
+}
+
 sub graph_object {
 	my($obj) = @_;
 	if(!defined $obj or !ref $obj) {
 		barf("Invalid object to TriD::graph_object");
 	}
-	print "graph_object: calling get_new_graph\n" if($PDL::debug_trid);
+	print "graph_object: calling get_new_graph\n" if($PDL::Graphics::TriD::verbose);
 	my $g = get_new_graph();
-	print "graph_object: back from get_new_graph\n" if($PDL::debug_trid);
-
+	print "graph_object: back from get_new_graph\n" if($PDL::Graphics::TriD::verbose);
 	my $name = $g->add_dataseries($obj);
 	$g->bind_default($name);
 	$g->scalethings();
 	print "ADDED TO GRAPH: '$name'\n" if $PDL::Graphics::TriD::verbose;
-
 	twiddle_current();
 	return $obj;
 }
@@ -827,7 +837,7 @@ sub PDL::imagrgb {
 sub PDL::line3d { 
     &checkargs;
     my $obj = new PDL::Graphics::TriD::LineStrip(@_);
-    print "line3d: object is $obj\n" if($PDL::debug_trid);
+    print "line3d: object is $obj\n" if($PDL::Graphics::TriD::verbose);
     &graph_object($obj);
 }
 
@@ -887,7 +897,7 @@ sub PDL::spheres3d { &checkargs;
 *grabpic3d=*grabpic3d=\&PDL::grabpic3d;
 sub PDL::grabpic3d {
 	my $win = PDL::Graphics::TriD::get_current_window();
-	barf "backend doesn't support grabing the rendered scene"
+	barf "backend doesn't support grabbing the rendered scene"
 	  unless $win->can('read_picture');
 	my $pic = $win->read_picture();
 	return ($pic->float) / 255;
@@ -902,12 +912,12 @@ sub PDL::release3d {$PDL::Graphics::TriD::hold_on = 0;}
 *release3d=*release3d=\&PDL::release3d;
 
 sub get_new_graph {
-    print "get_new_graph: calling PDL::Graphics::TriD::get_current_window...\n" if($PDL::debug_trid);
+    print "get_new_graph: calling PDL::Graphics::TriD::get_current_window...\n" if($PDL::Graphics::TriD::verbose);
 	my $win = PDL::Graphics::TriD::get_current_window();
 
-    print "get_new_graph: calling get_current_graph...\n" if($PDL::debug_trid);
+    print "get_new_graph: calling get_current_graph...\n" if($PDL::Graphics::TriD::verbose);
 	my $g = get_current_graph($win);
-    print "get_new_graph: back get_current_graph returned $g...\n" if($PDL::debug_trid);
+    print "get_new_graph: back get_current_graph returned $g...\n" if($PDL::Graphics::TriD::verbose);
 
 	if(!$PDL::Graphics::TriD::hold_on) {
 		$g->clear_data();
@@ -932,23 +942,20 @@ sub get_current_graph {
 }
 
 
-# $PDL::Graphics::TriD::cur = {};
 # $PDL::Graphics::TriD::create_window_sub = undef;
 sub get_current_window {
   my $opts = shift @_;
-  my $win = $PDL::Graphics::TriD::cur;
+  my $win = $PDL::Graphics::TriD::current_window;
 
   if(!defined $win) {
 	 if(!$PDL::Graphics::TriD::create_window_sub) {
 		barf("PDL::Graphics::TriD must be used with a display mechanism: for example PDL::Graphics::TriD::GL!\n");
 	 }
-	 print "get_current_window - creating window...\n" if($PDL::debug_trid);
-	 $win = new PDL::Graphics::TriD::Window($opts);
+	 print "get_current_window - creating window...\n" if($PDL::Graphics::TriD::verbose);
+	 $PDL::Graphics::TriD::current_window = $win = new PDL::Graphics::TriD::Window($opts);
 
-	 print "get_current_window - calling set_material...\n" if($PDL::debug_trid);
+	 print "get_current_window - calling set_material...\n" if($PDL::Graphics::TriD::verbose);
 	 $win->set_material(new PDL::Graphics::TriD::Material);
-	 $PDL::Graphics::TriD::current_window = $win;
-	 $PDL::Graphics::TriD::cur = $win
   }
   return $PDL::Graphics::TriD::current_window;
 }

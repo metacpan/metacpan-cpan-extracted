@@ -1,3 +1,7 @@
+0.083		2022-03-17	T. R. Wyant
+    Correct and optimize the computation of logical column position (the
+    one that takes account of tabs).
+
 0.082		2021-11-29	T. R. Wyant
     Add --version to eg/predump, and document all options with double
     dashes.

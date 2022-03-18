@@ -7,7 +7,7 @@ use Capture::Tiny qw( capture );
 use File::Which qw( which );
 
 # ABSTRACT: Find system git
-our $VERSION = '0.08'; # VERSION
+our $VERSION = '0.09'; # VERSION
 
 
 sub cflags {''}
@@ -34,7 +34,7 @@ sub version
       '--version',
     );
   };
-  
+
   $out =~ /git version ([0-9\.]+)/
     ? $1
     : 'unknown';
@@ -61,7 +61,7 @@ Alien::git - Find system git
 
 =head1 VERSION
 
-version 0.08
+version 0.09
 
 =head1 SYNOPSIS
 
@@ -84,7 +84,7 @@ From L<alienfile>:
    download [
      [ '%{git}', 'clone', 'http://example.com/foo.git' ],
    ];
-   
+ 
    ...
  
  };
@@ -141,7 +141,7 @@ Graham Ollis <plicease@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Graham Ollis.
+This software is copyright (c) 2017,2018,2019,2022 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

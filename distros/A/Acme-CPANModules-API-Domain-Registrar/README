@@ -1,30 +1,74 @@
 NAME
-    Acme::CPANModules::API::Domain::Registrar - API to domain registrars
+    Acme::CPANModules::API::Domain::Registrar - List of API modules for
+    domain registrars
 
 VERSION
-    This document describes version 0.001 of
+    This document describes version 0.002 of
     Acme::CPANModules::API::Domain::Registrar (from Perl distribution
-    Acme-CPANModules-API-Domain-Registrar), released on 2019-01-13.
+    Acme-CPANModules-API-Domain-Registrar), released on 2022-03-08.
 
 DESCRIPTION
-    API to domain registrars.
-
     If you know of others, please drop me a message.
 
-INCLUDED MODULES
-    *   WWW::DaftarNama::Reseller
+ACME::CPANMODULES ENTRIES
+    *   WWW::DaftarNama::Reseller - Reseller API client for DaftarNama.id
+
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
     *   WWW::Enom
 
-    *   Net::OpenSRS
+    *   Net::OpenSRS - Domain registration via the Tucows OpenSRS HTTPS XML
+        API
 
-    *   WWW::GoDaddy::REST
+        Author: JEF <https://metacpan.org/author/JEF>
 
-    *   WWW::Domain::Registry::Joker
+    *   WWW::GoDaddy::REST - Work with services conforming to the GDAPI spec
 
-    *   WWW::Domain::Registry::VeriSign
+        Author: DBARTLE <https://metacpan.org/author/DBARTLE>
+
+    *   WWW::Domain::Registry::Joker - an interface to the Joker.com DMAPI
+
+        Author: ROAM <https://metacpan.org/author/ROAM>
+
+    *   WWW::Domain::Registry::VeriSign - VeriSign NDS
+        (https://www.verisign-grs.com/) Registrar Tool
+
+        Author: MASAHITO <https://metacpan.org/author/MASAHITO>
 
     *   WWW::NameCheap::API
+
+FAQ
+  What is an Acme::CPANModules::* module?
+    An Acme::CPANModules::* module, like this module, contains just a list
+    of module names that share a common characteristics. It is a way to
+    categorize modules and document CPAN. See Acme::CPANModules for more
+    details.
+
+  What are ways to use this Acme::CPANModules module?
+    Aside from reading this Acme::CPANModules module's POD documentation,
+    you can install all the listed modules (entries) using cpanm-cpanmodules
+    script (from App::cpanm::cpanmodules distribution):
+
+     % cpanm-cpanmodules -n API::Domain::Registrar
+
+    Alternatively you can use the cpanmodules CLI (from App::cpanmodules
+    distribution):
+
+        % cpanmodules ls-entries API::Domain::Registrar | cpanm -n
+
+    or Acme::CM::Get:
+
+        % perl -MAcme::CM::Get=API::Domain::Registrar -E'say $_->{module} for @{ $LIST->{entries} }' | cpanm -n
+
+    or directly:
+
+        % perl -MAcme::CPANModules::API::Domain::Registrar -E'say $_->{module} for @{ $Acme::CPANModules::API::Domain::Registrar::LIST->{entries} }' | cpanm -n
+
+    This Acme::CPANModules module also helps lcpan produce a more meaningful
+    result for "lcpan related-mods" command when it comes to finding related
+    modules for the modules listed in this Acme::CPANModules module. See
+    App::lcpan::Cmd::related_mods for more details on how "related modules"
+    are found.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -35,14 +79,6 @@ SOURCE
     <https://github.com/perlancar/perl-Acme-CPANModules-API-Domain-Registrar
     >.
 
-BUGS
-    Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-API-
-    Domain-Registrar>
-
-    When submitting a bug or request, please include a test-file or a patch
-    to an existing test-file that illustrates the bug or desired feature.
-
 SEE ALSO
     Acme::CPANModules - about the Acme::CPANModules namespace
 
@@ -51,9 +87,33 @@ SEE ALSO
 AUTHOR
     perlancar <perlancar@cpan.org>
 
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
+    steps required beyond that are considered a bug and can be reported to
+    me.
+
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019 by perlancar@cpan.org.
+    This software is copyright (c) 2022 by perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-API-
+    Domain-Registrar>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 

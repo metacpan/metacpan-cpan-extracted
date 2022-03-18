@@ -35,10 +35,9 @@
       },
       "runtime" : {
          "requires" : {
-            "Bible::Reference" : "1.05",
-            "Clone" : "0",
-            "Template" : "0",
-            "Text::Balanced" : "0",
+            "Bible::Reference" : "1.08",
+            "Mojo::DOM" : "0",
+            "Mojo::Util" : "0",
             "Text::Wrap" : "0",
             "exact" : "1.14",
             "exact::class" : "1.10",
@@ -70,7 +69,7 @@
          "web" : "https://github.com/gryphonshafer/Bible-OBML"
       }
    },
-   "version" : "1.18",
+   "version" : "2.03",
    "x_generated_by_perl" : "v5.35.4",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
    "x_spdx_expression" : "Artistic-2.0"

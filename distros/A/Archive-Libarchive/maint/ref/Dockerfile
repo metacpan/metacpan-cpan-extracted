@@ -23,6 +23,7 @@ RUN  apt-get update                            \
      castxml                                   \
      libexpat1-dev                             \
      libffi-dev                                \
+  && apt-get purge libarchive-dev              \
   && apt-get -q autoremove                     \
   && apt-get -q clean                          \
   && rm -rf /var/lib/apt/lists/*

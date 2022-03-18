@@ -1,11 +1,11 @@
-[![Build Status](https://circleci.com/gh/gfx/Perl-Data-Util.svg)](https://circleci.com/gh/gfx/Perl-Data-Util)
+[![Actions Status](https://github.com/gfx/Perl-Data-Util/workflows/test.yml/badge.svg)](https://github.com/gfx/Perl-Data-Util/actions) [![MetaCPAN Release](https://badge.fury.io/pl/Data-Util.svg)](https://metacpan.org/release/Data-Util)
 # NAME
 
 Data::Util - A selection of utilities for data and data types
 
 # VERSION
 
-This document describes Data::Util version 0.66
+This document describes Data::Util version 0.67
 
 # SYNOPSIS
 
@@ -314,7 +314,7 @@ There are some other utility functions you can import from this module.
 
     This is also considered as lightweight closures.
 
-    See also [Data::Util::Curry](https://metacpan.org/pod/Data::Util::Curry).
+    See also [Data::Util::Curry](https://metacpan.org/pod/Data%3A%3AUtil%3A%3ACurry).
 
 - modify\_subroutine(subr, ...)
 
@@ -395,25 +395,25 @@ Please report any bugs or feature requests to the author.
 
 # SEE ALSO
 
-[Scalar::Util](https://metacpan.org/pod/Scalar::Util).
+[Scalar::Util](https://metacpan.org/pod/Scalar%3A%3AUtil).
 
 [overload](https://metacpan.org/pod/overload).
 
-[Params::Util](https://metacpan.org/pod/Params::Util).
+[Params::Util](https://metacpan.org/pod/Params%3A%3AUtil).
 
-[Sub::Install](https://metacpan.org/pod/Sub::Install).
+[Sub::Install](https://metacpan.org/pod/Sub%3A%3AInstall).
 
-[Sub::Identify](https://metacpan.org/pod/Sub::Identify).
+[Sub::Identify](https://metacpan.org/pod/Sub%3A%3AIdentify).
 
-[Sub::Delete](https://metacpan.org/pod/Sub::Delete).
+[Sub::Delete](https://metacpan.org/pod/Sub%3A%3ADelete).
 
-[Sub::Curry](https://metacpan.org/pod/Sub::Curry).
+[Sub::Curry](https://metacpan.org/pod/Sub%3A%3ACurry).
 
-[Class::MOP](https://metacpan.org/pod/Class::MOP).
+[Class::MOP](https://metacpan.org/pod/Class%3A%3AMOP).
 
-[Class::Method::Modifiers](https://metacpan.org/pod/Class::Method::Modifiers).
+[Class::Method::Modifiers](https://metacpan.org/pod/Class%3A%3AMethod%3A%3AModifiers).
 
-[Data::OptList](https://metacpan.org/pod/Data::OptList).
+[Data::OptList](https://metacpan.org/pod/Data%3A%3AOptList).
 
 [Mouse](https://metacpan.org/pod/Mouse)
 

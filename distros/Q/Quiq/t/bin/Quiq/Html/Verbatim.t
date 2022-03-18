@@ -30,8 +30,8 @@ sub test_unitTest : Test(4) {
     );
     $self->like($html,qr|class="sdoc-code"|);
     $self->like($html,qr|id="cod001"|);
-    $self->like($html,qr|<pre>173</pre>|);
-    $self->like($html,qr|<pre>Hello world!</pre>|);
+    $self->like($html,qr|<pre style="margin: 0">173</pre>|);
+    $self->like($html,qr|<pre style="margin: 0">Hello world!</pre>|);
 }
 
 # -----------------------------------------------------------------------------

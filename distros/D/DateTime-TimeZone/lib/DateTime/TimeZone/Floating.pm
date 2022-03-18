@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '2.51';
+our $VERSION = '2.52';
 
 use parent 'Class::Singleton', 'DateTime::TimeZone::OffsetOnly';
 
@@ -59,7 +59,7 @@ DateTime::TimeZone::Floating - A time zone that is always local
 
 =head1 VERSION
 
-version 2.51
+version 2.52
 
 =head1 SYNOPSIS
 
@@ -91,7 +91,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Dave Rolsky.
+This software is copyright (c) 2022 by Dave Rolsky.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

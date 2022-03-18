@@ -26,7 +26,8 @@
       "build" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
-            "File::Path" : "0"
+            "File::Path" : "0",
+            "Pod::Select" : "0"
          }
       },
       "configure" : {
@@ -60,7 +61,6 @@
             "Filter::Util::Call" : "0",
             "List::Util" : "1.33",
             "Math::Complex" : "0",
-            "Pod::Parser" : "0",
             "Pod::Select" : "0",
             "Scalar::Util" : "0",
             "Storable" : "1.03",
@@ -68,7 +68,8 @@
             "perl" : "5.010"
          },
          "suggests" : {
-            "Astro::FITS::Header" : "0"
+            "Astro::FITS::Header" : "0",
+            "Sys::SigAction" : "0"
          }
       },
       "test" : {
@@ -94,6 +95,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#pdl"
    },
-   "version" : "2.076",
+   "version" : "2.077",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

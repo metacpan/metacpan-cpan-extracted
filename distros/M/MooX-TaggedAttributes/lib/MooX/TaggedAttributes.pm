@@ -7,14 +7,13 @@ use v5.10.1;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
-use Carp;
 use MRO::Compat;
 
-use Scalar::Util qw[ blessed ];
-use Class::Method::Modifiers qw[ install_modifier ];
+use Class::Method::Modifiers ();
 
+use Moo::Role ();
 use MooX::TaggedAttributes::Cache;
 
 our %TAGSTORE;
@@ -22,20 +21,17 @@ our %TAGCACHE;
 
 my %ARGS = ( -tags => [] );
 
-our $_role_import = sub {
-    my $class = shift;
-    return unless Moo::Role->is_role( $class );
-    my $target = caller;
-    Moo::Role->apply_roles_to_package( $target, $class );
-    _install_tags( $target, $TAGSTORE{$class} );
-};
+sub _croak {
+    require Carp;
+    goto \&Carp::croak;
+}
 
 sub import {
 
     my ( $class, @args ) = @_;
     my $target = caller;
 
-    Moo::Role->apply_roles_to_package( $target, __PACKAGE__ );
+    Moo::Role->apply_roles_to_package( $target, 'MooX::TaggedAttributes::Role' );
 
     return unless @args;
 
@@ -44,7 +40,7 @@ sub import {
     while ( @args ) {
         my $arg = shift @args;
 
-        croak( "unknown argument to ", __PACKAGE__, ": $arg" )
+        _croak( "unknown argument to ", __PACKAGE__, ": $arg" )
           unless exists $ARGS{$arg};
 
         $args{$arg} = defined $ARGS{$arg} ? shift @args : 1;
@@ -53,15 +49,57 @@ sub import {
     $args{-tags} = [ $args{-tags} ]
       unless 'ARRAY' eq ref $args{-tags};
 
-    _install_tags( $target, $args{-tags} )
+    install_tags( $target, $args{-tags} )
       if @{ $args{-tags} };
 
     no strict 'refs';    ## no critic
-    *${ \"${target}::import" } = $_role_import;
+    *${ \"${target}::import" } = \&role_import;
 }
 
 
-sub _install_tags {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+sub role_import {
+    my $class = shift;
+    return unless Moo::Role->is_role( $class );
+    my $target = caller;
+    Moo::Role->apply_roles_to_package( $target, $class );
+    install_tags( $target, $TAGSTORE{$class} );
+};
+
+
+
+
+
+
+
+
+
+
+
+
+sub install_tags {
     my ( $target, $tags ) = @_;
 
     if ( $TAGSTORE{$target} ) {
@@ -70,11 +108,21 @@ sub _install_tags {
 
     else {
         $TAGSTORE{$target} = [@$tags];
-        _install_tag_handler( $target );
+        install_tag_handler( $target );
     }
 }
 
-sub _install_tag_handler {
+
+
+
+
+
+
+
+
+
+
+sub install_tag_handler {
     my $target = shift;
 
     # we need to
@@ -87,7 +135,7 @@ sub _install_tag_handler {
 
     my $around = \&${ \"${target}::around" };
 
-    install_modifier(
+    Class::Method::Modifiers::install_modifier(
         $target,
         after => has => sub {
             my ( $attrs, %attr ) = @_;
@@ -113,77 +161,6 @@ sub _install_tag_handler {
 }
 
 
-# Moo::Role won't compose anything before it was used into a consuming
-# package. Don't want import to be consumed.
-use Moo::Role;
-
-use Sub::Name 'subname';
-
-my $maybe_next_method = sub { ( shift )->maybe::next::method };
-
-# this modifier is run once for each composition of a tag role into
-# the class.  role composition is orthogonal to class inheritance, so we
-# need to carefully handle both
-
-# see http://www.nntp.perl.org/group/perl.moose/2015/01/msg287{6,7,8}.html,
-# but note that djerius' published solution was incomplete.
-around _tag_list => sub {
-
-# 1. call &$orig to handle tag role compositions into the current class
-# 2. call up the inheritance stack to handle parent class tag role compositions.
-
-    my $orig    = shift;
-    my $package = caller;
-
-    # create the proper environment context for next::can
-    my $code = subname( "${package}::_tag_list" => $maybe_next_method );
-    my $next = $_[0]->$code;
-
-    return [ @{&$orig}, $next ? @{$next} : () ];
-};
-
-
-# _tags can't be lazy; we must resolve the tags and attributes at
-# object creation time in case a role is modified after this object
-# is created, as we scan both clsses and roles to gather the tags.
-# classes should be immutable after the first instantiation
-# of an object (but see RT#101631), but roles aren't.
-
-# We also need to identify when a role has been added to an *object*
-# which adds tagged attributes.  TODO: make this work.
-
-
-# Build the tag cache.  Only update it if we're an object.  if the
-# class hasn't yet been instantiated, it's still mutable, and we'd be
-# caching prematurely.
-
-sub _class_tags {
-
-    my $class = shift;
-
-    # return cached values if available.  They are stored in %TAGCACHE
-    # on the first object method call to _tags(), at which point we've
-    # decreed the class as being complete.
-    return $TAGCACHE{$class} || MooX::TaggedAttributes::Cache->new( $class );
-}
-
-use namespace::clean -except => qw( import  );
-
-# this is where all of the tags get stored while a class is being
-# built up.  eventually they are condensed into a simple hash via
-# _build_cache
-
-sub _tag_list { [] }
-
-# never create a cached value if called as a class method, as the class
-# may still be under construction.
-sub _tags {
-    my $class = blessed $_[0];
-    $class
-      ? $TAGCACHE{$class} ||= _class_tags( $class )
-      : _class_tags( $_[0] );
-}
-
 1;
 
 #
@@ -208,7 +185,7 @@ MooX::TaggedAttributes - Add a tag with an arbitrary value to a an attribute
 
 =head1 VERSION
 
-version 0.12
+version 0.13
 
 =head1 SYNOPSIS
 
@@ -369,12 +346,55 @@ and C<< C->new->_tags >>
 
 are identical.
 
-=head1 BUGS AND LIMITATIONS
+=head1 BUGS, LIMITATIONS, TRAPS FOR THE UNWARY
 
 =head2 Changes to an object after instantiation are not tracked.
 
 If a role with tagged attributes is applied to an object, the
 tags for those attributes are not visible.
+
+=head2 An B<import> routine is installed into the tag role's namespace
+
+When a tag role imports C<MooX::TaggedAttributes> via
+
+  package My::Role;
+  use MooX::TaggedAttributes;
+
+two things happen to it:
+
+=over
+
+=item 1
+
+a role is applied to it which adds the  methods C<_tags> and C<_tag_list>.
+
+=item 2
+
+An C<import()> method is installed (e.g. in the above example, that
+becomes C<My::Role::import>). This may cause conflicts if C<My::Role>
+has an import method. (It's exceedingly rare that a role would have an
+C<import> method.)  This import method is used when the tag role is
+itself imported, e.g. in the above example,
+
+  package My::Module;
+  use My::Role;  # <---- My::Role's import routine is called here
+
+This C<import> does two things. In the above example, it 
+
+=over
+
+=item 1
+
+applies the role C<My::Role> to C<My::Module>;
+
+=item 2
+
+modifies the L<Moo> C<has> attribute creator so that calls to C<has>
+in C<My::Module> track attributes with tags.
+
+=back
+
+=back
 
 =head1 SUPPORT
 
@@ -391,6 +411,48 @@ Source is available at
 and may be cloned from
 
   https://gitlab.com/djerius/moox-taggedattributes.git
+
+=head1 INTERNAL ROUTINES
+
+These routines are B<not> meant for public consumption, but are
+documented here for posterity.
+
+=head2 role_import
+
+This import method is installed into tag roles (i.e. roles which
+import L<MooX::TaggedAttributes>).  The result is that when a tag role
+is imported, via e.g.
+
+   package My::Module
+   use My::TagRole;
+
+=over
+
+=item *
+
+The role will be applied to the importing module (e.g., C<My::Module>), providing the C<_tags> and
+C<_tag_list> methods.
+
+=item *
+
+The Moo C<has> routine in C<My::Module> will be modified to track attributes with tags.
+
+=back
+
+=head2 install_tags
+
+   install_tags( $class, \@tags );
+
+This subroutine associates a list of tags with a class.  The first time this is called
+on a class it also calls L</install_tag_handler>.  For subsequent calls it appends
+the tags to the class' list of tags.
+
+=head2 install_tag_handler
+
+   install_tag_handler( $class );
+
+This modifies the Moo C<has> routine in C<$class> so that it keeps track
+of which attributes are assigned a tag.
 
 =head1 AUTHOR
 

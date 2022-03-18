@@ -111,10 +111,11 @@ allows whitespace, comments, breaking into multiple lines, many
 independent expressions (such as function definitions).
 
 We do not include the corresponding C code from the calculator, but provide
-a Perl clone.  It supports whitespace, C<\\>-comments, and, for multi-line
-arguments, it supports trailing C<\> for line-continuation, trailing binary ops,
-comma, opening parenthesis/bracket indicate lines with continuation, group of
-lines in C<{}> joined into one line.
+a Perl clone.  It supports whitespace, C<\\>- and C</* */>-comments, and, for multi-line
+arguments, it supports line continuation via trailing C<\>, trailing binary ops,
+comma, opening parenthesis/bracket; moreover, group of
+lines in C<{}> are joined into one line.  (Additionally, C<\q> and C<\p> are
+recognized, as well as trailing allocatemem().  C<\e> is tolerated.)
 
 Keep in mind that this is just a convenience function, and no attempt was
 performed to make it particularly quick.  Moreover, the PARI user functions
@@ -132,6 +133,16 @@ a temporary convenience function __wrap_PARI_macro():
 but keep in mind that the generated this way wrapper is also not designed
 to be quick.)
 
+With the optional second argument C<'quote'>, it would return an unevaluated array
+of strings instead of the result of evaluation.   Special strings C<\q> etc. are
+replaced by references to appropriate (undocumented) Perl subroutines.
+
+With the optional third argument C<'echo'>, would "echo" the commands (preceded by
+C<"? ">) before execution.  With C<TRUE>
+optional fourth argument (command counter), would "echo" the result too
+(preceded by C<"%C = ">, with C<C> being the command counter, which is
+incremented).  
+
 =item C<use> with arguments
 
 If arguments are specified in the C<use Math::Pari> directive, the
@@ -148,14 +159,17 @@ or simply do it in two steps
   use Math::Pari;
   use Math::Pari 'factorint';
 
-The other tags recognized are C<:PARI>, C<:all>, C<prec=NUMBER>,
-number tags (e.g., C<:4>), overloaded constants tags (C<:int>,
-C<:float>, C<:hex>) and section names tags.  The number tags export
-functions from the PARI library from the given class (except for
-C<:PARI>, which exports all of the classes).  Tag C<:all> exports all of the
+The other recognized tags are C<:PARI>, C<:all>, C<prec=NUMBER>,
+overloaded constants tags (C<:int>, C<:float>, C<:hex>) and "section
+names" tags.
+
+Additionally, the number tags (e.g., C<:4>) export
+functions from the PARI library from the given "section" (moreover,
+C<:PARI> exports all of the "sections").  Tag C<:all> exports all of the
 exportable symbols and C<:PARI>.
 
-Giving C<?> command to C<gp> (B<PARI> calculator) lists the following classes:
+With older versions of B<PARI>, giving C<?> command to C<gp> (the B<PARI>
+calculator) lists the following sections:
 
   1: Standard monadic or dyadic OPERATORS
   2: CONVERSIONS and similar elementary functions
@@ -169,10 +183,22 @@ Giving C<?> command to C<gp> (B<PARI> calculator) lists the following classes:
   10: GRAPHIC functions
   11: PROGRAMMING under GP
 
+Starting with GP/PARI version 2.9.0, this list depends significantly on this
+version; for backward compatibility, we follow this older list of section
+numbers (to avoid confusion, better use symbolic names below).  For
+compatibility, we assign arbitrary numbers to newer sections:
+
+  100: L-FUNCTIONS
+  101: MODULAR SYMBOLS
+  102: Associative and central simple ALGEBRAS
+  103: functions related to COMBINATORICS
+  104: MODULAR FORMS
+
 One can use section names instead of number tags.  Recognized names are
 
   :standard :conversions :transcendental :number :elliptic
   :fields :polynomials :vectors :sums :graphic :programming
+  :l_functions :modular_symb :algebras :combinatorics :modular 
 
 One can get the list of all of the functions accessible by C<Math::Pari>,
 or the accessible functions from the given section using listPari() function.
@@ -354,7 +380,8 @@ other argument of comparison!)
 
 The function listPari($number) outputs a list of names of PARI
 functions in the section $number.  Use listPari(-1) to get the list
-across all of the sections.
+across all of the sections.  (_listPari() behaves likewise, with the
+version-specific section numbers.)
 
 =item Uncompatible functions
 
@@ -752,10 +779,9 @@ output terminal by calling plotterm(), as in
 
     use Math::Pari qw(:graphic asin);
 
-    open FH, '>out.tex' or die;
     link_gnuplot();		# automatically loads Term::Gnuplot
-    set_plot_fh(\*FH);
     plotterm('emtex');
+    plot_outfile_set('out.tex');	# better do after plotterm()
     ploth($x, .5, .999, sub {asin $x});
     close FH or die;
 
@@ -846,7 +872,9 @@ Summary: if the dynaloading on your system requires some kind of C<-fPIC> flag, 
 
 ).
 
-=item isprime() is a misnomer before PARI version 2.3
+=item *
+
+isprime() is a misnomer before PARI version 2.3!
 
 In older versions of PARI, the one-argument variant of the function isprime()
 is actually checking for probable primes.  Moreover, it has certain problems.
@@ -861,7 +889,7 @@ acceptable results in non-adversarial situations, the worst-case behaviour is
 significantly worse than the average behaviour.  The algorithm is looking for so-called
 "witnesses" (with up to 10 tries) among random integers; usually, witnesses are abundant.  However,
 there are non-prime numbers for which the fraction of witnesses is close to the theoretical
-mininum, 0.75; with 10 random tries, the probability
+minimum, 0.75; with 10 random tries, the probability
 of missing a witness for such numbers is close to 1e-6.  (The known worst-case numbers M
 have phi(M)/4 non-witnesses, with M=P(2P-1), prime P, 2P-1 and 4|P+1; the proportion of such
 numbers near K is expected to be const/sqrt(K)log(K)^2.  Note that numbers which have more than
@@ -912,13 +940,17 @@ Ilya Zakharevich, I<ilyaz@cpan.org>
 
 =cut
 
+use strict;
+
 # $Id: Pari.pm,v 1.3 1994/11/25 23:40:52 ilya Exp ilya $
 package Math::Pari::Arr;
 
 #sub TIEARRAY { $_[0] }
 sub STORE { die "Storing into array elements unsupported" }
 
-package Math::Pari;
+package Math::Pari;		# %converted $initmem $initprimes inspected by xs
+use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT $AUTOLOAD
+	    %converted $initmem $initprimes %names %sections);	# XXX may need to access %names %sections?
 
 require Exporter;
 require DynaLoader;
@@ -939,7 +971,7 @@ require DynaLoader;
 @EXPORT_OK = qw(
   sv2pari sv2parimat pari2iv pari2nv pari2num pari2pv pari2bool loadPari _bool
   listPari pari_print pari_pprint pari_texprint O ifact gdivent gdivround
-  changevalue set_plot_fh link_gnuplot setprecision setseriesprecision
+  changevalue set_plot_fh plot_outfile_set link_gnuplot setprecision setseriesprecision
   setprimelimit allocatemem type_name pari2num_
 );
 
@@ -995,7 +1027,7 @@ sub _shiftr {
 $initmem ||= 4000000;		# How much memory for the stack
 $initprimes ||= 500000;		# Calculate primes up to this number
 
-$VERSION = '2.01080900';
+$VERSION = '2.03052001';
 
 my $true = 1;
 # Propagate sv_true, sv_false to SvIOK:
@@ -1060,6 +1092,7 @@ sub AUTOLOAD {
 #  goto &$cv;
 #  goto &$AUTOLOAD;
 #  &$cv;
+  no strict 'refs';
   &$1;
 #  &$AUTOLOAD;
 }
@@ -1115,12 +1148,37 @@ sub new {
 	       9 sums
 	       10 graphic
 	       11 programming
+
+	       100 l_functions
+	       101 modular_symb
+	       102 algebras
+	       103 combinatorics
+	       104 modular
 	      );
 @sections{values %names} = keys %names;
+# warn "No code to handle added sections yet" if added_sections();	# Now tested in 02_sections.t
 
-@converted{split /,\s+/, qq(buchimag, buchreal,
-    buchgen, buchgenforcefu, buchgenfu, buchinit, buchinitforcefu, buchinitfu,
-    plotstring, addhelp, kill)} = (1) x 100;
+if (pari_version_exp() < 2009000) {
+  *listPari = \&_listPari;
+  *old2newsec = sub ($) {shift};
+} else {	# XXX only 2.9.* supported so far
+  my %sec2;
+  if (pari_version_exp() < 2011000) {
+    %sec2 = (100 => 6+2, 101 => 7+2, 102 => 9+2, map {($_, $_ + 2 + 2*($_>=6) + ($_>=7))} -1..11);
+  } else {
+    my @S = (0, 2, 3, 8, 5, 12, 10, 6, 7, undef, 16, 1); 	# (1,2,4) +1; 3 -> 8, (5,6) -> (12,10), (7,8) -> -1, (10,11) -> 16,1
+    my @aS = (13,15,11,4,14);
+    %sec2 = (-1, 1, map {($_, 2+($S[$_] || $aS[$_-100] || $_))} 0..11, 100..104);
+  }
+  *old2newsec = sub ($) {($sec2{shift()} || 202) - 2};		# unknowns => 200
+  *listPari = sub ($) {_listPari(($sec2{shift()} || 202) - 2)};
+#  *listPari = sub ($) {_listPari(old2newsec(shift))};
+}
+
+# buch* not appearing in newer PARIs (at least as of 2.3.5)
+@converted{qw(buchimag buchreal 
+    buchgen buchgenforcefu buchgenfu buchinit buchinitforcefu buchinitfu 
+    plotstring addhelp kill)} = (1) x 100;
 
 # Now even tested...
 sub _cvt { PARI(shift) }
@@ -1153,13 +1211,15 @@ sub _hex_cvt {
   die "Cannot hex '$in'" if length $in;
   return $ret;
 }
-%overloaded_const = ( 'int' => \&_cvt, float => \&_cvt, 'hex' => \&_hex_cvt);
-%overloaded_const_word
+my %overloaded_const = ( 'int' => \&_cvt, float => \&_cvt, 'hex' => \&_hex_cvt);
+my %overloaded_const_word
   = ( 'int' => 'integer', float => 'float', 'hex' => 'binary');
+
+my %export_ok;
 
 sub import {
   my $p=shift;
-  my @consts;			# Need to do it outside any block!
+  my @const;			# Need to do it outside any block!
   @_ = map {
     if (/^:(?!DEFAULT)(.*)/) {
       my $tag = $1;
@@ -1168,7 +1228,7 @@ sub import {
       $tag = -1, @pre = (@EXPORT_OK,@EXPORT) if ($tag eq 'all');
       $tag = -1 if ($tag eq 'PARI');
       $tag = $sections{$tag} if $tag !~ /^-?\d+$/ and exists $sections{$tag};
-      push @pre, 'link_gnuplot', 'set_plot_fh' if $tag eq 10;
+      push @pre, 'link_gnuplot', 'set_plot_fh', 'plot_outfile_set' if $tag eq $sections{graphic};
       if ($tag =~ /^prec=(\d+)$/) {
 	setprecision($1);
 	();
@@ -1238,30 +1298,31 @@ for $name (keys %converted) {
   push @EXPORT_OK, $name;
   next if defined &$name;
   # string needs to format numbers to 8.3...
+  no strict 'refs';
   if ($name eq 'addhelp' or $name eq 'plotstring') {
     *$name = sub { PARI ( qq($name($_[0],"$_[1]")) ) }
-  } else {
-    *$name = sub { local $"=','; PARI("$name(@_)") }
+  } else {				# probably `kill' only
+    *$name = sub { local $"=','; PARI("$name(@_)") }	# "
   }
 }
 
 @export_ok{@EXPORT_OK,@EXPORT} = (1) x (@EXPORT_OK + @EXPORT);
 
+sub __my_NOP {}
+
+my %supported_cmd = qw(q 0   p setprecision   e __my_NOP);		# ???  WRONG !!!
+my $supported_cmd_rx = '(?:' . join( '|', keys %supported_cmd) . ')';
+$supported_cmd_rx = qr($supported_cmd_rx);
+my $matched_par;
+$matched_par = qr[[^()]*(?:\((??{$matched_par})\)[^()]*)*];		# arbitrary string with ( and ) matching
+
 sub remove_nl ($) { (my $in = shift) =~ s/\n//g; $in }
-sub parse_as_gp ($) {
-  my $in = shift;
-  $in =~ s/(\\(?!\\)|[^"\s\\]|\n|"([^"\\]|\\.)*")|[^\S\n]+|\\\\[^\n]*/ defined($1) ? $1 : '' /ges;
-  # Now all unneeded whitespace (except LF) and comments are removed
-  $in =~ s/^\{(.*?)^}$/ remove_nl $1 /gems;
-  $in =~ s/(?<=[-=+*\/%^><|&,\(\[])\n(?<!--\n|\+\+\n)//gsm;	# not \ !
-  $in =~ s/\\\n//g;
-  $in =~ s/\n{2,}/\n/g;		# Empty lines in the middle
-  $in =~ s/\A\n//;		# Empty line at start
-#  warn "in: <<$in>>\n";
-  my @in = split /\n/, $in;
-  $in = pop @in;
-  PARI($_) for @in;	# Void context (ignored???)
-  PARI($in)
+
+my %POSTF = qw(K 1 M 2 G 3 T 4);
+sub allocatemem_prot ($) {
+  my $mem = shift;
+  $mem =~ s/^(.*)([KMGT])/$1*1000**$POSTF{$2}/e;
+  eval {allocatemem($mem); 1} or $@ =~ /^PARI:\s\sat\s+\S*\s+line\s+\d+\.?\s*$/ or die "allocatemem($mem) died: $@"
 }
 
 sub MP___a___($) { $Math::Pari::__args::a->[shift] }
@@ -1273,14 +1334,67 @@ sub __wrap_PARI_macro ($) {
   }
 }
 
+sub PARI_with_default_mem ($) {
+  my($in) = shift;
+  $in =~ s/(?:^|;)default\(parisize,("?)($matched_par)\1\)\s*$// or return PARI($in);
+  my $s = "$2";
+  PARI($in);
+  allocatemem_prot($s);
+}
+
+sub parse_as_gp ($;$$$) {	# string, quote-and-return, <ignored>, count to use on the first numbered output (like %33 = 2*x+1)
+  my($in, $quote, $echo, $c, $def) = (shift, shift, shift, shift);
+  $def = ($quote and ($quote eq 'define' or ref $quote) and $quote);
+  $def = sub ($) {shift} if $def and not ref $def;
+  $quote = ($quote and not $def);
+  $in =~ s/(\\(?!\\)|\/(?!\*)|[^"\s\\\/]|\n|"([^"\\]|\\.)*")|\/\*.*?\*\/|[^\S\n\/]+|\\\\[^\n]*/ defined($1) ? $1 : '' /ges;
+  # Now all unneeded whitespace (except LF) and comments are removed
+  $in =~ s/(?:^\s*\{|\{\s*$)(.*?)(?:^\s*\}|\}\s*$)/ remove_nl $1 /gems;	# XXXX In fact, braces may appear everywhere???  Strings?
+  $in =~ s/(?<=[-=+*\/%^><|&,\(\[])\n(?<!--\n|\+\+\n)//gsm;	# not \ !
+  $in =~ s/\\\n//g;
+  $in =~ s/\n{2,}/\n/g;		# Empty lines in the middle
+  $in =~ s/\A\n//;		# Empty line at start
+#  warn "in: <<$in>>\n";
+  my @in = split /\n/, $in;
+  /^\\($supported_cmd_rx)\s*(.*)$/ and $_ = [$supported_cmd{$1}, $2, $_] for @in;	# support a few of cmd; cannot have \b:  \p38 is OK
+  my $pre;
+  @in = map { ref() ? $_
+                    : ($pre = $_, s/(?:^|;)allocatemem\(((??{$matched_par}))\);?$//) ? ((length() ? "$_;" : ()), ['allocatemem_prot', $1, $pre]) : $_} @in;
+  return @in if $quote or not @in;
+  $in = pop @in;
+  my $v;
+###  	warn "  Doing($def,$quote): last -> $in";
+ LOOP: {
+		  no strict 'refs';	# for subroutine names used in $foo->(), and defines if $def
+    for my $IN (@in) {
+      print +($echo and ref $IN) ? "? $IN->[2]\n" : "? $IN\n";
+      ref $IN ? ($IN->[0] ? $IN->[0]->(PARI_with_default_mem($IN->[1])) : last LOOP)
+            : (($c and not $IN =~ /;$/) ? (is_gnil(PARI_with_default_mem($IN)) or print("%$c = $v\n"), $c++ ) : PARI_with_default_mem($IN));	# Void context (ignored???)
+      *{$def->("$1")} = __wrap_PARI_macro "$1" if $def and not ref $IN and $IN =~ /^(\w+)\((??{$matched_par})\)=(?!=)/;
+    }
+    print +($echo and ref $in) ? "? $in->[2]\n" : "? $in\n";
+    ref $in ? ($in->[0] ? $in->[0]->(PARI_with_default_mem($in->[1])) : last LOOP)
+            : (($c and not $in =~ /;$/) ? ((is_gnil($v = PARI_with_default_mem($in)) or print("%$c = $v\n"), $c++)) : ($v = PARI_with_default_mem($in)));
+    *{$def->("$1")} = __wrap_PARI_macro "$1" if $def and not ref $in and $in =~ /^(\w+)\((??{$matched_par})\)=(?!=)/;
+  }
+  $v;
+}
+
 sub link_gnuplot {
     eval 'use Term::Gnuplot 0.56; 1' or die;
     int_set_term_ftable(Term::Gnuplot::get_term_ftable());
 }
 
-sub set_plot_fh {
+sub set_plot_fh($) {
   eval 'use Term::Gnuplot 0.4; 1' or die;
+  die "set_plot_fh() unsupported with $Term::Gnuplot::VERSION >= 0.55.  Use plot_outfile_set(FNAME) instead"
+    if $Term::Gnuplot::VERSION ge '0.55';
   Term::Gnuplot::set_gnuplot_fh(@_);
+}
+
+sub plot_outfile_set($) {
+  eval 'use Term::Gnuplot 0.55; 1' or die;
+  Term::Gnuplot::plot_outfile_set(@_);
 }
 
 PARI_DEBUG_set($ENV{MATHPARI_DEBUG} || 0);

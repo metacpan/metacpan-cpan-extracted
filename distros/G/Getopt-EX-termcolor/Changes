@@ -1,5 +1,11 @@
 Revision history for Getopt-EX extension Getopt-EX-termcolor
 
+1.08 2022-03-18T02:59:05Z
+
+    - Improve XTerm terminal interface.
+      Try:
+        perl `perldoc -l Getopt::EX::termcolor::XTerm`
+
 1.07 2020-07-06T01:45:00Z
 
     - Eliminate indirect object call.

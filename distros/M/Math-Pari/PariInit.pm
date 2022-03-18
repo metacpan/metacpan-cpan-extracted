@@ -1,4 +1,5 @@
 package Math::Pari;
+use strict;
 
 my %shift = ( k => 10, K => 10, m => 20, M => 20, g => 30, G=> 30);
 
@@ -13,7 +14,7 @@ sub Math::PariInit::import {
   CORE::shift;
   my @args = map { 
     /^:?(primes|stack)=(\d+((\.\d*)?[eE][-+]?\d+)?)[kKmMgG]?$/ 
-      ? do { ($1 eq 'primes' ? $initprimes : $initmem) = _human2decimal $2;
+      ? do { ($1 eq 'primes' ? $Math::Pari::initprimes : $Math::Pari::initmem) = _human2decimal $2;
 	     $seen++;
 	     () }
 	: $_
@@ -29,6 +30,8 @@ sub Math::PariInit::import {
 }
 
 1;
+
+package Math::PariInit;		# Otherwise MetaCPAN parser would confuse this with Math::Pari docs 
 
 =head1 NAME
 
@@ -47,7 +50,8 @@ specify up to which number the initial list of primes should be
 precalculated, and how large should be the arena for PARI calculations.
 
 The arguments C<primes> and C<stack> cannot be specified if
-Math::Pari is already loaded.
+Math::Pari is already loaded.  Use setprimelimit() and allocatemem() instead.
+
 
 =head1 AUTHOR
 

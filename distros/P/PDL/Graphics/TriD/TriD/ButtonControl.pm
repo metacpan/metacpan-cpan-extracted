@@ -54,7 +54,8 @@ sub new {
 =head2 mouse_moved
 
 =for ref
-  A do nothing function to prevent errors if not defined in a subclass
+
+A do-nothing function to prevent errors if not defined in a subclass
 
 =cut
 
@@ -65,7 +66,8 @@ sub mouse_moved{
 =head2 ButtonRelease
 
 =for ref
-  A do nothing function to prevent errors if not defined in a subclass
+
+A do nothing function to prevent errors if not defined in a subclass
 
 =cut
 
@@ -79,18 +81,18 @@ sub ButtonRelease{
 
 =for ref
 
-  Activates the viewport the mouse is inside when pressed
+Activates the viewport the mouse is inside when pressed
 
 =cut
 
-$PDL::Graphics::TriD::cur = $PDL::Graphics::TriD::cur; # warnings
+$PDL::Graphics::TriD::current_window = $PDL::Graphics::TriD::current_window; # warnings
 
 sub ButtonPress{
   my ($this,$x,$y) = @_;
 #
 # GL (0,0) point is Lower left X and Tk is upper left.
 #
-  $y = $PDL::Graphics::TriD::cur->{Height}-$y;
+  $y = $PDL::Graphics::TriD::current_window->{Height}-$y;
 
 #  print "$x $y ",$this->{Win}{X0}," ",$this->{Win}{Y0}," ",$this->{Win}{W}," ",$this->{Win}{H},"\n";
 
@@ -105,7 +107,7 @@ sub ButtonPress{
 
 =for ref
 
-  Define the width and Height of the window for button control
+Define the width and Height of the window for button control
 
 =cut
 
@@ -122,6 +124,5 @@ sub set_wh {
 	 $this->{SC} = $w/2;
   }
 }
-
 
 1;

@@ -124,7 +124,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.199';
+our $VERSION = '1.200';
 
 use Quiq::Html::Table::Simple;
 
@@ -260,17 +260,17 @@ sub html {
             $tmp .= sprintf '%*d',$lnMaxWidth,$i;
         }
         push my @cols,
-            [class=>"ln",$h->tag('pre',$tmp)],
+            [class=>"ln",$h->tag('pre',style=>'margin: 0',$tmp)],
             [class=>"margin",''],
         ;
 
         # Text-Kolumne
-        push @cols,[class=>"text",$h->tag('pre',$text)];
+        push @cols,[class=>"text",$h->tag('pre',style=>'margin: 0',$text)];
 
         # Erzeuge Tabelle
 
         $html = Quiq::Html::Table::Simple->html($h,
-            border => undef,
+            border => 0,
             cellpadding => undef,
             cellspacing => undef,
             rows => [
@@ -297,7 +297,7 @@ sub html {
 
 =head1 VERSION
 
-1.199
+1.200
 
 =head1 AUTHOR
 

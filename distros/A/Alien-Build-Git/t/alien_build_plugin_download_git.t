@@ -11,7 +11,7 @@ skip_all 'Test requires Sort::Versions'
 
 my $build = alienfile_ok q{
   use alienfile;
-  
+
   plugin 'Download::Git';
 };
 
@@ -34,22 +34,22 @@ subtest 'latest' => sub {
     };
     $error = $@;
   };
-  
+
   is $error, '';
   diag $out if $error;
-  
+
   note $out = scalar capture_merged {
     $ret = eval {
       $build->extract;
     };
    $error = $@;
   };
-  
+
   is $error, '';
   diag $out if $error;
 
   my $dir = $ret;
-  
+
   ok -d $dir;
   is( path($dir)->child('content.txt')->slurp, "This is version 0.03\n");
 

@@ -25,7 +25,6 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
-                                      'Crypt::SSLeay' => '0.72',
                                       'File::MMagic' => '1.29',
                                       'JSON' => '2.53',
                                       'LWP::Protocol::https' => '6.04',

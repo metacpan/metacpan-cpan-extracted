@@ -37,16 +37,17 @@ use warnings;
 
 use base qw{ PPIx::Regexp::Token };
 
-use Carp qw{ confess };
+use Carp ();
 use PPIx::Regexp::Constant qw{ @CARP_NOT };
+use PPIx::Regexp::Util;
 
-our $VERSION = '0.082';
+our $VERSION = '0.083';
 
 sub __new {
     my ( $class, $content, %arg ) = @_;
 
     defined $arg{error}
-	or confess 'Programming error - error argument required';
+	or Carp::confess( 'Programming error - error argument required' );
 
     my $self = $class->SUPER::__new( $content, %arg )
 	or return;
@@ -91,19 +92,7 @@ sub ordinal {
     return ord $self->content();
 }
 
-sub __PPIX_ELEM__rebless {
-    my ( $class, $self, %arg ) = @_;
-    my $rslt = $class->SUPER::__PPIX_ELEM__rebless( $self, %arg );
-    unless ( defined( $self->{error} = $arg{error} ) ) {
-	Carp::cluck( 'Making unknown token with no error message' );
-	$self->{error} = 'Unspecified error';
-	$rslt++;
-    }
-    $self->{explanation} = defined $arg{explanation} ?
-	$arg{explanation} :
-	$arg{error};
-    return $rslt;
-}
+*__PPIX_ELEM__post_reblessing = \&PPIx::Regexp::Util::__post_rebless_error;
 
 # Since the lexer does not count these on the way in (because it needs
 # the liberty to rebless them into a known class if it figures out what
@@ -129,7 +118,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2009-2021 by Thomas R. Wyant, III
+Copyright (C) 2009-2022 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

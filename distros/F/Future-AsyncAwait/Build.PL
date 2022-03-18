@@ -56,7 +56,8 @@ my $build = Module::Build->new(
 XS::Parse::Keyword::Builder->extend_module_build( $build );
 XS::Parse::Sublike::Builder->extend_module_build( $build );
 
-if( eval { require Devel::MAT::Dumper::Helper } ) {
+if( eval { require Devel::MAT::Dumper::Helper and
+            Devel::MAT::Dumper::Helper->VERSION( '0.44' ) } ) {
    Devel::MAT::Dumper::Helper->extend_module_build( $build );
 }
 

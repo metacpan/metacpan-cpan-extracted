@@ -1,5 +1,17 @@
 Revision history for Perl extension Geo::LatLon2City
 
+	- bumped database version to 2.
+	- moved search to C.
+        - too many bugs to list them - it's a miracle you got correct results
+          for most queries.
+	- slightly improved docs.
+        - postal code support was actually implemented already.
+        - bump perl version requirement to 5.10.
+        - add embedded cdb version, ask whether to use it and use it by default
+          on windows.
+        - associated data can now be up to 255 bytes.
+        - fixed memory corruption caused b y not properly allocating the cdb structure.
+
 0.01  Mon 14 Mar 2022 04:09:30 CET
 	- first release
 

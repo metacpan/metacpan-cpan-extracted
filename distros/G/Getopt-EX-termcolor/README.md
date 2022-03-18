@@ -1,10 +1,7 @@
+[![Actions Status](https://github.com/kaz-utashiro/Getopt-EX-termcolor/workflows/test/badge.svg)](https://github.com/kaz-utashiro/Getopt-EX-termcolor/actions) [![MetaCPAN Release](https://badge.fury.io/pl/Getopt-EX-termcolor.svg)](https://metacpan.org/release/Getopt-EX-termcolor)
 # NAME
 
 Getopt::EX::termcolor - Getopt::EX termcolor module
-
-# VERSION
-
-Version 1.07
 
 # SYNOPSIS
 
@@ -22,20 +19,24 @@ Version 1.07
 
     $ command -Mtermcolor::bg=
 
+# VERSION
+
+Version 1.08
+
 # DESCRIPTION
 
-This is a common module for command using [Getopt::EX](https://metacpan.org/pod/Getopt::EX) to manipulate
+This is a common module for command using [Getopt::EX](https://metacpan.org/pod/Getopt%3A%3AEX) to manipulate
 system dependent terminal color.
 
-Actual action is done by sub-module under [Getopt::EX::termcolor](https://metacpan.org/pod/Getopt::EX::termcolor),
-such as [Getopt::EX::termcolor::Apple\_Terminal](https://metacpan.org/pod/Getopt::EX::termcolor::Apple_Terminal).
+Actual action is done by sub-module under [Getopt::EX::termcolor](https://metacpan.org/pod/Getopt%3A%3AEX%3A%3Atermcolor),
+such as [Getopt::EX::termcolor::Apple\_Terminal](https://metacpan.org/pod/Getopt%3A%3AEX%3A%3Atermcolor%3A%3AApple_Terminal).
 
 Each sub-module is expected to have `&get_color` function which
 return the list of RGB values for requested name, but currently name
 `background` is only supported.  Each RGB values are expected in a
-range of 0 to 255 by default.  If the list first entry is a HASH
-reference, it may include maximum number indication like `{ max =>
-65535 }`.
+range of 0 to 255 by default.  If the first entry of the list is a
+HASH reference, it may include maximum number indication like `{
+max => 65535 }`.
 
 Terminal luminance is calculated from RGB values by this equation and
 produces decimal value from 0 to 100.
@@ -46,7 +47,7 @@ If the environment variable `TERM_BGCOLOR` is defined, it is used as
 a background RGB value without calling sub-modules.  RGB value is a
 combination of integer described in 24bit/12bit hex, 24bit decimal or
 6x6x6 216 color format.  RGB color notation is compatible with
-[Getopt::EX::Colormap](https://metacpan.org/pod/Getopt::EX::Colormap).
+[Getopt::EX::Colormap](https://metacpan.org/pod/Getopt%3A%3AEX%3A%3AColormap).
 
     24bit hex     #000000 .. #FFFFFF
     12bit hex     #000    .. #FFF
@@ -85,13 +86,13 @@ module has utility function `bgcolor` which can be used like this:
 
 # SEE ALSO
 
-[Getopt::EX](https://metacpan.org/pod/Getopt::EX)
+[Getopt::EX](https://metacpan.org/pod/Getopt%3A%3AEX)
 
-[Getopt::EX::termcolor::Apple\_Terminal](https://metacpan.org/pod/Getopt::EX::termcolor::Apple_Terminal)
+[Getopt::EX::termcolor::Apple\_Terminal](https://metacpan.org/pod/Getopt%3A%3AEX%3A%3Atermcolor%3A%3AApple_Terminal)
 
-[Getopt::EX::termcolor::iTerm](https://metacpan.org/pod/Getopt::EX::termcolor::iTerm)
+[Getopt::EX::termcolor::iTerm](https://metacpan.org/pod/Getopt%3A%3AEX%3A%3Atermcolor%3A%3AiTerm)
 
-[Getopt::EX::termcolor::XTerm](https://metacpan.org/pod/Getopt::EX::termcolor::XTerm)
+[Getopt::EX::termcolor::XTerm](https://metacpan.org/pod/Getopt%3A%3AEX%3A%3Atermcolor%3A%3AXTerm)
 
 # AUTHOR
 
@@ -99,7 +100,7 @@ Kazumasa Utashiro
 
 # LICENSE
 
-Copyright (C) 2020 Kazumasa Utashiro.
+Copyright 2020-2021 Kazumasa Utashiro.
 
 You can redistribute it and/or modify it under the same terms
 as Perl itself.

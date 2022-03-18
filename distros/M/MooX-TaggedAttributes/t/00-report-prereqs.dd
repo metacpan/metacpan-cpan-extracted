@@ -81,7 +81,6 @@ do { my $x = {
                                       'Scalar::Util' => '0',
                                       'Sub::Name' => '0',
                                       'autovivification' => '0',
-                                      'namespace::clean' => '0',
                                       'overloading' => '0',
                                       'perl' => '5.010001'
                                     }

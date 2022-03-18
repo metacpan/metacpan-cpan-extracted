@@ -1,3 +1,7 @@
+0.020		2022-03-17	T. R. Wyant
+    Correct and optimize the computation of logical column position (the
+    one that takes account of tabs).
+
 0.019		2021-11-15	T. R. Wyant
     Add CONTRIBUTING file.
 

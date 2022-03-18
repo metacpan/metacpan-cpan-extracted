@@ -10,6 +10,16 @@ $PERLDL::PROMPT = $PERLDL::PROMPT; # suppress warning
 
 with 'Devel::REPL::Profile';
 
+my %plugin2deps = (
+  'Completion' => [qw(PPI)],
+  'CompletionDriver::INC' => [qw(File::Next)],
+  'CompletionDriver::Keywords' => [qw(B::Keywords)],
+  'CompletionDriver::LexEnv' => [qw(Lexical::Persistence)],
+  'DDS' => [qw(Data::Dump::Streamer)],
+  'Interrupt' => [qw(Sys::SigAction)],
+  'LexEnv' => [qw(Lexical::Persistence)],
+  'MultiLine::PPI' => [qw(PPI)],
+);
 sub plugins {
    qw(
       CleanErrors
@@ -21,6 +31,7 @@ sub plugins {
       CompletionDriver::Methods
       DDS
       History
+      Interrupt
       LexEnv
       MultiLine::PPI
       Packages
@@ -47,20 +58,10 @@ sub apply_profile {
    push @{$repl->_plugin_app_ns}, 'PDL::Perldl2';
 
    foreach my $plug ($self->plugins) {
-      if ($plug =~ 'CompletionDriver::INC') {
-         eval 'use File::Next';
-         next if $@;
-      }
-      if ($plug =~ 'CompletionDriver::Keywords') {
-         eval 'use B::Keywords';
-         next if $@;
-      }
-      $repl->load_plugin($plug);
-   }
-
-   # these plugins don't work on win32
-   unless ($^O =~ m/win32/i) {
-      $repl->load_plugin('Interrupt');
+     if (my $deps = $plugin2deps{$plug}) {
+       next if grep !eval "require $_; 1", @$deps;
+     }
+     $repl->load_plugin($plug);
    }
 
    # enable Term::ReadLine file expansion by default
@@ -110,61 +111,32 @@ sub apply_profile {
       #map {print  "$_: $h[$_]\n"} ($min..$#h);
       };');
 
-   # preliminary support for PDL demos
    $repl->eval( q{
-      sub demo {
-      local $_ = lc $_[0] ;
-      if(/^$/) {
-      print <<EOD;
-      Use:
-      demo pdl         # general demo
+    sub with_time (&) {
+      require Time::HiRes;
+      my @t = Time::HiRes::gettimeofday();
+      &{$_[0]}();
+      printf "%g ms\n", Time::HiRes::tv_interval(\@t) * 1000;
+    }
+   } );
 
-      demo 3d          # 3d demo (requires TriD with OpenGL or Mesa)
-      demo 3d2         # 3d demo, part 2. (Somewhat memory-intensive)
-      demo 3dgal       # the 3D gallery: make cool images with 3-line scripts
-
-      demo pgplot      # PGPLOT graphics output (Req.: PGPLOT)
-      demo OOplot      # PGPLOT OO interface    (Req.: PGPLOT)
-
-      demo gnuplot     # Gnuplot graphics (requires PDL::Graphics::Gnuplot)
-      demo prima       # Prima graphics (requires PDL::Graphics::Prima)
-
-      demo transform   # Coordinate transformations (Req.: PGPLOT)
-      demo cartography # Cartographic projections (Req.: PGPLOT)
-
-      demo bad         # Bad-value demo (Req.: bad value support)
-      demo bad2        # Bad-values, part 2 (Req.: bad value support and PGPLOT)
-EOD
-      return;
-      } # if: /^$/
-
-      my %demos = (
-         'pdl' => 'PDL::Demos::General', # have to protect pdl as it means something
-         '3d' => 'PDL::Demos::TriD1',
-         '3d2' => 'PDL::Demos::TriD2',
-         '3dgal' => 'PDL::Demos::TriDGallery',
-         'pgplot' => 'PDL::Demos::PGPLOT_demo',
-         'ooplot' => 'PDL::Demos::PGPLOT_OO_demo', # note: lowercase
-         'bad' => 'PDL::Demos::BAD_demo',
-         'bad2' => 'PDL::Demos::BAD2_demo',
-         'transform' => 'PDL::Demos::Transform_demo',
-         'cartography' => 'PDL::Demos::Cartography_demo',
-         'gnuplot' => 'PDL::Demos::Gnuplot_demo',
-         'prima' => 'PDL::Demos::Prima',
-      );
-
-      if ( exists $demos{$_} ) {
-         require PDL::Demos::Screen; # Get the routines for screen demos.
-         my $name = $demos{$_};
-         eval "require $name;"; # see docs on require for need for eval
-         $name .= "::run";
-         no strict 'refs';
-         &{$name}();
-      } else {
-         print "No such demo!\n";
+   $repl->eval( q{
+    use PDL::Demos;
+    sub demo {
+      if (!$_[0]) {
+        require List::Util;
+        my @kw = sort grep $_ ne 'pdl', PDL::Demos->keywords;
+        my $maxlen = List::Util::max(map length, @kw);
+        print "Use:\n";
+        printf "   demo %-${maxlen}s # %s\n", @$_[0,1] for map [PDL::Demos->info($_)], 'pdl', @kw;
+        return;
       }
-
-   } } );
+      no strict;
+      PDL::Demos->init($_[0]);
+      $_->[0]->($_->[1]) for PDL::Demos->demo($_[0]);
+      PDL::Demos->done($_[0]);
+    }
+   } );
 
    if ($repl->can('do_print')) {
       $repl->eval('sub do_print { $_REPL->do_print(@_) };');

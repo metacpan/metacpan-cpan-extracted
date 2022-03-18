@@ -13,6 +13,11 @@ use parent 'Text::Layout';
 sub new {
     my ( $pkg, @data ) = @_;
     my $self = $pkg->SUPER::new;
+    $self->{_currentfont} = { family => 'default',
+			      style => 'normal',
+			      weight => 'normal' };
+    $self->{_currentcolor} = 'black';
+    $self->{_currentsize} = 12;
     $self;
 }
 

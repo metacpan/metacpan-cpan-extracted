@@ -15,7 +15,7 @@ name: NewsExtractor
 provides:
   NewsExtractor:
     file: lib/NewsExtractor.pm
-    version: v0.44.0
+    version: v0.45.0
   NewsExtractor::Article:
     file: lib/NewsExtractor/Article.pm
   NewsExtractor::CSSExtractor:
@@ -161,7 +161,7 @@ requires:
 resources:
   bugtracker: https://github.com/perltaiwan/NewsExtractor/issues
   repository: https://github.com/perltaiwan/NewsExtractor.git
-version: v0.44.0
+version: v0.45.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_spdx_expression: CC0-1.0
 x_static_install: '1'

@@ -4,7 +4,7 @@
       "Goro Fuji(gfx) <gfuji(at)cpan.org>."
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.10",
+   "generated_by" : "Minilla/v3.1.15",
    "license" : [
       "perl_5"
    ],
@@ -47,7 +47,7 @@
          "requires" : {
             "Test::CPAN::Meta" : "0",
             "Test::MinimumVersion::Fast" : "0.04",
-            "Test::PAUSE::Permissions" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
             "Test::Pod" : "1.41",
             "Test::Spellunker" : "v0.2.7"
          }
@@ -62,7 +62,7 @@
    "provides" : {
       "Data::Util" : {
          "file" : "lib/Data/Util.pm",
-         "version" : "0.66"
+         "version" : "0.67"
       },
       "Data::Util::Error" : {
          "file" : "lib/Data/Util/Error.pm"
@@ -78,18 +78,20 @@
       },
       "homepage" : "https://github.com/gfx/Perl-Data-Util",
       "repository" : {
-         "url" : "git://github.com/gfx/Perl-Data-Util.git",
+         "type" : "git",
+         "url" : "https://github.com/gfx/Perl-Data-Util.git",
          "web" : "https://github.com/gfx/Perl-Data-Util"
       }
    },
-   "version" : "0.66",
+   "version" : "0.67",
    "x_contributors" : [
       "Fuji Goro <fuji.goro@dena.jp>",
-      "Fuji, Goro <g.psy.va@gmail.com>",
-      "Tokuhiro Matsuno <tokuhirom@gmail.com>",
       "Fuji, Goro (gfx) <gfuji@cpan.org>",
+      "Fuji, Goro <g.psy.va@gmail.com>",
       "Patrice Clement <monsieurp@gentoo.org>",
-      "Syohei YOSHIDA <syohex@gmail.com>"
+      "Shohei YOSHIDA <syohex@gmail.com>",
+      "Tokuhiro Matsuno <tokuhirom@gmail.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "x_serialization_backend" : "JSON::PP version 4.07",
+   "x_static_install" : 0
 }

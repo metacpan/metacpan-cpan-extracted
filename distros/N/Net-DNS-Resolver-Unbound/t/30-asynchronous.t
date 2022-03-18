@@ -21,8 +21,8 @@ sleep 1 if $resolver->bgbusy($handle);
 
 my $reply = $resolver->bgread($handle);
 ok( $handle->async_id(), 'handle->async_id' );
-is( $handle->err(), 0, 'no handle->err' );
-ok( $reply, '$reselver->bgread($handle)' );
+ok( !$handle->err(),	 'no handle->err' );
+ok( $reply,		 '$reselver->bgread($handle)' );
 
 
 exit;

@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.10, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.12, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,7 +26,7 @@ no_index:
 provides:
   Getopt::EX::termcolor:
     file: lib/Getopt/EX/termcolor.pm
-    version: '1.07'
+    version: '1.08'
   Getopt::EX::termcolor::Apple_Terminal:
     file: lib/Getopt/EX/termcolor/Apple_Terminal.pm
   Getopt::EX::termcolor::XTerm:
@@ -43,9 +43,9 @@ resources:
   bugtracker: https://github.com/kaz-utashiro/Getopt-EX-termcolor/issues
   homepage: https://github.com/kaz-utashiro/Getopt-EX-termcolor
   repository: git://github.com/kaz-utashiro/Getopt-EX-termcolor.git
-version: '1.07'
+version: '1.08'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

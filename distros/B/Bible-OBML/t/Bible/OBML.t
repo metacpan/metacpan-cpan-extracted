@@ -5,160 +5,72 @@ my $self = Bible::OBML->new;
 isa_ok( $self, 'Bible::OBML' );
 
 can_ok( $self, $_ ) for ( qw(
-    html bible acronyms refs
-    read_file write_file parse render canonicalize smartify desmartify
+    indent_width reference_acronym fnxref_acronym wrap_at wrap_lines wrap_indents reference
+    data html obml
 ) );
 
-parse_render($self);
-smartify($self);
+sub deindent {
+    my $text = join( "\n", @_ );
+    $text =~ s/^[ ]{4}//mg;
+    $text =~ s/(?:^\s+|\s+$)//g;
+    return $text;
+}
+
+my $obml = deindent(q$
+    ~ 2 Corinthians 6:8-12 ~
+
+    |8| Jesus said, "*I am the ^way^{Mt 5:29; Ro 14:13, 20; 1Co 3:9; 8:9, 13; 9:12;
+    10:32; 2Co 5:20} and the truth and the light.* |9| *For it is written:*"
+
+        The \Lord\ is a mighty fortress[literally ^castle^],
+            the Creator of all things.
+        |10| In the time of my favor I heard you,
+            and in the day of salvation I helped you.
+
+    = Header =
+
+    |11| Then stuff happened.
+
+    # This is a comment.
+
+        # This is also a comment.
+
+    == Sub-Header ==
+
+    |12| Then more stuff happened.
+$);
+
+my $html = deindent(q$
+    <obml><reference>2 Corinthians 6:8-12</reference>
+
+    <p><verse_number>8</verse_number>Jesus said, "<woj>I am the <i>way</i><crossref>Mt 5:29; Ro 14:13, 20; 1Co 3:9; 8:9, 13; 9:12; 10:32; 2Co 5:20</crossref> and the truth and the light.</woj> <verse_number>9</verse_number><woj>For it is written:</woj>"</p>
+
+    <p><indent level="1">The <small_caps>Lord</small_caps> is a mighty fortress<footnote>literally <i>castle</i></footnote>,</indent><br>
+    <indent level="2">the Creator of all things.</indent><br>
+    <indent level="1"><verse_number>10</verse_number>In the time of my favor I heard you,</indent><br>
+    <indent level="2">and in the day of salvation I helped you.</indent></p>
+
+    <header>Header</header>
+
+    <p><verse_number>11</verse_number>Then stuff happened.</p>
+
+    <sub_header>Sub-Header</sub_header>
+
+    <p><verse_number>12</verse_number>Then more stuff happened.</p></obml>
+$);
+
+is( $self->obml($obml)->html, $html, 'obml -> html' );
+is( $self->html($html)->html, $html, 'html -> html' );
+
+( my $clean_obml = $obml ) =~ s/^\s*#.*?\n//mg;
+is( $self->html($html)->obml, $clean_obml, 'html -> obml' );
+is( $self->obml($obml)->obml, $clean_obml, 'obml -> obml' );
+
+my $data = $self->obml($obml)->data;
+is( $data, $self->html($html)->data, 'data == data' );
+is( $data, $self->data($data)->data, 'data -> data' );
+
+is( $self->data($data)->html, $html,       'data -> html' );
+is( $self->data($data)->obml, $clean_obml, 'data -> obml' );
+
 done_testing;
-
-sub parse_render {
-    my ($self) = @_;
-
-    my $test = sub {
-        my ( $content, $data, $name ) = @_;
-
-        is( $self->parse($content), $data, '$self->parse; # ' . $name );
-        is( $self->render($data), $content, '$self->render; # ' . $name );
-    };
-
-    $test->(
-        join( "\n",
-            q\~ Jude 1 ~\,
-            q\\,
-            q\|1| Jude, a slave of Jesus Christ, and brother of James, to those having been\,
-            q\set apart in God ^the^ Father, and having been kept by Jesus Christ.\,
-            q\\,
-        ),
-        [
-            {
-                'reference' => {
-                    'book'    => 'Jude',
-                    'chapter' => '1',
-                    'verse'   => '1'
-                },
-                'content' => [
-                    'Jude, a slave of Jesus Christ, and brother of James, to those having been set apart in God',
-                    [
-                        'italic',
-                        'the'
-                    ],
-                    'Father, and having been kept by Jesus Christ.'
-                ]
-            }
-        ],
-        'Simple single verse with italic',
-    );
-
-    $test->(
-        join( "\n",
-            q\~ Jude 1 ~\,
-            q\\,
-            q\|1| Jude, [or ^Judas^] {Mt 13:55; Mk 6:3; Joh 14:22; Ac 1:13} a slave [or\,
-            q\^servant^] {Ti 1:1} of Jesus Christ, and brother of James, [or ^Jacob^] to\,
-            q\those having been set apart [or ^loved^ or ^sanctified^] in God ^the^ Father,\,
-            q\{Ro 1:6-7} and having been kept [or ^called^] by [or ^for^ or ^in^] Jesus\,
-            q\Christ: {Joh 17:12; 1Pt 1:5}\,
-            q\\,
-        ),
-        [ {
-            'reference' => { 'verse' => '1', 'book' => 'Jude', 'chapter' => '1' },
-            'content' => [
-                'Jude,', [ 'footnote', 'or', [ 'italic', 'Judas' ] ], [
-                'crossreference', [ 'Mt 13:55', 'Mk 6:3', 'Joh 14:22', 'Ac 1:13' ] ],
-                'a slave', [ 'footnote', 'or', [ 'italic', 'servant' ] ], [ 'crossreference', [
-                'Ti 1:1' ] ], 'of Jesus Christ, and brother of James,', [ 'footnote', 'or', [
-                'italic', 'Jacob' ] ], 'to those having been set apart', [ 'footnote', 'or', [
-                'italic', 'loved' ], 'or', [ 'italic', 'sanctified' ] ], 'in God', [ 'italic',
-                'the' ], 'Father,', [ 'crossreference', [ 'Ro 1:6-7' ] ],
-                'and having been kept', [ 'footnote', 'or', [ 'italic', 'called' ] ], 'by',
-                [ 'footnote', 'or', [ 'italic', 'for' ], 'or', [ 'italic', 'in' ] ], 'Jesus Christ:',
-                [ 'crossreference', [ 'Joh 17:12', '1Pt 1:5' ] ]
-            ]
-        } ],
-        'Complex single verse with footnotes and crossreferences',
-    );
-
-    $test->(
-        join( "\n",
-            q\~ Jude 1 ~\,
-            q\\,
-            q\= Header Alpha =\,
-            q\\,
-            q\|1| Jude, a slave of Jesus Christ, and brother of James, to those having been\,
-            q\set apart in God ^the^ Father, and having been kept by Jesus Christ. |2| This\,
-            q\is a second verse, but it's fake.\,
-            q\\,
-            q\= Header Beta =\,
-            q\\,
-            q\|3| This is a third verse, also fake.\,
-            q\\,
-        ),
-        [
-            {
-                'header' => [ 'Header Alpha' ], 'content' => [
-                'Jude, a slave of Jesus Christ, and brother of James, to those having been set apart in God',
-                [ 'italic', 'the' ], 'Father, and having been kept by Jesus Christ.' ], 'reference' => {
-                'book' => 'Jude', 'verse' => '1', 'chapter' => '1' }
-            },
-            {
-                'reference' => {
-                'book' => 'Jude', 'chapter' => '1', 'verse' => '2' }, 'content' =>
-                [ 'This is a second verse, but it\'s fake.', [ 'paragraph' ] ]
-            },
-            {
-                'header' => [ 'Header Beta' ], 'reference' => { 'book' => 'Jude', 'chapter' =>
-                '1', 'verse' => '3' }, 'content' => [ 'This is a third verse, also fake.' ]
-            }
-        ],
-        '3 simple verses with 2 headers',
-    );
-
-    $test->(
-        join( "\n",
-            q\~ Romans 12 ~\,
-            q\\,
-            q\|14| These are words.\,
-            q\\,
-            q\    Behold, these are more words\,
-            q\      and another line of words.\,
-            q\    |15| For he who |16| reads lines\,
-            q\      shall |17| have words.\,
-            q\\,
-            q\|18| Then there's more.\,
-            q\\,
-        ),
-        [
-            { 'reference' => { 'verse' => '14', 'chapter' => '12', 'book' =>
-            'Romans' }, 'content' => [ 'These are words.', [ 'paragraph' ], [ 'blockquote', 'Behold, these are more words' ],
-            [ 'break' ], [ 'blockquote_indent', 'and another line of words.' ], [
-            'break' ] ] }, { 'content' => [ [ 'blockquote', 'For he who' ] ], 'reference' => { 'verse' =>
-            '15', 'chapter' => '12', 'book' => 'Romans' } }, { 'content' => [ [ 'blockquote', 'reads lines' ], [ 'break' ],
-            [ 'blockquote_indent', 'shall' ] ], 'reference' => { 'book' => 'Romans',
-            'chapter' => '12', 'verse' => '16' } }, { 'content' => [ [ 'blockquote_indent', 'have words.' ], [
-            'paragraph' ] ], 'reference' => { 'verse' => '17', 'chapter' => '12',
-            'book' => 'Romans' } }, { 'content' => [ 'Then there\'s more.' ],
-            'reference' => { 'chapter' => '12', 'verse' => '18', 'book' => 'Romans' } }
-        ],
-        'Blockquote and indented blockquote run with trailing verse',
-    );
-
-    return;
-}
-
-sub smartify {
-    my ($self) = @_;
-
-    my $content =
-        q{A "test" of module's "awesome 'perfect' } .
-        q{cool" smarts. It's "not" awesome.};
-    my $smart_content =
-        qq{A \x{201c}test\x{201d} of module\x{2019}s \x{201c}awesome \x{2018}perfect\x{2019} } .
-        qq{cool\x{201d} smarts. It\x{2019}s \x{201c}not\x{201d} awesome.};
-
-    is( $self->smartify($content), $smart_content, '$self->smartify($content)' );
-    is( $self->desmartify($smart_content), $content, '$self->desmartify($smart_content)' );
-
-    return;
-}

@@ -3,15 +3,30 @@
 #  include <windows.h>
 #endif
 
+#define strtoi		PARI_strtoi	/* NetBSD declares a function strtoi() conflicting with PARI one */
+
+#ifdef USE_STANDALONE_PARILIB
+#  include <pari/pari.h>
+#  include <pari/paripriv.h>
+#else
 #  include <pari.h>
-#  include <graph/rect.h>
-#  include <language/anal.h>
+#  if PARI_VERSION_EXP < 2011000	/* Probably much earlier too... */
+#    include <graph/rect.h>
+#  endif
+#  if 1 || PARI_VERSION_EXP < 2011000	/* Misses foreign*, varentries, fetch_entry... */
+#    include <language/anal.h>
+#  endif
 
 #ifdef HAVE_PARIPRIV
-#  include <headers/paripriv.h>
+#  if 1 || PARI_VERSION_EXP < 2011000	/* Misses EpNEW, EpVAR, precreal */
+#    include <headers/paripriv.h>
+#  endif
 #endif
 
-#  include <gp/gp.h>			/* init_opts */
+#  if 1 || PARI_VERSION_EXP < 2011000	/* misses gp_get_plot */		/* Probably much earlier too... */
+#    include <gp/gp.h>			/* init_opts */
+#  endif
+#endif /* !defined USE_STANDALONE_PARILIB */
 
 /* On some systems /usr/include/sys/dl.h attempts to declare
    ladd which pari.h already defined with a different meaning.
@@ -19,6 +34,7 @@
    It is not clear whether this is a correct fix...
  */
 #undef ladd
+#undef strtoi				/* See above */
 
 #define PERL_POLLUTE			/* We use older varnames */
 
@@ -26,14 +42,44 @@
 extern "C" {
 #endif 
 
+#if defined(_WIN64) && defined(long)
+#  undef long
+#  define NEED_TO_REDEFINE_LONG
+#endif
+
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
 #include "func_codes.h"
 
+#ifdef NEED_TO_REDEFINE_LONG
+#  ifdef SSize_t		/* XXX  Defect in Perl???  Not in 5.18.0, but in 5.28.1. */
+typedef SSize_t mySSize_t;
+#    undef SSize_t		/* long long; would be expanded to long long long long */
+#    define SSize_t mySSize_t
+#  endif
+#  define long long 	long	/* see parigen.h */
+#  define MYatol	atoll
+#else
+#  define MYatol	atol
+#endif
+
 #ifdef __cplusplus
 }
 #endif 
+
+#ifndef PTRV
+#  define PTRV IV
+#endif
+
+#ifndef TWOPOTBYTES_IN_LONG		/* Miss starting from 2.4.2; taken from 2.3.5 */
+#ifdef LONG_IS_64BIT
+#  define TWOPOTBYTES_IN_LONG  3
+#else
+#  define TWOPOTBYTES_IN_LONG  2
+#endif
+#define BYTES_IN_LONG (1<<TWOPOTBYTES_IN_LONG)
+#endif
 
 #if !defined(na) && defined(PERL_VERSION) && (PERL_VERSION > 7)	/* Added in 6 (???), Removed in 13 */
 #  define na		PL_na
@@ -43,6 +89,43 @@ extern "C" {
 
 #if PARI_VERSION_EXP < 2002012
 void init_defaults(int force);	/* Probably, will never be fixed in 2.1.* */
+#endif
+
+#if PARI_VERSION_EXP >= 2004000	/* Unclear when exactly they disappeared.  Miss in 3.5.0 */
+extern entree functions_basic[];
+extern entree  functions_highlevel[];
+#endif
+
+#if PARI_VERSION_EXP < 2009000
+#  define myPARI_top	(top)
+#  define myPARI_bot	(bot)
+#else
+#  define myPARI_top	(pari_mainstack->top)
+#  define myPARI_bot	(pari_mainstack->bot)
+#  define lgef		lg
+#endif
+
+#if PARI_VERSION_EXP < 2002009
+#define gen_0	gzero
+#define gen_1	gun
+#endif
+
+#if PARI_VERSION_EXP < 2002011
+#  define readseq		lisexpr
+#endif
+
+#if PARI_VERSION_EXP < 2002010
+#  define gequal	gegal
+#endif
+
+#if PARI_VERSION_EXP < 2000009
+#  define gpow		gpui
+#endif
+
+#if PARI_VERSION_EXP < 2002013
+#  define myforcecopy		forcecopy
+#else
+#  define myforcecopy		gcopy
 #endif
 
 /* This should not be defined at this moment, but in 5.001n is. */
@@ -96,9 +179,11 @@ STRLEN n___a;
 #  define PERL_UNUSED_VAR(var) if (0) var = var
 #endif
 
-/* Here is the rationals for managing SVs which keep GENs: when newly
-   created SVs from GENs on stack, the same moved to heap, and
-   originally from heap. We assume that we do not need to free stuff
+/* Here is the rationals for managing SVs which keep GENs:
+     * SVs may reference GENs on stack, or
+     * or GEN on stack which we later moved to heap (so nobody else knows where they are!), or
+     * GEN which was originally on heap.
+   We assume that we do not need to free stuff
    that was originally on heap. However, we need to free the stuff we
    moved from the stack ourself.
    
@@ -159,12 +244,11 @@ SV_myvoidp_set(SV *sv, void *p)
 	SV_myvoidp_reset_clone_IVX(sv);			\
     } } STMT_END
 
-
 /* Should be applied to SV* and AV* only */
 #  define SV_myvoidp_get(sv)						\
 	((SvTYPE(sv) == SVt_PVAV) ? *PARI_SV_to_voidpp(sv) : INT2PTR(void*,SvIV(sv)))
-#  define CV_myint_get(sv)	INT2PTR(int, *PARI_SV_to_voidpp(sv))
-#  define CV_myint_set(sv,i)	SV_myvoidp_set((sv), INT2PTR(void*,i))
+#  define CV_myint_get(sv)	INT2PTR(PTRV, *PARI_SV_to_voidpp(sv))	/* INT2PTR is two-way; PTR2INT missing in newer Perls */
+#  define CV_myint_set(sv,i)	SV_myvoidp_set((sv), INT2PTR(void*,(PTRV)i))
 #else /* !USE_SLOW_NARGS_ACCESS */
 #  define CV_myint_get(sv)	SvIVX(sv)		/* IVOK is not set! */
 #  define CV_myint_set(sv, i)	(SvIVX(sv) = (i))
@@ -228,18 +312,51 @@ SV_myvoidp_set(SV *sv, void *p)
 	SvPVX(sv) = newval, (void)0					\
     ))
 
+#define SV_Stack_find_next(sv)			\
+    ( NEED_SLOW_ARRAY_ACCESS(sv) ? (				\
+	(SV *)AvARRAY(sv)					\
+    ) : (							\
+	(SV *) SvPVX(sv)					\
+    ))
+
 #define GENmovedOffStack ((char*) 1) /* Just an atom. */
 #define GENfirstOnStack ((char*) 2) /* Just an atom. */
 #define GENheap NULL
 #define ifact mpfact
 
-typedef entree * PariVar;		/* For loop variables. */
-typedef entree * PariName;		/* For changevalue.  */
-typedef char * PariExpr;
+#if PARI_VERSION_EXP >= 2004002
+typedef SV	* PariVar;		/* For loop variables. */
+#else
+typedef entree	* PariVar;		/* For loop variables. */
+#endif
+
+typedef entree	* PariName;		/* For changevalue.  */
+#if PARI_VERSION_EXP >= 2004002
+typedef GEN PariExpr, PariExpr2, PariExprV;
+#else
+typedef char * PariExpr, *PariExpr2, *PariExprV;
+#endif
 typedef GEN * GEN_Ptr;
 
-XS((*math_pari_subaddr));		/* On CygWin XS() has attribute conflicting with static */
+#if PARI_VERSION_EXP >= 2004002			/* Undocumented when it appeared; present in 2.5.0 */
+#  define AssignPariExprR(var,arg,is_void,sv)					\
+	((SvROK(arg) && (SvTYPE(SvRV(arg)) == SVt_PVCV)) ?		\
+	  (var = make_trampolinecv(SvRV(arg),is_void,sv))		\
+	 : (warn("Argument-types E,I of string type not supported yet, substituting x->1"), var = code_return_1))
+#  define AssignPariExpr2R(var,arg,is_void,sv1,sv2)	(warn("Argument-types E,I not supported yet, substituting (x,y)->1"), var = code2_return_1)
+#else	/* PARI_VERSION_EXP < 2004002 */	/* Undocumented when it appeared; present in 2.5.0 */
+#  define AssignPariExprR(var,arg,is_void,sv)					\
+	((SvROK(arg) && SvTYPE(SvRV(arg)) == SVt_PVCV) ?		\
+	  (var = ((char*)&(SvRV(arg)->sv_flags)) + LSB_in_U32)		\
+	 : (var = (char *)SvPV(arg,na)))
+#  define AssignPariExpr2R(var,arg,is_void,sv1,sv2)	AssignPariExprR(var,arg,is_void,sv1)
+#endif	/* PARI_VERSION_EXP < 2004002 */	/* Undocumented when it appeared; present in 2.5.0 */
 
+#define MAYBE_NOTVOID	0			/* Used in 'typemap' - but only for Expr2 now */
+#define AssignPariExpr2(var,arg)	AssignPariExpr2R(var,arg,MAYBE_NOTVOID, 0, 0)
+#define AssignPariExprR0(var,arg,is_void)	AssignPariExprR(var,arg,is_void,0)
+
+XS((*math_pari_subaddr));		/* On CygWin XS() has attribute conflicting with static */
 
 #if defined(MYMALLOC) && defined(EMBEDMYMALLOC) && defined(UNEMBEDMYMALLOC)
 
@@ -266,7 +383,7 @@ realloc(void *mp, size_t nbytes)
 /* We make a "fake" PVAV, not enough entries.  */
 
 /* This macro resets avma *immediately* if IN is a global
-   static GEN (such as gnil, gun etc).  So it should be called near
+   static GEN (such as gnil, gen_1 etc).  So it should be called near
    the end of stack-manipulating scope */
 #define setSVpari(sv, in, oldavma)	\
 		setSVpari_or_do(sv, in, oldavma, avma = oldavma)
@@ -285,7 +402,7 @@ realloc(void *mp, size_t nbytes)
     }								\
     if (isonstack(in)) {					\
 	SV* g = SvRV(sv);					\
-	SV_OAVMA_PARISTACK_set(g, oldavma - bot, PariStack);	\
+	SV_OAVMA_PARISTACK_set(g, oldavma - myPARI_bot, PariStack);	\
 	PariStack = g;						\
 	perlavma = avma;					\
 	onStack_inc;						\
@@ -295,11 +412,15 @@ realloc(void *mp, size_t nbytes)
     SVnum_inc;							\
 } while (0)
 
+#if PARI_VERSION_EXP < 2002005
+typedef long pari_sp;
+#endif
+
 SV* PariStack;			/* PariStack keeps the latest SV that
 				 * keeps a GEN on stack. */
-long perlavma;				/* How much stack is needed
+pari_sp perlavma;			/* How much stack is needed
 					   for GENs in Perl variables. */
-long sentinel;				/* How much stack was used
+pari_sp sentinel;			/* How much stack was used
 					   when Pari called Perl. */
 
 #ifdef DEBUG_PARI
@@ -324,10 +445,51 @@ long offStack;
 
 #define pari_version_exp() PARI_VERSION_EXP
 
-#if PARI_VERSION_EXP >= 2002012
-#  define	prec	precreal
+#if !defined(ndec2prec) && PARI_VERSION_EXP < 2003000
+#  ifndef pariK1
+#    define pariK1 (0.103810253/(BYTES_IN_LONG/4))  /* log(10)/(SL*log(2))   */
+#  endif
+#  define ndec2prec(d)			(long)(d*pariK1 + 3)
 #endif
 
+#if PARI_VERSION_EXP >= 2008000
+#    define	prec_words		get_localprec()
+#    define	prec_bits		get_localbitprec()
+#else	/* !(PARI_VERSION_EXP >= 2008000) */
+#  if PARI_VERSION_EXP >= 2002012
+#    define	prec_words		precreal
+#  else
+#    define	prec_words		prec
+#  endif
+#endif
+
+#if PARI_VERSION_EXP >= 2003005			/* XXX When did it actually start??? */
+long dummy;
+/*  #    define	prec_words_set(w)	(fmt_nbPset(w), precreal = prec2nbits(w))  */
+#    define	prec_digits_set(w)	setrealprecision(w, &dummy)
+#    define	fmt_nbP			getrealprecision()
+#    define	fmt_nbPset(v)		((void)0)
+#else	/* !(PARI_VERSION_EXP >= 2008000) */
+#  define	prec_words_set(p)	(prec_words = (p))
+#  define	prec_digits_set(d)	prec_words_set(ndec2prec(d))
+
+int fmt_nb;
+#  define fmt_nbP		fmt_nb
+#  define fmt_nbPset(v)		fmt_nb = (v)
+
+#  ifdef LONG_IS_64BIT
+#    define def_fmt_nb 38
+#  else
+#    define def_fmt_nb 28
+#  endif
+
+#endif	/* !(PARI_VERSION_EXP >= 2008000) */
+
+
+#ifdef USE_PERLLOCAL_PREC
+
+#else	/* !defined(USE_PERLLOCAL_PREC) */
+#endif	/* !defined(USE_PERLLOCAL_PREC) */
 
 #if PARI_VERSION_EXP >= 2000018
 
@@ -355,7 +517,6 @@ _gbitshiftr(GEN g, long s)
 {
     return gshift3(g, -s, signe(g) < 0); /* Bug up to 2.2.2: 1 should be OK */
 }
-
 
 #endif	/* PARI_VERSION_EXP >= 2002001 && PARI_VERSION_EXP <= 2002007 */
 
@@ -401,10 +562,7 @@ wrongT(SV *sv, char *file, int line)
 HV *pariStash;				/* For quick id. */
 HV *pariEpStash;
 
-#if PARI_VERSION_EXP >= 2002012		/* Probably earlier too */
-#  define HAVE_FETCH_NAMED_VAR
-#else
-
+#if PARI_VERSION_EXP < 2002012		/* Probably earlier too */
 /* Copied from anal.c. */
 static entree *
 installep(void *f, char *name, int len, int valence, int add, entree **table)
@@ -422,6 +580,51 @@ installep(void *f, char *name, int len, int valence, int add, entree **table)
   return *table = ep;
 }
 #endif	/* PARI_VERSION_EXP >= 2002012 */ 
+
+#if PARI_VERSION_EXP >= 2002012		/* Probably earlier too */
+#  if PARI_VERSION_EXP < 2009000	/* Probably earlier too */
+#    define my_fetch_named_var	fetch_named_var
+#  else /* !(PARI_VERSION_EXP < 2009000) */
+#    define MAY_USE_FETCH_ENTRY
+entree *
+my_fetch_named_var(const char *s)
+{		/* A part of fetch_user_var() of 2.9.0 */
+  entree *ep = fetch_entry(s);
+  switch (EpVALENCE(ep))
+  {
+    case EpNEW:
+	pari_var_create(ep);	/* fall through */
+	ep->valence = EpVAR;
+	ep->value = initial_value(ep);
+    case EpVAR: 
+	return ep;
+    default: pari_err(e_MISC, "variable <<<%s>>> already exists with incompatible valence", s);
+  }
+  return 0;	/* NOT REACHED */
+}
+#  endif /* !(PARI_VERSION_EXP < 2009000) */
+#else
+static entree *
+my_fetch_named_var(char *s)
+{
+  long hash;
+  entree * ep = is_entry_intern(s, functions_hash, &hash);
+
+  if (ep) {
+      if (EpVALENCE(ep) != EpVAR
+#if PARI_VERSION_EXP >= 2004000
+	  || typ(ep->value)==t_CLOSURE
+#endif
+	  )
+	  croak("Got a function name instead of a variable");
+  } else {
+      ep = installep(NULL, s, strlen(s), EpVAR, 7*sizeof(long),
+		     functions_hash + hash);
+      manage_var(0,ep);
+  }
+  return ep;
+}
+#endif
 
 #if PARI_VERSION_EXP <= 2002000		/* Global after 2.2.0 */
 static void
@@ -443,7 +646,7 @@ changevalue(entree *ep, GEN val)
 static GEN
 my_gpui(GEN x, GEN y)
 {
-  return gpui(x, y, prec);
+  return gpow(x, y, prec_words);
 }
 
 static long
@@ -455,68 +658,30 @@ numvar(GEN x)
   return varn(x);
 }
 
-
 static SV *
 PARIvar(char *s)
 {
-#if 0
-  char *olds = s, *u, *v;
-  GEN p1;
-#endif
-  long hash;
   SV *sv;
   entree *ep;
 
-#ifdef HAVE_FETCH_NAMED_VAR
-  ep = fetch_named_var(s);
-#else
-  ep = is_entry_intern(s, functions_hash, &hash);
-  if (ep) {
-      if (EpVALENCE(ep) != EpVAR)
-	  croak("Got a function name instead of a variable");
-  } else {
-      ep = installep(NULL, s, strlen(s), EpVAR, 7*sizeof(long),
-		     functions_hash + hash);
-      manage_var(0,ep);
-#  if 0
-      ep = (entree *)gpmalloc(sizeof(entree) + 7*BYTES_IN_LONG 
-			    + s - olds + 1);
-      ep->name = (char *)ep + sizeof(entree) + 7*BYTES_IN_LONG;
-      for (u = ep->name, v = olds; v < s;) *u++ = *v++; *u = 0;
-      ep->value = (void *)((char *)ep + sizeof(entree));
-      ep->code = ep->help = NULL;
-      ep->next = hashtable[n];
-      hashtable[n] = ep;
-      p1 = (GEN)ep->value;
-      if (nvar == MAXVAR) err(trucer1);
-      ep->valence = 200;
-      p1[0] = evaltyp(10)+evalpere(1)+evallg(4);
-      p1[1] = evalsigne(1)+evallgef(4)+evalvarn(nvar);
-      p1[2] = zero; p1[3] = un;
-      polx[nvar] = p1;
-      polvar[nvar+1] = (long)p1;
-      p1 += 4;
-      p1[0] = evaltyp(10)+evalpere(1)+evallg(3);
-      p1[1] = evalsigne(1)+evallgef(3)+evalvarn(nvar); p1[2] = un;
-      polun[nvar] = p1;
-      varentries[nvar++] = ep;
-      setlg(polvar, nvar+1);    
-#  endif
-  }
-#endif	/* !( defined HAVE_FETCH_NAMED_VAR ) */
-
-#if 0
- found:
-#endif
+  ep = my_fetch_named_var(s);
   sv = NEWSV(909,0);
   sv_setref_pv(sv, "Math::Pari::Ep", (void*)ep);
   make_PariAV(sv);
   return sv;
 }
 
+#if PARI_VERSION_EXP >= 2004000
+#  define ORDVAR(n)	(n)		/* The big change... */
+#  define FETCH_CODE_const	const	/* ->code is const */
+#else
+#  define ORDVAR(n)	ordvar[n]
+#  define FETCH_CODE_const		/* fetch_named_variable() cannot take const */
+#endif	/* PARI_VERSION_EXP >= 2004000 */
+
 static entree *
 findVariable(SV *sv, int generate)
-{
+{ /* Used for PariVar (generate=1, before 2.4.2) and PariName (generate=0; only for changevalue()) */
     /* There may be 4 important cases:
        a) we got a 'word' string, which we interpret as the name of
           the variable to use;
@@ -526,15 +691,11 @@ findVariable(SV *sv, int generate)
        d) It is an ep value => typo (same iterator in two loops).
        In any case we localize the value.
      */
-  char *s = Nullch;
-  char *s1;
+  FETCH_CODE_const char *s = Nullch;
+  FETCH_CODE_const char *s1;
   long hash;
   entree *ep;
   char name[50];
-#if 0
-  char *u, *v;
-  GEN p1;
-#endif
 
   if (SvROK(sv)) {
       SV* tsv = SvRV(sv);
@@ -547,7 +708,7 @@ findVariable(SV *sv, int generate)
 		      && lgef(x)==4		/* 2 terms */
 		      && (gcmp0((GEN)x[2]))	/* Free */
 		      && (gcmp1((GEN)x[3]))) { /* Leading */
-		      s = varentries[ordvar[varn(x)]]->name;
+		      s = varentries[ORDVAR(varn(x))]->name;
 		      goto repeat;
 		  }
 		  goto ignore;
@@ -587,60 +748,13 @@ findVariable(SV *sv, int generate)
       goto repeat;
   }
 
-#ifdef HAVE_FETCH_NAMED_VAR
-  ep = fetch_named_var(s);
-#else
-  ep = is_entry_intern(s, functions_hash, &hash);
-
-  if (ep) {
-      if (EpVALENCE(ep) != EpVAR)
-	  croak("Got a function name instead of a variable");
-  } else {
-      ep = installep(NULL, s, s1 - s, EpVAR, 7*sizeof(long),
-		     functions_hash + hash);
-      manage_var(0,ep);
-  }
-#endif	/* !( defined HAVE_FETCH_NAMED_VAR ) */
-
-#if 0
-  olds = s;
-  for (n = 0; isalnum(*s); s++) n = n << 1 ^ *s;
-  if (n < 0) n = -n; n %= TBLSZ;
-  for(ep = hashtable[n]; ep; ep = ep->next)
-  {
-    for(u = ep->name, v = olds; (*u) && *u == *v; u++, v++);
-    if (!*u && !*v) {
-      if (EpVALENCE(ep) != 200)
-	croak("Got a function name instead of a variable");
-      return ep;
-    }
-  }
-  ep = (entree *)gpmalloc(sizeof(entree) + 7*BYTES_IN_LONG 
-			+ s - olds + 1);
-  ep->name = (char *)ep + sizeof(entree) + 7*BYTES_IN_LONG;
-  for (u = ep->name, v = olds; v < s;) *u++ = *v++; *u = 0;
-  ep->value = (void *)((char *)ep + sizeof(entree));
-  ep->code = ep->help = NULL;
-  ep->next = hashtable[n];
-  hashtable[n] = ep;
-  p1 = (GEN)ep->value;
-  if (nvar == MAXVAR) err(trucer1);
-  ep->valence = 200;
-  p1[0] = evaltyp(10)+evalpere(1)+evallg(4);
-  p1[1] = evalsigne(1)+evallgef(4)+evalvarn(nvar);
-  p1[2] = zero; p1[3] = un;
-  polx[nvar] = p1;
-  polvar[nvar+1] = (long)p1;
-  p1 += 4;
-  p1[0] = evaltyp(10)+evalpere(1)+evallg(3);
-  p1[1] = evalsigne(1)+evallgef(3)+evalvarn(nvar); p1[2] = un;
-  polun[nvar] = p1;
-  varentries[nvar++] = ep;
-  setlg(polvar, nvar+1);
-#endif
-  return ep;
+  return my_fetch_named_var(s);
 }
 
+#if PARI_VERSION_EXP >= 2004000
+/* #  define findVariable(sv,gen)		(sv)	*/	/* Not needed */
+#  define bindVariable(sv)		(sv)
+#else	/* !(PARI_VERSION_EXP >= 2004000) */
 static PariVar
 bindVariable(SV *sv)
 {
@@ -648,8 +762,8 @@ bindVariable(SV *sv)
        a) we got a 'word' string, which we interpret as the name of
           the variable to use;
        b1) It is a pari value containing a polynomial 0+1*v, we use it;
-       b2) It is other pari value, we ignore it;
-       c) it is a string containing junk, same as 'b';
+       b2) It is other pari value, we ignore it, and generate a suitable name of iteration variable;
+       c) it is a string containing junk, same as 'b2';
        d) It is an ep value => typo (same iterator in two loops).
        In any case we localize the value.
      */
@@ -667,6 +781,7 @@ bindVariable(SV *sv)
   }
   return ep;
 }
+#endif	/* !(PARI_VERSION_EXP >= 2004000) */
 
 static int
 not_here(char *s)
@@ -683,10 +798,15 @@ longword(GEN x, long n)
   return x[n];
 }
 
+SV* worksv = 0;
+SV* workErrsv = 0;
 
-
-SV* worksv;
-SV* workErrsv;
+/* Our output routines may be called several times during a Perl's statement */
+#define renewWorkSv						\
+   ((SvREFCNT(worksv) > 1 &&	/* Still in use */		\
+	(SvREFCNT_dec(worksv),	/* Abandon the old copy */	\
+	 worksv = NEWSV(910,0))),				\
+    SvREFCNT_inc(worksv))	/* It is going to be mortalized soon */
 
 void
 svputc(char c)
@@ -700,6 +820,10 @@ svputc(char c)
 #  define PUTS_CONST
 #endif
 
+#if PARI_VERSION_EXP < 2005000 && !defined(taille)	/* When did it appear??? In >= 2.5.0 the definition of taille() and taille2() are mixed up */
+#  define gsizeword taille
+#endif
+
 void
 svputs(PUTS_CONST char* p)
 {
@@ -711,7 +835,6 @@ svErrputc(char c)
 {
   sv_catpvn(workErrsv,&c,1);
 }
-
 
 void
 svErrputs(PUTS_CONST char* p)
@@ -737,9 +860,12 @@ svErrflush(void)
 
     if (s && l) {
 	char *nl = memchr(s,'\n',l);
+	char *nl1 = nl ? memchr(nl+1,'\n',l - (STRLEN)(nl-s+1)) : NULL;
 
 	/* Avoid signed/unsigned mismatch */
-	if (nl && (STRLEN)(nl - s) < l - 1)
+	if (nl1 && (STRLEN)(nl1 - s) < l - 1)
+	    warn("PARI: %.*s%*s%.*s%*s%s", (int)(nl + 1 - s), s, 6, "", (int)(nl1 - nl), nl + 1, 6, "", nl1 + 1);
+	else if (nl && (STRLEN)(nl - s) < l - 1)
 	    warn("PARI: %.*s%*s%s", nl + 1 - s, s, 6, "", nl + 1);
 	else
 	    warn("PARI: %s", s);
@@ -747,36 +873,76 @@ svErrflush(void)
     }
 }
 
+enum _Unknown_Exception {Unknown_Exception=-1000};
+
+static pari_sp global_top;
+
 void
-svErrdie(void)
+_svErrdie(long e)
 {
   SV *errSv = newSVsv(workErrsv);
   STRLEN l;
-  char *s = SvPV(errSv,l);
-  char *nl = memchr(s,'\n',l);
+  char *s = SvPV(errSv,l), *nl, *nl1;
 
-  sv_setpv(workErrsv,"");
+  if (e == -1) {		/* XXXX Need to abandon our references to stack positions! */
+  }
+  sv_setpvn(workErrsv,"",0);
   sv_2mortal(errSv);
+  if (l && s[l-1] == '\n')
+    s[l-- - 1] = 0;
+  if (l && s[l-1] == '.')
+    s[l-- - 1] = 0;
+  nl = memchr(s,'\n',l);
+  nl1 = nl ? memchr(nl+1,'\n',l - (STRLEN)(nl-s+1)) : NULL;
+
+#if PARI_VERSION_EXP >= 2005000	/* Undocumented when it changed; needed in 2.5.0 */
+# ifdef CB_EXCEPTION_FLAGS
+  if (!cb_exception_resets_avma)
+# endif
+    myPARI_top = global_top;
+#endif
   /* Avoid signed/unsigned mismatch */
-  if (nl && (STRLEN)(nl - s) < l - 1)
-    croak("PARI: %.*s%*s%s", nl + 1 - s, s, 6, "", nl + 1);
+  if (nl1 && (STRLEN)(nl1 - s) < l - 1)
+    croak("PARI: %.*s%*s%.*s%*s%s", (int)(nl + 1 - s), s, 6, "", (int)(nl1 - nl), nl + 1, 6, "", nl1 + 1);
+  else if (nl && (STRLEN)(nl - s) < l - 1)
+    croak("PARI: %.*s%*s%s", (int)(nl + 1 - s), s, 6, "", nl + 1);
   else
     croak("PARI: %s", s);
 }
 
+int
+math_pari_handle_exception(long e)
+{
+# ifdef CB_EXCEPTION_FLAGS
+  if (!cb_exception_resets_avma)
+# endif
+    myPARI_top = avma;			/* ???  XXXX  Do not let evalstate_reset() steal our avma! */
+  return 0;
+}
+
+#if PARI_VERSION_EXP < 2004000	/* Undocumented when it changed; not present in 2.5.0 */
+void
+svErrdie(void)
+{
+  _svErrdie(Unknown_Exception);
+}
 
 PariOUT perlOut={svputc, svputs, svOutflush, NULL};
 PariOUT perlErr={svErrputc, svErrputs, svErrflush, svErrdie};
+#else	/* !(PARI_VERSION_EXP < 2004000) */
+PariOUT perlOut={svputc, svputs, svOutflush};
+PariOUT perlErr={svErrputc, svErrputs, svErrflush};
+#endif	/* !(PARI_VERSION_EXP < 2004000) */
 
 static GEN
 my_ulongtoi(ulong uv)
 {
-  long oldavma = avma;
+  pari_sp oldavma = avma;
   GEN a = stoi((long)(uv>>1));
 
   a = gshift(a, 1);
   if (uv & 0x1)
-      a = gadd(a, gun);
+      a = gadd(a, gen_1);
   return gerepileupto(oldavma, a);
 }
 
@@ -784,7 +950,7 @@ my_ulongtoi(ulong uv)
 GEN
 my_UVtoi(UV uv)
 {
-  long oldavma = avma;
+  pari_sp oldavma = avma;
   GEN a = my_ulongtoi((ulong)(uv>>(8*sizeof(ulong))));
   GEN b = my_ulongtoi((ulong)(uv & ((((UV)1)<<(8*sizeof(ulong))) - 1)));
 
@@ -794,7 +960,7 @@ my_UVtoi(UV uv)
 GEN
 my_IVtoi(IV iv)
 {
-  long oldavma = avma;
+  pari_sp oldavma = avma;
   GEN a;
 
   if (iv >= 0)
@@ -814,6 +980,10 @@ my_IVtoi(IV iv)
 #  define mySvIsUV(sv)	0
 #endif
 #define PerlInt_to_i(sv) (mySvIsUV(sv) ? my_UVtoi(SvUV(sv)) : my_IVtoi(SvIV(sv)))
+
+static int warn_undef = 0;	/* Cannot enable until 'I' prototype can be distinguished: it may return undef correctly */
+
+#define is_gnil(g)	((g) == gnil)
 
 GEN
 sv2pari(SV* sv)
@@ -853,7 +1023,7 @@ sv2pari(SV* sv)
 	      }
 	      return ret;
 	  } else {
-	      return lisexpr(SvPV(sv,na)); /* For overloading */
+	      return readseq(SvPV(sv,na)); /* For overloading */
 	  }
       }
   }
@@ -872,13 +1042,14 @@ sv2pari(SV* sv)
 #endif	/* !defined(PERL_VERSION) || (PERL_VERSION < 6) */
       return dbltor(n);
   }
-  else if (SvPOK(sv))  return lisexpr(SvPV(sv,na));
+  else if (SvPOK(sv))  return readseq(SvPV(sv,na));
   else if (SvIOKp(sv)) return PerlInt_to_i(sv);
   else if (SvNOKp(sv)) return dbltor((double)SvNV(sv));
-  else if (SvPOKp(sv)) return lisexpr(SvPV(sv,na));
+  else if (SvPOKp(sv)) return readseq(SvPV(sv,na));
   else if (SvOK(sv))   croak("Variable in sv2pari is not of known type");  
 
-  return stoi(0);	/* !SvOK(sv) */
+  if (warn_undef) warn("undefined value in sv2pari");
+  return gnil;		/* was: stoi(0) */	/* !SvOK(sv) */
 }
 
 GEN
@@ -888,14 +1059,16 @@ sv2parimat(SV* sv)
   if (typ(in)==t_VEC) {
     long len=lg(in)-1;
     long t;
-    long l=lg(in[1]);
+    long l=lg((GEN)(in[1]));
     for (;len;len--) {
-      if ((t=typ(in[len])) == t_VEC) {
-	settyp(in[len], t_COL);
+      GEN elt = (GEN)(in[len]);
+
+      if ((t=typ(elt)) == t_VEC) {
+	settyp(elt, t_COL);
       } else if (t != t_COL) {
 	croak("Not a vector where column of a matrix expected");
       }
-      if (lg(in[len])!=l) {
+      if (lg(elt)!=l) {
 	croak("Columns of input matrix are of different height");
       }
     }
@@ -957,6 +1130,26 @@ do_nv:
 
 #if PARI_VERSION_EXP >= 2002005 && PARI_VERSION_EXP <= 2002007
 #  define _gtodouble	gtodouble
+#else	/* !(PARI_VERSION_EXP >= 2002005 && PARI_VERSION_EXP <= 2002007) */
+
+#ifndef m_evallg
+#  define m_evallg	_evallg
+#endif
+
+double
+_gtodouble(GEN x)
+{
+  static long reel4[4]={ evaltyp(t_REAL) | m_evallg(4),0,0,0 };
+
+  if (typ(x)==t_REAL) return rtodbl(x);
+  gaffect(x,(GEN)reel4); return rtodbl((GEN)reel4);
+}
+#endif	/* !(PARI_VERSION_EXP >= 2002005 && PARI_VERSION_EXP <= 2002007) */
+
+#if PARI_VERSION_EXP >= 2003000		/* In 2.3.5 is using argument 0, in 2.1.7 it is still 1. */
+#  define mybrute	brute
+#else /* !(PARI_VERSION_EXP >= 2003000) */
+#  if PARI_VERSION_EXP >= 2002005 && PARI_VERSION_EXP <= 2002007
 static void
 _initout(pariout_t *T, char f, long sigd, long sp, long fieldw, int prettyp)
 {
@@ -972,28 +1165,13 @@ void
 mybruteall(GEN g, char f, long d, long sp)
 {
   pariout_t T; _initout(&T,f,d,sp,0, f_RAW);
-  gen_output(g, &T);
+  my_gen_output(g, &T);
 }
-
-#else
-
-#ifndef m_evallg
-#  define m_evallg	_evallg
-#endif
-
-double
-_gtodouble(GEN x)
-{
-  static long reel4[4]={ evaltyp(t_REAL) | m_evallg(4),0,0,0 };
-
-  if (typ(x)==t_REAL) return rtodbl(x);
-  gaffect(x,(GEN)reel4); return rtodbl((GEN)reel4);
-}
-
-#define mybruteall	bruteall
-
-#endif
-
+#  else	/* !((PARI_VERSION_EXP >= 2002005 && PARI_VERSION_EXP <= 2002007) || PARI_VERSION_EXP >= 2004000) */
+#    define mybruteall	bruteall
+#  endif	/* !((PARI_VERSION_EXP >= 2002005 && PARI_VERSION_EXP <= 2002007) || PARI_VERSION_EXP >= 2004000) */
+#  define mybrute(g,f,d)	mybruteall(g,f,d,0)		/* 0: compact pari-readable form */
+#endif /* !(PARI_VERSION_EXP >= 2003000) */
 
 SV*
 pari2nv(GEN in)
@@ -1004,38 +1182,38 @@ pari2nv(GEN in)
 SV*
 pari2pv(GEN in)
 {
+    renewWorkSv;
     if (typ(in) == t_STR)		/* Puts "" around without special-casing */
-	return newSVpv(GSTR(in),0);
+	return sv_setpv(worksv, GSTR(in)), worksv;
     {    
 	PariOUT *oldOut = pariOut;
 	pariOut = &perlOut;
-	worksv = newSVpv("",0);
-	mybruteall(in,'g',-1,0);	/* 0: compact pari-readable form */
+        sv_setpvn(worksv,"",0);
+	mybrute(in,'g',-1);
 	pariOut = oldOut;
 	return worksv;
     }
 }
 
-int fmt_nb;
-
-#ifdef LONG_IS_64BIT
-#  define def_fmt_nb 38
-#else
-#  define def_fmt_nb 28
-#endif
-
-#ifndef pariK1
-#  define pariK1 (0.103810253/(BYTES_IN_LONG/4))  /* log(10)/(SL*log(2))   */
-#endif
-
 long
 setprecision(long digits)
 {
-  long m = fmt_nb;
+  long m = fmt_nbP;
 
-  if(digits>0) {fmt_nb = digits; prec = (long)(digits*pariK1 + 3);}
+  if(digits>0) {fmt_nbPset(digits); prec_digits_set(digits);}
   return m;
 }
+
+#if 0
+long
+setbitprecision(long bits)
+{
+  long m = fmt_nbP;
+
+  if(bits>0) {fmt_nbPset((long)bits*10/3); prec_bits_set(bits);}
+  return m;
+}
+#endif
 
 #if PARI_VERSION_EXP < 2002012 || PARI_VERSION_EXP >= 2003000
 long
@@ -1058,10 +1236,14 @@ setprimelimit(IV n)
     IV o = primelimit;
 
     if (n != 0) {
+#if PARI_VERSION_EXP < 2007000
 	ptr = initprimes(n);
 	free(diffptr);
 	diffptr = ptr;
 	primelimit = n;
+#else
+	initprimetable(n);
+#endif
     }
     return o;
 }
@@ -1071,8 +1253,9 @@ pari_print(GEN in)
 {
   PariOUT *oldOut = pariOut;
   pariOut = &perlOut;
-  worksv = newSVpv("",0);
-  brute(in, 'g', fmt_nb);
+  renewWorkSv;
+  sv_setpvn(worksv,"",0);
+  brute(in, 'g', fmt_nbP);
   pariOut = oldOut;
   return worksv;
 }
@@ -1082,8 +1265,13 @@ pari_pprint(GEN in)
 {
   PariOUT *oldOut = pariOut;
   pariOut = &perlOut;
-  worksv = newSVpv("",0);
-  sor(in, 'g'/*fmt.format*/, fmt_nb, 0/*fmt.field*/);
+  renewWorkSv;
+  sv_setpvn(worksv,"",0);
+#if PARI_VERSION_EXP >= 2004000
+  brute(in, 'g', fmt_nbP);		/* Make a synonim of pari_print(), as in GP/PARI */
+#else
+  sor(in, 'g'/*fmt.format*/, fmt_nbP, 0/*fmt.field*/);
+#endif
   pariOut = oldOut;
   return worksv;
 }
@@ -1093,8 +1281,9 @@ pari_texprint(GEN in)
 {
   PariOUT *oldOut = pariOut;
   pariOut = &perlOut;
-  worksv = newSVpv("",0);
-  texe(in, 'g', fmt_nb);
+  renewWorkSv;
+  sv_setpvn(worksv,"",0);
+  texe(in, 'g', fmt_nbP);
   pariOut = oldOut;
   return worksv;
 }
@@ -1115,7 +1304,9 @@ typedef struct {
     int context;
 } heap_dumper_t;
 
-#define BL_HEAD 3			/* from init.c */
+#ifndef BL_HEAD			/* in 2.5.0 it is 4 */
+#  define BL_HEAD 3			/* from init.c */
+#endif
 static void
 heap_dump_one(heap_dumper_t *d, GEN x)
 {
@@ -1129,7 +1320,7 @@ heap_dump_one(heap_dumper_t *d, GEN x)
 	d->words += x[0];
 	tmp = newSVpv("bernzone",8);
     } else { /* GEN */
-	d->words += taille(x);
+	d->words += gsizeword(x);
 	tmp = pari_print(x);
     }
     /* add to output */
@@ -1177,7 +1368,7 @@ heap_dumper(heap_dumper_t *d)
 #endif	/* !( PARI_VERSION_EXP >= 2002012 ) */
 
 void
-resetSVpari(SV* sv, GEN g, long oldavma)
+resetSVpari(SV* sv, GEN g, pari_sp oldavma)
 {
   if (SvROK(sv)) {
       SV* tsv = SvRV(sv);
@@ -1217,81 +1408,10 @@ resetSVpari(SV* sv, GEN g, long oldavma)
 }
 
 static const 
-unsigned char defcode[] = "\06xD0,G,D0,G,D0,G,D0,G,D0,G,D0,G,";
+unsigned char defcode[] = "xD0,G,D0,G,D0,G,D0,G,D0,G,D0,G,";
+int def_numargs = 6;
 
 static int doing_PARI_autoload = 0;
-
-entree *
-installPerlFunctionCV(SV* cv, char *name, I32 numargs, char *help)
-{
-    char *code, *s;
-    I32 req = numargs, opt = 0;
-    entree *ep;
-
-    if(SvROK(cv))
-	cv = SvRV(cv);
-
-    if (numargs < 0 && SvPOK(cv) && (s = SvPV(cv,na))) {
-	/* Get number of arguments. */
-	req = opt = 0;
-	while (*s == '$')
-	    req++, s++;
-	if (*s == ';') 
-	    s++;
-	while (*s == '$')
-	    opt++, s++;
-	if (*s == '@') {
-	    opt += 6;			/* Max 6 optional arguments. */
-	    s++;
-	}
-	if (*s == 0) {			/* Got it! */
-	    numargs = req + opt;
-	} else {
-	    croak("Can't install Perl function with prototype `%s'", s);
-	}
-    }
-    
-    if (numargs < 0) {		/* Variable number of arguments. */
-	/* Install something hairy with <= 6 args */
-	code = (char*)defcode + 1;		/* Remove constness. */
-	numargs = code[-1];
-    } else if (numargs >= 256) {
-	croak("Import of Perl function with too many arguments");
-    } else {
-	/* Should not use gpmalloc(), since we call free()... */
-	code = (char *)malloc(numargs*6 - req*5 + 2);
-	code[0] = 'x';
-	memset(code + 1, 'G', req);
-	s = code + 1 + req;
-	while (opt--) {
-	    strcpy(s, "D0,G,");
-	    s += 6;
-	}
-	*s = '\0';
-    }
-    CV_NUMARGS_set(cv, numargs);
-    SAVEINT(doing_PARI_autoload);
-    doing_PARI_autoload = 1;
-    ep = install((void*)SvREFCNT_inc(cv), name, code);
-    doing_PARI_autoload = 0;
-    if (code != (char*)defcode + 1)
-	free(code);
-    ep->help = help;
-    return ep;
-}
-
-void
-freePerlFunction(entree *ep)
-{
-    if (!ep->code || (*ep->code != 'x')) {
-	croak("Attempt to ask Perl to free PARI function not installed from Perl");
-    }
-    if (ep->code != (char *)defcode + 1)
-	free(ep->code - 1);
-    if (ep->help)
-	free(ep->help);
-    SvREFCNT_dec((SV*)ep->value);
-}
 
 long
 moveoffstack_newer_than(SV* sv)
@@ -1302,8 +1422,8 @@ moveoffstack_newer_than(SV* sv)
   
   for (sv1 = PariStack; sv1 != sv; sv1 = nextsv) {
     ret++;
-    SV_OAVMA_switch(nextsv, sv1, GENmovedOffStack); /* Mark as moved off stack. */
-    SV_myvoidp_reset_clone(sv1);
+    SV_OAVMA_switch(nextsv, sv1, GENmovedOffStack);	/* Mark as moved off stack. */
+    SV_myvoidp_reset_clone(sv1);			/* Relocate to cloned */
     onStack_dec;
     offStack_inc;
   }
@@ -1311,39 +1431,28 @@ moveoffstack_newer_than(SV* sv)
   return ret;
 }
 
-void
-detach_stack(void)
-{
-    moveoffstack_newer_than((SV *) GENfirstOnStack);
-}
-
-UV
-allocatemem(UV newsize)
-{
-    if (newsize) {
-	detach_stack();
-	parisize = allocatemoremem(newsize);
-	perlavma = sentinel = avma;
-    }
-    return parisize;
-}
-
+#if PARI_VERSION_EXP > 2004002
+typedef long PerlFunctionArg1;
+#  define toEntreeP(l)	((entree *)(l))
+#  define elt_CV pvalue
+#else
+typedef entree *PerlFunctionArg1;
+#  define toEntreeP
+#  define elt_CV value
+#endif
 
 GEN
-callPerlFunction(entree *ep, ...)
+callPerlFunction_va_list(int rettype, int numargs, SV *cv, va_list args)
 {
-    va_list args;
-    SV *cv = (SV*) ep->value;
-    int numargs = CV_NUMARGS_get(cv);
     GEN res;
     int i;
     dSP;
     int count ;
-    long oldavma = avma;
+    pari_sp oldavma = avma;
     SV *oPariStack = PariStack;
     SV *sv;
 
-    va_start(args, ep);
+/* warn("Entering Perl handler inside PARI, %d args", numargs); */
     ENTER ;
     SAVETMPS;
     SAVEINT(sentinel);
@@ -1354,20 +1463,26 @@ callPerlFunction(entree *ep, ...)
 	/* It should be OK to have the same oldavma here, since avma
 	   is not modified... */
 	PUSHs(pari2mortalsv(va_arg(args, GEN), oldavma));
+/*	warn("pushed an argument"); */
     }
-    va_end(args);
     PUTBACK;
-    count = perl_call_sv(cv, G_SCALAR);
+    count = perl_call_sv(cv, rettype);
+    if (rettype == G_VOID && count == 1)
+	count = 0;
 
     SPAGAIN;
-    if (count != 1)
-	croak("Perl function exported into PARI did not return a value");
+    if (count != (rettype == G_SCALAR))
+	croak("Perl function exported into PARI returns unexpected number %d of values (need %d)", count, (rettype == G_SCALAR));
 
-    sv = SvREFCNT_inc(POPs);		/* Preserve the guy. */
+    if (rettype == G_SCALAR)
+      sv = SvREFCNT_inc(POPs);		/* Preserve the guy. */
 
     PUTBACK ;
     FREETMPS ;
     LEAVE ;
+
+    if (rettype == G_VOID)
+      return 0;
     /* Now PARI data created inside this subroutine sits above
        oldavma, but the caller is going to unwind the stack: */
     if (PariStack != oPariStack)
@@ -1379,16 +1494,162 @@ callPerlFunction(entree *ep, ...)
      the count.  The ABI is that a C function [which can be put into a
      GP/PARI function C-function slot] should have its result
      completely on stack. */
-    res = forcecopy(res);
+    res = myforcecopy(res);
     SvREFCNT_dec(sv);
     
     return res;
 }
 
-/* Currently with <=6 arguments only! */
+GEN
+callPerlFunction(PerlFunctionArg1 long_ep, ...)
+{
+    GEN res;
+    entree *ep = toEntreeP(long_ep);
+    va_list args;
+    SV *cv = (SV*) ep->elt_CV;
+    int numargs = CV_NUMARGS_get(cv);
+
+    va_start(args, long_ep);
+/*    warn("calling with numargs=%d", numargs); */
+    res = callPerlFunction_va_list(G_SCALAR, numargs, cv, args);
+/*    warn("ending call"); */
+    va_end(args);
+/*    warn("ended call"); */
+    return res;
+}
 
 entree *
-autoloadPerlFunction(char *s, long len)
+installPerlFunctionCV(SV* cv, char *name, I32 numargs, char *help)
+{
+    char *code, *s, *s0;
+    I32 req = numargs, opt = 0;
+    entree *ep;
+    STRLEN len;
+
+    if(SvROK(cv))
+	cv = SvRV(cv);
+
+    if (numargs < 0 && SvPOK(cv) && (s0 = s = SvPV(cv,len))) {
+        char *end = s + len;		/* CvCONST() may have a CvFILE() appended - depends on version */
+
+	/* Get number of arguments. */
+	req = opt = 0;
+	while (s < end && *s == '$')
+	    req++, s++;
+	if (s < end && *s == ';') 
+	    s++;
+	while (s < end && *s == '$')
+	    opt++, s++;
+	if (s < end && *s == '@') {
+	    opt += 6;			/* Max 6 optional arguments. */
+	    s++;
+	}
+	if (s == end) {			/* Got it! */
+	    numargs = req + opt;
+	} else {
+	    croak("Can't install Perl function with prototype `%s'", s0);
+	}
+    }
+    
+    if (numargs < 0) {		/* Variable number of arguments. */
+	/* Install something hairy with <= 6 args */
+	code = (char*)defcode;		/* Remove constness. */
+	numargs = def_numargs;
+    } else if (numargs >= 256) {
+	croak("Import of Perl function with too many arguments");
+    } else {
+	/* Should not use gpmalloc(), since we call free()... */
+	code = (char *)malloc(numargs*6 - req*5 + 2);
+	code[0] = 'x';
+	memset(code + 1, 'G', req);
+	s = code + 1 + req;
+	while (opt--) {
+	    strcpy(s, "D0,G,");
+	    s += 5;
+	}
+	*s = '\0';
+    }
+    CV_NUMARGS_set(cv, numargs);
+    SAVEINT(doing_PARI_autoload);
+    doing_PARI_autoload = 1;
+    ep = install((void*)SvREFCNT_inc(cv), name, code);
+#if PARI_VERSION_EXP >= 2004002
+    ep->pvalue = (void*)cv;
+    ep->value = (void*)callPerlFunction;
+#endif
+/*    warn("installed %#x code=<%s> numargs=%d", (int)ep->value, ep->code, (int)numargs);	*/
+    doing_PARI_autoload = 0;
+    if (code != (char*)defcode)
+	free(code);
+    if (help)
+	ep->help = pari_strdup(help);		/* Same code as in addhelp() so that the same free()ing code works */
+    return ep;
+}
+
+void
+freePerlFunction(entree *ep)
+{
+    if (!ep->code || (*ep->code != 'x')) {
+	croak("Attempt to ask Perl to free PARI function not installed from Perl");
+    }
+    if (ep->code && (ep->code != (char *)defcode))
+	free((void *)(ep->code));
+    ep->code = NULL;
+    SvREFCNT_dec((SV*)ep->elt_CV);
+    ep->elt_CV = NULL;
+}
+
+void
+detach_stack(void)
+{
+    moveoffstack_newer_than((SV *) GENfirstOnStack);
+}
+
+static unsigned long
+s_allocatemem(unsigned long newsize)
+{
+#ifdef CB_EXCEPTION_FLAGS
+    int o = cb_exception_resets_avma;
+#endif
+
+    if (newsize) {
+	detach_stack();
+#if PARI_VERSION_EXP >= 2004000	/* ??? */
+#  if PARI_VERSION_EXP >= 2009000	/* ??? */
+#    ifdef CB_EXCEPTION_FLAGS__try_without
+      cb_exception_resets_avma = 0;	/* otherwise warn about stack increase would try to use old avma */
+#    endif
+      if (pari_mainstack->vsize)
+        paristack_resize(newsize);
+      else if (newsize != pari_mainstack->rsize)
+        paristack_setsize(newsize, 0);
+#    ifdef CB_EXCEPTION_FLAGS__try_without
+      cb_exception_resets_avma = o;
+#    endif
+#  else /* !(PARI_VERSION_EXP >= 2009000) */
+	pari_init_stack(newsize, 0);
+#  endif /* !(PARI_VERSION_EXP >= 2009000) */
+
+	parisize = myPARI_top - myPARI_bot;
+#else
+	parisize = allocatemoremem(newsize);
+#endif
+	perlavma = sentinel = avma;
+    }
+    global_top = myPARI_top;
+    return parisize;
+}
+
+/* Currently with <=6 arguments only! */
+
+#if PARI_VERSION_EXP >= 2004000
+#  define APF_CONST const
+#else	/* !(PARI_VERSION_EXP >= 2004000) */
+#  define APF_CONST 
+#endif	/* PARI_VERSION_EXP >= 2004000 */
+
+entree *
+autoloadPerlFunction(APF_CONST char *s, long len)
 {
     CV *cv;
     SV* name;
@@ -1445,12 +1706,11 @@ exprHandler_Perl(char *s)
     res = sv2pari(sv);
     /* We need to copy it back to stack, otherwise we cannot decrement
      the count. */
-    res = forcecopy(res);
+    res = myforcecopy(res);
     SvREFCNT_dec(sv);
     
     return res;
 }
-
 
 static GEN
 Arr_FETCH(GEN g, I32 n) 
@@ -1483,7 +1743,7 @@ Arr_STORE(GEN g, I32 n, GEN elt)
 
     if (typ(g) == t_MAT) {
 	long len = lg(g);
-	long l   = lg(g[1]);
+	long l   = lg((GEN)(g[1]));
 	if (typ(elt) != t_COL) {
 	    if (typ(elt) != t_VEC)
 		croak("Not a vector where column of a matrix expected");
@@ -1528,15 +1788,129 @@ check_pointer(unsigned int ptrs, GEN argvec[])
 	argvec[0], argvec[1], argvec[2], argvec[3],		\
 	argvec[4], argvec[5], argvec[6], argvec[7], argvec[8]
 
+GEN code_return_1 = 0;
+GEN code2_return_1 = 0;
+
+#if PARI_VERSION_EXP >= 2004000
+struct trampoline_data_1v {SV *var1; SV* cv;};
+
+GEN
+callPerlFunction_var(int rettype, int numargs, SV *cv, ...)
+{
+    va_list args;
+
+    va_start(args, cv);
+    callPerlFunction_va_list(rettype, numargs, cv, args);
+    va_end(args);
+}
+
+static GEN code_trampoline_1v_ret(GEN v)
+{
+    struct trampoline_data_1v *tr = (struct trampoline_data_1v*)itos(v);
+    GEN arg1 = get_lex(-2);	/* XXX one before v, which is -1 ??? */
+    GEN res = callPerlFunction_var(G_SCALAR, 1, tr->cv, arg1);
+
+    return res;
+}
+
+static void code_trampoline_vL_ret(long v)
+{
+    struct trampoline_data_1v *tr = (struct trampoline_data_1v*)v;
+    GEN arg1 = get_lex(-2);	/* XXX one before v, which is -1 ??? */
+
+    callPerlFunction_var(G_VOID, 1, tr->cv, arg1);	/* works with G_SCALAR */
+    return;
+}
+
+static void code_trampoline_vG_ret(GEN v)
+{
+    struct trampoline_data_1v *tr = (struct trampoline_data_1v*)itos(v);
+    GEN arg1 = get_lex(-2);	/* XXX one before v, which is -1 ??? */
+    SV *oPariStack = PariStack;
+
+    callPerlFunction_var(G_VOID, 1, tr->cv, arg1);	/* works with G_SCALAR */
+
+    /* Now PARI data created inside this subroutine sits above
+       oldavma, but the caller is going to unwind the stack: */
+    if (PariStack != oPariStack)
+	moveoffstack_newer_than(oPariStack);
+    return;
+}
+
+static GEN code_trampoline_G_ret(GEN v)
+{
+    struct trampoline_data_1v *tr = (struct trampoline_data_1v*)itos(v);
+    GEN arg1 = get_lex(-2), ret;	/* XXX one before v, which is -1 ??? */
+    SV *oPariStack = PariStack;
+
+
+    ret = callPerlFunction_var(G_SCALAR, 1, tr->cv, arg1);
+    /* Now PARI data created inside this subroutine sits above
+       oldavma, but the caller is going to unwind the stack: */
+    if (PariStack != oPariStack)
+	moveoffstack_newer_than(oPariStack);
+    return ret;
+}
+
+static GEN code_trampoline_G_ret_SV(GEN v)
+{
+    struct trampoline_data_1v *tr = (struct trampoline_data_1v*)itos(v);
+    GEN arg1 = get_lex(-2), ret;	/* XXX one before v, which is -1 ??? */
+    SV *oPariStack = PariStack;
+    pari_sp oldavma = avma;
+
+    setSVpari_keep_avma(tr->var1, arg1, oldavma);
+    ret = callPerlFunction_var(G_SCALAR, 0, tr->cv);
+    /* Now PARI data created inside this subroutine sits above
+       oldavma, but the caller is going to unwind the stack: */
+    if (PariStack != oPariStack)
+	moveoffstack_newer_than(oPariStack);
+    return ret;
+}
+#endif	/* PARI_VERSION_EXP >= 2004000 */
+
+#if PARI_VERSION_EXP >= 2004002			/* Undocumented when it appeared; present in 2.5.0 */
+static const entree eH_vG = {"___fake_MathPari_handler_vG",0x100/*EpSTATIC*/,(void*)code_trampoline_vG_ret,2,"vG","trampoline to call Perl call in PARI \"loops\"", 0, 1};
+static const entree eH_G = {"___fake_MathPari_handler_G",0x100/*EpSTATIC*/,(void*)code_trampoline_G_ret,2,"G","trampoline to call Perl call in PARI \"loops\"", 0, 1};
+
+static GEN
+make_trampolinecv(SV *cv, int is_void, SV *sv)
+{	/* Poor man's snmk_closure(): create a no-argument closure which calls a 1-argument function e(callee);
+                e extracts the current loop variable, and calls a 1-argument function callee->cv with this argument. */
+    struct trampoline_data_1v *callee;
+    char *s = "N/A";
+    STRLEN len;
+
+    if (!SvPOK(cv) || !(s = SvPV(cv,len)) || len != 1 || s[0] != '$') {
+	warn("Argument-types E,I with prototype `%s' not supported yet, substituting x->1", s);
+	return code_return_1;
+    }
+    warn("Ignoring the variable(s) of a closure");
+    callee = (struct trampoline_data_1v*) stack_malloc(sizeof(struct trampoline_data_1v));   /* new_chunk(words)??? */
+    callee->cv = cv;
+    callee->var1 = sv;
+    GEN extraargs = mkvec(stoi((long) callee));		/* Need real mkvec()!!!  XXX ??? */
+    return snm_closure((entree*) (is_void ? &eH_vG : &eH_G), extraargs);
+}
+#endif	/* PARI_VERSION_EXP < 2004002 */	/* Undocumented when it appeared; present in 2.5.0 */
+
 static void
-fill_argvect(entree *ep, char *s, long *has_pointer, GEN *argvec,
+fill_argvect(entree *ep, const char *s, long *has_pointer, GEN *argvec,
 	     long *rettype, SV **args, int items,
 	     SV **sv_OUT, GEN *gen_OUT, long *OUT_cnt)
 {	/* The last 3 to support '&' code - treated after the call */
     entree *ep1;
-    int i = 0, j = 0, saw_M = 0;
+    int i = 0, j = 0, saw_M = 0, saw_V = 0;
     long fake;
+    const char *s0 = s, *pre;
     PariExpr expr;
+#if PARI_VERSION_EXP >= 2004002
+#  define MaxPariVar			7
+    PariVar loopvars[MaxPariVar];
+#  define LoopVar(i)			loopvars[i]
+#else
+#  define LoopVar(i)			N/A
+#endif
 
     if (!ep)
 	croak("XSUB call through interface did not provide *function");
@@ -1556,6 +1930,9 @@ fill_argvect(entree *ep, char *s, long *has_pointer, GEN *argvec,
 	    case 'M': /* long or a mneumonic string (string not supported) */
 		saw_M = 1;
 		/* Fall through */
+#if PARI_VERSION_EXP >= 2004002
+	    case 'P': /* series precision */
+#endif
 	    case 'L': /* long */
 		argvec[i++] = (GEN) (long)SvIV(args[j]);
 		j++;
@@ -1566,14 +1943,27 @@ fill_argvect(entree *ep, char *s, long *has_pointer, GEN *argvec,
 		break;
 
 	    case 'V': /* variable */
+#if PARI_VERSION_EXP < 2004002
 		ep1 = bindVariable(args[j++]);
 		argvec[i++] = (GEN)ep1;
 		if (EpVALENCE(ep1) != EpVAR && *(s-1) == 'V')
 		    croak("Did not get a variable");
+		saw_V++;
+#else
+		if (*s != '=')
+		   warn("Unexpected: `V' not followed by `='");		/* appears in fordiv() etc. */
+		if (saw_V >= MaxPariVar)
+		   croak("Too many loop variables in a signature (max=%d)", MaxPariVar);
+		loopvars[saw_V++] = args[j++];		/* XXXX Ignore this variable (should be compiled into the closure!!!) ??? */
+#endif
 		break;
 	    case 'S': /* symbol */
+#if PARI_VERSION_EXP < 2004002
 		ep1 = bindVariable(args[j++]);
 		argvec[i++] = (GEN)ep1;
+#else
+		croak("Variable type `S' unsupported after 2.4.2");
+#endif
 		break;
 	    case '&': /* *GEN */
 		gen_OUT[*OUT_cnt] = sv2pari(args[j]);
@@ -1581,11 +1971,18 @@ fill_argvect(entree *ep, char *s, long *has_pointer, GEN *argvec,
 		sv_OUT[(*OUT_cnt)++]   = args[j++];
 		break;
 	    case  'E': /* Input position - subroutine */
-	    case  'I': /* Input position - subroutine */
-		if (SvROK(args[j]) && SvTYPE(SvRV(args[j])) == SVt_PVCV) {
-		    expr = ((char*)&(SvRV(args[j])->sv_flags)) + LSB_in_U32;
-		} else expr = (char *)SvPV(args[j],na);
-		argvec[i++] = (GEN) expr;
+	    case  'I': /* Input position - subroutine, ignore value */
+		if (!args[j])
+		  croak("panic: no arg when AssignPariExpr()");
+		if (saw_V > 1) {
+		  if (saw_V > 2)
+		    croak("More than 2 running variables per PARI entry point not supported");
+		  AssignPariExpr2R(expr,args[j], 'I'==s[-1], LoopVar(0), LoopVar(1));
+		} else if (saw_V == 1) {
+		  AssignPariExprR(expr,args[j], 'I'==s[-1], LoopVar(0));
+		} else
+		    croak("Type E, I without a preceding variable");
+		argvec[i++] = (GEN) expr;		/* XXXX Cast not needed after 2004002 */
 		j++;
 		break;
 
@@ -1596,22 +1993,29 @@ fill_argvect(entree *ep, char *s, long *has_pointer, GEN *argvec,
 		break;
 
 	    case 'p': /* precision */
-		argvec[i++] = (GEN) prec; 
+		argvec[i++] = (GEN) prec_words; 
 		break;
+
+#if PARI_VERSION_EXP >= 2008000
+	    case 'b': /* bitprecision */
+	    	warn("===Passing precision=%ld; precreal=%ld", (long)prec_bits, (long)precreal);
+		argvec[i++] = (GEN)precreal;		/* prec_bits; */
+		break;
+#endif
 
 	    case '=':
 	    case ',':
 		break;
 
 	    case 'D': /* Has a default value */
+		pre = s;
 		if (j >= items || !SvOK(args[j]))
 		    {
-			char *pre = s;
-
 			if (j < items)
 			    j++;
 
 			if ( *s == 'G' || *s == '&' 
+			     || *s == 'r' || *s == 's'
 			     || *s == 'E' || *s == 'I' || *s == 'V') { 
 			    argvec[i++]=DFT_GEN; s++; 
 			    break; 
@@ -1620,7 +2024,14 @@ fill_argvect(entree *ep, char *s, long *has_pointer, GEN *argvec,
 			    argvec[i++]=DFT_VAR; s++; 
 			    break; 
 			}
-			while (*s++ != ',');
+			if (*s == 'P')              { 
+			    argvec[i++] = (GEN) precdl; s++; 
+			    break; 
+			}
+			while (*s && *s++ != ',');
+			if (!*s)
+			if (!s[0] && s[-1] != ',')
+			    goto unrecognized_syntax;
 			switch (*s) {
 			case 'r': case 's':
 			    if (pre[0] == '\"' && pre[1] == '\"' 
@@ -1634,31 +2045,39 @@ fill_argvect(entree *ep, char *s, long *has_pointer, GEN *argvec,
 			    saw_M = 1;
 			    /* Fall through */
 			case 'L': /* long */
-			    argvec[i++] = (GEN) atol(pre);
+			    argvec[i++] = (GEN) MYatol(pre);
 			    break;
 			case 'G':
 			    if ((*pre == '1' || *pre == '0') && pre[1]==',') {
 				argvec[i++] = (*pre == '1'
-					       ? gun : gzero);
+					       ? gen_1 : gen_0);
 				break;
 			    }
 			default:
 			  unknown:
-			    croak("Cannot process default argument %.*s of type %.1s",
-				  s - pre - 1, pre, s);
+			    croak("Cannot process default argument %.*s of type %.1s for prototype '%s'",
+				  s - pre - 1, pre, s, s0);
 			}
 			s++;			/* Skip ',' */
 		    }
 		else
 		    if (*s == 'G' || *s == '&' || *s == 'n'
+			|| *s == 'P' || *s == 'r' || *s == 's'
 			|| *s == 'E' || *s == 'I' || *s == 'V') 
 			break;
-		while (*s++ != ',');
+		while (*s && *s++ != ',');
+		if (!s[0] && s[-1] != ',') {
+		  unrecognized_syntax:
+		    croak("Unexpected syntax of default argument '%s' in prototype '%s'",
+			  pre - 1, s0);
+		}
 		break;
 
+#if PARI_VERSION_EXP < 2004002
 	    case 'P': /* series precision */
 		argvec[i++] = (GEN) precdl; 
 		break;
+#endif
 
 	    case 'f': /* Fake *long argument */
 		argvec[i++] = (GEN) &fake; 
@@ -1684,35 +2103,34 @@ fill_argvect(entree *ep, char *s, long *has_pointer, GEN *argvec,
 		}		
 		/* FALL THROUGH */
 	    default: 
-		croak("Unsupported code '%.1s' in signature of a PARI function", s-1);
+		croak("Unsupported code '%.1s' in signature '%s' of a PARI function", s-1, s0);
 	    }
 	if (j > items)
 	    croak("Too few args %d for PARI function %s", items, ep->name);
     }
     if (j < items)
-	croak("%d unused args for PARI function %s", items - j, ep->name);
+	croak("%d unused args for PARI function %s of signature `%s' (with %d args)", items - j, ep->name, ep->code, j);
 #if PURIFY
     for ( ; i<ARGS_SUPPORTED; i++) argvec[i]=NULL; 
 #endif
 }
 
 static void
-fill_outvect(SV **sv_OUT, GEN *gen_OUT, long c, long oldavma)
+fill_outvect(SV **sv_OUT, GEN *gen_OUT, long c, pari_sp oldavma)
 {
     while (c-- > 0)
 	resetSVpari(sv_OUT[c], gen_OUT[c], oldavma);
 }
-
 
 #define _to_int(in,dummy1,dummy2) to_int(in)
 
 static GEN
 to_int(GEN in)
 {
-    long sign = gcmp(in,gzero);
+    long sign = gcmp(in,gen_0);
 
     if (!sign)
-	return gzero;
+	return gen_0;
     switch (typ(in)) {
     case t_INT:
 #if PARI_VERSION_EXP < 2002008
@@ -1736,23 +2154,29 @@ typedef void (*TSET_FP)(char *s);
 #  define have_highlevel()	1
 #endif
 
-#ifdef NO_GRAPHICS_PARI
-#  define have_graphics()	0
-#  define set_gnuterm(a,b,c) croak("This build of Math::Pari has no plotting support")
-#  define int_set_term_ftable(a) croak("This build of Math::Pari has no plotting support")
+#ifdef NO_GNUPLOT_PARI
+#  define have_graphics()	-1
+#  define set_gnuterm(a,b,c) croak("This build of Math::Pari has no Gnuplot plotting support")
+#  define int_set_term_ftable(a) croak("This build of Math::Pari has no Gnuplot plotting support")
 #else
-#  define have_graphics()	1
-#  if PARI_VERSION_EXP < 2000013
-#    define set_gnuterm(a,b,c) \
-	set_term_funcp((FUNC_PTR)(a),(struct termentry *)(b))
-#  else	/* !( PARI_VERSION_EXP < 2000013 ) */ 
-#    define set_gnuterm(a,b,c) \
-	set_term_funcp3((FUNC_PTR)(INT2PTR(void*, a)), INT2PTR(struct termentry *, b), INT2PTR(TSET_FP,c))
+#  ifdef NO_GRAPHICS_PARI
+#    define have_graphics()	0
+#    define set_gnuterm(a,b,c) croak("This build of Math::Pari has no plotting support")
+#    define int_set_term_ftable(a) croak("This build of Math::Pari has no plotting support")
+#  else
+#    define have_graphics()	1
+#    if PARI_VERSION_EXP < 2000013
+#      define set_gnuterm(a,b,c) \
+	  set_term_funcp((FUNC_PTR)(a),(struct termentry *)(b))
+#    else	/* !( PARI_VERSION_EXP < 2000013 ) */ 
+#      define set_gnuterm(a,b,c) \
+	  set_term_funcp3((FUNC_PTR)(INT2PTR(void*, a)), INT2PTR(struct termentry *, b), INT2PTR(TSET_FP,c))
 extern void set_term_funcp3(FUNC_PTR change_p, void *term_p, TSET_FP tchange);
 
-#  endif	/* PARI_VERSION_EXP < 2000013 */
+#    endif	/* PARI_VERSION_EXP < 2000013 */
 
-#  define int_set_term_ftable(a) (v_set_term_ftable(INT2PTR(void*,a)))
+#    define int_set_term_ftable(a) (v_set_term_ftable(INT2PTR(void*,a)))
+#  endif
 #endif
 
 extern  void v_set_term_ftable(void *a);
@@ -1770,6 +2194,80 @@ s_reset_on_reload(int newvalue)
       reset_on_reload = newvalue;
   return old;
 }
+
+static int
+isPariFunction(entree *ep)
+{
+#if PARI_VERSION_EXP < 2004000
+   return EpVALENCE(ep) < EpUSER;
+		    /* && ep>=fonctions && ep < fonctions+NUMFUNC) */
+#else	/* !( PARI_VERSION_EXP < 2004000) */
+   return (EpVALENCE(ep) == 0 || EpVALENCE(ep) != EpNEW && typ((GEN)(ep->value))==t_CLOSURE);	/* == EpVAR */
+#endif	/* !( PARI_VERSION_EXP < 2004000) */
+}
+
+#if 1
+#  define checkPariFunction(arg)
+#else
+void
+checkPariFunction(const char *name)
+{
+	long hash;
+   	entree   *ep = is_entry_intern(name, functions_hash, &hash);
+	 warn( "Ep for `%s': VALENCE=%#04x, EpVAR=%d, EpINSTALL=%d, name=<%s>, code=<%s>, isFunction=%d", name, (ep ? (int)EpVALENCE(ep) : 0xDEAD),
+		 (int)EpVAR, (int)EpINSTALL, (ep ? ep->name : "<null>"),
+		 ((ep && ep->code) ? ep->code : "<null>"), (ep && isPariFunction(ep)));
+}
+#endif
+
+#if PARI_VERSION_EXP < 2008000	/* Need to recheck with each new major release???  See src/desc/gen_proto, src/test/32/help */
+#  define TAG_community		12	/* "The PARI community" */
+#else		/* !(PARI_VERSION_EXP < 2008000) */
+#  if PARI_VERSION_EXP < 2010000
+#    define TAG_community	15	/* "The PARI community" */
+#  else /* !(PARI_VERSION_EXP < 2010000) */
+#    if PARI_VERSION_EXP < 2014000
+#      define TAG_community	17	/* "The PARI community" */
+#    else /* !(PARI_VERSION_EXP < 2012000) */
+#      define TAG_community	TAG_community_unknown___needs_to_be_checked_for_every_new_version__see__GPbuilddir_src_test_32_help
+#    endif	/* !(PARI_VERSION_EXP < 2012000) */
+#  endif	/* !(PARI_VERSION_EXP < 2010000) */
+#endif		/* !(PARI_VERSION_EXP < 2008000) */
+
+#  define INTERNAL_TAG_start	(TAG_community+1)	/* symbolic_operators */
+#  define INTERNAL_TAG_end	(TAG_community+3)	/* programming/internals (in between: member_functions) */
+
+int
+_is_internal(int tag)
+{			/* from gp_rl.c */
+#if PARI_VERSION_EXP < 2004000
+   return 0;
+#else	/* !( PARI_VERSION_EXP < 2004000) */
+  return tag >= INTERNAL_TAG_start && tag <= INTERNAL_TAG_end;
+#endif	/* !( PARI_VERSION_EXP < 2004000) */
+}
+
+char *
+added_sections()
+{
+#if PARI_VERSION_EXP < 2013000
+   /* Suggestion on format (part of 2.10.0), only use short names: "4: functions related to COMBINATORICS\n13: L-FUNCTIONS" */
+   return "";
+#else	/* !( PARI_VERSION_EXP < 2011000) */
+   /* Check by entering "?" at gp prompt.  Compare with the list in Pari.pm */
+   croak("Do not know which \"sections\" (of list of functions) were added to PARI at v2.11.0");
+#endif	/* !( PARI_VERSION_EXP < 2011000) */
+}
+
+
+#if PARI_VERSION_EXP >= 2006000		/* taken from 2.5.5 */
+static GEN
+gand(GEN x, GEN y) { return gequal0(x)? gen_0: (gequal0(y)? gen_0: gen_1); }
+
+static GEN
+gor(GEN x, GEN y) { return gequal0(x)? (gequal0(y)? gen_0: gen_1): gen_1; }
+#endif /* PARI_VERSION_EXP >= 2006000 */
+
 
 MODULE = Math::Pari PACKAGE = Math::Pari PREFIX = Arr_
 
@@ -1809,6 +2307,10 @@ MODULE = Math::Pari PACKAGE = Math::Pari
 
 PROTOTYPES: ENABLE
 
+int
+is_gnil(in)
+	GEN	in
+
 GEN
 sv2pari(sv)
 long	oldavma=avma;
@@ -1819,7 +2321,6 @@ sv2parimat(sv)
 long	oldavma=avma;
      SV *	sv
 
-
 SV *
 pari2iv(in)
 long	oldavma=avma;
@@ -1827,14 +2328,12 @@ long	oldavma=avma;
  CLEANUP:
    avma=oldavma;
 
-
 SV *
 pari2nv(in)
 long	oldavma=avma;
      GEN	in
  CLEANUP:
    avma=oldavma;
-
 
 SV *
 pari2num_(in,...)
@@ -2085,7 +2584,7 @@ long	oldavma=avma;
       croak("XSUB call through interface did not provide *function");
     }
 
-    RETVAL=FUNCTION(prec);
+    RETVAL=FUNCTION(prec_words);
   }
  OUTPUT:
    RETVAL
@@ -2094,7 +2593,7 @@ GEN
 interface9900()
 long	oldavma=avma;
  CODE:
-  {
+  {	/* Code="" */
     dFUNCTION(GEN);
 
     if (!FUNCTION) {
@@ -2111,14 +2610,14 @@ interface1(arg1)
 long	oldavma=avma;
 GEN	arg1
  CODE:
-  {
+  {	/* Code="Gp" */
     dFUNCTION(GEN);
 
     if (!FUNCTION) {
       croak("XSUB call through interface did not provide *function");
     }
 
-    RETVAL=FUNCTION(arg1,prec);
+    RETVAL=FUNCTION(arg1,prec_words);
   }
  OUTPUT:
    RETVAL
@@ -2141,18 +2640,17 @@ long	inv = NO_INIT
 
     PERL_UNUSED_VAR(arg2); /* -W */
     PERL_UNUSED_VAR(inv); /* -W */
-    RETVAL=FUNCTION(arg1,prec);
+    RETVAL=FUNCTION(arg1,prec_words);
   }
  OUTPUT:
    RETVAL
-
 
 long
 interface10(arg1)
 long	oldavma=avma;
 GEN	arg1
  CODE:
-  {
+  {	/* Code="lG" */
     dFUNCTION(long);
 
     if (!FUNCTION) {
@@ -2196,7 +2694,7 @@ interface11(arg1)
 long	oldavma=avma;
 long	arg1
  CODE:
-  {
+  {	/* Code="L" */
     dFUNCTION(GEN);
 
     if (!FUNCTION) {
@@ -2232,7 +2730,7 @@ interface18(arg1)
 long	oldavma=avma;
 GEN	arg1
  CODE:
-  {
+  {	/* Code="G" */
     dFUNCTION(GEN);
 
     if (!FUNCTION) {
@@ -2250,7 +2748,7 @@ long	oldavma=avma;
 GEN	arg1
 GEN	arg2
  CODE:
-  {
+  {	/* Code="GG" */
     dFUNCTION(GEN);
 
     if (!FUNCTION) {
@@ -2289,7 +2787,7 @@ long	oldavma=avma;
 GEN	arg1
 GEN	arg2
  CODE:
-  {
+  {	/* Code="lGG" */
     dFUNCTION(long);
 
     if (!FUNCTION) {
@@ -2303,7 +2801,7 @@ GEN	arg2
  CLEANUP:
    avma=oldavma;
 
-# With fake arguments for overloading and comparison to gun for speed
+# With fake arguments for overloading and comparison to gen_1 for speed
 
 long
 interface2099(arg1,arg2,inv)
@@ -2319,7 +2817,7 @@ bool	inv
       croak("XSUB call through interface did not provide *function");
     }
 
-    RETVAL = (inv? FUNCTION(arg2,arg1): FUNCTION(arg1,arg2)) == gun;
+    RETVAL = (inv? FUNCTION(arg2,arg1): FUNCTION(arg1,arg2)) == gen_1;
   }
  OUTPUT:
    RETVAL
@@ -2378,14 +2876,14 @@ long	oldavma=avma;
 GEN	arg1
 GEN	arg2
  CODE:
-  {
+  {	/* Code="GGp" */
     dFUNCTION(GEN);
 
     if (!FUNCTION) {
       croak("XSUB call through interface did not provide *function");
     }
 
-    RETVAL=FUNCTION(arg1,arg2,prec);
+    RETVAL=FUNCTION(arg1,arg2,prec_words);
   }
  OUTPUT:
    RETVAL
@@ -2397,7 +2895,7 @@ GEN	arg1
 GEN	arg2
 GEN	arg3
  CODE:
-  {
+  {	/* Code="GGG" */
     dFUNCTION(GEN);
 
     if (!FUNCTION) {
@@ -2416,7 +2914,7 @@ GEN	arg1
 GEN	arg2
 GEN	arg3
  CODE:
-  {
+  {	/* Code="lGGG" */
     dFUNCTION(long);
 
     if (!FUNCTION) {
@@ -2438,7 +2936,7 @@ GEN	arg2
 GEN	arg3
 GEN	arg4
  CODE:
-  {
+  {	/* Code="GGGG" */
     dFUNCTION(GEN);
 
     if (!FUNCTION) {
@@ -2465,7 +2963,7 @@ GEN	arg4
       croak("XSUB call through interface did not provide *function");
     }
 
-    RETVAL=FUNCTION(arg1,arg2,arg3,arg4,prec);
+    RETVAL=FUNCTION(arg1,arg2,arg3,arg4,prec_words);
   }
  OUTPUT:
    RETVAL
@@ -2476,7 +2974,7 @@ long	oldavma=avma;
 GEN	arg1
 GEN	arg2
  CODE:
-  {
+  {	/* Code="GnP" */
     dFUNCTION(GEN);
 
     if (!FUNCTION) {
@@ -2488,15 +2986,14 @@ GEN	arg2
  OUTPUT:
    RETVAL
 
-
 GEN
-interface13(arg1, arg2=0, arg3=gzero)
+interface13(arg1, arg2=0, arg3=gen_0)
 long	oldavma=avma;
 GEN	arg1
 long	arg2
 GEN	arg3
  CODE:
-  {
+  {	/* Code="GD0,L,D0,G," */
     dFUNCTION(GEN);
 
     if (!FUNCTION) {
@@ -2508,14 +3005,13 @@ GEN	arg3
  OUTPUT:
    RETVAL
 
-
 GEN
 interface14(arg1,arg2=0)
 long	oldavma=avma;
 GEN	arg1
 GEN	arg2
  CODE:
-  {
+  {	/* Code="GDn" */
     dFUNCTION(GEN);
 
     if (!FUNCTION) {
@@ -2527,14 +3023,13 @@ GEN	arg2
  OUTPUT:
    RETVAL
 
-
 GEN
 interface21(arg1,arg2)
 long	oldavma=avma;
 GEN	arg1
 long	arg2
  CODE:
-  {
+  {	/* Code="GL" */
     dFUNCTION(GEN);
 
     if (!FUNCTION) {
@@ -2576,7 +3071,6 @@ bool	inv
  OUTPUT:
    RETVAL
 
-
 GEN
 interface22(arg1,arg2,arg3)
 long	oldavma=avma;
@@ -2584,14 +3078,17 @@ GEN	arg1
 PariVar	arg2
 PariExpr	arg3
  CODE:
-  {
+  {	/* Code="GVI" */
     dFUNCTION(GEN);
 
     if (!FUNCTION) {
       croak("XSUB call through interface did not provide *function");
     }
-
+#if PARI_VERSION_EXP >= 2004002
+    RETVAL = FUNCTION(arg1, arg3);		/* XXXX Omit `V' instead of merging it into I/E */
+#else
     RETVAL = FUNCTION(arg1, arg2, arg3);
+#endif
   }
  OUTPUT:
    RETVAL
@@ -2602,7 +3099,7 @@ long	oldavma=avma;
 GEN	arg1
 long	arg2
  CODE:
-  {
+  {	/* Code="GL" */
     dFUNCTION(GEN);
 
     if (!FUNCTION) {
@@ -2620,7 +3117,7 @@ long	oldavma=avma;
 long	arg1
 GEN	arg2
  CODE:
-  {
+  {	/* Code="LG" */
     dFUNCTION(GEN);
 
     if (!FUNCTION) {
@@ -2639,7 +3136,7 @@ GEN	arg1
 GEN	arg2
 long	arg3
  CODE:
-  {
+  {	/* Code="GGD0,L," */
     dFUNCTION(GEN);
 
     if (!FUNCTION) {
@@ -2658,7 +3155,7 @@ GEN	arg1
 GEN	arg2
 GEN	arg3
  CODE:
-  {
+  {	/* Code="GnG" */
     dFUNCTION(GEN);
 
     if (!FUNCTION) {
@@ -2677,14 +3174,17 @@ PariVar	arg1
 GEN	arg2
 PariExpr	arg3
  CODE:
-  {
+  {	/* Code="V=GIp" */
     dFUNCTION(GEN);
 
     if (!FUNCTION) {
       croak("XSUB call through interface did not provide *function");
     }
-
-    RETVAL=FUNCTION(arg1, arg2, arg3, prec);
+#if PARI_VERSION_EXP >= 2004002
+    RETVAL=FUNCTION(arg2, arg3, prec_words);		/* XXXX Omit `V' instead of merging it into I/E */
+#else
+    RETVAL=FUNCTION(arg1, arg2, arg3, prec_words);
+#endif
   }
  OUTPUT:
    RETVAL
@@ -2696,14 +3196,17 @@ GEN	arg1
 PariVar	arg2
 PariExpr	arg3
  CODE:
-  {
+  {	/* Code="GDVDI" */
     dFUNCTION(GEN);
 
     if (!FUNCTION) {
       croak("XSUB call through interface did not provide *function");
     }
-
+#if PARI_VERSION_EXP >= 2004002
+    RETVAL = FUNCTION(arg1, arg3);		/* XXXX Omit `V' instead of merging it into I/E */
+#else
     RETVAL = FUNCTION(arg1, arg2, arg3);
+#endif
   }
  OUTPUT:
    RETVAL
@@ -2755,7 +3258,7 @@ GEN	arg2
 GEN	arg3
 GEN	arg4
  CODE:
-  {
+  {	/* Code="GDGDGD&" */
     dFUNCTION(GEN);
 
     if (!FUNCTION) {
@@ -2774,7 +3277,7 @@ GEN	arg1
 GEN	arg2
 long	arg3
  CODE:
-  {
+  {	/* Code="GGL" */
     dFUNCTION(GEN);
 
     if (!FUNCTION) {
@@ -2794,14 +3297,14 @@ GEN	arg2
 GEN	arg3
 long	arg4
  CODE:
-  {
+  {	/* Code="GGGD0,L,p" */
     dFUNCTION(GEN);
 
     if (!FUNCTION) {
       croak("XSUB call through interface did not provide *function");
     }
 
-    RETVAL=FUNCTION(arg1,arg2,arg3,arg4,prec);
+    RETVAL=FUNCTION(arg1,arg2,arg3,arg4,prec_words);
   }
  OUTPUT:
    RETVAL
@@ -2812,7 +3315,7 @@ long	arg1
 long	arg2
 long	arg3
  CODE:
-  {
+  {	/* Code="vLLL" */
     dFUNCTION(GEN);
 
     if (!FUNCTION) {
@@ -2829,7 +3332,7 @@ long	arg1
 GEN	arg2
 GEN	arg3
  CODE:
-  {
+  {	/* Code="vLGG" */
     dFUNCTION(GEN);
 
     if (!FUNCTION) {
@@ -2849,14 +3352,17 @@ GEN	arg2
 GEN	arg3
 PariExpr	arg4
  CODE:
-  {
+  {	/* Code="V=GGIp" */
     dFUNCTION(GEN);
 
     if (!FUNCTION) {
       croak("XSUB call through interface did not provide *function");
     }
-
-    RETVAL=FUNCTION(arg1, arg2, arg3, arg4, prec);
+#if PARI_VERSION_EXP >= 2004002
+    RETVAL=FUNCTION(arg2, arg3, arg4, prec_words);	/* XXXX Omit `V' instead of merging it into I/E */
+#else
+    RETVAL=FUNCTION(arg1, arg2, arg3, arg4, prec_words);
+#endif
   }
  OUTPUT:
    RETVAL
@@ -2870,14 +3376,17 @@ GEN	arg2
 GEN	arg3
 PariExpr	arg4
  CODE:
-  {
+  {	/* Code="V=GGIDG" */
     dFUNCTION(GEN);
 
     if (!FUNCTION) {
       croak("XSUB call through interface did not provide *function");
     }
-
+#if PARI_VERSION_EXP >= 2004002
+    RETVAL=FUNCTION(arg2, arg3, arg4, arg0);	/* XXXX Omit `V' instead of merging it into I/E */
+#else
     RETVAL=FUNCTION(arg1, arg2, arg3, arg4, arg0);
+#endif
   }
  OUTPUT:
    RETVAL
@@ -2891,14 +3400,17 @@ GEN	arg2
 GEN	arg3
 PariExpr	arg4
  CODE:
-  {
+  {	/* Code="V=GGIDG" */
     dFUNCTION(GEN);
 
     if (!FUNCTION) {
       croak("XSUB call through interface did not provide *function");
     }
-
+#if PARI_VERSION_EXP >= 2004002
+    RETVAL=FUNCTION(arg2, arg3, arg4, arg0);	/* XXXX Omit `V' instead of merging it into I/E */
+#else
     RETVAL=FUNCTION(arg1, arg2, arg3, arg4, arg0);
+#endif
   }
  OUTPUT:
    RETVAL
@@ -2910,24 +3422,31 @@ GEN	arg0
 GEN	arg00
 PariVar	arg1
 PariVar	arg2
-PariExpr	arg3
+PariExpr2	arg3
  CODE:
-  {
+  {	/* Code="GGDVDVDI" */
     dFUNCTION(GEN);
 # arg1 and arg2 may finish to be the same entree*, like after $x=$y=PARIvar 'x'
     if (arg1 == arg2 && arg1) {
 	if (ST(2) == ST(3)) 
 	    croak("Same iterator for a double loop");
 # ST(3) is localized now
+#if PARI_VERSION_EXP >= 2004000
+	croak("Panic (unreachable (?) in a double loop construct)");
+#else
 	sv_unref(ST(3));
 	arg2 = findVariable(ST(3),1);
 	sv_setref_pv(ST(3), "Math::Pari::Ep", (void*)arg2);
+#endif
     }
     if (!FUNCTION) {
       croak("XSUB call through interface did not provide *function");
     }
-
+#if PARI_VERSION_EXP >= 2004002
+    RETVAL=FUNCTION(arg0, arg00, arg3);	/* XXXX Omit two `V's instead of merging them into I/E */
+#else
     RETVAL=FUNCTION(arg0, arg00, arg1, arg2, arg3);
+#endif
   }
  OUTPUT:
    RETVAL
@@ -2938,16 +3457,19 @@ long	oldavma=avma;
 PariVar	arg1
 GEN	arg2
 GEN	arg3
-PariExpr	arg4
+PariExprV	arg4
  CODE:
-  {
+  {	/* Code="vV=GGI" */
     dFUNCTION(void);
 
     if (!FUNCTION) {
       croak("XSUB call through interface did not provide *function");
     }
-
+#if PARI_VERSION_EXP >= 2004002
+    FUNCTION(arg2, arg3, arg4);		/* XXXX Omit `V' instead of merging it into I/E */
+#else
     FUNCTION(arg1, arg2, arg3, arg4);
+#endif
   }
  CLEANUP:
    avma=oldavma;
@@ -2957,20 +3479,22 @@ interface84(arg1,arg2,arg3)
 long	oldavma=avma;
 GEN	arg1
 PariVar	arg2
-PariExpr	arg3
+PariExprV	arg3
  CODE:
-  {
+  {	/* Code="vGVI" */
     dFUNCTION(void);
 
     if (!FUNCTION) {
       croak("XSUB call through interface did not provide *function");
     }
-
+#if PARI_VERSION_EXP >= 2004002
+    FUNCTION(arg1, arg3);		/* XXXX Omit `V' instead of merging it into I/E */
+#else
     FUNCTION(arg1, arg2, arg3);
+#endif
   }
  CLEANUP:
    avma=oldavma;
-
 
 # These interfaces were automatically generated:
 
@@ -2979,7 +3503,7 @@ interface16(arg1)
 long	oldavma=avma;
     char * arg1
  CODE:
-  {
+  {	/* Code="ls" */
     dFUNCTION(long);
 
     if (!FUNCTION) {
@@ -2993,13 +3517,12 @@ long	oldavma=avma;
  CLEANUP:
    avma=oldavma;
 
-
 void
 interface19(arg1, arg2)
     long arg1
     long arg2
  CODE:
-  {
+  {	/* Code="vLL" */
     dFUNCTION(GEN);
 
     if (!FUNCTION) {
@@ -3008,7 +3531,6 @@ interface19(arg1, arg2)
 
     FUNCTION(arg1, arg2);
   }
-
 
 GEN
 interface44(arg1, arg2, arg3, arg4)
@@ -3030,7 +3552,6 @@ long	oldavma=avma;
  OUTPUT:
    RETVAL
 
-
 GEN
 interface45(arg1, arg2, arg3=0)
 long	oldavma=avma;
@@ -3038,7 +3559,7 @@ long	oldavma=avma;
     GEN arg2
     long arg3
  CODE:
-  {
+  {	/* Code="LGD0,L," */
     dFUNCTION(GEN);
 
     if (!FUNCTION) {
@@ -3050,7 +3571,6 @@ long	oldavma=avma;
  OUTPUT:
    RETVAL
 
-
 void
 interface59(arg1, arg2, arg3, arg4, arg5)
 long	oldavma=avma;
@@ -3060,7 +3580,7 @@ long	oldavma=avma;
     GEN arg4
     GEN arg5
  CODE:
-  {
+  {	/* Code="vLGGGG" */
     dFUNCTION(GEN);
 
     if (!FUNCTION) {
@@ -3071,7 +3591,6 @@ long	oldavma=avma;
   }
  CLEANUP:
    avma=oldavma;
-
 
 GEN
 interface73(arg1, arg2, arg3, arg4, arg5, arg6=0, arg7=0)
@@ -3080,22 +3599,24 @@ long	oldavma=avma;
     PariVar arg2
     GEN arg3
     GEN arg4
-    PariExpr arg5
+    PariExprV arg5
     long arg6
     long arg7
  CODE:
-  {
+  {	/* Code="LV=GGIpD0,L,D0,L," */
     dFUNCTION(GEN);
 
     if (!FUNCTION) {
       croak("XSUB call through interface did not provide *function");
     }
-
-    RETVAL=FUNCTION(arg1, arg2, arg3, arg4, arg5, prec, arg6, arg7);
+#if PARI_VERSION_EXP >= 2004002
+    RETVAL=FUNCTION(arg1, arg3, arg4, arg5, prec_words, arg6, arg7);	/* XXXX Omit `V' instead of merging it into I/E */
+#else
+    RETVAL=FUNCTION(arg1, arg2, arg3, arg4, arg5, prec_words, arg6, arg7);
+#endif
   }
  OUTPUT:
    RETVAL
-
 
 void
 interface86(arg1, arg2, arg3, arg4, arg5)
@@ -3104,41 +3625,45 @@ long	oldavma=avma;
     GEN arg2
     GEN arg3
     GEN arg4
-    PariExpr arg5
+    PariExprV arg5
  CODE:
-  {
+  {	/* Code="vV=GGGI" */
     dFUNCTION(GEN);
 
     if (!FUNCTION) {
       croak("XSUB call through interface did not provide *function");
     }
-
+#if PARI_VERSION_EXP >= 2004002
+    FUNCTION(arg2, arg3, arg4, arg5);	/* XXXX Omit `V' instead of merging it into I/E */
+#else
     FUNCTION(arg1, arg2, arg3, arg4, arg5);
+#endif
   }
  CLEANUP:
    avma=oldavma;
-
 
 void
 interface87(arg1, arg2, arg3, arg4=0)
 long	oldavma=avma;
     PariVar arg1
     GEN arg2
-    PariExpr arg3
+    PariExprV arg3
     long arg4
  CODE:
-  {
+  {	/* Code="vV=GID0,L," */
     dFUNCTION(GEN);
 
     if (!FUNCTION) {
       croak("XSUB call through interface did not provide *function");
     }
-
+#if PARI_VERSION_EXP >= 2004002
+    FUNCTION(arg2, arg3, arg4);		/* XXXX Omit `V' instead of merging it into I/E */
+#else
     FUNCTION(arg1, arg2, arg3, arg4);
+#endif
   }
  CLEANUP:
    avma=oldavma;
-
 
 bool
 _2bool(arg1,arg2,inv)
@@ -3220,9 +3745,9 @@ loadPari(name, v = 99)
 	       if (strEQ(name,"geq")) {
 		   valence=2;
 		   func=(void (*)(void*)) geq;
-	       } else if (strEQ(name,"gegal")) {
+	       } else if (strEQ(name,"gegal") || strEQ(name,"gequal")) {	/* old name */
 		   valence=20;
-		   func=(void (*)(void*)) gegal;
+		   func=(void (*)(void*)) gequal;
 	       }
 	       break;
 	   case 'g':
@@ -3268,7 +3793,7 @@ loadPari(name, v = 99)
 	       }
 	       break;
 	   case 'p':
-	       if (strEQ(name,"gpui")) {
+	       if (strEQ(name,"gpui") || strEQ(name,"gpow")) {
 		   valence=2;
 		   func=(void (*)(void*)) my_gpui;
 	       }
@@ -3437,48 +3962,37 @@ loadPari(name, v = 99)
 	   }
        }
        if (!func) {
-	   SAVEINT(doing_PARI_autoload);
-	   doing_PARI_autoload = 1;
-	   ep = is_entry_intern(name, functions_hash, &hash);
-	   doing_PARI_autoload = 0;
-#if 0
-	 for (n = 0; *name; name++) n = n << 1 ^ *name;
-	 if (n < 0) n = -n; n %= TBLSZ;
-	 for(ep = hashtable[n]; ep; ep = ep->next) {
-	   if (strEQ(olds,ep->name)) { /* Name in the symbol table */
-	     break;
-	   }
-	 }
+         SAVEINT(doing_PARI_autoload);
+         doing_PARI_autoload = 1;
+         checkPariFunction(name);
+#ifdef MAY_USE_FETCH_ENTRY
+         ep = is_entry(name);
+#else
+         ep = is_entry_intern(name, functions_hash, &hash);
 #endif
-	 if (!ep) {
-#if 0					/* findentry() is static. */
-	     ep = findentry(name,strlen(name),funct_old_hash[hash]);
-#endif
-	     if (!ep)
-		 croak("`%s' is not a Pari function name",name);
-	     else
-		 warn("`%s' is an obsolete Pari function name", name);
-	 }
-	 if (ep && (EpVALENCE(ep) < EpUSER 
-		    /* && ep>=fonctions && ep < fonctions+NUMFUNC) */)) {
+         doing_PARI_autoload = 0;
+         if (!ep)
+           croak("`%s' is not a Pari function name",name);
+
+	 if (ep && isPariFunction(ep)) {
 	     /* Builtin */
 	   IV table_valence = 99;
 
-	   if (ep->code
+	   if (ep->code	/* This is in func_codes.h: */
 	       && (*(ep->code) ? (PERL_constant_ISIV == func_ord_by_type (aTHX_ ep->code, 
-					 strlen(ep->code), &table_valence))
+					 strlen(ep->code), &table_valence))	/* Essentially, PERL_constant_ISIV means: recognized */
 			: (table_valence = 9900)))
 	     valence = table_valence;
 	   else
 	     valence = 99;
 #ifdef CHECK_VALENCE
 	   if (ep->code && valence != EpVALENCE(ep)
+	       && EpVALENCE(ep) != 99
 	       && !(valence == 23 && EpVALENCE(ep) == 21)
 	       && !(valence == 48 && EpVALENCE(ep) == 47)
 	       && !(valence == 96 && EpVALENCE(ep) == 91)
 	       && !(valence == 99 && EpVALENCE(ep) == 0)
-	       && !(valence == 9900 && EpVALENCE(ep) == 0)
-	       && EpVALENCE(ep) != 99)
+	       && !(valence == 9900 && EpVALENCE(ep) == 0))
 	     warn("funcname=`%s', code=`%s', val=%d, calc_val=%d\n",
 		  name, ep->code, (int)EpVALENCE(ep), (int)valence);
 #endif
@@ -3494,11 +4008,13 @@ loadPari(name, v = 99)
        } else if (func) {
 	 char* file = __FILE__, *proto = NULL;
 	 char subname[276]="Math::Pari::";
-	 char buf[64], *s, *s1;
+	 char buf[64], *pbuf = buf;
+        const char *s, *s1;
 	 CV *protocv;
 	 int flexible = 0;
 	 
 	 sprintf(buf, "%ld", valence);
+/*		warn("See valence = %d", valence);	*/
 	 switch (valence) {
 	 case 0:
 	     if (!ep->code) {
@@ -3575,26 +4091,26 @@ loadPari(name, v = 99)
 	     if (*s1 == 'x')
 		 s1++;
 	     if (*s1 == 'v') {
-		 strcpy(buf, "_flexible_void");
+		 pbuf = "_flexible_void";
 		 DO_INTERFACE(_flexible_void);
 	     }
 	     else if (*s1 == 'l') {
-		 strcpy(buf, "_flexible_long");
+		 pbuf = "_flexible_long";
 		 DO_INTERFACE(_flexible_long);
 	     }
 	     else if (*s1 == 'i') {
-		 strcpy(buf, "_flexible_int");
+		 pbuf = "_flexible_int";
 		 DO_INTERFACE(_flexible_int);
 	     }
 	     else {
-		 strcpy(buf, "_flexible_gen");
+		 pbuf = "_flexible_gen";
 		 DO_INTERFACE(_flexible_gen);
 	     }
 	     
 	     flexible = 1;
 	 }
 	 strcpy(subname+12,"interface");
-	 strcpy(subname+12+9,buf);
+	 strcpy(subname+12+9,pbuf);
 	 protocv = perl_get_cv(subname, FALSE);
 	 if (protocv) {
 	     proto = SvPV((SV*)protocv,na);
@@ -3606,17 +4122,17 @@ loadPari(name, v = 99)
 	     sv_setpv((SV*)RETVAL, proto);
 	 XSINTERFACE_FUNC_SET(RETVAL, flexible ? (void*)ep : (void*)func);
        } else {
-	 croak("Cannot load a Pari macro `%s': macros are unsupported", olds);
+	 croak( "Cannot load a Pari macro `%s': macros are unsupported; VALENCE=%#04x, code=<%s>, isFunction=%d, EpVAR=%d",
+		olds, (ep ? (int)EpVALENCE(ep) : 0x666), (ep->code ? ep->code : "<null>"), isPariFunction(ep), (int)EpVAR);
        }
      }
    OUTPUT:
      RETVAL
 
-
 # Tag is menu entry, or -1 for all.
 
 void
-listPari(tag)
+_listPari(tag)
      int tag
    PPCODE:
      {
@@ -3626,7 +4142,7 @@ listPari(tag)
 
        while (++i <= 1) {
 	   if (i==1)
-#ifdef NO_HIGHLEVEL_PARI
+#if defined(NO_HIGHLEVEL_PARI) || PARI_VERSION_EXP >= 2009000		/* Probably disappered earlier */
 	       break;
 #else
 	       table = functions_highlevel;
@@ -3634,7 +4150,7 @@ listPari(tag)
 	   
 	   for(ep = table; ep->name; ep++)  {
 	       valence = EpVALENCE(ep);
-	       if (tag == -1 || ep->menu == tag) {
+	       if (tag == -1 && !_is_internal(ep->menu) || ep->menu == tag) {
 		   switch (valence) {
 		   default:
 		   case 0:
@@ -3702,23 +4218,26 @@ BOOT:
    static int reboot;
    SV *mem = perl_get_sv("Math::Pari::initmem", FALSE);
    SV *pri = perl_get_sv("Math::Pari::initprimes", FALSE);
+   pari_sp av;
    if (!mem || !SvOK(mem)) {
        croak("$Math::Pari::initmem not defined!");
    }
    if (!pri || !SvOK(pri)) {
        croak("$Math::Pari::initprimes not defined!");
    }
-#if PARI_VERSION_EXP < 2002012		/* XXXX HOW to do otherwise */
    if (reboot) {
 	detach_stack();
+#if PARI_VERSION_EXP >= 2002012	/* Present at least in 2.3.5; assume correct due to http://pari.math.u-bordeaux.fr/archives/pari-dev-0511/msg00037.html */
+   pari_close_opts(INIT_DFTm);
+#else /* PARI_VERSION_EXP < 2002012 */
 	if (reset_on_reload)
 	    freeall();
 	else
 	   allocatemoremem(1008);
-   }
 #endif
+   }
 #if PARI_VERSION_EXP >= 2002012
-   pari_init_defaults();
+   /* pari_init_defaults();	*/	/* Not needed with INIT_DFTm */
 #else
    INIT_JMP_off;
    INIT_SIG_off;
@@ -3756,37 +4275,81 @@ BOOT:
    if (!(reboot++)) {
 #  ifndef NO_HIGHLEVEL_PARI
 #    if PARI_VERSION_EXP >= 2002012
+#      if PARI_VERSION_EXP < 2009000		/* Probably disappered earlier */
        pari_add_module(functions_highlevel);
+#      endif	/* PARI_VERSION_EXP < 2009000 */
 #    else	/* !( PARI_VERSION_EXP >= 2002012 ) */
        pari_addfunctions(&pari_modules,
 			 functions_highlevel, helpmessages_highlevel);
 #    endif	/* !( PARI_VERSION_EXP >= 2002012 ) */
+#if PARI_VERSION_EXP >=  2011000
+       pari_set_plot_engine(gp_get_plot);
+#else
        init_graph();
+#endif
 #  endif
    }
 #endif  /* PARI_VERSION_EXP >= 2003000 */
    PariStack = (SV *) GENfirstOnStack;
-   workErrsv = newSVpv("",0);
+   if (!worksv)
+     worksv =    NEWSV(910,0);
+   if (workErrsv)
+     sv_setpvn(workErrsv, "", 0);		/* Just in case, on restart */
+   else
+     workErrsv = newSVpvn("",0);
    pariErr = &perlErr;
 #if PARI_VERSION_EXP >= 2003000
    pari_set_last_newline(1);			/* Bug in PARI: at the start, we do not need extra newlines */
 #endif
+#if PARI_VERSION_EXP >= 2004000			/* Undocumented when it appeared; present in 2.5.0 */
+   cb_pari_err_recover = _svErrdie;		/*  XXXX  Not enough for our needs! */
+   cb_pari_handle_exception = math_pari_handle_exception;
+# ifdef CB_EXCEPTION_FLAGS
+   cb_exception_resets_avma = 1;
+   cb_exception_flushes_err = 1;
+# endif
+   av = avma;
+				/* Init the rest ourselves */
+#if PARI_VERSION_EXP >= 2009000
+   if (!GP_DATA->colormap)				/* init_defaults() leaves them NULL */
+     sd_graphcolormap("[\"white\",\"black\",\"gray\",\"violetred\",\"red\",\"green\",\"blue\",\"gainsboro\",\"purple\"]",0);
+   if (!GP_DATA->graphcolors)
+     sd_graphcolors("[4,5]",0);
+   avma = av;
+#else /* !(PARI_VERSION_EXP >= 2009000) */
+   if (!pari_colormap)				/* init_defaults() leaves them NULL */
+     pari_colormap = gclone(readseq("[\"white\",\"black\",\"gray\",\"violetred\",\"red\",\"green\",\"blue\",\"gainsboro\",\"purple\"]"));
+   if (!pari_graphcolors)
+     pari_graphcolors = gclone(readseq("[4,5]"));
+   avma = av;
+#endif /* !(PARI_VERSION_EXP >= 2009000) */
+#endif
+#if PARI_VERSION_EXP < 2005000			/* Undocumented when it disappeared; missing in 2.5.0 */
    foreignHandler = (void*)&callPerlFunction;
-   foreignAutoload = &autoloadPerlFunction;
    foreignExprSwitch = (char)SVt_PVCV;
    foreignExprHandler = &exprHandler_Perl;
+#endif
+   foreignAutoload = &autoloadPerlFunction;
    foreignFuncFree = &freePerlFunction;
    pariStash = gv_stashpv("Math::Pari", TRUE);
    pariEpStash = gv_stashpv("Math::Pari::Ep", TRUE);
    perlavma = sentinel = avma;
-   fmt_nb = def_fmt_nb;
+   fmt_nbPset(def_fmt_nb);
+   global_top = myPARI_top;
+#if PARI_VERSION_EXP >= 2004002			/* Undocumented when it appeared; present in 2.5.0 */
+   if (!   code_return_1) {
+      code_return_1 = gclone(compile_str("x->1"));
+      code2_return_1 = gclone(compile_str("(x,y)->1"));
+      avma = sentinel;
+   }
+#endif
 }
 
 void
 memUsage()
 PPCODE:
 #ifdef DEBUG_PARI
-  EXTEND(sp, 3);		/* Got cv + 0, return 4. */
+  EXTEND(sp, 4);		/* Got cv + 0, - but on newer Perls, this does not count.  Return 4. */
   PUSHs(sv_2mortal(newSViv(SVnumtotal)));
   PUSHs(sv_2mortal(newSViv(SVnum)));
   PUSHs(sv_2mortal(newSViv(onStack)));
@@ -3797,19 +4360,59 @@ PPCODE:
 void
 dumpStack()
 PPCODE:
-	GEN x = (GEN)avma;
-	UV i = 0;
-	long ssize = getstack();
+	long i = 0, ssize, oursize = 0;
+	SV *ret, *sv1, *nextsv;
+        const char *pref = "";
+
+	switch(GIMME_V) {
+	case G_VOID:
+            pref = "# ";
+	case G_SCALAR:
+	    ssize = getstack();
+	    ret = newSVpvf("%sstack size is %ld bytes (%d x %ld longs)\n",
+			   pref, ssize, sizeof(long), ssize/sizeof(long));
+            for (sv1 = PariStack; sv1 != (SV *) GENfirstOnStack; sv1 = nextsv) {
+		GEN x = (GEN) SV_myvoidp_get(sv1);
+		SV* tmp = pari_print(x);
+		sv_catpvf(ret,"%s %2ld: %s\n", pref, i, SvPV_nolen(tmp));
+		SvREFCNT_dec(tmp);
+		i++;
+		oursize += gsizeword(x);
+		nextsv = SV_Stack_find_next(sv1);
+	    }
+	    sv_catpvf(ret,"%sour data takes %ld words out of %ld words on stack\n", pref, oursize, ssize/sizeof(long));
+	    if(GIMME_V == G_VOID) {
+		PerlIO_puts(PerlIO_stdout(), SvPV_nolen(ret));
+		SvREFCNT_dec(ret);
+		XSRETURN(0);
+	    } else {
+		ST(0) = sv_2mortal(ret);
+		XSRETURN(1);
+	    }
+	case G_ARRAY:
+            for (sv1 = PariStack; sv1 != (SV *) GENfirstOnStack; sv1 = nextsv) {
+		GEN x = (GEN) SV_myvoidp_get(sv1);
+		XPUSHs(sv_2mortal(pari_print(x)));
+		nextsv = SV_Stack_find_next(sv1);
+	    }
+	}
+
+void
+__dumpStack()
+PPCODE:
+	GEN x = (GEN)avma;	/* If this works, it is accidental only: it assumes the entry point to “the region on stack” is at its smallest address. */
+	long ssize, i = 0;
 	SV* ret;
 
 	switch(GIMME_V) {
 	case G_VOID:
 	case G_SCALAR:
-	    ret = newSVpvf("stack size is %d bytes (%d x %d longs)\n",
+	    ssize = getstack();
+	    ret = newSVpvf("stack size is %ld bytes (%d x %ld longs)\n",
 			   ssize,sizeof(long),ssize/sizeof(long));
-	    for(; x < (GEN)top; x += taille(x), i++) {
+	    for(; x < (GEN)myPARI_top; x += gsizeword(x), i++) {
 		SV* tmp = pari_print(x);
-		sv_catpvf(ret," %2d: %s\n",i,SvPV_nolen(tmp));
+		sv_catpvf(ret," %2ld: %s\n",i,SvPV_nolen(tmp));
 		SvREFCNT_dec(tmp);
 	    }
 	    if(GIMME_V == G_VOID) {
@@ -3821,7 +4424,7 @@ PPCODE:
 		XSRETURN(1);
 	    }
 	case G_ARRAY:
-	    for(; x < (GEN)top; x += taille(x), i++)
+	    for(; x < (GEN)myPARI_top; x += gsizeword(x), i++)
 		XPUSHs(sv_2mortal(pari_print(x)));
 	}
 
@@ -3886,7 +4489,7 @@ DESTROY(rv)
 					  * argument. */
 	 long howmany;
 	 SV_OAVMA_PARISTACK_get(sv, oldavma, ostack);
-	 oldavma += bot;
+	 oldavma += myPARI_bot;
 #if 1
 	 if (SvMAGICAL(sv) && SvTYPE(sv) == SVt_PVAV) {
 	     MAGIC *mg = mg_find(sv, 'P');
@@ -3912,7 +4515,7 @@ DESTROY(rv)
 	 		/* Still on stack */
 	     if (ostack != (char*)PariStack) { /* But not the newest one. */
 		 howmany = moveoffstack_newer_than(sv);
-		 RUN_IF_DEBUG_PARI( warn("%li items moved off stack", howmany) );
+		 RUN_IF_DEBUG_PARI( warn("%li items moved off stack, onStack=%ld, offStack=%ld", howmany, (long)onStack, (long)offStack) );
 	     }
 	     /* Now fall through: */
 /* case (IV)GENfirstOnStack: */
@@ -3928,7 +4531,6 @@ DESTROY(rv)
 	 }
 	 SVnum_dec;
      }
-
 
 SV *
 pari_print(in)
@@ -3998,23 +4600,6 @@ int
 PARI_DEBUG_set(val)
 	int val
 
-# Cannot do this: it is xsubpp which needs the typemap entry for UV,
-# and it needs to convert *all* the branches.
-#/* #if defined(PERL_VERSION) && (PERL_VERSION >= 6)*//* 5.6.0 has UV in the typemap */
-
-#if 0
-#UV
-#allocatemem(newsize = 0)
-#UV newsize
-
-#else	/* !( HAVE_UVs ) */
-
-unsigned long
-allocatemem(newsize = 0)
-    unsigned long newsize
-
-#endif	/* !( HAVE_UVs ) */
-
 long
 lgef(x)
     GEN x
@@ -4032,6 +4617,14 @@ longword(x,n)
     GEN x
     long n
 
+char *
+added_sections()
+
+void
+__detach_stack()
+  CODE:
+    detach_stack();
+
 MODULE = Math::Pari PACKAGE = Math::Pari	PREFIX = s_
 
 char *
@@ -4041,3 +4634,30 @@ s_type_name(x)
 int
 s_reset_on_reload(newvalue = -1)
     int newvalue
+
+#ifdef WITH_CRASHYOURSELF
+
+void
+crash_yourself()
+  CODE:
+    char *s = (char *) make_PariAV;
+    *s = s[0];
+
+#endif	/* defined(WITH_CRASHYOURSELF) */
+
+# Cannot do this: it is xsubpp which needs the typemap entry for UV,
+# and it needs to convert *all* the branches.
+#/* #if defined(PERL_VERSION) && (PERL_VERSION >= 6)*//* 5.6.0 has UV in the typemap */
+
+#if 0
+#UV
+#allocatemem(newsize = 0)
+#UV newsize
+
+#else	/* !( HAVE_UVs ) */
+
+unsigned long
+s_allocatemem(newsize = 0)
+    unsigned long newsize
+
+#endif	/* !( HAVE_UVs ) */

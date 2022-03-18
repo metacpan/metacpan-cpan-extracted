@@ -1,5 +1,10 @@
 Revision history for IP::Geolocation::MMDB
 
+1.005  2022-03-16 17:32:21 CET
+
+  - Check if Math::BigInt actually works
+  - Improve some error messages in the build and test scripts
+
 1.004  2022-03-07 17:32:21 CET
 
   - Reintroduce the Windows support

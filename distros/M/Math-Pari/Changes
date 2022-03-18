@@ -897,3 +897,540 @@ os2$(OBJ_EXT): $(PARI_DIR)/src/systems/os2/os2.c pariinl.h paricfg.h
 
 2.01080900
   Repackage as zip
+
+2.010810
+  Now can auto-patch an already present pari src directory.  Controlled by the new options force_patch or force_patch=NUM (default is 1).
+     Default: do if it is our subdirectory.
+  Fix patch/diff_2.3.5_mingw-w64.
+  Take into account a changed name for the download directory for GP/PARI src.
+  A workaround for broken <<do FILE>> behaviour in newer Perls (in ./test_eng/ex.t).
+  Include -I. when we run $^X on GP/PARI's scripts (now . is disabled on newer Perls) during Math::Pari build.
+	(Analysis by Kent Fredric, ticket 120711.)
+  Users could have sneaked in a later version than 2.3.5.  Detect this and warn.
+  Makefile.PL was not using strict.
+  Allow -DUSE_STANDALONE_PARILIB to make Pari.xs use only public interfaces of GP/PARI.
+  Incorporate certain changes to simplify building with a standalone PARI library:
+	-KPIC per http://gnats.netbsd.org/45271 (but it is not changed to -fPIC already???)
+  New unsupported function pari_formatted_version_from_includes($includeDir) from public headers.
+  Change name of option parilib to parilibs.
+  With -DNO_GNUPLOT_PARI, has a chance to compile with native graphics enabled (not tested).
+	(Temporarily?) disable ploth() testing when this is defined.
+  The code to filter out too new versions of Pari directories was reacting on non-directories too.
+  Allow building if the plotting functionality removed in v2.2.13 is restored (not tested).
+  Include patches diff_add_gnuplotNeeded diff_add_gnuplotAdd restoring this remove functionality (and diff_add_gnuplotAll for completeness).
+  Auto-apply these patches starting with 2.2.13.
+  Update build time messages to reflect the status of plotting.
+
+2.0305_010810
+  Change the default for $ok23 to 1.
+
+2.0305_010811
+  memUsage() had wrong count in EXTEND(sp...) (compatible with very old perls???)
+
+2.030500
+  Since it looks like we do not auto-generate highlvl.h, add a patch for it too.
+  New function plot_outfile_set().
+  Deprecate set_plot_fh() with Term::Gnuplot version 0.55 and later.
+  Fix documentation accordingly.
+
+2.030501
+XXX  The report of missing patches is very wrong (false negative and positives) when reusing a patched directory.
+  Do not call pari_init_defaults() if we use INIT_DFTm.
+  Call pari_close_opts() on restart (after 2.2.12).
+XXX  Still fails to restart: perl -Mblib -wle "for (1..shift) {delete $INC{q(Math/Pari.pm)}; require Math::Pari; print sin Math::Pari::PARI(1)}" 2
+XXX  Crashes in Math::Pari::DESTROY  Cmp with: http://pari.math.u-bordeaux.fr/archives/pari-dev-0511/msg00037.html
+  Do not try gnuplot with versions after 2.3.*.
+  $ok32 was not updated!!!
+  Add macros needed for 2.5.0 to our paricfg.h.
+XXX  We did not put the name for level1 kernel there yet...
+  New files libPARI/pre-noinline.h libPARI/post-noinline.h (to generate level0 kernel).
+  New code to generate level0 and level1 kernels above 2.3.*.  (We did not reuse the code to generate pariinl.h.)  (libPARI.a is OK with 2.5.0)
+XXX    only none for level1 now.
+  ordnum[] became id() in 2.4.0.
+  Set cb_pari_pre_recover after 2.4.0 (when did it appear???).
+  Correct for one less entry in PariOut after 2.4.0 (likewise???).
+  Our macroized free() cannot take (const *); insert conversion to (void *) in a couple of places (for ep's).
+  We had our own function allocatemem(); rename.
+  fill_argvect() and loadPari() need: a const* argument and variables for ep->code.
+  autoloadPerlFunction() requires a const* argument.
+XXX  Preliminary: how to check that ep is a PARI function, and get its address.
+XXX  On the first extract of Makefile.PL, 822 fails?!  Second run of Makefile.PL succeeds (2.5.0).
+	Maybe it generates empty files which stop a rerun???
+  On MSWin32, look in systems/mingw for C files.
+  bruteall() disappears (again!) in 2.5.0.
+  let pprint() be the same as print() on 2.5.0 (as in GP/PARI).
+  use init_stack() or pari_init_stack() instead of allocatemoremem().
+  What happens with *workSV when we reassign it???!!!   LEAK!!!		[Actually: no!]
+XXX  for t_CLOSURE, aid0() checks typ(gelt(,6)) == t_VEC.
+XXX  Temporarily (???) in pariVar and findVariable, prohibit variables holding closures.
+[X]  Mapping from section names to numbers changed!!!  (Need to recheck with every version???  Definitely changed in 2.10...)
+  Added a test for internal (non-exportable) Pari "function names" (such as "_!").  (Need to recheck with every version???)
+		A few tests started to pass with 2.5.0 on Windows: Failed 16/82 test programs. 18/356 subtests failed.
+XXX  t_FFELT, t_CLOSURE
+XXX  2.10.0: t_ERROR t_INFINITY. 2 t_LIST is actually in 2.1.7, but we treated it as a black box.  Should we continue this???
+XXX  New type 'J' (at least in 2.10.0???).
+XXX  DEBUGMEM DEBUGLEVEL (at least in 2.10.0???)
+
+XXXXXXXXXXXXXXXXX On NetBSD: es.c:312:13: error: 'input_method' has no member named '__fgets_chk'
+	(Somebody redefined `fgets' between paripriv.h and line 312 of es.c.  But there is no `#include's there???
+	(Only fgets() is redefined, not fgets.  Due to -D_FORTIFY_SOURCE=2.)
+
+2.030502
+  New function code_C_comment_interface() in Math::PariBuild:
+    perl -I utils -MMath::PariBuild -w00pe "Math::PariBuild::code_C_comment_interface" Pari.xs >Pari.xs-n
+  Add the corresponding string codes to text of interfaceDDD() XSUBs (to those who have associated string codes).
+    (as above, and then manually for 9900).
+  New XSUB added_sections() (essentially, to remind that sections change time to time).
+XXX  Handle added_sections() in Math::Pari (stub only! XXXX).
+XXX  (Temporarily???) Remove -D_FORTIFY_SOURCE=2 (on NetBSD breaks input_method->fgets() in es.c).
+
+2.030503
+XXX  (Temporarily) add new GEN code_return_1 which is a closure returning 1.
+XXX  (Temporarily) use code_return_1 as an argument to all PARI functions taking a t_CLOSURE (in fill_argvect() and T_PariExpr)
+XXX  Are DE, DI supported types in PARI/GP???
+XXX  disttest does something like -I ../../pari-2.3.5 ...... -I ./pari-2.5.0  (due to PASSTHRU ???) - won't hurt anyway!
+XXX  new Prototype-prefix letter 'm' for return type of no-copy???
+XXX  The prototype letter 'V' _stores_ the variable numbers, and not passes them as arguments.
+        So translates (X=A,B,sin(X)) to (A,B, X -> sin(X)).
+XXX  No access to low-level iterators (as in forvec_init()).
+XXX  Can we use closure_func_err() in our error handler?  (Also: it may be used in a warning handler???)
+XXX (Temporarily) ignore the variables of type `V' in prebuilt interfaces: remove them from the arglist of the called C function.
+		Failed 16/82 test programs. 67/595 subtests failed.
+XXX (Temporarily) same for flexible interfaces.
+		Failed 16/82 test programs. 102/647 subtests failed.	(6 crashes)
+  Handling of Prototype code 'x' in GP/PARI was missing.	Failed 16/82 test programs. 120/678 subtests failed (7 crashes).
+XXX  Code to generate closure out of external function (genclosure() with is_external) may be completely bogus.
+  ForeignFuncFree may have caused double free()s.
+  Adding/free()ing ->help for our installed subroutines was completely busted.
+  Re-installing in GP/PARI was ignoring the foreignFuncFree handler.
+  Remove pre-junk in precode.  (Is not used for a long time.)
+	Failed 16/82 test programs. 104/650 subtests failed.
+  The code to handle more than 1 optional argument was completely busted.
+XXX  Test for this???
+	Failed 16/82 test programs. 122/681 subtests failed.
+XXX  Our exception handler does not work as it should: the warning is already issued, so the error is empty.
+	Failed 16/82 test programs. 92/632 subtests failed. (without -O2 -s)
+  gclone() our tmp handlers ((x)->1), etc
+	Failed 16/82 test programs. 133/1249 subtests failed.	(4 crashes; with -g)
+  We did not detach_stack() on restart.  Now grows 6.7M on 1e5 iterations with 2.3.5 32bit windows (takes about 15min):
+    perl -Mblib -le "for (1..shift) {delete $INC{q(Math/Pari.pm)}; require Math::Pari; print sin Math::Pari::PARI(1)} END{warn 1; sleep 500}" 100000
+XXX  Probably worksv and workErrsv leaking???
+XXX  But this crashes with 100 (but not with 20):
+	perl -Mblib -wle "for (1..shift) {delete $INC{q(Math/Pari.pm)}; %Math::Pari::=(); require Math::Pari; $n=q(Math::Pari::PARI); *PARI = \&$n; print sin PARI(1)}" 100
+  To avoid warnings on redefinition, avoid function names in the script being resolved at compile time:
+	perl -Mblib -wle "for (1..shift) {delete $INC{q(Math/Pari.pm)}; %Math::Pari::=(); delete $::{PARI}; require Math::Pari; $n=q(Math::Pari::PARI); $N=q(PARI); *$N = \&$n; print sin &$N(1)}" 1000
+		but this cannot survive more than a few dozens of iterations...  But this runs fine:
+	perl -wle "for (1..shift) {delete $INC{q(List/Util.pm)}; %List::Util:: = %Scalar::Util:: = %Sub::Util:: = (); $N=q(sum0); $n=qq(List::Util::$N); delete $::{$N}; require List::Util; *$N = \&$n; print 1 + &$N(1..10)}" 20000
+  The fix for -D_FORTIFY_SOURCE was not working.  Redo.
+
+2.030504
+  Patch for 2.5.0 was not updated.  (Still not auto-applied.)
+  PerlFunctionArg1 had an extra *.
+  New XSUB __detach_stack().
+  Detach stack at end of 00_Pari.t.
+XXX Temporarily (???) remove -Wall from cflags on netbsd for early Perl version (to see the failure report - otherwise truncates at 1M).
+	Failed 16/82 test programs. 153/1272 subtests failed.  (5 crashes)
+
+2.030505
+XXX  Adding __detach_stack() on line 146 (but not on 143) fixes a crash in 00_Pari.t.  So does making $fff lexical!!!
+	Skipping 2 tests after assignment to $fff does not help!
+  On NetBSD, still too many warnings for CPANtesters infrastructure to work.  Disable -Wextra as well.
+  Do not disable -Wall unless AUTOMATED_TESTING.
+XXX  Code, but not enable (yet?) disabling -Wdiscarded-qualifiers too.
+  Find a "supported" Pari directory even if "unsupported" ones are present earlier in the list of directories to search.
+  Make exception for '.': if any Pari subdirectory is found, it is going to be used.
+    (Now one can work with a "newer" paridir in a current directory, but `make disttest' would pick up a supported directory in ..)
+
+2.030506
+  For Pari.xs, redefine away strtoi to avoid a conflicting declaration on NetBSD included via perl.h.
+  Define PTRV (if needed) and include casts to PTRV when using INT2PTR (otherwise may fail on NetBSD).
+	How comes that obsolete versions of INT2PTR survived there???
+
+2.030507
+  Make inclusion of none/gcdext.c conditional on its existence, not on version.
+  Workaround a bug in Perl configuration: remove -s and -Ofoo from (cc|ld|lddl)flags if OPTIMIZE=-g is given
+	gnukfreebsd(lddl) cygwin strawberry openbsd netbsd linux(lddl)
+  New file gdbinit-my (quasi-documentation inside it).
+  Avoid a leak with workErrsv, make worksv optimized.
+  New macro renewWorkSv to reuse when the old value was already REFCNT_dec'ed.
+	Leak on restart disappears: after about 6min of running, the working space stabilizes on the level (Start=5M)+(256K).
+  Make t/00_Pari.t set PARI_DEBUG if MATHPARI_T_DEBUG is in environment.
+  Compensate for: In >= 2.5.0 the definition of taille() and taille2() are mixed up.
+			Down to 5 crashes (from 8).
+  dumpStack() renamed to __dumpStack().
+     XXXX should not be used at all: it assumes the entry point to “the region on stack” is at its smallest address.
+  New function dumpStack() for dumping our values on stack.
+		XXXX evalstate_reset() resets avma!!!  Need to grab cb_pari_handle_exception().
+			(Need also to find avma for every eval{} level — and for eval ''... ???  What about globally visible SVs???)
+  In cb_pari_handle_exception(), do not let evalstate_reset() reset avma!
+			Down to 3 crashes.
+XXX allocatemem() should check whether it is called from inside a PARI function.
+  Avoid extra copying of strings in the interface creation.
+  We were not ignoring the Perl argument for 'V' in the flexible interfaces.
+			Down to 1 crash.
+  Initialize pari_colormap (to a saner value than GP), pari_graphcolors.
+			No crashes in the part of the test suite we can parse!
+
+2.030508
+  New patch diff-2.5.0-exceptions for exception handling.
+	=> Failed 16/82 test programs. 151/1304 subtests failed.  (But still crashes without -g...)
+  Support this model of exception handling in _Sverrdie(), math_pari_handle_exception() and init code.
+  Align also the new 3-line format of error messages; remove trailing '\n' and '.' if present.
+  Auto-patch on v2.5.* (unsupported!!! only partially working on 2.5.0).
+  README was missing the copyright section.
+  Auto-patching was not working with `pari_tgz'.
+  Allow version-spec in the table of patches to contain trailing *.
+  Patch all sub-versions of 2.3.* the same as 2.3.5 (untested).
+  Error in build of pari.desc was not detected on Windows.
+  Extra arguments added to build_funclist() etc. (used during build).
+  pari.desc needs to be built differently on 2.5.0.
+  The script gen_members is not used for build on 2.5.0.
+  More clear message about “failed patches (if any)” put into .perl.patches.
+   => 55_linear.t crashes in vecsort([[1,8,5],[2,5,8],[3,6,-6],[4,8,6]],2); Failed 16/82 test programs. 150/1300 subtests failed.
+
+  XXX bibli2.o requires -Og (segfaults with -O) on mingw gcc 4.9.2.  (Does not set content of v in vecsort0().)
+
+  XXX		PARI lexical variables are not visible from Perl code (even if it is embedded).  So when we convert Perl
+		subroutine to an inline closure, we need only the explicit loop variables (of the smallest enclosing scope?)
+			With one (the only present, except matrix()!), the code is (e.g., for sin(x) in void context)
+				OCpushlex(-1) OCPrecreal OCcallgen2(ep) OCpop(1).
+			Only matrix() takes two V’s.  A few take VE etc (without “=”)
+		Currently: the loop variables are globals.
+
+  XXX	Should not we work around Mac being broken: see end of https://rt.cpan.org/Public/Bug/Display.html?id=127028 ???
+
+2.030509
+  Document better that unsupported versions of GP/PARI should be in a subdirectory (for auto-search to not reject them).
+  Allow an expanded "version" in patches_for() (during build) (now can find which patches to recommend).
+  New patch to allow tuning optimization of particular functions (includes vecsort0() now).
+	XXX  But see https://gcc.gnu.org/wiki/FAQ#optimize_attribute_broken
+  Set aOPT__vectsort0 to -Og on gcc 4.9.*.
+	XXX  But this makes it harder to switch optimization options on the command line.
+  Better warning on already applied patches (still, we do not parse .perl.patches, just check for its existence).
+  Test for -g on Makefile.PL command line would not detect "OPTIMIZE=-Og -g".
+  For initialization of colors, we were using gcopy() instead of gclone()!!!
+  Redo the “exceptions” patch for 2.5.5.
+	=> Failed 16/90 test programs. 150/1307 subtests failed.
+  Put license into META fails.
+	  XXX  Doing via LICENSE fails.  (Bug in MakeMaker???  Due to 2 Makefile.PLs?)
+  Add “package” declaration to Math::PariInit (for MetaCPAN to recognize the POD).
+  Add setprimelimit() and allocatemem() to Math::PariInit docs.
+  Add extra arguments $quote, $echo, $res to parse_as_gp to return the parsed values/echo/print res.
+  Parse \q, \p (and allow \e) in parse_as_gp;
+  Better handling of {}-quoting in parse_as_gp.
+  XXX  We do not allow allocatemem() in argument to PARI()???  It would longjmp(), and we do not catch it???
+
+2.030510
+  Use $(PARIDIR) in results of extra_include().
+  For 2.7.0, build mt subsystem.
+  (Temporarily) hardwire 'single' as mt subsystem.
+  Redo patches for 2.7.0 (not auto-applied yet).
+  New patch diff-2.7.0-reinstall-foreigh (to the level of 2.5.0???) => libPARI builds.
+  Update Pari.xs to new macros (and code) in 2.7.0.
+  00_Pari.t needed to be updated for new error message in division by 0.
+	Failed 18/163 test programs. 177/1388 subtests failed.
+  Support argumentless default prototypes for 'P', 'r', 's'.
+  	Fixes perl -Mblib -MMath::Pari=:all -wle "print default('realprecision')"
+		Unsupported code '{' in signature of a PARI function at -e line 1.
+	Failed 18/163 test programs. 176/1388 subtests failed.  (2.7.0)
+	Failed 18/163 test programs. 178/1399 subtests failed.  (2.7.6)
+XXX  Tests are run with "$RUNTEST $gp -q --test  > $file_test 2>&1"; try "gp -f -q --test -D echo=1 < src/test/in/xxx"
+XXX  default() is documented as unsupported.
+XXX  PARIvar() — how it interacts with lexicals???
+XXX  Need to treat parts of tests before \e.
+  Fix the error in POD.
+  Autoinstall patches for 2.7.*.
+  More functions: https://pari.math.u-bordeaux.fr/archives/pari-users-1712/msg00014.html
+  Reversible cvt2str: https://pari.math.u-bordeaux.fr/archives/pari-users-1712/msg00032.html
+  Autoinstall patches for 2.9.*.  (XXX: Unsorted.)
+  Disable aliasing to pari_err starting with 2.3.0 (disappeared in 2.2.12).  (Now libPARI of 2.9.0 compiles.)
+XXX  (Temporarily???) switch to myPARI_top, myPARI_bot.
+  Switch to using new names gen_0, gen_1, readseq(), gequal(), gpow() (last two should be available in Perl too;  XXX: overload???).
+  Do not use forcecopy() on newer PARI.
+  Abstract code into my_find_named_var().
+XXX  May need to treat the newer “sections” too.  (Member functions, default???)
+XXX  Need to handle new sections in Pari.pm.
+  Remove some very old “#if 0”s.
+  Support new place for graphing defaults.	(Everything compliles; does not link on 2.9.0.)
+XXX  Many explicit references to PARI dir in Makefiles.
+  Support new header divll_pre.h (undocumented!).
+  Support removal of functions_highlevel and lgef().
+  Include plottty.c, plotps.c if present.	(Links on 2.9.0)
+XXX Added sections???  (We have code, but it is not used yet..)
+	1 crash in tests: Failed 18/200 test programs. 113/822 subtests failed.  (With -Og, elliptic.t loops.)
+XXX Code 'b', localprec(), localbitprec()???	get_localprec()!	2.8.0
+XXX push_localprec(), pop_localprec()
+XXX d_INITRC???
+XXX Our printing routines use a constant precision def_fmt_nb.
+  Support: precreal changed meaning, but not 'p'!!!
+	1 crash (only under test suite???!), Failed 18/200 test programs. 119/835 subtests failed.
+XXX cb_exception_resets_avma is put to 0 during reallocation; need to restore it after every eval (in case we ran out of memory).
+XXX paristack_newrsize() is new path of unconditional exception.  Should we treat e=-1 specially???
+	b _svErrdie        with t/55_intnum.t
+
+	#0  _svErrdie (e=-1) at Pari.xs:810
+	#1  0x694fe407 in paristack_newrsize (newsize=20000000) at ../pari-2.9.0/src/language/init.c:765
+	#2  0x694c55c2 in s_allocatemem (newsize=20000000) at Pari.xs:1516
+
+XXX Help from PARI developers: https://pari.math.u-bordeaux.fr/archives/pari-users-1711/msg00033.html
+XXX Already had a failure when we fail after 59 tests in 00_Pari.t with Math-Pari-2.01080900 :
+          panic: XSUB Math::Pari::memUsage (Pari.c) failed to extend arg stack: base=555c101a3a40, sp=555c101a3a60, hwm=555c101a3a58
+	  http://www.cpantesters.org/cpan/report/7cf92e4c-4b57-11e8-8eb4-9f2c675344ca
+  An extra patch to check_proto() is needed.
+	=> 2 crashes, Failed 18/200 test programs. 131/852 subtests failed.
+  New file README-win64.
+
+2.030511
+  Allow allocatemem() as a last command in a subgroup in quote_as_gp().
+XXX (Temporarily?) ignore empty die in such allocatemem().
+  Recognize /* */-comments in quote_as_gp().	(Can now run src/test/in/{qfbsolve,rfrac,round4,stark} in 2.3.5.)
+	ellglobalred,galois require datafiles.
+		https://pari.math.u-bordeaux.fr/archives/pari-dev-1608/msg00045.html
+  Improve README-win64 (thanks to yary).
+  Massage 3-line warning messages too (probably will not be necessary; just an error leaking now as a warning?).
+  In sv2pari(): warn on undef.
+	XXX (temporarily disable): warnings in tests on void seq (cannot tell whether a CV is called from 'E' or 'I' prototype).
+  In sv2pari(): return gnil on undef.
+  New method is_gnil().		(gnil is as 0, but used by gp to disable emitting the result)
+  Use is_gnil() to suppress printing results from parse_as_gp().	(Now the tests listed above produce the expected output.)
+XXX PARI() does not detect void returns: caller may use is_gnil().
+  Echo the original command for special commands too in parse_as_gp().
+  Remove AUTOGEN_HEADERS's "virtual dependence" from Makefile.PL.	(Quiets one warning [of two] from make.)
+  Use $(PARI_DIR) for .h files in libPARI/Makefile.			(Now all */Makefile are configurable w.r.t. location.)
+  Strictify Testout.pm.
+  Protect inclusion of perl.h from abominable "#define long".
+  Do not remove the last line of test scripts unless it is \q.
+  Evaluate pre-echo part of test scripts (without checking results).	=> Slightly different test suite messages.
+	=> 2 crashes, Failed 18/200 test programs. 120/870 subtests failed.
+		(Starting with 2.5.0, no messages for precision are present.)
+  Skip a test file if it requires a package.	(Starting with 2.7.0, \\package:galdata is present in test/in/galois.)
+  Make test engine treat oo as a function starting with 2.9.0.
+  Assume 64bit build on 64-bit Windows perls.  (Assumes the abominable #define from >= 2.9.0.)
+  Macro GPHELP is needed unconditionally on 2.11.1.
+
+2.030512
+  Use lower-level stack reallocation routine, which does not call signals.
+	XXX should not be done if inside Perl code called from inside PARI!  ???
+	=> Failed 18/200 test programs. 143/944 subtests failed.	(2.9.0) or (???)
+	=> Failed 18/200 test programs. 154/958 subtests failed.	(1 crash)
+  Fix the patch for 2.9.5.
+	=> Failed 19/201 test programs. 156/958 subtests failed.	(2.9.5) with 1 crash (new test "language" fails: 18->19)
+XXX Colors on errors/warnings should be conditional.
+XXX We should better be able to grap the std-output!
+  Fix err_display (sp?) to not flush the error.
+	=> Failed 18/200 test programs. 153/958 subtests failed.	(1 crash)
+	=> Failed 18/201 test programs. 153/963 subtests failed.	(1 crash) 2.9.5
+  plotps.c fails in 2.7.6 (system0); do not use it before 2.9.0.
+  Patch calculation of arity from a prototype with 'x' in 2.9.*.
+	=> Failed 18/201 test programs. 156/1004 subtests failed.	(1 crash) 2.9.5
+  On 2.9.* we were creating an ep when looking for existence of a Pari function.
+  isPariFunction() could not work on EpNEW values.
+	=> Failed 18/201 test programs. 156/1449 subtests failed.	2.9.5
+  We did not put ep-argument for functions with prototype "x".			  (Fixes crash on get0() from the next row.)
+  3 new subtests to check loading-into-PARI Perl subroutines with 3,1,0 arguments.
+      {name = 0x1d83110 "get0", valence = 103, value = 0x694c501c <callPerlFunction>, menu = 0, code = 0x26e98e8 "x", help = 0x0,
+       pvalue = 0x25a1ed4, arity = 1, hash = 628, next = 0x69865ac8 <functions_basic+37320>}
+	=> Failed 18/201 test programs. 156/1452 subtests failed.	2.9.5
+  Compensate for absense of gen_output(,) in 2.11.0.
+  Correct position of "community" section for 2.11.0.
+  Shortcut the complicated logic by a call to bruti().
+  New initialization of plotting.
+	=> Failed 19/226 test programs. 192/1484 subtests failed.	(1 crash: mathnf) on 2.11.[01] (graph: new failure! ploth!)
+XXX  We still did not do anything with sections in Pari.pm!!!
+XXX  We may miss:   pari_mt_init(); /* MPI: will not return on slaves (pari_MPI_rank = 0) */
+        pari_init_paths();
+   or:
+      gp_expand_path(GP_DATA->path);
+      gp_expand_path(GP_DATA->sopath);
+   and:
+      #ifdef _WIN32
+        if (stdin_isatty) win32_set_codepage();
+      #endif
+XXX We did not remove $oo in tests!!!
+
+2.030513
+  Start using brute() at least from 2.3.0 (via mybrute()).
+  Remove junk from mybrute().
+  Warning about unknown prototype was using a truncated-from-the-front string.
+  We were assuming that prototype of CV is 0-terminated.  This is not always so: http://matrix.cpantesters.org/?dist=Math-Pari+2.030512
+
+2.030514
+  Switch off special-casing of -oo in the test engine on recent PARI.
+	=> Failed 19/226 test programs. 190/1484 subtests failed.	(1 crash in mathnf)
+  Cosmetic changes to a message in ./Makefile.PL.
+  Make */Makefile.PL use PARI_DIR_SRC.
+  Make PariBuild.pm return includes based in PARI_DIR_SRC.
+    => Failed 20/226 test programs. 452/879 subtests failed.		(win64, 1 crash, locks in number, program [trashes], trans)
+  Disable LONG_IS_SHORTER_THAN_IV on 64-bit Win.
+  Use atoll() if appropriate instead of atol().
+    => Failed 18/226 test programs. 176/1484 subtests failed.		(win64, 1 crash in mathnf)
+  Implement filter_for_ll[_all]() in PariBuild.
+  Add code to generate src64 on Win64 if needed.
+
+2.030515
+  Protect SSize_t from expansion which is too late (after definition of long long).	Now builds with 5.28.1 too.
+XXX  Defect in Perl???  Not in 5.18.0, but in 5.28.1.
+  Use 64-bit assembler with src64 too.
+  Do not convert .y files when longlong'ing.	(Apparently, it does not hurt but better avoid triggering bison.)
+
+2.030516
+  Start cleaning up private headers:
+    rect.h not needed with 2.11.1
+    gp.h    is needed for gp_get_plot(); similarly for anal.h, paripriv.h.
+  New patch diff_2.3.5_mingw_longlong.				(5 failures; 31 subfailure).
+  Tolerate more mismatch in test's floating point output.
+  Tolerate +0.000..00 vs -0.000..00.				(3; 19)
+  Convert strto[u]l and atoul too on 2.3.5 (cosmetic???).
+  Patch gp.c too (to be able to test gp 2.3.5-64bit; see the docs inside the patch).
+  If needed, #define __USE_MINGW_ANSI_STDIO	1
+  Remove changes to test engine.
+  Detection of longbits was wrong in the test engine on Win32.	(Tests succeed on 2.3.5 Win64)
+  Remove README-win64.
+XXX We put some stuff into paricfg.h which may be not present in the GP/PARI's one (which is documented to be interchangeable!).
+
+2.030517
+  Disable auto-refusing on Win64.
+  Change the header of the generated POD to Math::libPARI; put a corresponding Perl header too.
+  (Mostly) undocument version23_ok option (and other obviously obsolete stuff in ./INSTALL).
+  Consider pari_tgz as a download filter too.
+  The long-long patch was DOSISH, and the end was mangled.
+  Better message for merge_822.
+  Look in ./unix when downloading too.
+  Allow for -pari-version=2.34.17 in libPARI/gphelp.
+  Generate POD files with suitable PARI version.
+
+2.030518
+  Pari.xs needed Unix file endings: http://www.cpantesters.org/cpan/report/877f2ec0-5989-11e9-9877-fad08465581c
+  New test file 02_sections.t.
+  Inline-asm creation failed with 2.1.7.
+  my_fetch_named_var() did not compile with 2.1.7.
+  pari_sp not present before 2.2.5.
+  Change all saved avma's in Pari.xs to pari_sp (XXX except in XSUBs!).
+
+2.030519				(Below, star * marks changes relevant to <=2.3.5 too.)
+  Patch for 2.9.5 had a chunk which was too long.
+  Document the mess with section numbers.
+  In .xs, change listPari() to _listPari().
+  Map section numbers from "old numbers" in listPari().
+  Do not use added_sections() now, when it is checked in the test suite.
+
+  \cM inserted on Win in language/init.h, gp/gp_init.h (autogenerated?!).  Not with GP/PARI build method!  To fix, need:
+    perl -wlpe "BEGIN{binmode STDIN; binmode STDOUT} s/\x0d/\x22\n \x22\\x0d\x22 \x22/g" init.h-pre >init.h-pre-post
+  Generated by:		$^X -I. gen_proto gp pari.desc
+  	XXX???  If $^X is cygwin, but pari.desc is generated with DOSISH line endings, this is what is going to happen.
+  		HOW ???		Also: it is guarded by unless -r $outfile...
+
+  XXX localvars_read_str(), localvars_find(), prototype='C'
+  XXX lookup pari-gnump
+  XXX PARI may have been initialized already by a different library https://pari.math.u-bordeaux.fr/archives/pari-dev-1409/msg00016.html
+	May need a flag for pari_init() which ensures (or does not require) a known state?
+
+  Infrastructure for PARI-closure trampolines (va_list versions of call-into-Perl etc) with newer PARI.
+	(XXXX entree for handler ___fake_MathPari_handler1var is marked with a "wrong" menu!).
+  * Allow G_VOID variant of callPerlFunction_var() to ignore 1-value return from a Perl function.
+  New typemap entry PariExprV (with void return).
+  Instrument intervace*() calls to use this entry if appropriate.
+	XXX Currently only sub ($) {FOO} is allowed as Perl-code (not compatible with older GP/PARI), and only with one argument.
+
+			was:
+		Failed 18/227 test programs. 176/1517 subtests failed.
+			now (only with newer 32-bit???)
+		Failed 19/227 test programs. 190/1517 subtests failed.
+	D:\Programs\cygwin2016\bin\perl -Mblib -MMath::Pari -wle "PARI('default(realprecision,50)'); print PARI 'default(realprecision)'; print Math::Pari::setprecision()"
+			Local precision 28, global 57; who set local???
+				/* Our variable, not changed by default (): */   fmt_nb = def_fmt_nb;
+
+  * Conditionally enable crash_yourself() (for debugging a debugger).
+
+  Makefile.PL:		* Add new target subdirs-make to avoid entering libPARI twice (which was breaking a parallel make).
+				(Fix-of-fix: Fix the logic: it was too fragile.)
+			* Remove subdirs_dynamic as a dependence of dynamic (XXX introduced at least in perl 5.22???)
+			* Allow -g on broken architectures (which hardwire OPTIMIZE into CC) even when %Config is tied
+
+  test_eng/Testout.pm:	better we-are-skipping-it-message for Pari tests not enabling echoing (which we do not know how to test anyway)
+
+  gdbinit_my:		* Document the macros
+  typemap:		Support void-return PariExpr
+
+2.030520
+  * Use PARI's precision, and not our cached values (if possible).
+	(Fixes discrepancy between tests on 64-bit and 32-bit compiles.)
+		D:\Programs\cygwin2016\bin\perl -Mblib -MMath::Pari -wle "Math::Pari::parse_as_gp('default(realprecision,100);Pi;default(realprecision,50);'); print PARI 'default(realprecision)'; print Math::Pari::setprecision(100); print PARI 'default(realprecision)'; print Math::Pari::setprecision()"
+	XXX Can this be done earlier than 2.3.5 ???
+
+  Separate coding macros for access to the local version of precision and the global one.
+	XXX Currently gpui() uses the PARI-local version of precision.
+  Disable bindVariable() and (except for changevalue()) findVariable().  Switch PariVar to SV*.  For loop variables, store SV*
+    instead of entree* (after 2.4.2).
+  	XXX Temporary macro AssignPariExprR0 for interface*.
+		XXX How to call setSVpari_keep_avma() ???
+
+  XXX Should not arg to sub($) … be made mortal???  Should not it be cleared on exit?  Is not it done downwind already???
+
+  Support 'P' used with 'D' (as in elltaniyama()).
+  	XXX When the meaning of 'P' started to be encoded as "DP" ???  Between 2.3.5 and 2.5.0 (we use 2.4.2).
+  Update TAG_community for 2.13.* (no change).
+  	XXX Should not we scan src/test/32/help to cover at least cases when it does not change???
+  New argument type 'b' for bitprecision.
+  	XXX Since some tests use localprec(), (temporarily???) pass global precision.
+  	XXX Temporarily keep the code for debugging local-vs.-global issues.
+
+     Testout.pl:	test with new sub ($) {...} interface (for closure arguments).
+     			* when reading PARI matrix output, strip whitespace near [].
+			* In a matrix/vector, remove space after [.
+			* Smarter detection of !-for-factorial.
+			* Evaluate a user function in PARI if we cannot parse its definition.
+			    Skip subtests using PARI user functions which call print().
+			* Better "skipping" message for subtests using methods.
+			* Support conversion of decimals with an exponent.
+			* Recognize fractions after = as well.
+			* Recognize multi-arg user functions.  Do not skip if can redefine in PARI (+= ~10 subtests of intnum fail).
+			* Attempt to process non-echoing blocks (as in 'ff').
+			Process Mat(x) in our output (why it does not appear in PARI's???).
+			Skip when -> is in the test code.  (UNUSED??? XXX)
+			* Do not pass to PARI user functions which mention variables converted to Perl earlier.
+			* Process \pb.
+			* Processing of \ps seems to be wrong before.
+			Include a no-echo pre-group as a separate test, and eval{} it.
+			Compensate for difference in spaces in Mod() output: our vs PARI's.
+			Handle no-echo blocks defining user functions using print() (XXXX but not error(), and we do not restore back
+			    when the same user function is redefined).
+			Handle user functions using error() the same way as for print().  (XXXX no changes???)
+     PariInit.pm:	* Enable 'strict'.
+     Pari.pm:		* Make 'strict'-safe, and enable 'strict'.
+			* parse_as_gp(): more flexible handling of braces (still too strict, to not worry about strings).
+			    Allow the second argument to be 'quote' (grandfathered TRUE); it may also be either
+			    'define', or a reference to a sub to filter the name.  (XXXX Undocumented, not in 00_Pari.t.)
+			    Was: contrary to documentation, every evaluation was echoed.  Do not return value from non-last cmds.
+			  	XXX Not now: Now return the new value of the counter.  (Contradicts returning the result of the
+			  		last command.)
+			* detect parisize changes inside parse_as_gp().
+    PariBuild.pm:	Filter PARI directories with the same version by the length of directory name.
+				XXXX Bug in perl 5.22: does not work without local()???
+			Patching was not working unless in a subdirectory of ./.
+			Report $@ (per Net::FTP docs) after a failure of Net::FTP->new().
+    patches/diff-2.13.3-all:		Updated for 2.13.3.
+    libPARI/Makefile.PL			Compile a new component halfgcd.c of mp.c (needed for 2.13.3).
+    Makefile.PL		More intelligent report of auto-applied patches.
+    auto-dbg/*   t/zzz_debug-crash.t
+			New files (based on Audio::FindChunks; docs updated).
+    t/000_load-problem.t t/00-Pari.t t/01_no_extra_newlines.t  t/02_sections.t t/zz_leak.t t/PlotRect.t  test_eng/ex.t
+			Trigger auto-debug.
+
+  XXX  Complex regular subexpression recursion limit (32766) exceeded at ./test_eng/Testout.pm line 479.
+  	when the code to avoid sub{} (when creating sub ...{}) is not instrumented for ($).
+
+     Failed 8/227 test programs. 90/1517 subtests failed.		with 2.11.1 and -g
+	The only crash is in:
+		D:\Programs\cygwin2016\bin\perl -Mblib -MMath::Pari -wle "Math::Pari::matsolvemod(PARImat_tr([[]]),2,PARIcol(1),1)"
+
+     Failed 12/227 test programs. 45/1199 subtests failed.		with -O2 and 2.11.1
+     Failed 12/243 test programs. 33/1159 subtests failed.		with 2.13.3 -O2	(~5 crashes)
+     Failed 9/243 test programs. 84/1500 subtests failed.		with 2.13.3 and -g (1 extra crash in ff.t)
+     Failed 8/243 test programs. 93/1557 subtests failed.	after 'b' (with ff early exit from preamble in parisize=10M)
+     Failed 8/243 test programs. 77/1557 subtests failed.		with early exit fixed
+					Out of the failing subtests, 12 are generating "Argument-types" messages.
+
+2.03052001
+   t/zzz_debug-crash.t	Auto-debug if smoke-testing is detected (even if AUTOMATED_TESTING not defined)
+				see http://www.cpantesters.org/cpan/report/55089d5e-a621-11ec-9168-a27a1f24ea8f

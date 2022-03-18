@@ -2121,26 +2121,18 @@ sub warn_non_numeric_op_wrapper {
 }
 
 { package PDL;
-  use Carp;
   use overload %OVERLOADS,
     "eq"    => PDL::Ops::warn_non_numeric_op_wrapper(\&PDL::eq, 'eq'),
-    "="     => sub {$_[0]},          # Don't deep copy, just copy reference
     ".="    => sub {
       my @args = !$_[2] ? @_[1,0] : @_[0,1];
       PDL::Ops::assgn(@args);
       return $args[1];
     },
-    'bool'  => sub {
-      return 0 if $_[0]->isnull;
-      confess("multielement ndarray in conditional expression (see PDL::FAQ questions 6-10 and 6-11)")
-        unless $_[0]->nelem == 1;
-      $_[0]->clump(-1)->at(0);
-    },
     '++' => sub { $_[0] += 1 },
     '--' => sub { $_[0] -= 1 },
-  ;
+    ;
 }
-#line 2144 "Ops.pm"
+#line 2136 "Ops.pm"
 
 
 
@@ -2159,7 +2151,7 @@ Doug Burke (burke@ifa.hawaii.edu),
 and Craig DeForest (deforest@boulder.swri.edu).
 
 =cut
-#line 2163 "Ops.pm"
+#line 2155 "Ops.pm"
 
 
 

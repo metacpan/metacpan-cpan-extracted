@@ -102,9 +102,9 @@ S_nv_is_integer(pTHX_ NV const nv) {
         return TRUE;
     }
     else {
-        char buf[64];  /* Must fit sprintf/Gconvert of longest NV */
+        char buf[128];  /* Must fit sprintf of longest NV(__float128) */
         char* p;
-        (void)Gconvert(nv, NV_DIG, 0, buf);
+        (void)my_snprintf(buf, sizeof(buf), "%" NVgf, nv);
         p = &buf[0];
 
         /* -?[0-9]+ */

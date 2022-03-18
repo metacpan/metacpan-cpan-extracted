@@ -65,8 +65,8 @@ sub all : Global {
 
 	if ($c->stash->{is_game_time}) {
       # Count of correct picks per player
-      $c->stash->{correct_picks_per_player} = $c->model('DBIC')->count_player_picks_correct;
-      $c->stash->{upset_picks_per_player} = $c->model('DBIC')->count_player_picks_upset;
+      ($c->stash->{correct_picks_per_player}, $c->stash->{max_correct}) = $c->model('DBIC')->count_player_picks_correct;
+      ($c->stash->{upset_picks_per_player}, $c->stash->{max_upsets}) = $c->model('DBIC')->count_player_picks_upset;
 	}
 	else {
       # Count of picks already made per player

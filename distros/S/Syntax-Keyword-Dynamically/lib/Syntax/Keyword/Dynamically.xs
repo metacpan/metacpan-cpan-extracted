@@ -12,13 +12,16 @@
 #include "XSParseKeyword.h"
 
 #ifdef HAVE_DMD_HELPER
+#  define WANT_DMD_API_044
 #  include "DMD_helper.h"
 #endif
 
 #define HAVE_PERL_VERSION(R, V, S) \
     (PERL_REVISION > (R) || (PERL_REVISION == (R) && (PERL_VERSION > (V) || (PERL_VERSION == (V) && (PERL_SUBVERSION >= (S))))))
 
+#include "perl-backcompat.c.inc"
 #include "perl-additions.c.inc"
+#include "newOP_CUSTOM.c.inc"
 
 static bool is_async = FALSE;
 
@@ -56,7 +59,7 @@ static SV *S_newSVdynamicvar(pTHX)
 }
 
 #ifdef HAVE_DMD_HELPER
-static int dmd_help_dynamicvar(pTHX_ const SV *sv)
+static int dmd_help_dynamicvar(pTHX_ DMDContext *ctx, const SV *sv)
 {
   int ret = 0;
 
@@ -100,7 +103,7 @@ static SV *S_newSVsuspendeddynamicvar(pTHX)
 }
 
 #ifdef HAVE_DMD_HELPER
-static int dmd_help_suspendeddynamicvar(pTHX_ const SV *sv)
+static int dmd_help_suspendeddynamicvar(pTHX_ DMDContext *ctx, const SV *sv)
 {
   int ret = 0;
 

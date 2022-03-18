@@ -84,6 +84,7 @@ root/static/images/btn_88x31_powered_shadow.png
 root/static/images/catalyst_logo.png
 root/static/javascript/bracket_picks.js
 root/static/javascript/final4_picks.js
+root/static/javascript/jquery.3.3.1.min.js
 root/static/javascript/json.js
 root/static/javascript/move_pick.js
 root/util/dump.tt

@@ -1,0 +1,64 @@
+{
+   "abstract" : "Interface to Tesla's API",
+   "author" : [
+      "Steve Bertrand <steveb@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Tesla-API",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Digest::SHA" : "0",
+            "File::HomeDir" : "0",
+            "HTTP::Request" : "0",
+            "JSON" : "0",
+            "MIME::Base64" : "3.16",
+            "URI" : "0",
+            "WWW::Mechanize" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/stevieb9/tesla-api/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/stevieb9/tesla-api.git",
+         "web" : "https://github.com/stevieb9/tesla-api"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 4.04"
+}

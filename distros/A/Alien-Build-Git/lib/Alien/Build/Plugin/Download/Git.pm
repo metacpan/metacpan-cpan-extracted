@@ -10,7 +10,7 @@ use Alien::Build::Plugin::Extract::Directory;
 use PerlX::Maybe qw( maybe );
 
 # ABSTRACT: Alien::Build plugin to download from git
-our $VERSION = '0.08'; # VERSION
+our $VERSION = '0.09'; # VERSION
 
 
 has filter => undef;
@@ -19,7 +19,7 @@ has version => undef;
 sub init
 {
   my($self, $meta) = @_;
-  
+
   $meta->add_requires('configure' => 'Alien::Build::Plugin::Download::Git'        => '0.01');
   $meta->add_requires('configure' => 'Alien::Build::Plugin::Fetch::Git'           => '0.01');
   $meta->add_requires('configure' => 'Alien::Build::Plugin::Prefer::SortVersions' => '0.65');
@@ -27,14 +27,14 @@ sub init
 
   my $fetch = Alien::Build::Plugin::Fetch::Git->new;
   $fetch->init($meta);
-  
+
   my $prefer = Alien::Build::Plugin::Prefer::SortVersions->new(
     maybe filter  => $self->filter,
     maybe version => $self->version,
   );
-  
+
   $prefer->init($meta);
-  
+
   my $extract = Alien::Build::Plugin::Extract::Directory->new;
   $extract->init($meta);
 
@@ -54,7 +54,7 @@ Alien::Build::Plugin::Download::Git - Alien::Build plugin to download from git
 
 =head1 VERSION
 
-version 0.08
+version 0.09
 
 =head1 SYNOPSIS
 
@@ -146,7 +146,7 @@ Graham Ollis <plicease@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Graham Ollis.
+This software is copyright (c) 2017,2018,2019,2022 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

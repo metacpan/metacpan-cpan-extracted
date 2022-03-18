@@ -3,6 +3,7 @@ package Alien::Build::Plugin::Fetch::Git;
 use strict;
 use warnings;
 use 5.008001;
+use Alien::Util qw( version_cmp );
 use Alien::Build::Plugin;
 use URI;
 use URI::file;
@@ -10,18 +11,18 @@ use URI::git;
 use Path::Tiny qw( path );
 use File::Temp qw( tempdir );
 use File::chdir;
-use Capture::Tiny qw( capture_merged );
+use Capture::Tiny qw( capture_merged capture_stdout );
 
 # ABSTRACT: Alien::Build plugin to fetch from git
-our $VERSION = '0.08'; # VERSION
+our $VERSION = '0.09'; # VERSION
 
 
 sub init
 {
   my($self, $meta) = @_;
-  
+
   $meta->add_requires('share' => 'Alien::git' => 0);
-  
+
   $meta->register_hook(
     fetch => sub {
       my($build, $url) = @_;
@@ -51,7 +52,7 @@ sub init
         $tmp->path($url);
         $url = $tmp;
       }
-      
+
       my $exe = Alien::git->exe;
 
       if(defined $url->fragment)
@@ -59,20 +60,34 @@ sub init
         local $CWD = tempdir( CLEANUP => 1 );
         my($tag) = $url->fragment;
         $url->fragment(undef);
-        $build->system('%{git}', 'clone', "$url");
-        die "command failed" if $?;
-        my($dir) = path(".")->absolute->children;
-
-        # mildly prefer the -C version as it will handle spaces in $dir.
-        if(can_minus_c())
+        if(can_branch_clone())
         {
-          $build->system('%{git}', -C => "$dir", 'checkout', $tag);
+          $build->system('%{git}', 'clone', '--depth' => 1, '--branch', "$tag", "$url");
         }
         else
         {
-          $build->system("cd $dir ; %{git} checkout $tag");
+          $build->system('%{git}', 'clone', "$url");
         }
         die "command failed" if $?;
+        my($dir) = path(".")->absolute->children;
+
+        if(can_branch_clone())
+        {
+          # do nothing
+        }
+        else
+        {
+          # mildly prefer the -C version as it will handle spaces in $dir.
+          if(can_minus_c())
+          {
+            $build->system('%{git}', -C => "$dir", 'checkout', $tag);
+          }
+          else
+          {
+            $build->system("cd $dir ; %{git} checkout $tag");
+          }
+          die "command failed" if $?;
+        }
         return {
           type     => 'file',
           filename => $dir->basename,
@@ -97,11 +112,11 @@ sub init
                    grep { defined $_ }
                    map { m{refs/tags/(.*)$} ? $1 : undef }
                    split /\n\r?/, $output;
-        
+
         return {
           type => 'list',
           list => [
-            map { 
+            map {
               my $tag = $_;
               my $url = $url->clone;
               $url->fragment($tag);
@@ -133,8 +148,27 @@ sub can_minus_c
     $can_minus_c = !! $? == 0 && -d $tmp->child('.git');
     $tmp->remove_tree;
   }
-  
+
   $can_minus_c;
+}
+
+my $can_branch_clone;
+sub can_branch_clone
+{
+  unless(defined $can_branch_clone)
+  {
+    require Alien::git;
+    if(version_cmp(Alien::git->version, "1.8.3.5") >= 0)
+    {
+      $can_branch_clone = 1;
+    }
+    else
+    {
+      $can_branch_clone = 0;
+    }
+  }
+
+  $can_branch_clone;
 }
 
 1;
@@ -151,7 +185,7 @@ Alien::Build::Plugin::Fetch::Git - Alien::Build plugin to fetch from git
 
 =head1 VERSION
 
-version 0.08
+version 0.09
 
 =head1 SYNOPSIS
 
@@ -185,7 +219,7 @@ Graham Ollis <plicease@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Graham Ollis.
+This software is copyright (c) 2017,2018,2019,2022 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

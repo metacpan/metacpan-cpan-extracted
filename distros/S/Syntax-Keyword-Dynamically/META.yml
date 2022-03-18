@@ -18,12 +18,12 @@ name: Syntax-Keyword-Dynamically
 provides:
   Syntax::Keyword::Dynamically:
     file: lib/Syntax/Keyword/Dynamically.pm
-    version: '0.09'
+    version: '0.10'
 requires:
   XS::Parse::Keyword: '0.13'
   perl: '5.014'
 resources:
   IRC: irc://irc.perl.org/#io-async
   license: http://dev.perl.org/licenses/
-version: '0.09'
+version: '0.10'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

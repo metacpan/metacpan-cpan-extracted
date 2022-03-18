@@ -1,0 +1,8 @@
+Revision history for Alien-SWIG4},
+
+0.04      2022-03-16 00:15:35-04:00 America/New_York
+  - Renamed from Alien-SWIG to Alien-SWIG4.
+  - Set the major version of SWIG that is checked and installed to v4.
+
+0.01      2022-02-10 20:13:33-05:00 America/New_York
+  - initial version

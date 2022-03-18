@@ -1,0 +1,105 @@
+	MOTIVATION (A): output from the configuration/build steps
+	=========================================================
+
+CpanTesters framework provides a wonderful system for finding out how your
+module fares in close-to-realworld environments.  Unfortunately, several errors
+in design make this framework less helpful in the most important case: when
+your test suite fails.  The output provided by CpanTesters is optimized for
+compactness, and some critically important pieces of build info are omitted
+in the report.
+
+In more details: the build of the module is broken into 3 parts:
+   (*) Configuration (e.g., perl Makefile.PL);
+   (*) Build proper (e.g., make);
+   (*) Testing.
+For many modules, the first two steps are practically a no-OP (at least, they
+run exactly the same on all architectures).  It is (probably) because of this
+fact that the output from the first two steps is NOT send to the author of the
+module when these steps are successful, but the test suite fails.
+
+On the other hand, if these two steps ARE non-trivial, the diagnostic output
+from these steps may be NECESSARY to understand the reasons for the failure
+of the test suite.  However, short of rebuilding the module, there is no
+way that the test suite may recover this diagnostic output.
+
+	MOTIVATION (B): debugging the problems in XS code
+	=================================================
+
+Additionally, when the errors happen in your XS code, and you cannot
+immediately guess "why", the only recourse you have is to contact the persons
+who runs the machine on the CpanTester framework, and ASK them to help in
+debugging.
+
+I should not explain how probable it is that such "remote debugging" would
+succeed before the patience of the people on CpanTester machine would run out!
+
+	PARTIAL SOLUTION: auto-debug-module.pl
+	======================================
+
+With this code,
+  (*) one can rerun the build of the distribution (as a conditional part of
+      the test suite) and see its output.
+  (*) the rebuild may be performed in C-debugging-mode (with cc-like compilers)
+  (*) scripts may be rerun under C debugger, so one would get a detailed report
+      of what XS code was doing when it crashed.
+
+(With the last part, one gets only a partial solution to the "remote debugging
+problem" - you get information only in the case of crashes, and not in the case
+of "wrong answers".  However, by forcing your XS code to (conditionally) crash
+at a key point of the execution, one might get at least SOME leeway to remote
+debugging.)
+
+	DETAILS of auto-debug-module.pl (on example of Audio::FindChunks)
+	=================================================================
+
+(A) Running auto-debug-module.pl without arguments prints the usage info.
+
+(B) For an example of the usage (via `@ARGV=...; do $debugger')
+    see ../t/zzz_debug-crash.t.  With this usage, there is no extraneous output
+    unless something fishy is going on.
+
+(C) zzz_debug-crash.t should run AFTER Audio-FindChunks.t is run;
+    this relies on the .t tests running in alphabetical order.
+    However, this breaks on arm-freebsd; see
+         http://www.cpantesters.org/cpan/report/ef2ee424-1c8e-11e6-b928-8293027c4940
+            (bug in the shell's *.t ???)
+
+(D) Audio-FindChunks.t uses the trick (near the start, before loading modules)
+	# A poor-man indicator of a crash
+	my $SELF;
+	BEGIN { ($SELF = __FILE__) =~ s(.*[/\\])();
+	   open CR, ">tst-run-$SELF" and close CR}	# touch a file
+	END {unlink "tst-run-$SELF"}			# remove it - unless we crash
+    to communicate the fact that it crashed to zzz_debug-crash.t, which checks
+    for the presence of this file before starting its debugging session.
+
+(E) As a result of (D),
+     (*) when Audio-FindChunks.t crashes when running under automated testing,
+	 auto-debug-module.pl is called with arguments
+         	-q Audio::FindChunks t/Audio-FindChunks.t
+         , otherwise only with arguments
+         	-q Audio::FindChunks
+         so that the rebuild would be enabled only if the module cannot be loaded
+	 (as with a crash in XS_INIT) or if a crash was detected.
+
+     (*) the output from the debugging rebuild would be seen on the
+         CPANTester's report.
+
+     (*) if crashes are detected, the state of the program during the crash
+         is reported in as much detail as possible (with gdb - if present,
+         otherwise with dbx).  Examples of output are in this directory.
+
+(F) A more advanced example (with multiple failures possible) is in the test
+    files of the Math::Pari distribution.
+
+  TO REMOTELY DEBUG YOUR DISTRIBUTION via CPAN-Testers
+  ====================================================
+
+(*) Copy the trick BEGIN/END chunks (from above) to the beginning of one of
+    your .t test files;
+(*) add zzz_debug-crash.t to your test suite (modifying the name of the module,
+    and the filename of the test file);
+(*) add utils/auto-debug-module.pl to your distribution;
+(*) add
+      tst-run-* had-tst-run-* dbg-bld dbg-bldO
+    to the 'clean' key of WriteMakefile() of your Makefile.PL.

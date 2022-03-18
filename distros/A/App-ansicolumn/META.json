@@ -63,7 +63,7 @@
    "provides" : {
       "App::ansicolumn" : {
          "file" : "lib/App/ansicolumn.pm",
-         "version" : "1.16"
+         "version" : "1.17"
       },
       "App::ansicolumn::Border" : {
          "file" : "lib/App/ansicolumn/Border.pm"
@@ -83,11 +83,11 @@
          "web" : "https://github.com/kaz-utashiro/App-ansicolumn"
       }
    },
-   "version" : "1.16",
+   "version" : "1.17",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.04",
+   "x_serialization_backend" : "JSON::PP version 4.07",
    "x_static_install" : 0
 }

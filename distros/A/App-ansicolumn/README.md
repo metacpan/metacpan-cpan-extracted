@@ -16,6 +16,7 @@ ansicolumn \[options\] \[file ...\]
     -R#                  right adjust table columns
 
     -P[#]                page mode, with optional page length
+    -U[#]                show in N-up format (-WC# --linestyle=wrap)
     -D                   document mode
     -C#                  number of panes
     -S#                  pane width
@@ -45,7 +46,7 @@ ansicolumn \[options\] \[file ...\]
 
 # VERSION
 
-Version 1.16
+Version 1.17
 
 # DESCRIPTION
 
@@ -112,6 +113,12 @@ default, from the standard input.
     **--height** exists.  Otherwise page height is set to terminal height
     minus one.
 
+- **-U**#, **--up**=#
+
+    Show in N-up format.  This option set **--pane=#** with **--widen** and
+    **--linestyle=wrap** options.  This is convenient when you want
+    multi-column output without page mode.
+
 - **-D**, **--document**
 
     Document mode.  Set these options.
@@ -124,7 +131,7 @@ default, from the standard input.
         --no-isolation
 
     Next command display DOCX text in 3-up format using
-    [App::optex::textconv](https://metacpan.org/pod/App::optex::textconv).
+    [App::optex::textconv](https://metacpan.org/pod/App%3A%3Aoptex%3A%3Atextconv).
 
         optex -Mtextconv ansicolumn -DPC3 foo.docx | less
 
@@ -186,7 +193,7 @@ default, from the standard input.
 
     Set text wrap boundary.  If set as `word` or `space`, text is not
     wrapped in the middle of alphanumeric word or non-space sequence.
-    Option **--document** set this as `word`.  See [Text::ANSI::Fold](https://metacpan.org/pod/Text::ANSI::Fold) for
+    Option **--document** set this as `word`.  See [Text::ANSI::Fold](https://metacpan.org/pod/Text%3A%3AANSI%3A%3AFold) for
     detail.
 
 - **--linebreak**=`none`|`all`|`runin`|`runout`, **--lb**=...
@@ -278,7 +285,7 @@ default, from the standard input.
 - **--tabstyle**=#
 
     Set the style how tab is expanded.  Select from `dot`, `symbol` or
-    `shade`.  Styles are defined in [Text::ANSI::Fold](https://metacpan.org/pod/Text::ANSI::Fold) library.
+    `shade`.  Styles are defined in [Text::ANSI::Fold](https://metacpan.org/pod/Text%3A%3AANSI%3A%3AFold) library.
 
 - **--ambiguous**=`wide`|`narrow`
 
@@ -302,7 +309,7 @@ height, and terminal width for others.
     --height dup2%-2/   (height - height % 2) / 2
 
 Space and comma characters are ignored in the expression.  So `1-2/`
-and `1&nbsp;-&nbsp;2&nbsp;/` and `1,-,2,/` are all same.  See \`perldoc
+and `1 - 2 /` and `1,-,2,/` are all same.  See \`perldoc
 Math::RPN\` for the expression detail.
 
 Next example select number of panes by dividing terminal width by 85:
@@ -315,7 +322,7 @@ If you consider the case the terminal width is less than 85:
 
 # STARTUP
 
-This command is implemented with [Getopt::EX](https://metacpan.org/pod/Getopt::EX) module.  So
+This command is implemented with [Getopt::EX](https://metacpan.org/pod/Getopt%3A%3AEX) module.  So
 
     ~/.ansicolumnrc
 
@@ -348,10 +355,10 @@ To get the latest code, use this:
 [column(1)](http://man.he.net/man1/column),
 [https://man7.org/linux/man-pages/man1/column.1.html](https://man7.org/linux/man-pages/man1/column.1.html)
 
-[App::ansicolumn](https://metacpan.org/pod/App::ansicolumn),
+[App::ansicolumn](https://metacpan.org/pod/App%3A%3Aansicolumn),
 [https://github.com/kaz-utashiro/App-ansicolumn](https://github.com/kaz-utashiro/App-ansicolumn)
 
-[Text::ANSI::Printf](https://metacpan.org/pod/Text::ANSI::Printf),
+[Text::ANSI::Printf](https://metacpan.org/pod/Text%3A%3AANSI%3A%3APrintf),
 [https://github.com/kaz-utashiro/Text-ANSI-Printf](https://github.com/kaz-utashiro/Text-ANSI-Printf)
 
 # AUTHOR
@@ -360,7 +367,7 @@ Kazumasa Utashiro
 
 # LICENSE
 
-Copyright 2020-2021 Kazumasa Utashiro.
+Copyright 2020-2022 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

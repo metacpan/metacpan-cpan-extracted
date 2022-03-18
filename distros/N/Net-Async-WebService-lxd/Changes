@@ -1,0 +1,11 @@
+Revision history for Net::Async::WebService::lxd
+
+0.02    Fri 18 Mar 2022 08:44:57 AM CET
+        first release version
+
+           - pod fixes
+           - test suite fixes
+
+0.01    Thu 17 Feb 2022 06:05:13 PM CET
+        First experimental version, unreleased
+

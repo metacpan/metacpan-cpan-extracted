@@ -1139,10 +1139,10 @@ I<any> dimension.
 
 =for bad
 
-Output is set bad if all elements of the input are bad,
+Output is set bad if no elements of the input are non-bad,
 otherwise the bad flag is cleared for the output ndarray.
 
-Note that C<NaNs> are considered to be valid values;
+Note that C<NaNs> are considered to be valid values and will "win" over non-C<NaN>;
 see L<isfinite|PDL::Math/isfinite> and L<badmask|PDL::Math/badmask>
 for ways of masking NaNs.
 
@@ -1190,18 +1190,23 @@ Like minimum but returns the index rather than the value
 
 =for bad
 
-Output is set bad if all elements of the input are bad,
+Output is set bad if no elements of the input are non-bad,
 otherwise the bad flag is cleared for the output ndarray.
 
+Note that C<NaNs> are considered to be valid values and will "win" over non-C<NaN>;
+see L<isfinite|PDL::Math/isfinite> and L<badmask|PDL::Math/badmask>
+for ways of masking NaNs.
+
+
 =cut
-#line 1198 "Ufunc.pm"
+#line 1203 "Ufunc.pm"
 
 
 
 #line 1060 "../../blib/lib/PDL/PP.pm"
 
 *minimum_ind = \&PDL::minimum_ind;
-#line 1205 "Ufunc.pm"
+#line 1210 "Ufunc.pm"
 
 
 
@@ -1216,7 +1221,7 @@ otherwise the bad flag is cleared for the output ndarray.
 =cut
 
 *PDL::minover_ind = *minover_ind = \&PDL::minimum_ind;
-#line 1220 "Ufunc.pm"
+#line 1225 "Ufunc.pm"
 
 
 
@@ -1228,25 +1233,60 @@ otherwise the bad flag is cleared for the output ndarray.
 
 =for sig
 
-  Signature: (a(n); indx [o]c(m))
+  Signature: (a(n); indx [o]c(m); PDL_Indx m_size => m)
 
 =for ref
 
-Returns the index of C<m> minimum elements
+Returns the index of C<m_size> minimum elements. As of 2.077, you can
+specify how many by either passing in an ndarray of the given size
+(DEPRECATED - will be converted to indx if needed and the input arg will
+be set to that), or just the size, or a null and the size.
+
+=for usage
+
+  minimum_n_ind($pdl, $out = zeroes(5)); # DEPRECATED
+  $out = minimum_n_ind($pdl, 5);
+  minimum_n_ind($pdl, $out = null, 5);
+
+
 
 =for bad
 
-Not yet been converted to ignore bad values
+Output bad flag is cleared for the output ndarray if sufficient non-bad elements found,
+else remaining slots in C<$c()> are set bad.
+
+Note that C<NaNs> are considered to be valid values and will "win" over non-C<NaN>;
+see L<isfinite|PDL::Math/isfinite> and L<badmask|PDL::Math/badmask>
+for ways of masking NaNs.
+
 
 =cut
-#line 1243 "Ufunc.pm"
+#line 1265 "Ufunc.pm"
+
+
+
+#line 1059 "../../blib/lib/PDL/PP.pm"
+
+
+#line 416 "ufunc.pd"
+sub PDL::minimum_n_ind {
+  my ($a, $c, $m_size) = @_;
+  $m_size //= ref($c) ? $c->dim(0) : $c; # back-compat with pre-2.077
+  my $set_out = 1;
+  $set_out = 0, $c = null if !ref $c;
+  $c = $c->indx if !$c->isnull;
+  PDL::_minimum_n_ind_int($a, $c, $m_size);
+  $set_out ? $_[1] = $c : $c;
+}
+#line 1071 "../../blib/lib/PDL/PP.pm"
+#line 1283 "Ufunc.pm"
 
 
 
 #line 1060 "../../blib/lib/PDL/PP.pm"
 
 *minimum_n_ind = \&PDL::minimum_n_ind;
-#line 1250 "Ufunc.pm"
+#line 1290 "Ufunc.pm"
 
 
 
@@ -1261,7 +1301,7 @@ Not yet been converted to ignore bad values
 =cut
 
 *PDL::minover_n_ind = *minover_n_ind = \&PDL::minimum_n_ind;
-#line 1265 "Ufunc.pm"
+#line 1305 "Ufunc.pm"
 
 
 
@@ -1300,23 +1340,23 @@ I<any> dimension.
 
 =for bad
 
-Output is set bad if all elements of the input are bad,
+Output is set bad if no elements of the input are non-bad,
 otherwise the bad flag is cleared for the output ndarray.
 
-Note that C<NaNs> are considered to be valid values;
+Note that C<NaNs> are considered to be valid values and will "win" over non-C<NaN>;
 see L<isfinite|PDL::Math/isfinite> and L<badmask|PDL::Math/badmask>
 for ways of masking NaNs.
 
 
 =cut
-#line 1313 "Ufunc.pm"
+#line 1353 "Ufunc.pm"
 
 
 
 #line 1060 "../../blib/lib/PDL/PP.pm"
 
 *maximum = \&PDL::maximum;
-#line 1320 "Ufunc.pm"
+#line 1360 "Ufunc.pm"
 
 
 
@@ -1331,7 +1371,7 @@ for ways of masking NaNs.
 =cut
 
 *PDL::maxover = *maxover = \&PDL::maximum;
-#line 1335 "Ufunc.pm"
+#line 1375 "Ufunc.pm"
 
 
 
@@ -1351,18 +1391,23 @@ Like maximum but returns the index rather than the value
 
 =for bad
 
-Output is set bad if all elements of the input are bad,
+Output is set bad if no elements of the input are non-bad,
 otherwise the bad flag is cleared for the output ndarray.
 
+Note that C<NaNs> are considered to be valid values and will "win" over non-C<NaN>;
+see L<isfinite|PDL::Math/isfinite> and L<badmask|PDL::Math/badmask>
+for ways of masking NaNs.
+
+
 =cut
-#line 1359 "Ufunc.pm"
+#line 1404 "Ufunc.pm"
 
 
 
 #line 1060 "../../blib/lib/PDL/PP.pm"
 
 *maximum_ind = \&PDL::maximum_ind;
-#line 1366 "Ufunc.pm"
+#line 1411 "Ufunc.pm"
 
 
 
@@ -1377,7 +1422,7 @@ otherwise the bad flag is cleared for the output ndarray.
 =cut
 
 *PDL::maxover_ind = *maxover_ind = \&PDL::maximum_ind;
-#line 1381 "Ufunc.pm"
+#line 1426 "Ufunc.pm"
 
 
 
@@ -1389,25 +1434,60 @@ otherwise the bad flag is cleared for the output ndarray.
 
 =for sig
 
-  Signature: (a(n); indx [o]c(m))
+  Signature: (a(n); indx [o]c(m); PDL_Indx m_size => m)
 
 =for ref
 
-Returns the index of C<m> maximum elements
+Returns the index of C<m_size> maximum elements. As of 2.077, you can
+specify how many by either passing in an ndarray of the given size
+(DEPRECATED - will be converted to indx if needed and the input arg will
+be set to that), or just the size, or a null and the size.
+
+=for usage
+
+  maximum_n_ind($pdl, $out = zeroes(5)); # DEPRECATED
+  $out = maximum_n_ind($pdl, 5);
+  maximum_n_ind($pdl, $out = null, 5);
+
+
 
 =for bad
 
-Not yet been converted to ignore bad values
+Output bad flag is cleared for the output ndarray if sufficient non-bad elements found,
+else remaining slots in C<$c()> are set bad.
+
+Note that C<NaNs> are considered to be valid values and will "win" over non-C<NaN>;
+see L<isfinite|PDL::Math/isfinite> and L<badmask|PDL::Math/badmask>
+for ways of masking NaNs.
+
 
 =cut
-#line 1404 "Ufunc.pm"
+#line 1466 "Ufunc.pm"
+
+
+
+#line 1059 "../../blib/lib/PDL/PP.pm"
+
+
+#line 416 "ufunc.pd"
+sub PDL::maximum_n_ind {
+  my ($a, $c, $m_size) = @_;
+  $m_size //= ref($c) ? $c->dim(0) : $c; # back-compat with pre-2.077
+  my $set_out = 1;
+  $set_out = 0, $c = null if !ref $c;
+  $c = $c->indx if !$c->isnull;
+  PDL::_maximum_n_ind_int($a, $c, $m_size);
+  $set_out ? $_[1] = $c : $c;
+}
+#line 1071 "../../blib/lib/PDL/PP.pm"
+#line 1484 "Ufunc.pm"
 
 
 
 #line 1060 "../../blib/lib/PDL/PP.pm"
 
 *maximum_n_ind = \&PDL::maximum_n_ind;
-#line 1411 "Ufunc.pm"
+#line 1491 "Ufunc.pm"
 
 
 
@@ -1422,7 +1502,7 @@ Not yet been converted to ignore bad values
 =cut
 
 *PDL::maxover_n_ind = *maxover_n_ind = \&PDL::maximum_n_ind;
-#line 1426 "Ufunc.pm"
+#line 1506 "Ufunc.pm"
 
 
 
@@ -1460,14 +1540,14 @@ Otherwise they will have their bad flags cleared,
 since they will not contain any bad values.
 
 =cut
-#line 1464 "Ufunc.pm"
+#line 1544 "Ufunc.pm"
 
 
 
 #line 1060 "../../blib/lib/PDL/PP.pm"
 
 *minmaximum = \&PDL::minmaximum;
-#line 1471 "Ufunc.pm"
+#line 1551 "Ufunc.pm"
 
 
 
@@ -1482,11 +1562,11 @@ since they will not contain any bad values.
 =cut
 
 *PDL::minmaxover = *minmaxover = \&PDL::minmaximum;
-#line 1486 "Ufunc.pm"
+#line 1566 "Ufunc.pm"
 
 
 
-#line 550 "ufunc.pd"
+#line 568 "ufunc.pd"
 
 =head2 avg
 
@@ -1512,11 +1592,11 @@ sub PDL::avg {
 	$x->clump(-1)->average( $tmp=PDL->nullcreate($x) );
 	$tmp;
 }
-#line 1516 "Ufunc.pm"
+#line 1596 "Ufunc.pm"
 
 
 
-#line 550 "ufunc.pd"
+#line 568 "ufunc.pd"
 
 =head2 sum
 
@@ -1542,11 +1622,11 @@ sub PDL::sum {
 	$x->clump(-1)->sumover( $tmp=PDL->nullcreate($x) );
 	$tmp;
 }
-#line 1546 "Ufunc.pm"
+#line 1626 "Ufunc.pm"
 
 
 
-#line 550 "ufunc.pd"
+#line 568 "ufunc.pd"
 
 =head2 prod
 
@@ -1572,11 +1652,11 @@ sub PDL::prod {
 	$x->clump(-1)->prodover( $tmp=PDL->nullcreate($x) );
 	$tmp;
 }
-#line 1576 "Ufunc.pm"
+#line 1656 "Ufunc.pm"
 
 
 
-#line 550 "ufunc.pd"
+#line 568 "ufunc.pd"
 
 =head2 davg
 
@@ -1602,11 +1682,11 @@ sub PDL::davg {
 	$x->clump(-1)->daverage( $tmp=PDL->nullcreate($x) );
 	$tmp;
 }
-#line 1606 "Ufunc.pm"
+#line 1686 "Ufunc.pm"
 
 
 
-#line 550 "ufunc.pd"
+#line 568 "ufunc.pd"
 
 =head2 dsum
 
@@ -1632,11 +1712,11 @@ sub PDL::dsum {
 	$x->clump(-1)->dsumover( $tmp=PDL->nullcreate($x) );
 	$tmp;
 }
-#line 1636 "Ufunc.pm"
+#line 1716 "Ufunc.pm"
 
 
 
-#line 550 "ufunc.pd"
+#line 568 "ufunc.pd"
 
 =head2 dprod
 
@@ -1662,11 +1742,11 @@ sub PDL::dprod {
 	$x->clump(-1)->dprodover( $tmp=PDL->nullcreate($x) );
 	$tmp;
 }
-#line 1666 "Ufunc.pm"
+#line 1746 "Ufunc.pm"
 
 
 
-#line 550 "ufunc.pd"
+#line 568 "ufunc.pd"
 
 =head2 zcheck
 
@@ -1692,11 +1772,11 @@ sub PDL::zcheck {
 	$x->clump(-1)->zcover( $tmp=PDL->nullcreate($x) );
 	$tmp;
 }
-#line 1696 "Ufunc.pm"
+#line 1776 "Ufunc.pm"
 
 
 
-#line 550 "ufunc.pd"
+#line 568 "ufunc.pd"
 
 =head2 and
 
@@ -1722,11 +1802,11 @@ sub PDL::and {
 	$x->clump(-1)->andover( $tmp=PDL->nullcreate($x) );
 	$tmp;
 }
-#line 1726 "Ufunc.pm"
+#line 1806 "Ufunc.pm"
 
 
 
-#line 550 "ufunc.pd"
+#line 568 "ufunc.pd"
 
 =head2 band
 
@@ -1752,11 +1832,11 @@ sub PDL::band {
 	$x->clump(-1)->bandover( $tmp=PDL->nullcreate($x) );
 	$tmp;
 }
-#line 1756 "Ufunc.pm"
+#line 1836 "Ufunc.pm"
 
 
 
-#line 550 "ufunc.pd"
+#line 568 "ufunc.pd"
 
 =head2 or
 
@@ -1782,11 +1862,11 @@ sub PDL::or {
 	$x->clump(-1)->orover( $tmp=PDL->nullcreate($x) );
 	$tmp;
 }
-#line 1786 "Ufunc.pm"
+#line 1866 "Ufunc.pm"
 
 
 
-#line 550 "ufunc.pd"
+#line 568 "ufunc.pd"
 
 =head2 bor
 
@@ -1812,11 +1892,11 @@ sub PDL::bor {
 	$x->clump(-1)->borover( $tmp=PDL->nullcreate($x) );
 	$tmp;
 }
-#line 1816 "Ufunc.pm"
+#line 1896 "Ufunc.pm"
 
 
 
-#line 550 "ufunc.pd"
+#line 568 "ufunc.pd"
 
 =head2 min
 
@@ -1842,11 +1922,11 @@ sub PDL::min {
 	$x->clump(-1)->minimum( $tmp=PDL->nullcreate($x) );
 	$tmp;
 }
-#line 1846 "Ufunc.pm"
+#line 1926 "Ufunc.pm"
 
 
 
-#line 550 "ufunc.pd"
+#line 568 "ufunc.pd"
 
 =head2 max
 
@@ -1872,11 +1952,11 @@ sub PDL::max {
 	$x->clump(-1)->maximum( $tmp=PDL->nullcreate($x) );
 	$tmp;
 }
-#line 1876 "Ufunc.pm"
+#line 1956 "Ufunc.pm"
 
 
 
-#line 550 "ufunc.pd"
+#line 568 "ufunc.pd"
 
 =head2 median
 
@@ -1902,11 +1982,11 @@ sub PDL::median {
 	$x->clump(-1)->medover( $tmp=PDL->nullcreate($x) );
 	$tmp;
 }
-#line 1906 "Ufunc.pm"
+#line 1986 "Ufunc.pm"
 
 
 
-#line 550 "ufunc.pd"
+#line 568 "ufunc.pd"
 
 =head2 mode
 
@@ -1932,11 +2012,11 @@ sub PDL::mode {
 	$x->clump(-1)->modeover( $tmp=PDL->nullcreate($x) );
 	$tmp;
 }
-#line 1936 "Ufunc.pm"
+#line 2016 "Ufunc.pm"
 
 
 
-#line 550 "ufunc.pd"
+#line 568 "ufunc.pd"
 
 =head2 oddmedian
 
@@ -1962,11 +2042,11 @@ sub PDL::oddmedian {
 	$x->clump(-1)->oddmedover( $tmp=PDL->nullcreate($x) );
 	$tmp;
 }
-#line 1966 "Ufunc.pm"
+#line 2046 "Ufunc.pm"
 
 
 
-#line 580 "ufunc.pd"
+#line 598 "ufunc.pd"
 
 
 =head2 any
@@ -2026,7 +2106,7 @@ Returns a list with minimum and maximum values of an ndarray.
 This routine does I<not> broadcast over the dimensions of C<$pdl>;
 it returns the minimum and maximum values of the whole ndarray.
 See L</minmaximum> if this is not what is required.
-The two values are returned as Perl scalars similar to min/max,
+The two values are returned as Perl scalars,
 and therefore ignore whether the values are bad.
 
 =for example
@@ -2044,7 +2124,7 @@ sub PDL::minmax {
   my @arr = $x->clump(-1)->minmaximum;
   map $_->sclr, @arr[0,1]; # as scalars !
 }
-#line 2048 "Ufunc.pm"
+#line 2128 "Ufunc.pm"
 
 
 
@@ -2088,14 +2168,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 2092 "Ufunc.pm"
+#line 2172 "Ufunc.pm"
 
 
 
 #line 1060 "../../blib/lib/PDL/PP.pm"
 
 *medover = \&PDL::medover;
-#line 2099 "Ufunc.pm"
+#line 2179 "Ufunc.pm"
 
 
 
@@ -2147,14 +2227,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 2151 "Ufunc.pm"
+#line 2231 "Ufunc.pm"
 
 
 
 #line 1060 "../../blib/lib/PDL/PP.pm"
 
 *oddmedover = \&PDL::oddmedover;
-#line 2158 "Ufunc.pm"
+#line 2238 "Ufunc.pm"
 
 
 
@@ -2208,14 +2288,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 2212 "Ufunc.pm"
+#line 2292 "Ufunc.pm"
 
 
 
 #line 1060 "../../blib/lib/PDL/PP.pm"
 
 *modeover = \&PDL::modeover;
-#line 2219 "Ufunc.pm"
+#line 2299 "Ufunc.pm"
 
 
 
@@ -2266,14 +2346,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 2270 "Ufunc.pm"
+#line 2350 "Ufunc.pm"
 
 
 
 #line 1060 "../../blib/lib/PDL/PP.pm"
 
 *pctover = \&PDL::pctover;
-#line 2277 "Ufunc.pm"
+#line 2357 "Ufunc.pm"
 
 
 
@@ -2322,18 +2402,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 2326 "Ufunc.pm"
+#line 2406 "Ufunc.pm"
 
 
 
 #line 1060 "../../blib/lib/PDL/PP.pm"
 
 *oddpctover = \&PDL::oddpctover;
-#line 2333 "Ufunc.pm"
+#line 2413 "Ufunc.pm"
 
 
 
-#line 985 "ufunc.pd"
+#line 1003 "ufunc.pd"
 
 =head2 pct
 
@@ -2356,11 +2436,11 @@ sub PDL::pct {
 	$x->clump(-1)->pctover($p, my $tmp=PDL->nullcreate($x));
 	$tmp;
 }
-#line 2360 "Ufunc.pm"
+#line 2440 "Ufunc.pm"
 
 
 
-#line 1010 "ufunc.pd"
+#line 1028 "ufunc.pd"
 
 =head2 oddpct
 
@@ -2383,7 +2463,7 @@ sub PDL::oddpct {
 	$x->clump(-1)->oddpctover($p, my $tmp=PDL->nullcreate($x));
 	$tmp;
 }
-#line 2387 "Ufunc.pm"
+#line 2467 "Ufunc.pm"
 
 
 
@@ -2419,14 +2499,14 @@ Bad values are moved to the end of the array:
 
 
 =cut
-#line 2423 "Ufunc.pm"
+#line 2503 "Ufunc.pm"
 
 
 
 #line 1060 "../../blib/lib/PDL/PP.pm"
 
 *qsort = \&PDL::qsort;
-#line 2430 "Ufunc.pm"
+#line 2510 "Ufunc.pm"
 
 
 
@@ -2463,14 +2543,14 @@ Bad elements are moved to the end of the array:
 
 
 =cut
-#line 2467 "Ufunc.pm"
+#line 2547 "Ufunc.pm"
 
 
 
 #line 1060 "../../blib/lib/PDL/PP.pm"
 
 *qsorti = \&PDL::qsorti;
-#line 2474 "Ufunc.pm"
+#line 2554 "Ufunc.pm"
 
 
 
@@ -2521,14 +2601,14 @@ Vectors with bad components are moved to the end of the array:
 
 
 =cut
-#line 2525 "Ufunc.pm"
+#line 2605 "Ufunc.pm"
 
 
 
 #line 1060 "../../blib/lib/PDL/PP.pm"
 
 *qsortvec = \&PDL::qsortvec;
-#line 2532 "Ufunc.pm"
+#line 2612 "Ufunc.pm"
 
 
 
@@ -2567,20 +2647,20 @@ for L</qsortvec>.
 
 
 =cut
-#line 2571 "Ufunc.pm"
+#line 2651 "Ufunc.pm"
 
 
 
 #line 1060 "../../blib/lib/PDL/PP.pm"
 
 *qsortveci = \&PDL::qsortveci;
-#line 2578 "Ufunc.pm"
+#line 2658 "Ufunc.pm"
 
 
 
 
 
-#line 1280 "ufunc.pd"
+#line 1298 "ufunc.pd"
 
 
 =head1 AUTHOR
@@ -2595,7 +2675,7 @@ from the PDL distribution, the copyright notice should be included in
 the file.
 
 =cut
-#line 2599 "Ufunc.pm"
+#line 2679 "Ufunc.pm"
 
 
 

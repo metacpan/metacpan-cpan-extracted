@@ -16,6 +16,24 @@ for my $type (PDL::Types::types()) {
    ok defined pdl($type, 0), "constructing PDL of type $type";
 }
 
+is sequence(3,2)->dup(0, 2).'', '
+[
+ [0 1 2 0 1 2]
+ [3 4 5 3 4 5]
+]
+', 'dup';
+
+is sequence(3,2)->dupN(2, 3).'', '
+[
+ [0 1 2 0 1 2]
+ [3 4 5 3 4 5]
+ [0 1 2 0 1 2]
+ [3 4 5 3 4 5]
+ [0 1 2 0 1 2]
+ [3 4 5 3 4 5]
+]
+', 'dupN';
+
 my $a_long = sequence long, 10;
 my $a_dbl  = sequence 10;
 
@@ -36,6 +54,9 @@ like $@, qr/multielement ndarray in 'sclr' call/, "sclr failed on multi-element 
 
 eval { $c_dbl->sclr };
 like $@, qr/multielement ndarray in 'sclr' call/, "sclr failed on multi-element ndarray (dbl)";
+
+eval { zeroes(0)->max ? 1 : 0 };
+like $@, qr/bad.*conditional/, 'badvalue as boolean is error';
 
 # test reshape barfing with negative args
 #

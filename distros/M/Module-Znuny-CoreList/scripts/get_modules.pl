@@ -143,7 +143,6 @@ $Data::Dumper::Sortkeys = 1;
 
 my $dist_ini_content = curfile->dirname->child(qw/.. dist.ini/)->slurp;
 
-my ($dist_version)  = $dist_ini_content =~ m{version \s* = \s* (.*?)\n}xms;
 my ($dist_author)   = $dist_ini_content =~ m{author \s* = \s* (.*?)\n}xms;
 my ($dist_license)  = $dist_ini_content =~ m{license \s* = \s* (.*?)\n}xms;
 my ($dist_c_holder) = $dist_ini_content =~ m{copyright_holder \s* = \s* (.*?)\n}xms;
@@ -158,17 +157,17 @@ my $dist_copyright = $license_obj->notice;
 if ( open my $fh, '>', 'corelist' ) {
     print $fh q~package Module::Znuny::CoreList;
 
-# ABSTRACT: what modules shipped with versions of Znuny (>= 2.3.x)
+# ABSTRACT: what modules shipped with versions of Znuny (>= 6.0.30)
 
 use strict;
 use warnings;
 use 5.008;
 
+# VERSION
+
 ~;
 
     print $fh "\n\n";
-
-    print $fh "our \$VERSION = $dist_version;\n\n";
 
     $Data::Dumper::Indent = 0;
 
@@ -239,7 +238,8 @@ sub modules {
         @modules_in_znuny{@global_modules} = (1) x @global_modules;
     }
 
-    return sort keys %modules_in_znuny;
+    my @modules = sort keys %modules_in_znuny;
+    return @modules;
 }
 
 sub cpan_modules {
@@ -269,7 +269,8 @@ sub cpan_modules {
         @modules_in_znuny{@global_modules} = (1) x @global_modules;
     }
 
-    return sort keys %modules_in_znuny;
+    my @modules = sort keys %modules_in_znuny;
+    return @modules;
 }
 
 1;
@@ -307,6 +308,20 @@ print $pod_fh q~=head1 SYNOPSIS
     '6.0.x',
     'CGI',
  );
+
+=head1 METHODS
+
+=head2 modules
+
+returns a list of Core modules shipped with a given Znuny version
+
+=head2 shipped
+
+returns a list of Znuny versions that ships a given module
+
+=head2 cpan_modules
+
+returns a list of CPAN modules that are shipped with a given Znuny version
 
 ~;
 

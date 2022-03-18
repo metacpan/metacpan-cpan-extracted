@@ -1,0 +1,37 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'Module::Build::Tiny' => '0.034',
+                                        'perl' => 'v5.20.0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'File::Spec' => '0',
+                                      'IO::Handle' => '0',
+                                      'IPC::Open3' => '0',
+                                      'Test::More' => '0',
+                                      'Test::Pod' => '1.41'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Mojo::DOM58' => '0.999',
+                                      'Test2::Suite' => '0.000072',
+                                      'perl' => 'v5.20.0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'Test::More' => '0',
+                                   'perl' => 'v5.20.0'
+                                 }
+                 }
+     };
+  $x;
+ }

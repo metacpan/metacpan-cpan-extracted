@@ -1,5 +1,10 @@
 Revision history for this software.
 
+0.41  2022-03-18 00:00:00
+  - fix eratta of comments
+  - update POD
+  - created by INABA Hitoshi
+
 0.40  2022-02-19 00:00:00
   - updated for safety and long life
   - add MOJIBAKE samples

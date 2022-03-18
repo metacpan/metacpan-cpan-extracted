@@ -5,7 +5,7 @@ use warnings;
 use base qw( Alien::Base );
 
 # ABSTRACT: Find or build flex
-our $VERSION = '0.14'; # VERSION
+our $VERSION = '0.15'; # VERSION
 
 
 sub alien_helper
@@ -29,7 +29,7 @@ Alien::flex - Find or build flex
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 =head1 SYNOPSIS
 
@@ -72,6 +72,16 @@ This package can be used by other CPAN modules that require flex.
 
 Returns the name of the flex command.  Usually just C<flex>.
 
+=head1 SEE ALSO
+
+=over 4
+
+=item L<Alien>
+
+=item L<Alien::bison>
+
+=back
+
 =head1 AUTHOR
 
 Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
@@ -82,7 +92,7 @@ Diab Jerius (DJERIUS)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Graham Ollis.
+This software is copyright (c) 2014-2022 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -6,7 +6,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = 1.004;
+our $VERSION = 1.005;
 
 use parent qw(Alien::Base);
 
@@ -21,7 +21,7 @@ Alien::libmaxminddb - Find or download and install libmaxminddb
 
 =head1 VERSION
 
-version 1.004
+version 1.005
 
 =head1 SYNOPSIS
 

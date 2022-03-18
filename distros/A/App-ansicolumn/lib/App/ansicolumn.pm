@@ -1,6 +1,6 @@
 package App::ansicolumn;
 
-our $VERSION = "1.16";
+our $VERSION = "1.17";
 
 use v5.14;
 use warnings;
@@ -36,6 +36,7 @@ use Getopt::EX::Hashed; {
     has separator           => ' =s s    ' , default => ' ' ;
     has output_separator    => ' =s o    ' , default => '  ' ;
     has document            => '    D    ' ;
+    has up                  => ' :i U    ' ;
     has page                => ' :i P    ' , min => 0;
     has pane                => ' =s C    ' , default => 0 ;
     has pane_width          => ' =s S pw ' , min => 1;
@@ -174,6 +175,13 @@ sub setup_options {
 	$obj->{linestyle} ||= 'wrap';
 	$obj->{border} //= 1;
 	$obj->{fillup} //= 'pane';
+    }
+
+    ## -U
+    if ($obj->up) {
+	$obj->{pane} = $obj->up;
+	$obj->{widen} = 1;
+	$obj->{linestyle} ||= 'wrap';
     }
 
     ## -D

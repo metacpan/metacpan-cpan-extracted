@@ -15,9 +15,9 @@ diff -ru pari-2.3.5.orig\src\gp\highlvl.c pari-2.3.5\src\gp\highlvl.c
  #include "pari.h"
  #include "paripriv.h"
  #include "../graph/rect.h"
---- ./src/language/es.c-pre	2002-06-23 05:49:48.000000000 -0700
-+++ ./src/language/es.c	2014-06-01 10:48:39.046597000 -0700
-@@ -2223,6 +2223,10 @@ os_read(long fd, char ch[], long s)
+--- ./src/language/es.c.orig	2008-03-31 04:43:58.000000000 -0700
++++ ./src/language/es.c	2018-07-29 00:36:28.971866700 -0700
+@@ -2836,6 +2836,10 @@ os_read(long fd, char ch[], long s)
  #endif
  }
  
@@ -28,13 +28,11 @@ diff -ru pari-2.3.5.orig\src\gp\highlvl.c pari-2.3.5\src\gp\highlvl.c
  long
  os_open(char *s, int mode)
  {
-@@ -2259,9 +2263,6 @@ os_getenv(char *s)
- static char *last_filename = NULL;
- static char **dir_list = NULL;
+@@ -2872,7 +2876,6 @@ static char *last_filename = NULL;
  
--#ifdef HAS_OPENDIR
--#  include <dirent.h>
--#endif
+ #ifdef HAS_OPENDIR
  /* slow, but more portable than stat + S_I[FS]DIR */
- int
- pari_is_dir(char *name)
+-#  include <dirent.h>
+ static int
+ is_dir_opendir(char *name)
+ {

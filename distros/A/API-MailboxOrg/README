@@ -1,0 +1,105 @@
+NAME
+
+    API::MailboxOrg - Perl library to work with the API for the Mailbox.org
+    API
+
+VERSION
+
+    version 1.0.1
+
+SYNOPSIS
+
+        use API::MailboxOrg;
+        use Data::Printer;
+    
+        my $api = API::MailboxOrg->new(
+            user     => 'test_name@example.tld',
+            password => 'test1234567789',
+        );
+    
+        my $all_videochats = $api->videochat->list(
+            mail => 'test_name@example.tld',
+        );
+        p $all_videochats;
+
+INFO
+
+    This is still pretty alpha. The API of this distribution might change.
+
+ATTRIBUTES
+
+      * base_uri
+
+      (optional) Default: /v1
+
+      * client
+
+      (optional) A Mojo::UserAgent compatible user agent. By default a new
+      object of Mojo::UserAgent is created.
+
+      * host
+
+      (optional) This is the URL to Mailbox.org API. Defaults to
+      https://api.mailbox.org
+
+      * token
+
+      After authenticating, this will be the auth id.
+
+METHODS
+
+      * account
+
+      * backup
+
+      * base
+
+      * blacklist
+
+      * capabilities
+
+      * context
+
+      * domain
+
+      * hello
+
+      * invoice
+
+      * mail
+
+      * mailinglist
+
+      * password
+
+      * passwordreset
+
+      * spamprotect
+
+      * test
+
+      * user
+
+      * utils
+
+      * validate
+
+      * videochat
+
+MORE INFOS
+
+    The Mailbox.org API documentation is available at
+    https://api.mailbox.org/v1/doc/methods/index.html.
+
+AUTHOR
+
+    Renee Baecker <reneeb@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2022 by Renee Baecker.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+

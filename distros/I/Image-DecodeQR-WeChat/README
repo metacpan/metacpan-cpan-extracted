@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    Version 0.4
+    Version 0.8
 
 SYNOPSIS
 
@@ -13,7 +13,9 @@ SYNOPSIS
     decoder via XS code. OpenCV/WeChat library uses CNN to do this with
     pre-trained models.
 
-    This module has been tested with OpenCV v4.5.5 and Perl v5.32 on Linux.
+    This module has been tested by myself with OpenCV v4.5.5 and Perl v5.32
+    on Linux. But check the CPANtesters matrix on the left for all the
+    tests done on this module.
 
     The library is relatively successful even for rotated codes. It remains
     to be tested on the minimum size ofthe code images (60px in my case).
@@ -30,11 +32,11 @@ SYNOPSIS
             'an-input-image.png',
     
             # the dir with model parameters required by the library.
-            # These come with this package and are curtesy of WeChat
-            # which is part of OpenCV contrib packages
-            # They are installed with this package and their default location
+            # Model files come with this Perl module and are curtesy of WeChat
+            # which is part of OpenCV contrib packages.
+            # They are installed with this module and their default location
             # is given by Image::DecodeQR::WeChat::modelsdir()
-            # Alternatively, specify your own model files:
+            # Alternatively, you specify here your own model files:
             Image::DecodeQR::WeChat::modelsdir(),
     
             # outbase for all output files, optional
@@ -143,6 +145,27 @@ COMMAND LINE SCRIPT
     A CLI script is provided and will be installed by this module. Basic
     usage is as above.
 
+PREREQUISITES
+
+      * OpenCV library with contributed modules is required. The
+      contributed modules must include the QR-code decoder library by
+      WeChat. OpenCV must also contain the include dir (headers) - just
+      saying.
+
+      * A C++ compiler must be installed in your system.
+
+      * Optionally, pkg-config or cmake must be installed in order to aid
+      discovering the location of OpenCV's library and include dir. If you
+      don't have these installed then you must manually set environment
+      variables OPENCV_LDFLAGS and OPENCV_CFLAGS to point to those paths
+      and then attempt to install this module (e.g. perl Makefile.PL; make
+      all ; make install)
+
+      * Optionally, OpenCV can contain the Highgui library so that output
+      images can be displayed in their own window. But this is superfluous,
+      because the basic operation of this module allows for saving output
+      files to disk.
+
 SUBROUTINES/METHODS
 
    decode_xs(infile, modelsdir, outbase, verbosity, graphicaldisplayresult,
@@ -168,10 +191,10 @@ SUBROUTINES/METHODS
 
       * modelsdir : the location of the directory holding all model files
       (CNN trained models) required for QR code detection. These models are
-      already included with this package and will be installed in a shared
-      dir during installation. Their total size is about 1MB. They have
-      been kindly contributed by WeChat along with their library for QR
-      Code detection. They can be found
+      already included with this Perl module and will be installed in a
+      shared dir during installation. Their total size is about 1MB. They
+      have been kindly contributed by WeChat along with their library for
+      QR Code detection. They can be found
       https://github.com/WeChatCV/opencv_3rdparty|here. The installed
       models location is returned by modelsdir(). If you do not want to
       experiment with your own models then just plug the output of
@@ -204,13 +227,16 @@ SUBROUTINES/METHODS
 
    decode(\%params) 
 
-    This is a Perl wrapper to the decode_xs() so that user can specify only
-    a minimal set of parameters and the will be filled in by defaults.
+    This is a Perl wrapper to the decode_xs() and allows a user to specify
+    only a minimal set of parameters with the rest to be filled in by
+    defaults.
 
-    Like decode_xs(), it returns undef on failure.
+    Like decode_xs(), it returns undef on failure. Or an arrayref of two
+    arrays. The payloads array and the bounding-boxes array. Each has a
+    number of items equal to the QR codes detected.
 
-    It returns an empty ARRAYref (i.e. a ref to an empty array) if no QR
-    codes were found or decoded successfully.
+    An ARRAYref of two empty arrays will be returned if no QR codes were
+    found or decoded successfully.
 
     The  params  hashref:
 
@@ -221,12 +247,12 @@ SUBROUTINES/METHODS
       dumped to a text file. If further, dumpqrimagestofile is set to 1
       then image files with the detected QR-codes will be dumped one for
       each QR-code as well as text files with payloads and bounding boxes
-      wrt the input imaghe.
+      wrt the input image.
 
       * modelsdir : optional, use it only if you want to use your own model
       files (for their format have a look at
       https://docs.opencv.org/4.x/d5/d04/classcv_1_1wechat__qrcode_1_1WeChatQRCode.html,
-      they are CNN training files). This package has included the model
+      they are CNN training files). This Perl module has included the model
       files kindly submitted by WeChat as a contribution to OpenCV and will
       be installed in your system with all other files. Use modelsdir() to
       see the location of installed model files. Their total size is about
@@ -247,10 +273,11 @@ SUBROUTINES/METHODS
 
    modelsdir() 
 
-    It returns the path where the models included in this package have been
-    installed. This is useful when you want to use decode_xs() and need to
-    specify the modelsdir. Just pass the output of this to decode_xs() as
-    its modelsdir parameter.
+    It returns the path where the models included in this Perl module have
+    been installed. This is useful when you want to use decode_xs() and
+    need to specify the modelsdir. Just pass the output of this to
+    decode_xs() as its modelsdir parameter. However, you can not set the
+    location of your own modelsdir using  modelsdir() .
 
    opencv_has_highgui_xs() 
 
@@ -260,13 +287,13 @@ SUBROUTINES/METHODS
     which will be ignored if there is no highgui support.
 
     Caveat: checking for whether current OpenCV installation has highgui
-    support is very lame, it merely tries to find the include file
-    opencv2/highgui.hpp in the Include dirs. I have tried several methods
-    (see ```Makefile.PL```), for example DynaLoader or FFI::CheckLib can
-    search for symbols in any library (e.g. searching for imshow() in
-    libopencv_highgui or libopencv_world). This would have been the most
-    straight-forward way but alas, these are C++ libraries and function
-    names are mangled to weird function names like:
+    support is currently very lame, it merely tries to find the include
+    file opencv2/highgui.hpp in the Include dirs. I have tried several
+    methods (see ```Makefile.PL```), for example DynaLoader or
+    FFI::CheckLib can search for symbols in any library (e.g. searching for
+    imshow() in libopencv_highgui or libopencv_world). This would have been
+    the most straight-forward way but alas, these are C++ libraries and
+    function names are mangled to weird function names like:
 
         ZN2cv3viz6imshowERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERKNS_11_InputArrayERKNS_5Size_IiEE()
 
@@ -329,48 +356,62 @@ INSTALLING OpenCV
     install its own versions of packages I already had. So I prefered to
     install OpenCV from sources. This is the procedure I followed:
 
-    1. Download OpenCV sources and also its contributed modules.
+      * Download OpenCV sources and also its contributed modules.
 
-    2. Extract the sources and change to the source dir.
+      * Extract the sources and change to the source dir.
 
-    3. From within the source dir extract the contrib archive.
+      * From within the source dir extract the contrib archive.
 
-    4. Create a build dir and change to it.
+      * Create a build dir and change to it.
 
-    5. There are two ways to make cmake just tolerable: cmake-gui and
-    ccmake. The former is a full-gui interface to setting the billion cmake
-    variables. Use it if you are on a machine which offers a GUI: cmake-gui
-    .. If you are on a headless or remote host possibly over telnet or ssh
-    then do not despair because c<ccmake> is the CLI, curses-based
-    equivalent to cmake-gui, use it like: ccmake .. (from within the build
-    dir).
+      * There are two ways to make cmake just tolerable: cmake-gui and
+      ccmake. The former is a full-gui interface to setting the billion
+      cmake variables. Use it if you are on a machine which offers a GUI:
+      cmake-gui .. If you are on a headless or remote host possibly over
+      telnet or ssh then do not despair because c<ccmake> is the CLI,
+      curses-based equivalent to cmake-gui, use it like: ccmake .. (from
+      within the build dir).
 
-    6. Once on either of the cmake GUIs, first do a configure, then check
-    the list of all variables (you can search on both, for searching in the
-    CLI, press </> and then n for next hit) to suit you and then generate,
-    quit and VERBOSE=1 make -j4 all
+      * Once on either of the cmake GUIs, first do a configure, then check
+      the list of all variables (you can search on both, for searching in
+      the CLI, press </> and then n for next hit) to suit you and then
+      generate, quit and VERBOSE=1 make -j4 all
 
-    7. I guess, cmake variables you want to modify are
-    OPENCV_EXTRA_MODULES_PATH and OPENCV_ENABLE_NONFREE and anything that
-    has to do with CNN or DNN. If you have CUDA installed and a
-    CUDA-capable GPU then enable CUDA (search for CUDA string to find the
-    variable(s)). Also, VTK, Ceres Solver, Eigen3, Intel's TBB, CNN, DNN
-    etc. You need to install all these additional packages to get OpenCV
-    support with them.
+      * I guess, cmake variables you want to modify are
+      OPENCV_EXTRA_MODULES_PATH and OPENCV_ENABLE_NONFREE and anything that
+      has to do with CNN or DNN. If you have CUDA installed and a
+      CUDA-capable GPU then enable CUDA (search for CUDA string to find the
+      variable(s)). Also, VTK, Ceres Solver, Eigen3, Intel's TBB, CNN, DNN
+      etc. You need to install all these additional packages to get OpenCV
+      support with them.
 
-    8. I had a problem with compiling OpenCV with a GUI (the highgui) on a
-    headless host. So, I just disabled it. That's easy to achieve during
-    the above.
+      * I had a problem with compiling OpenCV with a GUI (the highgui) on a
+      headless host. So, I just disabled it. That's easy to achieve during
+      the above.
 
-    9. I have both installed this on a CUDA-capable GPU (with CUDA 10.2
-    installed) host and on a headless remote host with no GPU or basic.
-    CUDA is not required for building this module.
+      * I have both installed this on a CUDA-capable GPU (with CUDA 10.2
+      installed) host and on a headless remote host with no GPU or basic.
+      CUDA is not required for building this module.
 
     Your mileage may vary.
 
     If you are seriously in need of installing this module then consider
     migrating to a serious operating system such as Linux as your first
     action.
+
+INSTALLING THIS MODULE
+
+    This module depends on the existence of the OpenCV library with all the
+    extensions and contributed modules mentioned in section PREREQUISITES.
+
+    Detecting where this library is located in your system is the weakest
+    link in the installation process of this module. Makefile.PL contains
+    code to do this with pkg-config or cmake. If these fail, it will look
+    for ENVironment variables: OPENCV_LDFLAGS and OPENCV_CFLAGS, which
+    should contain the CFLAGS (for example: <-I/usr/include/opencv4/>) and
+    LDFLAGS (for example: <-L/usr/lib64 -lopencv_world>). Set these
+    variables manually prior installation if the automatic methods
+    mentioned above fail.
 
 AUTHOR
 

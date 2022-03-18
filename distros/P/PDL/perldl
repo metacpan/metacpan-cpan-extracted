@@ -177,12 +177,14 @@ EOP
 
 }
 
-my $readlines;
+my $readlines = 0;
 if(!$read_from_file  and  -t STDIN) {
   eval "use Term::ReadLine";
-  $readlines = ($@ eq "");
-} else {
-  $readlines=0;
+  if ( $readlines = !$@ ) {
+    $PERLDL::TERM = Term::ReadLine->new('perlDL', \*STDIN, \*STDOUT);
+    readhist();
+    $PERLDL::TERM->GetHistory if $PERLDL::TERM->can('GetHistory'); # if don't do this before loading OpenGL, it can load libedit via LLVM which has C symbol clashes with GNU readline
+  }
 }
 
 my @enabled = ();
@@ -212,13 +214,24 @@ unless ($@) {
 }
 
 use Text::Balanced;
-push @enabled,"MultiLines";
+push @enabled, "MultiLines";
+
+my $interrupt_handle = eval 'use Sys::SigAction qw(set_sig_handler); 1';
+my $interrupt_msg = "Ctrl-C detected";
+if ($interrupt_handle) {
+  push @enabled, "Interrupt";
+} else {
+  $SIG{'INT'} = sub { die "$interrupt_msg\n" }; # Ctrl-C handler
+}
+sub mksighandle {
+  $interrupt_handle ? set_sig_handler(INT => sub {
+    die "$interrupt_msg\n";
+  }) : undef;
+}
 
 print join(', ',@enabled)," enabled\n" if @enabled > 0;
 
 if ( $readlines ){
-
-   $PERLDL::TERM = Term::ReadLine->new('perlDL', \*STDIN, \*STDOUT);
 
     if (defined &OpenGL::GLUT::done_glutInit ) {
        # Attempt to use with FreeGLUT
@@ -268,6 +281,9 @@ if ( $readlines ){
 		warn("Sorry, cannot use Tk with this version of ReadLine\n");
 	}
     }
+}
+
+sub readhist {
     if ( ( -e "$HOME/.perldl_hist" )
 	&& ( open HIST, "<$HOME/.perldl_hist" ) ) {
 	my @allhist = <HIST>;
@@ -277,23 +293,24 @@ if ( $readlines ){
 	    $PERLDL::TERM->addhistory($_);
 	}
     }
-    eval <<'EOEND';
-sub END {
-
+}
+sub savehist {
+    return if !$readlines;
     # Save History in $ENV{'HOME'}/.perldl_hist
     # GetHistory doesn't work on all versions...
-    my @a= $PERLDL::TERM->GetHistory() if $PERLDL::TERM->can('GetHistory');
-
-    $#a-- if $a[-1] =~ /^(q$|x$|\s*exit\b|\s*quit\b)/; # chop off the exit command
-    @a= @a[($#a-$PERLDL::HISTFILESIZE+1)..($#a)] if $#a > $PERLDL::HISTFILESIZE-1 ;
+    return if !$PERLDL::TERM->can('GetHistory');
+    my @a= grep $_ && /\S/, $PERLDL::TERM->GetHistory;
+    pop @a if $a[-1] =~ /^(q$|x$|\s*exit\b|\s*quit\b)/; # chop off the exit command
+    return if !@a; # nothing to do (and don't overwrite)
+    @a = map {s/^\s*(.*?)\s*$/$1/;$_} @a; # strip whitespace
+    my %seen; @a = reverse grep !$seen{$_}++, reverse @a; # dedup
+    @a= @a[(@a-$PERLDL::HISTFILESIZE)..($#a)] if @a > $PERLDL::HISTFILESIZE;
     if( open HIST, ">$HOME/.perldl_hist" ) {
 	print HIST join("\n",@a);
 	close HIST;
     } else {
 	print " Unable to open \"$HOME/.perldl_hist\"\n";
     }
-}
-EOEND
 }
 
 sub l {
@@ -303,6 +320,13 @@ sub l {
     my $min = $#h < $n-1 ? 0 : $#h-$n+1;
     map {print "$_: $h[$_]\n"} ($min..$#h);
   }
+}
+
+sub with_time (&) {
+  require Time::HiRes;
+  my @t = Time::HiRes::gettimeofday();
+  &{$_[0]}();
+  printf "%g ms\n", Time::HiRes::tv_interval(\@t) * 1000;
 }
 
 sub page {
@@ -385,63 +409,21 @@ if (-e 'local.perldlrc') {
 sub p { local $^W=0; print(@_); }  # suppress possible undefined var message 
                                    # (dirty)
 
-my %demos =
-    (
-     'pdl' => 'PDL::Demos::General', # have to protect pdl as it means something
-     '3d' => 'PDL::Demos::TriD1',
-     '3d2' => 'PDL::Demos::TriD2',
-     '3dgal' => 'PDL::Demos::TriDGallery',
-     'pgplot' => 'PDL::Demos::PGPLOT_demo',
-     'ooplot' => 'PDL::Demos::PGPLOT_OO_demo', # note: lowercase
-     'bad' => 'PDL::Demos::BAD_demo',
-     'bad2' => 'PDL::Demos::BAD2_demo',
-     'transform' => 'PDL::Demos::Transform_demo',
-     'cartography' => 'PDL::Demos::Cartography_demo',
-     'gnuplot' => 'PDL::Demos::Gnuplot_demo',
-     'prima' => 'PDL::Demos::Prima',
-     );
-
+use PDL::Demos;
 sub demo {
-    local $_ = lc $_[0] ;
-    if(/^$/) {
-	print <<EOD;
-Use:
-   demo pdl         # general demo
-
-   demo 3d          # 3d demo (requires TriD with OpenGL or Mesa)
-   demo 3d2         # 3d demo, part 2. (Somewhat memory-intensive)
-   demo 3dgal       # the 3D gallery: make cool images with 3-line scripts
-
-   demo pgplot      # PGPLOT graphics output (Req.: PGPLOT)
-   demo OOplot      # PGPLOT OO interface    (Req.: PGPLOT)
-
-   demo gnuplot     # Gnuplot graphics (requires PDL::Graphics::Gnuplot)
-   demo prima       # Prima graphics (requires PDL::Graphics::Prima)
-
-   demo transform   # Coordinate transformations (Req.: PGPLOT)
-   demo cartography # Cartographic projections (Req.: PGPLOT)
-
-   demo bad         # Bad-value demo
-   demo bad2        # Bad-values, part 2 (Req.: PGPLOT)
-
-EOD
+  if (!$_[0]) {
+    require List::Util;
+    my @kw = sort grep $_ ne 'pdl', PDL::Demos->keywords;
+    my $maxlen = List::Util::max(map length, @kw);
+    print "Use:\n";
+    printf "   demo %-${maxlen}s # %s\n", @$_[0,1] for map [PDL::Demos->info($_)], 'pdl', @kw;
     return;
-    } # if: /^$/
-
-    if ( exists $demos{$_} ) {
-	require PDL::Demos::Screen; # Get the routines for screen demos.
-	my $name = $demos{$_};
-	eval "require $name;"; # see docs on require for need for eval
-	$name .= "::run";
-	&{$name}();
-    } else {
-	print "No such demo!\n";
-    }
-
-} # sub: demo
-
-$SIG{'INT'} = sub { die "Ctrl-C detected\n" }; # Ctrl-C handler
-
+  }
+  no strict;
+  PDL::Demos->init($_[0]);
+  $_->[0]->($_->[1]) for PDL::Demos->demo($_[0]);
+  PDL::Demos->done($_[0]);
+}
 
 my $preproc_warned = 0;
 sub preproc_oldwarn {
@@ -550,13 +532,16 @@ sub process_input {
 	 my $prompt = $cont ? "..$cont".(" "x(5-length($cont)))."> " : 
 	     ((ref $PERLDL::PROMPT) ? &$PERLDL::PROMPT : $PERLDL::PROMPT);
 
-	 if ($readlines) {
-	     $_ = $PERLDL::TERM->readline($prompt);
-	 }else{
-	     print $prompt if(-t ARGV);  # Don't print prompt in pipes
-	     $_ = <>;
+	 {
+	   my $sig_action = mksighandle();
+	   if ($readlines) {
+	       $_ = $PERLDL::TERM->readline($prompt);
+	   }else{
+	       print $prompt if(-t ARGV);  # Don't print prompt in pipes
+	       $_ = <>;
+	   }
 	 }
-	 
+
 	 if(!defined $_) {
 	     if($cont) {
 		 if( $PERLDL::NO_EOF > 1 && -t STDIN ) {
@@ -569,6 +554,7 @@ sub process_input {
 		     print STDERR "EOF ignored. ('q' or 'exit' to quit.  \$PERLDL::NO_EOF = $PERLDL::NO_EOF)\n";
 		 } else {
 		     print STDERR "EOF detected, exiting shell.\n";
+		     savehist();
 		     exit 0;
 		 }
 	     }
@@ -595,7 +581,7 @@ sub process_input {
      $PERLDL::TERM->SetHistory(@hist);
   }
   
-  if(!defined $lines || lc $lines eq 'q' || lc $lines eq 'x' || lc $lines eq 'quit') {exit};
+  if(!defined $lines || lc $lines eq 'q' || lc $lines eq 'x' || lc $lines eq 'quit') {savehist(); exit;};
   next if $lines =~/^\s*$/; # Blank line - do nothing
   
   $lines =~ s/^\s*\?\?\s*/apropos /; # Make '??' = 'apropos'
@@ -651,8 +637,8 @@ $|=1;
 while(1) {
   eval {process_input()};
   if ($@) {
-    if ($@ =~ /Ctrl-C detected/) {
-      print "Ctrl-C detected\n";
+    if ($@ =~ /$interrupt_msg/) {
+      print "$interrupt_msg\n";
       next;
     } else {
       print "Unknown error: $@\n exiting...\n";
@@ -693,7 +679,7 @@ EOD
   %@ = (); # Workaround to prevent spurious loss of $@ in early (pre-5.14 anyway) versions of perl
 
   if( (!$@) and (ref $__coderef eq 'CODE')) { 
-      eval { &$__coderef(); die $@ if($@); };
+      eval { my $sig_action = mksighandle(); &$__coderef(); die $@ if($@); };
   }
 
   if ($@) {
@@ -727,6 +713,8 @@ Use PDL interactively:
   
   bash$ pdl
   pdl> print "Hello, world!\n"; 
+
+  pdl> with_time { print +($A->matmult($B))->info, "\n" } for 1..5;
 
 Run a script:
 
@@ -888,9 +876,13 @@ command prompt:
 
   pdl> $result = start_lengthy_computation()
    <Ctrl-C>
- Ctrl-C detected
+  Ctrl-C detected
 
   pdl>
+
+As of 2.077, this requires L<Sys::SigAction> to be installed (without
+that, and before 2.077, for Perl >5.8 it didn't actually interrupt
+things).
 
 =head2 Shortcuts and aliases
 
@@ -944,6 +936,13 @@ by perl. So you can write, e.g.,
 instead of
 
   pdl> help 'help'
+
+=item *
+
+C<with_time> runs the following code-block, and tells you how long it
+took, in milliseconds. Requires L<Time::HiRes>.
+
+  pdl> with_time { print +($A->matmult($B))->info, "\n" } for 1..5;
 
 =back
 

@@ -7,16 +7,20 @@ build_requires:
   Encode: '0'
   ExtUtils::MakeMaker: '0'
   File::Copy: '0'
-  File::ShareDir::Install: '0'
+  File::ShareDir: '0'
   File::Spec: '0'
   FindBin: '0'
   Test::More: '0'
+  Time::HiRes: '0'
 configure_requires:
+  Cwd: '0'
+  Data::Roundtrip: '0.11'
   ExtUtils::MakeMaker: '0'
   FFI::CheckLib: '0'
   File::Copy: '0'
   File::ShareDir::Install: '0'
   File::Spec: '0'
+  File::Temp: '0'
   FindBin: '0'
   IPC::Run: '0'
 dynamic_config: 1
@@ -32,10 +36,12 @@ no_index:
     - inc
 requires:
   Data::Roundtrip: '0.11'
+  File::ShareDir: '0'
   Getopt::Long: '0'
+  Time::HiRes: '0'
   perl: '5.006'
 resources:
   homepage: https://metacpan.org/module/Image::DecodeQR::WeChat
   repository: https://github.com/hadjiprocopis/perl-image-decodeqr-wechat
-version: '0.7'
+version: '0.8'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

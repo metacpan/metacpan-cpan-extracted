@@ -128,6 +128,8 @@ enum PMAT_SVt {
   PMAT_SVtYES,
   PMAT_SVtNO,
 
+  PMAT_SVtSTRUCT      = 0x7F,  /* fields as described by corresponding META_STRUCT */
+
   /* TODO: emit these in DMD_helper.h */
   PMAT_SVxMAGIC = 0x80,
   PMAT_SVxSAVED_SV,
@@ -138,6 +140,8 @@ enum PMAT_SVt {
   PMAT_SVxSAVED_CV,
   PMAT_SVxSVSVnote,
   PMAT_SVxDEBUGREPORT,
+
+  PMAT_SVtMETA_STRUCT = 0xF0,
 };
 
 enum PMAT_CODEx {
@@ -158,11 +162,25 @@ enum PMAT_CTXt {
   PMAT_CTXtEVAL,
 };
 
-typedef int DMD_Helper(pTHX_ SV const *sv);
+/* API v0.44 */
+typedef struct {
+  FILE *fh;
+  int next_structid;
+  HV *structdefs;
+} DMDContext;
+
+typedef int DMD_Helper(pTHX_ DMDContext *ctx, SV const *sv);
 static HV *helper_per_package;
 
-typedef int DMD_MagicHelper(pTHX_ SV const *sv, MAGIC *mg);
+typedef int DMD_MagicHelper(pTHX_ DMDContext *ctx, SV const *sv, MAGIC *mg);
 static HV *helper_per_magic;
+
+/* Before API v0.44 */
+typedef int DMD_LegacyHelper(pTHX_ SV const *sv);
+static HV *legacy_helper_per_package;
+
+typedef int DMD_LegacyMagicHelper(pTHX_ SV const *sv, MAGIC *mg);
+static HV *legacy_helper_per_magic;
 
 static void write_u8(FILE *fh, uint8_t v)
 {
@@ -193,7 +211,7 @@ static void write_uint(FILE *fh, UV v)
 #endif
 }
 
-static void write_ptr(FILE *fh, void *ptr)
+static void write_ptr(FILE *fh, const void *ptr)
 {
   fwrite(&ptr, sizeof ptr, 1, fh);
 }
@@ -720,8 +738,9 @@ static void write_annotations_from_stack(FILE *fh, int n)
   }
 }
 
-static void write_sv(FILE *fh, const SV *sv)
+static void write_sv(DMDContext *ctx, const SV *sv)
 {
+  FILE *fh = ctx->fh;
   unsigned char type = -1;
   switch(SvTYPE(sv)) {
     case SVt_NULL:
@@ -801,16 +820,29 @@ static void write_sv(FILE *fh, const SV *sv)
 
       if(mg->mg_type == PERL_MAGIC_ext &&
          mg->mg_ptr && mg->mg_len != HEf_SVKEY) {
+        SV *key = make_tmp_iv((IV)mg->mg_virtual);
         HE *he;
 
-        he = hv_fetch_ent(helper_per_magic, make_tmp_iv((IV)mg->mg_virtual), 0, 0);
-        if(he) {
-          DMD_MagicHelper *helperfunc = (DMD_MagicHelper *)SvUV(HeVAL(he));
+        DMD_MagicHelper *helper = NULL;
+        he = hv_fetch_ent(helper_per_magic, key, 0, 0);
+        if(he)
+          helper = (DMD_MagicHelper *)SvUV(HeVAL(he));
 
+        DMD_LegacyMagicHelper *legacy_helper = NULL;
+        he = hv_fetch_ent(legacy_helper_per_magic, key, 0, 0);
+        if(he)
+          legacy_helper = (DMD_LegacyMagicHelper *)SvUV(HeVAL(he));
+
+        if(helper || legacy_helper) {
           ENTER;
           SAVETMPS;
 
-          int ret = (*helperfunc)(aTHX_ sv, mg);
+          int ret;
+          if(helper)
+            ret = (helper)(aTHX_ ctx, sv, mg);
+          else
+            ret = (*legacy_helper)(aTHX_ sv, mg);
+
           if(ret > 0)
             write_annotations_from_stack(fh, ret);
 
@@ -823,15 +855,26 @@ static void write_sv(FILE *fh, const SV *sv)
 
   if(SvOBJECT(sv)) {
     HV *stash = SvSTASH(sv);
-    SV **helpersv = hv_fetch(helper_per_package, HvNAME(stash), HvNAMELEN(stash), 0);
+    SV **svp;
 
-    if(helpersv) {
-      DMD_Helper *helperfunc = (DMD_Helper *)SvUV(*helpersv);
+    DMD_Helper *helper = NULL;
+    if((svp = hv_fetch(helper_per_package, HvNAME(stash), HvNAMELEN(stash), 0)))
+      helper = (DMD_Helper *)SvUV(*svp);
 
+    DMD_LegacyHelper *legacy_helper = NULL;
+    if((svp = hv_fetch(legacy_helper_per_package, HvNAME(stash), HvNAMELEN(stash), 0)))
+      legacy_helper = (DMD_LegacyHelper *)SvUV(*svp);
+
+    if(helper || legacy_helper) {
       ENTER;
       SAVETMPS;
 
-      int ret = (*helperfunc)(aTHX_ sv);
+      int ret;
+      if(helper)
+        ret = (*helper)(aTHX_ ctx, sv);
+      else
+        ret = (*legacy_helper)(aTHX_ sv);
+
       if(ret > 0)
         write_annotations_from_stack(fh, ret);
 
@@ -852,6 +895,89 @@ static void write_sv(FILE *fh, const SV *sv)
     write_str(fh, sv->sv_debug_file);
   }
 #endif
+}
+
+typedef struct
+{
+   const char *name;
+   enum {
+      DMD_FIELD_PTR,
+      DMD_FIELD_BOOL,
+      DMD_FIELD_U8,
+      DMD_FIELD_U32,
+      DMD_FIELD_UINT,
+   }           type;
+   struct {
+      void       *ptr;
+      bool        b;
+      long        n;
+   };
+} DMDNamedField;
+
+typedef struct
+{
+   const char *name;
+   const char *str;
+   size_t      len;
+} DMDNamedString;
+
+static void writestruct(pTHX_ DMDContext *ctx, const char *name, void *addr, size_t size,
+   size_t nfields, const DMDNamedField fields[])
+{
+  FILE *fh = ctx->fh;
+
+  if(!ctx->structdefs)
+    ctx->structdefs = newHV();
+
+  SV *idsv = *hv_fetch(ctx->structdefs, name, strlen(name), 1);
+  if(!SvOK(idsv)) {
+    int structid = ctx->next_structid;
+    ctx->next_structid++;
+
+    sv_setiv(idsv, structid);
+
+    write_u8(fh, PMAT_SVtMETA_STRUCT);
+    write_uint(fh, structid);
+    write_uint(fh, nfields);
+    write_str(fh, name);
+    for(size_t i = 0; i < nfields; i++) {
+      write_str(fh, fields[i].name);
+      write_u8(fh,  fields[i].type);
+    }
+  }
+
+  write_u8(fh, PMAT_SVtSTRUCT);
+  /* Almost the same layout as write_common_sv() */
+  // Header for common
+  write_svptr(fh, addr);
+  write_u32(fh, -1);
+  write_uint(fh, size);
+  // PTRs for common
+  write_svptr(fh, NUM2PTR(SV *, SvIV(idsv))); /* abuse the stash pointer to store the descriptor ID */
+
+  // Body
+  for(size_t i = 0; i < nfields; i++)
+    switch(fields[i].type) {
+      case DMD_FIELD_PTR:
+        write_ptr(fh, fields[i].ptr);
+        break;
+
+      case DMD_FIELD_BOOL:
+        write_u8(fh, fields[i].b);
+        break;
+
+      case DMD_FIELD_U8:
+        write_u8(fh, fields[i].n);
+        break;
+
+      case DMD_FIELD_U32:
+        write_u32(fh, fields[i].n);
+        break;
+
+      case DMD_FIELD_UINT:
+        write_uint(fh, fields[i].n);
+        break;
+    }
 }
 
 #if (PERL_REVISION == 5) && (PERL_VERSION < 14)
@@ -918,6 +1044,11 @@ static const PERL_CONTEXT *caller_cx(int count, void *ignore)
 static void dumpfh(FILE *fh)
 {
   max_string = SvIV(get_sv("Devel::MAT::Dumper::MAX_STRING", GV_ADD));
+
+  DMDContext ctx = {
+    .fh = fh,
+    .next_structid = 0,
+  };
 
   // Header
   fwrite("PMAT", 4, 1, fh);
@@ -1105,7 +1236,7 @@ static void dumpfh(FILE *fh)
           continue;
       }
 
-      write_sv(fh, sv);
+      write_sv(&ctx, sv);
 
       if(sv == (const SV *)PL_defstash)
         seen_defstash = true;
@@ -1114,7 +1245,7 @@ static void dumpfh(FILE *fh)
 
   // and a few other things that don't actually appear in the arena
   if(!seen_defstash)
-    write_sv(fh, (const SV *)PL_defstash);
+    write_sv(&ctx, (const SV *)PL_defstash);
 
   // Savestack
 #if (PERL_REVISION == 5) && (PERL_VERSION >= 18)
@@ -1185,6 +1316,10 @@ static void dumpfh(FILE *fh)
 #if (PERL_REVISION == 5) && (PERL_VERSION >= 20)
       case SAVEt_STRLEN:
 #endif
+#if (PERL_REVISION == 5) && (PERL_VERSION >= 34)
+      case SAVEt_STRLEN_SMALL:
+#endif
+      case SAVEt_SAVESWITCHSTACK:
       case SAVEt_VPTR:
       case SAVEt_ADELETE:
 
@@ -1325,6 +1460,9 @@ static void dumpfh(FILE *fh)
   }
 
   write_u8(fh, 0);
+
+  if(ctx.structdefs)
+    SvREFCNT_dec((SV *)ctx.structdefs);
 }
 
 MODULE = Devel::MAT::Dumper        PACKAGE = Devel::MAT::Dumper
@@ -1345,5 +1483,12 @@ void
 dumpfh(FILE *fh)
 
 BOOT:
-  helper_per_package = get_hv("Devel::MAT::Dumper::HELPER_PER_PACKAGE", GV_ADD);
-  helper_per_magic   = get_hv("Devel::MAT::Dumper::HELPER_PER_MAGIC", GV_ADD);
+  hv_stores(PL_modglobal, "Devel::MAT::Dumper/%helper_per_package",
+    newRV_noinc((SV *)(helper_per_package = newHV())));
+  hv_stores(PL_modglobal, "Devel::MAT::Dumper/%helper_per_magic",
+    newRV_noinc((SV *)(helper_per_magic = newHV())));
+
+  legacy_helper_per_package = get_hv("Devel::MAT::Dumper::HELPER_PER_PACKAGE", GV_ADD);
+  legacy_helper_per_magic   = get_hv("Devel::MAT::Dumper::HELPER_PER_MAGIC", GV_ADD);
+
+  sv_setiv(*hv_fetchs(PL_modglobal, "Devel::MAT::Dumper/writestruct()", 1), PTR2UV(&writestruct));

@@ -1,5 +1,9 @@
 [% page_title = c.user.first_name _ ' ' _ c.user.last_name _ ' Account' %]
 
+[% IF (is_admin && player_id != 1);
+    INCLUDE 'admin/links.tt';
+ END %]
+
 <ul class="account_links">
 <li><a href="[% c.uri_for('/logout') %]" title="Logout">Logout</a>
 <li><a href="[% c.uri_for('/change_password') %]">Change password</a>

@@ -1,3 +1,7 @@
+ [% IF is_admin;
+    INCLUDE 'admin/links.tt';
+ END %]
+
 [% page_title = 'Mark Round out for Teams' %]
 
 <div style="font-size: 0.88em;">

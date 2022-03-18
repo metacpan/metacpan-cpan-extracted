@@ -1,5 +1,12 @@
 Revision history for XML-Sig
 
+0.56 -- Tue Mar 15 21:04:47 ADT 2022
+
+  - f8a7779 Update release VERSION
+  - c9dc5cb Ignore Release notes files
+  - d987af2 Update cert expiry dates
+  - b42d113 v0.55
+
 0.55 -- Tue Dec 07 18:12:45 AST 2021
 
   - 9da4192 Updates version and small packaging change

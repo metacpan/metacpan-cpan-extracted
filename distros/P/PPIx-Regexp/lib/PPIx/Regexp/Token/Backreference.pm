@@ -44,7 +44,7 @@ use PPIx::Regexp::Constant qw{
 };
 use PPIx::Regexp::Util qw{ __to_ordinal_en };
 
-our $VERSION = '0.082';
+our $VERSION = '0.083';
 
 # Return true if the token can be quantified, and false otherwise
 # sub can_be_quantified { return };
@@ -181,7 +181,7 @@ sub __PPIX_LEXER__rebless {
     # be octal literals.
     my $content = $self->content();
     if ( $content =~ m/ \A \\ [0-7]{2,} \z /smx ) {
-	bless $self, TOKEN_LITERAL;
+	TOKEN_LITERAL->__PPIX_ELEM__rebless( $self );
 	return 0;
     }
 
@@ -193,8 +193,7 @@ sub __error {
     my ( $self, $msg ) = @_;
     defined $msg
 	or $msg = 'No corresponding capture group';
-    $self->{error} = $msg;
-    bless $self, TOKEN_UNKNOWN;
+    TOKEN_UNKNOWN->__PPIX_ELEM__rebless( $self, error => $msg );
     return 1;
 }
 
@@ -215,7 +214,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2009-2021 by Thomas R. Wyant, III
+Copyright (C) 2009-2022 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

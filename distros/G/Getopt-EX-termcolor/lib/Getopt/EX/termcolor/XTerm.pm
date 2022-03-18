@@ -48,7 +48,7 @@ my %alias = qw(
 sub get_color {
     my $res = lc shift;
     $res = $alias{$res} if $alias{$res};
-    return color_rgb($res);
+    return ask_color_rgb($res);
 }
 
 our $debug = $ENV{DEBUG_GETOPTEX};
@@ -60,8 +60,7 @@ use constant {
 };
 
 sub osc_command {
-    my($Ps, $Pt) = @_;
-    OSC . "$Ps;$Pt" . "\a";
+    OSC . join(';', @_) . "\a";
 }
 
 use List::Util qw(pairmap);
@@ -87,10 +86,11 @@ sub uncntrl {
 
 # OSC Set Text Parameter
 sub osc_stp {
-    my $name = shift;
-    my $color = @_ ? shift : '?';
-    my $Ps = $oscPs{$name} or croak;
-    osc_command $Ps, $color;
+    my $Ps = shift;
+    if ($Ps !~ /^\d+$/) {
+	$Ps = $oscPs{$Ps} or die "$Ps: invalid";
+    }
+    osc_command $Ps, @_;
 }
 
 my $osc_st_re = qr/[\a\x9c]|\e\\/;
@@ -134,13 +134,16 @@ sub ask {
 
 use List::Util qw(max);
 
-sub color_rgb {
-    my $name = shift;
-    my $rgb = osc_answer ask osc_stp $name or return;
+sub set_color_rgb {
+    my $rgb = osc_answer ask osc_stp @_ or return;
     my @rgb = $rgb =~ m{rgb:([\da-f]+)/([\da-f]+)/([\da-f]+)}i or return;
     my $max = (2 ** (length($1) * 4)) - 1;
     my @opt = $max == 255 ? () : ( { max => $max } );
     ( @opt, map { hex } @rgb );
+}
+
+sub ask_color_rgb {
+    set_color_rgb @_, '?';
 }
 
 do { test() } if __FILE__ eq $0;
@@ -150,9 +153,15 @@ sub test {
     local $Data::Dumper::Terse = 1;
     my $max = max map { length } @oscPs_names;
     for my $name (@oscPs_names) {
-	my @rgb = color_rgb($name);
+	my @rgb = ask_color_rgb $name;
 	printf "%*s: %s",
 	    $max, $name,
+	    @rgb ? Dumper(\@rgb)=~s/\n(?!\z)\s*/ /gr : "n/a\n";
+    }
+    for my $number (0 .. 255) {
+	my @rgb = ask_color_rgb(4, $number);
+	printf "%*d: %s",
+	    $max, $number,
 	    @rgb ? Dumper(\@rgb)=~s/\n(?!\z)\s*/ /gr : "n/a\n";
     }
 }

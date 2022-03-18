@@ -1,0 +1,66 @@
+{
+   "abstract" : "REST client (asynchronous) for lxd Linux containers",
+   "author" : [
+      "Robert Barta <rho@devc.at>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4224",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Net-Async-WebService-lxd",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::Slurp" : "0",
+            "JSON" : "0",
+            "Test::CheckManifest" : "0",
+            "Test::Deep" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Encode" : "0",
+            "HTTP::Cookies" : "0",
+            "HTTP::Request" : "0",
+            "HTTP::Response" : "0",
+            "HTTP::Status" : "0",
+            "IO::Async" : "0",
+            "JSON" : "0",
+            "Log::Log4perl" : "0",
+            "Moose" : "0",
+            "Net::Async::HTTP" : "0",
+            "URI" : "0",
+            "YAML" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Net::Async::WebService::lxd" : {
+         "file" : "lib/Net/Async/WebService/lxd.pm",
+         "version" : "0.02"
+      },
+      "lxd::instance" : {
+         "file" : "lib/Net/Async/WebService/lxd.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.perlfoundation.org/artistic_license_2_0"
+      ]
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

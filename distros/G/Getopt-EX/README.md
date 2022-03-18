@@ -5,7 +5,7 @@ Getopt::EX - Getopt Extender
 
 # VERSION
 
-Version v1.27.0
+Version v1.27.1
 
 # DESCRIPTION
 

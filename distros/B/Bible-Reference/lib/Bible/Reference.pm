@@ -6,7 +6,7 @@ use 5.020;
 use exact;
 use exact::class;
 
-our $VERSION = '1.08'; # VERSION
+our $VERSION = '1.09'; # VERSION
 
 has acronyms             => 0;
 has sorting              => 1;
@@ -1581,7 +1581,7 @@ Bible::Reference - Simple Bible reference parser, tester, and canonicalizer
 
 =head1 VERSION
 
-version 1.08
+version 1.09
 
 =for markdown [![test](https://github.com/gryphonshafer/Bible-Reference/workflows/test/badge.svg)](https://github.com/gryphonshafer/Bible-Reference/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/Bible-Reference/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Bible-Reference)
@@ -1937,7 +1937,7 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017-2021 by Gryphon Shafer.
+This software is Copyright (c) 2017-2050 by Gryphon Shafer.
 
 This is free software, licensed under:
 

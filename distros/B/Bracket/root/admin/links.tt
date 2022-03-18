@@ -1,9 +1,20 @@
-<div class="admin_links">
-<span style="text-decoration: underline;">Admin Features</span><br />
-<a href="[% c.uri_for('/player/1') %]">Perfect Player's Brackets</a><br />
-<a href="[% c.uri_for('/update_points') %]" 
-title="Run after updating Perfect Player's bracket">Update Player Points</a><br />
-<a href="[% c.uri_for('/round_out_unmarked') %]">Mark Out Teams Left</a><br />
-<!-- <a href="[% c.uri_for('/round_out') %]">Mark Out Teams (Complete List)</a><br /> -->
-<a href="[% c.uri_for('/qa') %]">Lower Seed - QA</a><br />
-</div>
+<table class="admin_links">
+<tr>
+<td>
+  <a href="[% c.uri_for('/player/1') %]">Perfect Brackets</a>
+</td>
+<td>
+  <a href="[% c.uri_for('/update_points') %]"
+  title="Run after updating Perfect Player's bracket">Update Points</a>
+</td>
+<td>
+  <a href="[% c.uri_for('/round_out_unmarked') %]">Mark Out</a>
+</td>
+<td>
+<!-- <a href="[% c.uri_for('/round_out') %]">Mark Out Teams (Complete List)</a> -->
+</td>
+<td>
+<a href="[% c.uri_for('/qa') %]">Lower QA</a>
+</td>
+</tr>
+</table>

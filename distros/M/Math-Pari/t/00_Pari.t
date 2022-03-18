@@ -1,5 +1,11 @@
 #!/usr/bin/perl -w
 
+	# A poor-man indicator of a crash
+	my $SELF;
+	BEGIN { ($SELF = __FILE__) =~ s(.*[/\\])();
+	   open CR, ">tst-run-$SELF" and close CR}	# touch a file
+	END {unlink "tst-run-$SELF"}			# remove it - unless we crash
+
 BEGIN { unshift @INC, './lib', '../lib';
     require Config; import Config;
 }
@@ -16,10 +22,24 @@ use Math::Pari;
 
 test(1);			# 1
 
+Math::Pari::PARI_DEBUG_set $ENV{MATHPARI_T_DEBUG} if exists $ENV{MATHPARI_T_DEBUG};
+
+# Math::Pari::__detach_stack(); print "# detach on line ", __LINE__, "\n";
+
+if ( ($tot, $now, $onstack, $offstack) = Math::Pari::memUsage) {
+  print "# total = $tot, now = $now, onstack = $onstack, offstack = $offstack on line ", __LINE__, "\n";
+  Math::Pari::dumpStack();;
+}
+
 $a=new Math::Pari 1;
 
 test($a);			# 2
 test(ref $a eq "Math::Pari");	# 3
+
+if ( ($tot, $now, $onstack, $offstack) = Math::Pari::memUsage) {
+  print "# total = $tot, now = $now, onstack = $onstack, offstack = $offstack on line ", __LINE__, "\n";
+  Math::Pari::dumpStack();;
+}
 
 {
   package Math::Pari;
@@ -28,6 +48,11 @@ test(ref $a eq "Math::Pari");	# 3
 
 test(defined &Math::Pari::pari2nv); # 5
 test(Math::Pari::pari2iv($a)==1); # 6
+
+if ( ($tot, $now, $onstack, $offstack) = Math::Pari::memUsage) {
+  print "# total = $tot, now = $now, onstack = $onstack, offstack = $offstack on line ", __LINE__, "\n";
+  Math::Pari::dumpStack();;
+}
 
 # This looks like a bug in the Pari conversion to double:
 
@@ -44,6 +69,11 @@ $b= &$add (34,67);
 test($b);			# 10
 test(ref $b eq "Math::Pari");	# 11
 test(Math::Pari::pari2iv($b)==101); # 12
+
+if ( ($tot, $now, $onstack, $offstack) = Math::Pari::memUsage) {
+  print "# total = $tot, now = $now, onstack = $onstack, offstack = $offstack on line ", __LINE__, "\n";
+  Math::Pari::dumpStack();;
+}
 
 $b=Math::Pari::gadd(11,12);	# Uninitialized value here
 
@@ -75,6 +105,12 @@ test(ref $e eq "Math::Pari");	# 24
 $cc=Math::Pari::pari2iv($c);
 
 test(! ref $cc);		# 25
+
+# Math::Pari::__detach_stack(); print "# detach on line ", __LINE__, "\n";
+if ( ($tot, $now, $onstack, $offstack) = Math::Pari::memUsage) {
+  print "# total = $tot, now = $now, onstack = $onstack, offstack = $offstack on line ", __LINE__, "\n";
+  Math::Pari::dumpStack();;
+}
 
 $ee=Math::Pari::pari2pv($e);
 
@@ -113,6 +149,12 @@ test("$g" eq "[-1/2,1/2;3/4,-1/4]") || print "$g\n"; # 35
 test($g == "[-1/2,1/2;3/4,-1/4]"); # 36
 #test(1);
 
+# Math::Pari::__detach_stack(); print "# detach on line ", __LINE__, "\n";
+if ( ($tot, $now, $onstack, $offstack) = Math::Pari::memUsage) {
+  print "# total = $tot, now = $now, onstack = $onstack, offstack = $offstack on line ", __LINE__, "\n";
+  Math::Pari::dumpStack();;
+}
+
 $f  = new Math::Pari "[2,3;3,1]";
 $ff = PARImat [[2,3],[3,1]];
 
@@ -130,21 +172,54 @@ test(!($f == $ff));		# 44
 test("$f" ne "$ff");		# 45
 test($f ne $ff);		# 46
 
+# Math::Pari::__detach_stack(); print "# detach on line ", __LINE__, "\n";
+if ( ($tot, $now, $onstack, $offstack) = Math::Pari::memUsage) {
+  print "# total = $tot, now = $now, onstack = $onstack, offstack = $offstack on line ", __LINE__, "\n";
+  Math::Pari::dumpStack();;
+}
+
 $f = new Math::Pari "[2,3;2,1]";
+
+# Math::Pari::__detach_stack(); print "# detach on line ", __LINE__, "\n";
+if ( ($tot, $now, $onstack, $offstack) = Math::Pari::memUsage) {
+  print "# total = $tot, now = $now, onstack = $onstack, offstack = $offstack on line ", __LINE__, "\n";
+  Math::Pari::dumpStack();;
+}
+
+# my
 $fff=$f**2;
+
+if ( ($tot, $now, $onstack, $offstack) = Math::Pari::memUsage) {
+  print "# total = $tot, now = $now, onstack = $onstack, offstack = $offstack\n";
+  Math::Pari::dumpStack();;
+}
+
+if ($ENV{MATH_PARI_TEST_FIX}) {
+  Math::Pari::__detach_stack(); print "# detach on line ", __LINE__, "\n";	# Fixes the crash
+  if ( ($tot, $now, $onstack, $offstack) = Math::Pari::memUsage) {
+    print "# total = $tot, now = $now, onstack = $onstack, offstack = $offstack\n";
+    Math::Pari::dumpStack();;
+  }
+}
 
 test($fff eq "[10,9;6,7]");	# 47
 test($fff eq $f*$f);		# 48
+
+# Math::Pari::__detach_stack(); print "# detach on line ", __LINE__, "\n";
 
 test(PARI(3)<4);		# 49
 test(3<PARI(4));		# 50
 test(!(PARI(3)<2));		# 51
 test(!(4<PARI(3)));		# 52
 
+# Math::Pari::__detach_stack(); print "# detach on line ", __LINE__, "\n";
+
 test(PARI(3) lt 4);		# 53
 test(3 lt PARI(4));		# 54
 test(!(PARI(3) lt 2));		# 55
 test(!(4 lt PARI(3)));		# 56
+
+# Math::Pari::__detach_stack(); print "# detach on line ", __LINE__, "\n";
 
 eval <<'EOE';
 use Math::Pari qw(I Pi);
@@ -156,7 +231,7 @@ use Math::Pari qw(I Pi);
 
 # Stupid test, probably version- or machine-specific
 
-test(abs(exp((Pi()+7e-29)*I)+1) >= 1e-29); # 57
+test(abs(exp((Pi()+7e-29)*I)+1) >= 1e-29) and Math::Pari::dumpStack(); # 57
 test(abs(exp(Pi()*I)+1) <= 1e-28); # 58
 
 test(('x'*I)**2 == "-x^2");	# 59
@@ -165,6 +240,7 @@ EOE
 
 if ( ($tot, $now, $onstack, $offstack) = Math::Pari::memUsage) {
   print "# total = $tot, now = $now, onstack = $onstack, offstack = $offstack\n";
+  Math::Pari::dumpStack();;
 }
 
 sub incr1 {
@@ -175,8 +251,11 @@ sub incr1 {
   #warn "Got $y, Sum $x\n";
 }
 
+# Math::Pari::__detach_stack(); print "# detach on line ", __LINE__, "\n";
+
 Math::Pari::installPerlFunction(\&incr1, "incrJ");
 
+print "# installed\n";
 $x = 0;
 Math::Pari::fordiv(28, 'j', 'incrJ(j)');
 
@@ -197,35 +276,40 @@ $x = 0;
 Math::Pari::fordiv(28, 'j', sub { incr1(PARI 'j') } ); # Perl code ->Pari expr
 
 test($x == 56);			# 63
-print "# x = '$x'\n" if $x != 56;
+print "## x = '$x'\n" if $x != 56;
+
+if ( ($tot, $now, $onstack, $offstack) = Math::Pari::memUsage) {
+  print "# total = $tot, now = $now, onstack = $onstack, offstack = $offstack\n";
+  Math::Pari::dumpStack();;
+}
 
 $x = 0;
 $j = PARIvar 'j';
 Math::Pari::fordiv(28, 'j', sub { incr1($j) } ); # Perl code ->Pari expr
 
 test($x == 56);			# 64
-print "# x = '$x'\n" if $x != 56;
+print "## x = '$x'\n" if $x != 56;
 
 $x = 0;
 $j = PARI 'j';
 Math::Pari::fordiv(28, $j, sub { incr1($j) } ); # Perl code ->Pari expr
 
 test($x == 56);			# 65
-print "# x = '$x'\n" if $x != 56;
+print "## x = '$x'\n" if $x != 56;
 
 $x = 0;
 $j = 3.4;
 Math::Pari::fordiv(28, $j, sub { incr1($j) } ); # Perl code ->Pari expr
 
 test($x == 56);			# 66
-print "# x = '$x'\n" if $x != 56;
+print "## x = '$x'\n" if $x != 56;
 
 $x = 0;
 $j = PARI 'x+O(x^7)';
 Math::Pari::fordiv(28, $j, sub { incr1($j) } ); # Perl code ->Pari expr
 
 test($x == 56);			# 67
-print "# x = '$x'\n" if $x != 56;
+print "## x = '$x'\n" if $x != 56;
 
 #use Math::Pari 'pi';
 
@@ -234,14 +318,23 @@ $j = PARI 3.14;
 Math::Pari::fordiv(28, $j, sub { incr1($j) } ); # Perl code ->Pari expr
 
 test($x == 56);			# 68
-print "# x = '$x'\n" if $x != 56;
+print "## x = '$x'\n" if $x != 56;
 
 undef $x;
+print "## x = undef\n";
 eval { $x  = Pi()/0; } ;	# Needs G_KEEPERR patch!
 #chomp($@), print "# '$@'\n" if $@;
-print "# x = '$x'\n" if defined $x;
+print "## x = '$x'\n"  if defined $x;
+print "## x == undef\n" unless defined $x;
 
-test( $@ =~ /^PARI:\s+\*+\s+division\s+by\s+zero\b/i ) or print "$@\n"; # 69
+test( $@ =~ /^PARI:\s+\*+\s+(division\s+by\s+zero|impossible\s+inverse\s+in\s+gdiv)\b/i ) or print "$@\n"; # 69
+
+# Math::Pari::__detach_stack(); print "# detach on line ", __LINE__, "\n";
+if ( ($tot, $now, $onstack, $offstack) = Math::Pari::memUsage) {
+  print "# total = $tot, now = $now, onstack = $onstack, offstack = $offstack\n";
+  Math::Pari::dumpStack();;
+}
+
 
 *O=\&Math::Pari::O;
 
@@ -263,7 +356,12 @@ Math::Pari::fordiv(28, 'j', 'k=k+counter(j)');
 test(PARI('k') == 984);		# 73
 
 sub get2 ($$) {7}
-test(PARI('get2(3,-19)==7'));	# 74
+test(PARI('get2(3,-19)==7'));	# 74 (see also 146)
+
+if ( ($tot, $now, $onstack, $offstack) = Math::Pari::memUsage) {
+  print "# total = $tot, now = $now, onstack = $onstack, offstack = $offstack\n";
+  Math::Pari::dumpStack();;
+}
 
 $res = 9;
 eval { $res = PARI('get2(3)') };
@@ -275,9 +373,19 @@ eval { $res = PARI('get2(3,1,67)') };
 #print "# res='$res' err=`$@'\n";
 test($res == 9 and $@ =~ /expected\scharacter:\s\'\)/); # 76
 
-$res = Math::Pari::sum($l,5,9,sub{'kk'**$l},7);
+if ( ($tot, $now, $onstack, $offstack) = Math::Pari::memUsage) {
+  print "# total = $tot, now = $now, onstack = $onstack, offstack = $offstack\n";
+  Math::Pari::dumpStack();;
+}
+
+eval {$res = Math::Pari::sum($l,5,9,sub{'kk'**$l},7); 1} or $res = "error=<<<$@>>>";
 #print "res = `$res'\n";
 test("$res" eq 'kk^9+kk^8+kk^7+kk^6+kk^5+7') or print "$res\n";	# 77
+
+if ( ($tot, $now, $onstack, $offstack) = Math::Pari::memUsage) {
+  print "# total = $tot, now = $now, onstack = $onstack, offstack = $offstack on line ", __LINE__, "\n";
+  Math::Pari::dumpStack();
+}
 
 $var = PARI 'var';
 $var1 = PARIvar 'var';
@@ -356,7 +464,14 @@ test 17 == Math::Pari::longword(-PARI(17),2); # 100
 test not defined eval { Math::Pari::longword((-PARI(17)),3); 1}; # 101
 test not defined eval { Math::Pari::longword((-PARI(17)),-3); 1}; # 102
 
+print "# pre 103\n";
+if ( ($tot, $now, $onstack, $offstack) = Math::Pari::memUsage) {
+  print "# total = $tot, now = $now, onstack = $onstack, offstack = $offstack on line ", __LINE__, "\n";
+  Math::Pari::dumpStack();
+}
+
 test 35906707  == (  (PARI(3)**60)  >> 70); # 103
+print "# ", ((PARI(3)**60)  >> 70)," | ", ((PARI(3)**60)  >> 20)," | ", ((PARI(3)**60)  >> 1)," | ", ((PARI(3)**60)), "\n";
 test -35906708 == ((-(PARI(3)**60)) >> 70); # 104
 test  4794036  == ( (1 . (0 x 100)) >> PARI(310)); # 105
 test -4794037  == ((-1 . (0 x 100)) >> PARI(310)); # 106
@@ -403,6 +518,12 @@ test !PARI(1)->_can('raft');			# 115
 test  PARI(1)->_can('O');			# 116
 
 test &$lift(Math::Pari::Mod(67,17)) == 16;	# 117
+
+# Math::Pari::__detach_stack(); print "# detach on line ", __LINE__, "\n";
+if ( ($tot, $now, $onstack, $offstack) = Math::Pari::memUsage) {
+  print "# total = $tot, now = $now, onstack = $onstack, offstack = $offstack on line ", __LINE__, "\n";
+  Math::Pari::dumpStack();
+}
 
 {
   package ttt;
@@ -476,6 +597,16 @@ test str_ex() eq '"foo \" bar"'; # 144
 test int_div(13,3) == 4;	# 145
 #warn "str_ex=<<", str_ex(), ">>\n";	# <<foo " bar>>
 
+sub get3 ($$$) {7+shift()+shift()*shift}
+test(PARI('get3(3,19,-1)==-9'));	# 146
+
+sub get1 ($) {7+shift}
+test(PARI('get1(-19)==-12'));	# 147
+
+sub get0 () {7}
+test(PARI('get0()==7'));	# 148
+
+
 for my $l (0..22) {		# + 23*9*2
   for my $d (1..9, -9..-1) {
     my $n = $d . (0 x $l);
@@ -486,6 +617,11 @@ for my $l (0..22) {		# + 23*9*2
     print "# `$n' ==> Perl `$pn' ==> Math::Pari `$op'\n" if $n ne $p;
     test ($n eq $p or $p =~ /(0{15}|9{15})\d{0,3}e\d\d$/i);
   }
+}
+
+if ( ($tot, $now, $onstack, $offstack) = Math::Pari::memUsage) {
+  print "# total = $tot, now = $now, onstack = $onstack, offstack = $offstack\n";
+  Math::Pari::dumpStack();;
 }
 
 my $ow;
@@ -506,4 +642,6 @@ BEGIN {
   $^W = $ow;
 }
 
-sub last {145 + 23*9*2}
+sub last {148 + 23*9*2}
+
+# END { Math::Pari::__detach_stack(); print "# end\n"; }

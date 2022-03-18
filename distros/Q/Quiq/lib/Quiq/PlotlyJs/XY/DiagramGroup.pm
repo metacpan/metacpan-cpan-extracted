@@ -233,7 +233,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.199';
+our $VERSION = '1.200';
 
 use Quiq::Math;
 use Quiq::Json;
@@ -271,6 +271,15 @@ Liste der Diagramm-Objekte. Die Diagramm-Objekte sind vom Typ
 B<< Quiq::PlotlyJs::XY::Diagram >> und definieren die Metadaten
 für die einzelnen Diagramme der Diagramm-Gruppe.
 
+=item downloadPng => $bool (Default: 1)
+
+Biete einen Button zum Herunterladen der Diagramm-Grafik an.
+
+=item fillArea => $bool (Default: 1)
+
+Biete eine Checkbox zum An- und Abschalten der Fill Area
+unter der Kurve an.
+
 =item fontSize => $n
 
 Fontgröße der Achsenbeschriftungen. Aus dieser Größe wird die Größe
@@ -286,10 +295,14 @@ Name der Diagramm-Gruppe. Der Name wird als CSS-Id für den
 äußeren div-Container der Diagramm-Gruppe und als Namespace
 für die Funktionen genutzt.
 
+=item scaleY => $bool (Default: 1)
+
+Biete einen Button zur Y-Skalierung der Kurvendaten an.
+
 =item shape => $shape (Default: scatter: 'Spline', scattergl: 'Linear')
 
 Anfangsauswahl des Shape-Menüs auf allen Diagrammen. Der Default
-hängt von Attribut type ab.
+hängt von Attribut type ab. Mögliche Werte: 'Spline', 'Linear', 'Marker'.
 
 =item strict => $bool (Default: 1)
 
@@ -332,14 +345,21 @@ sub new {
     my $self = $class->SUPER::new(
         debug => 0,
         diagrams => [],
+        downloadPng => 1,
+        fillArea => 1,
         fontSize => 11,
         height => 300,
         name => 'dgr',
+        scaleY => 1,
         shape => undef,
         strict => 1,
         type => 'scatter',
         width => undef,
         xAxisType => 'date',
+        xAxisHoverFormat => '%Y-%m-%d %H:%M:%S', # Format der
+            # Spike-Beschriftung für die X-Koordinate. Siehe:
+            # https://github.com/d3/d3-3.x-api-reference/blob/master/\
+            # Time-Formatting.md#format
         xTitle => undef,
     );
     $self->set(@_);
@@ -389,9 +409,9 @@ sub html {
     # Objektattribute
 
     my ($debug,$diagramA,$fontSize,$height,$name,$shape,$strict,$type,
-        $width,$xAxisType,$xTitle) =
+        $width,$xAxisType,$xAxisHoverFormat,$xTitle) =
         $self->get(qw/debug diagrams fontSize height name shape strict type
-        width xAxisType xTitle/);
+        width xAxisType xAxisHoverFormat xTitle/);
 
     # Default des Attributs shape hängt von type ab
 
@@ -470,12 +490,8 @@ sub html {
     my $plotBackground = '#ffffff'; # Hintergrund Plotbereich
     my $rangeSliderBorderColor = '#e0e0e0';
 
-    my ($xAxisHoverFormat,$xAxisTickFormat);
+    my $xAxisTickFormat;
     if ($xAxisType eq 'date') {
-        $xAxisHoverFormat = '%Y-%m-%d %H:%M:%S'; # Format der
-            # Spike-Beschriftung für die X-Koordinate. Siehe:
-            # https://github.com/d3/d3-3.x-api-reference/blob/master/\
-            # Time-Formatting.md#format
         $xAxisTickFormat = '%Y-%m-%d %H:%M'; # Format der
             # Zeitachsen-Beschriftung
     }
@@ -526,9 +542,9 @@ sub html {
                 for (let i = 0; i < x.length; i++) {
                     if (x[i] >= xMin && x[i] <= xMax) {
                         if (yMin === undefined || y[i] < yMin)
-                            yMin = y[i]
+                            yMin = y[i];
                         if (yMax === undefined || y[i] > yMax)
-                            yMax = y[i]
+                            yMax = y[i];
                     }
                 }
                 // console.log(xMin+' '+xMax+' '+yMin+' '+yMax);
@@ -576,7 +592,7 @@ sub html {
                             // Skalierung Y-Achse leiten wir nicht weiter
                             return;
                         }
-                        console.log(ed+JSON.stringify(ed,null,4));
+                        // console.log(ed+JSON.stringify(ed,null,4));
                         $('#'+groupId+' '+'.diagram').each(function(j) {
                             if (j+1 != i && ed['height'] === undefined) {
                                 Plotly.relayout(this,ed);
@@ -651,7 +667,7 @@ sub html {
                 let dId = name+'-d'+i;
                 Plotly.deleteTraces(dId,0);
                 Plotly.addTraces(dId,trace);
-                $('#'+name+'-c'+i).html(x.length.toString()+' values');
+                $('#'+name+'-c'+i).html(x.length.toString()+' points');
 
                 return;
             };
@@ -659,7 +675,7 @@ sub html {
             // Lade Daten asynchron per Ajax und füge sie zum Diagramm hinzu
             let loadDataSetTrace = function (name,i,trace,layout,shape,url) {
                 // Daten per Ajax besorgen
-                console.log(url);
+                // console.log(url);
                 $.ajax({
                     type: 'GET',
                     url: url,
@@ -938,6 +954,22 @@ sub html {
                 for my $par (@$diagramA) {
                     $tmp .= $self->jsDiagram($j,++$i,$par);
                 }
+
+# $tmp .= Quiq::JavaScript->code(q~
+#     $('#dgr-d1 rect.nsewdrag').bind('mousemove',function(e){   
+#         console.log(e);
+#     });
+# 
+#     let e = $.Event('mousemove');
+# 
+#     // coordinates
+#     e.pageX = 250;
+#     e.pageY = 250; 
+# 
+#     // trigger event
+#     $('#dgr-d1 rect.nsewdrag').trigger(e);
+# ~);
+
                 Quiq::JQuery::Function->ready($tmp);
             },
         ),
@@ -991,7 +1023,7 @@ sub htmlDiagram {
     # HTML erzeugen
 
     my $parameterName = $par->title;
-    my $zName = $par->zName;
+    my $zName = $par->zName // '';
     my $color = $par->color;
 
     return
@@ -1019,7 +1051,7 @@ sub htmlDiagram {
                      class => 'rangeslider',
                      option => 1,
                      value => 0,
-                     style => 'vertical-align: middle',
+                     # style => 'vertical-align: middle',
                      title => 'Toggle visibility of range slider',
                      onClick => "$name.toggleRangeSliders('$name',this)",
                 ).
@@ -1054,7 +1086,7 @@ sub htmlDiagram {
                         }
                         else if (shape == '$zName') {
                             let z = $name.getZArray($i);
-                            console.log(z);
+                            // console.log(z);
                             Plotly.restyle('$name-d$i',{
                                 mode: 'markers',
                                 marker: {
@@ -1068,39 +1100,48 @@ sub htmlDiagram {
                     title => 'Connect data points with straight lines,'.
                         ' splines or show markers',
                 ).
-                ' | FillArea:'.Quiq::Html::Widget::CheckBox->html($h,
-                     id =>  "$name-f$i",
-                     option => 1,
-                     value => 1,
-                     style => 'vertical-align: middle',
-                     title => 'Toggle colored area above or below graph',
-                     onClick => qq~
-                        let fill = this.checked? 'tozeroy': 'none';
-                        Plotly.restyle('$name-d$i',{
-                            'fill': fill,
-                        });
-                     ~,
-                ).
-                ' | '.Quiq::Html::Widget::Button->html($h,
-                    id => "$name-y$i",
-                    content => 'Scale Y Axis',
-                    onClick => sprintf("%s.rescaleY('%s',%s,%s)",
-                        $name,"$name-d$i",$par->yMin,$par->yMax),
-                    title => 'Rescale Y axis according to visible data or'.
-                        ' original state',
-                ).
-                ' | '.Quiq::Html::Widget::Button->html($h,
-                    content => 'Download as PNG',
-                    onClick => qq~
-                        let plot = \$('#$name-d$i');
-                        Plotly.downloadImage(plot[0],{
-                            format: 'png',
-                            width: plot.width(),
-                            height: plot.height(),
-                            filename: '$parameterName',
-                        });
-                    ~,
-                    title => 'Download plot graphic as PNG',
+                (
+                    !$self->fillArea? '':
+                        ' | FillArea:'.Quiq::Html::Widget::CheckBox->html(
+                             $h,
+                             id =>  "$name-f$i",
+                             option => 1,
+                             value => 1,
+                             style => 'vertical-align: middle',
+                             title => 'Toggle colored area above or below'.
+                                 ' graph',
+                             onClick => qq~
+                                let fill = this.checked? 'tozeroy': 'none';
+                                Plotly.restyle('$name-d$i',{
+                                    'fill': fill,
+                                });
+                             ~,
+                        )
+                ).(
+                    !$self->scaleY? '':
+                        ' | '.Quiq::Html::Widget::Button->html($h,
+                            id => "$name-y$i",
+                            content => 'Scale Y Axis',
+                            onClick => sprintf("%s.rescaleY('%s',%s,%s)",
+                                $name,"$name-d$i",$par->yMin,$par->yMax),
+                            title => 'Rescale Y axis according to visible'.
+                                ' data or original state',
+                        )
+                ).(
+                    !$self->downloadPng? '':
+                        ' | '.Quiq::Html::Widget::Button->html($h,
+                            content => 'Download as PNG',
+                            onClick => qq~
+                                let plot = \$('#$name-d$i');
+                                Plotly.downloadImage(plot[0],{
+                                    format: 'png',
+                                    width: plot.width(),
+                                    height: plot.height(),
+                                    filename: '$parameterName',
+                                });
+                            ~,
+                            title => 'Download plot graphic as PNG',
+                        )
                 ).
                 $h->tag('div',
                    id =>  "$name-c$i",
@@ -1175,14 +1216,16 @@ sub jsDiagram {
     if ($url) {
         return sprintf("$name.generatePlot('%s',%s,'%s','%s',%s,'%s','%s'".
                 ",'%s',%s,%s,%s,'%s','%s');\n",
-            $name,$i,$par->title,$par->yTitle,$j->encode($par->yTitleColor),
+            $name,$i,$par->title,$par->yTitle//'',
+            $j->encode($par->yTitleColor),
             $par->color,$xMin,$xMax,$yMin,$yMax,$showRangeSlider,$shape,$url);
     }
     else {
         # mit x,y,z
         return sprintf("$name.generatePlot('%s',%s,'%s','%s',%s,'%s','%s'".
                 ",'%s',%s,%s,%s,'%s','',%s,%s,%s);\n",
-            $name,$i,$par->title,$par->yTitle,$j->encode($par->yTitleColor),
+            $name,$i,$par->title,$par->yTitle//'',
+            $j->encode($par->yTitleColor),
             $par->color,$xMin,$xMax,$yMin,$yMax,$showRangeSlider,$shape,
             scalar($j->encode($par->x)),scalar($j->encode($par->y)),
             scalar($j->encode($par->z)));
@@ -1193,7 +1236,7 @@ sub jsDiagram {
 
 =head1 VERSION
 
-1.199
+1.200
 
 =head1 AUTHOR
 

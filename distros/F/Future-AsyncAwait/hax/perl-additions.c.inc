@@ -1,9 +1,5 @@
 /* vi: set ft=c : */
 
-#ifndef av_count
-#  define av_count(av)           (AvFILL(av) + 1)
-#endif
-
 #if HAVE_PERL_VERSION(5, 22, 0)
 #  define PadnameIsNULL(pn)  (!(pn))
 #else
@@ -28,16 +24,6 @@ static char *S_save_strndup(pTHX_ char *s, STRLEN l)
   char *ret = savepvn(s, l);
   SAVEFREEPV(ret);
   return ret;
-}
-
-#define sv_setrv(s, r)  S_sv_setrv(aTHX_ s, r)
-static void S_sv_setrv(pTHX_ SV *sv, SV *rv)
-{
-  sv_setiv(sv, (IV)rv);
-#if !HAVE_PERL_VERSION(5, 24, 0)
-  SvIOK_off(sv);
-#endif
-  SvROK_on(sv);
 }
 
 static char *PL_savetype_name[] PERL_UNUSED_DECL = {
@@ -186,7 +172,8 @@ static void S_ensure_module_version(pTHX_ SV *module, SV *version)
   LEAVE;
 }
 
-#define fetch_superclass_method_pv(stash, pv, len, level)  S_fetch_superclass_method_pv(aTHX_ stash, pv, len, level)
+#if HAVE_PERL_VERSION(5, 16, 0)
+#  define fetch_superclass_method_pv(stash, pv, len, level)  S_fetch_superclass_method_pv(aTHX_ stash, pv, len, level)
 static CV *S_fetch_superclass_method_pv(pTHX_ HV *stash, const char *pv, STRLEN len, U32 level)
 {
 #if HAVE_PERL_VERSION(5, 18, 0)
@@ -205,6 +192,7 @@ static CV *S_fetch_superclass_method_pv(pTHX_ HV *stash, const char *pv, STRLEN 
     return NULL;
   return GvCV(gv);
 }
+#endif
 
 #define get_class_isa(stash)  S_get_class_isa(aTHX_ stash)
 static AV *S_get_class_isa(pTHX_ HV *stash)
@@ -246,7 +234,8 @@ static bool MY_lex_consume_unichar(pTHX_ U32 c)
   return TRUE;
 }
 
-#define sv_derived_from_hv(sv, hv)  MY_sv_derived_from_hv(aTHX_ sv, hv)
+#if HAVE_PERL_VERSION(5, 16, 0)
+#  define sv_derived_from_hv(sv, hv)  MY_sv_derived_from_hv(aTHX_ sv, hv)
 static bool MY_sv_derived_from_hv(pTHX_ SV *sv, HV *hv)
 {
   char *hvname = HvNAME(hv);
@@ -254,4 +243,22 @@ static bool MY_sv_derived_from_hv(pTHX_ SV *sv, HV *hv)
     return FALSE;
 
   return sv_derived_from_pvn(sv, hvname, HvNAMELEN(hv), HvNAMEUTF8(hv) ? SVf_UTF8 : 0);
+}
+#endif
+
+#define av_push_from_av_inc(dst, src)    S_av_push_from_av(aTHX_ dst, src, TRUE)
+#define av_push_from_av_noinc(dst, src)  S_av_push_from_av(aTHX_ dst, src, FALSE)
+static void S_av_push_from_av(pTHX_ AV *dst, AV *src, bool refcnt_inc)
+{
+  SSize_t count = av_count(src);
+  SSize_t i;
+
+  av_extend(dst, av_count(dst) + count - 1);
+
+  SV **vals = AvARRAY(src);
+
+  for(i = 0; i < count; i++) {
+    SV *sv = vals[i];
+    av_push(dst, refcnt_inc ? SvREFCNT_inc(sv) : sv);
+  }
 }

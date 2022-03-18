@@ -27,6 +27,7 @@ ansicolumn [options] [file ...]
     -R#                  right adjust table columns
 
     -P[#]                page mode, with optional page length
+    -U[#]                show in N-up format (-WC# --linestyle=wrap)
     -D                   document mode
     -C#                  number of panes
     -S#                  pane width
@@ -56,7 +57,7 @@ ansicolumn [options] [file ...]
 
 =head1 VERSION
 
-Version 1.16
+Version 1.17
 
 =head1 DESCRIPTION
 
@@ -128,6 +129,12 @@ Page mode.  Set these options.
 If optional number is given, it is used as a page height unless option
 B<--height> exists.  Otherwise page height is set to terminal height
 minus one.
+
+=item B<-U>#, B<--up>=#
+
+Show in N-up format.  This option set B<--pane=#> with B<--widen> and
+B<--linestyle=wrap> options.  This is convenient when you want
+multi-column output without page mode.
 
 =item B<-D>, B<--document>
 
@@ -392,7 +399,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright 2020-2021 Kazumasa Utashiro.
+Copyright 2020-2022 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

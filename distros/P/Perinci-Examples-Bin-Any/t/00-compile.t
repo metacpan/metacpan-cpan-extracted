@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 15 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 18 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Perinci/Examples/Bin/Any.pm',
@@ -26,7 +26,10 @@ my @scripts = (
     'script/peri-eg-gen-random-bytes-any',
     'script/peri-eg-multi-any',
     'script/peri-eg-multi-embedded-any',
-    'script/peri-eg-single-embedded-any'
+    'script/peri-eg-single-embedded-any',
+    'script/peri-eg-table-aoaos-any',
+    'script/peri-eg-table-aohos-any',
+    'script/peri-eg-table-sales-any'
 );
 
 # no fake home requested

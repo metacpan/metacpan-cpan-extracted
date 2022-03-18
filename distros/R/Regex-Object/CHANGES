@@ -1,3 +1,6 @@
+1.25     2022-03-18 17:09:54 Europe/Moscow
+       - Fixed bug with built-in $MATCH
+
 1.24     2022-01-16 10:59:29 Europe/Moscow
        - Minor inner refactoring
 

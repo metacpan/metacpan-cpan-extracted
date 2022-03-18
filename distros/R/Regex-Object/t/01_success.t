@@ -16,7 +16,7 @@ $re = Regex::Object->new(
 );
 
 ## TEST 1
-# Test success match
+# Test success match.
 
 $expected = 1;
 $result = $re->match('word ')->success;
@@ -29,7 +29,7 @@ ok($result == $expected,
 );
 
 ## TEST 2
-# Test failed match
+# Test failed match.
 
 $expected = 0;
 $result = $re->match('word')->success;

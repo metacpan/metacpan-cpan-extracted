@@ -1,0 +1,436 @@
+PERL_DL_NONLAZY=1 /usr/bin/perl "-MExtUtils::Command::MM" "-e" "test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+t/Audio-FindChunks....dubious
+	Test returned status 0 (wstat 11, 0xb)
+DIED. FAILED tests 4-32
+	Failed 29/32 tests, 9.38% okay
+t/zzz_debug-crash.....# reporting ./Makefile header:
+# ==========================
+#     ABSTRACT_FROM => q[FindChunks.pm]
+#     AUTHOR => q[Ilya Zakharevich <cpan@ilyaz.org>]
+#     DEFINE => q[ -DNATIVE_LE_SHORTS]
+#     INC => q[-I.]
+#     LIBS => [q[]]
+#     NAME => q[Audio::FindChunks]
+#     OBJECT => q[$(O_FILES)]
+#     PREREQ_PM => { Data::Flow=>q[0.09] }
+#     VERSION_FROM => q[FindChunks.pm]
+#     clean => { FILES=>q[*.tmp tmp.*] }
+# ==========================
+Checking if your kit is complete...
+Looks good
+Writing Makefile for Audio::FindChunks
+make[1]: Entering directory `/tmp/Audio-FindChunks-1.04/dbg-bld'
+cp FindChunks.pm blib/lib/Audio/FindChunks.pm
+/usr/bin/perl /usr/lib/perl5/5.8.8/ExtUtils/xsubpp  -typemap /usr/lib/perl5/5.8.8/ExtUtils/typemap -typemap typemap  FindChunks.xs > FindChunks.xsc && mv FindChunks.xsc FindChunks.c
+gcc -c  -I. -D_REENTRANT -D_GNU_SOURCE -fno-strict-aliasing -pipe -Wdeclaration-after-statement -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -I/usr/include/gdbm -g   -DVERSION=\"1.04\" -DXS_VERSION=\"1.04\" -fPIC "-I/usr/lib/perl5/5.8.8/i386-linux-thread-multi/CORE"  -DNATIVE_LE_SHORTS FindChunks.c
+In file included from FindChunks.xs:5:
+ppport.h:230:1: warning: "PERL_UNUSED_DECL" redefined
+In file included from FindChunks.xs:2:
+/usr/lib/perl5/5.8.8/i386-linux-thread-multi/CORE/perl.h:163:1: warning: this is the location of the previous definition
+gcc -c  -I. -D_REENTRANT -D_GNU_SOURCE -fno-strict-aliasing -pipe -Wdeclaration-after-statement -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -I/usr/include/gdbm -g   -DVERSION=\"1.04\" -DXS_VERSION=\"1.04\" -fPIC "-I/usr/lib/perl5/5.8.8/i386-linux-thread-multi/CORE"  -DNATIVE_LE_SHORTS wavestats.c
+Running Mkbootstrap for Audio::FindChunks ()
+chmod 644 FindChunks.bs
+rm -f blib/arch/auto/Audio/FindChunks/FindChunks.so
+gcc  -shared -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector --param=ssp-buffer-size=4 -m32 -march=i386 -mtune=generic -fasynchronous-unwind-tables -L/usr/local/lib FindChunks.o wavestats.o  -o blib/arch/auto/Audio/FindChunks/FindChunks.so 	\
+	     	\
+	  
+chmod 755 blib/arch/auto/Audio/FindChunks/FindChunks.so
+cp FindChunks.bs blib/arch/auto/Audio/FindChunks/FindChunks.bs
+chmod 644 blib/arch/auto/Audio/FindChunks/FindChunks.bs
+Manifying blib/man3/Audio::FindChunks.3pm
+make[1]: Leaving directory `/tmp/Audio-FindChunks-1.04/dbg-bld'
+[Thread debugging using libthread_db enabled]
+1..32
+# Running under perl version 5.008008 for linux
+# Current time local: Thu Aug 26 20:49:41 2010
+# Current time GMT:   Fri Aug 27 03:49:41 2010
+# Using Test.pm version 1.25
+ok 1
+ok 2
+ok 3
+
+Program received signal SIGSEGV, Segmentation fault.
+0x00a3f0ef in le_short_sample_stats (buf=0x81aa1bc "\b", stride=4, 
+    samples=1792, stat=0x81a2d48) at wavestats.c:13
+13		buf[100000000] = 1;
+
+=====================================
+
+#0  0x00a3f0ef in le_short_sample_stats (buf=0x81aa1bc "\b", stride=4, 
+    samples=1792, stat=0x81a2d48) at wavestats.c:13
+#1  0x00a3e199 in XS_Audio__FindChunks_le_short_sample_stats (
+    my_perl=0x804c008, cv=0x805f4a8) at FindChunks.c:166
+#2  0x0067f51d in Perl_pp_entersub ()
+   from /usr/lib/perl5/5.8.8/i386-linux-thread-multi/CORE/libperl.so
+#3  0x0067898f in Perl_runops_standard ()
+   from /usr/lib/perl5/5.8.8/i386-linux-thread-multi/CORE/libperl.so
+#4  0x0061e20e in perl_run ()
+   from /usr/lib/perl5/5.8.8/i386-linux-thread-multi/CORE/libperl.so
+#5  0x0804921e in main ()
+
+=====================================
+
+eax            0xe1082bc	235963068
+ecx            0x81a2d48	135933256
+edx            0x81a2ffc	135933948
+ebx            0xa40c30	10751024
+esp            0xbfffe208	0xbfffe208
+ebp            0xbfffe218	0xbfffe218
+esi            0x81a3014	135933972
+edi            0x805f73c	134608700
+eip            0xa3f0ef	0xa3f0ef <le_short_sample_stats+35>
+eflags         0x210202	[ IF RF ID ]
+cs             0x73	115
+ss             0x7b	123
+ds             0x7b	123
+es             0x7b	123
+fs             0x0	0
+gs             0x33	51
+st0            0	(raw 0x00000000000000000000)
+st1            0	(raw 0x00000000000000000000)
+st2            0	(raw 0x00000000000000000000)
+st3            0	(raw 0x00000000000000000000)
+st4            9	(raw 0x40029000000000000000)
+st5            4	(raw 0x40018000000000000000)
+st6            1	(raw 0x3fff8000000000000000)
+st7            0	(raw 0x00000000000000000000)
+fctrl          0x37f	895
+fstat          0x120	288
+ftag           0xffff	65535
+fiseg          0x0	0
+fioff          0x0	0
+foseg          0x0	0
+fooff          0x0	0
+fop            0x0	0
+xmm0           {v4_float = {0x0, 0x0, 0x0, 0x0}, v2_double = {0x0, 0x0}, 
+  v16_int8 = {0x0 <repeats 16 times>}, v8_int16 = {0x0, 0x0, 0x0, 0x0, 0x0, 
+    0x0, 0x0, 0x0}, v4_int32 = {0x0, 0x0, 0x0, 0x0}, v2_int64 = {0x0, 0x0}, 
+  uint128 = 0x00000000000000000000000000000000}
+xmm1           {v4_float = {0x0, 0x0, 0x0, 0x0}, v2_double = {0x0, 0x0}, 
+  v16_int8 = {0x0 <repeats 16 times>}, v8_int16 = {0x0, 0x0, 0x0, 0x0, 0x0, 
+    0x0, 0x0, 0x0}, v4_int32 = {0x0, 0x0, 0x0, 0x0}, v2_int64 = {0x0, 0x0}, 
+  uint128 = 0x00000000000000000000000000000000}
+xmm2           {v4_float = {0x0, 0x0, 0x0, 0x0}, v2_double = {0x0, 0x0}, 
+  v16_int8 = {0x0 <repeats 16 times>}, v8_int16 = {0x0, 0x0, 0x0, 0x0, 0x0, 
+    0x0, 0x0, 0x0}, v4_int32 = {0x0, 0x0, 0x0, 0x0}, v2_int64 = {0x0, 0x0}, 
+  uint128 = 0x00000000000000000000000000000000}
+xmm3           {v4_float = {0x0, 0x0, 0x0, 0x0}, v2_double = {0x0, 0x0}, 
+  v16_int8 = {0x0 <repeats 16 times>}, v8_int16 = {0x0, 0x0, 0x0, 0x0, 0x0, 
+    0x0, 0x0, 0x0}, v4_int32 = {0x0, 0x0, 0x0, 0x0}, v2_int64 = {0x0, 0x0}, 
+  uint128 = 0x00000000000000000000000000000000}
+xmm4           {v4_float = {0x0, 0x0, 0x0, 0x0}, v2_double = {0x0, 0x0}, 
+  v16_int8 = {0x0 <repeats 16 times>}, v8_int16 = {0x0, 0x0, 0x0, 0x0, 0x0, 
+    0x0, 0x0, 0x0}, v4_int32 = {0x0, 0x0, 0x0, 0x0}, v2_int64 = {0x0, 0x0}, 
+  uint128 = 0x00000000000000000000000000000000}
+xmm5           {v4_float = {0x0, 0x0, 0x0, 0x0}, v2_double = {0x0, 0x0}, 
+  v16_int8 = {0x0 <repeats 16 times>}, v8_int16 = {0x0, 0x0, 0x0, 0x0, 0x0, 
+    0x0, 0x0, 0x0}, v4_int32 = {0x0, 0x0, 0x0, 0x0}, v2_int64 = {0x0, 0x0}, 
+  uint128 = 0x00000000000000000000000000000000}
+xmm6           {v4_float = {0x0, 0x0, 0x0, 0x0}, v2_double = {0x0, 0x0}, 
+  v16_int8 = {0x0 <repeats 16 times>}, v8_int16 = {0x0, 0x0, 0x0, 0x0, 0x0, 
+    0x0, 0x0, 0x0}, v4_int32 = {0x0, 0x0, 0x0, 0x0}, v2_int64 = {0x0, 0x0}, 
+  uint128 = 0x00000000000000000000000000000000}
+xmm7           {v4_float = {0x0, 0x0, 0x0, 0x0}, v2_double = {0x0, 0x0}, 
+  v16_int8 = {0x0 <repeats 16 times>}, v8_int16 = {0x0, 0x0, 0x0, 0x0, 0x0, 
+    0x0, 0x0, 0x0}, v4_int32 = {0x0, 0x0, 0x0, 0x0}, v2_int64 = {0x0, 0x0}, 
+  uint128 = 0x00000000000000000000000000000000}
+mxcsr          0x1f80	[ IM DM ZM OM UM PM ]
+mm0            {uint64 = 0x0, v2_int32 = {0x0, 0x0}, v4_int16 = {0x0, 0x0, 
+    0x0, 0x0}, v8_int8 = {0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}}
+mm1            {uint64 = 0x0, v2_int32 = {0x0, 0x0}, v4_int16 = {0x0, 0x0, 
+    0x0, 0x0}, v8_int8 = {0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}}
+mm2            {uint64 = 0x0, v2_int32 = {0x0, 0x0}, v4_int16 = {0x0, 0x0, 
+    0x0, 0x0}, v8_int8 = {0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}}
+mm3            {uint64 = 0x0, v2_int32 = {0x0, 0x0}, v4_int16 = {0x0, 0x0, 
+    0x0, 0x0}, v8_int8 = {0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}}
+mm4            {uint64 = 0x9000000000000000, v2_int32 = {0x0, 0x90000000}, 
+  v4_int16 = {0x0, 0x0, 0x0, 0x9000}, v8_int8 = {0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 
+    0x0, 0x90}}
+mm5            {uint64 = 0x8000000000000000, v2_int32 = {0x0, 0x80000000}, 
+  v4_int16 = {0x0, 0x0, 0x0, 0x8000}, v8_int8 = {0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 
+    0x0, 0x80}}
+mm6            {uint64 = 0x8000000000000000, v2_int32 = {0x0, 0x80000000}, 
+  v4_int16 = {0x0, 0x0, 0x0, 0x8000}, v8_int8 = {0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 
+    0x0, 0x80}}
+mm7            {uint64 = 0x0, v2_int32 = {0x0, 0x0}, v4_int16 = {0x0, 0x0, 
+    0x0, 0x0}, v8_int8 = {0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}}
+
+=====================================
+
+Dump of assembler code for function le_short_sample_stats:
+0x00a3f0cc <le_short_sample_stats+0>:	push   %ebp
+0x00a3f0cd <le_short_sample_stats+1>:	mov    %esp,%ebp
+0x00a3f0cf <le_short_sample_stats+3>:	sub    $0x10,%esp
+0x00a3f0d2 <le_short_sample_stats+6>:	movl   $0x0,-0xc(%ebp)
+0x00a3f0d9 <le_short_sample_stats+13>:	mov    0x8(%ebp),%eax
+0x00a3f0dc <le_short_sample_stats+16>:	mov    %eax,-0x8(%ebp)
+0x00a3f0df <le_short_sample_stats+19>:	jmp    0xa3f15c <le_short_sample_stats+144>
+0x00a3f0e1 <le_short_sample_stats+21>:	mov    0xc(%ebp),%eax
+0x00a3f0e4 <le_short_sample_stats+24>:	add    %eax,0x8(%ebp)
+0x00a3f0e7 <le_short_sample_stats+27>:	mov    0x8(%ebp),%eax
+0x00a3f0ea <le_short_sample_stats+30>:	add    $0x5f5e100,%eax
+0x00a3f0ef <le_short_sample_stats+35>:	movb   $0x1,(%eax)
+0x00a3f0f2 <le_short_sample_stats+38>:	mov    0x8(%ebp),%eax
+0x00a3f0f5 <le_short_sample_stats+41>:	movzwl (%eax),%eax
+0x00a3f0f8 <le_short_sample_stats+44>:	mov    %ax,-0x2(%ebp)
+0x00a3f0fc <le_short_sample_stats+48>:	movswl -0x2(%ebp),%edx
+0x00a3f100 <le_short_sample_stats+52>:	mov    0x14(%ebp),%eax
+0x00a3f103 <le_short_sample_stats+55>:	mov    0x10(%eax),%eax
+0x00a3f106 <le_short_sample_stats+58>:	cmp    %eax,%edx
+0x00a3f108 <le_short_sample_stats+60>:	jge    0xa3f114 <le_short_sample_stats+72>
+0x00a3f10a <le_short_sample_stats+62>:	movswl -0x2(%ebp),%edx
+0x00a3f10e <le_short_sample_stats+66>:	mov    0x14(%ebp),%eax
+0x00a3f111 <le_short_sample_stats+69>:	mov    %edx,0x10(%eax)
+0x00a3f114 <le_short_sample_stats+72>:	movswl -0x2(%ebp),%eax
+0x00a3f118 <le_short_sample_stats+76>:	mov    0x14(%ebp),%edx
+0x00a3f11b <le_short_sample_stats+79>:	mov    0x14(%edx),%edx
+0x00a3f11e <le_short_sample_stats+82>:	cmp    %edx,%eax
+0x00a3f120 <le_short_sample_stats+84>:	jle    0xa3f12c <le_short_sample_stats+96>
+0x00a3f122 <le_short_sample_stats+86>:	movswl -0x2(%ebp),%edx
+0x00a3f126 <le_short_sample_stats+90>:	mov    0x14(%ebp),%eax
+0x00a3f129 <le_short_sample_stats+93>:	mov    %edx,0x14(%eax)
+0x00a3f12c <le_short_sample_stats+96>:	mov    0x14(%ebp),%eax
+0x00a3f12f <le_short_sample_stats+99>:	fldl   0x8(%eax)
+0x00a3f132 <le_short_sample_stats+102>:	fild   -0x2(%ebp)
+0x00a3f135 <le_short_sample_stats+105>:	faddp  %st,%st(1)
+0x00a3f137 <le_short_sample_stats+107>:	mov    0x14(%ebp),%eax
+0x00a3f13a <le_short_sample_stats+110>:	fstpl  0x8(%eax)
+0x00a3f13d <le_short_sample_stats+113>:	mov    0x14(%ebp),%eax
+0x00a3f140 <le_short_sample_stats+116>:	fldl   (%eax)
+0x00a3f142 <le_short_sample_stats+118>:	movswl -0x2(%ebp),%edx
+0x00a3f146 <le_short_sample_stats+122>:	movswl -0x2(%ebp),%eax
+0x00a3f14a <le_short_sample_stats+126>:	imul   %edx,%eax
+0x00a3f14d <le_short_sample_stats+129>:	push   %eax
+0x00a3f14e <le_short_sample_stats+130>:	fildl  (%esp)
+0x00a3f151 <le_short_sample_stats+133>:	lea    0x4(%esp),%esp
+0x00a3f155 <le_short_sample_stats+137>:	faddp  %st,%st(1)
+0x00a3f157 <le_short_sample_stats+139>:	mov    0x14(%ebp),%eax
+0x00a3f15a <le_short_sample_stats+142>:	fstpl  (%eax)
+0x00a3f15c <le_short_sample_stats+144>:	addl   $0x1,-0xc(%ebp)
+0x00a3f160 <le_short_sample_stats+148>:	mov    -0xc(%ebp),%eax
+0x00a3f163 <le_short_sample_stats+151>:	cmp    0x10(%ebp),%eax
+0x00a3f166 <le_short_sample_stats+154>:	jle    0xa3f0e1 <le_short_sample_stats+21>
+0x00a3f16c <le_short_sample_stats+160>:	leave  
+0x00a3f16d <le_short_sample_stats+161>:	ret    
+End of assembler dump.
+
+=====================================
+
+#0  0x00a3f0ef in le_short_sample_stats (buf=0x81aa1bc "\b", stride=4, 
+    samples=1792, stat=0x81a2d48) at wavestats.c:13
+        elt = 2074
+        i = 1
+        ibuf = 0x81aa1b8 ""
+#1  0x00a3e199 in XS_Audio__FindChunks_le_short_sample_stats (
+    my_perl=0x804c008, cv=0x805f4a8) at FindChunks.c:166
+        buf = 0x81aa1b8 ""
+        stride = 4
+        samples = 1792
+        stat = 0x81a2d48
+        sp = 0x81a3014
+        ax = 6
+        mark = 0xe1082bc
+        items = 4
+#2  0x0067f51d in Perl_pp_entersub ()
+   from /usr/lib/perl5/5.8.8/i386-linux-thread-multi/CORE/libperl.so
+No symbol table info available.
+#3  0x0067898f in Perl_runops_standard ()
+   from /usr/lib/perl5/5.8.8/i386-linux-thread-multi/CORE/libperl.so
+No symbol table info available.
+#4  0x0061e20e in perl_run ()
+   from /usr/lib/perl5/5.8.8/i386-linux-thread-multi/CORE/libperl.so
+No symbol table info available.
+
+=====================================
+
+process 1622
+cmdline = '/usr/bin/perl'
+cwd = '/tmp/Audio-FindChunks-1.04/dbg-bld'
+exe = '/usr/bin/perl'
+Mapped address spaces:
+
+	Start Addr   End Addr       Size     Offset objfile
+	  0x154000   0x155000     0x1000   0x154000           [vdso]
+	  0x431000   0x44c000    0x1b000          0     /lib/ld-2.5.so
+	  0x44c000   0x44d000     0x1000    0x1a000     /lib/ld-2.5.so
+	  0x44d000   0x44e000     0x1000    0x1b000     /lib/ld-2.5.so
+	  0x450000   0x5a2000   0x152000          0     /lib/libc-2.5.so
+	  0x5a2000   0x5a4000     0x2000   0x152000     /lib/libc-2.5.so
+	  0x5a4000   0x5a5000     0x1000   0x154000     /lib/libc-2.5.so
+	  0x5a5000   0x5a8000     0x3000   0x5a5000        
+	  0x5aa000   0x5d1000    0x27000          0     /lib/libm-2.5.so
+	  0x5d1000   0x5d2000     0x1000    0x26000     /lib/libm-2.5.so
+	  0x5d2000   0x5d3000     0x1000    0x27000     /lib/libm-2.5.so
+	  0x5d5000   0x5d8000     0x3000          0     /lib/libdl-2.5.so
+	  0x5d8000   0x5d9000     0x1000     0x2000     /lib/libdl-2.5.so
+	  0x5d9000   0x5da000     0x1000     0x3000     /lib/libdl-2.5.so
+	  0x5dc000   0x5f1000    0x15000          0     /lib/libpthread-2.5.so
+	  0x5f1000   0x5f2000     0x1000    0x15000     /lib/libpthread-2.5.so
+	  0x5f2000   0x5f3000     0x1000    0x16000     /lib/libpthread-2.5.so
+	  0x5f3000   0x5f5000     0x2000   0x5f3000        
+	  0x5f7000   0x722000   0x12b000          0     /usr/lib/perl5/5.8.8/i386-linux-thread-multi/CORE/libperl.so
+	  0x722000   0x727000     0x5000   0x12a000     /usr/lib/perl5/5.8.8/i386-linux-thread-multi/CORE/libperl.so
+	  0x727000   0x729000     0x2000   0x727000        
+	  0xa3b000   0xa40000     0x5000          0      /tmp/Audio-FindChunks-1.04/dbg-bld/blib/arch/auto/Audio/FindChunks/FindChunks.so
+	  0xa40000   0xa41000     0x1000     0x4000      /tmp/Audio-FindChunks-1.04/dbg-bld/blib/arch/auto/Audio/FindChunks/FindChunks.so
+	  0xb80000   0xb82000     0x2000          0     /usr/lib/perl5/5.8.8/i386-linux-thread-multi/auto/Cwd/Cwd.so
+	  0xb82000   0xb83000     0x1000     0x1000     /usr/lib/perl5/5.8.8/i386-linux-thread-multi/auto/Cwd/Cwd.so
+	  0xd0c000   0xd21000    0x15000          0     /lib/libnsl-2.5.so
+	  0xd21000   0xd22000     0x1000    0x14000     /lib/libnsl-2.5.so
+	  0xd22000   0xd23000     0x1000    0x15000     /lib/libnsl-2.5.so
+	  0xd23000   0xd25000     0x2000   0xd23000        
+	  0xd38000   0xd48000    0x10000          0     /lib/libresolv-2.5.so
+	  0xd48000   0xd49000     0x1000     0xf000     /lib/libresolv-2.5.so
+	  0xd49000   0xd4a000     0x1000    0x10000     /lib/libresolv-2.5.so
+	  0xd4a000   0xd4c000     0x2000   0xd4a000        
+	  0xdda000   0xddc000     0x2000          0     /lib/libutil-2.5.so
+	  0xddc000   0xddd000     0x1000     0x1000     /lib/libutil-2.5.so
+	  0xddd000   0xdde000     0x1000     0x2000     /lib/libutil-2.5.so
+	 0x75bd000  0x75c6000     0x9000          0     /lib/libcrypt-2.5.so
+	 0x75c6000  0x75c7000     0x1000     0x8000     /lib/libcrypt-2.5.so
+	 0x75c7000  0x75c8000     0x1000     0x9000     /lib/libcrypt-2.5.so
+	 0x75c8000  0x75ef000    0x27000  0x75c8000        
+	 0x8048000  0x804b000     0x3000          0     /usr/bin/perl
+	 0x804b000  0x804c000     0x1000     0x2000     /usr/bin/perl
+	 0x804c000  0x81b6000   0x16a000  0x804c000           [heap]
+	0xb7d92000 0xb7db3000    0x21000 0xb7d92000        
+	0xb7db3000 0xb7db4000     0x1000  0x2e7e000     /usr/lib/locale/locale-archive
+	0xb7db4000 0xb7dba000     0x6000  0x103c000     /usr/lib/locale/locale-archive
+	0xb7dba000 0xb7dee000    0x34000   0xffe000     /usr/lib/locale/locale-archive
+	0xb7dee000 0xb7fee000   0x200000          0     /usr/lib/locale/locale-archive
+	0xb7fee000 0xb7ff1000     0x3000 0xb7fee000        
+	0xb7fff000 0xb8000000     0x1000 0xb7fff000        
+	0xbffea000 0xbffff000    0x15000 0xbffea000           [stack]
+
+=====================================
+
+Dump of assembler code for function le_short_sample_stats:
+6	{
+0x00a3f0cc <le_short_sample_stats+0>:	push   %ebp
+0x00a3f0cd <le_short_sample_stats+1>:	mov    %esp,%ebp
+0x00a3f0cf <le_short_sample_stats+3>:	sub    $0x10,%esp
+
+7	    long i = 0;
+0x00a3f0d2 <le_short_sample_stats+6>:	movl   $0x0,-0xc(%ebp)
+
+8	    char *ibuf = buf;
+0x00a3f0d9 <le_short_sample_stats+13>:	mov    0x8(%ebp),%eax
+0x00a3f0dc <le_short_sample_stats+16>:	mov    %eax,-0x8(%ebp)
+
+9	    while (++i <= samples) {
+0x00a3f0df <le_short_sample_stats+19>:	jmp    0xa3f15c <le_short_sample_stats+144>
+0x00a3f15c <le_short_sample_stats+144>:	addl   $0x1,-0xc(%ebp)
+0x00a3f160 <le_short_sample_stats+148>:	mov    -0xc(%ebp),%eax
+0x00a3f163 <le_short_sample_stats+151>:	cmp    0x10(%ebp),%eax
+0x00a3f166 <le_short_sample_stats+154>:	jle    0xa3f0e1 <le_short_sample_stats+21>
+
+10		short elt;
+11	
+12		buf += stride;
+0x00a3f0e1 <le_short_sample_stats+21>:	mov    0xc(%ebp),%eax
+0x00a3f0e4 <le_short_sample_stats+24>:	add    %eax,0x8(%ebp)
+
+13		buf[100000000] = 1;
+0x00a3f0e7 <le_short_sample_stats+27>:	mov    0x8(%ebp),%eax
+0x00a3f0ea <le_short_sample_stats+30>:	add    $0x5f5e100,%eax
+0x00a3f0ef <le_short_sample_stats+35>:	movb   $0x1,(%eax)
+
+14	#if NATIVE_LE_SHORTS
+15	#  define NAT 1
+16		elt = *(short*)buf;
+0x00a3f0f2 <le_short_sample_stats+38>:	mov    0x8(%ebp),%eax
+0x00a3f0f5 <le_short_sample_stats+41>:	movzwl (%eax),%eax
+0x00a3f0f8 <le_short_sample_stats+44>:	mov    %ax,-0x2(%ebp)
+
+17	#else
+18	#  define NAT 0
+19		{
+20		    unsigned int u = *(unsigned char*)buf;
+21		    u += (*(unsigned char*)(buf+1))<<8;
+22		    if (u >= 0x8000)
+23			elt = u - 0x10000;
+24		    else
+25			elt = u;
+26		}
+27	#endif
+28	#if WAVESTATS_DEBUG
+29		if (elt > 40 && buf >= ibuf + 4) {
+30		    char b[512];
+31		    sprintf(b, "@%#lx: %d, NAT=%d; %#x %#x %#x %#x | %#x %#x %#x %#x\n",
+32			    (long)(buf - ibuf), (int)elt, NAT,
+33			    (int)buf[-4], (int)buf[-3], (int)buf[-2], (int)buf[-1],
+34			    (int)buf[0], (int)buf[1], (int)buf[2], (int)buf[3]);
+35		    write(2,b,strlen(b));
+36		}
+37	#endif
+38		if (elt < stat->min)
+0x00a3f0fc <le_short_sample_stats+48>:	movswl -0x2(%ebp),%edx
+0x00a3f100 <le_short_sample_stats+52>:	mov    0x14(%ebp),%eax
+0x00a3f103 <le_short_sample_stats+55>:	mov    0x10(%eax),%eax
+0x00a3f106 <le_short_sample_stats+58>:	cmp    %eax,%edx
+0x00a3f108 <le_short_sample_stats+60>:	jge    0xa3f114 <le_short_sample_stats+72>
+
+39		    stat->min = elt;
+0x00a3f10a <le_short_sample_stats+62>:	movswl -0x2(%ebp),%edx
+0x00a3f10e <le_short_sample_stats+66>:	mov    0x14(%ebp),%eax
+0x00a3f111 <le_short_sample_stats+69>:	mov    %edx,0x10(%eax)
+
+40		if (elt > stat->max)
+0x00a3f114 <le_short_sample_stats+72>:	movswl -0x2(%ebp),%eax
+0x00a3f118 <le_short_sample_stats+76>:	mov    0x14(%ebp),%edx
+0x00a3f11b <le_short_sample_stats+79>:	mov    0x14(%edx),%edx
+0x00a3f11e <le_short_sample_stats+82>:	cmp    %edx,%eax
+0x00a3f120 <le_short_sample_stats+84>:	jle    0xa3f12c <le_short_sample_stats+96>
+
+41		    stat->max = elt;
+0x00a3f122 <le_short_sample_stats+86>:	movswl -0x2(%ebp),%edx
+0x00a3f126 <le_short_sample_stats+90>:	mov    0x14(%ebp),%eax
+0x00a3f129 <le_short_sample_stats+93>:	mov    %edx,0x14(%eax)
+
+42		stat->sum += elt;
+0x00a3f12c <le_short_sample_stats+96>:	mov    0x14(%ebp),%eax
+0x00a3f12f <le_short_sample_stats+99>:	fldl   0x8(%eax)
+0x00a3f132 <le_short_sample_stats+102>:	fild   -0x2(%ebp)
+0x00a3f135 <le_short_sample_stats+105>:	faddp  %st,%st(1)
+0x00a3f137 <le_short_sample_stats+107>:	mov    0x14(%ebp),%eax
+0x00a3f13a <le_short_sample_stats+110>:	fstpl  0x8(%eax)
+
+43		stat->sum_square += elt*elt;
+0x00a3f13d <le_short_sample_stats+113>:	mov    0x14(%ebp),%eax
+0x00a3f140 <le_short_sample_stats+116>:	fldl   (%eax)
+0x00a3f142 <le_short_sample_stats+118>:	movswl -0x2(%ebp),%edx
+0x00a3f146 <le_short_sample_stats+122>:	movswl -0x2(%ebp),%eax
+0x00a3f14a <le_short_sample_stats+126>:	imul   %edx,%eax
+0x00a3f14d <le_short_sample_stats+129>:	push   %eax
+0x00a3f14e <le_short_sample_stats+130>:	fildl  (%esp)
+0x00a3f151 <le_short_sample_stats+133>:	lea    0x4(%esp),%esp
+0x00a3f155 <le_short_sample_stats+137>:	faddp  %st,%st(1)
+0x00a3f157 <le_short_sample_stats+139>:	mov    0x14(%ebp),%eax
+0x00a3f15a <le_short_sample_stats+142>:	fstpl  (%eax)
+
+44	    }
+45	}
+0x00a3f16c <le_short_sample_stats+160>:	leave  
+0x00a3f16d <le_short_sample_stats+161>:	ret    
+
+End of assembler dump.
+A debugging session is active.
+
+	Inferior 1 [process 1622] will be killed.
+
+Quit anyway? (y or n) [answered Y; input not from terminal]
+GNU gdb (GDB) Red Hat Enterprise Linux (7.0.1-23.el5_5.2)
+Copyright (C) 2009 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "i386-redhat-linux-gnu".
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>.
+ok
+Failed Test          Stat Wstat Total Fail  Failed  List of Failed
+-------------------------------------------------------------------------------
+t/Audio-FindChunks.t    0    11    32   58 181.25%  4-32
+Failed 1/2 test scripts, 50.00% okay. 29/33 subtests failed, 12.12% okay.
+make: *** [test_dynamic] Error 255

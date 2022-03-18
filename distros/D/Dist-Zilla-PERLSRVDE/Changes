@@ -1,6 +1,10 @@
 Revision history for Dist::Zilla::PERLSRVDE
 ===========================================
 
+1.0.0  2022-03-18 07:00:00
+
+  * fix generated repository information
+
 0.0.3  2022-02-01 07:04:00
 
   * fix CPANTester failures (update dependency list)

@@ -4,7 +4,7 @@ Image::DecodeQR::WeChat - Decode QR code(s) from images using the OpenCV/WeChat 
 
 # VERSION
 
-Version 0.4
+Version 0.7
 
 # SYNOPSIS
 
@@ -12,8 +12,9 @@ This module provides a Perl interface to the OpenCV/WeChat QR code
 decoder via XS code.
 OpenCV/WeChat library uses CNN to do this with pre-trained models.
 
-This module has been tested with OpenCV v4.5.5 and Perl v5.32 on
-Linux.
+This module has been tested by myself with OpenCV v4.5.5 and Perl v5.32 on
+Linux. But check the CPANtesters matrix on the left for all the tests done
+on this module.
 
 The library is relatively successful even for rotated codes. It remains
 to be tested on the minimum size ofthe code images (60px in my case).
@@ -30,11 +31,11 @@ Here is some code to get you started:
         'an-input-image.png',
 
         # the dir with model parameters required by the library.
-        # These come with this package and are curtesy of WeChat
-        # which is part of OpenCV contrib packages
-        # They are installed with this package and their default location
+        # Model files come with this Perl module and are curtesy of WeChat
+        # which is part of OpenCV contrib packages.
+        # They are installed with this module and their default location
         # is given by Image::DecodeQR::WeChat::modelsdir()
-        # Alternatively, specify your own model files:
+        # Alternatively, you specify here your own model files:
         Image::DecodeQR::WeChat::modelsdir(),
 
         # outbase for all output files, optional
@@ -155,13 +156,13 @@ It returns an empty ARRAYref (i.e. a ref to an empty array)
 if no QR codes were found or decoded successfully.
 
 These are the parameters it requires. They must all be present, with
-optinal parameters allowed to be `undef`:
+optional parameters allowed to be `undef`:
 
 - `infile` : the input image with zero or more QR codes.
 All the image formats of OpenCV's [imread()](https://docs.opencv.org/4.5.5/d4/da8/group__imgcodecs.html)
 are supported.
 - `modelsdir` : the location of the directory holding all model files (CNN trained models)
-required for QR code detection. These models are already included with this package and will be
+required for QR code detection. These models are already included with this Perl module and will be
 installed in a shared dir during installation. Their total size is about 1MB.
 They have been kindly contributed by WeChat along with their library for QR Code detection.
 They can be found [https://github.com/WeChatCV/opencv\_3rdparty|here](https://github.com/WeChatCV/opencv_3rdparty|here). The installed
@@ -178,7 +179,9 @@ a file. As usual all detected codes' data is returned back via the returned
 value of [decode\_xs()](https://metacpan.org/pod/decode_xs%28%29).
 - ` verbosity ` levels: 0 is mute, 1 is only for C code, 10 is for C+XS code.
 - ` graphicaldisplayresult` : if set to 1, it will display a window with the input image
-and the detected QR-code(s) outlined.
+and the detected QR-code(s) outlined. This
+is subject to whether current OpenCV installation was compiled to support
+` imshow() ` (with C < highgui > enabled).
 - `dumpqrimagestofile` : if set to 0, and `outbase` is specified, then all payloads
 are written to a single file using the basename specified. If set to 1 a lot more information
 is written to separate files, one for each detected code. This is mainly for debugging purposes
@@ -187,12 +190,14 @@ boxes. See `outbase` above.
 
 ### ` decode(\%params) `
 
-This is a Perl wrapper to the `decode_xs()` so that user can specify
-only a minimal set of parameters and the will be filled in by defaults.
+This is a Perl wrapper to the `decode_xs()` and allows a user to specify
+only a minimal set of parameters with the rest to be filled in by defaults.
 
-Like [decode\_xs()](https://metacpan.org/pod/decode_xs%28%29), it returns undef on failure.
+Like [decode\_xs()](https://metacpan.org/pod/decode_xs%28%29), it returns undef on failure. Or an arrayref of
+two arrays. The `payloads` array and the `bounding-boxes` array.
+Each has a number of items equal to the QR codes detected.
 
-It returns an empty ARRAYref (i.e. a ref to an empty array)
+An ARRAYref of two empty arrays will be returned
 if no QR codes were found or decoded successfully.
 
 The ` params ` hashref:
@@ -201,23 +206,28 @@ The ` params ` hashref:
 - `outbase` : optional, if specified payloads (QR-code text) will be dumped to a text file.
 If further, `dumpqrimagestofile` is set to 1 then image files with the detected QR-codes will
 be dumped one for each QR-code as well as text files with payloads and bounding boxes wrt the
-input imaghe.
+input image.
 - `modelsdir` : optional, use it only if you want to use your own model files (for their
 format have a look at [https://docs.opencv.org/4.x/d5/d04/classcv\_1\_1wechat\_\_qrcode\_1\_1WeChatQRCode.html](https://docs.opencv.org/4.x/d5/d04/classcv_1_1wechat__qrcode_1_1WeChatQRCode.html), they are CNN training files).
-This package has included the model files kindly submitted by WeChat as a contribution to OpenCV
+This Perl module has included the model files kindly submitted by WeChat as a contribution to OpenCV
 and will be installed in your system with all other files. Use `modelsdir()` to see the location
 of installed model files. Their total size is about 1MB.
 - `verbosity` : default is 0 which is muted. 1 is for verbose C code and 10 is for verbose C and XS code.
 - `dumpqrimagestofile` : default is 0, set to 1 to have lots of image and text files dumped (relative to `outbase`)
 for each QR code detected.
 - `graphicaldisplayresult` : default is 0, set to 1 to have a window popping up with the input image
-and the QR-code detected highlighted, once for each code detected.
+and the QR-code detected highlighted, once for each code detected. This
+is subject to whether current OpenCV installation was compiled to support
+` imshow() ` (with C < highgui > enabled).
 
 ### ` modelsdir() `
 
-It returns the path where the models included in this package have been installed.
+It returns the path where the models included in this Perl module
+have been installed.
 This is useful when you want to use `decode_xs()` and need to specify
-the `modelsdir`. Just pass the output of this to `decode_xs()` as its `modelsdir` parameter.
+the `modelsdir`.
+Just pass the output of this to `decode_xs()` as its `modelsdir` parameter.
+However, you can not set the location of your own modelsdir using ` modelsdir() `.
 
 ### ` opencv_has_highgui_xs() `
 
@@ -227,7 +237,7 @@ affects the option `graphicaldisplayresult` to [decode()](https://metacpan.org/p
 which will be ignored if there is no highgui support.
 
 Caveat: checking for whether current OpenCV installation has highgui
-support is very lame, it merely tries to find the include file `opencv2/highgui.hpp`
+support is currently very lame, it merely tries to find the include file `opencv2/highgui.hpp`
 in the Include dirs. I have tried several methods (see \`\`\`Makefile.PL\`\`\`), for
 example [DynaLoader](https://metacpan.org/pod/DynaLoader) or [FFI::CheckLib](https://metacpan.org/pod/FFI%3A%3ACheckLib) can search for symbols in any library
 (e.g. searching for `imshow()` in `libopencv_highgui` or  `libopencv_world`).
@@ -304,7 +314,7 @@ OpenCV from sources. This is the procedure I followed:
 `cmake-gui` and `ccmake`. The former is a full-gui interface
 to setting the billion `cmake` variables. Use it
 if you are on a machine which offers a GUI: `cmake-gui ..`
- . If you are on a headless or remote host possibly over telnet or ssh
+If you are on a headless or remote host possibly over telnet or ssh
 then do not despair because c&lt;ccmake> is the CLI, curses-based
 equivalent to `cmake-gui`,  use it like: `ccmake ..` (from within the build dir).
 - Once on either of the cmake GUIs, first do a
@@ -327,12 +337,11 @@ during the above.
 host and on a headless remote host with no GPU or basic. CUDA is
 not required for building this module.
 
-    Your mileage may vary.
+Your mileage may vary.
 
-    If you are seriously in need of installing
-    this module then consider migrating to a serious operating system
-    such as Linux first. M$-Windows will always present problems and
-    I don't have the patience of keeping track of them ...
+If you are seriously in need of installing
+this module then consider migrating to a serious operating system
+such as Linux as your first action.
 
 # AUTHOR
 

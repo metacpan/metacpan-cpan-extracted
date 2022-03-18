@@ -18,7 +18,6 @@ benchmark/modifier_bench.pl
 benchmark/modify_bench.pl
 benchmark/number_bench.pl
 benchmark/ref_bench.pl
-circle.yml
 cpanfile
 example/curry.pl
 example/export_lexical.pl

@@ -9,16 +9,18 @@ sub _build_content_text {
     my ($self) = @_;
 
     # Remove the in-article ad.
-    $self->dom->find("#contentb p > a[href^='https://bit.ly/']")->grep(
+    $self->dom->find("div.raw-style > content-ad > p")->grep(
         sub {
-            ($_->parent->children->size == 1)
-            && ($_->text =~ m/^★/)
-        })->map('remove');
+            ($_->child_nodes->size > 2)
+                && ($_->children("a")->size >= 2)
+        }
+    )->map('remove');
 
-    # Remove recommendations at the end of the article body.
-    $self->dom->at("#contentb div.raw-style > span:nth-child(1)")->following_nodes()->map('remove');
+    my $text = $self->SUPER::_build_content_text();
 
-    return $self->SUPER::_build_content_text();
+    $text =~ s/\n\n【往下看更多】.+\z//s;
+
+    return $text;
 }
 
 sub journalist {

@@ -1,5 +1,14 @@
 Revision history for Bible::OBML
 
+2.03      2022-03-17 10:35:37-07:00 America/Los_Angeles
+        - Fix to support Perl down to version 20
+
+2.02      2022-03-16 20:36:24-07:00 America/Los_Angeles
+        - Minor documentation fixes
+
+2.01      2022-03-16 20:19:47-07:00 America/Los_Angeles
+        - Overhaul the entire module to be a bit smarter and more robust
+
 1.18      2022-02-11 14:36:38-08:00 America/Los_Angeles
         - Remove superfluous spaces around CRs and FNs
 

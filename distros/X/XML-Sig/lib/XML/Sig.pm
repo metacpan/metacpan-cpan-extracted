@@ -10,7 +10,7 @@ use Encode;
 use vars qw($VERSION @EXPORT_OK %EXPORT_TAGS $DEBUG);
 
 $DEBUG = 0;
-our $VERSION = '0.55';
+our $VERSION = '0.56';
 
 use base qw(Class::Accessor);
 XML::Sig->mk_accessors(qw(key));
@@ -1653,7 +1653,7 @@ XML::Sig - XML::Sig - A toolkit to help sign and verify XML Digital Signatures
 
 =head1 VERSION
 
-version 0.55
+version 0.56
 
 =head1 SYNOPSIS
 
@@ -1988,7 +1988,7 @@ Timothy Legge <timlegge@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Byrne Reese, Chris Andrews and Others; in detail:
+This software is copyright (c) 2022 by Byrne Reese, Chris Andrews and Others; in detail:
 
   Copyright 2009       Byrne, Michael Hendricks
             2010       Chris Andrews

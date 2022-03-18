@@ -22,10 +22,6 @@ has success => (
     is => 'rwp',
 );
 
-sub BUILD($self, $) {
-    $self->_set_success(defined $self->match);
-}
-
 1;
 
 __END__

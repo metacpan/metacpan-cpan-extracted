@@ -8,7 +8,7 @@ package Devel::MAT::Dumper;
 use strict;
 use warnings;
 
-our $VERSION = '0.43';
+our $VERSION = '0.44';
 
 use File::Basename qw( basename );
 use File::Spec;

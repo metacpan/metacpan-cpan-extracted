@@ -5,473 +5,322 @@ use 5.020;
 
 use exact;
 use exact::class;
-use Text::Balanced qw( extract_delimited extract_bracketed );
+use Mojo::DOM;
+use Mojo::Util 'html_unescape';
 use Text::Wrap 'wrap';
-use Bible::Reference 1.05;
-use Clone 'clone';
+use Bible::Reference;
 
-our $VERSION = '1.18'; # VERSION
+our $VERSION = '2.03'; # VERSION
 
-has bible    => 'Protestant';
-has acronyms => 1;
-has refs     => 'as_books';
-has html     => sub {
-    require Bible::OBML::HTML;
-    Bible::OBML::HTML->new( obml => shift );
-};
+has _load             => {};
+has indent_width      => 4;
+has reference_acronym => 0;
+has fnxref_acronym    => 1;
+has wrap_at           => 80;
+has wrap_lines        => 1;
+has wrap_indents      => 0;
+has reference         => Bible::Reference->new(
+    bible   => 'Protestant',
+    sorting => 1,
+);
 
-has _reference => sub { Bible::Reference->new( acronyms => 1 ) };
+sub __ocd_tree ($node) {
+    my $new_node;
 
-sub new {
-    my ( $self, @params ) = @_;
-    $self = $self->SUPER::new(@params);
+    if ( 'tag' eq shift @$node ) {
+        $new_node->{tag} = shift @$node;
 
-    $self->_reference->bible( $self->bible );
-    $self->_reference->acronyms( $self->acronyms );
+        my $attr = shift @$node;
+        $new_node->{attr} = $attr if (%$attr);
 
-    return $self;
-}
+        shift @$node;
 
-sub read_file {
-    my ( $self, $filename ) = @_;
-    open( my $file, '<', $filename ) or croak "Unable to read file $filename; $!";
-    return join( '', <$file> );
-}
-
-sub write_file {
-    my ( $self, $filename, $content ) = @_;
-    open( my $file, '>', $filename ) or croak "Unable to write file $filename; $!";
-    print $file $content;
-    return;
-}
-
-sub parse {
-    my ( $self, $content ) = @_;
-    # remove comments
-    $content =~ s/^\s*#.*?(?>\r?\n)//msg;
-
-    # "unwrap" wrapped lines
-    $content =~ s/\n[ \t]+\n/\n\n/mg;
-    $content =~ s/\n[ ]{6,}(?=\S)/ "\n" . ( ' ' x 6 ) /mge;
-    $content =~ s/\n[ ]{3,5}(?=\S)/ "\n" . ( ' ' x 4 ) /mge;
-    $content =~ s/\n[ ]{1,2}(?=\S)/\n/mg;
-    $content =~ s/(?<=\N)[ ]*\n(?=\S)/ /mg;
-    my @content;
-    for my $line ( split( /\n/, $content ) ) {
-        unless (
-            @content and $content[-1] and
-            (
-                ( $content[-1] =~ /^[ ]{4}\S/ and $line =~ /^[ ]{4}\S/ ) or
-                ( $content[-1] =~ /^[ ]{6}\S/ and $line =~ /^[ ]{6}\S/ )
-            )
-        ) {
-            push( @content, $line );
-        }
-        else {
-            $line =~ s/^[ ]+//;
-            $content[-1] .= ' ' . $line;
-        }
+        my $children = [ grep { defined } map { __ocd_tree($_) } @$node ];
+        $new_node->{children} = $children if (@$children);
     }
-    $content = join( "\n", @content );
+    else {
+        $new_node->{text} = $node->[0] if ( $node->[0] ne "\n\n" );
+    }
 
-    # pull out the reference base
-    ( my $reference_base = ( $content =~ s/~([^~]+)~//ms ) ? $1 : '' ) =~ s/^\s+|\s+$//g;
+    return $new_node;
+}
 
-    # warn on any obvious errors
-    croak('Missing reference base marker') unless ($reference_base);
-    croak('Multiple reference base markers') if ( $content =~ /~[^~]+~/ms );
+sub __html_tree ($node) {
+    if ( $node->{tag} ) {
+        if ( $node->{children} ) {
+            my $attr = ( $node->{attr} )
+                ? ' ' . join( ' ', map { $_ . '="' . $node->{attr}{$_} . '"' } keys %{ $node->{attr} } )
+                : '';
 
-    # split out book and chapter; check book name for validity
-    my $book = $reference_base;
-    my $chapter = 1;
-    $chapter = $1 if ( $book =~ s/\s*(\d+)\s*$// );
-    croak(qq{Book "$book" unknown; must use canonical book name})
-        unless ( grep { $_ eq $book } $self->_reference->books );
-
-    # code to recursively for a given block or sub-block
-    my $parse_block;
-    $parse_block = sub {
-        my ($block_content) = @_;
-        my @parts;
-
-        if ( @parts = split( /(?:\s*\r?\n){2,}/, $block_content, 2 ) and @parts > 1 ) {
-            return grep { $_ }
-                $parse_block->( $parts[0] ),
-                ['paragraph'],
-                $parse_block->( $parts[1] );
-        }
-
-        if ( @parts = split( /(?:\s*\r?\n)/, $block_content, 2 ) and @parts > 1 ) {
-            my @parsed_parts = grep { $_ } map { $parse_block->($_) } @parts;
-
-            for ( my $i = 0; $i < $#parsed_parts; $i++ ) {
-                splice( @parsed_parts, $i + 1, 0, ['break'] ) if (
-                    ref( $parsed_parts[$i] ) and
-                    ref( $parsed_parts[ $i + 1 ] ) and
-                    (
-                        $parsed_parts[$i][0] =~ /^blockquote/ and
-                        $parsed_parts[ $i + 1 ][0] =~ /^blockquote/
-                    )
-                );
-            }
-
-            return @parsed_parts;
-        }
-
-        if ( $block_content =~ s/^(\s{2,})(?=\S)// ) {
-            my $size = length($1);
-            return [
-                ( ( $size == 4 ) ? 'blockquote' : 'blockquote_indent' ),
-                $parse_block->($block_content),
-            ];
-        }
-
-        for (
-            [ 'footnote', '[]' ],
-            [ 'crossreference', '{}' ],
-            [ 'red text', '*' ],
-            [ 'italic', '^' ],
-        ) {
-            my $method = ( length( $_->[1] ) == 1 ) ? \&extract_delimited : \&extract_bracketed;
-            my ( $bit, $remainder, $entry ) = $method->(
-                $block_content,
-                $_->[1],
-                '(?s).*?(?=\\' . substr( $_->[1], 0, 1 ) . ')',
-            );
-
-            if ($bit) {
-                $bit = substr( $bit, 1, length($bit) - 2 );
-                if ( $_->[0] eq 'crossreference' ) {
-                    my $refs = $self->refs;
-                    $bit = [ $self->_reference->clear->in($bit)->$refs ];
-                }
-
-                return grep { $_ }
-                    $parse_block->($entry),
-                    [ $_->[0], $parse_block->($bit) ],
-                    $parse_block->($remainder);
-            }
-        }
-
-        $block_content =~ s/\s{2,}/ /msg;
-        $block_content =~ s/^\s+|\s+$//msg;
-        return $block_content;
-    };
-
-    my ( @verses, $header_text );
-    my $space_cache = '';
-
-    # split up the content into verse-sized blocks
-    for my $block ( map { split(/(?=\=[^=]+\=)/) } split( /(?=[ ]*\|\d+\|)/, $content ) ) {
-        # record block end-of-line type
-        my $eol = ( $block =~ /\n{2,}$/ ) ? 'paragraph' : ( $block =~ /\n$/ ) ? 'break' : '';
-
-        # preserve leading spaces for a given block/verse line
-        next if ( not @verses and not $block =~ /\w/ );
-        unless ( $block =~ /\w/ ) {
-            $space_cache .= $block;
-            next;
-        }
-        $block = $space_cache . $block;
-        $space_cache = '';
-
-        # check for a header and store for later if exists
-        if ( $block =~ /\=\s*([^=]+?)\s*\=/ ) {
-            croak('Multiple back-to-back headers found') if ($header_text);
-            $header_text = [ $parse_block->($1) ];
-            next;
-        }
-
-        # find the verse number
-        my $verse_number = $1 if ( $block =~ s/\|\s*(\d+)\s*\|\s*// );
-        croak('Failed to find verse number') unless ($verse_number);
-
-        # parse the block into a verse data structure
-        my $verse = {
-            reference => {
-                book    => $book,
-                chapter => $chapter,
-                verse   => $verse_number,
-            },
-            content => [ $parse_block->($block) ],
-        };
-
-        # set the header in the verse data stucture if a header was found
-        if ($header_text) {
-            $verse->{header} = $header_text;
-            undef $header_text;
-        }
-
-        # if there's an unfinished blockquote from the previous verse,
-        # ensure it's copied into this verse...
-        if (
-            @verses and $verses[-1] and ref( $verses[-1]{content} ) and ref( $verses[-1]{content}[-1] ) and
-            (
-                $verses[-1]{content}[-1][0] eq 'blockquote' or
-                $verses[-1]{content}[-1][0] eq 'blockquote_indent'
-            ) and not ref( $verse->{content}[0] )
-        ) {
-            $verse->{content}[0] = [ $verses[-1]{content}[-1][0], $verse->{content}[0] ];
-
-            splice( @{ $verse->{content} }, 1, 0, ['break'] ) if (
-                $verse->{content}[0] and $verse->{content}[1] and
-                ref( $verse->{content}[0] ) and ref( $verse->{content}[1] ) and
+            return join( '',
+                '<', $node->{tag}, $attr, '>',
                 (
-                    $verse->{content}[0][0] =~ /^blockquote/ and
-                    $verse->{content}[1][0] =~ /^blockquote/
-                )
+                    ( $node->{children} )
+                        ? ( map { __html_tree($_) } @{ $node->{children} } )
+                        : ()
+                ),
+                '</', $node->{tag}, '>',
             );
-        }
-
-        push( @{ $verse->{content} }, [$eol] ) if (
-            $eol and
-            (
-                not ( ref $verse->{content}[-1] eq 'ARRAY' and @{ $verse->{content}[-1] } )
-                or $verse->{content}[-1][0] ne $eol
-            )
-        );
-
-        push( @verses, $verse );
-    }
-
-    return \@verses;
-}
-
-sub render {
-    my ( $self, $data, $skip_wrapping ) = @_;
-    my $content = '';
-    $data = clone($data);
-
-    my $render_block;
-    $render_block = sub {
-        my ($node) = @_;
-        return $node unless ( ref $node );
-
-        if ( $node->[0] eq 'crossreference' ) {
-            my $refs = $self->refs;
-            return '{' . join( '; ',
-                $self->_reference->clear->in(
-                    map { $render_block->($_) } @{ $node->[1] }
-                )->$refs
-            ) . '}';
-        }
-        elsif ( $node->[0] eq 'footnote' ) {
-            shift @$node;
-            return '[' . join( ' ', map { $render_block->($_) } @$node ) . ']';
-        }
-        elsif ( $node->[0] eq 'italic' ) {
-            shift @$node;
-            return '^' . join( ' ', map { $render_block->($_) } @$node ) . '^';
-        }
-        elsif ( $node->[0] eq 'red text' ) {
-            shift @$node;
-            return '*' . join( ' ', map { $render_block->($_) } @$node ) . '*';
-        }
-        elsif ( $node->[0] eq 'paragraph' ) {
-            return "\n\n";
-        }
-        elsif ( $node->[0] eq 'break' ) {
-            return "\n";
-        }
-        elsif ( $node->[0] eq 'blockquote' ) {
-            shift @$node;
-            return ( ' ' x 4 ) . join( ' ', map { $render_block->($_) } @$node );
-        }
-        elsif ( $node->[0] eq 'blockquote_indent' ) {
-            shift @$node;
-            return ( ' ' x 6 ) . join( ' ', map { $render_block->($_) } @$node );
         }
         else {
-            my $rendered_block = join( ' ', map { $render_block->($_) } @$node );
-            $rendered_block =~ s/[ \t]*(\n+)[ \t]?/$1/g;
-
-            $rendered_block =~ s/[ \t]([^\w ]+)[ \t]*(\[[^\]]*\]|\{[^\}]*\})[ \t]*/ $1$2/g;
-            $rendered_block =~ s/[ \t]*(\[[^\]]*\]|\{[^\}]*\})[ \t]*([^\w ]+)[ \t]/$1$2 /g;
-
-            $rendered_block =~ s/^([^\w ]+)[ \t]*(\[[^\]]*\]|\{[^\}]*\})[ \t]*/$1$2/g;
-            $rendered_block =~ s/[ \t]*(\[[^\]]*\]|\{[^\}]*\})[ \t]*([^\w ]+)$/$1$2/g;
-
-            return $rendered_block;
+            return '<' . $node->{tag} . '>';
         }
-    };
-
-    my %chapters;
-    for my $verse (@$data) {
-        unless ($content) {
-            my $chapter = $verse->{reference}{book} . ' ' . $verse->{reference}{chapter};
-            croak('Appears to be multiple chapters in data; must be single chapter only')
-                if ( $chapters{$chapter}++ );
-            $content .= "~ $chapter ~\n\n";
-        }
-
-        $content .= '= ' . $render_block->( $verse->{header} ) . " =\n\n" if ( $verse->{header} );
-        $content .= ' ' if ( substr( $content, length($content) - 1, 1 ) ne "\n" );
-
-        my $verse_content = $render_block->( $verse->{content} );
-        my $leader = (
-            $verse_content =~ s/^(\s*)// and
-            substr( $content, length($content) - 1, 1 ) eq "\n"
-        ) ? $1 : '';
-
-        $content .= $leader . '|' . $verse->{reference}{verse} . '| ' . $verse_content;
     }
-
-    $content =~ s/\{\s+/\{/g;
-    $content =~ s/\s+\}/\}/g;
-    $content =~ s/\[\s+/\[/g;
-    $content =~ s/\s+\]/\]/g;
-    $content =~ s/\(\s+/\(/g;
-    $content =~ s/\s+\)/\)/g;
-
-    $content =~ s/\s+(?=[\,\;\.\!\?]+)//g;
-    $content =~ s/\s+(?=[\-]+\s)//g;
-
-    $content =~ s/\s+$/\n/msg;
-    $content .= "\n";
-
-    return $content if ($skip_wrapping);
-
-    return join( "\n", map {
-        s/^(\s+)//;
-        $Text::Wrap::columns = 80 - length( $1 || '' );
-        wrap( $1, $1, $_ );
-    } split( /\n/, $content ) ) . "\n";
+    else {
+        return $node->{text};
+    }
 }
 
-sub smartify {
-    my ( $self, $text ) = @_;
-    # extraction
+sub __cleanup_html ($html) {
+    # spacing cleanup
+    $html =~ s/\s+/ /g;
+    $html =~ s/(?:^\s+|\s+$)//mg;
+    $html =~ s/^[ ]+//mg;
 
-    my ( $processed, $extract, @bits, @sub_bits );
+    # protect against inadvertent OBML
+    $html =~ s/~/-/g;
+    $html =~ s/`/'/g;
+    $html =~ s/\|//g;
+    $html =~ s/\\/ /g;
+    $html =~ s/\*//g;
+    $html =~ s/\{/(/g;
+    $html =~ s/\}/)/g;
+    $html =~ s/\[/(/g;
+    $html =~ s/\]/)/g;
 
-    $extract = sub {
-        my ($type) = @_;
+    $html =~ s|<p>|\n\n<p>|g;
+    $html =~ s|<sub_header>|\n\n<sub_header>|g;
+    $html =~ s|<header>|\n\n<header>|g;
+    $html =~ s|<br>\s*|<br>\n|g;
+    $html =~ s|[ ]+</p>|</p>|g;
+    $html =~ s|[ ]+</obml>|</obml>|;
 
-        my $method = ( length( $type->[1] ) == 1 ) ? \&extract_delimited : \&extract_bracketed;
-        my ( $bit, $entry );
-        ( $bit, $text, $entry ) = $method->(
-            $text,
-            $type->[1],
-            '(?s).*?(?=\\' . substr( $type->[1], 0, 1 ) . ')',
-        );
+    # trim spaces at line ends
+    $html =~ s/[ ]+$//mg;
 
-        if ($bit) {
-            $bit = substr( $bit, 1, length($bit) - 2 );
+    return $html;
+}
 
-            $processed .= $entry . ( ( length $type->[1] == 1 ) ? $type->[1] x 2 : $type->[1] );
-            push( @sub_bits, $bit );
+sub __clean_html_to_data ($clean_html) {
+    return __ocd_tree( Mojo::DOM->new($clean_html)->at('obml')->tree );
+}
 
-            $extract->($type);
-        }
-    };
+sub __data_to_clean_html ($data) {
+    return __cleanup_html( __html_tree($data) );
+}
 
-    for (
-        [ 'crossreference', '{}' ],
-        [ 'footnote', '[]' ],
-        [ 'header', '=' ],
-        [ 'material', '~' ],
-    ) {
-        $processed = '';
-        $extract->($_);
-        $text = $processed . $text;
-        push( @bits, reverse @sub_bits );
-        @sub_bits = ();
-    }
+sub _clean_html_to_obml ( $self, $html ) {
+    my $dom = Mojo::DOM->new($html);
 
-    # conversion
+    # append a trailing <br> inside any <p> with a <br> for later wrapping reasons
+    $dom->find('p')->grep( sub { $_->find('br')->size } )->each( sub { $_->append_content('<br>') } );
 
-    my $convert = sub {
-        my ($content) = @_;
+    my $obml = html_unescape( $dom->to_string );
 
-        while (1) {
-            my ( $bit, $entry );
-            ( $bit, $content, $entry ) = extract_delimited(
-                $content,
-                '"',
-                '(?s).*?(?=\\")',
-            );
+    # de-XML
+    $obml =~ s|</?obml>||g;
+    $obml =~ s|</?p>||g;
+    $obml =~ s|</?woj>|\*|g;
+    $obml =~ s|</?i>|\^|g;
+    $obml =~ s|</?small_caps>|\\|g;
+    $obml =~ s|<reference>\s*|~ |g;
+    $obml =~ s|\s*</reference>| ~|g;
+    $obml =~ s!<verse_number>\s*!|!g;
+    $obml =~ s!\s*</verse_number>!| !g;
+    $obml =~ s|<sub_header>\s*|== |g;
+    $obml =~ s|\s*</sub_header>| ==|g;
+    $obml =~ s|<header>\s*|= |g;
+    $obml =~ s|\s*</header>| =|g;
+    $obml =~ s|<crossref>\s*|\{|g;
+    $obml =~ s|\s*</crossref>|\}|g;
+    $obml =~ s|<footnote>\s*|\[|g;
+    $obml =~ s|\s*</footnote>|\]|g;
+    $obml =~ s|^<indent level="(\d+)">| ' ' x ( $self->indent_width * $1 ) |mge;
+    $obml =~ s|<indent level="\d+">||g;
+    $obml =~ s|</indent>||g;
 
-            if ($bit) {
-                $bit = substr( $bit, 1, length($bit) - 2 );
-                $content = $entry . chr(8220) . $bit . chr(8221) . $content;
+    if ( $self->wrap_lines ) {
+        # wrap lines that don't end in <br>
+        $obml = join( "\n", map {
+            unless ( s|<br>|| and not $self->wrap_indents ) {
+                s/^(\s+)//;
+                $Text::Wrap::columns = $self->wrap_at - length( $1 || '' );
+                wrap( $1, $1, $_ );
             }
             else {
-                last;
+                $_;
+            }
+        } split( /\n/, $obml ) ) . "\n";
+    }
+    $obml =~ s|<br>||g;
+
+    chomp $obml;
+    return $obml;
+}
+
+sub _obml_to_clean_html ( $self, $obml ) {
+    # spacing cleanup
+    $obml =~ s/\r?\n/\n/g;
+    $obml =~ s/\t/    /g;
+    $obml =~ s/\n[ \t]+\n/\n\n/mg;
+    $obml =~ s/^\n+//g;
+    $obml =~ /^(\s+)/;
+    $obml =~ s/^$1//mg if ($1);
+    $obml =~ s/\s+$//g;
+
+    # remove comments
+    $obml =~ s/^\s*#.*?(?>\r?\n)//msg;
+
+    # "unwrap" wrapped lines
+    my @obml;
+    for my $line ( split( /\n/, $obml ) ) {
+        if ( not @obml or not length $line or not length $obml[-1] ) {
+            push( @obml, $line );
+        }
+        else {
+            my ($last_line_indent) = $obml[-1] =~ /^([ ]*)/;
+            my ($this_line_indent) = $line     =~ /^([ ]*)/;
+
+            if ( length $last_line_indent == length $this_line_indent ) {
+                $line =~ s/^[ ]+//;
+                $obml[-1] .= ' ' . $line;
+            }
+            else {
+                push( @obml, $line );
             }
         }
+    }
+    $obml = join( "\n", @obml );
 
-        $content =~ s/(?<=\w)\'(?=\w)/ chr(8217) /ge;
-        $content =~ s/\'(\S[^\']*\S)\'/ chr(8216) . $1 . chr(8217) /ge;
-        $content =~ s/\'/ chr(8217) /ge;
+    $obml =~ s|~+[ ]*([^~]+?)[ ]*~+|<reference>$1</reference>|g;
+    $obml =~ s|={2,}[ ]*([^=]+?)[ ]*={2,}|<sub_header>$1</sub_header>|g;
+    $obml =~ s|=[ ]*([^=]+?)[ ]*=|<header>$1</header>|g;
 
-        return $content;
-    };
+    $obml =~ s|^([ ]+)(\S.*)$|
+        '<indent level="'
+        . int( ( length($1) + $self->indent_width * 0.5 ) / $self->indent_width )
+        . '">'
+        . $2
+        . '</indent>'
+    |mge;
 
-    $text = $convert->($text);
-    @bits = map { $convert->($_) } @bits;
+    $obml =~ s|(\S)(?=\n\S)|$1<br>|g;
 
-    # recombining
+    $obml =~ s`(?:^|(?<=\n\n))(?!<(?:reference|sub_header|header)\b)`<p>`g;
+    $obml =~ s`(?:$|(?=\n\n))`</p>`g;
+    $obml =~ s`(?<=</reference>)</p>``g;
+    $obml =~ s`(?<=</sub_header>)</p>``g;
+    $obml =~ s`(?<=</header>)</p>``g;
 
-    my $result;
-    my $recombine;
-    $recombine = sub {
-        my ($type) = @_;
+    $obml =~ s!\|(\d+)\|\s*!<verse_number>$1</verse_number>!g;
 
-        my $method = ( length( $type->[1] ) == 1 ) ? \&extract_delimited : \&extract_bracketed;
-        my ( $bit, $entry );
-        ( $bit, $text, $entry ) = $method->(
-            $text,
-            $type->[1],
-            '(?s).*?(?=\\' . substr( $type->[1], 0, 1 ) . ')',
-        );
+    $obml =~ s|\*([^\*]+)\*|<woj>$1</woj>|g;
+    $obml =~ s|\^([^\^]+)\^|<i>$1</i>|g;
+    $obml =~ s|\\([^\\]+)\\|<small_caps>$1</small_caps>|g;
 
-        if ($bit) {
-            my ( $start, $stop ) = ( length( $type->[1] ) == 1 )
-                ? ( ( $type->[1] ) x 2 )
-                : split( '', $type->[1] );
+    $obml =~ s|\{|<crossref>|g;
+    $obml =~ s|\}|</crossref>|g;
 
-            $result .= $entry . $start . pop(@bits) . $stop;
+    $obml =~ s|\[|<footnote>|g;
+    $obml =~ s|\]|</footnote>|g;
 
-            $recombine->($type);
+    return "<obml>$obml</obml>";
+}
+
+sub _accessor ( $self, $input = undef ) {
+    my $want = ( split( '::', ( caller(1) )[3] ) )[-1];
+
+    if ($input) {
+        if ( ref $input ) {
+            my $data_refs_ocd;
+            $data_refs_ocd = sub ($node) {
+                if (
+                    $node->{tag} and $node->{children} and
+                    ( $node->{tag} eq 'crossref' or $node->{tag} eq 'footnote' )
+                ) {
+                    for ( grep { $_->{text} } @{ $node->{children} } ) {
+                        $_->{text} = $self->reference->acronyms(
+                            $self->fnxref_acronym
+                        )->clear->in( $_->{text} )->as_text;
+                    }
+                }
+                if ( $node->{children} ) {
+                    $data_refs_ocd->($_) for ( @{ $node->{children} } );
+                }
+                return;
+            };
+            $data_refs_ocd->($input);
+
+            my $reference = ( grep { $_->{tag} eq 'reference' } @{ $input->{children} } )[0]{children}[0];
+            my $runs      = $self->reference->acronyms(
+                $self->reference_acronym
+            )->clear->in( $reference->{text} )->as_runs;
+
+            $reference->{text} = $runs->[0];
         }
-    };
+        else {
+            my $ref_ocd = sub ( $text, $acronyms ) {
+                return $self->reference->acronyms($acronyms)->clear->in($text)->as_text;
+            };
 
-    for (
-        [ 'material', '~' ],
-        [ 'header', '=' ],
-        [ 'footnote', '[]' ],
-        [ 'crossreference', '{}' ],
-    ) {
-        $result = '';
-        $recombine->($_);
-        $text = $result . $text;
+            $input =~ s!
+                ((?:<(?:footnote|crossref)>|\{|\[)\s*.+?\s*(?:</(?:footnote|crossref)>|\}|\]))
+            !
+                $ref_ocd->( $1, $self->fnxref_acronym )
+            !gex;
+
+            $input =~ s!
+                ((?:<reference>|~)\s*.+?\s*(?:</reference>|~))
+            !
+                $ref_ocd->( $1, $self->reference_acronym )
+            !gex;
+        }
+
+        return $self->_load({ $want => $input });
     }
 
-    return $text;
+    return $self->_load->{data} if ( $want eq 'data' and $self->_load->{data} );
+
+    unless ( $self->_load->{canonical}{$want} ) {
+        if ( $self->_load->{html} ) {
+            $self->_load->{clean_html} //= __cleanup_html( $self->_load->{html} );
+
+            if ( $want eq 'obml' ) {
+                $self->_load->{canonical}{obml} = $self->_clean_html_to_obml( $self->_load->{clean_html} );
+            }
+            elsif ( $want eq 'data' or $want eq 'html' ) {
+                $self->_load->{data} = __clean_html_to_data( $self->_load->{clean_html} );
+
+                $self->_load->{canonical}{html} = __data_to_clean_html( $self->_load->{data} )
+                    if ( $want eq 'html' );
+            }
+        }
+        elsif ( $self->_load->{data} ) {
+            $self->_load->{canonical}{html} = __data_to_clean_html( $self->_load->{data} );
+
+            $self->_load->{canonical}{obml} = $self->_clean_html_to_obml( $self->_load->{canonical}{html} )
+                if ( $want eq 'obml' );
+        }
+        elsif ( $self->_load->{obml} ) {
+            $self->_load->{canonical}{html} = $self->_obml_to_clean_html( $self->_load->{obml} );
+
+            if ( $want eq 'obml' ) {
+                $self->_load->{canonical}{obml} = $self->_clean_html_to_obml(
+                    $self->_load->{canonical}{html}
+                );
+            }
+            elsif ( $want eq 'data' ) {
+                $self->_load->{data} = __clean_html_to_data( $self->_load->{canonical}{html} );
+            }
+        }
+    }
+
+    return ( $want eq 'data' ) ? $self->_load->{$want} : $self->_load->{canonical}{$want};
 }
 
-sub desmartify {
-    my ( $self, $text ) = @_;
-    ( my $new_text = $text ) =~ tr/\x{201c}\x{201d}\x{2018}\x{2019}/""''/;
-    return $new_text;
-}
-
-sub canonicalize {
-    my ( $self, $input_file, $output_file, $skip_wrapping ) = @_;
-    $output_file ||= $input_file;
-
-    $self->write_file(
-        $output_file,
-        $self->render(
-            $self->parse(
-                $self->read_file($input_file)
-            ),
-            $skip_wrapping,
-        )
-    );
-
-    return;
-}
+sub data { shift->_accessor(@_) }
+sub html { shift->_accessor(@_) }
+sub obml { shift->_accessor(@_) }
 
 1;
 
@@ -487,7 +336,7 @@ Bible::OBML - Open Bible Markup Language parser and renderer
 
 =head1 VERSION
 
-version 1.18
+version 2.03
 
 =for markdown [![test](https://github.com/gryphonshafer/Bible-OBML/workflows/test/badge.svg)](https://github.com/gryphonshafer/Bible-OBML/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/Bible-OBML/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Bible-OBML)
@@ -500,19 +349,15 @@ version 1.18
 =head1 SYNOPSIS
 
     use Bible::OBML;
-    my $self = Bible::OBML->new;
+    my $bo = Bible::OBML->new;
 
-    my $data_structure    = $self->parse($obml_text_content);
-    my $obml_text_content = $self->render( $data_structure, $skip_wrapping );
+    use Bible::OBML::Gateway;
+    my $gw   = Bible::OBML::Gateway->new;
+    my $html = $gw->parse( $gw->fetch( 'Romans 12', 'NIV' ) );
 
-    my $content_with_smart_quotes    = $self->smartify($content);
-    my $content_without_smart_quotes = $self->desmartify($smart_content);
-
-    $self->canonicalize( $input_file, $output_file, $skip_wrapping );
-
-    # ...and because re-inventing the wheel is fun...
-    my $file_content = $self->read_file($filename);
-    $self->write_file( $filename, $content );
+    my $obml  = $bo->html($html)->obml;
+    my $data  = $bo->obml($obml)->data;
+    my $obml2 = $bo->data($data)->obml;
 
 =head1 DESCRIPTION
 
@@ -521,195 +366,183 @@ Markup Language (OBML). OBML is a text markup way to represent Bible content,
 one whole text file per chapter. The goal or purpose of OBML is similar to
 Markdown in that it provides a human-readable text file allowing for simple and
 direct editing of content while maintaining context, footnotes,
-cross-references, "red text", and quotes.
+cross-references, "red text", and other basic formatting.
 
 =head2 Open Bible Markup Language (OBML)
 
 OBML makes the assumption that content will exist in one text file per chapter
-and content mark-up will conform to the following specification:
+and content mark-up will conform to the following specification (where "..."
+represents textual content):
 
-    ~...~    --> material reference
-    =...=    --> header
-    {...}    --> crossreferences
-    [...]    --> footnotes
-    *...*    --> red text
-    ^...^    --> italic
-    4 spaces --> blockquote (line by line)
-    6 spaces --> blockquote + indent (line by line)
-    |*|      --> notes the beginning of a verse (the "*" must be a number)
-    #        --> line comments
+    ~ ... ~   --> material reference
+    = ... =   --> header
+    == ... == --> sub-header
+    |...|     --> verse number
+    {...}     --> cross-references
+    [...]     --> footnotes
+    *...*     --> red text
+    ^...^     --> italic
+    \...\     --> small-caps
+    spaces    --> indenting
+    # ...     --> line comments
+                  (if "#" is the first non-whitespace character on the line)
 
-HTML/XML-like markup can be used throughout the content for additional markup
-not defined by the above specification. When OBML is parsed, such markup
-is ignored and passed through, treated like any other content of the verse.
+HTML-like markup can be used throughout the content for additional markup not
+defined by the above specification. When OBML is parsed, such markup is ignored
+and passed through, treated like any other content of the verse.
 
 An example of OBML follows, with several verses missing so as to save space:
 
-    ~ Jude 1 ~
+    ~ Mark 1 ~
 
-    |1| Jude, [or ^Judas^] {Mt 13:55; Mk 6:3; Jhn 14:22; Ac 1:13} a
-    slave [or ^servant^] {Ti 1:1} of Jesus Christ, and
-    brother of James, [or ^Jacob^] to those having been set apart [or
-    ^loved^ or ^sanctified^] in God ^the^ Father.
+    = John the Baptist Prepares the Way{Mt 3:1, 11; Lk 3:2, 16} =
 
-    = The Sin and Punishment of the Ungodly =
+    |1| The beginning of the good news about Jesus the Messiah,[Or ^Jesus Christ.^
+    ^Messiah^ (He) and ^Christ^ (Greek) both mean ^Anointed One.^] the Son of
+    God,[Some manuscripts do not have ^the SS of God.^]{Mt 4:3} |2| as it is
+    written in Isaiah the prophet:
 
-    |14| Enoch, {Ge 5:18; Ge 5:21-24} ^the^ seventh from Adam, also
-    prophesied to these saying:
+        “I will send my messenger ahead of you,
+            who will prepare your way”[Ml 3:1]{Ml 3:1; Mt 11:10; Lk 7:27}—
+        |3| “a voice of one calling in the wilderness,
+        ‘Prepare the way for the \Lord\,
+            make straight paths for him.’”[Is 40:3]{Is 40:3; Joh 1:23}
 
-        Behold, ^the^ Lord came with myriads of His saints [or ^holy
-        ones^] {De 33:2; Da 7:10; Mt 16:27; He 12:22}
-        |15| to do judgment against all {2Pt 2:6-9}.
+    |4| And so John the Baptist{Mt 3:1} appeared in the wilderness, preaching a
+    baptism of repentance{Mk 1:8; Joh 1:26, 33; Ac 1:5, 22; 11:16; 13:24; 18:25;
+    19:3-4} for the forgiveness of sins.{Lk 1:77}
 
-    |16| These are murmurers, complainers, {Nu 16:11; Nu 16:41; 1Co
-    10:10} following ^after^ [or ^according to^] their
-    lusts, {Jdg 1:18; 2Pt 2:10} and their mouths speak of proud things
-    {2Pt 2:18} ^showing admiration^ [literally ^admiring faces^] to gain
-    ^an advantage^. [literally ^for the sake of you^] {2Pt 2:3}
+    # cut verses 5-13 to save space
 
-When the OBML is parsed, it's turned into a uniform data structure. The data
-structure is an arrayref containing a hashref per verse. The hashrefs will have
-a "reference" key and a "content" key and an optional "header" key. Given OBML
-for Jude 1:14 as defined above, this is the data structure of the hashref for
-the verse:
+    = Jesus Announces the Good News{Mt 4:18, 22; Lk 5:2, 11; Joh 1:35, 42} =
 
-    'reference' => { 'verse' => '14', 'chapter' => '1', 'book' => 'Jude' },
-    'header'    => [ 'The Sin and Punishment of the Ungodly' ],
-    'content'   => [
-        'Enoch,',
-        [ 'crossreference', [ 'Ge 5:18', 'Ge 5:21-24' ] ],
-        [ 'italic', 'the' ],
-        'seventh from Adam, also prophesied to these saying:',
-        [ 'paragraph' ],
-        [
-            'blockquote',
-            'Behold,',
-            [ 'italic', 'the' ],
-            'Lord came with myriads of His saints',
-            [ 'footnote', 'or', [ 'italic', 'holy ones' ] ],
-            [
-                'crossreference',
-                [ 'De 33:2', 'Da 7:10', 'Mt 16:27', 'He 12:22' ],
-            ],
-        ],
-    ],
+    |14| After John{Mt 3:1} was put in prison, Jesus went into Galilee,{Mt 4:12}
+    proclaiming the good news of God.{Mt 4:23} *|15| “The time has come,”{Ro 5:6;
+    Ga 4:4; Ep 1:10}* he said. *“The kingdom of God has come near. Repent and
+    believe{Joh 3:15} the good news!”{Ac 20:21}*
 
-Note that even in the simplest of cases, both "header" and "content" will be
-arrayrefs around some number of strings. The "reference" key will always be
-a hashref with 3 keys. The structure of the values inside the arrayrefs of
-"header" and "content" can be (and usually are) nested.
+Typically, one might load OBML and render it into HTML-like output or a data
+structure.
+
+    my $html = Bible::OBML->new->obml($obml)->html;
+    my $data = Bible::OBML->new->obml($obml)->data;
 
 =head1 METHODS
 
-=head2 parse
+=head2 obml
 
-This method accepts a single text string consisting of OBML. It parses the
-string and returns a data structure as described above.
+This method accepts OBML as input or if no input is provided outputs OBML
+converted from previous input.
 
-    my $data_structure = $self->parse($obml_text_content);
-
-=head2 render
-
-This method accepts a data structure that conforms to the example description
-above and returns a rendered OBML text output. It can optionally accept
-a second input, which is a boolean, which if true will cause the method to
-skip the line-wrapping step.
-
-    my $obml_text_content = $self->render( $data_structure, $skip_wrapping );
-
-Normally, this method will take the text output and wrap long lines. By passing
-a second value which is true, you can cause the method to skip that step.
-
-=head2 smartify, desmartify
-
-The intent of OBML is to store simple text files that you can use a basic text
-editor on. Some people prefer viewing content with so-called "smart" quotes in
-appropriate places. It is entirely possible to parse and render OBML as UTF8
-that includes these so-called "smart" quotes. However, in the typical case of
-pure ASCII, you may want to add or remove so-called "smart" quotes. Here's how:
-
-    my $content_with_smart_quotes    = $self->smartify($content);
-    my $content_without_smart_quotes = $self->desmartify($smart_content);
-
-=head2 canonicalize
-
-This method requires an input filename and an output filename. It will read
-the input file, assume it's OBML, parse it, clean-up references, and render
-it back to OBML, and save it to the output filename.
-
-    $self->canonicalize( $input_file, $output_file, $skip_wrapping );
-
-You can optionally add a third input which is a boolean indicating if you want
-the method to skip line-wrapping. (See the C<render()> method for more
-information.)
-
-The point of this method is if you happen to be writing in OBML manually and
-want to ensure your content is canonical OBML.
-
-=head2 read_file, write_file
-
-Just in case you want to read or write a file directly, here are two methods
-that reinvent the wheel.
-
-    my $file_content = $self->read_file($filename);
-    $self->write_file( $filename, $content );
-
-=head1 ATTRIBUTES
+    my $object = Bible::OBML->new->obml($obml);
+    say $object->obml;
 
 =head2 html
 
-This module has an attribute of "html" which contains a reference to an
-instance of L<Bible::OBML::HTML>.
+This method accepts a specific form of HTML-like input or if no input is
+provided outputs this HTML-like content converted from previous input.
 
-=head2 acronyms
+    my $object = Bible::OBML->new->html($html);
+    say $object->html;
 
-By default, references will be canonicalized in acronym form; however, you can
-change that by setting the value of this accessor.
+HTML-like content might look something like this:
 
-    $self->acronyms(1); # use acronyms; default
-    $self->acronyms(0); # use full book names
+    <obml>
+        <reference>Mark 1</reference>
+        <header>
+            John the Baptist Prepares the Way
+            <crossref>Mt 3:1, 11; Lk 3:2, 16</crossref>
+        </header>
+        <p>
+            <verse_number>1</verse_number>
+            The beginning of the good news about Jesus the Messiah,
+            <footnote>
+                Or <i>Jesus Christ.</i> <i>Messiah</i> (He) and <i>Christ</i>
+                (Greek) both mean <i>Anointed One.</i>
+            </footnote> the Son of God...
+        </p>
+    </obml>
 
-=head2 refs
+=head2 data
 
-This is an accessor to a string that informs the OBML parser and renderer how
-to group canonicalized references. The string must be one of the following:
+This method accepts OBML as input or if no input is provided outputs OBML
+converted from previous input.
 
-=over 4
+    my $object = Bible::OBML->new->data($data);
+    use DDP;
+    p $object->data;
 
-=item *
+This data might look something like this:
 
-refs
+    {
+        tag      => 'obml',
+        children => [
+            {
+                tag      => 'reference',
+                children => [ { text => 'John 1' } ],
+            },
+            {
+                tag      => 'p',
+                children => [
+                    {
+                        tag      => 'verse_number',
+                        children => [ { text => '1' } ],
+                    },
+                    { text => 'In the beginning' },
+                    {
+                        tag      => 'crossref',
+                        children => [ { text => 'Ge 1:1' } ],
+                    },
+                    { text => ' was...' },
+                ],
+            },
+        ],
+    };
 
-=item *
+=head1 ATTRIBUTES
 
-as_books (default)
+Attributes can be set in a call to C<new> or explicitly as a get/set method.
 
-=item *
+    my $bo = Bible::OBML->new( indent_width => 4, reference_acronym => 0 );
+    $bo->indent_width(4);
+    say $bo->reference_acronym;
 
-as_chapters
+=head2 indent_width
 
-=item *
+This attribute is an integer representing the number of spaces that will be
+considered a single level of indentation. It's set to a default of 4 spaces.
 
-as_runs
+=head2 reference_acronym
 
-=item *
+By default, references in "reference" sections will be canonicalized to non-
+acronym form; however, you can change that by setting the value of this accessor
+to a true value.
 
-as_verses
+=head2 fnxref_acronym
 
-=back
+By default, references in all non-"reference" sections (i.e. cross-references
+and some footnotes) will be canonicalized to acronym form; however, you can
+change that by setting the value of this accessor to a false value.
 
-These directly correspond to methods from L<Bible::Reference>. See that
-module's documentation for details.
+=head2 wrap_at
 
-=head2 bible
+By default, lines of OBML that are not indented will be wrapped at 80
+characters. You can adjust this point with this attribute.
 
-This is an accessor to a string value representing one of the Bible types
-supported by L<Bible::Reference>. By default, this is "Protestant" as per the
-default in L<Bible::Reference>. See that module's documentation for details.
+=head2 wrap_lines
+
+This is a boolean attribute, default to true, that stipulates whether or not
+wrapping of OBML lines happens.
+
+=head2 wrap_indents
+
+This is a boolean attribute, default to false, that stipulates whether or not
+wrapping of OBML indented lines happens. This value is ignored if C<wrap_lines>
+is false.
 
 =head1 SEE ALSO
 
-L<Bible::OBML::HTML>, L<Bible::Reference>.
+L<Bible::OBML::Gateway>, L<Bible::Reference>.
 
 You can also look for additional information at:
 
@@ -749,7 +582,7 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2014-2021 by Gryphon Shafer.
+This software is Copyright (c) 2014-2050 by Gryphon Shafer.
 
 This is free software, licensed under:
 

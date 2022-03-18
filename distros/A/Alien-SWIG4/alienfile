@@ -1,0 +1,37 @@
+use alienfile;
+
+plugin 'Probe::CommandLine' => (
+  command => 'swig',
+  args    => [ '-version' ],
+  match   => qr/SWIG Version (4\.[0-9\.]+)/,
+  version => qr/SWIG Version (4\.[0-9\.]+)/,
+);
+
+share {
+  requires 'File::Which';
+
+  start_url 'http://swig.org/download.html';
+
+  plugin Download => (
+    filter  => qr/^swig.*tar\.gz$/,
+    version => qr/(4\.[0-9\.]+)/,
+  );
+
+  plugin Extract => 'tar.gz';
+
+  my $has_pcre2 = 0;
+
+  if( File::Which::which('pcre2-config') ) {
+    $has_pcre2 = 1;
+  }
+
+  plugin 'Build::Autoconf';
+  build [
+    join(' ',
+      '%{configure}',
+      ( ! $has_pcre2 ? ( '--without-pcre' ) : () ),
+    ),
+    '%{make}',
+    '%{make} install',
+  ];
+}

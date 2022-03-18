@@ -28,7 +28,7 @@ my @exports_internal = qw(howbig broadcastids topdl);
 my @exports_normal   = (@EXPORT,
   @convertfuncs,
   qw(nelem dims shape null
-      empty
+      empty dup dupN
       convert inplace zeroes zeros ones nan inf i list listindices unpdl
       set at flows broadcast_define over reshape dog cat barf type
       thread_define dummy mslice approx flat sclr squeeze
@@ -61,6 +61,7 @@ $PDL::toolongtoprint = 10000;  # maximum pdl size to stringify for printing
 *thread_define = *broadcast_define;
 *PDL::threadover_n = *PDL::broadcastover_n;
 
+*dup = \&PDL::dup; *dupN = \&PDL::dupN;
 *howbig       = \&PDL::howbig;	  *unpdl	= \&PDL::unpdl;
 *nelem        = \&PDL::nelem;	  *inplace	= \&PDL::inplace;
 *dims	      = \&PDL::dims;	  *list 	= \&PDL::list;
@@ -176,8 +177,8 @@ product of all the sizes in the PDL's shape or dimlist).
 Scalar PDLs are zero-dimensional and have no entries in the dim list,
 so they cannot be empty.  1-D and higher PDLs can be empty.  Empty
 PDLs are useful for set operations, and are most commonly encountered
-in the output from selection operators such as L<which|PDL::Primitive>
-and L<whichND|PDL::Primitive>.  Not all empty PDLs have the same
+in the output from selection operators such as L<which|PDL::Primitive/which>
+and L<whichND|PDL::Primitive/whichND>.  Not all empty PDLs have the same
 broadcasting properties -- e.g. a 2x0-PDL represents a collection of
 2-vectors that happens to contain no elements, while a simple 0-PDL
 represents a collection of scalar values (that also happens to contain
@@ -774,7 +775,19 @@ sub topdl {PDL->topdl(@_)}
 ####################### Overloaded operators #######################
 
 { package PDL;
-  use overload '""'  =>  \&PDL::Core::string;
+  use Carp;
+  use overload
+    '""' => \&PDL::Core::string,
+    "=" => sub {$_[0]},          # Don't deep copy, just copy reference
+    bool => sub {
+      return 0 if $_[0]->isnull;
+      confess("multielement ndarray in conditional expression (see PDL::FAQ questions 6-10 and 6-11)")
+        unless $_[0]->nelem == 1;
+      confess("bad value ndarray in conditional expression")
+        if $_[0]->badflag and $_[0].'' eq 'BAD';
+      $_[0]->clump(-1)->at(0);
+    },
+    ;
 }
 
 ##################### Data type/conversion stuff ########################
@@ -1508,6 +1521,48 @@ sub PDL::dummy($$;$) {
    $s .= '*1,'  x ( $dim_diff > 0 ? $dim_diff : 0 );
    $s .= "*$size";
    $pdl->slice($s);
+}
+
+=head2 dup
+
+=for ref
+
+Duplicates an ndarray along a dimension
+
+=for example
+
+ $x = sequence(3);
+ $y = $x->dup(0, 2); # doubles along first dimension
+ # $y now [0 1 2 0 1 2]
+
+=cut
+
+sub PDL::dup {
+  my ($this, $dim, $times) = @_;
+  return $this->copy if $times == 1;
+  $this->dummy($dim+1, $times)->clump($dim, $dim+1);
+}
+
+=head2 dupN
+
+=for ref
+
+Duplicates an ndarray along several dimensions
+
+=for example
+
+ $x = sequence(3,2);
+ $y = $x->dupN(2, 3); # doubles along first dimension, triples along second
+
+=cut
+
+sub PDL::dupN {
+  my ($this, @times) = @_;
+  return $this->copy if !grep $_ != 1, @times;
+  my $sl = join ',', map ":,*$_", @times; # insert right-size dummy after each real
+  $this = $this->slice($sl);
+  $this = $this->clump($_, $_+1) for 0..$#times;
+  $this;
 }
 
 =head2 clump

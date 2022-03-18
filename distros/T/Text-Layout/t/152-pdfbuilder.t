@@ -72,7 +72,8 @@ fuzz( $a->{height}, 18.00, "size height" );
 my @ink = qw( ink layout );
 my @fields = qw( x y width height );
 
-my $res = { x => 0.00, y => 0.00, width => 166.08, height => 18.00 };
+# Subtracting height from y was introduced in 0.028.
+my $res = { x => 0.00, y => -18.00, width => 166.08, height => 18.00 };
 
 # This case cannot calculate ink.
 my $ink = $res;

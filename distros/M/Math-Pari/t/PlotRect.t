@@ -1,4 +1,9 @@
 #! perl -w
+	# A poor-man indicator of a crash
+	my $SELF;
+	BEGIN { ($SELF = __FILE__) =~ s(.*[/\\])();
+	   open CR, ">tst-run-$SELF" and close CR}	# touch a file
+	END {unlink "tst-run-$SELF"}			# remove it - unless we crash
 use Math::Pari ':all';
 
 if ($ENV{MP_NOGNUPLOT}) {

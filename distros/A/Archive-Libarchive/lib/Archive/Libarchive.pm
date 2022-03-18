@@ -15,7 +15,7 @@ use Archive::Libarchive::EntryLinkResolver;
 use parent qw( Exporter );
 
 # ABSTRACT: Modern Perl bindings to libarchive
-our $VERSION = '0.04'; # VERSION
+our $VERSION = '0.05'; # VERSION
 
 
 my $ffi = Archive::Libarchive::Lib->ffi;
@@ -87,7 +87,7 @@ Archive::Libarchive - Modern Perl bindings to libarchive
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 
@@ -830,6 +830,10 @@ Provides an interface for extracting arbitrary archives of any format/filter sup
 
 Decompresses / unwraps files that have been compressed or wrapped in any of the filter formats supported by C<libarchive>
 
+=item L<Dist::Zilla::Plugin::Libarchive>
+
+Build L<Dist::Zilla> based dist tarballs with libarchive instead of the built in L<Archive::Tar>.
+
 =item L<Archive::Libarchive::API>
 
 This contains the full and complete API for all of the L<Archive::Libarchive>
@@ -896,7 +900,7 @@ Graham Ollis <plicease@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Graham Ollis.
+This software is copyright (c) 2021,2022 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

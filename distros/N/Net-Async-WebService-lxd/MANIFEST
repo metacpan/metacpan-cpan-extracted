@@ -1,0 +1,15 @@
+Build.PL
+Changes
+lib/Net/Async/WebService/lxd.pm
+lib/Net/Async/WebService/lxd.pod
+MANIFEST			This list of files
+README.md
+LICENSE
+t/manifest.t
+t/01_projects.t
+t/01_images.t
+t/02_instances.t
+t/client.crt
+t/client.key
+META.yml
+META.json

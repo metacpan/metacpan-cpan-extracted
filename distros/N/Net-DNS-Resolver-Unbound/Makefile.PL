@@ -1,4 +1,5 @@
 #
+#	Generate Makefile
 #
 
 use 5.008009;
@@ -69,6 +70,8 @@ WriteMakefile(
 	LIBS	  => [$lib],
 	clean	  => {FILES => "@debris"},
 	);
+
+exit;
 
 
 package MY;				## customise generated Makefile
@@ -155,7 +158,6 @@ PlanB
 	return <<"PlanA";
 test_cover :
 	cover -delete
-	\$(NOECHO) \$(TOUCH) Unbound.c	# recompile XS component
 	HARNESS_PERL_SWITCHES=-MDevel::Cover \$(MAKE) -W Unbound.xs test CCFLAGS="$ccflags" OTHERLDFLAGS="$ldflags"
 	gcov Unbound.xs
 	gcov2perl Unbound.xs.gcov

@@ -1,6 +1,26 @@
 use ExtUtils::MakeMaker;
 
-use Canary::Stability Geo::LatLon2Place => 1, 5.008;
+use Canary::Stability Geo::LatLon2Place => 1, 5.010;
+
+my $embed_cdb = $^O eq "MSWin32";
+
+if (exists $ENV{GEO_LATLON2PLACE_EMBED_CDB}) {
+   $embed_cdb = $ENV{GEO_LATLON2PLACE_EMBED_CDB};
+} else {
+   print <<EOF;
+
+*** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***
+
+Use embedded CDB?
+
+On most platforms, this module will rely on the system tinycdb library
+(on GNU/Debian you can "apt install libcdb-dev" for example). However,
+this module can also use an embedded version of this library.
+
+EOF
+
+   $embed_cdb = prompt ("Use embedded tinycdb library (y/n)?", $embed_cdb ? "y" : "n") =~ /y/i;
+}
 
 WriteMakefile(
     dist	=> {
@@ -9,7 +29,7 @@ WriteMakefile(
 	            SUFFIX	=> '.gz',
 	           },
     NAME => "Geo::LatLon2Place",
-    LIBS => ["-lcdb"],
+    ($embed_cdb ? (DEFINE => "-DEMBED_CDB") : (LIBS => ["-lcdb"])),
     VERSION_FROM => "LatLon2Place.pm",
     CONFIGURE_REQUIRES => {
        "ExtUtils::MakeMaker" => 6.6,

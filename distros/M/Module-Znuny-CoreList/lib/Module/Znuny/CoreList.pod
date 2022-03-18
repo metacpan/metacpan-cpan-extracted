@@ -12,7 +12,7 @@ Module::Znuny::CoreList
 
 =head1 VERSION
 
-version 1.00
+version 1.01
 
 =head1 SYNOPSIS
 
@@ -36,6 +36,20 @@ version 1.00
     '6.0.x',
     'CGI',
  );
+
+=head1 METHODS
+
+=head2 modules
+
+returns a list of Core modules shipped with a given Znuny version
+
+=head2 shipped
+
+returns a list of Znuny versions that ships a given module
+
+=head2 cpan_modules
+
+returns a list of CPAN modules that are shipped with a given Znuny version
 
 =head1 AUTHOR
 

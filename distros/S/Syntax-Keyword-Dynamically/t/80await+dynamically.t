@@ -11,9 +11,9 @@ BEGIN {
    plan skip_all => "Future::AsyncAwait >= 0.31_002 is not available"
       unless eval { require Future::AsyncAwait;
                     Future::AsyncAwait->VERSION( '0.31_002' ) };
-   plan skip_all => "Syntax::Keyword::Dynamically >= 0.01 is not available"
+   plan skip_all => "Syntax::Keyword::Dynamically >= 0.02 is not available"
       unless eval { require Syntax::Keyword::Dynamically;
-                    Syntax::Keyword::Dynamically->VERSION( '0.01' ) };
+                    Syntax::Keyword::Dynamically->VERSION( '0.02' ) };
 
    Future::AsyncAwait->import;
    Syntax::Keyword::Dynamically->import(qw( -async ));

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 our $VERSION;
-$VERSION = '1.08';
+$VERSION = '1.09';
 
 use Carp;
 use Net::DNS;
@@ -28,7 +28,7 @@ Net::DNS::Resolver::Unbound - Unbound resolver base for Net::DNS
 =head1 DESCRIPTION
 
 Net::DNS::Resolver::Unbound is designed as an extension to an existing
-Net::DNS installation which includes DNSSEC records in responses.
+Net::DNS installation which facilitates DNS(SEC) name resolution.
 
 Net::DNS::Resolver::Unbound replaces the resolver send() and bgsend()
 functionality in the Net::DNS::Resolver::Base implementation.
@@ -115,12 +115,7 @@ sub send {
 	$self->_reset_errorstring;
 
 	my ($query) = $self->_make_query_packet(@_)->question;
-	my $qname   = $query->name;
-	my $qtype   = $query->{qtype};
-	my $qclass  = $query->{qclass};
-
-	my $ub_ctx = $self->{ub_ctx};
-	my $result = Net::DNS::Resolver::libunbound::ub_resolve( $ub_ctx, $qname, $qtype, $qclass );
+	my $result = $self->{ub_ctx}->ub_resolve( $query->name, $query->{qtype}, $query->{qclass} );
 	return $self->_decode_result($result);
 }
 
@@ -130,20 +125,14 @@ sub bgsend {
 	$self->_reset_errorstring;
 
 	my ($query) = $self->_make_query_packet(@_)->question;
-	my $qname   = $query->name;
-	my $qtype   = $query->{qtype};
-	my $qclass  = $query->{qclass};
-
-	my $ub_ctx = $self->{ub_ctx};
-	return Net::DNS::Resolver::libunbound::ub_resolve_async( $ub_ctx, $qname, $qtype, $qclass );
+	return $self->{ub_ctx}->ub_resolve_async( $query->name, $query->{qtype}, $query->{qclass} );
 }
 
 sub bgbusy {
 	my ( $self, $handle ) = @_;
 	return unless $handle;
 	return unless $handle->waiting;
-	my $ub_ctx = $self->{ub_ctx};
-	Net::DNS::Resolver::libunbound::ub_process($ub_ctx);
+	$self->{ub_ctx}->ub_process;
 	eval { select( undef, undef, undef, 0.200 ) };		# avoid tight loop on bgbusy()
 	return $handle->waiting;
 }
@@ -152,11 +141,10 @@ sub bgread {
 	my ( $self, $handle ) = @_;
 	return unless $handle;
 
-	Net::DNS::Resolver::libunbound::ub_wait( $self->{ub_ctx} ) if &bgbusy;
+	$self->{ub_ctx}->ub_wait if &bgbusy;
 
-	my $qid = $handle->async_id;
-	my $err = $handle->err;
-	$self->errorstring( Net::DNS::Resolver::libunbound::ub_strerror($err) ) if $err;
+	my $async_id = $handle->async_id;
+	$self->errorstring( $handle->err );
 	my $result = $handle->result;
 	return $self->_decode_result($result);
 }
@@ -204,7 +192,6 @@ If the proxy is not DNSSEC-capable, validation may fail.
 Can be called several times, in that case the addresses are used
 as backup servers.
 
-
 =cut
 
 sub set_fwd {
@@ -250,6 +237,7 @@ sub set_stub {
 
 Extract nameserver list from resolv.conf(5) format configuration file.
 Any domain, searchlist, ndots or other settings are ignored.
+
 Note that Net::DNS builds its own nameserver list using /etc/resolv.conf
 or other platform-specific sources.
 
@@ -259,6 +247,7 @@ sub resolv_conf {
 	my ( $self, $filename ) = @_;
 	return $self->{ub_ctx}->resolv_conf($filename);
 }
+
 
 =head2 hosts
 
@@ -289,12 +278,13 @@ sub add_ta {
 	return $self->{ub_ctx}->add_ta( Net::DNS::RR->new(@_)->plain );
 }
 
+
 =head2 add_ta_file
 
     $resolver->add_ta_file( 'filename' );
 
-Pass the name of a file containing DS and DNSKEY records (like from dig
-or drill).
+Pass the name of a file containing DS and DNSKEY records
+(as from dig or drill).
 
 =cut
 
@@ -302,6 +292,7 @@ sub add_ta_file {
 	my ( $self, $filename ) = @_;
 	return $self->{ub_ctx}->add_ta_file($filename);
 }
+
 
 =head2 add_ta_autr
 
@@ -317,6 +308,7 @@ sub add_ta_autr {
 	my ( $self, $filename ) = @_;
 	return $self->{ub_ctx}->add_ta_autr($filename);
 }
+
 
 =head2 trusted_keys
 
@@ -345,6 +337,7 @@ sub debug_out {
 	my ( $self, $out ) = @_;
 	return $self->{ub_ctx}->debug_out($out);
 }
+
 
 =head2 debug_level
 

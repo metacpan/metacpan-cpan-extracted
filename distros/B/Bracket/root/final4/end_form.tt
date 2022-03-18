@@ -1,2 +1,2 @@
-	<input type="submit" value="Save Picks" />
+	<input class="save_picks" type="submit" value="Save Picks" />
 	</form> 

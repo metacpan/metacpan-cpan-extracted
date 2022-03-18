@@ -12,6 +12,7 @@
 #include "AsyncAwait.h"
 
 #ifdef HAVE_DMD_HELPER
+#  define WANT_DMD_API_044
 #  include "DMD_helper.h"
 #endif
 
@@ -52,12 +53,9 @@
 #  include "cx_pusheval.c.inc"
 #endif
 
-#if !HAVE_PERL_VERSION(5, 22, 0)
-#  define CvPADLIST_set(cv, padlist)  (CvPADLIST(cv) = padlist)
-#endif
-
 #include "perl-additions.c.inc"
 #include "newOP_CUSTOM.c.inc"
+#include "cv_copy_flags.c.inc"
 
 /* Currently no version of perl makes this visible, so we always want it. Maybe
  * one day in the future we can make it version-dependent
@@ -194,7 +192,7 @@ static MGVTBL vtbl_suspendedstate = {
 };
 
 #ifdef HAVE_DMD_HELPER
-static int dumpmagic_suspendedstate(pTHX_ const SV *sv, MAGIC *mg)
+static int dumpmagic_suspendedstate(pTHX_ DMDContext *ctx, const SV *sv, MAGIC *mg)
 {
   SuspendedState *state = (SuspendedState *)mg->mg_ptr;
   int ret = 0;
@@ -982,155 +980,6 @@ nosave:
     PL_tmps_ix = PL_tmps_floor;
     PL_tmps_floor = oldtmpsfloor;
   }
-}
-
-static bool padname_is_normal_lexical(PADNAME *pname)
-{
-  /* PAD slots without names are certainly not lexicals */
-  if(!pname ||
-#if !HAVE_PERL_VERSION(5, 20, 0)
-    /*  Perl before 5.20.0 could put PL_sv_undef in PADNAMEs */
-    pname == &PL_sv_undef || 
-#endif
-    !PadnameLEN(pname))
-    return FALSE;
-
-  /* Outer lexical captures are not lexicals */
-  if(PadnameOUTER(pname))
-    return FALSE;
-
-  /* Protosubs for closures are not lexicals */
-  if(PadnamePV(pname)[0] == '&')
-    return FALSE;
-
-  /* anything left is a normal lexical */
-  return TRUE;
-}
-
-#define cv_dup_for_suspend(orig)  MY_cv_dup_for_suspend(aTHX_ orig)
-static CV *MY_cv_dup_for_suspend(pTHX_ CV *orig)
-{
-  /* Parts of this code stolen from S_cv_clone() in pad.c
-   */
-  CV *new = MUTABLE_CV(newSV_type(SVt_PVCV));
-  CvFLAGS(new) = CvFLAGS(orig) & ~CVf_CVGV_RC;
-
-  CvFILE(new) = CvDYNFILE(orig) ? savepv(CvFILE(orig)) : CvFILE(orig);
-#if HAVE_PERL_VERSION(5, 18, 0)
-  if(CvNAMED(orig)) {
-    /* Perl core uses CvNAME_HEK_set() here, but that involves a call to a
-     * non-public function unshare_hek(). The latter is only needed in the
-     * case where an old value needs to be removed, but since we've only just
-     * created the CV we know it will be empty, so we can just set the field
-     * directly
-     */
-    ((XPVCV*)MUTABLE_PTR(SvANY(new)))->xcv_gv_u.xcv_hek = share_hek_hek(CvNAME_HEK(orig));
-    CvNAMED_on(new);
-  }
-  else
-#endif
-    CvGV_set(new, CvGV(orig));
-  CvSTASH_set(new, CvSTASH(orig));
-  {
-    OP_REFCNT_LOCK;
-    CvROOT(new) = OpREFCNT_inc(CvROOT(orig));
-    OP_REFCNT_UNLOCK;
-  }
-  CvSTART(new) = NULL; /* intentionally left NULL because caller should fill this in */
-  CvOUTSIDE_SEQ(new) = CvOUTSIDE_SEQ(orig);
-
-  /* No need to bother with SvPV slot because that's the prototype, and it's
-   * too late for that here
-   */
-
-  {
-    ENTER_with_name("cv_dup_for_suspend");
-
-    SAVESPTR(PL_compcv);
-    PL_compcv = new;
-
-    CvOUTSIDE(new) = MUTABLE_CV(SvREFCNT_inc(CvOUTSIDE(orig)));
-
-    SAVESPTR(PL_comppad_name);
-    PL_comppad_name = PadlistNAMES(CvPADLIST(orig));
-    CvPADLIST_set(new, pad_new(padnew_CLONE|padnew_SAVE));
-#if HAVE_PERL_VERSION(5, 22, 0)
-    CvPADLIST(new)->xpadl_id = CvPADLIST(orig)->xpadl_id;
-#endif
-
-    PADNAMELIST *padnames = PadlistNAMES(CvPADLIST(orig));
-    const PADOFFSET fnames = PadnamelistMAX(padnames);
-    const PADOFFSET fpad = AvFILLp(PadlistARRAY(CvPADLIST(orig))[1]);
-    SV **origpad = AvARRAY(PadlistARRAY(CvPADLIST(orig))[CvDEPTH(orig)]);
-
-#if !HAVE_PERL_VERSION(5, 18, 0)
-/* Perls before 5.18.0 didn't copy the padnameslist
- */
-    SvREFCNT_dec(PadlistNAMES(CvPADLIST(new)));
-    PadlistNAMES(CvPADLIST(new)) = (PADNAMELIST *)SvREFCNT_inc(PadlistNAMES(CvPADLIST(orig)));
-#endif
-
-    av_fill(PL_comppad, fpad);
-    PL_curpad = AvARRAY(PL_comppad);
-
-    PADNAME **pnames = PadnamelistARRAY(padnames);
-    PADOFFSET padix;
-    for(padix = 1; padix <= fpad; padix++) {
-      PADNAME *pname = (padix <= fnames) ? pnames[padix] : NULL;
-      SV *newval = NULL;
-
-      if(PadnameIsSTATE(pname))
-        newval = SvREFCNT_inc_NN(origpad[padix]);
-      else if(padname_is_normal_lexical(pname)) {
-        /* No point copying a normal lexical slot because the suspend logic is
-         * about to capture all the pad slots from the running CV (orig) and
-         * they'll be restored into this new one later by resume.
-         */
-        continue;
-      }
-      else if(pname && PadnamePV(pname)) {
-#if !HAVE_PERL_VERSION(5, 18, 0)
-        /* Before perl 5.18.0, inner anon subs didn't find the right CvOUTSIDE
-         * at runtime, so we'll have to patch them up here
-         */
-        CV *origproto;
-        if(PadnamePV(pname)[0] == '&' && 
-           CvOUTSIDE(origproto = MUTABLE_CV(origpad[padix])) == orig) {
-          /* quiet any "Variable $FOO is not available" warnings about lexicals
-           * yet to be introduced
-           */
-          ENTER_with_name("find_cv_outside");
-          SAVEINT(CvDEPTH(origproto));
-          CvDEPTH(origproto) = 1;
-
-          CV *newproto = cv_dup_for_suspend(origproto);
-          CvPADLIST_set(newproto, CvPADLIST(origproto));
-          CvSTART(newproto) = CvSTART(origproto);
-
-          SvREFCNT_dec(CvOUTSIDE(newproto));
-          CvOUTSIDE(newproto) = MUTABLE_CV(SvREFCNT_inc_simple_NN(new));
-
-          LEAVE_with_name("find_cv_outside");
-
-          newval = MUTABLE_SV(newproto);
-        }
-        else
-#endif
-        if(origpad[padix])
-          newval = SvREFCNT_inc_NN(origpad[padix]);
-      }
-      else {
-        newval = newSV(0);
-        SvPADTMP_on(newval);
-      }
-
-      PL_curpad[padix] = newval;
-    }
-
-    LEAVE_with_name("cv_dup_for_suspend");
-  }
-
-  return new;
 }
 
 #define suspendedstate_suspend(state, cv)  MY_suspendedstate_suspend(aTHX_ state, cv)
@@ -1973,7 +1822,12 @@ static OP *pp_await(pTHX)
 
   if(!state) {
     /* Clone the CV and then attach suspendedstate magic to it */
-    curcv = cv_dup_for_suspend(curcv);
+
+    /* No point copying a normal lexical slot because the suspend logic is
+     * about to capture all the pad slots from the running CV (orig) and
+     * they'll be restored into this new one later by resume.
+     */
+    curcv = cv_copy_flags(curcv, CV_COPY_NULL_LEXICALS);
     state = suspendedstate_new(curcv);
 
     TRACEPRINT("  SUSPEND cloned CV->%p\n", curcv);

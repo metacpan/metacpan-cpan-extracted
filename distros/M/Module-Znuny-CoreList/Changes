@@ -1,6 +1,17 @@
 Release history for Module::Znuny::CoreList
 ===========================================
 
+1.01    2022-03-17 09:42
+
+ * Add znuny 6.0.38
+ * Add znuny 6.0.39
+ * Add znuny 6.0.40
+ * Add znuny 6.2.1
+ * Add znuny 6.2.2
+ * Add znuny 6.3.1
+ * Fixes some Pod::Coverage failures
+ * Fixes some Perl::Critic failures
+
 1.00    2021-10-25 10:46
 
  * initial release

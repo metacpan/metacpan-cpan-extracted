@@ -50,7 +50,6 @@
       },
       "runtime" : {
          "requires" : {
-            "Crypt::SSLeay" : "0.72",
             "File::MMagic" : "1.29",
             "JSON" : "2.53",
             "LWP::Protocol::https" : "6.04",
@@ -84,11 +83,11 @@
    "provides" : {
       "Net::Google::Drive::Simple" : {
          "file" : "lib/Net/Google/Drive/Simple.pm",
-         "version" : "0.21"
+         "version" : "0.22"
       },
       "Net::Google::Drive::Simple::Item" : {
          "file" : "lib/Net/Google/Drive/Simple/Item.pm",
-         "version" : "0.21"
+         "version" : "0.22"
       }
    },
    "release_status" : "stable",
@@ -103,7 +102,7 @@
          "web" : "https://github.com/mschilli/net-google-drive-simple"
       }
    },
-   "version" : "0.21",
+   "version" : "0.22",
    "x_contributors" : [
       "Andy Baugh <thomas.baugh@cpanel.net>",
       "Andy Bircumshaw <github.com@networkned.co.uk>",
@@ -116,6 +115,7 @@
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "Nicolas R <atoomic@cpan.org>",
       "Peter Scott <peter@computerpros.com.au>",
+      "Sawyer X <xsawyerx@cpan.org>",
       "Tim Mullin <tim@cpanel.net>",
       "Todd Rinaldo <toddr@cpan.org>",
       "Yxes <wells@cedarnet.org>"

@@ -22,7 +22,7 @@ use YAML qw( LoadFile DumpFile );
 use JSON qw( from_json to_json );
 use Log::Log4perl qw(:easy);
 
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 
 ###########################################
 sub new {
@@ -641,6 +641,8 @@ sub http_loop {
             if ( --$RETRIES >= 0 ) {
                 ERROR "Retrying in $SLEEP_INTERVAL seconds";
                 sleep $SLEEP_INTERVAL;
+                $self->{oauth}->token_expire();
+                $req->header( $self->{oauth}->authorization_headers() );
                 redo;
             }
             else {

@@ -1,209 +1,215 @@
 package Bible::OBML::Gateway;
-# ABSTRACT: Bible Gateway content conversion to Open Bible Markup Language (OBML)
+# ABSTRACT: Bible Gateway content conversion to Open Bible Markup Language
 
 use 5.020;
 
 use exact;
 use exact::class;
+use Bible::OBML;
+use Bible::Reference;
 use Mojo::DOM;
-use Mojo::Util qw( encode decode );
-use Mojo::File 'path';
-use Mojo::URL;
 use Mojo::UserAgent;
-use Bible::OBML 1.14;
-use Bible::Reference 1.05;
+use Mojo::URL;
+use Mojo::Util 'html_unescape';
 
-our $VERSION = '1.12'; # VERSION
-
-has ua  => sub { return Mojo::UserAgent->new };
-has url => sub { return Mojo::URL->new('https://www.biblegateway.com/passage/') };
+our $VERSION = '2.02'; # VERSION
 
 has translation => 'NIV';
-has obml        => undef;
-has data        => undef;
-
-has _reference => sub {
-    return Bible::Reference->new(
-        bible    => 'Protestant',
-        acronyms => 1,
-        sorting  => 1,
-    );
+has url         => Mojo::URL->new('https://www.biblegateway.com/passage/');
+has ua          => sub {
+    my $ua = Mojo::UserAgent->new( max_redirects => 3 );
+    $ua->transactor->name( __PACKAGE__ . '/' . ( __PACKAGE__->VERSION // '2.0' ) );
+    return $ua;
 };
+has reference => Bible::Reference->new(
+    bible   => 'Protestant',
+    sorting => 1,
+);
 
-has _obml_lib => sub { Bible::OBML->new };
-has _body     => undef;
-has _dom      => undef;
+sub translations ($self) {
+    my $translations;
 
-sub get {
-    my ( $self, $book_chapter, $translation ) = @_;
-    croak('Book/chapter not defined in call to get()') unless ($book_chapter);
-    croak('Verse ranges and partial chapter ranges not supported') if ( $book_chapter =~ /[:-]/ );
+    $self->ua->get( $self->url )->result->dom->find('select.search-dropdown option')->each( sub {
+        my $class = $_->attr('class') || '';
 
-    my $url = $self->url->query({
-        search  => $book_chapter,
-        version => ( $translation // $self->translation ),
-    })->to_string;
-
-    my $result = $self->ua->get($url)->result;
-    croak(qq{Failed to get "$book_chapter" via "$url"})
-        unless ( $result and $result->code == 200 and $result->dom->at('div.dropdown-display-text') );
-
-    return $self->_parse( $result->body, $result->dom );
-}
-
-sub _parse {
-    my ( $self, $body, $dom ) = @_;
-
-    $self->_body($body);
-    $self->_dom( $dom // Mojo::DOM->new($body) );
-
-    ( my $book_chapter = $self->_dom->at('div.dropdown-display-text')->text ) =~ s/:.+$//;
-
-    my $passage = Mojo::DOM->new(
-        $self->_dom->at('div.passage-text div.passage-content div:first-child')->to_string
-    )->at('div');
-
-    delete $passage->root->attr->{'class'};
-    $passage->descendant_nodes->grep( sub { $_->type eq 'comment' } )->each( sub { $_->remove } );
-
-    $passage->descendant_nodes->grep( sub { $_->tag and $_->tag eq 'i' } )->each( sub {
-        $_->replace( '^' . $_->content . '^' );
+        if ( $class eq 'lang' ) {
+            my @language = $_->text =~ /\-{3}(.+)\s\(([^\)]+)\)\-{3}/;
+            push( @$translations, {
+                language => $language[0],
+                acronym  => $language[1],
+            } );
+        }
+        elsif ( not $class ) {
+            my @translation = $_->text =~ /\s*(.+)\s\(([^\)]+)\)/;
+            push( @{ $translations->[-1]{translations} }, {
+                translation => $translation[0],
+                acronym     => $translation[1],
+            } );
+        }
     } );
 
-    my $footnotes;
-    if ( my $div_footnotes = $passage->at('div.footnotes') ) {
+    return $translations;
+}
+
+sub structure ( $self, $translation = $self->translation ) {
+    return $self->ua->get(
+        $self->url->clone->path( $self->url->path . 'bcv/' )->query( { version => $translation } )
+    )->result->json->{data}[0];
+}
+
+sub _retag ( $tag, $retag ) {
+    $tag->tag($retag);
+    delete $tag->attr->{$_} for ( keys %{ $tag->attr } );
+}
+
+sub fetch ( $self, $reference, $translation = $self->translation ) {
+    my $runs = $self->reference->acronyms(0)->clear->in($reference)->as_runs;
+    croak(
+        '"' . ( $reference // '(undef)' ) . '" not understood as a single chapter or single run of verses'
+    ) if ( @$runs != 1 or $runs->[0] !~ /\w\s*\d/ );
+
+    return $self->ua->get(
+        $self->url->query( {
+            version => $translation,
+            search  => $runs->[0],
+        } )
+    )->result->body;
+}
+
+sub parse ( $self, $html ) {
+    my $dom = Mojo::DOM->new( $html // '' );
+
+    my $ref_display = $dom->at('div.dropdown-display-text');
+    croak('source appears to be invalid; check your inputs') unless ( $ref_display and $ref_display->text );
+    my $reference = $ref_display->text;
+
+    my $block = $dom->at('div.passage-text div.passage-content div:first-child');
+
+    $block->descendant_nodes->grep( sub { $_->type eq 'comment' } )->each('remove');
+    $block
+        ->find('.il-text, hidden, hr, .translation-note, span.inline-note, a.full-chap-link')
+        ->each('remove');
+    $block->find('.std-text')->each('strip');
+
+    $block->find('i, .italic, .trans-change, .idiom, .catch-word')->each( sub { _retag( $_, 'i' ) } );
+    $block->find('.woj')->each( sub { _retag( $_, 'woj' ) } );
+    $block->find('.divine-name, .small-caps')->each( sub { _retag( $_, 'small_caps' ) } );
+
+    my $footnotes = $block->at('div.footnotes');
+    if ($footnotes) {
+        $footnotes->remove;
         $footnotes = {
             map {
-                '#' . $_->attr('id') => $self->_reference->clear->in(
+                '#' . $_->attr('id') => $self->reference->acronyms(1)->clear->in(
                     $_->at('span')->content
                 )->as_text
-            } $div_footnotes->find('ol li')->each
+            } $footnotes->find('ol li')->each
         };
-        $div_footnotes->remove;
     }
 
-    my $crossrefs;
-    if ( my $div_crossrefs = $passage->at('div.crossrefs') ) {
+    my $crossrefs = $block->at('div.crossrefs');
+    if ($crossrefs) {
+        $crossrefs->remove;
         $crossrefs = {
             map {
-                '#' . $_->attr('id') => $self->_reference->clear->in(
+                '#' . $_->attr('id') => $self->reference->acronyms(1)->clear->in(
                     $_->at('a:last-child')->attr('data-bibleref')
                 )->refs
-            } $div_crossrefs->find('ol li')->each
+            } $crossrefs->find('ol li')->each
         };
-        $div_crossrefs->remove;
     }
 
-    $passage->descendant_nodes->grep( sub { $_->tag and $_->tag eq 'sup' and $_->attr('class') } )->each( sub {
+    $block->find('sup.crossreference, sup.footnote')->each( sub {
         if ( $_->attr('class') eq 'footnote' ) {
-            $_->replace( '[' . $footnotes->{ $_->attr('data-fn') } . ']' );
+            $_->replace( '<footnote>' . $footnotes->{ $_->attr('data-fn') } . '</footnote>' );
         }
         elsif ( $_->attr('class') eq 'crossreference' ) {
-            $_->replace( '{' . $crossrefs->{ $_->attr('data-cr') } . '}' );
+            $_->replace( '<crossref>' . $crossrefs->{ $_->attr('data-cr') } . '</crossref>' );
         }
     } );
 
-    $passage->descendant_nodes->grep( sub { $_->tag and ( $_->tag eq 'h3' or $_->tag eq 'h4' ) } )->each( sub {
-        $_->replace( "= " . $_->content . " =\n\n" );
+    _retag( $block, 'obml' );
+    $block->child_nodes->first->prepend( $block->new_tag( 'reference', $reference ) );
+
+    $block->find('h3')->each( sub { _retag( $_, 'header' ) } );
+    $block->find('h4')->each( sub { _retag( $_, 'header_alt' ) } );
+
+    $block->find('.chapternum')->each( sub {
+        _retag( $_, 'verse_number' );
+        $_->content(1);
+    } );
+    $block->find('.versenum')->each( sub {
+        _retag( $_, 'verse_number' );
+        my ($verse_number) = $_->content =~ /(\d+)/;
+        $_->content($verse_number);
     } );
 
-    $passage->descendant_nodes->grep( sub {
-        $_->tag and $_->tag eq 'span' and $_->attr('class') and $_->attr('class') =~ /\bchapternum\b/
-    } )->each( sub {
-        $_->replace('|1| ');
+    $block->find('span.text')->each( sub { _retag( $_, 'text' ) } );
+
+    $block->find('table')->each( sub {
+        $_->find('tr')->each( sub {
+            $_->find('th')->each('remove');
+            unless ( $_->child_nodes->size ) {
+                $_->strip;
+            }
+            else {
+                $_->replace( join( '',
+                    '<text>',
+                    $_->find('td text')->map('content')->join(', '),
+                    (
+                        ( $_->find('td text')->map('text')->last =~ /\W$/ ) ? ''  :
+                        ( $_->following_nodes->size                       ) ? '; ' : '.'
+                    ),
+                    ( ( $_->following_nodes->size ) ? '</text> ' : '</text>' ),
+                ) );
+            }
+        } );
+
+        $_->tag('div');
+        $_->content( '<p>' . $_->content . '</p>' );
     } );
 
-    $passage->descendant_nodes->grep( sub {
-        $_->tag and $_->tag eq 'sup' and $_->attr('class') and $_->attr('class') =~ /\bversenum\b/
-    } )->each( sub {
-        $_->replace( '|' . ( ( $_->content =~ /(\d+)/ ) ? $1 : '?' ) . '| ' );
+    $block->find( join( ', ', map { '.left-' . $_ } 1 .. 9 ) )->each( sub {
+        my ($left) = $_->attr('class') =~ /\bleft\-(\d+)/;
+        $_->find('text')->each( sub { $_->attr( indent => $left ) } );
+        $_->strip;
     } );
 
-    $passage->descendant_nodes->grep( sub { $_->tag and $_->tag eq 'p' } )->each( sub {
-        $_->replace( $_->content . "\n\n" );
+    $block->find('div.poetry')->each( sub { $_->attr( class => 'indent-1' ) } );
+
+    $block->find( join( ', ', map { '.indent-' . $_ } 1 .. 9 ) )->each( sub {
+        my ($indent) = $_->attr('class') =~ /\bindent\-(\d+)/;
+        $_->find('text')->each( sub {
+            $indent += $_->attr('indent') || 0;
+            $_->attr( indent => $indent );
+        } );
+        $_->strip;
     } );
 
-    $passage->descendant_nodes->grep( sub {
-        $_->tag and $_->tag eq 'span' and $_->attr('class') and $_->attr('class') eq 'woj'
-    } )->each( sub {
-        $_->replace( '[*' . $_->content . '*]' );
+    $block->find( join( ', ', map { '.indent-' . $_ . '-breaks' } 1 .. 5 ) )->each('remove');
+
+    $block->find('text[indent]')->each( sub {
+        my $level = $_->attr('indent');
+        _retag( $_, 'indent' );
+        $_->attr( level => $level );
+    } );
+    $block->find('text')->each('strip');
+
+    $block->find('indent + indent')->each( sub {
+        if ( $_->previous->attr('level') eq $_->attr('level') ) {
+            $_->previous->append_content( ' ' . $_->content );
+            $_->remove;
+        }
     } );
 
-    $passage->descendant_nodes->grep( sub {
-        $_->tag and $_->tag eq 'span' and $_->attr('class') and $_->attr('class') =~ 'text '
-    } )->each( sub {
-        $_->replace( $_->content );
-    } );
+    $block->find('p')->each( sub { _retag( $_, 'p' ) } );
+    $block->find('div, span')->each('strip');
 
-    $passage->descendant_nodes->grep( sub {
-        $_->tag and $_->tag eq 'div' and $_->attr('class') and $_->attr('class') =~ 'poetry'
-    } )->each( sub {
-        $_->descendant_nodes->grep( sub { $_->tag and $_->tag eq 'br' } )->each( sub { $_->replace("\n_") } );
-
-        $_->descendant_nodes->grep( sub {
-            $_->tag and $_->tag eq 'span' and $_->attr('class') and $_->attr('class') eq 'indent-1-breaks'
-        } )->each( sub { $_->remove } );
-
-        $_->descendant_nodes->grep( sub {
-            $_->tag and $_->tag eq 'span' and $_->attr('class') and $_->attr('class') eq 'indent-1'
-        } )->each( sub { $_->replace( '_' . $_->content ) } );
-
-        $_->replace( '_' . $_->content );
-    } );
-
-    my $obml = '~ ' . $book_chapter . " ~\n\n" . $passage->content;
-
-    $obml = $self->_obml_lib->desmartify($obml);
-
-    $obml =~ s/<span.*?>(.*?)<\/span>/$1/sg; # rm <span> tags but keep content
-    $obml =~ s|<[^>]*>||sg;                  # rm all remaining HTML
-
-    $obml =~ s/\|1\|(.*?\|1\|)/$1/s; # rm dup verse # if chapter # fails override (ex: John 8)
-
-    $obml =~ s/[ \t]+/ /g;             # turn all whitespace ranges into single spaces
-    $obml =~ s/[ ]*\r?[ ]*\n[ ]*/\n/g; # rm spacing around line breaks and fix line breaks
-    $obml =~ s/\n{3,}/\n\n/g;          # rm extra blank lines
-    $obml =~ s/(?:^\s+|\s+$)//g;       # rm initial or postscript blank lines
-
-    $obml =~ s/^_{2,}/ ' ' x 6 /mge; # set double-indent (ex: Heb 1)
-    $obml =~ s/^_/     ' ' x 4 /mge; # set double-indent (ex: Heb 1)
-
-    $obml =~ s/(\{[^\}]+\})(\s*)(\[[^\]]+\])/$3$2$1/g; # reorder crossrefs before footnotes
-
-    # move footnotes, spaces, and crossrefs in front of woj end to after the woj end
-    $obml =~ s/((?:(?:\[[^\]]+\])|\s|(?:\{[^\}]+\}))+)\*\]/*$1/g;
-
-    $obml =~ s/\[\*/*/g; # set woj start
-    $obml =~ s/\*\]/*/g; # set woj end
-
-    $obml =~ s/([\*^])(\|\d+\|)(\s*)/$2$3$1/g; # fix markings left of verse number (ex: John 8)
-    $obml =~ s/=[^=\n]+=\n+(=[^=\n]+=)/$1/mg;  # rm preceeding duplicate header lines
-
-    $self->data( $self->_obml_lib->parse($obml) );
-    $self->obml( $self->_obml_lib->render( $self->data ) );
-
-    return $self;
+    return html_unescape( $block->to_string );
 }
 
-sub html {
-    my ($self) = @_;
-    croak('No result to return HTML for') unless ( $self->_body );
-    return $self->_body;
-}
-
-sub save {
-    my ( $self, $filename ) = @_;
-    croak('No filename provided to save to') unless ($filename);
-    croak('No result to return HTML for') unless ( $self->_body );
-    path($filename)->spurt( $self->_body );
-    return $self;
-}
-
-sub load {
-    my ( $self, $filename ) = @_;
-    croak('No filename provided to save to') unless ($filename);
-    $self->_parse( decode( 'UTF-8', path($filename)->slurp ) );
-    return $self;
+sub get ( $self, $reference, $translation = $self->translation ) {
+    return Bible::OBML->new->html( $self->parse( $self->fetch( $reference, $translation ) ) );
 }
 
 1;
@@ -216,11 +222,11 @@ __END__
 
 =head1 NAME
 
-Bible::OBML::Gateway - Bible Gateway content conversion to Open Bible Markup Language (OBML)
+Bible::OBML::Gateway - Bible Gateway content conversion to Open Bible Markup Language
 
 =head1 VERSION
 
-version 1.12
+version 2.02
 
 =for markdown [![test](https://github.com/gryphonshafer/Bible-OBML-Gateway/workflows/test/badge.svg)](https://github.com/gryphonshafer/Bible-OBML-Gateway/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/Bible-OBML-Gateway/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Bible-OBML-Gateway)
@@ -232,17 +238,17 @@ version 1.12
     my $bg = Bible::OBML::Gateway->new;
     $bg->translation('NIV');
 
-    my $obml = $bg->get( 'Romans 12', 'NIV' )->obml;
-    my $data = $bg->get( 'Romans 12' )->data;
-    my $html = $bg->get('Romans 12')->html;
+    my $obml_obj = $bg->get( 'Romans 12' );
+    print $bg->get( 'Romans 12', 'NASB' )->obml, "\n";
 
-    $bg->get( 'Romans 12', 'NIV' )->save('Romans_12_NIV.html');
-    say $bg->load('Romans_12_NIV.html')->obml;
+    my $translations = $bg->translations;
+    my $structure    = $bg->structure('NASB');
 
 =head1 DESCRIPTION
 
-This module consumes Bible Gateway content and converts it to Open Bible Markup
-Language (OBML).
+This module consumes Bible Gateway content and returns useful data-bearing
+objects or data structures. In the common case, it will accept a Bible reference
+and return a L<Bible::OBML> object loaded with parsed content.
 
 =head1 METHODS
 
@@ -255,58 +261,133 @@ acronym to be used on subsequent requests.
 
     my $bg = Bible::OBML::Gateway->new( translation => 'NIV' );
 
+=head2 get
+
+This method requires a text input containing a Bible reference that can be
+understood as a single chapter or single, unbroken run of verses. For example,
+"Romans 12" or "Ro 12:13-17" are acceptable, but "Romans 12:13-17, 19" is not.
+
+You can optionally also provide an overriding translation. If not specified,
+the object's translation (set via the C<translation> attribute) will be used.
+
+The method will get the raw HTML content from Bible Gateway, parse it, and
+return a L<Bible::OBML> object loaded with the data.
+
+    my $obml_obj = $bg->get( 'Romans 12' );
+    print $bg->get( 'Romans 12', 'NASB' )->obml, "\n";
+
+Internally, all this method does is call C<fetch>, pass that output to C<parse>,
+and then load output that into a new L<Bible::OBML> object.
+
+=head2 fetch
+
+If all you want to do is fetch the HTML from Bible Gateway, you can use this
+method. It uses the same signature as C<get> and returns the returned raw HTML.
+
+=head2 parse
+
+This method requires source HTML like what you might get from a C<fetch> call,
+which it will then parse and return a special sort of HTML that can be loaded
+directly into a L<Bible::OBML> object via it's C<html> method. (See
+L<Bible::OBML> for more information.)
+
+=head2 translations
+
+This method will return a data structure consisting of data describing available
+translations on Bible Gateway per spoken language. It returns an arrayref
+containing a hashref per language. Each hashref contains an arrayref of
+translations, each represented by a hashref.
+
+    my $translations = $bg->translations;
+
+This a simplified example of the data structure:
+
+    [
+        {
+            acronym      => 'EN',
+            language     => 'English',
+            translations => [
+                {
+                    acronym     => 'NIV',
+                    translation => 'New International Version',
+                },
+            ],
+        },
+    ]
+
+=head2 structure
+
+This method will return a data structure consisting of data describing the
+structure of a given translation of the Bible from Bible Gateway. It can
+optionally be provided an overriding translation. If not specified, the object's
+translation (set via the C<translation> attribute) will be used. The data
+structure returned is an arrayref of hashrefs, each representing a book.
+
+    my $structure = $bg->structure('NASB');
+
+This a simplified example of the data structure:
+
+    [
+        {
+            testament    =>  'NT',
+            display      =>  '2 John',
+            osis         =>  '2John',
+            intro        =>  0,
+            num_chapters =>  1,
+            chapters     =>  [
+                {
+                    chapter => 1,
+                    type    => 'heading',
+                    content => [
+                        "Walk According to His Commandments",
+                    ],
+                },
+            ],
+        }
+    ]
+
+=head1 ATTRIBUTES
+
+Attributes can be set in a call to C<new> or explicitly as a get/set method.
+
+    my $bg = Bible::OBML::Gateway->new( translation => 'NIV' );
+    $bg->translation('NIV');
+    say $bg->translation;
+
 =head2 translation
 
-Get or set the current translation acronym.
+Get or set the current translation acronym. The default if not explicitly set
+will be "NIV".
 
     say $bg->translation;
     $bg->translation('NIV');
 
-=head2 get
+=head2 url
 
-Gets the raw HTML content for a given chapter represented by book, chapter,
-and translation. The book and chapter can be combined with a space. The
-translation if provided will override the translation set in the object.
+This provides access to the base URL, contained within a L<Mojo::URL> object.
 
-    $bg->get( 'Romans 12', 'NIV' );
-    $bg->get('Romans 12');
+    $bg->url( Mojo::URL->new('https://www.biblegateway.com/passage/') );
 
-=head2 obml
+=head2 ua
 
-Parses the previously C<get()>-ed raw HTML if it hasn't been parsed yet and
-returns Open Bible Markup Language (OBML) using L<Bible::OBML>.
+This provides access to the L<Mojo::UserAgent> user agent.
 
-    my $obml = $bg->get('Romans 12')->obml;
+    $bg->ua->transactor->name("Your Application's Name");
 
-=head2 data
+=head2 reference
 
-Parses the previously C<get()>-ed raw HTML if it hasn't been parsed yet and
-returns a data structure of content that could be passed into L<Bible::OBML>'s
-C<render()> method.
+This provides access to the L<Bible::Reference> object used to parse and
+canonicalize Bible references.
 
-    my $data = $bg->get('Romans 12')->data;
+    $bg->reference->bible('Catholic');
 
-=head2 html
-
-Returns the previously C<get()>-ed raw HTML.
-
-    my $html = $bg->get('Romans 12')->html;
-
-=head2 save
-
-Saves the previously C<get()>-ed raw HTML to a file.
-
-    $bg->get('Romans 12')->save('Romans_12_NIV.html');
-
-=head2 load
-
-Loads raw HTML from a file.
-
-    say $bg->load('Romans_12_NIV.html')->obml;
+Depending on which translation you C<get> from Bible Gateway, you may need to
+alter the C<bible> setting of C<reference>, as in the example immediately above.
+By default, C<bible> is set to "Protestant".
 
 =head1 SEE ALSO
 
-L<Bible::OBML>, L<Bible::OBML::HTML>, L<Bible::Reference>.
+L<Bible::OBML>, L<Bible::Reference>, L<Mojo::URL>, L<Mojo::UserAgent>.
 
 You can also look for additional information at:
 
@@ -344,7 +425,7 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017-2021 by Gryphon Shafer.
+This software is Copyright (c) 2017-2050 by Gryphon Shafer.
 
 This is free software, licensed under:
 

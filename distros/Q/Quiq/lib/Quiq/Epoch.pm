@@ -42,7 +42,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.199';
+our $VERSION = '1.200';
 
 use Time::HiRes ();
 use Time::Local ();
@@ -63,6 +63,9 @@ use POSIX ();
   $t = $class->new;
   $t = $class->new($epoch);
   $t = $class->new($iso);
+  $t = $class->new('start-of-month');
+  $t = $class->new('start-of-previous-month');
+  $t = $class->new('start-of-next-month');
 
 =head4 Description
 
@@ -79,7 +82,33 @@ sub new {
     my $class = shift;
     my $epoch = shift // scalar(Time::HiRes::gettimeofday);
 
-    if ($epoch !~ /^[\d.]+$/) {
+    if ($epoch eq 'start-of-month') {
+        my (undef,undef,undef,undef,$m,$y) = localtime;
+        $epoch = Time::Local::timelocal(0,0,0,1,$m,$y);
+    }
+    elsif ($epoch eq 'start-of-next-month') {
+        my (undef,undef,undef,undef,$m,$y) = localtime;
+        if ($m == 11) {
+            $m = 1;
+            $y++;
+        }
+        else {
+            $m++;
+        }
+        $epoch = Time::Local::timelocal(0,0,0,1,$m,$y);
+    }
+    elsif ($epoch eq 'start-of-previous-month') {
+        my (undef,undef,undef,undef,$m,$y) = localtime;
+        if ($m == 0) {
+            $m = 12;
+            $y--;
+        }
+        else {
+            $m--;
+        }
+        $epoch = Time::Local::timelocal(0,0,0,1,$m,$y);
+    }
+    elsif ($epoch !~ /^[\d.]+$/) {
         # ISO Zeitangabe
 
         my $x;
@@ -207,6 +236,31 @@ Liefere (vierstellige) Jahreszahl.
 sub year {
     my $self = shift;
     return (localtime $$self)[5]+1900;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 month() - Monatsnummer
+
+=head4 Synopsis
+
+  $month = $t->month;
+
+=head4 Returns
+
+Integer
+
+=head4 Description
+
+Liefere die ein- oder zweistellige Monatsnummer (1 .. 12).
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub month {
+    my $self = shift;
+    return (localtime $$self)[4]+1;
 }
 
 # -----------------------------------------------------------------------------
@@ -514,7 +568,7 @@ sub asIso {
 
 =head1 VERSION
 
-1.199
+1.200
 
 =head1 AUTHOR
 

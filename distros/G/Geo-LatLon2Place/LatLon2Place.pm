@@ -74,12 +74,12 @@ use common::sense;
 use Carp ();
 
 BEGIN {
-   our $VERSION = 0.01;
+   our $VERSION = 0.9;
 
    require XSLoader;
    XSLoader::load (__PACKAGE__, $VERSION);
 
-   eval 'sub TORAD() { ' . ((atan2 1,0) / 180) . ' }';
+   eval 'sub TORAD() { ' . ((atan2 1,0) / 90) . ' }';
 }
 
 =item $lookup = Geo::LatLon2Place->new ($path)
@@ -108,8 +108,8 @@ sub new {
    $magic eq "SRGL"
       or Carp::croak "$path: not a Geo::LatLon2Place file";
 
-   $version == 1
-      or Carp::croak "$path: version mismatch (got $version, expected 1)";
+   $version == 2
+      or Carp::croak "$path: version mismatch (got $version, expected 2)";
 
    $self
 }
@@ -130,47 +130,22 @@ you usually do not specify this parameter.
 If something is found, the associated data blob (always a binary string)
 is returned, otherwise you receive C<undef>.
 
-Unless you specify a cusotrm format, the data blob is actually a UTF-8
-string, so you might want to call C<utf8::decode> on it to get a unicode
-astring.
+Unless you specify a custom format/extractor when building your database,
+the data blob is actually a UTF-8 string, so you might want to call
+C<utf8::decode> on it to get a unicode string:
 
-At the moment, the implementation is in pure perl, but will eventually
-move to C.
+   my $res = $db->lookup (47, 37); # near mariupol, UA
+   if (defined $res) {
+      utf8::decode $res;
+      # $res now contains the unicode result
+   }
 
 =cut
 
 sub lookup {
    my ($self, $lat, $lon, $radius) = @_;
 
-   $radius ||= $self->[2];
-   $radius = int +($radius + $self->[2] - 1) / $self->[2];
-
-   my $coslat = cos abs $lat * TORAD;
-
-   my $blat = int $self->[3] * $coslat;
-   my $cx = int (($lon + 180) * $blat      / 360);
-   my $cy = int (($lat +  90) * $self->[3] / 180);
-
-   my ($min, $res) = (1e00);
-
-   for my $y ($cy - $radius .. $cy + $radius) {
-      for my $x ($cx - $radius .. $cx + $radius) {
-         for (unpack "(C/a*)*", cdb_get $self->[1], pack "s< s<", $x, $y) {
-            my ($plat, $plon, $w, $data) = unpack "s< s< C a*";
-            $plat = $plat * ( 90 / 32767);
-            $plon = $plon * (180 / 32767);
-
-            my $dx = ($lon - $plon) * TORAD * $coslat;
-            my $dy = ($lat - $plat) * TORAD;
-            my $d2 = ($dx * $dx + $dy * $dy) * $w;
-
-            $d2 >= $min
-               or ($min, $res) = ($d2, $data);
-         }
-      }
-   }
-
-   $res
+   lookup_ext_ $self->[1], $self->[2], $self->[3], $lat, $lon, 0, $radius, 0
 }
 
 =back
@@ -192,7 +167,7 @@ It will then calculate the (squared) distance to the search coordinate
 using an approximate euclidean distance on an equireactangular
 projection. The squared distance is multiplied with a weight (1..25 for
 the geonames database, based on population and adminstrative status,
-always 1 for postcal codes), and the minimum distance wins.
+always 1 for postal codes), and the minimum distance wins.
 
 Binning should not introduce errors, but bigger bins can slow down lookup
 times due to having to look at more places. The lookup assumes a spherical
@@ -203,17 +178,27 @@ errors should be considered negligible.
 
 =head1 SPEED
 
-The current implementation is written in pure perl, and on my machine,
-typically does 10000-200000 lookups per second. The goal for version 1.0
-is to move the lookup to C.
+On my machine, C<lookup> typically does more than a million lookups per
+second - performance varies depending on result density and number of
+indexed points.
 
 =head1 TENTATIVE ROADMAP
 
-The database writer should be accessible via a module, so you cna easily
+The database writer should be accessible via a module, so you can easily
 generate your own databases without having to run an external command.
 
-The api might be extended to allow for multiple returns, or nearest
-neighbour search.
+The API might be extended to allow for multiple lookups, multiple
+returns, or nearest neighbour search, or more return values (distance,
+coordinates).
+
+Longer lookups will take advantage of perlmulticore.
+
+=head1 PERL MULTICORE SUPPORT
+
+This is not yet implemented:
+
+This module supports the perl multicore specification
+(L<http://perlmulticore.schmorp.de/>) when doing lookups.
 
 =head1 SEE ALSO
 

@@ -17,7 +17,7 @@ use strict;
 #use PDL::PP; ##-- do NOT do this!
 use Exporter;
 
-our $VERSION = '1.0.17'; ##-- v1.0.4: use perl-reversion from Perl::Version instead
+our $VERSION = '1.0.18'; ##-- v1.0.4: use perl-reversion from Perl::Version instead
 our @ISA = qw(Exporter);
 our @EXPORT_OK =
   (
@@ -564,7 +564,7 @@ PDL by Karl Glazebrook, Tuomas J. Lukka, Christian Soeller, and others.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2007-2021, Bryan Jurish.  All rights reserved.
+Copyright (c) 2007-2022, Bryan Jurish.  All rights reserved.
 
 This package is free software.  You may redistribute it
 and/or modify it under the same terms as Perl itself.

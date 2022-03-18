@@ -1,6 +1,6 @@
 package Math::PariBuild;
 
-$VERSION = '2.01080604';
+$VERSION = '2.030520';
 
 require Exporter;
 @ISA = 'Exporter';
@@ -33,6 +33,7 @@ require Exporter;
 	     ep_in_version
 	     code_C_translator
 	     build_funclists
+	     pari_formatted_version_from_includes
 	    );
 
 use strict;
@@ -107,8 +108,8 @@ EOW
 =item find_pari_dir()
 
 Returns the GP/PARI build directory, looking for it as a kid, sibling,
-or parent of the current directory.  [Currently skips versions 2.3.* if
-possible.]
+or parent of the current directory.  [Currently skips unsupported versions if
+supported versions are present - unless the directory is in the current directory.]
 
 =cut
 
@@ -117,26 +118,35 @@ my $latmus = 'src/test/in/nfields';
 sub filter_versions_too_new {
   my $force = shift;
   my @dirs = grep !m((?:^|[\\/])pari-(?:$common::skip_versions)), @_;
-  print "Filtered out versions too new...\n" if @dirs != @_;
+  print "Filtered out versions too new... <@dirs> out of <@_>\n" if @dirs != @_;
   return @dirs if $force or @dirs;
+  print "Nothing remained, so I ignore the filter...\n" if @_;
   return @_;			# Not found, not forced
 }
 
 sub find_pari_dir {
-  my ($dir, @dirs, @gooddirs);
+  my ($dir, @dirs, @adirs, @alldirs, @gooddirs);
   # Try to find alongside
   for $dir ('.', '..', '../..', '../../..') {
-    @dirs = filter_versions_too_new 0, <$dir/pari-[234].*>;
+    @dirs = grep -d, <$dir/pari-[234].*>;
     @dirs = "$dir/pari" if not @dirs and -d "$dir/pari";
-    @dirs = grep -e "$_/$latmus", @dirs;
+    @adirs = grep -e "$_/$latmus", @dirs;
+    push @alldirs, @adirs;
+    @dirs = filter_versions_too_new $dir ne '.', @adirs;
     last if @dirs;
   }
+  @dirs = @alldirs unless @dirs;
   @gooddirs = grep !/alpha|beta/, @dirs;
   @gooddirs = grep !/alpha/, @dirs unless @gooddirs;
   @gooddirs = @dirs unless @gooddirs;
+  return unless @gooddirs;
   @gooddirs = sort {pari_formatted_version($a) cmp pari_formatted_version($b)}
     @gooddirs;
-  return $gooddirs[-1];
+  my $v = pari_formatted_version($gooddirs[-1]);
+  @gooddirs = grep {my $d=$_; local $_; my $vv = pari_formatted_version($d); warn("v<<$d>> -> $vv"); $v eq $vv} @gooddirs;
+  	warn "v=$v => <<@gooddirs>>";
+  @gooddirs = sort {length($a) cmp length($b)} @gooddirs;	# Skip directory names with appended stuff
+  return $gooddirs[0];
 }
 
 =item download_pari()
@@ -167,8 +177,8 @@ directory of the current directory.
    There is no need to extract the archive, or build GP/PARI; but if you
    have it extracted [and patched, if needed], you may specify
        paridir=PATH_TO_DIST_DIR
-   option to Makefile.PL instead of `pari_tgz'.  However, in this case
-   the files WON'T be auto-patched.
+   option to Makefile.PL instead of `pari_tgz'.  However, in this case the
+   files WON'T be auto-patched (unless it is in a subdir, or force_patching).
 
    As a last-resort solution, there is also a possibility to use an already
    compiled PARI library.  See the documentation in README and INSTALL files.]
@@ -249,12 +259,22 @@ sub extract_pari_archive ($) {
     return $dir;
 }
 
+sub fmt_version {sprintf "%03d%03d%03d", split /\./, shift}
+
+sub pari_formatted_version_from_includes($) {	# Unsupported; to enable parilib option; based on
+    my $prefix = shift;			#  http://cvsweb.netbsd.org/bsdweb.cgi/~checkout~/pkgsrc/math/p5-Math-Pari/patches/patch-aa
+    open my $fh, "<", "$prefix/pari/paricfg.h" or die $!;
+    while( my $line = <$fh> ) {
+       next unless $line =~ m/^#define\s+PARIVERSION.*(\d+\.\d+\.\d+)/;
+       return fmt_version $1;
+    }
+}
+
 sub finish_download_pari ($$$$;$) {
   my($base_url, $dir, $_archive, $ftp, $ua) = (shift, shift, shift, shift, shift);
   my %archive = %$_archive;
   my ($type, %have, %types, $best, %latest_version, %latest_file);
   
-  sub fmt_version {sprintf "%03d%03d%03d", split /\./, shift}
 
   for $type (qw(alpha beta golden)) {
     if ($archive{$type}) {
@@ -309,19 +329,24 @@ sub finish_download_pari ($$$$;$) {
 sub download_pari {
   my ($srcfile, $force) = (shift, shift);
   my $host = 'megrez.math.u-bordeaux.fr';
-  my $dir  = '/pub/pari/unix/';
+  my $dir  = '/pub/pari/';
   my($ftp, $ua, $base_url);
 
   print "Did not find GP/PARI build directory around.\n" unless defined $srcfile;
 
+  my $match_ver = "(?!$common::skip_versions)";
+  if ($srcfile and not -d srcfile) {
+    (my $in = $srcfile) =~ s/^pari\W*//;
+    $match_ver = '(?=' . quotemeta($in) . '\b)' if length $in;	# cannot use \Q \E not in a REx operator
+  }
   my @match = ( '((?:.*\/)?pari\W*', '(\d+\.\d+\.\d+).*\.t(?:ar\.)?gz)$' );
-  my $match1 = "$match[0]$match[1]";
-  my $match  = "$match[0](?!$common::skip_versions)$match[1]";
+  my $match_all = "$match[0]$match[1]";
+  my $match     = "$match[0]$match_ver$match[1]";
 
   my %archive;
   my $match_pari_archive = sub {
     my ($file, $ok23) = (shift, shift);
-    return unless $ok23 ? $file =~ /$match1/o : $file =~ /$match/o;
+    return unless $ok23 ? $file =~ /$match_all/o : $file =~ /$match/o;
     $file = $1;
     my $version = $2;
     if ($file =~ /alpha/) {
@@ -340,7 +365,7 @@ sub download_pari {
   } else {
     if ($force) {
       print "Forced autofetching...\n\n"
-    } elsif ($^O =~ /^MSWin32\b/ and $Config{ptrsize} == 8 and $Config{longsize} == 4) {
+    } elsif (!'Not needed now' and $^O =~ /^MSWin32\b/ and $Config{ptrsize} == 8 and $Config{longsize} == 4) {
       print <<EOP;
 
 Apparently, you are running a 64-bit Perl built with MicroSoft's compilers.
@@ -416,35 +441,39 @@ EOP
     }
 
     $base_url = "ftp://$host$dir";
-    my @extra_chdir = qw(OLD/2.3 OLD/2.1 OLD);
+    my @extra_chdir = qw(unix OLD/2.3 OLD/2.1 OLD);
     print "Getting GP/PARI from $base_url\n";
 
     my @ret = eval {
       die "This is not an FTP url: $base_url" unless $base_url =~ m(^ftp://);
       require Net::FTP;
 
-      $ftp = Net::FTP->new($host) or die "Cannot create FTP object: $!";
+      $ftp = Net::FTP->new($host) or die "Cannot create FTP object: $! [[[\$\@=$@]]]";
       $ftp->login("anonymous","Math::Pari@")
         or die "Cannot login anonymously (",$ftp->message(),"): $!";
       my($c, $sub_old) = 0;
       my @Extra = @extra_chdir;
+      my @Lst;
       while (not $c) {
 	$ftp->cwd($dir) or die "Cannot cwd (",$ftp->message(),"): $!";
 	$ftp->binary() or die "Cannot switch to binary (",$ftp->message(),"): $!";
 	my @lst = $ftp->ls();
 	@lst or ($ftp->pasv() and @lst = $ftp->ls()) or die "Cannot list (",$ftp->message(),"): $!";
-	#print "list = `@lst'\n";
+	# print "list = `@lst'\n";
+	# print "skip = /PREFIX($common::skip_versions)/\n";
 
+        push @Lst, grep /pari\W*\d.*\bt(ar\.)?gz$/, @lst;
 	%archive = ();
 	for my $file (@lst) {
 	  $c++ if $match_pari_archive->($file);
 	}
 	$sub_old++ if $dir =~ m(OLD/);
 	unless ($c) {
-	  die "Did not find any file matching /$match/ via FTP\n\n"
+	  die "Did not find any file matching /$match/ via FTP\n\t(Checked @Lst)\n\n"
 	    . manual_download_instructions() unless @Extra;
 	  $dir = shift @Extra;
 	  $dir =~ s(OLD)(..) if $sub_old;
+	  $dir =~ s((?=OLD))(../) unless $sub_old;
 	  print "Not in this directory, now chdir('$dir')...\n";
 	}
       }
@@ -507,6 +536,13 @@ Returns patches appropriate for GP/PARI version $version (formatted as in C<2.2.
 
 sub patches_for ($) {
   my ($v) = (shift);
+  unless ($v =~ /\.\d+\./) {
+    (my $v0 = $v) =~ s/\.//;
+    s/^0+(?=\d)// for my @v = split /(?=(?:\d\d\d)+$)/, $v0;
+    $v = join '.', @v;
+#    warn "Converted version to `$v'";
+  }
+  my(@p250);
   my %patches = ('2.0.11'
 		 => [qw(
 			patch11/diff_pari_gnuplot_aa
@@ -545,14 +581,38 @@ sub patches_for ($) {
 			      'patches/diff_2.1.7_div',
 			      'patches/diff_2.1.6_align_power_of_2',
 			      'patches/diff_2.1.7_restart'],
-		 '2.3.5' =>  [
+		 '2.3.*' =>  [
 			($^O =~ /^MSWin32\b/ ? 'patches/diff_2.3.5_mingw-w64' : ()),
 			      'patches/diff_2.3.5_stderr_clobber'], 
+		 '2.5.0' =>  [@p250 = qw(patches/diff-2.5.0-x-prototype
+				         patches/diff-2.5.0-exceptions
+				         patches/diff-2.5.0-tune_opt)],		# Well, tune_opt is symptomatic: the bug is in PARI
+		 '2.5.1' =>  [@p250],						# untested
+		 '2.5.*' =>  ['patches/diff-2.5.0-x-prototype',
+			      'patches/diff-2.5.5-exceptions'],
+		 '2.7.*' =>  [qw(patches/diff-2.7.0-x-prototype
+				 patches/diff-2.7.0-exceptions
+				 patches/diff-2.7.0-reinstall-foreigh)],
+		 '2.9.*' =>  [qw(patches/diff-2.7.0-x-prototype
+				 patches/diff-2.7.0-exceptions
+				 patches/diff-2.7.0-reinstall-foreigh)],
+		 '2.9.0' =>  ['patches/diff-2.9.0-all'],
+		 '2.9.*' =>  ['patches/diff-2.9.5-all'],		# When did it actually change???
+		 '2.11.*' =>  ['patches/diff-2.11.0-all'],
+		 '2.12.*' =>  ['patches/diff-2.11.0-all'],		# Untested from here
+		 '2.13.*' =>  ['patches/diff-2.13.3-all'],
+		 '2.14.*' =>  ['patches/diff-2.13.3-all'],
 		);
   print "Looking for patches for $v...\n";
-  my @p = $patches{$v} ? @{$patches{$v}} : ();
+  my $vv = $v;
+  $vv =~ s/\d+$/*/ unless $patches{$vv};
+  my @p = $patches{$vv}	? @{$patches{$vv}} : ();
   push @p, 'patches/diff_pari-2.1.3-ix86-divl'
     if $v le '2.1.3' or $v ge '2.2' and $v le '2.2.2';
+  push @p, 'patches/diff_2.3.5_mingw_longlong'
+    if $v le '2.3.5' and $v !~ /^2\.\d\d/ and $common::src eq 'src64';	# checked starting with 2.3.3...
+  push @p, qw(	patches/diff_add_gnuplotNeeded
+		patches/diff_add_gnuplotAdd ) if $v =~ /^2\.3\b/; # ge '2.2.13';
   @p;
 }
 
@@ -583,8 +643,13 @@ sub patch_pari {
   my $patch = $Config{gnupatch} || 'patch';
   my ($dir_sep, @args) = patch_args $patch;
   my ($rc, $p) = join '; ', $dir_sep, @args, '';
+  my $ourdir = '..';
+  if ($dir =~ m{(^|[/\\])\.\.[/\\]|[^.][/\\]}) {	# Not an immediate subdir
+    require Cwd;
+    $ourdir = Cwd::cwd();
+  }
   foreach $p (@patches) {
-    (my $pp = "../$p") =~ s,/,$dir_sep,g;
+    (my $pp = "$ourdir/$p") =~ s,/,$dir_sep,g;
     my $cmd = "cd $dir && $patch -p1 @args < $pp";
     print "$cmd\n";
     system "$cmd"
@@ -594,7 +659,7 @@ sub patch_pari {
   print "Finished patching...\n";
   $common::patches_run = 1;
   if (open my $f, ">> $dir/.perl.patches") {
-    print $f join "\n", "# Needed patches:", @patches, "# Failed patches (if any):", @common::patches_fail, '';
+    print $f join "\n", "# Needed patches:", @patches, "# Failed patches (if any) will follow:", @common::patches_fail, '';
     close $f;
   } else {
      warn "???  Cannot report which patches were applied in $dir/.perl.patches: $!"
@@ -652,7 +717,8 @@ sub make_pod {
       chmod 0666, $targ;
       unlink $targ;
     }
-    (system "$^X libPARI/gphelp $how $paridir/doc/usersch3.tex > tmp_pod "
+    (my $v = $paridir) =~ s{^(.*[\\/])?pari\W*}();
+    (system "$^X -I. libPARI/gphelp $how -pari-version=$v $paridir/doc/usersch3.tex > tmp_pod "
       and (warn("Errors when converting documentation: $?"), 0))
       or rename 'tmp_pod', $targ;
   }
@@ -692,8 +758,8 @@ sub build_tests {
   unless (-e $targ and -M $targ <= -M $sou) {
     $dir =~ s/\\/\\\\\\\\/g;
     my $quote = ($^O =~ /win32/i) ? '"' : "'";
-    system "$^X -pe $quote s,CHANGE_ME,$dir, $quote $sou > $targ"
-      and die "Could not run test converter: $! $?";
+    system "$^X -pwe $quote s,CHANGE_ME,$dir, $quote $sou > $targ"
+      and die "Could not run test converter <<<$^X -pwe $quote s,CHANGE_ME,$dir, $quote $sou > $targ>>>: $! $?";
   }
   $sou = $targ;
   my $test;
@@ -812,13 +878,18 @@ EOP
   }
   # with 2.1.7, it is either in one of $miscdir/galdata $share_prefix/pari/galdata
   my $miscdir = $datadir;	# Not needed with 2.3.4
+  my $gphelp = "perl -S gphelp -detex";		# The config from DOSISH;
+  (my $bindir = $datadir) =~ s(/share/pari/$)(/bin/);
+  $gphelp = '\"' . $bindir . 'gphelp\"' unless $^O =~ /^(os2|mswin)/i;
   $datadir .= "galdata/" if $version < 2003000;
+
   print F <<EOP;
 #define SHELL_Q		'\\$shellq'
 EOP
   print F <<EOP;
-#define GPDATADIR "$datadir"
-#define GPMISCDIR "$miscdir"
+#define GPDATADIR	"$datadir"
+#define GPMISCDIR	"$miscdir"
+#define GPHELP		"$gphelp"
 
 #define PARI_BYTE_ORDER    $Config{byteorder}
 #define NOEXP2	/* Otherwise elliptic.t:11 rounds differetly, and fails */
@@ -856,7 +927,8 @@ EOP
 
   my $arch = find_machine_architecture();
   my $bits64 = ($arch =~ /alpha|64/ # ppc is 32bit
-		or defined($Config{longsize}) and $Config{longsize} == 8);
+		or defined($Config{longsize}) and $Config{longsize} == 8
+		or $^O =~ /^MSWin/i and $Config{ptrsize} == 8);		# PARI #define's long as "long long"
   print F <<EOP if $bits64;
 #define LONG_IS_64BIT	1
 
@@ -890,6 +962,26 @@ EOP
 #define PARI_VERSION_CODE	$vvv
 #define PARI_VERSION(a,b,c)	(((a) << 16) + ((b) << 8) + (c))
 #define PARI_VERSION_SHIFT	8
+
+EOP
+
+  my($V1,$V2,$V3) = $version =~ /(\d+?(?=\d{6}$))0*(\d+?(?=\d{3}$))0*(\d+)$/ or die "Unexpected format of version=$version";
+  my $rel = ($V2 & 1) ? 'released' : 'experimental';
+  my $bits = $bits64 ? 64 : 32;
+  print F <<EOP if $version >= 2004000;
+#define PARIVERSION \"GP/PARI CALCULATOR Version $V1.$V2.$V3 ($rel) configured by Math::Pari\"
+#define PARIINFO \"PerlArch=$^O ($arch kernel); $bits-bit version\"
+#define PARI_VCSVERSION \"\"
+
+EOP
+
+  print F <<EOP if $version >= 2007000;
+#define PARI_MT_ENGINE \"$common::thread_engine\"
+
+EOP
+
+  print F <<EOP if $common::src eq 'src64' and $Config{gccversion} =~ /^([1-3]|4\.[0-6])\./;
+#define __USE_MINGW_ANSI_STDIO	1	/* For %lld.  Fixed on gcc 4.7??? */
 
 EOP
 
@@ -967,8 +1059,8 @@ sub find_machine_architecture () {
 	   or $os eq 'freebsd' or $os =~ /^cygwin/) {
     chomp($machine = `uname -m`);
     $machine ||= 'ix86';
-  } elsif (($Config{archname} =~ /^MSWin32-x86\b/) && ($Config{cc} =~ /gcc/) and ($Config{longsize} == 4)) {
-    $machine = 'ix86';
+  } elsif ($Config{archname} =~ /^MSWin32-x(86|64)\b/ and $Config{cc} =~ /gcc/) {	#  and ($Config{longsize} == 4
+    $machine = 'ix86';		# will not work before 2.9.0 in 64-bit case - but portable build won't work anyway.
   } elsif (0 and $os =~ /win32/i and not $Config{gccversion}) {
     # Not needed with rename of kernel1.s to kernel1.c?
     $machine = 'port'; # Win32 compilers would not understand the assmebler anyway
@@ -1211,7 +1303,7 @@ sub choose_and_report_assembler {
   my $asmarch = $asmarch{$machine} || $machine; # Temporary only
   my %skip64 = (alpha => 1, none => 1);
   if (not ( $skip64{$asmarch} or $asmarch =~ /\D64$/ )
-      and ($Config{longsize} || 0) == 8) {
+      and (($Config{longsize} || 0) == 8 or $common::src eq 'src64')) {
     $asmarch .= '_64';
     $asmarch = 'hppa64' if $asmarch eq 'hppa_64';
     $asmarch = 'x86_64' if $asmarch eq 'ix86_64';
@@ -1387,28 +1479,40 @@ sub assembler_flags {		# Backward compatibility
 sub extra_includes {
   my $pari_dir = shift;
   # Some #include directives assume us inside $pari_dir/OARCH; replace by src
-  return join ' -I ', '', grep -d, "$pari_dir/src/systems/$^O", "$pari_dir/src";
+  return join ' -I ', '', map "\$(PARI_DIR_SRC)", grep -d "$pari_dir/src$_", "/systems/$^O", '', qw(/mt);
 }
 
-sub build_funclists_ourselves ($) {
-  my $pari_dir = shift;
+sub build_funclists_ourselves ($$) {
+  my($pari_dir, $pari_version) = (shift, shift);
 
   chdir "$pari_dir/src/desc"
     or die "Can't chdir to `$pari_dir/src/desc'";
   unless (-f 'pari.desc') {
     my $t = 'tmp-pari.desc';
-    #warn "Running `$^X merge_822 ../functions/*/* > $t'...\n";
-    if (system "$^X merge_822 ../functions/*/* > $t") {		# On AIX, this exceeds max command line length
+    #warn "Running `$^X -I. merge_822 ../functions/*/* > $t'...\n";
+    if ($pari_version >= 2005000 
+	or system "$^X -I. merge_822 ../functions/*/* > $t"	# On AIX, this exceeds max command line length; 
+	or not -s $t) {						# On Win32, globbing fails, but merge 822 does not report failure
       unlink ($t);
-      warn <<EOW;
-Can't run `$^X merge_822 ../functions/*/* > $t'
-Running merge_822 separately in subdirectories...
+      warn <<EOW unless $pari_version >= 2005000;
+Can't run `$^X -I. merge_822 ../functions/*/* > $t'
+   Running merge_822 separately in subdirectories...
 EOW
+      my @L;
       foreach (glob ("../functions/*")) {
          next unless (-d $_);
          my @l = glob "$_/*" or next;
-         system "$^X merge_822 @l >> $t"
-           and die "Can't run `$^X merge_822 @l >> $t'";
+	 push @L, @l and next if $pari_version >= 2005000;
+	 warn "Trying ```$^X -I. merge_822 @l >> $t'''" if $ENV{MATH_PARIBUILD_WARN};
+         system "$^X -I. merge_822 @l >> $t"
+           and die "Can't run `$^X -I. merge_822 @l >> $t'";
+      }
+      if ($pari_version >= 2005000) {
+        open my $O, '>', "fl-$t" or die "cannot open `fl-$t' for write: $!";
+        print $O "0 0 $_\n" for @L;				# unknown format; try to be safe
+        close $O or die "cannot close `fl-$t' for write: $!";
+        system "$^X -I. merge_822 fl-$t > $t"
+          and die "Can't run `$^X -I. merge_822 fl-$t > $t'";
       }
     }
     rename $t, 'pari.desc' or die "rename failed: $t => 'pari.desc'";
@@ -1424,8 +1528,8 @@ EOW
 		   'gp/gp_init.h'	  => [[qw(gen_proto gp)],
 					      [qw(gen_help gp)]],
 		 );
-  } else {
-    %recipies = (  'language/members.h'	  => [[qw(gen_member)]],
+  } else {	# gen_member disappears in 2.5.0
+    %recipies = (  (-f 'gen_member' ? ('language/members.h'	  => [[qw(gen_member)]]) : ()),
 		   'language/init.h'	  => [[qw(gen_proto basic)]],
 		   'gp/highlvl.h'	  => [[qw(gen_proto highlevel)]],
 		   'gp/gp_init.h'	  => [[qw(gen_proto gp)]],
@@ -1435,9 +1539,9 @@ EOW
     next if -r "../$outfile";
     my $append = '>';
     for my $step (@{$recipies{$outfile}}) {
-      #warn "Running `$^X @$step pari.desc $append ../$outfile-tmp'...\n";
-      system "$^X @$step pari.desc $append ../$outfile-tmp"
-	and die "Can't run `$^X @$step pari.desc $append ../$outfile-tmp'";
+      #warn "Running `$^X -I. @$step pari.desc $append ../$outfile-tmp'...\n";
+      system "$^X -I. @$step pari.desc $append ../$outfile-tmp"
+	and die "Can't run `$^X -I. @$step pari.desc $append ../$outfile-tmp'";
       $append = '>>';
     }
     rename "../$outfile-tmp", "../$outfile"
@@ -1447,10 +1551,11 @@ EOW
 }
 
 sub build_funclists {
-  my $pari_dir = shift;
+  my($pari_dir, $pari_version) = (shift, shift || 0);
   return unless -d "$pari_dir/src/desc"; # Old version, no autogeneration
   return if -f "$pari_dir/src/language/init.h"
         and -f "$pari_dir/src/desc/pari.desc";
+  warn "funclist needs to be autogenerated...\n";
   if (-f "$pari_dir/src/desc/Makefile") { # Old development version
     # Keeps checksum to update when needed; fake it
     open FL, "> $pari_dir/src/funclist" and close FL # Ignore errors
@@ -1467,9 +1572,10 @@ sub build_funclists {
 ###  $pari_dir/src/desc manually too...
 EOW
      } else {
+       warn "   ... Need to autogenerate funclist ourselves...\n";
        require Cwd;
        my $cwd = Cwd::cwd();
-       my $res = eval { build_funclists_ourselves $pari_dir };
+       my $res = eval { build_funclists_ourselves $pari_dir, $pari_version };
        chdir $cwd;
        die <<EOD unless $res;
 $@
@@ -1702,6 +1808,82 @@ sub code_C_translator {
 
   # 23 == 21  47==48  91 == 96 (this one unsupported)
   join '', @t, @tt;
+}
+
+sub code_C_comment_interface {
+  # Some historic changes in interfaces we do not care about (E vs I)
+  my %c = (%old_expected_codes, %expected_codes);
+  my $res;
+#  s{^(interface(\d+)\(.*)}{ my $res = defined $c{$2} ? qq(\t/* Code="$c{$2}" */) : ''; $1 . $res}e;
+  s[^(interface(\d+)\(.*?\n\s*CODE:\s*\{)]{ my $res = defined $c{$2} ? qq(\t/* Code="$c{$2}" */) : ''; $1 . $res}msge;
+}
+
+sub filter_for_ll ($$;$$) {
+  my($from, $to, $echo, $debug) = (shift, shift, shift, shift);
+  die "File `$to' already exists" if -e $to;
+  open my $f, '<', $from or die "cannot open `$from' for read: $!";
+  my $IN = do {local $/, <$f>};
+  close $f or die "cannot close `$from' for read: $!";
+  print "Convert-to-long-long: $from to $to.\n" if $echo;
+
+  # It would be nice to ignore empty strings, but then the REx would be triggered on the terminating-".
+  my @in = (split(m{(\n+|;|'(?:\\.|[^''])+'|"(?:[^\\"]|\\.)*"|//[^\n]*\n|/\*.*?\*/)}si, $IN), '', '', '');	# make $in[-3] be as expected
+  my($in_printf, $par_balanced) = 0;
+  $par_balanced = qr/(?:(?>[^()]+)|\((??{$par_balanced})\))*/;
+  for my $n (0..$#in) {				# split into strings, comments and the rest (subsplit into lines)
+      my $in = $in[$n];
+      next if $in =~ m(^/[*/]);
+      $in_printf = 0, next if $in =~ m(^;);
+      if ($in !~ m(^[""''])) {	# neither a string, nor comment
+    # Add LL to the end of any constant with 10 or more numbers
+#    sed 's/\([-+({ ][0-9]\{10,\}\)\([,;:)} ]\)/\1LL\2/g' < $file > TMP
+####   BUG: what is above does not fix mkfracss(-1961682050,1204555087)
+        $in[$n] =~ s<([-+*\s,({=~&|%:?]\b\d{10,})\b(?![^-+*\s,})&|%;])>(${1}LL)g;	# do not allow "." before and after
+
+    # Convert all decimal constants ending in L or UL.
+    # Note: replacing strings with lower case l breaks a couple things, namely strings like "%+1ld"
+#    sed -e 's/\([-+* ,()=~&|%][0-9][0-9]*\)[L]\{1,2\}/\1LL/g'
+#        -e 's/\([-+* ,()=~&|%][0-9][0-9]*\)[uU][lL]\{1,2\}/\1ULL/g' < TMP > TMP2
+
+    # Convert all hexadecimal constants ending in L or UL.
+#    sed -e 's/\(0x[0-9a-fA-F][0-9a-fA-F]*\)[lL]\{1,2\}/\1LL/g'
+#        -e 's/\(0x[0-9a-fA-F][0-9a-fA-F]*\)[uU][lL]\{1,2\}/\1ULL/g' < TMP2 > TMP
+####   BUG: what is above processes 1ulp
+        $in[$n] =~ s<([-+*\s,()=~&|%:?]\b(?:\d+|0x[\da-fA-F]+))(?=[uUL])([uU]?[lL])[lL]?\b>($1\U${2}L)g;
+	$in_printf = 1 if $in =~ /printf|PRINTF|pari_warn|pari_err|diag|\bcase\s+mf_/;
+      } elsif ($in_printf or $in =~ /findfont.*%.*scalefont/) {			# string
+    # String formatting conversions: %ld -> %lld, %lu -> %llu, %lx -> %llx.
+    # This will also handle cases like %+2ld and %0*lx
+
+    # Replace formatting with microsoft ll convention, but only inside regular printfs
+    # (and its variants)
+    # Do nothing inside of pari_printf() or pari_sprintf().
+#    sed -e '/\"/ s/\(%[-+]\{0,1\}[0-9]*\)ld/\1lld/g'
+#        -e '/\"/ s/\(%[-+]\{0,1\}[0-9]*\)lu/\1llu/g'
+#        -e '/\"/ s/\(%[-+]\{0,1\}[0-9]*\)lx/\1llx/g'
+#        -e '/\"/ s/\(%[0-9]\*\)lx/\1llx/g' < TMP > $outfile
+        $in[$n] =~ s((%[-+]?\d*(?:(?<=\b\d)\*(?=lx))?)(l[dux]))(${1}l$2)g;
+      }
+  }
+  (my $dir = $to) =~ s(^(.*)[\\/].*)($1);
+# use File::Path 'make_path';
+  require File::Path;
+  File::Path::make_path($dir) unless -d $dir;
+  open $f, '>', $to or die "cannot open `$to' for write: $!";
+  print $f join '', map {$debug ? "<<<<$_>>>>" : $_} @in;
+  close $f or die "cannot close `$to' for write: $!";  
+}
+
+sub filter_for_ll_all ($$) {
+  my($D,$to) = (shift, shift);
+  die "Directory '$D' does not look like PARI build directory" unless -r "$D/src/headers/paripriv.h";
+  require File::Find;
+  File::Find::find( {wanted => sub {
+    return unless /\.[ch]$/;			# .y is not needed
+    die "$_ not a file or not readable" unless -f $_ and -r $_;
+    (my $to = $_) =~ s(/src/)(/$to/) or return;	# Many files in ./config # die "unexpected format of the file name '$_'";
+    filter_for_ll($_, $to, 1);
+  }, no_chdir => 1}, $D);
 }
 
 =back

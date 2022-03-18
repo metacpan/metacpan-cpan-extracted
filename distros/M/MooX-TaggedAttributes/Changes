@@ -1,5 +1,11 @@
 Revision history for MooX-TaggedAttributes
 
+0.13      2022-03-15 18:16:06-04:00 America/New_York
+
+  [ENHANCEMENT]
+
+   * namespace::clean is no longer required
+
 0.12      2022-03-10 16:42:46-05:00 America/New_York
 
   [ENHANCEMENT]

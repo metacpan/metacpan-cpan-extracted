@@ -1,5 +1,6 @@
 package mb;
 '有朋自遠方来不亦楽乎'=~/^\xE6\x9C\x89/ or die "Perl script '@{[__FILE__]}' must be UTF-8 encoding.\n";
+# You are welcome! MOJIBAKE-san, you are our friend forever!!
 ######################################################################
 #
 # mb - run Perl script in MBCS encoding (not only CJK ;-)
@@ -12,7 +13,7 @@ package mb;
 use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.40';
+$VERSION = '0.41';
 $VERSION = $VERSION;
 
 # internal use
@@ -171,7 +172,7 @@ END
     ) {
 
         # read application script
-        mb::_open_r(my $fh, $ARGV[0]) or die "$0(@{[__LINE__]}): cant't open file: $ARGV[0]\n";
+        mb::_open_r(my $fh, $ARGV[0]) or die "$0(@{[__LINE__]}): can't open file: $ARGV[0]\n";
 
         # sysread(...) has hidden binmode($fh) that's not portable
         # local $_; sysread($fh, $_, -s $ARGV[0]);
@@ -180,14 +181,14 @@ END
 
         # poor file locking
         local $SIG{__DIE__} = sub { rmdir "$ARGV[0].lock"; };
-        if (mkdir("$ARGV[0].lock", 0755)) {
-            mb::_open_w(my $fh, $script_oo) or die "$0(@{[__LINE__]}): cant't open file: $script_oo\n";
+        if (mkdir "$ARGV[0].lock", 0755) {
+            mb::_open_w(my $fh, $script_oo) or die "$0(@{[__LINE__]}): can't open file: $script_oo\n";
             print {$fh} mb::parse();
             close $fh;
             rmdir "$ARGV[0].lock";
         }
         else {
-            die "$0(@{[__LINE__]}): cant't mkdir: $ARGV[0].lock\n";
+            die "$0(@{[__LINE__]}): can't mkdir: $ARGV[0].lock\n";
         }
     }
 
@@ -339,20 +340,20 @@ sub mb::do ($) {
                 (mtime($prefix_file_oo) <= mtime($prefix_file)) or
                 (mtime($prefix_file_oo) <= mtime(__FILE__))
             ) {
-                mb::_open_r(my $fh, $prefix_file) or confess "$0(@{[__LINE__]}): cant't open file: $prefix_file\n";
+                mb::_open_r(my $fh, $prefix_file) or confess "$0(@{[__LINE__]}): can't open file: $prefix_file\n";
                 local $_ = CORE::do { local $/; <$fh> };
                 close $fh;
 
                 # poor file locking
                 local $SIG{__DIE__} = sub { rmdir "$prefix_file.lock"; };
-                if (mkdir("$prefix_file.lock", 0755)) {
-                    mb::_open_w(my $fh, $prefix_file_oo) or confess "$0(@{[__LINE__]}): cant't open file: $prefix_file_oo\n";
+                if (mkdir "$prefix_file.lock", 0755) {
+                    mb::_open_w(my $fh, $prefix_file_oo) or confess "$0(@{[__LINE__]}): can't open file: $prefix_file_oo\n";
                     print {$fh} mb::parse();
                     close $fh;
                     rmdir "$prefix_file.lock";
                 }
                 else {
-                    confess "$0(@{[__LINE__]}): cant't mkdir: $prefix_file.lock\n";
+                    confess "$0(@{[__LINE__]}): can't mkdir: $prefix_file.lock\n";
                 }
             }
             $INC{$file} = $prefix_file_oo;
@@ -595,20 +596,20 @@ sub mb::require (;$) {
                     (mtime($prefix_file_oo) <= mtime($prefix_file)) or
                     (mtime($prefix_file_oo) <= mtime(__FILE__))
                 ) {
-                    mb::_open_r(my $fh, $prefix_file) or confess "$0(@{[__LINE__]}): cant't open file: $prefix_file\n";
+                    mb::_open_r(my $fh, $prefix_file) or confess "$0(@{[__LINE__]}): can't open file: $prefix_file\n";
                     local $_ = CORE::do { local $/; <$fh> };
                     close $fh;
 
                     # poor file locking
                     local $SIG{__DIE__} = sub { rmdir "$prefix_file.lock"; };
-                    if (mkdir("$prefix_file.lock", 0755)) {
-                        mb::_open_w(my $fh, $prefix_file_oo) or confess "$0(@{[__LINE__]}): cant't open file: $prefix_file_oo\n";
+                    if (mkdir "$prefix_file.lock", 0755) {
+                        mb::_open_w(my $fh, $prefix_file_oo) or confess "$0(@{[__LINE__]}): can't open file: $prefix_file_oo\n";
                         print {$fh} mb::parse();
                         close $fh;
                         rmdir "$prefix_file.lock";
                     }
                     else {
-                        confess "$0(@{[__LINE__]}): cant't mkdir: $prefix_file.lock\n";
+                        confess "$0(@{[__LINE__]}): can't mkdir: $prefix_file.lock\n";
                     }
                 }
                 $INC{$_} = $prefix_file_oo;
@@ -5872,17 +5873,24 @@ To install this software without make, type the following:
   lc("A") makes halfwidth-"a", however lc("乙") does "乙" not "兀", moreover lc("Ａ")
   does "Ａ" not fullwidth-"ａ".
 
-    -------------------------------------------------------
-    encoding     script         bare Perl    mb.pm
-                                MOJIBAKE     not MOJIBAKE
-    -------------------------------------------------------
-    big5         lc("A乙Ａ")    "a兀Ａ"      "a乙Ａ"
-    big5hkscs    lc("A淾Ａ")    "a蘏Ａ"      "a淾Ａ"
-    gb18030      lc("A華Ａ")    "a萢Ａ"      "a華Ａ"
-    gbk          lc("A華Ａ")    "a萢Ａ"      "a華Ａ"
-    sjis         lc("AアＡ")    "aヂＡ"      "aアＡ"
-    uhc          lc("A갂Ａ")    "a갵Ａ"      "a갂Ａ"
-    -------------------------------------------------------
+    ----------------------------------------------------------------------------------------------
+    encoding    script                         bare Perl4, bare Perl5     mb.pm modulino
+                                               makes MOJIBAKE             makes no MOJIBAKE
+    ----------------------------------------------------------------------------------------------
+    big5        lc("A乙Ａ") [41][A441][A2CF]   "a兀Ａ" [61][A461][A2CF]   "a乙Ａ" [61][A441][A2CF]
+    big5hkscs   lc("A淾Ａ") [41][8C41][A2CF]   "a蘏Ａ" [61][8C61][A2CF]   "a淾Ａ" [61][8C41][A2CF]
+    gb18030     lc("A華Ａ") [41][C841][A3C1]   "a萢Ａ" [61][C861][A3C1]   "a華Ａ" [61][C841][A3C1]
+    gbk         lc("A華Ａ") [41][C841][A3C1]   "a萢Ａ" [61][C861][A3C1]   "a華Ａ" [61][C841][A3C1]
+    sjis        lc("AアＡ") [41][8341][8261]   "aヂＡ" [61][8361][8261]   "aアＡ" [61][8341][8261]
+    uhc         lc("A갂Ａ") [41][8141][A3C1]   "a갵Ａ" [61][8161][A3C1]   "a갂Ａ" [61][8141][A3C1]
+    ----------------------------------------------------------------------------------------------
+    big5        uc("a兀ａ") [61][A461][A2E9]   "A乙ａ" [41][A441][A2E9]   "A兀ａ" [41][A461][A2E9]
+    big5hkscs   uc("a蘏ａ") [61][8C61][A2E9]   "A淾ａ" [41][8C41][A2E9]   "A蘏ａ" [41][8C61][A2E9]
+    gb18030     uc("a萢ａ") [61][C861][A3E1]   "A華ａ" [41][C841][A3E1]   "A萢ａ" [41][C861][A3E1]
+    gbk         uc("a萢ａ") [61][C861][A3E1]   "A華ａ" [41][C841][A3E1]   "A萢ａ" [41][C861][A3E1]
+    sjis        uc("aヂａ") [61][8361][8281]   "Aアａ" [41][8341][8281]   "Aヂａ" [41][8361][8281]
+    uhc         uc("a갵ａ") [61][8161][A3E1]   "A갂ａ" [41][8141][A3E1]   "A갵ａ" [41][8161][A3E1]
+    ----------------------------------------------------------------------------------------------
 
 =head1 What transpiles to what by this software?
 

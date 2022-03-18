@@ -5,13 +5,13 @@ The distribution is contained in a Git repository, so simply clone the
 repository
 
 ```
-$ git clone https://github.com/perlservices/Dist-Zilla-PERLSRVDE/issues.git
+$ git clone git://github.com/perlservices/Dist-Zilla-PERLSRVDE.git
 ```
 
 and change into the newly-created directory.
 
 ```
-$ cd issues
+$ cd Dist-Zilla-PERLSRVDE
 ```
 
 The project uses [`Dist::Zilla`](https://metacpan.org/pod/Dist::Zilla) to

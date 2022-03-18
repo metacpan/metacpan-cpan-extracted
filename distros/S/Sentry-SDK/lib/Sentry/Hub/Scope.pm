@@ -118,7 +118,8 @@ sub apply_to_event ($self, $event, $hint = undef) {
   merge($event, $self, 'tags')     if $self->tags;
   merge($event, $self, 'user')     if $self->user;
   merge($event, $self, 'contexts') if $self->contexts;
-  $event->{level}       = $self->level       if $self->level;
+
+  $event->{level} //= $self->level           if $self->level;
   $event->{transaction} = $self->transaction if $self->transaction_name;
 
   if ($self->span) {

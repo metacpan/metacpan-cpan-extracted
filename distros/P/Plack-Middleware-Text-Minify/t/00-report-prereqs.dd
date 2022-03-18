@@ -42,7 +42,9 @@ do { my $x = {
                                    },
                    'requires' => {
                                    'File::Spec' => '0',
+                                   'File::Temp' => '0',
                                    'HTTP::Request::Common' => '0',
+                                   'IO::File' => '0',
                                    'Module::Metadata' => '0',
                                    'Plack::Builder' => '0',
                                    'Plack::MIME' => '0',

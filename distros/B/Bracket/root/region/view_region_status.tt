@@ -1,11 +1,14 @@
-[% site_title = "Bracket  " _ c.config.year %]
 [% page_title = player.first_name _ " " _ player.last_name  _ " " _ region.name _ " Region" %]
-[% page_head_title = page_title _ " - " _ site_title %]
 
 [% SET no_javascript = 1 %]
 
 [% #INCLUDE 'html_head_no_javascript.tt' %]
 [% USE Dumper %]
+
+ [% IF is_admin;
+    INCLUDE 'admin/links.tt';
+ END %]
+
 <div class="container">
  
     <div style="text-align:center; clear:right;">

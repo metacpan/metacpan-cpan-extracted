@@ -1,5 +1,8 @@
 Revision history for Data-Util
 
+0.67 2022-03-16T04:28:19Z
+    - fix is_integer on usequadmath Perl
+
 0.66 2017-04-05T17:09:54Z
     - Fix tests of @INC issue on newer Perl
 

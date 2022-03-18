@@ -16,7 +16,7 @@ use Text::Minify::XS v0.4.8 ();
 
 # RECOMMEND PREREQ:  Ref::Util::XS
 
-our $VERSION = 'v0.2.2';
+our $VERSION = 'v0.3.0';
 
 sub call {
     my ($self, $env) = @_;
@@ -62,11 +62,10 @@ sub call {
                 return unless $type =~ m{^text/};
             }
 
-            my $body = $res->[2];
-            return unless is_arrayref($body);
+            my $body = "";
+            Plack::Util::foreach( $res->[2], sub { $body .= $_[0] } );
 
-            $res->[2] = [ Text::Minify::XS::minify( join("", @$body ) ) ];
-
+            $res->[2] = [ Text::Minify::XS::minify($body) ];
 
             if (Plack::Util::header_exists( $res->[1], 'content-length' )) {
                 Plack::Util::header_set( $res->[1], 'content-length', length( $res->[2][0] ) );
@@ -93,7 +92,7 @@ Plack::Middleware::Text::Minify - remove HTML indentation on the fly
 
 =head1 VERSION
 
-version v0.2.2
+version v0.3.0
 
 =head1 SYNOPSIS
 

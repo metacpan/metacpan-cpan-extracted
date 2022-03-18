@@ -22,7 +22,7 @@ my @otrs_versions = Module::Znuny::CoreList->shipped(
    'Kernel::System::DB',
 );
 
-my @check_otrs_version = map{ "6.0." . $_ } ( 31 .. 37 );
+my @check_otrs_version = map{ "6.0." . $_ } ( 31 .. 40 );
 
 is_deeply( \@otrs_versions, \@check_otrs_version, 'Kernel::System::DB in 6.0.x' );
 

@@ -33,9 +33,9 @@ my $example1 = example1();
 
 my $build = alienfile_ok qq{
   use alienfile;
-  
+
   probe sub { 'share' };
-  
+
   share {
     requires 'Alien::git';
     download [ [ '%{git}', 'clone', '$example1' ] ];

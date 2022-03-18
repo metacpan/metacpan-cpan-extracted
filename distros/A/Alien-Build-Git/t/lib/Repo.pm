@@ -15,12 +15,12 @@ my $corpus = path(__FILE__)->absolute->parent->parent->parent->child('corpus');
 sub example1
 {
   my $dir = tempdir( CLEANUP => 1 );
-  
+
   local $CWD = "$dir";
-  
+
   my $tar = Archive::Tar->new($corpus->child('example1.tar')->stringify);
   $tar->extract;
-  
+
   path($dir)->child('example1')->stringify;
 }
 

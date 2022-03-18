@@ -95,7 +95,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.199';
+our $VERSION = '1.200';
 
 use Quiq::Hash;
 use Quiq::Properties;
@@ -195,7 +195,18 @@ sub new {
 
 =head4 Synopsis
 
-  @columns | $columnA = $tab->columns;
+  @columns | $columnA = $tab->columns(@opt);
+
+=head4 Options
+
+=over 4
+
+=item -sloppy => $bool (Default: 0)
+
+Wirf keine Exception, wenn keine Kolumnennamen definiert sind, sondern
+liefere eine leere Liste.
+
+=back
 
 =head4 Returns
 
@@ -212,9 +223,20 @@ Liefere die Liste der Kolumnennamen der Tabelle.
 
 sub columns {
     my $self = shift;
+    # @_: @opt
+
+    # Optionen
+
+    my $sloppy = 0;
+
+    $self->parameters(\@_,
+        -sloppy => \$sloppy,
+    );
+
+    # Operation ausführen
 
     my $columnA = $self->{'columnA'};
-    if (!@$columnA) {
+    if (!@$columnA && !$sloppy) {
         $self->throw(
             'TABLE-00099: No column names defined',
         );
@@ -314,9 +336,25 @@ sub pos {
 
 =over 4
 
+=item $pos
+
+(Integer) Kolumnenposition
+
 =item $column
 
-Kolumnenname (String).
+(String) Kolumnenname (nur, wenn Kolumennamen definiert sind)
+
+=back
+
+=head4 Options
+
+=over 4
+
+=item -withTitles => $bool (Default: 0)
+
+Beziehe die Länge der Kolumnennamen mit ein. D.h, wenn ein Kolumnenname
+länger ist als der längste Wert, setzte die maximale Länge
+(Property width) auf die Länge des Kolumnennamens.
 
 =back
 
@@ -337,7 +375,17 @@ Tabelle mit push() erweitert, wird der Cache automatisch gelöscht.
 # -----------------------------------------------------------------------------
 
 sub properties {
-    my ($self,$arg) = @_;
+    my ($self,$arg) = splice @_,0,2;
+
+    # Optionen
+
+    my $withTitles = 0;
+
+    my $opt = $self->parameters(0,0,\@_,
+        -withTitles => \$withTitles,
+    );
+
+    # Operation ausführen
 
     my $pos = $self->pos($arg);
     my $prp = $self->{'propertyA'}->[$pos];
@@ -346,6 +394,14 @@ sub properties {
         for my $val ($self->values($pos,-distinct=>1)) {
             $prp->analyze($val);
         }
+
+        if ($withTitles) {
+            my $l = length $self->{'columnA'}->[$pos];
+            if ($l > $prp->width) {
+                $prp->width($l);
+            }
+        }
+
         $self->{'propertyA'}->[$pos] = $prp;
     }
 
@@ -562,6 +618,84 @@ sub width {
 
 =head2 Formatierung
 
+=head3 asAsciiTable() - Tabelle als Ascii-Table
+
+=head4 Synopsis
+
+  $text = $tab->asAsciiTable;
+
+=head4 Returns
+
+Ascii-Table (String)
+
+=head4 Description
+
+Liefere die Tabelle in der Repräsentation der Klasse Quiq::AsciiTable.
+
+=head4 Example
+
+  $tab = Quiq::Table->new(['Integer','String','Float'],[
+      [1,  'A',  76.253],
+      [12, 'AB', 1.7   ],
+      [123,'ABC',9999  ],
+  ]);
+  
+  $str = $tab->asAsciiTable;
+  ==>
+  %Table:
+  Integer String    Float
+  ------- ------ --------
+        1 A        76.253
+       12 AB        1.700
+      123 ABC    9999.000
+  .
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub asAsciiTable {
+    my $self = shift;
+
+    my @columns = $self->columns(-sloppy=>1);
+    my $withTitles = scalar @columns;
+
+    my @properties = map {$self->properties($_,-withTitles=>$withTitles)}
+        0 .. $self->width-1;
+
+    my $str = '';
+
+    my @arr;
+    if ($withTitles) {
+        for (my $i = 0; $i < @properties; $i++) {
+            my $prp = $properties[$i];
+            CORE::push @arr,sprintf '%*s',
+                ($prp->align eq 'r'? '': '-').$prp->width,$columns[$i];
+        }
+        $str .= join(' ',@arr)."\n";
+    }
+
+    @arr = ();
+    for (my $i = 0; $i < @properties; $i++) {
+        CORE::push @arr,'-' x $properties[$i]->width;
+    }
+    $str .= join(' ',@arr)."\n";
+
+    for my $row ($self->rows) {
+        my @row;
+        my $valueA = $row->values;
+        for (my $i = 0; $i < @$valueA; $i++) {
+            my $val = sprintf $properties[$i]->format('text',$valueA->[$i]);
+            CORE::push @row,$val;
+        }
+        $str .= join(' ',@row)."\n";
+    }
+
+    return $str;
+}
+
+# -----------------------------------------------------------------------------
+
 =head3 asText() - Tabelle als Text
 
 =head4 Synopsis
@@ -574,7 +708,7 @@ sub width {
 
 =item -colorize => $sub
 
-Callback-Funktion, die für jede Zelle gerufen wird und eine Termnal-Farbe
+Callback-Funktion, die für jede Zelle gerufen wird und eine Terminal-Farbe
 für die jeweilige Zelle liefert. Die Funktion hat die Struktur:
 
   sub {
@@ -591,6 +725,20 @@ erwartet. Anwendungsbeispiel siehe quiq-ls.
 =head4 Returns
 
 Text-Tabelle (String)
+
+=head4 Example
+
+  $tab = Quiq::Table->new(3,[
+      [1,  'A',  76.253],
+      [12, 'AB', 1.7   ],
+      [123,'ABC',9999  ],
+  ]);
+  
+  $str = $tab->asText;
+  ==>
+  |   1 | A   |   76.253 |
+  |  12 | AB  |    1.700 |
+  | 123 | ABC | 9999.000 |
 
 =cut
 
@@ -638,7 +786,7 @@ sub asText {
 
 =head1 VERSION
 
-1.199
+1.200
 
 =head1 AUTHOR
 

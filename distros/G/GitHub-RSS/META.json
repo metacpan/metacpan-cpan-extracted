@@ -1,0 +1,70 @@
+{
+   "abstract" : "collect data from Github.com for feeding into RSS",
+   "author" : [
+      "Max Maischein <corion@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "GitHub-RSS",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "DBD::SQLite" : "0",
+            "Data::Dumper" : "0",
+            "DateTime" : "0",
+            "DateTime::Format::ISO8601" : "0",
+            "Filter::signatures" : "0.09",
+            "HTML::Entities" : "0",
+            "JSON" : "0",
+            "Moo" : "2",
+            "Net::GitHub" : "0",
+            "PerlX::Maybe" : "0",
+            "Text::Markdown" : "0",
+            "XML::Feed" : "0",
+            "XML::RSS" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {}
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "https://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/Corion/GitHub-RSS.git",
+         "web" : "https://github.com/Corion/GitHub-RSS"
+      }
+   },
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 4.04",
+   "x_static_install" : 1
+}

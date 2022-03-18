@@ -8,17 +8,21 @@ use utf8;
 
 use Test::More;
 
+use Alien::libmaxminddb;
 use File::Spec::Functions qw(catfile);
 use IP::Geolocation::MMDB;
 use Math::BigInt 1.999806;
 
 my $version = IP::Geolocation::MMDB::libmaxminddb_version;
-diag 'libmaxminddb version is ' . $version;
 
-# There are weird FreeBSD systems at cpantesters.org.
-if ($version =~ m{^(0|1\.[01])\.}) {
-  plan skip_all => 'libmaxminddb is too old';
+my $expected_version = Alien::libmaxminddb->version;
+
+# Check if the module was linked against the wrong library version.
+if ($version ne $expected_version) {
+  plan skip_all => "Error: wrong libmaxminddb version, got $version, expected $expected_version";
 }
+
+diag 'libmaxminddb version is ' . $version;
 
 ok !eval { IP::Geolocation::MMDB->new },
   'constructor without "file" parameter dies';

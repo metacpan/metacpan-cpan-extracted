@@ -3,7 +3,7 @@ name = "Data-Util"
 module_maker="ModuleBuild"
 allow_pureperl=1
 c_source=['xs-src']
-badges = ['circleci']
+badges = ['github-actions/test.yml', 'metacpan']
 
 [XSUtil]
 needs_compiler_c99 = 1

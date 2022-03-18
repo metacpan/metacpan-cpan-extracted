@@ -31,6 +31,13 @@ ok(tapprox($y->where($y>4), PDL->pdl(5,6)), "where with >");
 ok(tapprox($y->which, PDL->pdl(0,1,2,7,8,10,11)), "which");
 ok(tapprox($c->where($y), PDL->pdl(10,11,12,17,18,20,21)), "where with mask");
 
+$y = sequence(10) + 2;
+my ($big, $small) = where_both($y, $y > 5);
+$big += 2, $small -= 1;
+ok tapprox($big, pdl('[8 9 10 11 12 13]')), 'where_both big + 2 is right';
+ok tapprox($small, pdl('[1 2 3 4]')), 'where_both small - 2 is right';
+ok tapprox($y, pdl('[1 2 3 4 8 9 10 11 12 13]')), 'where_both dataflow affected orig';
+
 {
   my $orig = ones(byte, 300);
   my $xvals = $orig->xvals;
@@ -48,6 +55,22 @@ my $p = pdl [ 1, 2, 3, 4, 7, 9, 1, 1, 6, 2, 5];
 my $q = zeroes 5;
 minimum_n_ind $p, $q;
 ok(tapprox($q, pdl(0, 6, 7, 1, 9)), "minimum_n_ind");
+$q = minimum_n_ind($p, 5);
+ok(tapprox($q, pdl(0, 6, 7, 1, 9)), "minimum_n_ind usage 2");
+minimum_n_ind($p, $q = null, 5);
+ok(tapprox($q, pdl(0, 6, 7, 1, 9)), "minimum_n_ind usage 3");
+$p = pdl '[1 BAD 3 4 7 9 1 1 6 2 5]';
+$q = zeroes 5;
+minimum_n_ind $p, $q;
+is $q.'', '[0 6 7 9 2]', "minimum_n_ind BAD";
+$p = pdl '[1 BAD 3 4 BAD BAD]';
+$q = zeroes 5;
+minimum_n_ind $p, $q;
+is $q.'', '[0 2 3 BAD BAD]', "minimum_n_ind insufficient good";
+$p = pdl '[1 BAD 3 4 BAD BAD 3 1 5 8 9]';
+$q = zeroes 5;
+minimum_n_ind $p, $q;
+is $q.'', '[0 7 2 6 3]', "minimum_n_ind some bad, sufficient good";
 
 ##############################
 # check that our random functions work with Perl's srand

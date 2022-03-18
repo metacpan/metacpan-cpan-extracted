@@ -74,12 +74,15 @@ THE Geo::LatLon2Place CLASS
         If something is found, the associated data blob (always a binary
         string) is returned, otherwise you receive "undef".
 
-        Unless you specify a cusotrm format, the data blob is actually a
-        UTF-8 string, so you might want to call "utf8::decode" on it to get
-        a unicode astring.
+        Unless you specify a custom format/extractor when building your
+        database, the data blob is actually a UTF-8 string, so you might
+        want to call "utf8::decode" on it to get a unicode string:
 
-        At the moment, the implementation is in pure perl, but will
-        eventually move to C.
+           my $res = $db->lookup (47, 37); # near mariupol, UA
+           if (defined $res) {
+              utf8::decode $res;
+              # $res now contains the unicode result
+           }
 
 ALGORITHM
     The algorithm that this module implements consists of two parts: binning
@@ -98,7 +101,7 @@ ALGORITHM
     using an approximate euclidean distance on an equireactangular
     projection. The squared distance is multiplied with a weight (1..25 for
     the geonames database, based on population and adminstrative status,
-    always 1 for postcal codes), and the minimum distance wins.
+    always 1 for postal codes), and the minimum distance wins.
 
     Binning should not introduce errors, but bigger bins can slow down
     lookup times due to having to look at more places. The lookup assumes a
@@ -108,16 +111,25 @@ ALGORITHM
     these errors should be considered negligible.
 
 SPEED
-    The current implementation is written in pure perl, and on my machine,
-    typically does 10000-200000 lookups per second. The goal for version 1.0
-    is to move the lookup to C.
+    On my machine, "lookup" typically does more than a million lookups per
+    second - performance varies depending on result density and number of
+    indexed points.
 
 TENTATIVE ROADMAP
-    The database writer should be accessible via a module, so you cna easily
+    The database writer should be accessible via a module, so you can easily
     generate your own databases without having to run an external command.
 
-    The api might be extended to allow for multiple returns, or nearest
-    neighbour search.
+    The API might be extended to allow for multiple lookups, multiple
+    returns, or nearest neighbour search, or more return values (distance,
+    coordinates).
+
+    Longer lookups will take advantage of perlmulticore.
+
+PERL MULTICORE SUPPORT
+    This is not yet implemented:
+
+    This module supports the perl multicore specification
+    (<http://perlmulticore.schmorp.de/>) when doing lookups.
 
 SEE ALSO
     geo-latlon2place-makedb to create databases from common formats.

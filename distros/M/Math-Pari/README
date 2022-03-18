@@ -136,3 +136,17 @@ e) Documentation to this package is contained inside Pari.pm. After
      perldoc Math::libPARI.dumb
 
    etc.
+
+=============================================================
+
+Copyright (C) 1997-2019 by Ilya Zakharevich <cpan@ilyaz.org>
+
+The code in this distribution is free software; you can redistribute it and/or modify
+it (with exception of Pari.xs) under the same terms as Perl itself, either Perl version 5.8.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+The file Pari.xs may contain chunks of code based on code from GP/PARI.
+So it is covered by the viral license of GP/PARI (GPL v2).
+
+Keep in mind that in practice, this distribution is unusable without
+linking in code from GP/PARI.  As of 2019, that code is covered by GPL v2.

@@ -9,12 +9,12 @@ use Test::NoTabs;
 my @files = (
     'lib/MooX/TaggedAttributes.pm',
     'lib/MooX/TaggedAttributes/Cache.pm',
+    'lib/MooX/TaggedAttributes/Role.pm',
     't/00-compile.t',
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
     't/cache.t',
     't/class_role_inherited.t',
-    't/custom_import.t',
     't/late_role_to_object.t',
     't/lib/B1.pm',
     't/lib/B2.pm',

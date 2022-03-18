@@ -7,7 +7,7 @@ use v5.24;
 use strict;
 use warnings;
 
-our $VERSION = '0.0.3'; # VERSION
+our $VERSION = '1.0.0'; # VERSION
 
 use namespace::autoclean;
 
@@ -204,7 +204,7 @@ sub configure {
             ],
             [
                 'GitHubREADME::Badge' => {
-                    badges => [ qw/cpants issues cpancover/ ],
+                    badges => [ qw/cpants issues cpancover license/ ],
                     phase  => 'build',
                     place  => 'top',
                 },
@@ -239,7 +239,7 @@ sub _meta_resources {
         $meta_resources{'repository.type'} = 'git';
 
         if ( !$self->bugtracker ) {
-            $meta_resources{'repository.url'} =
+            $meta_resources{'bugtracker.web'} =
                 sprintf "https://github.com/%s/issues",
                     $name
             ;
@@ -258,7 +258,7 @@ sub _meta_resources {
         $meta_resources{'repository.type'} = 'git';
 
         if ( !$self->bugtracker ) {
-            $meta_resources{'repository.url'} =
+            $meta_resources{'bugtracker.web'} =
                 sprintf "https://gitlab.com/%s/-/issues",
                     $name
             ;
@@ -299,7 +299,7 @@ Dist::Zilla::PluginBundle::PERLSRVDE - The plugin bundle we use at Perl-Services
 
 =head1 VERSION
 
-version 0.0.3
+version 1.0.0
 
 =head1 SYNOPSIS
 

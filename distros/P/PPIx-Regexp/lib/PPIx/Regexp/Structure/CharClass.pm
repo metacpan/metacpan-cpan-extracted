@@ -40,7 +40,7 @@ use PPIx::Regexp::Constant qw{
 };
 use PPIx::Regexp::Util qw{ __instance };
 
-our $VERSION = '0.082';
+our $VERSION = '0.083';
 
 sub __new {
     my ( $class, @args ) = @_;
@@ -102,7 +102,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2009-2021 by Thomas R. Wyant, III
+Copyright (C) 2009-2022 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

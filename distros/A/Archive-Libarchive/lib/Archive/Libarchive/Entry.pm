@@ -8,7 +8,7 @@ use FFI::Platypus::Buffer qw( buffer_to_scalar scalar_to_buffer );
 use experimental qw( signatures );
 
 # ABSTRACT: Libarchive entry class
-our $VERSION = '0.04'; # VERSION
+our $VERSION = '0.05'; # VERSION
 
 my $ffi = Archive::Libarchive::Lib->ffi;
 
@@ -157,7 +157,7 @@ Archive::Libarchive::Entry - Libarchive entry class
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 
@@ -363,7 +363,7 @@ Graham Ollis <plicease@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Graham Ollis.
+This software is copyright (c) 2021,2022 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

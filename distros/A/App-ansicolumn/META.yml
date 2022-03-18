@@ -26,7 +26,7 @@ no_index:
 provides:
   App::ansicolumn:
     file: lib/App/ansicolumn.pm
-    version: '1.16'
+    version: '1.17'
   App::ansicolumn::Border:
     file: lib/App/ansicolumn/Border.pm
   App::ansicolumn::default:
@@ -46,9 +46,9 @@ resources:
   bugtracker: https://github.com/kaz-utashiro/App-ansicolumn/issues
   homepage: https://github.com/kaz-utashiro/App-ansicolumn
   repository: git://github.com/kaz-utashiro/App-ansicolumn.git
-version: '1.16'
+version: '1.17'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 0

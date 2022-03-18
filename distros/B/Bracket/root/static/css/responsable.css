@@ -19,7 +19,7 @@ ul {
  
 header {
     background: darkblue; /* #1c1c1c; */
-    padding: 10px 10px;
+    padding: 0.2em 0.2em;
 }
  
         /*shorter clearfix http://nicolasgallagher.com/micro-clearfix-hack/*/
@@ -43,7 +43,7 @@ h1.logo a {
     text-decoration: none;
     font-weight: bold;
 /*    text-transform: uppercase; */
-    font-size: 20px;
+    font-size: 108%;
 /*    line-height: 22px; */
     float: left;
     letter-spacing: 0.2em;
@@ -78,20 +78,17 @@ a.to_nav:focus {
 	  float: left;
     list-style: none;
     background: darkblue; /* #1c1c1c; */
-    padding: 3px 3px;
 }
  
 #primary_nav li a {
     display: block;
-    padding: 10px 10px;
+    padding: 0.2em 0.2em;
     color: #fff;
     text-decoration: none;
     font-weight: bold;
     text-transform: uppercase;
     letter-spacing: 0.1em;
     letter-spacing: 0.1em;
-    line-height: 1.66em;
-    height: 1.66em;
     border-bottom: 1px solid #383838;
 }
  

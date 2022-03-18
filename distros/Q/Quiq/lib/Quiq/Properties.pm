@@ -87,7 +87,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.199';
+our $VERSION = '1.200';
 
 use Quiq::String;
 
@@ -331,6 +331,7 @@ sub type {
 =head4 Synopsis
 
   $width = $prp->width;
+  $width = $prp->width($width);
 
 =head4 Returns
 
@@ -338,7 +339,7 @@ Integer
 
 =head4 Description
 
-Liefere die Länge des längsten Werts.
+Liefere oder setzte die Länge des längsten Werts.
 
 =over 2
 
@@ -366,6 +367,18 @@ maximalen Anzahl an Zeichen vor und einschließlich des Kommas.
 
 sub width {
     my $self = shift;
+    # @_: $width;
+
+    if (@_) {
+        my $width = shift;
+
+        if ($self->type eq 'f') {
+            $self->[2] = $width-$self->scale;
+        }
+        else {
+            $self->[1] = $width;
+        }
+    }
 
     if ($self->type eq 'f') {
         return $self->[2]+$self->scale;
@@ -519,42 +532,43 @@ sub format {
 
     if ($format eq 'text') {
         if (!defined($val) || $val eq '') {
-            return ' ' x abs($width);
-        }
-
-        if (($type eq 'd' || $type eq 'f') && $val =~ /[^-+\d.]/) {
-            # Einen nicht-numerischen Wert in einer numerischen Kolumne
-            # (z.B. Überschrift) formatieren wir als String
-            $type = 's';
-        }
-
-        if ($type eq 's') {
-            $val = sprintf '%*s',$self->[4] eq 'l'? -$width: $width,$val;
-        }
-        elsif ($type eq 'd') {
-            # %d funktioniert bei großen Zahlen mit z.B. 24 Stellen nicht.
-            # Es wird dann fälschlicherweise -1 als Wert angezeigt.
-            # $val = sprintf '%*d',$width,$val;
-            $val = sprintf '%*s',$width,$val;
-        }
-        elsif ($type eq 'f') {
-            $val = sprintf '%*.*f',$width,$self->scale,$val;
-            if ($self->[6]) { # noTrailingZeros
-                if ($val =~ s/(0+)$/' ' x length($1)/e) {
-                    $val =~ s/\.$/ /;
-                }
-            }
+            $val = ' ' x abs($width);
         }
         else {
-            $self->throw(
-                'PROP-00099: Unknown type',
-                Type => $type,
-            );
+            if (($type eq 'd' || $type eq 'f') && $val =~ /[^-+\d.]/) {
+                # Einen nicht-numerischen Wert in einer numerischen Kolumne
+                # (z.B. Überschrift) formatieren wir als String
+                $type = 's';
+            }
+
+            if ($type eq 's') {
+                $val = sprintf '%*s',$self->[4] eq 'l'? -$width: $width,$val;
+            }
+            elsif ($type eq 'd') {
+                # %d funktioniert bei großen Zahlen mit z.B. 24 Stellen nicht.
+                # Es wird dann fälschlicherweise -1 als Wert angezeigt.
+                # $val = sprintf '%*d',$width,$val;
+                $val = sprintf '%*s',$width,$val;
+            }
+            elsif ($type eq 'f') {
+                $val = sprintf '%*.*f',$width,$self->scale,$val;
+                if ($self->[6]) { # noTrailingZeros
+                    if ($val =~ s/(0+)$/' ' x length($1)/e) {
+                        $val =~ s/\.$/ /;
+                    }
+                }
+            }
+            else {
+                $self->throw(
+                    'PROP-00099: Unknown type',
+                    Type => $type,
+                );
+            }
         }
     }
     elsif ($format eq 'html') {
         if (!defined($val) || $val eq '') {
-            return '';
+            $val = '';
         }
         elsif ($type eq 'f') {
             $val = sprintf '%*.*f',$width,$self->scale,$val;
@@ -624,7 +638,7 @@ sub set {
 
 =head1 VERSION
 
-1.199
+1.200
 
 =head1 AUTHOR
 

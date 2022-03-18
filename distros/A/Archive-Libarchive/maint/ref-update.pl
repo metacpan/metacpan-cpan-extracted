@@ -146,8 +146,8 @@ my @const;
 {
   my %bindings;
   my %functions;
-  process_functions($archive_h, \%functions, \%bindings);
-  process_functions($entry_h,   \%functions, \%bindings);
+  process_functions($archive_h, \%functions, \%bindings, 0);
+  process_functions($entry_h,   \%functions, \%bindings, 1);
   generate(\%functions, \%bindings);
 }
 
@@ -163,7 +163,7 @@ sub type_fixup ($type)
   }
 }
 
-sub process_functions ($href, $global, $bindings)
+sub process_functions ($href, $global, $bindings, $show_warnings)
 {
   my %id;
 
@@ -387,12 +387,8 @@ sub process_functions ($href, $global, $bindings)
 
     $class //= "Unbound";
 
-    say "warning: $orig returns $ret_type (check ownership)" if $ret_type =~ /^archive/;
-
     my $incomplete = (defined $ret_type && all { defined $_ } @arg_types) ? undef : 1;
     $count{$incomplete ? 'incomplete' : 'generated'}++;
-
-    say "warning: $orig is incomplete" if $incomplete;
 
     push $bindings->{$class}->@*, {
             symbol_name => $orig,
@@ -402,8 +398,31 @@ sub process_functions ($href, $global, $bindings)
             arg_types   => \@arg_types,
             ret_type    => $ret_type,
       maybe incomplete  => $incomplete,
+            class       => $class,
     };
   }
+
+  my $first = 1;
+
+  foreach my $binding ( sort { $a->{symbol_name} cmp $b->{symbol_name} } map { values $bindings->{$_}->@* } keys %$bindings )
+  {
+    if($show_warnings && ($binding->{incomplete} || $binding->{class} eq 'Unbound' || $binding->{ret_type} =~ /^archive/))
+    {
+      if($first)
+      {
+        print "\n";
+        print "needs addressing:\n";
+        $first = 0;
+      }
+      print " - [ ] @{[ $binding->{symbol_name} ]}";
+      print " (incomplete)" if $binding->{incomplete};
+      print " (unbound)" if $binding->{class} eq 'Unbound';
+      print " (returns object)" if $binding->{ret_type} =~ /^archive/;
+      print "\n";
+    }
+  }
+
+  print "\n" unless $first;
 
   %$global = (%$global, %functions);
 }

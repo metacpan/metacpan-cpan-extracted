@@ -4,7 +4,7 @@ Plack::Middleware::Text::Minify - remove HTML indentation on the fly
 
 # VERSION
 
-version v0.2.2
+version v0.3.0
 
 # SYNOPSIS
 
@@ -24,7 +24,7 @@ builder {
 
 # DESCRIPTION
 
-This middleware uses [Text::Minify::XS](https://metacpan.org/pod/Text::Minify::XS) to remove indentation and
+This middleware uses [Text::Minify::XS](https://metacpan.org/pod/Text%3A%3AMinify%3A%3AXS) to remove indentation and
 trailing whitespace from text content.
 
 It will be disabled if the `psgix.no-minify` environment key is set
@@ -57,7 +57,7 @@ By default, it will match against any "text/" MIME type.
 ## Support for older Perl versions
 
 This module requires Perl v5.9.3 or newer, which is the minimum
-version supported by [Text::Minify::XS](https://metacpan.org/pod/Text::Minify::XS).
+version supported by [Text::Minify::XS](https://metacpan.org/pod/Text%3A%3AMinify%3A%3AXS).
 
 ## Use with templating directive that collapse whitespace
 
@@ -83,7 +83,7 @@ e.g. `pre` or `textarea`.
 
 # SEE ALSO
 
-[Text::Minify::XS](https://metacpan.org/pod/Text::Minify::XS)
+[Text::Minify::XS](https://metacpan.org/pod/Text%3A%3AMinify%3A%3AXS)
 
 [PSGI](https://metacpan.org/pod/PSGI)
 

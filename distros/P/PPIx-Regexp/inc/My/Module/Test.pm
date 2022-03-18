@@ -15,7 +15,7 @@ use PPIx::Regexp::Util qw{ __choose_tokenizer_class __instance };
 use Scalar::Util qw{ looks_like_number refaddr };
 use Test::More 0.88;
 
-our $VERSION = '0.082';
+our $VERSION = '0.083';
 
 use constant ARRAY_REF	=> ref [];
 
@@ -104,7 +104,9 @@ sub klass {
     # error if you do it enough times.
     $Test::Builder::Level = $Test::Builder::Level + 1;
     if ( defined $class ) {
-	return isa_ok( $obj, $class, "$kind $nav" );
+	my $rslt = isa_ok( $obj, $class, "$kind $nav" )
+	    or diag "    Instead, $kind $nav isa $result";
+	return $rslt;
     } else {
 	return is( ref $obj || undef, $class, "Class of $kind $nav" );
     }
@@ -742,7 +744,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2009-2021 by Thomas R. Wyant, III
+Copyright (C) 2009-2022 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

@@ -1,5 +1,13 @@
 Revision history for Syntax-Keyword-Dynamically
 
+0.10    2022-03-16
+        [CHANGES]
+         * Updates for Devel::MAT::Dumper v0.44
+         * Updates to hax/ files
+
+        [BUGFIXES]
+         * `-async` mode needs SKD version 0.02 for shared unit test
+
 0.09    2021-08-26
         [CHANGES]
          * Updated to XS::Parse::Keyword 0.13

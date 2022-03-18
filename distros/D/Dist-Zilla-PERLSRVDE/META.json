@@ -63,23 +63,26 @@
    "provides" : {
       "Dist::Zilla::PERLSRVDE" : {
          "file" : "lib/Dist/Zilla/PERLSRVDE.pm",
-         "version" : "v0.0.3"
+         "version" : "v1.0.0"
       },
       "Dist::Zilla::PluginBundle::PERLSRVDE" : {
          "file" : "lib/Dist/Zilla/PluginBundle/PERLSRVDE.pm",
-         "version" : "v0.0.3"
+         "version" : "v1.0.0"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/perlservices/Dist-Zilla-PERLSRVDE/issues"
+      },
       "homepage" : "https://github.com/perlservices/Dist-Zilla-PERLSRVDE",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/perlservices/Dist-Zilla-PERLSRVDE/issues",
+         "url" : "git://github.com/perlservices/Dist-Zilla-PERLSRVDE.git",
          "web" : "https://github.com/perlservices/Dist-Zilla-PERLSRVDE"
       }
    },
-   "version" : "0.0.3",
+   "version" : "1.0.0",
    "x_contributors" : [
       "reneeb <info@perl-services.de>"
    ],

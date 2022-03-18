@@ -8,8 +8,6 @@ use warnings;
 use 5.016;
 use ExtUtils::MakeMaker;
 
-die "OS unsupported\n" if $^O eq 'MSWin32' && !eval { require Alien::MSYS };
-
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Find or download and install libmaxminddb",
   "AUTHOR" => "Andreas V\x{f6}gele <voegelas\@cpan.org>",
@@ -39,7 +37,7 @@ my %WriteMakefileArgs = (
     "Test::Alien" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "1.004",
+  "VERSION" => "1.005",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -75,6 +73,13 @@ delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
   unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
 
 WriteMakefile(%WriteMakefileArgs);
+
+# Alien::Build adds Alien::MSYS as a dynamic dependency, but there are CPAN
+# smokers that don't install Alien::MSYS.
+if ($^O eq 'MSWin32' && !eval { require Alien::MSYS }) {
+  warn "Error: Alien::MSYS is not installed.\n";
+  die "OS unsupported\n";
+}
 
 # BEGIN code inserted by Dist::Zilla::Plugin::AlienBuild
 { package

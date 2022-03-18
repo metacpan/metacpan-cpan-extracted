@@ -1,5 +1,14 @@
 Revision history for Devel-MAT-Dumper
 
+0.44    2022-03-16
+        [CHANGES]
+         * Defined a whole new mechanism for dumping information about C-level
+           structs that are not Perl-visible SVs
+         * Defined a better API for creating helper functions. New API is
+           opt-in by defining a `WANT_DMD_API_044` macro
+         * Also ignore SAVEt_STRLEN_SMALL and SAVEt_SAVESWITCHSTACK on the
+           savestack
+
 0.43    2022-02-26
         [CHANGES]
          * Ignore SAVEt_FREEPV on the savestack

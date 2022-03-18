@@ -45,7 +45,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.199';
+our $VERSION = '1.200';
 
 use Quiq::Perl;
 
@@ -443,7 +443,7 @@ sub delete {
 
 =head1 VERSION
 
-1.199
+1.200
 
 =head1 AUTHOR
 

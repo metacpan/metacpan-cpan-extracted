@@ -9,6 +9,7 @@ use File::Copy;
 use FindBin;
 use File::Temp qw/tempdir/;
 use Cwd qw/abs_path/;
+use Data::Roundtrip qw/perl2dump/;
 use IPC::Run;
 # FFI::CheckLib can check_lib with specified symbol which is handy, so use that
 # it does not depend on FFI!
@@ -43,7 +44,13 @@ sub find_opencv_settings {
 	if( $VERBOSE > 0 ){ print STDOUT "find_opencv_settings() : checking with pkg-config ...\n" }
 	for my $opv (qw/opencv4 opencv/){
 		my @cmd = ('pkg-config', $opv, '--libs');
-		IPC::Run::run \@cmd, \undef, \$out, \$err, IPC::Run::timeout(30) or next;
+		eval {
+			IPC::Run::run \@cmd, \undef, \$out, \$err, IPC::Run::timeout(30)
+		};
+		if( $@ ){
+			if( $VERBOSE > 0 ){ print STDERR "find_opencv_settings() : failed to run command '@cmd': $@\n"; }
+			next
+		}
 		chomp($out);
 		$ldflags = $out;
 		   @cmd = ('pkg-config', $opv, '--cflags');
@@ -59,9 +66,12 @@ sub find_opencv_settings {
 
 	# 3. check with cmake script, provided cmake is installed
 	if( $VERBOSE > 0 ){ print STDOUT "find_opencv_settings() : checking with cmake ...\n" }
-	my $tmpdir = tempdir(CLEANUP => 0);
+	my $tmpdir = tempdir(CLEANUP => 1);
 	my $curdir = Cwd::abs_path(Cwd::cwd);
-	die "find_opencv_settings() : failed to chdir to tempdir '$tmpdir'." unless chdir $tmpdir;
+	die "find_opencv_settings() : failed to chdir to tempdir '$tmpdir'."
+		unless chdir $tmpdir;
+	if( $VERBOSE > 0 ){ print STDOUT "find_opencv_settings() : writing CMakeLists.txt and test.cpp into tempdir '$tmpdir' ...\n"; }
+	# write the CMakeLists.txt for cmake
 	open my $fh, '>', 'CMakeLists.txt' or die "find_opencv_settings() : failed to open file 'CMakeLists.txt' for writing: $!";
 	print $fh <<'EOCM';
 cmake_minimum_required(VERSION 2.9)
@@ -76,20 +86,30 @@ message(STATUS "RUBBISH_CMAKE_PROJECT::INSTALL_PREFIX: ${OpenCV_INSTALL_PREFIX}"
 message(STATUS "RUBBISH_CMAKE_PROJECT::LIBS: ${OpenCV_LIBS}")
 EOCM
 	close $fh;
+	# now write a basic test C++ program
+	open $fh, '>', 'test.cpp' or die "find_opencv_settings() : failed to open file 'test.cpp' for writing: $!";
+	print $fh <<'EOCM';
+#include <opencv2/opencv.hpp>
+int main(void){ return(0); }
+EOCM
+	close $fh;
 	my @cmd = ('cmake', '.'); # does cmake even exist?
-	$ret = IPC::Run::run \@cmd, \undef, \$out, \$err;
-	if( $ret ){
-		print "ret=$ret, err=$err\n";
-		#die "find_opencv_settings() : running command has failed: \"@cmd\", following are stdout and stderr:\n$err\nstdout:\n$out";
+	if( $VERBOSE > 0 ){ print STDOUT "find_opencv_settings() : attempting to run '@cmd' into tempdir '$tmpdir' ...\n"; }
+	eval { IPC::Run::run \@cmd, \undef, \$out, \$err };
+	if( $@ ){
+		if( $VERBOSE > 0 ){ print STDERR "find_opencv_settings() : running command has failed: '@cmd': $@\n"; }
+	} else {
 		my %buildparams;
 		for my $l (split /\R/, $out){
 			if( $l =~ /^\-\- RUBBISH_CMAKE_PROJECT::([A-Z_]+): (.+?)$/ ){ $buildparams{$1} = $2 }
 		}
-		print "Build Params: \n".Dumper(\%buildparams);
+		print "Build Params: \n".perl2dump(\%buildparams);
 		if( exists($buildparams{INCLUDE_DIRS}) ){ $cflags .= ' -I'.$_ for split /\s*;\s*/, $buildparams{INCLUDE_DIRS} }
 		if( exists($buildparams{LIB_PATH}) ){ $ldflags .= ' -L'.$_ for split /\s*;\s*/, $buildparams{LIB_PATH} }
 		if( exists($buildparams{LIBS}) ){ $ldflags .= ' -l'.$_ for split /\s*;\s*/, $buildparams{LIBS} }
 	}
+	die "find_opencv_settings() : failed to chdir to previous current dir '$curdir'."
+		unless chdir $curdir;
 	if( $ldflags and $cflags ){
 		if( $VERBOSE > 0 ){ print STDOUT "find_opencv_settings() : found ldflags='$ldflags', cflags='$cflags' (using cmake).\n" }
 		return [$cflags, $ldflags]
@@ -100,6 +120,7 @@ EOCM
 	$cflags = ' '; # still make cflags empty and hope for the best (it must have 1 space there)
 	$ldflags = undef;
 	for my $wanted ('opencv_wechat_qrcode', 'opencv_world'){
+		# this will fail because symbol names are mangled, e.g. _ZN2cv13wechat_qrcode12WeChatQRCode15detectAndDecodeB5cxx11ERKNS_11_InputArrayERKNS_12_OutputArrayE
 		my ($lib) = FFI::CheckLib::find_lib(
 			lib => $wanted,
 			symbol => 'wechat_qrcode::WeChatQRCode'
@@ -117,9 +138,9 @@ EOCM
  "find_opencv_settings() : error, failed to find OpenCV compilation flags (library location and include-dir) using several methods."
 ."\nThe best way to proceed from here is to find where OpenCV library and include dir are located "
 ."and set ENVironment variables before re-running this script. "
-."For example library could be located at '/usr/lib64/libopencv_world.so' "
+."FOR EXAMPLE if library is located at '/usr/lib64/libopencv_world.so' "
 ."and include dir at '/usr/local/include/opencv4/include/', "
-."then set these ENV vars:"
+."then set these ENV vars (FOR EXAMPLE):"
 ."\n  OPENCV_LDFLAGS='-L/usr/lib64/ -lopencv_world'"
 ."\n  OPENCV_CFLAGS='-I/usr/local/include/opencv4/include/'"
 ."and re-run this script."
@@ -166,7 +187,8 @@ sub find_if_opencv_highgui_is_supported {
 }
 
 my $ret = find_opencv_settings();
-die "Error, failed to find OpenCV compilation flags (libs+includes), call to find_opencv_settings() has failed." unless $ret;
+die "Error, failed to find OpenCV compilation flags (libs+includes), call to find_opencv_settings() has failed. Is OpenCV installed (version 4+)? If yes, then your best option is to manually find the INCLUDE dir and LIB dir for OpenCV in your system and set OPENCV_LDFLAGS and OPENCV_CFLAGS ENVironment variables and re-run this Makefile.PL again."
+	unless $ret;
 my ($cflags, $ldflags) = @$ret;
 if( $VERBOSE > 0 ){ print "Found compilation flags:\n   CFLAGS: ${cflags}\n  LDFLAGS: ${ldflags}\n" }
 
@@ -187,13 +209,16 @@ my %WriteMakefileArgs = (
     MIN_PERL_VERSION => '5.006',
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
+	'File::ShareDir::Install' => '0',
+	'File::Spec' => '0',
+	'File::Copy' => '0',
+	'FindBin' => '0',
+	'File::Temp' => '0',
+	'Cwd' => '0',
+	'Data::Roundtrip' => '0.11',
 	'IPC::Run' => '0',
 	'FFI::CheckLib' => '0',
 	#'Devel::CheckLib' => '0',
-	'FindBin' => '0',
-	'File::Spec' => '0',
-	'File::Copy' => '0',
-	'File::ShareDir::Install' => '0',
     },
     TEST_REQUIRES => {
         'Test::More' => '0',
@@ -201,12 +226,13 @@ my %WriteMakefileArgs = (
 	'FindBin' => '0',
 	'File::Spec' => '0',
 	'File::Copy' => '0',
-	'File::ShareDir::Install' => '0',
+	'Time::HiRes' => '0',
+	'File::ShareDir' => '0',
 	'Data::Roundtrip' => '0.11',
     },
     PREREQ_PM => {
-        #'ABC'              => '1.6',
-        #'Foo::Bar::Module' => '5.0401',
+	'File::ShareDir' => '0',
+	'Time::HiRes' => '0',
 	'Data::Roundtrip' => '0.11',
 	'Getopt::Long' => '0',
     },
@@ -214,7 +240,7 @@ my %WriteMakefileArgs = (
 
     META_MERGE => {
 		'meta-spec' => { version => 2 },
-		requires	=> { perl	=> '5.10.0' },
+		requires	=> { perl	=> '5.16.0' },
 		resources   => {
 			license	=> 'artistic_2',
 			homepage   => 'https://metacpan.org/module/Image::DecodeQR::WeChat',

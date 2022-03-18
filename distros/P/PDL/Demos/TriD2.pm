@@ -4,19 +4,17 @@
 
 package PDL::Demos::TriD2;
 
-use PDL;
 use PDL::Graphics::TriD;
 use PDL::Graphics::TriD::Image;
 
-PDL::Demos::Routines->import();
-sub comment($);
-sub act($);
-sub actnw($);
-sub output;
+sub info {('3d2', '3d demo, part 2. (Somewhat memory-intensive)')}
+sub init {'
+use PDL::Graphics::TriD;
+use PDL::Graphics::TriD::Image;
+'}
 
-sub run {
-
-comment q|
+my @demo = (
+[comment => q|
 	Welcome to a short tour of the more esoteric capabilities of
 	PDL::Graphics::TriD.
 
@@ -31,9 +29,12 @@ comment q|
 		use PDL::Graphics::TriD::Image;
 
 	to work.
-|;
+|],
 
-actnw q|
+[actnw => q|
+	# See if we had a 3D window open already
+	$|.__PACKAGE__.q|::we_opened = !defined $PDL::Graphics::TriD::current_window;
+
 	# Number of subdivisions for lines / surfaces.
 	$size = 25;
 
@@ -43,15 +44,15 @@ actnw q|
 	$b = ((sin($r*6.3) * sin($g*6.3)) ** 3)/2 + 0.5;   # Bumps
 	imagrgb [$r,$g,$b];	# Draw an image
         # [press 'q' in the graphics window when done]
-|;
+|],
 
-actnw q|
+[actnw => q|
 	# How about this?
 	imagrgb3d([$r,$g,$b]);	# Draw an image on the lower plane
         # [press 'q' in the graphics window when done]
-|;
+|],
 
-actnw q|
+[actnw => q|
 	# Let's add the real image on top of this...
 	hold3d();
 	imag3d([$r,$g,$b+0.1], [$r,$g,$b]);
@@ -60,9 +61,9 @@ actnw q|
 	# Don't make your window too big or you might run out of memory
 	# at the next step.
         # [press 'q' in the graphics window when done]
-|;
+|],
 
-actnw q|
+[actnw => q|
 	# Warning: your mileage will vary based on which
 	# 	   OpenGL implementation you are using :(
 	# Let's grab this picture...
@@ -81,9 +82,9 @@ actnw q|
 	# save it in a jpeg using the PDL::IO::Pic module - or read
 	# it from one.
         # [press 'q' in the graphics window when done]
-|;
+|],
 
-actnw q|
+[actnw => q|
 	# That was fun - let's do that again!
 	$pic1 = grabpic3d();
 
@@ -94,9 +95,9 @@ actnw q|
 	hold3d(); 	# You remember, we leave the previous one in...
 	$o1 = imagrgb3d($pic1, {Points => [[0,0,0],[1,0,0],[1,0,1],[0,0,1]]});
         # [press 'q' in the graphics window when done]
-|;
+|],
 
-actnw q|
+[actnw => q|
 	# Now, let's update them in real time!
 	nokeeptwiddling3d(); # Don't wait for user while drawing
 	while(1) {
@@ -107,15 +108,17 @@ actnw q|
 		last if twiddle3d(); # exit from loop when 'q' pressed
 	}
         # [press 'q' in the graphics window when done]
-|;
+|],
 
-actnw q|
+[actnw => q|
       # Finally, leave 3d in a sane state
       keeptwiddling3d(); # Don't wait for user while drawing
-        release3d();
-        # [press 'q' in the graphics window when done]
-|;
+      release3d();
+      # close 3D window if we opened it
+      close3d() if $|.__PACKAGE__.q|::we_opened;
+|],
+);
 
-}
+sub demo { @demo }
 
 1;

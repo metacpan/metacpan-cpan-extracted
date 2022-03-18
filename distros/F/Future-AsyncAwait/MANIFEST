@@ -1,5 +1,6 @@
 Build.PL
 Changes
+hax/cv_copy_flags.c.inc
 hax/cx_pushblock.c.inc
 hax/cx_pusheval.c.inc
 hax/docatch.c.inc
@@ -13,11 +14,7 @@ lib/Future/AsyncAwait.pm
 lib/Future/AsyncAwait.xs
 lib/Future/AsyncAwait/Awaitable.pm
 lib/Test/Future/AsyncAwait/Awaitable.pm
-LICENSE
 MANIFEST			This list of files
-META.json
-META.yml
-README
 t/00use.t
 t/01async-immediate.t
 t/02await-immediate.t
@@ -65,3 +62,7 @@ t/82devel-mat-dumper-helper.t
 t/90rt128176.t
 t/90rt129836.t
 t/99pod.t
+README
+LICENSE
+META.yml
+META.json

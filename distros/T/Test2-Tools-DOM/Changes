@@ -1,0 +1,13 @@
+Revision history for Test2-Tools-DOM
+
+0.003     2022-03-18 09:08:51+00:00 Europe/London
+
+* Fixed missing entry in this change log for previous version
+
+0.002     2022-03-18 08:53:05+00:00 Europe/London
+
+* Bump minimum version of Test2::Suite to 0.000072
+
+0.001     2022-03-16 18:45:28+00:00 Europe/London
+
+        First version.

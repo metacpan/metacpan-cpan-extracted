@@ -1,0 +1,38 @@
+GitHub::RSS - collect data from Github.com for feeding into RSS
+
+DESCRIPTION
+
+This module provides a cache database for GitHub issues and scripts to
+periodically update the database from GitHub.
+
+This is mainly used for creating an RSS feed from the database, hence the
+name.
+
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult https://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+
+
+
+
+
+
+
+
+
+

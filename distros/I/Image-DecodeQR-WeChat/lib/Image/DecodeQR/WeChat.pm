@@ -18,11 +18,11 @@ our @EXPORT_OK = qw(
 	modelsdir
 ); # symbols to export on request (WHY?)
 
-our $VERSION = '0.7';
+our $VERSION = '0.8';
 
 
 BEGIN {
-    $VERSION = '0.7';
+    $VERSION = '0.8';
     if ($] > 5.006) {
         require XSLoader;
         XSLoader::load(__PACKAGE__, $VERSION);
@@ -91,7 +91,7 @@ Image::DecodeQR::WeChat - Decode QR code(s) from images using the OpenCV/WeChat 
 
 =head1 VERSION
 
-Version 0.7
+Version 0.8
 
 
 =head1 SYNOPSIS
@@ -237,9 +237,30 @@ interface other parts of the OpenCV library:
 
 A CLI script is provided and will be installed by this module. Basic usage is as above.
 
+=head1 PREREQUISITES
+
+=over
+
+=item * OpenCV library with contributed modules is required.
+The contributed modules must include the QR-code decoder library by WeChat.
+OpenCV must also contain the include dir (headers) - just saying.
+
+=item * A C++ compiler must be installed in your system.
+
+=item * Optionally, C<pkg-config> or C<cmake> must be installed in order to
+aid discovering the location of OpenCV's library and include dir. If you
+don't have these installed then you must manually set environment
+variables C<OPENCV_LDFLAGS> and C<OPENCV_CFLAGS> to point
+to those paths and then attempt to install this module (e.g. C<perl Makefile.PL; make all ; make install>)
+
+=item * Optionally, OpenCV can contain the Highgui library so that
+output images can be displayed in their own window. But this is
+superfluous, because the basic operation of this module allows for
+saving output files to disk.
+
+=back
 
 =head1 SUBROUTINES/METHODS
-
 
 =head3 C< decode_xs(infile, modelsdir, outbase, verbosity, graphicaldisplayresult, dumpqrimagestofile) >
 
@@ -478,6 +499,19 @@ If you are seriously in need of installing
 this module then consider migrating to a serious operating system
 such as Linux as your first action.
 
+=head1 INSTALLING THIS MODULE
+
+This module depends on the existence of the OpenCV library with all
+the extensions and contributed modules mentioned in section C<PREREQUISITES>.
+
+Detecting where this library is located in your system is the weakest
+link in the installation process of this module. C<Makefile.PL> contains
+code to do this with C<pkg-config> or C<cmake>. If these fail,
+it will look for ENVironment variables: C<OPENCV_LDFLAGS> and
+C<OPENCV_CFLAGS>, which should contain the C<CFLAGS> (for example:
+C<<-I/usr/include/opencv4/>>) and C<LDFLAGS> (for example:
+C<<-L/usr/lib64 -lopencv_world>>). Set these variables manually
+prior installation if the automatic methods mentioned above fail.
 
 =head1 AUTHOR
 

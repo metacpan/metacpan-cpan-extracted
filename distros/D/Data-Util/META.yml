@@ -14,7 +14,7 @@ configure_requires:
   Module::Build: '0.4005'
   Module::Build::XSUtil: '0.03'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.10, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.15, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -33,7 +33,7 @@ no_index:
 provides:
   Data::Util:
     file: lib/Data/Util.pm
-    version: '0.66'
+    version: '0.67'
   Data::Util::Error:
     file: lib/Data/Util/Error.pm
   Data::Util::PurePerl:
@@ -44,13 +44,14 @@ requires:
 resources:
   bugtracker: https://github.com/gfx/Perl-Data-Util/issues
   homepage: https://github.com/gfx/Perl-Data-Util
-  repository: git://github.com/gfx/Perl-Data-Util.git
-version: '0.66'
+  repository: https://github.com/gfx/Perl-Data-Util.git
+version: '0.67'
 x_contributors:
   - 'Fuji Goro <fuji.goro@dena.jp>'
-  - 'Fuji, Goro <g.psy.va@gmail.com>'
-  - 'Tokuhiro Matsuno <tokuhirom@gmail.com>'
   - 'Fuji, Goro (gfx) <gfuji@cpan.org>'
+  - 'Fuji, Goro <g.psy.va@gmail.com>'
   - 'Patrice Clement <monsieurp@gentoo.org>'
-  - 'Syohei YOSHIDA <syohex@gmail.com>'
+  - 'Shohei YOSHIDA <syohex@gmail.com>'
+  - 'Tokuhiro Matsuno <tokuhirom@gmail.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 0

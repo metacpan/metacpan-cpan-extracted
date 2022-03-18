@@ -14,3 +14,4 @@ t/02_matches.t
 t/03_captures.t
 t/04_pod.t
 t/05_init.t
+test.pl

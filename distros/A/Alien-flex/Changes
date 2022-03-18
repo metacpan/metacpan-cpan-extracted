@@ -1,5 +1,8 @@
 Revision history for Alien-flex
 
+0.15      2022-03-18 06:45:48 -0600
+  - Documentation improvements
+
 0.14      2020-02-20 16:18:51 -0500
   - Created patch based on Debian/Sid patches
     http://deb.debian.org/debian/pool/main/f/flex/flex_2.6.4-6.2.diff.gz,

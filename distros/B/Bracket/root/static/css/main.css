@@ -11,6 +11,7 @@
 	max-width: 60em;
     -moz-border-radius: 10px;
     border-radius: 10px;
+    font-size: 100%;
 }
 
 table.container {
@@ -23,6 +24,19 @@ table.container {
 td.container {
 	border: white;
 	padding: 0px;
+}
+
+table.lower_seed_check tr {
+        border-bottom: 1px solid #ccc;	
+}
+table.lower_seed_check th {
+	padding: 0.1em;
+        font-weight: bold;
+	font-size: smaller;
+}
+table.lower_seed_check td {
+	padding: 0.1em;
+	font-size: smaller;
 }
 
 
@@ -153,12 +167,18 @@ table#player_links_table td {
     border-radius: 10px;
 }
 
-.admin_links {
+table.admin_links {
+	margin: auto;
 	border: thin gray solid;
 	background-color: #e5ffcc;
 	font-size: 0.92em;
 	-moz-border-radius: 10px;
     border-radius: 10px;
+}
+
+.admin_links td {
+    padding: 0.5em;
+    font-size: 0.82em;
 }
 
 .player_name {
@@ -210,3 +230,10 @@ h1 {
 .account_links li {
 	padding-bottom: 0.75em;
 }
+
+input.save_picks {
+    margin: 0.4em;
+    padding: 0.1em;
+    font-size: large;
+}
+

@@ -54,7 +54,7 @@ use PPIx::Regexp::Constant qw{
     @CARP_NOT
 };
 
-our $VERSION = '0.082';
+our $VERSION = '0.083';
 
 =head2 accepts_perl
 
@@ -1139,8 +1139,7 @@ sub __error {
     my ( $self, $msg ) = @_;
     defined $msg
 	or $msg = 'Was ' . ref $self;
-    $self->{error} = $msg;
-    bless $self, TOKEN_UNKNOWN;
+    TOKEN_UNKNOWN->__PPIX_ELEM__rebless( $self, error => $msg );
     return 1;
 }
 
@@ -1165,13 +1164,14 @@ sub __PPIX_LEXER__record_capture_number {
 
 # Called by the lexer to rebless
 sub __PPIX_ELEM__rebless {
-    my ( $class, $self ) = @_;		# %arg unused
+    my ( $class, $self, %arg ) = @_;
     $self ||= {};
     bless $self, $class;
     delete $self->{error};
-    defined $self->{error}
-	and return 1;
-    delete $self->{error};
+    return $self->__PPIX_ELEM__post_reblessing( %arg );
+}
+
+sub __PPIX_ELEM__post_reblessing {
     return 0;
 }
 
@@ -1197,7 +1197,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2009-2021 by Thomas R. Wyant, III
+Copyright (C) 2009-2022 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

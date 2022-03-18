@@ -16,10 +16,8 @@ use Test::NoTabs;
 
 my @files = (
     'lib/Bible/OBML.pm',
-    'lib/Bible/OBML/HTML.pm',
     't/00-compile.t',
     't/Bible/OBML.t',
-    't/Bible/OBML/HTML.t',
     't/author-eol.t',
     't/author-no-tabs.t',
     't/author-pod-coverage.t',

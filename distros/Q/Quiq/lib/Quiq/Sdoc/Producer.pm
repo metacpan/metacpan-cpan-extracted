@@ -37,10 +37,11 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.199';
+our $VERSION = '1.200';
 
 use Quiq::Unindent;
 use Quiq::Hash;
+use Quiq::Table;
 
 # -----------------------------------------------------------------------------
 
@@ -364,12 +365,62 @@ sub paragraph {
 
 =head4 Synopsis
 
+  $str = $gen->table(\@titles,\@rows,@keyVal); # mit Titelzeile
+  $str = $gen->table($width,\@rows,@keyVal); # ohne Titelzeile
   $str = $gen->table($text,@keyVal);
+
+=head4 Arguments
+
+=over 4
+
+=item @titles
+
+(Array of Strings) Liste der Kolumnentitel
+
+=item @rows
+
+(Array of Arrays of Strings) Liste der Zeilen
+
+=item $width
+
+(Integer) Anzahl der Kolumnen
+
+=item $text
+
+(String) Tabellen-Body als Text
+
+=item @keyVal
+
+(Pairs of Strings) Liste von Tabellen-Eigenschaften
+
+=back
+
+=head4 Returns
+
+(String) Sdoc-Code
 
 =head4 Description
 
-Erzeuge eine Tabelle mit der ASCII-Darstellung $text mit den Eigenschaften
-@keyVal und liefere den resultierenden Sdoc-Code zurück.
+Erzeuge eine Tabelle mit den Titeln @titles und den Zeilen @rows bzw.
+dem Tabellen-Body $text sowie den Eigenschaften @keyVal und liefere den
+resultierenden Sdoc-Code zurück.
+
+=head4 Example
+
+  $str = $gen->table(['Integer','String','Float'],[
+      [1,  'A',  76.253],
+      [12, 'AB', 1.7   ],
+      [123,'ABC',9999  ],
+  ]);
+  ==>
+  %Table:
+  Integer String    Float
+  ------- ------ --------
+        1 A        76.253
+       12 AB        1.700
+      123 ABC    9999.000
+  .
+  \n
 
 =cut
 
@@ -377,21 +428,29 @@ Erzeuge eine Tabelle mit der ASCII-Darstellung $text mit den Eigenschaften
 
 sub table {
     my $self = shift;
-    my $text = Quiq::Unindent->trim(shift);
-    # @_: @keyVal
+    # @_: \@titles,\@rows,@keyVal -or- $text,@keyVal
 
-    if (!defined($text) || $text eq '') {
-        return $text;
+    if (!defined($_[0]) || $_[0] eq '') {
+        return '';
     }
 
-    my $ind = ' ' x $self->indentation;
-    
+    my $body;
+    if (ref($_[0]) || $_[0] =~ /^\d+$/) {
+        my $arg1 = shift; # $titleA -or- $width
+        my $rowsA = shift;
+
+        $body = Quiq::Table->new($arg1,$rowsA)->asAsciiTable;
+    }
+    else {
+        $body = Quiq::Unindent->trimNl(shift);
+    }
+
     my $str = "%Table:\n";
+    my $ind = ' ' x $self->indentation;
     while (@_) {
         $str .= sprintf qq|%s%s="%s"\n|,$ind,shift,shift;
     }
-    $text =~ s/^/$ind/mg;
-    $str .= "$text\n.\n\n";
+    $str .= "$body.\n\n";
 
     return $str;
 }
@@ -618,7 +677,7 @@ sub eof {
 
 =head1 VERSION
 
-1.199
+1.200
 
 =head1 AUTHOR
 

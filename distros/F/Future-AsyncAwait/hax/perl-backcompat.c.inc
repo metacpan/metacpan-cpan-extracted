@@ -32,6 +32,14 @@ typedef SV PADNAME;
 #  define PadMAX(pad)             AvFILLp(pad)
 #endif
 
+#if !HAVE_PERL_VERSION(5, 22, 0)
+#  define CvPADLIST_set(cv, padlist)  (CvPADLIST(cv) = padlist)
+#endif
+
+#ifndef av_count
+#  define av_count(av)           (AvFILL(av) + 1)
+#endif
+
 #ifndef av_top_index
 #  define av_top_index(av)       AvFILL(av)
 #endif

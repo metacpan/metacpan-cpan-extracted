@@ -1,9 +1,5 @@
 #!/opt/bin/perl
 
-# usage: geonames2cdb geonames.txt database.cdb
-# you can use allCountries.zp, or cities500.zip and so on
-# from https://download.geonames.org/export/dump/
-
 =head1 NAME
 
 geo-latlon2place-makedb - generate database for use with Geo::LatLon2Place
@@ -26,7 +22,7 @@ format, but this can be customized using B<--extract>.
 
 =over
 
-=item B<--cellsize> km (default C<20>)
+=item B<--cellsize> km (default C<20>, or C<10> for geonames-postalcodes)
 
 The (minimum) size of a single grid cell in km - the data is binned into
 cells of at least this size. It should not be larger than the search
@@ -39,9 +35,9 @@ geonames database (L<https://download.geonames.org/export/dump/>, for
 example F<DE.txt>, F<cities500.txt> or F<allCountries.txt>) and extracts
 I<placename, countrycode> strings from it.
 
-The method C<geonames-postalcodes> (not yet implemented)
-does the same, but for a geonames postal code database
-L<https://download.geonames.org/export/zip>.
+The method C<geonames-postalcodes> does the same, but for a geonames
+postal code database L<https://download.geonames.org/export/zip>, and
+extracts C<zip name, countrycopde> strings.
 
 Lastly, you can specify a perl fragment that implements your own filtering
 and extraction.
@@ -61,7 +57,7 @@ file is in UTF-8, so will be C<$_>.
 
 For example, the following would expect an input file with space separated
 latitude, longitude, weight and name, where name can contain spaces, which
-is useful when you wat to provide your own input data:
+is useful when you want to provide your own input data:
 
    geo-latlon2place-makedb --extract 'chomp; split / /, 4' input output
 
@@ -92,8 +88,21 @@ and will be multiplied to the square of the distance, and is used to make
 larger cities win over small ones when the coordinate is somewhere between
 them.
 
-The C<geonames> filter looks similar to this fragment, which shows off
-more possibilities:
+The standard extractors (C<geonames> and C<geonames-postalcodes>) provide
+a UTF-8-encoded string as blob, but any binary data will do, for example,
+if you want to associate your coordinate pairs with some short-ish
+integer codes, you could do this:
+
+   geo-latlon2place-makedb --extract '
+      chomp;
+      my ($lat, $lon, $id) = split / /, 4;
+      ($lat, $lon, 1, pack "w", $id)
+   ' input output
+
+And later use C<unpack "w"> on the data returned by C<lookup>.
+
+The C<geonames> filter looks similar to the following fragment, which
+shows off some more filtering possibilities:
 
    my ($id, $name, undef, undef, $lat, $lon, $t1, $t2, $cc, undef, $a1, $s2, $a3, $a4, $pop, undef) = split /\t/;
 
@@ -116,8 +125,8 @@ more possibilities:
       or return;
 
    # we estimate a weight by dividing 25 by the radius of the place,
-   # which we get by assuming a fixed population density of 5000 people/km²,
-   # which is almost always a considerable over-estimate.
+   # which we get by assuming a fixed population density of 5000 # people
+   # per square km, # which is almost always a considerable over-estimate.
    # 25 and 5000 are pretty much made-up, feel free to improve and
    # send me the results.
    my $w = 25 / (1 + sqrt $pop / 5000);
@@ -151,7 +160,6 @@ GetOptions
 @ARGV == 2
    or die "need exactly two paths: inputfile.txt outputdatabase.cdb\n";
 
-$km ||= 20;
 $extract ||= "geonames";
 
 if ($extract eq "geonames") {
@@ -183,6 +191,7 @@ if ($extract eq "geonames") {
       ($lat, $lon, $w, "$name, $cc")
    };
 } elsif ($extract eq "geonames-postalcodes") {
+   $km ||= 10;
    $extract = sub {
       my ($cc, $zip, $name, undef, undef, undef, undef, undef, undef, $lat, $lon, undef) = split /\t/;
 
@@ -193,7 +202,9 @@ if ($extract eq "geonames") {
    die "$@" if $@;
 }
 
-my $torad = (atan2 1,0) / 180;
+$km ||= 20;
+
+my $torad = (atan2 1,0) / 90;
 
 my $boxes = int 6378 * 2 * 2 * (atan2 1,0) / $km; # equator radius / cell size
 
@@ -205,19 +216,18 @@ while (<$fh>) {
    my ($lat, $lon, $w, $payload) = $extract->()
       or next;
 
-   unless (255 - (2+2+1) >= length $payload) {
+   unless (255 >= length $payload) {
       $payload =~ s/([^(\x20-\x7e])/sprintf "\\x%02x", ord $1/ge;
       warn "payload too long, skipping: $payload\n";
       next;
    }
 
-   # higher latitudes get a (much) lower resolution, so we always get at least $km cells
-   my $blat = int $boxes * cos abs $lat * $torad;
+   my $blat = int $boxes * cos $lat * $torad; # can be 0, but does not matter
    my $x = int (($lon + 180) * $blat  / 360);
    my $y = int (($lat +  90) * $boxes / 180);
 
    # we use 16 bit for lat/lon, 8 bi8t for the weight, BER-id, counted name and CC
-   push @{ $grid[$y][$x] }, pack "C/a*", pack "s< s< C a*", $lat * 32767 / 90, $lon * 32767 / 180, $w, $payload;
+   push @{ $grid[$y][$x] }, pack "s< s< C C/a*", $lat * 32767 / 90, $lon * 32767 / 180, $w, $payload;
 }
 
 my ($max, $sum, $cnt);
@@ -227,7 +237,7 @@ open my $cdb, ">", $ARGV[1]
 Geo::LatLon2Place::cdb_make_start fileno $cdb
    and die "cdb_make_start failure";
 
-Geo::LatLon2Place::cdb_make_add "", pack "a4VVV", "SRGL", 1, $km, $boxes;
+Geo::LatLon2Place::cdb_make_add "", pack "a4VVV", "SRGL", 2, $km, $boxes;
 
 for my $y (0 .. $#grid) {
    my $r = $grid[$y];
@@ -252,7 +262,7 @@ Geo::LatLon2Place::cdb_make_finish
 close $cdb;
 
 $max->[2] = $max->[2] * 180 / $boxes - 90;
-my $blat = int $boxes * cos abs $max->[2] * $torad;
+my $blat = int $boxes * cos $max->[2] * $torad;
 $max->[1] = $max->[1] * 360 / $blat - 180;
 print "cell size: $km km, grid size: $boxes, non-empty cell count: $cnt\naverage cell size: ", int $sum/$cnt, ", maximum cell size: $max->[0] (at $max->[2] $max->[1])\n";
 

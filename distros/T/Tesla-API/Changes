@@ -1,0 +1,11 @@
+Revision history for Tesla-API
+
+0.01    2022-03-16
+    - Auto generated distribution with Dist::Mgr
+    - Prompt user to authenticate via URL, and to paste new URL back into
+      console
+    - Auto generate access token, and stash home directory cache
+    - Impemented api(), which will use endpoints() for all Tesla API calls
+    - Implemented rudimentary vehicle ID handling
+    - Implemented initial basic list of API functionality
+    - Tesla API endpoints are stored in __DATA__ for the time being

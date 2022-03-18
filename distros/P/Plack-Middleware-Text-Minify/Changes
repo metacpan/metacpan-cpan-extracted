@@ -1,5 +1,15 @@
 Revision history for Plack-Middleware-Text-Minify:
 
+v0.3.0    2022-03-16 15:38:02+00:00 Europe/London
+  [Enhancements]
+  - Minify IO::Handle bodies.
+
+  [Documentation]
+  - Fix encoding of links in README.
+
+  [Other]
+  - Removed bad rule from MANIFEST.SKIP.
+
 v0.2.2    2021-09-29 17:24:50+01:00 Europe/London
   [Documentation]
   - Change ABSTRACT to match corresponding Mojo plugin.

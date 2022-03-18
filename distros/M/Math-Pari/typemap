@@ -6,6 +6,8 @@ GENMAT	T_PariMat
 bool	T_bool
 PariVar	T_PariVar
 PariExpr	T_PariExpr
+PariExprV	T_PariExprV
+PariExpr2	T_PariExpr2
 PariName	T_PariName
 
 ################################
@@ -27,9 +29,11 @@ T_PariVar
 T_PariName
 	$var = findVariable($arg, 0)
 T_PariExpr
-	if (SvROK($arg) && SvTYPE(SvRV($arg)) == SVt_PVCV) {
-	  $var = ((char*)&(SvRV($arg)->sv_flags)) + LSB_in_U32;
-	} else $var = (char *)SvPV($arg,na)
+	AssignPariExprR0($var,$arg,0)
+T_PariExprV
+	AssignPariExprR0($var,$arg,1)
+T_PariExpr2
+	AssignPariExpr2($var,$arg)
 
 
 ################################

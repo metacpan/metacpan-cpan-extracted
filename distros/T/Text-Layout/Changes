@@ -1,5 +1,12 @@
 Revision history for Text::Layout
 
+0.029	2022-03-17
+
+	Fix issue #11 (PDF::Builder only).
+	Fix font changes for Markdown.
+	Fix <span rise> in convenience mode.
+	Handle <span background>.
+
 0.028	2022-02-04
 
 	INCOMPATIBLE: In Pango mode, the direction of rise and lower

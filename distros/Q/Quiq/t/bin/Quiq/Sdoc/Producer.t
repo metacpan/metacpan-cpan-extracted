@@ -129,12 +129,10 @@ sub test_paragraph : Test(2) {
 
 # -----------------------------------------------------------------------------
 
-sub test_table : Test(3) {
+sub test_table : Test(4) {
     my $self = shift;
 
-    my $gen = Quiq::Sdoc::Producer->new(
-        indentation=>2,
-    );
+    my $gen = Quiq::Sdoc::Producer->new;
 
     # Leere Tabelle
 
@@ -144,20 +142,8 @@ sub test_table : Test(3) {
     $str = $gen->table('');
     $self->is($str,'');
 
-    # Tabelle
+    # Tabelle (Text)
 
-    my $res = '
-        %Table:
-          P C O
-          - - -
-          V T R
-          V V R
-          J T R
-          J T W
-          J V R
-        .
-    ';
-    
     $str = $gen->table('
         P C O
         - - -
@@ -167,7 +153,38 @@ sub test_table : Test(3) {
         J T W
         J V R
     ');
-    $self->is(Quiq::Unindent->trim($str),Quiq::Unindent->trim($res));
+    chomp $str;
+
+    $self->isText($str,q~
+        %Table:
+        P C O
+        - - -
+        V T R
+        V V R
+        J T R
+        J T W
+        J V R
+        .
+    ~);
+
+    # Tabelle (Titel und Zeilen)
+
+    $str = $gen->table(['Integer','String','Float'],[
+        [1,  'A',  76.253],
+        [12, 'AB', 1.7   ],
+        [123,'ABC',9999  ],
+    ]);
+    chomp $str;
+
+    $self->isText($str,q~
+        %Table:
+        Integer String    Float
+        ------- ------ --------
+              1 A        76.253
+             12 AB        1.700
+            123 ABC    9999.000
+        .
+    ~);
 }
 
 # -----------------------------------------------------------------------------

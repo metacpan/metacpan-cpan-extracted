@@ -1,0 +1,150 @@
+﻿Need to allow default(parisize, ...) ???  Catched by eval {}, but probably messes up our data on stack!
+
+when test() is modified without print (or error()), enable next tests again.
+	XXXX Need to use $skip_fun_rx and not $userfun???
+
+In _as_gp() should return gnil on allocatemem().  How to treat allocatemem() if called from Perl called from PARI code?
+
+### Disable user-functins with error too.
+
+# echo 'set history save on' >> ~/.gdbinit && chmod 600 ~/.gdbinit
+# set history size <size>
+
+r -Mblib -MMath::Pari=forprime -wle "<>; print forprime($p,1,100, sub ($) {print shift})"
+set breakpoint pending on
+symbol-file "D:/tmp/perl-modules/Math-Pari-2.030513-cygwin-get_lex/blib/arch/auto/Math/Pari/Pari.dll"
+y
+b init.c:1582
+
+r -Mblib -MMath::Pari=forprime -wle "Math::Pari::crash_yourself(); print forprime($p,1,100, sub ($) {print shift})"
+r -Mblib -MMath::Pari=forprime -wle 'print forprime($p,1,100, sub ($) {print shift})'
+
+void
+crash_yourself()
+  CODE:
+    char *s = (char *) make_PariAV;
+    *s = s[0];
+
+	cygwin gdb does not show the content of the subroutine where the crash happens (but it can show the subroutine with line
+		numbers (a load address mismatch???)
+
+Program received signal SIGSEGV, Segmentation fault.
+0x0bfeb543 in XS_Math__Pari_crash_yourself ()
+   from D:/tmp/perl-modules/Math-Pari-2.030513-cygwin-get_lex/blib/arch/auto/Math/Pari/Pari.dll
+(gdb) b 6354
+Breakpoint 1 at 0x6849b51a: file Pari.c, line 6354.
+(gdb) bt
+#0  0x0bfeb543 in XS_Math__Pari_crash_yourself ()
+   from D:/tmp/perl-modules/Math-Pari-2.030513-cygwin-get_lex/blib/arch/auto/Math/Pari/Pari.dll
+#1  0x371ea1f2 in cygperl5_22!Perl_pp_entersub ()
+   from /cygdrive/d/Programs/cygwin-no-tex_dist-no-add-with-dirs2016.zip/cygwin/bin/cygperl5_22.dll
+#2  0x371e2e38 in cygperl5_22!Perl_runops_standard ()
+   from /cygdrive/d/Programs/cygwin-no-tex_dist-no-add-with-dirs2016.zip/cygwin/bin/cygperl5_22.dll
+#3  0x37151715 in perl_run () from /cygdrive/d/Programs/cygwin-no-tex_dist-no-add-with-dirs2016.zip/cygwin/bin/cygperl5_22.dll
+#4  0x00401a6f in perl!main ()
+
+	Note mismatch between 0x6849b51a and 0x0bfeb543  (but b543 is probably correct).
+
+(gdb)
+1791        GEN extraargs = mkvecsmall((ulong) callee);
+(gdb) p callee
+$3 = (struct trampoline_data_1v *) 0x7ffff5d318b8
+(gdb) n
+1792        return snm_closure((entree*) &e, extraargs);
+(gdb) i extra
+extra_entry               extract0                  extract_full_lattice      extraprime
+extra_entry_module        extract0@plt              extract_full_lattice@plt
+extraargs                 extract_copy              extract_selector_ok
+(gdb) i extraargs
+Vecsmall([140737317640376])
+(gdb) p (long)callee
+$4 = 140737317640376
+(gdb) fin
+Run till exit from #0  make_trampolinecv (cv=0x55555596c8f0) at Pari.xs:1792
+0x00007ffff6600b50 in fill_argvect (ep=0x7ffff6ea4460 <functions_basic+37440>, s=0x7ffff6b611f3 "", has_pointer=0x7fffffffdc28,
+    argvec=0x7fffffffdb30, rettype=0x7fffffffdc30, args=0x5555559478f8, items=4, sv_OUT=0x7fffffffdb80, gen_OUT=0x7fffffffdbd0,
+    OUT_cnt=0x7fffffffdc20) at Pari.xs:1866
+1866                      AssignPariExpr(expr,args[j]);
+Value returned is $5 = (long *) 0x7ffff5d31868
+(gdb) i $5
+()->___fake_MathPari_handler1var("?UUU")
+(gdb) v $5
+[&=00007ffff5d31868] CLOSURE(lg=8):2e00000000000008 (arity=0):0000000000000000 00007ffff5d31858 00007ffff5d31830 00007ffff5d31828 00
+007ffff5d31808 00007ffff5d31788 00007ffff5d31778
+  code = [&=00007ffff5d31858] STR(lg=2):2a00000000000002 chars:000000005f49726a
+  operand = [&=00007ffff5d31830] VECSMALL(lg=5):2c00000000000005 ffffffffffffffff
+  data = [&=00007ffff5d31828] VEC(lg=1):2200000000000001
+  dbg/frpc/fram = [&=00007ffff5d31808] VEC(lg=4):2200000000000004 00007ffff5d317e0 00007ffff5d317d0 00007ffff5d317c0
+    1st component = [&=00007ffff5d317e0] VECSMALL(lg=5):2c00000000000005 0000000000000000
+    2nd component = [&=00007ffff5d317d0] VECSMALL(lg=2):2c00000000000002 0000000000000001
+    3rd component = [&=00007ffff5d317c0] VEC(lg=2):2200000000000002 00007ffff5d317b0
+      1st component = [&=00007ffff5d317b0] VECSMALL(lg=2):2c00000000000002 0000000000000000
+  text = [&=00007ffff5d31788] STR(lg=5):2a00000000000005 chars:5f656b61665f5f5f
+  frame = [&=00007ffff5d31778] VEC(lg=2):2200000000000002 00007ffff5d318b8
+    1st component = [&=00007ffff5d318b8] STR(lg=2):2a00000000000002 chars:000055555596c8f0
+
+(gdb) p extraargs
+$7 = (GEN) 0x7ffff5d318a8
+
+(gdb) p is_entry("sin")
+$5 = (entree *) 0x7ffff6eafc20 <functions_basic+84480>
+(gdb) p *$5
+$16 = {name = 0x7ffff6b7bf50 "sin", valence = 256, value = 0x7ffff6919af6 <gsin>, menu = 8, code = 0x7ffff6b54d04 "Gp",
+  help = 0x7ffff6b7bf54 "sin(x): sine of x.", pvalue = 0x0, arity = 2, hash = 368, next = 0x7ffff6eaf9f0 <functions_basic+83920>}
+(gdb) p EpSTATIC
+No symbol "EpSTATIC" in current context.
+(gdb) p mkvec(stoi((long) 3))
+$7 = (long *) 0x7ffff5d316d0
+(gdb) p snm
+snm_closure      snm_closure@plt
+(gdb) p snm_closure($5,$7)
+$8 = (long *) 0x7ffff5d31690
+(gdb) i $8
+()->sin(3)
+(gdb) p closure_ev
+closure_eval           closure_evalgen        closure_evalnobrk      closure_evalres        closure_evalvoid
+closure_evalbrk        closure_evalgen@plt    closure_evalnobrk@plt  closure_evalres@plt    closure_evalvoid@plt
+(gdb) p closure_evalvoid($8)
+
+Breakpoint 3, closure_eval (C=0x7ffff5d31690) at .././pari-2.11.1/src/language/eval.c:843
+843       const char *code=closure_codestr(C);
+The program being debugged stopped while in a function called from GDB.
+Evaluation of the expression containing the function
+(closure_evalvoid) will be abandoned.
+When the function is done executing, GDB will silently stop.
+(gdb) bt
+#0  closure_eval (C=0x7ffff5d31690) at .././pari-2.11.1/src/language/eval.c:843
+#1  0x00007ffff68a27fd in closure_evalvoid (C=0x7ffff5d31690) at .././pari-2.11.1/src/language/eval.c:1601
+#2  <function called from gdb>
+#3  closure_eval (C=0x7ffff5d31850) at .././pari-2.11.1/src/language/eval.c:847
+#4  0x00007ffff68a27fd in closure_evalvoid (C=0x7ffff5d31850) at .././pari-2.11.1/src/language/eval.c:1601
+#5  0x00007ffff661f798 in forprimestep (a=0x7ffff5d318e0, b=0x7ffff5d318c8, q=0x0, code=0x7ffff5d31850)
+    at .././pari-2.11.1/src/language/forprime.c:968
+#6  0x00007ffff661f840 in forprime (a=0x7ffff5d318e0, b=0x7ffff5d318c8, code=0x7ffff5d31850)
+    at .././pari-2.11.1/src/language/forprime.c:976
+#7  0x00007ffff6604413 in XS_Math__Pari_interface_flexible_void (my_perl=0x555555942010, cv=0x55555596ca38) at Pari.xs:2349
+#8  0x00005555556286a0 in Perl_pp_entersub ()
+#9  0x0000555555620be6 in Perl_runops_standard ()
+#10 0x00005555555a6919 in perl_run ()
+#11 0x000055555557facd in main ()
+
+(gdb) icl C
+00001   pushlex         -1
+00002   checkargs       0x1
+00003   precreal
+00004   callgen2        sin
+
+00001   pushlex         -1
+00002   checkargs       0x1
+00003   callgen         ___fake_MathPari_handler_G
+
+00001   pushlex         -1
+00002   checkargs       0x1
+00003   itos            -1
+00004   callgen         ___fake_MathPari_handler_vL
+
+00001   pushlex         -1
+00002   checkargs       0x1
+00003   itos            -1
+00004   callvoid        ___fake_MathPari_handler_vL
+00005   pushgnil
