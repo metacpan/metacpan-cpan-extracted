@@ -58,7 +58,7 @@ SYNOPSIS
         }
 
 VERSION
-        v0.17.1
+        v0.22.0
 
 DESCRIPTION
     Module::Generic as its name says it all, is a generic module to inherit
@@ -98,6 +98,9 @@ METHODS
     variable "GlobalRequest" in your Apache configuration, it is recognised
     and a clean up registered routine is declared to Apache to clean up the
     content of the object.
+
+    This methods calls "init", which does all the work of setting object
+    properties and calling methods to that effect.
 
   as_hash
     This will recursively transform the object into an hash suitable to be
@@ -255,6 +258,64 @@ METHODS
 
     If the debug value is switched to 1, the message will be silenced.
 
+  deserialise
+    This method use a specified serialiser class and deserialise the given
+    data either directly from a specified file or being provided, and
+    returns the perl data.
+
+    The 2 serialisers currently supported are: Sereal and Storable. They are
+    not required by Module::Generic, so you must install them yourself. If
+    the serialiser chosen is not installed, this will set an errr and return
+    "undef".
+
+    This method takes some parameters as an hash or hash reference. It can
+    then:
+
+    *   retrieve data directly from File
+
+    *   retrieve data from a file handle (only with Storable)
+
+    *   Return the deserialised data
+
+    The supported parameters are:
+
+    *   *data*
+
+        String of data to deserialise.
+
+    *   *file*
+
+        String. A file path where to store the serialised data.
+
+    *   *io*
+
+        A file handle. This is used when the serialiser is Storable to call
+        its function "store_fd" in Storable and "fd_retrieve" in Storable
+
+    *   *lock*
+
+        Boolean. If true, this will lock the file before reading from it.
+        This works only in conjonction with *file* and the serialiser
+        Storable
+
+    *   *serialiser* or *serializer*
+
+        A string being the class of the serialiser to use. This can be only
+        either Sereal or Storable
+
+    Additionally the following options are supported and passed through
+    directly to "decode" in Sereal::Decoder if the serialiser is Sereal:
+    *alias_smallint*, *alias_varint_under*, *incremental*,
+    *max_num_array_entries*, *max_num_hash_entries*, *max_recursion_depth*,
+    *max_string_length*, *max_uncompressed_size*, *no_bless_objects*,
+    *refuse_objects*, *refuse_snappy*, *set_readonly*,
+    *set_readonly_scalars*, *use_undef*, *validate_utf8*
+
+    If an error occurs, this sets an error and return "undef"
+
+  deserialize
+    Alias for "deserialise"
+
   dump
     Provided with some data, this will return a string representation of the
     data formatted by Data::Printer
@@ -295,9 +356,10 @@ METHODS
     Sets or gets an error number.
 
   error
-    Set the current error issuing a Module::Generic::Exception object, call
-    "warn" in perlfunc, or "$r-"warn> under Apache2 modperl, and returns
-    undef() or an empty list in list context:
+    Provided with a list of strings or an hash reference of parameters and
+    this will set the current error issuing a Module::Generic::Exception
+    object, call "warn" in perlfunc, or "$r-"warn> under Apache2 modperl,
+    and returns undef() or an empty list in list context:
 
         if( $some_condition )
         {
@@ -305,7 +367,7 @@ METHODS
         }
 
     Note that you do not have to worry about a trailing line feed sequence.
-    error() takes care of it.
+    "error" takes care of it.
 
     The script calling your module could write calls to your module methods
     like this:
@@ -316,15 +378,38 @@ METHODS
         my $cust_name = $object->customer->name ||
             die( "Got an error: ", $object->error, "\n" );
 
-    Note also that by calling error() it will not clear the current error.
-    For that you have to call clear_error() explicitly.
+    If you want to use an hash reference instead, you can pass the following
+    parameters. Any other parameters will be passed to the exception class.
 
-    Also, when an error is set, the global variable *ERROR* is set
-    accordingly. This is especially usefull, when your initiating an object
-    and that an error occured. At that time, since the object could not be
-    initiated, the end user can not use the object to get the error message,
-    and then can get it using the global module variable *ERROR*, for
-    example:
+    *class*
+        The package name or class to use to instantiate the error object. By
+        default, it will use Module::Generic::Exception class or the one
+        specified with the object property "_exception_class"
+
+            $self->do_something_bad ||
+                return( $self->error({
+                    code => 500,
+                    message => "Oopsie",
+                    class => "My::NoWayException",
+                }) );
+            my $exception = $self->error; # an My::NoWayException object
+
+        Note, however, that if the class specified cannot be loaded for some
+        reason, "error" in Module::Generic will die since this would be an
+        error within another error.
+
+    *message*
+        The error message.
+
+    Note also that by calling "error" it will not clear the current error.
+    For that you have to call "clear_error" explicitly.
+
+    Also, when an error is set, the global variable *ERROR* in the
+    inheriting package is set accordingly. This is especially usefull, when
+    your initiating an object and that an error occured. At that time, since
+    the object could not be initiated, the end user can not use the object
+    to get the error message, and then can get it using the global module
+    variable *ERROR*, for example:
 
         my $obj = Some::Package->new ||
         die( $Some::Package::ERROR, "\n" );
@@ -354,7 +439,7 @@ METHODS
     method cannot be called on an undefined value. To solve this, when an
     object is expected, "error" returns a special object from module
     Module::Generic::Null that will enable all the chained methods to be
-    performed and return the error when requested to. For example :
+    performed and return the error when requested to. For example:
 
         my $o = My::Package->new;
         my $total $o->get_customer(10)->products->total || die( $o->error, "\n" );
@@ -427,7 +512,7 @@ METHODS
             my $self = shift( @_ );
             my $dbh  = DB::Object->connect() ||
             return( $self->error( "Unable to connect to database server." ) );
-            $self->{ 'dbh' } = $dbh;
+            $self->{dbh} = $dbh;
             return( $self );
         }
 
@@ -509,6 +594,20 @@ METHODS
             $self->{_exception_class} = 'My::Package::Exception';
             $self->SUPER::init( @_ ) || return( $self->pass_error );
             return( $self );
+        }
+
+    You can also specify a default exception class that will be used by
+    "error" to create exception object, by setting the object property
+    "_exception_class":
+
+        sub init
+        {
+            my $self = shift( @_ );
+            $self->{name} = 'default_name';
+            # For any key-value pairs to be matched by a corresponding method
+            $self->{_init_strict_use_sub} = 1;
+            $self->{_exception_class} = 'My::Exception';
+            return( $self->SUPER::init( @_ ) );
         }
 
   log_handler
@@ -653,6 +752,21 @@ METHODS
     provided, it will pass it to "new" in Module::Generic::Array and return
     the object.
 
+  new_datetime
+    Provided with some optional arguments and this will instantiate a new
+    Module::Generic::DateTime object, passing it whatever argument was
+    provided.
+
+    Example:
+
+        my $dt = DateTime->now( time_zone => 'Asia/Tokyo' );
+        # Returns a new Module::Generic::DateTime object
+        my $d = $o->new_datetime( $dt );
+
+        # Returns a new Module::Generic::DateTime object with DateTime initiated automatically
+        # to now with time zone set by default to UTC
+        my $d = $o->new_datetime;
+
   new_file
     Instantiate a new Module::Generic::File object. If any arguments are
     provided, it will pass it to "new" in Module::Generic::File and return
@@ -662,6 +776,16 @@ METHODS
     Instantiate a new Module::Generic::Hash object. If any arguments are
     provided, it will pass it to "new" in Module::Generic::Hash and return
     the object.
+
+  new_json
+    This method tries to load JSON and create a new object.
+
+    By default it enables the following JSON object properties:
+
+    "allow_blessed" in JSON
+    "allow_nonref" in JSON
+    "convert_blessed" in JSON
+    "relaxed" in JSON
 
   new_null
     Returns a null value based on the expectations of the caller and thus
@@ -832,6 +956,64 @@ METHODS
     will set an error and return undef. Otherwise this returns the size of
     the file in bytes.
 
+  serialise
+    This method use a specified serialiser class and serialise the given
+    data either by returning it or by saving it directly to a given file.
+
+    The 2 serialisers currently supported are: Sereal and Storable. They are
+    not required by Module::Generic, so you must install them yourself. If
+    the serialiser chosen is not installed, this will set an errr and return
+    "undef".
+
+    This method takes some data and an optional hash or hash reference of
+    parameters. It can then:
+
+    *   save data directly to File
+
+    *   save data to a file handle (only with Storable)
+
+    *   Return the serialised data
+
+    The supported parameters are:
+
+    *   *append*
+
+        Boolean. If true, the serialised data will be appended to the given
+        file. This works only in conjonction with *file*
+
+    *   *file*
+
+        String. A file path where to store the serialised data.
+
+    *   *io*
+
+        A file handle. This is used when the serialiser is Storable to call
+        its function "store_fd" in Storable and "fd_retrieve" in Storable
+
+    *   *lock*
+
+        Boolean. If true, this will lock the file before writing to it. This
+        works only in conjonction with *file* and the serialiser Storable
+
+    *   *serialiser* or *serializer*
+
+        A string being the class of the serialiser to use. This can be only
+        either Sereal or Storable
+
+    Additionally the following options are supported and passed through
+    directly to "decode" in Sereal::Decoder if the serialiser is Sereal:
+    *aliased_dedupe_strings*, *canonical*, *canonical_refs*, *compress*,
+    *compress_level*, *compress_threshold*, *croak_on_bless*,
+    *dedupe_strings*, *freeze_callbacks*, *max_recursion_depth*,
+    *no_bless_objects*, *no_shared_hashkeys*, *protocol_version*, *snappy*,
+    *snappy_incr*, *snappy_threshold*, *sort_keys*, *stringify_unknown*,
+    *undef_unknown*, *use_protocol_v1*, *warn_unknown*
+
+    If an error occurs, this sets an error and return "undef"
+
+  serialize
+    Alias for "serialise"
+
   set
     set() sets object inner data type and takes arguments in a hash like
     fashion:
@@ -898,7 +1080,10 @@ METHODS
     the called routine did not exist and could not be found in the current
     class.
 
-SPECIAL METHODS
+SUPPORT METHODS
+    Those methods are designed to be called from the package inheriting from
+    Module::Generic to perform various function and speed up development.
+
   __instantiate_object
     Provided with an object property name, and a class/package name, this
     will attempt to load the module if it is not already loaded. It does so
@@ -1044,6 +1229,10 @@ SPECIAL METHODS
   _is_hash
     Same as "_is_array", but for hash reference.
 
+  _is_integer
+    Returns true if the value provided is an integer, or false otherwise. A
+    valid value includes an integer starting with "+" or "-"
+
   _is_ip
     Returns true if the given IP has a syntax compliant with IPv4 or IPv6
     including CIDR notation or not, false otherwise.
@@ -1098,6 +1287,77 @@ SPECIAL METHODS
         The minimum version for this class to load. This value is passed
         directly to "use" in perlfunc
 
+  _lvalue
+    This provides a generic lvalue method that can be used both in assign
+    context or lvalue context.
+
+    You only need to specify a setter and getter callback.
+
+    This takes an hash reference having either of the following properties:
+
+    *get*
+        A code reference that will be called, passing it the module object.
+        It takes whatever value is returned and returns it to the caller.
+
+    *set*
+        A code reference that will be called when values were provided
+        either in assign or regular method context:
+
+            my $now = DateTime->now;
+            $o->datetime = $now;
+            # or
+            $o->datetime( $now );
+
+    For example, in your module:
+
+        sub datetime : lvalue { return( shift->_lvalue({
+            set => sub
+            {
+                my( $self, $args ) = @_;
+                if( $self->_is_a( $args->[0] => 'DateTime' ) )
+                {
+                    return( $self->{datetime} = shift( @$args ) );
+                }
+                else
+                {
+                    return( $self->error( "Value provided is not a datetime." ) );
+                }
+            },
+            get => sub
+            {
+                my $self = shift( @_ );
+                my $dt = $self->{datetime};
+                return( $dt );
+            }
+        }, @_ ) ); }
+        # ^^^^
+        # Don't forget the @_ !
+
+    Be mindful that even if the setter callback returns "undef" in case of
+    an error, perl does not permit "undef" to be returned from an lvalue
+    method, and besides the return value in assign context is useless
+    anyway:
+
+        my $dt = $o->datetime = DateTime->now;
+
+    If you want to check if assignment worked, you should opt to make error
+    fatal and catch exceptions, such as:
+
+        $o->fatal(1);
+        try
+        {
+            $o->datetime = $not_a_datetime_object;
+        }
+        catch( $e )
+        {
+            die( "You provided a non DateTime object!: $e\n" );
+        }
+
+    or you can check if an error was set:
+
+        $o->datetime = $not_a_datetime_object;
+        die( "Did not work: ", $o->error ) if( $o->error );
+
   _obj2h
     This ensures the module object is an hash reference, such as when the
     module object is based on a file handle for example. This permits
@@ -1150,6 +1410,33 @@ SPECIAL METHODS
         printf( "There are %d products\n", $object->products->length );
         $object->products->push( $new_product );
 
+    Alternatively, you can pass an hash reference instead of an object
+    property to provide callbacks that will be called upon addition or
+    removal of value.
+
+    This hash reference can contain the following properties:
+
+    field
+        The object property name
+
+    callbacks
+        An hash reference of operation type ("add" or "remove") to callback
+        subroutine name or code reference pairs.
+
+    For example:
+
+        sub children { return( shift->set_get_array_as_object({
+            field => 'children',
+            callbacks => 
+            {
+                add => '_some_add_callback',
+                remove => 'som_remove_callback',
+            },
+        }), @_ ); }
+
+    The value of the callback can be either a subroutine name or a code
+    reference.
+
   _set_get_boolean
     Provided with an object property name and some data and this will store
     the data as a boolean value.
@@ -1172,6 +1459,33 @@ SPECIAL METHODS
     If no value is provided, and the object property has already been set,
     this performs the same checks as above and returns either a
     JSON::PP::Boolean or a Module::Generic::Boolean object.
+
+    Alternatively, you can pass an hash reference instead of an object
+    property to provide callbacks that will be called upon addition or
+    removal of value.
+
+    This hash reference can contain the following properties:
+
+    field
+        The object property name
+
+    callbacks
+        An hash reference of operation type ("add" or "remove") to callback
+        subroutine name or code reference pairs.
+
+    For example:
+
+        sub is_valid { return( shift->set_get_boolean({
+            field => 'is_valid',
+            callbacks => 
+            {
+                add => '_some_add_callback',
+                remove => 'som_remove_callback',
+            },
+        }), @_ ); }
+
+    The value of the callback can be either a subroutine name or a code
+    reference.
 
   __create_class
     Provided with an object property name and an hash reference representing
@@ -1465,6 +1779,33 @@ SPECIAL METHODS
         # Is it an od number: no
         $obj->level++; # level is now 5
 
+    Alternatively, you can pass an hash reference instead of an object
+    property to provide callbacks that will be called upon addition or
+    removal of value.
+
+    This hash reference can contain the following properties:
+
+    field
+        The object property name
+
+    callbacks
+        An hash reference of operation type ("add" or "remove") to callback
+        subroutine name or code reference pairs.
+
+    For example:
+
+        sub length { return( shift->set_get_number({
+            field => 'length',
+            callbacks => 
+            {
+                add => '_some_add_callback',
+                remove => 'som_remove_callback',
+            },
+        }), @_ ); }
+
+    The value of the callback can be either a subroutine name or a code
+    reference.
+
   _set_get_number_or_object
     Provided with an object property name and a number or an object and this
     call the value using "_set_get_number" or "_set_get_object" respectively
@@ -1482,6 +1823,12 @@ SPECIAL METHODS
     specified class or it will set an error and return undef.
 
     It returns the object currently set, if any.
+
+  _set_get_object_lvalue
+    Same as "_set_get_object_without_init" but with the possibility of
+    setting the object value as an lvalue method:
+
+        $o->my_property = $my_object;
 
   _set_get_object_without_init
     Sets or gets an object, but countrary to "_set_get_object" this method
@@ -1545,6 +1892,33 @@ SPECIAL METHODS
         my $cust_name = $object->name;
         print( "Nothing set yet.\n" ) if( !$cust_name->length );
 
+    Alternatively, you can pass an hash reference instead of an object
+    property to provide callbacks that will be called upon addition or
+    removal of value.
+
+    This hash reference can contain the following properties:
+
+    field
+        The object property name
+
+    callbacks
+        An hash reference of operation type ("add" or "remove") to callback
+        subroutine name or code reference pairs.
+
+    For example:
+
+        sub name { return( shift->set_get_scalar_as_object({
+            field => 'name',
+            callbacks => 
+            {
+                add => '_some_add_callback',
+                remove => 'som_remove_callback',
+            },
+        }), @_ ); }
+
+    The value of the callback can be either a subroutine name or a code
+    reference.
+
   _set_get_scalar_or_object
     Provided with an object property name, and a class/package name and this
     stores the value as an object calling "_set_get_object" if the value is
@@ -1604,6 +1978,62 @@ SPECIAL METHODS
 
   VERBOSE
     Return the value of your global variable *VERBOSE*, if any.
+
+ERROR & EXCEPTION HANDLING
+    This module has been developed on the idea that only the main part of
+    the application should control the flow and trigger exit. Thus, this
+    module and all the others in this distribution do not die, but rather
+    set and error and return undef. So you should always check for the
+    return value.
+
+    Error triggered are transformed into an Module::Generic::Exception
+    object, or any exception class that is specified by the object property
+    "_exception_class". For example:
+
+        sub init
+        {
+            my $self = shift( @_ );
+            $self->SUPER::init( @_ ) || return( $self->pass_error );
+            $self->{_exception_class} = 'My::Exception';
+            return( $self );
+        }
+
+    Those error objects can then be retrieved by calling "error"
+
+    If, however, you wanted errors triggered to be fatal, you can set the
+    object property "fatal" to a true value and/or set your package global
+    variable $FATAL_ERROR to true. When "error" is called with an error, it
+    will "die" in perlfunc with the error object rather than merely
+    returning "undef". For example:
+
+        package My::Module;
+        BEGIN
+        {
+            use strict;
+            use warnings;
+            use parent qw( Module::Generic );
+            our $VERSION = 'v0.1.0';
+            our $FATAL_ERROR = 1;
+        };
+
+        sub init
+        {
+            my $self = shift( @_ );
+            $self->{fatal} = 1;
+            $self->SUPER::init( @_ ) || return( $self->pass_error );
+            $self->{_exception_class} = 'My::Exception';
+            return( $self );
+        }
+
+    To catch fatal error you can use a "try-catch" block such as implemented
+    by Nice::Try.
+
+    Since perl version 5.33.7
+    <https://perldoc.perl.org/blead/perlsyn#Try-Catch-Exception-Handling>
+    you can use the try-catch block using an experimental feature "use
+    feature 'try';", but this does not support "catch" by exception class.
+
+    However
 
 SEE ALSO
     Module::Generic::Exception, Module::Generic::Array,

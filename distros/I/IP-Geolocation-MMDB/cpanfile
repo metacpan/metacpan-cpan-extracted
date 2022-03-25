@@ -16,6 +16,7 @@ on 'test' => sub {
 on 'configure' => sub {
   requires "Alien::libmaxminddb" => "0";
   requires "ExtUtils::MakeMaker" => "0";
+  requires "Math::BigInt" => "1.999806";
 };
 
 on 'develop' => sub {

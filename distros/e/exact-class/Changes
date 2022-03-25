@@ -1,5 +1,8 @@
 Revision history for exact::class
 
+1.16      2022-03-19 17:34:59-07:00 America/Los_Angeles
+        - Minor documentation update
+
 1.15      2021-03-30 19:57:04-07:00 America/Los_Angeles
         - Re-allow role composition to override role-provided methods
 

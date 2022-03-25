@@ -7,7 +7,7 @@ use Role::Tiny ();
 use Scalar::Util ();
 use Class::Method::Modifiers ();
 
-our $VERSION = '1.15'; # VERSION
+our $VERSION = '1.16'; # VERSION
 
 my $store;
 
@@ -277,7 +277,7 @@ exact::class - Simple class interface extension for exact
 
 =head1 VERSION
 
-version 1.15
+version 1.16
 
 =for markdown [![test](https://github.com/gryphonshafer/exact-class/workflows/test/badge.svg)](https://github.com/gryphonshafer/exact-class/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/exact-class/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/exact-class)
@@ -581,7 +581,7 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019-2021 by Gryphon Shafer.
+This software is Copyright (c) 2019-2050 by Gryphon Shafer.
 
 This is free software, licensed under:
 

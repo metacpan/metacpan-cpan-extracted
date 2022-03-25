@@ -1,5 +1,10 @@
 Revision history for IP::Geolocation::MMDB
 
+1.006  2022-03-16 17:32:21 CET
+
+  - Add Math::BigInt 1.999806 to the configuration requirements
+  - Revert to checking the libmaxminddb version with a regular expression
+
 1.005  2022-03-16 17:32:21 CET
 
   - Check if Math::BigInt actually works

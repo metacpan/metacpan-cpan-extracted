@@ -28,6 +28,7 @@ subtest competitions => sub {
           'name' => E,
           'prime_event' => E,
           'rank_name' => E,
+          'status' => E,
           'street' => E,
           'street_no' => E,
           'timezone' => E,

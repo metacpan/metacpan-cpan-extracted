@@ -18,7 +18,7 @@ use Carp;
 use JSON::PP;
 use Scalar::Util qw(blessed);
 
-our $VERSION = '1.0.1'; # VERSION
+our $VERSION = '1.0.2'; # VERSION
 
 my $meta = __PACKAGE__->meta;
 
@@ -94,7 +94,7 @@ API::MailboxOrg::Types - Types related to Mailbox.org API
 
 =head1 VERSION
 
-version 1.0.1
+version 1.0.2
 
 =head1 SYNOPSIS
 

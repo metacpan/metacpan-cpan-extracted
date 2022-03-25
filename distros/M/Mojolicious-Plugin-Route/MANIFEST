@@ -4,8 +4,11 @@ MANIFEST
 META.json
 META.yml
 README.md
+t/inverse.t
 t/load.t
 t/lite.t
+t/Inverse/Route/Base.pm
+t/Inverse/Route/Base/Page.pm
 t/Lite/Route/Admin.pm
 t/Lite/Route/Bar.pm
 t/Lite/Route/Bar/Qux.pm

@@ -2,10 +2,11 @@ package Alien::bison;
 
 use strict;
 use warnings;
+use 5.008001;
 use base qw( Alien::Base );
 
 # ABSTRACT: Find or build bison, the parser generator
-our $VERSION = '0.21'; # VERSION
+our $VERSION = '0.22'; # VERSION
 
 
 sub alien_helper
@@ -29,7 +30,7 @@ Alien::bison - Find or build bison, the parser generator
 
 =head1 VERSION
 
-version 0.21
+version 0.22
 
 =head1 SYNOPSIS
 
@@ -40,7 +41,18 @@ From a Perl script
  unshift @PATH, Alien::bison->bin_dir;
  system 'bison', ...;
 
-From Alien::Base Build.PL
+From L<alienfile>:
+
+ use alienfile;
+ 
+ share {
+   ..
+   requires 'Alien::bison' => 0;
+   build [ '%{bison} ...' ];
+   ...
+ };
+
+From Build.PL for L<Alien::Base::ModuleBuild>:
 
  use Alien:Base::ModuleBuild;
  my $builder = Module::Build->new(
@@ -62,6 +74,16 @@ the GNU Parser generator based on YACC.
  %{bison}
 
 Returns the name of the bison command.  Usually just C<bison>.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<Alien>
+
+=item L<Alien::flex>
+
+=back
 
 =head1 AUTHOR
 

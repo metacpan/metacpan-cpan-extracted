@@ -1,5 +1,8 @@
 Revision history for Devel-PatchPerl-Plugin-Darwin-getcwd
 
+0.003  2022-03-19 21:26:01 JST
+  - It seems that the bug has been fixed in macOS 12.3, so we don't need this module anymore
+
 0.002  2022-02-11 16:32:39 JST
   - Add Devel::PatchPerl prereq
 

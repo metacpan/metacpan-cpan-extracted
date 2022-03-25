@@ -1,5 +1,8 @@
 Revision history for PICA::Data
 
+2.02 2022-03-24T08:13:38Z
+    - Fix support of generic writer
+
 2.01 2021-12-10T13:00:56Z
     - picadata: keep unchanged fields with modify -a
     - picadata: add command 'join'

@@ -89,7 +89,7 @@
             "URI::Template" : "0.22",
             "UUID::Tiny" : "1.04",
             "Unicode::Normalize" : "0",
-            "YAML::XS" : "0.41",
+            "YAML::XS" : "0.83",
             "asa" : "0",
             "namespace::clean" : "0.24",
             "perl" : "v5.14.0"
@@ -121,7 +121,7 @@
          "web" : "https://github.com/LibreCat/Catmandu"
       }
    },
-   "version" : "1.2018",
+   "version" : "1.2019",
    "x_contributors" : [
       "Christian Pietsch <chr.pietsch+github@googlemail.com>",
       "Dave Sherohman <dsheroh@cpan.org>",
@@ -144,7 +144,8 @@
       "Stefan Weil <sw@weilnetz.de>",
       "Tom Hukins <tom@eborcom.com>",
       "Upasana Shukla <me@upasana.me>",
-      "Vitali Peil <vpeil@cpan.org>"
+      "Vitali Peil <vpeil@cpan.org>",
+      "Zakariyya Mughal <zaki.mughal@gmail.com>"
    ],
    "x_generated_by_perl" : "v5.30.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",

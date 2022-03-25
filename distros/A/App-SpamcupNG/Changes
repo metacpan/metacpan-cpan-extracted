@@ -1,10 +1,66 @@
 ==================================================
-Changes from 2021-03-06 00:00:00 +0000 to present.
+Changes from 2021-03-19 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.013 at 2022-03-06 15:17:23 +0000
+version 0.014 at 2022-03-19 17:16:41 +0000
 ------------------------------------------
+
+  Change: fb701af0cd61a22674673e1f5337f6a245b75fdc
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-03-19 14:16:01 +0000
+
+    Merge pull request #8 from glasswalk3r/feature/cookie_login
+
+    Cookie based login 
+
+  Change: 0c1d23509dcd6e71dbbe2e0bbccf4b2f37737a0c
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-03-19 14:15:29 +0000
+
+    refactor: better handling of form data 
+
+  Change: f68edfceb35ec376ddd5db7a6f17809e6cfd4fa5
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-03-19 12:03:45 +0000
+
+    fix: form dump failed 
+
+  Change: c972f4bd3d42fb709c6e8de2489ef8ccc224a59d
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-03-12 12:27:42 +0000
+
+    chore: tidyall 
+
+  Change: eaa8e9308ffd9065d035d876e5ade2dd15ba5aa4
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-03-12 12:26:09 +0000
+
+    chore: updated attribs and methods 
+
+  Change: cd87e33a49a5cdbb60b78bd19aea1cda010ac032
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-03-12 12:25:43 +0000
+
+    fix: redact after login 
+
+  Change: 32e55dcc1c42598e49463f53ac7b841d4178e5ba
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-03-12 12:07:41 +0000
+
+    refactor: tidyall with new config 
+
+  Change: ec1d753c9ff111e68eb8a1bf2f1870cb0a20df44
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-03-12 12:07:19 +0000
+
+    feat: cookie based login 
+
+  Change: 34b7b46ca33aa2e57c3743a49d6bb69e4fd463cc
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-03-12 11:51:06 +0000
+
+    refactor: deprecated tidyall testing 
 
   Change: cf5dcef4e10605484f640ca245f7e997dd49462d
   Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>

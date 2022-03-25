@@ -2,6 +2,9 @@ use 5.010;
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
+use File::ShareDir::Install;
+
+install_share dist => 'share';
 
 my %WriteMakefileArgs = (
     NAME             => 'Tesla::API',
@@ -24,14 +27,17 @@ my %WriteMakefileArgs = (
         },
     },
     CONFIGURE_REQUIRES => {
-        'ExtUtils::MakeMaker' => '0',
+        'ExtUtils::MakeMaker'     => '0',
+        'File::ShareDir::Install' => '0',
     },
     TEST_REQUIRES => {
         'Test::More' => '0',
     },
     PREREQ_PM => {
         'Digest::SHA'       => 0,
+        'File::Copy'        => 0,
         'File::HomeDir'     => 0,
+        'File::Share'       => 0,
         'HTTP::Request'     => 0,
         'JSON'              => 0,
         'MIME::Base64'      => '3.16',
@@ -61,3 +67,6 @@ delete $WriteMakefileArgs{LICENSE}
     unless eval { ExtUtils::MakeMaker->VERSION('6.31'); 1 };
 
 WriteMakefile(%WriteMakefileArgs);
+
+package MY;
+use File::ShareDir::Install 'postamble';

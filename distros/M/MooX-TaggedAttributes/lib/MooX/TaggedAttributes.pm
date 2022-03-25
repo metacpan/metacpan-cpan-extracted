@@ -7,19 +7,21 @@ use v5.10.1;
 use strict;
 use warnings;
 
-our $VERSION = '0.13';
+our $VERSION = '0.15';
 
 use MRO::Compat;
 
 use Class::Method::Modifiers ();
 
+use Sub::Name ();
 use Moo::Role ();
 use MooX::TaggedAttributes::Cache;
 
 our %TAGSTORE;
 our %TAGCACHE;
+our %TAGHANDLER;
 
-my %ARGS = ( -tags => [] );
+my %ARGS = ( -tags => 1, -handler => 1 );
 
 sub _croak {
     require Carp;
@@ -31,26 +33,28 @@ sub import {
     my ( $class, @args ) = @_;
     my $target = caller;
 
-    Moo::Role->apply_roles_to_package( $target, 'MooX::TaggedAttributes::Role' );
+    Moo::Role->apply_roles_to_package( $target,
+        'MooX::TaggedAttributes::Role' );
 
     return unless @args;
 
-    my %args = %ARGS;
+    my %args;
 
     while ( @args ) {
         my $arg = shift @args;
-
         _croak( "unknown argument to ", __PACKAGE__, ": $arg" )
           unless exists $ARGS{$arg};
-
         $args{$arg} = defined $ARGS{$arg} ? shift @args : 1;
     }
 
-    $args{-tags} = [ $args{-tags} ]
-      unless 'ARRAY' eq ref $args{-tags};
+    if ( defined $args{-tags} ) {
+        $args{-tags} = [ $args{-tags} ]
+          unless 'ARRAY' eq ref $args{-tags};
 
-    install_tags( $target, $args{-tags} )
-      if @{ $args{-tags} };
+        $args{-class} = $class;
+        install_tags( $target, %args )
+          if @{ $args{-tags} };
+    }
 
     no strict 'refs';    ## no critic
     *${ \"${target}::import" } = \&role_import;
@@ -84,9 +88,24 @@ sub role_import {
     my $class = shift;
     return unless Moo::Role->is_role( $class );
     my $target = caller;
-    Moo::Role->apply_roles_to_package( $target, $class );
-    install_tags( $target, $TAGSTORE{$class} );
-};
+    if ( Moo::Role->is_role( $target ) ) {
+        Moo::Role->apply_roles_to_package( $target, $class );
+    }
+    else {
+        # Prevent installation of the import routine from a tagged role
+        # into the consumer.  Roles won't overwrite an existing method,
+        # so create one which goes away when this block exits.
+        no strict 'refs';    ## no critic
+        local *${ \"${target}::import" } = sub { };
+        Moo::Role->apply_roles_to_package( $target, $class );
+    }
+    install_tags( $target, -class => $class );
+}
+
+
+
+
+
 
 
 
@@ -100,15 +119,27 @@ sub role_import {
 
 
 sub install_tags {
-    my ( $target, $tags ) = @_;
+    my ( $target, %opt ) = @_;
 
-    if ( $TAGSTORE{$target} ) {
-        push @{ $TAGSTORE{$target} }, @$tags;
-    }
+    my $tags = $opt{-tags}
+      // ( defined( $opt{-class} ) && $TAGSTORE{ $opt{-class} } )
+      || _croak( "-tags or -class not specified" );
 
-    else {
-        $TAGSTORE{$target} = [@$tags];
-        install_tag_handler( $target );
+    # first time importing a tag role, install our tag handler
+    install_tag_handler( $target, \&make_tag_handler )
+      if !exists $TAGSTORE{$target};
+
+    # add the tags.
+    push @{ $TAGSTORE{$target} //= [] }, @$tags;
+
+    # if an extra handler has been specified, or the tag role class
+    # $opt{-class} has one install that as well.
+    if ( my $handler = $opt{-handler}
+        // ( defined $opt{-class} && $TAGHANDLER{ $opt{-class} } ) )
+    {
+        my @handlers = 'ARRAY' eq ref $handler ? @$handler : $handler;
+        install_tag_handler( $target, $_ ) for @handlers;
+        push @{ $TAGHANDLER{$target} //= [] }, @handlers;
     }
 }
 
@@ -122,8 +153,24 @@ sub install_tags {
 
 
 
+
 sub install_tag_handler {
-    my $target = shift;
+    my ( $target, $handler ) = @_;
+    Class::Method::Modifiers::install_modifier( $target,
+        around => has => $handler->( $target ) );
+}
+
+
+
+
+
+
+
+
+
+
+
+sub make_tag_handler {
 
     # we need to
     #  1) use the target package's around() function, and
@@ -133,31 +180,27 @@ sub install_tag_handler {
     # so that if namespace::clean is called on the target class
     # we don't lose access to it.
 
+
+    my $target = shift;
     my $around = \&${ \"${target}::around" };
 
-    Class::Method::Modifiers::install_modifier(
-        $target,
-        after => has => sub {
-            my ( $attrs, %attr ) = @_;
+    return Sub::Name::subname "${target}::tag_handler" => sub {
+        my ( $orig, $attrs, %opt ) = @_;
+        $orig->( $attrs, %opt );
 
-            $attrs = ref $attrs ? $attrs : [$attrs];
-
-            my @tags = @{ $TAGSTORE{$target} };
-
-            $around->(
-                "_tag_list" => sub {
-                    my $orig = shift;
-
-                    ## no critic (ProhibitAccessOfPrivateData)
-                    return [
-                        @{&$orig},
-                        map    { [ $_, $attrs, $attr{$_} ] }
-                          grep { exists $attr{$_} } @tags,
-                    ];
-
-                } );
-
-        } );
+        $attrs = ref $attrs ? $attrs : [$attrs];
+        my @tags = @{ $TAGSTORE{$target} };
+        $around->(
+            "_tag_list" => sub {
+                my $orig = shift;
+                ## no critic (ProhibitAccessOfPrivateData)
+                return [
+                    @{&$orig},
+                    map    { [ $_, $attrs, $opt{$_} ] }
+                      grep { exists $opt{$_} } @tags,
+                ];
+            } );
+    }
 }
 
 
@@ -185,7 +228,7 @@ MooX::TaggedAttributes - Add a tag with an arbitrary value to a an attribute
 
 =head1 VERSION
 
-version 0.13
+version 0.15
 
 =head1 SYNOPSIS
 
@@ -237,7 +280,8 @@ version 0.13
 
 This module attaches a tag-value pair to an attribute in a B<Moo>
 class or role, and provides a interface to query which attributes have
-which tags, and what the values are.
+which tags, and what the values are.  It keeps track of tags for
+attributes through role composition as well as class inheritance.
 
 =head2 Tagging Attributes
 
@@ -346,6 +390,27 @@ and C<< C->new->_tags >>
 
 are identical.
 
+=head1 ADVANCED USE
+
+B<Experimental>
+
+C<MooX::TaggedAttributes> works in part by wrapping L<Moo/has> in
+logic which handles the association of tags with attributes.  This
+wrapping is automatically applied when a module uses a tag role, and
+its mechanism may be used to apply an additional wrapper by passing
+the C<-handler> option to L<MooX::TaggedAttributes>:
+
+  use MooX::TaggedAttributes -handler => $handler, -tags => ...;
+
+C<$handler> is a subroutine reference which will be called as
+
+  $coderef = $handler->($class);
+
+Its return value must be a coderef suitable for passing to
+L<Class::Method::Modifiers/around> to wrap C<has>, e.g.
+
+  around has => $coderef;
+
 =head1 BUGS, LIMITATIONS, TRAPS FOR THE UNWARY
 
 =head2 Changes to an object after instantiation are not tracked.
@@ -441,18 +506,32 @@ The Moo C<has> routine in C<My::Module> will be modified to track attributes wit
 
 =head2 install_tags
 
-   install_tags( $class, \@tags );
+   install_tags( $target, %opt );
 
 This subroutine associates a list of tags with a class.  The first time this is called
 on a class it also calls L</install_tag_handler>.  For subsequent calls it appends
 the tags to the class' list of tags.
 
+C<%opt> may contain C<tag_handler> which is a coderef for a tag handler.
+
+C<%opt> must contain either C<tags>, an arrayref of tags, or C<class>, the name of a class
+which as already been registered with L<MooX::TaggedAttributes>.
+
 =head2 install_tag_handler
 
-   install_tag_handler( $class );
+   install_tag_handler( $class, $factory );
 
-This modifies the Moo C<has> routine in C<$class> so that it keeps track
-of which attributes are assigned a tag.
+This installs a wrapper around the C<has> routine in C<$class>. C<$factory>
+is called as C<< $factory->($class) >> and should return a wrapper compatible
+with L<Class::Method::Modifiers/around>.
+
+=head2 make_tag_handler
+
+  $coderef = make_tag_handler( $target_class );
+
+A tag handler factory returning a coderef which wraps the
+C<$target_class::_tag_list> method to add the tags in
+C<$TAGSTORE{$target}> to its return value.
 
 =head1 AUTHOR
 

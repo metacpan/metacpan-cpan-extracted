@@ -1,7 +1,16 @@
 #
 # Revision history for Perl extension Unicode::Char.
 #
-$Revision: 0.2 $ $Date: 2006/05/15 08:14:53 $
+$Revision: 0.03 $ $Date: 2022/03/19 05:19:16 $
+! lib/Unicode/Char.pm t/02-u.t t/03-n.t
+  * `do 'unicore/Name.pl'` no longer used. `use charnames` instead.
+  * POD fixes
+! README
+  * version removed
+  * copyright years adjusted
+  * dependency section fixed
+
+0.02 2006/05/15 08:14:53
 ! lib/Unicode/Char.pm
   POD typo fixes  
 ! MANIFEST Makefile.PL

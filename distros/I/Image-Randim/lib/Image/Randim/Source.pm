@@ -1,5 +1,5 @@
 package Image::Randim::Source;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 use v5.20;
 use Moose;
 use Module::Find;
@@ -7,18 +7,38 @@ use namespace::autoclean;
 
 usesub Image::Randim::Source;
 
-has 'src_obj' => ( is  => 'ro',
-		   isa => 'Image::Randim::Source::Role',
-    );
-has 'timeout' => ( is  => 'rw',
-		   isa => 'Int',
-		   default => 20,
-    );
+has 'src_obj' => (
+  is  => 'ro',
+  isa => 'Image::Randim::Source::Role',
+);
+
+has 'timeout' => (
+  is  => 'rw',
+  isa => 'Int',
+  default => 20,
+);
+
+# This property will be removed - it's only here to fix the badness
+# of people who don't keep their module libraries clean between
+# released versions of this module.
+has 'autoload_blacklist' => (
+  is => 'ro',
+  isa => 'HashRef',
+  default => sub { {'Image::Randim::Source::Role'      => 1,
+                    'Image::Randim::Source::Desktoppr' => 1,
+                  }
+                },
+);
 
 sub list {
-    my $self = shift;
-    my @class = map { s/.+::(.+)$/$1/r } grep {!/::Role$/} findsubmod Image::Randim::Source;    
-    return \@class;
+  my $self = shift;
+  #my @class = map { s/.+::(.+)$/$1/r } grep {!/::Role$/ && !/::Desktoppr$/} findsubmod Image::Randim::Source;
+  my @class;
+  foreach (findsubmod Image::Randim::Source) {
+    next if defined ${$self->autoload_blacklist}{$_};
+    push @class, s/.+::(.+)$/$1/r;
+  }
+  return \@class;
 }
 
 sub set_provider {

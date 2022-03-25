@@ -15,9 +15,9 @@ use Webservice::OVH;
 
 my $api = Webservice::OVH->new_from_json($json_dir);
 ok($api, "module ok");
-
+=head2
 ok( $api->order->carts && ref $api->order->carts eq 'ARRAY', 'carts ok');
 ok( $api->order->hosting, 'hosting ok' );
 ok( $api->order->email, 'email ok' );
-
+=cut
 done_testing();

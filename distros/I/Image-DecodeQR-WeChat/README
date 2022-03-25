@@ -366,32 +366,37 @@ INSTALLING OpenCV
 
       * There are two ways to make cmake just tolerable: cmake-gui and
       ccmake. The former is a full-gui interface to setting the billion
-      cmake variables. Use it if you are on a machine which offers a GUI:
-      cmake-gui .. If you are on a headless or remote host possibly over
-      telnet or ssh then do not despair because c<ccmake> is the CLI,
-      curses-based equivalent to cmake-gui, use it like: ccmake .. (from
-      within the build dir).
+      cmake variables. Use it if you are on a machine which offers a GUI
+      like this: cmake-gui .. If you are on a headless or remote host
+      possibly over telnet or ssh then do not despair because ccmake is the
+      CLI, curses-based equivalent to cmake-gui, use it like: ccmake ..
+      (from within the build dir).
 
       * Once on either of the cmake GUIs, first do a configure, then check
       the list of all variables (you can search on both, for searching in
-      the CLI, press </> and then n for next hit) to suit you and then
+      the CLI, press / and then n for next hit) to suit you and then
       generate, quit and VERBOSE=1 make -j4 all
 
       * I guess, cmake variables you want to modify are
-      OPENCV_EXTRA_MODULES_PATH and OPENCV_ENABLE_NONFREE and anything that
-      has to do with CNN or DNN. If you have CUDA installed and a
-      CUDA-capable GPU then enable CUDA (search for CUDA string to find the
-      variable(s)). Also, VTK, Ceres Solver, Eigen3, Intel's TBB, CNN, DNN
-      etc. You need to install all these additional packages to get OpenCV
-      support with them.
+      OPENCV_EXTRA_MODULES_PATH and turn ON OPENCV_ENABLE_NONFREE and
+      anything that has to do with CNN or DNN. If you have CUDA installed
+      and a CUDA-capable GPU then enable CUDA (search for CUDA string to
+      find the variable(s)). Also, VTK, Ceres Solver, Eigen3, Intel's TBB,
+      CNN, DNN etc. You need to install all these additional packages
+      first, before finally compiling OpenCV.
 
       * I had a problem with compiling OpenCV with a GUI (the highgui) on a
       headless host. So, I just disabled it. That's easy to achieve during
       the above.
 
-      * I have both installed this on a CUDA-capable GPU (with CUDA 10.2
+      * I have installed this on a CUDA-capable GPU (with CUDA 10.2
       installed) host and on a headless remote host with no GPU or basic.
       CUDA is not required for building this module.
+
+      * It is also possible to download a binary distribution of OpenCV.
+      Just make sure that it supports all the things I mentioned above. And
+      that it has all the required headers (in an include dir) - just
+      saying.
 
     Your mileage may vary.
 

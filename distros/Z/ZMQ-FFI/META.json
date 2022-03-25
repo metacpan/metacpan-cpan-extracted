@@ -3,8 +3,8 @@
    "author" : [
       "Dylan Cali <calid1984@gmail.com>"
    ],
-   "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "dynamic_config" : 1,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -13,12 +13,20 @@
       "version" : 2
    },
    "name" : "ZMQ-FFI",
+   "no_index" : {
+      "directory" : [
+         "t"
+      ]
+   },
    "prereqs" : {
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
-            "FFI::CheckLib" : "0.11",
+            "FFI::CheckLib" : "0.28",
             "FFI::Platypus" : "0.86"
+         },
+         "suggests" : {
+            "Alien::ZMQ::latest" : "0.007"
          }
       },
       "develop" : {
@@ -32,6 +40,7 @@
             "Carp" : "0",
             "Class::XSAccessor" : "1.18",
             "Exporter" : "0",
+            "FFI::CheckLib" : "0",
             "FFI::Platypus" : "0.86",
             "FFI::Platypus::Buffer" : "0",
             "FFI::Platypus::Memory" : "0",
@@ -46,10 +55,13 @@
             "feature" : "0",
             "if" : "0",
             "namespace::clean" : "0",
-            "perl" : "5.010",
+            "perl" : "v5.10.0",
             "strict" : "0",
             "threads" : "0",
             "warnings" : "0"
+         },
+         "suggests" : {
+            "Alien::ZMQ::latest" : "0.007"
          }
       },
       "test" : {
@@ -59,14 +71,15 @@
             "Math::BigInt" : "1.997",
             "POSIX" : "0",
             "Sub::Override" : "0",
-            "Sys::SigAction" : "0",
             "Test::Deep" : "0",
             "Test::Exception" : "0",
             "Test::More" : "0",
             "Test::NoWarnings" : "0",
             "Test::Warnings" : "0",
             "Time::HiRes" : "0",
+            "lib" : "0",
             "locale" : "0",
+            "perl" : "v5.10.0",
             "utf8" : "0"
          }
       }
@@ -74,15 +87,33 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/calid/zmq-ffi/issues"
+         "web" : "https://github.com/zeromq/perlzmq/issues"
       },
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/calid/zmq-ffi.git",
-         "web" : "https://github.com/calid/zmq-ffi"
+         "url" : "git://github.com/zeromq/perlzmq.git",
+         "web" : "https://github.com/zeromq/perlzmq"
       }
    },
-   "version" : "1.17",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+   "version" : "1.18",
+   "x_contributors" : [
+      "Dave Lambley <github@davel.me.uk>",
+      "Graham Ollis <perl@wdlabs.com>",
+      "Klaus Ita <klaus@worstofall.com>",
+      "Marc Mims <marc@questright.com>",
+      "Parth Gandhi <parth.gandhi85@gmail.com>",
+      "Pawel Pabian <bbkr@post.pl>",
+      "Robert Hunter <rh.rhunter@gmail.com>",
+      "Sergey KHripchenko <shripchenko@intermedia.net>",
+      "Slaven Rezic <slaven@rezic.de>",
+      "Whitney Jackson <whjackson@gmail.com>",
+      "pipcet <pipcet@gmail.com>",
+      "Judd Taylor <juddtaylor996@gmail.com>",
+      "Ji-Hyeon Gim <potatogim@potatogim.net>",
+      "Zaki Mughal <zaki.mughal@gmail.com>",
+      "Gavin Henry <ghenry@suretecsystems.com>"
+   ],
+   "x_generated_by_perl" : "v5.30.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19"
 }
 

@@ -3,7 +3,7 @@ package Net::Async::Redis::Commands;
 use strict;
 use warnings;
 
-our $VERSION = '3.021'; # VERSION
+our $VERSION = '3.022'; # VERSION
 
 =head1 NAME
 
@@ -3296,6 +3296,25 @@ sub pubsub_shardchannels : method {
     $self->execute_command(qw(PUBSUB SHARDCHANNELS) => @args)
 }
 
+=head2 pubsub_shardnumsub
+
+Get the count of subscribers for shard channels.
+
+=over 4
+
+=item * [channel [channel ...]]
+
+=back
+
+L<https://redis.io/commands/pubsub-shardnumsub>
+
+=cut
+
+sub pubsub_shardnumsub : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(PUBSUB SHARDNUMSUB) => @args)
+}
+
 =head2 punsubscribe
 
 Stop listening for messages posted to channels matching the given patterns.
@@ -4290,7 +4309,7 @@ Get information and statistics about the server.
 
 =over 4
 
-=item * [section]
+=item * [section [section ...]]
 
 =back
 
@@ -4697,7 +4716,7 @@ sub shutdown : method {
 
 =head2 slaveof
 
-Make the server a replica of another instance, or promote it as master. Deprecated starting with Redis 5. Use REPLICAOF instead.
+Make the server a replica of another instance, or promote it as master.
 
 =over 4
 
@@ -6163,6 +6182,8 @@ Create a consumer group.
 
 =item * [MKSTREAM]
 
+=item * [ENTRIESREAD entries_read]
+
 =back
 
 L<https://redis.io/commands/xgroup-create>
@@ -6252,6 +6273,8 @@ Set a consumer group to an arbitrary last delivered ID value.
 =item * groupname
 
 =item * id|$
+
+=item * [ENTRIESREAD entries_read]
 
 =back
 
@@ -6476,6 +6499,10 @@ An internal command for replicating stream values.
 =item * key
 
 =item * last-id
+
+=item * [ENTRIESADDED entries_added]
+
+=item * [MAXDELETEDID max_deleted_entry_id]
 
 =back
 

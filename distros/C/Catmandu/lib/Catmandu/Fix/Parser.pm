@@ -2,7 +2,7 @@ package Catmandu::Fix::Parser;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.2018';
+our $VERSION = '1.2019';
 
 use Catmandu::Util
     qw(check_value check_string is_array_ref is_instance is_able require_package);
@@ -74,7 +74,7 @@ sub parse {
     }
     catch {
         my $err = $_;
-        if (is_instance($err, 'Catmandu::Error')) {
+        if (ref($err) && ref($err) =~ /^Catmandu/) {
             $err->set_source($source) if is_able($err, 'set_source');
             $err->throw;
         }

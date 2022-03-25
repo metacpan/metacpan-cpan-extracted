@@ -1,6 +1,6 @@
 package Koha::Contrib::Sudoc::PPNize::Updater;
 # ABSTRACT: Mise à jour des PPN dans notices existantes
-$Koha::Contrib::Sudoc::PPNize::Updater::VERSION = '2.36';
+$Koha::Contrib::Sudoc::PPNize::Updater::VERSION = '2.37';
 use Moose;
 use Log::Dispatch;
 use Log::Dispatch::Screen;
@@ -107,7 +107,7 @@ Koha::Contrib::Sudoc::PPNize::Updater - Mise à jour des PPN dans notices exista
 
 =head1 VERSION
 
-version 2.36
+version 2.37
 
 =head1 AUTHOR
 
@@ -115,7 +115,7 @@ Frédéric Demians <f.demians@tamil.fr>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2021 by Fréderic Demians.
+This software is Copyright (c) 2022 by Fréderic Demians.
 
 This is free software, licensed under:
 

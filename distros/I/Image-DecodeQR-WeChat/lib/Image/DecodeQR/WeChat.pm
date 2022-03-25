@@ -18,11 +18,11 @@ our @EXPORT_OK = qw(
 	modelsdir
 ); # symbols to export on request (WHY?)
 
-our $VERSION = '0.8';
+our $VERSION = '0.9';
 
 
 BEGIN {
-    $VERSION = '0.8';
+    $VERSION = '0.9';
     if ($] > 5.006) {
         require XSLoader;
         XSLoader::load(__PACKAGE__, $VERSION);
@@ -91,7 +91,7 @@ Image::DecodeQR::WeChat - Decode QR code(s) from images using the OpenCV/WeChat 
 
 =head1 VERSION
 
-Version 0.8
+Version 0.9
 
 
 =head1 SYNOPSIS
@@ -463,33 +463,37 @@ OpenCV from sources. This is the procedure I followed:
 =item * There are two ways to make C<cmake> just tolerable:
 C<cmake-gui> and C<ccmake>. The former is a full-gui interface
 to setting the billion C<cmake> variables. Use it
-if you are on a machine which offers a GUI: C<cmake-gui ..>
+if you are on a machine which offers a GUI like this: C<cmake-gui ..>
 If you are on a headless or remote host possibly over telnet or ssh
-then do not despair because c<ccmake> is the CLI, curses-based
+then do not despair because C<ccmake> is the CLI, curses-based
 equivalent to C<cmake-gui>,  use it like: C<ccmake ..> (from within the build dir).
 
 =item * Once on either of the cmake GUIs, first do a
 C<configure>, then check the
 list of all variables (you can search on both, for searching
-in the CLI, press C<</>> and then C<n> for next hit)
+in the CLI, press C</> and then C<n> for next hit)
 to suit you and then C<generate>, quit
 and  C<VERBOSE=1 make -j4 all>
 
 =item * I guess, cmake variables you want to modify
 are C<OPENCV_EXTRA_MODULES_PATH>
-and C<OPENCV_ENABLE_NONFREE> and anything that has to do with C<CNN> or C<DNN>.
+and turn ON C<OPENCV_ENABLE_NONFREE> and anything that has to do with C<CNN> or C<DNN>.
 If you have CUDA installed and a CUDA-capable GPU then enable CUDA
 (search for CUDA string to find the variable(s)). Also, VTK, Ceres Solver,
 Eigen3, Intel's TBB, CNN, DNN etc. You need to install all these
-additional packages to get OpenCV support with them.
+additional packages first, before finally compiling OpenCV.
 
 =item * I had a problem with compiling OpenCV with a GUI (the C<highgui>)
 on a headless host. So, I just disabled it. That's easy to achieve
 during the above.
 
-=item * I have both installed this on a CUDA-capable GPU (with CUDA 10.2 installed)
+=item * I have installed this on a CUDA-capable GPU (with CUDA 10.2 installed)
 host and on a headless remote host with no GPU or basic. CUDA is
 not required for building this module.
+
+=item * It is also possible to download a binary distribution of OpenCV.
+Just make sure that it supports all the things I mentioned above.
+And that it has all the required headers (in an include dir) - just saying.
 
 =back
 

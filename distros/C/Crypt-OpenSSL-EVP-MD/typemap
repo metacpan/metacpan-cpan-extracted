@@ -1,0 +1,3 @@
+TYPEMAP
+Crypt::OpenSSL::EVP::MD          T_PTROBJ
+Crypt::OpenSSL::EVP::MD::CTX     T_PTROBJ

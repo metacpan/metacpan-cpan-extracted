@@ -42,14 +42,15 @@ t/14_no_color.t
 t/Checker.pm
 t/JA.txt
 t/SAMPLE.txt
+t/SAMPLE_euc-jp.txt
 t/Util.pm
 t/line/00_load.t
 t/line/02_search.t
 t/pod-coverage.t
 t/pod.t
-t/runner/README.md
-t/runner/Runner.pm
 t/select/00_load.t
 t/select/01_select.t
+t/runner/README.md
+t/runner/Runner.pm
 META.yml
 MANIFEST

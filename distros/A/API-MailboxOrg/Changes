@@ -1,6 +1,10 @@
 Release history for API::MailboxOrg
 ===================================
 
+1.0.2   2022-03-21 06:34:00
+
+  * Update dependency list: add IO::Socket::SSL
+
 1.0.1   2022-03-18 12:53:00
 
   * fix list of dependencies (#2, thanks Slaven @eserte)

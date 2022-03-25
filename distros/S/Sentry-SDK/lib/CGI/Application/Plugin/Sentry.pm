@@ -28,12 +28,10 @@ CGI::Application->add_callback(
 
 CGI::Application->add_callback(
   prerun => sub ($c, $rm) {
-    my $request_uri = $ENV{REQUEST_URI}
-      || $c->query->url(-full => 1, -path => 1, -query => 1);
+    my $request_uri = $c->query->self_url;
 
     Sentry::SDK->configure_scope(sub ($scope) {
-      $scope->set_tags({
-        runtime => "Perl $]", url => $request_uri, runmode => $rm, });
+      $scope->set_tags({ runtime => "Perl $]", runmode => $rm, });
     });
 
     Sentry::Hub->get_current_hub()->push_scope();

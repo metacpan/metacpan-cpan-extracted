@@ -1,5 +1,8 @@
 Revision history for Bot::IRC::X::Feeds
 
+1.07      2022-03-18 08:51:56-07:00 America/Los_Angeles
+        - Minor documentation update
+
 1.06      2021-01-13 11:06:50-08:00 America/Los_Angeles
         - Override some minimum version reqs in dist.ini
 

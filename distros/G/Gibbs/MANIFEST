@@ -1,0 +1,6 @@
+MANIFEST
+README
+Makefile.PL
+lib/Gibbs.pm
+META.yml
+META.json

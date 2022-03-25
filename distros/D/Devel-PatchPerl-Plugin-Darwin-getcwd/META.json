@@ -1,5 +1,5 @@
 {
-   "abstract" : "a workaround for getcwd in macOS",
+   "abstract" : "(DEPRECATED) a workaround for getcwd in macOS",
    "author" : [
       "Shoichi Kaji <skaji@cpan.org>"
    ],
@@ -30,7 +30,7 @@
    "provides" : {
       "Devel::PatchPerl::Plugin::Darwin::getcwd" : {
          "file" : "lib/Devel/PatchPerl/Plugin/Darwin/getcwd.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       }
    },
    "release_status" : "stable",
@@ -45,8 +45,9 @@
          "web" : "https://github.com/skaji/Devel-PatchPerl-Plugin-Darwin-getcwd"
       }
    },
-   "version" : "0.002",
-   "x_generated_by_perl" : "v5.34.0",
+   "version" : "0.003",
+   "x_deprecated" : 1,
+   "x_generated_by_perl" : "v5.34.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_static_install" : 1

@@ -1,3 +1,13 @@
+1.000114  2022-03-24 09:27:03-07:00 America/Los_Angeles
+
+    - Fix bug when inotify is not installed
+    - Make yath better at detecting when 2 files are the same
+
+1.000113  2022-03-23 09:36:57-07:00 America/Los_Angeles
+
+    - Refactor preloader into preloader and reloader
+    - Honor churn blocks during relead events even if --reload is disabled
+
 1.000112  2022-03-15 14:21:29-07:00 America/Los_Angeles
 
     - Add --rerun and --rerun-failed options to test/run command

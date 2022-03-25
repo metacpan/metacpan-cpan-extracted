@@ -62,32 +62,6 @@ subtest array_redirect => sub {
     ok !$res->{timeout};
 };
 
-subtest string => sub {
-    my ($stdout, $stderr) = ("", "");
-    my $res = Command::Runner->new
-        ->commandf("%q -e %q", $^X, "warn 1; print 2; exit 3")
-        ->stdout(sub { $stdout .= $_[0] })
-        ->stderr(sub { $stderr .= $_[0] })
-        ->run;
-    is $res->{result} >> 8, 3;
-    is $stdout, "2";
-    is $stderr, "1 at -e line 1.";
-    ok !$res->{timeout};
-};
-
-subtest string_redirect => sub {
-    my ($stdout, $stderr) = ("", "");
-    my $res = Command::Runner->new
-        ->commandf("%q -e %q", $^X, "warn 1; print 2; exit 3")
-        ->redirect(1)
-        ->stdout(sub { $stdout .= $_[0] })
-        ->run;
-    is $res->{result} >> 8, 3;
-    is $stdout, "1 at -e line 1.2";
-    is $stderr, "";
-    ok !$res->{timeout};
-};
-
 my %SIGNAL = do {
     my @sig = split /\s+/, $Config{sig_name} || "";
     map { ($_, $sig[$_]) } 0...$#sig;

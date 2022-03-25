@@ -5,7 +5,7 @@ greple - extensible grep with lexical expression and region control
 
 # VERSION
 
-Version 8.5601
+Version 8.5701
 
 # SYNOPSIS
 
@@ -65,6 +65,7 @@ Version 8.5601
       --border=pattern     border pattern
       --block=pattern      block of records
       --blockend=s         block end mark (Default: "--")
+      --join-blocks        join back-to-back consecutive blocks
     REGION
       --inside=pattern     select matches inside of pattern
       --outside=pattern    select matches outside of pattern
@@ -661,6 +662,14 @@ For example, if you want to search repeated characters, use
 
         --format LINE='%05d\t'
 
+- **--frame-top**=_string_
+- **--frame-middle**=_string_
+- **--frame-bottom**=_string_
+
+    Print surrounding frames before and after each blocks.  `top` frame
+    is printed at the beginning, `bottom` frame at the end, `middle`
+    frame between each blocks.
+
 ## FILES
 
 - **--glob**=_pattern_
@@ -1018,6 +1027,12 @@ For example, if you want to search repeated characters, use
 
     Change the end mark displayed after **-pABC** or **--block** options.
     Default value is "--".
+
+- **--join-blocks**
+
+    Join consecutive blocks together.  Logical operation is done for each
+    individual blocks, but if the results are back-to-back connected, make
+    them single block for final output.
 
 ## REGIONS
 

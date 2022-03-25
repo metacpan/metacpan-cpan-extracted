@@ -469,7 +469,7 @@ sub open
     
     my $there = $new->stat( SEM_MARKER );
     $new->size( $opts->{size} );
-    $new->flags( $flags );
+    # $new->flags( $flags );
     if( $there == SHM_EXISTS )
     {
         # $self->message( 3, "Binding to existing segment on ", $new->id );
@@ -634,7 +634,7 @@ sub remove_semaphore
     if( !defined( $rv = semctl( $semid, 0, IPC::SysV::IPC_RMID, 0 ) ) )
     {
         $self->message( 3, "Failed to remove semaphore with id '$semid': $!" );
-        $self->error( "Warning only: could not remove the semaphore id \"$semid\": $!" );
+        $self->error( "Warning only: could not remove the semaphore id \"$semid\" with IPC::SysV::IPC_RMID value '", IPC::SysV::IPC_RMID, "': $!" );
     }
     $self->removed_semaphore( $rv ? 1 : 0 );
     $self->semid( undef() );

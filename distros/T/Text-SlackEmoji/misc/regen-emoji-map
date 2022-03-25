@@ -28,10 +28,11 @@ my %min_perl = (
   120 => '5.030',
   121 => '5.030',
   130 => '5.032',
+  140 => '5.035004',
 );
 
 use HTTP::Tiny;
-use JSON;
+use Cpanel::JSON::XS;
 use List::Util qw(min max);
 use Unicode::UCD 'charprop';
 
@@ -46,24 +47,43 @@ die "error: $res->{content}" unless $res->{success};
 
 my $json = $res->{content}; # XXX: Can we really assume this is ASCII?
 
-my $data = JSON->new->decode($json);
+my $data = Cpanel::JSON::XS->new->decode($json);
 
-my %emoji;
+my %by_perl;
+my %extra_emoji;
 
 for my $char (sort { $a->{short_name} cmp $b->{short_name} } @$data) {
   my @points  = split /-/, $char->{unified};
 
-  my $max_age = max map {; charprop( hex("0x$_"), "Age") =~ s/[^0-9]+//gr } @points;
+  # Consider :transgender_flag: here.  It's:
+  #   1F3F3-FE0F-200D-26A7-FE0F
+  #
+  # All those codepoints were known for 5.22, but this sequence didn't have
+  # meaning until Unicode 13.  If we don't consider the $char->{added_in},
+  # we'll end up saying it "works" on 5.22.  Now, what does "works" mean?  It's
+  # hazy, innit, but I think it should mean "sequence is known name", and that
+  # means we should check both.
+  #
+  # Isn't it enough to just check $char->{added_in} and not each code point?
+  # Yeah, it probably is… but I'm leaving the code as-is.
+  # -- rjbs, 2022-03-23
+  my $max_age = max(
+    int($char->{added_in} * 10),
+    map {; charprop( hex("0x$_"), "Age") =~ s/[^0-9]+//gr } @points
+  );
+
   if ($max_age < $MIN_AGE) { $max_age = $MIN_AGE }
   if ($max_age > $MAX_AGE) { die "can't handle unicode age $max_age\n" }
 
   my $perl = $min_perl{ $max_age };
-  die "can't handle $max_age\n" unless $perl;
+  my $str  = join q{}, map {; "\\x{$_}" } @points;
 
-  my $str = join q{}, map {; "\\x{$_}" } @points;
+  my $target = $perl
+             ? ($by_perl{$perl} //= {})
+             : \%extra_emoji;
 
   for my $name (@{ $char->{short_names} }) {
-    $emoji{$perl}{$name} = $str;
+    $target->{$name} = $str;
   }
 }
 
@@ -71,10 +91,18 @@ my $output = "my %hash;\n";
 
 $output .= qq{  \$hash{simple_smile} = "\\x{1F642}";\n};
 
-for my $perl (sort keys %emoji) {
+for my $perl (sort keys %by_perl) {
   $output .= "if (\$] >= $perl || ! \$ENV{SLACKEMOJI_STRICT}) {\n";
-  $output .= qq{  \$hash{"$_"} = "$emoji{$perl}{$_}";\n}
-    for sort keys %{ $emoji{$perl} };
+  $output .= qq{  \$hash{"$_"} = "$by_perl{$perl}{$_}";\n}
+    for sort keys %{ $by_perl{$perl} };
+  $output .= "}\n";
+}
+
+{
+  $output .= "if (! \$ENV{SLACKEMOJI_STRICT}) {\n";
+  for my $name (sort keys %extra_emoji) {
+    $output .= qq{  \$hash{"$name"} = "$extra_emoji{$name}";\n};
+  }
   $output .= "}\n";
 }
 

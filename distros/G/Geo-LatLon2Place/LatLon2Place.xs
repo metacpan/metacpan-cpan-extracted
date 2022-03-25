@@ -83,10 +83,11 @@ lookup_ext_ (SV *cdb, int km, int boxes, NV lat, NV lon, int r0, int r1, int fla
                 rx += rx <     0 ? blat : 0;
                 rx -= rx >= blat ? blat : 0;
 
-                unsigned char key[4] = {
-                  rx, rx >> 8,
-                   y,  y >> 8,
-                };
+                unsigned char key[4];
+                key[0] = rx;
+                key[1] = rx >> 8;
+                key[2] = y;
+                key[3] = y  >> 8;
 
                 //printf ("x,y %4d,%4d blat %d %d %g %02x%02x%02x%02x %d\n", rx, y, blat, (int)glat, TORAD(glat), key[0],key[1],key[2],key[3], sizeof(key));
 
@@ -94,7 +95,7 @@ lookup_ext_ (SV *cdb, int km, int boxes, NV lat, NV lon, int r0, int r1, int fla
                   continue;
 
                 int len = cdb_datalen (db);
-                const U8 *ptr = cdb_get (db, len, cdb_datapos (db));
+                const U8 *ptr = (const U8 *)cdb_get (db, len, cdb_datapos (db));
 
                 while (len > 0)
                   {
@@ -125,7 +126,7 @@ lookup_ext_ (SV *cdb, int km, int boxes, NV lat, NV lon, int r0, int r1, int fla
         if (!reslen)
           XSRETURN_EMPTY;
 
-        RETVAL = newSVpvn (resptr + 6, reslen);
+        RETVAL = newSVpvn ((const char *)resptr + 6, reslen);
 }
 	OUTPUT: RETVAL
 
@@ -160,7 +161,7 @@ cdb_get (SV *self, SV *key)
 
         p = cdb_datapos (db);
         l = cdb_datalen (db);
-        RETVAL = newSVpvn (cdb_get (db, l, p), l);
+        RETVAL = newSVpvn ((const char *)cdb_get (db, l, p), l);
 }
         OUTPUT: RETVAL
 

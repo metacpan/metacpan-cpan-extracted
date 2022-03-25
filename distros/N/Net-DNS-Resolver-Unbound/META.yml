@@ -26,5 +26,5 @@ requires:
   DynaLoader: '1.04'
   Net::DNS: '1.18'
   perl: '5.008009'
-version: '1.09'
+version: '1.10'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

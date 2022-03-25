@@ -866,7 +866,7 @@ svErrflush(void)
 	if (nl1 && (STRLEN)(nl1 - s) < l - 1)
 	    warn("PARI: %.*s%*s%.*s%*s%s", (int)(nl + 1 - s), s, 6, "", (int)(nl1 - nl), nl + 1, 6, "", nl1 + 1);
 	else if (nl && (STRLEN)(nl - s) < l - 1)
-	    warn("PARI: %.*s%*s%s", nl + 1 - s, s, 6, "", nl + 1);
+	    warn("PARI: %.*s%*s%s", (int)(nl + 1 - s), s, 6, "", nl + 1);
 	else
 	    warn("PARI: %s", s);
 	sv_setpv(workErrsv,"");
@@ -1326,8 +1326,8 @@ heap_dump_one(heap_dumper_t *d, GEN x)
     /* add to output */
     switch(d->context) {
     case G_VOID:
-    case G_SCALAR: sv_catpvf(d->acc, " %2d: %s\n",
-			     d->items - 1, SvPV_nolen(tmp));
+    case G_SCALAR: sv_catpvf(d->acc, " %2ld: %s\n",
+			     (long)(d->items - 1), SvPV_nolen(tmp));
 		   SvREFCNT_dec(tmp);     break;
     case G_ARRAY:  av_push((AV*)d->acc,tmp); break;
     }
@@ -1678,7 +1678,6 @@ exprHandler_Perl(char *s)
     SV* cv = (SV*)(s - LSB_in_U32 - 
 		   ((char*)&(dummy->sv_flags) - ((char*)dummy)));
     GEN res;
-    long count;
     dSP;
     SV *sv;
     SV *oPariStack = PariStack;
@@ -1688,7 +1687,7 @@ exprHandler_Perl(char *s)
     PUSHMARK(sp);
     SAVEINT(sentinel);
     sentinel = avma;
-    count = perl_call_sv(cv, G_SCALAR);
+    (void)perl_call_sv(cv, G_SCALAR);	/* The retval is always 1 */
 
     SPAGAIN;
     sv = SvREFCNT_inc(POPs);		/* Preserve it through FREETMPS */
@@ -1720,9 +1719,9 @@ Arr_FETCH(GEN g, I32 n)
     if (!is_matvec_t(typ(g)))
 	croak("Access to elements of not-a-vector");
     if (n >= l || n < 0)
-	croak("Array index %i out of range", n);
+	croak("Array index %li out of range", (long)n);
 #if 0
-    warn("fetching %d-th element of type %d", n, typ((GEN)g[n + 1]));
+    warn("fetching %ld-th element of type %d", (long)n, typ((GEN)g[n + 1]));
 #endif
     return (GEN)g[n + 1];
 }
@@ -1736,9 +1735,9 @@ Arr_STORE(GEN g, I32 n, GEN elt)
     if (!is_matvec_t(typ(g)))
 	croak("Access to elements of not-a-vector");
     if (n >= l || n < 0)
-	croak("Array index %i out of range", n);
+	croak("Array index %li out of range", (long)n);
 #if 0
-    warn("storing %d-th element of type %d", n, typ((GEN)g[n + 1]));
+    warn("storing %ld-th element of type %d", (long)n, typ((GEN)g[n + 1]));
 #endif	/* 0 */
 
     if (typ(g) == t_MAT) {
@@ -1798,10 +1797,12 @@ GEN
 callPerlFunction_var(int rettype, int numargs, SV *cv, ...)
 {
     va_list args;
+    GEN res;
 
     va_start(args, cv);
-    callPerlFunction_va_list(rettype, numargs, cv, args);
+    res = callPerlFunction_va_list(rettype, numargs, cv, args);
     va_end(args);
+    return res;
 }
 
 static GEN code_trampoline_1v_ret(GEN v)
@@ -1818,7 +1819,7 @@ static void code_trampoline_vL_ret(long v)
     struct trampoline_data_1v *tr = (struct trampoline_data_1v*)v;
     GEN arg1 = get_lex(-2);	/* XXX one before v, which is -1 ??? */
 
-    callPerlFunction_var(G_VOID, 1, tr->cv, arg1);	/* works with G_SCALAR */
+    (void)callPerlFunction_var(G_VOID, 1, tr->cv, arg1);	/* works with G_SCALAR */
     return;
 }
 
@@ -1828,7 +1829,7 @@ static void code_trampoline_vG_ret(GEN v)
     GEN arg1 = get_lex(-2);	/* XXX one before v, which is -1 ??? */
     SV *oPariStack = PariStack;
 
-    callPerlFunction_var(G_VOID, 1, tr->cv, arg1);	/* works with G_SCALAR */
+    (void)callPerlFunction_var(G_VOID, 1, tr->cv, arg1);	/* works with G_SCALAR */
 
     /* Now PARI data created inside this subroutine sits above
        oldavma, but the caller is going to unwind the stack: */
@@ -2056,7 +2057,7 @@ fill_argvect(entree *ep, const char *s, long *has_pointer, GEN *argvec,
 			default:
 			  unknown:
 			    croak("Cannot process default argument %.*s of type %.1s for prototype '%s'",
-				  s - pre - 1, pre, s, s0);
+				  (int)(s - pre - 1), pre, s, s0);
 			}
 			s++;			/* Skip ',' */
 		    }
@@ -2202,7 +2203,7 @@ isPariFunction(entree *ep)
    return EpVALENCE(ep) < EpUSER;
 		    /* && ep>=fonctions && ep < fonctions+NUMFUNC) */
 #else	/* !( PARI_VERSION_EXP < 2004000) */
-   return (EpVALENCE(ep) == 0 || EpVALENCE(ep) != EpNEW && typ((GEN)(ep->value))==t_CLOSURE);	/* == EpVAR */
+   return (EpVALENCE(ep) == 0 || (EpVALENCE(ep) != EpNEW && typ((GEN)(ep->value))==t_CLOSURE));	/* == EpVAR */
 #endif	/* !( PARI_VERSION_EXP < 2004000) */
 }
 
@@ -4018,7 +4019,7 @@ loadPari(name, v = 99)
 	 switch (valence) {
 	 case 0:
 	     if (!ep->code) {
-		 croak("Unsupported Pari function %s, interface 0 code NULL");
+		 croak("Unsupported Pari function %s, interface 0 code NULL", olds);
 	     } else if (ep->code[0] == 'p' && ep->code[1] == 0) {
 		 DO_INTERFACE(0);
 	     } else if (ep->code[0] == 0) {
@@ -4081,10 +4082,10 @@ loadPari(name, v = 99)
 
 	 default: 
 	     if (!ep)
-		 croak("Unsupported interface %d for \"direct-link\" Pari function %s",
+		 croak("Unsupported interface %ld for \"direct-link\" Pari function %s",
 		       valence, olds);
 	     if (!ep->code)
-		 croak("Unsupported interface %d and no code for a Pari function %s",
+		 croak("Unsupported interface %ld and no code for a Pari function %s",
 		       valence, olds);
 	   flexible:
 	     s1 = s = ep->code;
@@ -4150,7 +4151,7 @@ _listPari(tag)
 	   
 	   for(ep = table; ep->name; ep++)  {
 	       valence = EpVALENCE(ep);
-	       if (tag == -1 && !_is_internal(ep->menu) || ep->menu == tag) {
+	       if ((tag == -1 && !_is_internal(ep->menu)) || ep->menu == tag) {
 		   switch (valence) {
 		   default:
 		   case 0:
@@ -4369,8 +4370,8 @@ PPCODE:
             pref = "# ";
 	case G_SCALAR:
 	    ssize = getstack();
-	    ret = newSVpvf("%sstack size is %ld bytes (%d x %ld longs)\n",
-			   pref, ssize, sizeof(long), ssize/sizeof(long));
+	    ret = newSVpvf("%sstack size is %ld bytes (%ld x %ld longs)\n",
+			   pref, ssize, (long)sizeof(long), ssize/sizeof(long));
             for (sv1 = PariStack; sv1 != (SV *) GENfirstOnStack; sv1 = nextsv) {
 		GEN x = (GEN) SV_myvoidp_get(sv1);
 		SV* tmp = pari_print(x);
@@ -4408,8 +4409,8 @@ PPCODE:
 	case G_VOID:
 	case G_SCALAR:
 	    ssize = getstack();
-	    ret = newSVpvf("stack size is %ld bytes (%d x %ld longs)\n",
-			   ssize,sizeof(long),ssize/sizeof(long));
+	    ret = newSVpvf("stack size is %ld bytes (%ld x %ld longs)\n",
+			   ssize,(long)sizeof(long),ssize/sizeof(long));
 	    for(; x < (GEN)myPARI_top; x += gsizeword(x), i++) {
 		SV* tmp = pari_print(x);
 		sv_catpvf(ret," %2ld: %s\n",i,SvPV_nolen(tmp));

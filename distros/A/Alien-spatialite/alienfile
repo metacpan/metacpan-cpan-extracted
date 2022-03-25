@@ -8,14 +8,13 @@ my $on_automated_rig
   || $ENV{PERL_CPAN_REPORTER_CONFIG}
   || $ENV{AUTOMATED_TESTING}
   || $ENV{TRAVIS}
-  || $ENV{APPVEYOR};
+  || $ENV{APPVEYOR}
+  || $ENV{CI};
 
 
 use Cwd;
 my $base_dir = getcwd();
 
-#  make sure we get spatialite support
-#use Alien::geos::af;
 use Alien::proj;
 use Alien::sqlite;
 use Alien::freexl;
@@ -42,7 +41,7 @@ plugin 'Build::SearchDep' => (
 
 
 
-my $min_target_version = '4.3.0';
+my $min_target_version = '5.0.0';
 
 plugin 'PkgConfig' => (
     pkg_name => 'spatialite',
@@ -69,20 +68,40 @@ share {
 
 
   plugin 'Build::Autoconf' => ();
+  plugin 'PkgConfig::PPWrapper';
 
   my $build_static = ($^O =~ /mswin/i) ? '' : '--disable-shared';
   $build_static = '';
   $build_static = '--enable-static=no';  #  override - needed?  leftover from gdal
   $build_static = '' if $ENV{FORCE_DYNAMIC};
-  
-  my $build_with_libxml2  = '--enable-libxml2=no';
-  my $build_with_examples = '--enable-examples=no';
-  my $build_target = $on_windows ? '--target=mingw32' : '';
+
+  # most of these are crude  
+  # we can enable librttopo when we have an alien for it
+  my $extra_build_args
+    = ($on_windows ? '--target=mingw32' : '')
+      . join ' ', (qw /
+      --enable-libxml2=no
+      --enable-examples=no
+      --enable-minizip=no
+      --disable-rttopo
+      --disable-gcp
+    /);
+
+  #  see if this helps with cirrus bsd builds
+  #$ENV{SQLITE3_CFLAGS} = Alien::sqlite->cflags;
+  #$ENV{SQLITE3_LIBS} = Alien::sqlite->libs;
+  #say "sqlite cflags: " . Alien::sqlite->cflags;
+  #say "sqlite libs: " . Alien::sqlite->libs;
   
   if ($^O =~ /bsd/) {
     plugin 'Build::Make' => 'gmake';
     if (-d '/usr/local') {
         $with_local = ' --with-local=/usr/local ';
+    }
+    if (!-e '/usr/local/include/sqlite3.h' && Alien::sqlite->install_type eq 'system') {
+      warn '/usr/local/include/sqlite3.h does not exist, '
+         . 'you might need to install the sqlite package for your system, '
+         . 'or install a share version of Alien::sqlite';
     }
   }
   elsif ($^O =~ /dragonfly/) {
@@ -107,15 +126,20 @@ share {
         $make_inst_cmd =~ s/type/cat/;
         $make_inst_cmd =~ s/"/'/g;
     }
-    #if (! ($ENV{TRAVIS} || $ENV{APPVEYOR})) {
-    #    push @make_clean, '%{make} clean';
-    #}
     #  clean up the build dir on cpan testers etc
     plugin 'Cleanse::BuildDir';
   }
-  
+
+  #  ensure we optimise - should enable user control somehow
+  my $config_flags = qq{CFLAGS='-O2' CXXFLAGS='-O2'};
+  $config_flags = '';
+  #local $ENV{CFLAGS}   = '-O2';
+  #local $ENV{CXXFLAGS} = '-O2';
+  #say "CFLAGS IS " . ($ENV{CFLAGS} // '');
+  meta->around_hook( build => \&set_compiler_flags );
+
   build [
-    "%{configure} $with_local $with_cpp11 $build_static $build_with_libxml2 $build_with_examples $build_target",
+    "%{configure} $config_flags $with_local $with_cpp11 $build_static $extra_build_args",
     \&pause,
     $make_cmd,
     $make_inst_cmd,
@@ -124,9 +148,19 @@ share {
 
 };
 
+sub set_compiler_flags {
+  my ($orig, $build, @args) = @_;
+
+  local $ENV{CFLAGS}   = "-O2 " . ($ENV{CFLAGS} // '');
+  local $ENV{CXXFLAGS} = '-O2 ' . ($ENV{CXXFLAGS} // '');
+
+  $build->log ("Setting compiler flag env vars to -O2");
+
+  $orig->($build, @args);
+}
 
 sub pause {
-    return;  #  re-enable in case of debug
+    #return;  #  re-enable in case of debug
     return if $on_automated_rig;
     return if !$on_windows;
 

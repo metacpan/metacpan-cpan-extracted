@@ -10,13 +10,43 @@ use File::Temp qw();
 use File::Path;
 use Encode;
 use Cwd qw();
-use Scalar::Util qw(reftype);
+use Scalar::Util qw(reftype blessed);
 use CGI qw();
 use Digest::SHA;
 use JSON;
 use Want;
+use overload
+	fallback => 0,
+	'eq' => sub {_compare(@_)},
+	'ne' => sub {! _compare(@_)};
 
-our $VERSION = '2.19';
+sub _compare {
+	my ($self, $other, $swap) = @_;
+	return 0 unless defined $other;
+	my $reftype_self = reftype $self;
+	my $reftype_other = reftype $other;
+	return 0 if defined $reftype_other and $reftype_self ne $reftype_other;
+	my $j = JSON->new->canonical;
+	unless ($reftype_other) {
+		eval{
+			local $SIG{'__DIE__'};
+			$other = JSON->new->decode($other);
+		};
+		return 0 if $@;
+	}
+
+	my $canonother;
+	if (blessed $other and $other->isa('JSONP')) {
+		$canonother = $other->serialize(0, 1);
+	} else {
+		$canonother = $j->encode($other);
+	}
+
+	my $canonself = $self->serialize(0, 1);
+	return $canonself eq $canonother;
+}
+
+our $VERSION = '2.22';
 
 =encoding utf8
 
@@ -165,6 +195,31 @@ you can almost freely interleave above listed styles in order to access to eleme
 	$j->secondnode->thirdnode->a = 7;
 	delete $j->secondnode->{thirdnode}; # will delete thirdnode as expected in hash structures.
 
+you can compare the JSONP object with another Perl data structure or JSON string via C<eq> and C<ne> overloaded operators, it will return true if the two operands will result in same JSON structure and values:
+
+	my $j = JSONP->new(
+		{
+			firstkey => 5,
+			secondkey => [1, 2, 3],
+			thirdkey => {
+				nested => \1
+			}
+		}
+	);
+
+	my $json = '
+		{
+			"thirdkey": {"nested": true},
+			"firstkey": 5,
+			"secondkey": [1, 2, 3]
+		}
+	';
+
+	say $j eq $json ? 'the same' : 'different'; # will print 'the same'
+	say $j ne $json ? 'different' : 'the same'; # will print 'the same'
+	say $j eq 'a random string, not a valid JSON' ? 'the same' : 'different'; # will print 'different'
+	say $j eq '{"akey": "something"}' ? 'the same' : 'different'; # will print 'different'
+
 TODO: will investigate if possible to implement deletion using exclusively the convenience notation feature.
 
 IMPORTANT NOTE: while using the convenience notation without braces, if you autovivify a hierarchy without assigning anything to the last item, or assigning it an B<I<undef>>ined value, JSONP will assign to the last element a zero string ( '' ). Since it evaluates to false in a boolean context and can be safely catenated to other strings without causing runtime errors you can avoid several I<exists> checks without the risk to incur in runtime errors. The only dangerous tree traversal can occur if you try to treat an object node as an array node, or vice versa.
@@ -187,7 +242,7 @@ IMPORTANT NOTE 3: deserialized booleans from JSON are turned into referenes to s
 	say !! $j->testbool->true;
 	say !! $j->testbool->false;
 
-NOTE: in order to get a "pretty print" via serialize method you will need to either call I<debug> or I<pretty> methods before serialize, use I<pretty> if you want to serialize a deeper branch than the root one:
+NOTE: in order to get a "pretty print" via serialize method you will need to either call I<debug> or I<pretty> methods before serialize, use I<pretty> if you want to serialize a deeper branch than the root one. If your JSONP object/branch is an ARRAY object the internal I<_pretty> member that stores the related setting for I<serialize> in the object branch cannot exist and hence cannot be set/used, to circumvent this inconvenience you can pass a true value to I<serialize>:
 
 	my $j = JSONP->new->debug;
 	$j->firstnode->a = 5;
@@ -196,6 +251,11 @@ NOTE: in order to get a "pretty print" via serialize method you will need to eit
 	my $pretty = $j->serialize; # will get a pretty print
 	my $deepser = $j->firstnode->serialize; # won't get a pretty print, because deeper than root
 	my $prettydeeper = $j->firstnode->pretty->serialize; # will get a pretty print, because we called I<pretty> first
+
+	my $j = JSONP->new(['one', 'two', 'three']);
+	$j->serialize(1); # will get a pretty print
+	$j->serialize; # will get a normal print
+	$j->pretty->serialize; # ->pretty call will be ignored cause $j is an array, you will get a normal print
 
 =head1 DESCRIPTION
 
@@ -257,7 +317,7 @@ sub new {
 	if ($type eq '') {
 		eval{
 			local $SIG{'__DIE__'};
-			$json = JSON->new->decode($json // '');
+			$json = JSON->new->decode($json);
 		};
 
 		unless($@) {
@@ -313,6 +373,7 @@ sub run {
 	#$ENV{PATH} = '' if $self->{_taint_mode} = ${^TAINT};
 	die "you have to provide an AAA function" unless $self->{_aaa_sub};
 	my $r = CGI->new;
+	$$self{_cgi} = $r;
 	# this will enable us to give back the unblessed reference
 	my %params = $r->Vars;
 	# we assume all inputs are UTF-8, (XHR default encoding anyway) but check if params are already decoded for safety
@@ -357,7 +418,7 @@ sub run {
 	}
 
 	my $req = $self->{params}->{req} // '';
-	$req =~ /^([a-z][0-9a-zA-Z_]{1,63})$/; $req = $1 // '';
+	$req =~ /^([a-z][0-9a-zA-Z_\.]{1,63})$/; $req = $1 // '';
 	my $sid = $r->cookie('sid');
 
 	my $map = caller() . '::' . $req;
@@ -368,8 +429,6 @@ sub run {
 	} else {
 		$self->session = {};
 	}
-
-	$$self{_cgi} = $r;
 
 	my $isloginsub = \&$map == $self->{_login_sub};
 
@@ -434,6 +493,7 @@ sub run {
 	# give a nice JSON "true"/"false" output for authentication
 	$self->authenticated = $self->{_authenticated} ? \1 : \0;
 	$header->{'-status'} = $self->{_status_code} || 200;
+	$header->{"$_"} = $self->{_headers}->{$_} for keys %{$self->{_headers}};
 	my $callback;
 
 	# debug
@@ -441,7 +501,7 @@ sub run {
 
 	my $ofh = select;
 	# avoid putting multiple encoding layers on STDOUT
-	binmode($ofh) && binmode($ofh, ':utf8');
+	binmode($ofh) && binmode($ofh, ':encoding(UTF-8)');
 	unless($self->{_passthrough}){
 		$callback = $self->params->callback if $self->{_request_method} eq 'GET';
 		if($callback){
@@ -457,9 +517,20 @@ sub run {
 		print ')' if $callback;
 	} else {
 		$header->{'-type'} = $self->{_mimetype};
-		if($self->{_html}){
+		$header->{'-content-length'} = $self->{_blobsize} if $self->{_blobsize};
+		if ($self->{_html}) {
 			print $r->header($header);
 			print $self->{_html};
+		} elsif ($self->{_sendblob}) {
+			if ($self->{_inline}) {
+				$header->{'-disposition'} = 'inline';
+			} else {
+				$header->{'-attachment'} = $self->{_blobname};
+			}
+			print $r->header($header);
+			binmode $ofh;
+			print $self->{_sendblob};
+			delete $self->{_sendblob}; # release memory ASAP
 		} else {
 			if ($self->{_inline}) {
 				$header->{'-disposition'} = 'inline';
@@ -482,6 +553,8 @@ sub run {
 		$rh->custom_response($self->{_status_code} || 200, '');
 		$rh->rflush;
 	}
+
+	delete $self->{$_} for keys %$self; # force Perl to release memory in persistent environments
 
 	$self;
 }
@@ -540,6 +613,30 @@ sub html {
 	$self->{_mimetype} = $mime;
 	$self->{_passthrough} = 1;
 	$self->{_html} = $html;
+	$self;
+}
+
+=head3 sendblob
+
+use this method if you need to return a file held in memory instead of JSON, pass the bin/string blob as argument. MIME type will be set always to I<application/octet-stream>.
+
+	yoursubname
+	{
+		...
+		$j->sendblob($fullfilepath, $isTmpFileToDelete);
+	}
+
+=cut
+
+sub sendblob {
+	my ($self, $blob, $attachmentName, $size, $inline) = @_;
+	return $self unless (reftype $self // '') eq 'HASH' && $self->{_is_root_element};
+	$self->{_passthrough} = 1;
+	$self->{_mimetype} = 'application/octet-stream';
+	$self->{_sendblob} = $blob // '';
+	$self->{_blobname} = $attachmentName || 'file';
+	$self->{_blobsize} = 0 + $size;
+	$self->{_inline} = ! ! $inline;
 	$self;
 }
 
@@ -641,7 +738,7 @@ sub insecure {
 
 =head3 rest
 
-call this method if you want to omit the I<req> parameter and want that a sub with same name of the script will be called instead, so if your script will be I</var/www/cgi-bin/myscript> the sub I<myscript> will be called instead of the one passed with I<req> (that can be omitted at this point). You can pass a switch to this method (that will parsed as bool) to set it on or off. It could be useful if you want to pass a variable. If no switch (or undefined one) is passed, the switch will be set as true.
+call this method if you want to omit the I<req> parameter and want that a sub with same name of the script will be called instead, so if your script will be I</somepath/cgi-bin/myscript> the sub I<myscript> will be called instead of the one passed with I<req> (that can be omitted at this point). You can pass a switch to this method (that will parsed as bool) to set it on or off. It could be useful if you want to pass a variable. If no switch (or undefined one) is passed, the switch will be set as true.
 
 =cut
 
@@ -766,11 +863,13 @@ call this method in order to return an error message to the calling page. You ca
 =cut
 
 sub raiseError {
-	my ($self, $message, $code) = @_;
+	my ($self, $message, $code, $customHeaders) = @_;
 	return $self unless (reftype $self // '') eq 'HASH';
 	$self->error = \1;
 	push @{$self->{errors}}, (reftype $message // '') eq 'ARRAY' ? @$message : $message;
 	$self->{_status_code} = $code if defined $code;
+	$self->{_headers} = $customHeaders if defined $customHeaders;
+
 	$self;
 }
 
@@ -794,7 +893,7 @@ sub graft {
 
 	eval{
 		local $SIG{'__DIE__'};
-		$self->{$name} = JSON->new->decode($json // '');
+		$self->{$name} = JSON->new->decode($json);
 	};
 
 	return 0 if $@;
@@ -831,7 +930,7 @@ sub stack {
 
 	eval{
 		local $SIG{'__DIE__'};
-		push @$self, JSON->new->decode($json // '');
+		push @$self, JSON->new->decode($json);
 	};
 	return 0 if $@;
 
@@ -903,7 +1002,7 @@ sub loop {
 	my ($self) = @_;
 	my $refself = reftype $self // '';
 	my $class = ref $self; # bless in cases we have not a deep recursive blessing
-	return undef unless $refself eq 'ARRAY';
+	return undef unless $refself eq 'ARRAY'; ## no critic
 	# use different counter for every array
 	state $indexes = {};
 	my $addr = 0 + $self;
@@ -927,7 +1026,7 @@ sub loop {
 		# will leak few bytes until program end,
 		# with about 8 bytes per loop it's safe
 		delete $indexes->{$addr};
-		return undef;
+		return undef; ## no critic
 	}
 }
 
@@ -942,6 +1041,11 @@ call this method to serialize and output a subtree:
 	$j->subtree->newbranchname->graft('subtree', '{"name" : "some string", "count" : 4}');
 	print $j->subtree->newbranchname->subtree->serialize; # will print '{"name" : "some string", "count" : 4}'
 
+if you have a JSONP ARRAY object I<pretty> call won't be effective. To circumvent this limitation you can pass an override I<pretty> switch to serialize:
+
+	$j = JSONP->new(['one', 'two', 'three']);
+	print $j->serialize(1);
+
 IMPORTANT NOTE: do not assign any reference to a sub to any node, example:
 
 	$j->donotthis = sub { ... };
@@ -951,12 +1055,17 @@ for now the module does assume that nodes/leafs will be scalars/hashes/arrays, s
 =cut
 
 sub serialize {
-	my ($self) = @_;
+	my ($self, $prettyoverride, $canonical) = @_;
+	$canonical = !! $canonical;
+	# $prettyoverride to be used with ARRAY objects where we cannot have _pretty member
+	$prettyoverride //= 0;
 	my $out;
 	my $pretty = (reftype $self // '') eq 'HASH' && $self->{_pretty} ? 1 : 0;
+	$pretty ||= $prettyoverride; 
+
 	eval{
 		local $SIG{'__DIE__'};
-		$out = JSON->new->pretty($pretty)->allow_unknown->allow_blessed->convert_blessed->encode($self);
+		$out = JSON->new->canonical($canonical)->pretty($pretty)->allow_unknown->allow_blessed->convert_blessed->encode($self);
 	} || $@;
 }
 

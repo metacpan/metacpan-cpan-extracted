@@ -1,5 +1,8 @@
 Revision history for Auth::GoogleAuth
 
+1.04      2022-03-18 08:49:53-07:00 America/Los_Angeles
+        - Minor documentation update
+
 1.03      2021-01-10 13:38:22-08:00 America/Los_Angeles
         - Migrate to Test2::V0
         - Improve .gitignore file

@@ -39,7 +39,7 @@ use warnings;
 use Carp qw{ carp croak };
 use Webservice::OVH::Helper;
 
-our $VERSION = 0.46;
+our $VERSION = 0.47;
 
 # sub modules
 use Webservice::OVH::Me::Contact;

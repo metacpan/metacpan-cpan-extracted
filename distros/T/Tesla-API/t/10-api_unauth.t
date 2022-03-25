@@ -15,7 +15,7 @@ is $no_endpoint_ok, undef, "api() croaks if no endpoint sent in";
 like $@, qr/requires an endpoint/, "...and error is sane";
 
 my $no_id_ok = eval {
-    $tesla->api('VEHICLE_SUMMARY');
+    $tesla->api(endpoint => 'VEHICLE_SUMMARY');
     1;
 };
 

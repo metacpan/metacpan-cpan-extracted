@@ -2,7 +2,7 @@ package App::SpamcupNG::Error;
 use strict;
 use warnings;
 
-our $VERSION = '0.013'; # VERSION
+our $VERSION = '0.014'; # VERSION
 
 =head1 NAME
 
@@ -42,7 +42,7 @@ sub new {
         unless ( ( ref($message_ref) eq 'ARRAY' )
         and ( scalar( @{$message_ref} ) > 0 ) );
 
-    for ( my $i = 0; $i < scalar( @{$message_ref} ); $i++ ) {
+    for ( my $i = 0 ; $i < scalar( @{$message_ref} ) ; $i++ ) {
         $message_ref->[$i] =~ s/^\s+//;
         $message_ref->[$i] =~ s/\s+$//;
     }
@@ -50,7 +50,7 @@ sub new {
     my $self = {
         message  => $message_ref,
         is_fatal => $is_fatal
-        };
+    };
 
     bless( $self, $class );
     return $self;

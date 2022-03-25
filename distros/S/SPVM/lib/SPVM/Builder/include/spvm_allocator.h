@@ -2,48 +2,37 @@
 #define SPVM_ALLOCATOR_H
 
 #include "spvm_typedecl.h"
-#include "spvm_native.h"
 
 enum {
-  SPVM_COMPIER_ALLOCATOR_C_MEMORY_BLOCK_TYPE_COMPILE_TIME_TEMPORARY = 0,
-  SPVM_COMPIER_ALLOCATOR_C_MEMORY_BLOCK_TYPE_COMPILE_TIME_ETERNAL = 1,
-  SPVM_COMPIER_ALLOCATOR_C_MEMORY_BLOCK_TYPE_RUN_TIME = 2,
+  SPVM_ALLOCATOR_C_ALLOC_TYPE_TMP = 0,
+  SPVM_ALLOCATOR_C_ALLOC_TYPE_PERMANENT = 1,
 };
 
 // Parser information
 struct spvm_allocator {
-  // Blocks
-  SPVM_LIST* blocks;
+  // Parmanent memory blocks
+  void** permanent_memory_blocks;
 
-  // This is all memory blocks count allocated by the SPVM compiler and runtime.
-  int32_t memory_blocks_count;
+  // The length of parmanent memory blocks
+  int32_t permanent_memory_blocks_length;
 
-  // This is temporary memory blocks count allocated by the SPVM compiler.
-  int32_t memory_blocks_count_compile_tmp;
+  // The capacity of parmanent memory blocks
+  int32_t permanent_memory_blocks_capacity;
 
-  // This is eternal memory blocks count allocated by the SPVM compiler.
-  int32_t memory_blocks_count_compile_eternal;
+  // The count of temporary memory blocks count
+  int32_t memory_blocks_count_tmp;
 
-  // This is memory blocks count allocated by the SPVM runtime.
-  int32_t memory_blocks_count_runtime;
+  // The count of permanent memory blocks
+  int32_t memory_blocks_count_permanent;
 };
 
 SPVM_ALLOCATOR* SPVM_ALLOCATOR_new();
-void SPVM_ALLOCATOR_init(SPVM_COMPILER* compiler);
-
-void* SPVM_ALLOCATOR_new_block_unmanaged(size_t byte_size);
-void SPVM_ALLOCATOR_free_block_unmanaged(void* block);
-
-void* SPVM_ALLOCATOR_new_block_compile_tmp(SPVM_COMPILER* compiler, size_t byte_size);
-void SPVM_ALLOCATOR_free_block_compile_tmp(SPVM_COMPILER* compiler, void* block);
-
-void* SPVM_ALLOCATOR_new_block_compile_eternal(SPVM_COMPILER* compiler, size_t byte_size);
-SPVM_LIST* SPVM_ALLOCATOR_new_list_compile_eternal(SPVM_COMPILER* compiler, int32_t capacity);
-SPVM_HASH* SPVM_ALLOCATOR_new_hash_compile_eternal(SPVM_COMPILER* compiler, int32_t capacity);
-
-void* SPVM_ALLOCATOR_new_block_runtime(SPVM_COMPILER* compiler, size_t byte_size, SPVM_ENV* env);
-void SPVM_ALLOCATOR_free_block_runtime(SPVM_COMPILER* compiler, void* block, SPVM_ENV* env);
-
-void SPVM_ALLOCATOR_free(SPVM_COMPILER* compiler);
+int32_t SPVM_ALLOCATOR_get_memory_blocks_count(SPVM_ALLOCATOR* allocator);
+void* SPVM_ALLOCATOR_alloc_memory_block_unmanaged(size_t byte_size);
+void SPVM_ALLOCATOR_free_memory_block_unmanaged(void* block);
+void* SPVM_ALLOCATOR_alloc_memory_block_tmp(SPVM_ALLOCATOR* allocator, size_t byte_size);
+void SPVM_ALLOCATOR_free_memory_block_tmp(SPVM_ALLOCATOR* allocator, void* block);
+void* SPVM_ALLOCATOR_alloc_memory_block_permanent(SPVM_ALLOCATOR* allocator, size_t byte_size);
+void SPVM_ALLOCATOR_free(SPVM_ALLOCATOR* allocator);
 
 #endif

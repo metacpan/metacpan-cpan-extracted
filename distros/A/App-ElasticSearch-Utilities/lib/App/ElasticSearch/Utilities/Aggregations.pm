@@ -185,7 +185,9 @@ sub es_flatten_aggregations {
     if( $field ) {
         delete $result->{$_} for @remove;
         if( $result->{key} and exists $result->{doc_count} ) {
-            push @{ $row }, $field, delete $result->{key};
+            my $k = delete $result->{key};
+            my $ks = delete $result->{key_as_string};
+            push @{ $row }, $field, $ks || $k;
             push @{ $row }, "$field.hits", delete $result->{doc_count} || 0;
         }
         my %buckets = ();
@@ -249,7 +251,7 @@ App::ElasticSearch::Utilities::Aggregations - Code to simplify creating and work
 
 =head1 VERSION
 
-version 8.2
+version 8.3
 
 =head1 FUNCTIONS
 
@@ -592,7 +594,7 @@ Brad Lhotsky <brad@divisionbyzero.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2021 by Brad Lhotsky.
+This software is Copyright (c) 2022 by Brad Lhotsky.
 
 This is free software, licensed under:
 

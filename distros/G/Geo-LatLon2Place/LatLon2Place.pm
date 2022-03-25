@@ -74,7 +74,7 @@ use common::sense;
 use Carp ();
 
 BEGIN {
-   our $VERSION = 0.9;
+   our $VERSION = '1.0';
 
    require XSLoader;
    XSLoader::load (__PACKAGE__, $VERSION);

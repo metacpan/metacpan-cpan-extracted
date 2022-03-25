@@ -1,3 +1,8 @@
+0.003   2022-03-13  Released-By: PERLANCAR; Urgency: medium
+
+        - Add CLI scripts: corruptor-total, corruptor-zero.
+
+
 0.002   2021-05-25  Released-By: PERLANCAR; Urgency: high
 
 	- [build] Rebuild to update Sah coercion module names (old Sah coercion

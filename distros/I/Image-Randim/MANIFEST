@@ -3,7 +3,6 @@ cpanfile
 lib/Image/Randim.pm
 lib/Image/Randim/Image.pm
 lib/Image/Randim/Source.pm
-lib/Image/Randim/Source/Desktoppr.pm
 lib/Image/Randim/Source/Role.pm
 lib/Image/Randim/Source/Unsplash.pm
 LICENSE

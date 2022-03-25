@@ -8,7 +8,7 @@ use Mojo::Util 'decode';
 
 use constant DEBUG => $ENV{MOJO_MIGRATIONS_DEBUG} || 0;
 
-our $VERSION = '3.008';
+our $VERSION = '3.009';
 
 has name => 'migrations';
 has sqlite => undef, weak => 1;
@@ -51,10 +51,10 @@ sub migrate {
 
   # Already the right version (make sure migrations table exists)
   my $db = $self->sqlite->db;
-  return $self if $self->_active($db, 1) == $target;
+  return $self if $self->_active($db, 0) == $target;
 
   # Lock migrations table and check version again
-  my $tx = $db->begin;
+  my $tx = $db->begin('exclusive');
   return $self if (my $active = $self->_active($db, 1)) == $target;
 
   # Newer version

@@ -23,7 +23,7 @@ with 'MooX::Singleton';
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '1.0.1'; # VERSION
+our $VERSION = '1.0.2'; # VERSION
 
 my %validators = (
     'backup_import' => validation_for(
@@ -78,7 +78,7 @@ API::MailboxOrg::API::Backup - MailboxOrg::API::Backup
 
 =head1 VERSION
 
-version 1.0.1
+version 1.0.2
 
 =head1 SYNOPSIS
 

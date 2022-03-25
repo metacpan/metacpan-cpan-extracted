@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Document;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: One JSON Schema document
 
-our $VERSION = '0.548';
+our $VERSION = '0.549';
 
 use 5.020;
 use Moo;
@@ -149,6 +149,10 @@ sub BUILD ($self, $args) {
   $self->_set_canonical_uri($state->{initial_schema_uri}) if $state->{initial_schema_uri} ne $original_uri;
 
   if ($state->{errors}->@*) {
+    foreach my $error ($state->{errors}->@*) {
+      $error->mode('traverse') if not defined $error->mode;
+    }
+
     $self->_set_errors($state->{errors});
     return;
   }
@@ -212,7 +216,7 @@ JSON::Schema::Modern::Document - One JSON Schema document
 
 =head1 VERSION
 
-version 0.548
+version 0.549
 
 =head1 SYNOPSIS
 

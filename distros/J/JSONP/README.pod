@@ -145,6 +145,31 @@ you can almost freely interleave above listed styles in order to access to eleme
 	$j->secondnode->thirdnode->a = 7;
 	delete $j->secondnode->{thirdnode}; # will delete thirdnode as expected in hash structures.
 
+you can compare the JSONP object with another Perl data structure or JSON string via C<eq> and C<ne> overloaded operators, it will return true if the two operands will result in same JSON structure and values:
+
+	my $j = JSONP->new(
+		{
+			firstkey => 5,
+			secondkey => [1, 2, 3],
+			thirdkey => {
+				nested => \1
+			}
+		}
+	);
+
+	my $json = '
+		{
+			"thirdkey": {"nested": true},
+			"firstkey": 5,
+			"secondkey": [1, 2, 3]
+		}
+	';
+
+	say $j eq $json ? 'the same' : 'different'; # will print 'the same'
+	say $j ne $json ? 'different' : 'the same'; # will print 'the same'
+	say $j eq 'a random string, not a valid JSON' ? 'the same' : 'different'; # will print 'different'
+	say $j eq '{"akey": "something"}' ? 'the same' : 'different'; # will print 'different'
+
 TODO: will investigate if possible to implement deletion using exclusively the convenience notation feature.
 
 IMPORTANT NOTE: while using the convenience notation without braces, if you autovivify a hierarchy without assigning anything to the last item, or assigning it an B<I<undef>>ined value, JSONP will assign to the last element a zero string ( '' ). Since it evaluates to false in a boolean context and can be safely catenated to other strings without causing runtime errors you can avoid several I<exists> checks without the risk to incur in runtime errors. The only dangerous tree traversal can occur if you try to treat an object node as an array node, or vice versa.
@@ -167,7 +192,7 @@ IMPORTANT NOTE 3: deserialized booleans from JSON are turned into referenes to s
 	say !! $j->testbool->true;
 	say !! $j->testbool->false;
 
-NOTE: in order to get a "pretty print" via serialize method you will need to either call I<debug> or I<pretty> methods before serialize, use I<pretty> if you want to serialize a deeper branch than the root one:
+NOTE: in order to get a "pretty print" via serialize method you will need to either call I<debug> or I<pretty> methods before serialize, use I<pretty> if you want to serialize a deeper branch than the root one. If your JSONP object/branch is an ARRAY object the internal I<_pretty> member that stores the related setting for I<serialize> in the object branch cannot exist and hence cannot be set/used, to circumvent this inconvenience you can pass a true value to I<serialize>:
 
 	my $j = JSONP->new->debug;
 	$j->firstnode->a = 5;
@@ -176,6 +201,11 @@ NOTE: in order to get a "pretty print" via serialize method you will need to eit
 	my $pretty = $j->serialize; # will get a pretty print
 	my $deepser = $j->firstnode->serialize; # won't get a pretty print, because deeper than root
 	my $prettydeeper = $j->firstnode->pretty->serialize; # will get a pretty print, because we called I<pretty> first
+
+	my $j = JSONP->new(['one', 'two', 'three']);
+	$j->serialize(1); # will get a pretty print
+	$j->serialize; # will get a normal print
+	$j->pretty->serialize; # ->pretty call will be ignored cause $j is an array, you will get a normal print
 
 =head1 DESCRIPTION
 
@@ -220,6 +250,16 @@ use this method if you need to return HTML instead of JSON, pass the HTML string
 		$j->html($html);
 	}
 
+=head3 sendblob
+
+use this method if you need to return a file held in memory instead of JSON, pass the bin/string blob as argument. MIME type will be set always to I<application/octet-stream>.
+
+	yoursubname
+	{
+		...
+		$j->sendblob($fullfilepath, $isTmpFileToDelete);
+	}
+
 =head3 sendfile
 
 use this method if you need to return a file instead of JSON, pass the full file path as as argument. MIME type will be set always to I<application/octet-stream>. The last parameter is evaluated as boolean and if true will make JSONP to delete the passed file after it has been downloaded.
@@ -262,7 +302,7 @@ call this method if you are going to deploy the script under plain http protocol
 
 =head3 rest
 
-call this method if you want to omit the I<req> parameter and want that a sub with same name of the script will be called instead, so if your script will be I</var/www/cgi-bin/myscript> the sub I<myscript> will be called instead of the one passed with I<req> (that can be omitted at this point). You can pass a switch to this method (that will parsed as bool) to set it on or off. It could be useful if you want to pass a variable. If no switch (or undefined one) is passed, the switch will be set as true.
+call this method if you want to omit the I<req> parameter and want that a sub with same name of the script will be called instead, so if your script will be I</somepath/cgi-bin/myscript> the sub I<myscript> will be called instead of the one passed with I<req> (that can be omitted at this point). You can pass a switch to this method (that will parsed as bool) to set it on or off. It could be useful if you want to pass a variable. If no switch (or undefined one) is passed, the switch will be set as true.
 
 =head3 set_session_expiration
 
@@ -378,6 +418,11 @@ call this method to serialize and output a subtree:
 	print $j->sublist->newbranchname->[1]->name; will print "second one"
 	$j->subtree->newbranchname->graft('subtree', '{"name" : "some string", "count" : 4}');
 	print $j->subtree->newbranchname->subtree->serialize; # will print '{"name" : "some string", "count" : 4}'
+
+if you have a JSONP ARRAY object I<pretty> call won't be effective. To circumvent this limitation you can pass an override I<pretty> switch to serialize:
+
+	$j = JSONP->new(['one', 'two', 'three']);
+	print $j->serialize(1);
 
 IMPORTANT NOTE: do not assign any reference to a sub to any node, example:
 

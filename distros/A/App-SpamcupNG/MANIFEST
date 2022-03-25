@@ -61,7 +61,6 @@ t/warning.t
 tidyall.ini
 xt/author/00-compile.t
 xt/author/pod-syntax.t
-xt/author/tidyall.t
 xt/kwalitee.t
 xt/pod-coverage.t
 xt/pod.t

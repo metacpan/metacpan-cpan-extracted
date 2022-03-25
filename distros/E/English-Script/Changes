@@ -1,5 +1,8 @@
 Revision history for English::Script
 
+1.06      2022-03-19 17:50:34-07:00 America/Los_Angeles
+        - Minor documentation update
+
 1.05      2021-01-13 11:10:48-08:00 America/Los_Angeles
         - Override some minimum version reqs in dist.ini
 

@@ -12,7 +12,7 @@ use WebService::Hexonet::Connector::ResponseTemplate;
 use WebService::Hexonet::Connector::ResponseTemplateManager;
 use WebService::Hexonet::Connector::SocketConfig;
 
-use version 0.9917; our $VERSION = version->declare('v2.10.2');
+our $VERSION = 'v2.10.3';
 
 1;
 

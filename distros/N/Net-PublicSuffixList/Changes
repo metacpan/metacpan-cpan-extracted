@@ -1,5 +1,8 @@
 # Changes for Net::PublicSuffixList
 
+0.502 2022-03-19T15:56:32Z
+	* Freshen distro and correct some LICENSE issues. No code changes.
+
 0.501 2021-01-29T01:40:22Z
 	* Fix a problem with line-endings on Windows.
 

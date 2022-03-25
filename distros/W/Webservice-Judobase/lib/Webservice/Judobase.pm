@@ -1,9 +1,10 @@
-package Webservice::Judobase;
 use strict;
 use warnings;
 
+package Webservice::Judobase;
+$Webservice::Judobase::VERSION = '0.07';
 # ABSTRACT: This module wraps the www.judobase.org website API.
-our $VERSION = '0.004'; # VERSION
+# VERSION
 
 use Moo;
 require HTTP::Request;
@@ -11,6 +12,7 @@ require LWP::UserAgent;
 
 use Webservice::Judobase::Competitor;
 use Webservice::Judobase::Contests;
+use Webservice::Judobase::Country;
 use Webservice::Judobase::General;
 
 use namespace::clean;
@@ -33,6 +35,16 @@ has 'contests' => (
     is      => 'ro',
     default => sub {
         return Webservice::Judobase::Contests->new(
+            ua  => $ua,
+            url => $url,
+        );
+    },
+);
+
+has 'country' => (
+    is      => 'ro',
+    default => sub {
+        return Webservice::Judobase::Country->new(
             ua  => $ua,
             url => $url,
         );

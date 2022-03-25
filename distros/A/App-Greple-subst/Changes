@@ -1,5 +1,13 @@
 Revision history for Perl extension App-Greple-subst
 
+2.3001 2022-03-24T03:06:49Z
+
+    - Remove 'pairwise' because it seems to have a bug causing core dump.
+
+2.30 2021-12-16T02:09:00Z
+
+    - Use --no-newline not to produce extra newline at file end.
+
 2.2906 2021-11-01T02:51:39Z
 
     - Use /dev/fd always in --diff if its available.

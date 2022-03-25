@@ -94,10 +94,12 @@ do { my $x = {
                                    'File::Spec' => '0',
                                    'IO::Handle' => '0',
                                    'IPC::Open3' => '0',
+                                   'Sub::Name' => '0',
                                    'Test2::V0' => '0',
                                    'Test::CleanNamespaces' => '0',
                                    'Test::Lib' => '0',
-                                   'Test::More' => '0'
+                                   'Test::More' => '0',
+                                   'aliased' => '0'
                                  }
                  }
      };

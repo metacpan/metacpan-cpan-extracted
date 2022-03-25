@@ -2,11 +2,11 @@
 
 =encoding utf8
 
-=for HTML <a href="../../actions?query=workflow%3Amacos"><img src="../../workflows/macos/badge.svg"></a>
+=for HTML <a href="https://www.github.com/briandfoy/net-publicsuffixlist/actions?query=workflow%3Amacos"><img src="https://www.github.com/briandfoy/net-publicsuffixlist/workflows/macos/badge.svg"></a>
 
-=for HTML <a href="../../actions?query=workflow%3Aubuntu"><img src="../../workflows/ubuntu/badge.svg"></a>
+=for HTML <a href="https://www.github.com/briandfoy/net-publicsuffixlist/actions?query=workflow%3Aubuntu"><img src="https://www.github.com/briandfoy/net-publicsuffixlist/workflows/ubuntu/badge.svg"></a>
 
-=for HTML <a href="../../actions?query=workflow%3Awindows"><img src="../../workflows/windows/badge.svg"></a>
+=for HTML <a href="https://www.github.com/briandfoy/net-publicsuffixlist/actions?query=workflow%3Awindows"><img src="https://www.github.com/briandfoy/net-publicsuffixlist/workflows/windows/badge.svg"></a>
 
 =for HTML <a href='https://ci.appveyor.com/project/briandfoy/net-publicsuffixlist'><img src='https://ci.appveyor.com/api/projects/status/i965t1rpvo6sjgyw'></a>
 
@@ -15,6 +15,8 @@
 =for HTML <a href="https://github.com/briandfoy/net-publicsuffixlist/blob/master/LICENSE"><img src="https://img.shields.io/cpan/l/Net-PublicSuffixList.svg" /></a>
 
 =for HTML <a href="https://metacpan.org/pod/Net::PublicSuffixList"><img src="https://img.shields.io/cpan/v/Net-PublicSuffixList.svg" /></A>
+
+=for HTML <a href="https://doi.org/10.5281/zenodo.6171343"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.6171343.svg" /></A>
 
 =head1 The Net::PublicSuffixList module
 

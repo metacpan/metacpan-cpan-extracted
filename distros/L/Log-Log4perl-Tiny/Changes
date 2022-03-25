@@ -1,3 +1,15 @@
+1.6.0  2022-03-22 06:31:08 CET
+   - release after 147 PASSes on CPAN Testers (thanks!)
+
+1.5.0  2022-03-20 16:22:29 CET
+   - fix usage of __PACKAGE__ as a key inside a hash, useful for older
+     perl-s.
+
+1.4.1  2022-03-19 19:06:08 CET
+   - credits here in Changes to jwittkoski for asking about caller_depth
+   - expand sub{} message parts also for warn/die/Carp functions (fixes
+     https://github.com/polettix/Log-Log4perl-Tiny/issues/12)
+
 1.4.0  2016-05-30 19:14:57 CEST
    - doc fix (bad links)
    - release after checks on CPAN Testers (thanks!)
@@ -7,7 +19,8 @@
      (https://github.com/polettix/Log-Log4perl-Tiny/issues/6)
 
 1.3.1  2016-05-29 15:40:51 CEST
-   - added caller_depth
+   - added caller_depth (thanks to jwittkoski for asking it in 2012, see
+     https://github.com/polettix/Log-Log4perl-Tiny/issues/2)
    - fixed how caller() is used in different sprintf-like expanders
    - added author test for verifying alignment with Log::Log4perl
    - aligned expansion of %T to Log::Log4perl implementation using

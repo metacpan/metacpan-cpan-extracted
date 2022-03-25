@@ -286,10 +286,17 @@ share {
     #local $ENV{LDFLAGS} = join ' ', @ld_flags;
     #  hack
     push @LD_LIBRARY_PATH, @ld_lib_path;
+
+    foreach my $env_var (qw /LD_LIBRARY_PATH LDFLAGS CFLAGS CXXFLAGS/) {
+      say "ENV: $env_var is " . ($ENV{$env_var} // '');
+    }
+    #$ENV{CFLAGS} = ' -O2 ';
+    my $config_flags = qq{CFLAGS='-O2' CXXFLAGS='-O2'};
+    
     build [
       #\&update_pkg_conf_path,
       \&cleanup_ldflags,
-      "%{configure} $config_args $drivers_to_disable $build_static",
+      "%{configure} $config_flags $config_args $drivers_to_disable $build_static",
       \&pause,
       $make_cmd,
       \&patch_pkgconfig,
@@ -325,7 +332,7 @@ sub update_pkg_conf_path {
     say 'Modifying drive paths in PKG_CONFIG_PATH';
     say $ENV{PKG_CONFIG_PATH};
     #  msys-ificate drive paths
-    @PKG_CONFIG_PATH = map {s{^([a-z]):}{/$1}ri} @PKG_CONFIG_PATH;
+    @PKG_CONFIG_PATH = map {my $x = $_; $x =~ s{^([a-z]):}{/$1}i; $x} @PKG_CONFIG_PATH;
     say $ENV{PKG_CONFIG_PATH};
     return;
 }

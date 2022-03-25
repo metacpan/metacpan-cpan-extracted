@@ -12,6 +12,8 @@ $t->get_ok('/foo')->status_is(200)->content_is('Foo');
 
 $t->get_ok('/baz/a')->status_is(200)->content_is('Baz::A');
 
+$t->get_ok('/baz/a/new')->status_is(200)->content_is('Baz::A->new');
+
 $t->get_ok('/bar/qux/b')->status_is(200)->content_is('Bar::Qux::B');
 
 $t->get_ok('/b')->status_is(200)->content_is('B');

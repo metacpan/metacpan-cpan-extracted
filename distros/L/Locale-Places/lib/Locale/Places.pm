@@ -11,15 +11,20 @@ use Module::Info;
 
 =head1 NAME
 
-Locale::Places - Translate places using http://download.geonames.org/
+Locale::Places - Translate places between different languages using http://download.geonames.org/
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =cut
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
+
+=head1 SYNOPSIS
+
+Translates towns and cities between different languages, for example
+London is Londres in French.
 
 =head1 METHODS
 
@@ -40,10 +45,11 @@ sub new {
 	my($proto, %param) = @_;
 	my $class = ref($proto) || $proto;
 
-	# Use Locale::Places->new, not Locale::Places::new
 	if(!defined($class)) {
-		Carp::carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
-		return;
+		# Using Locale::Places->new, not Locale::Places::new
+		# carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
+		# return;
+		$class = __PACKAGE__;
 	}
 
 	my $directory = delete $param{'directory'} || Module::Info->new_from_loaded(__PACKAGE__)->file();
@@ -137,6 +143,30 @@ sub translate {
 			return $data;
 		}
 	} elsif(scalar(@places) > 1) {
+		# Handle the case when there are more than one preferred value
+		# but either not all translate or they all translate to the same
+		# value, in which case the duplicate can be ignored
+
+		# If none of them matches then assume there are no translations
+		# available and return that
+
+		my $candidate;
+		my $found_something;
+		foreach my $place(@places) {
+			if(my $data = $self->{'gb'}->data({ type => $to, code2 => $place })) {
+				$found_something = 1;
+				if(defined($candidate)) {
+					if($data ne $candidate) {
+						$candidate = undef;
+					}
+				} else {
+					$candidate = $data;
+				}
+			}
+		}
+		return $candidate if(defined($candidate));
+		return $place if(!defined($found_something));
+
 		@places = $self->{'gb'}->code2({ type => $from, data => $place, ispreferredname => 1, isshortname => undef });
 		if(scalar(@places) == 1) {
 			if(my $data = $self->{'gb'}->data({ type => $to, code2 => $places[0] })) {
@@ -157,8 +187,14 @@ sub translate {
 					return $data;
 				}
 			}
+			@places = $self->{'gb'}->code2({ type => $from, data => $place });
+			if(scalar(@places) == 1) {
+				if(my $data = $self->{'gb'}->data({ type => $to, code2 => $places[0] })) {
+					return $data;
+				}
+			}
 		}
-		Carp::croak(__PACKAGE__, ": database has more than one preferred entry for $place in language $to");
+		Carp::croak(__PACKAGE__, ': database has ', scalar(@places), " entries for $place in language $to: ", join(', ', @places));
 		# foreach my $p(@places) {
 			# if(my $line = $self->{'gb'}->fetchrow_hashref({ type => $to, code2 => $p->{'code2'} })) {
 				# return $line->{'data'};
@@ -234,11 +270,15 @@ L<http://cpanratings.perl.org/d/Locale-Places>
 
 L<http://deps.cpantesters.org/?module=Locale::Places>
 
+=item * Geonames Discussion Group
+
+L<https://groups.google.com/g/geonames>
+
 =back
 
 =head1 LICENCE AND COPYRIGHT
 
-Copyright 2020-2021 Nigel Horne.
+Copyright 2020-2022 Nigel Horne.
 
 This program is released under the following licence: GPL2
 

@@ -4,6 +4,54 @@
 #include <stdint.h>
 #include <stddef.h>
 
+// spvm_runtime_class_vars_of_class.h
+struct spvm_runtime_class_vars_of_class;
+typedef struct spvm_runtime_class_vars_of_class SPVM_RUNTIME_CLASS_VARS_OF_CLASS;
+
+// spvm_runtime_fields_of_class.h
+struct spvm_runtime_fields_of_class;
+typedef struct spvm_runtime_fields_of_class SPVM_RUNTIME_FIELDS_OF_CLASS;
+
+// spvm_runtime_methods_of_class.h
+struct spvm_runtime_methods_of_class;
+typedef struct spvm_runtime_methods_of_class SPVM_RUNTIME_METHODS_OF_CLASS;
+
+// spvm_runtime_class_var.h
+struct spvm_runtime_class_var;
+typedef struct spvm_runtime_class_var SPVM_RUNTIME_CLASS_VAR;
+
+// spvm_runtime_manager.h
+struct spvm_runtime_manager;
+typedef struct spvm_runtime_manager SPVM_RUNTIME_MANAGER;
+
+// spvm_runtime_basic_type.h
+struct spvm_runtime_basic_type;
+typedef struct spvm_runtime_basic_type SPVM_RUNTIME_BASIC_TYPE;
+
+// spvm_runtime_type.h
+struct spvm_runtime_type;
+typedef struct spvm_runtime_type SPVM_RUNTIME_TYPE;
+
+// spvm_runtime_string.h
+struct spvm_runtime_string;
+typedef struct spvm_runtime_string SPVM_RUNTIME_STRING;
+
+// spvm_runtime_field.h
+struct spvm_runtime_field;
+typedef struct spvm_runtime_field SPVM_RUNTIME_FIELD;
+
+// spvm_runtime_method.h
+struct spvm_runtime_method;
+typedef struct spvm_runtime_method SPVM_RUNTIME_METHOD;
+
+// spvm_runtime_class.h
+struct spvm_runtime_class;
+typedef struct spvm_runtime_class SPVM_RUNTIME_CLASS;
+
+// spvm_runtime.h
+struct spvm_runtime;
+typedef struct spvm_runtime SPVM_RUNTIME;
+
 // spvm_string.h
 struct spvm_string;
 typedef struct spvm_string SPVM_STRING;

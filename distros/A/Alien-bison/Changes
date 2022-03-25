@@ -1,5 +1,10 @@
 Revision history for Alien-bison
 
+0.22      2022-03-18 09:36:01 -0600
+  - Disable generation of info docs for platforms that
+    do not have makeinfo (gh#11)
+  - Additional windows share build fixes.
+
 0.21      2020-02-19 20:57:01 -0500
   - Use https instead of http
   - Do not explicitly use Decode::Mojo

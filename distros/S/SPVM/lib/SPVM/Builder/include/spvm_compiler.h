@@ -96,6 +96,9 @@ struct spvm_compiler {
   
   // String symtable
   SPVM_HASH* string_symtable;
+
+  // String Buffer
+  SPVM_STRING_BUFFER* string_buffer;
   
   // Used module symtable
   SPVM_HASH* used_class_symtable;
@@ -108,7 +111,7 @@ struct spvm_compiler {
   
   // Basic type symbol table
   SPVM_HASH* basic_type_symtable;
-  
+
   // Types
   SPVM_LIST* types;
   
@@ -123,6 +126,9 @@ struct spvm_compiler {
   
   // Method ops
   SPVM_LIST* methods;
+
+  // Method ops
+  SPVM_LIST* args;
 
   // OP our symtable
   SPVM_LIST* class_vars;
@@ -153,5 +159,7 @@ int32_t SPVM_COMPILER_get_error_messages_length(SPVM_COMPILER* compiler);
 const char* SPVM_COMPILER_get_error_message(SPVM_COMPILER* compiler, int32_t index);
 
 int32_t SPVM_COMPILER_compile_spvm(SPVM_COMPILER* compiler, const char* class_name);
+
+void SPVM_COMPILER_build_runtime(SPVM_COMPILER* compiler, SPVM_RUNTIME* runtime);
 
 #endif

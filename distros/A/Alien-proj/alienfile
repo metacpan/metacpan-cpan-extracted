@@ -63,11 +63,30 @@ plugin 'PkgConfig' => (
     pkg_name => 'proj',
     minimum_version => $min_target_version,
 );
-#plugin 'Probe::CommandLine' => (
-#  command  => 'projinfo',
-#  secondary => 1,  #  secondary to pkgconf probe
-#);
-
+if ($on_windows) {
+  #  possible GIS Internals distribution
+  if (my $path = `where geos_c.dll`) {
+    Alien::Build->log ('Found possible GIS Internals build');
+    $path = Path::Tiny::path ($path)->parent;
+    #  could be several variants
+    my @proj_dlls
+      = map {$_->[0]}
+        sort { versioncmp($a->[-1], $b->[-1]) }
+        map  { $_ =~ /(\d+)_(\d+)/; [$_, "$1.$2"] }
+        glob ("$path/proj*.dll");
+    $proj_dlls[-1] =~ /(\d+)_(\d+)/;
+    my $version = "$1.$2";
+    if (versioncmp ($version, $min_target_version) > 0) {
+      $path = Path::Tiny::path($proj_dlls[-1])->parent->stringify;
+      $path =~ s|\\|/|g;  #  path separators
+      Alien::Build->log ("Probe::CBuilder checking $path");
+      plugin 'Probe::CBuilder' => (
+        cflags => "-I$path/include",
+        libs   => "-L$path/lib -lproj",
+      );
+    }
+  }
+}
 
 
 share {
@@ -135,16 +154,16 @@ share {
   #  try not to exceed the cpan-testers log limits
   if ($on_automated_rig) {
     say "Running under CI or automated testing";
-    $make_cmd      .= q/ | perl -ne "BEGIN {$|=1; open our $log, q|>|, q|build.log|};   print qq|\n| if 0 == ($. %% 100); print q|.|; print {$log} $_;" || type build.log/;
-    $make_inst_cmd .= q/ | perl -ne "BEGIN {$|=1; open our $log, q|>|, q|install.log|}; print qq|\n| if 0 == ($. %% 100); print q|.|; print {$log} $_;" || type install.log/;
-    if (!$on_windows) {
-        $make_cmd =~ s/%%/%/;
-        $make_cmd =~ s/type/cat/;
-        $make_cmd =~ s/"/'/g;
-        $make_inst_cmd =~ s/%%/%/;
-        $make_inst_cmd =~ s/type/cat/;
-        $make_inst_cmd =~ s/"/'/g;
-    }
+    #$make_cmd      .= q/ | perl -ne "BEGIN {$|=1; open our $log, q|>|, q|build.log|};   print qq|\n| if 0 == ($. %% 100); print q|.|; print {$log} $_;" || type build.log/;
+    #$make_inst_cmd .= q/ | perl -ne "BEGIN {$|=1; open our $log, q|>|, q|install.log|}; print qq|\n| if 0 == ($. %% 100); print q|.|; print {$log} $_;" || type install.log/;
+    #if (!$on_windows) {
+    #    $make_cmd =~ s/%%/%/;
+    #    $make_cmd =~ s/type/cat/;
+    #    $make_cmd =~ s/"/'/g;
+    #    $make_inst_cmd =~ s/%%/%/;
+    #    $make_inst_cmd =~ s/type/cat/;
+    #    $make_inst_cmd =~ s/"/'/g;
+    #}
     #if (! ($ENV{TRAVIS} || $ENV{APPVEYOR})) {
     #    push @make_clean, '%{make} clean';
     #}
@@ -164,11 +183,11 @@ share {
   if ($proj_version ge 7) {
     if (!$have{'Alien::libtiff'} or $config_args =~ /--(without-tiff|with-tiff=no)/) {
       $enable_tiff = 'OFF';
-      say 'Disabling TIFF support';
+      Alien::Build->log ('Disabling TIFF support');
     }
     else {
       $enable_tiff = 'ON';
-      say 'Enabling TIFF support';
+      Alien::Build->log ('Enabling TIFF support');
       #  might need this but it depends on a few things
       if (Alien::libtiff->install_type ('share')) {
         my $libtiff_include = path ('Alien::libtiff'->dist_dir . '/include')->stringify;
@@ -188,7 +207,7 @@ share {
     else {
       my $dynamic_config = path ('Alien::curl'->dist_dir . '/dynamic/curl-config');
       if (-e $dynamic_config) {
-        say 'Adding curl support from dynamic dir does not yet work';
+        Alien::Build->log ("Adding curl support from " . 'Alien::curl'->dist_dir . "/dynamic");
         $enable_curl = "ON";
         push @PATH, path ('Alien::curl'->dist_dir . '/dynamic');
         my $curl_include = path ('Alien::curl'->dist_dir . '/include')->stringify;
@@ -204,15 +223,15 @@ share {
       elsif ('Alien::curl'->install_type eq 'system') {
         if ('Alien::curl'->cflags =~ /STATIC_LIB/) {
           $enable_curl = 'OFF';
-          say 'Disabling curl support.  You have Alien::curl, but it lacks a dynamic curl-config.';
+          Alien::Build->log ('Disabling curl support.  You have Alien::curl but it lacks a dynamic curl-config');
         }
         else {
-          say 'Adding curl support from system';
+          Alien::Build->log ('Adding curl support from system');
           $enable_curl = "ON";
         }
       }
       else {
-        say 'Disabling curl support.  You have Alien::curl, but it lacks a dynamic curl-config.';
+        Alien::Build->log ('Disabling curl support.  You have Alien::curl, but it lacks a dynamic curl-config');
         #  until we depend on an Alien::libcurl that provides a dynamic curl-config
         $enable_curl = 'OFF';  
       }
@@ -220,7 +239,7 @@ share {
   }
   my @sqlite_extra_args;
   if (Alien::sqlite->install_type ('share')) {
-    say 'Shared Alien::sqlite found, adding sqlite3 components to configure call';
+    Alien::Build->log ('Shared Alien::sqlite found, adding sqlite3 components to configure call');
     #  system install should have these in the relevant paths
     my $sqlite_include = path ('Alien::sqlite'->dist_dir . '/include')->stringify;
     my $libfile = find_lib_file (
@@ -236,17 +255,19 @@ share {
     );
   }
 
-  #meta->around_hook( build => \&_pkgconf_wrapper );
   plugin 'PkgConfig::PPWrapper';
   meta->around_hook( build => \&remove_gitfw_from_path );
   meta->around_hook( build => \&update_cmake_lists_file );
 
   #  silence an undef warning
-  say 'PKG_CONFIG_PATH:' . join ' ', grep {defined} @PKG_CONFIG_PATH;
+  Alien::Build->log ('PKG_CONFIG_PATH:' . join ' ', grep {defined} @PKG_CONFIG_PATH);
 
   foreach my $env_var (qw /LD_LIBRARY_PATH LDFLAGS CFLAGS CXXFLAGS/) {
     say "ENV: $env_var is " . ($ENV{$env_var} // '');
   }
+
+#  might fix some rpath issues?
+#  https://github.com/OSGeo/gdal/issues/5413#issuecomment-1060286925
 
   my $cmake_cmd = [
     '%{cmake}',
@@ -311,57 +332,6 @@ sub remove_gitfw_from_path {
   }
 
   $orig->($build, @args);
-}
-
-
-sub _pkgconf_wrapper {
-  my ($orig, $build, @args) = @_;
-
-  return $orig->($build, @args)
-    if !$on_windows;
-
-  my $pk = File::Which::which ($ENV{PKG_CONFIG})
-        || File::Which::which ('ppkg-config')
-        || File::Which::which ('pkg-config');
-
-  if (!defined $pk) {
-    $build->log ("Could not locate ppkg-config or pkg-config in your path:\n");
-    return $orig->($build, @args);
-  }
-
-  $pk =~ s/\.bat$//i;
-  if (!(-e $pk && -e "$pk.bat")) {
-    $build->log ("$pk unlikely to be pure perl");
-    return $orig->($build, @args);
-  }
-
-  my $perl = $^X;
-  $perl =~ s/\.exe$//i;
-  foreach my $path ($perl, $pk) {
-    $path =~ s{\\}{/}g;
-    $path =~ s{^([a-z]):/}{/$1/}i;
-    $path =~ s{\s}{\\ }g;
-  }
-  my $args = '$' . join ' $', (1..9);
-    
-  my $wrapper = <<"EOWRAPPER"
-#/bin/sh
-
-$perl $pk $args
-EOWRAPPER
-  ;
-  $build->log ("Pure perl pkg-config detected on windows.\n");
-  $build->log ("Wrapping $pk in shell script to cope with MSYS perl and paths.\n");
-  my $fname = Path::Tiny->new(File::Temp::tempdir( CLEANUP => 1 ))->child('pkg-config');
-  open my $fh, '>', $fname
-    or die "Unable to open pkg-config wrapper $fname, $!";
-  print {$fh} $wrapper;
-  close ($fh);
-  $build->log ("Setting \$ENV{PKG_CONFIG} to point to $fname\n");
-  
-  local $ENV{PKG_CONFIG} = $fname;
-  
-  return $orig->($build, @args);
 }
 
 
@@ -451,13 +421,13 @@ sub find_lib_file {
   
   my(@lib_files) = find_lib(
       %args,
-      system_path => [],  #  only search the alien
+      systempath => [],  #  only search the alien
   );
   #  we grab the first, assuming they are
   #  all the same or point to the same origin
   my $libfile = $lib_files[0];
   $libfile =~ s|\\|/|g if $on_windows;
-  say "Found $args{lib} dynamic lib: $libfile";
+  Alien::Build->log ("Found $args{lib} dynamic lib: $libfile");
   return $libfile;
 }
 

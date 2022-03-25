@@ -1,7 +1,7 @@
 package PICA::Parser::PPXML;
 use v5.14.1;
 
-our $VERSION = '2.01';
+our $VERSION = '2.02';
 
 use parent 'PICA::Parser::XML';
 

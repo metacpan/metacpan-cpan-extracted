@@ -44,7 +44,7 @@ Image::Randim::Image - Image object
   use Image::Randim::Source;
   
   $source = Image::Randim::Source->new;
-  $source->set_provider('Desktoppr');
+  $source->set_provider('Unsplash');
   $image = $source->get_image;
 
   say $image->url;

@@ -6,18 +6,22 @@ use parent qw( Alien::Base );
 use Env qw ( @PATH @LD_LIBRARY_PATH @DYLD_LIBRARY_PATH );
 use Capture::Tiny qw /:all/;
 use File::Which qw /which/;
+use List::Util qw /uniq/;
 
-our $VERSION = '1.20';
+our $VERSION = '1.22';
 
+#  adding to global {DY}LD_LIBRARY_PATH vars is icky but seems
+#  to be needed for utilities and downstream FFI
 my %also;
 my @alien_bins = (__PACKAGE__->bin_dir);
-
-foreach my $lib (qw /Alien::libtiff Alien::sqlite/) {
-    if (eval "require $lib" && $lib->install_type eq 'share') {
-        $also{$lib}++;
-        if ($lib->install_type eq 'share') {
-            push @alien_bins, $lib->bin_dir;
+my @ld_lib_dirs;
+foreach my $alien_lib (qw /Alien::libtiff Alien::sqlite/) {
+    if (eval "require $alien_lib" && $alien_lib->install_type eq 'share') {
+        $also{$alien_lib}++;
+        if ($alien_lib->install_type eq 'share') {
+            push @alien_bins, $alien_lib->bin_dir;
         }
+        push @ld_lib_dirs, $alien_lib->dist_dir . q{/lib};
     }
 }
 if (eval 'require Alien::curl' && 'Alien::curl'->install_type eq 'share') {
@@ -25,10 +29,18 @@ if (eval 'require Alien::curl' && 'Alien::curl'->install_type eq 'share') {
     if (-e 'Alien::curl'->dist_dir . '/dynamic/curl-config') {
         $also{'Alien::curl'}++;
         if (Alien::curl->install_type eq 'share') {
-            push @alien_bins, Alien::curl->dist_dir . '/dynamic';
+            push @alien_bins,  Alien::curl->dist_dir . '/dynamic';
+            push @ld_lib_dirs, Alien::curl->dist_dir . '/dynamic'
         }
     }
 }
+if ($^O =~ /darwin/i) {
+    @DYLD_LIBRARY_PATH = grep {defined} uniq (@DYLD_LIBRARY_PATH, @ld_lib_dirs);
+}
+elsif (not $^O =~ /mswin/i) {
+    @LD_LIBRARY_PATH = grep {defined} uniq (@LD_LIBRARY_PATH, @ld_lib_dirs)
+}
+
 
 sub bin_dirs {
     my $self = shift;
@@ -104,7 +116,6 @@ Alien::proj - Compile the Proj library
  
 <p>
     <img src="https://img.shields.io/badge/perl-5.10+-blue.svg" alt="Requires Perl 5.10+" />
-    <a href="https://travis-ci.org/shawnlaffan/perl-alien-proj"><img src="https://travis-ci.org/shawnlaffan/perl-alien-proj.svg?branch=master" /></a>
     <a href="https://ci.appveyor.com/project/shawnlaffan/perl-alien-proj"><img src="https://ci.appveyor.com/api/projects/status/0j4yh071yw7xyjxx?svg=true" /></a>
 </p>
 

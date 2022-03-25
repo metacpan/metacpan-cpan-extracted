@@ -6,16 +6,25 @@ use Catmandu::Sane;
 use PICA::Data qw(pica_writer);
 use Moo;
 
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 
 with 'Catmandu::Exporter';
 
-has type => ( is => 'rw', default => sub { 'xml' } );
-has writer => ( is => 'lazy' );
+has type               => ( is => 'rw', default => sub { 'xml' } );
+has subfield_indicator => ( is => 'rw', default => sub { '$' } );
+has field_separator    => ( is => 'rw', default => sub { "\n" } );
+has record_separator   => ( is => 'rw', default => sub { "\n" } );
+has writer             => ( is => 'lazy' );
 
 sub _build_writer {
     my ($self) = @_;
-    pica_writer( $self->type, fh => $self->fh );
+    pica_writer(
+        $self->type,
+        fh => $self->fh,
+        us => $self->subfield_indicator,
+        rs => $self->field_separator,
+        gs => $self->record_separator,
+    );
 }
 
 sub add {
@@ -47,7 +56,28 @@ structure.
 =head1 CONFIGURATION
 
 In addition to the configuration provided by L<Catmandu::Exporter> the exporter
-can be configured with a C<type> parameter as described at
-L<Catmandu::Importer>.
+can be configured with 
+
+=over
+
+=item C<type>
+
+Serialization type as described at L<Catmandu::Importer>. In addition to C<xml>
+(default), C<plain>, C<plus>, C<picaplus>, C<binary> and C<ppxml> the type
+C<generic> can be used to further control output format.
+
+=item C<subfield_indicator>
+
+Character sequence to use as subfield indicator (serialization type C<generic> only)
+
+=item C<field_separator>
+
+Character sequence to write at the end of a field (serialization type C<generic> only)
+
+=item C<record_separator>
+
+Character sequence to write at the end of a record (serialization type C<generic> only)
+
+=back
 
 =cut

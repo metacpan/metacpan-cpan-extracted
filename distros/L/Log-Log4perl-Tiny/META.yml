@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.034'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.041, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Milla version v1.0.20, Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150005'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,8 +27,12 @@ resources:
   bugtracker: https://github.com/polettix/Log-Log4perl-Tiny/issues
   homepage: https://github.com/polettix/Log-Log4perl-Tiny
   repository: https://github.com/polettix/Log-Log4perl-Tiny.git
-version: 1.4.0
+version: 1.6.0
 x_contributors:
+  - 'Dave Jacoby <jacoby.david@gmail.com>'
   - 'Flavio Poletti <flavio@polettix.it>'
   - 'Matt <code@deployable.org>'
   - 'user <user@debian.localdomain>'
+x_generated_by_perl: v5.24.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_static_install: 1

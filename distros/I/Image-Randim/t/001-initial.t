@@ -17,7 +17,7 @@ BEGIN {
     use_ok('Module::Find');
     use_ok('Image::Randim::Image');
     use_ok('Image::Randim::Source');
-    use_ok('Image::Randim::Source::Desktoppr');
+    #use_ok('Image::Randim::Source::Desktoppr');
     use_ok('Image::Randim::Source::Unsplash');
 }
 
@@ -34,13 +34,13 @@ can_ok $image, 'link';
 
 ## Test Image::Randim::Source::Desktoppr
 ##
-ok my $desktoppr = Image::Randim::Source::Desktoppr->new, 'Image::Randim::Source::Desktoppr instantiates';
-can_ok $desktoppr, 'name';
-can_ok $desktoppr, 'url';
-can_ok $desktoppr, 'get_image';
-can_ok $desktoppr, 'timeout';
-is $desktoppr->name, 'Desktoppr', 'Correct Desktoppr name';
-like $desktoppr->url, qr!^https://api.desktoppr.co!, 'Desktoppr API URL';
+#ok my $desktoppr = Image::Randim::Source::Desktoppr->new, 'Image::Randim::Source::Desktoppr instantiates';
+#can_ok $desktoppr, 'name';
+#can_ok $desktoppr, 'url';
+#can_ok $desktoppr, 'get_image';
+#can_ok $desktoppr, 'timeout';
+#is $desktoppr->name, 'Desktoppr', 'Correct Desktoppr name';
+#like $desktoppr->url, qr!^https://api.desktoppr.co!, 'Desktoppr API URL';
 
 ## Test Image::Randim::Source::Unsplash
 ##
@@ -65,10 +65,10 @@ can_ok $source, 'name';
 can_ok $source, 'url';
 ok scalar($source->list) > 1, 'at least a couple sources are defined';
 dies_ok { $source->set_provider('badsource') } 'dies on bad source provider';
-ok $source->set_provider('Desktoppr'), 'set provider to Desktoppr';
-ok $source->src_obj->name eq 'Desktoppr', 'source looks like the right object';
-is $source->name, 'Desktoppr', 'Correct Desktoppr name from source';
-like $source->url, qr!^https://api.desktoppr.co!, 'Desktoppr API URL from source';
+ok $source->set_provider('Unsplash'), 'set provider to Unsplash';
+ok $source->src_obj->name eq 'Unsplash', 'source looks like the right object';
+is $source->name, 'Unsplash', 'Correct Unsplash name from source';
+like $source->url, qr!^https://api.unsplash.co!, 'Unsplash API URL from source';
 my @valid_source = $source->list;
 my $random_test = 1;
 for (1..25) {
@@ -83,9 +83,14 @@ ok $source->timeout(25), 'timeout on integer';
 
 ## Test actual get
 ##
+## Unsplash rate-limits API requests causing CPAN to fail tests so
+## it is excluded
+
 $source = Image::Randim::Source->new;
-$source->set_random_provider;
-ok $image = $source->get_image, 'Source get_image';
-ok length($image->url) > 5, 'Image URL has more than 10 characters';
+$source->set_random_provider();
+if ($source->name ne 'Unsplash') {
+    ok $image = $source->get_image, 'Source get_image';
+    ok length($image->url) > 5, 'Image URL has more than 10 characters';
+}
 
 done_testing;

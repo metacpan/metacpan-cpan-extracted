@@ -12,7 +12,6 @@ TODO
 appveyor.yml
 cpanfile
 dist.ini
-foo.jsonl
 lib/App/Yath.pm
 lib/App/Yath/Command.pm
 lib/App/Yath/Command/abort.pm
@@ -90,6 +89,7 @@ lib/Test2/Harness/Runner/Preload.pm
 lib/Test2/Harness/Runner/Preload/Stage.pm
 lib/Test2/Harness/Runner/Preloader.pm
 lib/Test2/Harness/Runner/Preloader/Stage.pm
+lib/Test2/Harness/Runner/Reloader.pm
 lib/Test2/Harness/Runner/Resource.pm
 lib/Test2/Harness/Runner/Run.pm
 lib/Test2/Harness/Runner/Spawn.pm

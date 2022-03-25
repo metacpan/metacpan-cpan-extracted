@@ -153,7 +153,7 @@ struct cdb_rl {
 };
 
 static int _cdb_make_write(struct cdb_make *cdbmp,
-		    const unsigned char *ptr, unsigned len);
+		    const void *ptr, unsigned len);
 static int _cdb_make_fullwrite(int fd, const unsigned char *buf, unsigned len);
 static int _cdb_make_flush(struct cdb_make *cdbmp);
 static int _cdb_make_add(struct cdb_make *cdbmp, unsigned hval,
@@ -484,8 +484,9 @@ _cdb_make_flush(struct cdb_make *cdbmp) {
 }
 
 int internal_function
-_cdb_make_write(struct cdb_make *cdbmp, const unsigned char *ptr, unsigned len)
+_cdb_make_write(struct cdb_make *cdbmp, const void *ptr_, unsigned len)
 {
+  const unsigned char *ptr = (const unsigned char *)ptr_;
   unsigned l = sizeof(cdbmp->cdb_buf) - (cdbmp->cdb_bpos - cdbmp->cdb_buf);
   cdbmp->cdb_dpos += len;
   if (len > l) {

@@ -1,0 +1,52 @@
+=head1 NAME
+
+Crypt::OpenSSL::EVP::MD - OpenSSL EVP_MD
+
+=head1 SYNOPSIS
+
+    use Crypt::OpenSSL::EVP::MD;
+
+    my $hash_name = 'SHA256';
+    my $md = Crypt::OpenSSL::EVP::MD->new( $hash_name );
+
+    my $block_size = $md->block_size();
+    my $size = $md->size();
+
+    my $msg = 'abc';
+    my $dgst = $md->digest($msg);
+
+=head1 DESCRIPTION
+
+=over
+
+=item new($hash_name)
+
+ my $md = Crypt::OpenSSL::EVP::MD->new($hash_name);
+
+=item size()
+
+same with EVP_MD_size();
+
+  my $size = $md->size();
+
+
+=item block_size()
+
+same with EVP_MD_block_size();
+
+    my $block_size = $md->block_size();
+
+=item digest($msg)
+
+the digest of $msg
+
+    my $msg = 'abc';
+    my $dgst = $md->digest($msg);
+
+=back
+
+=head1 SEE ALSO
+
+L<Crypt::OpenSSL::Bignum>
+
+=cut

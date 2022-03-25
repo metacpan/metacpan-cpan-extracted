@@ -6,7 +6,7 @@ use warnings;
 
 use Test::Tester;
 
-use Test::More tests => 10;
+use Test::More tests => 11;
 use Test::Warnings 'warnings';
 use Test::Deep;
 use Test::Deep::URI;
@@ -215,3 +215,13 @@ subtest 'missing arg to uri()' => sub {
     );
 };
 
+subtest 'missing args to uri_qf()' => sub {
+    my @warnings = warnings {
+        run_tests(sub { cmp_deeply($test_uri, uri_qf()) });
+    };
+    cmp_deeply(
+        \@warnings,
+        [ re(qr/Missing uri for uri_qf\(\)/), re(qr/Missing query form for uri_qf\(\)/) ],
+        'Got warnings from missing args to uri_qf'
+    );
+};

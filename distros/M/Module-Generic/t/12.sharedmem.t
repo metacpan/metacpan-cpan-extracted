@@ -3,9 +3,11 @@ BEGIN
 {
     use strict;
     use warnings;
-    use Test::More;
+    use Test2::IPC;
+    use Test2::V0;
     use lib './lib';
-    use_ok( 'Module::Generic::SharedMem' ) || BAIL_OUT( "Unable to load Module::Generic::SharedMem" );
+    use POSIX ":sys_wait_h";
+    use ok( 'Module::Generic::SharedMem' ) || bail_out( "Unable to load Module::Generic::SharedMem" );
     our $IS_SUPPORTED = 1;
     if( !Module::Generic::SharedMem->supported )
     {
@@ -19,7 +21,7 @@ SKIP:
 {
     skip( 'IPC::SysV not supported on this system', 26 ) if( !$IS_SUPPORTED );
     ok( scalar( keys( %$Module::Generic::SharedMem::SEMOP_ARGS ) ) > 0, 'sempahore parameters' );
-    BAIL_OUT( '$SEMOP_ARGS not set somehow!' ) if( !scalar( keys( %$Module::Generic::SharedMem::SEMOP_ARGS ) ) );
+    bail_out( '$SEMOP_ARGS not set somehow!' ) if( !scalar( keys( %$Module::Generic::SharedMem::SEMOP_ARGS ) ) );
 
     ok( Module::Generic::SharedMem->supported, 'supported' );
 
@@ -27,7 +29,7 @@ SKIP:
         debug => $DEBUG,
         key => 'test_key',
         size => 2048,
-        destroy => 1,
+        destroy => 0,
         mode => 0666,
     );
     # Clean up
@@ -59,7 +61,7 @@ SKIP:
     skip( "Failed to create shared memory object. Your system does not seem to support shared memory: $!", 21 ) if( !defined( $s ) );
     ok( defined( $s ), 'open return value' );
 
-    isa_ok( $s, 'Module::Generic::SharedMem', 'Shared memory object' );
+    isa_ok( $s, ['Module::Generic::SharedMem'], 'Shared memory object' );
     my $id = $s->id;
     ok( defined( $id ) && $id =~ /\S+/, "shared memory id is \"$id\"" );
     my $semid = $s->semid;
@@ -81,36 +83,115 @@ SKIP:
     {
         fail( 'read data check' );
     }
-    # Give it time to write data to memory
-    sleep(1);
-    my $result = qx( $^X ./t/12.sharedmem.pl 2>&1 );
-    diag( "Result from calling sharedmem.pl is: $result" ) if( $DEBUG );
-    chomp( $result );
-    # if( $result eq 'ok' )
-    if( scalar( grep( /^ok$/, split( /\n/, $result ) ) ) )
+
+    # Block signal for fork
+    my $sigset = POSIX::SigSet->new( POSIX::SIGINT );
+    POSIX::sigprocmask( POSIX::SIG_BLOCK, $sigset ) || 
+        bail_out( "Cannot block SIGINT for fork: $!" );
+    select((select(STDOUT), $|=1)[0]);
+    select((select(STDERR), $|=1)[0]);
+    my $pid = fork();
+    skip( "Unable to fork: $!", 9 ) unless( defined( $pid ) );
+    if( $pid )
     {
-        pass( 'shared data with separate process' );
+        POSIX::sigprocmask( POSIX::SIG_UNBLOCK, $sigset ) ||
+            bail_out( "Cannot unblock SIGINT for fork: $!" );
+        if( kill( 0 => $pid ) || $!{EPERM} )
+        {
+            diag( "Child process with pid '$pid' is still running, waiting for it to complete." ) if( $DEBUG );
+            # Blocking wait
+            waitpid( $pid, 0 );
+            my $exit_status  = ( $? >> 8 );
+            my $exit_signal  = $? & 127;
+            my $has_coredump = ( $? & 128 );
+            diag( "Child process exited with value $?" ) if( $DEBUG );
+            if( WIFEXITED($?) )
+            {
+                diag( "Child with pid '$pid' exited with bit value '$?' (exit=${exit_status}, signal=${exit_signal}, coredump=${has_coredump})." ) if( $DEBUG );
+            }
+            else
+            {
+                diag( "Child with pid '$pid' exited with bit value '$?' -> $!" ) if( $DEBUG );
+            }
+        }
+        else
+        {
+            diag( "Child process with pid '$pid' is already completed." ) if( $DEBUG );
+            pass( "sub process exited rapidly" );
+        }
+        my $data = $s->read;
+        ok( ref( $data ) eq 'HASH', 'shared updated data type' );
+        if( ref( $data ) ne 'HASH' )
+        {
+            skip( 'parent: failed data type returned from child', 9 );
+        }
+        ok( $data->{year} == 2021, 'updated data value' );
+        my $data2;
+        $s->read( $data2 );
+        ok( ref( $data2 ) eq 'HASH', 'different read usage' );
+        if( ref( $data ) ne 'HASH' )
+        {
+            skip( 'parent: second read returned wrong data type.', 7 );
+        }
+        ok( $data2->{year} == 2021, 'different read data check' );
+        my $rv = $s->lock || diag( "Unable to lock: ", $s->error );
+        ok( $rv, 'lock' );
+        ok( $s->locked, 'locked' );
+        $data->{test} = 'ok';
+        ok( defined( $s->write( $data ) ), 'updated data with lock' );
+        ok( defined( $s->unlock ), 'unlock' );
+        ok( defined( $s->remove ), 'remove' );
+        ok( !$s->exists, 'exists after remove' );
     }
-    else
+    elsif( $pid == 0 )
     {
-        diag( "Failed process with: '$result'" );
-        fail( 'shared data with separate process' );
+        # We open it in write mode, but not create, because 80.notes.t will have created for us already
+        my $shem2 = Module::Generic::SharedMem->new(
+            debug => $DEBUG,
+            create => 0,
+            key => 'test_key',
+            size => 2048,
+            destroy => 0,
+            mode => 0666,
+        );
+        # For debugging only
+        # $shem->create(1);
+        # $shem->destroy(1);
+        SKIP:
+        {
+            my $s2 = $shem2->open;
+            ok( $s2, 'child: shared memory opened' );
+            if( !$s2 )
+            {
+                diag( "child: unable to open shared memory: ", $shem2->error );
+                skip( "child: failed, unable to open shared memory.", 2 );
+            }
+            my $ref = $s2->read;
+            if( !defined( $ref ) )
+            {
+                diag( "child: unable to open shared memory: ", $s2->error );
+                skip( "child: failed, data retrieved is empty.", 2 );
+            }
+            ok( ref( $ref ), 'child: data type retrieved -> hash' );
+            if( ref( $ref ) ne 'HASH' )
+            {
+                diag( "child: shared memory data ($ref) is not an hash reference." );
+                skip( "child: failed, data retrieved is not hash reference.", 1 );
+            }
+            # $ref = {};
+            $ref->{year} = 2021;
+            my $rv = $s2->write( $ref );
+            ok( $rv, 'child: wrote back to shared memory' );
+            if( !defined( $rv ) )
+            {
+                diag( "child: unable to write to shared memory: ", $s2->error );
+            };
+        };
+        exit(0);
     }
-    my $data = $s->read;
-    ok( ref( $data ) eq 'HASH', 'shared updated data type' );
-    ok( $data->{year} == 2021, 'updated data value' );
-    my $data2;
-    $s->read( $data2 );
-    ok( ref( $data2 ) eq 'HASH', 'different read usage' );
-    ok( $data2->{year} == 2021, 'different read data check' );
-    my $rv = $s->lock || diag( "Unable to lock: ", $s->error );
-    ok( $rv, 'lock' );
-    ok( $s->locked, 'locked' );
-    $data->{test} = 'ok';
-    ok( defined( $s->write( $data ) ), 'updated data with lock' );
-    ok( defined( $s->unlock ), 'unlock' );
-    ok( defined( $s->remove ), 'remove' );
-    ok( !$s->exists, 'exists after remove' );
 }
 
 done_testing();
+
+__END__
+

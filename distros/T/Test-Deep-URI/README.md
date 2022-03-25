@@ -31,7 +31,7 @@ cmp_deeply(
 # DESCRIPTION
 
 Test::Deep::URI provides the functions `uri($expected)` and
-`uri_qf($expected, $query_form)` for [Test::Deep](https://metacpan.org/pod/Test::Deep).
+`uri_qf($expected, $query_form)` for [Test::Deep](https://metacpan.org/pod/Test%3A%3ADeep).
 Use it in combination with `cmp_deeply` to test against partial URIs.
 
 In particular I wrote this because I was tired of stumbling across unit
@@ -77,6 +77,6 @@ it under the same terms as Perl itself.
 
 # SEE ALSO
 
-- [Test::Deep](https://metacpan.org/pod/Test::Deep)
-- [Test::Deep::JSON](https://metacpan.org/pod/Test::Deep::JSON)
-- [Test::Deep::Filter](https://metacpan.org/pod/Test::Deep::Filter)
+- [Test::Deep](https://metacpan.org/pod/Test%3A%3ADeep)
+- [Test::Deep::JSON](https://metacpan.org/pod/Test%3A%3ADeep%3A%3AJSON)
+- [Test::Deep::Filter](https://metacpan.org/pod/Test%3A%3ADeep%3A%3AFilter)

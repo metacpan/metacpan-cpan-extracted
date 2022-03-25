@@ -34,6 +34,8 @@ unlike $contents, qr/_GoBack/,                          "remove bookmarks (no _G
 like $contents,   qr/Condamne SMALL/,                   "remove bookmarks (contents preserved)";
 like $contents,   qr/do you prefer Foo \? Really \?/,   "ASK field (1/2)";
 like $contents,   qr/like this : Foo \?\B/,             "ASK field (2/2)";
+like $contents,   qr/soft hyphens that should really be removed/, "soft hyphens";
+
 
 
 my $new_xml = $surgeon->replace(qr/\bMsWord\b/,
@@ -46,6 +48,7 @@ $plain_text = $surgeon->plain_text;
 my ($test_tabs) = $plain_text =~ /(\n.*?TAB.*)/;
 like $test_tabs, qr/starts\twith an\tinitial TAB, and also has\tmany internal TABS/,
   "TABS were preserved";
+
 
 
 done_testing();

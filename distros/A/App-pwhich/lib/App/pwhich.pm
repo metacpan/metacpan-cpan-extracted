@@ -4,19 +4,19 @@ use strict;
 use warnings;
 use 5.008001;
 use File::Which qw( which );
-use Getopt::Std qw( getopts );
+use Getopt::Std qw( getopts );   ## no critic (Community::PreferredAlternatives)
 
 # ABSTRACT: Perl-only `which`
-our $VERSION = '1.16'; # VERSION
+our $VERSION = '1.17'; # VERSION
 
 sub main
 {
   local @ARGV;
   my $prog;
   ($prog, @ARGV) = @_;
-  
+
   my %opts;
-  
+
   if($prog eq 'which')
   {
     getopts('avs', \%opts) || return _usage();
@@ -27,7 +27,7 @@ sub main
   {
     $opts{a} = 1;
   }
-  
+
   foreach my $file (@ARGV)
   {
     local $File::Which::IMPLICIT_CURRENT_DIR = $File::Which::IMPLICIT_CURRENT_DIR;
@@ -38,21 +38,21 @@ sub main
     my @result = $opts{a}
     ? which($file)
     : scalar which($file);
-    
+
     # We might end up with @result = (undef) -> 1 elem
     @result = () unless defined $result[0];
     unless($opts{s})
     {
       print "$_\n" for grep { defined } @result;
     }
-    
+
     unless (@result)
     {
       print STDERR "$0: no $file in PATH\n" unless $opts{s};
       return 1;
     }
   }
-  
+
   return 0;
 }
 
@@ -101,7 +101,7 @@ App::pwhich - Perl-only `which`
 
 =head1 VERSION
 
-version 1.16
+version 1.17
 
 =head1 SYNOPSIS
 
@@ -116,11 +116,16 @@ need L<pwhich>.  If you require L<pwhich>,
 as a prerequisite, please use L<App::pwhich> as a prerequisite
 instead of L<File::Which>.
 
+If you want these executables installed without the C<p> prefix
+(useful on platforms like windows that do not have their own
+native which or where), set C<PERL_APP_PWHICH_NO_PREFIX> to
+C<no-prefix> during install of this module.
+
 =head1 SUPPORT
 
 Bugs should be reported via the GitHub issue tracker
 
-L<https://github.com/plicease/App-pwhich/issues>
+L<https://github.com/uperl/App-pwhich/issues>
 
 For other issues, contact the maintainer.
 
@@ -161,7 +166,7 @@ Adam Kennedy E<lt>adamk@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2002 by Per Einar Ellefsen <pereinar@cpan.org>.
+This software is copyright (c) 2002-2022 by Per Einar Ellefsen <pereinar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -67,6 +67,8 @@ WriteMakefile(
         'Test::More'    => '1.302162',
         'Test::Pod'     => '1.52',
         'Test::Time'    => 0,
+        'Test2::IPC'    => '1.302190',
+        'Test2::V0'     => '0.000145',
         'utf8'          => 0,
     },
     LICENSE             => 'perl_5',

@@ -6,7 +6,7 @@ use exact;
 use strict;
 use FindBin;
 
-our $VERSION = '1.02'; # VERSION
+our $VERSION = '1.03'; # VERSION
 
 sub import {
     my ( $self, $caller, $input ) = @_;
@@ -61,7 +61,7 @@ exact::lib - Compile-time @INC manipulation extension for exact
 
 =head1 VERSION
 
-version 1.02
+version 1.03
 
 =for markdown [![test](https://github.com/gryphonshafer/exact-lib/workflows/test/badge.svg)](https://github.com/gryphonshafer/exact-lib/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/exact-lib/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/exact-lib)
@@ -161,7 +161,7 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020-2021 by Gryphon Shafer.
+This software is Copyright (c) 2020-2050 by Gryphon Shafer.
 
 This is free software, licensed under:
 

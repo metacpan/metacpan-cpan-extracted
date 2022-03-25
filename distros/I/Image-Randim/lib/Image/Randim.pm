@@ -1,5 +1,5 @@
 package Image::Randim;
-our $VERSION = '0.01';
+our $VERSION = '0.08';
 use v5.20;
 
 1;

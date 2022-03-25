@@ -21,46 +21,35 @@ enum {
 
 // Method information
 struct spvm_method {
+  const char* name;
+  const char* signature;
   SPVM_OP* op_method;
   SPVM_OP* op_name;
   SPVM_OP* op_block;
-  SPVM_OP* op_inline;
-  SPVM_OP* op_list_tmp_mys;
-  SPVM_OP* op_my_condition_flag;
-  SPVM_LIST* object_arg_ids;
+  SPVM_TYPE* return_type;
   SPVM_LIST* mys;
   SPVM_LIST* captures;
-  void* precompile_address;
-  void* native_address;
-  SPVM_TYPE* return_type;
-  SPVM_LIST* args;
-  SPVM_LIST* arg_types;
-  SPVM_LIST* arg_mem_ids;
-  const char* name;
   const char* abs_name;
-  const char* signature;
   SPVM_CLASS* class;
   const char* accessor_original_name;
   const char* anon_method_defined_class_name;
+  void* precompile_address;
+  void* native_address;
+  int32_t args_length;
+  int32_t id;
+  int32_t rel_id;
+  int32_t tmp_vars_length;
   int32_t opcodes_base;
   int32_t opcodes_length;
-  int32_t call_method_arg_stack_max;
-  int32_t rel_id;
-  int32_t eval_stack_max_length;
-  int32_t mortal_stack_length;
-  int32_t id;
   int32_t flag;
-  int32_t args_alloc_length;
-  int32_t vars_alloc_length;
-  int32_t byte_vars_alloc_length;
-  int32_t short_vars_alloc_length;
-  int32_t int_vars_alloc_length;
-  int32_t long_vars_alloc_length;
-  int32_t float_vars_alloc_length;
-  int32_t double_vars_alloc_length;
-  int32_t object_vars_alloc_length;
-  int32_t ref_vars_alloc_length;
-  int32_t tmp_vars_length;
+  int32_t call_stack_byte_vars_legnth;
+  int32_t call_stack_short_vars_legnth;
+  int32_t call_stack_int_vars_legnth;
+  int32_t call_stack_long_vars_legnth;
+  int32_t call_stack_float_vars_legnth;
+  int32_t call_stack_double_vars_legnth;
+  int32_t call_stack_object_vars_legnth;
+  int32_t call_stack_ref_vars_legnth;
   int8_t have_vaarg;
   int8_t is_class_var_setter;
   int8_t is_class_var_getter;
@@ -68,13 +57,13 @@ struct spvm_method {
   int8_t is_field_getter;
   int8_t is_simple_constructor;
   int8_t is_constant;
-  int8_t is_init;
-  int8_t is_class_method;
   int8_t can_precompile;
+  int8_t is_class_method;
+  int8_t is_init;
+  int32_t mortal_stack_length;
+  SPVM_OP* op_inline;
 };
 
 SPVM_METHOD* SPVM_METHOD_new(SPVM_COMPILER* compiler);
-int32_t SPVM_METHOD_get_var_alloc_length(SPVM_COMPILER* compiler, SPVM_METHOD* method);
-int32_t SPVM_METHOD_get_arg_alloc_length(SPVM_COMPILER* compiler, SPVM_METHOD* method);
 
 #endif

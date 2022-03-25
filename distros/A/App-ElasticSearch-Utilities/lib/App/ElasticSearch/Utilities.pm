@@ -1,26 +1,14 @@
 # ABSTRACT: Utilities for Monitoring ElasticSearch
 package App::ElasticSearch::Utilities;
 
+use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '8.2'; # VERSION
-
-our $_OPTIONS_PARSED;
-our %_GLOBALS = ();
-our @_CONFIGS = (
-    '/etc/es-utils.yaml',
-    '/etc/es-utils.yml',
-);
-if( $ENV{HOME} ) {
-    push @_CONFIGS, map { "$ENV{HOME}/.es-utils.$_" } qw( yaml yml );
-
-    my $xdg_config_home = $ENV{XDG_CONFIG_HOME} || "$ENV{HOME}/.config";
-    push @_CONFIGS, map { "${xdg_config_home}/es-utils/config.$_" } qw( yaml yml );
-}
+our $VERSION = '8.3'; # VERSION
 
 use CLI::Helpers qw(:all);
-use Getopt::Long qw(:config pass_through);
+use Getopt::Long qw(GetOptionsFromArray :config pass_through no_auto_abbrev);
 use Hash::Flatten qw(flatten);
 use Hash::Merge::Simple qw(clone_merge);
 use IPC::Run3;
@@ -33,8 +21,19 @@ use URI;
 use URI::QueryParam;
 use YAML;
 
+# Control loading ARGV
+my $ARGV_AT_INIT    = 1;
+my $COPY_ARGV       = 0;
+our $_init_complete = 0;
+
 use Sub::Exporter -setup => {
+    collectors => [
+        copy_argv => \'_copy_argv',
+        preprocess_argv => \'_preprocess_argv',
+        delay_argv => \'_delay_argv',
+    ],
     exports => [ qw(
+        es_utils_initialize
         es_globals
         es_basic_auth
         es_pattern
@@ -64,8 +63,8 @@ use Sub::Exporter -setup => {
         es_flatten_hash
     )],
     groups => {
-        config  => [qw(es_globals)],
-        default => [qw(es_connect es_indices es_request)],
+        config  => [qw(es_utils_initialize es_globals)],
+        default => [qw(es_utils_initialize es_connect es_indices es_request)],
         indices => [qw(:default es_indices_meta)],
         index   => [qw(:default es_index_valid es_index_fields es_index_days_old es_index_bases)],
     },
@@ -73,111 +72,197 @@ use Sub::Exporter -setup => {
 use App::ElasticSearch::Utilities::Connection;
 use App::ElasticSearch::Utilities::VersionHacks qw(_fix_version_request);
 
+# Collectors
+sub _copy_argv       { $COPY_ARGV    = 1 }
+sub _preprocess_argv { $ARGV_AT_INIT = 1 }
+sub _delay_argv      { $ARGV_AT_INIT = 0 }
 
-my %opt = ();
-if( !defined $_OPTIONS_PARSED ) {
-    GetOptions(\%opt,
-        'local',
-        'host=s',
-        'port=i',
-        'timeout=i',
-        'keep-proxy',
-        'index=s',
-        'pattern=s',
-        'base|index-basename=s',
-        'days=i',
-        'noop!',
-        'datesep|date-separator=s',
-        'proto=s',
-        'http-username=s',
-        'http-password=s',
-        'password-exec=s',
-        'master-only|M',
-    );
-    $_OPTIONS_PARSED = 1;
-}
-my @ConfigData=();
-foreach my $config_file (@_CONFIGS) {
-    next unless -f $config_file;
-    debug("Loading options from $config_file");
-    eval {
-        my $ref = YAML::LoadFile($config_file);
-        push @ConfigData, $ref;
-        debug_var($ref);
-        1;
-    } or do {
-        debug({color=>"red"}, "[$config_file] $@");
-    };
-}
-%_GLOBALS  = @ConfigData ? %{ clone_merge(@ConfigData) } : ();
 
-# Set defaults
-my %DEF = (
-    # Connection Options
-    HOST        => exists $opt{host}              ? $opt{host} :
-                   exists $opt{local}             ? 'localhost' :
-                   exists $_GLOBALS{host}         ? $_GLOBALS{host} : 'localhost',
-    PORT        => exists $opt{port}              ? $opt{port} :
-                   exists $_GLOBALS{port}         ? $_GLOBALS{port} : 9200,
-    PROTO       => exists $opt{proto}             ? $opt{proto} :
-                   exists $_GLOBALS{proto}        ? $_GLOBALS{proto} : 'http',
-    TIMEOUT     => exists $opt{timeout}           ? $opt{timeout} :
-                   exists $_GLOBALS{timeout}      ? $_GLOBALS{timeout} : 30,
-    NOOP        => exists $opt{noop}              ? $opt{noop} :
-                   exists $_GLOBALS{noop}         ? $_GLOBALS{noop} : undef,
-    NOPROXY     => exists $opt{'keep-proxy'}      ? 0 :
-                   exists $_GLOBALS{'keep-proxy'} ? $_GLOBALS{'keep-proxy'} : 1,
-    MASTERONLY  => exists $opt{'master-only'}     ? $opt{'master-only'} : 0,
-    # HTTP Basic Authentication
-    USERNAME    => exists $opt{'http-username'}       ? $opt{'http-username'} :
-                   exists $_GLOBALS{'http-username'}  ? $_GLOBALS{'http-username'} : undef,
-    PASSWORD    => exists $opt{'http-password'}       ? $opt{'http-password'} :
-                   exists $_GLOBALS{'http-password'}  ? $_GLOBALS{'http-password'} : undef,
-    PASSEXEC    => exists $opt{'password-exec'}       ? $opt{'password-exec'} :
-                   exists $_GLOBALS{'password-exec'}  ? $_GLOBALS{'password-exec'} : undef,
-    # Index selection options
-    INDEX       => exists $opt{index}     ? $opt{index} : undef,
-    BASE        => exists $opt{base}      ? lc $opt{base} :
-                   exists $_GLOBALS{base} ? $_GLOBALS{base} : undef,
-    PATTERN     => exists $opt{pattern}   ? $opt{pattern} : '*',
-    DAYS        => exists $opt{days}      ? $opt{days} :
-                   exists $_GLOBALS{days} ? $_GLOBALS{days} : 1,
-    DATESEP     => exists $opt{datesep}               ? $opt{datesep} :
-                   exists $_GLOBALS{datesep}          ? $_GLOBALS{datesep} :
-                   exists $_GLOBALS{"date-separator"} ? $_GLOBALS{"date-separator"} :
-                   '.',
+# Global Variables
+our %_GLOBALS = ();
+my  %DEF      = ();
+my %PATTERN_REGEX = (
+    '*'  => qr/.*/,
+    ANY  => qr/.*/,
 );
-CLI::Helpers::override(verbose => 1) if $DEF{NOOP};
+my $PATTERN;
 
-if( $DEF{NOPROXY} ) {
-    debug("Removing any active HTTP Proxies from ENV.");
-    delete $ENV{$_} for qw(http_proxy HTTP_PROXY);
+{
+    ## no critic (ProhibitNoWarnings)
+    no warnings;
+    INIT {
+        return if $_init_complete++;
+        es_utils_initialize() if $ARGV_AT_INIT;
+    }
+    ## use critic
+}
+
+
+{
+    # Argument Parsing Block
+    my @argv_original = ();
+    my $parsed_argv = 0;
+    sub _parse_options {
+        my ($opt_ref) = @_;
+        my @opt_spec = qw(
+            local
+            host=s
+            port=i
+            timeout=i
+            keep-proxy
+            index=s
+            pattern=s
+            base|index-basename=s
+            days=i
+            noop!
+            datesep|date-separator=s
+            proto=s
+            http-username=s
+            http-password=s
+            password-exec=s
+            master-only|M
+        );
+
+        my $argv;
+        my %opt;
+        if( defined $opt_ref && is_arrayref($opt_ref) ) {
+            # If passed an argv array, use that
+            $argv = $COPY_ARGV ? [ @{ $opt_ref } ] : $opt_ref;
+        }
+        else {
+            # Ensure multiple calls to cli_helpers_initialize() yield the same results
+            if ( $parsed_argv ) {
+                ## no critic
+                @ARGV = @argv_original;
+                ## use critic
+            }
+            else {
+                @argv_original = @ARGV;
+                $parsed_argv++;
+            }
+            # Operate on @ARGV
+            $argv = $COPY_ARGV ? [ @ARGV ] : \@ARGV;
+        }
+        GetOptionsFromArray($argv, \%opt, @opt_spec );
+        return \%opt;
+    }
+}
+
+
+sub es_utils_initialize {
+    my ($argv) = @_;
+
+    # Parse Options
+    my $opts = _parse_options($argv);
+
+    # Config file locations
+    my @configs = (
+        '/etc/es-utils.yaml',
+        '/etc/es-utils.yml',
+    );
+    if( $ENV{HOME} ) {
+        push @configs, map { "$ENV{HOME}/.es-utils.$_" } qw( yaml yml );
+        my $xdg_config_home = $ENV{XDG_CONFIG_HOME} || "$ENV{HOME}/.config";
+        push @configs, map { "${xdg_config_home}/es-utils/config.$_" } qw( yaml yml );
+    }
+
+    my @ConfigData=();
+    foreach my $config_file (@configs) {
+        next unless -f $config_file;
+        debug("Loading options from $config_file");
+        eval {
+            my $ref = YAML::LoadFile($config_file);
+            push @ConfigData, $ref;
+            debug_var($ref);
+            1;
+        } or do {
+            debug({color=>"red"}, "[$config_file] $@");
+        };
+    }
+    %_GLOBALS  = @ConfigData ? %{ clone_merge(@ConfigData) } : ();
+
+    # Set defaults
+    %DEF = (
+        # Connection Options
+        HOST        => exists $opts->{host}   ? $opts->{host}
+                     : exists $opts->{local}  ? 'localhost'
+                     : exists $_GLOBALS{host} ? $_GLOBALS{host}
+                     : 'localhost',
+        PORT        => exists $opts->{port}   ? $opts->{port}
+                     : exists $_GLOBALS{port} ? $_GLOBALS{port}
+                     : 9200,
+        PROTO       => exists $opts->{proto}   ? $opts->{proto}
+                     : exists $_GLOBALS{proto} ? $_GLOBALS{proto}
+                     : 'http',
+        TIMEOUT     => exists $opts->{timeout}   ? $opts->{timeout}
+                     : exists $_GLOBALS{timeout} ? $_GLOBALS{timeout}
+                     : 10,
+        NOOP        => exists $opts->{noop}   ? $opts->{noop}
+                     : exists $_GLOBALS{noop} ? $_GLOBALS{noop}
+                     : undef,
+        NOPROXY     => exists $opts->{'keep-proxy'}   ? 0
+                     : exists $_GLOBALS{'keep-proxy'} ? $_GLOBALS{'keep-proxy'}
+                     : 1,
+        MASTERONLY  => exists $opts->{'master-only'} ? $opts->{'master-only'} : 0,
+        # HTTP Basic Authentication
+        USERNAME    => exists $opts->{'http-username'}    ? $opts->{'http-username'}
+                     : exists $_GLOBALS{'http-username'}  ? $_GLOBALS{'http-username'}
+                     : undef,
+        PASSWORD    => exists $opts->{'http-password'}   ? $opts->{'http-password'}
+                     : exists $_GLOBALS{'http-password'} ? $_GLOBALS{'http-password'}
+                     : undef,
+        PASSEXEC    => exists $opts->{'password-exec'}   ? $opts->{'password-exec'}
+                     : exists $_GLOBALS{'password-exec'} ? $_GLOBALS{'password-exec'}
+                     : undef,
+        # Index selection opts->ions
+        INDEX       => exists $opts->{index}  ? $opts->{index} : undef,
+        BASE        => exists $opts->{base}   ? lc $opts->{base}
+                     : exists $_GLOBALS{base} ? $_GLOBALS{base}
+                     : undef,
+        PATTERN     => exists $opts->{pattern} ? $opts->{pattern} : '*',
+        DAYS        => exists $opts->{days}    ? $opts->{days}
+                     : exists $_GLOBALS{days}  ? $_GLOBALS{days} : 1,
+        DATESEP     => exists $opts->{datesep}            ? $opts->{datesep}
+                     : exists $_GLOBALS{datesep}          ? $_GLOBALS{datesep}
+                     : exists $_GLOBALS{"date-separator"} ? $_GLOBALS{"date-separator"}
+                     : '.',
+    );
+    CLI::Helpers::override(verbose => 1) if $DEF{NOOP};
+
+    if( $DEF{NOPROXY} ) {
+        debug("Removing any active HTTP Proxies from ENV.");
+        delete $ENV{$_} for qw(http_proxy HTTP_PROXY);
+    }
+
+    # Setup Variables based on the config
+    %PATTERN_REGEX = (
+        '*'  => qr/.*/,
+        DATE => qr/\d{4}(?:\Q$DEF{DATESEP}\E)?\d{2}(?:\Q$DEF{DATESEP}\E)?\d{2}/,
+        ANY  => qr/.*/,
+    );
+    my @ordered = qw(* DATE ANY);
+
+    if( index($DEF{DATESEP},'-') >= 0 ) {
+        output({stderr=>1,color=>'yellow'}, "=== Using a '-' as your date separator may cause problems with other utilities. ===");
+    }
+
+    # Build the Index Pattern
+    $PATTERN = $DEF{PATTERN};
+    foreach my $literal ( @ordered ) {
+        $PATTERN =~ s/\Q$literal\E/$PATTERN_REGEX{$literal}/g;
+    }
+
 }
 
 # Regexes for Pattern Expansion
-my %PATTERN_REGEX = (
-    '*'  => qr/.*/,
-    DATE => qr/\d{4}(?:\Q$DEF{DATESEP}\E)?\d{2}(?:\Q$DEF{DATESEP}\E)?\d{2}/,
-    ANY  => qr/.*/,
-);
-my @ORDERED = qw(* DATE ANY);
-
-if( index($DEF{DATESEP},'-') >= 0 ) {
-    output({stderr=>1,color=>'yellow'}, "=== Using a '-' as your date separator may cause problems with other utilities. ===");
-}
-
-# Build the Index Pattern
-my $PATTERN = $DEF{PATTERN};
-foreach my $literal ( @ORDERED ) {
-    $PATTERN =~ s/\Q$literal\E/$PATTERN_REGEX{$literal}/g;
-}
-
 our $CURRENT_VERSION;
 my  $CLUSTER_MASTER;
 
 
 sub es_globals {
     my ($key) = @_;
+
+    es_utils_initialize() unless keys %DEF;
 
     return unless exists $_GLOBALS{$key};
     return $_GLOBALS{$key};
@@ -188,6 +273,8 @@ my %_auth_cache = ();
 
 sub es_basic_auth {
     my ($host) = @_;
+
+    es_utils_initialize() unless keys %DEF;
 
     $host ||= $DEF{HOST};
 
@@ -236,6 +323,9 @@ sub es_basic_auth {
 
 sub es_pass_exec {
     my ($host,$username,$exec) = @_;
+
+    es_utils_initialize() unless keys %DEF;
+
     # Simplest case we can't run
     $exec ||= $DEF{PASSEXEC};
     return unless -x $exec;
@@ -264,12 +354,12 @@ sub es_pass_exec {
 
 
 
-my %_pattern=(
-    re     => $PATTERN,
-    string => $DEF{PATTERN},
-);
 sub es_pattern {
-    return wantarray ? %_pattern : \%_pattern;
+    es_utils_initialize() unless keys %DEF;
+    return {
+        re     => $PATTERN,
+        string => $DEF{PATTERN},
+    };
 }
 
 sub _get_es_version {
@@ -304,6 +394,8 @@ my $ES = undef;
 
 sub es_connect {
     my ($override_servers) = @_;
+
+    es_utils_initialize() unless keys %DEF;
 
     my %conn = (
         host    => $DEF{HOST},
@@ -508,6 +600,9 @@ sub es_indices {
         check_dates => 1,
         @_
     );
+
+    es_utils_initialize() unless keys %DEF;
+
     # Seriously, English? Do you speak it motherfucker?
     $args{state} = 'close' if $args{state} eq 'closed';
 
@@ -545,7 +640,7 @@ sub es_indices {
                 next unless $result;
             }
 
-            my $p = es_pattern;
+            my $p = es_pattern();
             next unless $index =~ /$p->{re}/;
             debug({indent=>2},"= name checks succeeded");
 
@@ -585,6 +680,8 @@ sub es_index_strip_date {
     my ($index) = @_;
 
     return -1 unless defined $index;
+
+    es_utils_initialize() unless keys %DEF;
 
     if( $index =~ s/[-_]$PATTERN_REGEX{DATE}.*// ) {
         return $index;
@@ -628,6 +725,8 @@ sub es_index_days_old {
     my ($index) = @_;
 
     return unless defined $index;
+
+    es_utils_initialize() unless keys %DEF;
 
     if( my ($dateStr) = ($index =~ /($PATTERN_REGEX{DATE})/) ) {
         my @date=();
@@ -880,12 +979,16 @@ sub es_flatten_hash {
 sub def {
     my($key)= map { uc }@_;
 
+    es_utils_initialize() unless keys %DEF;
+
     return exists $DEF{$key} ? $DEF{$key} : undef;
 }
 
 
 sub es_local_index_meta {
     my ($key,$name_or_base) = @_;
+
+    es_utils_initialize() unless keys %DEF;
 
     if( exists $_GLOBALS{meta} ) {
         my $meta = $_GLOBALS{meta};
@@ -917,7 +1020,7 @@ App::ElasticSearch::Utilities - Utilities for Monitoring ElasticSearch
 
 =head1 VERSION
 
-version 8.2
+version 8.3
 
 =head1 SYNOPSIS
 
@@ -959,6 +1062,11 @@ The App::ElasticSearch::Utilities module simply serves as a wrapper around the s
 distribution.
 
 =head1 FUNCTIONS
+
+=head2 es_utils_initialize()
+
+Takes an optional reference to an C<@ARGV> like array. Performs environment and
+argument parsing.
 
 =head2 es_globals($key)
 
@@ -1173,7 +1281,7 @@ From App::ElasticSearch::Utilities:
     --http-password HTTP Basic Auth password (if not specified, and --http-user is, you will be prompted)
     --password-exec Script to run to get the users password
     --noop          Any operations other than GET are disabled, can be negated with --no-noop
-    --timeout       Timeout to ElasticSearch, default 30
+    --timeout       Timeout to ElasticSearch, default 10
     --keep-proxy    Do not remove any proxy settings from %ENV
     --index         Index to run commands against
     --base          For daily indexes, reference only those starting with "logstash"
@@ -1527,7 +1635,7 @@ L<https://github.com/reyjrar/es-utils>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2021 by Brad Lhotsky.
+This software is Copyright (c) 2022 by Brad Lhotsky.
 
 This is free software, licensed under:
 

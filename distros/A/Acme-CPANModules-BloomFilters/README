@@ -1,10 +1,10 @@
 NAME
-    Acme::CPANModules::BloomFilters - Bloom filter modules on CPAN
+    Acme::CPANModules::BloomFilters - List of bloom filter modules on CPAN
 
 VERSION
-    This document describes version 0.003 of Acme::CPANModules::BloomFilters
+    This document describes version 0.004 of Acme::CPANModules::BloomFilters
     (from Perl distribution Acme-CPANModules-BloomFilters), released on
-    2021-10-19.
+    2022-03-18.
 
 DESCRIPTION
     Bloom filter is a data structure that allows you to quickly check
@@ -28,45 +28,62 @@ DESCRIPTION
     In Perl, my default go-to choice is Algorithm::BloomFilter, unless
     there's a specific feature I need from other implementations.
 
-ACME::MODULES ENTRIES
-    *   Bloom::Filter
+ACME::CPANMODULES ENTRIES
+    *   Bloom::Filter - Sample Perl Bloom filter implementation
+
+        Author: XAERXESS <https://metacpan.org/author/XAERXESS>
 
         Does not provide mehods to save/load to/from strings/files, although
         you can just take a peek at the source code or the hash object and
         get the filter there. Performance might not be stellar since it's
         pure-Perl.
 
-    *   Bloom16
+    *   Bloom16 - Perl extension for "threshold" Bloom filters
+
+        Author: IWOODHEAD <https://metacpan.org/author/IWOODHEAD>
 
         An Inline::C module. Barely documented. Also does not provide filter
         saving/loading methods.
 
-    *   Algorithm::BloomFilter
+    *   Algorithm::BloomFilter - A simple bloom filter data structure
+
+        Author: SMUELLER <https://metacpan.org/author/SMUELLER>
 
         XS, made by SMUELLER. Can merge other bloom filters. Provides
         serialize and deserialize methods.
 
-    *   Bloom::Scalable
+    *   Bloom::Scalable - Implementation of the probalistic datastructure -
+        ScalableBloomFilter
+
+        Author: SUBBU <https://metacpan.org/author/SUBBU>
 
         Pure-perl module. A little weird, IMO, e.g. with hardcoded
         filenames. The distribution also provides Bloom::Simple.
 
     *   Bloom::Simple
 
+        Author: SUBBU <https://metacpan.org/author/SUBBU>
+
         Pure-perl module. A little weird, IMO, e.g. with hardcoded
         filenames. The distribution also provides Bloom::Simple.
 
-    *   Bloom::Faster
+    *   Bloom::Faster - Perl extension for the c library libbloom.
+
+        Author: PALVARO <https://metacpan.org/author/PALVARO>
 
         XS module. Serialize/deserialize directly to/from files, no string
         (de)serialization provided.
 
     *   Text::Bloom
 
+        Author: ASPINELLI <https://metacpan.org/author/ASPINELLI>
+
         Pure-Perl module, part of Text-Document distribution. Uses
         Bit::Vector.
 
-    *   App::BloomUtils
+    *   App::BloomUtils - Utilities related to bloom filters
+
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
     *   Bencher::Scenarios::BloomFilters
 
@@ -136,7 +153,7 @@ CONTRIBUTING
     me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021, 2018 by perlancar
+    This software is copyright (c) 2022, 2021, 2018 by perlancar
     <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under

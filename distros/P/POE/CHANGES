@@ -1,72 +1,24 @@
 ================================
-2020-02-01 16:22:28 +0000 v1_368
+2022-03-23 12:42:01 +0000 v1_370
 ================================
 
-  commit 0f954072fe361ad48861202c43aec3c0b5129e4a
+  commit 8d07be6dbc4b89c79f66c52b736895010f5f65dd
   Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date:   Sat Feb 1 16:22:28 2020 +0000
+  Date:   Wed Mar 23 12:42:01 2022 +0000
   
     Version bump for release.
 
-  commit b9971dfd392ac3098ef3bfaf6e1fbce2fcb48b01
+  commit f8587e83eae3bd5d9a1243841b50118d0b185dd7
   Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date:   Sat Feb 1 12:40:44 2020 +0000
+  Date:   Tue Mar 22 14:46:48 2022 +0000
   
-    Fix leolo-filter-httpd test when HTTP::Status is missing
+    Remove explicit call to setsid() in POE::Wheel::Run
 
-  commit 209890407b501a86ee322b07e9170ad8054c7bf1
-  Author: Michael Brantley <brantley@deshaw.com>
-  Date:   Tue Feb 20 07:12:06 2018 -0500
-  
-    Update broken Pod links in lib/POE/Filter/HTTPD.pm
+    We are using make_slave_controlling_terminal() from IO::Pty since
+    136f5dbab9d9 and that calls setsid() itself.
 
-    Update Pod links to refer only to the utf8 module and not its
-    methods, fix a mis-capitalized internal reference, and convert the
-    dangling "MaxContent" link into a code reference.
-
-    Resolves bug: https://rt.cpan.org/Public/Bug/Display.html?id=124496
-
-  commit 1d088d3755f770397a27852f95925564d4c3f134
-  Author: Michael Brantley <brantley@deshaw.com>
-  Date:   Tue Feb 20 07:07:22 2018 -0500
-  
-    Update old URLs referenced in Pod
-
-    Remove mention of old URLs, replace mention of canonical SVN repo
-    with the new git-based one at github.com.
-
-    Resolves bug: https://rt.cpan.org/Public/Bug/Display.html?id=124495
-
-  commit 92c2cfb55ae87ecdb4a89ad5fac65315052a3d15
-  Author: Mohammad S Anwar <mohammad.anwar@yahoo.com>
-  Date:   Fri Jul 20 18:22:44 2018 +0100
-  
-    Fixed minor typo in the pod.
-
-  commit cf5b772fa54e0cda0e447c33ce351f1e6c074d42
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date:   Tue Oct 29 10:09:52 2019 +0000
-  
-    Corrected previous commit as per tonyc's suggestion
-
-  commit ad8639840383ea1b166ff0090afabc954dffba27
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date:   Fri Oct 25 15:21:25 2019 +0100
-  
-    RT#130664 test failures with v5.31.5
-
-    As per perldelta entry for v5.31.5
-
-    https://metacpan.org/pod/release/SHAY/perl-5.31.5/pod/perldelta.pod#I
-    ncompatible-Changes
-
-  commit 1c0dccd41b8fc1fd2bbfd4ea6a0e94255cd747fc
-  Author: Rocco Caputo <rcaputo@cpan.org>
-  Date:   Mon Feb 29 17:54:58 2016 -0500
-  
-    Modernize the SYNOPSIS by replacing perl -w with "use warnings".
-
-    Thanks, mauke @ irc.perl.org #perl! 
+    Fixes to IO::Pty have unmasked this double call to setsid() which is
+    generating a spurious warning on any use of a pty(-pipe) conduit. 
 
 ==============
 End of Excerpt

@@ -1,5 +1,5 @@
 package ZMQ::FFI::ContextRole;
-$ZMQ::FFI::ContextRole::VERSION = '1.17';
+$ZMQ::FFI::ContextRole::VERSION = '1.18';
 use Moo::Role;
 
 use ZMQ::FFI::Util qw(current_tid);
@@ -52,6 +52,8 @@ requires qw(
     device
     destroy
     curve_keypair
+    z85_encode
+    z85_decode
     has_capability
 );
 
@@ -69,7 +71,7 @@ ZMQ::FFI::ContextRole
 
 =head1 VERSION
 
-version 1.17
+version 1.18
 
 =head1 AUTHOR
 
@@ -77,7 +79,7 @@ Dylan Cali <calid1984@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Dylan Cali.
+This software is copyright (c) 2022 by Dylan Cali.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

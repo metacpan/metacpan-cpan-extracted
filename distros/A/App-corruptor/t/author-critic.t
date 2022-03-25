@@ -11,11 +11,11 @@ BEGIN {
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::Perl::Critic::Subset 3.001.005
+# this test was generated with Dist::Zilla::Plugin::Test::Perl::Critic::Subset 3.001.006
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/App/corruptor.pm','script/corruptor'];
+my $filenames = ['lib/App/corruptor.pm','script/corruptor','script/corruptor-total','script/corruptor-zero'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

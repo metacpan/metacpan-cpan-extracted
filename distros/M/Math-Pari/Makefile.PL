@@ -3,10 +3,24 @@ use strict;
 use Config '%Config';
 
 BEGIN {	# Need to do before ExtUtils::MakeMaker caches them
+  my $c = tied(%Config) || \%Config;
   if ($Config{gccversion} and grep /^OPTIMIZE=.*(?<![^\s=])-g(?!\S)/,  @ARGV) {		# XXXX Bug in Perl configuration: these should be in {optimize} only
-    my $c = tied(%Config) || \%Config;
     ($c->{"${_}flags"} = $Config{"${_}flags"}) =~ s/(?<!\S)-(s|O(\d+|s|fast)?)(?!\S)//g for qw(cc cpp ld lddl);
   }							# gnukfreebsd(lddl) cygwin strawberry openbsd netbsd linux(lddl)
+  if ($^O eq 'solaris' and $Config{cc} eq 'gcc'
+      and (    ($c->{optimize}   = $Config{optimize})   =~ s/(?<!\S)(-xarch=386|-xildoff)(?!\S)//g
+            or ($c->{cccdlflags} = $Config{cccdlflags}) =~ s/(?<!\S)-KPIC(?!\S)/-fPIC/ )) {
+    # Vendor's Perl has major problems with building extensions; try to fix this
+    # One way is to use perlgcc; but it does not work with 5.8.4
+    # See http://prefetch.net/blog/index.php/2006/07/29/building-perl-modules-for-solaris/
+  print <<EOP;
+
+... Broken config of gcc-on-Solaris detected!  I would try to work around this.
+... Reset: cccdlflags --> '$Config{cccdlflags}',   optimize -> '$Config{optimize}'.
+
+EOP
+  }
+  ($c->{$_} = $Config{$_}) =~ s/(?<!\S)-flto(?!\S)// for qw(optimize $ldflags);
 }
 
 use ExtUtils::MakeMaker;
@@ -160,20 +174,6 @@ Setting up Math::Pari with Perl $] on $^O version $Config{osvers};
    optimize='$Config{optimize}',
    ld=$Config{ld}, ldflags='$Config{ldflags}'.
 EOP
-
-  if ($^O eq 'solaris' and $Config{cc} eq 'gcc'
-      and (    $Config{optimize}   =~ s/(?<!\S)(-xarch=386|-xildoff)(?!\S)//g
-            or $Config{cccdlflags} =~ s/(?<!\S)-KPIC(?!\S)/-fPIC/ )) {
-    # Vendor's Perl has major problems with building extensions; try to fix this
-    # One way is to use perlgcc; but it does not work with 5.8.4
-    # See http://prefetch.net/blog/index.php/2006/07/29/building-perl-modules-for-solaris/
-  print <<EOP;
-
-... Broken config of gcc-on-Solaris detected!  I would try to work around this.
-... Reset: cccdlflags --> '$Config{cccdlflags}',   optimize -> '$Config{optimize}'.
-
-EOP
-  }
 
   $define .= " -DPARI_VERSION_EXP=$pari_version -DDEBUG_PARI";
   $define .= " -DUSE_SLOW_ARRAY_ACCESS -DUSE_SLOW_NARGS_ACCESS" if $] >= 5.009;

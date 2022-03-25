@@ -87,7 +87,7 @@ debugging.)
 
      (*) if crashes are detected, the state of the program during the crash
          is reported in as much detail as possible (with gdb - if present,
-         otherwise with dbx).  Examples of output are in this directory.
+         otherwise with dbx or lldb).  Examples of output are in this directory.
 
 (F) A more advanced example (with multiple failures possible) is in the test
     files of the Math::Pari distribution.

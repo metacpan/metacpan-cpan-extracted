@@ -12,6 +12,7 @@ lib/Module/Generic/Dynamic.pod
 lib/Module/Generic/Exception.pm
 lib/Module/Generic/Exception.pod
 lib/Module/Generic/File.pm
+lib/Module/Generic/File/Cache.pm
 lib/Module/Generic/Finfo.pm
 lib/Module/Generic/Hash.pm
 lib/Module/Generic/Hash.pod
@@ -51,10 +52,10 @@ t/08.datetime.t
 t/09.other.t
 t/10.file.t
 t/11.finfo.t
-t/12.sharedmem.pl
 t/12.sharedmem.t
 t/13.header_value.t
 t/14.core.t
+t/15.cache.t
 t/90.coverage.t
 t/91.signature.t
 t/99.kwalitee.t

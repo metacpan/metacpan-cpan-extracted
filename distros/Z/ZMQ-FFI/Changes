@@ -1,4 +1,16 @@
 
+1.18      2022-03-21 10:48:44+00:00 UTC
+
+    - New maintainer @ghenry - welcome and thank you!
+    - Add MSWin32 support (GH#47 - thanks @zmughal!)
+    - Add zmq_socket_monitor support (GH#46 - thanks @potatogim!)
+    - Add z85_encoding support (GH#43 - thanks @juddtaylor!)
+    - Document contributors
+    - Update repository info. Now officially part of the zeromq project at
+      https://github.com/zeromq/perlzmq
+    - Have examples and scripts use 5.12 as minimum version, which enables
+      strict by default
+
 1.17      2019-03-14 04:05:15+00:00 UTC
 
 1.16_01   2019-03-13 03:40:02+00:00 UTC (TRIAL RELEASE)

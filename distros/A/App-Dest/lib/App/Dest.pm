@@ -14,7 +14,7 @@ use IPC::Run 'run';
 use Path::Tiny 'path';
 use Text::Diff ();
 
-our $VERSION = '1.30'; # VERSION
+our $VERSION = '1.31'; # VERSION
 
 sub init {
     my $self = _new( shift, 'expect_no_root_dir' );
@@ -763,7 +763,7 @@ App::Dest - Deployment State Manager
 
 =head1 VERSION
 
-version 1.30
+version 1.31
 
 =for markdown [![test](https://github.com/gryphonshafer/dest/workflows/test/badge.svg)](https://github.com/gryphonshafer/dest/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/dest/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/dest)
@@ -1317,7 +1317,7 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2013-2021 by Gryphon Shafer.
+This software is Copyright (c) 2013-2050 by Gryphon Shafer.
 
 This is free software, licensed under:
 

@@ -1434,3 +1434,28 @@ XXX We put some stuff into paricfg.h which may be not present in the GP/PARI's o
 2.03052001
    t/zzz_debug-crash.t	Auto-debug if smoke-testing is detected (even if AUTOMATED_TESTING not defined)
 				see http://www.cpantesters.org/cpan/report/55089d5e-a621-11ec-9168-a27a1f24ea8f
+
+2.03052002
+   t/zzz_debug-crash.t	Workaround for '.' is not in @INC any more.
+
+	http://www.cpantesters.org/cpan/report/c9fbf858-a85c-11ec-ad31-2126fb4fc8a9
+		no dbx no gdb.  Scan PATH for candidates?	Check lldb ??? :
+	https://stackoverflow.com/questions/39702871/gdb-kind-of-doesnt-work-on-macos-sierra
+
+2.03052003
+   auto-dbg/auto-debug-module.pl	New option -B.
+					Scan $PATH for candidates for a debugger if gdb or dbx are not found.
+   t/zzz_debug-crash.t			Use option -B of auto-debug-module.pl.
+
+2.03052004
+   auto-dbg/auto-debug-module.pl	Multiple fixes.
+
+2.030521
+   Pari.xs	Fix warnings found on Darwin and with -Wall.  (Now same failures on 2.13.3 on the optimized and non-optimized builds.)
+
+2.030521a
+   auto-dbg/auto-debug-module.pl	Try to support lldb (untested; mapping of /proc and w32 thread-information-block unsupported).
+					Remove extra quoting from the Makefile.PL command-line.
+   Makefile.PL				Fix editing %Config in one more place (on Solaris).
+					Remove LTO flag from %Config (reported to fail; thanks to Kent Fredric; untested).
+						https://rt.cpan.org/Public/Bug/Display.html?id=120711

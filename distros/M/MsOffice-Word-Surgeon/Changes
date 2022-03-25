@@ -1,5 +1,8 @@
 Revision history for MsOffice-Word-Surgeon
 
+1.08     21.03.2022
+  - additional noise reduction : soft hyphens
+
 1.07     27.10.2021
   - new method suppress_bookmarks()
   - fix bug : runs containing '0' should not be treated as empty

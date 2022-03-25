@@ -11,7 +11,6 @@
 #include "spvm_yacc_util.h"
 #include "spvm_class.h"
 #include "spvm_field.h"
-#include "spvm_limit.h"
 #include "spvm_basic_type.h"
 #include "spvm_method.h"
 
@@ -50,6 +49,7 @@ const char* const* SPVM_TYPE_TYPE_CATEGORY_C_ID_NAMES(void) {
     "REF_MULNUM_DOUBLE",
     "VOID",
     "STRING",
+    "ELEMENT_ARRAY",
   };
   
   return id_names;
@@ -182,6 +182,9 @@ int32_t SPVM_TYPE_get_type_category(SPVM_COMPILER* compiler, int32_t basic_type_
     }
     else if (SPVM_TYPE_is_mulnum_array_type(compiler, basic_type_id, dimension, flag)) {
       type_category = SPVM_TYPE_C_TYPE_CATEGORY_MULNUM_ARRAY;
+    }
+    else if (SPVM_TYPE_is_any_object_array_type(compiler, basic_type_id, dimension, flag)) {
+      type_category = SPVM_TYPE_C_TYPE_CATEGORY_ANY_OBJECT_ARRAY;
     }
     else if (SPVM_TYPE_is_array_type(compiler, basic_type_id, dimension, flag)) {
       type_category = SPVM_TYPE_C_TYPE_CATEGORY_OBJECT_ARRAY;
@@ -403,10 +406,10 @@ const char* SPVM_TYPE_new_type_name_with_eternal_flag(SPVM_COMPILER* compiler, i
   
   char* type_name;
   if (is_eternal) {
-    type_name = SPVM_ALLOCATOR_new_block_compile_eternal(compiler, type_name_length + 1);
+    type_name = SPVM_ALLOCATOR_alloc_memory_block_permanent(compiler->allocator, type_name_length + 1);
   }
   else {
-    type_name = SPVM_ALLOCATOR_new_block_compile_tmp(compiler, type_name_length + 1);
+    type_name = SPVM_ALLOCATOR_alloc_memory_block_tmp(compiler->allocator, type_name_length + 1);
   }
   
   char* cur = type_name;
@@ -449,7 +452,7 @@ const char* SPVM_TYPE_new_type_name(SPVM_COMPILER* compiler, int32_t basic_type_
 
 SPVM_TYPE* SPVM_TYPE_new(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag) {
   
-  int32_t start_memory_blocks_count_compile_tmp = compiler->allocator->memory_blocks_count_compile_tmp;
+  int32_t start_memory_blocks_count_tmp = compiler->allocator->memory_blocks_count_tmp;
   
   const char* type_name = SPVM_TYPE_new_type_name_tmp(compiler,  basic_type_id, dimension, flag);
   
@@ -459,20 +462,21 @@ SPVM_TYPE* SPVM_TYPE_new(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t
     type = found_type;
   }
   else {
-    type = SPVM_ALLOCATOR_new_block_compile_eternal(compiler, sizeof(SPVM_TYPE));
+    type = SPVM_ALLOCATOR_alloc_memory_block_permanent(compiler->allocator, sizeof(SPVM_TYPE));
     SPVM_BASIC_TYPE* basic_type = SPVM_LIST_fetch(compiler->basic_types, basic_type_id);
+    type->id = compiler->types->length;
     type->basic_type = basic_type;
     type->dimension = dimension;
     type->flag = flag;
-    type->type_name = SPVM_TYPE_new_type_name(compiler,  basic_type_id, dimension, flag);
-
+    type->name = SPVM_TYPE_new_type_name(compiler,  basic_type_id, dimension, flag);
+    
     SPVM_LIST_push(compiler->types, type);
     SPVM_HASH_insert(compiler->type_symtable, type_name, strlen(type_name), type);
   }
   
-  SPVM_ALLOCATOR_free_block_compile_tmp(compiler, (void*)type_name);
+  SPVM_ALLOCATOR_free_memory_block_tmp(compiler->allocator, (void*)type_name);
   type_name = NULL;
-  assert(compiler->allocator->memory_blocks_count_compile_tmp == start_memory_blocks_count_compile_tmp);
+  assert(compiler->allocator->memory_blocks_count_tmp == start_memory_blocks_count_tmp);
   
   return type;
 }
@@ -496,11 +500,11 @@ SPVM_TYPE* SPVM_TYPE_new_void_type(SPVM_COMPILER* compiler) {
   return type;
 }
 
-SPVM_TYPE* SPVM_TYPE_new_oarray_type(SPVM_COMPILER* compiler) {
+SPVM_TYPE* SPVM_TYPE_new_any_object_array_type(SPVM_COMPILER* compiler) {
   (void)compiler;
   
-  SPVM_BASIC_TYPE* basic_type = SPVM_LIST_fetch(compiler->basic_types, SPVM_BASIC_TYPE_C_ID_OARRAY);
-  int32_t type_dimension = 0;
+  SPVM_BASIC_TYPE* basic_type = SPVM_LIST_fetch(compiler->basic_types, SPVM_BASIC_TYPE_C_ID_ELEMENT);
+  int32_t type_dimension = 1;
   int32_t type_flag = 0;
   SPVM_TYPE* type = SPVM_TYPE_new(compiler, basic_type->id, type_dimension, type_flag);
   
@@ -762,6 +766,17 @@ SPVM_TYPE* SPVM_TYPE_new_any_object_type(SPVM_COMPILER* compiler) {
   return type;
 }
 
+SPVM_TYPE* SPVM_TYPE_new_element_type(SPVM_COMPILER* compiler) {
+  (void)compiler;
+  
+  SPVM_BASIC_TYPE* basic_type = SPVM_LIST_fetch(compiler->basic_types, SPVM_BASIC_TYPE_C_ID_ELEMENT);
+  int32_t type_dimension = 0;
+  int32_t type_flag = 0;
+  SPVM_TYPE* type = SPVM_TYPE_new(compiler, basic_type->id, type_dimension, type_flag);
+  
+  return type;
+}
+
 int32_t SPVM_TYPE_is_byte_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag) {
   (void)compiler;
   
@@ -999,7 +1014,7 @@ int32_t SPVM_TYPE_is_object_array_type(SPVM_COMPILER* compiler, int32_t basic_ty
   (void)compiler;
   
   if (SPVM_TYPE_is_array_type(compiler, basic_type_id, dimension, flag)) {
-    if (SPVM_TYPE_is_oarray_type(compiler, basic_type_id, dimension, flag)) {
+    if (SPVM_TYPE_is_any_object_array_type(compiler, basic_type_id, dimension, flag)) {
       return 1;
     }
     else {
@@ -1162,18 +1177,13 @@ int32_t SPVM_TYPE_is_string_or_byte_array_type(SPVM_COMPILER* compiler, int32_t 
 int32_t SPVM_TYPE_is_array_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag) {
   (void)compiler;
   
-  if (SPVM_TYPE_is_oarray_type(compiler, basic_type_id, dimension, flag)) {
-    return 1;
-  }
-  else {
-    return dimension > 0 && !(flag & SPVM_TYPE_C_FLAG_REF);
-  }
+  return dimension > 0 && !(flag & SPVM_TYPE_C_FLAG_REF);
 }
 
-int32_t SPVM_TYPE_is_oarray_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag) {
+int32_t SPVM_TYPE_is_any_object_array_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag) {
   (void)compiler;
   
-  if (basic_type_id == SPVM_BASIC_TYPE_C_ID_OARRAY && dimension == 0 && !(flag & SPVM_TYPE_C_FLAG_REF)) {
+  if (basic_type_id == SPVM_BASIC_TYPE_C_ID_ELEMENT && dimension == 1 && !(flag & SPVM_TYPE_C_FLAG_REF)) {
     return 1;
   }
   else {

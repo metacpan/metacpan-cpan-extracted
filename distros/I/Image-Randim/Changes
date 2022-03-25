@@ -1,3 +1,39 @@
+commit f65d4eb965c338181d6e604b22f8e2215451ad38
+Author: Mark Rushing <mark@marks-imac.local>
+Date:   Tue Mar 22 01:00:13 2022 +0000
+
+    No live test for Unsplash API to avoid rate-limit
+
+commit a34a05e566d49c0e4706f87957627a486cd2f925
+Author: Mark Rushing <mark@marks-imac.local>
+Date:   Mon Mar 21 01:39:19 2022 +0000
+
+    Blacklist created for Source modules.
+
+commit d66cde9a74e969065dbff4334a0cf6fefc721139
+Author: Mark Rushing <mark@marks-imac.local>
+Date:   Sun Mar 20 11:13:46 2022 +0000
+
+    Took out ‘use’ references to Desktoppr
+
+commit 81d3ce4a5ba60c3922c8426eead13996b1f83ddd
+Author: Mark Rushing <mark@marks-imac.local>
+Date:   Sun Mar 20 05:05:52 2022 +0000
+
+    Removed reference to Desktoppr and upped verson
+
+commit 68bbb9e3a23155816100b804099e697d98a2ac0a
+Author: Mark Rushing <mark@marks-imac.local>
+Date:   Sun Mar 20 05:01:04 2022 +0000
+
+    Removed Desktoppr since it’s no more.
+
+commit c35c33b0010031281b8eeb341739061432b7b537
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Mon Oct 1 16:34:32 2018 -0700
+
+    Record changes
+
 commit 200a7e7491d64bc362e5252097a40e215508340b
 Author: Mark Rushing <mark@orbislumen.net>
 Date:   Mon Oct 1 16:32:24 2018 -0700

@@ -23,12 +23,16 @@ share/ms-style-guide.pl
 share/sccc2.dict
 t/00_compile.t
 t/01_run.t
+t/02_conflict.t
 t/JA-bad.txt
+t/JA-include.dict
+t/JA-overlap.dict
 t/JA.dict
 t/JA.txt
-t/Runner.pm
 t/Util.pm
 t/data_shishin.docx
 t/data_shishin.txt
+t/runner/README.md
+t/runner/Runner.pm
 META.yml
 MANIFEST

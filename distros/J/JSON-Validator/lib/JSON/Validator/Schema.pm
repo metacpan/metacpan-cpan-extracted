@@ -195,29 +195,21 @@ sub _build_formats {
 sub _bundle_from {
   my ($self, $root_state) = @_;
 
-  my @topics = ([$root_state, $root_state->{schema}, $self->data]);
+  my @topics = ([$root_state, $root_state->{schema}, $self->data, []]);
   while (my $topic = shift @topics) {
-    my ($state, $source, $target) = @$topic;
+    my ($state, $source, $target, $path) = @$topic;
     next if $state->{seen_schema}{$target}++;    # Avoid recursion
 
     if (ref $source eq 'HASH') {
       for my $k (keys %$source) {
         if ($k eq '$ref') {
-          my $uri = $state->{base_url} eq $root_state->{base_url} ? uri $source->{'$ref'} : uri $source->{'$ref'},
-            $state->{base_url};
-          my @path = $self->_bundle_ref_path($state, $uri);
-          $target->{'$ref'} = join '/', '#', @path;
-
-          my $def_target = $self->data;
-          $def_target = $def_target->{$_} //= {} for @path;
-          my $source_state = $self->store->resolve($source->{'$ref'}, $state);
-          push @topics, [$source_state, $source_state->{schema}, $def_target];
-          $self->_refs->{$target} = $source_state;
+          local @$state{qw(root_state schema_path)} = ($root_state, $path);
+          push @topics, $self->_bundle_ref($state, $source, $target);
         }
         else {
           my $type = ref $source->{$k};
           $target->{$k} //= $type eq 'HASH' ? {} : $type eq 'ARRAY' ? [] : $source->{$k};
-          push @topics, [$state, $source->{$k}, $target->{$k}] if $type eq 'HASH' or $type eq 'ARRAY';
+          push @topics, [$state, $source->{$k}, $target->{$k}, [@$path, $k]] if $type eq 'HASH' or $type eq 'ARRAY';
         }
       }
     }
@@ -225,7 +217,7 @@ sub _bundle_from {
       for my $i (0 .. @$source - 1) {
         my $type = ref $source->[$i];
         $target->[$i] //= $type eq 'HASH' ? {} : $type eq 'ARRAY' ? [] : $source->[$i];
-        push @topics, [$state, $source->[$i], $target->[$i]] if $type eq 'HASH' or $type eq 'ARRAY';
+        push @topics, [$state, $source->[$i], $target->[$i], [@$path, $i]] if $type eq 'HASH' or $type eq 'ARRAY';
       }
     }
     else {
@@ -234,23 +226,35 @@ sub _bundle_from {
   }
 }
 
-sub _bundle_ref_path {
-  my ($self, $state, $uri) = @_;
-  my $prefix = join '-', map { s!^/+!!; $_ } grep { length $_ } pop @{$uri->path}, $uri->fragment;
-  my $suffix = data_checksum $state->{schema};
+sub _bundle_ref {
+  my ($self, $state, $source, $target) = @_;
 
-  my $i = -1;
-  while (++$i <= 30) {
-    my @path = $self->_bundle_ref_path_expand($i ? join '-', $prefix, substr $suffix, 0, $i * 4 : $prefix);
+  my $uri
+    = $state->{base_url} eq $state->{root_state}{base_url}
+    ? uri($source->{'$ref'})
+    : uri($source->{'$ref'}, $state->{base_url});
+
+  my $source_state = $self->store->resolve($source->{'$ref'}, $state);
+  my $prefix       = join '-', map { s!^/+!!; $_ } grep { length $_ } pop @{$uri->path}, $uri->fragment;
+  my ($i, $suffix, @path) = (-1);
+
+  while (++$i <= 3) {
+    $suffix ||= data_checksum $source_state->{schema} if $i;
+    @path = $self->_bundle_ref_path_expand($source_state, $i ? join '-', $prefix, substr $suffix, 0, $i * 4 : $prefix);
     $path[-1] =~ s!^\W+!!;
     $path[-1] =~ s![^\w-]!_!g;    # Make a pretty path
-    return @path unless $self->{seen_bundle_ref}{@path};
+    last unless $self->{seen_bundle_ref}{@path};
   }
 
-  Carp::confess("Unable to create bundle ref from $uri.");
+  my $def_target = $self->data;
+  $target->{'$ref'}       = join '/', '#', @path;
+  $def_target             = $def_target->{$_} //= {} for @path;
+  $self->_refs->{$target} = $source_state;
+
+  return [$source_state, $source_state->{schema}, $def_target, $state->{schema_path}];
 }
 
-sub _bundle_ref_path_expand  { local $_ = $_[1]; s!^definitions/!!; return 'definitions', $_; }
+sub _bundle_ref_path_expand  { local $_ = $_[2]; s!^definitions/!!; return 'definitions', $_; }
 sub _extract_ref_from_schema { $_[1]->{'$ref'} }
 
 sub _get {
@@ -863,7 +867,7 @@ JSON::Validator::Schema - Base class for JSON::Validator schemas
   my $store = JSON::Validator::Store->new;
   my $schema = JSON::Validator::Schema::Draft7->new(store => $store);
 
-  # Will not fetch the fike from web, if the $store has already retrived
+  # Will not fetch the file from web, if the $store has already retrieved
   # the schema
   $schema->resolve('https://api.example.com/cool/beans.json');
 
@@ -938,8 +942,8 @@ C<$schema> is valid.
   $schema   = $schema->formats(\%hash);
 
 Holds a hash-ref, where the keys are supported JSON type "formats", and
-the values holds a code block which can validate a given format. A code
-block should return C<undef> on success and an error string on error:
+the associated values hold code blocks which can validate the given format.
+A code block should return C<undef> on success and an error string on error:
 
   sub { return defined $_[0] && $_[0] eq "42" ? undef : "Not the answer." };
 
@@ -1030,7 +1034,7 @@ same as the number C<1>, unless you have "numbers" coercion enabled.
 
 =item * booleans
 
-Will convert what looks can be interpreted as a boolean (that is, an actual
+Will convert what could be interpreted as a boolean (that is, an actual
 numeric C<1> or C<0>, and the strings "true" and "false") to a
 L<JSON::PP::Boolean> object. Note that "foo" is not considered a true value and
 will fail the validation.
@@ -1045,7 +1049,7 @@ might be changed in future versions.
 
 =item * numbers
 
-Will convert strings that looks like numbers, into true numbers. This works for
+Will convert strings that look like numbers, into true numbers. This works for
 both the "integer" and "number" types.
 
 =item * strings
@@ -1076,7 +1080,7 @@ use L</resolve> instead of L</data>.
 This method will extract data from L</data>, using a C<$json_pointer> -
 L<RFC 6901|http://tools.ietf.org/html/rfc6901>. It can however be used in a more
 complex way by passing in an array-ref: The array-ref can contain C<undef()>
-values, will result in extracting any element on that point, regardsless of
+values, will result in extracting any element on that point, regardless of
 value. In that case a L<Mojo::Collection> will be returned.
 
 A callback can also be given. This callback will be called each time the
@@ -1084,14 +1088,14 @@ C<$json_pointer> matches some data, and will pass in the C<$json_pointer> at
 that place.
 
 In addition if this method "sees" a JSON-Schema C<$ref> on the way, the "$ref"
-will be followed into any given sub schema.
+will be followed into any given sub-schema.
 
 =head2 is_invalid
 
   my $bool = $schema->is_invalid;
 
 Returns true if the schema in L</data> is invalid. Internally this method calls
-L</errors> which will validate L</data> agains L</specification>.
+L</errors> which will validate L</data> against L</specification>.
 
 =head2 load_and_validate_schema
 
@@ -1103,7 +1107,7 @@ This method is unsupported. Use L</is_invalid> or L</errors> instead.
   my $schema = JSON::Validator::Schema->new($data, %attributes);
   my $schema = JSON::Validator::Schema->new(%attributes);
 
-Construct a new L<JSON::Validator::Schema> object. Passing on C<$data> as the
+Construct a new L<JSON::Validator::Schema> object. Passing C<$data> as the
 first argument will cause L</resolve> to be called, meaning the constructor
 might throw an exception if the schema could not be successfully resolved.
 
@@ -1113,7 +1117,7 @@ might throw an exception if the schema could not be successfully resolved.
   $schema = $schema->resolve($data);
 
 Used to resolve L<$uri> or L<$data> and store the resolved schema in L</data>.
-If C<$data> or C<$uri> contains any $ref's, then these schemas will be
+If C<$data> or C<$uri> contain any "$ref", then these schemas will be
 downloaded and resolved as well.
 
 If L</data> does not contain an "id" or "$id", then L</id> will be assigned a

@@ -145,4 +145,71 @@ $j->raiseError([qw/zonk bam/], 404);
 is_deeply($j->errors, ['kapow', 'zonk', 'bam'], 'call raiseError with an arrayref - result an arrayref - kapow, zonk, bam');
 is($j->{_status_code}, 404, 'call raiseError with two arguments, check that status code was set - result string - 404');
 
+my $jss = JSONP->new({
+	firstkey => 5,
+	secondkey => [1, 2, 3],
+	thirdkey => {
+		nested => \1
+	},
+});
+
+my $jss2 = JSONP->new({
+	secondkey => [1, 2, 3],
+	thirdkey => {
+		nested => \1
+	},
+	firstkey => 5,
+});
+
+my $jss3 = JSONP->new({
+	secondkey => [1, 2, 3],
+	thirdkey => {
+		nested => \1,
+		another => undef,
+	},
+	firstkey => 5,
+});
+
+my $dst = {
+	thirdkey => {
+		nested => \1
+	},
+	secondkey => [1, 2, 3],
+	firstkey => 5,
+};
+
+my $dsf = {
+	secondkey => [1, 2, 3],
+	thirdkey => {
+		nested => \1
+	},
+	firstkey => 5,
+	_hidden => 'something'
+};
+
+my $jsont = '{
+	"thirdkey": {"nested": true},
+	"firstkey": 5,
+	"secondkey": [1, 2, 3]
+}';
+
+my $jsonf = '{
+	"thirdkey": {"nested": true},
+	"firstkey": 5,
+	"secondkey": [1, 2, 3, 4]
+}';
+
+ok($jss eq $jss2, 'checking eq operator overloading between JSONP objects');
+ok($jss ne $jss3, 'checking ne operator overloading between JSONP objects');
+ok($jss eq $dst, 'checking eq operator overloading between JSONP object and Perl data structure');
+ok($jss ne $dsf, 'checking ne operator overloading between JSONP object and Perl data structure');
+ok($jss eq $jsont, 'checking eq operator overloading between JSONP object and JSON string');
+ok($jss ne $jsonf, 'checking ne operator overloading between JSONP object and JSON string');
+isnt($jss eq '', 1, 'checking eq operator overloading between JSONP object and void string');
+ok($jss ne '', 'checking ne operator overloading between JSONP object and void string');
+isnt($jss eq undef, 1, 'checking eq operator overloading between JSONP object and undef');
+ok($jss ne undef, 'checking ne operator overloading between JSONP object and undef');
+
+isa_ok($jss, 'JSONP', '$jss');
+
 done_testing();

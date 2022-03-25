@@ -1,5 +1,18 @@
 Revision history for Perl application 'greple'.
 
+8.5701 2022-03-22T00:10:35Z
+
+    - Add --git-r option in -Mdig to recurse submodules.
+
+8.57 2022-02-28T02:11:13Z
+
+    - Now TEXT color does not affect FILE and LINE color.
+    - Introduce --join-blocks option.
+
+8.5602 2022-02-25T00:32:39Z
+
+    - Change filter debug flag to -dF.
+
 8.5601 2022-02-12T15:49:01Z
 
     - Go back to Minilla.

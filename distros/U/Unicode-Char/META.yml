@@ -1,10 +1,22 @@
-# http://module-build.sourceforge.net/META-spec.html
-#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
-name:         Unicode-Char
-version:      0.02
-version_from: lib/Unicode/Char.pm
-installdirs:  site
-requires:
-
-distribution_type: module
-generated_by: ExtUtils::MakeMaker version 6.30
+---
+abstract: 'OO interface to charnames and others'
+author:
+  - 'Dan Kogai <dankogai@dan.co.jp>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Unicode-Char
+no_index:
+  directory:
+    - t
+    - inc
+requires: {}
+version: '0.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

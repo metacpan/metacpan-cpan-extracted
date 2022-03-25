@@ -13,7 +13,7 @@ use URI::Escape 'uri_escape';
 use Convert::Base32 qw( encode_base32 decode_base32 );
 use Carp 'croak';
 
-our $VERSION = '1.03'; # VERSION
+our $VERSION = '1.04'; # VERSION
 
 my @accessors = qw( secret secret32 issuer key_id otpauth );
 __PACKAGE__->mk_accessors(@accessors);
@@ -136,7 +136,7 @@ Auth::GoogleAuth - Google Authenticator TBOT Abstraction
 
 =head1 VERSION
 
-version 1.03
+version 1.04
 
 =for markdown [![test](https://github.com/gryphonshafer/Auth-GoogleAuth/workflows/test/badge.svg)](https://github.com/gryphonshafer/Auth-GoogleAuth/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/Auth-GoogleAuth/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Auth-GoogleAuth)
@@ -396,7 +396,7 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2015-2021 by Gryphon Shafer.
+This software is Copyright (c) 2015-2050 by Gryphon Shafer.
 
 This is free software, licensed under:
 

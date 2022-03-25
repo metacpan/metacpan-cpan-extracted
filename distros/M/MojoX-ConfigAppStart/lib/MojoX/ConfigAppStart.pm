@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use Carp 'croak';
 
-our $VERSION = '1.02'; # VERSION
+our $VERSION = '1.03'; # VERSION
 
 BEGIN {
     $ENV{CONFIGAPPENV} = $ENV{MOJO_MODE} || $ENV{PLACK_ENV} || 'development';
@@ -48,7 +48,7 @@ MojoX::ConfigAppStart - Start a Mojolicious application with Config::App
 
 =head1 VERSION
 
-version 1.02
+version 1.03
 
 =for markdown [![test](https://github.com/gryphonshafer/MojoX-ConfigAppStart/workflows/test/badge.svg)](https://github.com/gryphonshafer/MojoX-ConfigAppStart/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/MojoX-ConfigAppStart/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/MojoX-ConfigAppStart)
@@ -145,7 +145,7 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2021 by Gryphon Shafer.
+This software is Copyright (c) 2018-2050 by Gryphon Shafer.
 
 This is free software, licensed under:
 

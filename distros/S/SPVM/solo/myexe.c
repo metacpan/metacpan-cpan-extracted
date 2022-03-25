@@ -11,44 +11,48 @@ int32_t main(int32_t argc, const char *argv[]) {
   
   // Class name
   const char* class_name = "MyExe";
-  
-  SPVM_ENV* compiler_env = SPVM_API_new_env_raw(NULL);
+
+  // Create env
+  SPVM_ENV* env = SPVM_NATIVE_new_env_raw();
   
   // Create compiler
-  void* compiler = compiler_env->new_compiler(compiler_env);
+  void* compiler = env->compiler_new();
   
   // compiler->debug = 1;
   
-  compiler_env->compiler_set_start_file(compiler_env, compiler, class_name);
+  env->compiler_set_start_file(compiler, class_name);
 
-  compiler_env->compiler_set_start_line(compiler_env, compiler, 0);
+  env->compiler_set_start_line(compiler, 0);
   
   // Add module directory
   char* module_dir = "solo/SPVM";
-  compiler_env->compiler_add_module_dir(compiler_env, compiler, module_dir);
+  env->compiler_add_module_dir(compiler, module_dir);
 
-  int32_t compile_error_code = compiler_env->compiler_compile_spvm(compiler_env, compiler, class_name);
+  int32_t compile_error_code = env->compiler_compile_spvm(compiler, class_name);
   
   if (compile_error_code != 0) {
-    int32_t error_messages_length = compiler_env->compiler_get_error_messages_length(compiler_env, compiler);
+    int32_t error_messages_length = env->compiler_get_error_messages_length(compiler);
     for (int32_t i = 0; i < error_messages_length; i++) {
-      const char* error_message = compiler_env->compiler_get_error_message(compiler_env, compiler, i);
+      const char* error_message = env->compiler_get_error_message(compiler, i);
       fprintf(stderr, "%s\n", error_message);
     }
     exit(255);
   }
-  
-  compiler_env->free_env_raw(compiler_env);
-  compiler_env = NULL;
 
-  // Create env
-  SPVM_ENV* env = SPVM_API_new_env_raw(NULL);
+  // Build runtime information
+  void* runtime = SPVM_API_runtime_new(env);
+  SPVM_API_compiler_build_runtime(compiler, runtime);
   
-  // Set the compiler
-  env->compiler = compiler;
+  env->compiler_free(compiler);
+  
+  // Prepare runtime
+  SPVM_API_runtime_prepare(runtime);
+
+  // Set runtime information
+  env->runtime = runtime;
   
   // Initialize env
-  SPVM_API_init_env(env);
+  env->init_env(env);
   
   // Call INIT blocks
   env->call_init_blocks(env);
@@ -80,7 +84,7 @@ int32_t main(int32_t argc, const char *argv[]) {
   SPVM_VALUE stack[255];
   stack[0].oval = cmd_start_file_obj;
   stack[1].oval = cmd_args_obj;
-  
+
   // Run
   int32_t exception_flag = env->call_spvm_method(env, method_id, stack);
   
@@ -93,7 +97,7 @@ int32_t main(int32_t argc, const char *argv[]) {
   else {
     status = stack[0].ival;
   }
-  
+
   // Leave scope
   env->leave_scope(env, scope_id);
   
@@ -102,9 +106,6 @@ int32_t main(int32_t argc, const char *argv[]) {
   
   // Free env
   env->free_env_raw(env);
-
-  // Free compiler
-  SPVM_API_compiler_free(compiler_env, compiler);
   
   return status;
 }

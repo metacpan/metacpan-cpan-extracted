@@ -191,9 +191,28 @@ sub _build_formats {
   };
 }
 
+sub _bundle_ref {
+  my ($self, $state, $source, $target) = @_;
+
+  # Recurse into the inner $ref to avoid invalid schema
+  my $source_state = $self->store->resolve($source->{'$ref'}, $state);
+  return $self->_bundle_ref($source_state, $source_state->{schema}, $target) if $source_state->{schema}{'$ref'};
+
+  # Replace "paths" inline
+  if (@{$state->{schema_path}} == 2 and $state->{schema_path}[0] eq 'paths') {
+    delete $state->{seen_schema}{$target};    # path definitions should not recurse
+    return [$source_state, $source_state->{schema}, $target, $state->{schema_path}];
+  }
+
+  return $self->SUPER::_bundle_ref($state, $source, $target);
+}
+
 sub _bundle_ref_path_expand {
-  my ($self, $ref) = @_;
-  return $ref =~ m!\b(definitions|parameters|responses)/(.+)$! ? ($1, $2) : ('definitions', $ref);
+  my ($self, $state, $ref) = @_;
+  return (parameters => $ref) if $state->{schema}{in};
+  return ($1 => $2) if $ref =~ m!\b(definitions|parameters|responses)\b\.*(?:json|yaml)?(.+)$!;
+  return ($1, $2 ? ($2) : ()) if $ref =~ m!\b(x-[^/]+)/?\b(.*)!;
+  return (definitions => $ref);
 }
 
 sub _coerce_arrays {
@@ -221,6 +240,8 @@ sub _coerce_parameter_format {
   return unless $val->{exists};
   return unless my $format = $param->{collectionFormat};
   return $val->{value} = ref $val->{value} eq 'ARRAY' ? $val->{value} : [$val->{value}] if $format eq 'multi';
+
+  $val->{value} = $val->{value}[0] // '' if ref $val->{value} eq 'ARRAY';
   return $val->{value} = [split /\|/,  $val->{value}] if $format eq 'pipes';
   return $val->{value} = [split /[ ]/, $val->{value}] if $format eq 'ssv';
   return $val->{value} = [split /\t/,  $val->{value}] if $format eq 'tsv';

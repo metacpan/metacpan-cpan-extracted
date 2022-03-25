@@ -403,7 +403,7 @@ Returns the value of the global variable C<$ERROR>. However, since this package 
 
 =head2 exists
 
-Provided with a value and this returns the number of match, as an L<Module::Generic::Number> object, if it is found in the array, or false otherwise.
+Provided with a value, including reference, and this returns the number of match, as an L<Module::Generic::Number> object, if it is found in the array, or false otherwise.
 
 =head2 even
 

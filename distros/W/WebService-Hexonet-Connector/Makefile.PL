@@ -18,7 +18,6 @@ WriteMakefile(
         'Carp'                 => 0,
         'POSIX'                => 0,
         'List::MoreUtils'      => 0.428,
-        'version'              => 0.9924,
         'Config'               => 0
     },
     TEST_REQUIRES => {
@@ -27,7 +26,6 @@ WriteMakefile(
         'Test::RequiresInternet' => 0,
         'Scalar::Util'           => 0,
         'Readonly'               => 0,
-        'version'                => 0,
         'POSIX'                  => 0,
         'Config'                 => 0
     },

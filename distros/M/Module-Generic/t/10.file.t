@@ -697,6 +697,5 @@ subtest 'standard io' => sub
 
 done_testing();
 
-
 __END__
 

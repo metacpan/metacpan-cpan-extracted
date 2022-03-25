@@ -14,7 +14,7 @@ BEGIN {
     Template->import;
 }
 
-our $VERSION = '1.11'; # VERSION
+our $VERSION = '1.12'; # VERSION
 
 sub register {
     my ( $self, $app, $settings ) = @_;
@@ -87,7 +87,7 @@ Mojolicious::Plugin::ToolkitRenderer - Template Toolkit Renderer Mojolicious Plu
 
 =head1 VERSION
 
-version 1.11
+version 1.12
 
 =for markdown [![test](https://github.com/gryphonshafer/Mojo-Plugin-Toolkit/workflows/test/badge.svg)](https://github.com/gryphonshafer/Mojo-Plugin-Toolkit/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/Mojo-Plugin-Toolkit/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Mojo-Plugin-Toolkit)
@@ -254,7 +254,7 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2013-2021 by Gryphon Shafer.
+This software is Copyright (c) 2013-2050 by Gryphon Shafer.
 
 This is free software, licensed under:
 

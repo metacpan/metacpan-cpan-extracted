@@ -7,7 +7,7 @@ package English::Script {
     use Parse::RecDescent;
     use YAML::XS 'Dump';
 
-    our $VERSION = '1.05'; # VERSION
+    our $VERSION = '1.06'; # VERSION
 
     sub new {
         my $self = shift;
@@ -371,7 +371,7 @@ package English::Script::JavaScript {
     use exact;
     use JavaScript::Packer;
 
-    our $VERSION = '1.05'; # VERSION
+    our $VERSION = '1.06'; # VERSION
 
     sub new {
         my ( $self, $args ) = @_;
@@ -638,7 +638,7 @@ English::Script - Parse English subset and convert to data or code
 
 =head1 VERSION
 
-version 1.05
+version 1.06
 
 =for markdown [![test](https://github.com/gryphonshafer/English-Script/workflows/test/badge.svg)](https://github.com/gryphonshafer/English-Script/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/English-Script/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/English-Script)
@@ -1071,7 +1071,7 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020-2021 by Gryphon Shafer.
+This software is Copyright (c) 2020-2050 by Gryphon Shafer.
 
 This is free software, licensed under:
 

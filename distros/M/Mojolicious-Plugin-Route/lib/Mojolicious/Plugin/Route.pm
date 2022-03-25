@@ -10,13 +10,14 @@ use constant BASE => {
     references => {}
 };
 
-our $VERSION = '0.03';
+our $VERSION = '0.06';
 
 sub register {
     my ($self, $app, $conf) = @_;
 
     my ($moniker, $moniker_path) = $self->_get_moniker($app, $conf);
     my $namespace                = $conf->{namespace} // 'Route';
+    my $inverse                  = $conf->{inverse} // undef;
     my $path_routes              = $app->home . '/lib/' . $moniker_path;
 
     croak "Routes path ($path_routes) does not exist!" unless -d $path_routes;
@@ -28,7 +29,7 @@ sub register {
 
     $self->_find_files($path_routes);
 
-    $self->_load_routes($app, $moniker, $namespace);
+    $self->_load_routes($app, $moniker, $namespace, $inverse);
 }
 
 sub _find_files {
@@ -55,7 +56,7 @@ sub _find_files {
 }
 
 sub _load_routes {
-    my ($self, $app, $moniker, $namespace) = @_;
+    my ($self, $app, $moniker, $namespace, $inverse) = @_;
 
     my $base = $moniker . '::' . $namespace;
 
@@ -64,60 +65,55 @@ sub _load_routes {
 
         my $class = $self->_load_class($file);
 
-        if ($class && $class->isa('MojoX::Route')) {
+        if ($class && $class->isa('MojoX::Route')) {            
             my $ref = $class->new(app => $app);
 
-            $self->_any($app, $ref, $file, $base)   if $class->can('any');
-            $self->_under($app, $ref, $file, $base) if $class->can('under');
-            $self->_route($app, $ref, $file, $base) if $class->can('route');
+            $self->_any($app, $ref, $file, $base, $inverse)   if $class->can('any');
+            $self->_under($app, $ref, $file, $base, $inverse) if $class->can('under');
+            $self->_route($app, $ref, $file, $base, $inverse) if $class->can('route');
         }
     }
 }
 
 sub _any {
-    my ($self, $app, $ref, $file, $base) = @_;
+    my ($self, $app, $ref, $file, $base, $inverse) = @_;
 
     my ($name, $ref_name) = $self->_ref_name($file, $base);
+    
+    my @params;
+    push(@params, BASE->{references}->{$ref_name}) if $self->_valid_reference($ref_name);
+    push(@params, $app->routes);    
 
-    my $any = $ref->any(
-        $ref_name && defined BASE->{references}->{$ref_name}
-        ? (BASE->{references}->{$ref_name}, $app->routes)
-        : $app->routes
-    );
+    my $any = $ref->any($inverse ? reverse(@params) : @params);
 
     BASE->{references}->{$name} = $any if $any;
 }
 
 sub _under {
-    my ($self, $app, $ref, $file, $base) = @_;
+    my ($self, $app, $ref, $file, $base, $inverse) = @_;
 
     my ($name, $ref_name) = $self->_ref_name($file, $base);
+    
+    my @params;
+    push(@params, BASE->{references}->{$ref_name}) if $self->_valid_reference($ref_name);
+    push(@params, $app->routes);    
 
-    my $under = $ref->under(
-        $ref_name && defined BASE->{references}->{$ref_name}
-        ? (BASE->{references}->{$ref_name}, $app->routes)
-        : $app->routes
-    );
+    my $under = $ref->under($inverse ? reverse(@params) : @params);
 
     BASE->{references}->{$name} = $under if $under;
 }
 
 sub _route {
-    my ($self, $app, $ref, $file, $base) = @_;
+    my ($self, $app, $ref, $file, $base, $inverse) = @_;
 
     my ($name, $ref_name) = $self->_ref_name($file, $base);
+    
+    my @params;
+    push(@params, BASE->{references}->{$name})     if $self->_valid_reference($name);
+    push(@params, BASE->{references}->{$ref_name}) if $self->_valid_reference($ref_name);
+    push(@params, $app->routes);
 
-    $ref->route(
-        (
-            defined BASE->{references}->{$ref_name ? $ref_name . '::' . $name : $name}
-            ? (BASE->{references}->{$ref_name ? $ref_name . '::' . $name : $name}, $app->routes)
-            : ( 
-                $ref_name && defined BASE->{references}->{$ref_name}
-                ? (BASE->{references}->{$ref_name}, $app->routes)
-                : $app->routes
-            )
-        )
-    );
+    $ref->route($inverse ? reverse(@params) : @params);
 }
 
 sub _ref_name {
@@ -159,6 +155,12 @@ sub _get_moniker {
     return ($app->moniker, $app->moniker) unless -d $path . $moniker_path;
 
     return ($moniker, $moniker_path);
+}
+
+sub _valid_reference {
+    my ($self, $name) = @_;
+    
+    return $name && defined BASE->{references}->{$name};
 }
 
 1;
@@ -275,12 +277,33 @@ Similar to method any, the reference of the method under will be saved to be use
 
 =head1 OPTIONS
 
+=head2 inverse
+
+    # Mojolicious::Lite
+    plugin Route => {inverse => 1};
+    
+Inverse option will pass the parameters with inverse format.
+
+If you define inverse to L<Example 2|https://metacpan.org/pod/Mojolicious::Plugin::Route#Example-2> your methods need to receive parameters like this:
+
+    sub under {
+        my ($self, $r, $base) = @_; # parameters inverse
+    }    
+
+    sub route {    
+        my ($self, $r, $base, $under_above) = @_; # parameters inverse
+    }
+
+=head2 namespace
+
     # Mojolicious::Lite
     plugin Route => {namespace => 'Foo'}; # $moniker::Foo
 
 Namespace to load routes from, defaults to $moniker::Route.
 
 =head1 EXAMPLES
+
+=head2 Example 1
 
     package MyApp::Route::Admin;
     use Mojo::Base 'MojoX::Route';
@@ -312,6 +335,49 @@ Namespace to load routes from, defaults to $moniker::Route.
         });
     }
 
+    1;
+    
+=head2 Example 2
+
+    package MyApp::Route::Base;
+    use Mojo::Base 'MojoX::Route';
+
+    sub under {
+        my ($self, $r) = @_;
+
+        $r->under('/base');
+    }  
+    
+    1;
+    
+    package MyApp::Route::Base::Page;
+    use Mojo::Base 'MojoX::Route';
+
+    sub under {
+        my ($self, $base, $r) = @_;
+
+        $base->under('/page');
+    }    
+    
+    sub route {    
+        my ($self, $under_above, $base, $r) = @_;
+        
+        # will create route /base/page/foo
+        $under_above->get('/foo' => sub {
+            shift->render(text => 'Foo');
+        }); 
+        
+        # will create route /base/bar
+        $base->get('/bar' => sub {
+            shift->render(text => 'Bar');
+        });
+        
+        # will create route /baz
+        $r->get('/baz' => sub {
+            shift->render(text => 'Baz');
+        });                       
+    }
+    
     1;
 
 =head1 SEE ALSO

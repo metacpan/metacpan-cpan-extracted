@@ -15,7 +15,8 @@ my %WriteMakefileArgs = (
   "AUTHOR" => "Andreas V\x{f6}gele <voegelas\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "Alien::libmaxminddb" => 0,
-    "ExtUtils::MakeMaker" => 0
+    "ExtUtils::MakeMaker" => 0,
+    "Math::BigInt" => "1.999806"
   },
   "DISTNAME" => "IP-Geolocation-MMDB",
   "LICENSE" => "perl",
@@ -32,7 +33,7 @@ my %WriteMakefileArgs = (
     "File::Spec::Functions" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "1.005",
+  "VERSION" => "1.006",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -65,9 +66,11 @@ delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
 
 WriteMakefile(%WriteMakefileArgs);
 
+# Alien::Base->atleast_version might not be available.
 use Alien::libmaxminddb;
-if (!Alien::libmaxminddb->atleast_version('1.2.0')) {
-  warn "Error: libmaxminddb is too old.\n";
+my $version = Alien::libmaxminddb->version;
+if ($version =~ m{^(0|1\.[01])\.}) {
+  warn "Error: libmaxminddb $version is too old.\n";
   die "OS unsupported\n";
 }
 # Some Math::BigInt versions fail on i386 if Perl is built with -Dusequadmath.

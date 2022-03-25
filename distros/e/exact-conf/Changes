@@ -1,5 +1,8 @@
 Revision history for exact::conf
 
+1.07      2022-03-19 17:35:24-07:00 America/Los_Angeles
+        - Minor documentation update
+
 1.06      2022-01-14 12:01:34-08:00 America/Los_Angeles
         - Add ability to skip Config::App import
 

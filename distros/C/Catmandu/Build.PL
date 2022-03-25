@@ -18,7 +18,7 @@ my %module_build_args = (
     "Nicolas Steenlant, C<< <nicolas.steenlant at ugent.be> >>"
   ],
   "dist_name" => "Catmandu",
-  "dist_version" => "1.2018",
+  "dist_version" => "1.2019",
   "license" => "perl",
   "module_name" => "Catmandu",
   "recommends" => {
@@ -66,7 +66,7 @@ my %module_build_args = (
     "URI::Template" => "0.22",
     "UUID::Tiny" => "1.04",
     "Unicode::Normalize" => 0,
-    "YAML::XS" => "0.41",
+    "YAML::XS" => "0.83",
     "asa" => 0,
     "namespace::clean" => "0.24",
     "perl" => "v5.14.0"

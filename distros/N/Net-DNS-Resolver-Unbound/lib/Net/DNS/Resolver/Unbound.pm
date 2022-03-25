@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 our $VERSION;
-$VERSION = '1.09';
+$VERSION = '1.10';
 
 use Carp;
 use Net::DNS;
@@ -196,7 +196,7 @@ as backup servers.
 
 sub set_fwd {
 	my ( $self, $fwd ) = @_;
-	return $self->{ub_ctx}->set_fwd( $fwd || return );
+	return $self->{ub_ctx}->set_fwd($fwd);
 }
 
 
@@ -344,7 +344,7 @@ sub debug_out {
     $resolver->debug_level(0);
 
 Set verbosity of the debug output directed to stderr.  Level 0 is off,
-1 very minimal, 2 detailed, and 3 lots.
+1 minimal, 2 detailed, 3 lots, and 4 lots more.
 
 =cut
 
@@ -372,6 +372,12 @@ sub async_thread {
 
 
 ########################################
+
+sub nameservers {
+	my $self = shift;
+	local $self->{debug};		## "no nameservers" ok in this context
+	return $self->SUPER::nameservers(@_);
+}
 
 sub string {
 	my $self = shift;
@@ -401,13 +407,12 @@ sub _decode_result {
 
 	my $packet;
 	if ($result) {
+		$self->errorstring('INSECURE') unless $result->secure;
+		$self->errorstring( $result->why_bogus ) if $result->bogus;
+
 		my $buffer = $result->answer_packet;
 		$packet = Net::DNS::Packet->decode( \$buffer, $self->debug );
 		$self->errorstring($@);
-
-		my $secure = $result->secure;
-		my $bogus  = $result->bogus;
-		$self->errorstring( $result->why_bogus );
 	}
 
 	return $packet;
@@ -417,10 +422,22 @@ sub _decode_result {
 sub _finalise_config {
 	my $self = shift;
 	return if $self->{ub_frozen}++;
-	my @nameservers = $self->nameservers;
-	$self->set_fwd( shift @nameservers );
-	$self->set_fwd( shift @nameservers );
-	$self->set_fwd( shift @nameservers );
+
+	my %IP_conf = (
+		force_v4  => ['do-ip6'	   => 'no'],
+		force_v6  => ['do-ip4'	   => 'no'],
+		prefer_v4 => ['prefer-ip4' => 'yes'],
+		prefer_v6 => ['prefer-ip6' => 'yes'] );
+
+	for ( grep { $self->{$_} } qw(prefer_v4 prefer_v6 force_v4 force_v6) ) {
+		my $argref = $IP_conf{$_};
+		$self->option(@$argref);
+	}
+
+	my $count = 3;
+	foreach ( grep { $count-- > 0 } $self->nameservers ) {
+		$self->set_fwd($_);
+	}
 	return;
 }
 

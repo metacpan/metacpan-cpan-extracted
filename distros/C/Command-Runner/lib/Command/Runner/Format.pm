@@ -18,6 +18,9 @@ my $regex = qr/
              )/x;
 
 sub commandf {
+    if (!$ENV{PERL_COMMAND_RUNNER_SUPPRESS_WARNINGS}) {
+        warn "Command::Runner::Format::commandf is deprecated; will be removed in the future version of Command-Runner distribution";
+    }
     my ($format, @args) = @_;
     my $i = 0;
     $format =~ s{$regex}{

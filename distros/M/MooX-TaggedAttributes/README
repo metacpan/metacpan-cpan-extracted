@@ -2,7 +2,8 @@ MooX::TaggedAttributes
 
 This module attaches a tag-value pair to an attribute in a Moo class or
 role, and provides a interface to query which attributes have which
-tags, and what the values are.
+tags, and what the values are. It keeps track of tags for attributes
+through role composition as well as class inheritance.
 
   Tagging Attributes
 

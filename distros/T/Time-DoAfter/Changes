@@ -1,5 +1,8 @@
 Revision history for Time::DoAfter
 
+1.08      2022-03-19 17:52:59-07:00 America/Los_Angeles
+        - Minor documentation update
+
 1.07      2021-01-10 14:37:29-08:00 America/Los_Angeles
         - Migrate to Test2::V0
         - Improve .gitignore file

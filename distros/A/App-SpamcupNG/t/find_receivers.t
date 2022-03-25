@@ -13,12 +13,13 @@ is( scalar( @{$receivers_ref} ),
 
 is_deeply(
     $receivers_ref,
-    [   [ 'google-abuse-bounces-reports',    undef ],
+    [
+        [ 'google-abuse-bounces-reports',    undef ],
         [ 'dl_security_whois@navercorp.com', '7151980235' ],
         [ 'deliverabilityteam#epsilon.com',  undef ]
     ],
     'It has the expected receivers'
-    );
+);
 
 # vim: filetype=perl
 

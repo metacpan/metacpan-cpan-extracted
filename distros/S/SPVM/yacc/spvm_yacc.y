@@ -16,13 +16,14 @@
   #include "spvm_list.h"
   #include "spvm_class.h"
   #include "spvm_descriptor.h"
+  #include "spvm_string.h"
 %}
 
 %token <opval> CLASS HAS METHOD OUR ENUM MY USE AS REQUIRE ALLOW CURRENT_CLASS MUTABLE
 %token <opval> DESCRIPTOR MAKE_READ_ONLY IMPLEMENT
 %token <opval> IF UNLESS ELSIF ELSE FOR WHILE LAST NEXT SWITCH CASE DEFAULT BREAK EVAL
 %token <opval> NAME VAR_NAME CONSTANT EXCEPTION_VAR
-%token <opval> UNDEF VOID BYTE SHORT INT LONG FLOAT DOUBLE STRING OBJECT TRUE FALSE END_OF_FILE
+%token <opval> UNDEF VOID BYTE SHORT INT LONG FLOAT DOUBLE STRING OBJECT ELEMENT OARRAY TRUE FALSE END_OF_FILE
 %token <opval> DOT3 FATCAMMA RW RO WO INIT NEW
 %token <opval> RETURN WEAKEN DIE WARN PRINT CURRENT_CLASS_NAME UNWEAKEN '[' '{' '('
 
@@ -43,7 +44,7 @@
 %type <opval> my_var var implement
 %type <opval> expression opt_expressions expressions opt_expression case_statements
 %type <opval> field_name method_name is_read_only
-%type <opval> type qualified_type basic_type array_type array_type_with_length ref_type  qualified_type_or_void
+%type <opval> type qualified_type basic_type array_type element_array_type oarray_type array_type_with_length ref_type  qualified_type_or_void
 
 %right <opval> ASSIGN SPECIAL_ASSIGN
 %left <opval> LOGICAL_OR
@@ -171,6 +172,8 @@ init_block
   : INIT block
     { 
       SPVM_OP* op_method = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_METHOD, compiler->cur_file, compiler->cur_line);
+      SPVM_STRING* method_name_string = SPVM_STRING_new(compiler, "INIT", strlen("INIT"));
+      const char* method_name = method_name_string->value;
       SPVM_OP* op_method_name = SPVM_OP_new_op_name(compiler, "INIT", compiler->cur_file, compiler->cur_line);
       SPVM_OP* op_void_type = SPVM_OP_new_op_void_type(compiler, compiler->cur_file, compiler->cur_line);
 
@@ -1179,6 +1182,8 @@ qualified_type
 type
   : basic_type
   | array_type
+  | element_array_type
+  | oarray_type
   | ref_type
 
 basic_type
@@ -1249,6 +1254,18 @@ array_type
   | array_type '[' ']'
     {
       $$ = SPVM_OP_build_array_type(compiler, $1, NULL);
+    }
+
+element_array_type
+  : ELEMENT '[' ']'
+    {
+      $$ = SPVM_OP_build_element_array_type(compiler, $1);
+    }
+
+oarray_type
+  : OARRAY
+    {
+      $$ = SPVM_OP_build_element_array_type(compiler, $1);
     }
 
 array_type_with_length

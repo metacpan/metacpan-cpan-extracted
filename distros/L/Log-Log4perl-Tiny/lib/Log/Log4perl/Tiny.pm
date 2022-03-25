@@ -2,7 +2,7 @@ package Log::Log4perl::Tiny;
 
 use strict;
 use warnings;
-{ our $VERSION = '1.4.0'; }
+{ our $VERSION = '1.6.0'; }
 
 use Carp;
 use POSIX ();
@@ -272,7 +272,7 @@ sub emit_log {
         ? $channel->($message, $self)
         : print {$channel} $message;
    }
-   return;
+   return $message;
 } ## end sub emit_log
 
 sub log {
@@ -305,34 +305,50 @@ sub _exit {
 
 sub logwarn {
    my $self = shift;
-   $self->warn(@_);
 
-   # default warning when nothing is passed to warn
-   push @_, "Warning: something's wrong" unless @_;
+   my @message;
+   @message = __expand_message_list({message => \@_})
+      if $self->is_warn() || $LOGDIE_MESSAGE_ON_STDERR;
 
-   # add 'at <file> line <line>' unless argument ends in "\n";
-   my (undef, $file, $line) = caller(1);
-   push @_, sprintf " at %s line %d.\n", $file, $line
-     if substr($_[-1], -1, 1) ne "\n";
+   $self->warn(@message);
 
-   # go for it!
-   CORE::warn(@_) if $LOGDIE_MESSAGE_ON_STDERR;
+   if ($LOGDIE_MESSAGE_ON_STDERR) {
+      # default warning when nothing is passed to warn
+      push @message, "Warning: something's wrong" unless @message;
+
+      # add 'at <file> line <line>' unless argument ends in "\n";
+      my (undef, $file, $line) = caller(1);
+      push @message, sprintf " at %s line %d.\n", $file, $line
+         if substr($message[-1], -1, 1) ne "\n";
+
+      # go for it!
+      CORE::warn(@message);
+   }
+
+   return
 } ## end sub logwarn
 
 sub logdie {
    my $self = shift;
-   $self->fatal(@_);
 
-   # default die message when nothing is passed to die
-   push @_, "Died" unless @_;
+   my @message;
+   @message = __expand_message_list({message => \@_})
+      if $self->is_fatal() || $LOGDIE_MESSAGE_ON_STDERR;
 
-   # add 'at <file> line <line>' unless argument ends in "\n";
-   my (undef, $file, $line) = caller(1);
-   push @_, sprintf " at %s line %d.\n", $file, $line
-     if substr($_[-1], -1, 1) ne "\n";
+   $self->fatal(@message);
 
-   # go for it!
-   CORE::die(@_) if $LOGDIE_MESSAGE_ON_STDERR;
+   if ($LOGDIE_MESSAGE_ON_STDERR) {
+      # default die message when nothing is passed to die
+      push @message, "Died" unless @message;
+
+      # add 'at <file> line <line>' unless argument ends in "\n";
+      my (undef, $file, $line) = caller(1);
+      push @message, sprintf " at %s line %d.\n", $file, $line
+         if substr($message[-1], -1, 1) ne "\n";
+
+      # go for it!
+      CORE::die(@message);
+   }
 
    $self->_exit();
 } ## end sub logdie
@@ -343,63 +359,50 @@ sub logexit {
    $self->_exit();
 }
 
-sub logcarp {
+sub _carpstuff {
    my $self = shift;
+   my $renderer = shift;
+   my $emitter  = shift;
+   my $emit_log = shift;
+
    require Carp;
-   $Carp::Internal{$_} = 1 for __PACKAGE__;
-   if ($self->is_warn()) {    # avoid unless we're allowed to emit
-      my $message = Carp::shortmess(@_);
+   local $Carp::Internal{'' . __PACKAGE__} = 1;
+
+   my @message;
+   @message = __expand_message_list({message => \@_})
+      if $emit_log || $LOGDIE_MESSAGE_ON_STDERR;
+
+   if ($emit_log) {    # avoid unless we're allowed to emit
+      my $message = Carp->can($renderer)->(@message);
       $self->warn($_) for split m{\n}mxs, $message;
    }
    if ($LOGDIE_MESSAGE_ON_STDERR) {
-      local $Carp::CarpLevel = $Carp::CarpLevel + 1;
-      Carp::carp(@_);
+      local $Carp::CarpLevel = $Carp::CarpLevel + 2;
+      Carp->can($emitter)->(@message);
    }
+
    return;
+}
+
+sub logcarp {
+   my $self = shift;
+   return $self->_carpstuff(qw< shortmess carp >, $self->is_warn(), @_);
 } ## end sub logcarp
 
 sub logcluck {
    my $self = shift;
-   require Carp;
-   $Carp::Internal{$_} = 1 for __PACKAGE__;
-   if ($self->is_warn()) {    # avoid unless we're allowed to emit
-      my $message = Carp::longmess(@_);
-      $self->warn($_) for split m{\n}mxs, $message;
-   }
-   if ($LOGDIE_MESSAGE_ON_STDERR) {
-      local $Carp::CarpLevel = $Carp::CarpLevel + 1;
-      Carp::cluck(@_);
-   }
-   return;
+   return $self->_carpstuff(qw< longmess cluck >, $self->is_warn(), @_);
 } ## end sub logcluck
 
 sub logcroak {
    my $self = shift;
-   require Carp;
-   $Carp::Internal{$_} = 1 for __PACKAGE__;
-   if ($self->is_fatal()) {    # avoid unless we're allowed to emit
-      my $message = Carp::shortmess(@_);
-      $self->fatal($_) for split m{\n}mxs, $message;
-   }
-   if ($LOGDIE_MESSAGE_ON_STDERR) {
-      local $Carp::CarpLevel = $Carp::CarpLevel + 1;
-      Carp::croak(@_);
-   }
+   $self->_carpstuff(qw< shortmess croak >, $self->is_fatal(), @_);
    $self->_exit();
 } ## end sub logcroak
 
 sub logconfess {
    my $self = shift;
-   require Carp;
-   $Carp::Internal{$_} = 1 for __PACKAGE__;
-   if ($self->is_fatal()) {    # avoid unless we're allowed to emit
-      my $message = Carp::longmess(@_);
-      $self->fatal($_) for split m{\n}mxs, $message;
-   }
-   if ($LOGDIE_MESSAGE_ON_STDERR) {
-      local $Carp::CarpLevel = $Carp::CarpLevel + 1;
-      Carp::confess(@_);
-   }
+   $self->_carpstuff(qw< longmess confess >, $self->is_fatal(), @_);
    $self->_exit();
 } ## end sub logconfess
 
@@ -423,6 +426,13 @@ sub _set_level_if_first {
    }
    return;
 } ## end sub _set_level_if_first
+
+sub __expand_message_list {
+   join(
+      (defined $, ? $, : ''),
+      map { ref($_) eq 'CODE' ? $_->() : $_; } @{shift->{message}}
+   );
+}
 
 BEGIN {
 
@@ -579,14 +589,7 @@ BEGIN {
             return $line;
          },
       ],
-      m => [
-         s => sub {
-            join(
-               (defined $, ? $, : ''),
-               map { ref($_) eq 'CODE' ? $_->() : $_; } @{shift->{message}}
-            );
-         },
-      ],
+      m => [s => \&__expand_message_list,],
       M => [
          s => sub {
             my ($internal_package) = caller 0;

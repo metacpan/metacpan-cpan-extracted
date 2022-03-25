@@ -1,5 +1,8 @@
 Revision history for Bot::IRC::X::Message
 
+1.06      2022-03-18 08:52:22-07:00 America/Los_Angeles
+        - Minor documentation update
+
 1.05      2021-01-13 11:07:31-08:00 America/Los_Angeles
         - Override some minimum version reqs in dist.ini
 

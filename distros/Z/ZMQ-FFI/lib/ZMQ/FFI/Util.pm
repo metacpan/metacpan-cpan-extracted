@@ -1,11 +1,12 @@
 package ZMQ::FFI::Util;
-$ZMQ::FFI::Util::VERSION = '1.17';
+$ZMQ::FFI::Util::VERSION = '1.18';
 # ABSTRACT: zmq convenience functions
 
 use strict;
 use warnings;
 
 use FFI::Platypus;
+use FFI::CheckLib qw(find_lib);
 use Carp;
 
 use Sub::Exporter -setup => {
@@ -22,38 +23,18 @@ sub zmq_soname {
 
     my $die = $args{die};
 
-    # Try to find a soname available on this system
-    #
-    # Linux .so symlink conventions are linker_name => soname => real_name
-    # e.g. libzmq.so => libzmq.so.X => libzmq.so.X.Y.Z
-    # Unfortunately not all distros follow this convention (Ubuntu). So first
-    # we'll try the linker_name, then the sonames.
-    #
-    # If Linux extensions fail also try platform specific
-    # extensions (e.g. OS X) before giving up.
-    my @sonames = qw(
-        libzmq.so    libzmq.so.5    libzmq.so.4    libzmq.so.3    libzmq.so.1
-        libzmq.dylib libzmq.4.dylib libzmq.3.dylib libzmq.1.dylib
+    my ($soname) = find_lib(
+        lib => 'zmq',
+        alien => 'Alien::ZMQ::latest',
+        verify => sub {
+            my($name, $libpath) = @_;
+            return valid_soname($libpath);
+        },
     );
-
-    my $soname;
-    FIND_SONAME:
-    for (@sonames) {
-        $soname = $_;
-
-        unless ( valid_soname($soname) ) {
-            undef $soname;
-        }
-
-        if ($soname) {
-            last FIND_SONAME;
-        }
-    }
 
     if ( !$soname && $die ) {
         croak
-            qq(Could not load libzmq, tried:\n),
-            join(', ', @sonames),"\n",
+            qq(Could not load libzmq:\n),
             q(Is libzmq on your loader path?);
     }
 
@@ -123,7 +104,7 @@ ZMQ::FFI::Util - zmq convenience functions
 
 =head1 VERSION
 
-version 1.17
+version 1.18
 
 =head1 SYNOPSIS
 
@@ -136,17 +117,8 @@ version 1.17
 
 =head2 zmq_soname([die => 0|1])
 
-Tries to load the following sonames (in order):
-
-    libzmq.so
-    libzmq.so.5
-    libzmq.so.4
-    libzmq.so.3
-    libzmq.so.1
-    libzmq.dylib
-    libzmq.4.dylib
-    libzmq.3.dylib
-    libzmq.1.dylib
+Tries to load C<libzmq> by looking for platform-specific shared library file
+using L<FFI::CheckLib> with a fallback to L<Alien::ZMQ::latest>.
 
 Returns the name of the first one that was successful or undef. If you would
 prefer exceptional behavior pass C<die =E<gt> 1>
@@ -175,7 +147,7 @@ Dylan Cali <calid1984@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Dylan Cali.
+This software is copyright (c) 2022 by Dylan Cali.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

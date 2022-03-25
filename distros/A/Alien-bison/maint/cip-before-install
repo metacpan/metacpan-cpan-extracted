@@ -15,6 +15,13 @@ if echo $CIP_ENV | grep -q system; then
   cip sudo apt-get -y install bison
 else
   echo use internet bison
+  if echo $CIP_TAG | grep -q fedora; then
+    cip sudo dnf install -y m4
+  else
+    cip sudo apt-get update
+    cip sudo apt-get -y install m4
+  fi
+  env ALIEN_INSTALL_TYPE=default cip exec cpanm -n Alien::m4
 fi
 
-cip sudo dzil-cpanm -n Alien::Build::Plugin::Probe::GnuWin32
+cip exec dzil-cpanm -n Alien::Build::Plugin::Probe::GnuWin32

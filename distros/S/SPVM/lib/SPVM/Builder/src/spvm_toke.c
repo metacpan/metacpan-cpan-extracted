@@ -179,7 +179,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
             
             // Create moudle relative file name from class name by changing :: to / and add ".spvm"
             int32_t cur_rel_file_length = (int32_t)(strlen(class_name) + 6);
-            char* cur_rel_file = SPVM_ALLOCATOR_new_block_compile_eternal(compiler, cur_rel_file_length + 1);
+            char* cur_rel_file = SPVM_ALLOCATOR_alloc_memory_block_permanent(compiler->allocator, cur_rel_file_length + 1);
             const char* bufptr_orig = class_name;
             char* bufptr_to = cur_rel_file;
             while (*bufptr_orig) {
@@ -217,7 +217,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                 
                 // File name
                 int32_t file_name_length = (int32_t)(strlen(module_dir) + 1 + strlen(cur_rel_file));
-                cur_file = SPVM_ALLOCATOR_new_block_compile_eternal(compiler, file_name_length + 1);
+                cur_file = SPVM_ALLOCATOR_alloc_memory_block_permanent(compiler->allocator, file_name_length + 1);
                 sprintf(cur_file, "%s/%s", module_dir, cur_rel_file);
                 cur_file[file_name_length] = '\0';
                 
@@ -244,7 +244,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                     const char* module_dir = (const char*) SPVM_LIST_fetch(compiler->module_dirs, i);
                     moduler_dirs_str_length += 1 + strlen(module_dir);
                   }
-                  char* moduler_dirs_str = SPVM_ALLOCATOR_new_block_compile_eternal(compiler, moduler_dirs_str_length + 1);
+                  char* moduler_dirs_str = SPVM_ALLOCATOR_alloc_memory_block_permanent(compiler->allocator, moduler_dirs_str_length + 1);
                   int32_t moduler_dirs_str_offset = 0;
                   for (int32_t i = 0; i < module_dirs_length; i++) {
                     const char* module_dir = (const char*) SPVM_LIST_fetch(compiler->module_dirs, i);
@@ -267,10 +267,10 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                   return 0;
                 }
                 fseek(fh, 0, SEEK_SET);
-                char* src = SPVM_ALLOCATOR_new_block_compile_eternal(compiler, file_size + 1);
+                char* src = SPVM_ALLOCATOR_alloc_memory_block_permanent(compiler->allocator, file_size + 1);
                 if ((int32_t)fread(src, 1, file_size, fh) < file_size) {
                   SPVM_COMPILER_error(compiler, "Can't read file %s at %s line %d", cur_file, op_use->file, op_use->line);
-                  SPVM_ALLOCATOR_free_block_compile_tmp(compiler, src);
+                  SPVM_ALLOCATOR_free_memory_block_tmp(compiler->allocator, src);
                   return 0;
                 }
                 fclose(fh);
@@ -316,10 +316,13 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                 compiler->cur_file = cur_file;
               }
               else {
-                char* embedded_file_name = (char*)SPVM_ALLOCATOR_new_block_compile_eternal(compiler, 11 + strlen(cur_rel_file) + 1);
+                char* embedded_file_name = (char*)SPVM_ALLOCATOR_alloc_memory_block_permanent(compiler->allocator, 11 + strlen(cur_rel_file) + 1);
                 sprintf(embedded_file_name, "embedded://%s", cur_rel_file);
                 compiler->cur_file = embedded_file_name;
               }
+              
+              SPVM_STRING* cur_file_string = SPVM_STRING_new(compiler, compiler->cur_file, strlen(compiler->cur_file));
+              compiler->cur_file = cur_file_string->value;
               
               // Set initial information for tokenization
               compiler->bufptr = compiler->cur_src;
@@ -863,9 +866,9 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                   || (*compiler->bufptr >= 'a' && *compiler->bufptr <= 'f')
                   || (*compiler->bufptr >= 'A' && *compiler->bufptr <= 'F'))
               {
-                int32_t memory_blocks_count_compile_tmp = compiler->allocator->memory_blocks_count_compile_tmp;
+                int32_t memory_blocks_count_tmp = compiler->allocator->memory_blocks_count_tmp;
                 
-                char* num_str = SPVM_ALLOCATOR_new_block_compile_tmp(compiler, 3);
+                char* num_str = SPVM_ALLOCATOR_alloc_memory_block_tmp(compiler->allocator, 3);
                 num_str[0] = *compiler->bufptr;
                 compiler->bufptr++;
                 if (
@@ -882,8 +885,8 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                   SPVM_COMPILER_error(compiler, "A invalid hexadecimal ascii code \"\\x%c%c\" in the second hexadecimal character of the charater literal at %s line %d", *(compiler->bufptr - 1), *compiler->bufptr, compiler->cur_file, compiler->cur_line);
                   compiler->bufptr++;
                 }
-                SPVM_ALLOCATOR_free_block_compile_tmp(compiler, num_str);
-                assert(compiler->allocator->memory_blocks_count_compile_tmp == memory_blocks_count_compile_tmp);
+                SPVM_ALLOCATOR_free_memory_block_tmp(compiler->allocator, num_str);
+                assert(compiler->allocator->memory_blocks_count_tmp == memory_blocks_count_tmp);
               }
               else {
                 SPVM_COMPILER_error(compiler, "A invalid hexadecimal ascii code \"\\x%c%c\" in the first hexadecimal character of the charater literal at %s line %d", *compiler->bufptr, *(compiler->bufptr + 1), compiler->cur_file, compiler->cur_line);
@@ -932,10 +935,10 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
         int8_t next_state_var_expansion = SPVM_TOKE_C_STATE_VAR_EXPANSION_DEFAULT;
         
         char* string_literal_tmp;
-        int32_t memory_blocks_count_compile_tmp = compiler->allocator->memory_blocks_count_compile_tmp;
+        int32_t memory_blocks_count_tmp = compiler->allocator->memory_blocks_count_tmp;
         int32_t string_literal_length = 0;
         if (*(compiler->bufptr) == '"') {
-          string_literal_tmp = SPVM_ALLOCATOR_new_block_compile_tmp(compiler, 1);
+          string_literal_tmp = SPVM_ALLOCATOR_alloc_memory_block_tmp(compiler->allocator, 1);
           string_literal_tmp[0] = '\0';
           compiler->bufptr++;
         }
@@ -1063,7 +1066,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
 
           compiler->bufptr++;
           
-          string_literal_tmp = SPVM_ALLOCATOR_new_block_compile_tmp(compiler, string_literal_tmp_len + 1);
+          string_literal_tmp = SPVM_ALLOCATOR_alloc_memory_block_tmp(compiler->allocator, string_literal_tmp_len + 1);
           {
             char* char_ptr = (char*)cur_token_ptr;
             while (char_ptr != compiler->bufptr - 1) {
@@ -1122,8 +1125,8 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                 else if (*char_ptr == 'x') {
                   char_ptr++;
                   if (*char_ptr == '0' || *char_ptr == '1' || *char_ptr == '2' || *char_ptr == '3' || *char_ptr == '4' || *char_ptr == '5' || *char_ptr == '6' || *char_ptr == '7') {
-                    int32_t memory_blocks_count_compile_tmp = compiler->allocator->memory_blocks_count_compile_tmp;
-                    char* num_str = SPVM_ALLOCATOR_new_block_compile_tmp(compiler, 3);
+                    int32_t memory_blocks_count_tmp = compiler->allocator->memory_blocks_count_tmp;
+                    char* num_str = SPVM_ALLOCATOR_alloc_memory_block_tmp(compiler->allocator, 3);
                     num_str[0] = *char_ptr;
                     char_ptr++;
                     if (
@@ -1142,8 +1145,8 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                     else {
                       SPVM_COMPILER_error(compiler, "Invalid ascii code in escape character of string literal at %s line %d", compiler->cur_file, compiler->cur_line);
                     }
-                    SPVM_ALLOCATOR_free_block_compile_tmp(compiler, num_str);
-                    assert(compiler->allocator->memory_blocks_count_compile_tmp == memory_blocks_count_compile_tmp);
+                    SPVM_ALLOCATOR_free_memory_block_tmp(compiler->allocator, num_str);
+                    assert(compiler->allocator->memory_blocks_count_tmp == memory_blocks_count_tmp);
                   }
                   else {
                     SPVM_COMPILER_error(compiler, "Invalid ascii code in escape character of string literal at %s line %d", compiler->cur_file, compiler->cur_line);
@@ -1175,8 +1178,8 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                         SPVM_COMPILER_error(compiler, "Too big unicode code point at %s line %d", compiler->cur_file, compiler->cur_line);
                       }
                       else {
-                        int32_t memory_blocks_count_compile_tmp = compiler->allocator->memory_blocks_count_compile_tmp;
-                        char* unicode_chars = SPVM_ALLOCATOR_new_block_compile_tmp(compiler, unicode_chars_length + 1);
+                        int32_t memory_blocks_count_tmp = compiler->allocator->memory_blocks_count_tmp;
+                        char* unicode_chars = SPVM_ALLOCATOR_alloc_memory_block_tmp(compiler->allocator, unicode_chars_length + 1);
                         memcpy(unicode_chars, char_start_ptr, unicode_chars_length);
                         char *end;
                         int32_t unicode = (int32_t)strtoll(unicode_chars, &end, 16);
@@ -1193,8 +1196,8 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                         else {
                           SPVM_COMPILER_error(compiler, "Invalid unicode code point at %s line %d", compiler->cur_file, compiler->cur_line);
                         }
-                        SPVM_ALLOCATOR_free_block_compile_tmp(compiler, unicode_chars);
-                        assert(compiler->allocator->memory_blocks_count_compile_tmp == memory_blocks_count_compile_tmp);
+                        SPVM_ALLOCATOR_free_memory_block_tmp(compiler->allocator, unicode_chars);
+                        assert(compiler->allocator->memory_blocks_count_tmp == memory_blocks_count_tmp);
                       }
                     }
                     else {
@@ -1303,8 +1306,8 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
         SPVM_STRING* string_literal_string = SPVM_STRING_new(compiler, string_literal_tmp, string_literal_length);
         const char* string_literal = string_literal_string->value;
 
-        SPVM_ALLOCATOR_free_block_compile_tmp(compiler, string_literal_tmp);
-        assert(compiler->allocator->memory_blocks_count_compile_tmp == memory_blocks_count_compile_tmp);
+        SPVM_ALLOCATOR_free_memory_block_tmp(compiler->allocator, string_literal_tmp);
+        assert(compiler->allocator->memory_blocks_count_tmp == memory_blocks_count_tmp);
         
         SPVM_OP* op_constant = SPVM_OP_new_op_constant_string(compiler, string_literal, string_literal_length, compiler->cur_file, compiler->cur_line);
         
@@ -1387,8 +1390,8 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
             int32_t var_name_length_without_sigil = compiler->bufptr - cur_token_ptr;
             int32_t var_name_length = var_name_length_without_sigil + 1;
 
-            int32_t memory_blocks_count_compile_tmp_var_name_tmp = compiler->allocator->memory_blocks_count_compile_tmp;
-            char* var_name_tmp = SPVM_ALLOCATOR_new_block_compile_tmp(compiler, 1 + var_name_length_without_sigil + 1);
+            int32_t memory_blocks_count_tmp_var_name_tmp = compiler->allocator->memory_blocks_count_tmp;
+            char* var_name_tmp = SPVM_ALLOCATOR_alloc_memory_block_tmp(compiler->allocator, 1 + var_name_length_without_sigil + 1);
             var_name_tmp[0] = '$';
             memcpy(&var_name_tmp[1], cur_token_ptr, var_name_length_without_sigil);
             var_name_tmp[1 + var_name_length_without_sigil] = '\0';
@@ -1396,8 +1399,8 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
             SPVM_STRING* var_name_string = SPVM_STRING_new(compiler, var_name_tmp, 1 + var_name_length_without_sigil);
             const char* var_name = var_name_string->value;
             
-            SPVM_ALLOCATOR_free_block_compile_tmp(compiler, var_name_tmp);
-            assert(compiler->allocator->memory_blocks_count_compile_tmp == memory_blocks_count_compile_tmp_var_name_tmp);
+            SPVM_ALLOCATOR_free_memory_block_tmp(compiler->allocator, var_name_tmp);
+            assert(compiler->allocator->memory_blocks_count_tmp == memory_blocks_count_tmp_var_name_tmp);
 
             if (have_brace) {
               if (*compiler->bufptr == '}') {
@@ -1524,8 +1527,8 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
           int32_t str_len = (compiler->bufptr - cur_token_ptr);
           
           // Ignore under line
-          int32_t num_str_memoyr_blocks_count = compiler->allocator->memory_blocks_count_compile_tmp;
-          char* num_str = (char*)SPVM_ALLOCATOR_new_block_compile_tmp(compiler, str_len + 2);
+          int32_t num_str_memoyr_blocks_count = compiler->allocator->memory_blocks_count_tmp;
+          char* num_str = (char*)SPVM_ALLOCATOR_alloc_memory_block_tmp(compiler->allocator, str_len + 2);
           int32_t pos = 0;
           {
             int32_t i;
@@ -1686,8 +1689,8 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
           else {
             assert(0);
           }
-          SPVM_ALLOCATOR_free_block_compile_tmp(compiler, num_str);
-          assert(compiler->allocator->memory_blocks_count_compile_tmp == num_str_memoyr_blocks_count);
+          SPVM_ALLOCATOR_free_memory_block_tmp(compiler->allocator, num_str);
+          assert(compiler->allocator->memory_blocks_count_tmp == num_str_memoyr_blocks_count);
 
           // Constant op
           SPVM_OP* op_constant;
@@ -1733,7 +1736,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
           
           // Keyword name
           int32_t symbol_name_length = (compiler->bufptr - cur_token_ptr);
-          char* symbol_name = SPVM_ALLOCATOR_new_block_compile_tmp(compiler, symbol_name_length + 1);
+          char* symbol_name = SPVM_ALLOCATOR_alloc_memory_block_tmp(compiler->allocator, symbol_name_length + 1);
           memcpy(symbol_name, cur_token_ptr, symbol_name_length);
           symbol_name[symbol_name_length] = '\0';
           
@@ -1855,7 +1858,12 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                 break;
               }
               case 'e' : {
-                if (strcmp(symbol_name, "elsif") == 0) {
+                if (strcmp(symbol_name, "element") == 0) {
+                  yylvalp->opval = SPVM_TOKE_new_op(compiler, SPVM_OP_C_ID_ELEMENT);
+                  is_keyword = 1;
+                  keyword_term = ELEMENT;
+                }
+                else if (strcmp(symbol_name, "elsif") == 0) {
                   yylvalp->opval = SPVM_TOKE_new_op(compiler, SPVM_OP_C_ID_ELSIF);
                   is_keyword = 1;
                   keyword_term = ELSIF;
@@ -2063,7 +2071,12 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                 break;
               }
               case 'o' : {
-                if (strcmp(symbol_name, "our") == 0) {
+                if (strcmp(symbol_name, "oarray") == 0) {
+                  yylvalp->opval = SPVM_TOKE_new_op(compiler, SPVM_OP_C_ID_OARRAY);
+                  is_keyword = 1;
+                  keyword_term = OARRAY;
+                }
+                else if (strcmp(symbol_name, "our") == 0) {
                   yylvalp->opval = SPVM_TOKE_new_op(compiler, SPVM_OP_C_ID_CLASS_VAR);
                   is_keyword = 1;
                   keyword_term = OUR;
@@ -2318,7 +2331,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
           }
 
           // Free symbol name
-          SPVM_ALLOCATOR_free_block_compile_tmp(compiler, symbol_name);
+          SPVM_ALLOCATOR_free_memory_block_tmp(compiler->allocator, symbol_name);
           
           return term;
         }

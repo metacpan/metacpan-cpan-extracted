@@ -6,7 +6,7 @@ use exact;
 
 use Math::Expression;
 
-our $VERSION = '1.38'; # VERSION
+our $VERSION = '1.39'; # VERSION
 
 sub init {
     my ($bot) = @_;
@@ -42,7 +42,7 @@ Bot::IRC::Math - Bot::IRC evaluate math expressions and return results
 
 =head1 VERSION
 
-version 1.38
+version 1.39
 
 =head1 SYNOPSIS
 
@@ -74,7 +74,7 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016-2021 by Gryphon Shafer.
+This software is Copyright (c) 2016-2050 by Gryphon Shafer.
 
 This is free software, licensed under:
 

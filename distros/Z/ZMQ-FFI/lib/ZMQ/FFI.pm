@@ -1,5 +1,5 @@
 package ZMQ::FFI;
-$ZMQ::FFI::VERSION = '1.17';
+$ZMQ::FFI::VERSION = '1.18';
 # ABSTRACT: version agnostic Perl bindings for zeromq using ffi
 
 use strict;
@@ -65,13 +65,13 @@ ZMQ::FFI - version agnostic Perl bindings for zeromq using ffi
 
 =head1 VERSION
 
-version 1.17
+version 1.18
 
 =head1 SYNOPSIS
 
     #### send/recv ####
 
-    use v5.10;
+    use 5.012;
     use ZMQ::FFI qw(ZMQ_REQ ZMQ_REP);
 
     my $endpoint = "ipc://zmq-ffi-$$";
@@ -91,7 +91,7 @@ version 1.17
 
     #### pub/sub ####
 
-    use v5.10;
+    use 5.012;
     use ZMQ::FFI qw(ZMQ_PUB ZMQ_SUB);
     use Time::HiRes q(usleep);
 
@@ -141,7 +141,7 @@ version 1.17
 
     #### multipart ####
 
-    use v5.10;
+    use 5.012;
     use ZMQ::FFI qw(ZMQ_DEALER ZMQ_ROUTER);
 
     my $endpoint = "ipc://zmq-ffi-$$";
@@ -163,7 +163,7 @@ version 1.17
 
     #### nonblocking ####
 
-    use v5.10;
+    use 5.012;
     use ZMQ::FFI qw(ZMQ_PUSH ZMQ_PULL);
     use AnyEvent;
     use EV;
@@ -621,7 +621,7 @@ L<https://gist.github.com/calid/17df5bcfb81c83786d6f>
 C<ZMQ::FFI> is free as in beer in addition to being free as in speech. While
 I've done my best to ensure it's tasty, high quality beer, it probably isn't perfect.
 If you encounter problems, or otherwise see room for improvement, please open
-an issue (or even better a pull request!) on L<github|https://github.com/calid/zmq-ffi>
+an issue (or even better a pull request!) on L<github|https://github.com/zeromq/perlzmq>
 
 =head1 SEE ALSO
 
@@ -649,13 +649,20 @@ L<ZMQ::LibZMQ3>
 
 =back
 
+=head1 CREDITS
+
+Thank you to the following for patches, bug reports, feedback, or suggestions:
+
+Dave Lambley, Graham Ollis, Klaus Ita, Marc Mims, Parth Gandhi, Pawel Pabian,
+Robert Hunter, Sergey KHripchenko, Slaven Rezic, Whitney Jackson, pipcet
+
 =head1 AUTHOR
 
 Dylan Cali <calid1984@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Dylan Cali.
+This software is copyright (c) 2022 by Dylan Cali.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

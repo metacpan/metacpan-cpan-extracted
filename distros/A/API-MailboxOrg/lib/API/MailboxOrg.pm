@@ -20,7 +20,7 @@ use Types::Standard qw(Str);
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '1.0.1'; # VERSION
+our $VERSION = '1.0.2'; # VERSION
 
 has user     => ( is => 'ro', isa => Str, required => 1 );
 has password => ( is => 'ro', isa => Str, required => 1 );
@@ -73,7 +73,7 @@ API::MailboxOrg - Perl library to work with the API for the Mailbox.org API
 
 =head1 VERSION
 
-version 1.0.1
+version 1.0.2
 
 =head1 SYNOPSIS
 

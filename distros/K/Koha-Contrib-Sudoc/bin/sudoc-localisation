@@ -4,7 +4,7 @@
 # ABSTRACT: Génération de fichier de localisation automatique dans le Sudoc
 
 package Main;
-$Main::VERSION = '2.36';
+$Main::VERSION = '2.37';
 use Modern::Perl;
 use utf8;
 use Getopt::Long;
@@ -61,7 +61,7 @@ sudoc-localisation - Génération de fichier de localisation automatique dans le
 
 =head1 VERSION
 
-version 2.36
+version 2.37
 
 =head1 AUTHOR
 
@@ -69,7 +69,7 @@ Frédéric Demians <f.demians@tamil.fr>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2021 by Fréderic Demians.
+This software is Copyright (c) 2022 by Fréderic Demians.
 
 This is free software, licensed under:
 

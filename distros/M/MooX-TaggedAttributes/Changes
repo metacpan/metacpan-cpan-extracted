@@ -1,5 +1,20 @@
 Revision history for MooX-TaggedAttributes
 
+0.15      2022-03-21 20:24:26-04:00 America/New_York
+
+  [BUG FIX]
+
+  * The tag role's import() method was installed into a consuming
+    class, which caused problems if the class had its own import
+    method.
+
+0.14      2022-03-18 21:54:04-04:00 America/New_York
+
+  [EXPERIMENTAL]
+
+  * allow piggy-backing of tag handler wrappers via -handler import
+    option.
+
 0.13      2022-03-15 18:16:06-04:00 America/New_York
 
   [ENHANCEMENT]

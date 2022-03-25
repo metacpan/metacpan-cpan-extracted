@@ -7,7 +7,7 @@ use App::pwhich;
 
 # PODNAME: pwhich
 # ABSTRACT: Pure Perl implementation of which
-our $VERSION = '1.16'; # VERSION
+our $VERSION = '1.17'; # VERSION
 
 exit App::pwhich::main('which', @ARGV);
 
@@ -23,7 +23,7 @@ pwhich - Pure Perl implementation of which
 
 =head1 VERSION
 
-version 1.16
+version 1.17
 
 =head1 SYNOPSIS
 
@@ -68,7 +68,7 @@ Prints version (of C<File::Which>) and copyright notice and exits.
 =head1 SUPPORT
 
 Bugs should be reported via the GitHub issue tracker
-L<https://github.com/plicease/App-pwhich/issues>
+L<https://github.com/uperl/App-pwhich/issues>
 For other issues, contact the maintainer.
 
 =head1 SEE ALSO
@@ -94,6 +94,11 @@ command C<which> and C<where> usually do.
 
 This module is fully supported back to Perl 5.8.1.  It may work on 5.8.0.
 
+If you want these executables installed without the C<p> prefix
+(useful on platforms like windows that do not have their own
+native which or where), set C<PERL_APP_PWHICH_NO_PREFIX> to
+C<no-prefix> during install of this module.
+
 =head1 AUTHOR
 
 Original author: Per Einar Ellefsen E<lt>pereinar@cpan.orgE<gt>
@@ -106,7 +111,7 @@ Adam Kennedy E<lt>adamk@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2002 by Per Einar Ellefsen <pereinar@cpan.org>.
+This software is copyright (c) 2002-2022 by Per Einar Ellefsen <pereinar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

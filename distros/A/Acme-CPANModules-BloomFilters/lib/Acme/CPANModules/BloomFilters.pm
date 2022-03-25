@@ -3,12 +3,12 @@ package Acme::CPANModules::BloomFilters;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-10-19'; # DATE
+our $DATE = '2022-03-18'; # DATE
 our $DIST = 'Acme-CPANModules-BloomFilters'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 our $LIST = {
-    summary => "Bloom filter modules on CPAN",
+    summary => "List of bloom filter modules on CPAN",
     description => <<'_',
 
 Bloom filter is a data structure that allows you to quickly check whether an
@@ -113,7 +113,7 @@ _
 };
 
 1;
-# ABSTRACT: Bloom filter modules on CPAN
+# ABSTRACT: List of bloom filter modules on CPAN
 
 __END__
 
@@ -123,11 +123,11 @@ __END__
 
 =head1 NAME
 
-Acme::CPANModules::BloomFilters - Bloom filter modules on CPAN
+Acme::CPANModules::BloomFilters - List of bloom filter modules on CPAN
 
 =head1 VERSION
 
-This document describes version 0.003 of Acme::CPANModules::BloomFilters (from Perl distribution Acme-CPANModules-BloomFilters), released on 2021-10-19.
+This document describes version 0.004 of Acme::CPANModules::BloomFilters (from Perl distribution Acme-CPANModules-BloomFilters), released on 2022-03-18.
 
 =head1 DESCRIPTION
 
@@ -150,30 +150,38 @@ used to reduce the number of direct queries to database.
 In Perl, my default go-to choice is L<Algorithm::BloomFilter>, unless there's
 a specific feature I need from other implementations.
 
-=head1 ACME::MODULES ENTRIES
+=head1 ACME::CPANMODULES ENTRIES
 
 =over
 
-=item * L<Bloom::Filter>
+=item * L<Bloom::Filter> - Sample Perl Bloom filter implementation
+
+Author: L<XAERXESS|https://metacpan.org/author/XAERXESS>
 
 Does not provide mehods to save/load to/from strings/files, although you can
 just take a peek at the source code or the hash object and get the filter there.
 Performance might not be stellar since it's pure-Perl.
 
 
-=item * L<Bloom16>
+=item * L<Bloom16> - Perl extension for "threshold" Bloom filters
+
+Author: L<IWOODHEAD|https://metacpan.org/author/IWOODHEAD>
 
 An Inline::C module. Barely documented. Also does not provide filter
 saving/loading methods.
 
 
-=item * L<Algorithm::BloomFilter>
+=item * L<Algorithm::BloomFilter> - A simple bloom filter data structure
+
+Author: L<SMUELLER|https://metacpan.org/author/SMUELLER>
 
 XS, made by SMUELLER. Can merge other bloom filters. Provides serialize and
 deserialize methods.
 
 
-=item * L<Bloom::Scalable>
+=item * L<Bloom::Scalable> - Implementation of the probalistic datastructure - ScalableBloomFilter
+
+Author: L<SUBBU|https://metacpan.org/author/SUBBU>
 
 Pure-perl module. A little weird, IMO, e.g. with hardcoded filenames. The
 distribution also provides L<Bloom::Simple>.
@@ -181,11 +189,15 @@ distribution also provides L<Bloom::Simple>.
 
 =item * L<Bloom::Simple>
 
+Author: L<SUBBU|https://metacpan.org/author/SUBBU>
+
 Pure-perl module. A little weird, IMO, e.g. with hardcoded filenames.
 The distribution also provides L<Bloom::Simple>.
 
 
-=item * L<Bloom::Faster>
+=item * L<Bloom::Faster> - Perl extension for the c library libbloom.
+
+Author: L<PALVARO|https://metacpan.org/author/PALVARO>
 
 XS module. Serialize/deserialize directly to/from files, no string
 (de)serialization provided.
@@ -193,10 +205,14 @@ XS module. Serialize/deserialize directly to/from files, no string
 
 =item * L<Text::Bloom>
 
+Author: L<ASPINELLI|https://metacpan.org/author/ASPINELLI>
+
 Pure-Perl module, part of Text-Document distribution. Uses L<Bit::Vector>.
 
 
-=item * L<App::BloomUtils>
+=item * L<App::BloomUtils> - Utilities related to bloom filters
+
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
 =item * L<Bencher::Scenarios::BloomFilters>
 
@@ -274,7 +290,7 @@ beyond that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2018 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2021, 2018 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

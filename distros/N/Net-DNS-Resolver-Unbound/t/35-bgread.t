@@ -1,9 +1,10 @@
 #!/usr/bin/perl
+# $Id$	-*-perl-*-
 #
 
 use strict;
 use warnings;
-use Test::More tests => 16;
+use Test::More tests => 15;
 
 use Net::DNS;
 use Net::DNS::Resolver::Unbound;
@@ -24,11 +25,10 @@ for ( my $handle = Net::DNS::Resolver::libunbound::emulate_wait(123) ) {
 	is( $handle->async_id(),	123,   'handle->async_id' );
 	is( $handle->result(),		undef, 'no handle->result' );
 	ok( !$handle->err(), 'no handle->err' );
-	is( $resolver->errorstring(), undef, 'no error' );
 }
 
 
-for ( my $handle = Net::DNS::Resolver::libunbound::emulate_error( 123, -99 ) ) {
+for ( my $handle = Net::DNS::Resolver::libunbound::emulate_callback( 123, -99 ) ) {
 	ok( !$handle->waiting(),	 'not handle->waiting' );
 	ok( !$resolver->bgbusy($handle), 'not bgbusy' );
 	is( $resolver->bgread($handle), undef, 'undefined bgread' );

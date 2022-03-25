@@ -4,7 +4,7 @@ use 5.006002;
 use strict;
 use warnings;
 
-our $VERSION = '1.024';
+our $VERSION = '1.025';
 
 my %introduces = do { no warnings 'qw';
                  ( '5.034' => [qw[
@@ -269,7 +269,7 @@ Syntax::Construct - Explicitly state which non-feature constructs are used in th
 
 =head1 VERSION
 
-Version 1.024
+Version 1.025
 
 =head1 SYNOPSIS
 
@@ -866,19 +866,19 @@ L<It is now possible to write \p{Name=...} in perl5320delta|perl5320delta/It>
 
 =head3 {,n}
 
-L<perldelta/qr/%7B,n%7D/ is now accepted>
+L<perl5340delta/qr/%7B,n%7D/ is now accepted>
 
 Alias: empty-left-quantifier
 
 =head3 0o
 
-L<perldelta/New octal syntax 0oddddd>
+L<perl5340delta/New octal syntax 0oddddd>
 
 Alias: octal-literals
 
 =head3 blanks-in-curlies
 
-L<perldelta/Blanks freely allowed within but adjacent to curly braces>
+L<perl5340delta/Blanks freely allowed within but adjacent to curly braces>
 
 =for completeness
 =head2 old

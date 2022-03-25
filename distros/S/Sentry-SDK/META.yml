@@ -3,6 +3,9 @@ abstract: 'sentry.io integration'
 author:
   - 'Philipp Busse <pmb@heise.de>'
 build_requires:
+  CGI: '0'
+  CGI::Application: '0'
+  Capture::Tiny: '0'
   LWP::UserAgent: '0'
   Perl::Critic: '0'
   Test::Exception: '0'
@@ -27,6 +30,12 @@ no_index:
     - share
     - t
     - xt
+optional_features:
+  cgiapp:
+    description: 'CGI::Application plugin'
+    requires:
+      CGI: '0'
+      CGI::Application: '0'
 requires:
   Clone: '0'
   HTTP::Status: '0'
@@ -41,7 +50,7 @@ resources:
   bugtracker: https://github.com/heiseonline/perl-sentry-sdk/issues
   homepage: https://github.com/heiseonline/perl-sentry-sdk
   repository: https://github.com/heiseonline/perl-sentry-sdk.git
-version: v1.0.18
+version: v1.0.20
 x_contributors:
   - 'bsd <bsd@heise.de>'
   - 'pmb0 <2140915+pmb0@users.noreply.github.com>'

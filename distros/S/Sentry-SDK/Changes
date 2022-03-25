@@ -1,6 +1,14 @@
 Revision history for Sentry-SDK
 
 
+v1.0.20  2022-03-22 22:39:32 CET
+
+  - Chore: Fixed missing dev/optional deps.
+
+v1.0.19  2022-03-21 18:38:01 CET
+
+  - Fix: Properly determine the URL in the CGI::Application plugin.
+
 v1.0.18  2022-03-17 12:49:16 CET
 
   - Fix: The event level of an exception should be "error".

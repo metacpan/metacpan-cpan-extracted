@@ -16,17 +16,5 @@ SKIP: {
     like( $alien->libs,   qr/-L/ , 'libs');
 }
 
-TODO: {
-    local $TODO = 'data_dir does not work across all platforms yet';
-    my $data_dir = eval {$alien->data_dir};
-    diag $@ if $@;
-    diag "Data dir is $data_dir";
-    ok ($data_dir && -d $data_dir, "data dir exists (" . ($data_dir // '') . ")");
-    if (versioncmp (Alien::gdal->version, 3) < 0) {
-        #  does not exist under 3.0 and higher
-        ok ($data_dir && -e "$data_dir/gcs.csv", "Found coordinate systems file (gcs.csv)");
-    }
-}
-
 done_testing();
 

@@ -7,7 +7,7 @@ use Test::More;
 use Test::Exception;
 use Test::RequiresInternet ( 'api.ispapi.net' => 443 );
 
-use version 0.9917; our $VERSION = version->declare('v2.10.2');
+our $VERSION = 'v2.10.3';
 
 # T1-4: test import modules
 use_ok('Config');
@@ -402,7 +402,7 @@ $cl->setSession(q{});
 
 # T69 ~> getURL method test
 my $url = $cl->getURL();
-is( $url, $WebService::Hexonet::Connector::APIClient::ISPAPI_CONNECTION_URL, 'AC: Check getURL result. #1' );
+is( $url, $WebService::Hexonet::Connector::APIClient::ISPAPI_CONNECTION_URL_LIVE, 'AC: Check getURL result. #1' );
 # check highperformance connection setup
 $cl->useHighPerformanceConnectionSetup();
 $url = $cl->getURL();
@@ -410,7 +410,7 @@ is( $url, $WebService::Hexonet::Connector::APIClient::ISPAPI_CONNECTION_URL_PROX
 # check default connection setup
 $cl->useDefaultConnectionSetup();
 $url = $cl->getURL();
-is( $url, $WebService::Hexonet::Connector::APIClient::ISPAPI_CONNECTION_URL, 'AC: Check getURL result. #3' );
+is( $url, $WebService::Hexonet::Connector::APIClient::ISPAPI_CONNECTION_URL_LIVE, 'AC: Check getURL result. #3' );
 # check get-/setreferer
 $cl->setReferer('https://www.hexonet.net/');
 is( $cl->getReferer(), 'https://www.hexonet.net/', 'AC: Check setReferer result. #1' );
@@ -425,7 +425,7 @@ is( $cl->getProxy(), undef, 'AC: Check setProxy result. #2' );
 # T70 ~> setURL method test
 $url = $cl->setURL($WebService::Hexonet::Connector::APIClient::ISPAPI_CONNECTION_URL_PROXY)->getURL();
 is( $url, $WebService::Hexonet::Connector::APIClient::ISPAPI_CONNECTION_URL_PROXY, 'AC : Check if setURL working.' );
-$cl->setURL($WebService::Hexonet::Connector::APIClient::ISPAPI_CONNECTION_URL);
+$cl->setURL($WebService::Hexonet::Connector::APIClient::ISPAPI_CONNECTION_URL_LIVE);
 
 # - T72 ~> setOTP method test
 $cl->setOTP('12345678');

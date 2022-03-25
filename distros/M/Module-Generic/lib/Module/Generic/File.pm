@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/File.pm
-## Version v0.3.3
+## Version v0.3.4
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/20
-## Modified 2022/03/11
+## Modified 2022/03/18
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -119,7 +119,7 @@ BEGIN
     # $URI::file::DEFAULT_AUTHORITY = undef;
     $FILES_TO_REMOVE = {};
     $GLOBBING = 0;
-    our $VERSION = 'v0.3.3';
+    our $VERSION = 'v0.3.4';
 };
 
 use strict;
@@ -443,7 +443,6 @@ sub can_read
         else
         {
             my $opened = $self->opened // '';
-            $self->message( 4, "Is file '$file' opened? '$opened'" );
             my $io;
             if( $opened )
             {
@@ -481,10 +480,17 @@ sub can_write
         }
         else
         {
+            if( $io )
+            {
+                my $flags = $io->fcntl( F_GETFL, 0 );
+                return( $flags & ( O_APPEND | & O_WRONLY | O_CREAT | & O_RDWR ) );
+            }
+            elsif( $self->finfo->can_write )
+            {
+                return(1);
+            }
             # File is not opened so we do not know if the file handle is writable
-            return(0) if( !$io );
-            my $flags = $io->fcntl( F_GETFL, 0 );
-            return( $flags & ( O_APPEND | & O_WRONLY | O_CREAT | & O_RDWR ) );
+            return(0);
         }
     }
     catch( $e )
@@ -1818,9 +1824,12 @@ sub mkpath
             # $parent_path = $curr->length ? $self->_spec_catpath( $vol, $self->_spec_catdir( [ @$curr ] ) ) : '';
             $parent_path = $curr->length ? $self->_spec_catdir( [ @$curr ] ) : '';
             my $current_path = $self->_spec_catpath( $vol, $self->_spec_catdir( [ @$curr, $dir ] ) );
-            if( !-e( $current_path ) )
+            if( !-e( "$current_path" ) )
             {
-                CORE::mkdir( $current_path ) || return( $self->error( "Unable to create directory \"$current_path\" ", ( CORE::length( $parent_path ) ? "under $parent_path" : "at filesystem root" ), ": $!" ) );
+                CORE::mkdir( "$current_path" ) || do
+                {
+                    return( $self->error( "Unable to create directory \"$current_path\" ", ( CORE::length( "$parent_path" ) ? "under $parent_path" : "at filesystem root" ), ": $!" ) ) unless( $! =~ /\bFile exists\b/i );
+                };
                 local $_ = $current_path;
                 try
                 {
@@ -3926,7 +3935,7 @@ Module::Generic::File - File Object Abstraction Class
 
 =head1 VERSION
 
-    v0.3.3
+    v0.3.4
 
 =head1 DESCRIPTION
 

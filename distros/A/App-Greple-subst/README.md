@@ -5,7 +5,7 @@ subst - Greple module for text search and substitution
 
 # VERSION
 
-Version 2.2906
+Version 2.3001
 
 # SYNOPSIS
 
@@ -79,7 +79,7 @@ warned (**--warn-overlap** by default) and ignored.
 
 ## Terminal color
 
-This version uses [Getopt::EX::termcolor](https://metacpan.org/pod/Getopt::EX::termcolor) module.  It sets option
+This version uses [Getopt::EX::termcolor](https://metacpan.org/pod/Getopt%3A%3AEX%3A%3Atermcolor) module.  It sets option
 **--light-screen** or **--dark-screen** depending on the terminal on
 which the command run, or **TERM\_BGCOLOR** environment variable.
 
@@ -109,7 +109,7 @@ digit depending on terminal background color.
 - **--select**=_N_
 
     Select _N_th entry from the dictionary.  Argument is interpreted by
-    [Getopt::EX::Numbers](https://metacpan.org/pod/Getopt::EX::Numbers) module.  Range can be defined like
+    [Getopt::EX::Numbers](https://metacpan.org/pod/Getopt%3A%3AEX%3A%3ANumbers) module.  Range can be defined like
     **--select**=_1:3,7:9_.  You can get numbers by **--stat** option.
 
 - **--linefold**

@@ -5,7 +5,7 @@ use 5.014;
 use exact;
 use strict;
 
-our $VERSION = '1.06'; # VERSION
+our $VERSION = '1.07'; # VERSION
 
 sub import {
     my ( $self, $caller, $params ) = @_;
@@ -42,7 +42,7 @@ exact::conf - Cascading merged application configuration extension for exact
 
 =head1 VERSION
 
-version 1.06
+version 1.07
 
 =for markdown [![test](https://github.com/gryphonshafer/exact-conf/workflows/test/badge.svg)](https://github.com/gryphonshafer/exact-conf/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/exact-conf/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/exact-conf)
@@ -129,7 +129,7 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019-2021 by Gryphon Shafer.
+This software is Copyright (c) 2019-2050 by Gryphon Shafer.
 
 This is free software, licensed under:
 

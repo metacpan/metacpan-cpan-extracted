@@ -18,6 +18,7 @@ my %WriteMakefileArgs = (
   "NAME" => "API::MailboxOrg",
   "PREREQ_PM" => {
     "Carp" => 0,
+    "IO::Socket::SSL" => 0,
     "JSON::PP" => 0,
     "Mojolicious" => 8,
     "Moo" => "1.003001",
@@ -36,7 +37,7 @@ my %WriteMakefileArgs = (
     "Test::RequiresInternet" => 0,
     "Test::Spec" => 0
   },
-  "VERSION" => "1.0.1",
+  "VERSION" => "1.0.2",
   "test" => {
     "TESTS" => "t/*.t t/types/*.t"
   }
@@ -45,6 +46,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Carp" => 0,
+  "IO::Socket::SSL" => 0,
   "JSON::PP" => 0,
   "Mojolicious" => 8,
   "Moo" => "1.003001",

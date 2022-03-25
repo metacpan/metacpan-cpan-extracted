@@ -1,5 +1,9 @@
 Revision history for Alien::spatialite
 
+1.05 2022-03-20
+    - Ensure share builds use -O2 in compilation
+    - Simplify alienfile
+
 1.04 2019-01-06
     - Set Alien::geos::af minimum version to 1.007
       It has better libs and cflags detection for some systems

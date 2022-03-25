@@ -60,7 +60,7 @@ greple - extensible grep with lexical expression and region control
 =head1 VERSION
 
 
-Version 8.5601
+Version 8.5701
 
 
 =head1 SYNOPSIS
@@ -122,6 +122,7 @@ B<greple> [B<-M>I<module>] [ B<-options> ] pattern [ file... ]
     --border=pattern     border pattern
     --block=pattern      block of records
     --blockend=s         block end mark (Default: "--")
+    --join-blocks        join back-to-back consecutive blocks
   REGION
     --inside=pattern     select matches inside of pattern
     --outside=pattern    select matches outside of pattern
@@ -183,7 +184,11 @@ my @opt_epilogue;
 my @opt_callback;
 my $opt_noif;
 my $opt_all;
+my $opt_frame_top    = '';
+my $opt_frame_middle = '';
+my $opt_frame_bottom = '';
 my $opt_blockend;
+my $opt_join_blocks = 0;
 my $opt_color = 'auto';
 my $opt_ansicolor = '256';
 my @opt_colormap;
@@ -291,7 +296,11 @@ my @optargs = (
     'noif'               => \$opt_noif,
     'border=s'           => \$opt_border,
     'block=s'            => \@opt_block,
+    'frame-top:s'        => \$opt_frame_top,
+    'frame-middle:s'     => \$opt_frame_middle,
+    'frame-bottom:s'     => \$opt_frame_bottom,
     'blockend:s'         => \$opt_blockend,
+    'join-blocks!'       => \$opt_join_blocks,
     'inside=s'           => \@opt_inside,
     'outside=s'          => \@opt_outside,
     'include=s'          => \@opt_include,
@@ -683,6 +692,9 @@ my %colormap = (
     TEXT     => "",
     BLOCKEND => "/WE",
     PROGRESS => "B",
+    TOP      => "",
+    MIDDLE   => "",
+    BOTTOM   => "",
     );
 
 my @colors;
@@ -741,10 +753,18 @@ for (values %opt_format) {
     s{\\(.)}{ { t => "\t", n => "\n" }->{$1} // $1 }egx;
 }
 
+my $blockend = "--";
+if (defined $opt_blockend) {
+    $blockend = $opt_blockend =~ s/\\n/\n/gr;
+}
+
 my $_file     = sub { $color_handler->color('FILE'    , sprintf($opt_format{FILE}, $_[0])) };
 my $_line     = sub { $color_handler->color('LINE'    , sprintf($opt_format{LINE}, $_[0])) };
 my $_text     = sub { $color_handler->color('TEXT'    , $_[0]) };
-my $_blockend = sub { $color_handler->color('BLOCKEND', $_[0]) };
+my $_blockend = $color_handler->color('BLOCKEND', $blockend);
+my $_top      = $color_handler->color('TOP'     , $opt_frame_top);
+my $_middle   = $color_handler->color('MIDDLE'  , $opt_frame_middle);
+my $_bottom   = $color_handler->color('BOTTOM'  , $opt_frame_bottom);
 
 sub index_color {
     $color_handler->index_color(@_);
@@ -814,10 +834,6 @@ my $border_re = do {
     }
 };
 
-my $blockend = "--";
-if (defined $opt_blockend) {
-    $blockend = $opt_blockend =~ s/\\n/\n/gr;
-}
 if ($opt_C) {
     $opt_A ||= $opt_C;
     $opt_B ||= $opt_C;
@@ -1206,6 +1222,7 @@ sub grep_data {
 	callback     => @opt_callback ? $opt_callback[-1] : undef,
 	alert_size   => $opt_alert{size},
 	alert_time   => $opt_alert{time},
+	join_blocks  => $opt_join_blocks,
 	)->run;
     my $matched = $grep->matched;
 
@@ -1263,7 +1280,11 @@ sub display_result {
 
     my $line = 1;
     my $lastpos = 0;
-    for my $result ($grep->result) {
+    my @result = $grep->result;
+    for my $rix (0 .. $#result) {
+	my $result = $result[$rix];
+	my $is_top    = $rix == 0;
+	my $is_bottom = $rix == $#result;
 
 	my($block_start, $block_end) = @{shift @$result};
 	my $block = $grep->cut($block_start, $block_end);
@@ -1344,14 +1365,14 @@ sub display_result {
 
 	$block = join '', @blocks;
 
+	my @line;
 	if ($opt_n) {
 	    if ($opt_linestyle eq 'line') {
 		my $increment = $block =~ /[\n$mark]/ ? 1 : 0;
-		$block =~ s{(?:($mark)|(?<=\n)|\A)(?=.)}{
-			    my $s = $1 ? $opt_joinby
-				       : $_line->($line);
+		$block =~ s{(?:(?<mark>$mark)|(?<=\n)|\A)(?=.)}{
+		    	    push @line, $_line->($line) unless $+{mark};
 			    $line += $increment;
-			    $s;
+			    $+{mark} ? $opt_joinby : '';
 			   }gse;
 	    } else {
 		$line += $block =~ tr/\n/\n/;
@@ -1360,16 +1381,26 @@ sub display_result {
 
 	return if $block eq "";
 
+	$block = $_text->($block) if $colormap{TEXT} ne "";
+
+	if (@line) {
+	    $block =~ s/^/shift @line/mge;
+	}
+
 	if ($opt_filestyle eq 'line') {
 	    my $s = $_file->($file);
 	    $block =~ s/^/$s/mg;
 	}
 
-	$block = $_text->($block) if $colormap{TEXT} ne "";
-
+	print "$_top\n" if $is_top && $_top ne '';
 	print $block;
 	print "\n" if $opt_newline and not $block =~ /\n\z/;
-	print $_blockend->($blockend), "\n" if $need_blockend;
+	print "$_blockend\n" if $need_blockend;
+	if ($is_bottom) {
+	    print "$_bottom\n" if $_bottom ne '';
+	} else {
+	    print "$_middle\n" if $_middle ne '';
+	}
     }
 }
 
@@ -1984,6 +2015,16 @@ Next example will show line numbers in five digits with tab space:
 
     --format LINE='%05d\t'
 
+=item B<--frame-top>=I<string>
+
+=item B<--frame-middle>=I<string>
+
+=item B<--frame-bottom>=I<string>
+
+Print surrounding frames before and after each blocks.  C<top> frame
+is printed at the beginning, C<bottom> frame at the end, C<middle>
+frame between each blocks.
+
 =back
 
 
@@ -2369,6 +2410,12 @@ because it finds all blocks before processing.
 
 Change the end mark displayed after B<-pABC> or B<--block> options.
 Default value is "--".
+
+=item B<--join-blocks>
+
+Join consecutive blocks together.  Logical operation is done for each
+individual blocks, but if the results are back-to-back connected, make
+them single block for final output.
 
 =back
 

@@ -381,11 +381,13 @@ sub get_spvm_core_source_file_names {
     spvm_list.c
     spvm_method.c
     spvm_my.c
+    spvm_native.c
     spvm_op.c
     spvm_op_checker.c
     spvm_opcode_array.c
     spvm_opcode_builder.c
     spvm_opcode.c
+    spvm_runtime.c
     spvm_string.c
     spvm_string_buffer.c
     spvm_switch_info.c
@@ -425,11 +427,9 @@ sub get_spvm_core_header_file_names {
     spvm_field.h
     spvm_hash.h
     spvm_implement.h
-    spvm_limit.h
     spvm_list.h
     spvm_method.h
     spvm_my.h
-    spvm_name_info.h
     spvm_native.h
     spvm_object.h
     spvm_op_checker.h
@@ -437,6 +437,15 @@ sub get_spvm_core_header_file_names {
     spvm_opcode_builder.h
     spvm_opcode.h
     spvm_op.h
+    spvm_runtime_basic_type.h
+    spvm_runtime_class.h
+    spvm_runtime_class_var.h
+    spvm_runtime_field.h
+    spvm_runtime.h
+    spvm_runtime_manager.h
+    spvm_runtime_method.h
+    spvm_runtime_string.h
+    spvm_runtime_type.h
     spvm_string.h
     spvm_string_buffer.h
     spvm_switch_info.h

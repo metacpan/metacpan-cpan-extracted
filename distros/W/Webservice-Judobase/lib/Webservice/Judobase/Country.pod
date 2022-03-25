@@ -1,0 +1,27 @@
+=encoding UTF-8
+
+=head1 NAME
+
+Webservice::Judobase::Country - Country information from Judobase API.
+
+=head1 ATTRIBUTES
+
+=head2 ua
+
+User agent is passed in from the base class.
+
+=head2 url
+
+URL for the API, passed in from the base class.
+
+
+=head1 METHODS
+
+=head2 competitors_list( id_country => INT )
+
+Returns an array of competitors who have competed for this country.
+
+=head2 get_list( )
+
+Returns an array of countries that IJF has listed.
+

@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 19;
+use Test::Most tests => 21;
 use lib 't/lib';
 use MyLogger;
 
@@ -52,4 +52,7 @@ TRANSLATE: {
 	is($places->translate(place => 'Douvres', 'from' => 'fr'), 'Dover', 'Source LANG set to English');
 	is($places->translate(place => 'Dover', 'from' => 'en'), 'Dover', 'Source LANG set to English');
 
+	# There is more than one preferred entry for Bexley in London in the database, but they have the same value
+	is($places->translate(place => 'Bexley', from => 'en', to => 'fr'), 'Bexley', 'Test for two preferred values that are the same');
+	is($places->translate(place => 'Thurrock', to => 'fr'), 'Thurrock', 'Test for two preferred values neither of which matches');
 }

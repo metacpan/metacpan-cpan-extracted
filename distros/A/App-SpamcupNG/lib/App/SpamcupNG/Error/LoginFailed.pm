@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use parent 'App::SpamcupNG::Error';
 
-our $VERSION = '0.013'; # VERSION
+our $VERSION = '0.014'; # VERSION
 
 =head1 NAME
 
@@ -43,10 +43,11 @@ Overrided from the parent class, adding required behavior.
 
 sub message {
     my $self = shift;
-    my $additional = ' Also consider obtaining a password to Spamcop.net instead of using '.
-        'the old-style authorization token.';
+    my $additional
+        = ' Also consider obtaining a password to Spamcop.net instead of using '
+        . 'the old-style authorization token.';
 
-    return join('.', ($self->{message}->[0], $additional));
+    return join( '.', ( $self->{message}->[0], $additional ) );
 }
 
 =head1 AUTHOR

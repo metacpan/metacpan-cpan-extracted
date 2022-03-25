@@ -24,7 +24,6 @@
 #include "spvm_switch_info.h"
 #include "spvm_descriptor.h"
 #include "spvm_allocator.h"
-#include "spvm_limit.h"
 #include "spvm_use.h"
 #include "spvm_class_var.h"
 #include "spvm_class_var_access.h"
@@ -37,6 +36,7 @@
 #include "spvm_allow.h"
 #include "spvm_implement.h"
 #include "spvm_string.h"
+
 
 
 
@@ -248,6 +248,8 @@ const char* const* SPVM_OP_C_ID_NAMES(void) {
     "COPY",
     "IMPLEMENT",
     "HAS_IMPLEMENT",
+    "ELEMENT",
+    "OARRAY",
   };
   
   return id_names;
@@ -284,7 +286,7 @@ SPVM_OP* SPVM_OP_new_op_assign_bool(SPVM_COMPILER* compiler, SPVM_OP* op_operand
   SPVM_OP* op_bool = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_BOOL, file, line);
   SPVM_OP_insert_child(compiler, op_bool, op_bool->last, op_operand);
 
-  SPVM_OP* op_name_var = SPVM_OP_new_op_name(compiler, "@condition_flag", file, line);
+  SPVM_OP* op_name_var = SPVM_OP_new_op_name(compiler, "$.condition_flag", file, line);
   SPVM_OP* op_var = SPVM_OP_new_op_var(compiler, op_name_var);
   SPVM_OP* op_assign = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ASSIGN, file, line);
   SPVM_OP_build_assign(compiler, op_assign, op_var, op_bool);
@@ -1015,7 +1017,8 @@ SPVM_OP* SPVM_OP_build_default_statement(SPVM_COMPILER* compiler, SPVM_OP* op_de
 
 SPVM_OP* SPVM_OP_new_op_true(SPVM_COMPILER* compiler, SPVM_OP* op) {
   
-  const char* class_var_name = "$Bool::TRUE";
+  SPVM_STRING* class_var_name_string = SPVM_STRING_new(compiler, "$Bool::TRUE", strlen("$Bool::TRUE"));
+  const char* class_var_name = class_var_name_string->value;
   SPVM_OP* op_class_var_name = SPVM_OP_new_op_name(compiler, class_var_name, op->file, op->line);
   SPVM_OP* op_class_var_access = SPVM_OP_new_op_class_var_access(compiler, op_class_var_name);
   op_class_var_access->uv.class_var_access->inline_expansion = 1;
@@ -1025,7 +1028,8 @@ SPVM_OP* SPVM_OP_new_op_true(SPVM_COMPILER* compiler, SPVM_OP* op) {
 
 SPVM_OP* SPVM_OP_new_op_false(SPVM_COMPILER* compiler, SPVM_OP* op) {
   
-  const char* class_var_name = "$Bool::FALSE";
+  SPVM_STRING* class_var_name_string = SPVM_STRING_new(compiler, "$Bool::FALSE", strlen("$Bool::FALSE"));
+  const char* class_var_name = class_var_name_string->value;
   SPVM_OP* op_class_var_name = SPVM_OP_new_op_name(compiler, class_var_name, op->file, op->line);
   SPVM_OP* op_class_var_access = SPVM_OP_new_op_class_var_access(compiler, op_class_var_name);
   op_class_var_access->uv.class_var_access->inline_expansion = 1;
@@ -1399,10 +1403,10 @@ SPVM_TYPE* SPVM_OP_get_type(SPVM_COMPILER* compiler, SPVM_OP* op) {
     case SPVM_OP_C_ID_ARRAY_ACCESS: {
       SPVM_TYPE* first_type = SPVM_OP_get_type(compiler, op->first);
       SPVM_BASIC_TYPE* basic_type = SPVM_HASH_fetch(compiler->basic_type_symtable, first_type->basic_type->name, strlen(first_type->basic_type->name));
-      if (basic_type->id == SPVM_BASIC_TYPE_C_ID_STRING && first_type->dimension == 0) {
+      if (SPVM_TYPE_is_string_type(compiler, basic_type->id, first_type->dimension, 0)) {
         type = SPVM_TYPE_new_byte_type(compiler);
       }
-      else if (basic_type->id == SPVM_BASIC_TYPE_C_ID_OARRAY && first_type->dimension == 0) {
+      else if (SPVM_TYPE_is_any_object_array_type(compiler, basic_type->id, first_type->dimension, 0)) {
         type = SPVM_TYPE_new_any_object_type(compiler);
       }
       else {
@@ -1661,7 +1665,7 @@ SPVM_OP* SPVM_OP_build_has_implement(SPVM_COMPILER* compiler, SPVM_OP* op_has_im
   SPVM_OP_insert_child(compiler, op_has_implement, op_has_implement->last, op_var);
   SPVM_OP_insert_child(compiler, op_has_implement, op_has_implement->last, op_name);
 
-  SPVM_OP* op_name_var_condition = SPVM_OP_new_op_name(compiler, "@condition_flag", op_var->file, op_var->line);
+  SPVM_OP* op_name_var_condition = SPVM_OP_new_op_name(compiler, "$.condition_flag", op_var->file, op_var->line);
   SPVM_OP* op_var_condition = SPVM_OP_new_op_var(compiler, op_name_var_condition);
   SPVM_OP* op_assign = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ASSIGN, op_var->file, op_var->line);
   SPVM_OP_build_assign(compiler, op_assign, op_var_condition, op_has_implement);
@@ -1674,7 +1678,7 @@ SPVM_OP* SPVM_OP_build_is_read_only(SPVM_COMPILER* compiler, SPVM_OP* op_is_read
   // Build op
   SPVM_OP_insert_child(compiler, op_is_read_only, op_is_read_only->last, op_term);
 
-  SPVM_OP* op_name_var_condition = SPVM_OP_new_op_name(compiler, "@condition_flag", op_term->file, op_term->line);
+  SPVM_OP* op_name_var_condition = SPVM_OP_new_op_name(compiler, "$.condition_flag", op_term->file, op_term->line);
   SPVM_OP* op_var_condition = SPVM_OP_new_op_var(compiler, op_name_var_condition);
   SPVM_OP* op_assign = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ASSIGN, op_term->file, op_term->line);
   SPVM_OP_build_assign(compiler, op_assign, op_var_condition, op_is_read_only);
@@ -1698,7 +1702,7 @@ SPVM_OP* SPVM_OP_build_isweak_field(SPVM_COMPILER* compiler, SPVM_OP* op_isweak,
   SPVM_OP_insert_child(compiler, op_isweak_field, op_isweak_field->last, op_field_access);
   op_field_access->flag |= SPVM_OP_C_FLAG_FIELD_ACCESS_ISWEAK;
 
-  SPVM_OP* op_name_var = SPVM_OP_new_op_name(compiler, "@condition_flag", op_field_access->file, op_field_access->line);
+  SPVM_OP* op_name_var = SPVM_OP_new_op_name(compiler, "$.condition_flag", op_field_access->file, op_field_access->line);
   SPVM_OP* op_var = SPVM_OP_new_op_var(compiler, op_name_var);
   SPVM_OP* op_assign = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ASSIGN, op_field_access->file, op_field_access->line);
   SPVM_OP_build_assign(compiler, op_assign, op_var, op_field_access);
@@ -1744,8 +1748,12 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
     int32_t anon_method_class_name_length = 6 + strlen(anon_method_defined_rel_file_class_name) + 2 + int32_max_length + 2 + int32_max_length;
     
     // Anon class name
-    char* name_class = SPVM_ALLOCATOR_new_block_compile_eternal(compiler, anon_method_class_name_length + 1);
-    sprintf(name_class, "%s::anon::%d::%d", anon_method_defined_rel_file_class_name, anon_method_defined_line, anon_method_defined_column);
+    char* name_class_tmp = SPVM_ALLOCATOR_alloc_memory_block_permanent(compiler->allocator, anon_method_class_name_length + 1);
+    sprintf(name_class_tmp, "%s::anon::%d::%d", anon_method_defined_rel_file_class_name, anon_method_defined_line, anon_method_defined_column);
+
+    SPVM_STRING* name_class_string = SPVM_STRING_new(compiler, name_class_tmp, strlen(name_class_tmp));
+    const char* name_class = name_class_string->value;
+
     SPVM_OP* op_name_class = SPVM_OP_new_op_name(compiler, name_class, op_class->file, op_class->line);
     op_type = SPVM_OP_build_basic_type(compiler, op_name_class);
     
@@ -1917,7 +1925,9 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
           // }
 
           SPVM_OP* op_method = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_METHOD, op_decl->file, op_decl->line);
-          SPVM_OP* op_name_method = SPVM_OP_new_op_name(compiler, class_var->name + 1, op_decl->file, op_decl->line);
+          SPVM_STRING* method_name_string = SPVM_STRING_new(compiler, class_var->name + 1, strlen(class_var->name) - 1);
+          const char* method_name = method_name_string->value;
+          SPVM_OP* op_name_method = SPVM_OP_new_op_name(compiler, method_name, op_decl->file, op_decl->line);
           SPVM_OP* op_return_type = SPVM_OP_new_op_type(compiler, class_var->type, op_decl->file, op_decl->line);
           SPVM_OP* op_args = SPVM_OP_new_op_list(compiler, op_decl->file, op_decl->line);
           
@@ -1952,9 +1962,13 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
           //   $FOO = $foo;
           // }
           SPVM_OP* op_method = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_METHOD, op_decl->file, op_decl->line);
-          char* method_name = SPVM_ALLOCATOR_new_block_compile_eternal(compiler, 4 + strlen(class_var->name) - 1 + 1);
-          memcpy(method_name, "SET_", 4);
-          memcpy(method_name + 4, class_var->name + 1, strlen(class_var->name) - 1);
+          char* method_name_tmp = SPVM_ALLOCATOR_alloc_memory_block_permanent(compiler->allocator, 4 + strlen(class_var->name) - 1 + 1);
+          memcpy(method_name_tmp, "SET_", 4);
+          memcpy(method_name_tmp + 4, class_var->name + 1, strlen(class_var->name) - 1);
+
+          SPVM_STRING* method_name_string = SPVM_STRING_new(compiler, method_name_tmp, strlen(method_name_tmp));
+          const char* method_name = method_name_string->value;
+
           SPVM_OP* op_name_method = SPVM_OP_new_op_name(compiler, method_name, op_decl->file, op_decl->line);
           SPVM_OP* op_return_type = SPVM_OP_new_op_void_type(compiler, op_decl->file, op_decl->line);
           SPVM_OP* op_args = SPVM_OP_new_op_list(compiler, op_decl->file, op_decl->line);
@@ -2049,9 +2063,11 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
           // }
 
           SPVM_OP* op_method = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_METHOD, op_decl->file, op_decl->line);
-          char* method_name = SPVM_ALLOCATOR_new_block_compile_eternal(compiler, 4 + strlen(field->name) + 1);
-          memcpy(method_name, "set_", 4);
-          memcpy(method_name + 4, field->name, strlen(field->name));
+          char* method_name_tmp = SPVM_ALLOCATOR_alloc_memory_block_permanent(compiler->allocator, 4 + strlen(field->name) + 1);
+          memcpy(method_name_tmp, "set_", 4);
+          memcpy(method_name_tmp + 4, field->name, strlen(field->name));
+          SPVM_STRING* method_name_string = SPVM_STRING_new(compiler, method_name_tmp, strlen(method_name_tmp));
+          const char* method_name = method_name_string->value;
           SPVM_OP* op_name_method = SPVM_OP_new_op_name(compiler, method_name, op_decl->file, op_decl->line);
           SPVM_OP* op_return_type = SPVM_OP_new_op_void_type(compiler, op_decl->file, op_decl->line);
           SPVM_OP* op_args = SPVM_OP_new_op_list(compiler, op_decl->file, op_decl->line);
@@ -2109,7 +2125,9 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
           SPVM_MY* capture_my = SPVM_LIST_fetch(captures, i);
           
           SPVM_OP* op_field = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_FIELD, capture_my->op_my->file, capture_my->op_my->line);
-          SPVM_OP* op_name_field = SPVM_OP_new_op_name(compiler, capture_my->var->name + 1, capture_my->op_my->file, capture_my->op_my->line);
+          SPVM_STRING* field_name_string = SPVM_STRING_new(compiler, capture_my->var->name + 1, strlen(capture_my->var->name) - 1);
+          
+          SPVM_OP* op_name_field = SPVM_OP_new_op_name(compiler, field_name_string->value, capture_my->op_my->file, capture_my->op_my->line);
           
           SPVM_TYPE* type_new_capture_my = SPVM_TYPE_new(compiler, capture_my->type->basic_type->id, capture_my->type->dimension, capture_my->type->flag);
           SPVM_OP* op_type_new_capture_my = SPVM_OP_new_op_type(compiler, type_new_capture_my, capture_my->op_my->file, capture_my->op_my->line);
@@ -2146,8 +2164,6 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
         SPVM_COMPILER_error(compiler, "Redeclaration of field \"%s->{%s}\" at %s line %d", class_name, field_name, field->op_field->file, field->op_field->line);
       }
       else {
-        field->id = compiler->fields->length;
-        SPVM_LIST_push(compiler->fields, field);
         SPVM_HASH_insert(class->field_symtable, field_name, strlen(field_name), field);
         
         // Add op class
@@ -2168,8 +2184,6 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
           SPVM_COMPILER_error(compiler, "Redeclaration of class variable \"$%s::%s\" at %s line %d", class_name, class_var_name + 1, class_var->op_class_var->file, class_var->op_class_var->line);
         }
         else {
-          class_var->id = compiler->class_vars->length;
-          SPVM_LIST_push(compiler->class_vars, class_var);
           SPVM_HASH_insert(class->class_var_symtable, class_var_name, strlen(class_var_name), class_var);
           
           // Add op class
@@ -2198,8 +2212,8 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
         // Method check
         
         // Set first argument type if not set
-        if (method->args->length > 0) {
-          SPVM_MY* arg_my_first = SPVM_LIST_fetch(method->args, 0);
+        if (method->args_length > 0) {
+          SPVM_MY* arg_my_first = SPVM_LIST_fetch(method->mys, 0);
           SPVM_OP* op_arg_first_type = NULL;
           if (!method->is_class_method) {
             SPVM_TYPE* arg_invocant_type = op_type->uv.type;
@@ -2294,14 +2308,9 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
             
             assert(method->op_method->file);
             
-            method->id = compiler->methods->length;
-            
-            // Add the method to the list of methods of the compiler
-            SPVM_LIST_push(compiler->methods, method);
-            
             // Method absolute name
             int32_t method_abs_name_length = strlen(class->name) + 2 + strlen(method->name);
-            char* method_abs_name = SPVM_ALLOCATOR_new_block_compile_eternal(compiler, method_abs_name_length + 1);
+            char* method_abs_name = SPVM_ALLOCATOR_alloc_memory_block_permanent(compiler->allocator, method_abs_name_length + 1);
             memcpy(method_abs_name, class->name, strlen(class->name));
             memcpy(method_abs_name + strlen(class_name), "->", 2);
             memcpy(method_abs_name + strlen(class_name) + 2, method_name, strlen(method_name));
@@ -2523,7 +2532,9 @@ SPVM_OP* SPVM_OP_build_method(SPVM_COMPILER* compiler, SPVM_OP* op_method, SPVM_
   }
   
   if (op_name_method == NULL) {
-    op_name_method = SPVM_OP_new_op_name(compiler, "", op_method->file, op_method->line);
+    SPVM_STRING* anon_method_name_string = SPVM_STRING_new(compiler, "", strlen(""));
+    const char* anon_method_name = anon_method_name_string->value;
+    op_name_method = SPVM_OP_new_op_name(compiler, anon_method_name, op_method->file, op_method->line);
   }
   const char* method_name = op_name_method->uv.name;
   
@@ -2609,12 +2620,12 @@ SPVM_OP* SPVM_OP_build_method(SPVM_COMPILER* compiler, SPVM_OP* op_method, SPVM_
 
   // Add method arguments
   {
-    int32_t method_index = 0;
+    int32_t args_length = 0;
     SPVM_OP* op_arg = op_args->first;
     while ((op_arg = SPVM_OP_sibling(compiler, op_arg))) {
-      SPVM_LIST_push(method->args, op_arg->uv.var->my);
-      method_index++;
+      args_length++;
     }
+    method->args_length = args_length;
   }
 
   // Capture variables
@@ -2625,13 +2636,10 @@ SPVM_OP* SPVM_OP_build_method(SPVM_COMPILER* compiler, SPVM_OP* op_method, SPVM_
     }
   }
   
-  // Native my vars is same as arguments
-  if (method->flag & SPVM_METHOD_C_FLAG_NATIVE) {
-    SPVM_OP* op_arg = op_args->first;
-    while ((op_arg = SPVM_OP_sibling(compiler, op_arg))) {
-      SPVM_LIST_push(method->mys, op_arg->uv.var->my);
-      SPVM_LIST_push(method->mys, op_arg->uv.var->my);
-    }
+  // Variable declarations of arguments
+  SPVM_OP* op_arg = op_args->first;
+  while ((op_arg = SPVM_OP_sibling(compiler, op_arg))) {
+    SPVM_LIST_push(method->mys, op_arg->uv.var->my);
   }
 
   // return type
@@ -2650,11 +2658,11 @@ SPVM_OP* SPVM_OP_build_method(SPVM_COMPILER* compiler, SPVM_OP* op_method, SPVM_
 
     SPVM_OP* op_list_statement = op_block->first;
 
-    // 1. Add variable declaration to first of block
+    // Add variable declarations before the first of the statements
     {
       int32_t i;
-      for (i = method->args->length - 1; i >= 0; i--) {
-        SPVM_MY* arg_my = SPVM_LIST_fetch(method->args, i);
+      for (i = method->args_length - 1; i >= 0; i--) {
+        SPVM_MY* arg_my = SPVM_LIST_fetch(method->mys, i);
         assert(arg_my);
         SPVM_OP* op_name_var = SPVM_OP_new_op_name(compiler, arg_my->var->name, arg_my->op_my->file, arg_my->op_my->line);
         SPVM_OP* op_var = SPVM_OP_new_op_var(compiler, op_name_var);
@@ -2666,9 +2674,9 @@ SPVM_OP* SPVM_OP_build_method(SPVM_COMPILER* compiler, SPVM_OP* op_method, SPVM_
       }
     }
 
-    // 2. Add condition_flag variable to first of block
+    // Add condition_flag variable to first of block
     {
-      char* name = "@condition_flag";
+      char* name = "$.condition_flag";
       SPVM_OP* op_name = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_NAME, op_list_statement->file, op_list_statement->last->line + 1);
       op_name->uv.name = name;
       SPVM_OP* op_var = SPVM_OP_build_var(compiler, op_name);
@@ -2676,18 +2684,9 @@ SPVM_OP* SPVM_OP_build_method(SPVM_COMPILER* compiler, SPVM_OP* op_method, SPVM_
       SPVM_OP* op_type = SPVM_OP_new_op_int_type(compiler, op_list_statement->file, op_list_statement->line);
       op_var = SPVM_OP_build_my(compiler, op_my, op_var, op_type, NULL);
       SPVM_OP_insert_child(compiler, op_list_statement, op_list_statement->first, op_var);
-      method->op_my_condition_flag = op_my;
     }
 
-    
-    // 3. Add list of temporary variable declarations to first of block
-    {
-      SPVM_OP* op_list_tmp_mys = SPVM_OP_new_op_list(compiler, op_method->file, op_method->line);
-      SPVM_OP_insert_child(compiler, op_list_statement, op_list_statement->last, op_list_tmp_mys);
-      method->op_list_tmp_mys = op_list_tmp_mys;
-    }
-    
-    // 4. Add return to last of statement
+    // Add return statement after the last of the statements
     {
       SPVM_OP* op_return = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_RETURN, op_list_statement->file, op_list_statement->last->line + 1);
       SPVM_TYPE* return_type = method->return_type;
@@ -2696,7 +2695,7 @@ SPVM_OP* SPVM_OP_build_method(SPVM_COMPILER* compiler, SPVM_OP* op_method, SPVM_
       }
       else {
         // Return variable name
-        char* name = "@return";
+        char* name = "$.return";
         SPVM_OP* op_name = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_NAME, op_list_statement->file, op_list_statement->last->line + 1);
         op_name->uv.name = name;
         SPVM_OP* op_var = SPVM_OP_build_var(compiler, op_name);
@@ -2920,7 +2919,7 @@ SPVM_OP* SPVM_OP_build_comparison_op(SPVM_COMPILER* compiler, SPVM_OP* op_compar
   SPVM_OP_insert_child(compiler, op_comparison, op_comparison->last, op_first);
   SPVM_OP_insert_child(compiler, op_comparison, op_comparison->last, op_last);
   
-  SPVM_OP* op_name_var = SPVM_OP_new_op_name(compiler, "@condition_flag", op_comparison->file, op_comparison->line);
+  SPVM_OP* op_name_var = SPVM_OP_new_op_name(compiler, "$.condition_flag", op_comparison->file, op_comparison->line);
   SPVM_OP* op_var = SPVM_OP_new_op_var(compiler, op_name_var);
   SPVM_OP* op_assign = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ASSIGN, op_comparison->file, op_comparison->line);
   SPVM_OP_build_assign(compiler, op_assign, op_var, op_comparison);
@@ -2934,7 +2933,7 @@ SPVM_OP* SPVM_OP_build_isa(SPVM_COMPILER* compiler, SPVM_OP* op_isa, SPVM_OP* op
   SPVM_OP_insert_child(compiler, op_isa, op_isa->last, op_term);
   SPVM_OP_insert_child(compiler, op_isa, op_isa->last, op_type);
 
-  SPVM_OP* op_name_var = SPVM_OP_new_op_name(compiler, "@condition_flag", op_isa->file, op_isa->line);
+  SPVM_OP* op_name_var = SPVM_OP_new_op_name(compiler, "$.condition_flag", op_isa->file, op_isa->line);
   SPVM_OP* op_var = SPVM_OP_new_op_var(compiler, op_name_var);
   SPVM_OP* op_assign = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ASSIGN, op_isa->file, op_isa->line);
   SPVM_OP_build_assign(compiler, op_assign, op_var, op_isa);
@@ -3022,7 +3021,7 @@ SPVM_OP* SPVM_OP_build_and(SPVM_COMPILER* compiler, SPVM_OP* op_and, SPVM_OP* op
   SPVM_OP_build_if_statement(compiler, op_if2, op_last, op_assign_bool_true, op_assign_bool_false1);
   SPVM_OP_build_if_statement(compiler, op_if1, op_first, op_if2, op_assign_bool_false2);
 
-  SPVM_OP* op_name_var = SPVM_OP_new_op_name(compiler, "@condition_flag", op_and->file, op_and->line);
+  SPVM_OP* op_name_var = SPVM_OP_new_op_name(compiler, "$.condition_flag", op_and->file, op_and->line);
   SPVM_OP* op_var = SPVM_OP_new_op_var(compiler, op_name_var);
   SPVM_OP* op_assign = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ASSIGN, op_and->file, op_and->line);
   SPVM_OP_build_assign(compiler, op_assign, op_var, op_if1);
@@ -3071,7 +3070,7 @@ SPVM_OP* SPVM_OP_build_or(SPVM_COMPILER* compiler, SPVM_OP* op_or, SPVM_OP* op_f
   SPVM_OP_build_if_statement(compiler, op_if2, op_last, op_bool_true2, op_bool_false);
   SPVM_OP_build_if_statement(compiler, op_if1, op_first, op_bool_true1, op_if2);
   
-  SPVM_OP* op_name_var = SPVM_OP_new_op_name(compiler, "@condition_flag", op_or->file, op_or->line);
+  SPVM_OP* op_name_var = SPVM_OP_new_op_name(compiler, "$.condition_flag", op_or->file, op_or->line);
   SPVM_OP* op_var = SPVM_OP_new_op_var(compiler, op_name_var);
   SPVM_OP* op_assign = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ASSIGN, op_or->file, op_or->line);
   SPVM_OP_build_assign(compiler, op_assign, op_var, op_if1);
@@ -3107,7 +3106,7 @@ SPVM_OP* SPVM_OP_build_not(SPVM_COMPILER* compiler, SPVM_OP* op_not, SPVM_OP* op
   // Build if tree
   SPVM_OP_build_if_statement(compiler, op_if, op_first, op_assign_bool_false, op_assign_bool_true);
 
-  SPVM_OP* op_name_var = SPVM_OP_new_op_name(compiler, "@condition_flag", op_not->file, op_not->line);
+  SPVM_OP* op_name_var = SPVM_OP_new_op_name(compiler, "$.condition_flag", op_not->file, op_not->line);
   SPVM_OP* op_var = SPVM_OP_new_op_var(compiler, op_name_var);
   SPVM_OP* op_assign = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ASSIGN, op_not->file, op_not->line);
   SPVM_OP_build_assign(compiler, op_assign, op_var, op_if);
@@ -3283,6 +3282,17 @@ SPVM_OP* SPVM_OP_build_array_type(SPVM_COMPILER* compiler, SPVM_OP* op_type_chil
   return op_type;
 }
 
+SPVM_OP* SPVM_OP_build_any_object_array_type(SPVM_COMPILER* compiler, SPVM_OP* op_element) {
+  
+  // Type
+  SPVM_TYPE* type = SPVM_TYPE_new_any_object_array_type(compiler);
+  
+  // Type OP
+  SPVM_OP* op_type = SPVM_OP_new_op_type(compiler, type, op_element->file, op_element->line);
+
+  return op_type;
+}
+
 SPVM_OP* SPVM_OP_new_op_list(SPVM_COMPILER* compiler, const char* file, int32_t line) {
   
   SPVM_OP* op_pushmark = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_PUSHMARK, file, line);
@@ -3296,7 +3306,7 @@ SPVM_OP* SPVM_OP_new_op_list(SPVM_COMPILER* compiler, const char* file, int32_t 
 
 SPVM_OP* SPVM_OP_new_op(SPVM_COMPILER* compiler, int32_t id, const char* file, int32_t line) {
 
-  SPVM_OP *op = SPVM_ALLOCATOR_new_block_compile_tmp(compiler, sizeof(SPVM_OP));
+  SPVM_OP *op = SPVM_ALLOCATOR_alloc_memory_block_tmp(compiler->allocator, sizeof(SPVM_OP));
   
   memset(op, 0, sizeof(SPVM_OP));
   

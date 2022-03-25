@@ -273,11 +273,16 @@ sub create_source_file {
   my $output_file = $opt->{output_file};
   my $create_cb = $opt->{create_cb};
   
+  my $need_generate_input_files = [@$input_files];
+  my $config_file = $self->config_file;
+  if (defined $config_file && -f $config_file) {
+    push @$need_generate_input_files, $config_file;
+  }
   my $need_generate = SPVM::Builder::Util::need_generate({
     global_force => $self->force,
     config_force => $config->force,
     output_file => $output_file,
-    input_files => $input_files,
+    input_files => $need_generate_input_files,
   });
   
   if ($need_generate) {
@@ -304,13 +309,16 @@ sub compile_source_file {
     $depend_files = [];
   }
   
-  my $input_files = [$source_file, @$depend_files];
-  
+  my $need_generate_input_files = [$source_file, @$depend_files];
+  my $config_file = $self->config_file;
+  if (defined $config_file && -f $config_file) {
+    push @$need_generate_input_files, $config_file;
+  }
   my $need_generate = SPVM::Builder::Util::need_generate({
     global_force => $self->force,
     config_force => $config->force,
     output_file => $output_file,
-    input_files => $input_files,
+    input_files => $need_generate_input_files,
   });
 
   # Compile command
@@ -380,16 +388,11 @@ sub create_bootstrap_source {
 #include <assert.h>
 
 #include "spvm_native.h"
-
 #include "spvm_api.h"
-#include "spvm_op.h"
+
+// This will be removed in the near feature release
 #include "spvm_compiler.h"
 #include "spvm_hash.h"
-#include "spvm_list.h"
-#include "spvm_class.h"
-#include "spvm_method.h"
-#include "spvm_basic_type.h"
-
 EOS
     
     $boot_source .= "// module source get functions declaration\n";
@@ -438,12 +441,13 @@ EOS
 
     $boot_source .= <<'EOS';
 
-  SPVM_ENV* compiler_env = SPVM_API_new_env_raw(NULL);
+  // Create env
+  SPVM_ENV* env = SPVM_NATIVE_new_env_raw();
   
   // Create compiler
-  SPVM_COMPILER* compiler = compiler_env->new_compiler(compiler_env);
+  SPVM_COMPILER* compiler = env->compiler_new();
 
-  compiler_env->compiler_set_start_file(compiler_env, compiler, class_name);
+  env->compiler_set_start_file(compiler, class_name);
 
   // Set module source_files
 EOS
@@ -461,21 +465,39 @@ EOS
 
     $boot_source .= <<'EOS';
 
-  int32_t compile_error_code = compiler_env->compiler_compile_spvm(compiler_env, compiler, class_name);
+  int32_t compile_error_code = env->compiler_compile_spvm(compiler, class_name);
 
   if (compile_error_code != 0) {
-    int32_t error_messages_length = compiler_env->compiler_get_error_messages_length(compiler_env, compiler);
+    int32_t error_messages_length = env->compiler_get_error_messages_length(compiler);
     for (int32_t i = 0; i < error_messages_length; i++) {
-      const char* error_message = compiler_env->compiler_get_error_message(compiler_env, compiler, i);
+      const char* error_message = env->compiler_get_error_message(compiler, i);
       fprintf(stderr, "%s\n", error_message);
     }
     exit(255);
   }
 
-  compiler_env->free_env_raw(compiler_env);
-  compiler_env = NULL;
+  // Build runtime information
+  void* runtime = SPVM_API_runtime_new(env);
+  SPVM_API_compiler_build_runtime(compiler, runtime);
+
 EOS
     
+    $boot_source .= <<'EOS';
+    
+  // Free compiler
+  env->compiler_free(compiler);
+
+  // Prepare runtime
+  SPVM_API_runtime_prepare(runtime);
+
+  // Set runtime information
+  env->runtime = runtime;
+  
+  // Initialize env
+  env->init_env(env);
+  
+EOS
+
     for my $class_name (@$class_names) {
       my $class_cname = $class_name;
       $class_cname =~ s/::/__/g;
@@ -487,13 +509,9 @@ EOS
   { 
     const char* class_name = "$class_name";
     const char* method_name = "$precompile_method_name";
-    SPVM_BASIC_TYPE* basic_type = SPVM_HASH_fetch(compiler->basic_type_symtable, class_name, strlen(class_name));
-    assert(basic_type);
-    SPVM_CLASS* class = basic_type->class;
-    assert(class);
-    SPVM_METHOD* method = SPVM_HASH_fetch(class->method_symtable, method_name, strlen(method_name));
-    assert(method);
-    method->precompile_address = SPVMPRECOMPILE__${class_cname}__$precompile_method_name;
+    int32_t method_id = env->get_method_id_without_signature(env, class_name, method_name);
+    void* precompile_address = SPVMPRECOMPILE__${class_cname}__$precompile_method_name;
+    env->set_precompile_method_address(env, method_id, precompile_address);
   }
 EOS
       }
@@ -510,33 +528,20 @@ EOS
   { 
     const char* class_name = "$class_name";
     const char* method_name = "$native_method_name";
-    SPVM_BASIC_TYPE* basic_type = SPVM_HASH_fetch(compiler->basic_type_symtable, class_name, strlen(class_name));
-    assert(basic_type);
-    SPVM_CLASS* class = basic_type->class;
-    assert(class);
-    SPVM_METHOD* method = SPVM_HASH_fetch(class->method_symtable, method_name, strlen(method_name));
-    assert(method);
-    method->native_address = SPVM__${class_cname}__$native_method_name;
+    int32_t method_id = env->get_method_id_without_signature(env, class_name, method_name);
+    void* native_address = SPVM__${class_cname}__$native_method_name;
+    env->set_native_method_address(env, method_id, native_address);
   }
 EOS
       }
     }
 
     $boot_source .= <<'EOS';
-    
-  // Create env
-  SPVM_ENV* env = SPVM_API_new_env_raw(NULL);
-  
-  // Set the compiler
-  env->compiler = compiler;
-  
-  // Initialize env
-  SPVM_API_init_env(env);
   
   env->call_init_blocks(env);
   
   // Class
-  int32_t method_id = SPVM_API_get_class_method_id(env, class_name, "main", "int(string,string[])");
+  int32_t method_id = env->get_class_method_id(env, class_name, "main", "int(string,string[])");
   
   if (method_id < 0) {
     fprintf(stderr, "Can't find the definition of valid %s->main method:.\n    static method main : int ($start_file : string, $args : string[]) { ... } \n", class_name);
@@ -568,7 +573,7 @@ EOS
   
   int32_t status;
   if (exception_flag) {
-    SPVM_API_print(env, env->exception_object);
+    env->print_stderr(env, env->exception_object);
     printf("\n");
     status = 255;
   }
@@ -580,14 +585,11 @@ EOS
   env->leave_scope(env, scope_id);
 
   // Cleanup global variables
-  SPVM_API_cleanup_global_vars(env);
+  env->cleanup_global_vars(env);
   
   // Free env
-  SPVM_API_free_env_raw(env);
+  env->free_env_raw(env);
 
-  // Free compiler
-  SPVM_COMPILER_free(compiler);
-  
   return status;
 }
 EOS
@@ -950,11 +952,16 @@ sub link {
     libpth => '',
   };
   
+  my $need_generate_input_files = [@$object_file_infos];
+  my $config_file = $self->config_file;
+  if (defined $config_file && -f $config_file) {
+    push @$need_generate_input_files, $config_file;
+  }
   my $need_generate = SPVM::Builder::Util::need_generate({
     global_force => $self->force,
     config_force => $config->force,
     output_file => $output_file,
-    input_files => $object_file_infos,
+    input_files => $need_generate_input_files,
   });
 
   my $link_info = SPVM::Builder::LinkInfo->new(

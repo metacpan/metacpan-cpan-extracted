@@ -1,5 +1,5 @@
 package ZMQ::FFI::ZMQ4::Raw;
-$ZMQ::FFI::ZMQ4::Raw::VERSION = '1.17';
+$ZMQ::FFI::ZMQ4::Raw::VERSION = '1.18';
 use FFI::Platypus;
 
 sub load {
@@ -133,6 +133,24 @@ sub load {
         ['zmq_curve_keypair' => "${target}::zmq_curve_keypair"]
             => ['opaque', 'opaque'] => 'int'
     );
+    
+    $ffi->attach(
+        # char *zmq_z85_encode (char *dest, const uint8_t *data, size_t size);
+        ['zmq_z85_encode' => "${target}::zmq_z85_encode"]
+            => ['opaque', 'string', 'size_t'] => 'pointer'
+    );
+    
+    $ffi->attach(
+        # uint8_t *zmq_z85_decode (uint8_t *dest, const char *string);
+        ['zmq_z85_decode' => "${target}::zmq_z85_decode"]
+            => ['opaque', 'string'] => 'pointer'
+    );
+
+    $ffi->attach(
+        # int zmq_socket_monitor (void *socket, char *endpoint, int events);
+        ['zmq_socket_monitor' => "${target}::zmq_socket_monitor"]
+            => ['pointer', 'string', 'int'] => 'int'
+    );
 }
 
 1;
@@ -149,7 +167,7 @@ ZMQ::FFI::ZMQ4::Raw
 
 =head1 VERSION
 
-version 1.17
+version 1.18
 
 =head1 AUTHOR
 
@@ -157,7 +175,7 @@ Dylan Cali <calid1984@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Dylan Cali.
+This software is copyright (c) 2022 by Dylan Cali.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

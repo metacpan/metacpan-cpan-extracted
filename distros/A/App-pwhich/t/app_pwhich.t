@@ -1,7 +1,7 @@
 use Test2::V0 -no_srand => 1;
 use Test2::Mock;
 use App::pwhich;
-use Test::Script;
+use Test::Script 1.09;
 use File::Which qw( which );
 use File::Basename qw( basename );
 use File::Temp ();
@@ -11,15 +11,15 @@ subtest 'script can find perl' => sub {
 
   my $perl       = basename $^X;
   my $which_perl = which "$perl";
-  
+
   unless(defined $which_perl)
   {
     $perl       = 'perl';
     $which_perl = which $perl;
   }
-  
+
   note "perl       = $perl";
-  
+
   skip_all 'File::Which cannot find perl' unless defined $which_perl;
 
   note "which perl = $which_perl";
@@ -45,11 +45,11 @@ subtest 'script can find perl' => sub {
 subtest 'script can fail to find an executable' => sub {
 
   my $bogus;
-  
+
   do {
-  
+
     $bogus = basename File::Temp::tempnam(".","bogus");
-  
+
   } while(which $bogus);
 
   note "bogus = $bogus";
@@ -85,7 +85,7 @@ subtest 'script can print version number' => sub {
   );
 
   my $my_version = App::pwhich->VERSION || 'dev';
-  
+
   script_stdout_like qr{This is pwhich running File::Which version $File::Which::VERSION\n[ ]+App::pwhich version $my_version}, 'versions are printed';
   script_stdout_like qr{Copyright 2002 Per Einar Ellefsen}, 'original author copyright';
   script_stdout_like qr{Some parts Copyright 2009 Adam Kennedy}, 'second maintainer copyright';
@@ -97,7 +97,7 @@ subtest 'script can print version number' => sub {
 subtest 'more than one' => sub {
 
   my $arg;
-  
+
   my $mock = Test2::Mock->new(
     class => 'App::pwhich',
     override => [
@@ -147,7 +147,7 @@ subtest 'more than one' => sub {
         'i/o',
       );
     };
-    
+
   };
 
   subtest 'where' => sub {

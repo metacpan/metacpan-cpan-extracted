@@ -6,7 +6,7 @@ use exact;
 
 use LWP::Simple 'get';
 
-our $VERSION = '1.03'; # VERSION
+our $VERSION = '1.04'; # VERSION
 
 sub init {
     my ($bot) = @_;
@@ -70,7 +70,7 @@ Bot::IRC::X::MetarTaf - Bot::IRC plugin for METAR and TAF reporting
 
 =head1 VERSION
 
-version 1.03
+version 1.04
 
 =for markdown [![test](https://github.com/gryphonshafer/Bot-IRC-X-MetarTaf/workflows/test/badge.svg)](https://github.com/gryphonshafer/Bot-IRC-X-MetarTaf/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/Bot-IRC-X-MetarTaf/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Bot-IRC-X-MetarTaf)
@@ -135,7 +135,7 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016-2021 by Gryphon Shafer.
+This software is Copyright (c) 2016-2050 by Gryphon Shafer.
 
 This is free software, licensed under:
 

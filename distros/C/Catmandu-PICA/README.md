@@ -4,7 +4,7 @@ Catmandu::PICA - Catmandu modules for working with PICA+ data
 
 [![Unix Build Status](https://travis-ci.org/gbv/Catmandu-PICA.svg)](https://travis-ci.org/gbv/Catmandu-PICA)
 [![Windows Build status](https://ci.appveyor.com/api/projects/status/myyyxpobr8kn6aby?svg=true)](https://ci.appveyor.com/project/nichtich/catmandu-pica)
-[![Coverage Status](https://coveralls.io/repos/gbv/Catmandu-PICA/badge.svg?branch=master)](https://coveralls.io/r/gbv/Catmandu-PICA?branch=master)
+[![Coverage Status](https://coveralls.io/repos/gbv/Catmandu-PICA/badge.svg?branch=main)](https://coveralls.io/r/gbv/Catmandu-PICA?branch=main)
 [![Kwalitee Score](http://cpants.cpanauthors.org/dist/Catmandu-PICA.png)](http://cpants.cpanauthors.org/dist/Catmandu-PICA)
 
 # DESCRIPTION
@@ -12,24 +12,24 @@ Catmandu::PICA - Catmandu modules for working with PICA+ data
 Catmandu::PICA provides methods to work with PICA data within the [Catmandu](https://metacpan.org/pod/Catmandu)
 framework.  
 
-See [PICA::Data](https://metacpan.org/pod/PICA::Data) for more information about PICA data format and record
+See [PICA::Data](https://metacpan.org/pod/PICA%3A%3AData) for more information about PICA data format and record
 structure.
 
-See [Catmandu::Introduction](https://metacpan.org/pod/Catmandu::Introduction) and [http://librecat.org/Catmandu](http://librecat.org/Catmandu) for an
+See [Catmandu::Introduction](https://metacpan.org/pod/Catmandu%3A%3AIntroduction) and [http://librecat.org/Catmandu](http://librecat.org/Catmandu) for an
 introduction into Catmandu.
 
 # CATMANDU MODULES
 
-- [Catmandu::Exporter::PICA](https://metacpan.org/pod/Catmandu::Exporter::PICA)
-- [Catmandu::Fix::Bind::pica\_each](https://metacpan.org/pod/Catmandu::Fix::Bind::pica_each)
-- [Catmandu::Fix::Condition::pica\_match](https://metacpan.org/pod/Catmandu::Fix::Condition::pica_match)
-- [Catmandu::Fix::pica\_add](https://metacpan.org/pod/Catmandu::Fix::pica_add)
-- [Catmandu::Fix::pica\_map](https://metacpan.org/pod/Catmandu::Fix::pica_map)
-- [Catmandu::Fix::pica\_set](https://metacpan.org/pod/Catmandu::Fix::pica_set)
-- [Catmandu::Importer::PICA](https://metacpan.org/pod/Catmandu::Importer::PICA)
-- [Catmandu::Importer::SRU::Parser::picaxml](https://metacpan.org/pod/Catmandu::Importer::SRU::Parser::picaxml)
-- [Catmandu::Importer::SRU::Parser::ppxml](https://metacpan.org/pod/Catmandu::Importer::SRU::Parser::ppxml)
-- [Catmandu::Validator::PICA](https://metacpan.org/pod/Catmandu::Validator::PICA)
+- [Catmandu::Exporter::PICA](https://metacpan.org/pod/Catmandu%3A%3AExporter%3A%3APICA)
+- [Catmandu::Fix::Bind::pica\_each](https://metacpan.org/pod/Catmandu%3A%3AFix%3A%3ABind%3A%3Apica_each)
+- [Catmandu::Fix::Condition::pica\_match](https://metacpan.org/pod/Catmandu%3A%3AFix%3A%3ACondition%3A%3Apica_match)
+- [Catmandu::Fix::pica\_add](https://metacpan.org/pod/Catmandu%3A%3AFix%3A%3Apica_add)
+- [Catmandu::Fix::pica\_map](https://metacpan.org/pod/Catmandu%3A%3AFix%3A%3Apica_map)
+- [Catmandu::Fix::pica\_set](https://metacpan.org/pod/Catmandu%3A%3AFix%3A%3Apica_set)
+- [Catmandu::Importer::PICA](https://metacpan.org/pod/Catmandu%3A%3AImporter%3A%3APICA)
+- [Catmandu::Importer::SRU::Parser::picaxml](https://metacpan.org/pod/Catmandu%3A%3AImporter%3A%3ASRU%3A%3AParser%3A%3Apicaxml)
+- [Catmandu::Importer::SRU::Parser::ppxml](https://metacpan.org/pod/Catmandu%3A%3AImporter%3A%3ASRU%3A%3AParser%3A%3Appxml)
+- [Catmandu::Validator::PICA](https://metacpan.org/pod/Catmandu%3A%3AValidator%3A%3APICA)
 
 # CONTRIBUTORS
 
@@ -50,4 +50,4 @@ the same terms as Perl itself.
 
 # SEE ALSO
 
-[PICA::Data](https://metacpan.org/pod/PICA::Data), [Catmandu](https://metacpan.org/pod/Catmandu)
+[PICA::Data](https://metacpan.org/pod/PICA%3A%3AData), [Catmandu](https://metacpan.org/pod/Catmandu)

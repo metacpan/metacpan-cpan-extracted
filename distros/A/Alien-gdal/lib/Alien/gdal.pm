@@ -10,7 +10,7 @@ use Capture::Tiny qw /:all/;
 use Path::Tiny qw /path/;
 use Alien::proj;
 
-our $VERSION = '1.27';
+our $VERSION = '1.28';
 
 my ($have_geos, $have_proj, $have_spatialite);
 my @have_aliens;
@@ -102,7 +102,7 @@ sub cflags {
     my $cflags = $self->SUPER::cflags;
     
     if ($have_geos) {
-        $cflags .= ' ' . Alien::geos::af->cflags;
+        $cflags .= ' ' . (Alien::geos::af->cflags // '');
     }
     
     return $cflags;
@@ -114,7 +114,7 @@ sub libs {
     my $cflags = $self->SUPER::libs;
     
     if ($have_geos) {
-        $cflags .= ' ' . Alien::geos::af->libs;
+        $cflags .= ' ' . (Alien::geos::af->libs // '');
     }
     
     return $cflags;

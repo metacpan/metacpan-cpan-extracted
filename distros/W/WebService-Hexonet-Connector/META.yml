@@ -11,7 +11,6 @@ build_requires:
   Test::Exception: '0'
   Test::More: '0'
   Test::RequiresInternet: '0'
-  version: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -38,6 +37,5 @@ requires:
   Time::Local: '0'
   perl: '5.030000'
   utf8: '0'
-  version: '0.9924'
-version: v2.10.2
+version: v2.10.3
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

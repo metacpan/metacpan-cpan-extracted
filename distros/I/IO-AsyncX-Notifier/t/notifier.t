@@ -5,7 +5,8 @@ use Test::More;
 use Test::Fatal;
 
 use Object::Pad;
-class Example isa IO::AsyncX::Notifier {
+use Object::Pad qw(:experimental);
+class Example :isa(IO::AsyncX::Notifier) {
     use Ryu::Observable;
     has $slot_to_populate = "empty";
     has $slot_to_leave_alone = "untouched";

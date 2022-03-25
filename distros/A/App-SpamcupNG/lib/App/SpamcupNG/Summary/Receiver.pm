@@ -7,7 +7,7 @@ use Carp 'confess';
 
 use App::SpamcupNG::Summary;
 
-our $VERSION = '0.013'; # VERSION
+our $VERSION = '0.014'; # VERSION
 
 =pod
 
@@ -66,7 +66,7 @@ sub new {
     my $self = {
         report_id => $attribs_ref->[1],
         email     => $attribs_ref->[0],
-        };
+    };
 
     bless $self, $class;
     lock_hash( %{$self} );

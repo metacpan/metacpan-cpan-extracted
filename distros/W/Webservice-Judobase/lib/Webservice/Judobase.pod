@@ -30,6 +30,10 @@ Interface to Webservice::Judobase::Competitor, lazy builds by default using the 
 
 Interface to Webservice::Judobase::Contests, lazy builds by default using the $ua and $url (to API) from this class.
 
+=head2 country
+
+Interface to Webservice::Judobase::Country, lazy builds by default using the $ua and $url (to API) from this class.
+
 =head2 general
 
 Interface to Webservice::Judobase::General, lazy builds by default using the $ua and $url (to API) from this class.

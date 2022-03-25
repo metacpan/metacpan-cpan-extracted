@@ -1,5 +1,8 @@
 Revision history for Alien::gdal
 
+1.28 2022-03-19
+    - share builds config: explicitly set optimisation flags
+
 1.27 2022-01-31
     - Fix shared builds when spatialite is enabled
     - Add Geos lib dir to $ENV{LD_LIBRARY_PATH} on any non-windows system,

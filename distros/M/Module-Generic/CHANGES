@@ -1,6 +1,15 @@
 Revision history for Perl module Module::Generic
 
-v0.21.12 2022-03-11T21:41:04+0900
+v0.22.1 2022-03-21T15:39:24+0900
+    - Corrected shared memory unit test
+
+v0.22.0 2022-03-18T14:57:40Z +0900
+    - Corrected a minor bug in can_write() in Module::Generic::File
+    - Added module Module::Generic::File::Cache to provide a file-base caching mechanism across processes
+    - Updated _set_get_object and _set_get_object_without_init in Module::Generic to accept an array of classes
+    - Updated method deserialise to check if data in file was serialise with Storable::store or Storable::freeze
+
+v0.21.12 2022-03-11T21:41:04Z +0900
     - Added the 'skip' parameter to find() in Module::Generic::File
     - Added the 'glob' parameter to resolve() in Module::Generic::File
     - Added the 'globbing' parameter to new() in Module::Generic::File
@@ -9,54 +18,54 @@ v0.21.12 2022-03-11T21:41:04+0900
     - Made minor improvements to Module::Generic::SharedMem
     - Added serialise/serialize and deserialise/deserialize to Module::Generic
 
-v0.21.11 2022-03-10T23:50:16+0900
+v0.21.11 2022-03-10T23:50:16Z +0900
     - Correction of a minor, but annoying bug in Module::Generic::Array with $TRUE and $FALSE not properly set.
 
-v0.21.10 2022-03-10T17:25:56+0900
+v0.21.10 2022-03-10T17:25:56Z +0900
     - Correction to unit test with DateTime and system missing components
 
-v0.21.9 2022-03-09T17:37:34+0900
+v0.21.9 2022-03-09T17:37:34Z +0900
     - Improvements with Module::Generic::SharedMem encoding and decoding of JSON data
 
-v0.21.8 2022-03-08T14:47:21+0900
+v0.21.8 2022-03-08T14:47:21Z +0900
     - Corrected a minor bug in resolve() whereby 'base_dir' was not taken under account
     - Updated documentation in Module::Generic::DateTime and added new documentation for Module::Generic::DateTime::Interval
     - Allowed Module::Generic::DateTime to instantiate a default DateTime object when provided no argument
     - Updated method _datetime in Module::Generic::Finfo, and _parse_timestamp and _set_get_datetime in Module::Generic to trap issues DateTime::TimeZone::Local exceptions triggered when system lacks proper time zone components.
 
-v0.21.7 2022-03-06T16:50:58+0900
+v0.21.7 2022-03-06T16:50:58Z +0900
     - Added methods load_json and unlaod_json in Module::Generic::File and new_json in Module::Generic
     - Added methods checksum_md5, checksum_256 and checksum512 in Module::Generic::File
 
-v0.21.6 2022-03-06T13:10:02+0900
+v0.21.6 2022-03-06T13:10:02Z +0900
     - Corrected DateTime version requirement to avoid "Cannot determine local time zone" error
 
-v0.21.5 2022-03-05T16:40:09+0900
+v0.21.5 2022-03-05T16:40:09Z +0900
     - Removing a unit test
 
-v0.21.4 2022-03-05T14:23:20+0900
+v0.21.4 2022-03-05T14:23:20Z +0900
     - Updated Module::Generic::Number
     - Made Class::* modules separate
 
-v0.21.3 2022-02-28T07:14:12+0900
+v0.21.3 2022-02-28T07:14:12Z +0900
     - Resubmission due to error on CPAN
 
-v0.21.2 2022-02-27T23:52:10+0900
+v0.21.2 2022-02-27T23:52:10Z +0900
     - Resubmission after transfer from Dan Kogai of Class::Array and Class::Scalar
 
-v0.21.1 2022-02-27T22:34:58+0900
+v0.21.1 2022-02-27T22:34:58Z +0900
     - Resubmission due to error
 
-v0.21.0 2022-02-27T17:18:25+0900
+v0.21.0 2022-02-27T17:18:25Z +0900
     - Improved code and removed warnings
     - Added modules Class, Class::Array, Class::Boolean, Class::Exception, Class::File, Class::Finfo, Class::Hash, Class::Null, Class::Class::Number, Class::Scalar
 
-v0.20.0 2022-01-17T05:17:16+0900
+v0.20.0 2022-01-17T05:17:16Z +0900
     - Corrected small time lag in test unit 08.datetime.t
     - Add class functions stdin, stdout and stderr to Module::Generic::File
     - Corrected a bug in Module::Generic::File
 
-v0.19.0 2022-12-23T14:04:47+0900
+v0.19.0 2022-12-23T14:04:47Z +0900
     - Added method mkdir in Module::Generic::File for a simpler way to create a directory than mkpath
     - Minor change to _move_or_copy() in Module::Generic::File
     - Added callback method to Module::Generic::Array to control, accept or reject insertion or deletion
@@ -66,24 +75,24 @@ v0.19.0 2022-12-23T14:04:47+0900
     - Added method _lvalue as a generic lvalue method to Module::Generic
     - Added method filter to Module::Generic::Array
 
-v0.18.4 2021-12-17T09:10:36+0900
+v0.18.4 2021-12-17T09:10:36Z +0900
     - Updated _parse_timestamp to handle unix timestamp provided by Time::HiRes, i.e with a decimal
     - Small correction in _obj2h in Module::Generic
     - Added method _is_integer in Module::Generic
     - Modified exists in Module::Generic::Array to take under account objects.
 
-v0.18.3 2021-12-14T12:44:31+0900
+v0.18.3 2021-12-14T12:44:31Z +0900
     - Added method replace in Module::Generic::Array
     - Added methods is_empty and remove in Module::Generic::Hash
     - Changed Module::Generic::SharedMem default encoding tool to JSON instead of Storable
 
-v0.18.2 2021-12-08T15:27:47+0900
+v0.18.2 2021-12-08T15:27:47Z +0900
     - Correction in Number::Format when default locale is C or POSIX
 
-v0.18.1 2021-12-07T21:24:28+0900
+v0.18.1 2021-12-07T21:24:28Z +0900
     - Resubmission
 
-v0.18.0 2021-12-04T11:13:15+0900
+v0.18.0 2021-12-04T11:13:15Z +0900
     - Correction in baseinfo() in Module::Generic::File
     - Minor improvement in helper method _is_a in Module::Generic
     - Added the standard PROPAGATE method in Module::Generic::Exeption
@@ -97,40 +106,40 @@ v0.18.0 2021-12-04T11:13:15+0900
     - Corrected a bug in as_String in Module::Generic::HeaderValue
     - Module::Generic::HeaderValue returns a boolean rather than the string in boolean context
 
-v0.17.3 2021-11-22T11:14:35+0900
+v0.17.3 2021-11-22T11:14:35Z +0900
     - Minor correction in Module::Generic removing the INIT block
 
-v0.17.2 2021-11-16T12:20:03+0900
+v0.17.2 2021-11-16T12:20:03Z +0900
     - Minor improvement to _parse_timestamp in Module::Generic
 
-v0.17.1 2021-11-15T11:55:16+0900
+v0.17.1 2021-11-15T11:55:16Z +0900
     - Minor correction in Module::Generic in _parse_timestamp
     - Fine tuning of the module versions requirements
 
-v0.17.0 2021-11-05T20:40:13+0900
+v0.17.0 2021-11-05T20:40:13Z +0900
     - Updated Module::Generic::Hash, adding alias method size() pointing to length()
     - Added class Module::Generic::HeaderValue
     - Added shortcut methods device, inode, mode, nlink, uid, gid, rdev, atime, mtime, ctime, block_size, blocks, last_accessed and last_modified in package Module::Generic::File
     - Added method utime in package Module::Generic::File
     - Added method line in package Module::Generic::Scalar::IO
 
-v0.16.5 2021-10-24T12:10:52+0900
+v0.16.5 2021-10-24T12:10:52Z +0900
     - Corrected Module::Generic::SharedMem read() method to not decode if buffer is empty
 
-v0.16.4 2021-10-22T15:51:20+0900
+v0.16.4 2021-10-22T15:51:20Z +0900
     - Correcting an oversight in Module::Generic (module Devel::Confess was required for debugging but not removed later)
 
-v0.16.3 2021-10-21T12:17:58+0900
+v0.16.3 2021-10-21T12:17:58Z +0900
     - Improved mmap method in Module::Generic::File
 
-v0.16.2 2021-10-15T16:10:14+0900
+v0.16.2 2021-10-15T16:10:14Z +0900
     - Improved mmap method in Module::Generic::File
 
-v0.16.1 2021-10-12T22:46:58+0900
+v0.16.1 2021-10-12T22:46:58Z +0900
     - Added methods blocking, eof, fcntl, fdopen, flush, format_write, getc, getline, getlines, ioctl, printflush, sync, sysread, sysseek, syswrite, ungetc and content_objects in Module::Generic::File
     - Corrected test units for Module::Generif::File
 
-v0.16.0 2021-10-11T13:51:57+0900
+v0.16.0 2021-10-11T13:51:57Z +0900
     - Tuned _set_get_datetime method to only set a default DateTime formatter when none were already set yet
     - Added support method _set_get_uuid to store universal unique identifier with data validation
     - Added method as_json in Module::Generic::Hash to return a json string representation of the hash object
@@ -162,44 +171,44 @@ v0.16.0 2021-10-11T13:51:57+0900
     - Updated method autoflush in Module::Generic::File to affect the underlying file handle with the value provided. Before, it was just storing the boolean value.
     - Added methods mmap and unmap in Module::Generic::File to use file-based variable that can be shared across processes
 
-v0.15.8 2021-08-21T14:13:52+0900
+v0.15.8 2021-08-21T14:13:52Z +0900
     - Corrected an overlooked warning in Module::Generic::Array->split
 
-v0.15.7 2021-08-20T18:14:07+0900
+v0.15.7 2021-08-20T18:14:07Z +0900
     - Added support method _get_stack_trace in Module::Generic
     - Updated method init to not issue any warning when a package method returns undef when passing undef value to those methods in Module::Generic. Normally a method returning undef is a sign of an error having occurred.
     - Updated the test units for Module::Generic::SharedMem
     - Improved documentation for Module::Generic::Array
 
-v0.15.6 2021-08-18T09:44:08+0900
+v0.15.6 2021-08-18T09:44:08Z +0900
     - Updated documentation for Module::Generic::Scalar (lc, lcfirst, uc, ucfirst)
     - Updated the test unit for shared memory to better handle platform not supporting IPC SysV
 
-v0.15.5 2021-07-26T12:54:23+0900
+v0.15.5 2021-07-26T12:54:23Z +0900
     - Corrected mistake with module name Module::Generic::DateTime
     - Added alias makpath() to mkpath() in Module::Generic::File
     - Added alias absolute() to abs() in Module::Generic::File
 
-v0.15.4 2021-06-29T18:34:17+0900
+v0.15.4 2021-06-29T18:34:17Z +0900
     - Added methods join and split in Module::Generic::File
     - Changed method extension which can now take a new value and then return a new file object
     - Added method fragments to Module::Generic::File
     - Added helper method _is_number in Module::Generic
 
-v0.15.3 2021-06-26T14:31:27+0900
+v0.15.3 2021-06-26T14:31:27Z +0900
     - Improvement for Module::Generic::File for method load
     - Switched Module::Generic::SharedMem to use json xs module by default as data packing mechanism, but with the choice left to the user between JSON and Storable
     - Corrected a bug in Module::Generic::File in method tmpfile that, due to errors in parameters, inadvertently, was creating also temporary directories
     - Corrected a bug in rmtree whereby the directory itself was not removed. Added the option "keep_root" to decide whether to keep it or not.
 
-v0.15.2 2021-06-26T06:06:16+0900
+v0.15.2 2021-06-26T06:06:16Z +0900
     - Added missing documentation for Module::Generic::File
     - Improved documentation for Module::Generic
 
-v0.15.1 2021-06-20T10:19:58+0900
+v0.15.1 2021-06-20T10:19:58Z +0900
     - Resubmission due to bundling error
 
-v0.15.0 2021-04-18T12:05:35+0900
+v0.15.0 2021-04-18T12:05:35Z +0900
     - Corrected a minor bug in Module::Generic::Dynamic, ignoring now fields that do not contain any valid chracter to become a method
     - Added method as_array(), offset() and merge() in Module::Generic::Array
     - Added method empty() in Module::Generic::Array as an alias to reset()
@@ -219,39 +228,39 @@ v0.15.0 2021-04-18T12:05:35+0900
     - Added inline class Module::Generic::Scalar::IO that inherits from IO::Scalar and enables to print to scalar
     - Added module Module::Generic::SharedMem for easy-to-use shared memory interface
 
-v0.14.2 2021-04-03T17:22:00+0900
+v0.14.2 2021-04-03T17:22:00Z +0900
     - Corrected a bug in _set_get_scalar_as_object to accept overloaded objects that implement stringification
     - Corrected a bug in _set_get_hash
 
-v0.14.1 2021-03-31T14:50:43+0900
+v0.14.1 2021-03-31T14:50:43Z +0900
     - Correcting a test unit in datetime and upgrading version numbers for sub modules
 
-v0.14.0 2021-03-20T21:43:18+0900
+v0.14.0 2021-03-20T21:43:18Z +0900
     - Added Module::Generic::Datetime and split inline modules to their own files
     - Added method _get_args_as_hash to get methods parameters as hash reference whether they were provided initially as such or not
 
-v0.13.6 2021-02-14T13:01:16+0900
+v0.13.6 2021-02-14T13:01:16Z +0900
     - Improved test unit for cygwin not supporting crypt
 
-v0.13.5 2021-02-06T11:46:18+0900
+v0.13.5 2021-02-06T11:46:18Z +0900
     - Corrected a mising require for DateTime::Format::Strptime
     - Improved the _warnings_is_enabled helper method
 
-v0.13.4 2021-01-25T18:47:55+0900
+v0.13.4 2021-01-25T18:47:55Z +0900
     - Moved the requirement on Apache module to the BEGIN block as it should.
 
-v0.13.3 2020-12-08T11:12:15+0900
+v0.13.3 2020-12-08T11:12:15Z +0900
     - Removed method message_switch
     - Added method _set_get_object_without_init for object that cannot just simply be initiated without specific parameters, such as Apache2::RequestRec.
 
-v0.13.2 2020-11-20T22:14:54+0900
+v0.13.2 2020-11-20T22:14:54Z +0900
     - Corrected method _set_get_class_array when testing if data received are an array
     - Added parameter alias 'package' to parameter 'class' in _set_get_class
     - Added data type alias in _set_get_class for convenience.
     - Corrected pass_error to create an error object when it is passed a string rather than an error object.
     - Expanded method _parse_timestamp to include keyword 'now', relative timestamp and unix timestamp.
 
-v0.13.1 2020-09-20T08:12:16+0900
+v0.13.1 2020-09-20T08:12:16Z +0900
     - Updated the error method to accept and use an Exception object as parameter
     - Updated the method throw in Module::Generic::Exception to either take a string and instantiate a new exception object or use the current one.
     - Improved the error() method to better report from the start of the call stack, excluding internal package and better handling exception object
@@ -261,7 +270,7 @@ v0.13.1 2020-09-20T08:12:16+0900
     - Modified __create_class that was missing the handling of object_array_object type of method.
     - Modified as_hash so that DateTime object are converted to string
 
-v0.13.0 2020-07-10T10:30:10+0900
+v0.13.0 2020-07-10T10:30:10Z +0900
     - Added alias method _set_get_number_as_object for convenience and pointing to _set_get_number
     - Added the method append in Module::Generic::Scalar
     - Added an iterator class with Module::Generic::Iterator and Module::Generic::Iterator::Element
@@ -280,7 +289,7 @@ v0.13.0 2020-07-10T10:30:10+0900
     - corrected methods map_array() and map_hash() in Module::Generic::Hash
     - Updated _set_get_url to better capture all kinds of url
 
-v0.12.16 2020-06-17T15:03:17+0900
+v0.12.16 2020-06-17T15:03:17Z +0900
     - Added the helper method _is_a to simplify the check for object class
     - Added method get() and list() in Module::Generic::Array
     - Added method tr in Module::Generic::Scalar
@@ -289,13 +298,13 @@ v0.12.16 2020-06-17T15:03:17+0900
     - Added methods new_array, new_hash, new_number and new_scalar in Module::Generic to make it more convenient to create object from those classes
     - Added some missing documentation to Module::Generic::Scalar
 
-v0.12.15 2020-06-16T12:22:19+0900
+v0.12.15 2020-06-16T12:22:19Z +0900
     - Fixed some test units
 
-v0.12.14 2020-05-28T05:46:04+0900
+v0.12.14 2020-05-28T05:46:04Z +0900
     - Tweaked Module::Generic::Number::_set_get_prop in my last desperate attempt to correct this tedious bug. Should fix RT #132714
 
-v0.12.13 2020-05-27T13:58:324+0900
+v0.12.13 2020-05-27T13:58:32Z 4+0900
     - Corrected (hopefully) an issue whereby some undefined hash keys would not be undefined affecting test unit
 
 v0.12.12 2020-05-25T13:55:00+09:00
@@ -303,28 +312,28 @@ v0.12.12 2020-05-25T13:55:00+09:00
     - Implemented a workaround to Number::Format on Windows whereby some of the POSIX::localconv values are -1. When there is no value, such as when the locale is C or when it is on Windows (value being -1), then numeric values default to 0
     - Improved test units for when running on Windows Strawberry
 
-v0.12.11 2020-05-25T14:56:154+0900
+v0.12.11 2020-05-25T14:56:15Z 4+0900
 
-v0.12.10 2020-05-24T13:00:034+0900
+v0.12.10 2020-05-24T13:00:03Z 4+0900
     - Corrected bug in test unit for Module::Generic::Number. Fix bug RT #132671
     - Updated Module::Generic::Scalar to return undef when creating an object with an undefined value. Fix bug RT #132681 (https://rt.cpan.org/Ticket/Display.html?id=132681)
 
-v0.12.9 2020-05-23T15:00:574+0900
+v0.12.9 2020-05-23T15:00:57Z 4+0900
     - Corrected bug in test unit for Module::Generic::Number
 
-v0.12.8 2020-05-22T16:15:004+0900
+v0.12.8 2020-05-22T16:15:00Z 4+0900
     - Change POSIX requirement to version 1.53_01 and perl minimum version to v5.26.1
 
-v0.12.7 2020-05-22T16:15:004+0900
+v0.12.7 2020-05-22T16:15:00Z 4+0900
     - Corrected RT bug #132664 https://rt.cpan.org/Public/Bug/Display.html?id=132664 in Module::Number::init
 
-v0.12.6 2020-05-21T14:52:004+0900
+v0.12.6 2020-05-21T14:52:00Z 4+0900
     - Corrected a small bug in creating a Number::Format object.
 
-v0.12.5 2020-05-20T23:22:004+0900
+v0.12.5 2020-05-20T23:22:00Z 4+0900
     - Change from TryCatch to Nice::Try because TryCatch got broken with release of Devel::Declare version 0.006020
 
-v0.12.4 2020-05-16T17:22:004+0900
+v0.12.4 2020-05-16T17:22:00Z 4+0900
     - Specified more clearly version 0.006019 for Devel::Declare, because upper version break TryCatch
 
 v0.12.3 2020-05-16

@@ -458,7 +458,7 @@ Write the data provided to the shared memory, after having encoded it using L<JS
 
 You can only store in shared memory reference, such as scalar reference, array or hash reference. You could also store module objects, but L<JSON> only supports encoding objects that are based on array or hash. As the L<JSON> documentation states "other blessed references will be converted into null"
 
-It returns the current object for chaining, or under if there was an error, which can then be retrieved with L<Module::Generic/error>
+It returns the current object for chaining, or C<undef> if there was an error, which can then be retrieved with L<Module::Generic/error>
 
 =head1 AUTHOR
 

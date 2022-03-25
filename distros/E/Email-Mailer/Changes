@@ -1,5 +1,8 @@
 Revision history for Email::Mailer
 
+1.19      2022-03-19 17:50:12-07:00 America/Los_Angeles
+        - Minor documentation update
+
 1.18      2021-05-03 07:21:02-07:00 America/Los_Angeles
         - Fix text-parts missing charset and content-transfer-encoding
 

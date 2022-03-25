@@ -26,7 +26,7 @@ use strict;
 use warnings;
 use Carp qw{ carp croak };
 
-our $VERSION = 0.46;
+our $VERSION = 0.47;
 
 =head2 _new
 

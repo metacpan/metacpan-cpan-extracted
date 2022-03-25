@@ -1,4 +1,5 @@
-requires 'Object::Pad', '>= 0.61';
+requires 'perl', '>= 5.026';
+requires 'Object::Pad', '>= 0.63';
 requires 'IO::Async::Notifier', '>= 0.79';
 
 on 'test' => sub {

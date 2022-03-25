@@ -7,7 +7,7 @@ use warnings;
 
 use Filter::Simple;
 
-our $VERSION = '1.02'; # VERSION
+our $VERSION = '1.03'; # VERSION
 
 FILTER_ONLY
     code => sub {
@@ -28,7 +28,7 @@ Filter::CommaEquals - Adds support for ,= to any package or script
 
 =head1 VERSION
 
-version 1.02
+version 1.03
 
 =for markdown [![test](https://github.com/gryphonshafer/Filter-CommaEquals/workflows/test/badge.svg)](https://github.com/gryphonshafer/Filter-CommaEquals/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/Filter-CommaEquals/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Filter-CommaEquals)
@@ -114,7 +114,7 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2014-2021 by Gryphon Shafer.
+This software is Copyright (c) 2014-2050 by Gryphon Shafer.
 
 This is free software, licensed under:
 

@@ -33,6 +33,7 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
+            "IO::Socket::SSL" : "0",
             "JSON::PP" : "0",
             "Mojolicious" : "8",
             "Moo" : "1.003001",
@@ -59,83 +60,83 @@
    "provides" : {
       "API::MailboxOrg" : {
          "file" : "lib/API/MailboxOrg.pm",
-         "version" : "v1.0.1"
+         "version" : "v1.0.2"
       },
       "API::MailboxOrg::API::Account" : {
          "file" : "lib/API/MailboxOrg/API/Account.pm",
-         "version" : "v1.0.1"
+         "version" : "v1.0.2"
       },
       "API::MailboxOrg::API::Backup" : {
          "file" : "lib/API/MailboxOrg/API/Backup.pm",
-         "version" : "v1.0.1"
+         "version" : "v1.0.2"
       },
       "API::MailboxOrg::API::Base" : {
          "file" : "lib/API/MailboxOrg/API/Base.pm",
-         "version" : "v1.0.1"
+         "version" : "v1.0.2"
       },
       "API::MailboxOrg::API::Blacklist" : {
          "file" : "lib/API/MailboxOrg/API/Blacklist.pm",
-         "version" : "v1.0.1"
+         "version" : "v1.0.2"
       },
       "API::MailboxOrg::API::Capabilities" : {
          "file" : "lib/API/MailboxOrg/API/Capabilities.pm",
-         "version" : "v1.0.1"
+         "version" : "v1.0.2"
       },
       "API::MailboxOrg::API::Context" : {
          "file" : "lib/API/MailboxOrg/API/Context.pm",
-         "version" : "v1.0.1"
+         "version" : "v1.0.2"
       },
       "API::MailboxOrg::API::Domain" : {
          "file" : "lib/API/MailboxOrg/API/Domain.pm",
-         "version" : "v1.0.1"
+         "version" : "v1.0.2"
       },
       "API::MailboxOrg::API::Hello" : {
          "file" : "lib/API/MailboxOrg/API/Hello.pm",
-         "version" : "v1.0.1"
+         "version" : "v1.0.2"
       },
       "API::MailboxOrg::API::Invoice" : {
          "file" : "lib/API/MailboxOrg/API/Invoice.pm",
-         "version" : "v1.0.1"
+         "version" : "v1.0.2"
       },
       "API::MailboxOrg::API::Mail" : {
          "file" : "lib/API/MailboxOrg/API/Mail.pm",
-         "version" : "v1.0.1"
+         "version" : "v1.0.2"
       },
       "API::MailboxOrg::API::Mailinglist" : {
          "file" : "lib/API/MailboxOrg/API/Mailinglist.pm",
-         "version" : "v1.0.1"
+         "version" : "v1.0.2"
       },
       "API::MailboxOrg::API::Passwordreset" : {
          "file" : "lib/API/MailboxOrg/API/Passwordreset.pm",
-         "version" : "v1.0.1"
+         "version" : "v1.0.2"
       },
       "API::MailboxOrg::API::Spamprotect" : {
          "file" : "lib/API/MailboxOrg/API/Spamprotect.pm",
-         "version" : "v1.0.1"
+         "version" : "v1.0.2"
       },
       "API::MailboxOrg::API::Test" : {
          "file" : "lib/API/MailboxOrg/API/Test.pm",
-         "version" : "v1.0.1"
+         "version" : "v1.0.2"
       },
       "API::MailboxOrg::API::Utils" : {
          "file" : "lib/API/MailboxOrg/API/Utils.pm",
-         "version" : "v1.0.1"
+         "version" : "v1.0.2"
       },
       "API::MailboxOrg::API::Validate" : {
          "file" : "lib/API/MailboxOrg/API/Validate.pm",
-         "version" : "v1.0.1"
+         "version" : "v1.0.2"
       },
       "API::MailboxOrg::API::Videochat" : {
          "file" : "lib/API/MailboxOrg/API/Videochat.pm",
-         "version" : "v1.0.1"
+         "version" : "v1.0.2"
       },
       "API::MailboxOrg::APIBase" : {
          "file" : "lib/API/MailboxOrg/APIBase.pm",
-         "version" : "v1.0.1"
+         "version" : "v1.0.2"
       },
       "API::MailboxOrg::Types" : {
          "file" : "lib/API/MailboxOrg/Types.pm",
-         "version" : "v1.0.1"
+         "version" : "v1.0.2"
       }
    },
    "release_status" : "stable",
@@ -150,7 +151,7 @@
          "web" : "https://github.com/perlservices/API-MailboxOrg"
       }
    },
-   "version" : "1.0.1",
+   "version" : "1.0.2",
    "x_contributors" : [
       "reneeb <info@perl-services.de>"
    ],

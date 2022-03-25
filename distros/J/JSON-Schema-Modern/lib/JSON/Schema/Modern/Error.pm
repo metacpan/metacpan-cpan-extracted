@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Error;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Contains a single error from a JSON Schema evaluation
 
-our $VERSION = '0.548';
+our $VERSION = '0.549';
 
 use 5.020;
 use Moo;
@@ -17,7 +17,7 @@ no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 use Safe::Isa;
 use JSON::PP ();
 use MooX::TypeTiny;
-use Types::Standard qw(Str Undef InstanceOf);
+use Types::Standard qw(Str Undef InstanceOf Enum);
 use namespace::clean;
 
 use overload
@@ -51,6 +51,11 @@ has exception => (
   coerce => sub { $_[0] ? JSON::PP::true : JSON::PP::false },
 );
 
+has mode => (
+  is => 'rw',
+  isa => Enum[qw(traverse evaluate)],
+);
+
 sub TO_JSON ($self) {
   return +{
     # note that locations are JSON pointers, not uri fragments!
@@ -63,7 +68,9 @@ sub TO_JSON ($self) {
 }
 
 sub stringify ($self) {
-  'at \''.$self->instance_location.'\': '.$self->error;
+  ($self->mode//'') eq 'traverse'
+    ? 'at \''.$self->keyword_location.'\': '.$self->error
+    : 'at \''.$self->instance_location.'\': '.$self->error;
 }
 
 1;
@@ -82,7 +89,7 @@ JSON::Schema::Modern::Error - Contains a single error from a JSON Schema evaluat
 
 =head1 VERSION
 
-version 0.548
+version 0.549
 
 =head1 SYNOPSIS
 
@@ -135,7 +142,7 @@ Indicates the error's severity is sufficient to stop evaluation.
 
 =head1 METHODS
 
-=for Pod::Coverage stringify
+=for Pod::Coverage stringify mode
 
 =head2 TO_JSON
 

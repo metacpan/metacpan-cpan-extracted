@@ -34,7 +34,7 @@ use strict;
 use warnings;
 use Carp qw{ carp croak };
 
-our $VERSION = 0.46;
+our $VERSION = 0.47;
 
 use Webservice::OVH::Cloud::Project::IP;
 use Webservice::OVH::Cloud::Project::Instance;

@@ -1,0 +1,248 @@
+use alienfile;
+
+# NOTE: you can set ALIEN_7ZIP_SHARE_PREFER to either:
+#
+# - "auto": try binary install if possible (default)
+# - "source": try from-source install only
+# - "binary": try from-binary install only
+
+# NOTE
+# - 7zip provides the '7zz' binary on Unix-likes and the '7z.exe' binary on
+#   Windows.
+# - p7zip is a fork which provides the '7z' binary on Unix-likes.
+plugin 'Probe::CommandLine' => (
+  command => $_,
+  match   => qr/7-Zip (?:\Q(z) \E)?([0-9\.]+)/,
+  version => qr/7-Zip (?:\Q(z) \E)?([0-9\.]+)/,
+) for qw( 7z.exe 7zz );
+
+sub can_source {
+  return 1;
+}
+
+sub do_source {
+  plugin Download => (
+    filter  => qr/^7z(\d+).*-src\.tar\.xz$/,
+    version => qr/^7z([0-9\.]+)/,
+  );
+  plugin Extract => 'tar.xz';
+  my $build_dir = 'CPP/7zip/Bundles/Alone2';
+  my $output_dir = '_o';
+  my $bin_name = '7zz';
+  build [
+    [ '%{make}',
+      qw(-C), $build_dir,
+      qw(-f makefile.gcc),
+      "O=$output_dir",
+      ( $^O eq 'MSWin32' ? ('IS_MINGW=1') : () ),
+    ],
+    sub {
+      my ($build) = @_;
+      my $prefix = Path::Tiny::path($build->install_prop->{prefix});
+      my $output = Path::Tiny::path($build_dir, $output_dir);
+
+      my $prefix_bin_name = $prefix->child('bin', $bin_name);
+      $prefix_bin_name->parent->mkpath;
+      File::Copy::Recursive::fcopy($output->child($bin_name), $prefix_bin_name);
+    }
+  ];
+  after build => sub {
+    my($build) = @_;
+    $build->runtime_prop->{'style'} = 'source';
+    if( $^O ne 'MSWin32' ) {
+      # on Unix-likes (linux, darwin)
+      $build->runtime_prop->{command} = '7zz';
+    } else {
+      # TODO not yet implemented
+      $build->runtime_prop->{command} = '7z.exe';
+    }
+  };
+}
+
+use Config;
+# normalise architecture name
+sub _arch_norm {
+  if( $Config{archname} =~ /x64|x86_64|amd64/i ) {
+    return 'x86_64'
+  }
+  if( $Config{archname} =~ /x86|i686/i ) {
+    return 'x86'
+  }
+  if( $Config{archname} =~ /darwin/i ) {
+    my $cpu_brand = `sysctl -n machdep.cpu.brand_string`;
+    if( $cpu_brand =~ /Apple/ ) {
+      return 'arm64'; # MacOS M1
+    } elsif( $cpu_brand =~ /Intel/ ) {
+      return 'x86_64'; # MacOS Intel
+    }
+  }
+  if( $Config{archname} =~ /aarch64/i ) {
+    return 'arm64'
+  }
+  if( $Config{archname} =~ /arm-linux-gnueabihf/i ) {
+    return 'armhf'; # 32-bit ARM hard float
+  }
+}
+
+my @binary_variants = (
+  # 64-bit Windows x64
+  { os => 'MSWin32', arch => 'x86_64', filter => qr/7z(\d+)\Q-x64.msi\E/, format => '.msi', },
+  # 32-bit Windows x86
+  { os => 'MSWin32', arch => 'x86'   , filter => qr/7z(\d+)\Q.msi\E/, format => '.msi', },
+  # 64-bit Linux x86-64
+  { os => 'linux'  , arch => 'x86_64', filter => qr/7z(\d+)\Q-linux-x64.tar.xz\E/, format => '.tar.xz', },
+  # 32-bit Linux x86
+  { os => 'linux'  , arch => 'x86'   , filter => qr/7z(\d+)\Q-linux-x86.tar.xz\E/, format => '.tar.xz', },
+  # 64-bit Linux arm64
+  { os  => 'linux' , arch => 'arm64' , filter => qr/7z(\d+)\Q-linux-arm64.tar.xz\E/, format => '.tar.xz', },
+  # 32-bit Linux arm
+  { os => 'linux'  , arch => 'armhf' , filter => qr/7z(\d+)\Q-linux-arm.tar.xz\E/, format => '.tar.xz', },
+  # macOS (arm64 / x86-64)
+  { os => 'darwin', arch => qr/^(x86_64|arm64)$/, filter => qr/7z(\d+)\Q-mac.tar.xz\E/, format => '.tar.xz', },
+);
+
+my ($binary_release_name_re, $binary_release_format);
+sub can_binary {
+  my $arch = _arch_norm();
+  print STDERR "<os, arch> = < $^O, $arch >\n" if $arch;
+  for my $variant (@binary_variants) {
+    if( $^O =~ $variant->{os} && $arch =~ $variant->{arch} ) {
+      $binary_release_name_re = $variant->{filter};
+      $binary_release_format  = $variant->{format};
+      return;
+    }
+  }
+
+  die "No binary packages available for this configuration";
+}
+
+sub do_binary {
+  plugin Download => (
+    filter  => $binary_release_name_re,
+    version => qr/^7z([0-9\.]+)/,
+  );
+  if( $binary_release_format eq '.msi' ) {
+    extract sub {
+      my ($build) = @_;
+
+      my $msi = Path::Tiny::path($build->install_prop->{download})->canonpath;
+      my $cwd = Path::Tiny->cwd->canonpath;
+
+      Alien::Build::CommandSequence->new([
+        qw(msiexec /a),
+        $msi,
+        "TARGETDIR=$cwd",
+        '/qn'
+      ])->execute($build);
+    };
+
+    patch sub {
+      my $cwd = Path::Tiny->cwd;
+      $_->remove for $cwd->children( qr/\.msi$/ );
+      my $_7zip = $cwd->child('Files/7-Zip');
+      $_->remove for $_7zip->children( qr/\.chm$|History\.txt|readme\.txt/ );
+      my $bin_dir = $cwd->child('bin');
+      $bin_dir->mkpath;
+      File::Copy::Recursive::rmove( "$_7zip/*", $bin_dir );
+      $_7zip->remove_tree;
+      $_7zip->parent->remove_tree unless $_7zip->parent->children;
+    };
+    plugin 'Build::Copy';
+    after build => sub {
+      my($build) = @_;
+      $build->runtime_prop->{'style'} = 'binary';
+      # on MSWin32
+      $build->runtime_prop->{command} = '7z.exe';
+    };
+  } elsif( $binary_release_format eq '.tar.xz' ) {
+    plugin Extract => 'tar.xz';
+    patch sub {
+      my $cwd = Path::Tiny->cwd;
+      # remove History.txt, readme.txt, MANUAL/
+      $_->remove_tree for $cwd->children( qr/MANUAL|History\.txt|readme\.txt/ );
+
+      my $bin_dir = $cwd->child('bin');
+      $bin_dir->mkpath;
+      # Move 7zz|7zzs into bin/ (if exist)
+      File::Copy::Recursive::rmove( "$_", $bin_dir ) for $cwd->children( qr/^(7zz|7zzs)$/ );
+    };
+    plugin 'Build::Copy';
+    after build => sub {
+      my($build) = @_;
+      $build->runtime_prop->{'style'} = 'binary';
+      # on Unix-likes (linux, darwin)
+      $build->runtime_prop->{command} = '7zz';
+    };
+  }
+}
+
+sub _fix_share_version {
+  meta->around_hook(
+    prefer => sub {
+      my $orig = shift;
+      my $build = shift;
+      my $data = $orig->($build, @_);
+
+      for my $item (@{ $data->{list} }) {
+        # insert a dot after the first 2 digits
+        $item->{version} =~ s/^(\d{2})(\d.*)$/$1.$2/;
+      }
+
+      $data;
+    },
+  );
+}
+
+share {
+  requires 'Path::Tiny';
+  requires 'File::Copy::Recursive';
+  requires 'Alien::Build::CommandSequence';
+
+  $ENV{ALIEN_7ZIP_SHARE_PREFER} ||= 'auto';
+
+  start_url 'https://www.7-zip.org/download.html';
+  _fix_share_version();
+
+  my $release_types = {
+    source => {
+      'can' => \&can_source,
+      'do'  => \&do_source,
+    },
+    binary => {
+      'can' => \&can_binary,
+      'do'  => \&do_binary,
+    },
+  };
+
+  if( $ENV{ALIEN_7ZIP_SHARE_PREFER} eq 'auto' ) {
+    my $which_type;
+    my @types = qw(binary source);
+    for my $type (@types) {
+      eval { $release_types->{$type}{can}->() };
+      my $catch = $@;
+      if( $catch ) {
+        warn "Unable to install release type $type: $catch";
+        next;
+      }
+
+      $which_type = $type;
+      $release_types->{$type}{do}->();
+      last;
+    }
+
+    if( ! $which_type ) {
+      die "Unable to install from release types: @types";
+    }
+  } elsif( exists $release_types->{ $ENV{ALIEN_7ZIP_SHARE_PREFER} } ) {
+    $release_types->{ $ENV{ALIEN_7ZIP_SHARE_PREFER} }{$_}->() for qw(can do);
+  } else {
+    die "Unknown value for ALIEN_7ZIP_SHARE_PREFER: $ENV{ALIEN_7ZIP_SHARE_PREFER}";
+  }
+};
+
+sys {
+  meta->after_hook( probe => sub {
+    my($build) = @_;
+    $build->runtime_prop->{'style'} = 'system';
+  });
+};

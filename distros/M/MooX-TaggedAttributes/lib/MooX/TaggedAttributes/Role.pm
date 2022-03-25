@@ -3,14 +3,14 @@ package MooX::TaggedAttributes::Role;
 # ABSTRACT: "Parent" Tag Role
 
 ## no critic
-our $VERSION = '0.13';
+our $VERSION = '0.15';
 ## use critic
 
 use MRO::Compat;
 
-use Scalar::Util ();
+use Scalar::Util           ();
 use MooX::TaggedAttributes ();
-use Sub::Name ();
+use Sub::Name              ();
 
 # Moo::Role won't compose anything before it was used into a consuming
 # package.
@@ -36,7 +36,8 @@ around _tag_list => sub {
     my $package = caller;
 
     # create the proper environment context for next::can
-    my $code = Sub::Name::subname( "${package}::_tag_list" => $maybe_next_method );
+    my $code
+      = Sub::Name::subname( "${package}::_tag_list" => $maybe_next_method );
     my $next = $_[0]->$code;
 
     return [ @{&$orig}, $next ? @{$next} : () ];
@@ -76,12 +77,14 @@ sub _tags {
 
     # called as an object method?
     if ( defined $class ) {
-        return $MooX::TaggedAttributes::TAGCACHE{$class} //= MooX::TaggedAttributes::Cache->new( $class );
+        return $MooX::TaggedAttributes::TAGCACHE{$class}
+          //= MooX::TaggedAttributes::Cache->new( $class );
     }
 
     else {
         $class = $_[0];
-        return $MooX::TaggedAttributes::TAGCACHE{$class} // MooX::TaggedAttributes::Cache->new( $class );
+        return $MooX::TaggedAttributes::TAGCACHE{$class}
+          // MooX::TaggedAttributes::Cache->new( $class );
     }
 
 }
@@ -100,7 +103,7 @@ MooX::TaggedAttributes::Role - "Parent" Tag Role
 
 =head1 VERSION
 
-version 0.13
+version 0.15
 
 =head1 SUBROUTINES
 

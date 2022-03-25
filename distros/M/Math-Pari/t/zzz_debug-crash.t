@@ -28,7 +28,8 @@ print "1..1\nok 1\n";
 
 my $debugger = 'auto-dbg/auto-debug-module.pl';
 $debugger = "../$debugger" if not -f $debugger and -f "../$debugger";
-@ARGV = ('-q', $module, @crash);
+$debugger = "./$debugger";		# '.' is not in INC any more
+@ARGV = (qw(-B -q), $module, @crash);
 $0 = $debugger;
 do $debugger or warn "$debugger exited unexpectedly: $@";
 __END__

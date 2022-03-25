@@ -7,6 +7,7 @@ build_requires:
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
@@ -20,7 +21,9 @@ no_index:
     - inc
 requires:
   Digest::SHA: '0'
+  File::Copy: '0'
   File::HomeDir: '0'
+  File::Share: '0'
   HTTP::Request: '0'
   JSON: '0'
   MIME::Base64: '3.16'
@@ -30,5 +33,5 @@ requires:
 resources:
   bugtracker: https://github.com/stevieb9/tesla-api/issues
   repository: https://github.com/stevieb9/tesla-api.git
-version: '0.01'
+version: '0.09'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

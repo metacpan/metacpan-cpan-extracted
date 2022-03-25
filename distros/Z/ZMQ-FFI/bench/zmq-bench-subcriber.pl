@@ -1,5 +1,4 @@
-use v5.10;
-use strict;
+use 5.012;
 use warnings;
 
 use ZMQ::FFI qw(ZMQ_SUB);

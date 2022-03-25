@@ -4,7 +4,7 @@ package App::ElasticSearch::Utilities::QueryString::AutoEscape;
 use strict;
 use warnings;
 
-our $VERSION = '8.2'; # VERSION
+our $VERSION = '8.3'; # VERSION
 
 use CLI::Helpers qw(:output);
 use Const::Fast;
@@ -41,7 +41,7 @@ App::ElasticSearch::Utilities::QueryString::AutoEscape - Provides a prefix of '=
 
 =head1 VERSION
 
-version 8.2
+version 8.3
 
 =head1 SYNOPSIS
 
@@ -73,7 +73,7 @@ Brad Lhotsky <brad@divisionbyzero.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2021 by Brad Lhotsky.
+This software is Copyright (c) 2022 by Brad Lhotsky.
 
 This is free software, licensed under:
 

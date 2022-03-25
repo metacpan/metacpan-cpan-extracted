@@ -1,12 +1,22 @@
 package Lite::Route::Baz::A;
 use Mojo::Base 'MojoX::Route';
 
-sub route {
-    my ($self, $r) = @_;
+sub under {
+    my ($self, $baz) = @_;
+    
+    $baz->under('/a');
+}
 
-    $r->get('/a' => sub {
+sub route {
+    my ($self, $a, $baz) = @_;
+
+    $baz->get('/a' => sub {
         shift->render(text => 'Baz::A');
     });
+    
+    $a->get('/new' => sub {
+        shift->render(text => 'Baz::A->new');
+    })
 }
 
 1;

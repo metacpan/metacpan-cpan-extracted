@@ -4,7 +4,7 @@ use strict;
 our ( %released, %version, %families, %upstream, %bug_tracker, %deprecated, %delta );
 
 use version;
-our $VERSION = '5.20220313';
+our $VERSION = '5.20220320';
 
 sub PKG_PATTERN () { q#\A[a-zA-Z_][0-9a-zA-Z_]*(?:(::|')[0-9a-zA-Z_]+)*\z# }
 sub _looks_like_invocant ($) { local $@; !!eval { $_[0]->isa(__PACKAGE__) } }
@@ -389,6 +389,7 @@ sub changes_between {
     5.035008 => '2022-01-20',
     5.035009 => '2022-02-20',
     5.034001 => '2022-03-13',
+    5.035010 => '2022-03-20',
   );
 
 for my $version ( sort { $a <=> $b } keys %released ) {
@@ -19167,6 +19168,123 @@ for my $version ( sort { $a <=> $b } keys %released ) {
         removed => {
         }
     },
+    5.035010 => {
+        delta_from => 5.035009,
+        changed => {
+            'Attribute::Handlers'   => '1.02',
+            'B::Deparse'            => '1.63',
+            'B::Op_private'         => '5.035010',
+            'Config'                => '5.03501',
+            'Cwd'                   => '3.84',
+            'DB_File'               => '1.857',
+            'Devel::PPPort'         => '3.68',
+            'ExtUtils::ParseXS'     => '3.45',
+            'ExtUtils::ParseXS::Constants'=> '3.45',
+            'ExtUtils::ParseXS::CountLines'=> '3.45',
+            'ExtUtils::ParseXS::Eval'=> '3.45',
+            'ExtUtils::ParseXS::Utilities'=> '3.45',
+            'ExtUtils::Typemaps'    => '3.45',
+            'ExtUtils::Typemaps::Cmd'=> '3.45',
+            'ExtUtils::Typemaps::InputMap'=> '3.45',
+            'ExtUtils::Typemaps::OutputMap'=> '3.45',
+            'ExtUtils::Typemaps::Type'=> '3.45',
+            'File::Spec'            => '3.84',
+            'File::Spec::AmigaOS'   => '3.84',
+            'File::Spec::Cygwin'    => '3.84',
+            'File::Spec::Epoc'      => '3.84',
+            'File::Spec::Functions' => '3.84',
+            'File::Spec::Mac'       => '3.84',
+            'File::Spec::OS2'       => '3.84',
+            'File::Spec::Unix'      => '3.84',
+            'File::Spec::VMS'       => '3.84',
+            'File::Spec::Win32'     => '3.84',
+            'GDBM_File'             => '1.23',
+            'List::Util'            => '1.62',
+            'List::Util::XS'        => '1.62',
+            'Module::CoreList'      => '5.20220320',
+            'Module::CoreList::Utils'=> '5.20220320',
+            'Opcode'                => '1.57',
+            'Scalar::Util'          => '1.62',
+            'Sub::Util'             => '1.62',
+            'Test2'                 => '1.302190',
+            'Test2::API'            => '1.302190',
+            'Test2::API::Breakage'  => '1.302190',
+            'Test2::API::Context'   => '1.302190',
+            'Test2::API::Instance'  => '1.302190',
+            'Test2::API::InterceptResult'=> '1.302190',
+            'Test2::API::InterceptResult::Event'=> '1.302190',
+            'Test2::API::InterceptResult::Facet'=> '1.302190',
+            'Test2::API::InterceptResult::Hub'=> '1.302190',
+            'Test2::API::InterceptResult::Squasher'=> '1.302190',
+            'Test2::API::Stack'     => '1.302190',
+            'Test2::Event'          => '1.302190',
+            'Test2::Event::Bail'    => '1.302190',
+            'Test2::Event::Diag'    => '1.302190',
+            'Test2::Event::Encoding'=> '1.302190',
+            'Test2::Event::Exception'=> '1.302190',
+            'Test2::Event::Fail'    => '1.302190',
+            'Test2::Event::Generic' => '1.302190',
+            'Test2::Event::Note'    => '1.302190',
+            'Test2::Event::Ok'      => '1.302190',
+            'Test2::Event::Pass'    => '1.302190',
+            'Test2::Event::Plan'    => '1.302190',
+            'Test2::Event::Skip'    => '1.302190',
+            'Test2::Event::Subtest' => '1.302190',
+            'Test2::Event::TAP::Version'=> '1.302190',
+            'Test2::Event::V2'      => '1.302190',
+            'Test2::Event::Waiting' => '1.302190',
+            'Test2::EventFacet'     => '1.302190',
+            'Test2::EventFacet::About'=> '1.302190',
+            'Test2::EventFacet::Amnesty'=> '1.302190',
+            'Test2::EventFacet::Assert'=> '1.302190',
+            'Test2::EventFacet::Control'=> '1.302190',
+            'Test2::EventFacet::Error'=> '1.302190',
+            'Test2::EventFacet::Hub'=> '1.302190',
+            'Test2::EventFacet::Info'=> '1.302190',
+            'Test2::EventFacet::Info::Table'=> '1.302190',
+            'Test2::EventFacet::Meta'=> '1.302190',
+            'Test2::EventFacet::Parent'=> '1.302190',
+            'Test2::EventFacet::Plan'=> '1.302190',
+            'Test2::EventFacet::Render'=> '1.302190',
+            'Test2::EventFacet::Trace'=> '1.302190',
+            'Test2::Formatter'      => '1.302190',
+            'Test2::Formatter::TAP' => '1.302190',
+            'Test2::Hub'            => '1.302190',
+            'Test2::Hub::Interceptor'=> '1.302190',
+            'Test2::Hub::Interceptor::Terminator'=> '1.302190',
+            'Test2::Hub::Subtest'   => '1.302190',
+            'Test2::IPC'            => '1.302190',
+            'Test2::IPC::Driver'    => '1.302190',
+            'Test2::IPC::Driver::Files'=> '1.302190',
+            'Test2::Tools::Tiny'    => '1.302190',
+            'Test2::Util'           => '1.302190',
+            'Test2::Util::ExternalMeta'=> '1.302190',
+            'Test2::Util::Facets2Legacy'=> '1.302190',
+            'Test2::Util::HashBase' => '1.302190',
+            'Test2::Util::Trace'    => '1.302190',
+            'Test::Builder'         => '1.302190',
+            'Test::Builder::Formatter'=> '1.302190',
+            'Test::Builder::Module' => '1.302190',
+            'Test::Builder::Tester' => '1.302190',
+            'Test::Builder::Tester::Color'=> '1.302190',
+            'Test::Builder::TodoDiag'=> '1.302190',
+            'Test::More'            => '1.302190',
+            'Test::Simple'          => '1.302190',
+            'Test::Tester'          => '1.302190',
+            'Test::Tester::Capture' => '1.302190',
+            'Test::Tester::CaptureRunner'=> '1.302190',
+            'Test::Tester::Delegate'=> '1.302190',
+            'Test::use::ok'         => '1.302190',
+            'XS::APItest'           => '1.22',
+            'builtin'               => '0.004',
+            'experimental'          => '0.028',
+            'feature'               => '1.71',
+            'ok'                    => '1.302190',
+            'warnings'              => '1.58',
+        },
+        removed => {
+        }
+    },
 );
 
 sub is_core
@@ -20449,6 +20567,13 @@ sub is_core
         removed => {
         }
     },
+    5.035010 => {
+        delta_from => 5.035009,
+        changed => {
+        },
+        removed => {
+        }
+    },
 );
 
 %deprecated = _undelta(\%deprecated);
@@ -20639,6 +20764,7 @@ sub is_core
     'Math::BigInt::Lib'     => 'cpan',
     'Math::BigInt::Trace'   => 'cpan',
     'Math::BigRat'          => 'cpan',
+    'Math::BigRat::Trace'   => 'cpan',
     'Math::Complex'         => 'cpan',
     'Math::Trig'            => 'cpan',
     'Memoize'               => 'cpan',
@@ -21067,6 +21193,7 @@ sub is_core
     'Math::BigInt::Lib'     => undef,
     'Math::BigInt::Trace'   => undef,
     'Math::BigRat'          => undef,
+    'Math::BigRat::Trace'   => undef,
     'Math::Complex'         => undef,
     'Math::Trig'            => undef,
     'Memoize'               => undef,

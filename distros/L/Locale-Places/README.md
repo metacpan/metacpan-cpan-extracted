@@ -1,10 +1,15 @@
 # NAME
 
-Locale::Places - Translate places using http://download.geonames.org/
+Locale::Places - Translate places between different languages using http://download.geonames.org/
 
 # VERSION
 
-Version 0.06
+Version 0.07
+
+# SYNOPSIS
+
+Translates towns and cities between different languages, for example
+London is Londres in French.
 
 # METHODS
 
@@ -80,9 +85,13 @@ You can also look for information at:
 
     [http://deps.cpantesters.org/?module=Locale::Places](http://deps.cpantesters.org/?module=Locale::Places)
 
+- Geonames Discussion Group
+
+    [https://groups.google.com/g/geonames](https://groups.google.com/g/geonames)
+
 # LICENCE AND COPYRIGHT
 
-Copyright 2020-2021 Nigel Horne.
+Copyright 2020-2022 Nigel Horne.
 
 This program is released under the following licence: GPL2
 

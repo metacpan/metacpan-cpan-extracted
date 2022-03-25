@@ -16,7 +16,7 @@ use Types::Standard qw(Str Object Int);
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '1.0.1'; # VERSION
+our $VERSION = '1.0.2'; # VERSION
 
 has api      => ( is => 'ro', isa => Object, required => 1 );
 has json_rpc => ( is => 'ro', isa => Str, default => sub { '2.0' } );
@@ -91,7 +91,7 @@ API::MailboxOrg::APIBase - Base class for all entity classes
 
 =head1 VERSION
 
-version 1.0.1
+version 1.0.2
 
 =head1 ATTRIBUTES
 

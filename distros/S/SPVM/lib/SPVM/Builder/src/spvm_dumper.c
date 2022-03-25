@@ -268,7 +268,6 @@ void SPVM_DUMPER_dump_opcode_array(SPVM_COMPILER* compiler, SPVM_OPCODE_ARRAY* o
       printf("        [%" PRId32 "] %-20s", i, (SPVM_OPCODE_C_ID_NAMES())[opcode.id]);
       printf(" %d %d %d %d\n", opcode.operand0, opcode.operand1, opcode.operand2, opcode.operand3);
     }
-    
   }
 }
 
@@ -315,20 +314,6 @@ void SPVM_DUMPER_dump_method(SPVM_COMPILER* compiler, SPVM_METHOD* method) {
     printf("\n");
     printf("      is_enum => %d\n", (method->flag & SPVM_METHOD_C_FLAG_ENUM) ? 1 : 0);
     printf("      have_native_desc => %d\n", (method->flag & SPVM_METHOD_C_FLAG_NATIVE) ? 1 : 0);
-    printf("      var_alloc_length => %d\n", SPVM_METHOD_get_var_alloc_length(compiler, method));
-    printf("      arg_alloc_length => %d\n", SPVM_METHOD_get_var_alloc_length(compiler, method));
-    
-    printf("      args\n");
-    SPVM_LIST* args = method->args;
-    {
-      int32_t i;
-      for (i = 0; i < args->length; i++) {
-        SPVM_MY* my = SPVM_LIST_fetch(method->args, i);
-        printf("        [%" PRId32 "] ", i);
-        SPVM_DUMPER_dump_my(compiler, my);
-      }
-    }
-    
     if (!(method->flag & SPVM_METHOD_C_FLAG_NATIVE)) {
       printf("      mys\n");
       SPVM_LIST* mys = method->mys;
@@ -340,8 +325,6 @@ void SPVM_DUMPER_dump_method(SPVM_COMPILER* compiler, SPVM_METHOD* method) {
           SPVM_DUMPER_dump_my(compiler, my);
         }
       }
-      
-      printf("      call_method_arg_stack_max => %" PRId32 "\n", method->call_method_arg_stack_max);
       
       printf("      AST\n");
       SPVM_DUMPER_dump_ast(compiler, method->op_block);
@@ -359,9 +342,6 @@ void SPVM_DUMPER_dump_method_opcode_array(SPVM_COMPILER* compiler, SPVM_METHOD* 
   if (method) {
     
     printf("      name => \"%s\"\n", method->op_name->uv.name);
-    printf("      var_alloc_length => %d\n", SPVM_METHOD_get_var_alloc_length(compiler, method));
-    printf("      arg_alloc_length => %d\n", SPVM_METHOD_get_var_alloc_length(compiler, method));
-    
     if (!(method->flag & SPVM_METHOD_C_FLAG_NATIVE)) {
       printf("      mys\n");
       SPVM_LIST* mys = method->mys;

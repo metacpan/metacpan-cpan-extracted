@@ -20,7 +20,7 @@ my %regexes = (
     message_age => qr/^Message\sis\s(\d+)\s(\w+)\sold/
 );
 
-our $VERSION = '0.013'; # VERSION
+our $VERSION = '0.014'; # VERSION
 
 =head1 NAME
 

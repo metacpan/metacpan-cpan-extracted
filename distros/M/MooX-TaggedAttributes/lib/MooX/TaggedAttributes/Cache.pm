@@ -9,7 +9,7 @@ use warnings;
 
 use Hash::Util;
 
-our $VERSION = '0.13';
+our $VERSION = '0.15';
 
 use overload '%{}' => \&tag_hash, fallback => 1;
 
@@ -164,7 +164,7 @@ MooX::TaggedAttributes::Cache - Extract information from a Tagged Attribute Cach
 
 =head1 VERSION
 
-version 0.13
+version 0.15
 
 =head1 SYNOPSIS
 

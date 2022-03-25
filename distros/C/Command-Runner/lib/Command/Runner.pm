@@ -8,13 +8,14 @@ use Command::Runner::LineBuffer;
 use Command::Runner::Quote ();
 use Command::Runner::Timeout;
 use Config ();
+use File::pushd ();
 use IO::Select;
 use POSIX ();
 use Time::HiRes ();
 
 use constant WIN32 => $^O eq 'MSWin32';
 
-our $VERSION = '0.103';
+our $VERSION = '0.200';
 our $TICK = 0.02;
 
 sub new {
@@ -22,18 +23,17 @@ sub new {
     my $command = delete $option{command};
     my $commandf = delete $option{commandf};
     die "Cannot specify both command and commandf" if $command && $commandf;
-    if (!$command && $commandf) {
-        $command = Command::Runner::Format::commandf @$commandf;
-    }
-    bless {
+    my $self = bless {
         keep => 1,
         _buffer => {},
         %option,
         ($command ? (command => $command) : ()),
     }, $class;
+    $self->commandf(@$commandf) if $commandf;
+    $self;
 }
 
-for my $attr (qw(command redirect timeout keep stdout stderr env)) {
+for my $attr (qw(command cwd redirect timeout keep stdout stderr env)) {
     no strict 'refs';
     *$attr = sub {
         my $self = shift;
@@ -42,15 +42,16 @@ for my $attr (qw(command redirect timeout keep stdout stderr env)) {
     };
 }
 
+# NOTE: commandf is derecated; do not use this. will be removed in the future version
 sub commandf {
     my ($self, $format, @args) = @_;
-    $self->{command} = Command::Runner::Format::commandf $format, @args;
+    require Command::Runner::Format;
+    $self->{command} = Command::Runner::Format::commandf($format, @args);
     $self;
 }
 
 sub run {
     my $self = shift;
-    local %ENV = %{$self->{env}} if $self->{env};
     my $command = $self->{command};
     if (ref $command eq 'CODE') {
         $self->_wrap(sub { $self->_run_code($command) });
@@ -93,8 +94,17 @@ sub _wrap {
 sub _run_code {
     my ($self, $code) = @_;
 
+    my $wrap_code;
+    if ($self->{env} || $self->{cwd}) {
+        $wrap_code = sub {
+            local %ENV = %{$self->{env}} if $self->{env};
+            my $guard = File::pushd::pushd($self->{cwd}) if $self->{cwd};
+            $code->();
+        };
+    }
+
     if (!$self->{timeout}) {
-        my $result = $code->();
+        my $result = $wrap_code ? $wrap_code->() : $code->();
         return { pid => $$, result => $result };
     }
 
@@ -104,7 +114,7 @@ sub _run_code {
         local $SIG{ALRM} = sub { die "__TIMEOUT__\n" };
         eval {
             alarm $self->{timeout};
-            $result = $code->();
+            $result = $wrap_code ? $wrap_code->() : $code->();
         };
         $err = $@;
         alarm 0;
@@ -124,8 +134,12 @@ sub _system_win32 {
     my $pid;
     if (ref $command) {
         my @cmd = map { Command::Runner::Quote::quote_win32($_) } @$command;
+        local %ENV = %{$self->{env}} if $self->{env};
+        my $guard = File::pushd::pushd($self->{cwd}) if $self->{cwd};
         $pid = system { $command->[0] } 1, @cmd;
     } else {
+        local %ENV = %{$self->{env}} if $self->{env};
+        my $guard = File::pushd::pushd($self->{cwd}) if $self->{cwd};
         $pid = system 1, $command;
     }
 
@@ -179,6 +193,13 @@ sub _exec {
         }
         if ($Config::Config{d_setpgrp}) {
             POSIX::setpgid(0, 0) or die "setpgid: $!";
+        }
+
+        if ($self->{cwd}) {
+            chdir $self->{cwd} or die "chdir $self->{cwd}: $!";
+        }
+        if ($self->{env}) {
+            %ENV = %{$self->{env}};
         }
 
         if (ref $command) {
@@ -260,15 +281,6 @@ Command::Runner - run external commands and Perl code refs
   );
   my $res = $cmd->run;
 
-  my $untar = Command::Runner->new;
-  $untar->commandf(
-    '%q -dc %q | %q tf -',
-    'C:\\Program Files (x86)\\GnuWin32\\bin\\gzip.EXE',
-    'File-ShareDir-Install-0.13.tar.gz'
-    'C:\\Program Files (x86)\\GnuWin32\\bin\\tar.EXE',
-  );
-  my $capture = $untar->run->{stdout};
-
 =head1 DESCRIPTION
 
 Command::Runner runs external commands and Perl code refs
@@ -285,21 +297,6 @@ A constructor, which takes:
 
 an array of external commands, a string of external programs, or a Perl code ref.
 If an array of external commands is specified, it is automatically quoted on Windows.
-
-=item commandf
-
-a command string by C<sprintf>-like syntax.
-You can use positional formatting together with a conversion C<%q> (with quoting).
-
-Here is an example:
-
-  my $cmd = Command::Runner->new(
-    commandf => [ '%q %q >> %q', '/path/to/cat', 'foo bar.txt', 'out.txt' ],
-  );
-
-  # or, you can set it separately
-  my $cmd = Command::Runner->new;
-  $cmd->commandf('%q %q >> %q', '/path/to/cat', 'foo bar.txt', 'out.txt');
 
 =item timeout
 
@@ -324,10 +321,24 @@ set environment variables.
 
   Command::Runner->new(..., env => \%env)->run
 
-is equivalent to
+is roughly equivalent to
 
   {
     local %ENV = %env;
+    Command::Runner->new(...)->run;
+  }
+
+=item cwd
+
+set the current directory.
+
+  Command::Runner->new(..., cwd => $dir)->run
+
+is roughly equivalent to
+
+  {
+    require File::pushd;
+    my $guard = File::pushd::pushd($dir);
     Command::Runner->new(...)->run;
   }
 

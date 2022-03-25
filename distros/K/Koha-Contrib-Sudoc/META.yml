@@ -56,5 +56,5 @@ resources:
   bugtracker: https://github.com/fredericd/koha-sudoc/issues
   homepage: https://www.tamil.fr/sudoc/sudoc.html
   repository: https://github.com/fredericd/koha-sudoc
-version: '2.36'
+version: '2.37'
 x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -8,7 +8,7 @@ use Mojolicious::Plugin::OpenAPI::Parameters;
 
 use constant DEBUG => $ENV{MOJO_OPENAPI_DEBUG} || 0;
 
-our $VERSION = '5.02';
+our $VERSION = '5.05';
 
 has route     => sub {undef};
 has validator => sub { JSON::Validator::Schema->new; };
@@ -306,9 +306,12 @@ Mojolicious::Plugin::OpenAPI - OpenAPI / Swagger plugin for Mojolicious
 
 =head1 SYNOPSIS
 
+  # It is recommended to use Mojolicious::Plugin::OpenAPI with a "full app".
+  # See the links after this example for more information.
   use Mojolicious::Lite;
 
-  # Will be moved under "basePath", resulting in "POST /api/echo"
+  # Because the route name "echo" matches the "x-mojo-name", this route
+  # will be moved under "basePath", resulting in "POST /api/echo"
   post "/echo" => sub {
 
     # Validate input request or return an error document
@@ -323,41 +326,34 @@ Mojolicious::Plugin::OpenAPI - OpenAPI / Swagger plugin for Mojolicious
   }, "echo";
 
   # Load specification and start web server
-  plugin OpenAPI => {url => "data:///spec.json"};
+  plugin OpenAPI => {url => "data:///swagger.yaml"};
   app->start;
 
   __DATA__
-  @@ spec.json
-  {
-    "swagger" : "2.0",
-    "info" : { "version": "0.8", "title" : "Echo Service" },
-    "schemes" : [ "http" ],
-    "basePath" : "/api",
-    "paths" : {
-      "/echo" : {
-        "post" : {
-          "x-mojo-name" : "echo",
-          "parameters" : [
-            { "in": "body", "name": "body", "schema": { "type" : "object" } }
-          ],
-          "responses" : {
-            "200": {
-              "description": "Echo response",
-              "schema": { "type": "object" }
-            }
-          }
-        }
-      }
-    }
-  }
+  @@ swagger.yaml
+  swagger: "2.0"
+  info: { version: "0.8", title: "Echo Service" }
+  schemes: ["https"]
+  basePath: "/api"
+  paths:
+    /echo:
+     post:
+       x-mojo-name: "echo"
+       parameters:
+       - { in: "body", name: "body", schema: { type: "object" } }
+       responses:
+         200:
+           description: "Echo response"
+           schema: { type: "object" }
 
 See L<Mojolicious::Plugin::OpenAPI::Guides::OpenAPIv2> or
-L<Mojolicious::Plugin::OpenAPI::Guides::OpenAPIv3> for more information about.
+L<Mojolicious::Plugin::OpenAPI::Guides::OpenAPIv3> for more in depth
+information about how to use L<Mojolicious::Plugin::OpenAPI> with a "full app".
+Even with a "lite app" it can be very useful to read those guides.
 
 Looking at the documentation for
 L<Mojolicious::Plugin::OpenAPI::Guides::OpenAPIv2/x-mojo-to> can be especially
-useful if you are using extensions (formats) such as ".json". The logic is the
-same for OpenAPIv2 and OpenAPIv3.
+useful. (The logic is the same for OpenAPIv2 and OpenAPIv3)
 
 =head1 DESCRIPTION
 
@@ -366,7 +362,8 @@ input/output validation to your L<Mojolicious> application based on a OpenAPI
 (Swagger) specification. This plugin supports both version L<2.0|/schema> and
 L<3.x|/schema>, though 3.x I<might> have some missing features.
 
-Have a look at the L</SEE ALSO> for references to more documentation.
+Have a look at the L</SEE ALSO> for references to plugins and other useful
+documentation.
 
 Please report in L<issues|https://github.com/jhthorsen/json-validator/issues>
 or open pull requests to enhance the 3.0 support.
@@ -509,7 +506,7 @@ C<log_level> is used when logging invalid request/response error messages.
 
 Default: "warn".
 
-=head2 op_spec_to_route
+=head3 op_spec_to_route
 
 C<op_spec_to_route> can be provided if you want to add route definitions
 without using "x-mojo-to". Example:
@@ -561,13 +558,20 @@ Name of the route that handles the "basePath" part of the specification and
 serves the specification. Defaults to "x-mojo-name" in the specification at
 the top level.
 
-=head3 url
+=head3 spec, url
 
 See L<JSON::Validator/schema> for the different C<url> formats that is
 accepted.
 
 C<spec> is an alias for "url", which might make more sense if your
 specification is written in perl, instead of JSON or YAML.
+
+Here are some common uses:
+
+  $app->plugin(OpenAPI => {url  => $app->home->rel_file('openapi.yaml'));
+  $app->plugin(OpenAPI => {url  => 'https://example.com/swagger.json'});
+  $app->plugin(OpenAPI => {spec => JSON::Validator::Schema::OpenAPIv3->new(...)});
+  $app->plugin(OpenAPI => {spec => {swagger => "2.0", paths => {...}, ...}});
 
 =head3 version_from_class
 
@@ -616,7 +620,7 @@ Plugin for handling security definitions in your schema.
 
 =item * L<Mojolicious::Plugin::OpenAPI::SpecRenderer>
 
-Plugin for exposing your spec in human readble or JSON format.
+Plugin for exposing your spec in human readable or JSON format.
 
 =item * L<https://www.openapis.org/>
 

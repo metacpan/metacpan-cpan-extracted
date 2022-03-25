@@ -55,8 +55,10 @@ lib/Sentry/Transport/Http.pm
 lib/Sentry/Util.pm
 t/author-pod-syntax.t
 t/cache.t
+t/cgi-application-plugin-sentry.t
 t/context-line.t
 t/dsn.t
+t/lib/Mock/Mojo/UserAgent.pm
 t/lib/Mock/Sentry/Client.pm
 t/pod-coverage.t
 t/pod.t

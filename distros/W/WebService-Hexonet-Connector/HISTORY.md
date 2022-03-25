@@ -1,3 +1,10 @@
+## [2.10.3](https://github.com/hexonet/perl-sdk/compare/v2.10.2...v2.10.3) (2022-03-23)
+
+
+### Bug Fixes
+
+* **ot&e:** url updated for OT&E environment ([2f43e5d](https://github.com/hexonet/perl-sdk/commit/2f43e5deaed906401c4dc510053d8501e63d194e))
+
 ## [2.10.2](https://github.com/hexonet/perl-sdk/compare/v2.10.1...v2.10.2) (2021-01-26)
 
 

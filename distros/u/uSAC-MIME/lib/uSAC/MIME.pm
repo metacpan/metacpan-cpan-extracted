@@ -1,7 +1,7 @@
 package uSAC::MIME;
 use strict;
 use warnings;
-use version; our $VERSION=version->declare("v0.2");
+use version; our $VERSION=version->declare("v0.2.1");
 
 #Private storage for the internal database
 my $default_mime_to_ext;
@@ -166,6 +166,7 @@ image/x-icon                                     ico
 image/x-jng                                      jng
 image/x-ms-bmp                                   bmp
 
+font/ttf                                         ttf
 font/woff                                        woff
 font/woff2                                       woff2
 

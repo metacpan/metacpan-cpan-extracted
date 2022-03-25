@@ -26,7 +26,7 @@ use strict;
 use warnings;
 use Carp qw{ carp croak };
 
-our $VERSION = 0.46;
+our $VERSION = 0.47;
 
 use Webservice::OVH::Email::Domain::Domain::Redirection;
 use Webservice::OVH::Email::Domain::Domain::Account;

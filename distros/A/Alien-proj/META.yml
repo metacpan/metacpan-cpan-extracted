@@ -3,21 +3,32 @@ abstract: 'Alien package for the PROJ library'
 author:
   - 'Shawn Laffan <shawnlaffan@gmail.com>'
 build_requires:
-  Alien::Build: '2.25'
+  Alien::Build: '2.48'
   Alien::Build::MM: '1.74'
   Alien::Build::Plugin::Cleanse::BuildDir: '0'
   Alien::Build::Plugin::PkgConfig::PPWrapper: '0'
+  Alien::cmake3: '0.02'
+  Alien::libtiff: '0'
   Alien::sqlite: '1.06'
+  Archive::Tar: '0'
+  Config: '0'
+  Env::ShellWords: '0.01'
   ExtUtils::MakeMaker: '6.52'
   FFI::CheckLib: '0.23'
   File::Find::Rule: '0'
   File::Which: '0'
+  HTTP::Tiny: '0.044'
+  IO::Zlib: '0'
+  List::Util: '0'
+  Mojo::DOM58: '1.00'
   Path::Tiny: '0'
   PkgConfig: '0.19026'
   Sort::Versions: '0'
   Test::Alien: '0'
+  URI: '0'
+  URI::Escape: '0'
 configure_requires:
-  Alien::Build: '2.25'
+  Alien::Build: '2.48'
   Alien::Build::MM: '1.74'
   Alien::Build::Plugin::Build::CMake: '0.99'
   Alien::Build::Plugin::Build::SearchDep: '0.53'
@@ -27,6 +38,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.52'
   File::Find::Rule: '0'
   File::Which: '0'
+  List::Util: '0'
   Path::Tiny: '0'
   PkgConfig: '0'
   Sort::Versions: '0'
@@ -48,9 +60,9 @@ requires:
 resources:
   bugtracker: https://github.com/shawnlaffan/perl-alien-proj/issues/
   repository: https://github.com/shawnlaffan/perl-alien-proj
-version: '1.20'
+version: '1.22'
 x_alienfile:
-  generated_by: 'Alien::Build::MM version 2.46'
+  generated_by: 'Alien::Build::MM version 2.48'
   requires:
     share:
       Alien::cmake3: '0.02'

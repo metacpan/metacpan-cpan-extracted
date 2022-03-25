@@ -12,7 +12,7 @@ use IO::Socket::IP -register;
 use IO::Socket::SSL;
 use Time::Crontab;
 
-our $VERSION = '1.38'; # VERSION
+our $VERSION = '1.39'; # VERSION
 
 sub new {
     my $class = shift;
@@ -717,7 +717,7 @@ Bot::IRC - Yet Another IRC Bot
 
 =head1 VERSION
 
-version 1.38
+version 1.39
 
 =for markdown [![test](https://github.com/gryphonshafer/Bot-IRC/workflows/test/badge.svg)](https://github.com/gryphonshafer/Bot-IRC/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/Bot-IRC/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Bot-IRC)
@@ -1428,7 +1428,7 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016-2021 by Gryphon Shafer.
+This software is Copyright (c) 2016-2050 by Gryphon Shafer.
 
 This is free software, licensed under:
 

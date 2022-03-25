@@ -30,7 +30,7 @@ use strict;
 use warnings;
 use Carp qw{ carp croak };
 
-our $VERSION = 0.46;
+our $VERSION = 0.47;
 
 use Webservice::OVH::Order::Cart::Item;
 
@@ -583,6 +583,66 @@ sub add_transfer {
     $body->{domain}   = $domain;
 
     my $response = $api->rawCall( method => 'post', path => "/order/cart/$cart_id/domainTransfer", body => $body, noSignature => 0 );
+    croak $response->error if $response->error;
+
+    my $item_id = $response->content->{itemId};
+    my $item = Webservice::OVH::Order::Cart::Item->_new( wrapper => $api, cart => $self, id => $item_id, module => $self->{_module} );
+
+    return unless $item;
+
+    my $auth_info = $params{auth_info};
+    my $owner     = $params{owner_contact};
+    my $admin     = $params{admin_account};
+    my $tech      = $params{tech_account};
+
+    my $config_preset = { label => "AUTH_INFO", value => $auth_info };
+    my $response_product_set_config = $api->rawCall( method => 'post', path => "/order/cart/$cart_id/item/$item_id/configuration", body => $config_preset, noSignature => 0 );
+    my $config1 = $response_product_set_config->content unless $response_product_set_config->error;
+    croak $response_product_set_config->error if $response_product_set_config->error;
+
+    if ($owner) {
+        my $config_preset_owner = { label => "OWNER_CONTACT", value => $owner };
+        my $response_product_set_config_owner = $api->rawCall( method => 'post', path => "/order/cart/$cart_id/item/$item_id/configuration", body => $config_preset_owner, noSignature => 0 );
+        my $config2 = $response_product_set_config_owner->content unless $response_product_set_config_owner->error;
+        croak $response_product_set_config_owner->error if $response_product_set_config_owner->error;
+    }
+
+    if ($admin) {
+        my $config_preset_admin = { label => "ADMIN_ACCOUNT", value => $admin };
+        my $response_product_set_config_admin = $api->rawCall( method => 'post', path => "/order/cart/$cart_id/item/$item_id/configuration", body => $config_preset_admin, noSignature => 0 );
+        my $config3 = $response_product_set_config_admin->content unless $response_product_set_config_admin->error;
+        croak $response_product_set_config_admin->error if $response_product_set_config_admin->error;
+    }
+
+    if ($tech) {
+        my $config_preset_tech = { label => "TECH_ACCOUNT", value => $tech };
+        my $response_product_set_config_tech = $api->rawCall( method => 'post', path => "/order/cart/$cart_id/item/$item_id/configuration", body => $config_preset_tech, noSignature => 0 );
+        my $config4 = $response_product_set_config_tech->content unless $response_product_set_config_tech->error;
+        croak $response_product_set_config_tech->error if $response_product_set_config_tech->error;
+    }
+
+    return $item;
+}
+
+sub add_transfer_new {
+
+    my ( $self, $domain, %params ) = @_;
+
+    return unless $self->_is_valid;
+
+    my $api     = $self->{_api_wrapper};
+    my $cart_id = $self->id;
+
+    croak "Missing domain parameter" unless $domain;
+    croak "Missing auth_info" unless exists $params{auth_info};
+
+    my $body = {};
+    $body->{duration} = $params{duration} if exists $params{duration};
+    $body->{offerId}  = $params{offer_id} if exists $params{offer_id};
+    $body->{quantity} = $params{quantity} if exists $params{quantity};
+    $body->{domain}   = $domain;
+
+    my $response = $api->rawCall( method => 'post', path => "/order/cart/$cart_id/domain", body => $body, noSignature => 0 );
     croak $response->error if $response->error;
 
     my $item_id = $response->content->{itemId};

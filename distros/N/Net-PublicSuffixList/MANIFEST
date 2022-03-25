@@ -1,4 +1,5 @@
 Changes
+CITATION.cff
 corpus/test.dat
 examples/placeholder.pl
 examples/sample.pl
@@ -18,5 +19,6 @@ t/pod.t
 t/pod_coverage.t
 t/suffix.t
 t/test_manifest
+xt/citation.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

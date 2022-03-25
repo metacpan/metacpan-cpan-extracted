@@ -1,9 +1,70 @@
 ==================================================
-Changes from 2019-09-25 00:00:00 +0000 to present.
+Changes from 2020-03-23 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 8.2 at 2021-09-24 21:30:53 +0000
+version 8.3 at 2022-03-23 00:17:37 +0000
+----------------------------------------
+
+  Change: 823b184da9c4238d91fc2455922510aa937491c4
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2022-03-22 17:15:12 +0000
+
+    Prepping 8.3 release 
+
+  Change: b065c26c080ccc10d9f1860bcb033657fe3e4097
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2022-02-01 10:38:12 +0000
+
+    Allow wildcard and regexp matches from files
+
+    Adds the `wildcard` and `regexp` queries into the
+    `::QueryString::FileExpansion` plugin.
+
+    ``` $ cat wildcards.dat *gmail.com *yahoo.com
+
+    $ es-search.pl email:*wildcard.dat
+
+    $ cat regexps.dat .*\.gmail\.com$ .*\.yahoo\.com$
+
+    $ es-search.pl email:~regexp.dat ``` 
+
+  Change: f7ea1b13fe33f941d66af30dc8b2d999d10e70b1
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2022-01-31 17:51:35 +0000
+
+    Options to disable mucking with @ARGV at import
+
+    Support `delay_argv` to prevent messing with `@ARGV` at import time.
+
+    Added import options:
+
+    * `delay_argv` - Don't muck with `@ARGV` at import time * `preprocess_argv`
+    - Current default, messes with `@ARGV` at import
+
+    time. * `copy_argv` - Don't mess with `@ARGV` at all, just make a copy
+
+    Disable `auto_abbrev` from `Getopt::Long`. 
+
+  Change: b9da116757d0a543560797d06983972008df1f3f
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2021-10-01 12:53:30 +0000
+
+    Use `key_as_string` instead of `key` when provided
+
+    This is most noticeable when using `date_histogram` aggregations. 
+
+  Change: 04890b682bcf156edba62e231798e9705d62d9ae
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2021-09-24 15:54:14 +0000
+
+    Fix merging of query stash and bool sections
+
+    This is related to the earlier bug I discovered in handling array
+    references with ES 7.x and later. 
+
+----------------------------------------
+version 8.2 at 2021-09-24 21:30:36 +0000
 ----------------------------------------
 
   Change: 569436f7847833b3b3b20d15d14f753ab07c61aa
@@ -384,92 +445,6 @@ version 7.6 at 2020-03-27 22:43:58 +0000
     simple_request does not handle authentication responses, which breaks in
     environments where ElasticSearch requires Kerberos authentication. 
 
-----------------------------------------
-version 7.5 at 2019-11-21 21:39:18 +0000
-----------------------------------------
-
-  Change: eef552859755c3b446755232ef5cdab4fe39713f
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2019-11-21 13:39:18 +0000
-
-    Version 7.5 Release 
-
-  Change: fdccadaf74838e2876b5d370978ba780a8bbb819
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2019-11-21 13:33:31 +0000
-
-    Include count in the --by ordering
-
-    The default sort order for --by does not take into account the count of the
-    sub buckets. This adds a secondary sort descending on the count of objects
-    in each bucket. 
-
-  Change: a27a8b23f9bfd25259539dbae83a54ffc5a40cc7
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2019-11-21 13:10:17 +0000
-
-    Make ::Query objects able to execute
-
-    This was an oversight on my part. The `::Query` object now supports
-    `->execute( $list_of_indexes )` directly. This makes working with the
-    library easier as folks don't need to read docs on the `es_request()`
-    function to figure out how to construct a search.
-
-    Additionally, `scroll_id`'s are automatically extracted from the result
-    set. Calls to `->scroll_results()` will allow scrolling without having to
-    understand the mechanics of the scroll. 
-
-----------------------------------------
-version 7.4 at 2019-10-20 13:24:50 +0000
-----------------------------------------
-
-  Change: be1145db74f2394ae9c4f2747332cc03d3f7ca07
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2019-10-20 09:24:50 +0000
-
-    Ready v7.4 Release
-
-    * Docs updated * Update tests to handle the new IP range query 
-
-  Change: feca6053d575b523277743a937a51cb226781d66
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2019-10-20 09:03:07 +0000
-
-    Add Support for --or and IPv6
-
-    * Added support to change the default token joiner to OR to es-search.pl *
-    Added support for IPv6 to the ::QueryString::IP expander * Converted
-    ::QueryString::IP to use a range query 
-
-  Change: 17e80653b2a90e665e59c545eda7776b2fae7c90
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2019-10-19 10:46:48 +0000
-
-    Update the examples/es-utils.yml file for new options
-
-    This file had gotten outdated. 
-
-  Change: 31c3caf10224615723e8036eae28ac7789a1824d
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2019-10-09 20:23:57 +0000
-
-    Use a better name for fields metadata 
-
-  Change: f6369b88f311751908dec2addad33d999a452c75
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2019-10-09 20:19:38 +0000
-
-    Some code cleanup for es-search.pl 
-
-  Change: 29bbf1415b2be39cf79d0281608832ade50565a9
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2019-10-09 20:18:57 +0000
-
-    Allow field metadata sharing with ::Query
-
-    This will enable automatic detection of and working with nested fields in
-    the near term. Possibly other features in the long term. 
-
 =================================================
-Plus 80 releases after 2019-09-25 00:00:00 +0000.
+Plus 82 releases after 2020-03-23 00:00:00 +0000.
 =================================================

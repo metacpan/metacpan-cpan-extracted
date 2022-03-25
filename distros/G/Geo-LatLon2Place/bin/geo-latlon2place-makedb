@@ -208,7 +208,8 @@ my $torad = (atan2 1,0) / 90;
 
 my $boxes = int 6378 * 2 * 2 * (atan2 1,0) / $km; # equator radius / cell size
 
-open my $fh, "<:perlio", $ARGV[0];
+open my $fh, "<:perlio", $ARGV[0]
+   or die "$ARGV[0]: $!\n";
 
 my @grid;
 
@@ -230,32 +231,64 @@ while (<$fh>) {
    push @{ $grid[$y][$x] }, pack "s< s< C C/a*", $lat * 32767 / 90, $lon * 32767 / 180, $w, $payload;
 }
 
-my ($max, $sum, $cnt);
+#############################################################################
+# write gridded data out
 
 open my $cdb, ">", $ARGV[1]
-   or die;
+   or die "$ARGV[1]: $!\n";
 Geo::LatLon2Place::cdb_make_start fileno $cdb
    and die "cdb_make_start failure";
 
-Geo::LatLon2Place::cdb_make_add "", pack "a4VVV", "SRGL", 2, $km, $boxes;
+Geo::LatLon2Place::cdb_make_add "", pack "a4VVVV", "SRGL", 2, $km, $boxes, time;
 
-for my $y (0 .. $#grid) {
-   my $r = $grid[$y];
-   for my $x (0 .. $#$r) {
-      my $c = $r->[$x]
-         or next;
+#############################################################################
+# now we walk the grid using a hilbert curve to increase locality when querying
 
-      # statistics
-      $sum += scalar @$c;
-      $cnt++;
-      $max = [(scalar @$c), $x, $y] if @$c > $max->[0];
+my ($max, $sum, $cnt); # statistics
 
-      Geo::LatLon2Place::cdb_make_add
-            +(pack "s< s<", $x, $y),
-            +(join "", @$c)
-         and "cdb_make_add failure";
-   }
+my ($x, $y) = (-1, 0);
+
+sub step { # move one step into $_[0] direction: 0 x++, 1 y++, 2 x--, 3 y--
+   ($_[0] & 1 ? $y : $x) += 1 - ($_[0] & 2);
+
+   # write cell at $x,$y, if any
+   my $c = $grid[$y][$x]
+      or return;
+
+   undef $grid[$y][$x]; # for paranoia check
+
+   # statistics
+   $sum += scalar @$c;
+   $cnt++;
+   $max = [(scalar @$c), $x, $y] if @$c > $max->[0];
+
+   Geo::LatLon2Place::cdb_make_add
+         +(pack "s< s<", $x, $y),
+         +(join "", @$c)
+      and "cdb_make_add failure";
 }
+
+sub hilbert;
+sub hilbert { # order dir rot
+   my $order = $_[0] >> 1
+      or return;
+
+   hilbert $order, $_[1] + $_[2], -$_[2]; step $_[1] + $_[2];
+   hilbert $order, $_[1]        ,  $_[2]; step $_[1]        ;
+   hilbert $order, $_[1]        ,  $_[2]; step $_[1] - $_[2];
+   hilbert $order, $_[1] - $_[2], -$_[2];
+}
+
+step 0; # move to 0,0
+hilbert @grid * 2, 0, 1;
+
+# paranoia-check, make sure we wrote out all cells
+for (@grid) {
+   grep $_, @$_
+      and die;
+}
+
+#############################################################################
 
 Geo::LatLon2Place::cdb_make_finish
    and die "cdb_make_finish failed";

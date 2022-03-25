@@ -1,5 +1,8 @@
 Revision history for Lingua::ManagementSpeak
 
+1.04      2022-03-19 17:51:30-07:00 America/Los_Angeles
+        - Minor documentation update
+
 1.03      2021-01-10 14:15:11-08:00 America/Los_Angeles
         - Migrate to Test2::V0
         - Improve .gitignore file

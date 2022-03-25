@@ -1,11 +1,11 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic.pm
-## Version v0.21.12
+## Version v0.22.1
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/08/24
-## Modified 2022/03/11
+## Modified 2022/03/21
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -42,7 +42,7 @@ BEGIN
     our @EXPORT      = qw( );
     our @EXPORT_OK   = qw( subclasses );
     our %EXPORT_TAGS = ();
-    our $VERSION     = 'v0.21.12';
+    our $VERSION     = 'v0.22.1';
     # local $^W;
     # mod_perl/2.0.10
     if( exists( $ENV{MOD_PERL} )
@@ -973,13 +973,54 @@ sub deserialise
                 return( $self->error( "File provided \"$opts->{file}\" does not exist." ) ) if( !-e( "$opts->{file}" ) );
                 return( $self->error( "File provided \"$opts->{file}\" is actually a directory." ) ) if( -d( "$opts->{file}" ) );
                 return( $self->error( "File provided \"$opts->{file}\" to deserialise is empty." ) ) if( -z( "$opts->{file}" ) );
-                if( $opts->{lock} )
+                # We need to check if the serialised data were created with Storable::store
+                # or by Storable::freeze then stored into a file separately with print or syswrite
+                # The latter would not have the necessary headers
+                # As per Storable documentation, if the following return an hash it is a
+                # valid file with header, otherwise it would return undef
+                my $info = Storable::file_magic( "$opts->{file}" );
+                if( ref( $info ) eq 'HASH' )
                 {
-                    return( Storable::lock_retrieve( "$opts->{file}" ) );
+                    if( $self->{debug} || $opts->{debug} )
+                    {
+                        print( STDOUT <<EOT );
+Byte order... : $info->{byteorder}
+File......... : $info->{file}
+Header size.. : $info->{hdrsize}
+Integer size. : $info->{intsize}
+Long size.... : $info->{longsize}
+Major version : $info->{major}
+Minor version : $info->{minor}
+Net order.... : $info->{netorder}
+NV size...... : $info->{nvsize}
+PTR size..... : $info->{ptrsize}
+Version...... : $info->{version}
+Version NV... : $info->{version_nv}
+EOT
+                    }
+                
+                    if( $opts->{lock} )
+                    {
+                        return( Storable::lock_retrieve( "$opts->{file}" ) );
+                    }
+                    else
+                    {
+                        return( Storable::retrieve( "$opts->{file}" ) );
+                    }
                 }
                 else
                 {
-                    return( Storable::retrieve( "$opts->{file}" ) );
+                    $self->message( 4, "Got here to use Storable::thaw" );
+                    my $f = $self->new_file( $opts->{file} ) || return( $self->pass_error );
+                    $f->lock( shared => 1 ) if( $opts->{lock} );
+                    my $data = $f->load( binmode => 'raw' );
+                    $self->messagef( 4, "Loaded %d bytes of data.", CORE::length( $data ) );
+                    $f->unlock;
+                    return( $data ) if( !defined( $data ) || !length( $data ) );
+                    my $decoded = Storable::thaw( $data );
+                    $self->message( 4, "Returning '$decoded'" );
+                    # return( Storable::thaw( $data ) );
+                    return( $decoded );
                 }
             }
             elsif( exists( $opts->{data} ) )
@@ -2507,7 +2548,9 @@ sub _instantiate_object { return( shift->__instantiate_object( @_ ) ); }
 sub _get_stack_trace
 {
     my $self = shift( @_ );
-    my $trace = Devel::StackTrace->new( skip_frames => 1, indent => 1 );
+    my $opts = $self->_get_args_as_hash( @_ );
+    $opts->{skip_frames} //= 0;
+    my $trace = Devel::StackTrace->new( skip_frames => ( 1 + $opts->{skip_frames} ), indent => 1 );
     return( $trace );
 }
 
@@ -4304,14 +4347,28 @@ sub _set_get_object
             elsif( Scalar::Util::blessed( $_[0] ) )
             {
                 my $o = shift( @_ );
-                # $self->message( 3, "Object provided (", ref( $o ), ") for $field is not a valid $class object" ) if( !$o->isa( "$class" ) );
-                return( $self->error( "Object provided (", ref( $o ), ") for $field is not a valid $class object" ) ) if( !$o->isa( "$class" ) );
-                # XXX Bad idea:
-                # $o->debug( $this->{debug} ) if( $o->can( 'debug' ) );
+                if( ref( $class ) eq 'ARRAY' )
+                {
+                    my $ok = 0;
+                    foreach my $c ( @$class )
+                    {
+                        if( $o->isa( $c ) )
+                        {
+                            $ok++, last;
+                        }
+                    }
+                    return( $self->error( "Object provided (", ref( $o ), ") for $field does not match any of the possible classes: '", join( "', '", @$class ), "'." ) ) if( !$ok );
+                }
+                else
+                {
+                    # $self->message( 3, "Object provided (", ref( $o ), ") for $field is not a valid $class object" ) if( !$o->isa( "$class" ) );
+                    return( $self->error( "Object provided (", ref( $o ), ") for $field is not a valid $class object" ) ) if( !$o->isa( "$class" ) );
+                }
                 $data->{ $field } = $o;
             }
             else
             {
+                $class = $class->[0] if( ref( $class ) eq 'ARRAY' );
                 # $self->message( 3, "Got here, instantiating object for field '$field' and class '$class'." );
                 my $o = $self->_instantiate_object( $field, $class, @_ ) || do
                 {
@@ -4330,6 +4387,7 @@ sub _set_get_object
         }
         else
         {
+            $class = $class->[0] if( ref( $class ) eq 'ARRAY' );
             # $self->message( 3, "Argument provideds ('", join( "', '", map( overload::StrVal( $_ ), @_ ) ), "'), instantiating object for field '$field' and class '$class' called from file ", [caller(1)]->[1], " at line ", [caller(1)]->[2], "." );
             # There is already an object, so we pass any argument to the existing object
             if( $data->{ $field } && $self->_is_a( $data->{ $field }, $class ) )
@@ -4356,6 +4414,7 @@ sub _set_get_object
     # we set a dummy object that will just call itself to avoid perl complaining about undefined value calling a method
     if( !$data->{ $field } && want( 'OBJECT' ) )
     {
+        $class = $class->[0] if( ref( $class ) eq 'ARRAY' );
         my $o = $self->_instantiate_object( $field, $class, @_ ) || do
         {
             if( $class->can( 'error' ) )
@@ -4465,10 +4524,25 @@ sub _set_get_object_without_init
             elsif( Scalar::Util::blessed( $_[0] ) )
             {
                 my $o = shift( @_ );
-                $self->message( 4, "Object provided (", ref( $o ), ") for $field is not a valid $class object" ) if( !$o->isa( "$class" ) );
-                return( $self->error( "Object provided (", ref( $o ), ") for $field is not a valid $class object" ) ) if( !$o->isa( "$class" ) );
-                # XXX Bad idea:
-                # $o->debug( $this->{debug} ) if( $o->can( 'debug' ) );
+                if( ref( $class ) eq 'ARRAY' )
+                {
+                    my $ok = 0;
+                    foreach my $c ( @$class )
+                    {
+                        if( $o->isa( $c ) )
+                        {
+                            $ok++, last;
+                        }
+                    }
+                    return( $self->error( "Object provided (", ref( $o ), ") for $field does not match any of the possible classes: '", join( "', '", @$class ), "'." ) ) if( !$ok );
+                }
+                else
+                {
+                    $self->message( 4, "Object provided (", ref( $o ), ") for $field is not a valid $class object" ) if( !$o->isa( "$class" ) );
+                    return( $self->error( "Object provided (", ref( $o ), ") for $field is not a valid $class object" ) ) if( !$o->isa( "$class" ) );
+                    # XXX Bad idea:
+                    # $o->debug( $this->{debug} ) if( $o->can( 'debug' ) );
+                }
                 $data->{ $field } = $o;
             }
             else
@@ -4505,8 +4579,8 @@ sub _set_get_object_without_init
             $data->{ $field } = $o;
         }
     }
-    ## If nothing has been set for this field, ie no object, but we are called in chain, this will fail on purpose.
-    ## To avoid this, use _set_get_object
+    # If nothing has been set for this field, ie no object, but we are called in chain, this will fail on purpose.
+    # To avoid this, use _set_get_object
     return( $data->{ $field } );
 }
 
@@ -5386,7 +5460,7 @@ Module::Generic - Generic Module to inherit from
 
 =head1 VERSION
 
-    v0.21.12
+    v0.22.1
 
 =head1 DESCRIPTION
 

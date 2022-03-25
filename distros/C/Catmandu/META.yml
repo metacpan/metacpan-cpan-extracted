@@ -73,7 +73,7 @@ requires:
   URI::Template: '0.22'
   UUID::Tiny: '1.04'
   Unicode::Normalize: '0'
-  YAML::XS: '0.41'
+  YAML::XS: '0.83'
   asa: '0'
   namespace::clean: '0.24'
   perl: v5.14.0
@@ -81,7 +81,7 @@ resources:
   bugtracker: https://github.com/LibreCat/Catmandu/issues
   homepage: https://github.com/LibreCat/Catmandu
   repository: https://github.com/LibreCat/Catmandu.git
-version: '1.2018'
+version: '1.2019'
 x_contributors:
   - 'Christian Pietsch <chr.pietsch+github@googlemail.com>'
   - 'Dave Sherohman <dsheroh@cpan.org>'
@@ -105,6 +105,7 @@ x_contributors:
   - 'Tom Hukins <tom@eborcom.com>'
   - 'Upasana Shukla <me@upasana.me>'
   - 'Vitali Peil <vpeil@cpan.org>'
+  - 'Zakariyya Mughal <zaki.mughal@gmail.com>'
 x_generated_by_perl: v5.30.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_static_install: 0

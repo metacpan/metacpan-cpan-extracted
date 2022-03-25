@@ -317,11 +317,11 @@ VERSION(void)
 ########################
 
 Net::DNS::Resolver::Unbound::Handle
-emulate_error(int async_id, int err, ...)
+emulate_callback(int async_id, int err, struct ub_result* result=NULL)
     CODE:
 	RETVAL = newAV();
 	av_push(RETVAL, newSViv(async_id) );
-	async_callback( (void*) RETVAL, err, NULL );
+	async_callback( (void*) RETVAL, err, result );
     OUTPUT:
 	RETVAL
 
@@ -330,6 +330,18 @@ emulate_wait(int async_id)
     CODE:
 	RETVAL = newAV();
 	av_push(RETVAL, newSViv(async_id) );
+    OUTPUT:
+	RETVAL
+
+
+MODULE = Net::DNS::Resolver::Unbound	PACKAGE = Net::DNS::Resolver::Unbound::Context
+
+Net::DNS::Resolver::Unbound::Result
+mock_result(struct ub_ctx* ctx, SV* name, int secure, int bogus)
+    CODE:
+	checkerr( ub_resolve(ctx, (const char*) SvPVX(name), 1, 1, &RETVAL) );
+	RETVAL->secure = secure;
+	RETVAL->bogus  = bogus;
     OUTPUT:
 	RETVAL
 

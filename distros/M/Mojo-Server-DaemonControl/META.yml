@@ -1,0 +1,30 @@
+---
+abstract: 'A Mojolicious daemon manager'
+author:
+  - 'Jan Henning Thorsen <jhthorsen@cpan.org>'
+build_requires:
+  Test2::Suite: '0.000145'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojo-Server-DaemonControl
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Mojolicious: '8.25'
+  perl: v5.20.0
+resources:
+  bugtracker: https://github.com/jhthorsen/mojo-server-daemoncontrol/issues
+  homepage: https://github.com/jhthorsen/mojo-server-daemoncontrol
+  repository: https://github.com/jhthorsen/mojo-server-daemoncontrol.git
+version: '0.01'
+x_contributors:
+  - 'Jan Henning Thorsen'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

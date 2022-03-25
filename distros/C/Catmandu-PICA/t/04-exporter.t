@@ -10,6 +10,10 @@ use Encode qw(encode);
 use PICA::Data qw(pica_parser);
 use PICA::Parser::PPXML;
 
+sub slurp {
+    do { local (@ARGV,$/) = shift; <> };
+}
+
 my @pica_records = (
     [
       ['003@', '', '0', '1041318383'],
@@ -28,17 +32,12 @@ my $exporter = Catmandu::Exporter::PICA->new(
     type => 'plain',
 );
 
-for my $record (@pica_records) {
-    $exporter->add($record);
-}
-
+$exporter->add_many(\@pica_records);
 $exporter->commit();
 
 close($fh);
 
-my $out = do { local (@ARGV,$/)=$filename; <> };
-
-is $out, <<'PLAIN';
+is slurp($filename), <<'PLAIN';
 003@ $01041318383
 021A $aHello $$¥!
 
@@ -52,38 +51,49 @@ $exporter = Catmandu::Exporter::PICA->new(
     type => 'plus',
 );
 
-for my $record (@pica_records) {
-    $exporter->add($record);
-}
-
+$exporter->add_many(\@pica_records);
 $exporter->commit();
 
 close($fh);
 
-$out = do { local (@ARGV,$/)=$filename; <> };
-
-is $out, <<'PLUS';
+is slurp($filename), <<'PLUS';
 003@ 01041318383021A aHello $¥!
 028C/01 dEmmaaGoldman
 PLUS
 
+## Generic
+($fh, $filename) = tempfile();
+$exporter = Catmandu::Exporter::PICA->new(
+    fh   => $fh,
+    type => 'generic',
+    subfield_indicator => '_',
+    field_separator    => '!',
+    record_separator   => "#\n"
+);
+$exporter->add_many(\@pica_records);
+$exporter->commit();
+
+close($fh);
+
+is slurp($filename), <<'GENERIC';
+003@ _01041318383!021A _aHello $¥!!#
+028C/01 _dEmma_aGoldman!#
+GENERIC
+
+
+## XML
 ( $fh, $filename ) = tempfile();
 $exporter = Catmandu::Exporter::PICA->new(
     fh => $fh,
     type => 'xml',
 );
 
-for my $record (@pica_records) {
-    $exporter->add($record);
-}
-
+$exporter->add_many(\@pica_records);
 $exporter->commit();
 
 close($fh);
 
-$out = do { local (@ARGV,$/)=$filename; <> };
-
-is $out, <<'XML';
+is slurp($filename), <<'XML';
 <?xml version="1.0" encoding="UTF-8"?>
 
 <collection xmlns="info:srw/schema/5/picaXML-v1.0">
@@ -118,9 +128,8 @@ while($record = $parser->next){
 $exporter->commit();
 close $fh;
 
-$out = do { local (@ARGV,$/)=$filename; <> };
 my $in = do { local (@ARGV,$/)='t/files/slim_ppxml.xml'; <> };
 
-is_xml($out, $in, 'PPXML writer');
+is_xml(slurp($filename), $in, 'PPXML writer');
 
 done_testing;

@@ -142,11 +142,11 @@ EOCM
 ."and include dir at '/usr/local/include/opencv4/include/', "
 ."then set these ENV vars (FOR EXAMPLE):"
 ."\n  OPENCV_LDFLAGS='-L/usr/lib64/ -lopencv_world'"
-."\n  OPENCV_CFLAGS='-I/usr/local/include/opencv4/include/'"
+."\n   OPENCV_CFLAGS='-I/usr/local/include/opencv4/include/'"
 ."and re-run this script."
 ."The only complication then is if you don't thave the libopencv_world.so which includes all OpenCV symbols "
 ."but instead you have hundreds of smaller OpenCV component libraries. In which case set this:"
-."\n OPENCV_LDFLAGS='-L/usr/lib64/ "
+."\n  OPENCV_LDFLAGS='-L/usr/lib64/ "
 # add here all libs:
 ."-lopencv_core "
 ."-lopencv_dnn "
@@ -158,7 +158,8 @@ EOCM
 ."-lopencv_highgui "
 ."'" # ending the libs here
 ."\n\nIf running this script was successful but 'make' fails, then Perhaps you may also "
-."need to add '-lpng -ltiff -ljpeg' in the same way as described above. Also -ltbb etc. In general add all libraries via ENV vars when all else fails.\nGood luck (if you use Unix/Linux you don't need luck, you got a solid dev env).\n"
+."need to add '-lpng -ltiff -ljpeg' in the same way as described above. Also -ltbb etc. In general add all libraries via ENV vars when all else fails."
+."\nGood luck unless you have Unix/Linux which is a solid dev env.\n"
 ."\n"
 	;
 	return  undef # failed

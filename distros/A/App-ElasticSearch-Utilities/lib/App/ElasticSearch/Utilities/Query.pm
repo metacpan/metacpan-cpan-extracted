@@ -4,7 +4,7 @@ package App::ElasticSearch::Utilities::Query;
 use strict;
 use warnings;
 
-our $VERSION = '8.2'; # VERSION
+our $VERSION = '8.3'; # VERSION
 
 use App::ElasticSearch::Utilities qw(es_request es_indices);
 use App::ElasticSearch::Utilities::Aggregations;
@@ -244,8 +244,8 @@ sub query {
                 debug({color=>'red'}, "query() - Failed to retrieve '$k'");
             };
             $bool{$k} = clone $v if defined $v;
-            if($self->stash($k)) {
-                push @{ $bool{$k} }, $self->stash($k);
+            if(my $stash = $self->stash($k)) {
+                push @{ $bool{$k} }, is_arrayref($stash) ? @{ $stash } : $stash;
             }
             delete $bool{$k} if exists $bool{$k} and is_arrayref($bool{$k}) and not @{ $bool{$k} };
         }
@@ -395,7 +395,7 @@ App::ElasticSearch::Utilities::Query - Object representing ES Queries
 
 =head1 VERSION
 
-version 8.2
+version 8.3
 
 =head1 ATTRIBUTES
 
@@ -678,7 +678,7 @@ Brad Lhotsky <brad@divisionbyzero.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2021 by Brad Lhotsky.
+This software is Copyright (c) 2022 by Brad Lhotsky.
 
 This is free software, licensed under:
 

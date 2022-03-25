@@ -45,3 +45,11 @@ Revision history for Image-DecodeQR-WeChat
 
 0.8	2022-03-16/19:30
 	Fixed a problem with using cmake to detect OpenCV.
+
+0.9	2022-03-17/20:00
+	A problem arose when calling decode_xs() with an array
+	of 6 scalars rather than 6 scalars. Both should work AFAIC.
+	Having PROTOTYPES: ENABLE in xs code caught this and complained.
+	I have fixed it with specifying explicitly the prototype using
+	PROTOTYPE: @ (without this, xsubp produces a '$$$$$$' prototype).
+	Added a test case to test this.

@@ -423,7 +423,7 @@ sub mode_n2s
 }
 
 1;
-
+# NOTE: POD
 __END__
 
 =encoding utf-8

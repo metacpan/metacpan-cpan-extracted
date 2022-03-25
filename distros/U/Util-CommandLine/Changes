@@ -1,5 +1,8 @@
 Revision history for Util::CommandLine
 
+1.07      2022-03-19 17:53:23-07:00 America/Los_Angeles
+        - Minor documentation update
+
 1.06      2021-01-10 14:22:54-08:00 America/Los_Angeles
         - Migrate to Test2::V0
         - Improve .gitignore file

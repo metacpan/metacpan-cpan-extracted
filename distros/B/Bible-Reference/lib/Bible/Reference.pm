@@ -6,7 +6,7 @@ use 5.020;
 use exact;
 use exact::class;
 
-our $VERSION = '1.09'; # VERSION
+our $VERSION = '1.11'; # VERSION
 
 has acronyms             => 0;
 has sorting              => 1;
@@ -27,8 +27,8 @@ has _bibles => {
         [ 'Ruth',                  'Ru',   'Rut'                                                         ],
         [ '1 Samuel',              '1Sa',  '1Sm',     '1Sam'                                             ],
         [ '2 Samuel',              '2Sa',  '2Sm',     '2Sam'                                             ],
-        [ '1 Kings',               '1Ki',  '1Kg',     '1Kin'                                             ],
-        [ '2 Kings',               '2Ki',  '2Kg',     '2Kin'                                             ],
+        [ '1 Kings',               '1Ki',  '1Kg',     '1Kgs',                '1Kin'                      ],
+        [ '2 Kings',               '2Ki',  '2Kg',     '2Kgs',                '2Kin'                      ],
         [ '1 Chronicles',          '1Ch',  '1Cr',     '1Chr'                                             ],
         [ '2 Chronicles',          '2Ch',  '2Cr',     '2Chr'                                             ],
         [ 'Ezra',                  'Ezr'                                                                 ],
@@ -80,9 +80,9 @@ has _bibles => {
         [ '1 Timothy',             '1Ti',  '1Tm',     '1Tim'                                             ],
         [ '2 Timothy',             '2Ti',  '2Tm',     '2Tim'                                             ],
         [ 'Titus',                 'Ti',   'Tt'                                                          ],
-        [ 'Philemon',              'Phm',  'Phile'                                                       ],
+        [ 'Philemon',              'Phm',  'Phlm',    'Phile'                                            ],
         [ 'Hebrews',               'He',   'Heb'                                                         ],
-        [ 'James',                 'Jam',  'Jms'                                                         ],
+        [ 'James',                 'Jam',  'Jms',     'Jas'                                              ],
         [ '1 Peter',               '1Pt',  '1Pe',     '1Pet'                                             ],
         [ '2 Peter',               '2Pt',  '2Pe',     '2Pet'                                             ],
         [ '1 John',                '1Jn',  '1Jo',     '1Joh'                                             ],
@@ -102,8 +102,8 @@ has _bibles => {
         [ 'Ruth',                  'Ru',   'Rut'                                                         ],
         [ '1 Samuel',              '1Sa',  '1Sm',     '1Sam'                                             ],
         [ '2 Samuel',              '2Sa',  '2Sm',     '2Sam'                                             ],
-        [ '1 Kings',               '1Ki',  '1Kg',     '1Kin'                                             ],
-        [ '2 Kings',               '2Ki',  '2Kg',     '2Kin'                                             ],
+        [ '1 Kings',               '1Ki',  '1Kg',     '1Kgs',                '1Kin'                      ],
+        [ '2 Kings',               '2Ki',  '2Kg',     '2Kgs',                '2Kin'                      ],
         [ '1 Chronicles',          '1Ch',  '1Cr',     '1Chr'                                             ],
         [ '2 Chronicles',          '2Ch',  '2Cr',     '2Chr'                                             ],
         [ 'Esdras',                'Esd'                                                                 ],
@@ -160,9 +160,9 @@ has _bibles => {
         [ '1 Timothy',             '1Ti',  '1Tm',     '1Tim'                                             ],
         [ '2 Timothy',             '2Ti',  '2Tm',     '2Tim'                                             ],
         [ 'Titus',                 'Ti',   'Tt'                                                          ],
-        [ 'Philemon',              'Phm',  'Phile'                                                       ],
+        [ 'Philemon',              'Phm',  'Phlm',    'Phile'                                            ],
         [ 'Hebrews',               'He',   'Heb'                                                         ],
-        [ 'James',                 'Jam',  'Jms'                                                         ],
+        [ 'James',                 'Jam',  'Jms',     'Jas'                                              ],
         [ '1 Peter',               '1Pt',  '1Pe',     '1Pet'                                             ],
         [ '2 Peter',               '2Pt',  '2Pe',     '2Pet'                                             ],
         [ '1 John',                '1Jn',  '1Jo',     '1Joh'                                             ],
@@ -182,8 +182,8 @@ has _bibles => {
         [ 'Ruth',                  'Ru',   'Rut'                                                         ],
         [ '1 Samuel',              '1Sa',  '1Sm',     '1Sam'                                             ],
         [ '2 Samuel',              '2Sa',  '2Sm',     '2Sam'                                             ],
-        [ '1 Kings',               '1Ki',  '1Kg',     '1Kin'                                             ],
-        [ '2 Kings',               '2Ki',  '2Kg',     '2Kin'                                             ],
+        [ '1 Kings',               '1Ki',  '1Kg',     '1Kgs',                '1Kin'                      ],
+        [ '2 Kings',               '2Ki',  '2Kg',     '2Kgs',                '2Kin'                      ],
         [ '1 Chronicles',          '1Ch',  '1Cr',     '1Chr'                                             ],
         [ '2 Chronicles',          '2Ch',  '2Cr',     '2Chr'                                             ],
         [ 'Ezra',                  'Ezr'                                                                 ],
@@ -228,9 +228,9 @@ has _bibles => {
         [ '1 Timothy',             '1Ti',  '1Tm',     '1Tim'                                             ],
         [ '2 Timothy',             '2Ti',  '2Tm',     '2Tim'                                             ],
         [ 'Titus',                 'Ti',   'Tt'                                                          ],
-        [ 'Philemon',              'Phm',  'Phile'                                                       ],
+        [ 'Philemon',              'Phm',  'Phlm',    'Phile'                                            ],
         [ 'Hebrews',               'He',   'Heb'                                                         ],
-        [ 'James',                 'Jam',  'Jms'                                                         ],
+        [ 'James',                 'Jam',  'Jms',     'Jas'                                              ],
         [ '1 Peter',               '1Pt',  '1Pe',     '1Pet'                                             ],
         [ '2 Peter',               '2Pt',  '2Pe',     '2Pet'                                             ],
         [ '1 John',                '1Jn',  '1Jo',     '1Joh'                                             ],
@@ -250,8 +250,8 @@ has _bibles => {
         [ 'Ruth',                  'Ru',   'Rut',     'Ruth'                                             ],
         [ '1 Samuel',              '1Sa',  '1Sm',     '1Sam',                '1 Samuelis'                ],
         [ '2 Samuel',              '2Sa',  '2Sm',     '2Sam',                '2 Samuelis'                ],
-        [ '1 Kings',               '1Ki',  '1Kg',     '1Kin',                '1 Regum'                   ],
-        [ '2 Kings',               '2Ki',  '2Kg',     '2Kin',                '2 Regum'                   ],
+        [ '1 Kings',               '1Ki',  '1Kg',     '1Kgs',                '1Kin',         '1 Regum'   ],
+        [ '2 Kings',               '2Ki',  '2Kg',     '2Kgs',                '2Kin',         '2 Regum'   ],
         [ '1 Paralipomenon',       '1Pa',  '1Par',    '1 Paralipomenon'                                  ],
         [ '2 Paralipomenon',       '2Pa',  '2Par',    '2 Paralipomenon'                                  ],
         [ 'Esdras',                'Esd',  'Esdrae'                                                      ],
@@ -303,9 +303,9 @@ has _bibles => {
         [ '1 Timothy',             '1Ti',  '1Tm',     '1Tim',                '1 Timotheum'               ],
         [ '2 Timothy',             '2Ti',  '2Tm',     '2Tim',                '2 Timotheum'               ],
         [ 'Titus',                 'Ti',   'Tt',      'Titum'                                            ],
-        [ 'Philemon',              'Phm',  'Phile',   'Philemonem'                                       ],
+        [ 'Philemon',              'Phm',  'Phlm',    'Phile',               'Philemonem'                ],
         [ 'Hebrews',               'He',   'Heb',     'Hebraeos'                                         ],
-        [ 'James',                 'Jam',  'Jms',     'Iacobi'                                           ],
+        [ 'James',                 'Jam',  'Jms',     'Jas',                 'Iacobi'                    ],
         [ '1 Peter',               '1Pt',  '1Pe',     '1Pet',                '1 Petri'                   ],
         [ '2 Peter',               '2Pt',  '2Pe',     '2Pet',                '2 Petri'                   ],
         [ '1 John',                '1Jn',  '1Jo',     '1Joh',                '1 Ioannis'                 ],
@@ -1567,6 +1567,31 @@ sub get_bible_structure ( $self, $bible = undef ) {
     return [ map { [ $_, $self->_bible_data->{lengths}{$_} ] } @{ $self->_bible_data->{books} } ];
 }
 
+sub identify_bible ( $self, @books ) {
+    croak('No books supplied; must supply at least 1 input') unless (@books);
+
+    my $obj = $self->new( minimum_book_length  => $self->minimum_book_length );
+
+    my $bibles = [
+        sort { $b->{count} <=> $a->{count} }
+        map {
+            $obj->bible($_);
+            my $books = scalar( $obj->clear->in(@books)->as_books );
+            {
+                name  => $_,
+                books => $books,
+                count => scalar(@$books),
+            };
+        }
+        keys %{ $obj->_bibles }
+    ];
+
+    $bibles = [ grep { $bibles->[0]{count} == $_->{count} } @$bibles ]
+        if ( $bibles->[0]{count} != $bibles->[-1]{count} );
+
+    return $bibles;
+}
+
 1;
 
 __END__
@@ -1581,7 +1606,7 @@ Bible::Reference - Simple Bible reference parser, tester, and canonicalizer
 
 =head1 VERSION
 
-version 1.09
+version 1.11
 
 =for markdown [![test](https://github.com/gryphonshafer/Bible-Reference/workflows/test/badge.svg)](https://github.com/gryphonshafer/Bible-Reference/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/Bible-Reference/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Bible-Reference)
@@ -1871,6 +1896,28 @@ chapter/verse range.
 This method will return an arrayref containing an arrayref per book (in order)
 that contains two elements: the name of the book and an arrayref of the maximum
 verse number per chapter.
+
+=head2 identify_bible
+
+This method is to help identify which Bible to use if you aren't sure. It
+requires a list of strings as input, each string representing a book from the
+Bible you're trying to identify. This method will then try to match these book
+names across all Bibles and will return an array of the most likely Bibles for
+your inputs.
+
+For example:
+
+    my $bibles = $r->identify_bible( 'Gen', 'Lev', '3 Mac' );
+
+The above will return:
+
+    [
+        {
+            name  => 'Orthodox',
+            count => 3,
+            books => [ 'Genesis', 'Leviticus', '3 Maccabees' ],
+        },
+    ],
 
 =head1 HANDLING MATCHING ERRORS
 

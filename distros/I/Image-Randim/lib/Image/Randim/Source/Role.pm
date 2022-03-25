@@ -23,7 +23,8 @@ sub get_response {
     if ($rc > 200) {
 	die 'Source '.$self->name
 	    . " received a response code of $rc from "
-	    . $self->url . "\n";
+	    . $self->url . "\n"
+      . $client->responseContent ."\n";
     }
     return $client->responseContent;
 }

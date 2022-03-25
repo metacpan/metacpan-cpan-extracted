@@ -8,7 +8,7 @@ use Set::Tiny 0.04;
 
 use App::SpamcupNG::Summary::Receiver;
 
-our $VERSION = '0.013'; # VERSION
+our $VERSION = '0.014'; # VERSION
 
 =pod
 
@@ -56,14 +56,16 @@ will not be used for the report, but only for Spamcop statistics.
 =cut
 
 __PACKAGE__->follow_best_practice;
-my $fields = Set::Tiny->new((
-        'tracking_id', 'mailer', 'content_type', 'age',
+my $fields = Set::Tiny->new(
+    (
+        'tracking_id', 'mailer',   'content_type', 'age',
         'age_unit',    'contacts', 'receivers'
-    ));
+    )
+);
 my $ro_fields = Set::Tiny->new(qw(receivers));
 
-__PACKAGE__->mk_accessors(($fields->difference($ro_fields))->members);
-__PACKAGE__->mk_ro_accessors($ro_fields->members);
+__PACKAGE__->mk_accessors( ( $fields->difference($ro_fields) )->members );
+__PACKAGE__->mk_ro_accessors( $ro_fields->members );
 
 =head1 METHODS
 
@@ -83,7 +85,7 @@ sub new {
         age_unit     => undef,
         contacts     => undef,
         receivers    => undef
-        };
+    };
     bless $self, $class;
     lock_keys( %{$self} );
     return $self;
@@ -103,21 +105,22 @@ sub as_text {
     my @simple;
 
 # Set::Tiny->members is not ordered and we need that to have deterministic text
-    my @fields = sort($fields->members);
+    my @fields  = sort( $fields->members );
     my $complex = Set::Tiny->new(qw(contacts receivers age));
 
     foreach my $field (@fields) {
-        next if ( $complex->has(($field)) );
+        next if ( $complex->has( ($field) ) );
         push( @simple, $field );
     }
 
     my @dump = map { $_ . '=' . ( $self->{$_} || $self->na ) } @simple;
 
     # age can be zero
-    if (defined($self->{age})) {
-        push(@dump, 'age=' . $self->{age});
-    } else {
-        push(@dump, 'age=' . $self->na);
+    if ( defined( $self->{age} ) ) {
+        push( @dump, 'age=' . $self->{age} );
+    }
+    else {
+        push( @dump, 'age=' . $self->na );
     }
 
     foreach my $key (qw(receivers contacts)) {
@@ -198,7 +201,7 @@ sub na {
 }
 
 sub _fields {
-    my @fields = sort($fields->members);
+    my @fields = sort( $fields->members );
     return \@fields;
 }
 

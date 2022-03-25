@@ -11,7 +11,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.7, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Minilla/v3.1.11, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -30,48 +30,48 @@ no_index:
 provides:
   Catmandu::Exporter::PICA:
     file: lib/Catmandu/Exporter/PICA.pm
-    version: '1.07'
+    version: '1.08'
   Catmandu::Fix::Bind::pica_each:
     file: lib/Catmandu/Fix/Bind/pica_each.pm
-    version: '1.07'
+    version: '1.08'
   Catmandu::Fix::Condition::pica_match:
     file: lib/Catmandu/Fix/Condition/pica_match.pm
-    version: '1.07'
+    version: '1.08'
   Catmandu::Fix::pica_add:
     file: lib/Catmandu/Fix/pica_add.pm
-    version: '1.07'
+    version: '1.08'
   Catmandu::Fix::pica_map:
     file: lib/Catmandu/Fix/pica_map.pm
-    version: '1.07'
+    version: '1.08'
   Catmandu::Fix::pica_set:
     file: lib/Catmandu/Fix/pica_set.pm
-    version: '1.07'
+    version: '1.08'
   Catmandu::Importer::PICA:
     file: lib/Catmandu/Importer/PICA.pm
-    version: '1.07'
+    version: '1.08'
   Catmandu::Importer::SRU::Parser::picaxml:
     file: lib/Catmandu/Importer/SRU/Parser/picaxml.pm
-    version: '1.07'
+    version: '1.08'
   Catmandu::Importer::SRU::Parser::ppxml:
     file: lib/Catmandu/Importer/SRU/Parser/ppxml.pm
-    version: '1.07'
+    version: '1.08'
   Catmandu::PICA:
     file: lib/Catmandu/PICA.pm
-    version: '1.07'
+    version: '1.08'
   Catmandu::Validator::PICA:
     file: lib/Catmandu/Validator/PICA.pm
-    version: '1.07'
+    version: '1.08'
 requires:
   Catmandu: '1.20'
   Catmandu::SRU: '0.427'
   Moo: '1.0'
-  PICA::Data: '1.29'
+  PICA::Data: '2.02'
   perl: v5.14.1
 resources:
   bugtracker: https://github.com/gbv/Catmandu-PICA/issues
   homepage: https://github.com/gbv/Catmandu-PICA
   repository: git://github.com/gbv/Catmandu-PICA.git
-version: '1.07'
+version: '1.08'
 x_contributors:
   - 'Carsten Klee <klee@cpan.org>'
   - 'E. Choroba <choroba@matfyz.cz>'
@@ -79,4 +79,5 @@ x_contributors:
   - 'Johann Rolschewski <johann@rolschewski.de>'
   - 'Johann Rolschewski <jorol@cpan.org>'
   - 'julianladisch <julianladisch@users.noreply.github.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

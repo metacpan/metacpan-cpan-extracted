@@ -1,10 +1,10 @@
-package Webservice::Judobase::Competitor;
-
 use strict;
 use warnings;
 
+package Webservice::Judobase::Competitor;
+$Webservice::Judobase::Competitor::VERSION = '0.07';
 # ABSTRACT: This module wraps the www.judobase.org website API.
-our $VERSION = '0.004'; # VERSION
+# VERSION
 
 use HTTP::Request;
 use JSON::Tiny 'decode_json';

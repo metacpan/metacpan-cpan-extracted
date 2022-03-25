@@ -4,7 +4,7 @@ package Bot::IRC::X::Retort;
 use 5.014;
 use exact;
 
-our $VERSION = '1.04'; # VERSION
+our $VERSION = '1.05'; # VERSION
 
 sub init {
     my ($bot) = @_;
@@ -81,7 +81,7 @@ Bot::IRC::X::Retort - Bot::IRC plugin for bot-retorting to key words
 
 =head1 VERSION
 
-version 1.04
+version 1.05
 
 =for markdown [![test](https://github.com/gryphonshafer/Bot-IRC-X-Retort/workflows/test/badge.svg)](https://github.com/gryphonshafer/Bot-IRC-X-Retort/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/Bot-IRC-X-Retort/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Bot-IRC-X-Retort)
@@ -146,7 +146,7 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016-2021 by Gryphon Shafer.
+This software is Copyright (c) 2016-2050 by Gryphon Shafer.
 
 This is free software, licensed under:
 

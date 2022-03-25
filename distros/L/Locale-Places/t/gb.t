@@ -22,6 +22,7 @@ GB: {
 		Data::Dumper->import();
 		diag(Data::Dumper->new([$dover])->Dump());
 	}
+
 	$dover = $places->selectall_hashref({ code2 => $dover->{'code2'} });
 
 	my $found;
@@ -41,5 +42,5 @@ GB: {
 		}
 	}
 
-	is($found, 2, 'Should have been 2 matches');
+	cmp_ok($found, '==', 2, 'Should have been 2 matches');
 }

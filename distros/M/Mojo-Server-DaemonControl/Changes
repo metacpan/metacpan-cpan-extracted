@@ -1,0 +1,9 @@
+Revision history for perl distribution Mojo-Server-DaemonControl
+
+0.01 2022-03-21T17:31:19+0900
+ - Add "mojodctl" manager program
+ - Add custom "daemon" worker class
+ - Add support for hot deploy (USR2)
+ - Add support for inc- and decreasing workers (TTIN/TTOU)
+ - Add heartbeat channel using a unix socket
+ - Add test for checking load balancing using reuse=1

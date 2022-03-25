@@ -14,7 +14,7 @@ my $expected = [
     ')',
     '------=_NextPart_001_1B4D_3C042781.4D516F77',
     'Content-Type: multipart/alternative;'
-    ];
+];
 
 is( ref($parsed), 'ARRAY',
     'result from find_spam_header is an array reference' )

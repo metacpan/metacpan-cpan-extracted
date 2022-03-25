@@ -43,15 +43,17 @@ enum {
   SPVM_TYPE_C_TYPE_CATEGORY_REF_MULNUM_DOUBLE,
   SPVM_TYPE_C_TYPE_CATEGORY_VOID,
   SPVM_TYPE_C_TYPE_CATEGORY_STRING,
+  SPVM_TYPE_C_TYPE_CATEGORY_ANY_OBJECT_ARRAY,
 };
 
 struct spvm_type {
-  const char* type_name;
-  SPVM_BASIC_TYPE* basic_type;
+  const char* name;
   int32_t dimension;
   int32_t flag;
   int32_t category;
   int32_t width;
+  int32_t id;
+  SPVM_BASIC_TYPE* basic_type;
 };
 
 int32_t SPVM_TYPE_has_callback(
@@ -89,6 +91,7 @@ SPVM_TYPE* SPVM_TYPE_new_long_ref_type(SPVM_COMPILER* compiler);
 SPVM_TYPE* SPVM_TYPE_new_float_ref_type(SPVM_COMPILER* compiler);
 SPVM_TYPE* SPVM_TYPE_new_double_ref_type(SPVM_COMPILER* compiler);
 SPVM_TYPE* SPVM_TYPE_new_any_object_type(SPVM_COMPILER* compiler);
+SPVM_TYPE* SPVM_TYPE_new_element_type(SPVM_COMPILER* compiler);
 
 int32_t SPVM_TYPE_is_void_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
 int32_t SPVM_TYPE_is_byte_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
@@ -134,7 +137,7 @@ int32_t SPVM_TYPE_is_byte_array_type(SPVM_COMPILER* compiler, int32_t basic_type
 
 int32_t SPVM_TYPE_is_string_or_byte_array_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
 
-int32_t SPVM_TYPE_is_oarray_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
+int32_t SPVM_TYPE_is_any_object_array_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
 int32_t SPVM_TYPE_is_object_array_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
 int32_t SPVM_TYPE_is_callback_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
 int32_t SPVM_TYPE_is_interface_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
@@ -150,5 +153,7 @@ int32_t SPVM_TYPE_is_embedded_class_name(SPVM_COMPILER* compiler, const char* ty
 int32_t SPVM_TYPE_get_elem_byte_size(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
 
 SPVM_TYPE* SPVM_TYPE_new(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
+
+SPVM_TYPE* SPVM_TYPE_new_any_object_array_type(SPVM_COMPILER* compiler);
 
 #endif

@@ -11,7 +11,7 @@ use Storable 'dclone';
 use vars '@ISA';
 @ISA = 'SQL::Abstract';
 
-our $VERSION = '1.07'; # VERSION
+our $VERSION = '1.08'; # VERSION
 
 sub new {
     my $self = shift;
@@ -160,7 +160,7 @@ SQL::Abstract::Complete - Generate complete SQL from Perl data structures
 
 =head1 VERSION
 
-version 1.07
+version 1.08
 
 =for markdown [![test](https://github.com/gryphonshafer/SQL-Abstract-Complete/workflows/test/badge.svg)](https://github.com/gryphonshafer/SQL-Abstract-Complete/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/SQL-Abstract-Complete/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/SQL-Abstract-Complete)
@@ -381,7 +381,7 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2013-2021 by Gryphon Shafer.
+This software is Copyright (c) 2013-2050 by Gryphon Shafer.
 
 This is free software, licensed under:
 

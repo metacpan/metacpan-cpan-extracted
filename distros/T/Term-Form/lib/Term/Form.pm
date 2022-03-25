@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '0.540';
+our $VERSION = '0.542';
 use Exporter 'import';
 our @EXPORT_OK = qw( fill_form read_line );
 
@@ -1081,13 +1081,8 @@ sub __prepare_footer_fmt {
 
 
 sub __write_first_screen {
-    my ( $self, $list, $curr_row, $auto_up ) = @_;
-    if ( $auto_up == 2 ) {
-        $self->{i}{curr_row} = $curr_row;
-    }
-    else {
-        $self->{i}{curr_row} = @{$self->{i}{pre}};
-    }
+    my ( $self, $list ) = @_;
+    $self->{i}{curr_row} = $self->{auto_up} ? 0 : @{$self->{i}{pre}};
     $self->{i}{begin_row} = 0;
     $self->{i}{end_row}  = ( $self->{i}{avail_h} - 1 );
     if ( $self->{i}{end_row} > $#$list ) {
@@ -1247,13 +1242,11 @@ sub fill_form {
     else {
         $list = [ @{$self->{i}{pre}}, map { [ _sanitized_string( $_->[0] ), $_->[1] ] } @$orig_list ];
     }
-    my $auto_up = $self->{auto_up};
-    my $back_row = 0;
     $self->__length_longest_key( $list );
     $self->__prepare_width( $term_w );
     $self->__prepare_hight( $list, $term_w, $term_h );
     $self->__prepare_footer_fmt();
-    $self->__write_first_screen( $list, $back_row, $auto_up );
+    $self->__write_first_screen( $list );
     my $m = $self->__string_and_pos( $list );
     my $k = 0;
 
@@ -1302,7 +1295,7 @@ sub fill_form {
             $self->__prepare_width( $term_w );
             $self->__prepare_hight( $list, $term_w, $term_h );
             $self->__prepare_footer_fmt();
-            $self->__write_first_screen( $list, $back_row, $auto_up );
+            $self->__write_first_screen( $list );
             $m = $self->__string_and_pos( $list );
         }
         # reset $m->{avail_w} to default:
@@ -1446,67 +1439,51 @@ sub fill_form {
             else {
                 print up( $up );
                 print "\r" . clear_to_end_of_screen();
-                $self->__write_first_screen( $list, $back_row, 2 );
+                $self->__write_first_screen( $list );
                 $m = $self->__string_and_pos( $list );
             }
         }
         elsif ( $char == VK_INSERT ) {
             $self->{i}{beep} = 1;
         }
-        elsif ( $char == LINE_FEED || $char == CARRIAGE_RETURN ) {                                                  # ENTER
-            $self->{i}{lock_ENTER} = 0 if $k;                                                                       # any previously pressed key other than ENTER removes lock_ENTER
-            if ( $auto_up == 2 && $self->{auto_up} == 1 && ! $self->{i}{lock_ENTER} ) {                             # a removed lock_ENTER resets "auto_up" from 2 to 1 if the 2 was originally a 1
-                $auto_up = 1;
-            }
-            if ( $auto_up == 1 && @$list - @{$self->{i}{pre}} == 1 ) {                                              # else auto_up 1 sticks on the last==first data row
-                $auto_up = 2;
-            }
-            $k = 0;                                                                                                 # if ENTER set $k to 0
+        elsif ( $char == LINE_FEED || $char == CARRIAGE_RETURN ) {
             my $up = $self->{i}{curr_row} - $self->{i}{begin_row};
             $up += $self->{i}{pre_text_row_count} if $self->{i}{pre_text_row_count};
-            if ( $list->[$self->{i}{curr_row}][0] eq $self->{back} ) {                                              # if ENTER on   {back/0}: leave and return nothing
+            if ( $list->[$self->{i}{curr_row}][0] eq $self->{back} ) {
                 $self->__reset_term( $up );
                 return;
             }
-            elsif ( $list->[$self->{i}{curr_row}][0] eq $self->{confirm} ) {                                        # if ENTER on {confirm/1}: leave and return result
-                #if ( @{$self->{i}{valid_keys}} ) { ##
-                #    my $valid_keys = $self->{i}{valid_keys};
-                #    my $pre_count = @{$self->{i}{pre}};
-                #    $self->__reset_term( $up );
-                #    return [ map { [ $orig_list->[$_-$pre_count][0], $list->[$_][1] ] } @$valid_keys ];
-                #else {
-                    splice @$list, 0, @{$self->{i}{pre}};
-                    $self->__reset_term( $up );
-                    return [ map { [ $orig_list->[$_][0], $list->[$_][1] ] } 0 .. $#{$list} ];
-                #}
+            elsif ( $list->[$self->{i}{curr_row}][0] eq $self->{confirm} ) {
+                splice @$list, 0, @{$self->{i}{pre}};
+                $self->__reset_term( $up );
+                return [ map { [ $orig_list->[$_][0], $list->[$_][1] ] } 0 .. $#{$list} ];
             }
-            if ( $auto_up == 2 ) {                                                                                  # if ENTER && "auto_up" == 2 && any row: jumps {back/0}
+            if ( $self->{auto_up} == 2 ) {
                 print up( $up );
                 print "\r" . clear_to_end_of_screen();
-                $self->__write_first_screen( $list, $back_row, $auto_up );                                          # cursor on {back}
+                $self->__write_first_screen( $list );
                 $m = $self->__string_and_pos( $list );
             }
-            elsif ( $self->{i}{curr_row} == $#$list ) {                                                             # if ENTER && {last row}: jumps to the {first data row/2}
+            elsif ( $self->{i}{curr_row} == $#$list ) {
                 print up( $up );
                 print "\r" . clear_to_end_of_screen();
-                $self->__write_first_screen( $list, scalar( @{$self->{i}{pre}} ), $auto_up );                       # cursor on the first data row
+                if ( $self->{auto_up} == 1 ) {
+                    $self->__write_first_screen( $list );
+                }
+                else {
+                    $self->__write_first_screen( $list );
+                }
                 $m = $self->__string_and_pos( $list );
-                $self->{i}{lock_ENTER} = 1;                                                                         # set lock_ENTER when jumped automatically from the {last row} to the {first data row/2}
             }
             else {
-                if ( $auto_up == 1 && $self->{i}{curr_row} == @{$self->{i}{pre}} && $self->{i}{lock_ENTER} ) {      # if ENTER && "auto_up" == 1 $$ "curr_row" == {first data row/2} && lock_ENTER is true:
-                    $self->{i}{beep} = 1;                                                                           # set "auto_up" temporary to 2 so a second ENTER moves the cursor to {back/0}
-                    $auto_up = 2;
-                    next CHAR;
-                }
                 $self->{i}{curr_row}++;
                 $m = $self->__string_and_pos( $list );
-                if ( $self->{i}{curr_row} <= $self->{i}{end_row} ) {                                                # or go to the next row if not on the last row
+                if ( $self->{i}{curr_row} <= $self->{i}{end_row} ) {
                     $self->__reset_previous_row( $list, $self->{i}{curr_row} - 1 );
                     print down( 1 );
                 }
                 else {
-                    print up( $up );                                                                                # or else to the next page
+                    print up( $up );
                     $self->__print_next_page( $list );
                 }
             }
@@ -1579,7 +1556,7 @@ Term::Form - Read lines from STDIN.
 
 =head1 VERSION
 
-Version 0.540
+Version 0.542
 
 =cut
 
@@ -1729,11 +1706,11 @@ Expects as is value a string. If set, the string is printed on top of the output
 
 =head3 no_echo
 
-- if set to C<0>, the input is echoed on the screen.
+0 - the input is echoed on the screen.
 
-- if set to C<1>, "C<*>" are displayed instead of the characters.
+1 - "C<*>" are displayed instead of the characters.
 
-- if set to C<2>, no output is shown apart from the prompt string.
+2 - no output is shown apart from the prompt string.
 
 default: C<0>
 
@@ -1761,17 +1738,16 @@ The optional second argument is a hash-reference. The keys/options are
 
 =head3 auto_up
 
-With I<auto_up> set to C<0> or C<1> pressing C<ENTER> moves the cursor to the next line (if the cursor is not on the
-"back" or "confirm" row). If the last row is reached, the cursor jumps to the first data row if C<ENTER> is pressed.
-While with  I<auto_up> set to C<0> the cursor loops through the rows until a key other than C<ENTER> is pressed with
-I<auto_up> set to C<1> after one loop an C<ENTER> moves the cursor to the top menu entry ("back") if no other
-key than C<ENTER> was pressed.
+0 - if the cursor is on a data row (that means not on the "back" or "confirm" menu entry) pressing C<ENTER> moves the
+cursor to the next row. If C<ENTER> is pressed when the cursor is on the last data row the cursor jumps to the first
+data row. The initially cursor position is on the first data row.
 
-With I<auto_up> set to C<2> an C<ENTER> moves the cursor to the top menu entry (except the cursor is on the "confirm"
-row).
+1 - if the cursor is on a data row pressing C<ENTER> moves the cursor to the next row unless the cursor is on the last
+data row. Then pressing C<ENTER> moves the cursor to the "back" menu entry (the menu entry on the top of the menu). The
+initially cursor position is on the "back" menu entry.
 
-If I<auto_up> is set to C<0> or C<1> the initially cursor position is on the first data row while when set to C<2> the
-initially cursor position is on the first menu entry ("back").
+2 - if the cursor is on a data row pressing C<ENTER> moves the cursor to the "back" menu entry. The initially cursor
+position is on the "back" menu entry.
 
 default: C<1>
 
@@ -1889,7 +1865,7 @@ L<stackoverflow|http://stackoverflow.com> for the help.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2014-2021 Matthäus Kiem.
+Copyright 2014-2022 Matthäus Kiem.
 
 This library is free software; you can redistribute it and/or modify it under the same terms as Perl 5.10.0. For
 details, see the full text of the licenses in the file LICENSE.

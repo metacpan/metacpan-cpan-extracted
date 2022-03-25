@@ -13,7 +13,7 @@ use JSON::XS ();
 use YAML::XS ();
 use POSIX ();
 
-our $VERSION = '1.14'; # VERSION
+our $VERSION = '1.15'; # VERSION
 
 $Carp::Internal{ (__PACKAGE__) }++;
 
@@ -392,7 +392,7 @@ Config::App - Cascading merged application configuration
 
 =head1 VERSION
 
-version 1.14
+version 1.15
 
 =for markdown [![test](https://github.com/gryphonshafer/Config-App/workflows/test/badge.svg)](https://github.com/gryphonshafer/Config-App/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/Config-App/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Config-App)
@@ -768,7 +768,7 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2015-2021 by Gryphon Shafer.
+This software is Copyright (c) 2015-2050 by Gryphon Shafer.
 
 This is free software, licensed under:
 

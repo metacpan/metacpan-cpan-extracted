@@ -30,7 +30,7 @@ int32_t SPVM__TestCase__NativeAPI__check_native_api_indexes(SPVM_ENV* env, SPVM_
   if ((void*)&env->long_object_basic_type_id != &env_array[12]) { stack[0].ival = 0; return 0; }
   if ((void*)&env->float_object_basic_type_id != &env_array[13]) { stack[0].ival = 0; return 0; }
   if ((void*)&env->double_object_basic_type_id != &env_array[14]) { stack[0].ival = 0; return 0; }
-  if ((void*)&env->compiler != &env_array[15]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->runtime != &env_array[15]) { stack[0].ival = 0; return 0; }
   if ((void*)&env->exception_object != &env_array[16]) { stack[0].ival = 0; return 0; }
   if ((void*)&env->native_mortal_stack != &env_array[17]) { stack[0].ival = 0; return 0; }
   if ((void*)&env->native_mortal_stack_top != &env_array[18]) { stack[0].ival = 0; return 0; }
@@ -201,7 +201,7 @@ int32_t SPVM__TestCase__NativeAPI__check_native_api_indexes(SPVM_ENV* env, SPVM_
   if ((void*)&env->init_env != &env_array[183]) { stack[0].ival = 0; return 0;}
   if ((void*)&env->call_init_blocks != &env_array[184]) { stack[0].ival = 0; return 0;}
   if ((void*)&env->cleanup_global_vars != &env_array[185]) { stack[0].ival = 0; return 0;}
-  if ((void*)&env->new_compiler != &env_array[186]) { stack[0].ival = 0; return 0;}
+  if ((void*)&env->compiler_new != &env_array[186]) { stack[0].ival = 0; return 0;}
   if ((void*)&env->compiler_free != &env_array[187]) { stack[0].ival = 0; return 0;}
   if ((void*)&env->compiler_set_start_line != &env_array[188]) { stack[0].ival = 0; return 0;}
   if ((void*)&env->compiler_get_start_line != &env_array[189]) { stack[0].ival = 0; return 0;}
@@ -226,10 +226,14 @@ int32_t SPVM__TestCase__NativeAPI__check_native_api_indexes(SPVM_ENV* env, SPVM_
   if ((void*)&env->compiler_is_init_block_method != &env_array[208]) { stack[0].ival = 0; return 0;}
   if ((void*)&env->compiler_is_native_method != &env_array[209]) { stack[0].ival = 0; return 0;}
   if ((void*)&env->compiler_is_precompile_method != &env_array[210]) { stack[0].ival = 0; return 0;}
-  if ((void*)&env->compiler_get_native_method_address != &env_array[211]) { stack[0].ival = 0; return 0;}
-  if ((void*)&env->compiler_get_precompile_method_address != &env_array[212]) { stack[0].ival = 0; return 0;}
-  if ((void*)&env->compiler_set_native_method_address != &env_array[213]) { stack[0].ival = 0; return 0;}
-  if ((void*)&env->compiler_set_precompile_method_address != &env_array[214]) { stack[0].ival = 0; return 0;}
+  if ((void*)&env->get_native_method_address != &env_array[211]) { stack[0].ival = 0; return 0;}
+  if ((void*)&env->get_precompile_method_address != &env_array[212]) { stack[0].ival = 0; return 0;}
+  if ((void*)&env->set_native_method_address != &env_array[213]) { stack[0].ival = 0; return 0;}
+  if ((void*)&env->set_precompile_method_address != &env_array[214]) { stack[0].ival = 0; return 0;}
+  if ((void*)&env->is_object_array != &env_array[215]) { stack[0].ival = 0; return 0;}
+  if ((void*)&env->get_method_id_without_signature != &env_array[216]) { stack[0].ival = 0; return 0;}
+  if ((void*)&env->get_constant_string_value != &env_array[217]) { stack[0].ival = 0; return 0;}
+  if ((void*)&env->compiler_build_runtime != &env_array[218]) { stack[0].ival = 0; return 0;}
 
   stack[0].ival = 1;
 

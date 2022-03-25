@@ -2,7 +2,7 @@ package Catmandu::Iterable;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.2018';
+our $VERSION = '1.2019';
 
 use Catmandu::Util qw(
     is_number
@@ -59,6 +59,11 @@ sub count {
         $n++;
     }
     $n;
+}
+
+sub add_to {
+    my ($self, $exporter) = @_;
+    $exporter->add_many($self);
 }
 
 sub slice {
@@ -612,6 +617,11 @@ Return all the items in the iterator as an array ref.
 =head2 count
 
 Return the count of all the items in the iterator.
+
+=head2 add_to
+
+Add all items in the iterator to a L<Catmandu::Exporter>. Returns a true value
+when the exportwas successful or undef on error.
 
 =head3 LOOPING
 

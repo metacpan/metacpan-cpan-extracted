@@ -44,7 +44,7 @@ DESCRIPTION
 
     Current features include:
 
-      * all commands <https://redis.io/commands> as of 7.0 RC (February
+      * all commands <https://redis.io/commands> as of 7.0 RC2 (March
       2022), see https://redis.io/commands for the methods and parameters
 
       * pub/sub support <https://redis.io/topics/pubsub>, see "METHODS -

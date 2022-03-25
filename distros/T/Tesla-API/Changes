@@ -1,5 +1,61 @@
 Revision history for Tesla-API
 
+0.09    2022-03-22
+    - In CI script, manually install File::ShareDir::Install, as it doesn't get
+      installed by default the way we configure the test run (was throwing "! No
+      MYMETA file is found after configure. Your toolchain is too old?" error on
+      the 'cpanm --installdeps .' command).
+    - api() now requires all parameters sent in as a hash
+
+0.08    2022-03-22
+    - We now store endpoints.json and option_codes.json in a share directory
+      with the library (closes #4)
+    - Added update_data_files(), updates the endpoints.json and
+      option_codes.json files this library uses if they have in fact been
+      changed
+    - Added option_codes
+
+0.07    2022-03-21
+    - POD corrections
+
+0.06    2022-03-20
+    - Made "API CACHE METHODS" section a head1 in POD
+
+0.05    2022-03-20
+    - DEBUG_API_CACHE now retrieved from $ENV{DEBUG_TESLA_API_CACHE} instead of
+      having it as a magic number (so we don't accidentally publish the code
+      with it set ;)
+    - Make EXAMPLE POD section a head1; accidentally had it as a head2
+    - Moved all cache methods in POD to their own METHOD section
+
+0.04    2022-03-20
+    - Fix issue where we were assigning to the wrong variable in
+      api_cache_time()
+    - Renamed $api_cache_time to $api_cache_alive_time to be non-ambiguous to
+      the api_cache_time() method
+    - Added api_cache_persist() and api_cache_persist param. Allows temporarily
+      or permanently returning the cached Tesla API data
+    - Added entire section in POD dealing exclusively with the API caching
+      mechanism
+
+0.03    2022-03-19
+    - Added api_clear_cache() for methods that need to daisy chain calls, but
+      require fresh data between them
+    - Added ability to send in an additional param, $api_params to api(), so
+      that we can send them to the API as JSON body content
+      (eg. $vehicle->trunk_actuate with 'which_trunk' => 'rear');
+
+0.02    2022-03-18
+    - Removed all vehicle related stuff and moved it into a separate subclass
+      distribution, Tesla::Vehicle. This distribution will only be for the
+      managing of access tokens and speaking to the Tesla API directly
+    - Cleaned up documentation about "id" param in new(). The children
+      classes must take care of this
+    - Added full blown caching mechanism to cache endpoint/id pair data for
+      each call through the Tesla API (closes #3)
+    - Access tokens now track their own expiry, and auto-refresh when needed
+      (closes #2)
+
 0.01    2022-03-16
     - Auto generated distribution with Dist::Mgr
     - Prompt user to authenticate via URL, and to paste new URL back into

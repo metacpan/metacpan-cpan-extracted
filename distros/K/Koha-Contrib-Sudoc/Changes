@@ -1,5 +1,9 @@
 Revision history for Perl module Koha::Contrib::Sudoc
 
+2.37 2022-03-21
+
+  - Fix warning
+
 2.33 2020-08-26
 
   - Prise en charge des nouveaux formats de sérialisation ES

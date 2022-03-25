@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.21
+    version 0.22
 
 SYNOPSIS
 
@@ -15,7 +15,18 @@ SYNOPSIS
      unshift @PATH, Alien::bison->bin_dir;
      system 'bison', ...;
 
-    From Alien::Base Build.PL
+    From alienfile:
+
+     use alienfile;
+     
+     share {
+       ..
+       requires 'Alien::bison' => 0;
+       build [ '%{bison} ...' ];
+       ...
+     };
+
+    From Build.PL for Alien::Base::ModuleBuild:
 
      use Alien:Base::ModuleBuild;
      my $builder = Module::Build->new(
@@ -37,6 +48,12 @@ HELPERS
      %{bison}
 
     Returns the name of the bison command. Usually just bison.
+
+SEE ALSO
+
+    Alien
+
+    Alien::flex
 
 AUTHOR
 

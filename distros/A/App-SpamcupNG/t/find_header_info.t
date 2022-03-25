@@ -19,10 +19,11 @@ note($source);
 $result = find_header_info( read_html($source) );
 is( ref($result),      'HASH', 'result is a hash reference' );
 is( $result->{mailer}, undef,  'mailer has the expected value' );
-is( $result->{content_type},
+is(
+    $result->{content_type},
     'multipart/alternative;charset=utf-8',
     'content_type has the expected value'
-    );
+);
 
 $source = 'boundary.html';
 note($source);
@@ -30,9 +31,7 @@ $result = find_header_info( read_html($source) );
 is( ref($result),      'HASH', 'result is a hash reference' );
 is( $result->{mailer}, undef,  'mailer has the expected value' );
 is( $result->{content_type},
-    'multipart/alternative',
-    'content_type has the expected value'
-    );
+    'multipart/alternative', 'content_type has the expected value' );
 
 # vim: filetype=perl
 

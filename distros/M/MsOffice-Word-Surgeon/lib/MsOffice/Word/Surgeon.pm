@@ -12,7 +12,7 @@ use MsOffice::Word::Surgeon::Change;
 
 use namespace::clean -except => 'meta';
 
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 
 # constant integers to specify indentation modes -- see L<XML::LibXML>
 use constant XML_NO_INDENT     => 0;
@@ -49,10 +49,12 @@ my %noise_reduction_regexes = (
   page_breaks           => qr(<w:lastRenderedPageBreak/>),
   language              => qr(<w:lang w:val="[^/>]+/>),
   empty_run_props       => qr(<w:rPr></w:rPr>),
+  soft_hyphens          => qr(<w:softHyphen/>),
  );
 
 my @noise_reduction_list = qw/proof_checking revision_ids
-                              complex_script_bold page_breaks language empty_run_props/;
+                              complex_script_bold page_breaks language 
+                              empty_run_props soft_hyphens/;
 
 #======================================================================
 # BUILDING
@@ -553,6 +555,7 @@ Known regexes are :
   page_breaks          => qr(<w:lastRenderedPageBreak/>),
   language             => qr(<w:lang w:val="[^/>]+/>),
   empty_run_props      => qr(<w:rPr></w:rPr>),
+  soft_hyphens         => qr(<w:softHyphen/>),
 
 =head3 reduce_all_noises
 
@@ -754,9 +757,13 @@ The C# Open XML SDK from Microsoft
 
 Additional functionalities built on top of the XML SDK.
 
+=item L<https://poi.apache.org>
+
+An open source Java library from the Apache foundation.
+
 =item L<https://www.docx4java.org/trac/docx4j>
 
-An open source Java library.
+Another open source Java library, competitor to Apache POI.
 
 =item L<https://phpword.readthedocs.io/en/latest/>
 
@@ -775,7 +782,8 @@ paragraphes, styles, fonts, inline shapes, etc.
 
 The present module is much simpler but also much more limited : it was optimised
 for dealing with the text contents and offers no support for presentation or
-paging features.
+paging features. However, it has the rare advantage of providing an API for
+regex substitutions within Word documents.
 
 The L<MsOffice::Word::Template> module relies on the present module, together with
 the L<Perl Template Toolkit|Template>, to implement a templating system for Word documents.

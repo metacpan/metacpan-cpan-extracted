@@ -395,8 +395,9 @@ sub selectall_hash {
 
 		my @rc;
 		while(my $href = $sth->fetchrow_hashref()) {
+			# FIXME: Doesn't store in the cache
+			return $href if(!wantarray);
 			push @rc, $href;
-			last if(!wantarray);
 		}
 		if($c && wantarray) {
 			$c->set($key, \@rc, '1 hour');

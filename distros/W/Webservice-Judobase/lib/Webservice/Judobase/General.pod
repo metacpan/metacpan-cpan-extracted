@@ -25,3 +25,7 @@ TBD.
 =head2 competitions()
 
 TBD.
+
+=head2 competitors()
+
+Given an event_id, will return the inscriptions for that event.

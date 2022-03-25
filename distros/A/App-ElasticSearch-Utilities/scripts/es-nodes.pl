@@ -61,7 +61,7 @@ es-nodes.pl - Listing the nodes in a cluster with some details
 
 =head1 VERSION
 
-version 8.2
+version 8.3
 
 =head1 SYNOPSIS
 
@@ -83,7 +83,7 @@ From App::ElasticSearch::Utilities:
     --http-password HTTP Basic Auth password (if not specified, and --http-user is, you will be prompted)
     --password-exec Script to run to get the users password
     --noop          Any operations other than GET are disabled, can be negated with --no-noop
-    --timeout       Timeout to ElasticSearch, default 30
+    --timeout       Timeout to ElasticSearch, default 10
     --keep-proxy    Do not remove any proxy settings from %ENV
     --index         Index to run commands against
     --base          For daily indexes, reference only those starting with "logstash"
@@ -145,7 +145,7 @@ Brad Lhotsky <brad@divisionbyzero.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2021 by Brad Lhotsky.
+This software is Copyright (c) 2022 by Brad Lhotsky.
 
 This is free software, licensed under:
 

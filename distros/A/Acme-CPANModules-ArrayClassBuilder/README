@@ -1,15 +1,13 @@
 NAME
-    Acme::CPANModules::ArrayClassBuilder - Class builders for array-backed
-    classes
+    Acme::CPANModules::ArrayClassBuilder - List of class builders for
+    array-backed classes
 
 VERSION
-    This document describes version 0.001 of
+    This document describes version 0.002 of
     Acme::CPANModules::ArrayClassBuilder (from Perl distribution
-    Acme-CPANModules-ArrayClassBuilder), released on 2019-01-09.
+    Acme-CPANModules-ArrayClassBuilder), released on 2022-03-08.
 
 DESCRIPTION
-    Class builders for array-backed classes.
-
     This list catalogs class builders for classes that use array (instead of
     the popular hash) as their backend storage.
 
@@ -20,17 +18,63 @@ DESCRIPTION
     attribute access speed, memory size, or other aspects. But they are not
     as versatile and generic as hash.
 
-INCLUDED MODULES
-    *   Class::Accessor::Array
+ACME::CPANMODULES ENTRIES
+    *   Class::Accessor::Array - Generate accessors/constructor for
+        array-based object
 
-    *   Class::Accessor::Array::Glob
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   Class::XSAccessor::Array
+    *   Class::Accessor::Array::Glob - Generate accessors/constructor for
+        array-based object (supports globbing attribute)
 
-    *   Class::ArrayObjects
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    *   Class::XSAccessor::Array - Generate fast XS accessors without
+        runtime compilation
+
+        Author: SMUELLER <https://metacpan.org/author/SMUELLER>
+
+    *   Class::ArrayObjects - utility class for array based objects
+
+        Author: RONAN <https://metacpan.org/author/RONAN>
 
     *   Object::ArrayType::New - Only supports defining constants for array
         indexes
+
+        Author: AVENJ <https://metacpan.org/author/AVENJ>
+
+FAQ
+  What is an Acme::CPANModules::* module?
+    An Acme::CPANModules::* module, like this module, contains just a list
+    of module names that share a common characteristics. It is a way to
+    categorize modules and document CPAN. See Acme::CPANModules for more
+    details.
+
+  What are ways to use this Acme::CPANModules module?
+    Aside from reading this Acme::CPANModules module's POD documentation,
+    you can install all the listed modules (entries) using cpanm-cpanmodules
+    script (from App::cpanm::cpanmodules distribution):
+
+     % cpanm-cpanmodules -n ArrayClassBuilder
+
+    Alternatively you can use the cpanmodules CLI (from App::cpanmodules
+    distribution):
+
+        % cpanmodules ls-entries ArrayClassBuilder | cpanm -n
+
+    or Acme::CM::Get:
+
+        % perl -MAcme::CM::Get=ArrayClassBuilder -E'say $_->{module} for @{ $LIST->{entries} }' | cpanm -n
+
+    or directly:
+
+        % perl -MAcme::CPANModules::ArrayClassBuilder -E'say $_->{module} for @{ $Acme::CPANModules::ArrayClassBuilder::LIST->{entries} }' | cpanm -n
+
+    This Acme::CPANModules module also helps lcpan produce a more meaningful
+    result for "lcpan related-mods" command when it comes to finding related
+    modules for the modules listed in this Acme::CPANModules module. See
+    App::lcpan::Cmd::related_mods for more details on how "related modules"
+    are found.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -40,14 +84,6 @@ SOURCE
     Source repository is at
     <https://github.com/perlancar/perl-Acme-CPANModules-ArrayClassBuilder>.
 
-BUGS
-    Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Arra
-    yClassBuilder>
-
-    When submitting a bug or request, please include a test-file or a patch
-    to an existing test-file that illustrates the bug or desired feature.
-
 SEE ALSO
     Acme::CPANModules - about the Acme::CPANModules namespace
 
@@ -56,9 +92,34 @@ SEE ALSO
 AUTHOR
     perlancar <perlancar@cpan.org>
 
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
+    steps required beyond that are considered a bug and can be reported to
+    me.
+
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019 by perlancar@cpan.org.
+    This software is copyright (c) 2022, 2019 by perlancar
+    <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Arra
+    yClassBuilder>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 

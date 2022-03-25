@@ -1,7 +1,7 @@
 package PICA::Data;
 use v5.14.1;
 
-our $VERSION = '2.01';
+our $VERSION = '2.02';
 
 use Exporter 'import';
 our @EXPORT_OK
@@ -425,6 +425,7 @@ use PICA::Writer::Binary;
 use PICA::Writer::PPXML;
 use PICA::Writer::PIXML;
 use PICA::Writer::JSON;
+use PICA::Writer::Generic;
 
 sub pica_parser {
     _pica_module('PICA::Parser', @_);

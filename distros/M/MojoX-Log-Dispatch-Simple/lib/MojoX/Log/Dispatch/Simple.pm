@@ -8,7 +8,7 @@ use warnings;
 use Mojo::Base 'Mojo::EventEmitter';
 use Mojo::Util 'encode';
 
-our $VERSION = '1.11'; # VERSION
+our $VERSION = '1.12'; # VERSION
 
 has history          => sub { [] };
 has level            => 'debug';
@@ -143,7 +143,7 @@ MojoX::Log::Dispatch::Simple - Simple Log::Dispatch replacement of Mojo::Log
 
 =head1 VERSION
 
-version 1.11
+version 1.12
 
 =for markdown [![test](https://github.com/gryphonshafer/MojoX-Log-Dispatch-Simple/workflows/test/badge.svg)](https://github.com/gryphonshafer/MojoX-Log-Dispatch-Simple/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/MojoX-Log-Dispatch-Simple/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/MojoX-Log-Dispatch-Simple)
@@ -450,7 +450,7 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2015-2021 by Gryphon Shafer.
+This software is Copyright (c) 2015-2050 by Gryphon Shafer.
 
 This is free software, licensed under:
 

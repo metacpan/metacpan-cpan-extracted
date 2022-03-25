@@ -5,7 +5,7 @@ use 5.008;
 use strict;
 use warnings;
 
-our $VERSION = '1.03'; # VERSION
+our $VERSION = '1.04'; # VERSION
 
 sub new {
     my $self = shift;
@@ -367,7 +367,7 @@ Lingua::ManagementSpeak - Tool to generate managerial-sounding text and full doc
 
 =head1 VERSION
 
-version 1.03
+version 1.04
 
 =for markdown [![test](https://github.com/gryphonshafer/Lingua-ManagementSpeak/workflows/test/badge.svg)](https://github.com/gryphonshafer/Lingua-ManagementSpeak/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/Lingua-ManagementSpeak/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Lingua-ManagementSpeak)
@@ -763,7 +763,7 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2014-2021 by Gryphon Shafer.
+This software is Copyright (c) 2014-2050 by Gryphon Shafer.
 
 This is free software, licensed under:
 

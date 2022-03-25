@@ -6,13 +6,13 @@ build_requires:
   Alien::Build: '1.14'
   Capture::Tiny: '0'
   File::chdir: '0'
-  Test2::V0: '0.000060'
+  Test2::V0: '0.000121'
   perl: '5.006'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.006'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -30,10 +30,11 @@ requires:
   perl: '5.006'
 resources:
   IRC: irc://irc.perl.org/#native
-  bugtracker: https://github.com/Perl5-Alien/Alien-Build-MB/issues
+  bugtracker: https://github.com/PerlAlien/Alien-Build-MB/issues
   homepage: https://metacpan.org/pod/Alien::Build::MB
-  repository: git://github.com/Perl5-Alien/Alien-Build-MB.git
-version: '0.07'
-x_generated_by_perl: v5.30.0
+  repository: git://github.com/PerlAlien/Alien-Build-MB.git
+version: '0.08'
+x_generated_by_perl: v5.35.9
 x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_use_unsafe_inc: 0

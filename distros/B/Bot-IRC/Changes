@@ -1,5 +1,8 @@
 Revision history for Bot::IRC
 
+1.39      2022-03-18 08:51:19-07:00 America/Los_Angeles
+        - Minor documentation update
+
 1.38      2021-09-24 15:45:14-07:00 America/Los_Angeles
         - Add "disconnect" parameter trigger option
 

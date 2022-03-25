@@ -1,6 +1,13 @@
 Revision history for Term::Form
 
 
+0.542   2022-03-23
+    - Code refactoring (__write_first_screen).
+
+0.541   2022-03-23
+    - Update option 'auto_up'.
+    - Update year copyright.
+
 0.540   2021-11-11
     - Raised Perl minimum version to 5.10.0.
     - Use '\v'.

@@ -1,5 +1,9 @@
 Revision history for Alien-Build-MB
 
+0.08      2022-03-23 12:29:50 -0600
+  - Generated ::Install::Files POD missing pod coverage
+    exception (gh#7, gh#14)
+
 0.07      2020-02-05 21:31:12 -0700
   - Generate ::Install::Files module like Alien::Build::MM
     and Alien::Base::ModuleBuild do (gh#4, gh#6)

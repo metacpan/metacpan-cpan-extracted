@@ -1,12 +1,7 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/corruptor/corruptor
-# and generated automatically using Perinci::CmdLine::Gen version 0.498
-
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-05-25'; # DATE
-our $DIST = 'App-corruptor'; # DIST
-our $VERSION = '0.002'; # VERSION
+# and generated automatically using Perinci::CmdLine::Gen version 0.501
 
 use 5.010001;
 use strict;
@@ -14,6 +9,11 @@ use warnings;
 use Log::ger;
 
 use Perinci::CmdLine::Any;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-03-13'; # DATE
+our $DIST = 'App-corruptor'; # DIST
+our $VERSION = '0.003'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/corruptor/corruptor",
@@ -23,7 +23,7 @@ my $cmdline = Perinci::CmdLine::Any->new(
 
 $cmdline->run;
 
-# ABSTRACT: Corrupt files by writing random bytes/blocks to them
+# ABSTRACT: Corrupt files by writing some random bytes/blocks to them
 # PODNAME: corruptor
 
 __END__
@@ -34,28 +34,17 @@ __END__
 
 =head1 NAME
 
-corruptor - Corrupt files by writing random bytes/blocks to them
+corruptor - Corrupt files by writing some random bytes/blocks to them
 
 =head1 VERSION
 
-This document describes version 0.002 of corruptor (from Perl distribution App-corruptor), released on 2021-05-25.
+This document describes version 0.003 of corruptor (from Perl distribution App-corruptor), released on 2022-03-13.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % corruptor [--config-path=path | -c] [--config-profile=profile | -P]
-     [--debug] [--dry-run | -n] [--file=s+] [--files-json=s]
-     [--format=name] [--json] [--log-level=level] [--(no)naked-res]
-     [--no-config | -C] [--no-env] [-p=s] [--page-result[=program]]
-     [--proportion=s] [--quiet] [--trace] [--verbose]
-     [--view-result[=program]] <file> ...
-
-Examples:
-
-Corrupt two files by writing 1% random bytes:
-
- % corruptor disk.img disk2.img -p1%
+% B<corruptor> [B<--config-path>=I<path>|B<-c>|B<--no-config>|B<-C>] [B<--config-profile>=I<profile>|B<-P>] [B<--debug>|B<--log-level>=I<level>|B<--quiet>|B<--trace>|B<--verbose>] [B<--dry-run>|B<-n>] [(B<--file>=I<filename>)+] [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--no-env>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--proportion>=I<percent>] [B<--files-json>=I<json>] [B<-p>=I<percent>] -- E<lt>I<file>E<gt> ...
 
 =head1 DESCRIPTION
 
@@ -245,7 +234,7 @@ For fish and zsh, install L<shcompgen> as described above.
 
 This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
 
-By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F<~/.config/corruptor.conf>, F<~/corruptor.conf>, or F</etc/corruptor.conf>.
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F</home/u1/.config/corruptor.conf>, F</home/u1/corruptor.conf>, or F</etc/corruptor.conf>.
 
 All found files will be read and merged.
 
@@ -288,11 +277,17 @@ Specify additional command-line options.
 
 =head1 FILES
 
-F<~/.config/corruptor.conf>
+F</home/u1/.config/corruptor.conf>
 
-F<~/corruptor.conf>
+F</home/u1/corruptor.conf>
 
 F</etc/corruptor.conf>
+
+=head1 EXAMPLES
+
+Corrupt two files by writing 1% random bytes:
+
+ % corruptor disk.img disk2.img -p1%
 
 =head1 HOMEPAGE
 
@@ -302,14 +297,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-corrup
 
 Source repository is at L<https://github.com/perlancar/perl-App-corruptor>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-corruptor>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<http://jrs-s.net/2016/05/09/testing-copies-equals-n-resiliency/>.
@@ -318,11 +305,36 @@ L<http://jrs-s.net/2016/05/09/testing-copies-equals-n-resiliency/>.
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by perlancar@cpan.org.
+This software is copyright (c) 2022, 2021 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-corruptor>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

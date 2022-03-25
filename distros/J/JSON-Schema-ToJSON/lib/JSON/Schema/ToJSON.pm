@@ -11,7 +11,7 @@ use Hash::Merge qw/ merge /;
 use Data::Fake qw/ Core Names Text Dates /;
 use JSON::Validator::Util qw/ schema_type /;
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 has _validator  => sub {
 	$ENV{JSON_VALIDATOR_RECURSION_LIMIT} = shift->max_depth;
@@ -419,7 +419,7 @@ JSON::Schema::ToJSON - Generate example JSON structures from JSON Schema definit
 
 =head1 VERSION
 
-0.19
+0.20
 
 =head1 SYNOPSIS
 
@@ -495,6 +495,10 @@ schema validation options may not generate representative JSON so they will not
 validate against the schema on a round trip. These include:
 
 =over 4
+
+=item * $ref may not be resolved
+
+Broken as of JSON::Validator v5.0
 
 =item * additionalItems
 

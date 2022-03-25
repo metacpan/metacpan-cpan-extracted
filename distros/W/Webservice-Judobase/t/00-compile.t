@@ -6,12 +6,13 @@ use warnings;
 
 use Test::More;
 
-plan tests => 4 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 5 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Webservice/Judobase.pm',
     'Webservice/Judobase/Competitor.pm',
     'Webservice/Judobase/Contests.pm',
+    'Webservice/Judobase/Country.pm',
     'Webservice/Judobase/General.pm'
 );
 

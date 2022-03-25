@@ -59,7 +59,7 @@ SYNOPSIS
 VERSION
 =======
 
-        v0.17.1
+        v0.22.0
 
 DESCRIPTION
 ===========
@@ -109,6 +109,9 @@ If the module runs under mod\_perl, and assuming you have set the
 variable `GlobalRequest` in your Apache configuration, it is recognised
 and a clean up registered routine is declared to Apache to clean up the
 content of the object.
+
+This methods calls [\"init\"](#init){.perl-module}, which does all the
+work of setting object properties and calling methods to that effect.
 
 as\_hash
 --------
@@ -294,6 +297,83 @@ debug value, the debugging message is printed.
 
 If the debug value is switched to 1, the message will be silenced.
 
+deserialise
+-----------
+
+This method use a specified serialiser class and deserialise the given
+data either directly from a specified file or being provided, and
+returns the perl data.
+
+The 2 serialisers currently supported are:
+[Sereal](https://metacpan.org/pod/Sereal){.perl-module} and
+[Storable](https://metacpan.org/pod/Storable){.perl-module}. They are
+not required by
+[Module::Generic](https://metacpan.org/pod/Module::Generic){.perl-module},
+so you must install them yourself. If the serialiser chosen is not
+installed, this will set an
+[errr](https://metacpan.org/pod/Module::Generic#error){.perl-module} and
+return `undef`.
+
+This method takes some parameters as an hash or hash reference. It can
+then:
+
+-   retrieve data directly from File
+-   retrieve data from a file handle (only with
+    [Storable](https://metacpan.org/pod/Storable){.perl-module})
+-   Return the deserialised data
+
+The supported parameters are:
+
+-   *data*
+
+    String of data to deserialise.
+
+-   *file*
+
+    String. A file path where to store the serialised data.
+
+-   *io*
+
+    A file handle. This is used when the serialiser is
+    [Storable](https://metacpan.org/pod/Storable){.perl-module} to call
+    its function [\"store\_fd\" in
+    Storable](https://metacpan.org/pod/Storable#store_fd){.perl-module}
+    and [\"fd\_retrieve\" in
+    Storable](https://metacpan.org/pod/Storable#fd_retrieve){.perl-module}
+
+-   *lock*
+
+    Boolean. If true, this will lock the file before reading from it.
+    This works only in conjonction with *file* and the serialiser
+    [Storable](https://metacpan.org/pod/Storable){.perl-module}
+
+-   *serialiser* or *serializer*
+
+    A string being the class of the serialiser to use. This can be only
+    either [Sereal](https://metacpan.org/pod/Sereal){.perl-module} or
+    [Storable](https://metacpan.org/pod/Storable){.perl-module}
+
+Additionally the following options are supported and passed through
+directly to [\"decode\" in
+Sereal::Decoder](https://metacpan.org/pod/Sereal::Decoder#decode){.perl-module}
+if the serialiser is
+[Sereal](https://metacpan.org/pod/Sereal){.perl-module}:
+*alias\_smallint*, *alias\_varint\_under*, *incremental*,
+*max\_num\_array\_entries*, *max\_num\_hash\_entries*,
+*max\_recursion\_depth*, *max\_string\_length*,
+*max\_uncompressed\_size*, *no\_bless\_objects*, *refuse\_objects*,
+*refuse\_snappy*, *set\_readonly*, *set\_readonly\_scalars*,
+*use\_undef*, *validate\_utf8*
+
+If an error occurs, this sets an
+[error](https://metacpan.org/pod/Module::Generic#error){.perl-module}
+and return `undef`
+
+deserialize
+-----------
+
+Alias for [\"deserialise\"](#deserialise){.perl-module}
+
 dump
 ----
 
@@ -366,7 +446,8 @@ Sets or gets an error number.
 error
 -----
 
-Set the current error issuing a
+Provided with a list of strings or an hash reference of parameters and
+this will set the current error issuing a
 [Module::Generic::Exception](https://metacpan.org/pod/Module::Generic::Exception){.perl-module}
 object, call [\"warn\" in
 perlfunc](https://metacpan.org/pod/perlfunc#warn){.perl-module}, or
@@ -379,7 +460,7 @@ in list context:
         }
 
 Note that you do not have to worry about a trailing line feed sequence.
-**error**() takes care of it.
+[\"error\"](#error){.perl-module} takes care of it.
 
 The script calling your module could write calls to your module methods
 like this:
@@ -390,15 +471,44 @@ like this:
         my $cust_name = $object->customer->name ||
             die( "Got an error: ", $object->error, "\n" );
 
-Note also that by calling **error**() it will not clear the current
-error. For that you have to call **clear\_error**() explicitly.
+If you want to use an hash reference instead, you can pass the following
+parameters. Any other parameters will be passed to the exception class.
 
-Also, when an error is set, the global variable *ERROR* is set
-accordingly. This is especially usefull, when your initiating an object
-and that an error occured. At that time, since the object could not be
-initiated, the end user can not use the object to get the error message,
-and then can get it using the global module variable *ERROR*, for
-example:
+*class*
+
+:   The package name or class to use to instantiate the error object. By
+    default, it will use
+    [Module::Generic::Exception](https://metacpan.org/pod/Module::Generic::Exception){.perl-module}
+    class or the one specified with the object property
+    `_exception_class`
+
+            $self->do_something_bad ||
+                return( $self->error({
+                    code => 500,
+                    message => "Oopsie",
+                    class => "My::NoWayException",
+                }) );
+            my $exception = $self->error; # an My::NoWayException object
+
+    Note, however, that if the class specified cannot be loaded for some
+    reason, [\"error\" in
+    Module::Generic](https://metacpan.org/pod/Module::Generic#error){.perl-module}
+    will die since this would be an error within another error.
+
+*message*
+
+:   The error message.
+
+Note also that by calling [\"error\"](#error){.perl-module} it will not
+clear the current error. For that you have to call
+[\"clear\_error\"](#clear_error){.perl-module} explicitly.
+
+Also, when an error is set, the global variable *ERROR* in the
+inheriting package is set accordingly. This is especially usefull, when
+your initiating an object and that an error occured. At that time, since
+the object could not be initiated, the end user can not use the object
+to get the error message, and then can get it using the global module
+variable *ERROR*, for example:
 
         my $obj = Some::Package->new ||
         die( $Some::Package::ERROR, "\n" );
@@ -434,7 +544,7 @@ To solve this, when an object is expected,
 [\"error\"](#error){.perl-module} returns a special object from module
 [Module::Generic::Null](https://metacpan.org/pod/Module::Generic::Null){.perl-module}
 that will enable all the chained methods to be performed and return the
-error when requested to. For example :
+error when requested to. For example:
 
         my $o = My::Package->new;
         my $total $o->get_customer(10)->products->total || die( $o->error, "\n" );
@@ -525,7 +635,7 @@ in the first place or an error if something went wrong, such as:
             my $self = shift( @_ );
             my $dbh  = DB::Object->connect() ||
             return( $self->error( "Unable to connect to database server." ) );
-            $self->{ 'dbh' } = $dbh;
+            $self->{dbh} = $dbh;
             return( $self );
         }
 
@@ -611,6 +721,20 @@ own `init` method, for example:
             $self->{_exception_class} = 'My::Package::Exception';
             $self->SUPER::init( @_ ) || return( $self->pass_error );
             return( $self );
+        }
+
+You can also specify a default exception class that will be used by
+[\"error\"](#error){.perl-module} to create exception object, by setting
+the object property `_exception_class`:
+
+        sub init
+        {
+            my $self = shift( @_ );
+            $self->{name} = 'default_name';
+            # For any key-value pairs to be matched by a corresponding method
+            $self->{_init_strict_use_sub} = 1;
+            $self->{_exception_class} = 'My::Exception';
+            return( $self->SUPER::init( @_ ) );
         }
 
 log\_handler
@@ -794,6 +918,23 @@ object. If any arguments are provided, it will pass it to [\"new\" in
 Module::Generic::Array](https://metacpan.org/pod/Module::Generic::Array#new){.perl-module}
 and return the object.
 
+new\_datetime
+-------------
+
+Provided with some optional arguments and this will instantiate a new
+[Module::Generic::DateTime](https://metacpan.org/pod/Module::Generic::DateTime){.perl-module}
+object, passing it whatever argument was provided.
+
+Example:
+
+        my $dt = DateTime->now( time_zone => 'Asia/Tokyo' );
+        # Returns a new Module::Generic::DateTime object
+        my $d = $o->new_datetime( $dt );
+
+        # Returns a new Module::Generic::DateTime object with DateTime initiated automatically
+        # to now with time zone set by default to UTC
+        my $d = $o->new_datetime;
+
 new\_file
 ---------
 
@@ -811,6 +952,32 @@ Instantiate a new
 object. If any arguments are provided, it will pass it to [\"new\" in
 Module::Generic::Hash](https://metacpan.org/pod/Module::Generic::Hash#new){.perl-module}
 and return the object.
+
+new\_json
+---------
+
+This method tries to load
+[JSON](https://metacpan.org/pod/JSON){.perl-module} and create a new
+object.
+
+By default it enables the following
+[JSON](https://metacpan.org/pod/JSON){.perl-module} object properties:
+
+[\"allow\_blessed\" in JSON](https://metacpan.org/pod/JSON#allow_blessed){.perl-module}
+
+:   
+
+[\"allow\_nonref\" in JSON](https://metacpan.org/pod/JSON#allow_nonref){.perl-module}
+
+:   
+
+[\"convert\_blessed\" in JSON](https://metacpan.org/pod/JSON#convert_blessed){.perl-module}
+
+:   
+
+[\"relaxed\" in JSON](https://metacpan.org/pod/JSON#relaxed){.perl-module}
+
+:   
 
 new\_null
 ---------
@@ -1013,6 +1180,84 @@ If it cannot open the file in write mode, or cannot print to it, this
 will set an error and return undef. Otherwise this returns the size of
 the file in bytes.
 
+serialise
+---------
+
+This method use a specified serialiser class and serialise the given
+data either by returning it or by saving it directly to a given file.
+
+The 2 serialisers currently supported are:
+[Sereal](https://metacpan.org/pod/Sereal){.perl-module} and
+[Storable](https://metacpan.org/pod/Storable){.perl-module}. They are
+not required by
+[Module::Generic](https://metacpan.org/pod/Module::Generic){.perl-module},
+so you must install them yourself. If the serialiser chosen is not
+installed, this will set an
+[errr](https://metacpan.org/pod/Module::Generic#error){.perl-module} and
+return `undef`.
+
+This method takes some data and an optional hash or hash reference of
+parameters. It can then:
+
+-   save data directly to File
+-   save data to a file handle (only with
+    [Storable](https://metacpan.org/pod/Storable){.perl-module})
+-   Return the serialised data
+
+The supported parameters are:
+
+-   *append*
+
+    Boolean. If true, the serialised data will be appended to the given
+    file. This works only in conjonction with *file*
+
+-   *file*
+
+    String. A file path where to store the serialised data.
+
+-   *io*
+
+    A file handle. This is used when the serialiser is
+    [Storable](https://metacpan.org/pod/Storable){.perl-module} to call
+    its function [\"store\_fd\" in
+    Storable](https://metacpan.org/pod/Storable#store_fd){.perl-module}
+    and [\"fd\_retrieve\" in
+    Storable](https://metacpan.org/pod/Storable#fd_retrieve){.perl-module}
+
+-   *lock*
+
+    Boolean. If true, this will lock the file before writing to it. This
+    works only in conjonction with *file* and the serialiser
+    [Storable](https://metacpan.org/pod/Storable){.perl-module}
+
+-   *serialiser* or *serializer*
+
+    A string being the class of the serialiser to use. This can be only
+    either [Sereal](https://metacpan.org/pod/Sereal){.perl-module} or
+    [Storable](https://metacpan.org/pod/Storable){.perl-module}
+
+Additionally the following options are supported and passed through
+directly to [\"decode\" in
+Sereal::Decoder](https://metacpan.org/pod/Sereal::Decoder#decode){.perl-module}
+if the serialiser is
+[Sereal](https://metacpan.org/pod/Sereal){.perl-module}:
+*aliased\_dedupe\_strings*, *canonical*, *canonical\_refs*, *compress*,
+*compress\_level*, *compress\_threshold*, *croak\_on\_bless*,
+*dedupe\_strings*, *freeze\_callbacks*, *max\_recursion\_depth*,
+*no\_bless\_objects*, *no\_shared\_hashkeys*, *protocol\_version*,
+*snappy*, *snappy\_incr*, *snappy\_threshold*, *sort\_keys*,
+*stringify\_unknown*, *undef\_unknown*, *use\_protocol\_v1*,
+*warn\_unknown*
+
+If an error occurs, this sets an
+[error](https://metacpan.org/pod/Module::Generic#error){.perl-module}
+and return `undef`
+
+serialize
+---------
+
+Alias for [\"serialise\"](#serialise){.perl-module}
+
 set
 ---
 
@@ -1095,8 +1340,12 @@ and pass it the arguments. Otherwise, **AUTOLOAD** will die with a
 message explaining that the called routine did not exist and could not
 be found in the current class.
 
-SPECIAL METHODS
+SUPPORT METHODS
 ===============
+
+Those methods are designed to be called from the package inheriting from
+[Module::Generic](https://metacpan.org/pod/Module::Generic){.perl-module}
+to perform various function and speed up development.
 
 \_\_instantiate\_object
 -----------------------
@@ -1277,6 +1526,12 @@ It would rather return the module package name: `My::Module`
 Same as [\"\_is\_array\"](#is_array){.perl-module}, but for hash
 reference.
 
+\_is\_integer
+-------------
+
+Returns true if the value provided is an integer, or false otherwise. A
+valid value includes an integer starting with `+` or `-`
+
 \_is\_ip
 --------
 
@@ -1354,6 +1609,82 @@ Possible options are:
     directly to [\"use\" in
     perlfunc](https://metacpan.org/pod/perlfunc#use){.perl-module}
 
+\_lvalue
+--------
+
+This provides a generic
+[lvalue](https://metacpan.org/pod/perlsub){.perl-module} method that can
+be used both in assign context or lvalue context.
+
+You only need to specify a setter and getter callback.
+
+This takes an hash reference having either of the following properties:
+
+*get*
+
+:   A code reference that will be called, passing it the module object.
+    It takes whatever value is returned and returns it to the caller.
+
+*set*
+
+:   A code reference that will be called when values were provided
+    either in assign or regular method context:
+
+            my $now = DateTime->now;
+            $o->datetime = $now;
+            # or
+            $o->datetime( $now );
+
+For example, in your module:
+
+        sub datetime : lvalue { return( shift->_lvalue({
+            set => sub
+            {
+                my( $self, $args ) = @_;
+                if( $self->_is_a( $args->[0] => 'DateTime' ) )
+                {
+                    return( $self->{datetime} = shift( @$args ) );
+                }
+                else
+                {
+                    return( $self->error( "Value provided is not a datetime." ) );
+                }
+            },
+            get => sub
+            {
+                my $self = shift( @_ );
+                my $dt = $self->{datetime};
+                return( $dt );
+            }
+        }, @_ ) ); }
+        # ^^^^
+        # Don't forget the @_ !
+
+Be mindful that even if the setter callback returns `undef` in case of
+an error, perl does not permit `undef` to be returned from an lvalue
+method, and besides the return value in assign context is useless
+anyway:
+
+        my $dt = $o->datetime = DateTime->now;
+
+If you want to check if assignment worked, you should opt to make error
+fatal and catch exceptions, such as:
+
+        $o->fatal(1);
+        try
+        {
+            $o->datetime = $not_a_datetime_object;
+        }
+        catch( $e )
+        {
+            die( "You provided a non DateTime object!: $e\n" );
+        }
+
+or you can check if an error was set:
+
+        $o->datetime = $not_a_datetime_object;
+        die( "Did not work: ", $o->error ) if( $o->error );
+
 \_obj2h
 -------
 
@@ -1422,6 +1753,35 @@ And using your method:
         printf( "There are %d products\n", $object->products->length );
         $object->products->push( $new_product );
 
+Alternatively, you can pass an hash reference instead of an object
+property to provide callbacks that will be called upon addition or
+removal of value.
+
+This hash reference can contain the following properties:
+
+field
+
+:   The object property name
+
+callbacks
+
+:   An hash reference of operation type (`add` or `remove`) to callback
+    subroutine name or code reference pairs.
+
+For example:
+
+        sub children { return( shift->set_get_array_as_object({
+            field => 'children',
+            callbacks => 
+            {
+                add => '_some_add_callback',
+                remove => 'som_remove_callback',
+            },
+        }), @_ ); }
+
+The value of the callback can be either a subroutine name or a code
+reference.
+
 \_set\_get\_boolean
 -------------------
 
@@ -1460,6 +1820,35 @@ this performs the same checks as above and returns either a
 or a
 [Module::Generic::Boolean](https://metacpan.org/pod/Module::Generic::Boolean){.perl-module}
 object.
+
+Alternatively, you can pass an hash reference instead of an object
+property to provide callbacks that will be called upon addition or
+removal of value.
+
+This hash reference can contain the following properties:
+
+field
+
+:   The object property name
+
+callbacks
+
+:   An hash reference of operation type (`add` or `remove`) to callback
+    subroutine name or code reference pairs.
+
+For example:
+
+        sub is_valid { return( shift->set_get_boolean({
+            field => 'is_valid',
+            callbacks => 
+            {
+                add => '_some_add_callback',
+                remove => 'som_remove_callback',
+            },
+        }), @_ ); }
+
+The value of the callback can be either a subroutine name or a code
+reference.
 
 \_\_create\_class
 -----------------
@@ -1802,6 +2191,35 @@ In the script using module `MyObject`:
         # Is it an od number: no
         $obj->level++; # level is now 5
 
+Alternatively, you can pass an hash reference instead of an object
+property to provide callbacks that will be called upon addition or
+removal of value.
+
+This hash reference can contain the following properties:
+
+field
+
+:   The object property name
+
+callbacks
+
+:   An hash reference of operation type (`add` or `remove`) to callback
+    subroutine name or code reference pairs.
+
+For example:
+
+        sub length { return( shift->set_get_number({
+            field => 'length',
+            callbacks => 
+            {
+                add => '_some_add_callback',
+                remove => 'som_remove_callback',
+            },
+        }), @_ ); }
+
+The value of the callback can be either a subroutine name or a code
+reference.
+
 \_set\_get\_number\_or\_object
 ------------------------------
 
@@ -1826,6 +2244,16 @@ object provided does belong to the specified class or it will set an
 error and return undef.
 
 It returns the object currently set, if any.
+
+\_set\_get\_object\_lvalue
+--------------------------
+
+Same as
+[\"\_set\_get\_object\_without\_init\"](#set_get_object_without_init){.perl-module}
+but with the possibility of setting the object value as an lvalue
+method:
+
+        $o->my_property = $my_object;
 
 \_set\_get\_object\_without\_init
 ---------------------------------
@@ -1909,6 +2337,35 @@ Getting the value :
 
         my $cust_name = $object->name;
         print( "Nothing set yet.\n" ) if( !$cust_name->length );
+
+Alternatively, you can pass an hash reference instead of an object
+property to provide callbacks that will be called upon addition or
+removal of value.
+
+This hash reference can contain the following properties:
+
+field
+
+:   The object property name
+
+callbacks
+
+:   An hash reference of operation type (`add` or `remove`) to callback
+    subroutine name or code reference pairs.
+
+For example:
+
+        sub name { return( shift->set_get_scalar_as_object({
+            field => 'name',
+            callbacks => 
+            {
+                add => '_some_add_callback',
+                remove => 'som_remove_callback',
+            },
+        }), @_ ); }
+
+The value of the callback can be either a subroutine name or a code
+reference.
 
 \_set\_get\_scalar\_or\_object
 ------------------------------
@@ -1995,6 +2452,69 @@ VERBOSE
 
 Return the value of your global variable *VERBOSE*, if any.
 
+ERROR & EXCEPTION HANDLING
+==========================
+
+This module has been developed on the idea that only the main part of
+the application should control the flow and trigger exit. Thus, this
+module and all the others in this distribution do not die, but rather
+set and
+[error](https://metacpan.org/pod/Module::Generic#error){.perl-module}
+and return undef. So you should always check for the return value.
+
+Error triggered are transformed into an
+[Module::Generic::Exception](https://metacpan.org/pod/Module::Generic::Exception){.perl-module}
+object, or any exception class that is specified by the object property
+`_exception_class`. For example:
+
+        sub init
+        {
+            my $self = shift( @_ );
+            $self->SUPER::init( @_ ) || return( $self->pass_error );
+            $self->{_exception_class} = 'My::Exception';
+            return( $self );
+        }
+
+Those error objects can then be retrieved by calling
+[\"error\"](#error){.perl-module}
+
+If, however, you wanted errors triggered to be fatal, you can set the
+object property `fatal` to a true value and/or set your package global
+variable `$FATAL_ERROR` to true. When [\"error\"](#error){.perl-module}
+is called with an error, it will [\"die\" in
+perlfunc](https://metacpan.org/pod/perlfunc#die){.perl-module} with the
+error object rather than merely returning `undef`. For example:
+
+        package My::Module;
+        BEGIN
+        {
+            use strict;
+            use warnings;
+            use parent qw( Module::Generic );
+            our $VERSION = 'v0.1.0';
+            our $FATAL_ERROR = 1;
+        };
+
+        sub init
+        {
+            my $self = shift( @_ );
+            $self->{fatal} = 1;
+            $self->SUPER::init( @_ ) || return( $self->pass_error );
+            $self->{_exception_class} = 'My::Exception';
+            return( $self );
+        }
+
+To catch fatal error you can use a `try-catch` block such as implemented
+by [Nice::Try](https://metacpan.org/pod/Nice::Try){.perl-module}.
+
+Since [perl version
+5.33.7](https://perldoc.perl.org/blead/perlsyn#Try-Catch-Exception-Handling){.perl-module}
+you can use the try-catch block using an experimental feature
+`use feature 'try';`, but this does not support `catch` by exception
+class.
+
+However
+
 SEE ALSO
 ========
 
@@ -2019,7 +2539,7 @@ and
 AUTHOR
 ======
 
-Jacques Deguest \<`jack@deguest.jp`{classes="ARRAY(0x561d57cb5268)"}\>
+Jacques Deguest \<`jack@deguest.jp`{classes="ARRAY(0x556e28057e28)"}\>
 
 COPYRIGHT & LICENSE
 ===================

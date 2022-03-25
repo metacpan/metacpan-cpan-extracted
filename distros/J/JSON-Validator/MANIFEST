@@ -91,6 +91,7 @@ t/load-yaml.t
 t/more-bundle.t
 t/newline-warnings.t
 t/openapiv2-basic.t
+t/openapiv2-bundle.t
 t/openapiv2-collection-format.t
 t/openapiv2-default-values.t
 t/openapiv2-discriminator.t
@@ -116,6 +117,7 @@ t/spec/bundlecheck.json
 t/spec/missing-ref.json
 t/spec/more-bundle.yaml
 t/spec/more-bundle2.yaml
+t/spec/paths.yaml
 t/spec/person.json
 t/spec/remotes/baseUriChange/folderInteger.json
 t/spec/remotes/baseUriChangeFolder/folderInteger.json
@@ -127,6 +129,7 @@ t/spec/remotes/subSchemas-defs.json
 t/spec/remotes/subSchemas.json
 't/spec/space bundle.json'
 t/spec/test-definitions-key.json
+t/spec/v2-bundle.yaml
 t/spec/v2-petstore.json
 t/spec/v3-default-response-extra.yaml
 t/spec/v3-petstore.json

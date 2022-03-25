@@ -6,14 +6,16 @@ use warnings;
 
 use Test::More;
 
-plan tests => 2 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 4 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/corruptor.pm'
 );
 
 my @scripts = (
-    'script/corruptor'
+    'script/corruptor',
+    'script/corruptor-total',
+    'script/corruptor-zero'
 );
 
 # no fake home requested

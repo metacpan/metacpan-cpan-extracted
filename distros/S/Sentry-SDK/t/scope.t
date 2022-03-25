@@ -38,14 +38,14 @@ describe 'Sentry::Hub::Scope' => sub {
       it 'defaults to level "info"' => sub {
         my $event = $scope->apply_to_event({});
 
-        is_deeply $event->{level}, Sentry::Severity->Info;
+        is $event->{level}, Sentry::Severity->Info;
       };
 
       it 'does not override the event level' => sub {
         my $event
           = $scope->apply_to_event({ level => Sentry::Severity->Fatal });
 
-        is_deeply $event->{level}, Sentry::Severity->Fatal;
+        is $event->{level}, Sentry::Severity->Fatal;
       };
     };
 

@@ -4,8 +4,7 @@ use 5.030;
 use strict;
 use warnings;
 use WebService::Hexonet::Connector;
-
-use version 0.9917; our $VERSION = version->declare('v2.10.2');
+our $VERSION = 'v2.10.3';
 
 1;
 
@@ -19,7 +18,7 @@ WebService::Hexonet - Namespace package for modules provided by L<HEXONET|https:
 
 =head1 DESCRIPTION
 
-This module is just used as namespace package for module provided by L<HEXONET|https://www.hexonet.net/>
+This module is just used as Namespace package for module provided by L<HEXONET|https://www.hexonet.net/>
 and does not provide any further functionality.
 
 =head1 AVAILABLE MODULES

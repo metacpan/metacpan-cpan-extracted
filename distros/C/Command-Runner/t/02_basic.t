@@ -69,18 +69,4 @@ subtest timeout => sub {
     }
 };
 
-subtest pipe => sub {
-    my (@stdout, @stderr);
-    my $cmd = Command::Runner->new(
-        commandf => [ '%q -le %q | %q -nle %q', $^X, 'print "2";', $^X, 'print' ],
-        stdout => sub { push @stdout, @_ },
-        stderr => sub { push @stderr, @_ },
-    );
-    my $res = $cmd->run;
-    is $res->{result}, 0;
-    is @stdout, 1;
-    is $stdout[0], 2;
-    is @stderr, 0;
-};
-
 done_testing;

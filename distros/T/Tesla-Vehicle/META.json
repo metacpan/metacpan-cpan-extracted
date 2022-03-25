@@ -1,0 +1,58 @@
+{
+   "abstract" : "Access information and command Tesla automobiles via the API",
+   "author" : [
+      "Steve Bertrand <steveb@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Tesla-Vehicle",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Tesla::API" : "0.09",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/stevieb9/tesla-vehicle/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/stevieb9/tesla-vehicle.git",
+         "web" : "https://github.com/stevieb9/tesla-vehicle"
+      }
+   },
+   "version" : "0.06",
+   "x_serialization_backend" : "JSON::PP version 4.04"
+}

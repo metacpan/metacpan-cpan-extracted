@@ -12,7 +12,7 @@ use File::Basename        qw(basename dirname);
 use File::Path            qw(make_path);
 use File::Spec::Functions qw(catfile);
 
-our $VERSION = '0.501';
+our $VERSION = '0.502';
 
 =encoding utf8
 
@@ -385,11 +385,13 @@ sub default_local_file ( $self ) {
 
 L<Domain::PublicSuffix>, L<Mozilla::PublicSuffix>, L<IO::Socket::SSL::PublicSuffix>
 
+L<https://publicsuffix.org/list/public_suffix_list.dat>
+
 =head1 SOURCE AVAILABILITY
 
 This source is in Github:
 
-	http://github.com/briandfoy/net-publicsuffixlist
+	https://github.com/briandfoy/net-publicsuffixlist
 
 =head1 AUTHOR
 
@@ -397,9 +399,11 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2020-2021, brian d foy, All Rights Reserved.
+Copyright © 2020-2022, brian d foy, All Rights Reserved.
 
 You may redistribute this under the terms of the Artistic License 2.0.
+
+The public suffix list is Mozilla Public License 2.0
 
 =cut
 

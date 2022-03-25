@@ -9,6 +9,138 @@ Module::Generic::Scalar - String Manipulation Object Class
     my $s = Module::Generic::Scalar->new( "John Doe" );
     print( $s->substr( 0, 4 ), "\n" );
     # prints: John
+    $s->append( 'more data' );
+    # $a is now a Module::Generic::Array object
+    my $a = $s->as_array;
+    # $bool is now a Module::Generic::Boolean object
+    # with value is true or false depending on underlying value of $s
+    my $bool = $s->as_boolean;
+    # $a is now a Module::Generic::Number object
+    my $n = $s->as_number
+    # raw string
+    my $str = $s->as_string;
+    print( "Hello $s\n" );
+    # Hello John Doe
+
+    my $str = Module::Generic::Scalar->new();
+    $a->callback( add => sub
+    {
+        my( $new ) = @_;
+        return unless( $$new eq $approved_string );
+        return(1);
+    });
+    $str->append( $some_string );
+    # or
+    $str .= $some_string;
+
+    $s->capitalise;
+    $s->chomp;
+    $s->chop;
+    $s->clone;
+    my $crypted = $s->crypt( $salt );
+    $s->defined;
+    $s->empty;
+    $s->fc( $that );
+    my $hex = $s->hex;
+    my $index = $s->index;
+    $s->is_alpha;
+    $s->is_alpha_numeric;
+    $s->is_empty;
+    $s->is_lower;
+    $s->is_numeric;
+    $s->is_upper;
+
+    my $s = Module::Generic::Scalar->new( 'Jack John Paul Peter' );
+    # Takes the string, split it by space (now an array), join it by comma (now a scalar) and rejoin it with more strings
+    say $s->split( qr/[[:blank:]]+/ )->join( ', ' )->join( ', ', qw( Gabriel Raphael Emmanuel ) );
+    # prints: Jack, John, Paul, Peter, Gabriel, Raphael, Emmanuel
+
+    $s->lc;
+    $s->lcfirst;
+    $s->left;
+    $s->length;
+    my $s = Module::Generic::Scalar->new( "I disapprove of what you say, but I will defend to the death your right to say it" );
+    print( "Matches? ", $s->like( qr/\bapprove[[:blank:]\h]+what\b/ ) ? 'yes' : 'no', "\n" ); # print yes
+    if( $s->like( qr/[[:blank:]\h]+/ ) )
+    {
+        # Do something
+    }
+    # or
+    if( my $rv = $s->like( qr/([[:blank:]\h]+)/ )->result )
+    {
+        my $first_match = $rv->capture->first;
+        # Do something
+    }
+
+    $s->lower;
+    $s->ltrim;
+    # Remove all kind of leading whitespaces
+    $s->ltrim( qr/[[:blank:]\h]+/ );
+
+    # $s is "Hello world"
+    $s->match( 'world' ); # pass
+    $s->match( qr/WORLD/i ); # pass
+    $s->match( 'monde' ); # obviously fail
+    if( $s->match( qr/[[:blank:]\h]+/ ) )
+    {
+        # Do something
+    }
+    if( my $rv = $s->match( qr/([[:blank:]\h]+)/ )->result )
+    {
+        my $first_match = $rv->capture->first;
+        # Do something
+    }
+
+    my $unpack = $unpack_data->unpack( "A10xA28xA8A*" )->object;
+    my $fh = $s->open;
+    $fh->print;
+    $fh->read;
+    $s->ord;
+    $s->pack;
+    $s->pad( 3, 'X' );
+    # XXXHello world
+
+    $s->padd( -3, 'X' );
+    # Hello worldXXX
+    $s->pos;
+    $s->$s->prepend( join( '', qw( Cogito ergo sum ) ) );
+    $s->quotemeta;
+
+    # $s is Hello world
+    my $rv = $s->replace( ' ', '_' ); # Hello_world
+    my $rv = $s->replace( qr/[[:blank:]\h]+/, '_' ); # Hello_world
+    if( my $rv = $s->replace( qr/([[:blank:]\h]+)/, '_' )->result )
+    {
+        my $first_match = $rv->capture->first;
+        # Do something
+    }
+    $s->reset;
+    $s->reverse;
+    Module::Generic::Scalar->new( "Hello world" )->right( 5 );
+    # will produce: world
+    $s->rindex;
+    # Remove all kind of trailing whitespaces
+    $s->rtrim( qr/[[:blank:]\h]+/ );
+    $s->scalar;
+    $s->set;
+    # Returns a Module::Generic::Array object
+    my $a = $s->split( /\n/ );
+    my $a = $s->split( qr/\n/ );
+    $s->sprintf;
+    $s->substr;
+    $s->tr;
+    $s->trim;
+    $s->uc;
+    $s->ucfirst;
+    print( $s->defined ? 'defined' : 'undefined', "\n" );
+
+    my $array = $s->unpack( "W" );
+    # Returns the ord() value as a Module::Generic::Array object
+    $s->unpack( "W" )->length;
+    # Object context. Ditto
+    my( $date, $desc, $income, $expend ) = $s->unpack( "A10xA27xA7A*" );
+    # Returns a regular list of values
+    $s->upper;
 
 =head1 VERSION
 
@@ -62,7 +194,7 @@ L<Module::Generic::Boolean> objects are very useful because they can be used in 
 
 =head2 as_number
 
-    Returns the current string as an L<Module::Generic::Number> object.
+Returns the current string as an L<Module::Generic::Number> object.
 
 =head2 as_string
 
@@ -483,7 +615,7 @@ Returns the string within this scalar object. This calls L</"as_string">
 
 =head2 set
 
-Provided with a scalar reference or scalar-based object like L<Module::Generic::Scalar> or an array reference and this sets the current string/.
+Provided with a scalar reference or scalar-based object like L<Module::Generic::Scalar> or an array reference and this sets the current string.
 
 This acts the exact same way as for L</"new">, except it acts on the current object string.
 

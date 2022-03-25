@@ -11,6 +11,7 @@ t/00-load.t
 t/00-pod.t
 t/10-context.t
 t/20-synchronous.t
+t/25-decode.t
 t/30-asynchronous.t
 t/35-bgread.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

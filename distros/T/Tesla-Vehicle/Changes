@@ -1,0 +1,42 @@
+Revision history for Tesla-Vehicle
+
+0.06    2022-03-23
+    - Return instead of print the return value of options()
+    - Bump prereq of Tesla::API to 0.09; its api() method now requires all
+      parameters (endpoint, id, api_params thus far) to be sent in as a hash
+      as opposed to positional scalars
+
+0.05    2022-03-22
+    - Fix issue where instead of timing out the wake() call properly, we were
+      repeatedly displaying the timeout notice, then doing nothing which
+      resulted in an uninit warning being thrown (fixes #4)
+    - Renamed option_codes() to options(). Tesla::API now handles option_codes()
+    - options() now returns an href of code => description pairs
+
+0.04    2022-03-21
+    - Added SYNOPSIS
+
+0.03    2022-03-20
+    - Added IMPORTANT section in POD to point to Tesla::API's caching
+      documentation
+
+0.02    2022-03-19
+    - Upper-cased method headers in POD
+    - _online_check() "not awake" warning now only executes if auto_wake is
+      disabled
+    - Added charging_stations_nearby()
+    - Added several command methods to actually operate the vehicle
+    - Updated Tesla::API to accept body content parameters for the new command
+      methods, therefore bumped prereq to v0.03
+
+0.01    2022-03-18
+    - Auto generated distribution with Dist::Mgr
+    - Added basic core and some additional functionality
+    - Added checking for online status in calls that require the car being
+      online to retrieve data from it
+    - Added auto_wake()
+    - Added wake()
+    - Added several 'summary' methods
+    - Added drive_state() and several accessor methods
+    - Added climate_state() and related attribute access methods
+    - Added vehicle_config()

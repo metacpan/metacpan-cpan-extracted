@@ -30,15 +30,16 @@ no_index:
 provides:
   IO::AsyncX::Notifier:
     file: lib/IO/AsyncX/Notifier.pm
-    version: '0.002'
+    version: '0.003'
 requires:
   IO::Async::Notifier: '0.79'
-  Object::Pad: '0.61'
+  Object::Pad: '0.63'
+  perl: '5.026'
 resources:
   bugtracker: https://github.com/team-at-cpan/IO-AsyncX-Notifier/issues
   homepage: https://github.com/team-at-cpan/IO-AsyncX-Notifier
   repository: https://github.com/team-at-cpan/IO-AsyncX-Notifier.git
-version: '0.002'
+version: '0.003'
 x_authority: cpan:TEAM
 x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.73'

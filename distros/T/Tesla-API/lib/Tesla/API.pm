@@ -6,30 +6,48 @@ use strict;
 use Carp qw(croak confess);
 use Data::Dumper;
 use Digest::SHA qw(sha256_hex);
+use FindBin qw($RealBin);
+use File::Copy;
 use File::HomeDir;
+use File::Share qw(:all);
 use HTTP::Request;
 use JSON;
 use MIME::Base64 qw(encode_base64url);
 use WWW::Mechanize;
 use URI;
 
-our $VERSION = '0.01';
+our $VERSION = '0.09';
+
+$| = 1;
 
 my $home_dir;
+
+# The %api_cache hash is a cache for Tesla API call data across all objects.
+# The $api_cache_alive_time is a timestamp of last cache write for a particular
+# endpoint/ID pair, and is relative to API_CACHE_TIMEOUT_SECONDS
+
+my %api_cache;
+my $api_cache_alive_time = time;
 
 BEGIN {
     $home_dir = File::HomeDir->my_home;
 }
 
 use constant {
-    CACHE_FILE  => "$home_dir/tesla_api_cache.json",
-    AUTH_URL    => 'https://auth.tesla.com/oauth2/v3/authorize',
-    TOKEN_URL   => 'https://auth.tesla.com/oauth2/v3/token',
-    API_URL     => 'https://owner-api.teslamotors.com/',
+    DEBUG_CACHE                 => $ENV{DEBUG_TESLA_API_CACHE},
+    API_CACHE_PERSIST           => 0,
+    API_CACHE_TIMEOUT_SECONDS   => 2,
+    CACHE_FILE                  => "$home_dir/tesla_api_cache.json",
+    ENDPOINTS_FILE              => dist_file('Tesla-API', 'endpoints.json'),
+    OPTION_CODES_FILE           => dist_file('Tesla-API', 'option_codes.json'),
+    URL_API                     => 'https://owner-api.teslamotors.com/',
+    URL_ENDPOINTS               => 'https://raw.githubusercontent.com/tdorssers/TeslaPy/master/teslapy/endpoints.json',
+    URL_OPTION_CODES            => 'https://raw.githubusercontent.com/tdorssers/TeslaPy/master/teslapy/option_codes.json',
+    URL_AUTH                    => 'https://auth.tesla.com/oauth2/v3/authorize',
+    URL_TOKEN                   => 'https://auth.tesla.com/oauth2/v3/token',
 };
 
 # Public object methods
-
 sub new {
     my ($class, %params) = @_;
     my $self = bless {}, $class;
@@ -43,15 +61,20 @@ sub new {
         return $self;
     }
 
+    $self->api_cache_persist($params{api_cache_persist});
+    $self->api_cache_time($params{api_cache_time});
+
     $self->mech;
     $self->_access_token;
-
-    $self->my_vehicle_id($params{vehicle_id});
 
     return $self;
 }
 sub api {
-    my ($self, $endpoint_name, $id) = @_;
+    my ($self, %params) = @_;
+
+    my $endpoint_name   = $params{endpoint};
+    my $id              = $params{id};
+    my $api_params      = $params{api_params};
 
     if (! defined $endpoint_name) {
         croak "Tesla::API::api() requires an endpoint name sent in";
@@ -64,50 +87,92 @@ sub api {
     my $uri = $endpoint->{URI};
 
     if ($uri =~ /\{/) {
-        if (! defined $id) {
-            croak "Endpoint $endpoint_name requires an \$id, but none sent in";
+        if (! defined $id || $id !~ /^\d+$/) {
+            croak "Endpoint $endpoint_name requires an \$id as an integer";
         }
         $uri =~ s/\{.*?\}/$id/;
     }
 
-    my $url = URI->new(API_URL . $uri);
+    # Return early if all cache mechanisms check out
 
-    my $request;
+    if ($self->api_cache_persist || $self->api_cache_time) {
+        if (DEBUG_CACHE) {
+            printf(
+                "Cache - Alive: $api_cache_alive_time, Timeout: %.2f, Persist: %d\n",
+                $self->api_cache_time,
+                $self->api_cache_persist
+            );
+        }
+        if ($self->api_cache_persist || time - $api_cache_alive_time <= $self->api_cache_time) {
+            if ($self->_cache(endpoint => $endpoint_name, id => $id)) {
+                print "Returning cache for $endpoint_name/$id pair...\n" if DEBUG_CACHE;
+                return $self->_cache(endpoint => $endpoint_name, id => $id);
+            }
+        }
+        print "No cache present for $endpoint_name/$id pair...\n" if DEBUG_CACHE;
+    }
+
+    my $url = URI->new(URL_API . $uri);
+
+    my $header = ['Content-Type' => 'application/json; charset=UTF-8'];
 
     if ($auth) {
         my $token_string = "Bearer " . $self->_access_token;
-        my $header = ['Authorization' => $token_string];
-        $request = HTTP::Request->new($type, $url, $header);
+        push @$header, 'Authorization' => $token_string;
     }
-    else {
-        $request = HTTP::Request->new($type, $url);
-    }
+
+    my $request = HTTP::Request->new($type, $url, $header, encode_json($api_params));
 
     my $response = $self->mech->request($request);
 
     if ($response->is_success) {
-        return _decode($response->decoded_content)->{response};
+        my $response_data = _decode($response->decoded_content)->{response};
+
+        $self->_cache(
+            endpoint => $endpoint_name,
+            id       => $id,
+            data     => $response_data
+        );
+
+        return $response_data;
     }
     else {
         warn $response->status_line;
     }
 }
-sub data {
+sub api_cache_clear {
     my ($self) = @_;
-    return $self->{data};
+    %api_cache = ();
+}
+sub api_cache_persist {
+    my ($self, $persist) = @_;
+    if (defined $persist) {
+        $self->{api_cache_persist} = $persist;
+    }
+    return $self->{api_cache_persist} // API_CACHE_PERSIST;
+}
+sub api_cache_time {
+    my ($self, $cache_seconds) = @_;
+    if (defined $cache_seconds) {
+        $self->{api_cache_time} = $cache_seconds;
+    }
+    return $self->{api_cache_time} // API_CACHE_TIMEOUT_SECONDS;
 }
 sub endpoints {
     my ($self, $endpoint) = @_;
 
-    if (! $self->{endpoints}) {
+    if (! $self->{endpoints} || $self->{reset_data}) {
+        $self->{reset_data} = 0;
+
         my $json_endpoints;
         {
             local $/;
-            $json_endpoints = <DATA>;
+            open my $fh, '<', ENDPOINTS_FILE
+                or die "Can't open ${\ENDPOINTS_FILE}: $!";
+            $json_endpoints = <$fh>;
         }
 
         my $perl_endpoints = decode_json($json_endpoints);
-
         $self->{endpoints} = $perl_endpoints;
     }
 
@@ -134,54 +199,101 @@ sub mech {
 
     $self->{mech} = $www_mech;
 }
-sub my_vehicle_id {
-    my ($self, $id) = @_;
+sub object_data {
+    my ($self) = @_;
+    return $self->{data};
+}
+sub option_codes {
+    my ($self, $code) = @_;
 
-    if (defined $id) {
-        $self->{data}{vehicle_id} = $id;
+    if (! $self->{option_codes}) {
+        my $json_option_codes;
+        {
+            local $/;
+            open my $fh, '<', OPTION_CODES_FILE
+                or die "Can't open ${\OPTION_CODES_FILE}: $!";
+            $json_option_codes = <$fh>;
+        }
+
+        my $perl_option_codes = decode_json($json_option_codes);
+
+        $self->{option_codes} = $perl_option_codes;
     }
-    else {
-        my @vehicle_ids = keys %{$self->my_vehicles};
 
-        if (scalar @vehicle_ids == 1) {
-            $self->{data}{vehicle_id} = $vehicle_ids[0];
+    if ($code) {
+        if (! exists $self->{option_codes}{$code}) {
+            croak "Tesla API option code $code does not exist";
+        }
+        return $self->{option_codes}{$code};
+    }
+
+    return $self->{option_codes};
+}
+sub update_data_files {
+    my ($self) = @_;
+
+    for my $data_url (URL_ENDPOINTS, URL_OPTION_CODES) {
+        my $filename;
+
+        if ($data_url =~ /.*\/(\w+\.json)$/) {
+            $filename = $1;
+        }
+
+        if (! defined $filename) {
+            croak "Couldn't extract the filename from '$data_url'";
+        }
+
+        (my $data_method = $filename) =~ s/\.json//;
+
+        my $url = URI->new($data_url);
+        my $response = $self->mech->get($url);
+
+        if ($response->is_success) {
+            my $new_data = decode_json($response->decoded_content);
+            my $existing_data = $self->$data_method;
+
+            my $data_differs;
+
+            if (scalar keys %$new_data != scalar keys %$existing_data) {
+                $data_differs = 1;
+            }
+
+            if (! $data_differs) {
+                for my $key (keys %$new_data) {
+                    if (! exists $existing_data->{$key}) {
+                        $data_differs = 1;
+                        last;
+                    }
+                }
+                for my $key (keys %$existing_data) {
+                    if (! exists $new_data->{$key}) {
+                        $data_differs = 1;
+                        last;
+                    }
+                }
+            }
+
+            if ($data_differs) {
+                $self->{reset_data} = 1;
+                my $file = dist_file('Tesla-API', $filename);
+
+                # Make a backup copy
+
+                my $backup = "$file." . time;
+                copy($file, $backup) or die "Can't create $file backup file!: $!";
+
+                chmod 0644, $file;
+
+                open my $fh, '>', "$file"
+                    or die "Can't open '$file' for writing: $!";
+
+                print $fh JSON->new->pretty->encode($new_data);
+            }
+        }
+        else {
+            croak $response->status_line;
         }
     }
-
-    return $self->{data}{vehicle_id} || -1;
-}
-sub my_vehicle_name {
-    my ($self) = @_;
-
-    if (! $self->my_vehicle_id) {
-        warn "You haven't set a vehicle ID yet";
-    }
-
-    return $self->my_vehicles->{$self->my_vehicle_id};
-}
-sub my_vehicles {
-    my ($self) = @_;
-
-    return $self->{vehicles} if $self->{vehicles};
-
-    my $vehicles = $self->api('VEHICLE_LIST');
-
-    for (@$vehicles) {
-        $self->{data}{vehicles}{$_->{id}} = $_->{display_name};
-    }
-
-    return $self->{data}{vehicles};
-}
-
-# Public Tesla API methods
-
-sub vehicle_data {
-    my ($self, $id) = @_;
-    return $self->api('VEHICLE_DATA', $self->_id($id));
-}
-sub wake {
-    my ($self, $id) = @_;
-    return $self->api('VEHICLE_DATA', $self->_id($id));
 }
 
 # Private methods
@@ -192,31 +304,37 @@ sub _access_token {
 
     my ($self) = @_;
 
-    return $self->{access_token} if $self->{access_token};
-
     if (! -e CACHE_FILE) {
         my $auth_code = $self->_authentication_code;
         $self->_access_token_generate($auth_code);
     }
-    else {
-        $self->{access_token} = $self->_access_token_fetch;
+
+    my $valid_token = $self->_access_token_validate;
+
+    if (! $valid_token) {
+        $self->_access_token_refresh;
     }
+
+    $self->{access_token} = $self->_access_token_data->{access_token};
+
+    return $self->{access_token};
 }
-sub _access_token_fetch {
-    # Fetches the access token from the cache file
+sub _access_token_data {
+    # Fetches and stores the cache data file dat
 
-    my ($self) = @_;
+    my ($self, $data) = @_;
 
-    my $cache_data;
+    $self->{cache_data} = $data if defined $data;
+
+    return $self->{cache_data} if $self->{cache_data};
+
     {
-        open my $fh, '<', CACHE_FILE or croak "Can't open Tesla cache file " . CACHE_FILE . ": $!";
+        open my $fh, '<', CACHE_FILE or die "Can't open Tesla cache file " . CACHE_FILE . ": $!";
         my $json = <$fh>;
-        $cache_data = decode_json($json);
+        $self->{cache_data} = decode_json($json);
     }
 
-    my $access_token = $cache_data->{access_token};
-
-    return $access_token;
+    return $self->{cache_data};
 }
 sub _access_token_generate {
     # Generates an access token and stores it in the cache file
@@ -227,7 +345,7 @@ sub _access_token_generate {
         croak "_access_token_generate() requires an \$auth_code parameter";
     }
 
-    my $url = URI->new(TOKEN_URL);
+    my $url = URI->new(URL_TOKEN);
     my $header = ['Content-Type' => 'application/json; charset=UTF-8'];
 
     my $request_data = {
@@ -243,17 +361,98 @@ sub _access_token_generate {
     my $response = $self->mech->request($request);
 
     if ($response->is_success) {
-        open my $fh, '>', CACHE_FILE or die $!;
-        print $response->decoded_content;
-        print $fh $response->decoded_content;
+        my $token_data = decode_json($response->decoded_content);
 
-        my $response_data = decode_json($response->decoded_content);
+        $token_data = $self->_access_token_set_expiry($token_data);
+        $self->_access_token_update($token_data);
 
-        return $response_data;
+        return $token_data;
     }
     else {
         croak $self->mech->response->status_line;
     }
+}
+sub _access_token_validate {
+    # Checks the validity of an existing token
+
+    my ($self) = @_;
+
+    my $token_expires_at = $self->_access_token_data->{expires_at};
+    my $token_expires_in = $self->_access_token_data->{expires_in};
+
+    my $valid = 0;
+
+    if (time + $token_expires_in < $token_expires_at) {
+        $valid = 1;
+    }
+
+    return $valid;
+}
+sub _access_token_set_expiry {
+    # Sets the access token expiry date/time after generation and
+    # renewal
+
+    my ($self, $token_data) = @_;
+
+    if (! defined $token_data || ref($token_data) ne 'HASH') {
+        croak "_access_token_set_expiry() needs a hash reference of token data";
+    }
+
+    my $expiry = time + $token_data->{expires_in};
+
+    $token_data->{expires_at} = $expiry;
+
+    return $token_data;
+}
+sub _access_token_refresh {
+    # Renews an expired/invalid access token
+
+    my ($self) = @_;
+
+    my $url = URI->new(URL_TOKEN);
+    my $header = ['Content-Type' => 'application/json; charset=UTF-8'];
+
+    my $refresh_token = $self->_access_token_data->{refresh_token};
+
+    my $request_data = {
+        grant_type    => 'refresh_token',
+        refresh_token => $refresh_token,
+        client_id     => 'ownerapi',
+    };
+
+    my $request = HTTP::Request->new('POST', $url, $header, encode_json($request_data));
+
+    my $response = $self->mech->request($request);
+
+    if ($response->is_success) {
+        my $token_data = decode_json($response->decoded_content);
+
+        # Re-add the existing refresh token; its still valid
+        $token_data->{refresh_token} = $refresh_token;
+
+        # Set the expiry time
+        $token_data = $self->_access_token_set_expiry($token_data);
+
+        # Update the cached token
+        $self->_access_token_update($token_data);
+    }
+    else {
+        croak $self->mech->response->status_line;
+    }
+}
+sub _access_token_update {
+    # Writes the new or updated token to the cache file
+
+    my ($self, $token_data) = @_;
+
+    if (! defined $token_data || ref($token_data) ne 'HASH') {
+        croak "_access_token_update() needs a hash reference of token data";
+    }
+
+    $self->_access_token_data($token_data);
+
+    open my $fh, '>', CACHE_FILE or die $!;
+    print $fh encode_json($token_data);
 }
 sub _authentication_code {
     # If an access token is unavailable, prompt the user with a URL to
@@ -262,7 +461,7 @@ sub _authentication_code {
     # token
 
     my ($self) = @_;
-    my $auth_url = URI->new(AUTH_URL);
+    my $auth_url = URI->new(URL_AUTH);
 
     my %params = (
         client_id             => 'ownerapi',
@@ -278,11 +477,9 @@ sub _authentication_code {
     $auth_url->query_form(%params);
 
     print
-        qq~
-            Please follow the URL displayed below in your browser and log into Tesla,
-            then paste the URL from the resulting "Page Not Found" page's address bar,
-            then hit ENTER:\n";
-        ~;
+        "Please follow the URL displayed below in your browser and log into Tesla, " .
+        "then paste the URL from the resulting 'Page Not Found' page's address bar, " .
+        "then hit ENTER:\n";
 
     print "\n$auth_url\n";
 
@@ -300,7 +497,6 @@ sub _authentication_code {
         croak "Could not extract the authorization code from the URL";
     }
 
-    print "$code\n";
     return $code;
 }
 sub _authentication_code_verifier {
@@ -318,6 +514,25 @@ sub _authentication_code_verifier {
     $code_verifier = encode_base64url($code_verifier);
 
     return $self->{authentication_code_verifier} = $code_verifier;
+}
+sub _cache {
+    # Stores the Tesla API fetched data
+    my ($self, %params) = @_;
+
+    my $endpoint = $params{endpoint};
+    my $id = $params{id} // 0;
+    my $data = $params{data};
+
+    if (! $endpoint) {
+        croak "_cache() requires an endpoint name sent in";
+    }
+
+    if ($data) {
+        $api_cache{$endpoint}{$id} = $data;
+        $api_cache_alive_time = time;
+    }
+
+    return $api_cache{$endpoint}{$id};
 }
 sub _decode {
     # Decode JSON to Perl
@@ -340,21 +555,6 @@ sub _useragent_string {
     my $ua = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:98.0) Gecko/20100101 Firefox/98.0';
     return $ua;
 }
-sub _id {
-    # Tries to figure out the ID to use in API calls
-
-    my ($self, $id) = @_;
-
-    if (! defined $id) {
-        $id = $self->my_vehicle_id;
-    }
-
-    if (! $id) {
-        croak "vehicle_data() requires an \$id sent in";
-    }
-
-    return $id;
-}
 
 1;
 
@@ -372,39 +572,45 @@ Tesla::API - Interface to Tesla's API
 
     my $tesla = Tesla::API->new;
 
-    my $vehicles = $tesla->my_vehicles;
-
-    my $vehicle_name = $tesla->vehicle_name;
-
     my @endpoint_names = keys %{ $tesla->endpoints };
 
-    # Using the internal api() until the complete interface
-    # of this distribution is done
+    # See Tesla::Vehicle for direct access to vehicle-related methods
 
-    my $endpoint_name = 'VEHICLE_DATA';
+    my $endpoint_name   = 'VEHICLE_DATA';
+    my $vehicle_id      = 3234234242124;
 
-    my $car_data = $tesla->api($endpoint_name, $tesla->vehicle_id);
+    # Get the entire list of car data
+
+    my $car_data = $tesla->api(
+        endpoint    => $endpoint_name,
+        id          => $vehicle_id
+    );
+
+    # Send the open trunk command
+
+    $tesla->api(
+        endpoint    => 'ACTUATE_TRUNK',
+        id          => $vehicle_id,
+        api_params  => {which_trunk => 'rear'}
+    );
+
+    if ($tesla->trunk_rear) {
+        # Trunk is open
+        put_stuff_in_trunk();
+    }
 
 =head1 DESCRIPTION
 
 This distribution provides access to the Tesla API.
 
-B<WARNING>: This is an initial, beta release. Barely any functionality has
-been implemented, and the authentication mechanism needs a lot of polishing.
+B<WARNING>: This is an initial, beta release. The interface may change.
 
-It's currently in its infancy, so the interface may^H^H^Hwill change. Although
-there are very few public access methods available yet, all current and future
-ones behave the exact same way, by using the object's C<api()> method with an
-endpoint name.
+This class is designed to be subclassed. For example, I have already begun a
+new L<Tesla::Vehicle> distribution which will have access and update methods
+that deal specifically with Tesla autos, then a C<Tesla::Powerwall>
+distribution for their battery storage etc.
 
-Some endpoints require an ID sent in, so it must be provided for those calls as
-well.
-
-B<< NOTE >>: The 'wake' function has not yet been fully impemented, so if a
-Tesla API call times out, its likely you'll have to use the official Tesla
-App to wake the car up.
-
-=head1 METHODS
+=head1 METHODS - CORE
 
 =head2 new(%params)
 
@@ -424,53 +630,62 @@ B<NOTE>: If you do not have a Tesla account, you can still instantiate a
 L<Tesla::API> object by supplying the C<< unauthenticated => 1 >> parameter
 to C<new()>.
 
-Parameters:
+B<Parameters>:
 
 All parameters are to be sent in the form of a hash.
 
     unauthenticated
 
-Optional, Bool: Set to true to bypass the access token generation.
+I<Optional, Bool>: Set to true to bypass the access token generation.
 
-Default: False.
+I<Default>: C<undef>
 
-    vehicle_id
+    api_cache_persist
 
-Optional, Integer: If sent in, we'll use this ID for all calls to endpoints
-that require one.
+I<Optional, Bool>: Set this to true if you want to make multiple calls against
+the same data set, where having the cache time out and re-populated between
+these calls would be non-beneficial.
 
-If not sent in, we'll check how many vehicles you own under your account, and
-if there's only one, we'll use that ID instead.
+I<Default>: False
 
-If you have more than one Tesla vehicle registered and you don't supply this
-parameter, you will have to supply the ID to each method call that requires it,
-or set it in C<vehicle_id($id)> after instantiation.
+    api_cache_time
 
-Default: C<undef>
+I<Optional, Integer>: By default, we cache the fetched data from the Tesla API
+for two seconds. If you make calls that have already been called within that
+time, we will return the cached data.
 
-=head2 api($endpoint, $id)
+Send in the number of seconds you'd like to cache the data for. A value of zero
+(C<0>) will disable caching and all calls through this library will go directly
+to Tesla every time.
+
+I<Return>: Integer, the number of seconds we're caching Tesla API data for.
+
+=head2 api(%params)
 
 Responsible for disseminating the endpoints and retrieving data through the
 Tesla API.
 
-Parameters:
+All parameters are to be sent in as a hash.
 
-    $endpoint
+B<Parameters>:
 
-Mandatory, String: A valid Tesla API endpoint name. The entire list can be
+    endpoint
+
+I<Mandatory, String>: A valid Tesla API endpoint name. The entire list can be
 found in the C<t/test_data/endpoints.json> file for the time being.
 
-    $id
+    id
 
-Optional, Integer: Some endpoints require an ID sent in (eg. vehicle ID,
-powerwall ID etc).
+I<Optional, Integer>: Some endpoints require an ID sent in (eg. vehicle ID,
+Powerwall ID etc).
 
-Return: Hash or array reference, depending on the endpoint.
+    api_params
 
-=head2 data
+I<Optional, Hash Reference>: Some API calls require additional parameters. Send
+in a hash reference where the keys are the API parameter name, and the value is,
+well, the value.
 
-Returns a hash reference of the data we've collected for you and stashed
-within the object. This does not reflect the entire object.
+I<Return>: Hash or array reference, depending on the endpoint.
 
 =head2 endpoints
 
@@ -502,69 +717,199 @@ To get a list of endpoint names:
 
 =head2 mech
 
-Returns the L<WWW::Mechanze> object we've instantiated internally.
+Returns the L<WWW::Mechanize> object we've instantiated internally.
 
-=head2 my_vehicle_id($id)
+=head2 object_data
 
-Sets/gets your primary vehicle ID. If set, we will use this in all API calls
-that require it.
+Returns a hash reference of the data we've collected for you and stashed
+within the object. This does not reflect the entire object, just the data
+returned from Tesla's API.
 
-Parameters:
+=head2 option_codes
 
-    $id
+B<NOTE>: I'm unsure if the option codes are vehicle specific, or general for
+all Tesla products, so I'm leaving this method here for now.
 
-Optional, Integer: The vehicle ID you want to use in all API calls that require
-one, as opposed to sending it into every separate call.
+Returns a hash reference of 'option code' => 'description' pairs.
 
-If you only have a single Tesla vehicle registered under your account, we will
-set C<my_vehicle_id()> to that ID when you instantiate the object.
+=head2 update_data_files
 
-You can also have this auto-populated in C<new()> by sending it in with the
-C<< vehicle_id => $id >> parameter.
+Checks to see if there are any updates to the C<endpoints.json> or
+C<option_codes.json> files online, and updates them locally.
 
-=head2 my_vehicle_name
+Takes no parameters, there is no return. C<croak()>s on failure.
 
-Returns the name you associated with your vehicle under your Tesla account.
+=head1 METHODS - API CACHE
 
-L</my_vehicle_id($id)> must have already been set.
+=head2 api_cache_clear
 
-=head2 my_vehicles
+Some methods chain method calls. For example, calling
+C<< $vehicle->doors_lock >> will poll the API, then cache the state data.
 
-Returns a hash reference of your listed vehicles. The key is the vehicle ID,
-and the value is the name you've assigned to that vehicle.
+if another call is made to C<< $vehicle->locked >> immediately thereafter to
+check whether the door is actually closed or not, the old cached data would
+normally be returned.
 
-Example:
+If we don't clear the cache out between these two calls, we will be returned
+stale data.
 
-    {
-        1234567891011 => 'Dream Machine',
-        1234567891012 => 'Model S',
+Takes no parameters, has no return. Only use this call in API calls that
+somehow manipulate the state of the object you're working with.
+
+=head2 api_cache_persist($bool)
+
+    $bool
+
+I<Optional, Bool>: Set this to true if you want to make multiple calls against
+the same data set, where having the cache time out and re-populated between
+these calls would be non-beneficial.
+
+You can ensure fresh data for the set by making a call to C<api_cache_clear()>
+before the first call that fetches data.
+
+I<Default>: False
+
+=head2 api_cache_time($cache_seconds)
+
+The number of seconds we will cache retrieved endpoint data from the Tesla API
+for, to reduce the number of successive calls to retrieve the same data.
+
+B<Parameters>:
+
+    $cache_seconds
+
+I<Optional, Integer>: By default, we cache the fetched data from the Tesla API
+for two seconds. If you make calls that have already been called within that
+time, we will return the cached data.
+
+Send in the number of seconds you'd like to cache the data for. A value of zero
+(C<0>) will disable caching and all calls through this library will go directly
+to Tesla every time.
+
+I<Return>: Integer, the number of seconds we're caching Tesla API data for.
+
+=head1 API CACHING
+
+We've employed a complex caching mechanism for data received from Tesla's API.
+
+By default, we cache retrieved data for every endpoint/ID pair in the cache for
+two seconds (modifiable by C<api_cache_timeout()>, or C<api_cache_timeout> in
+C<new()>).
+
+This means that if you call three methods in a row that all extract information
+from the data returned via a single endpoint/ID pair, you may get back the
+cached result, or if the cache has timed out, you'll get data from another call
+to the Tesla API. In some cases, having the data updated may be desirable,
+sometimes you want data from the same set.
+
+Here are some examples on how to deal with the caching mechanism. We will use
+a L<Tesla::Vehicle> object for this example:
+
+=head2 Store API cache for 10 seconds
+
+Again, by default, we cache and return data from the Tesla API for two seconds.
+Change it to 10:
+
+    my $api = Tesla::API->new(api_cache_timeout => 10);
+
+...or:
+
+    my $car = Tesla::Vehicle->new(api_cache_timeout => 10);
+
+...or:
+
+    $car->api_cache_timeout(10);
+
+=head2 Disable API caching
+
+    my $api = Tesla::API->new(api_cache_timeout => 0);
+
+...or:
+
+    my $car = Tesla::Vehicle->new(api_cache_timeout => 0);
+
+...or:
+
+    $car->api_cache_timeout(0);
+
+=head2 Flush the API cache
+
+    $api->api_cache_clear;
+
+...or:
+
+    $car->api_cache_clear;
+
+=head2 Permanently use the cached data until manually flushed
+
+    my $api = Tesla::API->new(api_cache_persist => 1);
+
+...or:
+
+    my $car = Tesla::Vehicle->new(api_cache_persist => 1);
+
+...or:
+
+    $car->api_cache_persist(1);
+
+=head2 Use the cache for a period of time
+
+If making multiple calls to methods that use the same data set and want to be
+sure the data doesn't change until you're done, do this:
+
+    my $car = Tesla::Vehicle->new; # Default caching of 2 seconds
+
+    sub work {
+
+        # Clear the cache so it gets updated, but set it to persistent so once
+        # the cache data is updated, it remains
+
+        $car->api_cache_clear;
+        $car->api_cache_persist(1);
+
+        say $car->online;
+        say $car->lat;
+        say $car->lon;
+        say $car->battery_level;
+
+        # Now unset the persist flag so other parts of your program won't be
+        # affected by it
+
+        $car->api_cache_persist(0);
     }
 
-=head2 vehicle_data($id)
+If you are sure no other parts of your program will be affected by having a
+persistent cache, you can set it globally:
 
-Returns a hash reference containing state data of a vehicle.
+    my $car = Tesla::Vehicle->new(api_cache_persist => 1);
 
-C<croak()>s if an ID isn't sent in and we can't sort one out automatically.
+    while (1) {
 
-=head2 wake($id)
+        # Clear the cache at the beginning of the loop so it gets updated,
+        # unless you never want new data after the first saving of data
 
-NOT YET IMPLEMENTED FULLY.
+        $car->api_cache_clear;
 
-=head2 EXAMPLE USAGE
+        say $car->online;
+        say $car->lat;
+        say $car->lon;
+        say $car->battery_level;
+    }
+
+=head1 EXAMPLE USAGE
+
+See L<Tesla::Vehicle> for vehicle specific methods.
 
     use Data::Dumper;
     use Tesla::API;
     use feature 'say';
 
     my $tesla = Tesla::API->new;
+    my $vehicle_id = 1234238782349137;
 
-    say $tesla->my_vehicle_name;
-
-    print Dumper $tesla->vehicle_data;
+    print Dumper $tesla->api(endpoint => 'VEHICLE_DATA', id => $vehicle_id);
 
 Output (massively and significantly snipped for brevity):
-
-    Dream machine
 
     $VAR1 = {
         'vehicle_config' => {
@@ -660,6 +1005,23 @@ Output (massively and significantly snipped for brevity):
 
 Steve Bertrand, C<< <steveb at cpan.org> >>
 
+=head1 ACKNOWLEDGEMENTS
+
+This distribution suite has been a long time in the works. For my other projects
+written in Perl previous to writing this code that required data from the Tesla
+API, I wrapped L<Tim Dorssers|https://github.com/tdorssers> wonderful
+L<TeslaPy|https://github.com/tdorssers/TeslaPy> Python project.
+
+Much of the code in this distribution is heavily influenced by the code his
+project, and currently, we're using a direct copy of its
+L<Tesla API endpoint file|https://github.com/tdorssers/TeslaPy/blob/master/teslapy/endpoints.json>.
+
+Thanks Tim, and great work!
+
+Also thanks goes out to L<https://teslaapi.io>, as a lot of the actual request
+parameter information and response data layout I learned from that site while
+implementing the actual REST calls to the Tesla API.
+
 =head1 LICENSE AND COPYRIGHT
 
 Copyright 2022 Steve Bertrand.
@@ -670,1734 +1032,8 @@ copy of the full license at:
 
 L<http://www.perlfoundation.org/artistic_license_2_0>
 
-=cut
+The copied endpoint code data borrowed from Tim's B<TeslaPy> project has been
+rebranded with the Perl license here, as permitted by the MIT license TeslaPy
+is licensed under.
 
-__DATA__
-{
-  "STATUS": {
-    "TYPE": "GET",
-    "URI": "status",
-    "AUTH": false
-  },
-  "PRODUCT_LIST": {
-    "TYPE": "GET",
-    "URI": "api/1/products",
-    "AUTH": true
-  },
-  "VEHICLE_LIST": {
-    "TYPE": "GET",
-    "URI": "api/1/vehicles",
-    "AUTH": true
-  },
-  "VEHICLE_ORDER_LIST": {
-    "TYPE": "GET",
-    "URI": "api/1/users/orders",
-    "AUTH": true
-  },
-  "VEHICLE_SUMMARY": {
-    "TYPE": "GET",
-    "URI": "api/1/vehicles/{vehicle_id}",
-    "AUTH": true
-  },
-  "VEHICLE_DATA_LEGACY": {
-    "TYPE": "GET",
-    "URI": "api/1/vehicles/{vehicle_id}/data",
-    "AUTH": true
-  },
-  "VEHICLE_DATA": {
-    "TYPE": "GET",
-    "URI": "api/1/vehicles/{vehicle_id}/vehicle_data",
-    "AUTH": true
-  },
-  "VEHICLE_SERVICE_DATA": {
-    "TYPE": "GET",
-    "URI": "api/1/vehicles/{vehicle_id}/service_data",
-    "AUTH": true
-  },
-  "NEARBY_CHARGING_SITES": {
-    "TYPE": "GET",
-    "URI": "api/1/vehicles/{vehicle_id}/nearby_charging_sites",
-    "AUTH": true
-  },
-  "WAKE_UP": {
-    "TYPE": "POST",
-    "URI": "api/1/vehicles/{vehicle_id}/wake_up",
-    "AUTH": true
-  },
-  "UNLOCK": {
-    "TYPE": "POST",
-    "URI": "api/1/vehicles/{vehicle_id}/command/door_unlock",
-    "AUTH": true
-  },
-  "LOCK": {
-    "TYPE": "POST",
-    "URI": "api/1/vehicles/{vehicle_id}/command/door_lock",
-    "AUTH": true
-  },
-  "HONK_HORN": {
-    "TYPE": "POST",
-    "URI": "api/1/vehicles/{vehicle_id}/command/honk_horn",
-    "AUTH": true
-  },
-  "FLASH_LIGHTS": {
-    "TYPE": "POST",
-    "URI": "api/1/vehicles/{vehicle_id}/command/flash_lights",
-    "AUTH": true
-  },
-  "CLIMATE_ON": {
-    "TYPE": "POST",
-    "URI": "api/1/vehicles/{vehicle_id}/command/auto_conditioning_start",
-    "AUTH": true
-  },
-  "CLIMATE_OFF": {
-    "TYPE": "POST",
-    "URI": "api/1/vehicles/{vehicle_id}/command/auto_conditioning_stop",
-    "AUTH": true
-  },
-  "MAX_DEFROST": {
-    "TYPE": "POST",
-    "URI": "api/1/vehicles/{vehicle_id}/command/set_preconditioning_max",
-    "AUTH": true
-  },
-  "CHANGE_CLIMATE_TEMPERATURE_SETTING": {
-    "TYPE": "POST",
-    "URI": "api/1/vehicles/{vehicle_id}/command/set_temps",
-    "AUTH": true
-  },
-  "SET_CLIMATE_KEEPER_MODE": {
-    "TYPE": "POST",
-    "URI": "api/1/vehicles/{vehicle_id}/command/set_climate_keeper_mode",
-    "AUTH": true
-  },
-  "HVAC_BIOWEAPON_MODE": {
-    "TYPE": "POST",
-    "URI": "api/1/vehicles/{vehicle_id}/command/set_bioweapon_mode",
-    "AUTH": true
-  },
-  "SCHEDULED_DEPARTURE": {
-    "TYPE": "POST",
-    "URI": "api/1/vehicles/{vehicle_id}/command/set_scheduled_departure",
-    "AUTH": true
-  },
-  "SCHEDULED_CHARGING": {
-    "TYPE": "POST",
-    "URI": "api/1/vehicles/{vehicle_id}/command/set_scheduled_charging",
-    "AUTH": true
-  },
-  "CHARGING_AMPS": {
-    "TYPE": "POST",
-    "URI": "api/1/vehicles/{vehicle_id}/command/set_charging_amps",
-    "AUTH": true
-  },
-  "SET_CABIN_OVERHEAT_PROTECTION": {
-    "TYPE": "POST",
-    "URI": "api/1/vehicles/{vehicle_id}/command/set_cabin_overheat_protection",
-    "AUTH": true
-  },
-  "CHANGE_CHARGE_LIMIT": {
-    "TYPE": "POST",
-    "URI": "api/1/vehicles/{vehicle_id}/command/set_charge_limit",
-    "AUTH": true
-  },
-  "SET_VEHICLE_NAME": {
-    "TYPE": "POST",
-    "URI": "api/1/vehicles/{vehicle_id}/command/set_vehicle_name",
-    "AUTH": true
-  },
-  "CHANGE_CHARGE_MAX": {
-    "TYPE": "POST",
-    "URI": "api/1/vehicles/{vehicle_id}/command/charge_max_range",
-    "AUTH": true
-  },
-  "CHANGE_CHARGE_STANDARD": {
-    "TYPE": "POST",
-    "URI": "api/1/vehicles/{vehicle_id}/command/charge_standard",
-    "AUTH": true
-  },
-  "CHANGE_SUNROOF_STATE": {
-    "TYPE": "POST",
-    "URI": "api/1/vehicles/{vehicle_id}/command/sun_roof_control",
-    "AUTH": true
-  },
-  "WINDOW_CONTROL": {
-    "TYPE": "POST",
-    "URI": "api/1/vehicles/{vehicle_id}/command/window_control",
-    "AUTH": true
-  },
-  "ACTUATE_TRUNK": {
-    "TYPE": "POST",
-    "URI": "api/1/vehicles/{vehicle_id}/command/actuate_trunk",
-    "AUTH": true
-  },
-  "REMOTE_START": {
-    "TYPE": "POST",
-    "URI": "api/1/vehicles/{vehicle_id}/command/remote_start_drive",
-    "AUTH": true
-  },
-  "TRIGGER_HOMELINK": {
-    "TYPE": "POST",
-    "URI": "api/1/vehicles/{vehicle_id}/command/trigger_homelink",
-    "AUTH": true
-  },
-  "CHARGE_PORT_DOOR_OPEN": {
-    "TYPE": "POST",
-    "URI": "api/1/vehicles/{vehicle_id}/command/charge_port_door_open",
-    "AUTH": true
-  },
-  "CHARGE_PORT_DOOR_CLOSE": {
-    "TYPE": "POST",
-    "URI": "api/1/vehicles/{vehicle_id}/command/charge_port_door_close",
-    "AUTH": true
-  },
-  "START_CHARGE": {
-    "TYPE": "POST",
-    "URI": "api/1/vehicles/{vehicle_id}/command/charge_start",
-    "AUTH": true
-  },
-  "STOP_CHARGE": {
-    "TYPE": "POST",
-    "URI": "api/1/vehicles/{vehicle_id}/command/charge_stop",
-    "AUTH": true
-  },
-  "MEDIA_TOGGLE_PLAYBACK": {
-    "TYPE": "POST",
-    "URI": "api/1/vehicles/{vehicle_id}/command/media_toggle_playback",
-    "AUTH": true
-  },
-  "MEDIA_NEXT_TRACK": {
-    "TYPE": "POST",
-    "URI": "api/1/vehicles/{vehicle_id}/command/media_next_track",
-    "AUTH": true
-  },
-  "MEDIA_PREVIOUS_TRACK": {
-    "TYPE": "POST",
-    "URI": "api/1/vehicles/{vehicle_id}/command/media_prev_track",
-    "AUTH": true
-  },
-  "MEDIA_NEXT_FAVORITE": {
-    "TYPE": "POST",
-    "URI": "api/1/vehicles/{vehicle_id}/command/media_next_fav",
-    "AUTH": true
-  },
-  "MEDIA_PREVIOUS_FAVORITE": {
-    "TYPE": "POST",
-    "URI": "api/1/vehicles/{vehicle_id}/command/media_prev_fav",
-    "AUTH": true
-  },
-  "MEDIA_VOLUME_UP": {
-    "TYPE": "POST",
-    "URI": "api/1/vehicles/{vehicle_id}/command/media_volume_up",
-    "AUTH": true
-  },
-  "MEDIA_VOLUME_DOWN": {
-    "TYPE": "POST",
-    "URI": "api/1/vehicles/{vehicle_id}/command/media_volume_down",
-    "AUTH": true
-  },
-  "SPLUNK_TELEMETRY": {
-    "TYPE": "POST",
-    "URI": "api/1/logs",
-    "AUTH": true
-  },
-  "APP_FEEDBACK_ENTITLEMENTS": {
-    "TYPE": "GET",
-    "URI": "api/1/diagnostics",
-    "AUTH": true
-  },
-  "APP_FEEDBACK_LOGS": {
-    "TYPE": "POST",
-    "URI": "api/1/reports",
-    "AUTH": true
-  },
-  "APP_FEEDBACK_METADATA": {
-    "TYPE": "POST",
-    "URI": "api/1/diagnostics",
-    "AUTH": true
-  },
-  "RETRIEVE_NOTIFICATION_PREFERENCES": {
-    "TYPE": "GET",
-    "URI": "api/1/notification_preferences",
-    "AUTH": true
-  },
-  "SEND_NOTIFICATION_PREFERENCES": {
-    "TYPE": "POST",
-    "URI": "api/1/notification_preferences",
-    "AUTH": true
-  },
-  "RETRIEVE_NOTIFICATION_SUBSCRIPTIONS": {
-    "TYPE": "GET",
-    "URI": "api/1/subscriptions",
-    "AUTH": true
-  },
-  "SEND_NOTIFICATION_SUBSCRIPTIONS": {
-    "TYPE": "POST",
-    "URI": "api/1/subscriptions",
-    "AUTH": true
-  },
-  "DEACTIVATE_DEVICE_TOKEN": {
-    "TYPE": "POST",
-    "URI": "api/1/device/{device_token}/deactivate",
-    "AUTH": true
-  },
-  "CALENDAR_SYNC": {
-    "TYPE": "POST",
-    "URI": "api/1/vehicles/{vehicle_id}/command/upcoming_calendar_entries",
-    "AUTH": true
-  },
-  "SET_VALET_MODE": {
-    "TYPE": "POST",
-    "URI": "api/1/vehicles/{vehicle_id}/command/set_valet_mode",
-    "AUTH": true
-  },
-  "RESET_VALET_PIN": {
-    "TYPE": "POST",
-    "URI": "api/1/vehicles/{vehicle_id}/command/reset_valet_pin",
-    "AUTH": true
-  },
-  "SPEED_LIMIT_ACTIVATE": {
-    "TYPE": "POST",
-    "URI": "api/1/vehicles/{vehicle_id}/command/speed_limit_activate",
-    "AUTH": true
-  },
-  "SPEED_LIMIT_DEACTIVATE": {
-    "TYPE": "POST",
-    "URI": "api/1/vehicles/{vehicle_id}/command/speed_limit_deactivate",
-    "AUTH": true
-  },
-  "SPEED_LIMIT_SET_LIMIT": {
-    "TYPE": "POST",
-    "URI": "api/1/vehicles/{vehicle_id}/command/speed_limit_set_limit",
-    "AUTH": true
-  },
-  "SPEED_LIMIT_CLEAR_PIN": {
-    "TYPE": "POST",
-    "URI": "api/1/vehicles/{vehicle_id}/command/speed_limit_clear_pin",
-    "AUTH": true
-  },
-  "SCHEDULE_SOFTWARE_UPDATE": {
-    "TYPE": "POST",
-    "URI": "api/1/vehicles/{vehicle_id}/command/schedule_software_update",
-    "AUTH": true
-  },
-  "CANCEL_SOFTWARE_UPDATE": {
-    "TYPE": "POST",
-    "URI": "api/1/vehicles/{vehicle_id}/command/cancel_software_update",
-    "AUTH": true
-  },
-  "SET_SENTRY_MODE": {
-    "TYPE": "POST",
-    "URI": "api/1/vehicles/{vehicle_id}/command/set_sentry_mode",
-    "AUTH": true
-  },
-  "POWERWALL_ORDER_SESSION_DATA": {
-    "TYPE": "GET",
-    "URI": "api/1/users/powerwall_order_entry_data",
-    "AUTH": true
-  },
-  "POWERWALL_ORDER_PAGE": {
-    "TYPE": "GET",
-    "URI": "powerwall_order_page",
-    "AUTH": true,
-    "CONTENT": "HTML"
-  },
-  "ONBOARDING_EXPERIENCE": {
-    "TYPE": "GET",
-    "URI": "api/1/users/onboarding_data",
-    "AUTH": true
-  },
-  "ONBOARDING_EXPERIENCE_PAGE": {
-    "TYPE": "GET",
-    "URI": "onboarding_page",
-    "AUTH": true,
-    "CONTENT": "HTML"
-  },
-  "GET_UPCOMING_SERVICE_VISIT_DATA": {
-    "TYPE": "GET",
-    "URI": "api/1/users/service_scheduling_data",
-    "AUTH": true
-  },
-  "GET_OWNERSHIP_XP_CONFIG": {
-    "TYPE": "GET",
-    "URI": "api/1/users/app_config",
-    "AUTH": true
-  },
-  "REFERRAL_DATA": {
-    "TYPE": "GET",
-    "URI": "api/1/users/referral_data",
-    "AUTH": true
-  },
-  "REFERRAL_PAGE": {
-    "TYPE": "GET",
-    "URI": "referral_page",
-    "AUTH": true,
-    "CONTENT": "HTML"
-  },
-  "ROADSIDE_ASSISTANCE_DATA": {
-    "TYPE": "GET",
-    "URI": "api/1/users/roadside_assistance_data",
-    "AUTH": true
-  },
-  "ROADSIDE_ASSISTANCE_PAGE": {
-    "TYPE": "GET",
-    "URI": "roadside_assistance_page",
-    "AUTH": true,
-    "CONTENT": "HTML"
-  },
-  "UPGRADE_ELIGIBILITY": {
-    "TYPE": "GET",
-    "URI": "api/1/vehicles/{vehicle_id}/eligible_upgrades",
-    "AUTH": true
-  },
-  "UPGRADES_PAGE": {
-    "TYPE": "GET",
-    "URI": "upgrades_page",
-    "AUTH": true,
-    "CONTENT": "HTML"
-  },
-  "MESSAGE_CENTER_MESSAGE_COUNT": {
-    "TYPE": "GET",
-    "URI": "api/1/messages/count",
-    "AUTH": true
-  },
-  "MESSAGE_CENTER_MESSAGE_LIST": {
-    "TYPE": "GET",
-    "URI": "api/1/messages",
-    "AUTH": true
-  },
-  "MESSAGE_CENTER_MESSAGE": {
-    "TYPE": "GET",
-    "URI": "api/1/messages/{message_id}",
-    "AUTH": true
-  },
-  "MESSAGE_CENTER_COUNTS": {
-    "TYPE": "GET",
-    "URI": "api/1/messages/count",
-    "AUTH": true
-  },
-  "MESSAGE_CENTER_MESSAGE_ACTION_UPDATE": {
-    "TYPE": "POST",
-    "URI": "api/1/messages/{message_id}/actions",
-    "AUTH": true
-  },
-  "MESSAGE_CENTER_CTA_PAGE": {
-    "TYPE": "GET",
-    "URI": "messages_cta_page",
-    "AUTH": true,
-    "CONTENT": "HTML"
-  },
-  "SEND_DEVICE_KEY": {
-    "TYPE": "POST",
-    "URI": "api/1/users/keys",
-    "AUTH": true
-  },
-  "BATTERY_SUMMARY": {
-    "TYPE": "GET",
-    "URI": "api/1/powerwalls/{battery_id}/status",
-    "AUTH": true
-  },
-  "BATTERY_DATA": {
-    "TYPE": "GET",
-    "URI": "api/1/powerwalls/{battery_id}",
-    "AUTH": true
-  },
-  "BATTERY_POWER_TIMESERIES_DATA": {
-    "TYPE": "GET",
-    "URI": "api/1/powerwalls/{battery_id}/powerhistory",
-    "AUTH": true
-  },
-  "BATTERY_ENERGY_TIMESERIES_DATA": {
-    "TYPE": "GET",
-    "URI": "api/1/powerwalls/{battery_id}/energyhistory",
-    "AUTH": true
-  },
-  "BATTERY_BACKUP_RESERVE": {
-    "TYPE": "POST",
-    "URI": "api/1/powerwalls/{battery_id}/backup",
-    "AUTH": true
-  },
-  "BATTERY_SITE_NAME": {
-    "TYPE": "POST",
-    "URI": "api/1/powerwalls/{battery_id}/site_name",
-    "AUTH": true
-  },
-  "BATTERY_OPERATION_MODE": {
-    "TYPE": "POST",
-    "URI": "api/1/powerwalls/{battery_id}/operation",
-    "AUTH": true
-  },
-  "SITE_SUMMARY": {
-    "TYPE": "GET",
-    "URI": "api/1/energy_sites/{site_id}/site_status",
-    "AUTH": true
-  },
-  "SITE_DATA": {
-    "TYPE": "GET",
-    "URI": "api/1/energy_sites/{site_id}/live_status",
-    "AUTH": true
-  },
-  "SITE_CONFIG": {
-    "TYPE": "GET",
-    "URI": "api/1/energy_sites/{site_id}/site_info",
-    "AUTH": true
-  },
-  "RATE_TARIFFS": {
-    "TYPE": "GET",
-    "URI": "api/1/energy_sites/rate_tariffs",
-    "AUTH": true
-  },
-  "SITE_TARIFFS": {
-    "TYPE": "GET",
-    "URI": "api/1/energy_sites/{site_id}/tariff_rates",
-    "AUTH": true
-  },
-  "SITE_TARIFF": {
-    "TYPE": "GET",
-    "URI": "api/1/energy_sites/{site_id}/tariff_rate",
-    "AUTH": true
-  },
-  "HISTORY_DATA": {
-    "TYPE": "GET",
-    "URI": "api/1/energy_sites/{site_id}/history",
-    "AUTH": true
-  },
-  "CALENDAR_HISTORY_DATA": {
-    "TYPE": "GET",
-    "URI": "api/1/energy_sites/{site_id}/calendar_history",
-    "AUTH": true
-  },
-  "SOLAR_SAVINGS_FORECAST": {
-    "TYPE": "GET",
-    "URI": "api/1/energy_sites/{site_id}/savings_forecast",
-    "AUTH": true
-  },
-  "ENERGY_SITE_BACKUP_TIME_REMAINING": {
-    "TYPE": "GET",
-    "URI": "api/1/energy_sites/{site_id}/backup_time_remaining",
-    "AUTH": true
-  },
-  "ENERGY_SITE_PROGRAMS": {
-    "TYPE": "GET",
-    "URI": "api/1/energy_sites/{site_id}/programs",
-    "AUTH": true
-  },
-  "ENERGY_SITE_TELEMETRY_HISTORY": {
-    "TYPE": "GET",
-    "URI": "api/1/energy_sites/{site_id}/telemetry_history",
-    "AUTH": true
-  },
-  "BACKUP_RESERVE": {
-    "TYPE": "POST",
-    "URI": "api/1/energy_sites/{site_id}/backup",
-    "AUTH": true
-  },
-  "OFF_GRID_VEHICLE_CHARGING_RESERVE": {
-    "TYPE": "POST",
-    "URI": "api/1/energy_sites/{site_id}/off_grid_vehicle_charging_reserve",
-    "AUTH": true
-  },
-  "SITE_NAME": {
-    "TYPE": "POST",
-    "URI": "api/1/energy_sites/{site_id}/site_name",
-    "AUTH": true
-  },
-  "OPERATION_MODE": {
-    "TYPE": "POST",
-    "URI": "api/1/energy_sites/{site_id}/operation",
-    "AUTH": true
-  },
-  "TIME_OF_USE_SETTINGS": {
-    "TYPE": "POST",
-    "URI": "api/1/energy_sites/{site_id}/time_of_use_settings",
-    "AUTH": true
-  },
-  "STORM_MODE_SETTINGS": {
-    "TYPE": "POST",
-    "URI": "api/1/energy_sites/{site_id}/storm_mode",
-    "AUTH": true
-  },
-  "ENERGY_SITE_COMMAND": {
-    "TYPE": "POST",
-    "URI": "api/1/energy_sites/{site_id}/command",
-    "AUTH": true
-  },
-  "ENERGY_SITE_ENROLL_PROGRAM": {
-    "TYPE": "POST",
-    "URI": "api/1/energy_sites/{site_id}/program",
-    "AUTH": true
-  },
-  "ENERGY_SITE_OPT_EVENT": {
-    "TYPE": "POST",
-    "URI": "api/1/energy_sites/{site_id}/event",
-    "AUTH": true
-  },
-  "ENERGY_SITE_PREFERENCE": {
-    "TYPE": "POST",
-    "URI": "api/1/energy_sites/{site_id}/preference",
-    "AUTH": true
-  },
-  "CHECK_ENERGY_PRODUCT_REGISTRATION": {
-    "TYPE": "GET",
-    "URI": "api/1/energy_sites/registered",
-    "AUTH": true
-  },
-  "ENERGY_EVENT": {
-    "TYPE": "POST",
-    "URI": "api/1/energy_sites/energy_event",
-    "AUTH": true
-  },
-  "VEHICLE_CHARGE_HISTORY": {
-    "TYPE": "POST",
-    "URI": "api/1/vehicles/{vehicle_id}/charge_history",
-    "AUTH": true
-  },
-  "SEND_NOTIFICATION_CONFIRMATION": {
-    "TYPE": "POST",
-    "URI": "api/1/notification_confirmations",
-    "AUTH": true
-  },
-  "SEND_TO_VEHICLE": {
-    "TYPE": "POST",
-    "URI": "api/1/vehicles/{vehicle_id}/command/share",
-    "AUTH": true
-  },
-  "SEND_SC_TO_VEHICLE": {
-    "TYPE": "POST",
-    "URI": "api/1/vehicles/{vehicle_id}/command/navigation_sc_request",
-    "AUTH": true
-  },
-  "SEND_GPS_TO_VEHICLE": {
-    "TYPE": "POST",
-    "URI": "api/1/vehicles/{vehicle_id}/command/navigation_gps_request",
-    "AUTH": true
-  },
-  "REMOTE_SEAT_HEATER_REQUEST": {
-    "TYPE": "POST",
-    "URI": "api/1/vehicles/{vehicle_id}/command/remote_seat_heater_request",
-    "AUTH": true
-  },
-  "REMOTE_STEERING_WHEEL_HEATER_REQUEST": {
-    "TYPE": "POST",
-    "URI": "api/1/vehicles/{vehicle_id}/command/remote_steering_wheel_heater_request",
-    "AUTH": true
-  },
-  "TRIGGER_VEHICLE_SCREENSHOT": {
-    "TYPE": "GET",
-    "URI": "api/1/vehicles/{vehicle_id}/screenshot",
-    "AUTH": true
-  },
-  "HERMES_AUTHORIZATION": {
-    "TYPE": "POST",
-    "URI": "api/1/users/jwt/hermes",
-    "AUTH": true
-  },
-  "HERMES_VEHICLE_AUTHORIZATION": {
-    "TYPE": "POST",
-    "URI": "api/1/vehicles/{id}/jwt/hermes",
-    "AUTH": true
-  },
-  "STATIC_SUPERCHARGER_FILE": {
-    "TYPE": "GET",
-    "URI": "static/superchargers/{file_path}",
-    "AUTH": true
-  },
-  "STATIC_CHARGER_FILE": {
-    "TYPE": "GET",
-    "URI": "static/chargers/{file_path}",
-    "AUTH": true
-  },
-  "PLAN_TRIP": {
-    "TYPE": "POST",
-    "URI": "api/1/vehicles/plan_trip",
-    "AUTH": true
-  },
-  "PLACE_SUGGESTIONS": {
-    "TYPE": "POST",
-    "URI": "api/1/vehicles/place_suggestions",
-    "AUTH": true
-  },
-  "DRIVING_PLAN": {
-    "TYPE": "POST",
-    "URI": "api/1/vehicles/driving_plan",
-    "AUTH": true
-  },
-  "REVERSE_GEOCODING": {
-    "TYPE": "GET",
-    "URI": "maps/reverse_geocoding/v3/",
-    "AUTH": true
-  },
-  "USER": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/user",
-    "AUTH": true
-  },
-  "OWNERSHIP_TRANSLATIONS": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/static/protected/translations/{path}",
-    "AUTH": true
-  },
-  "ROADSIDE_INCIDENTS": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/roadside/incidents",
-    "AUTH": true
-  },
-  "ROADSIDE_CREATE_INCIDENT": {
-    "TYPE": "POST",
-    "URI": "bff/v2/mobile-app/roadside/incidents",
-    "AUTH": true
-  },
-  "ROADSIDE_CANCEL_INCIDENT": {
-    "TYPE": "PUT",
-    "URI": "bff/v2/mobile-app/roadside/incidents/{incidentsId}",
-    "AUTH": true
-  },
-  "ROADSIDE_WARRANTY": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/roadside/warranty",
-    "AUTH": true
-  },
-  "ROADSIDE_LOCATIONS": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/roadside/locations",
-    "AUTH": true
-  },
-  "ROADSIDE_COUNTRIES": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/roadside/countries",
-    "AUTH": true
-  },
-  "SERVICE_GET_SERVICE_VISITS": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/service/appointments",
-    "AUTH": true
-  },
-  "SERVICE_UPDATE_APPOINTMENT": {
-    "TYPE": "PUT",
-    "URI": "bff/v2/mobile-app/service/appointments/{serviceVisitId}",
-    "AUTH": true
-  },
-  "SERVICE_CANCEL_APPOINTMENT": {
-    "TYPE": "PATCH",
-    "URI": "mobile-app/service/appointments/{serviceVisitId}",
-    "AUTH": true
-  },
-  "SERVICE_CREATE_ACTIVITIES": {
-    "TYPE": "POST",
-    "URI": "bff/v2/mobile-app/service/activities/{serviceVisitId}",
-    "AUTH": true
-  },
-  "SERVICE_UPDATE_ACTIVITIES": {
-    "TYPE": "PUT",
-    "URI": "bff/v2/mobile-app/service/activities/{serviceVisitId}",
-    "AUTH": true
-  },
-  "SERVICE_DELETE_ACTIVITIES": {
-    "TYPE": "PATCH",
-    "URI": "bff/v2/mobile-app/service/activities/{serviceVisitId}",
-    "AUTH": true
-  },
-  "SERVICE_GET_SERVICE_APPOINTMENTS": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/service/service-appointments",
-    "AUTH": true
-  },
-  "SERVICE_CREATE_SERVICE_VISIT": {
-    "TYPE": "POST",
-    "URI": "bff/v2/mobile-app/service/appointments",
-    "AUTH": true
-  },
-  "SERVICE_TRACKER_DETAILS": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/service/tracker/{serviceVisitID}",
-    "AUTH": true
-  },
-  "SERVICE_MOBILE_NEAREST_LOCATIONS": {
-    "TYPE": "GET",
-    "URI": "mobile-app/service/locations/mobile/nearest",
-    "AUTH": true
-  },
-  "SERVICE_MOBILE_OPEN_SLOTS": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/service/locations/mobile/slots",
-    "AUTH": true
-  },
-  "SERVICE_CENTER_OPEN_SLOTS": {
-    "TYPE": "POST",
-    "URI": "bff/v2/mobile-app/service/locations/center/slots",
-    "AUTH": true
-  },
-  "SERVICE_CENTER_IS_BODY_SHOP": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/service/locations/body-shop",
-    "AUTH": true
-  },
-  "SERVICE_SAVE_CENTER_APPOINTMENT": {
-    "TYPE": "POST",
-    "URI": "bff/v2/mobile-app/service/center",
-    "AUTH": true
-  },
-  "SERVICE_CREATE_MOBILE_APPOINTMENT": {
-    "TYPE": "POST",
-    "URI": "bff/v2/mobile-app/service/mobile",
-    "AUTH": true
-  },
-  "SERVICE_UPDATE_MOBILE_APPOINTMENT": {
-    "TYPE": "PATCH",
-    "URI": "bff/v2/mobile-app/service/mobile/{appointmentId}",
-    "AUTH": true
-  },
-  "SERVICE_SWITCH_TO_CENTER_APPOINTMENT": {
-    "TYPE": "POST",
-    "URI": "bff/v2/mobile-app/service/mobile/{appointmentId}/convert-to-center",
-    "AUTH": true
-  },
-  "SERVICE_SWITCH_TO_MOBILE_APPOINTMENT": {
-    "TYPE": "POST",
-    "URI": "bff/v2/mobile-app/service/center/{appointmentId}/convert-to-mobile",
-    "AUTH": true
-  },
-  "SERVICE_MOBILE_APPOINTMENT_DETAILS": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/service/mobile/{appointmentId}",
-    "AUTH": true
-  },
-  "SERVICE_CENTER_APPOINTMENT_DETAILS": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/service/center/{appointmentId}",
-    "AUTH": true
-  },
-  "SERVICE_HISTORY": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/service/history",
-    "AUTH": true
-  },
-  "SERVICE_SURVEY_ELIGIBILITY": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/service/surveys",
-    "AUTH": true
-  },
-  "SERVICE_SURVEY_QUESTIONS": {
-    "TYPE": "POST",
-    "URI": "bff/v2/mobile-app/service/surveys",
-    "AUTH": true
-  },
-  "SERVICE_SURVEY_ANSWER_QUESTIONS": {
-    "TYPE": "PUT",
-    "URI": "bff/v2/mobile-app/service/surveys",
-    "AUTH": true
-  },
-  "SERVICE_LOCATIONS": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/service/center/locations",
-    "AUTH": true
-  },
-  "SERVICE_LOCATIONS_BY_TRT_ID": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/service/center/locations-by-trtid",
-    "AUTH": true
-  },
-  "SERVICE_MOBILE_ISSUES": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/feature-flag/mobile-service-issues",
-    "AUTH": true
-  },
-  "SERVICE_FEATURE_FLAG_SERVICE_TRACKER": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/feature-flag/mobile-app-service-tracker",
-    "AUTH": true
-  },
-  "SERVICE_FEATURE_FLAG_ALLOW_FILE_UPLOAD": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/feature-flag/service-scheduling-allow-file-upload",
-    "AUTH": true
-  },
-  "SERVICE_FEATURE_FLAG_MOBILE_SERVICE": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/feature-flag/show-mobile-service",
-    "AUTH": true
-  },
-  "SERVICE_FEATURE_FLAG_MACGYVER": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/feature-flag/tao-4109-use-macgyver-mobile-app",
-    "AUTH": true
-  },
-  "SERVICE_FEATURE_FLAG_SCHEDULING_FALLBACK": {
-    "TYPE": "GET",
-    "URI": "mobile-app/feature-flag/TAO-13782-no-estimate-schedule-fallback",
-    "AUTH": true
-  },
-  "SERVICE_UPLOAD_FILE": {
-    "TYPE": "POST",
-    "URI": "bff/v2/mobile-app/files",
-    "AUTH": true
-  },
-  "SERVICE_DELETE_UPLOADED_FILE": {
-    "TYPE": "PUT",
-    "URI": "bff/v2/mobile-app/files/{uuid}",
-    "AUTH": true
-  },
-  "SERVICE_UPDATE_FILE_METADATA": {
-    "TYPE": "PATCH",
-    "URI": "bff/v2/mobile-app/files/{uuid}/metadata",
-    "AUTH": true
-  },
-  "SERVICE_GET_FILE_LIST": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/files/metadata",
-    "AUTH": true
-  },
-  "SERVICE_GET_FILE": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/files/{uuid}",
-    "AUTH": true
-  },
-  "SERVICE_GET_APPOINTMENT_INVOICES": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/service/tracker/{serviceVisitID}/invoices",
-    "AUTH": true
-  },
-  "SERVICE_GET_ESTIMATE_APPROVAL_STATUS": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/service/tracker/{serviceVisitID}/estimate-status",
-    "AUTH": true
-  },
-  "SERVICE_GET_ESTIMATE_COST_DETAILS": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/service/tracker/invoices/{invoiceId}",
-    "AUTH": true
-  },
-  "SERVICE_APPROVE_ESTIMATE": {
-    "TYPE": "POST",
-    "URI": "bff/v2/mobile-app/service/tracker/{serviceVisitID}/estimate-status",
-    "AUTH": true
-  },
-  "SERVICE_GET_FINAL_INVOICE_AMOUNT_DUE": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/service/tracker/{serviceVisitID}/amount-due",
-    "AUTH": true
-  },
-  "SERVICE_MACGYVER_ALERTS": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/macgyver/alerts",
-    "AUTH": true
-  },
-  "SERVICE_MACGYVER_OUTSTANDING_WORK": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/macgyver/categories",
-    "AUTH": true
-  },
-  "SERVICE_ACTIVITY_INFO": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/macgyver/activity-info/{serviceVisitID}",
-    "AUTH": true
-  },
-  "SERVICE_MACGYVER_POST_CUSTOMER_ANSWERS": {
-    "TYPE": "POST",
-    "URI": "bff/v2/mobile-app/macgyver/customer-answers",
-    "AUTH": true
-  },
-  "SERVICE_MACGYVER_DISMISS_CUSTOMER_ANSWERS": {
-    "TYPE": "PUT",
-    "URI": "bff/v2/mobile-app/macgyver/customer-answers",
-    "AUTH": true
-  },
-  "SERVICE_MACGYVER_SERVICE_TYPE": {
-    "TYPE": "POST",
-    "URI": "bff/v2/mobile-app/macgyver/service-type",
-    "AUTH": true
-  },
-  "SERVICE_MACGYVER_DIAGNOSTIC_RESULT": {
-    "TYPE": "GET",
-    "URI": "mobile-app/macgyver/urgent-autodiag-result",
-    "AUTH": true
-  },
-  "SERVICE_ACCEPT_LOANER_AGREEMENT": {
-    "TYPE": "POST",
-    "URI": "bff/v2/mobile-app/service/loaner/{serviceVisitId}",
-    "AUTH": true
-  },
-  "SERVICE_CREATE_OFFLINE_ORDER": {
-    "TYPE": "POST",
-    "URI": "bff/v2/mobile-app/service/payment/create-offline-order",
-    "AUTH": true
-  },
-  "SERVICE_COMPLETE_OFFLINE_ORDER": {
-    "TYPE": "POST",
-    "URI": "bff/v2/mobile-app/service/payment/complete-offline-order",
-    "AUTH": true
-  },
-  "ENERGY_OWNERSHIP_GET_TOGGLES": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/energy/feature-flags",
-    "AUTH": true
-  },
-  "ENERGY_SERVICE_GET_SITE_INFORMATION": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/energy-service/site-information",
-    "AUTH": true
-  },
-  "ENERGY_SERVICE_GET_SERVICE_CASES": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/energy-service/appointments",
-    "AUTH": true
-  },
-  "ENERGY_SERVICE_POST_SERVICE_CASE": {
-    "TYPE": "POST",
-    "URI": "bff/v2/mobile-app/energy-service/appointments",
-    "AUTH": true
-  },
-  "ENERGY_SERVICE_GET_APPOINTMENT_SUGGESTIONS": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/energy-service/appointment-suggestions",
-    "AUTH": true
-  },
-  "ENERGY_SERVICE_CANCEL_SERVICE_CASE": {
-    "TYPE": "PUT",
-    "URI": "bff/v2/mobile-app/energy-service/service-case",
-    "AUTH": true
-  },
-  "ENERGY_SERVICE_CANCEL_APPOINTMENT": {
-    "TYPE": "PUT",
-    "URI": "bff/v2/mobile-app/energy-service/appointments",
-    "AUTH": true
-  },
-  "ENERGY_DOCUMENTS_GET_DOCUMENTS": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/energy-documents/documents",
-    "AUTH": true
-  },
-  "ENERGY_DOCUMENTS_DOWNLOAD_DOCUMENT": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/energy-documents/documents/{documentId}",
-    "AUTH": true
-  },
-  "ENERGY_GET_TROUBLESHOOTING_GUIDE": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/energy-service/troubleshooting/{troubleshootingFlow}?version=2",
-    "AUTH": true
-  },
-  "ENERGY_SERVICE_GET_POWERWALL_WARRANTY_DETAILS": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/energy-service/warranty-details",
-    "AUTH": true
-  },
-  "LOOTBOX_USER_INFO": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/referrals",
-    "AUTH": true
-  },
-  "LOOTBOX_GET_ONBOARDING_COPY": {
-    "TYPE": "GET",
-    "URI": "mobile-app/referrals/getOnboardingCopy",
-    "AUTH": true
-  },
-  "LOOTBOX_PAST_REFERRAL_DATA": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/referrals/past-referrals",
-    "AUTH": true
-  },
-  "REFERRAL_GET_USER_INFO": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/referrals/user-info",
-    "AUTH": true
-  },
-  "REFERRAL_GET_PRODUCT_INFO": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/referrals/product-info",
-    "AUTH": true
-  },
-  "REFERRAL_GET_CONTACT_LIST": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/referrals/contact-list",
-    "AUTH": true
-  },
-  "REFERRAL_POST_CONTACT_LIST": {
-    "TYPE": "POST",
-    "URI": "bff/v2/mobile-app/referrals/contact-list",
-    "AUTH": true
-  },
-  "REFERRAL_GET_CREDIT_HISTORY": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/referrals/credit-history",
-    "AUTH": true
-  },
-  "REFERRAL_GET_PAST_HISTORY": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/referrals/past-referral-history",
-    "AUTH": true
-  },
-  "REFERRAL_GET_PAST_HISTORY_COUNT": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/referrals/past-referral-history/count",
-    "AUTH": true
-  },
-  "REFERRAL_GET_FEATURE_FLAG": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/feature-flag/tao-69420-treasure",
-    "AUTH": true
-  },
-  "REFERRAL_GET_TERMS_AND_CONDITIONS": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/referrals/terms-conditions",
-    "AUTH": true
-  },
-  "UPGRADES_GET_ELIGIBLE_UPGRADES": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/upgrades/eligible",
-    "AUTH": true
-  },
-  "UPGRADES_GET_PURCHASED_UPGRADES": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/upgrades/purchased",
-    "AUTH": true
-  },
-  "UPGRADES_SUBMIT_REFUND": {
-    "TYPE": "POST",
-    "URI": "bff/v2/mobile-app/upgrades/refunds",
-    "AUTH": true
-  },
-  "UPGRADES_POST_PAYMENT": {
-    "TYPE": "POST",
-    "URI": "bff/v2/mobile-app/upgrades/payment",
-    "AUTH": true
-  },
-  "USER_ACCOUNT_GET_DETAILS": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/account/details",
-    "AUTH": true
-  },
-  "USER_ACCOUNT_PUT_DETAILS": {
-    "TYPE": "PUT",
-    "URI": "bff/v2/mobile-app/account/details",
-    "AUTH": true
-  },
-  "USER_ACCOUNT_UPLOAD_PROFILE_PICTURE": {
-    "TYPE": "POST",
-    "URI": "bff/v2/mobile-app/account/profile-pic",
-    "AUTH": true
-  },
-  "USER_ACCOUNT_DOWNLOAD_PROFILE_PICTURE": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/account/profile-pic",
-    "AUTH": true
-  },
-  "UPGRADES_CREATE_OFFLINE_ORDER": {
-    "TYPE": "POST",
-    "URI": "bff/v2/mobile-app/upgrades/payment/offline-order",
-    "AUTH": true
-  },
-  "UPGRADES_COMPLETE_OFFLINE_ORDER": {
-    "TYPE": "POST",
-    "URI": "bff/v2/mobile-app/upgrades/payment/offline-purchase-complete",
-    "AUTH": true
-  },
-  "SUBSCRIPTIONS_GET_ELIGIBLE": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/subscriptions",
-    "AUTH": true
-  },
-  "SUBSCRIPTIONS_GET_PURCHASED_SUBSCRIPTIONS": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/subscriptions/purchased",
-    "AUTH": true
-  },
-  "SUBSCRIPTIONS_CREATE_OFFLINE_ORDER": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/subscriptions/offline-order",
-    "AUTH": true
-  },
-  "SUBSCRIPTIONS_POST_CREATE_OFFLINE_ORDER": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/subscriptions/offline-order",
-    "AUTH": true
-  },
-  "GET_WALLET_FEATURE_FLAG": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/feature-flag/enable-subscriptions-wallet-channel",
-    "AUTH": true
-  },
-  "SUBSCRIPTIONS_PURCHASE": {
-    "TYPE": "POST",
-    "URI": "bff/v2/mobile-app/subscriptions",
-    "AUTH": true
-  },
-  "MANAGE_GET_SUBSCRIPTION_INVOICES": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/subscriptions/invoices",
-    "AUTH": true
-  },
-  "MANAGE_PATCH_AUTO_RENEW_SUBSCRIPTIONS": {
-    "TYPE": "PATCH",
-    "URI": "bff/v2/mobile-app/subscriptions",
-    "AUTH": true
-  },
-  "MANAGE_GET_BILL_ME_LATER_LIST": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/bill-me-later/pending-orders",
-    "AUTH": true
-  },
-  "MANAGE_COMPLETE_BILL_ME_LATER_ORDER": {
-    "TYPE": "POST",
-    "URI": "bff/v2/mobile-app/bill-me-later/purchase-complete",
-    "AUTH": true
-  },
-  "MANAGE_CANCEL_BILL_ME_LATER_ORDER": {
-    "TYPE": "POST",
-    "URI": "bff/v2/mobile-app/bill-me-later/cancel",
-    "AUTH": true
-  },
-  "MANAGE_UPGRADE_BILL_ME_LATER_GET_OFFLINE_TOKEN": {
-    "TYPE": "POST",
-    "URI": "bff/v2/mobile-app/bill-me-later/token",
-    "AUTH": true
-  },
-  "MANAGE_GET_BILL_ME_LATER_TOGGLE": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/bill-me-later/security-toggle",
-    "AUTH": true
-  },
-  "MANAGE_POST_BILL_ME_LATER_TOGGLE": {
-    "TYPE": "POST",
-    "URI": "bff/v2/mobile-app/bill-me-later/security-toggle",
-    "AUTH": true
-  },
-  "UPGRADES_SUBSCRIPTIONS_SHARED_BILLING_ADDRESS_FEATURE_FLAG": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/billing-address/feature-flag/TAO-8065-in-app-BillingBlock-Enable",
-    "AUTH": true
-  },
-  "BILLING_ADDRESS_FORM_FEATURE_FLAG": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/billing-address/feature-flag/tao-8202-ownership-mobile-app-billing-address",
-    "AUTH": true
-  },
-  "VIDEO_GUIDES_GET_VIDEO_LIST": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/video-guides",
-    "AUTH": true
-  },
-  "PAYMENTS_GET_SIGNED_USER_TOKEN": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/payments/signed-user-token",
-    "AUTH": true
-  },
-  "PAYMENTS_GET_SIGNED_USER_TOKEN_V4": {
-    "TYPE": "POST",
-    "URI": "bff/v2/mobile-app/payments/v4/signed-user-token",
-    "AUTH": true
-  },
-  "PAYMENTS_POST_SIGNED_USER_TOKEN": {
-    "TYPE": "POST",
-    "URI": "bff/v2/mobile-app/payments/signed-user-token",
-    "AUTH": true
-  },
-  "PAYMENTS_GET_INSTRUMENT": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/payments/instrument",
-    "AUTH": true
-  },
-  "PAYMENTS_GET_BILLING_ADDRESS": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/billing-address",
-    "AUTH": true
-  },
-  "PAYMENTS_UPDATE_BILLING_ADDRESS": {
-    "TYPE": "PUT",
-    "URI": "bff/v2/mobile-app/billing-address",
-    "AUTH": true
-  },
-  "PAYMENTS_FETCH_CN_ENTITY": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/payments/entity",
-    "AUTH": true
-  },
-  "DOCUMENTS_DOWNLOAD_INVOICE": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/documents/invoices/{invoiceId}",
-    "AUTH": true
-  },
-  "SERVICE_MESSAGES": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/service/messages/{serviceVisitID}",
-    "AUTH": true
-  },
-  "SERVICE_SEND_MESSAGE": {
-    "TYPE": "POST",
-    "URI": "bff/v2/mobile-app/service/messages/{serviceVisitID}",
-    "AUTH": true
-  },
-  "SERVICE_MESSAGES_MARK_READ": {
-    "TYPE": "PATCH",
-    "URI": "bff/v2/mobile-app/service/messages/{serviceVisitID}",
-    "AUTH": true
-  },
-  "COMMERCE_CATEGORIES": {
-    "TYPE": "GET",
-    "URI": "commerce-api/categories/v1{locale}",
-    "AUTH": true
-  },
-  "COMMERCE_RECOMMENDATIONS_CATEGORIES": {
-    "TYPE": "POST",
-    "URI": "commerce-api/recommendations/categories/v1{locale}",
-    "AUTH": true
-  },
-  "COMMERCE_GET_ADDRESS": {
-    "TYPE": "GET",
-    "URI": "commerce-api/addresses/v1{locale}",
-    "AUTH": true
-  },
-  "COMMERCE_ADDRESS": {
-    "TYPE": "POST",
-    "URI": "commerce-api/addresses/v1{locale}",
-    "AUTH": true
-  },
-  "COMMERCE_CAPTURE": {
-    "TYPE": "POST",
-    "URI": "commerce-api/purchases/v1{locale}",
-    "AUTH": true
-  },
-  "COMMERCE_PROCESSPAYMENT": {
-    "TYPE": "POST",
-    "URI": "commerce-api/purchases/{purchaseNumber}/processpayment/v1{locale}",
-    "AUTH": true
-  },
-  "COMMERCE_CART_UPDATE": {
-    "TYPE": "PUT",
-    "URI": "commerce-api/carts/{cartId}/items/{lineItemId}/v1{locale}",
-    "AUTH": true
-  },
-  "COMMERCE_CART_DELETE": {
-    "TYPE": "DELETE",
-    "URI": "commerce-api/carts/{cartId}/items/{lineItemId}/v1{locale}",
-    "AUTH": true
-  },
-  "COMMERCE_ADD_CART": {
-    "TYPE": "POST",
-    "URI": "commerce-api/carts/items/v1{locale}",
-    "AUTH": true
-  },
-  "COMMERCE_CLEAR_CART": {
-    "TYPE": "DELETE",
-    "URI": "commerce-api/carts/v1{locale}",
-    "AUTH": true
-  },
-  "COMMERCE_GET_CART": {
-    "TYPE": "GET",
-    "URI": "commerce-api/carts/v1{locale}",
-    "AUTH": true
-  },
-  "COMMERCE_INVENTORY": {
-    "TYPE": "POST",
-    "URI": "commerce-api/inventory/v2{locale}",
-    "AUTH": true
-  },
-  "COMMERCE_ITEM": {
-    "TYPE": "POST",
-    "URI": "commerce-api/items/v1{locale}",
-    "AUTH": true
-  },
-  "COMMERCE_TOKEN": {
-    "TYPE": "POST",
-    "URI": "commerce-api/tokens/v1{locale}",
-    "AUTH": true
-  },
-  "COMMERCE_ADDRESS_VALIDATION": {
-    "TYPE": "POST",
-    "URI": "commerce-api/addresses/validations/v1{locale}",
-    "AUTH": true
-  },
-  "COMMERCE_GEOGRAPHIES": {
-    "TYPE": "GET",
-    "URI": "commerce-api/geographies/v1{locale}",
-    "AUTH": true
-  },
-  "COMMERCE_GET_STORE_INFO": {
-    "TYPE": "GET",
-    "URI": "commerce-api/storeconfigurations/v1{locale}",
-    "AUTH": true
-  },
-  "COMMERCE_PURCHASE_HISTORY": {
-    "TYPE": "GET",
-    "URI": "commerce-api/purchases/v1{locale}",
-    "AUTH": true
-  },
-  "COMMERCE_PURCHASE_BY_ORDERNUMBER": {
-    "TYPE": "GET",
-    "URI": "commerce-api/purchases/{orderNumber}/v1{locale}",
-    "AUTH": true
-  },
-  "COMMERCE_GET_VEHICLES": {
-    "TYPE": "GET",
-    "URI": "commerce-api/vehicles/v1{locale}",
-    "AUTH": true
-  },
-  "COMMERCE_POST_VEHICLES": {
-    "TYPE": "POST",
-    "URI": "commerce-api/vehicles/v1{locale}",
-    "AUTH": true
-  },
-  "COMMERCE_GET_SERVICECENTERS": {
-    "TYPE": "GET",
-    "URI": "commerce-api/servicecenters/v1{locale}",
-    "AUTH": true
-  },
-  "COMMERCE_POST_SERVICECENTERS": {
-    "TYPE": "POST",
-    "URI": "commerce-api/servicecenters/v1{locale}",
-    "AUTH": true
-  },
-  "COMMERCE_POST_CANCELORDER": {
-    "TYPE": "POST",
-    "URI": "commerce-api/cancellation/v1{locale}",
-    "AUTH": true
-  },
-  "COMMERCE_POST_RETURNORDER": {
-    "TYPE": "POST",
-    "URI": "commerce-api/returns/v1{locale}",
-    "AUTH": true
-  },
-  "COMMERCE_GET_INSTALLERS": {
-    "TYPE": "GET",
-    "URI": "commerce-api/installers/v1{locale}",
-    "AUTH": true
-  },
-  "COMMERCE_POST_INSTALLER_VENDOR": {
-    "TYPE": "POST",
-    "URI": "commerce-api/checkout/auditrecords/v1/{locale}",
-    "AUTH": true
-  },
-  "COMMERCE_CONTENT": {
-    "TYPE": "GET",
-    "URI": "commerce-api/content/v2?file={fileName}",
-    "AUTH": true
-  },
-  "MATTERMOST": {
-    "TYPE": "POST",
-    "URI": "Just a placeholder",
-    "AUTH": true
-  },
-  "SAFETY_RATING_GET_ELIGIBLE_FOR_TELEMATICS": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/insurance/eligible-for-telematics",
-    "AUTH": true
-  },
-  "SAFETY_RATING_GET_DAILY_BREAKDOWN": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/insurance/daily-breakdown",
-    "AUTH": true
-  },
-  "SAFETY_RATING_GET_TRIPS": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/insurance/trips",
-    "AUTH": true
-  },
-  "SAFETY_RATING_GET_ESTIMATED_SAFETY_SCORE": {
-    "TYPE": "POST",
-    "URI": "bff/v2/mobile-app/insurance/calculate-safety-rating",
-    "AUTH": true
-  },
-  "COMMERCE_POST_INVOICE": {
-    "TYPE": "POST",
-    "URI": "commerce-api/purchases/invoices/v1{locale}",
-    "AUTH": true
-  },
-  "COMMERCE_POST_CHECKOUT_INVOICE": {
-    "TYPE": "POST",
-    "URI": "commerce-api/checkout/invoices/v1{locale}",
-    "AUTH": true
-  },
-  "CHARGING_BALANCE": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/charging/balance",
-    "AUTH": true
-  },
-  "CHARGING_BALANCE_CHARGE_TYPE_FLAG": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/feature-flag/tao-9296-filter-by-charge-type",
-    "AUTH": true
-  },
-  "CHARGING_BALANCE_CREATE_OFFLINE_ORDER": {
-    "TYPE": "POST",
-    "URI": "bff/v2/mobile-app/charging/payment",
-    "AUTH": true
-  },
-  "CHARGING_BALANCE_PAYMENT": {
-    "TYPE": "POST",
-    "URI": "bff/v2/mobile-app/charging/payment/complete",
-    "AUTH": true
-  },
-  "CHARGING_BALANCE_ZERO_DOLLAR_TX": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/charging/signed-token",
-    "AUTH": true
-  },
-  "CHARGING_BALANCE_GET_IS_BLOCKED": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/charging-cn/supercharger-status",
-    "AUTH": true
-  },
-  "CHARGING_HISTORY": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/charging/history",
-    "AUTH": true
-  },
-  "CHARGING_HISTORY_VEHICLES": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/charging/vehicles",
-    "AUTH": true
-  },
-  "CHARGING_HISTORY_VEHICLE_IMAGES": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/charging/vehicle-images",
-    "AUTH": true
-  },
-  "DOWNLOAD_CHARGING_INVOICE": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/charging/invoice/{uuid}",
-    "AUTH": true
-  },
-  "DOWNLOAD_CHARGING_SUBSCRIPTION_INVOICE": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/charging/subscription/invoice/{invoiceId}",
-    "AUTH": true
-  },
-  "CHARGING_DOWNLOAD_CSV": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/charging/export",
-    "AUTH": true
-  },
-  "CHARGING_GET_SITES_BOUNDING_BOX": {
-    "TYPE": "POST",
-    "URI": "bff/v2/mobile-app/charging/sites",
-    "AUTH": true
-  },
-  "CHARGING_GET_SITE": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/charging/site/{id}",
-    "AUTH": true
-  },
-  "CHARGING_GET_BILLING_ADDRESS": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/charging/billing-address",
-    "AUTH": true
-  },
-  "CHARGING_SET_BILLING_ADDRESS": {
-    "TYPE": "POST",
-    "URI": "bff/v2/mobile-app/charging/billing-address",
-    "AUTH": true
-  },
-  "CHARGING_STOP_SESSION": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/charging/session/stop/{id}",
-    "AUTH": true
-  },
-  "FINANCING_IS_ENABLED": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/financing/is-captive",
-    "AUTH": true
-  },
-  "FINANCING_FETCH_DETAILS": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/financing/details",
-    "AUTH": true
-  },
-  "FINANCING_FETCH_DOCUMENT_LIST": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/financing/document-list",
-    "AUTH": true
-  },
-  "FINANCING_DOWNLOAD_DOCUMENT": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/financing/document",
-    "AUTH": true
-  },
-  "FINANCING_GET_SIGNED_TOKEN": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/financing/signed-token",
-    "AUTH": true
-  },
-  "FINANCING_GET_BILLING_ADDRESS": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/financing/billing-address",
-    "AUTH": true
-  },
-  "FINANCING_UPDATE_BILLING_ADDRESS": {
-    "TYPE": "POST",
-    "URI": "bff/v2/mobile-app/financing/billing-address",
-    "AUTH": true
-  },
-  "FINANCING_ONE_TIME_PAYMENT_SIGNED_TOKEN": {
-    "TYPE": "POST",
-    "URI": "bff/v2/mobile-app/financing/one-time-payment-signed-token",
-    "AUTH": true
-  },
-  "FINANCING_UPDATE_ONE_TIME_PAYMENT_STATUS": {
-    "TYPE": "POST",
-    "URI": "bff/v2/mobile-app/financing/update-one-time-payment-status",
-    "AUTH": true
-  },
-  "FINANCING_UPDATE_ENROLLMENT_SETTINGS": {
-    "TYPE": "POST",
-    "URI": "bff/v2/mobile-app/financing/update-enrollment-settings",
-    "AUTH": true
-  },
-  "FINANCING_LOOKUP_WALLET": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/financing/lookup-wallet",
-    "AUTH": true
-  },
-  "FINANCING_GET_FEATURE_FLAGS": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/financing/feature-flags",
-    "AUTH": true
-  },
-  "FINANCING_GET_E_SIGN_DOCUMENTS_STATUS": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/financing/documents-status",
-    "AUTH": true
-  },
-  "FINANCING_SUBMIT_FINANCING_ACTION": {
-    "TYPE": "POST",
-    "URI": "bff/v2/mobile-app/financing/manage-financing-action",
-    "AUTH": true
-  },
-  "FINANCING_GET_EXTENSION_QUOTE": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/financing/extension-quote",
-    "AUTH": true
-  },
-  "FINANCING_GET_CAR_DETAILS": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/financing/car-details",
-    "AUTH": true
-  },
-  "FINANCING_GET_E_SIGN_SUMMARY": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/financing/esign-summary",
-    "AUTH": true
-  },
-  "FINANCING_GET_E_SIGN_DOCUMENT": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/financing/esign-document",
-    "AUTH": true
-  },
-  "FINANCING_VALIDATE_E_SIGN_DETAILS": {
-    "TYPE": "POST",
-    "URI": "bff/v2/mobile-app/financing/esign-validate-details",
-    "AUTH": true
-  },
-  "DASHCAM_SAVE_CLIP": {
-    "TYPE": "POST",
-    "URI": "api/1/vehicles/{vehicle_id}/command/dashcam_save_clip",
-    "AUTH": true
-  },
-  "NON_OWNER_SUPPORTED_PRODUCTS": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/user/supported-products",
-    "AUTH": true
-  },
-  "FEATURE_CONFIG": {
-    "TYPE": "GET",
-    "URI": "api/1/users/feature_config",
-    "AUTH": true
-  },
-  "SITE_LOCK_GET_SITES": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/charging-cn/get-locks",
-    "AUTH": true
-  },
-  "SITE_LOCK_SEND_UNLOCK_REQUEST": {
-    "TYPE": "POST",
-    "URI": "bff/v2/mobile-app/charging-cn/open-lock",
-    "AUTH": true
-  },
-  "SITE_LOCK_GET_STATUS": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/charging-cn/get-lock-status",
-    "AUTH": true
-  },
-  "FETCH_VEHICLE_SHARED_DRIVERS": {
-    "TYPE": "GET",
-    "URI": "api/1/vehicles/{vehicle_id}/drivers",
-    "AUTH": true
-  },
-  "CREATE_VEHICLE_SHARE_INVITE": {
-    "TYPE": "POST",
-    "URI": "api/1/vehicles/{vehicle_id}/invitations",
-    "AUTH": true
-  },
-  "FETCH_VEHICLE_SHARE_INVITES": {
-    "TYPE": "GET",
-    "URI": "api/1/vehicles/{vehicle_id}/invitations",
-    "AUTH": true
-  },
-  "REVOKE_VEHICLE_SHARE_INVITE": {
-    "TYPE": "POST",
-    "URI": "api/1/vehicles/{vehicle_id}/invitations/{invite_id}/revoke",
-    "AUTH": true
-  },
-  "REMOVE_VEHICLE_SHARE_DRIVER": {
-    "TYPE": "DELETE",
-    "URI": "api/1/vehicles/{vehicle_id}/drivers/{share_user_id}",
-    "AUTH": true
-  },
-  "REDEEM_VEHICLE_SHARE_INVITE": {
-    "TYPE": "POST",
-    "URI": "api/1/invitations/redeem",
-    "AUTH": true
-  },
-  "AUTH_GENERATE_INSTANT_LOGIN": {
-    "TYPE": "POST",
-    "URI": "bff/v2/mobile-app/auth/generate-instant-login",
-    "AUTH": true
-  },
-  "GET_MANAGE_DRIVER_FLAG": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/feature-flag/TAO-14025-add-driver-flow",
-    "AUTH": true
-  },
-  "CONTACT_US_CLASSIFICATION": {
-    "TYPE": "POST",
-    "URI": "bff/v2/mobile-app/contact-us/classify-narrative",
-    "AUTH": true
-  },
-  "CONTACT_US_CONTENT_CATALOG": {
-    "TYPE": "GET",
-    "URI": "mobile-app/contact-us/content-catalog",
-    "AUTH": true
-  },
-  "VEHICLE_PSEUDONYM_DIRECTIVES": {
-    "TYPE": "POST",
-    "URI": "api/1/directives/products",
-    "AUTH": true
-  },
-  "VEHICLE_UPLOAD_PSEUDONYM_DIRECTIVE": {
-    "TYPE": "POST",
-    "URI": "api/1/directives/discover",
-    "AUTH": true
-  },
-  "VEHICLE_COMPLETE_PSEUDONYM_DIRECTIVE": {
-    "TYPE": "POST",
-    "URI": "api/1/directives/products/complete",
-    "AUTH": true
-  },
-  "OWNERSHIP_VEHICLE_SPECS_REQUEST": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/ownership/vehicle-details",
-    "AUTH": true
-  },
-  "OWNERSHIP_WARRANTY_DETAILS_REQUEST": {
-    "TYPE": "GET",
-    "URI": "bff/v2/mobile-app/ownership/warranty-details",
-    "AUTH": true
-  },
-  "COMMERCE_FEATURE_FLAG": {
-    "TYPE": "GET",
-    "URI": "mobile-app/commerce/feature-flags",
-    "AUTH": true
-  },
-  "COMMERCE_SEARCH_PRODUCTS": {
-    "TYPE": "POST",
-    "URI": "commerce-api/searches/v1{locale}",
-    "AUTH": true
-  }
-}
+=cut

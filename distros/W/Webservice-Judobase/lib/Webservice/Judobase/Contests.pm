@@ -1,9 +1,9 @@
-package Webservice::Judobase::Contests;
-
 use strict;
 use warnings;
 
-our $VERSION = '0.004'; # VERSION
+package Webservice::Judobase::Contests;
+$Webservice::Judobase::Contests::VERSION = '0.07';
+# VERSION
 
 use Moo;
 use HTTP::Request;

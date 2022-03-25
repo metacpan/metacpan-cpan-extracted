@@ -4,7 +4,7 @@ Image::DecodeQR::WeChat - Decode QR code(s) from images using the OpenCV/WeChat 
 
 # VERSION
 
-Version 0.7
+Version 0.8
 
 # SYNOPSIS
 
@@ -139,6 +139,22 @@ interface other parts of the OpenCV library:
     image-decodeqr-wechat.pl --help
 
 A CLI script is provided and will be installed by this module. Basic usage is as above.
+
+# PREREQUISITES
+
+- OpenCV library with contributed modules is required.
+The contributed modules must include the QR-code decoder library by WeChat.
+OpenCV must also contain the include dir (headers) - just saying.
+- A C++ compiler must be installed in your system.
+- Optionally, `pkg-config` or `cmake` must be installed in order to
+aid discovering the location of OpenCV's library and include dir. If you
+don't have these installed then you must manually set environment
+variables `OPENCV_LDFLAGS` and `OPENCV_CFLAGS` to point
+to those paths and then attempt to install this module (e.g. `perl Makefile.PL; make all ; make install`)
+- Optionally, OpenCV can contain the Highgui library so that
+output images can be displayed in their own window. But this is
+superfluous, because the basic operation of this module allows for
+saving output files to disk.
 
 # SUBROUTINES/METHODS
 
@@ -313,35 +329,52 @@ OpenCV from sources. This is the procedure I followed:
 - There are two ways to make `cmake` just tolerable:
 `cmake-gui` and `ccmake`. The former is a full-gui interface
 to setting the billion `cmake` variables. Use it
-if you are on a machine which offers a GUI: `cmake-gui ..`
+if you are on a machine which offers a GUI like this: `cmake-gui ..`
 If you are on a headless or remote host possibly over telnet or ssh
-then do not despair because c&lt;ccmake> is the CLI, curses-based
+then do not despair because `ccmake` is the CLI, curses-based
 equivalent to `cmake-gui`,  use it like: `ccmake ..` (from within the build dir).
 - Once on either of the cmake GUIs, first do a
 `configure`, then check the
 list of all variables (you can search on both, for searching
-in the CLI, press `</`> and then `n` for next hit)
+in the CLI, press `/` and then `n` for next hit)
 to suit you and then `generate`, quit
 and  `VERBOSE=1 make -j4 all`
 - I guess, cmake variables you want to modify
 are `OPENCV_EXTRA_MODULES_PATH`
-and `OPENCV_ENABLE_NONFREE` and anything that has to do with `CNN` or `DNN`.
+and turn ON `OPENCV_ENABLE_NONFREE` and anything that has to do with `CNN` or `DNN`.
 If you have CUDA installed and a CUDA-capable GPU then enable CUDA
 (search for CUDA string to find the variable(s)). Also, VTK, Ceres Solver,
 Eigen3, Intel's TBB, CNN, DNN etc. You need to install all these
-additional packages to get OpenCV support with them.
+additional packages first, before finally compiling OpenCV.
 - I had a problem with compiling OpenCV with a GUI (the `highgui`)
 on a headless host. So, I just disabled it. That's easy to achieve
 during the above.
-- I have both installed this on a CUDA-capable GPU (with CUDA 10.2 installed)
+- I have installed this on a CUDA-capable GPU (with CUDA 10.2 installed)
 host and on a headless remote host with no GPU or basic. CUDA is
 not required for building this module.
+- It is also possible to download a binary distribution of OpenCV.
+Just make sure that it supports all the things I mentioned above.
+And that it has all the required headers (in an include dir) - just saying.
 
 Your mileage may vary.
 
 If you are seriously in need of installing
 this module then consider migrating to a serious operating system
 such as Linux as your first action.
+
+# INSTALLING THIS MODULE
+
+This module depends on the existence of the OpenCV library with all
+the extensions and contributed modules mentioned in section `PREREQUISITES`.
+
+Detecting where this library is located in your system is the weakest
+link in the installation process of this module. `Makefile.PL` contains
+code to do this with `pkg-config` or `cmake`. If these fail,
+it will look for ENVironment variables: `OPENCV_LDFLAGS` and
+`OPENCV_CFLAGS`, which should contain the `CFLAGS` (for example:
+`<-I/usr/include/opencv4/`>) and `LDFLAGS` (for example:
+`<-L/usr/lib64 -lopencv_world`>). Set these variables manually
+prior installation if the automatic methods mentioned above fail.
 
 # AUTHOR
 

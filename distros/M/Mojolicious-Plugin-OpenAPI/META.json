@@ -33,7 +33,7 @@
             "Text::Markdown" : "v1.0.31"
          },
          "requires" : {
-            "JSON::Validator" : "5.03",
+            "JSON::Validator" : "5.08",
             "Mojolicious" : "9.00"
          }
       },
@@ -55,7 +55,7 @@
          "web" : "https://github.com/jhthorsen/mojolicious-plugin-openapi"
       }
    },
-   "version" : "5.02",
+   "version" : "5.05",
    "x_contributors" : [
       "Henrik Andersen",
       "Ilya Rassadin",

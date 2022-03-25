@@ -35,17 +35,6 @@ sub module_dirs {
   }
 }
 
-sub compiler_env {
-  my $self = shift;
-  if (@_) {
-    $self->{compiler_env} = $_[0];
-    return $self;
-  }
-  else {
-    return $self->{compiler_env};
-  }
-}
-
 sub compiler {
   my $self = shift;
   if (@_) {
@@ -67,6 +56,38 @@ sub env {
     return $self->{env};
   }
 }
+sub runtime {
+  my $self = shift;
+  if (@_) {
+    $self->{runtime} = $_[0];
+    return $self;
+  }
+  else {
+    return $self->{runtime};
+  }
+}
+
+sub native_address_info {
+  my $self = shift;
+  if (@_) {
+    $self->{native_address_info} = $_[0];
+    return $self;
+  }
+  else {
+    return $self->{native_address_info};
+  }
+}
+
+sub precompile_address_info {
+  my $self = shift;
+  if (@_) {
+    $self->{precompile_address_info} = $_[0];
+    return $self;
+  }
+  else {
+    return $self->{precompile_address_info};
+  }
+}
 
 sub new {
   my $class = shift;
@@ -78,45 +99,17 @@ sub new {
   
   bless $self, ref $class || $class;
   
-  # Create an environment for the compiler
-  $self->create_compiler_env;
+  # Create an environment
+  $self->create_env;
   
   # Create the compiler
   $self->create_compiler;
   
+  $self->native_address_info({});
+  
+  $self->precompile_address_info({});
+  
   return $self;
-}
-
-sub build {
-  my ($self, $class_name, $file, $line) = @_;
-  
-  # Add class informations
-  if (defined $class_name) {
-
-    my $start_classes_length = $self->get_classes_length;
-
-    # Compile SPVM source code and create runtime env
-    my $compile_success = $self->compile_spvm($class_name, $file, $line);
-    
-    unless ($compile_success) {
-      return 0;
-    }
-    
-    my $class_names = $self->get_class_names;
-    for (my $i = $start_classes_length; $i < @$class_names; $i++) {
-      my $added_class_name =  $class_names->[$i];
-      
-      next if $added_class_name =~ /::anon/;
-      
-      # Build Precompile classs - Compile C source codes and link them to SPVM precompile method
-      $self->build_and_bind_shared_lib($added_class_name, 'precompile');
-
-      # Build native classs - Compile C source codes and link them to SPVM native method
-      $self->build_and_bind_shared_lib($added_class_name, 'native');
-    }
-  }
-  
-  return 1;
 }
 
 sub print_error_messages {
@@ -227,9 +220,9 @@ sub build_and_bind_shared_lib {
     unless (-f $shared_lib_file) {
       $shared_lib_file = $cc->build_shared_lib_runtime($class_name);
     }
+    
     $self->bind_methods($cc, $shared_lib_file, $class_name, $category);
   }
-  
 }
 
 sub bind_methods {
@@ -254,7 +247,7 @@ sub bind_methods {
       push @$method_infos, $method_info;
     }
   }
-
+  
   for my $method_info (@$method_infos) {
     my $class_name = $method_info->{class_name};
     my $method_name = $method_info->{method_name};
@@ -298,13 +291,12 @@ EOS
     }
     
     if ($category eq 'native') {
-      $self->set_native_method_address($class_name, $method_name, $cfunc_address);
+      $self->native_address_info->{$class_name}{$method_name} = $cfunc_address;
     }
     elsif ($category eq 'precompile') {
-      $self->set_precompile_method_address($class_name, $method_name, $cfunc_address);
+      $self->precompile_address_info->{$class_name}{$method_name} = $cfunc_address;
     }
   }
-
 }
 
 1;

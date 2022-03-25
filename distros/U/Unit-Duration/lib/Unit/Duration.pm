@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use Carp 'croak';
 
-our $VERSION = '1.02'; # VERSION
+our $VERSION = '1.03'; # VERSION
 
 my $duration_element_re = qr/(?<expr>[-+*\/\d]+)\s*(?<unit>[A-z]+)\s*/;
 
@@ -333,7 +333,7 @@ Unit::Duration - Work-time unit duration conversion and canonicalization
 
 =head1 VERSION
 
-version 1.02
+version 1.03
 
 =for markdown [![test](https://github.com/gryphonshafer/Unit-Duration/workflows/test/badge.svg)](https://github.com/gryphonshafer/Unit-Duration/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/Unit-Duration/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Unit-Duration)
@@ -670,7 +670,7 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2021 by Gryphon Shafer.
+This software is Copyright (c) 2021-2050 by Gryphon Shafer.
 
 This is free software, licensed under:
 

@@ -6,7 +6,7 @@ use exact;
 
 use Games::Dice 'roll';
 
-our $VERSION = '1.05'; # VERSION
+our $VERSION = '1.06'; # VERSION
 
 sub init {
     my ($bot) = @_;
@@ -39,7 +39,7 @@ Bot::IRC::X::Dice - Bot::IRC plugin for dice rolling
 
 =head1 VERSION
 
-version 1.05
+version 1.06
 
 =for markdown [![test](https://github.com/gryphonshafer/Bot-IRC-X-Dice/workflows/test/badge.svg)](https://github.com/gryphonshafer/Bot-IRC-X-Dice/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/Bot-IRC-X-Dice/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Bot-IRC-X-Dice)
@@ -104,7 +104,7 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016-2021 by Gryphon Shafer.
+This software is Copyright (c) 2016-2050 by Gryphon Shafer.
 
 This is free software, licensed under:
 

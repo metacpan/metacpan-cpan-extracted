@@ -10,7 +10,7 @@ use Pod::Usage 'pod2usage';
 use Proc::PID::File;
 use Term::ReadKey 'ReadMode';
 
-our $VERSION = '1.06'; # VERSION
+our $VERSION = '1.07'; # VERSION
 
 use constant EXPORT_OK => [ qw( options pod2usage singleton readmode ) ];
 
@@ -114,7 +114,7 @@ Util::CommandLine - Command-line interface helper utility
 
 =head1 VERSION
 
-version 1.06
+version 1.07
 
 =for markdown [![test](https://github.com/gryphonshafer/Util-CommandLine/workflows/test/badge.svg)](https://github.com/gryphonshafer/Util-CommandLine/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/Util-CommandLine/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Util-CommandLine)
@@ -229,7 +229,7 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2015-2021 by Gryphon Shafer.
+This software is Copyright (c) 2015-2050 by Gryphon Shafer.
 
 This is free software, licensed under:
 

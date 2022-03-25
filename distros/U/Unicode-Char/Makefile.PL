@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.PL,v 0.2 2006/05/15 08:14:53 dankogai Exp dankogai $
+# $Id: Makefile.PL,v 0.02 2022/03/19 04:27:27 dankogai Exp $
 #
 use strict;
 use warnings;
