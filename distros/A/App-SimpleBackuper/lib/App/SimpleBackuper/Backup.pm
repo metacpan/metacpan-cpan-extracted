@@ -2,7 +2,7 @@ package App::SimpleBackuper;
 
 use strict;
 use warnings;
-use feature ':5.'.substr($], 3, 2);
+use feature ':5.14';
 use Carp;
 use Try::Tiny;
 use Time::HiRes qw(time);

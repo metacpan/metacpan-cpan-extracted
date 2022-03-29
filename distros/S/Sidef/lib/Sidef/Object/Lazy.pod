@@ -17,33 +17,33 @@ var obj = Lazy(...)
 
 =head2 each
 
-Lazy.each() -> I<Obj>
+    Lazy.each()
 
-Return the
+Returns the
 
 =cut
 
 =head2 first
 
-Lazy.first() -> I<Obj>
+    Lazy.first()
 
-Return the
+Returns the
 
 =cut
 
 =head2 first_by
 
-Lazy.first_by() -> I<Obj>
+    Lazy.first_by()
 
-Return the
+Returns the
 
 =cut
 
 =head2 grep
 
-Lazy.grep() -> I<Obj>
+    Lazy.grep()
 
-Return the
+Returns the
 
 Aliases: I<select>
 
@@ -51,25 +51,25 @@ Aliases: I<select>
 
 =head2 iter
 
-Lazy.iter() -> I<Obj>
+    Lazy.iter()
 
-Return the
+Returns the
 
 =cut
 
 =head2 lazy
 
-Lazy.lazy() -> I<Obj>
+    Lazy.lazy()
 
-Return the
+Returns the
 
 =cut
 
 =head2 map
 
-Lazy.map() -> I<Obj>
+    Lazy.map()
 
-Return the
+Returns the
 
 Aliases: I<collect>
 
@@ -77,24 +77,84 @@ Aliases: I<collect>
 
 =head2 new
 
-Lazy.new() -> I<Obj>
+    Lazy.new()
 
-Return the
+Returns the
 
 =cut
 
 =head2 nth
 
-Lazy.nth() -> I<Obj>
+    Lazy.nth()
 
-Return the
+Returns the
+
+=cut
+
+=head2 prod
+
+    Lazy.prod()
+
+Returns the
+
+Aliases: I<prod_by>
+
+=cut
+
+=head2 prod_kv
+
+    Lazy.prod_kv()
+
+Returns the
+
+=cut
+
+=head2 reduce
+
+    Lazy.reduce()
+
+Returns the
+
+=cut
+
+=head2 reduce_by
+
+    Lazy.reduce_by()
+
+Returns the
+
+=cut
+
+=head2 sum
+
+    Lazy.sum()
+
+Returns the
+
+Aliases: I<sum_by>
+
+=cut
+
+=head2 sum_kv
+
+    Lazy.sum_kv()
+
+Returns the
 
 =cut
 
 =head2 to_a
 
-Lazy.to_a() -> I<Obj>
+    Lazy.to_a()
 
-Return the
+Returns the
+
+=cut
+
+=head2 while
+
+    Lazy.while()
+
+Returns the
 
 =cut

@@ -1,4 +1,7 @@
 Revision history for Perl extension Crypt::OpenSSL::Hash2Curve
 
+0.02  2022/03/28
+	- add Crypt::OpenSSL::EC requirement
+
 0.01  2022/03/24
 	- init

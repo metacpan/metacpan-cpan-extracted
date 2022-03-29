@@ -24,9 +24,9 @@ Inherits methods from:
 
 =head2 &
 
-I<Obj> B<&> I<Obj> -> I<Obj>
+    a & b
 
-Return the
+Returns the
 
 Aliases: I<and>
 
@@ -34,9 +34,9 @@ Aliases: I<and>
 
 =head2 *
 
-I<Obj> B<*> I<Obj> -> I<Obj>
+    a * b
 
-Return the
+Returns the
 
 Aliases: I<mul>
 
@@ -44,9 +44,9 @@ Aliases: I<mul>
 
 =head2 **
 
-I<Obj> B<**> I<Obj> -> I<Obj>
+    a ** b
 
-Return the
+Returns the
 
 Aliases: I<pow>
 
@@ -54,9 +54,9 @@ Aliases: I<pow>
 
 =head2 +
 
-I<Obj> B<+> I<Obj> -> I<Obj>
+    a + b
 
-Return the
+Returns the
 
 Aliases: I<add>
 
@@ -64,9 +64,9 @@ Aliases: I<add>
 
 =head2 -
 
-I<Obj> B<-> I<Obj> -> I<Obj>
+    a - b
 
-Return the
+Returns the
 
 Aliases: I<sub>
 
@@ -74,9 +74,9 @@ Aliases: I<sub>
 
 =head2 /
 
-I<Obj> B</> I<Obj> -> I<Obj>
+    a / b
 
-Return the
+Returns the
 
 Aliases: I<÷>, I<div>
 
@@ -84,9 +84,9 @@ Aliases: I<÷>, I<div>
 
 =head2 ^
 
-I<Obj> B<^> I<Obj> -> I<Obj>
+    a ^ b
 
-Return the
+Returns the
 
 Aliases: I<xor>
 
@@ -94,9 +94,9 @@ Aliases: I<xor>
 
 =head2 |
 
-I<Obj> B<|> I<Obj> -> I<Obj>
+    a | b
 
-Return the
+Returns the
 
 Aliases: I<or>
 
@@ -104,89 +104,89 @@ Aliases: I<or>
 
 =head2 abs
 
-Vector.abs() -> I<Obj>
+    Vector.abs()
 
-Return the
+Returns the
 
 =cut
 
 =head2 atan2
 
-Vector.atan2() -> I<Obj>
+    Vector.atan2()
 
-Return the
+Returns the
 
 =cut
 
 =head2 ceil
 
-Vector.ceil() -> I<Obj>
+    Vector.ceil()
 
-Return the
+Returns the
 
 =cut
 
 =head2 chebyshev_dist
 
-Vector.chebyshev_dist() -> I<Obj>
+    Vector.chebyshev_dist()
 
-Return the
+Returns the
 
 =cut
 
 =head2 dist
 
-Vector.dist() -> I<Obj>
+    Vector.dist()
 
-Return the
+Returns the
 
 =cut
 
 =head2 dist_norm
 
-Vector.dist_norm() -> I<Obj>
+    Vector.dist_norm()
 
-Return the
+Returns the
 
 =cut
 
 =head2 floor
 
-Vector.floor() -> I<Obj>
+    Vector.floor()
 
-Return the
+Returns the
 
 =cut
 
 =head2 manhattan_dist
 
-Vector.manhattan_dist() -> I<Obj>
+    Vector.manhattan_dist()
 
-Return the
+Returns the
 
 =cut
 
 =head2 manhattan_norm
 
-Vector.manhattan_norm() -> I<Obj>
+    Vector.manhattan_norm()
 
-Return the
+Returns the
 
 =cut
 
 =head2 neg
 
-Vector.neg() -> I<Obj>
+    Vector.neg()
 
-Return the
+Returns the
 
 =cut
 
 =head2 new
 
-Vector.new() -> I<Obj>
+    Vector.new()
 
-Return the
+Returns the
 
 Aliases: I<call>
 
@@ -194,25 +194,33 @@ Aliases: I<call>
 
 =head2 norm
 
-Vector.norm() -> I<Obj>
+    Vector.norm()
 
-Return the
+Returns the
+
+=cut
+
+=head2 not
+
+    Vector.not()
+
+Returns the
 
 =cut
 
 =head2 round
 
-Vector.round() -> I<Obj>
+    Vector.round()
 
-Return the
+Returns the
 
 =cut
 
 =head2 to_a
 
-Vector.to_a() -> I<Obj>
+    Vector.to_a()
 
-Return the
+Returns the
 
 Aliases: I<to_array>
 
@@ -220,9 +228,9 @@ Aliases: I<to_array>
 
 =head2 to_s
 
-Vector.to_s() -> I<Obj>
+    Vector.to_s()
 
-Return the
+Returns the
 
 Aliases: I<dump>, I<to_str>
 
@@ -230,8 +238,8 @@ Aliases: I<dump>, I<to_str>
 
 =head2 zero
 
-Vector.zero() -> I<Obj>
+    Vector.zero()
 
-Return the
+Returns the
 
 =cut

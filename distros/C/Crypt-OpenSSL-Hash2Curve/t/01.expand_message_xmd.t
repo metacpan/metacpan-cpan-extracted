@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 use utf8;
 use Test::More;
-use Data::Dump qw/dump/;
+#use Data::Dump qw/dump/;
 use bignum;
 
 use Crypt::OpenSSL::Hash2Curve ;

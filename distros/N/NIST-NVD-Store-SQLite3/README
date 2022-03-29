@@ -36,6 +36,16 @@ You can also look for information at:
 LICENSE AND COPYRIGHT
 
 Copyright (C) 2012 C.J. Adams-Collier
+Copyright (C) 2012 F5 Networks, Inc
+Copyright (C) 2013 Washington State Guard Association
+Copyright (C) 2022 Google, LLC
+
+CVE(r) and CWE(tm) are marks of The MITRE Corporation and used here with
+permission.  The information in CVE and CWE are copyright of The MITRE
+Corporation and also used here with permission.
+
+Please include links for CVE(r) <http://cve.mitre.org/> and CWE(tm)
+<http://cwe.mitre.org/> in all reproductions of these materials.
 
 This program is released under the following license: perl
 

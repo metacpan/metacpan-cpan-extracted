@@ -24,9 +24,9 @@ Inherits methods from:
 
 =head2 new
 
-Complex.new() -> I<Obj>
+    Complex.new()
 
-Return the
+Returns the
 
 Aliases: I<call>
 

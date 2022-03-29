@@ -24,33 +24,33 @@ Inherits methods from:
 
 =head2 call
 
-DirHandle.call() -> I<Obj>
+    DirHandle.call()
 
-Return the
+Returns the
 
 =cut
 
 =head2 chdir
 
-DirHandle.chdir() -> I<Obj>
+    DirHandle.chdir()
 
-Return the
+Returns the
 
 =cut
 
 =head2 close
 
-DirHandle.close() -> I<Obj>
+    DirHandle.close()
 
-Return the
+Returns the
 
 =cut
 
 =head2 dir
 
-DirHandle.dir() -> I<Obj>
+    DirHandle.dir()
 
-Return the
+Returns the
 
 Aliases: I<parent>
 
@@ -58,88 +58,88 @@ Aliases: I<parent>
 
 =head2 dirs
 
-DirHandle.dirs() -> I<Obj>
+    DirHandle.dirs()
 
-Return the
+Returns the
 
 =cut
 
 =head2 each
 
-DirHandle.each() -> I<Obj>
+    DirHandle.each()
 
-Return the
+Returns the
 
 =cut
 
 =head2 entries
 
-DirHandle.entries() -> I<Obj>
+    DirHandle.entries()
 
-Return the
+Returns the
 
 =cut
 
 =head2 files
 
-DirHandle.files() -> I<Obj>
+    DirHandle.files()
 
-Return the
+Returns the
 
 =cut
 
 =head2 iter
 
-DirHandle.iter() -> I<Obj>
+    DirHandle.iter()
 
-Return the
+Returns the
 
 =cut
 
 =head2 lstat
 
-DirHandle.lstat() -> I<Obj>
+    DirHandle.lstat()
 
-Return the
+Returns the
 
 =cut
 
 =head2 read
 
-DirHandle.read() -> I<Obj>
+    DirHandle.read()
 
-Return the
+Returns the
 
 =cut
 
 =head2 rewind
 
-DirHandle.rewind() -> I<Obj>
+    DirHandle.rewind()
 
-Return the
+Returns the
 
 =cut
 
 =head2 seek
 
-DirHandle.seek() -> I<Obj>
+    DirHandle.seek()
 
-Return the
+Returns the
 
 =cut
 
 =head2 stat
 
-DirHandle.stat() -> I<Obj>
+    DirHandle.stat()
 
-Return the
+Returns the
 
 =cut
 
 =head2 tell
 
-DirHandle.tell() -> I<Obj>
+    DirHandle.tell()
 
-Return the
+Returns the
 
 =cut

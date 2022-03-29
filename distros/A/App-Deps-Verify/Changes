@@ -1,5 +1,8 @@
 Revision history for App-Deps-Verify
 
+0.12.1       2022-03-27
+    - Reupload for metacpan indexing.
+
 0.12.0       2020-07-20
     - Add list_missing_python3_modules()
     - Add the py3list sub command

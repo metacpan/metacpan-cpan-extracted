@@ -19,8 +19,8 @@ diag ('bin dir: ' . Alien::geos::af->bin_dir // '== unable to locate bin dir =='
 #my $bin = Alien::geos::af->bin_dir // '';
 
 #  nasty hack
-$ENV{LD_LIBRARY_PATH}   = Alien::geos::af->dist_dir . '/lib';
-$ENV{DYLD_LIBRARY_PATH} = Alien::geos::af->dist_dir . '/lib';
+#$ENV{LD_LIBRARY_PATH}   = Alien::geos::af->dist_dir . '/lib';
+#$ENV{DYLD_LIBRARY_PATH} = Alien::geos::af->dist_dir . '/lib';
 
 
 TODO: {

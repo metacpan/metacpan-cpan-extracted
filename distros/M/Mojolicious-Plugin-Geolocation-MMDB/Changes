@@ -1,5 +1,9 @@
 Revision history for Mojolicious::Plugin::Geolocation::MMDB
 
+0.003  2022-03-07 18:42:33 CET
+
+  - Reintroduce the Windows support
+
 0.002  2022-01-25 15:53:50 CET
 
   - Die with "OS unsupported" in Makefile.PL on Windows

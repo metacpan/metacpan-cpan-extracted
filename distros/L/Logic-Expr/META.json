@@ -1,0 +1,56 @@
+{
+   "abstract" : "logical expression parsing and related routines",
+   "author" : [
+      "Jeremy Mates <jeremy.mates@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4231",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Logic-Expr",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4004"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "Parser::MGC" : "0.21",
+            "Scalar::Util" : "0",
+            "perl" : "v5.14.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Scalar::Util" : "0",
+            "Test2::V0" : "0.000060",
+            "perl" : "v5.14.0"
+         }
+      }
+   },
+   "provides" : {
+      "Logic::Expr" : {
+         "file" : "lib/Logic/Expr.pm",
+         "version" : "0.02"
+      },
+      "Logic::Expr::Parser" : {
+         "file" : "lib/Logic/Expr/Parser.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/BSD-3-Clause"
+      ]
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 4.07"
+}

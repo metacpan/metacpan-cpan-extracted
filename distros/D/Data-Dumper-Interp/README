@@ -1,7 +1,7 @@
 This archive contains the distribution Data-Dumper-Interp,
-version 2.23:
+version 2.24:
 
-  Data::Dumper optimized for humans, with interpolation
+  Data::Dumper for humans, with interpolation
 
 This software is copyright (c) 2022 by Jim Avera.
 

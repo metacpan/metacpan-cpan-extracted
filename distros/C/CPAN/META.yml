@@ -23,8 +23,6 @@ no_index:
     - inc
 requires:
   Archive::Tar: '0'
-  Archive::Zip: '0'
-  CPAN::Checksums: '0'
   CPAN::Meta: '0'
   CPAN::Meta::Requirements: '2.121'
   CPAN::Meta::YAML: '0'
@@ -34,7 +32,6 @@ requires:
   Data::Dumper: '0'
   Digest::MD5: '0'
   Digest::SHA: '0'
-  Expect: '0'
   Exporter: '0'
   Exporter::Heavy: '0'
   ExtUtils::CBuilder: '0'
@@ -55,6 +52,7 @@ requires:
   Net::FTP: '0'
   Net::Ping: '0'
   Parse::CPAN::Meta: '0'
+  Pod::Perldoc: '0'
   Pod::Perldoc::ToMan: '0'
   Scalar::Util: '0'
   Socket: '0'
@@ -66,9 +64,8 @@ requires:
   Text::Wrap: '0'
   YAML: '0'
   YAML::Syck: '0'
-  YAML::XS: '0'
   perl: '5.006002'
 resources:
   repository: https://github.com/andk/cpanpm
-version: '2.29'
+version: '2.33'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

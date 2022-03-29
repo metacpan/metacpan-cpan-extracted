@@ -263,6 +263,9 @@ t/testfiles/recursiv.muse
 t/testfiles/right.exp.html
 t/testfiles/right.exp.ltx
 t/testfiles/right.muse
+t/testfiles/ruby.exp.html
+t/testfiles/ruby.exp.ltx
+t/testfiles/ruby.muse
 t/testfiles/secondary-fn-recursion.exp.html
 t/testfiles/secondary-fn-recursion.exp.ltx
 t/testfiles/secondary-fn-recursion.muse

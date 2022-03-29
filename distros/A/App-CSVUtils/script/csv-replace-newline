@@ -10,15 +10,16 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-02-10'; # DATE
+our $DATE = '2022-03-27'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '0.036'; # VERSION
+our $VERSION = '0.037'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/CSVUtils/csv_replace_newline",
     program_name => "csv-replace-newline",
     read_config => 0,
     read_env => 0,
+    use_utf8 => 1,
 );
 
 $cmdline->run;
@@ -38,7 +39,7 @@ csv-replace-newline - Replace newlines in CSV values
 
 =head1 VERSION
 
-This document describes version 0.036 of csv-replace-newline (from Perl distribution App-CSVUtils), released on 2022-02-10.
+This document describes version 0.037 of csv-replace-newline (from Perl distribution App-CSVUtils), released on 2022-03-27.
 
 =head1 SYNOPSIS
 
@@ -53,6 +54,10 @@ utility can be used to convert the newline to something else. There are a few
 choices: replace newline with space (C<--with-space>, the default), remove
 newline (C<--with-nothing>), replace with encoded representation
 (C<--with-backslash-n>), or with characters of your choice (C<--with 'blah'>).
+
+I<Common notes for the utilities>
+
+Encoding: The utilities in this module/distribution accept and emit UTF8 text.
 
 =head1 OPTIONS
 

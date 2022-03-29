@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2017-2020 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Tool::Find 0.45;
+package Devel::MAT::Tool::Find 0.46;
 
 use v5.14;
 use warnings;
@@ -505,6 +505,45 @@ sub build
             Devel::MAT::Cmd->format_sv( $cv )
          ),
       };
+   };
+}
+
+package # hide
+   Devel::MAT::Tool::Find::filter::struct;
+use base qw( Devel::MAT::Tool::Find::filter );
+
+=head2 struct
+
+   pmat> find struct Module::Name/Type
+   C_STRUCT(Module::Name/Type) at 0x55e0c3017bf0: Module::Name/Type
+   ...
+
+Searches for SVs that are C structures of the given type name.
+
+=cut
+
+use constant FILTER_DESC => "structs";
+
+use constant FILTER_ARGS => (
+   { name => "name", help => "the structure type name", required => 1 },
+);
+
+sub build
+{
+   my $self = shift;
+   my $inv = shift;
+   my ( $name ) = @_;
+
+   defined $name or
+      die "Expected structure type name for 'struct' filter";
+
+   return sub {
+      my ( $struct ) = @_;
+      return unless $struct->type eq "C_STRUCT";
+      my $type = $struct->structtype;
+      return unless $type->name eq $name;
+
+      return Devel::MAT::Cmd->format_value( $type->name );
    };
 }
 

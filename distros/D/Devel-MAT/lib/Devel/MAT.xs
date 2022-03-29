@@ -85,6 +85,16 @@ struct pmat_sv_code
   long           padnames_at;
 };
 
+struct pmat_sv_struct
+{
+  struct pmat_sv _parent;
+  long           n_fields;
+  struct pmat_sv_struct_field {
+    int   type;
+    long  val;
+  }             *fields;
+};
+
 #if (PERL_REVISION == 5) && (PERL_VERSION < 14)
 static MAGIC *mg_findext(const SV *sv, int type, const MGVTBL *vtbl)
 {
@@ -183,6 +193,8 @@ CODE:
         Newx(ptr, 1, struct pmat_sv_hash); break;
       case 7: /* PMAT_SVtCODE */
         Newx(ptr, 1, struct pmat_sv_code); break;
+      case 0x7F: /* PMAT_SVtSTRUCT */
+        Newx(ptr, 1, struct pmat_sv_struct); break;
       default:
         Newx(ptr, 1, struct pmat_sv); break;
     }
@@ -915,6 +927,79 @@ CODE:
         case 0: RETVAL = cv->file; break;
         case 1: RETVAL = cv->name; break;
       }
+  }
+OUTPUT:
+  RETVAL
+
+MODULE = Devel::MAT                PACKAGE = Devel::MAT::SV::C_STRUCT
+
+long
+structid(self)
+  HV   *self
+ALIAS:
+  structid   = 0
+  blessed_at = 1
+CODE:
+  {
+    struct pmat_sv *sv = get_pmat_sv(self);
+    switch(ix) {
+      case 0: RETVAL = sv->blessed_at; break;
+      case 1: RETVAL = 0;              break;
+    }
+  }
+OUTPUT:
+  RETVAL
+
+void
+_set_struct_fields(self, ...)
+  HV  *self
+CODE:
+  {
+    struct pmat_sv_struct *st = (struct pmat_sv_struct *)get_pmat_sv(self);
+    long n, i;
+
+    n = (items-1) / 2;
+    st->n_fields = n;
+
+    Newx(st->fields, n, struct pmat_sv_struct_field);
+    for(i = 0; i < n; i++) {
+      int type = SvIV(ST(1 + 2*i));
+      st->fields[i].type = type;
+
+      switch(type) {
+        case 0x00: // PTR
+        case 0x01: // BOOL
+        case 0x02: // U8
+        case 0x03: // U32
+        case 0x04: // UINT
+          st->fields[i].val = SvUV(ST(2 + 2*i));
+          break;
+        default:
+          croak("ARGH TODO _set_struct_fields from type=%d\n", type);
+      }
+    }
+  }
+
+long
+n_fields(self)
+  HV  *self
+CODE:
+  {
+    struct pmat_sv_struct *st = (struct pmat_sv_struct *)get_pmat_sv(self);
+    RETVAL = st->n_fields;
+  }
+OUTPUT:
+  RETVAL
+
+long
+field(self, i)
+  HV            *self
+  unsigned long  i
+CODE:
+  {
+    struct pmat_sv_struct *st = (struct pmat_sv_struct *)get_pmat_sv(self);
+    if(i < st->n_fields)
+      RETVAL = st->fields[i].val;
   }
 OUTPUT:
   RETVAL

@@ -5,7 +5,7 @@ package JSON::Schema::Modern::Document::OpenAPI;
 # ABSTRACT: One OpenAPI v3.1 document
 # KEYWORDS: JSON Schema data validation request response OpenAPI
 
-our $VERSION = '0.023';
+our $VERSION = '0.024';
 
 use 5.020;
 use Moo;
@@ -147,6 +147,7 @@ sub traverse ($self, $evaluator) {
   );
 
   if (not $result) {
+    $_->mode('evaluate') foreach $result->errors;
     push $state->{errors}->@*, $result->errors;
     return $state;
   }
@@ -237,7 +238,7 @@ JSON::Schema::Modern::Document::OpenAPI - One OpenAPI v3.1 document
 
 =head1 VERSION
 
-version 0.023
+version 0.024
 
 =head1 SYNOPSIS
 

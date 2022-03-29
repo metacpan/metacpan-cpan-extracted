@@ -4,12 +4,12 @@ use File::Path 'mkpath';
 use File::Copy 'copy';
 use Config;
 
-my $VERSION = '1.04';			# Changelog at end
+my $VERSION = '1.06';			# Changelog at end
 die "Debugging cycle detected"		# set to -1 to allow extra iteration
   if ++$ENV{PERL_DEBUG_MCODE_CYCLE} > 1;
 
 my %opt;
-$opt{$1} = shift while ($ARGV[0] || 0) =~ /^-([dq1OB])$/;
+$opt{$1} = shift while ($ARGV[0] || 0) =~ /^-([dq1OBU])$/;
 if ($opt{1}) {
   open STDERR, '>&STDOUT' or warn "can't redirect STDERR to STDOUT";
 } else {
@@ -20,7 +20,7 @@ my $bd = (my $bd0 = 'dbg-bld') . ($opt{O} || '');
 @ARGV >= 1 or die <<EOP;
 
 Usage:
- $0 [-B] [-d] [-q] [-1] [-O] check-module [failing-script1 failing-script2 ...]
+ $0 [-B] [-U] [-d] [-q] [-1] [-O] check-module [failing-script1 failing-script2 ...]
 
 A tool to simplify remote debugging of build problems for XSUB modules.
 By default, output goes to STDERR (to pass through the test suite wrappers).
@@ -42,9 +42,10 @@ debugging for FAILING-SCRIPTs is done.
 Options:	With -d, prefers dbx to gdb (DEFAULT: prefer gdb).
 		With -q and no FAILING-SCRIPTs, won't print anything unless a
 			failure of loading is detected.
-		With -1, all output goes to STDOUT.
+		With -1, all our output goes to STDOUT.
 		With -O, makes a non-debugging build.
 		With -B, builds in a subdirectory even if no debugger was found.
+		With -U will reuse the build directory if present.
 
 Assumptions:
   Should be run in the root of a distribution, or its immediate subdir.
@@ -66,10 +67,10 @@ $bd .= ($opt{O} || '');
 my ($chk_module) = (shift);
 
 sub report_Makefile ($) {
-  my($f, $in) = shift;
+  my($f, $in) = (shift, '');
   print STDERR "# reporting $f header:\n# ==========================\n";
   open M, "< $f" or die "Can't open $f";
-  $in = <M> while defined $in and $in !~ /MakeMaker \s+ Parameters/xi;
+  ($in =~ /ARGV/ and print STDERR $in), $in = <M> while defined $in and $in !~ /MakeMaker \s+ Parameters/xi;
   $in = <M>;
   $in = <M> while defined $in and $in !~ /\S/;
   print STDERR $in and $in = <M> while defined $in and $in =~ /^#/;
@@ -149,12 +150,11 @@ sub report_no_debugger () {
     unless $dbx or $lldb or $gdb =~ /\b GDB \b | \b Copyright \b .* \b Free Software \b/x;
   die "Can't parse output of `dbx -V -c quit'"
     unless $gdb or $lldb or $dbx =~ /\b dbx \s+ debugger \b/xi;
-  warn "Can't parse output of lldb --version: {{{$lldb}}}"
-    unless $dbx or $gdb or $lldb =~ /\b LLDB \b/x;
+  die "Can't parse output of lldb --version: {{{$lldb}}}"
+    unless $dbx or $gdb or $lldb =~ /\b lldb-\S*\d/x;
 }
 
 $@ = '';
-eval {report_no_debugger() };
 my $postpone = ( eval {report_no_debugger(); 1 } ? '' : "$@" );
 if ($opt{B}) {
   warn "No debugger found.  Nevertheless, I build a new version per -B switch." if $postpone;
@@ -162,53 +162,59 @@ if ($opt{B}) {
   die $postpone if $postpone;
 }
 
-die "Directory $bd exist; won't overwrite" if -d $bd;
-mkdir $bd or die "mkdir $bd: $!";
+my $build_was_OK = -f "$bd/autodebug-make-ok";
+die "Directory $bd exist; won't overwrite" if -d $bd and not ($opt{U} and $build_was_OK);
+mkdir $bd or die "mkdir $bd: $!" unless -d $bd;
 chdir $bd or die "chdir $bd: $!";
 
-open MF, '../MANIFEST' or die "Can't read MANIFEST: $!";
-while (<MF>) {
-  next unless /^\S/;
-  s/\s.*//;
-  my ($f, $d) = m[^((.*/)?.*)];
-  -d $d or mkpath $d if defined $d;	# croak()s itself
-  copy "../$f", $f or die "copy `../$f' to `$f' (inside $bd): $!";
-}
-close MF or die "Can't close MANIFEST: $!";
-
-my(@extraflags, $more, $subst) = 'OPTIMIZE=-g';
-# Work around bugs in Config: 'ccflags' may contain (parts???) of 'optimize'.
-if ($opt{O}) {			# Do not change debugging
-  @extraflags = ();
-} elsif ($Config{ccflags} =~ s/(?<!\S)\Q$Config{optimize}\E(?!\S)//) {
-  # e.g., Strawberry Perl
-  $subst++;
-} elsif ($Config{gccversion} or $Config{cc} =~ /\b\w?cc\b/i) {	# assume cc-flavor
-  #     http://www.cpantesters.org/cpan/report/ef2ee424-1c8e-11e6-b928-8293027c4940
-  #     http://www.cpantesters.org/cpan/report/4837b230-1d9d-11e6-91cb-6b7bc172c7fc
-  # Extra check:
-  $more++ if $Config{optimize} =~ /(?<!\S)-O(\d*|[a-z]?)(?!\S)/;
-}
-if ($more or $subst) {
-  my $FL;
-  $subst++ if ($FL = $Config{ccflags}) =~ s/(?<!\S)-(s|O(\d*|[a-z]?)|fomit-frame-pointer)(?!\S)//g;
-  push @extraflags, qq(CCFLAGS=$FL) if $subst;
-  for my $f (qw(ldflags lddlflags)) {
-    push @extraflags, qq(\U$f\E=$FL)
-      if ($FL = $Config{$f}) =~ s/(?<!\S)-s(?!\S)//g;
+sub do_subdir_build () {
+  open MF, '../MANIFEST' or die "Can't read MANIFEST: $!";
+  while (<MF>) {
+    next unless /^\S/;
+    s/\s.*//;
+    my ($f, $d) = m[^((.*/)?.*)];
+    -d $d or mkpath $d if defined $d;	# croak()s itself
+    copy "../$f", $f or die "copy `../$f' to `$f' (inside $bd): $!";
   }
+  close MF or die "Can't close MANIFEST: $!";
+
+  my(@extraflags, $more, $subst) = 'OPTIMIZE=-g';
+  # Work around bugs in Config: 'ccflags' may contain (parts???) of 'optimize'.
+  if ($opt{O}) {			# Do not change debugging
+    @extraflags = ();
+  } elsif ($Config{ccflags} =~ s/(?<!\S)\Q$Config{optimize}\E(?!\S)//) {
+    # e.g., Strawberry Perl
+    $subst++;
+  } elsif ($Config{gccversion} or $Config{cc} =~ /\b\w?cc\b/i) {	# assume cc-flavor
+    #     http://www.cpantesters.org/cpan/report/ef2ee424-1c8e-11e6-b928-8293027c4940
+    #     http://www.cpantesters.org/cpan/report/4837b230-1d9d-11e6-91cb-6b7bc172c7fc
+    # Extra check:
+    $more++ if $Config{optimize} =~ /(?<!\S)-O(\d*|[a-z]?)(?!\S)/;
+  }
+  if ($more or $subst) {
+    my $FL;
+    $subst++ if ($FL = $Config{ccflags}) =~ s/(?<!\S)-(s|O(\d*|[a-z]?)|fomit-frame-pointer)(?!\S)//g;
+    push @extraflags, qq(CCFLAGS=$FL) if $subst;
+    for my $f (qw(ldflags lddlflags)) {
+      push @extraflags, qq(\U$f\E=$FL)
+        if ($FL = $Config{$f}) =~ s/(?<!\S)-s(?!\S)//g;
+    }
+  }
+
+  system $^X, 'Makefile.PL', @extraflags and die "system(Makefile.PL @extraflags): rc=$?";
+  my $make = $Config{make};
+  $make = 'make' unless defined $make;
+  system $make and die "system($make): rc=$?";
+  { open my $f, '>', 'autodebug-make-ok'; }	# Leave a footprint of a successful build
 }
 
-system $^X, 'Makefile.PL', @extraflags and die "system(Makefile.PL @extraflags): rc=$?";
-my $make = $Config{make};
-$make = 'make' unless defined $make;
-system $make and die "system($make): rc=$?";
+do_subdir_build() unless -f 'autodebug-make-ok';
 
 die $postpone if $postpone;	# Reached without a debugger only with -B
 
 my $p = ($^X =~ m([\\/]) ? $^X : `which perl`) || $^X;
 chomp $p unless $p eq $^X;
-my(@cmd, $ver);
+my(@cmd, $ver, $ver_done, $dscript);
 
 for my $script (@ARGV) {
   $script = "../$script" if not -f $script and -f "../$script";
@@ -230,7 +236,7 @@ EOP
 info w32 thread-information-block
 echo \\n=====================================\\n\\n
 EOE
-    print TT <<EOP;		# Slightly different order than dbx...
+    print TT ($dscript = <<EOP);		# Slightly different order than dbx...
 run -Mblib $script
 echo \\n=====================================\\n\\n
 bt
@@ -253,6 +259,32 @@ EOP
     @cmd = (qw(gdb -batch), "--command=$gdb_in", $p);
   } elsif ($lldb) {
     $ver = $lldb;
+    warn <<EOW;
+
+!!!!  I seem to have found LLDB, but extra work may be needed.  !!!
+!!!!  If you see something like this:                           !!!
+
+  (lldb) run -Mblib t/000_load-problem.t
+  error: process exited with status -1 (developer mode is not enabled on this machine and this is a non-interactive debug session.)
+
+!!!!  Inspect the following recipe                              !!!
+!!!!     from https://developer.apple.com/forums/thread/678032  !!!
+
+  	sudo DevToolsSecurity -enable
+	Developer mode is now enabled.
+
+!!!!  This was Step 1; it should lead to the following error:   !!!
+
+  error: process exited with status -1 (this is a non-interactive debug session, cannot get permission to debug processes.)
+
+!!!!  You also need Step 2 (security implications???):          !!!
+
+	sudo dseditgroup -o edit -a UUU -t user _developer
+	###   replace UUU with your user name.
+
+!!!!  I'm crossing my virtual fingers and proceed.              !!!
+
+EOW
     my $lldb_in = 'lldb-in';
     open TT, ">$lldb_in" or die "Can't open $lldb_in for write: $!";
     # bt full: include local vars (not in 5.0; is in 6.5; is in 6.1, but crashes on 6.3:
@@ -269,7 +301,7 @@ EOP
 script print "??? info w32 thread-information-block"
 script print "\\n=====================================\\n"
 EOE
-    print TT <<EOP;		# Slightly different order than dbx...
+    print TT ($dscript = <<EOP);		# Slightly different order than dbx...
 run -Mblib $script
 script print "\\n=====================================\\n"
 bt
@@ -310,10 +342,10 @@ EOP
 	    qq(run -Mblib $script; echo; echo =================================; echo; where -v; echo; echo =================================; echo; dump; echo; echo =================================; echo; regs; echo; echo =================================; echo; list -i +1; echo; echo =================================; echo; list -i -10; echo; echo =================================; echo; echo ============== up 1:; up; dump; echo; echo ============== up 2:; up; dump; echo; echo ============== up 3:; up; dump; echo; echo ============== up 4:; up; dump; echo ==============; /usr/proc/bin/pmap -F \$proc; quit),
 	    $p);
   }
-  warn 'Running {{{', join('}}} {{{', @cmd), '}}}';
-  system @cmd and die "Running @cmd: rc=$?";
+  warn "\nDebugger's version: $ver\n" unless $ver_done++;
+  warn 'Running {{{', join('}}} {{{', @cmd), "}}}\n\n";
+  system @cmd and die "Running @cmd: rc=$?", ($dscript ? "\n========= script begin\n$dscript\n========= script end\n\t" : '');
 }
-print $ver if @ARGV;
 1;
 
 __END__
@@ -342,3 +374,12 @@ __END__
 		XXX Propagate flags for Makefile.PL???
 1.04	Try to support lldb (untested; mapping of /proc and w32 thread-information-block unsupported).
 	Remove extra quoting from the Makefile.PL command-line.
+1.05	Recognize version string of lldb.
+	Add instructions for enabling security settings for lldb debugging (Apple???).
+	report_no_debugger() was called twice.
+	Debugger's version was reported too late (after a possible die()!).
+	Were emitting a wrong section from Makefile's.
+	Emit MakeMaker's ARGV from Makefile too.
+1.06	Report the script if the debugger failed.
+	Leave ./autodebug-make-ok in the build directory if make was successful.
+	New option -U for using an existing directory with a successful build.

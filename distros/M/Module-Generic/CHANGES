@@ -1,6 +1,10 @@
 Revision history for Perl module Module::Generic
 
-v0.22.1 2022-03-21T15:39:24+0900
+v0.23.0 2022-03-27T20:30:48+0900
+    - Minor improvement in _parse_timestamp
+    - Implemented inline autoloading of some subroutines
+
+v0.22.1 2022-03-21T15:39:24Z +0900
     - Corrected shared memory unit test
 
 v0.22.0 2022-03-18T14:57:40Z +0900

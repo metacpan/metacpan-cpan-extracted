@@ -12,7 +12,7 @@ use App::SpamcupNG
   qw(main_loop read_config %OPTIONS_MAP config_logger);
 use App::SpamcupNG::UserAgent;
 
-our $VERSION = '0.014'; # VERSION
+our $VERSION = '0.015'; # VERSION
 # Delay between HTTP requests. Adjust this if Spamcop.net asks!
 use constant DELAY => 5;
 
@@ -278,6 +278,10 @@ everything logged into a text file (if DEBUG is enabled). See L<App::SpamcupNG> 
 
 Compatibility with the original Spamcup project: you can reuse your configuration file and/or command line options with minor adjustments.
 
+=item *
+
+Can optionally store the SPAM reports details to an local SQLite3 database for further queries, if desirable.
+
 =back
 
 =head2 MOTIVATIONS
@@ -357,8 +361,11 @@ The configuration file must be written as an YAML file, with the exact propertie
     stupid: y
     nothing: n
     alt_code: n
-	verbosity: INFO
+    verbosity: INFO
     alt_user: n
+    database:
+      enabled: true
+      path: /var/spamcupng/reports.db
     Accounts:
       Provider1:
         e-mail: account@provider1.com.br

@@ -1,0 +1,467 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Types::Number::Quaternion
+
+=head1 DESCRIPTION
+
+This class implements ...
+
+=head1 SYNOPSIS
+
+    var a = Quaternion(1,2,3,4)
+    var b = Quaternion(5,6,7,8)
+
+    say a+b     #=> Quaternion(6, 8, 10, 12)
+    say a-b     #=> Quaternion(-4, -4, -4, -4)
+    say a*b     #=> Quaternion(-60, 12, 30, 24)
+    say b*a     #=> Quaternion(-60, 20, 14, 32)
+    say a/b     #=> Quaternion(35/87, 4/87, 0, 8/87)
+
+=head1 INHERITS
+
+Inherits methods from:
+
+       * Sidef::Types::Number::Number
+
+=head1 METHODS
+
+=head2 !=
+
+    a != b
+
+Returns the
+
+Aliases: I<ne>
+
+=cut
+
+=head2 %
+
+    a % b
+
+Returns the
+
+Aliases: I<mod>
+
+=cut
+
+=head2 &
+
+    a & b
+
+Returns the
+
+Aliases: I<and>
+
+=cut
+
+=head2 *
+
+    a * b
+
+Returns the
+
+Aliases: I<mul>
+
+=cut
+
+=head2 **
+
+    a ** b
+
+Returns the
+
+Aliases: I<pow>
+
+=cut
+
+=head2 +
+
+    a + b
+
+Returns the
+
+Aliases: I<add>
+
+=cut
+
+=head2 ++
+
+    a ++ b
+
+Returns the
+
+Aliases: I<inc>
+
+=cut
+
+=head2 -
+
+    a - b
+
+Returns the
+
+Aliases: I<sub>
+
+=cut
+
+=head2 --
+
+    a -- b
+
+Returns the
+
+Aliases: I<dec>
+
+=cut
+
+=head2 /
+
+    a / b
+
+Returns the
+
+Aliases: I<÷>, I<div>
+
+=cut
+
+=head2 <
+
+    a < b
+
+Returns the
+
+Aliases: I<lt>
+
+=cut
+
+=head2 <<
+
+    a << b
+
+Returns the
+
+Aliases: I<lsft>, I<shift_left>
+
+=cut
+
+=head2 <=>
+
+    a <=> b
+
+Returns the
+
+Aliases: I<cmp>
+
+=cut
+
+=head2 ==
+
+    a == b
+
+Returns the
+
+Aliases: I<eq>
+
+=cut
+
+=head2 >
+
+    a > b
+
+Returns the
+
+Aliases: I<gt>
+
+=cut
+
+=head2 >>
+
+    a >> b
+
+Returns the
+
+Aliases: I<rsft>, I<shift_right>
+
+=cut
+
+=head2 ^
+
+    a ^ b
+
+Returns the
+
+Aliases: I<xor>
+
+=cut
+
+=head2 |
+
+    a | b
+
+Returns the
+
+Aliases: I<or>
+
+=cut
+
+=head2 ≤
+
+    a ≤ b
+
+Returns the
+
+Aliases: I<E<lt>=>, I<le>
+
+=cut
+
+=head2 ≥
+
+    a ≥ b
+
+Returns the
+
+Aliases: I<E<gt>=>, I<ge>
+
+=cut
+
+=head2 a
+
+    Quaternion.a()
+
+Returns the
+
+Aliases: I<re>, I<real>
+
+=cut
+
+=head2 abs
+
+    Quaternion.abs()
+
+Returns the
+
+=cut
+
+=head2 b
+
+    Quaternion.b()
+
+Returns the
+
+=cut
+
+=head2 c
+
+    Quaternion.c()
+
+Returns the
+
+=cut
+
+=head2 ceil
+
+    Quaternion.ceil()
+
+Returns the
+
+=cut
+
+=head2 conj
+
+    Quaternion.conj()
+
+Returns the
+
+=cut
+
+=head2 d
+
+    Quaternion.d()
+
+Returns the
+
+=cut
+
+=head2 dump
+
+    Quaternion.dump()
+
+Returns the
+
+=cut
+
+=head2 eval
+
+    Quaternion.eval()
+
+Returns the
+
+=cut
+
+=head2 float
+
+    Quaternion.float()
+
+Returns the
+
+=cut
+
+=head2 floor
+
+    Quaternion.floor()
+
+Returns the
+
+=cut
+
+=head2 inv
+
+    Quaternion.inv()
+
+Returns the
+
+=cut
+
+=head2 invmod
+
+    Quaternion.invmod()
+
+Returns the
+
+=cut
+
+=head2 is_coprime
+
+    Quaternion.is_coprime()
+
+Returns the
+
+=cut
+
+=head2 is_mone
+
+    Quaternion.is_mone()
+
+Returns the
+
+=cut
+
+=head2 is_one
+
+    Quaternion.is_one()
+
+Returns the
+
+=cut
+
+=head2 is_zero
+
+    Quaternion.is_zero()
+
+Returns the
+
+=cut
+
+=head2 neg
+
+    Quaternion.neg()
+
+Returns the
+
+=cut
+
+=head2 new
+
+    Quaternion.new()
+
+Returns the
+
+Aliases: I<call>
+
+=cut
+
+=head2 norm
+
+    Quaternion.norm()
+
+Returns the
+
+=cut
+
+=head2 parts
+
+    Quaternion.parts()
+
+Returns the
+
+=cut
+
+=head2 powmod
+
+    Quaternion.powmod()
+
+Returns the
+
+=cut
+
+=head2 reals
+
+    Quaternion.reals()
+
+Returns the
+
+=cut
+
+=head2 round
+
+    Quaternion.round()
+
+Returns the
+
+=cut
+
+=head2 sgn
+
+    Quaternion.sgn()
+
+Returns the
+
+=cut
+
+=head2 sqr
+
+    Quaternion.sqr()
+
+Returns the
+
+=cut
+
+=head2 to_c
+
+    Quaternion.to_c()
+
+Returns the
+
+Aliases: I<to_n>
+
+=cut
+
+=head2 to_gauss
+
+    Quaternion.to_gauss()
+
+Returns the
+
+=cut
+
+=head2 to_s
+
+    Quaternion.to_s()
+
+Returns the
+
+=cut

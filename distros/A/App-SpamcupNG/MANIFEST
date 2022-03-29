@@ -10,6 +10,7 @@ README.md
 TODO.txt
 bin/spamcup
 cpanfile
+db.sql
 dist.ini
 lib/App/SpamcupNG.pm
 lib/App/SpamcupNG/Error.pm
@@ -20,6 +21,7 @@ lib/App/SpamcupNG/Error/Mailhost.pm
 lib/App/SpamcupNG/HTMLParse.pm
 lib/App/SpamcupNG/Summary.pm
 lib/App/SpamcupNG/Summary/Receiver.pm
+lib/App/SpamcupNG/Summary/Recorder.pm
 lib/App/SpamcupNG/UserAgent.pm
 lib/App/SpamcupNG/Warning.pm
 lib/App/SpamcupNG/Warning/Factory.pm
@@ -28,10 +30,10 @@ perlcriticrc
 perltidyrc
 t/00-report-prereqs.dd
 t/00-report-prereqs.t
-t/07-main.t
 t/Fixture.pm
 t/UserAgent.pm
 t/basic.t
+t/config/sample.yaml
 t/error.t
 t/exports.t
 t/find_errors.t
@@ -41,6 +43,9 @@ t/find_next_id.t
 t/find_receivers.t
 t/find_warnings.t
 t/forms.t
+t/main.t
+t/read_config.t
+t/recorder.t
 t/responses/after_login.html
 t/responses/bounce_error.html
 t/responses/boundary.html

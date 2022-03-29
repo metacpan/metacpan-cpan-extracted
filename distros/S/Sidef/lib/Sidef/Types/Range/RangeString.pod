@@ -25,17 +25,17 @@ Inherits methods from:
 
 =head2 call
 
-RangeString.call() -> I<Obj>
+    RangeString.call()
 
-Return the
+Returns the
 
 =cut
 
 =head2 contain
 
-RangeString.contain() -> I<Obj>
+    RangeString.contain()
 
-Return the
+Returns the
 
 Aliases: I<include>, I<contains>, I<includes>
 
@@ -43,57 +43,57 @@ Aliases: I<include>, I<contains>, I<includes>
 
 =head2 from
 
-RangeString.from() -> I<Obj>
+    RangeString.from()
 
-Return the
+Returns the
 
 =cut
 
 =head2 iter
 
-RangeString.iter() -> I<Obj>
+    RangeString.iter()
 
-Return the
+Returns the
 
 =cut
 
 =head2 max
 
-RangeString.max() -> I<Obj>
+    RangeString.max()
 
-Return the
+Returns the
 
 =cut
 
 =head2 min
 
-RangeString.min() -> I<Obj>
+    RangeString.min()
 
-Return the
+Returns the
 
 =cut
 
 =head2 new
 
-RangeString.new() -> I<Obj>
+    RangeString.new()
 
-Return the
+Returns the
 
 =cut
 
 =head2 pick
 
-RangeString.pick() -> I<Obj>
+    RangeString.pick()
 
-Return the
+Returns the
 
 =cut
 
 =head2 rand
 
-RangeString.rand() -> I<Obj>
+    RangeString.rand()
 
-Return the
+Returns the
 
 Aliases: I<sample>
 
@@ -101,17 +101,17 @@ Aliases: I<sample>
 
 =head2 to
 
-RangeString.to() -> I<Obj>
+    RangeString.to()
 
-Return the
+Returns the
 
 =cut
 
 =head2 to_s
 
-RangeString.to_s() -> I<Obj>
+    RangeString.to_s()
 
-Return the
+Returns the
 
 Aliases: I<dump>, I<to_str>
 

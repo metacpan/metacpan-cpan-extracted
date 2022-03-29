@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-Systemd
 #
-# This software is Copyright (c) 2008-2021 by Dominique Dumont.
+# This software is Copyright (c) 2008-2022 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -44,14 +44,11 @@ L<systemd.resource-control(5)>,
 which configure resource control settings for the processes of the
 service.
 
-If a service is requested under a certain name but no unit
-configuration file is found, systemd looks for a SysV init script
-by the same name (with the C<.service> suffix
-removed) and dynamically creates a service unit from that script.
-This is useful for compatibility with SysV. Note that this
-compatibility is quite comprehensive but not 100%. For details
-about the incompatibilities, see the L<Incompatibilities
-with SysV|https://www.freedesktop.org/wiki/Software/systemd/Incompatibilities> document.
+If SysV init compat is enabled, systemd automatically creates service units that wrap SysV init
+scripts (the service name is the same as the name of the script, with a C<.service>
+suffix added); see
+L<systemd-sysv-generator(8)>.
+
 
 The L<systemd-run(1)>
 command allows creating C<.service> and C<.scope> units dynamically
@@ -89,6 +86,18 @@ C<simple> possibly delays the boot process, as the service manager needs to wait
 initialization to complete. It is hence recommended not to needlessly use any types other than
 C<simple>. (Also note it is generally not recommended to use C<idle> or
 C<oneshot> for long-running services.)",
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'ExitType',
+      {
+        'description' => 'Specifies when the manager should consider the service to be finished. One of C<main> or
+C<cgroup>:
+
+It is generally recommended to use C<ExitType>C<main> when a service has
+a known forking model and a main process can reliably be determined. C<ExitType>C<cgroup> is meant for applications whose forking model is not known ahead of time and which
+might not have a specific main process. It is well suited for transient or automatically generated services,
+such as graphical applications inside of a desktop environment.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -570,6 +579,15 @@ the service repeats C<EXTEND_TIMEOUT_USEC=\x{2026}> within the interval specifie
 shutdown is achieved by C<STOPPING=1> (or termination). (see
 L<sd_notify(3)>).
 ",
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'RuntimeRandomizedExtraSec',
+      {
+        'description' => 'This option modifies C<RuntimeMaxSec> by increasing the maximum runtime by an
+evenly distributed duration between 0 and the specified value (in seconds). If C<RuntimeMaxSec> is
+unspecified, then this feature will be disabled.
+',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },

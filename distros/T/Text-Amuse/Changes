@@ -1,5 +1,9 @@
 Revision history for perl module Text::Amuse
 
+1.81 2022-03-29
+
+ - EXPERIMENTAL feature: Support <ruby>lower|upper</ruby>
+
 1.80 2022-02-12
 
  - EXPERIMENTAL feature: support language switch with <[ISO]></[ISO]>

@@ -2,9 +2,9 @@ NAME
     ArrayData::Lingua::Word::EN::Wordle - Wordle words (English)
 
 VERSION
-    This document describes version 20220306.0.0 of
+    This document describes version 20220306.0.1 of
     ArrayData::Lingua::Word::EN::Wordle (from Perl distribution
-    ArrayData-Lingua-Word-EN-Wordle), released on 2022-03-06.
+    ArrayData-Lingua-Word-EN-Wordle), released on 2022-03-27.
 
 SYNOPSIS
      use ArrayData::Lingua::Word::EN::Wordle;

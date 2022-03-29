@@ -1,0 +1,104 @@
+NAME
+    XML::Enc - XML::Enc Encryption Support
+
+VERSION
+    version 0.03
+
+SYNOPSIS
+        my $decrypter = XML::Enc->new(
+                                    {
+                                        key                         => 't/sign-private.pem',
+                                        no_xml_declaration          => 1,
+                                    },
+                                );
+        $decrypted = $enc->decrypt($xml);
+
+        my $encrypter = XML::Enc->new(
+                                    {
+                                        cert                => 't/sign-certonly.pem',
+                                        no_xml_declaration  => 1,
+                                        data_enc_method     => 'aes256-cbc',
+                                        key_transport       => 'rsa-1_5',
+
+                                    },
+                                );
+        $encrypted = $enc->encrypt($xml);
+
+NAME
+    XML::Enc - XML Encryption
+
+METHODS
+  new( ... )
+    Constructor. Creates an instance of the XML::Enc object
+
+    Arguments:
+
+    key Filename of the private key to be used for decryption.
+
+    cert
+        Filename of the public key to be used for encryption.
+
+    no_xml_declaration
+        Do not return the XML declaration if true (1). Return it if false
+        (0). This is useful for decrypting documents without the declaration
+        such as SAML2 Responses.
+
+    data_enc_method
+        Specify the data encryption method to be used. Supported methods
+        are:
+
+        Used in encryption. Optional. Default method: aes256-cbc
+
+        *   tripledes-cbc
+            <https://www.w3.org/TR/2002/REC-xmlenc-core-20021210/Overview.ht
+            ml#tripledes-cbc>
+
+        *   aes128-cbc
+            <https://www.w3.org/TR/2002/REC-xmlenc-core-20021210/Overview.ht
+            ml#aes128-cbc>
+
+        *   aes196-cbc
+            <https://www.w3.org/TR/2002/REC-xmlenc-core-20021210/Overview.ht
+            ml#aes192-cbc>
+
+        *   aes256-cbc
+            <https://www.w3.org/TR/2002/REC-xmlenc-core-20021210/Overview.ht
+            ml#aes256-cbc>
+
+    key_transport
+        Specify the encryption method to be used for key transport.
+        Supported methods are:
+
+        Used in encryption. Optional. Default method: rsa-1_5
+
+        *   rsa-1_5
+            <https://www.w3.org/TR/2002/REC-xmlenc-core-20021210/Overview.ht
+            ml#rsa-1_5>
+
+        *   rsa-oaep-mgf1p
+            <https://www.w3.org/TR/2002/REC-xmlenc-core-20021210/Overview.ht
+            ml#rsa-oaep-mgf1p>
+
+  decrypt( ... )
+    Main decryption function.
+
+    Arguments:
+
+    xml XML containing the encrypted data.
+
+  encrypt( ... )
+    Main encryption function.
+
+    Arguments:
+
+    xml XML containing the plaintext data.
+
+AUTHOR
+    Timothy Legge <timlegge@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2022 by TImothy Legge.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

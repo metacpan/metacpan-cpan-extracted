@@ -6,9 +6,9 @@ use warnings;
 #use utf8;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-02-14'; # DATE
+our $DATE = '2022-03-27'; # DATE
 our $DIST = 'Text-Table-More'; # DIST
-our $VERSION = '0.023'; # VERSION
+our $VERSION = '0.025'; # VERSION
 
 # see Module::Features for more details on this
 our %FEATURES = (
@@ -661,7 +661,7 @@ Text::Table::More - Generate text table with simple interface and many options
 
 =head1 VERSION
 
-This document describes version 0.023 of Text::Table::More (from Perl distribution Text-Table-More), released on 2022-02-14.
+This document describes version 0.025 of Text::Table::More (from Perl distribution Text-Table-More), released on 2022-03-27.
 
 =head1 SYNOPSIS
 
@@ -796,9 +796,12 @@ then the output will be something like:
 
 =head1 DESCRIPTION
 
-This module uses the simple interface of L<Text::Table::Tiny> (0.04) with
-support for more formatting options like column/row spans, border style,
-per-row/column/cell align/valign.
+Text::Table::More is yet another text table rendering module. This module uses
+the simple interface of L<Text::Table::Tiny> with support for more formatting
+options like column/row spans, border style, per-row/column/cell
+align/valign/pad/vpad/hpad, and so on. At the time of this writing,
+Text::Table::More is the only text table module on CPAN that supports
+rowspans/colspans.
 
 Keywords: rowspan, colspan.
 

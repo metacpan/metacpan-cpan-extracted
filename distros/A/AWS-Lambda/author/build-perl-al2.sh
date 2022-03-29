@@ -34,12 +34,12 @@ curl -fsSL --compressed https://git.io/cpm | perl -i -pe 's(^#!.*perl$)(#!/opt/b
 install /tmp/cpm /opt/bin/cpm
 
 # Net::SSLeay needs special CCFLAGS and LIBS to link
-PERL_MM_OPT="INSTALLDIRS=vendor INSTALLMAN1DIR=none INSTALLMAN3DIR=none" /opt/bin/cpanm --notest Net::SSLeay@1.90
+PERL_MM_OPT="INSTALLDIRS=vendor INSTALLMAN1DIR=none INSTALLMAN3DIR=none" /opt/bin/cpanm --notest Net::SSLeay@1.92
 
 /opt/bin/cpanm --notest \
     AWS::XRay@0.11 \
-    JSON@4.03 \
-    Cpanel::JSON::XS@4.26 \
+    JSON@4.05 \
+    Cpanel::JSON::XS@4.27 \
     JSON::XS@4.03 \
     JSON::MaybeXS@1.004003 \
     YAML@1.30 \

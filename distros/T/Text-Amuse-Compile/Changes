@@ -1,5 +1,9 @@
 Revision history for perl module Text::Amuse::Compile
 
+1.84 2022-03-29
+
+ - EXPERIMENTAL feature: Support <ruby>lower|upper</ruby>
+
 1.83 2022-02-26
 
  - Add option to set the paragraph indentation

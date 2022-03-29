@@ -149,7 +149,7 @@ dependency cannot be specified directly. I< Optional. Type list of uniline.  >
 
 =head2 Upholds
 
-Configures dependencies similar to C<Wants>, but as long a this unit
+Configures dependencies similar to C<Wants>, but as long as this unit
 is up, all units listed in C<Upholds> are started whenever found to be inactive or
 failed, and no job is queued for them. While a C<Wants> dependency on another unit
 has a one-time effect when this units started, a C<Upholds> dependency on it has a
@@ -952,6 +952,57 @@ comparisons are supported for versioned parameters (e.g. C<VERSION_ID>). The
 comparator can be one of C<<>, C<<=>, C<=>,
 C<!=>, C<>=> and C<>>. I< Optional. Type list of uniline.  > 
 
+=head2 ConditionMemoryPressure
+
+Verify that the overall system (memory, CPU or IO) pressure is below or equal to a threshold.
+This setting takes a threshold value as argument. It can be specified as a simple percentage value,
+suffixed with C<%>, in which case the pressure will be measured as an average over the last
+five minutes before the attempt to start the unit is performed.
+Alternatively, the average timespan can also be specified using C</> as a separator, for
+example: C<10%/1min>. The supported timespans match what the kernel provides, and are
+limited to C<10sec>, C<1min> and C<5min>. The
+C<full> PSI will be checked first, and if not found C<some> will be
+checked. For more details, see the documentation on L<PSI (Pressure Stall Information)
+|https://www.kernel.org/doc/html/latest/accounting/psi.html>.
+
+Optionally, the threshold value can be prefixed with the slice unit under which the pressure will be checked,
+followed by a C<:>. If the slice unit is not specified, the overall system pressure will be measured,
+instead of a particular cgroup's. I< Optional. Type list of uniline.  > 
+
+=head2 ConditionCPUPressure
+
+Verify that the overall system (memory, CPU or IO) pressure is below or equal to a threshold.
+This setting takes a threshold value as argument. It can be specified as a simple percentage value,
+suffixed with C<%>, in which case the pressure will be measured as an average over the last
+five minutes before the attempt to start the unit is performed.
+Alternatively, the average timespan can also be specified using C</> as a separator, for
+example: C<10%/1min>. The supported timespans match what the kernel provides, and are
+limited to C<10sec>, C<1min> and C<5min>. The
+C<full> PSI will be checked first, and if not found C<some> will be
+checked. For more details, see the documentation on L<PSI (Pressure Stall Information)
+|https://www.kernel.org/doc/html/latest/accounting/psi.html>.
+
+Optionally, the threshold value can be prefixed with the slice unit under which the pressure will be checked,
+followed by a C<:>. If the slice unit is not specified, the overall system pressure will be measured,
+instead of a particular cgroup's. I< Optional. Type list of uniline.  > 
+
+=head2 ConditionIOPressure
+
+Verify that the overall system (memory, CPU or IO) pressure is below or equal to a threshold.
+This setting takes a threshold value as argument. It can be specified as a simple percentage value,
+suffixed with C<%>, in which case the pressure will be measured as an average over the last
+five minutes before the attempt to start the unit is performed.
+Alternatively, the average timespan can also be specified using C</> as a separator, for
+example: C<10%/1min>. The supported timespans match what the kernel provides, and are
+limited to C<10sec>, C<1min> and C<5min>. The
+C<full> PSI will be checked first, and if not found C<some> will be
+checked. For more details, see the documentation on L<PSI (Pressure Stall Information)
+|https://www.kernel.org/doc/html/latest/accounting/psi.html>.
+
+Optionally, the threshold value can be prefixed with the slice unit under which the pressure will be checked,
+followed by a C<:>. If the slice unit is not specified, the overall system pressure will be measured,
+instead of a particular cgroup's. I< Optional. Type list of uniline.  > 
+
 =head2 AssertArchitecture
 
 Similar to the C<ConditionArchitecture>,
@@ -1265,6 +1316,42 @@ requirements are not met, and when this is something the administrator or user s
 into. I< Optional. Type uniline.  > 
 
 =head2 AssertOSRelease
+
+Similar to the C<ConditionArchitecture>,
+C<ConditionVirtualization>, …, condition settings described above, these settings
+add assertion checks to the start-up of the unit. However, unlike the conditions settings, any
+assertion setting that is not met results in failure of the start job (which means this is logged
+loudly). Note that hitting a configured assertion does not cause the unit to enter the
+C<failed> state (or in fact result in any state change of the unit), it affects
+only the job queued for it. Use assertion expressions for units that cannot operate when specific
+requirements are not met, and when this is something the administrator or user should look
+into. I< Optional. Type uniline.  > 
+
+=head2 AssertMemoryPressure
+
+Similar to the C<ConditionArchitecture>,
+C<ConditionVirtualization>, …, condition settings described above, these settings
+add assertion checks to the start-up of the unit. However, unlike the conditions settings, any
+assertion setting that is not met results in failure of the start job (which means this is logged
+loudly). Note that hitting a configured assertion does not cause the unit to enter the
+C<failed> state (or in fact result in any state change of the unit), it affects
+only the job queued for it. Use assertion expressions for units that cannot operate when specific
+requirements are not met, and when this is something the administrator or user should look
+into. I< Optional. Type uniline.  > 
+
+=head2 AssertCPUPressure
+
+Similar to the C<ConditionArchitecture>,
+C<ConditionVirtualization>, …, condition settings described above, these settings
+add assertion checks to the start-up of the unit. However, unlike the conditions settings, any
+assertion setting that is not met results in failure of the start job (which means this is logged
+loudly). Note that hitting a configured assertion does not cause the unit to enter the
+C<failed> state (or in fact result in any state change of the unit), it affects
+only the job queued for it. Use assertion expressions for units that cannot operate when specific
+requirements are not met, and when this is something the administrator or user should look
+into. I< Optional. Type uniline.  > 
+
+=head2 AssertIOPressure
 
 Similar to the C<ConditionArchitecture>,
 C<ConditionVirtualization>, …, condition settings described above, these settings

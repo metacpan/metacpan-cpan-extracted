@@ -8,8 +8,6 @@ use warnings;
 use 5.016;
 use ExtUtils::MakeMaker;
 
-die "OS unsupported\n" if $^O eq 'MSWin32';
-
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Look up location information by IP address",
   "AUTHOR" => "Andreas V\x{f6}gele <voegelas\@cpan.org>",
@@ -32,7 +30,7 @@ my %WriteMakefileArgs = (
     "Test::Mojo" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }

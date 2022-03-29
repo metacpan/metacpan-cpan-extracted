@@ -90,32 +90,32 @@
    "provides" : {
       "HTML::Entities" : {
          "file" : "lib/HTML/Entities.pm",
-         "version" : "3.77"
+         "version" : "3.78"
       },
       "HTML::Filter" : {
          "file" : "lib/HTML/Filter.pm",
-         "version" : "3.77",
+         "version" : "3.78",
          "x_deprecated" : 1
       },
       "HTML::HeadParser" : {
          "file" : "lib/HTML/HeadParser.pm",
-         "version" : "3.77"
+         "version" : "3.78"
       },
       "HTML::LinkExtor" : {
          "file" : "lib/HTML/LinkExtor.pm",
-         "version" : "3.77"
+         "version" : "3.78"
       },
       "HTML::Parser" : {
          "file" : "lib/HTML/Parser.pm",
-         "version" : "3.77"
+         "version" : "3.78"
       },
       "HTML::PullParser" : {
          "file" : "lib/HTML/PullParser.pm",
-         "version" : "3.77"
+         "version" : "3.78"
       },
       "HTML::TokeParser" : {
          "file" : "lib/HTML/TokeParser.pm",
-         "version" : "3.77"
+         "version" : "3.78"
       }
    },
    "release_status" : "stable",
@@ -130,7 +130,7 @@
          "web" : "https://github.com/libwww-perl/HTML-Parser"
       }
    },
-   "version" : "3.77",
+   "version" : "3.78",
    "x_contributors" : [
       "Antonio Radici <antonio@dyne.org>",
       "Barbie <barbie@missbarbell.co.uk>",
@@ -144,6 +144,7 @@
       "Jacques Germishuys <jacquesg@striata.com>",
       "Jess Robinson <castaway@desert-island.me.uk>",
       "Jon Jensen <jon@endpoint.com>",
+      "Michal Josef \u0160pa\u010dek <mspacek@redhat.com>",
       "Mike South <msouth@gmail.com>",
       "Nicholas Clark <nick@ccl4.org>",
       "Nicolas R <nicolas@atoomic.org>",
@@ -154,7 +155,7 @@
       "Yves Orton <demerphq@gmail.com>",
       "Zefram <zefram@fysh.org>"
    ],
-   "x_generated_by_perl" : "v5.34.0",
+   "x_generated_by_perl" : "v5.34.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }

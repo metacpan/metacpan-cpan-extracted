@@ -11,8 +11,14 @@ This class implements ...
 
 =head1 SYNOPSIS
 
-var obj = Quadratic(...)
+    var x = Quadratic(3, 4, 5)  # represents: 3 + 4*sqrt(5)
+    var y = Quadratic(6, 1, 2)  # represents: 6 + sqrt(2)
 
+    say x**10       #=> (29578174649, 13203129720, 5)
+    say y**10       #=> (253025888, 176008128, 2)
+
+    say x.powmod(100, 97)   #=> (83, 42, 5)
+    say y.powmod(100, 97)   #=> (83, 39, 2)
 
 =head1 INHERITS
 
@@ -24,9 +30,9 @@ Inherits methods from:
 
 =head2 !=
 
-I<Obj> B<!=> I<Obj> -> I<Obj>
+    a != b
 
-Return the
+Returns the
 
 Aliases: I<ne>
 
@@ -34,9 +40,9 @@ Aliases: I<ne>
 
 =head2 %
 
-I<Obj> B<%> I<Obj> -> I<Obj>
+    a % b
 
-Return the
+Returns the
 
 Aliases: I<mod>
 
@@ -44,9 +50,9 @@ Aliases: I<mod>
 
 =head2 &
 
-I<Obj> B<&> I<Obj> -> I<Obj>
+    a & b
 
-Return the
+Returns the
 
 Aliases: I<and>
 
@@ -54,9 +60,9 @@ Aliases: I<and>
 
 =head2 *
 
-I<Obj> B<*> I<Obj> -> I<Obj>
+    a * b
 
-Return the
+Returns the
 
 Aliases: I<mul>
 
@@ -64,9 +70,9 @@ Aliases: I<mul>
 
 =head2 **
 
-I<Obj> B<**> I<Obj> -> I<Obj>
+    a ** b
 
-Return the
+Returns the
 
 Aliases: I<pow>
 
@@ -74,9 +80,9 @@ Aliases: I<pow>
 
 =head2 +
 
-I<Obj> B<+> I<Obj> -> I<Obj>
+    a + b
 
-Return the
+Returns the
 
 Aliases: I<add>
 
@@ -84,9 +90,9 @@ Aliases: I<add>
 
 =head2 ++
 
-I<Obj> B<++> I<Obj> -> I<Obj>
+    a ++ b
 
-Return the
+Returns the
 
 Aliases: I<inc>
 
@@ -94,9 +100,9 @@ Aliases: I<inc>
 
 =head2 -
 
-I<Obj> B<-> I<Obj> -> I<Obj>
+    a - b
 
-Return the
+Returns the
 
 Aliases: I<sub>
 
@@ -104,9 +110,9 @@ Aliases: I<sub>
 
 =head2 --
 
-I<Obj> B<--> I<Obj> -> I<Obj>
+    a -- b
 
-Return the
+Returns the
 
 Aliases: I<dec>
 
@@ -114,9 +120,9 @@ Aliases: I<dec>
 
 =head2 /
 
-I<Obj> B</> I<Obj> -> I<Obj>
+    a / b
 
-Return the
+Returns the
 
 Aliases: I<÷>, I<div>
 
@@ -124,9 +130,9 @@ Aliases: I<÷>, I<div>
 
 =head2 <
 
-I<Obj> B<E<lt>> I<Obj> -> I<Obj>
+    a < b
 
-Return the
+Returns the
 
 Aliases: I<lt>
 
@@ -134,9 +140,9 @@ Aliases: I<lt>
 
 =head2 <<
 
-I<Obj> B<E<lt>E<lt>> I<Obj> -> I<Obj>
+    a << b
 
-Return the
+Returns the
 
 Aliases: I<lsft>, I<shift_left>
 
@@ -144,9 +150,9 @@ Aliases: I<lsft>, I<shift_left>
 
 =head2 <=>
 
-I<Obj> B<E<lt>=E<gt>> I<Obj> -> I<Obj>
+    a <=> b
 
-Return the
+Returns the
 
 Aliases: I<cmp>
 
@@ -154,9 +160,9 @@ Aliases: I<cmp>
 
 =head2 ==
 
-I<Obj> B<==> I<Obj> -> I<Obj>
+    a == b
 
-Return the
+Returns the
 
 Aliases: I<eq>
 
@@ -164,9 +170,9 @@ Aliases: I<eq>
 
 =head2 >
 
-I<Obj> B<E<gt>> I<Obj> -> I<Obj>
+    a > b
 
-Return the
+Returns the
 
 Aliases: I<gt>
 
@@ -174,9 +180,9 @@ Aliases: I<gt>
 
 =head2 >>
 
-I<Obj> B<E<gt>E<gt>> I<Obj> -> I<Obj>
+    a >> b
 
-Return the
+Returns the
 
 Aliases: I<rsft>, I<shift_right>
 
@@ -184,9 +190,9 @@ Aliases: I<rsft>, I<shift_right>
 
 =head2 ^
 
-I<Obj> B<^> I<Obj> -> I<Obj>
+    a ^ b
 
-Return the
+Returns the
 
 Aliases: I<xor>
 
@@ -194,9 +200,9 @@ Aliases: I<xor>
 
 =head2 |
 
-I<Obj> B<|> I<Obj> -> I<Obj>
+    a | b
 
-Return the
+Returns the
 
 Aliases: I<or>
 
@@ -204,9 +210,9 @@ Aliases: I<or>
 
 =head2 ≤
 
-I<Obj> B<≤> I<Obj> -> I<Obj>
+    a ≤ b
 
-Return the
+Returns the
 
 Aliases: I<E<lt>=>, I<le>
 
@@ -214,9 +220,9 @@ Aliases: I<E<lt>=>, I<le>
 
 =head2 ≥
 
-I<Obj> B<≥> I<Obj> -> I<Obj>
+    a ≥ b
 
-Return the
+Returns the
 
 Aliases: I<E<gt>=>, I<ge>
 
@@ -224,149 +230,141 @@ Aliases: I<E<gt>=>, I<ge>
 
 =head2 a
 
-Quadratic.a() -> I<Obj>
+    Quadratic.a()
 
-Return the
+Returns the
 
-Aliases: I<real>
+Aliases: I<re>, I<real>
 
 =cut
 
 =head2 abs
 
-Quadratic.abs() -> I<Obj>
+    Quadratic.abs()
 
-Return the
+Returns the
 
 =cut
 
 =head2 b
 
-Quadratic.b() -> I<Obj>
+    Quadratic.b()
 
-Return the
+Returns the
 
-Aliases: I<imag>
+Aliases: I<im>, I<imag>
 
 =cut
 
 =head2 ceil
 
-Quadratic.ceil() -> I<Obj>
+    Quadratic.ceil()
 
-Return the
+Returns the
 
 =cut
 
 =head2 conj
 
-Quadratic.conj() -> I<Obj>
+    Quadratic.conj()
 
-Return the
+Returns the
 
 =cut
 
 =head2 dump
 
-Quadratic.dump() -> I<Obj>
+    Quadratic.dump()
 
-Return the
+Returns the
+
+=cut
+
+=head2 eval
+
+    Quadratic.eval()
+
+Returns the
 
 =cut
 
 =head2 float
 
-Quadratic.float() -> I<Obj>
+    Quadratic.float()
 
-Return the
+Returns the
 
 =cut
 
 =head2 floor
 
-Quadratic.floor() -> I<Obj>
+    Quadratic.floor()
 
-Return the
+Returns the
 
 =cut
 
 =head2 inv
 
-Quadratic.inv() -> I<Obj>
+    Quadratic.inv()
 
-Return the
+Returns the
 
 =cut
 
 =head2 invmod
 
-Quadratic.invmod() -> I<Obj>
+    Quadratic.invmod()
 
-Return the
+Returns the
 
 =cut
 
 =head2 is_coprime
 
-Quadratic.is_coprime() -> I<Obj>
+    Quadratic.is_coprime()
 
-Return the
-
-=cut
-
-=head2 is_imag
-
-Quadratic.is_imag() -> I<Obj>
-
-Return the
+Returns the
 
 =cut
 
 =head2 is_mone
 
-Quadratic.is_mone() -> I<Obj>
+    Quadratic.is_mone()
 
-Return the
+Returns the
 
 =cut
 
 =head2 is_one
 
-Quadratic.is_one() -> I<Obj>
+    Quadratic.is_one()
 
-Return the
-
-=cut
-
-=head2 is_real
-
-Quadratic.is_real() -> I<Obj>
-
-Return the
+Returns the
 
 =cut
 
 =head2 is_zero
 
-Quadratic.is_zero() -> I<Obj>
+    Quadratic.is_zero()
 
-Return the
+Returns the
 
 =cut
 
 =head2 neg
 
-Quadratic.neg() -> I<Obj>
+    Quadratic.neg()
 
-Return the
+Returns the
 
 =cut
 
 =head2 new
 
-Quadratic.new() -> I<Obj>
+    Quadratic.new()
 
-Return the
+Returns the
 
 Aliases: I<call>
 
@@ -374,65 +372,65 @@ Aliases: I<call>
 
 =head2 norm
 
-Quadratic.norm() -> I<Obj>
+    Quadratic.norm()
 
-Return the
+Returns the
+
+=cut
+
+=head2 parts
+
+    Quadratic.parts()
+
+Returns the
 
 =cut
 
 =head2 powmod
 
-Quadratic.powmod() -> I<Obj>
+    Quadratic.powmod()
 
-Return the
-
-=cut
-
-=head2 ratmod
-
-Quadratic.ratmod() -> I<Obj>
-
-Return the
+Returns the
 
 =cut
 
 =head2 reals
 
-Quadratic.reals() -> I<Obj>
+    Quadratic.reals()
 
-Return the
+Returns the
 
 =cut
 
 =head2 round
 
-Quadratic.round() -> I<Obj>
+    Quadratic.round()
 
-Return the
+Returns the
 
 =cut
 
 =head2 sgn
 
-Quadratic.sgn() -> I<Obj>
+    Quadratic.sgn()
 
-Return the
+Returns the
 
 =cut
 
 =head2 sqr
 
-Quadratic.sqr() -> I<Obj>
+    Quadratic.sqr()
 
-Return the
+Returns the
 
 =cut
 
 =head2 to_c
 
-Quadratic.to_c() -> I<Obj>
+    Quadratic.to_c()
 
-Return the
+Returns the
 
 Aliases: I<to_n>
 
@@ -440,17 +438,17 @@ Aliases: I<to_n>
 
 =head2 to_s
 
-Quadratic.to_s() -> I<Obj>
+    Quadratic.to_s()
 
-Return the
+Returns the
 
 =cut
 
 =head2 w
 
-Quadratic.w() -> I<Obj>
+    Quadratic.w()
 
-Return the
+Returns the
 
 Aliases: I<order>
 

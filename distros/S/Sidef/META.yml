@@ -17,7 +17,7 @@ name: Sidef
 provides:
   Sidef:
     file: lib/Sidef.pm
-    version: v3.97.1
+    version: '22.03'
   Sidef::Deparse::Perl:
     file: lib/Sidef/Deparse/Perl.pm
   Sidef::Deparse::Sidef:
@@ -92,14 +92,20 @@ provides:
     file: lib/Sidef/Types/Null/Null.pm
   Sidef::Types::Number::Complex:
     file: lib/Sidef/Types/Number/Complex.pm
+  Sidef::Types::Number::Fraction:
+    file: lib/Sidef/Types/Number/Fraction.pm
   Sidef::Types::Number::Gauss:
     file: lib/Sidef/Types/Number/Gauss.pm
   Sidef::Types::Number::Mod:
     file: lib/Sidef/Types/Number/Mod.pm
   Sidef::Types::Number::Number:
     file: lib/Sidef/Types/Number/Number.pm
+  Sidef::Types::Number::Polynomial:
+    file: lib/Sidef/Types/Number/Polynomial.pm
   Sidef::Types::Number::Quadratic:
     file: lib/Sidef/Types/Number/Quadratic.pm
+  Sidef::Types::Number::Quaternion:
+    file: lib/Sidef/Types/Number/Quaternion.pm
   Sidef::Types::Range::Range:
     file: lib/Sidef/Types/Range/Range.pm
   Sidef::Types::Range::RangeNumber:
@@ -121,8 +127,6 @@ provides:
   Sidef::Variable::NamedParam:
     file: lib/Sidef/Variable/NamedParam.pm
 recommends:
-  Data::Dump: '0'
-  Data::Dump::Filtered: '0'
   Digest::MD5: '0'
   Digest::SHA: '0'
   File::Find: '0'
@@ -135,6 +139,8 @@ requires:
   Algorithm::Combinatorics: '0'
   Algorithm::Loops: '0'
   Cwd: '0'
+  Data::Dump: '0'
+  Data::Dump::Filtered: '0'
   Encode: '0'
   Fcntl: '0'
   File::Basename: '0'
@@ -144,7 +150,7 @@ requires:
   Getopt::Std: '0'
   List::Util: '1.33'
   Math::GMPq: '0.45'
-  Math::GMPz: '0.39'
+  Math::GMPz: '0.48'
   Math::MPC: '0'
   Math::MPFR: '3.36'
   Math::Prime::Util::GMP: '0.52'
@@ -162,5 +168,5 @@ resources:
   homepage: https://github.com/trizen/sidef
   license: http://www.perlfoundation.org/artistic_license_2_0
   repository: https://github.com/trizen/sidef
-version: v3.97.1
+version: '22.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

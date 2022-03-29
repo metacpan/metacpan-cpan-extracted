@@ -1,6 +1,10 @@
 Revision history for App-DBBrowser
 
 
+2.294    2022-03-26
+       - Update plain data input.
+       - Bugfix in GetContent.
+
 2.293    2022-03-08
        - Bugfix encode json.
 

@@ -124,6 +124,7 @@ examples/migration/README.md
 examples/migration/run_example.pl
 examples/misc/get_all_image_assets.pl
 examples/misc/get_all_videos_and_images.pl
+examples/misc/navigate_search_result_pages_caching_tokens.pl
 examples/misc/set_custom_client_timeouts.pl
 examples/misc/upload_image.pl
 examples/misc/upload_image_asset.pl
@@ -162,6 +163,7 @@ examples/reporting/get_hotel_ads_performance.pl
 examples/reporting/get_keyword_stats.pl
 examples/reporting/parallel_report_download.pl
 examples/shopping_ads/add_listing_scope.pl
+examples/shopping_ads/add_performance_max_product_listing_group_tree.pl
 examples/shopping_ads/add_performance_max_retail_campaign.pl
 examples/shopping_ads/add_shopping_product_ad.pl
 examples/shopping_ads/add_shopping_product_listing_group_tree.pl

@@ -4,7 +4,7 @@ use Mojo::Base -signatures, -strict;
 use Mojo::Util qw(extract_usage getopt);
 use Mojo::File qw(path);
 
-my $daemon_class = $ENV{MOJO_SERVER_DAEMON_CONTROL_CLASS} || 'Mojo::Server::DaemonControl';
+my $daemon_class = $ENV{MOJODCTL_CONTROL_CLASS} || 'Mojo::Server::DaemonControl';
 die $@ unless eval "require $daemon_class; 1";
 my $daemon = $daemon_class->new;
 
@@ -18,12 +18,15 @@ getopt
   'H|heartbeat-timeout=i'  => sub { $daemon->$maybe(heartbeat_timeout  => $_[1]) },
   'l|listen=s'             => \my @listen,
   'P|pid-file=s'           => sub { $daemon->$maybe(pid_file => path($_[1])) },
-  'w|workers=i'            => sub { $daemon->$maybe(workers  => $_[1]) };
+  'R|reload'               => \my $reload,
+  'w|workers=i'            => sub { $daemon->$maybe(workers => $_[1]) };
 
 die extract_usage if $help || !(my $app = shift);
 
 $daemon->listen([map { Mojo::URL->new($_) } @listen]) if @listen;
-$daemon->run($app);
+_exit($reload ? $daemon->reload($app) : $daemon->run($app));
+
+sub _exit ($code) { $code //= 0; defined wantarray ? $code : exit $code }
 
 =encoding utf8
 
@@ -33,8 +36,13 @@ $daemon->run($app);
 
   Usage: mojodctcl [OPTIONS] [APPLICATION]
 
+    # Start a manager
     mojodctcl ./script/my_app
     mojodctcl -m production -l http://127.0.0.1:8080 ./myapp.pl
+    mojodctcl -P /tmp/myapp.pid ./myapp.pl
+
+    # Hot deploy a running manager
+    mojodctcl -R -P /tmp/myapp.pid ./myapp.pl
 
   Options:
     -G, --graceful-timeout <seconds>     Graceful timeout, defaults to 120.
@@ -47,6 +55,7 @@ $daemon->run($app);
                                          MOJO_MODE/PLACK_ENV or "development"
     -P, --pid-file <path>                Path to process id file, defaults to
                                          "mojodctl.pid" in a temporary directory
+    -R, --reload                         Used to hot deploy a running manager
     -w, --workers <number>               Number of workers, defaults to 4
     -h, --help                           Show this summary of available options
 

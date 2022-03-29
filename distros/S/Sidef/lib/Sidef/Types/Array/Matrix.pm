@@ -9,11 +9,27 @@ package Sidef::Types::Array::Matrix {
 
     require List::Util;
 
-    my %array_like = (
-                      'Sidef::Types::Array::Array'  => 1,
-                      'Sidef::Types::Array::Matrix' => 1,
-                      'Sidef::Types::Array::Pair'   => 1,
-                     );
+    sub _is_matrix {
+        my ($self) = @_;
+
+        my $ref = ref($self);
+
+        if ($ref eq __PACKAGE__) {
+            return 1;
+        }
+
+        if ($ref and UNIVERSAL::isa($self, 'Sidef::Types::Array::Array')) {
+
+            foreach my $row (@$self) {    # each row must an array-like object
+                ref($row) and UNIVERSAL::isa($row, 'Sidef::Types::Array::Array')
+                  or return 0;
+            }
+
+            return 1;
+        }
+
+        return 0;
+    }
 
     sub new {
         my (undef, @rows) = @_;
@@ -37,7 +53,7 @@ package Sidef::Types::Array::Matrix {
         my ($self) = @_;
         my $rows = $#{$self};
         $rows < 0 and return ((Sidef::Types::Number::Number::ZERO) x 2);
-        (Sidef::Types::Number::Number->_set_uint($rows + 1), Sidef::Types::Number::Number->_set_uint($#{$self->[0]} + 1));
+        (Sidef::Types::Number::Number::_set_int($rows + 1), Sidef::Types::Number::Number::_set_int($#{$self->[0]} + 1));
     }
 
     sub build {
@@ -55,10 +71,10 @@ package Sidef::Types::Array::Matrix {
 #<<<
         bless [
             map {
-                my $i = Sidef::Types::Number::Number->_set_uint($_);
+                my $i = Sidef::Types::Number::Number::_set_int($_);
                 bless([map {
                     $block->run(
-                        $i, Sidef::Types::Number::Number->_set_uint($_)
+                        $i, Sidef::Types::Number::Number::_set_int($_)
                     );
                 } 0 .. $m-1], 'Sidef::Types::Array::Array')
             } 0 .. $n-1
@@ -260,7 +276,7 @@ package Sidef::Types::Array::Matrix {
     sub add {
         my ($m1, $m2) = @_;
 
-        if (exists $array_like{ref($m2)}) {
+        if (_is_matrix($m2)) {
             return bless($m1->wise_operator('+', $m2));
         }
 
@@ -270,7 +286,7 @@ package Sidef::Types::Array::Matrix {
     sub sub {
         my ($m1, $m2) = @_;
 
-        if (exists $array_like{ref($m2)}) {
+        if (_is_matrix($m2)) {
             return bless($m1->wise_operator('-', $m2));
         }
 
@@ -280,7 +296,7 @@ package Sidef::Types::Array::Matrix {
     sub div {
         my ($m1, $m2) = @_;
 
-        if (exists $array_like{ref($m2)}) {
+        if (_is_matrix($m2)) {
             return $m1->mul($m2->inv);
         }
 
@@ -290,7 +306,7 @@ package Sidef::Types::Array::Matrix {
     sub mul {
         my ($m1, $m2) = @_;
 
-        if (not exists $array_like{ref($m2)}) {
+        if (!_is_matrix($m2)) {
             return bless($m1->scalar_operator('*', $m2));
         }
 
@@ -325,28 +341,18 @@ package Sidef::Types::Array::Matrix {
 
     sub floor {
         my ($self) = @_;
-
-        bless [
-            map {
-                bless [map { $_->floor } @$_], 'Sidef::Types::Array::Array'
-              } @$self
-        ];
+        bless($self->scalar_operator('floor'));
     }
 
     sub ceil {
         my ($self) = @_;
-
-        bless [
-            map {
-                bless [map { $_->ceil } @$_], 'Sidef::Types::Array::Array'
-              } @$self
-        ];
+        bless($self->scalar_operator('ceil'));
     }
 
     sub mod {
         my ($m1, $m2) = @_;
 
-        if (exists $array_like{ref($m2)}) {
+        if (_is_matrix($m2)) {
             return $m1->sub($m2->mul($m1->div($m2)->floor));
         }
 
@@ -356,7 +362,7 @@ package Sidef::Types::Array::Matrix {
     sub and {
         my ($m1, $m2) = @_;
 
-        if (exists $array_like{ref($m2)}) {
+        if (_is_matrix($m2)) {
             return bless($m1->wise_operator('&', $m2));
         }
 
@@ -366,7 +372,7 @@ package Sidef::Types::Array::Matrix {
     sub or {
         my ($m1, $m2) = @_;
 
-        if (exists $array_like{ref($m2)}) {
+        if (_is_matrix($m2)) {
             return bless($m1->wise_operator('|', $m2));
         }
 
@@ -376,7 +382,7 @@ package Sidef::Types::Array::Matrix {
     sub xor {
         my ($m1, $m2) = @_;
 
-        if (exists $array_like{ref($m2)}) {
+        if (_is_matrix($m2)) {
             return bless($m1->wise_operator('^', $m2));
         }
 
@@ -567,7 +573,7 @@ package Sidef::Types::Array::Matrix {
 
         foreach my $row (@$A) {
             foreach my $i (0 .. $#{$row}) {
-                $row->[$i] = $row->[$i]->ratmod($mod);
+                $row->[$i] = $row->[$i]->mod($mod);
             }
         }
 
@@ -719,7 +725,7 @@ package Sidef::Types::Array::Matrix {
     sub concat {
         my ($m1, $m2) = @_;
 
-        if (exists $array_like{ref($m2)}) {
+        if (_is_matrix($m2)) {
 
             my $end = List::Util::min($#{$m1}, $#{$m2});
 
@@ -779,7 +785,7 @@ package Sidef::Types::Array::Matrix {
     sub column_count {
         my ($A) = @_;
         @$A || return Sidef::Types::Number::Number::ZERO;
-        Sidef::Types::Number::Number->_set_uint(scalar @{$A->[0]});
+        Sidef::Types::Number::Number::_set_int(scalar @{$A->[0]});
     }
 
     *column_len  = \&column_count;
@@ -790,7 +796,7 @@ package Sidef::Types::Array::Matrix {
 
     sub row_count {
         my ($A) = @_;
-        Sidef::Types::Number::Number->_set_uint(scalar @$A);
+        Sidef::Types::Number::Number::_set_int(scalar @$A);
     }
 
     *row_len  = \&row_count;

@@ -19,26 +19,36 @@ our @ISA = qw(Exporter);
 
 our @EXPORT = qw(
   OBJ_sn2nid
+  EVP_MD_size
+  EVP_MD_block_size
+  EVP_get_digestbyname
+  EC_POINT_point2hex
+  EC_POINT_hex2point
+  EC_GROUP_get_curve
+  EC_POINT_set_affine_coordinates
+  EC_POINT_get_affine_coordinates
+  EC_POINT_point2hex
+  EC_POINT_hex2point
 
   sgn0_m_eq_1
   calc_c1_c2_for_sswu
-  map_to_curve_sswu
-  map_to_curve_sswu_optimized
+  map_to_curve_sswu_not_straight_line
+  map_to_curve_sswu_straight_line
   get_hash2curve_params
   map_to_curve
   encode_to_curve
   hash_to_curve
   clear_cofactor
   digest
-
   hash_to_field
   expand_message_xmd
   sn2z
+  hex2point
 );
 
 our @EXPORT_OK = @EXPORT;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 require XSLoader;
 XSLoader::load( 'Crypt::OpenSSL::Hash2Curve', $VERSION );
@@ -52,7 +62,7 @@ our %H2C_CNF = (
     'sswu' => {
       z                 => '-10',
       calc_c1_c2_func   => \&calc_c1_c2_for_sswu,
-      map_to_curve_func => \&map_to_curve_sswu_optimized,
+      map_to_curve_func => \&map_to_curve_sswu_straight_line,
     },
   },
 );
@@ -64,16 +74,23 @@ sub get_hash2curve_params {
   my $group = Crypt::OpenSSL::EC::EC_GROUP::new_by_curve_name( $nid );
   my $ctx   = Crypt::OpenSSL::Bignum::CTX->new();
 
-  my $z = sn2z( $group_name, $type );
 
   my $p = Crypt::OpenSSL::Bignum->new();
   my $a = Crypt::OpenSSL::Bignum->new();
   my $b = Crypt::OpenSSL::Bignum->new();
   EC_GROUP_get_curve( $group, $p, $a, $b, $ctx );
 
-  my $c1 = Crypt::OpenSSL::Bignum->new();
-  my $c2 = Crypt::OpenSSL::Bignum->new();
-  $H2C_CNF{$group_name}{$type}{calc_c1_c2_func}->( $c1, $c2, $p, $a, $b, $z, $ctx );
+  my $c1;
+  my $c2;
+  my $z;
+  if($type){
+      $z = sn2z( $group_name, $type );
+
+      $c1 = Crypt::OpenSSL::Bignum->new();
+      $c2 = Crypt::OpenSSL::Bignum->new();
+      $H2C_CNF{$group_name}{$type}{calc_c1_c2_func}->( $c1, $c2, $p, $a, $b, $z, $ctx );
+  }
+
   return [ $group, $c1, $c2, $p, $a, $b, $z, $ctx ];
 } ## end sub get_hash2curve_params
 
@@ -101,7 +118,7 @@ sub hash_to_curve {
   my $P = Crypt::OpenSSL::EC::EC_POINT::new( $group );
   clear_cofactor( $group, $P, $Q, $ctx );
 
-  return $P;
+  return wantarray ? ($P, $params_ref) : $P;
 } ## end sub hash_to_curve
 
 sub encode_to_curve {
@@ -116,7 +133,7 @@ sub encode_to_curve {
 
   my $u = $res[0][0];
   my $P = map_to_curve( $params_ref, $group_name, $type, $u, $clear_cofactor_flag );
-  return $P;
+  return wantarray ? ($P, $params_ref) : $P;
 }
 
 sub map_to_curve {
@@ -130,7 +147,7 @@ sub map_to_curve {
 
   my $Q = Crypt::OpenSSL::EC::EC_POINT::new( $group );
   Crypt::OpenSSL::EC::EC_POINT::new( $group );
-  Crypt::OpenSSL::EC::EC_POINT::set_affine_coordinates( $group, $Q, $x, $y, $ctx );
+  EC_POINT_set_affine_coordinates( $group, $Q, $x, $y, $ctx );
 
   return $Q unless ( $clear_cofactor_flag );
 

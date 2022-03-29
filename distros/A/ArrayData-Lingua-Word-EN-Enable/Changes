@@ -1,3 +1,9 @@
+0.003   2022-03-27  Released-By: PERLANCAR; Urgency: medium
+
+        - Specify minimum version of prereq
+          ArrayDataRole::Source::LinesInDATA (0.006) (RT#141756).
+
+
 0.002   2022-03-06  Released-By: PERLANCAR; Urgency: medium
 
         - Fix Abstract.

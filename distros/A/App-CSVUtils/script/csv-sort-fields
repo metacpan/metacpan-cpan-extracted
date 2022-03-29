@@ -10,15 +10,16 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-02-10'; # DATE
+our $DATE = '2022-03-27'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '0.036'; # VERSION
+our $VERSION = '0.037'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/CSVUtils/csv_sort_fields",
     program_name => "csv-sort-fields",
     read_config => 0,
     read_env => 0,
+    use_utf8 => 1,
 );
 
 $cmdline->run;
@@ -38,7 +39,7 @@ csv-sort-fields - Sort CSV fields
 
 =head1 VERSION
 
-This document describes version 0.036 of csv-sort-fields (from Perl distribution App-CSVUtils), released on 2022-02-10.
+This document describes version 0.037 of csv-sort-fields (from Perl distribution App-CSVUtils), released on 2022-03-27.
 
 =head1 SYNOPSIS
 
@@ -62,6 +63,10 @@ Example output CSV:
 
 You can also reverse the sort order (C<-r>), sort case-insensitively (C<-i>), or
 provides the ordering, e.g. C<--example a,c,b>.
+
+I<Common notes for the utilities>
+
+Encoding: The utilities in this module/distribution accept and emit UTF8 text.
 
 =head1 OPTIONS
 

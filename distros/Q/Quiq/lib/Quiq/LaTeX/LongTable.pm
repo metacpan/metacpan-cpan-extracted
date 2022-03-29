@@ -81,7 +81,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.200';
+our $VERSION = '1.201';
 
 # -----------------------------------------------------------------------------
 
@@ -439,7 +439,7 @@ sub latex {
 
 =head1 VERSION
 
-1.200
+1.201
 
 =head1 AUTHOR
 

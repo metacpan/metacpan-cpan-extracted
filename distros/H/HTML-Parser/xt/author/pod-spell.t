@@ -39,9 +39,11 @@ Jacques
 Jensen
 Jess
 Jon
+Josef
 LinkExtor
 MSIE
 Michael
+Michal
 Mike
 Nicholas
 Nicolas
@@ -87,6 +89,7 @@ jon
 lib
 mchase
 msouth
+mspacek
 nick
 nicolas
 olaf
@@ -97,3 +100,4 @@ toddr
 undecoded
 ville
 zefram
+Špaček

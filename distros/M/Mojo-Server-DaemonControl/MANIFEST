@@ -1,4 +1,3 @@
-.pls_cache/index
 Changes
 cpanfile
 lib/Mojo/Server/DaemonControl.pm
@@ -13,6 +12,7 @@ t/heartbeat.t
 t/hot-deploy.t
 t/load.t
 t/myapp.pl
+t/ppid.t
 t/signals.t
 t/spawn.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

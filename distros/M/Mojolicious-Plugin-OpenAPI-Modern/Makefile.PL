@@ -6,7 +6,7 @@
 use strict;
 use warnings;
 
-use 5.020000;
+use 5.020;
 use ExtUtils::MakeMaker;
 
 BEGIN {
@@ -79,13 +79,15 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Mojolicious-Plugin-OpenAPI-Modern",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.020000",
+  "MIN_PERL_VERSION" => "5.020",
   "NAME" => "Mojolicious::Plugin::OpenAPI::Modern",
   "PL_FILES" => {},
   "PREREQ_PM" => {
     "Feature::Compat::Try" => 0,
-    "JSON::MaybeXS" => 0,
+    "JSON::Schema::Modern" => "0.549",
+    "JSON::Schema::Modern::Document::OpenAPI" => "0.024",
     "Mojo::Base" => 0,
+    "Mojo::JSON" => 0,
     "OpenAPI::Modern" => "0.022",
     "Path::Tiny" => 0,
     "Safe::Isa" => 0,
@@ -97,14 +99,17 @@ my %WriteMakefileArgs = (
   },
   "TEST_REQUIRES" => {
     "File::Spec" => 0,
+    "JSON::Schema::Modern::Utilities" => 0,
     "Module::Metadata" => 0,
+    "Test::Deep" => 0,
     "Test::Mojo" => 0,
     "Test::More" => "0.88",
+    "constant" => 0,
     "experimental" => 0,
     "lib" => 0,
     "open" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -113,15 +118,20 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Feature::Compat::Try" => 0,
   "File::Spec" => 0,
-  "JSON::MaybeXS" => 0,
+  "JSON::Schema::Modern" => "0.549",
+  "JSON::Schema::Modern::Document::OpenAPI" => "0.024",
+  "JSON::Schema::Modern::Utilities" => 0,
   "Module::Metadata" => 0,
   "Mojo::Base" => 0,
+  "Mojo::JSON" => 0,
   "OpenAPI::Modern" => "0.022",
   "Path::Tiny" => 0,
   "Safe::Isa" => 0,
+  "Test::Deep" => 0,
   "Test::Mojo" => 0,
   "Test::More" => "0.88",
   "YAML::PP" => 0,
+  "constant" => 0,
   "experimental" => 0,
   "if" => 0,
   "lib" => 0,

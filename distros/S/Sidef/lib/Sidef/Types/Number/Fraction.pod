@@ -1,0 +1,372 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Types::Number::Fraction
+
+=head1 DESCRIPTION
+
+This class implements ...
+
+=head1 SYNOPSIS
+
+    var a = Fraction(3, 4)
+    var b = Fraction(5, 7)
+
+    say a*b     #=> Fraction(15, 28)
+    say a+b     #=> Fraction(41, 28)
+
+=head1 INHERITS
+
+Inherits methods from:
+
+       * Sidef::Types::Number::Number
+
+=head1 METHODS
+
+=head2 !=
+
+    a != b
+
+Returns the
+
+Aliases: I<ne>
+
+=cut
+
+=head2 %
+
+    a % b
+
+Returns the
+
+Aliases: I<mod>
+
+=cut
+
+=head2 &
+
+    a & b
+
+Returns the
+
+Aliases: I<and>
+
+=cut
+
+=head2 *
+
+    a * b
+
+Returns the
+
+Aliases: I<mul>
+
+=cut
+
+=head2 **
+
+    a ** b
+
+Returns the
+
+Aliases: I<pow>
+
+=cut
+
+=head2 +
+
+    a + b
+
+Returns the
+
+Aliases: I<add>
+
+=cut
+
+=head2 ++
+
+    a ++ b
+
+Returns the
+
+Aliases: I<inc>
+
+=cut
+
+=head2 -
+
+    a - b
+
+Returns the
+
+Aliases: I<sub>
+
+=cut
+
+=head2 --
+
+    a -- b
+
+Returns the
+
+Aliases: I<dec>
+
+=cut
+
+=head2 /
+
+    a / b
+
+Returns the
+
+Aliases: I<÷>, I<div>
+
+=cut
+
+=head2 <
+
+    a < b
+
+Returns the
+
+Aliases: I<lt>
+
+=cut
+
+=head2 <<
+
+    a << b
+
+Returns the
+
+Aliases: I<lsft>
+
+=cut
+
+=head2 <=>
+
+    a <=> b
+
+Returns the
+
+Aliases: I<cmp>
+
+=cut
+
+=head2 ==
+
+    a == b
+
+Returns the
+
+Aliases: I<eq>
+
+=cut
+
+=head2 >
+
+    a > b
+
+Returns the
+
+Aliases: I<gt>
+
+=cut
+
+=head2 >>
+
+    a >> b
+
+Returns the
+
+Aliases: I<rsft>
+
+=cut
+
+=head2 ^
+
+    a ^ b
+
+Returns the
+
+Aliases: I<xor>
+
+=cut
+
+=head2 |
+
+    a | b
+
+Returns the
+
+Aliases: I<or>
+
+=cut
+
+=head2 ≤
+
+    a ≤ b
+
+Returns the
+
+Aliases: I<E<lt>=>, I<le>
+
+=cut
+
+=head2 ≥
+
+    a ≥ b
+
+Returns the
+
+Aliases: I<E<gt>=>, I<ge>
+
+=cut
+
+=head2 ceil
+
+    Fraction.ceil()
+
+Returns the
+
+=cut
+
+=head2 de
+
+    Fraction.de()
+
+Returns the
+
+Aliases: I<den>, I<denominator>
+
+=cut
+
+=head2 eval
+
+    Fraction.eval()
+
+Returns the
+
+=cut
+
+=head2 floor
+
+    Fraction.floor()
+
+Returns the
+
+=cut
+
+=head2 is_mone
+
+    Fraction.is_mone()
+
+Returns the
+
+=cut
+
+=head2 is_nan
+
+    Fraction.is_nan()
+
+Returns the
+
+=cut
+
+=head2 is_one
+
+    Fraction.is_one()
+
+Returns the
+
+=cut
+
+=head2 is_real
+
+    Fraction.is_real()
+
+Returns the
+
+=cut
+
+=head2 is_zero
+
+    Fraction.is_zero()
+
+Returns the
+
+=cut
+
+=head2 neg
+
+    Fraction.neg()
+
+Returns the
+
+=cut
+
+=head2 new
+
+    Fraction.new()
+
+Returns the
+
+Aliases: I<call>
+
+=cut
+
+=head2 nu
+
+    Fraction.nu()
+
+Returns the
+
+Aliases: I<num>, I<numerator>
+
+=cut
+
+=head2 nude
+
+    Fraction.nude()
+
+Returns the
+
+=cut
+
+=head2 round
+
+    Fraction.round()
+
+Returns the
+
+=cut
+
+=head2 to_n
+
+    Fraction.to_n()
+
+Returns the
+
+Aliases: I<lift>
+
+=cut
+
+=head2 to_s
+
+    Fraction.to_s()
+
+Returns the
+
+Aliases: I<dump>
+
+=cut
+
+=head2 trunc
+
+    Fraction.trunc()
+
+Returns the
+
+=cut

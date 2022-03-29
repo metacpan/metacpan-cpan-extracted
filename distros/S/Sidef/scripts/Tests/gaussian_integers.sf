@@ -1,5 +1,7 @@
 #!/usr/bin/ruby
 
+# Tests for the "Gauss" class.
+
 var r = (-2 .. 2)
 
 for a in (r), b in (r), c in (r), d in (r) {
@@ -35,8 +37,8 @@ func gaussian_sum(n) {
 
 var arr = 10.of(gaussian_sum)
 
-assert_eq(arr.map{.head}, [0, 1, 2, 4, 16, 104, 624, 3648, 29184, 302976])
-assert_eq(arr.map{.tail}, [0, 0, 1, 3, 6, 30, 300, 2100, 11760, 105840])
+assert_eq(arr.map{.head}, %n[0, 1, 2, 4, 16, 104, 624, 3648, 29184, 302976])
+assert_eq(arr.map{.tail}, %n[0, 0, 1, 3, 6, 30, 300, 2100, 11760, 105840])
 
 do {
     var m = 10001
@@ -201,6 +203,70 @@ params.each_2d {|a,b,c,d|
             assert_eq(gcd(r2.re-1, m), 274177)
         }
     }
+}
+
+do {
+    var a = Gauss(3,4)**10
+    var b = Gauss(3,4).powmod(97, 1234)
+
+    assert_eq([a.reals], [reals(Gauss(3,4)**10)])
+    assert_eq([b.reals], [reals(Gauss(3,4).powmod(97, 1234))])
+    assert_eq([reals(a+b)], [reals(Gauss(reals(a)) + Gauss(reals(b)))])
+    assert_eq([reals(a-b)], [reals(Gauss(reals(a)) - Gauss(reals(b)))])
+
+    assert_eq([a.reals], [reals(Quadratic(3,4,-1)**10)])
+    assert_eq([b.reals], [reals(Quadratic(3,4,-1).powmod(97, 1234))])
+    assert_eq([reals(a+b)], [reals(Quadratic(reals(a),-1) + Quadratic(reals(b),-1))])
+    assert_eq([reals(a-b)], [reals(Quadratic(reals(a),-1) - Quadratic(reals(b),-1))])
+}
+
+assert_eq(  # OEIS: A006495
+    with (Gauss(1, 2)) {|g| 20.of { g**_ -> real } },
+    %n[1, 1, -3, -11, -7, 41, 117, 29, -527, -1199, 237, 6469, 11753, -8839, -76443, -108691, 164833, 873121, 922077, -2521451]
+)
+
+do {
+    func lucasUVmod(P, Q, n, m) {
+
+        var D = (P*P - 4*Q)
+
+        var a = Quadratic(P, +1, D)/2
+        var b = Quadratic(P, -1, D)/2
+
+        var x = Mod(a, m)**n
+        var y = Mod(b, m)**n
+
+        ((x-y).lift.b, (x+y).lift.a)
+    }
+
+    var P = 43
+    var Q = -11
+    var n = 10000000
+    var m = 1e9+1
+
+    assert_eq([lucasUVmod(P, Q, n, m)], [::lucasUVmod(P, Q, n, m)])
+}
+
+do {
+    func lucasUVmod(P, Q, n, m) {
+
+        var D = (P*P - 4*Q)
+
+        var a = Quadratic(Mod(P, m), +1, D)/2
+        var b = Quadratic(Mod(P, m), -1, D)/2
+
+        var x = a**n
+        var y = b**n
+
+        ((x-y).b.lift, (x+y).a.lift)
+    }
+
+    var P = 97
+    var Q = 11
+    var n = 10000
+    var m = 1e9-1
+
+    assert_eq([lucasUVmod(P, Q, n, m)], [::lucasUVmod(P, Q, n, m)])
 }
 
 say "** Test passed!"

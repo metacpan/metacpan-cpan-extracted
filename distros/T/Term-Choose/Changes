@@ -1,6 +1,10 @@
 Revision history for Term::Choose
 
 
+1.747   2022-03-26
+    - Update documentation.
+    - Code refactoring.
+
 1.746   2022-03-13
     - Char-width-tables: Arabic numbers in category 'Cf' to print-width 1.
     - Char-width-tables: update to Unicode 14.

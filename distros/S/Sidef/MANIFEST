@@ -72,14 +72,20 @@ lib/Sidef/Types/Null/Null.pm
 lib/Sidef/Types/Null/Null.pod
 lib/Sidef/Types/Number/Complex.pm
 lib/Sidef/Types/Number/Complex.pod
+lib/Sidef/Types/Number/Fraction.pm
+lib/Sidef/Types/Number/Fraction.pod
 lib/Sidef/Types/Number/Gauss.pm
 lib/Sidef/Types/Number/Gauss.pod
 lib/Sidef/Types/Number/Mod.pm
 lib/Sidef/Types/Number/Mod.pod
 lib/Sidef/Types/Number/Number.pm
 lib/Sidef/Types/Number/Number.pod
+lib/Sidef/Types/Number/Polynomial.pm
+lib/Sidef/Types/Number/Polynomial.pod
 lib/Sidef/Types/Number/Quadratic.pm
 lib/Sidef/Types/Number/Quadratic.pod
+lib/Sidef/Types/Number/Quaternion.pm
+lib/Sidef/Types/Number/Quaternion.pod
 lib/Sidef/Types/Range/Range.pm
 lib/Sidef/Types/Range/Range.pod
 lib/Sidef/Types/Range/RangeNumber.pm
@@ -184,6 +190,23 @@ scripts/Expensive/thiele_interpolation_formula.sf
 scripts/Expensive/zebra_puzzle.sf
 scripts/Expensive/zhang_suen_thinning_algorithm.sf
 scripts/extend_your_language.sf
+'scripts/Extended tests/digits2num.pl'
+'scripts/Extended tests/inverse_sigma.sf'
+'scripts/Extended tests/is_carmichael.sf'
+'scripts/Extended tests/is_over_psp.sf'
+'scripts/Extended tests/is_super_psp.sf'
+'scripts/Extended tests/lucas_carmichael_negative.sf'
+'scripts/Extended tests/lucas_carmichael_positive.sf'
+'scripts/Extended tests/lucas_sequences.sf'
+'scripts/Extended tests/mertens_function.sf'
+'scripts/Extended tests/nth_prime.sf'
+'scripts/Extended tests/nth_prime_near_powers_of_10.sf'
+'scripts/Extended tests/prime_bounds.sf'
+'scripts/Extended tests/prime_count.sf'
+'scripts/Extended tests/prime_power_count.sf'
+'scripts/Extended tests/range_sum.sf'
+'scripts/Extended tests/sqrtmod.pl'
+'scripts/Extended tests/sumdigits.pl'
 scripts/fast_fourier_transform.sf
 scripts/faulhaber_s_formula.sf
 scripts/fibonacci_sequence.sf
@@ -417,6 +440,7 @@ scripts/RosettaCode/intersection_of_two_lines.sf
 scripts/RosettaCode/kaprekar_numbers.sf
 scripts/RosettaCode/knapsack_problem_continuous.sf
 scripts/RosettaCode/knight_s_tour.sf
+scripts/RosettaCode/kolakoski_sequence.sf
 scripts/RosettaCode/largest_int_from_concatenated_ints.sf
 scripts/RosettaCode/last_sunday_of_each_month.sf
 scripts/RosettaCode/left_factorials.sf
@@ -471,6 +495,7 @@ scripts/RosettaCode/modular_inverse.sf
 scripts/RosettaCode/most_frequent_k_chars_distance.sf
 scripts/RosettaCode/move_to_front_algorithm_1.sf
 scripts/RosettaCode/move_to_front_algorithm_2.sf
+scripts/RosettaCode/MRG32k3a.sf
 scripts/RosettaCode/multifactorial.sf
 scripts/RosettaCode/multiple_distinct_objects.sf
 scripts/RosettaCode/multiplication_tables.sf
@@ -490,6 +515,7 @@ scripts/RosettaCode/pangram_checker.sf
 scripts/RosettaCode/partial_function_application.sf
 scripts/RosettaCode/pascal_s_triangle.sf
 scripts/RosettaCode/pascal_s_triangle_puzzle.sf
+scripts/RosettaCode/PCG32.sf
 scripts/RosettaCode/perfect_shuffle.sf
 scripts/RosettaCode/perlin_noise.sf
 scripts/RosettaCode/permutations_by_swapping.sf
@@ -592,6 +618,8 @@ scripts/RosettaCode/sorting_algorithms_stooge_sort.sf
 scripts/RosettaCode/sorting_algorithms_strand_sort.sf
 scripts/RosettaCode/spiral_matrix.sf
 scripts/RosettaCode/split_repchar_string.sf
+scripts/RosettaCode/Splitmix64.sf
+scripts/RosettaCode/square_but_not_cube.sf
 scripts/RosettaCode/stable_marriage_problem.sf
 scripts/RosettaCode/stack.sf
 scripts/RosettaCode/stack_1.sf
@@ -622,6 +650,7 @@ scripts/RosettaCode/walk_a_dir_non_recursively.sf
 scripts/RosettaCode/water_collected_between_towers.sf
 scripts/RosettaCode/word_break_problem.sf
 scripts/RosettaCode/word_wrap.sf
+scripts/RosettaCode/Xorshift_star.sf
 scripts/RosettaCode/zeckendorf_number_representation.sf
 scripts/RosettaCode/zig-zag_matrix.sf
 scripts/rsa_code.sf
@@ -686,6 +715,7 @@ scripts/Tests/cartesian.sf
 scripts/Tests/catalan_numbers.sf
 scripts/Tests/catalan_numbers_2.sf
 scripts/Tests/chebyshev_coefficients_test.sf
+scripts/Tests/chebyshev_polynomials.sf
 scripts/Tests/class_attr_inheritance.sf
 scripts/Tests/class_attributes.sf
 scripts/Tests/class_field_inheritance.sf
@@ -702,6 +732,7 @@ scripts/Tests/cnp.sf
 scripts/Tests/code_interpolation.sf
 scripts/Tests/combs_and_perms.sf
 scripts/Tests/complex_numbers.sf
+scripts/Tests/congruence_of_powers_factorization.sf
 scripts/Tests/const_tests.sf
 scripts/Tests/constant_folding.sf
 scripts/Tests/cpp_input_output.sf
@@ -720,6 +751,7 @@ scripts/Tests/def_primitive_type.sf
 scripts/Tests/def_primitive_type_2.sf
 scripts/Tests/default_param_values.sf
 scripts/Tests/default_var_values.sf
+scripts/Tests/difference_of_powers_factorization.sf
 scripts/Tests/digits_and_sum_of_digits.sf
 scripts/Tests/divisor_functions.sf
 scripts/Tests/draw_grid_of_squares_multi.sf
@@ -751,6 +783,7 @@ scripts/Tests/for_in_with_user_objects.sf
 scripts/Tests/for_two_vars.sf
 scripts/Tests/for_var_in_array.sf
 scripts/Tests/forward_difference.sf
+scripts/Tests/fraction_class.sf
 scripts/Tests/func_scoping.sf
 scripts/Tests/function_composition.sf
 scripts/Tests/functional_modules.sf
@@ -787,6 +820,7 @@ scripts/Tests/implicit_method_call_on_var_.sf
 scripts/Tests/implicit_numeric_conversions.sf
 scripts/Tests/infix_methods.sf
 scripts/Tests/inherited_blocks.sf
+scripts/Tests/integer_division.sf
 scripts/Tests/integer_limits.sf
 scripts/Tests/inverse_of_factorial.sf
 scripts/Tests/inverted_syntax.sf
@@ -888,6 +922,7 @@ scripts/Tests/palindrome_detection_recursive.sf
 scripts/Tests/palindromic_numbers.sf
 scripts/Tests/pascal_matrix_generation.sf
 scripts/Tests/pcg.sf
+scripts/Tests/pell_factorization.sf
 scripts/Tests/perfect_root_power.sf
 scripts/Tests/perl_eval.sf
 scripts/Tests/permutations.sf
@@ -898,6 +933,7 @@ scripts/Tests/pipeline_cross_operator.sf
 scripts/Tests/pipeline_map_operator.sf
 scripts/Tests/pipeline_operator.sf
 scripts/Tests/pipeline_zip_operator.sf
+scripts/Tests/polynomial.sf
 scripts/Tests/polynomial_regression.sf
 scripts/Tests/postfix_exclamation_mark.sf
 scripts/Tests/power_numbers.sf
@@ -908,9 +944,11 @@ scripts/Tests/problem_of_apollonius.sf
 scripts/Tests/pythagorean_means.sf
 scripts/Tests/quadratic_integers.sf
 scripts/Tests/quadratic_nonresidue.sf
+scripts/Tests/quaternion_integers.sf
 scripts/Tests/quicksort.sf
 scripts/Tests/quoted_strings.sf
 scripts/Tests/rand_pick.sf
+scripts/Tests/range_number.sf
 scripts/Tests/range_objects.sf
 scripts/Tests/range_prod.sf
 scripts/Tests/range_sum.sf
@@ -972,6 +1010,7 @@ scripts/Tests/sort_with_custom_cmp.sf
 scripts/Tests/soundex.sf
 scripts/Tests/special_methods.sf
 scripts/Tests/split_collapse.sf
+scripts/Tests/sqrtmod_all.sf
 scripts/Tests/square_free_count.sf
 scripts/Tests/squarefree.sf
 scripts/Tests/static_const_lazy_init.sf
@@ -984,6 +1023,7 @@ scripts/Tests/structures.sf
 scripts/Tests/subsets.sf
 scripts/Tests/subtractive_generator.sf
 scripts/Tests/sum_and_prod.sf
+scripts/Tests/sum_of_squares_function.sf
 scripts/Tests/swap.sf
 scripts/Tests/sylvesters_sequence.sf
 scripts/Tests/symbolic_fractions.sf
@@ -994,6 +1034,7 @@ scripts/Tests/ternary_operator.sf
 scripts/Tests/token_recursive.sf
 scripts/Tests/top_rank_per_group.sf
 scripts/Tests/topological_sort.sf
+scripts/Tests/trial_division.sf
 scripts/Tests/triangle_path.sf
 scripts/Tests/tribonacci_closed_form.sf
 scripts/Tests/trigonometric_functions.sf
@@ -1011,6 +1052,7 @@ scripts/Tests/url_encoding_decoding.sf
 scripts/Tests/var_ref.sf
 scripts/Tests/var_scoping.sf
 scripts/Tests/variable_references.sf
+scripts/Tests/vector.sf
 scripts/Tests/vigenere_cipher.sf
 scripts/Tests/while_loop.sf
 scripts/Tests/wireworld.sf
@@ -1078,13 +1120,16 @@ utils/Experiments/regexp_grammars_parser.pl
 utils/find_class_typos.pl
 utils/find_invalid_types.pl
 utils/find_undefined_methods.pl
+utils/gource-video.sh
 utils/grep_errors.sh
 utils/pod_generator.pl
 utils/sidef2bin.sh
+utils/sidef2exe.txt
 utils/test_deparser.pl
 utils/test_parser.pl
 'utils/Web interface/css/main.css'
 'utils/Web interface/index.cgi'
+'utils/Web interface/index.fcgi'
 'utils/Web interface/js/jquery-2.1.3.min.js'
 'utils/Web interface/js/jquery.autosize.min.js'
 'utils/Web interface/js/main.js'

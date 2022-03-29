@@ -5,8 +5,9 @@ package Sidef::Math::Math {
 
     use parent qw(
       Sidef::Object::Object
-      );
+    );
 
+    require List::Util;
     use Sidef::Types::Number::Number;
 
     sub new {
@@ -54,7 +55,7 @@ package Sidef::Math::Math {
         my ($self, @list) = @_;
 
         my $sum = Sidef::Types::Number::Number::sum(@list);
-        my $n   = Sidef::Types::Number::Number->_set_uint(scalar(@list));
+        my $n   = Sidef::Types::Number::Number::_set_int(scalar(@list));
 
         $sum->div($n);
     }
@@ -65,7 +66,7 @@ package Sidef::Math::Math {
         my ($self, @list) = @_;
 
         my $prod = Sidef::Types::Number::Number::prod(@list);
-        my $n    = Sidef::Types::Number::Number->_set_uint(scalar(@list));
+        my $n    = Sidef::Types::Number::Number::_set_int(scalar(@list));
 
         $prod->root($n);
     }
@@ -74,9 +75,83 @@ package Sidef::Math::Math {
         my ($self, @list) = @_;
 
         my $sum = Sidef::Types::Number::Number::sum(map { $_->inv } @list);
-        my $n   = Sidef::Types::Number::Number->_set_uint(scalar(@list));
+        my $n   = Sidef::Types::Number::Number::_set_int(scalar(@list));
 
         $n->div($sum);
+    }
+
+    sub product_tree {
+        my ($self, @list) = @_;
+
+        # Algorithm from: https://facthacks.cr.yp.to/product.html
+
+        my @result = Sidef::Types::Array::Array->new([@list]);
+
+        while (scalar(@list) > 1) {
+            @list =
+              map { Sidef::Types::Number::Number::prod(@list[($_ << 1) .. List::Util::min($#list, (($_ + 1) << 1) - 1)]) }
+              0 .. (((scalar(@list) + 1) >> 1) - 1);
+
+            push @result, Sidef::Types::Array::Array->new([@list]);
+        }
+
+        Sidef::Types::Array::Array->new(\@result);
+    }
+
+    sub remainders {
+        my ($self, $n, $arr) = @_;
+
+        # Algorithm from: https://facthacks.cr.yp.to/remainder.html
+
+        my @result = ($n);
+
+        foreach my $t (@{$self->product_tree(@$arr)->flip}) {
+            @result = map { $result[$_ >> 1]->mod($t->[$_]) } 0 .. $#{$t};
+        }
+
+        Sidef::Types::Array::Array->new(\@result);
+    }
+
+    sub batch_gcd {
+        my ($self, @X) = @_;
+
+        # Algorithm from: https://facthacks.cr.yp.to/batchgcd.html
+
+        my $prods = $self->product_tree(@X);
+        my @R     = @{pop(@$prods) // return Sidef::Types::Array::Array->new()};
+
+        while (@$prods) {
+            @X = @{pop(@$prods)};
+            @R = map { $R[$_ >> 1]->mod($X[$_]->sqr) } 0 .. $#X;
+        }
+
+        Sidef::Types::Array::Array->new([map { Sidef::Types::Number::Number::gcd($R[$_]->idiv($X[$_]), $X[$_]) } 0 .. $#R]);
+    }
+
+    sub batch_invmod {
+        my ($self, $x, $n) = @_;
+
+        # Algorithm 2.11 MultipleInversion from Modern Computer Arithmetic
+
+        @$x || return Sidef::Types::Array::Array->new;
+
+        my $k = $#{$x};
+        my @z = ($x->[0]);
+
+        foreach my $i (1 .. $k) {
+            $z[$i] = ($z[$i - 1]->mulmod($x->[$i], $n));
+        }
+
+        my @y;
+        my $q = $z[$k]->invmod($n);
+
+        for (my $i = $k ; $i >= 1 ; --$i) {
+            $y[$i] = $q->mulmod($z[$i - 1], $n);
+            $q = $q->mulmod($x->[$i], $n);
+        }
+
+        $y[0] = $q;
+        Sidef::Types::Array::Array->new(\@y);
     }
 
     sub smooth_numbers {
@@ -121,18 +196,13 @@ package Sidef::Math::Math {
         }
 
         my $res = eval { Math::Prime::Util::GMP::chinese(@pairs) } // return Sidef::Types::Number::Number->nan;
-
-        if ($res < Sidef::Types::Number::Number::ULONG_MAX and $res >= 0) {
-            return Sidef::Types::Number::Number->_set_uint($res);
-        }
-
-        Sidef::Types::Number::Number->_set_str('int', $res);
+        Sidef::Types::Number::Number::_set_int($res);
     }
 
     sub range_sum {
         my ($self, $from, $to, $step) = @_;
         $step //= Sidef::Types::Number::Number::ONE;
-        state $two = Sidef::Types::Number::Number->_set_uint(2);
+        state $two = Sidef::Types::Number::Number::_set_int(2);
         ($from->add($to))->mul($to->sub($from)->div($step)->add(Sidef::Types::Number::Number::ONE))->div($two);
     }
 
@@ -152,7 +222,7 @@ package Sidef::Math::Math {
         my $sum  = $to->sub($from)->abs;
         my $dist = $num->sub($to)->abs;
 
-        state $hundred = Sidef::Types::Number::Number->_set_uint(100);
+        state $hundred = Sidef::Types::Number::Number::_set_int(100);
         ($sum->sub($dist))->div($sum)->mul($hundred);
     }
 }

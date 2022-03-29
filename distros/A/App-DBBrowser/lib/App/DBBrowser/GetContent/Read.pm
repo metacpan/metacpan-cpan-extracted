@@ -59,13 +59,11 @@ sub from_col_by_col {
         my $col_count;
 
         COL_COUNT: while ( 1 ) {
-            my $info = 'DATA:';
             # Choose a number
             $col_count = $tu->choose_a_number( 2,
-                { info => $info, cs_label => 'Number of columns: ', small_first => 1, confirm => 'Confirm',
+                { cs_label => 'Number of columns: ', small_first => 1, confirm => 'Confirm',
                   default_number => $col_count, back => 'Back' }
             );
-            $ax->print_sql_info( $info );
             if ( ! $col_count ) {
                 return;
             }
@@ -75,9 +73,8 @@ sub from_col_by_col {
             # Fill_form
             my $form = $tf->fill_form(
                 $fields,
-                { info => $info, prompt => 'Col names:', auto_up => 2, confirm => $sf->{i}{_confirm}, back => $sf->{i}{_back} . '   ' }
+                { prompt => 'Column names:', auto_up => 2, confirm => $sf->{i}{_confirm}, back => $sf->{i}{_back} . '   ' }
             );
-            $ax->print_sql_info( $info );
             if ( ! $form ) {
                 next COL_COUNT;
             }
@@ -91,27 +88,27 @@ sub from_col_by_col {
     }
 
     ROWS: while ( 1 ) {
-        my $row_idxs = @$aoa;
-
-        COLS: for my $col_name ( @$col_names ) {
-            my $info = $sf->__get_read_info( $aoa );
-            # Readline
-            my $col = $tf->readline(
-                $col_name . ': ',
-                { info => $info }
-            );
-            $ax->print_sql_info( $info );
-            push @{$aoa->[$row_idxs]}, $col;
+        my $info = $sf->__get_read_info( $aoa );
+        my $fields = [ map { [ $_, ] } @$col_names ];
+        # Fill_form
+        my $row = $tf->fill_form(
+            $fields,
+            { info => $info, auto_up => 1, confirm => $sf->{i}{confirm}, back => $sf->{i}{back} . '   ' }
+        );
+        $ax->print_sql_info( $info );
+        my $default;
+        if ( ! defined $row ) {
+            $default = 0;
         }
-        my $default = 0;
-        if ( @$aoa ) {
-            $default = ( all { ! length } @{$aoa->[-1]} ) ? 3 : 2;
+        else {
+            push @{$aoa}, [ map { $_->[1] } @$row ];
+            $default = 2;
         }
 
         ASK: while ( 1 ) {
-            my ( $add, $del ) = ( 'Add', 'Del' );
+            my $add = 'Add';
             my @pre = ( undef, $sf->{i}{ok} );
-            my $menu = [ @pre, $add, $del ];
+            my $menu = [ @pre, $add ];
             my $info = $sf->__get_read_info( $aoa );
             # Choose
             my $add_row = $tc->choose(
@@ -121,10 +118,11 @@ sub from_col_by_col {
             $ax->print_sql_info( $info );
             if ( ! defined $add_row ) {
                 if ( @$aoa ) {
-                    $aoa = [];
+                    $default = 0;
+                    $#$aoa--;
                     next ASK;
                 }
-                $aoa = [];
+                $aoa = []; ##
                 return;
             }
             elsif ( $add_row eq $sf->{i}{ok} ) {
@@ -135,14 +133,6 @@ sub from_col_by_col {
                 require Text::CSV;
                 Text::CSV::csv( in => $aoa, out => $file_fs ) or die Text::CSV->error_diag;
                 return 1, $file_fs;
-            }
-            elsif ( $add_row eq $del ) {
-                if ( ! @$aoa ) {
-                    return;
-                }
-                $default = 0;
-                $#$aoa--;
-                next ASK;
             }
             last ASK;
         }

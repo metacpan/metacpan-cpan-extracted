@@ -12,7 +12,7 @@ package Sidef::Object::Enumerator {
     *call = \&new;
 
     sub first {
-        my ($self, $n) = @_;
+        my ($self, $n, $block) = @_;
 
         $n = CORE::int($n);
 
@@ -22,14 +22,37 @@ package Sidef::Object::Enumerator {
         $self->{block}->run(
             Sidef::Types::Block::Block->new(
                 code => sub {
-                    if (($count += @_) >= $n) {
-                        if ($count > $n) {
-                            splice(@_, $n - $count);
+                    if (defined($block) ? $block->run(@_) : 1) {
+                        if (($count += @_) >= $n) {
+                            if ($count > $n) {
+                                splice(@_, $n - $count);
+                            }
+                            push @arr, @_;
+                            goto RETURN;
                         }
                         push @arr, @_;
+                    }
+                }
+            )
+        );
+
+      RETURN: Sidef::Types::Array::Array->new(\@arr);
+    }
+
+    sub while {
+        my ($self, $block) = @_;
+
+        my @arr;
+
+        $self->{block}->run(
+            Sidef::Types::Block::Block->new(
+                code => sub {
+                    if ($block->run(@_)) {
+                        push @arr, @_;
+                    }
+                    else {
                         goto RETURN;
                     }
-                    push @arr, @_;
                 }
             )
         );
@@ -54,9 +77,7 @@ package Sidef::Object::Enumerator {
 
     sub each {
         my ($self, $block) = @_;
-
         $self->{block}->run($block);
-
         $self;
     }
 
@@ -94,6 +115,24 @@ package Sidef::Object::Enumerator {
 
     *select = \&grep;
 
+    sub count {
+        my ($self, $block) = @_;
+
+        my $count = 0;
+
+        $self->{block}->run(
+            Sidef::Types::Block::Block->new(
+                code => sub {
+                    ++$count if $block->run(@_);
+                },
+            )
+        );
+
+        Sidef::Types::Number::Number::_set_int($count);
+    }
+
+    *count_by = \&count;
+
     sub length {
         my ($self) = @_;
 
@@ -106,25 +145,27 @@ package Sidef::Object::Enumerator {
             )
         );
 
-        Sidef::Types::Number::Number->_set_uint($count);
+        Sidef::Types::Number::Number::_set_int($count);
     }
 
     *len  = \&length;    # alias
     *size = \&length;
 
-    #
-    ## AUTOLOAD
-    #
+#<<<
+    #~ #
+    #~ ## AUTOLOAD
+    #~ #
 
-    sub DESTROY { }
+    #~ sub DESTROY { }
 
-    our $AUTOLOAD;
+    #~ our $AUTOLOAD;
 
-    sub AUTOLOAD {
-        my ($self, @arg) = @_;
-        my ($method) = ($AUTOLOAD =~ /^.*[^:]::(.*)$/);
-        $self->to_a->$method(@arg);
-    }
+    #~ sub AUTOLOAD {
+        #~ my ($self, @arg) = @_;
+        #~ my ($method) = ($AUTOLOAD =~ /^.*[^:]::(.*)$/);
+        #~ $self->to_a->$method(@arg);
+    #~ }
+#>>>
 };
 
 1

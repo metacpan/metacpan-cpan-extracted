@@ -1,10 +1,10 @@
 NAME
-    Acme::CPANModules::BrowserUtilities - Utilities for web browsers
+    Acme::CPANModules::BrowserUtilities - List of utilities for web browsers
 
 VERSION
-    This document describes version 0.003 of
+    This document describes version 0.004 of
     Acme::CPANModules::BrowserUtilities (from Perl distribution
-    Acme-CPANModules-BrowserUtilities), released on 2021-06-09.
+    Acme-CPANModules-BrowserUtilities), released on 2022-03-18.
 
 DESCRIPTION
     General
@@ -66,52 +66,103 @@ DESCRIPTION
 
     Vivaldi::Util::Profile
 
-ACME::MODULES ENTRIES
-    *   App::FirefoxUtils
+ACME::CPANMODULES ENTRIES
+    *   App::FirefoxUtils - Utilities related to Firefox
 
-    *   App::DumpFirefoxHistory
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   App::FirefoxMultiAccountContainersUtils
+    *   App::DumpFirefoxHistory - Dump Firefox history
 
-    *   Firefox::Util::Profile
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   Firefox::Sync::Client
+    *   App::FirefoxMultiAccountContainersUtils - Utilities related to
+        Firefox Multi-Account Containers add-on
 
-    *   App::instopt
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   Software::Catalog::SW::firefox
+    *   Firefox::Util::Profile - Given a Firefox profile name, return its
+        directory
 
-    *   WordList::HTTP::UserAgentString::Browser::Firefox
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   Firefox::Marionette
+    *   Firefox::Sync::Client - A Client for the Firefox Sync Server
 
-    *   Selenium::Firefox
+        Author: SCHRORG <https://metacpan.org/author/SCHRORG>
 
-    *   WWW::Mechanize::Firefox
+    *   App::instopt - Download and install software
 
-    *   MozRepl
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   Firefox::Application
+    *   Software::Catalog::SW::firefox - Firefox
 
-    *   WWW::Mechanize::Firefox::Extended
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   App::ChromeUtils
+    *   WordList::HTTP::UserAgentString::Browser::Firefox - Collection of
+        Firefox browser User-Agent strings
 
-    *   App::DumpChromeHistory
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   Chrome::Util::Profile
+    *   Firefox::Marionette - Automate the Firefox browser with the
+        Marionette protocol
 
-    *   WWW::Mechanize::Chrome
+        Author: DDICK <https://metacpan.org/author/DDICK>
 
-    *   App::OperaUtils
+    *   Selenium::Firefox - Use FirefoxDriver without a Selenium server
 
-    *   App::DumpOperaHistory
+        Author: TEODESIAN <https://metacpan.org/author/TEODESIAN>
 
-    *   App::VivaldiUtils
+    *   WWW::Mechanize::Firefox - use Firefox as if it were WWW::Mechanize
 
-    *   App::DumpVivaldiHistory
+        Author: CORION <https://metacpan.org/author/CORION>
 
-    *   Vivaldi::Util::Profile
+    *   MozRepl - Perl interface of MozRepl
+
+        Author: ZIGOROU <https://metacpan.org/author/ZIGOROU>
+
+    *   Firefox::Application - inspect and automate the Firefox UI
+
+        Author: CORION <https://metacpan.org/author/CORION>
+
+    *   WWW::Mechanize::Firefox::Extended - Adds handy functions to
+        WWW::Mechanize::Firefox
+
+        Author: HOEKIT <https://metacpan.org/author/HOEKIT>
+
+    *   App::ChromeUtils - Utilities related to Google Chrome browser
+
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    *   App::DumpChromeHistory - Dump Chrome history
+
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    *   Chrome::Util::Profile - List available Google Chrome profiles
+
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    *   WWW::Mechanize::Chrome - automate the Chrome browser
+
+        Author: CORION <https://metacpan.org/author/CORION>
+
+    *   App::OperaUtils - Utilities related to the Opera browser
+
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    *   App::DumpOperaHistory - Dump Opera history
+
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    *   App::VivaldiUtils - Utilities related to the Vivaldi browser
+
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    *   App::DumpVivaldiHistory - Dump Vivaldi history
+
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    *   Vivaldi::Util::Profile - List available Vivaldi profiles
+
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
 FAQ
   What is an Acme::CPANModules::* module?
@@ -142,7 +193,9 @@ FAQ
 
     This Acme::CPANModules module also helps lcpan produce a more meaningful
     result for "lcpan related-mods" command when it comes to finding related
-    modules for the modules listed in this Acme::CPANModules module.
+    modules for the modules listed in this Acme::CPANModules module. See
+    App::lcpan::Cmd::related_mods for more details on how "related modules"
+    are found.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -152,14 +205,6 @@ SOURCE
     Source repository is at
     <https://github.com/perlancar/perl-Acme-CPANModules-BrowserUtilities>.
 
-BUGS
-    Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Brow
-    serUtilities>
-
-    When submitting a bug or request, please include a test-file or a patch
-    to an existing test-file that illustrates the bug or desired feature.
-
 SEE ALSO
     Acme::CPANModules - about the Acme::CPANModules namespace
 
@@ -168,9 +213,34 @@ SEE ALSO
 AUTHOR
     perlancar <perlancar@cpan.org>
 
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
+    steps required beyond that are considered a bug and can be reported to
+    me.
+
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021 by perlancar@cpan.org.
+    This software is copyright (c) 2022, 2021 by perlancar
+    <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Brow
+    serUtilities>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 

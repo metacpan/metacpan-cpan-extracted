@@ -62,4 +62,28 @@ var fib = Enumerator({ |yield|
 
 assert_eq(fib.first(10), [0, 1, 1, 2, 3, 5, 8, 13, 21, 34])
 
+var palindromes = Enumerator({|f|
+    var n = 1
+    loop { f(n); n.next_palindrome! }
+})
+
+assert_eq(
+    palindromes.while { _ < 100 },
+    1..100 -> grep { .is_palindrome }
+)
+
+do {
+    var e = Enumerator({|f| ^Inf -> each {|n| f(n**2 + 1) } })
+
+    assert_eq(
+        e.first(10),
+        ^10 -> map { _*_ + 1 }
+    )
+
+    assert_eq(
+        e.first(10, {.is_prime}),
+        ^Inf -> lazy.map { _*_ + 1 }.grep{.is_prime}.first(10)
+    )
+}
+
 say "** Test passed!"

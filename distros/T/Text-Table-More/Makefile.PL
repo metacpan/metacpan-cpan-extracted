@@ -24,7 +24,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "Text::Table::More",
   "PREREQ_PM" => {
-    "BorderStyle::ASCII::SingleLineDoubleAfterHeader" => "0.011",
+    "BorderStyle::ASCII::SingleLineDoubleAfterHeader" => "0.014",
     "Exporter" => "5.57",
     "List::AllUtils" => 0,
     "Module::Load::Util" => "0.004",
@@ -40,7 +40,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.98",
     "utf8" => 0
   },
-  "VERSION" => "0.023",
+  "VERSION" => "0.025",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -48,7 +48,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "BorderStyle::ASCII::SingleLineDoubleAfterHeader" => "0.011",
+  "BorderStyle::ASCII::SingleLineDoubleAfterHeader" => "0.014",
   "Exporter" => "5.57",
   "File::Spec" => 0,
   "IO::Handle" => 0,

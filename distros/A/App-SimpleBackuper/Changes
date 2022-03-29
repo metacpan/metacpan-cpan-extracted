@@ -1,6 +1,8 @@
+0.2.25  2021-03-27
+    - Use a static feature bundle (thanks to Graham Knop aka @haarg)
 0.2.24  2021-02-28
     - More verbosity about priorities in choosing files to delete: added user's priority and backup version score.
-    - Fix: first deleting heviest files of one priority.
+    - Fix: first deleting heaviest files of one priority.
 0.2.23  2021-02-13
     - Version bump
 0.2.22  2021-02-13
@@ -15,73 +17,73 @@
 0.2.21  2020-12-20
     - Non-zero exit code if some files failed to backup.
     - Report about deleted files for free up space.
-0.2.20	2020-12-12
-	- Before backup storage fix instead of storage check (for more simplicity).
-0.2.19	2020-12-02
-	- Fix: periodically db saving cancels part of backuped files.
-	- Fix: dirs in path to backuped files doesn't counts in backup counters.
-0.2.18	2020-12-01
-	- Fix: non-ascii files masks.
-	- Save DB every 10 min.
-	- Zero compression for files with media extentions, because it's useless.
-0.2.17	2020-11-26
-	- Reduced memory utilization at start.
-	- Undebug.
-	- Zero compression level in tests.
-0.2.16	2020-11-21
-	- Fix backuping crash when dir from config doesn't exists.
-0.2.15	2020-11-15
-	- Fix bug: infonity attempts ti read when reads more than 0 bytes and then read fails.
-	- Minor cosmetic fix for verbose mode.
-0.2.14	2020-11-15
-	- Fix bug with output compression ratio of zero file.
-0.2.13	2020-11-08
-	- Remove debug of OOM on openBSD: cause of OOM in Compress::Raw::Lzma & this compression method eats many of RAM.
-0.2.12	2020-11-05
-	- Removed requirements included to perl core.
-	- Debug OOM for openbsd.
-0.2.11	2020-11-02
-	- Do not restoring mode and ownership of symlinks.
-	- Debug OOM for openbsd.
-0.2.10	2020-10-31
-	- Minor docs fix.
-	- Minor fix in stats command.
-	- Progress info minor fix.
-	- Tests run in verbose mode.
-0.2.9	2020-10-26
-	- Fix merging blocks of file parts.
-0.2.8	2020-10-22
-	- Minor POD fix.
-0.2.7	2020-10-21
-	- Fix case with ignoring some dirs to backup.
-	- Minor storage integrity report fix.
-	- Minor verbosity output fix.
-	- Minor POD improvement.
-0.2.6	2020-10-18
-	- POD minor change.
-0.2.5	2020-10-18
-	- Version bump.
-0.2.4	2020-10-18
-	- Added info about installing required libs to docs.
-	- Fix some restoring bugs.
-0.2.3	2020-10-16
-	- Try to fix issue with failed test on comparing file owner in FreeBSD.
-	- Little bit POD improvement.
-	- Fix win32 exception in Makefile.PL.
-0.2.2	2020-10-15
-	- Some kwalitee improvements.
-0.2.1	2020-10-15
-	- Some kwalitee improvements.
-0.2.0	2020-10-15
-	- Version bump.
-0.1.1	2020-10-15
-	- Fix cpan module requirements.
-	- POD moved to .pod-file.
-0.1   	2020-10-12
-	- Fully rewrited app.
-	- Data encryption on host with backuped data.
-	- Data compression with LZMA algorythm.
-	- Data deduplication with subfile graduation (incremental backup).
-	- Ssh and local FS backups location.
-	- Different files priorities.
-	- Compact for RAM and for FS database.
+0.2.20  2020-12-12
+    - Before backup storage fix instead of storage check (for more simplicity).
+0.2.19  2020-12-02
+    - Fix: periodically db saving cancels part of backuped files.
+    - Fix: dirs in path to backuped files doesn't counts in backup counters.
+0.2.18  2020-12-01
+    - Fix: non-ascii files masks.
+    - Save DB every 10 min.
+    - Zero compression for files with media extentions, because it's useless.
+0.2.17  2020-11-26
+    - Reduced memory utilization at start.
+    - Undebug.
+    - Zero compression level in tests.
+0.2.16  2020-11-21
+    - Fix backuping crash when dir from config doesn't exists.
+0.2.15  2020-11-15
+    - Fix bug: infonity attempts ti read when reads more than 0 bytes and then read fails.
+    - Minor cosmetic fix for verbose mode.
+0.2.14  2020-11-15
+    - Fix bug with output compression ratio of zero file.
+0.2.13  2020-11-08
+    - Remove debug of OOM on openBSD: cause of OOM in Compress::Raw::Lzma & this compression method eats many of RAM.
+0.2.12  2020-11-05
+    - Removed requirements included to perl core.
+    - Debug OOM for openbsd.
+0.2.11  020-11-02
+    - Do not restoring mode and ownership of symlinks.
+    - Debug OOM for openbsd.
+0.2.10  2020-10-31
+    - Minor docs fix.
+    - Minor fix in stats command.
+    - Progress info minor fix.
+    - Tests run in verbose mode.
+0.2.9   2020-10-26
+    - Fix merging blocks of file parts.
+0.2.8   2020-10-22
+    - Minor POD fix.
+0.2.7   2020-10-21
+    - Fix case with ignoring some dirs to backup.
+    - Minor storage integrity report fix.
+    - Minor verbosity output fix.
+    - Minor POD improvement.
+0.2.6   2020-10-18
+    - POD minor change.
+0.2.5   2020-10-18
+    - Version bump.
+0.2.4   2020-10-18
+    - Added info about installing required libs to docs.
+    - Fix some restoring bugs.
+0.2.3   2020-10-16
+    - Try to fix issue with failed test on comparing file owner in FreeBSD.
+    - Little bit POD improvement.
+    - Fix win32 exception in Makefile.PL.
+0.2.2   2020-10-15
+    - Some kwalitee improvements.
+0.2.1   2020-10-15
+    - Some kwalitee improvements.
+0.2.0   2020-10-15
+    - Version bump.
+0.1.1   2020-10-15
+    - Fix cpan module requirements.
+    - POD moved to .pod-file.
+0.1     2020-10-12
+    - Fully rewrited app.
+    - Data encryption on host with backuped data.
+    - Data compression with LZMA algorythm.
+    - Data deduplication with subfile graduation (incremental backup).
+    - Ssh and local FS backups location.
+    - Different files priorities.
+    - Compact for RAM and for FS database.

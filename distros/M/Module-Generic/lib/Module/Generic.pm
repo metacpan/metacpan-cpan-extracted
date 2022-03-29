@@ -1,11 +1,11 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic.pm
-## Version v0.22.1
+## Version v0.23.0
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/08/24
-## Modified 2022/03/21
+## Modified 2022/03/27
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -20,7 +20,8 @@ BEGIN
     use warnings::register;
     use vars qw( $MOD_PERL $AUTOLOAD $ERROR $PARAM_CHECKER_LOAD_ERROR $VERBOSE $DEBUG 
                  $SILENT_AUTOLOAD $PARAM_CHECKER_LOADED $CALLER_LEVEL $COLOUR_NAME_TO_RGB 
-                 $true $false $DEBUG_LOG_IO %RE $stderr $stderr_raw $SERIALISER );
+                 $true $false $DEBUG_LOG_IO %RE $stderr $stderr_raw $SERIALISER 
+                 $AUTOLOAD_SUBS $SUB_ATTR_LIST $DATA_POS );
     use Config;
     use Class::Load ();
     use Clone ();
@@ -29,7 +30,7 @@ BEGIN
     use Encode ();
     use File::Spec ();
     use Module::Metadata;
-    use Nice::Try;
+    use Nice::Try v1.2.0;
     use Number::Format;
     use Scalar::Util qw( openhandle );
     use Sub::Util ();
@@ -42,7 +43,7 @@ BEGIN
     our @EXPORT      = qw( );
     our @EXPORT_OK   = qw( subclasses );
     our %EXPORT_TAGS = ();
-    our $VERSION     = 'v0.22.1';
+    our $VERSION     = 'v0.23.0';
     # local $^W;
     # mod_perl/2.0.10
     if( exists( $ENV{MOD_PERL} )
@@ -61,7 +62,7 @@ BEGIN
         Apache2::Const->import( compile => qw( :log OK ) );
     }
     $VERBOSE     = 0;
-    $DEBUG       = 0;
+    $DEBUG       = 4;
     $SILENT_AUTOLOAD      = 1;
     $PARAM_CHECKER_LOADED = 0;
     $CALLER_LEVEL         = 0;
@@ -70,6 +71,18 @@ BEGIN
     $DEBUG_LOG_IO = undef();
     # Can use Sereal also
     $SERIALISER = 'Storable';
+    $AUTOLOAD_SUBS = {};
+    $SUB_ATTR_LIST = qr{
+        [[:blank:]\h]* : [[:blank:]\h]*
+        (?:
+        # one attribute
+        (?> # no backtrack
+            (?! \d) \w+
+            (?<nested> \( (?: [^()]++ | (?&nested)++ )*+ \) ) ?
+        )
+        (?: [[:blank:]\h]* : [[:blank:]\h]* | [[:blank:]\h]ss+ (?! :) )
+        )*
+    }x;
     use constant COLOUR_OPEN  => '<';
     use constant COLOUR_CLOSE => '>';
     use constant HAS_THREADS  => ( $Config{useithreads} && $INC{'threads.pm'} );
@@ -108,7 +121,34 @@ $stderr_raw->autoflush( 1 );
     $true  = $Module::Generic::Boolean::true;
     $false = $Module::Generic::Boolean::false;
 }
-    
+
+# Subs that are inline autoloaded
+sub as_hash;
+sub clear;
+sub clear_error;
+sub clone;
+sub colour_close;
+sub colour_closest;
+sub colour_format;
+sub colour_open;
+sub colour_parse;
+sub colour_to_rgb;
+sub coloured;
+sub dump_hex;
+sub dump_print;
+sub dumper;
+sub dumpto_printer;
+sub dumpto_dumper;
+sub errno;
+sub message_colour;
+sub messagef_colour;
+sub message_log;
+sub message_log_io;
+sub printer;
+sub save;
+sub subclasses;
+sub __colour_data;
+
 # no warnings 'redefine';
 sub import
 {
@@ -122,7 +162,7 @@ sub import
     my $path  = $INC{ $dir . '.pm' };
     if( defined( $path ) )
     {
-        ## Try absolute path name
+        # Try absolute path name
         $path =~ s/^(.*)$dir\.pm$/${1}auto\/$dir\/autosplit.ix/;
         eval
         {
@@ -191,734 +231,6 @@ sub new
         }
     };
     return( $new );
-}
-
-# This is used to transform package data set into hash reference suitable for api calls
-# If package use AUTOLOAD, those AUtILOAD should make sure to create methods on the fly so they become defined
-sub as_hash
-{
-    my $self = shift( @_ );
-    my $this = $self->_obj2h;
-    my $p = {};
-    $p = shift( @_ ) if( scalar( @_ ) == 1 && ref( $_[0] ) eq 'HASH' );
-    $p->{_seen} = {} if( !exists( $p->{_seen} ) || !ref( $p->{_seen} ) );
-    # $self->message( 3, "Parameters are: ", sub{ $self->dumper( $p ) } );
-    my $class = ref( $this );
-    no strict 'refs';
-    my @methods = grep( !/^(?:new|init)$/, grep{ defined &{"${class}::$_"} } keys( %{"${class}::"} ) );
-
-    $self->messagef( 3, "The following methods found in package $class: '%s'.", join( "', '", sort( @methods ) ) );
-    use strict 'refs';
-    my $ref = {};
-    my $added_subs = CORE::exists( $this->{_added_method} ) && ref( $this->{_added_method} ) eq 'HASH'
-        ? $this->{_added_method}
-        : {};
-    
-    my $check;
-    $check = sub
-    {
-        my $meth = shift( @_ );
-        my $rv   = shift( @_ );
-        no overloading;
-        $self->message( 3, "Value for method '$meth' is '$rv'." );
-        use overloading;
-        if( $p->{json} && ( ref( $rv ) eq 'JSON::PP::Boolean' || ref( $rv ) eq 'Module::Generic::Boolean' || ref( $rv ) eq 'Class::Boolean' ) )
-        {
-            # $self->message( 3, "Encoding boolean to true or false for method '$meth'." );
-            # $ref->{ $meth } = Module::Generic::Boolean::TO_JSON( $ref->{ $meth } );
-            return( Module::Generic::Boolean::TO_JSON( $ref->{ $meth } ) );
-        }
-        elsif( $self->_is_object( $rv ) )
-        {
-            # Order of the checks here matter
-            if( $rv->can( 'as_hash' ) && overload::Overloaded( $rv ) && overload::Method( $rv, '""' ) )
-            {
-                $rv = $rv . '';
-                return( $rv );
-            }
-            elsif( $rv->can( 'as_hash' ) )
-            {
-                $self->message( 3, "$rv is an object (", ref( $rv ), ") capable of as_hash, calling it." );
-                if( !$p->{_seen}->{ Scalar::Util::refaddr( $rv ) } )
-                {
-                    $p->{_seen}->{ Scalar::Util::refaddr( $rv ) }++;
-                    $rv = $rv->as_hash( $p );
-                    $self->message( 4, "returned value is '$rv' -> ", sub{ $self->dump( $rv ) });
-                    if( Scalar::Util::blessed( $rv ) )
-                    {
-                        return( $check->( $meth => $rv ) );
-                    }
-                    else
-                    {
-                        return( $rv );
-                    }
-                }
-                else
-                {
-                    return;
-                }
-            }
-            # If the object can be overloaded, and has no TO_JSON method we get its string representation here.
-            # If it has a TO_JSON and we are asked to return data for json, we let the JSON module call the TO_JSON method
-            elsif( overload::Overloaded( $rv ) && overload::Method( $rv, '""' ) )
-            {
-                $rv = "$rv" unless( $p->{json} && $rv->can( 'TO_JSON' ) );
-                return( $rv );
-            }
-        }
-        else
-        {
-            return( $rv );
-        }
-    };
-    
-    foreach my $meth ( sort( @methods ) )
-    {
-        next if( substr( $meth, 0, 1 ) eq '_' );
-        next if( CORE::exists( $added_subs->{ $meth } ) );
-        my $rv = eval{ $self->$meth };
-        if( $@ )
-        {
-            warn( "An error occured while accessing method $meth: $@\n" );
-            next;
-        }
-        $rv = $check->( $meth => $rv );
-        next if( !defined( $rv ) );
-        
-        # $self->message( 3, "Checking field '$meth' with value '$rv'." );
-        
-        if( ref( $rv ) eq 'HASH' )
-        {
-            $ref->{ $meth } = $rv if( scalar( keys( %$rv ) ) );
-        }
-        # If method call returned an array, like array of string or array of object such as in data from Net::API::Stripe::List
-        elsif( ref( $rv ) eq 'ARRAY' )
-        {
-            my $arr = [];
-            foreach my $this_ref ( @$rv )
-            {
-                # my $that_ref = ( $self->_is_object( $this_ref ) && $this_ref->can( 'as_hash' ) ) ? $this_ref->as_hash : $this_ref;
-                my $that_ref;
-                if( $self->_is_object( $this_ref ) && $this_ref->can( 'as_hash' ) )
-                {
-                    if( !$p->{_seen}->{ Scalar::Util::refaddr( $this_ref ) } )
-                    {
-                        $p->{_seen}->{ Scalar::Util::refaddr( $this_ref ) }++;
-                        $that_ref = $this_ref->as_hash( $p );
-                    }
-                }
-                else
-                {
-                    $that_ref = $this_ref;
-                }
-                CORE::push( @$arr, $that_ref );
-            }
-            $ref->{ $meth } = $arr if( scalar( @$arr ) );
-        }
-        elsif( !ref( $rv ) )
-        {
-            $ref->{ $meth } = $rv if( CORE::length( $rv ) );
-        }
-        elsif( CORE::length( "$rv" ) )
-        {
-            $self->message( 3, "Adding value '$rv' to field '$meth' in hash \$ref" );
-            $ref->{ $meth } = $rv;
-        }
-    }
-    return( $ref );
-}
-
-sub clear
-{
-    goto( &clear_error );
-}
-
-sub clear_error
-{
-    my $self  = shift( @_ );
-    my $class = ref( $self ) || $self;
-    my $this  = $self->_obj2h;
-    no strict 'refs';
-    $this->{error} = ${ "$class\::ERROR" } = '';
-    return( $self );
-}
-
-sub clone
-{
-    my $self  = shift( @_ );
-    try
-    {
-        # $self->message( 3, "Cloning object '", overload::StrVal( $self ), "'." );
-        return( Clone::clone( $self ) );
-    }
-    catch( $e )
-    {
-        return( $self->error( "Error cloning object \"", overload::StrVal( $self ), "\": $e" ) );
-    }
-}
-
-sub colour_close { return( shift->_set_get( 'colour_close', @_ ) ); }
-
-sub colour_closest
-{
-    my $self    = shift( @_ );
-    my $colour  = uc( shift( @_ ) );
-    my $this  = $self->_obj2h;
-    my $colours = 
-    {
-    '000000000' => 'black',
-    '000000255' => 'blue',
-    '000255000' => 'green',
-    '000255255' => 'cyan',
-    '255000000' => 'red',
-    '255000255' => 'magenta',
-    '255255000' => 'yellow',
-    '255255255' => 'white',
-    };
-    my( $red, $green, $blue ) = ( '', '', '' );
-    our $COLOUR_NAME_TO_RGB;
-    if( $colour =~ /^[A-Z]+([A-Z\s]+)*$/ )
-    {
-        if( !scalar( keys( %$COLOUR_NAME_TO_RGB ) ) )
-        {
-            # $self->message( 3, "Processing colour map in <DATA> section." );
-            while( <DATA> )
-            {
-                chomp;
-                next if( /^[[:blank:]]*$/ );
-                last if( /^\=/ );
-                my( $r, $g, $b, $name ) = split( /[[:blank:]]+/, $_, 4 );
-                $COLOUR_NAME_TO_RGB->{ lc( $name ) } = [ $r, $g, $b ];
-            }
-            close( DATA );
-        }
-        if( CORE::exists( $COLOUR_NAME_TO_RGB->{ lc( $colour ) } ) )
-        {
-            ( $red, $green, $blue ) = @{$COLOUR_NAME_TO_RGB->{ lc( $colour ) }};
-        }
-    }
-    # Colour all in decimal??
-    elsif( $colour =~ /^\d{9}$/ )
-    {
-        # $self->message( 3, "Got colour all in decimal. Less work to do..." );
-        $red   = substr( $colour, 0, 3 );
-        $green = substr( $colour, 3, 3 );
-        $blue  = substr( $colour, 6, 3 );
-    }
-    # Colour in hexadecimal, convert it
-    elsif( $colour =~ /^[A-F0-9]+$/ )
-    {
-        $red   = hex( substr( $colour, 0, 2 ) );
-        $green = hex( substr( $colour, 2, 2 ) );
-        $blue  = hex( substr( $colour, 4, 2 ) );
-    }
-    # Clueless
-    else
-    {
-        # Not undef, but rather empty string. Undef is associated with an error
-        return( '' );
-    }
-    my $dec_colour = CORE::sprintf( '%3d%3d%3d', $red, $green, $blue );
-    my $last = '';
-    my @colours = reverse( sort( keys( %$colours ) ) );
-    $red    = CORE::sprintf( '%03d', $red );
-    $green  = CORE::sprintf( '%03d', $green );
-    $blue   = CORE::sprintf( '%03d', $blue );
-    my $cur = CORE::sprintf( '%03d%03d%03d', $red, $green, $blue );
-    my( $red_ok, $green_ok, $blue_ok ) = ( 0, 0, 0 );
-    # $self->message( 3, "Current colour: '$cur'." );
-    for( my $i = 0; $i < scalar( @colours ); $i++ )
-    {
-        my $r = CORE::sprintf( '%03d', substr( $colours[ $i ], 0, 3 ) );
-        my $g = CORE::sprintf( '%03d', substr( $colours[ $i ], 3, 3 ) );
-        my $b = CORE::sprintf( '%03d', substr( $colours[ $i ], 6, 3 ) );
- 
-        my $r_p = CORE::sprintf( '%03d', substr( $colours[ $i - 1 ], 0, 3 ) );
-        my $g_p = CORE::sprintf( '%03d', substr( $colours[ $i - 1 ], 3, 3 ) );
-        my $b_p = CORE::sprintf( '%03d', substr( $colours[ $i - 1 ], 6, 3 ) );
- 
-        # $self->message( 3, "$r ($red), $g ($green), $b ($blue)" );
-        if( $red == $r ||
-            ( $red < $r && $red > int( $r / 2 ) ) ||
-            ( $red > $r && $red < int( $r_p / 2 ) && $r_p ) ||
-            $red > $r )
-        {
-            $red_ok++;
-        }
- 
-        if( $red_ok )
-        {
-            if( $green == $g ||
-                ( $green < $g && $green > int( $g / 2 ) ) ||
-                ( $green > $g && $green < int( $g_p / 2 ) && $g_p ) ||
-                $green > $g )
-            {
-                $blue_ok++;
-            }
-        } 
- 
-        if( $blue_ok )
-        {
-            if( $blue == $b ||
-                ( $blue < $b && $blue > int( $b / 2 ) ) ||
-                ( $blue > $b && $blue < int( $b_p / 2 ) && $b_p ) ||
-                $blue > $b )
-            {
-                $last = $colours[ $i ];
-                last;
-            }
-        }
-    }
-    return( $colours->{ $last } );
-}
-
-sub colour_format
-{
-    my $self = shift( @_ );
-    # style, colour or color and text
-    my $opts = shift( @_ );
-    return( $self->error( "Parameter hash provided is not an hash reference." ) ) if( !$self->_is_hash( $opts ) );
-    my $this = $self->_obj2h;
-    # To make it possible to use either text or message property
-    $opts->{text} = CORE::delete( $opts->{message} ) if( CORE::length( $opts->{message} ) && !CORE::length( $opts->{text} ) );
-    return( $self->error( "No text was provided to format." ) ) if( !CORE::length( $opts->{text} ) );
-    
-    $opts->{colour} //= CORE::delete( $opts->{color} ) || CORE::delete( $opts->{fg_colour} ) || CORE::delete( $opts->{fg_color} ) || CORE::delete( $opts->{fgcolour} ) || CORE::delete( $opts->{fgcolor} );
-    $opts->{bgcolour} //= CORE::delete( $opts->{bgcolor} ) || CORE::delete( $opts->{bg_colour} ) || CORE::delete( $opts->{bg_color} );
-    
-    my $bold      = "\e[1m";
-    my $underline = "\e[4m";
-    my $reverse   = "\e[7m";
-    my $normal    = "\e[m";
-    my $cls       = "\e[H\e[2J";
-    my $styles =
-    {
-    # Bold
-    b       => 1,
-    bold    => 1,
-    strong  => 1,
-    # Italic
-    i       => 3,
-    italic  => 3,
-    # Underline
-    u       => 4,
-    underline => 4,
-    underlined => 4,
-    blink   => 5,
-    # Reverse
-    r       => 7,
-    reverse => 7,
-    reversed => 7,
-    # Concealed
-    c       => 8,
-    conceal => 8,
-    concealed => 8,
-    strike  => 9,
-    striked  => 9,
-    striken  => 9,
-    };
-    
-    my $convert_24_To_8bits = sub
-    {
-        my( $r, $g, $b ) = @_;
-        $self->message( 9, "Converting $r, $g, $b to 8 bits" );
-        return( ( POSIX::floor( $r * 7 / 255 ) << 5 ) +
-                ( POSIX::floor( $g * 7 / 255 ) << 2 ) +
-                ( POSIX::floor( $b * 3 / 255 ) ) 
-              );
-    };
-    
-    # opacity * original + (1-opacity)*background = resulting pixel
-    # https://stackoverflow.com/a/746934/4814971
-    my $colour_with_alpha = sub
-    {
-        my( $r, $g, $b, $a, $bg ) = @_;
-        ## Assuming a white background (255)
-        my( $bg_r, $bg_g, $bg_b ) = ( 255, 255, 255 );
-        if( ref( $bg ) eq 'HASH' )
-        {
-            ( $bg_r, $bg_g, $bg_b ) = @$bg{qw( red green blue )};
-        }
-        $r = POSIX::round( ( $a * $r ) + ( ( 1 - $a ) * $bg_r ) );
-        $g = POSIX::round( ( $a * $g ) + ( ( 1 - $a ) * $bg_g ) );
-        $b = POSIX::round( ( $a * $b ) + ( ( 1 - $a ) * $bg_b ) );
-        return( [$r, $g, $b] );
-    };
-    
-    my $check_colour = sub
-    {
-        my $col = shift( @_ );
-        # $self->message( 3, "Checking colour '$col'." );
-        # $colours or $bg_colours
-        my $map = shift( @_ );
-        my $code;
-        my $light;
-        # Example: 'light red' or 'light_red'
-        if( $col =~ /^(?:(?<light>bright|light)[[:blank:]\_]+)?
-        (?<colour>
-            (?:[a-zA-Z]+)(?:[[:blank:]]+\w+)?
-            |
-            (?<rgb_type>rgb[a]?)\([[:blank:]]*(?<red>\d{1,3})[[:blank:]]*\,[[:blank:]]*(?<green>\d{1,3})[[:blank:]]*\,[[:blank:]]*(?<blue>\d{1,3})
-            (?:[[:blank:]]*\,[[:blank:]]*(?<opacity>\d(?:\.\d+)?))?[[:blank:]]*
-            \)
-        )$/xi )
-        {
-            my %regexp = %+;
-            $self->message( 9, "Light colour request '$col'. Capture: ", sub{ $self->dumper( \%regexp ) } );
-            ( $light, $col ) = ( $+{light}, $+{colour} );
-            if( CORE::length( $+{rgb_type} ) &&
-                CORE::length( $+{red} ) &&
-                CORE::length( $+{green} ) &&
-                CORE::length( $+{blue} ) )
-            {
-                if( $+{opacity} || $light )
-                {
-                    my $opacity = CORE::length( $+{opacity} )
-                        ? $+{opacity}
-                        : $light
-                            ? 0.5
-                            : 1;
-                    $col = CORE::sprintf( 'rgba(%03d%03d%03d,%.1f)', $+{red}, $+{green}, $+{blue}, $opacity );
-                }
-                else
-                {
-                    $col = CORE::sprintf( 'rgb(%03d%03d%03d)', $+{red}, $+{green}, $+{blue} );
-                }
-            }
-            else
-            {
-                $self->message( 9, "Colour '$col' is not rgb[a]" );
-            }
-        }
-        elsif( $col =~ /^(?<rgb_type>rgb[a]?)\([[:blank:]]*(?<red>\d{1,3})[[:blank:]]*\,[[:blank:]]*(?<green>\d{1,3})[[:blank:]]*\,[[:blank:]]*(?<blue>\d{1,3})[[:blank:]]*(?:\,[[:blank:]]*(?<opacity>\d(?:\.\d+)?))?[[:blank:]]*\)$/i )
-        {
-            if( $+{opacity} )
-            {
-                $col = CORE::sprintf( 'rgba(%03d%03d%03d,%.1f)', $+{red}, $+{green}, $+{blue}, $+{opacity} );
-            }
-            else
-            {
-                $col = CORE::sprintf( '%03d%03d%03d', $+{red}, $+{green}, $+{blue} );
-            }
-        }
-        else
-        {
-            $self->message( 9, "Colour '$col' failed to match our rgba regexp." );
-        }
-        
-        my $col_ref;
-        if( $col =~ /^rgb[a]?\((?<red>\d{3})(?<green>\d{3})(?<blue>\d{3})\)$/i )
-        {
-            $col_ref = {};
-            %$col_ref = %+;
-            $self->message( 9, "Rgb colour '$+{red}', '$+{green}' and '$+{blue}' found: ", sub{ $self->dumper( $col_ref ) });
-            return({
-                _24bits => [@$col_ref{qw( red green blue )}],
-                _8bits => $convert_24_To_8bits->( @$col_ref{qw( red green blue )} )
-            });
-        }
-        # Treating opacity to make things lighter; not ideal, but standard scheme
-        elsif( $col =~ /^rgba\((?<red>\d{3})(?<green>\d{3})(?<blue>\d{3})[[:blank:]]*\,[[:blank:]]*(?<opacity>\d(?:\.\d)?)\)$/i )
-        {
-            $col_ref = {};
-            %$col_ref = %+;
-            $self->message( 9, "Rgba colour '$+{red}', '$+{green}' and '$+{blue}' found with opacity $+{opacity}: ", sub{ $self->dumper( $col_ref ) });
-            if( $+{opacity} )
-            {
-                my $opacity = $+{opacity};
-                $self->message( 9, "Opacity of $opacity found, applying the factor to the colour." );
-                my $bg;
-                if( $opts->{bgcolour} )
-                {
-                    $bg = $self->colour_to_rgb( $opts->{bgcolour} );
-                    $self->message( 9, "Calculating new rgb with opacity and background information: ", sub{ $self->dumper( $bg ) });
-                }
-                my $new_col = $colour_with_alpha->( @$col_ref{qw( red green blue )}, $opacity, $bg );
-                $self->message( 9, "New colour with opacity applied: ", sub{ $self->dumper( $new_col ) });
-                @$col_ref{qw( red green blue )} = @$new_col;
-                $self->message( 9, "Colour $+{red}, $+{green}, $+{blue} * $opacity => $col_ref->{red}, $col_ref->{green}, $col_ref->{blue}" );
-            }
-            return({
-                _24bits => [@$col_ref{qw( red green blue )}],
-                _8bits => $convert_24_To_8bits->( @$col_ref{qw( red green blue )} )
-            });
-        }
-        elsif( $self->message( 9, "Checking if rgb value exists for colour '$col'" ) &&
-               ( $col_ref = $self->colour_to_rgb( $col ) ) )
-        {
-            $self->message( 9, "Setting up colour '$col' with data: ", sub{ $self->dumper( $col_ref ) });
-            # $code = $map->{ $col };
-            return({
-                _24bits => [@$col_ref{qw( red green blue )}],
-                _8bits => $convert_24_To_8bits->( @$col_ref{qw( red green blue )} )
-            });
-        }
-        else
-        {
-            $self->message( 9, "Could not find a match for colour '$col'." );
-            return( {} );
-        }
-#         my $is_bg = ( CORE::substr( $code, 0, 1 ) == 4 );
-#         if( CORE::length( $code ) && $light )
-#         {
-#             ## If the colour is a background colour, replace 4 by 10 (e.g.: 42 becomes 103)
-#             ## and if foreground colour, replace 3 by 9
-#             CORE::substr( $code, 0, 1 ) = ( $is_bg ? 10 : 9 );
-#         }
-#         return( $code );
-    };
-    my $data = [];
-    my $data8 = [];
-    my $params = [];
-    # 8 bits parameters compatible
-    my $params8 = [];
-    if( $opts->{colour} || $opts->{color} || $opts->{fgcolour} || $opts->{fgcolor} || $opts->{fg_colour} || $opts->{fg_color} )
-    {
-        $opts->{colour} ||= CORE::delete( $opts->{color} ) || CORE::delete( $opts->{fg_colour} ) || CORE::delete( $opts->{fg_color} ) || CORE::delete( $opts->{fgcolour} ) || CORE::delete( $opts->{fgcolor} );
-        # my $col_ref = $check_colour->( $opts->{colour}, $colours );
-        my $col_ref = $check_colour->( $opts->{colour} );
-        # CORE::push( @$params, $col ) if( CORE::length( $col ) );
-        if( scalar( keys( %$col_ref ) ) )
-        {
-            $self->message( 9, "Foreground colour '$opts->{colour}' data are: ", sub{ $self->dumper( $col_ref ) });
-            CORE::push( @$params8, sprintf( '38;5;%d', $col_ref->{_8bits} ) );
-            CORE::push( @$params, sprintf( '38;2;%d;%d;%d', @{$col_ref->{_24bits}} ) );
-        }
-        else
-        {
-            $self->message( 9, "Could not resolve the foreground colour '$opts->{colour}'." );
-        }
-    }
-    if( $opts->{bgcolour} || $opts->{bgcolor} || $opts->{bg_colour} || $opts->{bg_color} )
-    {
-        $opts->{bgcolour} ||= CORE::delete( $opts->{bgcolor} ) || CORE::delete( $opts->{bg_colour} ) || CORE::delete( $opts->{bg_color} );
-        # my $col_ref = $check_colour->( $opts->{bgcolour}, $bg_colours );
-        my $col_ref = $check_colour->( $opts->{bgcolour} );
-        ## CORE::push( @$params, $col ) if( CORE::length( $col ) );
-        if( scalar( keys( %$col_ref ) ) )
-        {
-            $self->message( 9, "Foreground colour '$opts->{bgcolour}' data are: ", sub{ $self->dumper( $col_ref ) });
-            CORE::push( @$params8, sprintf( '48;5;%d', $col_ref->{_8bits} ) );
-            CORE::push( @$params, sprintf( '48;2;%d;%d;%d', @{$col_ref->{_24bits}} ) );
-        }
-        else
-        {
-            $self->message( 9, "Could not resolve the background colour '$opts->{colour}'." );
-        }
-    }
-    if( $opts->{style} )
-    {
-        # $self->message( 9, "Style '$opts->{style}' provided." );
-        my $those_styles = [CORE::split( /\|/, $opts->{style} )];
-        # $self->message( 9, "Split styles: ", sub{ $self->dumper( $those_styles ) } );
-        foreach my $s ( @$those_styles )
-        {
-            # $self->message( 9, "Adding style '$s'" ) if( CORE::exists( $styles->{lc($s)} ) );
-            if( CORE::exists( $styles->{lc($s)} ) )
-            {
-                CORE::push( @$params, $styles->{lc($s)} );
-                # We add the 8 bits compliant version only if any colour was provided, i.e.
-                # This is not just a style definition
-                CORE::push( @$params8, $styles->{lc($s)} ) if( scalar( @$params8 ) );
-            }
-        }
-    }
-    CORE::push( @$data, "\e[" . CORE::join( ';', @$params8 ) . "m" ) if( scalar( @$params8 ) );
-    CORE::push( @$data, "\e[" . CORE::join( ';', @$params ) . "m" ) if( scalar( @$params ) );
-    $self->message( 9, "Pre final colour data contains: ", sub{ $self->dumper( $data ) });
-    # If the text contains libe breaks, we must stop the formatting before, or else there would be an ugly formatting on the entire screen following the line break
-    if( scalar( @$params ) && $opts->{text} =~ /\n+/ )
-    {
-        my $text_parts = [CORE::split( /\n/, $opts->{text} )];
-        my $fmt = CORE::join( '', @$data );
-        my $fmt8 = CORE::join( '', @$data8 );
-        for( my $i = 0; $i < scalar( @$text_parts ); $i++ )
-        {
-            # Empty due to \n repeated
-            next if( !CORE::length( $text_parts->[$i] ) );
-            $text_parts->[$i] = $fmt . $text_parts->[$i] . $normal;
-        }
-        $opts->{text} = CORE::join( "\n", @$text_parts );
-        CORE::push( @$data, $opts->{text} );
-    }
-    else
-    {
-        CORE::push( @$data, $opts->{text} );
-        CORE::push( @$data, $normal, $normal ) if( scalar( @$params ) );
-    }
-    ## $self->message( "Returning '", quotemeta( CORE::join( '', @$data ) ), "'" );
-    return( CORE::join( '', @$data ) );
-}
-
-sub colour_open { return( shift->_set_get( 'colour_open', @_ ) ); }
-
-sub colour_parse
-{
-    my $self = shift( @_ );
-    my $txt  = join( '', @_ );
-    my $this  = $self->_obj2h;
-    my $open  = $this->{colour_open} || COLOUR_OPEN;
-    my $close = $this->{colour_close} || COLOUR_CLOSE;
-    no strict;
-    my $re = qr/
-(?<all>
-\Q$open\E(?!\/)(?<params>.*?)\Q$close\E
-    (?<content>
-        (?:
-            (?> [^$open$close]+ )
-            |
-            (?R)
-        )*+
-    )
-\Q$open\E\/\Q$close\E
-)
-    /x;
-    my $colour_re = qr/(?:(?:bright|light)[[:blank:]])?(?:[a-zA-Z]+(?:[[:blank:]]+[\w\-]+)?|rgb[a]?\([[:blank:]]*\d{1,3}[[:blank:]]*\,[[:blank:]]*\d{1,3}[[:blank:]]*\,[[:blank:]]*\d{1,3}[[:blank:]]*(?:\,[[:blank:]]*\d(?:\.\d)?)?[[:blank:]]*\))/;
-    my $style_re = qr/(?:bold|faint|italic|underline|blink|reverse|conceal|strike)/;
-    my $parse;
-    $parse = sub
-    {
-        my $str = shift( @_ );
-        # $self->message( 9, "Parsing coloured text '$str'" );
-        $str =~ s{$re}
-        {
-            my $re = { %- };
-            my $catch = substr( $str, $-[0], $+[0] - $-[0] );
-            ## $self->message( 9, "Regexp is: ", sub{ $self->dump( $re ) } );
-            my $all = $+{all};
-            my $ct = $+{content};
-            my $params = $+{params};
-            if( index( $ct, $open ) != -1 && index( $ct, $close ) != -1 )
-            {
-                $ct = $parse->( $ct );
-            }
-            my $def = {};
-            if( $params =~ /^[[:blank:]]*(?:(?<style1>$style_re)[[:blank:]]+)?(?<fg_colour>$colour_re)(?:[[:blank:]]+(?<style2>$style_re))?(?:[[:blank:]]+on[[:blank:]]+(?<bg_colour>$colour_re))?[[:blank:]]*$/i )
-            {
-                my $style = $+{style1} || $+{style2};
-                my $fg = $+{fg_colour};
-                my $bg = $+{bg_colour};
-                # $self->message( 9, "Found style '$style', colour '$fg' and background colour '$bg'." );
-                $def = 
-                {
-                style => $style,
-                colour => $fg,
-                bg_colour => $bg,
-                };
-            }
-            else
-            {
-                # $self->message( 9, "Evaluating the styling '$params'." );
-                local $SIG{__WARN__} = sub{};
-                local $SIG{__DIE__} = sub{};
-                my @res = eval( $params );
-                # $self->message( 9, "Evaluation result is: ", sub{ $self->dump( [ @res ] ) } );
-                $def = { @res } if( scalar( @res ) && !( scalar( @res ) % 2 ) );
-                if( $@ || ref( $def ) ne 'HASH' )
-                {
-                    my $err = $@ || "Invalid styling \"${params}\"";
-                    $self->message( 9, "Error evaluating: $err" );
-                    $def = {};
-                }
-            }
-            if( scalar( keys( %$def ) ) )
-            {
-                $def->{text} = $ct;
-                $self->message( 9, "Calling colour_parse with parameters: ", sub{ $self->dump( $def )} );
-                my $res = $self->colour_format( $def );
-                length( $res ) ? $res : $catch;
-            }
-            else
-            {
-                $self->message( 9, "Returning '$catch'" );
-                $catch;
-            }
-        }gex;
-        return( $str );
-    };
-    return( $parse->( $txt ) );
-}
-
-sub colour_to_rgb
-{
-    my $self    = shift( @_ );
-    my $colour  = lc( shift( @_ ) );
-    my $this  = $self->_obj2h;
-    my( $red, $green, $blue ) = ( '', '', '' );
-    our $COLOUR_NAME_TO_RGB;
-    $self->message( 9, "Checking rgb value for '$colour'. Called from line ", (caller)[2] );
-    if( $colour =~ /^[A-Za-z]+([\w\-]+)*([[:blank:]]+\w+)?$/ )
-    {
-        $self->message( 9, "Checking colour '$colour' as string. Looking up its rgb value." );
-        if( !scalar( keys( %$COLOUR_NAME_TO_RGB ) ) )
-        {
-            $self->message( 9, "Processing colour map in <DATA> section." );
-            my $colour_data = $self->__colour_data;
-            $COLOUR_NAME_TO_RGB = eval( $colour_data );
-            if( $@ )
-            {
-                return( $self->error( "An error occurred loading data from __colour_data: $@" ) );
-            }
-        }
-        if( CORE::exists( $COLOUR_NAME_TO_RGB->{ $colour } ) )
-        {
-            ( $red, $green, $blue ) = @{$COLOUR_NAME_TO_RGB->{ $colour }};
-            $self->message( 9, "Found rgb '$red, $green, $blue' for colour '$colour'." );
-        }
-        else
-        {
-            $self->message( 9, "Could not find colour '$colour' in our colour map." );
-            return( '' );
-        }
-    }
-    ## Colour all in decimal??
-    elsif( $colour =~ /^\d{9}$/ )
-    {
-        ## $self->message( 9, "Got colour all in decimal. Less work to do..." );
-        $red   = substr( $colour, 0, 3 );
-        $green = substr( $colour, 3, 3 );
-        $blue  = substr( $colour, 6, 3 );
-    }
-    ## Colour in hexadecimal, convert it
-    elsif( $colour =~ /^[A-F0-9]+$/ )
-    {
-        $red   = hex( substr( $colour, 0, 2 ) );
-        $green = hex( substr( $colour, 2, 2 ) );
-        $blue  = hex( substr( $colour, 4, 2 ) );
-    }
-    ## Clueless
-    else
-    {
-        $self->message( 9, "Clueless about what to do with colour '$colour'." );
-        ## Not undef, but rather empty string. Undef is associated with an error
-        return( '' );
-    }
-    return({ red => $red, green => $green, blue => $blue });
-}
-
-sub coloured
-{
-    my $self = shift( @_ );
-    my $pref = shift( @_ );
-    my $text = CORE::join( '', @_ );
-    my $this  = $self->_obj2h;
-    my( $style, $fg, $bg );
-    ## my $colour_re = qr/(?:(?:bright|light)[[:blank:]])?[a-zA-Z]+/;
-    my $colour_re = qr/(?:(?:bright|light)[[:blank:]])?(?:[a-zA-Z]+(?:[[:blank:]]+[\w\-]+)?|rgb[a]?\([[:blank:]]*\d{1,3}[[:blank:]]*\,[[:blank:]]*\d{1,3}[[:blank:]]*\,[[:blank:]]*\d{1,3}[[:blank:]]*(?:\,[[:blank:]]*\d(?:\.\d)?)?[[:blank:]]*\))/;
-    my $style_re = qr/(?:bold|faint|italic|underline|blink|reverse|conceal|strike)/;
-    if( $pref =~ /^(?:(?<style1>$style_re)[[:blank:]]+)?(?<fg_colour>$colour_re)(?:[[:blank:]]+(?<style2>$style_re))?(?:[[:blank:]]+on[[:blank:]]+(?<bg_colour>$colour_re))?$/i )
-    {
-        $style = $+{style1} || $+{style2};
-        $fg = $+{fg_colour};
-        $bg = $+{bg_colour};
-        ## $self->message( 9, "Found style '$style', colour '$fg' and background colour '$bg'." );
-        return( $self->colour_format({ text => $text, style => $style, colour => $fg, bg_colour => $bg }) );
-    }
-    else
-    {
-        $self->message( 9, "No match." );
-        return( '' );
-    }
 }
 
 sub deserialise
@@ -1088,137 +400,9 @@ sub dump
     }
 }
 
-sub dump_hex
-{
-    my $self = shift( @_ );
-    try
-    {
-        require Devel::Hexdump;
-        return( Devel::Hexdump::xd( shift( @_ ) ) );
-    }
-    catch( $e )
-    {
-        return( $self->error( "Devel::Hexdump is not installed on your system." ) );
-    }
-}
-
-## For backward compatibility and traceability
-sub dump_print { return( shift->dumpto_printer( @_ ) ); }
-
-sub dumper
-{
-    my $self = shift( @_ );
-    my $opts = {};
-    $opts = pop( @_ ) if( scalar( @_ ) > 1 && ref( $_[-1] ) eq 'HASH' );
-    try
-    {
-        no warnings 'once';
-        require Data::Dumper;
-        # local $Data::Dumper::Sortkeys = 1;
-        local $Data::Dumper::Terse = 1;
-        local $Data::Dumper::Indent = 1;
-        local $Data::Dumper::Useqq = 1;
-        local $Data::Dumper::Maxdepth = $opts->{depth} if( CORE::length( $opts->{depth} ) );
-        local $Data::Dumper::Sortkeys = sub
-        {
-            my $h = shift( @_ );
-            return( [ sort( grep{ ref( $h->{ $_ } ) !~ /^(DateTime|DateTime\:\:)/ } keys( %$h ) ) ] );
-        };
-        return( Data::Dumper::Dumper( @_ ) );
-    }
-    catch( $e )
-    {
-        return( $self->error( "Data::Dumper is not installed on your system." ) );
-    }
-}
-
-sub printer
-{
-    my $self = shift( @_ );
-    my $opts = {};
-    $opts = pop( @_ ) if( scalar( @_ ) > 1 && ref( $_[-1] ) eq 'HASH' );
-    try
-    {
-        local $SIG{__WARN__} = sub{ };
-        require Data::Printer;
-        if( scalar( keys( %$opts ) ) )
-        {
-            return( Data::Printer::np( @_, %$opts ) );
-        }
-        else
-        {
-            return( Data::Printer::np( @_ ) );
-        }
-    }
-    catch( $e )
-    {
-        return( $self->error( "Data::Printer is not installed on your system." ) );
-    }
-}
-
 {
     no warnings 'once';
     *dumpto = \&dumpto_dumper;
-}
-
-sub dumpto_printer
-{
-    my $self  = shift( @_ );
-    my( $data, $file ) = @_;
-    $file = Module::Generic::File::file( $file );
-    my $fh =  $file->open( '>', { binmode => 'utf-8', autoflush => 1 }) || 
-        die( "Unable to create file '$file': $!\n" );
-    $fh->print( Data::Dump::dump( $data ), "\n" );
-    $fh->close;
-    # 666 so it can work under command line and web alike
-    chmod( 0666, $file );
-    return(1);
-}
-
-sub dumpto_dumper
-{
-    my $self  = shift( @_ );
-    my( $data, $file ) = @_;
-    try
-    {
-        require Data::Dumper;
-        local $Data::Dumper::Sortkeys = 1;
-        local $Data::Dumper::Terse = 1;
-        local $Data::Dumper::Indent = 1;
-        local $Data::Dumper::Useqq = 1;
-        $file = Module::Generic::File::file( $file );
-        my $fh =  $file->open( '>', { autoflush => 1 }) || 
-            die( "Unable to create file '$file': $!\n" );
-        if( ref( $data ) )
-        {
-            $fh->print( Data::Dumper::Dumper( $data ), "\n" );
-        }
-        else
-        {
-            $fh->binmode( ':utf8' );
-            $fh->print( $data );
-        }
-        $fh->close;
-        ## 666 so it can work under command line and web alike
-        chmod( 0666, $file );
-        return(1);
-    }
-    catch( $e )
-    {
-        return( $self->error( "Unable to dump data to \"$file\" using Data::Dumper: $e" ) );
-    }
-}
-
-sub errno
-{
-    my $self = shift( @_ );
-    my $this = $self->_obj2h;
-    if( @_ )
-    {
-        $this->{errno} = shift( @_ ) if( $_[ 0 ] =~ /^\-?\d+$/ );
-        return( $self->error( @_ ) ) if( @_ );
-    }
-    return( $this->{errno} );
 }
 
 sub error
@@ -1867,46 +1051,6 @@ sub message_check
     *message_color = \&message_colour;
 }
 
-sub message_colour
-{
-    my $self  = shift( @_ );
-    my $class = ref( $self ) || $self;
-    my $this  = $self->_obj2h;
-    no strict 'refs';
-    if( $this->{verbose} || $this->{debug} || ${ $class . '::DEBUG' } )
-    {
-        my $level = ( $_[0] =~ /^\d+$/ ? shift( @_ ) : undef() );
-        my $opts = {};
-        if( scalar( @_ ) > 1 && ref( $_[-1] ) eq 'HASH' && ( CORE::exists( $_[-1]->{level} ) || CORE::exists( $_[-1]->{type} ) || CORE::exists( $_[-1]->{message} ) ) )
-        {
-            $opts = pop( @_ );
-        }
-        my $ref = [@_];
-        $level = $opts->{level} if( !defined( $level ) && CORE::exists( $opts->{level} ) );
-        my $txt;
-        if( $opts->{message} )
-        {
-            if( ref( $opts->{message} ) eq 'ARRAY' )
-            {
-                $txt = join( '', map( ( ref( $_ ) eq 'CODE' && !$this->{_msg_no_exec_sub} ) ? $_->() : $_, @{$opts->{message}} ) );
-            }
-            else
-            {
-                $txt = $opts->{message};
-            }
-        }
-        else
-        {
-            $txt = join( '', map( ( ref( $_ ) eq 'CODE' && !$this->{_msg_no_exec_sub} ) ? $_->() : $_, @$ref ) );
-        }
-        $txt = $self->colour_parse( $txt );
-        $opts->{message} = $txt;
-        $opts->{level} = $level if( defined( $level ) );
-        return( $self->message( ( $level || 0 ), $opts ) );
-    }
-    return( 1 );
-}
-
 sub message_frame
 {
     my $self = shift( @_ );
@@ -1940,47 +1084,6 @@ sub message_frame
         }
     }
     return( $mf );
-}
-
-sub message_log
-{
-    my $self = shift( @_ );
-    my $io   = $self->message_log_io;
-    return( undef() ) if( !$io );
-    return( undef() ) if( !Scalar::Util::openhandle( $io ) && $io );
-    ## 2019-06-14: I decided to remove this test, because if a log is provided it should print to it
-    ## If we are on the command line, we can easily just do tail -f log_file.txt for example and get the same result as
-    ## if it were printed directly on the console
-    my $rc = $io->print( scalar( localtime( time() ) ), " [$$]: ", @_ ) || return( $self->error( "Unable to print to log file: $!" ) );
-    return( $rc );
-}
-
-sub message_log_io
-{
-    #return( shift->_set_get( 'log_io', @_ ) );
-    my $self  = shift( @_ );
-    my $class = ref( $self ) || $self;
-    my $this  = $self->_obj2h;
-    no strict 'refs';
-    if( @_ )
-    {
-        my $io = shift( @_ );
-        $self->_set_get( 'log_io', $io );
-    }
-    elsif( ${ "${class}::LOG_DEBUG" } && 
-        !$self->_set_get( 'log_io' ) && 
-        ${ "${class}::DEB_LOG" } )
-    {
-        our $DEB_LOG = ${ "${class}::DEB_LOG" };
-        unless( $DEBUG_LOG_IO )
-        {
-            $DEB_LOG = Module::Generic::File::file( $DEB_LOG );
-            $DEBUG_LOG_IO = $DEB_LOG->open( '>>', { binmode => 'utf-8', autoflush => 1 }) || 
-                die( "Unable to open debug log file $DEB_LOG in append mode: $!\n" );
-        }
-        $self->_set_get( 'log_io', $DEBUG_LOG_IO );
-    }
-    return( $self->_set_get( 'log_io' ) );
 }
 
 sub messagef
@@ -2022,28 +1125,6 @@ sub messagef
         $opts->{message} = $txt;
         $opts->{level} = $level if( defined( $level ) );
         return( $self->message( ( $level || 0 ), $opts ) );
-    }
-    return( 1 );
-}
-
-sub messagef_colour
-{
-    my $self  = shift( @_ );
-    my $this  = $self->_obj2h;
-    my $class = ref( $self ) || $self;
-    no strict 'refs';
-    if( $this->{verbose} || $this->{debug} || ${ $class . '::DEBUG' } )
-    {
-        my @args = @_;
-        my $opts = {};
-        if( scalar( @args ) > 1 && ref( $args[-1] ) eq 'HASH' && ( CORE::exists( $args[-1]->{level} ) || CORE::exists( $args[-1]->{type} ) || CORE::exists( $args[-1]->{message} ) ) )
-        {
-            $opts = pop( @args );
-        }
-        $opts->{colour} = 1;
-        CORE::push( @args, $opts );
-        ## $self->message( 0, "Sending arguments: ", sub{ $self->dumper( \@args ) } );
-        return( $this->messagef( @args ) );
     }
     return( 1 );
 }
@@ -2239,34 +1320,6 @@ sub pass_error
 
 sub quiet { return( shift->_set_get( 'quiet', @_ ) ); }
 
-sub save
-{
-    my $self = shift( @_ );
-    my $this = $self->_obj2h;
-    my $opts = {};
-    $opts = pop( @_ ) if( ref( $_[-1] ) eq 'HASH' );
-    my( $file, $data );
-    if( @_ == 2 )
-    {
-        $opts->{data} = shift( @_ );
-        $opts->{file} = shift( @_ );
-    }
-    return( $self->error( "No file was provided to save data to." ) ) if( !$opts->{file} );
-    $file = Module::Generic::File::file( $opts->{file} );
-    my $fh = $file->open( '>', {
-        ( $opts->{encoding} ? ( binmode => $opts->{encoding} ) : () ),
-        autoflush => 1,
-    }) ||
-        return( $self->error( "Unable to open file \"$file\" in write mode: $!" ) );
-    if( !defined( $fh->print( ref( $opts->{data} ) eq 'SCALAR' ? ${$opts->{data}} : $opts->{data} ) ) )
-    {
-        return( $self->error( "Unable to write data to file \"$file\": $!" ) )
-    }
-    $fh->close;
-    my $bytes = -s( $opts->{file} );
-    return( $bytes );
-}
-
 sub serialise
 {
     my $self = shift( @_ );
@@ -2355,34 +1408,6 @@ sub set
     return( scalar( keys( %arg ) ) );
 }
 
-sub subclasses
-{
-    my $self  = shift( @_ );
-    my $that  = '';
-    $that     = @_ ? shift( @_ ) : $self;
-    my $base  = ref( $that ) || $that;
-    $base  =~ s,::,/,g;
-    $base .= '.pm';
-    
-    require IO::Dir;
-    # remove '.pm'
-    my $dir = substr( $INC{ $base }, 0, ( length( $INC{ $base } ) ) - 3 );
-    
-    my @packages = ();
-    my $io = IO::Dir->open( $dir );
-    if( defined( $io ) )
-    {
-        @packages = map{ substr( $_, 0, length( $_ ) - 3 ) } grep{ substr( $_, -3 ) eq '.pm' && -f( "$dir/$_" ) } $io->read();
-        $io->close ||
-        warn( "Unable to close directory \"$dir\": $!\n" );
-    }
-    else
-    {
-        warn( "Unable to open directory \"$dir\": $!\n" );
-    }
-    return( wantarray() ? @packages : \@packages );
-}
-
 sub true  { return( $Module::Generic::Boolean::true ); }
 
 sub false { return( $Module::Generic::Boolean::false ); }
@@ -2458,16 +1483,6 @@ sub will
         return( $sub );
     }
     return;
-}
-
-## Initially those data were stored after the __END__, but it seems some module is interfering with <DATA>
-## and so those data could not be loaded reliably
-## This is called once by colour_to_rgb to generate the hash reference COLOUR_NAME_TO_RGB
-sub __colour_data
-{
-    my $colour_data = <<EOT;
-{'alice blue' => ['240','248','255'],'aliceblue' => ['240','248','255'],'antique white' => ['250','235','215'],'antiquewhite' => ['250','235','215'],'antiquewhite1' => ['255','239','219'],'antiquewhite2' => ['238','223','204'],'antiquewhite3' => ['205','192','176'],'antiquewhite4' => ['139','131','120'],'aquamarine' => ['127','255','212'],'aquamarine1' => ['127','255','212'],'aquamarine2' => ['118','238','198'],'aquamarine3' => ['102','205','170'],'aquamarine4' => ['69','139','116'],'azure' => ['240','255','255'],'azure1' => ['240','255','255'],'azure2' => ['224','238','238'],'azure3' => ['193','205','205'],'azure4' => ['131','139','139'],'beige' => ['245','245','220'],'bisque' => ['255','228','196'],'bisque1' => ['255','228','196'],'bisque2' => ['238','213','183'],'bisque3' => ['205','183','158'],'bisque4' => ['139','125','107'],'black' => ['0','0','0'],'blanched almond' => ['255','235','205'],'blanchedalmond' => ['255','235','205'],'blue' => ['0','0','255'],'blue violet' => ['138','43','226'],'blue1' => ['0','0','255'],'blue2' => ['0','0','238'],'blue3' => ['0','0','205'],'blue4' => ['0','0','139'],'blueviolet' => ['138','43','226'],'brown' => ['165','42','42'],'brown1' => ['255','64','64'],'brown2' => ['238','59','59'],'brown3' => ['205','51','51'],'brown4' => ['139','35','35'],'burlywood' => ['222','184','135'],'burlywood1' => ['255','211','155'],'burlywood2' => ['238','197','145'],'burlywood3' => ['205','170','125'],'burlywood4' => ['139','115','85'],'cadet blue' => ['95','158','160'],'cadetblue' => ['95','158','160'],'cadetblue1' => ['152','245','255'],'cadetblue2' => ['142','229','238'],'cadetblue3' => ['122','197','205'],'cadetblue4' => ['83','134','139'],'chartreuse' => ['127','255','0'],'chartreuse1' => ['127','255','0'],'chartreuse2' => ['118','238','0'],'chartreuse3' => ['102','205','0'],'chartreuse4' => ['69','139','0'],'chocolate' => ['210','105','30'],'chocolate1' => ['255','127','36'],'chocolate2' => ['238','118','33'],'chocolate3' => ['205','102','29'],'chocolate4' => ['139','69','19'],'coral' => ['255','127','80'],'coral1' => ['255','114','86'],'coral2' => ['238','106','80'],'coral3' => ['205','91','69'],'coral4' => ['139','62','47'],'cornflower blue' => ['100','149','237'],'cornflowerblue' => ['100','149','237'],'cornsilk' => ['255','248','220'],'cornsilk1' => ['255','248','220'],'cornsilk2' => ['238','232','205'],'cornsilk3' => ['205','200','177'],'cornsilk4' => ['139','136','120'],'cyan' => ['0','255','255'],'cyan1' => ['0','255','255'],'cyan2' => ['0','238','238'],'cyan3' => ['0','205','205'],'cyan4' => ['0','139','139'],'dark blue' => ['0','0','139'],'dark cyan' => ['0','139','139'],'dark goldenrod' => ['184','134','11'],'dark gray' => ['169','169','169'],'dark green' => ['0','100','0'],'dark grey' => ['169','169','169'],'dark khaki' => ['189','183','107'],'dark magenta' => ['139','0','139'],'dark olive green' => ['85','107','47'],'dark orange' => ['255','140','0'],'dark orchid' => ['153','50','204'],'dark red' => ['139','0','0'],'dark salmon' => ['233','150','122'],'dark sea green' => ['143','188','143'],'dark slate blue' => ['72','61','139'],'dark slate gray' => ['47','79','79'],'dark slate grey' => ['47','79','79'],'dark turquoise' => ['0','206','209'],'dark violet' => ['148','0','211'],'darkblue' => ['0','0','139'],'darkcyan' => ['0','139','139'],'darkgoldenrod' => ['184','134','11'],'darkgoldenrod1' => ['255','185','15'],'darkgoldenrod2' => ['238','173','14'],'darkgoldenrod3' => ['205','149','12'],'darkgoldenrod4' => ['139','101','8'],'darkgray' => ['169','169','169'],'darkgreen' => ['0','100','0'],'darkgrey' => ['169','169','169'],'darkkhaki' => ['189','183','107'],'darkmagenta' => ['139','0','139'],'darkolivegreen' => ['85','107','47'],'darkolivegreen1' => ['202','255','112'],'darkolivegreen2' => ['188','238','104'],'darkolivegreen3' => ['162','205','90'],'darkolivegreen4' => ['110','139','61'],'darkorange' => ['255','140','0'],'darkorange1' => ['255','127','0'],'darkorange2' => ['238','118','0'],'darkorange3' => ['205','102','0'],'darkorange4' => ['139','69','0'],'darkorchid' => ['153','50','204'],'darkorchid1' => ['191','62','255'],'darkorchid2' => ['178','58','238'],'darkorchid3' => ['154','50','205'],'darkorchid4' => ['104','34','139'],'darkred' => ['139','0','0'],'darksalmon' => ['233','150','122'],'darkseagreen' => ['143','188','143'],'darkseagreen1' => ['193','255','193'],'darkseagreen2' => ['180','238','180'],'darkseagreen3' => ['155','205','155'],'darkseagreen4' => ['105','139','105'],'darkslateblue' => ['72','61','139'],'darkslategray' => ['47','79','79'],'darkslategray1' => ['151','255','255'],'darkslategray2' => ['141','238','238'],'darkslategray3' => ['121','205','205'],'darkslategray4' => ['82','139','139'],'darkslategrey' => ['47','79','79'],'darkturquoise' => ['0','206','209'],'darkviolet' => ['148','0','211'],'deep pink' => ['255','20','147'],'deep sky blue' => ['0','191','255'],'deeppink' => ['255','20','147'],'deeppink1' => ['255','20','147'],'deeppink2' => ['238','18','137'],'deeppink3' => ['205','16','118'],'deeppink4' => ['139','10','80'],'deepskyblue' => ['0','191','255'],'deepskyblue1' => ['0','191','255'],'deepskyblue2' => ['0','178','238'],'deepskyblue3' => ['0','154','205'],'deepskyblue4' => ['0','104','139'],'dim gray' => ['105','105','105'],'dim grey' => ['105','105','105'],'dimgray' => ['105','105','105'],'dimgrey' => ['105','105','105'],'dodger blue' => ['30','144','255'],'dodgerblue' => ['30','144','255'],'dodgerblue1' => ['30','144','255'],'dodgerblue2' => ['28','134','238'],'dodgerblue3' => ['24','116','205'],'dodgerblue4' => ['16','78','139'],'firebrick' => ['178','34','34'],'firebrick1' => ['255','48','48'],'firebrick2' => ['238','44','44'],'firebrick3' => ['205','38','38'],'firebrick4' => ['139','26','26'],'floral white' => ['255','250','240'],'floralwhite' => ['255','250','240'],'forest green' => ['34','139','34'],'forestgreen' => ['34','139','34'],'gainsboro' => ['220','220','220'],'ghost white' => ['248','248','255'],'ghostwhite' => ['248','248','255'],'gold' => ['255','215','0'],'gold1' => ['255','215','0'],'gold2' => ['238','201','0'],'gold3' => ['205','173','0'],'gold4' => ['139','117','0'],'goldenrod' => ['218','165','32'],'goldenrod1' => ['255','193','37'],'goldenrod2' => ['238','180','34'],'goldenrod3' => ['205','155','29'],'goldenrod4' => ['139','105','20'],'gray' => ['190','190','190'],'gray0' => ['0','0','0'],'gray1' => ['3','3','3'],'gray10' => ['26','26','26'],'gray100' => ['255','255','255'],'gray11' => ['28','28','28'],'gray12' => ['31','31','31'],'gray13' => ['33','33','33'],'gray14' => ['36','36','36'],'gray15' => ['38','38','38'],'gray16' => ['41','41','41'],'gray17' => ['43','43','43'],'gray18' => ['46','46','46'],'gray19' => ['48','48','48'],'gray2' => ['5','5','5'],'gray20' => ['51','51','51'],'gray21' => ['54','54','54'],'gray22' => ['56','56','56'],'gray23' => ['59','59','59'],'gray24' => ['61','61','61'],'gray25' => ['64','64','64'],'gray26' => ['66','66','66'],'gray27' => ['69','69','69'],'gray28' => ['71','71','71'],'gray29' => ['74','74','74'],'gray3' => ['8','8','8'],'gray30' => ['77','77','77'],'gray31' => ['79','79','79'],'gray32' => ['82','82','82'],'gray33' => ['84','84','84'],'gray34' => ['87','87','87'],'gray35' => ['89','89','89'],'gray36' => ['92','92','92'],'gray37' => ['94','94','94'],'gray38' => ['97','97','97'],'gray39' => ['99','99','99'],'gray4' => ['10','10','10'],'gray40' => ['102','102','102'],'gray41' => ['105','105','105'],'gray42' => ['107','107','107'],'gray43' => ['110','110','110'],'gray44' => ['112','112','112'],'gray45' => ['115','115','115'],'gray46' => ['117','117','117'],'gray47' => ['120','120','120'],'gray48' => ['122','122','122'],'gray49' => ['125','125','125'],'gray5' => ['13','13','13'],'gray50' => ['127','127','127'],'gray51' => ['130','130','130'],'gray52' => ['133','133','133'],'gray53' => ['135','135','135'],'gray54' => ['138','138','138'],'gray55' => ['140','140','140'],'gray56' => ['143','143','143'],'gray57' => ['145','145','145'],'gray58' => ['148','148','148'],'gray59' => ['150','150','150'],'gray6' => ['15','15','15'],'gray60' => ['153','153','153'],'gray61' => ['156','156','156'],'gray62' => ['158','158','158'],'gray63' => ['161','161','161'],'gray64' => ['163','163','163'],'gray65' => ['166','166','166'],'gray66' => ['168','168','168'],'gray67' => ['171','171','171'],'gray68' => ['173','173','173'],'gray69' => ['176','176','176'],'gray7' => ['18','18','18'],'gray70' => ['179','179','179'],'gray71' => ['181','181','181'],'gray72' => ['184','184','184'],'gray73' => ['186','186','186'],'gray74' => ['189','189','189'],'gray75' => ['191','191','191'],'gray76' => ['194','194','194'],'gray77' => ['196','196','196'],'gray78' => ['199','199','199'],'gray79' => ['201','201','201'],'gray8' => ['20','20','20'],'gray80' => ['204','204','204'],'gray81' => ['207','207','207'],'gray82' => ['209','209','209'],'gray83' => ['212','212','212'],'gray84' => ['214','214','214'],'gray85' => ['217','217','217'],'gray86' => ['219','219','219'],'gray87' => ['222','222','222'],'gray88' => ['224','224','224'],'gray89' => ['227','227','227'],'gray9' => ['23','23','23'],'gray90' => ['229','229','229'],'gray91' => ['232','232','232'],'gray92' => ['235','235','235'],'gray93' => ['237','237','237'],'gray94' => ['240','240','240'],'gray95' => ['242','242','242'],'gray96' => ['245','245','245'],'gray97' => ['247','247','247'],'gray98' => ['250','250','250'],'gray99' => ['252','252','252'],'green' => ['0','255','0'],'green yellow' => ['173','255','47'],'green1' => ['0','255','0'],'green2' => ['0','238','0'],'green3' => ['0','205','0'],'green4' => ['0','139','0'],'greenyellow' => ['173','255','47'],'grey' => ['190','190','190'],'grey0' => ['0','0','0'],'grey1' => ['3','3','3'],'grey10' => ['26','26','26'],'grey100' => ['255','255','255'],'grey11' => ['28','28','28'],'grey12' => ['31','31','31'],'grey13' => ['33','33','33'],'grey14' => ['36','36','36'],'grey15' => ['38','38','38'],'grey16' => ['41','41','41'],'grey17' => ['43','43','43'],'grey18' => ['46','46','46'],'grey19' => ['48','48','48'],'grey2' => ['5','5','5'],'grey20' => ['51','51','51'],'grey21' => ['54','54','54'],'grey22' => ['56','56','56'],'grey23' => ['59','59','59'],'grey24' => ['61','61','61'],'grey25' => ['64','64','64'],'grey26' => ['66','66','66'],'grey27' => ['69','69','69'],'grey28' => ['71','71','71'],'grey29' => ['74','74','74'],'grey3' => ['8','8','8'],'grey30' => ['77','77','77'],'grey31' => ['79','79','79'],'grey32' => ['82','82','82'],'grey33' => ['84','84','84'],'grey34' => ['87','87','87'],'grey35' => ['89','89','89'],'grey36' => ['92','92','92'],'grey37' => ['94','94','94'],'grey38' => ['97','97','97'],'grey39' => ['99','99','99'],'grey4' => ['10','10','10'],'grey40' => ['102','102','102'],'grey41' => ['105','105','105'],'grey42' => ['107','107','107'],'grey43' => ['110','110','110'],'grey44' => ['112','112','112'],'grey45' => ['115','115','115'],'grey46' => ['117','117','117'],'grey47' => ['120','120','120'],'grey48' => ['122','122','122'],'grey49' => ['125','125','125'],'grey5' => ['13','13','13'],'grey50' => ['127','127','127'],'grey51' => ['130','130','130'],'grey52' => ['133','133','133'],'grey53' => ['135','135','135'],'grey54' => ['138','138','138'],'grey55' => ['140','140','140'],'grey56' => ['143','143','143'],'grey57' => ['145','145','145'],'grey58' => ['148','148','148'],'grey59' => ['150','150','150'],'grey6' => ['15','15','15'],'grey60' => ['153','153','153'],'grey61' => ['156','156','156'],'grey62' => ['158','158','158'],'grey63' => ['161','161','161'],'grey64' => ['163','163','163'],'grey65' => ['166','166','166'],'grey66' => ['168','168','168'],'grey67' => ['171','171','171'],'grey68' => ['173','173','173'],'grey69' => ['176','176','176'],'grey7' => ['18','18','18'],'grey70' => ['179','179','179'],'grey71' => ['181','181','181'],'grey72' => ['184','184','184'],'grey73' => ['186','186','186'],'grey74' => ['189','189','189'],'grey75' => ['191','191','191'],'grey76' => ['194','194','194'],'grey77' => ['196','196','196'],'grey78' => ['199','199','199'],'grey79' => ['201','201','201'],'grey8' => ['20','20','20'],'grey80' => ['204','204','204'],'grey81' => ['207','207','207'],'grey82' => ['209','209','209'],'grey83' => ['212','212','212'],'grey84' => ['214','214','214'],'grey85' => ['217','217','217'],'grey86' => ['219','219','219'],'grey87' => ['222','222','222'],'grey88' => ['224','224','224'],'grey89' => ['227','227','227'],'grey9' => ['23','23','23'],'grey90' => ['229','229','229'],'grey91' => ['232','232','232'],'grey92' => ['235','235','235'],'grey93' => ['237','237','237'],'grey94' => ['240','240','240'],'grey95' => ['242','242','242'],'grey96' => ['245','245','245'],'grey97' => ['247','247','247'],'grey98' => ['250','250','250'],'grey99' => ['252','252','252'],'honeydew' => ['240','255','240'],'honeydew1' => ['240','255','240'],'honeydew2' => ['224','238','224'],'honeydew3' => ['193','205','193'],'honeydew4' => ['131','139','131'],'hot pink' => ['255','105','180'],'hotpink' => ['255','105','180'],'hotpink1' => ['255','110','180'],'hotpink2' => ['238','106','167'],'hotpink3' => ['205','96','144'],'hotpink4' => ['139','58','98'],'indian red' => ['205','92','92'],'indianred' => ['205','92','92'],'indianred1' => ['255','106','106'],'indianred2' => ['238','99','99'],'indianred3' => ['205','85','85'],'indianred4' => ['139','58','58'],'ivory' => ['255','255','240'],'ivory1' => ['255','255','240'],'ivory2' => ['238','238','224'],'ivory3' => ['205','205','193'],'ivory4' => ['139','139','131'],'khaki' => ['240','230','140'],'khaki1' => ['255','246','143'],'khaki2' => ['238','230','133'],'khaki3' => ['205','198','115'],'khaki4' => ['139','134','78'],'lavender' => ['230','230','250'],'lavender blush' => ['255','240','245'],'lavenderblush' => ['255','240','245'],'lavenderblush1' => ['255','240','245'],'lavenderblush2' => ['238','224','229'],'lavenderblush3' => ['205','193','197'],'lavenderblush4' => ['139','131','134'],'lawn green' => ['124','252','0'],'lawngreen' => ['124','252','0'],'lemon chiffon' => ['255','250','205'],'lemonchiffon' => ['255','250','205'],'lemonchiffon1' => ['255','250','205'],'lemonchiffon2' => ['238','233','191'],'lemonchiffon3' => ['205','201','165'],'lemonchiffon4' => ['139','137','112'],'light blue' => ['173','216','230'],'light coral' => ['240','128','128'],'light cyan' => ['224','255','255'],'light goldenrod' => ['238','221','130'],'light goldenrod yellow' => ['250','250','210'],'light gray' => ['211','211','211'],'light green' => ['144','238','144'],'light grey' => ['211','211','211'],'light pink' => ['255','182','193'],'light salmon' => ['255','160','122'],'light sea green' => ['32','178','170'],'light sky blue' => ['135','206','250'],'light slate blue' => ['132','112','255'],'light slate gray' => ['119','136','153'],'light slate grey' => ['119','136','153'],'light steel blue' => ['176','196','222'],'light yellow' => ['255','255','224'],'lightblue' => ['173','216','230'],'lightblue1' => ['191','239','255'],'lightblue2' => ['178','223','238'],'lightblue3' => ['154','192','205'],'lightblue4' => ['104','131','139'],'lightcoral' => ['240','128','128'],'lightcyan' => ['224','255','255'],'lightcyan1' => ['224','255','255'],'lightcyan2' => ['209','238','238'],'lightcyan3' => ['180','205','205'],'lightcyan4' => ['122','139','139'],'lightgoldenrod' => ['238','221','130'],'lightgoldenrod1' => ['255','236','139'],'lightgoldenrod2' => ['238','220','130'],'lightgoldenrod3' => ['205','190','112'],'lightgoldenrod4' => ['139','129','76'],'lightgoldenrodyellow' => ['250','250','210'],'lightgray' => ['211','211','211'],'lightgreen' => ['144','238','144'],'lightgrey' => ['211','211','211'],'lightpink' => ['255','182','193'],'lightpink1' => ['255','174','185'],'lightpink2' => ['238','162','173'],'lightpink3' => ['205','140','149'],'lightpink4' => ['139','95','101'],'lightsalmon' => ['255','160','122'],'lightsalmon1' => ['255','160','122'],'lightsalmon2' => ['238','149','114'],'lightsalmon3' => ['205','129','98'],'lightsalmon4' => ['139','87','66'],'lightseagreen' => ['32','178','170'],'lightskyblue' => ['135','206','250'],'lightskyblue1' => ['176','226','255'],'lightskyblue2' => ['164','211','238'],'lightskyblue3' => ['141','182','205'],'lightskyblue4' => ['96','123','139'],'lightslateblue' => ['132','112','255'],'lightslategray' => ['119','136','153'],'lightslategrey' => ['119','136','153'],'lightsteelblue' => ['176','196','222'],'lightsteelblue1' => ['202','225','255'],'lightsteelblue2' => ['188','210','238'],'lightsteelblue3' => ['162','181','205'],'lightsteelblue4' => ['110','123','139'],'lightyellow' => ['255','255','224'],'lightyellow1' => ['255','255','224'],'lightyellow2' => ['238','238','209'],'lightyellow3' => ['205','205','180'],'lightyellow4' => ['139','139','122'],'lime green' => ['50','205','50'],'limegreen' => ['50','205','50'],'linen' => ['250','240','230'],'magenta' => ['255','0','255'],'magenta1' => ['255','0','255'],'magenta2' => ['238','0','238'],'magenta3' => ['205','0','205'],'magenta4' => ['139','0','139'],'maroon' => ['176','48','96'],'maroon1' => ['255','52','179'],'maroon2' => ['238','48','167'],'maroon3' => ['205','41','144'],'maroon4' => ['139','28','98'],'medium aquamarine' => ['102','205','170'],'medium blue' => ['0','0','205'],'medium orchid' => ['186','85','211'],'medium purple' => ['147','112','219'],'medium sea green' => ['60','179','113'],'medium slate blue' => ['123','104','238'],'medium spring green' => ['0','250','154'],'medium turquoise' => ['72','209','204'],'medium violet red' => ['199','21','133'],'mediumaquamarine' => ['102','205','170'],'mediumblue' => ['0','0','205'],'mediumorchid' => ['186','85','211'],'mediumorchid1' => ['224','102','255'],'mediumorchid2' => ['209','95','238'],'mediumorchid3' => ['180','82','205'],'mediumorchid4' => ['122','55','139'],'mediumpurple' => ['147','112','219'],'mediumpurple1' => ['171','130','255'],'mediumpurple2' => ['159','121','238'],'mediumpurple3' => ['137','104','205'],'mediumpurple4' => ['93','71','139'],'mediumseagreen' => ['60','179','113'],'mediumslateblue' => ['123','104','238'],'mediumspringgreen' => ['0','250','154'],'mediumturquoise' => ['72','209','204'],'mediumvioletred' => ['199','21','133'],'midnight blue' => ['25','25','112'],'midnightblue' => ['25','25','112'],'mint cream' => ['245','255','250'],'mintcream' => ['245','255','250'],'misty rose' => ['255','228','225'],'mistyrose' => ['255','228','225'],'mistyrose1' => ['255','228','225'],'mistyrose2' => ['238','213','210'],'mistyrose3' => ['205','183','181'],'mistyrose4' => ['139','125','123'],'moccasin' => ['255','228','181'],'navajo white' => ['255','222','173'],'navajowhite' => ['255','222','173'],'navajowhite1' => ['255','222','173'],'navajowhite2' => ['238','207','161'],'navajowhite3' => ['205','179','139'],'navajowhite4' => ['139','121','94'],'navy' => ['0','0','128'],'navy blue' => ['0','0','128'],'navyblue' => ['0','0','128'],'old lace' => ['253','245','230'],'oldlace' => ['253','245','230'],'olive drab' => ['107','142','35'],'olivedrab' => ['107','142','35'],'olivedrab1' => ['192','255','62'],'olivedrab2' => ['179','238','58'],'olivedrab3' => ['154','205','50'],'olivedrab4' => ['105','139','34'],'orange' => ['255','165','0'],'orange red' => ['255','69','0'],'orange1' => ['255','165','0'],'orange2' => ['238','154','0'],'orange3' => ['205','133','0'],'orange4' => ['139','90','0'],'orangered' => ['255','69','0'],'orangered1' => ['255','69','0'],'orangered2' => ['238','64','0'],'orangered3' => ['205','55','0'],'orangered4' => ['139','37','0'],'orchid' => ['218','112','214'],'orchid1' => ['255','131','250'],'orchid2' => ['238','122','233'],'orchid3' => ['205','105','201'],'orchid4' => ['139','71','137'],'pale goldenrod' => ['238','232','170'],'pale green' => ['152','251','152'],'pale turquoise' => ['175','238','238'],'pale violet red' => ['219','112','147'],'palegoldenrod' => ['238','232','170'],'palegreen' => ['152','251','152'],'palegreen1' => ['154','255','154'],'palegreen2' => ['144','238','144'],'palegreen3' => ['124','205','124'],'palegreen4' => ['84','139','84'],'paleturquoise' => ['175','238','238'],'paleturquoise1' => ['187','255','255'],'paleturquoise2' => ['174','238','238'],'paleturquoise3' => ['150','205','205'],'paleturquoise4' => ['102','139','139'],'palevioletred' => ['219','112','147'],'palevioletred1' => ['255','130','171'],'palevioletred2' => ['238','121','159'],'palevioletred3' => ['205','104','137'],'palevioletred4' => ['139','71','93'],'papaya whip' => ['255','239','213'],'papayawhip' => ['255','239','213'],'peach puff' => ['255','218','185'],'peachpuff' => ['255','218','185'],'peachpuff1' => ['255','218','185'],'peachpuff2' => ['238','203','173'],'peachpuff3' => ['205','175','149'],'peachpuff4' => ['139','119','101'],'peru' => ['205','133','63'],'pink' => ['255','192','203'],'pink1' => ['255','181','197'],'pink2' => ['238','169','184'],'pink3' => ['205','145','158'],'pink4' => ['139','99','108'],'plum' => ['221','160','221'],'plum1' => ['255','187','255'],'plum2' => ['238','174','238'],'plum3' => ['205','150','205'],'plum4' => ['139','102','139'],'powder blue' => ['176','224','230'],'powderblue' => ['176','224','230'],'purple' => ['160','32','240'],'purple1' => ['155','48','255'],'purple2' => ['145','44','238'],'purple3' => ['125','38','205'],'purple4' => ['85','26','139'],'red' => ['255','0','0'],'red1' => ['255','0','0'],'red2' => ['238','0','0'],'red3' => ['205','0','0'],'red4' => ['139','0','0'],'rosy brown' => ['188','143','143'],'rosybrown' => ['188','143','143'],'rosybrown1' => ['255','193','193'],'rosybrown2' => ['238','180','180'],'rosybrown3' => ['205','155','155'],'rosybrown4' => ['139','105','105'],'royal blue' => ['65','105','225'],'royalblue' => ['65','105','225'],'royalblue1' => ['72','118','255'],'royalblue2' => ['67','110','238'],'royalblue3' => ['58','95','205'],'royalblue4' => ['39','64','139'],'saddle brown' => ['139','69','19'],'saddlebrown' => ['139','69','19'],'salmon' => ['250','128','114'],'salmon1' => ['255','140','105'],'salmon2' => ['238','130','98'],'salmon3' => ['205','112','84'],'salmon4' => ['139','76','57'],'sandy brown' => ['244','164','96'],'sandybrown' => ['244','164','96'],'sea green' => ['46','139','87'],'seagreen' => ['46','139','87'],'seagreen1' => ['84','255','159'],'seagreen2' => ['78','238','148'],'seagreen3' => ['67','205','128'],'seagreen4' => ['46','139','87'],'seashell' => ['255','245','238'],'seashell1' => ['255','245','238'],'seashell2' => ['238','229','222'],'seashell3' => ['205','197','191'],'seashell4' => ['139','134','130'],'sienna' => ['160','82','45'],'sienna1' => ['255','130','71'],'sienna2' => ['238','121','66'],'sienna3' => ['205','104','57'],'sienna4' => ['139','71','38'],'sky blue' => ['135','206','235'],'skyblue' => ['135','206','235'],'skyblue1' => ['135','206','255'],'skyblue2' => ['126','192','238'],'skyblue3' => ['108','166','205'],'skyblue4' => ['74','112','139'],'slate blue' => ['106','90','205'],'slate gray' => ['112','128','144'],'slate grey' => ['112','128','144'],'slateblue' => ['106','90','205'],'slateblue1' => ['131','111','255'],'slateblue2' => ['122','103','238'],'slateblue3' => ['105','89','205'],'slateblue4' => ['71','60','139'],'slategray' => ['112','128','144'],'slategray1' => ['198','226','255'],'slategray2' => ['185','211','238'],'slategray3' => ['159','182','205'],'slategray4' => ['108','123','139'],'slategrey' => ['112','128','144'],'snow' => ['255','250','250'],'snow1' => ['255','250','250'],'snow2' => ['238','233','233'],'snow3' => ['205','201','201'],'snow4' => ['139','137','137'],'spring green' => ['0','255','127'],'springgreen' => ['0','255','127'],'springgreen1' => ['0','255','127'],'springgreen2' => ['0','238','118'],'springgreen3' => ['0','205','102'],'springgreen4' => ['0','139','69'],'steel blue' => ['70','130','180'],'steelblue' => ['70','130','180'],'steelblue1' => ['99','184','255'],'steelblue2' => ['92','172','238'],'steelblue3' => ['79','148','205'],'steelblue4' => ['54','100','139'],'tan' => ['210','180','140'],'tan1' => ['255','165','79'],'tan2' => ['238','154','73'],'tan3' => ['205','133','63'],'tan4' => ['139','90','43'],'thistle' => ['216','191','216'],'thistle1' => ['255','225','255'],'thistle2' => ['238','210','238'],'thistle3' => ['205','181','205'],'thistle4' => ['139','123','139'],'tomato' => ['255','99','71'],'tomato1' => ['255','99','71'],'tomato2' => ['238','92','66'],'tomato3' => ['205','79','57'],'tomato4' => ['139','54','38'],'turquoise' => ['64','224','208'],'turquoise1' => ['0','245','255'],'turquoise2' => ['0','229','238'],'turquoise3' => ['0','197','205'],'turquoise4' => ['0','134','139'],'violet' => ['238','130','238'],'violet red' => ['208','32','144'],'violetred' => ['208','32','144'],'violetred1' => ['255','62','150'],'violetred2' => ['238','58','140'],'violetred3' => ['205','50','120'],'violetred4' => ['139','34','82'],'wheat' => ['245','222','179'],'wheat1' => ['255','231','186'],'wheat2' => ['238','216','174'],'wheat3' => ['205','186','150'],'wheat4' => ['139','126','102'],'white' => ['255','255','255'],'white smoke' => ['245','245','245'],'whitesmoke' => ['245','245','245'],'yellow' => ['255','255','0'],'yellow green' => ['154','205','50'],'yellow1' => ['255','255','0'],'yellow2' => ['238','238','0'],'yellow3' => ['205','205','0'],'yellow4' => ['139','139','0'],'yellowgreen' => ['154','205','50']}
-EOT
 }
 
 sub __instantiate_object
@@ -3137,7 +2152,7 @@ sub _parse_timestamp
                 my $parser;
                 try
                 {
-                    $parser = DateTime::Format::JP->new( pattern => '%E%Y年%m月%d日', time_zone => 'local' );
+                    $parser = DateTime::Format::JP->new( pattern => '%E%Y年%m月%d日', time_zone => $tz );
                 }
                 catch( $e )
                 {
@@ -3167,17 +2182,7 @@ sub _parse_timestamp
     {
         try
         {
-            # $self->message( 4, "Got here for epoch '$str'" );
-            my $dt;
-            try
-            {
-                $dt = DateTime->from_epoch( epoch => $str, time_zone => 'local' );
-            }
-            catch( $e )
-            {
-                warn( "Your system is missing key timezone components. ${class}::_parse_timestamp is reverting to UTC instead of local time zone.\n" );
-                $dt = DateTime->from_epoch( epoch => $str, time_zone => 'UTC' );
-            }
+            my $dt = DateTime->from_epoch( epoch => $str, time_zone => $tz );
             $opt->{pattern} = ( CORE::index( $str, '.' ) != -1 ? '%s.%N' : '%s' );
             my $strp = DateTime::Format::Strptime->new( %$opt );
             $dt->set_formatter( $strp );
@@ -3208,7 +2213,7 @@ sub _parse_timestamp
         my $ts = time() + $offset;
         try
         {
-            $dt = DateTime->from_epoch( epoch => $ts, time_zone => 'local' );
+            $dt = DateTime->from_epoch( epoch => $ts, time_zone => $tz );
             return( $dt );
         }
         # Exception raised by DateTime::TimeZone::Local
@@ -3226,15 +2231,7 @@ sub _parse_timestamp
     elsif( lc( $str ) eq 'now' )
     {
         # $self->message( 3, "\tValue is actually the special keyword: '$str'" );
-        try
-        {
-            $dt = DateTime->now( time_zone => 'local' );
-        }
-        catch( $e )
-        {
-            warn( "Your system is missing key timezone components. ${class}::_parse_timestamp is reverting to UTC instead of local time zone.\n" );
-            $dt = DateTime->now( time_zone => 'UTC' );
-        }
+        $dt = DateTime->now( time_zone => $tz );
         return( $dt );
     }
     else
@@ -4970,45 +3967,49 @@ sub _set_get_uri : lvalue
         }
     }
 
+    my $uri_class = 'URI';
+    if( ref( $field ) eq 'HASH' )
+    {
+        my $def = $field;
+        $field = $def->{field} if( CORE::exists( $def->{field} ) && defined( $def->{field} ) && CORE::length( $def->{field} ) );
+        $uri_class = $def->{class} if( CORE::exists( $def->{class} ) && ref( $def->{class} ) eq 'HASH' );
+    }
+    
+    $self->_load_class( $uri_class ) || do
+    {
+        my $error = $self->error;
+        if( $has_arg eq 'assign' )
+        {
+            $self->error( $error );
+            my $dummy = 'dummy';
+            return( $dummy );
+        }
+        return( $self->error( $error ) ) if( want( 'LVALUE' ) );
+        rreturn( $self->error( $error ) );
+    };
+    
     if( $has_arg )
     {
-        try
-        {
-            require URI if( !$self->_is_class_loaded( 'URI' ) );
-        }
-        catch( $e )
-        {
-            my $error = "Error trying to load module URI: $e";
-            if( $has_arg eq 'assign' )
-            {
-                $self->error( $error );
-                my $dummy = 'dummy';
-                return( $dummy );
-            }
-            return( $self->error( $error ) ) if( want( 'LVALUE' ) );
-            rreturn( $self->error( $error ) );
-        }
-        
         my $str = $arg;
-        if( Scalar::Util::blessed( $str ) && $str->isa( 'URI' ) )
+        if( Scalar::Util::blessed( $str ) && $str->isa( $uri_class ) )
         {
             $data->{ $field } = $str;
         }
         elsif( defined( $str ) && ( $str =~ /^[a-zA-Z]+:\/{2}/ || $str =~ /^urn\:[a-z]+\:/ || $str =~ /^[a-z]+\:/ ) )
         {
-            $data->{ $field } = URI->new( $str );
-            warn( "URI subclass is missing to handle this specific URI '$str'\n" ) if( !$data->{ $field }->has_recognized_scheme );
+            $data->{ $field } = $uri_class->new( $str );
+            warn( "$uri_class subclass is missing to handle this specific URI '$str'\n" ) if( !$data->{ $field }->has_recognized_scheme );
         }
-        ## Is it an absolute path?
+        # Is it an absolute path?
         elsif( substr( $str, 0, 1 ) eq '/' )
         {
-            $data->{ $field } = URI->new( $str );
+            $data->{ $field } = $uri_class->new( $str );
         }
         elsif( defined( $str ) )
         {
             try
             {
-                my $u = URI->new( $str );
+                my $u = $uri_class->new( $str );
                 $data->{ $field } = $u;
             }
             catch( $e )
@@ -5030,10 +4031,10 @@ sub _set_get_uri : lvalue
         }
     }
     # Data was pre-set or directly set but is not an URI object, so we convert it now
-    if( $data->{ $field } && !$self->_is_a( $data->{ $field }, 'URI' ) )
+    if( $data->{ $field } && !$self->_is_a( $data->{ $field }, $uri_class ) )
     {
         # Force stringification if this is an overloaded value
-        $data->{ $field } = URI->new( $data->{ $field } . '' );
+        $data->{ $field } = $uri_class->new( $data->{ $field } . '' );
     }
     return( $data->{ $field } ) if( want( 'LVALUE' ) );
     rreturn( $data->{ $field } );
@@ -5152,6 +4153,137 @@ sub __dbh
     return( $this->{__dbh} );
 }
 
+# Credits: SelfLoader
+# Adapted from SelfLoader module
+sub _autoload_subs
+{
+    my $self = shift( @_ );
+    my( $endlines ) = @_;
+    my $pack = 'Module::Generic';
+    no strict 'refs';
+    my $fh = \*{"${pack}::DATA"};
+    use strict;
+    my $currpack = $pack;
+    my( $line, $name, @lines, @stubs, $protoype );
+    my $deb_prefix = "${pack}\::_autoload_subs";
+    # CORE::print( STDERR "${deb_prefix}: starting with DATA file handle '$fh'\n" ) if( $DEBUG >= 4 );
+    die( "$pack does not contain an __DATA__ token" ) unless( defined( fileno( $fh ) ) );
+    # Protect: fork() shares the file pointer between the parent and the kid
+    CORE::seek( $fh, $DATA_POS, 0 );
+    # CORE::printf( STDERR "${deb_prefix}: Current position is %d\n", CORE::tell( $fh ) ) if( $DEBUG >= 4 );
+    if( CORE::sysseek( $fh, CORE::tell( $fh ), 0 ) )
+    {
+        # CORE::print( STDERR "${deb_prefix}: Rewinding\n" ) if( $DEBUG >= 4 );
+        CORE::open( my $nfh, '<&', $fh ) or die( "reopen: $!" ); # dup() the fd
+        CORE::close( $fh ) or die( "close: $!" );                # autocloses, but be paranoid
+        CORE::open( $fh, '<&', $nfh ) or die( "reopen2: $!" );  # dup() the fd "back"
+        CORE::close( $nfh ) or die( "close after reopen: $!" ); # autocloses, but be
+        $fh->untaint;
+    }
+
+    local( $/ ) = "\n";
+    # my $test = <$fh>;
+    # CORE::print( STDERR "${deb_prefix}: First line is '$test' (defined? ", ( defined( $test ) ? 'yes' : 'no' ), "\n" ) if( $DEBUG >= 4 );
+    while( defined( $line = <$fh> ) and $line !~ m/^__END__/ )
+    {
+        # CORE::print( STDERR "${deb_prefix}: Checking line: $line" ) if( $DEBUG >= 4 );
+        if( $line =~ m/ ^[[:blank:]\h]*                      # indentation
+	                sub[[:blank:]\h]+([\w:]+)[[:blank:]\h]*  # 'sub' and sub name
+	                (
+	                 (?:\([\\\$\@\%\&\*\;]*\))? # optional prototype sigils
+	                 (?:$SUB_ATTR_LIST)?        # optional attribute list
+	                )/x )
+	    {
+            push( @stubs, $self->_autoload_add_to_cache(
+                $name, $currpack, \@lines, $protoype
+            ) );
+            $protoype = $2;
+            @lines = ( $line );
+            # simple sub name
+            if( CORE::index( $1, '::' ) == -1 )
+            {
+                $name = "${currpack}::$1";
+            }
+            # sub name with package
+            else
+            {
+                $name = $1;
+                $name =~ m/^(.*)::/;
+                if( defined( &{"${1}::AUTOLOAD"} ) )
+                {
+                    \&{"${1}::AUTOLOAD"} == \&Module::Generic::AUTOLOAD ||
+                        die( 'AUTOLOAD subs error: attempt to specify autoloading',
+                            " sub $name in non-autoloading module $1" );
+                }
+                else
+                {
+                    $self->export( $1, 'AUTOLOAD' );
+                }
+            }
+        }
+        # A package declared
+        elsif( $line =~ m/^package[[:blank:]]+([\w:]+)/ )
+        {
+            push( @stubs, $self->_autoload_add_to_cache(
+                $name, $currpack, \@lines, $protoype
+            ) );
+            # $self->_package_defined($line);
+            $name = '';
+            @lines = ();
+            $currpack = $1;
+            # indicate package is cached
+            # $AUTOLOAD_SUBS->{ "${currpack}::<DATA" } = 1;
+            if( defined( &{"${1}::AUTOLOAD" } ) )
+            {
+                \&{"${1}::AUTOLOAD"} == \&Module::Generic::AUTOLOAD ||
+                    die( 'AUTOLOAD subs error: attempt to specify autoloading',
+                        " package $currpack which already has AUTOLOAD" );
+            }
+            else
+            {
+                $self->export( $currpack, 'AUTOLOAD' );
+            }
+        }
+        else
+        {
+            push( @lines, $line );
+        }
+    }
+    
+    # __END__
+    if( defined( $line ) && $line =~ /^__END__/ )
+    {
+        unless( $line =~ /^__END__[[:blank:]\h]*DATA/ )
+        {
+            if( $endlines )
+            {
+                @$endlines = <$fh>;
+            }
+            close( $fh );
+        }
+    }
+    push( @stubs, $self->_autoload_add_to_cache( $name, $currpack, \@lines, $protoype ) );
+    no strict;
+    eval( join( '', @stubs ) ) if( @stubs );
+}
+
+sub _autoload_add_to_cache
+{
+    my $self = shift( @_ );
+    my( $fullname, $pack, $lines, $protoype ) = @_;
+    return unless( $fullname );
+    my( $class, $subname ) = $fullname =~ /^(.*)::(.*)$/;
+    # print( STDERR __PACKAGE__, "::_autoload_add_to_cache: adding sub '$subname' with class '$class'\n" ) if( $DEBUG >= 4 );
+    $AUTOLOAD_SUBS->{ $class } = {} if( !CORE::exists( $AUTOLOAD_SUBS->{ $class } ) );
+    warn( "Redefining sub $fullname" ) if( exists( $AUTOLOAD_SUBS->{ $class }->{ $subname } ) );
+    $AUTOLOAD_SUBS->{ $class }->{ $subname } = join( '', "\n\#line 1 \"sub $fullname\"\npackage $pack; ", @$lines );
+    # $AUTOLOAD_SUBS->{ $fullname } = join('', "package $pack; ",@$lines);
+    # print( STDERR __PACKAGE__, "::_autoload_add_to_cache: cached $fullname: ", $AUTOLOAD_SUBS->{ $fullname } ) if( $DEBUG >= 4 );
+    # return stub to be eval'd
+    return( defined( $protoype ) ? "sub $fullname $protoype;" : "sub $fullname;" );
+}
+
+
 sub DEBUG
 {
     my $self = shift( @_ );
@@ -5170,6 +4302,7 @@ sub VERBOSE
     return( ${ $pkg . '::VERBOSE' } );
 }
 
+# NOTE:: AUTOLOAD
 AUTOLOAD
 {
     my $self;
@@ -5216,6 +4349,71 @@ AUTOLOAD
         {
             return( $code->( $self ) ) if( $code );
         }
+    }
+    
+    # printf( STDERR __PACKAGE__ . "::AUTOLOAD: %d autoload subs found.\n", scalar( keys( %$AUTOLOAD_SUBS ) ) ) if( $DEBUG >= 4 );
+    unless( scalar( keys( %$AUTOLOAD_SUBS ) ) )
+    {
+        # print( STDERR "\$DATA_POS is '$DATA_POS'\n" ) if( $DEBUG >= 4 );
+        unless( $DATA_POS )
+        {
+            seek( DATA, 0, 0 );
+            my $n = 0;
+            while( <DATA> )
+            {
+                last if( /^__DATA__/ );
+                $n++;
+            }
+            $DATA_POS = tell( DATA );
+            # print( STDERR "\$DATA_POS is now '$DATA_POS'\n" ) if( $DEBUG >= 4 );
+        }
+        Module::Generic->_autoload_subs;
+        # printf( STDERR __PACKAGE__ . "::AUTOLOAD: there are now %d autoload classes found: %s\n", scalar( keys( %$AUTOLOAD_SUBS ) ), join( ', ', sort( keys( %$AUTOLOAD_SUBS ) ) ) ) if( $DEBUG >= 4 );
+    }
+    
+    # print( STDERR "Checking if sub '$meth' from class '$class' ($AUTOLOAD) is within the autoload subroutines\n" ) if( $DEBUG >= 4 );
+    my $code;
+    if( CORE::exists( $AUTOLOAD_SUBS->{ $class } ) )
+    {
+        if( CORE::exists( $AUTOLOAD_SUBS->{ $class }->{ $meth } ) )
+        {
+            $code = $AUTOLOAD_SUBS->{ $class }->{ $meth };
+        }
+    }
+    else
+    {
+        foreach my $this_class ( keys( %$AUTOLOAD_SUBS ) )
+        {
+            if( $class->isa( $this_class ) && CORE::exists( $AUTOLOAD_SUBS->{ $this_class }->{ $meth } ) )
+            {
+                $code = $AUTOLOAD_SUBS->{ $this_class }->{ $meth };
+                last;
+            }
+        }
+    }
+    
+    if( CORE::defined( $code ) )
+    {
+        $code = Nice::Try->implement( $code ) if( CORE::index( $code, 'try' ) != -1 );
+        # print( STDERR __PACKAGE__, "::AUTOLOAD: updated code is:\n$code\n" ) if( $DEBUG >= 4 );
+        my $saved = $@;
+        {
+            no strict;
+            eval( $code );
+        }
+        if( $@ )
+        {
+            $@ =~ s/ at .*\n//;
+            die( $@ );
+        }
+        $@ = $saved;
+        # defined( &$AUTOLOAD ) || die( "AUTOLOAD inconsistency error for dynamic sub \"$meth\"." );
+        $class->can( $meth ) || die( "AUTOLOAD inconsistency error for dynamic sub \"$meth\"." );
+        # No need to keep it in the cache
+        delete( $AUTOLOAD_SUBS->{ $meth } );
+        # goto( &$AUTOLOAD );
+        return( &$meth( $self, @_ ) ) if( $self );
+        return( &$AUTOLOAD( @_ ) );
     }
     
     $meth = lc( $meth );
@@ -5391,6 +4589,1030 @@ DESTROY
 };
 
 1;
+# NOTE: Autoload
+__DATA__
+# This is used to transform package data set into hash reference suitable for api calls
+# If package use AUTOLOAD, those AUtILOAD should make sure to create methods on the fly so they become defined
+sub as_hash
+{
+    my $self = shift( @_ );
+    my $this = $self->_obj2h;
+    my $p = {};
+    $p = shift( @_ ) if( scalar( @_ ) == 1 && ref( $_[0] ) eq 'HASH' );
+    $p->{_seen} = {} if( !exists( $p->{_seen} ) || !ref( $p->{_seen} ) );
+    # $self->message( 3, "Parameters are: ", sub{ $self->dumper( $p ) } );
+    my $class = ref( $this );
+    no strict 'refs';
+    my @methods = grep( !/^(?:new|init)$/, grep{ defined &{"${class}::$_"} } keys( %{"${class}::"} ) );
+
+    $self->messagef( 3, "The following methods found in package $class: '%s'.", join( "', '", sort( @methods ) ) );
+    use strict 'refs';
+    my $ref = {};
+    my $added_subs = CORE::exists( $this->{_added_method} ) && ref( $this->{_added_method} ) eq 'HASH'
+        ? $this->{_added_method}
+        : {};
+    
+    my $check;
+    $check = sub
+    {
+        my $meth = shift( @_ );
+        my $rv   = shift( @_ );
+        no overloading;
+        $self->message( 3, "Value for method '$meth' is '$rv'." );
+        use overloading;
+        if( $p->{json} && ( ref( $rv ) eq 'JSON::PP::Boolean' || ref( $rv ) eq 'Module::Generic::Boolean' || ref( $rv ) eq 'Class::Boolean' ) )
+        {
+            # $self->message( 3, "Encoding boolean to true or false for method '$meth'." );
+            # $ref->{ $meth } = Module::Generic::Boolean::TO_JSON( $ref->{ $meth } );
+            return( Module::Generic::Boolean::TO_JSON( $ref->{ $meth } ) );
+        }
+        elsif( $self->_is_object( $rv ) )
+        {
+            # Order of the checks here matter
+            if( $rv->can( 'as_hash' ) && overload::Overloaded( $rv ) && overload::Method( $rv, '""' ) )
+            {
+                $rv = $rv . '';
+                return( $rv );
+            }
+            elsif( $rv->can( 'as_hash' ) )
+            {
+                $self->message( 3, "$rv is an object (", ref( $rv ), ") capable of as_hash, calling it." );
+                if( !$p->{_seen}->{ Scalar::Util::refaddr( $rv ) } )
+                {
+                    $p->{_seen}->{ Scalar::Util::refaddr( $rv ) }++;
+                    $rv = $rv->as_hash( $p );
+                    $self->message( 4, "returned value is '$rv' -> ", sub{ $self->dump( $rv ) });
+                    if( Scalar::Util::blessed( $rv ) )
+                    {
+                        return( $check->( $meth => $rv ) );
+                    }
+                    else
+                    {
+                        return( $rv );
+                    }
+                }
+                else
+                {
+                    return;
+                }
+            }
+            # If the object can be overloaded, and has no TO_JSON method we get its string representation here.
+            # If it has a TO_JSON and we are asked to return data for json, we let the JSON module call the TO_JSON method
+            elsif( overload::Overloaded( $rv ) && overload::Method( $rv, '""' ) )
+            {
+                $rv = "$rv" unless( $p->{json} && $rv->can( 'TO_JSON' ) );
+                return( $rv );
+            }
+        }
+        else
+        {
+            return( $rv );
+        }
+    };
+    
+    foreach my $meth ( sort( @methods ) )
+    {
+        next if( substr( $meth, 0, 1 ) eq '_' );
+        next if( CORE::exists( $added_subs->{ $meth } ) );
+        my $rv = eval{ $self->$meth };
+        if( $@ )
+        {
+            warn( "An error occured while accessing method $meth: $@\n" );
+            next;
+        }
+        $rv = $check->( $meth => $rv );
+        next if( !defined( $rv ) );
+        
+        # $self->message( 3, "Checking field '$meth' with value '$rv'." );
+        
+        if( ref( $rv ) eq 'HASH' )
+        {
+            $ref->{ $meth } = $rv if( scalar( keys( %$rv ) ) );
+        }
+        # If method call returned an array, like array of string or array of object such as in data from Net::API::Stripe::List
+        elsif( ref( $rv ) eq 'ARRAY' )
+        {
+            my $arr = [];
+            foreach my $this_ref ( @$rv )
+            {
+                # my $that_ref = ( $self->_is_object( $this_ref ) && $this_ref->can( 'as_hash' ) ) ? $this_ref->as_hash : $this_ref;
+                my $that_ref;
+                if( $self->_is_object( $this_ref ) && $this_ref->can( 'as_hash' ) )
+                {
+                    if( !$p->{_seen}->{ Scalar::Util::refaddr( $this_ref ) } )
+                    {
+                        $p->{_seen}->{ Scalar::Util::refaddr( $this_ref ) }++;
+                        $that_ref = $this_ref->as_hash( $p );
+                    }
+                }
+                else
+                {
+                    $that_ref = $this_ref;
+                }
+                CORE::push( @$arr, $that_ref );
+            }
+            $ref->{ $meth } = $arr if( scalar( @$arr ) );
+        }
+        elsif( !ref( $rv ) )
+        {
+            $ref->{ $meth } = $rv if( CORE::length( $rv ) );
+        }
+        elsif( CORE::length( "$rv" ) )
+        {
+            $self->message( 3, "Adding value '$rv' to field '$meth' in hash \$ref" );
+            $ref->{ $meth } = $rv;
+        }
+    }
+    return( $ref );
+}
+
+sub clear
+{
+    goto( &clear_error );
+}
+
+sub clear_error
+{
+    my $self  = shift( @_ );
+    my $class = ref( $self ) || $self;
+    my $this  = $self->_obj2h;
+    no strict 'refs';
+    $this->{error} = ${ "$class\::ERROR" } = '';
+    return( $self );
+}
+
+sub clone
+{
+    my $self  = shift( @_ );
+    try
+    {
+        # $self->message( 3, "Cloning object '", overload::StrVal( $self ), "'." );
+        return( Clone::clone( $self ) );
+    }
+    catch( $e )
+    {
+        return( $self->error( "Error cloning object \"", overload::StrVal( $self ), "\": $e" ) );
+    }
+}
+
+sub colour_close { return( shift->_set_get( 'colour_close', @_ ) ); }
+
+sub colour_closest
+{
+    my $self    = shift( @_ );
+    my $colour  = uc( shift( @_ ) );
+    my $this  = $self->_obj2h;
+    my $colours = 
+    {
+    '000000000' => 'black',
+    '000000255' => 'blue',
+    '000255000' => 'green',
+    '000255255' => 'cyan',
+    '255000000' => 'red',
+    '255000255' => 'magenta',
+    '255255000' => 'yellow',
+    '255255255' => 'white',
+    };
+    my( $red, $green, $blue ) = ( '', '', '' );
+    our $COLOUR_NAME_TO_RGB;
+    if( $colour =~ /^[A-Z]+([A-Z\s]+)*$/ )
+    {
+        $self->message( 9, "Checking colour '$colour' as string. Looking up its rgb value." );
+        if( !scalar( keys( %$COLOUR_NAME_TO_RGB ) ) )
+        {
+            $self->message( 9, "Processing colour map in <DATA> section." );
+            my $colour_data = $self->__colour_data;
+            $COLOUR_NAME_TO_RGB = eval( $colour_data );
+            if( $@ )
+            {
+                return( $self->error( "An error occurred loading data from __colour_data: $@" ) );
+            }
+        }
+        if( CORE::exists( $COLOUR_NAME_TO_RGB->{ lc( $colour ) } ) )
+        {
+            ( $red, $green, $blue ) = @{$COLOUR_NAME_TO_RGB->{ lc( $colour ) }};
+        }
+    }
+    # Colour all in decimal??
+    elsif( $colour =~ /^\d{9}$/ )
+    {
+        # $self->message( 3, "Got colour all in decimal. Less work to do..." );
+        $red   = substr( $colour, 0, 3 );
+        $green = substr( $colour, 3, 3 );
+        $blue  = substr( $colour, 6, 3 );
+    }
+    # Colour in hexadecimal, convert it
+    elsif( $colour =~ /^[A-F0-9]+$/ )
+    {
+        $red   = hex( substr( $colour, 0, 2 ) );
+        $green = hex( substr( $colour, 2, 2 ) );
+        $blue  = hex( substr( $colour, 4, 2 ) );
+    }
+    # Clueless
+    else
+    {
+        # Not undef, but rather empty string. Undef is associated with an error
+        return( '' );
+    }
+    my $dec_colour = CORE::sprintf( '%3d%3d%3d', $red, $green, $blue );
+    my $last = '';
+    my @colours = reverse( sort( keys( %$colours ) ) );
+    $red    = CORE::sprintf( '%03d', $red );
+    $green  = CORE::sprintf( '%03d', $green );
+    $blue   = CORE::sprintf( '%03d', $blue );
+    my $cur = CORE::sprintf( '%03d%03d%03d', $red, $green, $blue );
+    my( $red_ok, $green_ok, $blue_ok ) = ( 0, 0, 0 );
+    # $self->message( 3, "Current colour: '$cur'." );
+    for( my $i = 0; $i < scalar( @colours ); $i++ )
+    {
+        my $r = CORE::sprintf( '%03d', substr( $colours[ $i ], 0, 3 ) );
+        my $g = CORE::sprintf( '%03d', substr( $colours[ $i ], 3, 3 ) );
+        my $b = CORE::sprintf( '%03d', substr( $colours[ $i ], 6, 3 ) );
+ 
+        my $r_p = CORE::sprintf( '%03d', substr( $colours[ $i - 1 ], 0, 3 ) );
+        my $g_p = CORE::sprintf( '%03d', substr( $colours[ $i - 1 ], 3, 3 ) );
+        my $b_p = CORE::sprintf( '%03d', substr( $colours[ $i - 1 ], 6, 3 ) );
+ 
+        # $self->message( 3, "$r ($red), $g ($green), $b ($blue)" );
+        if( $red == $r ||
+            ( $red < $r && $red > int( $r / 2 ) ) ||
+            ( $red > $r && $red < int( $r_p / 2 ) && $r_p ) ||
+            $red > $r )
+        {
+            $red_ok++;
+        }
+ 
+        if( $red_ok )
+        {
+            if( $green == $g ||
+                ( $green < $g && $green > int( $g / 2 ) ) ||
+                ( $green > $g && $green < int( $g_p / 2 ) && $g_p ) ||
+                $green > $g )
+            {
+                $blue_ok++;
+            }
+        } 
+ 
+        if( $blue_ok )
+        {
+            if( $blue == $b ||
+                ( $blue < $b && $blue > int( $b / 2 ) ) ||
+                ( $blue > $b && $blue < int( $b_p / 2 ) && $b_p ) ||
+                $blue > $b )
+            {
+                $last = $colours[ $i ];
+                last;
+            }
+        }
+    }
+    return( $colours->{ $last } );
+}
+
+sub colour_format
+{
+    my $self = shift( @_ );
+    # style, colour or color and text
+    my $opts = shift( @_ );
+    return( $self->error( "Parameter hash provided is not an hash reference." ) ) if( !$self->_is_hash( $opts ) );
+    my $this = $self->_obj2h;
+    # To make it possible to use either text or message property
+    $opts->{text} = CORE::delete( $opts->{message} ) if( CORE::length( $opts->{message} ) && !CORE::length( $opts->{text} ) );
+    return( $self->error( "No text was provided to format." ) ) if( !CORE::length( $opts->{text} ) );
+    
+    $opts->{colour} //= CORE::delete( $opts->{color} ) || CORE::delete( $opts->{fg_colour} ) || CORE::delete( $opts->{fg_color} ) || CORE::delete( $opts->{fgcolour} ) || CORE::delete( $opts->{fgcolor} );
+    $opts->{bgcolour} //= CORE::delete( $opts->{bgcolor} ) || CORE::delete( $opts->{bg_colour} ) || CORE::delete( $opts->{bg_color} );
+    
+    my $bold      = "\e[1m";
+    my $underline = "\e[4m";
+    my $reverse   = "\e[7m";
+    my $normal    = "\e[m";
+    my $cls       = "\e[H\e[2J";
+    my $styles =
+    {
+    # Bold
+    b       => 1,
+    bold    => 1,
+    strong  => 1,
+    # Italic
+    i       => 3,
+    italic  => 3,
+    # Underline
+    u       => 4,
+    underline => 4,
+    underlined => 4,
+    blink   => 5,
+    # Reverse
+    r       => 7,
+    reverse => 7,
+    reversed => 7,
+    # Concealed
+    c       => 8,
+    conceal => 8,
+    concealed => 8,
+    strike  => 9,
+    striked  => 9,
+    striken  => 9,
+    };
+    
+    my $convert_24_To_8bits = sub
+    {
+        my( $r, $g, $b ) = @_;
+        $self->message( 9, "Converting $r, $g, $b to 8 bits" );
+        return( ( POSIX::floor( $r * 7 / 255 ) << 5 ) +
+                ( POSIX::floor( $g * 7 / 255 ) << 2 ) +
+                ( POSIX::floor( $b * 3 / 255 ) ) 
+              );
+    };
+    
+    # opacity * original + (1-opacity)*background = resulting pixel
+    # https://stackoverflow.com/a/746934/4814971
+    my $colour_with_alpha = sub
+    {
+        my( $r, $g, $b, $a, $bg ) = @_;
+        ## Assuming a white background (255)
+        my( $bg_r, $bg_g, $bg_b ) = ( 255, 255, 255 );
+        if( ref( $bg ) eq 'HASH' )
+        {
+            ( $bg_r, $bg_g, $bg_b ) = @$bg{qw( red green blue )};
+        }
+        $r = POSIX::round( ( $a * $r ) + ( ( 1 - $a ) * $bg_r ) );
+        $g = POSIX::round( ( $a * $g ) + ( ( 1 - $a ) * $bg_g ) );
+        $b = POSIX::round( ( $a * $b ) + ( ( 1 - $a ) * $bg_b ) );
+        return( [$r, $g, $b] );
+    };
+    
+    my $check_colour = sub
+    {
+        my $col = shift( @_ );
+        # $self->message( 3, "Checking colour '$col'." );
+        # $colours or $bg_colours
+        my $map = shift( @_ );
+        my $code;
+        my $light;
+        # Example: 'light red' or 'light_red'
+        if( $col =~ /^(?:(?<light>bright|light)[[:blank:]\_]+)?
+        (?<colour>
+            (?:[a-zA-Z]+)(?:[[:blank:]]+\w+)?
+            |
+            (?<rgb_type>rgb[a]?)\([[:blank:]]*(?<red>\d{1,3})[[:blank:]]*\,[[:blank:]]*(?<green>\d{1,3})[[:blank:]]*\,[[:blank:]]*(?<blue>\d{1,3})
+            (?:[[:blank:]]*\,[[:blank:]]*(?<opacity>\d(?:\.\d+)?))?[[:blank:]]*
+            \)
+        )$/xi )
+        {
+            my %regexp = %+;
+            $self->message( 9, "Light colour request '$col'. Capture: ", sub{ $self->dumper( \%regexp ) } );
+            ( $light, $col ) = ( $+{light}, $+{colour} );
+            if( CORE::length( $+{rgb_type} ) &&
+                CORE::length( $+{red} ) &&
+                CORE::length( $+{green} ) &&
+                CORE::length( $+{blue} ) )
+            {
+                if( $+{opacity} || $light )
+                {
+                    my $opacity = CORE::length( $+{opacity} )
+                        ? $+{opacity}
+                        : $light
+                            ? 0.5
+                            : 1;
+                    $col = CORE::sprintf( 'rgba(%03d%03d%03d,%.1f)', $+{red}, $+{green}, $+{blue}, $opacity );
+                }
+                else
+                {
+                    $col = CORE::sprintf( 'rgb(%03d%03d%03d)', $+{red}, $+{green}, $+{blue} );
+                }
+            }
+            else
+            {
+                $self->message( 9, "Colour '$col' is not rgb[a]" );
+            }
+        }
+        elsif( $col =~ /^(?<rgb_type>rgb[a]?)\([[:blank:]]*(?<red>\d{1,3})[[:blank:]]*\,[[:blank:]]*(?<green>\d{1,3})[[:blank:]]*\,[[:blank:]]*(?<blue>\d{1,3})[[:blank:]]*(?:\,[[:blank:]]*(?<opacity>\d(?:\.\d+)?))?[[:blank:]]*\)$/i )
+        {
+            if( $+{opacity} )
+            {
+                $col = CORE::sprintf( 'rgba(%03d%03d%03d,%.1f)', $+{red}, $+{green}, $+{blue}, $+{opacity} );
+            }
+            else
+            {
+                $col = CORE::sprintf( '%03d%03d%03d', $+{red}, $+{green}, $+{blue} );
+            }
+        }
+        else
+        {
+            $self->message( 9, "Colour '$col' failed to match our rgba regexp." );
+        }
+        
+        my $col_ref;
+        if( $col =~ /^rgb[a]?\((?<red>\d{3})(?<green>\d{3})(?<blue>\d{3})\)$/i )
+        {
+            $col_ref = {};
+            %$col_ref = %+;
+            $self->message( 9, "Rgb colour '$+{red}', '$+{green}' and '$+{blue}' found: ", sub{ $self->dumper( $col_ref ) });
+            return({
+                _24bits => [@$col_ref{qw( red green blue )}],
+                _8bits => $convert_24_To_8bits->( @$col_ref{qw( red green blue )} )
+            });
+        }
+        # Treating opacity to make things lighter; not ideal, but standard scheme
+        elsif( $col =~ /^rgba\((?<red>\d{3})(?<green>\d{3})(?<blue>\d{3})[[:blank:]]*\,[[:blank:]]*(?<opacity>\d(?:\.\d)?)\)$/i )
+        {
+            $col_ref = {};
+            %$col_ref = %+;
+            $self->message( 9, "Rgba colour '$+{red}', '$+{green}' and '$+{blue}' found with opacity $+{opacity}: ", sub{ $self->dumper( $col_ref ) });
+            if( $+{opacity} )
+            {
+                my $opacity = $+{opacity};
+                $self->message( 9, "Opacity of $opacity found, applying the factor to the colour." );
+                my $bg;
+                if( $opts->{bgcolour} )
+                {
+                    $bg = $self->colour_to_rgb( $opts->{bgcolour} );
+                    $self->message( 9, "Calculating new rgb with opacity and background information: ", sub{ $self->dumper( $bg ) });
+                }
+                my $new_col = $colour_with_alpha->( @$col_ref{qw( red green blue )}, $opacity, $bg );
+                $self->message( 9, "New colour with opacity applied: ", sub{ $self->dumper( $new_col ) });
+                @$col_ref{qw( red green blue )} = @$new_col;
+                $self->message( 9, "Colour $+{red}, $+{green}, $+{blue} * $opacity => $col_ref->{red}, $col_ref->{green}, $col_ref->{blue}" );
+            }
+            return({
+                _24bits => [@$col_ref{qw( red green blue )}],
+                _8bits => $convert_24_To_8bits->( @$col_ref{qw( red green blue )} )
+            });
+        }
+        elsif( $self->message( 9, "Checking if rgb value exists for colour '$col'" ) &&
+               ( $col_ref = $self->colour_to_rgb( $col ) ) )
+        {
+            $self->message( 9, "Setting up colour '$col' with data: ", sub{ $self->dumper( $col_ref ) });
+            # $code = $map->{ $col };
+            return({
+                _24bits => [@$col_ref{qw( red green blue )}],
+                _8bits => $convert_24_To_8bits->( @$col_ref{qw( red green blue )} )
+            });
+        }
+        else
+        {
+            $self->message( 9, "Could not find a match for colour '$col'." );
+            return( {} );
+        }
+#         my $is_bg = ( CORE::substr( $code, 0, 1 ) == 4 );
+#         if( CORE::length( $code ) && $light )
+#         {
+#             ## If the colour is a background colour, replace 4 by 10 (e.g.: 42 becomes 103)
+#             ## and if foreground colour, replace 3 by 9
+#             CORE::substr( $code, 0, 1 ) = ( $is_bg ? 10 : 9 );
+#         }
+#         return( $code );
+    };
+    my $data = [];
+    my $data8 = [];
+    my $params = [];
+    # 8 bits parameters compatible
+    my $params8 = [];
+    if( $opts->{colour} || $opts->{color} || $opts->{fgcolour} || $opts->{fgcolor} || $opts->{fg_colour} || $opts->{fg_color} )
+    {
+        $opts->{colour} ||= CORE::delete( $opts->{color} ) || CORE::delete( $opts->{fg_colour} ) || CORE::delete( $opts->{fg_color} ) || CORE::delete( $opts->{fgcolour} ) || CORE::delete( $opts->{fgcolor} );
+        # my $col_ref = $check_colour->( $opts->{colour}, $colours );
+        my $col_ref = $check_colour->( $opts->{colour} );
+        # CORE::push( @$params, $col ) if( CORE::length( $col ) );
+        if( scalar( keys( %$col_ref ) ) )
+        {
+            $self->message( 9, "Foreground colour '$opts->{colour}' data are: ", sub{ $self->dumper( $col_ref ) });
+            CORE::push( @$params8, sprintf( '38;5;%d', $col_ref->{_8bits} ) );
+            CORE::push( @$params, sprintf( '38;2;%d;%d;%d', @{$col_ref->{_24bits}} ) );
+        }
+        else
+        {
+            $self->message( 9, "Could not resolve the foreground colour '$opts->{colour}'." );
+        }
+    }
+    if( $opts->{bgcolour} || $opts->{bgcolor} || $opts->{bg_colour} || $opts->{bg_color} )
+    {
+        $opts->{bgcolour} ||= CORE::delete( $opts->{bgcolor} ) || CORE::delete( $opts->{bg_colour} ) || CORE::delete( $opts->{bg_color} );
+        # my $col_ref = $check_colour->( $opts->{bgcolour}, $bg_colours );
+        my $col_ref = $check_colour->( $opts->{bgcolour} );
+        ## CORE::push( @$params, $col ) if( CORE::length( $col ) );
+        if( scalar( keys( %$col_ref ) ) )
+        {
+            $self->message( 9, "Foreground colour '$opts->{bgcolour}' data are: ", sub{ $self->dumper( $col_ref ) });
+            CORE::push( @$params8, sprintf( '48;5;%d', $col_ref->{_8bits} ) );
+            CORE::push( @$params, sprintf( '48;2;%d;%d;%d', @{$col_ref->{_24bits}} ) );
+        }
+        else
+        {
+            $self->message( 9, "Could not resolve the background colour '$opts->{colour}'." );
+        }
+    }
+    if( $opts->{style} )
+    {
+        # $self->message( 9, "Style '$opts->{style}' provided." );
+        my $those_styles = [CORE::split( /\|/, $opts->{style} )];
+        # $self->message( 9, "Split styles: ", sub{ $self->dumper( $those_styles ) } );
+        foreach my $s ( @$those_styles )
+        {
+            # $self->message( 9, "Adding style '$s'" ) if( CORE::exists( $styles->{lc($s)} ) );
+            if( CORE::exists( $styles->{lc($s)} ) )
+            {
+                CORE::push( @$params, $styles->{lc($s)} );
+                # We add the 8 bits compliant version only if any colour was provided, i.e.
+                # This is not just a style definition
+                CORE::push( @$params8, $styles->{lc($s)} ) if( scalar( @$params8 ) );
+            }
+        }
+    }
+    CORE::push( @$data, "\e[" . CORE::join( ';', @$params8 ) . "m" ) if( scalar( @$params8 ) );
+    CORE::push( @$data, "\e[" . CORE::join( ';', @$params ) . "m" ) if( scalar( @$params ) );
+    $self->message( 9, "Pre final colour data contains: ", sub{ $self->dumper( $data ) });
+    # If the text contains libe breaks, we must stop the formatting before, or else there would be an ugly formatting on the entire screen following the line break
+    if( scalar( @$params ) && $opts->{text} =~ /\n+/ )
+    {
+        my $text_parts = [CORE::split( /\n/, $opts->{text} )];
+        my $fmt = CORE::join( '', @$data );
+        my $fmt8 = CORE::join( '', @$data8 );
+        for( my $i = 0; $i < scalar( @$text_parts ); $i++ )
+        {
+            # Empty due to \n repeated
+            next if( !CORE::length( $text_parts->[$i] ) );
+            $text_parts->[$i] = $fmt . $text_parts->[$i] . $normal;
+        }
+        $opts->{text} = CORE::join( "\n", @$text_parts );
+        CORE::push( @$data, $opts->{text} );
+    }
+    else
+    {
+        CORE::push( @$data, $opts->{text} );
+        CORE::push( @$data, $normal, $normal ) if( scalar( @$params ) );
+    }
+    ## $self->message( "Returning '", quotemeta( CORE::join( '', @$data ) ), "'" );
+    return( CORE::join( '', @$data ) );
+}
+
+sub colour_open { return( shift->_set_get( 'colour_open', @_ ) ); }
+
+sub colour_parse
+{
+    my $self = shift( @_ );
+    my $txt  = join( '', @_ );
+    my $this  = $self->_obj2h;
+    my $open  = $this->{colour_open} || COLOUR_OPEN;
+    my $close = $this->{colour_close} || COLOUR_CLOSE;
+    no strict;
+    my $re = qr/
+(?<all>
+\Q$open\E(?!\/)(?<params>.*?)\Q$close\E
+    (?<content>
+        (?:
+            (?> [^$open$close]+ )
+            |
+            (?R)
+        )*+
+    )
+\Q$open\E\/\Q$close\E
+)
+    /x;
+    my $colour_re = qr/(?:(?:bright|light)[[:blank:]])?(?:[a-zA-Z]+(?:[[:blank:]]+[\w\-]+)?|rgb[a]?\([[:blank:]]*\d{1,3}[[:blank:]]*\,[[:blank:]]*\d{1,3}[[:blank:]]*\,[[:blank:]]*\d{1,3}[[:blank:]]*(?:\,[[:blank:]]*\d(?:\.\d)?)?[[:blank:]]*\))/;
+    my $style_re = qr/(?:bold|faint|italic|underline|blink|reverse|conceal|strike)/;
+    my $parse;
+    $parse = sub
+    {
+        my $str = shift( @_ );
+        # $self->message( 9, "Parsing coloured text '$str'" );
+        $str =~ s{$re}
+        {
+            my $re = { %- };
+            my $catch = substr( $str, $-[0], $+[0] - $-[0] );
+            ## $self->message( 9, "Regexp is: ", sub{ $self->dump( $re ) } );
+            my $all = $+{all};
+            my $ct = $+{content};
+            my $params = $+{params};
+            if( index( $ct, $open ) != -1 && index( $ct, $close ) != -1 )
+            {
+                $ct = $parse->( $ct );
+            }
+            my $def = {};
+            if( $params =~ /^[[:blank:]]*(?:(?<style1>$style_re)[[:blank:]]+)?(?<fg_colour>$colour_re)(?:[[:blank:]]+(?<style2>$style_re))?(?:[[:blank:]]+on[[:blank:]]+(?<bg_colour>$colour_re))?[[:blank:]]*$/i )
+            {
+                my $style = $+{style1} || $+{style2};
+                my $fg = $+{fg_colour};
+                my $bg = $+{bg_colour};
+                # $self->message( 9, "Found style '$style', colour '$fg' and background colour '$bg'." );
+                $def = 
+                {
+                style => $style,
+                colour => $fg,
+                bg_colour => $bg,
+                };
+            }
+            else
+            {
+                # $self->message( 9, "Evaluating the styling '$params'." );
+                local $SIG{__WARN__} = sub{};
+                local $SIG{__DIE__} = sub{};
+                my @res = eval( $params );
+                # $self->message( 9, "Evaluation result is: ", sub{ $self->dump( [ @res ] ) } );
+                $def = { @res } if( scalar( @res ) && !( scalar( @res ) % 2 ) );
+                if( $@ || ref( $def ) ne 'HASH' )
+                {
+                    my $err = $@ || "Invalid styling \"${params}\"";
+                    $self->message( 9, "Error evaluating: $err" );
+                    $def = {};
+                }
+            }
+            if( scalar( keys( %$def ) ) )
+            {
+                $def->{text} = $ct;
+                $self->message( 9, "Calling colour_parse with parameters: ", sub{ $self->dump( $def )} );
+                my $res = $self->colour_format( $def );
+                length( $res ) ? $res : $catch;
+            }
+            else
+            {
+                $self->message( 9, "Returning '$catch'" );
+                $catch;
+            }
+        }gex;
+        return( $str );
+    };
+    return( $parse->( $txt ) );
+}
+
+sub colour_to_rgb
+{
+    my $self    = shift( @_ );
+    my $colour  = lc( shift( @_ ) );
+    my $this  = $self->_obj2h;
+    my( $red, $green, $blue ) = ( '', '', '' );
+    our $COLOUR_NAME_TO_RGB;
+    $self->message( 9, "Checking rgb value for '$colour'. Called from line ", (caller)[2] );
+    if( $colour =~ /^[A-Za-z]+([\w\-]+)*([[:blank:]]+\w+)?$/ )
+    {
+        $self->message( 9, "Checking colour '$colour' as string. Looking up its rgb value." );
+        if( !scalar( keys( %$COLOUR_NAME_TO_RGB ) ) )
+        {
+            $self->message( 9, "Processing colour map in <DATA> section." );
+            my $colour_data = $self->__colour_data;
+            $COLOUR_NAME_TO_RGB = eval( $colour_data );
+            if( $@ )
+            {
+                return( $self->error( "An error occurred loading data from __colour_data: $@" ) );
+            }
+        }
+        if( CORE::exists( $COLOUR_NAME_TO_RGB->{ $colour } ) )
+        {
+            ( $red, $green, $blue ) = @{$COLOUR_NAME_TO_RGB->{ $colour }};
+            $self->message( 9, "Found rgb '$red, $green, $blue' for colour '$colour'." );
+        }
+        else
+        {
+            $self->message( 9, "Could not find colour '$colour' in our colour map." );
+            return( '' );
+        }
+    }
+    ## Colour all in decimal??
+    elsif( $colour =~ /^\d{9}$/ )
+    {
+        ## $self->message( 9, "Got colour all in decimal. Less work to do..." );
+        $red   = substr( $colour, 0, 3 );
+        $green = substr( $colour, 3, 3 );
+        $blue  = substr( $colour, 6, 3 );
+    }
+    ## Colour in hexadecimal, convert it
+    elsif( $colour =~ /^[A-F0-9]+$/ )
+    {
+        $red   = hex( substr( $colour, 0, 2 ) );
+        $green = hex( substr( $colour, 2, 2 ) );
+        $blue  = hex( substr( $colour, 4, 2 ) );
+    }
+    ## Clueless
+    else
+    {
+        $self->message( 9, "Clueless about what to do with colour '$colour'." );
+        ## Not undef, but rather empty string. Undef is associated with an error
+        return( '' );
+    }
+    return({ red => $red, green => $green, blue => $blue });
+}
+
+sub coloured
+{
+    my $self = shift( @_ );
+    my $pref = shift( @_ );
+    my $text = CORE::join( '', @_ );
+    my $this  = $self->_obj2h;
+    my( $style, $fg, $bg );
+    ## my $colour_re = qr/(?:(?:bright|light)[[:blank:]])?[a-zA-Z]+/;
+    my $colour_re = qr/(?:(?:bright|light)[[:blank:]])?(?:[a-zA-Z]+(?:[[:blank:]]+[\w\-]+)?|rgb[a]?\([[:blank:]]*\d{1,3}[[:blank:]]*\,[[:blank:]]*\d{1,3}[[:blank:]]*\,[[:blank:]]*\d{1,3}[[:blank:]]*(?:\,[[:blank:]]*\d(?:\.\d)?)?[[:blank:]]*\))/;
+    my $style_re = qr/(?:bold|faint|italic|underline|blink|reverse|conceal|strike)/;
+    if( $pref =~ /^(?:(?<style1>$style_re)[[:blank:]]+)?(?<fg_colour>$colour_re)(?:[[:blank:]]+(?<style2>$style_re))?(?:[[:blank:]]+on[[:blank:]]+(?<bg_colour>$colour_re))?$/i )
+    {
+        $style = $+{style1} || $+{style2};
+        $fg = $+{fg_colour};
+        $bg = $+{bg_colour};
+        ## $self->message( 9, "Found style '$style', colour '$fg' and background colour '$bg'." );
+        return( $self->colour_format({ text => $text, style => $style, colour => $fg, bg_colour => $bg }) );
+    }
+    else
+    {
+        $self->message( 9, "No match." );
+        return( '' );
+    }
+}
+
+sub dump_hex
+{
+    my $self = shift( @_ );
+    try
+    {
+        require Devel::Hexdump;
+        return( Devel::Hexdump::xd( shift( @_ ) ) );
+    }
+    catch( $e )
+    {
+        return( $self->error( "Devel::Hexdump is not installed on your system." ) );
+    }
+}
+
+# For backward compatibility and traceability
+sub dump_print { return( shift->dumpto_printer( @_ ) ); }
+
+sub dumper
+{
+    my $self = shift( @_ );
+    my $opts = {};
+    $opts = pop( @_ ) if( scalar( @_ ) > 1 && ref( $_[-1] ) eq 'HASH' );
+    try
+    {
+        no warnings 'once';
+        require Data::Dumper;
+        # local $Data::Dumper::Sortkeys = 1;
+        local $Data::Dumper::Terse = 1;
+        local $Data::Dumper::Indent = 1;
+        local $Data::Dumper::Useqq = 1;
+        local $Data::Dumper::Maxdepth = $opts->{depth} if( CORE::length( $opts->{depth} ) );
+        local $Data::Dumper::Sortkeys = sub
+        {
+            my $h = shift( @_ );
+            return( [ sort( grep{ ref( $h->{ $_ } ) !~ /^(DateTime|DateTime\:\:)/ } keys( %$h ) ) ] );
+        };
+        return( Data::Dumper::Dumper( @_ ) );
+    }
+    catch( $e )
+    {
+        return( $self->error( "Data::Dumper is not installed on your system." ) );
+    }
+}
+
+sub dumpto_printer
+{
+    my $self  = shift( @_ );
+    my( $data, $file ) = @_;
+    $file = Module::Generic::File::file( $file );
+    my $fh =  $file->open( '>', { binmode => 'utf-8', autoflush => 1 }) || 
+        die( "Unable to create file '$file': $!\n" );
+    $fh->print( Data::Dump::dump( $data ), "\n" );
+    $fh->close;
+    # 666 so it can work under command line and web alike
+    chmod( 0666, $file );
+    return(1);
+}
+
+sub dumpto_dumper
+{
+    my $self  = shift( @_ );
+    my( $data, $file ) = @_;
+    try
+    {
+        require Data::Dumper;
+        local $Data::Dumper::Sortkeys = 1;
+        local $Data::Dumper::Terse = 1;
+        local $Data::Dumper::Indent = 1;
+        local $Data::Dumper::Useqq = 1;
+        $file = Module::Generic::File::file( $file );
+        my $fh =  $file->open( '>', { autoflush => 1 }) || 
+            die( "Unable to create file '$file': $!\n" );
+        if( ref( $data ) )
+        {
+            $fh->print( Data::Dumper::Dumper( $data ), "\n" );
+        }
+        else
+        {
+            $fh->binmode( ':utf8' );
+            $fh->print( $data );
+        }
+        $fh->close;
+        ## 666 so it can work under command line and web alike
+        chmod( 0666, $file );
+        return(1);
+    }
+    catch( $e )
+    {
+        return( $self->error( "Unable to dump data to \"$file\" using Data::Dumper: $e" ) );
+    }
+}
+
+sub errno
+{
+    my $self = shift( @_ );
+    my $this = $self->_obj2h;
+    if( @_ )
+    {
+        $this->{errno} = shift( @_ ) if( $_[ 0 ] =~ /^\-?\d+$/ );
+        return( $self->error( @_ ) ) if( @_ );
+    }
+    return( $this->{errno} );
+}
+
+sub message_colour
+{
+    my $self  = shift( @_ );
+    my $class = ref( $self ) || $self;
+    my $this  = $self->_obj2h;
+    no strict 'refs';
+    if( $this->{verbose} || $this->{debug} || ${ $class . '::DEBUG' } )
+    {
+        my $level = ( $_[0] =~ /^\d+$/ ? shift( @_ ) : undef() );
+        my $opts = {};
+        if( scalar( @_ ) > 1 && ref( $_[-1] ) eq 'HASH' && ( CORE::exists( $_[-1]->{level} ) || CORE::exists( $_[-1]->{type} ) || CORE::exists( $_[-1]->{message} ) ) )
+        {
+            $opts = pop( @_ );
+        }
+        my $ref = [@_];
+        $level = $opts->{level} if( !defined( $level ) && CORE::exists( $opts->{level} ) );
+        my $txt;
+        if( $opts->{message} )
+        {
+            if( ref( $opts->{message} ) eq 'ARRAY' )
+            {
+                $txt = join( '', map( ( ref( $_ ) eq 'CODE' && !$this->{_msg_no_exec_sub} ) ? $_->() : $_, @{$opts->{message}} ) );
+            }
+            else
+            {
+                $txt = $opts->{message};
+            }
+        }
+        else
+        {
+            $txt = join( '', map( ( ref( $_ ) eq 'CODE' && !$this->{_msg_no_exec_sub} ) ? $_->() : $_, @$ref ) );
+        }
+        $txt = $self->colour_parse( $txt );
+        $opts->{message} = $txt;
+        $opts->{level} = $level if( defined( $level ) );
+        return( $self->message( ( $level || 0 ), $opts ) );
+    }
+    return( 1 );
+}
+
+sub messagef_colour
+{
+    my $self  = shift( @_ );
+    my $this  = $self->_obj2h;
+    my $class = ref( $self ) || $self;
+    no strict 'refs';
+    if( $this->{verbose} || $this->{debug} || ${ $class . '::DEBUG' } )
+    {
+        my @args = @_;
+        my $opts = {};
+        if( scalar( @args ) > 1 && ref( $args[-1] ) eq 'HASH' && ( CORE::exists( $args[-1]->{level} ) || CORE::exists( $args[-1]->{type} ) || CORE::exists( $args[-1]->{message} ) ) )
+        {
+            $opts = pop( @args );
+        }
+        $opts->{colour} = 1;
+        CORE::push( @args, $opts );
+        ## $self->message( 0, "Sending arguments: ", sub{ $self->dumper( \@args ) } );
+        return( $this->messagef( @args ) );
+    }
+    return( 1 );
+}
+
+sub message_log
+{
+    my $self = shift( @_ );
+    my $io   = $self->message_log_io;
+    return( undef() ) if( !$io );
+    return( undef() ) if( !Scalar::Util::openhandle( $io ) && $io );
+    # 2019-06-14: I decided to remove this test, because if a log is provided it should print to it
+    # If we are on the command line, we can easily just do tail -f log_file.txt for example and get the same result as
+    # if it were printed directly on the console
+    my $rc = $io->print( scalar( localtime( time() ) ), " [$$]: ", @_ ) || return( $self->error( "Unable to print to log file: $!" ) );
+    return( $rc );
+}
+
+sub message_log_io
+{
+    #return( shift->_set_get( 'log_io', @_ ) );
+    my $self  = shift( @_ );
+    my $class = ref( $self ) || $self;
+    my $this  = $self->_obj2h;
+    no strict 'refs';
+    if( @_ )
+    {
+        my $io = shift( @_ );
+        $self->_set_get( 'log_io', $io );
+    }
+    elsif( ${ "${class}::LOG_DEBUG" } && 
+        !$self->_set_get( 'log_io' ) && 
+        ${ "${class}::DEB_LOG" } )
+    {
+        our $DEB_LOG = ${ "${class}::DEB_LOG" };
+        unless( $DEBUG_LOG_IO )
+        {
+            $DEB_LOG = Module::Generic::File::file( $DEB_LOG );
+            $DEBUG_LOG_IO = $DEB_LOG->open( '>>', { binmode => 'utf-8', autoflush => 1 }) || 
+                die( "Unable to open debug log file $DEB_LOG in append mode: $!\n" );
+        }
+        $self->_set_get( 'log_io', $DEBUG_LOG_IO );
+    }
+    return( $self->_set_get( 'log_io' ) );
+}
+
+sub printer
+{
+    my $self = shift( @_ );
+    my $opts = {};
+    $opts = pop( @_ ) if( scalar( @_ ) > 1 && ref( $_[-1] ) eq 'HASH' );
+    try
+    {
+        local $SIG{__WARN__} = sub{ };
+        require Data::Printer;
+        if( scalar( keys( %$opts ) ) )
+        {
+            return( Data::Printer::np( @_, %$opts ) );
+        }
+        else
+        {
+            return( Data::Printer::np( @_ ) );
+        }
+    }
+    catch( $e )
+    {
+        return( $self->error( "Data::Printer is not installed on your system." ) );
+    }
+}
+
+sub save
+{
+    my $self = shift( @_ );
+    my $this = $self->_obj2h;
+    my $opts = {};
+    $opts = pop( @_ ) if( ref( $_[-1] ) eq 'HASH' );
+    my( $file, $data );
+    if( @_ == 2 )
+    {
+        $opts->{data} = shift( @_ );
+        $opts->{file} = shift( @_ );
+    }
+    return( $self->error( "No file was provided to save data to." ) ) if( !$opts->{file} );
+    $file = Module::Generic::File::file( $opts->{file} );
+    my $fh = $file->open( '>', {
+        ( $opts->{encoding} ? ( binmode => $opts->{encoding} ) : () ),
+        autoflush => 1,
+    }) ||
+        return( $self->error( "Unable to open file \"$file\" in write mode: $!" ) );
+    if( !defined( $fh->print( ref( $opts->{data} ) eq 'SCALAR' ? ${$opts->{data}} : $opts->{data} ) ) )
+    {
+        return( $self->error( "Unable to write data to file \"$file\": $!" ) )
+    }
+    $fh->close;
+    my $bytes = -s( $opts->{file} );
+    return( $bytes );
+}
+
+sub subclasses
+{
+    my $self  = shift( @_ );
+    my $that  = '';
+    $that     = @_ ? shift( @_ ) : $self;
+    my $base  = ref( $that ) || $that;
+    $base  =~ s,::,/,g;
+    $base .= '.pm';
+    
+    require IO::Dir;
+    # remove '.pm'
+    my $dir = substr( $INC{ $base }, 0, ( length( $INC{ $base } ) ) - 3 );
+    
+    my @packages = ();
+    my $io = IO::Dir->open( $dir );
+    if( defined( $io ) )
+    {
+        @packages = map{ substr( $_, 0, length( $_ ) - 3 ) } grep{ substr( $_, -3 ) eq '.pm' && -f( "$dir/$_" ) } $io->read();
+        $io->close ||
+        warn( "Unable to close directory \"$dir\": $!\n" );
+    }
+    else
+    {
+        warn( "Unable to open directory \"$dir\": $!\n" );
+    }
+    return( wantarray() ? @packages : \@packages );
+}
+
+# Initially those data were stored after the __END__, but it seems some module is interfering with <DATA>
+# and so those data could not be loaded reliably
+# This is called once by colour_to_rgb to generate the hash reference COLOUR_NAME_TO_RGB
+sub __colour_data
+{
+    my $colour_data = <<EOT;
+{'alice blue' => ['240','248','255'],'aliceblue' => ['240','248','255'],'antique white' => ['250','235','215'],'antiquewhite' => ['250','235','215'],'antiquewhite1' => ['255','239','219'],'antiquewhite2' => ['238','223','204'],'antiquewhite3' => ['205','192','176'],'antiquewhite4' => ['139','131','120'],'aquamarine' => ['127','255','212'],'aquamarine1' => ['127','255','212'],'aquamarine2' => ['118','238','198'],'aquamarine3' => ['102','205','170'],'aquamarine4' => ['69','139','116'],'azure' => ['240','255','255'],'azure1' => ['240','255','255'],'azure2' => ['224','238','238'],'azure3' => ['193','205','205'],'azure4' => ['131','139','139'],'beige' => ['245','245','220'],'bisque' => ['255','228','196'],'bisque1' => ['255','228','196'],'bisque2' => ['238','213','183'],'bisque3' => ['205','183','158'],'bisque4' => ['139','125','107'],'black' => ['0','0','0'],'blanched almond' => ['255','235','205'],'blanchedalmond' => ['255','235','205'],'blue' => ['0','0','255'],'blue violet' => ['138','43','226'],'blue1' => ['0','0','255'],'blue2' => ['0','0','238'],'blue3' => ['0','0','205'],'blue4' => ['0','0','139'],'blueviolet' => ['138','43','226'],'brown' => ['165','42','42'],'brown1' => ['255','64','64'],'brown2' => ['238','59','59'],'brown3' => ['205','51','51'],'brown4' => ['139','35','35'],'burlywood' => ['222','184','135'],'burlywood1' => ['255','211','155'],'burlywood2' => ['238','197','145'],'burlywood3' => ['205','170','125'],'burlywood4' => ['139','115','85'],'cadet blue' => ['95','158','160'],'cadetblue' => ['95','158','160'],'cadetblue1' => ['152','245','255'],'cadetblue2' => ['142','229','238'],'cadetblue3' => ['122','197','205'],'cadetblue4' => ['83','134','139'],'chartreuse' => ['127','255','0'],'chartreuse1' => ['127','255','0'],'chartreuse2' => ['118','238','0'],'chartreuse3' => ['102','205','0'],'chartreuse4' => ['69','139','0'],'chocolate' => ['210','105','30'],'chocolate1' => ['255','127','36'],'chocolate2' => ['238','118','33'],'chocolate3' => ['205','102','29'],'chocolate4' => ['139','69','19'],'coral' => ['255','127','80'],'coral1' => ['255','114','86'],'coral2' => ['238','106','80'],'coral3' => ['205','91','69'],'coral4' => ['139','62','47'],'cornflower blue' => ['100','149','237'],'cornflowerblue' => ['100','149','237'],'cornsilk' => ['255','248','220'],'cornsilk1' => ['255','248','220'],'cornsilk2' => ['238','232','205'],'cornsilk3' => ['205','200','177'],'cornsilk4' => ['139','136','120'],'cyan' => ['0','255','255'],'cyan1' => ['0','255','255'],'cyan2' => ['0','238','238'],'cyan3' => ['0','205','205'],'cyan4' => ['0','139','139'],'dark blue' => ['0','0','139'],'dark cyan' => ['0','139','139'],'dark goldenrod' => ['184','134','11'],'dark gray' => ['169','169','169'],'dark green' => ['0','100','0'],'dark grey' => ['169','169','169'],'dark khaki' => ['189','183','107'],'dark magenta' => ['139','0','139'],'dark olive green' => ['85','107','47'],'dark orange' => ['255','140','0'],'dark orchid' => ['153','50','204'],'dark red' => ['139','0','0'],'dark salmon' => ['233','150','122'],'dark sea green' => ['143','188','143'],'dark slate blue' => ['72','61','139'],'dark slate gray' => ['47','79','79'],'dark slate grey' => ['47','79','79'],'dark turquoise' => ['0','206','209'],'dark violet' => ['148','0','211'],'darkblue' => ['0','0','139'],'darkcyan' => ['0','139','139'],'darkgoldenrod' => ['184','134','11'],'darkgoldenrod1' => ['255','185','15'],'darkgoldenrod2' => ['238','173','14'],'darkgoldenrod3' => ['205','149','12'],'darkgoldenrod4' => ['139','101','8'],'darkgray' => ['169','169','169'],'darkgreen' => ['0','100','0'],'darkgrey' => ['169','169','169'],'darkkhaki' => ['189','183','107'],'darkmagenta' => ['139','0','139'],'darkolivegreen' => ['85','107','47'],'darkolivegreen1' => ['202','255','112'],'darkolivegreen2' => ['188','238','104'],'darkolivegreen3' => ['162','205','90'],'darkolivegreen4' => ['110','139','61'],'darkorange' => ['255','140','0'],'darkorange1' => ['255','127','0'],'darkorange2' => ['238','118','0'],'darkorange3' => ['205','102','0'],'darkorange4' => ['139','69','0'],'darkorchid' => ['153','50','204'],'darkorchid1' => ['191','62','255'],'darkorchid2' => ['178','58','238'],'darkorchid3' => ['154','50','205'],'darkorchid4' => ['104','34','139'],'darkred' => ['139','0','0'],'darksalmon' => ['233','150','122'],'darkseagreen' => ['143','188','143'],'darkseagreen1' => ['193','255','193'],'darkseagreen2' => ['180','238','180'],'darkseagreen3' => ['155','205','155'],'darkseagreen4' => ['105','139','105'],'darkslateblue' => ['72','61','139'],'darkslategray' => ['47','79','79'],'darkslategray1' => ['151','255','255'],'darkslategray2' => ['141','238','238'],'darkslategray3' => ['121','205','205'],'darkslategray4' => ['82','139','139'],'darkslategrey' => ['47','79','79'],'darkturquoise' => ['0','206','209'],'darkviolet' => ['148','0','211'],'deep pink' => ['255','20','147'],'deep sky blue' => ['0','191','255'],'deeppink' => ['255','20','147'],'deeppink1' => ['255','20','147'],'deeppink2' => ['238','18','137'],'deeppink3' => ['205','16','118'],'deeppink4' => ['139','10','80'],'deepskyblue' => ['0','191','255'],'deepskyblue1' => ['0','191','255'],'deepskyblue2' => ['0','178','238'],'deepskyblue3' => ['0','154','205'],'deepskyblue4' => ['0','104','139'],'dim gray' => ['105','105','105'],'dim grey' => ['105','105','105'],'dimgray' => ['105','105','105'],'dimgrey' => ['105','105','105'],'dodger blue' => ['30','144','255'],'dodgerblue' => ['30','144','255'],'dodgerblue1' => ['30','144','255'],'dodgerblue2' => ['28','134','238'],'dodgerblue3' => ['24','116','205'],'dodgerblue4' => ['16','78','139'],'firebrick' => ['178','34','34'],'firebrick1' => ['255','48','48'],'firebrick2' => ['238','44','44'],'firebrick3' => ['205','38','38'],'firebrick4' => ['139','26','26'],'floral white' => ['255','250','240'],'floralwhite' => ['255','250','240'],'forest green' => ['34','139','34'],'forestgreen' => ['34','139','34'],'gainsboro' => ['220','220','220'],'ghost white' => ['248','248','255'],'ghostwhite' => ['248','248','255'],'gold' => ['255','215','0'],'gold1' => ['255','215','0'],'gold2' => ['238','201','0'],'gold3' => ['205','173','0'],'gold4' => ['139','117','0'],'goldenrod' => ['218','165','32'],'goldenrod1' => ['255','193','37'],'goldenrod2' => ['238','180','34'],'goldenrod3' => ['205','155','29'],'goldenrod4' => ['139','105','20'],'gray' => ['190','190','190'],'gray0' => ['0','0','0'],'gray1' => ['3','3','3'],'gray10' => ['26','26','26'],'gray100' => ['255','255','255'],'gray11' => ['28','28','28'],'gray12' => ['31','31','31'],'gray13' => ['33','33','33'],'gray14' => ['36','36','36'],'gray15' => ['38','38','38'],'gray16' => ['41','41','41'],'gray17' => ['43','43','43'],'gray18' => ['46','46','46'],'gray19' => ['48','48','48'],'gray2' => ['5','5','5'],'gray20' => ['51','51','51'],'gray21' => ['54','54','54'],'gray22' => ['56','56','56'],'gray23' => ['59','59','59'],'gray24' => ['61','61','61'],'gray25' => ['64','64','64'],'gray26' => ['66','66','66'],'gray27' => ['69','69','69'],'gray28' => ['71','71','71'],'gray29' => ['74','74','74'],'gray3' => ['8','8','8'],'gray30' => ['77','77','77'],'gray31' => ['79','79','79'],'gray32' => ['82','82','82'],'gray33' => ['84','84','84'],'gray34' => ['87','87','87'],'gray35' => ['89','89','89'],'gray36' => ['92','92','92'],'gray37' => ['94','94','94'],'gray38' => ['97','97','97'],'gray39' => ['99','99','99'],'gray4' => ['10','10','10'],'gray40' => ['102','102','102'],'gray41' => ['105','105','105'],'gray42' => ['107','107','107'],'gray43' => ['110','110','110'],'gray44' => ['112','112','112'],'gray45' => ['115','115','115'],'gray46' => ['117','117','117'],'gray47' => ['120','120','120'],'gray48' => ['122','122','122'],'gray49' => ['125','125','125'],'gray5' => ['13','13','13'],'gray50' => ['127','127','127'],'gray51' => ['130','130','130'],'gray52' => ['133','133','133'],'gray53' => ['135','135','135'],'gray54' => ['138','138','138'],'gray55' => ['140','140','140'],'gray56' => ['143','143','143'],'gray57' => ['145','145','145'],'gray58' => ['148','148','148'],'gray59' => ['150','150','150'],'gray6' => ['15','15','15'],'gray60' => ['153','153','153'],'gray61' => ['156','156','156'],'gray62' => ['158','158','158'],'gray63' => ['161','161','161'],'gray64' => ['163','163','163'],'gray65' => ['166','166','166'],'gray66' => ['168','168','168'],'gray67' => ['171','171','171'],'gray68' => ['173','173','173'],'gray69' => ['176','176','176'],'gray7' => ['18','18','18'],'gray70' => ['179','179','179'],'gray71' => ['181','181','181'],'gray72' => ['184','184','184'],'gray73' => ['186','186','186'],'gray74' => ['189','189','189'],'gray75' => ['191','191','191'],'gray76' => ['194','194','194'],'gray77' => ['196','196','196'],'gray78' => ['199','199','199'],'gray79' => ['201','201','201'],'gray8' => ['20','20','20'],'gray80' => ['204','204','204'],'gray81' => ['207','207','207'],'gray82' => ['209','209','209'],'gray83' => ['212','212','212'],'gray84' => ['214','214','214'],'gray85' => ['217','217','217'],'gray86' => ['219','219','219'],'gray87' => ['222','222','222'],'gray88' => ['224','224','224'],'gray89' => ['227','227','227'],'gray9' => ['23','23','23'],'gray90' => ['229','229','229'],'gray91' => ['232','232','232'],'gray92' => ['235','235','235'],'gray93' => ['237','237','237'],'gray94' => ['240','240','240'],'gray95' => ['242','242','242'],'gray96' => ['245','245','245'],'gray97' => ['247','247','247'],'gray98' => ['250','250','250'],'gray99' => ['252','252','252'],'green' => ['0','255','0'],'green yellow' => ['173','255','47'],'green1' => ['0','255','0'],'green2' => ['0','238','0'],'green3' => ['0','205','0'],'green4' => ['0','139','0'],'greenyellow' => ['173','255','47'],'grey' => ['190','190','190'],'grey0' => ['0','0','0'],'grey1' => ['3','3','3'],'grey10' => ['26','26','26'],'grey100' => ['255','255','255'],'grey11' => ['28','28','28'],'grey12' => ['31','31','31'],'grey13' => ['33','33','33'],'grey14' => ['36','36','36'],'grey15' => ['38','38','38'],'grey16' => ['41','41','41'],'grey17' => ['43','43','43'],'grey18' => ['46','46','46'],'grey19' => ['48','48','48'],'grey2' => ['5','5','5'],'grey20' => ['51','51','51'],'grey21' => ['54','54','54'],'grey22' => ['56','56','56'],'grey23' => ['59','59','59'],'grey24' => ['61','61','61'],'grey25' => ['64','64','64'],'grey26' => ['66','66','66'],'grey27' => ['69','69','69'],'grey28' => ['71','71','71'],'grey29' => ['74','74','74'],'grey3' => ['8','8','8'],'grey30' => ['77','77','77'],'grey31' => ['79','79','79'],'grey32' => ['82','82','82'],'grey33' => ['84','84','84'],'grey34' => ['87','87','87'],'grey35' => ['89','89','89'],'grey36' => ['92','92','92'],'grey37' => ['94','94','94'],'grey38' => ['97','97','97'],'grey39' => ['99','99','99'],'grey4' => ['10','10','10'],'grey40' => ['102','102','102'],'grey41' => ['105','105','105'],'grey42' => ['107','107','107'],'grey43' => ['110','110','110'],'grey44' => ['112','112','112'],'grey45' => ['115','115','115'],'grey46' => ['117','117','117'],'grey47' => ['120','120','120'],'grey48' => ['122','122','122'],'grey49' => ['125','125','125'],'grey5' => ['13','13','13'],'grey50' => ['127','127','127'],'grey51' => ['130','130','130'],'grey52' => ['133','133','133'],'grey53' => ['135','135','135'],'grey54' => ['138','138','138'],'grey55' => ['140','140','140'],'grey56' => ['143','143','143'],'grey57' => ['145','145','145'],'grey58' => ['148','148','148'],'grey59' => ['150','150','150'],'grey6' => ['15','15','15'],'grey60' => ['153','153','153'],'grey61' => ['156','156','156'],'grey62' => ['158','158','158'],'grey63' => ['161','161','161'],'grey64' => ['163','163','163'],'grey65' => ['166','166','166'],'grey66' => ['168','168','168'],'grey67' => ['171','171','171'],'grey68' => ['173','173','173'],'grey69' => ['176','176','176'],'grey7' => ['18','18','18'],'grey70' => ['179','179','179'],'grey71' => ['181','181','181'],'grey72' => ['184','184','184'],'grey73' => ['186','186','186'],'grey74' => ['189','189','189'],'grey75' => ['191','191','191'],'grey76' => ['194','194','194'],'grey77' => ['196','196','196'],'grey78' => ['199','199','199'],'grey79' => ['201','201','201'],'grey8' => ['20','20','20'],'grey80' => ['204','204','204'],'grey81' => ['207','207','207'],'grey82' => ['209','209','209'],'grey83' => ['212','212','212'],'grey84' => ['214','214','214'],'grey85' => ['217','217','217'],'grey86' => ['219','219','219'],'grey87' => ['222','222','222'],'grey88' => ['224','224','224'],'grey89' => ['227','227','227'],'grey9' => ['23','23','23'],'grey90' => ['229','229','229'],'grey91' => ['232','232','232'],'grey92' => ['235','235','235'],'grey93' => ['237','237','237'],'grey94' => ['240','240','240'],'grey95' => ['242','242','242'],'grey96' => ['245','245','245'],'grey97' => ['247','247','247'],'grey98' => ['250','250','250'],'grey99' => ['252','252','252'],'honeydew' => ['240','255','240'],'honeydew1' => ['240','255','240'],'honeydew2' => ['224','238','224'],'honeydew3' => ['193','205','193'],'honeydew4' => ['131','139','131'],'hot pink' => ['255','105','180'],'hotpink' => ['255','105','180'],'hotpink1' => ['255','110','180'],'hotpink2' => ['238','106','167'],'hotpink3' => ['205','96','144'],'hotpink4' => ['139','58','98'],'indian red' => ['205','92','92'],'indianred' => ['205','92','92'],'indianred1' => ['255','106','106'],'indianred2' => ['238','99','99'],'indianred3' => ['205','85','85'],'indianred4' => ['139','58','58'],'ivory' => ['255','255','240'],'ivory1' => ['255','255','240'],'ivory2' => ['238','238','224'],'ivory3' => ['205','205','193'],'ivory4' => ['139','139','131'],'khaki' => ['240','230','140'],'khaki1' => ['255','246','143'],'khaki2' => ['238','230','133'],'khaki3' => ['205','198','115'],'khaki4' => ['139','134','78'],'lavender' => ['230','230','250'],'lavender blush' => ['255','240','245'],'lavenderblush' => ['255','240','245'],'lavenderblush1' => ['255','240','245'],'lavenderblush2' => ['238','224','229'],'lavenderblush3' => ['205','193','197'],'lavenderblush4' => ['139','131','134'],'lawn green' => ['124','252','0'],'lawngreen' => ['124','252','0'],'lemon chiffon' => ['255','250','205'],'lemonchiffon' => ['255','250','205'],'lemonchiffon1' => ['255','250','205'],'lemonchiffon2' => ['238','233','191'],'lemonchiffon3' => ['205','201','165'],'lemonchiffon4' => ['139','137','112'],'light blue' => ['173','216','230'],'light coral' => ['240','128','128'],'light cyan' => ['224','255','255'],'light goldenrod' => ['238','221','130'],'light goldenrod yellow' => ['250','250','210'],'light gray' => ['211','211','211'],'light green' => ['144','238','144'],'light grey' => ['211','211','211'],'light pink' => ['255','182','193'],'light salmon' => ['255','160','122'],'light sea green' => ['32','178','170'],'light sky blue' => ['135','206','250'],'light slate blue' => ['132','112','255'],'light slate gray' => ['119','136','153'],'light slate grey' => ['119','136','153'],'light steel blue' => ['176','196','222'],'light yellow' => ['255','255','224'],'lightblue' => ['173','216','230'],'lightblue1' => ['191','239','255'],'lightblue2' => ['178','223','238'],'lightblue3' => ['154','192','205'],'lightblue4' => ['104','131','139'],'lightcoral' => ['240','128','128'],'lightcyan' => ['224','255','255'],'lightcyan1' => ['224','255','255'],'lightcyan2' => ['209','238','238'],'lightcyan3' => ['180','205','205'],'lightcyan4' => ['122','139','139'],'lightgoldenrod' => ['238','221','130'],'lightgoldenrod1' => ['255','236','139'],'lightgoldenrod2' => ['238','220','130'],'lightgoldenrod3' => ['205','190','112'],'lightgoldenrod4' => ['139','129','76'],'lightgoldenrodyellow' => ['250','250','210'],'lightgray' => ['211','211','211'],'lightgreen' => ['144','238','144'],'lightgrey' => ['211','211','211'],'lightpink' => ['255','182','193'],'lightpink1' => ['255','174','185'],'lightpink2' => ['238','162','173'],'lightpink3' => ['205','140','149'],'lightpink4' => ['139','95','101'],'lightsalmon' => ['255','160','122'],'lightsalmon1' => ['255','160','122'],'lightsalmon2' => ['238','149','114'],'lightsalmon3' => ['205','129','98'],'lightsalmon4' => ['139','87','66'],'lightseagreen' => ['32','178','170'],'lightskyblue' => ['135','206','250'],'lightskyblue1' => ['176','226','255'],'lightskyblue2' => ['164','211','238'],'lightskyblue3' => ['141','182','205'],'lightskyblue4' => ['96','123','139'],'lightslateblue' => ['132','112','255'],'lightslategray' => ['119','136','153'],'lightslategrey' => ['119','136','153'],'lightsteelblue' => ['176','196','222'],'lightsteelblue1' => ['202','225','255'],'lightsteelblue2' => ['188','210','238'],'lightsteelblue3' => ['162','181','205'],'lightsteelblue4' => ['110','123','139'],'lightyellow' => ['255','255','224'],'lightyellow1' => ['255','255','224'],'lightyellow2' => ['238','238','209'],'lightyellow3' => ['205','205','180'],'lightyellow4' => ['139','139','122'],'lime green' => ['50','205','50'],'limegreen' => ['50','205','50'],'linen' => ['250','240','230'],'magenta' => ['255','0','255'],'magenta1' => ['255','0','255'],'magenta2' => ['238','0','238'],'magenta3' => ['205','0','205'],'magenta4' => ['139','0','139'],'maroon' => ['176','48','96'],'maroon1' => ['255','52','179'],'maroon2' => ['238','48','167'],'maroon3' => ['205','41','144'],'maroon4' => ['139','28','98'],'medium aquamarine' => ['102','205','170'],'medium blue' => ['0','0','205'],'medium orchid' => ['186','85','211'],'medium purple' => ['147','112','219'],'medium sea green' => ['60','179','113'],'medium slate blue' => ['123','104','238'],'medium spring green' => ['0','250','154'],'medium turquoise' => ['72','209','204'],'medium violet red' => ['199','21','133'],'mediumaquamarine' => ['102','205','170'],'mediumblue' => ['0','0','205'],'mediumorchid' => ['186','85','211'],'mediumorchid1' => ['224','102','255'],'mediumorchid2' => ['209','95','238'],'mediumorchid3' => ['180','82','205'],'mediumorchid4' => ['122','55','139'],'mediumpurple' => ['147','112','219'],'mediumpurple1' => ['171','130','255'],'mediumpurple2' => ['159','121','238'],'mediumpurple3' => ['137','104','205'],'mediumpurple4' => ['93','71','139'],'mediumseagreen' => ['60','179','113'],'mediumslateblue' => ['123','104','238'],'mediumspringgreen' => ['0','250','154'],'mediumturquoise' => ['72','209','204'],'mediumvioletred' => ['199','21','133'],'midnight blue' => ['25','25','112'],'midnightblue' => ['25','25','112'],'mint cream' => ['245','255','250'],'mintcream' => ['245','255','250'],'misty rose' => ['255','228','225'],'mistyrose' => ['255','228','225'],'mistyrose1' => ['255','228','225'],'mistyrose2' => ['238','213','210'],'mistyrose3' => ['205','183','181'],'mistyrose4' => ['139','125','123'],'moccasin' => ['255','228','181'],'navajo white' => ['255','222','173'],'navajowhite' => ['255','222','173'],'navajowhite1' => ['255','222','173'],'navajowhite2' => ['238','207','161'],'navajowhite3' => ['205','179','139'],'navajowhite4' => ['139','121','94'],'navy' => ['0','0','128'],'navy blue' => ['0','0','128'],'navyblue' => ['0','0','128'],'old lace' => ['253','245','230'],'oldlace' => ['253','245','230'],'olive drab' => ['107','142','35'],'olivedrab' => ['107','142','35'],'olivedrab1' => ['192','255','62'],'olivedrab2' => ['179','238','58'],'olivedrab3' => ['154','205','50'],'olivedrab4' => ['105','139','34'],'orange' => ['255','165','0'],'orange red' => ['255','69','0'],'orange1' => ['255','165','0'],'orange2' => ['238','154','0'],'orange3' => ['205','133','0'],'orange4' => ['139','90','0'],'orangered' => ['255','69','0'],'orangered1' => ['255','69','0'],'orangered2' => ['238','64','0'],'orangered3' => ['205','55','0'],'orangered4' => ['139','37','0'],'orchid' => ['218','112','214'],'orchid1' => ['255','131','250'],'orchid2' => ['238','122','233'],'orchid3' => ['205','105','201'],'orchid4' => ['139','71','137'],'pale goldenrod' => ['238','232','170'],'pale green' => ['152','251','152'],'pale turquoise' => ['175','238','238'],'pale violet red' => ['219','112','147'],'palegoldenrod' => ['238','232','170'],'palegreen' => ['152','251','152'],'palegreen1' => ['154','255','154'],'palegreen2' => ['144','238','144'],'palegreen3' => ['124','205','124'],'palegreen4' => ['84','139','84'],'paleturquoise' => ['175','238','238'],'paleturquoise1' => ['187','255','255'],'paleturquoise2' => ['174','238','238'],'paleturquoise3' => ['150','205','205'],'paleturquoise4' => ['102','139','139'],'palevioletred' => ['219','112','147'],'palevioletred1' => ['255','130','171'],'palevioletred2' => ['238','121','159'],'palevioletred3' => ['205','104','137'],'palevioletred4' => ['139','71','93'],'papaya whip' => ['255','239','213'],'papayawhip' => ['255','239','213'],'peach puff' => ['255','218','185'],'peachpuff' => ['255','218','185'],'peachpuff1' => ['255','218','185'],'peachpuff2' => ['238','203','173'],'peachpuff3' => ['205','175','149'],'peachpuff4' => ['139','119','101'],'peru' => ['205','133','63'],'pink' => ['255','192','203'],'pink1' => ['255','181','197'],'pink2' => ['238','169','184'],'pink3' => ['205','145','158'],'pink4' => ['139','99','108'],'plum' => ['221','160','221'],'plum1' => ['255','187','255'],'plum2' => ['238','174','238'],'plum3' => ['205','150','205'],'plum4' => ['139','102','139'],'powder blue' => ['176','224','230'],'powderblue' => ['176','224','230'],'purple' => ['160','32','240'],'purple1' => ['155','48','255'],'purple2' => ['145','44','238'],'purple3' => ['125','38','205'],'purple4' => ['85','26','139'],'red' => ['255','0','0'],'red1' => ['255','0','0'],'red2' => ['238','0','0'],'red3' => ['205','0','0'],'red4' => ['139','0','0'],'rosy brown' => ['188','143','143'],'rosybrown' => ['188','143','143'],'rosybrown1' => ['255','193','193'],'rosybrown2' => ['238','180','180'],'rosybrown3' => ['205','155','155'],'rosybrown4' => ['139','105','105'],'royal blue' => ['65','105','225'],'royalblue' => ['65','105','225'],'royalblue1' => ['72','118','255'],'royalblue2' => ['67','110','238'],'royalblue3' => ['58','95','205'],'royalblue4' => ['39','64','139'],'saddle brown' => ['139','69','19'],'saddlebrown' => ['139','69','19'],'salmon' => ['250','128','114'],'salmon1' => ['255','140','105'],'salmon2' => ['238','130','98'],'salmon3' => ['205','112','84'],'salmon4' => ['139','76','57'],'sandy brown' => ['244','164','96'],'sandybrown' => ['244','164','96'],'sea green' => ['46','139','87'],'seagreen' => ['46','139','87'],'seagreen1' => ['84','255','159'],'seagreen2' => ['78','238','148'],'seagreen3' => ['67','205','128'],'seagreen4' => ['46','139','87'],'seashell' => ['255','245','238'],'seashell1' => ['255','245','238'],'seashell2' => ['238','229','222'],'seashell3' => ['205','197','191'],'seashell4' => ['139','134','130'],'sienna' => ['160','82','45'],'sienna1' => ['255','130','71'],'sienna2' => ['238','121','66'],'sienna3' => ['205','104','57'],'sienna4' => ['139','71','38'],'sky blue' => ['135','206','235'],'skyblue' => ['135','206','235'],'skyblue1' => ['135','206','255'],'skyblue2' => ['126','192','238'],'skyblue3' => ['108','166','205'],'skyblue4' => ['74','112','139'],'slate blue' => ['106','90','205'],'slate gray' => ['112','128','144'],'slate grey' => ['112','128','144'],'slateblue' => ['106','90','205'],'slateblue1' => ['131','111','255'],'slateblue2' => ['122','103','238'],'slateblue3' => ['105','89','205'],'slateblue4' => ['71','60','139'],'slategray' => ['112','128','144'],'slategray1' => ['198','226','255'],'slategray2' => ['185','211','238'],'slategray3' => ['159','182','205'],'slategray4' => ['108','123','139'],'slategrey' => ['112','128','144'],'snow' => ['255','250','250'],'snow1' => ['255','250','250'],'snow2' => ['238','233','233'],'snow3' => ['205','201','201'],'snow4' => ['139','137','137'],'spring green' => ['0','255','127'],'springgreen' => ['0','255','127'],'springgreen1' => ['0','255','127'],'springgreen2' => ['0','238','118'],'springgreen3' => ['0','205','102'],'springgreen4' => ['0','139','69'],'steel blue' => ['70','130','180'],'steelblue' => ['70','130','180'],'steelblue1' => ['99','184','255'],'steelblue2' => ['92','172','238'],'steelblue3' => ['79','148','205'],'steelblue4' => ['54','100','139'],'tan' => ['210','180','140'],'tan1' => ['255','165','79'],'tan2' => ['238','154','73'],'tan3' => ['205','133','63'],'tan4' => ['139','90','43'],'thistle' => ['216','191','216'],'thistle1' => ['255','225','255'],'thistle2' => ['238','210','238'],'thistle3' => ['205','181','205'],'thistle4' => ['139','123','139'],'tomato' => ['255','99','71'],'tomato1' => ['255','99','71'],'tomato2' => ['238','92','66'],'tomato3' => ['205','79','57'],'tomato4' => ['139','54','38'],'turquoise' => ['64','224','208'],'turquoise1' => ['0','245','255'],'turquoise2' => ['0','229','238'],'turquoise3' => ['0','197','205'],'turquoise4' => ['0','134','139'],'violet' => ['238','130','238'],'violet red' => ['208','32','144'],'violetred' => ['208','32','144'],'violetred1' => ['255','62','150'],'violetred2' => ['238','58','140'],'violetred3' => ['205','50','120'],'violetred4' => ['139','34','82'],'wheat' => ['245','222','179'],'wheat1' => ['255','231','186'],'wheat2' => ['238','216','174'],'wheat3' => ['205','186','150'],'wheat4' => ['139','126','102'],'white' => ['255','255','255'],'white smoke' => ['245','245','245'],'whitesmoke' => ['245','245','245'],'yellow' => ['255','255','0'],'yellow green' => ['154','205','50'],'yellow1' => ['255','255','0'],'yellow2' => ['238','238','0'],'yellow3' => ['205','205','0'],'yellow4' => ['139','139','0'],'yellowgreen' => ['154','205','50']}
+EOT
+}
 
 # XXX POD
 __END__
@@ -5460,7 +5682,7 @@ Module::Generic - Generic Module to inherit from
 
 =head1 VERSION
 
-    v0.22.1
+    v0.23.0
 
 =head1 DESCRIPTION
 
@@ -6655,6 +6877,8 @@ Provided with a string representing a date or datetime, and this will try to par
 
 =head2 _set_get
 
+    sub name { return( shift->_set_get( 'name', @_ ) ); }
+
 Provided with an object property name and some value and this will set or get that value for that property.
 
 However, if the value stored is an array and is called in list context, it will return the array as a list and not the array reference. Same thing for an hash reference. It will return an hash in list context. In scalar context, it returns whatever the value is, such as array reference, hash reference or string, etc.
@@ -6715,6 +6939,8 @@ For example:
 The value of the callback can be either a subroutine name or a code reference.
 
 =head2 _set_get_boolean
+
+    sub is_true { return( shift->_set_get_boolean( 'is_true', @_ ) ); }
 
 Provided with an object property name and some data and this will store the data as a boolean value.
 
@@ -6897,6 +7123,8 @@ It returns under and set an error if the provided value is not a code reference.
 
 =head2 _set_get_datetime
 
+    sub created_on { return( shift->_set_get_datetime( 'created_on', @_ ) ); }
+
 Provided with an object property name and asome date or datetime string and this will attempt to parse it and save it as a L<DateTime> object.
 
 If the data is a 10 digits integer, this will treat it as a unix timestamp.
@@ -6913,6 +7141,8 @@ Of course, the value of C<iso8601> will be empty since this is a fake method pro
 
 =head2 _set_get_file
 
+    sub file { return( shift->_set_get_file( 'file', @_ ) ); }
+
 Provided with an object property name and a file and this will store the given file as a L<Module::Generic::File> object.
 
 It returns under and set an error if the provided value is not a proper file.
@@ -6920,6 +7150,8 @@ It returns under and set an error if the provided value is not a proper file.
 Note that the files does not need to exist and it can also be a directory or a symbolic link or any other file on the system.
 
 =head2 _set_get_hash
+
+    sub metadata { return( shift->_set_get_hash( 'metadata', @_ ) ); }
 
 Provided with an object property name and an hash reference and this set the property name with this hash reference.
 
@@ -6933,6 +7165,8 @@ You can even pass it an associative array, and it will be saved as a hash refere
     my $hash = $object->metadata;
 
 =head2 _set_get_hash_as_mix_object
+
+    sub metadata { return( shift->_set_get_hash_as_mix_object( 'metadata', @_ ) ); }
 
 Provided with an object property name, and an optional hash reference and this returns a L<Module::Generic::Hash> object, which allows to manipulate the hash just like any regular hash, but it provides on top object oriented method described in details in L<Module::Generic::Hash>.
 
@@ -6959,6 +7193,8 @@ Then populating the data :
     printf( "Customer name is %s\n", $object->metadata->last_name );
 
 =head2 _set_get_ip
+
+    sub ip { return( shift->_set_get_ip( 'ip', @_ ) ); }
 
 This helper method takes a value and check if it is a valid IP address using L</_is_ip>. If C<undef> or zero-byte value is provided, it will merely accept it, as it can be used to reset the value by the caller.
 
@@ -7086,6 +7322,8 @@ This means the value stored for the object property will vary between an hash or
 
 =head2 _set_get_scalar
 
+    sub name { return( shift->_set_get_scalar( 'name', @_ ) ); }
+
 Provided with an object property name, and a string, possibly a number or anything really and this will set the property value accordingly. Very straightforward.
 
 It returns the currently value stored.
@@ -7148,9 +7386,26 @@ If no value has been set yet, this returns a L<Module::Generic::Null> object to 
 
 =head2 _set_get_uri
 
-Provided with an object property name, and an uri and this creates a L<URI> object and sets the property value accordingly.
+    sub uri { return( shift->_set_get_uri( 'uri', @_ ) ); }
+    sub uri { return( shift->_set_get_uri( { field => 'uri', class => 'URI::Fast' }, @_ ) ); }
 
-It accepts an L<URI> object, an uri or urn string, or an absolute path, i.e. a string starting with C</>.
+Provided with an object property name, and an uri and this creates an L<URI> object and sets the property value accordingly.
+
+Alternatively, the property name can be an hash with the following properties:
+
+=over 4
+
+=item I<field>
+
+The object property name
+
+=item I<class>
+
+The URI class to use. By default, L<URI>, but you could also use L<URI::Fast>, or other class of your choice.
+
+=back
+
+It accepts an L<URI> object (or any other URI class object), an uri or urn string, or an absolute path, i.e. a string starting with C</>.
 
 It returns the current value, if any, so the return value could be undef, thus it cannot be chained. Maybe it should return a L<Module::Generic::Null> object ?
 
@@ -7182,6 +7437,10 @@ It will also use the following global variables in your module to set the databa
 If C<DB_SERVER_PREPARE> is provided and true, C<pg_server_prepare> will be set to true in the database handler.
 
 It returns the database handler object.
+
+=for Pod::Coverage _autoload_subs
+
+=for Pod::Coverage _autoload_add_to_cache
 
 =head2 DEBUG
 

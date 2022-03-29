@@ -11,8 +11,13 @@ This class implements ...
 
 =head1 SYNOPSIS
 
-var obj = Gauss(...)
+    var a = Gauss(17,19)
+    var b = Gauss(43,97)
 
+    say a+b     #=> (60, 116)
+    say a-b     #=> (-26, -78)
+    say a*b     #=> (-1112, 2466)
+    say a/b     #=> (99/433, -32/433)
 
 =head1 INHERITS
 
@@ -24,9 +29,9 @@ Inherits methods from:
 
 =head2 !=
 
-I<Obj> B<!=> I<Obj> -> I<Obj>
+    a != b
 
-Return the
+Returns the
 
 Aliases: I<ne>
 
@@ -34,9 +39,9 @@ Aliases: I<ne>
 
 =head2 %
 
-I<Obj> B<%> I<Obj> -> I<Obj>
+    a % b
 
-Return the
+Returns the
 
 Aliases: I<mod>
 
@@ -44,9 +49,9 @@ Aliases: I<mod>
 
 =head2 &
 
-I<Obj> B<&> I<Obj> -> I<Obj>
+    a & b
 
-Return the
+Returns the
 
 Aliases: I<and>
 
@@ -54,9 +59,9 @@ Aliases: I<and>
 
 =head2 *
 
-I<Obj> B<*> I<Obj> -> I<Obj>
+    a * b
 
-Return the
+Returns the
 
 Aliases: I<mul>
 
@@ -64,9 +69,9 @@ Aliases: I<mul>
 
 =head2 **
 
-I<Obj> B<**> I<Obj> -> I<Obj>
+    a ** b
 
-Return the
+Returns the
 
 Aliases: I<pow>
 
@@ -74,9 +79,9 @@ Aliases: I<pow>
 
 =head2 +
 
-I<Obj> B<+> I<Obj> -> I<Obj>
+    a + b
 
-Return the
+Returns the
 
 Aliases: I<add>
 
@@ -84,9 +89,9 @@ Aliases: I<add>
 
 =head2 ++
 
-I<Obj> B<++> I<Obj> -> I<Obj>
+    a ++ b
 
-Return the
+Returns the
 
 Aliases: I<inc>
 
@@ -94,9 +99,9 @@ Aliases: I<inc>
 
 =head2 -
 
-I<Obj> B<-> I<Obj> -> I<Obj>
+    a - b
 
-Return the
+Returns the
 
 Aliases: I<sub>
 
@@ -104,9 +109,9 @@ Aliases: I<sub>
 
 =head2 --
 
-I<Obj> B<--> I<Obj> -> I<Obj>
+    a -- b
 
-Return the
+Returns the
 
 Aliases: I<dec>
 
@@ -114,9 +119,9 @@ Aliases: I<dec>
 
 =head2 /
 
-I<Obj> B</> I<Obj> -> I<Obj>
+    a / b
 
-Return the
+Returns the
 
 Aliases: I<÷>, I<div>
 
@@ -124,9 +129,9 @@ Aliases: I<÷>, I<div>
 
 =head2 <
 
-I<Obj> B<E<lt>> I<Obj> -> I<Obj>
+    a < b
 
-Return the
+Returns the
 
 Aliases: I<lt>
 
@@ -134,9 +139,9 @@ Aliases: I<lt>
 
 =head2 <<
 
-I<Obj> B<E<lt>E<lt>> I<Obj> -> I<Obj>
+    a << b
 
-Return the
+Returns the
 
 Aliases: I<lsft>, I<shift_left>
 
@@ -144,9 +149,9 @@ Aliases: I<lsft>, I<shift_left>
 
 =head2 <=>
 
-I<Obj> B<E<lt>=E<gt>> I<Obj> -> I<Obj>
+    a <=> b
 
-Return the
+Returns the
 
 Aliases: I<cmp>
 
@@ -154,9 +159,9 @@ Aliases: I<cmp>
 
 =head2 ==
 
-I<Obj> B<==> I<Obj> -> I<Obj>
+    a == b
 
-Return the
+Returns the
 
 Aliases: I<eq>
 
@@ -164,9 +169,9 @@ Aliases: I<eq>
 
 =head2 >
 
-I<Obj> B<E<gt>> I<Obj> -> I<Obj>
+    a > b
 
-Return the
+Returns the
 
 Aliases: I<gt>
 
@@ -174,9 +179,9 @@ Aliases: I<gt>
 
 =head2 >>
 
-I<Obj> B<E<gt>E<gt>> I<Obj> -> I<Obj>
+    a >> b
 
-Return the
+Returns the
 
 Aliases: I<rsft>, I<shift_right>
 
@@ -184,9 +189,9 @@ Aliases: I<rsft>, I<shift_right>
 
 =head2 ^
 
-I<Obj> B<^> I<Obj> -> I<Obj>
+    a ^ b
 
-Return the
+Returns the
 
 Aliases: I<xor>
 
@@ -194,9 +199,9 @@ Aliases: I<xor>
 
 =head2 |
 
-I<Obj> B<|> I<Obj> -> I<Obj>
+    a | b
 
-Return the
+Returns the
 
 Aliases: I<or>
 
@@ -204,9 +209,9 @@ Aliases: I<or>
 
 =head2 ≤
 
-I<Obj> B<≤> I<Obj> -> I<Obj>
+    a ≤ b
 
-Return the
+Returns the
 
 Aliases: I<E<lt>=>, I<le>
 
@@ -214,189 +219,207 @@ Aliases: I<E<lt>=>, I<le>
 
 =head2 ≥
 
-I<Obj> B<≥> I<Obj> -> I<Obj>
+    a ≥ b
 
-Return the
+Returns the
 
 Aliases: I<E<gt>=>, I<ge>
 
 =cut
 
+=head2 a
+
+    Gauss.a()
+
+Returns the
+
+Aliases: I<re>, I<real>
+
+=cut
+
 =head2 abs
 
-Gauss.abs() -> I<Obj>
+    Gauss.abs()
 
-Return the
+Returns the
+
+=cut
+
+=head2 b
+
+    Gauss.b()
+
+Returns the
+
+Aliases: I<im>, I<imag>
 
 =cut
 
 =head2 ceil
 
-Gauss.ceil() -> I<Obj>
+    Gauss.ceil()
 
-Return the
+Returns the
 
 =cut
 
 =head2 conj
 
-Gauss.conj() -> I<Obj>
+    Gauss.conj()
 
-Return the
+Returns the
 
 =cut
 
 =head2 dump
 
-Gauss.dump() -> I<Obj>
+    Gauss.dump()
 
-Return the
+Returns the
+
+=cut
+
+=head2 eval
+
+    Gauss.eval()
+
+Returns the
 
 =cut
 
 =head2 float
 
-Gauss.float() -> I<Obj>
+    Gauss.float()
 
-Return the
+Returns the
 
 =cut
 
 =head2 floor
 
-Gauss.floor() -> I<Obj>
+    Gauss.floor()
 
-Return the
+Returns the
 
 =cut
 
 =head2 gcd
 
-Gauss.gcd() -> I<Obj>
+    Gauss.gcd()
 
-Return the
+Returns the
 
 =cut
 
 =head2 gcd_norm
 
-Gauss.gcd_norm() -> I<Obj>
+    Gauss.gcd_norm()
 
-Return the
+Returns the
 
 =cut
 
 =head2 i
 
-Gauss.i() -> I<Obj>
+    Gauss.i()
 
-Return the
+Returns the
 
 =cut
 
 =head2 iabs
 
-Gauss.iabs() -> I<Obj>
+    Gauss.iabs()
 
-Return the
-
-=cut
-
-=head2 im
-
-Gauss.im() -> I<Obj>
-
-Return the
-
-Aliases: I<imag>
+Returns the
 
 =cut
 
 =head2 inv
 
-Gauss.inv() -> I<Obj>
+    Gauss.inv()
 
-Return the
+Returns the
 
 =cut
 
 =head2 invmod
 
-Gauss.invmod() -> I<Obj>
+    Gauss.invmod()
 
-Return the
+Returns the
 
 =cut
 
 =head2 is_coprime
 
-Gauss.is_coprime() -> I<Obj>
+    Gauss.is_coprime()
 
-Return the
+Returns the
 
 =cut
 
 =head2 is_imag
 
-Gauss.is_imag() -> I<Obj>
+    Gauss.is_imag()
 
-Return the
+Returns the
 
 =cut
 
 =head2 is_mone
 
-Gauss.is_mone() -> I<Obj>
+    Gauss.is_mone()
 
-Return the
+Returns the
 
 =cut
 
 =head2 is_one
 
-Gauss.is_one() -> I<Obj>
+    Gauss.is_one()
 
-Return the
+Returns the
 
 =cut
 
 =head2 is_prime
 
-Gauss.is_prime() -> I<Obj>
+    Gauss.is_prime()
 
-Return the
+Returns the
 
 =cut
 
 =head2 is_real
 
-Gauss.is_real() -> I<Obj>
+    Gauss.is_real()
 
-Return the
+Returns the
 
 =cut
 
 =head2 is_zero
 
-Gauss.is_zero() -> I<Obj>
+    Gauss.is_zero()
 
-Return the
+Returns the
 
 =cut
 
 =head2 neg
 
-Gauss.neg() -> I<Obj>
+    Gauss.neg()
 
-Return the
+Returns the
 
 =cut
 
 =head2 new
 
-Gauss.new() -> I<Obj>
+    Gauss.new()
 
-Return the
+Returns the
 
 Aliases: I<call>
 
@@ -404,67 +427,65 @@ Aliases: I<call>
 
 =head2 norm
 
-Gauss.norm() -> I<Obj>
+    Gauss.norm()
 
-Return the
+Returns the
+
+=cut
+
+=head2 parts
+
+    Gauss.parts()
+
+Returns the
 
 =cut
 
 =head2 powmod
 
-Gauss.powmod() -> I<Obj>
+    Gauss.powmod()
 
-Return the
-
-=cut
-
-=head2 ratmod
-
-Gauss.ratmod() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 re
-
-Gauss.re() -> I<Obj>
-
-Return the
-
-Aliases: I<real>
+Returns the
 
 =cut
 
 =head2 reals
 
-Gauss.reals() -> I<Obj>
+    Gauss.reals()
 
-Return the
+Returns the
 
 =cut
 
 =head2 round
 
-Gauss.round() -> I<Obj>
+    Gauss.round()
 
-Return the
+Returns the
 
 =cut
 
 =head2 sgn
 
-Gauss.sgn() -> I<Obj>
+    Gauss.sgn()
 
-Return the
+Returns the
+
+=cut
+
+=head2 sqr
+
+    Gauss.sqr()
+
+Returns the
 
 =cut
 
 =head2 to_c
 
-Gauss.to_c() -> I<Obj>
+    Gauss.to_c()
 
-Return the
+Returns the
 
 Aliases: I<to_n>
 
@@ -472,8 +493,8 @@ Aliases: I<to_n>
 
 =head2 to_s
 
-Gauss.to_s() -> I<Obj>
+    Gauss.to_s()
 
-Return the
+Returns the
 
 =cut

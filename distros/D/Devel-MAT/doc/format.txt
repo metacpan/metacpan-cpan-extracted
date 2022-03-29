@@ -258,6 +258,10 @@ An SV:
 
   type: NO
 
+  type: STRUCT
+    Header(0):
+    FIELD(n): -- given by META
+
 SV extensions:
   PTR   SV
 
@@ -314,6 +318,22 @@ SV extensions:
       UINT  LINE
     STRs(1):
             FILE
+
+  type: META_STRUCT (0xF0)
+    Header(2I):
+      UINT  STRUCTID
+      UINT  NFIELDS
+    STRs(1)
+            NAME
+    Body:
+      {STR  FIELDNAME
+       U8   TYPE
+              0x00 : Pointer (PTR)
+              0x01 : Boolean (U8)
+              0x02 : Number (U8)
+              0x03 : Number (U32)
+              0x04 : Number (UINT)
+       }*$n
 
 Context:
   type==0-terminated list of CTXs

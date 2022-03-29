@@ -4,7 +4,8 @@ use Mojo::Base 'Mojo::Server::Daemon', -signatures;
 use IO::Socket::UNIX;
 use Scalar::Util qw(weaken);
 
-has heartbeat_interval => sub { $ENV{MOJO_SERVER_DAEMON_HEARTBEAT_INTERVAL} || 5 };
+has heartbeat_interval => sub ($self) { $ENV{MOJODCTL_HEARTBEAT_INTERVAL} || 5 };
+has manager_pid        => sub ($self) { $ENV{MOJODCTL_PID}                || getppid };
 has silent             => 1;
 has worker_pipe        => sub ($self) { $self->_build_worker_pipe };
 
@@ -12,7 +13,7 @@ sub run ($self, $app, @) {
   weaken $self;
   $0 = $app;
   my $loop         = $self->ioloop;
-  my $heartbeat_cb = sub { $self->_heartbeat('h') };
+  my $heartbeat_cb = sub { $self->_heartbeat_tick };
   $loop->next_tick($heartbeat_cb);
   $loop->recurring($self->heartbeat_interval, $heartbeat_cb);
   $loop->on(finish => sub { $self->max_requests(1) });
@@ -21,14 +22,23 @@ sub run ($self, $app, @) {
 }
 
 sub _build_worker_pipe ($self) {
-  my $path = $ENV{MOJO_SERVER_DAEMON_CONTROL_SOCK}
-    || die "Can't create a worker pipe: MOJO_SERVER_DAEMON_CONTROL_SOCK not set";
+  my $path = $ENV{MOJODCTL_CONTROL_SOCK}
+    || die "Can't create a worker pipe: MOJODCTL_CONTROL_SOCK not set";
   return IO::Socket::UNIX->new(Peer => $path, Type => SOCK_DGRAM)
     || die "Can't create a worker pipe: $@";
 }
 
 sub _heartbeat ($self, $state) {
-  $self->worker_pipe->syswrite("$$:$state\n") || die "ERR! $!";
+  $self->worker_pipe->syswrite("$$:$state\n") || die "Heartbeat FAIL $!";
+}
+
+sub _heartbeat_tick ($self) {
+  return $self->_heartbeat('h') if $self->manager_pid eq getppid;
+
+  # Force kill when parent pid changes
+  $self->_heartbeat('k');
+  $self->worker_pipe->close;
+  kill KILL => $$;
 }
 
 sub _stop_gracefully ($self) {
@@ -85,6 +95,12 @@ L<Mojo::Server::Daemon> and implements the following ones.
 Heartbeat interval in seconds. See
 L<Mojo::Server::DaemonControl::Worker/heartbeat_interval> for more details.
 
+=head2 manager_pid
+
+  $int = $daemon->manager_pid;
+
+Holds the PID of the L<Mojo::Server::DaemonControl> process.
+
 =head2 silent
 
   $bool   = $daemon->silent;
@@ -97,8 +113,8 @@ Changes the default in L<Mojo::Server::Daemon/silent> to 1.
   $socket = $daemon->worker_pipe;
 
 Holds a L<IO::Socket::UNIX> object used to communicate with the manager. The
-default socket path is read from the C<MOJO_SERVER_DAEMON_CONTROL_SOCK>
-environment variable.
+default socket path is read from the C<MOJODCTL_CONTROL_SOCK> environment
+variable.
 
 =head1 METHODS
 

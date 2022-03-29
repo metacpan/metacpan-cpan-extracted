@@ -16,25 +16,37 @@ use Cwd;
 my $base_dir = getcwd();
 
 configure {
-  requires 'File::Copy' => 0, 'File::Find::Rule' => 0;
+  requires
+      'File::Copy'       => 0,
+      'File::Find::Rule' => 0,
+      'Capture::Tiny'    => 0;
 };
 
 my $min_target_version = '3.6.0';
 
 plugin 'Build::MSYS';
 
-probe sub {
-    my($build) = @_;  # $build is the Alien::Build instance.
-    my $version = `geos-config --version`;
-    my $build_type
-      = $? == 0
-      && (versioncmp ($version, $min_target_version) == 1)
-      ? 'system'
-      : 'share';
-    say "Build type is $build_type, found version " . ($version // 'n/a');
-    return $build_type;
-};
-
+plugin 'PkgConfig' => (
+    pkg_name => 'geos',
+    atleast_version => $min_target_version,
+);
+plugin 'Probe::CommandLine' => (
+  command => 'geos-config',
+  args    => [ '--version' ],
+  version => qr/([0-9\.]+)/,
+  atleast_version => $min_target_version,
+);
+if ($on_windows) {
+  if (my $path = `where geos_c.dll`) {
+    $path = Path::Tiny::path ($path)->parent->parent->stringify;
+    $path =~ s|\\|/|g;  #  path separators
+    Alien::Build->log ("Probe::CBuilder checking $path");
+    plugin 'Probe::CBuilder' => (
+      cflags => "-I$path/include",
+      libs   => "-L$path/lib -lgeos -lgeos_c",
+    );
+  }
+}
 
 share {
 
@@ -99,16 +111,37 @@ share {
     #  clean up the build dir on cpan testers etc
     #plugin 'Cleanse::BuildDir';
   }
+
+  meta->around_hook(
+    build => sub {
+      my ($orig, $build, @args) = @_;
+      $build->log("Setting CCACHE_BASEDIR to " . getcwd());
+      local $ENV{CCACHE_BASEDIR} = getcwd();
+      $orig->($build, @args);
+    }
+  );
+
+
+  #  might fix some rpath issues?
+  #  https://github.com/OSGeo/gdal/issues/5413#issuecomment-1060286925
+  my @rpath =
+    $on_windows ? ()
+    : $^O =~ /darwin/
+      ? q{-DCMAKE_INSTALL_RPATH='@loader_path'}
+      : q{-DCMAKE_INSTALL_RPATH='\$ORIGIN'};
+
   my $cmake_cmd = [
     '%{cmake}',
     -G => '%{cmake_generator}',
     '-DCMAKE_MAKE_PROGRAM=%{make}',
     '-DBUILD_DOCUMENTATION=NO',
-    "-DGEOS_ENABLE_TESTS=$run_tests_bool_text", #  seems not be in the source tree?
+    #"-DGEOS_ENABLE_TESTS=$run_tests_bool_text", #  seems not be in the source tree?
     "-DBUILD_TESTING:BOOL=$run_tests_bool_text",
     #'-DCMAKE_BUILD_TYPE=Release',
     '-DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=true',
     '-DCMAKE_INSTALL_PREFIX:PATH=%{.install.prefix}',
+    @rpath,
+    '-DBUILD_GEOSOP=OFF',
     '..'
   ];
   
@@ -125,6 +158,7 @@ share {
     $make_cmd,
     ($run_tests ? '%{make} test' : ()),
     #\&pause,
+    \&update_geos_config,
     $make_inst_cmd,
     \&rename_la_files,
   ];
@@ -133,9 +167,7 @@ share {
 
 
 gather [
-  \&update_geos_config,
   \&copy_geos_c_dll,
-  \&copy_geos_so_on_bsd,
   #\&pause,
   #  get all the geos-config fields
   \&set_runtime_props_from_config,
@@ -160,42 +192,6 @@ sub copy_geos_c_dll {
       log "copying $from to $to";
       eval {File::Copy::copy ("$from", "$to")};
       log $@ if $@;
-    }
-  }
-}
-
-#  also a bit brute force
-#  and numbering is volatile
-sub copy_geos_so_on_bsd {
-  my $build = shift;
-  
-  return unless $^O =~ /bsd/i;
-  
-  log 'Searching for libgeos so files to rename';
-
-  my @renames = (
-    ['libgeos_c.so.1'   => 'libgeos_c.so.17'],
-    ['libgeos_c.so.1'   => 'libgeos_c.so'],
-    ['libgeos.so.3.9.0' => 'libgeos-3.9.0.so'],
-    ['libgeos.so.3.9.0' => 'libgeos-3.so'],
-  );
-
-  
-  foreach my $names (@renames) {
-    my ($from_name, $to_name) = @$names;
-
-    my @files
-      = File::Find::Rule->file()
-                        ->name( $from_name )
-                        ->in( '.' );
-  
-    foreach my $from (@files) {
-      my $to = Path::Tiny->new($from)->parent->child($to_name);
-      if (!$to->exists) {
-        log "copying $from to $to";
-        eval {File::Copy::copy ("$from", "$to")};
-        log $@ if $@;
-      }
     }
   }
 }
@@ -244,31 +240,23 @@ sub update_geos_config {
                 ->in( getcwd() )
           : 'geos-config';
 
+    $build->log("Updating $geos_config");
+
     open my $fh , '<', $geos_config
       or die "Could not open $geos_config for reading, $!";
     my $file_contents;
 
-    while (my $line = <$fh>) {
+    while (defined (my $line = <$fh>)) {
         if ($line =~ /^\s*prefix=/) {
             #  MSYS1 does not have realpath
-            #if (not $^O =~ /bsd/i) {
-                my $part1
-                  = q{BASEPATH=`perl -MCwd -MFile::Basename -e"print File::Basename::dirname(Cwd::abs_path (qq{$0}))"`};
-                #  some variants use an escape function
-                my $part2 = $line =~ /`escape/
-                  ? 'prefix=`escape "${BASEPATH}"`'
-                  : 'prefix="${BASEPATH}"';
-                my $part3 = 'prefix=$(dirname ${prefix})';
-                $line = "$part1\n$part2\n$part3\n";
-            #}
-            #else {
-            #    #my $part1 = q{BASEPATH=$(dirname $(realpath $0))};
-            #    my $part2 = $line =~ /`escape/
-            #      ? 'prefix=`escape "$0"`'
-            #      : 'prefix="$0"';
-            #    my $part3 = 'prefix=$(dirname $(realpath $0))';
-            #    $line = "$part2\n$part3\n";
-            #}
+            my $part1
+              = q{BASEPATH=`perl -MCwd -MFile::Basename -e"print File::Basename::dirname(Cwd::abs_path (qq{$0}))"`};
+            #  some variants use an escape function
+            my $part2 = $line =~ /`escape/
+              ? 'prefix=`escape "${BASEPATH}"`'
+              : 'prefix="${BASEPATH}"';
+            my $part3 = 'prefix=$(dirname ${prefix})';
+            $line = "$part1\n$part2\n$part3\n";
         }
         $file_contents .= $line;
     }
@@ -348,7 +336,7 @@ sub rename_la_files {
 
 sub pause {
     #return;  #  disable
-    return if !$on_windows || $on_automated_rig;
+    #return if !$on_windows || $on_automated_rig;
 
     say "CONTINUE?";
     my $response = <>;

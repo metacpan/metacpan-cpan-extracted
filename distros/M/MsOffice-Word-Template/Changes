@@ -1,5 +1,7 @@
 Revision history for MsOffice-Word-Template
 
+1.02    28.03.2022
+  - support for bookmarks, hyperlinks and Word fields
 
 1.01    11.01.2021
   - Template Toolkit is no longer hardwired in; other templating systems

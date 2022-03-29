@@ -2,19 +2,19 @@
 use strict;
 use warnings;
 
-use 5.012;
+use 5.020;
 
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Data::Dumper optimized for humans, with interpolation",
+  "ABSTRACT" => "Data::Dumper for humans, with interpolation",
   "AUTHOR" => "Jim Avera",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "Data-Dumper-Interp",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.012",
+  "MIN_PERL_VERSION" => "5.020",
   "NAME" => "Data::Dumper::Interp",
   "PREREQ_PM" => {
     "Carp" => 0,
@@ -37,6 +37,7 @@ my %WriteMakefileArgs = (
     "Data::Compare" => 0,
     "English" => 0,
     "Math::BigFloat" => 0,
+    "Math::BigInt" => 0,
     "Math::BigRat" => 0,
     "Test::More" => "0.98",
     "Time::HiRes" => 0,
@@ -44,7 +45,7 @@ my %WriteMakefileArgs = (
     "bigrat" => 0,
     "open" => 0
   },
-  "VERSION" => "2.23",
+  "VERSION" => "2.24",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -61,6 +62,7 @@ my %FallbackPrereqs = (
   "Exporter" => 0,
   "List::Util" => 0,
   "Math::BigFloat" => 0,
+  "Math::BigInt" => 0,
   "Math::BigRat" => 0,
   "POSIX" => 0,
   "Regexp::Common" => 0,

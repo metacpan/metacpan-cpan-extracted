@@ -24,7 +24,7 @@ SYNOPSIS
             # A last then may be added after finally
         };
 
-        # You can share data among processes for those systems that support IPC::SysV
+        # You can share data among processes for all systems, including Windows
         my $data : shared = {};
         my( $name, %attributes, @options );
         share( $name, %attributes, @options );
@@ -105,26 +105,152 @@ SYNOPSIS
 VERSION
 =======
 
-        v0.1.1
+        v0.2.0
 
 DESCRIPTION
 ===========
 
-[Promise::Me](https://metacpan.org/pod/Promise::Me){.perl-module} is a
-fork-based JavaScript-like promise that enables asynchronous execution
-of code, implementing [\"async\"](#async){.perl-module},
-[\"await\"](#await){.perl-module}, [\"all\"](#all){.perl-module},
-[\"race\"](#race){.perl-module}, sharing of variables (including array,
-hash and scalar) with [\"share\"](#share){.perl-module} and
-[\"unshare\"](#unshare){.perl-module} and locking of those variable with
-[\"lock\"](#lock){.perl-module} and [\"unlock\"](#unlock){.perl-module}.
+[Promise::Me](https://metacpan.org/pod/Promise::Me){.perl-module} is an
+implementation of the JavaScript promise using fork for asynchronous
+tasks. Fork is great, because it is well supported by all operating
+systems ([except AmigaOS, RISC OS and
+VMS](https://metacpan.org/pod/perlport){.perl-module}) and effectively
+allows for asynchronous execution.
 
-It forks processes to run the code provided and execute the chain
-initially declared. It uses
-[IPC::SysV](https://metacpan.org/pod/IPC::SysV){.perl-module} shared
-memory to enable sharing variables and sharing processes return values.
-Because of that, this module would not work on Android. dos, MSWin32
-(but should work on cygwin), os2, VMS and riscos.
+While JavaScript has asynchronous execution at its core, which means
+that two consecutive lines of code will execute simultaneously, under
+perl, those two lines would be executed one after the other. For
+example:
+
+        # Assuming the function getRemote makes an http query of a remote resource that takes time
+        let response = getRemote('https://example.com/api');
+        console.log(response);
+
+Under JavaScript, this would yield: `undefined`, but in perl
+
+        my $resp = $ua->get('https://example.com/api');
+        say( $resp );
+
+Would correctly return the response object, but it will hang until it
+gets the returned object whereas in JavaScript, it would not wait.
+
+In JavaScript, because of this asynchronous execution, before people
+were using callback hooks, which resulted in \"callback from hell\",
+i.e. something like this\[1\]:
+
+        getData(function(x){
+            getMoreData(x, function(y){
+                getMoreData(y, function(z){ 
+                    ...
+                });
+            });
+        });
+
+\[1\] Taken from this [StackOverflow
+discussion](https://stackoverflow.com/questions/25098066/what-is-callback-hell-and-how-and-why-does-rx-solve-it){.perl-module}
+
+And then, they came up with
+[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise){.perl-module},
+so that instead of wrapping your code in a callback function you get
+instead a promise object that gets called when certain events get
+triggered, like so\[2\]:
+
+        const myPromise = new Promise((resolve, reject) => {
+          setTimeout(() => {
+            resolve('foo');
+          }, 300);
+        });
+
+        myPromise
+          .then(handleResolvedA, handleRejectedA)
+          .then(handleResolvedB, handleRejectedB)
+          .then(handleResolvedC, handleRejectedC);
+
+\[2\] Taken from [Mozilla
+documentation](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise){.perl-module}
+
+Chaining is easy to implement in perl and
+[Promise::Me](https://metacpan.org/pod/Promise::Me){.perl-module} does
+it too. Where it gets more tricky is returning a promise immediately
+without waiting for further execution, i.e. a deferred promise, like the
+following in JavaScript:
+
+        function getRemote(url)
+        {
+            let promise = new Promise((resolve, reject) => 
+            {
+                setTimeout(() => reject(new Error("Whoops!")), 1000);
+            });
+            // Maybe do some other stuff here
+            return( promise );
+        }
+
+In this example, under JavaScript, the `promise` will be returned
+immediately. However, under perl, the equivalent code would be executed
+sequentially. For example, using the excellent module
+[Promise::ES6](https://metacpan.org/pod/Promise::ES6){.perl-module}:
+
+        sub get_remote
+        {
+            my $url = shift( @_ );
+            my $p = Promise::ES6->new(sub($res)
+            {
+                $res->( Promise::ES6->resolve(123) );
+            });
+            # Do some more work that would take some time
+            return( $p );
+        }
+
+In the example above, the promise `$p` would not be returned until all
+the tasks are completed before the `return` statement, contrary to
+JavaScript where it would be returned immediately.
+
+So, in perl people have started to use loop such as
+[AnyEvent](https://metacpan.org/pod/AnyEvent){.perl-module} or
+[IO::Async](https://metacpan.org/pod/IO::Async){.perl-module} with
+\"conditional variable\" to get that asynchronous execution, but you
+need to use loops. For example (taken from
+[Promise::AsyncAwait](https://metacpan.org/pod/Promise::AsyncAwait){.perl-module}):
+
+        use Promise::AsyncAwait;
+        use Promise::XS;
+
+        sub delay {
+            my $secs = shift;
+
+            my $d = Promise::XS::deferred();
+
+            my $timer; $timer = AnyEvent->timer(
+                after => $secs,
+                cb => sub {
+                    undef $timer;
+                    $d->resolve($secs);
+                },
+            );
+
+            return $d->promise();
+        }
+
+        async sub wait_plus_1 {
+            my $num = await delay(0.01);
+
+            return 1 + $num;
+        }
+
+        my $cv = AnyEvent->condvar();
+        wait_plus_1()->then($cv, sub { $cv->croak(@_) });
+
+        my ($got) = $cv->recv();
+
+So, in the midst of this, I have tried to provide something without
+event loop by using fork instead as exemplified in the
+[\"SYNOPSIS\"](#synopsis){.perl-module}
+
+For a framework to do asynchronous tasks, you might also be interested
+in [Coro](https://metacpan.org/pod/Coro){.perl-module}, from [Marc A.
+Lehmann](https://metacpan.org/author/MLEHMANN){.perl-module} original
+author of [AnyEvent](https://metacpan.org/pod/AnyEvent){.perl-module}
+event loop.
 
 METHODS
 =======
@@ -165,6 +291,23 @@ The options supported are:
 
 :   Currently unused.
 
+*use\_cache\_file*
+
+:   Boolean. If true,
+    [Promise::Me](https://metacpan.org/pod/Promise::Me){.perl-module}
+    will use a cache file instead of shared memory block. If you are on
+    system that do not support shared memory,
+    [Promise::Me](https://metacpan.org/pod/Promise::Me){.perl-module}
+    will automatically revert to
+    [Module::Generic::File::Cache](https://metacpan.org/pod/Module::Generic::File::Cache){.perl-module}
+    to handle data shared among processes.
+
+    You can use the global package variable `$SHARE_MEDIUM` to set the
+    default value for all object instantiation.
+
+    `$SHARE_MEDIUM` value can be either `memory` for shared memory or
+    `file` for shared cache file.
+
 catch
 -----
 
@@ -173,15 +316,6 @@ chain of handlers.
 
 It will be called upon an exception being met or if
 [\"reject\"](#reject){.perl-module} is called.
-
-finally
--------
-
-This takes a code reference as its unique argument and is added to the
-chain of handlers.
-
-It will be called in the chain whether there was a exception or the
-execution of the previous code ended normally.
 
 reject
 ------
@@ -227,7 +361,7 @@ result
 This sets or gets the result returned by the asynchronous process. The
 data is exchanged through shared memory.
 
-This method is used internally n combination with
+This method is used internally in combination with
 [\"await\"](#await){.perl-module}, [\"all\"](#all){.perl-module} and
 [\"race\"](#race){.perl-module}
 
@@ -240,19 +374,10 @@ If the asynchronous process returns a simple string for example,
 Thus, unless the value returned is 1 element and it is a reference, it
 will be made of an array reference.
 
-then
-----
-
-This takes a code reference as its unique argument and is added to the
-chain of handlers.
-
-It will be called upon a proper execution of the previous execution in
-the chain or if [\"rsolve\"](#rsolve){.perl-module} is called.
-
 timeout
 -------
 
-Sets gets a timeout. This is currently no used. There is no timeout for
+Sets gets a timeout. This is currently not used. There is no timeout for
 the asynchronous process.
 
 If you want to set a timeout, you can use
@@ -435,6 +560,9 @@ reference.
             $dbh->disconnect;
         });
 
+It will try to use shared memory or shared cache file depending on the
+value of the global package variable `$SHARE_MEDIUM`
+
 unlock
 ------
 
@@ -597,6 +725,15 @@ This returns the
 object used for sharing data and result between the main parent process
 and the asynchronous child process.
 
+shared\_space\_destroy
+----------------------
+
+Boolean. Default to true. If true, the shared space used by the parent
+and child processes will be destroy automatically. Disable this if you
+want to debug or take a sneak peek into the data. The shared space will
+be either shared memory of cache file depending on the value of
+`$SHARE_MEDIUM`
+
 use\_async
 ----------
 
@@ -719,7 +856,11 @@ Otherwise the two keywords would conflict.
 SHARED MEMORY
 =============
 
-This module uses shared memory using perl core functions.
+This module uses shared memory using perl core functions, or shared
+cache file using
+[Module::Generic::File::Cache](https://metacpan.org/pod/Module::Generic::File::Cache){.perl-module}
+if shared memory is not supported, or if the value of the global package
+variable `$SHARE_MEDIUM` is set to `file` instead of `memory`
 
 Shared memory is used for:
 
@@ -739,7 +880,11 @@ You can control how much shared memory is allocated for each by:
 
 2. setting the option *result\_shared\_mem\_size* when instantiating a new `Promise::Me` object. If not set, this will default to [Module::Generic::SharedMem::SHM\_BUFSIZ](https://metacpan.org/pod/Module::Generic::SharedMem::SHM_BUFSIZ){.perl-module} constant value which is 64K bytes.
 
-:   
+:   If you use [shared cache
+    file](https://metacpan.org/pod/Module::Generic::File::Cache){.perl-module},
+    then not setting a size is ok. It will use the space on the
+    filesystem as needed and obviously return an error if there is no
+    space left.
 
 CONCURRENCY
 ===========
@@ -780,7 +925,7 @@ This will yield:
 AUTHOR
 ======
 
-Jacques Deguest \<`jack@deguest.jp`{classes="ARRAY(0x55e1e4d8bb90)"}\>
+Jacques Deguest \<`jack@deguest.jp`{classes="ARRAY(0x555f1974dcb0)"}\>
 
 SEE ALSO
 ========
@@ -799,4 +944,9 @@ promises](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_pr
 COPYRIGHT & LICENSE
 ===================
 
-Copyright(c) 2021 DEGUEST Pte. Ltd. DEGUEST Pte. Ltd.
+Copyright(c) 2021-2022 DEGUEST Pte. Ltd. DEGUEST Pte. Ltd.
+
+All rights reserved
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

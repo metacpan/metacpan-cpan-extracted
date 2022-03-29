@@ -391,8 +391,8 @@ package Sidef::Types::Block::Block {
     }
 
     sub exec {
-        my ($self) = @_;
-        $self->run;
+        my ($self, @args) = @_;
+        $self->run(@args);
         $self;
     }
 
@@ -429,14 +429,11 @@ package Sidef::Types::Block::Block {
         if ($ref eq 'Sidef::Types::Number::Number') {
             my ($type, $str) = $obj->_dump();
 
-            if ($type eq 'int' and $str >= 0 and $str < Sidef::Types::Number::Number::ULONG_MAX) {
-                return scalar {dump => ($ref . "->_set_uint('${str}')")};
-            }
-            elsif ($type eq 'int' and $str < 0 and $str > Sidef::Types::Number::Number::LONG_MIN) {
-                return scalar {dump => ($ref . "->_set_int('${str}')")};
+            if ($type eq 'int') {
+                return scalar {dump => ($ref . "::_set_int('${str}')")};
             }
 
-            return scalar {dump => ($ref . "->_set_str('${type}', '${str}')")};
+            return scalar {dump => ($ref . "::_set_str('${type}', '${str}')")};
         }
 
         if ($ref eq 'Sidef::Module::OO' or $ref eq 'Sidef::Module::Func') {
@@ -653,10 +650,14 @@ package Sidef::Types::Block::Block {
         $range->sum_by($self);
     }
 
+    *Σ = \&sum;
+
     sub prod {
         my ($self, $range) = @_;
         $range->prod_by($self);
     }
+
+    *Π = \&prod;
 
     sub cache {
         my ($self) = @_;

@@ -31,7 +31,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.200';
+our $VERSION = '1.201';
 
 # -----------------------------------------------------------------------------
 
@@ -79,7 +79,7 @@ sub new {
             my $msg = join '',@_;                
             $class->throw(
                 'MECHANIZE-00001: Fatal error',
-                Error => join('',@_),
+                Error => $msg,
             );
         },
         @_,
@@ -90,7 +90,7 @@ sub new {
 
 =head1 VERSION
 
-1.200
+1.201
 
 =head1 AUTHOR
 

@@ -1,9 +1,6 @@
 #!/usr/bin/perl
 use strict; use warnings  FATAL => 'all'; use feature qw(state say); use utf8;
 srand(42);  # so reproducible
-say "FIXME: Test qr/.../ as values to be dumped.";
-  #use Regexp::Common qw/RE_balanced/;
-  #my $re = RE_balanced(-parens=>'(){}[]');
 use open IO => ':locale';
 select STDERR; $|=1; select STDOUT; $|=1;
 use Scalar::Util qw(blessed reftype looks_like_number);
@@ -20,19 +17,16 @@ my $pkgname;
 BEGIN {
   use Data::Dumper::Interp;
   $pkgname = "Data::Dumper::Interp";
-  sub getPkgVar($) {
-    my ($varname) = @_;
-    no strict 'refs'; my $r = eval "\$${pkgname}::$varname"; die $@ if $@;
-    $r
+  sub _doeval($;@) {
+    my $saved_at = $@;
+    no strict 'refs'; my @r = eval $_[0]; die $@ if $@;
+    $@ = $saved_at;
+    wantarray ? @r : (@r > 1 ? confess("scalar context but > 1 value returned") : $r[0])
   }
-  sub setPkgVar($$) {
-    my ($varname, $value) = @_;
-    no strict 'refs'; eval "\$${pkgname}::$varname = \$value"; die $@ if $@;
-  }
-  sub callPkgNew(@) {
-    no strict 'refs'; my $r; eval "\$r = ${pkgname}->new(\@_)"; die $@ if $@;
-    $r
-  }
+  sub getPkgVar($) { _doeval "\$${pkgname}::$_[0]" }
+  sub getPkgAry($) { my @a = _doeval "\@${pkgname}::$_[0]"; @a }
+  sub setPkgVar($$) { _doeval "\$${pkgname}::$_[0] = \$_[1]", $_[1] }
+  sub callPkgNew(@) { _doeval "${pkgname}->new( \@_[1..\$#_] )", @_ }
 }
 diag "Loaded ", $INC{"${pkgname}.pm" =~ s/::/\//gr}, 
      " VERSION=", (getPkgVar("VERSION") // "undef"),"\n"; 
@@ -40,6 +34,8 @@ diag "Loaded ", $INC{"${pkgname}.pm" =~ s/::/\//gr},
 # Do an initial read of $[ so arybase will be autoloaded
 # (prevents corrupting $!/ERRNO in subsequent tests)
 eval '$[' // die;
+
+#$Data::Dumper::Interp::Debug = 1;
 
 #sub _dbvis(_) { goto &Data::Dumper::Interp::_dbvis }
 #sub _dbvisq(_) { goto &Data::Dumper::Interp::_dbvisq }
@@ -64,9 +60,9 @@ sub timed_run(&$@) {
 }
 
 sub visFoldwidth() {
-  "Data::Dumper::Interp::Foldwidth=".u($Data::Dumper::Interp::Foldwidth)
- ." Foldwidth1=".u($Data::Dumper::Interp::Foldwidth1)
- .($Data::Dumper::Interp::Foldwidth ? ("\n".("." x $Data::Dumper::Interp::Foldwidth)) : "")
+  "${pkgname}::Foldwidth=".u(getPkgVar("Foldwidth"))
+ ." Foldwidth1=".u(getPkgVar("Foldwidth1"))
+ .(getPkgVar('Foldwidth') ? ("\n".("." x getPkgVar('Foldwidth'))) : "")
 }
 sub checkeq_literal($$$) {
   my ($testdesc, $exp, $act) = @_;
@@ -88,7 +84,7 @@ sub checkeq_literal($$$) {
 }
 
 # USAGE: check $code_display, qr/$exp/, $doeval->($code, $item) ;
-# { my $code="Data::Dumper::Interp->new->hvis(k=>'v');"; check $code, '(k => "v")',eval $code }
+# { my $code="${pkgname}->new->hvis(k=>'v');"; check $code, '(k => "v")',eval $code }
 sub check($$@) {
   my ($code, $expected_arg, @actual) = @_;
   local $_;  # preserve $1 etc. for caller
@@ -166,7 +162,7 @@ sub checklit(&$$) {
     =~ s{ ( [^\\"]++|(\\.) )*+ \K " }{'}xsg
        or do{ die "bug" if $dq_expected_re =~ /(?<![^\\])'/; }; #probably
   foreach (
-    [ 'Data::Dumper::Interp->new()->vis($_[1])',  '_Q_' ],
+    [ "${pkgname}->new()->vis(\$_[1])",  '_Q_' ],
     [ 'vis($_[1])',              '_Q_' ],
     [ 'visq($_[1])',             '_q_' ],
     [ 'avis($_[1])',             '(_Q_)' ],
@@ -194,11 +190,11 @@ sub checklit(&$$) {
 }#checklit()
 
 # Basic test of OO interfaces
-{ my $code="Data::Dumper::Interp->new->vis('foo')  ;"; check $code, '"foo"',     eval $code }
-{ my $code="Data::Dumper::Interp->new->avis('foo') ;"; check $code, '("foo")',   eval $code }
-{ my $code="Data::Dumper::Interp->new->hvis(k=>'v');"; check $code, '(k => "v")',eval $code }
-{ my $code="Data::Dumper::Interp->new->dvis('foo') ;"; check $code, 'foo',       eval $code }
-{ my $code="Data::Dumper::Interp->new->ivis('foo') ;"; check $code, 'foo',       eval $code }
+{ my $code="${pkgname}->new->vis('foo')  ;"; check $code, '"foo"',     eval $code }
+{ my $code="${pkgname}->new->avis('foo') ;"; check $code, '("foo")',   eval $code }
+{ my $code="${pkgname}->new->hvis(k=>'v');"; check $code, '(k => "v")',eval $code }
+{ my $code="${pkgname}->new->dvis('foo') ;"; check $code, 'foo',       eval $code }
+{ my $code="${pkgname}->new->ivis('foo') ;"; check $code, 'foo',       eval $code }
 
 foreach (
           ['Foldwidth',0,1,80,9999],
@@ -225,14 +221,14 @@ foreach (
          $dumper .= ", 43" if $base =~ /^[ahl]/;
          $dumper .= ")";
         {
-          my $v = eval "{ local \$Data::Dumper::Interp::$confname = \$value;
-                          my \$obj = Data::Dumper::Interp->new();
+          my $v = eval "{ local \$${pkgname}::$confname = \$value;
+                          my \$obj = ${pkgname}->new();
                           \$obj->$dumper ;   # discard dump result
                           \$obj->$confname() # fetch effective setting
                         }";
         confess "bug:$@ " if $@;
-        confess "\$Data::Dumper::Interp::$confname value is not preserved by $dumper\n",
-            "(Set \$Data::Dumper::Interp::$confname=",u($value)," but new()...->$confname() returned ",u($v),")\n"
+        confess "\$${pkgname}::$confname value is not preserved by $dumper\n",
+            "(Set \$${pkgname}::$confname=",u($value)," but new()...->$confname() returned ",u($v),")\n"
          unless (! defined $v and ! defined $value) || ($v eq $value);
         }
       }
@@ -248,37 +244,41 @@ sub MyClass::meth {
 }
 
 # Many tests assume this
-$Data::Dumper::Interp::Foldwidth = 72;
+setPkgVar('Foldwidth', 72);
 
 @ARGV = ('fake','argv');
 $. = 1234;
 $ENV{EnvVar} = "Test EnvVar Value";
 
 
-my %toplex_h = ("" => "Emp", A=>111,"B B"=>222,C=>{d=>888,e=>999},D=>{},EEEEEEEEEEEEEEEEEEEEEEEEEE=>\42,F=>\\\43);
+my %toplex_h = ("" => "Emp", A=>111,"B B"=>222,C=>{d=>888,e=>999},D=>{},EEEEEEEEEEEEEEEEEEEEEEEEEE=>\42,F=>\\\43, G=>qr/foo.*bar/xsi);
    # EEE... identifer is long to force linewrap
 my @toplex_a = (0,1,"C",\%toplex_h,[],[0..9]);
 my $toplex_ar = \@toplex_a;
 my $toplex_hr = \%toplex_h;
 my $toplex_obj = bless {}, 'MyClass';
+my $toplex_regexp= qr/my.*regexp/;
 
 our %global_h = %toplex_h;
 our @global_a = @toplex_a;
 our $global_ar = \@global_a;
 our $global_hr = \%global_h;
 our $global_obj = bless {}, 'MyClass';
+our $global_regexp = $toplex_regexp;
 
 our %maskedglobal_h = (key => "should never be seen");
 our @maskedglobal_a = ("should never be seen");
 our $maskedglobal_ar = \@maskedglobal_a;
 our $maskedglobal_hr = \%maskedglobal_h;
 our $maskedglobal_obj = bless {}, 'ShouldNeverBeUsedClass';
+our $maskedglobal_regexp = qr/should.*never.*be_seen/;
 
 our %local_h = (key => "should never be seen");
 our @local_a = ("should never be seen");
 our $local_ar = \@local_a;
 our $local_hr = \%local_h;
 our $local_obj = \%local_h;
+our $local_regexp = qr/should.*never.*be_seen/;
 
 our $a = "global-a";  # used specially used by sort()
 our $b = "global-b";
@@ -289,6 +289,7 @@ our @ABC_a = @main::global_a;
 our $ABC_ar = \@ABC_a;
 our $ABC_hr = \%ABC_h;
 our $ABC_obj = $main::global_obj;
+our $ABC_regexp = $main::global_regexp;
 
 package main;
 
@@ -326,16 +327,18 @@ $_ = "GroupA.GroupB";
 { my $code = 'avis(undef)'; check $code, "(undef)", eval $code; }
 { my $code = 'hvis("foo",undef)'; check $code, "(foo => undef)", eval $code; }
 { my $code = 'vis(undef)'; check $code, "undef", eval $code; }
-{ my $code = 'vis(\undef)'; check $code, "\\undef", eval $code; }
 { my $code = 'ivis(undef)'; check $code, "<undef arg>", eval $code; }
 { my $code = 'dvis(undef)'; check $code, "<undef arg>", eval $code; }
 { my $code = 'dvisq(undef)'; check $code, "<undef arg>", eval $code; }
+{ my $code = 'vis(\undef)'; check $code, "\\undef", eval $code; }
+{ my $code = 'vis(\123)'; check $code, "\\123", eval $code; }
+{ my $code = 'vis(\"xy")'; check $code, "\\\"xy\"", eval $code; }
 
 { my $code = q/my $s; my @a=sort{ $s=dvis('$a $b'); $a<=>$b }(3,2); "@a $s"/ ;
   check $code, '2 3 a=3 b=2', eval $code;
 }
 
-# Data::Dumper::Interp v1.147ish+ : Check corner cases of re-parsing code 
+# Vis v1.147ish+ : Check corner cases of re-parsing code 
 { my $code = q(my $v = undef; dvis('$v')); check $code, "v=undef", eval $code; }
 { my $code = q(my $v = \undef; dvis('$v')); check $code, "v=\\undef", eval $code; }
 { my $code = q(my $v = \"abc"; dvis('$v')); check $code, 'v=\\"abc"', eval $code; }
@@ -367,9 +370,9 @@ $_ = "GroupA.GroupB";
 # Check Deparse support
 { my $data = eval 'BEGIN{ ${^WARNING_BITS} = 0 } no strict; no feature;
                    sub{ my $x = 42; };';
-  { my $code = 'vis($data)'; check $code, "sub { \"DUMMY\" }", eval $code; }
-  $Data::Dumper::Deparse = 1;
-  { my $code = 'vis($data)'; check $code, "sub { my \$x=42; }", eval $code; }
+  { my $code = 'vis($data)'; check $code, 'sub { "DUMMY" }', eval $code; }
+  setPkgVar("Deparse", 1);
+  { my $code = 'vis($data)'; check $code, qr/sub \{\s*my \$x = 42;\s*\}/, eval $code; }
 }
 
 # Floating point values (single values special-cased to show not as 'string')
@@ -457,8 +460,10 @@ my $ratstr  = '1/9';
 # There was a bug for s/dvis called direct from outer scope, so don't use eval:
 check 
   'global divs %toplex_h',
-  '%toplex_h=("" => "Emp",A => 111, "B B" => 222, C => {d => 888, e => 999'."\n"
-    .'    }, D => {}, EEEEEEEEEEEEEEEEEEEEEEEEEE => \\42, F => \\\\\\43)',
+q(%toplex_h=( "" => "Emp",A => 111,"B B" => 222,C => {d => 888,e => 999},
+  D => {},EEEEEEEEEEEEEEEEEEEEEEEEEE => \\42,F => \\\\\\43,
+  G => qr/foo.*bar/six
+)),
   dvis('%toplex_h');
 check 'global divs @ARGV', q(@ARGV=("fake","argv")), dvis('@ARGV');
 check 'global divs $.', q($.=1234), dvis('$.');
@@ -475,7 +480,7 @@ my @backtrack_bugtest_data = (
 );
 timed_run {
   check 'dvis @backtrack_bugtest_data',
-        '@backtrack_bugtest_data=(42,{A => 0, BBBBBBBBBBBBB => "foo"})',
+        '@backtrack_bugtest_data=(42,{A => 0,BBBBBBBBBBBBB => "foo"})',
         dvis('@backtrack_bugtest_data');
 } 0.01;
 
@@ -484,8 +489,17 @@ sub doquoting($$) {
   my $quoted = $input;
   if ($useqq) {
     $quoted =~ s/([\$\@"\\])/\\$1/gs;
-    $quoted =~ s/\n/\\n/gs;
-    $quoted =~ s/\t/\\t/gs;
+    if ($useqq =~ /controlp/) {
+      $quoted =~ s/\n/\N{SYMBOL FOR NEWLINE}/gs;
+      $quoted =~ s/\t/\N{SYMBOL FOR HORIZONTAL TABULATION}/gs;
+    } else {
+      $quoted =~ s/\n/\\n/gs;
+      $quoted =~ s/\t/\\t/gs;
+    }
+    if ($useqq !~ /unicode|utf/) {
+      $quoted = join("", map{ ord($_) > 127 ? sprintf("\\x{%x}", ord($_)) : $_ } 
+                           split //,$quoted);
+    }
     $quoted = "\"${quoted}\"";
   } else {
     $quoted =~ s/([\\'])/\\$1/gs;
@@ -561,23 +575,27 @@ sub get_closure(;$) {
   our $maskedglobal_ar = \@maskedglobal_a;
   our $maskedglobal_hr = \%maskedglobal_h;
   our $maskedglobal_obj = $toplex_obj;
+  our $maskedglobal_regexp = $toplex_regexp;
   local %local_h = %toplex_h;
   local @local_a = @toplex_a;
   local $local_ar = \@toplex_a;
   local $local_hr = \%local_h;
   local $local_obj = $toplex_obj;
+  local $local_regexp = $toplex_regexp;
 
-  my @tests = (
-    [ __LINE__, q(\x{263a}), qq(\N{U+263A}) ],   # \x{...} in dvis input
-    [ __LINE__, q(\N{U+263a}), qq(\N{U+263A}) ], # \N{U+...} in dvis input
+  my @dvis_tests = (
+    [ __LINE__, q(hexesc:\x{263a}), qq(hexesc:\N{U+263A}) ],   # \x{...} in dvis input
+    [ __LINE__, q(NUesc:\N{U+263a}), qq(NUesc:\N{U+263A}) ], # \N{U+...} in dvis input
     [ __LINE__, q(aaa\\\\bbb), q(aaa\bbb) ],
+    [ __LINE__, q(re is $toplex_regexp), q(re is toplex_regexp=qr/my.*regexp/) ],
 
     #[ q($unicode_str\n), qq(unicode_str=\" \\x{263a} \\x{263b} \\x{263c} \\x{263d} \\x{263e} \\x{263f} \\x{2640} \\x{2641} \\x{2642} \\x{2643} \\x{2644} \\x{2645} \\x{2646} \\x{2647} \\x{2648} \\x{2649} \\x{264a} \\x{264b} \\x{264c} \\x{264d} \\x{264e} \\x{264f} \\x{2650}\"\n) ],
     [__LINE__, q($unicode_str\n), qq(unicode_str="${unicode_str}"\n) ],
 
     [__LINE__, q(unicodehex_str=\"\\x{263a}\\x{263b}\\x{263c}\\x{263d}\\x{263e}\\x{263f}\\x{2640}\\x{2641}\\x{2642}\\x{2643}\\x{2644}\\x{2645}\\x{2646}\\x{2647}\\x{2648}\\x{2649}\\x{264a}\\x{264b}\\x{264c}\\x{264d}\\x{264e}\\x{264f}\\x{2650}\"\n), qq(unicodehex_str="${unicode_str}"\n) ],
 
-    [__LINE__, q($byte_str\n), qq(byte_str=\"\\n\\13\\f\\r\\16\\17\\20\\21\\22\\23\\24\\25\\26\\27\\30\\31\\32\\e\\34\\35\\36\"\n) ],
+    [__LINE__, q($byte_str\n), qq(byte_str=\"\N{SYMBOL FOR NEWLINE}\\13\N{SYMBOL FOR FORM FEED}\N{SYMBOL FOR CARRIAGE RETURN}\\16\\17\\20\\21\\22\\23\\24\\25\\26\\27\\30\\31\\32\N{SYMBOL FOR ESCAPE}\\34\\35\\36\"\n) ],
+    #[__LINE__, q($byte_str\n), qq(byte_str=\"\\n\\13\\f\\r\\16\\17\\20\\21\\22\\23\\24\\25\\26\\27\\30\\31\\32\\e\\34\\35\\36\"\n) ],
     #[__LINE__, q($byte_str\n), qq(byte_str=\"\\n\\x{B}\\f\\r\\x{E}\\x{F}\\x{10}\\x{11}\\x{12}\\x{13}\\x{14}\\x{15}\\x{16}\\x{17}\\x{18}\\x{19}\\x{1A}\\e\\x{1C}\\x{1D}\\x{1E}\"\n) ],
 
     [__LINE__, q($flex\n), qq(flex=\"Lexical in sub f\"\n) ],
@@ -593,14 +611,16 @@ sub get_closure(;$) {
     [__LINE__, q(${^MATCH}\n), qq(\${^MATCH}=\"GroupA.GroupB\"\n) ],
     [__LINE__, q($.\n), qq(\$.=1234\n) ],
     [__LINE__, q($NR\n), qq(NR=1234\n) ],
-    [__LINE__, q($/\n), qq(\$/=\"\\n\"\n) ],
+    [__LINE__, q($/\n), qq(\$/=\"\N{SYMBOL FOR NEWLINE}\"\n) ],
+    #[__LINE__, q($/\n), qq(\$/=\"\\n\"\n) ],
     [__LINE__, q($\\\n), qq(\$\\=undef\n) ],
     [__LINE__, q($"\n), qq(\$\"=\" \"\n) ],
     [__LINE__, q($~\n), qq(\$~=\"STDOUT\"\n) ],
     #20 :
     [__LINE__, q($^\n), qq(\$^=\"STDOUT_TOP\"\n) ],
-    [__LINE__, q($:\n), qq(\$:=\" \\n-\"\n) ],
-    [__LINE__, q($^L\n), qq(\$^L=\"\\f\"\n) ],
+    [__LINE__, q($:\n), qq(\$:=\" \N{SYMBOL FOR NEWLINE}-\"\n) ],
+    #[__LINE__, q($:\n), qq(\$:=\" \\n-\"\n) ],
+    [__LINE__, q($^L\n), qq(\$^L=\"\N{SYMBOL FOR FORM FEED}\"\n) ],
     [__LINE__, q($?\n), qq(\$?=0\n) ],
     [__LINE__, q($[\n), qq(\$[=0\n) ],
     [__LINE__, q($$\n), qq(\$\$=$$\n) ],
@@ -615,12 +635,17 @@ sub get_closure(;$) {
     [__LINE__, q($ENV{EnvVar}\n), qq(\$ENV{EnvVar}=\"Test EnvVar Value\"\n) ],
     [__LINE__, q($ENV{$EnvVarName}\n), qq(\$ENV{\$EnvVarName}=\"Test EnvVar Value\"\n) ],
     [__LINE__, q(@_\n), <<'EOF' ],  # N.B. Foldwidth was set to 72
-@_=(42,[0,1,"C",{"" => "Emp",A => 111, "B B" => 222, C => {d => 888,
-        e => 999}, D => {}, EEEEEEEEEEEEEEEEEEEEEEEEEE => \42, F =>
-      \\\43}, [], [0,1,2,3,4,5,6,7,8,9]])
+@_=( 42,
+  [ 0,1,"C",
+    { "" => "Emp",A => 111,"B B" => 222,C => {d => 888,e => 999},
+      D => {},EEEEEEEEEEEEEEEEEEEEEEEEEE => \42,F => \\\43,
+      G => qr/foo.*bar/six
+    },[],[0,1,2,3,4,5,6,7,8,9]
+  ]
+)
 EOF
     [__LINE__, q($#_\n), qq(\$#_=1\n) ],
-    [__LINE__, q($@\n), qq(\$\@=\"FAKE DEATH\\n\"\n) ],
+    [__LINE__, q($@\n), qq(\$\@=\"FAKE DEATH\N{SYMBOL FOR NEWLINE}\"\n) ],
     #37 :
     map({
       my ($LQ,$RQ) = (/^(.)(.)$/) or die "bug";
@@ -641,39 +666,42 @@ EOF
           #my $p = " " x length("?${dollar}${name}_?${r}");
           my $p = "";
 
-          [__LINE__, qq(${pfx}%${dollar}${name}_h${r}\\n), <<EOF ],
-${pfx}\%${dollar}${name}_h${r}=("" => "Emp",A => 111, "B B" => 222, C => {d => 888,
-${p}    e => 999}, D => {}, EEEEEEEEEEEEEEEEEEEEEEEEEE => \\42, F => \\\\\\43)
+          [__LINE__, qq(${pfx}%${dollar}${name}_h${r}\n), <<EOF ],
+${pfx}\%${dollar}${name}_h${r}=( "" => "Emp",A => 111,"B B" => 222,
+${p}  C => {d => 888,e => 999},D => {},EEEEEEEEEEEEEEEEEEEEEEEEEE => \\42,
+${p}  F => \\\\\\43,G => qr/foo.*bar/six
+${p})
 EOF
 
-
-          [__LINE__, qq(${pfx}\@${dollar}${name}_a${r}\\n), <<EOF ],
-${pfx}\@${dollar}${name}_a${r}=(0,1,"C",{"" => "Emp",A => 111, "B B" => 222, C => {
-${p}      d => 888, e => 999}, D => {}, EEEEEEEEEEEEEEEEEEEEEEEEEE => \\42,
-${p}    F => \\\\\\43}, [], [0,1,2,3,4,5,6,7,8,9])
+          [__LINE__, qq(${pfx}\@${dollar}${name}_a${r}\n), <<EOF ],
+${pfx}\@${dollar}${name}_a${r}=( 0,1,"C",
+${p}  { "" => "Emp",A => 111,"B B" => 222,C => {d => 888,e => 999},D => {},
+${p}    EEEEEEEEEEEEEEEEEEEEEEEEEE => \\42,F => \\\\\\43,G => qr/foo.*bar/six
+${p}  },[],[0,1,2,3,4,5,6,7,8,9]
+${p})
 EOF
 
           [__LINE__, qq(${pfx}\$#${dollar}${name}_a${r}),    
             qq(${pfx}\$#${dollar}${name}_a${r}=5)   
           ],
-          [__LINE__, qq(${pfx}\$#${dollar}${name}_a${r}\\n), 
+          [__LINE__, qq(${pfx}\$#${dollar}${name}_a${r}\n), 
             qq(${pfx}\$#${dollar}${name}_a${r}=5\n) 
           ],
 
-          [__LINE__, qq(${spfx}\$${dollar}${name}_a${r}[3]{C}{e}\\n),
+          [__LINE__, qq(${spfx}\$${dollar}${name}_a${r}[3]{C}{e}\n),
             qq(${spfx}\$${dolname_scalar}_a${r}[3]{C}{e}=999\n)
           ],
 
-          [__LINE__, qq(${spfx}\$${dollar}${name}_a${r}[3]->{A}\\n),
+          [__LINE__, qq(${spfx}\$${dollar}${name}_a${r}[3]->{A}\n),
             qq(${spfx}\$${dolname_scalar}_a${r}[3]->{A}=111\n)
           ],
-          [__LINE__, qq(${spfx}\$${dollar}${name}_a${r}[3]->{$LQ$RQ}\\n),
+          [__LINE__, qq(${spfx}\$${dollar}${name}_a${r}[3]->{$LQ$RQ}\n),
             qq(${spfx}\$${dolname_scalar}_a${r}[3]->{$LQ$RQ}="Emp"\n)
           ],
-          [__LINE__, qq(${spfx}\$${dollar}${name}_a${r}[3]{C}->{e}\\n),
+          [__LINE__, qq(${spfx}\$${dollar}${name}_a${r}[3]{C}->{e}\n),
             qq(${spfx}\$${dolname_scalar}_a${r}[3]{C}->{e}=999\n)
           ],
-          [__LINE__, qq(${spfx}\$${dollar}${name}_a${r}[3]->{C}->{e}\\n),
+          [__LINE__, qq(${spfx}\$${dollar}${name}_a${r}[3]->{C}->{e}\n),
             qq(${spfx}\$${dolname_scalar}_a${r}[3]->{C}->{e}=999\n)
           ],
           [__LINE__, qq(${spfx}\@${dollar}${name}_a${r}[\$zero,\$one]\\n),
@@ -722,7 +750,7 @@ EOF
       } ('""', "''")
     ), #map ($LQ,$RQ)
   );
-  for my $test (@tests) {
+  for my $test (@dvis_tests) {
     my ($lno, $dvis_input, $expected) = @$test;
     #warn "##^^^^^^^^^^^ lno=$lno dvis_input='$dvis_input' expected='$expected'\n";
 
@@ -775,7 +803,7 @@ EOF
           = ($fakeAt,$fakeFs,$fakeBs,$fakeCom,$fakeBang,$fake_cE,$fake_cW);
 
         $actual = $use_oo
-           ? Data::Dumper::Interp->new->dvis($dvis_input)
+           ? callPkgNew()->dvis($dvis_input)
            : dvis($dvis_input);
 
         checkspunct('$@',  $@,   $fakeAt);
@@ -801,16 +829,15 @@ EOF
         $actual);
     }
 
-    # Check Useqq
-    for my $useqq (0, 1) {
+    for my $useqq (0, 1, "utf", "unicode", "unicode|controlpic") {
       my $input = $expected.$dvis_input.'qqq@_(\(\))){\{\}\""'."'"; # gnarly
       # Now Data::Dumper (version 2.174) forces "double quoted" output
       # if there are any Unicode characters present.
       # So we can not test single-quoted mode in those cases
       next
-        if !$useqq && $input =~ tr/\0-\377//c; #
+        if !$useqq && $input =~ tr/\0-\377//c;
       my $exp = doquoting($input, $useqq);
-      my $act = Data::Dumper::Interp->new->Useqq($useqq)->vis($input);
+      my $act = callPkgNew()->Useqq($useqq)->vis($input);
       die "\n\nUseqq ",u($useqq)," bug:\n"
          ."   Input   «${input}»\n"
          ."  Expected «${exp}»\n"
@@ -826,7 +853,7 @@ sub f($) {
   get_closure(1);
   get_closure(1);
   $code->(@_);
-  die "Punct save/restore imbalance" if @Data::Dumper::Interp::save_stack != 0;
+  die "Punct save/restore imbalance" if getPkgAry('save_stack') != 0;
 }
 sub g($) {
   local $_ = 'SHOULD NEVER SEE THIS';

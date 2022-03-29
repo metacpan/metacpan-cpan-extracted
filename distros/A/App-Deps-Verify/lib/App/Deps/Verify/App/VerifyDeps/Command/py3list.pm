@@ -1,5 +1,5 @@
 package App::Deps::Verify::App::VerifyDeps::Command::py3list;
-$App::Deps::Verify::App::VerifyDeps::Command::py3list::VERSION = '0.12.0';
+$App::Deps::Verify::App::VerifyDeps::Command::py3list::VERSION = '0.12.1';
 use App::Deps::Verify::App::VerifyDeps -command;
 
 use strict;
@@ -52,7 +52,7 @@ __END__
 
 =head1 VERSION
 
-version 0.12.0
+version 0.12.1
 
 =for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

@@ -17,9 +17,9 @@ var obj = Range(...)
 
 =head2 *
 
-I<Obj> B<*> I<Obj> -> I<Obj>
+    a * b
 
-Return the
+Returns the
 
 Aliases: I<mul>
 
@@ -27,9 +27,9 @@ Aliases: I<mul>
 
 =head2 +
 
-I<Obj> B<+> I<Obj> -> I<Obj>
+    a + b
 
-Return the
+Returns the
 
 Aliases: I<add>
 
@@ -37,9 +37,9 @@ Aliases: I<add>
 
 =head2 -
 
-I<Obj> B<-> I<Obj> -> I<Obj>
+    a - b
 
-Return the
+Returns the
 
 Aliases: I<sub>
 
@@ -47,9 +47,9 @@ Aliases: I<sub>
 
 =head2 ...
 
-I<Obj> B<...> I<Obj> -> I<Obj>
+    a ... b
 
-Return the
+Returns the
 
 Aliases: I<to_list>
 
@@ -57,9 +57,9 @@ Aliases: I<to_list>
 
 =head2 /
 
-I<Obj> B</> I<Obj> -> I<Obj>
+    a / b
 
-Return the
+Returns the
 
 Aliases: I<÷>, I<div>
 
@@ -67,9 +67,9 @@ Aliases: I<÷>, I<div>
 
 =head2 ==
 
-I<Obj> B<==> I<Obj> -> I<Obj>
+    a == b
 
-Return the
+Returns the
 
 Aliases: I<eq>
 
@@ -77,9 +77,9 @@ Aliases: I<eq>
 
 =head2 ≠
 
-I<Obj> B<≠> I<Obj> -> I<Obj>
+    a ≠ b
 
-Return the
+Returns the
 
 Aliases: I<!=>, I<ne>
 
@@ -87,57 +87,57 @@ Aliases: I<!=>, I<ne>
 
 =head2 accumulate
 
-Range.accumulate() -> I<Obj>
+    Range.accumulate()
 
-Return the
+Returns the
 
 =cut
 
 =head2 accumulate_by
 
-Range.accumulate_by() -> I<Obj>
+    Range.accumulate_by()
 
-Return the
+Returns the
 
 =cut
 
 =head2 all
 
-Range.all() -> I<Obj>
+    Range.all()
 
-Return the
+Returns the
 
 =cut
 
 =head2 any
 
-Range.any() -> I<Obj>
+    Range.any()
 
-Return the
+Returns the
 
 =cut
 
 =head2 bounds
 
-Range.bounds() -> I<Obj>
+    Range.bounds()
 
-Return the
+Returns the
 
 =cut
 
 =head2 by
 
-Range.by() -> I<Obj>
+    Range.by()
 
-Return the
+Returns the
 
 =cut
 
 =head2 cons
 
-Range.cons() -> I<Obj>
+    Range.cons()
 
-Return the
+Returns the
 
 Aliases: I<map_cons>
 
@@ -145,9 +145,9 @@ Aliases: I<map_cons>
 
 =head2 contain
 
-Range.contain() -> I<Obj>
+    Range.contain()
 
-Return the
+Returns the
 
 Aliases: I<include>, I<contains>, I<includes>
 
@@ -155,57 +155,57 @@ Aliases: I<include>, I<contains>, I<includes>
 
 =head2 count
 
-Range.count() -> I<Obj>
+    Range.count()
 
-Return the
+Returns the
 
 =cut
 
 =head2 count_by
 
-Range.count_by() -> I<Obj>
+    Range.count_by()
 
-Return the
+Returns the
 
 =cut
 
 =head2 cross_operator
 
-Range.cross_operator() -> I<Obj>
+    Range.cross_operator()
 
-Return the
+Returns the
 
 =cut
 
 =head2 each_cons
 
-Range.each_cons() -> I<Obj>
+    Range.each_cons()
 
-Return the
+Returns the
 
 =cut
 
 =head2 each_slice
 
-Range.each_slice() -> I<Obj>
+    Range.each_slice()
 
-Return the
+Returns the
 
 =cut
 
 =head2 first_by
 
-Range.first_by() -> I<Obj>
+    Range.first_by()
 
-Return the
+Returns the
 
 =cut
 
 =head2 flip
 
-Range.flip() -> I<Obj>
+    Range.flip()
 
-Return the
+Returns the
 
 Aliases: I<reverse>
 
@@ -213,9 +213,9 @@ Aliases: I<reverse>
 
 =head2 for
 
-Range.for() -> I<Obj>
+    Range.for()
 
-Return the
+Returns the
 
 Aliases: I<each>, I<foreach>
 
@@ -223,17 +223,17 @@ Aliases: I<each>, I<foreach>
 
 =head2 from
 
-Range.from() -> I<Obj>
+    Range.from()
 
-Return the
+Returns the
 
 =cut
 
 =head2 grep
 
-Range.grep() -> I<Obj>
+    Range.grep()
 
-Return the
+Returns the
 
 Aliases: I<select>
 
@@ -241,9 +241,9 @@ Aliases: I<select>
 
 =head2 head
 
-Range.head() -> I<Obj>
+    Range.head()
 
-Return the
+Returns the
 
 Aliases: I<first>
 
@@ -251,17 +251,17 @@ Aliases: I<first>
 
 =head2 join
 
-Range.join() -> I<Obj>
+    Range.join()
 
-Return the
+Returns the
 
 =cut
 
 =head2 kv
 
-Range.kv() -> I<Obj>
+    Range.kv()
 
-Return the
+Returns the
 
 Aliases: I<pairs>, I<zip_indices>
 
@@ -269,9 +269,9 @@ Aliases: I<pairs>, I<zip_indices>
 
 =head2 last
 
-Range.last() -> I<Obj>
+    Range.last()
 
-Return the
+Returns the
 
 Aliases: I<tail>
 
@@ -279,17 +279,17 @@ Aliases: I<tail>
 
 =head2 last_by
 
-Range.last_by() -> I<Obj>
+    Range.last_by()
 
-Return the
+Returns the
 
 =cut
 
 =head2 len
 
-Range.len() -> I<Obj>
+    Range.len()
 
-Return the
+Returns the
 
 Aliases: I<length>
 
@@ -297,57 +297,57 @@ Aliases: I<length>
 
 =head2 map
 
-Range.map() -> I<Obj>
+    Range.map()
 
-Return the
+Returns the
 
 =cut
 
 =head2 map_operator
 
-Range.map_operator() -> I<Obj>
+    Range.map_operator()
 
-Return the
+Returns the
 
 =cut
 
 =head2 max
 
-Range.max() -> I<Obj>
+    Range.max()
 
-Return the
+Returns the
 
 =cut
 
 =head2 max_by
 
-Range.max_by() -> I<Obj>
+    Range.max_by()
 
-Return the
+Returns the
 
 =cut
 
 =head2 min
 
-Range.min() -> I<Obj>
+    Range.min()
 
-Return the
+Returns the
 
 =cut
 
 =head2 min_by
 
-Range.min_by() -> I<Obj>
+    Range.min_by()
 
-Return the
+Returns the
 
 =cut
 
 =head2 new
 
-Range.new() -> I<Obj>
+    Range.new()
 
-Return the
+Returns the
 
 Aliases: I<call>
 
@@ -355,33 +355,33 @@ Aliases: I<call>
 
 =head2 none
 
-Range.none() -> I<Obj>
+    Range.none()
 
-Return the
+Returns the
 
 =cut
 
 =head2 pam_operator
 
-Range.pam_operator() -> I<Obj>
+    Range.pam_operator()
 
-Return the
+Returns the
 
 =cut
 
 =head2 pick
 
-Range.pick() -> I<Obj>
+    Range.pick()
 
-Return the
+Returns the
 
 =cut
 
 =head2 rand
 
-Range.rand() -> I<Obj>
+    Range.rand()
 
-Return the
+Returns the
 
 Aliases: I<sample>
 
@@ -389,33 +389,33 @@ Aliases: I<sample>
 
 =head2 reduce
 
-Range.reduce() -> I<Obj>
+    Range.reduce()
 
-Return the
+Returns the
 
 =cut
 
 =head2 reduce_operator
 
-Range.reduce_operator() -> I<Obj>
+    Range.reduce_operator()
 
-Return the
+Returns the
 
 =cut
 
 =head2 shuffle
 
-Range.shuffle() -> I<Obj>
+    Range.shuffle()
 
-Return the
+Returns the
 
 =cut
 
 =head2 slices
 
-Range.slices() -> I<Obj>
+    Range.slices()
 
-Return the
+Returns the
 
 Aliases: I<map_slice>
 
@@ -423,25 +423,25 @@ Aliases: I<map_slice>
 
 =head2 step
 
-Range.step() -> I<Obj>
+    Range.step()
 
-Return the
+Returns the
 
 =cut
 
 =head2 to
 
-Range.to() -> I<Obj>
+    Range.to()
 
-Return the
+Returns the
 
 =cut
 
 =head2 to_a
 
-Range.to_a() -> I<Obj>
+    Range.to_a()
 
-Return the
+Returns the
 
 Aliases: I<to_array>
 
@@ -449,9 +449,9 @@ Aliases: I<to_array>
 
 =head2 to_v
 
-Range.to_v() -> I<Obj>
+    Range.to_v()
 
-Return the
+Returns the
 
 Aliases: I<to_vec>, I<to_vector>
 
@@ -459,16 +459,24 @@ Aliases: I<to_vec>, I<to_vector>
 
 =head2 unroll_operator
 
-Range.unroll_operator() -> I<Obj>
+    Range.unroll_operator()
 
-Return the
+Returns the
+
+=cut
+
+=head2 while
+
+    Range.while()
+
+Returns the
 
 =cut
 
 =head2 zip_operator
 
-Range.zip_operator() -> I<Obj>
+    Range.zip_operator()
 
-Return the
+Returns the
 
 =cut

@@ -1,3 +1,9 @@
+0.006   2022-03-27  Released-By: PERLANCAR; Urgency: medium
+
+        - [scenario StringFunctions::Trim] Add participant:
+          Text::Minify::XS::minify_ascii (RT#141852).
+
+
 0.005   2021-07-31  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

@@ -36,7 +36,11 @@ lib/Devel/MAT/ToolBase/GraphWalker.pm
 lib/Devel/MAT/UI.pod
 lib/Devel/MAT/UserGuide.pod
 lib/Devel/MAT/UserGuide/IdentifyingAnSV.pod
+LICENSE
 MANIFEST			This list of files
+META.json
+META.yml
+README
 share/icons/reachable-internal.svg
 share/icons/reachable-lexical.svg
 share/icons/reachable-none.svg
@@ -56,6 +60,7 @@ share/icons/strength-strong.svg
 share/icons/strength-weak.svg
 share/icons/type-ARRAY.svg
 share/icons/type-BOOL.svg
+share/icons/type-C_STRUCT.svg
 share/icons/type-CODE.svg
 share/icons/type-FORMAT.svg
 share/icons/type-GLOB.svg
@@ -81,7 +86,3 @@ t/10tool-reachability.t
 t/10tool-sizes.t
 t/50cmd-print-table.t
 t/99pod.t
-README
-LICENSE
-META.yml
-META.json

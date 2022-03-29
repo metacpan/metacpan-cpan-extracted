@@ -1,0 +1,49 @@
+#!/usr/bin/env perl
+#
+# solver - solve a bunch of predicates
+#
+#   $ ./eg/solver '~(A&B)' '~A' '~B'
+#   A,B     ~(A&B)  ~A      ~B
+#   T,T     F       F       F
+#   T,F     T       F       T
+#   F,T     T       T       F
+#   F,F     T       T       T
+#
+# see the problem?
+
+use 5.14.0;
+use warnings;
+use Logic::Expr::Parser;
+use Scalar::Util 'refaddr';
+
+die "Usage: solver expressions ...\n" unless @ARGV;
+
+# parse each argument (and build up bools and atoms in the Logic::Expr
+# class as a side-effect)
+my $p    = Logic::Expr::Parser->new;
+my @expr = map { $p->from_string($_) } @ARGV;
+
+# solve each argument and build up the results
+my $results;
+for my $e (@expr) {
+    my $ref = $e->solutions($results);
+    if ( !defined $results ) {
+        $results = $ref;
+    } else {
+        for my $i ( 0 .. $#$ref ) {
+            push @{ $results->[$i] }, $ref->[$i];
+        }
+    }
+}
+
+# some atomic tomfoolery that probably should be hidden in the module
+my %a2s =
+  map { refaddr( $Logic::Expr::atoms{$_} ) => $_ } keys %Logic::Expr::atoms;
+my $bools = join ',', map { $a2s{ refaddr \$_ } } @Logic::Expr::bools;
+
+# emit the results
+say join "\t", $bools, @ARGV;
+for my $ref (@$results) {
+    print join ',', map { $_ ? 'T' : 'F' } @{ shift @$ref };
+    say "\t", join "\t", map { $_ ? 'T' : 'F' } @$ref;
+}

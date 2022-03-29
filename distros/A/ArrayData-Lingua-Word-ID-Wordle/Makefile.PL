@@ -17,7 +17,7 @@ my %WriteMakefileArgs = (
   "NAME" => "ArrayData::Lingua::Word::ID::Wordle",
   "PREREQ_PM" => {
     "ArrayDataRole::BinarySearch::LinesInHandle" => 0,
-    "ArrayDataRole::Source::LinesInDATA" => 0,
+    "ArrayDataRole::Source::LinesInDATA" => "0.006",
     "Role::Tiny::With" => 0,
     "Role::TinyCommons::Collection::FindItem::Iterator" => "0.007",
     "Role::TinyCommons::Collection::PickItems::RandomSeekLines" => 0,
@@ -30,7 +30,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "20220306.0.0",
+  "VERSION" => "20220306.0.1",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -39,7 +39,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "ArrayDataRole::BinarySearch::LinesInHandle" => 0,
-  "ArrayDataRole::Source::LinesInDATA" => 0,
+  "ArrayDataRole::Source::LinesInDATA" => "0.006",
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,

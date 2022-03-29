@@ -11,15 +11,16 @@ EC_KEY * 		EC_KEY
 const EC_KEY * 		EC_KEY
 BIO * 			T_PTRREF
 point_conversion_form_t	T_ENUM
-const unsigned char *	T_PV
 EVP_MD *		EVP_MD
 const EVP_MD *		EVP_MD
 EVP_MD_CTX *		EVP_MD_CTX
 const EVP_MD_CTX *		EVP_MD_CTX
 ENGINE *		ENGINE
 const ENGINE *		ENGINE
-const void *    T_PTRREF
-unsigned int *    T_PTRREF
+const unsigned char *	T_PV
+const char *	T_PV
+const void *    T_PV
+unsigned int *    T_PV
 
 INPUT
 BIGNUM

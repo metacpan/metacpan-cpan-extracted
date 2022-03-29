@@ -21,7 +21,7 @@ my $builder = Module::Build->new(
       'HTML::Entities'            => undef,
       'Moose'                     => undef,
       'MooseX::StrictConstructor' => undef,
-      'MsOffice::Word::Surgeon'   => 1.05,
+      'MsOffice::Word::Surgeon'   => 1.08,
       'Template::AutoFilter'      => undef,
       'namespace::clean'          => undef,
     },

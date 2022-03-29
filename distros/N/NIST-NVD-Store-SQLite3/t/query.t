@@ -73,4 +73,3 @@ is_deeply(
     },
     'extracting cvss worked'
 ) or diag Data::Dumper::Dumper $cvss;
-

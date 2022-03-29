@@ -4,13 +4,16 @@ author:
   - 'Karen Etheridge <ether@cpan.org>'
 build_requires:
   File::Spec: '0'
+  JSON::Schema::Modern::Utilities: '0'
   Module::Metadata: '0'
+  Test::Deep: '0'
   Test::Mojo: '0'
   Test::More: '0.88'
+  constant: '0'
   experimental: '0'
   lib: '0'
   open: '0'
-  perl: v5.20.0
+  perl: '5.020'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   Module::Build::Tiny: '0.034'
@@ -39,28 +42,30 @@ no_index:
 provides:
   Mojolicious::Plugin::OpenAPI::Modern:
     file: lib/Mojolicious/Plugin/OpenAPI/Modern.pm
-    version: '0.001'
+    version: '0.002'
 requires:
   Feature::Compat::Try: '0'
-  JSON::MaybeXS: '0'
+  JSON::Schema::Modern: '0.549'
+  JSON::Schema::Modern::Document::OpenAPI: '0.024'
   Mojo::Base: '0'
+  Mojo::JSON: '0'
   OpenAPI::Modern: '0.022'
   Path::Tiny: '0'
   Safe::Isa: '0'
   YAML::PP: '0'
   if: '0'
   namespace::clean: '0'
-  perl: v5.20.0
+  perl: '5.020'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://github.com/karenetheridge/Mojolicious-Plugin-OpenAPI-Modern/issues
   homepage: https://github.com/karenetheridge/Mojolicious-Plugin-OpenAPI-Modern
   repository: https://github.com/karenetheridge/Mojolicious-Plugin-OpenAPI-Modern.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
-    version: '5.035008'
+    version: '5.035010'
   plugins:
     -
       class: Dist::Zilla::Plugin::Prereqs
@@ -93,6 +98,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::GatherDir:
           exclude_filename:
             - CONTRIBUTING
+            - INSTALL
             - LICENCE
             - README.pod
             - pull_request_template.md
@@ -154,7 +160,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Test::Compile
       config:
         Dist::Zilla::Plugin::Test::Compile:
-          bail_out_on_fail: '1'
+          bail_out_on_fail: 1
           fail_on_warning: author
           fake_home: 0
           filename: xt/author/00-compile.t
@@ -421,9 +427,9 @@ x_Dist_Zilla:
           include_underscores: 0
         Dist::Zilla::Role::MetaProvider::Provider:
           $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
-          inherit_missing: '0'
-          inherit_version: '0'
-          meta_noindex: '1'
+          inherit_missing: 0
+          inherit_version: 0
+          meta_noindex: 1
         Dist::Zilla::Role::ModuleMetadata:
           Module::Metadata: '1.000037'
           version: '0.006'
@@ -578,7 +584,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::EnsureLatestPerl
       config:
         Dist::Zilla::Plugin::EnsureLatestPerl:
-          Module::CoreList: '5.20220120'
+          Module::CoreList: '5.20220320'
       name: '@Author::ETHER/EnsureLatestPerl'
       version: '0.008'
     -
@@ -723,6 +729,7 @@ x_Dist_Zilla:
           allow_dirty:
             - CONTRIBUTING
             - Changes
+            - INSTALL
             - LICENCE
             - README.pod
           allow_dirty_match: []
@@ -741,7 +748,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.001
+          tag: v0.002
           tag_format: v%V
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:
@@ -853,6 +860,14 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Prereqs
       config:
         Dist::Zilla::Plugin::Prereqs:
+          phase: runtime
+          type: requires
+      name: RuntimeRequires
+      version: '6.024'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
           phase: develop
           type: requires
       name: DevelopRequires
@@ -904,10 +919,10 @@ x_Dist_Zilla:
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
-      is_trial: '0'
+      is_trial: 0
     version: '6.024'
 x_authority: cpan:ETHER
-x_generated_by_perl: v5.35.8
+x_generated_by_perl: v5.35.10
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_static_install: 1

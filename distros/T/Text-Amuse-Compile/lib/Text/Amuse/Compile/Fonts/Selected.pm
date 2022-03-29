@@ -198,6 +198,9 @@ HYPERREF
             }
         }
     }
+    if ($args{has_ruby}) {
+        push @out, "\\usepackage{ruby}";
+    }
     push @out, '';
     return join("\n", @out);
 }

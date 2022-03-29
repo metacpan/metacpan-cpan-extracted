@@ -2,9 +2,9 @@ NAME
     ArrayData::Lingua::Word::EN::Enable - The Enable word list (English)
 
 VERSION
-    This document describes version 0.002 of
+    This document describes version 0.003 of
     ArrayData::Lingua::Word::EN::Enable (from Perl distribution
-    ArrayData-Lingua-Word-EN-Enable), released on 2022-03-06.
+    ArrayData-Lingua-Word-EN-Enable), released on 2022-03-27.
 
 SYNOPSIS
      use ArrayData::Lingua::Word::EN::Enable;

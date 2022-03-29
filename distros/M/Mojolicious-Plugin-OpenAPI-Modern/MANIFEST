@@ -15,6 +15,7 @@ t/00-report-prereqs.dd
 t/00-report-prereqs.t
 t/01-basic.t
 t/lib/BasicApp.pm
+t/validate_request_response.t
 weaver.ini
 xt/author/00-compile.t
 xt/author/clean-namespaces.t

@@ -2,7 +2,7 @@ package App::SimpleBackuper::DB::BlocksTable;
 
 use strict;
 use warnings;
-use feature ':5.'.substr($], 3, 2);
+use feature ':5.14';
 use parent qw(App::SimpleBackuper::DB::BaseTable);
 
 sub pack {

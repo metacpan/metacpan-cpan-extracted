@@ -39,6 +39,7 @@ t/11_block.t
 t/12_error.t
 t/13_max.t
 t/14_no_color.t
+t/15_encoding.t
 t/Checker.pm
 t/JA.txt
 t/SAMPLE.txt

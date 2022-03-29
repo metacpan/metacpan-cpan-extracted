@@ -4,6 +4,7 @@ author:
   - 'Leo Lapworth'
 build_requires:
   File::Spec: '0'
+  Plack::App::Directory: '0'
   Plack::App::File: '0'
   Plack::Builder: '0'
   Plack::Middleware::ErrorDocument: '0'
@@ -11,9 +12,9 @@ build_requires:
   Test::More: '0'
   lib: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '6.30'
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.133380'
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,4 +30,7 @@ requires:
 resources:
   bugtracker: https://github.com/ranguard/plack-middleware-dirindex/issues
   repository: https://github.com/ranguard/plack-middleware-dirindex
-version: '1.00'
+version: '1.01'
+x_generated_by_perl: v5.34.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

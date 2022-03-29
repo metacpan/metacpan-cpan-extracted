@@ -3,7 +3,7 @@ package Sidef {
     use utf8;
     use 5.016;
 
-    our $VERSION = '3.97.1';
+    our $VERSION = '22.03';
 
     our $SPACES      = 0;    # the current number of indentation spaces
     our $SPACES_INCR = 4;    # the number of indentation spaces
@@ -88,6 +88,7 @@ package Sidef {
 
     sub get_sidef_config_dir {
         my ($self) = @_;
+
         $self->{sidef_config_dir} //= $ENV{SIDEF_CONFIG_DIR}
           || File::Spec->catdir(
                                 $ENV{XDG_CONFIG_DIR}
@@ -104,6 +105,14 @@ package Sidef {
                                 '.config',
                                 'sidef'
                                );
+
+        if (not -d $self->{sidef_config_dir}) {
+            require File::Path;
+            eval { File::Path::make_path($self->{sidef_config_dir}) }
+              or warn "[WARNING] Can't create directory <<$self->{sidef_config_dir}>>: $!";
+        }
+
+        return $self->{sidef_config_dir};
     }
 
     sub get_sidef_vdir {
@@ -126,21 +135,12 @@ package Sidef {
             return ($self->{dbm_driver} = 'gdbm');
         }
 
-        ($self->{dbm_driver} = undef);
+        $self->{dbm_driver} = 'sdbm';
     }
 
     sub _init_db {
         my ($self, $hash, $db_file) = @_;
-
-        if ($self->{dbm_driver} eq 'gdbm') {
-            require GDBM_File;
-            tie %$hash, 'GDBM_File', $db_file, &GDBM_File::GDBM_WRCREAT, 0640;
-        }
-        elsif ($self->{dbm_driver} eq 'bdbm') {
-            require DB_File;
-            require Fcntl;
-            tie %$hash, 'DB_File', $db_file, &Fcntl::O_CREAT | &Fcntl::O_RDWR, 0640, $DB_File::DB_HASH;
-        }
+        dbmopen(%$hash, $db_file, 0640);
     }
 
     sub _init_time_db {
@@ -172,6 +172,7 @@ package Sidef {
           if not exists($self->{$lang}{_time_hash});
 
         if (exists($self->{$lang}{_time_hash}{$md5})) {
+
             $self->_init_code_db($lang)
               if not exists($self->{$lang}{_code_hash});
 
@@ -231,7 +232,7 @@ package Sidef {
         if (
             $self->{opt}{s}
             ##and length($$code) > 1024
-            and (defined($self->{dbm_driver}) or $self->has_dbm_driver)
+            and $self->has_dbm_driver
           ) {
 
             my $db_dir = ($self->{$lang}{db_dir} //= File::Spec->catdir($self->get_sidef_vdir(), $lang));
@@ -321,7 +322,7 @@ package Sidef {
 
     sub normalize_method {
         my ($type, $method) = ($_[0] =~ /^(.*[^:])::(.*)$/);
-        normalize_type($type) . ".$method";
+        normalize_type($type) . '#' . $method;
     }
 
     sub jaro {
@@ -447,13 +448,13 @@ our $AUTOLOAD;
 
     my @caller = caller(1);
     my $from   = Sidef::normalize_method($caller[3]);
-    $from = $from eq '.' ? 'main()' : "$from()";
+    $from = $from eq '#' ? 'main()' : "$from()";
 
     my $table   = do { no strict 'refs'; \%{$self . '::'} };
     my @methods = grep { !ref($table->{$_}) and defined(&{$table->{$_}}) } keys(%$table);
 
     my $method = Sidef::normalize_method($AUTOLOAD);
-    my $name   = substr($method, rindex($method, '.') + 1);
+    my $name   = substr($method, rindex($method, '#') + 1);
 
     my @candidates = Sidef::best_matches($name, \@methods);
 

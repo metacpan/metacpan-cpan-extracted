@@ -119,6 +119,7 @@ sub new {
                 html_direction => $docs[0]->html_direction,
                 is_rtl => $docs[0]->is_rtl,
                 is_bidi => scalar(grep { $_->is_rtl || $_->is_bidi } @docs),
+                has_ruby => scalar(grep { $_->has_ruby } @docs),
                 include_paths => $include_paths || [],
                };
     bless $self, $class;
@@ -166,7 +167,15 @@ Return true if any of the text is RTL or bidirectional.
 
 Return the include paths set in the object.
 
+=head2 has_ruby
+
+Return true if any of the pieces needs ruby
+
 =cut
+
+sub has_ruby {
+    shift->{has_ruby};
+}
 
 sub include_paths {
     return @{shift->{include_paths}}

@@ -4,7 +4,7 @@ use 5.010;
 use ExtUtils::MakeMaker;
 
 my %common_reqs = (
-    "Alien::Build" => "2.25",
+    "Alien::Build" => "2.48",
     "ExtUtils::MakeMaker" => "6.52",
     "Alien::Build::MM" => "1.41",
     "File::Find::Rule" => 0,

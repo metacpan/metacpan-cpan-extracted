@@ -8,7 +8,7 @@ use App::SpamcupNG::Error::Mailhost;
 use App::SpamcupNG::Error::Bounce;
 use App::SpamcupNG::Error::LoginFailed;
 
-our $VERSION = '0.014'; # VERSION
+our $VERSION = '0.015'; # VERSION
 
 =head1 NAME
 

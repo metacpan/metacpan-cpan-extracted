@@ -23,7 +23,7 @@ name: App-CSVUtils
 provides:
   App::CSVUtils:
     file: lib/App/CSVUtils.pm
-    version: '0.036'
+    version: '0.037'
 recommends:
   Sort::Sub: '0.120'
 requires:
@@ -58,7 +58,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-CSVUtils
   homepage: https://metacpan.org/release/App-CSVUtils
   repository: git://github.com/perlancar/perl-App-CSVUtils.git
-version: '0.036'
+version: '0.037'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -265,8 +265,12 @@ x_Dist_Zilla:
       version: '0.02'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::EnsurePrereqToSpec
+      config:
+        Dist::Zilla::Role::ModuleMetadata:
+          Module::Metadata: '1.000037'
+          version: '0.006'
       name: '@Author::PERLANCAR/PERLANCAR::EnsurePrereqToSpec'
-      version: '0.062'
+      version: '0.064'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::MetaResources
       name: '@Author::PERLANCAR/PERLANCAR::MetaResources'

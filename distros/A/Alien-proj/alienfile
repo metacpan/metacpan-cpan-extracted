@@ -180,6 +180,7 @@ share {
   my $enable_curl = 'OFF';
   my @curl_extra_args;
   my @tiff_extra_args;
+  my @alien_rpaths;
   if ($proj_version ge 7) {
     if (!$have{'Alien::libtiff'} or $config_args =~ /--(without-tiff|with-tiff=no)/) {
       $enable_tiff = 'OFF';
@@ -195,10 +196,11 @@ share {
           lib   => 'tiff',
           alien => 'Alien::libtiff',
         );
-        push @curl_extra_args, (
+        push @tiff_extra_args, (
           "-DTIFF_LIBRARY=$libfile",
           "-DTIFF_INCLUDE_DIR=$libtiff_include",
         );
+        push @alien_rpaths, Alien::libtiff->dist_dir . '/lib';
       }
     }
     if (!$have{'Alien::curl'} or $config_args =~ /--(without-curl|with-curl=no)/ ) {
@@ -219,6 +221,7 @@ share {
           "-DCURL_LIBRARY=$libfile",
           "-DCURL_INCLUDE_DIR=$curl_include",
         );
+        push @alien_rpaths, Alien::curl->dist_dir . '/dynamic';
       }
       elsif ('Alien::curl'->install_type eq 'system') {
         if ('Alien::curl'->cflags =~ /STATIC_LIB/) {
@@ -228,6 +231,15 @@ share {
         else {
           Alien::Build->log ('Adding curl support from system');
           $enable_curl = "ON";
+          my $libfile = find_lib_file (
+            lib   => 'curl',
+          );
+          my $curl_include = Alien::curl->cflags;
+          $curl_include =~s/^-I//g;  #  hack
+          push @curl_extra_args, (
+            "-DCURL_LIBRARY=$libfile",
+            "-DCURL_INCLUDE_DIR=$curl_include",
+          );
         }
       }
       else {
@@ -253,11 +265,20 @@ share {
       "-DSQLITE3_LIBRARY=$libfile",
       "-DSQLITE3_INCLUDE_DIR=$sqlite_include",
     );
+    push @alien_rpaths, Alien::sqlite->dist_dir . '/lib';
   }
 
   plugin 'PkgConfig::PPWrapper';
   meta->around_hook( build => \&remove_gitfw_from_path );
   meta->around_hook( build => \&update_cmake_lists_file );
+  meta->around_hook(
+    build => sub {
+      my ($orig, $build, @args) = @_;
+      $build->log("Setting CCACHE_BASEDIR to " . getcwd());
+      local $ENV{CCACHE_BASEDIR} = getcwd();
+      $orig->($build, @args);
+    }
+  );
 
   #  silence an undef warning
   Alien::Build->log ('PKG_CONFIG_PATH:' . join ' ', grep {defined} @PKG_CONFIG_PATH);
@@ -266,8 +287,20 @@ share {
     say "ENV: $env_var is " . ($ENV{$env_var} // '');
   }
 
-#  might fix some rpath issues?
-#  https://github.com/OSGeo/gdal/issues/5413#issuecomment-1060286925
+  #  try to fix some rpath issues
+  #  See also:
+  #  https://github.com/OSGeo/gdal/issues/5413#issuecomment-1060286925
+  my $h = get_alien_state_hash();
+  my $install_path = $h->{install}{prefix};
+  my @rpath;
+  if (!$on_windows && defined $install_path && @alien_rpaths) {
+    my $origin_string = $^O =~ /darwin/ ? '@loader_path' : '\$ORIGIN';
+    my $alien_rpath_text
+      = join ':',
+        (map {$origin_string . '/../' . path ($_)->relative($install_path)->stringify} @alien_rpaths),
+        @alien_rpaths;
+    @rpath = (qq{-DCMAKE_INSTALL_RPATH='$alien_rpath_text'});
+  }
 
   my $cmake_cmd = [
     '%{cmake}',
@@ -280,14 +313,15 @@ share {
     #'-DSQLITE3_INCLUDE_DIR=??',
     #'-DSQLITE3_LIBRARY=??',
     "-DENABLE_CURL=$enable_curl",
-    @curl_extra_args,
+    $enable_curl eq 'ON' ? @curl_extra_args : (),
     "-DENABLE_TIFF=$enable_tiff",
-    $enable_tiff ? () : (),
+    $enable_tiff eq 'ON' ? @tiff_extra_args : (),
     '-DBUILD_PROJSYNC=OFF',
     #'-DENABLE_IPO=ON',
     #'-DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=true',
     '-DCMAKE_INSTALL_PREFIX:PATH=%{.install.prefix}',
     '-DCMAKE_BUILD_TYPE=Release',
+    @rpath,
     #'-DCMAKE_VERBOSE=ON',
     '..'
   ];
@@ -421,7 +455,7 @@ sub find_lib_file {
   
   my(@lib_files) = find_lib(
       %args,
-      systempath => [],  #  only search the alien
+      systempath => $args{alien} ? [] : undef,  #  only search the alien if one is passed
   );
   #  we grab the first, assuming they are
   #  all the same or point to the same origin

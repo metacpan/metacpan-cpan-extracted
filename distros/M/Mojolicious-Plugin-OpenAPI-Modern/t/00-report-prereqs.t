@@ -72,6 +72,8 @@ my @include = qw(
   Cpanel::JSON::XS
   JSON::XS
   Mojolicious
+  File::ShareDir
+  File::ShareDir::Install
 );
 
 my @exclude = qw(

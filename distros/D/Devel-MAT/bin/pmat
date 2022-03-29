@@ -13,6 +13,7 @@ use constant CAN_COLOUR => -t STDERR;
 
 GetOptions(
    'quiet|q' => \( my $QUIET ),
+   'blib'    => sub { require blib; blib->import },
 ) or exit 1;
 
 # Some tools might want to draw pretty graphs with line drawing / similar

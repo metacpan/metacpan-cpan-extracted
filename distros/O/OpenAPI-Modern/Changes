@@ -1,5 +1,9 @@
 Revision history for OpenAPI-Modern
 
+0.024     2022-03-25 23:41:04Z
+          - operation_id and method are now always returned in the options
+            hash in validate_request, validate_response, find_path
+
 0.023     2022-03-12 00:25:21Z
           - get_operationId has been renamed to get_operationId_path
           - updated bundled schemas from 2021-09-28 versions to 2022-02-27

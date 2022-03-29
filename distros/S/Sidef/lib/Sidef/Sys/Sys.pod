@@ -24,41 +24,41 @@ Inherits methods from:
 
 =head2 alarm
 
-Sys.alarm() -> I<Obj>
+    Sys.alarm()
 
-Return the
+Returns the
 
 =cut
 
 =head2 bless
 
-Sys.bless() -> I<Obj>
+    Sys.bless()
 
-Return the
+Returns the
 
 =cut
 
 =head2 class_name
 
-Sys.class_name() -> I<Obj>
+    Sys.class_name()
 
-Return the
+Returns the
 
 =cut
 
 =head2 defined
 
-Sys.defined() -> I<Obj>
+    Sys.defined()
 
-Return the
+Returns the
 
 =cut
 
 =head2 die
 
-Sys.die() -> I<Obj>
+    Sys.die()
 
-Return the
+Returns the
 
 Aliases: I<raise>
 
@@ -66,225 +66,225 @@ Aliases: I<raise>
 
 =head2 eval
 
-Sys.eval() -> I<Obj>
+    Sys.eval()
 
-Return the
+Returns the
 
 =cut
 
 =head2 exec
 
-Sys.exec() -> I<Obj>
+    Sys.exec()
 
-Return the
+Returns the
 
 =cut
 
 =head2 exit
 
-Sys.exit() -> I<Obj>
+    Sys.exit()
 
-Return the
+Returns the
 
 =cut
 
 =head2 fork
 
-Sys.fork() -> I<Obj>
+    Sys.fork()
 
-Return the
+Returns the
 
 =cut
 
 =head2 getgrent
 
-Sys.getgrent() -> I<Obj>
+    Sys.getgrent()
 
-Return the
+Returns the
 
 =cut
 
 =head2 getgrgid
 
-Sys.getgrgid() -> I<Obj>
+    Sys.getgrgid()
 
-Return the
+Returns the
 
 =cut
 
 =head2 getgrnam
 
-Sys.getgrnam() -> I<Obj>
+    Sys.getgrnam()
 
-Return the
+Returns the
 
 =cut
 
 =head2 gethostbyaddr
 
-Sys.gethostbyaddr() -> I<Obj>
+    Sys.gethostbyaddr()
 
-Return the
+Returns the
 
 =cut
 
 =head2 gethostbyname
 
-Sys.gethostbyname() -> I<Obj>
+    Sys.gethostbyname()
 
-Return the
+Returns the
 
 =cut
 
 =head2 gethostent
 
-Sys.gethostent() -> I<Obj>
+    Sys.gethostent()
 
-Return the
+Returns the
 
 =cut
 
 =head2 getnetbyaddr
 
-Sys.getnetbyaddr() -> I<Obj>
+    Sys.getnetbyaddr()
 
-Return the
+Returns the
 
 =cut
 
 =head2 getnetbyname
 
-Sys.getnetbyname() -> I<Obj>
+    Sys.getnetbyname()
 
-Return the
+Returns the
 
 =cut
 
 =head2 getnetent
 
-Sys.getnetent() -> I<Obj>
+    Sys.getnetent()
 
-Return the
+Returns the
 
 =cut
 
 =head2 getpgrp
 
-Sys.getpgrp() -> I<Obj>
+    Sys.getpgrp()
 
-Return the
+Returns the
 
 =cut
 
 =head2 getppid
 
-Sys.getppid() -> I<Obj>
+    Sys.getppid()
 
-Return the
+Returns the
 
 =cut
 
 =head2 getpriority
 
-Sys.getpriority() -> I<Obj>
+    Sys.getpriority()
 
-Return the
+Returns the
 
 =cut
 
 =head2 getprotobyname
 
-Sys.getprotobyname() -> I<Obj>
+    Sys.getprotobyname()
 
-Return the
+Returns the
 
 =cut
 
 =head2 getprotobynumber
 
-Sys.getprotobynumber() -> I<Obj>
+    Sys.getprotobynumber()
 
-Return the
+Returns the
 
 =cut
 
 =head2 getprotoent
 
-Sys.getprotoent() -> I<Obj>
+    Sys.getprotoent()
 
-Return the
+Returns the
 
 =cut
 
 =head2 getpwent
 
-Sys.getpwent() -> I<Obj>
+    Sys.getpwent()
 
-Return the
+Returns the
 
 =cut
 
 =head2 getpwnam
 
-Sys.getpwnam() -> I<Obj>
+    Sys.getpwnam()
 
-Return the
+Returns the
 
 =cut
 
 =head2 getpwuid
 
-Sys.getpwuid() -> I<Obj>
+    Sys.getpwuid()
 
-Return the
+Returns the
 
 =cut
 
 =head2 getservbyname
 
-Sys.getservbyname() -> I<Obj>
+    Sys.getservbyname()
 
-Return the
+Returns the
 
 =cut
 
 =head2 getservbyport
 
-Sys.getservbyport() -> I<Obj>
+    Sys.getservbyport()
 
-Return the
+Returns the
 
 =cut
 
 =head2 getservent
 
-Sys.getservent() -> I<Obj>
+    Sys.getservent()
 
-Return the
+Returns the
 
 =cut
 
 =head2 isweak
 
-Sys.isweak() -> I<Obj>
+    Sys.isweak()
 
-Return the
+Returns the
 
 =cut
 
 =head2 kill
 
-Sys.kill() -> I<Obj>
+    Sys.kill()
 
-Return the
+Returns the
 
 =cut
 
 =head2 nano_sleep
 
-Sys.nano_sleep() -> I<Obj>
+    Sys.nano_sleep()
 
-Return the
+Returns the
 
 Aliases: I<nanosleep>
 
@@ -292,25 +292,25 @@ Aliases: I<nanosleep>
 
 =head2 open
 
-Sys.open() -> I<Obj>
+    Sys.open()
 
-Return the
+Returns the
 
 =cut
 
 =head2 opendir
 
-Sys.opendir() -> I<Obj>
+    Sys.opendir()
 
-Return the
+Returns the
 
 =cut
 
 =head2 os
 
-Sys.os() -> I<Obj>
+    Sys.os()
 
-Return the
+Returns the
 
 Aliases: I<osname>
 
@@ -318,41 +318,41 @@ Aliases: I<osname>
 
 =head2 print
 
-Sys.print() -> I<Obj>
+    Sys.print()
 
-Return the
+Returns the
 
 =cut
 
 =head2 printf
 
-Sys.printf() -> I<Obj>
+    Sys.printf()
 
-Return the
+Returns the
 
 =cut
 
 =head2 printh
 
-Sys.printh() -> I<Obj>
+    Sys.printh()
 
-Return the
+Returns the
 
 =cut
 
 =head2 read
 
-Sys.read() -> I<Obj>
+    Sys.read()
 
-Return the
+Returns the
 
 =cut
 
 =head2 readln
 
-Sys.readln() -> I<Obj>
+    Sys.readln()
 
-Return the
+Returns the
 
 Aliases: I<scanln>
 
@@ -360,33 +360,33 @@ Aliases: I<scanln>
 
 =head2 ref
 
-Sys.ref() -> I<Obj>
+    Sys.ref()
 
-Return the
+Returns the
 
 =cut
 
 =head2 refaddr
 
-Sys.refaddr() -> I<Obj>
+    Sys.refaddr()
 
-Return the
+Returns the
 
 =cut
 
 =head2 reftype
 
-Sys.reftype() -> I<Obj>
+    Sys.reftype()
 
-Return the
+Returns the
 
 =cut
 
 =head2 run
 
-Sys.run() -> I<Obj>
+    Sys.run()
 
-Return the
+Returns the
 
 Aliases: I<system>
 
@@ -394,9 +394,9 @@ Aliases: I<system>
 
 =head2 say
 
-Sys.say() -> I<Obj>
+    Sys.say()
 
-Return the
+Returns the
 
 Aliases: I<println>
 
@@ -404,121 +404,121 @@ Aliases: I<println>
 
 =head2 select
 
-Sys.select() -> I<Obj>
+    Sys.select()
 
-Return the
+Returns the
 
 =cut
 
 =head2 setgrent
 
-Sys.setgrent() -> I<Obj>
+    Sys.setgrent()
 
-Return the
+Returns the
 
 =cut
 
 =head2 sethostent
 
-Sys.sethostent() -> I<Obj>
+    Sys.sethostent()
 
-Return the
+Returns the
 
 =cut
 
 =head2 setnetent
 
-Sys.setnetent() -> I<Obj>
+    Sys.setnetent()
 
-Return the
+Returns the
 
 =cut
 
 =head2 setpgrp
 
-Sys.setpgrp() -> I<Obj>
+    Sys.setpgrp()
 
-Return the
+Returns the
 
 =cut
 
 =head2 setpriority
 
-Sys.setpriority() -> I<Obj>
+    Sys.setpriority()
 
-Return the
+Returns the
 
 =cut
 
 =head2 setprotoent
 
-Sys.setprotoent() -> I<Obj>
+    Sys.setprotoent()
 
-Return the
+Returns the
 
 =cut
 
 =head2 setpwent
 
-Sys.setpwent() -> I<Obj>
+    Sys.setpwent()
 
-Return the
+Returns the
 
 =cut
 
 =head2 setservent
 
-Sys.setservent() -> I<Obj>
+    Sys.setservent()
 
-Return the
+Returns the
 
 =cut
 
 =head2 sidef
 
-Sys.sidef() -> I<Obj>
+    Sys.sidef()
 
-Return the
+Returns the
 
 =cut
 
 =head2 sleep
 
-Sys.sleep() -> I<Obj>
+    Sys.sleep()
 
-Return the
+Returns the
 
 =cut
 
 =head2 stderr
 
-Sys.stderr() -> I<Obj>
+    Sys.stderr()
 
-Return the
+Returns the
 
 =cut
 
 =head2 stdin
 
-Sys.stdin() -> I<Obj>
+    Sys.stdin()
 
-Return the
+Returns the
 
 =cut
 
 =head2 stdout
 
-Sys.stdout() -> I<Obj>
+    Sys.stdout()
 
-Return the
+Returns the
 
 =cut
 
 =head2 ualarm
 
-Sys.ualarm() -> I<Obj>
+    Sys.ualarm()
 
-Return the
+Returns the
 
 Aliases: I<micro_alarm>
 
@@ -526,25 +526,25 @@ Aliases: I<micro_alarm>
 
 =head2 umask
 
-Sys.umask() -> I<Obj>
+    Sys.umask()
 
-Return the
+Returns the
 
 =cut
 
 =head2 unweaken
 
-Sys.unweaken() -> I<Obj>
+    Sys.unweaken()
 
-Return the
+Returns the
 
 =cut
 
 =head2 user
 
-Sys.user() -> I<Obj>
+    Sys.user()
 
-Return the
+Returns the
 
 Aliases: I<getlogin>
 
@@ -552,9 +552,9 @@ Aliases: I<getlogin>
 
 =head2 usleep
 
-Sys.usleep() -> I<Obj>
+    Sys.usleep()
 
-Return the
+Returns the
 
 Aliases: I<micro_sleep>
 
@@ -562,24 +562,24 @@ Aliases: I<micro_sleep>
 
 =head2 wait
 
-Sys.wait() -> I<Obj>
+    Sys.wait()
 
-Return the
+Returns the
 
 =cut
 
 =head2 warn
 
-Sys.warn() -> I<Obj>
+    Sys.warn()
 
-Return the
+Returns the
 
 =cut
 
 =head2 weaken
 
-Sys.weaken() -> I<Obj>
+    Sys.weaken()
 
-Return the
+Returns the
 
 =cut

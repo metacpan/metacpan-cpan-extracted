@@ -1,0 +1,22 @@
+Revision history for Logic-Expr
+
+0.02    2022-03-29
+	    Second version, released to a somewhat less
+	    unsuspecting world.
+        * Rework module internals to better allow multiple expressions
+          to be parsed together. This removes the atoms, bools
+          methods, and adds some internal state that may need a
+          "reset" call to clear it.
+        * Add "codex" method that generates a function that can be
+          called to solve the expression.
+        * Add a "walk" method (used by "codex").
+        * Optional argument to "solutions" to better work with code that
+          generates solutions for multiple expressions.
+        * eg/solver may be of interest.
+        * Fix a postderef form that shouldn't have been there with the
+          perl requirements set as low as they are.
+        * Fix the all_pod_coverage_ok.
+        * Fix the Build.PL requirements.
+
+0.01    2022-03-26
+        First version, released on an unsuspecting world.

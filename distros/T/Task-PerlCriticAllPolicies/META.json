@@ -58,6 +58,7 @@
             "Perl::Critic::Policy::Modules::ProhibitUseLib" : "0",
             "Perl::Critic::Policy::Moo::ProhibitMakeImmutable" : "0",
             "Perl::Critic::Policy::Perlsecret" : "0",
+            "Perl::Critic::Policy::PreferredModules" : "0",
             "Perl::Critic::Policy::ProhibitImplicitImport" : "0",
             "Perl::Critic::Policy::ProhibitOrReturn" : "0",
             "Perl::Critic::Policy::ProhibitSmartmatch" : "0",
@@ -96,7 +97,7 @@
    "provides" : {
       "Task::PerlCriticAllPolicies" : {
          "file" : "lib/Task/PerlCriticAllPolicies.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -110,7 +111,7 @@
          "web" : "https://github.com/gugod/Task-PerlCriticAllPolicies"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 4.04",
    "x_spdx_expression" : "MIT",
    "x_static_install" : "1"

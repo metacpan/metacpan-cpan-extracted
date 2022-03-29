@@ -1,3 +1,17 @@
+0.025   2022-03-27  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Tweak Description.
+
+
+0.024   2022-03-27  Released-By: PERLANCAR; Urgency: medium
+
+        - Bump prereq version
+          BorderStyle::ASCII::SingleLineDoubleAfterHeader (0.014)
+          (RT#141332).
+
+
 0.023   2022-02-14  Released-By: PERLANCAR; Backward-Incompatible: yes; Urgency: medium
 
         [INCOMPATIBLE CHANGES]

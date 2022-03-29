@@ -35,14 +35,11 @@ L<systemd.resource-control(5)>,
 which configure resource control settings for the processes of the
 service.
 
-If a service is requested under a certain name but no unit
-configuration file is found, systemd looks for a SysV init script
-by the same name (with the C<.service> suffix
-removed) and dynamically creates a service unit from that script.
-This is useful for compatibility with SysV. Note that this
-compatibility is quite comprehensive but not 100%. For details
-about the incompatibilities, see the L<Incompatibilities
-with SysV|https://www.freedesktop.org/wiki/Software/systemd/Incompatibilities> document.
+If SysV init compat is enabled, systemd automatically creates service units that wrap SysV init
+scripts (the service name is the same as the name of the script, with a C<.service>
+suffix added); see
+L<systemd-sysv-generator(8)>.
+
 
 The L<systemd-run(1)>
 command allows creating C<.service> and C<.scope> units dynamically
@@ -74,10 +71,10 @@ and L<CFS
 Scheduler|https://www.kernel.org/doc/html/latest/scheduler/sched-design-CFS.html>.  The available CPU time is split up among all units within one slice relative to
 their CPU time weight. A higher weight means more CPU time, a lower weight means less.
 
-While C<StartupCPUWeight> only applies to the startup phase of the system,
+While C<StartupCPUWeight> applies to the startup and shutdown phases of the system,
 C<CPUWeight> applies to normal runtime of the system, and if the former is not set also to
-the startup phase. Using C<StartupCPUWeight> allows prioritizing specific services at
-boot-up differently than during normal runtime.
+the startup and shutdown phases. Using C<StartupCPUWeight> allows prioritizing specific services at
+boot-up and shutdown differently than during normal runtime.
 
 These settings replace C<CPUShares> and C<StartupCPUShares>. I< Optional. Type integer.  > 
 
@@ -101,10 +98,10 @@ and L<CFS
 Scheduler|https://www.kernel.org/doc/html/latest/scheduler/sched-design-CFS.html>.  The available CPU time is split up among all units within one slice relative to
 their CPU time weight. A higher weight means more CPU time, a lower weight means less.
 
-While C<StartupCPUWeight> only applies to the startup phase of the system,
+While C<StartupCPUWeight> applies to the startup and shutdown phases of the system,
 C<CPUWeight> applies to normal runtime of the system, and if the former is not set also to
-the startup phase. Using C<StartupCPUWeight> allows prioritizing specific services at
-boot-up differently than during normal runtime.
+the startup and shutdown phases. Using C<StartupCPUWeight> allows prioritizing specific services at
+boot-up and shutdown differently than during normal runtime.
 
 These settings replace C<CPUShares> and C<StartupCPUShares>. I< Optional. Type integer.  > 
 
@@ -125,6 +122,7 @@ Assign the specified CPU time quota to the processes executed. Takes a percentag
 available on one CPU. Use values > 100% for allotting CPU time on more than one CPU. This controls the
 C<cpu.max> attribute on the unified control group hierarchy and
 C<cpu.cfs_quota_us> on legacy. For details about these control group attributes, see L<Control Groups v2|https://www.kernel.org/doc/html/latest/admin-guide/cgroup-v2.html> and L<sched-bwc.txt|https://www.kernel.org/doc/Documentation/scheduler/sched-bwc.txt>.
+Setting C<CPUQuota> to an empty value unsets the quota.
 
 Example: C<CPUQuota=20%> ensures that the executed processes will never get more than
 20% CPU time on one CPU. I< Optional. Type uniline.  > 
@@ -149,8 +147,30 @@ Example: C<CPUQuotaPeriodSec=10ms> to request that the CPU quota is measured in 
 Restrict processes to be executed on specific CPUs. Takes a list of CPU indices or ranges separated by either
 whitespace or commas. CPU ranges are specified by the lower and upper CPU indices separated by a dash.
 
-Setting C<AllowedCPUs> doesn't guarantee that all of the CPUs will be used by the processes
-as it may be limited by parent units. The effective configuration is reported as C<EffectiveCPUs>.
+Setting C<AllowedCPUs> or C<StartupAllowedCPUs> doesn't guarantee that all
+of the CPUs will be used by the processes as it may be limited by parent units. The effective configuration is
+reported as C<EffectiveCPUs>.
+
+While C<StartupAllowedCPUs> applies to the startup and shutdown phases of the system,
+C<AllowedCPUs> applies to normal runtime of the system, and if the former is not set also to
+the startup and shutdown phases. Using C<StartupAllowedCPUs> allows prioritizing specific services at
+boot-up and shutdown differently than during normal runtime.
+
+This setting is supported only with the unified control group hierarchy. I< Optional. Type uniline.  > 
+
+=head2 StartupAllowedCPUs
+
+Restrict processes to be executed on specific CPUs. Takes a list of CPU indices or ranges separated by either
+whitespace or commas. CPU ranges are specified by the lower and upper CPU indices separated by a dash.
+
+Setting C<AllowedCPUs> or C<StartupAllowedCPUs> doesn't guarantee that all
+of the CPUs will be used by the processes as it may be limited by parent units. The effective configuration is
+reported as C<EffectiveCPUs>.
+
+While C<StartupAllowedCPUs> applies to the startup and shutdown phases of the system,
+C<AllowedCPUs> applies to normal runtime of the system, and if the former is not set also to
+the startup and shutdown phases. Using C<StartupAllowedCPUs> allows prioritizing specific services at
+boot-up and shutdown differently than during normal runtime.
 
 This setting is supported only with the unified control group hierarchy. I< Optional. Type uniline.  > 
 
@@ -160,9 +180,31 @@ Restrict processes to be executed on specific memory NUMA nodes. Takes a list of
 or ranges separated by either whitespace or commas. Memory NUMA nodes ranges are specified by the lower and upper
 NUMA nodes indices separated by a dash.
 
-Setting C<AllowedMemoryNodes> doesn't guarantee that all of the memory NUMA nodes will
-be used by the processes as it may be limited by parent units. The effective configuration is reported as
-C<EffectiveMemoryNodes>.
+Setting C<AllowedMemoryNodes> or C<StartupAllowedMemoryNodes> doesn't
+guarantee that all of the memory NUMA nodes will be used by the processes as it may be limited by parent units.
+The effective configuration is reported as C<EffectiveMemoryNodes>.
+
+While C<StartupAllowedMemoryNodes> applies to the startup and shutdown phases of the system,
+C<AllowedMemoryNodes> applies to normal runtime of the system, and if the former is not set also to
+the startup and shutdown phases. Using C<StartupAllowedMemoryNodes> allows prioritizing specific services at
+boot-up and shutdown differently than during normal runtime.
+
+This setting is supported only with the unified control group hierarchy. I< Optional. Type uniline.  > 
+
+=head2 StartupAllowedMemoryNodes
+
+Restrict processes to be executed on specific memory NUMA nodes. Takes a list of memory NUMA nodes indices
+or ranges separated by either whitespace or commas. Memory NUMA nodes ranges are specified by the lower and upper
+NUMA nodes indices separated by a dash.
+
+Setting C<AllowedMemoryNodes> or C<StartupAllowedMemoryNodes> doesn't
+guarantee that all of the memory NUMA nodes will be used by the processes as it may be limited by parent units.
+The effective configuration is reported as C<EffectiveMemoryNodes>.
+
+While C<StartupAllowedMemoryNodes> applies to the startup and shutdown phases of the system,
+C<AllowedMemoryNodes> applies to normal runtime of the system, and if the former is not set also to
+the startup and shutdown phases. Using C<StartupAllowedMemoryNodes> allows prioritizing specific services at
+boot-up and shutdown differently than during normal runtime.
 
 This setting is supported only with the unified control group hierarchy. I< Optional. Type uniline.  > 
 
@@ -308,12 +350,12 @@ Interface Files|https://www.kernel.org/doc/html/latest/admin-guide/cgroup-v2.htm
 relative to their block I/O weight. A higher weight means more I/O bandwidth, a lower weight means
 less.
 
-While C<StartupIOWeight> only applies
-to the startup phase of the system,
+While C<StartupIOWeight> applies
+to the startup and shutdown phases of the system,
 C<IOWeight> applies to the later runtime of
 the system, and if the former is not set also to the startup
-phase. This allows prioritizing specific services at boot-up
-differently than during runtime.
+and shutdown phases. This allows prioritizing specific services at boot-up
+and shutdown differently than during runtime.
 
 These settings replace C<BlockIOWeight> and C<StartupBlockIOWeight>
 and disable settings prefixed with C<BlockIO> or C<StartupBlockIO>. I< Optional. Type uniline.  > 
@@ -328,12 +370,12 @@ Interface Files|https://www.kernel.org/doc/html/latest/admin-guide/cgroup-v2.htm
 relative to their block I/O weight. A higher weight means more I/O bandwidth, a lower weight means
 less.
 
-While C<StartupIOWeight> only applies
-to the startup phase of the system,
+While C<StartupIOWeight> applies
+to the startup and shutdown phases of the system,
 C<IOWeight> applies to the later runtime of
 the system, and if the former is not set also to the startup
-phase. This allows prioritizing specific services at boot-up
-differently than during runtime.
+and shutdown phases. This allows prioritizing specific services at boot-up
+and shutdown differently than during runtime.
 
 These settings replace C<BlockIOWeight> and C<StartupBlockIOWeight>
 and disable settings prefixed with C<BlockIO> or C<StartupBlockIO>. I< Optional. Type uniline.  > 
@@ -824,6 +866,49 @@ Examples:
     …
 I< Optional. Type uniline.  > 
 
+=head2 RestrictNetworkInterfaces
+
+Takes a list of space-separated network interface names. This option restricts the network
+interfaces that processes of this unit can use. By default processes can only use the network interfaces
+listed (allow-list). If the first character of the rule is C<~>, the effect is inverted:
+the processes can only use network interfaces not listed (deny-list).
+
+This option can appear multiple times, in which case the network interface names are merged. If the
+empty string is assigned the set is reset, all prior assignments will have not effect.
+
+If you specify both types of this option (i.e. allow-listing and deny-listing), the first encountered
+will take precedence and will dictate the default action (allow vs deny). Then the next occurrences of this
+option will add or delete the listed network interface names from the set, depending of its type and the
+default action.
+
+The loopback interface ("lo") is not treated in any special way, you have to configure it explicitly
+in the unit file.
+
+Example 1: allow-list
+
+
+    RestrictNetworkInterfaces=eth1
+    RestrictNetworkInterfaces=eth2
+
+Programs in the unit will be only able to use the eth1 and eth2 network
+interfaces.
+
+Example 2: deny-list
+
+
+    RestrictNetworkInterfaces=~eth1 eth2
+
+Programs in the unit will be able to use any network interface but eth1 and eth2.
+
+Example 3: mixed
+
+
+    RestrictNetworkInterfaces=eth1 eth2
+    RestrictNetworkInterfaces=~eth1
+
+Programs in the unit will be only able to use the eth2 network interface.
+I< Optional. Type uniline.  > 
+
 =head2 DeviceAllow
 
 Control access to specific device nodes by the executed processes. Takes two space-separated
@@ -834,6 +919,10 @@ writing, or creation of the specific device node(s) by the unit
 C<devices.allow> control group attribute. For details about this control group
 attribute, see L<Device Whitelist Controller|https://www.kernel.org/doc/html/latest/admin-guide/cgroup-v1/devices.html>.
 In the unified cgroup hierarchy this functionality is implemented using eBPF filtering.
+
+When access to all physical devices should be disallowed,
+C<PrivateDevices> may be used instead. See
+L<systemd.exec(5)>.
 
 The device node specifier is either a path to a device node in the file system, starting with
 C</dev/>, or a string starting with either C<char-> or
@@ -1035,10 +1124,10 @@ value and control the C<cpu.shares> control group attribute. The allowed range i
 The available CPU time is split up among all units within one slice relative to their CPU time share
 weight.
 
-While C<StartupCPUShares> only applies to the startup phase of the system,
+While C<StartupCPUShares> applies to the startup and shutdown phases of the system,
 C<CPUShares> applies to normal runtime of the system, and if the former is not set also to
-the startup phase. Using C<StartupCPUShares> allows prioritizing specific services at
-boot-up differently than during normal runtime.
+the startup and shutdown phases. Using C<StartupCPUShares> allows prioritizing specific services at
+boot-up and shutdown differently than during normal runtime.
 
 Implies C<CPUAccounting=yes>.
 
@@ -1063,10 +1152,10 @@ value and control the C<cpu.shares> control group attribute. The allowed range i
 The available CPU time is split up among all units within one slice relative to their CPU time share
 weight.
 
-While C<StartupCPUShares> only applies to the startup phase of the system,
+While C<StartupCPUShares> applies to the startup and shutdown phases of the system,
 C<CPUShares> applies to normal runtime of the system, and if the former is not set also to
-the startup phase. Using C<StartupCPUShares> allows prioritizing specific services at
-boot-up differently than during normal runtime.
+the startup and shutdown phases. Using C<StartupCPUShares> allows prioritizing specific services at
+boot-up and shutdown differently than during normal runtime.
 
 Implies C<CPUAccounting=yes>.
 
@@ -1119,11 +1208,11 @@ The available I/O bandwidth is split up among all units within one slice relativ
 weight.
 
 While C<StartupBlockIOWeight> only
-applies to the startup phase of the system,
+applies to the startup and shutdown phases of the system,
 C<BlockIOWeight> applies to the later runtime
 of the system, and if the former is not set also to the
-startup phase. This allows prioritizing specific services at
-boot-up differently than during runtime.
+startup and shutdown phases. This allows prioritizing specific services at
+boot-up and shutdown differently than during runtime.
 
 Implies
 C<BlockIOAccounting=yes>.
@@ -1141,11 +1230,11 @@ The available I/O bandwidth is split up among all units within one slice relativ
 weight.
 
 While C<StartupBlockIOWeight> only
-applies to the startup phase of the system,
+applies to the startup and shutdown phases of the system,
 C<BlockIOWeight> applies to the later runtime
 of the system, and if the former is not set also to the
-startup phase. This allows prioritizing specific services at
-boot-up differently than during runtime.
+startup and shutdown phases. This allows prioritizing specific services at
+boot-up and shutdown differently than during runtime.
 
 Implies
 C<BlockIOAccounting=yes>.
@@ -1205,6 +1294,18 @@ C<BlockIOAccounting=yes>.
 
 These settings are deprecated. Use C<IOReadBandwidthMax> and
 C<IOWriteBandwidthMax> instead. I< Optional. Type uniline.  > 
+
+=head2 ExecSearchPath
+
+Takes a colon separated list of absolute paths relative to which the executable
+used by the C<Exec*=> (e.g. C<ExecStart>,
+C<ExecStop>, etc.) properties can be found. C<ExecSearchPath>
+overrides C<$PATH> if C<$PATH> is not supplied by the user through
+C<Environment>, C<EnvironmentFile> or
+C<PassEnvironment>. Assigning an empty string removes previous assignments
+and setting C<ExecSearchPath> to a value multiple times will append
+to the previous setting.
+I< Optional. Type list of uniline.  > 
 
 =head2 WorkingDirectory
 
@@ -1518,6 +1619,11 @@ These settings may be used more than once, each usage appends to the unit's list
 paths. If the empty string is assigned, the entire list of mount paths defined prior to this is
 reset.
 
+Each image must carry a C</usr/lib/extension-release.d/extension-release.IMAGE>
+file, with the appropriate metadata which matches C<RootImage>/C<RootDirectory>
+or the host. See:
+L<os-release(5)>.
+
 When C<DevicePolicy> is set to C<closed> or
 C<strict>, or set to C<auto> and C<DeviceAllow> is
 set, then this setting adds C</dev/loop-control> with C<rw> mode,
@@ -1777,9 +1883,12 @@ details. I< Optional. Type uniline.  >
 
 Set the SELinux security context of the executed process. If set, this will override the
 automated domain transition. However, the policy still needs to authorize the transition. This directive is
-ignored if SELinux is disabled. If prefixed by C<->, all errors will be ignored. This does not
-affect commands prefixed with C<+>.  See L<setexeccon(3)> for
-details. I< Optional. Type uniline.  > 
+ignored if SELinux is disabled. If prefixed by C<->, failing to set the SELinux
+security context will be ignored, but it's still possible that the subsequent
+execve() may fail if the policy doesn't allow the transition for the
+non-overridden context. This does not affect commands prefixed with C<+>.  See
+L<setexeccon(3)>
+for details. I< Optional. Type uniline.  > 
 
 =head2 AppArmorProfile
 
@@ -2738,10 +2847,11 @@ policies and for C<preferred> policy we expect a single NUMA node. I< Optional. 
 
 =head2 IOSchedulingClass
 
-Sets the I/O scheduling class for executed processes. Takes an integer between 0 and 3 or one
-of the strings C<none>, C<realtime>, C<best-effort> or
-C<idle>. If the empty string is assigned to this option, all prior assignments to both
-C<IOSchedulingClass> and C<IOSchedulingPriority> have no effect. See
+Sets the I/O scheduling class for executed processes. Takes one of the strings
+C<realtime>, C<best-effort> or C<idle>. The kernel's
+default scheduling class is C<best-effort> at a priority of 4. If the empty string is
+assigned to this option, all prior assignments to both C<IOSchedulingClass> and
+C<IOSchedulingPriority> have no effect. See
 L<ioprio_set(2)> for
 details. I< Optional. Type enum. choice: '0', '1', '2', '3', 'none', 'realtime', 'best-effort', 'idle'.  > 
 
@@ -2752,9 +2862,20 @@ Sets the I/O scheduling priority for executed processes. Takes an integer betwee
 bandwidth is made available to the unit's processes, larger values mean less bandwidth. The available
 priorities depend on the selected I/O scheduling class (see above). If the empty string is assigned
 to this option, all prior assignments to both C<IOSchedulingClass> and
-C<IOSchedulingPriority> have no effect.  See
+C<IOSchedulingPriority> have no effect. For the kernel's default scheduling class
+(C<best-effort>) this defaults to 4. See
 L<ioprio_set(2)> for
 details. I< Optional. Type integer.  > 
+
+=over 4
+
+=item upstream_default value :
+
+4
+
+=back
+
+
 
 =head2 ProtectSystem
 
@@ -2846,38 +2967,12 @@ directory is cleaned up automatically after use. For runtime directories that re
 configuration or lifetime guarantees, please consider using
 L<tmpfiles.d(5)>.
 
-The directories defined by these options are always created under the standard paths used by systemd
-(C</var/>, C</run/>, C</etc/>, …). If the service needs
-directories in a different location, a different mechanism has to be used to create them.
-
-L<tmpfiles.d(5)> provides
-functionality that overlaps with these options. Using these options is recommended, because the lifetime of
-the directories is tied directly to the lifetime of the unit, and it is not necessary to ensure that the
-C<tmpfiles.d> configuration is executed before the unit is started.
-
-To remove any of the directories created by these settings, use the systemctl clean
-… command on the relevant units, see
-L<systemctl(1)> for
-details.
-
-Example: if a system service unit has the following,
-
-    RuntimeDirectory=foo/bar baz
-
-the service manager creates C</run/foo> (if it does not exist),
-C</run/foo/bar>, and C</run/baz>. The
-directories C</run/foo/bar> and
-C</run/baz> except C</run/foo> are
-owned by the user and group specified in C<User> and C<Group>, and removed
-when the service is stopped.
-
-Example: if a system service unit has the following,
-
-    RuntimeDirectory=foo/bar
-    StateDirectory=aaa/bbb ccc
-
-then the environment variable C<RUNTIME_DIRECTORY> is set with C</run/foo/bar>, and
-C<STATE_DIRECTORY> is set with C</var/lib/aaa/bbb:/var/lib/ccc>. I< Optional. Type uniline.  > 
+C<RuntimeDirectory>, C<StateDirectory>, C<CacheDirectory>
+and C<LogsDirectory>  optionally support a second parameter, separated by C<:>.
+The second parameter will be interpreted as a destination path that will be created as a symlink to the directory.
+The symlinks will be created after any C<BindPaths> or C<TemporaryFileSystem>
+options have been set up, to make ephemeral symlinking possible. The same source can have multiple symlinks, by
+using the same first parameter, but a different second parameter. I< Optional. Type uniline.  > 
 
 =head2 StateDirectory
 
@@ -2927,38 +3022,12 @@ directory is cleaned up automatically after use. For runtime directories that re
 configuration or lifetime guarantees, please consider using
 L<tmpfiles.d(5)>.
 
-The directories defined by these options are always created under the standard paths used by systemd
-(C</var/>, C</run/>, C</etc/>, …). If the service needs
-directories in a different location, a different mechanism has to be used to create them.
-
-L<tmpfiles.d(5)> provides
-functionality that overlaps with these options. Using these options is recommended, because the lifetime of
-the directories is tied directly to the lifetime of the unit, and it is not necessary to ensure that the
-C<tmpfiles.d> configuration is executed before the unit is started.
-
-To remove any of the directories created by these settings, use the systemctl clean
-… command on the relevant units, see
-L<systemctl(1)> for
-details.
-
-Example: if a system service unit has the following,
-
-    RuntimeDirectory=foo/bar baz
-
-the service manager creates C</run/foo> (if it does not exist),
-C</run/foo/bar>, and C</run/baz>. The
-directories C</run/foo/bar> and
-C</run/baz> except C</run/foo> are
-owned by the user and group specified in C<User> and C<Group>, and removed
-when the service is stopped.
-
-Example: if a system service unit has the following,
-
-    RuntimeDirectory=foo/bar
-    StateDirectory=aaa/bbb ccc
-
-then the environment variable C<RUNTIME_DIRECTORY> is set with C</run/foo/bar>, and
-C<STATE_DIRECTORY> is set with C</var/lib/aaa/bbb:/var/lib/ccc>. I< Optional. Type uniline.  > 
+C<RuntimeDirectory>, C<StateDirectory>, C<CacheDirectory>
+and C<LogsDirectory>  optionally support a second parameter, separated by C<:>.
+The second parameter will be interpreted as a destination path that will be created as a symlink to the directory.
+The symlinks will be created after any C<BindPaths> or C<TemporaryFileSystem>
+options have been set up, to make ephemeral symlinking possible. The same source can have multiple symlinks, by
+using the same first parameter, but a different second parameter. I< Optional. Type uniline.  > 
 
 =head2 CacheDirectory
 
@@ -3008,38 +3077,12 @@ directory is cleaned up automatically after use. For runtime directories that re
 configuration or lifetime guarantees, please consider using
 L<tmpfiles.d(5)>.
 
-The directories defined by these options are always created under the standard paths used by systemd
-(C</var/>, C</run/>, C</etc/>, …). If the service needs
-directories in a different location, a different mechanism has to be used to create them.
-
-L<tmpfiles.d(5)> provides
-functionality that overlaps with these options. Using these options is recommended, because the lifetime of
-the directories is tied directly to the lifetime of the unit, and it is not necessary to ensure that the
-C<tmpfiles.d> configuration is executed before the unit is started.
-
-To remove any of the directories created by these settings, use the systemctl clean
-… command on the relevant units, see
-L<systemctl(1)> for
-details.
-
-Example: if a system service unit has the following,
-
-    RuntimeDirectory=foo/bar baz
-
-the service manager creates C</run/foo> (if it does not exist),
-C</run/foo/bar>, and C</run/baz>. The
-directories C</run/foo/bar> and
-C</run/baz> except C</run/foo> are
-owned by the user and group specified in C<User> and C<Group>, and removed
-when the service is stopped.
-
-Example: if a system service unit has the following,
-
-    RuntimeDirectory=foo/bar
-    StateDirectory=aaa/bbb ccc
-
-then the environment variable C<RUNTIME_DIRECTORY> is set with C</run/foo/bar>, and
-C<STATE_DIRECTORY> is set with C</var/lib/aaa/bbb:/var/lib/ccc>. I< Optional. Type uniline.  > 
+C<RuntimeDirectory>, C<StateDirectory>, C<CacheDirectory>
+and C<LogsDirectory>  optionally support a second parameter, separated by C<:>.
+The second parameter will be interpreted as a destination path that will be created as a symlink to the directory.
+The symlinks will be created after any C<BindPaths> or C<TemporaryFileSystem>
+options have been set up, to make ephemeral symlinking possible. The same source can have multiple symlinks, by
+using the same first parameter, but a different second parameter. I< Optional. Type uniline.  > 
 
 =head2 LogsDirectory
 
@@ -3089,38 +3132,12 @@ directory is cleaned up automatically after use. For runtime directories that re
 configuration or lifetime guarantees, please consider using
 L<tmpfiles.d(5)>.
 
-The directories defined by these options are always created under the standard paths used by systemd
-(C</var/>, C</run/>, C</etc/>, …). If the service needs
-directories in a different location, a different mechanism has to be used to create them.
-
-L<tmpfiles.d(5)> provides
-functionality that overlaps with these options. Using these options is recommended, because the lifetime of
-the directories is tied directly to the lifetime of the unit, and it is not necessary to ensure that the
-C<tmpfiles.d> configuration is executed before the unit is started.
-
-To remove any of the directories created by these settings, use the systemctl clean
-… command on the relevant units, see
-L<systemctl(1)> for
-details.
-
-Example: if a system service unit has the following,
-
-    RuntimeDirectory=foo/bar baz
-
-the service manager creates C</run/foo> (if it does not exist),
-C</run/foo/bar>, and C</run/baz>. The
-directories C</run/foo/bar> and
-C</run/baz> except C</run/foo> are
-owned by the user and group specified in C<User> and C<Group>, and removed
-when the service is stopped.
-
-Example: if a system service unit has the following,
-
-    RuntimeDirectory=foo/bar
-    StateDirectory=aaa/bbb ccc
-
-then the environment variable C<RUNTIME_DIRECTORY> is set with C</run/foo/bar>, and
-C<STATE_DIRECTORY> is set with C</var/lib/aaa/bbb:/var/lib/ccc>. I< Optional. Type uniline.  > 
+C<RuntimeDirectory>, C<StateDirectory>, C<CacheDirectory>
+and C<LogsDirectory>  optionally support a second parameter, separated by C<:>.
+The second parameter will be interpreted as a destination path that will be created as a symlink to the directory.
+The symlinks will be created after any C<BindPaths> or C<TemporaryFileSystem>
+options have been set up, to make ephemeral symlinking possible. The same source can have multiple symlinks, by
+using the same first parameter, but a different second parameter. I< Optional. Type uniline.  > 
 
 =head2 ConfigurationDirectory
 
@@ -3170,38 +3187,12 @@ directory is cleaned up automatically after use. For runtime directories that re
 configuration or lifetime guarantees, please consider using
 L<tmpfiles.d(5)>.
 
-The directories defined by these options are always created under the standard paths used by systemd
-(C</var/>, C</run/>, C</etc/>, …). If the service needs
-directories in a different location, a different mechanism has to be used to create them.
-
-L<tmpfiles.d(5)> provides
-functionality that overlaps with these options. Using these options is recommended, because the lifetime of
-the directories is tied directly to the lifetime of the unit, and it is not necessary to ensure that the
-C<tmpfiles.d> configuration is executed before the unit is started.
-
-To remove any of the directories created by these settings, use the systemctl clean
-… command on the relevant units, see
-L<systemctl(1)> for
-details.
-
-Example: if a system service unit has the following,
-
-    RuntimeDirectory=foo/bar baz
-
-the service manager creates C</run/foo> (if it does not exist),
-C</run/foo/bar>, and C</run/baz>. The
-directories C</run/foo/bar> and
-C</run/baz> except C</run/foo> are
-owned by the user and group specified in C<User> and C<Group>, and removed
-when the service is stopped.
-
-Example: if a system service unit has the following,
-
-    RuntimeDirectory=foo/bar
-    StateDirectory=aaa/bbb ccc
-
-then the environment variable C<RUNTIME_DIRECTORY> is set with C</run/foo/bar>, and
-C<STATE_DIRECTORY> is set with C</var/lib/aaa/bbb:/var/lib/ccc>. I< Optional. Type uniline.  > 
+C<RuntimeDirectory>, C<StateDirectory>, C<CacheDirectory>
+and C<LogsDirectory>  optionally support a second parameter, separated by C<:>.
+The second parameter will be interpreted as a destination path that will be created as a symlink to the directory.
+The symlinks will be created after any C<BindPaths> or C<TemporaryFileSystem>
+options have been set up, to make ephemeral symlinking possible. The same source can have multiple symlinks, by
+using the same first parameter, but a different second parameter. I< Optional. Type uniline.  > 
 
 =head2 RuntimeDirectoryMode
 
@@ -3648,31 +3639,38 @@ security. I< Optional. Type boolean.  >
 
 =head2 PrivateDevices
 
-Takes a boolean argument. If true, sets up a new C</dev/> mount for the
-executed processes and only adds API pseudo devices such as C</dev/null>,
-C</dev/zero> or C</dev/random> (as well as the pseudo TTY subsystem) to it,
-but no physical devices such as C</dev/sda>, system memory C</dev/mem>,
-system ports C</dev/port> and others. This is useful to securely turn off physical device
-access by the executed process. Defaults to false. Enabling this option will install a system call filter to
-block low-level I/O system calls that are grouped in the C<@raw-io> set, will also remove
-C<CAP_MKNOD> and C<CAP_SYS_RAWIO> from the capability bounding set for the
-unit (see above), and set C<DevicePolicy=closed> (see
-L<systemd.resource-control(5)>
-for details). Note that using this setting will disconnect propagation of mounts from the service to the host
-(propagation in the opposite direction continues to work). This means that this setting may not be used for
-services which shall be able to install mount points in the main mount namespace. The new
-C</dev/> will be mounted read-only and 'noexec'. The latter may break old programs which try
-to set up executable memory by using
-L<mmap(2)> of
-C</dev/zero> instead of using C<MAP_ANON>. For this setting the same
-restrictions regarding mount propagation and privileges apply as for C<ReadOnlyPaths> and
-related calls, see above. If turned on and if running in user mode, or in system mode, but without the
-C<CAP_SYS_ADMIN> capability (e.g. setting C<User>),
-C<NoNewPrivileges=yes> is implied.
+Takes a boolean argument. If true, sets up a new C</dev/> mount for
+the executed processes and only adds API pseudo devices such as C</dev/null>,
+C</dev/zero> or C</dev/random> (as well as the pseudo TTY
+subsystem) to it, but no physical devices such as C</dev/sda>, system memory
+C</dev/mem>, system ports C</dev/port> and others. This is useful
+to turn off physical device access by the executed process. Defaults to false.
 
-Note that the implementation of this setting might be impossible (for example if mount namespaces are not
-available), and the unit should be written in a way that does not solely rely on this setting for
-security. I< Optional. Type boolean.  > 
+Enabling this option will install a system call filter to block low-level I/O system calls that
+are grouped in the C<@raw-io> set, remove C<CAP_MKNOD> and
+C<CAP_SYS_RAWIO> from the capability bounding set for the unit, and set
+C<DevicePolicy=closed> (see
+L<systemd.resource-control(5)>
+for details). Note that using this setting will disconnect propagation of mounts from the service to
+the host (propagation in the opposite direction continues to work). This means that this setting may
+not be used for services which shall be able to install mount points in the main mount namespace. The
+new C</dev/> will be mounted read-only and 'noexec'. The latter may break old
+programs which try to set up executable memory by using
+L<mmap(2)> of
+C</dev/zero> instead of using C<MAP_ANON>. For this setting the
+same restrictions regarding mount propagation and privileges apply as for
+C<ReadOnlyPaths> and related calls, see above. If turned on and if running in user
+mode, or in system mode, but without the C<CAP_SYS_ADMIN> capability (e.g. setting
+C<User>), C<NoNewPrivileges=yes> is implied.
+
+Note that the implementation of this setting might be impossible (for example if mount
+namespaces are not available), and the unit should be written in a way that does not solely rely on
+this setting for security.
+
+When access to some but not all devices must be possible, the C<DeviceAllow>
+setting might be used instead. See
+L<systemd.resource-control(5)>.
+I< Optional. Type boolean.  > 
 
 =head2 PrivateNetwork
 
@@ -3907,6 +3905,53 @@ C<AF_UNIX> address family should be included in the configured allow list as it 
 used for local communication, including for
 L<syslog(2)>
 logging. I< Optional. Type uniline.  > 
+
+=head2 RestrictFileSystems
+
+Restricts the set of filesystems processes of this unit can open files on. Takes a space-separated
+list of filesystem names. Any filesystem listed is made accessible to the unit's processes, access to filesystem
+types not listed is prohibited (allow-listing). If the first character of the list is C<~>, the
+effect is inverted: access to the filesystems listed is prohibited (deny-listing). If the empty string is assigned,
+access to filesystems is not restricted.
+
+If you specify both types of this option (i.e. allow-listing and deny-listing), the first encountered will take
+precedence and will dictate the default action (allow access to the filesystem or deny it). Then the next occurrences
+of this option will add or delete the listed filesystems from the set of the restricted filesystems, depending on its
+type and the default action.
+
+Example: if a unit has the following,
+
+    RestrictFileSystems=ext4 tmpfs
+    RestrictFileSystems=ext2 ext4
+
+then access to C<ext4>, C<tmpfs>, and C<ext2> is allowed
+and access to other filesystems is denied.
+
+Example: if a unit has the following,
+
+    RestrictFileSystems=ext4 tmpfs
+    RestrictFileSystems=~ext4
+
+then only access C<tmpfs> is allowed.
+
+Example: if a unit has the following,
+
+    RestrictFileSystems=~ext4 tmpfs
+    RestrictFileSystems=ext4
+
+then only access to C<tmpfs> is denied.
+
+As the number of possible filesystems is large, predefined sets of filesystems are provided.  A set
+starts with C<@> character, followed by name of the set.
+
+Use
+L<systemd-analyze(1)>'s
+filesystems command to retrieve a list of filesystems defined on the local
+system.
+
+Note that this setting might not be supported on some systems (for example if the LSM eBPF hook is
+not enabled in the underlying kernel or if not using the unified control group hierarchy). In that case this setting
+has no effect. I< Optional. Type uniline.  > 
 
 =head2 RestrictNamespaces
 
@@ -4253,7 +4298,8 @@ material, …)  to service processes. Environment variables set for a unit are e
 clients via D-Bus IPC, and generally not understood as being data that requires protection. Moreover,
 environment variables are propagated down the process tree, including across security boundaries
 (such as setuid/setgid executables), and hence might leak to processes that should not have access to
-the secret data. Use C<LoadCredential> (see below) to pass data to unit processes
+the secret data. Use C<LoadCredential>, C<LoadCredentialEncrypted>
+or C<SetCredentialEncrypted> (see below) to pass data to unit processes
 securely. I< Optional. Type list of uniline.  > 
 
 =head2 EnvironmentFile
@@ -4706,6 +4752,16 @@ execution.  Defaults to C<no>. I< Optional. Type uniline.  >
 Disconnect all clients which have opened the terminal device specified with
 C<TTYPath> before and after execution. Defaults to C<no>. I< Optional. Type uniline.  > 
 
+=head2 TTYRows
+
+Configure the size of the TTY specified with C<TTYPath>. If unset or
+set to the empty string, the kernel default is used. I< Optional. Type uniline.  > 
+
+=head2 TTYColumns
+
+Configure the size of the TTY specified with C<TTYPath>. If unset or
+set to the empty string, the kernel default is used. I< Optional. Type uniline.  > 
+
 =head2 TTYVTDisallocate
 
 If the terminal device specified with C<TTYPath> is a virtual console
@@ -4740,6 +4796,88 @@ newline characters and C<NUL> bytes. If the file system path is omitted it is
 chosen identical to the credential name, i.e. this is a terse way do declare credentials to inherit
 from the service manager into a service. This option may be used multiple times, each time defining
 an additional credential to pass to the unit.
+
+The C<LoadCredentialEncrypted> setting is identical to
+C<LoadCredential>, except that the credential data is decrypted before being passed
+on to the executed processes. Specifically, the referenced path should refer to a file or socket with
+an encrypted credential, as implemented by
+L<systemd-creds(1)>. This
+credential is loaded, decrypted and then passed to the application in decrypted plaintext form, in
+the same way a regular credential specified via C<LoadCredential> would be. A
+credential configured this way may encrypted with a secret key derived from the system's TPM2
+security chip, or with a secret key stored in
+C</var/lib/systemd/credentials.secret>, or with both. Using encrypted credentials
+improves security as credentials are not stored in plaintext and only decrypted into plaintext the
+moment a service requiring them is started. Moreover, credentials may be bound to the local hardware
+and installations, so that they cannot easily be analyzed offline.
+
+The credential files/IPC sockets must be accessible to the service manager, but don't have to
+be directly accessible to the unit's processes: the credential data is read and copied into separate,
+read-only copies for the unit that are accessible to appropriately privileged processes. This is
+particularly useful in combination with C<DynamicUser> as this way privileged data
+can be made available to processes running under a dynamic UID (i.e. not a previously known one)
+without having to open up access to all users.
+
+In order to reference the path a credential may be read from within a
+C<ExecStart> command line use C<${CREDENTIALS_DIRECTORY}/mycred>,
+e.g. C<ExecStart=cat ${CREDENTIALS_DIRECTORY}/mycred>.
+
+Currently, an accumulated credential size limit of 1 MB per unit is enforced.
+
+If referencing an C<AF_UNIX> stream socket to connect to, the connection will
+originate from an abstract namespace socket, that includes information about the unit and the
+credential ID in its socket name. Use L<getpeername(2)>
+to query this information. The returned socket name is formatted as C<NUL>RANDOM C</unit/> UNITC</> ID, i.e. a C<NUL> byte (as required
+for abstract namespace socket names), followed by a random string (consisting of alphadecimal
+characters), followed by the literal string C</unit/>, followed by the requesting
+unit name, followed by the literal character C</>, followed by the textual credential
+ID requested. Example: C<\0adf9d86b6eda275e/unit/foobar.service/credx> in case the
+credential C<credx> is requested for a unit C<foobar.service>. This
+functionality is useful for using a single listening socket to serve credentials to multiple
+consumers. I< Optional. Type uniline.  > 
+
+=head2 LoadCredentialEncrypted
+
+Pass a credential to the unit. Credentials are limited-size binary or textual objects
+that may be passed to unit processes. They are primarily used for passing cryptographic keys (both
+public and private) or certificates, user account information or identity information from host to
+services. The data is accessible from the unit's processes via the file system, at a read-only
+location that (if possible and permitted) is backed by non-swappable memory. The data is only
+accessible to the user associated with the unit, via the
+C<User>/C<DynamicUser> settings (as well as the superuser). When
+available, the location of credentials is exported as the C<$CREDENTIALS_DIRECTORY>
+environment variable to the unit's processes.
+
+The C<LoadCredential> setting takes a textual ID to use as name for a
+credential plus a file system path, separated by a colon. The ID must be a short ASCII string
+suitable as filename in the filesystem, and may be chosen freely by the user. If the specified path
+is absolute it is opened as regular file and the credential data is read from it. If the absolute
+path refers to an C<AF_UNIX> stream socket in the file system a connection is made
+to it (only once at unit start-up) and the credential data read from the connection, providing an
+easy IPC integration point for dynamically providing credentials from other services. If the
+specified path is not absolute and itself qualifies as valid credential identifier it is understood
+to refer to a credential that the service manager itself received via the
+C<$CREDENTIALS_DIRECTORY> environment variable, which may be used to propagate
+credentials from an invoking environment (e.g. a container manager that invoked the service manager)
+into a service. The contents of the file/socket may be arbitrary binary or textual data, including
+newline characters and C<NUL> bytes. If the file system path is omitted it is
+chosen identical to the credential name, i.e. this is a terse way do declare credentials to inherit
+from the service manager into a service. This option may be used multiple times, each time defining
+an additional credential to pass to the unit.
+
+The C<LoadCredentialEncrypted> setting is identical to
+C<LoadCredential>, except that the credential data is decrypted before being passed
+on to the executed processes. Specifically, the referenced path should refer to a file or socket with
+an encrypted credential, as implemented by
+L<systemd-creds(1)>. This
+credential is loaded, decrypted and then passed to the application in decrypted plaintext form, in
+the same way a regular credential specified via C<LoadCredential> would be. A
+credential configured this way may encrypted with a secret key derived from the system's TPM2
+security chip, or with a secret key stored in
+C</var/lib/systemd/credentials.secret>, or with both. Using encrypted credentials
+improves security as credentials are not stored in plaintext and only decrypted into plaintext the
+moment a service requiring them is started. Moreover, credentials may be bound to the local hardware
+and installations, so that they cannot easily be analyzed offline.
 
 The credential files/IPC sockets must be accessible to the service manager, but don't have to
 be directly accessible to the unit's processes: the credential data is read and copied into separate,
@@ -4776,6 +4914,38 @@ user IDs, public key material and similar non-sensitive data. For everything els
 C<LoadCredential>. In order to embed binary data into the credential data use
 C-style escaping (i.e. C<\n> to embed a newline, or C<\x00> to embed
 a C<NUL> byte).
+
+The C<SetCredentialEncrypted> setting is identical to
+C<SetCredential> but expects an encrypted credential in literal form as value. This
+allows embedding confidential credentials securely directly in unit files. Use
+L<systemd-creds(1)>'
+C<-p> switch to generate suitable C<SetCredentialEncrypted> lines
+directly from plaintext credentials. For further details see
+C<LoadCredentialEncrypted> above.
+
+If a credential of the same ID is listed in both C<LoadCredential> and
+C<SetCredential>, the latter will act as default if the former cannot be
+retrieved. In this case not being able to retrieve the credential from the path specified in
+C<LoadCredential> is not considered fatal. I< Optional. Type uniline.  > 
+
+=head2 SetCredentialEncrypted
+
+The C<SetCredential> setting is similar to
+C<LoadCredential> but accepts a literal value to use as data for the credential,
+instead of a file system path to read the data from. Do not use this option for data that is supposed
+to be secret, as it is accessible to unprivileged processes via IPC. It's only safe to use this for
+user IDs, public key material and similar non-sensitive data. For everything else use
+C<LoadCredential>. In order to embed binary data into the credential data use
+C-style escaping (i.e. C<\n> to embed a newline, or C<\x00> to embed
+a C<NUL> byte).
+
+The C<SetCredentialEncrypted> setting is identical to
+C<SetCredential> but expects an encrypted credential in literal form as value. This
+allows embedding confidential credentials securely directly in unit files. Use
+L<systemd-creds(1)>'
+C<-p> switch to generate suitable C<SetCredentialEncrypted> lines
+directly from plaintext credentials. For further details see
+C<LoadCredentialEncrypted> above.
 
 If a credential of the same ID is listed in both C<LoadCredential> and
 C<SetCredential>, the latter will act as default if the former cannot be
@@ -4929,6 +5099,16 @@ C<simple> possibly delays the boot process, as the service manager needs to wait
 initialization to complete. It is hence recommended not to needlessly use any types other than
 C<simple>. (Also note it is generally not recommended to use C<idle> or
 C<oneshot> for long-running services.) I< Optional. Type uniline.  > 
+
+=head2 ExitType
+
+Specifies when the manager should consider the service to be finished. One of C<main> or
+C<cgroup>:
+
+It is generally recommended to use C<ExitType>C<main> when a service has
+a known forking model and a main process can reliably be determined. C<ExitType>C<cgroup> is meant for applications whose forking model is not known ahead of time and which
+might not have a specific main process. It is well suited for transient or automatically generated services,
+such as graphical applications inside of a desktop environment. I< Optional. Type uniline.  > 
 
 =head2 RemainAfterExit
 
@@ -5332,6 +5512,13 @@ C<RuntimeMaxSec>, the service manager will allow the service to continue to run,
 the service repeats C<EXTEND_TIMEOUT_USEC=…> within the interval specified until the service
 shutdown is achieved by C<STOPPING=1> (or termination). (see
 L<sd_notify(3)>).
+I< Optional. Type uniline.  > 
+
+=head2 RuntimeRandomizedExtraSec
+
+This option modifies C<RuntimeMaxSec> by increasing the maximum runtime by an
+evenly distributed duration between 0 and the specified value (in seconds). If C<RuntimeMaxSec> is
+unspecified, then this feature will be disabled.
 I< Optional. Type uniline.  > 
 
 =head2 WatchdogSec

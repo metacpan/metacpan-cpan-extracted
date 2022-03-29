@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package OpenAPI::Modern; # git description: v0.022-6-g2e04a6d
+package OpenAPI::Modern; # git description: v0.023-11-g0dbdd35
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate HTTP requests and responses against an OpenAPI document
 # KEYWORDS: validation evaluation JSON Schema OpenAPI Swagger HTTP request response
 
-our $VERSION = '0.023';
+our $VERSION = '0.024';
 
 use 5.020;
 use Moo;
@@ -84,12 +84,13 @@ sub validate_request ($self, $request, $options = {}) {
     initial_schema_uri => $self->openapi_uri,   # the canonical URI as of the start or last $id, or the last traversed $ref
     traversed_schema_path => '',    # the accumulated traversal path as of the start, or last $id, or up to the last traversed $ref
     schema_path => '',              # the rest of the path, since the last $id or the last traversed $ref
-    errors => $options->{errors} //= [],
     effective_base_uri => Mojo::URL->new->host(scalar _header($request, 'Host'))->scheme('https'),
   };
 
   try {
-    return $self->_result($options, 1) if not $self->find_path($request, $options);
+    my $path_ok = $self->find_path($request, $options);
+    $state->{errors} = delete $options->{errors};
+    return $self->_result($state, 1) if not $path_ok;
 
     my ($path_template, $path_captures) = $options->@{qw(path_template path_captures)};
     my $path_item = $self->openapi_document->schema->{paths}{$path_template};
@@ -168,7 +169,6 @@ sub validate_request ($self, $request, $options = {}) {
     }
   }
 
-  $options->{errors} = $state->{errors};
   return $self->_result($state);
 }
 
@@ -178,21 +178,21 @@ sub validate_response ($self, $response, $options = {}) {
     initial_schema_uri => $self->openapi_uri,   # the canonical URI as of the start or last $id, or the last traversed $ref
     traversed_schema_path => '',    # the accumulated traversal path as of the start, or last $id, or up to the last traversed $ref
     schema_path => '',              # the rest of the path, since the last $id or the last traversed $ref
-    errors => $options->{errors} //= [],
   };
 
   try {
-    return $self->_result($options, 1)
-      if not $self->find_path($response->$_call_if_can('request') // $options->{request}, $options);
+    my $path_ok = $self->find_path($response->$_call_if_can('request') // $options->{request}, $options);
+    $state->{errors} = delete $options->{errors};
+    return $self->_result($state, 1) if not $path_ok;
 
-    $state->{effective_base_uri} = Mojo::URL->new->host(scalar _header($options->{request}, 'Host'))->scheme('https')
-      if $options->{request};
     my ($path_template, $path_captures) = $options->@{qw(path_template path_captures)};
     my $method = lc $options->{method};
     my $operation = $self->openapi_document->schema->{paths}{$path_template}{$method};
 
     return $self->_result($state) if not exists $operation->{responses};
 
+    $state->{effective_base_uri} = Mojo::URL->new->host(scalar _header($options->{request}, 'Host'))->scheme('https')
+      if $options->{request};
     $state->{schema_path} = jsonp('/paths', $path_template, $method);
 
     my $response_name = first { exists $operation->{responses}{$_} }
@@ -238,13 +238,10 @@ sub validate_response ($self, $response, $options = {}) {
     }
   }
 
-  $options->{errors} = $state->{errors};
   return $self->_result($state);
 }
 
 sub find_path ($self, $request, $options) {
-  my ($path_template, $method);
-
   my $state = {
     data_path => '/request/uri/path',
     initial_schema_uri => $self->openapi_uri,   # the canonical URI as of the start or last $id, or the last traversed $ref
@@ -254,6 +251,8 @@ sub find_path ($self, $request, $options) {
     $request ? ( effective_base_uri => Mojo::URL->new->host(scalar _header($request, 'Host'))->scheme('https') ) : (),
   };
 
+  my ($method, $path_template);
+
   # method from options
   if (exists $options->{method}) {
     $method = lc $options->{method};
@@ -261,7 +260,7 @@ sub find_path ($self, $request, $options) {
       if $request and lc $request->method ne $method;
   }
   elsif ($request) {
-    $method = lc $request->method;
+    $method = $options->{method} = lc $request->method;
   }
 
   # path_template and method from operation_id from options
@@ -281,9 +280,7 @@ sub find_path ($self, $request, $options) {
         'wrong HTTP method %s', $options->{method})
       if $options->{method} and lc $options->{method} ne $method;
 
-    return E({ %$state, data_path => '/request/method', schema_path => $operation_path },
-        'wrong HTTP method %s', $request->method)
-      if $request and lc $request->method ne $method;
+    $options->{method} = lc $method;
   }
 
   croak 'at least one of request, $options->{method} and $options->{operation_id} must be provided'
@@ -297,7 +294,7 @@ sub find_path ($self, $request, $options) {
     return E({ %$state, keyword => 'paths' }, 'missing path-item "%s"', $path_template) if not $path_item;
 
     return E({ %$state, data_path => '/request/method', schema_path => jsonp('/paths', $path_template), keyword => $method },
-        'missing entry for HTTP method "%s"', $method)
+        'missing operation for HTTP method "%s"', $method)
       if not $path_item->{$method};
   }
 
@@ -317,10 +314,16 @@ sub find_path ($self, $request, $options) {
       my @capture_names = ($path_template =~ m!\{([^/?#}]+)\}!g);
       my %path_captures; @path_captures{@capture_names} = @capture_values;
 
+      $options->{path_template} = $path_template;
       return E({ %$state, keyword => 'paths' }, 'provided path_captures values do not match request URI')
         if $options->{path_captures} and not is_equal($options->{path_captures}, \%path_captures);
 
-      $options->@{qw(path_template path_captures method)} = ($path_template, \%path_captures, $method);
+      $options->{path_captures} = \%path_captures;
+      return E({ %$state, data_path => '/request/method', schema_path => jsonp('/paths', $path_template), keyword => $method },
+          'missing operation for HTTP method "%s"', $method)
+        if not exists $schema->{paths}{$path_template}{$method};
+
+      $options->{operation_id} = $self->openapi_document->schema->{paths}{$path_template}{$method}{operationId};
       return 1;
     }
 
@@ -338,7 +341,8 @@ sub find_path ($self, $request, $options) {
       and not is_equal([ sort keys $options->{path_captures}->%*], [ sort @capture_names ]);
 
   if (not $request) {
-    $options->@{qw(path_template method)} = ($path_template, $method);
+    $options->@{qw(path_template operation_id)} =
+      ($path_template, $self->openapi_document->schema->{paths}{$path_template}{$method}{operationId});
     return 1;
   }
 
@@ -362,7 +366,8 @@ sub find_path ($self, $request, $options) {
       and not is_equal([ map $_.'', $options->{path_captures}->@{@capture_names} ], \@capture_values);
 
   my %path_captures; @path_captures{@capture_names} = @capture_values;
-  $options->@{qw(path_template path_captures method)} = ($path_template, \%path_captures, $method);
+  $options->@{qw(path_template path_captures operation_id)} =
+    ($path_template, \%path_captures, $self->openapi_document->schema->{paths}{$path_template}{$method}{operationId});
   return 1;
 }
 
@@ -645,7 +650,7 @@ OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI docume
 
 =head1 VERSION
 
-version 0.023
+version 0.024
 
 =head1 SYNOPSIS
 
@@ -760,7 +765,7 @@ than features that seem to work but actually cut corners for simplicity.
 
 =for Pod::Coverage BUILDARGS
 
-=for :stopwords schemas jsonSchemaDialect metaschema subschema perlish
+=for stopwords schemas jsonSchemaDialect metaschema subschema perlish operationId
 
 =head1 CONSTRUCTOR ARGUMENTS
 
@@ -871,7 +876,7 @@ C<path_template>: a string representing the request URI, with placeholders in br
 
 =item *
 
-C<operation_id>: a string corresponding to the C<operationId> at a particular path-template and HTTP location under C</paths>
+C<operation_id>: a string corresponding to the L<operationId|https://swagger.io/docs/specification/paths-and-operations/#operationid> at a particular path-template and HTTP location under C</paths>
 
 =item *
 
@@ -888,8 +893,8 @@ as needed (albeit less
 efficiently than if they were provided). All passed-in values MUST be consistent with each other and
 the request URI.
 
-When successful, the options hash will be populated with keys C<path_template>, C<path_captures>
-and C<method>,
+When successful, the options hash will be populated with keys C<path_template>, C<path_captures>,
+C<method>, and C<operation_id>,
 and the return value is true.
 When not successful, the options hash will be populated with key C<errors>, an arrayref containing
 a L<JSON::Schema::Modern::Error> object, and the return value is false.

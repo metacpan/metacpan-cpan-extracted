@@ -5,7 +5,7 @@ use strict;
 
 use Carp(qw(croak));
 
-our $VERSION = '1.00.00';
+our $VERSION = '1.02.01';
 
 =head2 get_cve_for_cpe
 

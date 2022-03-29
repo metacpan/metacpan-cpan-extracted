@@ -3,11 +3,11 @@ use Moose;
 use MooseX::StrictConstructor;
 use Carp                           qw(croak);
 use HTML::Entities                 qw(decode_entities);
-use MsOffice::Word::Surgeon;
+use MsOffice::Word::Surgeon 1.08;
 
 use namespace::clean -except => 'meta';
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 # attributes for interacting with MsWord
 has 'surgeon'       => (is => 'ro',   isa => 'MsOffice::Word::Surgeon', required => 1);
@@ -26,6 +26,9 @@ has 'engine_args'   => (is => 'ro',   isa => 'ArrayRef',                default 
 has 'template_text' => (is => 'bare', isa => 'Str',                     init_arg => undef);
 has 'engine_stash'  => (is => 'bare', isa => 'HashRef',                 init_arg => undef,
                                                                         clearer  => 'clear_stash');
+
+my $XML_COMMENT_FOR_MARKING_DIRECTIVES = '<!--TEMPLATE_DIRECTIVE_ABOVE-->';
+
 
 
 #======================================================================
@@ -73,46 +76,52 @@ sub build_template_text {
   # start and end character sequences for a template fragment
   my ($rx_start, $rx_end) = map quotemeta, $self->start_tag, $self->end_tag;
 
-  # regex for matching paragraphs that contain directives to be treated outside the text flow.
+  # Regexes for extracting template directives within the XML.
   # Such directives are identified through a specific XML comment -- this comment is
   # inserted by method "template_fragment_for_run()" below.
-  my $regex_paragraph = qr{
-    <w:p               [^>]*>                  # start paragraph node
-      (?: <w:pPr> .*? </w:pPr>     (*SKIP) )?  # optional paragraph properties
-      <w:r             [^>]*>                  # start run node
-        <w:t           [^>]*>                  # start text node
+  # The (*SKIP) instructions are used to avoid backtracking after a
+  # closing tag for the subexpression has been found. Otherwise the
+  # .*? inside could possibly match across boundaries of the current
+  # XML node, we don't want that.
+
+  # regex for matching directives to be treated outside the text flow.
+  my $regex_outside_text_flow = qr{
+      <w:r\b           [^>]*>                  # start run node
+        (?: <w:rPr> .*? </w:rPr>   (*SKIP) )?  # optional run properties
+        <w:t\b         [^>]*>                  # start text node
           ($rx_start .*? $rx_end)  (*SKIP)     # template directive
-          <!--OUTSIDE_TEXT_FLOW-->             # specific XML comment
+          $XML_COMMENT_FOR_MARKING_DIRECTIVES  # specific XML comment
         </w:t>                                 # close text node
       </w:r>                                   # close run node
+   }sx;
+
+  # regex for matching paragraphs that contain only a directive
+  my $regex_paragraph = qr{
+    <w:p\b             [^>]*>                  # start paragraph node
+      (?: <w:pPr> .*? </w:pPr>     (*SKIP) )?  # optional paragraph properties
+      $regex_outside_text_flow
     </w:p>                                     # close paragraph node
    }sx;
 
-  # regex for matching table rows that contain such paragraphs.
+  # regex for matching table rows that contain only a directive in the first cell
   my $regex_row = qr{
-    <w:tr              [^>]*>                  # start row node
-      <w:tc            [^>]*>                  # start cell node
+    <w:tr\b            [^>]*>                  # start row node
+      <w:tc\b          [^>]*>                  # start cell node
          (?:<w:tcPr> .*? </w:tcPr> (*SKIP) )?  # cell properties
          $regex_paragraph                      # paragraph in cell
       </w:tc>                                  # close cell node
-      (?:<w:tc> .*? </w:tc>        (*SKIP) )*  # possibly other cells on the same row
+      (?:<w:tc> .*? </w:tc>        (*SKIP) )*  # ignore other cells on the same row
     </w:tr>                                    # close row node
    }sx;
-
-  # NOTE : the (*SKIP) instructions in regexes above are used to avoid backtracking
-  # after a closing tag for the subexpression has been found. Otherwise the .*? inside
-  # could possibly match across boundaries of the current XML node, we don't want that.
 
   # assemble template fragments from all runs in the document into a global template text
   $self->surgeon->cleanup_XML;
   my @template_fragments = map {$self->template_fragment_for_run($_)}  @{$self->surgeon->runs};
   my $template_text      = join "", @template_fragments;
 
-  # remove markup for rows around directives
-  $template_text =~ s/$regex_row/$1/g;
-
-  # remove markup for pagraphs around directives
-  $template_text =~ s/$regex_paragraph/$1/g;
+  # remove markup around directives, successively for table rows, for paragraphs, and finally
+  # for remaining directives embedded within text runs.
+  $template_text =~ s/$_/$1/g for $regex_row, $regex_paragraph, $regex_outside_text_flow;
 
   return $template_text;
 }
@@ -126,8 +135,6 @@ sub template_fragment_for_run { # given an instance of Surgeon::Run, build a tem
   my $control_color = $self->control_color;
 
   # if this run is highlighted in yellow or green, it must be translated into a template directive
-  # NOTE:  the code below has much in common with Surgeon::Run::as_xml() -- maybe
-  # part of it could be shared in a future version
   if ($props =~ s{<w:highlight w:val="($data_color|$control_color)"/>}{}) {
     my $color       = $1;
     my $xml         = $run->xml_before;
@@ -138,14 +145,15 @@ sub template_fragment_for_run { # given an instance of Surgeon::Run, build a tem
       $xml .= "<w:rPr>" . $props . "</w:rPr>" if $props;              # optional run properties
       $xml .= "<w:t>";                                                # opening XML tag for text node
       $xml .= $self->start_tag;                                       # start a template directive
-      foreach my $inner_text (@$inner_texts) {
-        my $txt = decode_entities($inner_text->literal_text);
+      foreach my $inner_text (@$inner_texts) {                        # loop over text nodes
+        my $txt = decode_entities($inner_text->literal_text);         # just take inner literal text
         $xml .= $txt . "\n";
         # NOTE : adding "\n" because the template parser may need them for identifying end of comments
       }
 
       $xml .= $self->end_tag;                                         # end of template directive
-      $xml .= "<!--OUTSIDE_TEXT_FLOW-->" if $color eq $control_color; # XML comment for marking
+      $xml .= $XML_COMMENT_FOR_MARKING_DIRECTIVES
+                                         if $color eq $control_color; # XML comment for marking
       $xml .= "</w:t>";                                               # closing XML tag for text node
       $xml .= "</w:r>";                                               # closing XML tag for run node
     }
@@ -185,16 +193,86 @@ sub process {
 # DEFAULT ENGINE : TEMPLATE TOOLKIT, a.k.a. TT2
 #======================================================================
 
+# arbitrary value for the first bookmark id. 100 should most often be above other
+# bookmarks generated by Word itself. TODO : would be better to find the highest
+# id number really used in the template
+my $first_bookmark_id = 100;
+
+# precompiled blocks as facilities to be used within templates
+my %precompiled_blocks = (
+
+  # a wrapper block for inserting a Word bookmark
+  bookmark => sub {
+    my $context     = shift;
+    my $stash       = $context->stash;
+
+    # assemble xml markup
+    my $bookmark_id = $stash->get('global.bookmark_id') || $first_bookmark_id;
+    my $name        = fix_bookmark_name($stash->get('name') || 'anonymous_bookmark');
+
+    my $xml         = qq{<w:bookmarkStart w:id="$bookmark_id" w:name="$name"/>}
+                    . $stash->get('content') # content of the wrapper
+                    . qq{<w:bookmarkEnd w:id="$bookmark_id"/>};
+
+    # next bookmark will need a fresh id
+    $stash->set('global.bookmark_id', $bookmark_id+1);
+
+    return $xml;
+  },
+
+  # a wrapper block for linking to a bookmark
+  link_to_bookmark => sub {
+    my $context = shift;
+    my $stash   = $context->stash;
+
+    # assemble xml markup
+    my $name    = fix_bookmark_name($stash->get('name') || 'anonymous_bookmark');
+    my $content = $stash->get('content');
+    my $tooltip = $stash->get('tooltip');
+    if ($tooltip) {
+      # TODO: escap quotes
+      $tooltip = qq{ w:tooltip="$tooltip"};
+    }
+    my $xml  = qq{<w:hyperlink w:anchor="$name"$tooltip>$content</w:hyperlink>};
+
+    return $xml;
+  },
+
+  # a block for generating a Word field. Can also be used as wrapper.
+  field => sub {
+    my $context = shift;
+    my $stash   = $context->stash;
+    my $code    = $stash->get('code');         # field code, including possible flags
+    my $text    = $stash->get('content');      # initial text content (before updating the field)
+
+    my $xml     = qq{<w:r><w:fldChar w:fldCharType="begin"/></w:r>}
+                . qq{<w:r><w:instrText xml:space="preserve"> $code </w:instrText></w:r>};
+    $xml       .= qq{<w:r><w:fldChar w:fldCharType="separate"/></w:r>$text} if $text;
+    $xml       .= qq{<w:r><w:fldChar w:fldCharType="end"/></w:r>};
+
+    return $xml;
+  },
+
+);
+
+
+
 
 sub TT2_engine {
   my ($self, $vars) = @_;
 
   require Template::AutoFilter; # a subclass of Template that adds automatic html filtering
 
+
+  # assemble args to be passed to the constructor
+  my %TT2_args = @{$self->engine_args};
+  $TT2_args{BLOCKS}{$_} //= $precompiled_blocks{$_} for keys %precompiled_blocks;
+
+
   # at the first invocation, create a TT2 compiled template and store it in the stash.
   # Further invocations just reuse the TT2 object in stash.
   my $stash                     = $self->{engine_stash} //= {};
-  $stash->{TT2}               //= Template::AutoFilter->new(@{$self->engine_args});
+  $stash->{TT2}               //= Template::AutoFilter->new(\%TT2_args);
   $stash->{compiled_template} //= $stash->{TT2}->template(\$self->{template_text});
 
   # generate new XML by invoking the template on $vars
@@ -204,6 +282,22 @@ sub TT2_engine {
 }
 
 
+#======================================================================
+# UTILITY ROUTINES (not methods)
+#======================================================================
+
+
+sub fix_bookmark_name {
+  my $name = shift;
+
+  # see https://stackoverflow.com/questions/852922/what-are-the-limitations-for-bookmark-names-in-microsoft-word
+
+  $name =~ s/[^\w_]+/_/g;                              # only digits, letters or underscores
+  $name =~ s/^(\d)/_$1/;                               # cannot start with a digit
+  $name = substr($name, 0, 40) if length($name) > 40;  # max 40 characters long
+
+  return $name;
+}
 
 
 1;
@@ -265,8 +359,8 @@ in order to avoid empty paragraphs or empty rows in the resulting document.
 =back
 
 The syntax of data and control directives depends on the backend
-templating engine.  The default engine is the L<Perl Template
-Toolkit|Template>; other engines can be specified through parameters
+templating engine.  The default engine is the L<Perl Template Toolkit|Template>;
+other engines can be specified through parameters
 to the L</new> method -- see the L</TEMPLATE ENGINE> section below.
 
 
@@ -346,9 +440,10 @@ C<foo.3.bar.-1> -- see L<Template::Manual::Directive/GET> and
 L<Template::Manual::Variables> if you are using the Template Toolkit.
 
 Control directives like C<IF>, C<FOREACH>, etc. must be highlighted in
-B<green>. When seeing a green zone, the system will remove markup for
-the surrounding XML nodes (text, run and paragraph nodes). If this
-occurs within a table, the markup for the current row is also
+B<green>. When seeing a green zone, the system will remove XML markup for
+the surrounding text and run nodes. If the directive is the only content
+of the paragraph, then the paragraph node is also removed. If this
+occurs within the first cell of a table row, the markup for that row is also
 removed. This mechanism ensures that the final result will not contain
 empty paragraphs or empty rows at places corresponding to control directives.
 
@@ -369,7 +464,7 @@ angle brackets in XML markup do not get translated into HTML entities.
 This module invokes a backend I<templating engine> for interpreting the
 template directives. In order to use an engine different from the default
 L<Template Toolkit|Template>, you must supply the following parameters
-to the N</new> method :
+to the L</new> method :
 
 =over
 
@@ -441,13 +536,90 @@ explicitly add an C<html> filter at each directive :
 but thanks to the L<Template::AutoFilter>
 module, this is performed automatically.
 
+
+=head1 AUTHORING NOTES SPECIFIC TO THE TEMPLATE TOOLKIT
+
+This chapter just gives a few hints for authoring Word templates with the
+Template Toolkit.
+
+The examples below use [[double square brackets]] to indicate
+segments that should be highlighted in B<green> within the Word template.
+
+
+=head2 Bookmarks
+
+The template processor is instantiated with a predefined wrapper named C<bookmark>
+for generating Word bookmarks. Here is an example:
+
+  Here is a paragraph with [[WRAPPER bookmark name="my_bookmark"]]bookmarked text[[END]].
+
+The C<name> argument is automatically truncated to 40 characters, and non-alphanumeric
+characters are replaced by underscores, in order to comply with the limitations imposed by Word
+for bookmark names.
+
+=head2 Internal hyperlinks
+
+Similarly, there is a predefined wrapper named C<link_to_bookmark> for generating
+hyperlinks to bookmarks. Here is an example:
+
+  Click [[WRAPPER link_to_bookmark name="my_bookmark" tooltip="tip top"]]here[[END]].
+
+The C<tooltip> argument is optional.
+
+=head2 Word fields
+
+A predefined block C<field> generates XML markup for Word fields, like for example :
+
+  Today is [[PROCESS field code="DATE \\@ \"h:mm am/pm, dddd, MMMM d\""]]
+
+Beware that quotes or backslashes must be escaped so that the Template Toolkit parser
+does not interpret these characters.
+
+The list of Word field codes is documented at 
+L<https://support.microsoft.com/en-us/office/list-of-field-codes-in-word-1ad6d91a-55a7-4a8d-b535-cf7888659a51>.
+
+When used as a wrapper, the C<field> block generates a Word field with alternative
+text content, displayed before the field gets updated. For example :
+
+  [[WRAPPER field code="TOC \o \"1-3\" \h \z \u"]]Table of contents – press F9 to update[[END]]
+
+
+=head1 TROUBLESHOOTING
+
+If the document generated by this module cannot open in Word, it is probably because the XML
+generated by your template is not equilibrated and therefore not valid.
+For example a template like this :
+
+  This paragraph [[ IF condition ]]
+     may have problems
+  [[END]]
+
+is likely to generate incorrect XML, because the IF statement starts in the middle
+of a paragraph and closes at a different paragraph -- therefore when the I<condition>
+evaluates to false, the XML tag for closing the initial paragraph will be missing.
+
+Compound directives like IF .. END, FOREACH .. END,  TRY .. CATCH .. END should therefore
+be equilibrated, either all within the same paragraph, or each directive on a separate 
+paragraph. Examples like this should be successful :
+
+  This paragraph [[ IF condition ]]has an optional part[[ ELSE ]]or an alternative[[ END ]].
+  
+  [[ SWITCH result ]]
+  [[ CASE 123 ]]
+     Not a big deal.
+  [[ CASE 789 ]]
+     You won the lottery.
+  [[ END ]]
+
+
+
 =head1 AUTHOR
 
 Laurent Dami, E<lt>dami AT cpan DOT org<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2020, 2021 by Laurent Dami.
+Copyright 2020-2022 by Laurent Dami.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

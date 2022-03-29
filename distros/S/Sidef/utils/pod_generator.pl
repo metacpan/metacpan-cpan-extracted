@@ -182,22 +182,22 @@ sub process_file {
         my $orig_name = $sub;
         my $is_method = lc($sub) ne uc($sub);
 
-        $sub =~ s{([<>])}{E<$esc{$1}>}g;
+        #$sub =~ s{([<>])}{E<$esc{$1}>}g;
 
         my $doc = $is_method ? <<"__POD__" : <<"__POD2__";
 
 \=head2 $orig_name
 
-$parts[-1].$sub() -> I<Obj>
+    $parts[-1].$sub()
 
-Return the
+Returns the
 __POD__
 
 \=head2 $orig_name
 
-I<Obj> B<$sub> I<Obj> -> I<Obj>
+    a $sub b
 
-Return the
+Returns the
 __POD2__
 
         if (@{$value->{aliases}}) {
@@ -245,7 +245,7 @@ __POD2__
 
         if ($alias // exists($pod_data->{$value->{name}})) {
             my $doc = $pod_data->{$alias // $value->{name}};
-            if (not $doc =~ /^Return the$/m) {
+            if (not $doc =~ /^Returns? the$/m) {
                 $subs{$key}{doc} = $doc;
             }
         }
@@ -255,7 +255,8 @@ __POD2__
 
     my $header = $pod_data->{__HEADER__};
 
-    if (not defined($header) or $header =~ /^This class implements \.\.\.$/m) {
+    #if (not defined($header) or $header =~ /^This class implements \.\.\.$/m) {
+    if (not defined($header)) {
         $header = <<"HEADER";
 
 \=encoding utf8

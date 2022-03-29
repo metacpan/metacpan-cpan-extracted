@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-Systemd
 #
-# This software is Copyright (c) 2008-2021 by Dominique Dumont.
+# This software is Copyright (c) 2008-2022 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -54,6 +54,23 @@ by L<parse-man.pl|https://github.com/dod38fr/config-model-systemd/contrib/parse-
       '2016 Dominique Dumont'
     ],
     'element' => [
+      'ExecSearchPath',
+      {
+        'cargo' => {
+          'type' => 'leaf',
+          'value_type' => 'uniline'
+        },
+        'description' => 'Takes a colon separated list of absolute paths relative to which the executable
+used by the C<Exec*=> (e.g. C<ExecStart>,
+C<ExecStop>, etc.) properties can be found. C<ExecSearchPath>
+overrides C<$PATH> if C<$PATH> is not supplied by the user through
+C<Environment>, C<EnvironmentFile> or
+C<PassEnvironment>. Assigning an empty string removes previous assignments
+and setting C<ExecSearchPath> to a value multiple times will append
+to the previous setting.
+',
+        'type' => 'list'
+      },
       'WorkingDirectory',
       {
         'description' => 'Takes a directory path relative to the service\'s root directory specified by
@@ -419,6 +436,11 @@ These settings may be used more than once, each usage appends to the unit\'s lis
 paths. If the empty string is assigned, the entire list of mount paths defined prior to this is
 reset.
 
+Each image must carry a C</usr/lib/extension-release.d/extension-release.IMAGE>
+file, with the appropriate metadata which matches C<RootImage>/C<RootDirectory>
+or the host. See:
+L<os-release(5)>.
+
 When C<DevicePolicy> is set to C<closed> or
 C<strict>, or set to C<auto> and C<DeviceAllow> is
 set, then this setting adds C</dev/loop-control> with C<rw> mode,
@@ -708,9 +730,12 @@ details.',
       {
         'description' => 'Set the SELinux security context of the executed process. If set, this will override the
 automated domain transition. However, the policy still needs to authorize the transition. This directive is
-ignored if SELinux is disabled. If prefixed by C<->, all errors will be ignored. This does not
-affect commands prefixed with C<+>.  See L<setexeccon(3)> for
-details.',
+ignored if SELinux is disabled. If prefixed by C<->, failing to set the SELinux
+security context will be ignored, but it\'s still possible that the subsequent
+execve() may fail if the policy doesn\'t allow the transition for the
+non-overridden context. This does not affect commands prefixed with C<+>.  See
+L<setexeccon(3)>
+for details.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -1782,10 +1807,11 @@ policies and for C<preferred> policy we expect a single NUMA node.',
           'best-effort',
           'idle'
         ],
-        'description' => 'Sets the I/O scheduling class for executed processes. Takes an integer between 0 and 3 or one
-of the strings C<none>, C<realtime>, C<best-effort> or
-C<idle>. If the empty string is assigned to this option, all prior assignments to both
-C<IOSchedulingClass> and C<IOSchedulingPriority> have no effect. See
+        'description' => 'Sets the I/O scheduling class for executed processes. Takes one of the strings
+C<realtime>, C<best-effort> or C<idle>. The kernel\'s
+default scheduling class is C<best-effort> at a priority of 4. If the empty string is
+assigned to this option, all prior assignments to both C<IOSchedulingClass> and
+C<IOSchedulingPriority> have no effect. See
 L<ioprio_set(2)> for
 details.',
         'type' => 'leaf',
@@ -1798,12 +1824,14 @@ details.',
 bandwidth is made available to the unit\'s processes, larger values mean less bandwidth. The available
 priorities depend on the selected I/O scheduling class (see above). If the empty string is assigned
 to this option, all prior assignments to both C<IOSchedulingClass> and
-C<IOSchedulingPriority> have no effect.  See
+C<IOSchedulingPriority> have no effect. For the kernel\'s default scheduling class
+(C<best-effort>) this defaults to 4. See
 L<ioprio_set(2)> for
 details.',
         'max' => '7',
         'min' => '0',
         'type' => 'leaf',
+        'upstream_default' => '4',
         'value_type' => 'integer'
       },
       'ProtectSystem',
@@ -1878,7 +1906,7 @@ general it has the same limitations as C<ReadOnlyPaths>, see below.',
       },
       'RuntimeDirectory',
       {
-        'description' => "These options take a whitespace-separated list of directory names. The specified
+        'description' => 'These options take a whitespace-separated list of directory names. The specified
 directory names must be relative, and may not include C<..>. If set, when the unit is
 started, one or more directories by the specified names will be created (including their parents)
 below the locations defined in the following table. Also, the corresponding environment variable will
@@ -1905,7 +1933,7 @@ C<ConfigurationDirectoryMode>.
 
 These options imply C<BindPaths> for the specified paths. When combined with
 C<RootDirectory> or C<RootImage> these paths always reside on the host and
-are mounted from there into the unit's file system namespace.
+are mounted from there into the unit\'s file system namespace.
 
 If C<DynamicUser> is used, the logic for C<CacheDirectory>,
 C<LogsDirectory> and C<StateDirectory> is slightly altered: the directories are created below
@@ -1924,44 +1952,18 @@ directory is cleaned up automatically after use. For runtime directories that re
 configuration or lifetime guarantees, please consider using
 L<tmpfiles.d(5)>.
 
-The directories defined by these options are always created under the standard paths used by systemd
-(C</var/>, C</run/>, C</etc/>, \x{2026}). If the service needs
-directories in a different location, a different mechanism has to be used to create them.
-
-L<tmpfiles.d(5)> provides
-functionality that overlaps with these options. Using these options is recommended, because the lifetime of
-the directories is tied directly to the lifetime of the unit, and it is not necessary to ensure that the
-C<tmpfiles.d> configuration is executed before the unit is started.
-
-To remove any of the directories created by these settings, use the systemctl clean
-\x{2026} command on the relevant units, see
-L<systemctl(1)> for
-details.
-
-Example: if a system service unit has the following,
-
-    RuntimeDirectory=foo/bar baz
-
-the service manager creates C</run/foo> (if it does not exist),
-C</run/foo/bar>, and C</run/baz>. The
-directories C</run/foo/bar> and
-C</run/baz> except C</run/foo> are
-owned by the user and group specified in C<User> and C<Group>, and removed
-when the service is stopped.
-
-Example: if a system service unit has the following,
-
-    RuntimeDirectory=foo/bar
-    StateDirectory=aaa/bbb ccc
-
-then the environment variable C<RUNTIME_DIRECTORY> is set with C</run/foo/bar>, and
-C<STATE_DIRECTORY> is set with C</var/lib/aaa/bbb:/var/lib/ccc>.",
+C<RuntimeDirectory>, C<StateDirectory>, C<CacheDirectory>
+and C<LogsDirectory>  optionally support a second parameter, separated by C<:>.
+The second parameter will be interpreted as a destination path that will be created as a symlink to the directory.
+The symlinks will be created after any C<BindPaths> or C<TemporaryFileSystem>
+options have been set up, to make ephemeral symlinking possible. The same source can have multiple symlinks, by
+using the same first parameter, but a different second parameter.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
       'StateDirectory',
       {
-        'description' => "These options take a whitespace-separated list of directory names. The specified
+        'description' => 'These options take a whitespace-separated list of directory names. The specified
 directory names must be relative, and may not include C<..>. If set, when the unit is
 started, one or more directories by the specified names will be created (including their parents)
 below the locations defined in the following table. Also, the corresponding environment variable will
@@ -1988,7 +1990,7 @@ C<ConfigurationDirectoryMode>.
 
 These options imply C<BindPaths> for the specified paths. When combined with
 C<RootDirectory> or C<RootImage> these paths always reside on the host and
-are mounted from there into the unit's file system namespace.
+are mounted from there into the unit\'s file system namespace.
 
 If C<DynamicUser> is used, the logic for C<CacheDirectory>,
 C<LogsDirectory> and C<StateDirectory> is slightly altered: the directories are created below
@@ -2007,44 +2009,18 @@ directory is cleaned up automatically after use. For runtime directories that re
 configuration or lifetime guarantees, please consider using
 L<tmpfiles.d(5)>.
 
-The directories defined by these options are always created under the standard paths used by systemd
-(C</var/>, C</run/>, C</etc/>, \x{2026}). If the service needs
-directories in a different location, a different mechanism has to be used to create them.
-
-L<tmpfiles.d(5)> provides
-functionality that overlaps with these options. Using these options is recommended, because the lifetime of
-the directories is tied directly to the lifetime of the unit, and it is not necessary to ensure that the
-C<tmpfiles.d> configuration is executed before the unit is started.
-
-To remove any of the directories created by these settings, use the systemctl clean
-\x{2026} command on the relevant units, see
-L<systemctl(1)> for
-details.
-
-Example: if a system service unit has the following,
-
-    RuntimeDirectory=foo/bar baz
-
-the service manager creates C</run/foo> (if it does not exist),
-C</run/foo/bar>, and C</run/baz>. The
-directories C</run/foo/bar> and
-C</run/baz> except C</run/foo> are
-owned by the user and group specified in C<User> and C<Group>, and removed
-when the service is stopped.
-
-Example: if a system service unit has the following,
-
-    RuntimeDirectory=foo/bar
-    StateDirectory=aaa/bbb ccc
-
-then the environment variable C<RUNTIME_DIRECTORY> is set with C</run/foo/bar>, and
-C<STATE_DIRECTORY> is set with C</var/lib/aaa/bbb:/var/lib/ccc>.",
+C<RuntimeDirectory>, C<StateDirectory>, C<CacheDirectory>
+and C<LogsDirectory>  optionally support a second parameter, separated by C<:>.
+The second parameter will be interpreted as a destination path that will be created as a symlink to the directory.
+The symlinks will be created after any C<BindPaths> or C<TemporaryFileSystem>
+options have been set up, to make ephemeral symlinking possible. The same source can have multiple symlinks, by
+using the same first parameter, but a different second parameter.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
       'CacheDirectory',
       {
-        'description' => "These options take a whitespace-separated list of directory names. The specified
+        'description' => 'These options take a whitespace-separated list of directory names. The specified
 directory names must be relative, and may not include C<..>. If set, when the unit is
 started, one or more directories by the specified names will be created (including their parents)
 below the locations defined in the following table. Also, the corresponding environment variable will
@@ -2071,7 +2047,7 @@ C<ConfigurationDirectoryMode>.
 
 These options imply C<BindPaths> for the specified paths. When combined with
 C<RootDirectory> or C<RootImage> these paths always reside on the host and
-are mounted from there into the unit's file system namespace.
+are mounted from there into the unit\'s file system namespace.
 
 If C<DynamicUser> is used, the logic for C<CacheDirectory>,
 C<LogsDirectory> and C<StateDirectory> is slightly altered: the directories are created below
@@ -2090,44 +2066,18 @@ directory is cleaned up automatically after use. For runtime directories that re
 configuration or lifetime guarantees, please consider using
 L<tmpfiles.d(5)>.
 
-The directories defined by these options are always created under the standard paths used by systemd
-(C</var/>, C</run/>, C</etc/>, \x{2026}). If the service needs
-directories in a different location, a different mechanism has to be used to create them.
-
-L<tmpfiles.d(5)> provides
-functionality that overlaps with these options. Using these options is recommended, because the lifetime of
-the directories is tied directly to the lifetime of the unit, and it is not necessary to ensure that the
-C<tmpfiles.d> configuration is executed before the unit is started.
-
-To remove any of the directories created by these settings, use the systemctl clean
-\x{2026} command on the relevant units, see
-L<systemctl(1)> for
-details.
-
-Example: if a system service unit has the following,
-
-    RuntimeDirectory=foo/bar baz
-
-the service manager creates C</run/foo> (if it does not exist),
-C</run/foo/bar>, and C</run/baz>. The
-directories C</run/foo/bar> and
-C</run/baz> except C</run/foo> are
-owned by the user and group specified in C<User> and C<Group>, and removed
-when the service is stopped.
-
-Example: if a system service unit has the following,
-
-    RuntimeDirectory=foo/bar
-    StateDirectory=aaa/bbb ccc
-
-then the environment variable C<RUNTIME_DIRECTORY> is set with C</run/foo/bar>, and
-C<STATE_DIRECTORY> is set with C</var/lib/aaa/bbb:/var/lib/ccc>.",
+C<RuntimeDirectory>, C<StateDirectory>, C<CacheDirectory>
+and C<LogsDirectory>  optionally support a second parameter, separated by C<:>.
+The second parameter will be interpreted as a destination path that will be created as a symlink to the directory.
+The symlinks will be created after any C<BindPaths> or C<TemporaryFileSystem>
+options have been set up, to make ephemeral symlinking possible. The same source can have multiple symlinks, by
+using the same first parameter, but a different second parameter.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
       'LogsDirectory',
       {
-        'description' => "These options take a whitespace-separated list of directory names. The specified
+        'description' => 'These options take a whitespace-separated list of directory names. The specified
 directory names must be relative, and may not include C<..>. If set, when the unit is
 started, one or more directories by the specified names will be created (including their parents)
 below the locations defined in the following table. Also, the corresponding environment variable will
@@ -2154,7 +2104,7 @@ C<ConfigurationDirectoryMode>.
 
 These options imply C<BindPaths> for the specified paths. When combined with
 C<RootDirectory> or C<RootImage> these paths always reside on the host and
-are mounted from there into the unit's file system namespace.
+are mounted from there into the unit\'s file system namespace.
 
 If C<DynamicUser> is used, the logic for C<CacheDirectory>,
 C<LogsDirectory> and C<StateDirectory> is slightly altered: the directories are created below
@@ -2173,44 +2123,18 @@ directory is cleaned up automatically after use. For runtime directories that re
 configuration or lifetime guarantees, please consider using
 L<tmpfiles.d(5)>.
 
-The directories defined by these options are always created under the standard paths used by systemd
-(C</var/>, C</run/>, C</etc/>, \x{2026}). If the service needs
-directories in a different location, a different mechanism has to be used to create them.
-
-L<tmpfiles.d(5)> provides
-functionality that overlaps with these options. Using these options is recommended, because the lifetime of
-the directories is tied directly to the lifetime of the unit, and it is not necessary to ensure that the
-C<tmpfiles.d> configuration is executed before the unit is started.
-
-To remove any of the directories created by these settings, use the systemctl clean
-\x{2026} command on the relevant units, see
-L<systemctl(1)> for
-details.
-
-Example: if a system service unit has the following,
-
-    RuntimeDirectory=foo/bar baz
-
-the service manager creates C</run/foo> (if it does not exist),
-C</run/foo/bar>, and C</run/baz>. The
-directories C</run/foo/bar> and
-C</run/baz> except C</run/foo> are
-owned by the user and group specified in C<User> and C<Group>, and removed
-when the service is stopped.
-
-Example: if a system service unit has the following,
-
-    RuntimeDirectory=foo/bar
-    StateDirectory=aaa/bbb ccc
-
-then the environment variable C<RUNTIME_DIRECTORY> is set with C</run/foo/bar>, and
-C<STATE_DIRECTORY> is set with C</var/lib/aaa/bbb:/var/lib/ccc>.",
+C<RuntimeDirectory>, C<StateDirectory>, C<CacheDirectory>
+and C<LogsDirectory>  optionally support a second parameter, separated by C<:>.
+The second parameter will be interpreted as a destination path that will be created as a symlink to the directory.
+The symlinks will be created after any C<BindPaths> or C<TemporaryFileSystem>
+options have been set up, to make ephemeral symlinking possible. The same source can have multiple symlinks, by
+using the same first parameter, but a different second parameter.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
       'ConfigurationDirectory',
       {
-        'description' => "These options take a whitespace-separated list of directory names. The specified
+        'description' => 'These options take a whitespace-separated list of directory names. The specified
 directory names must be relative, and may not include C<..>. If set, when the unit is
 started, one or more directories by the specified names will be created (including their parents)
 below the locations defined in the following table. Also, the corresponding environment variable will
@@ -2237,7 +2161,7 @@ C<ConfigurationDirectoryMode>.
 
 These options imply C<BindPaths> for the specified paths. When combined with
 C<RootDirectory> or C<RootImage> these paths always reside on the host and
-are mounted from there into the unit's file system namespace.
+are mounted from there into the unit\'s file system namespace.
 
 If C<DynamicUser> is used, the logic for C<CacheDirectory>,
 C<LogsDirectory> and C<StateDirectory> is slightly altered: the directories are created below
@@ -2256,38 +2180,12 @@ directory is cleaned up automatically after use. For runtime directories that re
 configuration or lifetime guarantees, please consider using
 L<tmpfiles.d(5)>.
 
-The directories defined by these options are always created under the standard paths used by systemd
-(C</var/>, C</run/>, C</etc/>, \x{2026}). If the service needs
-directories in a different location, a different mechanism has to be used to create them.
-
-L<tmpfiles.d(5)> provides
-functionality that overlaps with these options. Using these options is recommended, because the lifetime of
-the directories is tied directly to the lifetime of the unit, and it is not necessary to ensure that the
-C<tmpfiles.d> configuration is executed before the unit is started.
-
-To remove any of the directories created by these settings, use the systemctl clean
-\x{2026} command on the relevant units, see
-L<systemctl(1)> for
-details.
-
-Example: if a system service unit has the following,
-
-    RuntimeDirectory=foo/bar baz
-
-the service manager creates C</run/foo> (if it does not exist),
-C</run/foo/bar>, and C</run/baz>. The
-directories C</run/foo/bar> and
-C</run/baz> except C</run/foo> are
-owned by the user and group specified in C<User> and C<Group>, and removed
-when the service is stopped.
-
-Example: if a system service unit has the following,
-
-    RuntimeDirectory=foo/bar
-    StateDirectory=aaa/bbb ccc
-
-then the environment variable C<RUNTIME_DIRECTORY> is set with C</run/foo/bar>, and
-C<STATE_DIRECTORY> is set with C</var/lib/aaa/bbb:/var/lib/ccc>.",
+C<RuntimeDirectory>, C<StateDirectory>, C<CacheDirectory>
+and C<LogsDirectory>  optionally support a second parameter, separated by C<:>.
+The second parameter will be interpreted as a destination path that will be created as a symlink to the directory.
+The symlinks will be created after any C<BindPaths> or C<TemporaryFileSystem>
+options have been set up, to make ephemeral symlinking possible. The same source can have multiple symlinks, by
+using the same first parameter, but a different second parameter.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -2797,31 +2695,38 @@ security.',
       },
       'PrivateDevices',
       {
-        'description' => 'Takes a boolean argument. If true, sets up a new C</dev/> mount for the
-executed processes and only adds API pseudo devices such as C</dev/null>,
-C</dev/zero> or C</dev/random> (as well as the pseudo TTY subsystem) to it,
-but no physical devices such as C</dev/sda>, system memory C</dev/mem>,
-system ports C</dev/port> and others. This is useful to securely turn off physical device
-access by the executed process. Defaults to false. Enabling this option will install a system call filter to
-block low-level I/O system calls that are grouped in the C<@raw-io> set, will also remove
-C<CAP_MKNOD> and C<CAP_SYS_RAWIO> from the capability bounding set for the
-unit (see above), and set C<DevicePolicy=closed> (see
-L<systemd.resource-control(5)>
-for details). Note that using this setting will disconnect propagation of mounts from the service to the host
-(propagation in the opposite direction continues to work). This means that this setting may not be used for
-services which shall be able to install mount points in the main mount namespace. The new
-C</dev/> will be mounted read-only and \'noexec\'. The latter may break old programs which try
-to set up executable memory by using
-L<mmap(2)> of
-C</dev/zero> instead of using C<MAP_ANON>. For this setting the same
-restrictions regarding mount propagation and privileges apply as for C<ReadOnlyPaths> and
-related calls, see above. If turned on and if running in user mode, or in system mode, but without the
-C<CAP_SYS_ADMIN> capability (e.g. setting C<User>),
-C<NoNewPrivileges=yes> is implied.
+        'description' => 'Takes a boolean argument. If true, sets up a new C</dev/> mount for
+the executed processes and only adds API pseudo devices such as C</dev/null>,
+C</dev/zero> or C</dev/random> (as well as the pseudo TTY
+subsystem) to it, but no physical devices such as C</dev/sda>, system memory
+C</dev/mem>, system ports C</dev/port> and others. This is useful
+to turn off physical device access by the executed process. Defaults to false.
 
-Note that the implementation of this setting might be impossible (for example if mount namespaces are not
-available), and the unit should be written in a way that does not solely rely on this setting for
-security.',
+Enabling this option will install a system call filter to block low-level I/O system calls that
+are grouped in the C<@raw-io> set, remove C<CAP_MKNOD> and
+C<CAP_SYS_RAWIO> from the capability bounding set for the unit, and set
+C<DevicePolicy=closed> (see
+L<systemd.resource-control(5)>
+for details). Note that using this setting will disconnect propagation of mounts from the service to
+the host (propagation in the opposite direction continues to work). This means that this setting may
+not be used for services which shall be able to install mount points in the main mount namespace. The
+new C</dev/> will be mounted read-only and \'noexec\'. The latter may break old
+programs which try to set up executable memory by using
+L<mmap(2)> of
+C</dev/zero> instead of using C<MAP_ANON>. For this setting the
+same restrictions regarding mount propagation and privileges apply as for
+C<ReadOnlyPaths> and related calls, see above. If turned on and if running in user
+mode, or in system mode, but without the C<CAP_SYS_ADMIN> capability (e.g. setting
+C<User>), C<NoNewPrivileges=yes> is implied.
+
+Note that the implementation of this setting might be impossible (for example if mount
+namespaces are not available), and the unit should be written in a way that does not solely rely on
+this setting for security.
+
+When access to some but not all devices must be possible, the C<DeviceAllow>
+setting might be used instead. See
+L<systemd.resource-control(5)>.
+',
         'type' => 'leaf',
         'value_type' => 'boolean',
         'write_as' => [
@@ -3120,6 +3025,55 @@ C<AF_UNIX> address family should be included in the configured allow list as it 
 used for local communication, including for
 L<syslog(2)>
 logging.',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'RestrictFileSystems',
+      {
+        'description' => 'Restricts the set of filesystems processes of this unit can open files on. Takes a space-separated
+list of filesystem names. Any filesystem listed is made accessible to the unit\'s processes, access to filesystem
+types not listed is prohibited (allow-listing). If the first character of the list is C<~>, the
+effect is inverted: access to the filesystems listed is prohibited (deny-listing). If the empty string is assigned,
+access to filesystems is not restricted.
+
+If you specify both types of this option (i.e. allow-listing and deny-listing), the first encountered will take
+precedence and will dictate the default action (allow access to the filesystem or deny it). Then the next occurrences
+of this option will add or delete the listed filesystems from the set of the restricted filesystems, depending on its
+type and the default action.
+
+Example: if a unit has the following,
+
+    RestrictFileSystems=ext4 tmpfs
+    RestrictFileSystems=ext2 ext4
+
+then access to C<ext4>, C<tmpfs>, and C<ext2> is allowed
+and access to other filesystems is denied.
+
+Example: if a unit has the following,
+
+    RestrictFileSystems=ext4 tmpfs
+    RestrictFileSystems=~ext4
+
+then only access C<tmpfs> is allowed.
+
+Example: if a unit has the following,
+
+    RestrictFileSystems=~ext4 tmpfs
+    RestrictFileSystems=ext4
+
+then only access to C<tmpfs> is denied.
+
+As the number of possible filesystems is large, predefined sets of filesystems are provided.  A set
+starts with C<@> character, followed by name of the set.
+
+Use
+L<systemd-analyze(1)>\'s
+filesystems command to retrieve a list of filesystems defined on the local
+system.
+
+Note that this setting might not be supported on some systems (for example if the LSM eBPF hook is
+not enabled in the underlying kernel or if not using the unified control group hierarchy). In that case this setting
+has no effect.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -3526,7 +3480,8 @@ material, \x{2026})  to service processes. Environment variables set for a unit 
 clients via D-Bus IPC, and generally not understood as being data that requires protection. Moreover,
 environment variables are propagated down the process tree, including across security boundaries
 (such as setuid/setgid executables), and hence might leak to processes that should not have access to
-the secret data. Use C<LoadCredential> (see below) to pass data to unit processes
+the secret data. Use C<LoadCredential>, C<LoadCredentialEncrypted>
+or C<SetCredentialEncrypted> (see below) to pass data to unit processes
 securely.",
         'type' => 'list'
       },
@@ -4051,6 +4006,20 @@ C<TTYPath> before and after execution. Defaults to C<no>.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
+      'TTYRows',
+      {
+        'description' => 'Configure the size of the TTY specified with C<TTYPath>. If unset or
+set to the empty string, the kernel default is used.',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'TTYColumns',
+      {
+        'description' => 'Configure the size of the TTY specified with C<TTYPath>. If unset or
+set to the empty string, the kernel default is used.',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
       'TTYVTDisallocate',
       {
         'description' => 'If the terminal device specified with C<TTYPath> is a virtual console
@@ -4087,6 +4056,90 @@ newline characters and C<NUL> bytes. If the file system path is omitted it is
 chosen identical to the credential name, i.e. this is a terse way do declare credentials to inherit
 from the service manager into a service. This option may be used multiple times, each time defining
 an additional credential to pass to the unit.
+
+The C<LoadCredentialEncrypted> setting is identical to
+C<LoadCredential>, except that the credential data is decrypted before being passed
+on to the executed processes. Specifically, the referenced path should refer to a file or socket with
+an encrypted credential, as implemented by
+L<systemd-creds(1)>. This
+credential is loaded, decrypted and then passed to the application in decrypted plaintext form, in
+the same way a regular credential specified via C<LoadCredential> would be. A
+credential configured this way may encrypted with a secret key derived from the system\'s TPM2
+security chip, or with a secret key stored in
+C</var/lib/systemd/credentials.secret>, or with both. Using encrypted credentials
+improves security as credentials are not stored in plaintext and only decrypted into plaintext the
+moment a service requiring them is started. Moreover, credentials may be bound to the local hardware
+and installations, so that they cannot easily be analyzed offline.
+
+The credential files/IPC sockets must be accessible to the service manager, but don\'t have to
+be directly accessible to the unit\'s processes: the credential data is read and copied into separate,
+read-only copies for the unit that are accessible to appropriately privileged processes. This is
+particularly useful in combination with C<DynamicUser> as this way privileged data
+can be made available to processes running under a dynamic UID (i.e. not a previously known one)
+without having to open up access to all users.
+
+In order to reference the path a credential may be read from within a
+C<ExecStart> command line use C<${CREDENTIALS_DIRECTORY}/mycred>,
+e.g. C<ExecStart=cat ${CREDENTIALS_DIRECTORY}/mycred>.
+
+Currently, an accumulated credential size limit of 1 MB per unit is enforced.
+
+If referencing an C<AF_UNIX> stream socket to connect to, the connection will
+originate from an abstract namespace socket, that includes information about the unit and the
+credential ID in its socket name. Use L<getpeername(2)>
+to query this information. The returned socket name is formatted as C<NUL>RANDOM C</unit/> UNITC</> ID, i.e. a C<NUL> byte (as required
+for abstract namespace socket names), followed by a random string (consisting of alphadecimal
+characters), followed by the literal string C</unit/>, followed by the requesting
+unit name, followed by the literal character C</>, followed by the textual credential
+ID requested. Example: C<\\0adf9d86b6eda275e/unit/foobar.service/credx> in case the
+credential C<credx> is requested for a unit C<foobar.service>. This
+functionality is useful for using a single listening socket to serve credentials to multiple
+consumers.',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'LoadCredentialEncrypted',
+      {
+        'description' => 'Pass a credential to the unit. Credentials are limited-size binary or textual objects
+that may be passed to unit processes. They are primarily used for passing cryptographic keys (both
+public and private) or certificates, user account information or identity information from host to
+services. The data is accessible from the unit\'s processes via the file system, at a read-only
+location that (if possible and permitted) is backed by non-swappable memory. The data is only
+accessible to the user associated with the unit, via the
+C<User>/C<DynamicUser> settings (as well as the superuser). When
+available, the location of credentials is exported as the C<$CREDENTIALS_DIRECTORY>
+environment variable to the unit\'s processes.
+
+The C<LoadCredential> setting takes a textual ID to use as name for a
+credential plus a file system path, separated by a colon. The ID must be a short ASCII string
+suitable as filename in the filesystem, and may be chosen freely by the user. If the specified path
+is absolute it is opened as regular file and the credential data is read from it. If the absolute
+path refers to an C<AF_UNIX> stream socket in the file system a connection is made
+to it (only once at unit start-up) and the credential data read from the connection, providing an
+easy IPC integration point for dynamically providing credentials from other services. If the
+specified path is not absolute and itself qualifies as valid credential identifier it is understood
+to refer to a credential that the service manager itself received via the
+C<$CREDENTIALS_DIRECTORY> environment variable, which may be used to propagate
+credentials from an invoking environment (e.g. a container manager that invoked the service manager)
+into a service. The contents of the file/socket may be arbitrary binary or textual data, including
+newline characters and C<NUL> bytes. If the file system path is omitted it is
+chosen identical to the credential name, i.e. this is a terse way do declare credentials to inherit
+from the service manager into a service. This option may be used multiple times, each time defining
+an additional credential to pass to the unit.
+
+The C<LoadCredentialEncrypted> setting is identical to
+C<LoadCredential>, except that the credential data is decrypted before being passed
+on to the executed processes. Specifically, the referenced path should refer to a file or socket with
+an encrypted credential, as implemented by
+L<systemd-creds(1)>. This
+credential is loaded, decrypted and then passed to the application in decrypted plaintext form, in
+the same way a regular credential specified via C<LoadCredential> would be. A
+credential configured this way may encrypted with a secret key derived from the system\'s TPM2
+security chip, or with a secret key stored in
+C</var/lib/systemd/credentials.secret>, or with both. Using encrypted credentials
+improves security as credentials are not stored in plaintext and only decrypted into plaintext the
+moment a service requiring them is started. Moreover, credentials may be bound to the local hardware
+and installations, so that they cannot easily be analyzed offline.
 
 The credential files/IPC sockets must be accessible to the service manager, but don\'t have to
 be directly accessible to the unit\'s processes: the credential data is read and copied into separate,
@@ -4125,6 +4178,40 @@ user IDs, public key material and similar non-sensitive data. For everything els
 C<LoadCredential>. In order to embed binary data into the credential data use
 C-style escaping (i.e. C<\\n> to embed a newline, or C<\\x00> to embed
 a C<NUL> byte).
+
+The C<SetCredentialEncrypted> setting is identical to
+C<SetCredential> but expects an encrypted credential in literal form as value. This
+allows embedding confidential credentials securely directly in unit files. Use
+L<systemd-creds(1)>\'
+C<-p> switch to generate suitable C<SetCredentialEncrypted> lines
+directly from plaintext credentials. For further details see
+C<LoadCredentialEncrypted> above.
+
+If a credential of the same ID is listed in both C<LoadCredential> and
+C<SetCredential>, the latter will act as default if the former cannot be
+retrieved. In this case not being able to retrieve the credential from the path specified in
+C<LoadCredential> is not considered fatal.',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'SetCredentialEncrypted',
+      {
+        'description' => 'The C<SetCredential> setting is similar to
+C<LoadCredential> but accepts a literal value to use as data for the credential,
+instead of a file system path to read the data from. Do not use this option for data that is supposed
+to be secret, as it is accessible to unprivileged processes via IPC. It\'s only safe to use this for
+user IDs, public key material and similar non-sensitive data. For everything else use
+C<LoadCredential>. In order to embed binary data into the credential data use
+C-style escaping (i.e. C<\\n> to embed a newline, or C<\\x00> to embed
+a C<NUL> byte).
+
+The C<SetCredentialEncrypted> setting is identical to
+C<SetCredential> but expects an encrypted credential in literal form as value. This
+allows embedding confidential credentials securely directly in unit files. Use
+L<systemd-creds(1)>\'
+C<-p> switch to generate suitable C<SetCredentialEncrypted> lines
+directly from plaintext credentials. For further details see
+C<LoadCredentialEncrypted> above.
 
 If a credential of the same ID is listed in both C<LoadCredential> and
 C<SetCredential>, the latter will act as default if the former cannot be
@@ -4169,7 +4256,7 @@ leader. Defaults to C<init>.',
         'value_type' => 'enum'
       }
     ],
-    'generated_by' => 'parse-man.pl from systemd 249 doc',
+    'generated_by' => 'parse-man.pl from systemd 250 doc',
     'license' => 'LGPLv2.1+',
     'name' => 'Systemd::Common::Exec'
   }

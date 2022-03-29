@@ -8,7 +8,7 @@ package Sidef::Types::Number::Quadratic {
 
     use parent qw(
       Sidef::Types::Number::Number
-      );
+    );
 
     use overload
       q{bool} => sub { (@_) = ($_[0]); goto &__boolify__ },
@@ -18,6 +18,11 @@ package Sidef::Types::Number::Quadratic {
 
     sub new {
         my (undef, $x, $y, $w) = @_;
+
+        # Handle evaluation of polynomials
+        if (ref($_[0]) eq __PACKAGE__) {
+            return $_[0]->eval($x);
+        }
 
         $x //= Sidef::Types::Number::Number::ZERO;
         $y //= Sidef::Types::Number::Number::ZERO;
@@ -32,16 +37,23 @@ package Sidef::Types::Number::Quadratic {
 
     *call = \&new;
 
+    sub eval {
+        my ($x, $v) = @_;
+        __PACKAGE__->new($x->{a}->eval($v), $x->{b}->eval($v), $x->{w}->eval($v),);
+    }
+
     sub a {
         $_[0]->{a};
     }
 
+    *re   = \&a;
     *real = \&a;
 
     sub b {
         $_[0]->{b};
     }
 
+    *im   = \&b;
     *imag = \&b;
 
     sub w {
@@ -54,6 +66,10 @@ package Sidef::Types::Number::Quadratic {
         ($_[0]->{a}, $_[0]->{b});
     }
 
+    sub parts {
+        Sidef::Types::Array::Array->new($_[0]->{a}, $_[0]->{b}, $_[0]->{w});
+    }
+
     sub __boolify__ {
         $_[0]->{a};
     }
@@ -64,7 +80,7 @@ package Sidef::Types::Number::Quadratic {
 
     sub __stringify__ {
         my ($x) = @_;
-        '(' . join(', ', $x->{a}->dump, $x->{b}->dump, $x->{w}->dump) . ')';
+        'Quadratic(' . join(', ', $x->{a}->dump, $x->{b}->dump, $x->{w}->dump) . ')';
     }
 
     sub to_s {
@@ -74,7 +90,7 @@ package Sidef::Types::Number::Quadratic {
 
     sub dump {
         my ($x) = @_;
-        Sidef::Types::String::String->new('Quadratic' . $x->__stringify__);
+        Sidef::Types::String::String->new($x->__stringify__);
     }
 
     sub to_n {
@@ -111,7 +127,8 @@ package Sidef::Types::Number::Quadratic {
 
     sub sqr {
         my ($x) = @_;
-        $x->mul($x);
+        my $t = $x->{a}->mul($x->{b});
+        __PACKAGE__->new($x->{a}->sqr->add($x->{b}->sqr->mul($x->{w})), $t->add($t), $x->{w});
     }
 
     sub add {
@@ -119,7 +136,7 @@ package Sidef::Types::Number::Quadratic {
 
         # (x + y√d) + (z + w√d) = (x + z) + (y + w)√d
 
-        if (ref($y) eq __PACKAGE__) {
+        if (ref($y) eq __PACKAGE__ and $x->{w} eq $y->{w}) {
             return __PACKAGE__->new($x->{a}->add($y->{a}), $x->{b}->add($y->{b}), $x->{w});
         }
 
@@ -129,7 +146,7 @@ package Sidef::Types::Number::Quadratic {
     sub sub {
         my ($x, $y) = @_;
 
-        if (ref($y) eq __PACKAGE__) {
+        if (ref($y) eq __PACKAGE__ and $x->{w} eq $y->{w}) {
             return __PACKAGE__->new($x->{a}->sub($y->{a}), $x->{b}->sub($y->{b}), $x->{w});
         }
 
@@ -141,7 +158,7 @@ package Sidef::Types::Number::Quadratic {
 
         # (x + y√d) (z + w√d) = (xz+ ywd) + (xw + yz)√d
 
-        if (ref($y) eq __PACKAGE__) {
+        if (ref($y) eq __PACKAGE__ and $x->{w} eq $y->{w}) {
             return __PACKAGE__->new(
 
                 # Quadratic(a*a' + b*b'*w, a*b' + b*a', w)
@@ -149,7 +166,7 @@ package Sidef::Types::Number::Quadratic {
                 $x->{a}->mul($y->{a})->add($x->{b}->mul($y->{b})->mul($x->{w})),
                 $x->{a}->mul($y->{b})->add($x->{b}->mul($y->{a})),
                 $x->{w},
-            );
+                                   );
         }
 
         __PACKAGE__->new($x->{a}->mul($y), $x->{b}->mul($y), $x->{w});
@@ -205,7 +222,7 @@ package Sidef::Types::Number::Quadratic {
     sub invmod {
         my ($x, $m) = @_;
 
-        $x = $x->ratmod($m);
+        $x = $x->mod($m);
         my $t = $x->{a}->sqr->sub($x->{b}->sqr->mul($x->{w}))->invmod($m);
 
         __PACKAGE__->new($x->{a}->mul($t)->mod($m), $x->{b}->mul($t)->neg->mod($m), $x->{w});
@@ -232,27 +249,9 @@ package Sidef::Types::Number::Quadratic {
         $x->{a}->is_mone;
     }
 
-    sub is_real {
-        my ($x) = @_;
-        $x->{b}->is_zero;
-    }
-
-    sub is_imag {
-        my ($x) = @_;
-        my $bool = $x->{b}->is_zero;
-        $bool && return $bool->not;
-        $x->{a}->is_zero;
-    }
-
     sub is_coprime {
         my ($n, $k) = @_;
-        _valid(\$k);
         $n->norm->gcd($k->norm)->is_one;
-    }
-
-    sub ratmod {
-        my ($x, $m) = @_;
-        __PACKAGE__->new($x->{a}->ratmod($m), $x->{b}->ratmod($m), $x->{w});
     }
 
     sub inc {
@@ -275,20 +274,16 @@ package Sidef::Types::Number::Quadratic {
             $negative_power = 1;
         }
 
-        my ($X, $Y) = (Sidef::Types::Number::Number::ONE, Sidef::Types::Number::Number::ZERO);
-        my ($A, $B, $w) = ($x->{a}, $x->{b}, $x->{w});
+        my $c = __PACKAGE__->new(Sidef::Types::Number::Number::ONE, Sidef::Types::Number::Number::ZERO, $x->{w});
 
         foreach my $bit (reverse split(//, $n->as_bin)) {
 
-            if ($bit) {
-                ($X, $Y) = ($A->mul($X)->add($B->mul($Y)->mul($w)), $A->mul($Y)->add($B->mul($X)));
-            }
+            # c *= x if bit
+            # x *= x
 
-            my $t = $A->mul($B);
-            ($A, $B) = ($A->sqr->add($B->sqr->mul($w)), $t->add($t));
+            $c = $c->mul($x) if $bit;
+            $x = $x->sqr;
         }
-
-        my $c = __PACKAGE__->new($X, $Y, $w);
 
         if ($negative_power) {
             $c = $c->inv;
@@ -300,7 +295,7 @@ package Sidef::Types::Number::Quadratic {
     sub powmod {
         my ($x, $n, $m) = @_;
 
-        $x = $x->ratmod($m);
+        $x = $x->mod($m);
 
         my $negative_power = 0;
 
@@ -309,20 +304,16 @@ package Sidef::Types::Number::Quadratic {
             $negative_power = 1;
         }
 
-        my ($X, $Y) = (Sidef::Types::Number::Number::ONE, Sidef::Types::Number::Number::ZERO);
-        my ($A, $B, $w) = ($x->{a}, $x->{b}, $x->{w});
+        my $c = __PACKAGE__->new(Sidef::Types::Number::Number::ONE, Sidef::Types::Number::Number::ZERO, $x->{w});
 
         foreach my $bit (reverse split(//, $n->as_bin)) {
 
-            if ($bit) {
-                ($X, $Y) = ($A->mul($X)->add($B->mul($Y)->mul($w))->mod($m), $A->mul($Y)->add($B->mul($X))->mod($m));
-            }
+            # c = (c*x)%m if bit
+            # x = (x*x)%m
 
-            my $t = $A->mul($B);
-            ($A, $B) = ($A->sqr->add($B->sqr->mul($w))->mod($m), $t->add($t)->mod($m));
+            $c = $c->mul($x)->mod($m) if $bit;
+            $x = $x->sqr->mod($m);
         }
-
-        my $c = __PACKAGE__->new($X, $Y, $w);
 
         if ($negative_power) {
             $c = $c->invmod($m);
@@ -371,7 +362,7 @@ package Sidef::Types::Number::Quadratic {
             $bool && return $bool;
             $bool = $x->{b}->ne($y->{b});
             $bool && return $bool;
-            return ($x->{w}->new($y->{w}));
+            return ($x->{w}->ne($y->{w}));
         }
 
         my $bool = $x->{a}->ne($y);
@@ -407,7 +398,7 @@ package Sidef::Types::Number::Quadratic {
             *{__PACKAGE__ . '::' . $method} = sub {
                 my ($x, $y) = @_;
 
-                if (ref($y) eq __PACKAGE__) {
+                if (ref($y) eq __PACKAGE__ and $x->{w} eq $y->{w}) {
                     return __PACKAGE__->new($x->{a}->$method($y->{a}), $x->{b}->$method($y->{b}), $x->{w});
                 }
 

@@ -15,11 +15,11 @@ NIST::NVD::Update - Query and Update the NVD database
 
 =head1 VERSION
 
-Version 1.00.00
+Version 1.02.01
 
 =cut
 
-our $VERSION = '1.00.00';
+our $VERSION = '1.02.01';
 
 =head1 SYNOPSIS
 
@@ -199,11 +199,14 @@ sub put_cwe_data {
 
 =head1 AUTHOR
 
-C.J. Adams-Collier, C<< <cjac at f5.com> >>
+C.J. Collier, C<< <cjac at google.com> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2011, 2012 F5 Networks, Inc.
+Copyright (C) 2012 C.J. Adams-Collier
+Copyright (C) 2011,2012 F5 Networks, Inc
+Copyright (C) 2013 Washington State Guard Association
+Copyright (C) 2022 Google, LLC
 
 CVE(r) and CWE(tm) are marks of The MITRE Corporation and used here with
 permission.  The information in CVE and CWE are copyright of The MITRE
@@ -217,7 +220,6 @@ under the terms of either: the GNU General Public License as published
 by the Free Software Foundation; or the Artistic License.
 
 See http://dev.perl.org/licenses/ for more information.
-
 
 =cut
 

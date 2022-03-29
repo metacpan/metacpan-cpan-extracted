@@ -1,12 +1,14 @@
 package NIST::NVD::Store::DB_File;
 
+use Test::More;
+
 use NIST::NVD::Store::Base;
 use base qw{NIST::NVD::Store::Base};
 
 use warnings;
 use strict;
 
-our $VERSION = '1.00.00';
+our $VERSION = '1.02.01';
 
 use Carp;
 
@@ -95,7 +97,6 @@ sub new {
 
 sub get_cve_for_cpe {
     my ( $self, %args ) = @_;
-
     my $frozen;
 
     my $result = $self->{'idx_cpe.db'}->get( $args{cpe}, $frozen );
@@ -157,7 +158,6 @@ sub get_cve {
 
 sub put_cve_idx_cpe {
     my ( $self, $vuln_software ) = @_;
-
     foreach my $cpe_urn ( keys %$vuln_software ) {
         my $frozen;
 

@@ -24,136 +24,136 @@ Inherits methods from:
 
 =head2 all
 
-Stat.all() -> I<Obj>
+    Stat.all()
 
-Return the
+Returns the
 
 =cut
 
 =head2 atime
 
-Stat.atime() -> I<Obj>
+    Stat.atime()
 
-Return the
+Returns the
 
 =cut
 
 =head2 blksize
 
-Stat.blksize() -> I<Obj>
+    Stat.blksize()
 
-Return the
+Returns the
 
 =cut
 
 =head2 blocks
 
-Stat.blocks() -> I<Obj>
+    Stat.blocks()
 
-Return the
+Returns the
 
 =cut
 
 =head2 ctime
 
-Stat.ctime() -> I<Obj>
+    Stat.ctime()
 
-Return the
+Returns the
 
 =cut
 
 =head2 dev
 
-Stat.dev() -> I<Obj>
+    Stat.dev()
 
-Return the
+Returns the
 
 =cut
 
 =head2 gid
 
-Stat.gid() -> I<Obj>
+    Stat.gid()
 
-Return the
+Returns the
 
 =cut
 
 =head2 ino
 
-Stat.ino() -> I<Obj>
+    Stat.ino()
 
-Return the
+Returns the
 
 =cut
 
 =head2 lstat
 
-Stat.lstat() -> I<Obj>
+    Stat.lstat()
 
-Return the
+Returns the
 
 =cut
 
 =head2 mode
 
-Stat.mode() -> I<Obj>
+    Stat.mode()
 
-Return the
+Returns the
 
 =cut
 
 =head2 mtime
 
-Stat.mtime() -> I<Obj>
+    Stat.mtime()
 
-Return the
+Returns the
 
 =cut
 
 =head2 nlink
 
-Stat.nlink() -> I<Obj>
+    Stat.nlink()
 
-Return the
+Returns the
 
 =cut
 
 =head2 parent
 
-Stat.parent() -> I<Obj>
+    Stat.parent()
 
-Return the
+Returns the
 
 =cut
 
 =head2 rdev
 
-Stat.rdev() -> I<Obj>
+    Stat.rdev()
 
-Return the
+Returns the
 
 =cut
 
 =head2 size
 
-Stat.size() -> I<Obj>
+    Stat.size()
 
-Return the
+Returns the
 
 =cut
 
 =head2 stat
 
-Stat.stat() -> I<Obj>
+    Stat.stat()
 
-Return the
+Returns the
 
 =cut
 
 =head2 uid
 
-Stat.uid() -> I<Obj>
+    Stat.uid()
 
-Return the
+Returns the
 
 =cut

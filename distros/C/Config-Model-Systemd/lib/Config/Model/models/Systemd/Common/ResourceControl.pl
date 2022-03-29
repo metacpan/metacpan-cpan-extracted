@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-Systemd
 #
-# This software is Copyright (c) 2008-2021 by Dominique Dumont.
+# This software is Copyright (c) 2008-2022 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -84,10 +84,10 @@ and L<CFS
 Scheduler|https://www.kernel.org/doc/html/latest/scheduler/sched-design-CFS.html>.  The available CPU time is split up among all units within one slice relative to
 their CPU time weight. A higher weight means more CPU time, a lower weight means less.
 
-While C<StartupCPUWeight> only applies to the startup phase of the system,
+While C<StartupCPUWeight> applies to the startup and shutdown phases of the system,
 C<CPUWeight> applies to normal runtime of the system, and if the former is not set also to
-the startup phase. Using C<StartupCPUWeight> allows prioritizing specific services at
-boot-up differently than during normal runtime.
+the startup and shutdown phases. Using C<StartupCPUWeight> allows prioritizing specific services at
+boot-up and shutdown differently than during normal runtime.
 
 These settings replace C<CPUShares> and C<StartupCPUShares>.',
         'max' => '10000',
@@ -106,10 +106,10 @@ and L<CFS
 Scheduler|https://www.kernel.org/doc/html/latest/scheduler/sched-design-CFS.html>.  The available CPU time is split up among all units within one slice relative to
 their CPU time weight. A higher weight means more CPU time, a lower weight means less.
 
-While C<StartupCPUWeight> only applies to the startup phase of the system,
+While C<StartupCPUWeight> applies to the startup and shutdown phases of the system,
 C<CPUWeight> applies to normal runtime of the system, and if the former is not set also to
-the startup phase. Using C<StartupCPUWeight> allows prioritizing specific services at
-boot-up differently than during normal runtime.
+the startup and shutdown phases. Using C<StartupCPUWeight> allows prioritizing specific services at
+boot-up and shutdown differently than during normal runtime.
 
 These settings replace C<CPUShares> and C<StartupCPUShares>.',
         'max' => '10000',
@@ -125,6 +125,7 @@ These settings replace C<CPUShares> and C<StartupCPUShares>.',
 available on one CPU. Use values > 100% for allotting CPU time on more than one CPU. This controls the
 C<cpu.max> attribute on the unified control group hierarchy and
 C<cpu.cfs_quota_us> on legacy. For details about these control group attributes, see L<Control Groups v2|https://www.kernel.org/doc/html/latest/admin-guide/cgroup-v2.html> and L<sched-bwc.txt|https://www.kernel.org/doc/Documentation/scheduler/sched-bwc.txt>.
+Setting C<CPUQuota> to an empty value unsets the quota.
 
 Example: C<CPUQuota=20%> ensures that the executed processes will never get more than
 20% CPU time on one CPU.',
@@ -153,8 +154,32 @@ Example: C<CPUQuotaPeriodSec=10ms> to request that the CPU quota is measured in 
         'description' => 'Restrict processes to be executed on specific CPUs. Takes a list of CPU indices or ranges separated by either
 whitespace or commas. CPU ranges are specified by the lower and upper CPU indices separated by a dash.
 
-Setting C<AllowedCPUs> doesn\'t guarantee that all of the CPUs will be used by the processes
-as it may be limited by parent units. The effective configuration is reported as C<EffectiveCPUs>.
+Setting C<AllowedCPUs> or C<StartupAllowedCPUs> doesn\'t guarantee that all
+of the CPUs will be used by the processes as it may be limited by parent units. The effective configuration is
+reported as C<EffectiveCPUs>.
+
+While C<StartupAllowedCPUs> applies to the startup and shutdown phases of the system,
+C<AllowedCPUs> applies to normal runtime of the system, and if the former is not set also to
+the startup and shutdown phases. Using C<StartupAllowedCPUs> allows prioritizing specific services at
+boot-up and shutdown differently than during normal runtime.
+
+This setting is supported only with the unified control group hierarchy.',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'StartupAllowedCPUs',
+      {
+        'description' => 'Restrict processes to be executed on specific CPUs. Takes a list of CPU indices or ranges separated by either
+whitespace or commas. CPU ranges are specified by the lower and upper CPU indices separated by a dash.
+
+Setting C<AllowedCPUs> or C<StartupAllowedCPUs> doesn\'t guarantee that all
+of the CPUs will be used by the processes as it may be limited by parent units. The effective configuration is
+reported as C<EffectiveCPUs>.
+
+While C<StartupAllowedCPUs> applies to the startup and shutdown phases of the system,
+C<AllowedCPUs> applies to normal runtime of the system, and if the former is not set also to
+the startup and shutdown phases. Using C<StartupAllowedCPUs> allows prioritizing specific services at
+boot-up and shutdown differently than during normal runtime.
 
 This setting is supported only with the unified control group hierarchy.',
         'type' => 'leaf',
@@ -166,9 +191,33 @@ This setting is supported only with the unified control group hierarchy.',
 or ranges separated by either whitespace or commas. Memory NUMA nodes ranges are specified by the lower and upper
 NUMA nodes indices separated by a dash.
 
-Setting C<AllowedMemoryNodes> doesn\'t guarantee that all of the memory NUMA nodes will
-be used by the processes as it may be limited by parent units. The effective configuration is reported as
-C<EffectiveMemoryNodes>.
+Setting C<AllowedMemoryNodes> or C<StartupAllowedMemoryNodes> doesn\'t
+guarantee that all of the memory NUMA nodes will be used by the processes as it may be limited by parent units.
+The effective configuration is reported as C<EffectiveMemoryNodes>.
+
+While C<StartupAllowedMemoryNodes> applies to the startup and shutdown phases of the system,
+C<AllowedMemoryNodes> applies to normal runtime of the system, and if the former is not set also to
+the startup and shutdown phases. Using C<StartupAllowedMemoryNodes> allows prioritizing specific services at
+boot-up and shutdown differently than during normal runtime.
+
+This setting is supported only with the unified control group hierarchy.',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'StartupAllowedMemoryNodes',
+      {
+        'description' => 'Restrict processes to be executed on specific memory NUMA nodes. Takes a list of memory NUMA nodes indices
+or ranges separated by either whitespace or commas. Memory NUMA nodes ranges are specified by the lower and upper
+NUMA nodes indices separated by a dash.
+
+Setting C<AllowedMemoryNodes> or C<StartupAllowedMemoryNodes> doesn\'t
+guarantee that all of the memory NUMA nodes will be used by the processes as it may be limited by parent units.
+The effective configuration is reported as C<EffectiveMemoryNodes>.
+
+While C<StartupAllowedMemoryNodes> applies to the startup and shutdown phases of the system,
+C<AllowedMemoryNodes> applies to normal runtime of the system, and if the former is not set also to
+the startup and shutdown phases. Using C<StartupAllowedMemoryNodes> allows prioritizing specific services at
+boot-up and shutdown differently than during normal runtime.
 
 This setting is supported only with the unified control group hierarchy.',
         'type' => 'leaf',
@@ -344,12 +393,12 @@ Interface Files|https://www.kernel.org/doc/html/latest/admin-guide/cgroup-v2.htm
 relative to their block I/O weight. A higher weight means more I/O bandwidth, a lower weight means
 less.
 
-While C<StartupIOWeight> only applies
-to the startup phase of the system,
+While C<StartupIOWeight> applies
+to the startup and shutdown phases of the system,
 C<IOWeight> applies to the later runtime of
 the system, and if the former is not set also to the startup
-phase. This allows prioritizing specific services at boot-up
-differently than during runtime.
+and shutdown phases. This allows prioritizing specific services at boot-up
+and shutdown differently than during runtime.
 
 These settings replace C<BlockIOWeight> and C<StartupBlockIOWeight>
 and disable settings prefixed with C<BlockIO> or C<StartupBlockIO>.',
@@ -366,12 +415,12 @@ Interface Files|https://www.kernel.org/doc/html/latest/admin-guide/cgroup-v2.htm
 relative to their block I/O weight. A higher weight means more I/O bandwidth, a lower weight means
 less.
 
-While C<StartupIOWeight> only applies
-to the startup phase of the system,
+While C<StartupIOWeight> applies
+to the startup and shutdown phases of the system,
 C<IOWeight> applies to the later runtime of
 the system, and if the former is not set also to the startup
-phase. This allows prioritizing specific services at boot-up
-differently than during runtime.
+and shutdown phases. This allows prioritizing specific services at boot-up
+and shutdown differently than during runtime.
 
 These settings replace C<BlockIOWeight> and C<StartupBlockIOWeight>
 and disable settings prefixed with C<BlockIO> or C<StartupBlockIO>.',
@@ -896,6 +945,51 @@ Examples:
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
+      'RestrictNetworkInterfaces',
+      {
+        'description' => 'Takes a list of space-separated network interface names. This option restricts the network
+interfaces that processes of this unit can use. By default processes can only use the network interfaces
+listed (allow-list). If the first character of the rule is C<~>, the effect is inverted:
+the processes can only use network interfaces not listed (deny-list).
+
+This option can appear multiple times, in which case the network interface names are merged. If the
+empty string is assigned the set is reset, all prior assignments will have not effect.
+
+If you specify both types of this option (i.e. allow-listing and deny-listing), the first encountered
+will take precedence and will dictate the default action (allow vs deny). Then the next occurrences of this
+option will add or delete the listed network interface names from the set, depending of its type and the
+default action.
+
+The loopback interface ("lo") is not treated in any special way, you have to configure it explicitly
+in the unit file.
+
+Example 1: allow-list
+
+
+    RestrictNetworkInterfaces=eth1
+    RestrictNetworkInterfaces=eth2
+
+Programs in the unit will be only able to use the eth1 and eth2 network
+interfaces.
+
+Example 2: deny-list
+
+
+    RestrictNetworkInterfaces=~eth1 eth2
+
+Programs in the unit will be able to use any network interface but eth1 and eth2.
+
+Example 3: mixed
+
+
+    RestrictNetworkInterfaces=eth1 eth2
+    RestrictNetworkInterfaces=~eth1
+
+Programs in the unit will be only able to use the eth2 network interface.
+',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
       'DeviceAllow',
       {
         'cargo' => {
@@ -910,6 +1004,10 @@ writing, or creation of the specific device node(s) by the unit
 C<devices.allow> control group attribute. For details about this control group
 attribute, see L<Device Whitelist Controller|https://www.kernel.org/doc/html/latest/admin-guide/cgroup-v1/devices.html>.
 In the unified cgroup hierarchy this functionality is implemented using eBPF filtering.
+
+When access to all physical devices should be disallowed,
+C<PrivateDevices> may be used instead. See
+L<systemd.exec(5)>.
 
 The device node specifier is either a path to a device node in the file system, starting with
 C</dev/>, or a string starting with either C<char-> or
@@ -1146,10 +1244,10 @@ value and control the C<cpu.shares> control group attribute. The allowed range i
 The available CPU time is split up among all units within one slice relative to their CPU time share
 weight.
 
-While C<StartupCPUShares> only applies to the startup phase of the system,
+While C<StartupCPUShares> applies to the startup and shutdown phases of the system,
 C<CPUShares> applies to normal runtime of the system, and if the former is not set also to
-the startup phase. Using C<StartupCPUShares> allows prioritizing specific services at
-boot-up differently than during normal runtime.
+the startup and shutdown phases. Using C<StartupCPUShares> allows prioritizing specific services at
+boot-up and shutdown differently than during normal runtime.
 
 Implies C<CPUAccounting=yes>.
 
@@ -1169,10 +1267,10 @@ value and control the C<cpu.shares> control group attribute. The allowed range i
 The available CPU time is split up among all units within one slice relative to their CPU time share
 weight.
 
-While C<StartupCPUShares> only applies to the startup phase of the system,
+While C<StartupCPUShares> applies to the startup and shutdown phases of the system,
 C<CPUShares> applies to normal runtime of the system, and if the former is not set also to
-the startup phase. Using C<StartupCPUShares> allows prioritizing specific services at
-boot-up differently than during normal runtime.
+the startup and shutdown phases. Using C<StartupCPUShares> allows prioritizing specific services at
+boot-up and shutdown differently than during normal runtime.
 
 Implies C<CPUAccounting=yes>.
 
@@ -1228,11 +1326,11 @@ The available I/O bandwidth is split up among all units within one slice relativ
 weight.
 
 While C<StartupBlockIOWeight> only
-applies to the startup phase of the system,
+applies to the startup and shutdown phases of the system,
 C<BlockIOWeight> applies to the later runtime
 of the system, and if the former is not set also to the
-startup phase. This allows prioritizing specific services at
-boot-up differently than during runtime.
+startup and shutdown phases. This allows prioritizing specific services at
+boot-up and shutdown differently than during runtime.
 
 Implies
 C<BlockIOAccounting=yes>.
@@ -1252,11 +1350,11 @@ The available I/O bandwidth is split up among all units within one slice relativ
 weight.
 
 While C<StartupBlockIOWeight> only
-applies to the startup phase of the system,
+applies to the startup and shutdown phases of the system,
 C<BlockIOWeight> applies to the later runtime
 of the system, and if the former is not set also to the
-startup phase. This allows prioritizing specific services at
-boot-up differently than during runtime.
+startup and shutdown phases. This allows prioritizing specific services at
+boot-up and shutdown differently than during runtime.
 
 Implies
 C<BlockIOAccounting=yes>.
@@ -1326,7 +1424,7 @@ C<IOWriteBandwidthMax> instead.',
         'value_type' => 'uniline'
       }
     ],
-    'generated_by' => 'parse-man.pl from systemd 249 doc',
+    'generated_by' => 'parse-man.pl from systemd 250 doc',
     'license' => 'LGPLv2.1+',
     'name' => 'Systemd::Common::ResourceControl'
   }

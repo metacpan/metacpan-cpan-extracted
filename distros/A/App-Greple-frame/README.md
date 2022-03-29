@@ -24,14 +24,21 @@ lines into a single block.  If you don't like this, override it by
 
     Set frame options.
 
-    Put next line in your `~/.greplerc` to autoload **App::Greple::frame** module.
+- **--frame-fold**
 
-        autoload -Mframe --frame
+    Set frame and fold long lines with frame-friendly prefix string.
+    Folding width is taken from terminal.  If you want to use different
+    width, use **ansifold** command by yourself.
 
-    Then you can use **--frame** option whenever you want.
+Put next line in your `~/.greplerc` to autoload **App::Greple::frame** module.
+
+    autoload -Mframe --frame --frame-fold
+
+Then you can use **--frame** and **--frame-fold** option whenever you
+want.
 
 <div>
-    <p><img width="75%" src="https://github.com/kaz-utashiro/greple-frame/blob/main/images/terminal-small.png">
+    <p><img width="75%" src="https://raw.githubusercontent.com/kaz-utashiro/greple-frame/main/images/terminal-small.png">
 </div>
 
 # AUTHOR

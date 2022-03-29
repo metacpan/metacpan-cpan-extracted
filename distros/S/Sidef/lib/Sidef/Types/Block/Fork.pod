@@ -17,9 +17,9 @@ var obj = Fork(...)
 
 =head2 get
 
-Fork.get() -> I<Obj>
+    Fork.get()
 
-Return the
+Returns the
 
 Aliases: I<join>, I<wait>
 
@@ -27,16 +27,16 @@ Aliases: I<join>, I<wait>
 
 =head2 kill
 
-Fork.kill() -> I<Obj>
+    Fork.kill()
 
-Return the
+Returns the
 
 =cut
 
 =head2 new
 
-Fork.new() -> I<Obj>
+    Fork.new()
 
-Return the
+Returns the
 
 =cut

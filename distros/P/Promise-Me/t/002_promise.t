@@ -5,18 +5,13 @@ BEGIN
     use warnings;
     use lib './lib';
     use Test2::IPC;
-    use File::Spec ();
     use Module::Generic::File qw( file tempfile sys_tmpdir );
-    # use Nice::Try debug_file => './dev/t_promise.log', debug => 4, debug_code => 1;
     use Nice::Try;
-    # use Test::More tests => 4;
-    # use Test2::Bundle::More;
     use Test2::V0;
     use Time::HiRes;
     use Promise::Me qw( :all );
-    # For debugging only
-    # use Devel::Confess;
     our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
+    # $Promise::Me::SHARE_MEDIUM = 'file';
 };
 
 use warnings 'Promise::Me';
@@ -44,7 +39,7 @@ $prom->then(sub
 
 Promise::Me->new(sub
 {
-    diag( "Dying..." ) if( $DEBUG );
+    diag( "Dying on purpose..." ) if( $DEBUG );
     die( "Oh my!\n" );
 }, { share_auto_destroy => $DESTROY_SHARED_MEM })->then(sub
 {
@@ -80,7 +75,8 @@ subtest 'concurrency' => sub
         $file->append( "concurrency 1\n" );
     }, { debug => $DEBUG })->then(sub
     {
-        isa_ok( $_[0], ['Module::Generic::File'] );
+        diag( "[P1] Parameter received is '", overload::StrVal( $_[0] ), "'" ) if( $DEBUG );
+        isa_ok( $_[0], ['Module::Generic::File'], "[P1] PID $$: Value passed to then is an object file" );
     })->catch(sub
     {
         fail( 'concurrency test 1 with error: ' . $_[0] );
@@ -98,11 +94,12 @@ subtest 'concurrency' => sub
         $file->append( "concurrency 2\n" );
     }, { debug => $DEBUG, timeout => 2 })->then(sub
     {
-        isa_ok( $_[0], ['Module::Generic::File'] );
+        diag( "[P2] Parameter received is '", overload::StrVal( $_[0] ), "'" ) if( $DEBUG );
+        isa_ok( $_[0], ['Module::Generic::File'], "[P2] PID $$: Value passed to then #1 is an object file" );
         $_[0];
     })->then(sub
     {
-        isa_ok( $_[0], ['Module::Generic::File'] );
+        isa_ok( $_[0], ['Module::Generic::File'], "[P2] PID $$: Value passed to then #2 is an object file" );
     })->catch(sub
     {
         fail( 'concurrency test 2 with error: ' . $_[0] );
@@ -110,8 +107,9 @@ subtest 'concurrency' => sub
     #})->wait;
     
     diag( "Awaiting promise 1 and 2" ) if( $DEBUG );
-    await( $p1, $p2 );
+    my @res = await( $p1, $p2 );
     diag( "Result now is '$result'" ) if( $DEBUG );
+    diag( "await() retuned the following values '", join( "', '", map( ( ref( $_ ) eq 'ARRAY' ? @$_ : $_ ), @res ) ), "'." ) if( $DEBUG );
     is( $result, "concurrency 2\nconcurrency 1\n", 'concurrency' );
     
     $f = file( $tmpfile );

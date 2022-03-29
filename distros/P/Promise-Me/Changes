@@ -1,10 +1,14 @@
 Revision history for Perl module Promise::Me
 
-v0.1.2 2021-10-07T22:21:38+0900
+v0.2.0 2022-03-18T21:26:23+0900
+    - Add support for shared cache file if shared memory is not supported or desired
+    - Corrected a bug when terminating shared variable space in END block
+
+v0.1.2 2021-10-07T22:21:38Z +0900
     - Documentation improvement
 
-v0.1.1 2021-06-20T12:11:08+0900
+v0.1.1 2021-06-20T12:11:08Z +0900
     - Correcting typos in the documentation
 
-v0.1.0 2021-06-20T10:06:37+0900
+v0.1.0 2021-06-20T10:06:37Z +0900
     - initial release

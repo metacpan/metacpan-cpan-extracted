@@ -8,7 +8,7 @@ package Sidef::Types::Number::Gauss {
 
     use parent qw(
       Sidef::Types::Number::Number
-      );
+    );
 
     use overload
       q{bool} => sub { (@_) = ($_[0]); goto &__boolify__ },
@@ -19,68 +19,76 @@ package Sidef::Types::Number::Gauss {
     sub new {
         my (undef, $real, $imag) = @_;
 
+        # Handle evaluation of polynomials
+        if (ref($_[0]) eq __PACKAGE__) {
+            return $_[0]->eval($real);
+        }
+
         $real //= Sidef::Types::Number::Number::ZERO;
         $imag //= Sidef::Types::Number::Number::ZERO;
 
         $real = Sidef::Types::Number::Number->new($real) if !UNIVERSAL::isa($real, 'Sidef::Types::Number::Number');
         $imag = Sidef::Types::Number::Number->new($imag) if !UNIVERSAL::isa($imag, 'Sidef::Types::Number::Number');
 
-        bless {re => $real, im => $imag};
+        bless {a => $real, b => $imag};
     }
 
     *call = \&new;
 
-    sub _valid {
-        foreach (@_) {
-            if (ref($$_) ne __PACKAGE__) {
-                $$_ = __PACKAGE__->new($$_->to_n);
-            }
-        }
+    sub eval {
+        my ($x, $v) = @_;
+        __PACKAGE__->new($x->{a}->eval($v), $x->{b}->eval($v));
     }
 
     sub i {
         my ($x) = @_;
 
         if (ref($x) eq __PACKAGE__) {    # (a+bi)*i = -b + a*i
-            return __PACKAGE__->new($x->{im}->neg, $x->{re});
+            return __PACKAGE__->new($x->{b}->neg, $x->{a});
         }
 
         __PACKAGE__->new(Sidef::Types::Number::Number::ZERO, Sidef::Types::Number::Number::ONE);
     }
 
     sub to_c {
-        Sidef::Types::Number::Complex->new($_[0]->{re}, $_[0]->{im});
+        Sidef::Types::Number::Complex->new($_[0]->{a}, $_[0]->{b});
     }
 
     *to_n = \&to_c;
 
     sub re {
-        $_[0]->{re};
+        $_[0]->{a};
     }
 
+    *a    = \&re;
     *real = \&re;
 
     sub im {
-        $_[0]->{im};
+        $_[0]->{b};
     }
 
+    *b    = \&im;
     *imag = \&im;
 
     sub reals {
-        ($_[0]->{re}, $_[0]->{im});
+        ($_[0]->{a}, $_[0]->{b});
+    }
+
+    sub parts {
+        Sidef::Types::Array::Array->new($_[0]->reals);
     }
 
     sub __boolify__ {
-        $_[0]->{re};
+        $_[0]->{a};
     }
 
     sub __numify__ {
-        $_[0]->{re};
+        $_[0]->{a};
     }
 
     sub __stringify__ {
         my ($x) = @_;
-        '(' . join(', ', $x->{re}->dump, $x->{im}->dump) . ')';
+        'Gauss(' . join(', ', $x->{a}->dump, $x->{b}->dump) . ')';
     }
 
     sub to_s {
@@ -90,22 +98,22 @@ package Sidef::Types::Number::Gauss {
 
     sub dump {
         my ($x) = @_;
-        Sidef::Types::String::String->new('Gauss' . $x->__stringify__);
+        Sidef::Types::String::String->new($x->__stringify__);
     }
 
     sub abs {
         my ($x) = @_;
-        $x->{re}->sqr->add($x->{im}->sqr)->sqrt;
+        $x->{a}->sqr->add($x->{b}->sqr)->sqrt;
     }
 
     sub iabs {
         my ($x) = @_;
-        $x->{re}->sqr->add($x->{im}->sqr)->isqrt;
+        $x->{a}->sqr->add($x->{b}->sqr)->isqrt;
     }
 
     sub norm {
         my ($x) = @_;
-        $x->{re}->sqr->add($x->{im}->sqr);
+        $x->{a}->sqr->add($x->{b}->sqr);
     }
 
     sub sgn {
@@ -115,115 +123,141 @@ package Sidef::Types::Number::Gauss {
 
     sub neg {
         my ($x) = @_;
-        __PACKAGE__->new($x->{re}->neg, $x->{im}->neg);
+        __PACKAGE__->new($x->{a}->neg, $x->{b}->neg);
     }
 
     sub conj {
         my ($x) = @_;
-        __PACKAGE__->new($x->{re}, $x->{im}->neg);
+        __PACKAGE__->new($x->{a}, $x->{b}->neg);
     }
 
     sub add {
         my ($x, $y) = @_;
-        _valid(\$y);
-        __PACKAGE__->new(Sidef::Types::Number::Number::complex_add($x->{re}, $x->{im}, $y->{re}, $y->{im}));
+
+        if (ref($y) eq __PACKAGE__) {
+            return __PACKAGE__->new($x->{a}->add($y->{a}), $x->{b}->add($y->{b}));
+        }
+
+        __PACKAGE__->new($x->{a}->add($y), $x->{b});
     }
 
     sub sub {
         my ($x, $y) = @_;
-        _valid(\$y);
-        __PACKAGE__->new(Sidef::Types::Number::Number::complex_sub($x->{re}, $x->{im}, $y->{re}, $y->{im}));
+
+        if (ref($y) eq __PACKAGE__) {
+            return __PACKAGE__->new($x->{a}->sub($y->{a}), $x->{b}->sub($y->{b}));
+        }
+
+        __PACKAGE__->new($x->{a}->sub($y), $x->{b});
     }
 
     sub mul {
         my ($x, $y) = @_;
-        _valid(\$y);
-        __PACKAGE__->new(Sidef::Types::Number::Number::complex_mul($x->{re}, $x->{im}, $y->{re}, $y->{im}));
+
+        if (ref($y) eq __PACKAGE__) {
+            return
+              __PACKAGE__->new($x->{a}->mul($y->{a})->sub($x->{b}->mul($y->{b})),
+                               $x->{a}->mul($y->{b})->add($x->{b}->mul($y->{a})));
+        }
+
+        __PACKAGE__->new($x->{a}->mul($y), $x->{b}->mul($y));
+    }
+
+    sub sqr {
+        my ($x) = @_;
+        my $t = $x->{a}->mul($x->{b});
+        __PACKAGE__->new($x->{a}->sqr->sub($x->{b}->sqr), $t->add($t));
+    }
+
+    sub inv {
+        my ($x) = @_;
+        my $t = $x->{a}->sqr->add($x->{b}->sqr);
+        __PACKAGE__->new($x->{a}->div($t), $x->{b}->neg->div($t),);
+    }
+
+    sub invmod {
+        my ($x, $m) = @_;
+        $x->mod($m);
+        my $t = $x->{a}->sqr->add($x->{b}->sqr)->invmod($m);
+        __PACKAGE__->new($x->{a}->mul($t)->mod($m), $x->{b}->neg->mul($t)->mod($m),);
     }
 
     sub div {
         my ($x, $y) = @_;
-        _valid(\$y);
-        __PACKAGE__->new(Sidef::Types::Number::Number::complex_div($x->{re}, $x->{im}, $y->{re}, $y->{im}));
+        $x->mul($y->inv);
     }
 
     sub float {
         my ($x) = @_;
-        __PACKAGE__->new($x->{re}->float, $x->{im}->float);
+        __PACKAGE__->new($x->{a}->float, $x->{b}->float);
     }
 
     sub floor {
         my ($x) = @_;
-        __PACKAGE__->new($x->{re}->floor, $x->{im}->floor);
+        __PACKAGE__->new($x->{a}->floor, $x->{b}->floor);
     }
 
     sub ceil {
         my ($x) = @_;
-        __PACKAGE__->new($x->{re}->ceil, $x->{im}->ceil);
+        __PACKAGE__->new($x->{a}->ceil, $x->{b}->ceil);
     }
 
     sub round {
         my ($x, $r) = @_;
-        __PACKAGE__->new($x->{re}->round($r), $x->{im}->round($r));
+        __PACKAGE__->new($x->{a}->round($r), $x->{b}->round($r));
     }
 
     sub mod {
         my ($x, $y) = @_;
 
         if (ref($y) eq 'Sidef::Types::Number::Number') {
-            return __PACKAGE__->new(Sidef::Types::Number::Number::complex_mod($x->{re}, $x->{im}, $y));
+            return __PACKAGE__->new($x->{a}->mod($y), $x->{b}->mod($y),);
         }
 
         # mod(a, b) = a - b * floor(a/b)
         $x->sub($y->mul($x->div($y)->floor));
     }
 
-    sub inv {
-        my ($x) = @_;
-        __PACKAGE__->new(Sidef::Types::Number::Number::complex_inv($x->{re}, $x->{im}));
-    }
-
     sub is_prime {
         my ($x) = @_;
-        Sidef::Types::Number::Number::is_gaussian_prime($x->{re}, $x->{im});
+        Sidef::Types::Number::Number::is_gaussian_prime($x->{a}, $x->{b});
     }
 
     sub is_zero {
         my ($x) = @_;
-        my $bool = $x->{re}->is_zero;
+        my $bool = $x->{a}->is_zero;
         $bool || return $bool;
-        $x->{im}->is_zero;
+        $x->{b}->is_zero;
     }
 
     sub is_one {
         my ($x) = @_;
-        my $bool = $x->{im}->is_zero;
+        my $bool = $x->{b}->is_zero;
         $bool || return $bool;
-        $x->{re}->is_one;
+        $x->{a}->is_one;
     }
 
     sub is_mone {
         my ($x) = @_;
-        my $bool = $x->{im}->is_zero;
+        my $bool = $x->{b}->is_zero;
         $bool || return $bool;
-        $x->{re}->is_mone;
+        $x->{a}->is_mone;
     }
 
     sub is_real {
         my ($x) = @_;
-        $x->{im}->is_zero;
+        $x->{b}->is_zero;
     }
 
     sub is_imag {
         my ($x) = @_;
-        my $bool = $x->{im}->is_zero;
+        my $bool = $x->{b}->is_zero;
         $bool && return $bool->not;
-        $x->{re}->is_zero;
+        $x->{a}->is_zero;
     }
 
     sub gcd {
         my ($n, $k) = @_;
-        _valid(\$k);
 
         my $norm_n = $n->norm;
         my $norm_k = $k->norm;
@@ -233,6 +267,8 @@ package Sidef::Types::Number::Gauss {
         }
 
         until ($k->is_zero) {
+
+            last if ($n->is_nan or $k->is_nan);
 
             my $q = $n->div($k)->round;
             my $r = $n->sub($q->mul($k));
@@ -245,78 +281,122 @@ package Sidef::Types::Number::Gauss {
 
     sub gcd_norm {
         my ($n, $k) = @_;
-        _valid(\$k);
         $n->norm->gcd($k->norm);
     }
 
     sub is_coprime {
         my ($n, $k) = @_;
-        _valid(\$k);
         $n->norm->gcd($k->norm)->is_one;
-    }
-
-    sub ratmod {
-        my ($x, $m) = @_;
-        __PACKAGE__->new($x->{re}->ratmod($m), $x->{im}->ratmod($m));
-    }
-
-    sub invmod {
-        my ($x, $m) = @_;
-        __PACKAGE__->new(Sidef::Types::Number::Number::complex_invmod($x->{re}, $x->{im}, $m));
     }
 
     sub inc {
         my ($x) = @_;
-        __PACKAGE__->new($x->{re}->inc, $x->{im});
+        __PACKAGE__->new($x->{a}->inc, $x->{b});
     }
 
     sub dec {
         my ($x) = @_;
-        __PACKAGE__->new($x->{re}->dec, $x->{im});
+        __PACKAGE__->new($x->{a}->dec, $x->{b});
     }
 
     sub pow {
         my ($x, $n) = @_;
-        __PACKAGE__->new(Sidef::Types::Number::Number::complex_pow($x->{re}, $x->{im}, $n));
+
+        my $negative_power = 0;
+
+        if ($n->is_neg) {
+            $n              = $n->abs;
+            $negative_power = 1;
+        }
+
+        my $c = __PACKAGE__->new(Sidef::Types::Number::Number::ONE);
+
+        foreach my $bit (reverse split(//, $n->as_bin)) {
+
+            # c *= x if bit
+            # x *= x
+
+            $c = $c->mul($x) if $bit;
+            $x = $x->sqr;
+        }
+
+        if ($negative_power) {
+            $c = $c->inv;
+        }
+
+        return $c;
     }
 
     sub powmod {
         my ($x, $n, $m) = @_;
-        __PACKAGE__->new(Sidef::Types::Number::Number::complex_powmod($x->{re}, $x->{im}, $n, $m));
+
+        $x = $x->mod($m);
+
+        my $negative_power = 0;
+
+        if ($n->is_neg) {
+            $n              = $n->abs;
+            $negative_power = 1;
+        }
+
+        my $c = __PACKAGE__->new(Sidef::Types::Number::Number::ONE);
+
+        foreach my $bit (reverse split(//, $n->as_bin)) {
+
+            # c = (c*x)%m if bit
+            # x = (x*x)%m
+
+            $c = $c->mul($x)->mod($m) if $bit;
+            $x = $x->sqr->mod($m);
+        }
+
+        if ($negative_power) {
+            $c = $c->invmod($m);
+        }
+
+        return $c;
     }
 
     sub cmp {
         my ($x, $y) = @_;
-        _valid(\$y);
-        Sidef::Types::Number::Number::complex_cmp($x->{re}, $x->{im}, $y->{re}, $y->{im});
+
+        if (ref($y) eq __PACKAGE__) {
+            my $cmp = $x->{a}->cmp($y->{a}) // return undef;
+            $cmp && return $cmp;
+            return $x->{b}->cmp($y->{b});
+        }
+
+        my $cmp = $x->{a}->cmp($y) // return undef;
+        $cmp && return $cmp;
+        $x->{b}->cmp(Sidef::Types::Number::Number::ZERO);
     }
 
     sub eq {
         my ($x, $y) = @_;
 
         if (ref($y) eq __PACKAGE__) {
-            my $bool = $x->{re}->eq($y->{re});
+            my $bool = $x->{a}->eq($y->{a});
             $bool || return $bool;
-            return $x->{im}->eq($y->{im});
+            return $x->{b}->eq($y->{b});
         }
 
-        my $bool = $x->{re}->eq($y);
+        my $bool = $x->{a}->eq($y);
         $bool || return $bool;
-        $x->{im}->is_zero;
+        $x->{b}->is_zero;
     }
 
     sub ne {
         my ($x, $y) = @_;
 
         if (ref($y) eq __PACKAGE__) {
-            my $bool = $x->{re}->ne($y->{re});
+            my $bool = $x->{a}->ne($y->{a});
             $bool && return $bool;
-            return $x->{im}->ne($y->{im});
+            return $x->{b}->ne($y->{b});
         }
 
-        my $bool = $x->{re}->ne($y);
+        my $bool = $x->{a}->ne($y);
         $bool && return $bool;
-        $x->{im}->is_zero->not;
+        $x->{b}->is_zero->not;
     }
 
     sub shift_left {    # x * 2^n
@@ -339,17 +419,19 @@ package Sidef::Types::Number::Gauss {
         foreach my $method (qw(ge gt lt le)) {
             *{__PACKAGE__ . '::' . $method} = sub {
                 my ($x, $y) = @_;
-                _valid(\$y);
-                (Sidef::Types::Number::Number::complex_cmp($x->{re}, $x->{im}, $y->{re}, $y->{im}) // return undef)
-                  ->$method(Sidef::Types::Number::Number::ZERO);
+                ($x->cmp($y) // return undef)->$method(Sidef::Types::Number::Number::ZERO);
             };
         }
 
         foreach my $method (qw(and xor or)) {
             *{__PACKAGE__ . '::' . $method} = sub {
                 my ($x, $y) = @_;
-                _valid(\$y);
-                __PACKAGE__->new($x->{re}->$method($y->{re}), $x->{im}->$method($y->{im}));
+
+                if (ref($y) eq __PACKAGE__) {
+                    return __PACKAGE__->new($x->{a}->$method($y->{a}), $x->{b}->$method($y->{b}));
+                }
+
+                return __PACKAGE__->new($x->{a}->$method($y), $x->{b});
             };
         }
 

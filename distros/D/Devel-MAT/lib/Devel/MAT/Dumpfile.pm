@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2019 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2022 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Dumpfile 0.45;
+package Devel::MAT::Dumpfile 0.46;
 
 use v5.14;
 use warnings;
@@ -16,6 +16,10 @@ use List::Util qw( pairmap );
 
 use Devel::MAT::SV;
 use Devel::MAT::Context;
+
+use Struct::Dumb 0.07 qw( readonly_struct );
+readonly_struct StructType => [qw( name fields )];
+readonly_struct StructField => [qw( name type )];
 
 use constant {
    PMAT_SVxMAGIC => 0x80,
@@ -210,6 +214,8 @@ sub load
       $self->{ctx_sizes} = [ map [ unpack "C C C", $_ ], @ctx_sizes ];
    }
 
+   $self->{structtypes_by_id} = {};
+
    # Roots
    foreach (qw( undef yes no )) {
       my $addr = $self->{"${_}_at"} = $self->_read_ptr;
@@ -251,6 +257,15 @@ sub load
    $self->_fixup( %args ) unless $args{no_fixup};
 
    return $self;
+}
+
+sub structtype
+{
+   my $self = shift;
+   my ( $id ) = @_;
+
+   return $self->{structtypes_by_id}{$id} //
+      croak "Dumpfile does not define a struct type of ID=$id\n";
 }
 
 sub _fixup
@@ -387,7 +402,28 @@ sub _read_sv
       my $type = $self->_read_u8;
       return if !$type;
 
-      if( $type >= 0x80 ) {
+      if( $type >= 0xF1 ) {
+         die sprintf "Unrecognised META tag %02X\n", $type;
+      }
+      elsif( $type == 0xF0 ) {
+         # META_STRUCT
+         my $id = $self->_read_uint;
+         my $nfields = $self->_read_uint;
+         my $name = $self->_read_str;
+
+         my @fields;
+         push @fields, StructField(
+            $self->_read_str,
+            $self->_read_u8,
+         ) for 1 .. $nfields;
+
+         $self->{structtypes_by_id}{$id} = StructType(
+            $name, \@fields,
+         );
+
+         next;
+      }
+      elsif( $type >= 0x80 ) {
          my $sizes = $self->{svx_sizes}[$type - 0x80];
 
          if( $self->{format_minor} == 0 and $type == PMAT_SVxMAGIC ) {
@@ -421,17 +457,21 @@ sub _read_sv
          next;
       }
 
-      my $pos = tell $self->{fh};
-
       # First read the "common" header
       my $sv = Devel::MAT::SV->new( $type, $self,
          $self->_read_bytesptrsstrs( @{ $self->{sv_sizes}[0] } )
       );
 
-      # Then the SV header
-      $sv->load(
-         $self->_read_bytesptrsstrs( @{ $self->{sv_sizes}[$type] } )
-      );
+      if( $type == 0x7F ) {
+         my $structtype = $self->structtype( $sv->structid );
+         $sv->load( $structtype->fields );
+      }
+      else {
+         my ( $bytes, $nptrs, $nstrs ) = @{ $self->{sv_sizes}[$type] };
+         $sv->load(
+            $self->_read_bytesptrsstrs( $bytes, $nptrs, $nstrs )
+         );
+      }
 
       return $sv;
    }

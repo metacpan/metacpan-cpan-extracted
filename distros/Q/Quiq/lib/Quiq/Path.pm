@@ -31,7 +31,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.200';
+our $VERSION = '1.201';
 
 use Quiq::Option;
 use Quiq::FileHandle;
@@ -264,6 +264,53 @@ sub compareData {
 {
     no warnings 'once';
     *different = \&compareData;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 convertEncoding() - Wandele Character Encoding
+
+=head4 Synopsis
+
+  $this->convertEncoding($from,$to,$file);
+
+=head4 Arguments
+
+=over 4
+
+=item $from
+
+Aktuelles Encoding der Datei
+
+=item $to
+
+Zukünftiges Encoding der Datei
+
+=item $file
+
+Datei, deren Encoding gewandelt wird
+
+=back
+
+=head4 Description
+
+Wandele das Encoding der Datei $file von Encoding $from in Encoding $to.
+Die Wandelung findet "in place" statt.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub convertEncoding {
+    my $this = shift;
+    my $from = shift;
+    my $to = shift;
+    my $file = $this->expandTilde(shift);
+
+    my $data = $this->read($file,-decode=>$from);
+    $this->write($file,$data,-encode=>$to);
+
+    return;
 }
 
 # -----------------------------------------------------------------------------
@@ -3666,7 +3713,7 @@ sub uid {
 
 =head1 VERSION
 
-1.200
+1.201
 
 =head1 AUTHOR
 

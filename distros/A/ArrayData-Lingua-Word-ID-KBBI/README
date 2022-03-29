@@ -3,9 +3,9 @@ NAME
     Bahasa Indonesia
 
 VERSION
-    This document describes version 0.003 of
+    This document describes version 0.004 of
     ArrayData::Lingua::Word::ID::KBBI (from Perl distribution
-    ArrayData-Lingua-Word-ID-KBBI), released on 2021-09-26.
+    ArrayData-Lingua-Word-ID-KBBI), released on 2022-03-27.
 
 SYNOPSIS
      use ArrayData::Lingua::Word::ID::KBBI;
@@ -74,7 +74,7 @@ CONTRIBUTING
     me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021 by perlancar <perlancar@cpan.org>.
+    This software is copyright (c) 2022 by perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

@@ -8,7 +8,7 @@ use Capture::Tiny qw /:all/;
 use File::Which qw /which/;
 use List::Util qw /uniq/;
 
-our $VERSION = '1.22';
+our $VERSION = '1.23';
 
 #  adding to global {DY}LD_LIBRARY_PATH vars is icky but seems
 #  to be needed for utilities and downstream FFI
@@ -34,12 +34,12 @@ if (eval 'require Alien::curl' && 'Alien::curl'->install_type eq 'share') {
         }
     }
 }
-if ($^O =~ /darwin/i) {
-    @DYLD_LIBRARY_PATH = grep {defined} uniq (@DYLD_LIBRARY_PATH, @ld_lib_dirs);
-}
-elsif (not $^O =~ /mswin/i) {
-    @LD_LIBRARY_PATH = grep {defined} uniq (@LD_LIBRARY_PATH, @ld_lib_dirs)
-}
+#if ($^O =~ /darwin/i) {
+#    @DYLD_LIBRARY_PATH = grep {defined} uniq (@DYLD_LIBRARY_PATH, @ld_lib_dirs);
+#}
+#elsif (not $^O =~ /mswin/i) {
+#    @LD_LIBRARY_PATH = grep {defined} uniq (@LD_LIBRARY_PATH, @ld_lib_dirs)
+#}
 
 
 sub bin_dirs {

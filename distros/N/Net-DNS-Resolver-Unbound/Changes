@@ -1,6 +1,10 @@
 Revision history for Perl extension Net::DNS::Resolver::Unbound.
 
 
+**** 1.11  Mar 28, 2022
+	Ignore unimplemented prefer-ip* options in old Unbound.
+
+
 **** 1.10  Mar 24, 2022
 	Apply Net::DNS IPv4/IPv6 preference to Unbound context.
 	Report DNSSEC status via resolver->errorstring().

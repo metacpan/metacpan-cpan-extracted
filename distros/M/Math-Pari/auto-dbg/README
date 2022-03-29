@@ -92,6 +92,16 @@ debugging.)
 (F) A more advanced example (with multiple failures possible) is in the test
     files of the Math::Pari distribution.
 
+(G) Add the debug build directories to the 'clean' setting of the call to
+    WriteMakefile(), as in
+	clean => { FILES => 'dbg-bld dbg-bldO MORE_PATTERNS' }
+
+(W) WARNING: after running ./auto-debug-module.pl, if one reruns ./Makefile.PL
+    it may be confused by the auto-debug build subdirectory.  Running
+      make realclean
+    before rerunning ./Makefile.PL should fix this. (This assumes that the 'clean'
+    target is correctly set, as explained in (G).)
+
   TO REMOTELY DEBUG YOUR DISTRIBUTION via CPAN-Testers
   ====================================================
 

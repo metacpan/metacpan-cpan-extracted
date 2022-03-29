@@ -24,17 +24,17 @@ Inherits methods from:
 
 =head2 ...
 
-I<Obj> B<...> I<Obj> -> I<Obj>
+    a ... b
 
-Return the
+Returns the
 
 =cut
 
 =head2 cap
 
-Match.cap() -> I<Obj>
+    Match.cap()
 
-Return the
+Returns the
 
 Aliases: I<to_a>, I<caps>, I<to_array>, I<captures>
 
@@ -42,25 +42,25 @@ Aliases: I<to_a>, I<caps>, I<to_array>, I<captures>
 
 =head2 dump
 
-Match.dump() -> I<Obj>
+    Match.dump()
 
-Return the
+Returns the
 
 =cut
 
 =head2 join
 
-Match.join() -> I<Obj>
+    Match.join()
 
-Return the
+Returns the
 
 =cut
 
 =head2 ncap
 
-Match.ncap() -> I<Obj>
+    Match.ncap()
 
-Return the
+Returns the
 
 Aliases: I<ncaps>, I<named_captures>
 
@@ -68,9 +68,9 @@ Aliases: I<ncaps>, I<named_captures>
 
 =head2 pos
 
-Match.pos() -> I<Obj>
+    Match.pos()
 
-Return the
+Returns the
 
 Aliases: I<match_pos>
 
@@ -78,25 +78,25 @@ Aliases: I<match_pos>
 
 =head2 regex
 
-Match.regex() -> I<Obj>
+    Match.regex()
 
-Return the
+Returns the
 
 =cut
 
 =head2 string
 
-Match.string() -> I<Obj>
+    Match.string()
 
-Return the
+Returns the
 
 =cut
 
 =head2 to_bool
 
-Match.to_bool() -> I<Obj>
+    Match.to_bool()
 
-Return the
+Returns the
 
 Aliases: I<matched>, I<is_successful>
 
@@ -104,9 +104,9 @@ Aliases: I<matched>, I<is_successful>
 
 =head2 to_s
 
-Match.to_s() -> I<Obj>
+    Match.to_s()
 
-Return the
+Returns the
 
 Aliases: I<to_str>
 

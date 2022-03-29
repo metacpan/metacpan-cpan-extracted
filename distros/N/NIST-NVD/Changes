@@ -1,5 +1,18 @@
 Revision history for NIST-NVD
 
+ 1.02.01 20220327T125818-0800 cjac@google.com
+	- now parsing JSON instead of XML.  yay.
+
+ 1.02.00 20220327T004535-0800 cjac@google.com
+	- tests are passing again
+
+ 1.01.00 20120718T1832:49-0700 cjac@f5.com
+        - branched for changes to:
+				* t/websec.t                    - create and exercise websec index
+				* bin/convert-nvdcve            - re-factor code into lib/
+				* lib/NIST/NVD/Store/DB_File.pm - adjust as necessary for t/websec.t
+				* lib/NIST/NVD/Store/Base.pm    - verify that it does the right thing
+
  1.00.00 20120121T1602:23-0700 cjac@f5.com
         - exercised in house
 				* works for me.  How about you?

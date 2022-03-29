@@ -27,5 +27,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Crypt-OpenSSL-PKCS10
   homepage: https://metacpan.org/pod/Crypt::OpenSSL::PKCS10
   license: http://dev.perl.org/licenses/
-version: '0.18'
+version: '0.19'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

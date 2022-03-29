@@ -3,8 +3,8 @@ NAME
     options
 
 VERSION
-    This document describes version 0.023 of Text::Table::More (from Perl
-    distribution Text-Table-More), released on 2022-02-14.
+    This document describes version 0.025 of Text::Table::More (from Perl
+    distribution Text-Table-More), released on 2022-03-27.
 
 SYNOPSIS
      #!perl
@@ -137,9 +137,12 @@ SYNOPSIS
      └──────┴──────────────────────────────┴──────────────────────┴──────────────────────────────┴─────────────────────────────────────────────┴─────────────────────────┴────────────────────────────────────────────────┴────────────────────────────────────────┘
 
 DESCRIPTION
-    This module uses the simple interface of Text::Table::Tiny (0.04) with
-    support for more formatting options like column/row spans, border style,
-    per-row/column/cell align/valign.
+    Text::Table::More is yet another text table rendering module. This
+    module uses the simple interface of Text::Table::Tiny with support for
+    more formatting options like column/row spans, border style,
+    per-row/column/cell align/valign/pad/vpad/hpad, and so on. At the time
+    of this writing, Text::Table::More is the only text table module on CPAN
+    that supports rowspans/colspans.
 
     Keywords: rowspan, colspan.
 

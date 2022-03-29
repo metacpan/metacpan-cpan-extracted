@@ -1,5 +1,8 @@
 use strict;
 use warnings;
+
+
+use lib "../lib";
 use MsOffice::Word::Template;
 use Test::More;
 
@@ -26,7 +29,10 @@ my $new_doc = $template->process(\%data);
 my $xml = $new_doc->contents;
 
 like $xml, qr[Hello, </w:t></w:r><w:r><w:t>FOFOLLE</w:t></w:r>], "Foo";
-like $xml, qr[toto</w:t></w:r></w:p></w:tc>], "toto in first table row";
+like $xml, qr[toto</w:t></w:r></w:p></w:tc>],                    "toto in first table row";
+like $xml, qr[<w:bookmarkStart w:id="100" w:name="bkm1"/>],      "bookmark";
+like $xml, qr[<w:hyperlink w:anchor="bkm2">],                    "hyperlink";
+
 $new_doc->save_as("tt2_result.docx") if $do_save_results;
 
 # 2nd invocation to test potential caching problems
@@ -41,8 +47,8 @@ my %data2 = (
 $new_doc = $template->process(\%data2);
 $xml = $new_doc->contents;
 
-like $xml, qr[Hello, </w:t></w:r><w:r><w:t>FOLLONICA</w:t></w:r>], "Foo";
-like $xml, qr[tata</w:t></w:r></w:p></w:tc>], "tata in first table row";
+like $xml, qr[Hello, </w:t></w:r><w:r><w:t>FOLLONICA</w:t></w:r>], "Follonica";
+like $xml, qr[tata</w:t></w:r></w:p></w:tc>],                      "tata in first table row";
 
 $new_doc->save_as("tt2_result2.docx")  if $do_save_results;
 

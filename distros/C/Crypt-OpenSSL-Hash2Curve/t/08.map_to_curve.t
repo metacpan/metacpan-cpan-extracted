@@ -5,7 +5,7 @@ use Test::More ;
 use Crypt::OpenSSL::EC;
 use Crypt::OpenSSL::Bignum;
 use Crypt::OpenSSL::Hash2Curve;
-use Data::Dump qw/dump/;
+#use Data::Dump qw/dump/;
 
 my $group_name = "prime256v1";
 my $type = 'sswu';

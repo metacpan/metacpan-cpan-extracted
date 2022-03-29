@@ -8,9 +8,9 @@ with 'Role::TinyCommons::Collection::FindItem::Iterator';         # add find_ite
 with 'Role::TinyCommons::Collection::PickItems::RandomSeekLines'; # add pick_items() that uses binary search
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-03-06'; # DATE
+our $DATE = '2022-03-27'; # DATE
 our $DIST = 'ArrayData-Lingua-Word-EN-Enable'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 # STATS
 
@@ -27,7 +27,7 @@ ArrayData::Lingua::Word::EN::Enable - The Enable word list (English)
 
 =head1 VERSION
 
-This document describes version 0.002 of ArrayData::Lingua::Word::EN::Enable (from Perl distribution ArrayData-Lingua-Word-EN-Enable), released on 2022-03-06.
+This document describes version 0.003 of ArrayData::Lingua::Word::EN::Enable (from Perl distribution ArrayData-Lingua-Word-EN-Enable), released on 2022-03-27.
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,42 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.88.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 ece4e6ce9341a65ce3d6d8ba89c6ccdc31f9302dbef1517cb7d7008d471240f2 Build.PL
+SHA256 407f558f5d7859f85845dd47ae4683eab168bb0b2fbdb87c50709789380861fb Changes
+SHA256 63d5dc9cd1ee16c57a818cb7aeac699734d09aa8b02483837af4e2f954e139e9 LICENSE
+SHA256 433705aedbf5fa71978a0278a802e6d976a37ab276fc4c6f32c24d37ca0a1a4c MANIFEST
+SHA256 cce77f1e7cfca974676c5a5368a8042e961af627e4ad52359eaad86a980239e9 META.json
+SHA256 f8e8107f70c4d11e8c6fe36a81503947889964c9d9d1e1228d3967bd4023514b META.yml
+SHA256 46181a7a194d0df4eb95cf0505286971338d9b7013c00389c87739a130834801 README
+SHA256 14a81d5a13c02796c6e685f3905c075121d50da5442aa9d2ac46cad4510ea89a eg/solver
+SHA256 cbd8113a9d470ddb8045da401c228bae3f192a3b939c528dda2e22ea627cf1d4 lib/Logic/Expr.pm
+SHA256 9efe126a0002cae7a5ce1eba5af79e90ef710d7e68e71aef8f105787ed78555c lib/Logic/Expr/Parser.pm
+SHA256 72d6ea34fee8e737103d57b62ff929d8036854b72b921e99e59b564c9a43d722 t/00-load.t
+SHA256 85069e4ab5d7292ce43548b55bfd8d363ccbb8d5817f2ab9da97e0ae5f5d2fd3 t/10-parser.t
+SHA256 47f33d64db0bb9bf00492727f16e4a839aaaebf7b86dafc6c65d14b91a55aef0 t/20-logic.t
+SHA256 e6d9462c550e9e4fb82ab19823c8c5421ca0ce0fa077c01b9fac03a11e0a87f9 t/pod-coverage.t
+SHA256 26e8eef165b3efeb88516cf0e98ea5ac2455f53e57eabc1259f9cfa6937a51a8 t/pod.t
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBAwAdFiEExz5nATgiJJxZ/1+dgZku4eEsA4UFAmJCYs0ACgkQgZku4eEs
+A4UQggf/b0KcmZUklAnuj5BhM1gZpQ77MKnQyPVU+0bI0VyuLqnGE31ofnQe4qJq
+jO7nOCR8EqJfhTLJlYAZYW3cw7Gc0b3Ck/Zj9y6qLZLSErQEjYiZdRI8i/MF1vQo
+Lxhp3G/+iN6ZwY6troBhGl7tTmDJ6X44xMiMWOFnyp4DdxLr0SWSu4PaXlk64Tm6
+7EGGOWJK2742PUwW2AwtkRMcz5F5iW9qBGCojxUy3OKNCwn/jI2mqP28BPi3WFia
+h3LPKclwjb3ffR6mYZQ7OWQQOz59JavnVzVVu87tvZav7PBME77s960Yqc9jaJs/
+KP4RUI8KuzQNmPCDhU8/mFwHb+g9Mw==
+=SgED
+-----END PGP SIGNATURE-----

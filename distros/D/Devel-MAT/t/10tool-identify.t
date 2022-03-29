@@ -41,7 +41,18 @@ local *Devel::MAT::Cmd::printf = sub {
 Devel::MAT::Tool::Identify->walk_graph( $graph, "" );
 
 # Due to ordering within walk_graph this string should be relatively stable
-my $want = <<'EOR';
+
+# Different output on thready vs. non-thready perls
+my $want_thready = <<'EOR';
+├─(via RV) element [0] of ARRAY(1) at _ADDR_, which is:
+│ └─(via RV) value {array} of HASH(1) at _ADDR_, which is:
+│   └─the symbol '%main::HASH'
+├─(via RV) pad temporary _NUM_ at depth 1 of CODE() at _ADDR_=main_cv, which is:
+│ └─the main code
+└─(via RV) the lexical $SCALAR at depth 1 of CODE() at _ADDR_=main_cv, which is:
+  └─the main code
+EOR
+my $want_nonthready = <<'EOR';
 ├─(via RV) a constant of CODE() at _ADDR_=main_cv, which is:
 │ └─the main code
 ├─(via RV) element [0] of ARRAY(1) at _ADDR_, which is:
@@ -50,6 +61,8 @@ my $want = <<'EOR';
 └─(via RV) the lexical $SCALAR at depth 1 of CODE() at _ADDR_=main_cv, which is:
   └─the main code
 EOR
+
+my $want = $pmat->dumpfile->ithreads ? $want_thready : $want_nonthready;
 
 chomp $want;
 $want = quotemeta $want;

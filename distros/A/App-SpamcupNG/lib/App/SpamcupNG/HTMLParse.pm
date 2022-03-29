@@ -20,7 +20,7 @@ my %regexes = (
     message_age => qr/^Message\sis\s(\d+)\s(\w+)\sold/
 );
 
-our $VERSION = '0.014'; # VERSION
+our $VERSION = '0.015'; # VERSION
 
 =head1 NAME
 
@@ -101,14 +101,16 @@ sub find_header_info {
 
                     my $not_useful = 'boundary';
 
-                    if (substr( $charset, 0, length($not_useful) ) eq
+                    if (
+                        substr( $charset, 0, length($not_useful) ) eq
                         $not_useful )
                     {
                         $info{content_type} = $encoding;
+                        $info{charset}      = undef;
                     }
                     else {
-                        $info{content_type}
-                            = join( ';', $encoding, $charset );
+                        $info{content_type} = $encoding;
+                        $info{charset}      = ( split( '=', $charset ) )[1];
                     }
                 }
                 else {
@@ -191,7 +193,7 @@ sub find_next_id {
                 my $length   = length($next_id);
                 my $expected = 45;
                 warn
-                    "Unexpected length for SPAM ID: got $length, expected $expected"
+"Unexpected length for SPAM ID: got $length, expected $expected"
                     unless ( $length == $expected );
                 last;
             }
@@ -385,7 +387,7 @@ sub find_spam_header {
         my @lines;
         my $header = $nodes[0]->content;
 
-        for ( my $i = 0; $i <= scalar( @{$header} ); $i++ ) {
+        for ( my $i = 0 ; $i <= scalar( @{$header} ) ; $i++ ) {
             if ( ref( $header->[$i] ) eq 'HTML::Element' ) {
                 $header->[$i]->parent(undef);
 

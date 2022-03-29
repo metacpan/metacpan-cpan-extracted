@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-Systemd
 #
-# This software is Copyright (c) 2008-2021 by Dominique Dumont.
+# This software is Copyright (c) 2008-2022 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -522,36 +522,31 @@ notation. Defaults to 0755.',
       },
       'Accept',
       {
-        'description' => 'Takes a boolean argument. If yes, a service
-instance is spawned for each incoming connection and only the
-connection socket is passed to it. If no, all listening
-sockets themselves are passed to the started service unit, and
-only one service unit is spawned for all connections (also see
-above). This value is ignored for datagram sockets and FIFOs
-where a single service unit unconditionally handles all
-incoming traffic. Defaults to C<no>. For
-performance reasons, it is recommended to write new daemons
-only in a way that is suitable for
-C<Accept=no>. A daemon listening on an
-C<AF_UNIX> socket may, but does not need to,
-call
-L<close(2)>
-on the received socket before exiting. However, it must not
-unlink the socket from a file system. It should not invoke
-L<shutdown(2)>
-on sockets it got with C<Accept=no>, but it
-may do so for sockets it got with
-C<Accept=yes> set. Setting
-C<Accept=yes> is mostly useful to allow
-daemons designed for usage with
-L<inetd(8)>
-to work unmodified with systemd socket
-activation.
+        'description' => 'Takes a boolean argument. If yes, a service instance is spawned for each incoming
+connection and only the connection socket is passed to it. If no, all listening sockets themselves
+are passed to the started service unit, and only one service unit is spawned for all connections
+(also see above). This value is ignored for datagram sockets and FIFOs where a single service unit
+unconditionally handles all incoming traffic. Defaults to C<no>. For performance
+reasons, it is recommended to write new daemons only in a way that is suitable for
+C<Accept=no>. A daemon listening on an C<AF_UNIX> socket may, but
+does not need to, call
+L<close(2)> on the
+received socket before exiting. However, it must not unlink the socket from a file system. It should
+not invoke
+L<shutdown(2)> on
+sockets it got with C<Accept=no>, but it may do so for sockets it got with
+C<Accept=yes> set. Setting C<Accept=yes> is mostly useful to allow
+daemons designed for usage with L<inetd(8)> to work
+unmodified with systemd socket activation.
 
 For IPv4 and IPv6 connections, the C<REMOTE_ADDR> environment variable will
 contain the remote IP address, and C<REMOTE_PORT> will contain the remote port. This
 is the same as the format used by CGI. For C<SOCK_RAW>, the port is the IP
-protocol.',
+protocol.
+
+It is recommended to set C<CollectMode=inactive-or-failed> for service
+instances activated via C<Accept=yes>, to ensure that failed connection services are
+cleaned up and released from memory, and do not accumulate.',
         'type' => 'leaf',
         'value_type' => 'boolean',
         'write_as' => [
@@ -1108,7 +1103,7 @@ suffix.',
       },
       'TriggerLimitIntervalSec',
       {
-        'description' => "Configures a limit on how often this socket unit my be activated within a specific time
+        'description' => "Configures a limit on how often this socket unit may be activated within a specific time
 interval. The C<TriggerLimitIntervalSec> may be used to configure the length of the time
 interval in the usual time units C<us>, C<ms>, C<s>,
 C<min>, C<h>, \x{2026} and defaults to 2s (See
@@ -1124,7 +1119,7 @@ limit is enforced before the service activation is enqueued.",
       },
       'TriggerLimitBurst',
       {
-        'description' => "Configures a limit on how often this socket unit my be activated within a specific time
+        'description' => "Configures a limit on how often this socket unit may be activated within a specific time
 interval. The C<TriggerLimitIntervalSec> may be used to configure the length of the time
 interval in the usual time units C<us>, C<ms>, C<s>,
 C<min>, C<h>, \x{2026} and defaults to 2s (See
@@ -1139,7 +1134,7 @@ limit is enforced before the service activation is enqueued.",
         'value_type' => 'uniline'
       }
     ],
-    'generated_by' => 'parse-man.pl from systemd 249 doc',
+    'generated_by' => 'parse-man.pl from systemd 250 doc',
     'license' => 'LGPLv2.1+',
     'name' => 'Systemd::Section::Socket'
   }

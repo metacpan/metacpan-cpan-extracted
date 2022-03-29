@@ -24,328 +24,328 @@ Inherits methods from:
 
 =head2 getaddrinfo
 
-Socket.getaddrinfo() -> I<Obj>
+    Socket.getaddrinfo()
 
-Return the
+Returns the
 
 =cut
 
 =head2 gethostbyaddr
 
-Socket.gethostbyaddr() -> I<Obj>
+    Socket.gethostbyaddr()
 
-Return the
+Returns the
 
 =cut
 
 =head2 gethostbyname
 
-Socket.gethostbyname() -> I<Obj>
+    Socket.gethostbyname()
 
-Return the
+Returns the
 
 =cut
 
 =head2 gethostent
 
-Socket.gethostent() -> I<Obj>
+    Socket.gethostent()
 
-Return the
+Returns the
 
 =cut
 
 =head2 getnameinfo
 
-Socket.getnameinfo() -> I<Obj>
+    Socket.getnameinfo()
 
-Return the
+Returns the
 
 =cut
 
 =head2 getnetbyaddr
 
-Socket.getnetbyaddr() -> I<Obj>
+    Socket.getnetbyaddr()
 
-Return the
+Returns the
 
 =cut
 
 =head2 getnetbyname
 
-Socket.getnetbyname() -> I<Obj>
+    Socket.getnetbyname()
 
-Return the
+Returns the
 
 =cut
 
 =head2 getnetent
 
-Socket.getnetent() -> I<Obj>
+    Socket.getnetent()
 
-Return the
+Returns the
 
 =cut
 
 =head2 getprotobyname
 
-Socket.getprotobyname() -> I<Obj>
+    Socket.getprotobyname()
 
-Return the
+Returns the
 
 =cut
 
 =head2 getprotobynumber
 
-Socket.getprotobynumber() -> I<Obj>
+    Socket.getprotobynumber()
 
-Return the
+Returns the
 
 =cut
 
 =head2 getprotoent
 
-Socket.getprotoent() -> I<Obj>
+    Socket.getprotoent()
 
-Return the
+Returns the
 
 =cut
 
 =head2 getservbyname
 
-Socket.getservbyname() -> I<Obj>
+    Socket.getservbyname()
 
-Return the
+Returns the
 
 =cut
 
 =head2 getservbyport
 
-Socket.getservbyport() -> I<Obj>
+    Socket.getservbyport()
 
-Return the
+Returns the
 
 =cut
 
 =head2 getservent
 
-Socket.getservent() -> I<Obj>
+    Socket.getservent()
 
-Return the
+Returns the
 
 =cut
 
 =head2 inet_aton
 
-Socket.inet_aton() -> I<Obj>
+    Socket.inet_aton()
 
-Return the
+Returns the
 
 =cut
 
 =head2 inet_ntoa
 
-Socket.inet_ntoa() -> I<Obj>
+    Socket.inet_ntoa()
 
-Return the
+Returns the
 
 =cut
 
 =head2 inet_ntop
 
-Socket.inet_ntop() -> I<Obj>
+    Socket.inet_ntop()
 
-Return the
+Returns the
 
 =cut
 
 =head2 inet_pton
 
-Socket.inet_pton() -> I<Obj>
+    Socket.inet_pton()
 
-Return the
+Returns the
 
 =cut
 
 =head2 new
 
-Socket.new() -> I<Obj>
+    Socket.new()
 
-Return the
+Returns the
 
 =cut
 
 =head2 open
 
-Socket.open() -> I<Obj>
+    Socket.open()
 
-Return the
+Returns the
 
 =cut
 
 =head2 pack_ip_mreq
 
-Socket.pack_ip_mreq() -> I<Obj>
+    Socket.pack_ip_mreq()
 
-Return the
+Returns the
 
 =cut
 
 =head2 pack_ip_mreq_source
 
-Socket.pack_ip_mreq_source() -> I<Obj>
+    Socket.pack_ip_mreq_source()
 
-Return the
+Returns the
 
 =cut
 
 =head2 pack_ipv6_mreq
 
-Socket.pack_ipv6_mreq() -> I<Obj>
+    Socket.pack_ipv6_mreq()
 
-Return the
+Returns the
 
 =cut
 
 =head2 pack_sockaddr_in
 
-Socket.pack_sockaddr_in() -> I<Obj>
+    Socket.pack_sockaddr_in()
 
-Return the
+Returns the
 
 =cut
 
 =head2 pack_sockaddr_in6
 
-Socket.pack_sockaddr_in6() -> I<Obj>
+    Socket.pack_sockaddr_in6()
 
-Return the
+Returns the
 
 =cut
 
 =head2 pack_sockaddr_un
 
-Socket.pack_sockaddr_un() -> I<Obj>
+    Socket.pack_sockaddr_un()
 
-Return the
+Returns the
 
 =cut
 
 =head2 sethostent
 
-Socket.sethostent() -> I<Obj>
+    Socket.sethostent()
 
-Return the
+Returns the
 
 =cut
 
 =head2 setnetent
 
-Socket.setnetent() -> I<Obj>
+    Socket.setnetent()
 
-Return the
+Returns the
 
 =cut
 
 =head2 setprotoent
 
-Socket.setprotoent() -> I<Obj>
+    Socket.setprotoent()
 
-Return the
+Returns the
 
 =cut
 
 =head2 setservent
 
-Socket.setservent() -> I<Obj>
+    Socket.setservent()
 
-Return the
+Returns the
 
 =cut
 
 =head2 sockaddr_family
 
-Socket.sockaddr_family() -> I<Obj>
+    Socket.sockaddr_family()
 
-Return the
+Returns the
 
 =cut
 
 =head2 sockaddr_in
 
-Socket.sockaddr_in() -> I<Obj>
+    Socket.sockaddr_in()
 
-Return the
+Returns the
 
 =cut
 
 =head2 sockaddr_in6
 
-Socket.sockaddr_in6() -> I<Obj>
+    Socket.sockaddr_in6()
 
-Return the
+Returns the
 
 =cut
 
 =head2 sockaddr_un
 
-Socket.sockaddr_un() -> I<Obj>
+    Socket.sockaddr_un()
 
-Return the
+Returns the
 
 =cut
 
 =head2 socketpair
 
-Socket.socketpair() -> I<Obj>
+    Socket.socketpair()
 
-Return the
+Returns the
 
 =cut
 
 =head2 unpack_ip_mreq
 
-Socket.unpack_ip_mreq() -> I<Obj>
+    Socket.unpack_ip_mreq()
 
-Return the
+Returns the
 
 =cut
 
 =head2 unpack_ip_mreq_source
 
-Socket.unpack_ip_mreq_source() -> I<Obj>
+    Socket.unpack_ip_mreq_source()
 
-Return the
+Returns the
 
 =cut
 
 =head2 unpack_ipv6_mreq
 
-Socket.unpack_ipv6_mreq() -> I<Obj>
+    Socket.unpack_ipv6_mreq()
 
-Return the
+Returns the
 
 =cut
 
 =head2 unpack_sockaddr_in
 
-Socket.unpack_sockaddr_in() -> I<Obj>
+    Socket.unpack_sockaddr_in()
 
-Return the
+Returns the
 
 =cut
 
 =head2 unpack_sockaddr_in6
 
-Socket.unpack_sockaddr_in6() -> I<Obj>
+    Socket.unpack_sockaddr_in6()
 
-Return the
+Returns the
 
 =cut
 
 =head2 unpack_sockaddr_un
 
-Socket.unpack_sockaddr_un() -> I<Obj>
+    Socket.unpack_sockaddr_un()
 
-Return the
+Returns the
 
 =cut

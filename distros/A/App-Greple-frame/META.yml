@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.15, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.12, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,16 +26,17 @@ no_index:
 provides:
   App::Greple::frame:
     file: lib/App/Greple/frame.pm
-    version: '0.01'
+    version: '0.02'
 requires:
-  App::Greple: '8.57'
+  App::Greple: '8.5702'
+  App::ansifold: '1.14'
   Term::ReadKey: '0'
-  perl: '5.014'
+  perl: '5.016'
 resources:
   bugtracker: https://github.com/kaz-utashiro/greple-frame/issues
   homepage: https://github.com/kaz-utashiro/greple-frame
-  repository: https://github.com/kaz-utashiro/greple-frame.git
-version: '0.01'
+  repository: git://github.com/kaz-utashiro/greple-frame.git
+version: '0.02'
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

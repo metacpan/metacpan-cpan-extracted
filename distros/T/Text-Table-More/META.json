@@ -40,7 +40,7 @@
             "Text::WideChar::Util" : "0"
          },
          "requires" : {
-            "BorderStyle::ASCII::SingleLineDoubleAfterHeader" : "0.011",
+            "BorderStyle::ASCII::SingleLineDoubleAfterHeader" : "0.014",
             "Exporter" : "5.57",
             "List::AllUtils" : "0",
             "Module::Load::Util" : "0.004",
@@ -64,7 +64,7 @@
    "provides" : {
       "Text::Table::More" : {
          "file" : "lib/Text/Table/More.pm",
-         "version" : "0.023"
+         "version" : "0.025"
       }
    },
    "release_status" : "stable",
@@ -79,7 +79,7 @@
          "web" : "https://github.com/perlancar/perl-Text-Table-More"
       }
    },
-   "version" : "0.023",
+   "version" : "0.025",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"
@@ -215,7 +215,7 @@
                }
             },
             "name" : "@Author::PERLANCAR/PERLANCAR::EnsurePrereqToSpec",
-            "version" : "0.063"
+            "version" : "0.064"
          },
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::MetaResources",

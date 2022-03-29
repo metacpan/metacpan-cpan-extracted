@@ -40,7 +40,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.200';
+our $VERSION = '1.201';
 
 use Quiq::Option;
 use DBI ();
@@ -557,7 +557,7 @@ sub sql {
 
 =head1 VERSION
 
-1.200
+1.201
 
 =head1 AUTHOR
 

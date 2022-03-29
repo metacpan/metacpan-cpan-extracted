@@ -22,11 +22,11 @@ NIST::NVD::Store::SQLite3 - SQLite3 store for NIST::NVD
 
 =head1 VERSION
 
-Version 1.00.00
+Version 1.02.00
 
 =cut
 
-our $VERSION = '1.00.00';
+our $VERSION = '1.02.00';
 
 my %query = (
     cpe_create => qq{
@@ -1124,7 +1124,10 @@ L<http://search.cpan.org/dist/NIST-NVD-Store-SQLite3/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2012 F5 Networks, Inc.
+Copyright (C) 2012 C.J. Adams-Collier
+Copyright (C) 2012 F5 Networks, Inc
+Copyright (C) 2013 Washington State Guard Association
+Copyright (C) 2022 Google, LLC
 
 CVE(r) and CWE(tm) are marks of The MITRE Corporation and used here with
 permission.  The information in CVE and CWE are copyright of The MITRE

@@ -1,5 +1,8 @@
 Revision history for Perl module Plack::Middleware::DirIndex:
 
+1.00 Wed 09 Dec 2020 20:59:00 GMT
+  - Only try to serve the index file if it exists
+
 1.00 Tue 27 Jan 2015 08:48:45 GMT
   - Some changes from CPAN Pull Request Challenge
 

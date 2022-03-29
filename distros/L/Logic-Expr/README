@@ -1,0 +1,23 @@
+Logic::Expr - logical expression parsing and related routines
+
+this module can be installed using cpanm:
+
+    cpanm Logic::Expr
+
+
+run perldoc(1) on Logic::Expr for documentation
+
+
+to author a new release:
+
+    ./Build testcover
+    cover -report compilation | less
+    RELEASE_TESTING=1 TEST_SIGNATURE=1 ./Build test
+    ./Build disttest
+    ./Build dist
+    git tag -u ... -s v...
+    cpan-upload ...
+    git push ...
+    ./Build realclean
+
+maybe also check for spelling errors, huh?

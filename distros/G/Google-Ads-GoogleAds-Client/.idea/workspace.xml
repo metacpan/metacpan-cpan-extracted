@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="0db9d6cc-89a7-4404-b5dc-04c1f83a761d" name="Changes" comment="" />
+    <list default="true" id="e30da750-2536-414f-8fd7-e910a9eee815" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -13,6 +13,7 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
+        <option value="Perl5 package" />
         <option value="Perl5 script" />
       </list>
     </option>
@@ -34,7 +35,7 @@
       <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
     </file-type-list>
   </component>
-  <component name="ProjectId" id="23dtlQX1MPKmBgFJN8kbvLfb41I" />
+  <component name="ProjectId" id="26P45AYE7zArfVKYsoAAR4wjF7p" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -45,17 +46,17 @@
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="go.formatter.settings.were.checked" value="true" />
     <property name="go.import.settings.migrated" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/t/testdata" />
-    <property name="run.code.analysis.last.selected.profile" value="pProject Default" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/examples/remarketing" />
+    <property name="nodejs_package_manager_path" value="npm" />
     <property name="settings.editor.selected.configurable" value="PERL5_MAIN_SETTINGS" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/t/testdata" />
+      <recent name="$PROJECT_DIR$/examples/remarketing" />
     </key>
   </component>
-  <component name="RunManager" selected="Perl.get_keywords.pl">
-    <configuration name="add_display_upload_ad.pl" type="#PerlConfigurationType" factoryName="Perl" temporary="true" nameIsGenerated="true" show_console_on_std_err="false" show_console_on_std_out="false">
+  <component name="RunManager" selected="Perl.navigate_search_result_pages_caching_tokens.pl">
+    <configuration name="add_conversion_action.pl" type="#PerlConfigurationType" factoryName="Perl" temporary="true" nameIsGenerated="true" show_console_on_std_err="false" show_console_on_std_out="false">
       <option name="allowRunningInParallel" value="false" />
       <option name="alternativeSdkName" />
       <option name="compileTimeBreakpointsEnabled" value="false" />
@@ -70,7 +71,7 @@
       <option name="programParameters" />
       <option name="projectPathOnTarget" />
       <option name="scriptCharset" value="utf8" />
-      <option name="scriptPath" value="$PROJECT_DIR$/examples/advanced_operations/add_display_upload_ad.pl" />
+      <option name="scriptPath" value="$PROJECT_DIR$/examples/remarketing/add_conversion_action.pl" />
       <option name="selectedOptions">
         <list />
       </option>
@@ -79,7 +80,7 @@
       <option name="workingDirectory" />
       <method v="2" />
     </configuration>
-    <configuration name="add_performance_max_retail_campaign.pl" type="#PerlConfigurationType" factoryName="Perl" temporary="true" nameIsGenerated="true" show_console_on_std_err="false" show_console_on_std_out="false">
+    <configuration name="add_dynamic_remarketing_asset.pl" type="#PerlConfigurationType" factoryName="Perl" temporary="true" nameIsGenerated="true" show_console_on_std_err="false" show_console_on_std_out="false">
       <option name="allowRunningInParallel" value="false" />
       <option name="alternativeSdkName" />
       <option name="compileTimeBreakpointsEnabled" value="false" />
@@ -94,7 +95,7 @@
       <option name="programParameters" />
       <option name="projectPathOnTarget" />
       <option name="scriptCharset" value="utf8" />
-      <option name="scriptPath" value="$PROJECT_DIR$/examples/shopping_ads/add_performance_max_retail_campaign.pl" />
+      <option name="scriptPath" value="$PROJECT_DIR$/examples/remarketing/add_dynamic_remarketing_asset.pl" />
       <option name="selectedOptions">
         <list />
       </option>
@@ -103,7 +104,7 @@
       <option name="workingDirectory" />
       <method v="2" />
     </configuration>
-    <configuration name="get_all_image_assets.pl" type="#PerlConfigurationType" factoryName="Perl" temporary="true" nameIsGenerated="true" show_console_on_std_err="false" show_console_on_std_out="false">
+    <configuration name="authenticate_in_desktop_application.pl" type="#PerlConfigurationType" factoryName="Perl" temporary="true" nameIsGenerated="true" show_console_on_std_err="false" show_console_on_std_out="false">
       <option name="allowRunningInParallel" value="false" />
       <option name="alternativeSdkName" />
       <option name="compileTimeBreakpointsEnabled" value="false" />
@@ -118,7 +119,7 @@
       <option name="programParameters" />
       <option name="projectPathOnTarget" />
       <option name="scriptCharset" value="utf8" />
-      <option name="scriptPath" value="$PROJECT_DIR$/examples/misc/get_all_image_assets.pl" />
+      <option name="scriptPath" value="$PROJECT_DIR$/examples/authentication/authenticate_in_desktop_application.pl" />
       <option name="selectedOptions">
         <list />
       </option>
@@ -127,7 +128,7 @@
       <option name="workingDirectory" />
       <method v="2" />
     </configuration>
-    <configuration name="get_keywords.pl" type="#PerlConfigurationType" factoryName="Perl" temporary="true" nameIsGenerated="true" show_console_on_std_err="false" show_console_on_std_out="false">
+    <configuration name="navigate_search_result_pages_caching_tokens.pl" type="#PerlConfigurationType" factoryName="Perl" temporary="true" nameIsGenerated="true" show_console_on_std_err="false" show_console_on_std_out="false">
       <option name="allowRunningInParallel" value="false" />
       <option name="alternativeSdkName" />
       <option name="compileTimeBreakpointsEnabled" value="false" />
@@ -142,7 +143,7 @@
       <option name="programParameters" />
       <option name="projectPathOnTarget" />
       <option name="scriptCharset" value="utf8" />
-      <option name="scriptPath" value="$PROJECT_DIR$/examples/basic_operations/get_keywords.pl" />
+      <option name="scriptPath" value="$PROJECT_DIR$/examples/misc/navigate_search_result_pages_caching_tokens.pl" />
       <option name="selectedOptions">
         <list />
       </option>
@@ -151,7 +152,7 @@
       <option name="workingDirectory" />
       <method v="2" />
     </configuration>
-    <configuration name="upload_image_asset.pl" type="#PerlConfigurationType" factoryName="Perl" temporary="true" nameIsGenerated="true" show_console_on_std_err="false" show_console_on_std_out="false">
+    <configuration name="test.pl (1)" type="#PerlConfigurationType" factoryName="Perl" temporary="true" nameIsGenerated="true" show_console_on_std_err="false" show_console_on_std_out="false">
       <option name="allowRunningInParallel" value="false" />
       <option name="alternativeSdkName" />
       <option name="compileTimeBreakpointsEnabled" value="false" />
@@ -166,7 +167,7 @@
       <option name="programParameters" />
       <option name="projectPathOnTarget" />
       <option name="scriptCharset" value="utf8" />
-      <option name="scriptPath" value="$PROJECT_DIR$/examples/misc/upload_image_asset.pl" />
+      <option name="scriptPath" value="$PROJECT_DIR$/examples/misc/test.pl" />
       <option name="selectedOptions">
         <list />
       </option>
@@ -177,53 +178,55 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Perl.get_keywords.pl" />
-        <item itemvalue="Perl.add_performance_max_retail_campaign.pl" />
-        <item itemvalue="Perl.get_all_image_assets.pl" />
-        <item itemvalue="Perl.upload_image_asset.pl" />
-        <item itemvalue="Perl.add_display_upload_ad.pl" />
+        <item itemvalue="Perl.navigate_search_result_pages_caching_tokens.pl" />
+        <item itemvalue="Perl.test.pl (1)" />
+        <item itemvalue="Perl.authenticate_in_desktop_application.pl" />
+        <item itemvalue="Perl.add_dynamic_remarketing_asset.pl" />
+        <item itemvalue="Perl.add_conversion_action.pl" />
       </list>
     </recent_temporary>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="0db9d6cc-89a7-4404-b5dc-04c1f83a761d" name="Changes" comment="" />
-      <created>1642075943549</created>
+      <changelist id="e30da750-2536-414f-8fd7-e910a9eee815" name="Changes" comment="" />
+      <created>1647311704493</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1642075943549</updated>
-      <workItem from="1642075946396" duration="1254000" />
-      <workItem from="1642387107557" duration="714000" />
-      <workItem from="1643029228506" duration="631000" />
-      <workItem from="1643029879406" duration="21615000" />
-      <workItem from="1643253388149" duration="16467000" />
-      <workItem from="1643337804012" duration="6385000" />
-      <workItem from="1643516260337" duration="829000" />
-      <workItem from="1644547603318" duration="2499000" />
-      <workItem from="1644806058841" duration="16054000" />
+      <updated>1647311704493</updated>
+      <workItem from="1647311707545" duration="8238000" />
+      <workItem from="1647572746223" duration="7674000" />
+      <workItem from="1647832480097" duration="4048000" />
+      <workItem from="1647839449600" duration="26138000" />
+      <workItem from="1648107845691" duration="7451000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
+  <component name="Vcs.Log.History.Properties">
+    <option name="COLUMN_ID_ORDER">
+      <list>
+        <option value="Default.Root" />
+        <option value="Default.Author" />
+        <option value="Default.Date" />
+        <option value="Default.Subject" />
+      </list>
+    </option>
+  </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="perl_line_breakpoint">
-          <url>file://$PROJECT_DIR$/examples/remarketing/add_customer_match_user_list.pl</url>
-          <line>29</line>
+          <url>file://$PROJECT_DIR$/examples/remarketing/add_dynamic_remarketing_asset.pl</url>
+          <line>61</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="perl_line_breakpoint">
+          <url>file://$PROJECT_DIR$/examples/remarketing/add_dynamic_remarketing_asset.pl</url>
+          <line>112</line>
           <option name="timeStamp" value="2" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="perl_line_breakpoint">
-          <url>file://$PROJECT_DIR$/lib/Google/Ads/GoogleAds/V10/Resources/CustomerAsset.pm</url>
-          <option name="timeStamp" value="3" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="perl_line_breakpoint">
-          <url>file://$PROJECT_DIR$/lib/Google/Ads/GoogleAds/Client.pm</url>
-          <line>25</line>
-          <option name="timeStamp" value="4" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

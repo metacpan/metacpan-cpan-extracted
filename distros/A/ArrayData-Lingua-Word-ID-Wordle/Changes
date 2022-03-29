@@ -1,3 +1,9 @@
+20220306.0.1  2022-03-27  Released-By: PERLANCAR; Urgency: medium
+
+              - Bump prereq version ArrayDataRole::Source::LinesInDATA
+                (0.006) (RT#141843).
+
+
 20220306.0.0  2022-03-06  Released-By: PERLANCAR
 
               - First release.

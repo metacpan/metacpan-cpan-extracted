@@ -1,5 +1,8 @@
 Change history for HTML-Parser
 
+3.78      2022-03-28
+  * Remove unused variable (GH#26) (Michal Josef Špaček)
+
 3.77      2022-03-14
   * Update tests to remove HTML4 specific tags (GH#25) (Jess)
 
@@ -8,7 +11,7 @@ Change history for HTML-Parser
     and Chase Whitener)
 
 3.75      2020-08-30
-  * Cleanup the prereqs a bit
+  * Clean up the prereqs a bit
   * Mark HTML::Filter as deprecated as the docs point out
   * Move Parser.pm into the lib directory with the others. This will help
     with everything from auto version bumps after releases, to scanning for

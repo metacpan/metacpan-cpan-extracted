@@ -19,7 +19,7 @@ if (!grep { $_ } values %errors)
     use strict;
     use warnings;
 
-    use v5.20.0;
+    use 5.020;
     # use Module::Build::Tiny 0.034;
     Module::Build::Tiny::Build_PL();
 }
@@ -87,46 +87,54 @@ EOW
         "Karen Etheridge <ether\@cpan.org>"
       ],
       "dist_name" => "Mojolicious-Plugin-OpenAPI-Modern",
-      "dist_version" => "0.001",
+      "dist_version" => "0.002",
       "license" => "perl",
       "module_name" => "Mojolicious::Plugin::OpenAPI::Modern",
       "recursive_test_files" => 1,
       "requires" => {
         "Feature::Compat::Try" => 0,
-        "JSON::MaybeXS" => 0,
+        "JSON::Schema::Modern" => "0.549",
+        "JSON::Schema::Modern::Document::OpenAPI" => "0.024",
         "Mojo::Base" => 0,
+        "Mojo::JSON" => 0,
         "OpenAPI::Modern" => "0.022",
         "Path::Tiny" => 0,
         "Safe::Isa" => 0,
         "YAML::PP" => 0,
         "if" => 0,
         "namespace::clean" => 0,
-        "perl" => "v5.20.0",
+        "perl" => "5.020",
         "strict" => 0,
         "warnings" => 0
       },
       "test_requires" => {
         "File::Spec" => 0,
+        "JSON::Schema::Modern::Utilities" => 0,
         "Module::Metadata" => 0,
+        "Test::Deep" => 0,
         "Test::Mojo" => 0,
         "Test::More" => "0.88",
+        "constant" => 0,
         "experimental" => 0,
         "lib" => 0,
         "open" => 0,
-        "perl" => "v5.20.0"
+        "perl" => "5.020"
       }
     );
 
 
     my %fallback_build_requires = (
       "File::Spec" => 0,
+      "JSON::Schema::Modern::Utilities" => 0,
       "Module::Metadata" => 0,
+      "Test::Deep" => 0,
       "Test::Mojo" => 0,
       "Test::More" => "0.88",
+      "constant" => 0,
       "experimental" => 0,
       "lib" => 0,
       "open" => 0,
-      "perl" => "v5.20.0"
+      "perl" => "5.020"
     );
 
 

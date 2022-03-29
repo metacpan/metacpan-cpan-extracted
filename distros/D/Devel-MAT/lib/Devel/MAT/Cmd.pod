@@ -130,9 +130,12 @@ will use base-1024 sizes in C<KiB>, C<MiB>, C<GiB> or C<TiB> if necessary.
 
   $str = Devel::MAT::Cmd->format_sv_with_value( $sv )
 
-Similar to L</format_sv>, but more helpful on C<SCALAR> and C<REF> SVs. For
-C<SCALAR> SVs it will show the value directly by using L</format_value>, and
-for C<REF> SVs it will show the referrant SV.
+Similar to L</format_sv>, but printing additional information on some kinds
+of SVs to avoid the user needing to use the C<show> to identify it.
+
+For C<SCALAR> SVs it will show the value directly by using L</format_value>,
+for C<REF> SVs it will show the referrant SV, and for C<STASH> SVs it will
+show the symbol name.
 
 =head2 format_heading
 

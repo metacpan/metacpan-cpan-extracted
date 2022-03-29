@@ -206,7 +206,7 @@ static        short _marpaESLIF_bootstrap_G1_action_lhs_1b(void *userDatavp, mar
 static        short _marpaESLIF_bootstrap_G1_action_lhs_2b(void *userDatavp, marpaESLIFValue_t *marpaESLIFValuep, int arg0i, int argni, int resulti, short nullableb);
 static        short _marpaESLIF_bootstrap_G1_action_start_symbol_1b(void *userDatavp, marpaESLIFValue_t *marpaESLIFValuep, int arg0i, int argni, int resulti, short nullableb);
 static        short _marpaESLIF_bootstrap_G1_action_start_symbol_2b(void *userDatavp, marpaESLIFValue_t *marpaESLIFValuep, int arg0i, int argni, int resulti, short nullableb);
-static inline marpaESLIF_rule_t *_marpaESLIF_bootstrap_check_rulep(marpaESLIF_t *marpaESLIFp, marpaESLIFGrammar_t *marpaESLIFGrammarp, marpaESLIF_grammar_t *grammarp, char *descEncodings, char *descs, size_t descl, int lhsi, size_t nrhsl, int *rhsip, int exceptioni, int ranki, short nullRanksHighb, short sequenceb, int minimumi, int separatori, short properb, marpaESLIF_action_t *actionp, short passthroughb, short hideseparatorb, short *skipbp, marpaESLIF_lua_functiondecl_t *declp, marpaESLIF_lua_functioncall_t **callpp, marpaESLIF_lua_functioncall_t *separatorcallp);
+static inline marpaESLIF_rule_t *_marpaESLIF_bootstrap_check_rulep(marpaESLIF_t *marpaESLIFp, marpaESLIFGrammar_t *marpaESLIFGrammarp, marpaESLIF_grammar_t *grammarp, char *descEncodings, char *descs, size_t descl, int lhsi, size_t nrhsl, int *rhsip, int exceptioni, int ranki, short nullRanksHighb, short sequenceb, int minimumi, int separatori, short properb, marpaESLIF_action_t *actionp, short hideseparatorb, short *skipbp, marpaESLIF_lua_functiondecl_t *declp, marpaESLIF_lua_functioncall_t **callpp, marpaESLIF_lua_functioncall_t *separatorcallp);
 static short marpaESLIFValueImport(marpaESLIFValue_t *marpaESLIFValuep, void *userDatavp, marpaESLIFValueResult_t *marpaESLIFValueResultp, short haveUndefb);
 
 /* Helpers */
@@ -1513,7 +1513,6 @@ static inline marpaESLIF_symbol_t  *_marpaESLIF_bootstrap_check_rhsAlternativep(
                                               -1, /* separatori */
                                               0, /* properb */
                                               actionp,
-                                              0, /* passthroughb */
                                               0 /* hideseparatorb */,
                                               NULL, /* skipbp */
                                               declp,
@@ -1625,7 +1624,6 @@ static inline marpaESLIF_symbol_t  *_marpaESLIF_bootstrap_check_rhsAlternativep(
                                               (separatorp != NULL) ? separatorp->idi : -1, /* separatori */
                                               properb,
                                               actionp,
-                                              0, /* passthroughb */
                                               hideseparatorb,
                                               NULL, /* skipbp */
                                               declp,
@@ -4233,7 +4231,6 @@ static inline short _marpaESLIF_bootstrap_G1_action_priority_loosen_ruleb(marpaE
                                             -1, /* separatori */
                                             0, /* properb */
                                             &action,
-                                            0, /* passthroughb */
                                             0 /* hideseparatorb */,
                                             NULL, /* skipbp */
                                             declp,
@@ -4322,7 +4319,6 @@ static inline short _marpaESLIF_bootstrap_G1_action_priority_loosen_ruleb(marpaE
                                               -1, /* separatori */
                                               0, /* properb */
                                               &action,
-                                              0, /* passthroughb */
                                               0 /* hideseparatorb */,
                                               NULL, /* skipbp */
                                               declp,
@@ -4834,7 +4830,6 @@ static inline short _marpaESLIF_bootstrap_G1_action_priority_flat_ruleb(marpaESL
                                                 -1, /* separatori */
                                                 0, /* properb */
                                                 actionp,
-                                                0, /* passthroughb */
                                                 0 /* hideseparatorb */,
                                                 have_skipb ? skipbp : NULL,
                                                 declp,
@@ -5857,7 +5852,6 @@ static short _marpaESLIF_bootstrap_G1_action_quantified_ruleb(void *userDatavp, 
                                             (separatorp != NULL) ? separatorp->idi : -1, /* separatori */
                                             properb,
                                             actionp,
-                                            0, /* passthroughb */
                                             hideseparatorb,
                                             NULL, /* skipbp */
                                             bootstrapLhsp->declp,
@@ -5952,7 +5946,6 @@ static short _marpaESLIF_bootstrap_G1_action_start_ruleb(void *userDatavp, marpa
                                               -1, /* separatori */
                                               0, /* properb */
                                               &action,
-                                              0, /* passthroughb */
                                               0 /* hideseparatorb */,
                                               NULL, /* skipbp */
                                               NULL, /* declp */
@@ -6151,7 +6144,6 @@ static short _marpaESLIF_bootstrap_G1_action_empty_ruleb(void *userDatavp, marpa
                                             -1, /* separatori */
                                             0, /* properb */
                                             actionp,
-                                            0, /* passthroughb */
                                             0 /* hideseparatorb */,
                                             NULL, /* skipbp */
                                             bootstrapLhsp->declp,
@@ -7313,7 +7305,6 @@ static short _marpaESLIF_bootstrap_G1_action_discard_ruleb(void *userDatavp, mar
                                             -1, /* separatori */
                                             0, /* properb */
                                             NULL, /* actionp */
-                                            0, /* passthroughb */
                                             0 /* hideseparatorb */,
                                             NULL, /* skipbp */
                                             NULL, /* declp */
@@ -7787,7 +7778,6 @@ static short _marpaESLIF_bootstrap_G1_action_exception_statementb(void *userData
                                             -1, /* separatori */
                                             0, /* properb */
                                             actionp,
-                                            0, /* passthroughb */
                                             0 /* hideseparatorb */,
                                             NULL, /* skipbp */
                                             bootstrapLhsp->declp,
@@ -9263,7 +9253,7 @@ static short _marpaESLIF_bootstrap_G1_action_start_symbol_2b(void *userDatavp, m
 }
 
 /*****************************************************************************/
-static inline marpaESLIF_rule_t *_marpaESLIF_bootstrap_check_rulep(marpaESLIF_t *marpaESLIFp, marpaESLIFGrammar_t *marpaESLIFGrammarp, marpaESLIF_grammar_t *grammarp, char *descEncodings, char *descs, size_t descl, int lhsi, size_t nrhsl, int *rhsip, int exceptioni, int ranki, short nullRanksHighb, short sequenceb, int minimumi, int separatori, short properb, marpaESLIF_action_t *actionp, short passthroughb, short hideseparatorb, short *skipbp, marpaESLIF_lua_functiondecl_t *declp, marpaESLIF_lua_functioncall_t **callpp, marpaESLIF_lua_functioncall_t *separatorcallp)
+static inline marpaESLIF_rule_t *_marpaESLIF_bootstrap_check_rulep(marpaESLIF_t *marpaESLIFp, marpaESLIFGrammar_t *marpaESLIFGrammarp, marpaESLIF_grammar_t *grammarp, char *descEncodings, char *descs, size_t descl, int lhsi, size_t nrhsl, int *rhsip, int exceptioni, int ranki, short nullRanksHighb, short sequenceb, int minimumi, int separatori, short properb, marpaESLIF_action_t *actionp, short hideseparatorb, short *skipbp, marpaESLIF_lua_functiondecl_t *declp, marpaESLIF_lua_functioncall_t **callpp, marpaESLIF_lua_functioncall_t *separatorcallp)
 {
   size_t               rhsl;
   marpaESLIF_symbol_t *rhsp;
@@ -9285,7 +9275,6 @@ static inline marpaESLIF_rule_t *_marpaESLIF_bootstrap_check_rulep(marpaESLIF_t 
                                 separatori,
                                 properb,
                                 actionp,
-                                passthroughb,
                                 hideseparatorb,
                                 skipbp,
                                 declp,

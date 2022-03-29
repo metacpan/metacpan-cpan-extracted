@@ -457,6 +457,7 @@ sub inline_elements {
                             (?<verbatim>      \<verbatim\> .*? \<\/verbatim\>      ) |
                             (?<verbatim_code> \<code\>     .*? \<\/code\>          ) |
                             (?<verbatim_code> (?<![[:alnum:]])\=(?=\S)  .+? (?<=\S)\=(?![[:alnum:]]) ) |
+                            (?<ruby> \<ruby\> .+?\|.+? \<\/ruby\>) |
                             (?<bidimarker>   (?:\<\<\<|\>\>\>) ) |
                             (?<pri_footnote> \s*\[[1-9][0-9]*\]) |
                             (?<sec_footnote> \s*\{[1-9][0-9]*\}) |
@@ -513,6 +514,9 @@ sub inline_elements {
             die "Too many keys in <$string> the capture hash: @rest" if @rest;
             delete $captures{$type};
             $args{type} = $type;
+            if ($type eq 'ruby') {
+                $self->document->set_has_ruby;
+            }
         }
         die "Unprocessed captures %captures in <$string>" if %captures;
         push @list, Text::Amuse::InlineElement->new(%args);

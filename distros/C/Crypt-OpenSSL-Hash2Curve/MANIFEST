@@ -1,0 +1,22 @@
+Changes
+h2c.c
+Hash2Curve.pm
+Hash2Curve.xs
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+ppport.h
+README.pod
+t/01.expand_message_xmd.t
+t/02.hash_to_field.t
+t/03.OBJ_sn2nid.t
+t/04.sn2z.t
+t/05.sgn0_m_eq_1.t
+t/06.map_to_curve_sswu_not_straight_line.t
+t/07.map_to_curve_sswu_straight_line.t
+t/08.map_to_curve.t
+t/09.encode_to_curve.t
+t/10.hash_to_curve.t
+typemap
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

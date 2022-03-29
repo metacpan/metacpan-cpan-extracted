@@ -8,9 +8,9 @@ use Role::Tiny::With;
 with 'ArrayDataRole::Source::LinesInDATA';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-09-26'; # DATE
+our $DATE = '2022-03-27'; # DATE
 our $DIST = 'ArrayData-Lingua-Word-ID-KBBI'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 # STATS
 
@@ -27,7 +27,7 @@ ArrayData::Lingua::Word::ID::KBBI - Indonesian words from Kamus Besar Bahasa Ind
 
 =head1 VERSION
 
-This document describes version 0.003 of ArrayData::Lingua::Word::ID::KBBI (from Perl distribution ArrayData-Lingua-Word-ID-KBBI), released on 2021-09-26.
+This document describes version 0.004 of ArrayData::Lingua::Word::ID::KBBI (from Perl distribution ArrayData-Lingua-Word-ID-KBBI), released on 2022-03-27.
 
 =head1 SYNOPSIS
 
@@ -102,7 +102,7 @@ beyond that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

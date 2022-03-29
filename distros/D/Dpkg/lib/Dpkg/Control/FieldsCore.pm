@@ -49,6 +49,7 @@ use Dpkg::Control::Types;
 use constant {
     ALL_PKG => CTRL_INFO_PKG | CTRL_INDEX_PKG | CTRL_PKG_DEB | CTRL_FILE_STATUS,
     ALL_SRC => CTRL_INFO_SRC | CTRL_INDEX_SRC | CTRL_PKG_SRC,
+    ALL_FILE_MANIFEST => CTRL_FILE_BUILDINFO | CTRL_FILE_CHANGES,
     ALL_CHANGES => CTRL_FILE_CHANGES | CTRL_CHANGELOG,
     ALL_COPYRIGHT => CTRL_COPYRIGHT_HEADER | CTRL_COPYRIGHT_FILES | CTRL_COPYRIGHT_LICENSE,
 };
@@ -60,10 +61,10 @@ use constant {
     FIELD_SEP_LINE => 4,
 };
 
-# The canonical list of fields
+# The canonical list of fields.
 
-# Note that fields used only in dpkg's available file are not listed
-# Deprecated fields of dpkg's status file are also not listed
+# Note that fields used only in dpkg's available file are not listed.
+# Deprecated fields of dpkg's status file are also not listed.
 our %FIELDS = (
     'acquire-by-hash' => {
         name => 'Acquire-By-Hash',
@@ -71,7 +72,7 @@ our %FIELDS = (
     },
     'architecture' => {
         name => 'Architecture',
-        allowed => (ALL_PKG | ALL_SRC | CTRL_FILE_BUILDINFO | CTRL_FILE_CHANGES | CTRL_TESTS) & (~CTRL_INFO_SRC),
+        allowed => (ALL_PKG | ALL_SRC | ALL_FILE_MANIFEST | CTRL_TESTS) & (~CTRL_INFO_SRC),
         separator => FIELD_SEP_SPACE,
     },
     'architectures' => {
@@ -86,7 +87,7 @@ our %FIELDS = (
     },
     'binary' => {
         name => 'Binary',
-        allowed => CTRL_PKG_SRC | CTRL_INDEX_SRC | CTRL_FILE_BUILDINFO | CTRL_FILE_CHANGES,
+        allowed => CTRL_PKG_SRC | CTRL_INDEX_SRC | ALL_FILE_MANIFEST,
         # XXX: This field values are separated either by space or comma
         # depending on the context.
         separator => FIELD_SEP_SPACE | FIELD_SEP_COMMA,
@@ -216,15 +217,15 @@ our %FIELDS = (
     },
     'checksums-md5' => {
         name => 'Checksums-Md5',
-        allowed => CTRL_PKG_SRC | CTRL_INDEX_SRC | CTRL_FILE_CHANGES | CTRL_FILE_BUILDINFO,
+        allowed => CTRL_PKG_SRC | CTRL_INDEX_SRC | ALL_FILE_MANIFEST,
     },
     'checksums-sha1' => {
         name => 'Checksums-Sha1',
-        allowed => CTRL_PKG_SRC | CTRL_INDEX_SRC | CTRL_FILE_CHANGES | CTRL_FILE_BUILDINFO,
+        allowed => CTRL_PKG_SRC | CTRL_INDEX_SRC | ALL_FILE_MANIFEST,
     },
     'checksums-sha256' => {
         name => 'Checksums-Sha256',
-        allowed => CTRL_PKG_SRC | CTRL_INDEX_SRC | CTRL_FILE_CHANGES | CTRL_FILE_BUILDINFO,
+        allowed => CTRL_PKG_SRC | CTRL_INDEX_SRC | ALL_FILE_MANIFEST,
     },
     'classes' => {
         name => 'Classes',
@@ -329,7 +330,7 @@ our %FIELDS = (
     },
     'format' => {
         name => 'Format',
-        allowed => CTRL_PKG_SRC | CTRL_INDEX_SRC | CTRL_FILE_CHANGES | CTRL_COPYRIGHT_HEADER | CTRL_FILE_BUILDINFO,
+        allowed => CTRL_PKG_SRC | CTRL_INDEX_SRC | ALL_FILE_MANIFEST | CTRL_COPYRIGHT_HEADER,
     },
     'homepage' => {
         name => 'Homepage',
@@ -368,7 +369,7 @@ our %FIELDS = (
     },
     'maintainer' => {
         name => 'Maintainer',
-        allowed => CTRL_PKG_DEB| CTRL_INDEX_PKG | CTRL_FILE_STATUS | ALL_SRC  | ALL_CHANGES,
+        allowed => CTRL_PKG_DEB | CTRL_INDEX_PKG | CTRL_FILE_STATUS | ALL_SRC  | ALL_CHANGES,
     },
     'md5sum' => {
         # XXX: Wrong capitalization due to historical reasons.
@@ -755,8 +756,6 @@ our %FIELD_ORDER = (
             package-type
             source
             version
-            built-using
-            static-built-using
             kernel-version
             built-for-profiles
             auto-built-package
@@ -816,8 +815,6 @@ our %FIELD_ORDER = (
             package-type
             source
             version
-            built-using
-            static-built-using
             kernel-version
             built-for-profiles
             auto-built-package
@@ -1055,7 +1052,7 @@ sub field_capitalize($) {
     return join '-', map { ucfirst } split /-/, $field;
 }
 
-=item field_is_official($fname)
+=item $bool = field_is_official($fname)
 
 Returns true if the field is official and known.
 
@@ -1067,7 +1064,7 @@ sub field_is_official($) {
     return exists $FIELDS{$field};
 }
 
-=item field_is_allowed_in($fname, @types)
+=item $bool = field_is_allowed_in($fname, @types)
 
 Returns true (1) if the field $fname is allowed in all the types listed in
 the list. Note that you can use type sets instead of individual types (ex:
@@ -1094,7 +1091,7 @@ sub field_is_allowed_in($@) {
     return 1;
 }
 
-=item field_transfer_single($from, $to, $field)
+=item $new_field = field_transfer_single($from, $to, $field)
 
 If appropriate, copy the value of the field named $field taken from the
 $from Dpkg::Control object to the $to Dpkg::Control object.
@@ -1147,7 +1144,7 @@ sub field_transfer_single($$;$) {
     return;
 }
 
-=item field_transfer_all($from, $to)
+=item @field_list = field_transfer_all($from, $to)
 
 Transfer all appropriate fields from $from to $to. Calls
 field_transfer_single() on all fields available in $from.
@@ -1166,7 +1163,7 @@ sub field_transfer_all($$) {
     return @res;
 }
 
-=item field_ordered_list($type)
+=item @field_list = field_ordered_list($type)
 
 Returns an ordered list of fields for a given type of control information.
 This list can be used to output the fields in a predictable order.
@@ -1229,7 +1226,7 @@ sub field_parse_binary_source($) {
     return ($source, $version);
 }
 
-=item field_list_src_dep()
+=item @field_list = field_list_src_dep()
 
 List of fields that contains dependencies-like information in a source
 Debian package.
@@ -1248,7 +1245,7 @@ sub field_list_src_dep() {
     return @list;
 }
 
-=item field_list_pkg_dep()
+=item @field_list = field_list_pkg_dep()
 
 List of fields that contains dependencies-like information in a binary
 Debian package. The fields that express real dependencies are sorted from
@@ -1268,7 +1265,7 @@ sub field_list_pkg_dep() {
     return @list;
 }
 
-=item field_get_dep_type($field)
+=item $dep_type = field_get_dep_type($field)
 
 Return the type of the dependency expressed by the given field. Can
 either be "normal" for a real dependency field (Pre-Depends, Depends, ...)
@@ -1285,7 +1282,7 @@ sub field_get_dep_type($) {
     return;
 }
 
-=item field_get_sep_type($field)
+=item $sep_type = field_get_sep_type($field)
 
 Return the type of the field value separator. Can be one of FIELD_SEP_UNKNOWN,
 FIELD_SEP_SPACE, FIELD_SEP_COMMA or FIELD_SEP_LINE.
@@ -1302,49 +1299,64 @@ sub field_get_sep_type($) {
 =item field_register($field, $allowed_types, %opts)
 
 Register a new field as being allowed in control information of specified
-types. %opts is optional
+types. %opts is optional.
 
 =cut
 
 sub field_register($$;@) {
     my ($field, $types, %opts) = @_;
+
     $field = lc $field;
     $FIELDS{$field} = {
         name => field_capitalize($field),
         allowed => $types,
         %opts
     };
+
+    return;
 }
 
-=item field_insert_after($type, $ref, @fields)
+=item $bool = field_insert_after($type, $ref, @fields)
 
 Place field after another one ($ref) in output of control information of
 type $type.
 
+Return true if the field was inserted, otherwise false.
+
 =cut
+
 sub field_insert_after($$@) {
     my ($type, $field, @fields) = @_;
+
     return 0 if not exists $FIELD_ORDER{$type};
+
     ($field, @fields) = map { lc } ($field, @fields);
     @{$FIELD_ORDER{$type}} = map {
         ($_ eq $field) ? ($_, @fields) : $_
     } @{$FIELD_ORDER{$type}};
+
     return 1;
 }
 
-=item field_insert_before($type, $ref, @fields)
+=item $bool = field_insert_before($type, $ref, @fields)
 
 Place field before another one ($ref) in output of control information of
 type $type.
 
+Return true if the field was inserted, otherwise false.
+
 =cut
+
 sub field_insert_before($$@) {
     my ($type, $field, @fields) = @_;
+
     return 0 if not exists $FIELD_ORDER{$type};
+
     ($field, @fields) = map { lc } ($field, @fields);
     @{$FIELD_ORDER{$type}} = map {
         ($_ eq $field) ? (@fields, $_) : $_
     } @{$FIELD_ORDER{$type}};
+
     return 1;
 }
 

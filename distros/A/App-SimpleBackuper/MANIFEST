@@ -29,6 +29,7 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 README.md
 t/Actions.t
+t/bench-walk-homedir.pl
 t/DB/BackupsTable.t
 t/DB/BaseTable.t
 t/DB/FilesTable.t

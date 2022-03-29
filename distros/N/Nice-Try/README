@@ -39,7 +39,7 @@ SYNOPSIS
         Cleaning up
         Ok, then
 
-    Also since version 1.0.0, Nice::Try is context aware:
+    Also since version 1.0.0, Nice::Try is extended context aware:
 
         use Want; # an awesome module which extends wantarray
         sub info
@@ -103,13 +103,15 @@ SYNOPSIS
         # scalar reference context
         my $name = ${$o->info};
 
-    And you also have granual power in the catch block to filter which
+    And you also have granular power in the catch block to filter which
     exception to handle. See more on this in "EXCEPTION CLASS"
 
         try
         {
             die( Exception->new( "Arghhh" => 401 ) );
         }
+        # can also write this as:
+        # catch( Exception $oopsie where { $_->message =~ /Arghhh/ && $_->code == 500 } )
         catch( $oopsie isa Exception where { $_->message =~ /Arghhh/ && $_->code == 500 } )
         {
             # Do something to deal with some server error
@@ -133,7 +135,7 @@ SYNOPSIS
         }
 
 VERSION
-        v1.1.1
+        v1.2.0
 
 DESCRIPTION
     Nice::Try is a lightweight implementation of Try-Catch exception
@@ -226,7 +228,7 @@ DESCRIPTION
             }
             catch( $default )
             {
-                print( "Something weird has happened: $e\n" );
+                print( "Something weird has happened: $default\n" );
             }
             finally
             {
@@ -522,9 +524,8 @@ WHY USE IT?
     as a regular non-experimental feature.
 
     See more information about perl's featured implementation of try-catch
-    in
-    <https://perldoc.perl.org/5.34.0/perlsyn#Try-Catch-Exception-Handling|pe
-    rlsyn>
+    in perlsyn
+    <https://perldoc.perl.org/5.34.0/perlsyn#Try-Catch-Exception-Handling>
 
     So, Nice::Try is quite unique and fills the missing features, and since
     it uses XS modules for a one-time filtering, it is quite fast.
@@ -641,7 +642,8 @@ EXCEPTION CLASS
     As mentioned above, you can use class when raising exceptions and you
     can filter them in a variety of way when you catch them.
 
-    Here are your options:
+    Here are your options (replace "Exception::Class" with your favorite
+    exception class):
 
     1. catch( Exception::Class $error_variable ) { }
     2. catch( Exception::Class $error_variable where { $condition } ) { }
@@ -652,7 +654,7 @@ EXCEPTION CLASS
             {
                 die( Exception->new( "Oh no!", { code => 401 } ) );
             }
-            catch( Exception $oopsie where { $_->code >= 400 && $_->code < 499 })
+            catch( Exception $oopsie where { $_->code >= 400 && $_->code <= 499 })
             {
                 # some more handling here
             }
@@ -903,6 +905,63 @@ CONTEXT AWARENESS
     would need to be inside a subroutine, otherwise there is no rich context
     other than the one the regular "wantarray" in perlfunc provides.
 
+    This is particularly true when running within an Apache modperl handler
+    which has no caller. If you use Nice::Try in such handler, it will kill
+    Apache process, so you need to disable the use of Want, by calling:
+
+        use Nice::Try dont_want => 1;
+
+    When there is an update to correct this bug from Want, I will issue a
+    new version.
+
+    The use of Want is also automatically disabled when running under a
+    package that use overloading.
+
+LIMITATIONS
+    Currently, the only known limitation is when one use experimental
+    subroutine attributes inside a try-catch block. For example:
+
+        use strict;
+        use warnings;
+        use experimental 'signatures';
+        use Nice::Try;
+
+        sub test { 1 }
+
+        sub foo ($f = test()) { 1 }
+
+        try {
+            my $k = sub ($f = foo()) {}; # <-- this sub routine attribute inside try-catch block will disrupt Nice::Try and make it fail.
+            print( "worked\n" );
+        }
+        catch($e) {
+            warn "caught: $e";
+        }
+
+        __END__
+
+    instead, do not use experimental subroutine attributes inside try-catch
+    block:
+
+        use strict;
+        use warnings;
+        use experimental 'signatures';
+        use Nice::Try;
+
+        sub test { 1 }
+
+        sub foo ($f = test()) { 1 }
+
+        try {
+            my $k = sub {}; # <-- Now it works normally
+            print( "worked\n" );
+        }
+        catch($e) {
+            warn "caught: $e";
+        }
+
+        __END__
+
 DEBUGGING
     And to have Nice::Try save the filtered code to a file, pass it the
     "debug_file" parameter like this:
@@ -927,6 +986,19 @@ DEBUGGING
 
         use Nice::Try debug_code => 1;
 
+CLASS FUNCTIONS
+    The following class functions can be used.
+
+  implement
+        my $new_code = Nice::Try->implement( $perl_code );
+        eval( $new_code );
+
+    Provided with a perl code having one or more try-catch blocks and this
+    will return a perl code converted to support try-catch blocks.
+
+    This is designed to be used for perl code you store, such as subroutines
+    dynamically loaded.
+
 CREDITS
     Credits to Stephen R. Scaffidi for his implementation of Try::Harder
     from which I borrowed some code.
@@ -937,6 +1009,9 @@ AUTHOR
 SEE ALSO
     PPI, Filter::Util::Call, Try::Harder, Syntax::Keyword::Try,
     Exception::Class
+
+    JavaScript implementation of nice-try
+    <https://javascript.info/try-catch>
 
 COPYRIGHT & LICENSE
     Copyright (c) 2020-2021 DEGUEST Pte. Ltd.

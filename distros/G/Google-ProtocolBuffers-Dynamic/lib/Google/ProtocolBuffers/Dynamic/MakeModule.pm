@@ -215,7 +215,7 @@ Google::ProtocolBuffers::Dynamic::MakeModule
 
 =head1 VERSION
 
-version 0.34
+version 0.36
 
 =head1 AUTHOR
 

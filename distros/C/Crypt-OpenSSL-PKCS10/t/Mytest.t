@@ -5,7 +5,7 @@
 
 # change 'tests => 1' to 'tests => last_test_to_print';
 
-use Test::More tests => 6;
+use Test::More tests => 7;
 BEGIN { use_ok('Crypt::OpenSSL::PKCS10') };
 
 #########################
@@ -60,4 +60,11 @@ print STDERR $req->keyinfo()."\n";
 print STDERR $req->pubkey_type()."\n";
 print STDERR $req->get_pem_pubkey()."\n";
 ok($req);
+}
+
+{
+eval {
+	Crypt::OpenSSL::PKCS10->new_from_file("file_doesnt_exist");
+};
+like($@, qr{^Cannot open file 'file_doesnt_exist'}, "Check error if file doesn't exist.");
 }

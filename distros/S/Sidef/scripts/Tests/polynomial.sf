@@ -1,0 +1,306 @@
+#!/usr/bin/ruby
+
+# Tests for the Polynomial() class
+
+func faulhaber_formula(p) {
+    (p+1).of { |j|
+        Poly(p - j + 1) * bernoulli(j) * binomial(p+1, j)
+    }.sum / (p+1)
+}
+
+assert_eq(
+    faulhaber_formula(19),
+    Polynomial(2 => 43867/84, 4 => -68723/40, 6 => 2261, 8 => -223193/140, 10 => 4199/6, 12 => -4199/20, 14 => 323/7, 16 => -323/40, 18 => 19/12, 19 => 1/2, 20 => 1/20)
+)
+
+assert_eq(
+    faulhaber_formula(20),
+    Polynomial(1 => -174611/330, 3 => 219335/63, 5 => -68723/10, 7 => 6460, 9 => -223193/63, 11 => 41990/33, 13 => -323, 15 => 1292/21, 17 => -19/2, 19 => 5/3, 20 => 1/2, 21 => 1/21)
+)
+
+assert_eq(
+    faulhaber_formula(20).to_s,
+    "1/21*x^21 + 1/2*x^20 + 5/3*x^19 - 19/2*x^17 + 1292/21*x^15 - 323*x^13 + 41990/33*x^11 - 223193/63*x^9 + 6460*x^7 - 68723/10*x^5 + 219335/63*x^3 - 174611/330*x"
+)
+
+assert(Poly() == 0)
+assert_eq(Poly(), 0)
+assert_eq(Poly(0 => 0), 0)
+
+assert(Poly() != 1)
+assert_ne(Poly(), 1)
+
+assert_eq(Poly(), Poly())
+assert_eq(Poly(0), Poly(0))
+assert_eq(Poly(0 => 0), Poly(0 => 0))
+
+assert_ne(Poly(), Poly(1))
+assert_ne(Poly(1), Poly())
+
+with (Poly([1,2,3,4])) {|p|
+
+    assert_eq(
+        p / 42,
+        Polynomial(0 => 2/21, 1 => 1/14, 2 => 1/21, 3 => 1/42)
+    )
+
+    assert_eq(
+        42 * p,
+        p * 42,
+    )
+
+    assert_ne(
+        42 * p,
+        43 * p,
+    )
+
+    assert_eq(
+        p.mul(42),
+        p.mul(Poly(0 => 42))
+    )
+
+    assert_eq(
+        p.mul(42),
+        Polynomial(0 => 168, 1 => 126, 2 => 84, 3 => 42)
+    )
+
+    assert_eq(
+        42 - p,
+        Polynomial(0 => 38, 1 => -3, 2 => -2, 3 => -1)
+    ),
+
+    assert_eq(
+        p - 42,
+        p.sub(Poly(0 => 42))
+    )
+
+    assert_eq(
+        42 + p,
+        Polynomial(0 => 46, 1 => 3, 2 => 2, 3 => 1)
+    )
+
+    assert_eq(
+        p + 42,
+        p.add(Poly(0 => 42))
+    )
+
+    assert_eq(Poly(3 => 10) + Poly(0 => 42), Poly(0 => +42, 3 => 10))
+    assert_eq(Poly(3 => 10) - Poly(0 => 42), Poly(0 => -42, 3 => 10))
+
+    assert_eq(lift(Mod(p, 97)**10) <=> p.powmod(10, 97), 0)
+    assert_eq(p**3 <=> p**2, 1)
+    assert_eq(p**2 <=> p**3, -1)
+
+    assert_eq(
+        p % 3,
+        Polynomial(0 => 1, 2 => 2, 3 => 1)
+    )
+
+    assert_eq(p % 97 -> eval(6), Mod(19, 97))
+
+    assert_eq(
+        Poly([0,0,5]),
+        5
+    )
+
+    assert_ne(
+        lift(Mod(Poly([1,2,3]), 97)**10),
+        Poly([1,2,3]).powmod(11, 97)
+    )
+
+    assert_eq(
+        lift(Mod(Poly([1,2,3]), 97)**10),
+        Poly([1,2,3]).powmod(10, 97)
+    )
+}
+
+assert_eq(
+    Poly([1,2,3]) + Poly([3,4,5,6]),
+    Polynomial(0 => 9, 1 => 7, 2 => 5, 3 => 3)
+)
+
+assert_eq(
+    Poly([1,2,3]) - Poly([3,4,5,6]),
+    Polynomial(0 => -3, 1 => -3, 2 => -3, 3 => -3)
+)
+
+assert_eq(
+    Poly([1,2,3]) * Poly([3,4,5,6]),
+    Polynomial(0 => 18, 1 => 27, 2 => 28, 3 => 22, 4 => 10, 5 => 3)
+)
+
+assert_eq(
+    Poly([3,4,3+4i, 9]).to_s,
+    "3*x^3 + 4*x^2 + (3+4i)*x + 9"
+)
+
+assert_eq(
+    Polynomial(5).to_s,
+    'x^5'
+)
+
+assert_eq(
+    Polynomial([1,2,3,4]).to_s,
+    'x^3 + 2*x^2 + 3*x + 4'
+)
+
+assert_eq(
+    Polynomial(5 => 3, 2 => 10).to_s,
+    '3*x^5 + 10*x^2'
+)
+
+assert_eq(
+    Poly([3,Quadratic(3,4,5),5]).eval(17),
+    3*17**2 + Quadratic(3,4,5)*17 + 5
+)
+
+assert_eq(
+    faulhaber_formula(11).eval(1000),
+    1000.faulhaber(11)
+)
+
+assert_eq(
+    faulhaber_formula(20).eval(12345),
+    12345.faulhaber(20)
+)
+
+func cyclotomic(n) is cached {
+    var x = Poly(n, 1)-1
+    var y = n.divisors.grep { _ < n }.prod {|d| __FUNC__(d) }
+    x / y
+}
+
+assert_eq(cyclotomic(0), 0.cyclotomic)
+assert_eq(cyclotomic(1), 1.cyclotomic)
+assert_eq(cyclotomic(19), 19.cyclotomic)
+assert_eq(cyclotomic(42), 42.cyclotomic)
+
+assert_eq(cyclotomic(0), 0)
+assert_eq(cyclotomic(1).to_s, 'x - 1')
+assert_eq(cyclotomic(2).to_s, 'x + 1')
+assert_eq(cyclotomic(3).to_s, 'x^2 + x + 1')
+assert_eq(cyclotomic(4).to_s, 'x^2 + 1')
+assert_eq(cyclotomic(12).to_s, 'x^4 - x^2 + 1')
+assert_eq(cyclotomic(13).to_s, 'x^12 + x^11 + x^10 + x^9 + x^8 + x^7 + x^6 + x^5 + x^4 + x^3 + x^2 + x + 1')
+assert_eq(cyclotomic(24).to_s, 'x^8 - x^4 + 1')
+assert_eq(cyclotomic(30).to_s, 'x^8 + x^7 - x^5 - x^4 - x^3 + x + 1')
+
+assert_eq(Poly(3 => 1) / Poly(2 => 1), Poly(1 => 1))
+assert_eq(Poly(5 => 1) / Poly(2 => 1), Poly(3 => 1))
+
+assert_eq(Poly([3,4,5]) % Poly([12,3,14]), Poly(1 => 13/4, 0 => 3/2))
+assert_eq(Poly([10, 42]) / Poly([12]), Poly(1 => 5/6, 0 => 7/2))
+
+assert_eq(
+    Poly([15,2,3,-4,1,2,-3,-1,2,3]) % Poly([-1,2,3,1,2,-3,9]) -> to_s,
+    '1061*x^5 + 1126*x^4 + 591*x^3 + 613*x^2 + 17*x + 2982'
+)
+
+with (Poly(1 => 1)) {|x|
+
+    assert_eq(
+        Poly([3,4,5])**(-2),
+        Fraction(1, 9*x**4 + 24*x**3 + 46*x**2 + 40*x + 25)
+    )
+
+    var p = Poly([5,7,11])
+
+    assert_eq(p.inv, p**(-1))
+
+    assert_eq(p/0, Inf)
+    assert_eq(p/Poly(), Inf)
+
+    assert_eq(0/p, 0)
+    assert_eq(1/p, p.inv)
+    assert_eq(2/p, 2*p.inv)
+
+    assert_eq(p.powmod(+5, 97), lift(Mod(p, 97)**+5))
+    assert_eq(p.powmod(-5, 97), lift(Mod(p, 97)**-5))
+
+    assert_eq(Mod(p.powmod(+6, 97), 97), Mod(p, 97)**+6)
+    assert_eq(Mod(p.powmod(-6, 97), 97), Mod(p, 97)**-6)
+
+    assert_eq(p.powmod(+6, 97).eval(42), Mod(85, 97))
+    assert_eq([p.powmod(-6, 97).nude].map { .kind_of(Polynomial) ? .eval(42) : _ }.reduce('/'), 1/577294259220123291015625)
+
+    assert_eq(Polynomial(0 => 123, 1 => 4/3, 2 => 4, 3 => 3), Poly([3,4,4/3,123]))
+
+    var a = Poly([11,1,0,3,5])
+    var b = Poly([3,0,14])
+
+    assert_eq(a/b, Fraction(11*x**4 + x**3 + 3*x + 5, 3*x**2 + 14))
+    assert_eq(floor(a/b), idiv(a,b))
+    assert_eq(floor(Fraction(a,b)), (11/3)*x**2 + (1/3)*x - 154/9)
+
+    assert_eq(binomial(x, 0), Polynomial(0 => 1))
+    assert_eq(binomial(x, 1), Polynomial(1 => 1))
+    assert_eq(binomial(x, 2), Polynomial(1 => -1/2, 2 => 1/2))
+    assert_eq(binomial(x, 3), Polynomial(1 => 1/3, 2 => -1/2, 3 => 1/6))
+    assert_eq(binomial(x, 10), Polynomial(1 => -1/10, 2 => 7129/25200, 3 => -1303/4032, 4 => 4523/22680, 5 => -19/256, 6 => 3013/172800, 7 => -1/384, 8 => 29/120960, 9 => -1/80640, 10 => 1/3628800))
+}
+
+for n in (0..10) {
+    var x = irand(50, 100)
+
+    assert_eq(chebyshevT(n).eval(x), chebyshevT(n, x))
+    assert_eq(chebyshevU(n).eval(x), chebyshevU(n, x))
+
+    assert_eq(bernoulli_polynomial(n).eval(x), bernoulli_polynomial(n, x))
+    assert_eq(faulhaber_polynomial(n).eval(x), faulhaber_polynomial(n, x))
+    assert_eq(euler_polynomial(n).eval(x), euler_polynomial(n, x))
+
+    assert_eq(legendre_polynomial(n).eval(x), legendre_polynomial(n, x))
+
+    assert_eq(hermiteH(n).eval(x), hermiteH(n, x))
+    assert_eq(hermiteHe(n).eval(x), hermiteHe(n, x))
+    assert_eq(laguerreL(n).eval(x), laguerreL(n, x))
+
+    assert_eq(cyclotomic_polynomial(n).eval(x), cyclotomic_polynomial(n, x))
+}
+
+do {
+    assert_eq(20.of { _**2 }.solve_seq, Poly(2 => 1))
+    assert_eq(20.of { .faulhaber(2) }.solve_seq, Polynomial(1 => 1/6, 2 => 1/2, 3 => 1/3))
+
+    assert_eq(20.of { (_+10)**3 }.solve_seq, Polynomial(0 => 1000, 1 => 300, 2 => 30, 3 => 1))
+    assert_eq(20.of { (_+10)**3 }.solve_seq(10), Poly(3 => 1))
+
+    assert_eq([].solve_seq, Poly(0 => 0))
+    assert_eq([0].solve_seq, Poly(0 => 0))
+    assert_eq([1].solve_seq, Poly(0 => 1))
+    assert_eq([2].solve_seq, Poly(0 => 2))
+}
+
+assert_eq(Poly([3,4]).invmod(97)(1234), Mod(34, 97))
+assert_eq(Poly([1,2,3,4]).invmod(97)(1234), Mod(72, 97))
+
+assert_eq(Mod(Poly([3,4]), 97)(42), 33)
+assert_eq(Poly([3,4])(42) % 97, 33)
+
+assert_eq(Gauss(Poly([3,4,5]), 42)(99), Gauss(29804, 42))
+assert_eq(Gauss(Poly([3,4,5]), Poly([1,2]))(42), Gauss(5465, 44))
+
+assert_eq(Quadratic(Poly([3,4,5]), 42, -1)(99), Quadratic(29804, 42, -1))
+assert_eq(Quadratic(Poly([3,4,5]), Poly([1,2]), -1)(42), Quadratic(5465, 44, -1))
+
+assert_eq(Quaternion(Poly([3,4,5]), Poly([1,2]))(42), Quaternion(5465, 44))
+assert_eq(Quaternion(Poly([3,4,5]), 155, Poly([1,2]), Poly([4,3]))(42), Quaternion(5465, 155, 44, 171))
+assert_eq(Mod(Quaternion(Poly([3,4,5]), 155, Poly([1,2]), Poly([4,3])), 97)(42), Quaternion(5465 % 97, 155 % 97, 44 % 97, 171 % 97))
+assert_eq((Mod(Quaternion(Poly([3,4,5]), 155, Poly([1,2]), Poly([4,3])), 97)**2)(42), Mod(Quaternion(5465 % 97, 155 % 97, 44 % 97, 171 % 97)**2, 97).lift)
+
+assert_eq(Fraction(3,4)(), 3/4)
+assert_eq(Fraction(Poly([3, 2]), Poly([1,2,3]))(42), Poly([3,2])(42) / Poly([1,2,3])(42))
+
+assert_eq(Mod(chebyshevU(42), 97)(100), chebyshevU(42, 100) % 97)
+assert_eq(Mod(chebyshevU(42), 97)(100), chebyshevUmod(42, 100, 97))
+
+assert_eq(Mod(chebyshevU(42), 97)(15/13), chebyshevU(42, 15/13) % 97)
+assert_eq(Mod(chebyshevU(42), 97)(15/13), chebyshevUmod(42, 15/13, 97))
+
+assert_eq(Mod(chebyshevT(42), 97)(100), chebyshevT(42, 100) % 97)
+assert_eq(Mod(chebyshevT(42), 97)(100), chebyshevTmod(42, 100, 97))
+
+assert_eq(Mod(chebyshevT(42), 97)(15/13), chebyshevT(42, 15/13) % 97)
+assert_eq(Mod(chebyshevT(42), 97)(15/13), chebyshevTmod(42, 15/13, 97))
+
+say "** Test passed!"

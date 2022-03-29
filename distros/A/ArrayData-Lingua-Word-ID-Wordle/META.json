@@ -33,7 +33,7 @@
       "runtime" : {
          "requires" : {
             "ArrayDataRole::BinarySearch::LinesInHandle" : "0",
-            "ArrayDataRole::Source::LinesInDATA" : "0",
+            "ArrayDataRole::Source::LinesInDATA" : "0.006",
             "Role::Tiny::With" : "0",
             "Role::TinyCommons::Collection::FindItem::Iterator" : "0.007",
             "Role::TinyCommons::Collection::PickItems::RandomSeekLines" : "0",
@@ -53,11 +53,11 @@
    "provides" : {
       "ArrayData::Lingua::Word::ID::Katla" : {
          "file" : "lib/ArrayData/Lingua/Word/ID/Katla.pm",
-         "version" : "v20220306.0.0"
+         "version" : "v20220306.0.1"
       },
       "ArrayData::Lingua::Word::ID::Wordle" : {
          "file" : "lib/ArrayData/Lingua/Word/ID/Wordle.pm",
-         "version" : "v20220306.0.0"
+         "version" : "v20220306.0.1"
       }
    },
    "release_status" : "stable",
@@ -72,7 +72,7 @@
          "web" : "https://github.com/perlancar/perl-ArrayData-Lingua-Word-ID-Wordle"
       }
    },
-   "version" : "20220306.0.0",
+   "version" : "20220306.0.1",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

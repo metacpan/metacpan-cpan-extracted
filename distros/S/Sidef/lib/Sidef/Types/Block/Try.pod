@@ -17,16 +17,16 @@ var obj = Try(...)
 
 =head2 catch
 
-Try.catch() -> I<Obj>
+    Try.catch()
 
-Return the
+Returns the
 
 =cut
 
 =head2 try
 
-Try.try() -> I<Obj>
+    Try.try()
 
-Return the
+Returns the
 
 =cut

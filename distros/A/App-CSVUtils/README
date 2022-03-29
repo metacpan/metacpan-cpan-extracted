@@ -2,8 +2,8 @@ NAME
     App::CSVUtils - CLI utilities related to CSV
 
 VERSION
-    This document describes version 0.036 of App::CSVUtils (from Perl
-    distribution App-CSVUtils), released on 2022-02-10.
+    This document describes version 0.037 of App::CSVUtils (from Perl
+    distribution App-CSVUtils), released on 2022-03-27.
 
 DESCRIPTION
     This distribution contains the following CLI utilities:
@@ -78,8 +78,10 @@ FUNCTIONS
 
     Return an enveloped aoaos table data from CSV data.
 
-    Read more about "table data" in App::td, which comes with a CLI td to
-    munge table data.
+    *Common notes for the utilities*
+
+    Encoding: The utilities in this module/distribution accept and emit UTF8
+    text.
 
     This function is not exported.
 
@@ -161,6 +163,11 @@ FUNCTIONS
     of "--after" (to put after a certain field), "--before" (to put before a
     certain field), or "--at" (to put at specific position, 1 means as the
     first field).
+
+    *Common notes for the utilities*
+
+    Encoding: The utilities in this module/distribution accept and emit UTF8
+    text.
 
     This function is not exported.
 
@@ -300,6 +307,11 @@ FUNCTIONS
      csv_avg(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     Output a summary row which are arithmetic averages of data rows.
+
+    *Common notes for the utilities*
+
+    Encoding: The utilities in this module/distribution accept and emit UTF8
+    text.
 
     This function is not exported.
 
@@ -454,6 +466,11 @@ FUNCTIONS
      ,,,X
      ,,,Y
 
+    *Common notes for the utilities*
+
+    Encoding: The utilities in this module/distribution accept and emit UTF8
+    text.
+
     This function is not exported.
 
     Arguments ('*' denotes required arguments):
@@ -573,6 +590,11 @@ FUNCTIONS
 
     Return a hash of field names as keys and first row as values.
 
+    *Common notes for the utilities*
+
+    Encoding: The utilities in this module/distribution accept and emit UTF8
+    text.
+
     This function is not exported.
 
     Arguments ('*' denotes required arguments):
@@ -649,6 +671,11 @@ FUNCTIONS
 
     Why convert CSV to CSV? When you want to change separator/quote/escape
     character, for one.
+
+    *Common notes for the utilities*
+
+    Encoding: The utilities in this module/distribution accept and emit UTF8
+    text.
 
     This function is not exported.
 
@@ -773,6 +800,11 @@ FUNCTIONS
 
     Delete one or more fields from CSV file.
 
+    *Common notes for the utilities*
+
+    Encoding: The utilities in this module/distribution accept and emit UTF8
+    text.
+
     This function is not exported.
 
     Arguments ('*' denotes required arguments):
@@ -896,6 +928,11 @@ FUNCTIONS
 
     Dump CSV as data structure (array of array/hash).
 
+    *Common notes for the utilities*
+
+    Encoding: The utilities in this module/distribution accept and emit UTF8
+    text.
+
     This function is not exported.
 
     Arguments ('*' denotes required arguments):
@@ -982,6 +1019,11 @@ FUNCTIONS
 
     This is like csv_map, except result of code is not printed.
 
+    *Common notes for the utilities*
+
+    Encoding: The utilities in this module/distribution accept and emit UTF8
+    text.
+
     This function is not exported.
 
     Arguments ('*' denotes required arguments):
@@ -1059,6 +1101,11 @@ FUNCTIONS
      csv_freqtable(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     Output a frequency table of values of a specified field in CSV.
+
+    *Common notes for the utilities*
+
+    Encoding: The utilities in this module/distribution accept and emit UTF8
+    text.
 
     This function is not exported.
 
@@ -1158,6 +1205,11 @@ FUNCTIONS
     Your code is then free to return true or false based on some criteria.
     Only rows where Perl expression returns true will be included in the
     result.
+
+    *Common notes for the utilities*
+
+    Encoding: The utilities in this module/distribution accept and emit UTF8
+    text.
 
     This function is not exported.
 
@@ -1286,6 +1338,11 @@ FUNCTIONS
 
     Show information about CSV file (number of rows, fields, etc).
 
+    *Common notes for the utilities*
+
+    Encoding: The utilities in this module/distribution accept and emit UTF8
+    text.
+
     This function is not exported.
 
     Arguments ('*' denotes required arguments):
@@ -1355,6 +1412,11 @@ FUNCTIONS
      csv_list_field_names(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     List field names of CSV file.
+
+    *Common notes for the utilities*
+
+    Encoding: The utilities in this module/distribution accept and emit UTF8
+    text.
 
     This function is not exported.
 
@@ -1452,6 +1514,11 @@ FUNCTIONS
      101,Jerry,not renewing,andy@example.com,555-2983
      299,Jerry,still thinking over,cindy@example.com,555-7892
      734,Elaine,renewing,felipe@example.com,555-9067
+
+    *Common notes for the utilities*
+
+    Encoding: The utilities in this module/distribution accept and emit UTF8
+    text.
 
     This function is not exported.
 
@@ -1606,6 +1673,11 @@ FUNCTIONS
     against these data. This utility will then print out the resulting
     string.
 
+    *Common notes for the utilities*
+
+    Encoding: The utilities in this module/distribution accept and emit UTF8
+    text.
+
     This function is not exported.
 
     Arguments ('*' denotes required arguments):
@@ -1694,6 +1766,11 @@ FUNCTIONS
     $main::rownum contains the row number (2 means the first data row).
     $main::csv is the Text::CSV_XS object. $main::field_idxs is also
     available for additional information.
+
+    *Common notes for the utilities*
+
+    Encoding: The utilities in this module/distribution accept and emit UTF8
+    text.
 
     This function is not exported.
 
@@ -1829,6 +1906,11 @@ FUNCTIONS
     representation ("--with-backslash-n"), or with characters of your choice
     ("--with 'blah'").
 
+    *Common notes for the utilities*
+
+    Encoding: The utilities in this module/distribution accept and emit UTF8
+    text.
+
     This function is not exported.
 
     Arguments ('*' denotes required arguments):
@@ -1949,6 +2031,11 @@ FUNCTIONS
      csv_select_fields(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     Only output selected field(s).
+
+    *Common notes for the utilities*
+
+    Encoding: The utilities in this module/distribution accept and emit UTF8
+    text.
 
     This function is not exported.
 
@@ -2076,6 +2163,11 @@ FUNCTIONS
      csv_select_row(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     Only output specified row(s).
+
+    *Common notes for the utilities*
+
+    Encoding: The utilities in this module/distribution accept and emit UTF8
+    text.
 
     This function is not exported.
 
@@ -2273,6 +2365,11 @@ FUNCTIONS
 
     Finally you can print out certain fields using "--result-fields".
 
+    *Common notes for the utilities*
+
+    Encoding: The utilities in this module/distribution accept and emit UTF8
+    text.
+
     This function is not exported.
 
     Arguments ('*' denotes required arguments):
@@ -2416,6 +2513,11 @@ FUNCTIONS
 
     You can also reverse the sort order ("-r"), sort case-insensitively
     ("-i"), or provides the ordering, e.g. "--example a,c,b".
+
+    *Common notes for the utilities*
+
+    Encoding: The utilities in this module/distribution accept and emit UTF8
+    text.
 
     This function is not exported.
 
@@ -2624,6 +2726,11 @@ FUNCTIONS
      Andy,20
      Ben,30
 
+    *Common notes for the utilities*
+
+    Encoding: The utilities in this module/distribution accept and emit UTF8
+    text.
+
     This function is not exported.
 
     Arguments ('*' denotes required arguments):
@@ -2800,6 +2907,11 @@ FUNCTIONS
 
     Interface is loosely based on the "split" Unix utility.
 
+    *Common notes for the utilities*
+
+    Encoding: The utilities in this module/distribution accept and emit UTF8
+    text.
+
     This function is not exported.
 
     Arguments ('*' denotes required arguments):
@@ -2920,6 +3032,11 @@ FUNCTIONS
      csv_sum(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     Output a summary row which are arithmetic sums of data rows.
+
+    *Common notes for the utilities*
+
+    Encoding: The utilities in this module/distribution accept and emit UTF8
+    text.
 
     This function is not exported.
 
@@ -3043,6 +3160,11 @@ FUNCTIONS
      csv_transpose(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     Transpose a CSV.
+
+    *Common notes for the utilities*
+
+    Encoding: The utilities in this module/distribution accept and emit UTF8
+    text.
 
     This function is not exported.
 

@@ -3,7 +3,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 
 # SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
 
-our $VERSION = 0.002;
+our $VERSION = 0.003;
 
 use Carp qw(croak);
 use IP::Geolocation::MMDB;
@@ -44,7 +44,7 @@ Mojolicious::Plugin::Geolocation::MMDB - Look up location information by IP addr
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

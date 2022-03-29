@@ -276,6 +276,9 @@ Mapper::DecoderHandlers *Mapper::DecoderHandlers::on_start_map(DecoderHandlers *
         hv = (HV *) SvRV(target);
 
     cxt->mappers.push_back(mapper->fields[*field_index].mapper);
+    cxt->seen_fields.resize(cxt->seen_fields.size() + 1);
+    cxt->seen_fields.back().resize(2);
+    cxt->seen_fields.back()[0] = true; // never apply defaults to "key"
     cxt->items.push_back((SV *) hv);
     cxt->items.push_back(sv_newmortal());
     cxt->items.push_back(NULL);
@@ -284,6 +287,7 @@ Mapper::DecoderHandlers *Mapper::DecoderHandlers::on_start_map(DecoderHandlers *
 }
 
 bool Mapper::DecoderHandlers::on_end_map(DecoderHandlers *cxt, const int *field_index) {
+    cxt->seen_fields.pop_back();
     cxt->mappers.pop_back();
     cxt->items.pop_back();
     cxt->items.pop_back();
@@ -349,15 +353,13 @@ bool Mapper::DecoderHandlers::on_end_map_entry(DecoderHandlers *cxt, const int *
         if (SvPOK(key))
             SvLEN_set(key, 0);
     } else {
-        // having decoding of broken maps succeed is debatable
-        warn("Incomplete map entry: missing %s",
-             (!SvOK(key) && !value) ? "both key and value" :
-             !SvOK(key)             ? "key" :
-                                      "value");
+        // having decoding of maps without keys is debatable
+        warn("Incomplete map entry: missing key");
     }
 
     SvOK_off(key);
     cxt->items[size - 1] = NULL;
+    cxt->seen_fields.back()[1] = false;
 
     return true;
 }
@@ -532,7 +534,7 @@ Mapper::Mapper(pTHX_ Dynamic *_registry, const MessageDef *_message_def, HV *_st
     pb_encoder_handlers = Encoder::NewHandlers(message_def);
     json_encoder_handlers = Printer::NewHandlers(message_def, false /* XXX option */);
     decoder_handlers = Handlers::New(message_def);
-    decode_explicit_defaults = options.explicit_defaults;
+    decode_explicit_defaults = options.explicit_defaults || message_def->mapentry();
     encode_defaults =
         (message_def->syntax() == UPB_SYNTAX_PROTO2 &&
          options.encode_defaults) ||

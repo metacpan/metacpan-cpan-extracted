@@ -7,7 +7,7 @@ use Carp 'confess';
 
 use App::SpamcupNG::Summary;
 
-our $VERSION = '0.014'; # VERSION
+our $VERSION = '0.015'; # VERSION
 
 =pod
 
@@ -41,6 +41,7 @@ web interface does not exports that info).
 
 =cut
 
+# TODO: follow best practice
 my @fields = ( 'email', 'report_id' );
 __PACKAGE__->mk_ro_accessors(@fields);
 

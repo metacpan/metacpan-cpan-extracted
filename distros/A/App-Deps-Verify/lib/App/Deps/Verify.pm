@@ -1,5 +1,5 @@
 package App::Deps::Verify;
-$App::Deps::Verify::VERSION = '0.12.0';
+$App::Deps::Verify::VERSION = '0.12.1';
 use strict;
 use warnings;
 use autodie;
@@ -388,7 +388,7 @@ App::Deps::Verify - app and API to verify the presence of dependencies (Perl 5 
 
 =head1 VERSION
 
-version 0.12.0
+version 0.12.1
 
 =head1 SYNOPSIS
 

@@ -5,6 +5,8 @@ BEGIN
     use warnings;
     use lib './lib';
     use Test::More;
+    # 2021-11-01T08:12:10
+    use Test::Time time => 1635754330;
     use DateTime;
     use Nice::Try;
     our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
@@ -123,17 +125,28 @@ is( $cbv, 2, '_set_get_code exec value' );
 my $now = time();
 $o->created = 'now';
 my $dt = $o->created;
+$dt->set_time_zone( 'UTC' );
 isa_ok( $dt, 'DateTime', '_set_get_datetime as lvalue' );
-my $dt2 = DateTime->from_epoch( epoch => $now, time_zone => $dt->time_zone );
-diag( "created is '", $dt->iso8601, "' vs '", $dt2->iso8601, "'" ) if( $DEBUG );
-ok( ( $dt->ymd == $dt2->ymd && $dt->hour == $dt2->hour && $dt->minute == $dt2->minute ), 'datetime value' );
-$o->created( '+1d' );
-my $dt4 = DateTime->now( time_zone => $dt->time_zone )->add( days => 1 );
-$dt4->truncate( to => 'minute' );
-my $dt3 = $o->created;
-$dt3->truncate( to => 'minute' );
-isa_ok( $dt3, 'DateTime', '_set_get_datetime' );
-is( $dt3->iso8601, $dt4->iso8601, '_set_get_datetime value' );
+SKIP:
+{
+    try
+    {
+        my $dt2 = DateTime->from_epoch( epoch => $now, time_zone => $dt->time_zone );
+        diag( "created is '", $dt->iso8601, "' vs '", $dt2->iso8601, "'" ) if( $DEBUG );
+        ok( ( $dt->ymd == $dt2->ymd && $dt->hour == $dt2->hour && $dt->minute == $dt2->minute ), 'datetime value' );
+        $o->created( '+1d' );
+        my $dt4 = DateTime->now( time_zone => $dt->time_zone )->add( days => 1 );
+        $dt4->truncate( to => 'minute' );
+        my $dt3 = $o->created->set_time_zone( 'UTC' );
+        $dt3->truncate( to => 'minute' );
+        isa_ok( $dt3, 'DateTime', '_set_get_datetime' );
+        is( $dt3->iso8601, $dt4->iso8601, '_set_get_datetime value' );
+    }
+    catch( $e where { /Invalid local time for date in time zone/i } )
+    {
+        skip( "Invalid time when changing time zone", 3 );
+    }
+};
 
 my $test = $o->file = "./some/file.txt";
 my $f2 = $o->file;

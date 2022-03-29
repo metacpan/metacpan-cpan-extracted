@@ -21,6 +21,9 @@ my %WriteMakefileArgs = (
   "NAME" => "App::SpamcupNG",
   "PREREQ_PM" => {
     "Class::Accessor" => "0.51",
+    "DBD::SQLite" => "1.70",
+    "DBI" => "1.643",
+    "DateTime" => "1.55",
     "HTML::Form" => "6.07",
     "HTML::TreeBuilder::XPath" => "0.14",
     "HTTP::CookieJar::LWP" => "0.012",
@@ -39,9 +42,10 @@ my %WriteMakefileArgs = (
     "Perl::Tidy::Sweetened" => "1.18",
     "Pod::Tidy" => "0.10",
     "Test::Exception" => "0.43",
-    "Test::More" => 0
+    "Test::More" => 0,
+    "Test::TempDir::Tiny" => 0
   },
-  "VERSION" => "0.014",
+  "VERSION" => "0.015",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -50,6 +54,9 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Class::Accessor" => "0.51",
+  "DBD::SQLite" => "1.70",
+  "DBI" => "1.643",
+  "DateTime" => "1.55",
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
   "HTML::Form" => "6.07",
@@ -66,6 +73,7 @@ my %FallbackPrereqs = (
   "Set::Tiny" => "0.04",
   "Test::Exception" => "0.43",
   "Test::More" => 0,
+  "Test::TempDir::Tiny" => 0,
   "YAML::XS" => "0.62"
 );
 

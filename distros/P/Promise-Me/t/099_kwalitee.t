@@ -1,17 +1,12 @@
 # -*- perl -*-
 BEGIN 
 {
-    use Test2::V0;
+	use Test::More;
 	unless( $ENV{AUTHOR_TESTING} || $ENV{RELEASE_TESTING} )
 	{
-		skip_all( 'These tests are for author or release candidate testing');
+		plan(skip_all => 'These tests are for author or release candidate testing');
 	}
 }
 
 eval { require Test::Kwalitee; Test::Kwalitee->import() }; 
-skip_all( 'Test::Kwalitee not installed; skipping' ) if $@;
-
-done_testing();
-
-__END__
-
+plan( skip_all => 'Test::Kwalitee not installed; skipping' ) if $@;

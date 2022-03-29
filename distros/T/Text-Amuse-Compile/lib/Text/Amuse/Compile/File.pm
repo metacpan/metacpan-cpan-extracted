@@ -1313,6 +1313,7 @@ sub _prepare_tex_tokens {
                                             others => $doc->other_languages || [],
                                             enable_secondary_footnotes => $enable_secondary_footnotes,
                                             bidi => $doc->is_bidi,
+                                            has_ruby => $doc->has_ruby,
                                             is_slide => $is_slide,
                                             captions => Text::Amuse::Utils::language_code_locale_captions($doc->language_code),
                                            );

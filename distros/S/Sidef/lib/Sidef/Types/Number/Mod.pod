@@ -11,8 +11,13 @@ This class implements ...
 
 =head1 SYNOPSIS
 
-var obj = Mod(...)
+    var a = Mod(13, 19)
 
+    a += 15         # Mod(9, 19)
+    a *= 99         # Mod(17, 19)
+    a /= 17         # Mod(1, 19)
+
+    say a           # Mod(1, 19)
 
 =head1 INHERITS
 
@@ -24,9 +29,9 @@ Inherits methods from:
 
 =head2 !
 
-I<Obj> B<!> I<Obj> -> I<Obj>
+    a ! b
 
-Return the
+Returns the
 
 Aliases: I<factorial>
 
@@ -34,9 +39,9 @@ Aliases: I<factorial>
 
 =head2 !=
 
-I<Obj> B<!=> I<Obj> -> I<Obj>
+    a != b
 
-Return the
+Returns the
 
 Aliases: I<ne>
 
@@ -44,9 +49,9 @@ Aliases: I<ne>
 
 =head2 &
 
-I<Obj> B<&> I<Obj> -> I<Obj>
+    a & b
 
-Return the
+Returns the
 
 Aliases: I<and>
 
@@ -54,9 +59,9 @@ Aliases: I<and>
 
 =head2 *
 
-I<Obj> B<*> I<Obj> -> I<Obj>
+    a * b
 
-Return the
+Returns the
 
 Aliases: I<mul>
 
@@ -64,9 +69,9 @@ Aliases: I<mul>
 
 =head2 **
 
-I<Obj> B<**> I<Obj> -> I<Obj>
+    a ** b
 
-Return the
+Returns the
 
 Aliases: I<pow>
 
@@ -74,9 +79,9 @@ Aliases: I<pow>
 
 =head2 +
 
-I<Obj> B<+> I<Obj> -> I<Obj>
+    a + b
 
-Return the
+Returns the
 
 Aliases: I<add>
 
@@ -84,9 +89,9 @@ Aliases: I<add>
 
 =head2 ++
 
-I<Obj> B<++> I<Obj> -> I<Obj>
+    a ++ b
 
-Return the
+Returns the
 
 Aliases: I<inc>
 
@@ -94,9 +99,9 @@ Aliases: I<inc>
 
 =head2 -
 
-I<Obj> B<-> I<Obj> -> I<Obj>
+    a - b
 
-Return the
+Returns the
 
 Aliases: I<sub>
 
@@ -104,9 +109,9 @@ Aliases: I<sub>
 
 =head2 --
 
-I<Obj> B<--> I<Obj> -> I<Obj>
+    a -- b
 
-Return the
+Returns the
 
 Aliases: I<dec>
 
@@ -114,9 +119,9 @@ Aliases: I<dec>
 
 =head2 /
 
-I<Obj> B</> I<Obj> -> I<Obj>
+    a / b
 
-Return the
+Returns the
 
 Aliases: I<÷>, I<div>
 
@@ -124,9 +129,9 @@ Aliases: I<÷>, I<div>
 
 =head2 <
 
-I<Obj> B<E<lt>> I<Obj> -> I<Obj>
+    a < b
 
-Return the
+Returns the
 
 Aliases: I<lt>
 
@@ -134,9 +139,9 @@ Aliases: I<lt>
 
 =head2 <<
 
-I<Obj> B<E<lt>E<lt>> I<Obj> -> I<Obj>
+    a << b
 
-Return the
+Returns the
 
 Aliases: I<lsft>, I<shift_left>
 
@@ -144,9 +149,9 @@ Aliases: I<lsft>, I<shift_left>
 
 =head2 <=>
 
-I<Obj> B<E<lt>=E<gt>> I<Obj> -> I<Obj>
+    a <=> b
 
-Return the
+Returns the
 
 Aliases: I<cmp>
 
@@ -154,9 +159,9 @@ Aliases: I<cmp>
 
 =head2 ==
 
-I<Obj> B<==> I<Obj> -> I<Obj>
+    a == b
 
-Return the
+Returns the
 
 Aliases: I<eq>
 
@@ -164,9 +169,9 @@ Aliases: I<eq>
 
 =head2 >
 
-I<Obj> B<E<gt>> I<Obj> -> I<Obj>
+    a > b
 
-Return the
+Returns the
 
 Aliases: I<gt>
 
@@ -174,9 +179,9 @@ Aliases: I<gt>
 
 =head2 >>
 
-I<Obj> B<E<gt>E<gt>> I<Obj> -> I<Obj>
+    a >> b
 
-Return the
+Returns the
 
 Aliases: I<rsft>, I<shift_right>
 
@@ -184,9 +189,9 @@ Aliases: I<rsft>, I<shift_right>
 
 =head2 ^
 
-I<Obj> B<^> I<Obj> -> I<Obj>
+    a ^ b
 
-Return the
+Returns the
 
 Aliases: I<xor>
 
@@ -194,9 +199,9 @@ Aliases: I<xor>
 
 =head2 |
 
-I<Obj> B<|> I<Obj> -> I<Obj>
+    a | b
 
-Return the
+Returns the
 
 Aliases: I<or>
 
@@ -204,9 +209,9 @@ Aliases: I<or>
 
 =head2 ≤
 
-I<Obj> B<≤> I<Obj> -> I<Obj>
+    a ≤ b
 
-Return the
+Returns the
 
 Aliases: I<E<lt>=>, I<le>
 
@@ -214,9 +219,9 @@ Aliases: I<E<lt>=>, I<le>
 
 =head2 ≥
 
-I<Obj> B<≥> I<Obj> -> I<Obj>
+    a ≥ b
 
-Return the
+Returns the
 
 Aliases: I<E<gt>=>, I<ge>
 
@@ -224,17 +229,25 @@ Aliases: I<E<gt>=>, I<ge>
 
 =head2 chinese
 
-Mod.chinese() -> I<Obj>
+    Mod.chinese()
 
-Return the
+Returns the
+
+=cut
+
+=head2 eval
+
+    Mod.eval()
+
+Returns the
 
 =cut
 
 =head2 fib
 
-Mod.fib() -> I<Obj>
+    Mod.fib()
 
-Return the
+Returns the
 
 Aliases: I<fibonacci>
 
@@ -242,79 +255,169 @@ Aliases: I<fibonacci>
 
 =head2 inv
 
-Mod.inv() -> I<Obj>
+    Mod.inv()
 
-Return the
+Returns the
+
+=cut
+
+=head2 is_inf
+
+    Mod.is_inf()
+
+Returns the
+
+=cut
+
+=head2 is_mone
+
+    Mod.is_mone()
+
+Returns the
+
+=cut
+
+=head2 is_nan
+
+    Mod.is_nan()
+
+Returns the
+
+=cut
+
+=head2 is_neg
+
+    Mod.is_neg()
+
+Returns the
+
+=cut
+
+=head2 is_ninf
+
+    Mod.is_ninf()
+
+Returns the
+
+=cut
+
+=head2 is_one
+
+    Mod.is_one()
+
+Returns the
+
+=cut
+
+=head2 is_pos
+
+    Mod.is_pos()
+
+Returns the
+
+=cut
+
+=head2 is_real
+
+    Mod.is_real()
+
+Returns the
+
+=cut
+
+=head2 is_zero
+
+    Mod.is_zero()
+
+Returns the
 
 =cut
 
 =head2 lucas
 
-Mod.lucas() -> I<Obj>
+    Mod.lucas()
 
-Return the
-
-=cut
-
-=head2 lucas_U
-
-Mod.lucas_U() -> I<Obj>
-
-Return the
-
-Aliases: I<lucasu>, I<lucasU>
+Returns the
 
 =cut
 
-=head2 lucas_V
+=head2 lucasu
 
-Mod.lucas_V() -> I<Obj>
+    Mod.lucasu()
 
-Return the
+Returns the
 
-Aliases: I<lucasv>, I<lucasV>
+Aliases: I<lucasU>
+
+=cut
+
+=head2 lucasv
+
+    Mod.lucasv()
+
+Returns the
+
+Aliases: I<lucasV>
 
 =cut
 
 =head2 modulus
 
-Mod.modulus() -> I<Obj>
+    Mod.modulus()
 
-Return the
+Returns the
 
 =cut
 
 =head2 neg
 
-Mod.neg() -> I<Obj>
+    Mod.neg()
 
-Return the
+Returns the
 
 =cut
 
 =head2 new
 
-Mod.new() -> I<Obj>
+    Mod.new()
 
-Return the
+Returns the
 
 Aliases: I<call>
 
 =cut
 
+=head2 norm
+
+    Mod.norm()
+
+Returns the
+
+=cut
+
+=head2 re
+
+    Mod.re()
+
+Returns the
+
+Aliases: I<real>
+
+=cut
+
 =head2 sqrt
 
-Mod.sqrt() -> I<Obj>
+    Mod.sqrt()
 
-Return the
+Returns the
 
 =cut
 
 =head2 to_n
 
-Mod.to_n() -> I<Obj>
+    Mod.to_n()
 
-Return the
+Returns the
 
 Aliases: I<lift>
 
@@ -322,9 +425,9 @@ Aliases: I<lift>
 
 =head2 to_s
 
-Mod.to_s() -> I<Obj>
+    Mod.to_s()
 
-Return the
+Returns the
 
 Aliases: I<dump>
 
@@ -332,8 +435,8 @@ Aliases: I<dump>
 
 =head2 znorder
 
-Mod.znorder() -> I<Obj>
+    Mod.znorder()
 
-Return the
+Returns the
 
 =cut

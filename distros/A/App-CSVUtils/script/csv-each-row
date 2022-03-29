@@ -10,15 +10,16 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-02-10'; # DATE
+our $DATE = '2022-03-27'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '0.036'; # VERSION
+our $VERSION = '0.037'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/CSVUtils/csv_each_row",
     program_name => "csv-each-row",
     read_config => 0,
     read_env => 0,
+    use_utf8 => 1,
 );
 
 $cmdline->run;
@@ -38,7 +39,7 @@ csv-each-row - Run Perl code for every row
 
 =head1 VERSION
 
-This document describes version 0.036 of csv-each-row (from Perl distribution App-CSVUtils), released on 2022-02-10.
+This document describes version 0.037 of csv-each-row (from Perl distribution App-CSVUtils), released on 2022-03-27.
 
 =head1 SYNOPSIS
 
@@ -49,6 +50,10 @@ Usage:
 =head1 DESCRIPTION
 
 This is like csv_map, except result of code is not printed.
+
+I<Common notes for the utilities>
+
+Encoding: The utilities in this module/distribution accept and emit UTF8 text.
 
 =head1 OPTIONS
 

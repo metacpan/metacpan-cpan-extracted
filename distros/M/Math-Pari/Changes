@@ -1453,9 +1453,16 @@ XXX We put some stuff into paricfg.h which may be not present in the GP/PARI's o
 2.030521
    Pari.xs	Fix warnings found on Darwin and with -Wall.  (Now same failures on 2.13.3 on the optimized and non-optimized builds.)
 
-2.030521a
+2.03052101
    auto-dbg/auto-debug-module.pl	Try to support lldb (untested; mapping of /proc and w32 thread-information-block unsupported).
 					Remove extra quoting from the Makefile.PL command-line.
    Makefile.PL				Fix editing %Config in one more place (on Solaris).
 					Remove LTO flag from %Config (reported to fail; thanks to Kent Fredric; untested).
 						https://rt.cpan.org/Public/Bug/Display.html?id=120711
+
+2.03052102
+   auto-dbg/auto-debug-module.pl	Recognize the version string of lldb and emit our instructions on security settings (untested).
+
+2.03052103
+   auto-dbg/auto-debug-module.pl	New option -U.  Report the content of debugger-commands file.
+   auto-dbg/README			Document cleaning after the debugger, and rerunning ./Makefile.PL.

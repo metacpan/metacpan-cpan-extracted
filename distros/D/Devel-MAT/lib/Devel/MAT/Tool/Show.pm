@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2016-2022 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Tool::Show 0.45;
+package Devel::MAT::Tool::Show 0.46;
 
 use v5.14;
 use warnings;
@@ -371,6 +371,40 @@ sub show_IO
 
    Devel::MAT::Cmd->printf( "  ifileno=%d\n", $io->ifileno ) if defined $io->ifileno;
    Devel::MAT::Cmd->printf( "  ofileno=%d\n", $io->ofileno ) if defined $io->ofileno;
+}
+
+sub show_C_STRUCT
+{
+   my $self = shift;
+   my ( $struct ) = @_;
+
+   my @fields = $struct->fields;
+
+   while( @fields ) {
+      my $field = shift @fields;
+      my $val   = shift @fields;
+
+      next unless defined $val;
+
+      if( $field->type == 0x00 ) { # PTR
+         Devel::MAT::Cmd->printf( "  %s=%s\n",
+            $field->name,
+            Devel::MAT::Cmd->format_sv_with_value( $val )
+         );
+      }
+      elsif( $field->type == 0x01 ) { # BOOL
+         Devel::MAT::Cmd->printf( "  %s=%s\n",
+            $field->name,
+            Devel::MAT::Cmd->format_value( $val ? "true" : "false" )
+         );
+      }
+      else { # various number types
+         Devel::MAT::Cmd->printf( "  %s=%s\n",
+            $field->name,
+            Devel::MAT::Cmd->format_value( $val ),
+         );
+      }
+   }
 }
 
 package # hide

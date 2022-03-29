@@ -11,8 +11,19 @@ This class implements ...
 
 =head1 SYNOPSIS
 
-var obj = Set(...)
+    var a = Set(1,2,3,4)
+    var b = Set(2,3,5)
 
+    say (a ^ b)     #=> Set(1, 4, 5)
+    say (a - b)     #=> Set(1, 4)
+    say (a | b)     #=> Set(1, 2, 3, 4, 5)
+    say (a & b)     #=> Set(2, 3)
+
+    say a.has(2)    #=> true
+    say a.len       #=> 4
+
+    say b.map  {|n| n**2 }  #=> Set(4, 9, 25)
+    say b.grep {.is_odd}    #=> Set(3, 5)
 
 =head1 INHERITS
 
@@ -24,9 +35,9 @@ Inherits methods from:
 
 =head2 &
 
-I<Obj> B<&> I<Obj> -> I<Obj>
+    a & b
 
-Return the
+Returns the
 
 Aliases: I<∩>, I<and>, I<intersection>
 
@@ -34,9 +45,9 @@ Aliases: I<∩>, I<and>, I<intersection>
 
 =head2 +
 
-I<Obj> B<+> I<Obj> -> I<Obj>
+    a + b
 
-Return the
+Returns the
 
 Aliases: I<concat>
 
@@ -44,9 +55,9 @@ Aliases: I<concat>
 
 =head2 -
 
-I<Obj> B<-> I<Obj> -> I<Obj>
+    a - b
 
-Return the
+Returns the
 
 Aliases: I<∖>, I<sub>, I<diff>, I<difference>
 
@@ -54,9 +65,9 @@ Aliases: I<∖>, I<sub>, I<diff>, I<difference>
 
 =head2 ...
 
-I<Obj> B<...> I<Obj> -> I<Obj>
+    a ... b
 
-Return the
+Returns the
 
 Aliases: I<to_list>
 
@@ -64,9 +75,9 @@ Aliases: I<to_list>
 
 =head2 <<
 
-I<Obj> B<E<lt>E<lt>> I<Obj> -> I<Obj>
+    a << b
 
-Return the
+Returns the
 
 Aliases: I<add>, I<push>, I<append>
 
@@ -74,9 +85,9 @@ Aliases: I<add>, I<push>, I<append>
 
 =head2 ^
 
-I<Obj> B<^> I<Obj> -> I<Obj>
+    a ^ b
 
-Return the
+Returns the
 
 Aliases: I<xor>, I<symdiff>, I<symmetric_difference>
 
@@ -84,9 +95,9 @@ Aliases: I<xor>, I<symdiff>, I<symmetric_difference>
 
 =head2 |
 
-I<Obj> B<|> I<Obj> -> I<Obj>
+    a | b
 
-Return the
+Returns the
 
 Aliases: I<∪>, I<or>, I<union>
 
@@ -94,9 +105,9 @@ Aliases: I<∪>, I<or>, I<union>
 
 =head2 ∋
 
-I<Obj> B<∋> I<Obj> -> I<Obj>
+    a ∋ b
 
-Return the
+Returns the
 
 Aliases: I<has>, I<exists>, I<has_key>, I<haskey>, I<contain>, I<include>, I<contains>, I<includes>
 
@@ -104,25 +115,25 @@ Aliases: I<has>, I<exists>, I<has_key>, I<haskey>, I<contain>, I<include>, I<con
 
 =head2 ∌
 
-I<Obj> B<∌> I<Obj> -> I<Obj>
+    a ∌ b
 
-Return the
+Returns the
 
 =cut
 
 =head2 ≡
 
-I<Obj> B<≡> I<Obj> -> I<Obj>
+    a ≡ b
 
-Return the
+Returns the
 
 =cut
 
 =head2 ≤
 
-I<Obj> B<≤> I<Obj> -> I<Obj>
+    a ≤ b
 
-Return the
+Returns the
 
 Aliases: I<⊆>, I<E<lt>=>, I<is_subset>
 
@@ -130,9 +141,9 @@ Aliases: I<⊆>, I<E<lt>=>, I<is_subset>
 
 =head2 ≥
 
-I<Obj> B<≥> I<Obj> -> I<Obj>
+    a ≥ b
 
-Return the
+Returns the
 
 Aliases: I<⊇>, I<E<gt>=>, I<is_superset>
 
@@ -140,57 +151,57 @@ Aliases: I<⊇>, I<E<gt>=>, I<is_superset>
 
 =head2 all
 
-Set.all() -> I<Obj>
+    Set.all()
 
-Return the
+Returns the
 
 =cut
 
 =head2 any
 
-Set.any() -> I<Obj>
+    Set.any()
 
-Return the
+Returns the
 
 =cut
 
 =head2 collect
 
-Set.collect() -> I<Obj>
+    Set.collect()
 
-Return the
+Returns the
 
 =cut
 
 =head2 contains_all
 
-Set.contains_all() -> I<Obj>
+    Set.contains_all()
 
-Return the
+Returns the
 
 =cut
 
 =head2 count
 
-Set.count() -> I<Obj>
+    Set.count()
 
-Return the
+Returns the
 
 =cut
 
 =head2 count_by
 
-Set.count_by() -> I<Obj>
+    Set.count_by()
 
-Return the
+Returns the
 
 =cut
 
 =head2 delete
 
-Set.delete() -> I<Obj>
+    Set.delete()
 
-Return the
+Returns the
 
 Aliases: I<remove>, I<discard>
 
@@ -198,49 +209,49 @@ Aliases: I<remove>, I<discard>
 
 =head2 delete_first_if
 
-Set.delete_first_if() -> I<Obj>
+    Set.delete_first_if()
 
-Return the
+Returns the
 
 =cut
 
 =head2 delete_if
 
-Set.delete_if() -> I<Obj>
+    Set.delete_if()
 
-Return the
+Returns the
 
 =cut
 
 =head2 dump
 
-Set.dump() -> I<Obj>
+    Set.dump()
 
-Return the
+Returns the
 
 =cut
 
 =head2 each
 
-Set.each() -> I<Obj>
+    Set.each()
 
-Return the
+Returns the
 
 =cut
 
 =head2 each_2d
 
-Set.each_2d() -> I<Obj>
+    Set.each_2d()
 
-Return the
+Returns the
 
 =cut
 
 =head2 grep
 
-Set.grep() -> I<Obj>
+    Set.grep()
 
-Return the
+Returns the
 
 Aliases: I<select>
 
@@ -248,81 +259,81 @@ Aliases: I<select>
 
 =head2 grep_2d
 
-Set.grep_2d() -> I<Obj>
+    Set.grep_2d()
 
-Return the
+Returns the
 
 =cut
 
 =head2 iter
 
-Set.iter() -> I<Obj>
+    Set.iter()
 
-Return the
+Returns the
 
 =cut
 
 =head2 join
 
-Set.join() -> I<Obj>
+    Set.join()
 
-Return the
+Returns the
 
 =cut
 
 =head2 map
 
-Set.map() -> I<Obj>
+    Set.map()
 
-Return the
+Returns the
 
 =cut
 
 =head2 map_2d
 
-Set.map_2d() -> I<Obj>
+    Set.map_2d()
 
-Return the
+Returns the
 
 =cut
 
 =head2 max
 
-Set.max() -> I<Obj>
+    Set.max()
 
-Return the
+Returns the
 
 =cut
 
 =head2 max_by
 
-Set.max_by() -> I<Obj>
+    Set.max_by()
 
-Return the
+Returns the
 
 =cut
 
 =head2 min
 
-Set.min() -> I<Obj>
+    Set.min()
 
-Return the
+Returns the
 
 =cut
 
 =head2 min_by
 
-Set.min_by() -> I<Obj>
+    Set.min_by()
 
-Return the
+Returns the
 
 =cut
 
 =head2 new
 
-Set.new() -> I<Obj>
+    Set.new()
 
-Return the
+Returns the
 
 Aliases: I<call>
 
@@ -330,25 +341,25 @@ Aliases: I<call>
 
 =head2 none
 
-Set.none() -> I<Obj>
+    Set.none()
 
-Return the
+Returns the
 
 =cut
 
 =head2 pop
 
-Set.pop() -> I<Obj>
+    Set.pop()
 
-Return the
+Returns the
 
 =cut
 
 =head2 prod
 
-Set.prod() -> I<Obj>
+    Set.prod()
 
-Return the
+Returns the
 
 Aliases: I<prod_by>
 
@@ -356,41 +367,41 @@ Aliases: I<prod_by>
 
 =head2 prod_2d
 
-Set.prod_2d() -> I<Obj>
+    Set.prod_2d()
 
-Return the
+Returns the
 
 =cut
 
 =head2 shift
 
-Set.shift() -> I<Obj>
+    Set.shift()
 
-Return the
+Returns the
 
 =cut
 
 =head2 sort
 
-Set.sort() -> I<Obj>
+    Set.sort()
 
-Return the
+Returns the
 
 =cut
 
 =head2 sort_by
 
-Set.sort_by() -> I<Obj>
+    Set.sort_by()
 
-Return the
+Returns the
 
 =cut
 
 =head2 sum
 
-Set.sum() -> I<Obj>
+    Set.sum()
 
-Return the
+Returns the
 
 Aliases: I<sum_by>
 
@@ -398,17 +409,17 @@ Aliases: I<sum_by>
 
 =head2 sum_2d
 
-Set.sum_2d() -> I<Obj>
+    Set.sum_2d()
 
-Return the
+Returns the
 
 =cut
 
 =head2 to_a
 
-Set.to_a() -> I<Obj>
+    Set.to_a()
 
-Return the
+Returns the
 
 Aliases: I<values>, I<to_array>
 
@@ -416,16 +427,16 @@ Aliases: I<values>, I<to_array>
 
 =head2 to_bag
 
-Set.to_bag() -> I<Obj>
+    Set.to_bag()
 
-Return the
+Returns the
 
 =cut
 
 =head2 to_set
 
-Set.to_set() -> I<Obj>
+    Set.to_set()
 
-Return the
+Returns the
 
 =cut

@@ -5,7 +5,7 @@ package Sidef::Types::Number::Mod {
 
     use parent qw(
       Sidef::Types::Number::Number
-      );
+    );
 
     use overload
       q{bool} => sub { (@_) = ($_[0]); goto &__boolify__ },
@@ -16,10 +16,23 @@ package Sidef::Types::Number::Mod {
     sub new {
         my (undef, $n, $m) = @_;
 
+        # Handle evaluation of polynomials
+        if (ref($_[0]) eq __PACKAGE__) {
+            return $_[0]->eval($n);
+        }
+
         #$n = Sidef::Types::Number::Number->new($n) if !UNIVERSAL::isa($n, 'Sidef::Types::Number::Number');
         #$m = Sidef::Types::Number::Number->new($m) if !UNIVERSAL::isa($m, 'Sidef::Types::Number::Number');
 
+        if (ref($n) eq __PACKAGE__) {
+            $n = $n->real->mod($m);
+        }
+
         $n = $n->mod($m);
+
+        if (ref($n) eq __PACKAGE__) {
+            return $n;
+        }
 
         bless {n => $n, m => $m};
     }
@@ -31,6 +44,60 @@ package Sidef::Types::Number::Mod {
     }
 
     *lift = \&to_n;
+
+    sub eval {
+        my ($x, $v) = @_;
+        $x->{n}->eval($v)->mod($x->{m});
+    }
+
+    sub is_zero {
+        my ($x) = @_;
+        $x->eq(Sidef::Types::Number::Number::ZERO);
+    }
+
+    sub is_one {
+        my ($x) = @_;
+        $x->eq(Sidef::Types::Number::Number::ONE);
+    }
+
+    sub is_mone {
+        my ($x) = @_;
+        $x->eq(Sidef::Types::Number::Number::MONE);
+    }
+
+    sub is_neg {
+        $_[0]->{n}->is_neg;
+    }
+
+    sub is_pos {
+        $_[0]->{n}->is_pos;
+    }
+
+    sub is_nan {
+        $_[0]->{n}->is_nan;
+    }
+
+    sub is_inf {
+        $_[0]->{n}->is_inf;
+    }
+
+    sub is_ninf {
+        $_[0]->{n}->is_ninf;
+    }
+
+    sub is_real {
+        $_[0]->{n}->is_real;
+    }
+
+    sub real {
+        $_[0]->{n}->is_zero ? $_[0]->{m} : $_[0]->{n};
+    }
+
+    *re = \&real;
+
+    sub norm {
+        $_[0]->real->norm;
+    }
 
     sub modulus {
         $_[0]->{m};
@@ -144,18 +211,16 @@ package Sidef::Types::Number::Mod {
         __PACKAGE__->new(Sidef::Types::Number::Number::lucasUmod($P, $Q, $x->{n}, $x->{m}), $x->{m});
     }
 
-    *lucasU  = \&lucasu;
-    *LucasU  = \&lucasu;
-    *lucas_U = \&lucasu;
+    *lucasU = \&lucasu;
+    *LucasU = \&lucasu;
 
     sub lucasv {
         my ($x, $P, $Q) = @_;
         __PACKAGE__->new(Sidef::Types::Number::Number::lucasVmod($P, $Q, $x->{n}, $x->{m}), $x->{m});
     }
 
-    *lucasV  = \&lucasv;
-    *LucasV  = \&lucasv;
-    *lucas_V = \&lucasv;
+    *lucasV = \&lucasv;
+    *LucasV = \&lucasv;
 
     sub fibonacci {
         my ($x) = @_;

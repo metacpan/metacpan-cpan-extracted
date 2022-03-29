@@ -106,6 +106,8 @@ Aliases: I<add>
 
 =head2 ++
 
+    n++
+    ++n
     n.inc
 
 Increment C<n> by C<1> and return the result.
@@ -126,6 +128,8 @@ Aliases: I<sub>
 
 =head2 --
 
+    n--
+    --n
     n.dec
 
 Decrement C<n> by C<1> and return the result.
@@ -178,7 +182,7 @@ Aliases: I<÷>, I<div>
 
 Integer floor-division of C<a> and C<b>.
 
-Equivalent with:
+When C<a> and C<b> are integers, this is equivalent with:
 
     floor(a/b)
 
@@ -234,6 +238,7 @@ Aliases: I<cmp>
 
 =head2 approx_cmp
 
+    a <~> b
     approx_cmp(a, b)
     approx_cmp(a, b, k)
 
@@ -316,9 +321,9 @@ Aliases: I<catalan_G>
 
 =head2 Y
 
-Number.Y() -> I<Obj>
+    Num.Y()
 
-Return the
+Returns the Euler–Mascheroni constant: 0.5772156649...
 
 Aliases: I<γ>, I<euler_gamma>
 
@@ -326,9 +331,9 @@ Aliases: I<γ>, I<euler_gamma>
 
 =head2 |
 
-I<Obj> B<|> I<Obj> -> I<Obj>
+    a | b
 
-Return the
+Returns the bitwise OR or C<a> and C<b>.
 
 Aliases: I<or>
 
@@ -336,9 +341,10 @@ Aliases: I<or>
 
 =head2 ~
 
-I<Obj> B<~> I<Obj> -> I<Obj>
+    ~a
+    a.not
 
-Return the
+Returns the bitwise NOT of C<a>.
 
 Aliases: I<not>
 
@@ -346,9 +352,12 @@ Aliases: I<not>
 
 =head2 Γ
 
-Number.Γ() -> I<Obj>
+    Γ(n)
+    gamma(n)
 
-Return the
+The gamma function, where for any positive integer C<n>:
+
+    gamma(n) = (n-1)!
 
 Aliases: I<gamma>
 
@@ -356,9 +365,9 @@ Aliases: I<gamma>
 
 =head2 δ
 
-Number.δ() -> I<Obj>
+    δ(a,b)
 
-Return the
+The Kronecker delta function, which returns 1 iff C<a==b> and 0 otherwise.
 
 Aliases: I<kronecker_delta>
 
@@ -366,9 +375,10 @@ Aliases: I<kronecker_delta>
 
 =head2 ζ
 
-Number.ζ() -> I<Obj>
+    ζ(s)
+    zeta(s)
 
-Return the
+The Riemann Zeta function.
 
 Aliases: I<zeta>
 
@@ -376,9 +386,12 @@ Aliases: I<zeta>
 
 =head2 η
 
-Number.η() -> I<Obj>
+    η(s)
+    eta(s)
 
-Return the
+The Dirichlet eta function, defined as:
+
+    eta(s) = (1 - 2^(1-s)) * zeta(s)
 
 Aliases: I<eta>
 
@@ -386,9 +399,11 @@ Aliases: I<eta>
 
 =head2 μ
 
-Number.μ() -> I<Obj>
+    μ(n)
+    mu(n)
+    moebius(n)
 
-Return the
+The Möbius function: μ(n).
 
 Aliases: I<mu>, I<mobius>, I<möbius>, I<moebius>
 
@@ -396,9 +411,10 @@ Aliases: I<mu>, I<mobius>, I<möbius>, I<moebius>
 
 =head2 Π
 
-Number.Π() -> I<Obj>
+    Π(...)
+    prod(...)
 
-Return the
+Returns the product of a given list of numbers.
 
 Aliases: I<prod>
 
@@ -406,9 +422,22 @@ Aliases: I<prod>
 
 =head2 π
 
-Number.π() -> I<Obj>
+    π(n)
+    π(a,b)
+    Num.π
 
-Return the
+Returns the PI numerical value:
+
+    say Num.pi      #=> 3.1415...
+
+When applied on a Number object (as C<n.pi> or C<pi(n)>), it returns the number of primes <= n:
+
+    say 100.pi      #=> number of primes <= 100
+    say pi(100)     #=> 25
+
+When an additional argument is given, it returns the number of primes in the range C<a..b>:
+
+    say pi(50, 100)     # number of primes in the range 50..100
 
 Aliases: I<pi>
 
@@ -416,9 +445,10 @@ Aliases: I<pi>
 
 =head2 Σ
 
-Number.Σ() -> I<Obj>
+    Σ(...)
+    sum(...)
 
-Return the
+Returns the sum of a given list of numbers.
 
 Aliases: I<sum>
 
@@ -426,9 +456,10 @@ Aliases: I<sum>
 
 =head2 σ
 
-Number.σ() -> I<Obj>
+    σ(n,k=1)
+    sigma(n,k=1)
 
-Return the
+Returns the sum of the positive divisors of n, each raised to the power k.
 
 Aliases: I<sigma>
 
@@ -436,9 +467,16 @@ Aliases: I<sigma>
 
 =head2 τ
 
-Number.τ() -> I<Obj>
+    Num.τ
+    Num.tau
 
-Return the
+    τ(n)
+    tau(n)
+
+Returns the TAU constant (2*PI), or the number of positive divisors of n.
+
+    say Num.tau     #=> 6.283185307179...
+    say tau(120)    #=> 16
 
 Aliases: I<tau>
 
@@ -446,9 +484,16 @@ Aliases: I<tau>
 
 =head2 φ
 
-Number.φ() -> I<Obj>
+    Num.φ
+    Num.phi
 
-Return the
+    φ(n)
+    phi(n)
+
+Returns the golden ratio constant PHI, or the Euler totient of n.
+
+    say Num.phi       #=> 1.618033988749...
+    say phi(180)      #=> 48
 
 Aliases: I<phi>
 
@@ -456,9 +501,14 @@ Aliases: I<phi>
 
 =head2 Ψ
 
-Number.Ψ() -> I<Obj>
+    Ψ(x)
+    digamma(x)
 
-Return the
+The digamma function, defined as:
+
+     Γ'(x)
+    -------
+     Γ(x)
 
 Aliases: I<digamma>
 
@@ -466,29 +516,39 @@ Aliases: I<digamma>
 
 =head2 Ω
 
-Number.Ω() -> I<Obj>
+    Ω(n,k=0)
+    bigomega(n,k=0)
 
-Return the
+For k = 0, it returns the number of prime factors of n (counted with multiplicity).
 
-Aliases: I<bigomega>, I<prime_power_sigma0>
+In general, is equivalent with:
+
+    n.prime_power_divisors.sum {|d| n**k / d**k }
+
+Aliases: I<bigomega>
 
 =cut
 
 =head2 ω
 
-Number.ω() -> I<Obj>
+    ω(n,k=0)
+    omega(n,k=0)
 
-Return the
+For k = 0, it returns the number of distinct prime factors of n.
 
-Aliases: I<omega>, I<prime_sigma0>, I<prime_power_usigma0>
+In general, is equivalent with:
+
+    n.prime_divisors.sum {|d| n**k / d**k }
+
+Aliases: I<omega>
 
 =cut
 
 =head2 ≅
 
-I<Obj> B<≅> I<Obj> -> I<Obj>
+    a ≅ b
 
-Return the
+Returns true if C<a> and C<b> are approximately equal to each other.
 
 Aliases: I<=~=>, I<approx_eq>
 
@@ -496,9 +556,9 @@ Aliases: I<=~=>, I<approx_eq>
 
 =head2 ≠
 
-I<Obj> B<≠> I<Obj> -> I<Obj>
+    a ≠ b
 
-Return the
+Returns true if C<a> and C<b> are different from each other.
 
 Aliases: I<!=>, I<ne>
 
@@ -506,9 +566,9 @@ Aliases: I<!=>, I<ne>
 
 =head2 ≤
 
-I<Obj> B<≤> I<Obj> -> I<Obj>
+    a ≤ b
 
-Return the
+Returns true if C<a> is less than or equal to C<b>.
 
 Aliases: I<E<lt>=>, I<le>
 
@@ -516,9 +576,9 @@ Aliases: I<E<lt>=>, I<le>
 
 =head2 ≥
 
-I<Obj> B<≥> I<Obj> -> I<Obj>
+    a ≥ b
 
-Return the
+Returns true if C<a> is greater than or equal to C<b>.
 
 Aliases: I<E<gt>=>, I<ge>
 
@@ -528,15 +588,17 @@ Aliases: I<E<gt>=>, I<ge>
 
     n.abs
 
-Absolute value of C<n>.
+The absolute value of C<n>.
 
 =cut
 
 =head2 abundancy
 
-Number.abundancy() -> I<Obj>
+    abundancy(n)
 
-Return the
+Returns the abundancy index of n, defined as:
+
+    sigma(n)/n
 
 Aliases: I<abundancy_index>
 
@@ -544,9 +606,11 @@ Aliases: I<abundancy_index>
 
 =head2 acmp
 
-Number.acmp() -> I<Obj>
+    acmp(a,b)
 
-Return the
+Absolute comparison of C<a> and C<b>, defined as:
+
+    abs(a) <=> abs(b)
 
 =cut
 
@@ -600,9 +664,11 @@ Inverse hyperbolic cosecant of C<n>.
 
 =head2 addmod
 
-Number.addmod() -> I<Obj>
+    addmod(a, b, m)
 
-Return the
+Modular integer addition: C<(a+b) % m>.
+
+    say addmod(43, 97, 127)     # == (43+97)%127
 
 =cut
 
@@ -627,17 +693,46 @@ Aliases: I<airy>
 
 =head2 all_composite
 
-Number.all_composite() -> I<Obj>
+    all_composite(...)
 
-Return the
+Returns true if all the given values are composite positive integers, by checking first for small factors, then running a B-PSW primality test.
 
 =cut
 
 =head2 all_prime
 
-Number.all_prime() -> I<Obj>
+    all_prime(...)
 
-Return the
+Returns true if all the given values are prime numbers.
+
+This is done by first running a primality pre-test on all values and returning early if one of the values is composite with a small factor. Otherwise, we run a B-PSW primality test on each value.
+
+=cut
+
+=head2 almost_prime_divisors
+
+    n.almost_prime_divisors
+    n.almost_prime_divisors(k)
+
+Returns the k-almost prime divisors of n.
+
+    say 5040.almost_prime_divisors(7)   #=> [720, 1008, 1680, 2520]
+
+When C<k> is omitted, an array of arrays with the k-almost prime divisors of n, for each k in the range C<0..bigomega(n)>, is returned:
+
+    say 120.almost_prime_divisors       #=> [[1], [2, 3, 5], [4, 6, 10, 15], [8, 12, 20, 30], [24, 40, 60], [120]]
+
+=cut
+
+=head2 almost_primes
+
+    k.almost_primes(n)
+    k.almost_primes(a,b)
+
+Return an array with the k-almost primes <= n, or in the range C<a..b>.
+
+    5.almost_primes(1e6)        # array of 5-almost primes <= 1e6
+    5.almost_primes(1e5, 1e6)   # array of 5-almost primes in the range [1e5, 1e6]
 
 =cut
 
@@ -712,8 +807,6 @@ Equivalent with:
 
 Returns a C<String> with the binary representation of C<n>.
 
-Example:
-
     say 42.as_bin     # "101011"
 
 =cut
@@ -724,8 +817,6 @@ Example:
     n.as_dec(k)
 
 Given a rational number C<n>, it returns its decimal expansion as a C<String> object, expanded at C<k> decimal places.
-
-Example:
 
     say (1/17 -> as_dec(10))      # 0.05882352941
     say (1/17 -> as_dec(30))      # 0.0588235294117647058823529411765
@@ -757,8 +848,6 @@ Inverse hyperbolic secant of C<n>.
 
 String-representation of C<n> as fraction.
 
-Example:
-
     say 24.as_frac                 # 24/1
     say bernoulli(10).as_frac      # 5/66
     say bernoulli(12).as_frac(36)  # -j7/23u
@@ -772,8 +861,6 @@ If C<n> is an integer, it uses C<1> for the denominator.
     n.as_hex
 
 Returns a String representing the integer part of C<n> in hexadecimal (base 16).
-
-Example:
 
     say 42.as_hex       # "2a"
 
@@ -806,8 +893,6 @@ Returns a String representing the integer part of C<n> in a given base, where th
 
 When the base is omitted, it defaults to base 10.
 
-Example:
-
     say 255.as_int      # "255"
     say 255.as_int(16)  # "ff"
 
@@ -820,8 +905,6 @@ Returns C<nil> when C<n> cannot be converted to an integer.
     n.as_oct
 
 Returns a String representing the integer part of C<n> in octal (base 8).
-
-Example:
 
     say 42.as_oct   # 52
 
@@ -837,8 +920,6 @@ Returns C<nil> when C<n> cannot be converted to an integer.
 Returns a rational string-representation of C<n> in a given base, where the base must be between 2 and 62.
 
 When the base is omitted, it defaults to base 10.
-
-Example:
 
     say as_rat(42)          # "42"
     say as_rat(2/4)         # "1/2"
@@ -882,6 +963,22 @@ Aliases: I<in_base>
 
 =cut
 
+=head2 bdivisors
+
+    bdivisors(n)
+
+Returns an array with the bi-unitary divisors of n.
+
+    say 48.bdivisors    #=> [1, 2, 3, 6, 8, 16, 24, 48]
+
+These are divisors C<d> of C<n> that satisfy:
+
+    gcud(n/d, d) = 1
+
+Aliases: I<biudivisors>, I<bi_unitary_divisors>
+
+=cut
+
 =head2 bell
 
     n.bell
@@ -898,9 +995,7 @@ Aliases: I<bell_number>
     bernoulli(n)
     bernoulli(n, x)
 
-Returns the n-th Bernoulli number. When an additional argument is provided, it returns the n-th Bernoulli polynomial.
-
-Example:
+Returns the n-th Bernoulli number. When an additional argument is provided, it returns the n-th Bernoulli polynomial evaluated at C<x>.
 
     say bernoulli(10).as_rat       # B_10    = 5/66
     say bernoulli(10, 2).as_rat    # B_10(2) = 665/66
@@ -911,9 +1006,12 @@ Aliases: I<bernfrac>, I<bernoulli>, I<bernoulli_number>
 
 =head2 bernoulli_polynomial
 
+    bernoulli_polynomial(n)
     bernoulli_polynomial(n, x)
 
 Returns the n-th Bernoulli polynomial: C<B_n(x)>.
+
+When C<x> is omitted, a Polynomial object is returned.
 
 =cut
 
@@ -962,8 +1060,6 @@ Returns 1 if bit C<k> of C<n> is set, and 0 if it is not set.
 
 Return C<nil> when C<n> cannot be truncated to an integer or when C<k> is negative.
 
-Example:
-
     say getbit(0b1001, 0)   # 1
     say getbit(0b1000, 0)   # 0
 
@@ -973,9 +1069,17 @@ Aliases: I<getbit>, I<testbit>
 
 =head2 bits
 
-Number.bits() -> I<Obj>
+    n.bits()
 
-Return the
+Returns the binary digits of n.
+
+The bits are ordered from the most significant bit to the least significant bit.
+
+    say 1234.bits       #=> [1, 0, 0, 1, 1, 0, 1, 0, 0, 1, 0]
+
+Equivalent with:
+
+    n.digits(2).flip
 
 =cut
 
@@ -1055,35 +1159,92 @@ This function finds a value C<k> such that f(k) <= 0 and f(k+1) > 0. Returns C<n
 
 =head2 bsearch_max
 
-Number.bsearch_max() -> I<Obj>
+    bsearch_max(n, {...})
+    bsearch_max(a,b, {...})
 
-Return the
+Binary search, returning the largest integer value in the range C<a..b> that satisfies the given comparison function.
+
+    say bsearch_max(1, 1e6, {|k| pi(k) <=> 100 })   #=> 546
+
+where:
+
+    n = 546 is the  largest value satisfying pi(n) <= 100
 
 =cut
 
 =head2 bsearch_min
 
-Number.bsearch_min() -> I<Obj>
+    bsearch_min(n, {...})
+    bsearch_min(a,b, {...})
 
-Return the
+Binary search, returning the smallest integer value in the range C<a..b> that satisfies the given comparison function.
+
+    say bsearch_min(1, 1e6, {|k| pi(k) <=> 100 })   #=> 541
+
+where:
+
+    n = 541 is the smallest value satisfying pi(n) >= 100
 
 =cut
 
 =head2 bsearch_solve
 
-Number.bsearch_solve() -> I<Obj>
+    bsearch_solve(n, {...})
+    bsearch_solve(a,b, {...})
 
-Return the
+It computes the inverse of any continuous function, given the range that includes the inverse value.
+
+For floating-point values, the C<approx_cmp(a,b)> method (or the `<~>` operator) is recommended to be used for comparisons.
+
+    say bsearch_inverse(100, {|x| exp(x) <~> 2 })          # solution to x for: exp(x) =   2
+    say bsearch_inverse(200, {|x| x**2  <=> 43 })          # solution to x for:    x^2 =  43
+    say bsearch_inverse(-10, 10, {|x| x**3 <~> -43 })      # solution to x for:    x^3 = -43
+    say bsearch_inverse(300, 500, {|x| Li(x) <~> 100 })    # solution to x for:  Li(x) = 100
+
+This method can also be used in computing approximations to some integer-specific functions:
+
+    var n = 100000
+    var v = 2*int(n*log(n) / log(log(n)))
+
+    say nth_semiprime(n)                                        #=> 459577
+    say bsearch_inverse(v, {|x| semiprime_count(x) <=> n })     #=> 459577.93302154541015625
 
 Aliases: I<bsearch_inverse>
 
 =cut
 
+=head2 bsigma
+
+    bsigma(n, k=1)
+
+Returns the sum of the bi-unitary divisors of n, each divisor raised to the k-th power.
+
+    say 20.of { .bsigma }   #=> OEIS: A188999
+
+Aliases: I<biusigma>
+
+=cut
+
+=head2 bsigma0
+
+    bsigma0(n)
+
+Returns the count of the bi-unitary divisors of n.
+
+    say 20.of { .bsigma0 }  #=> OEIS: A286324
+
+Aliases: I<biusigma0>
+
+=cut
+
 =head2 by
 
-Number.by() -> I<Obj>
+    n.by { ... }
 
-Return the
+Returns an array with C<n> elements >= 0 that satisfy the provided block of code.
+
+    say 10.by { .is_prime }      # first 10 primes
+    say 10.by { .is_square }     # first 10 squares
 
 Aliases: I<first>
 
@@ -1091,9 +1252,11 @@ Aliases: I<first>
 
 =head2 cadd
 
-Number.cadd() -> I<Obj>
+    cadd(a,b,x,y)
 
-Return the
+Complex arithmetic addition, defined as:
+
+    cadd(a,b,x,y)   #=> (a+x, b+y)
 
 Aliases: I<complex_add>
 
@@ -1114,15 +1277,17 @@ If two arguments are provided, it returns the C<C(n,k)> entry in Catalan's trian
 
     n.cbrt
 
-Cube root of C<n>.
+Cube root of C<n>, as a floating-point value.
 
 =cut
 
 =head2 cdiv
 
-Number.cdiv() -> I<Obj>
+    cdiv(a,b,x,y)
 
-Return the
+Complex arithmetic division, defined as:
+
+    cdiv(a,b,x,y)   #=> ((a*x + b*y)/(x*x + y*y), (b*x - a*y)/(x*x + y*y))
 
 Aliases: I<complex_div>
 
@@ -1145,8 +1310,6 @@ Aliases: I<ceiling>
 
 Compute C<k> terms of the simple continued-fraction expansion of C<n>.
 
-Example:
-
     say sqrt(12).cfrac(6)    # [3, 2, 6, 2, 6, 2, 6]
 
 Can also be used to compute very good rational approximations to a given real number:
@@ -1159,8 +1322,9 @@ Aliases: I<as_cfrac>
 
 =cut
 
-=head2 chebyshev_T
+=head2 chebyshevT
 
+    chebyshevT(n)
     chebyshevT(n, x)
 
 Compute the Chebyshev polynomials of the first kind: C<T_n(x)>, where C<n> must be a native integer.
@@ -1171,12 +1335,23 @@ Defined as:
     T(1, x) = x
     T(n, x) = 2*x*T(n-1, x) - T(n-2, x)
 
-Aliases: I<chebyshevt>, I<chebyshevT>
+When C<x> is omitted, a Polynomial object is returned.
+
+Aliases: I<chebyshevt>
 
 =cut
 
-=head2 chebyshev_U
+=head2 chebyshevTmod
 
+    chebyshevTmod(n, x, m)
+
+Compute the modular Chebyshev polynomials of the first kind: C<T_n(x) mod m>, where C<n> and C<m> must be integers (arbitrarily large).
+
+=cut
+
+=head2 chebyshevU
+
+    chebyshevU(n)
     chebyshevU(n, x)
 
 Compute the Chebyshev polynomials of the second kind: C<U_n(x)>, where C<n> must be a native integer.
@@ -1187,7 +1362,17 @@ Defined as:
     U(1, x) = 2*x
     U(n, x) = 2*x*U(n-1, x) - U(n-2, x)
 
-Aliases: I<chebyshevu>, I<chebyshevU>
+When C<x> is omitted, a Polynomial object is returned.
+
+Aliases: I<chebyshevu>
+
+=cut
+
+=head2 chebyshevUmod
+
+    chebyshevUmod(n, x, m)
+
+Compute the modular Chebyshev polynomials of the second kind: C<U_n(x) mod m>, where C<n> and C<m> must be integers (arbitrarily large).
 
 =cut
 
@@ -1197,8 +1382,6 @@ Aliases: I<chebyshevu>, I<chebyshevU>
 
 Convert the integer C<n> into a character.
 
-Example:
-
     say 97.chr      # "a"
     say 9786.chr    # "☺"
 
@@ -1206,9 +1389,11 @@ Example:
 
 =head2 cinv
 
-Number.cinv() -> I<Obj>
+    cinv(a,b)
 
-Return the
+Complex arithmetic inversion, defined as:
+
+    cinv(a,b)   #=> (a/(a*a + b*b), (-b)/(a*a + b*b))
 
 Aliases: I<complex_inv>
 
@@ -1216,9 +1401,11 @@ Aliases: I<complex_inv>
 
 =head2 cinvmod
 
-Number.cinvmod() -> I<Obj>
+    cinvmod(a,b,m)
 
-Return the
+Complex modular inversion modulo C<m>: returns a pair of integers (x,y) such that:
+
+    cmod(cmul(a,b,x,y), m) == (1, 0)
 
 Aliases: I<complex_invmod>
 
@@ -1226,33 +1413,43 @@ Aliases: I<complex_invmod>
 
 =head2 circular_permutations
 
-Number.circular_permutations() -> I<Obj>
+    n.circular_permutations
+    n.circular_permutations { ... }
 
-Return the
+Returns an array of arrays with the circular permutations of the integers in the range C<0..n-1>, or iterates over the circular permutations when a block is given.
+
+    5.circular_permutations {|*a| say a }
 
 =cut
 
 =head2 cis
 
-Number.cis() -> I<Obj>
+    cis(x)
 
-Return the
+Euler's formula applied on C<x>, defined as:
+
+    cis(x) = cos(x) + sin(x)*i
 
 =cut
 
 =head2 clearbit
 
-Number.clearbit() -> I<Obj>
+    n.clearbit(k)
 
-Return the
+Set the k-th bit of integer n to 0.
+
+    say clearbit(0b1001, 0).as_bin  #=> 1000
+    say clearbit(0b1100, 2).as_bin  #=> 1000
 
 =cut
 
 =head2 cmod
 
-Number.cmod() -> I<Obj>
+    cmod(a,b,m)
 
-Return the
+Complex arithmetic modular operation, defined as:
+
+    cmod(a,b,m)     #=> (a%m, b%m)
 
 Aliases: I<complex_mod>
 
@@ -1260,9 +1457,11 @@ Aliases: I<complex_mod>
 
 =head2 cmul
 
-Number.cmul() -> I<Obj>
+    cmul(a,b,x,y)
 
-Return the
+Complex arithmetic multiplication, defined as:
+
+    cmul(a,b,x,y)   #=> (a*x - b*y, a*y + b*x)
 
 Aliases: I<complex_mul>
 
@@ -1270,57 +1469,81 @@ Aliases: I<complex_mul>
 
 =head2 combinations
 
-Number.combinations() -> I<Obj>
+    n.combinations(k)
+    n.combinations(k, { ... })
 
-Return the
+Returns an array with the k-combinations of the integers in the range C<0..n-1>, or iterates over the k-combinations when a block is given.
+
+    5.combinations(2, {|*a| say a })
 
 =cut
 
 =head2 combinations_with_repetition
 
-Number.combinations_with_repetition() -> I<Obj>
+    n.combinations_with_repetition(k)
+    n.combinations_with_repetition(k, { ... })
 
-Return the
+Returns an array with the k-combinations with repetition of the integers in the range C<0..n-1>, or iterates over the k-combinations with repetition when a block is given.
+
+    5.combinations_with_repetition(2, {|*a| say a })
 
 =cut
 
 =head2 commify
 
-Number.commify() -> I<Obj>
+    n.commify
 
-Return the
+Returns a string with thousands separators added after each group of 3 decimal digits.
+
+Exmaple:
+
+    say 1000.commify       #=> 1,000
+    say 1e10.commify       #=> 10,000,000,000
 
 =cut
 
 =head2 complex
 
-Number.complex() -> I<Obj>
+    n.complex
+    complex(a,b)
 
-Return the
+Converts C<n> to a complex number, or creates a complex number from C<a> and C<b>.
+
+    say complex(3, 4)       #=> 3+4i
+
+This is equivalent with:
+
+    say Complex(3, 4)       #=> 3+4i
 
 =cut
 
 =head2 complex_cmp
 
-Number.complex_cmp() -> I<Obj>
+    complex_cmp(a,b,x,y)
 
-Return the
+Complex number comparison, defined as:
+
+    (a <=> x) || (b <=> y)
 
 =cut
 
 =head2 complex_ipow
 
-Number.complex_ipow() -> I<Obj>
+    complex_ipow(a,b,n)
 
-Return the
+Complex integer exponentiation: returns C<(x,y)> such that C<x+y*i = (a+b*i)^n>.
+
+    say [complex_ipow(3,4,5)]       #=> [-237, -3116]
 
 =cut
 
 =head2 composite
 
-Number.composite() -> I<Obj>
+    n.composite
 
-Return the
+Returns the n-th composite number (OEIS: A002808).
+
+    say composite(10**9)        #=> 1053422339
 
 Aliases: I<nth_composite>
 
@@ -1328,27 +1551,38 @@ Aliases: I<nth_composite>
 
 =head2 composite_count
 
-Number.composite_count() -> I<Obj>
+    composite_count(n)
+    composite_count(a,b)
 
-Return the
+Returns the number of composite numbers <= n, or in the range C<a..b>.
+
+    say composite_count(100)          # number of composites <= 100
+    say composite_count(50, 100)      # number of composites in the range 50..100
+
+=cut
+
+=head2 composites
+
+    composites(n)
+    composites(a,b)
+
+Returns an array with the composite numbers <= n, or in the range C<a..b>.
 
 =cut
 
 =head2 conj
 
-Number.conj() -> I<Obj>
+    conj(x)
 
-Return the
-
-Aliases: I<conjug>, I<conjugate>
+Complex conjugate of C<x>. For real integers, this is a fixed-point function.
 
 =cut
 
 =head2 consecutive_lcm
 
-Number.consecutive_lcm() -> I<Obj>
+    consecutive_lcm(n)
 
-Return the
+Returns the least common multiple (LCM) of all the integers in the range C<1..n>.
 
 Aliases: I<consecutive_integer_lcm>
 
@@ -1356,57 +1590,79 @@ Aliases: I<consecutive_integer_lcm>
 
 =head2 convergents
 
-Number.convergents() -> I<Obj>
+    n.convergents(k)
 
-Return the
+Returns an array with the continued fraction convergents for a given real number C<n>, where C<k> is the number of convergenents to be computed and returned.
+
+    say Num.pi.convergents(5)   #=> [3, 22/7, 333/106, 355/113, 103993/33102]
+
+=cut
+
+=head2 cop_factor
+
+    cop_factor(n, reps=n.ilog2)
+
+Congruence of Powers (CoP) factorization method, trying to find algebraic factors of C<n>.
+
+    say cop_factor((5**48 + 1)*(3**120 + 1))
+
+An additional argument can be given to limit the number of iterations.
 
 =cut
 
 =head2 core
 
-Number.core() -> I<Obj>
+    core(n)
 
-Return the
+Squarefree part of n.
+
+    say 30.of { .core }     #=> OEIS: A007913
+
+Equivalent to PARI/GP C<core(n)> function.
+
+Aliases: I<squarefree_part>
 
 =cut
 
 =head2 cos
 
-Number.cos() -> I<Obj>
+    cos(x)
 
-Return the
+Trigonometric cosine function.
 
 =cut
 
 =head2 cosh
 
-Number.cosh() -> I<Obj>
+    cosh(x)
 
-Return the
+Hyperbolic cosine function.
 
 =cut
 
 =head2 cot
 
-Number.cot() -> I<Obj>
+    cot(x)
 
-Return the
+Trigonometric cotangent function.
 
 =cut
 
 =head2 coth
 
-Number.coth() -> I<Obj>
+    coth(x)
 
-Return the
+Hyperbolic cotangent function.
 
 =cut
 
 =head2 cpow
 
-Number.cpow() -> I<Obj>
+    cpow(a,b,n)
 
-Return the
+Computes C<(a + b*i)^n>, where a,b are real numbers and n is an integer. Returns the real and imaginary part as a list.
+
+    say [cpow(3, 4, 10)]    #=> [-9653287, 1476984]
 
 Aliases: I<complex_pow>
 
@@ -1414,9 +1670,11 @@ Aliases: I<complex_pow>
 
 =head2 cpowmod
 
-Number.cpowmod() -> I<Obj>
+    cpowmod(a,b,n,m)
 
-Return the
+Efficiently computes C<(a + b*i)^n mod m>, where a,b,n,m are all integers. Returns the real and imaginary part as a list.
+
+    say [complex_powmod(3, 4, 1000, 1e6)]   #=> [585313, 426784]
 
 Aliases: I<complex_powmod>
 
@@ -1424,35 +1682,52 @@ Aliases: I<complex_powmod>
 
 =head2 csc
 
-Number.csc() -> I<Obj>
+    csc(x)
 
-Return the
+Trigonometric cosecant function.
 
 =cut
 
 =head2 csch
 
-Number.csch() -> I<Obj>
+    csch(x)
 
-Return the
+Hyperbolic cosecant function.
 
 =cut
 
 =head2 csub
 
-Number.csub() -> I<Obj>
+    csub(a,b,x,y)
 
-Return the
+Complex arithmetic subtraction, defined as:
+
+    csub(a,b,x,y)   #=> (a-x, b-y)
 
 Aliases: I<complex_sub>
 
 =cut
 
+=head2 cube
+
+    cube(x)
+
+Returns the cube of C<x>. Equivalent with C<x**3>.
+
+=cut
+
 =head2 cyclotomic
 
-Number.cyclotomic() -> I<Obj>
+    cyclotomic(n)
+    cyclotomic(n,x)
 
-Return the
+Returns the n-th Cyclotomic polynomial evaluated at C<x>.
+
+    say cyclotomic(12, 10)      #=> 9901
+
+When C<x> is omitted, a Polynomial object is returned:
+
+    say cyclotomic(12)          #=> x^4 - x^2 + 1
 
 Aliases: I<cyclotomic_polynomial>
 
@@ -1460,9 +1735,11 @@ Aliases: I<cyclotomic_polynomial>
 
 =head2 dconv
 
-Number.dconv() -> I<Obj>
+    n.dconv(f,g)
 
-Return the
+Returns the Dirichlet convolution of f and g.
+
+    say 20.of { .dirichlet_convolution({.moebius}, {_}) }
 
 Aliases: I<dirichlet_convolution>
 
@@ -1470,9 +1747,12 @@ Aliases: I<dirichlet_convolution>
 
 =head2 de
 
-Number.de() -> I<Obj>
+    r.de
+    r.denominator
 
-Return the
+Returns the denominator for a rational number C<r>.
+
+    say denominator(43/97)      #=> 97
 
 Aliases: I<denominator>
 
@@ -1480,25 +1760,31 @@ Aliases: I<denominator>
 
 =head2 defs
 
-Number.defs() -> I<Obj>
+    n.defs { ... }
 
-Return the
+Returns an array with the first n defined values returned by the given block. The block is called with k = 0,1,...
+
+    10.defs {|k| k.is_prime ? k+1 : nil }      # array of p+1 for the first 10 primes p
 
 =cut
 
 =head2 deg2rad
 
-Number.deg2rad() -> I<Obj>
+    deg2rad(x)
 
-Return the
+Convert degrees to radians.
+
+    say deg2rad(180)    #=> 3.14159...
 
 =cut
 
 =head2 derangements
 
-Number.derangements() -> I<Obj>
+    n.derangements
 
-Return the
+Returns an array of arrays with the derangements of the integers in the range C<0..n-1>, or iterates over the derangements when a block is given.
+
+    5.derangements {|*a| say a }
 
 Aliases: I<complete_permutations>
 
@@ -1506,9 +1792,12 @@ Aliases: I<complete_permutations>
 
 =head2 derivative
 
-Number.derivative() -> I<Obj>
+    derivative(n)
 
-Return the
+Arithmetic derivative of C<n>, defined for rationals and integers (positive and negative).
+
+    say derivative(5040)                 #=> 15168
+    say derivative(-5040/4323).as_frac   #=> -6240176/2076481
 
 Aliases: I<arithmetic_derivative>
 
@@ -1516,25 +1805,50 @@ Aliases: I<arithmetic_derivative>
 
 =head2 digit
 
-Number.digit() -> I<Obj>
+    n.digit(k, b=10)
 
-Return the
+Returns the k-th digit of C<n> in a base C<b>.
+
+Exmaples:
+
+    say 1119.digit(0)         #=> 9
+    say 1181.digit(1)         #=> 8
+    say 1711.digit(2)         #=> 7
+    say 6111.digit(3)         #=> 6
+    say 1234.digit(4)         #=> 0
+
+It also supports negative indices:
+
+    say 9111.digit(-1)        #=> 9
+    say 1811.digit(-2)        #=> 8
+    say 1234.digit(-42)       #=> nil
 
 =cut
 
 =head2 digits
 
-Number.digits() -> I<Obj>
+    n.digits(b=10)
 
-Return the
+Returns the digits of C<n> in base C<b>, ordered from the least significant digit to the most significant digit.
+
+    say 1234.digits      #=> [4,3,2,1]
+    say 1234.digits(20)  #=> [14, 1, 3]
+
+The reverse operation is:
+
+    b.digits2num(n.digits(b)) == n
 
 =cut
 
 =head2 digits2num
 
-Number.digits2num() -> I<Obj>
+    b.digits2num(digits)
 
-Return the
+Convert an array of digits to a number in the base C<b>.
+
+The array of digits are ordered from the least significant digit to the most significant digit, as returned by C<n.digits(b)>.
+
+    say 10.digits2num([4,3,2,1])  #=> 1234
 
 Aliases: I<from_digits>
 
@@ -1542,9 +1856,16 @@ Aliases: I<from_digits>
 
 =head2 digits_sum
 
-Number.digits_sum() -> I<Obj>
+    sumdigits(n, b=10)
 
-Return the
+Sum of base C<b> digits of C<n>.
+
+    say sumdigits(1234)         #=> 10
+    say sumdigits(1e5!, 100)    #=> 10658934
+
+This is equivalent to:
+
+    n.digits(b).sum
 
 Aliases: I<sum_digits>, I<sumdigits>
 
@@ -1552,9 +1873,20 @@ Aliases: I<sum_digits>, I<sumdigits>
 
 =head2 dirichlet_sum
 
-Number.dirichlet_sum() -> I<Obj>
+    n.dirichlet_sum(f, g, F, G)
 
-Return the
+The method computes the following sum in O(sqrt(n)) steps:
+
+    Sum_{k=1..n} Sum_{d|k} f(d) * g(k/d)
+
+Where C<F> and C<G> are the partial sums of C<f> and C<g>, respectively.
+
+    say dirichlet_hyperbola(1e3,
+            { .is_squarefree ? 1 : 0 },
+            { _*_ },
+            { .squarefree_count },
+            { .faulhaber(2) }
+    )
 
 Aliases: I<dirichlet_hyperbola>
 
@@ -1562,25 +1894,34 @@ Aliases: I<dirichlet_hyperbola>
 
 =head2 divides
 
-Number.divides() -> I<Obj>
+    a.divides(b)
+    a `divides` b
 
-Return the
+Returns true if C<a> divides C<b>.
+
+    say 3.divides(15)   #=> true
 
 =cut
 
 =head2 divisor_map
 
-Number.divisor_map() -> I<Obj>
+    n.divisor_map {|d| ... }
 
-Return the
+Maps the divisors of n to the given block.
+
+    say 24.divisor_map {|d| 1/d }  #=> [1, 1/2, 1/3, 1/4, 1/6, 1/8, 1/12, 1/24]
 
 =cut
 
 =head2 divisor_prod
 
-Number.divisor_prod() -> I<Obj>
+    n.divisor_prod {|d| ... }
 
-Return the
+Product of the mapping of the positive divisors of n.
+
+Equivalent with:
+
+    n.divisor_map {|d| ... }.prod
 
 Aliases: I<divisors_prod>
 
@@ -1588,17 +1929,26 @@ Aliases: I<divisors_prod>
 
 =head2 divisors
 
-Number.divisors() -> I<Obj>
+    n.divisors(k=n)
 
-Return the
+Return an array with the positive divisors of n <= k.
+
+    say 120.divisors        #=> [1, 2, 3, 4, 5, 6, 8, 10, 12, 15, 20, 24, 30, 40, 60, 120]
+    say 120.divisors(13)    #=> [1, 2, 3, 4, 5, 6, 8, 10, 12]
 
 =cut
 
 =head2 divisor_sum
 
-Number.divisor_sum() -> I<Obj>
+    n.divisor_sum {|d| ... }
 
-Return the
+Sum of the mapping of the positive divisors of n.
+
+    say 5040.divisor_sum {|d| euler_phi(d)**2 } #=> 2217854
+
+Equivalent with:
+
+    n.divisor_map {|d| ... }.sum
 
 Aliases: I<divisors_sum>
 
@@ -1606,69 +1956,228 @@ Aliases: I<divisors_sum>
 
 =head2 divmod
 
-Number.divmod() -> I<Obj>
+    divmod(a, b)
+    divmod(a, b, m)
 
-Return the
+When only two arguments are provided, it returns C<(a//b, a%b)>.
+
+    say [divmod(23, 10)]    #=> [2,3]
+
+When three arguments are given, it does integer modular division: C<(a/b) % m>.
+
+    say divmod(43, 97, 127)     # == (43 * invmod(97, 127))%127
+
+=cut
+
+=head2 dop_factor
+
+    dop_factor(n, reps=n.ilog2)
+
+Difference of Powers (DoP) factorization method, trying to find algebraic factors of C<n>.
+
+    say dop_factor(2**120 + 1)
+
+An additional argument can be given to limit the number of iterations.
 
 =cut
 
 =head2 downto
 
-Number.downto() -> I<Obj>
+    a.downto(b, step=1)
 
-Return the
+Returns a reverse range from C<a> down to C<b>, with an optional stepping value.
+
+    say 10.downto(1)        #=> RangeNum(10, 1, -1)
+    say 10.downto(1, 2)     #=> RangeNum(10, 1, -2)
 
 =cut
 
 =head2 dump
 
-Number.dump() -> I<Obj>
+    n.dump
 
-Return the
+Returns a stringification version of C<n>.
+
+    say dump(42)    #=> "42"
+    say dump(3/4)   #=> "3/4"
 
 =cut
 
 =head2 e
 
-Number.e() -> I<Obj>
+    Num.e
 
-Return the
+Returns the I<e> mathematical constant: 2.71828...
+
+=cut
+
+=head2 each_almost_prime
+
+    k.each_almost_prime(n, {...})
+    k.each_almost_prime(a,b, {...})
+
+Iterates over the k-almost prime numbers <= n, or in the range C<a..b>.
+
+    11.almost_primes_each(1e7, {|n| say n })        # iterate over 11-almost primes <= 1e6
+    11.almost_primes_each(1e6, 1e7, {|n| say n })   # iterate over 11-almost primes in the range [1e6, 1e7]
+
+Aliases: I<almost_primes_each>
+
+=cut
+
+=head2 each_composite
+
+    n.each_composite { ... }
+    each_composite(a,b, { ... })
+
+Iterate over the composite numbers <= n, or in the given range C<a..b>.
+
+    # Iterate over the composite integers between 100 and 200
+    each_composite(100, 200, {|c|
+        say c
+    })
+
+    # Iterate over the composite integers <= 100
+    100.each_composite {|c|
+        say c
+    }
+
+Aliases: I<composites_each>
+
+=cut
+
+=head2 each_omega_prime
+
+    k.omega_primes_each(n, { ... })
+    k.omega_primes_each(a, b, { ... })
+
+Iterates over the k-omega primes <= n, or in the range C<a..b>.
+
+k-omega primes are numbers C<n> such that C<omega(n) == k>.
+
+    1.omega_primes_each(100, {|n| say n })          # iterate over prime powers <= 100
+    2.omega_primes_each(50, 100, {|n| say n })      # iterate over 2-omega primes in range 50..100
+
+Aliases: I<omega_primes_each>
+
+=cut
+
+=head2 each_powerful
+
+    k.powerful_each(n, { ... })
+    k.powerful_each(a, b, { ... })
+
+Iterates over the k-powerful numbers <= n, or in the range C<a..b>.
+
+    2.powerful_each(100, {|n| say n })          # iterate over 2-powerful numbers <= 100
+    2.powerful_each(50, 100, {|n| say n })      # iterate over 2-powerful in the range 50..100
+
+Aliases: I<powerful_each>
 
 =cut
 
 =head2 each_prime
 
-Number.each_prime() -> I<Obj>
+    n.each_prime {...}
+    each_prime(a,b,{...})
 
-Return the
+It efficiently iterates over the primes in the given range, using a segmented prime sieve.
+
+    # Iterate over the primes between 100 and 200
+    each_prime(100, 200, {|p|
+        say p
+    })
+
+    # Iterate over the primes <= 100
+    100.each_prime {|p|
+        say p
+    }
+
+It's considerably faster than using the C<next_prime(n)> method.
 
 Aliases: I<primes_each>
 
 =cut
 
+=head2 each_semiprime
+
+    n.each_semiprime { ... }
+    each_semiprime(a,b, { ... })
+
+Iterate over semiprimes <= n, or in the range C<a..b>:
+
+    100.each_semiprime {|k| say k }         # iterate over semiprimes <= 100
+    each_semiprime(50, 100, {|k| say k })   # iterate over semiprimes in the range [50, 100]
+
+Aliases: I<semiprimes_each>
+
+=cut
+
 =head2 each_squarefree
 
-Number.each_squarefree() -> I<Obj>
+    n.each_squarefree {...}
+    each_squarefree(a,b,{...})
 
-Return the
+Iterates over the squarefree numbers in a given range.
+
+    # Iterate over the squarefree numbers in the interval [100, 200]
+    each_squarefree(100, 200, {|n|
+        say n
+    })
+
+    # Iterate over the squarefree numbers <= 100
+    100.each_squarefree {|n|
+        say n
+    }
 
 Aliases: I<squarefree_each>
 
 =cut
 
+=head2 each_squarefree_almost_prime
+
+    k.each_squarefree_almost_prime(n, {...})
+    k.each_squarefree_almost_prime(a,b,{...})
+
+Iterates over the squarefree k-almost primes <= n, or in the range C<a..b>.
+
+    # Iterate over squarefree 3-almost primes <= 100
+    3.squarefree_almost_primes_each(100, { .say })
+
+    # Iterate over squarefree 3-almost primes in the range 50..100
+    3.squarefree_almost_primes_each(50, 100, { . say })
+
+Aliases: I<squarefree_almost_primes_each>
+
+=cut
+
 =head2 ecm_factor
 
-Number.ecm_factor() -> I<Obj>
+    n.ecm_factor()
+    n.ecm_factor(B)
+    n.ecm_factor(B,reps)
 
-Return the
+Hendrik Lenstra's elliptic curve factorization method (ECM).
+
+=cut
+
+=head2 edivisors
+
+    edivisors(n)
+
+Returns an array with the exponential divisors (or e-divisors) of n.
+
+    say edivisors(5040)     #=> [210, 420, 630, 1260, 1680, 5040]
+
+Aliases: I<exponential_divisors>
 
 =cut
 
 =head2 ei
 
-Number.ei() -> I<Obj>
+    ei(x)
 
-Return the
+Exponential integral function.
 
 Aliases: I<eint>
 
@@ -1676,25 +2185,52 @@ Aliases: I<eint>
 
 =head2 erf
 
-Number.erf() -> I<Obj>
+    erf(x)
 
-Return the
+The Gauss error function.
 
 =cut
 
 =head2 erfc
 
-Number.erfc() -> I<Obj>
+    erfc(x)
 
-Return the
+The complementary error function.
+
+=cut
+
+=head2 esigma
+
+    esigma(n, k=1)
+
+Returns the sum of the exponential divisors (or e-divisors) of n, each divisor raised to k-th power.
+
+    say 20.of { .esigma }       #=> OEIS: A051377
+
+=cut
+
+=head2 esigma0
+
+    esigma0(n)
+
+Returns the count of the exponential divisors (or e-divisors) of n.
+
+    say 20.of { .esigma0 }      #=> OEIS: A049419
 
 =cut
 
 =head2 euler
 
-Number.euler() -> I<Obj>
+    euler(n)
+    euler(n,x)
 
-Return the
+Returns the n-th Euler number:
+
+    say 10.of {|n| euler_number(n) }   #=> [1, 0, -1, 0, 5, 0, -61, 0, 1385, 0]
+
+Returns the n-th Euler polynomial evaluated at C<x>, when C<x> is given:
+
+    say euler(10, 5)    #=> 1981100
 
 Aliases: I<euler_number>
 
@@ -1702,59 +2238,97 @@ Aliases: I<euler_number>
 
 =head2 euler_polynomial
 
-Number.euler_polynomial() -> I<Obj>
+    euler_polynomial(n)
+    euler_polynomial(n, x)
 
-Return the
+Returns the n-th Euler polynomial evaluated at C<x>.
+
+When C<x> is omitted, a Polynomial object is returned.
+
+=cut
+
+=head2 eval
+
+    eval(x,v)
+
+Returns back C<x>.
 
 =cut
 
 =head2 exp
 
-Number.exp() -> I<Obj>
+    exp(x)
 
-Return the
+Exponential function: C<e^x>.
 
 =cut
 
 =head2 exp10
 
-Number.exp10() -> I<Obj>
+    exp10(x)
 
-Return the
+Exponential function: C<10^x>.
 
 =cut
 
 =head2 exp2
 
-Number.exp2() -> I<Obj>
+    exp2(x)
 
-Return the
+Exponential function: C<2^x>.
 
 =cut
 
 =head2 exp_mangoldt
 
-Number.exp_mangoldt() -> I<Obj>
+    exp_mangoldt(n)
 
-Return the
+Returns exp(Λ(n)); the exponential of the Mangoldt function.
 
 =cut
 
 =head2 expmod
 
-Number.expmod() -> I<Obj>
+    powmod(b, n, m)
 
-Return the
+Modular exponentiation: C<b^n mod m>, where C<b> is an integer or a rational number and C<n> and C<m> are both integers.
+
+    say powmod(2, 42, 43)           #=> 1
+    say powmod(3/4, 1234, 4171)     #=> 2138
 
 Aliases: I<powmod>
 
 =cut
 
+=head2 expnorm
+
+    expnorm(n, b=10)
+
+Returns C<exp(n)> normalized in the range C<[0,1)>.
+
+    say expnorm(log(2) * 20996011)          #=> 0.125976895450330105020494309574...
+
+    say exp(log(10!))               #=> 3628800
+    say expnorm(log(10!))           #=> 0.36288
+    say expnorm(log(10!), 2)        #=> 0.86517333984375
+
+    say 3628800.base(2)             #=> 1101110101111100000000
+    say 0.86517333984375.base(2)    #=> 11011101011111/100000000000000
+
+Complex numbers are also supported:
+
+    say expnorm(log(-1))            #=> 0.06682015101903....+0.074398033695749....i
+    say expnorm(log(-1234)).abs     #=> 0.1234
+
+=cut
+
 =head2 factor
 
-Number.factor() -> I<Obj>
+    factor(n)
 
-Return the
+Returns an array with the prime factors of C<n>, where C<n> is a positive integer, such that C<n.factor.prod == n>.
+
+    say 180.factor  #=> [2, 2, 3, 3, 5]
 
 Aliases: I<factors>
 
@@ -1762,9 +2336,11 @@ Aliases: I<factors>
 
 =head2 factor_exp
 
-Number.factor_exp() -> I<Obj>
+    factor_exp(n)
 
-Return the
+Returns an array of pairs C<[p,k]> factors C<p^k> of n.
+
+    say 180.factor_exp  #=> [[2, 2], [3, 2], [5, 1]]
 
 Aliases: I<factors_exp>
 
@@ -1772,17 +2348,21 @@ Aliases: I<factors_exp>
 
 =head2 factorialmod
 
-Number.factorialmod() -> I<Obj>
+    factorialmod(n,m)
 
-Return the
+Factorial of n modulo m (faster than C<n! % m>).
 
 =cut
 
 =head2 factorial_power
 
-Number.factorial_power() -> I<Obj>
+    factorial_power(n, p)
 
-Return the
+Returns the number of times C<p> divides C<n!>, where C<p> is a prime number.
+
+Equivalent with (but more efficient):
+
+    valuation(n!, p)
 
 Aliases: I<factorial_valuation>
 
@@ -1790,9 +2370,15 @@ Aliases: I<factorial_valuation>
 
 =head2 factorial_sum
 
-Number.factorial_sum() -> I<Obj>
+    factorial_sum(n)
 
-Return the
+Left factorial of C<n>, defined as:
+
+    Sum_{k=0..n-1} k!
+
+Example:
+
+    say 20.of { .factorial_sum }    # OEIS: A003422
 
 Aliases: I<left_factorial>
 
@@ -1800,17 +2386,25 @@ Aliases: I<left_factorial>
 
 =head2 factor_map
 
-Number.factor_map() -> I<Obj>
+    n.factor_map {|p,k| ... }
 
-Return the
+Maps the prime-power factorization C<(p,k)> of n to the given block.
+
+    say 5040.factor_map  {|p,k| p**k }  #=> [16, 9, 5, 7]
 
 =cut
 
 =head2 factor_prod
 
-Number.factor_prod() -> I<Obj>
+    n.factor_prod {|p,k| ... }
 
-Return the
+Product of the mapping of the prime-power factorization of n.
+
+    say 5040.factor_prod {|p,k| (p-1) * p**(k-1) }  #=> 1152
+
+Equivalent with:
+
+    n.factor_map {|p,k| ... }.prod
 
 Aliases: I<factors_prod>
 
@@ -1818,9 +2412,13 @@ Aliases: I<factors_prod>
 
 =head2 factor_sum
 
-Number.factor_sum() -> I<Obj>
+    n.factor_sum {|p,k| ... }
 
-Return the
+Sum of the mapping of the prime-power factorization of n.
+
+Equivalent with:
+
+    n.factor_map {|p,k| ... }.sum
 
 Aliases: I<factors_sum>
 
@@ -1828,17 +2426,29 @@ Aliases: I<factors_sum>
 
 =head2 falling_factorial
 
-Number.falling_factorial() -> I<Obj>
+    falling_factorial(n,k)
 
-Return the
+Falling factorial: C<(n)_k = n * (n - 1) * ... * (n - k + 1)>, defined as:
+
+    binomial(n, k) * k!
+
+For negative values of C<k>, falling factorial is defined as:
+
+    falling_factorial(n, -k) = 1/falling_factorial(n + k, k)
+
+When the denominator is zero, C<NaN> is returned.
 
 =cut
 
 =head2 faulhaber
 
-Number.faulhaber() -> I<Obj>
+    faulhaber(n,k)
 
-Return the
+Sum of powers: C<1^k + 2^k + ... + n^k>, using Faulhaber's summation formula.
+
+    faulhaber(5, 2)   # 1^2 + 2^2 + 3^2 + 4^2 + 5^2 = 55
+
+The value for C<k> must be a non-negative native integer.
 
 Aliases: I<faulhaber_sum>
 
@@ -1846,25 +2456,55 @@ Aliases: I<faulhaber_sum>
 
 =head2 faulhaber_polynomial
 
-Number.faulhaber_polynomial() -> I<Obj>
+    faulhaber_polynomial(n)
+    faulhaber_polynomial(n, x)
 
-Return the
+Computes the n-th Faulhaber polynomials evaluated at C<x>.
+
+Defined in terms of the Bernoulli polynomials, as:
+
+    faulhaber_polynomial(n,x) = (bernoulli_polynomial(n+1,x+1) - bernoulli_polynomial(n+1, 1))/(n+1)
+
+When C<x> is omitted, a Polynomial object is returned.
+
+=cut
+
+=head2 faulhaber_range
+
+    faulhaber_range(a, b, k)
+
+Sum of powers: C<a^k + (a+1)^k + (a+2)^k + ... + b^k>, using Faulhaber's summation formula.
+
+    faulhaber_range(50, 100, 2)   # 50^2 + 51^2 + ... + 100^2 = 297925
+
+The value for C<k> must be a non-negative native integer.
 
 =cut
 
 =head2 fermat_factor
 
-Number.fermat_factor() -> I<Obj>
+    n.fermat_factor(k=1e4)
 
-Return the
+Tries to factorize a given number using Fermat's factorization method (using at most C<k> iterations).
+
+Works for odd composite non-power numbers C<n> that have two divisors close to C<sqrt(n)>.
 
 =cut
 
 =head2 fib
 
-Number.fib() -> I<Obj>
+    fib(n)
+    fib(n,k)
 
-Return the
+Returns the n-th Fibonacci number.
+
+    say 10.of { .fib }      #=> [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]
+
+When an additional is provided, it returns the n-th Fibonacci number of k-th order.
+
+    say 20.of { .fib(3) }   #=> Tribonacci numbers
+    say 20.of { .fib(4) }   #=> Tetranacci numbers
+    say 20.of { .fib(5) }   #=> Pentanacci numbers
 
 Aliases: I<fibonacci>
 
@@ -1872,9 +2512,9 @@ Aliases: I<fibonacci>
 
 =head2 fibmod
 
-Number.fibmod() -> I<Obj>
+    fibmod(n,m)
 
-Return the
+Efficiently compute the n-th Fibonacci number modulo m.
 
 Aliases: I<fibonacci_mod>, I<fibonaccimod>
 
@@ -1882,9 +2522,12 @@ Aliases: I<fibonacci_mod>, I<fibonaccimod>
 
 =head2 flip
 
-Number.flip() -> I<Obj>
+    n.flip(base=10)
 
-Return the
+Returns the reversal of C<n> in base C<b>. When C<b> is not given, it defaults to base 10.
+
+    say 20.of { .flip }         # A004086
+    say 20.of { .flip(2) }      # A030101
 
 Aliases: I<reverse>
 
@@ -1892,73 +2535,125 @@ Aliases: I<reverse>
 
 =head2 flipbit
 
-Number.flipbit() -> I<Obj>
+    flipbit(n,k)
 
-Return the
+Flip the value of the k-th bit of integer C<n>.
+
+    say flipbit(0b1000, 0).as_bin  #=> 1001
+    say flipbit(0b1001, 0).as_bin  #=> 1000
 
 =cut
 
 =head2 floor
 
-Number.floor() -> I<Obj>
+    floor(x)
 
-Return the
+Round C<x> towards -Infinity.
+
+    say floor( 2.5)     #  2
+    say floor(-2.5)     # -3
 
 =cut
 
 =head2 flt_factor
 
-Number.flt_factor() -> I<Obj>
+    n.flt_factor(base=2, tries=1e4)
 
-Return the
+Tries to find a factor of C<n>, using a new factorization method, inspired by Fermat's Little Theorem (FLT).
+
+The method is particularly effective for numbers that have factors closed to each other, or have a factor C<k> for which C<znorder(2,k)> is small.
+
+Example (try with base 3 and give up after 10^6 iterations):
+
+    say flt_factor(2**64 + 1, 3, 1e6)   #=> [274177, 67280421310721]
+
+=cut
+
+=head2 fusc
+
+    fusc(n)
+
+Returns the n-th term in Stern's diatomic series (or Stern-Brocot sequence).
+
+    say 30.of { .fusc }     #=> OEIS: A002487
 
 =cut
 
 =head2 gcd
 
-Number.gcd() -> I<Obj>
+    gcd(...)
 
-Return the
+Returns the greatest common divisor of a list of integers.
 
 =cut
 
 =head2 gcdext
 
-Number.gcdext() -> I<Obj>
+    gcdext(a,b)
 
-Return the
+The extended greatest common divisor of C<a> and C<b>, returning C<(u, v, d)>, where C<d = gcd(a,b)>, while C<u> and C<v> are the coefficients satisfying:
+
+    u*a + v*b = d.
+
+The value of C<d> is always non-negative.
+
+=cut
+
+=head2 gcud
+
+    gcud(...)
+
+Returns the greatest common unitary divisor of a list of integers.
 
 =cut
 
 =head2 geometric_sum
 
-Number.geometric_sum() -> I<Obj>
+    geometric_sum(n,r)
 
-Return the
+Geometric sum: C<r^0 + r^1 + ... + r^n>, using the following formula:
+
+    geometric_sum(n, r) = (r^(n+1) - 1) / (r - 1)
+
+Example:
+
+    say geometric_sum(5, 8)     # 8^0 + 8^1 + 8^2 + 8^3 + 8^4 + 8^5 = 37449
 
 =cut
 
 =head2 gpf
 
-Number.gpf() -> I<Obj>
+    gpf(n)
 
-Return the
+Returns the greatest prime factor of n.
+
+Defined with the base-cases:
+
+    gpf(0) = 0
+    gpf(1) = 1
+
+Example:
+
+    say gpf(2**128 + 1)     #=> 5704689200685129054721
 
 =cut
 
 =head2 hamdist
 
-Number.hamdist() -> I<Obj>
+    hamdist(a,b)
 
-Return the
+Returns the Hamming distance (number of bit-positions where the bits differ) between integers C<a> and C<b>.
 
 =cut
 
 =head2 harm
 
-Number.harm() -> I<Obj>
+    harmonic(n)
+    harmonic(n, k)
 
-Return the
+Returns the n-th Harmonic number C<H_n>. The harmonic numbers are the sum of reciprocals of the first C<n> natural numbers: C<1 + 1/2 + 1/3 + ... + 1/n>.
+
+When an additional argument is given, it returns the n-th Harmonic number of the k-th order.
 
 Aliases: I<harmfrac>, I<harmonic>, I<harmonic_number>
 
@@ -1966,53 +2661,78 @@ Aliases: I<harmfrac>, I<harmonic>, I<harmonic_number>
 
 =head2 harmreal
 
-Number.harmreal() -> I<Obj>
+    harmreal(n)
+    harmreal(n, k)
 
-Return the
+Returns the n-th Harmonic number C<H_n> as a floating-point value, defined as:
 
-=cut
+    harmreal(n) = digamma(n+1) + γ
 
-=head2 hermite_H
+where C<γ> is the Euler-Mascheroni constant.
 
-Number.hermite_H() -> I<Obj>
-
-Return the
-
-Aliases: I<hermiteH>, I<hermite_polynomial_H>, I<hermite_polynomialH>
+When an additional argument is given, it returns the n-th Harmonic number of the k-th order.
 
 =cut
 
-=head2 hermite_He
+=head2 hclassno
 
-Number.hermite_He() -> I<Obj>
+    hclassno(n)
 
-Return the
+Returns the Hurwitz-Kronecker class number.
 
-Aliases: I<hermiteHe>, I<hermite_polynomial_He>, I<hermite_polynomialHe>
+    say 30.of { .hclassno.nu }      # OEIS: A058305
+    say 30.of { .hclassno.de }      # OEIS: A058306
+    say 30.of { 12 * .hclassno }    # OEIS: A259825
+
+=cut
+
+=head2 hermiteH
+
+    hermiteH(n)
+    hermiteH(n, x)
+
+Physicists' Hermite polynomials: C<H_n(x)>.
+
+When C<x> is omitted, a Polynomial object is returned.
+
+Aliases: I<hermite_polynomialH>
+
+=cut
+
+=head2 hermiteHe
+
+    hermiteHe(n)
+    hermiteHe(n, x)
+
+Probabilists' Hermite polynomials: C<He_n(x)>.
+
+When C<x> is omitted, a Polynomial object is returned.
+
+Aliases: I<hermite_polynomialHe>
 
 =cut
 
 =head2 holf_factor
 
-Number.holf_factor() -> I<Obj>
+    n.holf_factor(reps)
 
-Return the
+Hart's OLF method (variant of Fermat's method).
 
 =cut
 
 =head2 hyperfactorial
 
-Number.hyperfactorial() -> I<Obj>
+    Number.hyperfactorial()
 
-Return the
+Hyperfactorial of C<n>, defined as C<Prod_{k=1..n} k^k>.
 
 =cut
 
 =head2 hyperfactorial_ln
 
-Number.hyperfactorial_ln() -> I<Obj>
+    hyperfactorial_ln(n)
 
-Return the
+Natural logarithm of C<hyperfactorial(n)>, where C<n> is a non-negative integer.
 
 Aliases: I<lnhyperfactorial>, I<hyperfactorial_log>
 
@@ -2020,65 +2740,126 @@ Aliases: I<lnhyperfactorial>, I<hyperfactorial_log>
 
 =head2 hypot
 
-Number.hypot() -> I<Obj>
+    hypot(x,y)
 
-Return the
+The value of the hypotenuse for catheti C<x> and C<y>, defined as:
+
+    sqrt(x**2 + y**2)
+
+Also defined for complex numbers.
 
 =cut
 
 =head2 i
 
-Number.i() -> I<Obj>
+    x.i
 
-Return the
+Multiplies C<x> by the imaginary unit C<i>.
+
+    say 42.i         #=> 42i
+    say 42i.i        #=> -42
 
 =cut
 
 =head2 iadd
 
-Number.iadd() -> I<Obj>
+    iadd(a,b)
 
-Return the
+Integer addition: C<a+b>.
 
 =cut
 
 =head2 icbrt
 
-Number.icbrt() -> I<Obj>
+    icbrt(n)
 
-Return the
+Integer cube root of n.
+
+=cut
+
+=head2 idiv_ceil
+
+    idiv_ceil(a,b)
+
+Integer division of integers C<a> and C<b>, rounded towards +Infinity.
+
+When C<a> and C<b> are integers, this is equivalent with:
+
+    ceil(a/b)
+
+=cut
+
+=head2 idivisors
+
+    idivisors(n)
+
+Returns an array with the infinitary divisors (or i-divisors) of n.
+
+    say 96.idivisors        #=> [1, 2, 3, 6, 16, 32, 48, 96]
+
+Aliases: I<infinitary_divisors>
+
+=cut
+
+=head2 idiv_round
+
+    idiv_round(a,b)
+
+Integer division of integers C<a> and C<b>, rounded towards nearest integer.
+
+When C<a> and C<b> are integers, this is equivalent with:
+
+    floor(a/b + 1/2)
+
+=cut
+
+=head2 idiv_trunc
+
+    idiv_trunc(a,b)
+
+Integer division of integers C<a> and C<b>, rounded towards 0.
+
+When C<a> and C<b> are integers, this is equivalent with:
+
+    trunc(a/b)
 
 =cut
 
 =head2 ilog
 
-Number.ilog() -> I<Obj>
+    ilog(n,b)
 
-Return the
+Integer logarithm of C<n> to base C<b>, satisfying:
+
+    b**ilog(n,b) <= n < b**(ilog(n,b)+1)
 
 =cut
 
 =head2 ilog10
 
-Number.ilog10() -> I<Obj>
+    ilog10(n)
 
-Return the
+Integer logarithm of C<n> to base C<10>, equivalent to:
+
+    ilog(n,10)
 
 =cut
 
 =head2 ilog2
 
-Number.ilog2() -> I<Obj>
+    ilog2(n)
 
-Return the
+Integer logarithm of C<n> to base C<2>, equivalent to:
+
+    ilog(n,2)
 
 =cut
 
 =head2 im
 
-Number.im() -> I<Obj>
+    x.im
 
-Return the
+The imaginary part of complex number C<x>. Return 0 when C<x> is a real number.
 
 Aliases: I<imag>, I<imaginary>
 
@@ -2086,33 +2867,34 @@ Aliases: I<imag>, I<imaginary>
 
 =head2 imod
 
-Number.imod() -> I<Obj>
+    imod(a,m)
 
-Return the
+Integer remainder of C<a> when divided by C<m>: C<a % m>.
 
 =cut
 
 =head2 imul
 
-Number.imul() -> I<Obj>
+    imul(a,b)
 
-Return the
+Integer multiplication: C<a*b>.
 
 =cut
 
 =head2 inf
 
-Number.inf() -> I<Obj>
+    Num.inf
 
-Return the
+Returns the positive Infinity special floating-point value.
 
 =cut
 
 =head2 int
 
-Number.int() -> I<Obj>
+    int(x)
+    trunc(x)
 
-Return the
+Truncate C<x> to an integer.
 
 Aliases: I<to_i>, I<to_int>, I<trunc>
 
@@ -2120,17 +2902,17 @@ Aliases: I<to_i>, I<to_int>, I<trunc>
 
 =head2 inv
 
-Number.inv() -> I<Obj>
+    inv(x)
 
-Return the
+Multiplicative inverse of C<x>: C<1/x>.
 
 =cut
 
 =head2 inverse_phi
 
-Number.inverse_phi() -> I<Obj>
+    n.inverse_phi
 
-Return the
+Returns all the solutions C<x> to the Euler totient function: phi(x) = n.
 
 Aliases: I<inverse_totient>
 
@@ -2138,19 +2920,57 @@ Aliases: I<inverse_totient>
 
 =head2 inverse_phi_len
 
-Number.inverse_phi_len() -> I<Obj>
+    n.inverse_phi_len
 
-Return the
+Returns the number of solutions to the Euler totient function: phi(x) = n.
+
+Equivalent with:
+
+    n.inverse_phi.len
 
 Aliases: I<inverse_totient_len>
 
 =cut
 
+=head2 inverse_phi_max
+
+    n.inverse_phi_max
+
+Returns the largest solution x to the Euler totient function: phi(x) = n.
+
+Equivalent with:
+
+    n.inverse_phi.max
+
+Returns C<nil> if there are no solutions.
+
+Aliases: I<inverse_euler_phi_max>
+
+=cut
+
+=head2 inverse_phi_min
+
+    n.inverse_phi_min
+
+Returns the smallest solution x to the Euler totient function: phi(x) = n.
+
+Equivalent with:
+
+    n.inverse_phi.min
+
+Returns C<nil> if there are no solutions.
+
+Aliases: I<inverse_euler_phi_min>
+
+=cut
+
 =head2 inverse_polygonal
 
-Number.inverse_polygonal() -> I<Obj>
+    polygonal_inverse(n)
 
-Return the
+Returns an array of pairs C<[r,k]> such that C<polygonal(r,k) = n>.
+
+    say polygonal_inverse(4012)   #=> [[2, 4012], [4, 670], [8, 145], [4012, 2]]
 
 Aliases: I<polygonal_inverse>
 
@@ -2158,9 +2978,11 @@ Aliases: I<polygonal_inverse>
 
 =head2 inverse_psi
 
-Number.inverse_psi() -> I<Obj>
+    n.inverse_psi
 
-Return the
+Returns all the solutions C<x> to the Dedekin psi function: psi(x) = n.
+
+    say inverse_psi(120)    #=> [75, 76, 87, 95]
 
 Aliases: I<inverse_dedekind_psi>
 
@@ -2168,99 +2990,188 @@ Aliases: I<inverse_dedekind_psi>
 
 =head2 inverse_psi_len
 
-Number.inverse_psi_len() -> I<Obj>
+    n.inverse_psi_len
 
-Return the
+Returns the number of solutions to Dedekind's psi function: psi(x) = n.
+
+Equivalent to C<n.inverse_psi.len>, but much faster.
 
 Aliases: I<inverse_dedekind_psi_len>
 
 =cut
 
+=head2 inverse_psi_max
+
+    n.inverse_psi_max
+
+Returns the largest solution x to the Dedekind psi function: psi(x) = n.
+
+Equivalent with:
+
+    n.inverse_psi.max
+
+Returns C<nil> if there are no solutions.
+
+Aliases: I<inverse_dedekind_psi_max>
+
+=cut
+
+=head2 inverse_psi_min
+
+    n.inverse_psi_min
+
+Returns the smallest solution x to the Dedekind psi function: psi(x) = n.
+
+Equivalent with:
+
+    n.inverse_psi.min
+
+Returns C<nil> if there are no solutions.
+
+Aliases: I<inverse_dedekind_psi_min>
+
+=cut
+
 =head2 inverse_sigma
 
-Number.inverse_sigma() -> I<Obj>
+    n.inverse_sigma(k=1)
 
-Return the
+The method returns all the numbers C<m> for which C<sigma(m,k) = n>, where C<n> is given.
+
+    say inverse_sigma(42)           # [20, 26, 41]
+    say inverse_sigma(22100, 2)     # [120, 130, 141]
+
+Also works with arbitrary large integers:
+
+    say inverse_sigma(9325257382230393314439814176)
 
 =cut
 
 =head2 inverse_sigma_len
 
-Number.inverse_sigma_len() -> I<Obj>
+    n.inverse_sigma_len(k=1)
 
-Return the
+Returns the number of solutions to the sigma sum of divisors function: sigma_k(x) = n.
+
+Equivalent to C<n.inverse_sigma(k).len>, but much faster.
+
+=cut
+
+=head2 inverse_sigma_max
+
+    n.inverse_sigma_max
+
+Returns the largest solution x to the sum of divisors function: sigma(x) = n.
+
+Equivalent with:
+
+    n.inverse_sigma.max
+
+Returns C<nil> if there are no solutions.
+
+=cut
+
+=head2 inverse_sigma_min
+
+    n.inverse_sigma_min
+
+Returns the smallest solution x to the sum of divisors function: sigma(x) = n.
+
+Equivalent with:
+
+    n.inverse_sigma.min
+
+Returns C<nil> if there are no solutions.
 
 =cut
 
 =head2 inverse_uphi
 
-Number.inverse_uphi() -> I<Obj>
+    n.inverse_uphi
 
-Return the
+Returns an array with all the solutions C<x> to C<uphi(x) = n>.
+
+    say inverse_uphi(120)       #=> [121, 143, 144, 155, 164, 183, 220, 231, 240, 242, 286, 310, 366, 462]
 
 =cut
 
 =head2 inverse_usigma
 
-Number.inverse_usigma() -> I<Obj>
+    n.inverse_usigma
 
-Return the
+Returns an array with all the possible solutions for C<x> in usigma(x) = n.
+
+    say inverse_usigma(120)                         #=> [60, 87, 92, 95, 99]
+    say inverse_usigma(5040).len                    #=> 38
+    say inverse_usigma(5040).map { .usigma }.uniq   #=> [5040]
 
 =cut
 
 =head2 invmod
 
-Number.invmod() -> I<Obj>
+    n.invmod(m)
 
-Return the
+Returns the modular inverse of n modulo m.
 
 =cut
 
 =head2 ipolygonal_root
 
-Number.ipolygonal_root() -> I<Obj>
+    ipolygonal_root(n,k)
 
-Return the
+First integer k-gonal root of n.
+
+    say ipolygonal_root(n, 5)                   # integer pentagonal root
+    say ipolygonal_root(polygonal(10, 5), 5)    # prints: "10"
 
 =cut
 
 =head2 ipolygonal_root2
 
-Number.ipolygonal_root2() -> I<Obj>
+    ipolygonal_root2(n,k)
 
-Return the
+Second integer k-gonal root of C<n>.
+
+    say ipolygonal_root2(n, 5)                   # second integer pentagonal root
+    say ipolygonal_root2(polygonal(-10, 5), 5)   # prints: "-10"
 
 =cut
 
 =head2 ipow
 
-Number.ipow() -> I<Obj>
+    ipow(b,n)
 
-Return the
+Integer exponentiation: C<b^n>.
 
 =cut
 
 =head2 ipow10
 
-Number.ipow10() -> I<Obj>
+    ipow10(n)
 
-Return the
+Integer exponentiation: C<10^n>.
 
 =cut
 
 =head2 ipow2
 
-Number.ipow2() -> I<Obj>
+    ipow2(n)
 
-Return the
+Integer exponentiation: C<2^n>.
 
 =cut
 
 =head2 iquadratic_formula
 
-Number.iquadratic_formula() -> I<Obj>
+    iquadratic_formula(a,b,c)
 
-Return the
+Returns a list of integer solutions C<(x_1, x_2)> to the quadratic equation: C<a*x^2 + b*x + c = 0>, defined as:
+
+    floor((-b ± isqrt(b^2 - 4ac)) / (2a))
+
+Example:
+
+    say [iquadratic_formula(13, -42, -34)]  #=> [3, -1]
 
 Aliases: I<integer_quadratic_formula>
 
@@ -2268,81 +3179,109 @@ Aliases: I<integer_quadratic_formula>
 
 =head2 irand
 
-Number.irand() -> I<Obj>
+    irand(n)
+    irand(a,b)
 
-Return the
+Returns a pseudorandom integer in range C<0..n> (all inclusive), or in the range C<a..b> (all inclusive).
+
+If C<a> is greater than C<b>, the returned integer will be in the range C<b..a>.
+
+    irand(10)        # a pseudorandom integer in the interval [0, 10]
+    irand(10, 20)    # a pseudorandom integer in the interval [10, 20]
 
 =cut
 
 =head2 iroot
 
-Number.iroot() -> I<Obj>
+    n.iroot(k)
 
-Return the
+Integer k-th root of n.
 
 =cut
 
 =head2 irootrem
 
-Number.irootrem() -> I<Obj>
+    n.irootrem(k)
 
-Return the
+Returns a list with the integer k-th root of n and k-th root remainder of n.
+
+Equivalent with:
+
+    (n.iroot(k), n - n.iroot(k)**k)
+
+=cut
+
+=head2 is_abs_euler_psp
+
+    n.is_abs_euler_psp
+
+Returns true if C<n> is an absolute Euler pseudoprime: p-1 | (n-1)/2 for every p|n, where C<n> is a squarefree composite integer.
+
+    say 10.by { .is_abs_euler_psp }     #=> OEIS: A033181
+
+Aliases: I<is_absolute_euler_psp>
 
 =cut
 
 =head2 is_abundant
 
-Number.is_abundant() -> I<Obj>
+    n.is_abundant
 
-Return the
+Returns true when sigma(n) > 2*n.
 
 =cut
 
 =head2 is_aks_prime
 
-Number.is_aks_prime() -> I<Obj>
+    n.is_aks_prime
 
-Return the
+Return true if C<n> passes the Agrawal-Kayal-Saxena (AKS) primality test.
 
 =cut
 
 =head2 is_almost_prime
 
-Number.is_almost_prime() -> I<Obj>
+    n.is_almost_prime(k=2)
 
-Return the
+Return true if C<n> is a k-almost prime (i.e.: true iff C<n> is the product of C<k> not necessarily distinct primes).
+
+Equivalently, k-almost primes are numbers n such that C<bigomega(n) == k>.
+
+    say 20.by { .is_almost_prime(1) }   # primes
+    say 20.by { .is_almost_prime(2) }   # semiprimes
+    say 20.by { .is_almost_prime(3) }   # 3-almost primes
 
 =cut
 
 =head2 is_between
 
-Number.is_between() -> I<Obj>
+    n.is_between(min, max)
 
-Return the
+Returns a true value when `n >= min` and `n <= max`.
 
 =cut
 
 =head2 is_bpsw_prime
 
-Number.is_bpsw_prime() -> I<Obj>
+    n.is_bpsw_prime()
 
-Return the
+Returns true if C<n> passes the B-PSW primality test (extra-strong variant).
 
 =cut
 
 =head2 is_carmichael
 
-Number.is_carmichael() -> I<Obj>
+    n.is_carmichael()
 
-Return the
+Returns true if is a Carmichael number.
 
 =cut
 
 =head2 is_chebyshev
 
-Number.is_chebyshev() -> I<Obj>
+    n.is_chebyshev()
 
-Return the
+Returns true if C<n> is an odd composite Chebyshev pseudoprime, as defined by OEIS A175530.
 
 Aliases: I<is_chebyshev_psp>, I<is_chebyshev_pseudoprime>
 
@@ -2350,73 +3289,86 @@ Aliases: I<is_chebyshev_psp>, I<is_chebyshev_pseudoprime>
 
 =head2 is_complex
 
-Number.is_complex() -> I<Obj>
+    x.is_complex
 
-Return the
+Returns true if C<x> is a complex number.
+
+    say is_complex(complex(4))        # false (is real)
+    say is_complex(complex(4i))       # false (is imaginary)
+    say is_complex(complex(3+4i))     # true
 
 =cut
 
 =head2 is_composite
 
-Number.is_composite() -> I<Obj>
+    n.is_composite
 
-Return the
+Returns true if C<n> is a positive > 1 composite number.
 
 =cut
 
 =head2 is_congruent
 
-Number.is_congruent() -> I<Obj>
+    n.is_congruent(a,m)
 
-Return the
+Returns true when n is congruent to a modulo m.
+
+    say 99923.is_congruent(-2, 5)   #=> true
+    say 99923.is_congruent(3, 5)    #=> true
+
+Also defined for rationals, floats and complex numbers:
+
+    say is_congruent(124, 1/4, 3/4) #=> true
 
 =cut
 
 =head2 is_coprime
 
-Number.is_coprime() -> I<Obj>
+    is_coprime(a,b)
 
-Return the
+Returns true if C<gcd(a,b) = 1>.
 
 =cut
 
 =head2 is_cube
 
-Number.is_cube() -> I<Obj>
+    n.is_cube
 
-Return the
+Return true if n is a cube number (if it can be written as b^3, for some integer b).
 
 =cut
 
 =head2 is_cyclic
 
-Number.is_cyclic() -> I<Obj>
+    n.is_cyclic
 
-Return the
+Returns true when C<gcd(phi(n), n) = 1>, where C<phi(n)> is the Euler totient function.
+
+    say 30.by { .is_cyclic }    # OEIS: A003277
 
 =cut
 
 =head2 is_ecpp_prime
 
-Number.is_ecpp_prime() -> I<Obj>
+    n.is_ecpp_prime
 
-Return the
+Return true if C<n> can be proved prime using the Elliptic Curve Primality Proving algorithm.
 
 =cut
 
 =head2 iseed
 
-Number.iseed() -> I<Obj>
+    iseed(n)
 
-Return the
+Re-seed the C<irand()> function. The value for C<n> can be any arbitrary large integer.
 
 =cut
 
 =head2 is_euler_psp
 
-Number.is_euler_psp() -> I<Obj>
+    n.is_euler_psp(bases...)
 
-Return the
+Return true if C<n> is an Euler-Jacobi pseudoprime, given a list of bases.
 
 Aliases: I<is_euler_pseudoprime>
 
@@ -2424,17 +3376,30 @@ Aliases: I<is_euler_pseudoprime>
 
 =head2 is_even
 
-Number.is_even() -> I<Obj>
+    n.is_even
 
-Return the
+Returns true if C<n> is an integer divisible by 2.
+
+=cut
+
+=head2 is_fib
+
+    n.is_fib
+
+Returns true if n is a Fibonacci number. False otherwise.
+
+Aliases: I<is_fibonacci>
 
 =cut
 
 =head2 is_fib_psp
 
-Number.is_fib_psp() -> I<Obj>
+    n.is_fib_psp(P=1, Q=-1)
 
-Return the
+Returns true if C<n> passes the Lucas test to the C<U>, using the parameters C<P> and C<Q>.
+
+    say 10.by { .is_composite && .is_lucasU_psp }               # Fibonacci pseudoprimes
+    say 10.by { .is_odd_composite && .is_lucasU_psp(2, -1) }    #=> OEIS: A327651
 
 Aliases: I<is_lucasu_psp>, I<is_lucasU_psp>, I<is_fibonacci_psp>, I<is_lucasU_pseudoprime>, I<is_fibonacci_pseudoprime>
 
@@ -2442,9 +3407,9 @@ Aliases: I<is_lucasu_psp>, I<is_lucasU_psp>, I<is_fibonacci_psp>, I<is_lucasU_ps
 
 =head2 is_frobenius_psp
 
-Number.is_frobenius_psp() -> I<Obj>
+    n.is_frobenius_psp(a,b)
 
-Return the
+Return true if C<n> is a Frobenius probable prime with respect to the polynomial C<x^2 - ax + b>.
 
 Aliases: I<is_frobenius_pseudoprime>
 
@@ -2452,75 +3417,119 @@ Aliases: I<is_frobenius_pseudoprime>
 
 =head2 is_fundamental
 
-Number.is_fundamental() -> I<Obj>
+    n.is_fundamental
 
-Return the
+Returns true if C<n> is a fundamental discriminant.
 
 =cut
 
 =head2 is_gaussian_prime
 
-Number.is_gaussian_prime() -> I<Obj>
+    is_gaussian_prime(a,b)
 
-Return the
+Returns true if a+b*i is a Gaussian prime.
+
+    say is_gaussian_prime(3, 4)       #=> false
+    say is_gaussian_prime(13, 42)     #=> true
+
+Provided by L<Math::Prime::Util::GMP> >= 0.52.
+
+=cut
+
+=head2 isigma
+
+    isigma(n, k=1)
+
+Returns the sum of the infinitary divisors of n, each divisor raised to the k-th power.
+
+    say 20.of { .isigma }       #=> OEIS: A049417
+
+=cut
+
+=head2 isigma0
+
+    isigma0(n)
+
+Returns the count of the infinitary divisors of n.
+
+    say 20.of { .isigma0 }      #=> OEIS: A037445
 
 =cut
 
 =head2 is_imag
 
-Number.is_imag() -> I<Obj>
+    x.is_imag
 
-Return the
+Returns true if C<x> is an imaginary number.
+
+    say is_imag(complex(4))           # false (is real)
+    say is_imag(complex(4i))          # true
+    say is_imag(complex(3+4i))        # false (is complex)
 
 =cut
 
 =head2 is_imprimitive_carmichael
 
-Number.is_imprimitive_carmichael() -> I<Obj>
+    n.is_imprimitive_carmichael
 
-Return the
+Returns true if C<n> is an imprimitive Carmichael numbers, as defined by OEIS: A328935.
+
+    say 325533792014488126487416882038879701391121.is_imprimitive_carmichael   # true
+
+The method efficiently tries to factorize large Carmichael numbers, using the C<miller_factor(n)> method.
 
 =cut
 
 =head2 is_inf
 
-Number.is_inf() -> I<Obj>
+    x.is_inf
 
-Return the
+Returns true if C<x> equals positive infinity (C<Inf>).
 
 =cut
 
 =head2 is_int
 
-Number.is_int() -> I<Obj>
+    x.is_int
 
-Return the
+Returns true if C<x> is an integer.
 
 =cut
 
 =head2 is_khashin_psp
 
-Number.is_khashin_psp() -> I<Obj>
+    n.is_khashin_psp
 
-Return the
+Return true if C<n> passes the Frobenius test of Sergey Khashin.
 
 Aliases: I<is_khashin_pseudoprime>, I<is_frobenius_khashin_psp>, I<is_frobenius_khashin_pseudoprime>
 
 =cut
 
+=head2 is_lucas
+
+    n.is_lucas
+
+Returns true if n is a Lucas number. False otherwise.
+
+=cut
+
 =head2 is_lucas_carmichael
 
-Number.is_lucas_carmichael() -> I<Obj>
+    n.is_lucas_carmichael
 
-Return the
+Returns true if C<n> is a Lucas-Carmichael number.
+
+    say 10.by(:is_lucas_carmichael)                               # OEIS: A006972
+    say is_lucas_carmichael(58735331016965175152455996272482303)  # true
 
 =cut
 
 =head2 is_lucas_psp
 
-Number.is_lucas_psp() -> I<Obj>
+    n.is_lucas_psp
 
-Return the
+Return true if C<n> is a Lucas pseudoprime.
 
 Aliases: I<is_lucas_pseudoprime>
 
@@ -2528,9 +3537,12 @@ Aliases: I<is_lucas_pseudoprime>
 
 =head2 is_lucasv_psp
 
-Number.is_lucasv_psp() -> I<Obj>
+    n.is_lucasv_psp(P=1, Q=-1)
 
-Return the
+Returns true if C<n> passes the Lucas test to the C<V> sequence, using the parameters C<P> and C<Q>.
+
+    say 10.by { .is_composite && .is_lucasV_psp }               # Bruckman-Lucas pseudoprimes
+    say 10.by { .is_odd_composite && .is_lucasV_psp(2, -1) }    #=> OEIS: A330276
 
 Aliases: I<is_lucasV_psp>, I<is_bruckman_lucas_psp>, I<is_lucasV_pseudoprime>, I<is_bruckman_lucas_pseudoprime>
 
@@ -2538,33 +3550,35 @@ Aliases: I<is_lucasV_psp>, I<is_bruckman_lucas_psp>, I<is_lucasV_pseudoprime>, I
 
 =head2 is_mersenne_prime
 
-Number.is_mersenne_prime() -> I<Obj>
+    is_mersenne_prime(p)
 
-Return the
+Returns true if C<2^p - 1> is a Mersenne prime.
+
+    say 607.is_mersenne_prime       # prints true; (2**607 - 1) is a Mersenne prime.
 
 =cut
 
 =head2 is_mone
 
-Number.is_mone() -> I<Obj>
+    x.is_mone
 
-Return the
+Returns true if C<x> equals -1.
 
 =cut
 
 =head2 is_nan
 
-Number.is_nan() -> I<Obj>
+    x.is_nan
 
-Return the
+Returns true if C<x> holds the Not-a-Number special value (C<NaN>).
 
 =cut
 
 =head2 is_neg
 
-Number.is_neg() -> I<Obj>
+    x.is_neg
 
-Return the
+Returns true if C<x> is negative.
 
 Aliases: I<is_negative>
 
@@ -2572,17 +3586,17 @@ Aliases: I<is_negative>
 
 =head2 is_ninf
 
-Number.is_ninf() -> I<Obj>
+    x.is_ninf
 
-Return the
+Returns true if C<x> equals negative infinity (C<-Inf>).
 
 =cut
 
 =head2 is_nm1_prime
 
-Number.is_nm1_prime() -> I<Obj>
+    n.is_nm1_prime
 
-Return the
+Return true if C<n> can be proved prime using the factorization of C<n-1>.
 
 Aliases: I<is_pm1_prime>, I<is_nminus1_prime>
 
@@ -2590,43 +3604,75 @@ Aliases: I<is_pm1_prime>, I<is_nminus1_prime>
 
 =head2 is_np1_prime
 
-Number.is_np1_prime() -> I<Obj>
+    n.is_np1_prime
 
-Return the
+Return true if C<n> can be proved prime using the factorization of C<n+1>.
 
 Aliases: I<is_pp1_prime>, I<is_nplus1_prime>
 
 =cut
 
+=head2 is_ntf
+
+    g.is_ntf(n)
+
+Returns true if C<g> is a non-trivial integer factor of C<n>.
+
+Equivalent with (assuming C<g> and C<n> are both integers):
+
+    g.divides(n) && g.is_between(2, n-1)
+
+Aliases: I<is_nontrivial_factor>
+
+=cut
+
 =head2 is_odd
 
-Number.is_odd() -> I<Obj>
+    n.is_odd
 
-Return the
+Returns true when C<n> is an integer not divisible by 2.
 
 =cut
 
 =head2 is_odd_composite
 
-Number.is_odd_composite() -> I<Obj>
+    n.is_odd_composite
 
-Return the
+Returns true when C<n> is an odd composite integer.
+
+=cut
+
+=head2 is_omega_prime
+
+    n.is_omega_prime(k=2)
+
+Return true if C<n> is a k-omega prime (i.e.: true if C<n> is divisible by exactly C<k> different primes).
+
+Equivalently, k-omega primes are numbers n such that C<omega(n) == k>.
+
+    say 20.by { .is_omega_prime(1) }   # prime powers
+    say 20.by { .is_omega_prime(2) }   # numbers n such that omega(n) == 2
 
 =cut
 
 =head2 is_one
 
-Number.is_one() -> I<Obj>
+    n.is_one
 
-Return the
+Returns true when C<n> equals 1.
 
 =cut
 
 =head2 is_over_psp
 
-Number.is_over_psp() -> I<Obj>
+    n.is_over_psp
 
-Return the
+Returns true if C<n> is an overpseudoprime to base C<b>. Multiple bases can also be provided.
+
+An overpseudoprime to base C<b> is a also a strong Fermat pseudoprime to base C<b> and a super-pseudoprime to base C<b>, where znorder(b,n) == znorder(b,p) for every p|n.
+
+    say 10.by { .is_composite && .is_over_psp }         # overpseudoprimes to base 2
+    say 10.by { .is_composite && .is_over_psp(3) }      # overpseudoprimes to base 3
 
 Aliases: I<is_over_pseudoprime>, I<is_overpseudoprime>
 
@@ -2634,9 +3680,12 @@ Aliases: I<is_over_pseudoprime>, I<is_overpseudoprime>
 
 =head2 is_palindrome
 
-Number.is_palindrome() -> I<Obj>
+    n.is_palindrome(b=10)
 
-Return the
+Returns true if the given number C<n> is palindromic in the given base C<b>. When no base is given, it defaults to 10.
+
+    # Numbers that are palindromic in bases 2 and 10 (OEIS: A007632)
+    say 1e6.range.grep{ .is_palindrome(2) && .is_palindrome(10) }
 
 Aliases: I<is_palindromic>
 
@@ -2644,9 +3693,13 @@ Aliases: I<is_palindromic>
 
 =head2 is_pell_lucas_psp
 
-Number.is_pell_lucas_psp() -> I<Obj>
+    n.is_pell_lucas_psp
 
-Return the
+It returns true if C<V_n(2, -1) = 2 (mod n)>.
+
+    say 20.by { .is_pell_lucas_pseudoprime }                               #=> OEIS: A270342
+    say 20.by { .is_pell_lucas_pseudoprime && .is_composite }              #=> OEIS: A335668
+    say 20.by { .is_pell_lucas_pseudoprime && .is_composite && .is_odd }   #=> OEIS: A330276
 
 Aliases: I<is_pell_lucas_pseudoprime>
 
@@ -2654,9 +3707,15 @@ Aliases: I<is_pell_lucas_pseudoprime>
 
 =head2 is_pell_psp
 
-Number.is_pell_psp() -> I<Obj>
+    n.is_pell_psp
 
-Return the
+These are odd numbers that satisfy:
+
+    U_n(2, -1) = (2|n) (mod n)
+
+Example:
+
+    say 10.by { .is_pell_pseudoprime && .is_composite }  # OEIS: A099011
 
 Aliases: I<is_pell_pseudoprime>
 
@@ -2664,9 +3723,9 @@ Aliases: I<is_pell_pseudoprime>
 
 =head2 is_perrin_psp
 
-Number.is_perrin_psp() -> I<Obj>
+    n.is_perrin_psp
 
-Return the
+Returns true if C<n> passes the Perrin primality test.
 
 Aliases: I<is_perrin_pseudoprime>
 
@@ -2674,9 +3733,9 @@ Aliases: I<is_perrin_pseudoprime>
 
 =head2 is_plumb_psp
 
-Number.is_plumb_psp() -> I<Obj>
+    n.is_plumb_psp
 
-Return the
+Return true if C<n> passes Colin Plumb's Euler Criterion primality test.
 
 Aliases: I<is_euler_plumb_psp>, I<is_plumb_pseudoprime>, I<is_euler_plumb_pseudoprime>
 
@@ -2684,109 +3743,139 @@ Aliases: I<is_euler_plumb_psp>, I<is_plumb_pseudoprime>, I<is_euler_plumb_pseudo
 
 =head2 is_polygonal
 
-Number.is_polygonal() -> I<Obj>
+    is_polygonal(n,k)
 
-Return the
+Returns true if C<n> is a first k-gonal number.
+
+    say is_polygonal(145, 5)      #=> 1 ("145" is a pentagonal number)
+    say is_polygonal(155, 5)      #=> 0
 
 =cut
 
 =head2 is_polygonal2
 
-Number.is_polygonal2() -> I<Obj>
+    is_polygonal2(n,k)
 
-Return the
+Returns true when C<n> is a second k-gonal number.
+
+    say is_polygonal2(145, 5)      #=> 0
+    say is_polygonal2(155, 5)      #=> 1 ("155" is a second-pentagonal number)
 
 =cut
 
 =head2 is_pos
 
-Number.is_pos() -> I<Obj>
+    x.is_pos
 
-Return the
+Returns true when C<x> is a positive integer.
 
 Aliases: I<is_positive>
 
 =cut
 
-=head2 is_pow
+=head2 is_powerfree
 
-Number.is_pow() -> I<Obj>
+    n.is_powerfree(k=2)
 
-Return the
-
-Aliases: I<is_power>, I<is_perfect_power>
+Returns true when all the exponents in the prime-power factorization of n are < k.
 
 =cut
 
 =head2 is_powerful
 
-Number.is_powerful() -> I<Obj>
+    n.is_powerful(k=2)
 
-Return the
+Returns true when all the exponents in the prime-power factorization of n are >= k.
 
 =cut
 
 =head2 is_power_of
 
-Number.is_power_of() -> I<Obj>
+    n.is_power_of(b)
 
-Return the
+Return true if n is a power of b, such that n = b^k for some k >= 0:
+
+    n.is_power_of(b)    # true if n == b^k for some k >= 0
+
+Example:
+
+    say 1000.range.grep { .is_power_of(2) }     # powers of 2
+    say 1000.range.grep { .is_power_of(5) }     # powers of 5
+
+=cut
+
+=head2 is_pow
+
+    n.is_power
+    n.is_power(k)
+
+When k is omitted, it true if n is a perfect power.
+
+When k is given, it returns true if n can be expressed as C<n = b^k> for some b >= 1.
+
+    say 225.is_power          # true: 225 == 15**2
+    say 100.is_power(2)       # true: 100 is square (10**2)
+    say 125.is_power(3)       # true: 125 is a cube ( 5**3)
+
+Aliases: I<is_power>, I<is_perfect_power>
 
 =cut
 
 =head2 is_practical
 
-Number.is_practical() -> I<Obj>
+    n.is_practical()
 
-Return the
+Returns true if n is a practical number (OEIS: A005153).
+
+    say 20.by { .is_practical }
 
 =cut
 
 =head2 is_prime
 
-Number.is_prime() -> I<Obj>
+    n.is_prime
 
-Return the
+Returns true if C<n> is a prime number.
 
 =cut
 
 =head2 is_prime_power
 
-Number.is_prime_power() -> I<Obj>
+    n.is_prime_power
 
-Return the
+Returns true if n is a power of some prime.
 
 =cut
 
 =head2 is_primitive_root
 
-Number.is_primitive_root() -> I<Obj>
+    n.is_primitive_root(m)
 
-Return the
+Returns true if n is a primitive root modulo m.
 
 =cut
 
 =head2 is_prob_prime
 
-Number.is_prob_prime() -> I<Obj>
+    is_prob_prime(n)
 
-Return the
+Returns true if n is probably prime. The method does some trial division, then it performs a B-PSW test.
 
 =cut
 
 =head2 is_prob_squarefree
 
-Number.is_prob_squarefree() -> I<Obj>
+    n.is_prob_squarefree(k)
 
-Return the
+Returns true iff C<n> is not a power and is not divisible by a square <= k.
 
 =cut
 
 =head2 is_prov_prime
 
-Number.is_prov_prime() -> I<Obj>
+    is_prov_prime(n)
 
-Return the
+Returns true if n is provable prime.
 
 Aliases: I<is_provable_prime>
 
@@ -2794,9 +3883,9 @@ Aliases: I<is_provable_prime>
 
 =head2 is_psp
 
-Number.is_psp() -> I<Obj>
+    n.is_psp(bases...)
 
-Return the
+Returns true if C<n> is a Fermat pseudoprime to the provided bases.
 
 Aliases: I<is_fermat_psp>, I<is_pseudoprime>, I<is_fermat_pseudoprime>
 
@@ -2804,81 +3893,98 @@ Aliases: I<is_fermat_psp>, I<is_pseudoprime>, I<is_fermat_pseudoprime>
 
 =head2 isqrt
 
-Number.isqrt() -> I<Obj>
+    n.isqrt
 
-Return the
+Integer square root of n.
 
 =cut
 
 =head2 isqrtrem
 
-Number.isqrtrem() -> I<Obj>
+    n.isqrtrem
 
-Return the
+Returns a list with the integer square root of n and the square root remainder of n.
+
+Equivalent with:
+
+    (n.isqrt, n - n.isqrt**2)
 
 =cut
 
 =head2 is_rat
 
-Number.is_rat() -> I<Obj>
+    x.is_rat
 
-Return the
+Returns true if C<x> is a rational number.
 
 =cut
 
 =head2 is_real
 
-Number.is_real() -> I<Obj>
+    x.is_real
 
-Return the
+Returns true if C<x> is a real number.
+
+    say is_real(complex(4))           # true
+    say is_real(complex(4i))          # false (is imaginary)
+    say is_real(complex(3+4i))        # false (is complex)
 
 =cut
 
 =head2 is_rough
 
-Number.is_rough() -> I<Obj>
+    n.is_rough(k)
 
-Return the
+Returns true if all prime factors of n are >= k.
+
+    say 30.by { .is_rough(3) }  #=> OEIS: A005408
+    say 30.by { .is_rough(5) }  #=> OEIS: A007310
+    say 30.by { .is_rough(7) }  #=> OEIS: A007775
+    # ...
+    say 30.by { .is_rough(23) } #=> OEIS: A166063
 
 =cut
 
 =head2 is_safe_prime
 
-Number.is_safe_prime() -> I<Obj>
+    n.is_safe_prime
 
-Return the
+It returns true if both C<n> and C<(n-1)/2> are prime.
+
+    say 30.by { .is_safe_prime }    #=> OEIS: A005385
 
 =cut
 
 =head2 is_semiprime
 
-Number.is_semiprime() -> I<Obj>
+    n.is_semiprime
 
-Return the
+Returns true if n has exactly two prime factors (not necessarily distinct).
 
 =cut
 
 =head2 is_smooth
 
-Number.is_smooth() -> I<Obj>
+    n.is_smooth(k)
 
-Return the
+Returns true if all the prime factors of C<n> are <= k. False otherwise.
 
 =cut
 
 =head2 is_smooth_over_prod
 
-Number.is_smooth_over_prod() -> I<Obj>
+    n.is_smooth_over_prod(k)
 
-Return the
+Returns true when C<n> is smooth over the prime factors of C<k>.
 
 =cut
 
 =head2 is_sqr
 
-Number.is_sqr() -> I<Obj>
+    n.is_sqr
+    is_square(n)
 
-Return the
+Returns true if C<n> is a perfect square integer.
 
 Aliases: I<is_square>, I<is_perfect_square>
 
@@ -2886,9 +3992,9 @@ Aliases: I<is_square>, I<is_perfect_square>
 
 =head2 is_square_free
 
-Number.is_square_free() -> I<Obj>
+    n.is_square_free
 
-Return the
+Returns true if the prime factorization of n does not include duplicated factors (i.e.: n is not divisible by a square).
 
 Aliases: I<is_squarefree>
 
@@ -2896,9 +4002,9 @@ Aliases: I<is_squarefree>
 
 =head2 is_stronger_lucas_psp
 
-Number.is_stronger_lucas_psp() -> I<Obj>
+    n.is_stronger_lucas_psp
 
-Return the
+Return true if C<n> is an extra-strong Lucas pseudoprime.
 
 Aliases: I<is_extra_strong_lucas_psp>, I<is_stronger_lucas_pseudoprime>, I<is_extra_strong_lucas_pseudoprime>
 
@@ -2906,9 +4012,25 @@ Aliases: I<is_extra_strong_lucas_psp>, I<is_stronger_lucas_pseudoprime>, I<is_ex
 
 =head2 is_strong_fib
 
-Number.is_strong_fib() -> I<Obj>
+    n.is_strong_fib
 
-Return the
+Teturns true if C<n> is a strong Fibonacci pseudoprime, satisfying:
+
+    V_n(P,Q) = P (mod)
+
+for Q = -1 and all P.
+
+Odd composite integer n is a strong Fibonacci pseudoprime iff:
+
+    1) n is a Carmichael number: p-1 | n-1
+    2) 2(p + 1) | (n − 1) or 2(p + 1) | (n − p)
+
+for each prime p|n.
+
+Example:
+
+    say is_strong_fibonacci_pseudoprime(443372888629441)    #=> true
+    say is_strong_fibonacci_pseudoprime(39671149333495681)  #=> true
 
 Aliases: I<is_strong_fib_psp>, I<is_strong_fibonacci>, I<is_strong_fibonacci_psp>, I<is_strong_fibonacci_pseudoprime>
 
@@ -2916,9 +4038,9 @@ Aliases: I<is_strong_fib_psp>, I<is_strong_fibonacci>, I<is_strong_fibonacci_psp
 
 =head2 is_strongish_lucas_psp
 
-Number.is_strongish_lucas_psp() -> I<Obj>
+    n.is_strongish_lucas_psp
 
-Return the
+Return true if C<n> is almost an extra-strong Lucas pseudoprime.
 
 Aliases: I<is_strongish_lucas_pseudoprime>
 
@@ -2926,9 +4048,9 @@ Aliases: I<is_strongish_lucas_pseudoprime>
 
 =head2 is_strong_lucas_psp
 
-Number.is_strong_lucas_psp() -> I<Obj>
+    n.is_strong_lucas_psp
 
-Return the
+Return true if C<n> is a strong Lucas pseudoprime.
 
 Aliases: I<is_strong_lucas_pseudoprime>
 
@@ -2936,9 +4058,9 @@ Aliases: I<is_strong_lucas_pseudoprime>
 
 =head2 is_strong_psp
 
-Number.is_strong_psp() -> I<Obj>
+    n.is_strong_psp(bases...)
 
-Return the
+Return true if C<n> is a strong pseudoprime.
 
 Aliases: I<miller_rabin>, I<is_strong_fermat_psp>, I<is_strong_pseudoprime>, I<is_strong_fermat_pseudoprime>
 
@@ -2946,9 +4068,18 @@ Aliases: I<miller_rabin>, I<is_strong_fermat_psp>, I<is_strong_pseudoprime>, I<i
 
 =head2 is_super_psp
 
-Number.is_super_psp() -> I<Obj>
+    n.is_super_psp(bases...)
 
-Return the
+It returns true if the given value of n is a super-pseudoprime to the given bases. When no base is given, the base 2 is used (which represents the Super-Poulet numbers: A050217)
+
+    # Super-Poulet numbers (OEIS: A050217)
+    say 1e4.range.grep { .is_super_pseudoprime }.grep{ .is_composite }
+
+    # Super-Poulet numbers to base 3 (OEIS: A328662)
+    say 1e4.range.grep { .is_super_pseudoprime(3) }.grep{ .is_composite }
+
+    # Super-Poulet numbers to base 2 and 3
+    say 1e5.range.grep { .is_super_pseudoprime(2, 3) }.grep{ .is_composite }
 
 Aliases: I<is_super_pseudoprime>, I<is_superpseudoprime>
 
@@ -2956,25 +4087,25 @@ Aliases: I<is_super_pseudoprime>, I<is_superpseudoprime>
 
 =head2 is_totient
 
-Number.is_totient() -> I<Obj>
+    n.is_totient
 
-Return the
+Given an integer C<n>, returns true if there exists an integer C<x> such that C<euler_phi(x) == n>.
 
 =cut
 
 =head2 isub
 
-Number.isub() -> I<Obj>
+    isub(a,b)
 
-Return the
+Integer subtraction: C<a-b>.
 
 =cut
 
 =head2 is_underwood_psp
 
-Number.is_underwood_psp() -> I<Obj>
+    n.is_underwood_psp
 
-Return the
+Return true if C<n> passes the efficient Frobenius test of Paul Underwood.
 
 Aliases: I<is_underwood_pseudoprime>, I<is_frobenius_underwood_psp>, I<is_frobenius_underwood_pseudoprime>
 
@@ -2982,41 +4113,44 @@ Aliases: I<is_underwood_pseudoprime>, I<is_frobenius_underwood_psp>, I<is_froben
 
 =head2 is_zero
 
-Number.is_zero() -> I<Obj>
+    x.is_zero
 
-Return the
+Returns true when C<x> equals 0.
 
 =cut
 
 =head2 jacobi
 
-Number.jacobi() -> I<Obj>
+    jacobi(a,n)
 
-Return the
+Returns the Jacobi symbol: C<(a|n)>.
 
 =cut
 
 =head2 jordan_totient
 
-Number.jordan_totient() -> I<Obj>
+    jordan_totient(n,k)
 
-Return the
+Jordan's totient C<J_k(n)>, which is a generalization of Euler's totient function.
 
 =cut
 
 =head2 kronecker
 
-Number.kronecker() -> I<Obj>
+    kronecker(a,n)
 
-Return the
+Returns the Kronecker symbol: C<(a|n)>.
 
 =cut
 
 =head2 laguerre
 
-Number.laguerre() -> I<Obj>
+    laguerre(n)
+    laguerre(n, x)
 
-Return the
+Laguerre polynomials: C<L_n(x)>.
+
+When C<x> is omitted, a Polynomial object is returned.
 
 Aliases: I<laguerreL>, I<laguerre_polynomial>
 
@@ -3028,7 +4162,7 @@ Aliases: I<laguerreL>, I<laguerre_polynomial>
 
 Carmichael lambda function: C<λ(n)>, defined as the smallest positive integer C<m> such that:
 
-    aᵐ ≡ 1 (mod n)
+    powmod(a, m, n) == 1
 
 for every integer C<a> between C<1> and C<n> that is coprime to C<n>.
 
@@ -3038,43 +4172,68 @@ Alias: I<carmichael_lambda>.
 
 =head2 lambert_w
 
-Number.lambert_w() -> I<Obj>
+    lambert_w(x)
 
-Return the
+The Lambert-W function. When the value of C<x> is less than C<-1/e>, it returns a complex number.
+
+    It also accepts a complex number as input.
+
+Identities (assuming x>0):
+
+    LambertW(exp(x)*x) = x
+    LambertW(log(x)*x) = log(x)
 
 =cut
 
 =head2 lcm
 
-Number.lcm() -> I<Obj>
+    lcm(...)
 
-Return the
+Least common multiple of a list of integers.
 
 =cut
 
 =head2 legendre
 
-Number.legendre() -> I<Obj>
+    legendre(a,p)
 
-Return the
+Returns the Legendre symbol: C<(a|p)>.
 
 =cut
 
-=head2 legendre_P
+=head2 legendreP
 
-Number.legendre_P() -> I<Obj>
+    legendreP(n)
+    legendreP(n,x)
 
-Return the
+Legendre polynomials: C<P_n(x)>.
 
-Aliases: I<legendrep>, I<legendreP>, I<legendre_polynomial>
+When C<x> is omitted, a Polynomial object is returned.
+
+Aliases: I<legendrep>, I<legendre_polynomial>
+
+=cut
+
+=head2 legendre_phi
+
+    n.legendre_phi(k)
+
+Returns the count of numbers <= C<n> that are not divisible by the first C<k> primes.
+
+Equivalent with:
+
+    prime(k+1).rough_count(n)
 
 =cut
 
 =head2 len
 
-Number.len() -> I<Obj>
+    n.len(b=10)
 
-Return the
+Returns the number of digits of the integer part of C<n> in a given base..
+
+    say 5040.len        #=> 4
+    say 5040.len(2)     #=> 13
 
 Aliases: I<size>, I<length>
 
@@ -3082,9 +4241,9 @@ Aliases: I<size>, I<length>
 
 =head2 lgamma
 
-Number.lgamma() -> I<Obj>
+    lgamma(x)
 
-Return the
+Natural logarithm of C<abs(Γ(x))>.
 
 Aliases: I<gamma_abs_log>
 
@@ -3092,65 +4251,77 @@ Aliases: I<gamma_abs_log>
 
 =head2 lgrt
 
-Number.lgrt() -> I<Obj>
+    lgrt(x)
 
-Return the
+Returns the "logarithm-root" of C<x>, such that C<lgrt(x) ** lgrt(x) =~= x>.
+
+    say lgrt(100)       #=> 3.59728502354041750549765225178229
+    say lgrt(-100)      #=> 3.70202936660214594290193962952737+1.34823128471151901327831464969872i
 
 =cut
 
 =head2 li
 
-Number.li() -> I<Obj>
+    li(x)
 
-Return the
+Returns the logarithmic integral of x.
+
+    say 100.li  # prints: 30.12614158...
 
 =cut
 
 =head2 li2
 
-Number.li2() -> I<Obj>
+    li2(x)
 
-Return the
+Dilogarithm function, defined as the integral of C<-log(1-t)/t> from 0 to x.
 
 =cut
 
 =head2 liouville
 
-Number.liouville() -> I<Obj>
+    liouville(n)
 
-Return the
+The Liouville function.
+
+Equivalent to:
+
+    (-1)**omega(n)
 
 =cut
 
 =head2 liouville_sum
 
-Number.liouville_sum() -> I<Obj>
+    n.liouville_sum
 
-Return the
+Computes partial sums of the Liouville lambda function.
+
+    say liouville_sum(10**9)    #=> -25216
+    say liouville_sum(10**10)   #=> -116026
 
 =cut
 
 =head2 ln
 
-Number.ln() -> I<Obj>
+    x.ln
 
-Return the
+Natural logarithm of C<x>.
 
 =cut
 
 =head2 ln2
 
-Number.ln2() -> I<Obj>
+    Num.ln2
 
-Return the
+Returns the natural logarithm of 2 constant.
 
 =cut
 
 =head2 lnbern
 
-Number.lnbern() -> I<Obj>
+    lnbern(n)
 
-Return the
+Returns the natural logarithm of the n-th Bernoulli number.
 
 Aliases: I<bern_log>, I<lnbernreal>, I<bernoulli_log>
 
@@ -3158,9 +4329,9 @@ Aliases: I<bern_log>, I<lnbernreal>, I<bernoulli_log>
 
 =head2 lngamma
 
-Number.lngamma() -> I<Obj>
+    lngamma(x)
 
-Return the
+Natural logarithm of C<Γ(x)>.
 
 Aliases: I<gamma_log>
 
@@ -3168,9 +4339,9 @@ Aliases: I<gamma_log>
 
 =head2 lnsuperfactorial
 
-Number.lnsuperfactorial() -> I<Obj>
+    lnsuperfactorial(n)
 
-Return the
+Natural logarithm of C<superfactorial(n)>.
 
 Aliases: I<superfactorial_ln>, I<superfactorial_log>
 
@@ -3178,65 +4349,81 @@ Aliases: I<superfactorial_ln>, I<superfactorial_log>
 
 =head2 log
 
-Number.log() -> I<Obj>
+    log(x)
+    log(x, b)
 
-Return the
+Natural logarithm of C<x> to base I<e>, or to a given base C<b>.
 
 =cut
 
 =head2 log10
 
-Number.log10() -> I<Obj>
+    x.log10
 
-Return the
+Logarithm of C<x> to base 10.
 
 =cut
 
 =head2 log2
 
-Number.log2() -> I<Obj>
+    x.log2
 
-Return the
+Logarithm of C<x> to base 2.
 
 =cut
 
 =head2 logarithmic_derivative
 
-Number.logarithmic_derivative() -> I<Obj>
+    logarithmic_derivative(n)
 
-Return the
+Return the logarithmic derivative of C<n>, defined as:
+
+    derivative(n)/n
 
 =cut
 
 =head2 lpf
 
-Number.lpf() -> I<Obj>
+    lpf(n)
 
-Return the
+Returns the least prime factor of n.
+
+Defined with the base-cases:
+
+    lpf(0) = 0
+    lpf(1) = 1
+
+Example:
+
+    say lpf(fibonacci(1234))    #=> 234461
 
 =cut
 
 =head2 lsb
 
-Number.lsb() -> I<Obj>
+    lsb(n)
 
-Return the
+Returns the least significant bit of n.
+
+    say 0b110010101111000000.lsb    # 6
 
 =cut
 
 =head2 lucas
 
-Number.lucas() -> I<Obj>
+    lucas(n)
 
-Return the
+Returns the n-th Lucas number.
 
 =cut
 
 =head2 lucas_factor
 
-Number.lucas_factor() -> I<Obj>
+    n.lucas_factor(j=1, tries=100)
 
-Return the
+Effective in factoring Carmichael numbers, Fermat pseudoprimes, Lucas pseudoprimes and Lucas-Carmichael numbers.
+
+    say lucas_factor(2425361208749736840354501506901183117777758034612345610725789878400467)
 
 Aliases: I<lucas_miller_factor>
 
@@ -3244,59 +4431,71 @@ Aliases: I<lucas_miller_factor>
 
 =head2 lucas_mod
 
-Number.lucas_mod() -> I<Obj>
+    lucasmod(n,m)
 
-Return the
+Efficiently compute the n-th Lucas number modulo m.
 
 Aliases: I<lucasmod>
 
 =cut
 
-=head2 lucas_U
+=head2 lucasU
 
-Number.lucas_U() -> I<Obj>
+    lucasU(P, Q, n)
 
-Return the
+The Lucas C<U_n(P, Q)> function.
 
-Aliases: I<lucasu>, I<lucasU>
+    say 20.of{|n| lucasU(1, -1, n) }    # the Fibonacci numbers
+    say 20.of{|n| lucasU(2, -1, n) }    # the Pell numbers
+    say 20.of{|n| lucasU(1, -2, n) }    # the Jacobsthal numbers
 
-=cut
-
-=head2 lucasumod
-
-Number.lucasumod() -> I<Obj>
-
-Return the
-
-Aliases: I<lucasUmod>
+Aliases: I<lucasu>
 
 =cut
 
-=head2 lucasuvmod
+=head2 lucasUmod
 
-Number.lucasuvmod() -> I<Obj>
+    lucasUmod(P,Q,n,m)
 
-Return the
+Efficiently compute the Lucas C<U_n(P, Q)> function modulo m.
 
-Aliases: I<lucasUVmod>
+Aliases: I<lucasumod>
 
 =cut
 
-=head2 lucas_V
+=head2 lucasUVmod
 
-Number.lucas_V() -> I<Obj>
+    lucasUVmod(P,Q,n,m)
 
-Return the
+Efficiently compute the Lucas C<U_n(P, Q)> and C<V_n(P,Q)> functions modulo m.
 
-Aliases: I<lucasv>, I<lucasV>
+Equivalent with:
+
+    (lucasUmod(P,Q,n,m), lucasVmod(P,Q,n,m))
+
+Aliases: I<lucasuvmod>
+
+=cut
+
+=head2 lucasV
+
+    lucasV(P, Q, n)
+
+The Lucas C<V_n(P, Q)> function.
+
+    say 20.of{|n| lucasV(1, -1, n) }    # the Lucas numbers
+    say 20.of{|n| lucasV(2, -1, n) }    # the Pell-Lucas numbers
+    say 20.of{|n| lucasV(1, -2, n) }    # the Jacobsthal-Lucas numbers
+
+Aliases: I<lucasv>
 
 =cut
 
 =head2 lucasvmod
 
-Number.lucasvmod() -> I<Obj>
+    lucasVmod(P,Q,n,m)
 
-Return the
+Efficiently compute the Lucas C<V_n(P, Q)> function modulo m.
 
 Aliases: I<lucasVmod>
 
@@ -3304,41 +4503,57 @@ Aliases: I<lucasVmod>
 
 =head2 make_coprime
 
-Number.make_coprime() -> I<Obj>
+    n.make_coprime(k)
 
-Return the
+Returns the largest divisor of n that is coprime to k.
 
 =cut
 
 =head2 mangoldt
 
-Number.mangoldt() -> I<Obj>
+    mangoldt(n)
 
-Return the
+The Mangoldt function. For the exponential values, see C<exp_mangoldt>.
 
 =cut
 
 =head2 max
 
-Number.max() -> I<Obj>
+    max(...)
 
-Return the
+Returns the maximum value from a list of numbers.
 
 =cut
 
 =head2 mertens
 
-Number.mertens() -> I<Obj>
+    mertens(n)
+    mertens(a,b)
 
-Return the
+Returns the Mertens functions, which is defined as the partial sums of the Moebius function:
+
+    Sum_{k=1..n} moebius(k)
+
+When an additional argument is given, the returned result is:
+
+    Sum_{k=a..b} moebius(k)
+
+Example:
+
+    say mertens(100000)     # equivalent with: (1..100000 -> sum { .moebius })
+    say mertens(21, 123)    # equivalent with: (21..123 -> sum { .moebius })
 
 =cut
 
 =head2 mfac
 
-Number.mfac() -> I<Obj>
+    mfac(n,k)
+    mfactorial(n,k)
 
-Return the
+The generalized multi-factorial of n.
+
+    say 15.of { .mfac(2) }    # double-factorials (OEIS: A006882)
+    say 15.of { .mfac(3) }    # triple-factorials (OEIS: A007661)
 
 Aliases: I<mfactorial>, I<multi_factorial>
 
@@ -3346,9 +4561,13 @@ Aliases: I<mfactorial>, I<multi_factorial>
 
 =head2 miller_factor
 
-Number.miller_factor() -> I<Obj>
+    n.miller_factor(tries=100)
 
-Return the
+Effective in factoring Carmichael numbers and Fermat pseudoprimes.
+
+It returns an array with the factors of C<n>. However, sometimes, not all factors are prime.
+
+    say miller_factor(58571442634534443082821160508299574798027946748324125518533225605795841)
 
 Aliases: I<miller_rabin_factor>
 
@@ -3356,73 +4575,123 @@ Aliases: I<miller_rabin_factor>
 
 =head2 miller_rabin_random
 
-Number.miller_rabin_random() -> I<Obj>
+    n.miller_rabin_random(k)
 
-Return the
+Return true if C<n> passes the Miller-Rabin primality test with C<k> random bases.
 
 =cut
 
 =head2 min
 
-Number.min() -> I<Obj>
+    min(...)
 
-Return the
+Returns the smallest value from a list of numbers.
 
 =cut
 
 =head2 mone
 
-Number.mone() -> I<Obj>
+    Num.mone
 
-Return the
+Returns the -1 value.
 
 =cut
 
 =head2 motzkin
 
-Number.motzkin() -> I<Obj>
+    motzkin(n)
 
-Return the
+Returns the n-th Motzkin number. (OEIS: A001006)
+
+    say 10.of { .motzkin }   #=> [1, 1, 2, 4, 9, 21, 51, 127, 323, 835]
 
 =cut
 
 =head2 msb
 
-Number.msb() -> I<Obj>
+    msb(n)
 
-Return the
+Returns the most significant bit of n.
+
+    say 0b110010101111000000.msb    # 17
 
 =cut
 
 =head2 mulmod
 
-Number.mulmod() -> I<Obj>
+    mulmod(a,b,m)
 
-Return the
+Modular integer multiplication: C<(a*b) % m>.
+
+    say mulmod(43, 97, 127)     # == (43*97)%127
 
 =cut
 
 =head2 multinomial
 
-Number.multinomial() -> I<Obj>
+    multinomial(...)
 
-Return the
+The multinomial coefficient, given a list of native integers.
+
+    say multinomial(1, 4, 4, 2)     #=> 34650
 
 =cut
 
 =head2 nan
 
-Number.nan() -> I<Obj>
+    Num.nan
 
-Return the
+Returns the Not-a-Number special value (C<NaN>).
+
+=cut
+
+=head2 nbsigma
+
+    nbsigma(n, k=1)
+
+Returns the sum of the non-bi-unitary divisors of n, each divisor raised to the k-th power.
+
+    say 30.of { .nbsigma }      #=> OEIS: A319072
+
+=cut
+
+=head2 nbsigma0
+
+    nbsigma0(n)
+
+Returns the count of the non-bi-unitary divisors of n.
+
+=cut
+
+=head2 n_composites
+
+    n_composites(n, start=4)
+
+Returns n consecutive composite numbers starting from C<start>.
+
+    say n_composites(10)        #=> [4, 6, 8, 9, 10, 12, 14, 15, 16, 18]
+    say n_composites(5, 50)     #=> [50, 51, 52, 54, 55]
+
+Aliases: I<ncomposites>, I<next_composites>
 
 =cut
 
 =head2 nd
 
-Number.nd() -> I<Obj>
+    n.st({...})
+    n.nd({...})
+    n.rd({...})
+    n.th({...})
 
-Return the
+It returns the n-th value for which the provided block evaluates to a true value, starting counting from 0.
+
+    say 100.th { .is_prime }    # 100-th prime
+
+Also aliased as C<.st>, C<.nd> and C<.rd>:
+
+    say 1.st { .is_prime }      # first prime
+    say 2.nd { .is_prime }      # second prime
+    say 3.rd { .is_prime }      # third prime
 
 Aliases: I<rd>, I<st>, I<th>
 
@@ -3430,17 +4699,38 @@ Aliases: I<rd>, I<st>, I<th>
 
 =head2 neg
 
-Number.neg() -> I<Obj>
+    x.neg
 
-Return the
+Negates the sign of <Cx> (equivalent with: C<-x>).
+
+=cut
+
+=head2 nesigma
+
+    nesigma(n, k=1)
+
+Returns the sum of the non-exponential divisors of n, each divisor raised to the k-th power.
+
+    say 30.of { .nesigma }      #=> OEIS: A160135
+
+=cut
+
+=head2 nesigma0
+
+    nesigma0(n)
+
+Returns the count of the non-exponential divisors of n.
+
+    say 30.of { .nesigma0 }     #=> OEIS: A160097
 
 =cut
 
 =head2 new
 
-Number.new() -> I<Obj>
+    Number(string, base=10)
+    Num.new(string, base=10)
 
-Return the
+Create a new Number object, given a string and a base.
 
 Aliases: I<call>
 
@@ -3448,69 +4738,108 @@ Aliases: I<call>
 
 =head2 next_composite
 
-Number.next_composite() -> I<Obj>
+    n.next_composite
 
-Return the
+Given a non-negative integer C<n>, it returns the next composite number after C<n>.
 
 =cut
 
 =head2 next_palindrome
 
-Number.next_palindrome() -> I<Obj>
+    n.next_palindrome(b=10)
 
-Return the
+Efficiently returns the next palindrome in base-b greater than n.
+
+    # Iterate over the base-10 palindromic numbers < 10^6
+    for (var n = 0; n < 1e6; n = n.next_palindrome) {
+        say n
+    }
 
 =cut
 
 =head2 next_pow
 
-Number.next_pow() -> I<Obj>
+    n.next_pow(b)
 
-Return the
+Returns the next perfect power greater than C<n>, with base C<b>.
+
+    say 63.next_pow(2)      #=> 64
+    say 64.next_pow(2)      #=> 128
+
+Equivalent with:
+
+    b**(1+ilog(n,b))
 
 Aliases: I<next_power>
 
 =cut
 
-=head2 next_pow2
+=head2 next_prime
 
-Number.next_pow2() -> I<Obj>
+    n.next_prime
 
-Return the
-
-Aliases: I<next_power2>
+Returns the next prime larger than C<n>.
 
 =cut
 
-=head2 next_prime
+=head2 next_squarefree
 
-Number.next_prime() -> I<Obj>
+    n.next_squarefree
 
-Return the
+Returns the next squarefree integer larger than C<n>.
 
 =cut
 
 =head2 next_twin_prime
 
-Number.next_twin_prime() -> I<Obj>
+    n.next_twin_prime
 
-Return the
+Returns next twin prime number larger than C<n>.
+
+Provided by L<Math::Prime::Util::GMP> >= 0.52.
 
 =cut
 
 =head2 ninf
 
-Number.ninf() -> I<Obj>
+    Num.ninf
 
-Return the
+Returns the negative infinity special value (C<-Inf>).
+
+=cut
+
+=head2 nisigma
+
+    nisigma(n, k=1)
+
+Returns the sum of the non-infinitary divisors of n, each divisor raised to the k-th power.
+
+    say 30.of { .nisigma }      #=> OEIS: A348271
+
+=cut
+
+=head2 nisigma0
+
+    nisigma0(n)
+
+Returns the count of the non-infinitary divisors of n.
+
+    say 30.of { .nisigma0 }     #=> OEIS: A348341
 
 =cut
 
 =head2 nok
 
-Number.nok() -> I<Obj>
+    nok(n,k)
+    binomial(n,k)
 
-Return the
+Returns the binomial coefficient C<n> over C<k>, also called the "choose" function.
+
+Equivalent to:
+
+                        n!
+    binomial(n, k) = --------
+                     k!(n-k)!
 
 Aliases: I<binomial>
 
@@ -3518,27 +4847,37 @@ Aliases: I<binomial>
 
 =head2 norm
 
-Number.norm() -> I<Obj>
+    norm(x)
 
-Return the
+Returns the normalized value of C<x>: C<abs(x)^2>.
 
 =cut
 
 =head2 n_primes
 
-Number.n_primes() -> I<Obj>
+    n_primes(n, start=2)
 
-Return the
+Returns an array containing C<n> consecutive primes that are `>= start` (if omitted, then start = 2).
 
-Aliases: I<nprimes>
+    say n_primes(10)        #=> [2, 3, 5, 7, 11, 13, 17, 19, 23, 29]
+    say n_primes(10, 1000)  #=> [1009, 1013, 1019, 1021, 1031, 1033, 1039, 1049, 1051, 1061]
+
+The value for C<start> can be any arbitrarily large integer:
+
+    say n_primes(10, 2**128 + 1)    # first 10 primes > 2^128
+
+Aliases: I<nprimes>, I<next_primes>
 
 =cut
 
 =head2 nu
 
-Number.nu() -> I<Obj>
+    r.nu
+    r.numerator
 
-Return the
+Returns the numerator of rational number C<r>.
+
+    say numerator(43/97)     #=> 43
 
 Aliases: I<numerator>
 
@@ -3546,101 +4885,210 @@ Aliases: I<numerator>
 
 =head2 nude
 
-Number.nude() -> I<Obj>
+    nude(r)
 
-Return the
+Returns a list with the numerator and the denominator of a rational number C<r>.
+
+    say [nude(43/97)]       #=> [43, 97]
 
 =cut
 
 =head2 num2perm
 
-Number.num2perm() -> I<Obj>
+    num2perm(n,k)
 
-Return the
+Given a non-negative integer C<n> and integer C<k>, return the rank C<k> lexicographic permutation of C<n> elements.
+
+C<k> will be interpreted as mod C<n!>.
+
+The inverse value for C<k> is given by C<Array#perm2num>:
+
+    say num2perm(5, 43)             #=> [1, 4, 0, 3, 2]
+    say num2perm(5, 43).perm2num    #=> 43
 
 =cut
 
 =head2 numify
 
-Number.numify() -> I<Obj>
+    n.numify
 
-Return the
+Returns a raw native number representation for the self-number.
+
+Can be used for assigning values to C<Num!PREC> variable.
+
+    local Num!PREC = 42.numify  # set precision to 42 bits
+    say sqrt(2)                 # 1.414213562
+
+Native numbers can also be used when indexing an array:
+
+    var arr = [42, 43, 44]
+    var idx = 2.numify
+    say arr[idx]            #=> 44
+
+Although this may or may not be actually faster.
+
+=cut
+
+=head2 nusigma
+
+    nusigma(n, k=1)
+
+Returns the sum of the non-unitary divisors of n, each divisor raised to the k-th power.
+
+    say 30.of { .nusigma }     #=> OEIS: A048146
+
+=cut
+
+=head2 nusigma0
+
+    nusigma0(n)
+
+Returns the count of the non-unitary divisors of n.
+
+    say 30.of { .nusigma0 }    #=> OEIS: A048105
 
 =cut
 
 =head2 of
 
-Number.of() -> I<Obj>
+    n.of {|k| ... }
 
-Return the
+Returns an array with n elements mapped to the given block. The block is called with k = 0,1,2...,n-1.
+
+    say 10.of { _*_ }       #=> first 10 squares
+    say 10.of { .fib }      #=> first 10 Fibonacci numbers
+
+=cut
+
+=head2 omega_prime_divisors
+
+    n.omega_prime_divisors
+    n.omega_prime_divisors(k)
+
+Returns the k-omega prime divisors of n.
+
+    say 5040.omega_prime_divisors(4)    #=> [210, 420, 630, 840, 1260, 1680, 2520, 5040]
+
+When C<k> is omitted, an array of arrays with the k-omega prime divisors of n, for each k in the range C<0..omega(n)>, is returned:
+
+    say 120.omega_prime_divisors        #=> [[1], [2, 3, 4, 5, 8], [6, 10, 12, 15, 20, 24, 40], [30, 60, 120]]
+
+=cut
+
+=head2 omega_prime_count
+
+    k.omega_prime_count(n)
+    k.omega_prime_count(a,b)
+
+Returns the number of k-omega primes <= n, or in the range C<a..b>.
+
+    say 1.omega_prime_count(100)            # number prime powers <= 100
+    say 2.omega_prime_count(50, 100)        # number of 2-omega primes in range 50..100
+
+Aliases: I<omega_primepi>
+
+=cut
+
+=head2 omega_primes
+
+    k.omega_primes(n)
+    k.omega_primes(a,b)
+
+Returns an array with k-omega primes <= n, or in the range C<a..b>.
+
+k-omega primes are numbers C<n> such that C<omega(n) == k>.
+
+    say 1.omega_primes(100)         # prime powers <= 100
+    say 2.omega_primes(50, 100)     # 2-omega primes in range 50..100
 
 =cut
 
 =head2 one
 
-Number.one() -> I<Obj>
+    Num.one
 
-Return the
+Returns the 1 value.
 
 =cut
 
 =head2 partitions
 
-Number.partitions() -> I<Obj>
+    partitions(n)
 
-Return the
+Returns the number of partitions of n.
 
 Aliases: I<partition_number>
 
 =cut
 
+=head2 parts
+
+    x.parts
+
+Returns an array with the real and imaginary parts of C<x>.
+
+    say parts(5)        #=> [5, 0]
+    say parts(3+4i)     #=> [3, 4]
+
+=cut
+
 =head2 pbrent_factor
 
-Number.pbrent_factor() -> I<Obj>
+    n.pbrent_factor(reps)
 
-Return the
+Pollard-Brent rho factorization method.
 
 =cut
 
 =head2 perfect_power
 
-Number.perfect_power() -> I<Obj>
+    n.perfect_power
 
-Return the
+Returns the largest power C<k> of C<n> for which there exists an integer C<r>, such that: C<n = r^k>.
+
+    say perfect_power(15**5)    #=> 5
 
 =cut
 
 =head2 perfect_root
 
-Number.perfect_root() -> I<Obj>
+    n.perfect_root
 
-Return the
+Returns the smallest root C<r> of C<n> for which there exists an integer C<k>, such that: C<n = r^k>.
+
+    say perfect_root(15**5)    #=> 15
 
 =cut
 
 =head2 permutations
 
-Number.permutations() -> I<Obj>
+    n.permutations
 
-Return the
+Returns an array of arrays with the permutations of the integers in the range C<0..n-1>, or iterates over the permutations when a block is given.
+
+    5.permutations {|*a| say a }
 
 =cut
 
 =head2 pi_k
 
-Number.pi_k() -> I<Obj>
+    k.almost_prime_count(n)
+    k.almost_prime_count(a,b)
 
-Return the
+Returns the number of k-almost primes <= n, or in the range C<a..b>.
 
-Aliases: I<k_prime_count>, I<almost_primepi>, I<almost_prime_count>
+    say 1.almost_prime_count(100)           # count of primes <= 100
+    say 2.almost_prime_count(50, 100)       # count of semiprimes in range 50..100
+
+Aliases: I<almost_primepi>, I<almost_prime_count>
 
 =cut
 
 =head2 pm1_factor
 
-Number.pm1_factor() -> I<Obj>
+    n.pm1_factor(B)
 
-Return the
+Pollard p-1 factorization method.
 
 Aliases: I<pminus1_factor>
 
@@ -3648,57 +5096,79 @@ Aliases: I<pminus1_factor>
 
 =head2 pn_primes
 
-Number.pn_primes() -> I<Obj>
+    pn_primes(n)
+    pn_primes(a,b)
 
-Return the
+Returns the first n prime numbers, or the primes in the range prime(a)..prime(b).
+
+    say pn_primes(25)        # the first 25 primes
+    say pn_primes(100, 110)  # the primes from 100-th prime to 110-th prime (inclusive)
 
 =cut
 
 =head2 pn_primorial
 
-Number.pn_primorial() -> I<Obj>
+    pn_primorial(n)
 
-Return the
+Returns the product of the first n primes.
 
 =cut
 
 =head2 polygonal
 
-Number.polygonal() -> I<Obj>
+    polygonal(n,k)
 
-Return the
+Returns the n-th k-gonal number. When C<n> is negative, it returns the second k-gonal number.
+
+   say 10.of {|n| polygonal( n, 3) }  # triangular numbers
+   say 10.of {|n| polygonal( n, 5) }  # pentagonal numbers
+   say 10.of {|n| polygonal(-n, 5) }  # second pentagonal numbers
 
 =cut
 
 =head2 polygonal_root
 
-Number.polygonal_root() -> I<Obj>
+    polygonal_root(n,k)
 
-Return the
+Returns the k-gonal root of C<n>. Also defined for complex numbers.
+
+    say polygonal_root(n, 3)      # triangular root
+    say polygonal_root(n, 5)      # pentagonal root
 
 =cut
 
 =head2 polygonal_root2
 
-Number.polygonal_root2() -> I<Obj>
+    polygonal_root2(n,k)
 
-Return the
+Returns the second k-gonal root of C<n>. Also defined for complex numbers.
+
+    say polygonal_root2(n, 5)      # second pentagonal root
 
 =cut
 
 =head2 polymod
 
-Number.polymod() -> I<Obj>
+    n.polymod(...)
 
-Return the
+Returns a list of mod results corresponding to the divisors in given list.
+
+    say [120.polymod(10)]    # (0, 12)
+    say [120.polymod(10,10)] # [0, 2, 1]
+
+Particularly useful for:
+
+    var (sec, min, hours, days) = seconds.polymod(60, 60, 24)
 
 =cut
 
 =head2 popcount
 
-Number.popcount() -> I<Obj>
+    n.popcount
 
-Return the
+Number of 1's in binary representation of n.
+
+This value is also known as the Hamming weight value.
 
 Aliases: I<hammingweight>
 
@@ -3706,69 +5176,333 @@ Aliases: I<hammingweight>
 
 =head2 power_count
 
-Number.power_count() -> I<Obj>
+    n.power_count
 
-Return the
+Returns the number of perfect powers <= n.
+
+    say power_count(10**6)      #=> 1111
+    say power_count(10**20)     #=> 10004650118
 
 Aliases: I<perfect_power_count>
 
 =cut
 
+=head2 power_divisors
+
+    k.power_divisors(n)
+
+Return an array with the k-th power divisors of n.
+
+    say 3.power_divisors(10!)       #=> [1, 8, 27, 64, 216, 1728]
+    say 4.power_divisors(10!)       #=> [1, 16, 81, 256, 1296, 20736]
+
+Equivalent with:
+
+    n.divisors.grep { .is_power(k) }
+
+=cut
+
+=head2 powerfree_count
+
+    k.powerfree_count(n)
+    k.powerfree_count(a,b)
+
+It efficiently counts the number of k-powerfree numbers <= n, or in the range C<a..b>:
+
+    say 3.powerfree_count(100)       #=> count of cubefree numbers <= 100
+    say 3.powerfree_count(50, 100)   #=> count of cubefree numbers in the range 50..100
+
+=cut
+
+=head2 powerfree_divisors
+
+    k.powerfree_divisors(n)
+
+Returns an array with the k-powerfree divisors of n.
+
+    say 2.powerfree_divisors(5040)      # squarefree divisors of 5040
+    say 3.powerfree_divisors(5040)      # cubefree divisors of 5040
+
+=cut
+
+=head2 powerfree_part
+
+    k.powerfree_part(n)
+
+Returns the k-powerfree part of C<n>.
+
+    say 30.of { 2.powerfree_part(_) }       # squarefree part (OEIS: A007913)
+    say 30.of { 3.powerfree_part(_) }       # cubefree part (OEIS: A050985)
+
+=cut
+
+=head2 powerfree_part_sum
+
+    k.powerfree_part_sum(n)
+    k.powerfree_part_sum(a,b)
+
+Returns the sum of the k-powerfree parts of integers <= n or in the range C<a..b>:
+
+    say 2.powerfree_part_sum(100)            # sum of squarefree part of n for n <= 100
+    say 3.powerfree_part_sum(50, 100)        # sum of cubefree part of n for n in the range 50..100
+
+=cut
+
+=head2 powerfree_sigma
+
+    k.powerfree_sigma(n, j=1)
+
+Returns the sum of the k-powerfree divisors of n, each divisor raised to the power j.
+
+    say 30.of { 2.powerfree_sigma(_) }        # OEIS: A048250
+    say 30.of { 3.powerfree_sigma(_) }        # OEIS: A073185
+
+Equivalent with (but much faster):
+
+    n.divisors.grep { .is_powerfree(k) }.sum {|d| d**j }
+
+=cut
+
+=head2 powerfree_sigma0
+
+    k.powerfree_sigma0(n)
+
+Returns the number of the k-powerfree divisors of n.
+
+    say 30.of { 3.powerfree_sigma0(_) }       # OEIS: A073184
+
+=cut
+
+=head2 powerfree_sum
+
+    k.powerfree_sum(n)
+    k.powerfree_sum(a,b)
+
+Returns the sum of k-powerfree numbers <= n or in the range C<a..b>:
+
+    say 2.powerfree_sum(100)            # sum of squarefree numbers <= 100
+    say 3.powerfree_sum(50, 100)        # sum of cubefree numbers in the range 50..100
+
+=cut
+
+=head2 powerfree_udivisors
+
+    k.powerfree_udivisors(n)
+
+Returns an array with the k-powerfree unitary divisors of n.
+
+    say 2.powerfree_udivisors(5040)      # squarefree unitary divisors of 5040
+    say 3.powerfree_udivisors(5040)      # cubefree unitary divisors of 5040
+
+Equivalent with (but much faster):
+
+    n.udivisors.grep { .is_powerfree(k) }
+    k.powerfree_divisors(n).grep {|d| gcd(n/d, d) == 1 }
+
+Aliases: I<powerfree_unitary_divisors>, I<unitary_powerfree_divisors>
+
+=cut
+
+=head2 powerfree_usigma
+
+    k.powerfree_usigma(n, j=1)
+
+Returns the sum of the k-powerfree unitary divisors of n, each divisor raised to the power j.
+
+    say 20.of { 2.powerfree_usigma(_) }        # OEIS: A092261
+    say 20.of { 2.powerfree_usigma(_, 2) }     # OEIS: A091306
+
+Equivalent with (but much faster):
+
+    n.udivisors.grep { .is_powerfree(k) }.sum {|d| d**j }
+
+=cut
+
+=head2 powerfree_usigma0
+
+    k.powerfree_usigma0(n)
+
+Returns the number of the k-powerfree unitary divisors of n.
+
+    say 20.of { 2.powerfree_usigma0(_) }       # OEIS: A056671
+
+=cut
+
 =head2 powerful
 
-Number.powerful() -> I<Obj>
+    k.powerful(n)
+    k.powerful(a,b)
 
-Return the
+It efficiently generates all the k-powerful numbers <= n, or in the range C<a..b>.
+
+    say 2.powerful(100)          #=> 2-powerful numbers <= 100
+    say 2.powerful(50, 100)      #=> 2-powerful numbers in the range 50..100
 
 =cut
 
 =head2 powerful_count
 
-Number.powerful_count() -> I<Obj>
+    k.powerful_count(n)
+    k.powerful_count(a,b)
 
-Return the
+It efficiently counts the number of k-powerful numbers <= n, or in the range C<a..b>;
+
+    say 2.powerful_count(100)       #=> count of 2-powerful numbers <= 100
+    say 2.powerful_count(50, 100)   #=> count of 2-powerful numbers in the range 50..100
+
+=cut
+
+=head2 power_sigma
+
+    k.power_sigma(n, j=1)
+
+Returns the sum of the k-th power divisors of n, each divisor raised to the power j.
+
+    say 30.of { 2.power_sigma(_) }        # OEIS: A035316
+    say 30.of { 3.power_sigma(_) }        # OEIS: A113061
+
+Equivalent with (but much faster):
+
+    n.divisors.grep { .is_power(k) }.sum {|d| d**j }
+
+=cut
+
+=head2 power_sigma0
+
+    k.power_sigma0(n)
+
+Returns the number of the k-th power divisors of n.
+
+    say 30.of { 2.power_sigma0(_) }       # OEIS: A046951
+
+=cut
+
+=head2 power_udivisors
+
+    k.power_udivisors(n)
+
+Returns an array with the k-th power unitary divisors of C<n>.
+
+    say 2.power_udivisors(15!)      #=> [1, 49, 729, 35721]
+    say 3.power_udivisors(15!)      #=> [1, 125, 729, 91125]
+
+Equivalent with:
+
+    n.udivisors.grep { .is_power(k) }
+
+Aliases: I<power_unitary_divisors>, I<unitary_power_divisors>
+
+=cut
+
+=head2 power_usigma
+
+    k.power_usigma(n, j=1)
+
+Returns the sum of the k-th power unitary divisors of n, each divisor raised to the power j.
+
+Equivalent with (but much faster):
+
+    n.udivisors.grep { .is_power(k) }.sum {|d| d**j }
+
+=cut
+
+=head2 power_usigma0
+
+    k.power_usigma0(n)
+
+Returns the number of the k-th power unitary divisors of n.
+
+    say 30.of { 2.power_usigma0(_) }       # OEIS: A056624
 
 =cut
 
 =head2 pp1_factor
 
-Number.pp1_factor() -> I<Obj>
+    n.pp1_factor(B)
 
-Return the
+Williams' p+1 factorization method.
 
 Aliases: I<pplus1_factor>
 
 =cut
 
+=head2 pp_divisors
+
+    pp_divisors(n)
+
+Returns an array with the perfect power divisors of C<n>.
+
+    say 5040.pp_divisors        #=> [1, 4, 8, 9, 16, 36, 144]
+
+Equivalent with:
+
+    n.divisors.grep { .is_perfect_power }
+
+Aliases: I<perfect_power_divisors>
+
+=cut
+
+=head2 pp_udivisors
+
+    pp_udivisors(n)
+
+Returns an array with the perfect power unitary divisors of C<n>, such that each divisor C<d> is a perfect power and C<gcd(n/d, d) = 1>.
+
+    say 15!.pp_udivisors        #=> [1, 49, 125, 729, 2048, 35721, 91125]
+
+Equivalent with:
+
+    n.udivisors.grep { .is_perfect_power }
+
+Aliases: I<perfect_power_udivisors>, I<perfect_power_unitary_divisors>
+
+=cut
+
+=head2 prev_pow
+
+    n.prev_pow(b)
+
+Returns the previous perfect power smaller than C<n>, with base C<b>. Returns NaN when C<n> is <= 1.
+
+    say 65.prev_pow(2)      #=> 64
+    say 64.prev_pow(2)      #=> 32
+
+Aliases: I<prev_power>
+
+=cut
+
 =head2 prev_prime
 
-Number.prev_prime() -> I<Obj>
+    n.prev_prime
 
-Return the
+Returns the previous prime smaller than n.
 
 =cut
 
 =head2 prho_factor
 
-Number.prho_factor() -> I<Obj>
+    n.prho_factor(reps)
 
-Return the
+Pollard rho factorization method.
 
 =cut
 
 =head2 primality_pretest
 
-Number.primality_pretest() -> I<Obj>
+    n.primality_pretest()
 
-Return the
+The method returns true when C<n> passes the internal primality pretest (when n is large enough and it has no small factors).
 
 =cut
 
 =head2 prime
 
-Number.prime() -> I<Obj>
+    prime(n)
 
-Return the
+Returns the n-th prime number.
+
+    say prime(100)      #  100th prime: 541
+    say prime(1000)     # 1000th prime: 7919
 
 Aliases: I<nth_prime>
 
@@ -3776,17 +5510,28 @@ Aliases: I<nth_prime>
 
 =head2 prime_divisors
 
-Number.prime_divisors() -> I<Obj>
+    prime_divisors(n)
 
-Return the
+Returns the unique prime factors of C<n>.
+
+=cut
+
+=head2 prime_lower
+
+    n.prime_lower
+
+Lower bound for the n-th prime.
+
+Aliases: I<nth_prime_lower>
 
 =cut
 
 =head2 primepi
 
-Number.primepi() -> I<Obj>
+    primepi(n)
+    primepi(a,b)
 
-Return the
+Returns the number of primes <= n, or in the range C<a..b>.
 
 Aliases: I<prime_count>, I<count_primes>
 
@@ -3794,9 +5539,9 @@ Aliases: I<prime_count>, I<count_primes>
 
 =head2 primepi_lower
 
-Number.primepi_lower() -> I<Obj>
+    n.primepi_lower
 
-Return the
+Lower bound for prime_count(n).
 
 Aliases: I<prime_count_lower>
 
@@ -3804,9 +5549,9 @@ Aliases: I<prime_count_lower>
 
 =head2 primepi_upper
 
-Number.primepi_upper() -> I<Obj>
+    n.primepi_upper
 
-Return the
+Upper bound for prime_count(n).
 
 Aliases: I<prime_count_upper>
 
@@ -3814,41 +5559,81 @@ Aliases: I<prime_count_upper>
 
 =head2 prime_power
 
-Number.prime_power() -> I<Obj>
+    n.prime_power
 
-Return the
+Returns the exponent C<k> if C<n> is a power of the form C<n = p^k> for some prime C<p>. Returns 1 otherwise.
+
+    say prime_power(15)     #=> 1
+    say prime_power(43**5)  #=> 5
 
 =cut
 
 =head2 prime_power_count
 
-Number.prime_power_count() -> I<Obj>
+    prime_power_count(n)
+    prime_power_count(a,b)
 
-Return the
+Returns the number of prime powers <= n, or in the range C<a..b>.
+
+    say prime_power_count(1e15)     # number of prime powers <= 10^15
+    say prime_power_count(1e6, 1e8) # number of prime powers in [10^6, 10^8]
 
 =cut
 
 =head2 prime_power_divisors
 
-Number.prime_power_divisors() -> I<Obj>
+    n.prime_power_divisors()
 
-Return the
+Returns the prime power divisors of n.
+
+    say prime_power_divisors(5040)  #=> [2, 3, 4, 5, 7, 8, 9, 16]
+
+Equivalent with:
+
+    n.divisors.grep{.is_prime_power}
 
 =cut
 
 =head2 prime_power_sigma
 
-Number.prime_power_sigma() -> I<Obj>
+    n.prime_power_sigma(k=1)
 
-Return the
+Sum of the prime power divisors of n, each divisor raised to the k-th power.
+
+    say prime_power_sigma(10!)      #=> 667
+    say prime_power_sigma(10!, 2)   #=> 95459
+
+Equivalent with:
+
+    n.prime_power_divisors.sum {|d| d**k }
+
+=cut
+
+=head2 prime_power_sigma0
+
+    prime_power_sigma0(n)
+
+Returns the number of prime power divisors of n.
+
+Equivalent with:
+
+    bigomega(n)
 
 =cut
 
 =head2 prime_power_udivisors
 
-Number.prime_power_udivisors() -> I<Obj>
+    prime_power_udivisors(n)
 
-Return the
+Returns the unitary prime power divisors of n.
+
+    say prime_power_udivisors(10!)  #=> [7, 25, 81, 256]
+
+The product of the unitary prime power divisors of a number, is the number itself.
+
+This method is equivalent with:
+
+    n.factor_map {|p,k| p**k }.sort
 
 Aliases: I<prime_power_unitary_divisors>, I<unitary_prime_power_divisors>
 
@@ -3856,109 +5641,191 @@ Aliases: I<prime_power_unitary_divisors>, I<unitary_prime_power_divisors>
 
 =head2 prime_power_usigma
 
-Number.prime_power_usigma() -> I<Obj>
+    Number.prime_power_usigma(k=1)
 
-Return the
+Returns the sum of the unitary prime power divisors of n, each divisor raised to power C<k>.
+
+    say prime_power_usigma(10!)     #=> 369     (== 7 + 25 + 81 + 256)
+    say prime_power_usigma(10!, 2)  #=> 72771   (== 7^2 + 25^2 + 81^2 + 256^2)
+
+Equivalent with:
+
+    n.factor_map {|p,e| p**(e * k) }.sum
+
+=cut
+
+=head2 prime_power_usigma0
+
+    prime_power_usigma0(n)
+
+Returns the number of unitary prime power divisors of n.
+
+Equivalent with:
+
+    omega(n)
 
 =cut
 
 =head2 prime_root
 
-Number.prime_root() -> I<Obj>
+    n.prime_root
 
-Return the
+Returns the prime C<p> if n can be expressed as C<n = p^k> for some prime number C<p> and integer C<k>. Returns C<n> otherwise.
+
+    say prime_root(15)      #=> 15
+    say prime_root(43**5)   #=> 43
 
 =cut
 
 =head2 primes
 
-Number.primes() -> I<Obj>
+    primes(n)
+    primes(a,b)
 
-Return the
+Returns an array with the prime numbers <= n, or in the range C<a..b>.
 
 =cut
 
 =head2 prime_sigma
 
-Number.prime_sigma() -> I<Obj>
+    n.prime_sigma(k=1)
 
-Return the
+Sum of the unique prime divisors of n, each divisor raised to the k-th power.
+
+    say prime_sigma(100!)       #=> 1060
+    say prime_sigma(100!, 2)    #=> 65796
 
 =cut
 
-=head2 primes_sum
+=head2 prime_sigma0
 
-Number.primes_sum() -> I<Obj>
+    prime_sigma0(n)
 
-Return the
+Returns the number of prime divisors of n.
 
-Aliases: I<sum_primes>
+Equivalent with:
+
+    omega(n)
+
+=cut
+
+=head2 prime_sum
+
+    prime_sum(n)
+    prime_sum(a,b)
+
+Sum of the prime numbers <= n, or in the range C<a..b>.
+
+Aliases: I<primes_sum>, I<sum_primes>
 
 =cut
 
 =head2 prime_udivisors
 
-Number.prime_udivisors() -> I<Obj>
+    n.prime_udivisors
 
-Return the
+Returns the unique unitary prime factors of C<n>.
 
 Aliases: I<prime_unitary_divisors>, I<unitary_prime_divisors>
 
 =cut
 
+=head2 prime_upper
+
+    n.prime_upper
+
+Upper bound for the n-th prime.
+
+Aliases: I<nth_prime_upper>
+
+=cut
+
 =head2 prime_usigma
 
-Number.prime_usigma() -> I<Obj>
+    n.prime_usigma(k=1)
 
-Return the
+Sum of the unique unitary prime divisors of n, each divisor raised to the k-th power.
+
+    say prime_usigma(100!)      #=> 732
+    say prime_usigma(100!, 2)   #=> 55330
 
 =cut
 
 =head2 prime_usigma0
 
-Number.prime_usigma0() -> I<Obj>
+    prime_usigma0(n)
 
-Return the
+The number of unique unitary prime divisors of n.
 
 =cut
 
 =head2 primitive_part
 
-Number.primitive_part() -> I<Obj>
+    n.primitive_part(f)
 
-Return the
+Returns the primitive part of C<f(n)>, for n > 0, such that:
+
+    a(n) = primitive part of f(n)
+    f(n) = Product_{d|n} a(d)
+
+Example:
+
+    func f(n) { n.fib }
+    func a(n) { n.primitive_part(f) }
+
+    say 20.of { a(_) }
+    say 20.of { f(_) }
+    say 20.of { .divisors.prod {|d| a(d) } }
 
 =cut
 
 =head2 primorial
 
-Number.primorial() -> I<Obj>
+    Number.primorial()
 
-Return the
+Returns the
 
 =cut
 
 =head2 primorial_deflation
 
-Number.primorial_deflation() -> I<Obj>
+    n.primorial_deflation()
 
-Return the
+Primorial deflation of n, satisfying:
+
+    primorial_inflation(primorial_deflation(n)) = n
+
+Defined as:
+
+    primorial_deflation(n) = A319626(n)/A319627(n)
 
 =cut
 
 =head2 primorial_inflation
 
-Number.primorial_inflation() -> I<Obj>
+    n.primorial_inflation()
 
-Return the
+Primorial inflation of n: fully multiplicative with a(p) = primorial(p).
+
+Defined as:
+
+    primorial_inflation(n) = A108951(n)
+
+The method also accepts C<n> to be a fraction, which is computed as:
+
+    primorial_inflation(a/b) = primorial_inflation(a)/primorial_inflation(b)
 
 =cut
 
 =head2 psi
 
-Number.psi() -> I<Obj>
+    n.psi(k=1)
+    dedekind_psi(n,k=1)
 
-Return the
+Dedekind psi function.
+
+    say 10.of { .dedekind_psi    }   #=> [0, 1, 3, 4, 6, 6, 12, 8, 12, 12]
+    say 10.of { .dedekind_psi(2) }   #=> [0, 1, 5, 10, 20, 26, 50, 50, 80, 90]
 
 Aliases: I<dedekind_psi>
 
@@ -3966,9 +5833,12 @@ Aliases: I<dedekind_psi>
 
 =head2 qnr
 
-Number.qnr() -> I<Obj>
+    qnr(n)
 
-Return the
+Returns the least quadratic non-residue of n.
+
+    say qnr(17676352761153241)      #=> 37
+    say qnr(172138573277896681)     #=> 41
 
 Aliases: I<quadratic_nonresidue>
 
@@ -3976,73 +5846,94 @@ Aliases: I<quadratic_nonresidue>
 
 =head2 qs_factor
 
-Number.qs_factor() -> I<Obj>
+    qs_factor(n)
 
-Return the
+Pomerance's Quadratic Sieve factorization method (SIMPQS).
 
 =cut
 
 =head2 quadratic_formula
 
-Number.quadratic_formula() -> I<Obj>
+    quadratic_formula(a,b,c)
 
-Return the
+Returns a list of solutions C<(x_1, x_2)> to the quadratic equation: C<a*x^2 + b*x + c = 0>, defined as:
+
+    (-b ± sqrt(b^2 - 4ac)) / (2a)
+
+Example:
+
+    say [quadratic_formula(13, -42, -34)]     #=> [3.9011...., -0.6704...]
 
 =cut
 
 =head2 rad
 
-Number.rad() -> I<Obj>
+    rad(n)
 
-Return the
+Returns the radical of C<n>, which is the largest squarefree divisor of C<n>.
+
+    say rad(2**5 * 3**9)    #=> 6
+
+Equivalent to:
+
+    n.factor.uniq.prod
 
 =cut
 
 =head2 rad2deg
 
-Number.rad2deg() -> I<Obj>
+    rad2deg(x)
 
-Return the
+Convert radians to degrees.
+
+    say rad2deg(Num.pi)     #=> 180
 
 =cut
 
 =head2 ramanujan_sum
 
-Number.ramanujan_sum() -> I<Obj>
+    ramanujan_sum(n,q)
 
-Return the
+The Ramanujan sum function, defined as:
+
+    c_q(n) = μ(q/gcd(n,q)) * φ(q) / φ(q/gcd(n,q))
+
+Example:
+
+    say 20.of {|q| ramanujan_sum(2, q) }    #=> OEIS: A086831
 
 =cut
 
 =head2 ramanujan_tau
 
-Number.ramanujan_tau() -> I<Obj>
+    ramanujan_tau(n)
 
-Return the
+Ramanujan's tau function.
 
 =cut
 
 =head2 rand
 
-Number.rand() -> I<Obj>
+    rand(n)
+    rand(a,b)
 
-Return the
+Returns a pseudorandom floating-point in the interval C<[0,n)>, or in the interval C<[a,b)>.
 
 =cut
 
 =head2 random_bytes
 
-Number.random_bytes() -> I<Obj>
+    n.random_bytes
 
-Return the
+Returns an array with C<n> random values between 0 and 255.
 
 =cut
 
 =head2 random_maurer_nbit_prime
 
-Number.random_maurer_nbit_prime() -> I<Obj>
+    random_maurer_nbit_prime(n)
 
-Return the
+Generate a random n-bit Marurer prime.
 
 Aliases: I<random_nbit_maurer_prime>
 
@@ -4050,17 +5941,19 @@ Aliases: I<random_nbit_maurer_prime>
 
 =head2 random_nbit_prime
 
-Number.random_nbit_prime() -> I<Obj>
+    random_nbit_prime(n)
 
-Return the
+Returns a random n-bit prime.
+
+    say random_nbit_prime(100)      # 100-bit random prime
 
 =cut
 
 =head2 random_nbit_strong_prime
 
-Number.random_nbit_strong_prime() -> I<Obj>
+    random_nbit_strong_prime(n)
 
-Return the
+Generate a random n-bit strong prime number.
 
 Aliases: I<random_strong_nbit_prime>
 
@@ -4068,49 +5961,65 @@ Aliases: I<random_strong_nbit_prime>
 
 =head2 random_ndigit_prime
 
-Number.random_ndigit_prime() -> I<Obj>
+    random_ndigit_prime(n)
 
-Return the
+Returns a random n-digit prime.
+
+    say random_ndigit_prime(100)    # 100-digit random prime
 
 =cut
 
 =head2 random_prime
 
-Number.random_prime() -> I<Obj>
+    random_prime(n)
+    random_prime(a,b)
 
-Return the
+Returns a random prime <= n, or in the range C<a..b>.
+
+    say random_prime(100)         # random prime in range [2, 100]
+    say random_prime(100, 1000)   # random prime in range [100, 1000]
 
 =cut
 
 =head2 random_safe_prime
 
-Number.random_safe_prime() -> I<Obj>
+    random_safe_prime(n)
 
-Return the
+Returns a random n-bit safe-prime.
+
+    say random_safe_prime(512)   #=> 512-bit safe prime
+
+Provided by L<Math::Prime::Util::GMP> >= 0.52.
 
 =cut
 
 =head2 random_string
 
-Number.random_string() -> I<Obj>
+    n.random_string
 
-Return the
+Returns a string with C<n> random characters (bytes).
 
 =cut
 
 =head2 range
 
-Number.range() -> I<Obj>
+    range(n)
+    range(a,b)
+    range(a,b,step)
 
-Return the
+Creates a new RangeNumber object.
+
+    say range(10)           #=> RangeNum(0, 9, 1)
+    say range(1, 10)        #=> RangeNum(1, 10, 1)
+    say range(1, 10, 2)     #=> RangeNum(1, 10, 2)
 
 =cut
 
 =head2 rat
 
-Number.rat() -> I<Obj>
+    x.rat
 
-Return the
+Convert C<x> to a rational number. Returns C<NaN> when this conversion is not possible.
 
 Aliases: I<to_r>, I<to_rat>
 
@@ -4118,25 +6027,22 @@ Aliases: I<to_r>, I<to_rat>
 
 =head2 rat_approx
 
-Number.rat_approx() -> I<Obj>
+    x.rat_approx
 
-Return the
+Given a real number C<x>, it returns a very good (sometimes exact) rational approximation to C<n>, computed with continued fractions.
 
-=cut
+    say rat_approx(3.14).as_frac        #=> 22/7
+    say rat_approx(zeta(-5)).as_frac    #=> -1/252
 
-=head2 ratmod
-
-Number.ratmod() -> I<Obj>
-
-Return the
+Returns C<NaN> when C<x> is not a real number.
 
 =cut
 
 =head2 re
 
-Number.re() -> I<Obj>
+    re(z)
 
-Return the
+Returns the real part of a complex number C<z>.
 
 Aliases: I<real>
 
@@ -4144,17 +6050,21 @@ Aliases: I<real>
 
 =head2 reals
 
-Number.reals() -> I<Obj>
+    reals(z)
 
-Return the
+Returns a list with the real and imaginary parts of C<z>.
 
 =cut
 
 =head2 remdiv
 
-Number.remdiv() -> I<Obj>
+    n.remdiv(k)
 
-Return the
+Removes all occurrences of the divisor C<k> from integer C<n>.
+
+Equivalent with:
+
+    n / k**valuation(n,k)
 
 Aliases: I<remove>
 
@@ -4162,41 +6072,76 @@ Aliases: I<remove>
 
 =head2 rising_factorial
 
-Number.rising_factorial() -> I<Obj>
+    rising_factorial(n,k)
 
-Return the
+Rising factorial: C<n^(k) = n * (n + 1) * ... * (n + k - 1)>, defined as:
+
+    binomial(n + k - 1, k) * k!
+
+For negative values of C<k>, rising factorial is defined as:
+
+    rising_factorial(n, -k) = 1/rising_factorial(n - k, k)
 
 =cut
 
 =head2 root
 
-Number.root() -> I<Obj>
+    root(n,k)
 
-Return the
+The k-th root of n, defined as:
+
+    n**(1/k)
+
+=cut
+
+=head2 rotate
+
+    rotate(n, k, b=10)
+
+Rotate the digits of C<n> to the left when C<k> is positive or to the right otherwise, in a given base C<b>, or base 10 when no base is given.
+
+    say rotate(12345, 2)         #=> 34512
+    say rotate(12345, -1)        #=> 51234
 
 =cut
 
 =head2 rough_count
 
-Number.rough_count() -> I<Obj>
+    k.rough_count(n)
+    k.rough_count(a,b)
 
-Return the
+Returns the number of k-rough numbers <= n, or in the range C<a..b>.
+
+    say 97.rough_count(1e6)    #=> 122005
+    say 23.rough_count(1e9)    #=> 171024023
+
+Also works with arbitrarily large n:
+
+    say 43.rough_count(1e34)   #=> 1450936704022016442012254601096989
 
 =cut
 
 =head2 rough_part
 
-Number.rough_part() -> I<Obj>
+    n.rough_part(k)
 
-Return the
+It returns the k-rough part of n that contains all the prime factors p|n such that p >= k.
+
+    say 15.of {|n| rough_part(n!, 3) }      #=> OEIS: A049606
 
 =cut
 
 =head2 round
 
-Number.round() -> I<Obj>
+    round(x,k=0)
 
-Return the
+Rounds C<x> to the k-th decimal place.
+
+A negative argument rounds that many digits after the decimal point, while a positive argument rounds that many digits before the decimal point.
+
+    say round(1234.567)             #=> 1235
+    say round(1234.567, 2)          #=> 1200
+    say round(3.123+4.567i, -2)     #=> 3.12+4.57*i
 
 Aliases: I<roundf>
 
@@ -4204,49 +6149,51 @@ Aliases: I<roundf>
 
 =head2 run
 
-Number.run() -> I<Obj>
+    run(a,b)
 
-Return the
+Given two arguments, it returns the second one.
 
 =cut
 
 =head2 sec
 
-Number.sec() -> I<Obj>
+    sec(x)
 
-Return the
+Trigonometric secant function.
 
 =cut
 
 =head2 secant_number
 
-Number.secant_number() -> I<Obj>
+    secant_number(n)
 
-Return the
+Return the n-th secant/zig number. (OEIS: A000364)
 
 =cut
 
 =head2 sech
 
-Number.sech() -> I<Obj>
+    sech(x)
 
-Return the
+Hyperbolic secant function.
 
 =cut
 
 =head2 seed
 
-Number.seed() -> I<Obj>
+    seed(n)
 
-Return the
+Re-seed the C<rand()> function. The value for C<n> can be any arbitrary large integer.
 
 =cut
 
 =head2 semiprime
 
-Number.semiprime() -> I<Obj>
+    semiprime(n)
 
-Return the
+Returns the n-th semiprime number.
+
+    say 10.of {|k| semiprime(10**k) }    #=> OEIS: A114125
 
 Aliases: I<nth_semiprime>
 
@@ -4254,25 +6201,47 @@ Aliases: I<nth_semiprime>
 
 =head2 semiprime_count
 
-Number.semiprime_count() -> I<Obj>
+    semiprime_count(n)
+    semiprime_count(a,b)
 
-Return the
+Counts the number of semiprimes <= n (OEIS: A072000), or in the range C<a..b>.
+
+    say 20.of {|k| semiprime_count(2**k) }
+
+=cut
+
+=head2 semiprimes
+
+    semiprimes(n)
+    semiprimes(a,b)
+
+Returns an array with the semiprimes <= n, or in the range C<a..b>.
+
+    say semiprimes(100)             # semiprimes <= 100
+    say semiprimes(50, 100)         # semiprimes in the range [50, 100]
 
 =cut
 
 =head2 setbit
 
-Number.setbit() -> I<Obj>
+    setbit(n,k)
 
-Return the
+Set the k-th bit of integer C<n> to 1.
+
+    say setbit(0b1000, 0).as_bin    #=> 1001
+    say setbit(0b1000, 2).as_bin    #=> 1100
 
 =cut
 
 =head2 sgn
 
-Number.sgn() -> I<Obj>
+    sgn(x)
 
-Return the
+Returns the sign of x.
+
+Defined as:
+
+    x / abs(x)
 
 Aliases: I<sign>
 
@@ -4280,145 +6249,256 @@ Aliases: I<sign>
 
 =head2 sigma0
 
-Number.sigma0() -> I<Obj>
+    tau(n)
+    sigma0(n)
 
-Return the
+Returns the number of positive divisors of n.
 
 =cut
 
 =head2 sin
 
-Number.sin() -> I<Obj>
+    sin(x)
 
-Return the
+Trigonometric sine function.
 
 =cut
 
 =head2 sin_cos
 
-Number.sin_cos() -> I<Obj>
+    sin_cos(x)
 
-Return the
+Returns a list with the values C<(sin(x), cos(x))>.
 
 =cut
 
 =head2 sinh
 
-Number.sinh() -> I<Obj>
+    sinh(x)
 
-Return the
+Hyperbolic sine function.
 
 =cut
 
 =head2 smooth_count
 
-Number.smooth_count() -> I<Obj>
+    k.smooth_count(n)
+    k.smooth_count(a,b)
 
-Return the
+Returns the number of k-smooth numbers <= n, or in the range C<a..b>.
+
+    say 30.of {|n| 13.smooth_count(10**n) }   #=> OEIS: A106629
 
 =cut
 
 =head2 smooth_part
 
-Number.smooth_part() -> I<Obj>
+    n.smooth_part(k)
 
-Return the
+It efficiently returns the largest divisor of n that is k-smooth.
+
+    say 20.of {|n| smooth_part(n!, 3) }     #=> OEIS: A118381
+
+=cut
+
+=head2 solve_lcg
+
+    solve_lcg(n, r, m)
+
+Return the smallest solution for C<x> to the following linear congruence:
+
+    n*x == r (mod m)
+
+Example:
+
+    say solve_lcg(143, 44, 231)     #=> 10
+
+Return C<NaN> when no solution exists (i.e.: when C<r> is not divisible by C<gcd(n, m)>).
+
+Aliases: I<solve_linear_congruence>
 
 =cut
 
 =head2 solve_pell
 
-Number.solve_pell() -> I<Obj>
+    solve_pell(d, k=1)
 
-Return the
+Find the smallest pair of integers C<(x,y)> that satisfy the Pell equation: C<x^2 - d*y^2 = k>.
+
+    say [solve_pell(863)]       #=> [18524026608, 630565199]
+    say [solve_pell(953, -1)]   #=> [2746864744, 88979677]
+
+Return C<(nil,nil)> when a solution does not exist.
 
 =cut
 
 =head2 sopf
 
-Number.sopf() -> I<Obj>
+    sopf(n)
 
-Return the
+Sum of the distinct primes dividing n.
+
+    say 30.of { .sopf }     #=> OEIS: A008472
 
 =cut
 
 =head2 sopfr
 
-Number.sopfr() -> I<Obj>
+    sopfr(n)
 
-Return the
+Sum of primes dividing n (with repetition).
+
+    say 30.of { .sopfr }    #=> OEIS: A001414
 
 =cut
 
 =head2 sqr
 
-Number.sqr() -> I<Obj>
+    sqr(x)
 
-Return the
+Returns the square of C<x>. Equivalent with C<x*x>.
+
+Aliases: I<square>
 
 =cut
 
 =head2 sqrt
 
-Number.sqrt() -> I<Obj>
+    sqrt(x)
 
-Return the
+Returns the square root of C<x>. Equivalent with C<x**(1/2)>.
 
 =cut
 
 =head2 sqrt_cfrac
 
-Number.sqrt_cfrac() -> I<Obj>
+    n.sqrt_cfrac
+    n.sqrt_cfrac(k)
 
-Return the
+Returns the expansion of the continued fraction for square root of n.
+
+When an additional argument C<k> is specified, it includes only the first C<k> terms from the expansion period.
+
+    say 28.sqrt_cfrac               #=> [5, 3, 2, 3, 10]
+    say 28.sqrt_cfrac(2)            #=> [5, 3, 2]
+    say 12345678910.sqrt_cfrac(10)  #=> [111111, 9, 26, 1, 2, 3, 1, 1, 2, 8, 1]
 
 =cut
 
 =head2 sqrt_cfrac_period
 
-Number.sqrt_cfrac_period() -> I<Obj>
+    n.sqrt_cfrac_period
 
-Return the
+Returns the period of the expansion of the continued fraction for square root of n.
+
+    say 28.sqrt_cfrac_period        #=> [3, 2, 3, 10]
+
+=cut
+
+=head2 sqrt_cfrac_period_each
+
+    n.sqrt_cfrac_period_each { ... }
+    n.sqrt_cfrac_period_each({ ... }, max_iter)
+
+Iterate over the period of the expansion of the continued fraction for square root of n.
+
+    28.sqrt_cfrac_period_each {|r| say r }
 
 =cut
 
 =head2 sqrt_cfrac_period_len
 
-Number.sqrt_cfrac_period_len() -> I<Obj>
+    n.sqrt_cfrac_period_len
 
-Return the
+Returns the length of the period of continued fraction for square root of n. (OEIS: A003285)
 
 =cut
 
 =head2 sqrtmod
 
-Number.sqrtmod() -> I<Obj>
+    sqrtmod(a,m)
 
-Return the
+Modular square root of C<a>, returning a solution C<r>, such that C<r^2 = a (mod m)>.
+
+    say sqrtmod(544, 800)         #=> 512
+    say sqrtmod(436, 1752)        #=> 1010
+
+=cut
+
+=head2 sqrtmod_all
+
+    sqrtmod_all(a, n)
+
+Given two integers C<a> and C<n>, return a sorted array of all modular square roots of C<a> mod C<|n|>. If no square root exists, an empty array is returned.
+
+    say sqrtmod_all(4095, 8469)     #=> [1110, 1713, 3933, 4536, 6756, 7359]
+
+=cut
+
+=head2 sqrtQ
+
+    sqrtQ(n)
+
+Returns a Quadratic object, representing C<sqrt(n)>.
 
 =cut
 
 =head2 square_divisors
 
-Number.square_divisors() -> I<Obj>
+    square_divisors(n)
 
-Return the
+Returns the square divisors of n.
+
+    say 5040.square_divisors    #=> [1, 4, 9, 16, 36, 144]
+
+Equivalent with:
+
+    n.divisors.grep { .is_square }
 
 =cut
 
 =head2 squarefree
 
-Number.squarefree() -> I<Obj>
+    squarefree(n)
+    squarefree(a,b)
 
-Return the
+Returns an array with the squarefree numbers <= n, or in the range C<a..b>.
+
+    # Squarefree numbers in the interval [100, 200]
+    say squarefree(100, 200)
+
+    # Squarefree numbers <= 100
+    say squarefree(100)
+
+=cut
+
+=head2 squarefree_almost_primes
+
+    k.squarefree_almost_primes(n)
+    k.squarefree_almost_primes(a,b)
+
+Returns an array with the squarefree k-almost primes <= n, or in the range C<a..b>.
+
+    say 2.squarefree_almost_primes(100)      #=> squarefree semiprimes <= 100
+    say 2.squarefree_almost_primes(50, 100)  #=> squarefree semiprimes in the range 50..100
+
+    say 3.squarefree_almost_primes(100)      #=> squarefree 3-almost primes <= 100
+    say 3.squarefree_almost_primes(50, 100)  #=> squarefree 3-almost primes in the range 50..100
 
 =cut
 
 =head2 square_free_count
 
-Number.square_free_count() -> I<Obj>
+    square_free_count(n)
+    square_free_count(a,b)
 
-Return the
+Returns the number of squarefree integers <= n, or in the range C<a..b>.
+
+    # The number of square-free integers between 10^5 and 10^6
+    say square_free_count(10**5, 10**6) # 547132
+
+    # The number of square-free integers <= 2^40
+    say square_free_count(2**40)        # 668422917419
 
 Aliases: I<squarefree_count>
 
@@ -4426,25 +6506,58 @@ Aliases: I<squarefree_count>
 
 =head2 squarefree_divisors
 
-Number.squarefree_divisors() -> I<Obj>
+    squarefree_divisors(n)
 
-Return the
+Returns an array with the square-free divisors of n.
+
+    say squarefree_divisors(120)  #=> [1, 2, 3, 5, 6, 10, 15, 30]
+
+=cut
+
+=head2 squarefree_pi_k
+
+    k.squarefree_almost_prime_count(n)
+    k.squarefree_almost_prime_count(a,b)
+
+Returns the number of squarefree k-almost primes <= n, or in the range C<a..b>.
+
+    say 1.squarefree_almost_prime_count(1000)          # count of primes <= 1000
+    say 2.squarefree_almost_prime_count(50, 1000)      # count of squarefree semiprimes in range 50..1000
+
+Aliases: I<squarefree_almost_primepi>, I<squarefree_almost_prime_count>
 
 =cut
 
 =head2 squarefree_sigma
 
-Number.squarefree_sigma() -> I<Obj>
+    squarefree_sigma(n,k=1)
 
-Return the
+Sum of the square free divisors of C<n>, each divisor raised to power C<k>.
+
+    say squarefree_sigma(5040)      #=> 576
+    say squarefree_sigma(5040, 2)   #=> 65000
+
+=cut
+
+=head2 squarefree_sum
+
+    squarefree_sum(n)
+    squarefree_sum(a,b)
+
+Returns the sum of squarefree numbers <= n or in the range C<a..b>. (OEIS: A066779)
+
+    say squarefree_sum(1e12)    #=> 303963551353876732927386
+    say squarefree_sum(1e13)    #=> 30396355090144154315002969
 
 =cut
 
 =head2 squarefree_udivisors
 
-Number.squarefree_udivisors() -> I<Obj>
+    squarefree_udivisors(n)
 
-Return the
+Returns the unitary squarefree divisors of C<n>.
+
+    say squarefree_udivisors(5040)   #=> [1, 5, 7, 35]
 
 Aliases: I<squarefree_unitary_divisors>, I<unitary_squarefree_divisors>
 
@@ -4452,41 +6565,69 @@ Aliases: I<squarefree_unitary_divisors>, I<unitary_squarefree_divisors>
 
 =head2 squarefree_usigma
 
-Number.squarefree_usigma() -> I<Obj>
+    n.squarefree_usigma(k=1)
 
-Return the
+Sum of the unitary squarefree divisors of n, each divisor raised to the k-th power.
+
+    say 5040.squarefree_usigma     #=> 48
+    say 5040.squarefree_usigma(2)  #=> 1300
 
 =cut
 
 =head2 squarefree_usigma0
 
-Number.squarefree_usigma0() -> I<Obj>
+    squarefree_usigma0(n)
 
-Return the
+Returns the number of unitary squarefree divisors of n.
+
+    say squarefree_usigma0(5040)    #=> 4
 
 =cut
 
 =head2 square_sigma
 
-Number.square_sigma() -> I<Obj>
+    n.square_sigma(k=1)
 
-Return the
+Sum of the square divisors of C<n>, each divisor raised to the power C<k>.
+
+    say 5040.square_sigma       #=> 210
+    say 5040.square_sigma(2)    #=> 22386
+
+Equivalent with:
+
+    n.square_divisors.sum {|d| d**k }
 
 =cut
 
 =head2 square_sigma0
 
-Number.square_sigma0() -> I<Obj>
+    square_sigma0(n)
 
-Return the
+Returns the number of square divisors of C<n>.
+
+=cut
+
+=head2 squares_r
+
+    squares_r(n, k=2)
+
+Sum of squares function C<r_k(n)>: returns the number of ways or representing C<n> as a sum of C<k> squares.
+
+    say 30.of { .squares_r(2) }     # OEIS: A004018
+    say 30.of { .squares_r(3) }     # OEIS: A005875
+    say 30.of { .squares_r(4) }     # OEIS: A000118
+
+Aliases: I<sum_of_squares_count>
 
 =cut
 
 =head2 square_udivisors
 
-Number.square_udivisors() -> I<Obj>
+    square_udivisors(n)
 
-Return the
+Returns the unitary square divisors of C<n>, such that each divisor C<d> is a square and C<gcd(n/d, d) = 1>.
+
+    say 5040.square_udivisors   #=> [1, 9, 16, 144]
 
 Aliases: I<square_unitary_divisors>, I<unitary_square_divisors>
 
@@ -4494,33 +6635,40 @@ Aliases: I<square_unitary_divisors>, I<unitary_square_divisors>
 
 =head2 square_usigma
 
-Number.square_usigma() -> I<Obj>
+    n.square_usigma(k=1)
 
-Return the
+Sum of the unitary square divisors of C<n>, each divisor raised to power C<k>.
+
+    say square_usigma(5040)     #=> 170
+    say square_usigma(5040, 2)  #=> 21074
+
+Equivalent with:
+
+    n.square_udivisors.sum {|d| d**k }
 
 =cut
 
 =head2 square_usigma0
 
-Number.square_usigma0() -> I<Obj>
+    square_usigma0(n)
 
-Return the
+Returns the number of unitary square divisors of C<n>.
 
 =cut
 
 =head2 squfof_factor
 
-Number.squfof_factor() -> I<Obj>
+    n.squfof_factor(reps)
 
-Return the
+Shanks' SQUFOF method.
 
 =cut
 
 =head2 stirling
 
-Number.stirling() -> I<Obj>
+    stirling(n,k)
 
-Return the
+Stirling numbers of the first kind.
 
 Aliases: I<stirling1>
 
@@ -4528,97 +6676,128 @@ Aliases: I<stirling1>
 
 =head2 stirling2
 
-Number.stirling2() -> I<Obj>
+    stirling2(n,k)
 
-Return the
+Stirling numbers of the second kind.
 
 =cut
 
 =head2 stirling3
 
-Number.stirling3() -> I<Obj>
+    stirling3(n,k)
 
-Return the
+Stirling numbers of the third kind (also known as Lah numbers).
 
 =cut
 
 =head2 subfactorial
 
-Number.subfactorial() -> I<Obj>
+    subfactorial(n,k=0)
 
-Return the
+Number of derangements of a set with n elements having exactly k fixed points. Also known as the rencontres numbers.
+
+    say 20.of { .subfactorial }        #=> OEIS: A000166
+    say 20.of { .subfactorial(2) }     #=> OEIS: A000387
 
 =cut
 
 =head2 submod
 
-Number.submod() -> I<Obj>
+    submod(a,b,m)
 
-Return the
+Modular integer subtraction: C<(a-b)%m>.
+
+    say submod(43, 97, 127)     #=> (43-97)%127
 
 =cut
 
 =head2 subsets
 
-Number.subsets() -> I<Obj>
+    n.subsets
+    n.subsets(k)
+    n.subsets { ... }
+    n.subsets(k, { ... })
 
-Return the
+Returns an array with the subsets of the integers in the range C<0..n-1>, or iterates over the k-subsets when a block is given.
+
+    say 5.subsets           # all k-subsets of 0..4
+    say 5.subsets(2)        # all 2-subsets of 0..4
+
+    5.subsets {|*a| say a }         # iterate over all k-subsets of 0..4
+    5.subsets(2, {|*a| say a })     # iterate over all 2-subsets of 0..4
+
+=cut
+
+=head2 sum_remainders
+
+    sum_remainders(n, v)
+
+Returns the following sum: C<Sum_{k=1..n} v % k>, computed in C<O(sqrt(v))> steps.
+
+    say 20.of {|n| sum_remainders(n, n) }        #=> OEIS: A004125
+    say 20.of {|n| sum_remainders(n, n.prime) }  #=> OEIS: A099726
 
 =cut
 
 =head2 superfactorial
 
-Number.superfactorial() -> I<Obj>
+    superfactorial(n)
 
-Return the
+Returns the product of first n factorials.
+
+    say 10.of { .superfactorial }   #=> OEIS: A000178
 
 =cut
 
 =head2 superprimorial
 
-Number.superprimorial() -> I<Obj>
+    superprimorial(n)
 
-Return the
+Returns the product of first n primorials.
+
+    say 10.of { .superprimorial }   #=> OEIS: A006939
 
 =cut
 
 =head2 tan
 
-Number.tan() -> I<Obj>
+    tan(x)
 
-Return the
+Trigonometric tangent function.
 
 =cut
 
 =head2 tangent_number
 
-Number.tangent_number() -> I<Obj>
+    tangent_number(n)
 
-Return the
+Returns the n-th tangent/zag number. (OEIS: A000182).
 
 =cut
 
 =head2 tanh
 
-Number.tanh() -> I<Obj>
+    tanh(x)
 
-Return the
+Hyperbolic tangent function.
 
 =cut
 
 =head2 times
 
-Number.times() -> I<Obj>
+    n.times {|k| ... }
 
-Return the
+Call a given block of code C<n> times with k = 0,1,2,...,n-1.
+
+    5.times {|k| say "k = #{k}" }
 
 =cut
 
 =head2 to_f
 
-Number.to_f() -> I<Obj>
+    x.to_f
 
-Return the
+Convert C<x> to a floating-point value number.
 
 Aliases: I<float>, I<to_float>
 
@@ -4626,19 +6805,27 @@ Aliases: I<float>, I<to_float>
 
 =head2 to_n
 
-Number.to_n() -> I<Obj>
+    x.to_n
 
-Return the
+Fixed-point function: returns C<x>.
 
 Aliases: I<to_num>
 
 =cut
 
+=head2 to_poly
+
+    x.to_poly
+
+Converts C<x> to a Polynomial object.
+
+=cut
+
 =head2 to_s
 
-Number.to_s() -> I<Obj>
+    x.to_s
 
-Return the
+Converts C<x> to a String object.
 
 Aliases: I<to_str>
 
@@ -4646,9 +6833,10 @@ Aliases: I<to_str>
 
 =head2 totient
 
-Number.totient() -> I<Obj>
+    phi(n)
+    totient(n)
 
-Return the
+Euler's totient function.
 
 Aliases: I<euler_phi>, I<eulerphi>, I<euler_totient>
 
@@ -4656,17 +6844,20 @@ Aliases: I<euler_phi>, I<eulerphi>, I<euler_totient>
 
 =head2 trial_factor
 
-Number.trial_factor() -> I<Obj>
+    n.trial_factor(limit)
 
-Return the
+Trial division.
 
 =cut
 
 =head2 tuples
 
-Number.tuples() -> I<Obj>
+    n.tuples(k)
+    n.tuples(k, { ... })
 
-Return the
+Returns an array with the k-tuples of the integers in the range C<0..n-1>, or iterates over the k-tuples when a block is given.
+
+    5.tuples(2, {|*a| say a })
 
 Aliases: I<variations>
 
@@ -4674,9 +6865,12 @@ Aliases: I<variations>
 
 =head2 tuples_with_repetition
 
-Number.tuples_with_repetition() -> I<Obj>
+    n.tuples_with_repetition(k)
+    n.tuples_with_repetition(k, { ... })
 
-Return the
+Returns an array with the k-tuples with repetition of the integers in the range C<0..n-1>, or iterates over the k-tuples with repetition when a block is given.
+
+    5.tuples_with_repetition(2, {|*a| say a })
 
 Aliases: I<variations_with_repetition>
 
@@ -4684,9 +6878,15 @@ Aliases: I<variations_with_repetition>
 
 =head2 udivisors
 
-Number.udivisors() -> I<Obj>
+    udivisors(n)
 
-Return the
+Returns an array with the unitary divisors of n.
+
+    say 120.udivisors   #=> [1, 3, 5, 8, 15, 24, 40, 120]
+
+These are divisors C<d> of C<n> that satisfy:
+
+    gcd(n/d, d) = 1
 
 Aliases: I<unitary_divisors>
 
@@ -4694,25 +6894,29 @@ Aliases: I<unitary_divisors>
 
 =head2 uphi
 
-Number.uphi() -> I<Obj>
+    uphi(n)
 
-Return the
+The unitary totient function. (OEIS: A047994)
 
 =cut
 
 =head2 usigma
 
-Number.usigma() -> I<Obj>
+    usigma(n, k=1)
 
-Return the
+Returns the sum of the unitary divisors of C<n>, each divisor raised to the power C<k>.
 
 =cut
 
 =head2 usigma0
 
-Number.usigma0() -> I<Obj>
+    usigma0(n)
 
-Return the
+Returns the number of unitary divisor of n.
+
+Equivalently, the number of squarefree divisors of n.
+
+    say usigma0(5040)   #=> 16
 
 Aliases: I<squarefree_sigma0>
 
@@ -4720,32 +6924,36 @@ Aliases: I<squarefree_sigma0>
 
 =head2 valuation
 
-Number.valuation() -> I<Obj>
+    n.valuation(k)
 
-Return the
+Returns the number of times n is divisible by k.
+
+    say valuation(2**32, 4)     # prints: 16
 
 =cut
 
 =head2 zero
 
-Number.zero() -> I<Obj>
+    Num.zero
 
-Return the
+Returns the number 0.
 
 =cut
 
 =head2 znorder
 
-Number.znorder() -> I<Obj>
+    znorder(a,m)
 
-Return the
+The smallest positive integer k such that C<powmod(a, k, m) == 1>.
+
+Return C<NaN> if C<a> is not coprime to C<m>.
 
 =cut
 
 =head2 znprimroot
 
-Number.znprimroot() -> I<Obj>
+    znprimroot(n)
 
-Return the
+The smallest primitive root of (Z/nZ)^*.
 
 =cut

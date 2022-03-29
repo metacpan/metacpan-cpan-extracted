@@ -22,12 +22,14 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "0",
+            "File::ShareDir::Install" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "0",
+            "File::ShareDir::Install" : "0"
          }
       },
       "runtime" : {
@@ -45,16 +47,24 @@
          }
       },
       "test" : {
-         "requires" : {}
+         "requires" : {
+            "Data::Dumper" : "2.145",
+            "JSON::PP" : "4.07",
+            "ReadonlyX" : "1.04",
+            "Test::More" : "1.001014",
+            "Text::CSV_XS" : "1.00",
+            "strict" : "1.07",
+            "warnings" : "1.13"
+         }
       }
    },
    "provides" : {
       "File::Process" : {
-         "file" : "/usr/local/share/perl5/File/Process.pm",
-         "version" : "0.01"
+         "file" : "lib/File/Process.pm",
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
-   "version" : "0.01",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

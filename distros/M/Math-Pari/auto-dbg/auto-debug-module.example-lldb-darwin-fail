@@ -1,0 +1,35 @@
+!!!!  I seem to have found LLDB, but extra work may be needed.  !!!
+!!!!  If you see something like this:                           !!!
+
+  (lldb) run -Mblib t/000_load-problem.t
+  error: process exited with status -1 (developer mode is not enabled on this machine and this is a non-interactive debug session.)
+
+!!!!  Inspect the following recipe                              !!!
+!!!!     from https://developer.apple.com/forums/thread/678032  !!!
+
+  	sudo DevToolsSecurity -enable
+	Developer mode is now enabled.
+
+!!!!  This was Step 1; it should lead to the following error:   !!!
+
+  error: process exited with status -1 (this is a non-interactive debug session, cannot get permission to debug processes.)
+
+!!!!  You also need Step 2 (security implications???):          !!!
+
+	sudo dseditgroup -o edit -a UUU -t user _developer
+	###   replace UUU with your user name.
+
+!!!!  I'm crossing my virtual fingers and proceed.              !!!
+
+Debugger's version: lldb-1300.0.42.3
+Swift version 5.5.2-dev
+Running {{{lldb}}} {{{-batch}}} {{{-s}}} {{{lldb-in}}} {{{/Users/cpantesting/cpantesting/perl-blead/bin/perl5.35.10}}} at ./auto-dbg/auto-debug-module.pl line 339.
+(lldb) target create "/Users/cpantesting/cpantesting/perl-blead/bin/perl5.35.10"
+Current executable set to '/Users/cpantesting/cpantesting/perl-blead/bin/perl5.35.10' (x86_64).
+(lldb) command source -s 0 'lldb-in'
+Executing commands in '/Users/cpantesting/cpantesting/perl-blead/.cpan/build/Math-Pari-2.03052102-0/dbg-bld/lldb-in'.
+(lldb) run -Mblib t/000_load-problem.t
+error: process exited with status -1 (developer mode is not enabled on this machine and this is a non-interactive debug session.)
+./auto-dbg/auto-debug-module.pl exited unexpectedly: Running lldb -batch -s lldb-in /Users/cpantesting/cpantesting/perl-blead/bin/perl5.35.10: rc=256 at ./auto-dbg/auto-debug-module.pl line 340.
+
+	per https://www.cpantesters.org/cpan/report/f755e666-ad15-11ec-ad22-ad7400082472

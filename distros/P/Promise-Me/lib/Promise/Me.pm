@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Promise - ~/lib/Promise/Me.pm
-## Version v0.1.2
-## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Version v0.2.0
+## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/28
-## Modified 2022/03/09
+## Modified 2022/03/18
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -18,9 +18,13 @@ BEGIN
     use warnings;
     use warnings::register;
     use parent qw( Module::Generic );
+    use vars qw( $KIDS $DEBUG $FILTER_RE_FUNC_ARGS $FILTER_RE_SHARED_ATTRIBUTE 
+                 $SHARED_MEMORY_SIZE $SHARED $VERSION $SHARE_MEDIUM $SHARE_FALLBACK 
+                 $SHARE_AUTO_DESTROY $OBJECTS_REPO );
     use Clone;
     use Filter::Util::Call ();
-    use Module::Generic::SharedMem v0.2.2 qw( :all );
+    use Module::Generic::File::Cache v0.1.0;
+    use Module::Generic::SharedMem v0.2.3 qw( :all );
     use Nice::Try;
     use POSIX qw( WNOHANG WIFEXITED WEXITSTATUS WIFSIGNALED );
     use PPI;
@@ -104,8 +108,14 @@ BEGIN
     our $SHARED_MEMORY_SIZE = ( 64 * 1024 );
     use constant SHARED_MEMORY_BLOCK => ( 64 * 1024 );
     our $SHARED  = {};
-    our @TIED    = ();
-    our $VERSION = 'v0.1.2';
+    our $SHARE_MEDIUM = 'memory';
+    # If shared memory block is not supported, should we fall back to cache file?
+    our $SHARE_FALLBACK = 1;
+    our $SHARE_AUTO_DESTROY = 1;
+    # A repository of objects that is used by END and DESTROY to remove the shared
+    # space only when no proces is using it, since the processes run asynchronously
+    our $OBJECTS_REPO = [];
+    our $VERSION = 'v0.2.0';
 };
 
 sub import
@@ -129,6 +139,7 @@ sub import
     $hash->{debug_code} = 0 if( !CORE::exists( $hash->{debug_code} ) );
     Filter::Util::Call::filter_add( bless( $hash => ( ref( $class ) || $class ) ) );
     my $caller = caller;
+    no strict 'refs';
     for( qw( ARRAY HASH SCALAR ) )
     {
         *{"${caller}\::MODIFY_${_}_ATTRIBUTES"} = sub
@@ -250,6 +261,8 @@ sub init
     $self->{result_shared_mem_size} = '';
     $self->{shared_vars_mem_size}   = $SHARED_MEMORY_SIZE;
     $self->{use_async} = 0;
+    # By default, should we use file cache to store shared data or memory?
+    $self->{use_cache_file} = ( $SHARE_MEDIUM eq 'file' );
     # XXX Probably should remove as it is not used
     $self->{timeout} = 0;
     $self->{name}  = $name;
@@ -277,15 +290,18 @@ sub init
     }
     $self->{_handlers} = [];
     $self->{_no_more_chaining} = 0;
+    $self->{executed}     = 0;
     $self->{exit_bit}     = '';
     $self->{exit_signal}  = '';
     $self->{exit_status}  = '';
     $self->{has_coredump} = 0;
     $self->{is_child}     = 0;
+    $self->{pid}          = $$;
     $self->{share_auto_destroy} = 1;
     # promise status; data space shared between child and parent through shared memory
     $self->{shared}       = {};
     $self->{shared_key}   = 'pm' . $$;
+    $self->{shared_space_destroy} = 1;
     $self->{global}       = {};
     $self->{global_key}   = 'gl' . $$;
     # This will be set to true if the chain ends with a call to wait()
@@ -294,13 +310,16 @@ sub init
     # Check if there are any variables to share
     # Because this is stored in a global variable, we use the caller's package name as namespace
     my $pack = caller(1);
+    # Resulting values from exec, or then when there are no more handler but there could be later
+    $self->{_saved_values} = [];
     $self->{_shared_from} = $pack;
+    push( @$OBJECTS_REPO, $self );
 
-    unless( Want::want( 'OBJECT' ) )
-    {
-        $self->no_more_chaining(1);
-        $self->exec;
-    }
+#     unless( Want::want( 'OBJECT' ) )
+#     {
+#         $self->no_more_chaining(1);
+#         $self->exec;
+#     }
     return( $self );
 }
 
@@ -319,7 +338,6 @@ sub add_resolve_handler
     my $code = shift( @_ ) || return( $self->error( "No code reference was provided to add a resolve handler." ) );
     return( $self->error( "Resolve handler provided is not a code reference." ) ) if( ref( $code ) ne 'CODE' );
     push( @{$self->{_handlers}}, { type => 'then', handler => $code });
-    $self->messagef( 3, "Added new resolve handler. There are now %d handler(s).", scalar( @{$self->{_handlers}} ) );
     return( $self );
 }
 
@@ -329,14 +347,13 @@ sub add_reject_handler
     my $code = shift( @_ ) || return( $self->error( "No code reference was provided to add a reject handler." ) );
     return( $self->error( "Reject handler provided is not a code reference." ) ) if( ref( $code ) ne 'CODE' );
     push( @{$self->{_handlers}}, { type => 'catch', handler => $code });
-    $self->messagef( 3, "Added new reject handler. There are now %d handler(s).", scalar( @{$self->{_handlers}} ) );
     return( $self );
 }
 
 sub all
 {
     my $this  = shift( @_ );
-    return( $self->error( __PACKAGE__, "->all must be called as a class function such as: ", __PACKAGE__, "->all()" ) ) if( ref( $this ) || $this ne 'Promise::Me' );
+    return( __PACKAGE__->error( __PACKAGE__, "->all must be called as a class function such as: ", __PACKAGE__, "->all()" ) ) if( ref( $this ) || $this ne 'Promise::Me' );
     my $opts  = {};
     $opts = pop( @_ ) if( ref( $_[-1] ) eq 'HASH' );
     $opts->{timeout} //= 0;
@@ -353,7 +370,7 @@ sub all
         # Size the array
         $#results = $#proms;
         my $done = {};
-        local $keep_going = 1;
+        my $keep_going = 1;
         local $SIG{ALRM} = sub{ $keep_going = 0 };
         alarm( $opts->{timeout} ) if( $opts->{timeout} =~ /^\d+$/ );
         COLLECT: while($keep_going)
@@ -441,30 +458,31 @@ sub await
         {
             my $prom = $promises[$i];
             my $pid  = $prom->child;
+            my $prefix = '[' . ( $prom->is_child ? 'child' : 'parent' ) . ']';
             # Already removed
             if( !CORE::exists( $KIDS->{ $pid } ) )
             {
-                $prom->message( 6, "Child pid $pid has already been completed, moving on to the next one." );
+                # $prom->message( 6, "${prefix} Child pid $pid has already been completed, moving on to the next one." );
                 splice( @promises, $i, 1 );
                 $i--;
                 next;
             }
 
-            $prom->message( 6, "Checking id child pid '$pid' is still up. Position is $i out of $#promises" );
+            # $prom->message( 6, "${prefix} Checking id child pid '$pid' is still up. Position is $i out of $#promises" );
             my $rv = waitpid( $pid, POSIX::WNOHANG );
             if( $rv == 0 )
             {
-                $prom->message( 6, "Child pid '$pid' is still running, waiting for it." );
+                # $prom->message( 6, "${prefix} Child pid '$pid' is still running, waiting for it." );
             }
             elsif( $rv > 0 )
             {
-                $prom->message( 6, "Child process with pid '$pid' finally exited." );
+                # $prom->message( 6, "${prefix} Child process with pid '$pid' finally exited." );
                 CORE::delete( $KIDS->{ $pid } );
                 $prom->_set_exit_values( $? );
                 # $prom->message( 4, "resolved value is '", $prom->resolved, "' and rejected is '", $prom->rejected, "'." );
                 if( !$prom->resolved && !$prom->rejected )
                 {
-                    $prom->message( 4, "Promise is not yet resolved nor rejected. Child exited with value ($?) -> ", $prom->exit_status, " (", ( $? >> 8 ), ")." );
+                    # $prom->message( 4, "${prefix} Promise is not yet resolved nor rejected. Child exited with value ($?) -> ", $prom->exit_status, " (", ( $? >> 8 ), ")." );
                     # exit with value > 0 meaning an error occurred
                     if( $prom->exit_status )
                     {
@@ -537,6 +555,7 @@ sub exec
         return( $self->error( "Cannot block SIGINT for fork: $!" ) );
     select((select(STDOUT), $|=1)[0]);
     select((select(STDERR), $|=1)[0]);
+    $self->executed(1);
     
     my $pid = fork();
     # Parent
@@ -551,30 +570,29 @@ sub exec
         $shm->lock( LOCK_EX );
         $shm->write( $self->{shared} );
         $shm->unlock;
-        $self->message( 3, "Successfully forked child with pid '$pid'. Should we wait for child? ", ( $self->{wait} ? 'yes' : 'no' ), ". Our object address is ", Scalar::Util::refaddr( $self ), " and our pid is $$" );
         # If we are to wait for the child to exit, there is no CHLD signal handler
         if( $self->{wait} )
         {
-            $self->message( 3, "Requested to wait for child process pid '$pid'. Checking it is still there." );
+            # $self->message( 3, "[parent] Requested to wait for child process pid '$pid'. Checking it is still there." );
             # Is the child still there?
             if( kill( 0 => $pid ) || $!{EPERM} )
             {
-                $self->message( 3, "Child process with pid '$pid' is still running, waiting for it to complete." );
+                # $self->message( 3, "[parent] Child process with pid '$pid' is still running, waiting for it to complete." );
                 # Blocking wait
                 waitpid( $pid, 0 );
                 $self->_set_exit_values( $? );
                 if( WIFEXITED($?) )
                 {
-                    $self->message( 3, "Child with pid '$pid' exited with bit value '$?' (exit=$self->{exit_status}, signal=$self->{exit_signal}, coredump=$self->{has_coredump})." );
+                    # $self->message( 3, "[parent] Child with pid '$pid' exited with bit value '$?' (exit=$self->{exit_status}, signal=$self->{exit_signal}, coredump=$self->{has_coredump})." );
                 }
                 else
                 {
-                    $self->message( 3, "Child with pid '$pid' exited with bit value '$?' -> $!" );
+                    # $self->message( 3, "[parent] Child with pid '$pid' exited with bit value '$?' -> $!" );
                 }
             }
             else
             {
-                $self->message( 3, "Child process with pid '$pid' is already completed." );
+                # $self->message( 3, "[parent] Child process with pid '$pid' is already completed." );
             }
         }
         else
@@ -590,7 +608,7 @@ sub exec
         $self->is_child(1);
         $self->pid( $$ );
         $self->_set_shared_space();
-        $self->messagef( 3, "Within child with pid '$$', %d variables to share.", scalar( keys( %{$self->{_shared}} ) ) );
+        # $self->messagef( 3, "[child] Within child with pid '$$', %d variables to share.", scalar( keys( %{$self->{_shared}} ) ) );
         
         try
         {
@@ -598,27 +616,27 @@ sub exec
             # Promise::Me->new( args => [@args] );
             my $args = $self->args;
             my $code = $self->{_code};
-            $self->messagef( 4, "%d arguments set: '%s'.", scalar( @$args ), join( "', '", @$args ) );
+            # $self->messagef( 4, "[child] %d arguments set: '%s'.", scalar( @$args ), join( "', '", @$args ) );
             my @rv = @$args ? $code->( @$args ) : $code->();
-            $self->message( 3, "Child code returned value is: ", ( scalar( @rv ) == 1 && Scalar::Util::blessed( $rv[0] ) ) ? ref( $rv[0] ) . ' object' : sub{ $self->dump( \@rv ) });
+            # $self->message( 3, "[child] Child code returned value is: ", ( scalar( @rv ) == 1 && Scalar::Util::blessed( $rv[0] ) ) ? ref( $rv[0] ) . ' object' : sub{ $self->dump( \@rv ) });
             # The code executed, returned a promise, so we use it and call the next 'then' 
             # in the chain with it.
             if( scalar( @rv ) && 
                 Scalar::Util::blessed( $rv[0] ) && 
                 $rv[0]->isa( 'Promise::Me' ) )
             {
-                $self->message( 3, "Execution of the primary code returned a promise object, calling resolve on it, paassing ", scalar( @rv ), " arguments: [", join( ', ', map( overload::StrVal( $_ ), @rv ) ), "]" );
+                # $self->message( 3, "[child] Execution of the primary code returned a promise object, calling resolve on it, paassing ", scalar( @rv ), " arguments: [", join( ', ', map( overload::StrVal( $_ ), @rv ) ), "]" );
                 shift( @rv )->resolve( @rv );
             }
             elsif( scalar( @rv ) )
             {
-                $self->message( 3, "Execution of the primary code succeeded, calling resolve on it, paassing ", scalar( @rv ), " arguments: [", join( ', ', map( overload::StrVal( $_ ), @rv ) ), "]" );
+                # $self->message( 3, "[child] Execution of the primary code succeeded, calling resolve on it, paassing ", scalar( @rv ), " arguments: [", join( ', ', map( overload::StrVal( $_ ), @rv ) ), "]" );
                 $self->resolve( @rv );
             }
         }
         catch( $e )
         {
-            $self->message( 3, "Execution of the primary code failed with error '$e'. Calling reject." );
+            # $self->message( 3, "[child] Execution of the primary code failed with error '$e'. Calling reject." );
             if( Scalar::Util::blessed( $e ) )
             {
                 $self->reject( $e );
@@ -650,6 +668,8 @@ sub exec
     return( $self );
 }
 
+sub executed { return( shift->_set_get_boolean( 'executed', @_ ) ); }
+
 sub exit_bit { return( shift->_set_get_scalar( 'exit_bit', @_ ) ); }
 
 sub exit_signal { return( shift->_set_get_scalar( 'exit_signal', @_ ) ); }
@@ -674,7 +694,6 @@ sub get_next_by_type
     }
     return if( !defined( $code ) );
     splice( @$h, 0, $pos + 1 );
-    # $self->messagef( 3, "After processing, there are %d handlers. Returning code '$code'.", scalar( @$h ) );
     return( $code );
 }
 
@@ -696,12 +715,13 @@ sub lock
     $self = shift( @_ ) if( scalar( @_ ) && Scalar::Util::blessed( $_[0] ) && $_[0]->isa( 'Promise::Me' ) );
     my $type;
     $type = pop( @_ ) if( !ref( $_[-1] ) );
+    my $prefix = '[' . ( $self->is_child ? 'child' : 'parent' ) . ']';
     foreach my $ref ( @_ )
     {
         my $tied = tied( $ref );
         if( defined( $self ) )
         {
-            $self->message( 4, "Checking if variable '$ref' is tied -> ", ( Scalar::Util::blessed( $tied ) ? 'Yes' : 'No' ) );
+            $self->message( 4, "${prefix} Checking if variable '$ref' is tied -> ", sub{ ( Scalar::Util::blessed( $tied ) ? 'Yes' : 'No' ) });
         }
         else
         {
@@ -723,7 +743,7 @@ sub pid { return( shift->_set_get_scalar( 'pid', @_ ) ); }
 sub race
 {
     my $this = shift( @_ );
-    return( $self->error( __PACKAGE__, "->race must be called as a class function such as: ", __PACKAGE__, "->race()" ) ) if( ref( $this ) || $this ne 'Promise::Me' );
+    return( __PACKAGE__->error( __PACKAGE__, "->race must be called as a class function such as: ", __PACKAGE__, "->race()" ) ) if( ref( $this ) || $this ne 'Promise::Me' );
     my $opts = {};
     $opts = pop( @_ ) if( ref( $_[-1] ) eq 'HASH' );
     $opts->{race} = 1;
@@ -737,9 +757,11 @@ sub reject
     $self->rejected(1);
     # Maybe there is no more reject handler, like when we are at the end of the chain.
     my $code = $self->get_next_reject_handler();
-    my @caller = caller;
-    $self->message( 4, "Got code '$code' for reject handler and called in file $caller[1] at line $caller[2]." );
-    return( $self ) if( !defined( $code ) );
+    if( !defined( $code ) )
+    {
+        $self->{_saved_values} = $vals;
+        return( $self );
+    }
     try
     {
         my @rv = $code->( @$vals );
@@ -748,19 +770,19 @@ sub reject
             Scalar::Util::blessed( $rv[0] ) && 
             $rv[0]->isa( 'Promise::Me' ) )
         {
-            $self->message( 4, "Calling reject handler returned a promise. Calling its resolve on it." );
+            # $self->message( 4, "${prefix} Calling reject handler returned a promise. Calling its resolve on it." );
             return( shift( @rv )->resolve( @rv ) );
         }
         # We call our next 'then' by resolving this with the arguments received
         elsif( scalar( @rv ) )
         {
-            $self->message( 4, "Calling reject handler returned ", scalar( @rv ), " values. Calling our resolve on it: ", sub{ $self->dump( \@rv ) } );
+            # $self->message( 4, "${prefix} Calling reject handler returned ", scalar( @rv ), " values. Calling our resolve on it: ", sub{ $self->dump( \@rv ) } );
             return( $self->resolve( @rv ) );
         }
         # Called in void
         else
         {
-            $self->message( 4, "Called in void context, returning our own object." );
+            # $self->message( 4, "${prefix} Called in void context, returning our own object." );
             return( $self );
         }
     }
@@ -768,12 +790,12 @@ sub reject
     {
         if( Scalar::Util::blessed( $e ) )
         {
-            $self->message( 4, "An error occurred while executing the reject handler. I received an object: $e" );
+            # $self->message( 4, "${prefix} An error occurred while executing the reject handler. I received an object: $e" );
             return( $self->reject( $e ) );
         }
         else
         {
-            $self->message( 4, "An error occurred while executing the reject handler. I received: $e" );
+            # $self->message( 4, "${prefix} An error occurred while executing the reject handler. I received: $e" );
             return( $self->reject( Promise::Me::Exception->new( $e ) ) );
         }
     }
@@ -785,53 +807,71 @@ sub resolve
 {
     my $self = shift( @_ );
     my $vals = [@_];
-    my @callinfo = caller;
-    $self->messagef( 3, "Found %d handlers. Called from $callinfo[0] in file $callinfo[1] at line $callinfo[2]", scalar( @{$self->{_handlers}} ) );
+    my $prefix = '[' . ( $self->is_child ? 'child' : 'parent' ) . ']';
+    if( $self->debug >= 3 )
+    {
+        my $trace = $self->_get_stack_trace;
+        # $self->messagef( 3, "${prefix} Found %d handlers. Trace: %s", scalar( @{$self->{_handlers}} ), $trace->as_string );
+    }
     # Maybe there is no more resolve handler, like when we are at the end of the chain.
     my $code = $self->get_next_resolve_handler();
-    $self->message( 4, "Using code: '$code' for resolve handler." );
-    # No more resolve handler. We are at the end of the chain. Mark this as resolved
+    {
+        no warnings;
+        # $self->message( 4, "${prefix} Using code: '$code' (possibly none) for resolve handler." );
+    }
+    # # No more resolve handler. We are at the end of the chain. Mark this as resolved
+    # No actually, marke this resolved right now, and if next iteration is a fail, 
+    # then it will be marked differently
+    $self->resolved(1);
     if( !defined( $code ) || !ref( $code ) )
     {
-        $self->resolved(1);
+        # $self->messagef( 4, "${prefix} Storing resulting values '%s'.", join( ',', @$vals ) );
+        $self->{_saved_values} = $vals;
         return( $self );
     }
+    
     try
     {
+        # $self->messagef( 4, "${prefix} Calling then with %d parameters; '%s'", scalar( @$vals ), join( "', '", @$vals ) );
         my @rv = $code->( @$vals );
+        # $self->message( 4, "${prefix} Saving result from then execution: '", join( "', '", @rv ), "'" );
+        $self->result( @rv );
         # The code returned another promise
         if( scalar( @rv ) && 
             Scalar::Util::blessed( $rv[0] ) && 
             $rv[0]->isa( 'Promise::Me' ) )
         {
-            $self->message( 4, "Code returned a promise, calling resolve on it." );
+            # $self->message( 4, "${prefix} Code returned a promise, calling resolve on it." );
             return( shift( @rv )->resolve( @rv ) );
         }
         # We call our next 'then' by resolving this with the arguments received
         elsif( scalar( @rv ) )
         {
-            $self->message( 4, "Code returned ", scalar( @rv ), " value(s), calling our resolve with it: [", sub{ join( ', ', map( overload::StrVal( $_ ), @rv ) ) }, "]" );
+            # $self->message( 4, "${prefix} Code returned ", scalar( @rv ), " value(s), calling our resolve with it: [", sub{ join( ', ', map( overload::StrVal( $_ ), @rv ) ) }, "]" );
             return( $self->resolve( @rv ) );
         }
         # Called in void
         else
         {
-            $self->message( 4, "Code was called in void, returning self." );
+            # $self->message( 4, "${prefix} Code was called in void, returning self." );
             return( $self );
         }
     }
     catch( $e )
     {
+        my $ex;
         if( Scalar::Util::blessed( $e ) )
         {
-            $self->message( 4, "An error occurred while executing the resolve handler. I received an object: $e" );
-            return( $self->reject( $e ) );
+            # $self->message( 4, "${prefix} An error occurred while executing the resolve handler. I received an object: $e" );
+            $ex = $e;
         }
         else
         {
-            $self->message( 4, "An error occurred while executing the resolve handler. I received: $e" );
-            return( $self->reject( Promise::Me::Exception->new( $e ) ) );
+            # $self->message( 4, "${prefix} An error occurred while executing the resolve handler. I received: $e" );
+            $ex = Promise::Me::Exception->new( $e );
         }
+        $self->result( $ex );
+        return( $self->reject( $ex ) );
     }
 }
 
@@ -849,21 +889,21 @@ sub result
         if( $shm )
         {
             my $hash = $shm->read;
-            $self->message( 4, "${prefix} Retrieved hash from shared memory '$hash' for 'result' with value '$val'." );
+            # $self->message( 4, "${prefix} Retrieved hash from shared memory '$hash' for 'result' with value '$val'." );
             $hash->{result} = $val;
-            $self->message( 4, "${prefix} Saving hash to shared memory with value: ", sub{ $self->dump( $hash ) });
+            # $self->message( 4, "${prefix} Saving hash to shared memory with value: ", sub{ $self->_is_object( $hash ) ? overload::StrVal( $hash ) : $self->dump( $hash ) });
             $shm->write( $hash );
         }
         else
         {
-            $self->message_colour( 4, "${prefix}  <red>Shared memory object not found.</>" );
+            # $self->message_colour( 4, "${prefix}  <red>Shared memory object not found.</>" );
             warnings::warn( "Shared space object not set or lost!\n" ) if( warnings::enabled() || $self->debug );
         }
     }
     else
     {
         my $hash = $shm->read;
-        $self->message( 4, "${prefix} Retrieved value of shared hash -> ", sub{ $self->dump( $hash ) });
+        # $self->message( 4, "${prefix} Retrieved value of shared hash -> ", sub{ $self->_is_object( $hash ) ? overload::StrVal( $hash ) : $self->dump( $hash ) });
         $self->{shared} = $hash;
         return( $hash->{result} );
     }
@@ -895,9 +935,11 @@ sub share
 
 sub share_auto_destroy { return( shift->_set_get_boolean( 'share_auto_destroy', @_ ) ); }
 
-sub shared_mem { return( shift->_set_get_object( 'shared_mem', 'Module::Generic::SharedMem', @_ ) ); }
+sub shared_mem { return( shift->_set_get_object_without_init( 'shared_mem', [qw( Module::Generic::SharedMem Module::Generic::File::Cache )], @_ ) ); }
 
-sub shared_mem_global { return( shift->_set_get_object( 'shared_mem_global', 'Module::Generic::SharedMem', @_ ) ); }
+sub shared_mem_global { return( shift->_set_get_object( 'shared_mem_global',[qw( Module::Generic::SharedMem Module::Generic::File::Cache )], @_ ) ); }
+
+sub shared_space_destroy { return( shift->_set_get_boolean( 'shared_space_destroy', @_ ) ); }
 
 sub shared_vars_mem_size { return( shift->_set_get_mem_size( 'shared_vars_mem_size', @_ ) ); }
 
@@ -913,11 +955,24 @@ sub then
         return( $self->error( "then() only accepts one or two code references. Value provided for reject was '$fail'." ) ) if( defined( $fail ) && ref( $fail ) ne 'CODE' );
         $self->add_resolve_handler( $pass );
         $self->add_reject_handler( $fail ) if( defined( $fail ) );
+        my $vals = $self->{_saved_values} || [];
+        # Now that we have a new handler, call resolve to process the saved values
+        if( $self->executed && scalar( @$vals ) )
+        {
+            if( $self->rejected )
+            {
+                return( $self->reject( @$vals ) );
+            }
+            else
+            {
+                return( $self->resolve( @$vals ) );
+            }
+        }
     }
     
     # Is there more chaining, or is this the end of the chain?
     # If the latter, we then start executing our codes
-    unless( Want::want( 'OBJECT' ) )
+    unless( Want::want( 'OBJECT' ) || $self->executed )
     {
         $self->no_more_chaining(1);
         $self->exec;
@@ -931,12 +986,13 @@ sub unlock
     $self = shift( @_ ) if( scalar( @_ ) && Scalar::Util::blessed( $_[0] ) && $_[0]->isa( 'Promise::Me' ) );
     my $type;
     $type = pop( @_ ) if( !ref( $_[-1] ) );
+    my $prefix = '[' . ( $self->is_child ? 'child' : 'parent' ) . ']';
     foreach my $ref ( @_ )
     {
         my $tied = tied( $ref );
         if( defined( $self ) )
         {
-            $self->message( 4, "Checking if variable '$ref' is tied -> ", ( Scalar::Util::blessed( $tied ) ? 'Yes' : 'No' ) );
+            $self->message( 4, "${prefix} Checking if variable '$ref' is tied -> ", sub{ ( Scalar::Util::blessed( $tied ) ? 'Yes' : 'No' ) });
         }
         else
         {
@@ -982,32 +1038,27 @@ sub wait
 {
     my $self = shift( @_ );
     my @callinfo = caller;
-    $self->message( 3, "Called from package $callinfo[0] in file $callinfo[1] at line $callinfo[2] on object with reference id ", Scalar::Util::refaddr( $self ), " and pid $$" );
     
     # $prom->wait(1)
     # $prom->wait(0)
     if( @_ )
     {
-#         $self->message( 3, "Setting wait value to '$_[0]'." );
         $self->_set_get_boolean( 'wait', @_ );
     }
     # In chaining, without argument, we set this implicitly to true
     # $prom->then(sub{})->wait->catch(sub{})
     elsif( Want::want( 'OBJECT' ) )
     {
-#         $self->message( 3, "Implicitly setting wait to true." );
         $self->_set_get_boolean( 'wait', 1 );
     }
     elsif( Want::want( 'VOID' ) || Want::want( 'SCALAR' ) )
     {
-#         $self->message( 3, "Implicitly setting wait to true." );
         $self->_set_get_boolean( 'wait', 1 );
         $self->no_more_chaining(1);
         $self->exec;
     }
     else
     {
-#         $self->message( 3, "Retrieving value for wait." );
         return( $self->_set_get_boolean( 'wait' ) );
     }
     return( $self );
@@ -1058,6 +1109,7 @@ sub _parse
             });
         }
     });
+    $sts ||= [];
     $self->messagef( 4, "Found %d statements containing an 'async' keyword.", scalar( @$sts ) );
     if( scalar( @$sts ) )
     {
@@ -1102,6 +1154,7 @@ sub _parse
         my( $top, $this ) = @_;
         return( $this->class eq 'PPI::Statement' && substr( $this->content, 0, 5 ) eq 'async' );
     });
+    $ref ||= [];
     return( $self->_error( "Failed to find any async subroutines: $@" ) ) if( !defined( $ref ) );
     $self->messagef( 4, "Found %d match(es)", scalar( @$ref ) );
     return if( !scalar( @$ref ) );
@@ -1231,21 +1284,19 @@ sub _reject_resolve
     my $self = shift( @_ );
     my $what = shift( @_ );
     my $shm = $self->shared_mem;
-    my $prefix = '[' . ( $self->is_child ? 'child' : 'parent' ) . ']';
     if( @_ )
     {
         my $val = shift( @_ );
         if( $shm )
         {
             my $hash = $shm->read;
-            # $self->message( 3, "${prefix} Retrieved hash from shared memory '$hash' for '$what' with value '$val'." );
+            $hash = {} if( ref( $hash ) ne 'HASH' );
             $hash->{ $what } = $val;
-            # $self->message( 3, "${prefix} Saving hash to shared memory with value: ", sub{ $self->dump( $hash ) });
-            $shm->write( $hash );
+            my $rv = $shm->write( $hash );
+            return( $self->error( "Unable to write data to shared space using object (", overload::StrVal( $shm ), ")" ) ) if( !defined( $rv ) );
         }
         else
         {
-            # $self->message_colour( 3, "${prefix}  <red>Shared memory object not found.</>" );
             warnings::warn( "Shared space object not set or lost!\n" ) if( warnings::enabled() );
         }
         $self->_set_get_boolean( $what, $val );
@@ -1253,7 +1304,7 @@ sub _reject_resolve
     else
     {
         my $hash = $shm->read;
-        # $self->message( 4, "${prefix} Retrieved value of shared hash -> ", sub{ $self->dump( $hash ) });
+        return( $hash ) unless( ref( $hash ) );
         $self->{shared} = $hash;
         return( $hash->{ $what } );
     }
@@ -1304,6 +1355,8 @@ sub _share_vars
     $opts    = pop( @_ ) if( scalar( @_ ) && ref( $_[-1] ) eq 'HASH' );
     # Nothing to do
     return if( !scalar( @$vars ) );
+    $opts->{use_cache_file} = ( $SHARE_MEDIUM eq 'file' );
+    $opts->{fallback} = $SHARE_FALLBACK if( !CORE::exists( $opts->{fallback} ) || !CORE::length( $opts->{fallback} ) );
     
     my( $shm, $data );
     # By process id
@@ -1334,19 +1387,46 @@ sub _share_vars
         my $p =
         {
         create  => 1,
-        destroy => 1,
+        # destroy => $SHARE_AUTO_DESTROY,
+        # Actually, we need to control when to remove the shared memory space, and
+        # this needs to happen when this module ends
+        destroy => 0,
         key     => $key,
         mode    => 0666,
+        storable => 1,
         };
         my $size = $SHARED_MEMORY_SIZE;
         $p->{size} = $size if( CORE::length( $size ) && int( $size ) > 0 );
-        my $s = Module::Generic::SharedMem->new( %$p ) || return( __PACKAGE__->error( "Unable to create shared memory object: ", Module::Generic::SharedMem->error ) );
-        $shm = $s->open ||
-            return( __PACKAGE__->error( "Unable to open shared memory object: ", $s->error ) );
-        $shm->attach;
+        if( Module::Generic::SharedMem->supported && !$opts->{use_cache_file} )
+        {
+            my $s = Module::Generic::SharedMem->new( %$p ) || return( __PACKAGE__->error( "Unable to create shared memory object: ", Module::Generic::SharedMem->error ) );
+            $shm = $s->open;
+            if( !$shm )
+            {
+                if( $opts->{fallback} )
+                {
+                    my $c = Module::Generic::File::Cache->new( %$p ) ||
+                        return( __PACKAGE__->error( "Unable to create a shared cache file or a shared memory: ", Module::Generic::File::Cache->error ) );
+                }
+                else
+                {
+                    return( __PACKAGE__->error( "Unable to open shared memory object: ", $s->error ) );
+                }
+            }
+            else
+            {
+                $shm->attach;
+            }
+        }
+        else
+        {
+            my $c = Module::Generic::File::Cache->new( %$p ) ||
+                return( __PACKAGE__->error( "Unable to create a shared cache file: ", Module::Generic::File::Cache->error ) );
+            $shm = $c->open || return( __PACKAGE__->error( "Unable to create a shared cache file: ", $c->error ) );
+        }
         $data = {};
     }
-    print( STDERR __PACKAGE__, "::_share_vars: Shared memory object is '$shm' and id is '", $shm->id, "'.\n" ) if( $DEBUG >= 4 );
+    print( STDERR __PACKAGE__, "::_share_vars: Shared object is '$shm' and id is '", $shm->id, "'.\n" ) if( $DEBUG >= 4 );
     
     printf( STDERR "%s::_share_vars: Processing %d variables.\n", __PACKAGE__, scalar( @$vars ) ) if( $DEBUG >= 4 );
     my @objects = ();
@@ -1401,18 +1481,19 @@ sub _share_vars
     return( scalar( @objects ) > 1 ? @objects : $objects[0] );
 }
 
+# Used to create a shared space for processes to share result
 sub _set_shared_space
 {
     my $self = shift( @_ );
     my $key  = $self->{shared_key} ||
         return( $self->error( "No shared key found!" ) );
-#     $self->message_colour( 4, "Setting shared memory space <green>$key</>. Am I the child process? ", $self->is_child ? 'Yes' : 'No' );
     my $p =
     {
         create  => 1,
         key     => $key,
         mode    => 0666,
         # debug   => $self->debug,
+        storable => 1,
     };
     my $size = $self->result_shared_mem_size;
     $p->{size} = $size if( CORE::length( $size ) && int( $size ) > 0 );
@@ -1423,15 +1504,23 @@ sub _set_shared_space
     {
         $p->{destroy_semaphore} = 0;
     }
+    
+    my $shm;
+    if( Module::Generic::SharedMem->supported && !$self->{use_cache_file} )
+    {
+        my $s = Module::Generic::SharedMem->new( %$p ) || return( $self->error( "Unable to create shared memory object: ", Module::Generic::SharedMem->error ) );
+        $shm = $s->open ||
+            return( $self->error( "Unable to open shared memory object: ", $s->error ) );
+        $shm->attach;
+    }
     else
     {
-        $p->{destroy} = 1;
+        my $s = Module::Generic::File::Cache->new( %$p ) || return( $self->error( "Unable to create shared cache file object: ", Module::Generic::File::Cache->error ) );
+        $shm = $s->open ||
+            return( $self->error( "Unable to open shared cache file object: ", $s->error ) );
     }
-    my $s = Module::Generic::SharedMem->new( %$p ) || return( $self->error( "Unable to create shared memory object: ", Module::Generic::SharedMem->error ) );
-    my $shm = $s->open ||
-        return( $self->error( "Unable to open shared memory object: ", $s->error ) );
-    $self->{shared_mem} = $shm;
-    $shm->attach;
+    $self->shared_mem( $shm );
+    
     if( $self->is_parent )
     {
         $shm->reset( {} );
@@ -1442,19 +1531,61 @@ sub _set_shared_space
 sub DESTROY
 {
     my $self = shift( @_ );
-};
-
-# XXX END
-END
-{
-    printf( STDERR "%s::END: %d tied objects.\n", __PACKAGE__, scalar( @TIED ) ) if( $DEBUG >= 4 );
-    foreach my $t ( @TIED )
+    my $child = $self->child;
+    my $status = $self->exit_status;
+    my $shm = $self->shared_mem;
+    my $destroy = $self->shared_space_destroy;
+    # If there is a child associated and it has exited and we still have a shared space 
+    # object, then remove that shared space
+    if( $destroy && $child && CORE::length( $status ) && $shm )
     {
-        print( STDERR __PACKAGE__, "::END: Object '$t' for variable '", $t->{value}, "'. Is it tied? ", ( tied( $t->{type} eq 'array' ? @{$t->{value}} : $t->{type} eq 'hash' ? %{$t->{value}} : ${$t->{value}} ) ? 'Yes' : 'No' ), "\n" ) if( $DEBUG >= 6 );
+        $shm->remove;
+        my $addr = Scalar::Util::refaddr( $self );
+        for( my $i = 0; $i < $#$OBJECTS_REPO; $i++ )
+        {
+            if( Scalar::Util::refaddr( $OBJECTS_REPO->[$i] ) eq $addr )
+            {
+                CORE::splice( @$OBJECTS_REPO, $i, 1 );
+                last;
+            }
+        }
     }
 };
 
-# XXX PPI::Element class, modifying PPI::Element::replace to be more permissive
+# NOTE: END
+END
+{
+    # Only the objects, which are initiated in the parent process are in here.
+    for( my $i = 0; $i < $#$OBJECTS_REPO; $i++ )
+    {
+        my $o = $OBJECTS_REPO->[$i];
+        # END block called by child process typically
+        my $pid = $o->pid;
+        next if( $pid ne $$ );
+        my $shm;
+        if( $o->shared_space_destroy && ( $shm = $o->shared_mem ) )
+        {
+            $shm->remove;
+        }
+        next if( !CORE::exists( $SHARED->{ $pid } ) );
+        my $rv = kill( $pid, 0 );
+        print( STDERR __PACKAGE__, "::END: [$$] Checking pid $pid -> ", ( $rv ? 'alive' : 'exited' ), "\n" ) if( $DEBUG >= 4 );
+        my $first = [keys( %{$SHARED->{ $pid }} )]->[0];
+        my $ref   = $SHARED->{ $pid }->{ $first };
+        my $type  = lc( ref( $ref ) );
+        my $tied  = tied( $type eq 'array' ? @$ref : $type eq 'hash' ? %$ref : $$ref );
+        unless( Scalar::Util::blessed( $tied ) && $tied->isa( 'Promise::Me::Share' ) )
+        {
+            next;
+        }
+        $shm = $tied->shared;
+        next if( !$shm );
+        $shm->remove;
+        CORE::delete( $SHARED->{ $pid } );
+    }
+};
+
+# NOTE: PPI::Element class, modifying PPI::Element::replace to be more permissive
 {
     package
         PPI::Element;
@@ -1472,7 +1603,7 @@ END
     }
 }
 
-# XXX Promise::Me::Exception
+# NOTE: Promise::Me::Exception
 package
     Promise::Me::Exception;
 BEGIN
@@ -1483,7 +1614,7 @@ BEGIN
     our $VERSION = 'v0.1.0';
 };
 
-# XXX Promise::Me::Share class
+# NOTE: Promise::Me::Share class
 package
     Promise::Me::Share;
 BEGIN
@@ -1492,6 +1623,7 @@ BEGIN
     use warnings;
     use warnings::register;
     use parent qw( Module::Generic );
+    use vars qw( $DEBUG $VERSION );
     use Module::Generic::SharedMem qw( :all );
     use constant SHMEM_SIZE => 65536;
     our $DEBUG = $Promise::Me::DEBUG;
@@ -1503,7 +1635,6 @@ sub TIEARRAY
     my $class = shift( @_ );
     my $opts  = $class->_get_args_as_hash( @_ );
     $opts->{type} = 'array';
-    # XXX For debugging only. To remove
     my $self = $class->_tie( $opts ) || do
     {
         print( STDERR __PACKAGE__, "::TIEARRAY: Failed to create object with given options.\n" ) if( $DEBUG );
@@ -1518,7 +1649,6 @@ sub TIEHASH
     my $class = shift( @_ );
     my $opts  = $class->_get_args_as_hash( @_ );
     $opts->{type} = 'hash';
-    # XXX For debugging only. To remove
     my $self = $class->_tie( $opts ) || do
     {
         print( STDERR __PACKAGE__, "::TIEHASH: Failed to create object with given options.\n" ) if( $DEBUG );
@@ -1533,7 +1663,6 @@ sub TIESCALAR
     my $class = shift( @_ );
     my $opts  = $class->_get_args_as_hash( @_ );
     $opts->{type} = 'scalar';
-    # XXX For debugging only. To remove
     my $self = $class->_tie( $opts ) || do
     {
         print( STDERR __PACKAGE__, "::TIESCALAR: Failed to create object with given options.\n" ) if( $DEBUG );
@@ -2043,7 +2172,7 @@ sub DESTROY
 };
 
 1;
-
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -2077,7 +2206,7 @@ Promise::Me - Fork Based Promise with Asynchronous Execution, Async, Await and S
         # A last then may be added after finally
     };
 
-    # You can share data among processes for those systems that support IPC::SysV
+    # You can share data among processes for all systems, including Windows
     my $data : shared = {};
     my( $name, %attributes, @options );
     share( $name, %attributes, @options );
@@ -2157,11 +2286,11 @@ Promise::Me - Fork Based Promise with Asynchronous Execution, Async, Await and S
 
 =head1 VERSION
 
-    v0.1.2
+    v0.2.0
 
 =head1 DESCRIPTION
 
-L<Promise::Me> is an implementation of the JavaScript promise using fork for asynchronous tasks. Fork is great, because it is well supported by all operating systems and effectively allows for asynchronous execution.
+L<Promise::Me> is an implementation of the JavaScript promise using fork for asynchronous tasks. Fork is great, because it is well supported by all operating systems (L<except AmigaOS, RISC OS and VMS|perlport>) and effectively allows for asynchronous execution.
 
 While JavaScript has asynchronous execution at its core, which means that two consecutive lines of code will execute simultaneously, under perl, those two lines would be executed one after the other. For example:
 
@@ -2203,7 +2332,7 @@ And then, they came up with L<Promise|https://developer.mozilla.org/en-US/docs/W
 
 [2] Taken from L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise>
 
-Chaining is easy to implement in perl and L<Promise::Me> does it too. Where it gets more tricky is returning a promise immediately without waiting for further execution, i.e. a deferred promise, like so:
+Chaining is easy to implement in perl and L<Promise::Me> does it too. Where it gets more tricky is returning a promise immediately without waiting for further execution, i.e. a deferred promise, like the following in JavaScript:
 
     function getRemote(url)
     {
@@ -2300,6 +2429,14 @@ Sets the shared memory segment to store the asynchronous process results. This d
 =item I<timeout> integer
 
 Currently unused.
+
+=item I<use_cache_file>
+
+Boolean. If true, L<Promise::Me> will use a cache file instead of shared memory block. If you are on system that do not support shared memory, L<Promise::Me> will automatically revert to L<Module::Generic::File::Cache> to handle data shared among processes.
+
+You can use the global package variable C<$SHARE_MEDIUM> to set the default value for all object instantiation.
+
+C<$SHARE_MEDIUM> value can be either C<memory> for shared memory or C<file> for shared cache file.
 
 =back
 
@@ -2495,6 +2632,8 @@ Currently supported variable types are: array, hash and scalar (string) referenc
         $dbh->disconnect;
     });
 
+It will try to use shared memory or shared cache file depending on the value of the global package variable C<$SHARE_MEDIUM>
+
 =head2 unlock
 
 This unlocks a shared variable. It has no effect on variable that have not already been shared.
@@ -2601,6 +2740,10 @@ This is true by default. If you want to set it to false, you can do:
 
 This returns the L<Module::Generic::SharedMem> object used for sharing data and result between the main parent process and the asynchronous child process.
 
+=head2 shared_space_destroy
+
+Boolean. Default to true. If true, the shared space used by the parent and child processes will be destroy automatically. Disable this if you want to debug or take a sneak peek into the data. The shared space will be either shared memory of cache file depending on the value of C<$SHARE_MEDIUM>
+
 =head2 use_async
 
 This is a boolean value which is set automatically when a promise is instantiated from L</async>.
@@ -2701,7 +2844,7 @@ Otherwise the two keywords would conflict.
 
 =head1 SHARED MEMORY
 
-This module uses shared memory using perl core functions.
+This module uses shared memory using perl core functions, or shared cache file using L<Module::Generic::File::Cache> if shared memory is not supported, or if the value of the global package variable C<$SHARE_MEDIUM> is set to C<file> instead of C<memory>
 
 Shared memory is used for:
 
@@ -2720,6 +2863,8 @@ You can control how much shared memory is allocated for each by:
 =item 1. setting the global variable C<$SHARED_MEMORY_SIZE>, which default to 64K bytes.
 
 =item 2. setting the option I<result_shared_mem_size> when instantiating a new C<Promise::Me> object. If not set, this will default to L<Module::Generic::SharedMem::SHM_BUFSIZ> constant value which is 64K bytes.
+
+If you use L<shared cache file|Module::Generic::File::Cache>, then not setting a size is ok. It will use the space on the filesystem as needed and obviously return an error if there is no space left.
 
 =back
 
@@ -2768,5 +2913,9 @@ L<Mozilla documentation on promises|https://developer.mozilla.org/en-US/docs/Web
 =head1 COPYRIGHT & LICENSE
 
 Copyright(c) 2021-2022 DEGUEST Pte. Ltd. DEGUEST Pte. Ltd.
+
+All rights reserved
+
+This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 
 =cut

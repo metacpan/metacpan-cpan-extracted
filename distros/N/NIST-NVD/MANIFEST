@@ -16,7 +16,7 @@ t/query.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
-t/data/nvdcve-2.0-test.xml
+t/data/nvdcve-1.1-test.json.gz
 t/data/cwec_v2.1.xml
 t/critic.t
 t/perlcriticrc

@@ -16,12 +16,353 @@ var h = Hash(
     prime_power_udivisors => 'prime_power_usigma',
     square_udivisors => 'square_usigma',
     squarefree_udivisors => 'squarefree_usigma',
+
+    edivisors => 'esigma',
+    idivisors => 'isigma',
+    bdivisors => 'bsigma',
 )
 
 for k in (0..5) {
     h.each {|a,b|
         assert_eq(n.(a).sum {|d| d**k }, n.(b)(k), "#{a} != #{b} for n=#{n} and k=#{k}")
+        assert_eq(n.(a).len, n.(b+'0'), "#{a}.len != #{b+'0'} for n=#{n}")
     }
+}
+
+var h2 = Hash(
+    power_divisors => 'power_sigma',
+    power_udivisors => 'power_usigma',
+
+    powerfree_divisors => 'powerfree_sigma',
+    powerfree_udivisors => 'powerfree_usigma',
+)
+
+for k in (0..5), j in (0..5) {
+    h2.each {|a,b|
+        assert_eq(k.(a)(n).sum {|d| d**j }, k.(b)(n,j), "#{a} != #{b} for n=#{n}, k=#{k}, j=#{j}")
+        assert_eq(k.(a)(n).len, k.(b+'0')(n), "#{a}.len != #{b+'0'} for n=#{n}, k=#{k}")
+    }
+}
+
+with (irand(5, 10)!) {|n|
+    var D = n.divisors
+    assert_eq(n.perfect_power_divisors,    D.grep{.is_power})
+    assert_eq(1.power_divisors(n), D.grep{.is_power(1)})
+    assert_eq(2.power_divisors(n), D.grep{.is_power(2)})
+    assert_eq(3.power_divisors(n), D.grep{.is_power(3)})
+    assert_eq(4.power_divisors(n), D.grep{.is_power(4)})
+    assert_eq(5.power_divisors(n), D.grep{.is_power(5)})
+    assert_eq(9.power_divisors(n), D.grep{.is_power(9)})
+}
+
+with (irand(10, 21)!) {|n|
+    var D = n.udivisors
+    assert_eq(n.pp_udivisors,       D.grep{.is_power})
+    assert_eq(1.power_udivisors(n), D.grep{.is_power(1)})
+    assert_eq(2.power_udivisors(n), D.grep{.is_power(2)})
+    assert_eq(3.power_udivisors(n), D.grep{.is_power(3)})
+    assert_eq(4.power_udivisors(n), D.grep{.is_power(4)})
+    assert_eq(5.power_udivisors(n), D.grep{.is_power(5)})
+    assert_eq(9.power_udivisors(n), D.grep{.is_power(9)})
+}
+
+with (irand(10, 21)!) {|n|
+    var D = n.udivisors
+    assert_eq(1.powerfree_udivisors(n), D.grep{.is_powerfree(1)})
+    assert_eq(2.powerfree_udivisors(n), D.grep{.is_powerfree(2)})
+    assert_eq(3.powerfree_udivisors(n), D.grep{.is_powerfree(3)})
+    assert_eq(4.powerfree_udivisors(n), D.grep{.is_powerfree(4)})
+    assert_eq(5.powerfree_udivisors(n), D.grep{.is_powerfree(5)})
+    assert_eq(6.powerfree_udivisors(n), D.grep{.is_powerfree(6)})
+    assert_eq(7.powerfree_udivisors(n), D.grep{.is_powerfree(7)})
+}
+
+for n in (0..50) {
+    var D1 = n.divisors
+    var D2 = n.udivisors
+
+    assert_eq(n.pp_divisors,       D1.grep { .is_power })
+    assert_eq(1.power_divisors(n), D1.grep { .is_power(1) })
+    assert_eq(2.power_divisors(n), D1.grep { .is_power(2) })
+    assert_eq(3.power_divisors(n), D1.grep { .is_power(3) })
+
+    assert_eq(n.pp_udivisors,       D2.grep { .is_power })
+    assert_eq(1.power_udivisors(n), D2.grep { .is_power(1) })
+    assert_eq(2.power_udivisors(n), D2.grep { .is_power(2) })
+    assert_eq(3.power_udivisors(n), D2.grep { .is_power(3) })
+
+    assert_eq(0.powerfree_udivisors(n), D2.grep { .is_powerfree(0) })
+    assert_eq(1.powerfree_udivisors(n), D2.grep { .is_powerfree(1) })
+    assert_eq(2.powerfree_udivisors(n), D2.grep { .is_powerfree(2) })
+    assert_eq(3.powerfree_udivisors(n), D2.grep { .is_powerfree(3) })
+    assert_eq(4.powerfree_udivisors(n), D2.grep { .is_powerfree(4) })
+    assert_eq(5.powerfree_udivisors(n), D2.grep { .is_powerfree(5) })
+}
+
+assert_eq(5040.sigma(-1), 5040.divisors.sum {|d| d**(-1) })
+assert_eq( 10!.sigma(-2),  10!.divisors.sum {|d| d**(-2) })
+
+do {
+
+    var n = 5040
+    var D = n.divisors
+
+    for k in (0..4) {
+        assert_eq(k.powerfree_divisors(n), D.grep{ .is_powerfree(k) })
+    }
+}
+
+do {    # bi-unitary divisors
+    func biudivs(n) {
+        #return n.bdivisors
+        n.divisors.grep {|x| gcud(x,n/x) == 1 }
+    }
+
+    func a(n,k=1) {
+        biudivs(n).sum { _**k }
+    }
+
+    func g(n, k=1) {
+
+        return 0 if (n == 0)
+
+        n.factor_prod {|p,e|
+            (p**(k*(e + 1)) - 1)/(p**k - 1) - (e.is_even ? p**(k*(e/2)) : 0)
+        }
+    }
+
+    assert_eq(
+        30.of { bsigma(_, 1) },
+        30.of { g(_) }
+    )
+
+    assert_eq(
+        30.of { bsigma(_, 2) },
+        30.of { g(_, 2) }
+    )
+
+    assert_eq(
+        30.of { bsigma(_, 3) },
+        30.of { g(_, 3) }
+    )
+
+    assert_eq(
+        30.of { .bsigma },
+        30.of { a(_) },
+    )
+
+    assert_eq(
+        30.of { .bsigma(2) },
+        30.of { a(_, 2) },
+    )
+
+    assert_eq(
+        30.of { .bsigma(3) },
+        30.of { a(_, 3) },
+    )
+
+    assert_eq(
+        30.of  { a(_, 0) }
+        30.of  { .bsigma(0) }
+    )
+
+    assert_eq(
+        30.of  { .divisors - biudivs(_) -> sum }
+        30.of  { .nbsigma }
+    )
+
+    assert_eq(
+        30.of  { .divisors - biudivs(_) -> sum { _**2 } }
+        30.of  { .nbsigma(2) }
+    )
+
+    assert_eq(
+        30.of  { .divisors - biudivs(_) -> len }
+        30.of  { .nbsigma0 }
+    )
+}
+
+do {    # non-unitary divisors
+    assert_eq(
+        30.of { .nusigma },
+        30.of {|n| n.divisors.grep {|d| gcd(d, n/d) != 1 }.sum }
+    )
+
+    assert_eq(
+        10.of { .nusigma(0) },
+        10.of { .nusigma0 },
+    )
+
+    assert_eq(
+        30.of { .nusigma(0) },
+        30.of {|n| n.divisors.count {|d| gcd(d, n/d) != 1 } }
+    )
+}
+
+do {    # infinitary divisors
+
+    func a(n, k=1) {
+
+        return 0 if (n == 0)
+
+        n.factor_prod {|p,e|
+
+            #~ e.digits(2).map_kv {|r,v|
+                #~ (p**(2**r * (v+1) * k) - 1) / (p**(k * 2**r) - 1)
+            #~ }.prod
+
+            var prod = 1
+            var r = 0
+
+            do {
+                if (e%2 == 1) {
+                    #prod *= ((p**(2**(r+1) * k) - 1) / (p**(k * 2**r) - 1))
+                    prod *= (p**(k * 2**r) + 1)
+                }
+                ++r
+            } while (e >>= 1)
+
+            prod
+        }
+    }
+
+    assert_eq(
+        30.of { a(_+1) },
+        30.of { idivisors(_+1).sum }
+    )
+
+    assert_eq(
+        30.of { a(_+1, 2) },
+        30.of { idivisors(_+1).sum { _**2 } }
+    )
+
+    assert_eq(
+        30.of { a(_+1, 3) },
+        30.of { idivisors(_+1).sum { _**3 } }
+    )
+
+    assert_eq(
+        30.of { .isigma0 },
+        30.of { idivisors(_).len }
+    )
+
+    assert_eq(
+        30.of { .isigma },
+        30.of { a(_) },
+    )
+
+    assert_eq(
+        30.of { .isigma(2) },
+        30.of { a(_, 2) },
+    )
+
+    assert_eq(
+        30.of { .isigma(3) },
+        30.of { a(_, 3) },
+    )
+
+    assert_eq(
+        30.of { divisors(_) - idivisors(_) -> sum },
+        30.of { .nisigma },
+    )
+
+    assert_eq(
+        30.of { divisors(_) - idivisors(_) -> len },
+        30.of { .nisigma0 },
+    )
+
+    assert_eq(
+        30.of { divisors(_) - idivisors(_) -> sum { _**2 } },
+        30.of { .nisigma(2) },
+    )
+}
+
+do {    # A051377: exponential divisors
+
+    func ediv(n) {
+
+        #return n.edivisors
+        return [1] if (n == 1)
+
+        var f = n.factor_exp
+        var D = f.map{.tail.divisors}
+
+        var L = []
+
+        D.map {|d| @(^d.len) }.cartesian {|*a|
+            L << f.prod_kv {|j,pp|
+                pp[0]**D[j][a[j]]
+            }
+        }
+
+        L
+    }
+
+    func f(n, k=1) {
+
+        return 0 if (n == 0)
+
+        # Multiplicative with:
+        #   a(p^e) = Sum_{d|e} p^d
+
+        n.factor_map {|p,e|
+            e.divisors.sum {|d| p**(k*d) }
+        }.prod
+    }
+
+    assert_eq(ediv(7!).sum, f(7!))
+    assert_eq(ediv(8!).sum { _**2 }, f(8!, 2))
+    assert_eq(ediv(9!).sum { _**3 }, f(9!, 3))
+
+    assert_eq(
+        30.of { ediv(_).sum },
+        30.of { .esigma(1) }
+    )
+
+    assert_eq(
+        30.of { ediv(_).sum { _**3 } },
+        30.of { .esigma(3) }
+    )
+
+    assert_eq(
+        30.of { ediv(_).len },
+        30.of { .esigma(0) }
+    )
+
+    assert_eq(
+        30.of { ediv(_).len },
+        30.of { .esigma0 }
+    )
+
+    assert_eq(
+        30.of { f(_) },
+        30.of { .esigma }
+    )
+
+    assert_eq(
+        30.of { f(_, 2) },
+        30.of { .esigma(2) },
+    )
+
+    assert_eq(
+        30.of { f(_, 3) },
+        30.of { .esigma(3) },
+    )
+
+    assert_eq(
+        30.of { divisors(_) - ediv(_) -> sum },
+        30.of { .nesigma },
+    )
+
+    assert_eq(
+        30.of { divisors(_) - ediv(_) -> sum { _**2 } },
+        30.of { .nesigma(2) },
+    )
+
+    assert_eq(
+        30.of { divisors(_) - ediv(_) -> len },
+        30.of { .nesigma0 },
+    )
 }
 
 say "** Test passed!"

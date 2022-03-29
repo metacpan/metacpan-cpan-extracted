@@ -17,8 +17,8 @@ var obj = GetOpt(...)
 
 =head2 new
 
-GetOpt.new() -> I<Obj>
+    GetOpt.new()
 
-Return the
+Returns the
 
 =cut

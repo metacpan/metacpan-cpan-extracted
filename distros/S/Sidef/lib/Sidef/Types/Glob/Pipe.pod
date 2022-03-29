@@ -24,17 +24,17 @@ Inherits methods from:
 
 =head2 command
 
-Pipe.command() -> I<Obj>
+    Pipe.command()
 
-Return the
+Returns the
 
 =cut
 
 =head2 new
 
-Pipe.new() -> I<Obj>
+    Pipe.new()
 
-Return the
+Returns the
 
 Aliases: I<call>
 
@@ -42,17 +42,17 @@ Aliases: I<call>
 
 =head2 open
 
-Pipe.open() -> I<Obj>
+    Pipe.open()
 
-Return the
+Returns the
 
 =cut
 
 =head2 open_r
 
-Pipe.open_r() -> I<Obj>
+    Pipe.open_r()
 
-Return the
+Returns the
 
 Aliases: I<open_read>
 
@@ -60,9 +60,9 @@ Aliases: I<open_read>
 
 =head2 open_w
 
-Pipe.open_w() -> I<Obj>
+    Pipe.open_w()
 
-Return the
+Returns the
 
 Aliases: I<open_write>
 
@@ -70,9 +70,9 @@ Aliases: I<open_write>
 
 =head2 to_s
 
-Pipe.to_s() -> I<Obj>
+    Pipe.to_s()
 
-Return the
+Returns the
 
 Aliases: I<dump>, I<to_str>
 

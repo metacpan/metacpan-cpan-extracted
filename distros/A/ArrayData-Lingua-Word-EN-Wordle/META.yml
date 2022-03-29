@@ -19,10 +19,10 @@ name: ArrayData-Lingua-Word-EN-Wordle
 provides:
   ArrayData::Lingua::Word::EN::Wordle:
     file: lib/ArrayData/Lingua/Word/EN/Wordle.pm
-    version: v20220306.0.0
+    version: v20220306.0.1
 requires:
   ArrayDataRole::BinarySearch::LinesInHandle: '0'
-  ArrayDataRole::Source::LinesInDATA: '0'
+  ArrayDataRole::Source::LinesInDATA: '0.006'
   Role::Tiny::With: '0'
   Role::TinyCommons::Collection::FindItem::Iterator: '0.007'
   Role::TinyCommons::Collection::PickItems::RandomSeekLines: '0'
@@ -31,7 +31,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=ArrayData-Lingua-Word-EN-Wordle
   homepage: https://metacpan.org/release/ArrayData-Lingua-Word-EN-Wordle
   repository: git://github.com/perlancar/perl-ArrayData-Lingua-Word-EN-Wordle.git
-version: 20220306.0.0
+version: 20220306.0.1
 x_Dist_Zilla:
   perl:
     version: '5.034000'

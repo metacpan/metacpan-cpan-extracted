@@ -23,141 +23,395 @@ Inherits methods from:
 
 =head1 METHODS
 
+=head2 Π
+
+    RangeNumber.Π()
+
+Returns the
+
+Aliases: I<prod>
+
+=cut
+
+=head2 Σ
+
+    RangeNumber.Σ()
+
+Returns the
+
+Aliases: I<sum>
+
+=cut
+
+=head2 almost_prime_count
+
+    RangeNumber.almost_prime_count()
+
+Returns the
+
+=cut
+
+=head2 almost_primes
+
+    RangeNumber.almost_primes()
+
+Returns the
+
+=cut
+
 =head2 avg
 
-RangeNumber.avg() -> I<Obj>
+    RangeNumber.avg()
 
-Return the
+Returns the
 
 =cut
 
 =head2 avg_by
 
-RangeNumber.avg_by() -> I<Obj>
+    RangeNumber.avg_by()
 
-Return the
+Returns the
 
 =cut
 
 =head2 bsearch
 
-RangeNumber.bsearch() -> I<Obj>
+    RangeNumber.bsearch()
 
-Return the
+Returns the
 
 =cut
 
 =head2 bsearch_ge
 
-RangeNumber.bsearch_ge() -> I<Obj>
+    RangeNumber.bsearch_ge()
 
-Return the
+Returns the
 
 =cut
 
 =head2 bsearch_le
 
-RangeNumber.bsearch_le() -> I<Obj>
+    RangeNumber.bsearch_le()
 
-Return the
+Returns the
+
+=cut
+
+=head2 composite_count
+
+    RangeNumber.composite_count()
+
+Returns the
+
+=cut
+
+=head2 composites
+
+    RangeNumber.composites()
+
+Returns the
+
+=cut
+
+=head2 each_almost_prime
+
+    RangeNumber.each_almost_prime()
+
+Returns the
+
+=cut
+
+=head2 each_composite
+
+    RangeNumber.each_composite()
+
+Returns the
+
+=cut
+
+=head2 each_omega_prime
+
+    RangeNumber.each_omega_prime()
+
+Returns the
+
+=cut
+
+=head2 each_powerful
+
+    RangeNumber.each_powerful()
+
+Returns the
+
+=cut
+
+=head2 each_prime
+
+    RangeNumber.each_prime()
+
+Returns the
+
+=cut
+
+=head2 each_semiprime
+
+    RangeNumber.each_semiprime()
+
+Returns the
+
+=cut
+
+=head2 each_squarefree
+
+    RangeNumber.each_squarefree()
+
+Returns the
+
+=cut
+
+=head2 each_squarefree_almost_prime
+
+    RangeNumber.each_squarefree_almost_prime()
+
+Returns the
+
+=cut
+
+=head2 faulhaber
+
+    RangeNumber.faulhaber()
+
+Returns the
+
+Aliases: I<faulhaber_sum>
 
 =cut
 
 =head2 gcd
 
-RangeNumber.gcd() -> I<Obj>
+    RangeNumber.gcd()
 
-Return the
+Returns the
 
 =cut
 
 =head2 gcd_by
 
-RangeNumber.gcd_by() -> I<Obj>
+    RangeNumber.gcd_by()
 
-Return the
+Returns the
 
 =cut
 
 =head2 iter
 
-RangeNumber.iter() -> I<Obj>
+    RangeNumber.iter()
 
-Return the
+Returns the
 
 =cut
 
 =head2 lcm
 
-RangeNumber.lcm() -> I<Obj>
+    RangeNumber.lcm()
 
-Return the
+Returns the
 
 =cut
 
 =head2 lcm_by
 
-RangeNumber.lcm_by() -> I<Obj>
+    RangeNumber.lcm_by()
 
-Return the
+Returns the
+
+=cut
+
+=head2 mertens
+
+    RangeNumber.mertens()
+
+Returns the
 
 =cut
 
 =head2 new
 
-RangeNumber.new() -> I<Obj>
+    RangeNumber.new()
 
-Return the
+Returns the
 
 Aliases: I<call>
 
 =cut
 
-=head2 primes
+=head2 omega_prime_count
 
-RangeNumber.primes() -> I<Obj>
+    RangeNumber.omega_prime_count()
 
-Return the
+Returns the
 
 =cut
 
-=head2 prod
+=head2 omega_primes
 
-RangeNumber.prod() -> I<Obj>
+    RangeNumber.omega_primes()
 
-Return the
+Returns the
+
+=cut
+
+=head2 powerfree_count
+
+    RangeNumber.powerfree_count()
+
+Returns the
+
+=cut
+
+=head2 powerfree_sum
+
+    RangeNumber.powerfree_sum()
+
+Returns the
+
+=cut
+
+=head2 powerful
+
+    RangeNumber.powerful()
+
+Returns the
+
+=cut
+
+=head2 powerful_count
+
+    RangeNumber.powerful_count()
+
+Returns the
+
+=cut
+
+=head2 prime_count
+
+    RangeNumber.prime_count()
+
+Returns the
+
+=cut
+
+=head2 primes
+
+    RangeNumber.primes()
+
+Returns the
+
+=cut
+
+=head2 prime_sum
+
+    RangeNumber.prime_sum()
+
+Returns the
 
 =cut
 
 =head2 prod_by
 
-RangeNumber.prod_by() -> I<Obj>
+    RangeNumber.prod_by()
 
-Return the
+Returns the
 
 =cut
 
-=head2 sum
+=head2 rough_count
 
-RangeNumber.sum() -> I<Obj>
+    RangeNumber.rough_count()
 
-Return the
+Returns the
+
+=cut
+
+=head2 semiprime_count
+
+    RangeNumber.semiprime_count()
+
+Returns the
+
+=cut
+
+=head2 semiprimes
+
+    RangeNumber.semiprimes()
+
+Returns the
+
+=cut
+
+=head2 smooth_count
+
+    RangeNumber.smooth_count()
+
+Returns the
+
+=cut
+
+=head2 squarefree
+
+    RangeNumber.squarefree()
+
+Returns the
+
+=cut
+
+=head2 squarefree_almost_prime_count
+
+    RangeNumber.squarefree_almost_prime_count()
+
+Returns the
+
+=cut
+
+=head2 squarefree_almost_primes
+
+    RangeNumber.squarefree_almost_primes()
+
+Returns the
+
+=cut
+
+=head2 squarefree_count
+
+    RangeNumber.squarefree_count()
+
+Returns the
+
+=cut
+
+=head2 squarefree_sum
+
+    RangeNumber.squarefree_sum()
+
+Returns the
 
 =cut
 
 =head2 sum_by
 
-RangeNumber.sum_by() -> I<Obj>
+    RangeNumber.sum_by()
 
-Return the
+Returns the
 
 =cut
 
 =head2 to_s
 
-RangeNumber.to_s() -> I<Obj>
+    RangeNumber.to_s()
 
-Return the
+Returns the
 
 Aliases: I<dump>, I<to_str>
 

@@ -10,7 +10,6 @@ use Test::Log::Log4perl;
 use Config::Model qw/cme/;
 use Config::Model::Tester::Setup qw/init_test setup_test_dir/;
 
-$::_use_log4perl_to_warn =1;
 
 my ($model, $trace) = init_test();
 

@@ -12,6 +12,11 @@ plan skip_all => 'TEST_LIVE=1' unless $ENV{TEST_LIVE};
 my $app    = curfile->dirname->child('myapp.pl');
 my $listen = Mojo::URL->new(sprintf 'http://127.0.0.1:%s', Mojo::IOLoop::Server->generate_port);
 
+subtest reload => sub {
+  my $dctl = Mojo::Server::DaemonControl->new;
+  is int($dctl->reload($app)), 3, 'not running';
+};
+
 subtest 'hot deploy workers' => sub {
   my $dctl = Mojo::Server::DaemonControl->new(
     graceful_timeout   => 2,
@@ -21,11 +26,14 @@ subtest 'hot deploy workers' => sub {
     workers            => 2,
   );
 
-  my ($reloaded, %workers) = (0);
+  my ($reloaded, $running, %workers) = (0);
   $dctl->on(
     heartbeat => sub {
       my ($dctl, $w) = @_;
       $workers{$w->{pid}} = $w;
+
+      # Cannot have two running managers
+      $running //= $dctl->run($app);
 
       # Only do this once
       state $ua_pid = run_slow_request_in_fork();
@@ -37,8 +45,9 @@ subtest 'hot deploy workers' => sub {
 
   $dctl->on(reap => sub { $workers{$_[1]->{pid}}{reaped} = time });
 
-  $dctl->run($app);
-  is int(values %workers), 4, 'started';
+  is int($dctl->run($app)), 0,  'run';
+  is int($running),         16, 'already running';
+  is int(values %workers),  4,  'started';
   my ($forced) = grep { $_->{KILL} } values %workers;
   my ($normal) = grep { $_->{QUIT} and !$_->{KILL} } values %workers;
   is $normal->{graceful}, $forced->{graceful}, 'stopped at the same time';
@@ -52,7 +61,7 @@ done_testing;
 sub run_slow_request_in_fork {
   return if fork;
   my $ua = Mojo::UserAgent->new;
-  $ua->ioloop->timer(0.1 => sub { Mojo::Server::DaemonControl->new->run($app) });
+  $ua->ioloop->timer(0.1 => sub { Mojo::Server::DaemonControl->new->reload($app) });
   $ua->get($listen->clone->path('/block'));
   exit 0;
 }

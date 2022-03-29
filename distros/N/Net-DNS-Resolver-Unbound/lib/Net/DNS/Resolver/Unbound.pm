@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 our $VERSION;
-$VERSION = '1.10';
+$VERSION = '1.11';
 
 use Carp;
 use Net::DNS;
@@ -431,7 +431,7 @@ sub _finalise_config {
 
 	for ( grep { $self->{$_} } qw(prefer_v4 prefer_v6 force_v4 force_v6) ) {
 		my $argref = $IP_conf{$_};
-		$self->option(@$argref);
+		eval { $self->option(@$argref) };		# unimplemented in old versions
 	}
 
 	my $count = 3;

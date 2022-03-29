@@ -30,18 +30,18 @@ my $convert_script
 
 ok( -f $convert_script, '$convert_script is a file' );
 
-(my $source_file) = ( File::Spec->catfile( $data_dir, 'nvdcve-2.0-test.xml' )
-        =~ m:^(.*?.nvdcve-2.0-test.xml)$: );
+(my $source_file) = ( File::Spec->catfile( $data_dir, 'nvdcve-1.1-test.json.gz' )
+        =~ m:^(.*?.nvdcve-1.1-test.json.gz)$: );
 
 ok( -f $source_file, '$source_file is a file' ) or diag $source_file;
 
-my $db_file = File::Spec->catfile( $data_dir, 'nvdcve-2.0.db' );
+my $db_file = File::Spec->catfile( $data_dir, 'nvdcve-1.1.db' );
 
 unlink($db_file) if -f $db_file;
 
 ok( !-e $db_file, '$db_file does not yet exist' );
 
-my $cpe_idx_file = File::Spec->catfile( $data_dir, 'nvdcve-2.0.idx_cpe.db' );
+my $cpe_idx_file = File::Spec->catfile( $data_dir, 'nvdcve-1.1.idx_cpe.db' );
 
 unlink($cpe_idx_file) if -f $cpe_idx_file;
 
@@ -51,7 +51,8 @@ undef $ENV{PATH};
 undef $ENV{ENV};
 undef $ENV{CDPATH};
 
-$ENV{PERL5LIB} = File::Spec->catfile( $dist_dir, 'blib', 'lib' );
+
+$ENV{PERL5LIB} = "$ENV{PERL5LIB}:" . File::Spec->catfile( $dist_dir, 'blib', 'lib' );
 
 chdir($data_dir);
 

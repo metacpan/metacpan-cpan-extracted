@@ -12,7 +12,7 @@ use Mojo::Util qw(steady_time);
 use POSIX qw(WNOHANG);
 use Scalar::Util qw(weaken);
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 # This should be considered internal for now
 our $MOJODCTL = do {
@@ -21,13 +21,13 @@ our $MOJODCTL = do {
   -x $x ? $x : 'mojodctl';
 };
 
-has graceful_timeout   => 120;
-has heartbeat_interval => 5;
-has heartbeat_timeout  => 50;
-has listen             => sub ($self) { [Mojo::URL->new('http://*:8080')] };
+has graceful_timeout   => sub ($self) { $ENV{MOJODCTL_GRACEFUL_TIMEOUT}   || 120 };
+has heartbeat_interval => sub ($self) { $ENV{MOJODCTL_HEARTBEAT_INTERVAL} || 5 };
+has heartbeat_timeout  => sub ($self) { $ENV{MOJODCTL_HEARTBEAT_TIMEOUT}  || 50 };
+has listen             => sub ($self) { $self->_build_listen };
 has log                => sub ($self) { $self->_build_log };
-has pid_file           => sub ($self) { path tmpdir, basename($0) . '.pid' };
-has workers            => 4;
+has pid_file           => sub ($self) { $self->_build_pid_file };
+has workers            => sub ($self) { $ENV{MOJODCTL_WORKERS} || 4 };
 has worker_pipe        => sub ($self) { $self->_build_worker_pipe };
 
 sub check_pid ($self) {
@@ -45,10 +45,16 @@ sub ensure_pid_file ($self) {
   return $file->spurt("$pid\n")->chmod(0644) && $self;
 }
 
+sub reload ($self, $app) {
+  return _errno(3) unless my $pid = $self->check_pid;
+  $self->log->info("Starting hot deployment of $pid.");
+  return kill(USR2 => $pid) ? _errno(0) : _errno(1);
+}
+
 sub run ($self, $app) {
   if (my $pid = $self->check_pid) {
-    $self->log->info("Starting hot deployment of $pid.");
-    return kill(USR2 => $pid) ? 0 : 1;
+    $self->log->info("Manager for $app is already running ($pid).");
+    return _errno(16);
   }
 
   weaken $self;
@@ -67,6 +73,7 @@ sub run ($self, $app) {
   $self->log->info("Manager for $app started");
   $self->_manage($app) while $self->{running};
   $self->log->info("Manager for $app stopped");
+  return _errno(0);
 }
 
 sub stop ($self, $signal = 'TERM') {
@@ -75,10 +82,22 @@ sub stop ($self, $signal = 'TERM') {
   return $self->emit(stop => $signal);
 }
 
+sub _build_listen ($self) {
+  return [map { Mojo::URL->new($_) } split ',', $ENV{MOJODCTL_LISTEN} || 'http://*:8080'];
+}
+
 sub _build_log ($self) {
-  $ENV{MOJO_LOG_LEVEL}
+  $ENV{MOJODCTL_LOG_LEVEL}
     ||= $ENV{HARNESS_IS_VERBOSE} ? 'debug' : $ENV{HARNESS_ACTIVE} ? 'error' : 'info';
-  return Mojo::Log->new(level => $ENV{MOJO_LOG_LEVEL});
+  $ENV{MOJO_LOG_LEVEL} ||= $ENV{MOJODCTL_LOG_LEVEL};
+  my $log = Mojo::Log->new(level => $ENV{MOJODCTL_LOG_LEVEL});
+  $log->path($ENV{MOJODCTL_LOG_FILE}) if $ENV{MOJODCTL_LOG_FILE};
+  return $log;
+}
+
+sub _build_pid_file ($self) {
+  return path($ENV{MOJODCTL_PID_FILE}) if $ENV{MOJODCTL_PID_FILE};
+  return path(tmpdir, basename($0) . '.pid');
 }
 
 sub _build_worker_pipe ($self) {
@@ -88,6 +107,8 @@ sub _build_worker_pipe ($self) {
   return IO::Socket::UNIX->new(Listen => 1, Local => $path, Type => SOCK_DGRAM)
     || die "Can't create a worker pipe: $@";
 }
+
+sub _errno ($n) { $! = $n }
 
 sub _hot_deploy ($self) {
   $self->log->info('Starting hot deployment.');
@@ -157,6 +178,7 @@ sub _read_heartbeat ($self) {
   my $time = steady_time;
   while ($chunk =~ /(\d+):(\w)\n/g) {
     next unless my $w = $self->{pool}{$1};
+    ($w->{killed} = $time), $self->log->fatal("Worker $w->{pid} forced killed") if $2 eq 'k';
     $w->{graceful} ||= $time if $2 eq 'g';
     $w->{time} = $time;
     $self->emit(heartbeat => $w);
@@ -172,13 +194,15 @@ sub _spawn ($self, $app) {
   } @{$self->listen};
 
   # Parent
+  my $ppid = $$;
   die "Can't fork: $!" unless defined(my $pid = fork);
   return $self->emit(spawn => $self->{pool}{$pid} = {pid => $pid, time => steady_time}) if $pid;
 
   # Child
-  $ENV{MOJO_SERVER_DAEMON_HEARTBEAT_INTERVAL} = $self->heartbeat_interval;
-  $ENV{MOJO_SERVER_DAEMON_CONTROL_CLASS}      = 'Mojo::Server::DaemonControl::Worker';
-  $ENV{MOJO_SERVER_DAEMON_CONTROL_SOCK}       = $self->worker_pipe->hostpath;
+  $ENV{MOJODCTL_HEARTBEAT_INTERVAL} = $self->heartbeat_interval;
+  $ENV{MOJODCTL_CONTROL_CLASS}      = 'Mojo::Server::DaemonControl::Worker';
+  $ENV{MOJODCTL_CONTROL_SOCK}       = $self->worker_pipe->hostpath;
+  $ENV{MOJODCTL_PID}                = $ppid;
   $self->log->debug("Exec $^X $MOJODCTL $app daemon @args");
   exec $^X, $MOJODCTL => $app => daemon => @args;
   die "Could not exec $app: $!";
@@ -213,12 +237,11 @@ Mojo::Server::DaemonControl - A Mojolicious daemon manager
 
 =head2 Commmand line
 
-  # Start a server
+  # Start the manager
   $ mojodctl -l 'http://*:8080' -P /tmp/myapp.pid -w 4 /path/to/myapp.pl;
 
-  # Running mojodctl with the same PID file will hot reload a running server
-  # or start a new if it is not running
-  $ mojodctl -l 'http://*:8080' -P /tmp/myapp.pid -w 4 /path/to/myapp.pl;
+  # Reload the manager
+  $ mojodctl -R -P /tmp/myapp.pid /path/to/myapp.pl;
 
   # For more options
   $ mojodctl --help
@@ -270,6 +293,51 @@ code run, while new processes are deployed.
 
 Note that L<Mojo::Server::DaemonControl> is currently EXPERIMENTAL and it has
 not been tested in production yet. Feedback is more than welcome.
+
+=head1 ENVIRONMENT VARIABLES
+
+Some environment variables can be set in C<systemd> service files, while other
+can be useful to be read when initializing your web server.
+
+=head2 MOJODCTL_CONTROL_CLASS
+
+This environment variable will be set to L<Mojo::Server::DaemonControl::Worker>
+inside the worker process.
+
+=head2 MOJODCTL_GRACEFUL_TIMEOUT
+
+Can be used to set the default value for L</graceful_timeout>.
+
+=head2 MOJODCTL_HEARTBEAT_INTERVAL
+
+Can be used to set the default value for L</heartbeat_interval> and will be set
+to ensure a default value for L<Mojo::Server::DaemonControl::Worker/heartbeat_interval>.
+
+=head2 MOJODCTL_HEARTBEAT_TIMEOUT
+
+Can be used to set the default value for L</heartbeat_timeout>.
+
+=head2 MOJODCTL_LISTEN
+
+Can be used to set the default value for L</listen>. The environment variable
+will be split on comma for multiple listen addresses.
+
+=head2 MOJODCTL_LOG_FILE
+
+By default the log will be written to STDERR. It is possible to set this
+environment variable to log to a file instead.
+
+=head2 MOJODCTL_LOG_LEVEL
+
+Can be set to debug, info, warn, error, fatal. Default log level is "info".
+
+=head2 MOJODCTL_PID_FILE
+
+Can be used to set a default value for L</pid_file>.
+
+=head2 MOJODCTL_WORKERS
+
+Can be used to set a default value for L</workers>.
 
 =head1 SIGNALS
 
@@ -395,9 +463,15 @@ if it is not running.
 
 Makes sure L</pid_file> exists and contains the current PID.
 
+=head2 reload
+
+  $int = $dctl->reload($app);
+
+Tries to reload a running instance by sending L</USR2> to L</pid_file>.
+
 =head2 run
 
-  $dctl->run($app);
+  $int = $dctl->run($app);
 
 Run the menager and wait for L</SIGNALS>. Note that C<$app> is not loaded in
 the manager process, which means that each worker does not share any code or

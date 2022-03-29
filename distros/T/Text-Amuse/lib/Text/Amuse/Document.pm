@@ -42,6 +42,7 @@ sub new {
                 _list_element_pile => [],
                 _list_parsing_output => [],
                 _bidi_document => 0,
+                _has_ruby => 0,
                 include_paths => [],
                 included_files => [],
                 _other_doc_language_codes => [],
@@ -183,6 +184,14 @@ Return true if the document uses a bidirectionl marker.
 
 Internal, set the bidi flag on.
 
+=item has_ruby
+
+Return true if the document uses the ruby
+
+=item set_has_ruby
+
+Internal, set the ruby flag on.
+
 =cut
 
 sub bidi_document {
@@ -192,6 +201,15 @@ sub bidi_document {
 sub set_bidi_document {
     shift->{_bidi_document} = 1;
 }
+
+sub set_has_ruby {
+    shift->{_has_ruby} = 1;
+}
+
+sub has_ruby {
+    shift->{_has_ruby};
+}
+
 
 
 =item language_code

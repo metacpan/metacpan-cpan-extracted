@@ -73,6 +73,9 @@ package Sidef::Parser {
                      | Mod\b                          (?{ state $x = bless({}, 'Sidef::DataTypes::Number::Mod') })
                      | Gauss\b                        (?{ state $x = bless({}, 'Sidef::DataTypes::Number::Gauss') })
                      | Quadratic\b                    (?{ state $x = bless({}, 'Sidef::DataTypes::Number::Quadratic') })
+                     | Quaternion\b                   (?{ state $x = bless({}, 'Sidef::DataTypes::Number::Quaternion') })
+                     | Poly(?:nomial)?\b              (?{ state $x = bless({}, 'Sidef::DataTypes::Number::Polynomial') })
+                     | Frac(?:tion)?\b                (?{ state $x = bless({}, 'Sidef::DataTypes::Number::Fraction') })
                      | Inf\b                          (?{ state $x = Sidef::Types::Number::Number->inf })
                      | NaN\b                          (?{ state $x = Sidef::Types::Number::Number->nan })
                      | Infi\b                         (?{ state $x = Sidef::Types::Number::Complex->new(0, Sidef::Types::Number::Number->inf) })
@@ -205,9 +208,12 @@ package Sidef::Parser {
                   Bag
                   Str String
                   Num Number
+                  Poly Polynomial
+                  Frac Fraction
                   Mod
                   Gauss
                   Quadratic
+                  Quaternion
                   Range
                   RangeStr RangeString
                   RangeNum RangeNumber
@@ -824,6 +830,12 @@ package Sidef::Parser {
                 $ref_type = $obj;
             }
 
+            my ($subset);
+            if (ref($ref_type) eq 'Sidef::Variable::Subset') {
+                $subset = $ref_type;
+                undef $ref_type;
+            }
+
             my ($var_name, $class_name) = $self->get_name_and_class($name);
 
             if ($opt{type} eq 'del') {
@@ -847,7 +859,6 @@ package Sidef::Parser {
                                   );
             }
 
-            my ($subset);
             if (defined($end_delim) and m{\G<<?\h*}gc) {
                 my ($subset_name) = /\G($self->{var_name_re})/goc;
 

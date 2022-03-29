@@ -152,6 +152,19 @@ sub stringify {
     if ($type eq 'safe') {
         return $self->verbatim_string($string);
     }
+    if ($type eq 'ruby') {
+        if ($string =~ m/\A<ruby>\s*(.+?)\s*\|\s*(.+?)\s*<\/ruby>\z/) {
+            my ($main, $ann) = ($1, $2);
+            $main = $self->verbatim_string($main);
+            $ann = $self->verbatim_string($ann);
+            if ($self->is_latex) {
+                return sprintf("\\ruby{%s}{%s}", $main, $ann);
+            }
+            elsif ($self->is_html) {
+                return sprintf("<ruby><rb>%s</rb><rt>%s</rt></ruby>", $main, $ann);
+            }
+        }
+    }
     if ($type eq 'verbatim') {
         if ($string =~ /\A<verbatim>(.*)<\/verbatim>\z/s) {
             $string = $1;

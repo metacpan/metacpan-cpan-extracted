@@ -1,5 +1,5 @@
 package App::Greple::frame;
-our $VERSION = "0.01";
+our $VERSION = "0.02";
 
 =encoding utf-8
 
@@ -30,17 +30,24 @@ B<--no-join-blocks> option.
 
 Set frame options.
 
-Put next line in your F<~/.greplerc> to autoload B<App::Greple::frame> module.
+=item B<--frame-fold>
 
-    autoload -Mframe --frame
-
-Then you can use B<--frame> option whenever you want.
+Set frame and fold long lines with frame-friendly prefix string.
+Folding width is taken from terminal.  If you want to use different
+width, use B<ansifold> command by yourself.
 
 =back
 
+Put next line in your F<~/.greplerc> to autoload B<App::Greple::frame> module.
+
+    autoload -Mframe --frame --frame-fold
+
+Then you can use B<--frame> and B<--frame-fold> option whenever you
+want.
+
 =begin html
 
-<p><img width="75%" src="https://github.com/kaz-utashiro/greple-frame/blob/main/images/terminal-small.png">
+<p><img width="75%" src="https://raw.githubusercontent.com/kaz-utashiro/greple-frame/main/images/terminal-small.png">
 
 =end html
 
@@ -105,3 +112,7 @@ option --frame \
 	--format=LINE='%5d │ ' \
 	--blockend= \
 	--show-frame
+
+option --frame-fold \
+	--frame \
+	--pf 'ansifold --width=term --prefix "      │ "'

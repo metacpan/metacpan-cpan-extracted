@@ -8,7 +8,7 @@ use Set::Tiny 0.04;
 
 use App::SpamcupNG::Summary::Receiver;
 
-our $VERSION = '0.014'; # VERSION
+our $VERSION = '0.015'; # VERSION
 
 =pod
 
@@ -59,7 +59,7 @@ __PACKAGE__->follow_best_practice;
 my $fields = Set::Tiny->new(
     (
         'tracking_id', 'mailer',   'content_type', 'age',
-        'age_unit',    'contacts', 'receivers'
+        'age_unit',    'contacts', 'receivers',    'charset'
     )
 );
 my $ro_fields = Set::Tiny->new(qw(receivers));
@@ -84,7 +84,8 @@ sub new {
         age          => undef,
         age_unit     => undef,
         contacts     => undef,
-        receivers    => undef
+        receivers    => undef,
+        charset      => undef
     };
     bless $self, $class;
     lock_keys( %{$self} );

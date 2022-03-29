@@ -59,7 +59,7 @@ SYNOPSIS
 VERSION
 =======
 
-        v0.22.0
+        v0.23.0
 
 DESCRIPTION
 ===========
@@ -1711,6 +1711,8 @@ stringified, it displays the same string that was originally parsed.
 \_set\_get
 ----------
 
+        sub name { return( shift->_set_get( 'name', @_ ) ); }
+
 Provided with an object property name and some value and this will set
 or get that value for that property.
 
@@ -1784,6 +1786,8 @@ reference.
 
 \_set\_get\_boolean
 -------------------
+
+        sub is_true { return( shift->_set_get_boolean( 'is_true', @_ ) ); }
 
 Provided with an object property name and some data and this will store
 the data as a boolean value.
@@ -2011,6 +2015,8 @@ reference.
 \_set\_get\_datetime
 --------------------
 
+        sub created_on { return( shift->_set_get_datetime( 'created_on', @_ ) ); }
+
 Provided with an object property name and asome date or datetime string
 and this will attempt to parse it and save it as a
 [DateTime](https://metacpan.org/pod/DateTime){.perl-module} object.
@@ -2044,6 +2050,8 @@ The return value of a method should always be checked.
 \_set\_get\_file
 ----------------
 
+        sub file { return( shift->_set_get_file( 'file', @_ ) ); }
+
 Provided with an object property name and a file and this will store the
 given file as a
 [Module::Generic::File](https://metacpan.org/pod/Module::Generic::File){.perl-module}
@@ -2057,6 +2065,8 @@ directory or a symbolic link or any other file on the system.
 
 \_set\_get\_hash
 ----------------
+
+        sub metadata { return( shift->_set_get_hash( 'metadata', @_ ) ); }
 
 Provided with an object property name and an hash reference and this set
 the property name with this hash reference.
@@ -2073,6 +2083,8 @@ hash reference, such as :
 
 \_set\_get\_hash\_as\_mix\_object
 ---------------------------------
+
+        sub metadata { return( shift->_set_get_hash_as_mix_object( 'metadata', @_ ) ); }
 
 Provided with an object property name, and an optional hash reference
 and this returns a
@@ -2119,6 +2131,8 @@ Then populating the data :
 
 \_set\_get\_ip
 --------------
+
+        sub ip { return( shift->_set_get_ip( 'ip', @_ ) ); }
 
 This helper method takes a value and check if it is a valid IP address
 using [\"\_is\_ip\"](#is_ip){.perl-module}. If `undef` or zero-byte
@@ -2302,6 +2316,8 @@ hash or array reference.
 \_set\_get\_scalar
 ------------------
 
+        sub name { return( shift->_set_get_scalar( 'name', @_ ) ); }
+
 Provided with an object property name, and a string, possibly a number
 or anything really and this will set the property value accordingly.
 Very straightforward.
@@ -2383,13 +2399,31 @@ object to enable chaining.
 \_set\_get\_uri
 ---------------
 
-Provided with an object property name, and an uri and this creates a
+        sub uri { return( shift->_set_get_uri( 'uri', @_ ) ); }
+        sub uri { return( shift->_set_get_uri( { field => 'uri', class => 'URI::Fast' }, @_ ) ); }
+
+Provided with an object property name, and an uri and this creates an
 [URI](https://metacpan.org/pod/URI){.perl-module} object and sets the
 property value accordingly.
 
-It accepts an [URI](https://metacpan.org/pod/URI){.perl-module} object,
-an uri or urn string, or an absolute path, i.e. a string starting with
-`/`.
+Alternatively, the property name can be an hash with the following
+properties:
+
+*field*
+
+:   The object property name
+
+*class*
+
+:   The URI class to use. By default,
+    [URI](https://metacpan.org/pod/URI){.perl-module}, but you could
+    also use
+    [URI::Fast](https://metacpan.org/pod/URI::Fast){.perl-module}, or
+    other class of your choice.
+
+It accepts an [URI](https://metacpan.org/pod/URI){.perl-module} object
+(or any other URI class object), an uri or urn string, or an absolute
+path, i.e. a string starting with `/`.
 
 It returns the current value, if any, so the return value could be
 undef, thus it cannot be chained. Maybe it should return a
@@ -2539,7 +2573,7 @@ and
 AUTHOR
 ======
 
-Jacques Deguest \<`jack@deguest.jp`{classes="ARRAY(0x556e28057e28)"}\>
+Jacques Deguest \<`jack@deguest.jp`{classes="ARRAY(0x560d6cc05588)"}\>
 
 COPYRIGHT & LICENSE
 ===================

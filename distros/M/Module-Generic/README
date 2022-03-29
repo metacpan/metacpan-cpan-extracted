@@ -58,7 +58,7 @@ SYNOPSIS
         }
 
 VERSION
-        v0.22.0
+        v0.23.0
 
 DESCRIPTION
     Module::Generic as its name says it all, is a generic module to inherit
@@ -1373,6 +1373,8 @@ SUPPORT METHODS
     originally parsed.
 
   _set_get
+        sub name { return( shift->_set_get( 'name', @_ ) ); }
+
     Provided with an object property name and some value and this will set
     or get that value for that property.
 
@@ -1438,6 +1440,8 @@ SUPPORT METHODS
     reference.
 
   _set_get_boolean
+        sub is_true { return( shift->_set_get_boolean( 'is_true', @_ ) ); }
+
     Provided with an object property name and some data and this will store
     the data as a boolean value.
 
@@ -1636,6 +1640,8 @@ SUPPORT METHODS
     reference.
 
   _set_get_datetime
+        sub created_on { return( shift->_set_get_datetime( 'created_on', @_ ) ); }
+
     Provided with an object property name and asome date or datetime string
     and this will attempt to parse it and save it as a DateTime object.
 
@@ -1661,6 +1667,8 @@ SUPPORT METHODS
     should always be checked.
 
   _set_get_file
+        sub file { return( shift->_set_get_file( 'file', @_ ) ); }
+
     Provided with an object property name and a file and this will store the
     given file as a Module::Generic::File object.
 
@@ -1671,6 +1679,8 @@ SUPPORT METHODS
     directory or a symbolic link or any other file on the system.
 
   _set_get_hash
+        sub metadata { return( shift->_set_get_hash( 'metadata', @_ ) ); }
+
     Provided with an object property name and an hash reference and this set
     the property name with this hash reference.
 
@@ -1685,6 +1695,8 @@ SUPPORT METHODS
         my $hash = $object->metadata;
 
   _set_get_hash_as_mix_object
+        sub metadata { return( shift->_set_get_hash_as_mix_object( 'metadata', @_ ) ); }
+
     Provided with an object property name, and an optional hash reference
     and this returns a Module::Generic::Hash object, which allows to
     manipulate the hash just like any regular hash, but it provides on top
@@ -1722,6 +1734,8 @@ SUPPORT METHODS
         printf( "Customer name is %s\n", $object->metadata->last_name );
 
   _set_get_ip
+        sub ip { return( shift->_set_get_ip( 'ip', @_ ) ); }
+
     This helper method takes a value and check if it is a valid IP address
     using "_is_ip". If "undef" or zero-byte value is provided, it will
     merely accept it, as it can be used to reset the value by the caller.
@@ -1862,6 +1876,8 @@ SUPPORT METHODS
     hash or array reference.
 
   _set_get_scalar
+        sub name { return( shift->_set_get_scalar( 'name', @_ ) ); }
+
     Provided with an object property name, and a string, possibly a number
     or anything really and this will set the property value accordingly.
     Very straightforward.
@@ -1928,11 +1944,24 @@ SUPPORT METHODS
     object to enable chaining.
 
   _set_get_uri
-    Provided with an object property name, and an uri and this creates a URI
-    object and sets the property value accordingly.
+        sub uri { return( shift->_set_get_uri( 'uri', @_ ) ); }
+        sub uri { return( shift->_set_get_uri( { field => 'uri', class => 'URI::Fast' }, @_ ) ); }
 
-    It accepts an URI object, an uri or urn string, or an absolute path,
-    i.e. a string starting with "/".
+    Provided with an object property name, and an uri and this creates an
+    URI object and sets the property value accordingly.
+
+    Alternatively, the property name can be an hash with the following
+    properties:
+
+    *field*
+        The object property name
+
+    *class*
+        The URI class to use. By default, URI, but you could also use
+        URI::Fast, or other class of your choice.
+
+    It accepts an URI object (or any other URI class object), an uri or urn
+    string, or an absolute path, i.e. a string starting with "/".
 
     It returns the current value, if any, so the return value could be
     undef, thus it cannot be chained. Maybe it should return a

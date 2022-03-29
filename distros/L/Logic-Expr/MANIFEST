@@ -1,0 +1,16 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+README
+eg/solver
+lib/Logic/Expr.pm
+lib/Logic/Expr/Parser.pm
+t/00-load.t
+t/10-parser.t
+t/20-logic.t
+t/pod-coverage.t
+t/pod.t
+SIGNATURE    Added here by Module::Build

@@ -12,10 +12,10 @@
 
 #include "ppport.h"
 
-#if OPENSSL_VERSION_NUMBER < 0x10100000L
+#if OPENSSL_VERSION_NUMBER < 0x10100000L || defined LIBRESSL_VERSION_NUMBER
 #define EVP_PKEY_get0_RSA(pkey) ((pkey)->pkey.rsa)
 #define EVP_PKEY_get0_DSA(pkey) ((pkey)->pkey.dsa)
-#ifndef OPENSSL_NO_EC
+#ifndef OPENSSL_NO_EC || defined LIBRESSL_VERSION_NUMBER
 #define EVP_PKEY_get0_EC_KEY(pkey) ((pkey)->pkey.ec)
 #endif
 #endif
@@ -549,17 +549,20 @@ get_pem_pk(pkcs10,...)
 
 	CODE:
 	if((ix != 1 && items > 1) || (ix == 1 && items != 2))
-		croak("get_pem_req illegal/missing args");
+		croak("get_pem_pk illegal/missing args");
 	if(items > 1) {
 		bio = sv_bio_create_file(ST(1));
 	} else {
 		bio = sv_bio_create();
 	}
 
+    if(!pkcs10->pk)
+            croak ("Private key doesn't exist");
+
 	/* get the certificate back out in a specified format. */
 
 	if(!PEM_write_bio_PrivateKey(bio,pkcs10->pk,NULL,NULL,0,NULL,NULL))
-		croak ("%s - PEM_write_bio_X509_REQ", pkcs10->req);
+		croak ("%s - PEM_write_bio_PrivateKey", pkcs10->pk);
 
 	RETVAL = sv_bio_final(bio);
 
@@ -628,7 +631,7 @@ add_custom_ext_raw(pkcs10, oid_SV, ext_SV)
 		pkcs10->exts = sk_X509_EXTENSION_new_null();
 
 	if ((nid = OBJ_create(oid, oid, oid)) == NID_undef)
-        croak ("add_custom_ext_raw: OBJ_create() for OID %s failed", oid);
+        croak ("add_custom_ext: OBJ_create() for OID %s failed", oid);
 	RETVAL = add_ext_raw(pkcs10->exts, nid, ext, ext_length);
 
 	if (!RETVAL)
@@ -701,6 +704,9 @@ new_from_file(class, filename_SV)
   CODE:
   filename = SvPV(filename_SV, filename_length);
   fp = fopen(filename, "r");
+  if (fp == NULL) {
+          croak ("Cannot open file '%s'", filename);
+  }
   req = PEM_read_X509_REQ (fp, NULL, NULL, NULL);
   fclose(fp);
 

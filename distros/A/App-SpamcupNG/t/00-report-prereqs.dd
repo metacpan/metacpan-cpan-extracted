@@ -19,6 +19,9 @@ do { my $x = {
        'runtime' => {
                       'requires' => {
                                       'Class::Accessor' => '0.51',
+                                      'DBD::SQLite' => '1.70',
+                                      'DBI' => '1.643',
+                                      'DateTime' => '1.55',
                                       'HTML::Form' => '6.07',
                                       'HTML::TreeBuilder::XPath' => '0.14',
                                       'HTTP::CookieJar::LWP' => '0.012',
@@ -43,7 +46,8 @@ do { my $x = {
                                    'Perl::Tidy::Sweetened' => '1.18',
                                    'Pod::Tidy' => '0.10',
                                    'Test::Exception' => '0.43',
-                                   'Test::More' => '0'
+                                   'Test::More' => '0',
+                                   'Test::TempDir::Tiny' => '0'
                                  }
                  }
      };

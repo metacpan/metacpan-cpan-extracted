@@ -5,9 +5,9 @@
 
 use strict;
 use warnings;
-use App::Deps::Verify::App::VerifyDeps;
+use App::Deps::Verify::App::VerifyDeps ();
 
-App::Deps::Verify::App::VerifyDeps->run;
+App::Deps::Verify::App::VerifyDeps->run();
 
 __END__
 
@@ -17,7 +17,7 @@ __END__
 
 =head1 VERSION
 
-version 0.12.0
+version 0.12.1
 
 =head1 SYNOPSIS
 

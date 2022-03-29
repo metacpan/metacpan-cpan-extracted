@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2013-2022 -- leonerd@leonerd.org.uk
 
-package Devel::MAT 0.45;
+package Devel::MAT 0.46;
 
 use v5.14;
 use warnings;
@@ -646,6 +646,9 @@ sub format_sv_with_value
    elsif( $sv->type eq "REF" ) {
       #return "REF => NULL" if !$sv->rv;
       return "$repr => " . $self->format_sv_with_value( $sv->rv ) if $sv->rv;
+   }
+   elsif( $sv->type eq "STASH" ) {
+      return "$repr is " . $self->format_symbol( $sv->stashname, $sv );
    }
 
    return $repr;

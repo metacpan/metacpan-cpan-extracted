@@ -24,9 +24,9 @@ Inherits methods from:
 
 =head2 `
 
-I<Obj> B<`> I<Obj> -> I<Obj>
+    a ` b
 
-Return the
+Returns the
 
 Aliases: I<run>, I<exec>, I<execute>
 
@@ -34,17 +34,17 @@ Aliases: I<run>, I<exec>, I<execute>
 
 =head2 call
 
-Backtick.call() -> I<Obj>
+    Backtick.call()
 
-Return the
+Returns the
 
 =cut
 
 =head2 to_s
 
-Backtick.to_s() -> I<Obj>
+    Backtick.to_s()
 
-Return the
+Returns the
 
 Aliases: I<dump>, I<to_str>
 

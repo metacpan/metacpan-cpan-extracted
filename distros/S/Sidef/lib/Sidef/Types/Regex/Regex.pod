@@ -24,9 +24,9 @@ Inherits methods from:
 
 =head2 +
 
-I<Obj> B<+> I<Obj> -> I<Obj>
+    a + b
 
-Return the
+Returns the
 
 Aliases: I<add>, I<concat>
 
@@ -34,9 +34,9 @@ Aliases: I<add>, I<concat>
 
 =head2 <
 
-I<Obj> B<E<lt>> I<Obj> -> I<Obj>
+    a < b
 
-Return the
+Returns the
 
 Aliases: I<lt>
 
@@ -44,9 +44,9 @@ Aliases: I<lt>
 
 =head2 <=>
 
-I<Obj> B<E<lt>=E<gt>> I<Obj> -> I<Obj>
+    a <=> b
 
-Return the
+Returns the
 
 Aliases: I<cmp>
 
@@ -54,9 +54,9 @@ Aliases: I<cmp>
 
 =head2 ==
 
-I<Obj> B<==> I<Obj> -> I<Obj>
+    a == b
 
-Return the
+Returns the
 
 Aliases: I<eq>
 
@@ -64,9 +64,9 @@ Aliases: I<eq>
 
 =head2 =~
 
-I<Obj> B<=~> I<Obj> -> I<Obj>
+    a =~ b
 
-Return the
+Returns the
 
 Aliases: I<run>, I<match>
 
@@ -74,9 +74,9 @@ Aliases: I<run>, I<match>
 
 =head2 >
 
-I<Obj> B<E<gt>> I<Obj> -> I<Obj>
+    a > b
 
-Return the
+Returns the
 
 Aliases: I<gt>
 
@@ -84,9 +84,9 @@ Aliases: I<gt>
 
 =head2 |
 
-I<Obj> B<|> I<Obj> -> I<Obj>
+    a | b
 
-Return the
+Returns the
 
 Aliases: I<union>
 
@@ -94,9 +94,9 @@ Aliases: I<union>
 
 =head2 ≠
 
-I<Obj> B<≠> I<Obj> -> I<Obj>
+    a ≠ b
 
-Return the
+Returns the
 
 Aliases: I<!=>, I<ne>
 
@@ -104,9 +104,9 @@ Aliases: I<!=>, I<ne>
 
 =head2 ≤
 
-I<Obj> B<≤> I<Obj> -> I<Obj>
+    a ≤ b
 
-Return the
+Returns the
 
 Aliases: I<E<lt>=>, I<le>
 
@@ -114,9 +114,9 @@ Aliases: I<E<lt>=>, I<le>
 
 =head2 ≥
 
-I<Obj> B<≥> I<Obj> -> I<Obj>
+    a ≥ b
 
-Return the
+Returns the
 
 Aliases: I<E<gt>=>, I<ge>
 
@@ -124,17 +124,17 @@ Aliases: I<E<gt>=>, I<ge>
 
 =head2 call
 
-Regex.call() -> I<Obj>
+    Regex.call()
 
-Return the
+Returns the
 
 =cut
 
 =head2 gmatch
 
-Regex.gmatch() -> I<Obj>
+    Regex.gmatch()
 
-Return the
+Returns the
 
 Aliases: I<global_match>
 
@@ -142,9 +142,9 @@ Aliases: I<global_match>
 
 =head2 gmatches
 
-Regex.gmatches() -> I<Obj>
+    Regex.gmatches()
 
-Return the
+Returns the
 
 Aliases: I<all_matches>, I<map_matches>, I<global_matches>, I<repeated_match>
 
@@ -152,9 +152,9 @@ Aliases: I<all_matches>, I<map_matches>, I<global_matches>, I<repeated_match>
 
 =head2 to_re
 
-Regex.to_re() -> I<Obj>
+    Regex.to_re()
 
-Return the
+Returns the
 
 Aliases: I<to_regex>
 
@@ -162,9 +162,9 @@ Aliases: I<to_regex>
 
 =head2 to_s
 
-Regex.to_s() -> I<Obj>
+    Regex.to_s()
 
-Return the
+Returns the
 
 Aliases: I<dump>, I<to_str>
 

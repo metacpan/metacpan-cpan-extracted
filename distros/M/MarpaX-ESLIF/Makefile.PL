@@ -50,6 +50,7 @@ autoflush STDOUT 1;
 my %cbuilder_config = ExtUtils::CBuilder->new()->get_config;
 $ENV{CC} = $cbuilder_config{cc} // 'cc';
 $ENV{CFLAGS} //= '';
+$ENV{CFLAGS} .= ' -DNDEBUG';
 $ENV{CXX} = $cbuilder_config{cxx} // $ENV{CC};
 $ENV{CXXFLAGS} = $cbuilder_config{cxxflags} // $cbuilder_config{ccflags} // '';
 $ENV{LD} = $cbuilder_config{ld} // $ENV{CC};
@@ -595,7 +596,7 @@ my %WriteMakefileArgs = (
     "threads::shared" => 0,
     "utf8" => 0
   },
-  "VERSION" => "6.0.15",
+  "VERSION" => "6.0.16",
   "test" => {
     "TESTS" => "t/*.t"
   }

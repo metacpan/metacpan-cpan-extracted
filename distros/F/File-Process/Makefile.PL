@@ -10,15 +10,15 @@ if ( -d 'share' ) {
 }
 
 WriteMakefile(
-    NAME           => 'File::Process',
-    AUTHOR         => 'Rob Lauer <rlauer6@comcast.net>',
-    VERSION_FROM   => 'lib/File/Process.pm',
-    ABSTRACT       => 'File processing utiltiy',
-    LICENSE        => 'perl',
-    PL_FILES       => {},
-    EXE_FILES      =>     []
+  NAME           => 'File::Process',
+  AUTHOR         => 'Rob Lauer <rlauer6@comcast.net>',
+  VERSION_FROM   => 'lib/File/Process.pm',
+  ABSTRACT       => 'File processing utiltiy',
+  LICENSE        => 'perl',
+  PL_FILES       => {},
+  EXE_FILES      =>     []
 ,
-    PREREQ_PM      => {
+  PREREQ_PM      => {
       'Carp' => '1.26',
       'Carp::Always' => '0.12',
       'English' => '1.05',
@@ -30,16 +30,32 @@ WriteMakefile(
       'vars' => '1.02',
       'warnings' => '1.13'
     },
-    TEST_REQUIRES  =>     {}
+  BUILD_REQUIRES => {
+    'ExtUtils::MakeMaker'     => 0,
+    'File::ShareDir::Install' => 0,
+    },
+  CONFIGURE_REQUIRES => {
+    'ExtUtils::MakeMaker'     => 0,
+    'File::ShareDir::Install' => 0,
+    },
+  TEST_REQUIRES => {
+      'Data::Dumper' => '2.145',
+      'JSON::PP' => '4.07',
+      'ReadonlyX' => '1.04',
+      'Test::More' => '1.001014',
+      'Text::CSV_XS' => '1.00',
+      'strict' => '1.07',
+      'warnings' => '1.13'
+    }
 ,
-    META_MERGE =>    {
+  META_MERGE =>    {
       'meta-spec'=>{
                        'version'=>2
                      },
       'provides'=>{
                       'File::Process'=>{
-                                           'file'=>'/usr/local/share/perl5/File/Process.pm',
-                                           'version'=>'0.01'
+                                           'file'=>'lib/File/Process.pm',
+                                           'version'=>'0.05'
                                          }
                     }
     }

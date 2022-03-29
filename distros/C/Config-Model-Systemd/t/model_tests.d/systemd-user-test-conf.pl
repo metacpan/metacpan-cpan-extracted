@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-Systemd
 #
-# This software is Copyright (c) 2008-2021 by Dominique Dumont.
+# This software is Copyright (c) 2008-2022 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #

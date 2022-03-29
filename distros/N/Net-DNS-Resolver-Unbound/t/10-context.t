@@ -1,19 +1,18 @@
 #!/usr/bin/perl
-# $Id$	-*-perl-*-
 #
 
 use strict;
 use warnings;
-use Test::More tests => 9;
+use Test::More tests => 8;
 
 use Net::DNS::Resolver::Unbound;
 
-ok( Net::DNS::Resolver::Unbound->string(), 'default configuration' );
 
+ok( Net::DNS::Resolver::Unbound->string(), 'default configuration' );
 
 my $resolver = Net::DNS::Resolver::Unbound->new(
 	nameservers  => ['127.0.0.1', '::1'],
-	prefer_v6    => 1,
+	prefer_v4    => 1,
 	async_thread => 1
 	);
 
@@ -34,22 +33,16 @@ my @result = $resolver->option($option);
 is( pop(@result), $value, 'multi-valued resolver option' );
 
 
-my $finalise = $resolver->bgsend( '.', 2 );	## side effect: finalise config
-
-eval { my $bogus = $resolver->option('bogus') };
-my ($bogus_option) = split /\n/, "$@\n";
-ok( $bogus_option, "unknown Unbound option\t[$bogus_option]" );
-
-
 eval { my $resolver = Net::DNS::Resolver::Unbound->new( option => {$option, $value} ); };
 my ($option_usage) = split /\n/, "$@\n";
 ok( $option_usage, "Unbound option usage\t[$option_usage]" );
 
 
+$resolver->send('localhost');		## side effect: finalise config
+
 eval { my $value = $resolver->config('filename') };
 my ($reject_option) = split /\n/, "$@\n";
 ok( $reject_option, "reject Unbound option\t[$reject_option]" );
-
 
 ## exercise special config options
 eval { $resolver->add_ta('zone DS') };

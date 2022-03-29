@@ -1,3 +1,15 @@
+1.201 2022-03-27
+================
+
+[Quiq::Mechanize]
+* new(): Code-Verbesserung
+
+[Quiq::Path]
+* convertEncoding(): Methode hinzugefügt
+
+[Quiq::Ssh]
+* exec(): Rückgabewerte $stdout, $stderr auf Leerstring initialisiert
+
 1.200 2022-03-15
 ================
 

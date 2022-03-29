@@ -1,10 +1,111 @@
 ==================================================
-Changes from 2021-03-19 00:00:00 +0000 to present.
+Changes from 2021-03-26 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.014 at 2022-03-19 17:16:41 +0000
+version 0.015 at 2022-03-26 22:08:08 +0000
 ------------------------------------------
+
+  Change: edff644e8fa6b590578341353be5b7ad5afcceed
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-03-26 19:07:10 +0000
+
+    Merge pull request #9 from glasswalk3r/feature/sqlite3_db
+
+    Feature/sqlite3 db 
+
+  Change: 12a6e54d617213d62e44213dcbbd88181fb1924e
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-03-26 18:44:05 +0000
+
+    chore: tidied Perl file 
+
+  Change: 91271a3cfc99ca0bf81108848bc5ee014fc7018d
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-03-23 20:36:54 +0000
+
+    doc: fixes 
+
+  Change: ae712d3feb8a1c9bf07c95ac64250c90758b9d70
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-03-23 00:09:21 +0000
+
+    refactor: indicating expected tests 
+
+  Change: e22c0be7241ef7fbd23382319cb31ee8a08e08f7
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-03-23 00:06:43 +0000
+
+    fix: not persisting charset
+
+    Also added lock_hash to avoid hash key autovivification. Added unit
+    tests to cover the class. 
+
+  Change: 0b0c70ead698b143a9dadf6d55350cc8312018c3
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-03-22 22:30:17 +0000
+
+    feat: added unix epoch when summary was stored 
+
+  Change: b02cc9721c271f03c7784ad105b6a175f4904dcf
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-03-20 23:24:52 +0000
+
+    fix: not load db config 
+
+  Change: 602eac1e34206a72fac6b3eacb204fbb8baed852
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-03-20 21:21:43 +0000
+
+    feat: db persistence from config 
+
+  Change: cc1ffb7c8c13bfdfdd52986954829747815d4573
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-03-20 20:59:05 +0000
+
+    doc: required updated 
+
+  Change: 4ecae6374394049c6c408a8750d116d115a3dedf
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-03-20 20:58:46 +0000
+
+    chore: version bump 
+
+  Change: cf32bb74869e8fb7bf9c09d2dbad4ebab8b9f5cf
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-03-20 20:58:11 +0000
+
+    feat: database config 
+
+  Change: 3aaf663c1df651ca49ed39a6ed944461b7c58018
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-03-20 19:30:16 +0000
+
+    doc: fixes typo and formatting 
+
+  Change: 96e24ac06c7adc30bb82f287956d4740c0f19a40
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-03-20 14:24:32 +0000
+
+    feat: saving summary to SQLite 
+
+  Change: 771793642f2158b0cdef255832d2830dd4e5548d
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-03-20 14:24:03 +0000
+
+    chore: added TODO 
+
+  Change: e333a6e40d30eaf1f1b59640adf5d13971b83d94
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-03-20 11:47:03 +0000
+
+    feat: split charset from content-type 
+
+  Change: 03ebc1c728569c71e1504957557795c1fe77667d
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-03-20 11:43:04 +0000
+
+    chore: module prereq 
 
   Change: fb701af0cd61a22674673e1f5337f6a245b75fdc
   Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>

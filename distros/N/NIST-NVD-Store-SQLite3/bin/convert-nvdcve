@@ -79,7 +79,7 @@ my $nvd_entries = process_nvd_file($nvd);
 
 print "Done.\n";
 
-printf( "read \%i nvd entries\n", int keys $nvd_entries );
+printf( 'read %i nvd entries'.$/, scalar keys %$nvd_entries );
 
 print "Writing CPE URNs to disk...";
 
@@ -103,9 +103,9 @@ if( -f $cwe ){
 	print "\nDone processing CWE file.\n";
 
 
-	printf( "read \%i cwe Categories\n", int keys $cwe_data->{Category} );
-	printf( "read \%i cwe Weaknesses\n", int keys $cwe_data->{Weakness} );
-	printf( "read \%i cwe Views\n",      int keys $cwe_data->{View} );
+	printf( "read \%i cwe Categories\n", scalar keys %{$cwe_data->{Category}} );
+	printf( "read \%i cwe Weaknesses\n", scalar keys %{$cwe_data->{Weakness}} );
+	printf( "read \%i cwe Views\n",      scalar keys %{$cwe_data->{View}} );
 
 }
 

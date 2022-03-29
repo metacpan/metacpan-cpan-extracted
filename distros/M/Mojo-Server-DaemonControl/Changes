@@ -1,5 +1,12 @@
 Revision history for perl distribution Mojo-Server-DaemonControl
 
+0.03 2022-03-28T13:35:55+0900
+ - Add support for config from environment variables
+ - Changed hot deployment to be done explicit
+
+0.02 2022-03-26T10:47:29+0900
+ - Force stop worker if parent pid changes
+
 0.01 2022-03-21T17:31:19+0900
  - Add "mojodctl" manager program
  - Add custom "daemon" worker class

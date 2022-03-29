@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '1.746';
+our $VERSION = '1.747';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -250,7 +250,7 @@ sub __modify_options {
     if ( $self->{page} == 2 && ! $self->{clear_screen} ) {
         $self->{clear_screen} = 1;
     }
-    if ( $self->{max_cols} && $self->{layout} != 0 && $self->{layout} != 2 ) { ##
+    if ( $self->{max_cols} && $self->{layout} == 1 ) {
         $self->{layout} = 0;
     }
     if ( ! defined $self->{prompt} ) {
@@ -747,7 +747,7 @@ sub __prepare_info_and_prompt_lines {
     $self->{prompt_copy} = $prompt;
     $self->{prompt_copy} .= "\n\r";
     # s/\n/\n\r/g; -> stty 'raw' mode and Term::Readkey 'ultra-raw' mode
-    #                 don't translate newline to carriage return-newline
+    #                 don't translate newline to carriage_return/newline
     $self->{count_prompt_lines} = $self->{prompt_copy} =~ s/\n/\n\r/g;
 }
 
@@ -1222,7 +1222,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.746
+Version 1.747
 
 =cut
 
@@ -1614,6 +1614,8 @@ Allowed values: 1 or greater
 
 Limit the number of columns to I<max_cols>.
 
+I<layout> set to C<2> has always one column.
+
 Allowed values: 1 or greater
 
 (default: undefined)
@@ -1842,8 +1844,8 @@ to a true value, ambiguous width characters are treated as full width.
 
 =head2 Escape sequences
 
-By default C<Term::Choose> uses C<tput> to get the appropriate escape sequences. Setting the environment variable
-C<TC_ANSI_ESCAPES> to a true value allows one to use ANSI escape sequences directly without calling C<tput>.
+By default C<Term::Choose> uses C<tput> to get the appropriate escape sequences. If the environment variable
+C<TC_ANSI_ESCAPES> is set to a true value hardcoded ANSI escape sequences are used directly without calling C<tput>.
 
     BEGIN {
         $ENV{TC_ANSI_ESCAPES} = 1;

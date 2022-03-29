@@ -29,6 +29,7 @@ requires "Perl::Critic::Policy::CompileTime";
 requires "Perl::Critic::Policy::HTTPCookies";
 requires "Perl::Critic::PetPeeves::JTRAMMELL";
 requires "Perl::Critic::PolicyBundle::PERLANCAR";
+requires "Perl::Critic::Policy::PreferredModules";
 requires "Perl::Critic::Policy::ProhibitOrReturn";
 requires "Perl::Critic::Policy::ProhibitSmartmatch";
 requires "Perl::Critic::Policy::Dynamic::NoIndirect";

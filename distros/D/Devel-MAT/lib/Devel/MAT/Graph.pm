@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2014-2016 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Graph 0.45;
+package Devel::MAT::Graph 0.46;
 
 use v5.14;
 use warnings;
@@ -181,7 +181,7 @@ sub get_root_nodes
    } keys %{ $self->{roots_from} };
 }
 
-package Devel::MAT::Graph::Node 0.45;
+package Devel::MAT::Graph::Node 0.46;
 
 =head1 NODE OBJECTS
 

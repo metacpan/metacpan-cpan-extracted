@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-Systemd
 #
-# This software is Copyright (c) 2008-2021 by Dominique Dumont.
+# This software is Copyright (c) 2008-2022 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -68,13 +68,11 @@ type suffix). The name of the full unit is formed by inserting the instance name
 C<\@> and the unit type suffix. In the unit file itself, the instance parameter may be
 referred to using C<%i> and other specifiers, see below.
 
-Unit files may contain additional options on top of those
-listed here. If systemd encounters an unknown option, it will
-write a warning log message but continue loading the unit. If an
-option or section name is prefixed with C<X->, it is
-ignored completely by systemd. Options within an ignored section
-do not need the prefix. Applications may use this to include
-additional information in the unit files.
+Unit files may contain additional options on top of those listed here. If systemd encounters an
+unknown option, it will write a warning log message but continue loading the unit. If an option or
+section name is prefixed with C<X->, it is ignored completely by systemd. Options within an
+ignored section do not need the prefix. Applications may use this to include additional information in
+the unit files. To access those options, applications need to parse the unit files on their own.
 
 Units can be aliased (have an alternative name), by creating a symlink from the new name to the
 existing name in one of the unit search paths. For example, C<systemd-networkd.service>
@@ -443,7 +441,7 @@ dependency cannot be specified directly.",
       },
       'Upholds',
       {
-        'description' => 'Configures dependencies similar to C<Wants>, but as long a this unit
+        'description' => 'Configures dependencies similar to C<Wants>, but as long as this unit
 is up, all units listed in C<Upholds> are started whenever found to be inactive or
 failed, and no job is queued for them. While a C<Wants> dependency on another unit
 has a one-time effect when this units started, a C<Upholds> dependency on it has a
@@ -1531,6 +1529,72 @@ comparator can be one of C<<>, C<<=>, C<=>,
 C<!=>, C<>=> and C<>>.',
         'type' => 'list'
       },
+      'ConditionMemoryPressure',
+      {
+        'cargo' => {
+          'type' => 'leaf',
+          'value_type' => 'uniline'
+        },
+        'description' => 'Verify that the overall system (memory, CPU or IO) pressure is below or equal to a threshold.
+This setting takes a threshold value as argument. It can be specified as a simple percentage value,
+suffixed with C<%>, in which case the pressure will be measured as an average over the last
+five minutes before the attempt to start the unit is performed.
+Alternatively, the average timespan can also be specified using C</> as a separator, for
+example: C<10%/1min>. The supported timespans match what the kernel provides, and are
+limited to C<10sec>, C<1min> and C<5min>. The
+C<full> PSI will be checked first, and if not found C<some> will be
+checked. For more details, see the documentation on L<PSI (Pressure Stall Information)
+|https://www.kernel.org/doc/html/latest/accounting/psi.html>.
+
+Optionally, the threshold value can be prefixed with the slice unit under which the pressure will be checked,
+followed by a C<:>. If the slice unit is not specified, the overall system pressure will be measured,
+instead of a particular cgroup\'s.',
+        'type' => 'list'
+      },
+      'ConditionCPUPressure',
+      {
+        'cargo' => {
+          'type' => 'leaf',
+          'value_type' => 'uniline'
+        },
+        'description' => 'Verify that the overall system (memory, CPU or IO) pressure is below or equal to a threshold.
+This setting takes a threshold value as argument. It can be specified as a simple percentage value,
+suffixed with C<%>, in which case the pressure will be measured as an average over the last
+five minutes before the attempt to start the unit is performed.
+Alternatively, the average timespan can also be specified using C</> as a separator, for
+example: C<10%/1min>. The supported timespans match what the kernel provides, and are
+limited to C<10sec>, C<1min> and C<5min>. The
+C<full> PSI will be checked first, and if not found C<some> will be
+checked. For more details, see the documentation on L<PSI (Pressure Stall Information)
+|https://www.kernel.org/doc/html/latest/accounting/psi.html>.
+
+Optionally, the threshold value can be prefixed with the slice unit under which the pressure will be checked,
+followed by a C<:>. If the slice unit is not specified, the overall system pressure will be measured,
+instead of a particular cgroup\'s.',
+        'type' => 'list'
+      },
+      'ConditionIOPressure',
+      {
+        'cargo' => {
+          'type' => 'leaf',
+          'value_type' => 'uniline'
+        },
+        'description' => 'Verify that the overall system (memory, CPU or IO) pressure is below or equal to a threshold.
+This setting takes a threshold value as argument. It can be specified as a simple percentage value,
+suffixed with C<%>, in which case the pressure will be measured as an average over the last
+five minutes before the attempt to start the unit is performed.
+Alternatively, the average timespan can also be specified using C</> as a separator, for
+example: C<10%/1min>. The supported timespans match what the kernel provides, and are
+limited to C<10sec>, C<1min> and C<5min>. The
+C<full> PSI will be checked first, and if not found C<some> will be
+checked. For more details, see the documentation on L<PSI (Pressure Stall Information)
+|https://www.kernel.org/doc/html/latest/accounting/psi.html>.
+
+Optionally, the threshold value can be prefixed with the slice unit under which the pressure will be checked,
+followed by a C<:>. If the slice unit is not specified, the overall system pressure will be measured,
+instead of a particular cgroup\'s.',
+        'type' => 'list'
+      },
       'AssertArchitecture',
       {
         'description' => "Similar to the C<ConditionArchitecture>,
@@ -1909,6 +1973,48 @@ into.",
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
+      'AssertMemoryPressure',
+      {
+        'description' => "Similar to the C<ConditionArchitecture>,
+C<ConditionVirtualization>, \x{2026}, condition settings described above, these settings
+add assertion checks to the start-up of the unit. However, unlike the conditions settings, any
+assertion setting that is not met results in failure of the start job (which means this is logged
+loudly). Note that hitting a configured assertion does not cause the unit to enter the
+C<failed> state (or in fact result in any state change of the unit), it affects
+only the job queued for it. Use assertion expressions for units that cannot operate when specific
+requirements are not met, and when this is something the administrator or user should look
+into.",
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'AssertCPUPressure',
+      {
+        'description' => "Similar to the C<ConditionArchitecture>,
+C<ConditionVirtualization>, \x{2026}, condition settings described above, these settings
+add assertion checks to the start-up of the unit. However, unlike the conditions settings, any
+assertion setting that is not met results in failure of the start job (which means this is logged
+loudly). Note that hitting a configured assertion does not cause the unit to enter the
+C<failed> state (or in fact result in any state change of the unit), it affects
+only the job queued for it. Use assertion expressions for units that cannot operate when specific
+requirements are not met, and when this is something the administrator or user should look
+into.",
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'AssertIOPressure',
+      {
+        'description' => "Similar to the C<ConditionArchitecture>,
+C<ConditionVirtualization>, \x{2026}, condition settings described above, these settings
+add assertion checks to the start-up of the unit. However, unlike the conditions settings, any
+assertion setting that is not met results in failure of the start job (which means this is logged
+loudly). Note that hitting a configured assertion does not cause the unit to enter the
+C<failed> state (or in fact result in any state change of the unit), it affects
+only the job queued for it. Use assertion expressions for units that cannot operate when specific
+requirements are not met, and when this is something the administrator or user should look
+into.",
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
       'StartLimitInterval',
       {
         'status' => 'deprecated',
@@ -1924,7 +2030,7 @@ into.",
         'warn' => 'OnFailureIsolate is now OnFailureJobMode.'
       }
     ],
-    'generated_by' => 'parse-man.pl from systemd 249 doc',
+    'generated_by' => 'parse-man.pl from systemd 250 doc',
     'license' => 'LGPLv2.1+',
     'name' => 'Systemd::Section::Unit'
   }

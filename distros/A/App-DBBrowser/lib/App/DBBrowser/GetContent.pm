@@ -74,6 +74,9 @@ sub get_content {
         GET_DATA: while ( 1 ) {
             my ( $aoa, $open_mode );
             if ( ! $skip_to || $skip_to eq 'GET_DATA' ) {
+                if ( $skip_to ) {
+                    $skip_to = '';
+                }
                 my $ok;
                 if ( $sf->{i}{gc}{source_type} eq 'plain' ) {
                     ( $ok, $sf->{i}{gc}{file_fs} ) = $cr->from_col_by_col( $sql );
@@ -83,7 +86,6 @@ sub get_content {
                 }
                 if ( ! $ok ) {
                     return if $data_source_choice_idx < 2;
-                    $skip_to = '';
                     next MENU;
                 }
             }
@@ -94,6 +96,9 @@ sub get_content {
 
             PARSE: while ( 1 ) {
                 if ( ! $skip_to || $skip_to eq 'PARSE' ) {
+                    if ( $skip_to ) {
+                        $skip_to = '';
+                    }
                     my ( $parse_mode_idx, $open_mode );
                     if ( $sf->{i}{gc}{source_type} eq 'plain' ) {
                         $parse_mode_idx = -1;
@@ -124,7 +129,6 @@ sub get_content {
                             }
                         }
                         if ( ! $parse_ok ) {
-                            $skip_to = '';
                             next GET_DATA;
                         }
                         if ( ! @{$sql->{insert_into_args}} ) {
@@ -133,7 +137,6 @@ sub get_content {
                                 { prompt => 'Press ENTER' }
                             );
                             close $fh;
-                            $skip_to = '';
                             next GET_DATA;
                         }
                     }
@@ -141,21 +144,21 @@ sub get_content {
                         SHEET: while ( 1 ) {
                             my $ok = $cp->parse_with_Spreadsheet_Read( $sql, $file_fs );
                             if ( ! $ok ) {
-                                $skip_to = '';
                                 next GET_DATA;
                             }
                             if ( ! @{$sql->{insert_into_args}} ) { #
                                 next SHEET if $sf->{i}{ss}{$file_fs}{sheet_count} >= 2;
-                                $skip_to = '';
                                 next GET_DATA;
                             }
                             last SHEET;
                         }
                     }
                 }
-                $skip_to = '';
                 if ( ! $sf->{o}{insert}{enable_input_filter} ) {
                     return 1;
+                }
+                if ( $skip_to eq 'FILTER') {
+                    $skip_to = '';
                 }
 
                 FILTER: while ( 1 ) {

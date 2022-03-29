@@ -1,5 +1,13 @@
 Revision history for Alien::geos::af
 
+1.010 2022-03-26
+    - Share builds:
+      - Set rpath in compilation so geos.so finds geos_c.so
+      - Set ccache base dir to improve cache hits
+      - Use multiple probes to find geos.pc, geos-config
+        or (windows only) GIS Internals files
+    - General alienfile cleanups 
+
 1.009 2022-02-03
     - share builds:
       - Modify geos-config to dynamically return paths relative to install directory.

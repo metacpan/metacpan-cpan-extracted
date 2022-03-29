@@ -3,7 +3,7 @@ package Quiq;
 use strict;
 use warnings;
 
-our $VERSION = '1.200';
+our $VERSION = '1.201';
 
 =encoding utf8
 
@@ -930,7 +930,7 @@ L<Quiq::Xml::LibXml> - Funktionale Erweiterungen von XML::LibXML
 
 =head1 VERSION
 
-1.200
+1.201
 
 =head1 AUTHOR
 

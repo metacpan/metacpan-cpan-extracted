@@ -24,25 +24,25 @@ Inherits methods from:
 
 =head2 dump
 
-NamedParam.dump() -> I<Obj>
+    NamedParam.dump()
 
-Return the
+Returns the
 
 =cut
 
 =head2 name
 
-NamedParam.name() -> I<Obj>
+    NamedParam.name()
 
-Return the
+Returns the
 
 =cut
 
 =head2 new
 
-NamedParam.new() -> I<Obj>
+    NamedParam.new()
 
-Return the
+Returns the
 
 Aliases: I<call>
 
@@ -50,8 +50,8 @@ Aliases: I<call>
 
 =head2 value
 
-NamedParam.value() -> I<Obj>
+    NamedParam.value()
 
-Return the
+Returns the
 
 =cut

@@ -8,9 +8,9 @@ with 'Role::TinyCommons::Collection::FindItem::Iterator';         # add find_ite
 with 'Role::TinyCommons::Collection::PickItems::RandomSeekLines'; # add pick_items() that uses binary search
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-03-06'; # DATE
+our $DATE = '2022-03-27'; # DATE
 our $DIST = 'ArrayData-Lingua-Word-EN-Wordle'; # DIST
-our $VERSION = '20220306.0.0'; # VERSION
+our $VERSION = '20220306.0.1'; # VERSION
 
 # STATS
 
@@ -27,7 +27,7 @@ ArrayData::Lingua::Word::EN::Wordle - Wordle words (English)
 
 =head1 VERSION
 
-This document describes version 20220306.0.0 of ArrayData::Lingua::Word::EN::Wordle (from Perl distribution ArrayData-Lingua-Word-EN-Wordle), released on 2022-03-06.
+This document describes version 20220306.0.1 of ArrayData::Lingua::Word::EN::Wordle (from Perl distribution ArrayData-Lingua-Word-EN-Wordle), released on 2022-03-27.
 
 =head1 SYNOPSIS
 

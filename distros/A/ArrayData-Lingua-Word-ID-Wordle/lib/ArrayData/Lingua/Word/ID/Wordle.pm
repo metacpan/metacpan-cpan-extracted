@@ -17,7 +17,7 @@ ArrayData::Lingua::Word::ID::Wordle - Alias for ArrayData::Lingua::Word::ID::Kat
 
 =head1 VERSION
 
-This document describes version 20220306.0.0 of ArrayData::Lingua::Word::ID::Wordle (from Perl distribution ArrayData-Lingua-Word-ID-Wordle), released on 2022-03-06.
+This document describes version 20220306.0.1 of ArrayData::Lingua::Word::ID::Wordle (from Perl distribution ArrayData-Lingua-Word-ID-Wordle), released on 2022-03-27.
 
 =head1 SYNOPSIS
 

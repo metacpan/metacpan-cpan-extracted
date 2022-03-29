@@ -1,3 +1,9 @@
+0.037   2022-03-27  Released-By: PERLANCAR; Urgency: medium
+
+        - Set input and output encoding to UTF8 and note this in the
+          scripts' documentation (RT#141357).
+
+
 0.036   2022-02-10  Released-By: PERLANCAR; Urgency: medium
 
         - [cli csv-freqtable] [bugfix] Extraneous first row was produced.

@@ -35,8 +35,7 @@
             "Clone" : "0.45",
             "Config" : "0",
             "Filter::Util::Call" : "1.59",
-            "Module::Generic" : "v0.21.9",
-            "Module::Generic::SharedMem" : "v0.2.2",
+            "Module::Generic" : "v0.22.1",
             "Nice::Try" : "v1.1.2",
             "POSIX" : "0",
             "PPI" : "1.270",
@@ -46,6 +45,7 @@
             "parent" : "0",
             "perl" : "5.014000",
             "strict" : "0",
+            "vars" : "0",
             "warnings" : "0"
          }
       },
@@ -54,6 +54,7 @@
             "Module::Generic::File" : "v0.3.2",
             "Test2::IPC" : "1.302190",
             "Test2::V0" : "0.000145",
+            "Test::More" : "1.302162",
             "Test::Pod" : "1.52",
             "Time::HiRes" : "0"
          }
@@ -69,6 +70,6 @@
          "web" : "https://git.deguest.jp/jack/Promise-Me"
       }
    },
-   "version" : "v0.1.2",
+   "version" : "v0.2.0",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

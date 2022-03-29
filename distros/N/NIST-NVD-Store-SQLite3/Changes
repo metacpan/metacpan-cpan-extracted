@@ -1,5 +1,15 @@
 Revision history for NIST-NVD-Store-SQLite3
 
+1.02.00 20220326T233454-0800 cjac@google.com
+	- tests are passing again
+
+1.01.00 20120718T1832:49-0700 cjac@f5.com
+        - branched for changes to:
+				* t/websec.t                    - create and exercise websec index
+				* bin/convert-nvdcve            - re-factor code into lib/
+				* lib/NIST/NVD/Store/SQLite3.pm - adjust as necessary for t/websec.t
+
+
 1.00.00 cjac@f5.com 20120718T155922
 				* exercised code in-house
 				* tests are now all green on debian wheezy amd64

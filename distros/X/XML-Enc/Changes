@@ -1,0 +1,19 @@
+Revision history for Perl extension XML::Enc.
+
+0.03 -- Sat Mar 26 22:01:34 ADT 2022
+
+    - 894b08c Update Version and README for release
+    - 4a7ff19 Remove the force_element_to_content its unneeded
+    - 83b98b1 v0.02
+
+0.02 -- Sat Mar 26 13:23:00 ADT 2022
+
+    [Minor POD Changes]
+    - bf08275 Fix an issue with the POD for force_element_to_content inserted in the incorrect location
+    - 8e5361b v0.01
+    - 66f6443 Add Changes document
+
+0.01 -- Sat Mar 26 11:53:16 ADT 2022
+
+    [ First Release ]
+    - 89e87ab Initial Version

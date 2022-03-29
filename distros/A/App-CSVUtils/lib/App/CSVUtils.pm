@@ -8,9 +8,9 @@ use Log::ger;
 use Hash::Subset qw(hash_subset);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-02-10'; # DATE
+our $DATE = '2022-03-27'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '0.036'; # VERSION
+our $VERSION = '0.037'; # VERSION
 
 our %SPEC;
 
@@ -1100,10 +1100,17 @@ sub csvutil {
     [200, "OK", $res, {"cmdline.skip_format"=>1}];
 } # csvutil
 
+our $common_desc = <<'_';
+*Common notes for the utilities*
+
+Encoding: The utilities in this module/distribution accept and emit UTF8 text.
+
+_
+
 $SPEC{csv_add_field} = {
     v => 1.1,
     summary => 'Add a field to CSV file',
-    description => <<'_',
+    description => <<'_' . $common_desc,
 
 Your Perl code (-e) will be called for each row (excluding the header row) and
 should return the value for the new field. `$main::row` is available and
@@ -1160,6 +1167,7 @@ $SPEC{csv_list_field_names} = {
         %args_common,
         %arg_filename_0,
     },
+    description => '' . $common_desc,
 };
 sub csv_list_field_names {
     my %args = @_;
@@ -1173,6 +1181,7 @@ $SPEC{csv_info} = {
         %args_common,
         %arg_filename_0,
     },
+    description => '' . $common_desc,
 };
 sub csv_info {
     my %args = @_;
@@ -1188,6 +1197,7 @@ $SPEC{csv_delete_field} = {
         %arg_filename_0,
         %arg_fields_1,
     },
+    description => '' . $common_desc,
     tags => ['outputs_csv'],
 };
 sub csv_delete_field {
@@ -1198,7 +1208,7 @@ sub csv_delete_field {
 $SPEC{csv_munge_field} = {
     v => 1.1,
     summary => 'Munge a field in every row of CSV file',
-    description => <<'_',
+    description => <<'_' . $common_desc,
 
 Perl code (-e) will be called for each row (excluding the header row) and `$_`
 will contain the value of the field, and the Perl code is expected to modify it.
@@ -1224,7 +1234,7 @@ sub csv_munge_field {
 $SPEC{csv_replace_newline} = {
     v => 1.1,
     summary => 'Replace newlines in CSV values',
-    description => <<'_',
+    description => <<'_' . $common_desc,
 
 Some CSV parsers or applications cannot handle multiline CSV values. This
 utility can be used to convert the newline to something else. There are a few
@@ -1282,7 +1292,7 @@ sub csv_replace_newline {
 $SPEC{csv_sort_rows} = {
     v => 1.1,
     summary => 'Sort CSV rows',
-    description => <<'_',
+    description => <<'_' . $common_desc,
 
 This utility sorts the rows in the CSV. Example input CSV:
 
@@ -1398,7 +1408,7 @@ sub csv_sort_rows {
 $SPEC{csv_sort_fields} = {
     v => 1.1,
     summary => 'Sort CSV fields',
-    description => <<'_',
+    description => <<'_' . $common_desc,
 
 This utility sorts the order of fields in the CSV. Example input CSV:
 
@@ -1448,6 +1458,7 @@ $SPEC{csv_sum} = {
         %arg_filename_0,
         %arg_with_data_rows,
     },
+    description => '' . $common_desc,
     tags => ['outputs_csv'],
 };
 sub csv_sum {
@@ -1465,6 +1476,7 @@ $SPEC{csv_avg} = {
         %arg_filename_0,
         %arg_with_data_rows,
     },
+    description => '' . $common_desc,
     tags => ['outputs_csv'],
 };
 sub csv_avg {
@@ -1481,6 +1493,7 @@ $SPEC{csv_freqtable} = {
         %arg_filename_0,
         %arg_field_1,
     },
+    description => '' . $common_desc,
 };
 sub csv_freqtable {
     my %args = @_;
@@ -1503,6 +1516,7 @@ $SPEC{csv_select_row} = {
             pos => 1,
         },
     },
+    description => '' . $common_desc,
     links => [
         {url=>"prog:csv-split"},
     ],
@@ -1517,7 +1531,7 @@ sub csv_select_row {
 $SPEC{csv_split} = {
     v => 1.1,
     summary => 'Split CSV file into several files',
-    description => <<'_',
+    description => <<'_' . $common_desc,
 
 Will output split files xaa, xab, and so on. Each split file will contain a
 maximum of `lines` rows (options to limit split files' size based on number of
@@ -1559,7 +1573,7 @@ sub csv_split {
 $SPEC{csv_grep} = {
     v => 1.1,
     summary => 'Only output row(s) where Perl expression returns true',
-    description => <<'_',
+    description => <<'_' . $common_desc,
 
 This is like Perl's `grep` performed over rows of CSV. In `$_`, your Perl code
 will find the CSV row as an arrayref (or, if you specify `-H`, as a hashref).
@@ -1608,7 +1622,7 @@ sub csv_grep {
 $SPEC{csv_map} = {
     v => 1.1,
     summary => 'Return result of Perl code for every row',
-    description => <<'_',
+    description => <<'_' . $common_desc,
 
 This is like Perl's `map` performed over rows of CSV. In `$_`, your Perl code
 will find the CSV row as an arrayref (or, if you specify `-H`, as a hashref).
@@ -1653,7 +1667,7 @@ sub csv_map {
 $SPEC{csv_each_row} = {
     v => 1.1,
     summary => 'Run Perl code for every row',
-    description => <<'_',
+    description => <<'_' . $common_desc,
 
 This is like csv_map, except result of code is not printed.
 
@@ -1694,6 +1708,7 @@ $SPEC{csv_convert_to_hash} = {
             pos => 1,
         },
     },
+    description => '' . $common_desc,
 };
 sub csv_convert_to_hash {
     my %args = @_;
@@ -1710,6 +1725,7 @@ $SPEC{csv_transpose} = {
         %args_csv_output,
         %arg_filename_0,
     },
+    description => '' . $common_desc,
     tags => ['outputs_csv'],
 };
 sub csv_transpose {
@@ -1731,6 +1747,7 @@ _
         %args_common,
         %arg_filename_0,
     },
+    description => '' . $common_desc,
 };
 sub csv2td {
     my %args = @_;
@@ -1742,7 +1759,7 @@ $SPEC{csv_concat} = {
     v => 1.1,
     summary => 'Concatenate several CSV files together, '.
         'collecting all the fields',
-    description => <<'_',
+    description => <<'_' . $common_desc,
 
 Example, concatenating this CSV:
 
@@ -1854,6 +1871,7 @@ $SPEC{csv_select_fields} = {
     args_rels => {
         req_one => ['fields', 'field_pat'],
     },
+    description => '' . $common_desc,
     tags => ['outputs_csv'],
 };
 sub csv_select_fields {
@@ -1870,6 +1888,7 @@ $SPEC{csv_dump} = {
         %arg_filename_0,
         %arg_hash,
     },
+    description => '' . $common_desc,
 };
 sub csv_dump {
     my %args = @_;
@@ -1879,7 +1898,7 @@ sub csv_dump {
 $SPEC{csv_csv} = {
     v => 1.1,
     summary => 'Convert CSV to CSV',
-    description => <<'_',
+    description => <<'_' . $common_desc,
 
 Why convert CSV to CSV? When you want to change separator/quote/escape
 character, for one.
@@ -1900,7 +1919,7 @@ sub csv_csv {
 $SPEC{csv_setop} = {
     v => 1.1,
     summary => 'Set operation against several CSV files',
-    description => <<'_',
+    description => <<'_' . $common_desc,
 
 Example input:
 
@@ -2238,7 +2257,7 @@ sub csv_setop {
 $SPEC{csv_lookup_fields} = {
     v => 1.1,
     summary => 'Fill fields of a CSV file from another',
-    description => <<'_',
+    description => <<'_' . $common_desc,
 
 Example input:
 
@@ -2479,7 +2498,7 @@ App::CSVUtils - CLI utilities related to CSV
 
 =head1 VERSION
 
-This document describes version 0.036 of App::CSVUtils (from Perl distribution App-CSVUtils), released on 2022-02-10.
+This document describes version 0.037 of App::CSVUtils (from Perl distribution App-CSVUtils), released on 2022-03-27.
 
 =head1 DESCRIPTION
 
@@ -2562,8 +2581,9 @@ Usage:
 
 Return an enveloped aoaos table data from CSV data.
 
-Read more about "table data" in L<App::td>, which comes with a CLI L<td>
-to munge table data.
+I<Common notes for the utilities>
+
+Encoding: The utilities in this module/distribution accept and emit UTF8 text.
 
 This function is not exported.
 
@@ -2645,6 +2665,10 @@ also available for additional information.
 Field by default will be added as the last field, unless you specify one of
 C<--after> (to put after a certain field), C<--before> (to put before a certain
 field), or C<--at> (to put at specific position, 1 means as the first field).
+
+I<Common notes for the utilities>
+
+Encoding: The utilities in this module/distribution accept and emit UTF8 text.
 
 This function is not exported.
 
@@ -2781,6 +2805,10 @@ Usage:
  csv_avg(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Output a summary row which are arithmetic averages of data rows.
+
+I<Common notes for the utilities>
+
+Encoding: The utilities in this module/distribution accept and emit UTF8 text.
 
 This function is not exported.
 
@@ -2932,6 +2960,10 @@ will result in:
  ,,,X
  ,,,Y
 
+I<Common notes for the utilities>
+
+Encoding: The utilities in this module/distribution accept and emit UTF8 text.
+
 This function is not exported.
 
 Arguments ('*' denotes required arguments):
@@ -3048,6 +3080,10 @@ Usage:
 
 Return a hash of field names as keys and first row as values.
 
+I<Common notes for the utilities>
+
+Encoding: The utilities in this module/distribution accept and emit UTF8 text.
+
 This function is not exported.
 
 Arguments ('*' denotes required arguments):
@@ -3125,6 +3161,10 @@ Convert CSV to CSV.
 
 Why convert CSV to CSV? When you want to change separator/quote/escape
 character, for one.
+
+I<Common notes for the utilities>
+
+Encoding: The utilities in this module/distribution accept and emit UTF8 text.
 
 This function is not exported.
 
@@ -3246,6 +3286,10 @@ Usage:
 
 Delete one or more fields from CSV file.
 
+I<Common notes for the utilities>
+
+Encoding: The utilities in this module/distribution accept and emit UTF8 text.
+
 This function is not exported.
 
 Arguments ('*' denotes required arguments):
@@ -3366,6 +3410,10 @@ Usage:
 
 Dump CSV as data structure (array of arrayE<sol>hash).
 
+I<Common notes for the utilities>
+
+Encoding: The utilities in this module/distribution accept and emit UTF8 text.
+
 This function is not exported.
 
 Arguments ('*' denotes required arguments):
@@ -3457,6 +3505,10 @@ Examples:
 
 This is like csv_map, except result of code is not printed.
 
+I<Common notes for the utilities>
+
+Encoding: The utilities in this module/distribution accept and emit UTF8 text.
+
 This function is not exported.
 
 Arguments ('*' denotes required arguments):
@@ -3535,6 +3587,10 @@ Usage:
  csv_freqtable(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Output a frequency table of values of a specified field in CSV.
+
+I<Common notes for the utilities>
+
+Encoding: The utilities in this module/distribution accept and emit UTF8 text.
 
 This function is not exported.
 
@@ -3638,6 +3694,10 @@ information.
 
 Your code is then free to return true or false based on some criteria. Only rows
 where Perl expression returns true will be included in the result.
+
+I<Common notes for the utilities>
+
+Encoding: The utilities in this module/distribution accept and emit UTF8 text.
 
 This function is not exported.
 
@@ -3763,6 +3823,10 @@ Usage:
 
 Show information about CSV file (number of rows, fields, etc).
 
+I<Common notes for the utilities>
+
+Encoding: The utilities in this module/distribution accept and emit UTF8 text.
+
 This function is not exported.
 
 Arguments ('*' denotes required arguments):
@@ -3833,6 +3897,10 @@ Usage:
  csv_list_field_names(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 List field names of CSV file.
+
+I<Common notes for the utilities>
+
+Encoding: The utilities in this module/distribution accept and emit UTF8 text.
 
 This function is not exported.
 
@@ -3930,6 +3998,10 @@ client_email:email,client_phone:phone>. The result will be:
  101,Jerry,not renewing,andy@example.com,555-2983
  299,Jerry,still thinking over,cindy@example.com,555-7892
  734,Elaine,renewing,felipe@example.com,555-9067
+
+I<Common notes for the utilities>
+
+Encoding: The utilities in this module/distribution accept and emit UTF8 text.
 
 This function is not exported.
 
@@ -4083,6 +4155,10 @@ information.
 Your code is then free to return a string based on some operation against these
 data. This utility will then print out the resulting string.
 
+I<Common notes for the utilities>
+
+Encoding: The utilities in this module/distribution accept and emit UTF8 text.
+
 This function is not exported.
 
 Arguments ('*' denotes required arguments):
@@ -4171,6 +4247,10 @@ will contain the value of the field, and the Perl code is expected to modify it.
 C<$main::row> will contain the current row array. C<$main::rownum> contains the
 row number (2 means the first data row). C<$main::csv> is the L<Text::CSV_XS>
 object. C<$main::field_idxs> is also available for additional information.
+
+I<Common notes for the utilities>
+
+Encoding: The utilities in this module/distribution accept and emit UTF8 text.
 
 This function is not exported.
 
@@ -4302,6 +4382,10 @@ choices: replace newline with space (C<--with-space>, the default), remove
 newline (C<--with-nothing>), replace with encoded representation
 (C<--with-backslash-n>), or with characters of your choice (C<--with 'blah'>).
 
+I<Common notes for the utilities>
+
+Encoding: The utilities in this module/distribution accept and emit UTF8 text.
+
 This function is not exported.
 
 Arguments ('*' denotes required arguments):
@@ -4419,6 +4503,10 @@ Usage:
  csv_select_fields(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Only output selected field(s).
+
+I<Common notes for the utilities>
+
+Encoding: The utilities in this module/distribution accept and emit UTF8 text.
 
 This function is not exported.
 
@@ -4543,6 +4631,10 @@ Usage:
  csv_select_row(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Only output specified row(s).
+
+I<Common notes for the utilities>
+
+Encoding: The utilities in this module/distribution accept and emit UTF8 text.
 
 This function is not exported.
 
@@ -4735,6 +4827,10 @@ Then C<--union --compare-fields a:Ei,b:Bi file1.csv file3.csv> will result in:
 
 Finally you can print out certain fields using C<--result-fields>.
 
+I<Common notes for the utilities>
+
+Encoding: The utilities in this module/distribution accept and emit UTF8 text.
+
 This function is not exported.
 
 Arguments ('*' denotes required arguments):
@@ -4875,6 +4971,10 @@ Example output CSV:
 
 You can also reverse the sort order (C<-r>), sort case-insensitively (C<-i>), or
 provides the ordering, e.g. C<--example a,c,b>.
+
+I<Common notes for the utilities>
+
+Encoding: The utilities in this module/distribution accept and emit UTF8 text.
 
 This function is not exported.
 
@@ -5078,6 +5178,10 @@ descending length of name):
  Andy,20
  Ben,30
 
+I<Common notes for the utilities>
+
+Encoding: The utilities in this module/distribution accept and emit UTF8 text.
+
 This function is not exported.
 
 Arguments ('*' denotes required arguments):
@@ -5250,6 +5354,10 @@ overwritten.
 
 Interface is loosely based on the C<split> Unix utility.
 
+I<Common notes for the utilities>
+
+Encoding: The utilities in this module/distribution accept and emit UTF8 text.
+
 This function is not exported.
 
 Arguments ('*' denotes required arguments):
@@ -5367,6 +5475,10 @@ Usage:
  csv_sum(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Output a summary row which are arithmetic sums of data rows.
+
+I<Common notes for the utilities>
+
+Encoding: The utilities in this module/distribution accept and emit UTF8 text.
 
 This function is not exported.
 
@@ -5487,6 +5599,10 @@ Usage:
  csv_transpose(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Transpose a CSV.
+
+I<Common notes for the utilities>
+
+Encoding: The utilities in this module/distribution accept and emit UTF8 text.
 
 This function is not exported.
 

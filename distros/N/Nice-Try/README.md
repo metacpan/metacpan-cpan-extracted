@@ -39,8 +39,8 @@ When run, this would produce, as one would expect:
         Ok, then
 
 Also since version 1.0.0,
-[Nice::Try](https://metacpan.org/pod/Nice::Try){.perl-module} is context
-aware:
+[Nice::Try](https://metacpan.org/pod/Nice::Try){.perl-module} is
+**extended** context aware:
 
         use Want; # an awesome module which extends wantarray
         sub info
@@ -104,7 +104,7 @@ aware:
         # scalar reference context
         my $name = ${$o->info};
 
-And you also have granual power in the catch block to filter which
+And you also have granular power in the catch block to filter which
 exception to handle. See more on this in [\"EXCEPTION
 CLASS\"](#exception-class){.perl-module}
 
@@ -112,6 +112,8 @@ CLASS\"](#exception-class){.perl-module}
         {
             die( Exception->new( "Arghhh" => 401 ) );
         }
+        # can also write this as:
+        # catch( Exception $oopsie where { $_->message =~ /Arghhh/ && $_->code == 500 } )
         catch( $oopsie isa Exception where { $_->message =~ /Arghhh/ && $_->code == 500 } )
         {
             # Do something to deal with some server error
@@ -137,7 +139,7 @@ CLASS\"](#exception-class){.perl-module}
 VERSION
 =======
 
-        v1.1.1
+        v1.2.0
 
 DESCRIPTION
 ===========
@@ -231,7 +233,7 @@ Here is a list of its distinctive features:
             }
             catch( $default )
             {
-                print( "Something weird has happened: $e\n" );
+                print( "Something weird has happened: $default\n" );
             }
             finally
             {
@@ -557,7 +559,7 @@ as a regular non-experimental feature.
 
 See more information about perl\'s featured implementation of try-catch
 in
-[https://perldoc.perl.org/5.34.0/perlsyn\#Try-Catch-Exception-Handling\|perlsyn](https://perldoc.perl.org/5.34.0/perlsyn#Try-Catch-Exception-Handling|perlsyn){.perl-module}
+[perlsyn](https://perldoc.perl.org/5.34.0/perlsyn#Try-Catch-Exception-Handling){.perl-module}
 
 So, [Nice::Try](https://metacpan.org/pod/Nice::Try){.perl-module} is
 quite unique and fills the missing features, and since it uses XS
@@ -681,7 +683,8 @@ EXCEPTION CLASS
 As mentioned above, you can use class when raising exceptions and you
 can filter them in a variety of way when you catch them.
 
-Here are your options:
+Here are your options (replace `Exception::Class` with your favorite
+exception class):
 
 1. catch( Exception::Class \$error\_variable ) { }
 
@@ -696,7 +699,7 @@ Here are your options:
             {
                 die( Exception->new( "Oh no!", { code => 401 } ) );
             }
-            catch( Exception $oopsie where { $_->code >= 400 && $_->code < 499 })
+            catch( Exception $oopsie where { $_->code >= 400 && $_->code <= 499 })
             {
                 # some more handling here
             }
@@ -979,6 +982,69 @@ other than the one the regular [\"wantarray\" in
 perlfunc](https://metacpan.org/pod/perlfunc#wantarray){.perl-module}
 provides.
 
+This is particularly true when running within an Apache modperl handler
+which has no caller. If you use
+[Nice::Try](https://metacpan.org/pod/Nice::Try){.perl-module} in such
+handler, it will kill Apache process, so you need to disable the use of
+[Want](https://metacpan.org/pod/Want){.perl-module}, by calling:
+
+        use Nice::Try dont_want => 1;
+
+When there is an update to correct this bug from
+[Want](https://metacpan.org/pod/Want){.perl-module}, I will issue a new
+version.
+
+The use of [Want](https://metacpan.org/pod/Want){.perl-module} is also
+automatically disabled when running under a package that use
+overloading.
+
+LIMITATIONS
+===========
+
+Currently, the only known limitation is when one use experimental
+subroutine attributes inside a try-catch block. For example:
+
+        use strict;
+        use warnings;
+        use experimental 'signatures';
+        use Nice::Try;
+
+        sub test { 1 }
+
+        sub foo ($f = test()) { 1 }
+
+        try {
+            my $k = sub ($f = foo()) {}; # <-- this sub routine attribute inside try-catch block will disrupt Nice::Try and make it fail.
+            print( "worked\n" );
+        }
+        catch($e) {
+            warn "caught: $e";
+        }
+
+        __END__
+
+instead, do not use experimental subroutine attributes inside try-catch
+block:
+
+        use strict;
+        use warnings;
+        use experimental 'signatures';
+        use Nice::Try;
+
+        sub test { 1 }
+
+        sub foo ($f = test()) { 1 }
+
+        try {
+            my $k = sub {}; # <-- Now it works normally
+            print( "worked\n" );
+        }
+        catch($e) {
+            warn "caught: $e";
+        }
+
+        __END__
+
 DEBUGGING
 =========
 
@@ -1010,6 +1076,23 @@ human readable code, pass it the `debug_code` parameter like this:
 
         use Nice::Try debug_code => 1;
 
+CLASS FUNCTIONS
+===============
+
+The following class functions can be used.
+
+implement
+---------
+
+        my $new_code = Nice::Try->implement( $perl_code );
+        eval( $new_code );
+
+Provided with a perl code having one or more try-catch blocks and this
+will return a perl code converted to support try-catch blocks.
+
+This is designed to be used for perl code you store, such as subroutines
+dynamically loaded.
+
 CREDITS
 =======
 
@@ -1020,7 +1103,7 @@ which I borrowed some code.
 AUTHOR
 ======
 
-Jacques Deguest \<`jack@deguest.jp`{classes="ARRAY(0x555fc0e5db78)"}\>
+Jacques Deguest \<`jack@deguest.jp`{classes="ARRAY(0x56479b4d0358)"}\>
 
 SEE ALSO
 ========
@@ -1030,6 +1113,9 @@ SEE ALSO
 [Try::Harder](https://metacpan.org/pod/Try::Harder){.perl-module},
 [Syntax::Keyword::Try](https://metacpan.org/pod/Syntax::Keyword::Try){.perl-module},
 [Exception::Class](https://metacpan.org/pod/Exception::Class){.perl-module}
+
+[JavaScript implementation of
+nice-try](https://javascript.info/try-catch){.perl-module}
 
 COPYRIGHT & LICENSE
 ===================

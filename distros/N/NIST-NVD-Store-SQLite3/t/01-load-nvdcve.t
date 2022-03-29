@@ -15,7 +15,7 @@ use NIST::NVD::Query;
 
 ( my $dist_dir )
     = ( Cwd::realpath( File::Spec->catfile( $Bin, '..' ) )
-        =~ m:^(.*NIST-NVD-Store-SQLite3)$: );
+        =~ m:^(.*NIST-NVD-Store-SQLite3.*)$: );
 
 ok( -d $dist_dir, '$dist_dir is a directory' );
 
@@ -35,7 +35,7 @@ ok( -f $convert_script, '$convert_script is a file' );
 my $nvd_source_file = File::Spec->catfile( $data_dir, 'nvdcve-2.0-test.xml' );
 my $cwe_source_file = File::Spec->catfile( $data_dir, 'cwec_v2.1.xml' );
 
-ok( -f $nvd_source_file, '$nvd_source_file is a file' );
+ok( -f $nvd_source_file, "[$nvd_source_file] is a file" );
 
 my $db_file = File::Spec->catfile( $data_dir, 'nvdcve-2.0.db' );
 
@@ -51,7 +51,7 @@ unlink($db_file) if -f $db_file;
 
 chdir($data_dir);
 
-$ENV{PERL5LIB} = File::Spec->catfile( $dist_dir, 'blib', 'lib' );
+$ENV{PERL5LIB} = "$ENV{PERL5LIB}:" . File::Spec->catfile( $dist_dir, 'blib', 'lib' );
 
 my $cmd
     = "$convert_script --nvd $nvd_source_file --cwe $cwe_source_file --store SQLite3 2>&1";
@@ -108,8 +108,8 @@ is( $type, 'application/octet-stream',
 my $flm = File::LibMagic->new();
 
 $type = $flm->describe_filename($db_file);
-is( $type,
-    'SQLite 3.x database',
+like( $type,
+    qr/^SQLite 3.x database/,
     "file contents indicate correct type: [$type]"
 );
 

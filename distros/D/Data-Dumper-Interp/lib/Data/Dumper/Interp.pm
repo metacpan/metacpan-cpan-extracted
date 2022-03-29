@@ -12,10 +12,10 @@
 # restriction, but the library as a whole (or any portion containing those 
 # extracts) may only be distributred under the said software licenses.
 
-use strict; use warnings FATAL => 'all'; use utf8; use 5.012;
+use strict; use warnings FATAL => 'all'; use utf8; use 5.020;
 use feature qw(state);
 package  Data::Dumper::Interp;
-$Data::Dumper::Interp::VERSION = '2.23';
+$Data::Dumper::Interp::VERSION = '2.24';
 
 package  # newline prevents Dist::Zilla::Plugin::PkgVersion from adding $VERSION
   DB;
@@ -45,7 +45,23 @@ sub _dbvisq(_) {  # for our internal debugging messages
   $s
 }
 sub _dbavis(@) { "(" . join(", ", map{_dbvis} @_) . ")" }
-sub oops(@) { @_ = ("\noops:",@_,"\n  "); goto &Carp::confess }
+our $_dbmaxlen = 300;
+sub _dbrawstr(_) { "«".(length($_[0])>$_dbmaxlen ? substr($_[0],0,$_dbmaxlen-3)."..." : $_[0])."»" }
+sub _dbstr($) {
+  local $_ = shift;
+  s/\n/\N{U+2424}/sg; # a special NL glyph
+  s/[\x{00}-\x{20}]/ chr( ord($&)+0x2400 ) /aseg;
+  _dbrawstr($_) . " (".length().")";
+}
+sub _dbstrposn($$) {
+  local $_ = shift;
+  my $posn = shift;
+  local $_dbmaxlen = max($_dbmaxlen+2, $posn+2);
+  $_ = _dbstr($_);
+  $_ .= "\n " . (" " x $posn) . "^";
+}
+
+sub oops(@) { @_ = ("\n".__PACKAGE__." oops:",@_,"\n  "); goto &Carp::confess }
 
 use Exporter 'import';
 our @EXPORT    = qw(vis  avis  alvis  ivis  dvis  hvis  hlvis
@@ -53,7 +69,8 @@ our @EXPORT    = qw(vis  avis  alvis  ivis  dvis  hvis  hlvis
                     u qsh _forceqsh qshpath);
 
 our @EXPORT_OK = qw($Debug $MaxStringwidth $Truncsuffix $Stringify $Foldwidth
-                    $Useqq $Quotekeys $Sortkeys $Sparseseen);
+                    $Useqq $Quotekeys $Sortkeys $Sparseseen
+                    $Maxdepth $Maxrecurse $Deparse);
 
 our @ISA       = ('Data::Dumper'); # see comments at new()
 
@@ -88,7 +105,8 @@ sub qshpath(_) {  # like qsh but does not quote initial ~ or ~username
 
 our ($Debug, $MaxStringwidth, $Truncsuffix, $Stringify,
      $Foldwidth, $Foldwidth1,
-     $Useqq, $Quotekeys, $Sortkeys, $Sparseseen);
+     $Useqq, $Quotekeys, $Sortkeys, $Sparseseen,
+     $Maxdepth, $Maxrecurse, $Deparse);
 
 $Debug          = 0            unless defined $Debug;
 $MaxStringwidth = 0            unless defined $MaxStringwidth;
@@ -98,10 +116,13 @@ $Foldwidth      = undef        unless defined $Foldwidth;  # undef auto-detects
 $Foldwidth1     = undef        unless defined $Foldwidth1; # override for 1st
 
 # The following override Data::Dumper defaults
-$Useqq          = 1            unless defined $Useqq;
+$Useqq          = "utf8:controlpics" unless defined $Useqq;
 $Quotekeys      = 0            unless defined $Quotekeys;
 $Sortkeys       = \&__sortkeys unless defined $Sortkeys;
 $Sparseseen     = 1            unless defined $Sparseseen;
+$Maxdepth       = $Data::Dumper::Maxdepth   unless defined $Maxdepth;
+$Maxrecurse     = $Data::Dumper::Maxrecurse unless defined $Maxrecurse;
+$Deparse        = 0             unless defined $Deparse;
 
 #################### Methods #################
 
@@ -207,6 +228,9 @@ sub _config_defaults {
     ->Stringify($Stringify)
     ->Truncsuffix($Truncsuffix)
     ->Quotekeys($Quotekeys)
+    ->Maxdepth($Maxdepth)
+    ->Maxrecurse($Maxrecurse)
+    ->Deparse($Deparse)
     ->Sortkeys($Sortkeys)
     ->Sparseseen($Sparseseen)
     ->Useqq($Useqq)
@@ -442,166 +466,389 @@ sub __sortkeys {
   ]
 }
 
-# FIXME: These don't take into account quoted strings in the interior!
+my $balanced_re = RE_balanced(-parens=>'{}[]()');
+
+# cf man perldata
+my $userident_re = qr/ (?: (?=\p{Word})\p{XID_Start} | _ )
+                           (?: (?=\p{Word})\p{XID_Continue}  )* /x;
+
+my $pkgname_re = qr/ ${userident_re} (?: :: ${userident_re} )* /x;
+
 our $curlies_re = RE_balanced(-parens=>'{}');
 our $parens_re = RE_balanced(-parens=>'()');
 our $curliesorsquares_re = RE_balanced(-parens=>'{}[]');
 
-my $bareword_re = qr/\b[A-Za-z_][A-Za-z0-9_]*\b/;
-my $qquote_re = qr/"(?:[^"\\]++|\\.)*+"/;
-my $squote_re = qr/'(?:[^'\\]++|\\.)*+'/;
-my $quote_re = qr/${qquote_re}|${squote_re}/;
+my $anyvname_re =
+  qr/ ${pkgname_re} | [0-9]+ | \^[A-Z]
+                    | [-+!\$\&\;i"'().,\@\/:<>?\[\]\~\^\\] /x;
 
-# These never match spaces (except as part of a quote)
-my $nonquote_atom_re
-      = qr/ (?: [^,;\{\}\[\]"'\s]++ | \\["'] )++ | [,;\{\}\[\]] /xs;
-my $atom_re = qr/ $quote_re | $nonquote_atom_re /x;
+my $anyvname_or_refexpr_re = qr/ ${anyvname_re} | ${curlies_re} /x;
 
-my $indent_unit = 2;
+my %qqesc2controlpic = (
+  '\0' => "\N{SYMBOL FOR NULL}",
+  '\a' => "\N{SYMBOL FOR BELL}",
+  '\b' => "\N{SYMBOL FOR BACKSPACE}",
+  '\e' => "\N{SYMBOL FOR ESCAPE}",
+  '\f' => "\N{SYMBOL FOR FORM FEED}",
+  '\n' => "\N{SYMBOL FOR NEWLINE}",
+  '\r' => "\N{SYMBOL FOR CARRIAGE RETURN}",
+  '\t' => "\N{SYMBOL FOR HORIZONTAL TABULATION}",
+);
+sub __postprocess_atom() {  # edits $_
+  s/\Q$magic_numstr_prefix\E//s 
+    if /^['"]/s;
 
-sub __insert_spaces() { # edits $_ in place
-  #FIXME BUG HERE might corrupt interior of quoted strings
-
-  ### TEMP? Verify that we can parse everything
-  ### (probably redundant with 'unmatched tail' check in __fold)
-  /\A(?: ${atom_re} | \s+ )+\z/xs or oops "regex problem($_)";
-
-  s( $quote_re ?+ \K
-     ( \bsub\s*${curlies_re} | (?: $nonquote_atom_re | \s+)*+ )
-   )
-   ( do {
-       local $_ = $1;
-       s/\ (?![\$\@])//g;                        # FIXME: is this correct?
-       s/^sub\ ?(${curlies_re})/"sub { ".substr($1,1,length($1)-2)." }"/eg;
-       s/=>/ => /g;
-       s/(=>\s*[-.\w\\]+,)/$1 /g;  #  key => value,<add space here>
-       s/([\]\}],)(?!\ )/$1 /g; # after ], or },
-       #s/,(?!\ )/, /g;      # space after every comma
-       # Insert a space after an opening bracket at start of line, so the
-       # first item will line up with the indentation of stuff at that level.
-       s/\ +/ /sg;           # collapse muiltiple spaces
-       $_
-     }
-   )exsg;
-}#__insert_spaces
-
-my $foldunit_re = qr/${atom_re}(?: , | \s*=>)?+/x;
-
-sub _fold { # edits $_ in place
-  my $self = shift;
-  my ($debug, $maxwidth, $maxwidth1, $pad) =
-       (@$self{qw/Debug Foldwidth Foldwidth1/}, $self->Pad);
-  return
-    if $maxwidth == 0;  # no folding
-  my $maxwid = $maxwidth1 || $maxwidth;
-  #$maxwid = INT_MAX if $maxwid==0;  # no folding, but maybe space adjustments
-  $maxwid = max(0, $maxwid - length($pad));
-  my $smidgen = max(5, int($maxwid / 6));
-
-  pos = 0;
-  my $curr_indent = 0;
-  my $next_indent = 0;
-  our $nind; local $nind = 0;
-  my sub __ind_adjustment(;$) {
-    if ($debug) {
-      my $len = $curr_indent + pos() - $-[0];
-      say "#VisFold: @{_}atom «$^N» len=$len pos=${\pos} \$-[0]=$-[0] c_indent=$curr_indent n_indent=$next_indent nind=$nind mw=$maxwid,$smidgen";
-    }
-    local $_ = $^N;;
-    /^["']/ ? 0 : ( (()=/[\[\{\(]/) - (()=/[\]\}\)]/) )*$indent_unit;
-  }
-  s(\G
-    (?{ say "##Visfold at top: pos=",u(pos)," ->«",substr($_,pos//0),"»"
-          if $debug;
-        local $nind = $next_indent;  # initialize localized var
-    })
-    (
-      \s*(${foldunit_re})  # at least one even if too wide
-      (?{ local $nind = $nind + __ind_adjustment("First ") })
-      (?:
-          \s*
-          (${foldunit_re})
-          (?{ local $nind = $nind + __ind_adjustment("Cont  ") })
-          (?(?{ my $len = $curr_indent + pos() - $-[0];
-                $len <= ($^N eq "[" ? $maxwid-$smidgen : $maxwid)
-              })|(*FAIL))
-      )*+
-    )
-    (?{ $next_indent = $nind }) # copy to non-localized storage
-    (?<extra>\s*)
-   )(do{
-       my $len = length($1);
-       my $indent = $curr_indent;
-       $curr_indent = $next_indent;
-       $maxwid = max(0, $maxwidth - length($pad)); # stop using maxwidth1
-       say "#VisFold: --folding-- after «$1» pos ${\pos} new mw=$maxwid"
-         if $debug;
-       $pad . (" " x $indent) . $1 ."\n"
-     }
-   )exsg
-    or oops "\nnot matched (pad='$pad' maxwid=$maxwid):\n", _dbvis($_),"\n";
-  s/\n\z//
-    or oops "unmatched tail (pad='${pad}') in:\n",_dbvis($_);
-  #say "## fold RESULT:", _dbvis($_);
-}#__fold
-
-sub __unescape_printables() {
-  # Data::Dumper outputs wide characters as escapes with Useqq(1).
-  #say "__un INPUT:$_";
-
-  s( \G (${atom_re}) (?<trailing>\s*)
-   )( do{
-        local $_ = $1;
-        if (/^"/) {  # "double quoted string
-          s{ \G (?: [^\\]++ | \\[^x] )*+ \K ( \\x\{ (?<hex>[a-fA-F0-9]+) \} )
-           }{
-              my $orig = $1;
-              local $_ = hex( length($+{hex}) > 6 ? '0' : $+{hex} );
-              $_ = $_ > 0x10FFFF ? "\0" : chr($_); # 10FFFF is Unicode limit
-              # Using 'lc' so regression tests do not depend on Data::Dumper's
-              # choice of case when escaping wide characters.
-              m<\P{XPosixGraph}|[\0-\377]> ? lc($orig) : $_
-           }xesg;
-        }
-        $_
-      }.$+{trailing}
-   )xesg;
+  s/^(['"])[^'"]*?\Q$magic_num_prefix\E(.*?)(\1)/$2/s;
 }
+
+sub __unesc_unicode() {  # edits $_
+  if (/^"/) {
+    # Data::Dumper outputs wide characters as escapes with Useqq(1).
+  
+    s{ \G (?: [^\\]++ | \\[^x] )*+ \K (?<w> \\x\{ (?<hex>[a-fA-F0-9]+) \} )
+     }{
+        my $orig = $+{w};
+        local $_ = hex( length($+{hex}) > 6 ? '0' : $+{hex} );
+        $_ = $_ > 0x10FFFF ? "\0" : chr($_); # 10FFFF is Unicode limit
+        # Using 'lc' so regression tests do not depend on Data::Dumper's
+        # choice of case when escaping wide characters.
+        m<\P{XPosixGraph}|[\0-\377]> ? lc($orig) : $_
+      }xesg;
+  } 
+}
+sub __subst_controlpics() {  # edits $_
+  if (/^"/) {
+    s{ \G (?: [^\\]++ | \\[^0abefnrt] )*+ \K ( \\[abefnrt] | \\0(?![0-7]) )
+     }{
+        $qqesc2controlpic{$1} // $1
+      }xesg;
+  }
+}
+
+my $indent_unit;
+my $linelen;
+my $reserved;
+my $outstr;
+
+my @stack; # [offset_of_start, flags]
+ 
+sub BLK_FOLDEDBACK() {    1 } # block start has been folded back to min indent
+sub BLK_CANTSPACE()  {    2 } # blanks may not (any longer) be inserted
+sub BLK_HASCHILD()   {    4 }
+sub BLK_FATARROW()   {    8 } # block is actually a key => value triple
+sub BLK_MASK()       { 0x0F }
+sub OPENER()         { 0x10 } # (used in &atom flags argument)
+sub CLOSER()         { 0x20 } # (used in &atom flags argument)
+sub NOOP()           { 0x40 } # (used in &atom flags argument)
+sub FLAGS_MASK()     { 0x7F }
+sub _fmt_flags($) {
+  my $r = "";
+  $r .= " FOLDEDBACK" if $_[0] & BLK_FOLDEDBACK;
+  $r .= " CANTSPACE"  if $_[0] & BLK_CANTSPACE;
+  $r .= " HASCHILD"   if $_[0] & BLK_HASCHILD;
+  $r .= " FATARROW"   if $_[0] & BLK_FATARROW;
+  $r .= " OPENER"     if $_[0] & OPENER;
+  $r .= " CLOSER"     if $_[0] & CLOSER;
+  $r .= " NOOP"       if $_[0] & NOOP;
+  $r .= " *INVALID($_[0])" if ($_[0] & ~FLAGS_MASK);
+  $r
+}
+sub _fmt_block($) {
+  my $blk = shift;
+  "[".$blk->[0]."→".substr($outstr,$blk->[0],1)._fmt_flags($blk->[1])."]"
+}
+sub _fmt_stack() { @stack ? (join ",", map{ _fmt_block($_) } @stack) : "()" }
 
 sub _postprocess_DD_result {
   (my $self, local $_) = @_;
-
-  my ($debug, $vistype, $maxwidth, $maxwidth1)
+  my ($debug, $vistype, $foldwidth, $foldwidth1)
     = @$self{qw/Debug _vistype Foldwidth Foldwidth1/};
+  my $useqq = $self->Useqq();
+  my $unesc_unicode = $useqq =~ /utf|unic/;
+  my $controlpics = $useqq =~ /pic/;
 
-  croak "invalid _vistype ", u($vistype)
-    unless ($vistype//0) =~ /^(?:[salh]|hl)$/;
+  oops if @stack or $reserved;
+  $reserved = 0;
+  $linelen = 0;
+  $outstr = "";
+  $indent_unit = 2; # make configurable?
 
-  say "##RAW  :",$_ if $self->{Debug};
+  say "##RAW ",_dbrawstr($_) if $debug;
 
-  s/(['"])\Q$magic_num_prefix\E(.*?)(\1)/$2/sg;
-  s/\Q$magic_numstr_prefix\E//sg;
+  # Fit everything in a single line if possible.  
+  #
+  # Otherwise, enclosing blocks (starting with the outermost) are folded
+  # just before the next inner block opener, placing the inner block opener
+  # on its own line indented according to level:
+  #
+  #    [aaa,bbb,[ccc,ddd,[eee,fff,«not enough space for next item»
+  # becomes
+  #    [ aaa,bbb,
+  #      [ccc,ddd,[eee,fff,«next item goes here»
+  #
+  # If necessary more levels are folded:
+  #    [ aaa,bbb,
+  #      [ ccc,ddd,
+  #        [eee,fff,«next item goes here»
+  #
+  # When a block is first folded, additional space is inserted before the
+  # first sub-item in the block so it aligns with the next indent level,
+  # as shown for 'aaa' and 'ccc' above.
+  #
+  # If, after all enclosing blocks have been folded, there is still not enough
+  # room, then the current block is folded at the end: 
+  #
+  #    [ aaa,bbb,
+  #      [ ccc,ddd,
+  #        [ eee,fff,
+  #          «next items go here»
+  #          «may fold again later if required»
+  #
+  # The insertion of spaces to align the first item in a block sometimes causes
+  # *expansion*, with less available space than before:
+  #
+  #     [[[aaa,bbb,ccc,«next item would go here»
+  # becomes
+  #     [
+  #       [
+  #         [aaa,bbb,ccc,«even less space here !»
+  #
+  # To avoid retroactive line overflows, enough space is reserved to fold
+  # all open blocks once without causing existing content to overflow (unless
+  # a single item is too large, in which case overflow occurs regardless).
+  #
+  # 'key => value' triples are treated as a special kind of "block" so
+  # that they are kept together if possible.
 
-  __unescape_printables;
-  __insert_spaces;
-  $self->_fold();
+  my $foldwidthN = $foldwidth || INT_MAX;
+  my $maxlinelen = $foldwidth1 || $foldwidthN;
+  my sub _fold_block($$;$) {
+    my ($bx, $foldposn, $debmsg) = @_;
+    say ">>>FOLD (",($debmsg//""),") bx=$bx fp=$foldposn res=$reserved (${\length($outstr)})" if $debug;
+    oops if $foldposn <= $stack[$bx]->[0]; # must be after block opener
+    oops if $foldposn < length($outstr) - $linelen; # must be in last line
+
+    # If the block has children, insert spacing before the first child to
+    # align align it with the wrapped item (if not already done, as indicated
+    # by BLK_CANTSPACE not yet set); consume reserved space for this.  
+    # If the block has no children, just release the reserved space.
+    if ( !($stack[$bx]->[1] & BLK_CANTSPACE) ) {
+      my $spaces = " " x ($indent_unit-1);
+      if ($stack[$bx]->[1] & BLK_HASCHILD) {
+        my $insposn = $stack[$bx]->[0] + 1;
+        if ($insposn >= length($outstr)-$linelen) {
+          $linelen += length($spaces);
+        } 
+        substr($outstr, $insposn, 0) = $spaces;
+        $foldposn += length($spaces);
+        foreach (@stack[$bx+1 .. $#stack]) { $_->[0] += length($spaces) }
+        $reserved -= length($spaces); oops if $reserved < 0;
+        $stack[$bx]->[1] |= BLK_CANTSPACE; 
+        say "#***>space inserted b4 first item in bx $bx" if $debug;
+      }
+    }
+    my $indent = ($bx+1) * $indent_unit;
+    # Remove any spaces at what will become end of line
+    pos($outstr) = max(0, $foldposn - $indent_unit);
+    my $replacelen = $outstr =~ /\G\S*\K\s++/gcs ? length($&) : 0;
+    if (pos($outstr) == $foldposn) {
+      $foldposn -= $replacelen;
+    } else {
+      $replacelen = 0;  # did not match immediately preceding the bracket
+    } 
+    pos($outstr) = undef;
+    my $delta = 1 + $indent - $replacelen; # \n + spaces
+    $linelen = length($outstr) - $replacelen - $foldposn + $indent;
+    oops if $stack[$bx]->[0] > $foldposn;
+    $stack[$bx]->[0] += $delta if $stack[$bx]->[0] == $foldposn;
+    oops if $bx < $#stack && $stack[$bx+1]->[0] < $foldposn;
+    foreach ($bx+1 .. $#stack) { $stack[$_]->[0] += $delta }
+    substr($outstr, $foldposn, $replacelen) = "\n" . (" " x $indent);
+    $maxlinelen = $foldwidthN;
+    say "   After fold: stack=${\_fmt_stack()} length(outstr)=${\length($outstr)} llen=$linelen maxllen=$maxlinelen res=$reserved\n",_dbrawstr($outstr) if $debug;
+  }#_fold_block
+
+  my ($previtem, $prevflags);
+  my sub atom($;$) {
+    #say "##a${\_dbavis(@_)} previtem=${\_dbrawstr($previtem)} prevflags=${\_fmt_flags($prevflags)}" if $debug;
+    
+    # Queue each item for one cycle before processing.  This allows special 
+    # cases to look ahead or behind one token (e.g. fatarrow or \\something)
+    (local $_, my $flags) = ($previtem, $prevflags);
+    ($previtem, $prevflags) = ($_[0], $_[1]//0);
+
+    if (/\A[\\\*]+$/) {
+      # Glue backslashes or * onto the front of whatever follows
+      $previtem = $_ . $previtem;
+      #say "##--------[glue $_ forward] : ",_dbstr($previtem) if $debug;
+      return;
+    }
+
+    __postprocess_atom;
+    __unesc_unicode if $unesc_unicode;
+    __subst_controlpics if $controlpics;
+
+    say "##--------atom ${\_dbrawstr($_)}${\_fmt_flags($flags)} stack:${\_fmt_stack()} res=$reserved length(outstr)=${\length($outstr)} llen=$linelen maxllen=$maxlinelen" if $debug;
+
+    return if ($flags & NOOP);
+   
+    if ( !($flags & CLOSER)
+         && @stack 
+         && ($stack[-1]->[1] & (BLK_HASCHILD|BLK_CANTSPACE))==0 ) {
+      # Reserve space to insert blanks before the item being added
+      $reserved += ($indent_unit - 1);
+      $stack[-1]->[1] |= BLK_HASCHILD if @stack;
+      say "Increased reserved to $reserved for bx $#stack" if $debug;
+    }
+    if ( ($flags & CLOSER) 
+         && ($stack[-1]->[1] & (BLK_HASCHILD|BLK_CANTSPACE))==BLK_HASCHILD 
+         && length() <= ($indent_unit - 1)) {
+      # Closing a block which has reserved space and has not been folded yet;
+      # unless the closer is larger than the reserved space, release the
+      # reserved space to the closer can fit on the same line.
+      $reserved -= ($indent_unit - 1); oops if $reserved < 0;
+      $stack[-1]->[1] |= BLK_CANTSPACE;
+      say "Released wont-be-needed reserved for bx $#stack" if $debug;
+    }
+
+    # Fold back enclosing blocks to try to make room
+    my $count = 0;
+    while ( $maxlinelen - $linelen < $reserved + length() ) {
+      my $bx = first { ($stack[$_]->[1] & BLK_FOLDEDBACK)==0 } 1..$#stack;
+      last 
+        unless defined($bx);
+      my $foldposn = $stack[$bx]->[0];
+      _fold_block($bx-1, $foldposn, "encl");
+      $stack[$bx]->[1] |= BLK_FOLDEDBACK;
+      $count++;
+    }
+    say "# # After $count foldbacks: maxllen=$maxlinelen llen=$linelen r=$reserved len()=${\length()} stack:",_fmt_stack() if $debug && $count;
+
+    # Fold the innermost block to start a new line if more space is needed,
+    # unless removing trailing spaces would make it fit exactly (in which
+    # case a fold will always occur before appending the next item).
+    # If closing, $reserved is not counted because it will not be needed
+    # if the closer fits on the same line.
+    #
+    # Always fold before closing a block if there are previous children
+    # and place the closer one level outward to align with the opener.
+    my $deficit = (($flags & CLOSER) ? 0 : $reserved) + length() 
+                    - ($maxlinelen - $linelen) ;
+    if ($deficit > 0 && /\s++\z/s && length($&) >= $deficit) {
+      s/\s{$deficit}\z// or oops;
+      say "Trimmed $deficit trailing spaces for exact fit" if $debug;
+      $deficit = 0;  # e.g. if item is " => "
+    }
+    if (@stack && 
+         ($deficit > 0
+          ||
+          (($flags & CLOSER) && (length($outstr) - $stack[-1]->[0] > $linelen)))
+       )
+    {
+      _fold_block($#stack, length($outstr), "TAIL FOLD");
+      if ($flags & OPENER) {
+        $flags |= BLK_FOLDEDBACK; # will be born in left-most possible position
+      }
+      if ($flags & CLOSER) {
+        my $removed = substr($outstr, length($outstr)-$indent_unit, INT_MAX, "");
+        oops unless $removed eq (" " x $indent_unit);
+        say "Backed up one indent level for block closer" if $debug;
+      }
+      s/^\s++//s; # elide leading spaces since starting a new line
+    }
+
+    # Append the new item.  Oversized items may exceeed available space.
+    $outstr .= $_;
+    $linelen += length();
+
+    if ($flags & CLOSER) {
+      if ( ($stack[-1]->[1] & (BLK_HASCHILD|BLK_CANTSPACE)) == BLK_HASCHILD ) {
+        $reserved -= ($indent_unit - 1); oops if $reserved < 0;
+        say "Released unused reserved from bx $#stack" if $debug;
+      }
+      oops if @stack==1 && $reserved != 0;
+      say "## POP ${\_fmt_block($stack[-1])} res=$reserved" if $debug;
+      pop @stack;
+    }
+
+    if ($flags & OPENER) {
+      push @stack, [length($outstr)-length(), $flags & BLK_MASK];
+      say "## PUSH ${\_fmt_block($stack[-1])}" if $debug;
+    }
+
+    if (@stack && $stack[-1]->[1] & BLK_FATARROW) {
+      $reserved -= ($indent_unit - 1)  # can never happen!
+        if ($stack[-1]->[1] & (BLK_HASCHILD|BLK_CANTSPACE))==BLK_HASCHILD;
+      say "## POP FATARROW ${\_fmt_block($stack[-1])} res=$reserved" if $debug;
+      pop @stack;
+    }
+
+    say "#  final   stack:${\_fmt_stack()} res=$reserved llen=$linelen maxllen=$maxlinelen (${\length($outstr)})",_dbrawstr($outstr) if $debug;
+  }
+  my sub pushlevel($) {
+    atom( $_[0], OPENER );
+  }
+  my sub poplevel($) {
+    atom( $_[0], CLOSER );
+  }
+  my sub fatarrow($) {
+    my $item = shift;
+    # Make "key => value" triple be a block, to keep together if possible
+    oops if $prevflags != 0;
+    $prevflags |= (OPENER | BLK_CANTSPACE);
+    atom( " $item ", 0 );  # " => "
+    atom( "", NOOP );      # push through the =>
+    $stack[-1]->[1] |= BLK_FATARROW;
+  }
+  my sub commasemi($) {
+    # Glue to the end of the pending item, so they always appear together
+    $previtem .= $_[0];
+  }
+
+  $previtem = "";
+  $prevflags = NOOP;
+
+  while ((pos()//0) < length) {
+    if    (/\G\s+/sgc) { }
+    elsif (/\G[\\\*]/gc)                      { atom($&) } # will be glued fwd
+    elsif (/\G[,;]/gc)                        { commasemi($&) }
+    elsif (/\G"(?:[^"\\]++|\\.)*+"/gc)        { atom($&) } # "quoted"
+    elsif (/\G'(?:[^'\\]++|\\.)*+'/gc)        { atom($&) } # 'quoted'
+    elsif (m(\Gqr/(?:[^\\\/]++|\\.)*+/[a-z]*)gc) { atom($&) } # Regexp
+    elsif (/\Gsub\s*${curlies_re}/gc)         { atom($&) } # sub{...}
+    elsif (/\G\$(?:VAR\d+|->|${balanced_re})++/gc) { atom($&) } 
+    elsif (/\G${userident_re}(?=\()${balanced_re}\s*/gc) { atom($&) } #bless(...)
+    elsif (/\G${userident_re}\(.*?\)\S*/gc) { atom($&) } #bless(...)
+    elsif (/\G\b[A-Za-z_][A-Za-z0-9_]*+\b/gc) { atom($&) } # bareword
+    elsif (/\G\b-?\d[\deE\.]*+\b/gc)          { atom($&) } # number
+    elsif (/\G=>/gc)                          { fatarrow($&) }
+    elsif (/\G:*${pkgname_re}/gc)             { atom($&) }
+    elsif (/\G[\[\{]/gc) { pushlevel($&) }
+    elsif (/\G[\]\}]/gc) { poplevel($&)  }
+    else { oops "UNPARSED ",_dbstr(substr($_,pos,30)."..."),"\   at pos ",u(pos()), " ",_dbstrposn($_,pos()//0);
+    }
+  }
+  atom(""); # push through the lookahead item
 
   if (($vistype//"s") eq "s") { }
-  elsif ($vistype eq "a") {
-    s/\A\[/(/ && s/\]\z/)/s or oops;
+  elsif ($vistype eq 'a') {
+    $outstr =~ s/\A\[/(/ && $outstr =~ s/\]\z/)/s or oops;
   }
-  elsif ($vistype eq "l") {
-    s/\A\[// && s/\]\z//s or oops;
+  elsif ($vistype eq 'l') {
+    $outstr =~ s/\A\[// && $outstr =~ s/\]\z//s or oops;
   }
-  elsif ($vistype eq "h") {
-    s/\A\{/(/ && s/\}\z/)/s or oops;
+  elsif ($vistype eq 'h') {
+    $outstr =~ s/\A\{/(/ && $outstr =~ s/\}\z/)/s or oops;
   }
-  elsif ($vistype eq "hl") {
-    s/\A\{// && s/\}\z//s or oops;
+  elsif ($vistype eq 'hl') {
+    $outstr =~ s/\A\{// && $outstr =~ s/\}\z//s or oops;
   }
   else { oops }
+   
+  oops "Residual reserved=$reserved" if $reserved;
+  oops "Stack not empty: ",_fmt_stack(),"\nInput: ",_dbvis($_[1]) if @stack;
 
-  $_
+  $outstr
 } #_postprocess_DD_result {
 
 my $sane_cW = $^W;
@@ -624,18 +871,6 @@ sub _Interpolate {
   my ($self, $input, $s_or_d) = @_;
   return "<undef arg>" if ! defined $input;
 
-  # cf man perldata
-  state $userident_re = qr/ (?: (?=\p{Word})\p{XID_Start} | _ )
-                            (?: (?=\p{Word})\p{XID_Continue}  )* /x;
-
-  state $pkgname_re = qr/ ${userident_re} (?: :: ${userident_re} )* /x;
-
-  state $anyvname_re =
-    qr/ ${pkgname_re} | [0-9]+ | \^[A-Z]
-                      | [-+!\$\&\;i"'().,\@\/:<>?\[\]\~\^\\] /x;
-
-  state $anyvname_or_refexpr_re = qr/ ${anyvname_re} | ${curlies_re} /x;
-
   &_SaveAndResetPunct;
 
   my $debug = $self->Debug;
@@ -651,16 +886,25 @@ sub _Interpolate {
     while (
       /\G (
            # Stuff without variable references (might include \n etc. escapes)
-           ( (?: [^\\\$\@\%] | \\[^\$\@\%] )++ )
+           
+           #This gets "recursion limit exceeded"
+           #( (?: [^\\\$\@\%] | \\[^\$\@\%] )++ )
+           #|
+
+           (?: [^\\\$\@\%]++ )
            |
+           (?: (?: \\[^\$\@\%] )++ )
+           |
+
            # $#arrayvar $#$$...refvarname $#{aref expr} $#$$...{ref2ref expr}
            #
            (?: \$\#\$*+\K ${anyvname_or_refexpr_re} )
            |
+           
            # $scalarvar $$$...refvarname ${sref expr} $$$...{ref2ref expr}
            #  followed by [] {} ->[] ->{} ->method() ... «zero or more»
            # EXCEPT $$<punctchar> is parsed as $$ followed by <punctchar>
-           #
+           
            (?:
              (?: \$\$++ ${pkgname_re} \K | \$ ${anyvname_or_refexpr_re} \K )
              (?:
@@ -670,6 +914,7 @@ sub _Interpolate {
              )*
            )
            |
+
            # @arrayvar @$$...varname @{aref expr} @$$...{ref2ref expr}
            #  followed by [] {} «zero or one»
            #
@@ -692,7 +937,6 @@ sub _Interpolate {
           push @pieces, ["vis", $_];
         }
         elsif ($sigl eq '@') {
-          # FIXME verify that multi-value eval results work
           push @pieces, ["avis", $_];
         }
         elsif ($sigl eq '%') {
@@ -701,10 +945,11 @@ sub _Interpolate {
         else { confess "BUG:sigl='$sigl'"; }
       } else {
         if (/^.+?(?<!\\)([\$\@\%])/) { confess __PACKAGE__." bug: Missed '$1' in «$_»" }
-        if (/\\/) {
-          # Interpolate backslash escapes so users can say (ivis '$foo\n';)
-          s/([()])/\\$1/g;
-          push @pieces, [ "e", "qq(".$_.")" ];
+        # Due to the need to simplify the big regexp above, \x{abcd} is now 
+        # split into "\x" and "{abcd}".  Accumlate everything as a single 
+        # passthru ("=") and convert later to "e" if an eval if needed.
+        if (@pieces && $pieces[-1]->[0] eq "=") {
+          $pieces[-1]->[1] .= $_;
         } else {
           push @pieces, [ "=", $_ ];
         }
@@ -714,7 +959,15 @@ sub _Interpolate {
       my $leftover = substr($_,pos()//0);
       confess __PACKAGE__." Bug:LEFTOVER «$leftover»";
     }
-  }# local $_
+    foreach (@pieces) {
+      my ($meth, $str) = @$_;
+      next unless $meth eq "=" && $str =~ /\\[abtnfrexXN0-7]/;
+      $str =~ s/([()\$\@\%])/\\$1/g;  # don't hide \-escapes to be interpolated!
+      $str =~ s/\$\\/\$\\\\/g;
+      $_->[1] = "qq(" . $str . ")";
+      $_->[0] = 'e';
+    }
+  } #local $_
 
   my $q = $useqq ? "" : "q";
   my $funcname = $s_or_d . "vis" .$q;
@@ -739,9 +992,9 @@ sub DB_Vis_Interpolate {
     } else {
       # Reduce indent before first wrap to account for stuff alrady there
       my $leftwid = length($result) - rindex($result,"\n") - 1;
-      my $maxwidth = $self->{Foldwidth};
-      local $self->{Foldwidth1} = $self->{Foldwidth1} // $maxwidth;
-      if ($maxwidth) {
+      my $foldwidth = $self->{Foldwidth};
+      local $self->{Foldwidth1} = $self->{Foldwidth1} // $foldwidth;
+      if ($foldwidth) {
         $self->{Foldwidth1} -= $leftwid if $leftwid < $self->{Foldwidth1}
       }
       $result .= $self->$methname( DB::DB_Vis_Eval($funcname, $arg) );
@@ -811,7 +1064,7 @@ sub DB_Vis_Eval($$) {
 
 =head1 NAME
 
-Data::Dumper::Interp - Data::Dumper optimized for humans, with interpolation
+Data::Dumper::Interp - Data::Dumper for humans, with interpolation
 
 =head1 SYNOPSIS
 
@@ -865,18 +1118,24 @@ Data::Dumper::Interp - Data::Dumper optimized for humans, with interpolation
 
 =head1 DESCRIPTION
 
-The namesake feature of this module is interpolating Data::Dumper output 
-into strings.
-In addition, simple functions are provided to visualize a scalar, array, or hash.
-And finally a few utilities to quote strings for /bin/sh.
+This is a wrapper for Data::Dumper optimized for use by humans
+instead of machines; the result may not be 'eval'able.
 
-Data::Dumper is used internally to visualize (i.e. format) data, 
+The namesake feature of this module is interpolating Data::Dumper output 
+into strings, but simple functions are also provided to 
+visualize a scalar, array, or hash.
+
+Casual debug messages are a primary use case.
+
+Internally, Data::Dumper is called to visualize (i.e. format) data
 with pre- and postprocessing to "improve" the results:
 Output is compact (1 line if possibe) and omits a trailing newline;
 Unicode characters appear as themselves,
 objects like Math:BigInt are stringified, and some
 Data::Dumper bugs^H^H^H^Hquirks are circumvented.
 See "DIFFERENCES FROM Data::Dumper".
+
+Finally, a few utilities are provided to quote strings for /bin/sh.
 
 =head1 FUNCTIONS
 
@@ -889,14 +1148,8 @@ format variable values.
 C<$var> is replaced by its value,
 C<@var> is replaced by "(comma, sparated, list)",
 and C<%hash> by "(key => value, ...)" visualizations.
-
-Most Perl expressions are recognized including slices and method calls.
-For example
-
-  say ivis 'The value is ${\@myarray}[42]->{$key}->method(...)'
-
-would print "The value is " followed by the Data:Dumper visualization of
-the value of that expression.
+Most complex expressions are recognized, e.g. indexing,
+dereferences, slices, etc.
 
 Expressions are evaluated in the caller's context using Perl's debugger
 hooks, and may refer to almost any lexical or global visible at
@@ -913,27 +1166,24 @@ are prefixed with a "exprtext=" label.
 The 'd' in 'dvis' stands for B<d>ebugging messages, a frequent use case where
 brevity of typing is more highly prized than beautiful output.
 
-=head2 vis
-
-=head2 vis SCALAR
+=head2 vis [SCALAREXPR]
 
 =head2 avis LIST
 
 =head2 hvis EVENLIST
 
-These are the underlying functions used by C<ivis> to visualize expressions.
-
-C<vis> formats a single scalar ($_ if no argument is given).
+C<vis> formats a single scalar ($_ if no argument is given)
+and returns the resulting string.
 
 C<avis> formats an array (or any list) as comma-separated values in parenthesis.
 
-C<hvis> formats a hash as key => value pairs in parens.
+C<hvis> formats a hash as key => value pairs in parenthesis.
 
 =head2 alvis LIST
 
 =head2 hlvis EVENLIST
 
-These variants produce a bare list without the enclosing parenthesis
+These "l" variants return a bare list without the enclosing parenthesis.
 
 =head2 ivisq 'string to be interpolated'
 
@@ -961,7 +1211,7 @@ if wide characters are present.
 =head2 Data::Dumper::Interp->new()
 
 Creates an object initialized from the global configuration
-variables listed below.
+variables listed below.  C<new> takes no arguments.
 
 The functions described above may also be used as I<methods>
 when called on a C<Data::Dumper::Interp> object
@@ -978,31 +1228,34 @@ returns the same string as
 
 =head1 Configuration Variables / Methods
 
-These work in the same way as similar variables/methods in Data::Dumper.
+These work the same way as variables/methods in Data::Dumper.
 
-Global variables determine the initial state of objects created by C<new>,
-and the state of an object can be quieried or changed with corresponding
-methods.  When a method is called with arguments to set a value,
-the method returns the object itself to facilitate chained calls.
+For each of the following configuration items, there is a global
+variable in package C<Data::Dumper::Interp> which provides the default value,
+and a I<method> of the same name which sets or retrieves a config value
+on a specific object.
 
-The following configuration methods may be used:
+When a methods is called without arguments, the current value is returned.
 
-=head2 $Data::Dumper::Interp::MaxStringwidth or $obj->MaxStringwidth(INTEGER)
+When a method is called with an argument (i.e. to set a value), the object
+is returned so that method calls can be chained.
 
-=head2 $Data::Dumper::Interp::Truncsuffix or $obj->Truncsuffix("...")
+=head2 MaxStringwidth(INTEGER)
+
+=head2 Truncsuffix("...")
 
 Longer strings are truncated and I<Truncsuffix> appended.
 MaxStringwidth=0 (the default) means no limit.
 
-=head2 $Data::Dumper::Interp::Foldwidth or $obj->Foldwidth(INTEGER)
+=head2 Foldwidth(INTEGER)
 
 Defaults to the terminal width at the time of first use.
 
-=head2 $Data::Dumper::Interp::Stringify or $obj->Stringify(BOOL);
+=head2 Stringify(BOOL);
 
-=head2                        or (classname);
+=head2 Stringify("classname")
 
-=head2                        or ([list of classnames]);
+=head2 Stringify([ list of classnames ])
 
 A I<false> value disables object stringification.
 
@@ -1012,16 +1265,55 @@ support it (i.e. they overload the "" operator).
 Otherwise stringification is enabled only for the specified
 class name(s).
 
-=head2 $Data::Dumper::Interp::Sortkeys or $obj->Sortkeys(subref)
+=head2 Sortkeys(subref)
 
-Controls sorting and optionally filtering of hash keys.  
 See C<Data::Dumper> documentation.
 
-C<Data::Dumper::Interp> provides a default which sorts
-numeric substrings in keys by numerical
+The default sorts numeric substrings in keys by numerical
 value (see "DIFFERENCES FROM Data::Dumper").
 
-=head2 $Data::Dumper::Interp::Quotekeys or $obj->Quotekeys(subref)
+=head2 Useqq
+
+The default value is 0 for functions/methods with 'q' in their name,
+otherwise "unicode".
+
+0 means generate 'single quoted' strings when possible.
+
+1 means generate "double quoted" strings, as-is from Data::Dumper.
+Non-ASCII charcters will be shown as hex escapes.
+
+Otherwise generate "double quoted" strings enhanced by options
+given as a :-separated list of keywords, for example Useqq("unicode:controlpic").
+The two avilable options are:
+
+=over 4
+
+=item "unicode" (or "utf8" for historical compat.) 
+
+Show all printable
+characters as themselves rather than hex escapes.
+
+=item "controlpic"
+
+Visualize non-printing ASCII characters using Unicode "control picture" characters.
+'␤' is used instead of '\n' and similarly for \0 \a \b \e \f \r and \t.
+
+This can be useful in debugging because every character occupies the same space
+(assuming a fixed-width font).  However the commonly-used "Last Resort" font
+draws these symbols with single-pixel lines, which on modern high-res displays
+are dim and hard to read.  For this reason, "controlpic" is no longer the default.
+
+=back
+
+=head2 Quotekeys
+
+=head2 Sparseseen
+
+=head2 Maxdepth
+
+=head2 Maxrecurse
+
+=head2 Deparse
 
 See C<Data::Dumper> documentation.
 
@@ -1114,17 +1406,17 @@ the "_" filehandle will not change across calls.
 
 =head1 DIFFERENCES FROM Data::Dumper
 
-Visualized data structures differ from using C<Data::Dumper> directly 
+Visualized data structures differ from plain C<Data::Dumper> output
 as follows:
 
 =over 2
 
 =item *
 
+A final newline is I<not> included.
+
 Everything is shown on a single line if possible, otherwise wrapped to
 the terminal width with indentation appropriate to structure levels.
-
-A final newline is I<not> included.
 
 =item *
 
@@ -1141,7 +1433,7 @@ will be escaped as individual bytes when necessary.
 
 Object refs are replaced by the object's stringified representation.
 For example, C<bignum> and C<bigrat> numbers are shown as easily
-readable values rather than "bless( {...}, 'Math::BigInt')".
+readable values rather than "bless( {...}, 'Math::...')".
 
 Stingified objects are prefixed with "(classname)" to make clear what
 happened.
@@ -1153,7 +1445,7 @@ For example "A.20" sorts before "A.100".
 
 =item *
 
-Punctuation variables, including $@ and $?, are preserved over calls.
+All punctuation variables, including $@ and $?, are preserved over calls.
 
 =item *
 
@@ -1162,8 +1454,8 @@ Floating-point values always appear as numbers (not 'quoted strings'),
 and strings containing digits like "42" appear as quoted strings
 and not numbers (string vs. number detection is ala JSON::PP).
 
-Such differences might not matter to Perl when executing code,
-but may be important when communicating to a human.
+Although such differences might be immaterial to Perl when executing code,
+they may be important when communicating to a human.
 
 =back
 
@@ -1178,9 +1470,13 @@ Jim Avera  (jim.avera AT gmail dot com)
 =for nobody Foldwidth1 is currently an undocumented experimental method
 =for nobody which sets a different fold width for the first line only.
 =for nobody Terse & Indent methods exist to croak; using them is not allowed.
-=for nobody oops is an internal function (called to die if bug detected)
-=for nobody Debug method is for author's debugging, not documented
+=for nobody oops is an internal function (called to die if bug detected).
+=for nobody Debug method is for author's debugging, not documented.
+=for nobody BLK_* CLOSER FLAGS_MASK NOOP OPENER are internal "constants".
 
 =for Pod::Coverage Foldwidth1 Terse Indent oops Debug
+
+=for Pod::Coverage BLK_CANTSPACE BLK_FATARROW BLK_FOLDEDBACK BLK_HASCHILD BLK_MASK CLOSER FLAGS_MASK NOOP OPENER
+
 
 =cut

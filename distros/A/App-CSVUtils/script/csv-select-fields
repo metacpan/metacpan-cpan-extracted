@@ -10,15 +10,16 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-02-10'; # DATE
+our $DATE = '2022-03-27'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '0.036'; # VERSION
+our $VERSION = '0.037'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/CSVUtils/csv_select_fields",
     program_name => "csv-select-fields",
     read_config => 0,
     read_env => 0,
+    use_utf8 => 1,
 );
 
 $cmdline->run;
@@ -38,13 +39,19 @@ csv-select-fields - Only output selected field(s)
 
 =head1 VERSION
 
-This document describes version 0.036 of csv-select-fields (from Perl distribution App-CSVUtils), released on 2022-02-10.
+This document describes version 0.037 of csv-select-fields (from Perl distribution App-CSVUtils), released on 2022-03-27.
 
 =head1 SYNOPSIS
 
 Usage:
 
 % B<csv-select-fields> [B<--escape-char>=I<str>] [B<--field-pat>=I<re>] [B<--format>=I<name>|B<--json>] [B<--header>|B<--input-header>|B<--no-header>|B<--noheader>] [B<--(no)naked-res>] [B<--output-escape-char>=I<str>] [B<--output-header>|B<--no-output-header>|B<--nooutput-header>] [B<--output-quote-char>=I<str>] [B<--output-sep-char>=I<str>] [B<--output-tsv>|B<--no-output-tsv>|B<--nooutput-tsv>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--quote-char>=I<str>] [B<--sep-char>=I<str>] [B<--tsv>|B<--input-tsv>|B<--no-tsv>|B<--notsv>] -- E<lt>I<filename>E<gt> [I<fields>] ...
+
+=head1 DESCRIPTION
+
+I<Common notes for the utilities>
+
+Encoding: The utilities in this module/distribution accept and emit UTF8 text.
 
 =head1 OPTIONS
 

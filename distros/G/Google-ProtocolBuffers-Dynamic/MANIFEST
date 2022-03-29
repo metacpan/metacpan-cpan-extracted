@@ -47,6 +47,7 @@ t/025_bigints.t
 t/030_repeated.t
 t/032_map.t
 t/033_proto2_map.t
+t/034_map_incomplete.t
 t/035_required.t
 t/040_messages.t
 t/042_recursion.t
@@ -131,7 +132,14 @@ t/proto/person.proto
 t/proto/recurse.proto
 t/proto/repeated.proto
 t/proto/scalar.proto
+t/proto/wkt/copies/LICENSE
+t/proto/wkt/copies/duration.proto
+t/proto/wkt/copies/timestamp.proto
+t/proto/wkt/copies/wrappers.proto
+t/proto/wkt/scalar.pb
 t/proto/wkt/scalar.proto
+t/proto/wkt/scalar_copies.pb
+t/proto/wkt/scalar_copies.proto
 xsp/dynamic.xsp
 xsp/introspection.xsp
 xsp/main.xspt

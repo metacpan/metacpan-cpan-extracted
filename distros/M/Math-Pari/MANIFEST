@@ -77,4 +77,5 @@ auto-dbg/auto-debug-module.example-dbx-2_00
 auto-dbg/auto-debug-module.example-gdb
 auto-dbg/auto-debug-module.example-gdb-2_00
 auto-dbg/auto-debug-module.example-gdb-2_03_win
+auto-dbg/auto-debug-module.example-lldb-darwin-fail
 auto-dbg/README

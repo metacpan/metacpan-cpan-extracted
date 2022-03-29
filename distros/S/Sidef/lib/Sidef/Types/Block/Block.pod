@@ -24,9 +24,9 @@ Inherits methods from:
 
 =head2 &
 
-I<Obj> B<&> I<Obj> -> I<Obj>
+    a & b
 
-Return the
+Returns the
 
 Aliases: I<grep>
 
@@ -34,9 +34,9 @@ Aliases: I<grep>
 
 =head2 *
 
-I<Obj> B<*> I<Obj> -> I<Obj>
+    a * b
 
-Return the
+Returns the
 
 Aliases: I<repeat>
 
@@ -44,9 +44,9 @@ Aliases: I<repeat>
 
 =head2 <<
 
-I<Obj> B<E<lt>E<lt>> I<Obj> -> I<Obj>
+    a << b
 
-Return the
+Returns the
 
 Aliases: I<for>, I<each>, I<foreach>
 
@@ -54,19 +54,39 @@ Aliases: I<for>, I<each>, I<foreach>
 
 =head2 >>
 
-I<Obj> B<E<gt>E<gt>> I<Obj> -> I<Obj>
+    a >> b
 
-Return the
+Returns the
 
 Aliases: I<map>
 
 =cut
 
+=head2 Π
+
+    Block.Π()
+
+Returns the
+
+Aliases: I<prod>
+
+=cut
+
+=head2 Σ
+
+    Block.Σ()
+
+Returns the
+
+Aliases: I<sum>
+
+=cut
+
 =head2 ∘
 
-I<Obj> B<∘> I<Obj> -> I<Obj>
+    a ∘ b
 
-Return the
+Returns the
 
 Aliases: I<compose>
 
@@ -74,33 +94,33 @@ Aliases: I<compose>
 
 =head2 array_identity
 
-Block.array_identity() -> I<Obj>
+    Block.array_identity()
 
-Return the
+Returns the
 
 =cut
 
 =head2 cache
 
-Block.cache() -> I<Obj>
+    Block.cache()
 
-Return the
+Returns the
 
 =cut
 
 =head2 call
 
-Block.call() -> I<Obj>
+    Block.call()
 
-Return the
+Returns the
 
 =cut
 
 =head2 cap
 
-Block.cap() -> I<Obj>
+    Block.cap()
 
-Return the
+Returns the
 
 Aliases: I<capture>
 
@@ -108,9 +128,9 @@ Aliases: I<capture>
 
 =head2 do
 
-Block.do() -> I<Obj>
+    Block.do()
 
-Return the
+Returns the
 
 Aliases: I<run>
 
@@ -118,17 +138,17 @@ Aliases: I<run>
 
 =head2 exec
 
-Block.exec() -> I<Obj>
+    Block.exec()
 
-Return the
+Returns the
 
 =cut
 
 =head2 ffork
 
-Block.ffork() -> I<Obj>
+    Block.ffork()
 
-Return the
+Returns the
 
 Aliases: I<start>
 
@@ -136,105 +156,89 @@ Aliases: I<start>
 
 =head2 first
 
-Block.first() -> I<Obj>
+    Block.first()
 
-Return the
+Returns the
 
 =cut
 
 =head2 fork
 
-Block.fork() -> I<Obj>
+    Block.fork()
 
-Return the
+Returns the
 
 =cut
 
 =head2 identity
 
-Block.identity() -> I<Obj>
+    Block.identity()
 
-Return the
+Returns the
 
 =cut
 
 =head2 if
 
-Block.if() -> I<Obj>
+    Block.if()
 
-Return the
+Returns the
 
 =cut
 
 =head2 is_identity
 
-Block.is_identity() -> I<Obj>
+    Block.is_identity()
 
-Return the
+Returns the
 
 =cut
 
 =head2 list_identity
 
-Block.list_identity() -> I<Obj>
+    Block.list_identity()
 
-Return the
+Returns the
 
 =cut
 
 =head2 loop
 
-Block.loop() -> I<Obj>
+    Block.loop()
 
-Return the
+Returns the
 
 =cut
 
 =head2 new
 
-Block.new() -> I<Obj>
+    Block.new()
 
-Return the
+Returns the
 
 =cut
 
 =head2 nth
 
-Block.nth() -> I<Obj>
+    Block.nth()
 
-Return the
+Returns the
 
 =cut
 
 =head2 null_identity
 
-Block.null_identity() -> I<Obj>
+    Block.null_identity()
 
-Return the
-
-=cut
-
-=head2 prod
-
-Block.prod() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 sum
-
-Block.sum() -> I<Obj>
-
-Return the
+Returns the
 
 =cut
 
 =head2 thr
 
-Block.thr() -> I<Obj>
+    Block.thr()
 
-Return the
+Returns the
 
 Aliases: I<thread>
 
@@ -242,9 +246,9 @@ Aliases: I<thread>
 
 =head2 to_s
 
-Block.to_s() -> I<Obj>
+    Block.to_s()
 
-Return the
+Returns the
 
 Aliases: I<dump>, I<to_str>
 
@@ -252,16 +256,16 @@ Aliases: I<dump>, I<to_str>
 
 =head2 uncache
 
-Block.uncache() -> I<Obj>
+    Block.uncache()
 
-Return the
+Returns the
 
 =cut
 
 =head2 while
 
-Block.while() -> I<Obj>
+    Block.while()
 
-Return the
+Returns the
 
 =cut

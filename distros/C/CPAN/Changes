@@ -1,3 +1,70 @@
+2022-03-27  k  <andk@cpan.org>
+
+	* release 2.33
+
+	* code is unchanged from 2.33-TRIAL
+
+	* tiny distroprefs maintenance
+
+2022-01-21  k  <andk@cpan.org>
+
+	* release 2.33-TRIAL
+
+	* in CHECKSUM_check_file run configured gpg instead of hard-coded
+	"gpg" (Thanks to Tomas Hoger)
+
+	* tiny distroprefs maintenance
+
+2021-12-26  k  <andk@cpan.org>
+
+	* release 2.32-TRIAL
+
+	* Respect arguments to run() by localizing @ARGV (brian d foy)
+
+	* improve separation of test runs from each other
+
+	* remove dated distroprefs file
+
+2021-12-14  k  <andk@cpan.org>
+
+	* release 2.31-TRIAL
+
+	* replace short id with fingerprint (thanks to Stig Palmquist for
+	the suggestion)
+
+	* new test scripe t/32pushyhttps.t
+
+	* skip download programs with zero length
+
+	* add a stdout redirection for curl which was lost in release 2.29 on pushy_https branch
+
+	* in function localize_2021 state more precisely what we plan to do
+
+	* tweak the condition when to use HTTP::Tiny to fully support http urls
+
+	* address #140449: ensure for CHECKSUMS files having timestamps >
+	$epoch_starting_support_of_cpan_path (thanks to Neil Bowers and
+	twata for their bug reports)
+
+2021-12-12  k  <andk@cpan.org>
+
+	* release 2.30-TRIAL
+
+	* Alert bootstrap users when make is missing (David Golden)
+
+	* 2021 download must have SSL support (David Golden)
+
+	* typo fixes: "Consensus" not "Concensus" (Ricardo Signes)
+
+	* bundled MIRRORED.BY updated with latest copy at https://www.cpan.org/MIRRORED.BY,
+	to reflect the sunset of the cpan mirror network (Karen Etheridge)
+
+	* Typo fix: s/SQLLite/SQLite (Samanta Navarro)
+
+	* testfix: replace sks-keyserver with pgpkeys.eu
+
+	* tiny distroprefs update
+
 2021-11-23  k  <andk@cpan.org>
 
 	* release 2.29

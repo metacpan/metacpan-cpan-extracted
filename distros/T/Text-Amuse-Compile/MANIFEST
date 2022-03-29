@@ -36,6 +36,9 @@ t/bcor-sides.t
 t/beamer.t
 t/bidi-slides.t
 t/changes.t
+t/check-compile.t
+t/check-compile/ruby-2.muse
+t/check-compile/ruby.muse
 t/colophon.t
 t/compile-file.t
 t/compile-merged.t

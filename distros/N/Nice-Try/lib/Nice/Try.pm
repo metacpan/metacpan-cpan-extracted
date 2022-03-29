@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## A real Try Catch Block Implementation Using Perl Filter - ~/lib/Nice/Try.pm
-## Version v1.1.4
-## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Version v1.2.0
+## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/05/17
-## Modified 2022/03/10
+## Modified 2022/03/27
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -24,7 +24,7 @@ BEGIN
     use Scalar::Util ();
     use List::Util ();
     use Want ();
-    our $VERSION = 'v1.1.4';
+    our $VERSION = 'v1.2.0';
     our $ERROR;
     our( $CATCH, $DIED, $EXCEPTION, $FINALLY, $HAS_CATCH, @RETVAL, $SENTINEL, $TRY, $WANTARRAY );
 }
@@ -124,7 +124,7 @@ sub filter
         $self->_message( 4, "Processing $line lines of code." ) if( $self->{debug} >= 4 );
         my $doc = PPI::Document->new( \$code, readonly => 1 ) || die( "Unable to parse: ", PPI::Document->errstr, "\n$code\n" );
         # Remove pod
-        $doc->prune('PPI::Token::Pod');
+        # $doc->prune('PPI::Token::Pod');
         $self->_browse( $doc ) if( $self->{debug_dump} );
         if( $doc = $self->_parse( $doc ) )
         {
@@ -149,7 +149,7 @@ sub filter
     {
         while( $status = filter_read() )
         {
-            $self->message( 4, "Reading more line: $_" );
+            $self->_message( 4, "Reading more line: $_" );
             return( $status ) if( $status < 0 );
             $line++;
         }
@@ -166,6 +166,23 @@ sub filter
     }
     # filter_del();
     return( $line );
+}
+
+sub implement
+{
+    my( $self, $code ) = @_;
+    return( $code ) if( !CORE::defined( $code ) || !CORE::length( $code ) );
+    # 2021-06-05 (Jacques): fixes the issue No. 3 <https://git.deguest.jp/jack/Nice-Try/issues/3>
+    # Make sure there is at least a space at the beginning
+    $code = ' ' . $code;
+    $self->_message( 4, "Processing $line lines of code." ) if( $self->{debug} >= 4 );
+    my $doc = PPI::Document->new( \$code, readonly => 1 ) || die( "Unable to parse: ", PPI::Document->errstr, "\n$code\n" );
+    $self->_browse( $doc ) if( $self->{debug_dump} );
+    if( $doc = $self->_parse( $doc ) )
+    {
+        $code = $doc->serialize;
+    }
+    return( $code );
 }
 
 sub _browse
@@ -452,35 +469,35 @@ sub _parse
         my $element_before_try = $this->previous_sibling;
         # $self->_message( 4, "Is \$element_before_try defined ? ", defined( $element_before_try ) ? 'Yes' : 'No', "(", overload::StrVal( $element_before_try ), ") -> '$element_before_try'" );
         my $try_block_ref = [];
-        ## Contains the finally block reference
+        # Contains the finally block reference
         my $fin_block_ref = [];
         my $nodes_to_replace = [];
         my $catch_def = [];
-        ## Replacement data
+        # Replacement data
         my $repl = [];
         my $catch_repl = [];
         
-        ## There is a weird bug in PPI that I have searched but could not find
-        ## If I don't attempt to stringify, I may end up with a PPI::Statement object that has no children as an array reference
+        # There is a weird bug in PPI that I have searched but could not find
+        # If I don't attempt to stringify, I may end up with a PPI::Statement object that has no children as an array reference
         my $ct = "$this";
-        ## $self->_message( 3, "Checking sibling elements for '$ct'" );
+        # $self->_message( 3, "Checking sibling elements for '$ct'" );
         my( @block_children ) = $this->children;
         next if( !scalar( @block_children ) );
         my $prev_sib = $block_children[0];
         push( @$nodes_to_replace, $prev_sib );
         my( $inside_catch, $inside_finally );
         my $temp = {};
-        ## Buffer of nodes found in between blocks
+        # Buffer of nodes found in between blocks
         my $buff = [];
-        ## Temporary new line counter between try-catch block so we can reproduce it and ensure proper reporting of error line
+        # Temporary new line counter between try-catch block so we can reproduce it and ensure proper reporting of error line
         my $nl_counter = 0;
         my $sib;
         while( $sib = $prev_sib->next_sibling )
         {
-            ## $self->_messagef( 3, "Try sibling at line %d with class '%s': '%s'", $sib->line_number, $sib->class, $sib->content );
+            # $self->_messagef( 3, "Try sibling at line %d with class '%s': '%s'", $sib->line_number, $sib->class, $sib->content );
             if( !scalar( @$try_block_ref ) )
             {
-                ## $self->_message( 3, "\tWorking on the initial try block." );
+                # $self->_message( 3, "\tWorking on the initial try block." );
                 if( $sib->class eq 'PPI::Structure::Block' &&
                     substr( "$sib", 0, 1 ) eq "\{" &&
                     substr( "$sib", -1, 1 ) eq "\}" )
@@ -521,8 +538,8 @@ sub _parse
             }
             elsif( $inside_catch )
             {
-                ## $self->_message( 3, "\tWorking on a catch block." );
-                ## This is the catch list as in catch( $e ) or catch( Exception $e )
+                # $self->_message( 3, "\tWorking on a catch block." );
+                # This is the catch list as in catch( $e ) or catch( Exception $e )
                 if( $sib->class eq 'PPI::Structure::List' )
                 {
                     $temp->{var} = $sib;
@@ -547,7 +564,7 @@ sub _parse
                 }
                 elsif( $sib->class eq 'PPI::Token::Whitespace' && $sib->content =~ /[\015\012]+/ )
                 {
-                    ## $self->_messagef( 4, "\tCatch -> Found open new line at line %d", $sib->line_number );
+                    # $self->_messagef( 4, "\tCatch -> Found open new line at line %d", $sib->line_number );
                     $temp->{open_curly_nl}++;
                     push( @$nodes_to_replace, $sib );
                 }
@@ -628,7 +645,7 @@ sub _parse
         
         my $has_catch_clause = scalar( @$catch_def ) > 0 ? 1 : 0;
         
-        ## Prepare the finally block, if any, and add it below at the appropriate place
+        # Prepare the finally block, if any, and add it below at the appropriate place
         my $fin_block = '';
         if( scalar( @$fin_block_ref ) )
         {
@@ -875,28 +892,30 @@ EOT
                 
                 if( $cdef->{var} )
                 {
-                    # $self->_messagef( 3, "Catch assignment is: '%s'", $cdef->{var}->content );
+                    $cdef->{var}->prune( 'PPI::Token::Comment' );
+                    $cdef->{var}->prune( 'PPI::Token::Pod' );
+                    $self->_messagef( 3, "Catch assignment is: '%s'", $cdef->{var}->content );
                     # my $str = $cdef->{var}->content;
                     my $str = $self->_serialize( $cdef->{var} );
-                    $str =~ s/^\([[:blank:]\h]*|[[:blank:]]*\)$//g;
+                    $str =~ s/^\([[:blank:]\h\v]*|[[:blank:]]*\)$//g;
                     # My::Exception $e
-                    if( $str =~ /^(\S+)[[:blank:]\h]+(\$\S+)$/ )
+                    if( $str =~ /^(\S+)[[:blank:]\h\v]+(\$\S+)$/ )
                     {
                         @$cdef{qw( class var )} = ( $1, $2 );
                     }
-                    elsif( $str =~ /^(\S+)[[:blank:]\h]+(\$\S+)[[:blank:]\h]+where[[:blank:]\h]+\{(.*?)\}$/ )
+                    elsif( $str =~ /^(\S+)[[:blank:]\h\v]+(\$\S+)[[:blank:]\h\v]+where[[:blank:]\h\v]+\{(.*?)\}$/ )
                     {
                         @$cdef{qw( class var where )} = ( $1, $2, $3 );
                     }
-                    elsif( $str =~ /^(\$\S+)[[:blank:]\h]+where[[:blank:]\h]+\{(.*?)\}$/ )
+                    elsif( $str =~ /^(\$\S+)[[:blank:]\h\v]+where[[:blank:]\h\v]+\{(.*?)\}$/ )
                     {
                         @$cdef{qw( var where )} = ( $1, $2 );
                     }
-                    elsif( $str =~ /^(\$\S+)[[:blank:]\h]+isa[[:blank:]\h]+(\S+)(?:[[:blank:]\h]+where[[:blank:]\h]+\{(.*?)\})?$/ )
+                    elsif( $str =~ /^(\$\S+)[[:blank:]\h\v]+isa[[:blank:]\h\v]+(\S+)(?:[[:blank:]\h\v]+where[[:blank:]\h\v]+\{(.*?)\})?$/ )
                     {
                         @$cdef{qw( var class where )} = ( $1, $2, $3 );
                     }
-                    elsif( $str =~ /^(?<var>\$\S+)[[:blank:]\h]+isa[[:blank:]\h]*\([[:blank:]\h]*(?<quote>["'])?(?<class>[^[:blank:]\h\'\"\)]+)\k{quote}[[:blank:]\h]*\)(?:[[:blank:]\h]+where[[:blank:]\h]+\{(?<where>.*?)\})?$/ )
+                    elsif( $str =~ /^(?<var>\$\S+)[[:blank:]\h\v]+isa[[:blank:]\h\v]*\([[:blank:]\h\v]*(?<quote>["'])?(?<class>[^[:blank:]\h\v\'\"\)]+)\k{quote}[[:blank:]\h\v]*\)(?:[[:blank:]\h\v]+where[[:blank:]\h\v]+\{(?<where>.*?)\})?$/ )
                     {
                         @$cdef{qw( var class where )} = ( $+{var}, $+{class}, $+{where} );
                     }
@@ -1786,7 +1805,7 @@ And you also have granular power in the catch block to filter which exception to
 
 =head1 VERSION
 
-    v1.1.4
+    v1.2.0
 
 =head1 DESCRIPTION
 
@@ -2144,7 +2163,7 @@ Also, the C<use feature 'try'> expression must be in the relevant block where yo
 
 It is probably a matter of time until this is fully implemented in perl as a regular non-experimental feature.
 
-See more information about perl's featured implementation of try-catch in L<https://perldoc.perl.org/5.34.0/perlsyn#Try-Catch-Exception-Handling|perlsyn>
+See more information about perl's featured implementation of try-catch in L<perlsyn|https://perldoc.perl.org/5.34.0/perlsyn#Try-Catch-Exception-Handling>
 
 So, L<Nice::Try> is quite unique and fills the missing features, and since it uses XS modules for a one-time filtering, it is quite fast.
 
@@ -2583,6 +2602,19 @@ to avoid L<Nice::Try> from filtering your script
 If you want L<Nice::Try> to produce human readable code, pass it the C<debug_code> parameter like this:
 
     use Nice::Try debug_code => 1;
+
+=head1 CLASS FUNCTIONS
+
+The following class functions can be used.
+
+=head2 implement
+
+    my $new_code = Nice::Try->implement( $perl_code );
+    eval( $new_code );
+
+Provided with a perl code having one or more try-catch blocks and this will return a perl code converted to support try-catch blocks.
+
+This is designed to be used for perl code you store, such as subroutines dynamically loaded.
 
 =head1 CREDITS
 

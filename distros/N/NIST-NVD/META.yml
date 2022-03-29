@@ -1,27 +1,28 @@
 ---
 abstract: "Fetch and convert NIST's NVD feeds"
 author:
-  - 'C.J. Adams-Collier <cjac@f5.com>'
+  - 'C.J. Collier <cjac@google.com>'
 build_requires:
-  LWP::UserAgent: 6.04
-  Perl::Critic: 1.117
-  Test::File: 1.31
-  Test::More: 0.98
-  Test::Pod: 1.44
-  Test::Pod::Coverage: 1.08
-  XML::XPath: 1.13
+  Perl::Critic: '1.117'
+  Test::File: '1.31'
+  Test::More: '0.98'
+  Test::Pod: '1.44'
+  Test::Pod::Coverage: '1.08'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112150'
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: NIST-NVD
 no_index:
   directory:
     - t
     - inc
-requires: {}
-version: v1.00.00
+requires:
+  JSON::XS: '4.03'
+  LWP::UserAgent: '6.61'
+version: v1.02.01
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

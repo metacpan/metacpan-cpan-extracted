@@ -1,0 +1,142 @@
+NAME
+    Acme::CPANModules::SQLite - List of modules related to SQLite
+
+VERSION
+    This document describes version 0.001 of Acme::CPANModules::SQLite (from
+    Perl distribution Acme-CPANModules-SQLite), released on 2022-03-18.
+
+DESCRIPTION
+    Drivers
+
+    DBD::SQLite is a driver for DBI framework.
+
+    Alternative APIs: Mojo::SQLite (wrapper to DBD::SQLite).
+
+    DBI helpers
+
+    DBIx::Conn::SQLite
+
+    Applications using SQLite
+
+    Presented alphabetically. Probably an incomplete list.
+
+    App::idxdb App::lcpan App::reposdb App::rimetadb App::TimeTracker
+
+ACME::CPANMODULES ENTRIES
+    *   DBD::SQLite - Self-contained RDBMS in a DBI Driver
+
+        Author: ISHIGAKI <https://metacpan.org/author/ISHIGAKI>
+
+    *   DBI - Database independent interface for Perl
+
+        Author: TIMB <https://metacpan.org/author/TIMB>
+
+    *   Mojo::SQLite - A tiny Mojolicious wrapper for SQLite
+
+        Author: DBOOK <https://metacpan.org/author/DBOOK>
+
+    *   DBIx::Conn::SQLite - Shortcut to connect to SQLite database
+
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    *   App::idxdb - Import data for stocks on the IDX (Indonesian Stock
+        Exchange) and perform queries on them
+
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    *   App::lcpan - Manage your local CPAN mirror
+
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    *   App::reposdb - Manipulate repos.db
+
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    *   App::rimetadb - Manage a Rinci metadata database
+
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    *   App::TimeTracker - time tracking for impatient and lazy command line
+        lovers
+
+        Author: DOMM <https://metacpan.org/author/DOMM>
+
+FAQ
+  What is an Acme::CPANModules::* module?
+    An Acme::CPANModules::* module, like this module, contains just a list
+    of module names that share a common characteristics. It is a way to
+    categorize modules and document CPAN. See Acme::CPANModules for more
+    details.
+
+  What are ways to use this Acme::CPANModules module?
+    Aside from reading this Acme::CPANModules module's POD documentation,
+    you can install all the listed modules (entries) using cpanm-cpanmodules
+    script (from App::cpanm::cpanmodules distribution):
+
+     % cpanm-cpanmodules -n SQLite
+
+    Alternatively you can use the cpanmodules CLI (from App::cpanmodules
+    distribution):
+
+        % cpanmodules ls-entries SQLite | cpanm -n
+
+    or Acme::CM::Get:
+
+        % perl -MAcme::CM::Get=SQLite -E'say $_->{module} for @{ $LIST->{entries} }' | cpanm -n
+
+    or directly:
+
+        % perl -MAcme::CPANModules::SQLite -E'say $_->{module} for @{ $Acme::CPANModules::SQLite::LIST->{entries} }' | cpanm -n
+
+    This Acme::CPANModules module also helps lcpan produce a more meaningful
+    result for "lcpan related-mods" command when it comes to finding related
+    modules for the modules listed in this Acme::CPANModules module. See
+    App::lcpan::Cmd::related_mods for more details on how "related modules"
+    are found.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Acme-CPANModules-SQLite>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Acme-CPANModules-SQLite>.
+
+SEE ALSO
+    Acme::CPANModules - about the Acme::CPANModules namespace
+
+    cpanmodules - CLI tool to let you browse/view the lists
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
+    steps required beyond that are considered a bug and can be reported to
+    me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2022 by perlancar <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-SQLi
+    te>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
