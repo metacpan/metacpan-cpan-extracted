@@ -146,7 +146,7 @@ use Exporter;
 
 our @ISA = qw{ Exporter };
 
-our $VERSION = '0.151';
+our $VERSION = '0.152';
 our @EXPORT_OK = qw{
     shell
 
@@ -306,24 +306,29 @@ my %catalogs = (	# Catalog names (and other info) for each source.
 	'2019-006'	=> { name => 'Indian ASAT Test Debris' },
     },
     celestrak_supplemental => {
-	gps		=> { name => 'GPS',		rms => 1 },
-	glonass		=> { name => 'Glonass',		rms => 1 },
-	meteosat	=> { name => 'Meteosat',	rms => 1 },
-	intelsat	=> { name => 'Intelsat',	rms => 1 },
-	ses		=> { name => 'SES',		rms => 1 },
-	telesat		=> { name => 'Telesat',		rms => 1 },
-	orbcomm		=> { name => 'Orbcomm (no rms data)' },
-	iss		=> { name => 'ISS (from NASA, no rms data)' },
-	cpf		=> { name => 'CPF TLEs',	rms => 1 },
-	starlink	=> { name => 'Starlink TLEs',	rms => 1 },
-	oneweb		=> { name => 'OneWeb TLEs',	rms => 1 },
+	gps		=> { name => 'GPS',		rms => 1, match => 1 },
+	glonass		=> { name => 'Glonass',		rms => 1, match => 1 },
+	meteosat	=> { name => 'Meteosat',	rms => 1, match => 1 },
+	intelsat	=> { name => 'Intelsat',	rms => 1, match => 1 },
+	ses		=> { name => 'SES',		rms => 1, match => 1 },
+	telesat		=> { name => 'Telesat',		rms => 1, match => 1 },
+	orbcomm		=> { name => 'Orbcomm (no RMS or match data)' },
+	iss		=> {
+	    name	=> 'ISS (from NASA, no match data)',
+	    rms		=> 1,
+	},
+	cpf		=> { name => 'CPF TLEs (no match data)', rms => 1 },
+	starlink	=> { name => 'Starlink TLEs',	rms => 1, match => 1 },
+	oneweb		=> { name => 'OneWeb TLEs',	rms => 1, match => 1 },
 	planet		=> {
 	    name	=> 'Planet TLEs (no, not Mercury etc)',
 	    rms		=> 1,
+	    match	=> 1,
 	},
 	iridium		=> {
 	    name	=> 'Iridium Next',
 	    rms		=> 1,
+	    match	=> 1,
 	},
 	# Project Kuiper Internet
     },
@@ -1212,6 +1217,10 @@ The legal options are:
    specifies that RMS data be returned rather than TLE
    data, if available. If RMS data are not available
    for the data set, an error is returned.
+ -match
+   specifies that match data be returned rather than TLE
+   data, if available. If match data are not available
+   for the data set, an error is returned.
 
 A list of valid names and brief descriptions can be obtained by calling
 C<< $st->names( 'celestrak_supplemental' ) >>. If you have set the
@@ -1241,21 +1250,31 @@ sub celestrak_supplemental {
 	[
 	    'file=s'	=> 'Name of cache file',
 	    'rms!'	=> 'Return RMS data',
+	    'match!'	=> 'Return match data',
 	], @args );
+    $opt->{rms}
+	and $opt->{match}
+	and return HTTP::Response->new(
+	HTTP_PRECONDITION_FAILED,
+	'You may not assert both -rms and -match',
+    );
     my $name = $args[0];
     return $self->_get_from_net(
 	%{ $opt },
 	catalog		=> $name,
 	pre_process	=> sub {
 	    my ( undef, $arg, $info ) = @_;	# Invocant not used
-	    not $arg->{rms}
-		or $info->{rms}
-		or return HTTP::Response->new(
-		HTTP_PRECONDITION_FAILED,
-		"$name does not take the -rms option" );
+	    foreach my $key ( qw{ rms match } ) {
+		not $arg->{$key}
+		    or $info->{$key}
+		    or return HTTP::Response->new(
+		    HTTP_PRECONDITION_FAILED,
+		    "$name does not take the -$key option" );
+	    }
 	    ( $info->{spacetrack_type}, my $sfx ) = $arg->{rms} ?
-		( 'rms', 'rms.txt' ) :
-		( 'orbit', 'txt' );
+		( rms => 'rms.txt' ) :
+		$arg->{match} ? ( match => 'match.txt' ) :
+		( orbit => 'txt' );
 	    $info->{url} = "https://celestrak.com/NORAD/elements/supplemental/$name.$sfx";
 	    return;
 	},

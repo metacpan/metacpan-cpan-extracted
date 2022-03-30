@@ -3,6 +3,8 @@ use warnings;
 
 use ExtUtils::MakeMaker;
 
+my $developer = -f '.gitignore';
+
 my %WriteMakefileArgs = (
   NAME => 'File::Find::Rule::Perl',
   AUTHOR => 'Adam Kennedy <adamk@cpan.org>',
@@ -37,6 +39,7 @@ my %WriteMakefileArgs = (
   },
 
   META_ADD => {
+    'meta-spec' => { version => 2 },
     prereqs => {
       configure => {
         requires => {
@@ -59,9 +62,11 @@ my %WriteMakefileArgs = (
       },
     },
   },
+  test => { TESTS => 't/*.t' . ( $developer ? ' xt/*/*.t' : '' ) },
 );
 
 my $eumm_version  = eval $ExtUtils::MakeMaker::VERSION;
+ExtUtils::MakeMaker->VERSION(6.98) if $developer;
 
 for (qw(configure build test runtime)) {
   my $key = $_ eq 'runtime' ? 'PREREQ_PM' : uc $_.'_REQUIRES';
@@ -98,7 +103,7 @@ delete $WriteMakefileArgs{MIN_PERL_VERSION}
   if $eumm_version < 6.48;
 
 delete @WriteMakefileArgs{qw(META_ADD META_MERGE)}
-  if $eumm_version < 6.46;
+  if not $developer;
 
 delete $WriteMakefileArgs{LICENSE}
   if $eumm_version < 6.31;

@@ -302,44 +302,36 @@ my $w_pattern = do {
 ##
 ## Converter/Effector function for visible characters
 ##
+my($converter, $effector);
 use Getopt::EX::LabeledParam;
 Getopt::EX::LabeledParam
     ->new(HASH => \%opt_visible)
     ->load_params (@opt_visible);
-my @visible_names = grep $opt_visible{$_}, keys %opt_visible;
-my $visible_chars = join "", map $visible{$_}->[0], @visible_names;
-my($visible_chars_re, @converter) = do {
-    if ($visible_chars eq '') {
-	(undef);
-    } else {
-	my %hash = map { @$_ } values %visible;
-	my $re = qr/[\Q$visible_chars\E]/;
-	my $sub0 = sub {          s/($re)/$hash{$1}/g };
-	my $sub1 = sub { $_[0] =~ s/($re)/$hash{$1}/gr };
-	my $sub2 = sub {
-	    my $mark_re = shift;
-	    for (@_) {
-		s{^$mark_re\K(?=.*$re)(.*\R?)}{
-		    $sub1->($1);
-		}mge;
-	    }
-	};
-	($re, $sub0, $sub1, $sub2);
-    }
-};
-my $effector = do {
-    if (@visible_names and my $color = $colormap{'VISIBLE'}) {
+if (my @names = grep $opt_visible{$_}, keys %opt_visible) {
+    my @chars = map $visible{$_}->[0], @names;
+    my %hash = map { @$_ } values %visible;
+    my $re = do { local $" = ''; qr/[\Q@chars\E]/ };
+    my $sub0 = sub {          s/($re)/$hash{$1}/g };
+    my $sub1 = sub { $_[0] =~ s/($re)/$hash{$1}/gr };
+    my $sub2 = sub {
+	my $mark_re = shift;
+	for (@_) {
+	    s{^$mark_re\K(?=.*$re)(.*\R?)}{
+		$sub1->($1);
+	    }mge;
+	}
+    };
+    $converter = $sub2;
+
+    if (my $color = $colormap{'VISIBLE'}) {
 	my $s = ansi_code($color);
-	my $e = ansi_code($color =~ s/(?=.)/~/gr);
+	my $e = ansi_code($color =~ s/(?=.)/~/gr); # cancel the effect
 	my $symbols = join('',
 			   map  { $visible{$_}->[-1] =~ s/\s+//gr }
-			   @visible_names);
-	my $symbols_re = qr/[\Q$symbols\E]/;
-	sub { s/($symbols_re+)/${s}${1}${e}/g };
-    } else {
-	undef;
+			   @names);
+	$effector = sub { s/([\Q$symbols\E]+)/${s}${1}${e}/g };
     }
-};
+}
 
 ##
 ## Temporary files
@@ -432,8 +424,8 @@ while (<DIFF>) {
 	    } else {
 		@new = read_diffc(*DIFF, $nline);
 	    }
-	    if (@converter) {
-		$converter[2]->(qr/[\-\+\!\ ][ \t]/, @old, @new);
+	    if ($converter) {
+		$converter->(qr/[\-\+\!\ ][ \t]/, @old, @new);
 	    }
 	    my $mark_re = qr/![ \t]/;
 	    for my $i (0 .. $#old) {
@@ -495,8 +487,8 @@ while (<DIFF>) {
 	    qr/$mark/;
 	};
 
-	if (@converter) {
-	    map { $converter[2]->($mark_re, @$_) }
+	if ($converter) {
+	    map { $converter->($mark_re, @$_) }
 	    map { $_->lists }
 	    @buf;
 	}
@@ -923,7 +915,7 @@ cdif - word context diff
 
 =head1 VERSION
 
-Version 4.21.0
+Version 4.21.1
 
 =head1 SYNOPSIS
 
@@ -1189,6 +1181,22 @@ This is equivalent to :
          --cm 'OTEXT=C,NTEXT=M,*CHANGE=BD/445,DELETE=APPEND=RD/544' \
          --cm 'CMARK=GS,MMARK=YS,CTEXT=G,MTEXT=Y'
 
+=item B<--colormap>=C<&func>
+
+=item B<--colormap>=C<sub{...}>
+
+You can also set the name of perl subroutine name or definition to be
+called handling matched words.  Target word is passed as variable
+C<$_>, and the return value of the subroutine will be displayed.
+
+Next option produces L<wdiff>-like formatted output.
+
+    --cm '*'= \
+    --cm DELETE=OCHANGE='sub{"[-$_-]"}' \
+    --cm APPEND=NCHANGE='sub{"{+$_+}"}'
+
+See L<Getopt::EX::Colormap/FUNCTION SPEC> for detail.
+
 =item B<-->[B<no->]B<commandcolor>, B<-->[B<no->]B<cc>
 
 =item B<-->[B<no->]B<markcolor>, B<-->[B<no->]B<mc>
@@ -1331,7 +1339,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright 1992-2021 Kazumasa Utashiro
+Copyright 1992-2022 Kazumasa Utashiro
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

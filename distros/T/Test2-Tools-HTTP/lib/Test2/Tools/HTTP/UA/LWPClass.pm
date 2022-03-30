@@ -6,7 +6,7 @@ use URI;
 use parent 'Test2::Tools::HTTP::UA';
 
 # ABSTRACT: Global LWP user agent wrapper for Test2::Tools::HTTP
-our $VERSION = '0.09'; # VERSION
+our $VERSION = '0.10'; # VERSION
 
 
 my %orig;
@@ -27,7 +27,7 @@ sub instrument
       $orig;
     };
   }
-  
+
   $ua ||= LWP::UserAgent->new;
 }
 
@@ -69,7 +69,7 @@ sub apps { Test2::Tools::HTTP::UA->apps }
 sub request
 {
   my($self, $req, $proxy, $arg, @rest) = @_;
-  
+
   if(my $app = $self->apps->uri_to_app($req->uri))
   {
     my $env = req_to_psgi $req;
@@ -98,7 +98,7 @@ Test2::Tools::HTTP::UA::LWPClass - Global LWP user agent wrapper for Test2::Tool
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
 
@@ -139,7 +139,7 @@ Graham Ollis <plicease@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Graham Ollis.
+This software is copyright (c) 2018-2022 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

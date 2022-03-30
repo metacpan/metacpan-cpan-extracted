@@ -6,7 +6,7 @@ use strict;
 
 use parent 'GraphQL::Client::http';
 
-our $VERSION = '0.604'; # VERSION
+our $VERSION = '0.605'; # VERSION
 
 sub new {
     my $class = shift;
@@ -27,7 +27,7 @@ GraphQL::Client::https - GraphQL over HTTPS
 
 =head1 VERSION
 
-version 0.604
+version 0.605
 
 =head1 DESCRIPTION
 
@@ -48,7 +48,7 @@ feature.
 
 =head1 AUTHOR
 
-Charles McGarvey <chazmcgarvey@brokenzipper.com>
+Charles McGarvey <ccm@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 

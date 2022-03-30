@@ -6,7 +6,7 @@ use Test2::API ();
 use Carp ();
 
 # ABSTRACT: Object representing the last transaction for Test2::Tools::HTTP
-our $VERSION = '0.09'; # VERSION
+our $VERSION = '0.10'; # VERSION
 
 
 sub req { shift->{req} }
@@ -30,7 +30,7 @@ sub _note_or_diag
     $ctx->$method($self->res->decoded_content || $self->res->content);
   }
   $ctx->$method("ok = " . $self->ok);
-  
+
   $ctx->release;
 }
 
@@ -56,17 +56,17 @@ sub diag
 sub add_helper
 {
   my(undef, $sig, $code) = @_;
-  
+
   my($class, $name) = split /\./, $sig;
-  
+
   my %class = (
     tx => 'Test2::Tools::HTTP::Tx',
     req => 'Test2::Tools::HTTP::Tx::Request',
     res => 'Test2::Tools::HTTP::Tx::Response',
   );
-  
+
   $class = $class{lc $class} if $class{lc $class};
-  
+
   Carp::croak("$class already can $name") if $class->can($name);
 
   no strict 'refs';
@@ -95,7 +95,7 @@ Test2::Tools::HTTP::Tx - Object representing the last transaction for Test2::Too
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
 
@@ -204,7 +204,7 @@ Graham Ollis <plicease@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Graham Ollis.
+This software is copyright (c) 2018-2022 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

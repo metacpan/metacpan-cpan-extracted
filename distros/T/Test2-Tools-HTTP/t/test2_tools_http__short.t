@@ -36,7 +36,7 @@ subtest 'x' => sub {
       return [ 404, [ 'Content-Type' => 'text/plain;charset=UTF-8', 'Content-Length' => 14 ], [ "404 Not Found\n" ] ];
     }
   };
-  
+
   req(
     $get->('http://x.test/'),
     res {
@@ -46,9 +46,9 @@ subtest 'x' => sub {
       content_length_ok;
     },
   );
-  
+
   tx->note;
-  
+
   req(
     $get->('http://x.test/foo'),
     res {
@@ -60,7 +60,7 @@ subtest 'x' => sub {
   );
 
   tx->note;
-  
+
   req(
     $get->('http://x.test/foo/'),
     res {
@@ -78,9 +78,9 @@ subtest 'x' => sub {
       header 'x-foo' => 'Bar';
     }
   );
-  
+
   tx->note;
-  
+
 };
 
 subtest 'tx' => sub {

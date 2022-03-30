@@ -5,7 +5,7 @@ use strict;
 use warnings;
 no warnings qw(uninitialized);
 
-our $VERSION = '0.030';
+our $VERSION = '0.031';
 $VERSION = eval $VERSION;
 
 sub import {

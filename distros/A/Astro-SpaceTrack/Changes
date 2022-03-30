@@ -1,3 +1,8 @@
+0.152		2022-03-30	T. R. Wyant
+    Add match data to celestrak_supplemental.  This is accessed with the
+    --match option.  This option may not be specified with the --rms
+    option.
+
 0.151		2022-03-08	T. R. Wyant
     The deprecated spaceflight() method now warns on every use.  It also
     returns a 403 error, since the web site it scrapes has gone the way

@@ -9,7 +9,7 @@ use HTTP::AnyUA::Util qw(www_form_urlencode);
 use HTTP::AnyUA;
 use namespace::clean;
 
-our $VERSION = '0.604'; # VERSION
+our $VERSION = '0.605'; # VERSION
 
 sub _croak { require Carp; goto &Carp::croak }
 
@@ -171,7 +171,7 @@ GraphQL::Client::http - GraphQL over HTTP
 
 =head1 VERSION
 
-version 0.604
+version 0.605
 
 =head1 SYNOPSIS
 
@@ -316,7 +316,7 @@ feature.
 
 =head1 AUTHOR
 
-Charles McGarvey <chazmcgarvey@brokenzipper.com>
+Charles McGarvey <ccm@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 

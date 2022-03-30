@@ -111,6 +111,7 @@ $rslt = $ua->get ('https://celestrak.com/NORAD/elements/supplemental/');
 foreach my $key ( keys %got ) {
     $key !~ m{ / }smx
 	and $key !~ m{ [.] rms \z }smx
+	and $key !~ m{ [.] match \z }smx
 	and next;
     delete $got{$key};
 }

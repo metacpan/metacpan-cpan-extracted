@@ -29,7 +29,7 @@ subtest 'base url' => sub {
     note "http_base_url default = @{[ http_base_url ]}";
 
     isa_ok http_base_url, 'URI';
-  
+
   };
 
   subtest override => sub {
@@ -47,7 +47,7 @@ subtest 'base url' => sub {
     );
 
     isa_ok http_base_url, 'URI';
-  
+
   };
 
 };
@@ -125,7 +125,7 @@ EOM
   subtest 'with base url' => sub {
 
     http_base_url 'https://example.test/';
-    
+
     is(
       intercept {
         http_request(
@@ -149,7 +149,7 @@ EOM
       },
     );
 
-  
+
   };
 
   subtest 'bad' => sub {
@@ -285,7 +285,7 @@ subtest psgi => sub {
 
     psgi_app_del 'http://myhost1.test:8001';
     psgi_app_del 'http://myhost2.test:8002';
-  
+
   };
 
 };
@@ -574,15 +574,15 @@ subtest 'test forward' => sub {
     {
       return [ 302, [ 'Content-Type' => 'text/plain;charset=utf-8', Location => '/foo/' ], ['Go To /foo/'] ];
     }
-    
+
     if($env->{PATH_INFO} eq '/foo/')
     {
       return [ 200, [ 'Content-Type' => 'text/plain;charset=utf-8' ], [ 'foo-text' ] ];
     }
-    
+
     [ 404, [ 'Content-Type' => 'text/plain;charset=utf-8' ], [ '404 Not Found' ] ];
   };
-  
+
   http_request(
     GET('http://forward.test/foo'),
     http_response {
@@ -593,12 +593,12 @@ subtest 'test forward' => sub {
       http_content 'Go To /foo/';
     },
   );
-  
+
   is(
     http_tx->location,
     'http://forward.test/foo/',
   );
-  
+
   http_request(
     GET(http_tx->location),
     http_response {
@@ -613,7 +613,7 @@ subtest 'test forward' => sub {
     http_tx->location,
     U(),,
   );
-  
+
   http_request(
     [ GET('http://forward.test/foo'), follow_redirects => 1 ],
     http_response {
@@ -625,7 +625,7 @@ subtest 'test forward' => sub {
   );
 
   psgi_app_del 'http://forward.test/';
-  
+
 };
 
 subtest 'headers' => sub {
@@ -745,16 +745,16 @@ subtest 'psgi_app_guard' => sub {
   psgi_app_add 'http://other.test' =>   sub { [ 200, [ 'Content-Type' => 'text/plain' ], [ "Original Other App\n" ] ] };
 
   subtest 'void contet' => sub {
-  
+
     eval { psgi_app_guard; };
     my $error = $@;
     like $error, qr/psgi_app_guard called in void context/;
     note $error if $error;
-  
+
   };
-  
+
   subtest 'before' => sub {
-  
+
     http_request
       GET('/'),
       http_response {
@@ -766,13 +766,13 @@ subtest 'psgi_app_guard' => sub {
       http_response {
         http_content "Original Other App\n";
       };
-  
+
   };
 
   subtest 'override default' => sub {
-  
+
     my $guard = psgi_app_guard sub { [ 200, [ 'Content-Type' => 'text/plain' ], [ "Override Default App\n" ] ] };
-  
+
     http_request
       GET('/'),
       http_response {
@@ -782,9 +782,9 @@ subtest 'psgi_app_guard' => sub {
   };
 
   subtest 'override other' => sub {
-  
+
     my $guard = psgi_app_guard 'http://other.test' => sub { [ 200, [ 'Content-Type' => 'text/plain' ], [ "Override Other App\n" ] ] };
-  
+
     http_request
       GET('http://other.test'),
       http_response {
@@ -792,9 +792,9 @@ subtest 'psgi_app_guard' => sub {
       };
 
   };
-  
+
   subtest 'override nothing' => sub {
-  
+
     my $guard = psgi_app_guard 'http://nothing.test' => sub { [ 200, [ 'Content-Type' => 'text/plain' ], [ "Nothing\n" ] ] };
 
     http_request
@@ -802,11 +802,11 @@ subtest 'psgi_app_guard' => sub {
       http_response {
         http_content "Nothing\n";
       };
-  
+
   };
 
   subtest 'after' => sub {
-  
+
     http_request
       GET('/'),
       http_response {
@@ -818,9 +818,9 @@ subtest 'psgi_app_guard' => sub {
       http_response {
         http_content "Original Other App\n";
       };
-  
+
   };
-  
+
   psgi_app_del;
 
 };

@@ -5,7 +5,7 @@ use warnings;
 use URI;
 
 # ABSTRACT: App container class for Test2::Tools::HTTP
-our $VERSION = '0.09'; # VERSION
+our $VERSION = '0.10'; # VERSION
 
 
 {
@@ -49,12 +49,12 @@ sub del_psgi
 sub base_url
 {
   my($self, $new) = @_;
-  
+
   if($new)
   {
     $self->{base_url} = ref $new ? $new : URI->new($new);
   }
-  
+
   unless(defined $self->{base_url})
   {
     $self->{base_url} = URI->new('http://localhost/');
@@ -82,7 +82,7 @@ sub uri_to_tester
   my $key = $self->uri_key($url);
   my $app = $self->{psgi}->{$key}->{app};
   return unless $app;
-  
+
   $self->{psgi}->{$key}->{tester} ||= do {
     require Plack::Test;
     Plack::Test->create($app);
@@ -103,14 +103,14 @@ Test2::Tools::HTTP::Apps - App container class for Test2::Tools::HTTP
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
 
 =head1 DESCRIPTION
 
 This acts as a container for zero or more PSGI applications
-that have been added using L<Test2::Tools::HTTP>'s 
+that have been added using L<Test2::Tools::HTTP>'s
 C<psgi_app_add> method.  It is used by a user agent wrapper
 (L<Test2::Tools::HTTP::UA>) class to dispatch requests to
 the correct PSGI app.
@@ -187,7 +187,7 @@ Graham Ollis <plicease@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Graham Ollis.
+This software is copyright (c) 2018-2022 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

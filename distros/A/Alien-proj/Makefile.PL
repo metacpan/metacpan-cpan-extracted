@@ -16,7 +16,7 @@ my %common_reqs = (
     "File::Which" => 0,
     ($^O =~ /mswin/i) ? ("Alien::MSYS" => 0) : (),
     "Alien::Build::Plugin::PkgConfig::PPWrapper" => '0',
-    "List::Util" => '0',
+    "List::Util" => '1.45',
 );
 
 my %WriteMakefileArgs = (
@@ -31,15 +31,15 @@ my %WriteMakefileArgs = (
     "BUILD_REQUIRES" => {
         %common_reqs,
         "File::Find::Rule" => 0,
-        "FFI::CheckLib" => "0.23",
+        "FFI::CheckLib" => "0.28",
     },
     "TEST_REQUIRES" => {
         "Test::Alien" => 0,
-        "FFI::CheckLib" => "0.23",
+        "FFI::CheckLib" => "0.28",
     },
     "PREREQ_PM" => {
         "Alien::Base"   => "1.41",
-        "FFI::CheckLib" => "0.23",
+        "FFI::CheckLib" => "0.28",
     },
     META_MERGE => {
         'meta-spec' => { version => 2 },

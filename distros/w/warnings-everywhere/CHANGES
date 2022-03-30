@@ -1,3 +1,11 @@
+0.031 29-03-2022
+    [Tests]
+        Test some warning categories introduced in the five years since this module
+        was last upadted.
+
+    [Bugfix]
+        Cope with warning categories having changed in perl 5.35.10+.
+
 0.030 15-02-2017
 	[Feature]
 		Thwarting modules that import compile-time warnings was a bad idea.

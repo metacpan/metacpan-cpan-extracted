@@ -26,25 +26,15 @@
             "Alien::Build::MM" : "1.74",
             "Alien::Build::Plugin::Cleanse::BuildDir" : "0",
             "Alien::Build::Plugin::PkgConfig::PPWrapper" : "0",
-            "Alien::cmake3" : "0.02",
-            "Alien::libtiff" : "0",
             "Alien::sqlite" : "1.06",
-            "Archive::Tar" : "0",
-            "Config" : "0",
-            "Env::ShellWords" : "0.01",
             "ExtUtils::MakeMaker" : "6.52",
-            "FFI::CheckLib" : "0.23",
+            "FFI::CheckLib" : "0.28",
             "File::Find::Rule" : "0",
             "File::Which" : "0",
-            "HTTP::Tiny" : "0.044",
-            "IO::Zlib" : "0",
-            "List::Util" : "0",
-            "Mojo::DOM58" : "1.00",
+            "List::Util" : "1.45",
             "Path::Tiny" : "0",
             "PkgConfig" : "0.19026",
-            "Sort::Versions" : "0",
-            "URI" : "0",
-            "URI::Escape" : "0"
+            "Sort::Versions" : "0"
          },
          "suggests" : {
             "Alien::curl" : "0.08",
@@ -63,7 +53,7 @@
             "ExtUtils::MakeMaker" : "6.52",
             "File::Find::Rule" : "0",
             "File::Which" : "0",
-            "List::Util" : "0",
+            "List::Util" : "1.45",
             "Path::Tiny" : "0",
             "PkgConfig" : "0",
             "Sort::Versions" : "0"
@@ -73,7 +63,7 @@
          "requires" : {
             "Alien::Base" : "1.41",
             "Alien::Build" : "1.74",
-            "FFI::CheckLib" : "0.23"
+            "FFI::CheckLib" : "0.28"
          },
          "suggests" : {
             "Alien::curl" : "0.08",
@@ -82,7 +72,7 @@
       },
       "test" : {
          "requires" : {
-            "FFI::CheckLib" : "0.23",
+            "FFI::CheckLib" : "0.28",
             "Test::Alien" : "0"
          }
       }
@@ -97,7 +87,7 @@
          "url" : "https://github.com/shawnlaffan/perl-alien-proj"
       }
    },
-   "version" : "1.23",
+   "version" : "1.24",
    "x_alienfile" : {
       "generated_by" : "Alien::Build::MM version 2.48",
       "requires" : {

@@ -106,7 +106,7 @@ my %CONFIG = (
 
 # synctype: git
     df_gitbin        => 'git',
-    df_gitorigin     => 'git://github.com/Perl/perl5.git',
+    df_gitorigin     => 'https://github.com/Perl/perl5.git',
     df_gitdir        => undef,
     df_gitdfbranch   => 'blead',
     df_gitbranchfile => undef,

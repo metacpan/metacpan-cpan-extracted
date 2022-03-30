@@ -1,0 +1,37 @@
+Dipki version 0.01
+==================
+
+NAME
+    Dipki - Perl extension for CryptoSys PKI
+	
+DESCRIPTION
+    An interface to the most common functions in the CryptoSys PKI library.
+	Windows only.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Win32::API
+
+Requires CryptoSys PKI to be installed on your system, available from
+    <https://www.cryptosys.net/pki/>.
+
+AUTHOR
+    David Ireland, <https://www.cryptosys.net/contact/>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2022 David Ireland, DI Management Services Pty Limited,
+    <https://www.di-mgt.com.au> <https://www.cryptosys.net>. The code in
+    this module is licensed under the terms of the MIT license. For a copy,
+    see <http://opensource.org/licenses/MIT>
+

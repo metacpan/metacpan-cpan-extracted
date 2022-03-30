@@ -11,7 +11,7 @@ use JSON::MaybeXS;
 use Text::ParseWords;
 use namespace::clean;
 
-our $VERSION = '0.604'; # VERSION
+our $VERSION = '0.605'; # VERSION
 
 my $JSON = JSON::MaybeXS->new(canonical => 1);
 
@@ -138,6 +138,7 @@ sub _get_options {
 
     my $transport = eval { _expand_vars($options{transport}) };
     die "Two or more --transport keys are incompatible.\n" if $@;
+    $options{transport} = $transport if ref $transport eq 'HASH' && %$transport;
 
     if (ref $options{variables}) {
         $options{variables} = eval { _expand_vars($options{variables}) };
@@ -368,7 +369,7 @@ GraphQL::Client::CLI - Implementation of the graphql CLI program
 
 =head1 VERSION
 
-version 0.604
+version 0.605
 
 =head1 DESCRIPTION
 
@@ -397,7 +398,7 @@ feature.
 
 =head1 AUTHOR
 
-Charles McGarvey <chazmcgarvey@brokenzipper.com>
+Charles McGarvey <ccm@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 

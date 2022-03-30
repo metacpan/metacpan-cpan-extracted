@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.09
+    version 0.10
 
 SYNOPSIS
 
@@ -26,14 +26,14 @@ SYNOPSIS
          # http_response {} is a subclass of object {}
          # for HTTP::Response objects only, so you can
          # also use object {} style comparisons:
-         call code => 200; 
-    
+         call code => 200;
+     
          http_content_type match qr/^text\/(html|plain)$/;
          http_content_type_charset 'UTF-8';
          http_content match qr/Test/;
        }
      );
-    
+     
      use Test2::Tools::JSON::Pointer;
      
      # test an external website
@@ -216,20 +216,20 @@ FUNCTIONS
      http_request(
        GET('http://example.test'),
        http_response {
-    
+     
          # single value
          http_header 'X-Foo', 'Bar';
-    
+     
          # list as scalar, will match either:
          #     X-Foo: A
          #     X-Foo: B
-         # or 
+         # or
          #     X-Foo: A,B
          http_header 'X-Foo', 'A,B';
-    
+     
          # list mode, with an array ref:
          http_header 'X-Foo', ['A','B'];
-    
+     
          # list mode, with an array check:
          http_header 'X-Foo', array { item 'A'; item 'B' };
        },
@@ -390,17 +390,17 @@ FUNCTIONS
      psgi_add_add 'http://foo.test' => sub { ... };
      
      subtest 'mysubtest' => sub {
-       my $guard = psgi_app_guard 
+       my $guard = psgi_app_guard
          'http://foo.test' => sub { ... },
          'https://www.google.com' => sub { ... };
-         
+     
        http_request
          # gets the foo.test for this scope.
          GET('http://foo.test'),
          http_response {
            ...
          };
-       
+     
        http_request
          # gets the mock google
          GET('https://www.google.com'),
@@ -476,7 +476,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    This software is copyright (c) 2018 by Graham Ollis.
+    This software is copyright (c) 2018-2022 by Graham Ollis.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

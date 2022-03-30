@@ -1,7 +1,10 @@
 Revision history for Alien::proj
 
+1.24 2022-03-30
+    - Fix dependency versions in Makefile.PL
+
 1.23 2022-03-27
-    - Share builds: Set rpath n resulting binaries
+    - Share builds: Set rpath in resulting binaries
     - Disable global setting of $ENV{{DY}LD_LIBRARY_PATH}
       as it did not work and the rpath change is a better fix.
 

@@ -7,7 +7,7 @@ use File::Spec ();
 use Test2::Tools::HTTP::Apps;
 
 # ABSTRACT: User agent wrapper for Test2::Tools::HTTP
-our $VERSION = '0.09'; # VERSION
+our $VERSION = '0.10'; # VERSION
 
 
 sub _init
@@ -36,7 +36,7 @@ my %instance;
 
 sub new
 {
-  my($class, $ua) = @_;  
+  my($class, $ua) = @_;
 
   if($class eq __PACKAGE__)
   {
@@ -57,7 +57,7 @@ sub new
         }
       }
     }
-    
+
     if(defined $class)
     {
       return $class->new($ua);
@@ -67,7 +67,7 @@ sub new
       Carp::croak("user agent @{[ ref $ua ]} not supported ");
     }
   }
-  
+
   bless {
     ua   => $ua,
   }, $class;
@@ -114,7 +114,9 @@ sub register
 
 package Test2::Tools::HTTP::UA::Error;
 
-use overload '""' => sub { shift->as_string };
+use overload
+  '""' => sub { shift->as_string },
+  bool => sub { 1 }, fallback => 1;
 
 sub message { shift->{message} }
 sub res { shift->{res} }
@@ -134,14 +136,14 @@ Test2::Tools::HTTP::UA - User agent wrapper for Test2::Tools::HTTP
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
 
 Use a wrapper:
 
  my $wrapper = Test2::Tools::HTTP::MyUAWrapper->new($ua);
-
+ 
  # returns a HTTP::Response object
  # or throws an error on a connection error
  my $res = $wrapper->request($req);
@@ -157,7 +159,7 @@ Write your own wrapper:
    my($self) = @_;
    my $ua = $self->ua;  # the user agent object
    my $apps = $self->apps;
-
+ 
    # instrument $ua so that when requests
    # made against URLs in $apps the responses
    # come from the apps in $apps.
@@ -169,10 +171,10 @@ Write your own wrapper:
    my $self = shift;
    my $req  = shift;   # this isa HTTP::Request
    my %options = @_;
-   
+ 
    my $self = $self->ua;
    my $res;
-   
+ 
    if($options{follow_redirects})
    {
      # make a request using $ua, store
@@ -180,7 +182,7 @@ Write your own wrapper:
      # follow any redirects if $ua supports
      # that.
      my $res = eval { ... };
-     
+ 
      # on a CONNECTION error, you should throw
      # an exception using $self->error.  This should
      # NOT be used for 400 or 500 responses that
@@ -199,7 +201,7 @@ Write your own wrapper:
      # NOT follow any redirects.
      ...
    }
-   
+ 
    $res;
  }
  
@@ -287,7 +289,7 @@ Graham Ollis <plicease@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Graham Ollis.
+This software is copyright (c) 2018-2022 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

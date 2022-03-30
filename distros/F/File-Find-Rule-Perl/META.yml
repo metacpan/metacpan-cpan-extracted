@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001'
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,7 +27,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=File-Find-Rule-Perl
   homepage: https://github.com/karenetheridge/File-Find-Rule-Perl
   repository: https://github.com/karenetheridge/File-Find-Rule-Perl.git
-version: '1.15'
+version: '1.16'
 x_authority: cpan:ADAMK
 x_contributors:
   - 'Adam Kennedy <adam@ali.as>'
@@ -36,3 +36,4 @@ x_contributors:
   - 'Jonathan Yu <jawnsy@cpan.org>'
   - 'Karen Etheridge <ether@cpan.org>'
   - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -413,7 +413,7 @@ my %opt = (
     gitorigin => {
         msg => "Git main repository?",
         alt => [ ],
-        dft => 'git://perl5.git.perl.org/perl5.git',
+        dft => 'https://github.com/Perl/perl5.git',
     },
     gitdir => {
         msg => "Directory for the local git repository?",

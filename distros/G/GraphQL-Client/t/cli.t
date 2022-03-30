@@ -44,6 +44,29 @@ subtest 'get_options' => sub {
     }
 };
 
+subtest 'get_options_transport' => sub {
+    my $expected = {
+        format          => 'json:pretty',
+        filter          => undef,
+        help            => undef,
+        manual          => undef,
+        operation_name  => undef,
+        outfile         => undef,
+        query           => 'bar',
+        transport       => { headers => {'X-Test' => 'value', 'X-Test-2' => 'val2' } },
+        unpack          => 0,
+        url             => 'foo',
+        variables       => undef,
+        version         => undef,
+    };
+
+    my $r = GraphQL::Client::CLI->_get_options(qw{--url foo --query bar --transport headers.X-Test=value --transport headers.X-Test-2=val2});
+    is_deeply($r, $expected, '--url, --query set option and correctly expanded transport options') or diag explain $r;
+};
+
+
+
+
 subtest 'expand_vars' => sub {
     my $r = GraphQL::Client::CLI::_expand_vars({
         'foo.bar'       => 'baz',

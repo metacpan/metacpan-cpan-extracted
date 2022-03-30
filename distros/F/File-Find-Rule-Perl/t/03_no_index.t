@@ -36,6 +36,7 @@ SCOPE: {
 			pm_to_blib
                         MYMETA.yml
                         MYMETA.json
+                        Makefile.old
 		};
 		my @files = sort grep {
 			! /^debian\b/

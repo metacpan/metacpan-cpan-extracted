@@ -1,0 +1,25 @@
+---
+abstract: 'Perl extension for CryptoSys PKI'
+author:
+  - 'David Ireland, <https://www.cryptosys.net/contact/>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dipki
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Win32::API: '0'
+  strict: '0'
+  warnings: '0'
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

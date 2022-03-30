@@ -32,7 +32,7 @@ subtest 'via wrapper' => sub {
       call decoded_content => "Something Same\n";
     },
   );
-  
+
   note($res->as_string);
 
 };
@@ -52,7 +52,7 @@ subtest 'some other lwp object' => sub {
       call decoded_content => "Something Same\n";
     },
   );
-  
+
   note($res->as_string);
 
 };
@@ -69,7 +69,7 @@ subtest 'forward' => sub {
   subtest 'no follow' => sub {
 
     my $res = $wrapper->request(GET('http://forward.lwpclass.test'));
-    
+
     is(
       $res,
       object {
@@ -85,7 +85,7 @@ subtest 'forward' => sub {
   subtest 'no follow' => sub {
 
     my $res = $wrapper->request(GET('http://forward.lwpclass.test'), follow_redirects => 1);
-    
+
     is(
       $res,
       object {
@@ -97,7 +97,7 @@ subtest 'forward' => sub {
         call decoded_content => "Something Same\n";
       },
     );
-  
+
   note($res->as_string);
 
   }

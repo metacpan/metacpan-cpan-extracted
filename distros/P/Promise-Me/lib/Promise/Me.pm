@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Promise - ~/lib/Promise/Me.pm
-## Version v0.2.0
+## Version v0.2.1
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/28
-## Modified 2022/03/18
+## Modified 2022/03/30
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -115,7 +115,7 @@ BEGIN
     # A repository of objects that is used by END and DESTROY to remove the shared
     # space only when no proces is using it, since the processes run asynchronously
     our $OBJECTS_REPO = [];
-    our $VERSION = 'v0.2.0';
+    our $VERSION = 'v0.2.1';
 };
 
 sub import
@@ -1509,9 +1509,25 @@ sub _set_shared_space
     if( Module::Generic::SharedMem->supported && !$self->{use_cache_file} )
     {
         my $s = Module::Generic::SharedMem->new( %$p ) || return( $self->error( "Unable to create shared memory object: ", Module::Generic::SharedMem->error ) );
-        $shm = $s->open ||
-            return( $self->error( "Unable to open shared memory object: ", $s->error ) );
-        $shm->attach;
+        $shm = $s->open;
+        
+        if( !$shm )
+        {
+            if( $s->error->message =~ /No[[:blank:]\h]+space[[:blank:]\h]+left/i )
+            {
+                my $s = Module::Generic::File::Cache->new( %$p ) || return( $self->error( "Unable to create shared cache file object: ", Module::Generic::File::Cache->error ) );
+                $shm = $s->open ||
+                    return( $self->error( "Unable to open shared cache file object: ", $s->error ) );
+            }
+            else
+            {
+                return( $self->error( "Unable to open shared memory object: ", $s->error ) );
+            }
+        }
+        else
+        {
+            $shm->attach;
+        }
     }
     else
     {
@@ -2286,7 +2302,7 @@ Promise::Me - Fork Based Promise with Asynchronous Execution, Async, Await and S
 
 =head1 VERSION
 
-    v0.2.0
+    v0.2.1
 
 =head1 DESCRIPTION
 

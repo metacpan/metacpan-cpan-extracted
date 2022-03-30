@@ -1,6 +1,9 @@
 Revision history for Perl module Promise::Me
 
-v0.2.0 2022-03-18T21:26:23+0900
+v0.2.1 2022-03-30T13:51:28+0900
+    - Implemented fallback when shared memory is not available
+
+v0.2.0 2022-03-18T21:26:23Z +0900
     - Add support for shared cache file if shared memory is not supported or desired
     - Corrected a bug when terminating shared variable space in END block
 

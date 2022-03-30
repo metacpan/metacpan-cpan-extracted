@@ -4,13 +4,13 @@
       "Adam Kennedy <adamk@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "File-Find-Rule-Perl",
    "no_index" : {
@@ -53,7 +53,7 @@
          "web" : "https://github.com/karenetheridge/File-Find-Rule-Perl"
       }
    },
-   "version" : "1.15",
+   "version" : "1.16",
    "x_authority" : "cpan:ADAMK",
    "x_contributors" : [
       "Adam Kennedy <adam@ali.as>",
@@ -62,5 +62,6 @@
       "Jonathan Yu <jawnsy@cpan.org>",
       "Karen Etheridge <ether@cpan.org>",
       "Tatsuhiko Miyagawa <miyagawa@bulknews.net>"
-   ]
+   ],
+   "x_serialization_backend" : "JSON::MaybeXS version 1.004003"
 }

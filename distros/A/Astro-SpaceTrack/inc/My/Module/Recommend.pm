@@ -37,8 +37,15 @@ EOD
 EOD
 );
 
+my %core = map { $_ => 1 } qw{ Time::HiRes };
+
 sub optionals {
-    return ( map { $_->modules() } @optionals );
+    # As of Test::Builder 1.302190 (March 2 2022) Time::HiRes is needed
+    # by Test::Builder, which is used by Test::More. It's a core module,
+    # so it OUGHT to be available, though there are known downstream
+    # packagers who strip core modules. Sigh. This is the reason I'm
+    # stripping it here rather than removing it completely.
+    return ( grep { ! $core{$_} } map { $_->modules() } @optionals );
 }
 
 sub recommend {

@@ -421,7 +421,7 @@ sub gitorigin {
     return $opt->new(
         name => 'gitorigin',
         option => '=s',
-        default => 'git://github.com/Perl/perl5.git',
+        default => 'https://github.com/Perl/perl5.git',
         helptext => "The remote location of the git repository.",
     );
 }

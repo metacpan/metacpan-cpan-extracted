@@ -10,7 +10,7 @@ use strict;
 
 use GraphQL::Client::CLI;
 
-our $VERSION = '0.604'; # VERSION
+our $VERSION = '0.605'; # VERSION
 
 GraphQL::Client::CLI->main(@ARGV);
 
@@ -26,7 +26,7 @@ graphql - Command-line GraphQL client
 
 =head1 VERSION
 
-version 0.604
+version 0.605
 
 =head1 SYNOPSIS
 
@@ -346,7 +346,13 @@ feature.
 
 =head1 AUTHOR
 
-Charles McGarvey <chazmcgarvey@brokenzipper.com>
+Charles McGarvey <ccm@cpan.org>
+
+=head1 CONTRIBUTOR
+
+=for stopwords jwright
+
+jwright <jwright@ecstuning.com>
 
 =head1 COPYRIGHT AND LICENSE
 

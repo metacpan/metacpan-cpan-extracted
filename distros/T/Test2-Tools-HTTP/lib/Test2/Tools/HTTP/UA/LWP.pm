@@ -6,16 +6,16 @@ use URI;
 use parent 'Test2::Tools::HTTP::UA';
 
 # ABSTRACT: LWP user agent wrapper for Test2::Tools::HTTP
-our $VERSION = '0.09'; # VERSION
+our $VERSION = '0.10'; # VERSION
 
 
 sub instrument
 {
   my($self) = @_;
-  
+
   my $cb = $self->{request_send_cb} ||= sub {
     my($req, $ua, $h) = @_;
-    
+
     if(my $tester = $self->apps->uri_to_tester($req->uri))
     {
       return $tester->request($req);
@@ -25,7 +25,7 @@ sub instrument
       return;
     }
   };
-  
+
   $self->ua->set_my_handler( 'request_send' => $cb );
 }
 
@@ -71,7 +71,7 @@ Test2::Tools::HTTP::UA::LWP - LWP user agent wrapper for Test2::Tools::HTTP
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
 
@@ -112,7 +112,7 @@ Graham Ollis <plicease@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Graham Ollis.
+This software is copyright (c) 2018-2022 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

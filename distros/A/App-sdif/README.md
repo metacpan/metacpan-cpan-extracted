@@ -68,7 +68,7 @@ You can write everything in ~/.gitconfig:
 
 [sdif](https://metacpan.org/pod/sdif), [cdif](https://metacpan.org/pod/cdif), [watchdiff](https://metacpan.org/pod/watchdiff)
 
-[Getopt::EX](https://metacpan.org/pod/Getopt::EX)
+[Getopt::EX](https://metacpan.org/pod/Getopt%3A%3AEX)
 
 # AUTHOR
 

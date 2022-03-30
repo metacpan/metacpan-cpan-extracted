@@ -1,0 +1,21 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Dipki.t
+lib/Dipki.pm
+lib/Dipki/Asn1.pm
+lib/Dipki/Cipher.pm
+lib/Dipki/Cnv.pm
+lib/Dipki/Compr.pm
+lib/Dipki/Ecc.pm
+lib/Dipki/Err.pm
+lib/Dipki/Gen.pm
+lib/Dipki/Hash.pm
+lib/Dipki/Hmac.pm
+lib/Dipki/Rng.pm
+lib/Dipki/Rsa.pm
+lib/Dipki/Sig.pm
+lib/Dipki/X509.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

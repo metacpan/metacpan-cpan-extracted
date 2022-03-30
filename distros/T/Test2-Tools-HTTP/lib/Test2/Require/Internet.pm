@@ -6,7 +6,7 @@ use IO::Socket::INET;
 use parent qw( Test2::Require );
 
 # ABSTRACT: Skip tests if there is no internet access
-our $VERSION = '0.09'; # VERSION
+our $VERSION = '0.10'; # VERSION
 
 
 sub skip
@@ -19,7 +19,7 @@ sub skip
   {
     my $host = shift @pairs;
     my $port = shift @pairs;
-    
+
     my $sock = IO::Socket::INET->new(
       PeerAddr => $host,
       PeerPort => $port,
@@ -48,7 +48,7 @@ Test2::Require::Internet - Skip tests if there is no internet access
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
 
@@ -69,7 +69,7 @@ This test requirement will skip your test if either
 
 =item The environment variable C<NO_NETWORK_TESTING> is set to a true value
 
-=item A connection to a particular host/port cannot be made.  The default is usually reasonable, but subject to change as the author sees fit. 
+=item A connection to a particular host/port cannot be made.  The default is usually reasonable, but subject to change as the author sees fit.
 
 =back
 
@@ -91,7 +91,7 @@ Graham Ollis <plicease@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Graham Ollis.
+This software is copyright (c) 2018-2022 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

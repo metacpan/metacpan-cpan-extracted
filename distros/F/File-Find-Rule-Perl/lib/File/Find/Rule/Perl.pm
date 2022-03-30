@@ -45,7 +45,7 @@ use File::Find::Rule  0.20 ();
 use Params::Util      0.38 ();
 use Parse::CPAN::Meta 1.38 ();
 
-our $VERSION = '1.15';
+our $VERSION = '1.16';
 use base 'File::Find::Rule';
 our @EXPORT  = @File::Find::Rule::EXPORT;
 
