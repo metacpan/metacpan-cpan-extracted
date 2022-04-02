@@ -6,11 +6,14 @@ use warnings;
 
 use Test::More;
 
-plan tests => 3;
+plan tests => 6;
 
 my @module_files = (
     'Net/Google/Drive/Simple.pm',
-    'Net/Google/Drive/Simple/Item.pm'
+    'Net/Google/Drive/Simple/Core.pm',
+    'Net/Google/Drive/Simple/Item.pm',
+    'Net/Google/Drive/Simple/V2.pm',
+    'Net/Google/Drive/Simple/V3.pm'
 );
 
 

@@ -1,5 +1,7 @@
 #!/usr/bin/perl -w
 
+BEGIN { unshift @INC, 'lib', '../lib'}
+
 # The Integral of the mathematical function 1/x
 
 use strict;

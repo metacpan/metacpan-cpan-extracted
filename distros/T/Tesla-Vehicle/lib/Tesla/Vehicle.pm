@@ -8,10 +8,12 @@ use parent 'Tesla::API';
 use Carp qw(croak confess);
 use Data::Dumper;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use constant {
-    DEBUG_ONLINE    => 0,
+    DEBUG_ONLINE    => $ENV{TESLA_DEBUG_ONLINE},
+    DEBUG_API_RETRY => $ENV{TESLA_DEBUG_API_RETRY},
+    API_RETRIES     => 5,
     WAKE_TIMEOUT    => 30,
     WAKE_INTERVAL   => 2,
     WAKE_BACKOFF    => 1.15
@@ -111,7 +113,34 @@ sub name {
 sub data {
     my ($self) = @_;
     $self->_online_check;
-    return $self->api(endpoint => 'VEHICLE_DATA', id => $self->id);
+
+    my $data = $self->api(endpoint => 'VEHICLE_DATA', id => $self->id);
+
+    if (ref $data ne 'HASH') {
+        CORE::warn "Tesla API timed out. Please retry the call\n";
+        return {};
+    }
+
+    if (! defined $data->{drive_state}{shift_state}) {
+
+        for (1 .. API_RETRIES) {
+            print "API retry attempt $_\n" if DEBUG_API_RETRY;
+
+            $self->api_cache_clear;
+
+            $data = $self->api(endpoint => 'VEHICLE_DATA', id => $self->id);
+
+            if (defined $data->{drive_state}{shift_state}) {
+                last;
+            }
+        }
+
+        if (! defined $data->{drive_state}{shift_state}) {
+            $data->{drive_state}{shift_state} = 'U';
+        }
+    }
+
+    return $data;
 }
 sub state {
     my ($self) = @_;
@@ -169,7 +198,6 @@ sub trunk_front {
 sub trunk_rear {
     return $_[0]->data->{vehicle_state}{rt};
 }
-
 sub user_present {
     return $_[0]->data->{vehicle_state}{is_user_present};
 }
@@ -195,7 +223,7 @@ sub power {
     return $_[0]->data->{drive_state}{power};
 }
 sub speed {
-    return $_[0]->data->{drive_state}{speed};
+    return $_[0]->data->{drive_state}{speed} // 0;
 }
 
 # Charge State Methods
@@ -315,6 +343,30 @@ sub temperature_setting_passenger {
 }
 
 # Command Related Methods
+
+sub charge_limit_set {
+    my ($self, $percent) = @_;
+
+    if (! defined $percent || $percent !~ /^\d+$/ || $percent > 100 || $percent < 1) {
+        croak "charge_limit_set() requires a percent integer between 1 and 100";
+    }
+
+    $self->_online_check;
+
+    my $return = $self->api(
+        endpoint    => 'CHANGE_CHARGE_LIMIT',
+        id          => $self->id,
+        api_params  => { percent => $percent }
+    );
+
+    $self->api_cache_clear;
+
+    if (! $return->{result} && $self->warn) {
+        print "Couldn't set charge limit: '$return->{reason}'\n";
+    }
+
+    return $return->{result};
+}
 
 sub bioweapon_mode_toggle {
     my ($self) = @_;
@@ -908,17 +960,14 @@ Turns up the audio volume by one notch.
 Returns true on success, false on failure.
 
 I<NOTE>: Most often reason for fail is "User Not Present".
-=head2 wake
 
-Wakes up an offline Tesla vehicle.
+=head2 charge_limit_set($percent)
 
-Most Tesla API calls related to your vehicle require the vehicle to be in an
-online state. If C<auto_wake()> isn't set and you attempt to make an API call
-that requires the vehicle online, we will print a warning and exit.
+Sets the limit in percent the battery can be charged to.
 
-Use this method to wake the vehicle up manually.
+Returns true if the operation was successful, and false if not.
 
-Default wake timeout is 30 seconds, and is set in the constant C<WAKE_TIMEOUT>.
+Follow up with a call to C<battery_level()>.
 
 =head2 trunk_rear_actuate
 
@@ -1074,6 +1123,10 @@ vehicle.
 Returns a single alpha character representing the gear the vehicle is in.
 
 One of C<P> for parked, C<N> for Neutral, C<D> for Drive and C<R> for reverse.
+
+This value is very often retured as undefined by Tesla, so a custom value of
+C<U> is returned if the Tesla API doesn't return a valid value after
+C<API_RETRIES> attempts to get one.
 
 =head2 gps_as_of
 

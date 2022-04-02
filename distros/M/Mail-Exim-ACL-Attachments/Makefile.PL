@@ -30,7 +30,7 @@ my %WriteMakefileArgs = (
     "IO::Compress::Zip" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "1.001",
+  "VERSION" => "1.002",
   "test" => {
     "TESTS" => "t/*.t"
   }

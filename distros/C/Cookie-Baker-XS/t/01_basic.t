@@ -30,6 +30,9 @@ my @tests = (
      # disallow "," as a delimiter
     [ 'Foo=Bar; Bar=Baz,  XXX=Foo%20Bar   ; YYY=; ', { Foo => 'Bar', Bar => 'Baz,  XXX=Foo Bar',YYY=>"" }],
 
+    [ '%=";', {'%' => '"' }],
+    [ ';%=";', {'%' => '"' }],
+    [ ';;;;;      A="B"";;C=D', { A => 'B"', C => 'D' }],
 
     [ '', {} ],
     [ undef, {} ],

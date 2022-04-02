@@ -1,5 +1,6 @@
 #!/usr/bin/perl -w
 
+BEGIN { unshift @INC, 'lib', '../lib'}
 use Chart::Points;
 
 print "1..1\n";

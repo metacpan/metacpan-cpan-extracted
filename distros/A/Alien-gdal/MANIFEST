@@ -1,4 +1,3 @@
-0001-Enable-shared-build-on-freebsd-10.patch
 alienfile
 Changes
 lib/Alien/gdal.pm
@@ -6,7 +5,6 @@ LICENSE
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
-patch_isnan_gcc.patch
 README.md
 t/00-load.t
 t/01-config.t

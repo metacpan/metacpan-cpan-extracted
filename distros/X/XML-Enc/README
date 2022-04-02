@@ -2,7 +2,7 @@ NAME
     XML::Enc - XML::Enc Encryption Support
 
 VERSION
-    version 0.03
+    version 0.05
 
 SYNOPSIS
         my $decrypter = XML::Enc->new(
@@ -57,13 +57,19 @@ METHODS
             <https://www.w3.org/TR/2002/REC-xmlenc-core-20021210/Overview.ht
             ml#aes128-cbc>
 
-        *   aes196-cbc
+        *   aes192-cbc
             <https://www.w3.org/TR/2002/REC-xmlenc-core-20021210/Overview.ht
             ml#aes192-cbc>
 
         *   aes256-cbc
             <https://www.w3.org/TR/2002/REC-xmlenc-core-20021210/Overview.ht
             ml#aes256-cbc>
+
+        *   aes128-gcm <https://www.w3.org/TR/xmlenc-core/#aes128-gcm>
+
+        *   aes192-gcm <https://www.w3.org/TR/xmlenc-core/#aes192-gcm>
+
+        *   aes256-gcm <https://www.w3.org/TR/xmlenc-core/#aes256-gcm>
 
     key_transport
         Specify the encryption method to be used for key transport.

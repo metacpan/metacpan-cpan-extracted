@@ -1,9 +1,9 @@
 ##############################################################################
 #
 #  Data::Tools::Socket perl module
-#  2013-2022 (c) Vladi Belperchinov-Shabanski "Cade"
-#  http://cade.datamax.bg
-#  <cade@bis.bg> <cade@biscom.net> <cade@datamax.bg> <cade@cpan.org>
+#  Copyright (c) 2013-2022 Vladi Belperchinov-Shabanski "Cade" 
+#        <cade@noxrun.com> <cade@bis.bg> <cade@cpan.org>
+#  http://cade.noxrun.com/  
 #
 #  GPL
 #
@@ -13,7 +13,7 @@ use strict;
 use Exporter;
 use Time::HiRes qw( time );
 
-our $VERSION = '1.21';
+our $VERSION = '1.27';
 
 our @ISA    = qw( Exporter );
 our @EXPORT = qw(
@@ -266,9 +266,8 @@ Data::Tools::Socket uses:
 =head1 AUTHOR
 
   Vladi Belperchinov-Shabanski "Cade"
-
-        <cade@noxrun.com> <cade@bis.bg> <cade@cpan.org>
-  http://cade.noxrun.com
+#        <cade@noxrun.com> <cade@bis.bg> <cade@cpan.org>
+#  http://cade.noxrun.com/  
 
 
 =cut

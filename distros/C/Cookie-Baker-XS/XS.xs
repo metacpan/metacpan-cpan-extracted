@@ -39,7 +39,7 @@ void
 url_decode_key(const char *src, int src_len, char *d, int *key_len) {
     int i, dlen=0;
     for (i = 0; i < src_len; i++ ) {
-        if ( src[i] == '%' && isxdigit(src[i+1]) && isxdigit(src[i+2]) ) {
+        if ((i + 2) < src_len && src[i] == '%' && isxdigit(src[i+1]) && isxdigit(src[i+2]) ) {
             d[dlen++] = hextbl[(U8)src[i+1]] * 16 + hextbl[(U8)src[i+2]];
             i += 2;
         }
@@ -51,23 +51,23 @@ url_decode_key(const char *src, int src_len, char *d, int *key_len) {
 }
 
 static SV *
-url_decode_val(pTHX_ const char *src, int start, int end) {
+url_decode_val(pTHX_ const char *src, int src_len) {
     int dlen = 0, i = 0;
     char *d;
     SV * dst;
 
     // Values can be quoted
-    if ( src[start] == '"' && src[end-1] == '"' ) {
-        start++;
-        --end;
+    if (src_len > 1 && src[0] == '"' && src[src_len-1] == '"' ) {
+        src++;
+        src_len -= 2;
     }
 
     dst = newSV(0);
     (void)SvUPGRADE(dst, SVt_PV);
-    d = SvGROW(dst, (end - start) * 3 + 1);
+    d = SvGROW(dst, src_len + 1);
 
-    for (i = start; i < end; i++ ) {
-        if ( src[i] == '%' && isxdigit(src[i+1]) && isxdigit(src[i+2]) ) {
+    for (i = 0; i < src_len; i++ ) {
+        if ( (i + 2) < src_len && src[i] == '%' && isxdigit(src[i+1]) && isxdigit(src[i+2]) ) {
             d[dlen++] = hextbl[(U8)src[i+1]] * 16 + hextbl[(U8)src[i+2]];
             i += 2;
         }
@@ -101,58 +101,78 @@ SV *
 crush_cookie(cookie)
     SV *cookie
   PREINIT:
-    char *src, *prev, *p, *key;
-    int i, prev_s=0, la, key_len, key_size=64;
-    STRLEN src_len;
+    char *key, *key_p, *val_p, *val_end_p;
+    int cur_len, key_len, val_len, key_size=64;
+    STRLEN len_left_from_orig;
     HV *hv;
   CODE:
     hv = newHV();
     if ( SvOK(cookie) ) {
         Newx(key, key_size, char);
-        src = (char *)SvPV(cookie,src_len);
-        prev = src;
-        for ( i=0; i<src_len; i++ ) {
-            if ( src[i] == ';' ) {
-                while ( prev[0] == ' ' ) {
-                    prev++;
-                    prev_s++;
-                }
-                la = i - prev_s;
-                while ( prev[la-1] == ' ' ) {
-                    --la;
-                }
-                p = memchr(prev, '=', i - prev_s);
-                if ( p != NULL ) {
-                    renewmem(aTHX_ &key, &key_size, (p - prev)*3+1);
-                    url_decode_key(prev, p - prev, key, &key_len);
-                    if ( !hv_exists(hv, key, key_len) ) {
-                        (void)hv_store(hv, key, key_len,
-                            url_decode_val(aTHX_ prev, p - prev + 1, la ), 0);
-                    }
-                }
-                prev = &src[i+1];
-                prev_s = i + 1;
+        key_p = (char *)SvPV(cookie, len_left_from_orig);
+
+        while(len_left_from_orig > 0) {
+            /* strip starting spaces */
+            while(len_left_from_orig > 0 && (key_p[0] == ' ' || key_p[0] == ';')) {
+                key_p++;
+                len_left_from_orig--;
             }
-        }
-        if ( i > prev_s ) {
-            while ( prev[0] == ' ' ) {
-                prev++;
-                prev_s++;
+
+            if (len_left_from_orig == 0) {
+                break;
             }
-            la = i - prev_s;
-            while ( prev[la-1] == ' ' ) {
-                --la;
+
+            val_end_p = memchr(key_p, ';', len_left_from_orig);
+
+            /* set cur_len to not count the ; */
+            if (val_end_p == NULL) {
+                cur_len = len_left_from_orig;
+                val_end_p = key_p + cur_len;
+                len_left_from_orig = 0;
+            } else {
+                cur_len = val_end_p - key_p;
+                len_left_from_orig -= cur_len + 1;
             }
-            p = memchr(prev, '=', i - prev_s);
-            if ( p != NULL ) {
-                renewmem(aTHX_ &key, &key_size, (p - prev)*3+1);
-                url_decode_key(prev, p - prev, key, &key_len);
+
+            val_p = memchr(key_p, '=', cur_len);
+            if (val_p != NULL) {
+                key_len = val_p - key_p;
+
+                /* drop trailing spaces from key */
+                while(key_len > 0 && key_p[key_len-1] == ' ') {
+                    key_len--;
+                }
+
+                /* skip the = */
+                val_p++;
+                val_len = val_end_p - val_p;
+
+                /* skip starting spaces from value */
+                while(val_len > 0 && val_p[0] == ' ') {
+                    val_p++;
+                    val_len--;
+                }
+                /* skip trailing spaces from value */
+                while(val_len > 0 && val_p[val_len-1] == ' ') {
+                    val_len--;
+                }
+
+                renewmem(aTHX_ &key, &key_size, key_len);
+                url_decode_key(key_p, key_len, key, &key_len);
                 if ( !hv_exists(hv, key, key_len) ) {
                     (void)hv_store(hv, key, key_len,
-                        url_decode_val(aTHX_ prev, p - prev + 1, la ), 0);
+                        url_decode_val(aTHX_ val_p, val_len), 0);
                 }
             }
+
+            if (len_left_from_orig == 0) {
+                /* bypass bogus ptr math below */
+                break;
+            }
+
+            key_p = val_end_p + 1;
         }
+
         Safefree(key);
     }
     RETVAL = newRV_noinc((SV *)hv);

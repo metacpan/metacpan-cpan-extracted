@@ -5,8 +5,7 @@ use warnings;
 
 use Test::More;
 
-use Object::Pad;
-use Object::Pad qw( :experimental(mop) );
+use Object::Pad ':experimental(mop)';
 
 class Example { }
 

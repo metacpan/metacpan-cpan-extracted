@@ -11,6 +11,7 @@ use File::Spec::Functions qw( catfile );
 
 use Term::Choose         qw();
 use Term::Choose::Screen qw( hide_cursor clear_screen );
+use Term::Form::ReadLine qw();
 use Term::TablePrint     qw();
 
 use App::DBBrowser::Auxil;
@@ -221,7 +222,7 @@ sub __selected_statement_result {
 sub __get_filename_fs {
     my ( $sf, $sql ) = @_;
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
-    my $tf = Term::Form->new( $sf->{i}{tf_default} );
+    my $tr = Term::Form::ReadLine->new( $sf->{i}{tr_default} );
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $file_name;
     my $count = 0;
@@ -232,7 +233,7 @@ sub __get_filename_fs {
         }
         my $info = $ax->get_sql_info( $sql );
         # Readline
-        $file_name = $tf->readline(
+        $file_name = $tr->readline(
             'File name: ',
             { info => $info, default => $file_name, hide_cursor => 2 }
         );

@@ -26,7 +26,7 @@
 % my $TicketLabel = $Id ? loc("Ticket #[_1]", $Id) : loc('this ticket');
 
 % if ($Duration ||($u->id && $u->id == $session{'CurrentUser'}->id)) {
-<div class="locked-by-you">
+<div class="locked-by-you alert alert-info mt-2">
 % if(defined $Duration && !$Lock) {
     <&|/l, $TicketLabel, $ago &>You had [_1] locked for [_2]. It is now unlocked</&>.
 % #Do not display time if it is very little time, since such a short time probably 
@@ -43,7 +43,8 @@
 %    $TicketLabel = loc('This ticket') if $TicketLabel eq loc('this ticket');
 %    $TicketLabel = $m->interp->apply_escapes($TicketLabel, 'h');
 %    $ago         = $m->interp->apply_escapes($ago, 'h');
-<div class="locked">
+
+<div class="locked alert alert-danger mt-2">
 <&|/l_unsafe, $TicketLabel, $u_str, $ago &>[_1] has been locked by [_2] for [_3]</&>.
 </div>
 %}

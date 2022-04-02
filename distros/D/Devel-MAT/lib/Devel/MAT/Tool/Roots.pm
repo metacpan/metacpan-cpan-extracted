@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2017 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Tool::Roots 0.46;
+package Devel::MAT::Tool::Roots 0.47;
 
 use v5.14;
 use warnings;
@@ -46,10 +46,12 @@ sub run
    Devel::MAT::Cmd->print_table(
       [ map {
          my ( $name, $description ) = @$_;
-         my $sv = $df->$name;
+         my $addr = $df->root_at( $name );
+         my $sv = $df->sv_at( $addr );
 
-         $sv ? [ "$description", Devel::MAT::Cmd->format_sv( $sv ) ]
-             : ()
+         $sv   ? [ "$description", Devel::MAT::Cmd->format_sv( $sv ) ] :
+         $addr ? [ "$description", sprintf( "PTR(0x%x)", $addr ) ] :
+                 ()
       } pairs $df->root_descriptions ],
       sep => ": ",
    );

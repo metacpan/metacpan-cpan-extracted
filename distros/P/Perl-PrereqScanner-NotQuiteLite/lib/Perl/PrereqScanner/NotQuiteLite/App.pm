@@ -79,6 +79,19 @@ sub new {
     $opts{private_re} ||= $re->_regexp;
   }
 
+  if ($opts{optional} and ref $opts{optional} eq 'ARRAY') {
+    require Regexp::Trie;
+    my $re = Regexp::Trie->new;
+    for (@{$opts{optional}}) {
+        s|\\|/|g if WIN32;
+        $re->add($_);
+    }
+    $opts{optional_re} ||= $re->_regexp;
+  }
+  if ($opts{optional_re}) {
+    $opts{suggests} = 1;
+  }
+
   if (my $index_name = delete $opts{use_index}) {
     my $index_package = "CPAN::Common::Index::$index_name";
     if (eval "require $index_package; 1") {
@@ -445,11 +458,14 @@ sub _scan_file {
     return if $file =~ /\b$self->{ignore_re}\b/;
   }
 
+  my $optional = $self->{optional_re} && $file =~ /\b$self->{optional_re}\b/ ? 1 : 0;
+
   my $context = Perl::PrereqScanner::NotQuiteLite->new(
     parsers => $self->{parsers},
     recommends => $self->{recommends},
     suggests => $self->{suggests},
     verbose => $self->{verbose},
+    optional => $optional,
   )->scan_file($file);
 
   my $relpath = File::Spec->abs2rel($file, $self->{base_dir});
@@ -628,6 +644,14 @@ Instead of ignoring a set of files, you can use C<features> option to
 let their prerequisites belong to a specific feature that will not be
 installed unless asked. However, you are advised to create a separate
 distribution for the specific feature.
+
+=item optional, optional_re
+
+Instead of ignoring a set of files, you can also use C<optional> option
+to mark all the prerequisites found in some of the files in your distribution
+optional (i.e. suggests). You can specify (a reference to) a list of
+files (with C<optional> option), or a regular expression that matches
+the files (with C<optional_re> option).
 
 =item private, private_re
 

@@ -18,6 +18,7 @@ my %WriteMakefileArgs = (
   "NAME" => "XML::Enc",
   "PREREQ_PM" => {
     "Carp" => 0,
+    "Crypt::AuthEnc::GCM" => 0,
     "Crypt::Mode::CBC" => 0,
     "Crypt::OpenSSL::Bignum" => 0,
     "Crypt::OpenSSL::RSA" => 0,
@@ -34,7 +35,7 @@ my %WriteMakefileArgs = (
     "File::Which" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.03",
+  "VERSION" => "0.05",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -43,6 +44,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Carp" => 0,
+  "Crypt::AuthEnc::GCM" => 0,
   "Crypt::Mode::CBC" => 0,
   "Crypt::OpenSSL::Bignum" => 0,
   "Crypt::OpenSSL::RSA" => 0,

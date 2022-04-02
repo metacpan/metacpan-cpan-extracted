@@ -4,7 +4,7 @@ use Test::More;
 #use Data::Dump qw/dump/;
 use bignum;
 
-use Crypt::OpenSSL::Hash2Curve qw/hash_to_field expand_message_xmd/;
+use Crypt::OpenSSL::Hash2Curve ;
 
 my $res;
 

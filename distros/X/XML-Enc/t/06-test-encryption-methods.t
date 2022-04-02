@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 32;
+use Test::More tests => 56;
 use XML::Enc;
 use MIME::Base64 qw/decode_base64 encode_base64/;
 use File::Which;
@@ -13,7 +13,7 @@ my $xml = <<'XML';
 XML
 
 my @key_methods     = qw/rsa-1_5 rsa-oaep-mgf1p/;
-my @data_methods    = qw/aes128-cbc aes192-cbc aes256-cbc tripledes-cbc/;
+my @data_methods    = qw/aes128-cbc aes192-cbc aes256-cbc tripledes-cbc aes128-gcm aes192-gcm aes256-gcm/;
 
 foreach my $km (@key_methods) {
     foreach my $dm (@data_methods) {
@@ -34,6 +34,11 @@ foreach my $km (@key_methods) {
 
         SKIP: {
             skip "xmlsec1 not installed", 2 unless which('xmlsec1');
+            my $version;
+            if (`xmlsec1 version` =~ m/(\d+\.\d+\.\d+)/) {
+                $version = $1;
+            };
+            skip "xmlsec version 1.2.27 minimum for GCM", 2 if $version lt '1.2.27';
             ok( open XML, '>', 'tmp.xml' );
             print XML $encrypted;
             close XML;

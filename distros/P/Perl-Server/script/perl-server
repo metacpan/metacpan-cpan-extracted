@@ -1,0 +1,47 @@
+#!perl
+
+use strict;
+use warnings;
+use Perl::Server;
+
+my $path = shift @ARGV if exists $ARGV[0] && $ARGV[0] !~ /^-/;
+
+my $server = Perl::Server->new($path);
+$server->run(@ARGV);
+
+__END__
+
+=encoding utf8
+ 
+=head1 NAME
+ 
+perl-server - Perl::Server launcher
+
+=head1 SYNOPSIS
+ 
+  $ perl-server
+  $ perl-server /home/foo/www
+  $ perl-server file.pl
+  $ perl-server file.psgi
+  
+=head1 DESCRIPTION
+
+perl-server [path] [options]
+
+These options are the same as L<Plackup Options|plackup#OPTIONS>.
+
+=head1 SEE ALSO
+ 
+L<Plack>, L<Plack::App::WWW>, L<Plack::App::WrapCGI>, L<Plack::App::CGIBin>, L<plackup>.
+ 
+=head1 AUTHOR
+ 
+Lucas Tiago de Moraes, C<lucastiagodemoraes@gmail.com>.
+ 
+=head1 COPYRIGHT AND LICENSE
+ 
+This software is copyright (c) 2022 by Lucas Tiago de Moraes.
+ 
+This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.
+ 
+=cut

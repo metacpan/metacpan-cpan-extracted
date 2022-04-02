@@ -11,6 +11,11 @@
 
 #undef register_class_attribute
 
+#ifdef HAVE_DMD_HELPER
+#  define WANT_DMD_API_044
+#  include "DMD_helper.h"
+#endif
+
 #include "perl-backcompat.c.inc"
 #include "sv_setrv.c.inc"
 
@@ -1933,13 +1938,17 @@ static const struct ClassHookFuncs classhooks_strict = {
   .apply = &classhook_strict_apply,
 };
 
-void ObjectPad__boot_classes(void)
+void ObjectPad__boot_classes(pTHX)
 {
   register_class_attribute("isa",    &classhooks_isa,    NULL);
   register_class_attribute("does",   &classhooks_does,   NULL);
   register_class_attribute("repr",   &classhooks_repr,   NULL);
   register_class_attribute("compat", &classhooks_compat, NULL);
   register_class_attribute("strict", &classhooks_strict, NULL);
+
+#ifdef HAVE_DMD_HELPER
+  DMD_ADD_ROOT((SV *)&vtbl_backingav, "the Object::Pad backing AV VTBL");
+#endif
 }
 
 

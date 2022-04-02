@@ -37,6 +37,7 @@ use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
 
+use AsposeSlidesCloud::Object::ChartLinesFormat;
 use AsposeSlidesCloud::Object::EffectFormat;
 use AsposeSlidesCloud::Object::FillFormat;
 use AsposeSlidesCloud::Object::LineFormat;
@@ -96,7 +97,6 @@ sub new {
 		my $args_key = $class->attribute_map->{$attribute};
 		$self->$attribute( $args{ $args_key } );
 	}
-	
 	return $self;
 }  
 
@@ -122,16 +122,28 @@ sub from_hash {
     my ($self, $hash) = @_;
 
     # loop through attributes and use swagger_types to deserialize the data
+    my $current_types = {};
     while ( my ($_key, $_type) = each %{$self->swagger_types} ) {
+        $current_types->{$_key} = $_type;
+    }
+    while ( my ($_key, $_type) = each %{$current_types} ) {
     	my $_json_attribute = $self->attribute_map->{$_key}; 
         if ($_type =~ /^array\[/i) { # array
             my $_subclass = substr($_type, 6, -1);
             my @_array = ();
             foreach my $_element (@{$hash->{$_json_attribute}}) {
-                push @_array, $self->_deserialize($_subclass, $_element);
+                if (defined $_element) {
+                    push @_array, $self->_deserialize($_subclass, $_element);
+                } else {
+                    push @_array, undef;
+                }
             }
-            foreach my $_element (@{$hash->{$_json_attribute}}) {
-                push @_array, $self->_deserialize(lcfirst($_subclass), $_element);
+            foreach my $_element (@{$hash->{lcfirst($_json_attribute)}}) {
+                if (defined $_element) {
+                    push @_array, $self->_deserialize(lcfirst($_subclass), $_element);
+                } else {
+                    push @_array, undef;
+                }
             }
             $self->{$_key} = \@_array;
         } elsif (exists $hash->{$_json_attribute}) { #hash(model), primitive, datetime
@@ -153,7 +165,8 @@ sub _deserialize {
     } elsif ( grep( /^$type$/, ('int', 'double', 'string', 'boolean'))) {
         return $data;
     } else { # hash(model)
-        my $_instance = eval "AsposeSlidesCloud::Object::$type->new()";
+        my $class = AsposeSlidesCloud::ClassRegistry->get_class_name(ucfirst($type), $data);
+        my $_instance = use_module("AsposeSlidesCloud::Object::$class")->new();
         return $_instance->from_hash($data);
     }
 }
@@ -418,6 +431,20 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'major_grid_lines_format' => {
+    	datatype => 'ChartLinesFormat',
+    	base_name => 'MajorGridLinesFormat',
+    	description => 'Get or sets the format of major grid lines.',
+    	format => '',
+    	read_only => '',
+    		},
+    'minor_grid_lines_format' => {
+    	datatype => 'ChartLinesFormat',
+    	base_name => 'MinorGridLinesFormat',
+    	description => 'Get or sets the format of major grid lines.',
+    	format => '',
+    	read_only => '',
+    		},
 });
 
 __PACKAGE__->swagger_types( {
@@ -456,7 +483,9 @@ __PACKAGE__->swagger_types( {
     'tick_label_rotation_angle' => 'double',
     'fill_format' => 'FillFormat',
     'effect_format' => 'EffectFormat',
-    'line_format' => 'LineFormat'
+    'line_format' => 'LineFormat',
+    'major_grid_lines_format' => 'ChartLinesFormat',
+    'minor_grid_lines_format' => 'ChartLinesFormat'
 } );
 
 __PACKAGE__->attribute_map( {
@@ -495,7 +524,9 @@ __PACKAGE__->attribute_map( {
     'tick_label_rotation_angle' => 'TickLabelRotationAngle',
     'fill_format' => 'FillFormat',
     'effect_format' => 'EffectFormat',
-    'line_format' => 'LineFormat'
+    'line_format' => 'LineFormat',
+    'major_grid_lines_format' => 'MajorGridLinesFormat',
+    'minor_grid_lines_format' => 'MinorGridLinesFormat'
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

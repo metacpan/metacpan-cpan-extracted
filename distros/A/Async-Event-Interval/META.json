@@ -50,6 +50,6 @@
          "web" : "https://github.com/stevieb9/async-event-interval"
       }
    },
-   "version" : "1.11",
+   "version" : "1.12",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

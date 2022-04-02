@@ -7,10 +7,12 @@ build_requires:
   Alien::Build::MM: '1.74'
   Alien::Build::Plugin::Cleanse::BuildDir: '0'
   Alien::Build::Plugin::PkgConfig::PPWrapper: '0'
-  Alien::geos::af: '1.005'
+  Alien::geos::af: '1.010'
   Alien::libtiff: '0'
   Alien::patch: '0'
-  Alien::proj: '1.13'
+  Alien::patchelf: '0'
+  Alien::proj: '1.24'
+  Alien::spatialite: '0'
   Alien::sqlite: '1.02'
   Archive::Tar: '0'
   Config: '0'
@@ -33,10 +35,11 @@ configure_requires:
   Alien::Build::Plugin::Build::SearchDep: '0.53'
   Alien::Build::Plugin::Cleanse::BuildDir: '0'
   Alien::Build::Plugin::PkgConfig::PPWrapper: '0'
-  Alien::geos::af: '1.005'
+  Alien::geos::af: '1.010'
   Alien::libtiff: '0'
   Alien::patch: '0'
-  Alien::proj: '1.13'
+  Alien::patchelf: '0'
+  Alien::proj: '1.24'
   Alien::sqlite: '1.02'
   ExtUtils::MakeMaker: '6.52'
   FFI::CheckLib: '0.23'
@@ -46,7 +49,7 @@ configure_requires:
   Sort::Versions: '0'
   parent: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -64,7 +67,7 @@ requires:
 resources:
   bugtracker: https://github.com/shawnlaffan/perl-alien-gdal/issues/
   repository: https://github.com/shawnlaffan/perl-alien-gdal
-version: '1.28'
+version: '1.29'
 x_alienfile:
   generated_by: 'Alien::Build::MM version 2.48'
   requires:
@@ -72,6 +75,7 @@ x_alienfile:
       Alien::geos::af: '0'
       Alien::libtiff: '0'
       Alien::proj: '0'
+      Alien::spatialite: '0'
       Alien::sqlite: '0'
       Archive::Tar: '0'
       Config: '0'

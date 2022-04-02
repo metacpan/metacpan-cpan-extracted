@@ -1,5 +1,8 @@
 Revision history for Perl-PrereqScanner-NotQuiteLite
 
+0.9915 2022/04/01
+  - Add optional option
+
 0.9914 2021/09/13
   - Support Object::Pad
 

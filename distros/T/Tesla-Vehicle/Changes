@@ -1,5 +1,19 @@
 Revision history for Tesla-Vehicle
 
+0.07    2022-03-31
+    - Added PR#7; Add set_charge_limit() and examples/control.pl (Thanks
+      @ankratochvil !)
+    - Added PR#5; Update example scripts with shebang line (Thanks
+      @ankratochvil !)
+    - Add POD for set_charge_limit()
+    - Update example shebang lines to use /usr/bin/env perl
+    - Renamed set_charge_limit() to charge_limit_set()
+    - Add Tesla API retries (API_RETRIES) if 'gear' is undefined (closes #1)
+    - Add DEBUG_TESLA_API_RETRY to output info about API retries
+    - If a vehicle is parked, 'speed' is undefined, so we return 0 in this case
+    - Add new 'gear' return value, 'U', for when we've retried the API call but
+      still haven't got a defined value
+
 0.06    2022-03-23
     - Return instead of print the return value of options()
     - Bump prereq of Tesla::API to 0.09; its api() method now requires all

@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use Digest::SHA qw/sha256/;
+#use Digest::SHA qw/sha256/;
 use List::Util qw/min/;
 use strict;
 use warnings;
@@ -11,7 +11,7 @@ use Crypt::OpenSSL::EC;
 use Crypt::OpenSSL::Bignum;
 use Crypt::OpenSSL::Hash2Curve qw/expand_message_xmd encode_to_curve get_hash2curve_params hash_to_curve/;
 use Crypt::CPace ;
-use Data::Dump qw/dump/;
+#use Data::Dump qw/dump/;
 
 my $res = generator_string(
 'CPaceP256_XMD:SHA-256_SSWU_NU_',

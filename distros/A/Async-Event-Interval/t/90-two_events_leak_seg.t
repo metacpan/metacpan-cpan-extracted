@@ -4,24 +4,27 @@ use strict;
 my $segs_begin;
 
 use Data::Dumper;
-use IPC::Shareable;
 use Test::More;
 
 BEGIN {
     if (! $ENV{CI_TESTING}) {
         plan skip_all => "Not on a legit CI platform...";
     }
-    warn "Segs Before Async::Event::Interval: " . IPC::Shareable::ipcs() . "\n" if $ENV{PRINT_SEGS};
-    $segs_begin = IPC::Shareable::ipcs();
+    warn "Segs before: " . `ipcs -m | wc -l` . "\n" if $ENV{PRINT_SEGS};
+    $segs_begin = `ipcs -m | wc -l`;
+    $segs_begin =~ s/\s+//g;
 }
 
 use Async::Event::Interval;
+use IPC::Shareable;
 use Data::Dumper;
 
-my $segs_before = IPC::Shareable::ipcs();
+my $segs_before = `ipcs -m | wc -l`;
 
 {
-    my $segs_before_ipc_create = IPC::Shareable::ipcs();
+    my $segs_before_ipc_create = `ipcs -m | wc -l`;
+    $segs_before_ipc_create =~ s/\s+//g;
+
     is
         $segs_before_ipc_create,
         $segs_begin + 1,
@@ -33,7 +36,9 @@ my $segs_before = IPC::Shareable::ipcs();
         destroy => 1
     };
 
-    my $segs_after_ipc_create = IPC::Shareable::ipcs();
+    my $segs_after_ipc_create = `ipcs -m | wc -l`;
+    $segs_after_ipc_create =~ s/\s+//g;
+
     is
         $segs_after_ipc_create,
         $segs_begin + 2,
@@ -56,7 +61,9 @@ my $segs_before = IPC::Shareable::ipcs();
     is exists $shared_data{$one_pid}{called}, 1, "Event one got a rand shm key ok";
     is exists $shared_data{$two_pid}{called}, 1, "Adding srand() ensures _shm_key_rand() gives out rand key in fork()";
 
-    my $segs_before_ipc_cleaned = IPC::Shareable::ipcs();
+    my $segs_before_ipc_cleaned = `ipcs -m | wc -l`;
+    $segs_before_ipc_cleaned =~ s/\s+//g;
+
     is
         $segs_before_ipc_cleaned,
         $segs_begin + 6,
@@ -64,14 +71,18 @@ my $segs_before = IPC::Shareable::ipcs();
 
     IPC::Shareable::clean_up_all;
 
-    my $segs_after_ipc_cleaned = IPC::Shareable::ipcs();
+    my $segs_after_ipc_cleaned = `ipcs -m | wc -l`;
+    $segs_after_ipc_cleaned =~ s/\s+//g;
+
     is
         $segs_after_ipc_cleaned,
         $segs_begin + 3,
         "Proper number of segs after IPC cleanup, before AEI destroy on two events";
 }
 
-my $segs_destroy = IPC::Shareable::ipcs();
+my $segs_destroy = `ipcs -m | wc -l`;
+$segs_destroy =~ s/\s+//g;
+
 is
     $segs_destroy,
     $segs_begin + 3,
@@ -80,12 +91,14 @@ is
 Async::Event::Interval::_end;
 IPC::Shareable::_end;
 
-my $segs_after = IPC::Shareable::ipcs();
+my $segs_after = `ipcs -m | wc -l`;
+$segs_after =~ s/\s+//g;
+
 is
     $segs_after,
     $segs_begin,
     "%event seg cleaned up after Async::Event::Interval END";
 
-warn "Segs After: " . IPC::Shareable::ipcs() . "\n" if $ENV{PRINT_SEGS};
+warn "Segs After: " . `ipcs -m | wc -l` . "\n" if $ENV{PRINT_SEGS};
 
 done_testing();

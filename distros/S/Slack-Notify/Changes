@@ -1,5 +1,9 @@
 Revision history for Slack-Notify
 
+0.005     2022-03-31 08:28:54+11:00 Australia/Melbourne
+- pass "channel" param through to Slack (thanks, dsdee!)
+- use 5.10-compatible package block syntax (thanks, jwright!)
+
 0.004     2021-08-22 12:39:04+10:00 Australia/Melbourne
 - fix direct use of JSON::XS (thanks ether!)
 

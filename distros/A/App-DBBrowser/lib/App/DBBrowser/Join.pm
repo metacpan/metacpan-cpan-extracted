@@ -7,9 +7,9 @@ use 5.014;
 
 use List::MoreUtils qw( any );
 
-use Term::Choose     qw();
-use Term::Form       qw();
-use Term::TablePrint qw();
+use Term::Choose         qw();
+use Term::Form::ReadLine qw();
+use Term::TablePrint     qw();
 
 use App::DBBrowser::Auxil;
 #use App::DBBrowser::Subqueries; # required
@@ -289,9 +289,9 @@ sub __add_join_condition {
                 my $condition = $join->{stmt} =~ s/^\Q$bu_stmt\E\s//r;
                 $join->{stmt} = $bu_stmt; # add condition to the info print only after edit (?)
                 my $info = $ax->get_sql_info( $join );
-                my $tf = Term::Form->new( $sf->{i}{tf_default} );
+                my $tr = Term::Form::ReadLine->new( $sf->{i}{tr_default} );
                 # Readline
-                $condition = $tf->readline(
+                $condition = $tr->readline(
                     'Edit: ',
                     { info => $info, default => $condition, show_context => 1 }
                 );

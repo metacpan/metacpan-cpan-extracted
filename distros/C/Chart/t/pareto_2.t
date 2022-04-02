@@ -1,3 +1,5 @@
+
+BEGIN { unshift @INC, 'lib', '../lib'}
 use Chart::Pareto;
 
 print "1..1\n";

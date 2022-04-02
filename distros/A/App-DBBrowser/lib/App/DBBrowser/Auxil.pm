@@ -14,7 +14,7 @@ use Term::Choose::Constants qw( WIDTH_CURSOR );
 use Term::Choose::LineFold  qw( line_fold print_columns );
 use Term::Choose::Screen    qw( clear_screen );
 use Term::Choose::Util      qw( insert_sep get_term_width get_term_height unicode_sprintf );
-use Term::Form              qw();
+use Term::Form::ReadLine    qw();
 
 
 sub new {
@@ -286,10 +286,10 @@ sub alias {
     }
     my $alias;
     if ( $sf->{o}{alias}{$type} ) {
-        my $tf = Term::Form->new( $sf->{i}{tf_default} );
+        my $tr = Term::Form::ReadLine->new( $sf->{i}{tr_default} );
         my $info = $sf->get_sql_info( $sql ) . "\n" . $tmp_info;
         # Readline
-        $alias = $tf->readline(
+        $alias = $tr->readline(
             $identifier,
             { info => $info }
         );

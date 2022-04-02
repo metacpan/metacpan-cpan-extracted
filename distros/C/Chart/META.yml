@@ -1,20 +1,30 @@
 --- #YAML:1.0
 name:               Chart
-version:            2.4.10
-abstract:           ~
-author:  []
-license:            unknown
-distribution_type:  module
+version:            2.400.10
+abstract:           a series of charting modules
+author:
+  - 'Chart-Group <chartgrp@web.de>'
+  - 'Herbert Breunung <lichtkind@cpan.org>'
+license: artistic_2
+distribution_type: module
 configure_requires:
     ExtUtils::MakeMaker:  0
 build_requires:
     ExtUtils::MakeMaker:  0
+provides:
+  Chart:
+    file: lib/Chart.pm
+    version: 2.400.10
 requires:
+    perl: '5.012000'
     GD:  2
+    Carp: 1.35
 no_index:
     directory:
         - t
         - inc
+        - doc
+        - patterns
 generated_by:       ExtUtils::MakeMaker version 6.57_05
 meta-spec:
     url:      http://module-build.sourceforge.net/META-spec-v1.4.html

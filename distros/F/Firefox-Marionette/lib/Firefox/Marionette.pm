@@ -36,6 +36,7 @@ use File::Spec();
 use URI();
 use URI::Escape();
 use Time::HiRes();
+use Time::Local();
 use File::Temp();
 use File::stat();
 use File::Spec::Unix();
@@ -61,7 +62,7 @@ our @EXPORT_OK =
   qw(BY_XPATH BY_ID BY_NAME BY_TAG BY_CLASS BY_SELECTOR BY_LINK BY_PARTIAL);
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
-our $VERSION = '1.22';
+our $VERSION = '1.23';
 
 sub _ANYPROCESS                     { return -1 }
 sub _COMMAND                        { return 0 }
@@ -106,6 +107,9 @@ sub _DEFAULT_UPDATE_TIMEOUT         { return 300 }           # 5 minutes
 sub _MIN_VERSION_NO_CHROME_CALLS    { return 94 }
 sub _MIN_VERSION_FOR_SCRIPT_SCRIPT  { return 31 }
 sub _MIN_VERSION_FOR_SCRIPT_WO_ARGS { return 60 }
+sub _MIN_VERSION_FOR_MODERN_GO      { return 31 }
+sub _MIN_VERSION_FOR_MODERN_SWITCH  { return 90 }
+sub _ACTIVE_UPDATE_XML_FILE_NAME    { return 'active-update.xml' }
 
 # sub _MAGIC_NUMBER_MOZL4Z            { return "mozLz40\0" }
 
@@ -1177,6 +1181,8 @@ sub logins_from_csv {
     }
     my %mapping = (
         'web site'          => 'host',
+        'last modified'     => 'password_changed_time',
+        created             => 'creation_time',
         'login name'        => 'user',
         login_uri           => 'host',
         login_username      => 'user',
@@ -1191,6 +1197,10 @@ sub logins_from_csv {
         timelastused        => 'last_used_in_ms',
         timepasswordchanged => 'password_changed_in_ms',
     );
+    my %time_mapping = (
+        'last modified' => 1,
+        'created'       => 1,
+    );
     while ( my $row = $csv->getline($import_handle) ) {
         my %parameters;
         foreach my $key ( sort { $a cmp $b } keys %import_headers ) {
@@ -1198,6 +1208,19 @@ sub logins_from_csv {
                 && ( defined $mapping{$key} ) )
             {
                 $parameters{ $mapping{$key} } = $row->[ $import_headers{$key} ];
+                if ( $time_mapping{$key} ) {
+                    if ( $parameters{ $mapping{$key} } =~
+/^(\d{4})\-(\d{2})\-(\d{2})T(\d{2}):(\d{2}):(\d{2})Z$/smx
+                      )
+                    {
+                        my ( $year, $month, $day, $hour, $mins, $secs ) =
+                          ( $1, $2, $3, $4, $5, $6 );
+                        my $time =
+                          Time::Local::timegm( $secs, $mins, $hour, $day,
+                            $month - 1, $year );
+                        $parameters{ $mapping{$key} } = $time;
+                    }
+                }
             }
         }
         foreach my $key (qw(host origin)) {
@@ -1316,6 +1339,93 @@ sub _get_extra_parameters {
     return $extra_parameters;
 }
 
+sub logins_from_xml {
+    my ( $class, $import_handle ) = @_;
+    my $parser = XML::Parser->new();
+    my @parsed_pw_entries;
+    my $current_pw_entry;
+    my $key_regex_string = join q[|], qw(
+      username
+      url
+      password
+      uuid
+      creationtime
+      lastmodtime
+      lastaccesstime
+    );
+    my $key_name;
+    $parser->setHandlers(
+        Start => sub {
+            my ( $p, $element, %attributes ) = @_;
+            if ( $element eq 'pwentry' ) {
+                $current_pw_entry = {};
+                $key_name         = undef;
+            }
+            elsif ( $element =~ /^($key_regex_string)$/smx ) {
+                $key_name = ($1);
+            }
+            else {
+                $key_name = undef;
+            }
+        },
+        Char => sub {
+            my ( $p, $string ) = @_;
+            if ( defined $key_name ) {
+                chomp $string;
+                $current_pw_entry->{$key_name} .= $string;
+            }
+        },
+        End => sub {
+            my ( $p, $element ) = @_;
+            $key_name = undef;
+            if ( $element eq 'pwentry' ) {
+                push @parsed_pw_entries, $current_pw_entry;
+            }
+        },
+    );
+    $parser->parse($import_handle);
+    my @logins;
+    foreach my $pw_entry (@parsed_pw_entries) {
+        my $login = {};
+        foreach my $key (qw(creationtime lastmodtime lastaccesstime)) {
+            if (
+                ( defined $pw_entry->{$key} )
+                && ( $pw_entry->{$key} =~
+                    /^(\d{4})\-(\d{2})\-(\d{2})T(\d{2}):(\d{2}):(\d{2})$/smx )
+              )
+            {
+                my ( $year, $month, $day, $hour, $mins, $secs ) =
+                  ( $1, $2, $3, $4, $5, $6 );
+                my $time =
+                  Time::Local::timegm( $secs, $mins, $hour, $day,
+                    $month - 1, $year );
+                $pw_entry->{$key} = $time;
+            }
+
+        }
+        my $host;
+        if ( defined $pw_entry->{url} ) {
+            my $url = URI::URL->new( $pw_entry->{url} );
+            $host = URI::URL->new( $url->scheme() . q[://] . $url->host_port() )
+              ->canonical()->as_string;
+        }
+        if ( ( $pw_entry->{username} ) && ($host) && ( $pw_entry->{password} ) )
+        {
+            push @logins,
+              Firefox::Marionette::Login->new(
+                host                  => $host,
+                user                  => $pw_entry->{username},
+                password              => $pw_entry->{password},
+                guid                  => $pw_entry->{uuid},
+                creation_time         => $pw_entry->{creationtime},
+                password_changed_time => $pw_entry->{lastmodtime},
+                last_used_time        => $pw_entry->{lastaccesstime}
+              );
+        }
+    }
+    return @logins;
+}
+
 sub logins_from_zip {
     my ( $class, $import_handle ) = @_;
     my @logins;
@@ -1337,11 +1447,12 @@ sub logins_from_zip {
             if ( ( defined $username ) && ( defined $password ) ) {
                 push @logins,
                   Firefox::Marionette::Login->new(
-                    guid     => $item->{uuid},
-                    host     => $item->{overview}->{url},
-                    user     => $username,
-                    password => $password,
-                    creation => $item->{createdAt},
+                    guid                  => $item->{uuid},
+                    host                  => $item->{overview}->{url},
+                    user                  => $username,
+                    password              => $password,
+                    creation_time         => $item->{createdAt},
+                    password_changed_time => $item->{updatedAt},
                   );
             }
         }
@@ -1447,6 +1558,9 @@ sub _binary_directory {
 
             }
             elsif ( $self->_remote_uname() eq 'cygwin' ) {
+                $binary =
+                  $self->_execute_via_ssh( {}, 'cygpath', '-u', $binary );
+                chomp $binary;
                 my ( $volume, $directories ) =
                   File::Spec::Unix->splitpath($binary);
                 $binary_directory =
@@ -2302,6 +2416,24 @@ sub _launch_xvfb_if_required {
     return;
 }
 
+sub _restart_profile_directory {
+    my ($self) = @_;
+    my $profile_directory = $self->{_profile_directory};
+    if ( $self->_ssh() ) {
+        if ( $self->_remote_uname() eq 'cygwin' ) {
+            $profile_directory =
+              $self->_execute_via_ssh( {}, 'cygpath', '-s', '-m',
+                $profile_directory );
+            chomp $profile_directory;
+        }
+    }
+    elsif ( $OSNAME eq 'cygwin' ) {
+        $profile_directory =
+          $self->execute( 'cygpath', '-s', '-m', $profile_directory );
+    }
+    return $profile_directory;
+}
+
 sub _setup_arguments {
     my ( $self, %parameters ) = @_;
     my @arguments = qw(-marionette);
@@ -2318,13 +2450,11 @@ sub _setup_arguments {
     push @arguments, $self->_check_addons(%parameters);
     push @arguments, $self->_check_visible(%parameters);
     if ( $parameters{restart} ) {
-        my $profile_directory = $self->{_profile_directory};
-        if ( $OSNAME eq 'cygwin' ) {
-            $profile_directory =
-              $self->execute( 'cygpath', '-s', '-m', $profile_directory );
-        }
         push @arguments,
-          ( '-profile', $profile_directory, '--no-remote', '--new-instance' );
+          (
+            '-profile',    $self->_restart_profile_directory(),
+            '--no-remote', '--new-instance'
+          );
     }
     elsif ( $parameters{profile_name} ) {
         $self->{profile_name} = $parameters{profile_name};
@@ -2464,6 +2594,36 @@ sub _is_firefox_major_version_at_least {
 sub _is_xvfb_okay {
     my ($self) = @_;
     if ( $self->_is_firefox_major_version_at_least( _MIN_VERSION_FOR_XVFB() ) )
+    {
+        return 1;
+    }
+    else {
+        return 0;
+    }
+}
+
+sub _is_modern_switch_window_okay {
+    my ($self) = @_;
+    if (
+        $self->_is_firefox_major_version_at_least(
+            _MIN_VERSION_FOR_MODERN_SWITCH()
+        )
+      )
+    {
+        return 1;
+    }
+    else {
+        return 0;
+    }
+}
+
+sub _is_modern_go_okay {
+    my ($self) = @_;
+    if (
+        $self->_is_firefox_major_version_at_least(
+            _MIN_VERSION_FOR_MODERN_GO()
+        )
+      )
     {
         return 1;
     }
@@ -2703,74 +2863,197 @@ sub _read_and_close_handle {
     return $content;
 }
 
+sub _catfile {
+    my ( $self, $base_directory, @parts ) = @_;
+    my $path;
+    if ( $self->_ssh() ) {
+        $path = $self->_remote_catfile( $base_directory, @parts );
+    }
+    else {
+        $path = File::Spec->catfile( $base_directory, @parts );
+    }
+    return $path;
+}
+
+sub _find_win32_active_update_xml {
+    my ( $self, $update_directory ) = @_;
+    foreach
+      my $tainted_id ( $self->_directory_listing( {}, $update_directory, 1 ) )
+    {
+        if ( $tainted_id =~ /^([A-F\d]{16})$/smx ) {
+            my ($id) = ($1);
+            my $sub_directory_path = $self->_catfile( $update_directory, $id );
+            if (
+                my $found = $self->_find_active_update_xml_in_directory(
+                    $sub_directory_path)
+              )
+            {
+                return $found;
+            }
+        }
+    }
+    return;
+}
+
+sub _find_active_update_xml_in_directory {
+    my ( $self, $directory ) = @_;
+    foreach my $entry ( $self->_directory_listing( {}, $directory, 1 ) ) {
+        if ( $entry eq _ACTIVE_UPDATE_XML_FILE_NAME() ) {
+            return $self->_catfile( $directory,
+                _ACTIVE_UPDATE_XML_FILE_NAME() );
+        }
+    }
+    return;
+}
+
+sub _active_update_xml_path {
+    my ($self) = @_;
+    my $path;
+    my $directory = $self->_binary_directory();
+    if ( !defined $directory ) {
+    }
+    elsif ( $self->_ssh() ) {
+        if (   ( $self->_remote_uname() eq 'MSWin32' )
+            || ( $self->_remote_uname() eq 'cygwin' ) )
+        {
+            my $common_appdata_directory =
+              $self->_get_remote_environment_variable_via_ssh(
+                'ALLUSERSPROFILE');
+            if ( $self->_remote_uname() eq 'cygwin' ) {
+                $common_appdata_directory =~ s/\\/\//smxg;
+                $common_appdata_directory =
+                  $self->_execute_via_ssh( {}, 'cygpath', '-u',
+                    $common_appdata_directory );
+                chomp $common_appdata_directory;
+            }
+            my $update_directory =
+              $self->_remote_catfile( $common_appdata_directory, 'Mozilla',
+                'updates' );
+            if ( my $found =
+                $self->_find_win32_active_update_xml($update_directory) )
+            {
+                $path = $found;
+            }
+        }
+        else {
+            if ( my $found =
+                $self->_find_active_update_xml_in_directory($directory) )
+            {
+                $path = $found;
+            }
+        }
+    }
+    else {
+        if ( $OSNAME eq 'MSWin32' ) {
+            my $common_appdata_directory =
+              Win32::GetFolderPath( Win32::CSIDL_COMMON_APPDATA() );
+            my $update_directory =
+              File::Spec->catdir( $common_appdata_directory, 'Mozilla',
+                'updates' );
+            if ( my $found =
+                $self->_find_win32_active_update_xml($update_directory) )
+            {
+                $path = $found;
+            }
+        }
+        else {
+            if ( my $found =
+                $self->_find_active_update_xml_in_directory($directory) )
+            {
+                $path = $found;
+            }
+        }
+    }
+    return $path;
+}
+
+sub _active_update_version {
+    my ($self) = @_;
+    my $active_update_version;
+    if ( my $active_update_path = $self->_active_update_xml_path() ) {
+        my $active_update_handle;
+        if ( $self->_ssh() ) {
+            $active_update_handle =
+              $self->_get_file_via_scp( { ignore_missing_file => 1 },
+                $active_update_path, _ACTIVE_UPDATE_XML_FILE_NAME() );
+        }
+        else {
+            $active_update_handle =
+              FileHandle->new( $active_update_path, Fcntl::O_RDONLY() )
+              or Firefox::Marionette::Exception->throw(
+"Failed to open $active_update_path for reading:$EXTENDED_OS_ERROR"
+              );
+        }
+        if ($active_update_handle) {
+            my $active_update_contents =
+              $self->_read_and_close_handle( $active_update_handle,
+                $active_update_path );
+            my $parser = XML::Parser->new();
+            $parser->setHandlers(
+                Start => sub {
+                    my ( $p, $element, %attributes ) = @_;
+                    if ( $element eq 'update' ) {
+                        $active_update_version = $attributes{appVersion};
+                    }
+                },
+            );
+            $parser->parse($active_update_contents);
+        }
+    }
+    return $active_update_version;
+}
+
+sub _application_ini_config {
+    my ( $self, $binary ) = @_;
+    my $application_ini_path;
+    my $application_ini_handle;
+    my $application_ini_name = 'application.ini';
+    if ( my $binary_directory = $self->_binary_directory() ) {
+        if ( $self->_ssh() ) {
+            if ( $self->_remote_uname() eq 'darwin' ) {
+                $binary_directory =~ s/Contents\/MacOS$/Contents\/Resources/smx;
+            }
+            if ( $self->_remote_uname() eq 'cygwin' ) {
+                $binary_directory =
+                  $self->_execute_via_ssh( {}, 'cygpath', '-u',
+                    $binary_directory );
+                chomp $binary_directory;
+            }
+            $application_ini_path =
+              $self->_catfile( $binary_directory, $application_ini_name );
+            $application_ini_handle =
+              $self->_get_file_via_scp( { ignore_missing_file => 1 },
+                $application_ini_path, $application_ini_name );
+        }
+        else {
+            $application_ini_path =
+              File::Spec->catfile( $binary_directory, $application_ini_name );
+            $application_ini_handle =
+              FileHandle->new( $application_ini_path, Fcntl::O_RDONLY() );
+        }
+    }
+    if ($application_ini_handle) {
+        my $config = Config::INI::Reader->read_handle($application_ini_handle);
+        return $config;
+    }
+    return;
+}
+
 sub _search_for_version_in_application_ini {
     my ( $self, $binary ) = @_;
-    my $binary_directory = $self->_binary_directory();
-    if ( defined $binary_directory ) {
-        my $found_active_update;
-        foreach
-          my $entry ( $self->_directory_listing( {}, $binary_directory, 1 ) )
-        {
-            if ( $entry eq 'active-update.xml' ) {
-                $found_active_update = 1;
+    my $active_update_version = $self->_active_update_version();
+    if ( my $config = $self->_application_ini_config($binary) ) {
+        if ( my $app = $config->{App} ) {
+            if (
+                ( $app->{SourceRepository} )
+                && ( $app->{SourceRepository} eq
+                    'https://hg.mozilla.org/releases/mozilla-beta' )
+              )
+            {
+                $self->{developer_edition} = 1;
             }
-        }
-        my ( $active_update_handle, $active_update_path );
-        my $active_update_version;
-        if ($found_active_update) {
-            if ( $self->_ssh() ) {
-                $active_update_path =
-                  $self->_remote_catfile( $binary_directory,
-                    'active-update.xml' );
-
-                $active_update_handle =
-                  $self->_get_file_via_scp( { ignore_missing_file => 1 },
-                    $active_update_path, 'active-update.xml' );
-            }
-            else {
-                $active_update_path =
-                  File::Spec->catdir( $binary_directory, 'active-update.xml' );
-                $active_update_handle =
-                  FileHandle->new( $active_update_path, Fcntl::O_RDONLY() )
-                  or Firefox::Marionette::Exception->throw(
-"Failed to open $active_update_path for reading:$EXTENDED_OS_ERROR"
-                  );
-            }
-            if ($active_update_handle) {
-                my $active_update_contents =
-                  $self->_read_and_close_handle( $active_update_handle,
-                    $active_update_path );
-                my $parser = XML::Parser->new();
-                $parser->setHandlers(
-                    Start => sub {
-                        my ( $p, $element, %attributes ) = @_;
-                        if ( $element eq 'update' ) {
-                            $active_update_version = $attributes{appVersion};
-                        }
-                    },
-                );
-                $parser->parse($active_update_contents);
-            }
-        }
-        my $application_ini_path =
-          File::Spec->catfile( $binary_directory, 'application.ini' );
-        my $application_ini_handle =
-          FileHandle->new( $application_ini_path, Fcntl::O_RDONLY() );
-        if ($application_ini_handle) {
-            my $config =
-              Config::INI::Reader->read_handle($application_ini_handle);
-            if ( my $app = $config->{App} ) {
-                if (
-                    ( $app->{SourceRepository} )
-                    && ( $app->{SourceRepository} eq
-                        'https://hg.mozilla.org/releases/mozilla-beta' )
-                  )
-                {
-                    $self->{developer_edition} = 1;
-                }
-                return join q[ ], $app->{Vendor}, $app->{Name},
-                  $active_update_version || $app->{Version};
-            }
+            return join q[ ], $app->{Vendor}, $app->{Name},
+              $active_update_version || $app->{Version};
         }
     }
     return;
@@ -2831,9 +3114,10 @@ sub _get_version {
     }
     else {
         $version_string = $self->_get_version_string($binary);
-        my $browser_regex = join q[|],
+        my $waterfox_regex = qr/Waterfox(?:Limited)?[ ]Waterfox[ ]/smx;
+        my $browser_regex  = join q[|],
           qr/Mozilla[ ]Firefox[ ]/smx,
-          qr/Waterfox[ ]Waterfox[ ]/smx,
+          $waterfox_regex,
           qr/Moonchild[ ]Productions[ ]Basilisk[ ]/smx,
           qr/Moonchild[ ]Productions[ ]Pale[ ]Moon[ ]/smx;
         if ( $version_string =~
@@ -2843,23 +3127,24 @@ sub _get_version {
 # RHEL6 and dbus crashing with error messages like
 # 'Failed to open connection to "session" message bus: /bin/dbus-launch terminated abnormally without any error message'
         {
-            if ( $1 eq 'Moonchild Productions Pale Moon ' ) {
+            my ( $browser_result, $major, $minor, $patch ) = ( $1, $2, $3, $4 );
+            if ( $browser_result eq 'Moonchild Productions Pale Moon ' ) {
                 $self->{pale_moon} = 1;
                 $self->{_initial_version}->{major} =
                   _PALEMOON_VERSION_EQUIV();
             }
-            elsif ( $1 eq 'Waterfox Waterfox ' ) {
+            elsif ( $browser_result =~ /^$waterfox_regex$/smx ) {
                 $self->{waterfox} = 1;
             }
             else {
-                $self->{_initial_version}->{major} = $2;
-                $self->{_initial_version}->{minor} = $3;
-                $self->{_initial_version}->{patch} = $4;
+                $self->{_initial_version}->{major} = $major;
+                $self->{_initial_version}->{minor} = $minor;
+                $self->{_initial_version}->{patch} = $patch;
             }
         }
         elsif ( defined $self->{_initial_version} ) {
         }
-        elsif ( $version_string =~ /^Waterfox[ ]/smx ) {
+        elsif ( $version_string =~ /^Waterfox(?:Limited)?[ ]/smx ) {
             $self->{waterfox} = 1;
             if ( $version_string =~ /^Waterfox Classic/smx ) {
                 $self->{_initial_version}->{major} =
@@ -2958,7 +3243,7 @@ sub _firefox_tmp_directory {
 }
 
 sub _quoting_for_cmd_exe {
-    my (@unquoted_arguments) = @_;
+    my ( $self, @unquoted_arguments ) = @_;
     my @quoted_arguments;
     foreach my $unquoted_argument (@unquoted_arguments) {
         $unquoted_argument =~ s/\\"/\\\\"/smxg;
@@ -3020,7 +3305,7 @@ sub _restore_stdin_stdout {
 sub _start_win32_process {
     my ( $self, $binary, @arguments ) = @_;
     my $full_path    = $self->_get_full_short_path_for_win32_binary($binary);
-    my $command_line = _quoting_for_cmd_exe( $binary, @arguments );
+    my $command_line = $self->_quoting_for_cmd_exe( $binary, @arguments );
     if ( $self->debug() ) {
         warn q[** ] . $command_line . "\n";
     }
@@ -3716,7 +4001,7 @@ sub _get_binary_from_cygwin_registry_via_ssh {
                   . $name_for_path_to_exe . q[/]
                   . $version
                   . '/Main/PathToExe"' );
-            my $version_regex = qr/(\d+)[.](\d+(?:\w\d+)?)(?:[.](\d+))?/smx;
+            my $version_regex = qr/(\d+)[.](\d+(?:\w\d+)?)(?:[.](\d+))?\0?/smx;
             if (   ( defined $path )
                 && ( $initial_version =~ /^$version_regex$/smx ) )
             {
@@ -4159,7 +4444,11 @@ sub _remote_process_running {
         return $self->{last_remote_alive_status};
     }
     $self->{last_remote_kill_time} = $now;
-    if ( $self->_remote_uname() eq 'MSWin32' ) {
+    my $remote_uname = $self->_remote_uname();
+    if ( !defined $remote_uname ) {
+        return;
+    }
+    elsif ( $remote_uname eq 'MSWin32' ) {
         return $self->_win32_remote_process_running($remote_pid);
     }
     else {
@@ -4447,14 +4736,10 @@ sub _setup_local_socket_via_ssh {
 
 sub _get_marionette_port_or_undef {
     my ($self) = @_;
-    my $port;
-    if ( $self->{profile_path} ) {
-        $port =
-          defined $port && $port > 0 ? $port : $self->_get_marionette_port();
-        if ( ( !defined $port ) || ( $port == 0 ) ) {
-            sleep 1;
-            return;
-        }
+    my $port = $self->_get_marionette_port();
+    if ( ( !defined $port ) || ( $port == 0 ) ) {
+        sleep 1;
+        return;
     }
     return $port;
 }
@@ -4788,7 +5073,15 @@ sub _setup_new_profile {
     if ($profile) {
         if ( !$profile->download_directory() ) {
             my $download_directory = $self->{_download_directory};
-            if ( $OSNAME eq 'cygwin' ) {
+            if ( $self->_ssh() ) {
+                if ( $self->_remote_uname() eq 'cygwin' ) {
+                    $download_directory =
+                      $self->_execute_via_ssh( {}, 'cygpath', '-s', '-w',
+                        $download_directory );
+                    chomp $download_directory;
+                }
+            }
+            elsif ( $OSNAME eq 'cygwin' ) {
                 $download_directory =
                   $self->execute( 'cygpath', '-s', '-w', $download_directory );
             }
@@ -4818,10 +5111,6 @@ sub _setup_new_profile {
               $self->_execute_via_ssh( {}, 'cygpath', '-s', '-w',
                 $download_directory );
             chomp $download_directory;
-            $bookmarks_path =
-              $self->_execute_via_ssh( {}, 'cygpath', '-s', '-w',
-                $bookmarks_path );
-            chomp $bookmarks_path;
         }
         $profile->download_directory($download_directory);
         $profile->set_value( 'browser.bookmarks.file', $bookmarks_path, 1 );
@@ -5091,7 +5380,7 @@ sub _get_local_command_output {
     my $output;
     my $handle;
     if ( $OSNAME eq 'MSWin32' ) {
-        my $shell_command = _quoting_for_cmd_exe( $binary, @arguments );
+        my $shell_command = $self->_quoting_for_cmd_exe( $binary, @arguments );
         if ( $parameters->{capture_stderr} ) {
             $shell_command = "\"$shell_command 2>&1\"";
         }
@@ -5219,7 +5508,7 @@ sub _system {
     my $command_line;
     my $result;
     if ( $OSNAME eq 'MSWin32' ) {
-        $command_line = _quoting_for_cmd_exe( $binary, @arguments );
+        $command_line = $self->_quoting_for_cmd_exe( $binary, @arguments );
         if ( $self->_execute_win32_process( $binary, @arguments ) ) {
             $result = 0;
         }
@@ -5283,7 +5572,7 @@ sub _get_file_via_scp {
     my $local_path =
       File::Spec->catfile( $self->{_local_scp_get_directory}, $local_name );
     if ( $OSNAME eq 'MSWin32' ) {
-        $remote_path = _quoting_for_cmd_exe($remote_path);
+        $remote_path = $self->_quoting_for_cmd_exe($remote_path);
     }
     my @arguments = (
         $self->_scp_arguments(),
@@ -5341,7 +5630,7 @@ sub _put_file_via_scp {
       or Firefox::Marionette::Exception->throw(
         "Failed to close $local_path:$EXTENDED_OS_ERROR");
     if ( $OSNAME eq 'MSWin32' ) {
-        $remote_path = _quoting_for_cmd_exe($remote_path);
+        $remote_path = $self->_quoting_for_cmd_exe($remote_path);
     }
     my @arguments = (
         $self->_scp_arguments(),
@@ -5468,6 +5757,11 @@ sub _get_marionette_port {
               or Firefox::Marionette::Exception->throw(
                 "Failed to close '$self->{profile_path}':$EXTENDED_OS_ERROR");
         }
+        elsif (( $OSNAME eq 'MSWin32' )
+            && ( $EXTENDED_OS_ERROR == _WIN32_ERROR_SHARING_VIOLATION() ) )
+        {
+            $port = 0;
+        }
     }
     if ( defined $port ) {
     }
@@ -5487,6 +5781,34 @@ sub _initial_socket_setup {
     return $self->new_session($capabilities);
 }
 
+sub _split_browser_version {
+    my ($self) = @_;
+    my ( $major, $minor, $patch );
+    my $browser_version = $self->browser_version();
+    if ( defined $browser_version ) {
+        ( $major, $minor, $patch ) = split /[.]/smx, $browser_version;
+    }
+    return ( $major, $minor, $patch );
+}
+
+sub _check_ftp_support_for_proxy_request {
+    my ( $self, $proxy, $build ) = @_;
+    if ( $proxy->ftp() ) {
+        my ( $major, $minor, $patch ) = $self->_split_browser_version();
+        if ( ( defined $major ) && ( $major <= _MAX_VERSION_FOR_FTP_PROXY() ) )
+        {
+            $build->{proxyType} ||= 'manual';
+            $build->{ftpProxy} = $proxy->ftp();
+        }
+        else {
+            Carp::carp(
+'**** FTP proxying is no longer supported, ignoring this request ****'
+            );
+        }
+    }
+    return $build;
+}
+
 sub _request_proxy {
     my ( $self, $proxy ) = @_;
     my $build = {};
@@ -5499,19 +5821,7 @@ sub _request_proxy {
     if ( $proxy->pac() ) {
         $build->{proxyAutoconfigUrl} = $proxy->pac()->as_string();
     }
-    if ( $proxy->ftp() ) {
-        my ( $major, $minor, $patch ) = split /[.]/smx,
-          $self->browser_version();
-        if ( $major <= _MAX_VERSION_FOR_FTP_PROXY() ) {
-            $build->{proxyType} ||= 'manual';
-            $build->{ftpProxy} = $proxy->ftp();
-        }
-        else {
-            Carp::carp(
-'**** FTP proxying is no longer supported, ignoring this request ****'
-            );
-        }
-    }
+    $build = $self->_check_ftp_support_for_proxy_request( $proxy, $build );
     if ( $proxy->http() ) {
         $build->{proxyType} ||= 'manual';
         $build->{httpProxy} = $proxy->http();
@@ -5561,8 +5871,10 @@ sub _proxy_from_env {
     my ($self) = @_;
     my $build;
     my @keys = (qw(all https http));
-    my ( $major, $minor, $patch ) = split /[.]/smx, $self->browser_version();
-    if ( $major <= _MAX_VERSION_FOR_FTP_PROXY() ) {
+    my ( $major, $minor, $patch ) = $self->_split_browser_version();
+    if ( $self->{waterfox} ) {
+    }
+    elsif ( ( defined $major ) && ( $major <= _MAX_VERSION_FOR_FTP_PROXY() ) ) {
         unshift @keys, qw(ftp);
     }
     foreach my $key (@keys) {
@@ -6123,7 +6435,7 @@ _JS_
 sub _compress_script {
     my ( $self, $script ) = @_;
     $script =~ s/\/[*].*?[*]\///smxg;
-    $script =~ s/\/\/.*$//smxg;
+    $script =~ s/\b\/\/.*$//smxg;
     $script =~ s/[\r\n\t]+/ /smxg;
     $script =~ s/[ ]+/ /smxg;
     return $script;
@@ -7722,6 +8034,9 @@ sub quit {
         }
         $self->_terminate_process();
     }
+    else {
+        $self->_terminate_process();
+    }
     if ( !$self->_reconnected() ) {
         if ( $self->ssh_local_directory() ) {
             File::Path::rmtree( $self->ssh_local_directory(), 0, 0 );
@@ -7749,16 +8064,16 @@ sub _quit_over_marionette {
     if ( $OSNAME eq 'MSWin32' ) {
         if ( defined $self->{_win32_ssh_process} ) {
             $self->{_win32_ssh_process}->Wait( Win32::Process::INFINITE() );
-            $self->_reap();
+            $self->_wait_for_firefox_to_exit();
         }
         if ( defined $self->{_win32_firefox_process} ) {
             $self->{_win32_firefox_process}->Wait( Win32::Process::INFINITE() );
-            $self->_reap();
+            $self->_wait_for_firefox_to_exit();
         }
     }
     elsif ( ( $OSNAME eq 'MSWin32' ) && ( !$self->_ssh() ) ) {
         $self->{_win32_firefox_process}->Wait( Win32::Process::INFINITE() );
-        $self->_reap();
+        $self->_wait_for_firefox_to_exit();
     }
     else {
         if (
@@ -7801,15 +8116,15 @@ sub _sandbox_prefix {
 sub _wait_for_firefox_to_exit {
     my ($self) = @_;
     if ( $self->_ssh() ) {
-        if ( $self->_reconnected() ) {
-            while ( $self->_remote_process_running( $self->_firefox_pid() ) ) {
-                sleep 1;
-            }
-        }
-        else {
+        if ( !$self->_reconnected() ) {
             while ( kill 0, $self->_local_ssh_pid() ) {
                 sleep 1;
                 $self->_reap();
+            }
+        }
+        if ( $self->_firefox_pid() ) {
+            while ( $self->_remote_process_running( $self->_firefox_pid() ) ) {
+                sleep 1;
             }
         }
     }
@@ -7926,8 +8241,8 @@ sub _cleanup_remote_filesystem {
                     (
                         join q[ ], 'if',
                         'exist',   $remote_directory,
-                        'rmdir',   '/S',
-                        '/Q',      $remote_directory
+                        $binary,   @parameters,
+                        $remote_directory
                     )
                 );
             }
@@ -8455,8 +8770,14 @@ sub switch_to_window {
             $message_id,
             $self->_command('WebDriver:SwitchToWindow'),
             {
-                value  => "$window_handle",
-                name   => "$window_handle",
+                (
+                    $self->_is_modern_switch_window_okay()
+                    ? ()
+                    : (
+                        value => "$window_handle",
+                        name  => "$window_handle",
+                    )
+                ),
                 handle => "$window_handle",
             }
         ]
@@ -8494,8 +8815,8 @@ sub go {
             $message_id,
             $self->_command('WebDriver:Navigate'),
             {
-                url       => "$uri",
-                value     => "$uri",
+                url => "$uri",
+                ( $self->_is_modern_go_okay() ? () : ( value => "$uri" ) ),
                 sessionId => $self->_session_id()
             }
         ]
@@ -8696,9 +9017,17 @@ sub install {
           or Firefox::Marionette::Exception->throw(
             "Failed to open $xpi_path for reading:$EXTENDED_OS_ERROR");
         binmode $handle;
-        $actual_path =
-          $self->_remote_catfile( $self->{_addons_directory}, $name );
+        my $addons_directory = $self->{_addons_directory};
+        $actual_path = $self->_remote_catfile( $addons_directory, $name );
         $self->_put_file_via_scp( $handle, $actual_path, 'addon ' . $name );
+        if ( $self->_remote_uname() eq 'cygwin' ) {
+            $addons_directory =
+              $self->_execute_via_ssh( {}, 'cygpath', '-s', '-w',
+                $addons_directory );
+            chomp $addons_directory;
+            $actual_path =
+              File::Spec::Win32->catdir( $addons_directory, $name );
+        }
     }
     elsif ( $OSNAME eq 'cygwin' ) {
         $actual_path = $self->execute( 'cygpath', '-s', '-w', $xpi_path );
@@ -8983,7 +9312,7 @@ Firefox::Marionette - Automate the Firefox browser with the Marionette protocol
 
 =head1 VERSION
 
-Version 1.22
+Version 1.23
 
 =head1 SYNOPSIS
 
@@ -9145,7 +9474,7 @@ these headers are added to any existing headers going to the metacpan.org site, 
 
 =head2 addons
 
-returns if pre-existing addons (extensions/themes) are allowed to run.  This will be true for Firefox versions less than 55, as -safe-mode cannot be automated.
+returns if pre-existing addons (extensions/themes) are allowed to run.  This will be true for Firefox versions less than 55, as L<-safe-mode|http://kb.mozillazine.org/Command_line_arguments#List_of_command_line_arguments_.28incomplete.29> cannot be automated.
 
 =head2 alert_text
 
@@ -9255,6 +9584,7 @@ returns a list of all known L<certificates in the Firefox database|Firefox::Mari
     my $firefox = Firefox::Marionette->new();
     foreach my $certificate (grep { $_->is_ca_cert() && $_->not_valid_after() < time } $firefox->certificates()) {
         say "The " . $certificate->display_name() " . certificate has expired and should be removed";
+        print 'PEM Encoded Certificate ' . "\n" . $firefox->certificate_as_pem($certificate) . "\n";
     }
 
 This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
@@ -10073,6 +10403,27 @@ returns a list of L<Firefox::Marionette::Login|Firefox::Marionette::Login> objec
         $firefox->add_login($login);
     }
 
+=head2 logins_from_xml
+
+accepts a filehandle as a parameter and then reads the filehandle for exported logins as XML.  This is known to work with the following formats;
+
+=over 4
+
+=item * L<KeePass 1.x XML|https://keepass.info/help/base/importexport.html#xml>
+
+=back
+
+returns a list of L<Firefox::Marionette::Login|Firefox::Marionette::Login> objects.
+
+    use Firefox::Marionette();
+    use FileHandle();
+
+    my $handle = FileHandle->new('/path/to/keepass1.xml');
+    my $firefox = Firefox::Marionette->new();
+    foreach my $login (Firefox::Marionette->logins_from_csv($handle)) {
+        $firefox->add_login($login);
+    }
+
 =head2 logins_from_zip
 
 accepts a filehandle as a parameter and then reads the filehandle for exported logins as a zip file.  This is known to work with the following formats;
@@ -10202,7 +10553,7 @@ accepts an optional hash as a parameter.  Allowed keys are below;
 
 =item * height - set the L<height|http://kb.mozillazine.org/Command_line_arguments#List_of_command_line_arguments_.28incomplete.29> of the initial firefox window
 
-=item * har - begin the session with the L<devtools|https://developer.mozilla.org/en-US/docs/Tools> window opened in a separate window.  The L<HAR Export Trigger|https://addons.mozilla.org/en-US/firefox/addon/har-export-trigger/> addon will be loaded into the new session automatically, which means that -safe-mode will not be activated for this session AND this functionality will only be available for Firefox 61+.
+=item * har - begin the session with the L<devtools|https://developer.mozilla.org/en-US/docs/Tools> window opened in a separate window.  The L<HAR Export Trigger|https://addons.mozilla.org/en-US/firefox/addon/har-export-trigger/> addon will be loaded into the new session automatically, which means that L<-safe-mode|http://kb.mozillazine.org/Command_line_arguments#List_of_command_line_arguments_.28incomplete.29> will not be activated for this session AND this functionality will only be available for Firefox 61+.
 
 =item * host - use L<ssh|https://man.openbsd.org/ssh.1> to create and automate firefox on the specified host.  See L<REMOTE AUTOMATION OF FIREFOX VIA SSH|Firefox::Marionette#REMOTE-AUTOMATION-OF-FIREFOX-VIA-SSH>.
 
@@ -10838,6 +11189,31 @@ When using ssh, Firefox::Marionette will attempt to pass the L<TMPDIR|https://en
 
 This module uses L<ControlMaster|https://man.openbsd.org/ssh_config#ControlMaster> functionality when using L<ssh|https://man.openbsd.org/ssh>, for a useful speedup of executing remote commands.  Unfortunately, when using ssh to move from a L<cygwin|https://gcc.gnu.org/wiki/SSH_connection_caching>, L<Windows 10 or Windows Server 2019|https://docs.microsoft.com/en-us/windows-server/administration/openssh/openssh_install_firstuse> node to a remote environment, we cannot use L<ControlMaster|https://man.openbsd.org/ssh_config#ControlMaster>, because at this time, Windows L<does not support ControlMaster|https://github.com/Microsoft/vscode-remote-release/issues/96> and therefore this type of automation is still possible, but slower than other client platforms.
 
+=head1 WEBGL
+
+There are a number of steps to getting L<WebGL|https://en.wikipedia.org/wiki/WebGL> to work correctly;
+
+=over
+
+=item 1. The addons parameter to the L<new|Firefox::Marionette#new> method must be set.  This will disable L<-safe-mode|http://kb.mozillazine.org/Command_line_arguments#List_of_command_line_arguments_.28incomplete.29>
+
+=item 2. The visible parameter to the L<new|Firefox::Marionette#new> method must be set.  This is due to L<an existing bug in Firefox|https://bugzilla.mozilla.org/show_bug.cgi?id=1375585>.
+
+=item 3. L<REMOTE AUTOMATION OF FIREFOX VIA SSH|Firefox::Marionette#REMOTE-AUTOMATION-OF-FIREFOX-VIA-SSH> cannot be used with WebGL at the moment.
+
+=back
+
+With all those conditions being met, L<WebGL|https://en.wikipedia.org/wiki/WebGL> can be enabled like so;
+
+    use Firefox::Marionette();
+
+    my $firefox = Firefox::Marionette->new( addons => 1, visible => 1 );
+    if ($firefox->script(q[let c = document.createElement('canvas'); return c.getContext('webgl2') ? true : c.getContext('experimental-webgl') ? true : false;])) {
+        $firefox->go("https://get.webgl.org/");
+    } else {
+        die "WebGL is not supported";
+    }
+
 =head1 DIAGNOSTICS
 
 =over
@@ -10979,6 +11355,9 @@ L<URI|URI>
 
 =item *
 L<XML::Parser|XML::Parser>
+ 
+=item *
+L<Time::Local|Time::Local>
  
 =back
 

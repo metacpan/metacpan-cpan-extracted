@@ -43,7 +43,7 @@ is ref $client->ua, 'Mojo::UserAgent',
     'default ->ua';
 
 # network error
-my ($failed,$result,$error) = $client->url('http://no-such-host-qKfdsEsZ/')->call('method');
+my ($failed,$result,$error) = $client->url('http://no-such-host-qKfdsEsZ./')->call('method');
 like $failed, qr/connect|resolve/msi, 'network error';
 
 $client->url('/');

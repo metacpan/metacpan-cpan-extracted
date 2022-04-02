@@ -1,6 +1,9 @@
 Revision history for Perl extension PerlCryptLib
 ================================================
 
+1.12  Fri Apr 01 12:11:00 2022
+	- Fixed check for version above 3.4.0
+
 1.11  Sun Oct 24 18:45:21 2010
 	- Added compatibility for deprecated functions removed from cryptlib starting from version 3.4.0
 

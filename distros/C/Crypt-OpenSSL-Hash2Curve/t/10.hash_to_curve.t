@@ -4,7 +4,7 @@ use warnings;
 use Test::More ;
 use Crypt::OpenSSL::EC;
 use Crypt::OpenSSL::Bignum;
-use Crypt::OpenSSL::Hash2Curve qw/expand_message_xmd encode_to_curve get_hash2curve_params hash_to_curve/;
+use Crypt::OpenSSL::Hash2Curve ;
 #use Data::Dump qw/dump/;
 
 
@@ -13,7 +13,7 @@ my $DST = 'QUUX-V01-CS02-with-P256_XMD:SHA-256_SSWU_RO_';
 my $group_name = "prime256v1";
 my $type = 'sswu';
 #my $P = hash_to_curve($msg, $DST, $group_name, $type, 'SHA256', \&Crypt::OpenSSL::Hash2Curve::expand_message_xmd , 0 );
-my $P = hash_to_curve($msg, $DST, $group_name, $type, 'SHA256', \&Crypt::OpenSSL::Hash2Curve::expand_message_xmd , 1 );
+my $P = hash_to_curve($msg, $DST, $group_name, $type, 'SHA256', \&expand_message_xmd , 1 );
 
 my $params_ref = get_hash2curve_params($group_name, $type);
 my $group = $params_ref->[0];

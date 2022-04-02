@@ -4,14 +4,14 @@ use warnings;
 
 #use lib '../lib';
 
-use Digest::SHA qw/sha256/;
+#use Digest::SHA qw/sha256/;
 use List::Util qw/min/;
 use Test::More ;
 use Crypt::OpenSSL::EC;
 use Crypt::OpenSSL::Bignum;
 use Crypt::OpenSSL::Hash2Curve qw/expand_message_xmd encode_to_curve get_hash2curve_params hash_to_curve/;
 use Crypt::CPace ;
-use Data::Dump qw/dump/;
+#use Data::Dump qw/dump/;
 
 my $i;
 $i = lexiographically_larger("\0", "\0\0");

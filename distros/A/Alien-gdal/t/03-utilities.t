@@ -4,6 +4,8 @@ use Test::More;
 use Test::Alien;
 use Alien::gdal;
 
+diag "LD_LIBRARY_PATH: "   . ($ENV{LD_LIBRARY_PATH} // '');
+diag "DYLD_LIBRARY_PATH: " . ($ENV{DYLD_LIBRARY_PATH} // '');
 
 TODO:
 {

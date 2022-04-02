@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '0.542';
+our $VERSION = '0.543';
 use Exporter 'import';
 our @EXPORT_OK = qw( fill_form read_line );
 
@@ -32,9 +32,6 @@ BEGIN {
 }
 
 
-sub ReadLine { 'Term::Form' }
-
-
 sub new {
     my $class = shift;
     croak "new: called with " . @_ . " arguments - 0 or 1 arguments expected." if @_ > 1;
@@ -55,7 +52,50 @@ sub new {
 }
 
 
-sub _valid_options {
+#sub _valid_options {
+#    return {
+#        codepage_mapping   => '[ 0 1 ]',
+#        auto_up            => '[ 0 1 2 ]',
+#        clear_screen       => '[ 0 1 2 ]',
+#        color              => '[ 0 1 2 ]',         # hide_cursor == 2 # documentation
+#        hide_cursor        => '[ 0 1 2 ]',
+#        page               => '[ 0 1 2 ]',         # undocumented
+#        keep               => '[ 1-9 ][ 0-9 ]*',   # undocumented
+#        read_only          => 'Array_Int',
+#        section_separators => 'Array_Int',         # 24.06.2021 removed
+#        skip_items         => 'Regexp',            # only keys are checked, passed values are ignored
+#                                                   # it's up to the user to remove the skipped items from the returned arra
+#        back               => 'Str',
+#        confirm            => 'Str',
+#        footer             => 'Str',               # undocumented
+#        info               => 'Str',
+#        prompt             => 'Str',
+#    };
+#}
+
+
+#sub _defaults {
+#    return {
+#        auto_up            => 0,
+#        back               => '   BACK',
+#        clear_screen       => 0,
+#        codepage_mapping   => 0,
+#        color              => 0,
+#        confirm            => 'CONFIRM',
+#        footer             => '',
+#        hide_cursor        => 1,
+#        info               => '',
+#        keep               => 5,
+#        page               => 1,
+#        prompt             => '',
+#        read_only          => [],
+#        section_separators => [],           # 24.06.2021 removed
+#        skip_items         => undef,
+#    };
+#}
+
+
+sub _valid_options { ###
     my ( $caller ) = @_;
     if ( $caller eq 'new' ) {
         return {
@@ -117,7 +157,7 @@ sub _valid_options {
 }
 
 
-sub _defaults {
+sub _defaults { ###
     return {
         auto_up            => 0,
         back               => '   BACK',
@@ -223,350 +263,6 @@ sub __calculate_threshold {
 }
 
 
-sub __before_readline {
-    my ( $self, $m ) = @_;
-    my @pre_text_array;
-    if ( $self->{show_context} ) {
-        my @before_lines;
-        if ( $m->{diff} ) {
-            my $line = '';
-            my $line_w = 0;
-            for my $i ( reverse( 0 .. $m->{diff} - 1 ) ) {
-                if ( $line_w + $m->{str}[$i][1] > $self->{i}{term_w} ) {
-                    unshift @before_lines, $line;
-                    $line   = $m->{str}[$i][0];
-                    $line_w = $m->{str}[$i][1];
-                    next;
-                }
-                $line   = $m->{str}[$i][0] . $line;
-                $line_w = $m->{str}[$i][1] + $line_w;
-            }
-            my $total_first_line_w = $self->{i}{max_key_w} + $line_w;
-            if ( $total_first_line_w <= $self->{i}{term_w} ) {
-                my $empty_w = $self->{i}{term_w} - $total_first_line_w;
-                unshift @before_lines, $self->__get_prompt() . ( ' ' x $empty_w ) . $line;
-            }
-            else {
-                my $empty_w = $self->{i}{term_w} - $line_w;
-                unshift @before_lines, ' ' x $empty_w . $line;
-                unshift @before_lines, $self->__get_prompt();
-            }
-            $self->{i}{keys}[0] = '';
-        }
-        else {
-            if ( ( $m->{str_w} + $self->{i}{max_key_w} ) <= $self->{i}{term_w} ) {
-                $self->{i}{keys}[0] = $self->{i}{prompt};
-            }
-            else {
-                if ( length $self->{i}{prompt} ) { #
-                    unshift @before_lines, $self->__get_prompt();
-                }
-                $self->{i}{keys}[0] = '';
-            }
-        }
-        push @pre_text_array, @before_lines;
-    }
-    else {
-        $self->{i}{keys}[0] = $self->__get_prompt();
-    }
-    if ( $self->{clear_screen} == 2 ) {
-        $self->{i}{pre_text} = join "\n", map { "\r" . clear_to_end_of_line() . $_ } @pre_text_array;
-    }
-    else {
-        $self->{i}{pre_text} = join "\n", @pre_text_array;
-    }
-    $self->{i}{pre_text_row_count} = scalar @pre_text_array;
-}
-
-
-sub __get_prompt {
-    my ( $self ) = @_;
-    my $prompt = $self->{i}{prompt};
-    if ( exists $self->{i}{prompt_colors} && @{$self->{i}{prompt_colors}} ) {
-        my @color = @{$self->{i}{prompt_colors}};
-        $prompt =~ s/\x{feff}/shift @color/ge;
-        $prompt .= normal();
-    }
-    return $prompt;
-}
-
-
-sub __after_readline {
-    my ( $self, $m ) = @_;
-    my $count_chars_after = @{$m->{str}} - ( @{$m->{p_str}} + $m->{diff} );
-    if ( ! $self->{show_context} || ! $count_chars_after ) {
-        $self->{i}{post_text} = '';
-        $self->{i}{post_text_row_count} = 0;
-        return;
-    }
-    my @post_text_array;
-    my $line = '';
-    my $line_w = 0;
-    for my $i ( ( @{$m->{str}} - $count_chars_after ) .. $#{$m->{str}} ) {
-        if ( $line_w + $m->{str}[$i][1] > $self->{i}{term_w} ) {
-            push @post_text_array, $line;
-            $line = $m->{str}[$i][0];
-            $line_w = $m->{str}[$i][1];
-            next;
-        }
-        $line = $line . $m->{str}[$i][0];
-        $line_w = $line_w + $m->{str}[$i][1];
-    }
-    if ( $line_w ) {
-        push @post_text_array, $line;
-    }
-    if ( $self->{clear_screen} == 2 ) { # never
-        $self->{i}{post_text} = join "\n", map { "\r" . clear_to_end_of_line() . $_ } @post_text_array;
-    }
-    else {
-        $self->{i}{post_text} = join "\n", @post_text_array;
-    }
-    $self->{i}{post_text_row_count} = scalar @post_text_array;
-}
-
-
-sub __print_footer {
-    my ( $self ) = @_;
-    my $used_rows = (
-          $self->{i}{info_row_count}
-        + $self->{i}{pre_text_row_count}
-        + 1     #readline
-        + $self->{i}{post_text_row_count}
-    );
-    my $empty = get_term_height() - $used_rows;
-    my $footer_line = sprintf $self->{i}{footer_fmt}, 1;
-    if ( $empty > 0 ) {
-        print "\n" x $empty;
-        print $footer_line;
-        print up( $empty );
-    }
-    else {
-        if ( get_term_height >= 2 ) { ##
-            print "\n";
-            print $footer_line;
-            print up( 1 );
-        }
-    }
-}
-
-
-sub __modify_readline_options {
-    my ( $self ) = @_;
-    if ( $self->{clear_screen} == 2 && $self->{show_context} ) {
-        $self->{clear_screen} = 0;
-    }
-    if ( length $self->{footer} && $self->{page} != 2 ) {
-        $self->{page} = 2;
-    }
-    if ( $self->{page} == 2 && $self->{clear_screen} != 1 ) {
-        $self->{clear_screen} = 1;
-    }
-}
-
-
-sub __init_readline {
-    my ( $self, $term_w, $prompt ) = @_;
-    $self->{i}{term_w} = $term_w;
-    if ( $self->{clear_screen} == 1 ) {
-        print clear_screen();
-    }
-    if ( length $self->{info} ) {
-        my $info_w = $term_w;
-        if ( $^O ne 'MSWin32' && $^O ne 'cygwin' ) {
-            $info_w += WIDTH_CURSOR;
-        }
-        my @info = line_fold( $self->{info}, $info_w, { color => $self->{color}, join => 0 } );
-        $self->{i}{info_row_count} = @info;
-        print join( "\n", @info ), "\n";
-    }
-    else {
-        $self->{i}{info_row_count} = 0;
-    }
-    $self->{i}{seps}[0] = ''; # in __readline
-    $self->{i}{curr_row} = 0; # in __readlline and __string_and_pos
-    $self->{i}{pre_text_row_count} = 0;
-    $self->{i}{post_text_row_count} = 0;
-    if ( $self->{color} ) {
-        my @color;
-        $prompt =~ s/\x{feff}//g;
-        $prompt =~ s/(\e\[[\d;]*m)/push( @color, $1 ) && "\x{feff}"/ge;
-        $self->{i}{prompt_colors} = [ @color ];
-    }
-    $prompt = _sanitized_string( $prompt );
-    $self->{i}{max_key_w} = print_columns( $prompt );
-    if ( $self->{i}{max_key_w} > $term_w / 3 ) {
-        $self->{i}{max_key_w} = int( $term_w / 3 );
-        $self->{i}{prompt} = $self->__unicode_trim( $prompt, $self->{i}{max_key_w} );
-    }
-    else {
-        $self->{i}{prompt} = $prompt;
-    }
-    if ( $self->{show_context} ) {
-        $self->{i}{arrow_left}  = '';
-        $self->{i}{arrow_right} = '';
-        $self->{i}{arrow_w} = 0;
-        $self->{i}{avail_w} = $term_w;
-    }
-    else {
-        $self->{i}{arrow_left}  = '<';
-        $self->{i}{arrow_right} = '>';
-        $self->{i}{arrow_w} = 1;
-        $self->{i}{avail_w} = $term_w - ( $self->{i}{max_key_w} + $self->{i}{arrow_w} );
-        # arrow_w: see comment in __prepare_width
-    }
-    $self->{i}{th} = int( $self->{i}{avail_w} / 5 );
-    $self->{i}{th} = 40 if $self->{i}{th} > 40;
-    if ( $self->{page} == 2 ) {
-        $self->{i}{page_count} = 1; ##
-        $self->{i}{print_footer} = 1;
-        $self->__prepare_footer_fmt();
-    }
-    else {
-        $self->{i}{print_footer} = 0;
-    }
-    my $list = [ [ $prompt, $self->{default} ] ];
-    my $m = $self->__string_and_pos( $list );
-    return $m;
-}
-
-
-sub read_line {
-    if ( ref $_[0] eq __PACKAGE__ ) {
-        croak "\"read_line\" is a function. The method is called \"readline\"";
-    }
-    my $ob = __PACKAGE__->new();
-    delete $ob->{backup_instance_defaults};
-    return $ob->readline( @_ );
-}
-
-
-sub readline {
-    my ( $self, $prompt, $opt ) = @_;
-    $prompt = ''                                         if ! defined $prompt;
-    croak "readline: a reference is not a valid prompt." if ref $prompt;
-    $opt = {}                                            if ! defined $opt;
-    if ( ! ref $opt ) {
-        $opt = { default => $opt };
-    }
-    elsif ( ref $opt ne 'HASH' ) {
-        croak "readline: the (optional) second argument must be a string or a HASH reference";
-    }
-    if ( %$opt ) {
-        my $caller = 'readline';
-        validate_options( _valid_options( $caller ), $opt, $caller );
-        for my $key ( keys %$opt ) {
-            $self->{$key} = $opt->{$key} if defined $opt->{$key};
-        }
-    }
-    $self->__modify_readline_options();
-    if ( $^O eq "MSWin32" ) {
-        print $self->{codepage_mapping} ? "\e(K" : "\e(U";
-    }
-    local $| = 1;
-    local $SIG{INT} = sub {
-        $self->__reset_term();
-        print "^C\n";
-        exit;
-    };
-    $self->__init_term();
-    my $term_w = get_term_width();
-    my $m = $self->__init_readline( $term_w, $prompt );
-    my $big_step = 10;
-    my $up_before = 0;
-
-    CHAR: while ( 1 ) {
-        if ( $self->{i}{beep} ) {
-            print bell();
-            $self->{i}{beep} = 0;
-        }
-        my $tmp_term_w = get_term_width();
-        if ( $tmp_term_w != $term_w ) {
-            $term_w = $tmp_term_w;
-            $self->{default} = join( '', map { $_->[0] } @{$m->{str}} );
-            $m = $self->__init_readline( $term_w, $prompt );
-        }
-        if ( $self->{show_context} ) {
-            if ( ( $self->{i}{pre_text_row_count} + 2 + $self->{i}{post_text_row_count} ) >= get_term_height() ) { ##
-                $self->{show_context} = 0;
-                $up_before = 0;
-                $self->{default} = join( '', map { $_->[0] } @{$m->{str}} );
-                $m = $self->__init_readline( $term_w, $prompt );
-            }
-        }
-        if ( $up_before ) {
-            print up( $up_before );
-        }
-        if ( $self->{clear_screen} < 2 ) {
-            print "\r" . clear_to_end_of_screen();
-        }
-        $self->__before_readline( $m );
-        $up_before = $self->{i}{pre_text_row_count};
-        if ( $self->{hide_cursor} ) {
-            print hide_cursor();
-        }
-        if ( length $self->{i}{pre_text} ) {
-            print $self->{i}{pre_text}, "\n";
-        }
-
-        $self->__after_readline( $m );
-        if ( length $self->{i}{post_text} ) {
-            print "\n" . $self->{i}{post_text};
-        }
-        if ( $self->{i}{print_footer} ) {
-            $self->__print_footer();
-        }
-        if ( $self->{i}{post_text_row_count} ) {
-            # after __print_footer()
-            print up( $self->{i}{post_text_row_count} );
-        }
-        $self->__print_readline( $m );
-        my $char = $self->{plugin}->__get_key_OS();
-        if ( ! defined $char ) {
-            $self->__reset_term();
-            warn "EOT: $!";
-            return;
-        }
-        # reset $m->{avail_w} to default:
-        $m->{avail_w} = $self->{i}{avail_w};
-        $self->__calculate_threshold( $m );
-        if    ( $char == NEXT_get_key                     ) { next CHAR }
-        elsif ( $char == KEY_TAB                          ) { next CHAR }
-        elsif ( $char == VK_UP      || $char == CONTROL_R ) { for ( 1 .. $big_step ) { last if $m->{pos} == 0; $self->__left( $m  ) } }
-        elsif ( $char == VK_DOWN    || $char == CONTROL_S ) { for ( 1 .. $big_step ) { last if $m->{pos} == @{$m->{str}}; $self->__right( $m ) } }
-        elsif ( $char == CONTROL_U                        ) { $self->__ctrl_u( $m ) }
-        elsif ( $char == CONTROL_K                        ) { $self->__ctrl_k( $m ) }
-        elsif ( $char == VK_RIGHT   || $char == CONTROL_F ) { $self->__right(  $m ) }
-        elsif ( $char == VK_LEFT    || $char == CONTROL_B ) { $self->__left(   $m ) }
-        elsif ( $char == VK_END     || $char == CONTROL_E ) { $self->__end(    $m ) }
-        elsif ( $char == VK_HOME    || $char == CONTROL_A ) { $self->__home(   $m ) }
-        elsif ( $char == KEY_BSPACE || $char == CONTROL_H ) { $self->__bspace( $m ) }
-        elsif ( $char == VK_DELETE  || $char == CONTROL_D ) { $self->__delete( $m ) }
-        elsif ( $char == CONTROL_X ) {
-            if ( @{$m->{str}} ) {
-                my $list = [ [ $prompt, '' ] ];
-                $m = $self->__string_and_pos( $list );
-            }
-            else {
-                $self->__reset_term( $self->{i}{pre_text_row_count} );
-                return;
-            }
-        }
-        elsif ( $char == VK_PAGE_UP || $char == VK_PAGE_DOWN || $char == VK_INSERT ) {
-            $self->{i}{beep} = 1;
-        }
-        elsif ( $char == LINE_FEED || $char == CARRIAGE_RETURN ) {
-            $self->__reset_term( $self->{i}{pre_text_row_count} );
-            return join( '', map { $_->[0] } @{$m->{str}} );
-        }
-        else {
-            $char = chr $char;
-            utf8::upgrade $char;
-            $self->__add_char( $m, $char );
-        }
-    }
-}
-
-
 sub __string_and_pos {
     my ( $self, $list ) = @_;
     my $default = $list->[$self->{i}{curr_row}][1];
@@ -631,7 +327,7 @@ sub __right {
         #rec w if vw
         $m->{pos}++;
         $m->{p_pos}++;
-        # cursor now behind the string at the end posistion
+        # cursor now behind the string at the end position
     }
     else {
         $self->{i}{beep} = 1;
@@ -1539,6 +1235,365 @@ sub __print_previous_page {
 }
 
 
+########################################################################################################################
+
+
+sub __before_readline {
+    my ( $self, $m ) = @_;
+    my @pre_text_array;
+    if ( $self->{show_context} ) {
+        my @before_lines;
+        if ( $m->{diff} ) {
+            my $line = '';
+            my $line_w = 0;
+            for my $i ( reverse( 0 .. $m->{diff} - 1 ) ) {
+                if ( $line_w + $m->{str}[$i][1] > $self->{i}{term_w} ) {
+                    unshift @before_lines, $line;
+                    $line   = $m->{str}[$i][0];
+                    $line_w = $m->{str}[$i][1];
+                    next;
+                }
+                $line   = $m->{str}[$i][0] . $line;
+                $line_w = $m->{str}[$i][1] + $line_w;
+            }
+            my $total_first_line_w = $self->{i}{max_key_w} + $line_w;
+            if ( $total_first_line_w <= $self->{i}{term_w} ) {
+                my $empty_w = $self->{i}{term_w} - $total_first_line_w;
+                unshift @before_lines, $self->__get_prompt() . ( ' ' x $empty_w ) . $line;
+            }
+            else {
+                my $empty_w = $self->{i}{term_w} - $line_w;
+                unshift @before_lines, ' ' x $empty_w . $line;
+                unshift @before_lines, $self->__get_prompt();
+            }
+            $self->{i}{keys}[0] = '';
+        }
+        else {
+            if ( ( $m->{str_w} + $self->{i}{max_key_w} ) <= $self->{i}{term_w} ) {
+                $self->{i}{keys}[0] = $self->{i}{prompt};
+            }
+            else {
+                if ( length $self->{i}{prompt} ) { #
+                    unshift @before_lines, $self->__get_prompt();
+                }
+                $self->{i}{keys}[0] = '';
+            }
+        }
+        push @pre_text_array, @before_lines;
+    }
+    else {
+        $self->{i}{keys}[0] = $self->__get_prompt();
+    }
+    if ( $self->{clear_screen} == 2 ) {
+        $self->{i}{pre_text} = join "\n", map { "\r" . clear_to_end_of_line() . $_ } @pre_text_array;
+    }
+    else {
+        $self->{i}{pre_text} = join "\n", @pre_text_array;
+    }
+    $self->{i}{pre_text_row_count} = scalar @pre_text_array;
+}
+
+
+sub __get_prompt {
+    my ( $self ) = @_;
+    my $prompt = $self->{i}{prompt};
+    if ( exists $self->{i}{prompt_colors} && @{$self->{i}{prompt_colors}} ) {
+        my @color = @{$self->{i}{prompt_colors}};
+        $prompt =~ s/\x{feff}/shift @color/ge;
+        $prompt .= normal();
+    }
+    return $prompt;
+}
+
+
+sub __after_readline {
+    my ( $self, $m ) = @_;
+    my $count_chars_after = @{$m->{str}} - ( @{$m->{p_str}} + $m->{diff} );
+    if ( ! $self->{show_context} || ! $count_chars_after ) {
+        $self->{i}{post_text} = '';
+        $self->{i}{post_text_row_count} = 0;
+        return;
+    }
+    my @post_text_array;
+    my $line = '';
+    my $line_w = 0;
+    for my $i ( ( @{$m->{str}} - $count_chars_after ) .. $#{$m->{str}} ) {
+        if ( $line_w + $m->{str}[$i][1] > $self->{i}{term_w} ) {
+            push @post_text_array, $line;
+            $line = $m->{str}[$i][0];
+            $line_w = $m->{str}[$i][1];
+            next;
+        }
+        $line = $line . $m->{str}[$i][0];
+        $line_w = $line_w + $m->{str}[$i][1];
+    }
+    if ( $line_w ) {
+        push @post_text_array, $line;
+    }
+    if ( $self->{clear_screen} == 2 ) { # never
+        $self->{i}{post_text} = join "\n", map { "\r" . clear_to_end_of_line() . $_ } @post_text_array;
+    }
+    else {
+        $self->{i}{post_text} = join "\n", @post_text_array;
+    }
+    $self->{i}{post_text_row_count} = scalar @post_text_array;
+}
+
+
+sub __print_footer {
+    my ( $self ) = @_;
+    my $used_rows = (
+          $self->{i}{info_row_count}
+        + $self->{i}{pre_text_row_count}
+        + 1        # readline
+        + $self->{i}{post_text_row_count}
+    );
+    my $empty = get_term_height() - $used_rows;
+    my $footer_line = sprintf $self->{i}{footer_fmt}, 1;
+    if ( $empty > 0 ) {
+        print "\n" x $empty;
+        print $footer_line;
+        print up( $empty );
+    }
+    else {
+        if ( get_term_height >= 2 ) { ##
+            print "\n";
+            print $footer_line;
+            print up( 1 );
+        }
+    }
+}
+
+
+sub __modify_readline_options {
+    my ( $self ) = @_;
+    if ( $self->{clear_screen} == 2 && $self->{show_context} ) {
+        $self->{clear_screen} = 0;
+    }
+    if ( length $self->{footer} && $self->{page} != 2 ) {
+        $self->{page} = 2;
+    }
+    if ( $self->{page} == 2 && $self->{clear_screen} != 1 ) {
+        $self->{clear_screen} = 1;
+    }
+}
+
+
+sub __init_readline {
+    my ( $self, $term_w, $prompt ) = @_;
+    $self->{i}{term_w} = $term_w;
+    if ( $self->{clear_screen} == 1 ) {
+        print clear_screen();
+    }
+    if ( length $self->{info} ) {
+        my $info_w = $term_w;
+        if ( $^O ne 'MSWin32' && $^O ne 'cygwin' ) {
+            $info_w += WIDTH_CURSOR;
+        }
+        my @info = line_fold( $self->{info}, $info_w, { color => $self->{color}, join => 0 } );
+        $self->{i}{info_row_count} = @info;
+        print join( "\n", @info ), "\n";
+    }
+    else {
+        $self->{i}{info_row_count} = 0;
+    }
+    $self->{i}{seps}[0] = ''; # in __readline
+    $self->{i}{curr_row} = 0; # in __readlline and __string_and_pos
+    $self->{i}{pre_text_row_count} = 0;
+    $self->{i}{post_text_row_count} = 0;
+    if ( $self->{color} ) {
+        my @color;
+        $prompt =~ s/\x{feff}//g;
+        $prompt =~ s/(\e\[[\d;]*m)/push( @color, $1 ) && "\x{feff}"/ge;
+        $self->{i}{prompt_colors} = [ @color ];
+    }
+    $prompt = _sanitized_string( $prompt );
+    $self->{i}{max_key_w} = print_columns( $prompt );
+    if ( $self->{i}{max_key_w} > $term_w / 3 ) {
+        $self->{i}{max_key_w} = int( $term_w / 3 );
+        $self->{i}{prompt} = $self->__unicode_trim( $prompt, $self->{i}{max_key_w} );
+    }
+    else {
+        $self->{i}{prompt} = $prompt;
+    }
+    if ( $self->{show_context} ) {
+        $self->{i}{arrow_left}  = '';
+        $self->{i}{arrow_right} = '';
+        $self->{i}{arrow_w} = 0;
+        $self->{i}{avail_w} = $term_w;
+    }
+    else {
+        $self->{i}{arrow_left}  = '<';
+        $self->{i}{arrow_right} = '>';
+        $self->{i}{arrow_w} = 1;
+        $self->{i}{avail_w} = $term_w - ( $self->{i}{max_key_w} + $self->{i}{arrow_w} );
+        # arrow_w: see comment in __prepare_width
+    }
+    $self->{i}{th} = int( $self->{i}{avail_w} / 5 );
+    $self->{i}{th} = 40 if $self->{i}{th} > 40;
+    if ( $self->{page} == 2 ) {
+        $self->{i}{page_count} = 1; ##
+        $self->{i}{print_footer} = 1;
+        $self->__prepare_footer_fmt();
+    }
+    else {
+        $self->{i}{print_footer} = 0;
+    }
+    my $list = [ [ $prompt, $self->{default} ] ];
+    my $m = $self->__string_and_pos( $list );
+    return $m;
+}
+
+
+sub read_line {
+    if ( ref $_[0] eq __PACKAGE__ ) {
+        croak "\"read_line\" is a function. The method is called \"readline\"";
+    }
+    my $ob = __PACKAGE__->new();
+    delete $ob->{backup_instance_defaults};
+    return $ob->readline( @_ );
+}
+
+
+sub readline {
+    my ( $self, $prompt, $opt ) = @_;
+    $prompt = ''                                         if ! defined $prompt;
+    croak "readline: a reference is not a valid prompt." if ref $prompt;
+    $opt = {}                                            if ! defined $opt;
+    if ( ! ref $opt ) { # undocumented
+        $opt = { default => $opt };
+    }
+    elsif ( ref $opt ne 'HASH' ) {
+        croak "readline: the (optional) second argument must be a string or a HASH reference";
+    }
+    if ( %$opt ) {
+        my $caller = 'readline';
+        validate_options( _valid_options( $caller ), $opt, $caller );
+        for my $key ( keys %$opt ) {
+            $self->{$key} = $opt->{$key} if defined $opt->{$key};
+        }
+    }
+
+    #################################################################################################
+    if ( ref( $self ) eq 'Term::Form' ) {
+        my $warning = "<<'readline' has been moved to 'Term::Form::ReadLine'.>>\n";
+        $warning .= "<<'readline' will be removed from 'Term::Form'.>>";
+        if ( $self->{info} ) {
+            $self->{info} = $warning . "\n" . $self->{info};
+        }
+        else {
+            $self->{info} = $warning;
+        }
+    }
+    #################################################################################################
+
+    $self->__modify_readline_options();
+    if ( $^O eq "MSWin32" ) {
+        print $self->{codepage_mapping} ? "\e(K" : "\e(U";
+    }
+    local $| = 1;
+    local $SIG{INT} = sub {
+        $self->__reset_term();
+        print "^C\n";
+        exit;
+    };
+    $self->__init_term();
+    my $term_w = get_term_width();
+    my $m = $self->__init_readline( $term_w, $prompt );
+    my $big_step = 10;
+    my $up_before = 0;
+
+    CHAR: while ( 1 ) {
+        if ( $self->{i}{beep} ) {
+            print bell();
+            $self->{i}{beep} = 0;
+        }
+        my $tmp_term_w = get_term_width();
+        if ( $tmp_term_w != $term_w ) {
+            $term_w = $tmp_term_w;
+            $self->{default} = join( '', map { $_->[0] } @{$m->{str}} );
+            $m = $self->__init_readline( $term_w, $prompt );
+        }
+        if ( $self->{show_context} ) {
+            if ( ( $self->{i}{pre_text_row_count} + 2 + $self->{i}{post_text_row_count} ) >= get_term_height() ) { ##
+                $self->{show_context} = 0;
+                $up_before = 0;
+                $self->{default} = join( '', map { $_->[0] } @{$m->{str}} );
+                $m = $self->__init_readline( $term_w, $prompt );
+            }
+        }
+        if ( $up_before ) {
+            print up( $up_before );
+        }
+        if ( $self->{clear_screen} < 2 ) {
+            print "\r" . clear_to_end_of_screen();
+        }
+        $self->__before_readline( $m );
+        $up_before = $self->{i}{pre_text_row_count};
+        if ( $self->{hide_cursor} ) {
+            print hide_cursor();
+        }
+        if ( length $self->{i}{pre_text} ) {
+            print $self->{i}{pre_text}, "\n";
+        }
+
+        $self->__after_readline( $m );
+        if ( length $self->{i}{post_text} ) {
+            print "\n" . $self->{i}{post_text};
+        }
+        if ( $self->{i}{print_footer} ) {
+            $self->__print_footer();
+        }
+        if ( $self->{i}{post_text_row_count} ) {
+            # after __print_footer()
+            print up( $self->{i}{post_text_row_count} );
+        }
+        $self->__print_readline( $m );
+        my $char = $self->{plugin}->__get_key_OS();
+        if ( ! defined $char ) {
+            $self->__reset_term();
+            warn "EOT: $!";
+            return;
+        }
+        # reset $m->{avail_w} to default:
+        $m->{avail_w} = $self->{i}{avail_w};
+        $self->__calculate_threshold( $m );
+        if    ( $char == NEXT_get_key                     ) { next CHAR }
+        elsif ( $char == KEY_TAB                          ) { next CHAR }
+        elsif ( $char == VK_UP      || $char == CONTROL_R ) { for ( 1 .. $big_step ) { last if $m->{pos} == 0; $self->__left( $m  ) } }
+        elsif ( $char == VK_DOWN    || $char == CONTROL_S ) { for ( 1 .. $big_step ) { last if $m->{pos} == @{$m->{str}}; $self->__right( $m ) } }
+        elsif ( $char == CONTROL_U                        ) { $self->__ctrl_u( $m ) }
+        elsif ( $char == CONTROL_K                        ) { $self->__ctrl_k( $m ) }
+        elsif ( $char == VK_RIGHT   || $char == CONTROL_F ) { $self->__right(  $m ) }
+        elsif ( $char == VK_LEFT    || $char == CONTROL_B ) { $self->__left(   $m ) }
+        elsif ( $char == VK_END     || $char == CONTROL_E ) { $self->__end(    $m ) }
+        elsif ( $char == VK_HOME    || $char == CONTROL_A ) { $self->__home(   $m ) }
+        elsif ( $char == KEY_BSPACE || $char == CONTROL_H ) { $self->__bspace( $m ) }
+        elsif ( $char == VK_DELETE  || $char == CONTROL_D ) { $self->__delete( $m ) }
+        elsif ( $char == CONTROL_X ) {
+            if ( @{$m->{str}} ) {
+                my $list = [ [ $prompt, '' ] ];
+                $m = $self->__string_and_pos( $list );
+            }
+            else {
+                $self->__reset_term( $self->{i}{pre_text_row_count} );
+                return;
+            }
+        }
+        elsif ( $char == VK_PAGE_UP || $char == VK_PAGE_DOWN || $char == VK_INSERT ) {
+            $self->{i}{beep} = 1;
+        }
+        elsif ( $char == LINE_FEED || $char == CARRIAGE_RETURN ) {
+            $self->__reset_term( $self->{i}{pre_text_row_count} );
+            return join( '', map { $_->[0] } @{$m->{str}} );
+        }
+        else {
+            $char = chr $char;
+            utf8::upgrade $char;
+            $self->__add_char( $m, $char );
+        }
+    }
+}
 
 
 
@@ -1556,7 +1611,7 @@ Term::Form - Read lines from STDIN.
 
 =head1 VERSION
 
-Version 0.542
+Version 0.543
 
 =cut
 
@@ -1575,28 +1630,21 @@ Version 0.542
 
     my $new = Term::Form->new();
 
-    my $line = $new->readline( 'Prompt: ', { default => 'abc' } );
-
     my $modified_list = $new->fill_form( $aoa );
 
     # Functional interface:
 
-    use Term::Form qw( read_line fill_form );
-
-    my $line = read_line( 'Prompt: ', { default => 'abc' } );
+    use Term::Form qw( fill_form );
 
     my $modified_list = fill_form( $aoa );
 
 =head1 DESCRIPTION
 
-C<readline> reads a line from STDIN. As soon as C<Return> is pressed C<readline> returns the read string without the
-newline character - so no C<chomp> is required.
-
 C<fill_form> reads a list of lines from STDIN.
 
-This module is intended to cope with Unicode (multibyte character/grapheme cluster).
-
 The output is removed after leaving the method, so the user can decide what remains on the screen.
+
+C<readline> has been moved to L<Term::Form::ReadLine>.
 
 =head2 Keys
 
@@ -1616,13 +1664,11 @@ C<Home> or C<Ctrl-A>: Move to the start of the line.
 
 C<End> or C<Ctrl-E>: Move to the end of the line.
 
-C<Up-Arrow> or C<Ctrl-R>: in C<fill_form> move up one row, in C<readline> move back 10 characters.
+C<Up-Arrow> or C<Ctrl-R>: Move up one row.
 
-C<Down-Arrow> or C<Ctrl-S>: in C<fill_form> move down one row, in C<readline> move forward 10 characters.
+C<Down-Arrow> or C<Ctrl-S>: Move down one row.
 
 C<Ctrl-X>: If the input puffer is not empty, the input puffer is cleared, else C<Ctrl-X> returns nothing (undef).
-
-Only in C<fill_form>:
 
 C<Page-Up> or C<Ctrl-P>: Move to the previous page.
 
@@ -1637,92 +1683,6 @@ The C<new> method returns a C<Term::Form> object.
     my $new = Term::Form->new();
 
 To set the different options it can be passed a reference to a hash as an optional argument.
-
-=head2 readline
-
-C<readline> reads a line from STDIN.
-
-    $line = $new->readline( $prompt, \%options );
-
-The fist argument is the prompt string.
-
-The optional second argument is the default string (see option I<default>) if it is not a reference. If the second
-argument is a hash-reference, the hash is used to set the different options. The keys/options are
-
-=head3 clear_screen
-
-If enabled, the screen is cleared before the output.
-
-0 - clears from the current position to the end of screen
-
-1 - clears the entire screen
-
-2 - if I<show_context> is disabled, clears only the current (readline) row. If I<show_context> is enabled behaves like
-I<clear_screen> where set to 0.
-
-default: C<0>
-
-=head3 codepage_mapping
-
-This option has only meaning if the operating system is MSWin32.
-
-If the OS is MSWin32, L<Win32::Console::ANSI> is used. By default C<Win32::Console::ANSI> converts the characters from
-Windows code page to DOS code page (the so-called ANSI to OEM conversion). This conversation is disabled by default in
-C<Term::Choose> but one can enable it by setting this option.
-
-Setting this option to C<1> enables the codepage mapping offered by L<Win32::Console::ANSI>.
-
-0 - disable automatic codepage mapping (default)
-
-1 - keep automatic codepage mapping
-
-default: C<0>
-
-=head3 color
-
-Enables the support for color and text formatting escape sequences for the prompt string and the I<info> text.
-
-0 - off
-
-1 - on
-
-default: C<0>
-
-=head3 default
-
-Set a initial value of input.
-
-=head3 hide_cursor
-
-0 - disabled
-
-1 - enabled
-
-default: C<1>
-
-=head3 info
-
-Expects as is value a string. If set, the string is printed on top of the output of C<readline>.
-
-=head3 no_echo
-
-0 - the input is echoed on the screen.
-
-1 - "C<*>" are displayed instead of the characters.
-
-2 - no output is shown apart from the prompt string.
-
-default: C<0>
-
-=head3 show_context
-
-Display the input that does not fit into the "readline" before or after the "readline".
-
-0 - disable I<show_context>
-
-1 - enable I<show_context>
-
-default: C<0>
 
 =head2 fill_form
 
@@ -1846,7 +1806,7 @@ Unless the OS is MSWin32 the terminal has to understand ANSI escape sequences.
 =head2 Encoding layer
 
 It is required to use appropriate I/O encoding layers. If the encoding layer for STDIN doesn't match the terminal's
-character set, C<readline> will break if a non ascii character is entered.
+character set, C<fill_from> will break if a non ascii character is entered.
 
 =head1 SUPPORT
 

@@ -1,5 +1,20 @@
 Revision history for Perl extension Hustle::Table
 
+0.5.1   Sat  2 Apr 2022 21:01:36 AEST
+	- Bump min perl version to 5.26 for @{^CAPTURE} variable
+	- Fixed issue where a cached entry did not return captures
+	- Default matcher type is updated to undef to allow cached matcher to do regex match
+	- Cleaned up tests
+
+0.5.0 	Thu 31 Mar 2022 20:15:33 AEST
+	- Major rewrite
+	- Simplified and restricted scope
+	- Table entry stores any scalar value, not just code references
+	- Regex, begin, end, exact and numeric matchers
+	- Dispatcher returns matching table entry and regex captures
+	- Caching always enabled. external management by user application
+
+
 0.4.1   Mon  7 Mar 2022 17:27:52 AEST
 	- Remove debugging output which should not have been active
 	- Remove more unused code

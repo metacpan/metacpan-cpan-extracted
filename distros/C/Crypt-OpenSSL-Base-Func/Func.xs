@@ -2,71 +2,101 @@
 #include "perl.h"
 #include "XSUB.h"
 
+#include "ppport.h"
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include <openssl/bio.h>
+#include <openssl/bn.h>
 #include <openssl/cmac.h>
 #include <openssl/crypto.h>
+#include <openssl/ec.h>
 #include <openssl/err.h>
 #include <openssl/evp.h>
+#include <openssl/objects.h>
 #include <openssl/pem.h>
 #include <openssl/pkcs12.h>
 
-#define PACKAGE_NAME "Crypt::OpenSSL::Base::Func"
+
+MODULE = Crypt::OpenSSL::Base::Func		PACKAGE = Crypt::OpenSSL::Base::Func		
 
 
-MODULE = Crypt::OpenSSL::Base::Func		PACKAGE = Crypt::OpenSSL::Base::Func
-PROTOTYPES: DISABLE
+int OBJ_sn2nid (const char *s)
 
-unsigned char*
-aes_cmac(key_hexstr, msg_hexstr, cipher_name)
-    unsigned char *key_hexstr;
-    unsigned char *msg_hexstr;
-    unsigned char *cipher_name;
-  PREINIT:
-    unsigned char *mac_hexstr;
+EC_GROUP *EC_GROUP_new_by_curve_name(int nid);
+
+const BIGNUM *EC_GROUP_get0_cofactor(const EC_GROUP *group)
+
+int EC_GROUP_get_curve(const EC_GROUP *group, BIGNUM *p, BIGNUM *a, BIGNUM *b, BN_CTX *ctx)
+
+int EC_POINT_set_affine_coordinates(const EC_GROUP *group, EC_POINT *p, const BIGNUM *x, const BIGNUM *y, BN_CTX *ctx)
+
+int EC_POINT_get_affine_coordinates(const EC_GROUP *group, const EC_POINT *p, BIGNUM *x, BIGNUM *y, BN_CTX *ctx)
+
+char *EC_POINT_point2hex(const EC_GROUP *group, const EC_POINT *p, point_conversion_form_t form, BN_CTX *ctx)
+
+EC_POINT *EC_POINT_hex2point(const EC_GROUP *group, const char *hex, EC_POINT *p, BN_CTX *ctx)
+
+
+const EVP_MD *EVP_get_digestbyname(const char *name)
+
+int EVP_MD_size(const EVP_MD *md)
+
+int EVP_MD_block_size(const EVP_MD *md)
+
+
+EC_POINT*
+hex2point(group, point_hex)
+    EC_GROUP *group;
+    const char *point_hex;
   CODE:
-{
-  long key_len;
-  unsigned char *key = OPENSSL_hexstr2buf(key_hexstr, &key_len);
-  
-  long msg_len;
-  unsigned char *msg = OPENSSL_hexstr2buf(msg_hexstr, &msg_len);
+  {
+    BN_CTX *ctx = BN_CTX_new();
 
- const EVP_CIPHER *cipher = EVP_get_cipherbyname(cipher_name);
- 
- size_t block_size = EVP_CIPHER_block_size(cipher);
+    EC_POINT* ec_point = EC_POINT_new(group);
+    ec_point = EC_POINT_hex2point(group, point_hex, ec_point, ctx); 
 
- unsigned char *mact = OPENSSL_malloc(block_size); 
+    BN_CTX_free(ctx);
 
-  CMAC_CTX *ctx = CMAC_CTX_new();
-  CMAC_Init(ctx, key, block_size, cipher, NULL);
- 
-  CMAC_Update(ctx, msg, msg_len);
-  CMAC_Final(ctx, mact, &block_size);
-
-  CMAC_CTX_free(ctx);
-
-  unsigned char* mac_hexstr = OPENSSL_buf2hexstr(mact, block_size);
-
-    OPENSSL_free(key);
-    OPENSSL_free(msg);
-   OPENSSL_free(mact);
-
-    RETVAL = mac_hexstr;
-}
+    RETVAL = ec_point;
+  }
   OUTPUT:
-    RETVAL 
+    RETVAL
 
 
-unsigned char*
+SV*
+digest(self, bin_SV)
+    EVP_MD *self;
+    SV* bin_SV;
+  PREINIT:
+    SV* res;
+    unsigned char* dgst;
+    unsigned int dgst_length;
+    unsigned char* bin;
+    STRLEN bin_length;
+  CODE:
+  {
+    bin = (unsigned char*) SvPV( bin_SV, bin_length );
+    dgst = malloc(EVP_MD_size(self));
+    EVP_Digest(bin, bin_length, dgst, &dgst_length, self, NULL);
+    res = newSVpv(dgst, dgst_length);
+    RETVAL = res;
+  }
+  OUTPUT:
+    RETVAL
+
+
+SV*
 ecdh(local_priv_pem, peer_pub_pem)
     unsigned char *local_priv_pem;
     unsigned char *peer_pub_pem;
   PREINIT:
-    unsigned char *z_hexstr;
+    unsigned char *z;
+    STRLEN zlen;
+    SV* res;
   CODE:
 {
 
@@ -84,8 +114,6 @@ ecdh(local_priv_pem, peer_pub_pem)
 
 
     EVP_PKEY_CTX *ctx;
-    unsigned char *z;
-    size_t zlen;
     ctx = EVP_PKEY_CTX_new(pkey, NULL);
 
     EVP_PKEY_derive_init(ctx);
@@ -98,76 +126,148 @@ ecdh(local_priv_pem, peer_pub_pem)
 
     EVP_PKEY_derive(ctx, z, &zlen);
 
-    unsigned char* z_hexstr = OPENSSL_buf2hexstr(z, zlen);
+  res = newSVpv(z, zlen);
 
-    OPENSSL_free(z);
-
-    RETVAL = z_hexstr;
+      RETVAL = res;
 }
   OUTPUT:
-    RETVAL 
+    RETVAL
 
-unsigned char*
-PKCS12_key_gen(password, salt_hexstr, id, iteration, outlen, digest_name)
-    unsigned char *password;
-    unsigned char *salt_hexstr;
+SV*
+aes_cmac(key_SV, msg_SV, cipher_name)
+    SV *key_SV;
+    SV *msg_SV;
+    unsigned char *cipher_name;
+  PREINIT:
+    unsigned char *key;
+    STRLEN keylen;
+    unsigned char *msg;
+    STRLEN msglen;
+    unsigned char *mac;
+    SV* res;
+  CODE:
+{
+    key = (unsigned char*) SvPV( key_SV, keylen );
+    msg = (unsigned char*) SvPV( msg_SV, msglen );
+
+     const EVP_CIPHER *cipher = EVP_get_cipherbyname(cipher_name);
+     size_t block_size = EVP_CIPHER_block_size(cipher);
+
+     mac = OPENSSL_malloc(block_size); 
+      CMAC_CTX *ctx = CMAC_CTX_new();
+      CMAC_Init(ctx, key, block_size, cipher, NULL);
+     
+      CMAC_Update(ctx, msg, msglen);
+      CMAC_Final(ctx, mac, &block_size);
+
+      CMAC_CTX_free(ctx);
+
+      res = newSVpv(mac, block_size);
+
+      RETVAL = res;
+}
+  OUTPUT:
+      RETVAL
+
+
+SV*
+PKCS12_key_gen(password_SV, salt_SV, id, iteration, outlen, digest_name)
+    SV *password_SV;
+    SV *salt_SV;
     unsigned int id;
     unsigned int iteration;
     unsigned int outlen;
     unsigned char *digest_name;
   PREINIT:
-    unsigned char *out_hexstr;
+    unsigned char *password;
+    STRLEN passlen;
+    unsigned char *salt;
+    STRLEN saltlen;
+    unsigned char *out;
+    SV* res;
   CODE:
 {
-    int passlen = strlen(password);
-
-    long salt_hexstr_len = strlen(salt_hexstr);
-    unsigned char *salt = OPENSSL_hexstr2buf(salt_hexstr, &salt_hexstr_len);
-    int saltlen = strlen(salt);
+    password = (unsigned char*) SvPV( password_SV, passlen );
+    salt = (unsigned char*) SvPV( salt_SV, saltlen );
 
     const EVP_MD *digest = EVP_get_digestbyname(digest_name);
 
     unsigned char *out = OPENSSL_malloc(EVP_MAX_MD_SIZE); 
     PKCS12_key_gen(password, passlen, salt, saltlen, id, iteration, outlen, out, digest);
-    out_hexstr = OPENSSL_buf2hexstr(out, outlen);
+    res = newSVpv(out, outlen);
 
-    OPENSSL_free(salt);
-    OPENSSL_free(out);
-
-    RETVAL = out_hexstr;
+    RETVAL = res;
 }
   OUTPUT:
-    RETVAL 
+    RETVAL
 
 
-
-unsigned char*
-PKCS5_PBKDF2_HMAC(password, salt_hexstr, iteration, digest_name, outlen)
-    unsigned char *password;
-    unsigned char *salt_hexstr;
+SV*
+PKCS5_PBKDF2_HMAC(password_SV, salt_SV, iteration, digest_name, outlen)
+    SV *password_SV;
+    SV *salt_SV;
     unsigned int iteration;
     unsigned char *digest_name;
     unsigned int outlen;
   PREINIT:
-    unsigned char *out_hexstr;
+    unsigned char *password;
+    STRLEN passlen;
+    unsigned char *salt;
+    STRLEN saltlen;
+    unsigned char *out;
+    SV* res;
   CODE:
-{
-    int passlen = strlen(password);
-
-    long salt_hexstr_len = strlen(salt_hexstr);
-    unsigned char *salt = OPENSSL_hexstr2buf(salt_hexstr, &salt_hexstr_len);
-    int saltlen = strlen(salt);
+  {
+    password = (unsigned char*) SvPV( password_SV, passlen );
+    salt = (unsigned char*) SvPV( salt_SV, saltlen );
 
     const EVP_MD *digest = EVP_get_digestbyname(digest_name);
 
-    unsigned char *out = OPENSSL_malloc(outlen); 
+    out = OPENSSL_malloc(outlen); 
     PKCS5_PBKDF2_HMAC(password, passlen, salt, saltlen, iteration, digest, outlen, out);
-    out_hexstr = OPENSSL_buf2hexstr(out, outlen);
+    res = newSVpv(out, outlen);
 
-    OPENSSL_free(salt);
-    OPENSSL_free(out);
+    RETVAL = res;
+  }
+  OUTPUT:
+    RETVAL
 
-    RETVAL = out_hexstr;
+
+unsigned char*
+bn_mod_sqrt(a, p)
+    unsigned char *a;
+    unsigned char *p;
+  PREINIT:
+    unsigned char *s;
+  CODE:
+{
+
+    BN_CTX *ctx;
+    BIGNUM *bn_a, *bn_p, *bn_s, *ret;
+
+    ctx = BN_CTX_new();
+
+    bn_a = BN_new();
+    BN_hex2bn(&bn_a, a); 
+
+    bn_p = BN_new();
+    BN_hex2bn(&bn_p, p);
+
+    bn_s = BN_new();
+    ret = BN_mod_sqrt(bn_s, bn_a, bn_p, ctx);
+
+    if(ret != NULL){
+        s = BN_bn2hex(bn_s);
+    }else{
+        s = "";
+    }
+
+    BN_free(bn_a);
+    BN_free(bn_p);
+    BN_free(bn_s);
+    BN_CTX_free(ctx);
+
+    RETVAL = s;
 }
   OUTPUT:
-    RETVAL 
+    RETVAL

@@ -4,7 +4,7 @@ use warnings;
 
 use Symbol qw<delete_package>;
 use Carp qw<carp croak>;
-use version; our $VERSION = version->declare('v0.1.1');
+use version; our $VERSION = version->declare('v0.2.0');
 use feature qw<say state refaliasing lexical_subs>;
 no warnings "experimental";
 
@@ -14,12 +14,13 @@ use Exporter 'import';
 #use Data::Dumper;
 
 
-our %EXPORT_TAGS = ( 'all' => [ qw( plex) ] );
+our %EXPORT_TAGS = ( 'all' => [ qw( plex plx  block pl plex_clear jmap) ] );
 
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
 our @EXPORT = qw(
 	plex
+	plx
 );
 
 my $Include=qr|\@\{\s*\[\s*include\s*\(\s*(.*?)\s*\)\s*\] \s* \}|x;
@@ -27,6 +28,7 @@ my $Include=qr|\@\{\s*\[\s*include\s*\(\s*(.*?)\s*\)\s*\] \s* \}|x;
 use constant KEY_OFFSET=>0;
 use enum  ("package_=".KEY_OFFSET, qw<sub_>);
 use constant KEY_COUNT=>sub_-package_+1;
+
 
 sub new;	#forward declare new;
 
@@ -63,19 +65,18 @@ $out.=lexical($href);		#add aliased variables	from hash
 $out.='
 	my $prepare=sub {
 		my ($self,undef, $href,%opts)=@_;
-		#$_[0];
-		#my $_data_=\$_[1];
-		#my $href=$_[2];
-		#my %opts=@_;
 		$href//={};
 		\my %fields=$href;
 		';
 	#need this to prevent variables going out of scope
+	#and avoid warnings
 	for my $k (keys %fields){
 		$out.= "1 or \$$k;\n";
 	}
 
 $out.='
+		use Template::Plex qw<pl block plex_clear jmap>;
+		use String::Util qw<:all>;
 		my $ref=eval Template::Plex::bootstrap (@_);
 		if($@ and !$ref){
 			print  $@;
@@ -85,34 +86,42 @@ $out.='
 		$self;
 	};
 
-';
-				#into current lexical scope
-$out.='
+	my %cache;	#Stores code refs using caller as keys
 
-	my sub plex{
-		my ($path, $vars, %opts)=@_;
+	#lexical plex changes the prepare and also reuses options with out making it explicit
+        my sub plex{
+                my ($path, $vars, %opts)=@_;
+
+
+                #unshift @_, $prepare;  #Sub templates now access lexical plex sub routine
+                                        #with access to its scoped $prepare sub and variables
+                my $template=Template::Plex->new($prepare,$path,$vars,%opts?%opts:%options);
+                $template;
+
+
+        }
+	my sub plx {
+		my ($path,$vars,%opts)=@_;
+
+		my $id=$path.join "", caller;
+		$cache{$id} and return $cache{$id}->render;
 		
-		#unshift @_, $prepare;	#Sub templates now access lexical plex sub routine
-					#with access to its scoped $prepare sub and variables
-		my $template=Template::Plex->new($prepare,$path,$vars,%opts?%opts:%options);
-		@_==1
-			?  $template->render
-			: $template;
-
-
+		my $template=&plex;
+		#Template::Plex->new($prepare,$path,$vars,%opts?%opts:%options);
+		#TODO: check for errors
+		
+		$cache{$id}//=$template;
+		$template->render;
+	}
+	my sub plex_clear {
+		%cache=();
 	}
 
-';
-$out.='
 sub {
 	no warnings \'uninitialized\';
 	no strict;
 	my $self=shift;
 	\\my %fields=shift//\\%fields;
-';
-
-
-$out.='
 	qq{'.$_data_.'};
 
 }
@@ -126,11 +135,11 @@ $out;
 # Second argument is a hash ref to default or base level fields
 # returns a code reference which when called renders the template with the values
 sub _prepare_template{
-	my ($self, undef,$href,%opts)=@_;
+	my ($self, undef, $href, %opts)=@_;
 	$href//={};
 	\my %fields=$href;
 
-	my $ref=eval &Template::Plex::bootstrap;
+ 	my $ref=eval &Template::Plex::bootstrap;
 	if($@ and !$ref){
 		print  STDERR "EVAL: ",$@;
 		print  STDERR "EVAL: ",$!;
@@ -169,6 +178,7 @@ sub _munge {
 		#not supported?
 		#
 	}
+
 	plex($path,"",%options);
 }
 
@@ -178,16 +188,48 @@ sub _subst_inject {
 		#TODO: Possible point for diagnostics?
 	};
 }
+sub _block_fix {
+	#remove any new line immediately after a ]} pair
+	\my $buffer=\(shift);
+	while($buffer=~s/^\]\}\n/]}/gms){
+	}
+}
 my $prepare=\&_prepare_template;
 
+#load a template to be rendered later.
+# Compiled once but usable multiple times
 sub plex{
 	my ($path,$vars,%opts)=@_;
 	#unshift @_, $prepare;	#push current top level scope
 	my $template=Template::Plex->new($prepare,$path,$vars,%opts);
-	@_==1
-		?  $template->render
-		: $template;
+	$template;
 }
+
+my %cache; #toplevel cache
+#Load template and render in one call. Easy for on offs
+sub plx {
+	my ($path,$vars,%opts)=@_;
+	my $id=$path.join "", caller;
+	$cache{$id} and "exisiting !" and return $cache{$id}->render;
+	my $template=&plex;
+
+	#TODO: check for errors
+	
+	$cache{$id}//=$template;
+	$template->render;
+}
+
+sub plex_clear {
+	#say join "\n", keys %cache;
+	%cache=();
+}
+
+
+sub block :prototype(&) {
+	$_[0]->();
+	return "";
+}
+*pl=\*block;
 
 
 
@@ -231,17 +273,27 @@ sub new{
 	chomp $data;
 	#Perform inject substitution
 	_subst_inject($data, root=>$root) unless $options{no_include};
+	#Perform suppurfluous EOL removal
+	_block_fix($data) unless $options{no_block_fix};
 	if($args){
 		#Only call this from top level call
 		#Returns the render sub
 
 		state $package=0;
 		$options{package}//="Template::Plex::temp".$package++;#force a unique package if non specified
-		$prepare->($self, $data, $args,%options);	#Prepare in the correct scope
+		$prepare->($self, $data, $args, %options);	#Prepare in the correct scope
 	}
 	else {
 		$data;
 	}
+}
+
+#Join map
+sub jmap :prototype(&@){
+	my $sub=shift;	#block is first
+	my $data=pop;	#Data is last
+	my $delimiter=shift//"";	#delimiter is whats left
+	join $delimiter, map &$sub, ($data//[])->@*;
 }
 
 1;

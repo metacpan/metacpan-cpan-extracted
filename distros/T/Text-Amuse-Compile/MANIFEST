@@ -126,6 +126,7 @@ t/resources/t-a-test.jpeg
 t/resources/t-a-test.jpg
 t/resources/test.png
 t/secondary-footnotes.t
+t/split-volumes.t
 t/strike.t
 t/templates.t
 t/testfile/attachment.png
@@ -148,6 +149,8 @@ t/testfile/index-me.muse
 t/testfile/invalid.muse
 t/testfile/options-2.muse
 t/testfile/slides.muse
+t/testfile/split-volumes-2.muse
+t/testfile/split-volumes.muse
 t/testfile/strike.muse
 t/testfile/test.muse
 t/tex.t

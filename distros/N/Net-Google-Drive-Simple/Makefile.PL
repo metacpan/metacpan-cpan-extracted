@@ -25,8 +25,7 @@ my %WriteMakefileArgs = (
     "Mojolicious" => "4.13",
     "OAuth::Cmdline" => "0.07",
     "Pod::Usage" => "1.36",
-    "Sysadm::Install" => "0.43",
-    "YAML" => "0.71"
+    "Sysadm::Install" => "0.43"
   },
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
@@ -38,9 +37,9 @@ my %WriteMakefileArgs = (
     "Test::MockModule" => "0.171",
     "Test::More" => 0
   },
-  "VERSION" => "0.22",
+  "VERSION" => "3.00",
   "test" => {
-    "TESTS" => "t/*.t"
+    "TESTS" => "t/*.t t/v3/*.t"
   }
 );
 
@@ -61,8 +60,7 @@ my %FallbackPrereqs = (
   "Test2::Tools::Explain" => 0,
   "Test2::V0" => 0,
   "Test::MockModule" => "0.171",
-  "Test::More" => 0,
-  "YAML" => "0.71"
+  "Test::More" => 0
 );
 
 unless ( eval { ExtUtils::MakeMaker->VERSION('6.63_03') } ) {

@@ -40,7 +40,7 @@ diag("Testing hard lock") if $ENV{'TEST_VERBOSE'};
 
 $agent->goto_ticket($inc);
 $agent->follow_link_ok({text => 'Lock', n => '1'}, "Followed 'Lock' link");
-$agent->content_like(qr{<div class="locked-by-you">\s*You have locked this ticket\.}ims, "Added a hard lock on ticket $inc");
+$agent->content_like(qr{<div class="locked-by-you.*">\s*You have locked this ticket\.}ims, "Added a hard lock on ticket $inc");
 my $lock = $inc_obj->Locked();
 ok(($lock->Content->{'Type'} eq 'Hard'), "Lock is a Hard lock");
 
@@ -58,7 +58,7 @@ SKIP: {
     sleep $expire;
 
     $agent->follow_link_ok({text => 'Display', n =>'1'}, "Going back to display page for Incident #$inc");
-    $agent->content_unlike(qr{<div class="locked-by-you">}, "Incident #$inc not locked anymore (lock expired)");
+    $agent->content_unlike(qr{<div class="locked-by-you.*">}, "Incident #$inc not locked anymore (lock expired)");
     ok(!$inc_obj->Locked(), "Lock not in the database");
 
     $agent->follow_link_ok({text => 'Lock', n => '1'}, "Followed 'Lock' link again");
@@ -70,28 +70,28 @@ sleep 5;    #Otherwise, we run the risk of getting "You have locked this ticket"
 ###Testing Reply.html locking###
 
 $agent->follow_link_ok({text => 'Reply to Reporters', n => '1'}, "Followed Reply to Reporters link");
-$agent->content_like(qr{<div class="locked-by-you">\s*You have had this ticket locked for \d+}ims, "Reply to Reporters page is locked");
+$agent->content_like(qr{<div class="locked-by-you.*">\s*You have had this ticket locked for \d+}ims, "Reply to Reporters page is locked");
 $agent->form_number(3);
 $agent->click('SubmitTicket');
 diag("Submitted Reply form") if $ENV{'TEST_VERBOSE'};
-$agent->content_like(qr{<div class="locked-by-you">}, "Incident $inc is still locked");
+$agent->content_like(qr{<div class="locked-by-you.*">}, "Incident $inc is still locked");
 
 
 $agent->follow_link_ok({text => 'Edit', n => '1'}, "Followed Edit link");
 
-$agent->content_like(qr{<div class="locked-by-you">\s*You have had this ticket locked for \d+}ims, "Edit page is locked");
+$agent->content_like(qr{<div class="locked-by-you.*">\s*You have had this ticket locked for \d+}ims, "Edit page is locked");
 
 $agent->form_number(3);
 $agent->submit();
 diag("Submitted Edit form") if $ENV{'TEST_VERBOSE'};
-$agent->content_like(qr{<div class="locked-by-you">}, "Incident $inc is still locked");
+$agent->content_like(qr{<div class="locked-by-you.*">}, "Incident $inc is still locked");
 
 $agent->follow_link_ok({text => 'Unlock', n => '1'}, "Unlocking Incident $inc");
-$agent->content_like(qr{<div class="locked-by-you">\s*You had this ticket locked for \d+ \w+\. It is now unlocked\.}ims, "Incident $inc is not locked");
+$agent->content_like(qr{<div class="locked-by-you.*">\s*You had this ticket locked for \d+ \w+\. It is now unlocked\.}ims, "Incident $inc is not locked");
 $agent->follow_link_ok({text => 'Lock', n => '1'}, "Followed 'Lock' link again");
 sleep 5;    #Otherwise, we run the risk of getting "You have locked this ticket" (see /Elements/ShowLock)
 $agent->follow_link_ok({text => 'Split', n => '1'}, "Followed Split link");
-$agent->content_like(qr{<div class="locked-by-you">\s*You have had this ticket locked for \d+}ims, "Split page is still locked");
+$agent->content_like(qr{<div class="locked-by-you.*">\s*You have had this ticket locked for \d+}ims, "Split page is still locked");
 $agent->form_number(3);
 my $nobody;
 if($agent->content =~ qr{<option.+?value="(\d+)"\s*>Nobody in particular &#40;Nobody&#41;</option>}ims) {
@@ -104,16 +104,16 @@ my $inc_id2;
 if($agent->content =~ qr{<li>Ticket (\d+) created in queue.*</li>}i) {
     $inc_id2 = $1;
 }
-$agent->content_like(qr{<div class="locked-by-you">\s*You have had Ticket #$inc locked for \d+ \w+\.\W+</div>}ims, "Incident $inc is still locked");
+$agent->content_like(qr{<div class="locked-by-you.*">\s*You have had Ticket #$inc locked for \d+ \w+\.\W+</div>}ims, "Incident $inc is still locked");
 display_ticket($agent, $inc);
 $agent->follow_link_ok({text => 'Merge', n => '1'}, "Followed Merge link");
-$agent->content_like(qr{<div class="locked-by-you">\s*You have had this ticket locked for \d+}ims, "Merge page is still locked");
+$agent->content_like(qr{<div class="locked-by-you.*">\s*You have had this ticket locked for \d+}ims, "Merge page is still locked");
 $agent->form_number(3);
 
 $agent->field("SelectedTicket", $inc_id2);
 $agent->submit();
 diag("Submitted Merge form") if $ENV{'TEST_VERBOSE'};
-$agent->content_like(qr{<div class="locked-by-you">\s*You have locked this ticket\.}ims, "Lock from $inc moved to $inc_id2");
+$agent->content_like(qr{<div class="locked-by-you.*">\s*You have locked this ticket\.}ims, "Lock from $inc moved to $inc_id2");
 $inc = $inc_id2;
 $agent->follow_link_ok({text => 'Unlock', n => '1'}, "Removing hard lock on Incident $inc");
 
@@ -125,16 +125,16 @@ diag("Testing auto lock") if $ENV{'TEST_VERBOSE'};
 ###Testing Reply.html locking###
 
 $agent->follow_link_ok({text => 'Reply to Reporters', n => '1'}, "Followed Reply to Reporters link");
-$agent->content_like(qr{<div class="locked-by-you">\s*You have locked this ticket\.}ims, "Reply to Reporters page is locked");
+$agent->content_like(qr{<div class="locked-by-you.*">\s*You have locked this ticket\.}ims, "Reply to Reporters page is locked");
 sleep 5;
 $agent->form_number(3);
 $agent->click('SubmitTicket');
 diag("Submitted Reply form") if $ENV{'TEST_VERBOSE'};
-$agent->content_like(qr{<div class="locked-by-you">\s*You had this ticket locked for \d+ \w+\. It is now unlocked\.}ims, "Incident $inc is still locked");
+$agent->content_like(qr{<div class="locked-by-you.*">\s*You had this ticket locked for \d+ \w+\. It is now unlocked\.}ims, "Incident $inc is still locked");
 
 
 $agent->follow_link_ok({text => 'Edit', n => '1'}, "Followed Edit link");
-$agent->content_like(qr{<div class="locked-by-you">\s*You have locked this ticket}ims, "Edit page is auto locked");
+$agent->content_like(qr{<div class="locked-by-you.*">\s*You have locked this ticket}ims, "Edit page is auto locked");
 # Without this, the lock type doesn't seem to refresh, even on successive calls to Locked()
 $inc_obj->Load($inc);
 $lock = $inc_obj->Locked();
@@ -142,28 +142,28 @@ ok(($lock->Content->{'Type'} eq 'Auto'), "Lock is an Auto lock");
 $agent->form_number(3);
 $agent->submit();
 diag("Submitted Edit form") if $ENV{'TEST_VERBOSE'};
-$agent->content_unlike(qr{<div class="locked-by-you">.+\.It is now unlocked\.}ims, "Incident $inc is not locked");
+$agent->content_unlike(qr{<div class="locked-by-you.*">.+\.It is now unlocked\.}ims, "Incident $inc is not locked");
 
 $agent->follow_link_ok({text => 'Split', n => '1'}, "Followed Split link");
-$agent->content_like(qr{<div class="locked-by-you">\s*You have locked this ticket}ims, "Split page is auto locked");
+$agent->content_like(qr{<div class="locked-by-you.*">\s*You have locked this ticket}ims, "Split page is auto locked");
 $agent->form_number(3);
 $agent->field('Owner', $nobody);
 sleep 5;
 $agent->click('CreateIncident');
 diag("Submitted Split form") if $ENV{'TEST_VERBOSE'};
-$agent->content_like(qr{<div class="locked-by-you">\s*You had Ticket #$inc locked for \d+ \w+. It is now unlocked\.}ims, "Incident $inc is not locked");
+$agent->content_like(qr{<div class="locked-by-you.*">\s*You had Ticket #$inc locked for \d+ \w+. It is now unlocked\.}ims, "Incident $inc is not locked");
 if($agent->content =~ qr{<li>Ticket (\d+) created in queue.*</li>}i) {
     $inc_id2 = $1;
 }
 display_ticket($agent, $inc);
 $agent->follow_link_ok({text => 'Merge', n => '1'}, "Followed Merge link");
-$agent->content_like(qr{<div class="locked-by-you">\s*You have locked this ticket\.}ims, "Merge page is locked");
+$agent->content_like(qr{<div class="locked-by-you.*">\s*You have locked this ticket\.}ims, "Merge page is locked");
 $agent->form_number(3);
 
 $agent->field("SelectedTicket", $inc_id2);
 $agent->submit();
 diag("Submitted Merge form") if $ENV{'TEST_VERBOSE'};
-$agent->content_unlike(qr{<div class="locked-by-you">}ims, "Lock from $inc not moved to $inc_id2");
+$agent->content_unlike(qr{<div class="locked-by-you.*">}ims, "Lock from $inc not moved to $inc_id2");
 $inc = $inc_id2;
 
 $agent->follow_link_ok({text => 'Lock', n => '1'}, "Hard locked to test multi-user lock");
@@ -173,7 +173,7 @@ $agent->follow_link_ok({text => 'Lock', n => '1'}, "Hard locked to test multi-us
 diag("Testing Incident locking from other user's point of view");
 
 display_ticket($root, $inc);
-$root->content_like(qr{<div class="locked">}, "Incident #$inc is locked by another");
+$root->content_like(qr{<div class="locked.*">}, "Incident #$inc is locked by another");
 $root->follow_link_ok({text => 'Break lock', n => '1'}, "Breaking lock on Incident #$inc");
 $root->content_like(qr{<li>You have broken the lock on this ticket</li>}, "Lock on Incident #$inc is broken");
 
@@ -195,7 +195,7 @@ diag("Testing hard lock") if $ENV{'TEST_VERBOSE'};
 
 $agent->goto_ticket($report);
 $agent->follow_link_ok({text => 'Lock', n => '1'}, "Followed 'Lock' link");
-$agent->content_like(qr{<div class="locked-by-you">\s*You have locked this ticket\.}ims, "Added a hard lock on ticket $report");
+$agent->content_like(qr{<div class="locked-by-you.*">\s*You have locked this ticket\.}ims, "Added a hard lock on ticket $report");
 $lock = $ir_obj->Locked();
 ok(($lock->Content->{'Type'} eq 'Hard'), "Lock is a Hard lock");
 
@@ -204,24 +204,24 @@ sleep 5;    #Otherwise, we run the risk of getting "You have locked this ticket"
 ###Testing Update.html locking###
 
 $agent->follow_link_ok({text => 'Comment', n => '1'}, "Followed Comment link");
-$agent->content_like(qr{<div class="locked-by-you">\s*You have had this ticket locked for \d+}ims, "Comment page is locked");
+$agent->content_like(qr{<div class="locked-by-you.*">\s*You have had this ticket locked for \d+}ims, "Comment page is locked");
 $agent->form_number(3);
 $agent->submit();
 diag("Submitted Comment form") if $ENV{'TEST_VERBOSE'};
-$agent->content_like(qr{<div class="locked-by-you">}, "IR $report is still locked");
+$agent->content_like(qr{<div class="locked-by-you.*">}, "IR $report is still locked");
 
 ###Testing Edit.html locking###
 
 $agent->follow_link_ok({text => 'Edit', n => '1'}, "Followed Edit link");
 
-$agent->content_like(qr{<div class="locked-by-you">\s*You have had this ticket locked for \d+}ims, "Edit page is locked");
+$agent->content_like(qr{<div class="locked-by-you.*">\s*You have had this ticket locked for \d+}ims, "Edit page is locked");
 $agent->form_number(3);
 $agent->submit();
 diag("Submitted Edit form") if $ENV{'TEST_VERBOSE'};
-$agent->content_like(qr{<div class="locked-by-you">}, "IR $report is still locked");
+$agent->content_like(qr{<div class="locked-by-you.*">}, "IR $report is still locked");
 
 $agent->follow_link_ok({text => 'Unlock', n => '1'}, "Unlocking IR $report");
-$agent->content_like(qr{<div class="locked-by-you">\s*You had this ticket locked for \d+ \w+\. It is now unlocked\.}ims, "IR $report is not locked");
+$agent->content_like(qr{<div class="locked-by-you.*">\s*You had this ticket locked for \d+ \w+\. It is now unlocked\.}ims, "IR $report is not locked");
 $agent->follow_link_ok({text => 'Lock', n => '1'}, "Followed 'Lock' link again");
 sleep 5;    #Otherwise, we run the risk of getting "You have locked this ticket" (see /Elements/ShowLock)
 
@@ -229,7 +229,7 @@ sleep 5;    #Otherwise, we run the risk of getting "You have locked this ticket"
 ###Testing Split.html locking###
 
 $agent->follow_link_ok({text => 'Split', n => '1'}, "Followed Split link");
-$agent->content_like(qr{<div class="locked-by-you">\s*You have had this ticket locked for \d+}ims, "Split page is still locked");
+$agent->content_like(qr{<div class="locked-by-you.*">\s*You have had this ticket locked for \d+}ims, "Split page is still locked");
 $agent->form_number(3);
 $agent->field('Owner', $nobody);
 $agent->click('Create');
@@ -238,19 +238,19 @@ my $ir_id2;
 if($agent->content =~ qr{<li>Ticket (\d+) created in queue.*</li>}i) {
     $ir_id2 = $1;
 }
-$agent->content_like(qr{<div class="locked-by-you">\s*You have had Ticket #$report locked for \d+ \w+\.\W+</div>}ims, "IR $report is still locked");
+$agent->content_like(qr{<div class="locked-by-you.*">\s*You have had Ticket #$report locked for \d+ \w+\.\W+</div>}ims, "IR $report is still locked");
 
 ###Testing Merge.html locking###
 
 display_ticket($agent, $report);
 $agent->follow_link_ok({text => 'Merge', n => '1'}, "Followed Merge link");
-$agent->content_like(qr{<div class="locked-by-you">\s*You have had this ticket locked for \d+}ims, "Merge page is still locked");
+$agent->content_like(qr{<div class="locked-by-you.*">\s*You have had this ticket locked for \d+}ims, "Merge page is still locked");
 $agent->form_number(3);
 
 $agent->field("SelectedTicket", $ir_id2);
 $agent->submit();
 diag("Submitted Merge form") if $ENV{'TEST_VERBOSE'};
-$agent->content_like(qr{<div class="locked-by-you">}ims, "Lock from $report moved to $ir_id2");
+$agent->content_like(qr{<div class="locked-by-you.*">}ims, "Lock from $report moved to $ir_id2");
 $report = $ir_id2;
 $agent->follow_link_ok({text => 'Unlock', n => '1'}, "Removing hard lock on IR $report");
 
@@ -261,7 +261,7 @@ diag("Testing auto lock") if $ENV{'TEST_VERBOSE'};
 ###Testing Update.html locking###
 
 $agent->follow_link_ok({text => 'Comment', n => '1'}, "Followed Comment link");
-$agent->content_like(qr{<div class="locked-by-you">\s*You have locked this ticket}ims, "Comment page is auto locked");
+$agent->content_like(qr{<div class="locked-by-you.*">\s*You have locked this ticket}ims, "Comment page is auto locked");
 # Without this, the lock type doesn't seem to refresh, even on successive calls to Locked()
 $ir_obj->Load($report);
 $lock = $ir_obj->Locked();
@@ -270,38 +270,38 @@ sleep 5;
 $agent->form_number(3);
 $agent->click('SubmitTicket');
 diag("Submitted Comment form") if $ENV{'TEST_VERBOSE'};
-$agent->content_like(qr{<div class="locked-by-you">.+\. It is now unlocked\.}ims, "IR $report is still locked");
+$agent->content_like(qr{<div class="locked-by-you.*">.+\. It is now unlocked\.}ims, "IR $report is still locked");
 
 
 ###Testing Edit.html locking###
 
 $agent->follow_link_ok({text => 'Edit', n => '1'}, "Followed Edit link");
-$agent->content_like(qr{<div class="locked-by-you">\s*You have locked this ticket}ims, "Edit page is auto locked");
+$agent->content_like(qr{<div class="locked-by-you.*">\s*You have locked this ticket}ims, "Edit page is auto locked");
 $agent->form_number(3);
 sleep 5;
 $agent->click('SaveChanges');
 diag("Submitted Edit form") if $ENV{'TEST_VERBOSE'};
-$agent->content_like(qr{<div class="locked-by-you">.+\. It is now unlocked\.}ims, "IR $report is not locked");
+$agent->content_like(qr{<div class="locked-by-you.*">.+\. It is now unlocked\.}ims, "IR $report is not locked");
 
 $agent->follow_link_ok({text => 'Split', n => '1'}, "Followed Split link");
-$agent->content_like(qr{<div class="locked-by-you">\s*You have locked this ticket}ims, "Split page is auto locked");
+$agent->content_like(qr{<div class="locked-by-you.*">\s*You have locked this ticket}ims, "Split page is auto locked");
 $agent->form_number(3);
 sleep 5;
 $agent->click('Create');
 diag("Submitted Split form") if $ENV{'TEST_VERBOSE'};
-$agent->content_like(qr{<div class="locked-by-you">\s*You had Ticket #$report locked for \d+ \w+. It is now unlocked\.}ims, "IR $report is not locked");
+$agent->content_like(qr{<div class="locked-by-you.*">\s*You had Ticket #$report locked for \d+ \w+. It is now unlocked\.}ims, "IR $report is not locked");
 if($agent->content =~ qr{<li>Ticket (\d+) created in queue.*</li>}i) {
     $ir_id2 = $1;
 }
 display_ticket($agent, $report);
 $agent->follow_link_ok({text => 'Merge', n => '1'}, "Followed Merge link");
-$agent->content_like(qr{<div class="locked-by-you">\s*You have locked this ticket\.}ims, "Merge page is locked");
+$agent->content_like(qr{<div class="locked-by-you.*">\s*You have locked this ticket\.}ims, "Merge page is locked");
 $agent->form_number(3);
 
 $agent->field("SelectedTicket", $ir_id2);
 $agent->submit();
 diag("Submitted Merge form") if $ENV{'TEST_VERBOSE'};
-$agent->content_unlike(qr{<div class="locked-by-you">}ims, "Lock from $report not moved to $ir_id2");
+$agent->content_unlike(qr{<div class="locked-by-you.*">}ims, "Lock from $report not moved to $ir_id2");
 $report = $ir_id2;
 
 #Now we need to set the owner to Nobody so that we can take the ticket for the Take tests
@@ -316,19 +316,19 @@ $agent->content_like(qr{<li>Owner changed from \w+ to Nobody</li>}, "Owner chang
 #Take lock
 diag("Testing take lock") if $ENV{'TEST_VERBOSE'};
 $agent->follow_link_ok({text => 'Take', n => '1'}, "Followed Take link");
-$agent->content_like(qr{<div class="locked-by-you">\s*You have locked this ticket\.}ims, "Got a lock from Taking");
+$agent->content_like(qr{<div class="locked-by-you.*">\s*You have locked this ticket\.}ims, "Got a lock from Taking");
 $ir_obj->Load($report);
 $lock = $ir_obj->Locked();
 ok(($lock->Content->{'Type'} eq 'Take'), "Lock is a Take lock");
 sleep 5;
 $agent->follow_link_ok({text => '[New]', n => '1'}, "Followed New (incident to link to) link");
-$agent->content_like(qr{<div class="locked-by-you">\s*You have had Ticket #$report locked for \d+ \w+\.}, "IR #$report is locked on Create Incident page");
+$agent->content_like(qr{<div class="locked-by-you.*">\s*You have had Ticket #$report locked for \d+ \w+\.}, "IR #$report is locked on Create Incident page");
 $agent->form_number(3);
 $agent->field('Subject', 'Incident linked to Lock Testing IR');
 $agent->click('CreateIncident');
-$agent->content_like(qr{<div class="locked-by-you">\s*You had Ticket #$report locked for \d+ \w+. It is now unlocked\.}ims, "Removed IR #$report Take lock");
+$agent->content_like(qr{<div class="locked-by-you.*">\s*You had Ticket #$report locked for \d+ \w+. It is now unlocked\.}ims, "Removed IR #$report Take lock");
 $agent->goto_ticket($report);
-$agent->content_unlike(qr{<div class="locked-by-you">}ims, "IR #$report is not locked");
+$agent->content_unlike(qr{<div class="locked-by-you.*">}ims, "IR #$report is not locked");
 
 ###Testing linking to existing incident###
 $agent->follow_link_ok({text => '[Unlink]', n => '1'}, "Followed Unlink link");
@@ -351,10 +351,10 @@ $agent->content_like(qr{<li>Owner changed from \w+ to Nobody</li>}, "Owner chang
 
 $agent->goto_ticket($report);
 $agent->follow_link_ok({text => 'Take', n => '1'}, "Followed Take link again");
-$agent->content_like(qr{<div class="locked-by-you">\s*You have locked this ticket\.}ims, "Got a lock from Taking");
+$agent->content_like(qr{<div class="locked-by-you.*">\s*You have locked this ticket\.}ims, "Got a lock from Taking");
 sleep 5;
 $agent->follow_link_ok({text => '[Link]', n => '1'}, "Followed Link (to existing incident) link");
-$agent->content_like(qr{<div class="locked-by-you">\s*You have had this ticket locked for \d+ \w+\.}, "IR still locked on Link To Incident page");
+$agent->content_like(qr{<div class="locked-by-you.*">\s*You have had this ticket locked for \d+ \w+\.}, "IR still locked on Link To Incident page");
 ###Pick a ticket to link to (we don't really care which)
 $agent->content =~ qr{<input type="radio" name="SelectedTicket" value="(\d+)"\s*/>}ims;
 my $inc_to_link_to = $1;
@@ -362,7 +362,7 @@ ok $inc_to_link_to, 'found id of an incident to link to';
 $agent->form_number(3);
 $agent->field('SelectedTicket', $inc_to_link_to);
 $agent->click('LinkChild');
-$agent->content_like(qr{<div class="locked-by-you">\s*You had Ticket #$report locked for \d+ \w+. It is now unlocked\.}ims, "Removed IR #$report Take lock");
+$agent->content_like(qr{<div class="locked-by-you.*">\s*You had Ticket #$report locked for \d+ \w+. It is now unlocked\.}ims, "Removed IR #$report Take lock");
 
 $agent->goto_ticket($report);
 $agent->follow_link_ok({text => 'Lock', n => '1'}, "Hard locked to test multi-user lock");
@@ -374,7 +374,7 @@ diag("Testing IR locking from other user's point of view");
 
 $root->get_ok( '/RTIR/index.html', 'go home');
 display_ticket($root, $report);
-$root->content_like(qr{<div class="locked">}, "IR #$report is locked by another");
+$root->content_like(qr{<div class="locked.*">}, "IR #$report is locked by another");
 $root->follow_link_ok({text => 'Break lock', n => '1'}, "Breaking lock on IR #$report");
 $root->content_like(qr{<li>You have broken the lock on this ticket</li>}, "Lock on IR #$report is broken");
 

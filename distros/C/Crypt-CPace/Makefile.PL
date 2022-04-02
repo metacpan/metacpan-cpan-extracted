@@ -13,13 +13,16 @@ my %WriteMakefileArgs = (
     "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "Crypt-CPace",
-  "LICENSE" => "perl",
+  "LICENSE" => "mozilla",
   "NAME" => "Crypt::CPace",
   "PREREQ_PM" => {
-    "Crypt::OpenSSL::Hash2Curve" => 0,
-    "List::Util" => 0
+    "Crypt::OpenSSL::Bignum" => "0.09",
+    "Crypt::OpenSSL::EC" => "1.31",
+    "Crypt::OpenSSL::Hash2Curve" => "0.021",
+    "List::Util" => "1.55",
+    "bignum" => "0.52"
   },
-  "VERSION" => "0.01",
+  "VERSION" => "0.011",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -27,8 +30,11 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Crypt::OpenSSL::Hash2Curve" => 0,
-  "List::Util" => 0
+  "Crypt::OpenSSL::Bignum" => "0.09",
+  "Crypt::OpenSSL::EC" => "1.31",
+  "Crypt::OpenSSL::Hash2Curve" => "0.021",
+  "List::Util" => "1.55",
+  "bignum" => "0.52"
 );
 
 

@@ -91,7 +91,7 @@ static uint8_t sv_sizes[] = {
 
 static uint8_t svx_sizes[] = {
   /* Header   PTRs   STRs */
-  2,          2,     0,     /* magic */
+  2,          3,     0,     /* magic */
   0,          1,     0,     /* saved SV */
   0,          1,     0,     /* saved AV */
   0,          1,     0,     /* saved HV */
@@ -817,6 +817,7 @@ static void write_sv(DMDContext *ctx, const SV *sv)
         write_svptr(fh, (SV*)mg->mg_ptr);
       else
         write_svptr(fh, NULL);
+      write_svptr(fh, (SV *)mg->mg_virtual); /* Not really an SV */
 
       if(mg->mg_type == PERL_MAGIC_ext &&
          mg->mg_ptr && mg->mg_len != HEf_SVKEY) {
@@ -1205,12 +1206,27 @@ static void dumpfh(FILE *fh)
 #endif
   };
 
-  write_u32(fh, sizeof(roots) / sizeof(roots[0]));
+  AV *moreroots = get_av("Devel::MAT::Dumper::MORE_ROOTS", 0);
+
+  int nroots = sizeof(roots) / sizeof(roots[0]);
+  if(moreroots)
+    nroots += (AvFILL(moreroots)+1) / 2;
+
+  write_u32(fh, nroots);
 
   int i;
   for(i = 0; i < sizeof(roots) / sizeof(roots[0]); i++) {
     write_str(fh, roots[i].name);
     write_svptr(fh, roots[i].ptr);
+  }
+  if(moreroots) {
+    SV **svp = AvARRAY(moreroots);
+    int max = AvFILL(moreroots);
+
+    for(i = 0; i < max; i += 2) {
+      write_str(fh, SvPV_nolen(svp[i]));
+      write_svptr(fh, svp[i+1]);
+    }
   }
 
   // Stack

@@ -6,6 +6,9 @@ use Module::Build;
 my $build = Module::Build->new(
    module_name => 'Devel::MAT',
    requires => {
+      'perl' => '5.014',      # s///r
+      'Syntax::Keyword::Match' => 0,
+
       'Commandable::Invocation' => '0.04', # ->peek_remaining
       'Devel::MAT::Dumper' => '0.35',
       'Feature::Compat::Try' => '0',
@@ -15,7 +18,6 @@ my $build = Module::Build->new(
       'List::Util' => '1.44', # uniq
       'List::UtilsBy' => 0,   # sort_by
       'Module::Pluggable' => 0,
-      'perl' => '5.014',      # s///r
       'String::Tagged' => '0.15', # sprintf
       'String::Tagged::Terminal' => '0.03',
       'Struct::Dumb' => '0.07',

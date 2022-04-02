@@ -3,10 +3,10 @@ use strict;
 use warnings;
 
 use Test::More ;
-use Data::Dump qw/dump/;
+#use Data::Dump qw/dump/;
 
 #use lib '../lib';
-use Digest::SHA qw/sha256/;
+#use Digest::SHA qw/sha256/;
 use List::Util qw/min/;
 use Crypt::OpenSSL::EC;
 use Crypt::OpenSSL::Bignum;

@@ -5,7 +5,7 @@ use warnings;
 use strict;
 use 5.014;
 
-use Term::Form qw();
+use Term::Form::ReadLine qw();
 
 
 sub new {
@@ -34,9 +34,9 @@ sub get_login {
     }
     else {
         my $prompt = ucfirst( $key ) . ': ';
-        my $tf = Term::Form->new( $sf->{i}{tf_default} );
+        my $tr = Term::Form::ReadLine->new( $sf->{i}{tr_default} );
         # Readline
-        my $new = $tf->readline(
+        my $new = $tr->readline(
             $prompt,
             { info => $show_sofar, no_echo => $no_echo }
         );

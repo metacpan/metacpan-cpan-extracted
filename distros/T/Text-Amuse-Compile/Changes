@@ -1,5 +1,10 @@
 Revision history for perl module Text::Amuse::Compile
 
+1.85 2022-03-31
+
+ - EXPERIMENTAL feature: support different volumes in the same PDF
+ - Support \addcontentsline in the magic comments
+
 1.84 2022-03-29
 
  - EXPERIMENTAL feature: Support <ruby>lower|upper</ruby>

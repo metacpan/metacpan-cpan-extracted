@@ -1,5 +1,18 @@
 Revision history for Async-Event-Interval
 
+1.12    2022-03-31
+    - Only remove the Async::Event::Interval protected shared %events hash
+      if it contains any keys (ie. event objects). When running in things
+      like 'plackup', END{} was being called on each browser session close,
+      but there were still objects, so we were trashing the %events
+      infrastructure prematurely
+    - Each unit test file now does pre-and-post segment counts and displays
+      them if PRINT_SEGS env var is true, and the suite itself has a before
+      and after count comparison to ensure the suite leaked no segments or
+      semaphores
+    - Fix issue where we were trying to set a _pid() on an undefined value,
+      causing IPC::Shareable to complain that "Can't STORE on undef val"
+
 1.11    2022-03-09
     - Modified tests to run only on valid CI platforms
 

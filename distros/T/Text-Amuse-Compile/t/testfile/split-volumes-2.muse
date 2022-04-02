@@ -1,0 +1,31 @@
+#author Pippo
+#title Title
+
+; ;;;#subtitle First Part
+
+; :ALL: \addcontentsline{toc}{part}{Volume Primo}
+
+
+** First
+
+Index me again.
+
+*** Second
+
+; ;;;#subtitle Second Part
+
+; :ALL: \addcontentsline{toc}{part}{Volume Secondo}
+
+** Third
+
+Here again.
+
+*** Fourth
+
+<comment>
+INDEX names: *Index*
+again
+Here
+Index
+</comment>
+

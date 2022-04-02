@@ -1,7 +1,7 @@
 package uSAC::MIME;
 use strict;
 use warnings;
-use version; our $VERSION=version->declare("v0.2.1");
+use version; our $VERSION=version->declare("v0.2.2");
 
 #Private storage for the internal database
 my $default_mime_to_ext;
@@ -212,6 +212,7 @@ application/x-xpinstall                          xpi
 application/xhtml+xml                            xhtml
 application/xspf+xml                             xspf
 application/zip                                  zip
+application/gzip				 gz
 
 application/octet-stream                         bin exe dll
 application/octet-stream                         deb

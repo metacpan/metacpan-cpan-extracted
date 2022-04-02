@@ -11,7 +11,7 @@ use ExtUtils::MakeMaker 6.64;
 my %WriteMakefileArgs = (
     NAME     => 'Cookie::Baker::XS',
     DISTNAME => 'Cookie-Baker-XS',
-    VERSION  => '0.11',
+    VERSION  => '0.12',
     EXE_FILES => [glob('script/*'), glob('bin/*')],
     CONFIGURE_REQUIRES => {
   "ExtUtils::MakeMaker" => "6.64"

@@ -64,7 +64,8 @@
             "Term::ReadKey" : "0",
             "Text::CSV_XS" : "0",
             "Time::HiRes" : "0",
-            "URI" : "0",
+            "Time::Local" : "0",
+            "URI" : "1.61",
             "URI::Escape" : "0",
             "URI::URL" : "0",
             "XML::Parser" : "0",
@@ -85,6 +86,6 @@
          "web" : "https://github.com/david-dick/firefox-marionette"
       }
    },
-   "version" : "1.22",
+   "version" : "1.23",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

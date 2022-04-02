@@ -33,7 +33,7 @@ _create_class(pkg, name, ...)
 
       if(cop && !cophh_exists_pvs(CopHINTHASH_get(cop), "Object::Pad/experimental(mop)", 0))
         Perl_ck_warner(aTHX_ packWARN(WARN_EXPERIMENTAL),
-          "Object::Pad::MOP is experimental and may be changed or removed without notice");
+          "The Object::Pad MOP API is experimental and may be changed or removed without notice");
     }
 
     static const char *args[] = {

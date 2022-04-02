@@ -17,6 +17,7 @@
 #include "sv_setrv.c.inc"
 
 #ifdef HAVE_DMD_HELPER
+#  define WANT_DMD_API_044
 #  include "DMD_helper.h"
 #endif
 
@@ -1252,108 +1253,152 @@ static const struct XSParseKeywordHooks kwhooks_requires = {
 };
 
 #ifdef HAVE_DMD_HELPER
-static int dump_fieldmeta(pTHX_ const SV *sv, FieldMeta *fieldmeta)
+static void dump_fieldmeta(pTHX_ DMDContext *ctx, FieldMeta *fieldmeta)
 {
-  int ret = 0;
+  DMD_DUMP_STRUCT(ctx, "Object::Pad/FieldMeta", fieldmeta, sizeof(FieldMeta),
+    6, ((const DMDNamedField []){
+      {"the name SV",          DMD_FIELD_PTR,  .ptr = fieldmeta->name},
+      {"the class",            DMD_FIELD_PTR,  .ptr = fieldmeta->class},
+      {"the default value SV", DMD_FIELD_PTR,  .ptr = mop_field_get_default_sv(fieldmeta)},
+      /* TODO: Maybe hunt for constants in the defaultexpr optree fragment? */
+      {"fieldix",              DMD_FIELD_UINT, .n   = fieldmeta->fieldix},
+      {"the :param name SV",   DMD_FIELD_PTR,  .ptr = fieldmeta->paramname},
+      {"the hooks AV",         DMD_FIELD_PTR,  .ptr = fieldmeta->hooks},
+    })
+  );
+}
 
-  /* Some trickery to generate dynamic labels */
-  const char *name = SvPVX(fieldmeta->name);
-  SV *label = newSV(0);
+static void dump_methodmeta(pTHX_ DMDContext *ctx, MethodMeta *methodmeta)
+{
+  DMD_DUMP_STRUCT(ctx, "Object::Pad/MethodMeta", methodmeta, sizeof(MethodMeta),
+    4, ((const DMDNamedField []){
+      {"the name SV",     DMD_FIELD_PTR,  .ptr = methodmeta->name},
+      {"the class",       DMD_FIELD_PTR,  .ptr = methodmeta->class},
+      {"the origin role", DMD_FIELD_PTR,  .ptr = methodmeta->role},
+      {"is_common",       DMD_FIELD_BOOL, .b   = methodmeta->is_common},
+    })
+  );
+}
 
-  sv_setpvf(label, "the Object::Pad field %s name", name);
-  ret += DMD_ANNOTATE_SV(sv, fieldmeta->name, SvPVX(label));
+static void dump_adjustblock(pTHX_ DMDContext *ctx, AdjustBlock *adjustblock)
+{
+  DMD_DUMP_STRUCT(ctx, "Object::Pad/AdjustBlock", adjustblock, sizeof(AdjustBlock),
+    2, ((const DMDNamedField []){
+      {"is_adjustparams", DMD_FIELD_BOOL, .b   = adjustblock->is_adjustparams},
+      {"the CV",          DMD_FIELD_PTR,  .ptr = adjustblock->cv},
+    })
+  );
+}
 
-  sv_setpvf(label, "the Object::Pad field %s default value", name);
-  ret += DMD_ANNOTATE_SV(sv, mop_field_get_default_sv(fieldmeta), SvPVX(label));
+static void dump_roleembedding(pTHX_ DMDContext *ctx, RoleEmbedding *embedding)
+{
+  DMD_DUMP_STRUCT(ctx, "Object::Pad/RoleEmbedding", embedding, sizeof(RoleEmbedding),
+    4, ((const DMDNamedField []){
+      {"the embedding SV", DMD_FIELD_PTR,  .ptr = embedding->embeddingsv},
+      {"the role",         DMD_FIELD_PTR,  .ptr = embedding->rolemeta},
+      {"the class",        DMD_FIELD_PTR,  .ptr = embedding->classmeta},
+      {"offset",           DMD_FIELD_UINT, .n   = embedding->offset}
+    })
+  );
+}
 
-  /* TODO: Maybe hunt for constants in the defaultexpr optree fragment? */
-
-  if(fieldmeta->paramname) {
-    sv_setpvf(label, "the Object::Pad field %s :param name", name);
-    ret += DMD_ANNOTATE_SV(sv, fieldmeta->paramname, SvPVX(label));
-  }
-
-  /* There's really nothing we can do about 'hooks' as in general we can't
-   * know what the hookfuncs are storing in there 
+static void dump_classmeta(pTHX_ DMDContext *ctx, ClassMeta *classmeta)
+{
+  /* We'll handle the two types of classmeta by claiming two different struct
+   * types
    */
 
-  SvREFCNT_dec(label);
+#define N_COMMON_FIELDS 16
+#define COMMON_FIELDS \
+      {"type",                       DMD_FIELD_U8,   .n   = classmeta->type},            \
+      {"repr",                       DMD_FIELD_U8,   .n   = classmeta->repr},            \
+      {"sealed",                     DMD_FIELD_BOOL, .b   = classmeta->sealed},          \
+      {"start_fieldix",              DMD_FIELD_UINT, .n   = classmeta->start_fieldix},   \
+      {"the name SV",                DMD_FIELD_PTR,  .ptr = classmeta->name},            \
+      {"the stash SV",               DMD_FIELD_PTR,  .ptr = classmeta->stash},           \
+      {"the pending submeta AV",     DMD_FIELD_PTR,  .ptr = classmeta->pending_submeta}, \
+      {"the hooks AV",               DMD_FIELD_PTR,  .ptr = classmeta->hooks},           \
+      {"the direct fields AV",       DMD_FIELD_PTR,  .ptr = classmeta->direct_fields},   \
+      {"the direct methods AV",      DMD_FIELD_PTR,  .ptr = classmeta->direct_methods},  \
+      {"the param map HV",           DMD_FIELD_PTR,  .ptr = classmeta->parammap},        \
+      {"the requiremethods AV",      DMD_FIELD_PTR,  .ptr = classmeta->requiremethods},  \
+      {"the initfields CV",          DMD_FIELD_PTR,  .ptr = classmeta->initfields},      \
+      {"the BUILD blocks AV",        DMD_FIELD_PTR,  .ptr = classmeta->buildblocks},     \
+      {"the ADJUST blocks AV",       DMD_FIELD_PTR,  .ptr = classmeta->adjustblocks},    \
+      {"the temporary method scope", DMD_FIELD_PTR,  .ptr = classmeta->methodscope}
 
-  return ret;
-}
+  switch(classmeta->type) {
+    case METATYPE_CLASS:
+      DMD_DUMP_STRUCT(ctx, "Object::Pad/ClassMeta.class", classmeta, sizeof(ClassMeta),
+        N_COMMON_FIELDS+5, ((const DMDNamedField []){
+          COMMON_FIELDS,
+          {"the supermeta",                         DMD_FIELD_PTR, .ptr = classmeta->cls.supermeta},
+          {"the foreign superclass constructor CV", DMD_FIELD_PTR, .ptr = classmeta->cls.foreign_new},
+          {"the foreign superclass DOES CV",        DMD_FIELD_PTR, .ptr = classmeta->cls.foreign_does},
+          {"the direct roles AV",                   DMD_FIELD_PTR, .ptr = classmeta->cls.direct_roles},
+          {"the embedded roles AV",                 DMD_FIELD_PTR, .ptr = classmeta->cls.embedded_roles},
+        })
+      );
+      break;
 
-static int dump_methodmeta(pTHX_ const SV *sv, MethodMeta *methodmeta)
-{
-  int ret = 0;
+    case METATYPE_ROLE:
+      DMD_DUMP_STRUCT(ctx, "Object::Pad/ClassMeta.role", classmeta, sizeof(ClassMeta),
+        N_COMMON_FIELDS+2, ((const DMDNamedField []){
+          COMMON_FIELDS,
+          {"the superroles AV",           DMD_FIELD_PTR, .ptr = classmeta->role.superroles},
+          {"the role applied classes HV", DMD_FIELD_PTR, .ptr = classmeta->role.applied_classes},
+        })
+      );
+      break;
+  }
 
-  const char *name = SvPVX(methodmeta->name);
-  SV *label = newSV(0);
+#undef COMMON_FIELDS
 
-  sv_setpvf(label, "the Object::Pad method %s name", name);
-  ret += DMD_ANNOTATE_SV(sv, methodmeta->name, SvPVX(label));
-
-  SvREFCNT_dec(label);
-
-  return ret;
-}
-
-static int dump_adjustblock(pTHX_ const SV *sv, AdjustBlock *adjustblock)
-{
-  int ret = 0;
-
-  ret += DMD_ANNOTATE_SV(sv, (SV *)adjustblock->cv, "an Object::Pad adjustblock CV");
-
-  return ret;
-}
-
-static int dumppackage_class(pTHX_ const SV *sv)
-{
   I32 i;
+
+  for(i = 0; i < av_count(classmeta->direct_fields); i++) {
+    FieldMeta *fieldmeta = (FieldMeta *)AvARRAY(classmeta->direct_fields)[i];
+
+    dump_fieldmeta(aTHX_ ctx, fieldmeta);
+  }
+
+  for(i = 0; i < av_count(classmeta->direct_methods); i++) {
+    MethodMeta *methodmeta = (MethodMeta *)AvARRAY(classmeta->direct_methods)[i];
+
+    dump_methodmeta(aTHX_ ctx, methodmeta);
+  }
+
+  for(i = 0; classmeta->adjustblocks && i < av_count(classmeta->adjustblocks); i++) {
+    AdjustBlock *adjustblock = (AdjustBlock *)AvARRAY(classmeta->adjustblocks)[i];
+
+    dump_adjustblock(aTHX_ ctx, adjustblock);
+  }
+
+  switch(classmeta->type) {
+    case METATYPE_CLASS:
+      for(i = 0; i < av_count(classmeta->cls.direct_roles); i++) {
+        RoleEmbedding *embedding = (RoleEmbedding *)AvARRAY(classmeta->cls.direct_roles)[i];
+
+        dump_roleembedding(aTHX_ ctx, embedding);
+      }
+      break;
+
+    case METATYPE_ROLE:
+      /* No need to dump the values of role.applied_classes because any class
+       * they're applied to will have done that already */
+      break;
+  }
+}
+
+static int dumppackage_class(pTHX_ DMDContext *ctx, const SV *sv)
+{
   int ret = 0;
 
   ClassMeta *meta = NUM2PTR(ClassMeta *, SvUV((SV *)sv));
 
-  ret += DMD_ANNOTATE_SV(sv, meta->name, "the Object::Pad class name");
-  ret += DMD_ANNOTATE_SV(sv, (SV *)meta->stash, "the Object::Pad stash");
-  if(meta->pending_submeta)
-    ret += DMD_ANNOTATE_SV(sv, (SV *)meta->pending_submeta, "the Object::Pad pending submeta AV");
+  dump_classmeta(aTHX_ ctx, meta);
 
-  ret += DMD_ANNOTATE_SV(sv, (SV *)meta->direct_fields, "the Object::Pad direct_fields AV");
-  for(i = 0; i < av_count(meta->direct_fields); i++)
-    ret += dump_fieldmeta(aTHX_ sv, (FieldMeta *)AvARRAY(meta->direct_fields)[i]);
-
-  ret += DMD_ANNOTATE_SV(sv, (SV *)meta->direct_methods, "the Object::Pad direct methods AV");
-  for(i = 0; i < av_count(meta->direct_methods); i++)
-    ret += dump_methodmeta(aTHX_ sv, (MethodMeta *)AvARRAY(meta->direct_methods)[i]);
-
-  ret += DMD_ANNOTATE_SV(sv, (SV *)meta->parammap, "the Object::Pad parammap HV");
-
-  ret += DMD_ANNOTATE_SV(sv, (SV *)meta->initfields, "the Object::Pad initfields CV");
-
-  ret += DMD_ANNOTATE_SV(sv, (SV *)meta->buildblocks, "the Object::Pad BUILD blocks AV");
-  /* elems are CVs directly */
-
-  if(meta->adjustblocks) {
-    ret += DMD_ANNOTATE_SV(sv, (SV *)meta->adjustblocks, "the Object::Pad ADJUST blocks AV");
-    for(i = 0; i < av_count(meta->adjustblocks); i++)
-      ret += dump_adjustblock(aTHX_ sv, (AdjustBlock *)AvARRAY(meta->adjustblocks)[i]);
-  }
-
-  ret += DMD_ANNOTATE_SV(sv, (SV *)meta->methodscope, "the Object::Pad temporary method scope");
-
-  switch(meta->type) {
-    case METATYPE_CLASS:
-      if(meta->cls.foreign_new)
-        ret += DMD_ANNOTATE_SV(sv, (SV *)meta->cls.foreign_new, "the Object::Pad foreign superclass constructor CV");
-      if(meta->cls.direct_roles)
-        ret += DMD_ANNOTATE_SV(sv, (SV *)meta->cls.direct_roles, "the Object::Pad direct roles AV");
-      break;
-
-    case METATYPE_ROLE:
-      ret += DMD_ANNOTATE_SV(sv, (SV *)meta->role.superroles, "the Object::Pad role superroles AV");
-      ret += DMD_ANNOTATE_SV(sv, (SV *)meta->role.applied_classes, "the Object::Pad role applied classes HV");
-      break;
-  }
+  ret += DMD_ANNOTATE_SV(sv, (SV *)meta, "the Object::Pad class");
 
   return ret;
 }
@@ -1519,5 +1564,5 @@ BOOT:
 
   register_xs_parse_sublike("method", &parse_method_hooks, (void *)PHASER_NONE);
 
-  ObjectPad__boot_classes();
+  ObjectPad__boot_classes(aTHX);
   ObjectPad__boot_fields(aTHX);

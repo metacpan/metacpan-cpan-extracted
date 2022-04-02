@@ -6,8 +6,7 @@ use warnings;
 use Test::More;
 use Test::Fatal;
 
-use Object::Pad;
-use Object::Pad qw( :experimental(mop) );
+use Object::Pad ':experimental(mop)';
 
 class Example {
    has $field :mutator :param(initial_field) = undef;
@@ -95,20 +94,23 @@ is_deeply( [ $classmeta->fields ], [ $fieldmeta ],
 # Forbid writing to non-scalar fields via ->value
 {
    class List {
-      has @values;
+      has @values :reader;
    }
+
+   my $list = List->new;
 
    my $arrayfieldmeta = Object::Pad::MOP::Class->for_class( "List" )
       ->get_field( '@values' );
 
-   like( exception { no warnings; $arrayfieldmeta->value( List->new ) = [] },
+   like( exception { no warnings; $arrayfieldmeta->value( $list ) = [] },
       qr/^Modification of a read-only value attempted at /,
       'Attempt to set value of list field fails' );
 
    my $e;
-   ok( !defined( $e = exception { @{ $arrayfieldmeta->value( List->new ) } = (1,2,3) } ),
+   ok( !defined( $e = exception { @{ $arrayfieldmeta->value( $list ) } = (1,2,3) } ),
       '->value accessor still works fine' ) or
       diag( "Exception was $e" );
+   is_deeply( [ $list->values ], [ 1,2,3 ], '$list->values after modification via fieldmeta' );
 }
 
 done_testing;

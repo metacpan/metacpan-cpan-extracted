@@ -1,0 +1,67 @@
+NAME
+
+    Devel::MAT::Tool::Object::Pad - extend Devel::MAT to analyse
+    Object::Pad-based programs
+
+DESCRIPTION
+
+    This third-party Devel::MAT tool adds commands and other support to
+    help with analysis of programs that use Object::Pad. Once installed, it
+    is loaded automatically by the pmat shell whenever a dumpfile that uses
+    Object::Pad is loaded.
+
+COMMANDS
+
+ classes
+
+    Prints a list of the Object::Pad classes and roles.
+
+       pmat> classes
+       role ARole at C_STRUCT(Object::Pad/ClassMeta.role) at 0x55d7c17a1550
+       class HashClass at C_STRUCT(Object::Pad/ClassMeta.class) at 0x55d7c1776b70
+       ...
+
+ fields
+
+    Prints the values of all the fields of a given instance of an
+    Object::Pad-based class.
+
+       pmat> fields 0x55d7c173d4b8
+       The field AV ARRAY(3)=NativeClass at 0x55d7c173d4b8
+       Ix Field   Value
+       0  $sfield SCALAR(UV) at 0x55d7c173d938 = 123
+       ...
+
+EXTENSIONS TO COMMANDS
+
+ outrefs, identify, ...
+
+    Outbound references from ARRAY SVs that are the backing fields of
+    object instances will print elements using field names, instead of
+    plain indexes.
+
+       pmat> outrefs 0x55d7c173d4b8
+       s  the $sfield field  SCALAR(UV) at 0x55d7c173d938
+       ...
+    
+       pmat> identify 0x55d7c17606d8
+       REF() at 0x55d7c17606d8 is:
+       └─the %hfield field of ARRAY(3)=NativeClass at 0x55d7c173d4b8, which is:
+       ...
+
+SV METHODS
+
+    This tool adds the following SV methods.
+
+ objectpad_class (STASH)
+
+       $class = $stash->objectpad_class
+
+    If the stash is the package for an Object::Pad-based class, returns the
+    C_STRUCT containing information about the class itself. Otherwise,
+    returns undef.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

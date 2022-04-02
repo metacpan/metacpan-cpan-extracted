@@ -2,27 +2,30 @@ use 5.006;
 use strict;
 use warnings;
 
-use IPC::Shareable;
 use Test::More;
 
 BEGIN {
+    warn "Segs before: " . `ipcs -m | wc -l` . "\n" if $ENV{PRINT_SEGS};
     use_ok( 'Async::Event::Interval' ) || print "Bail out!\n";
 }
+
+use IPC::Shareable;
 
 if (! $ENV{CI_TESTING}) {
     done_testing();
     exit;
 }
 
-tie my %store, 'IPC::Shareable', {key => 'async_tests', destroy => 1};
+tie my %store, 'IPC::Shareable', { key => 'async_tests', destroy => 1 };
 
 my $start_segs = $store{segs};
+
 IPC::Shareable::clean_up_all;
 
-my $segs = IPC::Shareable::ipcs();
+open my $fh, '>', '/tmp/ipc_shareable_ipc_count' or die "Can't open tmp file: $!";
 
-is $segs, $start_segs, "All test segments cleaned up after test run";
+print $fh $start_segs;
 
-print "Started with $start_segs, ending with $segs\n";
+warn "Segs after: " . `ipcs -m | wc -l` . "\n" if $ENV{PRINT_SEGS};
 
 done_testing();

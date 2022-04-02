@@ -10,7 +10,7 @@ WriteMakefile(
 	NAME => 'Hustle::Table',
 	ABSTRACT_FROM => 'lib/Hustle/Table.pod', 
 	VERSION_FROM => 'lib/Hustle/Table.pm',
-	MIN_PERL_VERSION => '5.24.0',		#for switch and ref aliasing
+	MIN_PERL_VERSION => '5.26.0',		#for switch and ref aliasing
 	PREREQ_PM => {
 		enum=>0,
 		"Template::Plex"=>0,

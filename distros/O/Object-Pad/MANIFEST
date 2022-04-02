@@ -83,6 +83,7 @@ t/70mop-custom-fieldattr.t
 t/80async-method.t
 t/80dynamically+Object-Pad.t
 t/81async-method+dynamically.t
+t/82devel-mat-dumper-helper.t
 t/90leak.t
 t/91rt141483.t
 t/92legacy-class-keywords.t

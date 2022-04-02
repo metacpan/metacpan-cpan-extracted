@@ -13,7 +13,7 @@ BEGIN {
         require Win32;
     }
 }
-our $VERSION = '1.22';
+our $VERSION = '1.23';
 
 sub ANY_PORT            { return 0 }
 sub _GETPWUID_DIR_INDEX { return 7 }
@@ -182,6 +182,7 @@ sub new {
         'ignore', 1 );
     $profile->set_value( 'browser.startup.page',                 '0',      0 );
     $profile->set_value( 'browser.tabs.warnOnClose',             'false',  0 );
+    $profile->set_value( 'browser.topsites.contile.enabled',     'false',  0 );
     $profile->set_value( 'browser.warnOnQuit',                   'false',  0 );
     $profile->set_value( 'datareporting.policy.firstRunURL',     q[],      1 );
     $profile->set_value( 'devtools.jsonview.enabled',            'false',  0 );
@@ -472,7 +473,7 @@ Firefox::Marionette::Profile - Represents a prefs.js Firefox Profile
 
 =head1 VERSION
 
-Version 1.22
+Version 1.23
 
 =head1 SYNOPSIS
 

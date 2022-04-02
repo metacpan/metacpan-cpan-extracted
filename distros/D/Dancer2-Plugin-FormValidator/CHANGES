@@ -1,2 +1,28 @@
+0.13 2022-03-31 13:03:59 Europe/Moscow
+    [BUGS]
+    * Fix old token has errors
+
+0.12 2022-03-31 12:24:41 Europe/Moscow
+    [IMPROVEMENTS]
+    * Default template tokens values as HashRef
+
+0.11 2022-03-30 23:15:44 Europe/Moscow
+    [IMPROVEMENTS]
+    * Delete plugin keys in deferred token
+
+0.10 2022-03-30 22:42:14 Europe/Moscow
+    [BUGS]
+    * Fix deferred template tokens bug
+
+    [FEATURES]
+    * Implement old parameters template token
+
+0.02 2022-03-30 19:58:02 Europe/Moscow
+    [BUGS]
+    * Fix before_template hook wrong name
+
+    [DOCS]
+    * Fix typos
+
 0.01 2022-03-30 00:04:12 Europe/Moscow
     Initial

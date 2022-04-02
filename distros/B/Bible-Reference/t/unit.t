@@ -185,17 +185,10 @@ sub books {
 
     $obj->bible('Orthodox');
     @books = $obj->books;
-    is( scalar @books, 78, 'Orthodox book count' );
+    is( scalar @books, 84, 'Orthodox book count' );
     is( $books[0], 'Genesis', 'Orthodox Genesis location' );
     is( $books[1], 'Exodus', 'Orthodox Exodus location' );
     is( $books[-1], 'Revelation', 'Orthodox Revelation location' );
-
-    $obj->bible('Vulgate');
-    @books = $obj->books;
-    is( scalar @books, 73, 'Vulgate book count' );
-    is( $books[0], 'Genesis', 'Vulgate Genesis location' );
-    is( $books[1], 'Exodus', 'Vulgate Exodus location' );
-    is( $books[-1], 'Revelation', 'Vulgate Revelation location' );
 }
 
 sub expand_ranges {
@@ -764,9 +757,9 @@ sub set_bible_data {
 sub get_bible_structure {
     my $structure = $obj->get_bible_structure('Orthodox');
     is( ref($structure), 'ARRAY', 'get_bible_structure returns arrayref' );
-    is( scalar(@$structure), 78, 'get_bible_structure correct size' );
-    is( $structure->[23][0], '4 Maccabees', 'get_bible_structure name correct' );
-    is( scalar( @{ $structure->[23][1] } ), 18, 'get_bible_structure chapters correct' );
+    is( scalar(@$structure), 84, 'get_bible_structure correct size' );
+    is( $structure->[25][0], '4 Maccabees', 'get_bible_structure name correct' );
+    is( scalar( @{ $structure->[23][1] } ), 31, 'get_bible_structure chapters correct' );
 }
 
 sub identify_bible {

@@ -401,9 +401,10 @@ WriteMakefile(
         'Scalar::Util'        => 0,
         'Socket'              => 0,
         'Text::CSV_XS'        => 0,
+        'Time::Local'         => 0,
         'Term::ReadKey'       => 0,
         'Time::HiRes'         => 0,
-        'URI'                 => 0,
+        'URI'                 => 1.61,
         'URI::Escape'         => 0,
         'URI::URL'            => 0,
         (

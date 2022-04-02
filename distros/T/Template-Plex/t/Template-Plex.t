@@ -3,9 +3,13 @@ use warnings;
 
 use Data::Dumper;
 $Data::Dumper::Deparse=1;
-use Test::More tests => 8;
+
+use Test::More tests => 10;
+
 BEGIN { use_ok('Template::Plex') };
+
 use Template::Plex;
+
 my $default_data={data=>[1,2,3,4]};
 
 my $template=q|@{[
@@ -87,18 +91,34 @@ ok $result eq "my name is John not Jill", "Lexical and override access";
 
 
 {
-	my $top_level='top level template recursively using another:@{[plex "sub1.plex"]}';
+	my $top_level='top level template recursively using another:@{[plx "sub1.plex"]}';
 
 	my $t=plex [$top_level], {}, root=> "t";
 	my $text=$t->render;
 	my($first,$last)=split ":", $text;
 	ok $last eq 'Sub template 1', "Recursive plex";
 }
+
 {
-	my $top_level='top level template recursively using another:@{[plex "sub2.plex"]}';
+	my $top_level='top level template recursively using another:@{[plx "sub2.plex"]}';
 	my %vars=(value=>10);
 	my $t=plex [$top_level], \%vars, root=> "t";
 	my $text=$t->render;
 	my($first,$last)=split ":", $text;
 	ok $last eq 'Sub template 2 10', "Recursive plex, top aliased";
+}
+
+{
+	my $top_level='This template is loaded,cached and executed automatically. $value';
+	my %vars=(value=>10);
+	for(10,20){
+		$vars{value}=$_;
+		my $output= plx [$top_level], \%vars;
+		ok $output =~ /$_/, "plx rendering ok";
+	}
+}
+
+
+{
+	
 }

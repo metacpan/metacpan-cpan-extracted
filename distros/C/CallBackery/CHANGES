@@ -1,3 +1,7 @@
+0.41.5 2022-03-31 16:00:42 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - translate button labels
+
 0.41.4 2022-02-15 18:19:07 +0100 Tobias Oetiker <tobi@oetiker.ch>
 
  - card now returns the currently selected field in selectedField and newValue

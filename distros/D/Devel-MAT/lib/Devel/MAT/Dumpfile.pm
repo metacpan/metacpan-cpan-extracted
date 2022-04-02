@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2013-2022 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Dumpfile 0.46;
+package Devel::MAT::Dumpfile 0.47;
 
 use v5.14;
 use warnings;
@@ -106,8 +106,10 @@ foreach (
    $ROOTDESC{$name} = $desc;
 
    # Autogenerate the accessors
-   my $name_at = "${name}_at";
-   my $code = sub { my $self = shift; $self->sv_at( $self->{$name_at} ) };
+   my $code = sub {
+      my $self = shift;
+      $self->{roots}{$name} ? $self->sv_at( $self->{roots}{$name}[0] ) : undef;
+   };
    no strict 'refs';
    *$name = $code;
 }
@@ -223,9 +225,12 @@ sub load
       $self->{uc $_} = $class->new( $self, $addr );
    }
 
+   $self->{roots} = \my %roots;
    foreach ( 1 .. $self->_read_u32 ) {
-      my $root = $self->_read_str;
-      $self->{"${root}_at"} = $self->_read_ptr;
+      my $name = $self->_read_str;
+      my $desc = $ROOTDESC{$name} // $name;
+      $desc =~ m/^[+-]/ or $desc = "+$desc";
+      $roots{$name} = [ $self->_read_ptr, $desc ];
    }
 
    # Stack
@@ -280,8 +285,8 @@ sub _fixup
    my $heap_total = scalar keys %$heap;
 
    # Annotate each root SV
-   foreach my $name ( keys %ROOTDESC ) {
-      my $sv = $self->$name or next;
+   foreach my $name ( keys %{ $self->{roots} } ) {
+      my $sv = $self->root( $name ) or next;
       $sv->{rootname} = $name;
    }
 
@@ -436,7 +441,7 @@ sub _read_sv
             # Legacy format didn't have flags, and didn't distinguish obj from ptr
             # However, the only objs it ever saved were refcounted ones. Lets just
             # pretend all of them are refcounted objects.
-            $sv->more_magic( $type => 0x01, $obj, 0 );
+            $sv->more_magic( $type => 0x01, $obj, 0, 0 );
          }
          elsif( !$sizes ) {
             die sprintf "Unrecognised SV extension type %02x\n", $type;
@@ -701,7 +706,10 @@ that count as strong references.
 sub _roots
 {
    my $self = shift;
-   return map { +$ROOTDESC{$_} => $self->sv_at( $self->{"${_}_at"} ) } @ROOTS;
+   return map {
+      my ( $root_at, $desc ) = @$_;
+      $desc => $self->sv_at( $root_at )
+   } values %{ $self->{roots} };
 }
 
 sub roots
@@ -773,7 +781,41 @@ each of the possible roots.
 sub root_descriptions
 {
    my $self = shift;
-   return map { $_, substr $ROOTDESC{$_}, 1 } @ROOTS;
+   my $roots = $self->{roots};
+   return map {
+      $_ => substr $roots->{$_}[1], 1
+   } keys %$roots;
+}
+
+=head2 root_at
+
+   $addr = $df->root_at( $name )
+
+Returns the SV address of the given named root.
+
+=cut
+
+sub root_at
+{
+   my $self = shift;
+   my ( $name ) = @_;
+
+   return $self->{roots}{$name} ? $self->{roots}{$name}[0] : undef;
+}
+
+=head2 root
+
+   $sv = $df->root( $name )
+
+Returns the given root SV.
+
+=cut
+
+sub root
+{
+   my $self = shift;
+   my $root_at = $self->root_at( @_ ) or return;
+   return $self->sv_at( $root_at );
 }
 
 =head2 heap

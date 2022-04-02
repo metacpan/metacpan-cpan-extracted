@@ -20,6 +20,9 @@ my $at_least_one_success;
 my $terminated;
 my $class;
 
+my $oldfh = select STDOUT; $| = 1; select $oldfh;
+$oldfh = select STDERR; $| = 1; select $oldfh;
+
 if (defined $ENV{WATERFOX}) {
 	$class = 'Waterfox::Marionette';
 	$class->import(qw(:all));
@@ -27,8 +30,24 @@ if (defined $ENV{WATERFOX}) {
 	$class = 'Firefox::Marionette';
 	$class->import(qw(:all));
 }
-if ($ENV{FIREFOX_ALARM}) {
-	alarm 900; # ten minutes is heaps for bulk testing
+my $alarm;
+if (defined $ENV{FIREFOX_ALARM}) {
+	if ($ENV{FIREFOX_ALARM} =~ /^(\d{1,6})\s*$/smx) {
+		($alarm) = ($1);
+		diag("Setting the ALARM value to $alarm");
+		alarm $alarm;
+	} else {
+		die "Invalid value of FIREFOX_ALARM ($ENV{FIREFOX_ALARM})";
+	}
+}
+foreach my $name (qw(FIREFOX_HOST FIREFOX_USER)) {
+	if (exists $ENV{$name}) {
+		if (defined $ENV{$name}) {
+			$ENV{$name} =~ s/\s*$//smx;
+		} else {
+			die "This is just not possible:$name";
+		}
+	}
 }
 
 my $test_time_limit = 90;
@@ -125,6 +144,7 @@ sub start_firefox {
         if (defined $ENV{FIREFOX_DEBUG}) {
 		$parameters{debug} = $ENV{FIREFOX_DEBUG};
         }
+	my $skip_message;
 	if ($ENV{FIREFOX_HOST}) {
 		$parameters{host} = $ENV{FIREFOX_HOST};
 		diag("Overriding host to '$parameters{host}'");
@@ -170,6 +190,10 @@ sub start_firefox {
 				$new{timeouts} = $old->timeouts();
 			}
 			$parameters{capabilities} = Firefox::Marionette::Capabilities->new(%new);
+		}
+		if ($parameters{visible}) {
+			$skip_message = "Firefox visible tests are unreliable on a remote host";
+			return ($skip_message, undef);
 		}
 	}
 	if ($ENV{FIREFOX_PORT}) {
@@ -230,7 +254,6 @@ sub start_firefox {
 		}
 		diag("Overriding firefox visibility");
 	}
-	my $skip_message;
 	if ($segv_detected) {
 		$skip_message = "Previous SEGV detected.  Trying to shutdown tests as fast as possible";
 		return ($skip_message, undef);
@@ -343,18 +366,16 @@ my $binary = 'firefox';
 if ($ENV{FIREFOX_BINARY}) {
 	$binary = $ENV{FIREFOX_BINARY};
 } elsif ( $^O eq 'MSWin32' ) {
-    my $program_files_key;
     foreach my $possible ( 'ProgramFiles(x86)', 'ProgramFiles' ) {
-        if ( $ENV{$possible} ) {
-            $program_files_key = $possible;
+        if (( $ENV{$possible} ) && (-e File::Spec->catfile($ENV{$possible}, 'Mozilla Firefox', 'firefox.exe') )) {
+	    $binary = File::Spec->catfile(
+		$ENV{$possible},
+		'Mozilla Firefox',
+		'firefox.exe'
+	    );
             last;
         }
     }
-    $binary = File::Spec->catfile(
-        $ENV{$program_files_key},
-        'Mozilla Firefox',
-        'firefox.exe'
-    );
 }
 elsif ( $^O eq 'darwin' ) {
     $binary = '/Applications/Firefox.app/Contents/MacOS/firefox';
@@ -635,7 +656,13 @@ SKIP: {
 	$mozilla_pid_support = defined $capabilities->moz_process_id() ? 1 : 0;
 	diag("Firefox BuildID is " . ($capabilities->moz_build_id() || 'Unknown'));
 	diag("Addons are " . ($firefox->addons() ? 'working' : 'disabled'));
-	if (($ENV{RELEASE_TESTING}) && ($major_version >= 52)) {
+	if (($^O eq 'MSWin32') || ($^O eq 'cygwin') || ($^O eq 'darwin') || ($ENV{FIREFOX_NO_UPDATE})) {
+		if ($ENV{FIREFOX_HOST}) {
+			diag("No update checks for $ENV{FIREFOX_HOST}");
+		} else {
+			diag("No update checks for $^O");
+		}
+	} elsif (($ENV{RELEASE_TESTING}) && ($major_version >= 52)) {
 		my $update = $firefox->update();
 		ok(ref $update eq 'Firefox::Marionette::UpdateStatus', "\$firefox->update() produces a Firefox::Marionette::UpdateStatus object");
 		diag("Update status code is " . $update->update_status_code());
@@ -778,8 +805,12 @@ $profile->set_value('browser.pagethumbnails.capturing_disabled', 'false', 0);
 $profile->set_value('startup.homepage_welcome_url', 'false', 0); 
 
 SKIP: {
-	if (($^O eq 'MSWin32') || ($^O eq 'cygwin')) {
-		skip("$^O is not supported for reconnecting yet", 8);
+	if (($^O eq 'MSWin32') || ($^O eq 'cygwin') || ($ENV{FIREFOX_NO_RECONNECT})) {
+		if ($ENV{FIREFOX_HOST}) {
+			skip("$ENV{FIREFOX_HOST} is not supported for reconnecting yet", 8);
+		} else {
+			skip("$^O is not supported for reconnecting yet", 8);
+		}
 	} elsif (!$mozilla_pid_support) {
 		skip("No pid support for this version of firefox", 8);
 	} elsif (!$ENV{RELEASE_TESTING}) {
@@ -832,13 +863,13 @@ SKIP: {
 		my $capabilities = $firefox->capabilities();
 		ok((ref $capabilities) eq 'Firefox::Marionette::Capabilities', "\$firefox->capabilities() returns a Firefox::Marionette::Capabilities object");
 		my $firefox_pid = $capabilities->moz_process_id();
-		ok($firefox_pid, "Firefox process has a process id of $firefox_pid");
-		ok((kill 0, $firefox_pid), "Can contact firefox process ($firefox_pid)");
+		ok($firefox_pid, "Firefox process has a process id of $firefox_pid when using a profile_name");
+		ok((kill 0, $firefox_pid), "Can contact firefox process ($firefox_pid) when using a profile_name");
 		$firefox = undef;
-		ok((kill 0, $firefox_pid), "Can contact firefox process ($firefox_pid)");
+		ok((kill 0, $firefox_pid), "Can contact firefox process ($firefox_pid) when using a profile_name");
 		($skip_message, $firefox) = start_firefox(0, debug => 1, reconnect => 1, profile_name => $name);
-		ok($firefox, "Firefox has reconnected in Marionette mode");
-		ok($firefox_pid == $capabilities->moz_process_id(), "Firefox has the same process id");
+		ok($firefox, "Firefox has reconnected in Marionette mode when using a profile_name");
+		ok($firefox_pid == $capabilities->moz_process_id(), "Firefox has the same process id when using a profile_name");
 		$firefox = undef;
 		ok(!(kill 0, $firefox_pid), "Cannot contact firefox process ($firefox_pid)");
 	}
@@ -890,7 +921,8 @@ SKIP: {
 	my $daemon = HTTP::Daemon->new(LocalAddr => 'localhost') || die "Failed to create HTTP::Daemon";
 	my $localPort = URI->new($daemon->url())->port();
 	my %proxy_parameters = (http => 'localhost:' . $localPort, https => 'proxy.example.org:4343', none => [ 'local.example.org' ], socks => 'socks.example.org:1081');
-	if ((defined $major_version) && ($major_version < 90)) {
+	if ($binary =~ /waterfox/i) {
+	} elsif ((defined $major_version) && ($major_version < 90)) {
 		$proxy_parameters{ftp} = 'ftp.example.org:2121';
 	}
 	my $proxy = Firefox::Marionette::Proxy->new(%proxy_parameters);
@@ -1151,79 +1183,88 @@ SKIP: {
 		skip("TLS test infrastructure seems compromised", 6);
 	}
 	ok($firefox, "Firefox has started in Marionette mode with definable capabilities set to known values");
-	my $shadow_root;
-	my $path = File::Spec->catfile(Cwd::cwd(), qw(t data elements.html));
-	if ($^O eq 'cygwin') {
-		$path = $firefox->execute( 'cygpath', '-s', '-m', $path );
+	if ($major_version < 30) {
+		diag("Skipping WebGL as it can cause older browsers to hang");
+	} elsif ($firefox->script(q[let c = document.createElement('canvas'); return c.getContext('webgl2') ? true : c.getContext('experimental-webgl') ? true : false;])) {
+		diag("WebGL is enabled by default when visible and addons are turned off");
+	} else {
+		diag("WebGL is disabled by default when visible and addons are turned off");
 	}
-	$firefox->go("file://$path");
-	$firefox->find_class('add')->click();
-	my $span = $firefox->has_tag('span');
-	{
-		my $count = 0;
-		my $element = $firefox->script('return arguments[0].children[0]', args => [ $span ]);
-		ok(ref $element eq 'Firefox::Marionette::Element' && $element->tag_name() eq 'button', "\$firefox->has_tag('span') has children and the first child is an Firefox::Marionette::Element with a tag_name of 'button'");
-	}
-	my $custom_square;
-	TODO: {
-		local $TODO = $major_version < 63 ? "Firefox cannot create elements from a shadow root for versions less than 63" : undef;
-		$custom_square = $firefox->has_tag('custom-square');
-		ok(ref $custom_square eq 'Firefox::Marionette::Element', "\$firefox->has_tag('custom-square') returns a Firefox::Marionette::Element");
-		if (ref $custom_square eq 'Firefox::Marionette::Element') {
-			my $element = $firefox->script('return arguments[0].shadowRoot.children[0]', args => [ $custom_square ]);
-			ok(!$span->shadowy(), "\$span->shadowy() returns false");
-			ok($custom_square->shadowy(), "\$custom_square->shadowy() returns true");
-			ok($element->tag_name() eq 'style', "First element from scripted shadowRoot is a style tag");
+	if (!$ENV{FIREFOX_HOST}) {
+		my $shadow_root;
+		my $path = File::Spec->catfile(Cwd::cwd(), qw(t data elements.html));
+		if ($^O eq 'cygwin') {
+			$path = $firefox->execute( 'cygpath', '-s', '-m', $path );
 		}
-	}
-	if ($major_version >= 96) {
-		$shadow_root = $custom_square->shadow_root();
-		ok(ref $shadow_root eq 'Firefox::Marionette::ShadowRoot', "\$firefox->has_tag('custom-square')->shadow_root() returns a Firefox::Marionette::ShadowRoot");
-		my $count = 0;
-		foreach my $element (@{$firefox->script('return arguments[0].children', args => [ $shadow_root ])}) {
-			if ($count == 0) {
-				ok($element->tag_name() eq 'style', "First element from ShadowRoot via script is a style tag");
-			} else {
-				ok($element->tag_name() eq 'div', "Second element from ShadowRoot via script is a div tag");
-			}
-			$count += 1;
-		}
-		ok($count == 2, "\$firefox->has_tag('custom-square')->shadow_root() has 2 children");
-		ok(ref $shadow_root eq 'Firefox::Marionette::ShadowRoot', "\$firefox->has_tag('custom-square')->shadow_root() returns a Firefox::Marionette::ShadowRoot");
+		$firefox->go("file://$path");
+		$firefox->find_class('add')->click();
+		my $span = $firefox->has_tag('span');
 		{
-			my $element = $firefox->script('return arguments[0].children[0]', args => [ $shadow_root ]);
-			ok($element->tag_name() eq 'style', "Element returned from ShadowRoot via script is a style tag");
+			my $count = 0;
+			my $element = $firefox->script('return arguments[0].children[0]', args => [ $span ]);
+			ok(ref $element eq 'Firefox::Marionette::Element' && $element->tag_name() eq 'button', "\$firefox->has_tag('span') has children and the first child is an Firefox::Marionette::Element with a tag_name of 'button'");
 		}
-		$count = 0;
-		foreach my $element (@{$firefox->script('return [ 2, arguments[0].children[0] ]', args => [ $shadow_root ])}) {
-			if ($count == 0) {
-				ok($element == 2, "First element is the numeric 2");
-			} else {
-				ok($element->tag_name() eq 'style', "Second element from ShadowRoot via script is a style tag");
+		my $custom_square;
+		TODO: {
+			local $TODO = $major_version < 63 ? "Firefox cannot create elements from a shadow root for versions less than 63" : undef;
+			$custom_square = $firefox->has_tag('custom-square');
+			ok(ref $custom_square eq 'Firefox::Marionette::Element', "\$firefox->has_tag('custom-square') returns a Firefox::Marionette::Element");
+			if (ref $custom_square eq 'Firefox::Marionette::Element') {
+				my $element = $firefox->script('return arguments[0].shadowRoot.children[0]', args => [ $custom_square ]);
+				ok(!$span->shadowy(), "\$span->shadowy() returns false");
+				ok($custom_square->shadowy(), "\$custom_square->shadowy() returns true");
+				ok($element->tag_name() eq 'style', "First element from scripted shadowRoot is a style tag");
 			}
-			$count += 1;
 		}
-		ok($count == 2, "\$firefox->script() correctly returns an array with 2 elements");
-	}
-	{
-		my $value = $firefox->script('return [2,1]', args => [ $span ]);
-		ok($value->[0] == 2, "Value returned from script is the numeric 2 in an array");
-	}
-	{
-		my $value = $firefox->script('return [2,arguments[0]]', args => [ $span ]);
-		ok(ref $value->[1] eq 'Firefox::Marionette::Element' && $value->[1]->tag_name() eq 'span', "Value returned from script is a Firefox::Mariontte::Element for a 'span' in an array");
-	}
-	{
-		my $value = $firefox->script('return arguments[0]', args => { elem => $span });
-		ok(ref $value->{elem} eq 'Firefox::Marionette::Element' && $value->{elem}->tag_name() eq 'span', "Value returned from script is a Firefox::Mariontte::Element for a 'span' in a hash");
-	}
-	{
-		my $value = $firefox->script('return 2', args => [ $span ]);
-		ok($value == 2, "Value returned from script is the numeric 2");
-	}
-	{
-		my $hash = $firefox->script('return { value: 2 }', args => [ $span ]);
-		ok($hash->{value} == 2, "Value returned from script is the numeric 2 in a hash");
+		if ($major_version >= 96) {
+			$shadow_root = $custom_square->shadow_root();
+			ok(ref $shadow_root eq 'Firefox::Marionette::ShadowRoot', "\$firefox->has_tag('custom-square')->shadow_root() returns a Firefox::Marionette::ShadowRoot");
+			my $count = 0;
+			foreach my $element (@{$firefox->script('return arguments[0].children', args => [ $shadow_root ])}) {
+				if ($count == 0) {
+					ok($element->tag_name() eq 'style', "First element from ShadowRoot via script is a style tag");
+				} else {
+					ok($element->tag_name() eq 'div', "Second element from ShadowRoot via script is a div tag");
+				}
+				$count += 1;
+			}
+			ok($count == 2, "\$firefox->has_tag('custom-square')->shadow_root() has 2 children");
+			ok(ref $shadow_root eq 'Firefox::Marionette::ShadowRoot', "\$firefox->has_tag('custom-square')->shadow_root() returns a Firefox::Marionette::ShadowRoot");
+			{
+				my $element = $firefox->script('return arguments[0].children[0]', args => [ $shadow_root ]);
+				ok($element->tag_name() eq 'style', "Element returned from ShadowRoot via script is a style tag");
+			}
+			$count = 0;
+			foreach my $element (@{$firefox->script('return [ 2, arguments[0].children[0] ]', args => [ $shadow_root ])}) {
+				if ($count == 0) {
+					ok($element == 2, "First element is the numeric 2");
+				} else {
+					ok($element->tag_name() eq 'style', "Second element from ShadowRoot via script is a style tag");
+				}
+				$count += 1;
+			}
+			ok($count == 2, "\$firefox->script() correctly returns an array with 2 elements");
+		}
+		{
+			my $value = $firefox->script('return [2,1]', args => [ $span ]);
+			ok($value->[0] == 2, "Value returned from script is the numeric 2 in an array");
+		}
+		{
+			my $value = $firefox->script('return [2,arguments[0]]', args => [ $span ]);
+			ok(ref $value->[1] eq 'Firefox::Marionette::Element' && $value->[1]->tag_name() eq 'span', "Value returned from script is a Firefox::Mariontte::Element for a 'span' in an array");
+		}
+		{
+			my $value = $firefox->script('return arguments[0]', args => { elem => $span });
+			ok(ref $value->{elem} eq 'Firefox::Marionette::Element' && $value->{elem}->tag_name() eq 'span', "Value returned from script is a Firefox::Mariontte::Element for a 'span' in a hash");
+		}
+		{
+			my $value = $firefox->script('return 2', args => [ $span ]);
+			ok($value == 2, "Value returned from script is the numeric 2");
+		}
+		{
+			my $hash = $firefox->script('return { value: 2 }', args => [ $span ]);
+			ok($hash->{value} == 2, "Value returned from script is the numeric 2 in a hash");
+		}
 	}
 	my $capabilities = $firefox->capabilities();
 	ok((ref $capabilities) eq 'Firefox::Marionette::Capabilities', "\$firefox->capabilities() returns a Firefox::Marionette::Capabilities object");
@@ -1342,7 +1383,7 @@ sub centimetres_to_points {
 
 SKIP: {
 	diag("Starting new firefox for testing logins");
-	($skip_message, $firefox) = start_firefox(0, capabilities => Firefox::Marionette::Capabilities->new(moz_headless => 1));
+	($skip_message, $firefox) = start_firefox(0, addons => 1, capabilities => Firefox::Marionette::Capabilities->new(moz_headless => 1));
 	if (!$skip_message) {
 		$at_least_one_success = 1;
 	}
@@ -1353,6 +1394,13 @@ SKIP: {
 		skip("TLS test infrastructure seems compromised", 4);
 	}
 	ok($firefox, "Firefox has started in Marionette mode with definable capabilities set to known values");
+	if ($major_version < 51) {
+		diag("WebGL does not work and should not as version $major_version is older than 51");
+	} elsif ($firefox->script(q[let c = document.createElement('canvas'); return c.getContext('webgl2') ? true : c.getContext('experimental-webgl') ? true : false;])) {
+		diag("WebGL appears to be enabled in headless mode (with addons => 1)");
+	} else {
+		diag("WebGL appears to be disabled in headless mode (with addons => 1)");
+	}
 	my $capabilities = $firefox->capabilities();
 	ok((ref $capabilities) eq 'Firefox::Marionette::Capabilities', "\$firefox->capabilities() returns a Firefox::Marionette::Capabilities object");
 	if (out_of_time()) {
@@ -1569,14 +1617,32 @@ SKIP: {
 		ok($firefox->delete_login($login), "\$firefox->delete_login() removes the form based login passed directly");
 	}
 	ok(scalar $firefox->logins() == 0, "\$firefox->logins() shows the correct number (0) of records");
-	foreach my $path (qw(t/data/1Passwordv7.csv t/data/bitwarden_export_org.csv t/data/keepass.csv t/data/last_pass_example.csv)) {
+	foreach my $path (qw(t/data/1Passwordv7.csv t/data/bitwarden_export_org.csv t/data/keepass.csv t/data/last_pass_example.csv t/data/keepassxs.csv)) {
 		my $handle = FileHandle->new($path, Fcntl::O_RDONLY()) or die "Failed to open $path:$!";
 		my @logins;
+		my $encoded_username = '!"§$%&/()=?`´²³{[]}\\';
+		my $display_username = $encoded_username;
+		my $utf8_username = Encode::decode('UTF-8', $encoded_username, 1);
+		my $found_utf8_user;
 		foreach my $login (Firefox::Marionette->logins_from_csv($handle)) {
-			ok($login->host() =~ /^https?:\/\/(?:[a-z]+[.])?[a-z]+[.](?:com|net|org)$/smx, "Firefox::Marionette::Login->host() from Firefox::Marionette->logins_from_csv('$path') looks correct:" . Encode::encode('UTF-8', $login->host(), 1));
-			ok($login->user(), "Firefox::Marionette::Login->user() from Firefox::Marionette->logins_from_csv('$path') looks correct:" . Encode::encode('UTF-8', $login->user(), 1));
+			if ($path eq 't/data/keepassxs.csv') {
+				if ($login->user() eq $utf8_username) {
+					$found_utf8_user = 1;
+					my $encoded_password = 'öüäÖÜÄß<>@€µ®“«';
+					my $utf8_password = Encode::decode('UTF-8', $encoded_password, 1);
+					ok($login->password() eq $utf8_password, "$display_username contains a correctly encoded UTF-8 password");
+					ok($login->creation_time() == 1644485034, "$display_username has a creation time of " . gmtime($login->creation_time()));
+					ok($login->password_changed_time() == 1644398823, "$display_username has a password changed time of " . gmtime($login->password_changed_time()));
+				}
+			} else {
+				ok($login->host() =~ /^https?:\/\/(?:[a-z]+[.])?[a-z]+[.](?:com|net|org)$/smx, "Firefox::Marionette::Login->host() from Firefox::Marionette->logins_from_csv('$path') looks correct:" . Encode::encode('UTF-8', $login->host(), 1));
+				ok($login->user(), "Firefox::Marionette::Login->user() from Firefox::Marionette->logins_from_csv('$path') looks correct:" . Encode::encode('UTF-8', $login->user(), 1));
+			}
 			ok($firefox->add_login($login), "\$firefox->add_login() copes with a login from Firefox::Marionette->logins_from_csv('$path') passed directly to it");
 			push @logins, $login;
+		}
+		if ($path eq 't/data/keepassxs.csv') {
+			ok($found_utf8_user, "$path contains a UTF-8 username of $display_username for $path");
 		}
 		ok(scalar @logins, "$path produces Firefox::Marionette::Login records:" . scalar @logins);
 		my %existing;
@@ -1593,12 +1659,25 @@ SKIP: {
 	foreach my $path (qw(t/data/1Passwordv8.1pux)) {
 		my $handle = FileHandle->new($path, Fcntl::O_RDONLY()) or die "Failed to open $path:$!";
 		my @logins;
+		my $encoded_username = 'tésting@au.example.org';
+		my $display_username = $encoded_username;
+		my $utf8_username = Encode::decode('UTF-8', $encoded_username, 1);
+		my $found_utf8_user;
 		foreach my $login (Firefox::Marionette->logins_from_zip($handle)) {
 			ok($login->host() =~ /^https?:\/\/(?:[a-z]+[.])?[a-z]+[.](?:com|net|org)$/smx, "Firefox::Marionette::Login->host() from Firefox::Marionette->logins_from_zip('$path') looks correct:" . Encode::encode('UTF-8', $login->host(), 1));
 			ok($login->user(), "Firefox::Marionette::Login->user() from Firefox::Marionette->logins_from_zip('$path') looks correct:" . Encode::encode('UTF-8', $login->user(), 1));
+			if ($login->user() eq $utf8_username) {
+				$found_utf8_user = 1;
+				my $encoded_password = 'TGe3xQxzZ8t4nfzQ-vpY6@D4GnCQaFTuD3hDe72D3btt!';
+				my $utf8_password = Encode::decode('UTF-8', $encoded_password, 1);
+				ok($login->password() eq $utf8_password, "$display_username contains a correctly encoded UTF-8 password");
+				ok($login->creation_time() == 1641413610, "$display_username has a creation time of " . gmtime($login->creation_time()));
+				ok($login->password_changed_time() == 1641850061, "$display_username has a password changed time of " . gmtime($login->password_changed_time()));
+			}
 			ok($firefox->add_login($login), "\$firefox->add_login() copes with a login from Firefox::Marionette->logins_from_zip('$path') passed directly to it");
 			push @logins, $login;
 		}
+		ok($found_utf8_user, "$path contains a UTF-8 username of $display_username for $path");
 		ok(scalar @logins, "$path produces Firefox::Marionette::Login records:" . scalar @logins);
 		my %existing;
 		foreach my $login ($firefox->logins()) {
@@ -1606,6 +1685,40 @@ SKIP: {
 		}
 		$handle = FileHandle->new($path, Fcntl::O_RDONLY()) or die "Failed to open $path:$!";
 		foreach my $login (Firefox::Marionette->logins_from_zip($handle)) {
+			ok(exists $existing{$login->host()}{$login->user()} && $existing{$login->host()}{$login->user()}->password() eq $login->password(), "\$firefox->logins() produces a matching login after adding record from Firefox::Marionette->logins_from_zip('$path')");
+			ok($firefox->delete_login($login), "\$firefox->delete_login() copes with a login from Firefox::Marionette->logins_from_zip('$path') passed directly to it");
+		}
+	}
+	ok(scalar $firefox->logins() == 0, "\$firefox->logins() shows the correct number (0) of records");
+	foreach my $path (qw(t/data/keepass1.xml)) {
+		my $handle = FileHandle->new($path, Fcntl::O_RDONLY()) or die "Failed to open $path:$!";
+		my @logins;
+		my $encoded_username = '!"§$%&/()=?`´²³{[]}\\';
+		my $display_username = $encoded_username;
+		my $utf8_username = Encode::decode('UTF-8', $encoded_username, 1);
+		my $found_utf8_user;
+		foreach my $login (Firefox::Marionette->logins_from_xml($handle)) {
+			ok($login->host() =~ /^https?:\/\/(?:[a-z]+[.])?[a-z]+[.](?:com|net|org)(?:[:]\d+)?\/?$/smx, "Firefox::Marionette::Login->host() from Firefox::Marionette->logins_from_zip('$path') looks correct:" . Encode::encode('UTF-8', $login->host(), 1));
+			ok($login->user(), "Firefox::Marionette::Login->user() from Firefox::Marionette->logins_from_zip('$path') looks correct:" . Encode::encode('UTF-8', $login->user(), 1));
+			if ($login->user() eq $utf8_username) {
+				$found_utf8_user = 1;
+				my $encoded_password = 'öüäÖÜÄß<>@€µ®“«';
+				my $utf8_password = Encode::decode('UTF-8', $encoded_password, 1);
+				ok($login->password() eq $utf8_password, "$display_username contains a correctly encoded UTF-8 password");
+				ok($login->creation_time() == 1167566157, "$display_username has a creation time of " . gmtime($login->creation_time()));
+				ok($login->password_changed_time() == 1167566166, "$display_username has a password changed time of " . gmtime($login->password_changed_time()));
+			}
+			ok($firefox->add_login($login), "\$firefox->add_login() copes with a login from Firefox::Marionette->logins_from_zip('$path') passed directly to it");
+			push @logins, $login;
+		}
+		ok($found_utf8_user, "$path contains a UTF-8 username of $display_username for $path");
+		ok(scalar @logins, "$path produces Firefox::Marionette::Login records:" . scalar @logins);
+		my %existing;
+		foreach my $login ($firefox->logins()) {
+			$existing{$login->host()}{$login->user()} = $login;
+		}
+		$handle = FileHandle->new($path, Fcntl::O_RDONLY()) or die "Failed to open $path:$!";
+		foreach my $login (Firefox::Marionette->logins_from_xml($handle)) {
 			ok(exists $existing{$login->host()}{$login->user()} && $existing{$login->host()}{$login->user()}->password() eq $login->password(), "\$firefox->logins() produces a matching login after adding record from Firefox::Marionette->logins_from_zip('$path')");
 			ok($firefox->delete_login($login), "\$firefox->delete_login() copes with a login from Firefox::Marionette->logins_from_zip('$path') passed directly to it");
 		}
@@ -1712,9 +1825,9 @@ SKIP: {
 				last GET_HAR;
 			}
 		}
-		if ($^O eq 'cygwin') {
+		if (($^O eq 'cygwin') || ($^O eq 'MSWin32')) {
 			TODO: {
-				local $TODO = "cygwin can fail this test";
+				local $TODO = "$^O can fail this test";
 				ok($correct == 4, "Correct headers have been set");
 			}
 		} else {
@@ -1734,189 +1847,191 @@ SKIP: {
 		skip($skip_message, 247);
 	}
 	ok($firefox, "Firefox has started in Marionette mode without defined capabilities, but with a defined profile and debug turned off");
-	my $path = File::Spec->catfile(Cwd::cwd(), qw(t data elements.html));
-	if ($^O eq 'cygwin') {
-		$path = $firefox->execute( 'cygpath', '-s', '-m', $path );
-	}
-	my $frame_url = "file://$path";
-	my $frame_element = '//iframe[@name="iframe"]';
-	ok($firefox->go($frame_url), "$frame_url has been loaded");
-	if (out_of_time()) {
-		skip("Running out of time.  Trying to shutdown tests as fast as possible", 246);
-	}
-	my $first_window_handle = $firefox->window_handle();
-	if ($major_version < 90) {
-		ok($first_window_handle =~ /^\d+$/, "\$firefox->window_handle() is an integer:" . $first_window_handle);
-	} else {
-		ok($first_window_handle =~ /^$guid_regex$/smx, "\$firefox->window_handle() is a GUID:" . $first_window_handle);
-	}
 	my $chrome_window_handle_supported;
 	eval {
 		$chrome_window_handle_supported = $firefox->chrome_window_handle();
 	} or do {
 		diag("\$firefox->chrome_window_handle is not supported for $major_version.$minor_version.$patch_version:$@");
 	};
-	SKIP: {
-		if (!$chrome_window_handle_supported) {
-			diag("\$firefox->chrome_window_handle is not supported for $major_version.$minor_version.$patch_version");
-			skip("\$firefox->chrome_window_handle is not supported for $major_version.$minor_version.$patch_version", 1);
+	if (!$ENV{FIREFOX_HOST}) {
+		my $path = File::Spec->catfile(Cwd::cwd(), qw(t data elements.html));
+		if ($^O eq 'cygwin') {
+			$path = $firefox->execute( 'cygpath', '-s', '-m', $path );
 		}
+		my $frame_url = "file://$path";
+		my $frame_element = '//iframe[@name="iframe"]';
+		ok($firefox->go($frame_url), "$frame_url has been loaded");
+		if (out_of_time()) {
+			skip("Running out of time.  Trying to shutdown tests as fast as possible", 246);
+		}
+		my $first_window_handle = $firefox->window_handle();
 		if ($major_version < 90) {
-			ok($chrome_window_handle_supported =~ /^\d+$/, "\$firefox->chrome_window_handle() is an integer:" . $chrome_window_handle_supported);
+			ok($first_window_handle =~ /^\d+$/, "\$firefox->window_handle() is an integer:" . $first_window_handle);
 		} else {
-			ok($chrome_window_handle_supported =~ /^$guid_regex$/smx, "\$firefox->chrome_window_handle() is a GUID:" . $chrome_window_handle_supported);
+			ok($first_window_handle =~ /^$guid_regex$/smx, "\$firefox->window_handle() is a GUID:" . $first_window_handle);
 		}
-	}
-        ok($firefox->capabilities()->timeouts()->script() == 5432, "\$firefox->capabilities()->timeouts()->script() correctly reflects the scripts shortcut timeout:" . $firefox->capabilities()->timeouts()->script());
-	SKIP: {
-		if (!$chrome_window_handle_supported) {
-			diag("\$firefox->chrome_window_handle is not supported for $major_version.$minor_version.$patch_version");
-			skip("\$firefox->chrome_window_handle is not supported for $major_version.$minor_version.$patch_version", 2);
-		}
-		if ($major_version < 90) {
-			ok($firefox->chrome_window_handle() == $firefox->current_chrome_window_handle(), "\$firefox->chrome_window_handle() is equal to \$firefox->current_chrome_window_handle()");
-		} else {
-			ok($firefox->chrome_window_handle() eq $firefox->current_chrome_window_handle(), "\$firefox->chrome_window_handle() is equal to \$firefox->current_chrome_window_handle()");
-		}
-		ok(scalar $firefox->chrome_window_handles() == 1, "There is one window/tab open at the moment");
-	}
-	ok(scalar $firefox->window_handles() == 1, "There is one actual window open at the moment");
-	my $original_chrome_window_handle;
-	SKIP: {
-		if (!$chrome_window_handle_supported) {
-			diag("\$firefox->chrome_window_handle is not supported for $major_version.$minor_version.$patch_version");
-			skip("\$firefox->chrome_window_handle is not supported for $major_version.$minor_version.$patch_version", 1);
-		}
-		($original_chrome_window_handle) = $firefox->chrome_window_handles();
-		foreach my $handle ($firefox->chrome_window_handles()) {
+		SKIP: {
+			if (!$chrome_window_handle_supported) {
+				diag("\$firefox->chrome_window_handle is not supported for $major_version.$minor_version.$patch_version");
+				skip("\$firefox->chrome_window_handle is not supported for $major_version.$minor_version.$patch_version", 1);
+			}
 			if ($major_version < 90) {
-				ok($handle =~ /^\d+$/, "\$firefox->chrome_window_handles() returns a list of integers:" . $handle);
+				ok($chrome_window_handle_supported =~ /^\d+$/, "\$firefox->chrome_window_handle() is an integer:" . $chrome_window_handle_supported);
 			} else {
-				ok($handle =~ /^$guid_regex$/, "\$firefox->chrome_window_handles() returns a list of GUIDs:" . $handle);
+				ok($chrome_window_handle_supported =~ /^$guid_regex$/smx, "\$firefox->chrome_window_handle() is a GUID:" . $chrome_window_handle_supported);
 			}
 		}
-	}
-	my ($original_window_handle) = $firefox->window_handles();
-	foreach my $handle ($firefox->window_handles()) {
-		if ($major_version < 90) {
-			ok($handle =~ /^\d+$/, "\$firefox->window_handles() returns a list of integers:" . $handle);
-		} else {
-			ok($handle =~ /^$guid_regex$/, "\$firefox->window_handles() returns a list of integers:" . $handle);
-		}
-	}
-	ok(not($firefox->script('window.open("https://duckduckgo.com", "_blank");')), "Opening new window to duckduckgo.com via 'window.open' script");
-	ok(scalar $firefox->window_handles() == 2, "There are two actual windows open at the moment");
-	my $new_chrome_window_handle;
-	SKIP: {
-		if (!$chrome_window_handle_supported) {
-			diag("\$firefox->chrome_window_handle is not supported for $major_version.$minor_version.$patch_version");
-			skip("\$firefox->chrome_window_handle is not supported for $major_version.$minor_version.$patch_version", 4);
-		}
-		ok(scalar $firefox->chrome_window_handles() == 2, "There are two windows/tabs open at the moment");
-		foreach my $handle ($firefox->chrome_window_handles()) {
+		ok($firefox->capabilities()->timeouts()->script() == 5432, "\$firefox->capabilities()->timeouts()->script() correctly reflects the scripts shortcut timeout:" . $firefox->capabilities()->timeouts()->script());
+		SKIP: {
+			if (!$chrome_window_handle_supported) {
+				diag("\$firefox->chrome_window_handle is not supported for $major_version.$minor_version.$patch_version");
+				skip("\$firefox->chrome_window_handle is not supported for $major_version.$minor_version.$patch_version", 2);
+			}
 			if ($major_version < 90) {
-				ok($handle =~ /^\d+$/, "\$firefox->chrome_window_handles() returns a list of integers:" . $handle);
+				ok($firefox->chrome_window_handle() == $firefox->current_chrome_window_handle(), "\$firefox->chrome_window_handle() is equal to \$firefox->current_chrome_window_handle()");
 			} else {
-				ok($handle =~ /^$guid_regex$/, "\$firefox->chrome_window_handles() returns a list of integers:" . $handle);
+				ok($firefox->chrome_window_handle() eq $firefox->current_chrome_window_handle(), "\$firefox->chrome_window_handle() is equal to \$firefox->current_chrome_window_handle()");
 			}
-			if ($handle ne $original_chrome_window_handle) {
-				$new_chrome_window_handle = $handle;
+			ok(scalar $firefox->chrome_window_handles() == 1, "There is one window/tab open at the moment");
+		}
+		ok(scalar $firefox->window_handles() == 1, "There is one actual window open at the moment");
+		my $original_chrome_window_handle;
+		SKIP: {
+			if (!$chrome_window_handle_supported) {
+				diag("\$firefox->chrome_window_handle is not supported for $major_version.$minor_version.$patch_version");
+				skip("\$firefox->chrome_window_handle is not supported for $major_version.$minor_version.$patch_version", 1);
+			}
+			($original_chrome_window_handle) = $firefox->chrome_window_handles();
+			foreach my $handle ($firefox->chrome_window_handles()) {
+				if ($major_version < 90) {
+					ok($handle =~ /^\d+$/, "\$firefox->chrome_window_handles() returns a list of integers:" . $handle);
+				} else {
+					ok($handle =~ /^$guid_regex$/, "\$firefox->chrome_window_handles() returns a list of GUIDs:" . $handle);
+				}
 			}
 		}
-		ok($new_chrome_window_handle, "New chrome window handle $new_chrome_window_handle detected");
-	}
-	my $new_window_handle;
-	foreach my $handle ($firefox->window_handles()) {
-		if ($major_version < 90) {
-			ok($handle =~ /^\d+$/, "\$firefox->window_handles() returns a list of integers:" . $handle);
-		} else {
-			ok($handle =~ /^$guid_regex$/, "\$firefox->window_handles() returns a list of integers:" . $handle);
-		}
-		if ($handle ne $original_window_handle) {
-			$new_window_handle = $handle;
-		}
-	}
-	ok($new_window_handle, "New window handle $new_window_handle detected");
-	TODO: {
-		my $screen_orientation = q[];
-		eval {
-			$screen_orientation = $firefox->screen_orientation();
-			ok($screen_orientation, "\$firefox->screen_orientation() is " . $screen_orientation);
-		} or do {
-			if (($@->isa('Firefox::Marionette::Exception')) && ($@ =~ /(?:Only supported in Fennec|unsupported operation: Only supported on Android)/)) {
-				local $TODO = "Only supported in Fennec";
-				ok($screen_orientation, "\$firefox->screen_orientation() is " . $screen_orientation);
-			} elsif ($major_version < 60) {
-				my $exception = "$@";
-				chomp $exception;
-				diag("\$firefox->screen_orientation() is unavailable in " . $firefox->browser_version() . ":$exception");
-				local $TODO = "\$firefox->screen_orientation() is unavailable in " . $firefox->browser_version() . ":$exception";
-				ok($screen_orientation, "\$firefox->screen_orientation() is " . $screen_orientation);
-			} else {
-				ok($screen_orientation, "\$firefox->screen_orientation() is " . $screen_orientation);
-			}
-		};
-	}
-	ok($firefox->switch_to_window($original_window_handle), "\$firefox->switch_to_window() used to move back to the original window:$@");
-	TODO: {
-		my $element;
-		eval {
-			$element = $firefox->find($frame_element)->switch_to_shadow_root();
-		};
-		if ($@) {
-			chomp $@;
-			diag("Switch to shadow root is broken:$@");
-		}
-		local $TODO = "Switch to shadow root can be broken";
-		ok($element, "Switched to $frame_element shadow root");
-	}
-	SKIP: {
-		my $switch_to_frame;
-		eval { $switch_to_frame = $firefox->list($frame_element)->switch_to_frame() };
-		if ((!$switch_to_frame) && (($major_version < 50) || ($major_version > 80))) {
-			chomp $@;
-			diag("switch_to_frame is not supported for $major_version.$minor_version.$patch_version:$@");
-			skip("switch_to_frame is not supported for $major_version.$minor_version.$patch_version", 1);
-		}
-		ok($switch_to_frame, "Switched to $frame_element frame");
-	}
-	SKIP: {
-		my $active_frame;
-		eval { $active_frame = $firefox->active_frame() };
-		if ((!$active_frame) && (($major_version < 50) || ($major_version > 80))) {
-			chomp $@;
-			diag("\$firefox->active_frame is not supported for $major_version.$minor_version.$patch_version:$@");
-			skip("\$firefox->active_frame is not supported for $major_version.$minor_version.$patch_version:$@", 1);
-		}
-		ok($active_frame->isa('Firefox::Marionette::Element'), "\$firefox->active_frame() returns a Firefox::Marionette::Element object");
-	}
-	SKIP: {
-		my $switch_to_parent_frame;
-		eval {
-			$switch_to_parent_frame = $firefox->switch_to_parent_frame();
-		};
-		if ((!$switch_to_parent_frame) && ($major_version < 50)) {
-			chomp $@;
-			diag("\$firefox->switch_to_parent_frame is not supported for $major_version.$minor_version.$patch_version:$@");
-			skip("\$firefox->switch_to_parent_frame is not supported for $major_version.$minor_version.$patch_version", 1);
-		}
-		ok($switch_to_parent_frame, "Switched to parent frame");
-	}
-	SKIP: {
-		if (!$chrome_window_handle_supported) {
-			diag("\$firefox->chrome_window_handle is not supported for $major_version.$minor_version.$patch_version");
-			skip("\$firefox->chrome_window_handle is not supported for $major_version.$minor_version.$patch_version", 1);
-		}
-		foreach my $handle ($firefox->close_current_chrome_window_handle()) {
-			local $TODO = $major_version < 52 ? "\$firefox->close_current_chrome_window_handle() can return a undef value for versions less than 52" : undef;
+		my ($original_window_handle) = $firefox->window_handles();
+		foreach my $handle ($firefox->window_handles()) {
 			if ($major_version < 90) {
-				ok(defined $handle && $handle == $new_chrome_window_handle, "Closed original window, which means the remaining chrome window handle should be $new_chrome_window_handle:" . ($handle || ''));
+				ok($handle =~ /^\d+$/, "\$firefox->window_handles() returns a list of integers:" . $handle);
 			} else {
-				ok(defined $handle && $handle eq $new_chrome_window_handle, "Closed original window, which means the remaining chrome window handle should be $new_chrome_window_handle:" . ($handle || ''));
+				ok($handle =~ /^$guid_regex$/, "\$firefox->window_handles() returns a list of integers:" . $handle);
 			}
 		}
+		ok(not($firefox->script('window.open("https://duckduckgo.com", "_blank");')), "Opening new window to duckduckgo.com via 'window.open' script");
+		ok(scalar $firefox->window_handles() == 2, "There are two actual windows open at the moment");
+		my $new_chrome_window_handle;
+		SKIP: {
+			if (!$chrome_window_handle_supported) {
+				diag("\$firefox->chrome_window_handle is not supported for $major_version.$minor_version.$patch_version");
+				skip("\$firefox->chrome_window_handle is not supported for $major_version.$minor_version.$patch_version", 4);
+			}
+			ok(scalar $firefox->chrome_window_handles() == 2, "There are two windows/tabs open at the moment");
+			foreach my $handle ($firefox->chrome_window_handles()) {
+				if ($major_version < 90) {
+					ok($handle =~ /^\d+$/, "\$firefox->chrome_window_handles() returns a list of integers:" . $handle);
+				} else {
+					ok($handle =~ /^$guid_regex$/, "\$firefox->chrome_window_handles() returns a list of integers:" . $handle);
+				}
+				if ($handle ne $original_chrome_window_handle) {
+					$new_chrome_window_handle = $handle;
+				}
+			}
+			ok($new_chrome_window_handle, "New chrome window handle $new_chrome_window_handle detected");
+		}
+		my $new_window_handle;
+		foreach my $handle ($firefox->window_handles()) {
+			if ($major_version < 90) {
+				ok($handle =~ /^\d+$/, "\$firefox->window_handles() returns a list of integers:" . $handle);
+			} else {
+				ok($handle =~ /^$guid_regex$/, "\$firefox->window_handles() returns a list of integers:" . $handle);
+			}
+			if ($handle ne $original_window_handle) {
+				$new_window_handle = $handle;
+			}
+		}
+		ok($new_window_handle, "New window handle $new_window_handle detected");
+		TODO: {
+			my $screen_orientation = q[];
+			eval {
+				$screen_orientation = $firefox->screen_orientation();
+				ok($screen_orientation, "\$firefox->screen_orientation() is " . $screen_orientation);
+			} or do {
+				if (($@->isa('Firefox::Marionette::Exception')) && ($@ =~ /(?:Only supported in Fennec|unsupported operation: Only supported on Android)/)) {
+					local $TODO = "Only supported in Fennec";
+					ok($screen_orientation, "\$firefox->screen_orientation() is " . $screen_orientation);
+				} elsif ($major_version < 60) {
+					my $exception = "$@";
+					chomp $exception;
+					diag("\$firefox->screen_orientation() is unavailable in " . $firefox->browser_version() . ":$exception");
+					local $TODO = "\$firefox->screen_orientation() is unavailable in " . $firefox->browser_version() . ":$exception";
+					ok($screen_orientation, "\$firefox->screen_orientation() is " . $screen_orientation);
+				} else {
+					ok($screen_orientation, "\$firefox->screen_orientation() is " . $screen_orientation);
+				}
+			};
+		}
+		ok($firefox->switch_to_window($original_window_handle), "\$firefox->switch_to_window() used to move back to the original window:$@");
+		TODO: {
+			my $element;
+			eval {
+				$element = $firefox->find($frame_element)->switch_to_shadow_root();
+			};
+			if ($@) {
+				chomp $@;
+				diag("Switch to shadow root is broken:$@");
+			}
+			local $TODO = "Switch to shadow root can be broken";
+			ok($element, "Switched to $frame_element shadow root");
+		}
+		SKIP: {
+			my $switch_to_frame;
+			eval { $switch_to_frame = $firefox->list($frame_element)->switch_to_frame() };
+			if ((!$switch_to_frame) && (($major_version < 50) || ($major_version > 80))) {
+				chomp $@;
+				diag("switch_to_frame is not supported for $major_version.$minor_version.$patch_version:$@");
+				skip("switch_to_frame is not supported for $major_version.$minor_version.$patch_version", 1);
+			}
+			ok($switch_to_frame, "Switched to $frame_element frame");
+		}
+		SKIP: {
+			my $active_frame;
+			eval { $active_frame = $firefox->active_frame() };
+			if ((!$active_frame) && (($major_version < 50) || ($major_version > 80))) {
+				chomp $@;
+				diag("\$firefox->active_frame is not supported for $major_version.$minor_version.$patch_version:$@");
+				skip("\$firefox->active_frame is not supported for $major_version.$minor_version.$patch_version:$@", 1);
+			}
+			ok($active_frame->isa('Firefox::Marionette::Element'), "\$firefox->active_frame() returns a Firefox::Marionette::Element object");
+		}
+		SKIP: {
+			my $switch_to_parent_frame;
+			eval {
+				$switch_to_parent_frame = $firefox->switch_to_parent_frame();
+			};
+			if ((!$switch_to_parent_frame) && ($major_version < 50)) {
+				chomp $@;
+				diag("\$firefox->switch_to_parent_frame is not supported for $major_version.$minor_version.$patch_version:$@");
+				skip("\$firefox->switch_to_parent_frame is not supported for $major_version.$minor_version.$patch_version", 1);
+			}
+			ok($switch_to_parent_frame, "Switched to parent frame");
+		}
+		SKIP: {
+			if (!$chrome_window_handle_supported) {
+				diag("\$firefox->chrome_window_handle is not supported for $major_version.$minor_version.$patch_version");
+				skip("\$firefox->chrome_window_handle is not supported for $major_version.$minor_version.$patch_version", 1);
+			}
+			foreach my $handle ($firefox->close_current_chrome_window_handle()) {
+				local $TODO = $major_version < 52 || $binary =~ /waterfox/i ? "\$firefox->close_current_chrome_window_handle() can return a undef value for versions less than 52" : undef;
+				if ($major_version < 90) {
+					ok(defined $handle && $handle == $new_chrome_window_handle, "Closed original window, which means the remaining chrome window handle should be $new_chrome_window_handle:" . ($handle || ''));
+				} else {
+					ok(defined $handle && $handle eq $new_chrome_window_handle, "Closed original window, which means the remaining chrome window handle should be $new_chrome_window_handle:" . ($handle || ''));
+				}
+			}
+		}
+		ok($firefox->switch_to_window($new_window_handle), "\$firefox->switch_to_window() used to move back to the original window");
 	}
-	ok($firefox->switch_to_window($new_window_handle), "\$firefox->switch_to_window() used to move back to the original window");
 	my $metacpan_uri = 'https://metacpan.org/';
 	ok($firefox->go($metacpan_uri), "$metacpan_uri has been loaded in the new window");
 	if (out_of_time()) {
@@ -2473,6 +2588,7 @@ SKIP: {
 	}
 	ELEMENTS: {
 		foreach my $element (@elements) {
+			diag("Clicking on API link with " . $element->uuid());
 			if ($major_version < 31) {
 				eval {
 					if (($element->is_displayed()) && ($element->is_enabled())) {
@@ -3364,7 +3480,7 @@ _CERT_
 			if (defined $certificate->sha256_fingerprint()) {
 				ok($certificate->sha256_fingerprint(), Encode::encode('UTF-8', display_name($certificate)) . " has a sha256_fingerprint of " . $certificate->sha256_fingerprint());
 			} else {
-				ok(1, Encode::encode('UTF-8', display_name($certificate)) . " has a sha256_fingerprint of " . $certificate->sha256_fingerprint());
+				ok(1, Encode::encode('UTF-8', display_name($certificate)) . ' does not have a sha256_fingerprint');
 			}
 			ok($certificate->subject_name(), Encode::encode('UTF-8', display_name($certificate)) . " has a subject_name of " . Encode::encode('UTF-8', $certificate->subject_name()));
 			if (defined $certificate->key_usages()) {
@@ -3412,11 +3528,10 @@ sub check_for_window {
 SKIP: {
 	diag("Starting new firefox for testing \%ENV proxy, min/maxing and killing firefox");
 	local %ENV = %ENV;
-	my $localPort = 8080;
-	$ENV{http_proxy} = 'https://localhost:' . $localPort;
-	$ENV{https_proxy} = 'https://proxy2.example.org:4343';
+	$ENV{http_proxy} = 'http://localhost:8080';
+	$ENV{https_proxy} = 'http://proxy2.example.org:4343';
 	$ENV{ftp_proxy} = 'ftp://ftp2.example.org:2121';
-	($skip_message, $firefox) = start_firefox(1, visible => 1, width => 800, height => 600);
+	($skip_message, $firefox) = start_firefox(1, addons => 1, visible => 1, width => 800, height => 600);
 	if (!$skip_message) {
 		$at_least_one_success = 1;
 	}
@@ -3453,13 +3568,28 @@ SKIP: {
 	ok((ref $capabilities) eq 'Firefox::Marionette::Capabilities', "\$firefox->capabilities() returns a Firefox::Marionette::Capabilities object");
 	ok(!$capabilities->moz_headless(), "\$capabilities->moz_headless() is set to false");
 	diag("Final Browser version is " . $capabilities->browser_version());
+	if ($major_version >= 51) {
+		SKIP: {
+			local $TODO = (($major_version > 70) && (!$ENV{FIREFOX_HOST}) && (!$ENV{SSH_CONNECTION})) ? '' : "WebGL should be okay after 51, but can be unstable for specific versions like 65.0.2 or over a remote session";
+			my $webgl2 = $firefox->script(q[return document.createElement('canvas').getContext('webgl2') ? true : false;]);
+			my $experimental = $firefox->script(q[return document.createElement('canvas').getContext('experimental-webgl') ? true : false;]);
+			ok($webgl2 || $experimental, "WebGL is enabled for this browser");
+			if ($webgl2) {
+				diag("WebGL (webgl2) is working correctly for " . $capabilities->browser_version() . " on $^O");
+			} elsif ($experimental) {
+				diag("WebGL (experimental) is working correctly for " . $capabilities->browser_version() . " on $^O");
+			} else {
+				diag("WebGL is NOT working correctly for " . $capabilities->browser_version() . " on $^O");
+			}
+		}
+	}
 	SKIP: {
 		if (!$capabilities->proxy()) {
 			diag("\$capabilities->proxy is not supported for " . $capabilities->browser_version());
 			skip("\$capabilities->proxy is not supported for " . $capabilities->browser_version(), 4);
 		}
 		ok($capabilities->proxy()->type() eq 'manual', "\$capabilities->proxy()->type() is 'manual'");
-		ok($capabilities->proxy()->http() eq 'localhost:' . $localPort, "\$capabilities->proxy()->http() is 'localhost:" . $localPort . "':" . $capabilities->proxy()->http());
+		ok($capabilities->proxy()->http() eq 'localhost:8080', "\$capabilities->proxy()->http() is 'localhost:8080':" . $capabilities->proxy()->http());
 		ok($capabilities->proxy()->https() eq 'proxy2.example.org:4343', "\$capabilities->proxy()->https() is 'proxy2.example.org:4343'");
 		if ($major_version < 90) {
 			ok($capabilities->proxy()->ftp() eq 'ftp2.example.org:2121', "\$capabilities->proxy()->ftp() is 'ftp2.example.org:2121'");
@@ -3586,5 +3716,11 @@ eval { $class->new(); };
 my $output = "$@";
 chomp $output;
 ok($@->isa('Firefox::Marionette::Exception'), "When File::Temp::newdir is forced to fail, a Firefox::Marionette::Exception is thrown:$output");
-
+my $total_run_time = time - $^T;
+if (defined $alarm) {
+	my $remaining_time = ($alarm - $total_run_time);
+	diag("Total runtime is " . $total_run_time . " seconds (remaining time before alarm of $alarm is $remaining_time)");
+} else {
+	diag("Total runtime is " . $total_run_time . " seconds");
+}
 done_testing();

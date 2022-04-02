@@ -52,10 +52,11 @@
             "Scalar::Util" : "0",
             "Spreadsheet::Read" : "0",
             "String::Unescape" : "0",
-            "Term::Choose" : "1.743",
-            "Term::Choose::Util" : "0.132",
-            "Term::Form" : "0.539",
-            "Term::TablePrint" : "0.148",
+            "Term::Choose" : "1.747",
+            "Term::Choose::Util" : "0.133",
+            "Term::Form" : "0.543",
+            "Term::Form::ReadLine" : "0.543",
+            "Term::TablePrint" : "0.149",
             "Text::CSV" : "0",
             "bytes" : "0",
             "open" : "0",
@@ -73,7 +74,7 @@
          "web" : "https://github.com/kuerbis/App-DBBrowser"
       }
    },
-   "version" : "2.294",
+   "version" : "2.295",
    "x_bugtracker" : {
       "web" : "https://github.com/kuerbis/App-DBBrowser/issues"
    },

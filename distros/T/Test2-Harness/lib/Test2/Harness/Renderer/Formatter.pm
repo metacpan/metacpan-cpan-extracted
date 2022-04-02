@@ -2,7 +2,7 @@ package Test2::Harness::Renderer::Formatter;
 use strict;
 use warnings;
 
-our $VERSION = '1.000114';
+our $VERSION = '1.000116';
 
 use Carp qw/croak/;
 
@@ -21,6 +21,7 @@ use Test2::Harness::Util::HashBase qw{
     -show_job_info
     -show_job_launch
     -show_job_end
+    -do_step
 };
 
 sub init {
@@ -54,7 +55,15 @@ sub init {
         no_wrap  => $settings->display->no_wrap,
     );
 
+    $self->{+DO_STEP} = $self->{+FORMATTER}->can('step') ? 1 : 0;
+
     $self->{+SHOW_JOB_END} = 1 unless defined $self->{+SHOW_JOB_END};
+}
+
+sub step {
+    my $self = shift;
+    return unless $self->{+DO_STEP};
+    $self->{+FORMATTER}->step;
 }
 
 sub render_event {

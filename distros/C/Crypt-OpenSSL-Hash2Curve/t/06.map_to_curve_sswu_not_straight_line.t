@@ -4,7 +4,8 @@ use warnings;
 use Test::More ;
 use Crypt::OpenSSL::EC;
 use Crypt::OpenSSL::Bignum;
-use Crypt::OpenSSL::Hash2Curve qw/EC_GROUP_get_curve OBJ_sn2nid map_to_curve_sswu_not_straight_line/;
+use Crypt::OpenSSL::Base::Func;
+use Crypt::OpenSSL::Hash2Curve;
 
 my $group_name = "prime256v1";
 my $nid = OBJ_sn2nid($group_name);

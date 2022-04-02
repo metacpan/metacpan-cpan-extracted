@@ -1,0 +1,30 @@
+use strict;
+use warnings;
+use alienfile;
+ 
+my $on_windows = $^O eq 'MSWin32';
+
+plugin 'Probe::CommandLine' => (
+  command => 'patchelf',
+);
+ 
+share {
+  #die 'Cannot run a share install on windows' if 'Alien::Build'->install_type('share');
+
+  plugin 'Download::GitHub' => (
+    github_user => 'NixOS',
+    github_repo => 'patchelf',
+  );
+  plugin Extract => 'tar.gz';
+  requires 'Alien::Autotools';
+  plugin 'Build::Autoconf';
+  if ($on_windows) {
+    plugin 'Build::MSYS';
+  }
+  build [
+    'sh ./bootstrap.sh',  #  windows needs explicit shell call
+    '%{configure}',
+    '%{make}',
+    '%{make} install',
+  ];
+};

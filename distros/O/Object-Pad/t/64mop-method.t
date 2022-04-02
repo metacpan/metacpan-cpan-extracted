@@ -6,8 +6,7 @@ use warnings;
 use Test::More;
 use Test::Fatal;
 
-use Object::Pad;
-use Object::Pad qw( :experimental(mop) );
+use Object::Pad ':experimental(mop)';
 
 class Example {
    method m { }

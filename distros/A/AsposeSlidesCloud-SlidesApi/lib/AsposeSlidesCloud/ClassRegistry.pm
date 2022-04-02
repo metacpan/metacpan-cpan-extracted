@@ -116,7 +116,9 @@ my %hierarchy = (
     'Slide' => 'ResourceBase',
     'SlideAnimation' => 'ResourceBase',
     'SlideBackground' => 'ResourceBase',
+    'SlideComment' => 'SlideCommentBase',
     'SlideComments' => 'ResourceBase',
+    'SlideModernComment' => 'SlideCommentBase',
     'SlideProperties' => 'ResourceBase',
     'Slides' => 'ResourceBase',
     'SolidFill' => 'FillFormat',
@@ -173,6 +175,7 @@ my %determiners = (
     'BlurEffect' => {  },
     'Camera' => {  },
     'ChartCategory' => {  },
+    'ChartLinesFormat' => {  },
     'ChartTitle' => {  },
     'ChartWall' => {  },
     'CommonSlideViewProperties' => {  },
@@ -191,6 +194,7 @@ my %determiners = (
     'FilesUploadResult' => {  },
     'FillFormat' => {  },
     'FillOverlayEffect' => {  },
+    'FontFallbackRule' => {  },
     'FontSet' => {  },
     'GeometryPath' => {  },
     'GeometryPaths' => {  },
@@ -230,8 +234,9 @@ my %determiners = (
     'ShapeExportFormat' => {  },
     'ShapeImageExportOptions' => {  },
     'ShapeThumbnailBounds' => {  },
+    'ShapeType' => {  },
     'ShapesAlignmentType' => {  },
-    'SlideComment' => {  },
+    'SlideCommentBase' => {  },
     'SlideExportFormat' => {  },
     'SmartArtNode' => {  },
     'SoftEdgeEffect' => {  },
@@ -242,6 +247,7 @@ my %determiners = (
     'TableColumn' => {  },
     'TableRow' => {  },
     'Task' => {  },
+    'TextBounds' => {  },
     'TextFrameFormat' => {  },
     'TextItem' => {  },
     'ThreeDFormat' => {  },
@@ -328,7 +334,9 @@ my %determiners = (
     'Slide' => {  },
     'SlideAnimation' => {  },
     'SlideBackground' => {  },
+    'SlideComment' => { 'Type' => 'Regular', },
     'SlideComments' => {  },
+    'SlideModernComment' => { 'Type' => 'Modern', },
     'SlideProperties' => {  },
     'Slides' => {  },
     'SolidFill' => { 'Type' => 'Solid', },
@@ -419,7 +427,10 @@ sub is_instance_of {
     if (!exists $determiners{$name} || !keys %{$determiners{$name}}) {
         return 0;
     }
-    my $data_decoded = decode_json($data);
+    my $data_decoded = $data;
+    if (ref $data ne "HASH") {
+        $data_decoded = decode_json($data);
+    }
     for(keys %{$determiners{$name}}) {
         if (!$self->value_exists($_, ${$determiners{$name}}{$_}, $data_decoded)) {
             return 0;

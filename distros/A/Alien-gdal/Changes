@@ -1,5 +1,9 @@
 Revision history for Alien::gdal
 
+1.29 2022-04-02
+    - share builds: update rpaths of binaries on unix operating systems
+      so dependent .so files are found
+
 1.28 2022-03-19
     - share builds config: explicitly set optimisation flags
 

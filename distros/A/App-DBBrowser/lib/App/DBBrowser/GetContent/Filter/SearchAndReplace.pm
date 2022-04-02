@@ -499,7 +499,7 @@ sub __from_form_to_sr_group_data {
 sub __get_entry_name {
     my ( $sf, $info, $prompt, $saved, $sr_group, $name ) = @_;
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
-    my $tf = Term::Form->new( $sf->{i}{tf_default} );
+    my $tr = Term::Form::ReadLine->new( $sf->{i}{tr_default} );
     my $name_default = $name;
     if ( ! length $name && @$sr_group < 3 ) {
         $name_default = join ' ', _stringified_code( $sr_group );
@@ -508,7 +508,7 @@ sub __get_entry_name {
 
     NAME: while ( 1 ) {
         # Readline
-        my $new_name = $tf->readline(
+        my $new_name = $tr->readline(
             $prompt,
             { info => $info, default => $name_default }
         );

@@ -2,22 +2,24 @@ use 5.006;
 use strict;
 use warnings;
 
-use IPC::Shareable;
 use Test::More;
 
+my $segs;
+
 BEGIN {
+    if (! $ENV{CI_TESTING}) {
+        plan skip_all => "Not on a legit CI platform...";
+    }
+    $segs = `ipcs -m | wc -l`;
+    warn "Segs before: " . `ipcs -m | wc -l` . "\n" if $ENV{PRINT_SEGS};
+
     use_ok( 'Async::Event::Interval' ) || print "Bail out!\n";
 }
 
+use Async::Event::Interval;
+use IPC::Shareable;
+
 diag( "Testing Async::Event::Interval $Async::Event::Interval::VERSION, Perl $], $^X" );
-
-if (! $ENV{CI_TESTING}) {
-    done_testing();
-    exit;
-}
-
-
-my $segs = IPC::Shareable::ipcs();
 
 print "Starting with $segs segments\n";
 
@@ -27,5 +29,9 @@ print "Starting with $segs segments\n";
 tie my %store, 'IPC::Shareable', {key => 'async_tests', create => 1};
 
 $store{segs} = $segs;
+
+warn "Segs After: " . `ipcs -m | wc -l` . "\n" if $ENV{PRINT_SEGS};
+
+my $e = Async::Event::Interval->new(0, sub {});
 
 done_testing;

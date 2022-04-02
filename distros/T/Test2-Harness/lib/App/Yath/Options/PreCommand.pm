@@ -2,7 +2,7 @@ package App::Yath::Options::PreCommand;
 use strict;
 use warnings;
 
-our $VERSION = '1.000114';
+our $VERSION = '1.000116';
 
 use App::Yath::Util qw/find_pfile/;
 use Test2::Harness::Util qw/mod2file clean_path/;
@@ -121,7 +121,7 @@ sub post_process {
     my %params   = @_;
     my $settings = $params{settings};
 
-    $settings->harness->field(persist_file => find_pfile($settings, vivify => 1))
+    $settings->harness->field(persist_file => find_pfile($settings, vivify => 1, no_checks => 1))
         unless defined $settings->harness->persist_file;
 }
 

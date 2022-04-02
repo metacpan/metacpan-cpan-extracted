@@ -1,5 +1,15 @@
 Revision history for Bible::OBML::Gateway
 
+2.04      2022-03-30 18:03:00-07:00 America/Los_Angeles
+        - b.inline-h3 filter and patch missing initial verse number
+
+2.03      2022-03-30 09:02:46-07:00 America/Los_Angeles
+        - Eliminate data-link prior to global regex-ing
+        - Greater/lesser-than used as quotes fix
+        - Remove hgroup, selah, b; clean footnote ref links
+        - Fix "header_alt" deprecated tag to "sub_header" current
+        - Several parsing edge-cases clean-up
+
 2.02      2022-03-17 11:16:12-07:00 America/Los_Angeles
         - Fix to support Perl down to version 20
         - Minor documentation fixes

@@ -1,5 +1,5 @@
 package Gherkin::TokenFormatterBuilder;
-$Gherkin::TokenFormatterBuilder::VERSION = '22.0.0';
+$Gherkin::TokenFormatterBuilder::VERSION = '23.0.1';
 use strict;
 use warnings;
 use base 'Gherkin::AstBuilder';

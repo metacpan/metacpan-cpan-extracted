@@ -18,7 +18,7 @@ my $json_data = $json->decode($data) or die $data;
 
 my $counter = 1;
 
-my $mock_gd = Test::MockModule->new('Net::Google::Drive::Simple')->redefine( path_resolve => sub { ( 'root', 'root' ) } )->redefine( init => 1 )->redefine(
+my $mock_gd = Test::MockModule->new('Net::Google::Drive::Simple::V2')->redefine( path_resolve => sub { ( 'root', 'root' ) } )->redefine( init => 1 )->redefine(
     http_json => sub {
         return $json_data if $counter++ == 1;
         return;

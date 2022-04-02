@@ -15,10 +15,12 @@ To install this module type the following:
 
 DEPENDENCIES
 
-Data::Tools does not use libraries other than core perl.
+Data::Tools uses very few non-core perl modules.
 
 COPYRIGHT AND LICENCE
 
 See `COPYING' file for full GPL license text.
 
-Copyright (C) 2013-2022 Vladi Belperchinov-Shabanski <cade@cpan.org> <cade@bis.bg>
+Copyright (C) 2013-2022 Vladi Belperchinov-Shabanski
+                        <cade@noxrun.com> <cade@bis.bg> <cade@cpan.org>
+                        http://cade.noxrun.com/  

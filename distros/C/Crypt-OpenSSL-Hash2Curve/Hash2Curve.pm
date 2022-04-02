@@ -1,6 +1,5 @@
 package Crypt::OpenSSL::Hash2Curve;
 
-use 5.008005;
 use strict;
 use warnings;
 use bignum;
@@ -11,44 +10,35 @@ require Exporter;
 use AutoLoader;
 use Crypt::OpenSSL::EC;
 use Crypt::OpenSSL::Bignum;
+use Crypt::OpenSSL::Base::Func;
 use Math::BigInt;
 use POSIX;
 #use Data::Dump qw/dump/;
 
+our $VERSION = '0.03';
+
 our @ISA = qw(Exporter);
 
 our @EXPORT = qw(
-  OBJ_sn2nid
-  EVP_MD_size
-  EVP_MD_block_size
-  EVP_get_digestbyname
-  EC_POINT_point2hex
-  EC_POINT_hex2point
-  EC_GROUP_get_curve
-  EC_POINT_set_affine_coordinates
-  EC_POINT_get_affine_coordinates
-  EC_POINT_point2hex
-  EC_POINT_hex2point
-
   sgn0_m_eq_1
+  clear_cofactor
+  CMOV
+
   calc_c1_c2_for_sswu
   map_to_curve_sswu_not_straight_line
   map_to_curve_sswu_straight_line
+
+  sn2z
   get_hash2curve_params
+  expand_message_xmd
+  hash_to_field
   map_to_curve
   encode_to_curve
   hash_to_curve
-  clear_cofactor
-  digest
-  hash_to_field
-  expand_message_xmd
-  sn2z
-  hex2point
 );
 
 our @EXPORT_OK = @EXPORT;
 
-our $VERSION = '0.02';
 
 require XSLoader;
 XSLoader::load( 'Crypt::OpenSSL::Hash2Curve', $VERSION );
@@ -180,7 +170,10 @@ sub hash_to_field {
 
   my $p_bin    = $p->to_bin();
   my $p_bigint = Math::BigInt->from_bytes( $p_bin );
-  my $L        = scalar $p_bigint->blog( 2 )->bceil()->badd( $k )->bdiv( 8 )->bceil();
+
+  my $L = Math::BigInt->from_bytes( $p_bin );
+  $L = $L->blog( 2 )->bceil()->numify();
+  $L = ceil(($L + $k)/8);
 
   my $len_in_bytes  = $count * $m * $L;
   my $uniform_bytes = $expand_message_func->( $msg, $DST, $len_in_bytes, $hash_name );
@@ -197,6 +190,7 @@ sub hash_to_field {
       #my $e_j = $tv_bn->to_hex();
       my $e_j   = $tv_bn->to_bytes();
       my $e_j_u = Crypt::OpenSSL::Bignum->new_from_bin( $e_j );
+
       push @u, $e_j_u;
     }
     push @res, \@u;

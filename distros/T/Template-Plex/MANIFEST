@@ -10,6 +10,7 @@ examples/recursive-2.plex
 examples/recursive-3.plex
 examples/recursive-top.plex
 examples/recursive.pl
+examples/synopsis.pl
 lib/Template/Plex.pm
 lib/Template/Plex.pod
 Makefile.PL

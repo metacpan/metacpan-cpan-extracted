@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use Sys::Syslog();
 use Fcntl();
+use FileHandle();
 use Symbol();
 use Getopt::Long();
 use English qw( -no_match_vars );
@@ -13,11 +14,46 @@ delete $ENV{PATH};
 
 local $ENV{PATH} = '/usr/bin:/bin:/usr/sbin:/sbin';
 
-our $VERSION = '1.22';
+our $VERSION = '1.23';
 
 my $binary  = 'firefox';
 my $ident   = 'ssh-auth-cmd-marionette';
 my %options = ( facility => 'LOG_LOCAL0' );
+
+sub _tmp_directory_regex {
+    my $regex = qr{(?:/var)?/tmp}smx;
+    if ( $OSNAME eq 'darwin' ) {    # getconf DARWIN_USER_TEMP_DIR
+        my $handle    = FileHandle->new();
+        my $command   = 'getconf';
+        my @arguments = qw(DARWIN_USER_TEMP_DIR);
+        if ( my $pid = $handle->open(q[-|]) ) {
+            my $content;
+            while ( my $line = <$handle> ) {
+                $content .= $line;
+            }
+            close $handle
+              or die "Failed to successfully complete:$EXTENDED_OS_ERROR\n";
+            chomp $content;
+            $content =~ s/\/$//smx;    # remove trailing / for darwin
+            my $quoted_content = quotemeta $content;
+            $regex = qr/$quoted_content/smx;
+        }
+        elsif ( defined $pid ) {
+            eval {
+                exec {$command} $command, @arguments
+                  or die "Failed to exec '$command':$EXTENDED_OS_ERROR\n";
+            } or do {
+                chomp $EVAL_ERROR;
+                warn "$EVAL_ERROR\n";
+            };
+            exit 1;
+        }
+        else {
+            die "Failed to fork:$EXTENDED_OS_ERROR\n";
+        }
+    }
+    return $regex;
+}
 
 eval {
     Getopt::Long::GetOptions( \%options, 'help', 'version', 'facility:s',
@@ -33,13 +69,14 @@ eval {
           or die "Failed to print to STDOUT:$EXTENDED_OS_ERROR\n";
         exit 0;
     }
-    %options = _validate_parameters(%options);
-    my $tmp_directory = $ENV{TMPDIR} || '/tmp';
+    my $tmp_directory_regex = _tmp_directory_regex();
+    my $tmp_directory       = $ENV{TMPDIR} || '/tmp';
     $tmp_directory =~ s/\/$//smx;    # remove trailing / for darwin
     my $root_dir_regex;
-    my $quoted_tmp_directory;
+    my $quoted_tmp_directory = quotemeta $tmp_directory;
     if ( $tmp_directory =~
-        s/^(.*firefox_marionette_remote\w+)(?:\/tmp)?$/$1/smx )
+s/^(${tmp_directory_regex}\/firefox_marionette_remote\w+)(?:\/tmp)?$/$1/smx
+      )
     {
         $quoted_tmp_directory = quotemeta $tmp_directory;
         $root_dir_regex       = qr/$quoted_tmp_directory/smx;
@@ -47,30 +84,56 @@ eval {
     else {
         $quoted_tmp_directory = quotemeta $tmp_directory;
         $root_dir_regex =
-          qr/${quoted_tmp_directory}\/firefox_marionette_remote\w+/smx;
+          qr/${$tmp_directory_regex}\/firefox_marionette_remote\w+/smx;
     }
-    my $allowed_binaries = q[(?:]
-      . ( join q[|], map { quotemeta } @{ $options{'allow-binary'} } ) . q[)];
+    %options = _validate_parameters(%options);
+    my @allowed_binaries;
+    my @allowed_binary_paths;
     my @allowed_binary_directories;
     foreach my $binary ( @{ $options{'allow-binary'} } ) {
         if ( $binary eq 'firefox' ) {
+            push @allowed_binaries,           'firefox';
+            push @allowed_binary_paths,       '/usr/bin/firefox';
             push @allowed_binary_directories, '/usr/bin';
         }
         else {
+            push @allowed_binaries,     $binary;
+            push @allowed_binary_paths, $binary;
             my ( $volume, $directories ) = File::Spec->splitpath($binary);
             push @allowed_binary_directories,
               File::Spec->catdir( $volume, $directories );
+            if ( $OSNAME eq 'darwin' ) {
+                $directories =~ s{/Contents/MacOS/$}{/Contents/Resources/}smx;
+                push @allowed_binary_directories,
+                  File::Spec->catdir( $volume, $directories );
+            }
         }
     }
+    my $allowed_binaries =
+      q[(?:] . ( join q[|], map { quotemeta } @allowed_binaries ) . q[)];
+    my $allowed_binary_paths =
+      q[(?:] . ( join q[|], map { quotemeta } @allowed_binary_paths ) . q[)];
     my $allowed_binary_directories = q[(?:]
       . ( join q[|], map { quotemeta } @allowed_binary_directories ) . q[)];
     my $allowed_binary_directories_regex = qr/$allowed_binary_directories/smx;
+    my $allowed_binary_paths_regex       = qr/$allowed_binary_paths/smx;
     my $allowed_binary_regex             = qr/$allowed_binaries/smx;
     my $sub_directory_regex = qr/(?:profile|downloads|tmp|addons|certs)/smx;
-    my $profile_file_regex =
-      qr/profile\/(?:bookmarks[.]html|prefs[.]js|mimeTypes[.]rdf)/smx;
+    my $profile_names       = q[(?:] . (
+        join q[|],
+        map { quotemeta } (
+            qw(
+              bookmarks.html
+              prefs.js
+              mimeTypes.rdf
+              search.json.mozlz4
+            )
+        )
+    ) . q[)];
+    my $profile_file_regex    = qr/profile\/$profile_names/smx;
     my $file_regex            = qr/[+\w\-()]{1,255}(?:[.][+\w\-()]{1,255})*/smx;
     my $downloads_regex       = qr/downloads\/$file_regex/smx;
+    my $addons_regex          = qr/(?:addons|profile)\/$file_regex/smx;
     my $ca_name_regex         = qr/Firefox::Marionette[ ]Root[ ]CA/smx;
     my $version_updates_regex = q[(?:]
       . (
@@ -86,12 +149,14 @@ eval {
       qr/[ ]\-marionette/smx,
       qr/(?:[ ]\-width[ ]\d{1,8})?/smx,
       qr/(?:[ ]\-height[ ]\d{1,8})?/smx,
+      qr/(?:[ ]\-\-jsconsole)?/smx,
       qr/(?:[ ]-safe\-mode)?/smx,
       qr/(?:[ ]\-headless)?/smx,
       qr/[ ]\-profile[ ]$root_dir_regex\/profile/smx,
       qr/[ ]\-\-no\-remote/smx,
       qr/[ ]\-\-new\-instance/smx,
-      qr/(?:[ ]\-\-devtools)?/smx;
+      qr/(?:[ ]\-\-devtools)?/smx,
+      qr/(?:[ ]\-\-kiosk)?/smx;
     my $prefs_grep_patterns_regex = join q[],
       qr/\-e[ ]marionette\\.port[ ]/smx,
       qr/\-e[ ]security\\.sandbox\\.content\\.tempDirSuffix[ ]/smx,
@@ -107,6 +172,8 @@ qr/plutil[ ]-convert[ ]json[ ]-o[ ]-[ ]"(?:$plist_prefix_regex)\/Info[.]plist"/s
         );
     }
 
+    my $scp_parameters_regex =
+      qr/(?:[ ]\-v)?[ ]\-p[ ]\-[tf][ ](?:-P[ ]\d{2}[ ])?(?:\-v[ ])?/smx;
     my $allowed_commands_regex = join q[|],
       qr/"$allowed_binary_regex"[ ]\-\-version/smx,
       @darwin_regexes,
@@ -115,14 +182,14 @@ qr/plutil[ ]-convert[ ]json[ ]-o[ ]-[ ]"(?:$plist_prefix_regex)\/Info[.]plist"/s
       qr/echo[ ]"TMP=\\"\$TMP\\""/smx,
       qr/mkdir[ ](?:\-m[ ]700[ ])?$root_dir_regex/smx,
       qr/mkdir[ ](?:\-m[ ]700[ ])?$root_dir_regex\/$sub_directory_regex/smx,
-      qr/scp[ ]\-p[ ]\-[tf][ ]"$root_dir_regex\/$profile_file_regex"/smx,
-qr/scp[ ]\-p[ ]\-t[ ]"$root_dir_regex\/(?:addons|profile)\/$file_regex"/smx,
+      qr/scp$scp_parameters_regex"$root_dir_regex\/$profile_file_regex"/smx,
+      qr/scp(?:[ ]\-v)?[ ]\-p[ ]\-t[ ]"$root_dir_regex\/$addons_regex"/smx,
       qr/scp[ ]\-p[ ]\-t[ ]"$root_dir_regex\/certs\/root_ca_\d{1,10}[.]cer"/smx,
 qr/scp[ ]\-p[ ]\-[fT][ ](?:\-P[ ])?"$allowed_binary_directories\/$version_updates_regex"/smx,
-      qr/scp[ ]\-p[ ]\-[tf][ ]"$root_dir_regex\/$downloads_regex"/smx,
+qr/scp(?:[ ]\-v)?[ ]\-p[ ]\-[tf][ ]"$root_dir_regex\/$downloads_regex"/smx,
       qr/kill[ ]\-0[ ]\d{1,8}/smx,
       qr/which[ ]$allowed_binary_regex/smx,
-      qr/readlink[ ]\-f[ ]$allowed_binary_regex/smx,
+      qr/readlink[ ]\-f[ ]$allowed_binary_paths_regex/smx,
 qr/rm[ ]\-Rf[ ]$root_dir_regex(?:[ ]$quoted_tmp_directory\/Temp\-[\d\-a-f]{1,255})*/smx,
       qr/ls[ ]-1[ ]"$allowed_binary_directories(?:\/updates(?:\/\d+)?)?"/smx,
       qr/ls[ ]-1[ ]"$root_dir_regex\/downloads"/smx,
@@ -219,7 +286,7 @@ ssh-auth-cmd-marionette - ssh ~/.ssh/authorized_keys command for Firefox::Marion
 
 =head1 VERSION
 
-Version 1.22
+Version 1.23
 
 =head1 USAGE
 

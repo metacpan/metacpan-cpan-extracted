@@ -10,7 +10,7 @@ use warnings;
 use HTTP::Cookies;
 
 ### after: use lib qw(@RT_LIB_PATH@);
-use lib qw(/Users/sunnavy/bps/git/rt/local/lib /Users/sunnavy/bps/git/rt/lib);
+use lib qw(/opt/rt4/local/lib /opt/rt4/lib);
 
 my $RTIR_TEST_USER = "rtir_test_user";
 my $RTIR_TEST_PASS = "rtir_test_pass";

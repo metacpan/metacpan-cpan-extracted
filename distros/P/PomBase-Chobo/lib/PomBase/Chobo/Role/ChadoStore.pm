@@ -35,7 +35,7 @@ under the same terms as Perl itself.
 
 =cut
 
-our $VERSION = '0.036'; # VERSION
+our $VERSION = '0.037'; # VERSION
 
 use Mouse::Role;
 use Text::CSV::Encoded;
@@ -239,6 +239,18 @@ my %row_makers = (
         my $cvterm_id =
           $chado_data->get_cvterm_by_termid($term->id())->cvterm_id();
         push @res, [$cvterm_id, $prop_types{consider}->cvterm_id(), $consider];
+      }
+
+      my @property_values = $term->property_values();
+
+      for my $prop_value (@property_values) {
+        my $cvterm_id =
+          $chado_data->get_cvterm_by_termid($term->id())->cvterm_id();
+        my $prop_value_name = $prop_value->[0];
+        my $prop_value_value = $prop_value->[1];
+        if (defined $prop_types{$prop_value_name}) {
+          push @res, [$cvterm_id, $prop_types{$prop_value_name}->cvterm_id(), $prop_value_value];
+        }
       }
 
       @res;

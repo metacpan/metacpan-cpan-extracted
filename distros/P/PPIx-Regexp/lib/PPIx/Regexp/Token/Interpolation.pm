@@ -20,6 +20,15 @@ This class represents a variable interpolation into a regular
 expression. In the L</SYNOPSIS> the C<$foo> would be represented by an
 object of this class.
 
+=head2 Incompatible Change: Parse of '@{[ ... ]}'
+
+In versions 0.083 and earlier, C<'@{[ ... ]}'> parsed as a member of
+this class. In 0.084 and later, it parses as a member of
+C<PPIx::Regexp::Token::Code>. This more accurately reflects the actual
+contents of the token, and enables the recognition of the full range of
+postfix dereference operators for versioning purposes, not just those
+valid in interpolations.
+
 =head1 METHODS
 
 This class provides the following public methods beyond those provided
@@ -44,7 +53,7 @@ use PPIx::Regexp::Constant qw{
     @CARP_NOT
 };
 
-our $VERSION = '0.083';
+our $VERSION = '0.084';
 
 use constant VERSION_WHEN_IN_REGEX_SET => '5.017009';
 
@@ -154,6 +163,7 @@ sub _interpolation {
 
     my @accum;	# The elements of the interpolation
     my $allow_subscript;	# Assume no subscripts allowed
+    my $want_class = __PACKAGE__;	# Assume we want an interpolation.
 
     # Find the beginning of the interpolation
     my $next = $stmt->schild( 0 ) or return;
@@ -179,6 +189,19 @@ sub _interpolation {
 	    ) or return;
 	    push @accum, $next;
 	} elsif ( $next->isa( 'PPI::Structure::Block' ) ) {
+	    # We want @{[ ... ]} to parse as a PPIx::Regexp::Token::Code.
+	    # PPI parses this as a cast followed by a block. The block
+	    # contains a single statement, which contains a single
+	    # constructor. So:
+	    my @kids = $next->schildren();
+	    if ( @kids == 1 && $kids[0]->isa( 'PPI::Statement' ) ) {
+		@kids = $kids[0]->schildren();
+		if ( @kids == 1 &&
+		    $kids[0]->isa( 'PPI::Structure::Constructor' ) &&
+		    $kids[0]->start() eq '[' ) {
+		    $want_class = 'PPIx::Regexp::Token::Code';
+		}
+	    }
 	    push @accum, $next;
 	} else {
 	    return;
@@ -243,7 +266,7 @@ sub _interpolation {
     foreach ( @accum ) {
 	$length += ref $_ ? length $_->content() : $_;
     }
-    return $length;
+    return ( $length, $want_class );
 }
 
 {
@@ -344,8 +367,10 @@ sub __PPIX_TOKENIZER__regexp {
 
     exists $sigil_alternate{$character} or return;
 
-    if ( my $accept = $class->_interpolation( $tokenizer, $character, 1 ) ) {
-	return $accept;
+    if ( my ( $accept, $want_class ) =
+	$class->_interpolation( $tokenizer, $character, 1 )
+    ) {
+	return $tokenizer->make_token( $accept, $want_class );
     }
 
     my $alternate = $sigil_alternate{$character} or return;
@@ -359,8 +384,9 @@ sub __PPIX_TOKENIZER__repl {
 
     exists $sigil_alternate{$character} or return;
 
-    if ( my $accept = $class->_interpolation( $tokenizer, $character, 0 ) ) {
-	return $accept;
+    if ( my ( $accept, $want_class ) =
+	$class->_interpolation( $tokenizer, $character, 0 ) ) {
+	return $tokenizer->make_token( $accept, $want_class );
     }
 
     return $tokenizer->make_token( 1, TOKEN_LITERAL );

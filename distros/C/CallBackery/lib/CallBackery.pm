@@ -35,7 +35,7 @@ use CallBackery::Database;
 use CallBackery::User;
 
 
-our $VERSION = '0.41.4';
+our $VERSION = '0.41.5';
 
 use Mojo::Base 'Mojolicious';
 

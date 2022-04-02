@@ -1,5 +1,17 @@
 Revision history for Devel-MAT
 
+0.47    2022-04-02
+        [CHANGES]
+         * Improved handling of root SVs including custom ones annotated by
+           the dumpfile itself
+         * Handle the magic VTBL pointer field in latest dumpfile format
+         * Added `find magic` filter
+
+        [BUGFIXES]
+         * 'show' tool should inspect `$sv->type` instead of relying on actual
+           blessed type of SV wrapper
+         * Fix default provided `Devel::MAT::Cmd->format_heading` method
+
 0.46    2022-03-29
         [CHANGES]
          * Support the new STRUCT types in .pmat files

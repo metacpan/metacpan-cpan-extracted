@@ -1,9 +1,9 @@
 ##############################################################################
 #
 #  Data::Tools perl module
-#  2013-2019 (c) Vladi Belperchinov-Shabanski "Cade"
-#  http://cade.datamax.bg
-#  <cade@bis.bg> <cade@biscom.net> <cade@datamax.bg> <cade@cpan.org>
+#  Copyright (c) 2013-2022 Vladi Belperchinov-Shabanski "Cade" 
+#        <cade@noxrun.com> <cade@bis.bg> <cade@cpan.org>
+#  http://cade.noxrun.com/  
 #
 #  GPL
 #
@@ -15,7 +15,7 @@ use Carp;
 use Data::Tools;
 use Math::BigFloat;
 
-our $VERSION = '1.20';
+our $VERSION = '1.27';
 
 our @ISA    = qw( Exporter );
 our @EXPORT = qw(
@@ -119,10 +119,8 @@ Data::Tools::Time uses:
 =head1 AUTHOR
 
   Vladi Belperchinov-Shabanski "Cade"
-
-  <cade@bis.bg> <cade@biscom.net> <cade@datamax.bg> <cade@cpan.org>
-
-  http://cade.datamax.bg
+        <cade@noxrun.com> <cade@bis.bg> <cade@cpan.org>
+  http://cade.noxrun.com/  
 
 
 =cut

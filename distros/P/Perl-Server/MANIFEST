@@ -1,0 +1,17 @@
+Makefile.PL
+Changes
+MANIFEST
+META.json
+META.yml
+README.md
+t/file.t
+t/folder.t
+t/load.t
+t/psgi.t
+t/test.t
+t/files/data.psgi
+t/files/index.pl
+t/files/ok.pl
+lib/Perl/Server.pm
+script/perl-server
+cpanfile

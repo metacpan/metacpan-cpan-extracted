@@ -32,11 +32,19 @@
       },
       "runtime" : {
          "requires" : {
+            "POSIX" : "0",
             "perl" : "5.008004"
          }
       }
    },
    "release_status" : "stable",
-   "version" : 22.02,
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/vkeselj/App-Utils.git",
+         "web" : "https://github.com/vkeselj/App-Utils"
+      }
+   },
+   "version" : 22.03,
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

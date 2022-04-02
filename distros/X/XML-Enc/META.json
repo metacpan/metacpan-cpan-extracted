@@ -35,6 +35,7 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
+            "Crypt::AuthEnc::GCM" : "0",
             "Crypt::Mode::CBC" : "0",
             "Crypt::OpenSSL::Bignum" : "0",
             "Crypt::OpenSSL::RSA" : "0",
@@ -59,7 +60,7 @@
    "provides" : {
       "XML::Enc" : {
          "file" : "lib/XML/Enc.pm",
-         "version" : "0.03"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -73,7 +74,7 @@
          "web" : "https://github.com/perl-net-saml2/perl-XML-Enc"
       }
    },
-   "version" : "0.03",
+   "version" : "0.05",
    "x_contributors" : [
       "Timothy Legge <timlegge@gmail.com>"
    ],

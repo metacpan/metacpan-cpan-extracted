@@ -2,7 +2,7 @@ package App::Yath::Command::start;
 use strict;
 use warnings;
 
-our $VERSION = '1.000114';
+our $VERSION = '1.000116';
 
 use App::Yath::Util qw/find_pfile/;
 use App::Yath::Options;
@@ -108,7 +108,7 @@ sub run {
     my $settings = $self->settings;
     my $dir      = $settings->workspace->workdir;
 
-    my $pfile = find_pfile($settings, vivify => 1);
+    my $pfile = find_pfile($settings, vivify => 1, no_checks => 1);
 
     if (-f $pfile) {
         remove_tree($dir, {safe => 1, keep_root => 0});

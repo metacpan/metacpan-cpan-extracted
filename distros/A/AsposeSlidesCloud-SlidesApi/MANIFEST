@@ -26,6 +26,7 @@ lib/AsposeSlidesCloud/Object/BubbleSeries.pm
 lib/AsposeSlidesCloud/Object/Camera.pm
 lib/AsposeSlidesCloud/Object/Chart.pm
 lib/AsposeSlidesCloud/Object/ChartCategory.pm
+lib/AsposeSlidesCloud/Object/ChartLinesFormat.pm
 lib/AsposeSlidesCloud/Object/ChartTitle.pm
 lib/AsposeSlidesCloud/Object/ChartWall.pm
 lib/AsposeSlidesCloud/Object/ClosePathSegment.pm
@@ -54,6 +55,7 @@ lib/AsposeSlidesCloud/Object/FileVersion.pm
 lib/AsposeSlidesCloud/Object/FileVersions.pm
 lib/AsposeSlidesCloud/Object/FillFormat.pm
 lib/AsposeSlidesCloud/Object/FillOverlayEffect.pm
+lib/AsposeSlidesCloud/Object/FontFallbackRule.pm
 lib/AsposeSlidesCloud/Object/FontScheme.pm
 lib/AsposeSlidesCloud/Object/FontSet.pm
 lib/AsposeSlidesCloud/Object/FormatScheme.pm
@@ -162,12 +164,15 @@ lib/AsposeSlidesCloud/Object/ShapeImageExportOptions.pm
 lib/AsposeSlidesCloud/Object/Shapes.pm
 lib/AsposeSlidesCloud/Object/ShapesAlignmentType.pm
 lib/AsposeSlidesCloud/Object/ShapeThumbnailBounds.pm
+lib/AsposeSlidesCloud/Object/ShapeType.pm
 lib/AsposeSlidesCloud/Object/Slide.pm
 lib/AsposeSlidesCloud/Object/SlideAnimation.pm
 lib/AsposeSlidesCloud/Object/SlideBackground.pm
 lib/AsposeSlidesCloud/Object/SlideComment.pm
+lib/AsposeSlidesCloud/Object/SlideCommentBase.pm
 lib/AsposeSlidesCloud/Object/SlideComments.pm
 lib/AsposeSlidesCloud/Object/SlideExportFormat.pm
+lib/AsposeSlidesCloud/Object/SlideModernComment.pm
 lib/AsposeSlidesCloud/Object/SlideProperties.pm
 lib/AsposeSlidesCloud/Object/SlideReplaceResult.pm
 lib/AsposeSlidesCloud/Object/Slides.pm
@@ -191,6 +196,7 @@ lib/AsposeSlidesCloud/Object/TableCell.pm
 lib/AsposeSlidesCloud/Object/TableColumn.pm
 lib/AsposeSlidesCloud/Object/TableRow.pm
 lib/AsposeSlidesCloud/Object/Task.pm
+lib/AsposeSlidesCloud/Object/TextBounds.pm
 lib/AsposeSlidesCloud/Object/TextElement.pm
 lib/AsposeSlidesCloud/Object/TextFrameFormat.pm
 lib/AsposeSlidesCloud/Object/TextItem.pm
@@ -212,7 +218,7 @@ lib/AsposeSlidesCloud/Object/ZoomFrame.pm
 lib/AsposeSlidesCloud/Object/ZoomObject.pm
 lib/AsposeSlidesCloud/SlidesApi.pm
 LICENSE
-MakeFile.pl
+Makefile.PL
 MANIFEST			This list of files
 prove.pl
 README.md

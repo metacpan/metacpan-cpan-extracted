@@ -5,7 +5,7 @@ my $self = Bible::OBML->new;
 isa_ok( $self, 'Bible::OBML' );
 
 can_ok( $self, $_ ) for ( qw(
-    indent_width reference_acronym fnxref_acronym wrap_at wrap_lines wrap_indents reference
+    indent_width reference_acronym fnxref_acronym wrap_at reference
     data html obml
 ) );
 
@@ -72,5 +72,28 @@ is( $data, $self->data($data)->data, 'data -> data' );
 
 is( $self->data($data)->html, $html,       'data -> html' );
 is( $self->data($data)->obml, $clean_obml, 'data -> obml' );
+
+my $obml2 = deindent(q$
+    ~ 2 Corinthians 7 ~
+
+    |1| Stuff and things:
+
+        This is about stuff.
+        And this is about things.
+        And more about stuff and things.
+$);
+
+my $html2 = deindent(q$
+    <obml><reference>2 Corinthians 7</reference>
+
+    <p><verse_number>1</verse_number>Stuff and things:</p>
+
+    <p><indent level="1">This is about stuff.</indent><br>
+    <indent level="1">And this is about things.</indent><br>
+    <indent level="1">And more about stuff and things.</indent></p></obml>
+$);
+
+is( $self->obml($obml2)->html, $html2, 'obml2 -> html2' );
+is( $self->html($html2)->html, $html2, 'html2 -> html2' );
 
 done_testing;

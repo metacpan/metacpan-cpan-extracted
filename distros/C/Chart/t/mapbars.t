@@ -1,3 +1,5 @@
+
+BEGIN { unshift @INC, 'lib', '../lib'}
 use strict;
 use Chart::Bars;
 

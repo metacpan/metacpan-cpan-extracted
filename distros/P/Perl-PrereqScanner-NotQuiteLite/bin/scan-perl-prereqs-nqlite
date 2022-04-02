@@ -25,6 +25,8 @@ GetOptions(\my %opts, qw/
   base_dir|base-dir=s
   ignore_re|ignore-re=s
   ignore=s@
+  optional_re|optional-re=s
+  optional=s@
   private_re|private-re=s
   private=s@
   recommends
@@ -148,6 +150,16 @@ useful when your distribution has a set of OS-specific modules, for example.
 
 You can also specify a regexp instead of a list of paths. If this is
 set, C<ignore> options are ignored.
+
+=item optional
+
+Set a list of paths C<scan-perl-prereqs-nqlite> should ignore. This is
+useful when your distribution has a set of OS-specific modules, for example.
+
+=item optional_re
+
+You can also specify a regexp instead of a list of paths. If this is
+set, C<optional> options are ignored.
 
 =item private
 

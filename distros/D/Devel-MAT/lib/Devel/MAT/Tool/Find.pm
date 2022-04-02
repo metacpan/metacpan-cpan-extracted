@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2017-2020 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Tool::Find 0.46;
+package Devel::MAT::Tool::Find 0.47;
 
 use v5.14;
 use warnings;
@@ -545,6 +545,51 @@ sub build
 
       return Devel::MAT::Cmd->format_value( $type->name );
    };
+}
+
+package # hide
+   Devel::MAT::Tool::Find::filter::magic;;
+use base qw( Devel::MAT::Tool::Find::filter );
+
+=head2 magic
+
+=cut
+
+use constant FILTER_DESC => "SVs with magic";
+
+use constant FILTER_OPTS => (
+   vtbl => { help => "the VTBL pointer",
+             type => "x",
+             alias => "v" },
+);
+
+sub build
+{
+   my $self = shift;
+   my $inv = shift;
+   my %opts = %{ +shift };
+
+   if( my $vtbl = $opts{vtbl} ) {
+      return sub {
+         my ( $sv ) = @_;
+         my @magics = $sv->magic or return;
+         foreach my $magic ( @magics ) {
+            next unless defined $magic->vtbl and $magic->vtbl == $vtbl;
+
+            my $ret = String::Tagged->from_sprintf( "magic type '%s'",
+               $magic->type,
+            );
+
+            $ret .= ", with object " . Devel::MAT::Cmd->format_sv( $magic->obj ) if $magic->obj;
+
+            $ret .= ", with pointer " . Devel::MAT::Cmd->format_sv( $magic->ptr ) if $magic->ptr;
+
+            return $ret;
+         }
+      };
+   }
+
+   die "Expected --vtbl\n";
 }
 
 =head1 AUTHOR

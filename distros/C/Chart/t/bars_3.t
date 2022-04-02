@@ -1,5 +1,8 @@
 #!/usr/bin/perl -w
 
+BEGIN { unshift @INC, 'lib', '../lib'}
+
+
 use Chart::Bars;
 print "1..1\n";
 $g = Chart::Bars->new( 500, 500 );

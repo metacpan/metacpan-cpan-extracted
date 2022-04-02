@@ -1,5 +1,7 @@
-package Slack::Notify {
-$Slack::Notify::VERSION = '0.004';
+package Slack::Notify;
+$Slack::Notify::VERSION = '0.005';
+{
+
 # ABSTRACT: Trigger Slack incoming webhooks
 
 use namespace::autoclean;
@@ -30,7 +32,8 @@ sub post {
 }
 
 package # hide from PAUSE
-  Slack::Notify::Payload {
+  Slack::Notify::Payload;
+{
 
 use namespace::autoclean;
 
@@ -43,6 +46,7 @@ has text       => ( is => 'ro', isa => Str );
 has username   => ( is => 'ro', isa => Str );
 has icon_url   => ( is => 'ro', isa => Str );
 has icon_emoji => ( is => 'ro', isa => Str );
+has channel    => ( is => 'ro', isa => Str );
 
 has attachments => (
   is     => 'ro',
@@ -63,7 +67,8 @@ sub _build__hash {
 }
 
 package # hide from PAUSE
-  Slack::Notify::Attachment {
+  Slack::Notify::Attachment;
+{
 
 use namespace::autoclean;
 
@@ -105,7 +110,8 @@ sub _build__hash {
 }
 
 package # hide from PAUSE
-  Slack::Notify::Field {
+  Slack::Notify::Field;
+{
 
 use namespace::autoclean;
 
@@ -207,6 +213,12 @@ URL of an image to use for the icon, overriding the one set in the hook config.
 C<icon_emoji>
 
 An emoji code (eg C<:+1:>) to use for the icon, overriding the one set in the hook config.
+
+=item *
+
+C<channel>
+
+A channel name or user to direct to direct the message into, overriding the one set in the hook config.
 
 =item *
 

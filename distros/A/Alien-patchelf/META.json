@@ -1,0 +1,81 @@
+{
+   "abstract" : "Alien package for the patchelf utility",
+   "author" : [
+      "Shawn Laffan <shawnlaffan@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Alien-patchelf",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Alien::Build" : "2.25",
+            "Alien::Build::MM" : "1.41",
+            "Alien::Build::Plugin::Download::GitHub" : "0",
+            "ExtUtils::MakeMaker" : "6.52"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Alien::Build" : "2.25",
+            "Alien::Build::MM" : "1.41",
+            "Alien::Build::Plugin::Download::GitHub" : "0",
+            "Alien::Build::Plugin::Fetch::CurlCommand" : "1.19",
+            "ExtUtils::MakeMaker" : "6.52"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::Base" : "1.41",
+            "Alien::Build" : "0.25",
+            "Capture::Tiny" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Alien" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/PerlAlien/Alien-patchelf/issues/"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/PerlAlien/Alien-patchelf"
+      }
+   },
+   "version" : "0.03",
+   "x_alienfile" : {
+      "generated_by" : "Alien::Build::MM version 2.48",
+      "requires" : {
+         "share" : {
+            "Alien::Autotools" : "0",
+            "Alien::Build::Plugin::Download::Negotiate" : "1.30",
+            "Archive::Tar" : "0",
+            "Config" : "0",
+            "IO::Zlib" : "0",
+            "Mojo::DOM58" : "1.00",
+            "URI" : "0",
+            "URI::Escape" : "0"
+         },
+         "system" : {}
+      }
+   },
+   "x_serialization_backend" : "JSON::PP version 4.06"
+}

@@ -56,6 +56,7 @@ t/app/dedupe.t
 t/app/exclude_core.t
 t/app/features.t
 t/app/ignore.t
+t/app/optional.t
 t/app/private.t
 t/app/scan_also.t
 t/app/use_index.t

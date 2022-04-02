@@ -1,5 +1,15 @@
 Revision history for Alien::spatialite
 
+1.07 2022-04-01
+    - Share builds: change method of requiring Alien::patchelf
+
+1.06 2022-04-01
+    - Share builds:
+      - Use the patchelf utility to set
+        relative rpaths in generated binaries
+      - Alien::patchelf is now a dependency
+      - Set ccache basepath env var 
+
 1.05 2022-03-20
     - Ensure share builds use -O2 in compilation
     - Simplify alienfile

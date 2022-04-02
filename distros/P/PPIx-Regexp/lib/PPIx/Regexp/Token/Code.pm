@@ -56,7 +56,7 @@ use PPIx::Regexp::Constant qw{
 };
 use PPIx::Regexp::Util qw{ __instance };
 
-our $VERSION = '0.083';
+our $VERSION = '0.084';
 
 use constant TOKENIZER_ARGUMENT_REQUIRED => 1;
 use constant VERSION_WHEN_IN_REGEX_SET => undef;
@@ -188,7 +188,7 @@ sub __ppi_normalize_content {
 
     my %accept = map { $_ => 1 } qw{ $ $# @ % & * };
 
-    # Say what casts are accepted, since not all are in am
+    # Say what casts are accepted, since not all are in an
     # interpolation.
     sub __postderef_accept_cast {
 	return \%accept;

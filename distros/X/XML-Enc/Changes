@@ -1,5 +1,21 @@
 Revision history for Perl extension XML::Enc.
 
+0.05 -- Thu Mar 31 20:10:51 ADT 2022
+
+    - 7e9b4d0 Update version for 0.05 release
+    - 299f358 Update docs and fix a default
+    - be46cd7 v0.04
+
+0.04 -- Thu Mar 31 00:08:04 ADT 2022
+
+    [ Major change since 0.03 ]
+    - Support AES GCM base encryption Algorithms
+
+    - 8059d02 Merge pull request #1 from perl-net-saml2/gcm-support
+    - 423d5c6 Update version number for release
+    - cf246ce Add support fot AES GCM based encryption Algorithms
+    - 0b69310 v0.03
+
 0.03 -- Sat Mar 26 22:01:34 ADT 2022
 
     - 894b08c Update Version and README for release

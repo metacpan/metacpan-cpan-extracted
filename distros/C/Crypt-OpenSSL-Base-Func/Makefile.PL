@@ -1,48 +1,51 @@
 use strict;
 use warnings;
 
-#Modify From https://metacpan.org/pod/Crypt::OpenSSL::RSA
-
 use ExtUtils::MakeMaker;
-use Crypt::OpenSSL::Guess qw(openssl_inc_paths openssl_lib_paths);
+#use Config;
+use Crypt::OpenSSL::Guess;
 
-# See lib/ExtUtils/MakeMaker.pm for details of how to influence
-# the contents of the Makefile that is written.
+# This is similar to what Crypt::OpenSSL::EC, Crypt::OpenSSL::RSA does.
 
 WriteMakefile(
-    'NAME'             => 'Crypt::OpenSSL::Base::Func',
-    AUTHOR             => 'Lanlan Pan <abbypan@gmail.com>',
-    'VERSION_FROM'     => 'Func.pm',                              # finds $VERSION
-    'ABSTRACT'    => 'Crypt Base Functions, using the OpenSSL libraries',
+    NAME              => 'Crypt::OpenSSL::Base::Func',
+    AUTHOR             => 'Pan Lanlan <abbypan@gmail.com>',
+    VERSION_FROM      => 'Func.pm',
+    ABSTRACT  => 'Crypt Base Functions, using the OpenSSL libraries', 
+    'LICENSE'  => 'Mozilla_2_0', 
     'DISTNAME'         => 'Crypt-OpenSSL-Base-Func',
-    'MIN_PERL_VERSION' => 5.006,
-    'PL_FILES'         => {},
-    ( $ExtUtils::MakeMaker::VERSION >= 6.3002 ? ( 'LICENSE' => 'perl', ) : () ),
-    'PREREQ_PM' => {
-        'Test::More'             => 0,
-    },
-    'OBJECT' => 'Func.o',
+    PREREQ_PM         => { 
+        'Crypt::OpenSSL::Guess' => 0.12,
+        'Crypt::OpenSSL::Bignum' => 0.09,
+        'Crypt::OpenSSL::EC' => 1.31,
+        'bignum' => 0.52, 
+        'Math::BigInt' => 1.999815,
+        'Carp' => 0.01,
+        'Test::More' => 0.01,
+        'Test' => 0.01,
+    }, 
     'LIBS'   => [openssl_lib_paths() . ' -lssl -lcrypto'],
-    'DEFINE' => '-DPERL5 -DOPENSSL_NO_KRB5',
-
-    # perl-5.8/gcc-3.2 needs -DPERL5, and redhat9 likes -DOPENSSL_NO_KRB5
+    DEFINE            => '-DPERL5 -DOPENSSL_NO_KRB5',
     'INC' => openssl_inc_paths(),    # e.g., '-I/usr/include/other'
+    'MIN_PERL_VERSION' => 5.006,
 
+    DEFINE            => '-DPERL5 -DOPENSSL_NO_KRB5',
     'dist'  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-    'clean' => { FILES    => 'Crypt-OpenSSL-Base-*' },
-    ( $ExtUtils::MakeMaker::VERSION >= 6.3002 ? ( 'LICENSE' => 'perl', ) : () ),
+    'clean' => { FILES    => 'Crypt-OpenSSL-Base-Func-*' },
+
     (
         $ExtUtils::MakeMaker::VERSION >= 6.46
         ? (
             'META_MERGE' => {
                 recommends => {
-                    #'Crypt::OpenSSL::Bignum' => 0,
+                    'Crypt::OpenSSL::Bignum' => 0.09,
                 },
                 configure_requires => {
-                    'Crypt::OpenSSL::Guess' => '0.11',
+                    'Crypt::OpenSSL::Guess' => 0.12,
                 },
                 build_requires => {
                     'Test' => 0,    # For testing
+                    'Crypt::OpenSSL::Guess' => 0.12,
                 },
                 resources => {
                     'license'    => 'http://dev.perl.org/licenses/',
@@ -51,8 +54,7 @@ WriteMakefile(
                     'repository' => 'http://github.com/abbypan/Crypt-OpenSSL-Base-Func',
                 }
             }
-          )
+        )
         : ()
     ),
 );
-

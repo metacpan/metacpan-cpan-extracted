@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2020-2022 -- leonerd@leonerd.org.uk
 
-package Object::Pad::MOP::Class 0.63;
+package Object::Pad::MOP::Class 0.64;
 
 use v5.14;
 use warnings;
@@ -30,7 +30,29 @@ effect. They can be silenced with
 
    use Object::Pad qw( :experimental(mop) );
 
+or
+
+   use Object::Pad::MOP::Class qw( :experimental(mop) );
+
 =cut
+
+sub import
+{
+   my $class = shift;
+   my $caller = caller;
+
+   $class->import_into( $caller, @_ );
+}
+
+sub import_into
+{
+   my $class = shift;
+   my $caller = shift;
+
+   Object::Pad->_import_experimental( \@_, qw( mop ) );
+
+   croak "Unrecognised import symbols @_" if @_;
+}
 
 =head1 CONSTRUCTOR
 

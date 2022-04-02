@@ -2,7 +2,7 @@ package Test2::Harness::Runner::Reloader;
 use strict;
 use warnings;
 
-our $VERSION = '1.000114';
+our $VERSION = '1.000116';
 
 use Carp qw/croak/;
 use Time::HiRes qw/time/;
@@ -215,10 +215,15 @@ sub reload_changes {
 
     my %out;
     for my $file (sort keys %$changed) {
+        if (USE_INOTIFY) {
+            my $inotify = $self->{+WATCHER};
+            $inotify->watch($file, INOTIFY_MASK());
+        }
+
         $notify_cb->(file_changed => $file) if $notify_cb;
 
-        my $rel = $self->{+MONITOR_LOOKUP}->{$file};
-        my $mod = file2mod($rel);
+        my $rel    = $self->{+MONITOR_LOOKUP}->{$file};
+        my $mod    = file2mod($rel);
         my %params = (reloader => $self, file => $file, relative => $rel, module => $mod, notify_cb => $notify_cb);
 
         my ($status, %fields) = $self->_reload_file(%params);

@@ -1,5 +1,6 @@
 #!/usr/bin/perl -w
 
+BEGIN { unshift @INC, 'lib', '../lib'}
 use strict;
 use Chart::Composite;
 

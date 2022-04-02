@@ -1,3 +1,11 @@
+0.084		2022-04-02	T. R. Wyant
+    Require PPI 1.238 for postfix deref support, and recode the
+    postfix deref logic in terms of 1.238's functionality.
+
+    Parse '@{[ ... ]}' as code, not interpolation.  This is more in line
+    with what it actually represents, and allows correct versioning of
+    postfix dereferences.  But is is an incompatible change.
+
 0.083		2022-03-17	T. R. Wyant
     Correct and optimize the computation of logical column position (the
     one that takes account of tabs).

@@ -1,50 +1,61 @@
-use 5.008005;
+use strict;
+use warnings;
+
 use ExtUtils::MakeMaker;
-use Config;
+#use Config;
+use Crypt::OpenSSL::Guess;
 
-# This is similar to what Crypt::OpenSSL::EC does.
-my $lib = '-lcrypto';
-my $inc = '';
-my $nul = $^O eq 'MSWin32' ? 'nul' : '/dev/null';
-if (my $dir = $ENV{OPENSSL_PREFIX}) {
-  $lib = "-L$dir/lib -lcrypto";
-  $inc = "-I$dir/include";
-}
-elsif ($ENV{OPENSSL_LIB}) {
-  $lib = $ENV{OPENSSL_LIB};
-  $inc = $ENV{OPENSSL_INCLUDE};
-}
-elsif (`pkg-config --modversion libcrypto 2>$nul`) {
-  $lib = `pkg-config --libs libcrypto 2> $nul`;
-  $inc = `pkg-config --cflags libcrypto 2> $nul`;
-}
-elsif ($^O eq 'MSWin32') {
-  $lib = '-llibeay32' if $Config{cc} =~ /cl/;
-  $lib = '-leay32'    if $Config{cc} =~ /gcc/;
-}
-
-$lib =~ s/[\r\n]+/ /g;
-$inc =~ s/[\r\n]+/ /g;
+# This is similar to what Crypt::OpenSSL::EC, Crypt::OpenSSL::RSA does.
 
 WriteMakefile(
     NAME              => 'Crypt::OpenSSL::Hash2Curve',
+    AUTHOR             => 'Pan Lanlan <abbypan@gmail.com>',
     VERSION_FROM      => 'Hash2Curve.pm',
-    'LICENSE'  => 'mpl_2_0', 
+    ABSTRACT  => 'hash to curve', 
+    'LICENSE'  => 'Mozilla_2_0', 
+    'DISTNAME'         => 'Crypt-OpenSSL-Hash2Curve',
     PREREQ_PM         => { 
+        'Crypt::OpenSSL::Guess' => 0.12,
         'Crypt::OpenSSL::Bignum' => 0.09,
         'Crypt::OpenSSL::EC' => 1.31,
+        'Crypt::OpenSSL::Base::Func' => 0.03,
         'Math::BigInt' => 1.999815,
         'Carp' => 0.01,
         'Test::More' => 0.01,
+        'Test' => 0.01,
+        'bignum' => 0.52, 
                           }, 
-    ($] >= 5.005 ?     
-      (ABSTRACT_FROM  => 'Hash2Curve.pm', 
-       AUTHOR         => 'Pan Lanlan <abbypan@gmail.com>') : ()),
-    LIBS              => [ $lib ],
+    'LIBS'   => [openssl_lib_paths() . ' -lssl -lcrypto'],
     DEFINE            => '-DPERL5 -DOPENSSL_NO_KRB5',
-    INC               => $inc,
-    dist => {
-        COMPRESS => "bzip2",
-        SUFFIX   => ".bz2"
-    },
+    'INC' => openssl_inc_paths(),    # e.g., '-I/usr/include/other'
+    'MIN_PERL_VERSION' => 5.006,
+
+    DEFINE            => '-DPERL5 -DOPENSSL_NO_KRB5',
+    'dist'  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
+    'clean' => { FILES    => 'Crypt-OpenSSL-Hash2Curve-*' },
+
+    (
+        $ExtUtils::MakeMaker::VERSION >= 6.46
+        ? (
+            'META_MERGE' => {
+                recommends => {
+                    'Crypt::OpenSSL::Bignum' => 0.09,
+                },
+                configure_requires => {
+                    'Crypt::OpenSSL::Guess' => 0.12,
+                },
+                build_requires => {
+                    'Test' => 0,    # For testing
+                    'Crypt::OpenSSL::Guess' => 0.12,
+                },
+                resources => {
+                    'license'    => 'http://dev.perl.org/licenses/',
+                    'homepage'   => 'http://github.com/abbypan/Crypt-OpenSSL-Hash2Curve',
+                    'bugtracker' => 'https://github.com/abbypan/Crypt-OpenSSL-Hash2Curve/issues',
+                    'repository' => 'http://github.com/abbypan/Crypt-OpenSSL-Hash2Curve',
+                }
+            }
+        )
+        : ()
+    ),
 );

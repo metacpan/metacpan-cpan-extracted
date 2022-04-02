@@ -1,0 +1,15 @@
+0.05 2022-04-01T13:41:00Z
+    - Added some modules as dependencies. 
+
+0.04 2022-04-01T03:20:00Z
+    - Improved initiation message with more information and colors.
+    - Solved error in module version.    
+
+0.03 2022-03-31T22:20:00Z
+    - Changed the title to better describe the module.
+
+0.02 2022-03-31T19:11:00Z
+    - Added initiation message with the URL.
+
+0.01 2022-03-31T15:58:00Z
+    - First release.

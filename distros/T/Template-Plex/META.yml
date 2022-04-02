@@ -19,9 +19,10 @@ no_index:
     - t
     - inc
 requires:
+  String::Util: '0'
   enum: '0'
   perl: '5.024000'
 resources:
   repository: git://github.com/drclaw1394/perl-template-plex.git
-version: v0.1.1
+version: v0.2.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

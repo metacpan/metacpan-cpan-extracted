@@ -2,11 +2,10 @@ package App::Yath::Command::do;
 use strict;
 use warnings;
 
-our $VERSION = '1.000114';
+our $VERSION = '1.000116';
 
 use Test2::Harness::Util::File::JSON;
 
-use App::Yath::Util qw/find_pfile/;
 use Test2::Harness::Util qw/open_file/;
 
 use parent 'App::Yath::Command';

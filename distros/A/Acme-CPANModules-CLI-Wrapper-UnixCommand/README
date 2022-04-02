@@ -1,11 +1,11 @@
 NAME
-    Acme::CPANModules::CLI::Wrapper::UnixCommand - Various CLIs that wrap
-    existing Unix commands
+    Acme::CPANModules::CLI::Wrapper::UnixCommand - List of various CLIs that
+    wrap existing Unix commands
 
 VERSION
-    This document describes version 0.007 of
+    This document describes version 0.008 of
     Acme::CPANModules::CLI::Wrapper::UnixCommand (from Perl distribution
-    Acme-CPANModules-CLI-Wrapper-UnixCommand), released on 2021-11-14.
+    Acme-CPANModules-CLI-Wrapper-UnixCommand), released on 2022-03-18.
 
 DESCRIPTION
     These CLI's usually are meant to be called as the Unix commands they
@@ -176,7 +176,7 @@ CONTRIBUTING
     me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021, 2020, 2018 by perlancar
+    This software is copyright (c) 2022, 2021, 2020, 2018 by perlancar
     <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under

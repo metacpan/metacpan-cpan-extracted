@@ -1,6 +1,9 @@
 Revision history for App-DBBrowser
 
 
+2.295    2022-03-31
+       - Make the code work with the new version (0.543) of Term::From.
+
 2.294    2022-03-26
        - Update plain data input.
        - Bugfix in GetContent.

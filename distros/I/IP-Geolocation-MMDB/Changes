@@ -1,6 +1,11 @@
 Revision history for IP::Geolocation::MMDB
 
-1.006  2022-03-16 17:32:21 CET
+1.007  2022-04-01 21:00:13 CEST
+
+  - Replace div() with arithmetic operators as GCC 11.2.0 may produce wrong
+    values
+
+1.006  2022-03-23 03:29:15 CET
 
   - Add Math::BigInt 1.999806 to the configuration requirements
   - Revert to checking the libmaxminddb version with a regular expression

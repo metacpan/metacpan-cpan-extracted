@@ -1,0 +1,27 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+L<XLS::Simple>  read xls, write xls
+
+=head1 FUNCTION
+
+=head2 read_xls
+
+    my $header = read_xls( 'test.xlsx', only_header => 1, );
+
+    my $data = read_xls( 'test.xlsx', skip_header => 1, );
+
+    my $all = read_xls( 'test.xlsx');
+
+=head2 write_xls
+
+    write_xls([ ['测试', '写入' ] ], 
+        'test.xlsx', 
+        header=> ['一二', '三四'], 
+        charset=>'utf8');
+
+
+=cut

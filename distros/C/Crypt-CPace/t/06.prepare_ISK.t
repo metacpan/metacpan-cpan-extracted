@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use Digest::SHA qw/sha256/;
+#use Digest::SHA qw/sha256/;
 use List::Util qw/min/;
 use strict;
 use warnings;

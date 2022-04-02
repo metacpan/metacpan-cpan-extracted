@@ -1,13 +1,17 @@
 use strict;
 use warnings;
 
-use Async::Event::Interval;
 use Time::HiRes qw(usleep);
 use Test::More;
 
-if (! $ENV{CI_TESTING}) {
-    plan skip_all => "Not on a valid CI testing platform..."
+BEGIN {
+    if (! $ENV{CI_TESTING}) {
+        plan skip_all => "Not on a valid CI testing platform...";
+    }
+    warn "Segs before: " . `ipcs -m | wc -l` . "\n" if $ENV{PRINT_SEGS};
 }
+
+use Async::Event::Interval;
 
 my $mod = 'Async::Event::Interval';
 
@@ -30,5 +34,7 @@ is $e->waiting, 0, "An event doesn't set waiting until after it's done";
 sleep 1;
 
 is $e->waiting, 1, "Event sets waiting after it completes";
+
+warn "Segs after: " . `ipcs -m | wc -l` . "\n" if $ENV{PRINT_SEGS};
 
 done_testing();

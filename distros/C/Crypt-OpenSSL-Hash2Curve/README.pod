@@ -6,13 +6,13 @@ Crypt::OpenSSL::Hash2Curve - OpenSSL hash to curve
 
     use Crypt::OpenSSL::EC;
     use Crypt::OpenSSL::Bignum;
-    use Crypt::OpenSSL::Hash2Curve qw/expand_message_xmd encode_to_curve get_hash2curve_params hash_to_curve/;
+    use Crypt::OpenSSL::Hash2Curve;
 
     my $msg='abc';
     my $DST = 'QUUX-V01-CS02-with-P256_XMD:SHA-256_SSWU_RO_';
     my $group_name = "prime256v1";
     my $type = 'sswu';
-    my $P = hash_to_curve($msg, $DST, $group_name, $type, 'SHA256', \&Crypt::OpenSSL::Hash2Curve::expand_message_xmd , 1 );
+    my $P = hash_to_curve($msg, $DST, $group_name, $type, 'SHA256', \&expand_message_xmd , 1 );
 
     my $params_ref = get_hash2curve_params($group_name, $type);
     my $group = $params_ref->[0];
@@ -28,8 +28,32 @@ https://datatracker.ietf.org/doc/draft-irtf-cfrg-hash-to-curve/
 
 =item encode_to_curve
 
+  my $P = encode_to_curve( $msg, $DST, $group_name, $type, $hash_name, $expand_message_func, $clear_cofactor_flag );
+
+  my ($P, $group_params_ref) = encode_to_curve( $msg, $DST, $group_name, $type, $hash_name, $expand_message_func, $clear_cofactor_flag );
+
 =item hash_to_curve
 
+  my $P = hash_to_curve( $msg, $DST, $group_name, $type, $hash_name, $expand_message_func, $clear_cofactor_flag );
+
+  my ($P, $group_params_ref)  = hash_to_curve( $msg, $DST, $group_name, $type, $hash_name, $expand_message_func, $clear_cofactor_flag );
+
+=item get_hash2curve_params
+
+    my $group_params_ref = get_hash2curve_params($group_name, $type);
+    # $group_params_ref = [ $group, $c1, $c2, $p, $a, $b, $z, $ctx ];
+
+=item map_to_curve
+
+  my $P = map_to_curve( $params_ref, $group_name, $type, $u, $clear_cofactor_flag );
+
+=item hash_to_field
+
+  my $res_arr_ref =  hash_to_field( $msg, $count, $DST, $p, $m, $k, $hash_name, $expand_message_func );
+
+=item expand_message_xmd
+
+  my $s = expand_message_xmd( $msg, $DST, $len_in_bytes, $hash_name );
 
 =back
 

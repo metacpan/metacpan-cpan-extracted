@@ -1,0 +1,179 @@
+##############################################################################
+#
+#  Data::Tools::CSV perl module
+#  Copyright (c) 2013-2022 Vladi Belperchinov-Shabanski "Cade" 
+#        <cade@noxrun.com> <cade@bis.bg> <cade@cpan.org>
+#  http://cade.noxrun.com/  
+#
+#  GPL
+#
+##############################################################################
+package Data::Tools::CSV;
+use strict;
+use Exporter;
+
+our $VERSION = '1.27';
+
+our @ISA    = qw( Exporter );
+our @EXPORT = qw(
+
+                  parse_csv
+                  parse_csv_line
+                  
+                  parse_csv_to_hash_array
+
+                );
+
+our %EXPORT_TAGS = (
+                   
+                   'all'  => \@EXPORT,
+                   'none' => [],
+                   
+                   );
+
+##############################################################################
+
+
+sub parse_csv
+{
+  my $csv_data = shift;
+  
+  my @csv_data = grep /\S/, split /[\r\n]+/, $csv_data;
+  
+  # 123,is,testing,"""The"" book, is now",qwerty
+  my @res;
+  for my $line ( @csv_data )
+    {
+    push @res, parse_csv_line( $line );
+    }
+
+  return \@res;
+}
+
+sub parse_csv_line
+{
+  my @line = split //, shift;
+  my @out;
+  my $fld;
+  my $q;
+  for( @line, undef )
+    {
+    if( ( /,/ or ! defined ) and $q % 2 == 0 )
+      {
+      $fld =~ s/^"(.*?)"$/$1/;
+      $fld =~ s/""/"/g;
+      push @out, $fld;
+      $fld = undef;
+      next;
+      }
+    $q++ if /"/;
+    $fld .= $_;
+    }
+  
+  return \@out;
+}
+
+#-----------------------------------------------------------------------------
+
+sub parse_csv_to_hash_array
+{
+  my $csv_data = shift;
+  
+  my @csv_data = grep /\S/, split /[\r\n]+/, $csv_data;
+  
+  my $head = parse_csv_line( shift @csv_data );
+  
+  my @res;
+  for my $line ( @csv_data )
+    {
+    my $line_array = parse_csv_line( $line );
+    push @res, { map { $_ => shift @$line_array } @$head };
+    }
+
+  return \@res;
+}
+
+##############################################################################
+
+=pod
+
+
+=head1 NAME
+
+  Data::Tools::CSV -- compact, pure-perl CSV parsing
+
+=head1 SYNOPSIS
+
+  use Data::Tools::CSV qw( :all );  # import all functions
+  use Data::Tools::CSV;             # the same as :all :) 
+  use Data::Tools::CSV qw( :none ); # do not import anything
+
+  # --------------------------------------------------------------------------
+
+  my $array_of_arrays = parse_csv( $csv_data_string );
+  my @single_line     = parse_csv_line( $single_csv_line );
+  
+  while( <$fh> )
+    {
+    parse_csv_line( $_ );
+    ...  
+    }
+
+  # hash keys names are mapped from the first line of $csv_data (head)
+  my @array_of_hashes = parse_csv_to_hash_array( $csv_data );
+
+  # --------------------------------------------------------------------------
+
+=head1 FUNCTIONS
+
+=head2 parse_csv( $csv_data_string )
+
+Parses multi-line CSV text
+
+=head2 parse_csv_line( $single_csv_line )
+
+Parses single line CSV data.
+
+=head2 parse_csv_to_hash_array( $csv_data )
+
+This function uses first line as hash key names to produce array of hashes
+for the rest of the data.
+
+  NOTE: Lines with more data than header will discard extra data.
+  NOTE: Lines with less data than header will produce keys with undef values.
+
+=head1 IMPLEMENTATION DETAILS
+
+Data::Tools::CSV is pure-perl implementation and has compact code.
+It parses RFC4180 style CSV files:
+
+  https://www.ietf.org/rfc/rfc4180.txt
+  
+RFC4180 says:
+
+  * lines are CRLF delimited, however CR or LF-only are accepted as well.
+  * whitespace is data, will not be stripped.
+  * whitespace and delimiters can be quoted with double quotes (").
+  * quotes in quoted text should be doubled ("") as escaping.
+
+=head1 FEEDBACK
+
+Please, report any bugs or missing features as long as they follow RFC4180.
+
+=head1 GITHUB REPOSITORY
+
+  git@github.com:cade-vs/perl-data-tools.git
+  
+  git clone git://github.com/cade-vs/perl-data-tools.git
+  
+=head1 AUTHOR
+
+  Vladi Belperchinov-Shabanski "Cade"
+        <cade@noxrun.com> <cade@bis.bg> <cade@cpan.org>
+  http://cade.noxrun.com/  
+
+
+=cut
+
+##############################################################################
+1;

@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 33;
+use Test::More tests => 40;
 use Test::Deep;
 
 use lib qw(t/lib);
@@ -66,6 +66,8 @@ my $narrow_term = $sth->fetchrow_hashref();
 is ($narrow_term->{name}, 'narrow');
 my $obsolete_term = $sth->fetchrow_hashref();
 is ($obsolete_term->{name}, 'obsolete repairosome (obsolete GO:0000108)');
+my $pombase_gene_id_term = $sth->fetchrow_hashref();
+is ($pombase_gene_id_term->{name}, 'pombase_gene_id');
 my $replaced_by_term = $sth->fetchrow_hashref();
 is ($replaced_by_term->{name}, 'replaced_by');
 is ($sth->fetchrow_hashref(), undef);
@@ -176,3 +178,42 @@ is($prop_row->{cvterm_id}, $obsolete_term->{cvterm_id});
 is($prop_row->{type_id}, $consider_term->{cvterm_id});
 is($prop_row->{value}, 'GO:0004321');
 
+
+# test reading property_value from min_pro.obo
+
+$ontology_data = PomBase::Chobo::OntologyData->new();
+$fake_handle = ChoboTest::FakeHandle->new();
+
+$chobo = PomBase::Chobo->new(dbh => $fake_handle, ontology_data => $ontology_data);
+
+is($ontology_data->get_terms(), 0);
+
+$chobo->read_obo(filename => 't/data/mini_pro.obo');
+
+$chobo->chado_store();
+
+is($ontology_data->get_terms(), 2);
+
+$sth = $fake_handle->prepare("select cvterm_id, definition, name, cv_id from cvterm order by name");
+$sth->execute();
+
+my $histone_term = undef;
+
+while (defined (my $row = $sth->fetchrow_hashref())) {
+  if ($row->{name} eq 'histone H3.1, initiator methionine removed form (Schizosaccharomyces pombe)') {
+    $histone_term = $row;
+    last;
+  }
+}
+
+$sth = $fake_handle->prepare("select cvterm_id, type_id, value from cvtermprop");
+$sth->execute();
+
+$prop_row = $sth->fetchrow_hashref();
+
+is($prop_row->{cvterm_id}, $histone_term->{cvterm_id});
+is($prop_row->{type_id}, $pombase_gene_id_term->{cvterm_id});
+is($prop_row->{value}, 'SPAC1834.04');
+
+$prop_row = $sth->fetchrow_hashref();
+is($prop_row, undef);

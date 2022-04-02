@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 28;
+use Test::More tests => 29;
 use Test::Deep;
 
 use PomBase::Chobo::ParseOBO;
@@ -152,3 +152,4 @@ my $fypo_0009876_term =
 
 is($fypo_0009876_term->replaced_by(), 'FYPO:0001006');
 is($fypo_0009876_term->consider(), 'FYPO:0000123');
+cmp_deeply([$fypo_0009876_term->property_values()], [ [ "test_prop", "test_prop_value" ] ]);

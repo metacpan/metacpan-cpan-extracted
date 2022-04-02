@@ -1,7 +1,3 @@
-all
-benchmark/data.pl
-benchmark/hustle_table.pl
-benchmark/smart_dispatch.pl
 Changes
 lib/Hustle/Table.pm
 lib/Hustle/Table.pod

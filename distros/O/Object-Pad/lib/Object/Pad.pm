@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2019-2022 -- leonerd@leonerd.org.uk
 
-package Object::Pad 0.63;
+package Object::Pad 0.64;
 
 use v5.14;
 use warnings;
@@ -103,18 +103,18 @@ silence every experimental warning, which may hide others unintentionally. For
 a more fine-grained approach you can instead use the import line for this
 module to only silence the module's warnings selectively:
 
-   use Object::Pad qw( :experimental(init_expr) );
+   use Object::Pad ':experimental(init_expr)';
 
-   use Object::Pad qw( :experimental(mop) );
+   use Object::Pad ':experimental(mop)';
 
-   use Object::Pad qw( :experimental(custom_field_attr) );
+   use Object::Pad ':experimental(custom_field_attr)';
 
-   use Object::Pad qw( :experimental );  # all of the above
+   use Object::Pad ':experimental';  # all of the above
 
-It is best to do this on a separate line from the main C<use Object::Pad;> or
-else you'll have to specify all the keywords individually:
+Multiple experimental features can be enabled at once by giving multiple names
+in the parens, separated by spaces:
 
-   use Object::Pad qw( class role method has requires :experimental(init_expr) );
+   use Object::Pad ':experimental(init_expr mop)';
 
 =head2 Automatic Construction
 
@@ -987,23 +987,54 @@ sub import
    $class->import_into( $caller, @_ );
 }
 
-my @EXPERIMENTAL = qw( init_expr mop custom_field_attr );
+sub _import_experimental
+{
+   shift;
+   my ( $syms, @experiments ) = @_;
+
+   my %enabled;
+
+   my $i = 0;
+   while( $i < @$syms ) {
+      my $sym = $syms->[$i];
+
+      if( $sym eq ":experimental" ) {
+         $enabled{$_}++ for @experiments;
+      }
+      elsif( $sym =~ m/^:experimental\((.*)\)$/ ) {
+         my $tags = $1 =~ s/^\s+|\s+$//gr; # trim
+         $enabled{$_}++ for split m/\s+/, $tags;
+      }
+      else {
+         $i++;
+         next;
+      }
+
+      splice @$syms, $i, 1, ();
+   }
+
+   foreach ( @experiments ) {
+      $^H{"Object::Pad/experimental($_)"}++ if delete $enabled{$_};
+   }
+
+   croak "Unrecognised :experimental features @{[ keys %enabled ]}" if keys %enabled;
+}
 
 sub import_into
 {
    my $class = shift;
-   my ( $caller, @syms ) = @_;
+   my $caller = shift;
 
-   @syms or @syms = qw( class role method has requires );
+   $class->_import_experimental( \@_, qw( init_expr mop custom_field_attr ) );
 
-   my %syms = map { $_ => 1 } @syms;
-   delete $syms{$_} and $^H{"Object::Pad/$_"}++ for qw( class role method has requires );
+   my %syms = map { $_ => 1 } @_;
 
-   my $all_experimental = delete $syms{":experimental"};
-
-   foreach ( @EXPERIMENTAL ) {
-      $^H{"Object::Pad/experimental($_)"}++ if delete $syms{":experimental($_)"} or $all_experimental;
+   # Default imports
+   unless( %syms ) {
+      $syms{$_}++ for qw( class role method has requires );
    }
+
+   delete $syms{$_} and $^H{"Object::Pad/$_"}++ for qw( class role method has requires );
 
    croak "Unrecognised import symbols @{[ keys %syms ]}" if keys %syms;
 }

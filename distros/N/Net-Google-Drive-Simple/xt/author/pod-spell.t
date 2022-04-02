@@ -19,6 +19,7 @@ Baugh
 Bircumshaw
 Bloch
 CPAN
+Core
 Drive
 Emmanuel
 Google
@@ -42,6 +43,8 @@ Scott
 Simple
 Tim
 Todd
+V2
+V3
 Yxes
 arhuman
 atoomic

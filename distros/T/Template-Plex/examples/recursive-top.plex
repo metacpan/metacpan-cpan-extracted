@@ -2,6 +2,7 @@ Top level template with title is $title
 @{[
 	do {
 		$my_package_var=1;
+		#Non immediate. Render manually
 		my $t=plex("recursive-2.plex",{});
 		$t->render();
 	}

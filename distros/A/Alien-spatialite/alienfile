@@ -1,6 +1,7 @@
 use 5.010;
 use alienfile;
 use Sort::Versions;
+use Path::Tiny qw /path/;
 
 my $on_windows = $^O =~ /mswin/i;
 my $on_automated_rig
@@ -20,6 +21,7 @@ use Alien::sqlite;
 use Alien::freexl;
 use Alien::geos::af;
 
+my @alien_deps = qw( Alien::sqlite Alien::proj Alien::freexl Alien::geos::af );
 
 my $sep_char = $on_windows ? ';' : ':';
 $ENV{PATH} .= $sep_char
@@ -31,7 +33,7 @@ $ENV{PATH} .= $sep_char
             );
 
 plugin 'Build::SearchDep' => (
-  aliens   => [qw( Alien::sqlite Alien::proj Alien::freexl Alien::geos::af )],
+  aliens   => [@alien_deps],
   public_I => 1,
   public_l => 1,
 );
@@ -130,23 +132,88 @@ share {
     plugin 'Cleanse::BuildDir';
   }
 
-  #  ensure we optimise - should enable user control somehow
-  my $config_flags = qq{CFLAGS='-O2' CXXFLAGS='-O2'};
-  $config_flags = '';
-  #local $ENV{CFLAGS}   = '-O2';
-  #local $ENV{CXXFLAGS} = '-O2';
-  #say "CFLAGS IS " . ($ENV{CFLAGS} // '');
   meta->around_hook( build => \&set_compiler_flags );
+  meta->around_hook(
+    build => sub {
+      my ($orig, $build, @args) = @_;
+      $build->log("Setting CCACHE_BASEDIR to " . getcwd());
+      local $ENV{CCACHE_BASEDIR} = getcwd();
+      $orig->($build, @args);
+    }
+  );
 
   build [
-    "%{configure} $config_flags $with_local $with_cpp11 $build_static $extra_build_args",
+    "%{configure} $with_local $with_cpp11 $build_static $extra_build_args",
     \&pause,
     $make_cmd,
+    \&patch_rpaths,
     $make_inst_cmd,
     #@make_clean
   ];
 
 };
+
+#  should be a gather hook working on the stage dir
+sub patch_rpaths {
+  my ($build) = @_;
+  
+  #  only run on unices - incomplete check but
+  #  I don't think aliens work on VMS or zOS
+  return if ($on_windows or $^O =~ /darwin/i);
+
+  my $h = get_alien_state_hash();
+  my $install_path = $h->{install}{prefix};
+  return if !defined $install_path;
+
+  my @alien_rpaths;
+  for my $alien (@alien_deps) {
+    next if not $alien->install_type('share');
+    push @alien_rpaths, $alien->dist_dir . '/lib';
+  }
+  if (!@alien_rpaths) {
+    $build->log('No shared alien deps found, not updating rpaths');
+    return;
+  }
+
+  my $origin_string = $^O =~ /darwin/ ? '@loader_path' : '${ORIGIN}';
+  my $alien_rpath_text
+    = join ':', (
+       (map {$origin_string . '/../' . path ($_)->relative($install_path)->stringify} @alien_rpaths),
+       @alien_rpaths
+      );
+
+  $build->log ("Prepending rpaths with $alien_rpath_text");
+  
+  use File::Find::Rule;
+  my (@so_files)
+    = grep {not -l $_}
+      File::Find::Rule
+              ->file()
+              ->name( qr/^(lib|mod_)spatialite.so.?/ )
+              ->in( getcwd() );
+  
+  eval 'require Alien::patchelf'
+    or do {
+      warn 'Unable to load Alien::patchelf ($@), cannot update rpaths';
+      return;
+    };
+  my $pe = Alien::patchelf->new;
+  foreach my $so_file (@so_files) {
+    my ($old_rpath, $result, $stderr, @errors);
+    ($old_rpath, $stderr, @errors)
+      = $pe->patchelf ('--print-rpath', $so_file);
+    $old_rpath //= '';
+    #  prepend our paths
+    my $rpath = $alien_rpath_text . ($old_rpath ? (':' . $old_rpath) : '');
+    $build->log("Updating rpath for $so_file to $rpath, was $old_rpath");
+    ($result, $stderr, @errors)
+      = $pe->patchelf ('--set-rpath', $rpath, $so_file);
+    warn $stderr if $stderr;
+  }
+  
+  return;
+}
+
 
 sub set_compiler_flags {
   my ($orig, $build, @args) = @_;
@@ -160,7 +227,7 @@ sub set_compiler_flags {
 }
 
 sub pause {
-    #return;  #  re-enable in case of debug
+    return;  #  re-enable in case of debug
     return if $on_automated_rig;
     return if !$on_windows;
 

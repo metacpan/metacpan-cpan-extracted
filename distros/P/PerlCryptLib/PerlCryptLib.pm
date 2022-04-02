@@ -8,7 +8,7 @@ use Carp;
 require Exporter;
 use AutoLoader;
 
-our $VERSION = '1.11';
+our $VERSION = '1.12';
 
 
 #############################################################################
@@ -131,7 +131,7 @@ our $VERSION = '1.11';
 							cryptLogin cryptLogout 
 						);
 	# Add deprecated functions when CRYPTLIB_VERSION prior 3.4.0
-	push @FUNCTIONS, qw(cryptGenerateKeyAsync cryptAsyncQuery cryptAsyncCancel) if &CRYPTLIB_VERSION < 3400;
+	push @FUNCTIONS, qw(cryptGenerateKeyAsync cryptAsyncQuery cryptAsyncCancel) if &CRYPTLIB_VERSION < 340;
 
 	# Esportazione costanti e funzioni
 	our @ISA = qw(Exporter);
@@ -170,7 +170,7 @@ sub AUTOLOAD {
 require XSLoader;
 XSLoader::load('PerlCryptLib', $VERSION);
 ## Add deprecated functions if CRYPTLIB_VERSION is less than 3.4.0
-#XSLoader::load('PerlCryptLib-deprecated-340', $VERSION) if &CRYPTLIB_VERSION < 3400;
+#XSLoader::load('PerlCryptLib-deprecated-340', $VERSION) if &CRYPTLIB_VERSION < 340;
 
 if ( __FILE__ eq "$0" ) {
 	# TEST PACKAGE SPACE

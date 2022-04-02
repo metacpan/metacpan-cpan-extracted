@@ -2,7 +2,7 @@ package Test2::Harness::Runner::Preloader;
 use strict;
 use warnings;
 
-our $VERSION = '1.000114';
+our $VERSION = '1.000116';
 
 use B();
 use Carp qw/confess croak/;
@@ -369,13 +369,13 @@ sub _reload_cb_find_loaded { keys %{$_[0]->dtrace->loaded} }
 
 sub _reload_cb_should_watch {
     my $self = shift;
-    my ($file) = @_;
+    my ($reloader, $rel, $abs) = @_;
 
     my $dirs = $self->{+RESTRICT_RELOAD};
     return 1 unless $dirs && @$dirs;
 
     for my $dir (@$dirs) {
-        return 1 if 0 == index($file, $dir);
+        return 1 if 0 == index($abs, $dir);
     }
 
     return 0;

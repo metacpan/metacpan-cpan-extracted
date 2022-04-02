@@ -1,9 +1,9 @@
 ##############################################################################
 #
 #  Data::Tools perl module
-#  2013-2022 (c) Vladi Belperchinov-Shabanski "Cade"
-#  http://cade.datamax.bg
-#  <cade@bis.bg> <cade@cpan.org> <shabanski@gmail.com> 
+#  Copyright (c) 2013-2022 Vladi Belperchinov-Shabanski "Cade" 
+#        <cade@noxrun.com> <cade@bis.bg> <cade@cpan.org>
+#  http://cade.noxrun.com/  
 #
 #  GPL
 #
@@ -21,14 +21,14 @@ use MIME::Base64;
 use File::Glob;
 use Hash::Util qw( lock_hashref unlock_hashref lock_ref_keys );
 
-our $VERSION = '1.25';
+our $VERSION = '1.27';
 
 our @ISA    = qw( Exporter );
 our @EXPORT = qw(
 
-              data_tools_set_file_io_encoding
-              data_tools_set_file_io_utf8
-              data_tools_set_file_io_bin
+              data_tools_set_text_io_encoding
+              data_tools_set_text_io_utf8
+              data_tools_set_text_io_bin
 
               file_save
               file_load
@@ -120,6 +120,8 @@ our @EXPORT = qw(
               ref_thaw
 
               fork_exec_cmd
+              
+              parse_csv
             );
 
 our %EXPORT_TAGS = (
@@ -131,25 +133,22 @@ our %EXPORT_TAGS = (
             
 ##############################################################################
 
-my $FILE_IO_ENCODING;
-my $FILE_IO_BINMODE;
+my $TEXT_IO_ENCODING;
 
-sub data_tools_set_file_io_encoding
+sub data_tools_set_text_io_encoding
 {
-  $FILE_IO_ENCODING = shift;
-  $FILE_IO_BINMODE  = uc $FILE_IO_ENCODING eq ':RAW' ? 1 : 0;
+  $TEXT_IO_ENCODING = shift;
+  die "invalid text files io encoding [$TEXT_IO_ENCODING]" unless $TEXT_IO_ENCODING =~ /^[a-z_0-9:\-]*$/i;
 }
 
-sub data_tools_set_file_io_utf8
+sub data_tools_set_text_io_utf8
 {
-  $FILE_IO_ENCODING = 'UTF-8';
-  $FILE_IO_BINMODE  = 0;
+  data_tools_set_text_io_encoding( 'UTF-8' );
 }
 
-sub data_tools_set_file_io_bin
+sub data_tools_set_text_io_bin
 {
-  $FILE_IO_ENCODING = ':RAW';
-  $FILE_IO_BINMODE  = 1;
+  data_tools_set_text_io_encoding( undef );
 }
 
 ##############################################################################
@@ -172,11 +171,11 @@ sub file_load
     }
   
   my $i;
-  my $encoding = $opt->{ 'ENCODING' } || $FILE_IO_ENCODING;
+  my $encoding = $opt->{ 'ENCODING' };
   my $mopt;
   $mopt = ":encoding($encoding)" if $encoding;
   open( $i, "<" . $mopt, $fn ) or return undef;
-  binmode( $i ) if $opt->{ ':RAW' } || $FILE_IO_BINMODE;
+  binmode( $i ) if $opt->{ ':RAW' };
   local $/ = undef;
   my $s = <$i>;
   close $i;
@@ -200,11 +199,11 @@ sub file_load_ar
     }
   
   my $i;
-  my $encoding = $opt->{ 'ENCODING' } || $FILE_IO_ENCODING;
+  my $encoding = $opt->{ 'ENCODING' };
   my $mopt;
   $mopt = ":encoding($encoding)" if $encoding;
   open( $i, "<" . $mopt, $fn ) or return undef;
-  binmode( $i ) if $opt->{ ':RAW' } || $FILE_IO_BINMODE;
+  binmode( $i ) if $opt->{ ':RAW' };
   my @all = <$i>;
   close $i;
   return \@all;
@@ -222,13 +221,13 @@ sub file_save
     $fn = $opt->{ 'FNAME' } || $opt->{ 'FILE_NAME' };
     }
 
-  my $encoding = $opt->{ 'ENCODING' } || $FILE_IO_ENCODING;
+  my $encoding = $opt->{ 'ENCODING' };
   my $mopt;
   $mopt = ":encoding($encoding)" if $encoding;
 
   my $o;
   open( $o, ">" . $mopt, $fn ) or return 0;
-  binmode( $o ) if $opt->{ ':RAW' } || $FILE_IO_BINMODE;
+  binmode( $o ) if $opt->{ ':RAW' };
   print $o @_;
   close $o;
   return 1;
@@ -265,9 +264,45 @@ sub file_bin_save
 ##############################################################################
 # text files load/save
 
-*file_text_save    = *file_save;
-*file_text_load    = *file_load;
-*file_text_load_ar = *file_load_ar;
+sub file_text_load
+{
+  my $fn  = shift; # file name
+
+  my $i;
+  my $enc = ":encoding($TEXT_IO_ENCODING)" if $TEXT_IO_ENCODING;
+  open( $i, "<$enc", $fn ) or return undef;
+  binmode( $i ) unless $TEXT_IO_ENCODING;
+  local $/ = undef;
+  my $s = <$i>;
+  close $i;
+  return $s;
+}
+
+sub file_text_load_ar
+{
+  my $fn  = shift; # file name
+
+  my $i;
+  my $enc = ":encoding($TEXT_IO_ENCODING)" if $TEXT_IO_ENCODING;
+  open( $i, "<$enc", $fn ) or return undef;
+  binmode( $i ) unless $TEXT_IO_ENCODING;
+  my @a = <$i>;
+  close $i;
+  return \@a;
+}
+
+sub file_text_save
+{
+  my $fn = shift; # file name
+  
+  my $o;
+  my $enc = ":encoding($TEXT_IO_ENCODING)" if $TEXT_IO_ENCODING;
+  open( $o, ">$enc", $fn ) or return 0;
+  binmode( $o ) unless $TEXT_IO_ENCODING;
+  print $o @_;
+  close $o;
+  return 1;
+}
 
 ##############################################################################
 
@@ -406,10 +441,13 @@ sub str_url_unescape
 }
 
 my %HTML_ESCAPES = (
-                   '>' => '&gt;',
-                   '<' => '&lt;',
-                   "'" => '&rsquo;',
-                   "`" => '&lsquo;',
+                   '>'  => '&gt;',
+                   '<'  => '&lt;',
+                   "'"  => '&rsquo;',
+                   "`"  => '&lsquo;',
+                   "&"  => '&amp;',
+                   '"'  => '&quot;',
+                   '\\' => '&#134;',
                    );
 
 sub str_html_escape
@@ -1245,10 +1283,8 @@ check Data::Validate::Struct module by Thomas Linden, cheers :)
 =head1 AUTHOR
 
   Vladi Belperchinov-Shabanski "Cade"
-
-  <cade@biscom.net> <cade@datamax.bg> <cade@cpan.org>
-
-  http://cade.datamax.bg
+        <cade@noxrun.com> <cade@bis.bg> <cade@cpan.org>
+  http://cade.noxrun.com/  
 
 
 =cut

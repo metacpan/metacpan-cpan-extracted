@@ -2,7 +2,7 @@ package App::Yath::Command::test;
 use strict;
 use warnings;
 
-our $VERSION = '1.000114';
+our $VERSION = '1.000116';
 
 use App::Yath::Options;
 
@@ -279,6 +279,7 @@ sub render {
     my $buffer;
     while (1) {
         return if $self->{+SIGNAL};
+        $_->step for @{$renderers};
 
         my $line = <$reader>;
         unless(defined $line) {

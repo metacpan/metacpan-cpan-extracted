@@ -14,7 +14,7 @@ Cookie::Baker::XS - boost Cookie::Baker's crush\_cookie
 Cookie::Baker::XS provides cookie string parser that implemented by XS.
 This modules only provides parser, does not have a generator function.
 
-For more details, see [Cookie::Baker](https://metacpan.org/pod/Cookie::Baker)'s document
+For more details, see [Cookie::Baker](https://metacpan.org/pod/Cookie%3A%3ABaker)'s document
 
 # BENCHMARK
 
@@ -36,7 +36,7 @@ For more details, see [Cookie::Baker](https://metacpan.org/pod/Cookie::Baker)'s 
 
 # SEE ALSO
 
-[Cookie::Baker](https://metacpan.org/pod/Cookie::Baker)
+[Cookie::Baker](https://metacpan.org/pod/Cookie%3A%3ABaker)
 
 # LICENSE
 

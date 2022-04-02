@@ -71,6 +71,7 @@ sub new {
     noes => CPAN::Meta::Requirements->new,
     file => $args{file},
     verbose => $args{verbose},
+    optional => $args{optional},
     stash => {},
   );
 
@@ -148,7 +149,12 @@ sub _optional {
 }
 
 sub add {
-  shift->_add('requires', @_);
+  my $self = shift;
+  if ($self->{optional}) {
+    $self->_add('suggests', @_);
+  } else {
+    $self->_add('requires', @_);
+  }
 }
 
 sub add_recommendation {

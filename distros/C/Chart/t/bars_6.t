@@ -1,7 +1,8 @@
 #!/usr/bin/perl -w
 
-use Chart::Bars;
+BEGIN { unshift @INC, 'lib', '../lib'}
 use strict;
+use Chart::Bars;
 
 print "1..1\n";
 

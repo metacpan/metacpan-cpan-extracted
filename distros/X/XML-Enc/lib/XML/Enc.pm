@@ -9,12 +9,13 @@ use Carp;
 use XML::LibXML;
 use Crypt::OpenSSL::RSA;
 use Crypt::Mode::CBC;
+use Crypt::AuthEnc::GCM;
 use MIME::Base64 qw/decode_base64 encode_base64/;
 use Crypt::Random qw( makerandom_octet );
 
 use vars qw($VERSION @EXPORT_OK %EXPORT_TAGS $DEBUG);
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 our $DEBUG = 0;
 
@@ -24,10 +25,37 @@ our $DEBUG = 0;
 # 5.2.2 AES - 128 bit initialization vector (IV) (16 bytes)
 
 my %encmethods = (
-        'http://www.w3.org/2001/04/xmlenc#tripledes-cbc' => { ivsize => 8, keysize => 24, modename => 'DES_EDE' },
-        'http://www.w3.org/2001/04/xmlenc#aes128-cbc' => { ivsize => '16', keysize => 16, modename => 'AES' },
-        'http://www.w3.org/2001/04/xmlenc#aes192-cbc' => { ivsize => '16', keysize => 24, modename => 'AES' },
-        'http://www.w3.org/2001/04/xmlenc#aes256-cbc' => { ivsize => '16', keysize => 32, modename => 'AES' },
+        'http://www.w3.org/2001/04/xmlenc#tripledes-cbc' => {
+                                                            ivsize => 8,
+                                                            keysize => 24,
+                                                            modename => 'DES_EDE' },
+        'http://www.w3.org/2001/04/xmlenc#aes128-cbc' => {
+                                                            ivsize => '16',
+                                                            keysize => 16,
+                                                            modename => 'AES' },
+        'http://www.w3.org/2001/04/xmlenc#aes192-cbc' => {
+                                                            ivsize => '16',
+                                                            keysize => 24,
+                                                            modename => 'AES' },
+        'http://www.w3.org/2001/04/xmlenc#aes256-cbc' => {
+                                                            ivsize => '16',
+                                                            keysize => 32,
+                                                            modename => 'AES' },
+        'http://www.w3.org/2009/xmlenc11#aes128-gcm' => {
+                                                            ivsize   => '12',
+                                                            keysize  => 16,
+                                                            modename => 'AES',
+                                                            tagsize  => 16 },
+        'http://www.w3.org/2009/xmlenc11#aes192-gcm' => {
+                                                            ivsize   => '12',
+                                                            keysize  => 24,
+                                                            modename => 'AES',
+                                                            tagsize  => 16 },
+        'http://www.w3.org/2009/xmlenc11#aes256-gcm' => {
+                                                            ivsize   => '12',
+                                                            keysize  => 32,
+                                                            modename => 'AES',
+                                                            tagsize  => 16 },
         );
 
 
@@ -53,7 +81,7 @@ sub new {
     my $enc_method = exists($params->{'data_enc_method'}) ? $params->{'data_enc_method'} : 'aes256-cbc';
     $self->{'data_enc_method'} = $self->_setEncryptionMethod($enc_method);
 
-    my $key_method = exists($params->{'key_transport'}) ? $params->{'key_transport'} : 'rsa-1_5';
+    my $key_method = exists($params->{'key_transport'}) ? $params->{'key_transport'} : 'rsa-oaep-mgf1p ';
     $self->{'key_transport'} = $self->_setKeyEncryptionMethod($key_method);
 
     return $self;
@@ -178,6 +206,9 @@ sub _setEncryptionMethod {
                     'aes192-cbc'    => 'http://www.w3.org/2001/04/xmlenc#aes192-cbc',
                     'aes256-cbc'    => 'http://www.w3.org/2001/04/xmlenc#aes256-cbc',
                     'tripledes-cbc' => 'http://www.w3.org/2001/04/xmlenc#tripledes-cbc',
+                    'aes128-gcm'    => 'http://www.w3.org/2009/xmlenc11#aes128-gcm',
+                    'aes192-gcm'    => 'http://www.w3.org/2009/xmlenc11#aes192-gcm',
+                    'aes256-gcm'    => 'http://www.w3.org/2009/xmlenc11#aes256-gcm',
                   );
 
     return exists($methods{$method}) ? $methods{$method} : $methods{'aes256-cbc'};
@@ -212,7 +243,7 @@ sub _setKeyEncryptionMethod {
                     'rsa-oaep-mgf1p'    => 'http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p',
                 );
 
-    return exists($methods{$method}) ? $methods{$method} : $methods{'rsa-1_5'};
+    return exists($methods{$method}) ? $methods{$method} : $methods{'rsa-oaep-mgf1p'};
 }
 
 sub _DecryptData {
@@ -223,23 +254,35 @@ sub _DecryptData {
 
     my $iv;
     my $encrypted;
-    my $cbc;
+    my $plaintext;
+
+    my $ivsize   = $encmethods{$method}->{ivsize};
+    my $tagsize  = $encmethods{$method}->{tagsize};
+
+    $iv          = substr $encrypteddata, 0, $ivsize;
+    $encrypted   = substr $encrypteddata, $ivsize;
 
     # XML Encryption 5.2 Block Encryption Algorithms
     # The resulting cipher text is prefixed by the IV.
-    if (defined $encmethods{$method}){
-        my $blksize = $encmethods{$method}->{ivsize};
-        #print "Block Size: ", $blksize;
-        $iv              = substr $encrypteddata, 0, $blksize;
-        $encrypted       = substr $encrypteddata, $blksize;
-        $cbc = Crypt::Mode::CBC->new($encmethods{$method}->{modename}, 0);
+    if (defined $encmethods{$method} & $method !~ /gcm/ ){
+        my $cbc     = Crypt::Mode::CBC->new($encmethods{$method}->{modename}, 0);
+        $plaintext  = $self->_remove_padding($cbc->decrypt($encrypted, $key, $iv));
+    } elsif (defined $encmethods{$method} & $method =~ /gcm/ ){
+        my $gcm     = Crypt::AuthEnc::GCM->new("AES", $key, $iv);
+
+        # Note that GCM support for additional authentication
+        # data is not used in the XML specification.
+        my $tag     = substr $encrypted, - $tagsize;
+        $encrypted  = substr $encrypted, 0, (length $encrypted) - $tagsize;
+        $plaintext  = $gcm->decrypt_add($encrypted);
+        if ( ! $gcm->decrypt_done($tag) ) {
+            die "Tag expected did not match returned Tag";
+        }
     } else {
         die "Unsupported Encryption Algorithm";
     }
 
-    my $plaintext = $cbc->decrypt($encrypted, $key, $iv);
-
-    return $self->_remove_padding($plaintext);
+    return $plaintext;
 }
 
 sub _EncryptData {
@@ -248,25 +291,33 @@ sub _EncryptData {
     my $data    = shift;
     my $key     = shift;
 
-    my $iv;
-    my $cbc;
+    my $cipherdata;
+    my $ivsize  = $encmethods{$method}->{ivsize};
+    my $keysize = $encmethods{$method}->{keysize};
 
-    # XML Encryption 5.2 Block Encryption Algorithms
-    # The resulting cipher text is prefixed by the IV.
-    if (defined $encmethods{$method}){
-        my $blksize = $encmethods{$method}->{ivsize};
-        my $keysize = $encmethods{$method}->{keysize};
-        $iv         = makerandom_octet ( Length => $blksize);
-        ${$key}     = makerandom_octet ( Length => $keysize);
-        $data       = $self->_add_padding($data, $blksize);
-        $cbc        = Crypt::Mode::CBC->new($encmethods{$method}->{modename}, 0);
+    my $iv      = makerandom_octet ( Length => $ivsize);
+    ${$key}     = makerandom_octet ( Length => $keysize);
+
+    if (defined $encmethods{$method} & $method !~ /gcm/ ){
+        my $cbc = Crypt::Mode::CBC->new($encmethods{$method}->{modename}, 0);
+        # XML Encryption 5.2 Block Encryption Algorithms
+        # The resulting cipher text is prefixed by the IV.
+        $data       = $self->_add_padding($data, $ivsize);
+        $cipherdata = $iv . $cbc->encrypt($data, ${$key}, $iv);
+    } elsif (defined $encmethods{$method} & $method =~ /gcm/ ){
+        my $gcm = Crypt::AuthEnc::GCM->new($encmethods{$method}->{modename}, ${$key}, $iv);
+
+        # Note that GCM support for additional authentication
+        # data is not used in the XML specification.
+        my $encrypted   = $gcm->encrypt_add($data);
+        my $tag         = $gcm->encrypt_done();
+
+        $cipherdata     = $iv . $encrypted . $tag;
     } else {
         die "Unsupported Encryption Algorithm";
     }
 
-    my $encrypted = $iv . $cbc->encrypt($data, ${$key}, $iv);
-
-    return $encrypted;
+    return $cipherdata;
 }
 
 sub _DecryptKey {
@@ -728,7 +779,7 @@ XML::Enc - XML::Enc Encryption Support
 
 =head1 VERSION
 
-version 0.03
+version 0.05
 
 =head1 SYNOPSIS
 
@@ -791,9 +842,15 @@ Used in encryption.  Optional.  Default method: aes256-cbc
 
 =item * L<aes128-cbc|https://www.w3.org/TR/2002/REC-xmlenc-core-20021210/Overview.html#aes128-cbc>
 
-=item * L<aes196-cbc|https://www.w3.org/TR/2002/REC-xmlenc-core-20021210/Overview.html#aes192-cbc>
+=item * L<aes192-cbc|https://www.w3.org/TR/2002/REC-xmlenc-core-20021210/Overview.html#aes192-cbc>
 
 =item * L<aes256-cbc|https://www.w3.org/TR/2002/REC-xmlenc-core-20021210/Overview.html#aes256-cbc>
+
+=item * L<aes128-gcm|https://www.w3.org/TR/xmlenc-core/#aes128-gcm>
+
+=item * L<aes192-gcm|https://www.w3.org/TR/xmlenc-core/#aes192-gcm>
+
+=item * L<aes256-gcm|https://www.w3.org/TR/xmlenc-core/#aes256-gcm>
 
 =back
 

@@ -217,7 +217,7 @@ qx.Class.define("callbackery.ui.Card", {
 
             // add action buttons
             this.__actions.forEach(function(action) {
-                var btn = this.__createButton(action.label, action.buttonSet.icon);
+                var btn = this.__createButton(this.xtr(action.label), action.buttonSet.icon);
                 btn.addListener('execute', function() {
                     this.__parentForm.setSelection(this.__dataCache);
                     this.__buttonMap[action.key].execute();

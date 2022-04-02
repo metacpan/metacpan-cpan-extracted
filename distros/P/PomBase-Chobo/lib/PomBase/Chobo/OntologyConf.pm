@@ -33,7 +33,7 @@ under the same terms as Perl itself.
 
 =cut
 
-our $VERSION = '0.036'; # VERSION
+our $VERSION = '0.037'; # VERSION
 
 use warnings;
 use Carp;
@@ -257,6 +257,20 @@ our %field_conf = (
       }
 
       return $ret_string;
+    },
+  },
+  property_value => {
+    type => 'ARRAY',
+    process => sub {
+      my $raw_value = shift;
+
+      $raw_value =~ s/\s+xsd:\w+\s*$//;
+
+      my ($name, $value) = split(/\s+/, $raw_value, 2);
+
+      return [
+        $name, $value
+      ]
     },
   },
 );

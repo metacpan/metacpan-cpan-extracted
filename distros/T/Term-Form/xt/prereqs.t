@@ -14,6 +14,8 @@ prereq_ok( undef, [ qw(
         Term::Choose::Screen
         Term::Choose::ValidateOptions
         Term::Choose::Win32
+        Term::Form
+        Term::Form::ReadLine
 
         Data_Test_Arguments
         Data_Test_Readline

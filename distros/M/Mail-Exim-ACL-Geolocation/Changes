@@ -1,5 +1,10 @@
 Revision history for Mail::Exim::ACL::Geolocation
 
+1.002  2022-03-31 07:32:26 CEST
+
+  - cpanspec may produce incomprehensible output if there are hyperlinks in
+    the module description
+
 1.001  2022-01-25 17:28:55 CET
 
   - Die with "OS unsupported" in Makefile.PL on Windows

@@ -11,9 +11,10 @@ use File::Basename qw( basename );
 use List::MoreUtils   qw( none any duplicates );
 #use SQL::Type::Guess qw();                 # required
 
-use Term::Choose       qw();
-use Term::Choose::Util qw( insert_sep );
-use Term::Form         qw();
+use Term::Choose         qw();
+use Term::Choose::Util   qw( insert_sep );
+use Term::Form           qw();
+use Term::Form::ReadLine qw();
 
 use App::DBBrowser::Auxil;
 #use App::DBBrowser::CreateDropAttach::DropTable;   # required
@@ -39,7 +40,7 @@ sub create_view {
     require App::DBBrowser::Subqueries;
     my $sq = App::DBBrowser::Subqueries->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
-    my $tf = Term::Form->new( $sf->{i}{tf_default} );
+    my $tr = Term::Form::ReadLine->new( $sf->{i}{tr_default} );
     my $sql = {};
     $ax->reset_sql( $sql );
     $sf->{i}{stmt_types} = [ 'Create_view' ];
@@ -64,7 +65,7 @@ sub create_view {
             $sql->{table} = '?';
             my $info = $ax->get_sql_info( $sql );
             # Readline
-            my $view = $tf->readline(
+            my $view = $tr->readline(
                 'View name: ' . $sf->{o}{create}{view_name_prefix},
                 { info => $info }
             );
@@ -251,7 +252,7 @@ sub __get_table_name {
     my ( $sf, $sql, $table_name, $count_table_name_loop ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
-    my $tf = Term::Form->new( $sf->{i}{tf_default} );
+    my $tr = Term::Form::ReadLine->new( $sf->{i}{tr_default} );
     $ax->print_sql_info( $ax->get_sql_info( $sql ) );
 
     while ( 1 ) {
@@ -286,7 +287,7 @@ sub __get_table_name {
         }
         my $info = $ax->get_sql_info( $sql ) . ( $file_info ? "\n" . $file_info : '' );
         # Readline
-        $table_name = $tf->readline(
+        $table_name = $tr->readline(
             'Table name: ',
             { info => $info, default => $table_name }
         );

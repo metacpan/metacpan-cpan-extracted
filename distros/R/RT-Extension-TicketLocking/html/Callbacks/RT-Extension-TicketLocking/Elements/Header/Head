@@ -1,1 +1,3 @@
-<link rel="stylesheet" href="<% $RT::WebPath %>/NoAuth/css/ticket-locking.css" type="text/css" media="all" />
+% if ( RT::Handle::cmp_version($RT::VERSION, '5.0.0') < 0 ) {
+    <link rel="stylesheet" href="<% $RT::WebPath %>/NoAuth/css/ticket-locking.css" type="text/css" media="all" />
+% }

@@ -12,7 +12,7 @@ use List::MoreUtils qw( any uniq );
 use Term::Choose           qw();
 use Term::Choose::LineFold qw( line_fold );
 use Term::Choose::Util     qw( get_term_width );
-use Term::Form             qw();
+use Term::Form::ReadLine   qw();
 
 use App::DBBrowser::Auxil;
 
@@ -120,9 +120,9 @@ sub choose_subquery {
             $default = ( @$history_HD, @$history_RAM )[$idx][0];
         }
         $info = $ax->get_sql_info( $sql );
-        my $tf = Term::Form->new( $sf->{i}{tf_default} );
+        my $tr = Term::Form::ReadLine->new( $sf->{i}{tr_default} );
         # Readline
-        my $stmt = $tf->readline(
+        my $stmt = $tr->readline(
             $prompt,
             { default => $default, show_context => 1, info => $info }
         );
@@ -196,7 +196,7 @@ sub __edit_sq_file {
 sub __add_subqueries {
     my ( $sf, $history_HD, $top_lines ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $tf = Term::Form->new( $sf->{i}{tf_default} );
+    my $tr = Term::Form::ReadLine->new( $sf->{i}{tr_default} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $history_RAM = $sf->__tmp_history( $history_HD );
     my $used = [];
@@ -236,7 +236,7 @@ sub __add_subqueries {
         elsif ( $menu->[$idx] eq $readline ) {
             my $info = join( "\n", @tmp_info );
             # Readline
-            my $stmt = $tf->readline(
+            my $stmt = $tr->readline(
                 'Stmt: ',
                 { info => $info, show_context => 1, clear_screen => 1 }
             );
@@ -250,7 +250,7 @@ sub __add_subqueries {
             my $folded_stmt = "\n" . line_fold( 'Stmt: ' . $stmt, get_term_width(), { init_tab => '', subseq_tab => ' ' x length( 'Stmt: ' ), join => 1 } );
             $info = join( "\n", @tmp_info ) . $folded_stmt;
             # Readline
-            my $name = $tf->readline(
+            my $name = $tr->readline(
                 'Name: ',
                 { info => $info, show_context => 1 }
             );
@@ -269,7 +269,7 @@ sub __add_subqueries {
             my $folded_stmt = "\n" . line_fold( 'Stmt: ' . $stmt, get_term_width(), { init_tab => '', subseq_tab => ' ' x length( 'Stmt: ' ), join => 1 } );
             my $info = join( "\n", @tmp_info ) . $folded_stmt;
             # Readline
-            my $name = $tf->readline(
+            my $name = $tr->readline(
                 'Name: ',
                 { info => $info, show_context => 1 }
             );
@@ -345,9 +345,9 @@ sub __edit_subqueries {
             }
             push @tmp_info, ' ';
             my $info = join "\n", @tmp_info;
-            my $tf = Term::Form->new( $sf->{i}{tf_default} );
+            my $tr = Term::Form::ReadLine->new( $sf->{i}{tr_default} );
             # Readline
-            my $stmt = $tf->readline(
+            my $stmt = $tr->readline(
                 'Stmt: ',
                 { info => $info, default => $history_HD->[$idx][0], show_context => 1, clear_screen => 1 }
             );
@@ -362,7 +362,7 @@ sub __edit_subqueries {
             }
             $info .= $folded_stmt;
             # Readline
-            my $name = $tf->readline(
+            my $name = $tr->readline(
                 'Name: ',
                 { info => $info, default => $default, show_context => 1 }
             );

@@ -6,7 +6,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = 1.001;
+our $VERSION = 1.002;
 
 use Exporter qw(import);
 use IP::Geolocation::MMDB;
@@ -54,7 +54,7 @@ Mail::Exim::ACL::Geolocation - Map IP addresses to country codes
 
 =head1 VERSION
 
-version 1.001
+version 1.002
 
 =head1 SYNOPSIS
 
@@ -67,9 +67,9 @@ version 1.001
 
 =head1 DESCRIPTION
 
-A Perl module for the L<Exim|https://www.exim.org/> mailer that maps IP
-addresses to two-letter country codes such as "DE", "FR" and "US".
-SpamAssassin can use these country codes to filter junk email.
+A Perl module for the Exim mailer that maps IP addresses to two-letter country
+codes such as "DE", "FR" and "US".  SpamAssassin can use these country codes
+to filter junk email.
 
 =head1 SUBROUTINES/METHODS
 

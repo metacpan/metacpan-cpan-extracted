@@ -3,10 +3,12 @@
 #
 #  (C) Paul Evans, 2016-2018 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Tool 0.46;
+package Devel::MAT::Tool 0.47;
 
 use v5.14;
 use warnings;
+
+use Syntax::Keyword::Match;
 
 use List::Util qw( any );
 use Commandable::Invocation;
@@ -166,11 +168,35 @@ sub get_opts_from_inv
 
       my $spec = $optspec->{$opt} or die "No such option '--$opt'\n";
 
-      for( $spec->{type} // "" ) {
-         m/^$/ and $opts{$opt} = 1, last;
-         m/^[si]$/ and $opts{$opt} = $inv->pull_token, last; # TODO: check number
-         die "TODO: unrecognised type $_\n";
+      my $val;
+      match( $spec->{type} // "" : eq ) {
+         case( "" ) {
+            $val = 1;
+         }
+         case( "s" ) {
+            defined( $val = $inv->pull_token ) or
+               die "Option --$opt requires a value\n";
+         }
+         case( "i" ) {
+            defined( $val = $inv->pull_token ) or
+               die "Option --$opt requires a value\n";
+            $val =~ m/^-?\d+$/ or
+               die "Option --$opt value '$val' is not a number\n";
+         }
+         case( "x" ) {
+            defined( $val = $inv->pull_token ) or
+               die "Option --$opt requires a value\n";
+            $val =~ m/^-?\d+$/ or $val =~ m/^0x[0-9a-f]+$/i or
+               die "Option --$opt value '$val' is not a (hex)number\n";
+            no warnings 'portable';
+            $val = hex $val if $val =~ m/^0x/;
+         }
+         default {
+            die "TODO: unrecognised type $_\n";
+         }
       }
+
+      $opts{$opt} = $val;
    }
 
    $inv->putback_tokens( @remaining );

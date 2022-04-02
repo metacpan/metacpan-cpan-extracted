@@ -5,8 +5,7 @@ use warnings;
 
 use Test::More;
 
-use Object::Pad;
-use Object::Pad qw( :experimental(mop) :experimental(custom_field_attr) );
+use Object::Pad ':experimental( mop custom_field_attr )';
 
 Object::Pad::MOP::FieldAttr->register( SomeAttr =>
    permit_hintkey => "t/SomeAttr",

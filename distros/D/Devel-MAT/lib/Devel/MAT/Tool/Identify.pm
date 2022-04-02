@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2016-2017 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Tool::Identify 0.46;
+package Devel::MAT::Tool::Identify 0.47;
 
 use v5.14;
 use warnings;

@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 40;
+use Test::More tests => 70;
 use XML::Enc;
 use MIME::Base64 qw/decode_base64/;
 use File::Which;
@@ -19,13 +19,26 @@ my $plaintext = <<'UNENCRYPTED';
 UNENCRYPTED
 
 my @key_methods     = qw/rsa-1_5 rsa-oaep-mgf1p/;
-my @data_methods    = qw/aes128-cbc aes192-cbc aes256-cbc tripledes-cbc/;
+my @data_methods    = qw/aes128-cbc aes192-cbc aes256-cbc tripledes-cbc aes128-gcm aes192-gcm aes256-gcm/;
+
+my %uri = (
+                'aes128-cbc'    => 'http://www.w3.org/2001/04/xmlenc#',
+                'aes192-cbc'    => 'http://www.w3.org/2001/04/xmlenc#',
+                'aes256-cbc'    => 'http://www.w3.org/2001/04/xmlenc#',
+                'tripledes-cbc' => 'http://www.w3.org/2001/04/xmlenc#',
+                'aes128-gcm'    => 'http://www.w3.org/2009/xmlenc11#',
+                'aes192-gcm'    => 'http://www.w3.org/2009/xmlenc11#',
+                'aes256-gcm'    => 'http://www.w3.org/2009/xmlenc11#',
+            );
 
 my %sesskey = (
                 'aes128-cbc'    => 'aes-128',
                 'aes192-cbc'    => 'aes-192',
                 'aes256-cbc'    => 'aes-256',
                 'tripledes-cbc' => 'des-192',
+                'aes128-gcm'    => 'aes-128-GCM',
+                'aes192-gcm'    => 'aes-192-GCM',
+                'aes256-gcm'    => 'aes-256-GCM',
             );
 
 foreach my $km (@key_methods) {
@@ -41,7 +54,7 @@ XML Security Library example: Original XML
   xmlns="http://www.w3.org/2001/04/xmlenc#"
   Type="http://www.w3.org/2001/04/xmlenc#Element">
  <EncryptionMethod Algorithm=
-   "http://www.w3.org/2001/04/xmlenc#$dm"/>
+   "$uri{$dm}$dm"/>
  <KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#">
   <EncryptedKey xmlns="http://www.w3.org/2001/04/xmlenc#">
    <EncryptionMethod Algorithm=
@@ -70,7 +83,7 @@ XML Security Library example: Original XML
   xmlns="http://www.w3.org/2001/04/xmlenc#"
   Type="http://www.w3.org/2001/04/xmlenc#Content">
  <EncryptionMethod Algorithm=
-   "http://www.w3.org/2001/04/xmlenc#$dm"/>
+   "$uri{$dm}$dm"/>
  <KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#">
   <EncryptedKey xmlns="http://www.w3.org/2001/04/xmlenc#">
    <EncryptionMethod Algorithm=
@@ -91,6 +104,11 @@ CONTENT
 
 SKIP: {
             skip "xmlsec1 not installed", 5 unless which('xmlsec1');
+            my $version;
+            if (`xmlsec1 version` =~ m/(\d+\.\d+\.\d+)/) {
+                $version = $1;
+            };
+            skip "xmlsec version 1.2.27 minimum for GCM", 5 if $version lt '1.2.27';
 
             ok( open XML, '>', 'plaintext.xml' );
             print XML $plaintext;

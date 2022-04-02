@@ -1,0 +1,49 @@
+---
+abstract: 'Alien package for the patchelf utility'
+author:
+  - 'Shawn Laffan <shawnlaffan@gmail.com>'
+build_requires:
+  Alien::Build: '2.25'
+  Alien::Build::MM: '1.41'
+  Alien::Build::Plugin::Download::GitHub: '0'
+  ExtUtils::MakeMaker: '6.52'
+  Test::Alien: '0'
+configure_requires:
+  Alien::Build: '2.25'
+  Alien::Build::MM: '1.41'
+  Alien::Build::Plugin::Download::GitHub: '0'
+  Alien::Build::Plugin::Fetch::CurlCommand: '1.19'
+  ExtUtils::MakeMaker: '6.52'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-patchelf
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Alien::Base: '1.41'
+  Alien::Build: '0.25'
+  Capture::Tiny: '0'
+resources:
+  bugtracker: https://github.com/PerlAlien/Alien-patchelf/issues/
+  repository: https://github.com/PerlAlien/Alien-patchelf
+version: '0.03'
+x_alienfile:
+  generated_by: 'Alien::Build::MM version 2.48'
+  requires:
+    share:
+      Alien::Autotools: '0'
+      Alien::Build::Plugin::Download::Negotiate: '1.30'
+      Archive::Tar: '0'
+      Config: '0'
+      IO::Zlib: '0'
+      Mojo::DOM58: '1.00'
+      URI: '0'
+      URI::Escape: '0'
+    system: {}
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

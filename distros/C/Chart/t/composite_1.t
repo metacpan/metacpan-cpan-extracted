@@ -1,5 +1,6 @@
 #!/usr/bin/perl -w
 
+BEGIN { unshift @INC, 'lib', '../lib'}
 use Chart::Composite;
 print "1..1\n";
 

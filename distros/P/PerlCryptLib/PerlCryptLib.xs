@@ -595,7 +595,7 @@ int cryptQueryObject(objectData, objectDataLength, cryptObjectInfo)
 		RETVAL
 
 # Add deprecated functions when CRYPTLIB_VERSION prior 3.4.0
-#if CRYPTLIB_VERSION < 3400
+#if CRYPTLIB_VERSION < 340
 
 int cryptAsyncCancel(cryptObject)
 	const int cryptObject;

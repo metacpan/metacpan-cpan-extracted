@@ -10,15 +10,13 @@ use Mojo::Util 'html_unescape';
 use Text::Wrap 'wrap';
 use Bible::Reference;
 
-our $VERSION = '2.03'; # VERSION
+our $VERSION = '2.04'; # VERSION
 
 has _load             => {};
 has indent_width      => 4;
 has reference_acronym => 0;
 has fnxref_acronym    => 1;
 has wrap_at           => 80;
-has wrap_lines        => 1;
-has wrap_indents      => 0;
 has reference         => Bible::Reference->new(
     bible   => 'Protestant',
     sorting => 1,
@@ -139,10 +137,10 @@ sub _clean_html_to_obml ( $self, $html ) {
     $obml =~ s|<indent level="\d+">||g;
     $obml =~ s|</indent>||g;
 
-    if ( $self->wrap_lines ) {
+    if ( $self->wrap_at ) {
         # wrap lines that don't end in <br>
         $obml = join( "\n", map {
-            unless ( s|<br>|| and not $self->wrap_indents ) {
+            unless ( s|<br>|| ) {
                 s/^(\s+)//;
                 $Text::Wrap::columns = $self->wrap_at - length( $1 || '' );
                 wrap( $1, $1, $_ );
@@ -181,7 +179,7 @@ sub _obml_to_clean_html ( $self, $obml ) {
             my ($last_line_indent) = $obml[-1] =~ /^([ ]*)/;
             my ($this_line_indent) = $line     =~ /^([ ]*)/;
 
-            if ( length $last_line_indent == length $this_line_indent ) {
+            if ( length $last_line_indent == 0 and length $this_line_indent == 0 ) {
                 $line =~ s/^[ ]+//;
                 $obml[-1] .= ' ' . $line;
             }
@@ -336,7 +334,7 @@ Bible::OBML - Open Bible Markup Language parser and renderer
 
 =head1 VERSION
 
-version 2.03
+version 2.04
 
 =for markdown [![test](https://github.com/gryphonshafer/Bible-OBML/workflows/test/badge.svg)](https://github.com/gryphonshafer/Bible-OBML/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/Bible-OBML/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Bible-OBML)
@@ -527,18 +525,8 @@ change that by setting the value of this accessor to a false value.
 =head2 wrap_at
 
 By default, lines of OBML that are not indented will be wrapped at 80
-characters. You can adjust this point with this attribute.
-
-=head2 wrap_lines
-
-This is a boolean attribute, default to true, that stipulates whether or not
-wrapping of OBML lines happens.
-
-=head2 wrap_indents
-
-This is a boolean attribute, default to false, that stipulates whether or not
-wrapping of OBML indented lines happens. This value is ignored if C<wrap_lines>
-is false.
+characters. You can adjust this point with this attribute. If set to a false
+value, no wrapping will take place.
 
 =head1 SEE ALSO
 

@@ -34,7 +34,6 @@ do { my $x = {
                                       'OAuth::Cmdline' => '0.07',
                                       'Pod::Usage' => '1.36',
                                       'Sysadm::Install' => '0.43',
-                                      'YAML' => '0.71',
                                       'perl' => '5.016'
                                     }
                     },

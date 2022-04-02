@@ -8,7 +8,7 @@ package Devel::MAT::Dumper::Helper;
 use strict;
 use warnings;
 
-our $VERSION = '0.44';
+our $VERSION = '0.45';
 
 =head1 NAME
 
@@ -221,6 +221,20 @@ The I<ctx> pointer to the helper function points at an opaque structure
 internal to the C<Devel::MAT::Dumper> module. Helper functions are not
 expected to interact with it, except to pass it on any C<DMD_DUMP_STRUCT>
 calls it may make.
+
+=head2 DMD_ADD_ROOT
+
+   DMD_ADD_ROOT(SV *sv, const char *name);
+
+This macro should be called from the C<BOOT> section of the XS module to add
+another root SV pointer to be added to the root SVs table. This is useful for
+annotating static SV pointers or other storage that can refer to SVs or memory
+structures within the module, but which would not be discovered by a normal
+heap walk.
+
+The I<name> argument is also used as the description string within the
+C<Devel::MAT> UI. It should begin with either a C<+> or C<-> character to
+annotate that the root contains a strong or weak reference, respectively.
 
 =head2 DMD_ANNOTATE_SV
 
@@ -502,6 +516,15 @@ static bool S_DMD_is_active(pTHX)
   }
   return active;
 #endif
+}
+
+#define DMD_ADD_ROOT(sv, name) S_DMD_add_root(aTHX_ sv, name)
+static void S_DMD_add_root(pTHX_ SV *sv, const char *name)
+{
+  AV *moreroots = get_av("Devel::MAT::Dumper::MORE_ROOTS", GV_ADD);
+
+  av_push(moreroots, newSVpvn(name, strlen(name)));
+  av_push(moreroots, sv);
 }
 
 #endif

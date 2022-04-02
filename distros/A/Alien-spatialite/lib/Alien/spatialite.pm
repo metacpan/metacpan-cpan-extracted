@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use parent qw( Alien::Base );
 
-our $VERSION = '1.05';
+our $VERSION = '1.07';
 
 
 1;
@@ -13,7 +13,7 @@ __END__
 
 =head1 NAME
 
-Alien::spatialite - Compile the spatialite library
+Alien::spatialite - Alien package for the spatialite library
 
 =head1 BUILD STATUS
  
@@ -52,8 +52,9 @@ L<Alien::geos::af>
 
 L<Alien::proj>
 
-L<Alien::spatialite>
+L<Alien::sqlite>
 
+L<Alien::patchelf>
 
 
 =head1 AUTHORS

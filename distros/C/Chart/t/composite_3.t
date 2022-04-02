@@ -1,4 +1,6 @@
 #!/usr/bin/perl -w
+
+BEGIN { unshift @INC, 'lib', '../lib'}
 use strict;
 use Chart::Composite;    #(type is one of: Points, Lines, Bars, LinesPoints, Composite, StackedBars, Mountain)
 

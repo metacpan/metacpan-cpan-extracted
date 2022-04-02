@@ -1,5 +1,15 @@
 Revision history for Object-Pad
 
+0.64    2022-04-02
+        [CHANGES]
+         * Improvements to `:experimental` import tag (RT141801):
+            + Support multiple experiments at once
+            + Make sure to still enable the default keywords
+         * Much better integration with `Devel::MAT::Dumper`:
+            + Export complete C-level structures and magic VTBL root
+         * Adjusted wording of "MOP API is experimental" so it doesn't refer
+           to a package that doesn't actually exist (RT141801)
+
 0.63    2022-03-07
         [CHANGES]
          * Deleted long-deprecated Object::Pad->begin_class

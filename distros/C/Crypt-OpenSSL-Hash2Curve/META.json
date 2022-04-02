@@ -1,10 +1,10 @@
 {
-   "abstract" : "unknown",
+   "abstract" : "hash to curve",
    "author" : [
       "Pan Lanlan <abbypan@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
@@ -22,25 +22,48 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "Crypt::OpenSSL::Guess" : "0.12",
+            "ExtUtils::MakeMaker" : "0",
+            "Test" : "0"
          }
       },
       "configure" : {
          "requires" : {
+            "Crypt::OpenSSL::Guess" : "0.12",
             "ExtUtils::MakeMaker" : "0"
          }
       },
       "runtime" : {
+         "recommends" : {
+            "Crypt::OpenSSL::Bignum" : "0.09"
+         },
          "requires" : {
             "Carp" : "0.01",
+            "Crypt::OpenSSL::Base::Func" : "0.03",
             "Crypt::OpenSSL::Bignum" : "0.09",
             "Crypt::OpenSSL::EC" : "1.31",
+            "Crypt::OpenSSL::Guess" : "0.12",
             "Math::BigInt" : "1.999815",
-            "Test::More" : "0.01"
+            "Test" : "0.01",
+            "Test::More" : "0.01",
+            "bignum" : "0.52",
+            "perl" : "5.006"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.02",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/abbypan/Crypt-OpenSSL-Hash2Curve/issues"
+      },
+      "homepage" : "http://github.com/abbypan/Crypt-OpenSSL-Hash2Curve",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/abbypan/Crypt-OpenSSL-Hash2Curve"
+      }
+   },
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

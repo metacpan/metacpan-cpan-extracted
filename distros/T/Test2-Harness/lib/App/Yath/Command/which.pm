@@ -2,7 +2,7 @@ package App::Yath::Command::which;
 use strict;
 use warnings;
 
-our $VERSION = '1.000114';
+our $VERSION = '1.000116';
 
 use App::Yath::Util qw/find_pfile/;
 
@@ -25,7 +25,7 @@ This will tell you about any persistent runners it can find.
 sub run {
     my $self = shift;
 
-    my $pfile = find_pfile($self->settings);
+    my $pfile = find_pfile($self->settings, no_fatal => 1);
 
     unless ($pfile) {
         print "\nNo persistent harness was found for the current path.\n\n";

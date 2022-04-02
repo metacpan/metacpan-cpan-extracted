@@ -77,18 +77,18 @@ DESCRIPTION
     the import line for this module to only silence the module's warnings
     selectively:
 
-       use Object::Pad qw( :experimental(init_expr) );
+       use Object::Pad ':experimental(init_expr)';
     
-       use Object::Pad qw( :experimental(mop) );
+       use Object::Pad ':experimental(mop)';
     
-       use Object::Pad qw( :experimental(custom_field_attr) );
+       use Object::Pad ':experimental(custom_field_attr)';
     
-       use Object::Pad qw( :experimental );  # all of the above
+       use Object::Pad ':experimental';  # all of the above
 
-    It is best to do this on a separate line from the main use Object::Pad;
-    or else you'll have to specify all the keywords individually:
+    Multiple experimental features can be enabled at once by giving
+    multiple names in the parens, separated by spaces:
 
-       use Object::Pad qw( class role method has requires :experimental(init_expr) );
+       use Object::Pad ':experimental(init_expr mop)';
 
  Automatic Construction
 

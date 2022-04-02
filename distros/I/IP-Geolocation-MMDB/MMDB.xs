@@ -49,8 +49,11 @@ typedef struct {
   to_bigint(SELF, (IPNUM).bytes, sizeof((IPNUM).bytes))
 
 #define numeric_ip_set_bit(IPNUM, BIT) { \
-  div_t d = div(BIT, 8 * sizeof(char)); \
-  (IPNUM).bytes[15 - d.quot] |= (128 >> (7 - d.rem)); \
+  int num = (BIT); \
+  int denom = 8 * sizeof(char); \
+  int quot = num / denom; \
+  int rem = num % denom; \
+  (IPNUM).bytes[15 - quot] |= (128 >> (7 - rem)); \
 }
 
 static SV *

@@ -20,10 +20,10 @@ name: IP-Geolocation-MMDB
 provides:
   IP::Geolocation::MMDB:
     file: lib/IP/Geolocation/MMDB.pm
-    version: '1.006'
+    version: '1.007'
   IP::Geolocation::MMDB::Metadata:
     file: lib/IP/Geolocation/MMDB/Metadata.pm
-    version: '1.006'
+    version: '1.007'
 requires:
   Math::BigInt: '1.999806'
   XSLoader: '0'
@@ -34,7 +34,7 @@ resources:
   bugtracker: https://gitlab.com/voegelas/ip-geolocation-mmdb/-/issues
   homepage: https://gitlab.com/voegelas/ip-geolocation-mmdb
   repository: https://gitlab.com/voegelas/ip-geolocation-mmdb.git
-version: '1.006'
-x_generated_by_perl: v5.34.0
+version: '1.007'
+x_generated_by_perl: v5.34.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

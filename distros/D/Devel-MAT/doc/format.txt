@@ -269,9 +269,10 @@ SV extensions:
     Header(2):
       U8    TYPE
       U8    FLAGS  0x01 : MGf_REFCOUNTED
-    PTRs(2):
+    PTRs(3):
             MG_OBJ
             MG_PTR
+            MG_VTBL
 
   type: SAVED_SV (0x81)
     Header(0)

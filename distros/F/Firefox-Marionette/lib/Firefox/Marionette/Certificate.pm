@@ -3,7 +3,7 @@ package Firefox::Marionette::Certificate;
 use strict;
 use warnings;
 
-our $VERSION = '1.22';
+our $VERSION = '1.23';
 
 sub _NUMBER_OF_MICROSECOND_DIGITS { return -6 }
 
@@ -24,9 +24,20 @@ sub common_name {
     return $self->{commonName};
 }
 
+sub _cert_type {
+    my ($self) = @_;
+    if ( defined $self->{certType} ) {
+        return $self->{certType};
+    }
+    return 0;
+}
+
 sub is_any_cert {
     my ($self) = @_;
-    return $self->{ANY_CERT} & $self->{certType};
+    if ( defined $self->{ANY_CERT} ) {
+        return $self->{ANY_CERT} & $self->_cert_type();
+    }
+    return 0;
 }
 
 sub email_address {
@@ -53,7 +64,7 @@ sub db_key {
 
 sub is_unknown_cert {
     my ($self) = @_;
-    return $self->{UNKNOWN_CERT} & $self->{certType};
+    return $self->{UNKNOWN_CERT} & $self->_cert_type();
 }
 
 sub is_built_in_root {
@@ -73,12 +84,12 @@ sub sha256_fingerprint {
 
 sub is_server_cert {
     my ($self) = @_;
-    return $self->{SERVER_CERT} & $self->{certType};
+    return $self->{SERVER_CERT} & $self->_cert_type();
 }
 
 sub is_user_cert {
     my ($self) = @_;
-    return $self->{USER_CERT} & $self->{certType};
+    return $self->{USER_CERT} & $self->_cert_type();
 }
 
 sub subject_name {
@@ -93,7 +104,7 @@ sub key_usages {
 
 sub is_ca_cert {
     my ($self) = @_;
-    return $self->{CA_CERT} & $self->{certType};
+    return $self->{CA_CERT} & $self->_cert_type();
 }
 
 sub issuer_organization_unit {
@@ -124,7 +135,7 @@ sub serial_number {
 
 sub is_email_cert {
     my ($self) = @_;
-    return $self->{EMAIL_CERT} & $self->{certType};
+    return $self->{EMAIL_CERT} & $self->_cert_type();
 }
 
 sub issuer_common_name {
@@ -166,7 +177,7 @@ Firefox::Marionette::Certificate - Represents a x509 Certificate from Firefox
 
 =head1 VERSION
 
-Version 1.22
+Version 1.23
 
 =head1 SYNOPSIS
 
@@ -175,7 +186,10 @@ Version 1.22
 
     my $firefox = Firefox::Marionette->new();
     foreach my $certificate (sort { $a->display_name() cmp $b->display_name() } $firefox->certificates()) {
-       ...
+        if ($certificate->is_ca_cert()) {
+            print 'PEM Encoded CA Certificate ' . "\n" . $firefox->certificate_as_pem($certificate) . "\n";
+        }
+        ...
     }
 
 =head1 DESCRIPTION
@@ -202,7 +216,7 @@ returns the emailAddress field if supplied, otherwise it will return undef.
 
 =head2 is_any_cert
 
-returns a boolean value to determine if the certificate is a certificate.  I would regard it as quite surprising to get a certificate that returned false.
+returns a boolean value to determine if the certificate is a certificate.  This can return false for old browsers that do not support this attribute (such as Firefox 31.1.0esr).
 
 =head2 is_built_in_root
 

@@ -30,6 +30,6 @@ use strict;
 use warnings;
 use utf8;
 
-use constant VERSION => '22.2.0';
+use constant VERSION => '22.3.0';
 
 1;

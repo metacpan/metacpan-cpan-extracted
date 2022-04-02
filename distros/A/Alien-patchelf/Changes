@@ -1,0 +1,11 @@
+Revision history for Alien::patchelf
+
+0.03 2022-04-02
+    - Add Alien::Build::Plugin::Download::GitHub to
+      configure section in Makefile.PL
+
+0.02 2022-03-30
+    - POD fixes
+
+0.01 2022-03-30
+    - First release

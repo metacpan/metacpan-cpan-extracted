@@ -8,6 +8,7 @@ build_requires:
   Alien::Build::Plugin::Cleanse::BuildDir: '0'
   Alien::freexl: '0'
   Alien::geos::af: '1.007'
+  Alien::patchelf: '0'
   Alien::proj: '0'
   Alien::sqlite: '1.02'
   Archive::Tar: '0'
@@ -19,6 +20,7 @@ build_requires:
   HTTP::Tiny: '0.044'
   IO::Zlib: '0'
   Mojo::DOM58: '1.00'
+  Path::Tiny: '0'
   PkgConfig: '0.19026'
   Sort::Versions: '0'
   Test::Alien: '0'
@@ -38,7 +40,7 @@ configure_requires:
   PkgConfig: '0'
   Sort::Versions: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -55,7 +57,7 @@ requires:
 resources:
   bugtracker: https://github.com/shawnlaffan/perl-alien-spatialite/issues/
   repository: https://github.com/shawnlaffan/perl-alien-spatialite
-version: '1.05'
+version: '1.07'
 x_alienfile:
   generated_by: 'Alien::Build::MM version 2.48'
   requires:

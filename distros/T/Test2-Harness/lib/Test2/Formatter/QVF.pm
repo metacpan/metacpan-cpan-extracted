@@ -2,7 +2,7 @@ package Test2::Formatter::QVF;
 use strict;
 use warnings;
 
-our $VERSION = '1.000114';
+our $VERSION = '1.000116';
 
 BEGIN { require Test2::Formatter::Test2; our @ISA = qw(Test2::Formatter::Test2) }
 
@@ -24,7 +24,7 @@ sub update_active_disp {
     my $self = shift;
     my ($f) = @_;
 
-    return if $f->{__RENDER__}->{update_active_disp}++;
+    return if $f && $f->{__RENDER__}->{update_active_disp}++;
 
     $self->SUPER::update_active_disp($f);
 }

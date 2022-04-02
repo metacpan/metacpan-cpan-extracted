@@ -103,6 +103,6 @@ RoleEmbedding **ObjectPad_mop_class_get_direct_roles(pTHX_ const ClassMeta *meta
 #define mop_class_get_all_roles(class, embeddings)  ObjectPad_mop_class_get_all_roles(aTHX_ class, embeddings)
 RoleEmbedding **ObjectPad_mop_class_get_all_roles(pTHX_ const ClassMeta *meta, U32 *nroles);
 
-void ObjectPad__boot_classes(void);
+void ObjectPad__boot_classes(pTHX);
 
 #endif

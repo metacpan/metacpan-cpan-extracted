@@ -7,8 +7,8 @@ use 5.014;
 
 use List::MoreUtils qw( any );
 
-use Term::Choose qw();
-use Term::Form   qw();
+use Term::Choose         qw();
+use Term::Form::ReadLine qw();
 
 use App::DBBrowser::Auxil;
 use App::DBBrowser::Table::Extensions;
@@ -224,7 +224,7 @@ sub __add_operator {
 sub read_and_add_value {
     my ( $sf, $sql, $clause, $op, $is_complex_value ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $tf = Term::Form->new( $sf->{i}{tf_default} );
+    my $tr = Term::Form::ReadLine->new( $sf->{i}{tr_default} );
     my $stmt = $clause . '_stmt';
     my $args = $clause . '_args';
     if ( $is_complex_value ) {
@@ -261,7 +261,7 @@ sub read_and_add_value {
             IN: while ( 1 ) {
                 my $info = $ax->get_sql_info( $sql );
                 # Readline
-                my $value = $tf->readline(
+                my $value = $tr->readline(
                     'Value: ',
                     { info => $info }
                 );
@@ -284,7 +284,7 @@ sub read_and_add_value {
         elsif ( $op =~ /^(?:NOT\s)?BETWEEN\z/ ) {
             my $info = $ax->get_sql_info( $sql );
             # Readline
-            my $value_1 = $tf->readline(
+            my $value_1 = $tr->readline(
                 'Value 1: ',
                 { info => $info }
             );
@@ -296,7 +296,7 @@ sub read_and_add_value {
             push @{$sql->{$args}}, $value_1;
             $info = $ax->get_sql_info( $sql );
             # Readline
-            my $value_2 = $tf->readline(
+            my $value_2 = $tr->readline(
                 'Value 2: ',
                 { info => $info }
             );
@@ -312,7 +312,7 @@ sub read_and_add_value {
             push @{$sql->{$args}}, '...';
             my $info = $ax->get_sql_info( $sql );
             # Readline
-            my $value = $tf->readline(
+            my $value = $tr->readline(
                 'Pattern: ',
                 { info => $info }
             );
@@ -329,7 +329,7 @@ sub read_and_add_value {
             my $prompt = $op =~ /^(?:NOT\s)?LIKE\z/ ? 'Pattern: ' : 'Value: '; #
             my $info = $ax->get_sql_info( $sql );
             # Readline
-            my $value = $tf->readline(
+            my $value = $tr->readline(
                 $prompt,
                 { info => $info }
             );

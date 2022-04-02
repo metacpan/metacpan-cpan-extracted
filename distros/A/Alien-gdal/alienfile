@@ -1,8 +1,12 @@
 use 5.010;
 use alienfile;
 use Sort::Versions;
-use Env qw /@PATH @LD_LIBRARY_PATH/;
+use Env qw /@PATH @LD_LIBRARY_PATH @DYLD_LIBRARY_PATH @PROJ_LIB/;
 use Path::Tiny qw /path/;
+
+#  note to self for cmake builds:
+#  https://github.com/OSGeo/gdal/pull/5485
+
 
 my $on_windows = $^O =~ /mswin/i;
 my $on_automated_rig
@@ -13,7 +17,7 @@ my $on_automated_rig
   || $ENV{APPVEYOR}
   || $ENV{CI};
 
-my @aliens_l_and_I = qw(
+my @alien_deps = qw(
         Alien::geos::af
         Alien::proj
         Alien::sqlite
@@ -21,9 +25,11 @@ my @aliens_l_and_I = qw(
   );
 
 #  make sure we get GEOS, PROJ and other support
-foreach my $alien (@aliens_l_and_I) {
+foreach my $alien (@alien_deps) {
   eval "require $alien";
-  if ($alien->install_type eq 'share') {
+  my $e = $@;
+  warn $e if $e;
+  if (!$e && $alien->install_type eq 'share') {
     log "Prepending $alien bin dir to path";
     unshift @PATH, $alien->bin_dir;
   }
@@ -31,25 +37,24 @@ foreach my $alien (@aliens_l_and_I) {
 my $have_spatialite = eval 'require
   Alien::spatialite';
 if ($have_spatialite && Alien::spatialite->version ge 5) {
-  log "Prepending Alien::spatialite bin dir to path";
-  unshift @PATH, Alien::spatialite->bin_dir;
-  push @aliens_l_and_I, $have_spatialite;
+  if (!$on_windows and Alien::spatialite->install_type('share')
+      and $Alien::spatialite::VERSION lt 1.06) {
+    $have_spatialite = undef;  #  rpath issues before this
+  }
+  else {
+    log "Prepending Alien::spatialite bin dir to path";
+    unshift @PATH, Alien::spatialite->bin_dir;
+    push @alien_deps, 'Alien::spatialite';
+  }
 }
 else {
   $have_spatialite = undef;
 }
 
-
-plugin 'Build::SearchDep' => (
-  aliens   => [@aliens_l_and_I],
-  public_I => 1,
-  public_l => 1,
-);
-
 #  configure script does not seem to detect the proj lib distributed with Strawberry perl
 #use FFI::CheckLib;
 #my $proj_lib = FFI::CheckLib::find_lib (lib => 'proj');
-#say "PROJ_LIB FILE IS $proj_lib";
+Alien::Build->log ('$ENV{PROJ_LIB} IS ' . ($ENV{PROJ_LIB} // ''));
 
 
 #  make libtool noisy for debug purposes
@@ -122,14 +127,17 @@ share {
     my $with_local = '';
     my $with_cpp11 = '';
     
-    #  ensure we are compatible with the installed proj version
-    my $start_url = Alien::proj->atleast_version ('6.0.0')
-      ? 'http://download.osgeo.org/gdal/CURRENT'
-      : 'http://download.osgeo.org/gdal/2.4.2';
+    Alien::Build->log ("Proj library version is " . Alien::proj->version);
+    die "Proj version must be at least 6.0.0"
+      if not Alien::proj->atleast_version ('6.0.0');  
+
+    plugin 'Build::SearchDep' => (
+      aliens   => [@alien_deps],
+      public_I => 1,
+      public_l => 1,
+    );
   
-    say "Proj library version is " . Alien::proj->version;
-  
-    start_url $start_url;
+    start_url 'http://download.osgeo.org/gdal/CURRENT';
     #start_url "file://$base_dir";  #  debug
     plugin Download => (
       filter  => qr/^gdal-([0-9\.]+)\.tar\.gz$/,
@@ -140,23 +148,6 @@ share {
     say "Downloaded gdal version is $gdal_version";
     
     plugin Extract => (format => 'tar.gz');
-  
-    if (versioncmp($gdal_version, '2.3.0') == -1) {
-      if ($on_windows) {
-        #  fix known issue in 2.2.3, harmless in 2.2.4.
-        patch [
-          '%{patch} port/cpl_port.h < ' . $patch_file_isnan,
-        ];
-      }
-      elsif ($^O =~ /freebsd/i) {
-        #  make sure we run a shared install on freebsd by default
-        #  (before libtool files were updated for gdal 2.3.0)
-        patch [
-          '%{patch} configure < ' . $patch_file_configure,
-        ];
-        $with_cpp11 = ' --without-cpp11 ';  #  issues with cad lib pre 2.3.0
-      }
-    }
   
     plugin 'Build::Autoconf' => ();
   
@@ -223,18 +214,34 @@ share {
     #  system installs won't necessarily have dist dirs
     if (Alien::proj->install_type eq 'share') {
       push @with_args, '--with-proj=' . Alien::proj->dist_dir;
+      my $proj_lib = Alien::proj->dist_dir . '/share/proj';
+      warn "======\nno proj lib\n=====" if !-e $proj_lib;
+      if (!grep {($_ // '')=~ /^$proj_lib$/} @PROJ_LIB) {
+        Alien::Build->log ("Appending $proj_lib to \$ENV{PROJ_LIB}");
+        push @PROJ_LIB, $proj_lib;
+        Alien::Build->log ("PROJ_LIB is now $ENV{PROJ_LIB}");
+      }
+      if (!$on_windows) {
+        push @ld_lib_path, Alien::proj->dist_dir . '/lib';
+      }
+      #  get dynamic proj extra deps, one day will not be needed
+      push @with_args,
+        q{--with-proj-extra-lib-for-test="} . Alien::proj->libs . q{"};
     }
     if (Alien::libtiff->install_type eq 'share') {
       push @with_args, '--with-libtiff=' . Alien::libtiff->dist_dir;
+      if (!$on_windows) {
+        push @ld_lib_path, Alien::libtiff->dist_dir . '/lib';
+      }
     }
-    if ($have_spatialite && $have_spatialite->install_type eq 'share') {
-      push @with_args, '--with-spatialite=' . $have_spatialite->dist_dir;
+    if ($have_spatialite && Alien::spatialite->install_type eq 'share') {
+      push @with_args, '--with-spatialite=' . Alien::spatialite->dist_dir;
     }
-    #  get dynamic proj extra deps, one day will not be needed
-    push @with_args,
-      q{--with-proj-extra-lib-for-test="} . Alien::proj->libs . q{"};
     if (Alien::sqlite->install_type eq 'share') {
       push @with_args, '--with-sqlite3=' . Alien::sqlite->dist_dir;
+      if (!$on_windows) {
+        push @ld_lib_path, Alien::sqlite->dist_dir . '/lib';
+      }
       #push @ld_flags, 'LDFLAGS=' . Alien::sqlite->libs;
       #'-L/home/libraries/intel/sqlite/lib -lsqlite3'
     }
@@ -277,6 +284,14 @@ share {
     
     meta->around_hook( build => \&remove_gitfw_from_path );
     plugin 'PkgConfig::PPWrapper';
+    meta->around_hook(
+      build => sub {
+        my ($orig, $build, @args) = @_;
+        $build->log("Setting CCACHE_BASEDIR to " . getcwd());
+        local $ENV{CCACHE_BASEDIR} = getcwd();
+        $orig->($build, @args);
+      }
+    );
 
     #meta->before_hook( build => \&cleanup_ldflags );
     
@@ -285,13 +300,19 @@ share {
     #  not sure this is needed, or if it is to deal with a cirrus quirk 
     #local $ENV{LDFLAGS} = join ' ', @ld_flags;
     #  hack
-    push @LD_LIBRARY_PATH, @ld_lib_path;
-
-    foreach my $env_var (qw /LD_LIBRARY_PATH LDFLAGS CFLAGS CXXFLAGS/) {
-      say "ENV: $env_var is " . ($ENV{$env_var} // '');
+    if ($^O =~ /darwin/) {
+      push @DYLD_LIBRARY_PATH, @ld_lib_path;
     }
+    else {
+      push @LD_LIBRARY_PATH, @ld_lib_path;
+    }
+
+    #foreach my $env_var (qw /LD_LIBRARY_PATH DYLD_LIBRARY_PATH LDFLAGS CFLAGS CXXFLAGS/) {
+    #  say "ENV: $env_var is " . ($ENV{$env_var} // '');
+    #}
     #$ENV{CFLAGS} = ' -O2 ';
-    my $config_flags = qq{CFLAGS='-O2' CXXFLAGS='-O2'};
+    my $ld_flags = '';
+    my $config_flags = qq{CFLAGS='-O2' CXXFLAGS='-O2' LDFLAGS='$ld_flags'};
     
     build [
       #\&update_pkg_conf_path,
@@ -299,11 +320,101 @@ share {
       "%{configure} $config_flags $config_args $drivers_to_disable $build_static",
       \&pause,
       $make_cmd,
+      \&patch_rpaths,
       \&patch_pkgconfig,
       $make_inst_cmd,
     ];
   }
 };
+
+sub patch_rpaths {
+  my ($build) = @_;
+  
+  #  only run on unices - incomplete check but
+  #  I don't think aliens work on VMS or zOS
+  return if ($on_windows or $^O =~ /darwin/i);
+
+  my $h = get_alien_state_hash();
+  my $install_path = $h->{install}{prefix};
+  return if !defined $install_path;
+
+  my @alien_rpaths;
+  for my $alien (@alien_deps) {
+    next if not $alien->install_type('share');
+    push @alien_rpaths, $alien->dist_dir . '/lib';
+  }
+  if (!@alien_rpaths) {
+    $build->log('No shared alien deps found, not updating rpaths');
+    return;
+  }
+
+  eval 'require Alien::patchelf'
+    or do {
+      warn 'Unable to load Alien::patchelf, cannot update rpaths';
+      return;
+    };
+  my $pe = Alien::patchelf->new;
+
+
+  my $origin_string = $^O =~ /darwin/ ? '@loader_path' : '$ORIGIN';
+  my $alien_rpath_text
+    = join ':', (
+       (map {$origin_string . '/../' . path ($_)->relative($install_path)->stringify} @alien_rpaths),
+       @alien_rpaths
+      );
+
+  $build->log ("Prepending rpaths with $alien_rpath_text");
+  
+  #  need to also do the bin dir - those files only need to have $ORIGIN/../lib added
+  use File::Find::Rule;
+  my (@so_files)
+    = grep {not -l $_}
+      File::Find::Rule
+              ->file()
+              ->name( qr/^libgdal.so/ )
+              ->in( getcwd() );
+  
+  foreach my $so_file (@so_files) {
+    my ($old_rpath, $result, $stderr, @errors);
+    ($old_rpath, $stderr, @errors)
+      = $pe->patchelf ('--print-rpath', $so_file);
+    $old_rpath //= '';
+    #  prepend our paths
+    my $rpath = $alien_rpath_text . ($old_rpath ? (':' . $old_rpath) : '');
+    $build->log("Updating rpath for $so_file to $rpath, was $old_rpath");
+    ($result, $stderr, @errors)
+      = $pe->patchelf ('--set-rpath', $rpath, $so_file);
+    warn $stderr if $stderr;
+  }
+  
+  #  surely we could just use one of the alien props to get the dir?
+  my (@gdalinfo_files)
+    = grep {not -l $_}
+      grep {$_ =~ m|apps/\.libs|}  #  must be in the .libs dir
+      File::Find::Rule
+              ->file()
+              ->name( 'gdalinfo' )
+              ->in( getcwd() );
+  my @binaries
+    = grep {$_ !~ /\.o$/}  #  no object files
+      map {glob (path($_)->parent->stringify . '/*')} @gdalinfo_files;
+
+  foreach my $so_file (@binaries) {
+    my ($old_rpath, $result, $stderr, @errors);
+    ($old_rpath, $stderr, @errors)
+      = $pe->patchelf ('--print-rpath', $so_file);
+    $old_rpath //= '';
+    #  prepend relative path
+    my $rpath = '$ORIGIN/../lib' . ($old_rpath ? (':' . $old_rpath) : '');
+    $build->log("Updating rpath for $so_file to $rpath, was $old_rpath");
+    ($result, $stderr, @errors)
+      = $pe->patchelf ('--set-rpath', $rpath, $so_file);
+    warn $stderr if $stderr;
+  }
+
+  return;
+}
+
 
 #  we can get dangling -L values
 #  bandaid until we find the source

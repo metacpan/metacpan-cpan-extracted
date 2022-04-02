@@ -7,8 +7,8 @@ use 5.014;
 
 use List::MoreUtils qw( any );
 
-use Term::Choose qw();
-use Term::Form   qw();
+use Term::Choose         qw();
+use Term::Form::ReadLine qw();
 
 use App::DBBrowser::Auxil;
 
@@ -69,14 +69,14 @@ sub attach_db {
                 $old_idx = $idx;
             }
             my $db = $menu->[$idx];
-            my $tf = Term::Form->new( $sf->{i}{tf_default} );
+            my $tr = Term::Form::ReadLine->new( $sf->{i}{tr_default} );
             push @tmp_info, "ATTACH DATABASE $db AS";
 
             ALIAS: while ( 1 ) {
                 my $info = join( "\n", @tmp_info );
                 $ax->print_sql_info( $info );
                 # Readline
-                my $alias = $tf->readline( ##
+                my $alias = $tr->readline( ##
                     'alias: ',
                     { info => $info, clear_screen => 1 }
                 );

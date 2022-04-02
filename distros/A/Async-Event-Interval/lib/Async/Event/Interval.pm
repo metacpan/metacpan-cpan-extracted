@@ -3,9 +3,10 @@ package Async::Event::Interval;
 use warnings;
 use strict;
 
-our $VERSION = '1.11';
+our $VERSION = '1.12';
 
 use Carp qw(croak);
+use Data::Dumper;
 use IPC::Shareable;
 use Parallel::ForkManager;
 
@@ -244,7 +245,6 @@ sub _event {
             }
         }
         else {
-
             my $callback_success = eval {
                 $self->_cb->(@{$self->_args});
                 1;
@@ -276,8 +276,10 @@ sub _pm {
 }
 sub _pid {
     my ($self, $pid) = @_;
-    $self->{pid} = $pid if defined $pid;
-    $events{$self->id}->{pid} = $self->{pid} if $self->{pid};
+    if (defined $pid) {
+        $self->{pid} = $pid;
+        $events{$self->id}->{pid} = $self->{pid};
+    }
     return $self->{pid} || undef;
 }
 sub _rand_shm_key {
@@ -316,7 +318,9 @@ sub _started {
     return $self->{started};
 }
 sub DESTROY {
-    $_[0]->stop if $_[0]->pid;
+    if (defined $_[0]) {
+        $_[0]->stop if $_[0]->pid;
+    }
 
     # On events with interval of zero, ForkManager runs finish(), which
     # calls our destroy method. We only want to blow away the %events
@@ -327,11 +331,9 @@ sub DESTROY {
     delete $events{$_[0]->id};
 }
 sub _end {
-    if (keys %events) {
-        warn "The following events remain: " . join(', ', keys %events);
+    if (! keys %events) {
+        IPC::Shareable::clean_up_protected(_shm_lock());
     }
-
-    IPC::Shareable::clean_up_protected(_shm_lock());
 }
 END {
     _end();

@@ -32,6 +32,7 @@
       },
       "runtime" : {
          "requires" : {
+            "String::Util" : "0",
             "enum" : "0",
             "perl" : "5.024000"
          }
@@ -50,6 +51,6 @@
          "web" : "http://github.com/drclaw1394/perl-template-plex"
       }
    },
-   "version" : "v0.1.1",
+   "version" : "v0.2.0",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

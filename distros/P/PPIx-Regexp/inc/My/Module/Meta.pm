@@ -152,8 +152,8 @@ sub requires {
 	'Encode'		=> 0,
         'Exporter'		=> 0,
         'List::Util'		=> 0,
-	'PPI::Document'		=> 1.117,	# for new( readonly => 1 )
-	'PPI::Dumper'		=> 1.117,
+	'PPI::Document'		=> 1.238,	# for postfix deref
+	'PPI::Dumper'		=> 1.238,
         'Scalar::Util'		=> 0,
 	'Task::Weaken'		=> 0,
 	'base'			=> 0,

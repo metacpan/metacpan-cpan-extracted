@@ -12,6 +12,7 @@ use Term::Choose::LineFold qw( line_fold print_columns );
 use Term::Choose::Util     qw( insert_sep get_term_width get_term_height unicode_sprintf );
 use Term::Choose::Screen   qw( clear_screen );
 use Term::Form             qw();
+use Term::Form::ReadLine   qw();
 
 use App::DBBrowser::Auxil;
 
@@ -441,6 +442,7 @@ sub __insert_cell {
     my ( $sf, $sql, $filter_str ) = @_;
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $tf = Term::Form->new( $sf->{i}{tf_default} );
+    my $tr = Term::Form::ReadLine->new( $sf->{i}{tr_default} );
     my $aoa = $sql->{insert_into_args};
 
     while ( 1 ) {
@@ -475,7 +477,7 @@ sub __insert_cell {
         $prompt = "<*>: ";
         $info = $sf->__get_filter_info( $sql, $count_static_rows, undef, undef, 1 ). "\n" . join( "\n", @tmp_info );
         # Readline
-        my $cell = $tf->readline(
+        my $cell = $tr->readline(
             $prompt,
             { info => $info }
         );
@@ -738,6 +740,7 @@ sub __join_columns {
     my ( $sf, $sql, $filter_str ) = @_;
     my $tu = Term::Choose::Util->new( $sf->{i}{tcu_default} );
     my $tf = Term::Form->new( $sf->{i}{tf_default} );
+    my $tr = Term::Form::ReadLine->new( $sf->{i}{tr_default} );
     my $aoa = $sql->{insert_into_args};
     my $empty_cells_of_col_count =  $sf->__count_empty_cells_of_cols( $aoa );
     my $header = $sf->__prepare_header( $aoa, $empty_cells_of_col_count );
@@ -762,7 +765,7 @@ sub __join_columns {
     $count_static_rows = @tmp_info + 2; # tmp_info, readline, empty line
     $info = $sf->__get_filter_info( $sql, $count_static_rows, undef, undef, 1 ). "\n" . join( "\n", @tmp_info );
     # Readline
-    my $join_char = $tf->readline(
+    my $join_char = $tr->readline(
         'Join-string: ',
         { info => $info }
     );

@@ -1,5 +1,8 @@
 Revision history for Perl extension Twiggy::TLS
 
+0.0020 Thu Mar 31 10:25:36 UTC 2022
+        - fix certificate for tests
+
 0.0019 Mon Jun 24 14:21:57 UTC 2013
         - fixed outdated certificates 
 

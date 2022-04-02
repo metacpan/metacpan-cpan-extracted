@@ -2,13 +2,15 @@ package Test2::Harness::Renderer;
 use strict;
 use warnings;
 
-our $VERSION = '1.000114';
+our $VERSION = '1.000116';
 
 use Carp qw/croak/;
 
 use Test2::Harness::Util::HashBase qw/-settings -verbose -progress -color/;
 
 sub render_event { croak "$_[0] forgot to override 'render_event()'" }
+
+sub step {}
 
 sub finish { }
 

@@ -12,7 +12,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.034'
 dynamic_config: 0
-generated_by: 'Dist::Milla version v1.0.18, Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Milla version v1.0.20, Dist::Zilla version 6.023, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,7 +29,7 @@ no_index:
 provides:
   MojoX::JSONRPC2::HTTP:
     file: lib/MojoX/JSONRPC2/HTTP.pm
-    version: v2.0.2
+    version: v2.0.3
 requires:
   JSON::RPC2: v1.0.0
   JSON::RPC2::Client: '0'
@@ -43,5 +43,8 @@ resources:
   bugtracker: https://github.com/powerman/perl-MojoX-JSONRPC2-HTTP/issues
   homepage: https://github.com/powerman/perl-MojoX-JSONRPC2-HTTP
   repository: https://github.com/powerman/perl-MojoX-JSONRPC2-HTTP.git
-version: v2.0.2
+version: v2.0.3
+x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: MIT
+x_static_install: 1

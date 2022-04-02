@@ -6,7 +6,7 @@ use warnings;
 use Module::Build;
 our @ISA = qw{ Module::Build };
 
-our $VERSION = '0.083';
+our $VERSION = '0.084';
 
 use Carp;
 

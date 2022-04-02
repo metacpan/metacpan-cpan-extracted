@@ -1,5 +1,5 @@
 {
-   "abstract" : "Pattern dispatch to code with optional optimisation",
+   "abstract" : "Cached general purpose dispatch and routing table",
    "author" : [
       "Ruben Westerberg <drclaw@mac.com>"
    ],
@@ -34,7 +34,7 @@
          "requires" : {
             "Template::Plex" : "0",
             "enum" : "0",
-            "perl" : "5.024000"
+            "perl" : "5.026000"
          }
       },
       "test" : {
@@ -51,6 +51,6 @@
          "web" : "http://github.com/drclaw1394/perl5-hustle-table"
       }
    },
-   "version" : "v0.4.1",
+   "version" : "v0.5.1",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

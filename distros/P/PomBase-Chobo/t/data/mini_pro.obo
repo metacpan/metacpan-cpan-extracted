@@ -4,100 +4,21 @@ date: 04:06:2013 15:11
 saved-by: jcowart
 auto-generated-by: PRO DB
 ontology: pr
-synonymtypedef: PRO-common-name "Label appended to organism-specific terms in place of scientific name" EXACT
-synonymtypedef: PRO-short-label "Unique short label for PRO terms for display purposes" EXACT
-synonymtypedef: PSI-MOD-label "Unique short label curated by PSI-MOD" EXACT
-idspace: CHEBI http://purl.obolibrary.org/obo/CHEBI_
-idspace: GO http://purl.obolibrary.org/obo/GO_
-idspace: MOD http://purl.obolibrary.org/obo/MOD_
-idspace: NCBITaxon http://purl.obolibrary.org/obo/NCBITaxon_
-idspace: OBI http://purl.obolibrary.org/obo/OBI_
-idspace: PR http://purl.obolibrary.org/obo/PR_
 idspace: SO http://purl.obolibrary.org/obo/SO_
 default-namespace: protein
 remark: Use reasoner in obo edit to see the correct hierarchy.
 
 [Term]
-id: CHEBI:23367
-name: molecular entity
-namespace: CHEBI
-def: "Any constitutionally or isotopically distinct atom, molecule, ion, ion pair, radical, radical ion, complex, conformer etc., identifiable as a separately distinguishable entity." [fake:2]
-is_a: snap:Object ! object
+id: PR:000000001
+name: protein
+def: "An amino acid chain that is produced de novo by ribosome-mediated translation of a genetically-encoded mRNA." [PRO:DAN, PRO:WCB]
+comment: Proteins descended from a common ancestor can be classified into families and superfamilies composed of products of evolutionarily-related genes. The domain architecture of a protein is described by the order of its constituent domains. Proteins with the same domains in the same order are defined as homeomorphic [PRO:WCB].
 
 [Term]
-id: CHEBI:4705
-name: double-stranded DNA
-namespace: CHEBI
-synonym: "C10H17O8PR2(C5H8O5PR)n.C10H17O7PR2(C5H8O6PR)n" RELATED [KEGG COMPOUND:C00434]
-synonym: "Double-stranded DNA" EXACT [KEGG COMPOUND:C00434]
-xref: KEGG COMPOUND:C00434 "KEGG COMPOUND"
-is_a: CHEBI:23367 ! molecular entity
-
-[Term]
-id: CHEBI:33708
-name: amino-acid residue
-def: "When two or more amino acids combine to form a peptide, the elements of water are removed, and what remains of each amino acid is called an amino-acid residue." [Dummy:dummy]
-synonym: "amino acid residue" EXACT []
-synonym: "protein residue" NARROW [PRO:DAN]
-is_a: snap:FiatObjectPart ! fiat_object_part
-relationship: part_of PR:000018263 ! amino acid chain
-
-[Term]
-id: snap:FiatObjectPart
-name: fiat_object_part
-is_a: snap:MaterialEntity ! material_entity
-
-[Term]
-id: snap:MaterialEntity
-name: material_entity
-
-[Term]
-id: snap:Object
-name: object
-is_a: snap:MaterialEntity ! material_entity
-
-[Typedef]
-id: derives_from
-name: derives_from
-is_transitive: true
-
-[Typedef]
-id: has_modification
-name: has_modification
-is_transitive: true
-is_obsolete: true
-
-[Typedef]
-id: has_part
-name: has_part
-is_transitive: true
-
-[Typedef]
-id: lacks_modification
-name: lacks_modification
-is_transitive: true
-is_obsolete: true
-
-[Typedef]
-id: lacks_part
-name: lacks_part
-
-[Typedef]
-id: located_in
-name: located_in
-is_transitive: true
-
-[Typedef]
-id: only_in_taxon
-name: only_in_taxon
-def: "U only_in_taxon T: U is a feature found in only in organisms of species of taxon T. The feature cannot be found in an organism of any species outside of (not subsumed by) that taxon. Down-propagates in U hierarchy, up-propagates in T hierarchy (species taxonomy). Implies applicable_to_taxon." [ROC:Waclaw]
-comment: Down-propagates. The original name for this in the paper is 'specific_to'. Applicable to genes because some genes are lost in sub-species (strains) of a species.
-synonym: "never_outside_taxon" EXACT []
-synonym: "specific_to" EXACT []
-synonym: "specific_to_taxon" EXACT []
-
-[Typedef]
-id: part_of
-name: part_of
-is_transitive: true
-
+id: PR:000027574
+name: histone H3.1, initiator methionine removed form (Schizosaccharomyces pombe)
+def: "A fungal histone H3.1, initiator methionine removed form in Schizosaccharomyces pombe." [PMID:11242054, PMID:20929775, PomBase:MAH]
+comment: Category=organism-modification. Requested by=PomBase.
+synonym: "Spom-hht1/InitMet-" EXACT PRO-short-label [PRO:DAN]
+is_a: PR:000000001
+property_value: pombase_gene_id SPAC1834.04

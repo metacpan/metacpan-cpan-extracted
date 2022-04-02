@@ -19,11 +19,13 @@ use File::Copy;
 use File::Spec;
 use IPC::Run qw(run);
 use File::Basename ();
+use Path::Tiny ();
 
 # ours
 use PDF::Imposition;
 use Text::Amuse;
 use Text::Amuse::Functions qw/muse_fast_scan_header
+                              muse_to_object
                               muse_format_line/;
 use Text::Amuse::Utils;
 
@@ -172,6 +174,7 @@ has fonts => (is => 'ro', required => 1, isa => InstanceOf['Text::Amuse::Compile
 has epub_embed_fonts => (is => 'ro', isa => Bool, default => sub { 1 });
 has indexes => (is => 'rwp', isa => Maybe[ArrayRef]);
 has include_paths => (is => 'ro', isa => ArrayRef, default => sub { [] });
+has volumes => (is => 'lazy', isa => ArrayRef);
 
 sub _build_file_header {
     my $self = shift;
@@ -234,6 +237,61 @@ sub _build_full_options {
         $options{$override} = $self->$override;
     }
     return \%options;
+}
+
+sub _build_volumes {
+    my $self = shift;
+    my @volumes;
+    if (!$self->virtual and -f $self->muse_file) {
+        my @lines = Path::Tiny::path($self->muse_file)->lines_utf8;
+
+        if (grep { /^; +;;;#\w+/ } @lines) {
+            my @current;
+            my @current_meta;
+            my @original_meta;
+
+            # muse starts with the directives
+            my $in_meta = 1;
+            my $in_volume_meta = 0;
+          LINE:
+            while (@lines) {
+                my $line = shift @lines;
+                # accumulate in the current pile until there's a blank line
+                my $blank = $line =~ m/\A\s*\z/;
+
+                if ($line =~ m/\A; +;;;(#[A-Za-z0-9_-]+\w+.*)\z/s) {
+                    my $directive = $1;
+                    $in_meta = 0;
+                    if (!$in_volume_meta) {
+                        # entered a new volume
+                        $in_volume_meta = 1;
+                        if (@current) {
+                            push @volumes, [ @current_meta, @original_meta, @current ];
+                        }
+                        @current = @current_meta = ();
+                    }
+                    push @current_meta, $directive;
+                    next LINE;
+                }
+                elsif (!$blank) {
+                    $in_volume_meta = 0;
+                }
+
+                if ($in_meta) {
+                    push @original_meta, $line;
+                }
+                else {
+                    push @current, $line;
+                }
+            }
+            # end of loop, flush the stack
+            if (@current) {
+                push @volumes, [ @current_meta, @original_meta, @current ];
+            }
+            # print Dumper(\@original_meta, \@volumes);
+        }
+    }
+    return \@volumes;
 }
 
 sub cover {
@@ -612,11 +670,78 @@ sub tex {
     }
     $self->purge('.tex');
     my $template_body = $self->templates->latex;
-    $self->_process_template($template_body,
-                             $self->_prepare_tex_tokens(%arguments,
-                                                        template_body => $template_body,
-                                                       ),
-                             $texfile);
+    my $tokens = $self->_prepare_tex_tokens(%arguments, template_body => $template_body);
+
+    # - if there's the ; ;;;#title magic cookie, split the volume. X
+    # - process the template normally. X
+    # - split the body between PREAMBLE \begin{document} BODY \end{document} END X
+    # - determine if the indexes and the toc go at the end or at the beginning, looking at the template X
+    # - split the muse body and create temporary files, adding the headers in the magic comments. X
+    # - process them, but override the wants_toc / wants_indexes depending on previous steps X
+    # - discard everything outside the \begin{document} and \end{document} X
+    # - concatenate the initial preamble, these bodies, and the end, and return it. X
+
+    my $volumes = $self->volumes;
+    if ($volumes and @$volumes > 1) {
+        my $tex_parse = qr{\A(.*\\begin\{document\})(.*)(\\end\{document\}.*)}s;
+        my $full;
+        $self->tt->process($template_body, $tokens, \$full);
+        # print $full;
+        if ($full =~ m/$tex_parse/s) {
+            my ($preamble, $body, $end) = ($1, $2, $3);
+            # print Dumper([$preamble, $body, $end ]);
+            my @pieces = ($preamble);
+            my $last = scalar $#$volumes;
+
+            # check if the template is custom
+            my $toc_i = $$template_body =~ m/latex_body.*tableofcontents/s ? $last : 0;
+            my $idx_i = $$template_body =~ m/printindex.*latex_body/s ? 0 : $last;
+
+            for (my $i = 0; $i <= $last; $i++) {
+                my $vol = $volumes->[$i];
+                my $doc = muse_to_object(join('', @$vol));
+                my $latex = $self->_interpolate_magic_comments($tokens->{format_id}, $doc);
+
+                if (my @raw_indexes = $self->document_indexes) {
+                    my $indexer = Text::Amuse::Compile::Indexer->new(latex_body => $latex,
+                                                                     language_code => $doc->language_code,
+                                                                     logger => sub {}, # silence here
+                                                                     index_specs => \@raw_indexes);
+                    $latex = $indexer->indexed_tex_body;
+                }
+
+                my %partial_tokens = (
+                                      options => {  %{ $tokens->{options} } },
+                                      safe_options => {  %{ $tokens->{safe_options} } },
+                                      tex_setup_langs => 'DUMMY', # irrelevant
+                                      doc => $doc,
+                                      latex_body => $latex,
+                                      tex_indexes => [ @{ $tokens->{tex_indexes} } ],
+                                     );
+                if ($i != $toc_i) {
+                    $partial_tokens{safe_options}{wants_toc} = 0;
+                }
+                if ($i != $idx_i) {
+                    $partial_tokens{tex_indexes} = [];
+                }
+
+                # print Dumper(\%partial_tokens);
+
+
+                # here clear wants_toc / indexes
+
+                my $out;
+                $self->tt->process($template_body, \%partial_tokens, \$out);
+                if ($out =~ m/$tex_parse/s) {
+                    push @pieces, $2;
+                }
+            }
+            push @pieces, $end;
+            Path::Tiny::path($texfile)->spew_utf8(@pieces);
+            return $texfile;
+        }
+    }
+    $self->_process_template($template_body, $tokens, $texfile);
 }
 
 =item sl_tex
@@ -1391,6 +1516,8 @@ sub _prepare_tex_tokens {
             enable_secondary_footnotes => $enable_secondary_footnotes,
             tex_metadata => $self->file_header->tex_metadata,
             tex_indexes => \@indexes,
+            # in case we need it for volumes
+            format_id => $template_options->format_id,
            };
 }
 
@@ -1483,6 +1610,24 @@ sub _interpolate_magic_comments {
                 $
                 \s*
                /\\looseness=$1\n/gmx;
+
+    # add to toc
+    $latex =~ s/^
+                $prefix
+                addcontentsline
+                \\\{
+                (toc|lof|lot)
+                \\\}
+                \\\{
+                (part|chapter|section|subsection)
+                \\\}
+                \\\{
+                ($regular)
+                \\\}
+                \x{20}*
+                $
+               /\\addcontentsline{$1}{$2}{$3}/gmx;
+
     return $latex;
 }
 

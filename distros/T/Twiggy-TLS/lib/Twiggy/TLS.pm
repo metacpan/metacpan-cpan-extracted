@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use 5.008_001;
-our $VERSION = '0.0019';
+our $VERSION = '0.0020';
 
 1;
 __END__
@@ -103,7 +103,7 @@ This module is licensed under the same terms as Perl itself.
 
 =head1 AUTHOR
 
-Sergey Zasenko
+Serhii Zasenko
 
 =head1 SEE ALSO
 

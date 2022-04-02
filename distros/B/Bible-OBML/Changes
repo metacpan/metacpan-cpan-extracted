@@ -1,5 +1,8 @@
 Revision history for Bible::OBML
 
+2.04      2022-03-30 09:01:16-07:00 America/Los_Angeles
+        - Avoid wrapping and dewrapping any indented content
+
 2.03      2022-03-17 10:35:37-07:00 America/Los_Angeles
         - Fix to support Perl down to version 20
 

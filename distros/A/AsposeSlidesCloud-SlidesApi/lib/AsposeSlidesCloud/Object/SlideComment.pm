@@ -37,7 +37,7 @@ use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
 
-use AsposeSlidesCloud::Object::SlideComment;
+use AsposeSlidesCloud::Object::SlideCommentBase;
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -94,7 +94,7 @@ sub new {
 		my $args_key = $class->attribute_map->{$attribute};
 		$self->$attribute( $args{ $args_key } );
 	}
-	
+	$self->{ type } = 'Regular';
 	return $self;
 }  
 
@@ -120,16 +120,28 @@ sub from_hash {
     my ($self, $hash) = @_;
 
     # loop through attributes and use swagger_types to deserialize the data
+    my $current_types = {};
     while ( my ($_key, $_type) = each %{$self->swagger_types} ) {
+        $current_types->{$_key} = $_type;
+    }
+    while ( my ($_key, $_type) = each %{$current_types} ) {
     	my $_json_attribute = $self->attribute_map->{$_key}; 
         if ($_type =~ /^array\[/i) { # array
             my $_subclass = substr($_type, 6, -1);
             my @_array = ();
             foreach my $_element (@{$hash->{$_json_attribute}}) {
-                push @_array, $self->_deserialize($_subclass, $_element);
+                if (defined $_element) {
+                    push @_array, $self->_deserialize($_subclass, $_element);
+                } else {
+                    push @_array, undef;
+                }
             }
-            foreach my $_element (@{$hash->{$_json_attribute}}) {
-                push @_array, $self->_deserialize(lcfirst($_subclass), $_element);
+            foreach my $_element (@{$hash->{lcfirst($_json_attribute)}}) {
+                if (defined $_element) {
+                    push @_array, $self->_deserialize(lcfirst($_subclass), $_element);
+                } else {
+                    push @_array, undef;
+                }
             }
             $self->{$_key} = \@_array;
         } elsif (exists $hash->{$_json_attribute}) { #hash(model), primitive, datetime
@@ -151,7 +163,8 @@ sub _deserialize {
     } elsif ( grep( /^$type$/, ('int', 'double', 'string', 'boolean'))) {
         return $data;
     } else { # hash(model)
-        my $_instance = eval "AsposeSlidesCloud::Object::$type->new()";
+        my $class = AsposeSlidesCloud::ClassRegistry->get_class_name(ucfirst($type), $data);
+        my $_instance = use_module("AsposeSlidesCloud::Object::$class")->new();
         return $_instance->from_hash($data);
     }
 }
@@ -186,9 +199,16 @@ __PACKAGE__->method_documentation({
     	read_only => '',
     		},
     'child_comments' => {
-    	datatype => 'ARRAY[SlideComment]',
+    	datatype => 'ARRAY[SlideCommentBase]',
     	base_name => 'ChildComments',
     	description => 'Child comments.',
+    	format => '',
+    	read_only => '',
+    		},
+    'type' => {
+    	datatype => 'string',
+    	base_name => 'Type',
+    	description => 'Slide comment type. ',
     	format => '',
     	read_only => '',
     		},
@@ -198,14 +218,16 @@ __PACKAGE__->swagger_types( {
     'author' => 'string',
     'text' => 'string',
     'created_time' => 'string',
-    'child_comments' => 'ARRAY[SlideComment]'
+    'child_comments' => 'ARRAY[SlideCommentBase]',
+    'type' => 'string'
 } );
 
 __PACKAGE__->attribute_map( {
     'author' => 'Author',
     'text' => 'Text',
     'created_time' => 'CreatedTime',
-    'child_comments' => 'ChildComments'
+    'child_comments' => 'ChildComments',
+    'type' => 'Type'
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

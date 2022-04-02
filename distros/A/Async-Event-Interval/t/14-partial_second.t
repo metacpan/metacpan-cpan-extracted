@@ -1,13 +1,17 @@
 use strict;
 use warnings;
 
-use Async::Event::Interval;
 use Test::More;
 use Time::HiRes qw(time);
 
-if (! $ENV{CI_TESTING}) {
-    plan skip_all => "Not on a valid CI testing platform..."
+BEGIN {
+    if (! $ENV{CI_TESTING}) {
+        plan skip_all => "Not on a valid CI testing platform...";
+    }
+    warn "Segs before: " . `ipcs -m | wc -l` . "\n" if $ENV{PRINT_SEGS};
 }
+
+use Async::Event::Interval;
 
 my $mod = 'Async::Event::Interval';
 
@@ -20,6 +24,8 @@ $$t = time;
 $e->start;
 sleep 2;
 $e->stop;
+
+warn "Segs after: " . `ipcs -m | wc -l` . "\n" if $ENV{PRINT_SEGS};
 
 sub perform {
     my $time = time;

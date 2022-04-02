@@ -11,6 +11,7 @@ use Term::Choose           qw();
 use Term::Choose::LineFold qw( print_columns line_fold );
 use Term::Choose::Util     qw( unicode_sprintf get_term_height get_term_width );
 use Term::Form             qw();
+use Term::Form::ReadLine   qw();
 
 use App::DBBrowser::DB;
 #use App::DBBrowser::Opt::Set; # required
@@ -230,13 +231,13 @@ sub __func_Char_Length {
 sub __func_Concat {
     my ( $sf, $sql, $cols, $func, $multi_col ) = @_;
     my $plui = App::DBBrowser::DB->new( $sf->{i}, $sf->{o} );
-    my $tf = Term::Form->new( $sf->{i}{tf_default} );
+    my $tr = Term::Form::ReadLine->new( $sf->{i}{tr_default} );
     my $subset = $sf->__choose_columns( $func, $cols, $multi_col );
     if ( ! defined $subset ) {
         return;
     }
     my $info = 'Function: Concat( ' . join( ',', @$subset ) . ' )' . "\n";
-    my $sep = $tf->readline(
+    my $sep = $tr->readline(
         'Separator: ',
         { info => $info }
     );

@@ -11,3 +11,5 @@ fallback/const-c.inc
 fallback/const-xs.inc
 t/1.t
 t/2.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

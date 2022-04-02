@@ -1,5 +1,8 @@
 Revision history for PomBase-Chobo
 
+0.037     2022-04-02 16:37:50
+          Store feature_field fields in cvtermprops
+
 0.036     2022-01-04 10:15:23
           Add special case to make sure that all part_of terms are merged
 

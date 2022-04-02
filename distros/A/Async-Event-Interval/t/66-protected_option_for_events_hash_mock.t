@@ -1,15 +1,19 @@
 use strict;
 use warnings;
 
-use Async::Event::Interval;
 use Data::Dumper;
-use IPC::Shareable;
 use Mock::Sub;
 use Test::More;
 
-if (! $ENV{CI_TESTING}) {
-    plan skip_all => "Not on a valid CI testing platform..."
+BEGIN {
+    if (! $ENV{CI_TESTING}) {
+        plan skip_all => "Not on a valid CI testing platform...";
+    }
+    warn "Segs before: " . `ipcs -m | wc -l` . "\n" if $ENV{PRINT_SEGS};
 }
+
+use Async::Event::Interval;
+use IPC::Shareable;
 
 my $mod = 'Async::Event::Interval';
 
@@ -50,5 +54,7 @@ my $mod = 'Async::Event::Interval';
     IPC::Shareable::clean_up_protected($protect_lock);
     is $keys, 0, "IPC::Shareable shows no entries in the register after cleanup";
 }
+
+warn "Segs after: " . `ipcs -m | wc -l` . "\n" if $ENV{PRINT_SEGS};
 
 done_testing();

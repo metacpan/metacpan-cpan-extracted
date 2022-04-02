@@ -1,5 +1,10 @@
 Revision history for Devel-MAT-Dumper
 
+0.45    2022-04-02
+        [CHANGES]
+         * Added `DMD_ADD_ROOT()`
+         * Additionally dump the `->mg_virtual` field of MAGIC structures
+
 0.44    2022-03-16
         [CHANGES]
          * Defined a whole new mechanism for dumping information about C-level

@@ -57,7 +57,7 @@ use PPIx::Regexp::Util qw{
 
 use Scalar::Util qw{ looks_like_number };
 
-our $VERSION = '0.083';
+our $VERSION = '0.084';
 
 our $DEFAULT_POSTDEREF;
 defined $DEFAULT_POSTDEREF
@@ -596,12 +596,6 @@ sub prior_significant_token {
 #   - Anything else results in an exception and stack trace.
 
 {
-    # %* &* **
-    my %magic_var = map { $_ => 1 } qw{ @* $* };
-    my %magic_oper = map { $_ => 1 } qw{ & ** % };
-    my %sliceable = map { $_ => 1 } qw{ @ % };
-    my %post_slice = map { $_ => 1 } qw< { [ >;	# ] }
-
     sub __recognize_postderef {
 	my ( $self, $token, $iterator ) = @_;
 	$self->{postderef}
@@ -638,52 +632,26 @@ sub prior_significant_token {
 	while ( my $elem = $iterator->() ) {
 
 	    my $content = $elem->content();
-	    $content =~ m/ \A ( . \#? ) /smx
-		and $accept->{$1}
+
+	    # As of PPI 1.238, all postfix dereferences are parsed as
+	    # casts. So if we find a cast of the correct content we have
+	    # a postfix deref.
+	    $elem->isa( 'PPI::Token::Cast' )
 		or next;
 
-	    my $length = length $content;
-
-	    # PPI parses '$x->@*' as containing magic variable '@*'.
-	    # Similarly for '$*' and '$#*'. I think this is a bug, and
-	    # they should be parsed as casts, but ...
-	    if ( $elem->isa( 'PPI::Token::Magic' ) ) {
-		$magic_var{$content}
-		    and return $length;
-		if ( '$#' eq $content ) {
-		    my $next = $elem->snext_sibling()
-			or return $length;
-		    '*' eq substr $next->content(), 0, 1
-			and return $length + 1;
-		}
-	    }
-
-	    # PPI parses '%*' as a cast of '%' followed by a splat, but
-	    # I think it is likely that if it ever supports postderef
-	    # operators that they will be casts. It currently parses
-	    # '**' as an operator and '&*' as two operators, but the
-	    # logic is pretty much the same as for a cast, so they get
-	    # handled here too.
-	    if ( $elem->isa( 'PPI::Token::Cast' ) || $elem->isa(
-		    'PPI::Token::Operator' ) && $magic_oper{$content} ) {
-		# Maybe PPI will eventually parse something like '$*' as
-		# a cast, so ...
-		$content =~ m/ [*] \z /smx
-		    and return $length;
-		# Or maybe it will parse the asterisk separately, but I
-		# have no idea what its class will be.
+	    if ( $content =~ m/ ( .* ) \* \z /smx ) {
+		# If we're an acceptable cast ending in a glob, accept
+		# it.
+		$accept->{$1}
+		    and return length $content;
+	    } elsif ( $accept->{$content} ) {
+		# If we're an acceptable cast followed by a subscript,
+		# we're a slice -- accept both cast and subscript.
 		my $next = $elem->snext_sibling()
-		    or return;
-		my $next_content = $next->content();
-		my $next_char = substr $next_content, 0, 1;
-		'*' eq $next_char
-		    and return $length + 1;
-		# We may still have a slice.
-		$sliceable{$content}
-		    and $post_slice{$next_char}
-		    and return $length + length $next_content;
-		# TODO maybe PPI will do something completely
-		# unanticipated with postderef.
+		    or next;
+		$next->isa( 'PPI::Structure::Subscript' )
+		    or next;
+		return length( $content ) + length( $next->content() );
 	    }
 
 	    # Otherwise, we're not a postfix dereference; try the next

@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2016-2022 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Tool::Show 0.46;
+package Devel::MAT::Tool::Show 0.47;
 
 use v5.14;
 use warnings;
@@ -101,6 +101,10 @@ sub run
          Devel::MAT::Cmd->format_sv( $magic->ptr )
       ) if $magic->ptr;
 
+      Devel::MAT::Cmd->printf( "\n     with virtual table at 0x%x",
+         $magic->vtbl
+      ) if $magic->vtbl;
+
       Devel::MAT::Cmd->printf( "\n" );
    }
 
@@ -112,7 +116,7 @@ sub run
          if defined $file;
    }
 
-   my $type = ref $sv; $type =~ s/^Devel::MAT::SV:://;
+   my $type = $sv->type;
    my $method = "show_$type";
    $self->$method( $sv, \%opts );
 }

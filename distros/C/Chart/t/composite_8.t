@@ -4,6 +4,8 @@
 # set(xy_plot => 1
 # You will the difference in the plots!
 #
+
+BEGIN { unshift @INC, 'lib', '../lib'}
 use Chart::Composite;
 use Chart::Lines;
 use Chart::Points;

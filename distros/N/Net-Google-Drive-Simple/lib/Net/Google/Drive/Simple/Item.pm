@@ -5,7 +5,7 @@ package Net::Google::Drive::Simple::Item;
 use strict;
 use warnings;
 
-our $VERSION = '0.22';
+our $VERSION = '3.00';
 
 sub new {
     my ( $pkg, $data ) = @_;
