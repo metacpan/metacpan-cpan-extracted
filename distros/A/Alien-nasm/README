@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.22
+    version 0.23
 
 SYNOPSIS
 
@@ -40,8 +40,13 @@ HELPERS
 
      %{nasm}
 
-    Returns the name of the nasm executable. As of this writing it is
-    always nasm, but in the future it may have a different value.
+    Returns the name of the nasm executable.
+
+ ndisasm
+
+     %{ndisasm}
+
+    Returns the name of the ndisasm executable.
 
 AUTHOR
 
@@ -49,7 +54,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    This software is copyright (c) 2017 by Graham Ollis.
+    This software is copyright (c) 2017-2022 by Graham Ollis.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

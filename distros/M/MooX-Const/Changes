@@ -1,5 +1,25 @@
 Revision history for MooX-Const:
 
+v0.5.3    2022-04-03 17:42:59+01:00 Europe/London
+  [Bug Fixes]
+  - Writers will throw errors, unless it is a write-once attribute.
+
+  - Clearers will throw errors.
+
+  - Fix error check for triggers on value types.
+
+v0.5.2    2022-04-03 16:30:15+01:00 Europe/London
+  [Bug Fixes]
+  - Wrap coercions, fixes GH#4.
+
+  [Documentation]
+  - Bumped copyright year.
+
+  - Fix encoding of links in README.
+
+  [Other]
+  - Removed bad rule from MANIFEST.SKIP.
+
 v0.5.1    2021-06-21 16:47:46+01:00 Europe/London
   [Documentation]
   - Bumped copyright year.

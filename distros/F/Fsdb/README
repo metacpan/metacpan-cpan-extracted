@@ -83,8 +83,8 @@ Fsdb(3)               User Contributed Perl Documentation              Fsdb(3)
            Then the previous scripts still work, even though duration is now
            the third column, not the second.
 
-       +o   A series of actions are self-documenting (each program records what
-           it does).
+       +o   A series of actions are self-documenting (the provenance of
+           processsing done to produce each output is recorded in comments).
 
            **  No more wondering what hacks were used to compute the final
                data, just look at the comments at the end of the output.
@@ -125,10 +125,10 @@ Fsdb(3)               User Contributed Perl Documentation              Fsdb(3)
        original implementation of this idea was "/rdb", a commercial product
        described in the book [4mUNIX[24m [4mrelational[24m [4mdatabase[24m [4mmanagement:[24m [4mapplication[0m
        [4mdevelopment[24m [4min[24m [4mthe[24m [4mUNIX[24m [4menvironment[24m by Rod Manis, Evan Schaffer, and
-       Robert Jorgensen (and also at the web page <http://www.rdb.com/>).
-       Fsdb is an incompatible re-implementation of their idea without any
-       accelerated indexing or forms support.  (But it's free, and probably
-       has better statistics!).
+       Robert Jorgensen (1988 by Prentice Hall, and also at the web page
+       <http://www.rdb.com/>).  Fsdb is an incompatible re-implementation of
+       their idea without any accelerated indexing or forms support.  (But
+       it's free, and probably has better statistics!).
 
        Fsdb-2.x will exploit multiple processors or cores, and provides Perl-
        level support for input, output, and threaded-pipelines.  (As of
@@ -144,13 +144,33 @@ Fsdb(3)               User Contributed Perl Documentation              Fsdb(3)
        <http://www.isi.edu/~johnh/SOFTWARE/FSDB/index.html>.
 
 [1mWHAT'S NEW[0m
-   [1m2.73, tbd xxx[0m
+   [1m2.75, tbd tbd[0m
        ENHANCEMENT
-           dbcolpercentile now has a "--weighted" option.
+           Even more IPv6: the functions in Fsdb::Support::IPv6 package now
+           support strings of hex digits as an alternate encoding for IP
+           address (and they are already the output of ipv6_fullhex), and
+           "ip_fullhex_to_normal" converts full hex-encoded IPv4 or IPv6
+           addresses to their "normal" form (dotted-quad or IPv6 printable
+           format).
 
        ENHANCEMENT
-           The new Fsdb::Support::IPv6 package includes ipv6_zeroize and
-           ipv6_normalize to rewrite ipv6 print addresses.
+           Add optional type specifications to the schema.  Types are not used
+           in Perl, but are relevant in Python and Go Fsdb bindings.  Types
+           use a subset of perl pack specifiers: c, s, l, q are signed 8, 16,
+           32, and 64-bit integers, f is a float, d is double float, a is
+           utf-8 string, and &gt; and &lt; can force big or little endianness.
+           The default type for everything is "a", that is, utf-8 strings.
+
+       ENHANCEMENT
+           dbcol, dbcolcreate, dbcolcopylast, and dbcolrename now understand
+           and propagate schema types.  dbsort, dbjoin, dbmerge, dbmerge2 and
+           dbfilepivot all take a new option "-t" to sort by type-inferred
+           comparision, if a type is given.
+
+       ENHANCEMENT
+           dbcolstat, dbmultistats, and dbcolmovingstats now include type
+           information in their output schema.  (They assumes input variables
+           are floats, not integers.)
 
 [1mREADME CONTENTS[0m
        executive summary
@@ -206,11 +226,18 @@ Fsdb(3)               User Contributed Perl Documentation              Fsdb(3)
                root * 0 0 Root /root /bin/bash
                # this is a simple database
 
-       The header line must be first and begins with "#h".  There are rows
+       The header line must be first and begins with "#fsdb".  There are rows
        (records) and columns (fields), just like in a normal database.
        Comment lines begin with "#".  Column names are any string not
        containing spaces or single quote (although it is prudent to keep them
        alphanumeric with underscore).
+
+       Columns can optionally include type anntations by following name with
+       :t where t is some type.  (Types are not used in Perl, but are relevant
+       in Python and Go Fsdb bindings.)  Types use a subset of perl pack
+       specifiers: c, s, l, q are signed 8, 16, 32, and 64-bit integers, f is
+       a float, d is double float, a is utf-8 string, and &gt; and &lt; can
+       force big or little endianness.
 
        By default, columns are delimited by whitespace.  With this default
        configuration, the contents of a field cannot contain whitespace.
@@ -549,6 +576,25 @@ Fsdb(3)               User Contributed Perl Documentation              Fsdb(3)
        Most programs run in constant memory and use temporary files if
        necessary.  Exceptions are dbcolneaten, dbcolpercentile, dbmapreduce,
        dbmultistats, dbrowsplituniq.
+
+   [1mSTANDARD SORTING OPTIONS[0m
+       A number of programs do sorting, or depend on defining an ordering of
+       rows.  Such programs use these standard sorting options:
+
+       [1m-r [22mor [1m--descending[0m
+           sort in reverse order (high to low)
+
+       [1m-R [22mor [1m--ascending[0m
+           sort in normal order (low to high)
+
+       [1m-t [22mor [1m--type-inferred-sorting[0m
+           sort fields by type (numeric or leicographic), automatically
+
+       [1m-n [22mor [1m--numeric[0m
+           sort numerically
+
+       [1m-N [22mor [1m--lexical[0m
+           sort lexicographically
 
 [1mANOTHER EXAMPLE[0m
        Take the raw data in "DATA/http_bandwidth", put a header on it
@@ -1347,7 +1393,7 @@ Fsdb(3)               User Contributed Perl Documentation              Fsdb(3)
        from 116 to 175.  All programs are now in perl-5, no more shell scripts
        or perl-4.  All programs now have manual pages.
 
-       Although this is a major step forward, I still expect to rename "fsdb"
+       Although this is a major step forward, I still expect to rename "jdb"
        to "fsdb".
 
        ENHANCEMENT
@@ -2044,7 +2090,7 @@ Fsdb(3)               User Contributed Perl Documentation              Fsdb(3)
        ENHANCEMENT
            Removed references to Jdb in the package specification.  Since the
            name was changed in 2008, there's no longer a huge need for
-           backwards comparability.  (Suggestion form Petr Xabata.)
+           backwards compatibility.  (Suggestion form Petr Xabata.)
 
        ENHANCEMENT
            Test suites now invoke the perl using the path from
@@ -2438,6 +2484,21 @@ Fsdb(3)               User Contributed Perl Documentation              Fsdb(3)
            The spec for Fedora now includes "make" as BuildRequires, something
            required for Fedora 34.
 
+   [1m2.73, 2021-05-18 Updates dbcolpercentile with "--weighted", and with more[0m
+       [1mipv6.[0m
+       ENHANCEMENT
+           dbcolpercentile now has a "--weighted" option.
+
+       ENHANCEMENT
+           The new Fsdb::Support::IPv6 package includes ipv6_normalize,
+           ipv6_zeroize to rewrite ipv6 print addresses in IPv6 normal form,
+           with a 0 in each 4-nybble field.
+
+   [1m2.74, 2021-06-23 More ipv6.[0m
+       ENHANCEMENT
+           Fsdb::Support::IPv6 package includes ipv6_fullhex to rewrite ipv6
+           print addresses as full, 128-bit hex values.
+
 [1mAUTHOR[0m
        John Heidemann, "johnh@isi.edu"
 
@@ -2445,7 +2506,7 @@ Fsdb(3)               User Contributed Perl Documentation              Fsdb(3)
        and fixes.
 
 [1mCOPYRIGHT[0m
-       Fsdb is Copyright (C) 1991-2020 by John Heidemann <johnh@isi.edu>.
+       Fsdb is Copyright (C) 1991-2022 by John Heidemann <johnh@isi.edu>.
 
        This program is free software; you can redistribute it and/or modify it
        under the terms of version 2 of the GNU General Public License as
@@ -2469,4 +2530,4 @@ Fsdb(3)               User Contributed Perl Documentation              Fsdb(3)
 
 
 
-perl v5.32.1                      2021-05-15                           Fsdb(3)
+perl v5.34.0                      2022-04-02                           Fsdb(3)

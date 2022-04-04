@@ -20,7 +20,7 @@ use namespace::clean;
 sub puke(@); sub belch(@);  # these will be defined later in import()
 
 
-our $VERSION = '1.37';
+our $VERSION = '1.38';
 our @ISA;
 
 sub import {
@@ -177,8 +177,7 @@ my %params_for_select = (
   -where        => {type => SCALAR|ARRAYREF|HASHREF, optional => 1},
   (map {-$_ => {type => ARRAYREF, optional => 1}} @set_operators),
   -group_by     => {type => SCALAR|ARRAYREF,         optional => 1},
-  -having       => {type => SCALAR|ARRAYREF|HASHREF, optional => 1,
-                                                     depends  => '-group_by'},
+  -having       => {type => SCALAR|ARRAYREF|HASHREF, optional => 1},
   -order_by     => {type => SCALAR|ARRAYREF|HASHREF, optional => 1},
   -page_size    => {type => SCALAR,                  optional => 1},
   -page_index   => {type => SCALAR,                  optional => 1,
@@ -407,17 +406,19 @@ sub select {
     }
   }
 
-  # add GROUP BY/HAVING if needed
+  # add GROUP BY if needed
   if ($args{-group_by}) {
     my $sql_grp = $self->where(undef, $args{-group_by});
     $sql_grp =~ s/\bORDER\b/GROUP/;
-    if ($args{-having}) {
-      my ($sql_having, @bind_having) = $self->where($args{-having});
-      $sql_having =~ s/\bWHERE\b/HAVING/;
-      $sql_grp .= " $sql_having";
-      push @bind, @bind_having;
-    }
     $sql .= $sql_grp;
+  }
+
+  # add HAVING if needed (often together with -group_by, but not always)
+  if ($args{-having}) {
+    my ($sql_having, @bind_having) = $self->where($args{-having});
+    $sql_having =~ s/\bWHERE\b/HAVING/;
+    $sql.= " $sql_having";
+    push @bind, @bind_having;
   }
 
   # add ORDER BY if needed
@@ -1971,8 +1972,8 @@ specified either by a plain string or by an array of strings.
 
 =item C<< -having => "string" >>  or C<< -having => \%criteria >> 
 
-adds a C<HAVING> clause in the SQL statement (only makes
-sense together with a C<GROUP BY> clause).
+adds a C<HAVING> clause in the SQL statement. In most cases this is used
+together with a C<GROUP BY> clause.
 This is like a C<-where> clause, except that the criteria
 are applied after grouping has occurred.
 
@@ -2620,12 +2621,13 @@ L<Class::DOES>.
 
 Laurent Dami, C<< <laurent dot dami at cpan dot org> >>
 
-=head1 BUGS
+=head1 ACKNOWLEDGEMENTS
 
-Please report any bugs or feature requests to C<bug-sql-abstract-more at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=SQL-Abstract-More>. 
-I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
+=over
+
+=item L<https://github.com/rouzier> : support for C<-having> without C<-order_by>
+
+=back
 
 
 =head1 SUPPORT
@@ -2635,32 +2637,13 @@ You can find documentation for this module with the perldoc command.
     perldoc SQL::Abstract::More
 
 
-You can also look for information at:
-
-=over 4
-
-=item RT: CPAN's request tracker
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=SQL-Abstract-More>
-
-=item AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/SQL-Abstract-More>
-
-=item CPAN Ratings
-
-L<http://cpanratings.perl.org/d/SQL-Abstract-More>
-
-=item MetaCPAN
-
+The same documentation is also available at
 L<https://metacpan.org/module/SQL::Abstract::More>
-
-=back
 
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2011-2017 Laurent Dami.
+Copyright 2011-2022 Laurent Dami.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

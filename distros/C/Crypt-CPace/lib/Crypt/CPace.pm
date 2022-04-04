@@ -8,7 +8,8 @@ use bignum;
 require Exporter;
 
 use List::Util qw/min/;
-use Crypt::OpenSSL::Hash2Curve qw/encode_to_curve hash_to_curve EVP_MD_block_size EVP_get_digestbyname EC_POINT_get_affine_coordinates hex2point digest/;
+use Crypt::OpenSSL::Hash2Curve;
+use Crypt::OpenSSL::Base::Func;
 
 #use Smart::Comments;
 

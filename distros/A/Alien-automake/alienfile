@@ -1,5 +1,7 @@
 use alienfile;
 
+$ENV{MAKEINFO} = 'true';
+
 probe sub { 'share' };
 
 share {

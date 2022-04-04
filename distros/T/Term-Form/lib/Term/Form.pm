@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '0.543';
+our $VERSION = '0.544';
 use Exporter 'import';
 our @EXPORT_OK = qw( fill_form read_line );
 
@@ -195,7 +195,7 @@ sub __reset_term {
     if ( $up ) {
         print up( $up );
     }
-    if ( $self->{clear_screen} == 2 ) {
+    if ( $self->{clear_screen} == 2 ) { # readline
         print "\r" . clear_to_end_of_line();
     }
     else {
@@ -609,15 +609,15 @@ sub __prepare_width {
 sub __prepare_hight {
     my ( $self, $list, $term_w, $term_h ) = @_;
     $self->{i}{avail_h} = $term_h;
-    if ( length $self->{i}{pre_text} ) {
+    if ( length $self->{i}{info_prompt} ) {
         my $info_w = $term_w;
         if ( $^O ne 'MSWin32' && $^O ne 'cygwin' ) {
             $info_w += WIDTH_CURSOR;
         }
-        my @pre_text = line_fold( $self->{i}{pre_text}, $info_w, { color => $self->{color}, join => 0 } );
-        $self->{i}{pre_text_row_count} = @pre_text;
-        $self->{i}{pre_text} = join "\n", @pre_text;
-        $self->{i}{avail_h} -= $self->{i}{pre_text_row_count};
+        my @info_prompt = line_fold( $self->{i}{info_prompt}, $info_w, { color => $self->{color}, join => 0 } );
+        $self->{i}{info_prompt_row_count} = @info_prompt;
+        $self->{i}{info_prompt} = join "\n", @info_prompt;
+        $self->{i}{avail_h} -= $self->{i}{info_prompt_row_count};
         my $min_avail_h = $self->{keep};
         if (  $term_h < $min_avail_h ) {
             $min_avail_h = $term_h;
@@ -627,7 +627,7 @@ sub __prepare_hight {
         }
     }
     else {
-        $self->{i}{pre_text_row_count} = 0;
+        $self->{i}{info_prompt_row_count} = 0;
     }
     if ( @$list > $self->{i}{avail_h} ) {
         $self->{i}{page_count} = int @$list / ( $self->{i}{avail_h} - 1 );
@@ -795,8 +795,8 @@ sub __write_first_screen {
     if ( $self->{hide_cursor} ) {
         print hide_cursor();
     }
-    if ( length $self->{i}{pre_text} ) {
-        print $self->{i}{pre_text} . "\n"; #
+    if ( length $self->{i}{info_prompt} ) {
+        print $self->{i}{info_prompt} . "\n"; #
     }
     $self->__write_screen( $list );
 }
@@ -871,7 +871,7 @@ sub fill_form {
     if ( length $self->{prompt} ) {
         push @tmp, $self->{prompt};
     }
-    $self->{i}{pre_text} = join "\n", @tmp;
+    $self->{i}{info_prompt} = join "\n", @tmp;
     $self->{i}{sep}    = ': ';
     $self->{i}{sep_ro} = '| ';
     die if length $self->{i}{sep} != length $self->{i}{sep_ro};
@@ -983,7 +983,7 @@ sub fill_form {
         next CHAR if $char == KEY_TAB;
         my ( $tmp_term_w, $tmp_term_h ) = get_term_size();
         if ( $tmp_term_w != $term_w || $tmp_term_h != $term_h && $tmp_term_h < ( @$list + 1 ) ) {
-            my $up = $self->{i}{curr_row} + $self->{i}{pre_text_row_count};
+            my $up = $self->{i}{curr_row} + $self->{i}{info_prompt_row_count};
             print up( $up ) if $up;
             ( $term_w, $term_h ) = ( $tmp_term_w, $tmp_term_h );
             $self->__prepare_meta_menu_elements( $term_w );
@@ -1144,7 +1144,7 @@ sub fill_form {
         }
         elsif ( $char == LINE_FEED || $char == CARRIAGE_RETURN ) {
             my $up = $self->{i}{curr_row} - $self->{i}{begin_row};
-            $up += $self->{i}{pre_text_row_count} if $self->{i}{pre_text_row_count};
+            $up += $self->{i}{info_prompt_row_count} if $self->{i}{info_prompt_row_count};
             if ( $list->[$self->{i}{curr_row}][0] eq $self->{back} ) {
                 $self->__reset_term( $up );
                 return;
@@ -1240,15 +1240,14 @@ sub __print_previous_page {
 
 sub __before_readline {
     my ( $self, $m ) = @_;
-    my @pre_text_array;
     if ( $self->{show_context} ) {
-        my @before_lines;
+        my @pre_text_array;
         if ( $m->{diff} ) {
             my $line = '';
             my $line_w = 0;
             for my $i ( reverse( 0 .. $m->{diff} - 1 ) ) {
                 if ( $line_w + $m->{str}[$i][1] > $self->{i}{term_w} ) {
-                    unshift @before_lines, $line;
+                    unshift @pre_text_array, $line;
                     $line   = $m->{str}[$i][0];
                     $line_w = $m->{str}[$i][1];
                     next;
@@ -1259,12 +1258,12 @@ sub __before_readline {
             my $total_first_line_w = $self->{i}{max_key_w} + $line_w;
             if ( $total_first_line_w <= $self->{i}{term_w} ) {
                 my $empty_w = $self->{i}{term_w} - $total_first_line_w;
-                unshift @before_lines, $self->__get_prompt() . ( ' ' x $empty_w ) . $line;
+                unshift @pre_text_array, $self->__get_prompt() . ( ' ' x $empty_w ) . $line;
             }
             else {
                 my $empty_w = $self->{i}{term_w} - $line_w;
-                unshift @before_lines, ' ' x $empty_w . $line;
-                unshift @before_lines, $self->__get_prompt();
+                unshift @pre_text_array, ' ' x $empty_w . $line;
+                unshift @pre_text_array, $self->__get_prompt();
             }
             $self->{i}{keys}[0] = '';
         }
@@ -1274,23 +1273,17 @@ sub __before_readline {
             }
             else {
                 if ( length $self->{i}{prompt} ) { #
-                    unshift @before_lines, $self->__get_prompt();
+                    unshift @pre_text_array, $self->__get_prompt();
                 }
                 $self->{i}{keys}[0] = '';
             }
         }
-        push @pre_text_array, @before_lines;
+        $self->{i}{pre_text} = join "\n", @pre_text_array;
+        $self->{i}{pre_text_row_count} = scalar @pre_text_array;
     }
     else {
         $self->{i}{keys}[0] = $self->__get_prompt();
     }
-    if ( $self->{clear_screen} == 2 ) {
-        $self->{i}{pre_text} = join "\n", map { "\r" . clear_to_end_of_line() . $_ } @pre_text_array;
-    }
-    else {
-        $self->{i}{pre_text} = join "\n", @pre_text_array;
-    }
-    $self->{i}{pre_text_row_count} = scalar @pre_text_array;
 }
 
 
@@ -1330,12 +1323,7 @@ sub __after_readline {
     if ( $line_w ) {
         push @post_text_array, $line;
     }
-    if ( $self->{clear_screen} == 2 ) { # never
-        $self->{i}{post_text} = join "\n", map { "\r" . clear_to_end_of_line() . $_ } @post_text_array;
-    }
-    else {
-        $self->{i}{post_text} = join "\n", @post_text_array;
-    }
+    $self->{i}{post_text} = join "\n", @post_text_array;
     $self->{i}{post_text_row_count} = scalar @post_text_array;
 }
 
@@ -1367,7 +1355,7 @@ sub __print_footer {
 
 sub __modify_readline_options {
     my ( $self ) = @_;
-    if ( $self->{clear_screen} == 2 && $self->{show_context} ) {
+    if ( $self->{clear_screen} == 2 && ( $self->{show_context} || $self->{info} ) ) {
         $self->{clear_screen} = 0;
     }
     if ( length $self->{footer} && $self->{page} != 2 ) {
@@ -1382,7 +1370,10 @@ sub __modify_readline_options {
 sub __init_readline {
     my ( $self, $term_w, $prompt ) = @_;
     $self->{i}{term_w} = $term_w;
-    if ( $self->{clear_screen} == 1 ) {
+    if ( $self->{clear_screen} == 0 ) {
+        print "\r" . clear_to_end_of_screen();
+    }
+    elsif ( $self->{clear_screen} == 1 ) {
         print clear_screen();
     }
     if ( length $self->{info} ) {
@@ -1576,7 +1567,7 @@ sub readline {
                 $m = $self->__string_and_pos( $list );
             }
             else {
-                $self->__reset_term( $self->{i}{pre_text_row_count} );
+                $self->__reset_term( $self->{i}{info_row_count} + $self->{i}{pre_text_row_count} );
                 return;
             }
         }
@@ -1584,7 +1575,7 @@ sub readline {
             $self->{i}{beep} = 1;
         }
         elsif ( $char == LINE_FEED || $char == CARRIAGE_RETURN ) {
-            $self->__reset_term( $self->{i}{pre_text_row_count} );
+            $self->__reset_term( $self->{i}{info_row_count} + $self->{i}{pre_text_row_count} );
             return join( '', map { $_->[0] } @{$m->{str}} );
         }
         else {
@@ -1611,7 +1602,7 @@ Term::Form - Read lines from STDIN.
 
 =head1 VERSION
 
-Version 0.543
+Version 0.544
 
 =cut
 

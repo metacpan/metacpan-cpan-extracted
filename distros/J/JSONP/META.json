@@ -50,6 +50,6 @@
          "web" : "https://github.com/ANSI-C/JSONP"
       }
    },
-   "version" : "2.22",
+   "version" : "2.24",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

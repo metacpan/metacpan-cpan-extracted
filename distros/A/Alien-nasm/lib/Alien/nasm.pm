@@ -7,7 +7,7 @@ use Env qw( @PATH );
 use File::Spec;
 
 # ABSTRACT: Find or build nasm, the netwide assembler
-our $VERSION = '0.22'; # VERSION
+our $VERSION = '0.23'; # VERSION
 
 
 sub alien_helper
@@ -15,6 +15,9 @@ sub alien_helper
   return {
     nasm => sub {
       'nasm';
+    },
+    ndisasm => sub {
+      'ndisasm';
     },
   }
 }
@@ -33,7 +36,7 @@ Alien::nasm - Find or build nasm, the netwide assembler
 
 =head1 VERSION
 
-version 0.22
+version 0.23
 
 =head1 SYNOPSIS
 
@@ -69,8 +72,13 @@ should work with this class.
 
  %{nasm}
 
-Returns the name of the nasm executable.  As of this writing it is always
-C<nasm>, but in the future it may have a different value.
+Returns the name of the nasm executable.
+
+=head2 ndisasm
+
+ %{ndisasm}
+
+Returns the name of the ndisasm executable.
 
 =head1 AUTHOR
 
@@ -78,7 +86,7 @@ Graham Ollis <plicease@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Graham Ollis.
+This software is copyright (c) 2017-2022 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

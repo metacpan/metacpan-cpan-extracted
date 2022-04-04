@@ -42,7 +42,7 @@ Unlike most Fsdb programs, this program does I<not> output a FSDB file.
 
 =item B<-m MECHANISM>
 
-Select the mail-sending mechanism: Mail, sendmail, or mh.
+Select the mail-sending mechanism: Mail, sendmail, mh.
 Defaults to "Mail".
 
 Mail uses a Berkeley-style /usr/bin/Mail.

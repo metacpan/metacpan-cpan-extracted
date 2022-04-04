@@ -1,5 +1,9 @@
 Revision history for Perl extension App-Greple-subst
 
+2.3002 2022-04-04T09:27:00Z
+
+    - Update ms-amend.dict
+
 2.3001 2022-03-24T03:06:49Z
 
     - Remove 'pairwise' because it seems to have a bug causing core dump.

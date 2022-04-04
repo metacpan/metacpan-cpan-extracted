@@ -1,4 +1,3 @@
-.github/workflows/perl.yml
 bin/db-iris
 Build.PL
 Changelog
@@ -18,6 +17,7 @@ scripts/makedeb-docker-helper
 share/csv2json
 share/enhance
 share/find-missing
+share/find-missing-wrapper
 share/json2csv
 share/json2json
 share/meta.json

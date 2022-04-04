@@ -188,7 +188,7 @@ sub t_distribution {
 	$nu_more = $t_nus[$nui];
     };
     
-    # now do interopation, if necssary
+    # now do interpolation, if necessary
     if (floats_equal($t_alphas[$alphai], $alpha)) {
 	if ($nu_less == $nu_more) {
 	    # print "exact match\n";

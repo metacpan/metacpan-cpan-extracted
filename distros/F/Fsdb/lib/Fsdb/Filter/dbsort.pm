@@ -72,6 +72,14 @@ sort in reverse order (high to low)
 
 sort in normal order (low to high)
 
+=item B<-t> or B<--type-inferred-sorting>
+
+sort fields by type (numeric or leicographic), automatically
+
+=item B<-T> or B<--no-type-inferred-sorting>
+
+sort fields only as specified based on C<-n> or C<-N>
+
 =item B<-n> or B<--numeric>
 
 sort numerically
@@ -248,6 +256,7 @@ sub parse_options ($@) {
 	'N|lexical' => sub { $self->parse_sort_option(@_); },
 	'r|descending' => sub { $self->parse_sort_option(@_); },
 	'R|ascending' => sub { $self->parse_sort_option(@_); },
+	't|type-inferred-sorting' => sub { $self->parse_sort_option(@_); },
 	'<>' => sub { $self->parse_sort_option('<>', @_); },
 	) or pod2usage(2);
     croak($self->{_prog} . ": internal error, extra arguments.\n")

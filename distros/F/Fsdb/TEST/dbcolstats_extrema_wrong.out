@@ -1,4 +1,4 @@
-#fsdb mean stddev pct_rsd conf_range conf_low conf_high conf_pct sum sum_squared min max n
+#fsdb mean:d stddev:d pct_rsd:d conf_range:d conf_low:d conf_high:d conf_pct:d sum:d sum_squared:d min:d max:d n:q
 0 8.165e+19 - 1.299e+20 -1.299e+20 1.299e+20 0.95 0 2e+40 -1e+20 1e+20 4
 # mean should be 0.5, but is zero because of floating point roundoff error
 # see discussion at http://code.activestate.com/recipes/393090/

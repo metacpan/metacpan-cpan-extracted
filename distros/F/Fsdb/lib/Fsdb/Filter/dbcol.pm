@@ -2,7 +2,7 @@
 
 #
 # dbcol.pm
-# Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
+# Copyright (C) 1991-2022 by John Heidemann <johnh@isi.edu>
 #
 # This program is distributed under terms of the GNU general
 # public license, version 2.  See the file COPYING
@@ -294,7 +294,18 @@ sub setup ($) {
     #
     # setup output
     #
-    $self->finish_io_option('output', -clone => $self->{_in}, -cols => \@{$self->{_arg_cols}});
+    my(@colspecs) = ();
+    foreach (@{$self->{_arg_cols}}) {
+	my $in_coli = $self->{_in}->col_to_i($_);
+        if (defined($in_coli)) {
+            push(@colspecs, $self->{_in}->col_to_colspec($in_coli));
+        } else {
+            # default type
+            push(@colspecs, $_);
+        };
+    };
+        
+    $self->finish_io_option('output', -clone => $self->{_in}, -cols => \@colspecs);
     my $write_fastpath_sub = $self->{_out}->fastpath_sub();
 
     #
@@ -354,7 +365,7 @@ sub finish ($) {
 
 =head1 AUTHOR and COPYRIGHT
 
-Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
+Copyright (C) 1991-2022 by John Heidemann <johnh@isi.edu>
 
 This program is distributed under terms of the GNU general
 public license, version 2.  See the file COPYING

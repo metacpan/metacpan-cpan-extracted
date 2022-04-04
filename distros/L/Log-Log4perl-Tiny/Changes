@@ -1,3 +1,12 @@
+1.6.2  2022-04-03 14:53:06 CEST
+   - Release after 187 PASSes on CPAN Testers (thanks!)
+   - Thanks to https://github.com/JC001010 for reporting the last
+     two bugs
+
+1.6.1  2022-04-01 00:33:17 CEST
+   - emitting logs at the right level for Carp-ish stuff, fixes
+     https://github.com/polettix/Log-Log4perl-Tiny/issues/13
+
 1.6.0  2022-03-22 06:31:08 CET
    - release after 147 PASSes on CPAN Testers (thanks!)
 

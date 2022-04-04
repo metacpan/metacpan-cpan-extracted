@@ -4,7 +4,7 @@ Linux::Statm::Tiny - simple access to Linux /proc/../statm
 
 # VERSION
 
-version 0.0601
+version 0.0603
 
 # SYNOPSIS
 
@@ -120,12 +120,13 @@ Robert Rothenberg <rrwo@cpan.org>
 # CONTRIBUTORS
 
 - Adrian Lai <aidy@cpan.org>
+- James Raspass <jraspass@gmail.com>
 - Karen Etheridge <ether@cpan.org>
 - Mohammad S Anwar <mohammad.anwar@yahoo.com>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015-2019 by Thermeon Worldwide, PLC.
+This software is copyright (c) 2015-2022 by Thermeon Worldwide, PLC.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

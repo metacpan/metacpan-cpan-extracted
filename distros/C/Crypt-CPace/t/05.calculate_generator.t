@@ -10,8 +10,9 @@ use Test::More ;
 use List::Util qw/min/;
 use Crypt::OpenSSL::EC;
 use Crypt::OpenSSL::Bignum;
-use Crypt::OpenSSL::Hash2Curve qw/expand_message_xmd encode_to_curve get_hash2curve_params hash_to_curve EC_POINT_point2hex/;
-use Crypt::CPace qw/calculate_generator/;
+use Crypt::OpenSSL::Hash2Curve;
+use Crypt::OpenSSL::Base::Func;
+use Crypt::CPace ;
 
 my $DSI = 'CPaceP256_XMD:SHA-256_SSWU_NU_';
 my $PRS = 'Password';

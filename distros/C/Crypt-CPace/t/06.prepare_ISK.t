@@ -9,7 +9,8 @@ use warnings;
 use Test::More ;
 
 use Crypt::OpenSSL::EC;
-use Crypt::OpenSSL::Hash2Curve qw/expand_message_xmd/;
+use Crypt::OpenSSL::Hash2Curve;
+use Crypt::OpenSSL::Base::Func;
 use Crypt::CPace ;
 
 # a, b with same info

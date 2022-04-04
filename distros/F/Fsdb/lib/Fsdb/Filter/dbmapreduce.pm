@@ -644,7 +644,7 @@ sub setup($) {
     _setup_reducer
 
 (internal)  
-One Fred that runs the reducer and produces output.
+One Fred runs the reducer and produces output.
 C<_reducer_queue> is sends the new key,
 then a Fsdb stream, then EOF (undef)
 for each group.

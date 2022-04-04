@@ -58,7 +58,7 @@ sub parse_csv_line
   my $q;
   for( @line, undef )
     {
-    if( ( /,/ or ! defined ) and $q % 2 == 0 )
+    if( ( /,/ and $q % 2 == 0 ) or ! defined )
       {
       $fld =~ s/^"(.*?)"$/$1/;
       $fld =~ s/""/"/g;
@@ -144,17 +144,26 @@ for the rest of the data.
 
 =head1 IMPLEMENTATION DETAILS
 
-Data::Tools::CSV is pure-perl implementation and has compact code.
-It parses RFC4180 style CSV files:
+Data::Tools::CSV is compact, pure-perl implementation of a CSV parser of
+RFC4180 style CSV files:
 
   https://www.ietf.org/rfc/rfc4180.txt
   
 RFC4180 says:
 
   * lines are CRLF delimited, however CR or LF-only are accepted as well.
-  * whitespace is data, will not be stripped.
+  * whitespace is data, will not be stripped (2.4).
   * whitespace and delimiters can be quoted with double quotes (").
   * quotes in quoted text should be doubled ("") as escaping.
+
+=head1 KNOWN BUGS
+
+This implementation does not support multiline fields (lines split),
+as described in RFC4180, (2.6).
+
+There is no much error handling. However the code makes reasonable effort
+to handle properly all the data provided. This may seem vague but the CSV 
+format itself is vague :)
 
 =head1 FEEDBACK
 

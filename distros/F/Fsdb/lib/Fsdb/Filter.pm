@@ -340,6 +340,8 @@ sub parse_sort_option ($$$) {
 	push (@$sort_aref, '-n');
     } elsif ($option_name eq 'N' || $option_name eq 'lexical') {
 	push (@$sort_aref, '-N');
+    } elsif ($option_name eq 't' || $option_name eq 'type-inferred-sorting') {
+	push (@$sort_aref, '-t');
     } elsif ($option_name eq 'r' || $option_name eq 'descending') {
 	push (@$sort_aref, '-r');
     } elsif ($option_name eq 'R' || $option_name eq 'descending') {
@@ -830,8 +832,9 @@ sub create_compare_code ($$;$$) {
     #
     my $compare_code = "sub {\n" .
 	    "\tno warnings \"numeric\";\n" .
-	    "\t\treturn\n";
-    my ($reverse, $numeric) = (0, 0);
+        "\t\treturn\n";
+    my($MODE_AUTO, $MODE_NUMERIC, $MODE_LEXICAL) = (0..10);
+    my ($reverse, $sort_mode) = (0, $MODE_AUTO);
     my $arg;
     my $fields_found = 0;
     foreach $arg (@{$self->{_sort_argv}}) {
@@ -840,9 +843,11 @@ sub create_compare_code ($$;$$) {
 	} elsif ($arg eq '-R') {
 	    $reverse = 0;
 	} elsif ($arg eq '-n') {
-	    $numeric = 1;
+	    $sort_mode = $MODE_NUMERIC;
 	} elsif ($arg eq '-N') {
-	    $numeric = 0;
+	    $sort_mode = $MODE_LEXICAL;
+	} elsif ($arg eq '-t') {
+	    $sort_mode = $MODE_AUTO;
         } elsif ($arg =~ /^-/) {
 	    croak $self->{_prog} . ": internal error: unknown option $arg in sort key\n";
 	} else {
@@ -857,12 +862,14 @@ sub create_compare_code ($$;$$) {
 	    };
 	    croak $self->{_prog} . ": unknown column name $arg in sort key\n"
 		if (!defined($left_coli) || !defined($right_coli));
+            my($this_sort_mode) = ($sort_mode == $MODE_AUTO ? ($a_fsdb->col_spec_is_numeric($left_coli) ? $MODE_NUMERIC : $MODE_LEXICAL) : $sort_mode);
+	    my($comparison_op) = ($this_sort_mode == $MODE_NUMERIC ? "<=>" : ($this_sort_mode == $MODE_LEXICAL ? "cmp": undef));
 	    $compare_code .= "\t" . '($' . $left . '->[' . $left_coli . '] ' .
-    	    	    ($numeric ? "<=>" : "cmp") .
+    	    	    $comparison_op .
 		    ' $' . $right . '->[' . $right_coli . ']) || ' .
 		    ' # ' . $arg  .
 		    ($reverse ? ", descending" : ", ascending") .
-		    ($numeric ? " numeric" : " lexical") .
+		    ($comparison_op eq '<=>' ? " numeric" : " lexical") .
 		    "\n";
 	    # note that we don't currently handle NaN comparisons returning undef
 	    $fields_found++;

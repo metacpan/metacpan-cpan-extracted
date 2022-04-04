@@ -21,6 +21,7 @@ my @files = (
     't/10-has.t',
     't/20-moo.t',
     't/21-moox-typetiny.t',
+    't/22-moo-coerce.t',
     't/30-strict.t',
     't/31-strict.t',
     't/40-moose.t',

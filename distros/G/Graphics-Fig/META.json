@@ -1,12 +1,12 @@
 {
-   "abstract" : "unknown",
+   "abstract" : "drawing library based on xfig",
    "author" : [
-      "unknown"
+      "Scott Guthridge <scott_guthridge@rompromity.net>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.46, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "unknown"
+      "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -40,6 +40,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v1.0.7",
+   "version" : "v1.0.8",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

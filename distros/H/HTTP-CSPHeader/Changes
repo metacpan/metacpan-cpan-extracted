@@ -1,0 +1,14 @@
+Revision history for HTTP-CSPHeader
+
+v0.1.1    2022-04-04 11:20:36+01:00 Europe/London
+  [Enhancements]
+  - Removed Ref::Util from dependencies, but added Type::Tiny::XS as recommended.
+
+  [Bug Fixes]
+  - Disallow header being set from the constructor.
+
+  [Documentation]
+  - Added missing note to Changes.
+
+v0.1.0    2022-04-03 13:26:16+01:00 Europe/London
+  - Initial version released.

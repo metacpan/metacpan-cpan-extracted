@@ -1,6 +1,48 @@
 CHANGES
 -------
 
+  2.103 3 April 2022
+  
+      * Update version to 2.103
+        97f1893892eccac69b3a8033378b0b44d7c4f3ab
+
+      * Fix for inflateSyncs retrurn code change
+        4843e22285bf8e52c9b5b913d167a1545995c793
+
+      * Add constant for ZIP_CM_AES
+        91be04dd8dc2848e3c25b87ec498cf8ccc34187a
+
+      * Point links to rfcs to ietf.org
+        https://github.com/pmqs/IO-Compress/pull/37
+        a8f28b36cf4d77df1cfa0516867012425920a62f
+
+      * Rename test file to fix manifest warning
+        https://github.com/pmqs/IO-Compress/pull/36
+        955244f9ac0654d7e8d54115162da53c85d7178c
+
+      * Add perl 5.34
+        06f41883f62ed1b88b03c246b16e0b5ef72503bc
+
+      * Fix for Calling nextStream on an IO::Uncompress::Zip object in Transparent mode dies when input is uncompressed
+        https://github.com/pmqs/IO-Compress/issues/34
+        b0f93fe62f84b7d4d4bb8d2ea8e6d5432887103f
+
+      * IO::Compress: Generalize for EBCDIC
+        https://github.com/pmqs/IO-Compress/pull/32
+        90b51dbbd785e2c824cb0a93feef3b3dd5d075f2
+
+      * IO::Compress: Fix misspelling in 112utf8-zip.t
+        c22216b5d3202dce01ef17a271252f82520a6ab9
+
+      * Revert "Always have full zip64 entry in central directory"
+        7df4c9bc98667bc1afd1b4bc5a27d20f94e3cd9c
+
+      * Always have full zip64 entry in central directory
+        333648ee1dece6eb220060c7ec09806f6ebb9866
+
+      * update cpanm path on MacOS
+        33079902934885c515768a08d72e89243a5d01a9
+
   2.102 28 February 2021
 
       * Add IO_COMPRESS_SKIP_STDIN_TESTS to skip tests on Windows

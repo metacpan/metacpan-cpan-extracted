@@ -10,7 +10,7 @@ use Smart::Args::TypeTiny;
 use Types::Standard qw/ArrayRef Bool ClassName Dict Enum InstanceOf Int Num/;
 use XSLoader;
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 XSLoader::load(__PACKAGE__, $VERSION);
 
@@ -240,7 +240,7 @@ Algorithm::LibLinear - A Perl binding for LIBLINEAR, a library for classificatio
 
 Algorithm::LibLinear is an XS module that provides features of LIBLINEAR, a fast C library for classification and regression.
 
-Current version is based on LIBLINEAR 2.42, released on November 1, 2020.
+Current version is based on LIBLINEAR 2.44, released on March 17, 2022.
 
 =head1 METHODS
 
@@ -391,7 +391,7 @@ L<Algorithm::SVM> - A Perl binding to LIBSVM.
 
 =head2 Algorithm::LibLinear
 
-Copyright (c) 2013-2020 Koichi SATO. All rights reserved.
+Copyright (c) 2013-2022 Koichi SATO. All rights reserved.
 
 The MIT License (MIT)
 
@@ -403,7 +403,7 @@ THE SOFTWARE IS PROVIDED ``AS IS'', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMP
 
 =head2 LIBLINEAR
 
-Copyright (c) 2007-2020 The LIBLINEAR Project.
+Copyright (c) 2007-2022 The LIBLINEAR Project.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without

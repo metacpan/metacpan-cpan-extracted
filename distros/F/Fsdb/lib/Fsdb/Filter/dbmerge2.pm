@@ -2,7 +2,7 @@
 
 #
 # dbmerge2.pm
-# Copyright (C) 1991-2019 by John Heidemann <johnh@isi.edu>
+# Copyright (C) 1991-2022 by John Heidemann <johnh@isi.edu>
 #
 # This program is distributed under terms of the GNU general
 # public license, version 2.  See the file COPYING
@@ -250,6 +250,7 @@ sub parse_options ($@) {
 	'N|lexical' => sub { $self->parse_sort_option(@_); },
 	'r|descending' => sub { $self->parse_sort_option(@_); },
 	'R|ascending' => sub { $self->parse_sort_option(@_); },
+	't|type-inferred-sorting' => sub { $self->parse_sort_option(@_); },
 	'<>' => sub { $self->parse_sort_option('<>', @_); },
 	) or pod2usage(2);
 }
@@ -345,7 +346,7 @@ sub run ($) {
 
 =head1 AUTHOR and COPYRIGHT
 
-Copyright (C) 1991-2019 by John Heidemann <johnh@isi.edu>
+Copyright (C) 1991-2022 by John Heidemann <johnh@isi.edu>
 
 This program is distributed under terms of the GNU general
 public license, version 2.  See the file COPYING

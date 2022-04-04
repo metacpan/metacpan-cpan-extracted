@@ -30,6 +30,7 @@ lib/IO/Compress/RawDeflate.pm
 lib/IO/Compress/Zip/Constants.pm
 lib/IO/Compress/Zip.pm
 lib/IO/Compress/Zlib/Constants.pm
+lib/IO/Compress/Zip/WeakDecrypt.pm
 lib/IO/Compress/Zlib/Extra.pm
 lib/IO/Uncompress/Adapter/Bunzip2.pm
 lib/IO/Uncompress/Adapter/Identity.pm
@@ -128,6 +129,7 @@ t/110encode-rawdeflate.t
 t/110encode-zip.t
 t/111const-deflate.t
 t/112utf8-zip.t
+t/113issues.t
 t/999meta-json.t
 t/999meta-yml.t
 t/999pod.t

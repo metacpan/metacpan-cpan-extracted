@@ -1,5 +1,8 @@
 Revision history for Alien-automake
 
+0.17      2022-04-03 06:34:22 -0600
+  - Disable makeinfo documentation generation for share install (gh#11, gh#12)
+
 0.16      2021-04-09 14:27:47 -0600
   - Fix build issue with macOS (kiwiroy++, gh#7. gh#8)
 

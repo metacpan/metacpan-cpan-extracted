@@ -1,7 +1,7 @@
 ---
-abstract: unknown
+abstract: 'drawing library based on xfig'
 author:
-  - unknown
+  - 'Scott Guthridge <scott_guthridge@rompromity.net>'
 build_requires:
   File::Temp: '0.23'
   Test::More: '1'
@@ -9,7 +9,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.46, CPAN::Meta::Converter version 2.150010'
-license: unknown
+license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -22,5 +22,5 @@ requires:
   Graphics::ColorNames: v3.5.0
   Image::Info: '1.37'
   Math::Trig: '1'
-version: v1.0.7
+version: v1.0.8
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

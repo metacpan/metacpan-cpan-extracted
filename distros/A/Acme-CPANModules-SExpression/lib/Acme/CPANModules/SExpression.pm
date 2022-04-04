@@ -1,12 +1,12 @@
 package Acme::CPANModules::SExpression;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-10'; # DATE
-our $DIST = 'Acme-CPANModules-SExpression'; # DIST
-our $VERSION = '0.001'; # VERSION
-
 use strict;
 use Acme::CPANModulesUtil::Misc;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-03-18'; # DATE
+our $DIST = 'Acme-CPANModules-SExpression'; # DIST
+our $VERSION = '0.002'; # VERSION
 
 my $text = <<'_';
 **Parsing**
@@ -28,7 +28,7 @@ my $text = <<'_';
 _
 
 our $LIST = {
-    summary => 'Working with S-expression in Perl',
+    summary => 'List of modules to work with S-expression',
     description => $text,
     tags => ['task'],
 };
@@ -36,7 +36,7 @@ our $LIST = {
 Acme::CPANModulesUtil::Misc::populate_entries_from_module_links_in_description;
 
 1;
-# ABSTRACT: Working with S-expression in Perl
+# ABSTRACT: List of modules to work with S-expression
 
 __END__
 
@@ -46,15 +46,13 @@ __END__
 
 =head1 NAME
 
-Acme::CPANModules::SExpression - Working with S-expression in Perl
+Acme::CPANModules::SExpression - List of modules to work with S-expression
 
 =head1 VERSION
 
-This document describes version 0.001 of Acme::CPANModules::SExpression (from Perl distribution Acme-CPANModules-SExpression), released on 2020-04-10.
+This document describes version 0.002 of Acme::CPANModules::SExpression (from Perl distribution Acme-CPANModules-SExpression), released on 2022-03-18.
 
 =head1 DESCRIPTION
-
-Working with S-expression in Perl.
 
 B<Parsing>
 
@@ -70,22 +68,38 @@ L<Data::Dumper::LispLike>
 
 L<Data::Dump::SExpression>
 
-=head1 INCLUDED MODULES
+=head1 ACME::CPANMODULES ENTRIES
 
 =over
 
-=item * L<Data::Dumper::LispLike>
+=item * L<Data::Dumper::LispLike> - Dump perl data structures formatted as Lisp-like S-expressions
 
-=item * L<Data::Dump::SExpression>
+Author: L<TEAK|https://metacpan.org/author/TEAK>
+
+=item * L<Data::Dump::SExpression> - Dump Perl data structures as S-expression
+
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
 =back
 
 =head1 FAQ
 
-=head2 What are ways to use this module?
+=head2 What is an Acme::CPANModules::* module?
 
-Aside from reading it, you can install all the listed modules using
-L<cpanmodules>:
+An Acme::CPANModules::* module, like this module, contains just a list of module
+names that share a common characteristics. It is a way to categorize modules and
+document CPAN. See L<Acme::CPANModules> for more details.
+
+=head2 What are ways to use this Acme::CPANModules module?
+
+Aside from reading this Acme::CPANModules module's POD documentation, you can
+install all the listed modules (entries) using L<cpanm-cpanmodules> script (from
+L<App::cpanm::cpanmodules> distribution):
+
+ % cpanm-cpanmodules -n SExpression
+
+Alternatively you can use the L<cpanmodules> CLI (from L<App::cpanmodules>
+distribution):
 
     % cpanmodules ls-entries SExpression | cpanm -n
 
@@ -93,9 +107,15 @@ or L<Acme::CM::Get>:
 
     % perl -MAcme::CM::Get=SExpression -E'say $_->{module} for @{ $LIST->{entries} }' | cpanm -n
 
-This module also helps L<lcpan> produce a more meaningful result for C<lcpan
-related-mods> when it comes to finding related modules for the modules listed
-in this Acme::CPANModules module.
+or directly:
+
+    % perl -MAcme::CPANModules::SExpression -E'say $_->{module} for @{ $Acme::CPANModules::SExpression::LIST->{entries} }' | cpanm -n
+
+This Acme::CPANModules module also helps L<lcpan> produce a more meaningful
+result for C<lcpan related-mods> command when it comes to finding related
+modules for the modules listed in this Acme::CPANModules module.
+See L<App::lcpan::Cmd::related_mods> for more details on how "related modules"
+are found.
 
 =head1 HOMEPAGE
 
@@ -104,14 +124,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Acme-CPANM
 =head1 SOURCE
 
 Source repository is at L<https://github.com/perlancar/perl-Acme-CPANModules-SExpression>.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-SExpression>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
 
 =head1 SEE ALSO
 
@@ -123,11 +135,36 @@ L<cpanmodules> - CLI tool to let you browse/view the lists
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by perlancar@cpan.org.
+This software is copyright (c) 2022, 2020 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-SExpression>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

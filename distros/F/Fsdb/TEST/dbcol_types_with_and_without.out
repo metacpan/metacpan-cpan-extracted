@@ -1,0 +1,6 @@
+#fsdb uid:l fullname
+2274	John_Heidemann
+2275	Greg_Johnson
+0	Root
+# this is a simple database
+#   | dbcol uid fullname

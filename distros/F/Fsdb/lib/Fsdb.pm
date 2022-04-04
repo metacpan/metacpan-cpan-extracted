@@ -3,7 +3,7 @@
 #
 # Fsdb.pm
 #
-# Copyright (C) 1991-2020 by John Heidemann <johnh@isi.edu>
+# Copyright (C) 1991-2022 by John Heidemann <johnh@isi.edu>
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License,
@@ -33,7 +33,7 @@ Fsdb - a flat-text database for shell scripting
 
 
 =cut
-our $VERSION = '2.73';
+our $VERSION = '2.75';
 
 =head1 SYNOPSIS
 
@@ -236,22 +236,50 @@ L<http://www.isi.edu/~johnh/SOFTWARE/FSDB/index.html>.
 
 =head1 WHAT'S NEW
 
-=head2 2.73, 2021-05-18
-Updates dbcolpercentile with C<--weighted>, and with more ipv6.
+=head2 2.75, 2022-04-02
+New type specifications in the schema to better support type conversions in python.
 
 =over 4
 
 =item ENHANCEMENT
 
-L<dbcolpercentile> now has a C<--weighted> option.
+Add optional type specifications to the schema.
+Types are not used in Perl, but are relevant in Python
+and Go Fsdb bindings.
+Types use a subset of perl pack specifiers:
+c, s, l, q are signed 8, 16, 32, and 64-bit integers,
+f is a float, d is double float,
+a is utf-8 string, and &gt; and &lt; can force big or little endianness.
+The default type for everything is "a", that is, utf-8 strings.
+Thanks to Wes Hardaker for pushing to get this long-desired feature
+out the door; his Python bindings need types. 
 
 =item ENHANCEMENT
 
-The new L<Fsdb::Support::IPv6> package includes
-ipv6_zeroize and ipv6_normalize to rewrite ipv6 print addresses.
+L<dbcol>, L<dbcolcreate>, L<dbcolcopylast>, and L<dbcolrename>
+now understand and propagate schema types.
+L<dbsort>, L<dbjoin>, L<dbmerge>, L<dbmerge2>
+and L<dbfilepivot> all take a 
+new option C<-t> to sort by type-inferred comparision, if a type is given.
+
+=item ENHANCEMENT
+
+L<dbcolstat>, L<dbmultistats>, and L<dbcolmovingstats>
+now include type information in their output schema.
+(They assumes input variables are floats, not integers.)
+
+=item ENHANCEMENT
+
+Even more IPv6: the functions in
+L<Fsdb::Support::IPv6> package
+now support strings of hex digits
+as an alternate encoding for IP address
+(and they are already the output of ipv6_fullhex),
+and C<ip_fullhex_to_normal> converts full hex-encoded
+IPv4 or IPv6 addresses to their "normal" form
+(dotted-quad or IPv6 printable format).
 
 =back
-
 
 
 =head1 README CONTENTS
@@ -331,12 +359,21 @@ comment lines.  For example:
 	root * 0 0 Root /root /bin/bash
 	# this is a simple database
 
-The header line must be first and begins with C<#h>.
+The header line must be first and begins with C<#fsdb>.
 There are rows (records) and columns (fields),
 just like in a normal database.
 Comment lines begin with C<#>.
 Column names are any string not containing spaces or single quote
 (although it is prudent to keep them alphanumeric with underscore).
+
+Columns can optionally include type anntations
+by following name with :t where t is some type.
+(Types are not used in Perl, but are relevant in Python
+and Go Fsdb bindings.)
+Types use a subset of perl pack specifiers:
+c, s, l, q are signed 8, 16, 32, and 64-bit integers,
+f is a float, d is double float,
+a is utf-8 string, and &gt; and &lt; can force big or little endianness.
 
 By default, columns are delimited by whitespace.  
 With this default configuration, the contents of a field
@@ -787,6 +824,37 @@ Exceptions are L<dbcolneaten>, L<dbcolpercentile>, L<dbmapreduce>,
 L<dbmultistats>, L<dbrowsplituniq>.
 
 
+=head2 STANDARD SORTING OPTIONS
+
+A number of programs do sorting, or depend on defining an ordering
+of rows.  Such programs use these standard sorting options:
+
+=over 4
+
+=item B<-r> or B<--descending>
+
+sort in reverse order (high to low)
+
+=item B<-R> or B<--ascending>
+
+sort in normal order (low to high)
+
+=item B<-t> or B<--type-inferred-sorting>
+
+sort fields by type (numeric or leicographic), automatically
+
+=item B<-n> or B<--numeric>
+
+sort numerically
+
+=item B<-N> or B<--lexical>
+
+sort lexicographically
+
+=back
+
+
+
 =head1 ANOTHER EXAMPLE
 
 Take the raw data in C<DATA/http_bandwidth>,
@@ -1174,7 +1242,8 @@ Christopher Meng,
 Calvin Ardi,
 H. Merijn Brand,
 Lan Wei,
-Hang Guo.
+Hang Guo,
+Wes Hardaker.
 
 Fsdb includes datasets contributed from NIST (F<DATA/nist_zarr13.fsdb>),
 from
@@ -1941,7 +2010,7 @@ All programs are now in perl-5, no more shell scripts or perl-4.
 All programs now have manual pages.
 
 Although this is a major step forward, I still expect
-to rename "fsdb" to "fsdb".
+to rename "jdb" to "fsdb".
 
 =over 4
 
@@ -3066,7 +3135,7 @@ Test suites now skip tests for libraries that are missing.
 
 Removed references to Jdb in the package specification.
 Since the name was changed in 2008, there's no longer a huge
-need for backwards comparability.
+need for backwards compatibility.
 (Suggestion form Petr Šabata.)
 
 =item ENHANCEMENT
@@ -3688,6 +3757,38 @@ something required for Fedora 34.
 
 =back
 
+=head2 2.73, 2021-05-18
+Updates dbcolpercentile with C<--weighted>, and with more ipv6.
+
+=over 4
+
+=item ENHANCEMENT
+
+L<dbcolpercentile> now has a C<--weighted> option.
+
+=item ENHANCEMENT
+
+The new L<Fsdb::Support::IPv6> package includes
+ipv6_normalize, ipv6_zeroize to rewrite ipv6 print addresses
+in IPv6 normal form, with a 0 in each 4-nybble field.
+
+=back
+
+=head2 2.74, 2021-06-23
+More ipv6.
+
+=over 4
+
+=item ENHANCEMENT
+
+L<Fsdb::Support::IPv6> package includes
+ipv6_fullhex to rewrite ipv6 print addresses
+as full, 128-bit hex values.
+
+=back
+
+
+
 
 =head1 AUTHOR
 
@@ -3699,7 +3800,7 @@ bug reports and fixes.
 
 =head1 COPYRIGHT
 
-Fsdb is Copyright (C) 1991-2020 by John Heidemann <johnh@isi.edu>.
+Fsdb is Copyright (C) 1991-2022 by John Heidemann <johnh@isi.edu>.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of version 2 of the GNU General Public License as

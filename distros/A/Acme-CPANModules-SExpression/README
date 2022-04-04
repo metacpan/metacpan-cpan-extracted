@@ -1,14 +1,13 @@
 NAME
-    Acme::CPANModules::SExpression - Working with S-expression in Perl
+    Acme::CPANModules::SExpression - List of modules to work with
+    S-expression
 
 VERSION
-    This document describes version 0.001 of Acme::CPANModules::SExpression
+    This document describes version 0.002 of Acme::CPANModules::SExpression
     (from Perl distribution Acme-CPANModules-SExpression), released on
-    2020-04-10.
+    2022-03-18.
 
 DESCRIPTION
-    Working with S-expression in Perl.
-
     Parsing
 
     <pm::Data::SExpression>
@@ -23,15 +22,32 @@ DESCRIPTION
 
     Data::Dump::SExpression
 
-INCLUDED MODULES
-    *   Data::Dumper::LispLike
+ACME::CPANMODULES ENTRIES
+    *   Data::Dumper::LispLike - Dump perl data structures formatted as
+        Lisp-like S-expressions
 
-    *   Data::Dump::SExpression
+        Author: TEAK <https://metacpan.org/author/TEAK>
+
+    *   Data::Dump::SExpression - Dump Perl data structures as S-expression
+
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
 FAQ
-  What are ways to use this module?
-    Aside from reading it, you can install all the listed modules using
-    cpanmodules:
+  What is an Acme::CPANModules::* module?
+    An Acme::CPANModules::* module, like this module, contains just a list
+    of module names that share a common characteristics. It is a way to
+    categorize modules and document CPAN. See Acme::CPANModules for more
+    details.
+
+  What are ways to use this Acme::CPANModules module?
+    Aside from reading this Acme::CPANModules module's POD documentation,
+    you can install all the listed modules (entries) using cpanm-cpanmodules
+    script (from App::cpanm::cpanmodules distribution):
+
+     % cpanm-cpanmodules -n SExpression
+
+    Alternatively you can use the cpanmodules CLI (from App::cpanmodules
+    distribution):
 
         % cpanmodules ls-entries SExpression | cpanm -n
 
@@ -39,9 +55,15 @@ FAQ
 
         % perl -MAcme::CM::Get=SExpression -E'say $_->{module} for @{ $LIST->{entries} }' | cpanm -n
 
-    This module also helps lcpan produce a more meaningful result for "lcpan
-    related-mods" when it comes to finding related modules for the modules
-    listed in this Acme::CPANModules module.
+    or directly:
+
+        % perl -MAcme::CPANModules::SExpression -E'say $_->{module} for @{ $Acme::CPANModules::SExpression::LIST->{entries} }' | cpanm -n
+
+    This Acme::CPANModules module also helps lcpan produce a more meaningful
+    result for "lcpan related-mods" command when it comes to finding related
+    modules for the modules listed in this Acme::CPANModules module. See
+    App::lcpan::Cmd::related_mods for more details on how "related modules"
+    are found.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -51,14 +73,6 @@ SOURCE
     Source repository is at
     <https://github.com/perlancar/perl-Acme-CPANModules-SExpression>.
 
-BUGS
-    Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-SExp
-    ression>
-
-    When submitting a bug or request, please include a test-file or a patch
-    to an existing test-file that illustrates the bug or desired feature.
-
 SEE ALSO
     Acme::CPANModules - about the Acme::CPANModules namespace
 
@@ -67,9 +81,34 @@ SEE ALSO
 AUTHOR
     perlancar <perlancar@cpan.org>
 
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
+    steps required beyond that are considered a bug and can be reported to
+    me.
+
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020 by perlancar@cpan.org.
+    This software is copyright (c) 2022, 2020 by perlancar
+    <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-SExp
+    ression>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 

@@ -35,6 +35,7 @@ t/30.level-resolution.t
 t/31.loglocal.t
 t/32.caller_depth.t
 t/50.issue012-subargs.t
+t/51.issue013-loglevel.t
 t/CarpingModule.pm
 t/LayoutCompareModule.pm
 t/TestLLT.pm

@@ -17,6 +17,7 @@ t/git_background_new.t
 t/git_background_run.t
 t/lib/Local/Test/TempDir.pm
 t/lib/Local/Thing.pm
+t/workdir_does_not_exist.t
 xt/await-exit_signal.t
 xt/await-no_run.t
 xt/await-slurp_error.t

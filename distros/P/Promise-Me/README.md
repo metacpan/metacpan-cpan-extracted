@@ -105,7 +105,7 @@ SYNOPSIS
 VERSION
 =======
 
-        v0.2.0
+        v0.2.2
 
 DESCRIPTION
 ===========
@@ -925,7 +925,7 @@ This will yield:
 AUTHOR
 ======
 
-Jacques Deguest \<`jack@deguest.jp`{classes="ARRAY(0x555f1974dcb0)"}\>
+Jacques Deguest \<`jack@deguest.jp`{classes="ARRAY(0x55960872b810)"}\>
 
 SEE ALSO
 ========

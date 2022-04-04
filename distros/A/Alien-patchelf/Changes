@@ -1,5 +1,8 @@
 Revision history for Alien::patchelf
 
+0.04 2022-04-04
+    - Share builds: Use gmake on Solaris
+
 0.03 2022-04-02
     - Add Alien::Build::Plugin::Download::GitHub to
       configure section in Makefile.PL

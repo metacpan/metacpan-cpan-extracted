@@ -65,7 +65,7 @@
    "provides" : {
       "App::Greple::subst" : {
          "file" : "lib/App/Greple/subst.pm",
-         "version" : "2.3001"
+         "version" : "2.3002"
       },
       "App::Greple::subst::Dict" : {
          "file" : "lib/App/Greple/subst/Dict.pm"
@@ -88,7 +88,7 @@
          "web" : "https://github.com/kaz-utashiro/greple-subst"
       }
    },
-   "version" : "2.3001",
+   "version" : "2.3002",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"

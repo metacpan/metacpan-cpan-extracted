@@ -11,7 +11,7 @@ use Moo       ();
 use Moo::Role ();
 use Scalar::Util qw/ blessed /;
 use Types::Const qw( Const );
-use Types::Standard qw( Value Object Ref );
+use Types::Standard qw( is_CodeRef Value Object Ref );
 
 # RECOMMEND PREREQ: Types::Const v0.3.6
 # RECOMMEND PREREQ: Type::Tiny::XS
@@ -19,7 +19,7 @@ use Types::Standard qw( Value Object Ref );
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.5.1';
+our $VERSION = 'v0.5.3';
 
 
 sub import {
@@ -86,16 +86,34 @@ sub _process_has {
 
                 if ($strict) {
                     $opts{isa} = Const[$isa];
-                    $opts{coerce} = $opts{isa}->coercion;
+                    if ( my $next = $opts{coerce} ) {
+
+                        if (is_CodeRef($next)) {
+                            $opts{coerce} = sub { $opts{isa}->coercion->( $next->( $_[0] ) ) };
+                        }
+                        else {
+                            $opts{coerce} = sub { $opts{isa}->coercion->( $isa->coercion->( $_[0] ) ) };
+                        }
+                    }
+                    else {
+                        $opts{coerce} = $opts{isa}->coercion;
+                    }
                 }
 
+                $opts{is} = $once ? 'rw' : 'ro';
 
-                if ($opts{trigger} && ($is ne "once")) {
-                    croak "triggers are not applicable to const attributes";
-                }
+            }
 
-                $opts{is}  = $once ? 'rw' : 'ro';
+            if ($opts{trigger} && ($is ne "once")) {
+                croak "triggers are not applicable to const attributes";
+            }
 
+            if ($opts{writer} && ($is ne "once")) {
+                croak "writers are not applicable to const attributes";
+            }
+
+            if ($opts{clearer}) {
+                croak "clearers are not applicable to const attributes";
             }
 
         }
@@ -125,7 +143,7 @@ MooX::Const - Syntactic sugar for constant and write-once Moo attributes
 
 =head1 VERSION
 
-version v0.5.1
+version v0.5.3
 
 =head1 SYNOPSIS
 
@@ -260,7 +278,7 @@ Kang-min Liu 劉康民 <gugod@gugod.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2021 by Robert Rothenberg.
+This software is Copyright (c) 2018-2022 by Robert Rothenberg.
 
 This is free software, licensed under:
 

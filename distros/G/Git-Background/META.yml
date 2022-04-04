@@ -42,5 +42,5 @@ resources:
   bugtracker: https://github.com/skirmess/Git-Background/issues
   homepage: https://github.com/skirmess/Git-Background
   repository: https://github.com/skirmess/Git-Background.git
-version: '0.004'
+version: '0.005'
 x_spdx_expression: BSD-2-Clause-FreeBSD

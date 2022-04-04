@@ -19,6 +19,7 @@ has bar => (
     is      => 'const',
     isa     => ArrayRef[Int],
     default => sub { [1] },
+    coerce  => sub { ref( $_[0] ) ? $_[0] : [ $_[0] ] }
 );
 
 has baz => (

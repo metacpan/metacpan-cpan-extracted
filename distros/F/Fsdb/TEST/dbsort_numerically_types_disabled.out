@@ -1,0 +1,8 @@
+#fsdb name:a id:i test1:i
+c	3	65
+b	2	7
+e	5	70
+a	1	80
+d	4	90
+f	6	90
+#   | dbsort -N test1

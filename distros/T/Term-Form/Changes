@@ -1,6 +1,11 @@
 Revision history for Term::Form
 
 
+0.544   2022-04-03
+    - Bugfix readline: clear info.
+    - Code refactoring.
+    - Update documentation.
+
 0.543   2022-03-31
     - Moved 'readline' to the new module Term::Form::ReadLine.
 

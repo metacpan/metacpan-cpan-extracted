@@ -5,6 +5,7 @@ pod_spelling_system:
   # (regardless of what spell check thinks)
   stopwords:
     - nasm
+    - ndisasm
     - netwide
 
 pod_coverage:

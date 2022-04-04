@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 
 use Carp       ();
 use File::Temp ();
@@ -19,7 +19,7 @@ use Git::Background::Future;
 # Git::Background->new( { dir => $dir, fatal => 0 } );
 # Git::Background->new( $dir, { fatal => 0 } );
 sub new {
-    my ($class) = shift @_;
+    my $class = shift;
 
   NEW: {
         my $self;
@@ -104,7 +104,7 @@ sub run {
             $e = qq{$@} || 'Failed to run Git with Proc::Background';
         }
     }
-    return Future->fail( $e, 'Proc::Background' ) if !defined $proc;
+    return Git::Background::Future->fail( $e, 'Proc::Background' ) if !defined $proc;
 
     return Git::Background::Future->new(
         {
@@ -202,7 +202,7 @@ Git::Background - use Git commands with L<Future>
 
 =head1 VERSION
 
-Version 0.004
+Version 0.005
 
 =head1 SYNOPSIS
 
@@ -311,7 +311,6 @@ and can be used to check if a Git is available.
         say "You have Git version $version";
     }
 
-
 =head1 EXAMPLES
 
 =head2 Example 1 Clone a repository
@@ -342,7 +341,7 @@ Alternatively you can overwrite the directory for the call to clone:
 
 =head1 SEE ALSO
 
-L<Git::Repository>, L<Git::Wrapper>, L<Future>
+L<Git::Repository>, L<Git::Wrapper>, L<Future>, L<Git::Version::Compare>
 
 =head1 SUPPORT
 

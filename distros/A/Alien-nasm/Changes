@@ -1,5 +1,8 @@
 Revision history for Alien-nasm
 
+0.23      2022-04-03 06:08:44 -0600
+  - Add ndisasm helper (gh#14)
+
 0.22      2019-06-18 16:52:48 -0400
   - use https instead of http
 

@@ -55,8 +55,11 @@ my @cases = (
     +{ constructor_params => [ cost => 0 ], error_pattern => qr/C <= 0/ },
     +{ constructor_params => [ epsilon => 0 ], error_pattern => qr/eps <= 0/ },
     +{
-        constructor_params => [ loss_sensitivity => -1 ],
-        error_pattern => qr/p < 0/,
+      constructor_params => [
+        loss_sensitivity => -1,
+        solver => 'L2R_L2LOSS_SVR',
+      ],
+      error_pattern => qr/p < 0/,
     },
 );
 for my $case (@cases) {

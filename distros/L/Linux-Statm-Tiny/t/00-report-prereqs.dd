@@ -18,6 +18,7 @@ do { my $x = {
                                       'Moo' => '0',
                                       'MooX::Aliases' => '0',
                                       'Types::Standard' => '0',
+                                      'constant' => '0',
                                       'namespace::autoclean' => '0.16',
                                       'perl' => 'v5.10.1'
                                     }

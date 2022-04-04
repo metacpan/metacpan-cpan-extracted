@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    Version 0.004
+    Version 0.005
 
 SYNOPSIS
 
@@ -142,7 +142,7 @@ EXAMPLES
 
 SEE ALSO
 
-    Git::Repository, Git::Wrapper, Future
+    Git::Repository, Git::Wrapper, Future, Git::Version::Compare
 
 SUPPORT
 

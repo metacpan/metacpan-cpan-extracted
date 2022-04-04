@@ -149,8 +149,8 @@ sub requires {
 	'Encode'	=> 0,
 	'Exporter'	=> 0,
 	'List::Util'	=> 0,
-	'PPI::Document'	=> 1.117,
-	'PPI::Dumper'	=> 1.117,
+	'PPI::Document'	=> 1.238,	# for postfix deref
+	'PPI::Dumper'	=> 1.238,
 	'Readonly'	=> 0,
 	'Scalar::Util'	=> 0,
 	base		=> 0,

@@ -1,6 +1,25 @@
 CHANGES
 -------
 
+  2.103 3 April 2022
+
+      * Sync upstream fix for CVE-2018-25032
+        https://github.com/advisories/GHSA-jc36-42cf-vqwj
+
+        Update to Zlib 1.2.12
+        d507f527768f6cbab5831ed3ec17fe741163785c
+
+        Fix for inflateSync return code change
+        f47ea5f36c40fe19efe404dd75fd790b115de596
+
+        Fix for incorrect CRC from zlib 1.2.12.1
+        https://github.com/madler/zlib/commit/ec3df00224d4b396e2ac6586ab5d25f673caa4c2
+        60104e3a162a116548303861ae0811fb850e65fd
+
+      * AUTHOR doesn't contain the stated information
+        bf5a03c1b440c8d9e41cffb344bf889794cc532b
+
+
   2.101 20 February 2021
 
       * fix version numbers in meta files

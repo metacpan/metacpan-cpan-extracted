@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '0.543';
+our $VERSION = '0.544';
 use Exporter 'import';
 our @EXPORT_OK = qw( read_line );
 
@@ -108,7 +108,7 @@ Term::Form::ReadLine - Read a line from STDIN.
 
 =head1 VERSION
 
-Version 0.543
+Version 0.544
 
 =cut
 
@@ -188,8 +188,8 @@ If enabled, the screen is cleared before the output.
 
 1 - clears the entire screen
 
-2 - if I<show_context> is disabled, clears only the current (readline) row. If I<show_context> is enabled behaves like
-I<clear_screen> where set to 0.
+2 - clears only the readline row, if I<show_context> is not enabled and I<info> not set. If I<show_context> is enabled
+or I<info> is set clears from the current position to the end of screen as with I<clear_screen> set to 0.
 
 default: C<0>
 

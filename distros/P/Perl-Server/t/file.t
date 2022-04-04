@@ -1,7 +1,7 @@
 use Test::More;
 use Perl::Server;
 use Test::Requires qw/LWP::UserAgent/;
-use Test::TCP qw/empty_port/;
+use Net::EmptyPort qw/empty_port check_port/;
 
 my $port = empty_port();
 my $pid = fork;
@@ -12,10 +12,17 @@ if ($pid == 0) {
     $SIG{INT} = 'IGNORE';
     sleep 1;
     
+    unless (check_port($port)) {
+        kill 'INT', $pid;
+        
+        plan skip_all => "Fail to open port!";
+    }
+    
     my $ua  = LWP::UserAgent->new;
     my $url = "http://localhost:$port";  
     
     my $res3 = $ua->get("$url");
+    
     is $res3->code, 200;  
     is $res3->content, 'ok';
     

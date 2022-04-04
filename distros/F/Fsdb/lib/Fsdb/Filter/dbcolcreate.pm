@@ -2,7 +2,7 @@
 
 #
 # dbcolcreate.pm
-# Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
+# Copyright (C) 1991-2022 by John Heidemann <johnh@isi.edu>
 #
 # This program is distributed under terms of the GNU general
 # public license, version 2.  See the file COPYING
@@ -230,7 +230,7 @@ sub setup ($) {
     push(@in_options, -header => $self->{_header}) if (defined($self->{_header}));
     $self->finish_io_option('input', @in_options);
 
-    my @new_cols = @{$self->{_in}->cols};
+    my @new_cols = ( $self->{_in}->colspecs() );
     my %existing_cols;
     foreach (@new_cols) {
 	$existing_cols{$_} = 1;
@@ -312,7 +312,7 @@ sub run ($) {
 
 =head1 AUTHOR and COPYRIGHT
 
-Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
+Copyright (C) 1991-2022 by John Heidemann <johnh@isi.edu>
 
 This program is distributed under terms of the GNU general
 public license, version 2.  See the file COPYING

@@ -51,6 +51,27 @@ FUNCTIONS
     100%.) Applies equally to all transactions created in the app. This
     must be defined to enable tracing.
 
+  before_send
+
+      Sentry::SDK->init({
+        before_send => sub ($event) {
+          $event->tags->{foo} = 'bar';
+    
+          # discard event
+          if (rand() < 0.5) {
+            return undef;
+          }
+    
+          return $event;
+        };
+      });
+
+    beforeSend is called immediately before the event is sent to the
+    server, so it’s the final place where you can edit its data. It
+    receives the event object as a parameter, so you can use that to modify
+    the event’s data or drop it completely (by returning undef) based on
+    custom logic and the data available on the event.
+
   integrations
 
       Sentry::SDK->init({

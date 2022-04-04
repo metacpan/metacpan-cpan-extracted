@@ -22,6 +22,13 @@ METHODS
 
             Default value is undef.
 
+    *       "no_css"
+
+            No CSS support flag. If this flag is set to 1, process_css()
+            returns undef.
+
+            Default value is 0.
+
     *       "tags"
 
             'Tags::Output' object for process processing.
@@ -135,10 +142,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © Michal Josef Špaček 2021
+    © Michal Josef Špaček 2021-2022
 
     BSD 2-Clause License
 
 VERSION
-    0.01
+    0.02
 

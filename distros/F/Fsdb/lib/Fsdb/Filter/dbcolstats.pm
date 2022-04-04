@@ -192,7 +192,7 @@ end_standard_fsdb_options
 
 =head2 Output:
 
-    #fsdb mean stddev pct_rsd conf_range conf_low conf_high conf_pct sum sum_squared min max n
+    #fsdb mean:d stddev:d pct_rsd:d conf_range:d conf_low:d conf_high:d conf_pct:d sum:d sum_squared:d min:d max:d n:q
     0.064188        0.036194        56.387  0.037989        0.026199        0.102180.95     0.38513 0.031271        0       0.096602        6
     #  | /home/johnh/BIN/DB/dbrow 
     #  | /home/johnh/BIN/DB/dbcol event clock
@@ -364,12 +364,12 @@ sub setup($) {
     my $read_fastpath_sub = $self->{_in}->fastpath_sub();
     $self->{_read_fastpath_sub} = $read_fastpath_sub;
 
-    my(@headers) = (qw(mean stddev pct_rsd conf_range conf_low conf_high
-		  conf_pct sum sum_squared min max n));
-    push(@headers, "median") if ($self->{_median});
+    my(@headers) = (qw(mean:d stddev:d pct_rsd:d conf_range:d conf_low:d conf_high:d
+		  conf_pct:d sum:d sum_squared:d min:d max:d n:q));
+    push(@headers, "median:d") if ($self->{_median});
     if ($self->{_quantile}) {
 	foreach (1..($self->{_quantile}-1)) {
-	    push(@headers, "q$_");
+	    push(@headers, "q$_:d");
 	};
     };
     unshift(@headers, $self->{_key_column}) if (defined($self->{_key_column}));

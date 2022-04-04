@@ -39,7 +39,7 @@ our @EXPORT_OK = qw{
     __variables
 };
 
-our $VERSION = '0.020';
+our $VERSION = '0.021';
 
 # Readonly::Scalar my $BRACED_RE	=> __match_enclosed( LEFT_CURLY );
 Readonly::Scalar my $BRACKETED_RE	=> __match_enclosed( '[' ); # ]
@@ -88,9 +88,6 @@ sub column_number {
 
 	return;
     }
-
-    # TODO make these state varables once we can require Perl 5.10.
-    my $postderef = { map { $_ => 1 } qw{ @* %* } };
 
     my $cast_allowed_for_bare_bracketed_variable = {
 	map { $_ => 1 } qw{ @ $ % } };
@@ -144,17 +141,6 @@ sub column_number {
 		'PPIx::QuoteLike::Token';
 
 	foreach my $sym ( _find( $ppi, 'PPI::Token::Symbol' ) ) {
-	    # The problem we're solving here is that PPI parses postfix
-	    # dereference as though it makes reference to non-existent
-	    # punctuation variables '@*' or '%*'. The following
-	    # statement omits these from output if they are preceded by
-	    # the '->' operator.
-	    my $prev;
-	    $postderef->{ $sym->content() }
-		and $prev = $sym->sprevious_sibling()
-		and $prev->isa( 'PPI::Token::Operator' )
-		and '->' eq $prev->content()
-		and next;
 	    # Eliminate rogue subscripts
 	    _is_bareword_subscript( $sym )
 		and next;
@@ -386,7 +372,7 @@ sub logical_line_number {
 
 	    # Based on Regexp::Common $RE{delimited}{-delim=>'`'}
 	    return ( $REGEXP_CACHE{$ql} ||=
-		qr< (?:
+		qr< (
 		    (?: \Q$left\E )
 		    (?: [^\\\Q$left\E]* (?: \\ . [^\\\Q$left\E]* )* )
 		    (?: \Q$left\E )

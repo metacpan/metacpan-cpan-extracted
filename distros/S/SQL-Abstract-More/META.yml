@@ -39,4 +39,4 @@ resources:
   homepage: https://metacpan.org/author/DAMI
   license: http://www.perlfoundation.org/artistic_license_2_0
   repository: git://github.com/damil/SQL-Abstract-More.git
-version: '1.37'
+version: '1.38'

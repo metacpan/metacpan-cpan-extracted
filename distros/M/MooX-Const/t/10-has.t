@@ -38,11 +38,47 @@ throws_ok {
 
 } qr/triggers are not applicable to const attributes/;
 
+throws_ok {
+
+    has e1 => ( is => 'const', isa => Str, trigger => sub {}  );
+
+} qr/triggers are not applicable to const attributes/;
+
+throws_ok {
+
+    has e2 => ( is => 'const', isa => Str, writer => 1 );
+
+} qr/writers are not applicable to const attributes/;
+
+throws_ok {
+
+    has e3 => ( is => 'const', isa => Ref, writer => 1 );
+
+} qr/writers are not applicable to const attributes/;
+
+throws_ok {
+
+    has e4 => ( is => 'const', isa => Str, clearer => 1 );
+
+} qr/clearers are not applicable to const attributes/;
+
+throws_ok {
+
+    has e5 => ( is => 'const', isa => Ref, clearer => 1 );
+
+} qr/clearers are not applicable to const attributes/;
+
 lives_ok {
 
     has f => ( is => 'once', isa => Ref, trigger => sub {}  );
 
 } 'triggers allowed for write-once attributes';
+
+lives_ok {
+
+    has f3 => ( is => 'once', isa => Ref, writer => 'set_f3' );
+
+} 'writers allowed for write-once attributes';
 
 lives_ok {
 

@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Promise - ~/lib/Promise/Me.pm
-## Version v0.2.1
+## Version v0.2.2
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/28
-## Modified 2022/03/30
+## Modified 2022/04/03
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -115,7 +115,7 @@ BEGIN
     # A repository of objects that is used by END and DESTROY to remove the shared
     # space only when no proces is using it, since the processes run asynchronously
     our $OBJECTS_REPO = [];
-    our $VERSION = 'v0.2.1';
+    our $VERSION = 'v0.2.2';
 };
 
 sub import
@@ -1407,6 +1407,7 @@ sub _share_vars
                 {
                     my $c = Module::Generic::File::Cache->new( %$p ) ||
                         return( __PACKAGE__->error( "Unable to create a shared cache file or a shared memory: ", Module::Generic::File::Cache->error ) );
+                    $shm = $c->open || return( __PACKAGE__->error( "Unable to create a shared cache file: ", $c->error ) );
                 }
                 else
                 {
@@ -2302,7 +2303,7 @@ Promise::Me - Fork Based Promise with Asynchronous Execution, Async, Await and S
 
 =head1 VERSION
 
-    v0.2.1
+    v0.2.2
 
 =head1 DESCRIPTION
 

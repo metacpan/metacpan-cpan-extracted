@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 
 use Future 0.40;
 
@@ -173,7 +173,7 @@ Git::Background::Future - use L<Future> with L<Git::Background>
 
 =head1 VERSION
 
-Version 0.004
+Version 0.005
 
 =head1 SYNOPSIS
 

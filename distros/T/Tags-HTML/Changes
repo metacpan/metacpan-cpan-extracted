@@ -1,2 +1,7 @@
+0.02 2022-04-03T12:42:06+02:00
+ - Add 'no_css' parameter to not support CSS.
+ - Add tests.
+ - Update copyrigt years.
+
 0.01 2021-10-03T17:35:44+02:00
  - First version.

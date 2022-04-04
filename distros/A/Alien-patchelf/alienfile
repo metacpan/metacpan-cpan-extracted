@@ -21,6 +21,9 @@ share {
   if ($on_windows) {
     plugin 'Build::MSYS';
   }
+  if ($^O =~ /solaris/) {
+    plugin 'Build::Make' => 'gmake';
+  }
   build [
     'sh ./bootstrap.sh',  #  windows needs explicit shell call
     '%{configure}',

@@ -17,8 +17,12 @@ use JSON;
 use Want;
 use overload
 	fallback => 0,
-	'eq' => sub {_compare(@_)},
-	'ne' => sub {! _compare(@_)};
+	'eq'     => sub {_compare(@_)},
+	'ne'     => sub {! _compare(@_)},
+	'bool'   => sub {
+		my $self = shift;
+		! ($self->errors && scalar @{$self->errors});
+	};
 
 sub _compare {
 	my ($self, $other, $swap) = @_;
@@ -46,7 +50,7 @@ sub _compare {
 	return $canonself eq $canonother;
 }
 
-our $VERSION = '2.22';
+our $VERSION = '2.24';
 
 =encoding utf8
 
@@ -327,7 +331,9 @@ sub new {
 		}
 	}
 
-	return 0;
+	my $self = bless {}, $class;
+	$self->raiseError('incorrect argument (JSON string or Perl data structure) passed to JSONP constructor');
+	$self;
 }
 
 =head3 run

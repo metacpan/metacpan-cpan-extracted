@@ -105,7 +105,7 @@ SYNOPSIS
         }
 
 VERSION
-        v0.2.0
+        v0.2.2
 
 DESCRIPTION
     Promise::Me is an implementation of the JavaScript promise using fork

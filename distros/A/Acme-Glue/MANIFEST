@@ -6,6 +6,7 @@ README.md
 t/glue.t
 snippets/LEEJO/hopscotch.p6
 snippets/LEEJO/transform.pl
+snippets/LEEJO/vec_pack.pl
 snippets/SLU/MAZE.BAS
 snippets/SLU/schwartzian_transform.pl
 CONTRIBUTING.md

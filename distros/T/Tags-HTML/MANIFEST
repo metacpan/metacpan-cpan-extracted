@@ -20,5 +20,8 @@ README
 SIGNATURE
 t/Tags-HTML/01-use.t
 t/Tags-HTML/02-version.t
+t/Tags-HTML/03-new.t
+t/Tags-HTML/04-process.t
+t/Tags-HTML/05-process_css.t
 xt/Tags-HTML/01-pod_coverage.t
 xt/Tags-HTML/02-pod.t

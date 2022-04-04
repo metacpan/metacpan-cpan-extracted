@@ -108,9 +108,6 @@ ok( $obj->{_fatal}, 'obj has correct _fatal' );
 is( $obj->{_dir}, $dir, 'obj has correct _dir' );
 is_deeply( $obj->{_git}, $obj->{_git}, 'obj has correct _git' );
 
-# Same tests as in xt/git_background-run_error.t but with ->failure instead
-# of ->get which doesn't throw an error
-
 #
 note('fatal - 128');
 $f = $obj->run( '-x128', '-ostdout 3', '-ostdout 3 line 2', '-eerror 3', '-eerror 3 line 2', { fatal => 0 } );

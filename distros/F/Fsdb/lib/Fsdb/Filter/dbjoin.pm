@@ -2,7 +2,7 @@
 
 #
 # dbjoin.pm
-# Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
+# Copyright (C) 1991-2022 by John Heidemann <johnh@isi.edu>
 #
 # This program is distributed under terms of the GNU general
 # public license, version 2.  See the file COPYING
@@ -328,6 +328,7 @@ sub parse_options ($@) {
 	'N|lexical' => sub { $self->parse_sort_option(@_); },
 	'r|descending' => sub { $self->parse_sort_option(@_); },
 	'R|ascending' => sub { $self->parse_sort_option(@_); },
+	'type-inferred-sorting' => sub { $self->parse_sort_option(@_); },
 	'<>' => sub { $self->parse_sort_option('<>', @_); },
 	) or pod2usage(2);
     croak($self->{_prog} . ": internal error, extra arguments.\n")
@@ -830,6 +831,7 @@ sub run_hash_join($$$) {
     $code = '$build_output_from_full = sub {' . "\n" . $reset_output_code . $self->{_build_output_from_full_code} . "\n};\n" .
 	    '$build_output_from_hit = sub {' . "\n" . $reset_output_code . $self->{_build_output_from_hit_code} . "\n};\n" .
 	    '$merge_output_from_hit = sub {' . "\n" . $self->{_merge_output_from_hit_code} . "\n};\n";
+    print "CODE in run_hash_join:\n$code\n" if ($self->{_debug} > 1);
     eval $code;
     $@ && croak($self->{_prog} . ":  internal eval error in hash probe code: $@.\n$code\n");
 
@@ -914,7 +916,7 @@ sub run($) {
 
 =head1 AUTHOR and COPYRIGHT
 
-Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
+Copyright (C) 1991-2022 by John Heidemann <johnh@isi.edu>
 
 This program is distributed under terms of the GNU general
 public license, version 2.  See the file COPYING

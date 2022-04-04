@@ -56,7 +56,7 @@ public:
 			ret += x->value*x->value;
 			x++;
 		}
-		return (ret);
+		return ret;
 	}
 
 	static double dot(const double *s, const feature_node *x)
@@ -67,7 +67,7 @@ public:
 			ret += s[x->index-1]*x->value;
 			x++;
 		}
-		return (ret);
+		return ret;
 	}
 
 	static double sparse_dot(const feature_node *x1, const feature_node *x2)
@@ -89,7 +89,7 @@ public:
 					++x1;
 			}
 		}
-		return (ret);
+		return ret;
 	}
 
 	static void axpy(const double a, const feature_node *x, double *y)
@@ -164,7 +164,7 @@ double l2r_erm_fun::fun(double *w)
 		f += C_times_loss(i, wx[i]);
 	f = f + 0.5 * wTw;
 
-	return(f);
+	return f;
 }
 
 int l2r_erm_fun::get_nr_variable(void)
@@ -898,7 +898,7 @@ void Solver_MCSVM_CS::Solve(double *w)
 #define GETI(i) (y[i]+1)
 // To support weights for instances, use GETI(i) (i)
 
-static int solve_l2r_l1l2_svc(const problem *prob, const parameter *param, double *w, double Cp, double Cn, int max_iter=500)
+static int solve_l2r_l1l2_svc(const problem *prob, const parameter *param, double *w, double Cp, double Cn, int max_iter=300)
 {
 	int l = prob->l;
 	int w_size = prob->n;
@@ -1103,7 +1103,7 @@ static int solve_l2r_l1l2_svc(const problem *prob, const parameter *param, doubl
 #define GETI(i) (0)
 // To support weights for instances, use GETI(i) (i)
 
-static int solve_l2r_l1l2_svr(const problem *prob, const parameter *param, double *w, int max_iter=500)
+static int solve_l2r_l1l2_svr(const problem *prob, const parameter *param, double *w, int max_iter=300)
 {
 	const int solver_type = param->solver_type;
 	int l = prob->l;
@@ -1311,7 +1311,7 @@ static int solve_l2r_l1l2_svr(const problem *prob, const parameter *param, doubl
 #define GETI(i) (y[i]+1)
 // To support weights for instances, use GETI(i) (i)
 
-static int solve_l2r_lr_dual(const problem *prob, const parameter *param, double *w, double Cp, double Cn, int max_iter=500)
+static int solve_l2r_lr_dual(const problem *prob, const parameter *param, double *w, double Cp, double Cn, int max_iter=300)
 {
 	int l = prob->l;
 	int w_size = prob->n;
@@ -2700,7 +2700,9 @@ static void train_one(const problem *prob, const parameter *param, double *w, do
 		}
 		case L2R_L1LOSS_SVC_DUAL:
 		{
-			solve_l2r_l1l2_svc(prob, param, w, Cp, Cn, dual_solver_max_iter);
+			iter = solve_l2r_l1l2_svc(prob, param, w, Cp, Cn, dual_solver_max_iter);
+			if(iter >= dual_solver_max_iter)
+				info("\nWARNING: reaching max number of iterations\nUsing -s 2 may be faster (also see FAQ)\n\n");			
 			break;
 		}
 		case L1R_L2LOSS_SVC:
@@ -2747,11 +2749,13 @@ static void train_one(const problem *prob, const parameter *param, double *w, do
 			newton_obj.set_print_string(liblinear_print_string);
 			newton_obj.newton(w);
 			break;
-
 		}
 		case L2R_L1LOSS_SVR_DUAL:
 		{
-			solve_l2r_l1l2_svr(prob, param, w, dual_solver_max_iter);
+			iter = solve_l2r_l1l2_svr(prob, param, w, dual_solver_max_iter);
+			if(iter >= dual_solver_max_iter)
+				info("\nWARNING: reaching max number of iterations\nUsing -s 11 may be faster (also see FAQ)\n\n");			
+
 			break;
 		}
 		case L2R_L2LOSS_SVR_DUAL:
@@ -3708,7 +3712,7 @@ const char *check_parameter(const problem *prob, const parameter *param)
 	if(param->C <= 0)
 		return "C <= 0";
 
-	if(param->p < 0)
+	if(param->p < 0 && param->solver_type == L2R_L2LOSS_SVR)
 		return "p < 0";
 
 	if(prob->bias >= 0 && param->solver_type == ONECLASS_SVM)

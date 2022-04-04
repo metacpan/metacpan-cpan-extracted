@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package OpenAPI::Modern; # git description: v0.023-11-g0dbdd35
+package OpenAPI::Modern; # git description: v0.024-6-g68faea4
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate HTTP requests and responses against an OpenAPI document
 # KEYWORDS: validation evaluation JSON Schema OpenAPI Swagger HTTP request response
 
-our $VERSION = '0.024';
+our $VERSION = '0.025';
 
 use 5.020;
 use Moo;
@@ -324,6 +324,7 @@ sub find_path ($self, $request, $options) {
         if not exists $schema->{paths}{$path_template}{$method};
 
       $options->{operation_id} = $self->openapi_document->schema->{paths}{$path_template}{$method}{operationId};
+      delete $options->{operation_id} if not defined $options->{operation_id};
       return 1;
     }
 
@@ -343,6 +344,7 @@ sub find_path ($self, $request, $options) {
   if (not $request) {
     $options->@{qw(path_template operation_id)} =
       ($path_template, $self->openapi_document->schema->{paths}{$path_template}{$method}{operationId});
+    delete $options->{operation_id} if not defined $options->{operation_id};
     return 1;
   }
 
@@ -368,6 +370,7 @@ sub find_path ($self, $request, $options) {
   my %path_captures; @path_captures{@capture_names} = @capture_values;
   $options->@{qw(path_template path_captures operation_id)} =
     ($path_template, \%path_captures, $self->openapi_document->schema->{paths}{$path_template}{$method}{operationId});
+  delete $options->{operation_id} if not defined $options->{operation_id};
   return 1;
 }
 
@@ -650,7 +653,7 @@ OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI docume
 
 =head1 VERSION
 
-version 0.024
+version 0.025
 
 =head1 SYNOPSIS
 
@@ -834,7 +837,7 @@ Validates an L<HTTP::Request> or L<Mojo::Message::Request>
 object against the corresponding OpenAPI v3.1 document, returning a
 L<JSON::Schema::Modern::Result> object.
 
-The second argument is a hashref that contains extra information about the request, corresponding to
+The second argument is an optional hashref that contains extra information about the request, corresponding to
 the values expected by L</find_path> below. It is populated with some information about the request:
 pass it to a later L</validate_response> to improve performance.
 
@@ -852,11 +855,11 @@ Validates an L<HTTP::Response> or L<Mojo::Message::Response>
 object against the corresponding OpenAPI v3.1 document, returning a
 L<JSON::Schema::Modern::Result> object.
 
-The second argument is a hashref that contains extra information about the request corresponding to
+The second argument is an optional hashref that contains extra information about the request corresponding to
 the response, as in L</find_path>.
 
 C<request> is also accepted as a key in the hashref, representing the original request object that
-corresponds to this response.
+corresponds to this response (as not all HTTP libraries link to the request in the response object).
 
 =head2 find_path
 

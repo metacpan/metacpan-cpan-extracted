@@ -21,9 +21,10 @@
       },
       "runtime" : {
          "requires" : {
+            "Crypt::OpenSSL::Base::Func" : "0.03",
             "Crypt::OpenSSL::Bignum" : "0.09",
             "Crypt::OpenSSL::EC" : "1.31",
-            "Crypt::OpenSSL::Hash2Curve" : "0.021",
+            "Crypt::OpenSSL::Hash2Curve" : "0.03",
             "List::Util" : "1.55",
             "bignum" : "0.52"
          }
@@ -37,7 +38,7 @@
          "web" : "https://github.com/abbypan/Crypt-CPace"
       }
    },
-   "version" : "0.011",
+   "version" : "0.012",
    "x_generated_by_perl" : "v5.34.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
    "x_spdx_expression" : "MPL-2.0"

@@ -2,7 +2,7 @@ package Log::Log4perl::Tiny;
 
 use strict;
 use warnings;
-{ our $VERSION = '1.6.0'; }
+{ our $VERSION = '1.6.2'; }
 
 use Carp;
 use POSIX ();
@@ -363,7 +363,9 @@ sub _carpstuff {
    my $self = shift;
    my $renderer = shift;
    my $emitter  = shift;
-   my $emit_log = shift;
+   my $log_level = shift;
+
+   my $emit_log = $self->can("is_$log_level")->($self);
 
    require Carp;
    local $Carp::Internal{'' . __PACKAGE__} = 1;
@@ -374,7 +376,8 @@ sub _carpstuff {
 
    if ($emit_log) {    # avoid unless we're allowed to emit
       my $message = Carp->can($renderer)->(@message);
-      $self->warn($_) for split m{\n}mxs, $message;
+      my $method = $self->can($log_level);
+      $self->$method($_) for split m{\n}mxs, $message;
    }
    if ($LOGDIE_MESSAGE_ON_STDERR) {
       local $Carp::CarpLevel = $Carp::CarpLevel + 2;
@@ -386,23 +389,23 @@ sub _carpstuff {
 
 sub logcarp {
    my $self = shift;
-   return $self->_carpstuff(qw< shortmess carp >, $self->is_warn(), @_);
+   return $self->_carpstuff(qw< shortmess carp warn >, @_);
 } ## end sub logcarp
 
 sub logcluck {
    my $self = shift;
-   return $self->_carpstuff(qw< longmess cluck >, $self->is_warn(), @_);
+   return $self->_carpstuff(qw< longmess cluck warn >, @_);
 } ## end sub logcluck
 
 sub logcroak {
    my $self = shift;
-   $self->_carpstuff(qw< shortmess croak >, $self->is_fatal(), @_);
+   $self->_carpstuff(qw< shortmess croak fatal >, @_);
    $self->_exit();
 } ## end sub logcroak
 
 sub logconfess {
    my $self = shift;
-   $self->_carpstuff(qw< longmess confess >, $self->is_fatal(), @_);
+   $self->_carpstuff(qw< longmess confess fatal >, @_);
    $self->_exit();
 } ## end sub logconfess
 

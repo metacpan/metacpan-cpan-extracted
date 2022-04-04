@@ -60,7 +60,7 @@
          "url" : "https://github.com/PerlAlien/Alien-patchelf"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_alienfile" : {
       "generated_by" : "Alien::Build::MM version 2.48",
       "requires" : {

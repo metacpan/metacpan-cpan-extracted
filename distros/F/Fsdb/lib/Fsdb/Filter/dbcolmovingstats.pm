@@ -2,7 +2,7 @@
 
 #
 # dbcolmovingstats.pm
-# Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
+# Copyright (C) 1991-2022 by John Heidemann <johnh@isi.edu>
 #
 # This program is distributed under terms of the GNU general
 # public license, version 2.  See the file COPYING
@@ -303,8 +303,8 @@ sub setup ($) {
     };
 
     $self->finish_io_option('output', -clone => $self->{_in}, -outputheader => 'delay');
-    my(@new_cols) = qw(moving_mean moving_stddev);
-    push (@new_cols, "moving_median") if ($self->{_median});
+    my(@new_cols) = qw(moving_mean:d moving_stddev:d);
+    push (@new_cols, "moving_median:d") if ($self->{_median});
     foreach (@new_cols) {
         $self->{_out}->col_create($_)
 	    or croak($self->{_prog} . ": cannot create column $_ (maybe it already existed?)\n");
@@ -442,7 +442,7 @@ sub run ($) {
 
 =head1 AUTHOR and COPYRIGHT
 
-Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
+Copyright (C) 1991-2022 by John Heidemann <johnh@isi.edu>
 
 This program is distributed under terms of the GNU general
 public license, version 2.  See the file COPYING

@@ -1,0 +1,52 @@
+---
+abstract: 'manage dynamic content security policy headers'
+author:
+  - 'Robert Rothenberg <rrwo@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  Module::Metadata: '0'
+  Plack::Middleware::ContentLength: '0'
+  Plack::Middleware::Head: '0'
+  Test::Differences: '0'
+  Test::More: '0'
+  Test::Most: '0'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - HTTP
+  - security
+  - CSP
+  - Content-Security-Policy
+  - WWW
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HTTP-CSPHeader
+provides:
+  HTTP::CSPHeader:
+    file: lib/HTTP/CSPHeader.pm
+    version: v0.1.1
+recommends:
+  Math::Random::ISAAC::XS: '0'
+  Type::Tiny::XS: '0'
+requires:
+  Fcntl: '0'
+  List::Util: '1.29'
+  Math::Random::ISAAC: '0'
+  Moo: '0'
+  Types::Standard: '0'
+  namespace::autoclean: '0'
+  perl: v5.10.0
+resources:
+  bugtracker: https://github.com/robrwo/perl-HTTP-CSPHeader/issues
+  repository: git://github.com/robrwo/perl-HTTP-CSPHeader.git
+version: v0.1.1
+x_authority: cpan:RRWO
+x_generated_by_perl: v5.34.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: Artistic-2.0

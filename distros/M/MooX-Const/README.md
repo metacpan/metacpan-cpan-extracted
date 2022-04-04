@@ -4,7 +4,7 @@ MooX::Const - Syntactic sugar for constant and write-once Moo attributes
 
 # VERSION
 
-version v0.5.1
+version v0.5.3
 
 # SYNOPSIS
 
@@ -22,7 +22,7 @@ has thing => (
 
 # DESCRIPTION
 
-This is syntactic sugar for using [Types::Const](https://metacpan.org/pod/Types::Const) with [Moo](https://metacpan.org/pod/Moo). The
+This is syntactic sugar for using [Types::Const](https://metacpan.org/pod/Types%3A%3AConst) with [Moo](https://metacpan.org/pod/Moo). The
 SYNOPSIS above is equivalent to:
 
 ```perl
@@ -40,7 +40,7 @@ are read-only ("ro") attributes for references, where the underlying
 data structure has been set as read-only.
 
 This will return an error if there is no "isa", the "isa" is not a
-[Type::Tiny](https://metacpan.org/pod/Type::Tiny) type, if it is not a reference, or if it is blessed
+[Type::Tiny](https://metacpan.org/pod/Type%3A%3ATiny) type, if it is not a reference, or if it is blessed
 object.
 
 Simple value types such as `Int` or `Str` are silently converted to
@@ -74,7 +74,7 @@ has thing => (
 ```
 
 When this is set to a false value, then the read-only constraint will
-only be applied when running in strict mode, see [Devel::StrictMode](https://metacpan.org/pod/Devel::StrictMode).
+only be applied when running in strict mode, see [Devel::StrictMode](https://metacpan.org/pod/Devel%3A%3AStrictMode).
 
 If omitted, `strict` is assumed to be true.
 
@@ -87,7 +87,7 @@ keys.
 
 Unfortunately, this behaviour is not replicated with array references.
 
-See [Types::Const](https://metacpan.org/pod/Types::Const) for other known issues related to the `Const`
+See [Types::Const](https://metacpan.org/pod/Types%3A%3AConst) for other known issues related to the `Const`
 type.
 
 ## Using with Moose and Mouse
@@ -99,24 +99,24 @@ It does not work with [Mouse](https://metacpan.org/pod/Mouse). Pull requests are
 
 ## Write-Once Attributes
 
-[Class::Accessor](https://metacpan.org/pod/Class::Accessor) antlers/moose-like mode uses "wo" for write-only
+[Class::Accessor](https://metacpan.org/pod/Class%3A%3AAccessor) antlers/moose-like mode uses "wo" for write-only
 attributes, not write-once attributes.
 
 As of v0.5.0, you should be using "once" instead of "wo".
 
 # SEE ALSO
 
-[Const::Fast](https://metacpan.org/pod/Const::Fast)
+[Const::Fast](https://metacpan.org/pod/Const%3A%3AFast)
 
-[Devel::StrictMode](https://metacpan.org/pod/Devel::StrictMode)
+[Devel::StrictMode](https://metacpan.org/pod/Devel%3A%3AStrictMode)
 
 [Moo](https://metacpan.org/pod/Moo)
 
-[MooseX::SetOnce](https://metacpan.org/pod/MooseX::SetOnce)
+[MooseX::SetOnce](https://metacpan.org/pod/MooseX%3A%3ASetOnce)
 
-[Types::Const](https://metacpan.org/pod/Types::Const)
+[Types::Const](https://metacpan.org/pod/Types%3A%3AConst)
 
-[Type::Tiny](https://metacpan.org/pod/Type::Tiny)
+[Type::Tiny](https://metacpan.org/pod/Type%3A%3ATiny)
 
 # SOURCE
 
@@ -145,7 +145,7 @@ Kang-min Liu 劉康民 <gugod@gugod.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2021 by Robert Rothenberg.
+This software is Copyright (c) 2018-2022 by Robert Rothenberg.
 
 This is free software, licensed under:
 

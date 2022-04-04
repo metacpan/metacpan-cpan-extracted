@@ -15,7 +15,7 @@
 # program.  If not, see <http://www.perlfoundation.org/artistic_license_2_0>.
 #
 package Graphics::Fig::Text;
-our $VERSION = 'v1.0.7';
+our $VERSION = 'v1.0.8';
 
 use strict;
 use warnings;
@@ -24,6 +24,7 @@ use Math::Trig;
 use Image::Info qw(image_info);
 use Graphics::Fig::Color;
 use Graphics::Fig::Parameters;
+use Graphics::Fig::FontSize;
 
 
 #
@@ -48,21 +49,27 @@ my %TextParameterTemplate = (
 );
 
 #
-# Graphics::Fig::Text::setTextSize: compute the length and height of text
+# Graphics::Fig::Text::calcSize: calculate dimensions of text
 #
-sub setTextSize {
+sub calcSize {
     my $self = shift;
-    my $pointSize = ${$self}{"fontSize"};
-    my $text = ${$self}{"text"};
+    my $size = &Graphics::Fig::FontSize::getTextSize($self->{fontRef},
+	    $self->{fontSize}, $self->{text});
+    my $justification = $self->{justification};
 
-    #
-    # TODO: This calculation is only an approximation.  It should determine
-    # the height and length of the text based on the given font and size.
-    #
-    my $height = $pointSize / 72.0;
-    my $length = $height * length($text) / 2.0;
-    ${$self}{"length"} = $length;
-    ${$self}{"height"} = $height;
+    if ($justification == 1) {		# centered
+	my $width = $size->{right} - $size->{left};
+
+	$size->{left}  = -$width / 2.0;
+	$size->{right} =  $width / 2.0;
+
+    } elsif ($justification == 2) {	# right-justified
+	my $width = $size->{right} - $size->{left};
+
+	$size->{left}  = -$width;
+	$size->{right} = 0.0;
+    }
+    $self->{size} = $size;
 }
 
 #
@@ -84,7 +91,7 @@ sub text {
     my $stack = ${$fig}{"stack"};
     my $tos = ${$stack}[$#{$stack}];
     eval {
-	Graphics::Fig::Parameters::parse($fig, "spline",
+	Graphics::Fig::Parameters::parse($fig, "text",
 					 \%TextParameterTemplate,
 			      		 ${$tos}{"options"}, \%parameters, @_);
     };
@@ -107,12 +114,11 @@ sub text {
 	justification	=> $parameters{"textJustification"},
 	penColor	=> $parameters{"penColor"},
 	depth		=> $parameters{"depth"},
-	fontName	=> $parameters{"fontName"}[1],
+	fontRef		=> $parameters{"fontName"},
 	fontSize	=> $parameters{"fontSize"},
 	fontFlags	=> $parameters{"fontName"}[0],
 	rotation	=> $rotation,
-	length		=> undef,
-	height		=> undef,
+	size		=> undef,
 	points		=> [ $parameters{"position"} ],
 	text		=> $text,
     };
@@ -123,7 +129,7 @@ sub text {
     # Apply font flags and calculate the text size.
     #
     ${$self}{"fontFlags"} |= $parameters{"fontFlags"} & ~4;
-    $self->setTextSize();
+    $self->calcSize();
 
     push(@{${$tos}{"objects"}}, $self);
     return $self;
@@ -176,8 +182,10 @@ sub scale {
 
     @{${$self}{"points"}} = Graphics::Fig::Parameters::scalePoints(
     		$parameters, @{${$self}{"points"}});
-    ${$self}{"length"} *= $u;
-    ${$self}{"height"} *= $v;
+    $self->{size}->{left}  *= $u;
+    $self->{size}->{right} *= $u;
+    $self->{size}->{up}    *= $v;
+    $self->{size}->{down}  *= $v;
 
     return 1;
 }
@@ -192,31 +200,12 @@ sub scale {
 sub getbbox {
     my $self       = shift;
     my $parameters = shift;
-    my $justification = ${$self}{"justification"};
-    my $position      = ${$self}{"points"}[0];
-    my $height	      = ${$self}{"height"};
-    my $length	      = ${$self}{"length"};
-    my ($xmin, $ymin, $xmax, $ymax);
 
-    #
-    # TODO: We need width and height (see setTextSize).  Additionally, we need
-    # to know the distance between the lowest part of the text, e.g. bottom of
-    # "y" or "g" and the baseline.
-    #
-    my $shift = $height / 3.0;
-
-    if ($justification == 2) {
-	$xmin = ${$position}[0] - $length;
-	$xmax = ${$position}[0];
-    } elsif ($justification == 1) {
-	$xmin = ${$position}[0] - $length / 2.0;
-	$xmax = ${$position}[0] + $length / 2.0;
-    } else {
-	$xmin = ${$position}[0];
-	$xmax = ${$position}[0] + $length;
-    }
-    $ymin = $shift + ${$position}[1];
-    $ymax = $shift + ${$position}[1] - $height;
+    my $position = ${$self}{"points"}[0];
+    my $xmin = $position->[0] + $self->{size}->{left};
+    my $xmax = $position->[0] + $self->{size}->{right};
+    my $ymin = $position->[1] + $self->{size}->{up};
+    my $ymax = $position->[1] + $self->{size}->{down};
 
     return [ [ $xmin, $ymin ], [ $xmax, $ymax ] ];
 }
@@ -235,13 +224,12 @@ sub print {
     my $text_out   = "";
 
     #
-    # Encode bytes above 127 with octal escapes.
+    # Encode backslashes and bytes above 127 with backslash escapes.
     #
-    utf8::encode($text_in);
     for (my $i = 0; $i < length($text_in); ++$i) {
 	my $c = substr($text_in, $i, 1);
 	my $n = ord($c);
-	die if $n < 0 || $n > 255;	# otherwise, utf8::encode didn't work
+	die if $n < 0 || $n > 255;	# enforced in convertText
 	if ($n == 0x5C) {		# '\'
 	    $text_out .= '\\';
 	    $text_out .= $c;
@@ -258,16 +246,18 @@ sub print {
     # Print
     #
     my $figPerInch = Graphics::Fig::_figPerInch($parameters);
+    my $width  = $self->{size}{right}  - $self->{size}{left};
+    my $height = $self->{size}{down} - $self->{size}{up};
     printf $fh ("4 %d %d %d -1 %d %.0f %.4f %u %.0f %.0f %d %d %s\\001\n",
 	   ${$self}{"justification"},
 	   ${$self}{"penColor"},
 	   ${$self}{"depth"},
-	   ${$self}{"fontName"},
+	   ${$self}{"fontRef"}[1],
 	   ${$self}{"fontSize"},
 	   ${$self}{"rotation"},
 	   ${$self}{"fontFlags"},
-	   ${$self}{"height"} * $figPerInch,
-	   ${$self}{"length"} * $figPerInch,
+	   $height * $figPerInch,
+	   $width  * $figPerInch,
 	   ${$self}{"points"}[0][0] * $figPerInch,
 	   ${$self}{"points"}[0][1] * $figPerInch,
 	   $text_out);

@@ -1,6 +1,6 @@
 package TestLLT;
 use base 'Exporter';
-our @EXPORT = qw( set_logger log_is log_like );
+our @EXPORT = qw( set_logger log_is log_like capture_stderr );
 
 use Test::Builder;
 my $Test = Test::Builder->new();
@@ -27,5 +27,15 @@ sub log_like (&$$) {
    close $fh;
    $Test->like($collector, $regex, $message);
 } ## end sub log_like (&$$)
+
+sub capture_stderr (&) {
+   local *STDERR;
+   close STDERR;
+   my $stderr = '';
+   open STDERR, '>', \$stderr;
+   $_[0]->();
+   close STDERR;
+   return $stderr;
+}
 
 1;

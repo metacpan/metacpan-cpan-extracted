@@ -191,6 +191,9 @@ sub _prepare_event ($self, $event, $scope, $hint = undef) {
   $self->_apply_client_options(\%prepared);
   $self->_apply_integrations_metadata(\%prepared);
 
+# beforeSend
+# https://github.com/getsentry/sentry-javascript/blob/72aed62a2aecb29cb75b807e7661d9929327281d/packages/core/src/baseclient.ts#L569
+
   # If we have scope given to us, use it as the base for further modifications.
   # This allows us to prevent unnecessary copying of data if `capture_context`
   # is not provided.
@@ -201,7 +204,6 @@ sub _prepare_event ($self, $event, $scope, $hint = undef) {
 
   # We prepare the result here with a resolved Event.
   my $result = \%prepared;
-
   # This should be the last thing called, since we want that
   # {@link Hub.addEventProcessor} gets the finished prepared event.
   if ($final_scope) {
@@ -218,12 +220,15 @@ sub _process_event ($self, $event, $hint, $scope) {
 
   my $is_transaction = ($event->{type} // '') eq 'transaction';
 
+  my $before_send     = $self->_options->{before_send} // sub ($event) {$event};
+  my $processed_event = $before_send->($prepared);
+
   die 'An event processor returned undef, will not send event.'
-    unless $prepared;
+    unless $processed_event;
 
-  $self->_send_event($prepared);
+  $self->_send_event($processed_event);
 
-  return $prepared;
+  return $processed_event;
 }
 
 sub _send_event ($self, $event) {

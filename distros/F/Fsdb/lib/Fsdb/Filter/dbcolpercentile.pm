@@ -2,7 +2,7 @@
 
 #
 # dbcolpercentile.pm
-# Copyright (C) 1997-2021 by John Heidemann <johnh@isi.edu>
+# Copyright (C) 1997-2022 by John Heidemann <johnh@isi.edu>
 #
 # This program is distributed under terms of the GNU general
 # public license, version 2.  See the file COPYING
@@ -239,7 +239,7 @@ sub set_defaults ($) {
     $self->SUPER::set_defaults();
     $self->{_mode} = 'percentile';
     $self->{_sort_order} = undef;
-    $self->{_sort_as_numeric} = 1;
+#    $self->{_sort_as_numeric} = 1;
     $self->{_include_non_numeric} = undef;
     $self->{_pre_sorted} = 0;
     $self->{_target_column} = undef;
@@ -333,7 +333,7 @@ sub setup ($) {
     	# not sorted, so sort it and read that
 	my @sort_args = ('--nolog', $self->{_target_column});
 	unshift(@sort_args, '--descending') if ($self->{_sort_order} == -1);
-	unshift(@sort_args, ($self->{_sort_as_numeric} ? '--numeric' : '--lexical'));
+	unshift(@sort_args, '--numeric');   # always numeric
 	my($new_reader, $new_fred) = dbpipeline_filter($self->{_input}, [-comment_handler => $self->create_delay_comments_sub], dbsort(@sort_args));
 	$self->{_pre_sorted_input} = $self->{_input};
 	$self->{_in} = $new_reader;
@@ -492,7 +492,7 @@ sub run ($) {
 
 =head1 AUTHOR and COPYRIGHT
 
-Copyright (C) 1991-2021 by John Heidemann <johnh@isi.edu>
+Copyright (C) 1991-2022 by John Heidemann <johnh@isi.edu>
 
 This program is distributed under terms of the GNU general
 public license, version 2.  See the file COPYING

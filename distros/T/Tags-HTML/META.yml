@@ -4,10 +4,10 @@ author:
   - 'Michal Josef Spacek <skim@cpan.org>'
 build_requires:
   CSS::Struct::Output::Raw: 0
-  CSS::Struct::Output::Structure: 0
+  English: 0
+  Error::Pure::Utils: 0
   ExtUtils::MakeMaker: 6.59
   Tags::Output::Raw: 0
-  Tags::Output::Structure: 0
   Test::More: 0
   Test::NoWarnings: 0
 configure_requires:
@@ -35,4 +35,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Tags-HTML
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Tags-HTML
-version: '0.01'
+version: '0.02'

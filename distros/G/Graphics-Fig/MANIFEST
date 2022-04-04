@@ -3,6 +3,7 @@ lib/Graphics/Fig/Arc.pm
 lib/Graphics/Fig/Color.pm
 lib/Graphics/Fig/Compound.pm
 lib/Graphics/Fig/Ellipse.pm
+lib/Graphics/Fig/FontSize.pm
 lib/Graphics/Fig/Matrix.pm
 lib/Graphics/Fig/Parameters.pm
 lib/Graphics/Fig/Polyline.pm

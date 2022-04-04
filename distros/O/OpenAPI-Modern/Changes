@@ -1,5 +1,9 @@
 Revision history for OpenAPI-Modern
 
+0.025     2022-04-03 19:58:27Z
+          - find_path() no longer returns an undef operation_id when there is
+            no operationId defined in the schema document
+
 0.024     2022-03-25 23:41:04Z
           - operation_id and method are now always returned in the options
             hash in validate_request, validate_response, find_path

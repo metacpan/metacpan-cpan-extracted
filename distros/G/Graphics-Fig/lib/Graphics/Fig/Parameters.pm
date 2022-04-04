@@ -15,7 +15,7 @@
 # program.  If not, see <http://www.perlfoundation.org/artistic_license_2_0>.
 #
 package Graphics::Fig::Parameters;
-our $VERSION = 'v1.0.7';
+our $VERSION = 'v1.0.8';
 
 use strict;
 use warnings;
@@ -76,7 +76,7 @@ my %AreaFills = (
     "not-filled"			=> -1,
     "black"				=>  0,
     "full"				=> 20,
-    "saturated"				=> 20,
+    "saturated"				=> 20,	# alias for compatibility
     "white"				=> 40,
     "left-diagonal-30"			=> 41,
     "right-diagonal-30"			=> 42,
@@ -427,7 +427,7 @@ sub convertExportOptions {
 	croak("${prefix}: error: expected reference to array of scalars");
     }
     foreach my $item (@{$value}) {
-	if (ref($value) ne "") {
+	if (ref($item) ne "") {
 	    croak("${prefix}: error: expected reference to array of scalars");
 	}
     }
@@ -516,7 +516,7 @@ sub convertFontSize {
     my $context = shift;
     my $temp;
 
-    if (!($value =~ s/^\s*($RE_REAL)//) && $value <= 0) {
+    if (!($value =~ m/^\s*($RE_REAL)\s*$/) || $value <= 0) {
 	croak("${prefix}: error: ${value}: invalid font size");
     }
     return $value + 0;
@@ -774,7 +774,7 @@ sub convertPositiveReal {
     my $value   = shift;
     my $context = shift;
 
-    if ($value =~ s/^($RE_REAL)$// && $value > 0) {
+    if ($value =~ m/^\s*($RE_REAL)\s*$/ && $value > 0) {
 	return $value;
     }
     croak("${prefix}: error: ${value}: expected positive number");
@@ -865,13 +865,15 @@ sub convertText {
     my $prefix  = shift;
     my $value   = shift;
     my $context = shift;
-    my $temp = $value;
 
-    utf8::encode($temp);
-    for (my $i = 0; $i < length($temp); ++$i) {
-	my $n = ord(substr($temp, $i, 1));
-	die if $n < 0 || $n > 255;
-	if ($n < 32 || $n == 127) {
+    #
+    # Standard xfig supports only ASCII and the Latin-1 code supplement
+    # pages.  Make sure there are no code points outside of the supported
+    # range.  Also disallow control characters.
+    #
+    for (my $i = 0; $i < length($value); ++$i) {
+	my $n = ord(substr($value, $i, 1));
+	if ($n < 32 || $n == 0x7F || $n > 0xFF) {
 	    croak("${prefix}: error: ${value}: " .
 	    	  "invalid character ${n} in string");
 	}

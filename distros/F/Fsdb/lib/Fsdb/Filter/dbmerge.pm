@@ -309,6 +309,7 @@ sub parse_options($@) {
 	'N|lexical' => sub { $self->parse_sort_option(@_); },
 	'r|descending' => sub { $self->parse_sort_option(@_); },
 	'R|ascending' => sub { $self->parse_sort_option(@_); },
+	't|type-inferred-sorting' => sub { $self->parse_sort_option(@_); },
 	'<>' => sub { if ($past_sort_options) {
 			    $self->parse_io_option('inputs', @_);
 			} else  {
@@ -1006,7 +1007,11 @@ sub setup($) {
     # control parallelism
     #
     # For the endgame, we overcommit by a large factor
-    # because in the merge tree many become blocked on the IO pipeline.
+    # because when we enter endgame mode,
+    # the top file in the tree will fully consume one core,
+    # and each layer lower in the tree will block on IO.
+    # Practically, each layer consumes about half the CPU of the layer
+    # above it.
     #
     $self->{_max_parallelism} //= Fsdb::Support::OS::max_parallelism();
     $self->{_parallelism_available} //= $self->{_max_parallelism};

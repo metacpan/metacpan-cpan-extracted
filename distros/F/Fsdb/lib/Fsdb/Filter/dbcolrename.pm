@@ -2,7 +2,7 @@
 
 #
 # dbcolrename.pm
-# Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
+# Copyright (C) 1991-2022 by John Heidemann <johnh@isi.edu>
 #
 # This program is distributed under terms of the GNU general
 # public license, version 2.  See the file COPYING
@@ -202,8 +202,8 @@ sub setup ($) {
 
     $self->finish_io_option('input', -comment_handler => $self->create_pass_comments_sub);
 
-    my @old_cols = @{$self->{_in}->cols};
-    my @new_cols = @old_cols;
+    my(@old_cols) =  @{ $self->{_in}->cols() };
+    my(@new_cols) =  ( $self->{_in}->colspecs() );
     my %cur_cols;  # just for double naming
     foreach (0..$#old_cols) {
 	$cur_cols{$old_cols[$_]} = $_;
@@ -217,7 +217,9 @@ sub setup ($) {
 	    if (!defined($old_i));
 	croak($self->{_prog} . ": column `$new' already exists in the output stream.\n")
 	    if (defined($cur_cols{$new}));
-	$new_cols[$old_i] = $new;
+        my($old_type) = $self->{_in}->col_to_type($old_i);
+        $old_type = ":" . $old_type if (defined($old_type));
+	$new_cols[$old_i] = $new .  $old_type;
 	$cur_cols{$new} = $old_i;
     };
 
@@ -246,7 +248,7 @@ sub run ($) {
 
 =head1 AUTHOR and COPYRIGHT
 
-Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
+Copyright (C) 1991-2022 by John Heidemann <johnh@isi.edu>
 
 This program is distributed under terms of the GNU general
 public license, version 2.  See the file COPYING

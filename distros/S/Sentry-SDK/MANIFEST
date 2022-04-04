@@ -56,10 +56,14 @@ lib/Sentry/Util.pm
 t/author-pod-syntax.t
 t/cache.t
 t/cgi-application-plugin-sentry.t
+t/client.t
 t/context-line.t
 t/dsn.t
 t/lib/Mock/Mojo/UserAgent.pm
 t/lib/Mock/Sentry/Client.pm
+t/lib/Mock/Sentry/Hub.pm
+t/lib/Mock/Sentry/Transport/HTTP.pm
+t/mojolicious-plugin-sentry-sdk.t
 t/pod-coverage.t
 t/pod.t
 t/scope.t
@@ -70,4 +74,5 @@ t/severity.t
 t/snapshots/sdk_t/client_options
 t/snapshots/sdk_t/client_options_env_
 t/stacktrace.t
+t/transaction.t
 t/util.t

@@ -47,11 +47,11 @@
 
 <p>For example:</p>
 
-<pre><code>        #fsdb experiment duration
-        ufs_mab_sys 37.2
-        ufs_mab_sys 37.3
-        ufs_rcp_real 264.5
-        ufs_rcp_real 277.9</code></pre>
+<pre><code>#fsdb experiment duration
+ufs_mab_sys 37.2
+ufs_mab_sys 37.3
+ufs_rcp_real 264.5
+ufs_rcp_real 277.9</code></pre>
 
 <p>Is a simple file with four experiments (the rows), each with a description, size parameter, and run time in the first, second, and third columns.</p>
 
@@ -68,12 +68,12 @@
 
 <p>Fewer lines of simpler code:</p>
 
-<pre><code>    dbrow &#39;_experiment eq &quot;ufs_mab_sys&quot;&#39; | dbcolstats duration</code></pre>
+<pre><code>dbrow &#39;_experiment eq &quot;ufs_mab_sys&quot;&#39; | dbcolstats duration</code></pre>
 
 <p>Picks out just one type of experiment and computes statistics on it, rather than:</p>
 
-<pre><code>    while (&lt;&gt;) { split; $sum+=$F[1]; $ss+=$F[1]**2; $n++; }
-    $mean = $sum / $n; $std_dev = ...</code></pre>
+<pre><code>while (&lt;&gt;) { split; $sum+=$F[1]; $ss+=$F[1]**2; $n++; }
+$mean = $sum / $n; $std_dev = ...</code></pre>
 
 <p>in dozens of places.</p>
 
@@ -101,18 +101,18 @@
 
 <p>Thus if your experiment gets more complicated with a size parameter, so your log changes to:</p>
 
-<pre><code>        #fsdb experiment size duration
-        ufs_mab_sys 1024 37.2
-        ufs_mab_sys 1024 37.3
-        ufs_rcp_real 1024 264.5
-        ufs_rcp_real 1024 277.9
-        ufs_mab_sys 2048 45.3
-        ufs_mab_sys 2048 44.2</code></pre>
+<pre><code>#fsdb experiment size duration
+ufs_mab_sys 1024 37.2
+ufs_mab_sys 1024 37.3
+ufs_rcp_real 1024 264.5
+ufs_rcp_real 1024 277.9
+ufs_mab_sys 2048 45.3
+ufs_mab_sys 2048 44.2</code></pre>
 
 <p>Then the previous scripts still work, even though duration is now the third column, not the second.</p>
 
 </li>
-<li><p>A series of actions are self-documenting (each program records what it does).</p>
+<li><p>A series of actions are self-documenting (the provenance of processsing done to produce each output is recorded in comments).</p>
 
 <dl>
 
@@ -126,7 +126,7 @@
 
 <p>For example, the commands</p>
 
-<pre><code>    dbrow &#39;_experiment eq &quot;ufs_mab_sys&quot;&#39; | dbcolstats duration</code></pre>
+<pre><code>dbrow &#39;_experiment eq &quot;ufs_mab_sys&quot;&#39; | dbcolstats duration</code></pre>
 
 <p>add to the end of the output the lines # | dbrow _experiment eq &quot;ufs_mab_sys&quot; # | dbcolstats duration</p>
 
@@ -152,18 +152,18 @@
 </li>
 <li><p>Fsdb-2.x supports Perl scripting (in addition to shell scripting), with libraries to do Fsdb input and output, and easy support for pipelines. The shell script</p>
 
-<pre><code>    dbcol name test1 | dbroweval &#39;_test1 += 5;&#39;</code></pre>
+<pre><code>dbcol name test1 | dbroweval &#39;_test1 += 5;&#39;</code></pre>
 
 <p>can be written in perl as:</p>
 
-<pre><code>    dbpipeline(dbcol(qw(name test1)), dbroweval(&#39;_test1 += 5;&#39;));</code></pre>
+<pre><code>dbpipeline(dbcol(qw(name test1)), dbroweval(&#39;_test1 += 5;&#39;));</code></pre>
 
 </li>
 </ul>
 
 <p>(The disadvantage is that you need to learn what functions Fsdb provides.)</p>
 
-<p>Fsdb is built on flat-ASCII databases. By storing data in simple text files and processing it with pipelines it is easy to experiment (in the shell) and look at the output. To the best of my knowledge, the original implementation of this idea was <code>/rdb</code>, a commercial product described in the book <i>UNIX relational database management: application development in the UNIX environment</i> by Rod Manis, Evan Schaffer, and Robert Jorgensen (and also at the web page <a href="http://www.rdb.com/">http://www.rdb.com/</a>). Fsdb is an incompatible re-implementation of their idea without any accelerated indexing or forms support. (But it&#39;s free, and probably has better statistics!).</p>
+<p>Fsdb is built on flat-ASCII databases. By storing data in simple text files and processing it with pipelines it is easy to experiment (in the shell) and look at the output. To the best of my knowledge, the original implementation of this idea was <code>/rdb</code>, a commercial product described in the book <i>UNIX relational database management: application development in the UNIX environment</i> by Rod Manis, Evan Schaffer, and Robert Jorgensen (1988 by Prentice Hall, and also at the web page <a href="http://www.rdb.com/">http://www.rdb.com/</a>). Fsdb is an incompatible re-implementation of their idea without any accelerated indexing or forms support. (But it&#39;s free, and probably has better statistics!).</p>
 
 <p>Fsdb-2.x will exploit multiple processors or cores, and provides Perl-level support for input, output, and threaded-pipelines. (As of Fsdb-2.44 it no longer uses Perl threading, just processes, since they are faster.)</p>
 
@@ -173,20 +173,32 @@
 
 <h1 id="WHATS-NEW">WHAT&#39;S NEW</h1>
 
-<h2 id="tbd-xxx">2.73, tbd xxx</h2>
+<h2 id="tbd-tbd">2.75, tbd tbd</h2>
 
 <dl>
 
 <dt id="ENHANCEMENT">ENHANCEMENT</dt>
 <dd>
 
-<p><a>dbcolpercentile</a> now has a <code>--weighted</code> option.</p>
+<p>Even more IPv6: the functions in <a>Fsdb::Support::IPv6</a> package now support strings of hex digits as an alternate encoding for IP address (and they are already the output of ipv6_fullhex), and <code>ip_fullhex_to_normal</code> converts full hex-encoded IPv4 or IPv6 addresses to their &quot;normal&quot; form (dotted-quad or IPv6 printable format).</p>
 
 </dd>
 <dt id="ENHANCEMENT1">ENHANCEMENT</dt>
 <dd>
 
-<p>The new <a>Fsdb::Support::IPv6</a> package includes ipv6_zeroize and ipv6_normalize to rewrite ipv6 print addresses.</p>
+<p>Add optional type specifications to the schema. Types are not used in Perl, but are relevant in Python and Go Fsdb bindings. Types use a subset of perl pack specifiers: c, s, l, q are signed 8, 16, 32, and 64-bit integers, f is a float, d is double float, a is utf-8 string, and &amp;gt; and &amp;lt; can force big or little endianness. The default type for everything is &quot;a&quot;, that is, utf-8 strings.</p>
+
+</dd>
+<dt id="ENHANCEMENT2">ENHANCEMENT</dt>
+<dd>
+
+<p><a>dbcol</a>, <a>dbcolcreate</a>, <a>dbcolcopylast</a>, and <a>dbcolrename</a> now understand and propagate schema types. <a>dbsort</a>, <a>dbjoin</a>, <a>dbmerge</a>, <a>dbmerge2</a> and <a>dbfilepivot</a> all take a new option <code>-t</code> to sort by type-inferred comparision, if a type is given.</p>
+
+</dd>
+<dt id="ENHANCEMENT3">ENHANCEMENT</dt>
+<dd>
+
+<p><a>dbcolstat</a>, <a>dbmultistats</a>, and <a>dbcolmovingstats</a> now include type information in their output schema. (They assumes input variables are floats, not integers.)</p>
 
 </dd>
 </dl>
@@ -261,14 +273,14 @@
 
 <p>Fsdb now uses the standard Perl build and installation from ExtUtil::MakeMaker(3), so the quick answer to installation is to type:</p>
 
-<pre><code>    perl Makefile.PL
-    make
-    make test
-    make install</code></pre>
+<pre><code>perl Makefile.PL
+make
+make test
+make install</code></pre>
 
 <p>Or, if you want to install it somewhere else, change the first line to</p>
 
-<pre><code>    perl Makefile.PL PREFIX=$HOME</code></pre>
+<pre><code>perl Makefile.PL PREFIX=$HOME</code></pre>
 
 <p>and it will go in your home directory&#39;s <i>bin</i>, etc. (See <a href="http://man.he.net/man3/ExtUtil::MakeMaker">ExtUtil::MakeMaker(3)</a> for more details.)</p>
 
@@ -276,7 +288,7 @@
 
 <p>A test-suite is available, run it with</p>
 
-<pre><code>    make test</code></pre>
+<pre><code>make test</code></pre>
 
 <p>In the past, the ports existed for FreeBSD and MacOS. If someone running one of those OSes wants to contribute a new port, please let me know.</p>
 
@@ -284,13 +296,15 @@
 
 <p>These programs are based on the idea storing data in simple ASCII files. A database is a file with one header line and then data or comment lines. For example:</p>
 
-<pre><code>        #fsdb account passwd uid gid fullname homedir shell
-        johnh * 2274 134 John_Heidemann /home/johnh /bin/bash
-        greg * 2275 134 Greg_Johnson /home/greg /bin/bash
-        root * 0 0 Root /root /bin/bash
-        # this is a simple database</code></pre>
+<pre><code>#fsdb account passwd uid gid fullname homedir shell
+johnh * 2274 134 John_Heidemann /home/johnh /bin/bash
+greg * 2275 134 Greg_Johnson /home/greg /bin/bash
+root * 0 0 Root /root /bin/bash
+# this is a simple database</code></pre>
 
-<p>The header line must be first and begins with <code>#h</code>. There are rows (records) and columns (fields), just like in a normal database. Comment lines begin with <code>#</code>. Column names are any string not containing spaces or single quote (although it is prudent to keep them alphanumeric with underscore).</p>
+<p>The header line must be first and begins with <code>#fsdb</code>. There are rows (records) and columns (fields), just like in a normal database. Comment lines begin with <code>#</code>. Column names are any string not containing spaces or single quote (although it is prudent to keep them alphanumeric with underscore).</p>
+
+<p>Columns can optionally include type anntations by following name with :t where t is some type. (Types are not used in Perl, but are relevant in Python and Go Fsdb bindings.) Types use a subset of perl pack specifiers: c, s, l, q are signed 8, 16, 32, and 64-bit integers, f is a float, d is double float, a is utf-8 string, and &amp;gt; and &amp;lt; can force big or little endianness.</p>
 
 <p>By default, columns are delimited by whitespace. With this default configuration, the contents of a field cannot contain whitespace. However, this limitation can be relaxed by changing the field separator as described below.</p>
 
@@ -298,47 +312,47 @@
 
 <p>Since no-whitespace in columns was a problem for some applications, there&#39;s an option which relaxes this rule. You can specify the field separator in the table header with <code>-F x</code> where <code>x</code> is a code for the new field separator. A full list of codes is at <a href="http://man.he.net/man1/dbfilealter">dbfilealter(1)</a>, but two common special values are <code>-F t</code> which is a separator of a single tab character, and <code>-F S</code>, a separator of two spaces. Both allowing (single) spaces in fields. An example:</p>
 
-<pre><code>        #fsdb -F S account passwd uid gid fullname homedir shell
-        johnh  *  2274  134  John Heidemann  /home/johnh  /bin/bash
-        greg  *  2275  134  Greg Johnson  /home/greg  /bin/bash
-        root  *  0  0  Root  /root  /bin/bash
-        # this is a simple database</code></pre>
+<pre><code>#fsdb -F S account passwd uid gid fullname homedir shell
+johnh  *  2274  134  John Heidemann  /home/johnh  /bin/bash
+greg  *  2275  134  Greg Johnson  /home/greg  /bin/bash
+root  *  0  0  Root  /root  /bin/bash
+# this is a simple database</code></pre>
 
 <p>See <a href="http://man.he.net/man1/dbfilealter">dbfilealter(1)</a> for more details. Regardless of what the column separator is for the body of the data, it&#39;s always whitespace in the header.</p>
 
 <p>There&#39;s also a third format: a &quot;list&quot;. Because it&#39;s often hard to see what&#39;s columns past the first two, in list format each &quot;column&quot; is on a separate line. The programs dblistize and dbcolize convert to and from this format, and all programs work with either formats. The command</p>
 
-<pre><code>    dbfilealter -R C  &lt; DATA/passwd.fsdb</code></pre>
+<pre><code>dbfilealter -R C  &lt; DATA/passwd.fsdb</code></pre>
 
 <p>outputs:</p>
 
-<pre><code>        #fsdb -R C account passwd uid gid fullname homedir shell
-        account:  johnh
-        passwd:   *
-        uid:      2274
-        gid:      134
-        fullname: John_Heidemann
-        homedir:  /home/johnh
-        shell:    /bin/bash
-        
-        account:  greg
-        passwd:   *
-        uid:      2275
-        gid:      134
-        fullname: Greg_Johnson
-        homedir:  /home/greg
-        shell:    /bin/bash
-        
-        account:  root
-        passwd:   *
-        uid:      0
-        gid:      0
-        fullname: Root
-        homedir:  /root
-        shell:    /bin/bash
-        
-        # this is a simple database
-        #  | dblistize </code></pre>
+<pre><code> #fsdb -R C account passwd uid gid fullname homedir shell
+ account:  johnh
+ passwd:   *
+ uid:      2274
+ gid:      134
+ fullname: John_Heidemann
+ homedir:  /home/johnh
+ shell:    /bin/bash
+ 
+ account:  greg
+ passwd:   *
+ uid:      2275
+ gid:      134
+ fullname: Greg_Johnson
+ homedir:  /home/greg
+ shell:    /bin/bash
+ 
+ account:  root
+ passwd:   *
+ uid:      0
+ gid:      0
+ fullname: Root
+ homedir:  /root
+ shell:    /bin/bash
+ 
+ # this is a simple database
+ #  | dblistize </code></pre>
 
 <p>See <a href="http://man.he.net/man1/dbfilealter">dbfilealter(1)</a> for more details.</p>
 
@@ -346,16 +360,16 @@
 
 <p>A number of programs exist to manipulate databases. Complex functions can be made by stringing together commands with shell pipelines. For example, to print the home directories of everyone with ``john&#39;&#39; in their names, you would do:</p>
 
-<pre><code>        cat DATA/passwd | dbrow &#39;_fullname =~ /John/&#39; | dbcol homedir</code></pre>
+<pre><code>cat DATA/passwd | dbrow &#39;_fullname =~ /John/&#39; | dbcol homedir</code></pre>
 
 <p>The output might be:</p>
 
-<pre><code>        #fsdb homedir
-        /home/johnh
-        /home/greg
-        # this is a simple database
-        #  | dbrow _fullname =~ /John/
-        #  | dbcol homedir</code></pre>
+<pre><code>#fsdb homedir
+/home/johnh
+/home/greg
+# this is a simple database
+#  | dbrow _fullname =~ /John/
+#  | dbcol homedir</code></pre>
 
 <p>(Notice that comments are appended to the output listing each command, providing an automatic audit log.)</p>
 
@@ -363,14 +377,14 @@
 
 <p>The real power of Fsdb is that one can apply arbitrary code to rows to do powerful things.</p>
 
-<pre><code>        cat DATA/passwd | dbroweval &#39;_fullname =~ s/(\w+)_(\w+)/$2,_$1/&#39;</code></pre>
+<pre><code>cat DATA/passwd | dbroweval &#39;_fullname =~ s/(\w+)_(\w+)/$2,_$1/&#39;</code></pre>
 
 <p>converts &quot;John_Heidemann&quot; into &quot;Heidemann,_John&quot;. Not too much more work could split fullname into firstname and lastname fields.</p>
 
 <p>(Or:</p>
 
-<pre><code>        cat DATA/passwd | dbcolcreate sort | dbroweval -b &#39;use Fsdb::Support&#39;
-                &#39;_sort = _fullname; _sort =~ s/_/ /g; _sort = fullname_to_sort(_sort);&#39;</code></pre>
+<pre><code>cat DATA/passwd | dbcolcreate sort | dbroweval -b &#39;use Fsdb::Support&#39;
+        &#39;_sort = _fullname; _sort =~ s/_/ /g; _sort = fullname_to_sort(_sort);&#39;</code></pre>
 
 <h1 id="TALKING-ABOUT-COLUMNS">TALKING ABOUT COLUMNS</h1>
 
@@ -790,57 +804,95 @@
 
 <p>Most programs run in constant memory and use temporary files if necessary. Exceptions are <a>dbcolneaten</a>, <a>dbcolpercentile</a>, <a>dbmapreduce</a>, <a>dbmultistats</a>, <a>dbrowsplituniq</a>.</p>
 
+<h2 id="STANDARD-SORTING-OPTIONS">STANDARD SORTING OPTIONS</h2>
+
+<p>A number of programs do sorting, or depend on defining an ordering of rows. Such programs use these standard sorting options:</p>
+
+<dl>
+
+<dt id="r-or---descending"><b>-r</b> or <b>--descending</b></dt>
+<dd>
+
+<p>sort in reverse order (high to low)</p>
+
+</dd>
+<dt id="R-or---ascending"><b>-R</b> or <b>--ascending</b></dt>
+<dd>
+
+<p>sort in normal order (low to high)</p>
+
+</dd>
+<dt id="t-or---type-inferred-sorting"><b>-t</b> or <b>--type-inferred-sorting</b></dt>
+<dd>
+
+<p>sort fields by type (numeric or leicographic), automatically</p>
+
+</dd>
+<dt id="n-or---numeric"><b>-n</b> or <b>--numeric</b></dt>
+<dd>
+
+<p>sort numerically</p>
+
+</dd>
+<dt id="N-or---lexical"><b>-N</b> or <b>--lexical</b></dt>
+<dd>
+
+<p>sort lexicographically</p>
+
+</dd>
+</dl>
+
 <h1 id="ANOTHER-EXAMPLE">ANOTHER EXAMPLE</h1>
 
 <p>Take the raw data in <code>DATA/http_bandwidth</code>, put a header on it (<code>dbcoldefine size bw</code>), took statistics of each category (<code>dbmultistats -k size bw</code>), pick out the relevant fields (<code>dbcol size mean stddev pct_rsd</code>), and you get:</p>
 
-<pre><code>        #fsdb size mean stddev pct_rsd
-        1024    1.4962e+06      2.8497e+05      19.047
-        10240   5.0286e+06      6.0103e+05      11.952
-        102400  4.9216e+06      3.0939e+05      6.2863
-        #  | dbcoldefine size bw
-        #  | /home/johnh/BIN/DB/dbmultistats -k size bw
-        #  | /home/johnh/BIN/DB/dbcol size mean stddev pct_rsd</code></pre>
+<pre><code>#fsdb size mean stddev pct_rsd
+1024    1.4962e+06      2.8497e+05      19.047
+10240   5.0286e+06      6.0103e+05      11.952
+102400  4.9216e+06      3.0939e+05      6.2863
+#  | dbcoldefine size bw
+#  | /home/johnh/BIN/DB/dbmultistats -k size bw
+#  | /home/johnh/BIN/DB/dbcol size mean stddev pct_rsd</code></pre>
 
 <p>(The whole command was:</p>
 
-<pre><code>        cat DATA/http_bandwidth |
-        dbcoldefine size |
-        dbmultistats -k size bw |
-        dbcol size mean stddev pct_rsd</code></pre>
+<pre><code>cat DATA/http_bandwidth |
+dbcoldefine size |
+dbmultistats -k size bw |
+dbcol size mean stddev pct_rsd</code></pre>
 
 <p>all on one line.)</p>
 
 <p>Then post-process them to get rid of the exponential notation by adding this to the end of the pipeline:</p>
 
-<pre><code>    dbroweval &#39;_mean = sprintf(&quot;%8.0f&quot;, _mean); _stddev = sprintf(&quot;%8.0f&quot;, _stddev);&#39;</code></pre>
+<pre><code>dbroweval &#39;_mean = sprintf(&quot;%8.0f&quot;, _mean); _stddev = sprintf(&quot;%8.0f&quot;, _stddev);&#39;</code></pre>
 
 <p>(Actually, this step is no longer required since <a>dbcolstats</a> now uses a different default format.)</p>
 
 <p>giving:</p>
 
-<pre><code>        #fsdb      size    mean    stddev  pct_rsd
-        1024     1496200          284970        19.047
-        10240    5028600          601030        11.952
-        102400   4921600          309390        6.2863
-        #  | dbcoldefine size bw
-        #  | dbmultistats -k size bw
-        #  | dbcol size mean stddev pct_rsd
-        #  | dbroweval   { _mean = sprintf(&quot;%8.0f&quot;, _mean); _stddev = sprintf(&quot;%8.0f&quot;, _stddev); }</code></pre>
+<pre><code>#fsdb      size    mean    stddev  pct_rsd
+1024     1496200          284970        19.047
+10240    5028600          601030        11.952
+102400   4921600          309390        6.2863
+#  | dbcoldefine size bw
+#  | dbmultistats -k size bw
+#  | dbcol size mean stddev pct_rsd
+#  | dbroweval   { _mean = sprintf(&quot;%8.0f&quot;, _mean); _stddev = sprintf(&quot;%8.0f&quot;, _stddev); }</code></pre>
 
 <p>In a few lines, raw data is transformed to processed output.</p>
 
 <p>Suppose you expect there is an odd distribution of results of one datapoint. Fsdb can easily produce a CDF (cumulative distribution function) of the data, suitable for graphing:</p>
 
-<pre><code>    cat DB/DATA/http_bandwidth | \
-        dbcoldefine size bw | \
-        dbrow &#39;_size == 102400&#39; | \
-        dbcol bw | \
-        dbsort -n bw | \
-        dbrowenumerate | \
-        dbcolpercentile count | \
-        dbcol bw percentile | \
-        xgraph</code></pre>
+<pre><code>cat DB/DATA/http_bandwidth | \
+    dbcoldefine size bw | \
+    dbrow &#39;_size == 102400&#39; | \
+    dbcol bw | \
+    dbsort -n bw | \
+    dbrowenumerate | \
+    dbcolpercentile count | \
+    dbcol bw percentile | \
+    xgraph</code></pre>
 
 <p>The steps, roughly: 1. get the raw input data and turn it into fsdb format, 2. pick out just the relevant column (for efficiency) and sort it, 3. for each data point, assign a CDF percentage to it, 4. pick out the two columns to graph and show them</p>
 
@@ -850,95 +902,95 @@
 
 <p>Format your data like DATA/grades.</p>
 
-<pre><code>        #fsdb name email id test1
-        a a@ucla.example.edu 1 80
-        b b@usc.example.edu 2 70
-        c c@isi.example.edu 3 65
-        d d@lmu.example.edu 4 90
-        e e@caltech.example.edu 5 70
-        f f@oxy.example.edu 6 90</code></pre>
+<pre><code>#fsdb name email id test1
+a a@ucla.example.edu 1 80
+b b@usc.example.edu 2 70
+c c@isi.example.edu 3 65
+d d@lmu.example.edu 4 90
+e e@caltech.example.edu 5 70
+f f@oxy.example.edu 6 90</code></pre>
 
 <p>Or if your students have spaces in their names, use <code>-F S</code> and two spaces to separate each column:</p>
 
-<pre><code>        #fsdb -F S name email id test1
-        alfred aho  a@ucla.example.edu  1  80
-        butler lampson  b@usc.example.edu  2  70
-        david clark  c@isi.example.edu  3  65
-        constantine drovolis  d@lmu.example.edu  4  90
-        debrorah estrin  e@caltech.example.edu  5  70
-        sally floyd  f@oxy.example.edu  6  90</code></pre>
+<pre><code>#fsdb -F S name email id test1
+alfred aho  a@ucla.example.edu  1  80
+butler lampson  b@usc.example.edu  2  70
+david clark  c@isi.example.edu  3  65
+constantine drovolis  d@lmu.example.edu  4  90
+debrorah estrin  e@caltech.example.edu  5  70
+sally floyd  f@oxy.example.edu  6  90</code></pre>
 
 <p>To compute statistics on an exam, do</p>
 
-<pre><code>        cat DATA/grades | dbstats test1 |dblistize</code></pre>
+<pre><code>cat DATA/grades | dbstats test1 |dblistize</code></pre>
 
 <p>giving</p>
 
-<pre><code>        #fsdb -R C  ...
-        mean:        77.5
-        stddev:      10.84
-        pct_rsd:     13.987
-        conf_range:  11.377
-        conf_low:    66.123
-        conf_high:   88.877
-        conf_pct:    0.95
-        sum:         465
-        sum_squared: 36625
-        min:         65
-        max:         90
-        n:           6
-        ...</code></pre>
+<pre><code>#fsdb -R C  ...
+mean:        77.5
+stddev:      10.84
+pct_rsd:     13.987
+conf_range:  11.377
+conf_low:    66.123
+conf_high:   88.877
+conf_pct:    0.95
+sum:         465
+sum_squared: 36625
+min:         65
+max:         90
+n:           6
+...</code></pre>
 
 <p>To do a histogram:</p>
 
-<pre><code>        cat DATA/grades | dbcolhisto -n 5 -g test1</code></pre>
+<pre><code>cat DATA/grades | dbcolhisto -n 5 -g test1</code></pre>
 
 <p>giving</p>
 
-<pre><code>        #fsdb low histogram
-        65      *
-        70      **
-        75
-        80      *
-        85
-        90      **
-        #  | /home/johnh/BIN/DB/dbhistogram -n 5 -g test1</code></pre>
+<pre><code>#fsdb low histogram
+65      *
+70      **
+75
+80      *
+85
+90      **
+#  | /home/johnh/BIN/DB/dbhistogram -n 5 -g test1</code></pre>
 
 <p>Now you want to send out grades to the students by e-mail. Create a form-letter (in the file <i>test1.txt</i>):</p>
 
-<pre><code>        To: _email (_name)
-        From: J. Random Professor &lt;jrp@usc.example.edu&gt;
-        Subject: test1 scores
+<pre><code>To: _email (_name)
+From: J. Random Professor &lt;jrp@usc.example.edu&gt;
+Subject: test1 scores
 
-        _name, your score on test1 was _test1.
-        86+   A
-        75-85 B
-        70-74 C
-        0-69  F</code></pre>
+_name, your score on test1 was _test1.
+86+   A
+75-85 B
+70-74 C
+0-69  F</code></pre>
 
 <p>Generate the shell script that will send the mail out:</p>
 
-<pre><code>        cat DATA/grades | dbformmail test1.txt &gt; test1.sh</code></pre>
+<pre><code>cat DATA/grades | dbformmail test1.txt &gt; test1.sh</code></pre>
 
 <p>And run it:</p>
 
-<pre><code>        sh &lt;test1.sh</code></pre>
+<pre><code>sh &lt;test1.sh</code></pre>
 
 <p>The last two steps can be combined:</p>
 
-<pre><code>        cat DATA/grades | dbformmail test1.txt | sh</code></pre>
+<pre><code>cat DATA/grades | dbformmail test1.txt | sh</code></pre>
 
 <p>but I like to keep a copy of exactly what I send.</p>
 
 <p>At the end of the semester you&#39;ll want to compute grade totals and assign letter grades. Both fall out of dbroweval. For example, to compute weighted total grades with a 40% midterm/60% final where the midterm is 84 possible points and the final 100:</p>
 
-<pre><code>        dbcol -rv total |
-        dbcolcreate total - |
-        dbroweval &#39;
-                _total = .40 * _midterm/84.0 + .60 * _final/100.0;
-                _total = sprintf(&quot;%4.2f&quot;, _total);
-                if (_final eq &quot;-&quot; || ( _name =~ /^_/)) { _total = &quot;-&quot;; };&#39; | 
-        dbcolneaten  </code></pre>
+<pre><code>dbcol -rv total |
+dbcolcreate total - |
+dbroweval &#39;
+        _total = .40 * _midterm/84.0 + .60 * _final/100.0;
+        _total = sprintf(&quot;%4.2f&quot;, _total);
+        if (_final eq &quot;-&quot; || ( _name =~ /^_/)) { _total = &quot;-&quot;; };&#39; | 
+dbcolneaten  </code></pre>
 
 <p>If you got the data originally from a spreadsheet, save it in &quot;tab-delimited&quot; format and convert it with tabdelim_to_db (run tabdelim_to_db -? for examples).</p>
 
@@ -946,62 +998,62 @@
 
 <p>To convert the Unix password file to db:</p>
 
-<pre><code>        cat /etc/passwd | sed &#39;s/:/  /g&#39;| \
-                dbcoldefine -F S login password uid gid gecos home shell \
-                &gt;passwd.fsdb</code></pre>
+<pre><code>cat /etc/passwd | sed &#39;s/:/  /g&#39;| \
+        dbcoldefine -F S login password uid gid gecos home shell \
+        &gt;passwd.fsdb</code></pre>
 
 <p>To convert the group file</p>
 
-<pre><code>        cat /etc/group | sed &#39;s/:/  /g&#39; | \
-                dbcoldefine -F S group password gid members \
-                &gt;group.fsdb</code></pre>
+<pre><code>cat /etc/group | sed &#39;s/:/  /g&#39; | \
+        dbcoldefine -F S group password gid members \
+        &gt;group.fsdb</code></pre>
 
 <p>To show the names of the groups that div7-members are in (assuming DIV7 is in the gecos field):</p>
 
-<pre><code>        cat passwd.fsdb | dbrow &#39;_gecos =~ /DIV7/&#39; | dbcol login gid | \
-                dbjoin -i - -i group.fsdb gid | dbcol login group</code></pre>
+<pre><code>cat passwd.fsdb | dbrow &#39;_gecos =~ /DIV7/&#39; | dbcol login gid | \
+        dbjoin -i - -i group.fsdb gid | dbcol login group</code></pre>
 
 <h1 id="SHORT-EXAMPLES">SHORT EXAMPLES</h1>
 
 <p>Which Fsdb programs are the most complicated (based on number of test cases)?</p>
 
-<pre><code>        ls TEST/*.cmd | \
-                dbcoldefine test | \
-                dbroweval &#39;_test =~ s@^TEST/([^_]+).*$@$1@&#39; | \
-                dbrowuniq -c | \
-                dbsort -nr count | \
-                dbcolneaten</code></pre>
+<pre><code>ls TEST/*.cmd | \
+        dbcoldefine test | \
+        dbroweval &#39;_test =~ s@^TEST/([^_]+).*$@$1@&#39; | \
+        dbrowuniq -c | \
+        dbsort -nr count | \
+        dbcolneaten</code></pre>
 
 <p>(Answer: <a>dbmapreduce</a>, then <a>dbcolstats</a>, <a>dbfilealter</a> and <a>dbjoin</a>.)</p>
 
 <p>Stats on an exam (in <code>$FILE</code>, where <code>$COLUMN</code> is the name of the exam)?</p>
 
-<pre><code>        cat $FILE | dbcolstats -q 4 $COLUMN &lt;$FILE | dblistize | dbstripcomments
+<pre><code>cat $FILE | dbcolstats -q 4 $COLUMN &lt;$FILE | dblistize | dbstripcomments
 
-        cat $FILE | dbcolhisto -g -n 20 $COLUMN | dbcolneaten | dbstripcomments</code></pre>
+cat $FILE | dbcolhisto -g -n 20 $COLUMN | dbcolneaten | dbstripcomments</code></pre>
 
 <p>Merging a the hw1 column from file hw1.fsdb into grades.fsdb assuming there&#39;s a common student id in column &quot;id&quot;:</p>
 
-<pre><code>        dbcol id hw1 &lt;hw1.fsdb &gt;t.fsdb
+<pre><code>dbcol id hw1 &lt;hw1.fsdb &gt;t.fsdb
 
-        dbjoin -a -e - grades.fsdb t.fsdb id | \
-            dbsort  name | \
-            dbcolneaten &gt;new_grades.fsdb</code></pre>
+dbjoin -a -e - grades.fsdb t.fsdb id | \
+    dbsort  name | \
+    dbcolneaten &gt;new_grades.fsdb</code></pre>
 
 <p>Merging two fsdb files with the same rows:</p>
 
-<pre><code>        cat file1.fsdb file2.fsdb &gt;output.fsdb</code></pre>
+<pre><code>cat file1.fsdb file2.fsdb &gt;output.fsdb</code></pre>
 
 <p>or if you want to clean things up a bit</p>
 
-<pre><code>        cat file1.fsdb file2.fsdb | dbstripextraheaders &gt;output.fsdb</code></pre>
+<pre><code>cat file1.fsdb file2.fsdb | dbstripextraheaders &gt;output.fsdb</code></pre>
 
 <p>or if you want to know where the data came from</p>
 
-<pre><code>        for i in 1 2
-        do
-                dbcolcreate source $i &lt; file$i.fsdb
-        done &gt;output.fsdb</code></pre>
+<pre><code>for i in 1 2
+do
+        dbcolcreate source $i &lt; file$i.fsdb
+done &gt;output.fsdb</code></pre>
 
 <p>(assumes you&#39;re using a Bourne-shell compatible shell, not csh).</p>
 
@@ -1548,11 +1600,11 @@
 
 <p>It also provides perl function aliases for the internal modules, so a string of fsdb commands in perl are nearly as terse as in the shell:</p>
 
-<pre><code>    use Fsdb::Filter::dbpipeline qw(:all);
-    dbpipeline(
-        dbrow(qw(name test1)),
-        dbroweval(&#39;_test1 += 5;&#39;)
-    );</code></pre>
+<pre><code>use Fsdb::Filter::dbpipeline qw(:all);
+dbpipeline(
+    dbrow(qw(name test1)),
+    dbroweval(&#39;_test1 += 5;&#39;)
+);</code></pre>
 
 </dd>
 <dt id="INCOMPATIBLE-CHANGE:-The-old-dbcolstats-has-been-renamed-dbcolstatscores.-The-new-dbcolstats-does-the-same-thing-as-the-old-dbstats.-This-incompatibility-is-unfortunate-but-normalizes-program-names">INCOMPATIBLE CHANGE: The old <a>dbcolstats</a> has been renamed <a>dbcolstatscores</a>. The new <a>dbcolstats</a> does the same thing as the old <a>dbstats</a>. This incompatibility is unfortunate but normalizes program names.</dt>
@@ -1643,7 +1695,7 @@
 
 <dl>
 
-<dt id="ENHANCEMENT2">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT4">ENHANCEMENT</dt>
 <dd>
 
 <p>shifting more old programs to Perl modules. New in 2.2: <a>dbrowaccumulate</a>, <a>dbformmail</a>. <a>dbcolmovingstats</a>. <a>dbrowuniq</a>. <a>dbrowdiff</a>. <a>dbcolmerge</a>. <a>dbcolsplittocols</a>. <a>dbcolsplittorows</a>. <a>dbmapreduce</a>. <a>dbmultistats</a>. <a>dbrvstatdiff</a>. Also <a>dbrowenumerate</a> exists only as a front-end (command-line) program.</p>
@@ -1737,13 +1789,13 @@
 
 <dl>
 
-<dt id="ENHANCEMENT3">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT5">ENHANCEMENT</dt>
 <dd>
 
 <p><a>dbrow</a> now defaults to running user supplied code without warnings (as with fsdb-1.x). Use <code>--warnings</code> or <code>-w</code> to turn them back on.</p>
 
 </dd>
-<dt id="ENHANCEMENT4">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT6">ENHANCEMENT</dt>
 <dd>
 
 <p><a>dbroweval</a> can now write different format output than the input, using the <code>-m</code> option.</p>
@@ -1773,7 +1825,7 @@
 
 <dl>
 
-<dt id="ENHANCEMENT5">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT7">ENHANCEMENT</dt>
 <dd>
 
 <p><a>dbmapreduce</a> can now tolerate non-map-aware reducers that pass back the key column in put. It also passes the current key as the last argument to external reducers.</p>
@@ -1793,7 +1845,7 @@
 
 <dl>
 
-<dt id="ENHANCEMENT6">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT8">ENHANCEMENT</dt>
 <dd>
 
 <p>shifting more old programs to Perl modules. New in 2.2: <a>dbcolpercentile</a>.</p>
@@ -1827,11 +1879,11 @@
 
 <p>The beta release of fsdb-2.x. Finally, all programs are ported. As statistics, the number of lines of non-library code doubled from 7.5k to 15.5k. The libraries are much more complete, going from 866 to 5164 lines. The overall number of programs is about the same, although 19 were dropped and 11 were added. The number of test cases has grown from 116 to 175. All programs are now in perl-5, no more shell scripts or perl-4. All programs now have manual pages.</p>
 
-<p>Although this is a major step forward, I still expect to rename &quot;fsdb&quot; to &quot;fsdb&quot;.</p>
+<p>Although this is a major step forward, I still expect to rename &quot;jdb&quot; to &quot;fsdb&quot;.</p>
 
 <dl>
 
-<dt id="ENHANCEMENT7">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT9">ENHANCEMENT</dt>
 <dd>
 
 <p>shifting more old programs to Perl modules. New in 2.7: <a>dbcolscorellate</a>. <a>dbcolsregression</a>. <a>cgi_to_db</a>. <a>dbfilevalidate</a>. <a>db_to_csv</a>. <a>csv_to_db</a>, <a>db_to_html_table</a>, <a>kitrace_to_db</a>, <a>tcpdump_to_db</a>, <a>tabdelim_to_db</a>, <a>ns_to_db</a>.</p>
@@ -1843,7 +1895,7 @@
 <p>The following programs have been dropped from fsdb-2.x: <a>db2dcliff</a>, <a>dbcolmultiscale</a>, <a>crl_to_db</a>. <a>ipchain_logs_to_db</a>. They may come back, but seemed overly specialized. The following program <a>dbrowsplituniq</a> was dropped because it is superseded by <a>dbmapreduce</a>. <a>dmalloc_to_db</a> was dropped pending a test cases and examples.</p>
 
 </dd>
-<dt id="ENHANCEMENT8">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT10">ENHANCEMENT</dt>
 <dd>
 
 <p><a>dbfilevalidate</a> now has a <code>-c</code> option to correct errors.</p>
@@ -1889,7 +1941,7 @@
 
 <dl>
 
-<dt id="ENHANCEMENT9">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT11">ENHANCEMENT</dt>
 <dd>
 
 <p><a>dbmapreduce</a> now generates plausible output when given no rows of input.</p>
@@ -1903,13 +1955,13 @@
 
 <dl>
 
-<dt id="ENHANCEMENT10">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT12">ENHANCEMENT</dt>
 <dd>
 
 <p><a>dbmapreduce</a> now generates plausible output when given no rows of input.</p>
 
 </dd>
-<dt id="ENHANCEMENT11">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT13">ENHANCEMENT</dt>
 <dd>
 
 <p><a>dbroweval</a> the warnings option was backwards; now corrected. As a result, warnings in user code now default off (like in fsdb-1.x).</p>
@@ -1935,13 +1987,13 @@
 
 <dl>
 
-<dt id="ENHANCEMENT12">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT14">ENHANCEMENT</dt>
 <dd>
 
 <p><a>html_table_to_db</a> is now more aggressive about filling in empty cells with the official empty value, rather than leaving them blank or as whitespace.</p>
 
 </dd>
-<dt id="ENHANCEMENT13">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT15">ENHANCEMENT</dt>
 <dd>
 
 <p><a>dbpipeline</a> now catches failures during pipeline element setup and exits reasonably gracefully.</p>
@@ -2003,7 +2055,7 @@
 <p>Improved documentation for <a>dbmapreduce</a>&#39;s <code>-f</code> option.</p>
 
 </dd>
-<dt id="ENHANCEMENT14">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT16">ENHANCEMENT</dt>
 <dd>
 
 <p><a>dbcolmovingstats</a> how computes a moving standard deviation in addition to a moving mean.</p>
@@ -2236,7 +2288,7 @@
 
 <p><i>dbmapreduce</i> was failing on MacOS-10.6.3 for some tests with the error</p>
 
-<pre><code>    dbmapreduce: cannot run external dbmapreduce reduce program (perl TEST/dbmapreduce_external_with_key.pl)</code></pre>
+<pre><code>dbmapreduce: cannot run external dbmapreduce reduce program (perl TEST/dbmapreduce_external_with_key.pl)</code></pre>
 
 <p>The problem seemed to be only in the error, not in operation. On MacOS, the error is now suppressed. Thanks to Alefiya Hussain for providing access to a Mac system that allowed debugging of this problem.</p>
 
@@ -2603,13 +2655,13 @@
 <p>Actually in 2.38, the Fedora <i>.spec</i> got cleaner dependencies. Suggestion from Christopher Meng via <a href="https://bugzilla.redhat.com/show_bug.cgi?id=877096">https://bugzilla.redhat.com/show_bug.cgi?id=877096</a>.</p>
 
 </dd>
-<dt id="ENHANCEMENT15">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT17">ENHANCEMENT</dt>
 <dd>
 
 <p>Fsdb files are now explicitly set into UTF-8 encoding, unless one specifies <code>-encoding</code> to <code>Fsdb::IO</code>.</p>
 
 </dd>
-<dt id="ENHANCEMENT16">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT18">ENHANCEMENT</dt>
 <dd>
 
 <p><a>dbrowuniq</a> now supports <code>-I</code> for incremental counting.</p>
@@ -2645,7 +2697,7 @@
 
 <dl>
 
-<dt id="ENHANCEMENT17">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT19">ENHANCEMENT</dt>
 <dd>
 
 <p>Documentation to <a>dbrvstatdiff</a> improved (inspired by questions from Qian Kun).</p>
@@ -2663,13 +2715,13 @@
 <p>Add missing <code>XML::Simple</code> dependency to <i>Makefile.PL</i>.</p>
 
 </dd>
-<dt id="ENHANCEMENT18">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT20">ENHANCEMENT</dt>
 <dd>
 
 <p>Tests now show the diff of the failing output if run with <code>make test TEST_VERBOSE=1</code>.</p>
 
 </dd>
-<dt id="ENHANCEMENT19">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT21">ENHANCEMENT</dt>
 <dd>
 
 <p><a>dbroweval</a> now includes documentation for how to output extra rows. Suggestion from Yuri Pradkin.</p>
@@ -2687,7 +2739,7 @@
 
 <dl>
 
-<dt id="ENHANCEMENT20">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT22">ENHANCEMENT</dt>
 <dd>
 
 <p>Documentation to <a>dbjoin</a> improved to better memory usage. (Based on problem report by Lin Quan.)</p>
@@ -2729,7 +2781,7 @@
 <p>Yet more parallelism in <a>dbmerge</a>: new &quot;endgame-mode&quot; builds a merge tree of processes at the end of large merge tasks to get maximally parallelism. Currently this feature is off by default because it can hang for some inputs. Enable this experimental feature with <code>--endgame</code>.</p>
 
 </dd>
-<dt id="ENHANCEMENT21">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT23">ENHANCEMENT</dt>
 <dd>
 
 <p><code>Fsdb::IO</code> now handles being given <code>IO::Pipe</code> objects (as exercised by <a>dbmerge</a>).</p>
@@ -2747,7 +2799,7 @@
 <p>Fsdb now requires perl 5.10. This is a bug fix because some test cases used to require it, but this fact was not properly documented. (Back-porting to 5.008 would require removing all <code>//</code> operators.)</p>
 
 </dd>
-<dt id="ENHANCEMENT22">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT24">ENHANCEMENT</dt>
 <dd>
 
 <p>Fsdb now handles automatic compression of file contents. Enable compression with <code>dbfilealter -Z xz</code> (or <code>gz</code> or <code>bz2</code>). All programs should operate on compressed files and leave the output with the same level of compression. <code>xz</code> is recommended as fastest and most efficient. <code>gz</code> is produces unrepeatable output (and so has no output test), it seems to insist on adding a timestamp.</p>
@@ -2759,7 +2811,7 @@
 
 <dl>
 
-<dt id="ENHANCEMENT23">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT25">ENHANCEMENT</dt>
 <dd>
 
 <p>Fsdb is now thread free and only uses processes for parallelism. This change is a big change--the entire motivation for Fsdb-2 was to exploit parallelism via threading. Parallelism--good, but perl threading--bad for performance. Horribly bad for performance. About 20x worse than pipes on my box. (See perl bug #119445 for the discussion.)</p>
@@ -2771,7 +2823,7 @@
 <p><code>Fsdb::Support::Freds</code> provides a thread-like abstraction over forking, with some nice support for callbacks in the parent upon child termination.</p>
 
 </dd>
-<dt id="ENHANCEMENT24">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT26">ENHANCEMENT</dt>
 <dd>
 
 <p>Details about removing threads: <code>dbpipeline</code> is thread free, and new tests to verify each of its parts. The easy cases are <code>dbcolpercentile</code>, <code>dbcolstats</code>, <code>dbfilepivot</code>, <code>dbjoin</code>, and <code>dbcolstatscores</code>, each of which use it in simple ways (2013-09-09). <code>dbmerge</code> is now thread free (2013-09-13), but was a significant rewrite, which brought <code>dbsort</code> along. <code>dbmapreduce</code> is partly thread free (2013-09-21), again as a rewrite, and it brings <code>dbmultistats</code> along. Full <code>dbmapreduce</code> support took much longer (2013-10-02).</p>
@@ -2795,7 +2847,7 @@
 <p><a>dbfilecat</a> will concatenate two files, verifying that they have the same schema.</p>
 
 </dd>
-<dt id="ENHANCEMENT25">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT27">ENHANCEMENT</dt>
 <dd>
 
 <p><a>dbmapreduce</a> now passes comments through, rather than eating them as before.</p>
@@ -2827,7 +2879,7 @@
 <p>Corrected a fast busy-wait in <a>dbmerge</a>.</p>
 
 </dd>
-<dt id="ENHANCEMENT26">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT28">ENHANCEMENT</dt>
 <dd>
 
 <p>Endgame mode enabled in <a>dbmerge</a>; it (and also large cases of <a>dbsort</a>) should now exploit greater parallelism.</p>
@@ -2877,7 +2929,7 @@
 <p>Better handling of Fred cleanup; should fix intermittent <a>dbmapreduce</a> failures on BSD.</p>
 
 </dd>
-<dt id="ENHANCEMENT27">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT29">ENHANCEMENT</dt>
 <dd>
 
 <p>Improved test framework to show output when tests fail. (This time, for real.)</p>
@@ -2889,19 +2941,19 @@
 
 <dl>
 
-<dt id="ENHANCEMENT28">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT30">ENHANCEMENT</dt>
 <dd>
 
 <p>Test suites now skip tests for libraries that are missing. (Patch for missing <code>IO::Compresss:Xz</code> contributed by Calvin Ardi.)</p>
 
 </dd>
-<dt id="ENHANCEMENT29">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT31">ENHANCEMENT</dt>
 <dd>
 
-<p>Removed references to Jdb in the package specification. Since the name was changed in 2008, there&#39;s no longer a huge need for backwards comparability. (Suggestion form Petr &Scaron;abata.)</p>
+<p>Removed references to Jdb in the package specification. Since the name was changed in 2008, there&#39;s no longer a huge need for backwards compatibility. (Suggestion form Petr &Scaron;abata.)</p>
 
 </dd>
-<dt id="ENHANCEMENT30">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT32">ENHANCEMENT</dt>
 <dd>
 
 <p>Test suites now invoke the perl using the path from <code>$Config{perlpath}</code>. Hopefully this helps testing in environments where there are multiple installed perls and the default perl is not the same as the perl-under-test (as happens in cpantesters.org).</p>
@@ -2945,7 +2997,7 @@
 
 <dl>
 
-<dt id="ENHANCEMENT31">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT33">ENHANCEMENT</dt>
 <dd>
 
 <p>In <a>dbroweval</a>, the <code>-N</code> (no output, even comments) option now implies <code>-n</code>, and it now suppresses the header and trailer.</p>
@@ -2969,19 +3021,19 @@
 
 <dl>
 
-<dt id="ENHANCEMENT32">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT34">ENHANCEMENT</dt>
 <dd>
 
 <p><a>dbcolcreate</a> now has a <code>--no-recreate-fatal</code> that causes it to ignore creation of existing columns (instead of failing).</p>
 
 </dd>
-<dt id="ENHANCEMENT33">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT35">ENHANCEMENT</dt>
 <dd>
 
 <p><a>dbmapreduce</a> once again is robust to reducers that output the key; <code>--no-prepend-key</code> is no longer mandatory.</p>
 
 </dd>
-<dt id="ENHANCEMENT34">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT36">ENHANCEMENT</dt>
 <dd>
 
 <p><a>dbcolsplittorows</a> can now enumerate the output rows with <code>-E</code>.</p>
@@ -3011,7 +3063,7 @@
 
 <dl>
 
-<dt id="ENHANCEMENT35">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT37">ENHANCEMENT</dt>
 <dd>
 
 <p>Test suites changes to be robust to exact line numbers of failures, since different Perl releases fail on different lines. <a href="https://bugzilla.redhat.com/show_bug.cgi?id=1158380">https://bugzilla.redhat.com/show_bug.cgi?id=1158380</a></p>
@@ -3023,13 +3075,13 @@
 
 <dl>
 
-<dt id="ENHANCEMENT36">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT38">ENHANCEMENT</dt>
 <dd>
 
 <p>The <a>dbfilediff</a> how supports a <code>--quiet</code> option.</p>
 
 </dd>
-<dt id="ENHANCEMENT37">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT39">ENHANCEMENT</dt>
 <dd>
 
 <p>Better documention of <a>dbpipeline_filter</a>.</p>
@@ -3071,13 +3123,13 @@
 
 <dl>
 
-<dt id="ENHANCEMENT38">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT40">ENHANCEMENT</dt>
 <dd>
 
 <p><a>dbfilediff</a> now can be extra quiet, as I continue to try to track down a numeric difference on FreeBSD AMD boxes.</p>
 
 </dd>
-<dt id="ENHANCEMENT39">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT41">ENHANCEMENT</dt>
 <dd>
 
 <p><a>dbcolmovingstats</a> gave different test output (just reflecting rounding error) when stddev approaches zero. We now detect hand handle this case. See &lt;https://rt.cpan.org/Public/Bug/Display.html?id=101220&gt; and thanks to H. Merijn Brand for the bug report.</p>
@@ -3157,13 +3209,13 @@
 <p>More IO is explicitly marked UTF-8 to avoid Perl&#39;s tendency to mojibake on otherwise valid unicode input. This change helps <a>html_table_to_db</a>.</p>
 
 </dd>
-<dt id="ENHANCEMENT40">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT42">ENHANCEMENT</dt>
 <dd>
 
 <p><a>dbcolscorrelate</a> now crossreferences <a>dbcolsregression</a>.</p>
 
 </dd>
-<dt id="ENHANCEMENT41">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT43">ENHANCEMENT</dt>
 <dd>
 
 <p>Documentation for <a>dbrowdiff</a> now clarifies that the default is baseline mode.</p>
@@ -3181,7 +3233,7 @@
 
 <dl>
 
-<dt id="ENHANCEMENT42">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT44">ENHANCEMENT</dt>
 <dd>
 
 <p><a>dbjoin</a> now supports hash joins with <code>-t lefthash</code> and <code>-t righthash</code>. Hash joins cache a table in memory, but do not require that the other table be sorted. They are ideal when joining a large table against a small one.</p>
@@ -3193,13 +3245,13 @@
 
 <dl>
 
-<dt id="ENHANCEMENT43">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT45">ENHANCEMENT</dt>
 <dd>
 
 <p><a>dbjoin</a> now handles left and right outer joins with <code>-t left</code> and <code>-t right</code>.</p>
 
 </dd>
-<dt id="ENHANCEMENT44">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT46">ENHANCEMENT</dt>
 <dd>
 
 <p><a>dbjoin</a> hash joins are now selected with <code>-m lefthash</code> and <code>-m righthash</code> (not the shortlived <code>-t righthash</code> option). (Technically this change is incompatible with Fsdd-2.60, but no one but me ever used that version.)</p>
@@ -3211,7 +3263,7 @@
 
 <dl>
 
-<dt id="ENHANCEMENT45">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT47">ENHANCEMENT</dt>
 <dd>
 
 <p>Documentation for <a>xml_to_db</a> now includes sample output.</p>
@@ -3229,25 +3281,25 @@
 <p>The test suite now uses <code>diff -c -b</code> rather than <code>diff -cb</code> to make OpenBSD-5.9 happier, I hope.</p>
 
 </dd>
-<dt id="ENHANCEMENT46">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT48">ENHANCEMENT</dt>
 <dd>
 
 <p>Comments that log operations at the end of each file now do simple quoting of spaces. (It is not guaranteed to be fully shell-compliant.)</p>
 
 </dd>
-<dt id="ENHANCEMENT47">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT49">ENHANCEMENT</dt>
 <dd>
 
 <p>There is a new standard option, <code>--header</code>, allowing one to specify an Fsdb header for inputs that lack it. Currently it is supported by <a>dbcoldefine</a>, <a>dbrowuniq</a>, <a>dbmapreduce</a>, <a>dbmultistats</a>, <a>dbsort</a>, <a>dbpipeline</a>.</p>
 
 </dd>
-<dt id="ENHANCEMENT48">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT50">ENHANCEMENT</dt>
 <dd>
 
 <p><a>dbfilepivot</a> now allows the <b>--possible-pivots</b> option, and if it is provided processes the data in one pass.</p>
 
 </dd>
-<dt id="ENHANCEMENT49">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT51">ENHANCEMENT</dt>
 <dd>
 
 <p><a>dbroweval</a> logs are now quoted.</p>
@@ -3259,13 +3311,13 @@
 
 <dl>
 
-<dt id="ENHANCEMENT50">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT52">ENHANCEMENT</dt>
 <dd>
 
 <p>The option <b>-j</b> is now a synonym for <b>--parallelism</b>. (And several documention bugs about this option are fixed.)</p>
 
 </dd>
-<dt id="ENHANCEMENT51">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT53">ENHANCEMENT</dt>
 <dd>
 
 <p>Additional support for <code>--header</code> in <a>dbcolmerge</a>, <a>dbcol</a>, <a>dbrow</a>, and <a>dbroweval</a>.</p>
@@ -3295,13 +3347,13 @@
 <p>In <a>dbroweval</a>, the <code>next row</code> option previously did not correctly set up <code>_last_fieldname</code>. It now does.</p>
 
 </dd>
-<dt id="ENHANCEMENT52">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT54">ENHANCEMENT</dt>
 <dd>
 
 <p>The <a>csv_to_db</a> converter now has an optional <code>-F x</code> option to set the field separator.</p>
 
 </dd>
-<dt id="ENHANCEMENT53">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT55">ENHANCEMENT</dt>
 <dd>
 
 <p>Finally <a>dbcolsplittocols</a> has a <code>--header</code> option, and a new <code>-N</code> option to give the list of resulting output columns.</p>
@@ -3319,7 +3371,7 @@
 
 <dl>
 
-<dt id="ENHANCEMENT54">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT56">ENHANCEMENT</dt>
 <dd>
 
 <p><a>dbmultistats</a> and <a>dbmapreduce</a> now both take a <code>-F x</code> option to set the field separator.</p>
@@ -3433,7 +3485,7 @@
 <p>Filled in the the test case for autodecompress, which was missing for the 2.68 release.</p>
 
 </dd>
-<dt id="ENHANCEMENT55">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT57">ENHANCEMENT</dt>
 <dd>
 
 <p>The groff program is required for build, and the <code>Makefile.PL</code> fails if groff is missing at build time. Thanks to Chris Williams for suggesting this check, and the CPAN auto-building system for trying many platforms.</p>
@@ -3451,13 +3503,13 @@
 
 <dl>
 
-<dt id="ENHANCEMENT56">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT58">ENHANCEMENT</dt>
 <dd>
 
 <p><a>dbcol</a> can now take an option <code>-a</code> to include all columns, allowing reordering of certain columns while passing the rest through.</p>
 
 </dd>
-<dt id="ENHANCEMENT57">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT59">ENHANCEMENT</dt>
 <dd>
 
 <p><a>dbrowuniq</a> and <a>dbmerge</a> now buffer comments in a way that the last row of data output is no longer in the last block of comments. (The data is identical, but for humans looking at output, this change makes it less likely to lose the last row.)</p>
@@ -3469,7 +3521,7 @@
 <p><a>dbmultistats</a> and <a>dbpipeline</a> documentation now indicates that they support <code>--header</code> (something they did since version 2.62 in 2016-11-29, but now documented.</p>
 
 </dd>
-<dt id="ENHANCEMENT58">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT60">ENHANCEMENT</dt>
 <dd>
 
 <p><a>dbcolcreate</a> now supports <code>--header</code>.</p>
@@ -3511,10 +3563,40 @@
 <p><a>dbcolhisto</a> now handles the degenerate case where everything has the same value (previously it would throw &quot;illegal division by zero&quot;).</p>
 
 </dd>
-<dt id="ENHANCEMENT59">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT61">ENHANCEMENT</dt>
 <dd>
 
 <p>The spec for Fedora now includes <code>make</code> as BuildRequires, something required for Fedora 34.</p>
+
+</dd>
+</dl>
+
+<h2 id="Updates-dbcolpercentile-with---weighted-and-with-more-ipv6">2.73, 2021-05-18 Updates dbcolpercentile with <code>--weighted</code>, and with more ipv6.</h2>
+
+<dl>
+
+<dt id="ENHANCEMENT62">ENHANCEMENT</dt>
+<dd>
+
+<p><a>dbcolpercentile</a> now has a <code>--weighted</code> option.</p>
+
+</dd>
+<dt id="ENHANCEMENT63">ENHANCEMENT</dt>
+<dd>
+
+<p>The new <a>Fsdb::Support::IPv6</a> package includes ipv6_normalize, ipv6_zeroize to rewrite ipv6 print addresses in IPv6 normal form, with a 0 in each 4-nybble field.</p>
+
+</dd>
+</dl>
+
+<h2 id="More-ipv6">2.74, 2021-06-23 More ipv6.</h2>
+
+<dl>
+
+<dt id="ENHANCEMENT64">ENHANCEMENT</dt>
+<dd>
+
+<p><a>Fsdb::Support::IPv6</a> package includes ipv6_fullhex to rewrite ipv6 print addresses as full, 128-bit hex values.</p>
 
 </dd>
 </dl>
@@ -3527,7 +3609,7 @@
 
 <h1 id="COPYRIGHT">COPYRIGHT</h1>
 
-<p>Fsdb is Copyright (C) 1991-2020 by John Heidemann &lt;johnh@isi.edu&gt;.</p>
+<p>Fsdb is Copyright (C) 1991-2022 by John Heidemann &lt;johnh@isi.edu&gt;.</p>
 
 <p>This program is free software; you can redistribute it and/or modify it under the terms of version 2 of the GNU General Public License as published by the Free Software Foundation.</p>
 

@@ -1,5 +1,8 @@
 Revision history for SQL-Abstract-More
 
+1.37 02.04.2022
+  - support -having without -group_by, since some DBMS admit this syntax (Rouzier++)
+
 1.37 29.01.2021
   - avoid defined-or operator (//), not admitted in perl 5.8
 

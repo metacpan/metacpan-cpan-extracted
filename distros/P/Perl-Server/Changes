@@ -1,3 +1,6 @@
+0.06 2022-04-03T11:47:00Z
+    - Skip test if fail to open port.
+
 0.05 2022-04-01T13:41:00Z
     - Added some modules as dependencies. 
 

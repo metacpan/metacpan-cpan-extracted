@@ -7,7 +7,7 @@ use Sentry::Client;
 use Sentry::Hub;
 use Sentry::Logger 'logger';
 
-our $VERSION = version->declare('v1.0.20');
+our $VERSION = version->declare('v1.1.0');
 
 sub _call_on_hub ($method, @args) {
   my $hub = Sentry::Hub->get_current_hub();
@@ -122,6 +122,23 @@ By default the SDK will try to read this value from the C<SENTRY_ENVIRONMENT> en
 =head3 traces_sample_rate
 
 A number between 0 and 1, controlling the percentage chance a given transaction will be sent to Sentry. (0 represents 0% while 1 represents 100%.) Applies equally to all transactions created in the app. This must be defined to enable tracing.
+
+=head3 before_send
+
+  Sentry::SDK->init({
+    before_send => sub ($event) {
+      $event->tags->{foo} = 'bar';
+
+      # discard event
+      if (rand() < 0.5) {
+        return undef;
+      }
+
+      return $event;
+    };
+  });
+
+C<beforeSend> is called immediately before the event is sent to the server, so it’s the final place where you can edit its data. It receives the event object as a parameter, so you can use that to modify the event’s data or drop it completely (by returning C<undef>) based on custom logic and the data available on the event.
 
 =head3 integrations
 

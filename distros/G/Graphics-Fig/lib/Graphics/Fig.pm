@@ -15,7 +15,7 @@
 # program.  If not, see <http://www.perlfoundation.org/artistic_license_2_0>.
 #
 package Graphics::Fig;
-our $VERSION = 'v1.0.7';
+our $VERSION = 'v1.0.8';
 
 use strict;
 use warnings;
@@ -1025,7 +1025,7 @@ __END__
 
 =head1 NAME
 
-Graphics::Fig - xfig library
+Graphics::Fig - drawing library based on xfig
 
 =head1 SYNOPSYS
 
@@ -2616,7 +2616,7 @@ parameters.  These parameters provide defaults for subsequent functions.
 
 Set the area fill pattern (also see B<fillColor>).  Valid values are:
 "not-filled", "black", "shade1" .. "shade19", "tint1" .. "tint19",
-"full", "saturated", "white", "left-diagonal-30", "right-diagonal-30",
+"full" (in fill color), "white", "left-diagonal-30", "right-diagonal-30",
 "crosshatch-30", "left-diagonal-45", "right-diagonal-45", "crosshatch-45",
 "horizontal-bricks", "vertical-bricks", "horizontal-lines",
 "vertical-lines", "crosshatch", "horizontal-right-shingles",
@@ -2928,10 +2928,6 @@ the terms of the Artistic License version 2.0 or later.
 =head1 AUTHOR
 
 Scott Guthridge <scott_guthridge@rompromity.net>
-
-=head1 BUGS
-
-Bounding boxes around text are only an approxmation.
 
 =head1 SEE ALSO
 

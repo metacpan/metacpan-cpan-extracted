@@ -33,7 +33,7 @@ requires:
 resources:
   homepage: https://github.com/ology/Music-Intervals
   repository: https://github.com/ology/Music-Intervals.git
-version: '0.0904'
+version: '0.0905'
 x_Dist_Zilla:
   perl:
     version: '5.032001'

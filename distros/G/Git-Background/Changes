@@ -1,5 +1,11 @@
 Revision history for Git-Background
 
+0.005  2022-04-03 16:05:30 UTC
+
+  - Use Git::Background::Future->fail instead of Future->fail when
+    Proc::Background fails. Otherwise mthods like stdout() wouldn't be
+    available on these errors but on others, which would be confusing.
+
 0.004  2022-01-08 21:19:34 UTC
 
   - run() throws an error if it is run in void context

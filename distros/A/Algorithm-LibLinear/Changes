@@ -1,5 +1,8 @@
 Revision history for Perl extension Algorithm::LibLinear
 
+0.24    Mon 4 Apr 2022
+        - Bundle LIBLINEAR 2.44.
+
 0.23    Wed 18 Nov 2020
         - Bundle LIBLINEAR 2.42, featuring automatic switching from dual CD
           solver to primal Newton solver when convergence is slow.

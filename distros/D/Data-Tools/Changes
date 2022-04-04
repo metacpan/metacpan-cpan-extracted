@@ -1,5 +1,10 @@
 Revision history for Perl extension Data::Tools
 
+1.28 2022-04-04
+
+    - CSV parse code fixed to handle trailing fields with wrong count of "s
+    - added more information to Data::Tools::CSV
+
 1.27 2022-04-02
 
     - added Data::Tools::CSV modules for parsing RFC4180 style CSV files.

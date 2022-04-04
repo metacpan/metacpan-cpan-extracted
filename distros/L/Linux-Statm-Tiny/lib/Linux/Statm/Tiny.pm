@@ -9,7 +9,9 @@ use Fcntl qw/ O_RDONLY /;
 use POSIX qw/ ceil /;
 use Types::Standard qw/ ArrayRef Int /;
 
-our $VERSION = '0.0601';
+use constant page_size => POSIX::sysconf POSIX::_SC_PAGESIZE;
+
+our $VERSION = '0.0603';
 
 # ABSTRACT: simple access to Linux /proc/../statm
 
@@ -18,20 +20,6 @@ has pid => (
     is      => 'lazy',
     isa     => Int,
     default => sub { $$ },
-    );
-
-
-my $PageSize;
-
-has page_size => (
-    is      => 'lazy',
-    isa     => Int,
-    default => sub {
-        $PageSize //= `getconf PAGE_SIZE`
-            or die "Unable to run getconf PAGE_SIZE: $!";
-        $PageSize += 0;
-        },
-    init_arg => undef,
     );
 
 
@@ -98,7 +86,7 @@ foreach my $attr (keys %stats) {
             is       => 'lazy',
             isa      => Int,
             default  => sub { my $self = shift;
-                              ceil($self->$attr * $self->page_size / $alts{$alt});
+                              ceil($self->$attr * page_size / $alts{$alt});
                               },
             init_arg => undef,
             clearer  => "_refresh_${attr}_${alt}",
@@ -137,7 +125,7 @@ Linux::Statm::Tiny - simple access to Linux /proc/../statm
 
 =head1 VERSION
 
-version 0.0601
+version 0.0603
 
 =head1 SYNOPSIS
 
@@ -250,13 +238,17 @@ Robert Rothenberg <rrwo@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Adrian Lai Karen Etheridge Mohammad S Anwar
+=for stopwords Adrian Lai James Raspass Karen Etheridge Mohammad S Anwar
 
 =over 4
 
 =item *
 
 Adrian Lai <aidy@cpan.org>
+
+=item *
+
+James Raspass <jraspass@gmail.com>
 
 =item *
 
@@ -270,7 +262,7 @@ Mohammad S Anwar <mohammad.anwar@yahoo.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015-2019 by Thermeon Worldwide, PLC.
+This software is copyright (c) 2015-2022 by Thermeon Worldwide, PLC.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

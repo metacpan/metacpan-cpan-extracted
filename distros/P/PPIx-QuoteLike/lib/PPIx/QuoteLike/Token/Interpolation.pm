@@ -20,7 +20,7 @@ use PPIx::QuoteLike::Utils qw{
 
 use base qw{ PPIx::QuoteLike::Token };
 
-our $VERSION = '0.020';
+our $VERSION = '0.021';
 
 sub ppi {
     my ( $self ) = @_;
@@ -76,7 +76,7 @@ sub variables {
 
 sub __perl_version_introduced {
     my ( $self ) = @_;
-    $self->content() =~ m/ -> (?: \@ [[{*] | % [*] ) /smx
+    $self->{postderef}
 	and return '5.019005';
     return;
 }

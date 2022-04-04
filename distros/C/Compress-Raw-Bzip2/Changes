@@ -1,6 +1,13 @@
 CHANGES
 -------
 
+  2.103 3 April 2022
+
+      * Silence uninitialized warnings
+        https://github.com/pmqs/Compress-Raw-Bzip2/pull/5
+        ff3d907325091287ac1525db384b99a968d763d7
+        641a440ec6229c1d368b9ead48f4968b955c0115
+  
   2.101 20 February 2021
 
       * fix version numbers in meta files

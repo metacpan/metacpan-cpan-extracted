@@ -1,4 +1,4 @@
-#fsdb experiment mean stddev pct_rsd conf_range conf_low conf_high conf_pct sum sum_squared min max n
+#fsdb experiment mean:d stddev:d pct_rsd:d conf_range:d conf_low:d conf_high:d conf_pct:d sum:d sum_squared:d min:d max:d n:q
 # test trailing comment
 #   | dbmultistats --output-on-no-input duration
 #   | dbmapreduce -M -k experiment -- dbmultistats --output-on-no-input duration

@@ -45,7 +45,7 @@
    "provides" : {
       "Algorithm::LibLinear" : {
          "file" : "lib/Algorithm/LibLinear.pm",
-         "version" : "0.23"
+         "version" : "0.24"
       },
       "Algorithm::LibLinear::DataSet" : {
          "file" : "lib/Algorithm/LibLinear/DataSet.pm"
@@ -63,9 +63,9 @@
    "release_status" : "stable",
    "resources" : {
       "license" : [
-         "http://www.opensource.org/licenses/mit-license.php"
+         "http://opensource.org/licenses/mit-license.php"
       ]
    },
-   "version" : "0.23",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.24",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

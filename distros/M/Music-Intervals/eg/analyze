@@ -7,7 +7,7 @@ use Music::Intervals;
 
 use constant OPT => { max_width => 256 };
 
-my $string = shift || 'pythagorean'; # comma, minor, harmonic, etc.
+my $string = shift || 'pythagorean'; # comma, minor, \\bharmonic, etc.
 
 my $intervals = Music::Intervals->by_description($string);
 

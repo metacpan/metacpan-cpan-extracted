@@ -2,7 +2,7 @@
 
 #
 # dbfilepivot.pm
-# Copyright (C) 2011-2018 by John Heidemann <johnh@isi.edu>
+# Copyright (C) 2011-2022 by John Heidemann <johnh@isi.edu>
 #
 # This program is distributed under terms of the GNU general
 # public license, version 2.  See the file COPYING
@@ -264,7 +264,7 @@ sub set_defaults ($) {
     $self->{_value_column} = undef;
     $self->{_pre_sorted} = 0;
     $self->{_sort_order} = undef;
-    $self->{_sort_as_numeric} = undef;
+    $self->{_sort_method} = undef;
     $self->{_possible_pivots} = undef;
 }
 
@@ -299,10 +299,11 @@ sub parse_options ($@) {
 	'T|tmpdir|tempdir=s' => \$self->{_tmpdir},
 	'v|value=s' => \$self->{_value_column},
 	# sort key options:
-	'n|numeric' => sub { $self->{_sort_as_numeric} = 1; },
-	'N|lexical' => sub { $self->{_sort_as_numeric} = undef; },
+	'n|numeric' => sub { $self->{_sort_method} = '--numeric'; },
+	'N|lexical' => sub { $self->{_sort_method} = '--lexical'; },
 	'r|descending' => sub { $self->{_sort_order} = -1; },
 	'R|ascending' => sub { $self->{_sort_order} = 1; },
+	't|type-inferred-sorting' => sub { $self->{_sort_method} = '--type-inferred-sorting'; },
 	) or pod2usage(2);
     pod2usage(2) if ($#argv != -1);
 }
@@ -405,7 +406,7 @@ sub setup ($) {
 	# not sorted, so sort it and read that
 	my @sort_args = ('--nolog', $self->{_key_column});
 	unshift(@sort_args, '--descending') if ($self->{_sort_order} == -1);
-	unshift(@sort_args, ($self->{_sort_as_numeric} ? '--numeric' : '--lexical'));
+	unshift(@sort_args, $self->{_sort_method}) if (defined($self->{_sort_method}));
 	my($new_reader, $new_fred) = dbpipeline_filter($self->{_input}, [-comment_handler => $self->create_delay_comments_sub], dbsort(@sort_args));
 	$self->{_pre_sorted_input} = $self->{_input};
 	$self->{_in} = $new_reader;
@@ -547,7 +548,7 @@ sub run ($) {
 
 =head1 AUTHOR and COPYRIGHT
 
-Copyright (C) 2011-2018 by John Heidemann <johnh@isi.edu>
+Copyright (C) 2011-2022 by John Heidemann <johnh@isi.edu>
 
 This program is distributed under terms of the GNU general
 public license, version 2.  See the file COPYING

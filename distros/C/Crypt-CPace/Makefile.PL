@@ -16,13 +16,14 @@ my %WriteMakefileArgs = (
   "LICENSE" => "mozilla",
   "NAME" => "Crypt::CPace",
   "PREREQ_PM" => {
+    "Crypt::OpenSSL::Base::Func" => "0.03",
     "Crypt::OpenSSL::Bignum" => "0.09",
     "Crypt::OpenSSL::EC" => "1.31",
-    "Crypt::OpenSSL::Hash2Curve" => "0.021",
+    "Crypt::OpenSSL::Hash2Curve" => "0.03",
     "List::Util" => "1.55",
     "bignum" => "0.52"
   },
-  "VERSION" => "0.011",
+  "VERSION" => "0.012",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -30,9 +31,10 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Crypt::OpenSSL::Base::Func" => "0.03",
   "Crypt::OpenSSL::Bignum" => "0.09",
   "Crypt::OpenSSL::EC" => "1.31",
-  "Crypt::OpenSSL::Hash2Curve" => "0.021",
+  "Crypt::OpenSSL::Hash2Curve" => "0.03",
   "List::Util" => "1.55",
   "bignum" => "0.52"
 );

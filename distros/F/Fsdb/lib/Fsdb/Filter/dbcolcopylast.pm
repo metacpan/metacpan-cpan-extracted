@@ -2,7 +2,7 @@
 
 #
 # dbcolcopylast.pm
-# Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
+# Copyright (C) 1991-2022 by John Heidemann <johnh@isi.edu>
 #
 # This program is distributed under terms of the GNU general
 # public license, version 2.  See the file COPYING
@@ -201,7 +201,8 @@ sub setup ($) {
 	    if (!defined($source_coli));
 
 	my($dest_col) = "copylast_" . $_;
-	$self->{_out}->col_create($dest_col)
+     	my($dest_colspec) = "copylast_" . $self->{_in}->col_to_colspec($_);
+	$self->{_out}->col_create($dest_colspec)
 	    or croak($self->{_prog} . ": cannot create column '$dest_col' (maybe it already existed?)\n");
 	my($dest_coli) = $self->{_out}->col_to_i($dest_col);
 
@@ -252,7 +253,7 @@ sub run ($) {
 
 =head1 AUTHOR and COPYRIGHT
 
-Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
+Copyright (C) 1991-2022 by John Heidemann <johnh@isi.edu>
 
 This program is distributed under terms of the GNU general
 public license, version 2.  See the file COPYING

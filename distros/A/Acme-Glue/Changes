@@ -1,5 +1,8 @@
 Revision history for Acme::Glue
 
+2022.04
+    - vec/pack examples from perldoc vec
+
 2021.08
     - update photo project details/URL
 

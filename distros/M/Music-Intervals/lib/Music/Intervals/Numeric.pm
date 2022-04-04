@@ -1,5 +1,5 @@
 package Music::Intervals::Numeric;
-$Music::Intervals::Numeric::VERSION = '0.0904';
+$Music::Intervals::Numeric::VERSION = '0.0905';
 our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Breakdown of numeric musical intervals
@@ -152,7 +152,7 @@ Music::Intervals::Numeric - Breakdown of numeric musical intervals
 
 =head1 VERSION
 
-version 0.0904
+version 0.0905
 
 =head1 SYNOPSIS
 

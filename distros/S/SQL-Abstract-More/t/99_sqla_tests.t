@@ -1,3 +1,8 @@
+# NOTE : this test was originally written to make sure that SQL::Abstract::More was
+# fully compliant with SQL::Abstract. However, the internal protocol for representing
+# bind values has changed in SQL::Abstract v2.0 -- therefore the tests no longer pass,
+# even if the surface behaviour is still compatible.
+
 use strict;
 use warnings;
 
@@ -12,7 +17,7 @@ SKIP: {
     my $msg = 'define $ENV{SQLA_SRC_DIR} to run these tests';
     diag $msg;
     skip $msg, 1;
-  };
+ };
 
   open my $fh, ">", \my $tap_output;
 

@@ -214,6 +214,9 @@ sub new {
 	_cols => [],    # array of names of the columns (fields)
 	_cols_to_i => {},  # reverse hash mapping names to offsets
 
+        _types => [],     # array of types of the columns
+        _typespecs => [],   # array of types of the columns as specified (could be null)
+
 	_fastpath_active => undef,   # track fastpathing to avoid breaking it
 
 	_codifier_sub => undef,   # converting perl code with embedded column names
@@ -236,6 +239,8 @@ sub _reset_cols {
 	if ($self->{_header_set});
     $self->{_cols} = [];
     $self->{_cols_to_i} = {};
+    $self->{_types} = [];
+    $self->{_typespecs} = [];
     $self->{_headerrow} = undef;
     $self->{_debug} = undef;
 }
@@ -307,8 +312,8 @@ sub config_one {
 	$self->_reset_cols;
 	$self->parse_fscode($clone->fscode());
 	$self->parse_rscode($clone->rscode());
-	foreach (@{$clone->cols()}) {
-	    $self->_internal_col_create($_);
+	foreach my $cs ($clone->colspecs()) {
+	    $self->_internal_col_create($cs);
 	};
 	$self->{_encoding} = $clone->{_encoding};
 	$self->{_compression} = $clone->{_compression};
@@ -506,7 +511,7 @@ sub parse_v1_headerrow ($) {
 internal: create the header the internal schema
 
 =cut
-sub update_headerrow {
+sub update_headerrow($) {
     my $self = shift @_;
     my $h = "#fsdb ";
     if ($self->{_fscode} && $self->{_fscode} ne 'D') {
@@ -519,7 +524,7 @@ sub update_headerrow {
 	$h .= "-Z " . $self->{_compression} . " ";
     };
     $self->{_header_prequel} = $h;   # save this aside for dbcolneaten
-    $h .= join(" ", @{$self->{_cols}});
+    $h .= join(" ", $self->colspecs());
     $self->{_headerrow} = $h;
 }
 
@@ -533,6 +538,8 @@ Format is:
 
 All options must come first, start with dashes, and have an argument.
 (More regular than the v1 header.)
+
+Columns have optional :t type specifiers.
 
 =cut
 sub parse_headerrow($) {
@@ -671,13 +678,18 @@ internal
 
 =cut
 sub establish_new_col_mapping {
-    my($self, $colname) = @_;
+    my($self, $colspec) = @_;
+
+    my($colname, $type, $typespec) = $self->_internal_colspec_to_name_type_spec($colspec);
 
     my $coli = $#{$self->{_cols}} + 1;
     $self->{_cols}->[$coli] = $colname;
     $self->{_cols_to_i}->{$colname} = $coli;
     # Old.pm also registers _$colname, but that seems Wrong. 
     $self->{_cols_to_i}->{"$coli"} = $coli;   # numeric synonym
+
+    $self->{_types}->[$coli] = $type;
+    $self->{_typespecs}->[$coli] = $typespec;
 
     $self->{_codifier_sub} = undef;  # clear cache
 }
@@ -702,9 +714,23 @@ sub col_create {
         $self->update_headerrow;
 }
 
+=head2 _internal_colspec_to_name_type
+
+    ($name, $type, $type_speced) = $fsdb->_internal_colspec_to_name_type($colspec)
+
+Split a colspec into a name, type, and the type as specified
+(which may be null if no type was given).
+
+=cut
+sub _internal_colspec_to_name_type_spec($$) {
+    my($self, $colspec) = @_;
+    my($name, $type) = split(/:/, $colspec);
+    return($name, $type // 'a', $type);
+};
+
 =head2 _internal_col_create
 
-    $fsdb->_internal_col_create($col_name)
+    $fsdb->_internal_col_create($colspec)
 
 For internal C<Fsdb::IO> use only.
 Create a new column $COL_NAME,
@@ -715,7 +741,10 @@ but do I<not> update the header row
 =cut
 
 sub _internal_col_create {
-    my($self, $colname) = @_;
+    my($self, $colspec) = @_;
+
+    my($colname, $type, $typespec) = $self->_internal_colspec_to_name_type_spec($colspec);
+
     if ($self->{_header_set}) {
 	$self->{_error} = "attempt to add column to frozen fsdb handle (reader or writer that's been written to): $colname";
 	return undef;
@@ -724,7 +753,7 @@ sub _internal_col_create {
 	$self->{_error} = "duplicate col definition: $colname";
 	return undef;
     };
-    $self->establish_new_col_mapping($colname);
+    $self->establish_new_col_mapping($colspec);
     return 1;
 }
 
@@ -840,16 +869,37 @@ sub ncols {
 
     $fields_aref = $fsdb->cols;
 
+Returns the column names (the field names, without type specifications)
+of the open database
+as an aref.
+
+=cut
+
+sub cols($) {
+    my($self) = @_;
+    return $self->{_cols};
+}
+
+=head2 colspecs
+
+    $fields_aref = $fsdb->colspecs();
+
 Returns the column headings (the field names) of the open database
 as an aref.
 
 =cut
 
-sub cols {
+sub colspecs($) {
     my($self) = @_;
-    return $self->{_cols};
+
+    my(@cs) = ();
+    foreach (0..$#{$self->{_cols}}) {
+        push(@cs, $self->col_to_colspec($_));
+    };
+    return(@cs);
 }
     
+
 
 =head2 col_to_i
 
@@ -865,6 +915,59 @@ since the index can be 0 which would be interpreted as false.
 sub col_to_i {
     my($self, $n) = @_;
     return $self->{_cols_to_i}->{$n};
+}
+
+=head2 col_to_type
+
+    @fields = $fsdb->col_to_type($column_name, $force_type);
+
+Returns the column type (and undef if type is not required, unless $FORCE_TYPE)
+of a given $COLUMN_NAME.
+
+=cut
+
+sub col_to_type($$;$) {
+    my($self, $n, $force_type) = @_;
+    my($i) = $self->{_cols_to_i}->{$n};
+    return $force_type ? $self->{_type}->[$i] : $self->{_typespecs}->[$i];
+}
+
+=head2 col_to_colspec
+
+    @fields = $fsdb->col_to_colspec($column_name, $force_type);
+
+Returns the column specification (type is optional, unless $FORCE_TYPE) of a given $COLUMN_NAME.
+
+=cut
+
+sub col_to_colspec($$;$) {
+    my($self, $n, $force_type) = @_;
+    my($i) = $self->{_cols_to_i}->{$n};
+    my($cs) = $self->{_cols}->[$i];
+    my $type = $force_type ? $self->{_type}->[$i] : $self->{_typespecs}->[$i];
+    return defined($type) ? "$cs:$type" : $cs;
+}
+
+=head2 col_spec_is_numeric
+
+    @fields = $fsdb->col_spec_is_numeric($column_name);
+
+Returns non-zero if column specification is numeric.
+(Actually, returns 1 for integers and 2 for floats.)
+
+=cut
+
+sub col_spec_is_numeric($$) {
+    my($self, $n) = @_;
+    my($i) = $self->{_cols_to_i}->{$n};
+    my $type = substr($self->{_types}->[$i], 0, 1);
+    if ($type eq 'a') {
+        return 0;
+    } elsif ($type eq 'f' || $type eq 'd') {
+        return 2;  # float family
+    } else {
+        return 1;  # int family
+    };
 }
 
 =head2 i_to_col

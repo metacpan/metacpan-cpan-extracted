@@ -1,5 +1,13 @@
 Revision history for Linux-Statm-Tiny
 
+0.0603    2022-04-04 16:41:03+01:00 Europe/London
+  [Documentation]
+  - Bumped copyright year.
+
+0.0602    2022-04-04 16:33:52+01:00 Europe/London
+  [Bug Fixes]
+  - Use POSIX to get the page size, GH#12 (raz)
+
 0.0601    2019-02-17 18:29:31+00:00 Europe/London
   [Documentation]
   - Fixed typo in POD markup (manwar).

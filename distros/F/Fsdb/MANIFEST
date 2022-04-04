@@ -152,6 +152,13 @@ TEST/dbcol_R.out
 TEST/dbcol_S.cmd
 TEST/dbcol_S.in
 TEST/dbcol_S.out
+TEST/dbcol_types.cmd
+TEST/dbcol_types.in
+TEST/dbcol_types.out
+TEST/dbcol_types_with.cmd
+TEST/dbcol_types_with.out
+TEST/dbcol_types_with_and_without.cmd
+TEST/dbcol_types_with_and_without.out
 TEST/dbcol_unicode.cmd
 TEST/dbcol_unicode.in
 TEST/dbcol_unicode.out
@@ -164,6 +171,9 @@ TEST/dbcol_v1_listed.out
 TEST/dbcolcopylast_ex.cmd
 TEST/dbcolcopylast_ex.in
 TEST/dbcolcopylast_ex.out
+TEST/dbcolcopylast_ex_types.cmd
+TEST/dbcolcopylast_ex_types.in
+TEST/dbcolcopylast_ex_types.out
 TEST/dbcolcreate_double_creation.cmd
 TEST/dbcolcreate_double_creation.out
 TEST/dbcolcreate_double_creation_ok.cmd
@@ -179,6 +189,9 @@ TEST/dbcolcreate_ex_S.in
 TEST/dbcolcreate_ex_S.out
 TEST/dbcolcreate_first.cmd
 TEST/dbcolcreate_first.out
+TEST/dbcolcreate_first_types.cmd
+TEST/dbcolcreate_first_types.in
+TEST/dbcolcreate_first_types.out
 TEST/dbcolcreate_new_default.cmd
 TEST/dbcolcreate_new_default.out
 TEST/dbcoldefine_ex.cmd
@@ -289,6 +302,8 @@ TEST/dbcolrename_ex_R.cmd
 TEST/dbcolrename_ex_R.out
 TEST/dbcolrename_ex_S.cmd
 TEST/dbcolrename_ex_S.out
+TEST/dbcolrename_ex_types.cmd
+TEST/dbcolrename_ex_types.out
 TEST/dbcolrename_missing_col.cmd
 TEST/dbcolrename_missing_col.out
 TEST/dbcolscorrelate_ex.cmd
@@ -790,7 +805,6 @@ TEST/dbrecolize_ex_S.in
 TEST/dbrecolize_ex_S.out
 TEST/dbrow_ex.cmd
 TEST/dbrow_ex.in
-TEST/dbrow_ex.in.gz
 TEST/dbrow_ex.out
 TEST/dbrow_ex_autodecompress.cmd
 TEST/dbrow_ex_autodecompress.out
@@ -943,8 +957,18 @@ TEST/dbsort_merge.out
 TEST/dbsort_numerically.cmd
 TEST/dbsort_numerically.in
 TEST/dbsort_numerically.out
+TEST/dbsort_numerically_types.cmd
+TEST/dbsort_numerically_types.in
+TEST/dbsort_numerically_types.out
+TEST/dbsort_numerically_types_disabled.cmd
+TEST/dbsort_numerically_types_disabled.out
 TEST/dbsort_reversed.cmd
 TEST/dbsort_reversed.out
+TEST/dbsort_types.in
+TEST/dbsort_types_a.cmd
+TEST/dbsort_types_a.out
+TEST/dbsort_types_l.cmd
+TEST/dbsort_types_l.out
 TEST/dbsubprocess_ex.cmd
 TEST/dbsubprocess_ex.out
 TEST/dbsubprocess_ex.pl
@@ -994,4 +1018,5 @@ TEST/yaml_to_db_ex.cmd
 TEST/yaml_to_db_ex.in
 TEST/yaml_to_db_ex.out
 update_modules
+TEST/dbrow_ex.in.gz
 META.json                                Module JSON meta-data (added by MakeMaker)

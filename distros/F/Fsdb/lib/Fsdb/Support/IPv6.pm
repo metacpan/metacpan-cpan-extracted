@@ -22,22 +22,36 @@ Fsdb::Support::IPv6 - ipv6-parsing helpers
 =cut
 #'
 
+
 =head2 ipv6_zeroize
 
-    $ipv6_zeroied = Fsdb::Support::IPv6::ipv6_zeroize('1:0002:3:4::');
+    $ipv6_zeroized = Fsdb::Support::IPv6::ipv6_zeroize('1:0002:3:4::');
     # result is 1:2:3:4:0:0:0:0
 
 Normalize an IPv6 address so it has all hextets present,
 with no leading zeros.
 
+Also treats strings of hex digits without colons as IPv6 prefixes.
+
 =cut
 sub ipv6_zeroize {
     my ($s) = @_;
-    if ($s !~ /::/) {
-        return $s;
-    };
+    if ($s !~ /:/) {
+        # no :, so it must be a hex string
+        # first, make it 32 bytes
+        if (length($s) < 32) {
+            $s = $s . "0" x (32 - length($s));
+        };
+        return undef if (length($s) > 32);
+        # insert colons (that we will then take out below :-( )
+        $s =~ s/(....)/$1:/g;
+        $s =~ s/:$//;
+    }
+#    if ($s !~ /::/) {
+#        return $s;
+#    };
     my(@double_colon_parts) = split(/::/, $s);
-    return undef if ($#double_colon_parts > 1);
+    return undef if ($#double_colon_parts > 1);  # multiple :: !
     my(@hextets) = split(/:/, $s);
     if ($#hextets < 7) {
         my(@full) = ();
@@ -60,24 +74,52 @@ sub ipv6_zeroize {
         # 1:: returns the list ('1')
         push (@full, ('0') x (7 - $#hextets)) if (!$found);
         return join(':', @full);
+    } elsif ($#hextets == 7) {
+        my(@full) = ();
+        foreach (@hextets) {
+            s/^0+//g;
+            $_ = '0' if ($_ eq '');   # put back singleton zero
+            push (@full, $_);
+        };
+        return join(':', @full);
     } else {
         return undef;
-    };
+    };                 
 };
+
+=head2 ipv6_fullhex
+
+    $ipv6_fullhex = Fsdb::Support::IPv6::ipv6_full('1:0002:3:4::');
+    # result is 0001000200030004000000000000000
+
+Rewrite an IPv6 address as a full, 128-bit, base-16 number.
+
+=cut
+sub ipv6_fullhex {
+    my ($s) = ipv6_zeroize($_[0]);
+    my($r) = '';
+    my(@parts) = split(/:/, $s);
+    return join('', map { length($_) >= 4 ? $_ : ('0' x (4 - length($_)) . $_) } @parts);
+};
+
 
 =head2 ipv6_normalize
 
     $ipv6_normal = Fsdb::Support::IPv6::ipv6_normalize('1:0002::7:0:00:8');
-    # result is 1:2:0:0:7:0:0:8
+    # result is 1:2::7:0:0:8
 
-Given an IPv6 address, maybe with some fields 0 or leading zero,
-normalize it to remove leading zeros and with the leftmost,
-longest run of zeros replaced with ::.
+Convert an IPv6 address to IETF normal form.
+The input maybe has some fields 0 or leading zero,
+or :: in a non-standard place.
+Normalize it to remove leading zeros and replace the leftmost,
+longest run of zeros with ::.
+
+Also treats strings of hex digits without colons as IPv6 prefixes.
 
 =cut
 sub ipv6_normalize {
     my ($s) = @_;
-    $s = ipv6_zeroize($s) if ($s =~ /::/);   # expand ::
+    $s = ipv6_zeroize($s) if ($s =~ /::/ || $s !~ /:/);   # expand :: or hex-only
     # we must have all fields, but maybe have leading zeros and runs of zeros
     my(@hextets) = split(/:/, $s);
     return undef if ($#hextets != 7);
@@ -128,6 +170,37 @@ sub ipv6_normalize {
     return join (':', @zero_runned_hextets);
 };
 
+=head2 ip_fullhex_to_normal
+
+    $ip_normal = Fsdb::Support::IPv6::ip_fullhex_to_normal('20010db8000300040005000600070008');
+    # result is 2001:db8:3:4:5:6:7:8
+
+    $ip_normal = Fsdb::Support::IPv6::ip_fullhex_to_normal('c0000201');
+    # result is 192.0.2.1
+
+Convert an IPv6 address to IETF normal form.
+The input maybe has some fields 0 or leading zero,
+or :: in a non-standard place.
+Normalize it to remove leading zeros and replace the leftmost,
+longest run of zeros with ::.
+
+Also treats strings of hex digits without colons as IPv6 prefixes.
+
+=cut
+sub ip_fullhex_to_normal {
+    my($s) = @_;
+    if (length($s) <= 8) {
+        my(@octets) = map { sprintf("%d", hex($_)) } unpack('(A2)*', $s);
+        while ($#octets < 3) {
+            push(@octets, '0');
+        };
+        return join('.', @octets);
+    } else {
+        return ipv6_normalize($s);
+    };
+}
+
+
 =head2 _test_zero_fill
 
 Internal testing.
@@ -139,9 +212,9 @@ sub _test_zero_fill {
     $out //= "undef";
     $trial //= "undef";
     if ($trial eq $out) {
-        print "zf ok: $in -> $out\n";
+        print "zzf ok: $in -> $out\n";
     } else {
-        print "zf NO: $in -> $out but got $trial\n";
+        print "zzf NO: $in -> $out but got $trial\n";
     };
 }
 
@@ -157,9 +230,41 @@ sub _test_zero_remove {
     $out //= "undef";
     $trial //= "undef";
     if ($trial eq $out) {
-        print "zr ok: $in -> $out\n";
+        print "zrr ok: $in -> $out\n";
     } else {
-        print "zr NO: $in -> $out but got $trial\n";
+        print "zrr NO: $in -> $out but got $trial\n";
+    };
+}
+
+=head2 _test_fullhex
+
+Internal testing.
+
+=cut
+sub _test_fullhex {
+    my($in, $out) = @_;
+    my($trial) = ipv6_fullhex($in);
+    $trial //= "undef";
+    if ($trial eq $out) {
+        print "fh ok: $in -> $out\n";
+    } else {
+        print "fh NO: $in -> $out but got $trial\n";
+    };
+}
+
+=head2 _test_fullhex_to_normal
+
+Internal testing.
+
+=cut
+sub _test_fullhex_to_normal {
+    my($in, $out) = @_;
+    my($trial) = ip_fullhex_to_normal($in);
+    $trial //= "undef";
+    if ($trial eq $out) {
+        print "fhn ok: $in -> $out\n";
+    } else {
+        print "fhn NO: $in -> $out but got $trial\n";
     };
 }
 
@@ -194,10 +299,23 @@ sub _test_ipv6 {
     _test_both("1::",             "1:0:0:0:0:0:0:0");
     _test_both("::",              "0:0:0:0:0:0:0:0");
     _test_both("1:2::6:0:0:8",    "1:2:0:0:6:0:0:8");
-    _test_zero_remove("1:002::6:0:0:8",    "1:2:0:0:6:0:0:8");
+    # _test_zero_remove("1:2::6:0:0:8",    "1:2:0:0:6:0:0:8");
+    _test_zero_fill("1:002::6:0:0:8",    "1:2:0:0:6:0:0:8");
     _test_zero_fill("1:2:0:0:6::8",    "1:2:0:0:6:0:0:8");  # technically non-compliant
     _test_zero_fill("1:2::6::8",       undef);              # ambiguous, coudl be 1:2:0:0:6:0:0:8, or 1:2:0:0:0:6:0:8, or other configs
+    _test_fullhex("1:2:3:4:5:6:7:8", "00010002000300040005000600070008");
+    _test_fullhex("1:002::6:0:0:8",  "00010002000000000006000000000008");
+    _test_fullhex("1:abcd::6:0:0:8", "0001abcd000000000006000000000008");
+    # missing case 2021-12-10
+    _test_zero_fill("1:02:003:0004:5:6:7:8", "1:2:3:4:5:6:7:8");
+    _test_zero_fill("00010002000300040005000600070008", "1:2:3:4:5:6:7:8");
+    _test_zero_fill("00010002000300040000000000070008", "1:2:3:4:0:0:7:8");
+    _test_zero_fill("000100020003", "1:2:3:0:0:0:0:0");
+    _test_fullhex_to_normal('20010db8000300040005000600070008', '2001:db8:3:4:5:6:7:8');
+    _test_fullhex_to_normal('c0000201', '192.0.2.1');
 };
+
+# _test_ipv6;
 
 1;
 
