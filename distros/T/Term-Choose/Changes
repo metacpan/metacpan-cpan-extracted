@@ -1,6 +1,9 @@
 Revision history for Term::Choose
 
 
+1.748   2022-04-06
+    - Search: 'readline' is now in Term::From::ReadLine.
+
 1.747   2022-03-26
     - Update documentation.
     - Code refactoring.

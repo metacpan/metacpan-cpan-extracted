@@ -4,7 +4,7 @@ Plack::Middleware::Security::Simple - A simple security filter for Plack
 
 # VERSION
 
-version v0.6.0
+version v0.6.1
 
 # SYNOPSIS
 
@@ -39,22 +39,22 @@ Note that as an alternative, you may want to consider using something like
 ## rules
 
 This is a set of rules. It can be a an array-reference or
-[Hash::Match](https://metacpan.org/pod/Hash::Match) object containing matches against keys in the Plack
+[Hash::Match](https://metacpan.org/pod/Hash%3A%3AMatch) object containing matches against keys in the Plack
 environment.
 
 It can also be a code reference for a subroutine that takes the Plack
 environment as an argument and returns a true value if there is a
 match.
 
-See [Plack::Middleware::Security::Common](https://metacpan.org/pod/Plack::Middleware::Security::Common) for a set of common rules.
+See [Plack::Middleware::Security::Common](https://metacpan.org/pod/Plack%3A%3AMiddleware%3A%3ASecurity%3A%3ACommon) for a set of common rules.
 
 ## handler
 
 This is a function that is called when a match is found.
 
 It takes the Plack environment as an argument, and returns a
-[Plack::Response](https://metacpan.org/pod/Plack::Response), or throws an exception for
-[Plack::Middleware::HTTPExceptions](https://metacpan.org/pod/Plack::Middleware::HTTPExceptions).
+[Plack::Response](https://metacpan.org/pod/Plack%3A%3AResponse), or throws an exception for
+[Plack::Middleware::HTTPExceptions](https://metacpan.org/pod/Plack%3A%3AMiddleware%3A%3AHTTPExceptions).
 
 The default handler will log a warning to the `psgix.logger`, and
 return a HTTP 400 (Bad Request) response.
@@ -74,7 +74,7 @@ when a resource is blocked.  It defaults to 400 (Bad Request).
 
 # SEE ALSO
 
-[Hash::Match](https://metacpan.org/pod/Hash::Match)
+[Hash::Match](https://metacpan.org/pod/Hash%3A%3AMatch)
 
 [Plack](https://metacpan.org/pod/Plack)
 

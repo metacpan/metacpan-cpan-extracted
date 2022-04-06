@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '1.747';
+our $VERSION = '1.748';
 
 use Term::Choose::Constants qw( ROW COL );
 use Term::Choose::Screen    qw( up clear_to_end_of_screen show_cursor hide_cursor );
@@ -15,9 +15,9 @@ sub __user_input {
     $self->{plugin}->__reset_mode( { mouse => $self->{mouse}, hide_cursor => $self->{hide_cursor} } );
     my $string;
     if ( ! eval {
-        require Term::Form;
-        Term::Form->VERSION(0.530);
-        my $term = Term::Form->new();
+        require Term::Form::ReadLine;
+        Term::Form::ReadLine->VERSION(0.544);
+        my $term = Term::Form::ReadLine->new();
         $string = $term->readline(
             $prompt,
             { info => $error, default => $default, hide_cursor => 2, clear_screen => length $error ? 1 : 2,

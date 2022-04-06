@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '1.747';
+our $VERSION = '1.748';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -1222,7 +1222,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.747
+Version 1.748
 
 =cut
 
@@ -1366,7 +1366,7 @@ be used instead the C<SpaceBar> key.
 Pressing the C<Ctrl-F> allows one to enter a regular expression so that only the items that match the regular expression
 are displayed. When going back to the unfiltered menu (C<Enter>) the item highlighted in the filtered menu keeps the
 highlighting. Also (in I<list context>) marked items retain there markings. The Perl function C<readline> is used to
-read the regular expression if L<Term::Form> is not available. See option I<search>.
+read the regular expression if L<Term::Form::ReadLine> is not available. See option I<search>.
 
 =head2 Keys to move around
 

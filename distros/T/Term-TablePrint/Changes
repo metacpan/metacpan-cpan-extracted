@@ -1,9 +1,13 @@
 Revision history for Term::TablePrint
 
 
+0.150   2022-04-06
+        - Search: 'readline' is now in Term::From::ReadLine.
+        - Update year copyright.
+
 0.149   2021-11-11
-    - Raised Perl minimum version to 5.10.0.
-    - Use '\v'.
+        - Raised Perl minimum version to 5.10.0.
+        - Use '\v'.
 
 0.148   2021-10-21
         - Refactored 'calc_avail_col_width'.

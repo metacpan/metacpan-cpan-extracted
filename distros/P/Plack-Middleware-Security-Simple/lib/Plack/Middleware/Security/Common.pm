@@ -27,12 +27,12 @@ our @EXPORT = qw(
    wordpress
 );
 
-our $VERSION = 'v0.6.0';
+our $VERSION = 'v0.6.1';
 
 
 
 sub archive_extensions {
-    my $re = qr{\.(?:iso|rar|tar|u?zip|[7g]?z)\b};
+    my $re = qr{\.(?:iso|rar|tar|u?zip|[7glx]?z|tgz)\b};
     return (
         PATH_INFO    => $re,
         QUERY_STRING => $re,
@@ -168,7 +168,7 @@ Plack::Middleware::Security::Common - A simple security filter for Plack with co
 
 =head1 VERSION
 
-version v0.6.0
+version v0.6.1
 
 =head1 SYNOPSIS
 
@@ -250,10 +250,14 @@ the F</.well-known/> path.
 This blocks requests with fake extensions, usually done with image extensions, e.g.
 F</some/path;.jpg>.
 
+Added in v0.5.1.
+
 =head2 ip_address_referer
 
 This blocks all requests where the HTTP referer is an IP4 or IP6
 address.
+
+Added in v0.5.0.
 
 =head2 misc_extensions
 
@@ -276,6 +280,8 @@ query string.
 
 This blocks requests that have non-web protocols like C<file>, C<dns>,
 C<jndi>, C<unix> or C<ldap> in the path, query string or referer.
+
+Added in v0.5.1.
 
 =head2 require_content
 

@@ -104,10 +104,12 @@ test_psgi
     };
 
     subtest 'blocked' => sub {
-        my $req = GET "/data/backup.zip";
-        my $res = $cb->($req);
-        ok is_error( $res->code ), join( " ", $req->method, $req->uri );
-        is $res->code, HTTP_BAD_REQUEST, "HTTP_BAD_REQUEST";
+        for my $ext (qw/ iso rar tar uzip zip 7z gz lz xz z tgz /) {
+            my $req = GET "/data/backup.${ext}";
+            my $res = $cb->($req);
+            ok is_error( $res->code ), join( " ", $req->method, $req->uri );
+            is $res->code, HTTP_BAD_REQUEST, "HTTP_BAD_REQUEST ($ext)";
+        }
     };
 
     subtest 'not blocked' => sub {

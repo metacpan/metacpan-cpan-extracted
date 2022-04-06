@@ -1,5 +1,17 @@
 Revision history for Plack-Middleware-Security-Simple:
 
+v0.6.1    2022-04-06 16:40:46+01:00 Europe/London
+  [Enhancements]
+  - Add .lz, .tgz and .xz to the archive_extensions rule.
+
+  [Documentation]
+  - Add version when newer rules were added.
+
+  - Fix encoding of links in README.
+
+  [Tests]
+  - Test more blocked archive extensions.
+
 v0.6.0    2022-02-18 18:29:34+00:00 Europe/London
   [Documentation]
   - Fix typo in Plack::Middleware::Security::Common ABSTRACT!

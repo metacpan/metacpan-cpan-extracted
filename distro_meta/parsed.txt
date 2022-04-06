@@ -78033,3 +78033,8 @@ E/ET/ETJ/PDL-LinearAlgebra-0.27.tar.gz
 B/BP/BPS/RT-Extension-ExcelFeed-0.07.tar.gz
 K/KI/KIMOTO/SPVM-0.9510.tar.gz
 S/SH/SHLOMIF/XML-Grammar-Fiction-0.30.0.tar.gz
+A/AL/ALEXPAN/Dancer2-Plugin-FormValidator-Extension-DBIC-0.81.tar.gz
+W/WY/WYANT/Game-Life-Faster-0.007.tar.gz
+R/RR/RRWO/Plack-Middleware-Security-Simple-v0.6.1.tar.gz
+K/KU/KUERBIS/Term-Choose-1.748.tar.gz
+K/KU/KUERBIS/Term-TablePrint-0.150.tar.gz
