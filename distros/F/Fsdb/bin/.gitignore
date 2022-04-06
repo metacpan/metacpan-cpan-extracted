@@ -21,6 +21,7 @@ dbcolsplittorows
 dbcolsregression
 dbcolstats
 dbcolstatscores
+dbcoltype
 dbfilealter
 dbfilecat
 dbfilediff

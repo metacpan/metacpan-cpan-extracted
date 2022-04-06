@@ -2,6 +2,8 @@
 
 BEGIN { unshift @INC, 'lib', '../lib'}
 use Chart::Composite;
+use File::Temp 0.19;
+my $samples = File::Temp->newdir();
 
 print "1..1\n";
 
@@ -31,7 +33,7 @@ $g->set(
     }
 );
 $g->set( 'brush_size2' => 1 );
-$g->png("samples/composite.png");
+$g->png("$samples/composite.png");
 
 print "ok 1\n";
 

@@ -6,11 +6,13 @@ build_requires:
   Dancer2: '0'
   Data::FormValidator::Constraints: '0'
   HTTP::Request::Common: '0'
-  JSON::Tiny: '0'
+  JSON::MaybeXS: '0'
   Plack::Test: '0'
   Test::More: '0'
   Test::Pod: '0'
+  URI::Escape: '0'
   strict: '0'
+  utf8::all: '0'
   warnings: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -22,21 +24,29 @@ meta-spec:
   version: '1.4'
 name: Dancer2-Plugin-FormValidator
 requires:
+  Carp: '0'
   Dancer2::Core::Hook: '0'
   Dancer2::Plugin: '0'
   Dancer2::Plugin::Deferred: '0'
-  Data::FormValidator: '0'
-  Data::FormValidator::Results: '0'
+  Email::Valid: '0'
+  Hash::MultiValue: '0'
+  Hash::Util: '0'
+  List::Util: '1.45'
+  Module::Load: '0'
   Moo: '0'
   Moo::Role: '0'
+  Scalar::Util: '0'
+  Storable: '0'
   Types::Common::String: '0'
   Types::Standard: '0'
   namespace::clean: '0'
+  perl: v5.24.0
+  utf8: '0'
 resources:
   bugtracker: https://github.com/AlexP007/dancer2-plugin-formvalidator/issues
   homepage: https://metacpan.org/pod/Dancer2::Plugin::FormValidator
   repository: https://github.com/AlexP007/dancer2-plugin-formvalidator.git
-version: '0.13'
+version: '0.50'
 x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

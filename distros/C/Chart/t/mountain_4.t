@@ -2,6 +2,8 @@
 
 BEGIN { unshift @INC, 'lib', '../lib'}
 use Chart::Mountain;
+use File::Temp 0.19;
+my $samples = File::Temp->newdir();
 
 print "1..1\n";
 
@@ -48,7 +50,7 @@ $obj->set(
     'title_font'      => ( GD::Font->Giant )
 );
 
-$obj->png( 'samples/mountain_4.png', \@data );
+$obj->png( "$samples/mountain_4.png", \@data );
 
 print "ok 1\n";
 exit(0);

@@ -1,3 +1,9 @@
+0.41.6 2022-04-05 14:28:48 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - make sure LC_TIME and LC_NUMERIC are C and not set to some local
+   variant as this will cause all sorts of fun effects with localized
+   numbers and date strings
+
 0.41.5 2022-03-31 16:00:42 +0200 Tobias Oetiker <tobi@oetiker.ch>
 
  - translate button labels

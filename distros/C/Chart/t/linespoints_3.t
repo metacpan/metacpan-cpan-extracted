@@ -3,6 +3,8 @@
 BEGIN { unshift @INC, 'lib', '../lib'}
 use Chart::LinesPoints;
 use strict;
+use File::Temp 0.19;
+my $samples = File::Temp->newdir();
 
 print "1..1\n";
 
@@ -33,7 +35,7 @@ $g->add_dataset(@data4);
 );
 
 $g->set(%hash);
-$g->png("samples/linespoints_3.png");
+$g->png("$samples/linespoints_3.png");
 
 #just a trick, to let the y scale start at the biggest point:
 #initiate with negativ values, remove the minus sign!

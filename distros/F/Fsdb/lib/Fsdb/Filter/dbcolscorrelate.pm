@@ -2,7 +2,7 @@
 
 #
 # dbcolscorrelate.pm
-# Copyright (C) 1998-2021 by John Heidemann <johnh@isi.edu>
+# Copyright (C) 1998-2022 by John Heidemann <johnh@isi.edu>
 #
 # This program is distributed under terms of the GNU general
 # public license, version 2.  See the file COPYING
@@ -132,7 +132,7 @@ end_standard_fsdb_options
 
 =head2 Output:
 
-    #fsdb correlation
+    #fsdb correlation:d
     0.83329
     #  | dbcolscorrelate test1 test2
 
@@ -263,7 +263,7 @@ sub setup ($) {
 	};
     };
     # if only one column, it has a special name
-    $output_columns[0] =  'correlation'
+    $output_columns[0] =  'correlation:d'
 	if ($#output_columns == 0);
     my @output_options = (-cols => \@output_columns);
     unshift (@output_options, -fscode => $self->{_fscode})
@@ -393,7 +393,7 @@ sub run ($) {
 
 =head1 AUTHOR and COPYRIGHT
 
-Copyright (C) 1998-2021 by John Heidemann <johnh@isi.edu>
+Copyright (C) 1998-2022 by John Heidemann <johnh@isi.edu>
 
 This program is distributed under terms of the GNU general
 public license, version 2.  See the file COPYING

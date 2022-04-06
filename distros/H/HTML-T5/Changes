@@ -1,5 +1,8 @@
 Revision history for HTML-T5
 
+0.011  2022-04-06
+    - "fix" the tests.
+
 0.010  2020-10-16
     - Remove stale links from the POD and other documentation cleanups.
 

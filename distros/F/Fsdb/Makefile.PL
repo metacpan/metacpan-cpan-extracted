@@ -40,6 +40,7 @@ my @modularized_db_programs = qw(
 	dbcolsregression
 	dbcolstats
 	dbcolstatscores
+	dbcoltype
 	dbfilealter
 	dbfilecat
 	dbfilediff

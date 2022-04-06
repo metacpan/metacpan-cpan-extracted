@@ -1,29 +1,12 @@
-## @file
-# Implementation of Chart::StackedBars
-#
-# written by
-# @author david bonner (dbonner@cs.bu.edu)
-#
-# maintained by the
-# @author Chart Group at Geodetic Fundamental Station Wettzell (Chart@fs.wettzell.de)
-# @date 2015-03-01
-# @version 2.4.10
-#
+use v5.12;
 
-## @class Chart::StackedBars
-# StackedBars class derived from class Base.
-#
-# This class provides all functions which are specific to
-# stacked bars
 package Chart::StackedBars;
+our @ISA     = qw(Chart::Base);
 our $VERSION = 2.400.5;
 
 use Chart::Base;
 use GD;
 use Carp;
-use strict;
-
-@Chart::StackedBars::ISA     = qw(Chart::Base);
 
 #>>>>>>>>>>>>>>>>>>>>>>>>>>#
 #  public methods go here  #

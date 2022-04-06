@@ -2,6 +2,8 @@
 
 BEGIN { unshift @INC, 'lib', '../lib'}
 use Chart::LinesPoints;
+use File::Temp 0.19;
+my $samples = File::Temp->newdir();
 
 print "1..1\n";
 
@@ -14,7 +16,7 @@ $g->add_dataset( 5,     7,     2,      7,      9 );
 $g->set( 'title'  => 'Lines and Points Chart' );
 $g->set( 'legend' => 'bottom' );
 
-$g->png("samples/linespoints.png");
+$g->png("$samples/linespoints.png");
 
 print "ok 1\n";
 

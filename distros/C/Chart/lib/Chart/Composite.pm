@@ -1,32 +1,14 @@
-## @file
-# Implementation of Chart::Composite
-#
-# written by
-# @author david bonner (dbonner@cs.bu.edu)
-#
-# maintained by the
-# @author Chart Group at Geodetic Fundamental Station Wettzell (Chart@fs.wettzell.de)
-# @date 2015-03-01
-# @version 2.4.10
-#
-#---------------------------------------------------------------------
-# History:
-#----------
+# charts composed of several types
 
-## @class Chart::Composite
-# Composite class derived from class Base.\n
-# This class provides all functions which are specific to
-# composite charts
+use v5.12;
 
 package Chart::Composite;
+our @ISA     = qw(Chart::Base);
 our $VERSION = 2.400.5;
 
 use Chart::Base;
 use GD;
 use Carp;
-use strict;
-
-@Chart::Composite::ISA     = qw(Chart::Base);
 
 #>>>>>>>>>>>>>>>>>>>>>>>>>>#
 #  public methods go here  #

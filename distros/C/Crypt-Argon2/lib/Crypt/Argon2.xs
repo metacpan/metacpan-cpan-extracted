@@ -31,14 +31,7 @@ static size_t S_parse_size(pTHX_ SV* value, int type) {
 
 MODULE = Crypt::Argon2	PACKAGE = Crypt::Argon2
 
-SV*
-argon2d_pass(password, salt, t_cost, m_factor, parallelism, output_length)
-	int t_cost
-	SV* m_factor
-	int parallelism
-	SV* password
-	SV* salt
-	size_t output_length;
+SV* argon2d_pass(SV* password, SV* salt, int t_cost, SV* m_factor, int parallelism, size_t output_length)
 	ALIAS:
 	argon2d_pass = Argon2_d
 	argon2i_pass = Argon2_i
@@ -63,20 +56,13 @@ argon2d_pass(password, salt, t_cost, m_factor, parallelism, output_length)
 	);
 	if (rc != ARGON2_OK) {
 		SvREFCNT_dec(RETVAL);
-		Perl_croak(aTHX_ "Couldn't compute %s tag: %s", argon2_type2string(ix, false), argon2_error_message(rc));
+		Perl_croak(aTHX_ "Couldn't compute %s tag: %s", argon2_type2string(ix, FALSE), argon2_error_message(rc));
 	}
 	SvCUR(RETVAL) = encoded_length - 1;
 	OUTPUT:
 	RETVAL
 
-SV*
-argon2d_raw(password, salt, t_cost, m_factor, parallelism, output_length)
-	int t_cost
-	SV* m_factor
-	int parallelism
-	SV* password
-	SV* salt
-	size_t output_length;
+SV* argon2d_raw(SV* password, SV* salt, int t_cost, SV* m_factor, int parallelism, size_t output_length)
 	ALIAS:
 	argon2d_raw = Argon2_d
 	argon2i_raw = Argon2_i
@@ -100,16 +86,13 @@ argon2d_raw(password, salt, t_cost, m_factor, parallelism, output_length)
 	);
 	if (rc != ARGON2_OK) {
 		SvREFCNT_dec(RETVAL);
-		Perl_croak(aTHX_ "Couldn't compute %s tag: %s", argon2_type2string(ix, false), argon2_error_message(rc));
+		Perl_croak(aTHX_ "Couldn't compute %s tag: %s", argon2_type2string(ix, FALSE), argon2_error_message(rc));
 	}
 	SvCUR(RETVAL) = output_length;
 	OUTPUT:
 	RETVAL
 
-SV*
-argon2d_verify(encoded, password)
-	SV* encoded;
-	SV* password;
+SV* argon2d_verify(SV* encoded, SV* password)
 	ALIAS:
 	argon2d_verify = Argon2_d
 	argon2i_verify = Argon2_i
@@ -129,7 +112,7 @@ argon2d_verify(encoded, password)
 			RETVAL = &PL_sv_no;
 			break;
 		default:
-			Perl_croak(aTHX_ "Could not verify %s tag: %s", argon2_type2string(ix, false), argon2_error_message(status));
+			Perl_croak(aTHX_ "Could not verify %s tag: %s", argon2_type2string(ix, FALSE), argon2_error_message(status));
 	}
 	OUTPUT:
 	RETVAL

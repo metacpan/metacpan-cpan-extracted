@@ -862,7 +862,7 @@ sub create_compare_code ($$;$$) {
 	    };
 	    croak $self->{_prog} . ": unknown column name $arg in sort key\n"
 		if (!defined($left_coli) || !defined($right_coli));
-            my($this_sort_mode) = ($sort_mode == $MODE_AUTO ? ($a_fsdb->col_spec_is_numeric($left_coli) ? $MODE_NUMERIC : $MODE_LEXICAL) : $sort_mode);
+            my($this_sort_mode) = ($sort_mode == $MODE_AUTO ? ($a_fsdb->col_type_is_numeric($left_coli) ? $MODE_NUMERIC : $MODE_LEXICAL) : $sort_mode);
 	    my($comparison_op) = ($this_sort_mode == $MODE_NUMERIC ? "<=>" : ($this_sort_mode == $MODE_LEXICAL ? "cmp": undef));
 	    $compare_code .= "\t" . '($' . $left . '->[' . $left_coli . '] ' .
     	    	    $comparison_op .

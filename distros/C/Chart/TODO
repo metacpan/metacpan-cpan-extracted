@@ -1,51 +1,75 @@
-Short term:
------------
-- Composite:
-   When using bars in both, an option is necessary to define whether
-   to put the bars above each other or to put aside.
-   Add an option to start x-ticks at the left (i.e. 0 point) side and
-   end at the right side
+TODO's:
+-------
+
+General:
+--------
 - Reorganize the relationship between
   autoscale, 
   y_ticks, min_y_ticks, max_y_ticks, xy_plot, integer_ticks_only, skip_int_ticks,
   min_val, max_val
   and document it.
   (At the moment the autoscale is used as the default)
-- Include Skyplot (Direction->polar) into the distribution   
-- Add an option to lines, linespoints to start at (0,0) point not only
-  if option xy_plot is active
-- Add chart type candlestick
 
-- Correct pie chart:
-  - Add a flat pie chart where the legend appears on the left
-    of the chart, and the chart itself is about 50% smaller
+- Add chart type candlestick (used for stock exchange plots)
 
+- include TrueType fonts
+
+- 3-D charts
+
+- 
+
+Plottype specific:
+------------------
 - Base class:
-  - Some labels on the top of each axis not printed: i.e.,
-      the graph goes to 100.6 but 100.6 is not printed. 
-  - Define an option to force the first point sits at the left border of
+  : Some labels on the top of each axis not printed: i.e.,
+    the graph goes to 100.6 but 100.6 is not printed. 
+  : Define an option to force the first point sits at the left border of
     the graph, and the last point sits at the right border, without any spaces.
-   
-
-- Bars chart:
-  - User would like to override the color of specific bars in a Chart::Bars graph.
-  - Program should croak if a color is not defined for a bar.
-  - Within one Bar graph, I have two datasets, but would like to change the 
-    width of one of them (it should have a width of 1, to indicate a limit).
-  
-- Composite chart:
-  - Define different brush_sizes for example with one Lines dataset 
+  : Add output for png without header as modperl generates the headers
+    by itsself.
+  : Add getopts(), 
+  : Add dumpGetOpts(), i.e. list all options settings relevant for the 
+                       module(s) currently in use, and/or all options defined.
+     
+- Composite:
+  : When using bars in both, an option is necessary to define whether
+    to put the bars above each other or to put aside.
+  : Add an option to start x-ticks at the left (i.e. 0 point) side and
+    end at the right side
+  : When combining LinePoints and Mountain the use of
+     min_val results in this error 
+        "Use of uninitialized value in multiplication ..."
+  : support up to 3 chart types - 
+         for example: Mountain, StackedBars, LinesPoints 
+    (The number of chart types should be flexible in general) 
+  : Add option to limit the y-ticks to just one side
+  : Define different brush_sizes for example with one Lines dataset 
     and one LinesPoints dataset. 
     
-- Add output for png without header as modperl generates the headers
-  by itsself.
-  
-- Add output for gif again as the new GD module defines it again.
+- pie chart:
+  : Add a flat pie chart where the legend appears on the left
+    of the chart, and the chart itself is about 50% smaller
+  : Add an option to reduce or remove all the border elements on the left, 
+    on the right and on the bottom
+  : Allow to unset the title and remove the space occupied by the title,
+    i.e., make the plot bigger
+  : Add 3D appearance to the pies
+  : Set arbitrary background color to the pie (and make the pie visible in
+    the defined colors)
+  : Setup the ray of the pie  
 
-Long term:
-----------
-- 3-D charts
-- include TrueType fonts as soon as GD supports it
-- include logarithmic x- and y-axis
-- Let plot arbitrary xy-functions in a defined area, like
-  y=sin(1/x)+2*x
+- Bars chart:
+  : User would like to override the color of specific bars in a Chart::Bars graph.
+  : Program should croak if a color is not defined for a bar.
+  : Within one Bar graph, I have two datasets, but would like to change the 
+    width of one of them (it should have a width of 1, to indicate a limit).
+  : Within one Bar graph, I have two datasets, but would like to change the 
+    width of one of them (it should have a width of 1, to indicate a limit).
+  : Show values on each bar
+  
+- xy Plot:
+  : Add a feature to limit what is shown on the x axis
+  : include logarithmic x- and y-axis
+  : Let plot arbitrary xy-functions in a defined area, like
+     y=sin(1/x)+2*x
+

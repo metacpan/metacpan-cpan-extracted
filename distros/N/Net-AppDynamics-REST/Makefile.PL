@@ -38,6 +38,7 @@ WriteMakefile(
       AnyEvent::Loop 0
       HTTP::MultiGet 1.010
       URI::Escape 3.31
+      DateTime 1.57
       JSON 2.94
     )
     

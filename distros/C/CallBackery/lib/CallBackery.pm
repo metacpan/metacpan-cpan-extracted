@@ -18,11 +18,14 @@ Configure the mojo engine to run our application logic as webrequests arrive.
 
 =cut
 
-use strict;
-use warnings;
-
 # load the two modules to have perl check them
+# having a non-C locale for number will wreck all sorts of havoc
+# when things get converted to string and back
+use POSIX qw(locale_h);
+setlocale(LC_NUMERIC, "C");
+setlocale(LC_TIME, "C");
 
+use Mojo::Base 'Mojolicious';
 use Mojolicious::Plugin::Qooxdoo;
 use Mojo::URL;
 use Mojo::JSON;
@@ -35,9 +38,8 @@ use CallBackery::Database;
 use CallBackery::User;
 
 
-our $VERSION = '0.41.5';
+our $VERSION = '0.41.6';
 
-use Mojo::Base 'Mojolicious';
 
 =head2 config
 
@@ -127,6 +129,10 @@ Mojolicious calls the startup method at initialization time.
 
 sub startup {
     my $app = shift;
+    # having a non-C locale for number will wreck all sorts of havoc
+    # when things get converted to string and back
+    setlocale(LC_NUMERIC, "C");
+    setlocale(LC_TIME, "C");
 
     $app->config->postProcessCfg();
     my $gcfg = $app->config->cfgHash->{BACKEND};

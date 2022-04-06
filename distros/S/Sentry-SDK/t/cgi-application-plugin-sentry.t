@@ -86,7 +86,8 @@ describe 'CGI::Application::Plugin::Sentry' => sub {
     };
 
     it 'send an event to the sentry server' => sub {
-      is scalar $http->requests->@*, 1;
+      # First: info notification; second: Transaction request
+      is scalar $http->requests->@*, 2;
     };
 
     it 'provided request details' => sub {

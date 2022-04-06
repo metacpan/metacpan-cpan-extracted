@@ -1,4 +1,4 @@
-#fsdb low histogram
+#fsdb low:d histogram:q
 0 0
 10 0
 20 0

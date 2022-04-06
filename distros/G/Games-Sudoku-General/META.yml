@@ -28,7 +28,7 @@ no_index:
 provides:
   Games::Sudoku::General:
     file: lib/Games/Sudoku/General.pm
-    version: '0.026'
+    version: '0.027'
 requires:
   Carp: '0'
   Data::Dumper: '0'
@@ -43,5 +43,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Games-Sudoku-General
   license: http://dev.perl.org/licenses/
   repository: git://github.com/trwyant/perl-Games-Sudoku-General.git
-version: '0.026'
+version: '0.027'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

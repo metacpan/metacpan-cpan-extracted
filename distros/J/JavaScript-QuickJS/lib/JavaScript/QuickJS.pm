@@ -35,7 +35,7 @@ your system.
 
 use XSLoader;
 
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 
 XSLoader::load( __PACKAGE__, $VERSION );
 
@@ -131,14 +131,36 @@ primitives.
 
 =back
 
-=head1 PLATFORM NOTES
+=head1 NUMERIC PRECISION
 
-Due to QuickJS limitations, Linux & macOS are the only platforms known
-to work “out-of-the-box”. Other POSIX OSes I<should> work with some small
-tweaks to quickjs; see the compiler errors and F<quickjs.c> for more
-details.
+Note the following if you expect to deal with “large” numbers:
 
-Pull requests to improve portability are welcome!
+=over
+
+=item * JavaScript’s numeric-precision limits apply. (cf.
+L<Number.MAX_SAFE_INTEGER|https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/MAX_SAFE_INTEGER>.)
+
+=item * Perl’s stringification of numbers may be I<less> precise than
+JavaScript’s storage of those numbers, or even than Perl’s own storage.
+For example, in Perl 5.34 C<print 1000000000000001.0> prints C<1e+15>.
+
+To counteract this loss of precision, add 0 to Perl’s numeric scalars
+(e.g., C<print 0 + 1000000000000001.0>); this will encourage Perl to store
+numbers as integers when possible, which fixes the precision problem.
+
+=item * Long-double and quad-math perls may lose precision when converting
+numbers to/from JavaScript. To see if this affects your perl—which, if
+you’re unsure, it probably doesn’t—run C<perl -V>, and see if the
+compile-time options mention long doubles or quad math.
+
+=back
+
+=head1 OS SUPPORT
+
+QuickJS supports Linux & macOS natively, so these work without issue.
+
+FreeBSD, OpenBSD, & Cygwin work after a few patches that we apply when
+building this library. (Hopefully these will eventually merge into QuickJS.)
 
 =head1 SEE ALSO
 

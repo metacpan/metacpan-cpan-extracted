@@ -2,6 +2,8 @@
 
 BEGIN { unshift @INC, 'lib', '../lib'}
 use Chart::Points;
+use File::Temp 0.19;
+my $samples = File::Temp->newdir();
 
 print "1..1\n";
 
@@ -15,7 +17,7 @@ $g = Chart::Points->new();
     'brush_size' => 18,                                      # 10 points diameter
 
     #    'brushStyle' => 'FilledCircle',
-    #     'brushStyle' => 'circle',
+    #    'brushStyle' => 'circle',
     #    'brushStyle' => 'donut',
     #    'brushStyle' => 'OpenCircle',
     #    'brushStyle' => 'fatPlus',
@@ -72,7 +74,7 @@ $g->add_dataset( 14,    14,    14 );
 
 $g->set( 'legend_labels' => \@labels );
 
-$g->png("samples/points_5.png");
+$g->png("$samples/points_5.png");
 
 print "ok 1\n";
 

@@ -12,7 +12,8 @@ $hash{OBJECT} .= ' selectfunc$(OBJ_EXT)';
 WriteMakefile(
 	%hash,
 	%ldloadlibs,
-	'VERSION_FROM' => $file,
+	VERSION_FROM => $file,
+	NO_MYMETA => 1,
 );
 
 sub MY::postamble {

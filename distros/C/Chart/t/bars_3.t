@@ -4,6 +4,8 @@ BEGIN { unshift @INC, 'lib', '../lib'}
 
 
 use Chart::Bars;
+use File::Temp 0.19;
+my $samples = File::Temp->newdir();
 print "1..1\n";
 $g = Chart::Bars->new( 500, 500 );
 
@@ -29,7 +31,7 @@ $g->add_dataset( -2.4,   3.4,      1.9,      1.2,       -1.1,     -2.9 );
 );
 $g->set(%hash);
 
-$g->png("samples/bars_3.png");
+$g->png("$samples/bars_3.png");
 
 print "ok 1\n";
 

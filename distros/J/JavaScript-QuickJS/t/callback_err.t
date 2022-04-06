@@ -13,6 +13,9 @@ my $js = JavaScript::QuickJS->new();
 $js->set_globals(
     trouble => sub { die( bless [], 'Trouble' ) },
     nada => sub {},
+    bad_perl => sub { bless [], 'WhatWhat' },
+    bad_perl_in_array => sub { [ bless [], 'WhatWhat' ] },
+    bad_perl_in_hash => sub { { foo => \*STDOUT } },
 );
 
 {
@@ -34,9 +37,21 @@ $js->set_globals(
     my $err = $@;
     like($err, qr<big>i, 'BigInt to Perl triggers error');
 
-    eval { $js->eval("nada(Symbol(123123))") };
+    eval { $js->eval("nada(123, Symbol(123123))") };
     $err = $@;
     like($err, qr<symbol>i, 'Symbol to Perl triggers error');
+
+    eval { $js->eval("bad_perl()") };
+    $err = $@;
+    like($err, qr<WhatWhat>i, 'blessed ref from callback triggers error');
+
+    eval { $js->eval("bad_perl_in_array()") };
+    $err = $@;
+    like($err, qr<WhatWhat>i, 'blessed ref is in array');
+
+    eval { $js->eval("bad_perl_in_hash()") };
+    $err = $@;
+    like($err, qr<GLOB>i, 'filehandle ref is in hash');
 }
 
 done_testing;

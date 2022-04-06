@@ -1,5 +1,5 @@
 package Crypt::Argon2;
-$Crypt::Argon2::VERSION = '0.011';
+$Crypt::Argon2::VERSION = '0.012';
 use strict;
 use warnings;
 
@@ -51,7 +51,7 @@ Crypt::Argon2 - Perl interface to the Argon2 key derivation functions
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 SYNOPSIS
 
@@ -174,13 +174,13 @@ Implementations of other similar algorithms include:
 
 =over 4
 
+=item * L<Crypt::Bcrypt|Crypt::Bcrypt>
+
+An implementation of bcrypt, a battle-tested algorithm that tries to be CPU but not particularly memory intensive.
+
 =item * L<Crypt::ScryptKDF|Crypt::ScryptKDF>
 
 An implementation of scrypt, a older scheme that also tries to be memory hard.
-
-=item * L<Crypt::Eksblowfish::Bcrypt|Crypt::Eksblowfish::Bcrypt>
-
-An implementation of bcrypt, a battle-tested algorithm that tries to be CPU but not particularly memory intensive.
 
 =back
 

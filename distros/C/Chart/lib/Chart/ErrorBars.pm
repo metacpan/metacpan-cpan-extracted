@@ -1,31 +1,16 @@
-## @file
-# Implementation of Chart::ErrorBars
-#
-# written by
-# @author david bonner (dbonner@cs.bu.edu)
-#
-# maintained by the
-# @author Chart Group at Geodetic Fundamental Station Wettzell (Chart@fs.wettzell.de)
-# @date 2015-03-01
-# @version 2.4.10
-#
+
+# chart type: error bar - vertical bars
+#     which represent errors or standard deviations
+
+use v5.12;
 
 package Chart::ErrorBars;
-our $VERSION = 2.400.5;
+our @ISA     = qw(Chart::Base);
+our $VERSION = '2.400.5';
+
 use Chart::Base;
 use GD;
 use Carp;
-use strict;
-
-@Chart::ErrorBars::ISA     = qw(Chart::Base);
-
-## @class Chart::ErrorBars
-# ErrorBars class derived from class Base.
-#
-# This class provides all functions which are specific to
-# pointes having carrying vertical bars which represent
-# errors or standard deviations
-#
 
 #>>>>>>>>>>>>>>>>>>>>>>>>>>#
 #  public methods go here  #
@@ -40,8 +25,7 @@ use strict;
 #
 # Overwrites Base function
 #
-sub _draw_data
-{
+sub _draw_data {
     my $self      = shift;
     my $data      = $self->{'dataref'};
     my $misccolor = $self->_color_role_to_index('misc');

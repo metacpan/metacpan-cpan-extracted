@@ -8,7 +8,9 @@ use ExtUtils::MakeMaker::CPANfile;
 use Config;
 
 use File::Temp;
+use File::Slurper;
 use File::Spec;
+use File::Which;
 use Cwd;
 
 my $PERL_QJS_MAKEFILE_PATH = File::Spec->catfile( Cwd::getcwd(), 'Makefile.quickjs');
@@ -22,6 +24,8 @@ my @libs = qw(-lm -ldl -lpthread);
 if (_has_libatomic()) {
     push @libs, '-latomic';
 }
+
+_tweak_for_os();
 
 make_libquickjs();
 
@@ -58,11 +62,77 @@ WriteMakefile(
             },
         },
     },
-
-    depend => {
-        $libpath => 'quickjs',
-    },
 );
+
+sub _tweak_for_os {
+    my %bsd_fix = (
+        Makefile => sub {
+            return "CONFIG_DARWIN=y$/" . shift;
+        },
+
+        'quickjs-libc.c' => sub {
+            return join(
+                $/,
+                'extern char **environ;',
+                '#include <signal.h>',
+                'typedef sig_t sighandler_t;',
+                shift
+            );
+        },
+    );
+
+    my %edits = (
+        cygwin => {
+            'quickjs.c' => sub {
+                return "#include <malloc.h>$/" . shift;
+            },
+        },
+
+        freebsd => \%bsd_fix,
+
+        openbsd => {
+            %bsd_fix,
+
+            'quickjs.c' => sub {
+
+                # OpenBSD 6.5 seems to have *deleted* this function,
+                # so we can assume it won’t return.
+                #
+                # https://www.openbsd.org/plus65.html
+                # https://fjordtek.com/git/Fincer/openntpd-openbsd/commit/1bb7064e52f2efe021728e66eb627bae7c9fae71
+                #
+                return "#define malloc_usable_size js_malloc_usable_size_unknown$/" . shift;
+            },
+        },
+    );
+
+    if (my $edits_h = $edits{$^O}) {
+        my $touchfile_path = File::Spec->catfile('quickjs', 'js-qjs-tweaked');
+
+        if (-e $touchfile_path) {
+            print "QuickJS is already tweaked for $^O compatibility.$/";
+        }
+        else {
+            print "Tweaking QuickJS for $^O compatibility …$/";
+
+            for my $fname (keys %$edits_h) {
+                my $path = "quickjs/$fname";
+
+                my $content = File::Slurper::read_binary($path);
+
+                my $out = $edits_h->{$fname}->($content);
+                File::Slurper::write_binary($path, $out);
+            }
+
+            print "Done.$/";
+
+            open my $fh, '>', $touchfile_path;
+        }
+    }
+    else {
+        print "No tweaks for $^O are available. Hopefully none are needed!$/";
+    }
+}
 
 sub _has_libatomic {
     my $dir = File::Temp::tempdir( CLEANUP => 1 );
@@ -94,19 +164,30 @@ sub make_libquickjs {
     #
     $make =~ s<^(\s*CFLAGS\s*=\s*)><$1 -fPIC >mg;
 
-    open my $fh, '>', $PERL_QJS_MAKEFILE_PATH;
+    open my $fh, '>', $PERL_QJS_MAKEFILE_PATH or die "open($PERL_QJS_MAKEFILE_PATH): $!";
     syswrite $fh, $make or die "write custom quickjs make: $!";
+    print "Created `$PERL_QJS_MAKEFILE_PATH`$/";
 }
 
 # ----------------------------------------------------------------------
 package MY;
 
+use Config;
+
+sub _gmake_path {
+
+    # QuickJS requires GNU make.
+    return ( ($^O =~ m<bsd>i) ? $Config{'gmake'} : '$(MAKE)' );
+}
+
 sub postamble {
+    my $gmake_path = _gmake_path();
+
     return <<"MAKE_FRAG"
 
 .PHONY:
 build-quickjs:
-\t\$(MAKE) -C quickjs -f '$PERL_QJS_MAKEFILE_PATH' libquickjs.a
+\t$gmake_path -C quickjs -f '$PERL_QJS_MAKEFILE_PATH' libquickjs.a
 MAKE_FRAG
 }
 

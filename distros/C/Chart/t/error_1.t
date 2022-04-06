@@ -2,6 +2,8 @@
 
 BEGIN { unshift @INC, 'lib', '../lib'}
 use Chart::ErrorBars;
+use File::Temp 0.19;
+my $samples = File::Temp->newdir();
 
 print "1..1\n";
 
@@ -24,7 +26,7 @@ $g->set(
 
 );
 
-$g->png("samples/error_1.png");
+$g->png("$samples/error_1.png");
 
 print "ok 1\n";
 

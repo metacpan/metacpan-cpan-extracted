@@ -2,6 +2,8 @@
 
 BEGIN { unshift @INC, 'lib', '../lib'}
 use Chart::Pareto;
+use File::Temp 0.19;
+my $samples = File::Temp->newdir();
 
 print "1..1\n";
 
@@ -31,7 +33,7 @@ $g->add_dataset( 2500, 1000,  250,  700,  100,  610,  20 );
 );
 
 $g->set(%hash);
-$g->png("samples/pareto_1.png");
+$g->png("$samples/pareto_1.png");
 
 print "ok 1\n";
 

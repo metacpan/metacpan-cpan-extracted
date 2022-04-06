@@ -4,7 +4,7 @@
       "Andy Lester <andy@petdance.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.48, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -48,12 +48,18 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/shlomif/html-tidy5/issues"
+      },
       "homepage" : "http://github.com/shlomif/html-tidy5",
       "license" : [
          "http://www.opensource.org/licenses/artistic-license-2.0.php"
-      ]
+      ],
+      "repository" : {
+         "url" : "http://github.com/shlomif/html-tidy5"
+      }
    },
-   "version" : "0.010",
+   "version" : "0.011",
    "x_contributors" : [
       "Andy Lester <andy@petdance.com>",
       "Jonathan Rockway <jrockway@cpan.org>",
@@ -61,5 +67,5 @@
       "Robert Rothenberg <rrwo@cpan.org>",
       "Rufus Cable <cpan@threebytesfull.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.05"
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

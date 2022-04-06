@@ -181,6 +181,7 @@ B<Examples of invalid local variable names:>
 
 The list of keywords.
 
+  alias
   allow
   as
   break
@@ -230,6 +231,7 @@ The list of keywords.
   next
   new
   new_string_len
+  of
   our
   object
   print
@@ -342,7 +344,7 @@ POD starts from the line beginning with C<=>, followed by any string that consis
 
 POD ends from the line beginning with C<=cut>, and ending with L<"Line Terminators">.
 
-B<POD Examples:>
+B<Examples of POD:>
 
   =pod
 
@@ -386,7 +388,7 @@ If Integer Literal is assigned to a L<"byte Type"> variable or passed to L<"byte
 
 If Integer Literal is assigned to a L<"short Type"> variable or passed to L<"short Type"> Method Argument, and does not exceed the range of numbers that can be represented by L<"short Type">, <a href = "#language-type-convertion-numeric-narrowing">Numeric Narrowing Type Conversion</a> is performed and the value converted to L<"short Type"> value. If it exceeds the range, a compilation error will occur.
 
-B<Integer Literal Example:>
+B<Examples of Integer Literal:>
 
   123
   +123
@@ -406,7 +408,7 @@ It is followed by one or more consecutive characters "0" to "9", "a" to "f", or 
 
 Other rules are same as Decimal Representation of Integer Literal
 
-B<Hexadecimal Representation of Integer Literal Example:>
+B<Examples of Hexadecimal Representation of Integer Literal:>
 
   0x3b4f
   -0x3F1A
@@ -423,7 +425,7 @@ It is followed by one or more consecutive characters "0" to "7".
 
 Other rules are same as Decimal Representation of Integer Literal
 
-B<Octal Representation of Integer Literal Example:>
+B<Examples of Octal Representation of Integer Literal:>
 
   0755
   -0644
@@ -438,7 +440,7 @@ Binary Representation of Integer Literal starts with "0b" or "0B".
 
 It is followed by one or more consecutive characters "0" or "1".
 
-B<Binary Representation of Integer Literal Example:>
+B<Examples of Binary Representation of Integer Literal:>
 
   0b0101
   -0b1010
@@ -485,7 +487,7 @@ If Floating Point Literal is L<"float Type">, the Floating Point Literal is conv
 
 If Floating Point Literal is L<"double Type">, the Floating Point Literal is converted to double value using C standard "strtod" function. If the conversion fails, a compilation error occurs.
 
-B<Floating Point Literal Example:>
+B<Examples of Floating Point Literal:>
 
   1.32
   -1.32
@@ -607,7 +609,7 @@ L<"Types"> of Charater Literal is L<"byte Type">.
 
 =end html
 
-B<Charater Literal Example:>
+B<Examples of Charater Literal:>
 
 B<Charater Literal> represents one character of ASCII.
 
@@ -843,18 +845,18 @@ The SPVM language is assumed to be parsed by yacc/bison.
 
 Show the definition of syntax parsing that is written by yacc/bison. The definition of the precidence of operators is contained in this difinition.
 
-  %token <opval> CLASS HAS METHOD OUR ENUM MY USE AS REQUIRE ALLOW CURRENT_CLASS MUTABLE
+  %token <opval> CLASS HAS METHOD OUR ENUM MY USE AS REQUIRE ALIAS ALLOW CURRENT_CLASS MUTABLE
   %token <opval> DESCRIPTOR MAKE_READ_ONLY IMPLEMENT
   %token <opval> IF UNLESS ELSIF ELSE FOR WHILE LAST NEXT SWITCH CASE DEFAULT BREAK EVAL
   %token <opval> NAME VAR_NAME CONSTANT EXCEPTION_VAR
   %token <opval> UNDEF VOID BYTE SHORT INT LONG FLOAT DOUBLE STRING OBJECT TRUE FALSE END_OF_FILE
-  %token <opval> DOT3 FATCAMMA RW RO WO INIT NEW
+  %token <opval> DOT3 FATCAMMA RW RO WO INIT NEW OF
   %token <opval> RETURN WEAKEN DIE WARN PRINT CURRENT_CLASS_NAME UNWEAKEN '[' '{' '('
   %type <opval> grammar
   %type <opval> opt_classes classes class class_block
   %type <opval> opt_declarations declarations declaration
   %type <opval> enumeration enumeration_block opt_enumeration_values enumeration_values enumeration_value
-  %type <opval> method anon_method opt_args args arg has use require our
+  %type <opval> method anon_method opt_args args arg has use require alias our
   %type <opval> opt_descriptors descriptors
   %type <opval> opt_statements statements statement if_statement else_statement
   %type <opval> for_statement while_statement switch_statement case_statement default_statement
@@ -866,8 +868,10 @@ Show the definition of syntax parsing that is written by yacc/bison. The definit
   %type <opval> new array_init
   %type <opval> my_var var implement
   %type <opval> expression opt_expressions expressions opt_expression case_statements
-  %type <opval> field_name method_name is_read_only
-  %type <opval> type qualified_type basic_type array_type array_type_with_length ref_type  qualified_type_or_void
+  %type <opval> field_name method_name class_name class_alias_name is_read_only
+  %type <opval> type qualified_type basic_type array_type
+  %type <opval> array_type_with_length ref_type  return_type type_comment opt_type_comment
+  
   %right <opval> ASSIGN SPECIAL_ASSIGN
   %left <opval> LOGICAL_OR
   %left <opval> LOGICAL_AND
@@ -914,28 +918,31 @@ Show the definition of syntax parsing that is written by yacc/bison. The definit
     : has
     | method
     | enumeration
-    | our ';'
+    | our
     | use
     | allow
     | implement
     | init_block
+    | alias
 
   init_block
     : INIT block
 
   use
-    : USE basic_type ';'
-    | USE basic_type AS basic_type';'
+    : USE class_name ';'
+    | USE class_name AS class_alias_name ';'
 
   require
-    : REQUIRE basic_type
-    | REQUIRE basic_type AS basic_type';'
+    : REQUIRE class_name
+
+  alias
+    : ALIAS class_name AS class_alias_name ';'
 
   allow
-    : ALLOW basic_type ';'
+    : ALLOW class_name ';'
 
   implement
-    : IMPLEMENT basic_type ';'
+    : IMPLEMENT class_name ';'
 
   enumeration
     : opt_descriptors ENUM enumeration_block
@@ -957,20 +964,20 @@ Show the definition of syntax parsing that is written by yacc/bison. The definit
     | method_name ASSIGN CONSTANT
 
   our
-    : OUR VAR_NAME ':' opt_descriptors qualified_type
+    : OUR VAR_NAME ':' opt_descriptors qualified_type opt_type_comment ';'
 
   has
-    : HAS field_name ':' opt_descriptors qualified_type ';'
+    : HAS field_name ':' opt_descriptors qualified_type opt_type_comment ';'
 
   method
-    : opt_descriptors METHOD method_name ':' qualified_type_or_void '(' opt_args opt_vaarg')' block
-    | opt_descriptors METHOD method_name ':' qualified_type_or_void '(' opt_args opt_vaarg')' ';'
-    | opt_descriptors METHOD ':' qualified_type_or_void '(' opt_args opt_vaarg')' block
-    | opt_descriptors METHOD ':' qualified_type_or_void '(' opt_args opt_vaarg ')' ';'
+    : opt_descriptors METHOD method_name ':' return_type '(' opt_args opt_vaarg')' block
+    | opt_descriptors METHOD method_name ':' return_type '(' opt_args opt_vaarg')' ';'
+    | opt_descriptors METHOD ':' return_type '(' opt_args opt_vaarg')' block
+    | opt_descriptors METHOD ':' return_type '(' opt_args opt_vaarg ')' ';'
 
   anon_method
-    : opt_descriptors METHOD ':' qualified_type_or_void '(' opt_args opt_vaarg')' block
-    | '[' args ']' opt_descriptors METHOD ':' qualified_type_or_void '(' opt_args opt_vaarg')' block
+    : opt_descriptors METHOD ':' return_type '(' opt_args opt_vaarg')' block
+    | '[' args ']' opt_descriptors METHOD ':' return_type '(' opt_args opt_vaarg')' block
 
   opt_args
     : /* Empty */
@@ -982,7 +989,7 @@ Show the definition of syntax parsing that is written by yacc/bison. The definit
     | arg
 
   arg
-    : var ':' qualified_type
+    : var ':' qualified_type opt_type_comment
 
   opt_vaarg
     : /* Empty */
@@ -1207,8 +1214,8 @@ Show the definition of syntax parsing that is written by yacc/bison. The definit
   call_spvm_method
     : CURRENT_CLASS NAME '(' opt_expressions  ')'
     | CURRENT_CLASS NAME
-    | basic_type ARROW method_name '(' opt_expressions  ')'
-    | basic_type ARROW method_name
+    | class_name ARROW method_name '(' opt_expressions  ')'
+    | class_name ARROW method_name
     | expression ARROW method_name '(' opt_expressions ')'
     | expression ARROW method_name
     | expression ARROW '(' opt_expressions ')'
@@ -1237,7 +1244,7 @@ Show the definition of syntax parsing that is written by yacc/bison. The definit
     | SCALAR '@' '{' expression '}'
 
   my_var
-    : MY var ':' qualified_type
+    : MY var ':' qualified_type opt_type_comment
     | MY var
 
   var
@@ -1274,9 +1281,16 @@ Show the definition of syntax parsing that is written by yacc/bison. The definit
     : basic_type '[' expression ']'
     | array_type '[' expression ']'
 
-  qualified_type_or_void
-    : qualified_type
+  return_type
+    : qualified_type opt_type_comment
     | VOID
+
+  opt_type_comment
+    : /* Empty */
+    | type_comment
+
+  type_comment
+    : OF type
 
   field_name
     : NAME
@@ -1284,11 +1298,20 @@ Show the definition of syntax parsing that is written by yacc/bison. The definit
   method_name
     : NAME
 
+  class_name
+    : NAME
+
+  class_alias_name
+    : NAME
+
 The following is a correspondence table between tokens in yacc/bison and keywords and operators in SPVM.
 
 =begin html
 
 <table>
+  <tr>
+    <td>ALIAS</td><td>alias</td>
+  </tr>
   <tr>
     <td>ALLOW</td><td>allow</td>
   </tr>
@@ -1476,6 +1499,9 @@ The following is a correspondence table between tokens in yacc/bison and keyword
     <td>NEW_STRING_LEN</td><td>new_string_len</td>
   </tr>
   <tr>
+    <td>OF</td><td>of</td>
+  </tr>
+  <tr>
     <td>NEXT</td><td>next</td>
   </tr>
   <tr>
@@ -1653,7 +1679,7 @@ B<Examples of class definitions:>
   
   }
 
-Direct children of the class block must be L<use|"Load Module">, L<our|"Class Variable">,
+Direct children of the class block must be L<use|"Load Modules">, L<our|"Class Variable">,
 L<has|"Field Definition">, L<enum|"Enumeration Definition">, L<method|"Method Definition">, L<allow|"Allow Class Access">,
 L<implement|"implement Statement"> and L<INIT block|"INIT Block"> can be defined.
 
@@ -1776,7 +1802,11 @@ If more than one of "callback_t", "mulnum_t", "pointer_t" are specified, a compi
 
 =head2 Destructor
 
-If the class is L<"Class Type">, the class can define the destructor.
+If a L<class|"Class"> can has the destructor.
+
+  method DESTROY : void () {
+  
+  }
 
 A destructor is a special L<method|"Method"> called when the object is destroyed.
 
@@ -1785,10 +1815,6 @@ A destructor name must be C<DESTROY>.
 A destructor retrun type must be L<void type|"void Type">, otherwise a compilation error occurs.
 
 A destructor must be a L<instance method|"Instance Method"> that don't have the arguments, otherwise a compilation error occurs.
-
-  method DESTROY : void () {
-  
-  }
 
 If a L<"Exception"> occurs in the destructor, the exception is not thrown, and prints the message to STDERR.
 
@@ -1804,65 +1830,64 @@ B<Examples of destructors:>
     }
   }
 
-=head2 Callback
+=head2 Allow Class Access
 
-Callback is a L<class|"Class"> that is designed to receive a callback method.
+By default, private Methods, Fields, and Class Variables cannot be accessed from outside the Class.
 
-A callback type is a L<"Class Type"> with L<"Class Descriptors"> "callback_t".
+Also, Private Class cannot L<"new Operator"> from outside of Class.
+
+If the class allow other class, the other class can access private Methods, Fields, and Class Variables, and can L<"new Operator"> of the class.
+
+  allow CLASS_NAME;
+
+allow must be defined directory under L<"Class Definition">.
+
+  class Foo {
+    allow Bar;
+  }
+
+In this example, Bar can access the private Method, Field, and Class Variable of Foo can be accessed and can new Operator of Foo.
+
+Specifying the module of B<allow> also loads the module by L<"use"> at the same time.
+
+=head1 Callback
+
+Explains callbacks.
+
+=head2 Callback Definition
+
+A callback can be defined using the L<class descriptor|"Class Descriptors"> C<callback_t>.
 
   class Comparator: callback_t {
     method : int ($x1 : object, $x2 : object);
   }
 
-A callback type must have only one L<"Method Definition">. The method must be L<"Instance Method">.
+The type of the callback is L<"Callback Type">.
 
-Method names of the callback type must be anonymouse.
+A callback must have only one L<method definition|"Method Definition">. The method must be a L<instance method|"Instance Method">.
 
-L<"Field Definition"> and L<"Class Variable Definition"> can't be defined.
+The callback can't have the L<method block|"Method Block">.
 
-A L<private class descriptor|"Class Descriptors"> is specifed.
+The method name of the callback must be an empty string C<"">.
 
-If the object has the same method declaration of the callback type, it can be assinged to the callback type.
+The callback can't have L<field definitions|"Field Definition"> and L<class variable definition|"Class Variable Definition">.
 
-  # the definiton of a callback type
-  class Comparator: callback_t {
-    method : int ($x1 : object, $x2 : object);
-  }
-  
-  # The definition of a class
-  class SomeComparator {
-    static method new: int () {
-      return new SomeComparator;
-    }
-  
-    method : int ($x1 : object, $x2 : object) {
-  
-    }
-  }
-  
-  # The object can be assign to the callback type
-  my $comparator: Comparator = SomeComparator->new;
+If the definition of the callback is invalid, a compilation error will occur.
 
-If the object is created by the syntax of L<"Create Callback"> and the object has the same method declaration of the callback type,
-it can be assinged to the callback type.
+If the object is created by the syntax of L<"Create Callback"> can be assigned to the callback that the types of arguments and return type are same.
 
-  # The definition of a callback type
-  class Comparator: callback_t {
-    method : int ($x1 : object, $x2 : object);
-  }
-  
   # Create a callback and it is assigned to a callback type
   my $comparator : Comparator = method : int ($x1 : object, $x2 : object) {
     
-  }
+  };
 
-=head2 Interface
+=head1 Interface
 
-Interface is a type that is designed for class abstructions.
+Explains interfaces.
 
-=head3 Interface Definision
+=head2 Interface Definision
 
-A interface type is defined using a L<"class descriptor|"Class Descriptors"> "interface_t".
+A interface is defined using a L<"class descriptor|"Class Descriptors"> C<interface_t>.
 
   class Asset: interface_t {
     method add_chunk : void ($chunk : string);
@@ -1871,7 +1896,9 @@ A interface type is defined using a L<"class descriptor|"Class Descriptors"> "in
     method is_file : int ();
   }
 
-The object that the class has the interface can be assign to the interface type.
+The type of the interface is L<"Interface Type">.
+
+The object that implements the interface using L<implement stataments|"implement Statement"> can be assign to the interface.
 
   class Asset::Memory {
     implement Asset;
@@ -1887,7 +1914,7 @@ The object that the class has the interface can be assign to the interface type.
 
 =head2 implement Statement
 
-The class have a L<interface|"Interface"> specified by a C<implement> statement is expected to implement the all methods of the interface class.
+The L<class|"Class"> that implements L<interfaces|"Interface"> is expected to implement the methods of the interface.
 
   class Asset::Memory {
     implement Asset;
@@ -1923,11 +1950,7 @@ The class have a L<interface|"Interface"> specified by a C<implement> statement 
     }
   }
 
-C<implement> statements can be defined in the class that is L<class types|"Class Type">.
-
-Not that C<implement> statement doesn't force the implementation of all methods of the interface class. 
-
-The class does not necessarily have all the methods declared in the interface.
+Not that C<implement> statement doesn't force the implementation of methods of the interface.
 
   class Asset::File {
     implement Asset;
@@ -1939,30 +1962,12 @@ The class does not necessarily have all the methods declared in the interface.
       # ...
     }
     
-    # OK although size and is_file method is not defined
+    # It is OK although size and is_file method is not defined
   }
 
-The existence of a the method implementation can be checked by the L<has_implement|"has_implement Operator"> operator.
+If the method implementation is not found, an exception is thrown at runtime.
 
-=head2 Allow Class Access
-
-By default, private Methods, Fields, and Class Variables cannot be accessed from outside the Class.
-
-Also, Private Class cannot L<"Create Object"> from outside of Class.
-
-If the class allow other class, the other class can access private Methods, Fields, and Class Variables, and can L<"Create Object"> of the class.
-
-  allow CLASS_NAME;
-
-allow must be defined directory under L<"Class Definition">.
-
-  class Foo {
-    allow Bar;
-  }
-
-In this example, Bar can access the private Method, Field, and Class Variable of Foo can be accessed and can Create Object of Foo.
-
-Specifying the module of B<allow> also loads the module by L<"use"> at the same time.
+The existence of the method implementation can be checked by the L<has_implement|"has_implement Operator"> operator.
 
 =head1 Module
 
@@ -1996,18 +2001,18 @@ Change "::" to "/". Add ".spvm" at the end.
   SPVM/Foo/Bar.spvm
   SPVM/Foo/Bar/Baz.spvm
 
-=head2 Load Module
+=head2 Load Modules
 
-Use B<use> keyword to load a Module.
-
+The C<use> syntax loads a Module.
+  
+  # Load a module
   use Foo;
-  use Foo::Bar;
+
+If the module does not exist, a compilation error will occur.
 
 Modules are loaded at compile-time.
 
-If the Module does not exist, a compilation error will occur.
-
-use Keyword must be defined directly under L<"Class Definition">.
+C<use> syntax must be defined directly under L<"Class Definition">.
 
   class Foo {
     use Foo;
@@ -2015,14 +2020,25 @@ use Keyword must be defined directly under L<"Class Definition">.
 
 =head2 Class Alias
 
-Define class aliases using B<as> syntax with B<use>
+C<alias> syntax create an alias name for a class name.
+  
+  # Create alias
+  alias Foo::Bar as FB;
 
-  use Foo::Bar as FB;
-
-FB is used as Foo::Bar alias in class method calls.
+FB is used as Foo::Bar alias in L<class method calls|Class Method Call>.
 
   # This means Foo::Bar->sum(1, 2);
   FB->sum(1, 2);
+
+C<alias> syntax must be defined directly under L<"Class Definition">.
+
+  class Foo {
+    alias Foo::Bar as FB;
+  }
+
+You can create an alias at the same time as loading a module by C<use>.
+  
+  use Foo::Bar as FB;
 
 =head2 Automatically Loaded Module
 
@@ -2168,7 +2184,7 @@ Write Acessor of Class Variable has one argument and the type is same as the typ
 
 Inline Expansion optimization is performed to Read Accessor and Write Accessor. You don't have to worry about the performance penalty of using Class Variable Accessors.
 
-B<Class Variable Definition Example:>
+B<Examples of Class Variable Definition:>
 
   class Foo {
     our $NUM1 : byte;
@@ -2202,9 +2218,9 @@ This initial value can be changed by using L<"INIT Block">.
 
 Class Variable Access is an operation to access Class Variable to get or set a value.
 
-See L<"Get Class Variable"> for how to get the value of Class Variable.
+See L<"Getting Class Variable"> for how to get the value of Class Variable.
 
-See L<"Set Class Variable"> for the setting of the value of Class Variable.
+See L<"Setting Class Variable"> for the setting of the value of Class Variable.
 
 =head1 Field
 
@@ -2300,7 +2316,7 @@ Write Acessor of Class Variable has two arguments. First argument is L<"self Typ
 
 Inline Expansion optimization is performed to Read Accessor and Write Accessor. You don't have to worry about the performance penalty of using Field Accessors.
 
-B<Field Definition Example:>
+B<Examples of Field Definition:>
 
   class Foo {
     has num1 : byte;
@@ -2318,47 +2334,52 @@ B<Field Definition Example:>
 
 =head2 Field Access
 
-Field Access is an operation to access Field to get or set a value.
+The field access is an L<expression|"Expressions"> to get or set the field.
 
-  EXPRESSION->{FIELD_NAME}
+  INVOCANT->{FIELD_NAME}
 
-Field Access has three different meanings.
+The field access has three different syntax.
 
-B<1. Class Based Object Field Access>
+If the invocant is different from the following three field access, a compilation error occurs.
 
-Class Based Object Field Access is Field Access from object which is create by L<"new"> keyword.
+If the field name does not found, a compilation error occurs
+
+=head3 Field Access of the Class
+
+The field access of the L<class|"Class">.
 
   my $point = new Point;
   $point->{x} = 1;
+  my $x = $point->{x};
 
-See L<"Get Field"> to get field of Class Based Object.
+See L<"Getting Field"> to get the field of the L<class|"Class">.
 
-See L<"Set Field"> to set field of Class Based Object.
+See L<"Setting Field"> to set the field of the L<class|"Class">.
 
-B<2. Multi Numeric Field Access>
+=head3 Field Access of the Multi Numeric Type
 
-Multi Numeric Field Access is Field Access from the value of L<"Multi Numeric Types">. The value of L<"Multi Numeric Types"> is allocated Callstack of Method.
+The field access of the L<multi numeric type|"Multi Numeric Types">.
 
   my $z : Complex_2d;
-  $z->{x} = 1;
-  $z->{y} = 3;
+  $z->{re} = 1;
+  my $re = $z->{re};
 
-See L<"Get Multi Numeric Field Value"> to get field of the value of L<"Multi Numeric Types">.
+See L<"Getting Multi Numeric Field"> to get the field of the L<multi numeric type|"Multi Numeric Types">.
 
-See L<"Set Multi Numeric Field Value"> to set field of the value of L<"Multi Numeric Types">.
+See L<"Setting Multi Numeric Field"> to set the field of L<multi numeric type|"Multi Numeric Types">.
 
-B<3. Dereference Multi Numeric Field>
+=head3 Field Access of the Multi Numeric Reference via Derefernce
 
-Dereference Multi Numeric Field is Field access from Reference of the value of L<"Multi Numeric Types">.
+The field access of the L<multi numeric reference|"Multi Numeric Reference Type"> via derefernce.
 
   my $z : Complex_2d;
   my $z_ref = \$z;
-  $z_ref->{x} = 1;
-  $z_ref->{y} = 3;
+  $z_ref->{re} = 1;
+  my $re = $z_ref->{re};
 
-See L<"Get Multi Numeric Field Value via Dereference"> to get Multi Numeric Field via Dereference.
+See L<"Getting Multi Numeric Field via Dereference"> to get the field of the L<multi numeric reference|"Multi Numeric Reference Type"> via dereference.
 
-See L<"Set Multi Numeric Field Value via Dereference"> to set Multi Numeric Field via Dereference.
+See L<"Setting Multi Numeric Field via Dereference"> to set the field of the L<multi numeric reference|"Multi Numeric Reference Type"> via dereference.
 
 =head1 Method
 
@@ -2546,7 +2567,7 @@ Signature is a string that follow the following rule sequence of Method Retrun V
 
 It the method is a instance method, the part of signature of the first argument is "self".
 
-B<Signature Example:>
+B<Examples of Signature:>
 
   # Method Definition
   static method foo : int ($num1 : double, $num2 : long[])
@@ -2824,9 +2845,9 @@ Local Variable is initialized by L<"Type Initial Value">.
 
 Local Variable Access is an operation to access Local Variable to get or set the value.
 
-See L<"Get Local Variable"> to get Local Variable value.
+See L<"Getting Local Variable"> to get Local Variable value.
 
-L<"Set Local Variable"> to get Local Variable value.
+L<"Setting Local Variable"> to get Local Variable value.
 
 If L<"Class Variable"> with the same name as the Local Variable exists, Program uses the variable as Local Variable, not L<"Class Variable">.
 
@@ -2847,7 +2868,7 @@ B<Scope> is a range surrounded by L<"Scope Blocks">.
 
 Local Variable Declaration registers the Local Variable that is L<"Object Types"> with Mortal Variable in run-time. 
 
-If the object is not L<"undef">, The Reference Count is added by 1.
+If the object is not L<"undef">, The reference count is added by C<1>.
 
   {
     # $num become Mortal Variable in run-time
@@ -2856,7 +2877,7 @@ If the object is not L<"undef">, The Reference Count is added by 1.
 
 At the end of Scope, the object that is registered as Mortal Variable, Reference Count is reduced by 1 except the object is not L<"undef">.
 
-If the Reference Count become 0, the object released.
+If the reference count become 0, the object released.
 
 =head2 Block
 
@@ -3006,9 +3027,9 @@ The created string is one more last byte that value is C<\0> on the internal mem
 
 The length of the string can be got using a L<string length operator|"String Length Operator">
   
-  # Get the length of the string
+  # Getting the length of the string
   my $message = "Hello"+
-  my $length = legnth $message;
+  my $length = length $message;
 
 =head1 Undefined Value
 
@@ -3062,37 +3083,33 @@ Identifiers other than L<"Class Variable Names"> and L<"Local Variable Names"> p
 
 =head1 Array
 
-=head2 Array Summary
+The array is the data structure for multiple values.
 
-Array is a data structure for continuous multiple values.
-
-There are the following types of Array.
+There are the following types of array.
 
 =begin html
 
 <ul>
   <li>
-    Numeric Types Array
+    Numeric Array
  </li>
   <li>
-    Object Type Array
+    Object Array
  </li>
   <li>
-    Multi Numeric Types Array
+    Multi Numeric Array
  </li>
 </ul>
 
 =end html
 
-Numeric Types Array is an array that element type is L<"Numeric Types">.
+The numeric array is the array that the type of the element is the L<numeric type|"Numeric Types">.
 
-Numeric Types Array is an array that element type is L<"Object Types">.
+The object array is the array that the type of the element is the L<object type|"Object Types">.
 
-Numeric Types Array is an array that element type is L<"Multi Numeric Types">.
+The multi numeric array is the array that the type of the element is the L<multi numeric type|"Multi Numeric Types">.
 
-=head2 Create Array
-
-See L<"Create Array"> to create Array.
+See L<"Creating Array"> to create Array.
 
 =head2 Array Access
 
@@ -3100,9 +3117,9 @@ Array Access is an operation to access the element of Array to get or set the va
 
   ARRAY->[INDEX]
 
-See L<"Get Array Element"> to get the element value of Array.
+See L<"Getting Array Element"> to get the element value of Array.
 
-See L<"Set Array Element"> to set the element value of Array.
+See L<"Setting Array Element"> to set the element value of Array.
 
 =head1 Multi Numeric Value
 
@@ -3239,9 +3256,9 @@ B<Multi Numeric Types Field Access> is an operation to access Multi Numeric Type
 
   MULTI_NUMERIC_TYPE_VALUE->{FIELD_NAME}
 
-See L<"Get Multi Numeric Field Value"> to get Multi Numeric Types Field Value.
+See L<"Getting Multi Numeric Field"> to get Multi Numeric Types Field.
 
-See L<"Set Multi Numeric Field Value"> to set Multi Numeric Types Field Value.
+See L<"Setting Multi Numeric Field"> to set Multi Numeric Types Field.
 
 =head1 Multi Numeric Array
 
@@ -3267,9 +3284,9 @@ Multi Numeric Array Access is an operation to access Multi Numeric Array to get 
 
   Array->[INDEX]
 
-See L<"Get Array Element"> to get Array Element Value.
+See L<"Getting Array Element"> to get Array Element Value.
 
-See L<"Set Array Element"> to get Array Element Value.
+See L<"Setting Array Element"> to get Array Element Value.
 
 =head1 Reference
 
@@ -3322,59 +3339,63 @@ Dereference is an operation to get and set the value pointed by Reference.
   # Dereference Multi Numeric Types Reference to set the pointed value
   $$point_ref = $point2;
 
-If the target of Reference Type is L<"Multi Numeric Types">, the setting and getting of Multi Numeric Types Field Value can be done by Arrow Operator.
+If the target of Reference Type is L<"Multi Numeric Types">, the setting and getting of Multi Numeric Types Field can be done by Arrow Operator.
 
-  # If the target of Reference Type is Multi Numeric Types, get Multi Numeric Types Field Value
+  # If the target of Reference Type is Multi Numeric Types, get Multi Numeric Types Field
   my $x = $point_ref->{x};
   
-  # If the Target of Reference Type is Multi Numeric Types, set Multi Numeric Types Field Value
+  # If the Target of Reference Type is Multi Numeric Types, set Multi Numeric Types Field
   $point_ref->{x} = 1;
 
 =head1 Expressions
 
-Expressions are a syntax part that can be evaluated as a value.
+Expressions are L<"Operators">, L<"Undefined Value">, L<"Literals">, L<"Getting Local Variable">, L<"Setting Local Variable">,
+L<"Getting Class Variable">, L<"Getting Class Variable">, L<"Setting Class Variable">, L<"Getting Exception Variable">, L<"Setting Exception Variable">,
+L<"Getting Field">, L<"Setting Field">, L<"Getting Multi Numeric Field">, L<"Setting Multi Numeric Field">, L<"Getting Multi Numeric Field via Dereference">, L<"Setting Multi Numeric Field via Dereference">, <"Getting Array Element">, L<"Setting Array Element"> and L<"Method Call">.
 
-These are L<"Operators">, L<"Undefined Value">, L<"Literals">, L<"Get Local Variable">, L<"Set Local Variable">,
-L<"Get Class Variable">, L<"Get Class Variable">, L<"Set Class Variable">, L<"Get Exception Variable">, L<"Set Exception Variable">,
-L<"Get Field">, L<"Set Field">, L<"Get Array Element">, L<"Set Array Element"> and L<"Method Call">.
+A expression returns a value.
 
-=head2 Get Local Variable
+=head2 Getting Local Variable
 
-B<Get Local Variable> is a Expression to get L<"Local Variable"> Value.
+The getting local variable is an L<expression|"Expressions"> to get the value of the L<local variable|"Local Variable">.
 
   $var
 
-=head2 Set Local Variable
+The return value is the value of the local variable.
 
-B<Set Local Variable Expression> is a Expression to set L<"Local Variable"> Value using L<"Assignment Operator">.
+The return type is the type of the local variable.
 
-  $var = RIGHT_OPERAND
+=head2 Setting Local Variable
 
-The Assignment must satisfy L<"Type Compatibility">.
+The setting local variable is an L<expression|"Expressions"> to set the value of L<"Local Variable"> using the L<assignment operator|"Assignment Operator">.
 
-Set Local Variable Expression returns the value after setting.
+  $var = VALUE
 
-If the right operand is L<"Object Types">, Reference Count of the object is incremented by 1.
+The assignment of the value must satisfy the L<type assignability|"Type Assignability">, otherwise a compilation error occurs.
 
-If an object has already been assigned to $var before the assignment, the Reference Count of that object is decremented by 1.
+The return value is the value after the assignment.
 
-See L<"Scope"> to know Garbage Collection of Local Variable.
+If the type of the assigned value is an L<object type|"Object Types">, the reference count of the object is incremented by C<1>.
 
-=head2 Get Class Variable
+If an object has already been assigned to $var before the assignment, the reference count of the object is decremented by C<1>.
 
-B<Get Class Variable Expression> is a Expression to get L<"Class Variable"> Value.
+See the L<scope|"Scope"> to know the L<garbage collection|"Garbage Collection"> of local variables.
+
+=head2 Getting Class Variable
+
+The getting class variable is an L<expression|"Expressions"> to get the value of the L<class variable|"Class Variable">.
 
   $CLASS_NAME::CLASS_VARIABLE_NAME
 
-"CLASS_NAME::" can be omitted when the Class Variable belongs to own L<"Class">.
+C<CLASS_NAME::> can be omitted if the class variable belongs to the current L<class|"Class">.
 
   $CLASS_VARIABLE_NAME
 
-If you try to get the value of a Class Variable that is not defined, a compilation error occurs.
+If the class variable does not found, a compilation error occurs.
 
-If you try to access a private Class Variable from outside the Class, a compilation error occurs.
+If the class variable is C<private> and it is accessed outside of the class, a compilation error occurs.
 
-B<Get Class Variable Example:>
+B<Examples of getting class variable:>
 
   class Foo {
     our $VAR : int;
@@ -3385,30 +3406,31 @@ B<Get Class Variable Example:>
     }
   }
 
-=head2 Set Class Variable
+=head2 Setting Class Variable
 
-B<Set Class Variable Expression> is a Expression to set L<"Class Variable"> Value using L<"Assignment Operator">.
-.
+B<Setting Class Variable Expression> is an L<expression|"Expressions"> to set L<"Class Variable"> Value using the L<assignment operator|"Assignment Operator">.
 
-  $CLASS_NAME::CLASS_VARIABLE_NAME = RIGHT_OPERAND
+  $CLASS_NAME::CLASS_VARIABLE_NAME = VALUE
 
 "CLASS_NAME::" can be omitted when the Class Variable belongs to own L<"Class">.
 
-  $CLASS_VARIABLE_NAME = RIGHT_OPERAND
+  $CLASS_VARIABLE_NAME = VALUE
 
-If the assignment does not satisfy L<"Type Compatibility">, a compilation error occurs.
+If the assignment does not satisfy the L<type assignability|"Type Assignability">, a compilation error occurs.
 
-Set Class Variable Expression returns the value after setting.
+The return value is the value after the setting.
 
-If you try to get the value of a Class Variable that is not defined, a compilation error occurs.
+The return type is the type of the class variable.
 
-If you try to access a private Class Variable from outside the Class, a compilation error occurs.
+If the class variable does not found, a compilation error occurs.
 
-If the right operand is L<"Object Types">, Reference Count of the object is incremented by 1.
+If the class variable is C<private> and it is accessed outside of the class, a compilation error occurs.
 
-If an object has already been assigned to Class Variable before the assignment, the Reference Count of that object is decremented by 1.
+If the type of the assigned value is an L<object type|"Object Types">, the reference count of the object is incremented by C<1>.
 
-B<Set Class Variable Example:>
+If an object has already been assigned to $CLASS_VARIABLE_NAME before the assignment, the reference count of the object is decremented by C<1>.
+
+B<Examples of setting class variable:>
 
   class Foo {
     our $VAR : int;
@@ -3419,173 +3441,164 @@ B<Set Class Variable Example:>
     }
   }
 
-=head2 Get Exception Variable
+=head2 Getting Exception Variable
 
-B<Set Class Variable Expression> is a Expression to get the value of L<"Exception Variable">.
+The setting exception variable is an L<expression|"Expressions"> to get the value of the L<exception variable|"Exception Variable">.
 
   $@
 
-Set Class Variable Expression returns the value of L<"string Type">.
+The return value is the value of L<exception variable|"Exception Variable">.
 
-B<Set Class Variable Example:>
+The type of return value is the L<string type|"string Type">.
 
-  eval {
-    foo();
-  };
+B<Examples of getting exception variable:>
   
-  if (my $message = $@) {
-  
-  }
+  # Getting the exception variable
+  my $message = $@;
 
-=head2 Set Exception Variable
+=head2 Setting Exception Variable
 
-B<Set Exception Variable Expression> is a Expression to set the value of L<"Exception Variable"> using L<"Assignment Operator">.
+The setting exception variable is an L<expression|"Expressions"> to set the value of L<"Exception Variable"> using the L<assignment operator|"Assignment Operator">.
 
-  $@ = RIGHT_OPERAND
+  $@ = VALUE
 
-the right operand must be L<"string Type">.
+The type of the assigned value must be L<"string Type">.
 
-Returns the value of Exception Variable after setting. This is L<"string Type">.
+The return value is the value after the setting.
 
-The Reference Count of the right operand is incremented by 1.
+The type of return value is the L<string type|"string Type">.
 
-If an object has already been assigned to Exception Variable before the assignment, the Reference Count of that object is decremented by 1.
+The reference count of the assigned value is incremented by C<1>.
 
-B<Set Exception Variable Example:>
+If an string has already been assigned to the exception variable before the assignment, the reference count of the string is decremented by C<1>.
+
+B<Examples of setting exception variable:>
 
   $@ = "Error";
 
-=head2 Get Field
+=head2 Getting Field
 
-B<Get Field Expression> is a Expression to get L<"Field"> Value.
+The getting field is an L<expression|"Expressions"> to get the L<field|"Field"> of the object. This is one syntax of the L<field access|"Field Access">.
 
-  INVOCANT_EXPRESSION->{FIELD_NAME}
+  INVOCANT->{FIELD_NAME}
 
-Invocant Expression is L<"Class Type">. If Expression is L<"Multi Numeric Types"> Value, The Field Access is L<"Get Multi Numeric Field Value">. If Expression is L<"Multi Numeric Reference Type"> Value, The Field Access is, otherwise a compilation error occurs.
+The type of invocant is a L<class type|"Class Type">.
 
-If the field names does not found in the <a href="#language-class">Class">, a compilation error occurs
+The retrun type is the L<type|"Types"> of the Field.
 
-Get Field Expression returns the value of the Field stored in the object.
-
-Retrun Type is The L<"Types"> of the Field.
-
-B<Get Field Example:>
+B<Examples of getting field:>
 
   my $point = Point->new;
   my $x = $point->{x};
 
-=head2 Set Field
+=head2 Setting Field
 
-B<Set Field Expression> is a Expression to set L<"Field"> Value.
+The setting field is an L<expression|"Expressions"> to set the L<field|"Field"> of the object. This is one syntax of the L<field access|"Field Access">.
 
-  INVOCANT_EXPRESSION->{FIELD_NAME} = RIGHT_OPERAND
+  INVOCANT->{FIELD_NAME} = VALUE
 
-Invocant Expression is L<"Class Type">. If Invocant Expression is L<"Multi Numeric Types">, the Field Access is ,L<"Set Multi Numeric Field Value">. If Invocant Expression is L<"Multi Numeric Reference Type">, the Field Access is L<"Set Multi Numeric Field Value via Dereference">, otherwise a compilation error occurs.
+The type of invocant is a L<class type|"Class Type">.
 
-If the assignment does not satisfy L<"Type Compatibility"> of the type of Field, a compilation error occurs.
+If the assignment does not satisfy the L<type assignability|"Type Assignability">, a compilation error occurs.
 
-If the field names does not found in the L<"Class">, a compilation error occurs.
+The return value is the value after the setting. 
 
-Set Field Expression returns the value of Field after setting. 
+The return type is the type of the field.
 
-Return Value Type is the type of Field.
+If the type of assigned value is a L<basic object type|"Object Types">, Reference Count of the object is incremented by C<1>.
 
-If the right operand is L<"Object Types">, Reference Count of the object is incremented by 1.
+If an object has already been assigned to Field before the assignment, the reference count of that object is decremented by C<1>.
 
-If an object has already been assigned to Field before the assignment, the Reference Count of that object is decremented by 1.
-
-B<Set Field Example:>
+B<Examples of Setting Field:>
 
   my $point = Point->new;
   $point->{x} = 1;
 
-=head2 Get Multi Numeric Field Value
+=head2 Getting Multi Numeric Field
 
-B<Get Multi Numeric Field Value Expression> is a Expression to get Field Value of L<"Multi Numeric Value">.
+B<Getting Multi Numeric Field Expression> is an L<expression|"Expressions"> to get Field of L<"Multi Numeric Value">. This is one syntax of the L<field access|"Field Access">.
 
-  INVOCANT_EXPRESSION->{FIELD_NAME}
+  INVOCANT->{FIELD_NAME}
 
-Invocant Expression is L<"Multi Numeric Types">. If Invocant Expression is L<"Class Type">, the Field Access is L<". If Invocant Expression <a href="#language-type-ref-multi-numeric">is Multi Numeric Reference Type">, the Field Access is L<"Get Multi Numeric Field Value via Dereference">, otherwise a compilation error occurs.
+Invocant Expression is L<"Multi Numeric Types">.
   
 If the field names does not found in the L<"Class">, a compilation error occurs
 
-Get Multi Numeric Field Value Expression returns the field value in the Multi Numeric Value.
+Getting Multi Numeric Field Expression returns the field value in the Multi Numeric Value.
 
 Retrun Type is The L<"Types"> of the Field.
 
-B<Get Multi Numeric Field Value Example:>
+B<Examples of Getting Multi Numeric Field:>
 
   my $z : Complex_2d;
   my $re = $z->{x};
 
-=head2 Set Multi Numeric Field Value
+=head2 Setting Multi Numeric Field
 
-Set Multi Numeric Field Value Expression is a Expression to set Field Value of L<"Multi Numeric Value"> using L<"Assignment Operator">.
+Setting Multi Numeric Field Expression is an L<expression|"Expressions"> to set Field of L<"Multi Numeric Value"> using L<"Assignment Operator">. This is one syntax of the L<field access|"Field Access">.
 
-  INVOCANT_EXPRESSION->{FIELD_NAME} = RIGHT_OPERAND
+  INVOCANT->{FIELD_NAME} = RIGHT_OPERAND
 
-<
-
-Invocant Expression is L<"Multi Numeric Types">. If Invocant Expression is L<"Class Type">, the Field Access is L<"Set Field">. Invocant Expression is L<"Multi Numeric Reference Type">, L<"Set Multi Numeric Field Value via Dereference">, otherwise a compilation error occurs.
+Invocant Expression is L<"Multi Numeric Types">.
 
 If the field names does not found in the L<"Class">, a compilation error occurs.
 
-Set Multi Numeric Field Value Expression returns the value of Field after setting. 
+Setting Multi Numeric Field Expression returns the value of Field after setting. 
 
-The Assignment must satisfy L<"Type Compatibility">.
+The assignment must satisfy the L<type assignability|"Type Assignability">.
 
 Return Value Type is the type of Field.
 
-B<Set Multi Numeric Field Value Example:>
+B<Examples of Setting Multi Numeric Field:>
 
   my $z : Complex_2d;
   $z->{x} = 2.5;
 
-=head2 Get Multi Numeric Field Value via Dereference
+=head2 Getting Multi Numeric Field via Dereference
 
-B<Get Multi Numeric Field Value via Dereference Expression> is a Expression to get Field Value of L<"Multi Numeric Value"> via L<"Dereference">.
+B<Getting Multi Numeric Field via Dereference Expression> is an L<expression|"Expressions"> to get Field of L<"Multi Numeric Value"> via L<"Dereference">. This is one syntax of the L<field access|"Field Access">
 
-  INVOCANT_EXPRESSION->{FIELD_NAME}
+  INVOCANT->{FIELD_NAME}
 
-Invocant Expression is L<"Multi Numeric Reference Type">. If Invocant Expression is L<"Class Type">, the Field Access is , L<"Get Field">. If Invocant Expression is L<"Multi Numeric Types">, the Field Access is L<"Get Multi Numeric Field Value">, otherwise a compilation error occurs.
+Invocant Expression is L<"Multi Numeric Reference Type">.
 
 If the field names does not found in the L<"Class">, a compilation error occurs
 
-Get Multi Numeric Field Value via Dereference Expression returns the field value in the Multi Numeric Value.
+Getting Multi Numeric Field via Dereference Expression returns the field value in the Multi Numeric Value.
 
 Retrun Type is The L<"Types"> of the Field.
 
-B<Get Multi Numeric Field Value via Dereference Example:>
+B<Examples of Getting Multi Numeric Field via Dereference:>
 
   my $z : Complex_2d;
   my $z_ref = \$z;
   my $re = $z_ref->{x};
 
-=head2 Set Multi Numeric Field Value via Dereference
+=head2 Setting Multi Numeric Field via Dereference
 
-Set Multi Numeric Field Value Expression via Dereference is a Expression to set Field Value of L<"Multi Numeric Value"> via L<"Dereference"> using L<"Assignment Operator">.
+Setting Multi Numeric Field Expression via Dereference is an L<expression|"Expressions"> to set Field of L<"Multi Numeric Value"> via L<"Dereference"> using L<"Assignment Operator">. This is one syntax of the L<field access|"Field Access">.
 
-  INVOCANT_EXPRESSION->{FIELD_NAME} = RIGHT_OPERAND
+  INVOCANT->{FIELD_NAME} = RIGHT_OPERAND
 
-Invocant Expression is L<"Multi Numeric Reference Type">. If Invocant Expression is L<"Class Type">, L<"Set Field">. If Invocant Expression is L<"Multi Numeric Types">, L<"Set Multi Numeric Field Value">, otherwise a compilation error occurs.
+Invocant Expression is L<"Multi Numeric Reference Type">.
 
 If the field names does not found in the L<"Class">, a compilation error occurs
 
-Set Multi Numeric Field Value via Dereference Expression returns the value of Field after setting.
+Setting Multi Numeric Field via Dereference Expression returns the value of Field after setting.
 
-The Assignment must satisfy L<"Type Compatibility">.
+The assignment must satisfy the L<type assignability|"Type Assignability">.
 
 Return Value Type is the type of Field.
 
-B<Set Multi Numeric Field Value via Dereference Example:>
+B<Examples of Setting Multi Numeric Field via Dereference:>
 
   my $z : Complex_2d;
   my $z_ref = \$z;
   $z_ref->{x} = 2.5;
 
-=head2 Get Array Element
+=head2 Getting Array Element
 
-B<Get Array Element Expression> is a Expression to get a Element Value of L<"Array">.
+B<Getting Array Element Expression> is an L<expression|"Expressions"> to get a Element Value of L<"Array">.
 
   ARRAY_EXPRESSION->[INDEX_EXPRESSION]
 
@@ -3593,13 +3606,13 @@ Array Expression must be L<"Array Types">.
 
 Index Expression must be L<"int Type"> or the type that become L<"int Type"> by L<"Unary Numeric Widening Type Conversion">.
 
-Get Array Element Expression returns the Element Value of the Index.
+Getting Array Element Expression returns the Element Value of the Index.
 
 If Array Expression is L<"Undefined Value">, a Runtime Exception occurs.
 
 If Index Expression is lower than 0 or more than the max index of the Array, a Runtime Exception occurs.
 
-B<Get Array Element Example:>
+B<Examples of Getting Array Element:>
 
   my $nums = new int[3];
   my $num = $nums->[1];
@@ -3607,12 +3620,12 @@ B<Get Array Element Example:>
   my $points = new Point[3];
   my $point = $points->[1];
   
-  my $objects : element[] = $points;
+  my $objects : object[] = $points;
   my $object = (Point)$objects->[1];
 
-=head2 Set Array Element
+=head2 Setting Array Element
 
-Set Array Element Expression is a Expression to set a Element Value of a Array using L<"Assignment Operator">.
+Setting Array Element Expression is an L<expression|"Expressions"> to set a Element Value of a Array using L<"Assignment Operator">.
 
   ARRAY_EXPRESSION->[INDEX_EXPRESSION] = RIGHT_OPERAND
 
@@ -3620,19 +3633,19 @@ Array Expression must be L<"Array Types">.
 
 Index Expression must be L<"int Type"> or the type that become L<"int Type"> by L<"Unary Numeric Widening Type Conversion">.
 
-The Assignment must satisfy L<"Type Compatibility">.
+The assignment must satisfy the L<type assignability|"Type Assignability">.
 
-Set Array Element Expression returns the value of the element after setting.
+Setting Array Element Expression returns the value of the element after setting.
 
 If Array Expression is L<"Undefined Value">, a Runtime Exception occurs.
 
 If Index Expression is lower than 0 or more than the max index of the Array, a Runtime Exception occurs.
 
-If the right operand is L<"Object Types">, Reference Count of the object is incremented by 1.
+If the right operand is L<"Object Types">, Reference Count of the object is incremented by C<1>.
 
-If an object has already been assigned to Field before the assignment, the Reference Count of that object is decremented by 1.
+If an object has already been assigned to Field before the assignment, the reference count of that object is decremented by C<1>.
 
-B<Set Array Element Example:>
+B<Examples of Setting Array Element:>
 
   my $nums = new int[3];
   $nums->[1] = 3;
@@ -3640,91 +3653,72 @@ B<Set Array Element Example:>
   my $points = new Point[3];
   $points->[1] = Point->new(1, 2);
   
-  my $objects : element[] = $points;
+  my $objects : object[] = $points;
   $objects->[2] = Point->new(3, 5);
 
-=head2 Create Object
+=head2 new Operator
 
-B<Create Object Expression> is a Expression to create Object using B<new> operator.
+The C<new> operator is an L<expression|"Expressions"> to create an object or an array.
 
-  my $object = new CLASS_NAME;
+=head2 Creating Object
 
-L<"Class"> that is specified by L<"Class Names"> must be L<"Class Type">.
+The creating object is an L<expression|"Expressions"> to create an object using the C<new> keyword.
 
-Fields of the Object are initialized by L<"Type Initial Value">.
+  new CLASS_NAME;
 
-Created Object Reference count is 0 at first. If the Object is assigned to some Variable by L<"Assignment Operator">, The Reference Count is incremented by 1. If implicite assignment is not done, Temporary Variable is created, the object is assigned to the Temporary Variable.
+The class name must be the name of the L<class|"Class"> defined by the L<class definition|"Class Definition">.
 
-B<Create Object Example:>
+The fields of the created object are initialized by L<the rule of type initial value|"Type Initial Value">.
+
+The reference count of the created object is C<0>. If the object is assigned to a local variable, a class variable, or a field by L<"Assignment Operator">, the reference count is incremented by C<1>.
+
+B<Examples of creating object:>
 
   my $object = new Foo;
 
-Create Object has the following information.
+=head2 Creating Array
 
-=begin html
+The creating array is an L<expression|"Expressions"> to create an array using the C<new> keyword.
 
-<ul>
-  <li>Reference Count</li>
-  <li>Back references of L<"Weaken Reference"></li>
-  <li>Basic Type ID</li>
-  <li>Type Dimension(Always 0)</li>
-</ul>
+  new BasicType[LENGTH]
 
-=end html
+The type must be a L<basic type|"Basic Type">.
 
-=head2 Create Array
+The type of length must be the L<int type|"int Type"> or the type that become L<int type|"int Type"> after the L<unary numeric widening type conversion|"Unary Numeric Widening Type Conversion">.
 
-B<Create Array Expression> is a Expression to create Array with B<new> Keyword.
+If the length is lower than C<0>, an exception is thrown.
 
-  new Type[ELEMENTS_COUNT_EXPRESSION]
+All elements of the array are initialized by L<the rule of type initial value|"Type Initial Value">.
 
-Type must be L<"Numeric Types">, L<"Object Types">, L<"Multi Numeric Types">.
+The type of created array is the L<array type|"Array Types">.
 
-Elements Count Expression must be L<"int Type"> or the type that become L<"int Type"> by L<"Unary Numeric Widening Type Conversion">.
-
-If Index Expression is lower than 0, a Runtime Exception occurs.
-
-Created Array Length is the value of Elements Count Expression.
-
-All Array Element is initialized by L<"Type Initial Value">.
-
-All Element is gurantied to be continued on Memory.
-
-Array is L<"Array Types">. This is also L<"Object Types">.
-
-B<Create Array Example:>
+B<Examples of creating array:>
 
   my $nums = new int[3];
   my $objects = new Foo[3];
   my $objects = new object[3];
   my $values = new Complex_2d[3]
 
-Created Array has the following information.
+=head3 Multi Dimensional Array
 
-=begin html
+Multi dimensional arrays can be created.
 
-<ul>
-  <li>Reference Count</li>
-  <li>Basic Type ID</li>
-  <li>Type Dimension(the value is 1)</li>
-  <li>Array Length</li>
-</ul>
+  new BasicType[][LENGTH]
+  new BasicType[][]...[LENGTH]
 
-=end html
+B<Examples of creating multi dimentional array:>
 
-Multi-Dimention Array is created by the following syntax.
-
-  # 2 Dimention Array (3 elements of int[] Type)
+  # 2 dimentional int array
   my $nums = new int[][3];
   
-  # 3 Dimention Array (3 elements of int[][] Type)
+  # 3 dimentional int array
   my $nums = new int[][][3];
 
-The max of Dimention of Multi-Dimention Array is 255.
+The max dimention is C<255>.
 
 =head2 Array Initialization
 
-SPVM has a syntax for Array Initialization to simplify Create Array. Expression is not required.
+SPVM has a syntax for Array Initialization to simplify Creating Array. Expression is not required.
 
   []
   [Expression1, Expression2, Expression3]
@@ -3733,7 +3727,7 @@ Array Initialization returns an Array that has the length of the number of eleme
 
 The type of Array is the type of Expression1 converted to Array Types. If no element is specified, it will be an Array Types of L<"Any Object Type">.
 
-If Expression2 or later does not satisfy L<"Type Compatibility">, a a compilation error will occur.
+If Expression2 or later does not satisfy the L<type assignability|"Type Assignability">, a a compilation error will occur.
 
 B<Examples:>
 
@@ -3759,27 +3753,43 @@ B<Examples:>
   # Key values
   my $key_values = {foo => 1, bar => "Hello"};
 
-=head2 Method Call
+=head2 Method Calls
 
-Methods defined by L<"Method Definition"> can be called from program. There are three types of method calls. B<Class Method Call> and B<Instance Method Call>.
+Method calls are L<"Class Method Call"> and L<"Instance Method Call">.
 
-Defined method can be called by Class Method Call except a case that the first argument is L<"self Type">.
+=head3 Class Method Call
 
-  ClassName->MethodName(ARGS1, ARGS2, ARGS3, ..., ARGSn);
+A method defined as the L<class method|"Class Method"> can be called using the class method call.
 
-The arguments max count is 255.
+  ClassName->MethodName(ARGS1, ARGS2, ...);
 
-If the number of arguments does not match the number of arguments defined in the method Definition, a compilation error occurs The Type of each argument and the type of the argument defined in Method Definition and <a href = "#language-type-compatible">Type Compatibility</a>, a compilation error occurs.
+If the number of arguments does not correct, a compilation error occurs.
 
-B<Class Method Call Example>
+If the types of arguments have no type compatible, a compilation error occurs.
+
+B<Examples of class method call:>
 
   my $ret = Foo->bar(1, 2, 3);
+
+=head3 Instance Method Call
+
+A method defined as the L<instance method|"Instance Method"> can be called using the instance method call.
+
+  Object->MethodName(ARGS1, ARGS2, ...);
+
+If the number of arguments does not correct, a compilation error occurs.
+
+If the types of arguments have no type compatible, a compilation error occurs.
+
+B<Examples of instance method call:>
+  
+  $object->bar(5, 3. 6);
 
 =head2 Current Class
 
 B<&> before method name means the current class. You can call method using "&" keyword instead of the current class name.
 
-B<Current Class Example>
+B<Examples of Current Class:>
 
   class Foo {
     
@@ -3798,7 +3808,7 @@ B<Current Class Example>
 
 Instance Method Call is a method to call Method which is L<"Method">. In L<"Method Definition">, the first argument is L<"self Type"> If the argument of> is specified, it becomes Method.
 
-Instance Method Call can be done with the following syntax using the object created by L<"Create Object">.
+Instance Method Call can be done with the following syntax using the object created by L<"new Operator">.
 
   OBJECT_EXPRESSION->METHOD_NAME(ARGS1, ARGS2, ARGS3, ..., ARGSn);
 
@@ -3808,7 +3818,7 @@ Instance Method Call returns Return Value if Return Value is other than L<"void 
 
 Instance Method Call is L<"Expressions">.
 
-B<Instance Method Call Example>
+B<Examples of Instance Method Call:>
 
   my $point = new Point;
   $point->set_x(3);
@@ -3827,7 +3837,7 @@ An Example that calls a Method from the object created by Create Callback.
   
   my $ret = $cb_obj->(1, 2);
 
-=head2 Get value by Dereference
+=head2 Getting value by Dereference
 
 Obtaining a value by Dereference is an operation to obtain the actual value from Reference. It was designed to realize the C joint operator "*".
 
@@ -3872,13 +3882,13 @@ Setting a value with Dereference returns the set value. This is L<"Expressions">
   
   $$z_ref = $z2;
 
-=head2 Get Current Class Names
+=head2 Getting Current Class Names
 
-B<Get Current class names> is a Expression to get the current class name by __CLASS__ L<"Keyword">.
+B<Getting Current class names> is an L<expression|"Expressions"> to get the current class name by __CLASS__ L<"Keyword">.
 
   __CLASS__
 
-B<Get Current class names Example:>
+B<Examples of Getting Current class names:>
 
   class Foo::Bar {
     static method baz : void () {
@@ -3887,15 +3897,15 @@ B<Get Current class names Example:>
     }
   }
 
-=head2 Get Current File Name
+=head2 Getting Current File Name
 
-B<Get Current File Name> is a Expression to get the current file name by __LINE__ L<"Keyword">.
+B<Getting Current File Name> is an L<expression|"Expressions"> to get the current file name by __LINE__ L<"Keyword">.
 
   __FILE__
 
 Current File Name means the relative path from the base path of the module file. For example, if the Module Loaded Path is "/mypath" and the Module name is "Foo::Bar", the absolute path is "/mypath/SPVM/Foo/Bar.spvm" and the relative path is "SPVM/Foo/Bar.spvm". "SPVM/Foo/Bar.spvm" is Current File Name.
 
-B<Get Current File Name Example:>
+B<Examples of Getting Current File Name:>
 
   # SPVM/Foo/Bar.spvm
   class Foo::Bar {
@@ -3911,13 +3921,13 @@ B<Get Current File Name Example:>
     }
   }
 
-=head2 Get Current Line Number
+=head2 Getting Current Line Number
 
-B<Get Current Line Number> is a Expression to get the current line number of the current file by __LINE__ L<"Keyword">.
+B<Getting Current Line Number> is an L<expression|"Expressions"> to get the current line number of the current file by __LINE__ L<"Keyword">.
 
   __LINE__
 
-B<Get Current Line Number Example:>
+B<Examples of Getting Current Line Number:>
 
   class Foo::Bar {
     static method baz : void () {
@@ -4711,7 +4721,7 @@ In Assignment Operator, the The left operand is evaluated after the right operan
 
 =head2 Special Assignment Operator
 
-Special Assignment Operator is a L<"Assignment Operator">L<"Type Compatibility">を満たさない場合は,a compilation error occurs
+Special Assignment Operator is a L<"Assignment Operator">the L<type assignability|"Type Assignability"> ,a compilation error occurs
 
 B<List of Special Assignment Operators>
 
@@ -4784,7 +4794,7 @@ For example, for add assignment Operator, it is expanded as follows:
   # After unwinding
   $x = (byte)($x + 1)
 
-B<Special Assignment Operator Example>
+B<Examples of Special Assignment Operator:>
 
 Special Assignment Operator Example
 
@@ -4811,7 +4821,7 @@ If the variable is not numeric type or Multi Numeric Types, a compilation error 
 
 Reference Operator returns expression. The type returned is L<"Reference Type">.
 
-    B<Reference Operator Example>
+B<Examples of Reference Operator:>
 
   my $num : int;
   my $num_ref : int* = \$num;
@@ -4835,11 +4845,11 @@ Array Length Operator returns L<"Expressions">
 
 B<Examples of array length operators:>
   
-  # Get the length of the array.
+  # Getting the length of the array.
   my $nums = new byte[10];
   my $length = @$nums;
 
-  # Get the length of the array with a scalar operator. This is exactly same as the avobe
+  # Getting the length of the array with a scalar operator. This is exactly same as the avobe
   my $nums = new byte[10];
   my $length = scalar @$nums;
   
@@ -4916,11 +4926,11 @@ Note that the returned length is byte size, not the count of the characters of t
 
 B<Examples of string length operators:>
   
-  # Get the string length. The result is 5
+  # Getting the string length. The result is 5
   my $message = "Hello";
   my $length = length $message;
   
-  # Get the string length of UTF-8. The result is 9, not 3
+  # Getting the string length of UTF-8. The result is 9, not 3
   my $message = "あいう";
   my $length = length $message;
 
@@ -4934,7 +4944,7 @@ The operand must be an L<"Array Length Operator">, otherwise a compilation error
 
 B<Examples of scalar operators:>
   
-  # Get the array length 
+  # Getting the array length 
   my $nums = new int[3];
   foo(scalar @$nums);
 
@@ -5230,7 +5240,7 @@ The C<while> statement is a L<statement|"Statements"> for repeating.
 
 L<"Expressions"> can be described in the condition Expression. L<"Bool Type Conversion"> is executed for condition Expression, and if the value is not 0, Block is executed. Exit the otherwise Block.
 
-B<While Statement Example>
+B<Examples of While Statement:>
 
 An example of a while Statement.
 
@@ -5269,7 +5279,7 @@ The while Statement is internally enclosed by an invisible L<"Simple Block">.
     $i++;
   }
   
-  # 展開後
+  # After expansion
   my $num = 5;
   {
     while (my $num = 3) {
@@ -5449,15 +5459,15 @@ If the value stored in the Field at execution time is L<"Undefined Value">, the 
 
 If the value stored in the Field at runtime is not L<"Undefined Value">, then the following is done:
 
-1. Decrement the Reference Count of the object stored in Field by 1.
+1. Decrement the reference count of the object stored in Field by C<1>.
 
-2. Set the Weaken Reference flag in Field.
+2. Setting the Weaken Reference flag in Field.
 
 3. Add Field to the back reference of the object saved in Field.
 
 Note that the Weaken Reference flag is set on the Field itself, not on the object stored in the Field.
 
-If the Reference Count of the object saved in Field becomes 0, the Weaken Reference is not created and the object saved in Field is released.
+If the reference count of the object saved in Field becomes 0, the Weaken Reference is not created and the object saved in Field is released.
 
 Back Reference is the data of the object saved in Field, and is added to know the Field with the Weaken Reference flag set. There may be more than one.
 
@@ -5495,7 +5505,7 @@ If the value stored in the Field at execution time is L<"Undefined Value">, the 
 
 If the value stored in the Field at runtime is not L<"Undefined Value">, then the following is done:
 
-1. Increase the Reference Count of the object stored in the Field by 1.
+1. Increase the reference count of the object stored in the Field by C<1>.
 
 2. Clear the Weaken Reference flag of Field.
 
@@ -5742,36 +5752,32 @@ C<double> type is a L<"Floating Point Types"> that represents a double precision
 
 =head2 Class Type
 
-The class type is the type that can create the object using a L<new operator|"Create Object">. Class types are the L<class|"Class"> that doesn't have class descriptors C<mulnum_t>, C<interface_t>, and C<callback_t>, and the class that has a C<pointer_t> L<class descriptor|"Class Descriptors">.
+The class type is the type that can create the object using a L<new operator|"new Operator">.
 
-  # Class types
-  class Foo {
-  
-  }
-  
-  class Foo: pointer_t {
-  
-  }
+  new ClassType;
 
 =head2 Pointer Type
 
-The pointer type is the type that has a C<pointer_t> L<class descriptor|"Class Descriptors">.
+The pointer type is the type that has a L<class descriptor|"Class Descriptors"> C<pointer_t>.
 
   # Pointer Type
   class Foo: pointer_t {
   
   }
 
-A pointer type is a L<class type|"Class Type">
+A pointer type is a L<class type|"Class Type">.
+
+=head2 Basic Object Types
+
+Basic object types are the L<class type|"Class Type">, the L<callback type|"Callback Type">, the L<array type|"Array Types">, the L<string type|"string Type">, and the L<any object type|"Any Object Type">.
 
 =head2 Object Types
 
-Object types are L<"Class Type">, L<"Callback Type">, L<"Array Types">, L<"string Type">, L<"Any Object Type">.
+Object types are the L<basic object types|"Basic Object Types"> and the L<array types|"Array Types">.
 
-The value of a object type can be assigned to a any object type.
+A object type can be assigned to a L<any object type|"Any Object Type">.
 
   my $object: object = new Foo;
-  my $object: object = new Foo [];
   my $object: object = "abc";
 
 =head2 Numeric Object Type
@@ -5965,7 +5971,7 @@ B<Numeric Array Types list>
 
 Data represented by Numeric Array Types must have elements whose size is L<"Numeric Types">, and must be consecutive by the number of Array Length.
 
-All elements of Numeric Array Types are initialized by L<"Type Initial Value"> when Create Array is performed.
+All elements of Numeric Array Types are initialized by L<"Type Initial Value"> when the L<creating array|"Creating Array"> is performed.
 
 =head2 byte[] Type
 
@@ -6000,13 +6006,13 @@ B<Examples of object array types:>
 
 The data represented by Object Array Types must have elements of size of L<"Object Types"> and consecutive by the number of Array Length.
 
-All elements of Object Array Types are initialized by L<"Type Initial Value"> when Create Array is performed.
+All elements of Object Array Types are initialized by L<"Type Initial Value"> when the L<creating array|"Creating Array"> is performed.
 
 =head2 Multi Numeric Array Types
 
 Multi Numeric Array Types means L<"Array Types that has the value of <a href="#language-type-multi-numeric">Multi Numeric Types"> as an element.</a>.
 
-B<Multi Numeric Array Types Example>
+B<Examples of Multi Numeric Array Types:>
 
 =begin html
 
@@ -6023,39 +6029,36 @@ B<Multi Numeric Array Types Example>
 
 Data represented by Multi Numeric Array Types must have elements whose size is L<"Multi Numeric Types"> and must be contiguous with the number of Array Length ..
 
-All elements of Multi Numeric Array Types are initialized by L<"Type Initial Value"> when Create Array is performed.
+All elements of Multi Numeric Array Types are initialized by L<"Type Initial Value"> when the L<creating array|"Creating Array"> is performed.
 
 =head2 Any Object-Array Type
 
-The any object-array type C<element[]> is the type that any L<object array type|"Object Array Types"> can be assigned.
+The any object-array type C<object[]> is the type that any L<object array type|"Object Array Types"> can be assigned.
 
   # Any object-array Type
-  my $array : element[] = new Point[3];
-  my $array : element[] = new object[3];
+  my $array : object[] = new Point[3];
+  my $array : object[] = new object[3];
 
 If a invalid type is assigned, a compilation error occurs.
-
-Note that the C<element[]> type is different from the C<object[]> type. An L<object array type|"Object Array Types"> can't be assinged to the C<object[]> type.
 
 Any Object-Array Type is an L<array type|"Array Types">.
 
 You can get the array length using the L<array length operator|"Array Length Operator">.
 
-  my $array : element[] = new Int[3];
+  my $array : object[] = new Int[3];
   
-  # Get the length of the element of Any Object-Array Type
+  # Getting the length of the element of Any Object-Array Type
   my $length = @$array;
 
-You can get and set the element using the L<get array element|"Get Array Element"> syntax and the L<set array element|"Set Array Element">.
+You can get and set the element using the L<get array element|"Getting Array Element"> syntax and the L<set array element|"Setting Array Element">.
  
-  # Get the element of any object-array
+  # Getting the element of any object-array
   my $num = (Int)$array->[0];
   
-  # Set the element of any object-array
+  # Setting the element of any object-array
   $array->[0] = Int->new(5);
 
 When setting the element of any object-array, the element type is checked. If the dimension of the element is not the dimension of the array - C<1>, an L<exception|"Exception"> is thrown.
-C<oarray> is alias for C<element[]>. C<oarray> will be removed at 0.9510.
 
 =head2 string Type
 
@@ -6115,6 +6118,10 @@ If the Reference Type is used at an Invalid location, a compilation error occurs
 
 See L<"Reference"> for a detailed explanation of Reference.
 
+=head2 Reference Types
+
+Reference Types are L<Numeric Reference Type> and L<Multi Numeric Reference Type>.
+
 =head2 Numeric Reference Type
 
 Numeric Reference Type means L<"Numeric Types"> for L<"Reference Type">. Says.
@@ -6136,6 +6143,197 @@ Omitting L<"Types"> when L<"Local Variable Declaration"> by Type Inference can. 
   # Foo
   my $foo = new Foo;
 
+=head1 Type Assignability
+
+Explains the type assignability.
+
+The assignment is invalid, a compilation error occurs.
+
+=head2 Type Assignability of to-Numeric
+
+Explains the type assignability of to-Numeric
+
+=head3 Type Assignability of Numeric-to-Numeric
+
+If the L<nemric type order|"Numeric Types Order"> of the left operand is greater than or equal to the L<nemric type order|"Numeric Types Order"> of the right operand, the assignment is valid.
+
+If the L<nemric type order|"Numeric Types Order"> of the left operand is greater than the L<nemric type order|"Numeric Types Order"> of the right operand, the L<unary numeric widening type conversion|"Unary Numeric Widening Type Conversion"> is performed.
+
+=begin html
+
+<table>
+  <tr>
+    <th>Assignable</th><th>To</th><th>From</th><th>Implicite Type Conversion</th>
+  </tr>
+  <tr>
+    <td>Yes</td><td>byte</td><td>byte</td><td>None</td>
+    <td>Yes</td><td>short</td><td>short</td><td>None</td>
+    <td>Yes</td><td>int</td><td>int</td><td>None</td>
+    <td>Yes</td><td>long</td><td>long</td><td>None</td>
+    <td>Yes</td><td>float</td><td>float</td><td>None</td>
+    <td>Yes</td><td>double</td><td>double</td><td>None</td>
+    <td>Yes</td><td>short</td><td>byte</td><td>Unary Numeric Widening Type Conversion</td>
+    <td>Yes</td><td>int</td><td>byte</td><td>Unary Numeric Widening Type Conversion</td>
+    <td>Yes</td><td>long</td><td>byte</td><td>Unary Numeric Widening Type Conversion</td>
+    <td>Yes</td><td>float</td><td>byte</td><td>Unary Numeric Widening Type Conversion</td>
+    <td>Yes</td><td>double</td><td>byte</td><td>Unary Numeric Widening Type Conversion</td>
+    <td>Yes</td><td>int</td><td>short</td><td>Unary Numeric Widening Type Conversion</td>
+    <td>Yes</td><td>long</td><td>short</td><td>Unary Numeric Widening Type Conversion</td>
+    <td>Yes</td><td>float</td><td>short</td><td>Unary Numeric Widening Type Conversion</td>
+    <td>Yes</td><td>double</td><td>short</td><td>Unary Numeric Widening Type Conversion</td>
+    <td>Yes</td><td>long</td><td>int</td><td>Unary Numeric Widening Type Conversion</td>
+    <td>Yes</td><td>float</td><td>int</td><td>Unary Numeric Widening Type Conversion</td>
+    <td>Yes</td><td>double</td><td>int</td><td>Unary Numeric Widening Type Conversion</td>
+    <td>Yes</td><td>float</td><td>long</td><td>Unary Numeric Widening Type Conversion</td>
+    <td>Yes</td><td>double</td><td>long</td><td>Unary Numeric Widening Type Conversion</td>
+    <td>Yes</td><td>double</td><td>float</td><td>Unary Numeric Widening Type Conversion</td>
+  </tr>
+</table>
+
+=end html
+
+B<Examples:>
+  
+  # int to int
+  my $num : int = 3;
+  
+  # byte to int
+  my $num : int = (byte)5;
+  
+  # double to double
+  my $num : double = 4.5;
+  
+  # float to double
+  my $num : double = 4.5f;
+
+If the L<nemric type order|"Numeric Types Order"> of the left operand is lower than the L<nemric type order|"Numeric Types Order"> of the right operand, the assignment is conditional valid.
+
+The condition is that the right operand is a L<interger literal|Integer Literal> and the value is between the max and minimal value of the type of the left operand.
+
+If the condition is ture, the L<numeric narrowing type conversion|"Numeric Narrowing Type Conversion"> is performed.
+
+=begin html
+
+<table>
+  <tr>
+    <th>Assignable</th><th>To</th><th>From</th><th>Implicite Type Conversion</th>
+  </tr>
+  <tr>
+    <td>Conditinal Yes</td><td>byte</td><td>short</td><td>Numeric Narrowing Type Conversion</td>
+    <td>Conditinal Yes</td><td>byte</td><td>int</td><td>Numeric Narrowing Type Conversion</td>
+    <td>Conditinal Yes</td><td>byte</td><td>long</td><td>byte</td><td>Numeric Narrowing Type Conversion</td>
+    <td>No</td><td>byte</td><td>float</td><td>None</td>
+    <td>No</td><td>byte</td><td>double</td><td>None</td>
+    <td>Conditinal Yes</td><td>short</td><td>int</td><td>Numeric Narrowing Type Conversion</td>
+    <td>Conditinal Yes</td><td>short</td><td>long</td><td>Numeric Narrowing Type Conversion</td>
+    <td>No</td><td>short</td><td>float</td><td>None</td>
+    <td>No</td><td>short</td><td>double</td><td>None</td>
+    <td>Conditinal Yes</td><td>int</td><td>long</td><td>Numeric Narrowing Type Conversion</td>
+    <td>No</td><td>int</td><td>float</td><td>None</td>
+    <td>No</td><td>int</td><td>double</td><td>None</td>
+    <td>No</td><td>long</td><td>float</td><td>None</td>
+    <td>No</td><td>long</td><td>double</td><td>None</td>
+    <td>No</td><td>float</td><td>double</td><td>None</td>
+  </tr>
+</table>
+
+=end html
+
+B<Examples:>
+  
+  # int to byte
+  my $num : byte = 127;
+
+=head3 Type Assignability of Object-to-Numeric
+
+If the type of the left operand is a L<numeric type|"Numeric Types"> and the type of the right operand is a L<any object type|"Any Object Type"> C<object>, the assignment is valid.
+
+The L<unboxing type conversion|"Unboxing Type Conversion"> corresponding to the numeric type is performed.
+
+=begin html
+
+<table>
+  <tr>
+    <th>Assignable</th><th>To</th><th>From</th><th>Implicite Type Conversion</th>
+  </tr>
+  <tr>
+    <td>Yes</td><td>byte</td><td>object</td><td>Unboxing Type Conversion</td>
+    <td>Yes</td><td>short</td><td>object</td><td>Unboxing Type Conversion</td>
+    <td>Yes</td><td>int</td><td>object</td><td>Unboxing Type Conversion</td>
+    <td>Yes</td><td>long</td><td>object</td><td>Unboxing Type Conversion</td>
+    <td>Yes</td><td>float</td><td>object</td><td>Unboxing Type Conversion</td>
+    <td>Yes</td><td>double</td><td>object</td><td>Unboxing Type Conversion</td>
+  </tr>
+</table>
+
+=end html
+
+B<Examples:>
+
+  my $int_obj = (object)Int->new(3);
+  my $int : int = $int_obj;
+
+If the type of the left operand is a L<numeric type|"Numeric Types"> corresponding to the numeric object type of the right operand and the type of the right operand is a L<numeric object type|"Numeric Object Type">, the assignment is valid.
+
+=begin html
+
+<table>
+  <tr>
+    <th>Assignable</th><th>To</th><th>From</th><th>Implicite Type Conversion</th>
+  </tr>
+  <tr>
+    <td>Yes</td><td>byte</td><td>Byte</td><td>Unboxing Type Conversion</td>
+    <td>Yes</td><td>short</td><td>Short</td><td>Unboxing Type Conversion</td>
+    <td>Yes</td><td>int</td><td>Int</td><td>Unboxing Type Conversion</td>
+    <td>Yes</td><td>long</td><td>Long</td><td>Unboxing Type Conversion</td>
+    <td>Yes</td><td>float</td><td>Float</td><td>Unboxing Type Conversion</td>
+    <td>Yes</td><td>double</td><td>Double</td><td>Unboxing Type Conversion</td>
+  </tr>
+</table>
+
+B<Examples:>
+
+  my $int_obj = Int->new(3);
+  my $int : int = $int_obj;
+
+=head3 Type Assignability of Others-to-Numeric
+
+If the type of the left operand is a L<numeric type|"Numeric Types"> and the type of the right operand is other than the types described above, the assignment is invalid.
+
+=head2 Type Assignability of Reference-to-Referenece
+
+If the type of the left operand is a L<reference type|"Reference Types"> and the type of the right operand is the same type of the left operand, the assignment is valid.
+
+If not, the assignment is invalid.
+
+<table>
+  <tr>
+    <th>Assignable</th><th>To</th><th>From</th><th>Implicite Type Conversion</th>
+  </tr>
+  <tr>
+    <td>Yes</td><td>&X</td><td>&X</td><td>None</td>
+    <td>No</td><td>&Y</td><td>&X</td><td>None</td>
+  </tr>
+</table>
+
+=head2 Type Assignability of MultiNumeric-to-MultiNumeric
+
+If the type of the left operand is a L<multi numeric type|"Multi Numeric Types"> and the type of the right operand is the same type of the left operand, the assignment is valid.
+
+If not, the assignment is invalid.
+
+<table>
+  <tr>
+    <th>Assignable</th><th>To</th><th>From</th><th>Implicite Type Conversion</th>
+  </tr>
+  <tr>
+    <td>Yes</td><td>X</td><td>X</td><td>None</td>
+    <td>No</td><td>Y</td><td>X</td><td>None</td>
+  </tr>
+</table>
+
+(Not Completed)
+
 =head1 Type Conversions
 
 =head2 Type Cast
@@ -6148,8 +6346,6 @@ Type Cast is Type Conversion that is explicitly described.
 L<"int Type"> value is converted to L<"long Type"> Become.
 
   my $num = (long)3;
-
-ype Cast returns L<"Expressions">.
 
 If the source Type and the specified Type are the same, the value is simply copied.
 
@@ -6591,6 +6787,26 @@ Type qualifiers qualify the type.
 
   QUALIFIER TYPE
 
+=head1 Type Comment
+
+The type comment syntax is supported. The type comment can be written after C<of> keyword.
+
+  TYPE of TYPE
+
+The type comment can be used the type of the L<field decralation|"Field Definition">, the L<class variable definition|"Class Variable Definition">, the L<local variable declaration|"Local Variable Declaration">, and the return value and the types of arguments of the L<method definition|"Method Definition">.
+
+  has points : List of Point;
+  
+  our $POINTS : List of Point;
+  
+  my $points : List of Point;
+  
+  static method foo : List of Point ($arg : List of Point) { ... }
+
+If the type specified as the type comment is not found, a compilation error occurs.
+
+Type comments have no meanings at runtime.
+
 =head2 mutable Type Qualifier
 
 The C<mutable> type qualifier is used to allow to set the character of the string.
@@ -6639,17 +6855,17 @@ B<Exception Variable> is a global variable that is represented by "B<$@>"
 
   $@
 
-See L<"Set Class Variable"> to get Exception Variable Value.
+See L<"Setting Class Variable"> to get Exception Variable Value.
 
-See L<"Set Exception Variable"> to set Exception Variable Value.
+See L<"Setting Exception Variable"> to set Exception Variable Value.
 
 =head1 Garbage Collection
 
-The object is released from memory when the Reference Count reaches 0.
+The object is released from memory when the reference count reaches 0.
 
-If the object is an Array that has Object Type values ​​as elements, the Reference Count of all Array elements that are not Undefined Value is decremented by 1 before Garbage Collection
+If the object is an Array that has Object Type values ​​as elements, the reference count of all Array elements that are not Undefined Value is decremented by C<1> before Garbage Collection
 
-When an object is a Class Type and has a field of Object Type, the Reference Count of the objects owned by all Fields of Object Type that are not Undefined Value is decremented by 1 before Garbage Collection. If Weaken Reference is set to the object saved in Field, Weaken Reference is released before Reference Count is decremented by 1.
+When an object is a L<class type|"Class Type"> and has a field of Object Type, the reference count of the objects owned by all Fields of Object Type that are not Undefined Value is decremented by C<1> before Garbage Collection. If Weaken Reference is set to the object saved in Field, Weaken Reference is released before Reference Count is decremented by C<1>.
 
 When the object has Back references of Weaken Reference, Undefined Value is assigned to all Fields registered as back References and all back References are deleted.
 
@@ -6671,7 +6887,7 @@ When Create Callback is performed, L<"Class Definition"> is performed internally
 
 Method defined by Create Callback must be L<"Method">. It must also be a Method with no name.
 
-B<Create Callback Example>
+B<Examples of Create Callback:>
 
   my $comparator = method : int ($x1 : object, $x2 : object) {
   
@@ -6731,9 +6947,9 @@ Capture is a syntax for writing such a long description short.
 
 =head1 Weaken Reference
 
-Weaken Reference is a reference that does not increase the Reference Count. Weaken Reference can be used to solve the problem of circular references.
+Weaken Reference is a reference that does not increase the reference count. Weaken Reference can be used to solve the problem of circular references.
 
-SPVM has GC of Reference Count Type. In the GC of Reference Count Type, the object is automatically released when the Reference Count becomes 0, but when the circular reference occurs, the Reference Count does not become 0 and the object is automatically released. not.
+SPVM has GC of Reference Count Type. In the GC of Reference Count Type, the object is automatically released when the reference count becomes 0, but when the circular reference occurs, the reference count does not become 0 and the object is automatically released. not.
 
 This is an Example when the Field of the object is circularly referenced.
 
@@ -6745,7 +6961,7 @@ This is an Example when the Field of the object is circularly referenced.
     $bar->{foo} = $foo;
   }
 
-In this case, both objects are not released when the Scope ends. This is because a circular reference has occurred and the Reference Count does not become 0.
+In this case, both objects are not released when the Scope ends. This is because a circular reference has occurred and the reference count does not become 0.
 
 Weaken Reference is a function to correctly destroy objects when a circular reference occurs in a programming language that has a Reference Count GC.
 
@@ -6767,7 +6983,7 @@ If there is no weaken statement, the reference count of $foo and the reference c
 
 When a weaken statement is executed, $foo has a Reference Count of 2 and $bar has a Reference Count of 1.
 
-When the Scope ends, the Reference Count of $bar is decremented by 1 and becomes 0, so it is released correctly.
+When the Scope ends, the reference count of $bar is decremented by C<1> and becomes 0, so it is released correctly.
 
 Even if there are 3 circular references, you can release them correctly by setting Weaken Reference in 1 Field.
 

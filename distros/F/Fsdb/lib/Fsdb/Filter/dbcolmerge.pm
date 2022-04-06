@@ -2,7 +2,7 @@
 
 #
 # dbcolmerge.pm
-# Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
+# Copyright (C) 1991-2022 by John Heidemann <johnh@isi.edu>
 #
 # This program is distributed under terms of the GNU general
 # public license, version 2.  See the file COPYING
@@ -21,7 +21,7 @@ dbcolmerge [-C ElementSeparator] [columns...]
 
 =head1 DESCRIPTION
 
-For each row, merge multiple columns down to a single column,
+For each row, merge multiple columns down to a single column (always a string),
 joining elements with ElementSeparator (defaults to a single underscore).
 
 =head1 OPTIONS
@@ -281,7 +281,7 @@ sub run ($) {
 
 =head1 AUTHOR and COPYRIGHT
 
-Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
+Copyright (C) 1991-2022 by John Heidemann <johnh@isi.edu>
 
 This program is distributed under terms of the GNU general
 public license, version 2.  See the file COPYING

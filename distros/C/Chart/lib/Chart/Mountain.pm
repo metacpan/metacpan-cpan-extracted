@@ -1,29 +1,5 @@
-## @file
-# Implementation of Chart::Mountain
-#
-#  written by david bonner
-#  dbonner@cs.bu.edu
-#
-# maintained by
-# @author Chart Group at Geodetic Fundamental Station Wettzell (Chart@fs.wettzell.de)
-# @date 2015-03-01
-# @version 2.4.10
-#
-#  Updated for
-#  compatibility with
-#  changes to Chart::Base
-#  by peter clark
-#  ninjaz@webexpress.com
-#
-# Copyright 1998, 1999 by James F. Miner.
-# All rights reserved.
-# This program is free software; you can redistribute it
-# and/or modify it under the same terms as Perl itself.
-#
 
-## @class Chart::Mountain
-# @brief Mountain class derived class for Chart to implement mountain type of plots
-#
+
 # Some Mountain chart details:
 #
 #   The effective y data value for a given x point and dataset
@@ -44,15 +20,15 @@
 #   of its area, not just a line color.  So the legend shou a square
 #   of the color and pattern for each dataset.
 
+use v5.12;
+
 package Chart::Mountain;
+our @ISA     = qw(Chart::Base);
 our $VERSION = 2.400.5;
 
 use Chart::Base;
 use GD;
 use Carp;
-use strict;
-
-@Chart::Mountain::ISA     = qw ( Chart::Base );
 
 #===================#
 #  private methods  #

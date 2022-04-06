@@ -2,6 +2,8 @@
 
 BEGIN { unshift @INC, 'lib', '../lib'}
 use Chart::Direction;
+use File::Temp 0.19;
+my $samples = File::Temp->newdir();
 
 print "1..1\n";
 
@@ -21,7 +23,7 @@ $g->set(
 
 );
 
-$g->png("samples/direction_2.png");
+$g->png("$samples/direction_2.png");
 
 print "ok 1\n";
 

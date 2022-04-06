@@ -3,6 +3,8 @@
 BEGIN { unshift @INC, 'lib', '../lib'}
 use Chart::Pie;
 use strict;
+use File::Temp 0.19;
+my $samples = File::Temp->newdir();
 
 print "1..1\n";
 
@@ -29,7 +31,7 @@ $g->set(
 );
 $g->set( 'legend_lines' => 'true' );
 
-$g->png("samples/pie_1.png");
+$g->png("$samples/pie_1.png");
 print "ok 1\n";
 
 exit(0);

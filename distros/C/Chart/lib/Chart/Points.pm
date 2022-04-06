@@ -1,30 +1,16 @@
-## @file
-# Implementation of Chart::Points
-#
-# written by
-# @author david bonner (dbonner@cs.bu.edu)
-#
-# maintained by the
-# @author Chart Group at Geodetic Fundamental Station Wettzell (Chart@fs.wettzell.de)
-# @date 2015-03-01
-# @version 2.4.10
-#
 
-## @class Chart::Points
-# Points class derived from class Base.
-#
-# This class provides all functions which are specific to
-# points
-#
+# xy charts (plots) with points (dots)
+
+use v5.12;
+
 package Chart::Points;
-our $VERSION = 2.400.5;
+our @ISA     = qw(Chart::Base);
+our $VERSION = '2.400.5';
 
-use Chart::Base;
-use GD;
 use Carp;
-use strict;
+use GD;
+use Chart::Base;
 
-@Chart::Points::ISA     = qw(Chart::Base);
 
 #>>>>>>>>>>>>>>>>>>>>>>>>>>#
 #  public methods go here  #
@@ -160,5 +146,4 @@ sub _draw_data
 
 }
 
-## be a good module and return 1
-1;
+1; # be a good module and return 1

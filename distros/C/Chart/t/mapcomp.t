@@ -1,8 +1,12 @@
+#!/usr/bin/perl -w
+
 BEGIN { unshift @INC, 'lib', '../lib'}
 use strict;
 use Chart::Composite;
+use File::Temp 0.19;
+my $samples = File::Temp->newdir();
 
-my $png_name = 'samples/mapcomp.png';
+my $png_name = "$samples/mapcomp.png";
 my @legend_keys = ( "Actual ", "Goal" );
 
 #

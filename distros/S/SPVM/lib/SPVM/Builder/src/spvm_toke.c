@@ -167,15 +167,15 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
         else if (op_use_stack->length > 0) {
           SPVM_OP* op_use = SPVM_LIST_shift(op_use_stack);
           
-          const char* class_name = op_use->uv.use->op_type->uv.type->basic_type->name;
+          const char* class_name = op_use->uv.use->class_name;
 
-          const char* used_class_name = (const char*)SPVM_HASH_fetch(compiler->used_class_symtable, class_name, strlen(class_name));
+          const char* used_class_name = (const char*)SPVM_HASH_get(compiler->used_class_symtable, class_name, strlen(class_name));
 
           if (used_class_name) {
             continue;
           }
           else {
-            SPVM_HASH_insert(compiler->used_class_symtable, class_name, strlen(class_name), (void*)class_name);
+            SPVM_HASH_set(compiler->used_class_symtable, class_name, strlen(class_name), (void*)class_name);
             
             // Create moudle relative file name from class name by changing :: to / and add ".spvm"
             int32_t cur_rel_file_length = (int32_t)(strlen(class_name) + 6);
@@ -204,16 +204,13 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
             int32_t do_directry_module_search;
 
             // Byte, Short, Int, Long, Float, Double, Bool is already existsregistered in module source symtable
-            const char* found_module_source = SPVM_HASH_fetch(compiler->module_source_symtable, class_name, strlen(class_name));
-            if (found_module_source) {
-
-            }
-            else {
+            const char* found_module_source = SPVM_HASH_get(compiler->module_source_symtable, class_name, strlen(class_name));
+            if (!found_module_source) {
               // Search module file
               FILE* fh = NULL;
               int32_t module_dirs_length = compiler->module_dirs->length;
               for (int32_t i = 0; i < module_dirs_length; i++) {
-                const char* module_dir = (const char*) SPVM_LIST_fetch(compiler->module_dirs, i);
+                const char* module_dir = (const char*) SPVM_LIST_get(compiler->module_dirs, i);
                 
                 // File name
                 int32_t file_name_length = (int32_t)(strlen(module_dir) + 1 + strlen(cur_rel_file));
@@ -241,13 +238,13 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                 if (!op_use->uv.use->is_require) {
                   int32_t moduler_dirs_str_length = 0;
                   for (int32_t i = 0; i < module_dirs_length; i++) {
-                    const char* module_dir = (const char*) SPVM_LIST_fetch(compiler->module_dirs, i);
+                    const char* module_dir = (const char*) SPVM_LIST_get(compiler->module_dirs, i);
                     moduler_dirs_str_length += 1 + strlen(module_dir);
                   }
                   char* moduler_dirs_str = SPVM_ALLOCATOR_alloc_memory_block_permanent(compiler->allocator, moduler_dirs_str_length + 1);
                   int32_t moduler_dirs_str_offset = 0;
                   for (int32_t i = 0; i < module_dirs_length; i++) {
-                    const char* module_dir = (const char*) SPVM_LIST_fetch(compiler->module_dirs, i);
+                    const char* module_dir = (const char*) SPVM_LIST_get(compiler->module_dirs, i);
                     sprintf(moduler_dirs_str + moduler_dirs_str_offset, " %s", module_dir);
                     moduler_dirs_str_offset += 1 + strlen(module_dir);
                   }
@@ -277,35 +274,16 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                 src[file_size] = '\0';
                 
                 found_module_source = src;
-                SPVM_HASH_insert(compiler->module_source_symtable, class_name, strlen(class_name), src);
+                SPVM_HASH_set(compiler->module_source_symtable, class_name, strlen(class_name), src);
               }
             }
             
             const char* src = NULL;
             int32_t file_size = 0;
-            int32_t module_not_found = 0;
             if (found_module_source) {
               src = found_module_source;
               file_size = strlen(src);
-            }
-            else {
-              module_not_found = 1;
-            }
-            
-            // If module not found and that is if (requre Foo) syntax, syntax is ok.
-            if (module_not_found && op_use->uv.use->is_require) {
-              op_use->uv.use->load_fail = 1;
-              SPVM_OP* op_class = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_CLASS, op_use->file, op_use->line);
-              SPVM_TYPE* type = SPVM_TYPE_new(compiler, op_use->uv.use->op_type->uv.type->basic_type->id, 0, 0);
-              SPVM_OP* op_type = SPVM_OP_new_op_type(compiler, type, op_use->file, op_use->line);
-              type->basic_type->fail_load = 1;
-              
-              SPVM_OP_build_class(compiler, op_class, op_type, NULL, NULL);
-              
-              continue;
-            }
-            else {
-              
+
               // Copy original source to current source because original source is used at other places(for example, SPVM::Builder::Exe)
               compiler->cur_src = (char*)src;
               compiler->cur_rel_file = cur_rel_file;
@@ -330,6 +308,14 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
               compiler->line_start_ptr = compiler->cur_src;
               compiler->cur_line = 1;
             }
+            else {
+              // If module not found and the module is used in require syntax, compilation errors don't occur.
+              if (op_use->uv.use->is_require) {
+                SPVM_HASH_set(compiler->fail_load_class_symtable, class_name, strlen(class_name), (void*)class_name);
+                continue;
+              }
+            }
+            
             break;
           }
         }
@@ -1769,7 +1755,12 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
             switch (symbol_name[0]) {
               // Keyword
               case 'a' : {
-                if (strcmp(symbol_name, "allow") == 0) {
+                if (strcmp(symbol_name, "alias") == 0) {
+                  yylvalp->opval = SPVM_TOKE_new_op(compiler, SPVM_OP_C_ID_ALIAS);
+                  is_keyword = 1;
+                  keyword_term = ALIAS;
+                }
+                else if (strcmp(symbol_name, "allow") == 0) {
                   yylvalp->opval = SPVM_TOKE_new_op(compiler, SPVM_OP_C_ID_ALLOW);
                   is_keyword = 1;
                   keyword_term = ALLOW;
@@ -1858,12 +1849,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                 break;
               }
               case 'e' : {
-                if (strcmp(symbol_name, "element") == 0) {
-                  yylvalp->opval = SPVM_TOKE_new_op(compiler, SPVM_OP_C_ID_ELEMENT);
-                  is_keyword = 1;
-                  keyword_term = ELEMENT;
-                }
-                else if (strcmp(symbol_name, "elsif") == 0) {
+                if (strcmp(symbol_name, "elsif") == 0) {
                   yylvalp->opval = SPVM_TOKE_new_op(compiler, SPVM_OP_C_ID_ELSIF);
                   is_keyword = 1;
                   keyword_term = ELSIF;
@@ -2071,10 +2057,10 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                 break;
               }
               case 'o' : {
-                if (strcmp(symbol_name, "oarray") == 0) {
-                  yylvalp->opval = SPVM_TOKE_new_op(compiler, SPVM_OP_C_ID_OARRAY);
+                if (strcmp(symbol_name, "of") == 0) {
+                  yylvalp->opval = SPVM_TOKE_new_op(compiler, SPVM_OP_C_ID_OF);
                   is_keyword = 1;
-                  keyword_term = OARRAY;
+                  keyword_term = OF;
                 }
                 else if (strcmp(symbol_name, "our") == 0) {
                   yylvalp->opval = SPVM_TOKE_new_op(compiler, SPVM_OP_C_ID_CLASS_VAR);

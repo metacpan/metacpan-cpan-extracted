@@ -3,13 +3,15 @@
 BEGIN { unshift @INC, 'lib', '../lib'}
 use strict;
 use Chart::Composite;    #(type is one of: Points, Lines, Bars, LinesPoints, Composite, StackedBars, Mountain)
+use File::Temp 0.19;
+my $samples = File::Temp->newdir();
 
 print "1..1\n";
 my $obj = Chart::Composite->new( 800, 600 );    #Breite, Höhe
 my @legend_ary;
 my ( $legend, @zeile );
 my @all_aryref;
-open( OUT, ">samples/composite_3.png" ) or die "kann Datei nicht schreiben\n";
+open( OUT, ">$samples/composite_3.png" ) or die "kann Datei nicht schreiben\n";
 
 my $i       = 0;
 my $e       = 0;

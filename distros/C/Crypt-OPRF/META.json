@@ -1,0 +1,45 @@
+{
+   "abstract" : "Oblivious Pseudorandom Functions (OPRFs) using Prime-Order Groups",
+   "author" : [
+      "Pan Lanlan <abbypan@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Crypt-OPRF",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Crypt::OpenSSL::Base::Func" : "0.031",
+            "Crypt::OpenSSL::Bignum" : "0.09",
+            "Crypt::OpenSSL::EC" : "1.31",
+            "Crypt::OpenSSL::Hash2Curve" : "0.03",
+            "bignum" : "0.52"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/abbypan/Crypt-OPRF.git",
+         "web" : "https://github.com/abbypan/Crypt-OPRF"
+      }
+   },
+   "version" : "0.01",
+   "x_generated_by_perl" : "v5.34.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
+   "x_spdx_expression" : "MPL-2.0"
+}
+

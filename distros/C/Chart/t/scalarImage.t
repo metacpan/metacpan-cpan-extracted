@@ -3,6 +3,8 @@
 BEGIN { unshift @INC, 'lib', '../lib'}
 use Chart::Lines;
 use strict;
+use File::Temp 0.19;
+my $samples = File::Temp->newdir();
 
 # bytewise comparision of scalar
 sub imgCompare
@@ -66,7 +68,7 @@ $g->set( 'y_label2'     => 'y label 2' );
 $g->set( 'y_grid_lines' => 'true' );
 $g->set( 'legend'       => 'bottom' );
 
-my $FileName = "samples/scalarImage.png";
+my $FileName = "$samples/scalarImage.png";
 $g->png($FileName);
 
 my $dataref     = $g->get_data();

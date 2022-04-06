@@ -3,6 +3,8 @@
 BEGIN { unshift @INC, 'lib', '../lib'}
 use Chart::Composite;
 use strict;
+use File::Temp 0.19;
+my $samples = File::Temp->newdir();
 
 print "1..1\n";
 
@@ -24,7 +26,7 @@ $g->set( 'legend_example_height0..1' => '10' );
 $g->set( 'legend_example_height2'    => '3' );
 $g->set( 'f_y_tick'                  => \&multiply );
 $g->set( 'f_x_tick'                  => \&int_quadrat );
-$g->png("samples/composite_f.png");
+$g->png("$samples/composite_f.png");
 
 print "ok 1\n";
 

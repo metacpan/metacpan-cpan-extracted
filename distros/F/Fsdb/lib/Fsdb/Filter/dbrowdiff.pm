@@ -95,7 +95,7 @@ end_standard_fsdb_options
 
 =head2 Input:
 
-    #fsdb      event   clock
+    #fsdb      event   clock:d
     _null_getpage+128       815812813.281756
     _null_getpage+128       815812813.328709
     _null_getpage+128       815812813.353830
@@ -111,7 +111,7 @@ end_standard_fsdb_options
 
 =head2 Output:
 
-    #fsdb      event   clock   absdiff pctdiff
+    #fsdb      event   clock:d   absdiff:d pctdiff:d
     _null_getpage+128       815812813.281756        0       0
     _null_getpage+128       815812813.328709        0.046953        5.7554e-09
     _null_getpage+128       815812813.353830        0.072074        8.8346e-09
@@ -235,7 +235,8 @@ sub setup ($) {
 	if (!defined($self->{_target_coli}));
 
     $self->finish_io_option('output', -clone => $self->{_in}, -outputheader => 'delay');
-    foreach (qw(absdiff pctdiff)) {
+    my($destination_type) = ($self->{_in}->col_type_is_numeric($self->{_target_column}) == 1 ? 'q' : 'd');
+    foreach ("absdiff:$destination_type", "pctdiff:$destination_type") {
 	$self->{_out}->col_create($_)
 	    or croak($self->{_prog} . ": cannot create column $_ (maybe it already existed?)\n");
     };

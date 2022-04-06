@@ -4,11 +4,11 @@
 #include "spvm_typedecl.h"
 
 struct spvm_use {
-  SPVM_OP* op_type;
-  int32_t is_require;
-  int32_t load_fail;
-  const char* file;
+  SPVM_OP* op_use;
+  const char* class_name;
   const char* class_alias_name;
+  const char* file;
+  int8_t is_require;
 };
 
 SPVM_USE* SPVM_USE_new(SPVM_COMPILER* compiler);

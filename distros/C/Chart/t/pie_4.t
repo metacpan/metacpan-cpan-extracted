@@ -4,6 +4,8 @@ BEGIN { unshift @INC, 'lib', '../lib'}
 use Chart::Pie;
 use GD;
 use strict;
+use File::Temp 0.19;
+my $samples = File::Temp->newdir();
 
 print "1..1\n";
 
@@ -22,7 +24,7 @@ $g->set( 'legend_font'         => gdSmallFont );
 $g->set( 'title_font'          => gdGiantFont );
 $g->set( 'legend_lines'        => 'false' );
 
-$g->png("samples/pie_4.png");
+$g->png("$samples/pie_4.png");
 print "ok 1\n";
 
 exit(0);

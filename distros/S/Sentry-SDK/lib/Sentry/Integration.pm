@@ -2,6 +2,7 @@ package Sentry::Integration;
 use Mojo::Base -base, -signatures;
 
 use Sentry::Hub;
+use Sentry::Hub::Scope;
 use Sentry::Integration::DBI;
 use Sentry::Integration::DieHandler;
 use Sentry::Integration::MojoUserAgent;
@@ -14,16 +15,11 @@ my @Global_integrations = (
   Sentry::Integration::LwpUserAgent->new,
 );
 
-## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
-sub _add_global_event_processor ($cb) {
-  Sentry::Hub->get_current_scope->add_event_processor($cb);
-}
-
 sub setup ($package, $custom_integrations = []) {
   my @all_integrations = (@Global_integrations, $custom_integrations->@*);
   foreach my $integration (grep { !$_->initialized } @all_integrations) {
     $integration->setup_once(
-      Sentry::Integration->can('_add_global_event_processor'),
+      Sentry::Hub::Scope->can('add_global_event_processor'),
       Sentry::Hub->can('get_current_hub'));
 
     $integration->initialized(1);

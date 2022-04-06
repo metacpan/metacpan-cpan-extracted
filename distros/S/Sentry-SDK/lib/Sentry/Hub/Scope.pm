@@ -119,8 +119,8 @@ sub apply_to_event ($self, $event, $hint = undef) {
   merge($event, $self, 'user')     if $self->user;
   merge($event, $self, 'contexts') if $self->contexts;
 
-  $event->{level} //= $self->level           if $self->level;
-  $event->{transaction} = $self->transaction if $self->transaction_name;
+  $event->{level} //= $self->level                if $self->level;
+  $event->{transaction} = $self->transaction_name if $self->transaction_name;
 
   if ($self->span) {
     $event->{request} = $self->span->request;
@@ -141,8 +141,11 @@ sub apply_to_event ($self, $event, $hint = undef) {
   $event->{breadcrumbs}
     = [($event->{breadcrumbs} // [])->@*, $self->breadcrumbs->@*];
 
-  foreach my $processor ($self->event_processors->@*) {
-    $processor->($event, $hint);
+  my @event_processors
+    = (get_global_event_processors()->@*, $self->event_processors->@*);
+
+  foreach my $processor (@event_processors) {
+    $event = $processor->($event, $hint);
   }
 
   return $event;
@@ -154,6 +157,15 @@ sub clone ($self) {
 
 sub update ($self, $fields) {
   $self->$_($fields->{$_}) for keys $fields->%*;
+}
+
+sub get_global_event_processors () {
+  state $processors = [];
+  return $processors;
+}
+
+sub add_global_event_processor ($processor) {
+  push get_global_event_processors()->@*, $processor;
 }
 
 1;

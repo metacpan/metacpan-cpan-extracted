@@ -19,10 +19,14 @@ use DynaLoader;
 
 
 
+
+
+#line 74 "real.pd"
+
 use strict;
 
 
-{ 
+{
   package # hide from CPAN
     PDL;
   my $warningFlag;
@@ -60,14 +64,11 @@ PDL::LinearAlgebra::Real - PDL interface to the real lapack linear algebra progr
  $job = 0;
  gesdd($a, $job, $info, $s , $u, $v);
 
-
-Blas vector routine use increment.
-
 =head1 DESCRIPTION
 
 This module provides an interface to parts of the real lapack library.
 These routines accept either float or double ndarrays.
-
+#line 72 "Real.pm"
 
 
 
@@ -79,6 +80,9 @@ These routines accept either float or double ndarrays.
 =cut
 
 
+
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -151,15 +155,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 159 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *gtsv = \&PDL::gtsv;
+#line 166 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -167,7 +174,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io,phys]A(m,n); int jobu(); int jobvt(); [o,phys]s(r); [o,phys]U(p,q); [o,phys]VT(s,t); int [o,phys]info())
+  Signature: ([io]A(m,n); int jobu(); int jobvt(); [o]s(minmn); [o]U(p,p); [o]VT(s,s); int [o]info())
 
 
 
@@ -261,15 +268,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 272 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *gesvd = \&PDL::gesvd;
+#line 279 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -277,7 +287,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io,phys]A(m,n); int job(); [o,phys]s(r); [o,phys]U(p,q); [o,phys]VT(s,t); int [o,phys]info())
+  Signature: ([io]A(m,n); int jobz(); [o]s(minmn); [o]U(p,p); [o]VT(s,s); int [o]info())
 
 
 
@@ -289,7 +299,7 @@ M-by-N matrix A.
 This routine use the Coppen's divide and conquer algorithm.
 It is much faster than the simple driver for large matrices, but uses more workspace.
 
-    job:    Specifies options for computing all or part of matrix:
+    jobz:    Specifies options for computing all or part of matrix:
 
             = 0:  no columns of U or rows of V' are computed;
 	    = 1:  all M columns of U and all N rows of V' are
@@ -306,28 +316,28 @@ It is much faster than the simple driver for large matrices, but uses more works
 
     A:      On entry, the M-by-N matrix A.
             On exit,
-            if job = 3,  A is overwritten with the first N columns
+            if jobz = 3,  A is overwritten with the first N columns
                             of U (the left singular vectors, stored
                             columnwise) if M >= N;
                             A is overwritten with the first M rows
                             of V' (the right singular vectors, stored
                             rowwise) otherwise.
-            if job != 3, the contents of A are destroyed.
+            if jobz != 3, the contents of A are destroyed.
 
     s:      The singular values of A, sorted so that s(i) >= s(i+1).
 
-    U:      If job = 1 or job = 3 and M < N, U contains the M-by-M
+    U:      If jobz = 1 or jobz = 3 and M < N, U contains the M-by-M
             orthogonal matrix U;
-            if job = 2, U contains the first min(M,N) columns of U
+            if jobz = 2, U contains the first min(M,N) columns of U
             (the left singular vectors, stored columnwise);
-            if job = 3 and M >= N, or job = 0, U is not referenced.
+            if jobz = 3 and M >= N, or jobz = 0, U is not referenced.
             Min size  = [1,1].
 
-    VT:     If job = 1 or job = 3 and M >= N, VT contains the
+    VT:     If jobz = 1 or jobz = 3 and M >= N, VT contains the
             N-by-N orthogonal matrix V';
-            if job = 2, VT contains the first min(M,N) rows of
+            if jobz = 2, VT contains the first min(M,N) rows of
             V' (the right singular vectors, stored rowwise);
-            if job = 3 and M < N, or job = 0, VT is not referenced.
+            if jobz = 3 and M < N, or jobz = 0, VT is not referenced.
             Min size  = [1,1].
 
     info:   = 0:  successful exit.
@@ -355,15 +365,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 369 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *gesdd = \&PDL::gesdd;
+#line 376 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -371,7 +384,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io,phys]A(m,n); int jobu(); int jobv(); int jobq(); [io,phys]B(p,n); int [o,phys]k(); int [o,phys]l();[o,phys]alpha(n);[o,phys]beta(n); [o,phys]U(q,r); [o,phys]V(s,t); [o,phys]Q(u,v); int [o,phys]iwork(n); int [o,phys]info())
+  Signature: ([io]A(m,n); int jobu(); int jobv(); int jobq(); [io]B(p,n); int [o]k(); int [o]l();[o]alpha(n);[o]beta(n); [o]U(q,q); [o]V(r,r); [o]Q(s,s); int [o]iwork(n); int [o]info())
 
 
 
@@ -550,15 +563,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 567 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *ggsvd = \&PDL::ggsvd;
+#line 574 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -566,7 +582,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([phys]A(n,n); int jobvl(); int jobvr(); [o,phys]wr(n); [o,phys]wi(n); [o,phys]vl(m,m); [o,phys]vr(p,p); int [o,phys]info())
+  Signature: (A(n,n); int jobvl(); int jobvr(); [o]wr(n); [o]wi(n); [o]vl(m,m); [o]vr(p,p); int [o]info())
 
 
 
@@ -636,7 +652,7 @@ equal to 1 and largest component real.
 
  $a = random (5, 5);
  $wr = zeroes(5);
- $wi = zeroes($wr); 
+ $wi = zeroes($wr);
  $vl = zeroes($a);
  $vr = zeroes($a);
  $info = null;
@@ -651,15 +667,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 671 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *geev = \&PDL::geev;
+#line 678 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -667,7 +686,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io,phys]A(n,n);  int jobvl(); int jobvr(); int balance(); int sense(); [o,phys]wr(n); [o,phys]wi(n); [o,phys]vl(m,m); [o,phys]vr(p,p); int [o,phys]ilo(); int [o,phys]ihi(); [o,phys]scale(n); [o,phys]abnrm(); [o,phys]rconde(q); [o,phys]rcondv(r); int [o,phys]info())
+  Signature: ([io]A(n,n);  int jobvl(); int jobvr(); int balance(); int sense(); [o]wr(n); [o]wi(n); [o]vl(m,m); [o]vr(p,p); int [o]ilo(); int [o]ihi(); [o]scale(n); [o]abnrm(); [o]rconde(q); [o]rcondv(r); int [o]info())
 
 
 
@@ -830,15 +849,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 853 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *geevx = \&PDL::geevx;
+#line 860 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -846,7 +868,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([phys]A(n,n); int jobvl();int jobvr();[phys]B(n,n);[o,phys]alphar(n);[o,phys]alphai(n);[o,phys]beta(n);[o,phys]VL(m,m);[o,phys]VR(p,p);int [o,phys]info())
+  Signature: (A(n,n); int [phys]jobvl();int [phys]jobvr();B(n,n);[o]alphar(n);[o]alphai(n);[o]beta(n);[o]VL(m,m);[o]VR(p,p);int [o]info())
 
 
 
@@ -934,7 +956,6 @@ of (A,B) satisfies
             > N:  =N+1: other than QZ iteration failed in hgeqz.
                   =N+2: error return from tgevc.
 
-
 =for example
 
  $a = random(5,5);
@@ -955,15 +976,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 980 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *ggev = \&PDL::ggev;
+#line 987 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -971,7 +995,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io,phys]A(n,n);int balanc();int jobvl();int jobvr();int sense();[io,phys]B(n,n);[o,phys]alphar(n);[o,phys]alphai(n);[o,phys]beta(n);[o,phys]VL(m,m);[o,phys]VR(p,p);int [o,phys]ilo();int [o,phys]ihi();[o,phys]lscale(n);[o,phys]rscale(n);[o,phys]abnrm();[o,phys]bbnrm();[o,phys]rconde(r);[o,phys]rcondv(s);int [o,phys]info())
+  Signature: ([io,phys]A(n,n);int balanc();int jobvl();int jobvr();int sense();[io,phys]B(n,n);[o]alphar(n);[o]alphai(n);[o]beta(n);[o]VL(m,m);[o]VR(p,p);int [o]ilo();int [o]ihi();[o]lscale(n);[o]rscale(n);[o]abnrm();[o]bbnrm();[o]rconde(r);[o]rcondv(s);int [o]info())
 
 
 
@@ -1188,15 +1212,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 1216 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *ggevx = \&PDL::ggevx;
+#line 1223 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -1204,7 +1231,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io,phys]A(n,n);  int jobvs(); int sort(); [o,phys]wr(n); [o,phys]wi(n); [o,phys]vs(p,p); int [o,phys]sdim(); int [o,phys]info(); SV* select_func)
+  Signature: ([io]A(n,n);  int jobvs(); int sort(); [o]wr(n); [o]wi(n); [o]vs(p,p); int [o]sdim(); int [o]info(); SV* select_func)
 
 
 
@@ -1224,7 +1251,7 @@ A matrix is in real Schur form if it is upper quasi-triangular with
 form
 
 	[  a  b  ]
- 	[  c  a  ]
+	[  c  a  ]
         where b*c < 0.
 
 The eigenvalues of such a block are a +- sqrt(bc).
@@ -1245,8 +1272,8 @@ The eigenvalues of such a block are a +- sqrt(bc).
             to the top left of the Schur form.
             If sort = 0, select_func is not referenced.
             An eigenvalue wr(j)+sqrt(-1)*wi(j) is selected if
-            select_func(SCALAR(wr(j)), SCALAR(wi(j))) is true; i.e., 
-	    if either one of a complex conjugate pair of eigenvalues 
+            select_func(SCALAR(wr(j)), SCALAR(wi(j))) is true; i.e.,
+	    if either one of a complex conjugate pair of eigenvalues
 	    is selected, then both complex eigenvalues are selected.
             Note that a selected complex eigenvalue may no longer
             satisfy select_func(wr(j),wi(j)) = 1 after ordering, since
@@ -1293,8 +1320,8 @@ The eigenvalues of such a block are a +- sqrt(bc).
 =for example
 
  sub select_function{
- 	my ($a, $b ) = @_;
- 	# Stable "continuous time" eigenspace
+	my ($a, $b ) = @_;
+	# Stable "continuous time" eigenspace
 	return $a < 0 ? 1 : 0;
  }
  $A = random (5,5);
@@ -1314,15 +1341,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 1345 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *gees = \&PDL::gees;
+#line 1352 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -1330,7 +1360,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io,phys]A(n,n);  int jobvs(); int sort(); int sense(); [o,phys]wr(n); [o,phys]wi(n); [o,phys]vs(p,p); int [o,phys]sdim(); [o,phys]rconde();[o,phys]rcondv(); int [o,phys]info(); SV* select_func)
+  Signature: ([io]A(n,n);  int jobvs(); int sort(); int sense(); [o]wr(n); [o]wi(n); [o]vs(p,p); int [o]sdim(); [o]rconde();[o]rcondv(); int [o]info(); SV* select_func)
 
 
 
@@ -1436,8 +1466,8 @@ the form
 =for example
 
  sub select_function{
- 	my ($a, $b) = @_;
- 	# Stable "discrete time" eigenspace
+	my ($a, $b) = @_;
+	# Stable "discrete time" eigenspace
 	return sqrt($a**2 + $b**2) < 1 ? 1 : 0;
  }
  $A = random (5,5);
@@ -1459,15 +1489,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 1493 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *geesx = \&PDL::geesx;
+#line 1500 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -1475,7 +1508,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io,phys]A(n,n); int jobvsl();int jobvsr();int sort();[io,phys]B(n,n);[o,phys]alphar(n);[o,phys]alphai(n);[o,phys]beta(n);[o,phys]VSL(m,m);[o,phys]VSR(p,p);int [o,phys]sdim();int [o,phys]info(); SV* select_func)
+  Signature: ([io]A(n,n); int jobvsl();int jobvsr();int sort();[io]B(n,n);[o]alphar(n);[o]alphai(n);[o]beta(n);[o]VSL(m,m);[o]VSR(p,p);int [o]sdim();int [o]info(); SV* select_func)
 
 
 
@@ -1601,9 +1634,9 @@ complex conjugate pair of generalized eigenvalues.
 =for example
 
  sub my_select{
- 	my ($zr, $zi, $d) = @_;
- 	# stable generalized eigenvalues for continuous time
- 	return ( ($zr < 0 && $d > 0 ) || ($zr > 0 && $d < 0) ) ?  1 : 0;
+	my ($zr, $zi, $d) = @_;
+	# stable generalized eigenvalues for continuous time
+	return ( ($zr < 0 && $d > 0 ) || ($zr > 0 && $d < 0) ) ?  1 : 0;
  }
  $a = random(5,5);
  $b = random(5,5);
@@ -1624,15 +1657,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 1661 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *gges = \&PDL::gges;
+#line 1668 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -1640,7 +1676,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io,phys]A(n,n); int jobvsl();int jobvsr();int sort();int sense();[io,phys]B(n,n);[o,phys]alphar(n);[o,phys]alphai(n);[o,phys]beta(n);[o,phys]VSL(m,m);[o,phys]VSR(p,p);int [o,phys]sdim();[o,phys]rconde(q);[o,phys]rcondv(r);int [o,phys]info(); SV* select_func)
+  Signature: ([io]A(n,n); int jobvsl();int jobvsr();int sort();int sense();[io]B(n,n);[o]alphar(n);[o]alphai(n);[o]beta(n);[o]VSL(m,m);[o]VSR(p,p);int [o]sdim();[o]rconde(q=2);[o]rcondv(q=2);int [o]info(); SV* select_func)
 
 
 
@@ -1799,10 +1835,10 @@ See LAPACK User's Guide, section 4.11 for more information.
 =for example
 
  sub my_select{
- 	my ($zr, $zi, $d) = @_;
- 	# Eigenvalue : (ZR/D) + sqrt(-1)*(ZI/D)
+	my ($zr, $zi, $d) = @_;
+	# Eigenvalue : (ZR/D) + sqrt(-1)*(ZI/D)
 	# stable generalized eigenvalues for discrete time
- 	return (sqrt($zr**2 + $zi**2) < abs($d) ) ?  1 : 0;
+	return (sqrt($zr**2 + $zi**2) < abs($d) ) ?  1 : 0;
 
  }
  $a = random(5,5);
@@ -1826,15 +1862,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 1866 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *ggesx = \&PDL::ggesx;
+#line 1873 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -1894,15 +1933,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 1937 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *syev = \&PDL::syev;
+#line 1944 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -1973,15 +2015,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 2019 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *syevd = \&PDL::syevd;
+#line 2026 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -1989,7 +2034,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([phys]A(n,n);  int jobz(); int range(); int uplo(); [phys]vl(); [phys]vu(); int [phys]il(); int [phys]iu(); [phys]abstol(); int [o,phys]m(); [o,phys]w(n); [o,phys]z(p,q);int [o,phys]ifail(r); int [o,phys]info())
+  Signature: (A(n,n);  int jobz(); int range(); int uplo(); vl(); vu(); int il(); int iu(); abstol(); int [o]m(); [o]w(n); [o]z(p,p);int [o]ifail(n); int [o]info())
 
 
 
@@ -2093,7 +2138,7 @@ for the desired eigenvalues.
  $ovfl = lamch(9);
  labad($unfl, $ovfl);
  $abstol = $unfl + $unfl;
- $m = null; 
+ $m = null;
  $info = null;
  $ifail = zeroes(5);
  $w = zeroes(5);
@@ -2109,15 +2154,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 2158 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *syevx = \&PDL::syevx;
+#line 2165 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -2271,7 +2319,7 @@ manner.
  $ovfl = lamch(9);
  labad($unfl, $ovfl);
  $abstol = $unfl + $unfl;
- $m = null; 
+ $m = null;
  $info = null;
  $isuppz = zeroes(10);
  $w = zeroes(5);
@@ -2287,15 +2335,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 2339 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *syevr = \&PDL::syevr;
+#line 2346 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -2384,15 +2435,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 2439 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *sygv = \&PDL::sygv;
+#line 2446 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -2488,15 +2542,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 2546 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *sygvd = \&PDL::sygvd;
+#line 2553 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -2504,7 +2561,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io,phys]A(n,n);int [phys]itype();int jobz();int range(); int uplo();[io,phys]B(n,n);[phys]vl();[phys]vu();int [phys]il();int [phys]iu();[phys]abstol();int [o,phys]m();[o,phys]w(n); [o,phys]Z(p,q);int [o,phys]ifail(r);int [o,phys]info())
+  Signature: ([io]A(n,n); int itype(); int jobz(); int range();
+	  int uplo(); [io]B(n,n); vl(); vu(); int il(); int iu(); abstol();
+	  int [o]m(); [o]w(n); [o]Z(p,p); int [o]ifail(n); int [o]info())
 
 
 
@@ -2636,7 +2695,7 @@ range of values or a range of indices for the desired eigenvalues.
  $m = null;
  $w=zeroes(5);
  $z = zeroes(5,5);
- $ifail = zeroes(5); 
+ $ifail = zeroes(5);
  sygvx($a, 1,1, 0,0, $b, 0, 0, 0, 0, $abstol, $m, $w, $z,$ifail,(my $info=null));
 
 
@@ -2648,15 +2707,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 2711 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *sygvx = \&PDL::sygvx;
+#line 2718 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -2680,7 +2742,7 @@ used to factor A as
 
 	A = P * L * U,
 	where P is a permutation matrix, L is unit lower triangular, and U is
-    	upper triangular.
+	upper triangular.
 
 The factored form of A is then used to solve the
 system of equations A * X = B.
@@ -2722,15 +2784,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 2788 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *gesv = \&PDL::gesv;
+#line 2795 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -2738,8 +2803,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io,phys]A(n,n); int trans(); int fact(); [io,phys]B(n,m); [io,phys]af(n,n); int [io,phys]ipiv(n); int [io]equed(); [io,phys]r(n); [io,phys]c(n); [o,phys]X(n,m); [o,phys]rcond(); [o,phys]ferr(m); [o,phys]berr(m);[o,phys]rpvgrw();int [o,phys]info())
-
+  Signature: ([io]A(n,n); int trans(); int fact(); [io]B(n,m); [io]af(n,n); int [io]ipiv(n); int [io]equed(); [o]r(p); [o]c(q); [o]X(n,m); [o]rcond(); [o]ferr(m); [o]berr(m);[o]rpvgrw();int [o]info())
 
 
 =for ref
@@ -2926,9 +2990,9 @@ that it solves the original system before equilibration.
             any element of A or B that makes X(j) an exact solution).
 
     rpvgrw: Contains the reciprocal pivot growth factor norm(A)/norm(U).
-	    The "max absolute element" norm is used. If it is much less 
-	    than 1, then the stability of the LU factorization of the 
-	    (equilibrated) matrix A could be poor. This also means that 
+	    The "max absolute element" norm is used. If it is much less
+	    than 1, then the stability of the LU factorization of the
+	    (equilibrated) matrix A could be poor. This also means that
 	    the solution X, condition estimator rcond, and forward error
 	    bound ferr could be unreliable. If factorization fails with
 	    0<info<=N, then it contains the reciprocal pivot growth factor
@@ -2978,15 +3042,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 3046 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *gesvx = \&PDL::gesvx;
+#line 3053 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -2994,7 +3061,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io,phys]A(n,n);  int uplo(); [io,phys]B(n,m); int [o,phys]ipiv(n); int [o,phys]info())
+  Signature: ([io,phys]A(n,n);  int uplo(); [io,phys]B(n,m); int [o]ipiv(n); int [o]info())
 
 
 
@@ -3075,15 +3142,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 3146 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *sysv = \&PDL::sysv;
+#line 3153 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -3091,7 +3161,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([phys]A(n,n); int uplo(); int fact(); [phys]B(n,m); [io,phys]af(n,n); int [io,phys]ipiv(n); [o,phys]X(n,m); [o,phys]rcond(); [o,phys]ferr(m); [o,phys]berr(m); int [o,phys]info())
+  Signature: ([phys]A(n,n); int uplo(); int fact(); [phys]B(n,m); [io,phys]af(n,n); int [io,phys]ipiv(n); [o]X(n,m); [o]rcond(); [o]ferr(m); [o]berr(m); int [o]info())
 
 
 
@@ -3254,15 +3324,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 3328 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *sysvx = \&PDL::sysvx;
+#line 3335 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -3337,15 +3410,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 3414 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *posv = \&PDL::posv;
+#line 3421 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -3353,7 +3429,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io,phys]A(n,n); int uplo(); int fact(); [io,phys]B(n,m); [io,phys]af(n,n); int [io]equed(); [io,phys]s(n); [o,phys]X(n,m); [o,phys]rcond(); [o,phys]ferr(m); [o,phys]berr(m); int [o,phys]info())
+  Signature: ([io,phys]A(n,n); int uplo(); int fact(); [io,phys]B(n,m); [io,phys]af(n,n); int [io]equed(); [o]s(p); [o,phys]X(n,m); [o,phys]rcond(); [o,phys]ferr(m); [o,phys]berr(m); int [o,phys]info())
 
 
 
@@ -3393,7 +3469,7 @@ factor the matrix A (after equilibration if fact = 2) as
 	A = U'* U,  if uplo = 0, or
 	A = L * L',  if uplo = 1,
 	where U is an upper triangular matrix and L is a lower triangular
-       	matrix.
+	matrix.
 
 =item 3
 
@@ -3555,15 +3631,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 3635 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *posvx = \&PDL::posvx;
+#line 3642 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -3667,15 +3746,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 3750 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *gels = \&PDL::gels;
+#line 3757 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -3777,15 +3859,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 3863 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *gelsy = \&PDL::gelsy;
+#line 3870 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -3868,15 +3953,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 3957 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *gelss = \&PDL::gelss;
+#line 3964 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -3986,15 +4074,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 4078 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *gelsd = \&PDL::gelsd;
+#line 4085 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -4068,15 +4159,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 4163 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *gglse = \&PDL::gglse;
+#line 4170 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -4151,15 +4245,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 4249 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *ggglm = \&PDL::ggglm;
+#line 4256 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -4167,7 +4264,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io,phys]A(m,n); int [o,phys]ipiv(p); int [o,phys]info())
+  Signature: ([io]A(m,n); int [o]ipiv(p); int [o]info())
 
 
 
@@ -4182,7 +4279,7 @@ The factorization has the form
 
 	where P is a permutation matrix, L is lower triangular with unit
 	diagonal elements (lower trapezoidal if m > n), and U is upper
-    	triangular (upper trapezoidal if m < n).
+	triangular (upper trapezoidal if m < n).
 
 This is the right-looking Level 3 BLAS version of the algorithm.
 
@@ -4219,15 +4316,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 4320 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *getrf = \&PDL::getrf;
+#line 4327 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -4235,7 +4335,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io,phys]A(m,n); int [o,phys]ipiv(p); int [o,phys]info())
+  Signature: ([io]A(m,n); int [o]ipiv(p); int [o]info())
 
 
 
@@ -4250,7 +4350,7 @@ The factorization has the form
 
 	where P is a permutation matrix, L is lower triangular with unit
 	diagonal elements (lower trapezoidal if m > n), and U is upper
-    	triangular (upper trapezoidal if m < n).
+	triangular (upper trapezoidal if m < n).
 
 This is the right-looking Level 2 BLAS version of the algorithm.
 
@@ -4287,15 +4387,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 4391 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *getf2 = \&PDL::getf2;
+#line 4398 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -4407,15 +4510,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 4514 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *sytrf = \&PDL::sytrf;
+#line 4521 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -4492,15 +4598,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 4602 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *sytf2 = \&PDL::sytf2;
+#line 4609 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -4563,15 +4672,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 4676 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *potrf = \&PDL::potrf;
+#line 4683 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -4634,15 +4746,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 4750 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *potf2 = \&PDL::potf2;
+#line 4757 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -4700,15 +4815,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 4819 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *getri = \&PDL::getri;
+#line 4826 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -4774,15 +4892,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 4896 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *sytri = \&PDL::sytri;
+#line 4903 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -4838,15 +4959,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 4963 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *potri = \&PDL::potri;
+#line 4970 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -4860,35 +4984,35 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-Computes the inverse of a real upper or lower triangular   
-matrix A.   
+Computes the inverse of a real upper or lower triangular
+matrix A.
 
-This is the Level 3 BLAS version of the algorithm.   
+This is the Level 3 BLAS version of the algorithm.
 
-    Arguments   
-    =========   
+    Arguments
+    =========
 
-    uplo:   = 0:  A is upper triangular;   
-            = 1:  A is lower triangular.   
+    uplo:   = 0:  A is upper triangular;
+            = 1:  A is lower triangular.
 
-    diag:   = 0:  A is non-unit triangular;   
-            = 1:  A is unit triangular.   
+    diag:   = 0:  A is non-unit triangular;
+            = 1:  A is unit triangular.
 
-    A:      On entry, the triangular matrix A.  If uplo = 0, the   
-            leading N-by-N upper triangular part of the array A contains   
-            the upper triangular matrix, and the strictly lower   
-            triangular part of A is not referenced.  If uplo = 1, the   
-            leading N-by-N lower triangular part of the array A contains   
-            the lower triangular matrix, and the strictly upper   
-            triangular part of A is not referenced.  If diag = 1, the   
-            diagonal elements of A are also not referenced and are   
-            assumed to be 1.   
-            On exit, the (triangular) inverse of the original matrix, in   
-            the same storage format.   
+    A:      On entry, the triangular matrix A.  If uplo = 0, the
+            leading N-by-N upper triangular part of the array A contains
+            the upper triangular matrix, and the strictly lower
+            triangular part of A is not referenced.  If uplo = 1, the
+            leading N-by-N lower triangular part of the array A contains
+            the lower triangular matrix, and the strictly upper
+            triangular part of A is not referenced.  If diag = 1, the
+            diagonal elements of A are also not referenced and are
+            assumed to be 1.
+            On exit, the (triangular) inverse of the original matrix, in
+            the same storage format.
 
-    info:   = 0: successful exit   
-            < 0: if info = -i, the i-th argument had an illegal value   
-            > 0: if info = i, A(i,i) is exactly zero.  The triangular   
+    info:   = 0: successful exit
+            < 0: if info = -i, the i-th argument had an illegal value
+            > 0: if info = i, A(i,i) is exactly zero.  The triangular
                  matrix is singular and its inverse can not be computed.
 
 
@@ -4909,15 +5033,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 5037 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *trtri = \&PDL::trtri;
+#line 5044 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -4931,34 +5058,34 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-Computes the inverse of a real upper or lower triangular   
-matrix A.   
+Computes the inverse of a real upper or lower triangular
+matrix A.
 
-This is the Level 2 BLAS version of the algorithm.   
+This is the Level 2 BLAS version of the algorithm.
 
-    Arguments   
-    =========   
+    Arguments
+    =========
 
-    uplo:   = 0:  A is upper triangular;   
-            = 1:  A is lower triangular.   
+    uplo:   = 0:  A is upper triangular;
+            = 1:  A is lower triangular.
 
-    diag:   = 0:  A is non-unit triangular;   
-            = 1:  A is unit triangular.   
+    diag:   = 0:  A is non-unit triangular;
+            = 1:  A is unit triangular.
 
-    A:      On entry, the triangular matrix A.  If uplo = 0, the   
-            leading N-by-N upper triangular part of the array A contains   
-            the upper triangular matrix, and the strictly lower   
-            triangular part of A is not referenced.  If uplo = 1, the   
-            leading N-by-N lower triangular part of the array A contains   
-            the lower triangular matrix, and the strictly upper   
-            triangular part of A is not referenced.  If diag = 1, the   
-            diagonal elements of A are also not referenced and are   
-            assumed to be 1.   
-            On exit, the (triangular) inverse of the original matrix, in   
-            the same storage format.   
+    A:      On entry, the triangular matrix A.  If uplo = 0, the
+            leading N-by-N upper triangular part of the array A contains
+            the upper triangular matrix, and the strictly lower
+            triangular part of A is not referenced.  If uplo = 1, the
+            leading N-by-N lower triangular part of the array A contains
+            the lower triangular matrix, and the strictly upper
+            triangular part of A is not referenced.  If diag = 1, the
+            diagonal elements of A are also not referenced and are
+            assumed to be 1.
+            On exit, the (triangular) inverse of the original matrix, in
+            the same storage format.
 
-    info:   = 0: successful exit   
-            < 0: if info = -i, the i-th argument had an illegal value   
+    info:   = 0: successful exit
+            < 0: if info = -i, the i-th argument had an illegal value
 
 =for example
 
@@ -4976,15 +5103,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 5107 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *trti2 = \&PDL::trti2;
+#line 5114 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -5044,15 +5174,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 5178 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *getrs = \&PDL::getrs;
+#line 5185 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -5112,15 +5245,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 5249 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *sytrs = \&PDL::sytrs;
+#line 5256 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -5175,15 +5311,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 5315 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *potrs = \&PDL::potrs;
+#line 5322 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -5197,44 +5336,44 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-Solves a triangular system of the form   
+Solves a triangular system of the form
 
-	A * X = B  or  A' * X = B,   
-	
-	where A is a triangular matrix of order N, and B is an N-by-NRHS   
-	matrix.  
+	A * X = B  or  A' * X = B,
 
-A check is made to verify that A is nonsingular.   
+	where A is a triangular matrix of order N, and B is an N-by-NRHS
+	matrix.
 
-    Arguments   
-    =========   
+A check is made to verify that A is nonsingular.
 
-    uplo:   = 0:  A is upper triangular;   
-            = 1:  A is lower triangular.   
+    Arguments
+    =========
 
-    trans:  Specifies the form of the system of equations:   
-            = 0:  A * X = B  (No transpose)   
-            = 1:  A**T * X = B  (Transpose)   
+    uplo:   = 0:  A is upper triangular;
+            = 1:  A is lower triangular.
 
-    diag:   = 0:  A is non-unit triangular;   
-            = 1:  A is unit triangular.   
+    trans:  Specifies the form of the system of equations:
+            = 0:  A * X = B  (No transpose)
+            = 1:  A**T * X = B  (Transpose)
 
-    A:      The triangular matrix A.  If uplo = 0, the leading N-by-N   
-            upper triangular part of the array A contains the upper   
-            triangular matrix, and the strictly lower triangular part of   
-            A is not referenced.  If uplo = 1, the leading N-by-N lower   
-            triangular part of the array A contains the lower triangular   
-            matrix, and the strictly upper triangular part of A is not   
-            referenced.  If diag = 1, the diagonal elements of A are   
-            also not referenced and are assumed to be 1.   
+    diag:   = 0:  A is non-unit triangular;
+            = 1:  A is unit triangular.
 
-    B:      On entry, the right hand side matrix B.   
-            On exit, if info = 0, the solution matrix X.   
+    A:      The triangular matrix A.  If uplo = 0, the leading N-by-N
+            upper triangular part of the array A contains the upper
+            triangular matrix, and the strictly lower triangular part of
+            A is not referenced.  If uplo = 1, the leading N-by-N lower
+            triangular part of the array A contains the lower triangular
+            matrix, and the strictly upper triangular part of A is not
+            referenced.  If diag = 1, the diagonal elements of A are
+            also not referenced and are assumed to be 1.
 
-    info    = 0:  successful exit   
-            < 0: if info = -i, the i-th argument had an illegal value   
-            > 0: if info = i, the i-th diagonal element of A is zero,   
-                 indicating that the matrix is singular and the solutions   
+    B:      On entry, the right hand side matrix B.
+            On exit, if info = 0, the solution matrix X.
+
+    info    = 0:  successful exit
+            < 0: if info = -i, the i-th argument had an illegal value
+            > 0: if info = i, the i-th diagonal element of A is zero,
+                 indicating that the matrix is singular and the solutions
                  X have not been computed.
 
 =for example
@@ -5257,15 +5396,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 5400 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *trtrs = \&PDL::trtrs;
+#line 5407 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -5279,143 +5421,143 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-Solves one of the triangular systems   
+Solves one of the triangular systems
 
-	A *x = s*b  or  A'*x = s*b   
+	A *x = s*b  or  A'*x = s*b
 
-with scaling to prevent overflow.  Here A is an upper or lower   
-triangular matrix, A' denotes the transpose of A, x and b are   
-n-element vectors, and s is a scaling factor, usually less than   
-or equal to 1, chosen so that the components of x will be less than   
-the overflow threshold.  If the unscaled problem will not cause   
-overflow, the Level 2 BLAS routine C<trsv> is called.  If the matrix A   
-is singular (A(j,j) = 0 for some j), then s is set to 0 and a   
-non-trivial solution to A*x = 0 is returned.   
+with scaling to prevent overflow.  Here A is an upper or lower
+triangular matrix, A' denotes the transpose of A, x and b are
+n-element vectors, and s is a scaling factor, usually less than
+or equal to 1, chosen so that the components of x will be less than
+the overflow threshold.  If the unscaled problem will not cause
+overflow, the Level 2 BLAS routine C<trsv> is called.  If the matrix A
+is singular (A(j,j) = 0 for some j), then s is set to 0 and a
+non-trivial solution to A*x = 0 is returned.
 
-Further Details   
-======= =======   
+Further Details
+======= =======
 
-A rough bound on x is computed; if that is less than overflow, trsv   
-is called, otherwise, specific code is used which checks for possible   
-overflow or divide-by-zero at every operation.   
+A rough bound on x is computed; if that is less than overflow, trsv
+is called, otherwise, specific code is used which checks for possible
+overflow or divide-by-zero at every operation.
 
-A columnwise scheme is used for solving A*x = b.  The basic algorithm   
-if A is lower triangular is   
+A columnwise scheme is used for solving A*x = b.  The basic algorithm
+if A is lower triangular is
 
-         x[1:n] := b[1:n]   
-         for j = 1, ..., n   
-              x(j) := x(j) / A(j,j)   
-              x[j+1:n] := x[j+1:n] - x(j) * A[j+1:n,j]   
-         end   
+         x[1:n] := b[1:n]
+         for j = 1, ..., n
+              x(j) := x(j) / A(j,j)
+              x[j+1:n] := x[j+1:n] - x(j) * A[j+1:n,j]
+         end
 
-Define bounds on the components of x after j iterations of the loop:   
+Define bounds on the components of x after j iterations of the loop:
 
-       M(j) = bound on x[1:j]   
-       G(j) = bound on x[j+1:n]   
+       M(j) = bound on x[1:j]
+       G(j) = bound on x[j+1:n]
 
-Initially, let M(0) = 0 and G(0) = max{x(i), i=1,...,n}.   
+Initially, let M(0) = 0 and G(0) = max{x(i), i=1,...,n}.
 
-    Then for iteration j+1 we have   
-       M(j+1) <= G(j) / | A(j+1,j+1) |   
-       G(j+1) <= G(j) + M(j+1) * | A[j+2:n,j+1] |   
-              <= G(j) ( 1 + cnorm(j+1) / | A(j+1,j+1) | )   
+    Then for iteration j+1 we have
+       M(j+1) <= G(j) / | A(j+1,j+1) |
+       G(j+1) <= G(j) + M(j+1) * | A[j+2:n,j+1] |
+              <= G(j) ( 1 + cnorm(j+1) / | A(j+1,j+1) | )
 
-    where cnorm(j+1) is greater than or equal to the infinity-norm of   
+    where cnorm(j+1) is greater than or equal to the infinity-norm of
     column j+1 of A, not counting the diagonal.
 
-Hence   
+Hence
 
-       G(j) <= G(0) product ( 1 + cnorm(i) / | A(i,i) | )   
-                    1<=i<=j   
-    and   
+       G(j) <= G(0) product ( 1 + cnorm(i) / | A(i,i) | )
+                    1<=i<=j
+    and
 
-       |x(j)| <= ( G(0) / |A(j,j)| ) product ( 1 + cnorm(i) / |A(i,i)| )   
-                                     1<=i< j   
+       |x(j)| <= ( G(0) / |A(j,j)| ) product ( 1 + cnorm(i) / |A(i,i)| )
+                                     1<=i< j
 
-Since |x(j)| <= M(j), we use the Level 2 BLAS routine DTRSV if the   
-reciprocal of the largest M(j), j=1,..,n, is larger than   
-max(underflow, 1/overflow).   
+Since |x(j)| <= M(j), we use the Level 2 BLAS routine DTRSV if the
+reciprocal of the largest M(j), j=1,..,n, is larger than
+max(underflow, 1/overflow).
 
-The bound on x(j) is also used to determine when a step in the   
-columnwise method can be performed without fear of overflow.  If   
-the computed bound is greater than a large constant, x is scaled to   
-prevent overflow, but if the bound overflows, x is set to 0, x(j) to   
-1, and scale to 0, and a non-trivial solution to A*x = 0 is found.   
+The bound on x(j) is also used to determine when a step in the
+columnwise method can be performed without fear of overflow.  If
+the computed bound is greater than a large constant, x is scaled to
+prevent overflow, but if the bound overflows, x is set to 0, x(j) to
+1, and scale to 0, and a non-trivial solution to A*x = 0 is found.
 
-Similarly, a row-wise scheme is used to solve A'*x = b.  The basic   
-algorithm for A upper triangular is   
+Similarly, a row-wise scheme is used to solve A'*x = b.  The basic
+algorithm for A upper triangular is
 
-         for j = 1, ..., n   
-              x(j) := ( b(j) - A[1:j-1,j]' * x[1:j-1] ) / A(j,j)   
-         end   
+         for j = 1, ..., n
+              x(j) := ( b(j) - A[1:j-1,j]' * x[1:j-1] ) / A(j,j)
+         end
 
-We simultaneously compute two bounds   
+We simultaneously compute two bounds
 
-         G(j) = bound on ( b(i) - A[1:i-1,i]' * x[1:i-1] ), 1<=i<=j   
-         M(j) = bound on x(i), 1<=i<=j   
+         G(j) = bound on ( b(i) - A[1:i-1,i]' * x[1:i-1] ), 1<=i<=j
+         M(j) = bound on x(i), 1<=i<=j
 
-The initial values are G(0) = 0, M(0) = max{b(i), i=1,..,n}, and we   
-add the constraint G(j) >= G(j-1) and M(j) >= M(j-1) for j >= 1.   
-Then the bound on x(j) is   
+The initial values are G(0) = 0, M(0) = max{b(i), i=1,..,n}, and we
+add the constraint G(j) >= G(j-1) and M(j) >= M(j-1) for j >= 1.
+Then the bound on x(j) is
 
-         M(j) <= M(j-1) * ( 1 + cnorm(j) ) / | A(j,j) |   
+         M(j) <= M(j-1) * ( 1 + cnorm(j) ) / | A(j,j) |
 
-              <= M(0) * product ( ( 1 + cnorm(i) ) / |A(i,i)| )   
-                        1<=i<=j   
+              <= M(0) * product ( ( 1 + cnorm(i) ) / |A(i,i)| )
+                        1<=i<=j
 
-and we can safely call trsv if 1/M(n) and 1/G(n) are both greater   
+and we can safely call trsv if 1/M(n) and 1/G(n) are both greater
 than max(underflow, 1/overflow).
 
-    Arguments   
-    =========   
+    Arguments
+    =========
 
-    uplo:   Specifies whether the matrix A is upper or lower triangular.   
-            = 0:  Upper triangular   
-            = 1:  Lower triangular   
+    uplo:   Specifies whether the matrix A is upper or lower triangular.
+            = 0:  Upper triangular
+            = 1:  Lower triangular
 
-    trans:  Specifies the operation applied to A.   
-            = 0:  Solve A * x = s*b  (No transpose)   
-            = 1:  Solve A'* x = s*b  (Transpose)   
+    trans:  Specifies the operation applied to A.
+            = 0:  Solve A * x = s*b  (No transpose)
+            = 1:  Solve A'* x = s*b  (Transpose)
 
-    diag:   Specifies whether or not the matrix A is unit triangular.   
-            = 0:  Non-unit triangular   
-            = 1:  Unit triangular   
+    diag:   Specifies whether or not the matrix A is unit triangular.
+            = 0:  Non-unit triangular
+            = 1:  Unit triangular
 
-    normin: Specifies whether cnorm has been set or not.   
-            = 1:  cnorm contains the column norms on entry   
-            = 0:  cnorm is not set on entry.  On exit, the norms will   
-                    be computed and stored in cnorm.   
+    normin: Specifies whether cnorm has been set or not.
+            = 1:  cnorm contains the column norms on entry
+            = 0:  cnorm is not set on entry.  On exit, the norms will
+                    be computed and stored in cnorm.
 
-    A:      The triangular matrix A.  If uplo = 0, the leading n by n   
-            upper triangular part of the array A contains the upper   
-            triangular matrix, and the strictly lower triangular part of   
-            A is not referenced.  If uplo = 1, the leading n by n lower   
-            triangular part of the array A contains the lower triangular   
-            matrix, and the strictly upper triangular part of A is not   
-            referenced.  If diag = 1, the diagonal elements of A are   
-            also not referenced and are assumed to be 1.   
+    A:      The triangular matrix A.  If uplo = 0, the leading n by n
+            upper triangular part of the array A contains the upper
+            triangular matrix, and the strictly lower triangular part of
+            A is not referenced.  If uplo = 1, the leading n by n lower
+            triangular part of the array A contains the lower triangular
+            matrix, and the strictly upper triangular part of A is not
+            referenced.  If diag = 1, the diagonal elements of A are
+            also not referenced and are assumed to be 1.
 
-    x:      On entry, the right hand side b of the triangular system.   
-            On exit, x is overwritten by the solution vector x.   
+    x:      On entry, the right hand side b of the triangular system.
+            On exit, x is overwritten by the solution vector x.
 
-    scale:  The scaling factor s for the triangular system   
-               A * x = s*b  or  A'* x = s*b.   
-            If scale = 0, the matrix A is singular or badly scaled, and   
-            the vector x is an exact or approximate solution to A*x = 0.   
+    scale:  The scaling factor s for the triangular system
+               A * x = s*b  or  A'* x = s*b.
+            If scale = 0, the matrix A is singular or badly scaled, and
+            the vector x is an exact or approximate solution to A*x = 0.
 
-    cnorm:  If normin = 0, cnorm is an output argument and cnorm(j)   
-            returns the 1-norm of the offdiagonal part of the j-th column   
+    cnorm:  If normin = 0, cnorm is an output argument and cnorm(j)
+            returns the 1-norm of the offdiagonal part of the j-th column
             of A.
-	    If normin = 1, cnorm is an input argument and cnorm(j)   
-            contains the norm of the off-diagonal part of the j-th column   
-            of A.  If trans = 0, cnorm(j) must be greater than or equal   
-            to the infinity-norm, and if trans = 1, cnorm(j)   
-            must be greater than or equal to the 1-norm.   
+	    If normin = 1, cnorm is an input argument and cnorm(j)
+            contains the norm of the off-diagonal part of the j-th column
+            of A.  If trans = 0, cnorm(j) must be greater than or equal
+            to the infinity-norm, and if trans = 1, cnorm(j)
+            must be greater than or equal to the 1-norm.
 
-               
 
-    info:   = 0:  successful exit   
-            < 0:  if info = -k, the k-th argument had an illegal value   
+
+    info:   = 0:  successful exit
+            < 0:  if info = -k, the k-th argument had an illegal value
 
 
 =for example
@@ -5438,15 +5580,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 5584 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *latrs = \&PDL::latrs;
+#line 5591 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -5508,15 +5653,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 5657 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *gecon = \&PDL::gecon;
+#line 5664 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -5579,15 +5727,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 5731 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *sycon = \&PDL::sycon;
+#line 5738 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -5644,15 +5795,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 5799 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *pocon = \&PDL::pocon;
+#line 5806 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -5666,44 +5820,44 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-Estimates the reciprocal of the condition number of a   
-triangular matrix A, in either the 1-norm or the infinity-norm.   
+Estimates the reciprocal of the condition number of a
+triangular matrix A, in either the 1-norm or the infinity-norm.
 
-The norm of A is computed and an estimate is obtained for   
-norm(inv(A)), then the reciprocal of the condition number is   
-computed as   
+The norm of A is computed and an estimate is obtained for
+norm(inv(A)), then the reciprocal of the condition number is
+computed as
 
-	rcond = 1 / ( norm(A) * norm(inv(A)) ).   
+	rcond = 1 / ( norm(A) * norm(inv(A)) ).
 
-    Arguments   
-    =========   
+    Arguments
+    =========
 
-    norm:   Specifies whether the 1-norm condition number or the   
-            infinity-norm condition number is required:   
-            = 0:	Infinity-norm.   
-            = 1:	1-norm;   
+    norm:   Specifies whether the 1-norm condition number or the
+            infinity-norm condition number is required:
+            = 0:	Infinity-norm.
+            = 1:	1-norm;
 
 
-    uplo:   = 0:  A is upper triangular;   
-            = 1:  A is lower triangular.   
+    uplo:   = 0:  A is upper triangular;
+            = 1:  A is lower triangular.
 
-    diag:   = 0:  A is non-unit triangular;   
-            = 1:  A is unit triangular.   
+    diag:   = 0:  A is non-unit triangular;
+            = 1:  A is unit triangular.
 
-    A:      The triangular matrix A.  If uplo = 0, the leading N-by-N   
-            upper triangular part of the array A contains the upper   
-            triangular matrix, and the strictly lower triangular part of   
-            A is not referenced.  If uplo = 1, the leading N-by-N lower   
-            triangular part of the array A contains the lower triangular   
-            matrix, and the strictly upper triangular part of A is not   
-            referenced.  If diag = 1, the diagonal elements of A are   
-            also not referenced and are assumed to be 1.   
+    A:      The triangular matrix A.  If uplo = 0, the leading N-by-N
+            upper triangular part of the array A contains the upper
+            triangular matrix, and the strictly lower triangular part of
+            A is not referenced.  If uplo = 1, the leading N-by-N lower
+            triangular part of the array A contains the lower triangular
+            matrix, and the strictly upper triangular part of A is not
+            referenced.  If diag = 1, the diagonal elements of A are
+            also not referenced and are assumed to be 1.
 
-    rcond:  The reciprocal of the condition number of the matrix A,   
-            computed as rcond = 1/(norm(A) * norm(inv(A))).   
+    rcond:  The reciprocal of the condition number of the matrix A,
+            computed as rcond = 1/(norm(A) * norm(inv(A))).
 
-    info:   = 0:  successful exit   
-            < 0:  if info = -i, the i-th argument had an illegal value 
+    info:   = 0:  successful exit
+            < 0:  if info = -i, the i-th argument had an illegal value
 
 
 =for example
@@ -5721,15 +5875,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 5879 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *trcon = \&PDL::trcon;
+#line 5886 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -5743,43 +5900,43 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-geqp3 computes a QR factorization  using Level 3 BLAS with column pivoting of a   
-matrix A:  
+geqp3 computes a QR factorization  using Level 3 BLAS with column pivoting of a
+matrix A:
 
-		A*P = Q*R    
+		A*P = Q*R
 
-The matrix Q is represented as a product of elementary reflectors   
+The matrix Q is represented as a product of elementary reflectors
 
-	Q = H(1) H(2) . . . H(k), where k = min(m,n).   
+	Q = H(1) H(2) . . . H(k), where k = min(m,n).
 
-Each H(i) has the form   
+Each H(i) has the form
 
-	H(i) = I - tau * v * v'   
+	H(i) = I - tau * v * v'
 
-	where tau is a real/complex scalar, and v is a real/complex vector   
-    	with v(1:i-1) = 0 and v(i) = 1; v(i+1:m) is stored on exit in   
-    	A(i+1:m,i), and tau in tau(i).
-    
-    Arguments   
-    =========   
+	where tau is a real/complex scalar, and v is a real/complex vector
+	with v(1:i-1) = 0 and v(i) = 1; v(i+1:m) is stored on exit in
+	A(i+1:m,i), and tau in tau(i).
 
-    A:      On entry, the M-by-N matrix A.   
-            On exit, the upper triangle of the array contains the   
-            min(M,N)-by-N upper trapezoidal matrix R; the elements below   
-            the diagonal, together with the array tau, represent the   
-            orthogonal matrix Q as a product of min(M,N) elementary   
-            reflectors.   
+    Arguments
+    =========
 
-    jpvt:   On entry, if jpvt(J)!=0, the J-th column of A is permuted   
-            to the front of A*P (a leading column); if jpvt(J)=0,   
-            the J-th column of A is a free column.   
-            On exit, if jpvt(J)=K, then the J-th column of A*P was the   
-            the K-th column of A.   
+    A:      On entry, the M-by-N matrix A.
+            On exit, the upper triangle of the array contains the
+            min(M,N)-by-N upper trapezoidal matrix R; the elements below
+            the diagonal, together with the array tau, represent the
+            orthogonal matrix Q as a product of min(M,N) elementary
+            reflectors.
+
+    jpvt:   On entry, if jpvt(J)!=0, the J-th column of A is permuted
+            to the front of A*P (a leading column); if jpvt(J)=0,
+            the J-th column of A is a free column.
+            On exit, if jpvt(J)=K, then the J-th column of A*P was the
+            the K-th column of A.
 
     tau:    The scalar factors of the elementary reflectors.
 
-    info:   = 0: successful exit.   
-            < 0: if info = -i, the i-th argument had an illegal value.   
+    info:   = 0: successful exit.
+            < 0: if info = -i, the i-th argument had an illegal value.
 
 =for example
 
@@ -5797,15 +5954,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 5958 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *geqp3 = \&PDL::geqp3;
+#line 5965 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -5819,37 +5979,37 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-geqrf computes a QR factorization of a   
-matrix A:  
+geqrf computes a QR factorization of a
+matrix A:
 
-	A = Q * R   
+	A = Q * R
 
-The matrix Q is represented as a product of elementary reflectors   
+The matrix Q is represented as a product of elementary reflectors
 
-	Q = H(1) H(2) . . . H(k), where k = min(m,n).   
+	Q = H(1) H(2) . . . H(k), where k = min(m,n).
 
-Each H(i) has the form   
+Each H(i) has the form
 
-	H(i) = I - tau * v * v'   
+	H(i) = I - tau * v * v'
 
-	where tau is a real/complex scalar, and v is a real/complex vector   
-	with v(1:i-1) = 0 and v(i) = 1; v(i+1:m) is stored on exit in   
+	where tau is a real/complex scalar, and v is a real/complex vector
+	with v(1:i-1) = 0 and v(i) = 1; v(i+1:m) is stored on exit in
 	A(i+1:m,i), and tau in tau(i).
-    
-    Arguments   
-    =========   
 
-    A:      On exit, the elements on and above the diagonal of the array   
-            contain the min(M,N)-by-N upper trapezoidal matrix R (R is   
-            upper triangular if m >= n); the elements below the diagonal,   
-            with the array TAU, represent the orthogonal matrix Q as a   
+    Arguments
+    =========
+
+    A:      On exit, the elements on and above the diagonal of the array
+            contain the min(M,N)-by-N upper trapezoidal matrix R (R is
+            upper triangular if m >= n); the elements below the diagonal,
+            with the array TAU, represent the orthogonal matrix Q as a
             product of min(m,n) elementary reflectors.
 
 
     tau:    The scalar factors of the elementary reflectors.
 
-    info:   = 0: successful exit.   
-            < 0: if info = -i, the i-th argument had an illegal value.   
+    info:   = 0: successful exit.
+            < 0: if info = -i, the i-th argument had an illegal value.
 
 =for example
 
@@ -5866,15 +6026,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 6030 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *geqrf = \&PDL::geqrf;
+#line 6037 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -5888,27 +6051,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-Generates an M-by-N real matrix Q with orthonormal columns,   
-which is defined as the first N columns of a product of K elementary   
-reflectors of order M   
+Generates an M-by-N real matrix Q with orthonormal columns,
+which is defined as the first N columns of a product of K elementary
+reflectors of order M
 
-	Q  =  H(1) H(2) . . . H(k)   
+	Q  =  H(1) H(2) . . . H(k)
 
-	as returned by geqrf or geqp3.   
+	as returned by geqrf or geqp3.
 
-    Arguments   
-    =========   
+    Arguments
+    =========
 
-    A:      On entry, the i-th column must contain the vector which   
-            defines the elementary reflector H(i), for i = 1,2,...,k, as   
-            returned by geqrf or geqp3 in the first k columns of its array   
-            argument A.   
-            On exit, the M-by-N matrix Q.   
+    A:      On entry, the i-th column must contain the vector which
+            defines the elementary reflector H(i), for i = 1,2,...,k, as
+            returned by geqrf or geqp3 in the first k columns of its array
+            argument A.
+            On exit, the M-by-N matrix Q.
 
-    tau:    tau(i) must contain the scalar factor of the elementary   
-            reflector H(i), as returned by geqrf or geqp3.   
+    tau:    tau(i) must contain the scalar factor of the elementary
+            reflector H(i), as returned by geqrf or geqp3.
 
-    info:   = 0:  successful exit   
+    info:   = 0:  successful exit
             < 0:  if info = -i, the i-th argument has an illegal value
 
 
@@ -5928,15 +6091,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 6095 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *orgqr = \&PDL::orgqr;
+#line 6102 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -5950,44 +6116,44 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-Overwrites the general real M-by-N matrix C with   
+Overwrites the general real M-by-N matrix C with
 
-                    side = 0     side = 1   
-    trans = 0:      Q * C          C * Q   
-    trans = 1:      Q' * C       C * Q'   
+                    side = 0     side = 1
+    trans = 0:      Q * C          C * Q
+    trans = 1:      Q' * C       C * Q'
 
-    where Q is a real orthogonal matrix defined as the product of k   
-    elementary reflectors   
+    where Q is a real orthogonal matrix defined as the product of k
+    elementary reflectors
 
-          Q = H(1) H(2) . . . H(k)   
+          Q = H(1) H(2) . . . H(k)
 
 	as returned by geqrf or geqp3.
 
-Q is of order M if C<side> = 0 and of order N   
-if C<side> = 1.   
+Q is of order M if C<side> = 0 and of order N
+if C<side> = 1.
 
-    Arguments   
-    =========   
+    Arguments
+    =========
 
-    side:   = 0: apply Q or Q' from the Left;   
-            = 1: apply Q or Q' from the Right.   
+    side:   = 0: apply Q or Q' from the Left;
+            = 1: apply Q or Q' from the Right.
 
-    trans:  = 0:  No transpose, apply Q;   
-            = 1:  Transpose, apply Q'.   
+    trans:  = 0:  No transpose, apply Q;
+            = 1:  Transpose, apply Q'.
 
-    A:      The i-th column must contain the vector which defines the   
-            elementary reflector H(i), for i = 1,2,...,k, as returned by   
-            geqrf or geqp3 in the first k columns of its array argument A.   
-            A is modified by the routine but restored on exit.   
+    A:      The i-th column must contain the vector which defines the
+            elementary reflector H(i), for i = 1,2,...,k, as returned by
+            geqrf or geqp3 in the first k columns of its array argument A.
+            A is modified by the routine but restored on exit.
 
-    tau:    tau(i) must contain the scalar factor of the elementary   
-            reflector H(i), as returned by geqrf or geqp3.   
+    tau:    tau(i) must contain the scalar factor of the elementary
+            reflector H(i), as returned by geqrf or geqp3.
 
-    C:      On entry, the M-by-N matrix C.   
-            On exit, C is overwritten by Q*C or Q'*C or C*Q' or C*Q.   
+    C:      On entry, the M-by-N matrix C.
+            On exit, C is overwritten by Q*C or Q'*C or C*Q' or C*Q.
 
-    info:   = 0:  successful exit   
-            < 0:  if info = -i, the i-th argument had an illegal value 
+    info:   = 0:  successful exit
+            < 0:  if info = -i, the i-th argument had an illegal value
 
 
 =for example
@@ -6011,15 +6177,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 6181 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *ormqr = \&PDL::ormqr;
+#line 6188 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -6033,36 +6202,36 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-Computes an LQ factorization of a real M-by-N matrix A:   
+Computes an LQ factorization of a real M-by-N matrix A:
 
-	A = L * Q.   
+	A = L * Q.
 
-The matrix Q is represented as a product of elementary reflectors   
+The matrix Q is represented as a product of elementary reflectors
 
-       Q = H(k) . . . H(2) H(1), where k = min(m,n).   
+       Q = H(k) . . . H(2) H(1), where k = min(m,n).
 
-Each H(i) has the form   
+Each H(i) has the form
 
-	H(i) = I - tau * v * v'   
+	H(i) = I - tau * v * v'
 
-	where tau is a real scalar, and v is a real vector with   
-	v(1:i-1) = 0 and v(i) = 1; v(i+1:n) is stored on exit in A(i,i+1:n),   
+	where tau is a real scalar, and v is a real vector with
+	v(1:i-1) = 0 and v(i) = 1; v(i+1:n) is stored on exit in A(i,i+1:n),
 	and tau in tau(i).
 
-    Arguments   
-    =========   
+    Arguments
+    =========
 
-    A:      On entry, the M-by-N matrix A.   
-            On exit, the elements on and below the diagonal of the array   
-            contain the m-by-min(m,n) lower trapezoidal matrix L (L is   
-            lower triangular if m <= n); the elements above the diagonal,   
-            with the array tau, represent the orthogonal matrix Q as a   
-            product of elementary reflectors.   
+    A:      On entry, the M-by-N matrix A.
+            On exit, the elements on and below the diagonal of the array
+            contain the m-by-min(m,n) lower trapezoidal matrix L (L is
+            lower triangular if m <= n); the elements above the diagonal,
+            with the array tau, represent the orthogonal matrix Q as a
+            product of elementary reflectors.
 
     tau:    The scalar factors of the elementary reflectors.
 
-    info:   = 0:  successful exit   
-            < 0:  if info = -i, the i-th argument had an illegal value   
+    info:   = 0:  successful exit
+            < 0:  if info = -i, the i-th argument had an illegal value
 
 =for example
 
@@ -6079,15 +6248,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 6252 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *gelqf = \&PDL::gelqf;
+#line 6259 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -6101,26 +6273,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-Generates an M-by-N real matrix Q with orthonormal rows,   
-which is defined as the first M rows of a product of K elementary   
-reflectors of order N   
+Generates an M-by-N real matrix Q with orthonormal rows,
+which is defined as the first M rows of a product of K elementary
+reflectors of order N
 
-	Q  =  H(k) . . . H(2) H(1)   
+	Q  =  H(k) . . . H(2) H(1)
 
-	as returned by gelqf.   
+	as returned by gelqf.
 
-    Arguments   
-    =========   
+    Arguments
+    =========
 
-    A:      On entry, the i-th row must contain the vector which defines   
-            the elementary reflector H(i), for i = 1,2,...,k, as returned   
-            by gelqf in the first k rows of its array argument A.   
-            On exit, the M-by-N matrix Q.   
+    A:      On entry, the i-th row must contain the vector which defines
+            the elementary reflector H(i), for i = 1,2,...,k, as returned
+            by gelqf in the first k rows of its array argument A.
+            On exit, the M-by-N matrix Q.
 
-    tau:    tau(i) must contain the scalar factor of the elementary   
-            reflector H(i), as returned by gelqf.   
+    tau:    tau(i) must contain the scalar factor of the elementary
+            reflector H(i), as returned by gelqf.
 
-    info:   = 0:  successful exit   
+    info:   = 0:  successful exit
             < 0:  if info = -i, the i-th argument has an illegal value
 
 
@@ -6140,15 +6312,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 6316 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *orglq = \&PDL::orglq;
+#line 6323 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -6162,43 +6337,43 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-Overwrites the general real M-by-N matrix C with   
+Overwrites the general real M-by-N matrix C with
 
-                    side = 0     side = 1   
-    trans = 0:      Q * C          C * Q   
-    trans = 1:      Q' * C       C * Q'   
+                    side = 0     side = 1
+    trans = 0:      Q * C          C * Q
+    trans = 1:      Q' * C       C * Q'
 
-    where Q is a real orthogonal matrix defined as the product of k   
-    elementary reflectors   
+    where Q is a real orthogonal matrix defined as the product of k
+    elementary reflectors
 
-          Q = H(k) . . . H(2) H(1)   
+          Q = H(k) . . . H(2) H(1)
 
     as returned by gelqf.
 
-Q is of order M if C<side> = 0 and of order N   
-if C<side> = 1.   
+Q is of order M if C<side> = 0 and of order N
+if C<side> = 1.
 
-    Arguments   
-    =========   
+    Arguments
+    =========
 
-    side:   = 0: apply Q or Q' from the Left;   
-            = 1: apply Q or Q' from the Right.   
+    side:   = 0: apply Q or Q' from the Left;
+            = 1: apply Q or Q' from the Right.
 
-    trans:  = 0:  No transpose, apply Q;   
-            = 1:  Transpose, apply Q'.   
+    trans:  = 0:  No transpose, apply Q;
+            = 1:  Transpose, apply Q'.
 
-    A:      The i-th row must contain the vector which defines the   
-            elementary reflector H(i), for i = 1,2,...,k, as returned by   
-            gelqf in the first k rows of its array argument A.   
-            A is modified by the routine but restored on exit.   
+    A:      The i-th row must contain the vector which defines the
+            elementary reflector H(i), for i = 1,2,...,k, as returned by
+            gelqf in the first k rows of its array argument A.
+            A is modified by the routine but restored on exit.
 
-    tau:    tau(i) must contain the scalar factor of the elementary   
-            reflector H(i), as returned by gelqf.   
+    tau:    tau(i) must contain the scalar factor of the elementary
+            reflector H(i), as returned by gelqf.
 
-    C:      On entry, the M-by-N matrix C.   
-            On exit, C is overwritten by Q*C or Q'*C or C*Q' or C*Q.   
+    C:      On entry, the M-by-N matrix C.
+            On exit, C is overwritten by Q*C or Q'*C or C*Q' or C*Q.
 
-    info:   = 0:  successful exit   
+    info:   = 0:  successful exit
             < 0:  if info = -i, the i-th argument had an illegal value
 
 
@@ -6223,15 +6398,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 6402 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *ormlq = \&PDL::ormlq;
+#line 6409 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -6245,38 +6423,38 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-Computes a QL factorization of a real M-by-N matrix A:   
+Computes a QL factorization of a real M-by-N matrix A:
 
 	A = Q * L
 
-The matrix Q is represented as a product of elementary reflectors   
+The matrix Q is represented as a product of elementary reflectors
 
-	Q = H(k) . . . H(2) H(1), where k = min(m,n).   
+	Q = H(k) . . . H(2) H(1), where k = min(m,n).
 
-Each H(i) has the form   
+Each H(i) has the form
 
-	H(i) = I - tau * v * v'   
+	H(i) = I - tau * v * v'
 
-	where tau is a real scalar, and v is a real vector with   
-	v(m-k+i+1:m) = 0 and v(m-k+i) = 1; v(1:m-k+i-1) is stored on exit in   
-	A(1:m-k+i-1,n-k+i), and tau in TAU(i).   
+	where tau is a real scalar, and v is a real vector with
+	v(m-k+i+1:m) = 0 and v(m-k+i) = 1; v(1:m-k+i-1) is stored on exit in
+	A(1:m-k+i-1,n-k+i), and tau in TAU(i).
 
-    Arguments   
-    =========   
+    Arguments
+    =========
 
-    A:      On entry, the M-by-N matrix A.   
-            On exit,   
-            if m >= n, the lower triangle of the subarray   
-            A(m-n+1:m,1:n) contains the N-by-N lower triangular matrix L;   
-            if m <= n, the elements on and below the (n-m)-th   
-            superdiagonal contain the M-by-N lower trapezoidal matrix L;   
-            the remaining elements, with the array tau, represent the   
+    A:      On entry, the M-by-N matrix A.
+            On exit,
+            if m >= n, the lower triangle of the subarray
+            A(m-n+1:m,1:n) contains the N-by-N lower triangular matrix L;
+            if m <= n, the elements on and below the (n-m)-th
+            superdiagonal contain the M-by-N lower trapezoidal matrix L;
+            the remaining elements, with the array tau, represent the
             orthogonal matrix Q as a product of elementary reflectors.
 
     tau:    The scalar factors of the elementary reflectors.
 
-    info:   = 0:  successful exit   
-            < 0:  if info = -i, the i-th argument had an illegal value   
+    info:   = 0:  successful exit
+            < 0:  if info = -i, the i-th argument had an illegal value
 
 =for example
 
@@ -6293,15 +6471,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 6475 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *geqlf = \&PDL::geqlf;
+#line 6482 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -6315,27 +6496,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-Generates an M-by-N real matrix Q with orthonormal columns,   
-which is defined as the last N columns of a product of K elementary   
-reflectors of order M   
+Generates an M-by-N real matrix Q with orthonormal columns,
+which is defined as the last N columns of a product of K elementary
+reflectors of order M
 
-	Q  =  H(k) . . . H(2) H(1)   
+	Q  =  H(k) . . . H(2) H(1)
 
-	as returned by geqlf.   
+	as returned by geqlf.
 
-    Arguments   
-    =========   
+    Arguments
+    =========
 
-    A:      On entry, the (n-k+i)-th column must contain the vector which   
-            defines the elementary reflector H(i), for i = 1,2,...,k, as   
-            returned by geqlf in the last k columns of its array   
-            argument A.   
-            On exit, the M-by-N matrix Q.   
+    A:      On entry, the (n-k+i)-th column must contain the vector which
+            defines the elementary reflector H(i), for i = 1,2,...,k, as
+            returned by geqlf in the last k columns of its array
+            argument A.
+            On exit, the M-by-N matrix Q.
 
-    tau:    tau(i) must contain the scalar factor of the elementary   
-            reflector H(i), as returned by geqlf.   
+    tau:    tau(i) must contain the scalar factor of the elementary
+            reflector H(i), as returned by geqlf.
 
-    info:   = 0:  successful exit   
+    info:   = 0:  successful exit
             < 0:  if info = -i, the i-th argument has an illegal value
 
 
@@ -6355,15 +6536,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 6540 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *orgql = \&PDL::orgql;
+#line 6547 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -6377,43 +6561,43 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-Overwrites the general real M-by-N matrix C with   
+Overwrites the general real M-by-N matrix C with
 
-                    side = 0     side = 1   
-    trans = 0:      Q * C          C * Q   
-    trans = 1:      Q' * C       C * Q'   
+                    side = 0     side = 1
+    trans = 0:      Q * C          C * Q
+    trans = 1:      Q' * C       C * Q'
 
-    where Q is a real orthogonal matrix defined as the product of k   
-    elementary reflectors   
+    where Q is a real orthogonal matrix defined as the product of k
+    elementary reflectors
 
-          Q = H(k) . . . H(2) H(1)   
+          Q = H(k) . . . H(2) H(1)
 
-    as returned by geqlf. 
+    as returned by geqlf.
 
-Q is of order M if C<side> = 0 and of order N   
-if C<side> = 1.   
+Q is of order M if C<side> = 0 and of order N
+if C<side> = 1.
 
-    Arguments   
-    =========   
+    Arguments
+    =========
 
-    side:   = 0: apply Q or Q' from the Left;   
-            = 1: apply Q or Q' from the Right.   
+    side:   = 0: apply Q or Q' from the Left;
+            = 1: apply Q or Q' from the Right.
 
-    trans:  = 0:  No transpose, apply Q;   
-            = 1:  Transpose, apply Q'.   
+    trans:  = 0:  No transpose, apply Q;
+            = 1:  Transpose, apply Q'.
 
-    A:      The i-th row must contain the vector which defines the   
-            elementary reflector H(i), for i = 1,2,...,k, as returned by   
-            geqlf in the last k rows of its array argument A.   
-            A is modified by the routine but restored on exit.   
+    A:      The i-th row must contain the vector which defines the
+            elementary reflector H(i), for i = 1,2,...,k, as returned by
+            geqlf in the last k rows of its array argument A.
+            A is modified by the routine but restored on exit.
 
-    tau:    tau(i) must contain the scalar factor of the elementary   
-            reflector H(i), as returned by geqlf.   
+    tau:    tau(i) must contain the scalar factor of the elementary
+            reflector H(i), as returned by geqlf.
 
-    C:      On entry, the M-by-N matrix C.   
-            On exit, C is overwritten by Q*C or Q'*C or C*Q' or C*Q.   
+    C:      On entry, the M-by-N matrix C.
+            On exit, C is overwritten by Q*C or Q'*C or C*Q' or C*Q.
 
-    info:   = 0:  successful exit   
+    info:   = 0:  successful exit
             < 0:  if info = -i, the i-th argument had an illegal value
 
 
@@ -6438,15 +6622,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 6626 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *ormql = \&PDL::ormql;
+#line 6633 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -6460,39 +6647,39 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-Computes an RQ factorization of a real M-by-N matrix A:   
+Computes an RQ factorization of a real M-by-N matrix A:
 
-	A = R * Q.   
+	A = R * Q.
 
-The matrix Q is represented as a product of elementary reflectors   
+The matrix Q is represented as a product of elementary reflectors
 
-	Q = H(1) H(2) . . . H(k), where k = min(m,n).   
+	Q = H(1) H(2) . . . H(k), where k = min(m,n).
 
-Each H(i) has the form   
+Each H(i) has the form
 
-	H(i) = I - tau * v * v'   
+	H(i) = I - tau * v * v'
 
-	where tau is a real scalar, and v is a real vector with   
-	v(n-k+i+1:n) = 0 and v(n-k+i) = 1; v(1:n-k+i-1) is stored on exit in   
-	A(m-k+i,1:n-k+i-1), and tau in TAU(i).  
+	where tau is a real scalar, and v is a real vector with
+	v(n-k+i+1:n) = 0 and v(n-k+i) = 1; v(1:n-k+i-1) is stored on exit in
+	A(m-k+i,1:n-k+i-1), and tau in TAU(i).
 
-    Arguments   
-    =========   
+    Arguments
+    =========
 
-    A:      On entry, the M-by-N matrix A.   
-            On exit,   
-            if m <= n, the upper triangle of the subarray   
-            A(1:m,n-m+1:n) contains the M-by-M upper triangular matrix R;   
-            if m >= n, the elements on and above the (m-n)-th subdiagonal   
-            contain the M-by-N upper trapezoidal matrix R;   
-            the remaining elements, with the array tau, represent the   
-            orthogonal matrix Q as a product of min(m,n) elementary   
-            reflectors (see Further Details).   
+    A:      On entry, the M-by-N matrix A.
+            On exit,
+            if m <= n, the upper triangle of the subarray
+            A(1:m,n-m+1:n) contains the M-by-M upper triangular matrix R;
+            if m >= n, the elements on and above the (m-n)-th subdiagonal
+            contain the M-by-N upper trapezoidal matrix R;
+            the remaining elements, with the array tau, represent the
+            orthogonal matrix Q as a product of min(m,n) elementary
+            reflectors (see Further Details).
 
     tau:    The scalar factors of the elementary reflectors.
 
-    info:   = 0:  successful exit   
-            < 0:  if info = -i, the i-th argument had an illegal value   
+    info:   = 0:  successful exit
+            < 0:  if info = -i, the i-th argument had an illegal value
 
 =for example
 
@@ -6509,15 +6696,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 6700 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *gerqf = \&PDL::gerqf;
+#line 6707 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -6531,27 +6721,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-Generates an M-by-N real matrix Q with orthonormal rows,   
-which is defined as the last M rows of a product of K elementary   
-reflectors of order N   
+Generates an M-by-N real matrix Q with orthonormal rows,
+which is defined as the last M rows of a product of K elementary
+reflectors of order N
 
-	Q  =  H(1) H(2) . . . H(k)   
+	Q  =  H(1) H(2) . . . H(k)
 
-	as returned by gerqf.   
+	as returned by gerqf.
 
-    Arguments   
-    =========   
+    Arguments
+    =========
 
-    A:      On entry, the (m-k+i)-th row must contain the vector which   
-            defines the elementary reflector H(i), for i = 1,2,...,k, as   
-            returned by gerqf in the last k rows of its array argument   
-            A.   
-            On exit, the M-by-N matrix Q.   
+    A:      On entry, the (m-k+i)-th row must contain the vector which
+            defines the elementary reflector H(i), for i = 1,2,...,k, as
+            returned by gerqf in the last k rows of its array argument
+            A.
+            On exit, the M-by-N matrix Q.
 
-    tau:    tau(i) must contain the scalar factor of the elementary   
-            reflector H(i), as returned by gerqf.   
+    tau:    tau(i) must contain the scalar factor of the elementary
+            reflector H(i), as returned by gerqf.
 
-    info:   = 0:  successful exit   
+    info:   = 0:  successful exit
             < 0:  if info = -i, the i-th argument has an illegal value
 
 
@@ -6571,15 +6761,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 6765 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *orgrq = \&PDL::orgrq;
+#line 6772 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -6593,43 +6786,43 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-Overwrites the general real M-by-N matrix C with   
+Overwrites the general real M-by-N matrix C with
 
-                    side = 0     side = 1   
-    trans = 0:      Q * C          C * Q   
-    trans = 1:      Q' * C       C * Q'   
+                    side = 0     side = 1
+    trans = 0:      Q * C          C * Q
+    trans = 1:      Q' * C       C * Q'
 
-    where Q is a real orthogonal matrix defined as the product of k   
-    elementary reflectors   
+    where Q is a real orthogonal matrix defined as the product of k
+    elementary reflectors
 
-          Q = H(1) H(2) . . . H(k)   
+          Q = H(1) H(2) . . . H(k)
 
-	as returned by gerqf. 
+	as returned by gerqf.
 
-Q is of order M if C<side> = 0 and of order N   
-if C<side> = 1.   
+Q is of order M if C<side> = 0 and of order N
+if C<side> = 1.
 
-    Arguments   
-    =========   
+    Arguments
+    =========
 
-    side:   = 0: apply Q or Q' from the Left;   
-            = 1: apply Q or Q' from the Right.   
+    side:   = 0: apply Q or Q' from the Left;
+            = 1: apply Q or Q' from the Right.
 
-    trans:  = 0:  No transpose, apply Q;   
-            = 1:  Transpose, apply Q'.   
+    trans:  = 0:  No transpose, apply Q;
+            = 1:  Transpose, apply Q'.
 
-    A:      The i-th row must contain the vector which defines the   
-            elementary reflector H(i), for i = 1,2,...,k, as returned by   
-            gerqf in the last k rows of its array argument A.   
-            A is modified by the routine but restored on exit.     
+    A:      The i-th row must contain the vector which defines the
+            elementary reflector H(i), for i = 1,2,...,k, as returned by
+            gerqf in the last k rows of its array argument A.
+            A is modified by the routine but restored on exit.
 
-    tau:    tau(i) must contain the scalar factor of the elementary   
-            reflector H(i), as returned by gerqf.   
+    tau:    tau(i) must contain the scalar factor of the elementary
+            reflector H(i), as returned by gerqf.
 
-    C:      On entry, the M-by-N matrix C.   
-            On exit, C is overwritten by Q*C or Q'*C or C*Q' or C*Q.   
+    C:      On entry, the M-by-N matrix C.
+            On exit, C is overwritten by Q*C or Q'*C or C*Q' or C*Q.
 
-    info:   = 0:  successful exit   
+    info:   = 0:  successful exit
             < 0:  if info = -i, the i-th argument had an illegal value
 
 
@@ -6654,15 +6847,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 6851 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *ormrq = \&PDL::ormrq;
+#line 6858 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -6676,57 +6872,57 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-Reduces the M-by-N ( M <= N ) real upper trapezoidal matrix A   
-to upper triangular form by means of orthogonal transformations.   
+Reduces the M-by-N ( M <= N ) real upper trapezoidal matrix A
+to upper triangular form by means of orthogonal transformations.
 
-The upper trapezoidal matrix A is factored as   
+The upper trapezoidal matrix A is factored as
 
-	A = ( R  0 ) * Z,   
-	
-	where Z is an N-by-N orthogonal matrix and R is an M-by-M upper   
-	triangular matrix.   
+	A = ( R  0 ) * Z,
 
-The factorization is obtained by Householder's method.  The kth   
-transformation matrix, Z( k ), which is used to introduce zeros into   
-the ( m - k + 1 )th row of A, is given in the form   
+	where Z is an N-by-N orthogonal matrix and R is an M-by-M upper
+	triangular matrix.
 
-       Z( k ) = ( I     0   ),   
-                ( 0  T( k ) )   
+The factorization is obtained by Householder's method.  The kth
+transformation matrix, Z( k ), which is used to introduce zeros into
+the ( m - k + 1 )th row of A, is given in the form
 
-    where   
+       Z( k ) = ( I     0   ),
+                ( 0  T( k ) )
 
-       T( k ) = I - tau*u( k )*u( k )',   u( k ) = (   1    ),   
-                                                    (   0    )   
-                                                    ( z( k ) )   
+    where
 
-tau is a scalar and z( k ) is an ( n - m ) element vector.   
-tau and z( k ) are chosen to annihilate the elements of the kth row   
-of X.   
+       T( k ) = I - tau*u( k )*u( k )',   u( k ) = (   1    ),
+                                                    (   0    )
+                                                    ( z( k ) )
 
-The scalar tau is returned in the kth element of C<tau> and the vector   
-u( k ) in the kth row of A, such that the elements of z( k ) are   
-in  a( k, m + 1 ), ..., a( k, n ). The elements of R are returned in   
-the upper triangular part of A.   
+tau is a scalar and z( k ) is an ( n - m ) element vector.
+tau and z( k ) are chosen to annihilate the elements of the kth row
+of X.
 
-Z is given by   
+The scalar tau is returned in the kth element of C<tau> and the vector
+u( k ) in the kth row of A, such that the elements of z( k ) are
+in  a( k, m + 1 ), ..., a( k, n ). The elements of R are returned in
+the upper triangular part of A.
+
+Z is given by
 
        Z =  Z( 1 ) * Z( 2 ) * ... * Z( m ).
 
-    Arguments   
-    =========   
+    Arguments
+    =========
 
-    A:      On entry, the leading M-by-N upper trapezoidal part of the   
-            array A must contain the matrix to be factorized.   
-            On exit, the leading M-by-M upper triangular part of A   
-            contains the upper triangular matrix R, and elements M+1 to   
-            N of the first M rows of A, with the array tau, represent the   
-            orthogonal matrix Z as a product of M elementary reflectors.   
+    A:      On entry, the leading M-by-N upper trapezoidal part of the
+            array A must contain the matrix to be factorized.
+            On exit, the leading M-by-M upper triangular part of A
+            contains the upper triangular matrix R, and elements M+1 to
+            N of the first M rows of A, with the array tau, represent the
+            orthogonal matrix Z as a product of M elementary reflectors.
 
-    tau:    The scalar factors of the elementary reflectors.   
+    tau:    The scalar factors of the elementary reflectors.
 
-    info:   = 0:  successful exit   
-            < 0:  if info = -i, the i-th argument had an illegal value   
-   
+    info:   = 0:  successful exit
+            < 0:  if info = -i, the i-th argument had an illegal value
+
 
 =for example
 
@@ -6743,15 +6939,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 6943 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *tzrzf = \&PDL::tzrzf;
+#line 6950 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -6765,43 +6964,43 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-Overwrites the general real M-by-N matrix C with   
+Overwrites the general real M-by-N matrix C with
 
-                    side = 0     side = 1   
-    trans = 0:      Q * C          C * Q   
-    trans = 1:      Q' * C       C * Q'   
+                    side = 0     side = 1
+    trans = 0:      Q * C          C * Q
+    trans = 1:      Q' * C       C * Q'
 
-    where Q is a real orthogonal matrix defined as the product of k   
-    elementary reflectors   
+    where Q is a real orthogonal matrix defined as the product of k
+    elementary reflectors
 
-          Q = H(1) H(2) . . . H(k)   
+          Q = H(1) H(2) . . . H(k)
 
-    as returned by tzrzf. 
+    as returned by tzrzf.
 
-Q is of order M if C<side> = 0 and of order N   
-if C<side> = 1.   
+Q is of order M if C<side> = 0 and of order N
+if C<side> = 1.
 
-    Arguments   
-    =========   
+    Arguments
+    =========
 
-    side:   = 0: apply Q or Q' from the Left;   
-            = 1: apply Q or Q' from the Right.   
+    side:   = 0: apply Q or Q' from the Left;
+            = 1: apply Q or Q' from the Right.
 
-    trans:  = 0:  No transpose, apply Q;   
-            = 1:  Transpose, apply Q'.   
+    trans:  = 0:  No transpose, apply Q;
+            = 1:  Transpose, apply Q'.
 
-    A:      The i-th row must contain the vector which defines the   
-            elementary reflector H(i), for i = 1,2,...,k, as returned by   
-            tzrzf in the last k rows of its array argument A.   
-            A is modified by the routine but restored on exit.   
+    A:      The i-th row must contain the vector which defines the
+            elementary reflector H(i), for i = 1,2,...,k, as returned by
+            tzrzf in the last k rows of its array argument A.
+            A is modified by the routine but restored on exit.
 
-    tau:    tau(i) must contain the scalar factor of the elementary   
-            reflector H(i), as returned by tzrzf.   
+    tau:    tau(i) must contain the scalar factor of the elementary
+            reflector H(i), as returned by tzrzf.
 
-    C:      On entry, the M-by-N matrix C.   
-            On exit, C is overwritten by Q*C or Q'*C or C*Q' or C*Q.  
+    C:      On entry, the M-by-N matrix C.
+            On exit, C is overwritten by Q*C or Q'*C or C*Q' or C*Q.
 
-    info:   = 0:  successful exit   
+    info:   = 0:  successful exit
             < 0:  if info = -i, the i-th argument had an illegal value
 
 
@@ -6826,15 +7025,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 7029 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *ormrz = \&PDL::ormrz;
+#line 7036 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -6848,65 +7050,65 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-Reduces a real general matrix A to upper Hessenberg form H by   
-an orthogonal similarity transformation:  Q' * A * Q = H .   
+Reduces a real general matrix A to upper Hessenberg form H by
+an orthogonal similarity transformation:  Q' * A * Q = H .
 
-Further Details   
-===============   
+Further Details
+===============
 
-The matrix Q is represented as a product of (ihi-ilo) elementary   
-reflectors   
+The matrix Q is represented as a product of (ihi-ilo) elementary
+reflectors
 
-	Q = H(ilo) H(ilo+1) . . . H(ihi-1).   
+	Q = H(ilo) H(ilo+1) . . . H(ihi-1).
 
-Each H(i) has the form   
+Each H(i) has the form
 
-	H(i) = I - tau * v * v'   
-	where tau is a real scalar, and v is a real vector with   
-    	v(1:i) = 0, v(i+1) = 1 and v(ihi+1:n) = 0; v(i+2:ihi) is stored on   
-    	exit in A(i+2:ihi,i), and tau in tau(i).   
+	H(i) = I - tau * v * v'
+	where tau is a real scalar, and v is a real vector with
+	v(1:i) = 0, v(i+1) = 1 and v(ihi+1:n) = 0; v(i+2:ihi) is stored on
+	exit in A(i+2:ihi,i), and tau in tau(i).
 
-The contents of A are illustrated by the following example, with   
-n = 7, ilo = 2 and ihi = 6:   
+The contents of A are illustrated by the following example, with
+n = 7, ilo = 2 and ihi = 6:
 
-	on entry,                        on exit,   
+	on entry,                        on exit,
 
-	( a   a   a   a   a   a   a )    (  a   a   h   h   h   h   a )   
-	(     a   a   a   a   a   a )    (      a   h   h   h   h   a )   
-	(     a   a   a   a   a   a )    (      h   h   h   h   h   h )   
-	(     a   a   a   a   a   a )    (      v2  h   h   h   h   h )   
-	(     a   a   a   a   a   a )    (      v2  v3  h   h   h   h )   
-	(     a   a   a   a   a   a )    (      v2  v3  v4  h   h   h )   
-	(                         a )    (                          a )   
+	( a   a   a   a   a   a   a )    (  a   a   h   h   h   h   a )
+	(     a   a   a   a   a   a )    (      a   h   h   h   h   a )
+	(     a   a   a   a   a   a )    (      h   h   h   h   h   h )
+	(     a   a   a   a   a   a )    (      v2  h   h   h   h   h )
+	(     a   a   a   a   a   a )    (      v2  v3  h   h   h   h )
+	(     a   a   a   a   a   a )    (      v2  v3  v4  h   h   h )
+	(                         a )    (                          a )
 
-	where a denotes an element of the original matrix A, h denotes a   
-	modified element of the upper Hessenberg matrix H, and vi denotes an   
+	where a denotes an element of the original matrix A, h denotes a
+	modified element of the upper Hessenberg matrix H, and vi denotes an
 	element of the vector defining H(i).
 
 
-    Arguments   
-    =========   
+    Arguments
+    =========
 
-    ilo:   
-    ihi:    It is assumed that A is already upper triangular in rows   
-            and columns 1:ilo-1 and ihi+1:N. ilo and ihi are normally   
-            set by a previous call to gebal; otherwise they should be   
-            set to 1 and N respectively. See Further Details.   
-            1 <= ilo <= ihi <= N, if N > 0; ilo=1 and ihi=0, if N=0.   
+    ilo:
+    ihi:    It is assumed that A is already upper triangular in rows
+            and columns 1:ilo-1 and ihi+1:N. ilo and ihi are normally
+            set by a previous call to gebal; otherwise they should be
+            set to 1 and N respectively. See Further Details.
+            1 <= ilo <= ihi <= N, if N > 0; ilo=1 and ihi=0, if N=0.
 
-    A:      On entry, the N-by-N general matrix to be reduced.   
-            On exit, the upper triangle and the first subdiagonal of A   
-            are overwritten with the upper Hessenberg matrix H, and the   
-            elements below the first subdiagonal, with the array tau,   
-            represent the orthogonal matrix Q as a product of elementary   
-            reflectors. See Further Details.   
+    A:      On entry, the N-by-N general matrix to be reduced.
+            On exit, the upper triangle and the first subdiagonal of A
+            are overwritten with the upper Hessenberg matrix H, and the
+            elements below the first subdiagonal, with the array tau,
+            represent the orthogonal matrix Q as a product of elementary
+            reflectors. See Further Details.
 
-    tau:    The scalar factors of the elementary reflectors (see Further   
-            Details). Elements 1:ilo-1 and ihi:N-1 of tau are set to   
+    tau:    The scalar factors of the elementary reflectors (see Further
+            Details). Elements 1:ilo-1 and ihi:N-1 of tau are set to
             zero. (dimension (N-1))
 
-    info:   = 0:  successful exit   
-            < 0:  if info = -i, the i-th argument had an illegal value.   
+    info:   = 0:  successful exit
+            < 0:  if info = -i, the i-th argument had an illegal value.
 
 
 =for example
@@ -6924,15 +7126,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 7130 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *gehrd = \&PDL::gehrd;
+#line 7137 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -6946,31 +7151,31 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-Generates a real orthogonal matrix Q which is defined as the   
-product of ihi-ilo elementary reflectors of order N, as returned by   
-C<gehrd>:   
+Generates a real orthogonal matrix Q which is defined as the
+product of ihi-ilo elementary reflectors of order N, as returned by
+C<gehrd>:
 
-	Q = H(ilo) H(ilo+1) . . . H(ihi-1).   
+	Q = H(ilo) H(ilo+1) . . . H(ihi-1).
 
 
-    Arguments   
-    =========   
+    Arguments
+    =========
 
     ilo:
-    ihi:   ilo and ihi must have the same values as in the previous call   
-            of gehrd. Q is equal to the unit matrix except in the   
-            submatrix Q(ilo+1:ihi,ilo+1:ihi).   
-            1 <= ilo <= ihi <= N, if N > 0; ilo=1 and ihi=0, if N=0.   
+    ihi:   ilo and ihi must have the same values as in the previous call
+            of gehrd. Q is equal to the unit matrix except in the
+            submatrix Q(ilo+1:ihi,ilo+1:ihi).
+            1 <= ilo <= ihi <= N, if N > 0; ilo=1 and ihi=0, if N=0.
 
-    A:      On entry, the vectors which define the elementary reflectors,   
-            as returned by gehrd.   
-            On exit, the N-by-N orthogonal matrix Q.   
+    A:      On entry, the vectors which define the elementary reflectors,
+            as returned by gehrd.
+            On exit, the N-by-N orthogonal matrix Q.
 
-    tau:    tau(i) must contain the scalar factor of the elementary   
+    tau:    tau(i) must contain the scalar factor of the elementary
             reflector H(i), as returned by gehrd.(dimension (N-1))
 
-    info:   = 0:  successful exit   
-            < 0:  if info = -i, the i-th argument had an illegal value   
+    info:   = 0:  successful exit
+            < 0:  if info = -i, the i-th argument had an illegal value
 
 
 =for example
@@ -6980,7 +7185,7 @@ C<gehrd>:
  $tau = zeroes(50);
  gehrd($a, 1, 50, $tau, $info);
  orghr($a, 1, 50, $tau, $info);
- 
+
 
 
 =for bad
@@ -6990,15 +7195,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 7199 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *orghr = \&PDL::orghr;
+#line 7206 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -7012,71 +7220,71 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-Computes the eigenvalues of a real upper Hessenberg matrix H   
-and, optionally, the matrices T and Z from the Schur decomposition   
-H = Z T Z**T, where T is an upper quasi-triangular matrix (the Schur   
-form), and Z is the orthogonal matrix of Schur vectors.   
+Computes the eigenvalues of a real upper Hessenberg matrix H
+and, optionally, the matrices T and Z from the Schur decomposition
+H = Z T Z**T, where T is an upper quasi-triangular matrix (the Schur
+form), and Z is the orthogonal matrix of Schur vectors.
 
-Optionally Z may be postmultiplied into an input orthogonal matrix Q,   
-so that this routine can give the Schur factorization of a matrix A   
-which has been reduced to the Hessenberg form H by the orthogonal   
-matrix Q:  A = Q*H*Q**T = (QZ)*T*(QZ)**T.   
+Optionally Z may be postmultiplied into an input orthogonal matrix Q,
+so that this routine can give the Schur factorization of a matrix A
+which has been reduced to the Hessenberg form H by the orthogonal
+matrix Q:  A = Q*H*Q**T = (QZ)*T*(QZ)**T.
 
-    Arguments   
-    =========   
+    Arguments
+    =========
 
-    job:    = 0:  compute eigenvalues only;   
-            = 1:  compute eigenvalues and the Schur form T.   
+    job:    = 0:  compute eigenvalues only;
+            = 1:  compute eigenvalues and the Schur form T.
 
-    compz:  = 0:  no Schur vectors are computed;   
-            = 1:  Z is initialized to the unit matrix and the matrix Z   
-                    of Schur vectors of H is returned;   
-            = 2:  Z must contain an orthogonal matrix Q on entry, and   
-                    the product Q*Z is returned.   
+    compz:  = 0:  no Schur vectors are computed;
+            = 1:  Z is initialized to the unit matrix and the matrix Z
+                    of Schur vectors of H is returned;
+            = 2:  Z must contain an orthogonal matrix Q on entry, and
+                    the product Q*Z is returned.
 
     ilo:
-    ihi:    It is assumed that H is already upper triangular in rows   
-            and columns 1:ilo-1 and ihi+1:N. ilo and ihi are normally   
-            set by a previous call to gebal, and then passed to gehrd   
-            when the matrix output by gebal is reduced to Hessenberg   
-            form. Otherwise ilo and ihi should be set to 1 and N   
-            respectively.   
-            1 <= ilo <= ihi <= N, if N > 0; ilo=1 and ihi=0, if N=0.   
+    ihi:    It is assumed that H is already upper triangular in rows
+            and columns 1:ilo-1 and ihi+1:N. ilo and ihi are normally
+            set by a previous call to gebal, and then passed to gehrd
+            when the matrix output by gebal is reduced to Hessenberg
+            form. Otherwise ilo and ihi should be set to 1 and N
+            respectively.
+            1 <= ilo <= ihi <= N, if N > 0; ilo=1 and ihi=0, if N=0.
 
-    H:      On entry, the upper Hessenberg matrix H.   
-            On exit, if job = 1, H contains the upper quasi-triangular   
-            matrix T from the Schur decomposition (the Schur form);   
-            2-by-2 diagonal blocks (corresponding to complex conjugate   
-            pairs of eigenvalues) are returned in standard form, with   
-            H(i,i) = H(i+1,i+1) and H(i+1,i)*H(i,i+1) < 0. If job = 0,   
-            the contents of H are unspecified on exit.   
+    H:      On entry, the upper Hessenberg matrix H.
+            On exit, if job = 1, H contains the upper quasi-triangular
+            matrix T from the Schur decomposition (the Schur form);
+            2-by-2 diagonal blocks (corresponding to complex conjugate
+            pairs of eigenvalues) are returned in standard form, with
+            H(i,i) = H(i+1,i+1) and H(i+1,i)*H(i,i+1) < 0. If job = 0,
+            the contents of H are unspecified on exit.
 
     wr:
-    wi:     The real and imaginary parts, respectively, of the computed   
-            eigenvalues. If two eigenvalues are computed as a complex   
-            conjugate pair, they are stored in consecutive elements of   
-            wr and wi, say the i-th and (i+1)th, with wi(i) > 0 and   
-            wi(i+1) < 0. If job = 1, the eigenvalues are stored in the   
-            same order as on the diagonal of the Schur form returned in   
-            H, with wr(i) = H(i,i) and, if H(i:i+1,i:i+1) is a 2-by-2   
-            diagonal block, wi(i) = sqrt(H(i+1,i)*H(i,i+1)) and   
-            wi(i+1) = -wi(i).   
+    wi:     The real and imaginary parts, respectively, of the computed
+            eigenvalues. If two eigenvalues are computed as a complex
+            conjugate pair, they are stored in consecutive elements of
+            wr and wi, say the i-th and (i+1)th, with wi(i) > 0 and
+            wi(i+1) < 0. If job = 1, the eigenvalues are stored in the
+            same order as on the diagonal of the Schur form returned in
+            H, with wr(i) = H(i,i) and, if H(i:i+1,i:i+1) is a 2-by-2
+            diagonal block, wi(i) = sqrt(H(i+1,i)*H(i,i+1)) and
+            wi(i+1) = -wi(i).
 
-    Z:      If compz = 0: Z is not referenced.   
-            If compz = 1: on entry, Z need not be set, and on exit, Z   
-            contains the orthogonal matrix Z of the Schur vectors of H.   
-            If compz = 2: on entry Z must contain an N-by-N matrix Q,   
-            which is assumed to be equal to the unit matrix except for   
-            the submatrix Z(ilo:ihi,ilo:ihi); on exit Z contains Q*Z.   
-            Normally Q is the orthogonal matrix generated by orghr after   
-            the call to gehrd which formed the Hessenberg matrix H.   
+    Z:      If compz = 0: Z is not referenced.
+            If compz = 1: on entry, Z need not be set, and on exit, Z
+            contains the orthogonal matrix Z of the Schur vectors of H.
+            If compz = 2: on entry Z must contain an N-by-N matrix Q,
+            which is assumed to be equal to the unit matrix except for
+            the submatrix Z(ilo:ihi,ilo:ihi); on exit Z contains Q*Z.
+            Normally Q is the orthogonal matrix generated by orghr after
+            the call to gehrd which formed the Hessenberg matrix H.
 
-    info:   = 0:  successful exit   
-            < 0:  if info = -i, the i-th argument had an illegal value   
-            > 0:  if info = i, hseqr failed to compute all of the   
-                  eigenvalues in a total of 30*(ihi-ilo+1) iterations;   
-                  elements 1:ilo-1 and i+1:n of wr and wi contain those   
-                  eigenvalues which have been successfully computed.   
+    info:   = 0:  successful exit
+            < 0:  if info = -i, the i-th argument had an illegal value
+            > 0:  if info = i, hseqr failed to compute all of the
+                  eigenvalues in a total of 30*(ihi-ilo+1) iterations;
+                  elements 1:ilo-1 and i+1:n of wr and wi contain those
+                  eigenvalues which have been successfully computed.
 
 
 =for example
@@ -7087,7 +7295,7 @@ matrix Q:  A = Q*H*Q**T = (QZ)*T*(QZ)**T.
  $z= zeroes(1,1);
  gehrd($a, 1, 50, $tau, $info);
  hseqr($a,0,0,1,50,($wr=null),($wi=null),$z,$info);
- 
+
 
 
 =for bad
@@ -7097,15 +7305,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 7309 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *hseqr = \&PDL::hseqr;
+#line 7316 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -7113,7 +7324,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io,phys]T(n,n); int side();int howmny();int [phys]select(q);[io,phys]VL(m,r); [io,phys]VR(p,s);int [o,phys]m(); int [o,phys]info())
+  Signature: ([io]T(n,n); int side();int howmny();int select(q);[o]VL(m,m); [o]VR(p,p);int [o]m(); int [o]info())
 
 
 
@@ -7170,13 +7381,13 @@ magnitude has magnitude 1; here the magnitude of a complex number
             = 2:  compute selected right and/or left eigenvectors,
                     specified by the logical array select.
 
-    select: If howmny = 2, select specifies the eigenvectors to be   
-            computed.   
-            If howmny = 0 or 1, select is not referenced.   
-            To select the real eigenvector corresponding to a real   
-            eigenvalue w(j), select(j) must be set to TRUE.  To select   
-            the complex eigenvector corresponding to a complex conjugate   
-            pair w(j) and w(j+1), either select(j) or select(j+1) must be   
+    select: If howmny = 2, select specifies the eigenvectors to be
+            computed.
+            If howmny = 0 or 1, select is not referenced.
+            To select the real eigenvector corresponding to a real
+            eigenvalue w(j), select(j) must be set to TRUE.  To select
+            the complex eigenvector corresponding to a complex conjugate
+            pair w(j) and w(j+1), either select(j) or select(j+1) must be
             set to TRUE; then on exit select(j) is TRUE and
             select(j+1) is FALSE.
 
@@ -7248,7 +7459,7 @@ magnitude has magnitude 1; here the magnitude of a complex number
  $z= zeroes(1,1);
  gehrd($a, 1, 50, $tau, $info);
  hseqr($a,0,0,1,50,($wr=null),($wi=null),$z,$info);
- 
+
 
 
 =for bad
@@ -7258,15 +7469,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 7473 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *trevc = \&PDL::trevc;
+#line 7480 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -7274,7 +7488,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io,phys]A(n,n); int side();int howmny();[io,phys]B(n,n);int [phys]select(q);[io,phys]VL(m,r); [io,phys]VR(p,s);int [o,phys]m(); int [o,phys]info())
+  Signature: ([io]A(n,n); int side();int howmny();[io]B(n,n);int select(q);[o]VL(m,m); [o]VR(p,p);int [o]m(); int [o]info())
 
 
 
@@ -7288,7 +7502,7 @@ eigenvector y of (A,B) corresponding to a generalized eigenvalue
 w are defined by:
 
 	(A - wB) * x = 0  and  y**H * (A - wB) = 0
-	where y**H denotes the conjugate tranpose of y.
+	where y**H denotes the conjugate transpose of y.
 
 If an eigenvalue w is determined by zero diagonal elements of both A
 and B, a unit vector is returned as the corresponding eigenvector.
@@ -7317,7 +7531,7 @@ to the eigenvalue with positive imaginary part.
     side:   = 0 : compute both right and left eigenvectors;
 	    = 1 : compute right eigenvectors only;
             = 2 : compute left eigenvectors only.
-            
+
     howmny: = 0 : compute all right and/or left eigenvectors;
             = 1 : compute all right and/or left eigenvectors, and
                    backtransform them using the input matrices supplied
@@ -7388,7 +7602,7 @@ to the eigenvalue with positive imaginary part.
  $z= zeroes(1,1);
  gehrd($a, 1, 50, $tau, $info);
  hseqr($a,0,0,1,50,($wr=null),($wi=null),$z,$info);
- 
+
 
 
 =for bad
@@ -7398,15 +7612,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 7616 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *tgevc = \&PDL::tgevc;
+#line 7623 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -7420,88 +7637,88 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-Balances a general real matrix A.  This involves, first,   
-permuting A by a similarity transformation to isolate eigenvalues   
-in the first 1 to ilo-1 and last ihi+1 to N elements on the   
-diagonal; and second, applying a diagonal similarity transformation   
-to rows and columns ilo to ihi to make the rows and columns as   
-close in norm as possible.  Both steps are optional.   
+Balances a general real matrix A.  This involves, first,
+permuting A by a similarity transformation to isolate eigenvalues
+in the first 1 to ilo-1 and last ihi+1 to N elements on the
+diagonal; and second, applying a diagonal similarity transformation
+to rows and columns ilo to ihi to make the rows and columns as
+close in norm as possible.  Both steps are optional.
 
-Balancing may reduce the 1-norm of the matrix, and improve the   
-accuracy of the computed eigenvalues and/or eigenvectors.   
+Balancing may reduce the 1-norm of the matrix, and improve the
+accuracy of the computed eigenvalues and/or eigenvectors.
 
-Further Details   
-===============   
+Further Details
+===============
 
-The permutations consist of row and column interchanges which put   
-the matrix in the form   
+The permutations consist of row and column interchanges which put
+the matrix in the form
 
-               ( T1   X   Y  )   
-       P A P = (  0   B   Z  )   
-               (  0   0   T2 )   
+               ( T1   X   Y  )
+       P A P = (  0   B   Z  )
+               (  0   0   T2 )
 
-       where T1 and T2 are upper triangular matrices whose eigenvalues lie   
-       along the diagonal.  The column indices ilo and ihi mark the starting   
-       and ending columns of the submatrix B. Balancing consists of applying   
-       a diagonal similarity transformation inv(D) * B * D to make the   
-       1-norms of each row of B and its corresponding column nearly equal.   
-    
-The output matrix is   
+       where T1 and T2 are upper triangular matrices whose eigenvalues lie
+       along the diagonal.  The column indices ilo and ihi mark the starting
+       and ending columns of the submatrix B. Balancing consists of applying
+       a diagonal similarity transformation inv(D) * B * D to make the
+       1-norms of each row of B and its corresponding column nearly equal.
 
-       ( T1     X*D          Y    )   
-       (  0  inv(D)*B*D  inv(D)*Z ).   
-       (  0      0           T2   )   
+The output matrix is
+
+       ( T1     X*D          Y    )
+       (  0  inv(D)*B*D  inv(D)*Z ).
+       (  0      0           T2   )
 
 
-Information about the permutations P and the diagonal matrix D is   
+Information about the permutations P and the diagonal matrix D is
 returned in the vector C<scale>.
 
 
-    Arguments   
-    =========   
+    Arguments
+    =========
 
-    job:    Specifies the operations to be performed on A:   
-            = 0:  none:  simply set ilo = 1, ihi = N, scale(I) = 1.0   
-                    for i = 1,...,N;   
-            = 1:  permute only;   
-            = 2:  scale only;   
-            = 3:  both permute and scale.   
+    job:    Specifies the operations to be performed on A:
+            = 0:  none:  simply set ilo = 1, ihi = N, scale(I) = 1.0
+                    for i = 1,...,N;
+            = 1:  permute only;
+            = 2:  scale only;
+            = 3:  both permute and scale.
 
-    A:      On entry, the input matrix A.   
-            On exit,  A is overwritten by the balanced matrix.   
-            If job = 0, A is not referenced.   
-            See Further Details.   
+    A:      On entry, the input matrix A.
+            On exit,  A is overwritten by the balanced matrix.
+            If job = 0, A is not referenced.
+            See Further Details.
 
     ilo:
-    ihi:    ilo and ihi are set to integers such that on exit   
-            A(i,j) = 0 if i > j and j = 1,...,ilo-1 or I = ihi+1,...,N.   
-            If job = 0 or 2, ilo = 1 and ihi = N.   
+    ihi:    ilo and ihi are set to integers such that on exit
+            A(i,j) = 0 if i > j and j = 1,...,ilo-1 or I = ihi+1,...,N.
+            If job = 0 or 2, ilo = 1 and ihi = N.
 
-    scale:  Details of the permutations and scaling factors applied to   
-            A.  If P(j) is the index of the row and column interchanged   
-            with row and column j and D(j) is the scaling factor   
-            applied to row and column j, then   
-            scale(j) = P(j)    for j = 1,...,ilo-1   
-                     = D(j)    for j = ilo,...,ihi   
-                     = P(j)    for j = ihi+1,...,N.   
-            The order in which the interchanges are made is N to ihi+1,   
-            then 1 to ilo-1.   
+    scale:  Details of the permutations and scaling factors applied to
+            A.  If P(j) is the index of the row and column interchanged
+            with row and column j and D(j) is the scaling factor
+            applied to row and column j, then
+            scale(j) = P(j)    for j = 1,...,ilo-1
+                     = D(j)    for j = ilo,...,ihi
+                     = P(j)    for j = ihi+1,...,N.
+            The order in which the interchanges are made is N to ihi+1,
+            then 1 to ilo-1.
 
-    info:   = 0:  successful exit.   
-            < 0:  if info = -i, the i-th argument had an illegal value.   
+    info:   = 0:  successful exit.
+            < 0:  if info = -i, the i-th argument had an illegal value.
 
-   
+
 
 
 =for example
 
  $a = random (50, 50);
- $scale = zeroes(50); 
+ $scale = zeroes(50);
  $info = null;
  $ilo = null;
  $ihi = null;
  gebal($a, $ilo, $ihi, $scale, $info);
- 
+
 
 
 =for bad
@@ -7511,15 +7728,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 7732 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *gebal = \&PDL::gebal;
+#line 7739 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -7533,24 +7753,24 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-gebak forms the right or left eigenvectors of a real general matrix   
-by backward transformation on the computed eigenvectors of the   
+gebak forms the right or left eigenvectors of a real general matrix
+by backward transformation on the computed eigenvectors of the
 balanced matrix output by gebal.
 
-    Arguments   
-    =========   
+    Arguments
+    =========
 
-    A:      On entry, the matrix of right or left eigenvectors to be   
-            transformed, as returned by hsein or trevc.   
-            On exit, A is overwritten by the transformed eigenvectors.   
+    A:      On entry, the matrix of right or left eigenvectors to be
+            transformed, as returned by hsein or trevc.
+            On exit, A is overwritten by the transformed eigenvectors.
 
-    job:    Specifies the type of backward transformation required:   
-            = 0 , do nothing, return immediately;   
-            = 1, do backward transformation for permutation only;   
-            = 2, do backward transformation for scaling only;   
-            = 3, do backward transformations for both permutation and   
-                   scaling.   
-            job must be the same as the argument job supplied to gebal.   
+    job:    Specifies the type of backward transformation required:
+            = 0 , do nothing, return immediately;
+            = 1, do backward transformation for permutation only;
+            = 2, do backward transformation for scaling only;
+            = 3, do backward transformations for both permutation and
+                   scaling.
+            job must be the same as the argument job supplied to gebal.
 
     side:   = 0:  V contains left eigenvectors.
 	    = 1:  V contains right eigenvectors;
@@ -7560,26 +7780,26 @@ balanced matrix output by gebal.
             1 <= ilo <= ihi <= N, if N > 0; ilo=1 and ihi=0, if N=0.
 	    Here N is the the number of rows of the matrix A.
 
-    scale:  Details of the permutation and scaling factors, as returned   
-            by gebal.   
+    scale:  Details of the permutation and scaling factors, as returned
+            by gebal.
 
-    info:   = 0:  successful exit   
+    info:   = 0:  successful exit
             < 0:  if info = -i, the i-th argument had an illegal value.
 
-   
+
 
 
 =for example
 
  $a = random (50, 50);
- $scale = zeroes(50); 
+ $scale = zeroes(50);
  $info = null;
  $ilo = null;
  $ihi = null;
  gebal($a, $ilo, $ihi, $scale, $info);
  # Compute eigenvectors ($ev)
  gebak($ev, $ilo, $ihi, $scale, $info);
- 
+
 
 
 =for bad
@@ -7589,15 +7809,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 7813 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *gebak = \&PDL::gebak;
+#line 7820 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -7656,15 +7879,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 7883 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *lange = \&PDL::lange;
+#line 7890 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -7678,9 +7904,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-Computes the value of the one norm,  or the Frobenius norm, or   
-the  infinity norm,  or the  element of  largest absolute value  of a   
-real symmetric matrix A. 
+Computes the value of the one norm,  or the Frobenius norm, or
+the  infinity norm,  or the  element of  largest absolute value  of a
+real symmetric matrix A.
 
     Description
     ===========
@@ -7700,20 +7926,20 @@ real symmetric matrix A.
     normF  denotes the  Frobenius norm of a matrix (square root of sum of
     squares).  Note that  max(abs(A(i,j)))  is not a  matrix norm.
 
-    norm:   Specifies the value to be returned in lansy as described   
-            above.   
+    norm:   Specifies the value to be returned in lansy as described
+            above.
 
-    uplo:   Specifies whether the upper or lower triangular part of the   
-            symmetric matrix A is to be referenced.   
-            = 0:  Upper triangular part of A is referenced   
-            = 1:  Lower triangular part of A is referenced   
+    uplo:   Specifies whether the upper or lower triangular part of the
+            symmetric matrix A is to be referenced.
+            = 0:  Upper triangular part of A is referenced
+            = 1:  Lower triangular part of A is referenced
 
-    A:      The symmetric matrix A.  If uplo = 0, the leading n by n   
-            upper triangular part of A contains the upper triangular part   
-            of the matrix A, and the strictly lower triangular part of A   
-            is not referenced.  If uplo = 1, the leading n by n lower   
-            triangular part of A contains the lower triangular part of   
-            the matrix A, and the strictly upper triangular part of A is   
+    A:      The symmetric matrix A.  If uplo = 0, the leading n by n
+            upper triangular part of A contains the upper triangular part
+            of the matrix A, and the strictly lower triangular part of A
+            is not referenced.  If uplo = 1, the leading n by n lower
+            triangular part of A contains the lower triangular part of
+            the matrix A, and the strictly upper triangular part of A is
             not referenced.
 
 
@@ -7732,15 +7958,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 7962 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *lansy = \&PDL::lansy;
+#line 7969 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -7754,9 +7983,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-Computes the value of the one norm,  or the Frobenius norm, or   
-the  infinity norm,  or the  element of  largest absolute value  of a   
-trapezoidal or triangular matrix A. 
+Computes the value of the one norm,  or the Frobenius norm, or
+the  infinity norm,  or the  element of  largest absolute value  of a
+trapezoidal or triangular matrix A.
 
     Description
     ===========
@@ -7776,27 +8005,27 @@ trapezoidal or triangular matrix A.
     normF  denotes the  Frobenius norm of a matrix (square root of sum of
     squares).  Note that  max(abs(A(i,j)))  is not a  matrix norm.
 
-    norm:   Specifies the value to be returned in lantr as described   
-            above.   
+    norm:   Specifies the value to be returned in lantr as described
+            above.
 
-    uplo:   Specifies whether the matrix A is upper or lower trapezoidal.   
-            = 0:  Upper triangular part of A is referenced   
+    uplo:   Specifies whether the matrix A is upper or lower trapezoidal.
+            = 0:  Upper triangular part of A is referenced
             = 1:  Lower triangular part of A is referenced
-	    Note that A is triangular instead of trapezoidal if M = N.   
+	    Note that A is triangular instead of trapezoidal if M = N.
 
-    diag:   Specifies whether or not the matrix A has unit diagonal.   
-            = 0:  Non-unit diagonal   
-            = 1:  Unit diagonal   
+    diag:   Specifies whether or not the matrix A has unit diagonal.
+            = 0:  Non-unit diagonal
+            = 1:  Unit diagonal
 
-    A:      The trapezoidal matrix A (A is triangular if m = n).   
-            If uplo = 0, the leading m by n upper trapezoidal part of   
-            the array A contains the upper trapezoidal matrix, and the   
-            strictly lower triangular part of A is not referenced.   
-            If uplo = 1, the leading m by n lower trapezoidal part of   
-            the array A contains the lower trapezoidal matrix, and the   
-            strictly upper triangular part of A is not referenced.  Note   
-            that when diag = 1, the diagonal elements of A are not   
-            referenced and are assumed to be one. 
+    A:      The trapezoidal matrix A (A is triangular if m = n).
+            If uplo = 0, the leading m by n upper trapezoidal part of
+            the array A contains the upper trapezoidal matrix, and the
+            strictly lower triangular part of A is not referenced.
+            If uplo = 1, the leading m by n lower trapezoidal part of
+            the array A contains the lower trapezoidal matrix, and the
+            strictly upper triangular part of A is not referenced.  Note
+            that when diag = 1, the diagonal elements of A are not
+            referenced and are assumed to be one.
 
 
 =for example
@@ -7814,15 +8043,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 8047 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *lantr = \&PDL::lantr;
+#line 8054 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -7893,15 +8125,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 8129 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *gemm = \&PDL::gemm;
+#line 8136 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -7926,15 +8161,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 8165 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *mmult = \&PDL::mmult;
+#line 8172 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -7959,15 +8197,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 8201 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *crossprod = \&PDL::crossprod;
+#line 8208 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -8049,15 +8290,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 8294 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *syrk = \&PDL::syrk;
+#line 8301 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -8065,7 +8309,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([phys]a(n);int [phys]inca();[phys]b(m);int [phys]incb();[o,phys]c())
+  Signature: ([phys]a(n);[phys]b(n);[o,phys]c())
 
 
 
@@ -8077,7 +8321,7 @@ Dot product of two vectors using Blas.
 
  $a = random(5);
  $b = random(5);
- $c = dot($a, 1, $b, 1)
+ $c = dot($a, $b)
 
 
 
@@ -8088,15 +8332,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 8336 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *dot = \&PDL::dot;
+#line 8343 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -8104,7 +8351,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([phys]a(n);int [phys]inca();[phys] alpha();[io,phys]b(m);int [phys]incb())
+  Signature: ([phys]a(n);[phys] alpha();[io,phys]b(m))
 
 
 
@@ -8118,7 +8365,7 @@ Returns result in b.
 
  $a = random(5);
  $b = random(5);
- axpy($a, 1, 12, $b, 1)
+ axpy($a, 12, $b)
 
 
 
@@ -8129,15 +8376,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 8380 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *axpy = \&PDL::axpy;
+#line 8387 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -8145,7 +8395,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([phys]a(n);int [phys]inca();[o,phys]b())
+  Signature: ([phys]a(n);[o]b())
 
 
 
@@ -8156,7 +8406,7 @@ Euclidean norm of a vector using Blas.
 =for example
 
  $a = random(5);
- $norm2 = norm2($a,1)
+ $norm2 = norm2($a)
 
 
 
@@ -8167,15 +8417,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 8421 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *nrm2 = \&PDL::nrm2;
+#line 8428 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -8183,7 +8436,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([phys]a(n);int [phys]inca();[o,phys]b())
+  Signature: ([phys]a(n);[o]b())
 
 
 
@@ -8194,7 +8447,7 @@ Sum of absolute values of a vector using Blas.
 =for example
 
  $a = random(5);
- $absum = asum($a,1)
+ $absum = asum($a)
 
 
 
@@ -8205,15 +8458,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 8462 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *asum = \&PDL::asum;
+#line 8469 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -8221,7 +8477,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io,phys]a(n);int [phys]inca();[phys]scale())
+  Signature: ([io,phys]a(n);scale())
 
 
 
@@ -8232,7 +8488,7 @@ Scale a vector by a constant using Blas.
 =for example
 
  $a = random(5);
- $a->scal(1, 0.5)
+ $a->scal(0.5)
 
 
 
@@ -8243,15 +8499,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 8503 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *scal = \&PDL::scal;
+#line 8510 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -8259,7 +8518,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io,phys]a(n);int [phys]inca();[phys]c(); [phys]s();[io,phys]b(n);int [phys]incb())
+  Signature: ([io,phys]a(n);[phys]c(); [phys]s();[io,phys]b(n))
 
 
 
@@ -8271,7 +8530,7 @@ Applies plane rotation using Blas.
 
  $a = random(5);
  $b = random(5);
- rot($a, 1, 0.5, 0.7, $b, 1)
+ rot($a, 0.5, 0.7, $b)
 
 
 
@@ -8282,15 +8541,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 8545 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *rot = \&PDL::rot;
+#line 8552 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -8320,15 +8582,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 8586 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *rotg = \&PDL::rotg;
+#line 8593 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -8342,24 +8607,24 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-Sort the numbers in d in increasing order (if id = 0) or   
-in decreasing order (if id = 1 ).   
+Sort the numbers in d in increasing order (if id = 0) or
+in decreasing order (if id = 1 ).
 
-Use Quick Sort, reverting to Insertion sort on arrays of   
-size <= 20. Dimension of stack limits N to about 2**32.   
+Use Quick Sort, reverting to Insertion sort on arrays of
+size <= 20. Dimension of stack limits N to about 2**32.
 
-    Arguments   
-    =========   
+    Arguments
+    =========
 
-    id:     = 0: sort d in increasing order;   
-            = 1: sort d in decreasing order.   
+    id:     = 0: sort d in increasing order;
+            = 1: sort d in decreasing order.
 
-    d:      On entry, the array to be sorted.   
-            On exit, d has been sorted into increasing order   
-            (d(1) <= ... <= d(N) ) or into decreasing order   
-            (d(1) >= ... >= d(N) ), depending on id.   
+    d:      On entry, the array to be sorted.
+            On exit, d has been sorted into increasing order
+            (d(1) <= ... <= d(N) ) or into decreasing order
+            (d(1) >= ... >= d(N) ), depending on id.
 
-    info:   = 0:  successful exit   
+    info:   = 0:  successful exit
             < 0:  if info = -i, the i-th argument had an illegal value
 
 =for example
@@ -8375,15 +8640,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 8644 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *lasrt = \&PDL::lasrt;
+#line 8651 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -8428,15 +8696,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 8700 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *lacpy = \&PDL::lacpy;
+#line 8707 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -8450,28 +8721,28 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for ref
 
-Performs a series of row interchanges on the matrix A.   
+Performs a series of row interchanges on the matrix A.
 One row interchange is initiated for each of rows k1 through k2 of A.
 Doesn't use PDL indices (start = 1).
 
-    Arguments   
-    =========   
+    Arguments
+    =========
 
-    A:      On entry, the matrix of column dimension N to which the row   
-            interchanges will be applied.   
-            On exit, the permuted matrix.   
+    A:      On entry, the matrix of column dimension N to which the row
+            interchanges will be applied.
+            On exit, the permuted matrix.
 
-    k1:     The first element of ipiv for which a row interchange will   
-            be done.   
+    k1:     The first element of ipiv for which a row interchange will
+            be done.
 
-    k2:     The last element of ipiv for which a row interchange will   
-            be done.   
+    k2:     The last element of ipiv for which a row interchange will
+            be done.
 
-    ipiv:   The vector of pivot indices.  Only the elements in positions   
-            k1 through k2 of ipiv are accessed.   
-            ipiv(k) = l implies rows k and l are to be interchanged.   
+    ipiv:   The vector of pivot indices.  Only the elements in positions
+            k1 through k2 of ipiv are accessed.
+            ipiv(k) = l implies rows k and l are to be interchanged.
 
-    inc:    The increment between successive values of ipiv.  If ipiv   
+    inc:    The increment between successive values of ipiv.  If ipiv
             is negative, the pivots are applied in reverse order.
 
 =for example
@@ -8489,15 +8760,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 8764 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *laswp = \&PDL::laswp;
+#line 8771 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -8555,15 +8829,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 8833 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *lamch = \&PDL::lamch;
+#line 8840 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -8612,15 +8889,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 8893 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *labad = \&PDL::labad;
+#line 8900 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -8643,15 +8923,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 8927 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *tricpy = \&PDL::tricpy;
+#line 8934 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -8659,14 +8942,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (eigreval(n);eigimval(n); eigvec(n,p);int fortran();[o]cplx_val(q=2,n);[o]cplx_vec(r=2,n,p))
+  Signature: (eigreval(n);eigimval(n); eigvec(n,p);int fortran();[o]cplx_val(c=2,n);[o]cplx_vec(c=2,n,p))
 
 =for ref
 
 Output complex eigen-values/vectors from eigen-values/vectors
 as computed by geev or geevx.
 'fortran' means fortran storage type.
-
 
 
 =for bad
@@ -8676,15 +8958,35 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 8962 "Real.pm"
 
 
 
+#line 1059 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
+
+sub PDL::cplx_eigen {
+  my ($eigre, $eigim, $eigvec, $fortran, @outs) = @_;
+  my ($outval, $outvec) = @outs ? @outs : (null, null);
+  PDL::_cplx_eigen_int($eigre, $eigim, $eigvec, $fortran, $outval, $outvec);
+  if (defined $PDL::Complex::VERSION) {
+    $_ = bless($_, 'PDL::Complex') for $outval, $outvec;
+  } else {
+    $_ = $_->slice('(0)')->czip($_->slice('(1)')) for $outval, $outvec;
+  }
+  ($outval, $outvec);
+}
+#line 8979 "Real.pm"
 
 
+
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *cplx_eigen = \&PDL::cplx_eigen;
+#line 8986 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -8708,15 +9010,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 9014 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *augment = \&PDL::augment;
+#line 9021 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -8740,15 +9045,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 9049 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *mstack = \&PDL::mstack;
+#line 9056 "Real.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -8756,7 +9064,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([phys]A(n,n);[phys,o]Y(n,n);[phys,o]out(p))
+  Signature: (A(n,n);[o]Y(n,n);[o]out(p))
 
 =for ref
 
@@ -8771,17 +9079,20 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 9083 "Real.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *charpol = \&PDL::charpol;
+#line 9090 "Real.pm"
 
 
 
-;
+
+
+#line 10909 "real.pd"
 
 
 =head1 AUTHOR
@@ -8793,7 +9104,7 @@ it under the terms of the Perl Artistic License as in the file Artistic_2
 in this distribution.
 
 =cut
-
+#line 9108 "Real.pm"
 
 
 

@@ -1,31 +1,20 @@
-## @file
-# Implementation of Chart::LinesPoints
 #
-# written by
-# @author david bonner (dbonner@cs.bu.edu)
-#
-# maintained by the
-# @author Chart Group at Geodetic Fundamental Station Wettzell (Chart@fs.wettzell.de)
-# @date 2015-03-01
-# @version 2.4.10
+# line charts (plots)
+# LinesPoints class connect the given x-/y-values by straight lines 
+# and the x-/y-values are plotted by points.
 #
 
-## @class Chart::LinesPoints
-# LinesPoints class connect the given x-/y-values by straight lines and the x-/y-values are plotted by points.
-#
-# This class provides all functions which are specific to
-# lines
-#
+use v5.12;
 
 package Chart::LinesPoints;
+our @ISA     = qw(Chart::Base);
 our $VERSION = 2.400.5;
 
 use Chart::Base;
 use GD;
 use Carp;
-use strict;
 
-@Chart::LinesPoints::ISA     = qw(Chart::Base);
+
 
 #>>>>>>>>>>>>>>>>>>>>>>>>>>#
 #  public methods go here  #

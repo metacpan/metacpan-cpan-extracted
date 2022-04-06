@@ -28,7 +28,7 @@ Version 0.010
 
 =cut
 
-our $VERSION = '0.010';
+our $VERSION = '0.011';
 
 my $TB = Test::Builder->new;
 

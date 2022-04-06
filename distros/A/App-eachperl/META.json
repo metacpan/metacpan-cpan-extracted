@@ -25,7 +25,7 @@
             "Convert::Color::XTerm" : "0.06",
             "IO::Term::Status" : "0",
             "IPC::Run" : "0",
-            "Object::Pad" : "0.54",
+            "Object::Pad" : "0.63",
             "String::Tagged" : "0.17",
             "Struct::Dumb" : "0",
             "Syntax::Keyword::Dynamically" : "0",
@@ -41,7 +41,7 @@
    "provides" : {
       "App::eachperl" : {
          "file" : "lib/App/eachperl.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -50,6 +50,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

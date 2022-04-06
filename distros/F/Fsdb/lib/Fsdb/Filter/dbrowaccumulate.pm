@@ -2,7 +2,7 @@
 
 #
 # dbrowaccumulate.pm
-# Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
+# Copyright (C) 1991-2022 by John Heidemann <johnh@isi.edu>
 #
 # This program is distributed under terms of the GNU general
 # public license, version 2.  See the file COPYING
@@ -252,7 +252,13 @@ sub setup ($) {
 	if ($self->{_initial_value} !~ /$is_numeric_regexp/);
 	
     $self->finish_io_option('output', -clone => $self->{_in}, -outputheader => 'delay');
-    $self->{_out}->col_create($self->{_destination_column})
+    my $destination_type = undef;
+    if (defined($self->{_increment})) {
+        $destination_type = ($self->{_increment} =~ /\./) ? 'd' : 'q';
+    } else {
+        $destination_type = ($self->{_in}->col_type_is_numeric($self->{_target_column}) == 1 ? 'q' : 'd');
+    };
+    $self->{_out}->col_create($self->{_destination_column} . ':' . $destination_type)
 	or croak($self->{_prog} . ": cannot create column '" . $self->{_destination_column} . "' (maybe it already existed?)\n");
 }
 
@@ -306,7 +312,7 @@ sub run ($) {
 
 =head1 AUTHOR and COPYRIGHT
 
-Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
+Copyright (C) 1991-2022 by John Heidemann <johnh@isi.edu>
 
 This program is distributed under terms of the GNU general
 public license, version 2.  See the file COPYING

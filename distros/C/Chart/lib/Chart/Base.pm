@@ -1,73 +1,38 @@
-## @file
-# Implementation of Chart::Base
-#
-# written by
-# @author david bonner (dbonner@cs.bu.edu)
-#
-# maintained by the
-# @author Chart Group at Geodetic Fundamental Station Wettzell (Chart@fs.wettzell.de)
-# @date 2015-03-01
-# @version 2.400.1
 
-## @mainpage Chart::Base
-#
-# Basic Class of Chart from which all the other classes are derived.
+# Chart::Base :  all other drawing classes ared derived from this
+# provides all common functions
 
-## @class Chart::Base
-# @brief Base class for Chart; all other classes derived from here
-#
-# Base class from which all other classes are derived.
-# This class provides all functions which are common for
-# all classes
+use v5.12;
+
 package Chart::Base;
-our $VERSION = 2.400.5;
+our $VERSION = '2.400.5';
 
-use GD;
-use Carp;
 use FileHandle;
-use Chart::Constants;
+use Carp;
+use GD;
 use GD::Image;
-
-use vars qw(%named_colors);
-use strict;
+use Chart::Constants;
 
 #>>>>>>>>>>>>>>>>>>>>>>>>>>#
-#  public methods go here  #
+#  public methods          #
 #<<<<<<<<<<<<<<<<<<<<<<<<<<#
 
-## @cmethod object new()
-# @return A new object.
-#
-# @brief
-# Standard normal constructor.\n
-# Calls
-# @see _init
-sub new
+sub new            # Standard normal constructor
 {
     my $proto = shift;
     my $class = ref($proto) || $proto;
-    my $self  = {};
+    my $self  = (bless {}, $class) ;
 
-    bless $self, $class;
     $self->_init(@_);
-
     return $self;
 }
 
-## @method int set(%opts)
-# Set all options
-#
-# @details
-#  main method for customizing the chart, lets users
-#  specify values for different parameters\n
-#  The options are saved locally to be able to output them
-#  via @see getopts()
-#
-# @param[in] opts Hash of options to the Chart
-# @return ok or croak
-#
-sub set
-{
+
+# set (%options) --> 1 | croak
+#   main method for customizing the chart, by specify parameters
+#   options are saved locally to be able to output them via @see getopts()
+
+sub set {
     my $self = shift;
     my %opts = @_;
 
@@ -113,16 +78,13 @@ sub set
                         $self->{'colors'}{'x_grid_lines'}  = $sLocal;
                         $self->{'colors'}{'y2_grid_lines'} = $sLocal;
                     }
-                    else
-                    {
+                    else {
                         carp "colors{'grid_lines'} is not SCALAR and not ARRAY\n";
                     }
                 }
             }
         }
     }
-
-    # now return
     return 1;
 }
 
@@ -1307,7 +1269,7 @@ sub _draw
     return 1;
 }
 
-## @var	    Hash named_colors RGB values of named colors
+## @var     Hash named_colors RGB values of named colors
 #
 # see URL http://en.wikipedia.org/wiki/Web_colors#X11_color_names
 our %named_colors = (
@@ -1910,17 +1872,17 @@ sub _draw_title
     # Sketch for further processing
     #    if ( $font ~= /^gd/ && ! -f $font )
     #    {
-    #		$self->{'gd_obj'}->string( $font, $x, $y, $lines[0], $color );
-    #	}
-    #	elsif ( -f $font )
-    #	{
-    #		my $fontname = '/var/share/fonts/truetype/freefont/FreeSerifBoldItalic.ttf';
-    #		$self->{'gd_obj'}->stringFT( $color, $fontname, 8,0, $x, $y, $lines[0] );
-    #	}
+    #       $self->{'gd_obj'}->string( $font, $x, $y, $lines[0], $color );
+    #   }
+    #   elsif ( -f $font )
+    #   {
+    #       my $fontname = '/var/share/fonts/truetype/freefont/FreeSerifBoldItalic.ttf';
+    #       $self->{'gd_obj'}->stringFT( $color, $fontname, 8,0, $x, $y, $lines[0] );
+    #   }
 
-    #	my $fontname = '/var/share/fonts/truetype/freefont/FreeSerifBoldItalic.ttf';
+    #   my $fontname = '/var/share/fonts/truetype/freefont/FreeSerifBoldItalic.ttf';
     #    #                                              size, angle
-    #	$self->{'gd_obj'}->stringFT( $color, $fontname, 12,0, $x, $y, $lines[0] );
+    #   $self->{'gd_obj'}->stringFT( $color, $fontname, 12,0, $x, $y, $lines[0] );
 
     #-----------------------------------------------------------------
     $self->{'gd_obj'}->string( $font, $x, $y, $lines[0], $color );
@@ -2146,12 +2108,12 @@ sub _find_x_scale
 # This Sub calculates correct values for the following class local variables,
 # if they have not been set by the user.
 #
-# max_val, min_val: 	The maximum and minimum values for the y axis.\n
-# y_ticks:		The number of ticks to plot on the y scale, including
-#			the end points. e.g. If the scale runs from 0 to 50,
-#			with ticks every 10, y_ticks will have the value of 6.\n
-# y_tick_labels:	An array of strings, each is a label for the y axis.\n
-# y_tick_labels_length:	The length to allow for B tick labels. (How long is
+# max_val, min_val:     The maximum and minimum values for the y axis.\n
+# y_ticks:      The number of ticks to plot on the y scale, including
+#           the end points. e.g. If the scale runs from 0 to 50,
+#           with ticks every 10, y_ticks will have the value of 6.\n
+# y_tick_labels:    An array of strings, each is a label for the y axis.\n
+# y_tick_labels_length: The length to allow for B tick labels. (How long is
 #                       the longest?)
 sub _find_y_scale
 {
@@ -4485,7 +4447,6 @@ sub _prepare_brush
         if ( $brushStyle eq 'fatPlus' )
         {
             my $poly = new GD::Polygon;
-
             my $z = int( 0.3 * $radius );
 
             $poly->addPt( $xc + $z,     $yc + $z );
@@ -4590,7 +4551,6 @@ sub _prepare_brush
         }
 
     }
-
     # set the new image as the main object's brush
     return $brush;
 }
@@ -4615,13 +4575,10 @@ sub _default_f_tick
 sub _xyRatio
 {
     my $self = shift;
-
     my $width_x = $self->{'curr_x_max'} - $self->{'curr_x_min'} + 1;
     my $width_y = $self->{'curr_y_max'} - $self->{'curr_y_min'} + 1;
 
-    my $ratio = $width_x / $width_y;
-
-    return $ratio;
+    return $width_x / $width_y;
 }
 
 ## @fn private float _xPixelInReal
@@ -4632,13 +4589,11 @@ sub _xyRatio
 sub _xPixelInReal
 {
     my $self = shift;
-
     my $width_x = $self->{'curr_x_max'} - $self->{'curr_x_min'} + 1;
     my ( $min, $max ) = $self->_find_x_range();
     my $xRealWidth = $max - $min;
-    my $ratio      = $xRealWidth / $width_x;
 
-    return $ratio;
+    return $xRealWidth / $width_x;
 }
 
 ## @fn private float _yPixelInReal
@@ -4649,15 +4604,13 @@ sub _xPixelInReal
 sub _yPixelInReal
 {
     my $self = shift;
-
     my $width_y = $self->{'curr_y_max'} - $self->{'curr_y_min'} + 1;
     my ( $min, $max, $flag_all_integers ) = $self->_find_y_range();
     my $yRealWidth = $max - $min;
-    my $ratio      = $yRealWidth / $width_y;
-
-    return $ratio;
+    
+    return $yRealWidth / $width_y;
 }
 
-## be a good module and return positive
-1;
+
+1; # be a good module and return positive
 

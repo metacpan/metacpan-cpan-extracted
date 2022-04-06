@@ -2,7 +2,7 @@
 
 #
 # dbcolhisto.pm
-# Copyright (C) 1997-2018 by John Heidemann <johnh@isi.edu>
+# Copyright (C) 1997-2022 by John Heidemann <johnh@isi.edu>
 #
 # This program is distributed under terms of the GNU general
 # public license, version 2.  See the file COPYING
@@ -79,6 +79,10 @@ Compute stats over all records (treat non-numeric records
 as zero rather than just ignoring them).
 Default is non-numeric records are ignored.
 
+=item B<-e> EmptyValue or B<--empty>
+
+Specify the value any null bins get.  (Default: -.)
+
 =back
 
 =for comment
@@ -141,7 +145,7 @@ end_standard_fsdb_options
 
 =head2 Output:
 
-    #fsdb low histogram
+    #fsdb low histogram:q
     0       0
     10      0
     20      0
@@ -245,6 +249,7 @@ sub parse_options ($@) {
 	'close!' => \$self->{_close},
 	'a|include-non-numeric!' => \$self->{_include_non_numeric},
 	'd|debug+' => \$self->{_debug},
+	'e|empty=s' => \$self->{_empty},
 	'E|end=f' => \$self->{_bucket_end},
 	'F|fs|cs|fieldseparator|columnseparator=s' => \$self->{_fscode},
 	'g|graphical!' => \$self->{_graphical_output},
@@ -274,8 +279,11 @@ sub setup ($) {
 
     $self->finish_io_option('input', -comment_handler => $self->create_delay_comments_sub);
     $self->{_target_coli} = $self->{_in}->col_to_i($self->{_target_column});
+    # propagate an integral type, if any
+    my($target_type) = $self->{_in}->col_to_type($self->{_target_column}) // 'd';
 
-    my @output_options = (-cols => [qw(low histogram)]);
+    my(@cols) = ('low:' . $target_type, 'histogram' . ($self->{_graphical_output} ? '' : ':q'));
+    my @output_options = (-cols => \@cols);
     unshift (@output_options, -fscode => $self->{_fscode})
 	if (defined($self->{_fscode}));
     $self->finish_io_option('output', @output_options);
@@ -420,8 +428,9 @@ sub run ($) {
     }
     $replayable_reader->close;
 
+    my $empty_value = $self->{_empty};
     my $format_sub = $self->{_graphical_output} ?
-	sub { return "*" x $_[0]; } :
+	sub { return ($_[0] == 0) ? $empty_value : ("*" x $_[0]); } :
 	sub { return $_[0]; };
 
     if ($low_bucket) {
@@ -442,7 +451,7 @@ sub run ($) {
 
 =head1 AUTHOR and COPYRIGHT
 
-Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
+Copyright (C) 1991-2022 by John Heidemann <johnh@isi.edu>
 
 This program is distributed under terms of the GNU general
 public license, version 2.  See the file COPYING

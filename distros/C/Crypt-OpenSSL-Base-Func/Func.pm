@@ -14,7 +14,7 @@ use Math::BigInt;
 use POSIX;
 #use Data::Dump qw/dump/;
 
-our $VERSION = '0.03';
+our $VERSION = '0.031';
 
 our @ISA = qw(Exporter);
 
@@ -30,8 +30,11 @@ EC_POINT_set_affine_coordinates
 EC_POINT_get_affine_coordinates
 EC_POINT_point2hex
 EC_POINT_hex2point
+EC_KEY_get0_private_key
 
-PKCS5_PBKDF2_HMAC PKCS12_key_gen 
+PKCS5_PBKDF2_HMAC 
+PKCS12_key_gen 
+i2osp
 aes_cmac 
 ecdh hex2point
 bn_mod_sqrt 
@@ -45,6 +48,23 @@ require XSLoader;
 XSLoader::load( 'Crypt::OpenSSL::Base::Func', $VERSION );
 
 
+sub i2osp {
+    my ($len, $L) = @_;  
+
+    my $s = pack "C*", $len;
+    $s = unpack("H*", $s);
+
+    my $s_len = length($s);
+    my $tmp_l = $L*2;
+    if($tmp_l > $s_len){
+        my $pad_len = $tmp_l - $s_len;
+        substr $s, 0, 0, ('0') x $pad_len;
+    }   
+
+    $s = pack("H*", $s);
+
+    return $s; 
+}
 
 
 

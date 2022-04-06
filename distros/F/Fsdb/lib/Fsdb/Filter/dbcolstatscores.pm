@@ -2,7 +2,7 @@
 
 #
 # dbcolstatscores.pm
-# Copyright (C) 1997-2018 by John Heidemann <johnh@isi.edu>
+# Copyright (C) 1997-2022 by John Heidemann <johnh@isi.edu>
 #
 # This program is distributed under terms of the GNU general
 # public license, version 2.  See the file COPYING
@@ -140,7 +140,7 @@ end_standard_fsdb_options
 
 =head2 Output:
 
-    #fsdb name id test1 zscore   tscore 
+    #fsdb name id test1 zscore:d   tscore:d 
     a       1  80    0.23063  52.306 
     b       2  70    -0.69188 43.081 
     c       3  65    -1.1531  38.469 
@@ -271,10 +271,10 @@ sub setup ($) {
 	if (!defined($self->{_target_coli}));
 
     $self->finish_io_option('output', -clone => $self->{_in}, -outputheader => 'delay');
-    $self->{_out}->col_create('zscore')
+    $self->{_out}->col_create('zscore:d')
 	or croak($self->{_prog} . ": cannot create column zscore (maybe it already existed?)\n");
     if ($self->{_do_tscores}) {
-        $self->{_out}->col_create('tscore')
+        $self->{_out}->col_create('tscore:d')
 	    or croak($self->{_prog} . ": cannot create column tscore (maybe it already existed?)\n");
     };
 }
@@ -349,7 +349,7 @@ sub run ($) {
 
 =head1 AUTHOR and COPYRIGHT
 
-Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
+Copyright (C) 1991-2022 by John Heidemann <johnh@isi.edu>
 
 This program is distributed under terms of the GNU general
 public license, version 2.  See the file COPYING

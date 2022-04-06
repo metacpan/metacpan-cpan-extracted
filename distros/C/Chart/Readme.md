@@ -4,17 +4,17 @@
 
 # VERSION
  
-    2.400.10
+    2.401.1
 
 # INSTALLING
 
 
     The usual.
  
-    	perl Makefile.PL
-    	make
-    	make test
-    	make install
+        perl Makefile.PL
+        make
+        make test
+        make install
 
     This should install to your site_perl directory.  The test scripts also
     put samples of the different charts in the samples/ directory.
@@ -28,7 +28,7 @@
 # CHANGES
 
     are in file Changes
-	
+    
 # MAINTAINER
 
     - Chart-Group (chart@fs.wettzell.de)

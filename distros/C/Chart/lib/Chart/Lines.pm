@@ -1,30 +1,15 @@
-## @file
-# Implementation of Chart::Lines
-#
-#  written by david bonner
-#  dbonner@cs.bu.edu
-#
-#  maintained by the Chart Group at Geodetic Fundamental Station Wettzell
-#  Chart@fs.wettzell.de
-# @author Chart Group (Chart@fs.wettzell.de)
-# @date 2015-03-01
-# @version 2.4.10
 
-## @class Chart::Lines
-# Lines class derived from class Base.
-#
-# This class provides all functions which are specific to
-# lines
-#
+# chart type with lines
+
+use v5.12;
+
 package Chart::Lines;
+our @ISA     = qw(Chart::Base);
 our $VERSION = 2.400.5;
 
 use Chart::Base;
 use GD;
 use Carp;
-use strict;
-
-@Chart::Lines::ISA     = qw(Chart::Base);
 
 #>>>>>>>>>>>>>>>>>>>>>>>>>>#
 #  public methods go here  #

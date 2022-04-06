@@ -1,9 +1,12 @@
+#!/usr/bin/perl -w
 
 BEGIN { unshift @INC, 'lib', '../lib'}
 use strict;
 use Chart::Bars;
+use File::Temp 0.19;
+my $samples = File::Temp->newdir();
 
-my $png_name = 'samples/mapbars.png';
+my $png_name = "$samples/mapbars.png";
 my @legend_keys = ( "Actual ", "Goal" );
 
 my $Graph = new Chart::Bars( 600, 400 );

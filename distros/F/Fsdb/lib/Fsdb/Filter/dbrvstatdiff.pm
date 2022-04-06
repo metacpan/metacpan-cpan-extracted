@@ -172,7 +172,7 @@ end_standard_fsdb_options
 
 =head2 Output:
 
-    #fsdb title mean2 stddev2 n2 mean1 stddev1 n1 diff diff_pct diff_conf_half diff_conf_low diff_conf_high diff_conf_pct_half diff_conf_pct_low diff_conf_pct_high
+    #fsdb title mean2 stddev2 n2 mean1 stddev1 n1 diff:d diff_pct:d diff_conf_half:d diff_conf_low:d diff_conf_high:d diff_conf_pct_half:d diff_conf_pct_low:d diff_conf_pct_high:d
     example6.12	0.17	0.0020	5	0.22	0.0010	4	0.05	29.412	0.0026138	0.047386	0.052614	1.5375	27.874	30.949
     #  | dbrvstatdiff mean2 stddev2 n2 mean1 stddev1 n1
 
@@ -416,16 +416,18 @@ sub setup ($) {
     };
 
     $self->finish_io_option('output', -clone => $self->{_in}, -outputheader => 'delay');
-    my(@new_columns) = qw(diff diff_pct);
-    push(@new_columns, qw(diff_conf_half diff_conf_low diff_conf_high diff_conf_pct_half diff_conf_pct_low diff_conf_pct_high))
+    my(@new_columns) = qw(diff:d diff_pct:d);
+    push(@new_columns, qw(diff_conf_half:d diff_conf_low:d diff_conf_high:d diff_conf_pct_half:d diff_conf_pct_low:d diff_conf_pct_high:d))
 	if (defined($self->{_do_confidence}));
-    push(@new_columns, qw(t_test t_test_result t_test_break t_test_break_pct))
+    push(@new_columns, qw(t_test:d t_test_result t_test_break:d t_test_break_pct:d))
 	if (defined($self->{_hypothesis}));
     foreach (@new_columns) {
 	$self->{_out}->col_create($_)
 	    or croak($self->{_prog} . ": cannot create column ``$_'' (maybe it already existed?)\n");
-	$self->{"_${_}_coli"} = $self->{_out}->col_to_i($_);
-	defined($self->{"_${_}_coli"}) or croak("internal error\n");
+        my($typeless_column) = $_;
+        $typeless_column =~ s/:.*$//;
+	$self->{"_${typeless_column}_coli"} = $self->{_out}->col_to_i($typeless_column);
+	defined($self->{"_${typeless_column}_coli"}) or croak("internal error\n");
     };
 
 }

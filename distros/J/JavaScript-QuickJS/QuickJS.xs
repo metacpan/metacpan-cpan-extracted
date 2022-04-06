@@ -43,6 +43,8 @@ const char* __jstype_name_back[] = {
 static SV* _JSValue_to_SV (pTHX_ JSContext* ctx, JSValue jsval, SV** err_svp);
 
 static inline SV* _JSValue_object_to_SV (pTHX_ JSContext* ctx, JSValue jsval, SV** err_svp) {
+    assert(!err_svp);
+
     JSPropertyEnum *tab_atom;
     uint32_t tab_atom_count;
 
@@ -121,11 +123,9 @@ static SV* _JSValue_to_SV (pTHX_ JSContext* ctx, JSValue jsval, SV** err_svp) {
 
     int tag = JS_VALUE_GET_NORM_TAG(jsval);
 
-    switch (tag) {
-        case JS_TAG_EXCEPTION:
-            *err_svp = newSVpvs("DEV ERROR: Exception must be unwrapped!");
-            return NULL;
+    assert(tag != JS_TAG_EXCEPTION);
 
+    switch (tag) {
         case JS_TAG_STRING:
             STMT_START {
                 STRLEN strlen;
@@ -297,12 +297,53 @@ static JSValue __do_perl_callback(JSContext *ctx, JSValueConst this_val, int arg
 }
 
 static JSValue _sv_to_jsvalue(pTHX_ JSContext* ctx, SV* value, SV** error_svp) {
-    if (!SvOK(value)) {
-        return JS_NULL;
-    }
+    SvGETMAGIC(value);
 
-    if (SvROK(value)) {
-        if (!sv_isobject(value)) {
+    switch ( exs_sv_type(value) ) {
+        case EXS_SVTYPE_UNDEF:
+            return JS_NULL;
+
+        case EXS_SVTYPE_BOOLEAN:
+            return JS_NewBool(ctx, SvTRUE(value));
+
+        case EXS_SVTYPE_STRING: STMT_START {
+            STRLEN len;
+            const char* str = SvPVutf8(value, len);
+
+            return JS_NewStringLen(ctx, str, len);
+        } STMT_END;
+
+        case EXS_SVTYPE_UV: STMT_START {
+            UV val_uv = SvUV(value);
+
+            if (sizeof(UV) == sizeof(uint64_t)) {
+                if (val_uv > IV_MAX) {
+                    return JS_NewFloat64(ctx, val_uv);
+                }
+                else {
+                    return JS_NewInt64(ctx, (int64_t) val_uv);
+                }
+            }
+            else {
+                return JS_NewUint32(ctx, (uint32_t) val_uv);
+            }
+        } STMT_END;
+
+        case EXS_SVTYPE_IV: STMT_START {
+            if (sizeof(IV) == sizeof(int64_t)) {
+                return JS_NewInt64(ctx, (int64_t) SvIV(value));
+            }
+
+            return JS_NewInt32(ctx, (int32_t) SvIV(value));
+        } STMT_END;
+
+        case EXS_SVTYPE_NV: STMT_START {
+            return JS_NewFloat64(ctx, (double) SvNV(value));
+        } STMT_END;
+
+        case EXS_SVTYPE_REFERENCE:
+            if (sv_isobject(value)) break;
+
             switch (SvTYPE(SvRV(value))) {
                 case SVt_PVCV:
                     _ctx_add_sv(aTHX_ ctx, value);
@@ -371,43 +412,11 @@ static JSValue _sv_to_jsvalue(pTHX_ JSContext* ctx, SV* value, SV** error_svp) {
                 } STMT_END;
 
                 default:
-                    /* We’ll croak below. */
                     break;
             }
-        }
-    }
-    else {
-#ifdef SvIsBOOL
-        if (SvIsBOOL(value)) {
-            return JS_NewBool(ctx, SvTRUE(value));
-        }
-#endif
 
-        if (SvNOK(value)) {
-            return JS_NewFloat64(ctx, (double) SvNV(value));
-        }
-
-        if (SvUOK(value)) {
-            if (sizeof(IV) == sizeof(uint64_t)) {
-                return JS_NewInt64(ctx, (uint64_t) SvIV(value));
-            }
-
-            return JS_NewInt32(ctx, (uint32_t) SvIV(value));
-        }
-        if (SvIOK(value)) {
-            if (sizeof(IV) == sizeof(int64_t)) {
-                return JS_NewInt64(ctx, (int64_t) SvIV(value));
-            }
-
-            return JS_NewInt32(ctx, (int32_t) SvIV(value));
-        }
-
-        if (SvPOK(value)) {
-            STRLEN len;
-            const char* str = SvPVutf8(value, len);
-
-            return JS_NewStringLen(ctx, str, len);
-        }
+        default:
+            break;
     }
 
     *error_svp = newSVpvf("Cannot convert %" SVf " to JavaScript!", value);

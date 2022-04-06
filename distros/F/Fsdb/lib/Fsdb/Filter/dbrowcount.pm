@@ -2,7 +2,7 @@
 
 #
 # dbrowcount.pm
-# Copyright (C) 2007-2015 by John Heidemann <johnh@isi.edu>
+# Copyright (C) 2007-2022 by John Heidemann <johnh@isi.edu>
 # $Id: 83fba9f283f462ac2039ab283fe5e131f7390a09 $
 #
 # This program is distributed under terms of the GNU general
@@ -217,7 +217,7 @@ sub setup ($) {
     my($self) = @_;
 
     $self->finish_io_option('input', -comment_handler => $self->create_delay_comments_sub);
-    my @output_options = (-cols => [qw(n)]);
+    my @output_options = (-cols => [qw(n:q)]);
     unshift (@output_options, -fscode => $self->{_fscode})
 	if (defined($self->{_fscode}));
     $self->finish_io_option('output', @output_options);
@@ -258,7 +258,7 @@ Internal: write trailer.
 
 =head1 AUTHOR and COPYRIGHT
 
-Copyright (C) 2007-2015 by John Heidemann <johnh@isi.edu>
+Copyright (C) 2007-2022 by John Heidemann <johnh@isi.edu>
 
 This program is distributed under terms of the GNU general
 public license, version 2.  See the file COPYING

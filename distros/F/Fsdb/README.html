@@ -173,32 +173,32 @@ ufs_mab_sys 2048 44.2</code></pre>
 
 <h1 id="WHATS-NEW">WHAT&#39;S NEW</h1>
 
-<h2 id="tbd-tbd">2.75, tbd tbd</h2>
+<h2 id="Complete-type-support-and-accordingly-bump-major-version">3.0, 2022-04-04 Complete type support and accordingly bump major version.</h2>
 
 <dl>
 
+<dt id="NEW">NEW</dt>
+<dd>
+
+<p>The major version number is now 3.0 to correspond to the addition of types (although they were actually added in 2.75). Old fsdb files are supported (Fsdb-3.0 is backwards compatible with databases), but older versions will confuse types in new files (new Fsdb files are not forward compatible with old versions).</p>
+
+</dd>
 <dt id="ENHANCEMENT">ENHANCEMENT</dt>
 <dd>
 
-<p>Even more IPv6: the functions in <a>Fsdb::Support::IPv6</a> package now support strings of hex digits as an alternate encoding for IP address (and they are already the output of ipv6_fullhex), and <code>ip_fullhex_to_normal</code> converts full hex-encoded IPv4 or IPv6 addresses to their &quot;normal&quot; form (dotted-quad or IPv6 printable format).</p>
+<p>Type specifications in a few more programs: <a>dbcolhisto</a>, <a>dbcolscorrelate</a>, <a>dbcolsregression</a>, <a>dbcolstatscores</a>, <a>dbrowaccumulate</a>, <a>dbrowcount</a>, <a>dbrowdiff</a>, <a>dbrvstatdiff</a>.</p>
 
 </dd>
 <dt id="ENHANCEMENT1">ENHANCEMENT</dt>
 <dd>
 
-<p>Add optional type specifications to the schema. Types are not used in Perl, but are relevant in Python and Go Fsdb bindings. Types use a subset of perl pack specifiers: c, s, l, q are signed 8, 16, 32, and 64-bit integers, f is a float, d is double float, a is utf-8 string, and &amp;gt; and &amp;lt; can force big or little endianness. The default type for everything is &quot;a&quot;, that is, utf-8 strings.</p>
+<p><a>dbcolhisto</a> now puts an empty value on any empty rows.</p>
 
 </dd>
-<dt id="ENHANCEMENT2">ENHANCEMENT</dt>
+<dt id="NEW1">NEW</dt>
 <dd>
 
-<p><a>dbcol</a>, <a>dbcolcreate</a>, <a>dbcolcopylast</a>, and <a>dbcolrename</a> now understand and propagate schema types. <a>dbsort</a>, <a>dbjoin</a>, <a>dbmerge</a>, <a>dbmerge2</a> and <a>dbfilepivot</a> all take a new option <code>-t</code> to sort by type-inferred comparision, if a type is given.</p>
-
-</dd>
-<dt id="ENHANCEMENT3">ENHANCEMENT</dt>
-<dd>
-
-<p><a>dbcolstat</a>, <a>dbmultistats</a>, and <a>dbcolmovingstats</a> now include type information in their output schema. (They assumes input variables are floats, not integers.)</p>
+<p><a>dbcoltype</a> redefines column types, or clears them with the <code>-v</code> option.</p>
 
 </dd>
 </dl>
@@ -1077,7 +1077,7 @@ done &gt;output.fsdb</code></pre>
 
 <h1 id="HISTORY">HISTORY</h1>
 
-<p>There have been three versions of Fsdb; fsdb 1.0 is a complete re-write of the pre-1995 versions, and was distributed from 1995 to 2007. Fsdb 2.0 is a significant re-write of the 1.x versions for reasons described below.</p>
+<p>There have been four major versions of Fsdb: fsdb-0.x was begun in 1991 for my personal use. Fsdb 1.0 is a complete re-write of the pre-1995 versions, and was distributed from 1995 to 2007. Fsdb 2.0 is a significant re-write of the 1.x versions to systematically use a library and threads (although threads were abandoned in 2.44). Fsdb 3.0 in 2022 adds type specifiers to the schema, mostly to support use in languages with stronger typing (like Python, Go, and C).</p>
 
 <p>Fsdb (in its various forms) has been used extensively by its author since 1991. Since 1995 it&#39;s been used by two other researchers at UCLA and several at ISI. In February 1998 it was announced to the Internet. Since then it has found a few users, some outside where I work.</p>
 
@@ -1098,6 +1098,10 @@ done &gt;output.fsdb</code></pre>
 
 </dd>
 <dt id="abandoning-threads-for-improved-performance">2.44 2013-10-02: abandoning threads for improved performance</dt>
+<dd>
+
+</dd>
+<dt id="adding-type-specifiers-to-the-schema">3.0 2022-04-04: adding type specifiers to the schema</dt>
 <dd>
 
 </dd>
@@ -1141,7 +1145,7 @@ done &gt;output.fsdb</code></pre>
 
 <p>Fsdb includes code ported from Geoff Kuenning (<code>Fsdb::Support::TDistribution</code>).</p>
 
-<p>Fsdb contributors: Ashvin Goel <i>goel@cse.oge.edu</i>, Geoff Kuenning <i>geoff@fmg.cs.ucla.edu</i>, Vikram Visweswariah <i>visweswa@isi.edu</i>, Kannan Varadahan <i>kannan@isi.edu</i>, Lars Eggert <i>larse@isi.edu</i>, Arkadi Gelfond <i>arkadig@dyna.com</i>, David Graff <i>graff@ldc.upenn.edu</i>, Haobo Yu <i>haoboy@packetdesign.com</i>, Pavlin Radoslavov <i>pavlin@catarina.usc.edu</i>, Graham Phillips, Yuri Pradkin, Alefiya Hussain, Ya Xu, Michael Schwendt, Fabio Silva <i>fabio@isi.edu</i>, Jerry Zhao <i>zhaoy@isi.edu</i>, Ning Xu <i>nxu@aludra.usc.edu</i>, Martin Lukac <i>mlukac@lecs.cs.ucla.edu</i>, Xue Cai, Michael McQuaid, Christopher Meng, Calvin Ardi, H. Merijn Brand, Lan Wei, Hang Guo.</p>
+<p>Fsdb contributors: Ashvin Goel <i>goel@cse.oge.edu</i>, Geoff Kuenning <i>geoff@fmg.cs.ucla.edu</i>, Vikram Visweswariah <i>visweswa@isi.edu</i>, Kannan Varadahan <i>kannan@isi.edu</i>, Lars Eggert <i>larse@isi.edu</i>, Arkadi Gelfond <i>arkadig@dyna.com</i>, David Graff <i>graff@ldc.upenn.edu</i>, Haobo Yu <i>haoboy@packetdesign.com</i>, Pavlin Radoslavov <i>pavlin@catarina.usc.edu</i>, Graham Phillips, Yuri Pradkin, Alefiya Hussain, Ya Xu, Michael Schwendt, Fabio Silva <i>fabio@isi.edu</i>, Jerry Zhao <i>zhaoy@isi.edu</i>, Ning Xu <i>nxu@aludra.usc.edu</i>, Martin Lukac <i>mlukac@lecs.cs.ucla.edu</i>, Xue Cai, Michael McQuaid, Christopher Meng, Calvin Ardi, H. Merijn Brand, Lan Wei, Hang Guo, Wes Hardaker.</p>
 
 <p>Fsdb includes datasets contributed from NIST (<i>DATA/nist_zarr13.fsdb</i>), from <a href="http://www.itl.nist.gov/div898/handbook/eda/section4/eda4281.htm">http://www.itl.nist.gov/div898/handbook/eda/section4/eda4281.htm</a>, the NIST/SEMATECH e-Handbook of Statistical Methods, section 1.4.2.8.1. Background and Data. The source is public domain, and reproduced with permission.</p>
 
@@ -1695,7 +1699,7 @@ dbpipeline(
 
 <dl>
 
-<dt id="ENHANCEMENT4">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT2">ENHANCEMENT</dt>
 <dd>
 
 <p>shifting more old programs to Perl modules. New in 2.2: <a>dbrowaccumulate</a>, <a>dbformmail</a>. <a>dbcolmovingstats</a>. <a>dbrowuniq</a>. <a>dbrowdiff</a>. <a>dbcolmerge</a>. <a>dbcolsplittocols</a>. <a>dbcolsplittorows</a>. <a>dbmapreduce</a>. <a>dbmultistats</a>. <a>dbrvstatdiff</a>. Also <a>dbrowenumerate</a> exists only as a front-end (command-line) program.</p>
@@ -1707,7 +1711,7 @@ dbpipeline(
 <p>The following programs have been dropped from fsdb-2.x: <a>dbcoltighten</a>, <a>dbfilesplit</a>, <a>dbstripextraheaders</a>, <a>dbstripleadingspace</a>.</p>
 
 </dd>
-<dt id="NEW">NEW</dt>
+<dt id="NEW2">NEW</dt>
 <dd>
 
 <p><a>combined_log_format_to_db</a> to convert Apache logfiles</p>
@@ -1789,13 +1793,13 @@ dbpipeline(
 
 <dl>
 
-<dt id="ENHANCEMENT5">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT3">ENHANCEMENT</dt>
 <dd>
 
 <p><a>dbrow</a> now defaults to running user supplied code without warnings (as with fsdb-1.x). Use <code>--warnings</code> or <code>-w</code> to turn them back on.</p>
 
 </dd>
-<dt id="ENHANCEMENT6">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT4">ENHANCEMENT</dt>
 <dd>
 
 <p><a>dbroweval</a> can now write different format output than the input, using the <code>-m</code> option.</p>
@@ -1825,7 +1829,7 @@ dbpipeline(
 
 <dl>
 
-<dt id="ENHANCEMENT7">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT5">ENHANCEMENT</dt>
 <dd>
 
 <p><a>dbmapreduce</a> can now tolerate non-map-aware reducers that pass back the key column in put. It also passes the current key as the last argument to external reducers.</p>
@@ -1845,7 +1849,7 @@ dbpipeline(
 
 <dl>
 
-<dt id="ENHANCEMENT8">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT6">ENHANCEMENT</dt>
 <dd>
 
 <p>shifting more old programs to Perl modules. New in 2.2: <a>dbcolpercentile</a>.</p>
@@ -1883,7 +1887,7 @@ dbpipeline(
 
 <dl>
 
-<dt id="ENHANCEMENT9">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT7">ENHANCEMENT</dt>
 <dd>
 
 <p>shifting more old programs to Perl modules. New in 2.7: <a>dbcolscorellate</a>. <a>dbcolsregression</a>. <a>cgi_to_db</a>. <a>dbfilevalidate</a>. <a>db_to_csv</a>. <a>csv_to_db</a>, <a>db_to_html_table</a>, <a>kitrace_to_db</a>, <a>tcpdump_to_db</a>, <a>tabdelim_to_db</a>, <a>ns_to_db</a>.</p>
@@ -1895,13 +1899,13 @@ dbpipeline(
 <p>The following programs have been dropped from fsdb-2.x: <a>db2dcliff</a>, <a>dbcolmultiscale</a>, <a>crl_to_db</a>. <a>ipchain_logs_to_db</a>. They may come back, but seemed overly specialized. The following program <a>dbrowsplituniq</a> was dropped because it is superseded by <a>dbmapreduce</a>. <a>dmalloc_to_db</a> was dropped pending a test cases and examples.</p>
 
 </dd>
-<dt id="ENHANCEMENT10">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT8">ENHANCEMENT</dt>
 <dd>
 
 <p><a>dbfilevalidate</a> now has a <code>-c</code> option to correct errors.</p>
 
 </dd>
-<dt id="NEW1">NEW</dt>
+<dt id="NEW3">NEW</dt>
 <dd>
 
 <p><a>html_table_to_db</a> provides the inverse of <a>db_to_html_table</a>.</p>
@@ -1941,7 +1945,7 @@ dbpipeline(
 
 <dl>
 
-<dt id="ENHANCEMENT11">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT9">ENHANCEMENT</dt>
 <dd>
 
 <p><a>dbmapreduce</a> now generates plausible output when given no rows of input.</p>
@@ -1955,13 +1959,13 @@ dbpipeline(
 
 <dl>
 
-<dt id="ENHANCEMENT12">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT10">ENHANCEMENT</dt>
 <dd>
 
 <p><a>dbmapreduce</a> now generates plausible output when given no rows of input.</p>
 
 </dd>
-<dt id="ENHANCEMENT13">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT11">ENHANCEMENT</dt>
 <dd>
 
 <p><a>dbroweval</a> the warnings option was backwards; now corrected. As a result, warnings in user code now default off (like in fsdb-1.x).</p>
@@ -1987,13 +1991,13 @@ dbpipeline(
 
 <dl>
 
-<dt id="ENHANCEMENT14">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT12">ENHANCEMENT</dt>
 <dd>
 
 <p><a>html_table_to_db</a> is now more aggressive about filling in empty cells with the official empty value, rather than leaving them blank or as whitespace.</p>
 
 </dd>
-<dt id="ENHANCEMENT15">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT13">ENHANCEMENT</dt>
 <dd>
 
 <p><a>dbpipeline</a> now catches failures during pipeline element setup and exits reasonably gracefully.</p>
@@ -2055,7 +2059,7 @@ dbpipeline(
 <p>Improved documentation for <a>dbmapreduce</a>&#39;s <code>-f</code> option.</p>
 
 </dd>
-<dt id="ENHANCEMENT16">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT14">ENHANCEMENT</dt>
 <dd>
 
 <p><a>dbcolmovingstats</a> how computes a moving standard deviation in addition to a moving mean.</p>
@@ -2341,13 +2345,13 @@ dbpipeline(
 <p><i>kitrace_to_db</i> now supports a <i>--utc</i> option, which also fixes this test case for users outside of the Pacific time zone. Bug reported by David Graff, and also by Peter Desnoyers (within a week of each other :-)</p>
 
 </dd>
-<dt id="NEW2">NEW</dt>
+<dt id="NEW4">NEW</dt>
 <dd>
 
 <p><i>xml_to_db</i> can convert simple, very regular XML files into Fsdb.</p>
 
 </dd>
-<dt id="NEW3">NEW</dt>
+<dt id="NEW5">NEW</dt>
 <dd>
 
 <p><i>dbfilepivot</i> &quot;pivots&quot; a file, converting multiple rows corresponding to the same entity into a single row with multiple columns.</p>
@@ -2497,7 +2501,7 @@ dbpipeline(
 
 <dl>
 
-<dt id="NEW4">NEW</dt>
+<dt id="NEW6">NEW</dt>
 <dd>
 
 <p>New <a>dbfilediff</a> does fsdb-aware file differencing. It does not do smart intuition of add/removes like Unix diff(1), but it does know about columns, and with <code>-E</code>, it does numeric-aware differences.</p>
@@ -2655,13 +2659,13 @@ dbpipeline(
 <p>Actually in 2.38, the Fedora <i>.spec</i> got cleaner dependencies. Suggestion from Christopher Meng via <a href="https://bugzilla.redhat.com/show_bug.cgi?id=877096">https://bugzilla.redhat.com/show_bug.cgi?id=877096</a>.</p>
 
 </dd>
-<dt id="ENHANCEMENT17">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT15">ENHANCEMENT</dt>
 <dd>
 
 <p>Fsdb files are now explicitly set into UTF-8 encoding, unless one specifies <code>-encoding</code> to <code>Fsdb::IO</code>.</p>
 
 </dd>
-<dt id="ENHANCEMENT18">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT16">ENHANCEMENT</dt>
 <dd>
 
 <p><a>dbrowuniq</a> now supports <code>-I</code> for incremental counting.</p>
@@ -2697,7 +2701,7 @@ dbpipeline(
 
 <dl>
 
-<dt id="ENHANCEMENT19">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT17">ENHANCEMENT</dt>
 <dd>
 
 <p>Documentation to <a>dbrvstatdiff</a> improved (inspired by questions from Qian Kun).</p>
@@ -2715,13 +2719,13 @@ dbpipeline(
 <p>Add missing <code>XML::Simple</code> dependency to <i>Makefile.PL</i>.</p>
 
 </dd>
-<dt id="ENHANCEMENT20">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT18">ENHANCEMENT</dt>
 <dd>
 
 <p>Tests now show the diff of the failing output if run with <code>make test TEST_VERBOSE=1</code>.</p>
 
 </dd>
-<dt id="ENHANCEMENT21">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT19">ENHANCEMENT</dt>
 <dd>
 
 <p><a>dbroweval</a> now includes documentation for how to output extra rows. Suggestion from Yuri Pradkin.</p>
@@ -2739,7 +2743,7 @@ dbpipeline(
 
 <dl>
 
-<dt id="ENHANCEMENT22">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT20">ENHANCEMENT</dt>
 <dd>
 
 <p>Documentation to <a>dbjoin</a> improved to better memory usage. (Based on problem report by Lin Quan.)</p>
@@ -2781,7 +2785,7 @@ dbpipeline(
 <p>Yet more parallelism in <a>dbmerge</a>: new &quot;endgame-mode&quot; builds a merge tree of processes at the end of large merge tasks to get maximally parallelism. Currently this feature is off by default because it can hang for some inputs. Enable this experimental feature with <code>--endgame</code>.</p>
 
 </dd>
-<dt id="ENHANCEMENT23">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT21">ENHANCEMENT</dt>
 <dd>
 
 <p><code>Fsdb::IO</code> now handles being given <code>IO::Pipe</code> objects (as exercised by <a>dbmerge</a>).</p>
@@ -2799,7 +2803,7 @@ dbpipeline(
 <p>Fsdb now requires perl 5.10. This is a bug fix because some test cases used to require it, but this fact was not properly documented. (Back-porting to 5.008 would require removing all <code>//</code> operators.)</p>
 
 </dd>
-<dt id="ENHANCEMENT24">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT22">ENHANCEMENT</dt>
 <dd>
 
 <p>Fsdb now handles automatic compression of file contents. Enable compression with <code>dbfilealter -Z xz</code> (or <code>gz</code> or <code>bz2</code>). All programs should operate on compressed files and leave the output with the same level of compression. <code>xz</code> is recommended as fastest and most efficient. <code>gz</code> is produces unrepeatable output (and so has no output test), it seems to insist on adding a timestamp.</p>
@@ -2811,19 +2815,19 @@ dbpipeline(
 
 <dl>
 
-<dt id="ENHANCEMENT25">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT23">ENHANCEMENT</dt>
 <dd>
 
 <p>Fsdb is now thread free and only uses processes for parallelism. This change is a big change--the entire motivation for Fsdb-2 was to exploit parallelism via threading. Parallelism--good, but perl threading--bad for performance. Horribly bad for performance. About 20x worse than pipes on my box. (See perl bug #119445 for the discussion.)</p>
 
 </dd>
-<dt id="NEW5">NEW</dt>
+<dt id="NEW7">NEW</dt>
 <dd>
 
 <p><code>Fsdb::Support::Freds</code> provides a thread-like abstraction over forking, with some nice support for callbacks in the parent upon child termination.</p>
 
 </dd>
-<dt id="ENHANCEMENT26">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT24">ENHANCEMENT</dt>
 <dd>
 
 <p>Details about removing threads: <code>dbpipeline</code> is thread free, and new tests to verify each of its parts. The easy cases are <code>dbcolpercentile</code>, <code>dbcolstats</code>, <code>dbfilepivot</code>, <code>dbjoin</code>, and <code>dbcolstatscores</code>, each of which use it in simple ways (2013-09-09). <code>dbmerge</code> is now thread free (2013-09-13), but was a significant rewrite, which brought <code>dbsort</code> along. <code>dbmapreduce</code> is partly thread free (2013-09-21), again as a rewrite, and it brings <code>dbmultistats</code> along. Full <code>dbmapreduce</code> support took much longer (2013-10-02).</p>
@@ -2835,19 +2839,19 @@ dbpipeline(
 <p>When running with user-only output (<code>-n</code>), <a>dbroweval</a> now resets the output vector <code>$ofref</code> after it has been output.</p>
 
 </dd>
-<dt id="NEW6">NEW</dt>
+<dt id="NEW8">NEW</dt>
 <dd>
 
 <p><a>dbcolcreate</a> will create all columns at the head of each row with the <code>--first</code> option.</p>
 
 </dd>
-<dt id="NEW7">NEW</dt>
+<dt id="NEW9">NEW</dt>
 <dd>
 
 <p><a>dbfilecat</a> will concatenate two files, verifying that they have the same schema.</p>
 
 </dd>
-<dt id="ENHANCEMENT27">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT25">ENHANCEMENT</dt>
 <dd>
 
 <p><a>dbmapreduce</a> now passes comments through, rather than eating them as before.</p>
@@ -2879,7 +2883,7 @@ dbpipeline(
 <p>Corrected a fast busy-wait in <a>dbmerge</a>.</p>
 
 </dd>
-<dt id="ENHANCEMENT28">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT26">ENHANCEMENT</dt>
 <dd>
 
 <p>Endgame mode enabled in <a>dbmerge</a>; it (and also large cases of <a>dbsort</a>) should now exploit greater parallelism.</p>
@@ -2929,7 +2933,7 @@ dbpipeline(
 <p>Better handling of Fred cleanup; should fix intermittent <a>dbmapreduce</a> failures on BSD.</p>
 
 </dd>
-<dt id="ENHANCEMENT29">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT27">ENHANCEMENT</dt>
 <dd>
 
 <p>Improved test framework to show output when tests fail. (This time, for real.)</p>
@@ -2941,19 +2945,19 @@ dbpipeline(
 
 <dl>
 
-<dt id="ENHANCEMENT30">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT28">ENHANCEMENT</dt>
 <dd>
 
 <p>Test suites now skip tests for libraries that are missing. (Patch for missing <code>IO::Compresss:Xz</code> contributed by Calvin Ardi.)</p>
 
 </dd>
-<dt id="ENHANCEMENT31">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT29">ENHANCEMENT</dt>
 <dd>
 
 <p>Removed references to Jdb in the package specification. Since the name was changed in 2008, there&#39;s no longer a huge need for backwards compatibility. (Suggestion form Petr &Scaron;abata.)</p>
 
 </dd>
-<dt id="ENHANCEMENT32">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT30">ENHANCEMENT</dt>
 <dd>
 
 <p>Test suites now invoke the perl using the path from <code>$Config{perlpath}</code>. Hopefully this helps testing in environments where there are multiple installed perls and the default perl is not the same as the perl-under-test (as happens in cpantesters.org).</p>
@@ -2997,7 +3001,7 @@ dbpipeline(
 
 <dl>
 
-<dt id="ENHANCEMENT33">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT31">ENHANCEMENT</dt>
 <dd>
 
 <p>In <a>dbroweval</a>, the <code>-N</code> (no output, even comments) option now implies <code>-n</code>, and it now suppresses the header and trailer.</p>
@@ -3021,19 +3025,19 @@ dbpipeline(
 
 <dl>
 
-<dt id="ENHANCEMENT34">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT32">ENHANCEMENT</dt>
 <dd>
 
 <p><a>dbcolcreate</a> now has a <code>--no-recreate-fatal</code> that causes it to ignore creation of existing columns (instead of failing).</p>
 
 </dd>
-<dt id="ENHANCEMENT35">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT33">ENHANCEMENT</dt>
 <dd>
 
 <p><a>dbmapreduce</a> once again is robust to reducers that output the key; <code>--no-prepend-key</code> is no longer mandatory.</p>
 
 </dd>
-<dt id="ENHANCEMENT36">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT34">ENHANCEMENT</dt>
 <dd>
 
 <p><a>dbcolsplittorows</a> can now enumerate the output rows with <code>-E</code>.</p>
@@ -3045,7 +3049,7 @@ dbpipeline(
 <p><a>dbcolmovingstats</a> is more mathematically robust. Previously for some inputs and some platforms, floating point rounding could sometimes cause squareroots of negative numbers.</p>
 
 </dd>
-<dt id="NEW8">NEW</dt>
+<dt id="NEW10">NEW</dt>
 <dd>
 
 <p><a>sqlselect_to_db</a> converts the output of the MySQL or MarinaDB select comment into fsdb format.</p>
@@ -3063,7 +3067,7 @@ dbpipeline(
 
 <dl>
 
-<dt id="ENHANCEMENT37">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT35">ENHANCEMENT</dt>
 <dd>
 
 <p>Test suites changes to be robust to exact line numbers of failures, since different Perl releases fail on different lines. <a href="https://bugzilla.redhat.com/show_bug.cgi?id=1158380">https://bugzilla.redhat.com/show_bug.cgi?id=1158380</a></p>
@@ -3075,13 +3079,13 @@ dbpipeline(
 
 <dl>
 
-<dt id="ENHANCEMENT38">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT36">ENHANCEMENT</dt>
 <dd>
 
 <p>The <a>dbfilediff</a> how supports a <code>--quiet</code> option.</p>
 
 </dd>
-<dt id="ENHANCEMENT39">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT37">ENHANCEMENT</dt>
 <dd>
 
 <p>Better documention of <a>dbpipeline_filter</a>.</p>
@@ -3123,13 +3127,13 @@ dbpipeline(
 
 <dl>
 
-<dt id="ENHANCEMENT40">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT38">ENHANCEMENT</dt>
 <dd>
 
 <p><a>dbfilediff</a> now can be extra quiet, as I continue to try to track down a numeric difference on FreeBSD AMD boxes.</p>
 
 </dd>
-<dt id="ENHANCEMENT41">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT39">ENHANCEMENT</dt>
 <dd>
 
 <p><a>dbcolmovingstats</a> gave different test output (just reflecting rounding error) when stddev approaches zero. We now detect hand handle this case. See &lt;https://rt.cpan.org/Public/Bug/Display.html?id=101220&gt; and thanks to H. Merijn Brand for the bug report.</p>
@@ -3209,13 +3213,13 @@ dbpipeline(
 <p>More IO is explicitly marked UTF-8 to avoid Perl&#39;s tendency to mojibake on otherwise valid unicode input. This change helps <a>html_table_to_db</a>.</p>
 
 </dd>
-<dt id="ENHANCEMENT42">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT40">ENHANCEMENT</dt>
 <dd>
 
 <p><a>dbcolscorrelate</a> now crossreferences <a>dbcolsregression</a>.</p>
 
 </dd>
-<dt id="ENHANCEMENT43">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT41">ENHANCEMENT</dt>
 <dd>
 
 <p>Documentation for <a>dbrowdiff</a> now clarifies that the default is baseline mode.</p>
@@ -3233,7 +3237,7 @@ dbpipeline(
 
 <dl>
 
-<dt id="ENHANCEMENT44">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT42">ENHANCEMENT</dt>
 <dd>
 
 <p><a>dbjoin</a> now supports hash joins with <code>-t lefthash</code> and <code>-t righthash</code>. Hash joins cache a table in memory, but do not require that the other table be sorted. They are ideal when joining a large table against a small one.</p>
@@ -3245,13 +3249,13 @@ dbpipeline(
 
 <dl>
 
-<dt id="ENHANCEMENT45">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT43">ENHANCEMENT</dt>
 <dd>
 
 <p><a>dbjoin</a> now handles left and right outer joins with <code>-t left</code> and <code>-t right</code>.</p>
 
 </dd>
-<dt id="ENHANCEMENT46">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT44">ENHANCEMENT</dt>
 <dd>
 
 <p><a>dbjoin</a> hash joins are now selected with <code>-m lefthash</code> and <code>-m righthash</code> (not the shortlived <code>-t righthash</code> option). (Technically this change is incompatible with Fsdd-2.60, but no one but me ever used that version.)</p>
@@ -3263,13 +3267,13 @@ dbpipeline(
 
 <dl>
 
-<dt id="ENHANCEMENT47">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT45">ENHANCEMENT</dt>
 <dd>
 
 <p>Documentation for <a>xml_to_db</a> now includes sample output.</p>
 
 </dd>
-<dt id="NEW9">NEW</dt>
+<dt id="NEW11">NEW</dt>
 <dd>
 
 <p><a>yaml_to_db</a> converts a specific form of YAML to fsdb.</p>
@@ -3281,25 +3285,25 @@ dbpipeline(
 <p>The test suite now uses <code>diff -c -b</code> rather than <code>diff -cb</code> to make OpenBSD-5.9 happier, I hope.</p>
 
 </dd>
-<dt id="ENHANCEMENT48">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT46">ENHANCEMENT</dt>
 <dd>
 
 <p>Comments that log operations at the end of each file now do simple quoting of spaces. (It is not guaranteed to be fully shell-compliant.)</p>
 
 </dd>
-<dt id="ENHANCEMENT49">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT47">ENHANCEMENT</dt>
 <dd>
 
 <p>There is a new standard option, <code>--header</code>, allowing one to specify an Fsdb header for inputs that lack it. Currently it is supported by <a>dbcoldefine</a>, <a>dbrowuniq</a>, <a>dbmapreduce</a>, <a>dbmultistats</a>, <a>dbsort</a>, <a>dbpipeline</a>.</p>
 
 </dd>
-<dt id="ENHANCEMENT50">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT48">ENHANCEMENT</dt>
 <dd>
 
 <p><a>dbfilepivot</a> now allows the <b>--possible-pivots</b> option, and if it is provided processes the data in one pass.</p>
 
 </dd>
-<dt id="ENHANCEMENT51">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT49">ENHANCEMENT</dt>
 <dd>
 
 <p><a>dbroweval</a> logs are now quoted.</p>
@@ -3311,13 +3315,13 @@ dbpipeline(
 
 <dl>
 
-<dt id="ENHANCEMENT52">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT50">ENHANCEMENT</dt>
 <dd>
 
 <p>The option <b>-j</b> is now a synonym for <b>--parallelism</b>. (And several documention bugs about this option are fixed.)</p>
 
 </dd>
-<dt id="ENHANCEMENT53">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT51">ENHANCEMENT</dt>
 <dd>
 
 <p>Additional support for <code>--header</code> in <a>dbcolmerge</a>, <a>dbcol</a>, <a>dbrow</a>, and <a>dbroweval</a>.</p>
@@ -3347,13 +3351,13 @@ dbpipeline(
 <p>In <a>dbroweval</a>, the <code>next row</code> option previously did not correctly set up <code>_last_fieldname</code>. It now does.</p>
 
 </dd>
-<dt id="ENHANCEMENT54">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT52">ENHANCEMENT</dt>
 <dd>
 
 <p>The <a>csv_to_db</a> converter now has an optional <code>-F x</code> option to set the field separator.</p>
 
 </dd>
-<dt id="ENHANCEMENT55">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT53">ENHANCEMENT</dt>
 <dd>
 
 <p>Finally <a>dbcolsplittocols</a> has a <code>--header</code> option, and a new <code>-N</code> option to give the list of resulting output columns.</p>
@@ -3371,7 +3375,7 @@ dbpipeline(
 
 <dl>
 
-<dt id="ENHANCEMENT56">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT54">ENHANCEMENT</dt>
 <dd>
 
 <p><a>dbmultistats</a> and <a>dbmapreduce</a> now both take a <code>-F x</code> option to set the field separator.</p>
@@ -3485,7 +3489,7 @@ dbpipeline(
 <p>Filled in the the test case for autodecompress, which was missing for the 2.68 release.</p>
 
 </dd>
-<dt id="ENHANCEMENT57">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT55">ENHANCEMENT</dt>
 <dd>
 
 <p>The groff program is required for build, and the <code>Makefile.PL</code> fails if groff is missing at build time. Thanks to Chris Williams for suggesting this check, and the CPAN auto-building system for trying many platforms.</p>
@@ -3503,13 +3507,13 @@ dbpipeline(
 
 <dl>
 
-<dt id="ENHANCEMENT58">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT56">ENHANCEMENT</dt>
 <dd>
 
 <p><a>dbcol</a> can now take an option <code>-a</code> to include all columns, allowing reordering of certain columns while passing the rest through.</p>
 
 </dd>
-<dt id="ENHANCEMENT59">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT57">ENHANCEMENT</dt>
 <dd>
 
 <p><a>dbrowuniq</a> and <a>dbmerge</a> now buffer comments in a way that the last row of data output is no longer in the last block of comments. (The data is identical, but for humans looking at output, this change makes it less likely to lose the last row.)</p>
@@ -3521,7 +3525,7 @@ dbpipeline(
 <p><a>dbmultistats</a> and <a>dbpipeline</a> documentation now indicates that they support <code>--header</code> (something they did since version 2.62 in 2016-11-29, but now documented.</p>
 
 </dd>
-<dt id="ENHANCEMENT60">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT58">ENHANCEMENT</dt>
 <dd>
 
 <p><a>dbcolcreate</a> now supports <code>--header</code>.</p>
@@ -3563,7 +3567,7 @@ dbpipeline(
 <p><a>dbcolhisto</a> now handles the degenerate case where everything has the same value (previously it would throw &quot;illegal division by zero&quot;).</p>
 
 </dd>
-<dt id="ENHANCEMENT61">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT59">ENHANCEMENT</dt>
 <dd>
 
 <p>The spec for Fedora now includes <code>make</code> as BuildRequires, something required for Fedora 34.</p>
@@ -3575,13 +3579,13 @@ dbpipeline(
 
 <dl>
 
-<dt id="ENHANCEMENT62">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT60">ENHANCEMENT</dt>
 <dd>
 
 <p><a>dbcolpercentile</a> now has a <code>--weighted</code> option.</p>
 
 </dd>
-<dt id="ENHANCEMENT63">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT61">ENHANCEMENT</dt>
 <dd>
 
 <p>The new <a>Fsdb::Support::IPv6</a> package includes ipv6_normalize, ipv6_zeroize to rewrite ipv6 print addresses in IPv6 normal form, with a 0 in each 4-nybble field.</p>
@@ -3593,10 +3597,40 @@ dbpipeline(
 
 <dl>
 
-<dt id="ENHANCEMENT64">ENHANCEMENT</dt>
+<dt id="ENHANCEMENT62">ENHANCEMENT</dt>
 <dd>
 
 <p><a>Fsdb::Support::IPv6</a> package includes ipv6_fullhex to rewrite ipv6 print addresses as full, 128-bit hex values.</p>
+
+</dd>
+</dl>
+
+<h2 id="New-type-specifications-in-the-schema-to-better-support-type-conversions-in-python">2.75, 2022-04-02 New type specifications in the schema to better support type conversions in python.</h2>
+
+<dl>
+
+<dt id="ENHANCEMENT63">ENHANCEMENT</dt>
+<dd>
+
+<p>Add optional type specifications to the schema. Types are not used in Perl, but are relevant in Python and Go Fsdb bindings. Types use a subset of perl pack specifiers: c, s, l, q are signed 8, 16, 32, and 64-bit integers, f is a float, d is double float, a is utf-8 string, and &amp;gt; and &amp;lt; can force big or little endianness. The default type for everything is &quot;a&quot;, that is, utf-8 strings. Thanks to Wes Hardaker for pushing to get this long-desired feature out the door; his Python bindings need types.</p>
+
+</dd>
+<dt id="ENHANCEMENT64">ENHANCEMENT</dt>
+<dd>
+
+<p><a>dbcol</a>, <a>dbcolcreate</a>, <a>dbcolcopylast</a>, and <a>dbcolrename</a> now understand and propagate schema types. <a>dbsort</a>, <a>dbjoin</a>, <a>dbmerge</a>, <a>dbmerge2</a> and <a>dbfilepivot</a> all take a new option <code>-t</code> to sort by type-inferred comparision, if a type is given.</p>
+
+</dd>
+<dt id="ENHANCEMENT65">ENHANCEMENT</dt>
+<dd>
+
+<p><a>dbcolstat</a>, <a>dbmultistats</a>, and <a>dbcolmovingstats</a> now include type information in their output schema. (They assumes input variables are floats, not integers.)</p>
+
+</dd>
+<dt id="ENHANCEMENT66">ENHANCEMENT</dt>
+<dd>
+
+<p>Even more IPv6: the functions in <a>Fsdb::Support::IPv6</a> package now support strings of hex digits as an alternate encoding for IP address (and they are already the output of ipv6_fullhex), and <code>ip_fullhex_to_normal</code> converts full hex-encoded IPv4 or IPv6 addresses to their &quot;normal&quot; form (dotted-quad or IPv6 printable format).</p>
 
 </dd>
 </dl>

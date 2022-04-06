@@ -3,6 +3,8 @@
 BEGIN { unshift @INC, 'lib', '../lib'}
 use Chart::Split;
 use strict;
+use File::Temp 0.19;
+my $samples = File::Temp->newdir();
 print "1..1\n";
 
 my ( $x, $y, @x, @y, %hash );
@@ -32,7 +34,7 @@ $g->add_dataset(@y);
 );
 $g->set(%hash);
 
-$g->png("samples/split_1.png");
+$g->png("$samples/split_1.png");
 print "ok 1\n";
 
 exit(0);

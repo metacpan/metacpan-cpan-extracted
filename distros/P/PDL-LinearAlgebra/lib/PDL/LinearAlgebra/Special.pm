@@ -96,26 +96,9 @@ sub mtri{
 }
 
 sub PDL::mtri {
+	&PDL::LinearAlgebra::_2d_array;
 	my ($m, $upper) = @_;
-	my(@dims) = $m->dims;
-
-	barf("mtri requires a 2-D matrix")
-		unless( @dims >= 2);
-
-	my $b = PDL::zeroes $m;
-	$m->tricpy($upper, $b);
-	$b;
-}
-
-sub PDL::Complex::mtri {
-	my ($m, $upper) = @_;
-	my(@dims) = $m->dims;
-
-	barf("mtri requires a 2-D matrix")
-		unless( @dims >= 3);
-
-	my $b = PDL::zeroes $m;
-	$m->ctricpy($upper, $b);
+	$m->tricpy($upper, my $b = $m->_similar_null);
 	$b;
 }
 
@@ -155,15 +138,10 @@ Return antisymmetric and symmetric part of a real or complex square matrix.
 *mpart = \&PDL::mpart;
 
 sub PDL::mpart {
+	&PDL::LinearAlgebra::_square;
 	my ($m, $conj) = @_;
-	my @dims = $m->dims;
-
-	barf("mpart requires a 2-D square matrix")
-		unless( ((@dims == 2) || (@dims == 3)) && $dims[-1] == $dims[-2] );
-
 	# antisymmetric and symmetric part
         return (0.5* ($m - $m->t($conj))),(0.5* ($m + $m->t($conj)));
-
 }
 
 =head2 mhankel
@@ -198,12 +176,12 @@ If c is a scalar number, it's determinant can be computed by:
 *mhankel = \&PDL::mhankel;
 
 sub PDL::mhankel {
+	my $di = $_[0]->dims_internal;
 	my ($m, $n) = @_;
 	$m = xvals($m) + 1 unless ref($m);
 	my @dims = $m->dims;
-
 	$n = PDL::zeroes($m) unless defined $n;
-	my $index = xvals($dims[-1]);
+	my $index = xvals($dims[$di]);
 	$index = $index->dummy(0) + $index;
 	if (@dims == 2){
 		$m = mstack($m,$n(,1:));
@@ -234,39 +212,24 @@ For complex need object of type PDL::Complex.
 
 *mtoeplitz = \&PDL::mtoeplitz;
 sub PDL::mtoeplitz {
+	my $di = $_[0]->dims_internal;
+	my $slice_prefix = ',' x $di;
 	my ($m, $n) = @_;
-	my($res, $min);
-	
 	$n = $m->copy unless defined $n;
 	my $mdim= $m->dim(-1);
 	my $ndim= $n->dim(-1);
-	$res = PDL::new_from_specification('PDL',$m->type,$ndim,$mdim);
-
+	my $res = $m->_similar($ndim,$mdim);
 	$ndim--;
-	$min = $mdim <= $ndim ? $mdim : $ndim;
-	if(UNIVERSAL::isa($m,'PDL::Complex')){
-		$res= $res->r2C;
-		for(1..$min){
-			$res(,$_:,($_-1)) .= $n(,1:$ndim-$_+1);
-		}
-		$mdim--;
-		$min = $mdim < $ndim ? $mdim : $ndim;
-		for(0..$min){
-			$res(,($_),$_:) .= $m(,:$mdim-$_);
-		}	
+	my $min = $mdim <= $ndim ? $mdim : $ndim;
+	for(1..$min) {
+		$res->slice("$slice_prefix$_:,@{[$_-1]}") .= $n->slice("${slice_prefix}1:,@{[$ndim-$_+1]}");
 	}
-	else{
-		for(1..$min){
-			$res($_:,($_-1)) .= $n(1:$ndim-$_+1);
-		}
-		$mdim--;
-		$min = $mdim < $ndim ? $mdim : $ndim;
-		for(0..$min){
-			$res(($_),$_:) .= $m(:$mdim-$_);
-		}
+	$mdim--;
+	$min = $mdim < $ndim ? $mdim : $ndim;
+	for(0..$min){
+		$res->slice("$slice_prefix$_,$_:") .= $m->slice("${slice_prefix}:@{[$mdim-$_]}");
 	}
 	return $res;
-
 }
 
 =head2 mpascal
@@ -276,7 +239,7 @@ Return Pascal matrix (from Pascal's triangle) of order N.
 =for usage
 
  mpascal(N,uplo).
- uplo: 
+ uplo:
  	0 => upper triangular (Cholesky factor),
  	1 => lower triangular (Cholesky factor),
  	2 => symmetric.
@@ -298,49 +261,45 @@ Their determinants are all equal to one and:
 *mpascal = \&PDL::mpascal;
 sub PDL::mpascal {
 	my ($m, $n) = @_;
-	my ($mat, $error, $warning);
-	
-	$mat = eval{
-		require PDL::Stat::Distributions;
+	my $mat;
+	$mat = eval {
+		require PDL::Stats::Distributions;
 		$mat = xvals($m);
 		if ($n > 1){
-			return (PDL::Stat::Distributions::choose($mat + $mat->dummy(0),$mat))[0];		
+			return (PDL::Stats::Distributions::choose($mat + $mat->dummy(0),$mat))[0];
 		}
 		else{
-			$mat = PDL::Stat::Distributions::choose($mat,$mat->dummy(0));
+			$mat = PDL::Stats::Distributions::choose($mat,$mat->dummy(0));
 			return $n ? $mat->xchg(0,1)->mtri(1) : $mat->mtri;
 		}
 	};
-	if ($@){
-		$mat = eval{
-			require PDL::GSLSF::GAMMA;
-			if ($n > 1){
-				$mat = xvals($m);
-				return (PDL::GSLSF::GAMMA::gsl_sf_choose($mat + $mat->dummy(0),$mat))[0];					
-			}else{
-				$mat = xvals($m, $m);
-				return (PDL::GSLSF::GAMMA::gsl_sf_choose($mat->tritosym,$mat->xchg(0,1)->tritosym))[0]->mtri($n);
-			}
-		};
-		if ($@){
-			warn("mpascal: can't compute binomial coefficients with neither".
-				" PDL::Stat::Distributions nor PDL::GSLSF::GAMMA\n");
-			return;
+	return $mat if !$@;
+	$mat = eval {
+		require PDL::GSLSF::GAMMA;
+		if ($n > 1){
+			$mat = xvals($m);
+			return (PDL::GSLSF::GAMMA::gsl_sf_choose($mat + $mat->dummy(0),$mat))[0];
+		}else{
+			$mat = xvals($m, $m);
+			return (PDL::GSLSF::GAMMA::gsl_sf_choose($mat->tritosym,$mat->xchg(0,1)->tritosym))[0]->mtri($n);
 		}
-	}
-	$mat;
+	};
+	return $mat if !$@;
+	warn("mpascal: can't compute binomial coefficients with neither".
+		" PDL::Stats::Distributions nor PDL::GSLSF::GAMMA\n");
+	return;
 }
 
 =head2 mcompanion
 
 Return a matrix with characteristic polynomial equal to p if p is monic.
-If p is not monic the characteristic polynomial of A is equal to p/c where c is the 
+If p is not monic the characteristic polynomial of A is equal to p/c where c is the
 coefficient of largest degree in p (here p is in descending order).
 
 =for usage
 
  mcompanion(PDL(p),SCALAR(charpol)).
- charpol: 
+ charpol:
  	0 => first row is -P(1:n-1)/P(0),
  	1 => last column is -P(1:n-1)/P(0),
 
@@ -348,28 +307,19 @@ coefficient of largest degree in p (here p is in descending order).
 
 *mcompanion = \&PDL::mcompanion;
 sub PDL::mcompanion{
+	my $di = $_[0]->dims_internal;
+	my $slice_prefix = ',' x $di;
 	my ($m, $char) = @_;
 	my( @dims, $dim, $ret);
 	$m = $m->{PDL} if (UNIVERSAL::isa($m, 'HASH') && exists $m->{PDL});
 	@dims = $m->dims;
 	$dim = $dims[-1] - 1;
-	if (@dims == 2){
-		if($char){
-			$ret = (-$m->slice(",1:$dim")->dummy(2)/$m->slice(",0"))->cmstack(identity($dim-1)->r2C->mstack(zeroes(2,$dim-1)->dummy(1)));
-		}
-		else{
-			#zeroes($dim-1)->dummy(0)->augment(identity($dim-1))->mstack(-$m->slice("$dim:1")->dummy(-1)/$m->slice("(0)"));
-			$ret = zeroes($dim-1)->r2C->dummy(2)->cmstack(identity($dim-1)->r2C)->mstack(-$m->slice(",$dim:1")->dummy(1)/$m->slice(",(0)"));
-		}	
+	my $id = identity($dim-1); $id = $id->r2C if $m->_is_complex;
+	if($char){
+		$ret = (-$m->slice("${slice_prefix}1:$dim")->dummy($di+1)/$m->slice("${slice_prefix}0"))->_call_method('mstack', $id->mstack(zeroes($m->dims_internal_values,$dim-1)->dummy($di)));
 	}
 	else{
-		if($char){
-			$ret = (-$m->slice("1:$dim")->dummy(-1)/$m->slice("0"))->mstack(identity($dim-1)->augment(zeroes($dim-1)->dummy(0)));
-		}
-		else{
-			#zeroes($dim-1)->dummy(0)->augment(identity($dim-1))->mstack(-$m->slice("$dim:1")->dummy(-1)/$m->slice("(0)"));
-			$ret = zeroes($dim-1)->dummy(-1)->mstack(identity($dim-1))->augment(-$m->slice("$dim:1")->dummy(0)/$m->slice("(0)"));
-		}
+		$ret = $m->_similar($dim-1)->dummy($di+1)->_call_method('mstack', $id)->mstack(-$m->slice("${slice_prefix}$dim:1")->dummy($di)/$m->slice("${slice_prefix}(0)"));
 	}
 	$ret->sever;
 }
@@ -388,4 +338,3 @@ file.
 # Exit with OK status
 
 1;
-

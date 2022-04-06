@@ -48,6 +48,7 @@ lib/Fsdb/Filter/dbcolsplittorows.pm
 lib/Fsdb/Filter/dbcolsregression.pm
 lib/Fsdb/Filter/dbcolstats.pm
 lib/Fsdb/Filter/dbcolstatscores.pm
+lib/Fsdb/Filter/dbcoltype.pm
 lib/Fsdb/Filter/dbfilealter.pm
 lib/Fsdb/Filter/dbfilecat.pm
 lib/Fsdb/Filter/dbfilediff.pm
@@ -208,6 +209,8 @@ TEST/dbcolhisto_ex_R.out
 TEST/dbcolhisto_ex_S.cmd
 TEST/dbcolhisto_ex_S.in
 TEST/dbcolhisto_ex_S.out
+TEST/dbcolhisto_graphical.cmd
+TEST/dbcolhisto_graphical.out
 TEST/dbcolhisto_same.cmd
 TEST/dbcolhisto_same.in
 TEST/dbcolhisto_same.out
@@ -427,6 +430,15 @@ TEST/dbcolstatscores_ex.out
 TEST/dbcolstatscores_ex_R.cmd
 TEST/dbcolstatscores_ex_R.in
 TEST/dbcolstatscores_ex_R.out
+TEST/dbcoltype_ex.cmd
+TEST/dbcoltype_ex.out
+TEST/dbcoltype_one.cmd
+TEST/dbcoltype_one.out
+TEST/dbcoltype_v.cmd
+TEST/dbcoltype_v.in
+TEST/dbcoltype_v.out
+TEST/dbcoltype_v_one.cmd
+TEST/dbcoltype_v_one.out
 TEST/dbfilealter_colize_cases.cmd
 TEST/dbfilealter_colize_cases.in
 TEST/dbfilealter_colize_cases.out
@@ -821,6 +833,8 @@ TEST/dbrow_negate.cmd
 TEST/dbrow_negate.out
 TEST/dbrowaccumulate_constant.cmd
 TEST/dbrowaccumulate_constant.out
+TEST/dbrowaccumulate_constant_float.cmd
+TEST/dbrowaccumulate_constant_float.out
 TEST/dbrowaccumulate_constant_initial.cmd
 TEST/dbrowaccumulate_constant_initial.out
 TEST/dbrowaccumulate_ex.cmd

@@ -3,6 +3,8 @@
 BEGIN { unshift @INC, 'lib', '../lib'}
 use Chart::Lines;
 use strict;
+use File::Temp 0.19;
+my $samples = File::Temp->newdir();
 my $g;
 
 print "1..1\n";
@@ -30,7 +32,7 @@ $g->set( 'y_label2'     => 'y label 2' );
 $g->set( 'y_grid_lines' => 'true' );
 $g->set( 'legend'       => 'top' );
 
-$g->png("samples/lines_4.png");
+$g->png("$samples/lines_4.png");
 
 print "ok 1\n";
 

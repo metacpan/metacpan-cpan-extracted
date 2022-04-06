@@ -3,6 +3,8 @@
 BEGIN { unshift @INC, 'lib', '../lib'}
 use Chart::LinesPoints;
 use strict;
+use File::Temp 0.19;
+my $samples = File::Temp->newdir();
 
 print "1..1\n";
 
@@ -45,7 +47,7 @@ $g->add_dataset(@data2);
 );
 
 $g->set(%hash);
-$g->png("samples/linespoints_2.png");
+$g->png("$samples/linespoints_2.png");
 print "ok 1\n";
 
 exit(0);

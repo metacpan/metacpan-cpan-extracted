@@ -77,6 +77,18 @@ the Perl API’s `call_method()` for more details.
 Like `exs_call_method_void()` but calls the method in scalar context.
 The result is returned.
 
+## SV “Typing”
+
+Perl scalars are supposed to be “untyped”, at least insofar as
+strings/numbers. When conversing with other languages, though, or
+serializing it’s usually helpful to break things down in greater
+detail.
+
+EasyXS defines an `exs_sv_type` macro that takes an SV as argument
+and returns a member of `enum exs_sv_type_e` (typedef’d as just
+`exs_sv_type_e`; see `easyxs_scalar.h` for values). The logic is compatible
+with the serialization logic formulated during Perl 5.36’s development cycle.
+
 ## SV/Number Conversion
 
 ### `UV* exs_SvUV(SV* sv)`

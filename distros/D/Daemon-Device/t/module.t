@@ -53,51 +53,48 @@ sub get_log_file {
     return \@log_file;
 }
 
-my $good = 0;
-for ( 1 .. 10 ) {
-    sleep 1;
-    my $log_file = &get_log_file;
-    if (
-        scalar( grep { $_ =~ /PARENT \d+ start/ } @$log_file ) and
-        scalar( grep { $_ =~ /CHILD \d+ start/ } @$log_file ) == 3
-    ) {
-        $good = 1;
-        last;
+sub time_test {
+    my ( $code, $limit, $label ) = @_;
+
+    my ( $count, $result );
+    while (1) {
+        $result = $code->();
+        $count++;
+        last if ( $result or $count >= $limit );
+        sleep 1;
     }
+
+    ok( $result, $label );
+    note("Previous test took $count wait iterations to complete");
 }
-ok( $good, 'Parent and 3 (and no more) children started in under 10 seconds' );
+
+time_test( sub {
+    my $log_file = &get_log_file;
+    return 1 if (
+        scalar( grep { $_ =~ /PARENT \d+ start/ } @$log_file ) and
+        scalar( grep { $_ =~ /CHILD \d+ start/  } @$log_file ) == 3
+    );
+}, 120, 'Parent and 3 (and no more) children started' );
 
 my @pids = map { /(\d+)/; $1 } grep { $_ =~ /CHILD \d+ start/ } @{&get_log_file};
 
 kill( 'TERM', shift @pids );
 kill( 'KILL', pop @pids );
 
-$good = 0;
-for ( 1 .. 10 ) {
-    sleep 1;
+time_test( sub {
     my $log_file = &get_log_file;
-    if ( scalar( grep { $_ =~ /on_replace_child/ } @$log_file ) == 2 ) {
-        $good = 1;
-        last;
-    }
-}
-ok( $good, '2 children were appropriately replaced in under 10 seconds' );
+    return 1 if ( scalar( grep { $_ =~ /on_replace_child/ } @$log_file ) == 2 );
+}, 120, '2 children were appropriately replaced' );
 
 $obj->{_daemon}->do_stop;
 
-$good = 0;
-for ( 1 .. 10 ) {
-    sleep 1;
+time_test( sub {
     my $log_file = &get_log_file;
-    if (
-        scalar( grep { $_ =~ /on_shutdown/ } @$log_file ) == 1 and
+    return 1 if (
+        scalar( grep { $_ =~ /on_shutdown/    } @$log_file ) == 1 and
         scalar( grep { $_ =~ /on_child_death/ } @$log_file ) == 4
-    ) {
-        $good = 1;
-        last;
-    }
-}
-ok( $good, 'Shutdown properly took place in under 10 seconds' );
+    );
+}, 120, 'Shutdown properly took place' );
 
 is(
     { map { s/\d+/D/; $_ => 1 } @{ &get_log_file } },

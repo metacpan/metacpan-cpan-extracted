@@ -27,7 +27,9 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker::CPANfile" : "0.09"
+            "ExtUtils::MakeMaker::CPANfile" : "0.09",
+            "File::Slurper" : "0",
+            "File::Which" : "0"
          }
       },
       "test" : {
@@ -48,6 +50,6 @@
          "web" : "https://github.com/FGasper/p5-JavaScript-QuickJS"
       }
    },
-   "version" : "0.02",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

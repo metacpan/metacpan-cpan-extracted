@@ -12,10 +12,12 @@
 # restriction, but the library as a whole (or any portion containing those 
 # extracts) may only be distributred under the said software licenses.
 
+##FIXME: Blessed structures are not formatted because we treat bless(...) as an atom
+
 use strict; use warnings FATAL => 'all'; use utf8; use 5.020;
 use feature qw(state);
 package  Data::Dumper::Interp;
-$Data::Dumper::Interp::VERSION = '2.24';
+$Data::Dumper::Interp::VERSION = '2.27';
 
 package  # newline prevents Dist::Zilla::Plugin::PkgVersion from adding $VERSION
   DB;
@@ -60,7 +62,6 @@ sub _dbstrposn($$) {
   $_ = _dbstr($_);
   $_ .= "\n " . (" " x $posn) . "^";
 }
-
 sub oops(@) { @_ = ("\n".__PACKAGE__." oops:",@_,"\n  "); goto &Carp::confess }
 
 use Exporter 'import';
@@ -183,8 +184,14 @@ sub new {
 
 ########### Subs callable as either a Function or Method #############
 
+sub __chop_loc($) {
+  (local $_ = shift) =~ s/ at .*? line \d+[^\n]*\n?\z//s;
+  $_
+}
 sub __getobj {
-  (blessed($_[0]) && $_[0]->isa(__PACKAGE__) ? shift : __PACKAGE__->new())
+  # Args are not evaluated until referenced, and tie handlers might throw
+  my $bl; do{ local $@; eval {$bl=blessed($_[0])}; croak __chop_loc($@) if $@ };
+  $bl && $_[0]->isa(__PACKAGE__) ? shift : __PACKAGE__->new()
 }
 sub __getobj_s { &__getobj->Values([$_[0]]) }
 sub __getobj_a { &__getobj->Values([\@_])   } #->Values([[@_]])
@@ -199,12 +206,12 @@ sub vis(_)    { &__getobj_s ->_vistype('s' )->Dump; }
 sub visq(_)   { &__getobj_s ->_vistype('s' )->Useqq(0)->Dump; }
 sub avis(@)   { &__getobj_a ->_vistype('a' )->Dump; }
 sub avisq(@)  { &__getobj_a ->_vistype('a' )->Useqq(0)->Dump; }
-sub alvis(@)   { &__getobj_a ->_vistype('l' )->Dump; }
-sub alvisq(@)  { &__getobj_a ->_vistype('l' )->Useqq(0)->Dump; }
 sub hvis(@)   { &__getobj_h ->_vistype('h' )->Dump; }
 sub hvisq(@)  { &__getobj_h ->_vistype('h' )->Useqq(0)->Dump; }
-sub hlvis(@)  { &__getobj_h ->_vistype('hl')->Dump; }
-sub hlvisq(@) { &__getobj_h ->_vistype('hl')->Useqq(0)->Dump; }
+sub alvis(@)  { substr &avis,  1, -1 }  # bare List without parenthesis
+sub alvisq(@) { substr &avisq, 1, -1 }
+sub hlvis(@)  { substr &hvis,  1, -1 }
+sub hlvisq(@) { substr &hvisq, 1, -1 }
 
 # Trampolines which replace the call frame with a call directly to the
 # interpolation code which uses $package DB to access the user's context.
@@ -278,7 +285,7 @@ sub __walk_worker($$$$$) {
     }
   }
   if (my $class = blessed($_[0])) {
-    # Strinify objects which have the stringification operator
+    # Stringify objects which have the stringification operator
     if (overload::Method($class,'""')) { # implements operator stringify
       if (any { ref() eq "Regexp" ? $class =~ /$_/
                                   : ($_ eq "1" || $_ eq $class) } @$stringify)
@@ -299,11 +306,11 @@ sub __walk_worker($$$$$) {
   #     maintainers won't fix it because the difference isn't functionally
   #     relevant to correctly-written Perl code.  However we want to help
   #     humans debug their software and so want to see the representation
-  #     most liklye to have been used by the programmer to store the value.
+  #     most likely to be what the programmer used to create the datum.
   #
   #  2. Floating point values come out as "strings" to avoid some
-  #     cross-platform problem I don't understand.  For our purposes
-  #     we want all numbers to appear as numbers.
+  #     cross-platform problem issue.  For our purposes we want all numbers 
+  #     to appear as numbers.
   if (!reftype($_[0]) && looks_like_number($_[0])) {
     return \undef if $detection_pass;  # halt immediately
     my $prefix = _show_as_number($_[0])
@@ -323,20 +330,24 @@ sub Dump {
     croak "extraneous args" if @_ != 1;
   }
 
-  my ($debug, $maxstringwidth, $stringify)
-    = @$self{qw/Debug MaxStringwidth Stringify/};
+  my ($maxstringwidth, $stringify)
+    = @$self{qw/MaxStringwidth Stringify/};
 
   # Do desired substitutions in the data (cloning first)
+  # Catch possible exceptions from tie handlers
   if ($stringify || $maxstringwidth) {
-    $stringify = [ $stringify ] unless ref($stringify) eq 'ARRAY';
-    $maxstringwidth //= 0;
-    my $truncsuf = $self->{Truncsuffix};
-    my $r = $self->_Visit_Values(
-      sub{ __walk_worker(shift,1,$stringify,$maxstringwidth,$truncsuf) } );
-    if (ref $r) {  # something needs changing
-      $self->_Modify_Values(
-        sub{ __walk_worker(shift,0,$stringify,$maxstringwidth,$truncsuf) } );
-    }
+    eval {
+      $stringify = [ $stringify ] unless ref($stringify) eq 'ARRAY';
+      $maxstringwidth //= 0;
+      my $truncsuf = $self->{Truncsuffix};
+      my $r = $self->_Visit_Values(
+        sub{ __walk_worker(shift,1,$stringify,$maxstringwidth,$truncsuf) } );
+      if (ref $r) {  # something needs changing
+        $self->_Modify_Values(
+          sub{ __walk_worker(shift,0,$stringify,$maxstringwidth,$truncsuf) } );
+      }
+    };
+    croak "Exception while traversing data: $@ " if $@;
   }
 
   my @values = $self->Values;
@@ -361,13 +372,17 @@ sub Dump {
   $_
 }
 
-# Walk an arbitrary structure calling &coderef on each item. stopping
+# Walk an arbitrary structure calling &coderef on each item.
 # The sub should return 1 to continue, or any other defined value to
 # terminate the traversal early.
 # Members of containers are visited after processing the container item itself,
 # and containerness is checked after &$coderef returns so that &$coderef
 # may transform the item (by reference through $_[0]) e.g. to replace a
 # container with a scalar.
+#
+# Tied items are skipped because we can not safely modify even cloned
+# copies because the side-effects can not be known.
+#
 # RETURNS: The final $&coderef return val
 sub __walk($$;$);
 sub __walk($$;$) {  # (coderef, item [, seenhash])
@@ -375,15 +390,25 @@ sub __walk($$;$) {  # (coderef, item [, seenhash])
   my $seen = $_[2] // {};
   # Test for recursion both before and after calling the coderef, in case the
   # code unconditionally clones or otherwise replaces the item with new data.
-  if (reftype($_[1])) {
+#say "###A item=",u($_[1]), " rt=", u(reftype $_[1]); #," tied=", u(tied $_[1]); 
+  if (my $rt = reftype($_[1])) {
     my $refaddr0 = refaddr($_[1]);
     return 1 if $seen->{$refaddr0}; # increment only below
+    return 1
+      if ( ($rt eq 'ARRAY'  && tied @{ $_[1] }) ||
+           ($rt eq 'HASH'   && tied %{ $_[1] }) ||
+           ($rt eq 'SCALAR' && tied ${ $_[1] }) ||
+           ($rt eq 'REF'    && tied ${ $_[1] }) );
+  } else {
+    return 1 if tied $_[1];
   }
   # Now call the coderef and re-check the item
   my $r = &{ $_[0] }($_[1]);
-  return $r unless (my $reftype = reftype($_[1])); # no longer a container?
-  my $refaddr1 = refaddr($_[1]);
-  return $r if $seen->{$refaddr1}++;
+  my $reftype = reftype($_[1]);
+  return $r unless $reftype;  # not (or not any longer) a container
+  my $refaddr = refaddr($_[1]);
+#say "#B item=",u($_[1]), " reftype=", u($reftype), " seen=",u($seen->{$refaddr}), " r=",u($r); #, " tied=",u(tied $_[1]);
+  return $r if $seen->{$refaddr}++;
   return $r unless $r eq "1";
   if ($reftype eq 'ARRAY') {
     foreach (@{$_[1]}) {
@@ -392,14 +417,14 @@ sub __walk($$;$) {  # (coderef, item [, seenhash])
     }
   }
   elsif ($reftype eq 'HASH') {
-    #foreach (values %{$_[1]})
-    #  return 0 unless __walk($_[0], $_, $seen);
-    #}
-    # sort to retain same visitation order in cloned copy
-    foreach (sort keys %{$_[1]}) {
-      my $r = __walk($_[0], $_[1]->{$_}, $seen);
+    foreach my $key (sort keys %{$_[1]}) {
+      my $r = __walk($_[0], $_[1]->{$key}, $seen); # walk the value
       return $r unless $r eq "1";
     }
+  }
+  elsif ($reftype eq 'SCALAR' or $reftype eq 'REF') {
+    my $r = __walk($_[0], ${ $_[1] }, $seen);
+    return $r unless $r eq "1";
   }
   1
 }
@@ -494,12 +519,6 @@ my %qqesc2controlpic = (
   '\r' => "\N{SYMBOL FOR CARRIAGE RETURN}",
   '\t' => "\N{SYMBOL FOR HORIZONTAL TABULATION}",
 );
-sub __postprocess_atom() {  # edits $_
-  s/\Q$magic_numstr_prefix\E//s 
-    if /^['"]/s;
-
-  s/^(['"])[^'"]*?\Q$magic_num_prefix\E(.*?)(\1)/$2/s;
-}
 
 sub __unesc_unicode() {  # edits $_
   if (/^"/) {
@@ -529,7 +548,6 @@ my $indent_unit;
 my $linelen;
 my $reserved;
 my $outstr;
-
 my @stack; # [offset_of_start, flags]
  
 sub BLK_FOLDEDBACK() {    1 } # block start has been folded back to min indent
@@ -559,6 +577,12 @@ sub _fmt_block($) {
 }
 sub _fmt_stack() { @stack ? (join ",", map{ _fmt_block($_) } @stack) : "()" }
 
+sub __unmagic($) {
+  ${$_[0]} =~ s/(['"])([^'"]*?)
+                (?:\Q$magic_numstr_prefix\E|\Q$magic_num_prefix\E)
+                (.*?)(\1)/$2$3/xgs;
+}
+
 sub _postprocess_DD_result {
   (my $self, local $_) = @_;
   my ($debug, $vistype, $foldwidth, $foldwidth1)
@@ -572,31 +596,29 @@ sub _postprocess_DD_result {
   $linelen = 0;
   $outstr = "";
   $indent_unit = 2; # make configurable?
-
   say "##RAW ",_dbrawstr($_) if $debug;
 
   # Fit everything in a single line if possible.  
   #
-  # Otherwise, enclosing blocks (starting with the outermost) are folded
-  # just before the next inner block opener, placing the inner block opener
-  # on its own line indented according to level:
+  # Otherwise "fold back" block-starters onto their their own line, indented 
+  # according to level, beginning at the (second-to-)outer level:
   #
   #    [aaa,bbb,[ccc,ddd,[eee,fff,«not enough space for next item»
   # becomes
   #    [ aaa,bbb,
   #      [ccc,ddd,[eee,fff,«next item goes here»
   #
-  # If necessary more levels are folded:
+  # If necessary fold back additional levels:
   #    [ aaa,bbb,
   #      [ ccc,ddd,
   #        [eee,fff,«next item goes here»
   #
-  # When a block is first folded, additional space is inserted before the
-  # first sub-item in the block so it aligns with the next indent level,
+  # When a block-starter is folded back, additional space is inserted 
+  # before the first sub-item so it will align with the next indent level,
   # as shown for 'aaa' and 'ccc' above.
   #
-  # If, after all enclosing blocks have been folded, there is still not enough
-  # room, then the current block is folded at the end: 
+  # If folding back all block-starters does not provide enough room,
+  # then the current line is folded at the end:
   #
   #    [ aaa,bbb,
   #      [ ccc,ddd,
@@ -613,8 +635,8 @@ sub _postprocess_DD_result {
   #       [
   #         [aaa,bbb,ccc,«even less space here !»
   #
-  # To avoid retroactive line overflows, enough space is reserved to fold
-  # all open blocks once without causing existing content to overflow (unless
+  # To avoid retroactive line overflows, enough space is reserved to fold back
+  # all unclosed blocks without causing existing content to overflow (unless
   # a single item is too large, in which case overflow occurs regardless).
   #
   # 'key => value' triples are treated as a special kind of "block" so
@@ -624,27 +646,24 @@ sub _postprocess_DD_result {
   my $maxlinelen = $foldwidth1 || $foldwidthN;
   my sub _fold_block($$;$) {
     my ($bx, $foldposn, $debmsg) = @_;
-    say ">>>FOLD (",($debmsg//""),") bx=$bx fp=$foldposn res=$reserved (${\length($outstr)})" if $debug;
     oops if $foldposn <= $stack[$bx]->[0]; # must be after block opener
     oops if $foldposn < length($outstr) - $linelen; # must be in last line
 
-    # If the block has children, insert spacing before the first child to
-    # align align it with the wrapped item (if not already done, as indicated
-    # by BLK_CANTSPACE not yet set); consume reserved space for this.  
-    # If the block has no children, just release the reserved space.
+    # If the block has children, insert spacing before the first child
+    # if not already done (as indicated by BLK_CANTSPACE not yet set),
+    # consuming reserved space.  If there are no children, just release
+    # the reserved space.
     if ( !($stack[$bx]->[1] & BLK_CANTSPACE) ) {
       my $spaces = " " x ($indent_unit-1);
       if ($stack[$bx]->[1] & BLK_HASCHILD) {
         my $insposn = $stack[$bx]->[0] + 1;
-        if ($insposn >= length($outstr)-$linelen) {
-          $linelen += length($spaces);
-        } 
+        $linelen += length($spaces)
+          if $insposn >= length($outstr)-$linelen;
         substr($outstr, $insposn, 0) = $spaces;
         $foldposn += length($spaces);
         foreach (@stack[$bx+1 .. $#stack]) { $_->[0] += length($spaces) }
-        $reserved -= length($spaces); oops if $reserved < 0;
+        ($reserved -= length($spaces)) >= 0 or oops;
         $stack[$bx]->[1] |= BLK_CANTSPACE; 
-        say "#***>space inserted b4 first item in bx $bx" if $debug;
       }
     }
     my $indent = ($bx+1) * $indent_unit;
@@ -665,30 +684,24 @@ sub _postprocess_DD_result {
     foreach ($bx+1 .. $#stack) { $stack[$_]->[0] += $delta }
     substr($outstr, $foldposn, $replacelen) = "\n" . (" " x $indent);
     $maxlinelen = $foldwidthN;
-    say "   After fold: stack=${\_fmt_stack()} length(outstr)=${\length($outstr)} llen=$linelen maxllen=$maxlinelen res=$reserved\n",_dbrawstr($outstr) if $debug;
   }#_fold_block
 
   my ($previtem, $prevflags);
   my sub atom($;$) {
-    #say "##a${\_dbavis(@_)} previtem=${\_dbrawstr($previtem)} prevflags=${\_fmt_flags($prevflags)}" if $debug;
-    
-    # Queue each item for one cycle before processing.  This allows special 
-    # cases to look ahead or behind one token (e.g. fatarrow or \\something)
+    # Queue each item for one "look ahead" cycle before processing.  
     (local $_, my $flags) = ($previtem, $prevflags);
     ($previtem, $prevflags) = ($_[0], $_[1]//0);
+
+    __unmagic(\$previtem);
 
     if (/\A[\\\*]+$/) {
       # Glue backslashes or * onto the front of whatever follows
       $previtem = $_ . $previtem;
-      #say "##--------[glue $_ forward] : ",_dbstr($previtem) if $debug;
       return;
     }
 
-    __postprocess_atom;
     __unesc_unicode if $unesc_unicode;
     __subst_controlpics if $controlpics;
-
-    say "##--------atom ${\_dbrawstr($_)}${\_fmt_flags($flags)} stack:${\_fmt_stack()} res=$reserved length(outstr)=${\length($outstr)} llen=$linelen maxllen=$maxlinelen" if $debug;
 
     return if ($flags & NOOP);
    
@@ -698,7 +711,6 @@ sub _postprocess_DD_result {
       # Reserve space to insert blanks before the item being added
       $reserved += ($indent_unit - 1);
       $stack[-1]->[1] |= BLK_HASCHILD if @stack;
-      say "Increased reserved to $reserved for bx $#stack" if $debug;
     }
     if ( ($flags & CLOSER) 
          && ($stack[-1]->[1] & (BLK_HASCHILD|BLK_CANTSPACE))==BLK_HASCHILD 
@@ -708,11 +720,9 @@ sub _postprocess_DD_result {
       # reserved space to the closer can fit on the same line.
       $reserved -= ($indent_unit - 1); oops if $reserved < 0;
       $stack[-1]->[1] |= BLK_CANTSPACE;
-      say "Released wont-be-needed reserved for bx $#stack" if $debug;
     }
 
     # Fold back enclosing blocks to try to make room
-    my $count = 0;
     while ( $maxlinelen - $linelen < $reserved + length() ) {
       my $bx = first { ($stack[$_]->[1] & BLK_FOLDEDBACK)==0 } 1..$#stack;
       last 
@@ -720,23 +730,24 @@ sub _postprocess_DD_result {
       my $foldposn = $stack[$bx]->[0];
       _fold_block($bx-1, $foldposn, "encl");
       $stack[$bx]->[1] |= BLK_FOLDEDBACK;
-      $count++;
     }
-    say "# # After $count foldbacks: maxllen=$maxlinelen llen=$linelen r=$reserved len()=${\length()} stack:",_fmt_stack() if $debug && $count;
 
-    # Fold the innermost block to start a new line if more space is needed,
-    # unless removing trailing spaces would make it fit exactly (in which
-    # case a fold will always occur before appending the next item).
-    # If closing, $reserved is not counted because it will not be needed
-    # if the closer fits on the same line.
+    # Fold the innermost block to start a new line if more space is needed.
+    # Ignore $reserved if the item is a closer because reserved space will 
+    # not be needed if the item fits on the same line.
     #
-    # Always fold before closing a block if there are previous children
-    # and place the closer one level outward to align with the opener.
+    # But always fold if this is a block-closer and there exist already-folded
+    # children; in that case align the closer with the opener:
+    #     [ aaa, bbb, 
+    #       ccc, «wrap instead of putting closer here»
+    #     ]
+    #
+    # If removing trailing spaces makes it fit exactly then remove the spaces.
+    #
     my $deficit = (($flags & CLOSER) ? 0 : $reserved) + length() 
                     - ($maxlinelen - $linelen) ;
     if ($deficit > 0 && /\s++\z/s && length($&) >= $deficit) {
       s/\s{$deficit}\z// or oops;
-      say "Trimmed $deficit trailing spaces for exact fit" if $debug;
       $deficit = 0;  # e.g. if item is " => "
     }
     if (@stack && 
@@ -747,53 +758,43 @@ sub _postprocess_DD_result {
     {
       _fold_block($#stack, length($outstr), "TAIL FOLD");
       if ($flags & OPENER) {
-        $flags |= BLK_FOLDEDBACK; # will be born in left-most possible position
+        $flags |= BLK_FOLDEDBACK; # born already in left-most position
       }
       if ($flags & CLOSER) {
-        my $removed = substr($outstr, length($outstr)-$indent_unit, INT_MAX, "");
+        # Back up to previous indent level so closer aligns with it's opener
+        my $removed = substr($outstr,length($outstr)-$indent_unit,INT_MAX,"");
         oops unless $removed eq (" " x $indent_unit);
-        say "Backed up one indent level for block closer" if $debug;
       }
-      s/^\s++//s; # elide leading spaces since starting a new line
+      s/^\s++//s; # elide leading spaces at start of (indented) line
     }
 
-    # Append the new item.  Oversized items may exceeed available space.
-    $outstr .= $_;
+    $outstr .= $_; # Append the new item
     $linelen += length();
 
     if ($flags & CLOSER) {
       if ( ($stack[-1]->[1] & (BLK_HASCHILD|BLK_CANTSPACE)) == BLK_HASCHILD ) {
+        # Release reserved space which was not needed
         $reserved -= ($indent_unit - 1); oops if $reserved < 0;
-        say "Released unused reserved from bx $#stack" if $debug;
       }
       oops if @stack==1 && $reserved != 0;
-      say "## POP ${\_fmt_block($stack[-1])} res=$reserved" if $debug;
       pop @stack;
     }
 
     if ($flags & OPENER) {
       push @stack, [length($outstr)-length(), $flags & BLK_MASK];
-      say "## PUSH ${\_fmt_block($stack[-1])}" if $debug;
     }
 
     if (@stack && $stack[-1]->[1] & BLK_FATARROW) {
       $reserved -= ($indent_unit - 1)  # can never happen!
         if ($stack[-1]->[1] & (BLK_HASCHILD|BLK_CANTSPACE))==BLK_HASCHILD;
-      say "## POP FATARROW ${\_fmt_block($stack[-1])} res=$reserved" if $debug;
       pop @stack;
     }
-
-    say "#  final   stack:${\_fmt_stack()} res=$reserved llen=$linelen maxllen=$maxlinelen (${\length($outstr)})",_dbrawstr($outstr) if $debug;
   }
-  my sub pushlevel($) {
-    atom( $_[0], OPENER );
-  }
-  my sub poplevel($) {
-    atom( $_[0], CLOSER );
-  }
+  my sub pushlevel($) { atom( $_[0], OPENER ); }
+  my sub poplevel($) { atom( $_[0], CLOSER ); }
   my sub fatarrow($) {
     my $item = shift;
-    # Make "key => value" triple be a block, to keep together if possible
+    # Make a "key => value" triple be a block, to keep together if possible
     oops if $prevflags != 0;
     $prevflags |= (OPENER | BLK_CANTSPACE);
     atom( " $item ", 0 );  # " => "
@@ -825,29 +826,21 @@ sub _postprocess_DD_result {
     elsif (/\G:*${pkgname_re}/gc)             { atom($&) }
     elsif (/\G[\[\{]/gc) { pushlevel($&) }
     elsif (/\G[\]\}]/gc) { poplevel($&)  }
-    else { oops "UNPARSED ",_dbstr(substr($_,pos,30)."..."),"\   at pos ",u(pos()), " ",_dbstrposn($_,pos()//0);
+    else { oops "UNPARSED ",_dbstr(substr($_,pos//0,30)."..."),"\   at pos ",u(pos()), " ",_dbstrposn($_,pos()//0);
     }
   }
   atom(""); # push through the lookahead item
 
-  if (($vistype//"s") eq "s") { }
+  if (($vistype//"s") eq "s") { 
+  }
   elsif ($vistype eq 'a') {
     $outstr =~ s/\A\[/(/ && $outstr =~ s/\]\z/)/s or oops;
-  }
-  elsif ($vistype eq 'l') {
-    $outstr =~ s/\A\[// && $outstr =~ s/\]\z//s or oops;
   }
   elsif ($vistype eq 'h') {
     $outstr =~ s/\A\{/(/ && $outstr =~ s/\}\z/)/s or oops;
   }
-  elsif ($vistype eq 'hl') {
-    $outstr =~ s/\A\{// && $outstr =~ s/\}\z//s or oops;
-  }
   else { oops }
-   
-  oops "Residual reserved=$reserved" if $reserved;
-  oops "Stack not empty: ",_fmt_stack(),"\nInput: ",_dbvis($_[1]) if @stack;
-
+  oops if @stack;
   $outstr
 } #_postprocess_DD_result {
 
@@ -882,7 +875,6 @@ sub _Interpolate {
       state $warned=0;
       carp("Warning: String passed to ${s_or_d}vis may have been interpolated by Perl\n(use 'single quotes' to avoid this)\n") unless $warned++;
     }
-    say "#Vis_Interp START «$_»" if $debug;
     while (
       /\G (
            # Stuff without variable references (might include \n etc. escapes)
@@ -925,7 +917,6 @@ sub _Interpolate {
           ) /xsgc)
     {
       local $_ = $1; oops unless length() > 0;
-      say "#Vis expr «$_»" if $debug;
       if (/^[\$\@\%]/) {
         my $sigl = substr($_,0,1);
         if ($s_or_d eq 'd') {
@@ -1050,7 +1041,7 @@ sub DB_Vis_Eval($$) {
   $Data::Dumper::Interp::save_stack[-1]->[0] = $Data::Dumper::Interp::user_dollarat;
 
   if ($errmsg) {
-    $errmsg =~ s/ at \(eval \d+\) line \d+[^\n]*\n?\z//s;
+    $errmsg = __chop_loc($errmsg);
     Carp::confess("${label_for_errmsg}: Error interpolating '$evalarg' at $fname line $lno:\n$errmsg\n");
   }
 
@@ -1075,33 +1066,37 @@ Data::Dumper::Interp - Data::Dumper for humans, with interpolation
   my %hash = (abc => [1,2,3,4,5], def => undef);
   my $ref = \%hash;
 
-  # Interpolate variables in strings, substituting Data::Dumper output
+  # Interpolate variables in strings with Data::Dumper output
   say ivis 'FYI ref is $ref\nThat hash is: %hash\nArgs are @ARGV';
 
-    -->FYI ref is {abc => [1,2,3,4,5], def => undef}
-       That hash is: (abc => [1,2,3,4,5], def => undef)
-       Args are ("-i","/file/path")
+    # -->FYI ref is {abc => [1,2,3,4,5], def => undef}
+    #    That hash is: (abc => [1,2,3,4,5], def => undef)
+    #    Args are ("-i","/file/path")
 
   # Label interpolated values with "expr=" 
-  say dvis '@ARGV'; -->@ARGV=("-i","/file/path")
+  say dvis '$ref\nand @ARGV'; 
+
+    # -->ref={abc => [1,2,3,4,5], def => undef} 
+    #    and @ARGV=("-i","/file/path")
 
   # Functions to format one thing 
-  say vis \@ARGV;   #any scalar   -->["-i", "/file/path"]
-  say avis @ARGV;   -->("-i", "/file/path")
-  say hvis %hash;   -->(abc => [1,2,3,4,5], def => undef)
+  say vis $ref;     #-->{abc => [1,2,3,4,5], def => undef}
+  say vis \@ARGV;   #-->["-i", "/file/path"]  # any scalar
+  say avis @ARGV;   #-->("-i", "/file/path")
+  say hvis %hash;   #-->(abc => [1,2,3,4,5], def => undef)
 
   # Stringify objects
   { use bigint;
     my $struct = { debt => 999_999_999_999_999_999.02 };
     say vis $struct;
-      --> {debt => (Math::BigFloat)999999999999999999.02}
+      # --> {debt => (Math::BigFloat)999999999999999999.02}
   }
 
   # Wide characters are readable
   use utf8;
   my $h = {msg => "My language is not ASCII ☻ ☺ 😊 \N{U+2757}!"};
   say dvis '$h' ;
-    --> h={msg => "My language is not ASCII ☻ ☺ 😊 ❗"}
+    # --> h={msg => "My language is not ASCII ☻ ☺ 😊 ❗"}
 
   #-------- OO API --------
 
@@ -1129,7 +1124,8 @@ Casual debug messages are a primary use case.
 
 Internally, Data::Dumper is called to visualize (i.e. format) data
 with pre- and postprocessing to "improve" the results:
-Output is compact (1 line if possibe) and omits a trailing newline;
+Output omits a trailing newline and is compact (1 line if possibe,
+otherwise folded at your terminal width);
 Unicode characters appear as themselves,
 objects like Math:BigInt are stringified, and some
 Data::Dumper bugs^H^H^H^Hquirks are circumvented.
@@ -1147,7 +1143,7 @@ format variable values.
 
 C<$var> is replaced by its value,
 C<@var> is replaced by "(comma, sparated, list)",
-and C<%hash> by "(key => value, ...)" visualizations.
+and C<%hash> by "(key => value, ...)" .
 Most complex expressions are recognized, e.g. indexing,
 dereferences, slices, etc.
 
@@ -1213,8 +1209,8 @@ if wide characters are present.
 Creates an object initialized from the global configuration
 variables listed below.  C<new> takes no arguments.
 
-The functions described above may also be used as I<methods>
-when called on a C<Data::Dumper::Interp> object
+The functions described above may then be called as I<methods>
+on a C<Data::Dumper::Interp> object
 (when not called as a method they create a new object internally).
 
 For example:
@@ -1235,9 +1231,9 @@ variable in package C<Data::Dumper::Interp> which provides the default value,
 and a I<method> of the same name which sets or retrieves a config value
 on a specific object.
 
-When a methods is called without arguments, the current value is returned.
+When a method is called without arguments the current value is returned.
 
-When a method is called with an argument (i.e. to set a value), the object
+When a method is called with an argument to set a value, the object
 is returned so that method calls can be chained.
 
 =head2 MaxStringwidth(INTEGER)
@@ -1267,41 +1263,42 @@ class name(s).
 
 =head2 Sortkeys(subref)
 
-See C<Data::Dumper> documentation.
-
 The default sorts numeric substrings in keys by numerical
-value (see "DIFFERENCES FROM Data::Dumper").
+value.  See C<Data::Dumper> documentation.
 
 =head2 Useqq
 
-The default value is 0 for functions/methods with 'q' in their name,
-otherwise "unicode".
+The default is "unicode:controlpic" except for 
+functions/methods with 'q' in their name, which force C<Useqq(0)>.
 
 0 means generate 'single quoted' strings when possible.
 
 1 means generate "double quoted" strings, as-is from Data::Dumper.
 Non-ASCII charcters will be shown as hex escapes.
 
-Otherwise generate "double quoted" strings enhanced by options
-given as a :-separated list of keywords, for example Useqq("unicode:controlpic").
+Otherwise generate "double quoted" strings enhanced according to option
+keywords given as a :-separated list, e.g. Useqq("unicode:controlpic").
 The two avilable options are:
 
 =over 4
 
-=item "unicode" (or "utf8" for historical compat.) 
+=item "unicode" (or "utf8" for historical reasons)
 
 Show all printable
 characters as themselves rather than hex escapes.
 
 =item "controlpic"
 
-Visualize non-printing ASCII characters using Unicode "control picture" characters.
-'␤' is used instead of '\n' and similarly for \0 \a \b \e \f \r and \t.
+Show non-printing ASCII characters using single "control picture" characters,
+for example '␤' is shown for newline instead of '\n'.  
+Similarly for \0 \a \b \e \f \r and \t.
 
-This can be useful in debugging because every character occupies the same space
-(assuming a fixed-width font).  However the commonly-used "Last Resort" font
-draws these symbols with single-pixel lines, which on modern high-res displays
-are dim and hard to read.  For this reason, "controlpic" is no longer the default.
+This is sometimes useful for debugging because every character occupies 
+the same space with a fixed-width font.  
+The commonly-used "Last Resort" font draws these symbols 
+with single-pixel lines, which on modern high-res displays
+can be dim and hard to read.  If you experience this problem,
+set C<Useqq> to "unicode" to see traditional \n etc. backslash escapes.
 
 =back
 
@@ -1338,11 +1335,11 @@ the string "undef".
 
 The string ($_ by default) is quoted if necessary for parsing
 by /bin/sh, which has different quoting rules than Perl.
-"Double quotes" are used when no escapes would be needed,
-otherwise 'single quotes'.
 
 If the string contains only "shell-safe" ASCII characters
 it is returned as-is, without quotes.
+Otherwise "double quotes" are used when no escapes would be needed,
+otherwise 'single quotes'.
 
 C<qshpath> is like C<qsh> except that an initial ~ or ~username is left
 unquoted.  Useful for paths given to bash or csh.
@@ -1407,7 +1404,7 @@ the "_" filehandle will not change across calls.
 =head1 DIFFERENCES FROM Data::Dumper
 
 Visualized data structures differ from plain C<Data::Dumper> output
-as follows:
+as follows (by default):
 
 =over 2
 
@@ -1423,17 +1420,23 @@ the terminal width with indentation appropriate to structure levels.
 Printable Unicode characters appear as themselves instead of \x{ABCD}.
 
 Note: If your data contains 'wide characters', you must encode
-the result before displaying it as explained in C<perluniintro>.
-For example with C<< use open IO => ':locale'; >>
+the result before displaying it as explained in C<perluniintro>,
+for example with C<< use open IO => ':locale'; >>.  
+You'll also want C<< use utf8; >> if your Perl source code
+contains characters outside the ASCII range.
 
 Undecoded binary octets (e.g. data read from a 'binmode' file)
 will be escaped as individual bytes when necessary.
 
 =item *
 
+'␤' and similar "control picture" characters are shown for ASCII controls.
+
+=item *
+
 Object refs are replaced by the object's stringified representation.
 For example, C<bignum> and C<bigrat> numbers are shown as easily
-readable values rather than "bless( {...}, 'Math::...')".
+readable values rather than S<"bless( {...}, 'Math::...')">.
 
 Stingified objects are prefixed with "(classname)" to make clear what
 happened.

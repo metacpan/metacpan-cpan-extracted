@@ -2,7 +2,7 @@ package App::Yath::Command::abort;
 use strict;
 use warnings;
 
-our $VERSION = '1.000116';
+our $VERSION = '1.000119';
 
 use Time::HiRes qw/sleep/;
 use Term::Table;
@@ -1544,6 +1544,19 @@ socket to use when connecting to the db
 =item --no-yathui-db-user
 
 Username to use when connecting to the db
+
+
+=back
+
+=head3 NO CATEGORY - FIX ME
+
+=over 4
+
+=item --check-reload-state
+
+=item --no-check-reload-state
+
+Abort the run if there are unfixes reload errors and show a confirmation dialogue for unfixed reload warnings.
 
 
 =back

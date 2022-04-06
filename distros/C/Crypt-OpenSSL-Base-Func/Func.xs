@@ -40,6 +40,8 @@ char *EC_POINT_point2hex(const EC_GROUP *group, const EC_POINT *p, point_convers
 
 EC_POINT *EC_POINT_hex2point(const EC_GROUP *group, const char *hex, EC_POINT *p, BN_CTX *ctx)
 
+const BIGNUM *EC_KEY_get0_private_key(const EC_KEY *key);
+
 
 const EVP_MD *EVP_get_digestbyname(const char *name)
 

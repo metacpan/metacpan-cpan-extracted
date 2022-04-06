@@ -1,9 +1,18 @@
-2.400.10 2022-04-02
-    = Testrelease for new metafiles
 
-2.400.5 2022-03-31
+2.401.1   2022-04-04
+    = minor fix release & test for init dzil file
+    ~ new file headers
+    ! 2 patches by Petr Pisar fixing tests
+    ? expanded TODO
+ 
+2.400.10  2022-04-02
+    = Testrelease for new metafiles
+    + cpan file
+
+2.400.5   2022-03-31
     = Upload fix for failed 2.4.19 .. 2.400.04
-    ? first upload by new maintainer: LICHTKIND 
+    ~ first upload by new maintainer: LICHTKIND
+    + files CONTRIBUTING
 
 2.4.10 Upload to pause.perl.org failed for version 2.4.9. Therefore, the version 2.4.9 was renamed to 2.4.10
        for a new upload.
@@ -101,20 +110,20 @@
                  
 2.3  Changes done by Christine Zilker:
         Added new Options: 
-	     in Composite: 
+         in Composite: 
                 legend_example_height    changes thickness of the lines in the legend,
-	        f_y_tick1, f_y_tick2 analog to f_y_tick 
+            f_y_tick1, f_y_tick2 analog to f_y_tick 
                                          used for right and left y-axes
-	     in Direction: 
+         in Direction: 
                 pairs                    
 
         Added the possibility to add more datasets in Chart::Direction 
-			   
-	Fixed "label space" problem in Pie
-	Fixed dataset order (in the legend) in StackedBars
-	Fixed problem of getting the right values if round2Tick is used
-	Fixed problem of datavalues in _find_y_scale
-	Some minor bugfixes	    
+               
+    Fixed "label space" problem in Pie
+    Fixed dataset order (in the legend) in StackedBars
+    Fixed problem of getting the right values if round2Tick is used
+    Fixed problem of datavalues in _find_y_scale
+    Some minor bugfixes     
 
         Update of the Documentation (Documentation.pdf)
 
@@ -127,40 +136,40 @@
 2.2: Composite.pm: imagemap_dump() repaired.
 
 2.1: Changes done by Markus Brandl:
-	new Modules added: ErrorBars.pm, HorizontalBars.pm, Pareto.pm,                          
-	 
-	Pie.pm, Split.pm and Direction.pm
+    new Modules added: ErrorBars.pm, HorizontalBars.pm, Pareto.pm,                          
+     
+    Pie.pm, Split.pm and Direction.pm
 
         Subdirectory "doc" contains a Acrobat Reader Documentation.pdf file.
 
-	Function add_datafile() added. It is now possible to add a complete
-	datafile.
+    Function add_datafile() added. It is now possible to add a complete
+    datafile.
 
         Added new Options: precision, xy_plot, min_x_ticks, max_x_ticks,
-	skip_y_ticks, skip_int_ticks, legend_label_value, y_axes,
-	scale, interval, start, interval_ticks, sort, same_error, point,
-	line, arrow, angle_interval, min_circles, max_circles
-	Also added: the 'title' and 'x_label' options in the colors option 
+    skip_y_ticks, skip_int_ticks, legend_label_value, y_axes,
+    scale, interval, start, interval_ticks, sort, same_error, point,
+    line, arrow, angle_interval, min_circles, max_circles
+    Also added: the 'title' and 'x_label' options in the colors option 
 
-	Documentation (Documentation.pdf) added.
+    Documentation (Documentation.pdf) added.
 
-	_find_x_scale, _find_x_range and _draw_x_number_ticks added to make 
-	xy_plots possible.
+    _find_x_scale, _find_x_range and _draw_x_number_ticks added to make 
+    xy_plots possible.
 
-	_sort_data has now a body. 
+    _sort_data has now a body. 
 
         Fixed integer ticks problem by adding the skip_int_ticks option
-	Fixed f_x_ticks and f_y_ticks problem in Composite
-	Fixed negative value problem in Bars
-	Fixed min_val and max_val problem in draw_data function of all modules:
-	Now, Chart plots the data only if the data is in the area of min_val and
-	max_val! The border of bars in Bars, HorizontalBars and StackedBars will
-	be plotted pink (not misccolor) if the data isn't in the min_val-max_val
-	interval.
-	Fixed custom_x_ticks problem in _draw_x_ticks
-	Some other bugfixes.
-	Updates in _find_y_scale, _round2tick, _calcTickInterval 
-	   
+    Fixed f_x_ticks and f_y_ticks problem in Composite
+    Fixed negative value problem in Bars
+    Fixed min_val and max_val problem in draw_data function of all modules:
+    Now, Chart plots the data only if the data is in the area of min_val and
+    max_val! The border of bars in Bars, HorizontalBars and StackedBars will
+    be plotted pink (not misccolor) if the data isn't in the min_val-max_val
+    interval.
+    Fixed custom_x_ticks problem in _draw_x_ticks
+    Some other bugfixes.
+    Updates in _find_y_scale, _round2tick, _calcTickInterval 
+       
 
 1.1: Changes done by David Pottage:
         Plot scales can now have any magnitude. 
@@ -186,56 +195,56 @@
         Delete GIF support, added PNG and JPEG instead
 
 0.99b - 0.99c-pre3:
-	James F Miner <jfm@winternet.com>:
-	Added Mountain chart type
-	Added Patterns.  See t/mountain.t for details
-	Bugfix for drifting x tick
-	Improved internal color handling
+    James F Miner <jfm@winternet.com>:
+    Added Mountain chart type
+    Added Patterns.  See t/mountain.t for details
+    Bugfix for drifting x tick
+    Improved internal color handling
 
-	Richard Dice  <rdice@shadnet.shad.ca>:
-	Added brush shapes for Points, LinesPoints
-	Added scalar_gif
+    Richard Dice  <rdice@shadnet.shad.ca>:
+    Added brush shapes for Points, LinesPoints
+    Added scalar_gif
 
 0.99a - 0.99b:
-	Fixed left legend in composite charts
-	Fixed no color problem when using composite charts w/ no legend
-	Fixed color handling for datasets
-	Added option for http header Pragma: no-cache
-		Netscape 4.5 has a bug that breaks it, but it works with
-		other browsers.  Any ideas for a workaround?
+    Fixed left legend in composite charts
+    Fixed no color problem when using composite charts w/ no legend
+    Fixed color handling for datasets
+    Added option for http header Pragma: no-cache
+        Netscape 4.5 has a bug that breaks it, but it works with
+        other browsers.  Any ideas for a workaround?
 
 0.99 - 0.99a:
-	Added use of undef() values to represent 'no data' for line breaks
-	Added ylabel*_color options
-	Added x_grid_lines, y_grid_lines & y2_grid_lines , and color options for each
-	Cache disabling in cgi header: Reiner Nippes <nippes.r@gmx.de>
-	Restored grid_lines option: Heinz-Guenter Kontny <hek@kronos.nic.dtag.de>
-	Fixed a typo that broke imagemap data storage in Lines charts
+    Added use of undef() values to represent 'no data' for line breaks
+    Added ylabel*_color options
+    Added x_grid_lines, y_grid_lines & y2_grid_lines , and color options for each
+    Cache disabling in cgi header: Reiner Nippes <nippes.r@gmx.de>
+    Restored grid_lines option: Heinz-Guenter Kontny <hek@kronos.nic.dtag.de>
+    Fixed a typo that broke imagemap data storage in Lines charts
 
 0.94 - 0.99:
-	Modified the 'title' option to correctly process newlines
-	Deprecated the 'subtitle' option, will remove it in next release
-	Changed the API for specifying colors
-	Added support for printing to file handles
-	Added Chart::Composite
-	Added 'spaced_bars' to make it easy to differentiate the bars
-	Added 'grey_background' to make plot background grey
-	Added support for negative values in the datasets
-	Added methods to remember and dump imagemap pixel information
-	Included rgb.txt with distribution for WinXX users
+    Modified the 'title' option to correctly process newlines
+    Deprecated the 'subtitle' option, will remove it in next release
+    Changed the API for specifying colors
+    Added support for printing to file handles
+    Added Chart::Composite
+    Added 'spaced_bars' to make it easy to differentiate the bars
+    Added 'grey_background' to make plot background grey
+    Added support for negative values in the datasets
+    Added methods to remember and dump imagemap pixel information
+    Included rgb.txt with distribution for WinXX users
 
 0.93 - 0.94:
-	Moved the legend down to be flush with the chart
-	Fixed the long decimal y-tick label problem
-	Fixed (for the last time, hopefully) the pre-5.004 compilation problem
-	Fixed handling of undefined data points
-	Added more colors for the default data colors
-	Added the transparent gif option
-	Added the option for user-specified colors
-	Added the grid_lines option
+    Moved the legend down to be flush with the chart
+    Fixed the long decimal y-tick label problem
+    Fixed (for the last time, hopefully) the pre-5.004 compilation problem
+    Fixed handling of undefined data points
+    Added more colors for the default data colors
+    Added the transparent gif option
+    Added the option for user-specified colors
+    Added the grid_lines option
 
 0.92 - 0.93: 
-	Fixed the sort problem
-	Fixed the y-axis label centering problem
-	Fixed pre-5.004 compilation problem
-	Added StackedBars charts
+    Fixed the sort problem
+    Fixed the y-axis label centering problem
+    Fixed pre-5.004 compilation problem
+    Added StackedBars charts

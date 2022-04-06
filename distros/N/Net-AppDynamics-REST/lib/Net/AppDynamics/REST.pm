@@ -14,6 +14,7 @@ use HTTP::Headers;
 use Ref::Util qw(is_plain_arrayref);
 use URI::Escape;
 use namespace::clean;
+use DateTime;
 
 BEGIN {
   with 'HTTP::MultiGet::Role';
@@ -82,7 +83,7 @@ This module makes use of the following roles:  L<HTTP::MultiGet::Role>, L<Log::L
 
 =cut
 
-our $VERSION = "1.008";
+our $VERSION = "1.009";
 
 has USER => (
   is       => 'ro',
@@ -252,6 +253,81 @@ sub que_list_applications {
   my $req  = $self->create_get($path);
   return $self->do_oauth_request( $req, $cb );
 }
+
+=back
+
+=head3 Getting License Rules
+
+=over 4
+
+=item * Non Blocking my $result=$self->que_get_license_rules($cb,%args);
+
+Queues a request to fetch license rules
+
+Example Callback: 
+
+  my $cb=sub {
+    my ($self,$id,$result,$request,$response)=@_;
+    # 0 Net::AppDynamics::REST Object
+    # 1 Id of the request
+    # 2 Data::Result Object
+    # 3 HTTP::Request Object
+    # 4 HTTP::Response Object
+  };
+
+$result contains the results when true and why it failed when false.
+
+=back 
+
+=cut
+
+sub que_get_license_rules {
+  my ( $self, $cb, @args ) = @_;
+
+  my $path = '/controller/mds/v1/license/rules';
+  my $get  = $self->create_get( $path, @args );
+  return $self->do_oauth_request( $get, $cb );
+}
+
+=head3 Getting license rule usage
+
+=over 4
+
+=item * Non Blocking my $result=$self->que_get_license_rules_usage($cb,$account_id,$access_key,%args);
+
+Queues a request to fetch license rules
+
+Example Callback: 
+
+  my $cb=sub {
+    my ($self,$id,$result,$request,$response)=@_;
+    # 0 Net::AppDynamics::REST Object
+    # 1 Id of the request
+    # 2 Data::Result Object
+    # 3 HTTP::Request Object
+    # 4 HTTP::Response Object
+  };
+
+$result contains the results when true and why it failed when false.
+
+=back 
+
+=cut
+
+sub que_get_license_rules_usage {
+  my ( $self, $cb, $accountId, $accessKey, @args ) = @_;
+  my $dt= DateTime->now(time_zone => 'UTC');
+  
+  #push @args, 'dateTo', $dt->iso8601().'Z';
+  push @args, 'dateFrom', $dt->subtract(minutes => 5)->iso8601().'Z';
+  push @args, 'granularityMinutes', 5;
+
+  my $path = '/controller/licensing/v1/usage/account/'.$accountId.'/allocation/'.$accessKey;
+  my $get  = $self->create_get( $path, @args );
+
+  return $self->do_oauth_request( $get, $cb );
+}
+
 
 =back
 

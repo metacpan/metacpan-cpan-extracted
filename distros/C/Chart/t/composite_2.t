@@ -3,6 +3,8 @@
 BEGIN { unshift @INC, 'lib', '../lib'}
 use strict;
 use Chart::Composite;
+use File::Temp 0.19;
+my $samples = File::Temp->newdir();
 
 print "1..1\n";
 
@@ -59,7 +61,7 @@ $g->set(
 
 $g->set( 'f_y_tick' => sub { return ( $_[0] . '(' . sprintf( "%.1f", $_[0] / 18.0182 ) . ')' ) } );
 
-$g->png("samples/composite_2.png");
+$g->png("$samples/composite_2.png");
 
 print "ok 1\n";
 

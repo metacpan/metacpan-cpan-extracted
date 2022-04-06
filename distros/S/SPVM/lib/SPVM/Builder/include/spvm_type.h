@@ -10,40 +10,34 @@ enum {
   SPVM_TYPE_C_FLAG_MUTABLE = 2,
 };
 
+
+
+
+
+
+
 enum {
-  SPVM_TYPE_C_TYPE_CATEGORY_UNKNOWN,
-  SPVM_TYPE_C_TYPE_CATEGORY_BYTE,
-  SPVM_TYPE_C_TYPE_CATEGORY_SHORT,
-  SPVM_TYPE_C_TYPE_CATEGORY_INT,
-  SPVM_TYPE_C_TYPE_CATEGORY_LONG,
-  SPVM_TYPE_C_TYPE_CATEGORY_FLOAT,
-  SPVM_TYPE_C_TYPE_CATEGORY_DOUBLE,
-  SPVM_TYPE_C_TYPE_CATEGORY_MULNUM_BYTE,
-  SPVM_TYPE_C_TYPE_CATEGORY_MULNUM_SHORT,
-  SPVM_TYPE_C_TYPE_CATEGORY_MULNUM_INT,
-  SPVM_TYPE_C_TYPE_CATEGORY_MULNUM_LONG,
-  SPVM_TYPE_C_TYPE_CATEGORY_MULNUM_FLOAT,
-  SPVM_TYPE_C_TYPE_CATEGORY_MULNUM_DOUBLE,
-  SPVM_TYPE_C_TYPE_CATEGORY_ANY_OBJECT,
-  SPVM_TYPE_C_TYPE_CATEGORY_CLASS,
-  SPVM_TYPE_C_TYPE_CATEGORY_NUMERIC_ARRAY,
-  SPVM_TYPE_C_TYPE_CATEGORY_MULNUM_ARRAY,
-  SPVM_TYPE_C_TYPE_CATEGORY_OBJECT_ARRAY,
-  SPVM_TYPE_C_TYPE_CATEGORY_REF_BYTE,
-  SPVM_TYPE_C_TYPE_CATEGORY_REF_SHORT,
-  SPVM_TYPE_C_TYPE_CATEGORY_REF_INT,
-  SPVM_TYPE_C_TYPE_CATEGORY_REF_LONG,
-  SPVM_TYPE_C_TYPE_CATEGORY_REF_FLOAT,
-  SPVM_TYPE_C_TYPE_CATEGORY_REF_DOUBLE,
-  SPVM_TYPE_C_TYPE_CATEGORY_REF_MULNUM_BYTE,
-  SPVM_TYPE_C_TYPE_CATEGORY_REF_MULNUM_SHORT,
-  SPVM_TYPE_C_TYPE_CATEGORY_REF_MULNUM_INT,
-  SPVM_TYPE_C_TYPE_CATEGORY_REF_MULNUM_LONG,
-  SPVM_TYPE_C_TYPE_CATEGORY_REF_MULNUM_FLOAT,
-  SPVM_TYPE_C_TYPE_CATEGORY_REF_MULNUM_DOUBLE,
-  SPVM_TYPE_C_TYPE_CATEGORY_VOID,
-  SPVM_TYPE_C_TYPE_CATEGORY_STRING,
-  SPVM_TYPE_C_TYPE_CATEGORY_ANY_OBJECT_ARRAY,
+  SPVM_TYPE_C_CATEGORY_UNKNOWN,
+  SPVM_TYPE_C_CATEGORY_FAIL_LOAD,
+  SPVM_TYPE_C_CATEGORY_UNDEF,
+  SPVM_TYPE_C_CATEGORY_VOID,
+  SPVM_TYPE_C_CATEGORY_NUMERIC,
+  SPVM_TYPE_C_CATEGORY_MULNUM,
+  SPVM_TYPE_C_CATEGORY_STRING,
+  SPVM_TYPE_C_CATEGORY_CLASS,
+  SPVM_TYPE_C_CATEGORY_INTERFACE,
+  SPVM_TYPE_C_CATEGORY_CALLBACK,
+  SPVM_TYPE_C_CATEGORY_ANY_OBJECT,
+  SPVM_TYPE_C_CATEGORY_NUMERIC_ARRAY,
+  SPVM_TYPE_C_CATEGORY_MULNUM_ARRAY,
+  SPVM_TYPE_C_CATEGORY_STRING_ARRAY,
+  SPVM_TYPE_C_CATEGORY_CLASS_ARRAY,
+  SPVM_TYPE_C_CATEGORY_INTERFACE_ARRAY,
+  SPVM_TYPE_C_CATEGORY_CALLBACK_ARRAY,
+  SPVM_TYPE_C_CATEGORY_ANY_OBJECT_ARRAY,
+  SPVM_TYPE_C_CATEGORY_MULDIM_ARRAY,
+  SPVM_TYPE_C_CATEGORY_NUMERIC_REF,
+  SPVM_TYPE_C_CATEGORY_MULNUM_REF,
 };
 
 struct spvm_type {
@@ -120,19 +114,23 @@ int32_t SPVM_TYPE_is_bool_object_type(SPVM_COMPILER* compiler, int32_t basic_typ
 
 int32_t SPVM_TYPE_is_integral_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
 int32_t SPVM_TYPE_is_numeric_ref_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
+int32_t SPVM_TYPE_is_mulnum_ref_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
 int32_t SPVM_TYPE_is_numeric_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
 int32_t SPVM_TYPE_is_numeric_object(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
 int32_t SPVM_TYPE_is_array_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
+int32_t SPVM_TYPE_is_interface_array_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
+int32_t SPVM_TYPE_is_callback_array_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
+int32_t SPVM_TYPE_is_class_array_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
+int32_t SPVM_TYPE_is_muldim_array_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
 int32_t SPVM_TYPE_is_numeric_array_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
 int32_t SPVM_TYPE_is_string_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
 int32_t SPVM_TYPE_is_class_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
 int32_t SPVM_TYPE_is_object_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
 int32_t SPVM_TYPE_is_any_object_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
 int32_t SPVM_TYPE_is_undef_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
-int32_t SPVM_TYPE_is_multi_numeric_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
-int32_t SPVM_TYPE_is_multi_numeric_ref_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
+int32_t SPVM_TYPE_is_mulnum_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
 int32_t SPVM_TYPE_is_mulnum_array_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
-int32_t SPVM_TYPE_basic_type_is_multi_numeric_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
+int32_t SPVM_TYPE_basic_type_is_mulnum_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
 int32_t SPVM_TYPE_is_byte_array_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
 
 int32_t SPVM_TYPE_is_string_or_byte_array_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
@@ -155,5 +153,22 @@ int32_t SPVM_TYPE_get_elem_byte_size(SPVM_COMPILER* compiler, int32_t basic_type
 SPVM_TYPE* SPVM_TYPE_new(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
 
 SPVM_TYPE* SPVM_TYPE_new_any_object_array_type(SPVM_COMPILER* compiler);
+
+int32_t SPVM_TYPE_get_mulnum_basic_type_id(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
+
+int32_t SPVM_TYPE_is_basic_object_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
+
+int32_t SPVM_TYPE_is_unknown_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
+
+int32_t SPVM_TYPE_is_fail_load_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
+
+int32_t SPVM_TYPE_is_string_array_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
+
+int32_t SPVM_TYPE_can_assign(
+  SPVM_COMPILER* compiler,
+  int32_t dist_type_basic_type_id, int32_t dist_type_dimension, int32_t dist_type_flag,
+  int32_t src_type_basic_type_id, int32_t src_type_dimension, int32_t src_type_flag,
+  SPVM_CONSTANT* src_constant, int32_t* need_implicite_conversion, int32_t* narrowing_conversion_error, int32_t* mutable_invalid
+);
 
 #endif

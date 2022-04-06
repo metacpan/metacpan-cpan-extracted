@@ -1,25 +1,17 @@
-## @file
-# Implementation of Chart::Pie
-#
-# written and maintained by
-# @author Chart Group at Geodetic Fundamental Station Wettzell (Chart@fs.wettzell.de)
-# @date 2015-03-01
-# @version 2.4.10
-#
 
-## @class Chart::Pie
-# @brief Pie class derived class for Chart to implement pies
-#
+# pie and doughnut (ring) charts
+
+use v5.12;
+
 package Chart::Pie;
-our $VERSION = 2.400.5;
+our @ISA     = qw(Chart::Base);
+our $VERSION = '2.400.5';
 
-use Chart::Base;
-use GD;
 use Carp;
+use GD;
 use Chart::Constants;
-use strict;
+use Chart::Base ;
 
-@Chart::Pie::ISA     = qw(Chart::Base);
 
 #>>>>>>>>>>>>>>>>>>>>>>>>>>#
 #  public methods go here  #
@@ -470,7 +462,7 @@ sub _draw_data
         #        # Draw Point
         #        # reset the brush for points
         #        my $brush = $self->_prepare_brush($color, 'point',
-        #			$self->{'pointStyle' . '0'});
+        #           $self->{'pointStyle' . '0'});
         #        $self->{'gd_obj'}->setBrush($brush);
         #
         #        # draw the point

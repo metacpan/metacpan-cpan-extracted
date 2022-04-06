@@ -8,6 +8,18 @@
 struct spvm_env;
 typedef struct spvm_env SPVM_ENV;
 
+struct spvm_env_compiler;
+typedef struct spvm_env SPVM_ENV_COMPILER;
+
+struct spvm_env_runtime;
+typedef struct spvm_env SPVM_ENV_RUNTIME;
+
+struct spvm_env_string_buffer;
+typedef struct spvm_env SPVM_ENV_STRING_BUFFER;
+
+struct spvm_env_allocator;
+typedef struct spvm_env SPVM_ENV_ALLOCATOR;
+
 typedef union spvm_value SPVM_VALUE;
 
 union spvm_value {
@@ -25,18 +37,6 @@ union spvm_value {
   float* fref;
   double* dref;
 };
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -283,6 +283,13 @@ struct spvm_env {
   int32_t (*init_env)(SPVM_ENV* env);
   void (*call_init_blocks)(SPVM_ENV* env);
   void (*cleanup_global_vars)(SPVM_ENV* env);
+  void* (*get_native_method_address)(SPVM_ENV* env, int32_t method_id);
+  void* (*get_precompile_method_address)(SPVM_ENV*, int32_t method_id);
+  void (*set_native_method_address)(SPVM_ENV* env, int32_t method_id, void* address);
+  void (*set_precompile_method_address)(SPVM_ENV* env, int32_t method_id, void* address);
+  int32_t (*is_object_array)(SPVM_ENV* env, void* object);
+  int32_t (*get_method_id_without_signature)(SPVM_ENV* env, const char* class_name, const char* method_name);
+  const char* (*get_constant_string_value)(SPVM_ENV* env, int32_t string_id, int32_t* string_length);
   void* (*compiler_new)();
   void (*compiler_free)(void* compiler);
   void (*compiler_set_start_line)(void* compiler, int32_t start_line);
@@ -308,16 +315,31 @@ struct spvm_env {
   int32_t (*compiler_is_init_block_method)(void* compiler, int32_t method_id);
   int32_t (*compiler_is_native_method)(void* compiler, int32_t method_id);
   int32_t (*compiler_is_precompile_method)(void* compiler, int32_t method_id);
-  void* (*get_native_method_address)(SPVM_ENV* env, int32_t method_id);
-  void* (*get_precompile_method_address)(SPVM_ENV*, int32_t method_id);
-  void (*set_native_method_address)(SPVM_ENV* env, int32_t method_id, void* address);
-  void (*set_precompile_method_address)(SPVM_ENV* env, int32_t method_id, void* address);
-  int32_t (*is_object_array)(SPVM_ENV* env, void* object);
-  int32_t (*get_method_id_without_signature)(SPVM_ENV* env, const char* class_name, const char* method_name);
-  const char* (*get_constant_string_value)(SPVM_ENV* env, int32_t string_id, int32_t* string_length);
   void (*compiler_build_runtime)(void* compiler, void* runtime);
+  int32_t (*can_assign_array_element)(SPVM_ENV* env, void* array, void* element);
+};
+
+struct spvm_env_allocator {
+  void* (*new_allocator)();
+  void (*free_allocator)(SPVM_ENV_ALLOCATOR* compiler);
+};
+
+struct spvm_env_string_buffer {
+  void* (*new_string_buffer)();
+  void (*free_string_buffer)(SPVM_ENV_STRING_BUFFER* compiler);
+};
+
+struct spvm_env_compiler {
+  void* (*new_compiler)();
+  void (*free_compiler)(SPVM_ENV_COMPILER* compiler);
+};
+
+struct spvm_env_runtime {
+  void* (*new_runtime)();
+  void (*free_runtime)(SPVM_ENV_RUNTIME* compiler);
 };
 
 SPVM_ENV* SPVM_NATIVE_new_env_raw();
+SPVM_ENV* SPVM_NATIVE_new_env_prepared();
 
 #endif

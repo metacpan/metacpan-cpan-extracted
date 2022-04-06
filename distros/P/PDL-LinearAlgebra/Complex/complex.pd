@@ -16,11 +16,6 @@ pp_addhdr('
 }
 
 pp_addhdr('
-#ifndef PDL /* this is needed for PDL pre-2.058 */
-#define PDL PDL_LinearAlgebra_Complex
-Core* PDL = NULL; PDL_COMMENT("Structure hold core C functions")
-#endif
-
 #include <math.h>
 
 typedef PDL_Long logical;
@@ -46,6 +41,20 @@ opts_len);
 
 static integer c_zero = 0;
 static integer c_nine = 9;
+
+#define PDL_MAYBE_SIZE(flagpdltype, flagpdl, flagcond, outpdl, outdim, indim) \
+if (outpdl->state & PDL_MYDIMS_TRANS) { \
+  PDL_Indx i; \
+  char gobig = 0; \
+  flagpdltype *datap = PDL_REPRP(flagpdl); \
+  for (i=0; i<flagpdl->nvals; i++) { \
+    flagpdltype tmp = datap[i]; /* [phys] means ignore incs and offs */ \
+    if (!(flagcond)) continue; \
+    gobig = 1; \
+    break; \
+  } \
+  outdim = gobig ? indim : 1; \
+}
 ');
 
 sub generate_code($){
@@ -61,49 +70,7 @@ sub generate_code($){
 	}
 }
 
-my %float2native = (F => 'G', D => 'C');
-sub pp_defc {
-  my ($function, %hash) = @_;
-  $hash{GenericTypes} ||= [qw(F D)];
-  my $doc = $hash{Doc} || "\n=for ref\n\nComplex version of $function\n\n";
-  $hash{Doc} = undef;
-  my $decl = delete $hash{_decl};
-  $decl =~ s/\$GENERIC\(\)\s*\*/void */g; # dodge float vs float complex ptr problem
-  $hash{Code} = "$decl\n$hash{Code}";
-  pp_def("__Cc$function", %hash);
-  my %hash2 = %hash;
-  $hash2{Pars} =~ s/\(2,/(/g;
-  $hash2{GenericTypes} = [map $float2native{$_} || $_, @{$hash{GenericTypes}}];
-  $hash2{Code} =~ s/\$GENERIC\(\)/\$TFD(float,double)/g;
-  $hash2{Code} =~ s/\$TFD\(/\$TGC(/g;
-  if ($hash2{RedoDimsCode}) {
-    # decrement numbers being compared to, or dims offsets
-    $hash2{RedoDimsCode} =~ s/(>\s*)(\d+)|(\[\s*)(\d+)(\s*\])/
-      $1
-        ? $1.($2 - 1)
-        : $3.($4 - 1).$5
-    /ge;
-  }
-  pp_def("__Nc$function", %hash2);
-  pp_add_exported("c$function");
-  pp_addpm(<<EOF);
-=head2 c$function
-
-=for sig
-
-  Signature: ($hash{Pars})
-
-$doc
-
-=cut
-
-sub PDL::c$function {
-  \$_[0]->type->real ? goto &PDL::__Cc$function : goto &PDL::__Nc$function;
-}
-*c$function = \\&PDL::c$function;
-
-EOF
-}
+do '../pp_defc.pl'; die if $@;
 
 pp_addpm({At=>'Top'},<<'EOD');
 use strict;
@@ -246,8 +213,12 @@ pp_defc("gesvd",
 		integer *info);
 EOF
        HandleBad => 0,
-	RedoDimsCode => '$SIZE(r) =  $PDL(A)->ndims > 2 ? min($PDL(A)->dims[1], $PDL(A)->dims[2]) : 1;',
-	Pars => '[io,phys]A(2,m,n); int jobu(); int jobvt(); [o,phys]s(r); [o,phys]U(2,p,q); [o,phys]VT(2,s,t); int [o,phys]info()',
+	Pars => '[io]A(2,m,n); int jobu(); int jobvt(); [o]s(minmn); [o]U(2,p,p); [o]VT(2,s,s); int [o]info()',
+	RedoDimsCode => '
+	  $SIZE(minmn) = PDLMIN($SIZE(m),$SIZE(n));
+	  PDL_MAYBE_SIZE(PDL_Long, $PDL(jobu), tmp==1 || tmp==2, $PDL(U), $SIZE(p), $SIZE(m))
+	  PDL_MAYBE_SIZE(PDL_Long, $PDL(jobvt), tmp==1 || tmp==2, $PDL(VT), $SIZE(s), $SIZE(n))
+	',
 	Code => generate_code '
 		integer lwork;
 		char trau, travt;
@@ -323,7 +294,7 @@ Doc=>'
 
 =for ref
 
-Complex version of gesvd.
+Complex version of L<PDL::LinearAlgebra::Real/gesvd>.
 
 The SVD is written
 
@@ -339,8 +310,12 @@ pp_defc("gesdd",
 		$GENERIC() *rwork, integer *iwork, integer *info);
 EOF
        HandleBad => 0,
-       RedoDimsCode => '$SIZE(r) =  $PDL(A)->ndims > 2 ? min($PDL(A)->dims[1], $PDL(A)->dims[2]) : 1;',
-	Pars => '[io,phys]A(2,m,n); int job(); [o,phys]s(r); [o,phys]U(2,p,q); [o,phys]VT(2,s,t); int [o,phys]info()',
+	Pars => '[io]A(2,m,n); int jobz(); [o]s(minmn); [o]U(2,p,p); [o]VT(2,s,s); int [o]info()',
+	RedoDimsCode => '
+	  $SIZE(minmn) = PDLMIN($SIZE(m),$SIZE(n));
+	  PDL_MAYBE_SIZE(PDL_Long, $PDL(jobz), tmp==1 || (tmp==2) || (tmp==3 && $SIZE(m)<$SIZE(n)), $PDL(U), $SIZE(p), $SIZE(minmn))
+	  PDL_MAYBE_SIZE(PDL_Long, $PDL(jobz), tmp==1 || (tmp==2) || (tmp==3 && $SIZE(m)>=$SIZE(n)), $PDL(VT), $SIZE(s), $SIZE(minmn))
+	',
 	Code => generate_code '
 		integer lwork;
 		integer *iwork;
@@ -349,10 +324,10 @@ EOF
 		$GENERIC() *rwork;
 		$GENERIC() tmp_work[2];
 		
-		lwork = ($SIZE(m) < $SIZE(n)) ? $SIZE(m) : $SIZE(n);
+		lwork = $SIZE(minmn);
 		iwork = (integer *)malloc(lwork * 8 * sizeof(integer));
 
-		switch ($job())
+		switch ($jobz())
 		{
 
 			case 1: tra = \'A\';
@@ -416,7 +391,7 @@ Doc=>'
 
 =for ref
 
-Complex version of gesdd.
+Complex version of L<PDL::LinearAlgebra::Real/gesdd>.
 
 The SVD is written
 
@@ -434,18 +409,20 @@ pp_defc("ggsvd",
 		integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[io,phys]A(2,m,n); int jobu(); int jobv(); int jobq(); [io,phys]B(2,p,n); int [o,phys]k(); int [o,phys]l();[o,phys]alpha(n);[o,phys]beta(n); [o,phys]U(2,q,r); [o,phys]V(2,s,t); [o,phys]Q(2,u,v); int [o,phys]iwork(n); int [o,phys]info()',
+	Pars => '[io]A(2,m,n); int jobu(); int jobv(); int jobq(); [io]B(2,p,n); int [o]k(); int [o]l();[o]alpha(n);[o]beta(n); [o]U(2,q,q); [o]V(2,r,r); [o]Q(2,s,s); int [o]iwork(n); int [o]info()',
+	RedoDimsCode => '
+	  PDL_MAYBE_SIZE(PDL_Long, $PDL(jobu), tmp, $PDL(U), $SIZE(q), $SIZE(m))
+	  PDL_MAYBE_SIZE(PDL_Long, $PDL(jobv), tmp, $PDL(V), $SIZE(r), $SIZE(p))
+	  PDL_MAYBE_SIZE(PDL_Long, $PDL(jobq), tmp, $PDL(Q), $SIZE(s), $SIZE(n))
+	',
 	Code => generate_code '
 		char pjobu = \'N\';
 		char pjobv = \'N\';		
 		char pjobq = \'N\';
 
-		$GENERIC() *work, *rwork, twork[1];
-		//integer lwork = ($SIZE (m) < $SIZE (n)) ? $SIZE (n): $SIZE (m);
+		$GENERIC() *work, *rwork, twork[2];
 		integer lwork = -1;
 
-		//if ($SIZE (p) > lwork)
-		//	lwork = $SIZE (p);
 		if ($jobu())
 			pjobu = \'U\';
 		if ($jobv())
@@ -471,9 +448,9 @@ EOF
 		$P(U),
 		&(integer){$SIZE(q)},
 		$P(V),
-		&(integer){$SIZE(s)},
+		&(integer){$SIZE(r)},
 		$P(Q),
-		&(integer){$SIZE(u)},
+		&(integer){$SIZE(s)},
 		&twork[0],
 		&lwork,
 		rwork,
@@ -503,9 +480,9 @@ EOF
 		$P(U),
 		&(integer){$SIZE(q)},
 		$P(V),
-		&(integer){$SIZE(s)},
+		&(integer){$SIZE(r)},
 		$P(Q),
-		&(integer){$SIZE(u)},
+		&(integer){$SIZE(s)},
 		work,
 		&lwork,
 		rwork,
@@ -522,7 +499,11 @@ pp_defc("geev",
 		integer *ldvr, $GENERIC() *work, integer *lwork, $GENERIC() *rwork, integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[phys]A(2,n,n); int jobvl(); int jobvr(); [o,phys]w(2,n); [o,phys]vl(2,m,m); [o,phys]vr(2,p,p); int [o,phys]info()',
+	Pars => 'A(2,n,n); int jobvl(); int jobvr(); [o]w(2,n); [o]vl(2,m,m); [o]vr(2,p,p); int [o]info()',
+	RedoDimsCode => '
+	  PDL_MAYBE_SIZE(PDL_Long, $PDL(jobvl), tmp, $PDL(vl), $SIZE(m), $SIZE(n))
+	  PDL_MAYBE_SIZE(PDL_Long, $PDL(jobvr), tmp, $PDL(vr), $SIZE(p), $SIZE(n))
+	',
 	Code => generate_code '
 		char jvl = \'N\';
 		char jvr = \'N\';
@@ -584,7 +565,13 @@ pp_defc("geevx",
 		*work, integer *lwork, $GENERIC() *rwork, integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[io,phys]A(2,n,n);  int jobvl(); int jobvr(); int balance(); int sense(); [o,phys]w(2,n); [o,phys]vl(2,m,m); [o,phys]vr(2,p,p); int [o,phys]ilo(); int [o,phys]ihi(); [o,phys]scale(n); [o,phys]abnrm(); [o,phys]rconde(q); [o,phys]rcondv(r); int [o,phys]info()',
+	Pars => '[io]A(2,n,n);  int jobvl(); int jobvr(); int balance(); int sense(); [o]w(2,n); [o]vl(2,m,m); [o]vr(2,p,p); int [o]ilo(); int [o]ihi(); [o]scale(n); [o]abnrm(); [o]rconde(q); [o]rcondv(r); int [o]info()',
+	RedoDimsCode => '
+	  PDL_MAYBE_SIZE(PDL_Long, $PDL(jobvl), tmp, $PDL(vl), $SIZE(m), $SIZE(n))
+	  PDL_MAYBE_SIZE(PDL_Long, $PDL(jobvr), tmp, $PDL(vr), $SIZE(p), $SIZE(n))
+	  PDL_MAYBE_SIZE(PDL_Long, $PDL(sense), tmp == 1 || tmp == 3, $PDL(rconde), $SIZE(q), $SIZE(n))
+	  PDL_MAYBE_SIZE(PDL_Long, $PDL(sense), tmp == 2 || tmp == 3, $PDL(rcondv), $SIZE(r), $SIZE(n))
+	',
 	Code => generate_code '
 		char jvl = \'N\';
 		char jvr = \'N\';
@@ -682,7 +669,11 @@ pp_defc("ggev",
 		$GENERIC() *rwork, integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[phys]A(2,n,n); int jobvl();int jobvr();[phys]B(2,n,n);[o,phys]alpha(2,n);[o,phys]beta(2,n);[o,phys]VL(2,m,m);[o,phys]VR(2,p,p);int [o,phys]info()',
+	Pars => 'A(2,n,n); int [phys]jobvl();int [phys]jobvr();B(2,n,n);[o]alpha(2,n);[o]beta(2,n);[o]VL(2,m,m);[o]VR(2,p,p);int [o]info()',
+	RedoDimsCode => '
+	  PDL_MAYBE_SIZE(PDL_Long, $PDL(jobvl), tmp, $PDL(VL), $SIZE(m), $SIZE(n))
+	  PDL_MAYBE_SIZE(PDL_Long, $PDL(jobvr), tmp, $PDL(VR), $SIZE(p), $SIZE(n))
+	',
 	Code => generate_code '
 		integer lwork = -1;
 		char pjobvl = \'N\', pjobvr = \'N\';
@@ -752,9 +743,16 @@ pp_defc("ggevx",
 		bwork, integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[io,phys]A(2,n,n);int balanc();int jobvl();int jobvr();int sense();[io,phys]B(2,n,n);[o,phys]alpha(2,n);[o,phys]beta(2,n);[o,phys]VL(2,m,m);[o,phys]VR(2,p,p);int [o,phys]ilo();int [o,phys]ihi();[o,phys]lscale(n);[o,phys]rscale(n);[o,phys]abnrm();[o,phys]bbnrm();[o,phys]rconde(r);[o,phys]rcondv(s);int [o,phys]info()',
+	Pars => '[io,phys]A(2,n,n);int balanc();int jobvl();int jobvr();int sense();[io,phys]B(2,n,n);[o]alpha(2,n);[o]beta(2,n);[o]VL(2,m,m);[o]VR(2,p,p);int [o]ilo();int [o]ihi();[o]lscale(n);[o]rscale(n);[o]abnrm();[o]bbnrm();[o]rconde(r);[o]rcondv(s);int [o]info()',
+	RedoDimsCode => '
+	  PDL_MAYBE_SIZE(PDL_Long, $PDL(jobvl), tmp, $PDL(VL), $SIZE(m), $SIZE(n))
+	  PDL_MAYBE_SIZE(PDL_Long, $PDL(jobvr), tmp, $PDL(VR), $SIZE(p), $SIZE(n))
+	  PDL_MAYBE_SIZE(PDL_Long, $PDL(sense), tmp != 2, $PDL(rconde), $SIZE(r), $SIZE(n))
+	  PDL_MAYBE_SIZE(PDL_Long, $PDL(sense), tmp != 1, $PDL(rcondv), $SIZE(s), $SIZE(n))
+	',
 	Code => generate_code '
-		integer lwork = -1, *iwork, *bwork;
+		integer lwork = -1, *iwork;
+		logical *bwork;
 		char pjobvl = \'N\', pjobvr = \'N\';
 		char pbalanc, psens;
 
@@ -778,15 +776,15 @@ EOF
 		switch ($sense())
 		{
 			case 1: psens = \'E\';
-				bwork = (integer *)malloc($SIZE(n) *  sizeof(integer));
+				bwork = (logical *)malloc($SIZE(n) *  sizeof(logical));
 				break;
 			case 2: psens = \'V\';
 				iwork = (integer *)malloc(($SIZE(n) + 2) *  sizeof(integer));
-				bwork = (integer *)malloc($SIZE(n) *  sizeof(integer));
+				bwork = (logical *)malloc($SIZE(n) *  sizeof(logical));
 				break;
 			case 3: psens = \'B\';
 				iwork = (integer *)malloc(($SIZE(n) + 2) *  sizeof(integer));
-				bwork = (integer *)malloc($SIZE(n) *  sizeof(integer));
+				bwork = (logical *)malloc($SIZE(n) *  sizeof(logical));
 				break;
 			default: psens = \'N\';
 				iwork = (integer *)malloc(($SIZE(n) + 2) *  sizeof(integer));
@@ -879,15 +877,18 @@ pp_defc("gees",
 		extern int $TFD(c,z)gees_(char *jobvs, char *sort, L_fp select, integer *n,
 		$GENERIC() *a, integer *lda, integer *sdim, $GENERIC() *w,
 		$GENERIC() *vs, integer *ldvs, $GENERIC() *work,
-		integer *lwork, $GENERIC() *rwork, integer *bwork, integer *info);
+		integer *lwork, $GENERIC() *rwork, logical *bwork, integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[io,phys]A(2,n,n);  int jobvs(); int sort(); [o,phys]w(2,n); [o,phys]vs(2,p,p); int [o,phys]sdim(); int [o,phys]info()',
+	Pars => '[io]A(2,n,n);  int jobvs(); int sort(); [o]w(2,n); [o]vs(2,p,p); int [o]sdim(); int [o]info()',
+	RedoDimsCode => '
+	  PDL_MAYBE_SIZE(PDL_Long, $PDL(jobvs), tmp, $PDL(vs), $SIZE(p), $SIZE(n))
+	',
 	OtherPars => "SV* select_func" ,
 	Code => generate_code '
 		char jvs = \'N\';
 		char psort = \'N\';
-		integer *bwork;
+		logical *bwork;
 		integer lwork = -1;
 
 		$GENERIC() tmp_work[2];
@@ -899,7 +900,7 @@ EOF
 			jvs = \'V\';
 		if ($sort()){
 			psort = \'S\';
-			bwork  = (integer * ) malloc ($SIZE(n) * sizeof (integer));
+			bwork  = (logical * ) malloc ($SIZE(n) * sizeof (logical));
 		}
              $TFD(c,z)gees_(
 		&jvs,
@@ -947,7 +948,7 @@ EOF
 
 =for ref
 
-Complex version of gees
+Complex version of L<PDL::LinearAlgebra::Real/gees>
 
     select_func:
             If sort = 1, select_func is used to select eigenvalues to sort
@@ -971,16 +972,19 @@ pp_defc("geesx",
 		integer *n, $GENERIC() *a, integer *lda, integer *sdim, $GENERIC() *w,
 		$GENERIC() *vs, integer *ldvs, $GENERIC() *rconde, $GENERIC() *rcondv,
 		$GENERIC() *work, integer *lwork, $GENERIC() *rwork,
-		integer *bwork, integer *info);
+		logical *bwork, integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[io,phys]A(2,n,n);  int jobvs(); int sort(); int sense(); [o,phys]w(2,n);[o,phys]vs(2,p,p); int [o,phys]sdim(); [o,phys]rconde();[o,phys]rcondv(); int [o,phys]info()',
+	Pars => '[io]A(2,n,n);  int jobvs(); int sort(); int sense(); [o]w(2,n);[o]vs(2,p,p); int [o]sdim(); [o]rconde();[o]rcondv(); int [o]info()',
+	RedoDimsCode => '
+	  PDL_MAYBE_SIZE(PDL_Long, $PDL(jobvs), tmp, $PDL(vs), $SIZE(p), $SIZE(n))
+	',
 	OtherPars => "SV* select_func" ,
 	Code => generate_code '
 		char jvs = \'N\';
 		char psort = \'N\';
-		integer *bwork;
-		integer lwork = 0;
+		logical *bwork;
+		integer lwork = -1;
 		char sens;
 
 		$GENERIC() *work, *rwork;
@@ -992,23 +996,42 @@ EOF
 			jvs = \'V\';
 		if ($sort()){
 			psort = \'S\';
-			bwork  = (integer * )  malloc ($SIZE(n) * sizeof (integer));
+			bwork  = (logical * )  malloc ($SIZE(n) * sizeof (logical));
 		}
 
 		switch ($sense())
 		{
 			case 1: sens = \'E\';
-				lwork  = (integer ) ($SIZE(n) * ($SIZE(n)/2));
 				break;
 			case 2: sens = \'V\';
-				lwork  = (integer ) ($SIZE(n) * ($SIZE(n)/2));
 				break;
 			case 3: sens = \'B\';
-				lwork  = (integer ) ($SIZE(n) * ($SIZE(n)/2));
 				break;
 			default: sens = \'N\';
-				 lwork = (integer ) ($SIZE(n) * 2);
 		}
+
+		$GENERIC() tmp_work[2];
+		$TFD(c,z)geesx_(
+		&jvs,
+		&psort,
+		$TFD(f,d)select_wrapper,
+		&sens,
+		&(integer){$SIZE(n)},
+		$P(A),
+		&(integer){$SIZE(n)},
+		$P(sdim),
+		$P(w),
+		$P(vs),
+		&(integer){$SIZE(p)},
+		$P(rconde),
+		$P(rcondv),
+		&tmp_work[0],
+		&lwork,
+		rwork,
+		bwork,
+		$P(info));
+
+		lwork = (integer )tmp_work[0];
 		work  = ($GENERIC() * )malloc(2*lwork * sizeof ($GENERIC()));
 
 		$TFD(c,z)geesx_(
@@ -1040,7 +1063,7 @@ EOF
 
 =for ref
 
-Complex version of geesx
+Complex version of L<PDL::LinearAlgebra::Real/geesx>
 
     select_func:
             If sort = 1, select_func is used to select eigenvalues to sort
@@ -1076,12 +1099,16 @@ pp_defc("gges",
 		logical *bwork, integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[io,phys]A(2,n,n); int jobvsl();int jobvsr();int sort();[io,phys]B(2,n,n);[o,phys]alpha(2,n);[o,phys]beta(2,n);[o,phys]VSL(2,m,m);[o,phys]VSR(2,p,p);int [o,phys]sdim();int [o,phys]info()',
+	Pars => '[io]A(2,n,n); int jobvsl();int jobvsr();int sort();[io]B(2,n,n);[o]alpha(2,n);[o]beta(2,n);[o]VSL(2,m,m);[o]VSR(2,p,p);int [o]sdim();int [o]info()',
+	RedoDimsCode => '
+	  PDL_MAYBE_SIZE(PDL_Long, $PDL(jobvsl), tmp, $PDL(VSL), $SIZE(m), $SIZE(n))
+	  PDL_MAYBE_SIZE(PDL_Long, $PDL(jobvsr), tmp, $PDL(VSR), $SIZE(p), $SIZE(n))
+	',
 	OtherPars => "SV* select_func" ,
 	Code => generate_code '
 		integer lwork = -1;
 		char pjobvsl = \'N\', pjobvsr = \'N\', psort = \'N\';
-		integer *bwork;
+		logical *bwork;
 
 		$GENERIC() tmp_work[2], *rwork;
 		$TFD(f,d)gselect_func_set($COMP(select_func));
@@ -1092,7 +1119,7 @@ EOF
 			pjobvsr = \'V\';
 		if ($sort()){
 			psort = \'S\';
-			bwork = (integer *)malloc($SIZE(n) *  sizeof(integer));
+			bwork = (logical *)malloc($SIZE(n) *  sizeof(logical));
 		}
 		$TFD(c,z)gges_(
 		&pjobvsl,
@@ -1154,7 +1181,7 @@ Doc=>'
 
 =for ref
 
-Complex version of ggees
+Complex version of L<PDL::LinearAlgebra::Real/ggees>
 
     select_func:
             If sort = 1, select_func is used to select eigenvalues to sort
@@ -1182,7 +1209,11 @@ pp_defc("ggesx",
 		integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[io,phys]A(2,n,n); int jobvsl();int jobvsr();int sort();int sense();[io,phys]B(2,n,n);[o,phys]alpha(2,n);[o,phys]beta(2,n);[o,phys]VSL(2,m,m);[o,phys]VSR(2,p,p);int [o,phys]sdim();[o,phys]rconde(q);[o,phys]rcondv(r);int [o,phys]info()',
+	Pars => '[io]A(2,n,n); int jobvsl();int jobvsr();int sort();int sense();[io]B(2,n,n);[o]alpha(2,n);[o]beta(2,n);[o]VSL(2,m,m);[o]VSR(2,p,p);int [o]sdim();[o]rconde(q=2);[o]rcondv(q=2);int [o]info()',
+	RedoDimsCode => '
+	  PDL_MAYBE_SIZE(PDL_Long, $PDL(jobvsl), tmp, $PDL(VSL), $SIZE(m), $SIZE(n))
+	  PDL_MAYBE_SIZE(PDL_Long, $PDL(jobvsr), tmp, $PDL(VSR), $SIZE(p), $SIZE(n))
+	',
 	OtherPars => "SV* select_func" ,
 	Code => generate_code '
 		integer lwork, maxwrk;
@@ -1195,7 +1226,7 @@ EOF
 		char pjobvsr = \'N\';
 		char psort = \'N\';
 		char psens = \'N\';
-		integer *bwork;
+		logical *bwork;
 		integer *iwork;
 		$GENERIC() *rwork = ($GENERIC() *)malloc(8 * $SIZE(n) *  sizeof($GENERIC()));	
 		$TFD(f,d)gselect_func_set($COMP(select_func));
@@ -1204,7 +1235,7 @@ EOF
 
 		if ($sort()){
 			psort = \'S\';
-			bwork = (integer *)malloc($SIZE(n) *  sizeof(integer));
+			bwork = (logical *)malloc($SIZE(n) *  sizeof(logical));
 		}
 
 		switch ($sense())
@@ -1288,7 +1319,7 @@ Doc=>'
 
 =for ref
 
-Complex version of ggeesx
+Complex version of L<PDL::LinearAlgebra::Real/ggeesx>
 
     select_func:
             If sort = 1, select_func is used to select eigenvalues to sort
@@ -1360,7 +1391,7 @@ Doc=>'
 
 =for ref
 
-Complex version of syev for Hermitian matrix
+Complex version of L<PDL::LinearAlgebra::Real/syev> for Hermitian matrix
 
 ');
 
@@ -1436,7 +1467,7 @@ Doc=>'
 
 =for ref
 
-Complex version of syevd for Hermitian matrix
+Complex version of L<PDL::LinearAlgebra::Real/syevd> for Hermitian matrix
 
 ');
 
@@ -1450,7 +1481,10 @@ pp_defc("heevx",
 		$GENERIC() *rwork, integer *iwork, integer *ifail, integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[phys]A(2,n,n);  int jobz(); int range(); int uplo(); [phys]vl(); [phys]vu(); int [phys]il(); int [phys]iu(); [phys]abstol(); int [o,phys]m(); [o,phys]w(n); [o,phys]z(2,p,q);int [o,phys]ifail(r); int [o,phys]info()',
+	Pars => 'A(2,n,n);  int jobz(); int range(); int uplo(); vl(); vu(); int il(); int iu(); abstol(); int [o]m(); [o]w(n); [o]z(2,p,p);int [o]ifail(n); int [o]info()',
+	RedoDimsCode => '
+	  PDL_MAYBE_SIZE(PDL_Long, $PDL(jobz), tmp, $PDL(z), $SIZE(p), $SIZE(n))
+	',
 	Code => generate_code '
 		char jz = \'N\';
 		char puplo = \'U\';
@@ -1535,7 +1569,7 @@ Doc=>'
 
 =for ref
 
-Complex version of syevx for Hermitian matrix
+Complex version of L<PDL::LinearAlgebra::Real/syevx> for Hermitian matrix
 
 ');
 
@@ -1640,7 +1674,7 @@ Doc=>'
 
 =for ref
 
-Complex version of syevr for Hermitian matrix
+Complex version of L<PDL::LinearAlgebra::Real/syevr> for Hermitian matrix
 
 ');
 
@@ -1706,7 +1740,7 @@ Doc=>'
 
 =for ref
 
-Complex version of sygv for Hermitian matrix
+Complex version of L<PDL::LinearAlgebra::Real/sygv> for Hermitian matrix
 
 ');
 
@@ -1789,7 +1823,7 @@ Doc=>'
 
 =for ref
 
-Complex version of sygvd for Hermitian matrix
+Complex version of L<PDL::LinearAlgebra::Real/sygvd> for Hermitian matrix
 
 ');
 
@@ -1804,7 +1838,13 @@ pp_defc("hegvx",
 		integer *iwork, integer *ifail, integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[io,phys]A(2,n,n);int [phys]itype();int jobz();int range(); int uplo();[io,phys]B(2,n,n);[phys]vl();[phys]vu();int [phys]il();int [phys]iu();[phys]abstol();int [o,phys]m();[o,phys]w(n); [o,phys]Z(2,p,q);int [o,phys]ifail(r);int [o,phys]info()',
+	Pars => '[io]A(2,n,n);int itype();int jobz();int range();
+	  int uplo();[io]B(2,n,n);vl();vu();int il();
+	  int iu();abstol();int [o]m();[o]w(n);
+	  [o]Z(2,p,p);int [o]ifail(n);int [o]info()',
+	RedoDimsCode => '
+	  PDL_MAYBE_SIZE(PDL_Long, $PDL(jobz), tmp, $PDL(Z), $SIZE(p), $SIZE(n))
+	',
 	Code => generate_code '
 		char jz = \'N\';
 		char puplo = \'U\';
@@ -1894,7 +1934,7 @@ Doc=>'
 
 =for ref
 
-Complex version of sygvx for Hermitian matrix
+Complex version of L<PDL::LinearAlgebra::Real/sygvx> for Hermitian matrix
 
 ');
 
@@ -1927,7 +1967,11 @@ pp_defc("gesvx",
 		rwork, integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[io,phys]A(2,n,n); int trans(); int fact(); [io,phys]B(2,n,m); [io,phys]af(2,n,n); int [io,phys]ipiv(n); int [io]equed(); [io,phys]r(n); [io,phys]c(n); [o,phys]X(2,n,m); [o,phys]rcond(); [o,phys]ferr(m); [o,phys]berr(m); [o,phys]rpvgrw(); int [o,phys]info()',
+	Pars => '[io]A(2,n,n); int trans(); int fact(); [io]B(2,n,m); [io]af(2,n,n); int [io]ipiv(n); int [io]equed(); [o]r(p); [o]c(q); [o]X(2,n,m); [o]rcond(); [o]ferr(m); [o]berr(m); [o]rpvgrw(); int [o]info()',
+	RedoDimsCode => '
+	  $SIZE(p) = $SIZE(n); /* Ubuntu LAPACK 3 writes to r anyway */
+	  $SIZE(q) = $SIZE(n); /* Ubuntu LAPACK 3 writes to c anyway */
+	',
 	Code => generate_code '
 		char ptrans, pfact, pequed;
 
@@ -1986,9 +2030,6 @@ EOF
 		rwork,
 		$P(info));
 
-		free(work);
-		free(rwork);
-
 		switch (pequed)
 		{
 			case \'R\': $equed() = 1;
@@ -2000,12 +2041,15 @@ EOF
 			default: $equed()= 0;
 		}
 		$rpvgrw() = rwork[0];
+
+		free(work);
+		free(rwork);
 ',
 Doc => '
 
 =for ref
 
-Complex version of gesvx.
+Complex version of L<PDL::LinearAlgebra::Real/gesvx>.
 
     trans:  Specifies the form of the system of equations:
             = 0:  A * X = B     (No transpose)   
@@ -2021,7 +2065,7 @@ pp_defc("sysv",
 		$GENERIC() *work, integer *lwork, integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[io,phys]A(2,n,n);  int uplo(); [io,phys]B(2,n,m); int [o,phys]ipiv(n); int [o,phys]info()',
+	Pars => '[io,phys]A(2,n,n);  int uplo(); [io,phys]B(2,n,m); int [o]ipiv(n); int [o]info()',
 	Code => generate_code '
 		char puplo = \'U\';
 		integer lwork = -1;
@@ -2058,9 +2102,8 @@ EOF
                 work,
 		&lwork,
 		$P(info));
-
-
-             }
+		free(work);
+		}
 ');
 
 pp_defc("sysvx",
@@ -2072,7 +2115,7 @@ pp_defc("sysvx",
 		$GENERIC() *work, integer *lwork, $GENERIC() *rwork, integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[phys]A(2,n,n); int uplo(); int fact(); [phys]B(2,n,m); [io,phys]af(2,n,n); int [io,phys]ipiv(n); [o,phys]X(2,n,m); [o,phys]rcond(); [o,phys]ferr(m); [o,phys]berr(m); int [o,phys]info()',
+	Pars => '[phys]A(2,n,n); int uplo(); int fact(); [phys]B(2,n,m); [io,phys]af(2,n,n); int [io,phys]ipiv(n); [o]X(2,n,m); [o]rcond(); [o]ferr(m); [o]berr(m); int [o]info()',
 	Code => generate_code '
 		char pfact = \'N\';
 		char puplo = \'U\';
@@ -2193,7 +2236,7 @@ Doc=>'
 
 =for ref
 
-Complex version of sysv for Hermitian matrix
+Complex version of L<PDL::LinearAlgebra::Real/sysv> for Hermitian matrix
 
 ');
 
@@ -2278,7 +2321,7 @@ Doc=>'
 
 =for ref
 
-Complex version of sysvx for Hermitian matrix
+Complex version of L<PDL::LinearAlgebra::Real/sysvx> for Hermitian matrix
 
 ');
 
@@ -2309,7 +2352,7 @@ Doc=>'
 
 =for ref
 
-Complex version of posv for Hermitian positive definite matrix
+Complex version of L<PDL::LinearAlgebra::Real/posv> for Hermitian positive definite matrix
 
 ');
 pp_defc("posvx",
@@ -2321,7 +2364,10 @@ pp_defc("posvx",
 		berr, $GENERIC() *work, $GENERIC() *rwork, integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[io,phys]A(2,n,n); int uplo(); int fact(); [io,phys]B(2,n,m); [io,phys]af(2,n,n); int [io]equed(); [io,phys]s(n); [o,phys]X(2,n,m); [o,phys]rcond(); [o,phys]ferr(m); [o,phys]berr(m); int [o,phys]info()',
+	Pars => '[io,phys]A(2,n,n); int uplo(); int fact(); [io,phys]B(2,n,m); [io,phys]af(2,n,n); int [io]equed(); [o]s(p); [o,phys]X(2,n,m); [o,phys]rcond(); [o,phys]ferr(m); [o,phys]berr(m); int [o,phys]info()',
+	RedoDimsCode => '
+	  $SIZE(p) = $SIZE(n); /* Ubuntu LAPACK 3 writes to s anyway */
+	',
 	Code => generate_code '
 		char pfact;
 		char pequed = \'N\';
@@ -2382,7 +2428,7 @@ Doc => '
 
 =for ref
 
-Complex version of posvx for Hermitian positive definite matrix
+Complex version of L<PDL::LinearAlgebra::Real/posvx> for Hermitian positive definite matrix
 
 ');
 
@@ -2442,7 +2488,7 @@ Doc=>'
 
 Solves overdetermined or underdetermined complex linear systems   
 involving an M-by-N matrix A, or its conjugate-transpose.
-Complex version of gels.
+Complex version of L<PDL::LinearAlgebra::Real/gels>.
 
     trans:  = 0: the linear system involves A;
             = 1: the linear system involves A**H.
@@ -2464,7 +2510,7 @@ EOF
 		$GENERIC() tmp_work[2];
 		$GENERIC() *rwork;
 
-		rwork = ($GENERIC() *)malloc(2 * $SIZE(m) * sizeof($GENERIC()));
+		rwork = ($GENERIC() *)malloc(2 * $SIZE(n) * sizeof($GENERIC()));
 
 		$TFD(cgelsy_,zgelsy_)(
 		&(integer){$SIZE(m)},
@@ -2578,6 +2624,7 @@ pp_defc("gelsd",
 EOF
        HandleBad => 0,
 	Pars => '[io,phys]A(2,m,n); [io,phys]B(2,p,q); [phys]rcond(); [o,phys]s(r); int [o,phys]rank();int [o,phys]info()',
+	RedoDimsCode => '$SIZE(r) = PDLMIN($SIZE(m),$SIZE(n));',
 	Code => generate_code '
 		integer lwork = -1;
 		integer smlsiz, size_i, nlvl, *iwork;
@@ -2758,8 +2805,8 @@ pp_defc("getrf",
 		lda, integer *ipiv, integer *info);
 EOF
        HandleBad => 0,
-	RedoDimsCode => '$SIZE(p) =  $PDL(A)->ndims > 2 ? min($PDL(A)->dims[1], $PDL(A)->dims[2]) : 1;',
-	Pars => '[io,phys]A(2,m,n); int [o,phys]ipiv(p); int [o,phys]info()',
+	RedoDimsCode => '$SIZE(p) = PDLMIN($SIZE(m),$SIZE(n));',
+	Pars => '[io]A(2,m,n); int [o]ipiv(p); int [o]info()',
 	Code => generate_code '
 		$TFD(cgetrf_,zgetrf_)(
 		&(integer){$SIZE(m)},
@@ -2776,8 +2823,8 @@ pp_defc("getf2",
 		lda, integer *ipiv, integer *info);
 EOF
        HandleBad => 0,
-	RedoDimsCode => '$SIZE(p) =  $PDL(A)->ndims > 2 ? min($PDL(A)->dims[1], $PDL(A)->dims[2]) : 1;',
-	Pars => '[io,phys]A(2,m,n); int [o,phys]ipiv(p); int [o,phys]info()',
+	RedoDimsCode => '$SIZE(p) = PDLMIN($SIZE(m),$SIZE(n));',
+	Pars => '[io]A(2,m,n); int [o]ipiv(p); int [o]info()',
 	Code => generate_code '
 		$TFD(cgetf2_,zgetf2_)(
 		&(integer){$SIZE(m)},
@@ -2883,7 +2930,7 @@ Doc=>'
 
 =for ref
 
-Complex version of sytrf for Hermitian matrix
+Complex version of L<PDL::LinearAlgebra::Real/sytrf> for Hermitian matrix
 
 ');
 
@@ -2911,7 +2958,7 @@ Doc=>'
 
 =for ref
 
-Complex version of sytf2 for Hermitian matrix
+Complex version of L<PDL::LinearAlgebra::Real/sytf2> for Hermitian matrix
 
 ');
 
@@ -2938,7 +2985,7 @@ Doc=>'
 
 =for ref
 
-Complex version of potrf for Hermitian positive definite matrix
+Complex version of L<PDL::LinearAlgebra::Real/potrf> for Hermitian positive definite matrix
 
 ');
 
@@ -2965,7 +3012,7 @@ Doc => '
 
 =for ref
 
-Complex version of potf2 for Hermitian positive definite matrix
+Complex version of L<PDL::LinearAlgebra::Real/potf2> for Hermitian positive definite matrix
 
 ');
 
@@ -3056,7 +3103,7 @@ Doc => '
 
 =for ref
 
-Complex version of sytri for Hermitian matrix
+Complex version of L<PDL::LinearAlgebra::Real/sytri> for Hermitian matrix
 
 ');
 
@@ -3158,7 +3205,7 @@ EOF
 
 =for ref
 
-Complex version of getrs
+Complex version of L<PDL::LinearAlgebra::Real/getrs>
 
     Arguments   
     =========   
@@ -3222,7 +3269,7 @@ Doc => '
 
 =for ref
 
-Complex version of sytrs for Hermitian matrix
+Complex version of L<PDL::LinearAlgebra::Real/sytrs> for Hermitian matrix
 
 ');
 
@@ -3254,7 +3301,7 @@ Doc=>'
 
 =for ref
 
-Complex version of potrs for Hermitian positive definite matrix
+Complex version of L<PDL::LinearAlgebra::Real/potrs> for Hermitian positive definite matrix
 
 ');
 
@@ -3296,7 +3343,7 @@ EOF
 
 =for ref
 
-Complex version of trtrs
+Complex version of L<PDL::LinearAlgebra::Real/trtrs>
 
     Arguments   
     =========   
@@ -3349,7 +3396,7 @@ EOF
 
 =for ref
 
-Complex version of latrs
+Complex version of L<PDL::LinearAlgebra::Real/latrs>
 
     Arguments   
     =========   
@@ -3371,8 +3418,8 @@ EOF
 	Pars => '[phys]A(2,n,n); int norm(); [phys]anorm(); [o,phys]rcond();int [o,phys]info()',
 	Code => generate_code '
              char pnorm = \'I\';
-		$GENERIC() *work = ($GENERIC() *) malloc(($SIZE(n) * 4) *  sizeof($GENERIC()));
-		$GENERIC() *rwork = ($GENERIC() *) malloc(($SIZE(n) * 2)*  sizeof(integer));
+		$GENERIC() *work = ($GENERIC() *) malloc(($SIZE(n) * 4) * sizeof($GENERIC()));
+		$GENERIC() *rwork = ($GENERIC() *) malloc(($SIZE(n) * 2) * sizeof($GENERIC()));
 
 		if($norm())
 			pnorm = \'O\';
@@ -3454,7 +3501,7 @@ Doc => '
 
 =for ref
 
-Complex version of sycon for Hermitian matrix
+Complex version of L<PDL::LinearAlgebra::Real/sycon> for Hermitian matrix
 
 ');
 
@@ -3469,7 +3516,7 @@ EOF
 	Code => generate_code '
              char puplo = \'U\';
 		$GENERIC() *work = ($GENERIC() *) malloc(($SIZE(n) * 4) *  sizeof($GENERIC()));
-		$GENERIC() *rwork = ($GENERIC() *) malloc($SIZE(n) *  sizeof(integer));
+		$GENERIC() *rwork = ($GENERIC() *) malloc($SIZE(n) * sizeof($GENERIC()));
 
 		if($uplo())
 			puplo = \'L\';
@@ -3492,7 +3539,7 @@ Doc => '
 
 =for ref
 
-Complex version of pocon for Hermitian positive definite matrix
+Complex version of L<PDL::LinearAlgebra::Real/pocon> for Hermitian positive definite matrix
 
 ');
 
@@ -3508,7 +3555,7 @@ EOF
              char pdiag = \'N\';
              char pnorm = \'I\';
 		$GENERIC() *work = ($GENERIC() *) malloc(($SIZE(n) * 4) *  sizeof($GENERIC()));
-		$GENERIC() *rwork = ($GENERIC() *) malloc($SIZE(n) *  sizeof(integer));
+		$GENERIC() *rwork = ($GENERIC() *) malloc($SIZE(n) *  sizeof($GENERIC()));
 
 		if($uplo())
 			puplo = \'L\';
@@ -3661,7 +3708,7 @@ EOF
 
 =for ref
 
-Complex version of orgqr
+Complex version of L<PDL::LinearAlgebra::Real/orgqr>
 
 ');
 
@@ -3723,7 +3770,7 @@ EOF
 
 =for ref
 
-Complex version of ormqr. Here trans = 1 means conjugate transpose.
+Complex version of L<PDL::LinearAlgebra::Real/ormqr>. Here trans = 1 means conjugate transpose.
 
 ');
 
@@ -3808,7 +3855,7 @@ EOF
 
 =for ref
 
-Complex version of orglq
+Complex version of L<PDL::LinearAlgebra::Real/orglq>
 
 ');
 
@@ -3869,7 +3916,7 @@ EOF
 
 =for ref
 
-Complex version of ormlq. Here trans = 1 means conjugate transpose.
+Complex version of L<PDL::LinearAlgebra::Real/ormlq>. Here trans = 1 means conjugate transpose.
 
 ');
 
@@ -3956,7 +4003,7 @@ EOF
 
 =for ref
 
-Complex version of orgql.
+Complex version of L<PDL::LinearAlgebra::Real/orgql>.
 
 ');
 
@@ -4017,7 +4064,7 @@ EOF
 
 =for ref
 
-Complex version of ormql. Here trans = 1 means conjugate transpose.
+Complex version of L<PDL::LinearAlgebra::Real/ormql>. Here trans = 1 means conjugate transpose.
 
 ');
 
@@ -4102,7 +4149,7 @@ EOF
 
 =for ref
 
-Complex version of orgrq.
+Complex version of L<PDL::LinearAlgebra::Real/orgrq>.
 
 ');
 
@@ -4163,7 +4210,7 @@ EOF
 
 =for ref
 
-Complex version of ormrq. Here trans = 1 means conjugate transpose.
+Complex version of L<PDL::LinearAlgebra::Real/ormrq>. Here trans = 1 means conjugate transpose.
 
 ');
 
@@ -4265,7 +4312,7 @@ EOF
 
 =for ref
 
-Complex version of ormrz. Here trans = 1 means conjugate transpose.
+Complex version of L<PDL::LinearAlgebra::Real/ormrz>. Here trans = 1 means conjugate transpose.
 
 ');
 
@@ -4355,7 +4402,7 @@ Doc=>'
 
 =for ref
 
-Complex version of orghr
+Complex version of L<PDL::LinearAlgebra::Real/orghr>
 
 ');
 
@@ -4432,10 +4479,14 @@ pp_defc("trevc",
 		$GENERIC() *work, $GENERIC() *rwork, integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[io,phys]T(2,n,n); int side();int howmny();int [phys]select(q);[io,phys]VL(2,m,r); [io,phys]VR(2,p,s);int [o,phys]m(); int [o,phys]info()',
+	Pars => '[io]T(2,n,n); int side();int howmny();int [phys]select(q);[o]VL(2,m,m); [o]VR(2,p,p);int [o]m(); int [o]info()',
+	RedoDimsCode => '
+	  PDL_MAYBE_SIZE(PDL_Long, $PDL(side), tmp != 1, $PDL(VL), $SIZE(m), $SIZE(n))
+	  PDL_MAYBE_SIZE(PDL_Long, $PDL(side), tmp != 2, $PDL(VR), $SIZE(p), $SIZE(n))
+	',
 	Code => generate_code '
 		char pside,phowmny;
-		integer mm = 0;
+		integer mm = PDLMAX($SIZE(m),$SIZE(p));
 		$GENERIC() *work = ($GENERIC() *) malloc(5 * $SIZE(n) *sizeof($GENERIC()));
 
 		switch ($howmny())
@@ -4450,13 +4501,10 @@ EOF
 		switch ($side())
 		{
 			case 1: pside = \'R\';
-				mm = $SIZE(s);
 				break;
 			case 2: pside = \'L\';
-				mm = $SIZE(r);
 				break;
 			default:pside = \'B\';
-				mm = $SIZE(s);
 		}
 
 		$TFD(ctrevc_,ztrevc_)(
@@ -4487,10 +4535,14 @@ pp_defc("tgevc",
 		integer *mm, integer *m, $GENERIC() *work, $GENERIC() *rwork, integer *info);
 EOF
        HandleBad => 0,
-	Pars => '[io,phys]A(2,n,n); int side();int howmny(); [io,phys]B(2,n,n);int [phys]select(q);[io,phys]VL(2,m,r); [io,phys]VR(2,p,s);int [o,phys]m(); int [o,phys]info()',
+	Pars => '[io]A(2,n,n); int side();int howmny(); [io]B(2,n,n);int select(q);[o]VL(2,m,m); [o]VR(2,p,p);int [o]m(); int [o]info()',
+	RedoDimsCode => '
+	  PDL_MAYBE_SIZE(PDL_Long, $PDL(side), tmp != 1, $PDL(VL), $SIZE(m), $SIZE(n))
+	  PDL_MAYBE_SIZE(PDL_Long, $PDL(side), tmp != 2, $PDL(VR), $SIZE(p), $SIZE(n))
+	',
 	Code => generate_code '
 		char pside,phowmny;
-		integer mm = 0;
+		integer mm = PDLMAX($SIZE(m),$SIZE(p));
 		$GENERIC() *work = ($GENERIC() *) malloc(6 * $SIZE(n) *sizeof($GENERIC()));
 
 		switch ($howmny())
@@ -4505,13 +4557,10 @@ EOF
 		switch ($side())
 		{
 			case 1: pside = \'R\';
-				mm = $SIZE(s);
 				break;
 			case 2: pside = \'L\';
-				mm = $SIZE(r);
 				break;
 			default:pside = \'B\';
-				mm = $SIZE(s);
 		}
 
 		$TFD(ctgevc_,ztgevc_)(
@@ -4731,7 +4780,7 @@ EOF
 
 =for ref
 
-Complex version of gemm. 
+Complex version of L<PDL::LinearAlgebra::Real/gemm>.
 
     Arguments   
     =========   
@@ -4793,7 +4842,7 @@ Doc=>'
 
 =for ref
 
-Complex version of rmgemm. 
+Complex version of L<PDL::LinearAlgebra::Real/rmgemm>.
 
     Arguments   
     =========   
@@ -4975,44 +5024,42 @@ Doc=>'
 
 =for ref
 
-Complex version of rmsyrk
+Complex version of L<PDL::LinearAlgebra::Real/rmsyrk>
 
 ');
 }
 pp_defc("dot",
        _decl => <<'EOF',
-			extern $GENERIC() $TFD(c,z)dotu_($GENERIC() *ret, integer *n, $GENERIC() *dx, integer *incx, $GENERIC() *dy,
+			extern complex $TFD(float,double) $TFD(c,z)dotu_(integer *n, $GENERIC() *dx, integer *incx, $GENERIC() *dy,
 			integer *incy);
 EOF
        HandleBad => 0,
-	Pars => '[phys]a(2,n);int [phys]inca();[phys]b(2,n);int [phys]incb();[o,phys]c(2)',
+	Pars => '[phys]a(2,n);[phys]b(2,n);[o]c(2)',
 	Code =>  '
-		integer n = (integer ) $SIZE(n)/$inca();
-		$TFD(cdotu_,zdotu_)(
-		$P(c),
-		&n,
+		complex $TFD(float,double) *cptr = (void*)$P(c);
+		*cptr = $TFD(cdotu_,zdotu_)(
+		&(integer){$SIZE(n)},
 		$P(a),
-		$P(inca),
+		&(integer){1},
 		$P(b),
-		$P(incb));
+		&(integer){1});
 ');
 
 pp_defc("dotc",
        _decl => <<'EOF',
-			extern $GENERIC() $TFD(c,z)dotc_($GENERIC() *ret, integer *n, $GENERIC() *dx, integer *incx, $GENERIC() *dy,
+			extern $GENERIC() $TFD(c,z)dotc_(integer *n, $GENERIC() *dx, integer *incx, $GENERIC() *dy,
 			integer *incy);
 EOF
        HandleBad => 0,
-	Pars => '[phys]a(2,n);int [phys]inca();[phys]b(2,n);int [phys]incb();[o,phys]c(2)',
+	Pars => '[phys]a(2,n);[phys]b(2,n);[o,phys]c(2)',
 	Code =>  '
-		integer n = (integer ) $SIZE(n)/$inca();
-		$TFD(cdotc_,zdotc_)(
-		$P(c),
-		&n,
+		complex $TFD(float,double) *cptr = (void*)$P(c);
+		*cptr = $TFD(cdotc_,zdotc_)(
+		&(integer){$SIZE(n)},
 		$P(a),
-		$P(inca),
+		&(integer){1},
 		$P(b),
-		$P(incb));
+		&(integer){1});
 ',
 Doc=>'
 
@@ -5029,16 +5076,15 @@ pp_defc("axpy",
 		integer *incx, $GENERIC() *dy, integer *incy);
 EOF
        HandleBad => 0,
-	Pars => '[phys]a(2,n);int [phys]inca();[phys] alpha(2);[io,phys]b(2,n);int [phys]incb()',
+	Pars => '[phys]a(2,n);[phys] alpha(2);[io,phys]b(2,n)',
 	Code =>  '
-		integer n = (integer ) $SIZE(n)/$inca();
 		$TFD(caxpy_,zaxpy_)(
-		&n,
+		&(integer){$SIZE(n)},
 		$P(alpha),
 		$P(a),
-		$P(inca),
+		&(integer){1},
 		$P(b),
-		$P(incb));
+		&(integer){1});
 ');
 
 pp_defc("nrm2",
@@ -5047,13 +5093,12 @@ pp_defc("nrm2",
 			integer *incx);
 EOF
        HandleBad => 0,
-	Pars => '[phys]a(2,n);int [phys]inca();[o,phys]b()',
+	Pars => '[phys]a(2,n);[o]b()',
 	Code =>  '
-		integer n = (integer ) $SIZE(n)/$inca();
 		$b() = $TFD(sc,dz)nrm2_(
-		&n,
+		&(integer){$SIZE(n)},
 		$P(a),
-		$P(inca));
+		&(integer){1});
 ');
 
 pp_defc("asum",
@@ -5062,13 +5107,12 @@ pp_defc("asum",
 		integer *incx);
 EOF
        HandleBad => 0,
-	Pars => '[phys]a(2,n);int [phys]inca();[o,phys]b()',
+	Pars => '[phys]a(2,n);[o]b()',
 	Code =>  '
-		integer n = (integer ) $SIZE(n)/$inca();
 		$b() = $TFD(sc,dz)asum_(
-		&n,
+		&(integer){$SIZE(n)},
 		$P(a),
-		$P(inca));
+		&(integer){1});
 ');
 
 pp_defc("scal",
@@ -5077,25 +5121,28 @@ pp_defc("scal",
 		$GENERIC() *dx, integer *incx);
 EOF
         HandleBad => 0,
-	Pars => '[io,phys]a(2,n);int [phys]inca();[phys]scale(2)',
+	Pars => '[io,phys]a(2,n);scale(2)',
 	Code =>  '
-		integer n = (integer ) $SIZE(n)/$inca();
 		$TFD(cscal_,zscal_)(
-		&n,
+		&(integer){$SIZE(n)},
 		$P(scale),
 		$P(a),
-		$P(inca));
+		&(integer){1});
 ');
 
-pp_def("sscal",
-        HandleBad => 0,
-	Pars => '[io,phys]a(2,n);int [phys]inca();[phys]scale()',
-	GenericTypes => [F],
-	Code =>  '
-		extern int csscal_(integer *n, $GENERIC() *sa,
+pp_defc("sscal",
+	_decl => <<'EOF',
+		extern int $TFD(cs,zd)scal_(integer *n, $GENERIC() *sa,
 		$GENERIC() *dx, integer *incx);
-		integer n = (integer ) $SIZE(n)/$inca();
-		csscal_( &n, $P(scale), $P(a), $P(inca));
+EOF
+        HandleBad => 0,
+	Pars => '[io,phys]a(2,n);scale()',
+	Code =>  '
+		$TFD(csscal_,zdscal_)(
+		&(integer){$SIZE(n)},
+		$P(scale),
+		$P(a),
+		&(integer){1});
 ',
 Doc=>'
 
@@ -5161,7 +5208,7 @@ pp_defc("laswp",
 		*k1, integer *k2, integer *ipiv, integer *incx);
 EOF
        HandleBad => 0,
-	Pars => '[io,phys]A(2,m,n); int [phys]k1(); int [phys]k2(); int [phys]ipiv(p);int [phys]inc()',
+	Pars => '[io,phys]A(2,m,n); int [phys]k1(); int [phys]k2(); int [phys]ipiv(p)',
 	Code => '
 		$TFD(claswp_,zlaswp_)(
 		&(integer){$SIZE(n)},
@@ -5170,7 +5217,7 @@ EOF
 		$P(k1),
 		$P(k2),
 		$P(ipiv),
-		$P(inc));
+		&(integer){1});
 ');
 
 ################################################################################
@@ -5182,7 +5229,7 @@ pp_def(
 	'ctricpy',
 	Pars => 'A(c=2,m,n);int uplo();[o] C(c=2,m,n)',
 	Code => '
-		PDL_Long i, j, k;
+		PDL_Indx i, j, k;
 		
 		if ($uplo())
 		{
@@ -5231,9 +5278,9 @@ pp_def(
 	DefaultFlow => 1,
 	TwoWay => 1,
 	Pars => 'x(c,n,m);y(c,n,p);[o]out(c,n,q);',
-	RedoDimsCode => '$SIZE(q) = $PDL(x)->dims[2] + $PDL(y)->dims[2];',
+	RedoDimsCode => '$SIZE(q) = $SIZE(m) + $SIZE(n);',
 	Code => '
-	  register PDL_Long i,j;
+	  register PDL_Indx i,j;
 	  loop(m)%{
 		  loop(n)%{
 			  loop(c)%{
@@ -5253,7 +5300,7 @@ pp_def(
 	',
 
        BackCode => '
-	  register PDL_Long i,j;
+	  register PDL_Indx i,j;
 	  loop(m)%{
 		  loop(n)%{
 			loop(c)%{
@@ -5295,7 +5342,7 @@ pp_defc('charpol',
 	$GENERIC() *b, integer *ldb, $GENERIC() *beta, $GENERIC() *c__,
 	integer *ldc);
 EOF
-	RedoDimsCode => '$SIZE(p) = $PDL(A)->dims[1] + 1;',
+	RedoDimsCode => '$SIZE(p) = $SIZE(n) + 1;',
 	Pars => '[phys]A(c=2,n,n);[phys,o]Y(c=2,n,n);[phys,o]out(c=2,p);',
 	Code => '
 	int i,j,k;
@@ -5390,4 +5437,3 @@ in this distribution.
 EOD
 
 pp_done();  # you will need this to finish pp processing
-

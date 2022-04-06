@@ -1,3 +1,8 @@
+0.018   2022-04-05  Released-By: PERLANCAR; Urgency: medium
+
+        - Mark the use of --get-product-detail option in filename.
+
+
 0.017   2022-01-23  Released-By: PERLANCAR; Urgency: medium
 
 	- Adjust with Perinci::Result::Format::Lite 0.285 & Rinci 1.1.100

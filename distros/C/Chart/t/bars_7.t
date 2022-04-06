@@ -4,6 +4,8 @@ BEGIN { unshift @INC, 'lib', '../lib'}
 use Chart::Bars;
 use strict;
 use POSIX;
+use File::Temp 0.19;
+my $samples = File::Temp->newdir();
 
 my $a;
 
@@ -44,7 +46,7 @@ $g->set(
     x_label         => 'Date',
 );
 
-$g->png("samples/bars_7.png");
+$g->png("$samples/bars_7.png");
 print "ok 1\n";
 
 exit(0);

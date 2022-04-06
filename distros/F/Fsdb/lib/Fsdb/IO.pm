@@ -917,6 +917,19 @@ sub col_to_i {
     return $self->{_cols_to_i}->{$n};
 }
 
+=head2 col_to_name
+
+    @fields = $fsdb->col_to_name($column_name);
+
+Returns the column anme a given $COLUMN_NAME_OR_INDEX.
+
+=cut
+
+sub col_to_name {
+    my($self, $n_or_i) = @_;
+    return $self->{_cols}->[$self->{_cols_to_i}->{$n_or_i}];
+}
+
 =head2 col_to_type
 
     @fields = $fsdb->col_to_type($column_name, $force_type);
@@ -948,18 +961,19 @@ sub col_to_colspec($$;$) {
     return defined($type) ? "$cs:$type" : $cs;
 }
 
-=head2 col_spec_is_numeric
+=head2 col_type_is_numeric
 
-    @fields = $fsdb->col_spec_is_numeric($column_name);
+    @fields = $fsdb->col_type_is_numeric($column_name);
 
 Returns non-zero if column specification is numeric.
 (Actually, returns 1 for integers and 2 for floats.)
 
 =cut
 
-sub col_spec_is_numeric($$) {
+sub col_type_is_numeric($$) {
     my($self, $n) = @_;
     my($i) = $self->{_cols_to_i}->{$n};
+    return undef if (!defined($i));
     my $type = substr($self->{_types}->[$i], 0, 1);
     if ($type eq 'a') {
         return 0;

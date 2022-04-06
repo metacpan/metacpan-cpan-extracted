@@ -7,7 +7,7 @@ my $build = Module::Build->new(
    module_name => 'App::eachperl',
    requires => {
       'perl' => 5.026,
-      'Object::Pad' => '0.54',
+      'Object::Pad' => '0.63', # :experimental
 
       'Config::Tiny' => 0,
       'Convert::Color::XTerm' => '0.06',

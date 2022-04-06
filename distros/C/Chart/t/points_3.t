@@ -2,6 +2,8 @@
 
 BEGIN { unshift @INC, 'lib', '../lib'}
 use Chart::Points;
+use File::Temp 0.19;
+my $samples = File::Temp->newdir();
 
 print "1..1\n";
 
@@ -24,7 +26,7 @@ $g->add_dataset( -3, 0, 8, 4,  2,  1,  0 );
 
 $g->set(@hash);
 
-$g->png("samples/points_3.png");
+$g->png("$samples/points_3.png");
 
 print "ok 1\n";
 

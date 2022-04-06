@@ -10,7 +10,7 @@ our @EXPORT_OK = qw( mexp mexpts mlog msqrt mpow
 			macosh masinh matanh masech macsch macoth
 			sec asec sech asech 
 			cot acot acoth coth mfun
-			csc acsc csch acsch toreal pi geexp cgeexp ctrsqrt ctrfun );
+			csc acsc csch acsch toreal pi geexp __Ccgeexp __Ncgeexp cgeexp __Cctrsqrt __Nctrsqrt ctrsqrt __Cctrfun __Nctrfun ctrfun );
 our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
@@ -26,12 +26,16 @@ use DynaLoader;
 
 
 
+
+
+#line 80 "trans.pd"
+
 use PDL::Func;
 use PDL::Core;
 use PDL::Slices;
 use PDL::Ops qw//;
 use PDL::Math qw/floor/;
-use PDL::NiceSlice;
+use PDL::MatrixOps qw/identity/;
 use PDL::LinearAlgebra;
 use PDL::LinearAlgebra::Real qw //;
 use PDL::LinearAlgebra::Complex qw //;
@@ -56,7 +60,7 @@ This module provides some transcendental functions for matrices.
 Moreover it provides sec, asec, sech, asech, cot, acot, acoth, coth, csc,
 acsc, csch, acsch. Beware, importing this module will overwrite the hidden
 PDL routine sec. If you need to call it specify its origin module : PDL::Basic::sec(args)
-
+#line 64 "Trans.pm"
 
 
 
@@ -68,6 +72,9 @@ PDL routine sec. If you need to call it specify its origin module : PDL::Basic::
 =cut
 
 
+
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -109,7 +116,7 @@ ACM - Transactions On Mathematical Software, 24(1):130-156, 1998
 
   = random(5,5);
   = pdl(1);
- ->xchg(0,1)->geexp(6,1,, ( = null), ( = null));
+ ->t->geexp(6,1,, ( = null), ( = null));
 
 
 
@@ -120,24 +127,38 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 131 "Trans.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *geexp = \&PDL::geexp;
+#line 138 "Trans.pm"
 
 
 
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
+*__Ccgeexp = \&PDL::__Ccgeexp;
+#line 145 "Trans.pm"
+
+
+
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
+
+*__Ncgeexp = \&PDL::__Ncgeexp;
+#line 152 "Trans.pm"
+
+
+
+#line 23 "../pp_defc.pl"
 
 =head2 cgeexp
 
 =for sig
 
-  Signature: ([io,phys]A(2,n,n);int deg();scale();int trace();int [o]ns();int [o]info())
-
+  Signature: (complex [io,phys]A(n,n);int deg();scale();int trace();int [o]ns();int [o]info())
 
 
 =for ref
@@ -149,30 +170,37 @@ ACM - Transactions On Mathematical Software, 24(1):130-156, 1998
 
 
 
-=for bad
-
-cgeexp does not process bad values.
-It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
-
-
 =cut
 
-
-
-
-
-
+sub PDL::cgeexp {
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Ccgeexp : goto &PDL::__Ncgeexp;
+}
 *cgeexp = \&PDL::cgeexp;
+#line 180 "Trans.pm"
 
 
 
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
+*__Cctrsqrt = \&PDL::__Cctrsqrt;
+#line 187 "Trans.pm"
+
+
+
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
+
+*__Nctrsqrt = \&PDL::__Nctrsqrt;
+#line 194 "Trans.pm"
+
+
+
+#line 23 "../pp_defc.pl"
 
 =head2 ctrsqrt
 
 =for sig
 
-  Signature: ([io,phys]A(2,n,n);int uplo();[phys,o] B(2,n,n);int [o]info())
+  Signature: (complex [io,phys]A(n,n);int uplo();complex [phys,o] B(n,n);int [o]info())
 
 
 
@@ -186,31 +214,37 @@ If uplo is true, A is lower triangular.
 
 
 
-=for bad
-
-ctrsqrt does not process bad values.
-It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
-
-
 =cut
 
-
-
-
-
-
+sub PDL::ctrsqrt {
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Cctrsqrt : goto &PDL::__Nctrsqrt;
+}
 *ctrsqrt = \&PDL::ctrsqrt;
+#line 224 "Trans.pm"
 
 
 
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
+*__Cctrfun = \&PDL::__Cctrfun;
+#line 231 "Trans.pm"
+
+
+
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
+
+*__Nctrfun = \&PDL::__Nctrfun;
+#line 238 "Trans.pm"
+
+
+
+#line 23 "../pp_defc.pl"
 
 =head2 ctrfun
 
 =for sig
 
-  Signature: ([io,phys]A(2,n,n);int uplo();[phys,o] B(2,n,n);int [o]info(); SV* func)
-
+  Signature: (complex [io]A(n,n);int uplo();complex [o] B(n,n);int [o]info();SV* func)
 
 
 =for ref
@@ -219,23 +253,17 @@ Apply an arbitrary function to a complex triangular matrix. Uses a recurrence of
 If uplo is true, A is lower triangular.
 
 
-
-=for bad
-
-ctrfun does not process bad values.
-It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
-
-
 =cut
 
-
-
-
-
-
+sub PDL::ctrfun {
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Cctrfun : goto &PDL::__Nctrfun;
+}
 *ctrfun = \&PDL::ctrfun;
+#line 263 "Trans.pm"
 
 
+
+#line 940 "trans.pd"
 
 my $pi;
 BEGIN { $pi = pdl(3.1415926535897932384626433832795029) }
@@ -283,7 +311,7 @@ sub toreal{
 	return $_[0] if $_[0]->isempty;
 	$_tol = $_[1] if defined $_[1];
 	my ($min, $max, $tmp);
-	($min, $max) = $_[0]->slice('(1)')->minmax;
+	($min, $max) = $_[0]->im->minmax;
 	return $_[0]->re->sever unless (abs($min) > $_tol || abs($max) > $_tol);
 	$_[0];
 }
@@ -307,10 +335,8 @@ Return matrix logarithm of a square matrix.
 
 *mlog = \&PDL::mlog;
 sub PDL::mlog {
+	&PDL::LinearAlgebra::_square;
 	my ($m, $tol) = @_;
-	my @dims = $m->dims;
-	barf("mlog requires a 2-D square matrix")
-		unless( ((@dims == 2) || (@dims == 3)) && $dims[-1] == $dims[-2] );
 	mfun($m, sub{$_[0].=log $_[0]} , 0, $tol);
 }
 
@@ -334,12 +360,9 @@ Return matrix square root (principal) of a square matrix.
 *msqrt = \&PDL::msqrt;
 
 sub PDL::msqrt {
+	&PDL::LinearAlgebra::_square;
 	my ($m, $tol) = @_;
-	my @dims = $m->dims;
-	barf("msqrt requires a 2-D square matrix")
-		unless( ((@dims == 2) || (@dims == 3)) && $dims[-1] == $dims[-2] );
-
-	$m = $m->r2C unless @dims == 3;
+	$m = $m->r2C unless $m->_is_complex;
 	my ($t, undef, $z, undef, $info) = $m->mschur(1);
 	if ($info){
 		warn "msqrt: Can't compute Schur form\n";
@@ -351,7 +374,7 @@ sub PDL::msqrt {
 		return;
 	}
 	$m = $z x $t x $z->t(1);
-	return (@dims ==3) ? $m : toreal($m, $tol);
+	return $m->_is_complex ? $m : toreal($m, $tol);
 }
 
 =head2 mexp
@@ -373,19 +396,12 @@ Return matrix exponential of a square matrix.
 
 *mexp = \&PDL::mexp;
 sub PDL::mexp {
+	&PDL::LinearAlgebra::_square;
 	my ($m, $order, $trace) = @_;
-	my @dims = $m->dims;
-	barf("mexp requires a 2-D square matrix")
-		unless( ((@dims == 2) || (@dims == 3)) && $dims[-1] == $dims[-2] );
-
-	my ($info, $ns);
-	$info  = PDL::null;
-	$ns = PDL::null;
 	$trace = 1 unless defined $trace;
 	$order = 6 unless defined $order;
 	$m = $m->copy;
-	@dims == 3 ? $m->xchg(1,2)->cgeexp($order, 1, $trace, $ns, $info) :
-			$m->xchg(0,1)->geexp($order, 1, $trace, $ns, $info);
+	$m->t->_call_method('geexp', $order, 1, $trace, my $ns = PDL->null, my $info = PDL->null);
 	if ($info){
 		warn "mexp: Error $info";
 	}
@@ -394,98 +410,20 @@ sub PDL::mexp {
 	}
 }
 
-#*mexp2 = \&PDL::mexp2;
-#sub PDL::mexp2 {
-#	my ($m, $order) = @_;
-#	my @dims = $m->dims;
-#	barf("mexp requires a 2-D square matrix")
-#		unless( ((@dims == 2) || (@dims == 3)) && $dims[-1] == $dims[-2] );
-
-#	my ($norm, $X, $c, $D, $N, $fact, $cX, $trace);
-#	if (defined $order){
-#		$order++;
-#	}
-#	else{
-#		$order = 8;
-#	}
-
-	# Trace normalization
-#	$m = $m->copy;
-#	$trace = $m->diag->sumover / $m->dim(1);
-
-#	if (@dims == 3){
-#		$trace = $trace->im->r2C if ($trace->re < 0);
-#		$m->diagonal(1,2) .= $m->diagonal(1,2) - $trace;	
-#	}
-#	elsif ($trace > 0){
-#		$m->diagonal(0,1) -= $trace;
-#	}
-
-	# Scale M
-#	$norm = $m->mnorm(0);
-#	$norm = $norm > 0 ?  PDL::floor(1 + ($norm->log / log(2))) : 0;
-#	$norm = 0 unless $norm > 0;
-#	$m = $m / 2**$norm if $norm > 0;
-
-#	$X = $m;
-#	$N = $m / 2;
-#	$D = -$m / 2;
-#	$c = 0.5;
-#	if (@dims == 3){
-#		$N->re->diagonal(0,1)++;
-#		$D->re->diagonal(0,1)++;
-#	}
-#	else{
-#		$N->diagonal(0,1)++;
-#		$D->diagonal(0,1)++;
-#	}
-#
-#	for ($fact = 2; $fact <= $order;$fact++){
-#		# Padé coeff
-#		$c = $c * ($order - $fact + 1 ) / ($fact * (2 * $order - $fact +1));
-#
-#		if (@dims == 3){
-#			$X = PDL::cmmult($m, $X);
-#			$cX = PDL::Complex::Cmul($X, PDL::Complex::r2C(PDL->pdl($c)));
-#		}
-#		else{
-#			$X = PDL::mmult($m, $X);
-#			$cX = PDL::mult($X, PDL->pdl($c),0);
-#		}
-#		$N = PDL::plus($N,$cX,0);
-#		$D = ($fact % 2) ? PDL::minus($D,$cX,0) :
-#			PDL::plus($D,$cX,0);
-#	}	
-#
-#	$X = PDL::msolvex($D,$N, equilibrate=>1);
-#
-#	# Squaring
-#	if($norm > 0){
-#		for(1..$norm){
-#			$X x= $X;
-#		}
-#	}
-#	
-#	# Reverse trace normalization	
-#	$X = $trace->exp * $X if (@dims == 3 || $trace > 0);
-#	$X;
-#}
-
 *mexpts = \&PDL::mexpts;
 sub PDL::mexpts {
+	&PDL::LinearAlgebra::_square;
 	my ($m, $order, $tol) = @_;
 	my @dims = $m->dims;
-	barf("mexp1 requires a 2-D square matrix")
-		unless( ((@dims == 2) || (@dims == 3)) && $dims[-1] == $dims[-2] );
 	my ($em, $trm);
 	$order = 20 unless defined $order;
-	$em = (@dims == 3 ) ? diag(r2C(ones($dims[1]))) : diag(ones($dims[1]));
+	$em = $m->_is_complex ? diag(r2C(ones($dims[1]))) : diag(ones($dims[1]));
 	$trm = $em->copy;
 	for (1..($order - 1)){
 		$trm =  $trm x ($m / $_);
 	        $em += $trm;
 	}
-	return (@dims ==3) ? $em : toreal($em, $tol);
+	return $m->_is_complex ? $em : toreal($em, $tol);
 }
 
 =head2 mpow
@@ -509,16 +447,16 @@ Return matrix power of a square matrix.
 
 *mpow = \&PDL::mpow;
 sub PDL::mpow {
+	&PDL::LinearAlgebra::_square;
+	my $di = $_[0]->dims_internal;
 	my ($m, $power, $tol, $eigen) = @_;
 	my @dims = $m->dims;
-	barf("mpow requires a 2-D square matrix")
-		unless( ((@dims == 2) || (@dims == 3)) && $dims[-1] == $dims[-2] );
 	my $ret;
 	if (UNIVERSAL::isa($power,'PDL') and $power->dims > 1){
 		my ($e, $v) = $m->meigen(0,1);
 		$ret = $v * $e->Cpow($power) x $v->minv;
 	}
-	elsif( 1/$dims[-1] * 1000 > abs($power)  and !$eigen){
+	elsif( 1/$dims[$di] * 1000 > abs($power)  and !$eigen){
 		$ret = $m;
 		my $pow = floor($power);
 		$pow++ if ($power < 0 and $power != $pow);
@@ -540,7 +478,7 @@ sub PDL::mpow {
 		my ($e, $v) = $m->meigen(0,1);
 		$ret = $v * $e**$power x $v->minv;
 	}
-	return (@dims ==3) ? $ret : toreal($ret, $tol);
+	return $m->_is_complex ? $ret : toreal($ret, $tol);
 }
 
 =head2 mcos
@@ -560,13 +498,16 @@ Return matrix cosine of a square matrix.
 
 =cut
 
+sub _i {
+  defined $PDL::Complex::VERSION ? PDL::Complex::i() : i();
+}
+
 *mcos = \&PDL::mcos;
 sub PDL::mcos {
+	&PDL::LinearAlgebra::_square;
 	my $m = shift;
-	my @dims = $m->dims;
-	barf("mcos requires a 2-D square matrix")
-		unless( ((@dims == 2) || (@dims == 3)) && $dims[-1] == $dims[-2] );
-	return (@dims == 3) ? (mexp(PDL::Complex::i()*$m) + mexp(- PDL::Complex::i()*$m)) / 2 : mexp(PDL::Complex::i()*$m)->re->sever;
+	my $i = _i();
+	return $m->_is_complex ? (mexp($i*$m) + mexp(- $i*$m)) / 2 : mexp($i*$m)->re->sever;
 }
 
 =head2 macos
@@ -588,15 +529,14 @@ Return matrix inverse cosine of a square matrix.
 
 *macos = \&PDL::macos;
 sub PDL::macos {
+	&PDL::LinearAlgebra::_square;
+	my $di = $_[0]->dims_internal;
 	my ($m, $tol) = @_;
 	my @dims = $m->dims;
-	barf("macos requires a 2-D square matrix")
-		unless( ((@dims == 2) || (@dims == 3)) && $dims[-1] == $dims[-2] );
-	my ($id, $ret);
-	$id = PDL::zeroes $m;
-	(@dims == 3) ? $id->slice('(0),:,:')->diagonal(0,1) .= 1 : $id->diagonal(0,1) .= 1;
-	$ret = PDL::Complex::i() * mlog( ($m->r2C - PDL::Complex::i() * msqrt( ($id - $m x $m), $tol)));
-	return (@dims ==3) ? $ret : toreal($ret, $tol);
+	my $id = identity($dims[$di]); $id = $id->r2C if $m->_is_complex;
+	my $i = _i();
+	my $ret = $i * mlog( ($m->r2C - $i * msqrt( ($id - $m x $m), $tol)));
+	return $m->_is_complex ? $ret : toreal($ret, $tol);
 }
 
 =head2 msin
@@ -618,11 +558,10 @@ Return matrix sine of a square matrix.
 
 *msin = \&PDL::msin;
 sub PDL::msin {
+	&PDL::LinearAlgebra::_square;
 	my $m = shift;
-	my @dims = $m->dims;
-	barf("msin requires a 2-D square matrix")
-		unless( ((@dims == 2) || (@dims == 3)) && $dims[-1] == $dims[-2] );
-	return (@dims == 3) ? (mexp(PDL::Complex::i()*$m) - mexp(- PDL::Complex::i()*$m))/(2*PDL::Complex::i()) : mexp(PDL::Complex::i()*$m)->im->sever;
+	my $i = _i();
+	$m->_is_complex ? (mexp($i*$m) - mexp(- $i*$m))/(2*$i) : mexp($i*$m)->im->sever;
 }
 
 =head2 masin
@@ -644,15 +583,14 @@ Return matrix inverse sine of a square matrix.
 
 *masin = \&PDL::masin;
 sub PDL::masin {
+	&PDL::LinearAlgebra::_square;
+	my $di = $_[0]->dims_internal;
 	my ($m, $tol) = @_;
 	my @dims = $m->dims;
-	barf("masin requires a 2-D square matrix")
-		unless( ((@dims == 2) || (@dims == 3)) && $dims[-1] == $dims[-2] );
-	my ($ret, $id);
-	$id = PDL::zeroes $m;
-	(@dims == 3) ? $id->slice('(0),:,:')->diagonal(0,1) .= 1 : $id->diagonal(0,1) .= 1;
-	$ret = (- PDL::Complex::i()) * mlog(((PDL::Complex::i()*$m) + msqrt($id - $m x $m, $tol)));
-	return (@dims ==3) ? $ret : toreal($ret, $tol);
+	my $i = _i();
+	my $id = identity($dims[$di]); $id = $id->r2C if $m->_is_complex;
+	my $ret = (-$i) * mlog((($i*$m) + msqrt($id - $m x $m, $tol)));
+	return $m->_is_complex ? $ret : toreal($ret, $tol);
 }
 
 =head2 mtan
@@ -674,19 +612,19 @@ Return matrix tangent of a square matrix.
 
 *mtan = \&PDL::mtan;
 sub PDL::mtan {
+	&PDL::LinearAlgebra::_square;
 	my ($m, $id) = @_;
 	my @dims = $m->dims;
-	barf("mtan requires a 2-D square matrix")
-		unless( ((@dims == 2) || (@dims == 3)) && $dims[-1] == $dims[-2] );
 	return scalar msolvex(mcos($m), msin($m),equilibrate=>1) unless $id;
-	if (@dims == 3){
-		$id = PDL::zeroes $m;
-		$id->slice('(0),:,:')->diagonal(0,1) .= 1;
-		$m = mexp(-2*PDL::Complex::i()*$m);
-		return scalar msolvex( ($id + $m ),( (- PDL::Complex::i()) * ($id - $m)),equilibrate=>1);
+	my $i = _i();
+	if ($m->_is_complex){
+		my $di = $_[0]->dims_internal;
+		$id = identity($dims[$di])->r2C;
+		$m = mexp(-2*$i*$m);
+		return scalar msolvex( ($id + $m ),( (- $i) * ($id - $m)),equilibrate=>1);
 	}
 	else{
-		$m = mexp(PDL::Complex::i() * $m);
+		$m = mexp($i * $m);
 		return scalar $m->re->msolvex($m->im,equilibrate=>1);
 	}
 }
@@ -710,15 +648,14 @@ Return matrix inverse tangent of a square matrix.
 
 *matan = \&PDL::matan;
 sub PDL::matan {
+	&PDL::LinearAlgebra::_square;
+	my $di = $_[0]->dims_internal;
 	my ($m, $tol) = @_;
 	my @dims = $m->dims;
-	barf("matan requires a 2-D square matrix")
-		unless( ((@dims == 2) || (@dims == 3)) && $dims[-1] == $dims[-2] );
-	my ($id, $ret);
-	$id = PDL::zeroes($m)->r2C;
-	$id->re->diagonal(0,1) .= 1;
-	$ret = - PDL::Complex::i()/2 * mlog( scalar PDL::msolvex( ($id - PDL::Complex::i()*$m) ,($id + PDL::Complex::i()*$m),equilibrate=>1 ));
-	return (@dims ==3) ? $ret : toreal($ret, $tol);
+	my $i = _i();
+	my $id = identity($dims[$di]); $id = $id->r2C if $m->_is_complex;
+	my $ret = -$i/2 * mlog( scalar PDL::msolvex( ($id - $i*$m) ,($id + $i*$m),equilibrate=>1 ));
+	return $m->_is_complex ? $ret : toreal($ret, $tol);
 }
 
 =head2 mcot
@@ -740,19 +677,19 @@ Return matrix cotangent of a square matrix.
 
 *mcot = \&PDL::mcot;
 sub PDL::mcot {
+	&PDL::LinearAlgebra::_square;
 	my ($m, $id) = @_;
 	my @dims = $m->dims;
-	barf("mcot requires a 2-D square matrix")
-		unless( ((@dims == 2) || (@dims == 3)) && $dims[-1] == $dims[-2] );
 	return scalar msolvex(msin($m),mcos($m),equilibrate=>1) unless $id;
-	if (@dims == 3){
-		$id = PDL::zeroes $m;
-		$id->slice('(0),:,:')->diagonal(0,1) .= 1;
-		$m = mexp(-2*PDL::Complex::i()*$m);
-		return  scalar msolvex( ($id - $m ),(  PDL::Complex::i() * ($id + $m)),equilibrate=>1);
+	my $i = _i();
+	if ($m->_is_complex){
+		my $di = $_[0]->dims_internal;
+		$id = identity($dims[$di])->r2C;
+		$m = mexp(-2*$i*$m);
+		return  scalar msolvex( ($id - $m), ($i * ($id + $m)), equilibrate=>1);
 	}
 	else{
-		$m = mexp(PDL::Complex::i() * $m);
+		$m = mexp($i * $m);
 		return scalar $m->im->msolvex($m->re,equilibrate=>1);
 	}
 }
@@ -776,10 +713,8 @@ Return matrix inverse cotangent of a square matrix.
 
 *macot = \&PDL::macot;
 sub PDL::macot {
+	&PDL::LinearAlgebra::_square;
 	my ($m, $tol, $id) = @_;
-	my @dims = $m->dims;
-	barf("macot requires a 2-D square matrix")
-		unless( ((@dims == 2) || (@dims == 3)) && $dims[-1] == $dims[-2] );
 	my ($inv, $info) = $m->minv;
 	if ($info){
 		warn "macot: singular matrix";
@@ -807,11 +742,10 @@ Return matrix secant of a square matrix.
 
 *msec = \&PDL::msec;
 sub PDL::msec {
+	&PDL::LinearAlgebra::_square;
 	my $m = shift;
-	my @dims = $m->dims;
-	barf("msec requires a 2-D square matrix")
-		unless( ((@dims == 2) || (@dims == 3)) && $dims[-1] == $dims[-2] );
-	return (@dims == 3) ? PDL::minv(mexp(PDL::Complex::i()+$m) + mexp(- PDL::Complex::i()*$m)) * 2 : scalar PDL::minv(re(mexp(PDL::Complex::i()*$m)));
+	my $i = _i();
+	return $m->_is_complex ? PDL::minv(mexp($i*$m) + mexp(- $i*$m)) * 2 : scalar PDL::minv(re(mexp($i*$m)));
 }
 
 =head2 masec
@@ -833,10 +767,8 @@ Return matrix inverse secant of a square matrix.
 
 *masec = \&PDL::masec;
 sub PDL::masec {
+	&PDL::LinearAlgebra::_square;
 	my ($m, $tol) = @_;
-	my @dims = $m->dims;
-	barf("masec requires a 2-D square matrix")
-		unless( ((@dims == 2) || (@dims == 3)) && $dims[-1] == $dims[-2] );
 	my ($inv, $info) = $m->minv;
 	if ($info){
 		warn "masec: singular matrix";
@@ -864,11 +796,10 @@ Return matrix cosecant of a square matrix.
 
 *mcsc = \&PDL::mcsc;
 sub PDL::mcsc {
+	&PDL::LinearAlgebra::_square;
 	my $m = shift;
-	my @dims = $m->dims;
-	barf("mcsc requires a 2-D square matrix")
-		unless( ((@dims == 2) || (@dims == 3)) && $dims[-1] == $dims[-2] );
-	return (@dims == 3) ? PDL::minv(mexp(PDL::Complex::i()*$m) - mexp(- PDL::Complex::i()*$m)) * 2*PDL::Complex::i() : scalar PDL::minv(im(mexp(PDL::Complex::i()*$m)));
+	my $i = _i();
+	$m->_is_complex ? PDL::minv(mexp($i*$m) - mexp(- $i*$m)) * 2*$i : scalar PDL::minv(im(mexp($i*$m)));
 }
 
 =head2 macsc
@@ -890,10 +821,8 @@ Return matrix inverse cosecant of a square matrix.
 
 *macsc = \&PDL::macsc;
 sub PDL::macsc {
+	&PDL::LinearAlgebra::_square;
 	my ($m, $tol) = @_;
-	my @dims = $m->dims;
-	barf("macsc requires a 2-D square matrix")
-		unless( ((@dims == 2) || (@dims == 3)) && $dims[-1] == $dims[-2] );
 	my ($inv, $info) = $m->minv;
 	if ($info){
 		warn "macsc: singular matrix";
@@ -922,10 +851,8 @@ Return matrix hyperbolic cosine of a square matrix.
 *mcosh = \&PDL::mcosh;
 
 sub PDL::mcosh {
+	&PDL::LinearAlgebra::_square;
 	my $m  = shift;
-	my @dims = $m->dims;
-	barf("mcosh requires a 2-D square matrix")
-		unless( ((@dims == 2) || (@dims == 3)) && $dims[-1] == $dims[-2] );
 	( $m->mexp + mexp(-$m) )/2;
 }
 
@@ -949,14 +876,12 @@ Return matrix hyperbolic inverse cosine of a square matrix.
 *macosh = \&PDL::macosh;
 
 sub PDL::macosh {
+	&PDL::LinearAlgebra::_square;
 	my ($m, $tol)  =  @_;
 	my @dims = $m->dims;
-	barf("macosh requires a 2-D square matrix")
-		unless( ((@dims == 2) || (@dims == 3)) && $dims[-1] == $dims[-2] );
-	my ($id, $ret);
-	$id = PDL::zeroes $m;
-	(@dims == 3) ? $id->slice('(0),:,:')->diagonal(0,1) .= 1 : $id->diagonal(0,1) .= 1;
-	$ret = msqrt($m x $m - $id);
+	my $di = $_[0]->dims_internal;
+	my $id = identity($dims[$di]); $id = $id->r2C if $m->_is_complex;
+	my $ret = msqrt($m x $m - $id);
 	$m = $m->r2C if $ret->getndims > @dims;
 	mlog($m + $ret, $tol);
 }
@@ -981,10 +906,8 @@ Return matrix hyperbolic sine of a square matrix.
 *msinh = \&PDL::msinh;
 
 sub PDL::msinh {
+	&PDL::LinearAlgebra::_square;
 	my $m  = shift;
-	my @dims = $m->dims;
-	barf("msinh requires a 2-D square matrix")
-		unless( ((@dims == 2) || (@dims == 3)) && $dims[-1] == $dims[-2] );
 	( $m->mexp - mexp(-$m) )/2;
 }
 
@@ -1008,14 +931,12 @@ Return matrix hyperbolic inverse sine of a square matrix.
 *masinh = \&PDL::masinh;
 
 sub PDL::masinh {
+	&PDL::LinearAlgebra::_square;
 	my ($m, $tol)  = @_;
 	my @dims = $m->dims;
-	barf("masinh requires a 2-D square matrix")
-		unless( ((@dims == 2) || (@dims == 3)) && $dims[-1] == $dims[-2] );
-	my ($id, $ret);
-	$id = PDL::zeroes $m;
-	(@dims == 3) ? $id->slice('(0),:,:')->diagonal(0,1) .= 1 : $id->diagonal(0,1) .= 1;
-	$ret = msqrt($m x $m + $id);
+	my $di = $_[0]->dims_internal;
+	my $id = identity($dims[$di]); $id = $id->r2C if $m->_is_complex;
+	my $ret = msqrt($m x $m + $id);
 	$m = $m->r2C if $ret->getndims > @dims;	
 	mlog(($m + $ret), $tol);
 }
@@ -1040,13 +961,12 @@ Return matrix hyperbolic tangent of a square matrix.
 *mtanh = \&PDL::mtanh;
 
 sub PDL::mtanh {
+	&PDL::LinearAlgebra::_square;
 	my ($m, $id)  = @_;
 	my @dims = $m->dims;
-	barf("mtanh requires a 2-D square matrix")
-		unless( ((@dims == 2) || (@dims == 3)) && $dims[-1] == $dims[-2] );
 	return scalar msolvex(mcosh($m), msinh($m),equilibrate=>1) unless $id;
-	$id = PDL::zeroes $m;
-	(@dims == 3) ? $id->slice('(0),:,:')->diagonal(0,1) .= 1 : $id->diagonal(0,1) .= 1;
+	my $di = $_[0]->dims_internal;
+	$id = identity($dims[$di]); $id = $id->r2C if $m->_is_complex;
 	$m = mexp(-2*$m);
 	return  scalar msolvex( ($id + $m ),($id - $m), equilibrate=>1);
 }
@@ -1071,13 +991,11 @@ Return matrix hyperbolic inverse tangent of a square matrix.
 *matanh = \&PDL::matanh;
 
 sub PDL::matanh {
+	&PDL::LinearAlgebra::_square;
 	my ($m, $tol)  = @_;
 	my @dims = $m->dims;
-	barf("matanh requires a 2-D square matrix")
-		unless( ((@dims == 2) || (@dims == 3)) && $dims[-1] == $dims[-2] );
-	my ($id, $ret);
-	$id = PDL::zeroes $m;
-	(@dims == 3) ? $id->slice('(0),:,:')->diagonal(0,1) .= 1 : $id->diagonal(0,1) .= 1;
+	my $di = $_[0]->dims_internal;
+	my $id = identity($dims[$di]); $id = $id->r2C if $m->_is_complex;
 	mlog( scalar msolvex( ($id - $m ),($id + $m),equilibrate=>1), $tol ) / 2;
 }
 
@@ -1101,13 +1019,12 @@ Return matrix hyperbolic cotangent of a square matrix.
 *mcoth = \&PDL::mcoth;
 
 sub PDL::mcoth {
+	&PDL::LinearAlgebra::_square;
 	my ($m, $id)  = @_;
 	my @dims = $m->dims;
-	barf("mcoth requires a 2-D square matrix")
-		unless( ((@dims == 2) || (@dims == 3)) && $dims[-1] == $dims[-2] );
 	scalar msolvex(msinh($m), mcosh($m),equilibrate=>1) unless $id;
-	$id = PDL::zeroes $m;
-	(@dims == 3) ? $id->slice('(0),:,:')->diagonal(0,1) .= 1 : $id->diagonal(0,1) .= 1;
+	my $di = $_[0]->dims_internal;
+	$id = identity($dims[$di]); $id = $id->r2C if $m->_is_complex;
 	$m = mexp(-2*$m);
 	return  scalar msolvex( ($id - $m ),($id + $m),equilibrate=>1);
 }
@@ -1132,10 +1049,8 @@ Return matrix hyperbolic inverse cotangent of a square matrix.
 *macoth = \&PDL::macoth;
 
 sub PDL::macoth {
+	&PDL::LinearAlgebra::_square;
 	my ($m, $tol)  = @_;
-	my @dims = $m->dims;
-	barf("macoth requires a 2-D square matrix")
-		unless( ((@dims == 2) || (@dims == 3)) && $dims[-1] == $dims[-2] );
 	my ($inv, $info) = $m->minv;
 	if ($info){
 		warn "macoth: singular matrix";
@@ -1164,10 +1079,8 @@ Return matrix hyperbolic secant of a square matrix.
 *msech = \&PDL::msech;
 
 sub PDL::msech {
+	&PDL::LinearAlgebra::_square;
 	my $m  = shift;
-	my @dims = $m->dims;
-	barf("msech requires a 2-D square matrix")
-		unless( ((@dims == 2) || (@dims == 3)) && $dims[-1] == $dims[-2] );
 	PDL::minv( $m->mexp + mexp(-$m) ) * 2;
 }
 
@@ -1191,10 +1104,8 @@ Return matrix hyperbolic inverse secant of a square matrix.
 *masech = \&PDL::masech;
 
 sub PDL::masech {
+	&PDL::LinearAlgebra::_square;
 	my ($m, $tol)  = @_;
-	my @dims = $m->dims;
-	barf("masech requires a 2-D square matrix")
-		unless( ((@dims == 2) || (@dims == 3)) && $dims[-1] == $dims[-2] );
 	my ($inv, $info) = $m->minv;
 	if ($info){
 		warn "masech: singular matrix";
@@ -1223,10 +1134,8 @@ Return matrix hyperbolic cosecant of a square matrix.
 *mcsch = \&PDL::mcsch;
 
 sub PDL::mcsch {
+	&PDL::LinearAlgebra::_square;
 	my $m  = shift;
-	my @dims = $m->dims;
-	barf("mcsch requires a 2-D square matrix")
-		unless( ((@dims == 2) || (@dims == 3)) && $dims[-1] == $dims[-2] );
 	PDL::minv( $m->mexp - mexp(-$m) ) * 2;
 }
 
@@ -1250,10 +1159,8 @@ Return matrix hyperbolic inverse cosecant of a square matrix.
 *macsch = \&PDL::macsch;
 
 sub PDL::macsch {
+	&PDL::LinearAlgebra::_square;
 	my ($m, $tol)  = @_;
-	my @dims = $m->dims;
-	barf("macsch requires a 2-D square matrix")
-		unless( ((@dims == 2) || (@dims == 3)) && $dims[-1] == $dims[-2] );
 	my ($inv, $info) = $m->minv;
 	if ($info){
 		warn "macsch: singular matrix";
@@ -1293,15 +1200,12 @@ Function will be applied on a PDL::Complex object.
 *mfun = \&PDL::mfun;
 
 sub PDL::mfun {
+	&PDL::LinearAlgebra::_square;
 	my ($m, $method, $diag, $tol)  = @_;
 	my @dims = $m->dims;
-	barf("mfun requires a 2-D square matrix")
-		unless( ((@dims == 2) || (@dims == 3)) && $dims[-1] == $dims[-2] );
 	if ($diag){
-		my ($e, $v, $inv, $info);
-		($e, $v) = $m->meigen(0,1);
-	
-		($inv, $info) = $v->minv;
+		my ($e, $v) = $m->meigen(0,1);
+		my ($inv, $info) = $v->minv;
 		unless ($info){
 			$method = 'PDL::Complex::'.$method unless ref($method);
 			eval {$v = ($v * $e->$method) x $v->minv;};
@@ -1314,10 +1218,10 @@ sub PDL::mfun {
 			warn "mfun: Non invertible matrix in computation of $method\n";
 			return;
 		}
-		return (@dims ==3) ? $v : toreal($v, $tol);
+		return $m->_is_complex ? $v : toreal($v, $tol);
 	}
 	else{
-		$m = $m->r2C unless @dims == 3;
+		$m = $m->r2C unless $m->_is_complex;
 		my ($t, undef, $z, undef, $info) = $m->mschur(1);
 		if ($info){
 			warn "mfun: Can't compute Schur form\n";
@@ -1330,45 +1234,9 @@ sub PDL::mfun {
 			return;
 		}
 		$m = $z x $t x $z->t(1);
-		return (@dims ==3) ? $m : toreal($m, $tol);	
-	
+		return $m->_is_complex ? $m : toreal($m, $tol);
 	}
 }
-
-#*mspfun = \&PDL::mspfun;
-
-#sub PDL::mspfun {
-#	my ($m, $method, $tol)  = @_;
-#	my @dims = $m->dims;
-#	barf("mspfun requires a 2-D square matrix")
-#		unless( ((@dims == 2) || (@dims == 3)) && $dims[-1] == $dims[-2] );
-
-#	my ($T, $Z, $F, $p, $i, $j, $sden, $s );
-#	($T, undef, $Z) = $m->r2C->mschur(1);
- 	
-#	$F = $T->diagonal(1,2)->$method->diag;
-#	for $p (1..($dims[-1] - 1 )){
-#		for $i (0..($dims[-1]-$p-1)){
-#			$j = $i + $p;
-#			$s = $T(,($j),($i))->Cmul($F(,($j),($j))->Csub($F(,($i),($i))));
-#			if ($i < ($j-1)){
-#				$s = $s + $T(,$i+1:$j-1,($i))->cdot(1, $F(,($j), $i+1:$j-1),1)->Csub($F(,$i+1:$j-1,($i))->cdot(1,$T(,($j), $i+1:$j-1),1));
-#			}
-#			$sden = $T(,($j),($j))->Csub($T(,($i),($i)));
-#			if ($sden != 0){
-#	                	$s = $s / $sden;
-#  			}
-#                       else{
-#				barf "Illegal division by zero occured\n";
-#                       }
-#			$F(,($j),($i)) .= $s;
-#        	}
-#	}
-#	print $F;
-#	$m = $Z x $F x $Z->t(1);
-#	return (@dims ==3) ? $m : toreal($m, $tol);
-#
-#}
 
 =head1 TODO
 
@@ -1384,10 +1252,10 @@ it under the terms of the Perl Artistic License as in the file Artistic_2
 in this distribution.
 
 =cut
+#line 1256 "Trans.pm"
 
 
 
-;
 
 
 

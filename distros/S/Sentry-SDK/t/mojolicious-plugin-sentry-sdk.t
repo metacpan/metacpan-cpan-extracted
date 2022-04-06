@@ -51,7 +51,7 @@ use Test::Spec;
   sub adds_breadcrumb ($self) {
     Sentry::SDK->add_breadcrumb({ category => 'foo', message => 'hello' });
     Sentry::SDK->capture_message('hello');
-    $self->render(text => 'bla!');
+    $self->render(text => 'breadcrumb added!');
   }
 
   sub dies { die 'boom' }
@@ -74,34 +74,39 @@ describe 'Mojolicious::Plugin::SentrySDK' => sub {
     );
   };
 
-  # it 'does not crash the application' => sub {
-  #   $t->get_ok('/')->status_is(HTTP_OK)->text_is('Hello!');
-  # };
+  it 'does not crash the application' => sub {
+    $t->get_ok('/')->status_is(HTTP_OK)->content_is('Hello World!');
+  };
 
-  # it 'captures exceptions' => sub {
-  #   $t->get_ok('/dies')->status_is(HTTP_INTERNAL_SERVER_ERROR);
+  it 'captures exceptions' => sub {
+    $t->get_ok('/dies')->status_is(HTTP_INTERNAL_SERVER_ERROR);
 
-  #   ok exists $http->requests->[0]{body}{exception};
-  # };
+    # Notification; Transaction
+    is $http->requests->@*, 2;
+    isa_ok($http->requests->[0]{body}, 'HASH');
+    is ref($http->requests->[1]{body}), '';
+
+    ok exists $http->requests->[0]{body}{exception};
+  };
 
   it 'registers breadcrumbs' => sub {
     # Sentry-Requests are ignored in the MojoUserAgent integration
     my %do_not_track = ('x-sentry-auth' => 1);
     %do_not_track = ();
-    # $t->get_ok('/' => \%do_not_track)->status_is(HTTP_OK)->text_is('Hello!');
     $t->get_ok('/adds-breadcrumb' => \%do_not_track)->status_is(HTTP_OK)
-      ->text_is('Hello!');
+      ->content_is('breadcrumb added!');
 
-    is $http->requests->@*, 1;
+    # Notification; Transaction
+    is $http->requests->@*, 2;
 
-    my %event = $http->requests->[-1]{body}->%*;
+    my %event = $http->requests->[0]{body}->%*;
 
     is $event{message} => 'hello';
     is $event{level}   => 'info';
 
-    is $event{breadcrumbs}->@*          => 1;
-    is $event{breadcrumbs}[0]{category} => 'foo';
-    is $event{breadcrumbs}[0]{message}  => 'hello';
+    # is $event{breadcrumbs}->@*           => 1;
+    is $event{breadcrumbs}[-1]{category} => 'foo';
+    is $event{breadcrumbs}[-1]{message}  => 'hello';
   };
 };
 

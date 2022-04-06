@@ -2,6 +2,8 @@
 
 BEGIN { unshift @INC, 'lib', '../lib'}
 use Chart::LinesPoints;
+use File::Temp 0.19;
+my $samples = File::Temp->newdir();
 
 print "1..1\n";
 
@@ -22,7 +24,7 @@ $g->set( 'grid_lines'      => 'true' );
 $g->set( 'grey_background' => 'false' );
 $g->set( 'legend'          => 'bottom' );
 
-$g->png("samples/linespoints_1.png");
+$g->png("$samples/linespoints_1.png");
 
 print "ok 1\n";
 

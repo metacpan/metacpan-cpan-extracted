@@ -2,6 +2,8 @@
 
 BEGIN { unshift @INC, 'lib', '../lib'}
 use Chart::Pie;
+use File::Temp 0.19;
+my $samples = File::Temp->newdir();
 
 print "1..1\n";
 
@@ -25,7 +27,7 @@ $g->add_dataset( 90,     0,          1,             216,      0 );
 
 $g->set(%opt);
 
-$g->png("samples/pie_6.png");
+$g->png("$samples/pie_6.png");
 
 print "ok 1\n";
 exit(0);

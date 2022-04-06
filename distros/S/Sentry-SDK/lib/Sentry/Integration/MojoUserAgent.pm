@@ -57,17 +57,6 @@ sub setup_once ($self, $add_global_event_processor, $get_current_hub) {
       return $result;
     }
   );
-
-  $add_global_event_processor->(
-    sub ($event, $hint) {
-
-      # warn 'PROCESS' . dumper($event);
-
-      # warn $get_current_hub->();
-    }
-  );
-
-  # my $hub = $get_current_hub->();
 }
 
 1;

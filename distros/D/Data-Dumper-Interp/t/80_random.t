@@ -81,7 +81,7 @@ sub gen_hashkey() {
   if ($kind == 0) { return "x" x int(rand(15)) }   # bareword
   if ($kind == 1) { return " x " x int(rand(10)) } # string with spaces
   if ($kind == 2) { return int(rand(INT_MAX)) }    # integer
-  if ($kind == 3) { return     rand(INT_MAX)  }  # float
+  if ($kind == 3) { return     rand(INT_MAX)  }    # float
   die
 }
 sub gen_hash($) {
@@ -93,15 +93,18 @@ sub gen_hash($) {
 my $start_time = time;
 my $iter = 0;
 while (time < $start_time+$time_limit) {
-  ++$iter;
-  #$Data::Dumper::Interp::Debug = 1 if $iter==21;
-  @saved_items = ();
-  my $item = gen_item();
-  my $r; eval { $r = vis $item };
-  if ($@) {
-    die "Iter $iter:\n$@\n\n", Data::Dumper->new([$item],["item"])->Dump,"\nFailed on iter $iter. initial_seed=$initial_seed  len(exmsg)=",length($@);
+  # Do several iterations between OS calls to get current time
+  for (0..49) {
+    ++$iter;
+    #$Data::Dumper::Interp::Debug = 1 if $iter==21;
+    @saved_items = ();
+    my $item = gen_item();
+    my $r; eval { $r = vis $item };
+    if ($@) {
+      die "Iter $iter:\n$@\n\n", Data::Dumper->new([$item],["item"])->Dump,"\nFailed on iter $iter. initial_seed=$initial_seed  len(exmsg)=",length($@);
+    }
+    #diag "Iter $iter : vis result length = ",length($r);
   }
-  #diag "Iter $iter : vis result length = ",length($r);
 } 
 ok(1, "Stopped after time limit expired ($time_limit seconds).  $iter iterations completed.");
 

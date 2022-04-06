@@ -1,4 +1,4 @@
-#fsdb x accum
+#fsdb x accum:d
 # first should be zero, not error
 -	0
 1	1

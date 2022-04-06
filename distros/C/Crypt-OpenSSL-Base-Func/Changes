@@ -1,5 +1,8 @@
 Revision history for Perl extension Crypt::OpenSSL::Base::Func.
 
+0.031 2022/04/06
+    - i2osp
+
 0.03  2022/04/02   
     - input/output binary
     - add more base func

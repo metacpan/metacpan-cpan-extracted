@@ -141,7 +141,7 @@ sub build_shared_lib_runtime {
     $src_dir = $self->builder->create_build_src_path;
     mkpath $src_dir;
     
-    $self->create_precompile_csource(
+    $self->create_precompile_source_file(
       $class_name,
       {
         src_dir => $src_dir,
@@ -183,7 +183,7 @@ sub build_shared_lib_dist {
     $src_dir = $self->builder->create_build_src_path;
     mkpath $src_dir;
 
-    $self->create_precompile_csource(
+    $self->create_precompile_source_file(
       $class_name,
       {
         src_dir => $src_dir,
@@ -959,7 +959,7 @@ sub link {
   return $shared_lib_file;
 }
 
-sub create_precompile_csource {
+sub create_precompile_source_file {
   my ($self, $class_name, $opt) = @_;
 
   my $src_dir = $opt->{src_dir};
@@ -977,7 +977,7 @@ sub create_precompile_csource {
   $spvm_module_dir =~ s/\.pm$//;
   $spvm_module_dir .= '/src';
   
-  my $spvm_precompile_soruce_file = "$spvm_module_dir/spvm_csource_builder_precompile.c";
+  my $spvm_precompile_soruce_file = "$spvm_module_dir/spvm_precompile.c";
   
   unless (-f $spvm_precompile_soruce_file) {
     confess "Can't find $spvm_precompile_soruce_file";
@@ -994,10 +994,10 @@ sub create_precompile_csource {
     my $source_dir = "$src_dir/$class_rel_dir";
     mkpath $source_dir;
     
-    my $class_csource = $self->build_class_csource_precompile($class_name);
+    my $precompile_source = $self->create_precompile_source($class_name);
     open my $fh, '>', $source_file
       or die "Can't create $source_file";
-    print $fh $class_csource;
+    print $fh $precompile_source;
     close $fh;
   }
 }

@@ -191,9 +191,6 @@ sub _prepare_event ($self, $event, $scope, $hint = undef) {
   $self->_apply_client_options(\%prepared);
   $self->_apply_integrations_metadata(\%prepared);
 
-# beforeSend
-# https://github.com/getsentry/sentry-javascript/blob/72aed62a2aecb29cb75b807e7661d9929327281d/packages/core/src/baseclient.ts#L569
-
   # If we have scope given to us, use it as the base for further modifications.
   # This allows us to prevent unnecessary copying of data if `capture_context`
   # is not provided.

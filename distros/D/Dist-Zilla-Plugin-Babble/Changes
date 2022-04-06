@@ -1,4 +1,7 @@
 Revision history for Dist-Zilla-Plugin-Babble
 
+0.002     2022-04-06 13:46:36+02:00 Europe/Amsterdam
+	  Add ::SubstituteAndReturn support.
+
 0.001     2018-08-19 19:51:03+02:00 Europe/Amsterdam
           Initial release to an unsuspecting world

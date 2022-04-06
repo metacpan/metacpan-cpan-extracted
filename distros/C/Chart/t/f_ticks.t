@@ -9,6 +9,8 @@
 BEGIN { unshift @INC, 'lib', '../lib'}
 use strict;
 use Chart::Points;
+use File::Temp 0.19;
+my $samples = File::Temp->newdir();
 
 print "1..1\n";
 
@@ -72,12 +74,12 @@ $graphic->set( 'f_y_tick' => \&formatter );
 
 if ( $graphic->can('gif') )
 {
-    my $picture_file = "samples/f_ticks.gif";
+    my $picture_file = "$samples/f_ticks.gif";
     $graphic->gif($picture_file);
 }
 if ( $graphic->can('png') )
 {
-    my $picture_file = "samples/f_ticks.png";
+    my $picture_file = "$samples/f_ticks.png";
     $graphic->png($picture_file);
 }
 

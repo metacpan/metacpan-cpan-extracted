@@ -1,10 +1,14 @@
 package Acme::CPANModules::StructuredDATA;
 
-our $DATE = '2019-01-09'; # DATE
-our $VERSION = '0.001'; # VERSION
+use strict;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-03-18'; # DATE
+our $DIST = 'Acme-CPANModules-StructuredDATA'; # DIST
+our $VERSION = '0.002'; # VERSION
 
 our $LIST = {
-    summary => 'Modules that give some structure to DATA',
+    summary => 'List of modules that give some structure to DATA',
     description => <<'_',
 
 The DATA file handle is a convenient feature provided by Perl to let scripts
@@ -75,7 +79,7 @@ _
 };
 
 1;
-# ABSTRACT: Modules that give some structure to DATA
+# ABSTRACT: List of modules that give some structure to DATA
 
 __END__
 
@@ -85,15 +89,13 @@ __END__
 
 =head1 NAME
 
-Acme::CPANModules::StructuredDATA - Modules that give some structure to DATA
+Acme::CPANModules::StructuredDATA - List of modules that give some structure to DATA
 
 =head1 VERSION
 
-This document describes version 0.001 of Acme::CPANModules::StructuredDATA (from Perl distribution Acme-CPANModules-StructuredDATA), released on 2019-01-09.
+This document describes version 0.002 of Acme::CPANModules::StructuredDATA (from Perl distribution Acme-CPANModules-StructuredDATA), released on 2022-03-18.
 
 =head1 DESCRIPTION
-
-Modules that give some structure to DATA.
 
 The DATA file handle is a convenient feature provided by Perl to let scripts
 access its own source code (specifically the part after B<END> or B<DATA>).
@@ -102,11 +104,13 @@ Scripts can usually put some data so they can run without additional data files.
 Instead of just a stream of bytes, some modules allow you to access the DATA as
 some kind of structured storage.
 
-=head1 INCLUDED MODULES
+=head1 ACME::CPANMODULES ENTRIES
 
 =over
 
-=item * L<Data::Section>
+=item * L<Data::Section> - read multiple hunks of data out of your DATA section
+
+Author: L<RJBS|https://metacpan.org/author/RJBS>
 
 With this module, you can put several strings in your DATA section, each
 prepended with a header line containing the label for each. For example:
@@ -122,7 +126,9 @@ prepended with a header line containing the label for each. For example:
 and access each string by referring to its label.
 
 
-=item * L<Data::Section::Seekable>
+=item * L<Data::Section::Seekable> - Read and write parts from data section
+
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
 This module is similar to L<Data::Section> in letting you put several
 multipart content in DATA with the exception that it writes a table of content
@@ -144,7 +150,9 @@ data. It is useful when the amount of data is quite large and you need quick
 access to random parts.
 
 
-=item * L<Inline::Files>
+=item * L<Inline::Files> - Multiple virtual files at the end of your code
+
+Author: L<AMBS|https://metacpan.org/author/AMBS>
 
 This is a prior art for L<Data::Section> but more magical (using source
 filters) and allows writing in addition to reading your parts. It completely
@@ -154,6 +162,41 @@ it, and the module itself gives such warning.
 
 =back
 
+=head1 FAQ
+
+=head2 What is an Acme::CPANModules::* module?
+
+An Acme::CPANModules::* module, like this module, contains just a list of module
+names that share a common characteristics. It is a way to categorize modules and
+document CPAN. See L<Acme::CPANModules> for more details.
+
+=head2 What are ways to use this Acme::CPANModules module?
+
+Aside from reading this Acme::CPANModules module's POD documentation, you can
+install all the listed modules (entries) using L<cpanm-cpanmodules> script (from
+L<App::cpanm::cpanmodules> distribution):
+
+ % cpanm-cpanmodules -n StructuredDATA
+
+Alternatively you can use the L<cpanmodules> CLI (from L<App::cpanmodules>
+distribution):
+
+    % cpanmodules ls-entries StructuredDATA | cpanm -n
+
+or L<Acme::CM::Get>:
+
+    % perl -MAcme::CM::Get=StructuredDATA -E'say $_->{module} for @{ $LIST->{entries} }' | cpanm -n
+
+or directly:
+
+    % perl -MAcme::CPANModules::StructuredDATA -E'say $_->{module} for @{ $Acme::CPANModules::StructuredDATA::LIST->{entries} }' | cpanm -n
+
+This Acme::CPANModules module also helps L<lcpan> produce a more meaningful
+result for C<lcpan related-mods> command when it comes to finding related
+modules for the modules listed in this Acme::CPANModules module.
+See L<App::lcpan::Cmd::related_mods> for more details on how "related modules"
+are found.
+
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Acme-CPANModules-StructuredDATA>.
@@ -161,14 +204,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Acme-CPANM
 =head1 SOURCE
 
 Source repository is at L<https://github.com/perlancar/perl-Acme-CPANModules-StructuredDATA>.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-StructuredDATA>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
 
 =head1 SEE ALSO
 
@@ -180,11 +215,36 @@ L<cpanmodules> - CLI tool to let you browse/view the lists
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2022, 2019 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-StructuredDATA>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

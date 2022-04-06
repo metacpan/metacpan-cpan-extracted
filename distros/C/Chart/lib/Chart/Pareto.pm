@@ -1,24 +1,12 @@
-## @file
-# Implementation of Chart::Pareto
-#
-# written and maintained by
-# @author Chart Group at Geodetic Fundamental Station Wettzell (Chart@fs.wettzell.de)
-# @date 2015-03-01
-# @version 2.4.10
-#
+use v5.12;
 
-## @class Chart::Pareto
-# @brief Pareto class derived class for Chart to implement
-#
 package Chart::Pareto;
+our @ISA     = qw(Chart::Base);
 our $VERSION = 2.400.5;
 
 use Chart::Base;
 use GD;
 use Carp;
-use strict;
-
-@Chart::Pareto::ISA     = qw(Chart::Base);
 
 #>>>>>>>>>>>>>>>>>>>>>>>>>>#
 #  public methods go here  #

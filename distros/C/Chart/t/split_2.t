@@ -2,6 +2,8 @@
 
 BEGIN { unshift @INC, 'lib', '../lib'}
 use Chart::Split;
+use File::Temp 0.19;
+my $samples = File::Temp->newdir();
 print "1..1\n";
 
 $g = Chart::Split->new( 500, 500 );
@@ -33,7 +35,7 @@ $g->add_dataset(@y2);
     'legend'         => 'bottom',
 );
 $g->set(%options);
-$g->png("samples/split_2.png");
+$g->png("$samples/split_2.png");
 print "ok 1\n";
 
 exit(0);

@@ -6,6 +6,8 @@ use Chart::Lines;
 use Chart::Points;
 use Chart::LinesPoints;
 use strict;
+use File::Temp 0.19;
+my $samples = File::Temp->newdir();
 
 print "1..1\n";
 
@@ -47,7 +49,7 @@ $g->add_dataset( @x[@s] );
 $g->add_dataset( @y[@s] );
 $g->add_dataset(@x2);
 $g->set(%hash);
-$g->jpeg("samples/composite_7.jpg");
+$g->jpeg("$samples/composite_7.jpg");
 
 print "ok 1\n";
 

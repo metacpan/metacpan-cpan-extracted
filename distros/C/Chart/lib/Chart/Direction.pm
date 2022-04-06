@@ -1,31 +1,16 @@
-## @file
-# Implementation of Chart::Direction
-#
-# written by
-# @author Chart Group at Geodetic Fundamental Station Wettzell (Chart@fs.wettzell.de)
-# @date 2015-03-01
-# @version 2.4.10
-#
 
-# @section Chart::Direction
-# Implements a circular oriented chart like rotating vectors
-#
+# circular oriented chart like rotating vectors
 
-## @class Chart::Direction
-# @brief Direction class derived class for Chart to implement direction
-# charts
+use v5.12;
 
 package Chart::Direction;
+our @ISA     = qw(Chart::Base);
 our $VERSION = 2.400.5;
 
 use Chart::Base;
 use GD;
 use Carp;
-
-use strict;
 use POSIX;
-
-@Chart::Direction::ISA     = qw(Chart::Base);
 
 #>>>>>>>>>>>>>>>>>>>>>>>>>>#
 #  public methods go here  #
@@ -737,7 +722,7 @@ sub _draw_data
                 $color = $self->_color_role_to_index( 'dataset' . ( $j / 2 - 0.5 ) );
             }
 
-#####	$color = $self->_color_role_to_index('dataset'.(1));  #####################
+#####   $color = $self->_color_role_to_index('dataset'.(1));  #####################
 
             for $i ( 0 .. $self->{'num_datapoints'} - 1 )
             {

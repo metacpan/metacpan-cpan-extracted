@@ -7,7 +7,7 @@ readme_from 'lib/RT/Extension/ExcelFeed.pm';
 license  'gplv2';
 
 requires 'Excel::Writer::XLSX';
-requires_rt '4.2.10';
+requires_rt '4.4.5';
 rt_too_new '5.2.0';
 
 sign;

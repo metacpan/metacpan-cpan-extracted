@@ -1,9 +1,9 @@
 NAME
-    Acme::CPANModules::Sudoku - Sudoku-related modules on CPAN
+    Acme::CPANModules::Sudoku - List of Sudoku-related modules on CPAN
 
 VERSION
-    This document describes version 0.006 of Acme::CPANModules::Sudoku (from
-    Perl distribution Acme-CPANModules-Sudoku), released on 2021-08-11.
+    This document describes version 0.007 of Acme::CPANModules::Sudoku (from
+    Perl distribution Acme-CPANModules-Sudoku), released on 2022-03-18.
 
 DESCRIPTION
     Recently (Dec 2020) I picked up more interest in Sudoku, as I was
@@ -59,28 +59,51 @@ DESCRIPTION
 
     Games::YASudoku
 
-ACME::MODULES ENTRIES
-    *   Games::Sudoku::CLI
+ACME::CPANMODULES ENTRIES
+    *   Games::Sudoku::CLI - play Sudoku on the command line
 
-    *   Games::Sudoku::Component::TkPlayer
+        Author: SZABGAB <https://metacpan.org/author/SZABGAB>
 
-    *   Spreadsheet::HTML::Presets::Sudoku
+    *   Games::Sudoku::Component::TkPlayer - Let's play Sudoku
+
+        Author: ISHIGAKI <https://metacpan.org/author/ISHIGAKI>
+
+    *   Spreadsheet::HTML::Presets::Sudoku - Generates 9x9 sudoku boards via
+        HTML tables.
+
+        Author: JEFFA <https://metacpan.org/author/JEFFA>
 
     *   Games::Sudoku::Lite
 
-    *   Games::Sudoku::Solver
+        Author: BOBO <https://metacpan.org/author/BOBO>
+
+    *   Games::Sudoku::Solver - Solve 9x9-Sudokus recursively.
+
+        Author: MEHNER <https://metacpan.org/author/MEHNER>
 
     *   Games::Sudoku::General
 
-    *   Games::Sudoku::CPSearch
+        Author: WYANT <https://metacpan.org/author/WYANT>
 
-    *   Games::Sudoku::Kubedoku
+    *   Games::Sudoku::CPSearch - Solve Sudoku problems quickly.
 
-    *   Games::Sudoku::SudokuTk
+        Author: MARTYLOO <https://metacpan.org/author/MARTYLOO>
 
-    *   Games::Sudoku::OO::Board
+    *   Games::Sudoku::Kubedoku - Sudoku Solver for any NxN puzzles
 
-    *   Games::YASudoku
+        Author: VELASCO <https://metacpan.org/author/VELASCO>
+
+    *   Games::Sudoku::SudokuTk - Sudoku Game
+
+        Author: CGUINE <https://metacpan.org/author/CGUINE>
+
+    *   Games::Sudoku::OO::Board - Object oriented Sudoku solver
+
+        Author: COPE <https://metacpan.org/author/COPE>
+
+    *   Games::YASudoku - Yet Another Sudoku Solver
+
+        Author: WYLLIE <https://metacpan.org/author/WYLLIE>
 
 FAQ
   What is an Acme::CPANModules::* module?
@@ -111,7 +134,9 @@ FAQ
 
     This Acme::CPANModules module also helps lcpan produce a more meaningful
     result for "lcpan related-mods" command when it comes to finding related
-    modules for the modules listed in this Acme::CPANModules module.
+    modules for the modules listed in this Acme::CPANModules module. See
+    App::lcpan::Cmd::related_mods for more details on how "related modules"
+    are found.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -120,14 +145,6 @@ HOMEPAGE
 SOURCE
     Source repository is at
     <https://github.com/perlancar/perl-Acme-CPANModules-Sudoku>.
-
-BUGS
-    Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Sudo
-    ku>
-
-    When submitting a bug or request, please include a test-file or a patch
-    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
     Acme::CPANModules - about the Acme::CPANModules namespace
@@ -154,8 +171,17 @@ CONTRIBUTING
     me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021 by perlancar <perlancar@cpan.org>.
+    This software is copyright (c) 2022, 2021 by perlancar
+    <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Sudo
+    ku>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 

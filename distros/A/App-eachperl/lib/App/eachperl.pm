@@ -6,8 +6,10 @@
 use v5.26;
 use Object::Pad 0.54;  # slot init BLOCK
 
-package App::eachperl 0.05;
+package App::eachperl 0.06;
 class App::eachperl;
+
+use Object::Pad qw( :experimental(init_expr) );
 
 use Config::Tiny;
 use Syntax::Keyword::Dynamically;

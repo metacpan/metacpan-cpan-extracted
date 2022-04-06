@@ -6,128 +6,82 @@
 #define PDL PDL_LinearAlgebra_Complex
 extern Core *PDL;
 
-#define PDL_LA_COMPLEX_INIT_PUSH(pdl, type, valp, svpdl) \
-   pdl = PDL->pdlnew(); \
-   PDL->setdims (pdl, dims, 2); \
-   pdl->datatype = type; \
-   pdl->data = valp; \
-   pdl->state |= PDL_DONTTOUCHDATA | PDL_ALLOCATED; \
+#define PDL_LA_COMPLEX_INIT_PUSH(pdlvar, type, valp, svpdl) \
+   pdl *pdlvar = PDL->pdlnew(); \
+   PDL->setdims(pdlvar, dims, ndims); \
+   pdlvar->datatype = type + type_add; \
+   pdlvar->data = valp; \
+   pdlvar->state |= PDL_DONTTOUCHDATA | PDL_ALLOCATED; \
    ENTER;   SAVETMPS;   PUSHMARK(sp); \
-    svpdl = sv_newmortal(); \
-    PDL->SetSV_PDL(svpdl, pdl); \
+    SV *svpdl = sv_newmortal(); \
+    PDL->SetSV_PDL(svpdl, pdlvar); \
     svpdl = sv_bless(svpdl, bless_stash); /* bless in PDL::Complex  */ \
     XPUSHs(svpdl); \
    PUTBACK;
 
 #define PDL_LA_COMPLEX_UNINIT(pdl) \
-   PDL->setdims (pdl, odims, 0); \
+   PDL->setdims(pdl, odims, sizeof(odims)/sizeof(odims[0])); \
    pdl->state &= ~ (PDL_ALLOCATED |PDL_DONTTOUCHDATA); \
    pdl->data=NULL;
 
-#define PDL_LA_CALL_SV(type, valp, sv_func) \
-   dSP; \
-   int count; \
-   long ret; \
-   SV *pdl1; \
-   HV *bless_stash; \
-   pdl *pdl; \
-   PDL_Indx odims[1]; \
-   PDL_Indx dims[] = {2,1}; \
-   bless_stash = gv_stashpv("PDL::Complex", 0); \
-   PDL_LA_COMPLEX_INIT_PUSH(pdl, type, valp, pdl1) \
-   count = perl_call_sv(sv_func, G_SCALAR); \
-   SPAGAIN; \
-   if (count !=1) \
-      croak("Error calling perl function\n"); \
-   /* For pdl_free */ \
-   odims[0] = 0; \
-   PDL_LA_COMPLEX_UNINIT(pdl) \
-   ret = (long ) POPl ; \
-   PUTBACK ;   FREETMPS ;   LEAVE ; \
-   return ret;
+/* replace BLAS one so don't terminate on bad input */
+int xerbla_(char *sub, int *info) { return 0; }
 
-static SV *fselect_func;
-void fselect_func_set(SV* func) {
-  fselect_func = func;
-}
-PDL_Long fselect_wrapper(float *p)
-{
-  PDL_LA_CALL_SV(PDL_F, p, fselect_func)
-}
-
-static SV*   dselect_func;
-void dselect_func_set(SV* func) {
-  dselect_func = func;
-}
-PDL_Long dselect_wrapper(double *p)
-{
-  PDL_LA_CALL_SV(PDL_D, p, dselect_func)
-}
-
-#define PDL_LA_CALL_GSV(type, val1p, val2p, sv_func) \
-   dSP; \
-   int count; \
-   long ret; \
-   SV *svpdl1, *svpdl2; \
-   HV *bless_stash; \
-   pdl *pdl1, *pdl2; \
-   PDL_Indx odims[1]; \
-   PDL_Indx dims[] = {2,1}; \
-   bless_stash = gv_stashpv("PDL::Complex", 0); \
-   PDL_LA_COMPLEX_INIT_PUSH(pdl1, type, val1p, svpdl1) \
-   PDL_LA_COMPLEX_INIT_PUSH(pdl2, type, val2p, svpdl2) \
-   count = perl_call_sv(sv_func, G_SCALAR); \
-   SPAGAIN; \
-   if (count !=1) \
-      croak("Error calling perl function\n"); \
-   /* For pdl_free */ \
-   odims[0] = 0; \
-   PDL_LA_COMPLEX_UNINIT(pdl1) \
-   PDL_LA_COMPLEX_UNINIT(pdl2) \
-   ret = (long ) POPl ; \
-   PUTBACK ;   FREETMPS ;   LEAVE ; \
-   return ret;
-
-static SV*   fgselect_func;
-void fgselect_func_set(SV* func) {
-  fgselect_func = func;
-}
-PDL_Long fgselect_wrapper(float *p, float *q)
-{
-  PDL_LA_CALL_GSV(PDL_F, p, q, fgselect_func)
-}
-
-static SV*   dgselect_func;
-void dgselect_func_set(SV* func) {
-  dgselect_func = func;
-}
-PDL_Long dgselect_wrapper(double *p, double *q)
-{
-  PDL_LA_CALL_GSV(PDL_D, p, q, dgselect_func)
-}
-
-void cftrace(int n, void *a1, void *a2)
-{
-  float *mat = a1, *res = a2;
-  int i;
-  res[0] = mat[0];
-  res[1] = mat[1];
-  for (i = 1; i < n; i++)
-  {
-	res[0] += mat[(i*(n+1))*2];
-	res[1] += mat[(i*(n+1))*2+1];
+#define SEL_FUNC2(letter, letter2, type, pdl_type, args, init, uninit) \
+  static SV* letter ## letter2 ## select_func; \
+  void letter ## letter2 ## select_func_set(SV* func) { \
+    letter ## letter2 ## select_func = func; \
+  } \
+  PDL_Long letter ## letter2 ## select_wrapper args \
+  { \
+    dSP; \
+    PDL_Indx odims[] = {0}; \
+    PDL_Indx pc_dims[] = {2}; \
+    SV *pcv = perl_get_sv("PDL::Complex::VERSION", 0); \
+    char use_native = !pcv || !SvOK(pcv); \
+    PDL_Indx *dims = use_native ? NULL : pc_dims; \
+    PDL_Indx ndims = use_native ? 0 : sizeof(dims)/sizeof(dims[0]); \
+    int type_add = use_native ? PDL_CF - PDL_F : 0; \
+    HV *bless_stash = gv_stashpv(use_native ? "PDL" : "PDL::Complex", 0); \
+    init \
+    int count = perl_call_sv(letter ## select_func, G_SCALAR); \
+    SPAGAIN; \
+    uninit \
+    if (count !=1) croak("Error calling perl function\n"); \
+    long ret = (long ) POPl ; \
+    PUTBACK ;   FREETMPS ;   LEAVE ; \
+    return ret; \
   }
-}
 
-void cdtrace(int n, void *a1, void *a2)
-{
-  double *mat = a1, *res = a2;
-  int i;
-  res[0] = mat[0];
-  res[1] = mat[1];
-  for (i = 1; i < n; i++)
-  {
-	res[0] += mat[(i*(n+1))*2];
-	res[1] += mat[(i*(n+1))*2+1];
+#define SEL_FUNC(letter, type, pdl_type) \
+  SEL_FUNC2(letter, , type, pdl_type, (type *p), \
+    PDL_LA_COMPLEX_INIT_PUSH(pdl, pdl_type, p, svpdl), \
+    PDL_LA_COMPLEX_UNINIT(pdl) \
+  )
+SEL_FUNC(f, float, PDL_F)
+SEL_FUNC(d, double, PDL_D)
+
+#define GSEL_FUNC(letter, type, pdl_type) \
+  SEL_FUNC2(letter, g, type, pdl_type, (type *p, type *q), \
+    PDL_LA_COMPLEX_INIT_PUSH(pdl1, pdl_type, p, svpdl1) \
+    PDL_LA_COMPLEX_INIT_PUSH(pdl2, pdl_type, q, svpdl2), \
+    PDL_LA_COMPLEX_UNINIT(pdl1) \
+    PDL_LA_COMPLEX_UNINIT(pdl2) \
+  )
+GSEL_FUNC(f, float, PDL_F)
+GSEL_FUNC(d, double, PDL_D)
+
+#define TRACE(letter, type) \
+  void c ## letter ## trace(int n, void *a1, void *a2) { \
+    type *mat = a1, *res = a2; \
+    PDL_Indx i; \
+    res[0] = mat[0]; \
+    res[1] = mat[1]; \
+    for (i = 1; i < n; i++) \
+    { \
+          res[0] += mat[(i*(n+1))*2]; \
+          res[1] += mat[(i*(n+1))*2+1]; \
+    } \
   }
-}
+TRACE(f, float)
+TRACE(d, double)

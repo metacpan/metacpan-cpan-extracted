@@ -5,33 +5,40 @@ use PDL::MatrixOps qw(identity);
 use PDL::LinearAlgebra;
 use PDL::LinearAlgebra::Trans qw //;
 use PDL::LinearAlgebra::Real;
-use PDL::Complex;
 use Test::More;
 
 sub fapprox {
 	my($a,$b) = @_;
-	($a-$b)->abs->max < 0.0001;
+	(PDL->topdl($a)-$b)->abs->max < 0.001;
+}
+sub runtest {
+  local $Test::Builder::Level = $Test::Builder::Level + 1;
+  my ($in, $method, $expected, $extra) = @_;
+  ($expected, my $expected_cplx) = ref($expected) eq 'ARRAY' ? @$expected : ($expected, $expected);
+  if (defined $expected) {
+    my ($got) = $in->$method(@{$extra||[]});
+    ok fapprox($got, $expected), $method or diag "got(".ref($got)."): $got";
+  }
+  $_ = PDL->topdl($_)->r2C for $in, $expected_cplx;
+  my ($got) = $in->$method(map ref() && ref() ne 'CODE' ? $_->r2C : $_, @{$extra||[]});
+  ok fapprox($got, $expected_cplx), "native complex $method" or diag "got(".ref($got)."): $got";
 }
 
+my $aa = random(2,2,2);
+$aa = czip($aa->slice('(0)'), $aa->slice('(1)'));
+runtest($aa, 't', [undef,$aa->xchg(0,1)->conj], [1]);
+
+do './t/common.pl'; die if $@;
+
+ok all(approx pdl([1,1,-1],[-1,-1,2])->positivise, pdl([1,1,-1],[1,1,-2])), 'positivise'; # real only
+
 my $a = pdl([[1.7,3.2],[9.2,7.3]]);
-ok(fapprox($a->t,$a->xchg(0,1)));
-
-my $aa = cplx random(2,2,2);
-ok(fapprox($aa->t(0),$aa->xchg(1,2)));
-
-my $id = pdl([[1,0],[0,1]]);
+my $id = identity(2);
 ok(fapprox($a->minv x $a,$id));
 
 ok(fapprox($a->mcrossprod->mposinv->tritosym x $a->mcrossprod,$id));
 
-ok(fapprox($a->mdet ,-17.03 ));
-
 ok($a->mcrossprod->mposdet !=0);
-
-
-ok(fapprox($a->mcos->macos,pdl([[1.7018092, 0.093001244],[0.26737858,1.8645614]])));
-ok(fapprox($a->msin->masin,pdl([[ -1.4397834,0.093001244],[0.26737858,-1.2770313]])));
-ok(fapprox($a->mexp->mlog,$a));
 
 my $A = identity(4) + ones(4, 4);
 $A->slice('2,0') .= 0; # if don't break symmetry, don't show need transpose
@@ -66,6 +73,5 @@ my $i=pdl('i'); # Can't use i() as it gets confused by PDL::Complex's i()
 my $complex_matrix=(1+sequence(2,2))*$i;
 $got=$complex_matrix->mdet;
 ok(fapprox($got, 2), "Complex mdet") or diag "got $got";
-
 
 done_testing;

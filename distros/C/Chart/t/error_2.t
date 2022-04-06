@@ -1,7 +1,9 @@
-#!usr/bin/perl -w
+#!/usr/bin/perl -w
 
 BEGIN { unshift @INC, 'lib', '../lib'}
 use Chart::ErrorBars;
+use File::Temp 0.19;
+my $samples = File::Temp->newdir();
 
 print "1..1\n";
 
@@ -24,7 +26,7 @@ $g->set(
     'custom_x_ticks' => [ 0, 1 ],
 );
 
-$g->png("samples/error_2.png");
+$g->png("$samples/error_2.png");
 
 print "ok 1\n";
 

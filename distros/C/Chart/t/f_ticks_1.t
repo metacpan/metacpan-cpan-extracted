@@ -7,6 +7,8 @@
 BEGIN { unshift @INC, 'lib', '../lib'}
 use strict;
 use Chart::LinesPoints;
+use File::Temp 0.19;
+my $samples = File::Temp->newdir();
 
 print "1..1\n";
 
@@ -93,7 +95,7 @@ $graphic->set( 'f_x_tick' => \&convert_to_real_x );
 
 if ( $graphic->can('png') )
 {
-    my $picture_file = "samples/f_ticks_1.png";
+    my $picture_file = "$samples/f_ticks_1.png";
     $graphic->png($picture_file);
 }
 

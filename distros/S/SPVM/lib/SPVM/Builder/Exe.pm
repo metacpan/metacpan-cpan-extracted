@@ -163,6 +163,7 @@ sub new {
   
   # Build directory
   my $build_dir = delete $self->{build_dir};
+  
   unless (defined $build_dir) {
     $build_dir = '.spvm_build';
   }
@@ -224,6 +225,9 @@ sub build_exe_file {
     exit(255);
   }
   
+  # Build runtime
+  $builder->build_runtime;
+  
   # Config file
   my $module_file = $builder->get_module_file($class_name);
   
@@ -242,14 +246,14 @@ sub build_exe_file {
   push @$object_files, @$spvm_module_objects;
 
   # Create precompile C source_files
-  $self->create_precompile_csources;
+  $self->create_precompile_sources;
   
   # Compile precompile C source_files
   my $precompile_object_files = $self->compile_precompile_sources;
   push @$object_files, @$precompile_object_files;
 
   # Compile precompile C source_files
-  my $native_object_files = $self->compile_native_csources;
+  my $native_object_files = $self->compile_native_sources;
   push @$object_files, @$native_object_files;
   
   # Create bootstrap C source
@@ -429,9 +433,65 @@ EOS
       }
     }
     
-    $boot_source .= <<'EOS';
+    $boot_source .= <<"EOS";
 
 int32_t main(int32_t argc, const char *argv[]) {
+
+  SPVM_ENV* env = SPVM_NATIVE_new_env_prepared();
+
+  // Class name
+  const char* class_name = "$class_name";
+  
+  // Class
+  int32_t method_id = env->get_class_method_id(env, class_name, "main", "int(string,string[])");
+  
+  if (method_id < 0) {
+    fprintf(stderr, "Can't find %s->main method", class_name);
+    return -1;
+  }
+  
+  // Enter scope
+  int32_t scope_id = env->enter_scope(env);
+  
+  // Starting file name
+  void* cmd_start_file_obj = env->new_string(env, argv[0], strlen(argv[0]));
+  
+  // new byte[][args_length] object
+  int32_t arg_type_basic_id = env->get_basic_type_id(env, "byte");
+  void* cmd_args_obj = env->new_muldim_array(env, arg_type_basic_id, 1, argc - 1);
+  
+  // Set command line arguments
+  for (int32_t arg_index = 1; arg_index < argc; arg_index++) {
+    void* cmd_arg_obj = env->new_string(env, argv[arg_index], strlen(argv[arg_index]));
+    env->set_elem_object(env, cmd_args_obj, arg_index - 1, cmd_arg_obj);
+  }
+  
+  SPVM_VALUE stack[255];
+  stack[0].oval = cmd_start_file_obj;
+  stack[1].oval = cmd_args_obj;
+  
+  // Run
+  int32_t exception_flag = env->call_spvm_method(env, method_id, stack);
+  
+  int32_t status;
+  if (exception_flag) {
+    env->print_stderr(env, env->exception_object);
+    printf("\\n");
+    status = 255;
+  }
+  else {
+    status = stack[0].ival;
+  }
+  
+  // Leave scope
+  env->leave_scope(env, scope_id);
+
+  SPVM_API_free_env_prepared(env);
+
+  return status;
+}
+
+SPVM_ENV* SPVM_NATIVE_new_env_prepared() {
 EOS
 
     $boot_source .= <<"EOS";
@@ -445,9 +505,9 @@ EOS
   SPVM_ENV* env = SPVM_NATIVE_new_env_raw();
   
   // Create compiler
-  SPVM_COMPILER* compiler = env->compiler_new();
+  SPVM_COMPILER* compiler = SPVM_API_compiler_new();
 
-  env->compiler_set_start_file(compiler, class_name);
+  SPVM_API_compiler_set_start_file(compiler, class_name);
 
   // Set module source_files
 EOS
@@ -458,19 +518,19 @@ EOS
       
       $boot_source .= "  {\n";
       $boot_source .= "    const char* module_source = SPMODSRC__${class_cname}__get_module_source();\n";
-      $boot_source .= qq(    SPVM_HASH_insert(compiler->module_source_symtable, "$class_name", strlen("$class_name"), (void*)module_source);\n);
+      $boot_source .= qq(    SPVM_HASH_set(compiler->module_source_symtable, "$class_name", strlen("$class_name"), (void*)module_source);\n);
       $boot_source .= "  }\n";
     }
     $boot_source .= "\n";
 
     $boot_source .= <<'EOS';
 
-  int32_t compile_error_code = env->compiler_compile_spvm(compiler, class_name);
+  int32_t compile_error_code = SPVM_API_compiler_compile_spvm(compiler, class_name);
 
   if (compile_error_code != 0) {
-    int32_t error_messages_length = env->compiler_get_error_messages_length(compiler);
+    int32_t error_messages_length = SPVM_API_compiler_get_error_messages_length(compiler);
     for (int32_t i = 0; i < error_messages_length; i++) {
-      const char* error_message = env->compiler_get_error_message(compiler, i);
+      const char* error_message = SPVM_API_compiler_get_error_message(compiler, i);
       fprintf(stderr, "%s\n", error_message);
     }
     exit(255);
@@ -485,7 +545,7 @@ EOS
     $boot_source .= <<'EOS';
     
   // Free compiler
-  env->compiler_free(compiler);
+  SPVM_API_compiler_free(compiler);
 
   // Prepare runtime
   SPVM_API_runtime_prepare(runtime);
@@ -540,57 +600,7 @@ EOS
   
   env->call_init_blocks(env);
   
-  // Class
-  int32_t method_id = env->get_class_method_id(env, class_name, "main", "int(string,string[])");
-  
-  if (method_id < 0) {
-    fprintf(stderr, "Can't find the definition of valid %s->main method:.\n    static method main : int ($start_file : string, $args : string[]) { ... } \n", class_name);
-    return -1;
-  }
-  
-  // Enter scope
-  int32_t scope_id = env->enter_scope(env);
-  
-  // Starting file name
-  void* cmd_start_file_obj = env->new_string(env, argv[0], strlen(argv[0]));
-  
-  // new byte[][args_length] object
-  int32_t arg_type_basic_id = env->get_basic_type_id(env, "byte");
-  void* cmd_args_obj = env->new_muldim_array(env, arg_type_basic_id, 1, argc - 1);
-  
-  // Set command line arguments
-  for (int32_t arg_index = 1; arg_index < argc; arg_index++) {
-    void* cmd_arg_obj = env->new_string(env, argv[arg_index], strlen(argv[arg_index]));
-    env->set_elem_object(env, cmd_args_obj, arg_index - 1, cmd_arg_obj);
-  }
-  
-  SPVM_VALUE stack[255];
-  stack[0].oval = cmd_start_file_obj;
-  stack[1].oval = cmd_args_obj;
-  
-  // Run
-  int32_t exception_flag = env->call_spvm_method(env, method_id, stack);
-  
-  int32_t status;
-  if (exception_flag) {
-    env->print_stderr(env, env->exception_object);
-    printf("\n");
-    status = 255;
-  }
-  else {
-    status = stack[0].ival;
-  }
-  
-  // Leave scope
-  env->leave_scope(env, scope_id);
-
-  // Cleanup global variables
-  env->cleanup_global_vars(env);
-  
-  // Free env
-  env->free_env_raw(env);
-
-  return status;
+  return env;
 }
 EOS
 
@@ -700,7 +710,7 @@ sub create_spvm_module_sources {
     my $perl_class_name = "SPVM::$class_name";
     my $module_source_base = $perl_class_name;
     $module_source_base =~ s|::|/|g;
-    my $module_source_csource_file = "$build_src_dir/$module_source_base.modsrc.c";
+    my $module_source_source_file = "$build_src_dir/$module_source_base.modsrc.c";
     
     # Source creating callback
     my $create_cb = sub {
@@ -715,24 +725,24 @@ sub create_spvm_module_sources {
       my $class_cname = $class_name;
       $class_cname =~ s/::/__/g;
 
-      my $get_module_source_csource = <<"EOS";
+      my $get_module_source_source = <<"EOS";
 static const char* module_source = "$module_source_c_hex";
 const char* SPMODSRC__${class_cname}__get_module_source() {
 return module_source;
 }
 EOS
-      mkpath dirname $module_source_csource_file;
+      mkpath dirname $module_source_source_file;
       
-      open my $module_source_csource_fh, '>', $module_source_csource_file
-        or die "Can't open file $module_source_csource_file:$!";
+      open my $module_source_source_fh, '>', $module_source_source_file
+        or die "Can't open file $module_source_source_file:$!";
 
-      print $module_source_csource_fh $get_module_source_csource;
+      print $module_source_source_fh $get_module_source_source;
     };
     
     # Create source file
     $self->create_source_file({
       input_files => [$module_file, __FILE__],
-      output_file => $module_source_csource_file,
+      output_file => $module_source_source_file,
       create_cb => $create_cb,
     });
   }
@@ -771,7 +781,7 @@ sub compile_spvm_module_sources {
   return $object_file_infos;
 }
 
-sub create_precompile_csources {
+sub create_precompile_sources {
   my ($self) = @_;
 
   my $builder = $self->builder;
@@ -796,7 +806,7 @@ sub create_precompile_csources {
       
       my $src_dir = $self->builder->create_build_src_path;
       mkpath $src_dir;
-      $builder_c_precompile->create_precompile_csource(
+      $builder_c_precompile->create_precompile_source_file(
         $class_name,
         {
           src_dir => $src_dir,
@@ -850,7 +860,7 @@ sub compile_precompile_sources {
   return $object_files;
 }
 
-sub compile_native_csources {
+sub compile_native_sources {
   my ($self) = @_;
   
   my $builder = $self->builder;

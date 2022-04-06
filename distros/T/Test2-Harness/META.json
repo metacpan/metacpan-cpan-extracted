@@ -72,6 +72,7 @@
             "Test::Builder" : "1.302170",
             "Test::Builder::Formatter" : "1.302170",
             "Test::More" : "1.302170",
+            "Text::ParseWords" : "0",
             "Time::HiRes" : "0",
             "base" : "0",
             "constant" : "0",
@@ -109,7 +110,7 @@
          "url" : "https://github.com/Test-More/Test2-Harness/"
       }
    },
-   "version" : "1.000116",
+   "version" : "1.000119",
    "x_generated_by_perl" : "v5.32.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

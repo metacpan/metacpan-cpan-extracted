@@ -1,3 +1,15 @@
+1.000119  2022-04-05 10:58:59-07:00 America/Los_Angeles
+
+    - Allow per-test args to be specified at the command line
+
+1.000118  2022-04-05 09:39:40-07:00 America/Los_Angeles
+
+    - Do not show broken reload files multiple times
+
+1.000117  2022-04-04 16:09:58-07:00 America/Los_Angeles
+
+    - Check for reload errors before allowing a `yath run` to work
+
 1.000116  2022-04-01 15:29:40-07:00 America/Los_Angeles
 
     - Better handling of version mismatches in the persistent runner

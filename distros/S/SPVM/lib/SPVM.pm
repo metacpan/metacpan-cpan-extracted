@@ -1,5 +1,7 @@
 package SPVM;
 
+our $VERSION = '0.9510';
+
 use 5.008007;
 use strict;
 use warnings;
@@ -18,9 +20,10 @@ use SPVM::ExchangeAPI;
 
 use Carp 'confess';
 
-our $VERSION = '0.9509';
-
+# INIT and CHECK block can't be used because SPVM supports dynamic module loading.
+# For the reason, this variable is needed.
 my $SPVM_INITED;
+
 my $BUILDER;
 
 require XSLoader;
@@ -64,7 +67,13 @@ sub import {
       push @$added_class_names, $added_class_name;
     }
     
-    my $address_info = {};
+    # Bind SPVM method to Perl
+    bind_to_perl($BUILDER, $added_class_names);
+
+    # Build runtime information
+    $BUILDER->build_runtime;
+    
+    # Set addresses of native methods and precompile methods
     for my $added_class_name (@$added_class_names) {
       next if $added_class_name =~ /::anon/;
       
@@ -74,19 +83,12 @@ sub import {
       # Build native classs - Compile C source codes and link them to SPVM native method
       $BUILDER->build_and_bind_shared_lib($added_class_name, 'native');
     }
-
-    # Bind SPVM method to Perl
-    bind_to_perl($BUILDER, $added_class_names);
-
   }
 }
 
 sub init {
   unless ($SPVM_INITED) {
     if (my $builder = $BUILDER) {
-      
-      # Build runtime information
-      $builder->build_runtime;
       
       # Prepare runtime environment
       $builder->prepare_env;

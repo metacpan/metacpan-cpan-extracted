@@ -1,41 +1,23 @@
-## @file
-# Chart::BrushStyles
-#
-# written and maintained by the
-# @author Chart Group at Geodetic Fundamental Station Wettzell (Chart@fs.wettzell.de)
-# @date 2015-03-01
-# @version 2.4.10
-#
 
-## @class Chart::BrushStyles
-# Define styles for Points and LinesPoints classes
-#
-# This class provides functions which define different
-# brush styles to extend the previous point as the only design
-# for Points.pm or LinesPoints.pm\n\n
-# The different brush styles are:\n
-# \see OpenCircle\n
-# \see FilledCircle\n
-# \see Star\n
-# \see OpenDiamond\n
-# \see FilledDiamond\n
-# \see OpenRectangle\n
-# \see FilledRectangle\n
+# styles for Points and LinesPoints classes
+
+use v5.12;
+
 package Chart::BrushStyles;
 our $VERSION = 2.400.5;
 
-use Chart::Base;
-use GD;
-use Carp;
-use strict;
-use Chart::Constants;
 
-@Chart::BrushStyles::ISA     = qw(Chart::Base);
+use Carp;
+use GD;
+use Chart::Constants;
+use Chart::Base;
+
+
 
 ## @fn OpenCircle
 # @param[in] *GD::Image $rbrush Reference to GD::Image
 # @param[in] int        $radius Radius of the point in pixels
-# @param[in] int        $color  Color of the not filled point
+# @param[in] int        $color 
 #
 # @brief Set the gdBrush object to have nice brushed object
 # representing a circle of the size \$radius.
@@ -51,8 +33,8 @@ sub OpenCircle
 {
     my $self   = shift;
     my $rbrush = shift;    # reference to GD::Image
-    my $radius = shift;
-    my $color  = shift;
+    my $radius = shift;    # radius of the point in pixels
+    my $color  = shift;    # Color of the not filled point
 
     # draw a filled circle
     if ( $radius < 2 ) { $radius = 2; }
@@ -232,13 +214,12 @@ sub OpenRectangle
     my $radius = shift;
     my $color  = shift;
 
-    # draw a filled circle
     if ( $radius < 2 ) { $radius = 2; }
-
     my $height = $radius;
     my $width  = $radius / 2;
     if ( $width < 1 ) { $width = 1; }
 
+    # draw a filled circle
     $$rbrush->line( -$width, -$height, $width, -$height, $color );
 
     #$$rbrush->line( $width,    -$height, $width, $height, $color );
@@ -246,5 +227,4 @@ sub OpenRectangle
     #$$rbrush->line( -$width,   $height, -$width ,-$height,$color );
 }
 
-#################################################################
 1;

@@ -74,7 +74,7 @@ describe 'Sentry::Client' => sub {
 
       $client->capture_message('katze');
       $transport->expect_to_have_sent_once;
-      $transport->expect_to_have_sent(dist => 'abc');
+      $transport->expect_to_have_sent_data(dist => 'abc');
     };
 
     it 'discarded the event' => sub {

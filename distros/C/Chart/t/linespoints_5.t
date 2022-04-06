@@ -3,6 +3,8 @@
 BEGIN { unshift @INC, 'lib', '../lib'}
 use strict;
 use Chart::Composite;
+use File::Temp 0.19;
+my $samples = File::Temp->newdir();
 
 print "1..1\n";
 
@@ -63,6 +65,6 @@ $g->set( 'brush_size'   => '4' );
 
 # $g-> set ('skip_x_ticks' => $skip_x);
 
-$g->png("samples/linespoints_5.png");
+$g->png("$samples/linespoints_5.png");
 print "ok 1\n\n";
 

@@ -4,6 +4,8 @@ BEGIN { unshift @INC, 'lib', '../lib'}
 use strict;
 use Chart::LinesPoints;
 use Chart::Lines;
+use File::Temp 0.19;
+my $samples = File::Temp->newdir();
 
 print "1..1\n";
 
@@ -430,6 +432,6 @@ $g->set( 'pt_size'         => '20' );
 $g->set( 'brush_size'      => '4' );
 $g->set( 'skip_x_ticks'    => '50' );
 
-$g->png("samples/linespoints_6.png");
+$g->png("$samples/linespoints_6.png");
 print "ok 1\n\n";
 

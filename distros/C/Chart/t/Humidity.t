@@ -8,6 +8,8 @@ BEGIN { unshift @INC, 'lib', '../lib'}
 
 use strict;
 use Chart::Lines;
+use File::Temp 0.19;
+my $samples = File::Temp->newdir();
 
 print "1..1\n";
 
@@ -228,12 +230,12 @@ $graphic->set( 'y_label' => $einheit );
 
 if ( $graphic->can('gif') )
 {
-    my $wettgif = "samples/" . $gif_name . ".gif";
+    my $wettgif = "$samples/" . $gif_name . ".gif";
     $graphic->gif($wettgif);
 }
 elsif ( $graphic->can('png') )
 {
-    my $wettgif = "samples/" . $gif_name . ".png";
+    my $wettgif = "$samples/" . $gif_name . ".png";
     $graphic->png($wettgif);
 }
 

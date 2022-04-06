@@ -2,7 +2,7 @@
 
 #
 # dbcolsregression.pm
-# Copyright (C) 1997-2018 by John Heidemann <johnh@isi.edu>
+# Copyright (C) 1997-2022 by John Heidemann <johnh@isi.edu>
 #
 # This program is distributed under terms of the GNU general
 # public license, version 2.  See the file COPYING
@@ -101,7 +101,7 @@ end_standard_fsdb_options
 
 =head2 Output:
 
-    #fsdb -R C slope intercept confcoeff n
+    #fsdb -R C slope:d intercept:d confcoeff:d n:q
     slope:     -0.79286
     intercept: 249.86
     confcoeff: -0.95426
@@ -225,7 +225,7 @@ sub setup ($) {
 	    if (!defined($self->{_colis}[$_]));
     };
 
-    my @output_options = (-cols => [qw(slope intercept confcoeff n)]);
+    my @output_options = (-cols => [qw(slope:d intercept:d confcoeff:d n:q)]);
     unshift (@output_options, -fscode => $self->{_fscode})
 	if (defined($self->{_fscode}));
     $self->finish_io_option('output', @output_options);
@@ -301,7 +301,7 @@ sub run ($) {
 
 =head1 AUTHOR and COPYRIGHT
 
-Copyright (C) 1997-2018 by John Heidemann <johnh@isi.edu>
+Copyright (C) 1997-2022 by John Heidemann <johnh@isi.edu>
 
 This program is distributed under terms of the GNU general
 public license, version 2.  See the file COPYING

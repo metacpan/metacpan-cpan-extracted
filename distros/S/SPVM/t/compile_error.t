@@ -250,6 +250,7 @@ sub print_error_messages {
 {
   compile_not_ok('TestCase::CompileError::Type::MutableNoStringCaseStringArray');
   compile_not_ok('TestCase::CompileError::Type::MutableNoStringCaseInt');
+  compile_not_ok('TestCase::CompileError::Type::MultiDimensionalAnyObject', qr/Multi dimensional array of any object/i);
 }
 
 # Divide - Compile Error
@@ -279,11 +280,17 @@ sub print_error_messages {
   compile_not_ok('TestCase::CompileError::Interface::NativeMethod', qr/interface.+native/i);
   compile_not_ok('TestCase::CompileError::Interface::StaticMethod', qr/interface.+instance/i);
   compile_not_ok('TestCase::CompileError::Interface::ImplementStatement', qr/implement/i);
+  compile_not_ok('TestCase::CompileError::Interface::ArrayElementCantAssign', qr/List to Stringable/i);
 }
 
 # Syntax
 {
   compile_not_ok('TestCase::CompileError::Syntax::LineNumber', qr/our.*\b8:3\b/i);
+}
+
+# Type comment
+{
+  compile_not_ok('TestCase::CompileError::TypeComment::NotExistType', qr/NotExists::XXXX/);
 }
 
 done_testing;

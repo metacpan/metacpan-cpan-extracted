@@ -2,6 +2,8 @@
 
 BEGIN { unshift @INC, 'lib', '../lib'}
 use Chart::HorizontalBars;
+use File::Temp 0.19;
+my $samples = File::Temp->newdir();
 
 print "1..1\n";
 
@@ -40,7 +42,7 @@ $g->add_dataset( 5,  4,  2,  5,  3,  6,  1,  4,  5,  4,  2,  5 );
 
 $g->set(%hash);
 
-$g->png("samples/hbars_1.png");
+$g->png("$samples/hbars_1.png");
 
 print "ok 1\n";
 

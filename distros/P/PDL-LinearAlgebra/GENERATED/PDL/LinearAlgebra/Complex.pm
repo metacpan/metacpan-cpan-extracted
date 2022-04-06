@@ -3,7 +3,7 @@
 #
 package PDL::LinearAlgebra::Complex;
 
-our @EXPORT_OK = qw(__Ccgtsv __Ncgtsv cgtsv __Ccgesvd __Ncgesvd cgesvd __Ccgesdd __Ncgesdd cgesdd __Ccggsvd __Ncggsvd cggsvd __Ccgeev __Ncgeev cgeev __Ccgeevx __Ncgeevx cgeevx __Ccggev __Ncggev cggev __Ccggevx __Ncggevx cggevx __Ccgees __Ncgees cgees __Ccgeesx __Ncgeesx cgeesx __Ccgges __Ncgges cgges __Ccggesx __Ncggesx cggesx __Ccheev __Ncheev cheev __Ccheevd __Ncheevd cheevd __Ccheevx __Ncheevx cheevx __Ccheevr __Ncheevr cheevr __Cchegv __Nchegv chegv __Cchegvd __Nchegvd chegvd __Cchegvx __Nchegvx chegvx __Ccgesv __Ncgesv cgesv __Ccgesvx __Ncgesvx cgesvx __Ccsysv __Ncsysv csysv __Ccsysvx __Ncsysvx csysvx __Cchesv __Nchesv chesv __Cchesvx __Nchesvx chesvx __Ccposv __Ncposv cposv __Ccposvx __Ncposvx cposvx __Ccgels __Ncgels cgels __Ccgelsy __Ncgelsy cgelsy __Ccgelss __Ncgelss cgelss __Ccgelsd __Ncgelsd cgelsd __Ccgglse __Ncgglse cgglse __Ccggglm __Ncggglm cggglm __Ccgetrf __Ncgetrf cgetrf __Ccgetf2 __Ncgetf2 cgetf2 __Ccsytrf __Ncsytrf csytrf __Ccsytf2 __Ncsytf2 csytf2 __Ccchetrf __Ncchetrf cchetrf __Cchetf2 __Nchetf2 chetf2 __Ccpotrf __Ncpotrf cpotrf __Ccpotf2 __Ncpotf2 cpotf2 __Ccgetri __Ncgetri cgetri __Ccsytri __Ncsytri csytri __Cchetri __Nchetri chetri __Ccpotri __Ncpotri cpotri __Cctrtri __Nctrtri ctrtri __Cctrti2 __Nctrti2 ctrti2 __Ccgetrs __Ncgetrs cgetrs __Ccsytrs __Ncsytrs csytrs __Cchetrs __Nchetrs chetrs __Ccpotrs __Ncpotrs cpotrs __Cctrtrs __Nctrtrs ctrtrs __Cclatrs __Nclatrs clatrs __Ccgecon __Ncgecon cgecon __Ccsycon __Ncsycon csycon __Cchecon __Nchecon checon __Ccpocon __Ncpocon cpocon __Cctrcon __Nctrcon ctrcon __Ccgeqp3 __Ncgeqp3 cgeqp3 __Ccgeqrf __Ncgeqrf cgeqrf __Ccungqr __Ncungqr cungqr __Ccunmqr __Ncunmqr cunmqr __Ccgelqf __Ncgelqf cgelqf __Ccunglq __Ncunglq cunglq __Ccunmlq __Ncunmlq cunmlq __Ccgeqlf __Ncgeqlf cgeqlf __Ccungql __Ncungql cungql __Ccunmql __Ncunmql cunmql __Ccgerqf __Ncgerqf cgerqf __Ccungrq __Ncungrq cungrq __Ccunmrq __Ncunmrq cunmrq __Cctzrzf __Nctzrzf ctzrzf __Ccunmrz __Ncunmrz cunmrz __Ccgehrd __Ncgehrd cgehrd __Ccunghr __Ncunghr cunghr __Cchseqr __Nchseqr chseqr __Cctrevc __Nctrevc ctrevc __Cctgevc __Nctgevc ctgevc __Ccgebal __Ncgebal cgebal __Cclange __Nclange clange __Cclansy __Nclansy clansy __Cclantr __Nclantr clantr __Ccgemm __Ncgemm cgemm __Ccmmult __Ncmmult cmmult __Cccrossprod __Nccrossprod ccrossprod __Ccsyrk __Ncsyrk csyrk __Ccdot __Ncdot cdot __Ccdotc __Ncdotc cdotc __Ccaxpy __Ncaxpy caxpy __Ccnrm2 __Ncnrm2 cnrm2 __Ccasum __Ncasum casum __Ccscal __Ncscal cscal sscal __Ccrotg __Ncrotg crotg __Cclacpy __Nclacpy clacpy __Cclaswp __Nclaswp claswp ctricpy cmstack __Cccharpol __Nccharpol ccharpol );
+our @EXPORT_OK = qw(__Ccgtsv __Ncgtsv cgtsv __Ccgesvd __Ncgesvd cgesvd __Ccgesdd __Ncgesdd cgesdd __Ccggsvd __Ncggsvd cggsvd __Ccgeev __Ncgeev cgeev __Ccgeevx __Ncgeevx cgeevx __Ccggev __Ncggev cggev __Ccggevx __Ncggevx cggevx __Ccgees __Ncgees cgees __Ccgeesx __Ncgeesx cgeesx __Ccgges __Ncgges cgges __Ccggesx __Ncggesx cggesx __Ccheev __Ncheev cheev __Ccheevd __Ncheevd cheevd __Ccheevx __Ncheevx cheevx __Ccheevr __Ncheevr cheevr __Cchegv __Nchegv chegv __Cchegvd __Nchegvd chegvd __Cchegvx __Nchegvx chegvx __Ccgesv __Ncgesv cgesv __Ccgesvx __Ncgesvx cgesvx __Ccsysv __Ncsysv csysv __Ccsysvx __Ncsysvx csysvx __Cchesv __Nchesv chesv __Cchesvx __Nchesvx chesvx __Ccposv __Ncposv cposv __Ccposvx __Ncposvx cposvx __Ccgels __Ncgels cgels __Ccgelsy __Ncgelsy cgelsy __Ccgelss __Ncgelss cgelss __Ccgelsd __Ncgelsd cgelsd __Ccgglse __Ncgglse cgglse __Ccggglm __Ncggglm cggglm __Ccgetrf __Ncgetrf cgetrf __Ccgetf2 __Ncgetf2 cgetf2 __Ccsytrf __Ncsytrf csytrf __Ccsytf2 __Ncsytf2 csytf2 __Ccchetrf __Ncchetrf cchetrf __Cchetf2 __Nchetf2 chetf2 __Ccpotrf __Ncpotrf cpotrf __Ccpotf2 __Ncpotf2 cpotf2 __Ccgetri __Ncgetri cgetri __Ccsytri __Ncsytri csytri __Cchetri __Nchetri chetri __Ccpotri __Ncpotri cpotri __Cctrtri __Nctrtri ctrtri __Cctrti2 __Nctrti2 ctrti2 __Ccgetrs __Ncgetrs cgetrs __Ccsytrs __Ncsytrs csytrs __Cchetrs __Nchetrs chetrs __Ccpotrs __Ncpotrs cpotrs __Cctrtrs __Nctrtrs ctrtrs __Cclatrs __Nclatrs clatrs __Ccgecon __Ncgecon cgecon __Ccsycon __Ncsycon csycon __Cchecon __Nchecon checon __Ccpocon __Ncpocon cpocon __Cctrcon __Nctrcon ctrcon __Ccgeqp3 __Ncgeqp3 cgeqp3 __Ccgeqrf __Ncgeqrf cgeqrf __Ccungqr __Ncungqr cungqr __Ccunmqr __Ncunmqr cunmqr __Ccgelqf __Ncgelqf cgelqf __Ccunglq __Ncunglq cunglq __Ccunmlq __Ncunmlq cunmlq __Ccgeqlf __Ncgeqlf cgeqlf __Ccungql __Ncungql cungql __Ccunmql __Ncunmql cunmql __Ccgerqf __Ncgerqf cgerqf __Ccungrq __Ncungrq cungrq __Ccunmrq __Ncunmrq cunmrq __Cctzrzf __Nctzrzf ctzrzf __Ccunmrz __Ncunmrz cunmrz __Ccgehrd __Ncgehrd cgehrd __Ccunghr __Ncunghr cunghr __Cchseqr __Nchseqr chseqr __Cctrevc __Nctrevc ctrevc __Cctgevc __Nctgevc ctgevc __Ccgebal __Ncgebal cgebal __Cclange __Nclange clange __Cclansy __Nclansy clansy __Cclantr __Nclantr clantr __Ccgemm __Ncgemm cgemm __Ccmmult __Ncmmult cmmult __Cccrossprod __Nccrossprod ccrossprod __Ccsyrk __Ncsyrk csyrk __Ccdot __Ncdot cdot __Ccdotc __Ncdotc cdotc __Ccaxpy __Ncaxpy caxpy __Ccnrm2 __Ncnrm2 cnrm2 __Ccasum __Ncasum casum __Ccscal __Ncscal cscal __Ccsscal __Ncsscal csscal __Ccrotg __Ncrotg crotg __Cclacpy __Nclacpy clacpy __Cclaswp __Nclaswp claswp ctricpy cmstack __Cccharpol __Nccharpol ccharpol );
 our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
@@ -18,6 +18,10 @@ use DynaLoader;
 
 
 
+
+
+
+#line 75 "complex.pd"
 
 use strict;
 use PDL::LinearAlgebra::Real;
@@ -72,7 +76,7 @@ PDL::LinearAlgebra::Complex - PDL interface to the lapack linear algebra program
 
 This module provides an interface to parts of the lapack library (complex numbers).
 These routines accept either float or double ndarrays.
-
+#line 80 "Complex.pm"
 
 
 
@@ -86,22 +90,27 @@ These routines accept either float or double ndarrays.
 
 
 
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ccgtsv = \&PDL::__Ccgtsv;
+#line 97 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ncgtsv = \&PDL::__Ncgtsv;
+#line 104 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 cgtsv
 
 =for sig
 
-  Signature: ([phys]DL(2,n); [phys]D(2,n); [phys]DU(2,n); [io,phys]B(2,n,nrhs); int [o,phys]info())
+  Signature: (complex [phys]DL(n);complex  [phys]D(n);complex  [phys]DU(n);complex  [io,phys]B(n,nrhs); int [o,phys]info())
 
 
 
@@ -163,35 +172,40 @@ its second element.
 =cut
 
 sub PDL::cgtsv {
-  $_[0]->type->real ? goto &PDL::__Ccgtsv : goto &PDL::__Ncgtsv;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Ccgtsv : goto &PDL::__Ncgtsv;
 }
 *cgtsv = \&PDL::cgtsv;
+#line 179 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ccgesvd = \&PDL::__Ccgesvd;
+#line 186 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ncgesvd = \&PDL::__Ncgesvd;
+#line 193 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 cgesvd
 
 =for sig
 
-  Signature: ([io,phys]A(2,m,n); int jobu(); int jobvt(); [o,phys]s(r); [o,phys]U(2,p,q); [o,phys]VT(2,s,t); int [o,phys]info())
+  Signature: (complex [io]A(m,n); int jobu(); int jobvt(); [o]s(minmn);complex  [o]U(p,p);complex  [o]VT(s,s); int [o]info())
 
 
 
 =for ref
 
-Complex version of gesvd.
+Complex version of L<PDL::LinearAlgebra::Real/gesvd>.
 
 The SVD is written
 
@@ -202,35 +216,40 @@ The SVD is written
 =cut
 
 sub PDL::cgesvd {
-  $_[0]->type->real ? goto &PDL::__Ccgesvd : goto &PDL::__Ncgesvd;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Ccgesvd : goto &PDL::__Ncgesvd;
 }
 *cgesvd = \&PDL::cgesvd;
+#line 223 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ccgesdd = \&PDL::__Ccgesdd;
+#line 230 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ncgesdd = \&PDL::__Ncgesdd;
+#line 237 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 cgesdd
 
 =for sig
 
-  Signature: ([io,phys]A(2,m,n); int job(); [o,phys]s(r); [o,phys]U(2,p,q); [o,phys]VT(2,s,t); int [o,phys]info())
+  Signature: (complex [io]A(m,n); int jobz(); [o]s(minmn);complex  [o]U(p,p);complex  [o]VT(s,s); int [o]info())
 
 
 
 =for ref
 
-Complex version of gesdd.
+Complex version of L<PDL::LinearAlgebra::Real/gesdd>.
 
 The SVD is written
 
@@ -241,205 +260,235 @@ The SVD is written
 =cut
 
 sub PDL::cgesdd {
-  $_[0]->type->real ? goto &PDL::__Ccgesdd : goto &PDL::__Ncgesdd;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Ccgesdd : goto &PDL::__Ncgesdd;
 }
 *cgesdd = \&PDL::cgesdd;
+#line 267 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ccggsvd = \&PDL::__Ccggsvd;
+#line 274 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ncggsvd = \&PDL::__Ncggsvd;
+#line 281 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 cggsvd
 
 =for sig
 
-  Signature: ([io,phys]A(2,m,n); int jobu(); int jobv(); int jobq(); [io,phys]B(2,p,n); int [o,phys]k(); int [o,phys]l();[o,phys]alpha(n);[o,phys]beta(n); [o,phys]U(2,q,r); [o,phys]V(2,s,t); [o,phys]Q(2,u,v); int [o,phys]iwork(n); int [o,phys]info())
+  Signature: (complex [io]A(m,n); int jobu(); int jobv(); int jobq();complex  [io]B(p,n); int [o]k(); int [o]l();[o]alpha(n);[o]beta(n);complex  [o]U(q,q);complex  [o]V(r,r);complex  [o]Q(s,s); int [o]iwork(n); int [o]info())
 
 
 =for ref
 
-Complex version of ggsvd
+Complex version of L<PDL::LinearAlgebra::Real/ggsvd>
 
 
 
 =cut
 
 sub PDL::cggsvd {
-  $_[0]->type->real ? goto &PDL::__Ccggsvd : goto &PDL::__Ncggsvd;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Ccggsvd : goto &PDL::__Ncggsvd;
 }
 *cggsvd = \&PDL::cggsvd;
+#line 306 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ccgeev = \&PDL::__Ccgeev;
+#line 313 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ncgeev = \&PDL::__Ncgeev;
+#line 320 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 cgeev
 
 =for sig
 
-  Signature: ([phys]A(2,n,n); int jobvl(); int jobvr(); [o,phys]w(2,n); [o,phys]vl(2,m,m); [o,phys]vr(2,p,p); int [o,phys]info())
+  Signature: (complex A(n,n); int jobvl(); int jobvr();complex  [o]w(n);complex  [o]vl(m,m);complex  [o]vr(p,p); int [o]info())
 
 
 =for ref
 
-Complex version of geev
+Complex version of L<PDL::LinearAlgebra::Real/geev>
 
 
 
 =cut
 
 sub PDL::cgeev {
-  $_[0]->type->real ? goto &PDL::__Ccgeev : goto &PDL::__Ncgeev;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Ccgeev : goto &PDL::__Ncgeev;
 }
 *cgeev = \&PDL::cgeev;
+#line 345 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ccgeevx = \&PDL::__Ccgeevx;
+#line 352 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ncgeevx = \&PDL::__Ncgeevx;
+#line 359 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 cgeevx
 
 =for sig
 
-  Signature: ([io,phys]A(2,n,n);  int jobvl(); int jobvr(); int balance(); int sense(); [o,phys]w(2,n); [o,phys]vl(2,m,m); [o,phys]vr(2,p,p); int [o,phys]ilo(); int [o,phys]ihi(); [o,phys]scale(n); [o,phys]abnrm(); [o,phys]rconde(q); [o,phys]rcondv(r); int [o,phys]info())
+  Signature: (complex [io]A(n,n);  int jobvl(); int jobvr(); int balance(); int sense();complex  [o]w(n);complex  [o]vl(m,m);complex  [o]vr(p,p); int [o]ilo(); int [o]ihi(); [o]scale(n); [o]abnrm(); [o]rconde(q); [o]rcondv(r); int [o]info())
 
 
 =for ref
 
-Complex version of geevx
+Complex version of L<PDL::LinearAlgebra::Real/geevx>
 
 
 
 =cut
 
 sub PDL::cgeevx {
-  $_[0]->type->real ? goto &PDL::__Ccgeevx : goto &PDL::__Ncgeevx;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Ccgeevx : goto &PDL::__Ncgeevx;
 }
 *cgeevx = \&PDL::cgeevx;
+#line 384 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ccggev = \&PDL::__Ccggev;
+#line 391 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ncggev = \&PDL::__Ncggev;
+#line 398 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 cggev
 
 =for sig
 
-  Signature: ([phys]A(2,n,n); int jobvl();int jobvr();[phys]B(2,n,n);[o,phys]alpha(2,n);[o,phys]beta(2,n);[o,phys]VL(2,m,m);[o,phys]VR(2,p,p);int [o,phys]info())
+  Signature: (complex A(n,n); int [phys]jobvl();int [phys]jobvr();complex B(n,n);complex [o]alpha(n);complex [o]beta(n);complex [o]VL(m,m);complex [o]VR(p,p);int [o]info())
 
 
 =for ref
 
-Complex version of ggev
+Complex version of L<PDL::LinearAlgebra::Real/ggev>
 
 
 
 =cut
 
 sub PDL::cggev {
-  $_[0]->type->real ? goto &PDL::__Ccggev : goto &PDL::__Ncggev;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Ccggev : goto &PDL::__Ncggev;
 }
 *cggev = \&PDL::cggev;
+#line 423 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ccggevx = \&PDL::__Ccggevx;
+#line 430 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ncggevx = \&PDL::__Ncggevx;
+#line 437 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 cggevx
 
 =for sig
 
-  Signature: ([io,phys]A(2,n,n);int balanc();int jobvl();int jobvr();int sense();[io,phys]B(2,n,n);[o,phys]alpha(2,n);[o,phys]beta(2,n);[o,phys]VL(2,m,m);[o,phys]VR(2,p,p);int [o,phys]ilo();int [o,phys]ihi();[o,phys]lscale(n);[o,phys]rscale(n);[o,phys]abnrm();[o,phys]bbnrm();[o,phys]rconde(r);[o,phys]rcondv(s);int [o,phys]info())
+  Signature: (complex [io,phys]A(n,n);int balanc();int jobvl();int jobvr();int sense();complex [io,phys]B(n,n);complex [o]alpha(n);complex [o]beta(n);complex [o]VL(m,m);complex [o]VR(p,p);int [o]ilo();int [o]ihi();[o]lscale(n);[o]rscale(n);[o]abnrm();[o]bbnrm();[o]rconde(r);[o]rcondv(s);int [o]info())
 
 
 =for ref
 
-Complex version of ggevx
+Complex version of L<PDL::LinearAlgebra::Real/ggevx>
 
 
 
 =cut
 
 sub PDL::cggevx {
-  $_[0]->type->real ? goto &PDL::__Ccggevx : goto &PDL::__Ncggevx;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Ccggevx : goto &PDL::__Ncggevx;
 }
 *cggevx = \&PDL::cggevx;
+#line 462 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ccgees = \&PDL::__Ccgees;
+#line 469 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ncgees = \&PDL::__Ncgees;
+#line 476 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 cgees
 
 =for sig
 
-  Signature: ([io,phys]A(2,n,n);  int jobvs(); int sort(); [o,phys]w(2,n); [o,phys]vs(2,p,p); int [o,phys]sdim(); int [o,phys]info())
+  Signature: (complex [io]A(n,n);  int jobvs(); int sort();complex  [o]w(n);complex  [o]vs(p,p); int [o]sdim(); int [o]info();SV* select_func)
 
 
 
 =for ref
 
-Complex version of gees
+Complex version of L<PDL::LinearAlgebra::Real/gees>
 
     select_func:
             If sort = 1, select_func is used to select eigenvalues to sort
@@ -459,35 +508,40 @@ Complex version of gees
 =cut
 
 sub PDL::cgees {
-  $_[0]->type->real ? goto &PDL::__Ccgees : goto &PDL::__Ncgees;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Ccgees : goto &PDL::__Ncgees;
 }
 *cgees = \&PDL::cgees;
+#line 515 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ccgeesx = \&PDL::__Ccgeesx;
+#line 522 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ncgeesx = \&PDL::__Ncgeesx;
+#line 529 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 cgeesx
 
 =for sig
 
-  Signature: ([io,phys]A(2,n,n);  int jobvs(); int sort(); int sense(); [o,phys]w(2,n);[o,phys]vs(2,p,p); int [o,phys]sdim(); [o,phys]rconde();[o,phys]rcondv(); int [o,phys]info())
+  Signature: (complex [io]A(n,n);  int jobvs(); int sort(); int sense();complex  [o]w(n);complex [o]vs(p,p); int [o]sdim(); [o]rconde();[o]rcondv(); int [o]info();SV* select_func)
 
 
 
 =for ref
 
-Complex version of geesx
+Complex version of L<PDL::LinearAlgebra::Real/geesx>
 
     select_func:
             If sort = 1, select_func is used to select eigenvalues to sort
@@ -507,35 +561,40 @@ Complex version of geesx
 =cut
 
 sub PDL::cgeesx {
-  $_[0]->type->real ? goto &PDL::__Ccgeesx : goto &PDL::__Ncgeesx;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Ccgeesx : goto &PDL::__Ncgeesx;
 }
 *cgeesx = \&PDL::cgeesx;
+#line 568 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ccgges = \&PDL::__Ccgges;
+#line 575 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ncgges = \&PDL::__Ncgges;
+#line 582 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 cgges
 
 =for sig
 
-  Signature: ([io,phys]A(2,n,n); int jobvsl();int jobvsr();int sort();[io,phys]B(2,n,n);[o,phys]alpha(2,n);[o,phys]beta(2,n);[o,phys]VSL(2,m,m);[o,phys]VSR(2,p,p);int [o,phys]sdim();int [o,phys]info())
+  Signature: (complex [io]A(n,n); int jobvsl();int jobvsr();int sort();complex [io]B(n,n);complex [o]alpha(n);complex [o]beta(n);complex [o]VSL(m,m);complex [o]VSR(p,p);int [o]sdim();int [o]info();SV* select_func)
 
 
 
 =for ref
 
-Complex version of ggees
+Complex version of L<PDL::LinearAlgebra::Real/ggees>
 
     select_func:
             If sort = 1, select_func is used to select eigenvalues to sort
@@ -555,35 +614,40 @@ Complex version of ggees
 =cut
 
 sub PDL::cgges {
-  $_[0]->type->real ? goto &PDL::__Ccgges : goto &PDL::__Ncgges;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Ccgges : goto &PDL::__Ncgges;
 }
 *cgges = \&PDL::cgges;
+#line 621 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ccggesx = \&PDL::__Ccggesx;
+#line 628 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ncggesx = \&PDL::__Ncggesx;
+#line 635 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 cggesx
 
 =for sig
 
-  Signature: ([io,phys]A(2,n,n); int jobvsl();int jobvsr();int sort();int sense();[io,phys]B(2,n,n);[o,phys]alpha(2,n);[o,phys]beta(2,n);[o,phys]VSL(2,m,m);[o,phys]VSR(2,p,p);int [o,phys]sdim();[o,phys]rconde(q);[o,phys]rcondv(r);int [o,phys]info())
+  Signature: (complex [io]A(n,n); int jobvsl();int jobvsr();int sort();int sense();complex [io]B(n,n);complex [o]alpha(n);complex [o]beta(n);complex [o]VSL(m,m);complex [o]VSR(p,p);int [o]sdim();[o]rconde(q=2);[o]rcondv(q=2);int [o]info();SV* select_func)
 
 
 
 =for ref
 
-Complex version of ggeesx
+Complex version of L<PDL::LinearAlgebra::Real/ggeesx>
 
     select_func:
             If sort = 1, select_func is used to select eigenvalues to sort
@@ -603,314 +667,362 @@ Complex version of ggeesx
 =cut
 
 sub PDL::cggesx {
-  $_[0]->type->real ? goto &PDL::__Ccggesx : goto &PDL::__Ncggesx;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Ccggesx : goto &PDL::__Ncggesx;
 }
 *cggesx = \&PDL::cggesx;
+#line 674 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ccheev = \&PDL::__Ccheev;
+#line 681 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ncheev = \&PDL::__Ncheev;
+#line 688 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 cheev
 
 =for sig
 
-  Signature: ([io,phys]A(2,n,n);  int jobz(); int uplo(); [o,phys]w(n); int [o,phys]info())
+  Signature: (complex [io,phys]A(n,n);  int jobz(); int uplo(); [o,phys]w(n); int [o,phys]info())
 
 
 
 =for ref
 
-Complex version of syev for Hermitian matrix
+Complex version of L<PDL::LinearAlgebra::Real/syev> for Hermitian matrix
 
 
 
 =cut
 
 sub PDL::cheev {
-  $_[0]->type->real ? goto &PDL::__Ccheev : goto &PDL::__Ncheev;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Ccheev : goto &PDL::__Ncheev;
 }
 *cheev = \&PDL::cheev;
+#line 714 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ccheevd = \&PDL::__Ccheevd;
+#line 721 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ncheevd = \&PDL::__Ncheevd;
+#line 728 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 cheevd
 
 =for sig
 
-  Signature: ([io,phys]A(2,n,n);  int jobz(); int uplo(); [o,phys]w(n); int [o,phys]info())
+  Signature: (complex [io,phys]A(n,n);  int jobz(); int uplo(); [o,phys]w(n); int [o,phys]info())
 
 
 
 =for ref
 
-Complex version of syevd for Hermitian matrix
+Complex version of L<PDL::LinearAlgebra::Real/syevd> for Hermitian matrix
 
 
 
 =cut
 
 sub PDL::cheevd {
-  $_[0]->type->real ? goto &PDL::__Ccheevd : goto &PDL::__Ncheevd;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Ccheevd : goto &PDL::__Ncheevd;
 }
 *cheevd = \&PDL::cheevd;
+#line 754 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ccheevx = \&PDL::__Ccheevx;
+#line 761 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ncheevx = \&PDL::__Ncheevx;
+#line 768 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 cheevx
 
 =for sig
 
-  Signature: ([phys]A(2,n,n);  int jobz(); int range(); int uplo(); [phys]vl(); [phys]vu(); int [phys]il(); int [phys]iu(); [phys]abstol(); int [o,phys]m(); [o,phys]w(n); [o,phys]z(2,p,q);int [o,phys]ifail(r); int [o,phys]info())
+  Signature: (complex A(n,n);  int jobz(); int range(); int uplo(); vl(); vu(); int il(); int iu(); abstol(); int [o]m(); [o]w(n);complex  [o]z(p,p);int [o]ifail(n); int [o]info())
 
 
 
 =for ref
 
-Complex version of syevx for Hermitian matrix
+Complex version of L<PDL::LinearAlgebra::Real/syevx> for Hermitian matrix
 
 
 
 =cut
 
 sub PDL::cheevx {
-  $_[0]->type->real ? goto &PDL::__Ccheevx : goto &PDL::__Ncheevx;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Ccheevx : goto &PDL::__Ncheevx;
 }
 *cheevx = \&PDL::cheevx;
+#line 794 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ccheevr = \&PDL::__Ccheevr;
+#line 801 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ncheevr = \&PDL::__Ncheevr;
+#line 808 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 cheevr
 
 =for sig
 
-  Signature: ([phys]A(2,n,n);  int jobz(); int range(); int uplo(); [phys]vl(); [phys]vu(); int [phys]il(); int [phys]iu(); [phys]abstol(); int [o,phys]m(); [o,phys]w(n); [o,phys]z(2,p,q);int [o,phys]isuppz(r); int [o,phys]info())
+  Signature: (complex [phys]A(n,n);  int jobz(); int range(); int uplo(); [phys]vl(); [phys]vu(); int [phys]il(); int [phys]iu(); [phys]abstol(); int [o,phys]m(); [o,phys]w(n);complex  [o,phys]z(p,q);int [o,phys]isuppz(r); int [o,phys]info())
 
 
 
 =for ref
 
-Complex version of syevr for Hermitian matrix
+Complex version of L<PDL::LinearAlgebra::Real/syevr> for Hermitian matrix
 
 
 
 =cut
 
 sub PDL::cheevr {
-  $_[0]->type->real ? goto &PDL::__Ccheevr : goto &PDL::__Ncheevr;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Ccheevr : goto &PDL::__Ncheevr;
 }
 *cheevr = \&PDL::cheevr;
+#line 834 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Cchegv = \&PDL::__Cchegv;
+#line 841 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Nchegv = \&PDL::__Nchegv;
+#line 848 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 chegv
 
 =for sig
 
-  Signature: ([io,phys]A(2,n,n);int [phys]itype();int jobz(); int uplo();[io,phys]B(2,n,n);[o,phys]w(n); int [o,phys]info())
+  Signature: (complex [io,phys]A(n,n);int [phys]itype();int jobz(); int uplo();complex [io,phys]B(n,n);[o,phys]w(n); int [o,phys]info())
 
 
 
 =for ref
 
-Complex version of sygv for Hermitian matrix
+Complex version of L<PDL::LinearAlgebra::Real/sygv> for Hermitian matrix
 
 
 
 =cut
 
 sub PDL::chegv {
-  $_[0]->type->real ? goto &PDL::__Cchegv : goto &PDL::__Nchegv;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Cchegv : goto &PDL::__Nchegv;
 }
 *chegv = \&PDL::chegv;
+#line 874 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Cchegvd = \&PDL::__Cchegvd;
+#line 881 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Nchegvd = \&PDL::__Nchegvd;
+#line 888 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 chegvd
 
 =for sig
 
-  Signature: ([io,phys]A(2,n,n);int [phys]itype();int jobz(); int uplo();[io,phys]B(2,n,n);[o,phys]w(n); int [o,phys]info())
+  Signature: (complex [io,phys]A(n,n);int [phys]itype();int jobz(); int uplo();complex [io,phys]B(n,n);[o,phys]w(n); int [o,phys]info())
 
 
 
 =for ref
 
-Complex version of sygvd for Hermitian matrix
+Complex version of L<PDL::LinearAlgebra::Real/sygvd> for Hermitian matrix
 
 
 
 =cut
 
 sub PDL::chegvd {
-  $_[0]->type->real ? goto &PDL::__Cchegvd : goto &PDL::__Nchegvd;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Cchegvd : goto &PDL::__Nchegvd;
 }
 *chegvd = \&PDL::chegvd;
+#line 914 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Cchegvx = \&PDL::__Cchegvx;
+#line 921 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Nchegvx = \&PDL::__Nchegvx;
+#line 928 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 chegvx
 
 =for sig
 
-  Signature: ([io,phys]A(2,n,n);int [phys]itype();int jobz();int range(); int uplo();[io,phys]B(2,n,n);[phys]vl();[phys]vu();int [phys]il();int [phys]iu();[phys]abstol();int [o,phys]m();[o,phys]w(n); [o,phys]Z(2,p,q);int [o,phys]ifail(r);int [o,phys]info())
+  Signature: (complex [io]A(n,n);int itype();int jobz();int range();
+	  int uplo();complex [io]B(n,n);vl();vu();int il();
+	  int iu();abstol();int [o]m();[o]w(n);complex 
+	  [o]Z(p,p);int [o]ifail(n);int [o]info())
 
 
 
 =for ref
 
-Complex version of sygvx for Hermitian matrix
+Complex version of L<PDL::LinearAlgebra::Real/sygvx> for Hermitian matrix
 
 
 
 =cut
 
 sub PDL::chegvx {
-  $_[0]->type->real ? goto &PDL::__Cchegvx : goto &PDL::__Nchegvx;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Cchegvx : goto &PDL::__Nchegvx;
 }
 *chegvx = \&PDL::chegvx;
+#line 957 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ccgesv = \&PDL::__Ccgesv;
+#line 964 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ncgesv = \&PDL::__Ncgesv;
+#line 971 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 cgesv
 
 =for sig
 
-  Signature: ([io,phys]A(2,n,n);  [io,phys]B(2,n,m); int [o,phys]ipiv(n); int [o,phys]info())
+  Signature: (complex [io,phys]A(n,n);complex   [io,phys]B(n,m); int [o,phys]ipiv(n); int [o,phys]info())
 
 
 =for ref
 
-Complex version of gesv
+Complex version of L<PDL::LinearAlgebra::Real/gesv>
 
 
 
 =cut
 
 sub PDL::cgesv {
-  $_[0]->type->real ? goto &PDL::__Ccgesv : goto &PDL::__Ncgesv;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Ccgesv : goto &PDL::__Ncgesv;
 }
 *cgesv = \&PDL::cgesv;
+#line 996 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ccgesvx = \&PDL::__Ccgesvx;
+#line 1003 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ncgesvx = \&PDL::__Ncgesvx;
+#line 1010 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 cgesvx
 
 =for sig
 
-  Signature: ([io,phys]A(2,n,n); int trans(); int fact(); [io,phys]B(2,n,m); [io,phys]af(2,n,n); int [io,phys]ipiv(n); int [io]equed(); [io,phys]r(n); [io,phys]c(n); [o,phys]X(2,n,m); [o,phys]rcond(); [o,phys]ferr(m); [o,phys]berr(m); [o,phys]rpvgrw(); int [o,phys]info())
+  Signature: (complex [io]A(n,n); int trans(); int fact();complex  [io]B(n,m);complex  [io]af(n,n); int [io]ipiv(n); int [io]equed(); [o]r(p); [o]c(q);complex  [o]X(n,m); [o]rcond(); [o]ferr(m); [o]berr(m); [o]rpvgrw(); int [o]info())
 
 
 
 =for ref
 
-Complex version of gesvx.
+Complex version of L<PDL::LinearAlgebra::Real/gesvx>.
 
     trans:  Specifies the form of the system of equations:
             = 0:  A * X = B     (No transpose)   
@@ -922,237 +1034,272 @@ Complex version of gesvx.
 =cut
 
 sub PDL::cgesvx {
-  $_[0]->type->real ? goto &PDL::__Ccgesvx : goto &PDL::__Ncgesvx;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Ccgesvx : goto &PDL::__Ncgesvx;
 }
 *cgesvx = \&PDL::cgesvx;
+#line 1041 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ccsysv = \&PDL::__Ccsysv;
+#line 1048 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ncsysv = \&PDL::__Ncsysv;
+#line 1055 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 csysv
 
 =for sig
 
-  Signature: ([io,phys]A(2,n,n);  int uplo(); [io,phys]B(2,n,m); int [o,phys]ipiv(n); int [o,phys]info())
+  Signature: (complex [io,phys]A(n,n);  int uplo();complex  [io,phys]B(n,m); int [o]ipiv(n); int [o]info())
 
 
 =for ref
 
-Complex version of sysv
+Complex version of L<PDL::LinearAlgebra::Real/sysv>
 
 
 
 =cut
 
 sub PDL::csysv {
-  $_[0]->type->real ? goto &PDL::__Ccsysv : goto &PDL::__Ncsysv;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Ccsysv : goto &PDL::__Ncsysv;
 }
 *csysv = \&PDL::csysv;
+#line 1080 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ccsysvx = \&PDL::__Ccsysvx;
+#line 1087 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ncsysvx = \&PDL::__Ncsysvx;
+#line 1094 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 csysvx
 
 =for sig
 
-  Signature: ([phys]A(2,n,n); int uplo(); int fact(); [phys]B(2,n,m); [io,phys]af(2,n,n); int [io,phys]ipiv(n); [o,phys]X(2,n,m); [o,phys]rcond(); [o,phys]ferr(m); [o,phys]berr(m); int [o,phys]info())
+  Signature: (complex [phys]A(n,n); int uplo(); int fact();complex  [phys]B(n,m);complex  [io,phys]af(n,n); int [io,phys]ipiv(n);complex  [o]X(n,m); [o]rcond(); [o]ferr(m); [o]berr(m); int [o]info())
 
 
 =for ref
 
-Complex version of sysvx
+Complex version of L<PDL::LinearAlgebra::Real/sysvx>
 
 
 
 =cut
 
 sub PDL::csysvx {
-  $_[0]->type->real ? goto &PDL::__Ccsysvx : goto &PDL::__Ncsysvx;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Ccsysvx : goto &PDL::__Ncsysvx;
 }
 *csysvx = \&PDL::csysvx;
+#line 1119 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Cchesv = \&PDL::__Cchesv;
+#line 1126 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Nchesv = \&PDL::__Nchesv;
+#line 1133 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 chesv
 
 =for sig
 
-  Signature: ([io,phys]A(2,n,n);  int uplo(); [io,phys]B(2,n,m); int [o,phys]ipiv(n); int [o,phys]info())
+  Signature: (complex [io,phys]A(n,n);  int uplo();complex  [io,phys]B(n,m); int [o,phys]ipiv(n); int [o,phys]info())
 
 
 
 =for ref
 
-Complex version of sysv for Hermitian matrix
+Complex version of L<PDL::LinearAlgebra::Real/sysv> for Hermitian matrix
 
 
 
 =cut
 
 sub PDL::chesv {
-  $_[0]->type->real ? goto &PDL::__Cchesv : goto &PDL::__Nchesv;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Cchesv : goto &PDL::__Nchesv;
 }
 *chesv = \&PDL::chesv;
+#line 1159 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Cchesvx = \&PDL::__Cchesvx;
+#line 1166 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Nchesvx = \&PDL::__Nchesvx;
+#line 1173 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 chesvx
 
 =for sig
 
-  Signature: ([phys]A(2,n,n); int uplo(); int fact(); [phys]B(2,n,m); [io,phys]af(2,n,n); int [io,phys]ipiv(n); [o,phys]X(2,n,m); [o,phys]rcond(); [o,phys]ferr(m); [o,phys]berr(m); int [o,phys]info())
+  Signature: (complex [phys]A(n,n); int uplo(); int fact();complex  [phys]B(n,m);complex  [io,phys]af(n,n); int [io,phys]ipiv(n);complex  [o,phys]X(n,m); [o,phys]rcond(); [o,phys]ferr(m); [o,phys]berr(m); int [o,phys]info())
 
 
 
 =for ref
 
-Complex version of sysvx for Hermitian matrix
+Complex version of L<PDL::LinearAlgebra::Real/sysvx> for Hermitian matrix
 
 
 
 =cut
 
 sub PDL::chesvx {
-  $_[0]->type->real ? goto &PDL::__Cchesvx : goto &PDL::__Nchesvx;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Cchesvx : goto &PDL::__Nchesvx;
 }
 *chesvx = \&PDL::chesvx;
+#line 1199 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ccposv = \&PDL::__Ccposv;
+#line 1206 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ncposv = \&PDL::__Ncposv;
+#line 1213 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 cposv
 
 =for sig
 
-  Signature: ([io,phys]A(2,n,n);  int uplo(); [io,phys]B(2,n,m); int [o,phys]info())
+  Signature: (complex [io,phys]A(n,n);  int uplo();complex  [io,phys]B(n,m); int [o,phys]info())
 
 
 
 =for ref
 
-Complex version of posv for Hermitian positive definite matrix
+Complex version of L<PDL::LinearAlgebra::Real/posv> for Hermitian positive definite matrix
 
 
 
 =cut
 
 sub PDL::cposv {
-  $_[0]->type->real ? goto &PDL::__Ccposv : goto &PDL::__Ncposv;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Ccposv : goto &PDL::__Ncposv;
 }
 *cposv = \&PDL::cposv;
+#line 1239 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ccposvx = \&PDL::__Ccposvx;
+#line 1246 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ncposvx = \&PDL::__Ncposvx;
+#line 1253 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 cposvx
 
 =for sig
 
-  Signature: ([io,phys]A(2,n,n); int uplo(); int fact(); [io,phys]B(2,n,m); [io,phys]af(2,n,n); int [io]equed(); [io,phys]s(n); [o,phys]X(2,n,m); [o,phys]rcond(); [o,phys]ferr(m); [o,phys]berr(m); int [o,phys]info())
+  Signature: (complex [io,phys]A(n,n); int uplo(); int fact();complex  [io,phys]B(n,m);complex  [io,phys]af(n,n); int [io]equed(); [o]s(p);complex  [o,phys]X(n,m); [o,phys]rcond(); [o,phys]ferr(m); [o,phys]berr(m); int [o,phys]info())
 
 
 
 =for ref
 
-Complex version of posvx for Hermitian positive definite matrix
+Complex version of L<PDL::LinearAlgebra::Real/posvx> for Hermitian positive definite matrix
 
 
 
 =cut
 
 sub PDL::cposvx {
-  $_[0]->type->real ? goto &PDL::__Ccposvx : goto &PDL::__Ncposvx;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Ccposvx : goto &PDL::__Ncposvx;
 }
 *cposvx = \&PDL::cposvx;
+#line 1279 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ccgels = \&PDL::__Ccgels;
+#line 1286 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ncgels = \&PDL::__Ncgels;
+#line 1293 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 cgels
 
 =for sig
 
-  Signature: ([io,phys]A(2,m,n); int trans(); [io,phys]B(2,p,q);int [o,phys]info())
+  Signature: (complex [io,phys]A(m,n); int trans();complex  [io,phys]B(p,q);int [o,phys]info())
 
 
 
@@ -1160,7 +1307,7 @@ sub PDL::cposvx {
 
 Solves overdetermined or underdetermined complex linear systems   
 involving an M-by-N matrix A, or its conjugate-transpose.
-Complex version of gels.
+Complex version of L<PDL::LinearAlgebra::Real/gels>.
 
     trans:  = 0: the linear system involves A;
             = 1: the linear system involves A**H.
@@ -1170,686 +1317,786 @@ Complex version of gels.
 =cut
 
 sub PDL::cgels {
-  $_[0]->type->real ? goto &PDL::__Ccgels : goto &PDL::__Ncgels;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Ccgels : goto &PDL::__Ncgels;
 }
 *cgels = \&PDL::cgels;
+#line 1324 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ccgelsy = \&PDL::__Ccgelsy;
+#line 1331 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ncgelsy = \&PDL::__Ncgelsy;
+#line 1338 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 cgelsy
 
 =for sig
 
-  Signature: ([io,phys]A(2,m,n); [io,phys]B(2,p,q); [phys]rcond(); int [io,phys]jpvt(n); int [o,phys]rank();int [o,phys]info())
+  Signature: (complex [io,phys]A(m,n);complex  [io,phys]B(p,q); [phys]rcond(); int [io,phys]jpvt(n); int [o,phys]rank();int [o,phys]info())
 
 
 =for ref
 
-Complex version of gelsy
+Complex version of L<PDL::LinearAlgebra::Real/gelsy>
 
 
 
 =cut
 
 sub PDL::cgelsy {
-  $_[0]->type->real ? goto &PDL::__Ccgelsy : goto &PDL::__Ncgelsy;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Ccgelsy : goto &PDL::__Ncgelsy;
 }
 *cgelsy = \&PDL::cgelsy;
+#line 1363 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ccgelss = \&PDL::__Ccgelss;
+#line 1370 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ncgelss = \&PDL::__Ncgelss;
+#line 1377 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 cgelss
 
 =for sig
 
-  Signature: ([io,phys]A(2,m,n); [io,phys]B(2,p,q); [phys]rcond(); [o,phys]s(r); int [o,phys]rank();int [o,phys]info())
+  Signature: (complex [io,phys]A(m,n);complex  [io,phys]B(p,q); [phys]rcond(); [o,phys]s(r); int [o,phys]rank();int [o,phys]info())
 
 
 =for ref
 
-Complex version of gelss
+Complex version of L<PDL::LinearAlgebra::Real/gelss>
 
 
 
 =cut
 
 sub PDL::cgelss {
-  $_[0]->type->real ? goto &PDL::__Ccgelss : goto &PDL::__Ncgelss;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Ccgelss : goto &PDL::__Ncgelss;
 }
 *cgelss = \&PDL::cgelss;
+#line 1402 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ccgelsd = \&PDL::__Ccgelsd;
+#line 1409 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ncgelsd = \&PDL::__Ncgelsd;
+#line 1416 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 cgelsd
 
 =for sig
 
-  Signature: ([io,phys]A(2,m,n); [io,phys]B(2,p,q); [phys]rcond(); [o,phys]s(r); int [o,phys]rank();int [o,phys]info())
+  Signature: (complex [io,phys]A(m,n);complex  [io,phys]B(p,q); [phys]rcond(); [o,phys]s(r); int [o,phys]rank();int [o,phys]info())
 
 
 =for ref
 
-Complex version of gelsd
+Complex version of L<PDL::LinearAlgebra::Real/gelsd>
 
 
 
 =cut
 
 sub PDL::cgelsd {
-  $_[0]->type->real ? goto &PDL::__Ccgelsd : goto &PDL::__Ncgelsd;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Ccgelsd : goto &PDL::__Ncgelsd;
 }
 *cgelsd = \&PDL::cgelsd;
+#line 1441 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ccgglse = \&PDL::__Ccgglse;
+#line 1448 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ncgglse = \&PDL::__Ncgglse;
+#line 1455 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 cgglse
 
 =for sig
 
-  Signature: ([phys]A(2,m,n); [phys]B(2,p,n);[io,phys]c(2,m);[phys]d(2,p);[o,phys]x(2,n);int [o,phys]info())
+  Signature: (complex [phys]A(m,n);complex  [phys]B(p,n);complex [io,phys]c(m);complex [phys]d(p);complex [o,phys]x(n);int [o,phys]info())
 
 
 =for ref
 
-Complex version of gglse
+Complex version of L<PDL::LinearAlgebra::Real/gglse>
 
 
 
 =cut
 
 sub PDL::cgglse {
-  $_[0]->type->real ? goto &PDL::__Ccgglse : goto &PDL::__Ncgglse;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Ccgglse : goto &PDL::__Ncgglse;
 }
 *cgglse = \&PDL::cgglse;
+#line 1480 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ccggglm = \&PDL::__Ccggglm;
+#line 1487 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ncggglm = \&PDL::__Ncggglm;
+#line 1494 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 cggglm
 
 =for sig
 
-  Signature: ([phys]A(2,n,m); [phys]B(2,n,p);[phys]d(2,n);[o,phys]x(2,m);[o,phys]y(2,p);int [o,phys]info())
+  Signature: (complex [phys]A(n,m);complex  [phys]B(n,p);complex [phys]d(n);complex [o,phys]x(m);complex [o,phys]y(p);int [o,phys]info())
 
 
 =for ref
 
-Complex version of ggglm
+Complex version of L<PDL::LinearAlgebra::Real/ggglm>
 
 
 
 =cut
 
 sub PDL::cggglm {
-  $_[0]->type->real ? goto &PDL::__Ccggglm : goto &PDL::__Ncggglm;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Ccggglm : goto &PDL::__Ncggglm;
 }
 *cggglm = \&PDL::cggglm;
+#line 1519 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ccgetrf = \&PDL::__Ccgetrf;
+#line 1526 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ncgetrf = \&PDL::__Ncgetrf;
+#line 1533 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 cgetrf
 
 =for sig
 
-  Signature: ([io,phys]A(2,m,n); int [o,phys]ipiv(p); int [o,phys]info())
+  Signature: (complex [io]A(m,n); int [o]ipiv(p); int [o]info())
 
 
 =for ref
 
-Complex version of getrf
+Complex version of L<PDL::LinearAlgebra::Real/getrf>
 
 
 
 =cut
 
 sub PDL::cgetrf {
-  $_[0]->type->real ? goto &PDL::__Ccgetrf : goto &PDL::__Ncgetrf;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Ccgetrf : goto &PDL::__Ncgetrf;
 }
 *cgetrf = \&PDL::cgetrf;
+#line 1558 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ccgetf2 = \&PDL::__Ccgetf2;
+#line 1565 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ncgetf2 = \&PDL::__Ncgetf2;
+#line 1572 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 cgetf2
 
 =for sig
 
-  Signature: ([io,phys]A(2,m,n); int [o,phys]ipiv(p); int [o,phys]info())
+  Signature: (complex [io]A(m,n); int [o]ipiv(p); int [o]info())
 
 
 =for ref
 
-Complex version of getf2
+Complex version of L<PDL::LinearAlgebra::Real/getf2>
 
 
 
 =cut
 
 sub PDL::cgetf2 {
-  $_[0]->type->real ? goto &PDL::__Ccgetf2 : goto &PDL::__Ncgetf2;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Ccgetf2 : goto &PDL::__Ncgetf2;
 }
 *cgetf2 = \&PDL::cgetf2;
+#line 1597 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ccsytrf = \&PDL::__Ccsytrf;
+#line 1604 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ncsytrf = \&PDL::__Ncsytrf;
+#line 1611 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 csytrf
 
 =for sig
 
-  Signature: ([io,phys]A(2,n,n); int uplo(); int [o,phys]ipiv(n); int [o,phys]info())
+  Signature: (complex [io,phys]A(n,n); int uplo(); int [o,phys]ipiv(n); int [o,phys]info())
 
 
 =for ref
 
-Complex version of sytrf
+Complex version of L<PDL::LinearAlgebra::Real/sytrf>
 
 
 
 =cut
 
 sub PDL::csytrf {
-  $_[0]->type->real ? goto &PDL::__Ccsytrf : goto &PDL::__Ncsytrf;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Ccsytrf : goto &PDL::__Ncsytrf;
 }
 *csytrf = \&PDL::csytrf;
+#line 1636 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ccsytf2 = \&PDL::__Ccsytf2;
+#line 1643 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ncsytf2 = \&PDL::__Ncsytf2;
+#line 1650 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 csytf2
 
 =for sig
 
-  Signature: ([io,phys]A(2,n,n); int uplo(); int [o,phys]ipiv(n); int [o,phys]info())
+  Signature: (complex [io,phys]A(n,n); int uplo(); int [o,phys]ipiv(n); int [o,phys]info())
 
 
 =for ref
 
-Complex version of sytf2
+Complex version of L<PDL::LinearAlgebra::Real/sytf2>
 
 
 
 =cut
 
 sub PDL::csytf2 {
-  $_[0]->type->real ? goto &PDL::__Ccsytf2 : goto &PDL::__Ncsytf2;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Ccsytf2 : goto &PDL::__Ncsytf2;
 }
 *csytf2 = \&PDL::csytf2;
+#line 1675 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ccchetrf = \&PDL::__Ccchetrf;
+#line 1682 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ncchetrf = \&PDL::__Ncchetrf;
+#line 1689 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 cchetrf
 
 =for sig
 
-  Signature: ([io,phys]A(2,n,n); int uplo(); int [o,phys]ipiv(n); int [o,phys]info())
+  Signature: (complex [io,phys]A(n,n); int uplo(); int [o,phys]ipiv(n); int [o,phys]info())
 
 
 
 =for ref
 
-Complex version of sytrf for Hermitian matrix
+Complex version of L<PDL::LinearAlgebra::Real/sytrf> for Hermitian matrix
 
 
 
 =cut
 
 sub PDL::cchetrf {
-  $_[0]->type->real ? goto &PDL::__Ccchetrf : goto &PDL::__Ncchetrf;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Ccchetrf : goto &PDL::__Ncchetrf;
 }
 *cchetrf = \&PDL::cchetrf;
+#line 1715 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Cchetf2 = \&PDL::__Cchetf2;
+#line 1722 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Nchetf2 = \&PDL::__Nchetf2;
+#line 1729 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 chetf2
 
 =for sig
 
-  Signature: ([io,phys]A(2,n,n); int uplo(); int [o,phys]ipiv(n); int [o,phys]info())
+  Signature: (complex [io,phys]A(n,n); int uplo(); int [o,phys]ipiv(n); int [o,phys]info())
 
 
 
 =for ref
 
-Complex version of sytf2 for Hermitian matrix
+Complex version of L<PDL::LinearAlgebra::Real/sytf2> for Hermitian matrix
 
 
 
 =cut
 
 sub PDL::chetf2 {
-  $_[0]->type->real ? goto &PDL::__Cchetf2 : goto &PDL::__Nchetf2;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Cchetf2 : goto &PDL::__Nchetf2;
 }
 *chetf2 = \&PDL::chetf2;
+#line 1755 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ccpotrf = \&PDL::__Ccpotrf;
+#line 1762 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ncpotrf = \&PDL::__Ncpotrf;
+#line 1769 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 cpotrf
 
 =for sig
 
-  Signature: ([io,phys]A(2,n,n); int uplo(); int [o,phys]info())
+  Signature: (complex [io,phys]A(n,n); int uplo(); int [o,phys]info())
 
 
 
 =for ref
 
-Complex version of potrf for Hermitian positive definite matrix
+Complex version of L<PDL::LinearAlgebra::Real/potrf> for Hermitian positive definite matrix
 
 
 
 =cut
 
 sub PDL::cpotrf {
-  $_[0]->type->real ? goto &PDL::__Ccpotrf : goto &PDL::__Ncpotrf;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Ccpotrf : goto &PDL::__Ncpotrf;
 }
 *cpotrf = \&PDL::cpotrf;
+#line 1795 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ccpotf2 = \&PDL::__Ccpotf2;
+#line 1802 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ncpotf2 = \&PDL::__Ncpotf2;
+#line 1809 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 cpotf2
 
 =for sig
 
-  Signature: ([io,phys]A(2,n,n); int uplo(); int [o,phys]info())
+  Signature: (complex [io,phys]A(n,n); int uplo(); int [o,phys]info())
 
 
 
 =for ref
 
-Complex version of potf2 for Hermitian positive definite matrix
+Complex version of L<PDL::LinearAlgebra::Real/potf2> for Hermitian positive definite matrix
 
 
 
 =cut
 
 sub PDL::cpotf2 {
-  $_[0]->type->real ? goto &PDL::__Ccpotf2 : goto &PDL::__Ncpotf2;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Ccpotf2 : goto &PDL::__Ncpotf2;
 }
 *cpotf2 = \&PDL::cpotf2;
+#line 1835 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ccgetri = \&PDL::__Ccgetri;
+#line 1842 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ncgetri = \&PDL::__Ncgetri;
+#line 1849 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 cgetri
 
 =for sig
 
-  Signature: ([io,phys]A(2,n,n); int [phys]ipiv(n); int [o,phys]info())
+  Signature: (complex [io,phys]A(n,n); int [phys]ipiv(n); int [o,phys]info())
 
 
 =for ref
 
-Complex version of getri
+Complex version of L<PDL::LinearAlgebra::Real/getri>
 
 
 
 =cut
 
 sub PDL::cgetri {
-  $_[0]->type->real ? goto &PDL::__Ccgetri : goto &PDL::__Ncgetri;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Ccgetri : goto &PDL::__Ncgetri;
 }
 *cgetri = \&PDL::cgetri;
+#line 1874 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ccsytri = \&PDL::__Ccsytri;
+#line 1881 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ncsytri = \&PDL::__Ncsytri;
+#line 1888 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 csytri
 
 =for sig
 
-  Signature: ([io,phys]A(2,n,n); int uplo(); int [phys]ipiv(n); int [o,phys]info())
+  Signature: (complex [io,phys]A(n,n); int uplo(); int [phys]ipiv(n); int [o,phys]info())
 
 
 =for ref
 
-Complex version of sytri
+Complex version of L<PDL::LinearAlgebra::Real/sytri>
 
 
 
 =cut
 
 sub PDL::csytri {
-  $_[0]->type->real ? goto &PDL::__Ccsytri : goto &PDL::__Ncsytri;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Ccsytri : goto &PDL::__Ncsytri;
 }
 *csytri = \&PDL::csytri;
+#line 1913 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Cchetri = \&PDL::__Cchetri;
+#line 1920 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Nchetri = \&PDL::__Nchetri;
+#line 1927 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 chetri
 
 =for sig
 
-  Signature: ([io,phys]A(2,n,n); int uplo(); int [phys]ipiv(n); int [o,phys]info())
+  Signature: (complex [io,phys]A(n,n); int uplo(); int [phys]ipiv(n); int [o,phys]info())
 
 
 
 =for ref
 
-Complex version of sytri for Hermitian matrix
+Complex version of L<PDL::LinearAlgebra::Real/sytri> for Hermitian matrix
 
 
 
 =cut
 
 sub PDL::chetri {
-  $_[0]->type->real ? goto &PDL::__Cchetri : goto &PDL::__Nchetri;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Cchetri : goto &PDL::__Nchetri;
 }
 *chetri = \&PDL::chetri;
+#line 1953 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ccpotri = \&PDL::__Ccpotri;
+#line 1960 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ncpotri = \&PDL::__Ncpotri;
+#line 1967 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 cpotri
 
 =for sig
 
-  Signature: ([io,phys]A(2,n,n); int uplo(); int [o,phys]info())
+  Signature: (complex [io,phys]A(n,n); int uplo(); int [o,phys]info())
 
 
 =for ref
 
-Complex version of potri
+Complex version of L<PDL::LinearAlgebra::Real/potri>
 
 
 
 =cut
 
 sub PDL::cpotri {
-  $_[0]->type->real ? goto &PDL::__Ccpotri : goto &PDL::__Ncpotri;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Ccpotri : goto &PDL::__Ncpotri;
 }
 *cpotri = \&PDL::cpotri;
+#line 1992 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Cctrtri = \&PDL::__Cctrtri;
+#line 1999 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Nctrtri = \&PDL::__Nctrtri;
+#line 2006 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 ctrtri
 
 =for sig
 
-  Signature: ([io,phys]A(2,n,n); int uplo(); int diag(); int [o,phys]info())
+  Signature: (complex [io,phys]A(n,n); int uplo(); int diag(); int [o,phys]info())
 
 
 =for ref
 
-Complex version of trtri
+Complex version of L<PDL::LinearAlgebra::Real/trtri>
 
 
 
 =cut
 
 sub PDL::ctrtri {
-  $_[0]->type->real ? goto &PDL::__Cctrtri : goto &PDL::__Nctrtri;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Cctrtri : goto &PDL::__Nctrtri;
 }
 *ctrtri = \&PDL::ctrtri;
+#line 2031 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Cctrti2 = \&PDL::__Cctrti2;
+#line 2038 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Nctrti2 = \&PDL::__Nctrti2;
+#line 2045 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 ctrti2
 
 =for sig
 
-  Signature: ([io,phys]A(2,n,n); int uplo(); int diag(); int [o,phys]info())
+  Signature: (complex [io,phys]A(n,n); int uplo(); int diag(); int [o,phys]info())
 
 
 =for ref
 
-Complex version of trti2
+Complex version of L<PDL::LinearAlgebra::Real/trti2>
 
 
 
 =cut
 
 sub PDL::ctrti2 {
-  $_[0]->type->real ? goto &PDL::__Cctrti2 : goto &PDL::__Nctrti2;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Cctrti2 : goto &PDL::__Nctrti2;
 }
 *ctrti2 = \&PDL::ctrti2;
+#line 2070 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ccgetrs = \&PDL::__Ccgetrs;
+#line 2077 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ncgetrs = \&PDL::__Ncgetrs;
+#line 2084 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 cgetrs
 
 =for sig
 
-  Signature: ([phys]A(2,n,n); int trans(); [io,phys]B(2,n,m); int [phys]ipiv(n); int [o,phys]info())
+  Signature: (complex [phys]A(n,n); int trans();complex  [io,phys]B(n,m); int [phys]ipiv(n); int [o,phys]info())
 
 
 
 =for ref
 
-Complex version of getrs
+Complex version of L<PDL::LinearAlgebra::Real/getrs>
 
     Arguments   
     =========   
@@ -1862,139 +2109,159 @@ Complex version of getrs
 =cut
 
 sub PDL::cgetrs {
-  $_[0]->type->real ? goto &PDL::__Ccgetrs : goto &PDL::__Ncgetrs;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Ccgetrs : goto &PDL::__Ncgetrs;
 }
 *cgetrs = \&PDL::cgetrs;
+#line 2116 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ccsytrs = \&PDL::__Ccsytrs;
+#line 2123 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ncsytrs = \&PDL::__Ncsytrs;
+#line 2130 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 csytrs
 
 =for sig
 
-  Signature: ([phys]A(2,n,n); int uplo();[io,phys]B(2,n,m); int [phys]ipiv(n); int [o,phys]info())
+  Signature: (complex [phys]A(n,n); int uplo();complex [io,phys]B(n,m); int [phys]ipiv(n); int [o,phys]info())
 
 
 =for ref
 
-Complex version of sytrs
+Complex version of L<PDL::LinearAlgebra::Real/sytrs>
 
 
 
 =cut
 
 sub PDL::csytrs {
-  $_[0]->type->real ? goto &PDL::__Ccsytrs : goto &PDL::__Ncsytrs;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Ccsytrs : goto &PDL::__Ncsytrs;
 }
 *csytrs = \&PDL::csytrs;
+#line 2155 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Cchetrs = \&PDL::__Cchetrs;
+#line 2162 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Nchetrs = \&PDL::__Nchetrs;
+#line 2169 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 chetrs
 
 =for sig
 
-  Signature: ([phys]A(2,n,n); int uplo();[io,phys]B(2,n,m); int [phys]ipiv(n); int [o,phys]info())
+  Signature: (complex [phys]A(n,n); int uplo();complex [io,phys]B(n,m); int [phys]ipiv(n); int [o,phys]info())
 
 
 
 =for ref
 
-Complex version of sytrs for Hermitian matrix
+Complex version of L<PDL::LinearAlgebra::Real/sytrs> for Hermitian matrix
 
 
 
 =cut
 
 sub PDL::chetrs {
-  $_[0]->type->real ? goto &PDL::__Cchetrs : goto &PDL::__Nchetrs;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Cchetrs : goto &PDL::__Nchetrs;
 }
 *chetrs = \&PDL::chetrs;
+#line 2195 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ccpotrs = \&PDL::__Ccpotrs;
+#line 2202 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ncpotrs = \&PDL::__Ncpotrs;
+#line 2209 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 cpotrs
 
 =for sig
 
-  Signature: ([phys]A(2,n,n); int uplo(); [io,phys]B(2,n,m); int [o,phys]info())
+  Signature: (complex [phys]A(n,n); int uplo();complex  [io,phys]B(n,m); int [o,phys]info())
 
 
 
 =for ref
 
-Complex version of potrs for Hermitian positive definite matrix
+Complex version of L<PDL::LinearAlgebra::Real/potrs> for Hermitian positive definite matrix
 
 
 
 =cut
 
 sub PDL::cpotrs {
-  $_[0]->type->real ? goto &PDL::__Ccpotrs : goto &PDL::__Ncpotrs;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Ccpotrs : goto &PDL::__Ncpotrs;
 }
 *cpotrs = \&PDL::cpotrs;
+#line 2235 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Cctrtrs = \&PDL::__Cctrtrs;
+#line 2242 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Nctrtrs = \&PDL::__Nctrtrs;
+#line 2249 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 ctrtrs
 
 =for sig
 
-  Signature: ([phys]A(2,n,n); int uplo(); int trans(); int diag();[io,phys]B(2,n,m); int [o,phys]info())
+  Signature: (complex [phys]A(n,n); int uplo(); int trans(); int diag();complex [io,phys]B(n,m); int [o,phys]info())
 
 
 
 =for ref
 
-Complex version of trtrs
+Complex version of L<PDL::LinearAlgebra::Real/trtrs>
 
     Arguments   
     =========   
@@ -2007,35 +2274,40 @@ Complex version of trtrs
 =cut
 
 sub PDL::ctrtrs {
-  $_[0]->type->real ? goto &PDL::__Cctrtrs : goto &PDL::__Nctrtrs;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Cctrtrs : goto &PDL::__Nctrtrs;
 }
 *ctrtrs = \&PDL::ctrtrs;
+#line 2281 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Cclatrs = \&PDL::__Cclatrs;
+#line 2288 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Nclatrs = \&PDL::__Nclatrs;
+#line 2295 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 clatrs
 
 =for sig
 
-  Signature: ([phys]A(2,n,n); int uplo(); int trans(); int diag(); int normin();[io,phys]x(2,n); [o,phys]scale();[io,phys]cnorm(n);int [o,phys]info())
+  Signature: (complex [phys]A(n,n); int uplo(); int trans(); int diag(); int normin();complex [io,phys]x(n); [o,phys]scale();[io,phys]cnorm(n);int [o,phys]info())
 
 
 
 =for ref
 
-Complex version of latrs
+Complex version of L<PDL::LinearAlgebra::Real/latrs>
 
     Arguments   
     =========   
@@ -2048,1033 +2320,1183 @@ Complex version of latrs
 =cut
 
 sub PDL::clatrs {
-  $_[0]->type->real ? goto &PDL::__Cclatrs : goto &PDL::__Nclatrs;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Cclatrs : goto &PDL::__Nclatrs;
 }
 *clatrs = \&PDL::clatrs;
+#line 2327 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ccgecon = \&PDL::__Ccgecon;
+#line 2334 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ncgecon = \&PDL::__Ncgecon;
+#line 2341 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 cgecon
 
 =for sig
 
-  Signature: ([phys]A(2,n,n); int norm(); [phys]anorm(); [o,phys]rcond();int [o,phys]info())
+  Signature: (complex [phys]A(n,n); int norm(); [phys]anorm(); [o,phys]rcond();int [o,phys]info())
 
 
 =for ref
 
-Complex version of gecon
+Complex version of L<PDL::LinearAlgebra::Real/gecon>
 
 
 
 =cut
 
 sub PDL::cgecon {
-  $_[0]->type->real ? goto &PDL::__Ccgecon : goto &PDL::__Ncgecon;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Ccgecon : goto &PDL::__Ncgecon;
 }
 *cgecon = \&PDL::cgecon;
+#line 2366 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ccsycon = \&PDL::__Ccsycon;
+#line 2373 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ncsycon = \&PDL::__Ncsycon;
+#line 2380 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 csycon
 
 =for sig
 
-  Signature: ([phys]A(2,n,n); int uplo(); int ipiv(n); [phys]anorm(); [o,phys]rcond();int [o,phys]info())
+  Signature: (complex [phys]A(n,n); int uplo(); int ipiv(n); [phys]anorm(); [o,phys]rcond();int [o,phys]info())
 
 
 =for ref
 
-Complex version of sycon
+Complex version of L<PDL::LinearAlgebra::Real/sycon>
 
 
 
 =cut
 
 sub PDL::csycon {
-  $_[0]->type->real ? goto &PDL::__Ccsycon : goto &PDL::__Ncsycon;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Ccsycon : goto &PDL::__Ncsycon;
 }
 *csycon = \&PDL::csycon;
+#line 2405 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Cchecon = \&PDL::__Cchecon;
+#line 2412 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Nchecon = \&PDL::__Nchecon;
+#line 2419 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 checon
 
 =for sig
 
-  Signature: ([phys]A(2,n,n); int uplo(); int ipiv(n); [phys]anorm(); [o,phys]rcond();int [o,phys]info())
+  Signature: (complex [phys]A(n,n); int uplo(); int ipiv(n); [phys]anorm(); [o,phys]rcond();int [o,phys]info())
 
 
 
 =for ref
 
-Complex version of sycon for Hermitian matrix
+Complex version of L<PDL::LinearAlgebra::Real/sycon> for Hermitian matrix
 
 
 
 =cut
 
 sub PDL::checon {
-  $_[0]->type->real ? goto &PDL::__Cchecon : goto &PDL::__Nchecon;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Cchecon : goto &PDL::__Nchecon;
 }
 *checon = \&PDL::checon;
+#line 2445 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ccpocon = \&PDL::__Ccpocon;
+#line 2452 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ncpocon = \&PDL::__Ncpocon;
+#line 2459 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 cpocon
 
 =for sig
 
-  Signature: ([phys]A(2,n,n); int uplo(); [phys]anorm(); [o,phys]rcond();int [o,phys]info())
+  Signature: (complex [phys]A(n,n); int uplo(); [phys]anorm(); [o,phys]rcond();int [o,phys]info())
 
 
 
 =for ref
 
-Complex version of pocon for Hermitian positive definite matrix
+Complex version of L<PDL::LinearAlgebra::Real/pocon> for Hermitian positive definite matrix
 
 
 
 =cut
 
 sub PDL::cpocon {
-  $_[0]->type->real ? goto &PDL::__Ccpocon : goto &PDL::__Ncpocon;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Ccpocon : goto &PDL::__Ncpocon;
 }
 *cpocon = \&PDL::cpocon;
+#line 2485 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Cctrcon = \&PDL::__Cctrcon;
+#line 2492 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Nctrcon = \&PDL::__Nctrcon;
+#line 2499 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 ctrcon
 
 =for sig
 
-  Signature: ([phys]A(2,n,n); int norm();int uplo();int diag(); [o,phys]rcond();int [o,phys]info())
+  Signature: (complex [phys]A(n,n); int norm();int uplo();int diag(); [o,phys]rcond();int [o,phys]info())
 
 
 =for ref
 
-Complex version of trcon
+Complex version of L<PDL::LinearAlgebra::Real/trcon>
 
 
 
 =cut
 
 sub PDL::ctrcon {
-  $_[0]->type->real ? goto &PDL::__Cctrcon : goto &PDL::__Nctrcon;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Cctrcon : goto &PDL::__Nctrcon;
 }
 *ctrcon = \&PDL::ctrcon;
+#line 2524 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ccgeqp3 = \&PDL::__Ccgeqp3;
+#line 2531 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ncgeqp3 = \&PDL::__Ncgeqp3;
+#line 2538 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 cgeqp3
 
 =for sig
 
-  Signature: ([io,phys]A(2,m,n); int [io,phys]jpvt(n); [o,phys]tau(2,k); int [o,phys]info())
+  Signature: (complex [io,phys]A(m,n); int [io,phys]jpvt(n);complex  [o,phys]tau(k); int [o,phys]info())
 
 
 =for ref
 
-Complex version of geqp3
+Complex version of L<PDL::LinearAlgebra::Real/geqp3>
 
 
 
 =cut
 
 sub PDL::cgeqp3 {
-  $_[0]->type->real ? goto &PDL::__Ccgeqp3 : goto &PDL::__Ncgeqp3;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Ccgeqp3 : goto &PDL::__Ncgeqp3;
 }
 *cgeqp3 = \&PDL::cgeqp3;
+#line 2563 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ccgeqrf = \&PDL::__Ccgeqrf;
+#line 2570 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ncgeqrf = \&PDL::__Ncgeqrf;
+#line 2577 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 cgeqrf
 
 =for sig
 
-  Signature: ([io,phys]A(2,m,n); [o,phys]tau(2,k); int [o,phys]info())
+  Signature: (complex [io,phys]A(m,n);complex  [o,phys]tau(k); int [o,phys]info())
 
 
 =for ref
 
-Complex version of geqrf
+Complex version of L<PDL::LinearAlgebra::Real/geqrf>
 
 
 
 =cut
 
 sub PDL::cgeqrf {
-  $_[0]->type->real ? goto &PDL::__Ccgeqrf : goto &PDL::__Ncgeqrf;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Ccgeqrf : goto &PDL::__Ncgeqrf;
 }
 *cgeqrf = \&PDL::cgeqrf;
+#line 2602 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ccungqr = \&PDL::__Ccungqr;
+#line 2609 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ncungqr = \&PDL::__Ncungqr;
+#line 2616 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 cungqr
 
 =for sig
 
-  Signature: ([io,phys]A(2,m,n); [phys]tau(2,k); int [o,phys]info())
+  Signature: (complex [io,phys]A(m,n);complex  [phys]tau(k); int [o,phys]info())
 
 
 
 =for ref
 
-Complex version of orgqr
+Complex version of L<PDL::LinearAlgebra::Real/orgqr>
 
 
 
 =cut
 
 sub PDL::cungqr {
-  $_[0]->type->real ? goto &PDL::__Ccungqr : goto &PDL::__Ncungqr;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Ccungqr : goto &PDL::__Ncungqr;
 }
 *cungqr = \&PDL::cungqr;
+#line 2642 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ccunmqr = \&PDL::__Ccunmqr;
+#line 2649 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ncunmqr = \&PDL::__Ncunmqr;
+#line 2656 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 cunmqr
 
 =for sig
 
-  Signature: ([phys]A(2,p,k); int side(); int trans(); [phys]tau(2,k); [io,phys]C(2,m,n);int [o,phys]info())
+  Signature: (complex [phys]A(p,k); int side(); int trans();complex  [phys]tau(k);complex  [io,phys]C(m,n);int [o,phys]info())
 
 
 
 =for ref
 
-Complex version of ormqr. Here trans = 1 means conjugate transpose.
+Complex version of L<PDL::LinearAlgebra::Real/ormqr>. Here trans = 1 means conjugate transpose.
 
 
 
 =cut
 
 sub PDL::cunmqr {
-  $_[0]->type->real ? goto &PDL::__Ccunmqr : goto &PDL::__Ncunmqr;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Ccunmqr : goto &PDL::__Ncunmqr;
 }
 *cunmqr = \&PDL::cunmqr;
+#line 2682 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ccgelqf = \&PDL::__Ccgelqf;
+#line 2689 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ncgelqf = \&PDL::__Ncgelqf;
+#line 2696 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 cgelqf
 
 =for sig
 
-  Signature: ([io,phys]A(2,m,n); [o,phys]tau(2,k); int [o,phys]info())
+  Signature: (complex [io,phys]A(m,n);complex  [o,phys]tau(k); int [o,phys]info())
 
 
 =for ref
 
-Complex version of gelqf
+Complex version of L<PDL::LinearAlgebra::Real/gelqf>
 
 
 
 =cut
 
 sub PDL::cgelqf {
-  $_[0]->type->real ? goto &PDL::__Ccgelqf : goto &PDL::__Ncgelqf;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Ccgelqf : goto &PDL::__Ncgelqf;
 }
 *cgelqf = \&PDL::cgelqf;
+#line 2721 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ccunglq = \&PDL::__Ccunglq;
+#line 2728 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ncunglq = \&PDL::__Ncunglq;
+#line 2735 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 cunglq
 
 =for sig
 
-  Signature: ([io,phys]A(2,m,n); [phys]tau(2,k); int [o,phys]info())
+  Signature: (complex [io,phys]A(m,n);complex  [phys]tau(k); int [o,phys]info())
 
 
 
 =for ref
 
-Complex version of orglq
+Complex version of L<PDL::LinearAlgebra::Real/orglq>
 
 
 
 =cut
 
 sub PDL::cunglq {
-  $_[0]->type->real ? goto &PDL::__Ccunglq : goto &PDL::__Ncunglq;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Ccunglq : goto &PDL::__Ncunglq;
 }
 *cunglq = \&PDL::cunglq;
+#line 2761 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ccunmlq = \&PDL::__Ccunmlq;
+#line 2768 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ncunmlq = \&PDL::__Ncunmlq;
+#line 2775 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 cunmlq
 
 =for sig
 
-  Signature: ([phys]A(2,k,p); int side(); int trans(); [phys]tau(2,k); [io,phys]C(2,m,n);int [o,phys]info())
+  Signature: (complex [phys]A(k,p); int side(); int trans();complex  [phys]tau(k);complex  [io,phys]C(m,n);int [o,phys]info())
 
 
 
 =for ref
 
-Complex version of ormlq. Here trans = 1 means conjugate transpose.
+Complex version of L<PDL::LinearAlgebra::Real/ormlq>. Here trans = 1 means conjugate transpose.
 
 
 
 =cut
 
 sub PDL::cunmlq {
-  $_[0]->type->real ? goto &PDL::__Ccunmlq : goto &PDL::__Ncunmlq;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Ccunmlq : goto &PDL::__Ncunmlq;
 }
 *cunmlq = \&PDL::cunmlq;
+#line 2801 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ccgeqlf = \&PDL::__Ccgeqlf;
+#line 2808 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ncgeqlf = \&PDL::__Ncgeqlf;
+#line 2815 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 cgeqlf
 
 =for sig
 
-  Signature: ([io,phys]A(2,m,n); [o,phys]tau(2,k); int [o,phys]info())
+  Signature: (complex [io,phys]A(m,n);complex  [o,phys]tau(k); int [o,phys]info())
 
 
 =for ref
 
-Complex version of geqlf
+Complex version of L<PDL::LinearAlgebra::Real/geqlf>
 
 
 
 =cut
 
 sub PDL::cgeqlf {
-  $_[0]->type->real ? goto &PDL::__Ccgeqlf : goto &PDL::__Ncgeqlf;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Ccgeqlf : goto &PDL::__Ncgeqlf;
 }
 *cgeqlf = \&PDL::cgeqlf;
+#line 2840 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ccungql = \&PDL::__Ccungql;
+#line 2847 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ncungql = \&PDL::__Ncungql;
+#line 2854 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 cungql
 
 =for sig
 
-  Signature: ([io,phys]A(2,m,n); [phys]tau(2,k); int [o,phys]info())
+  Signature: (complex [io,phys]A(m,n);complex  [phys]tau(k); int [o,phys]info())
 
 
 
 =for ref
 
-Complex version of orgql.
+Complex version of L<PDL::LinearAlgebra::Real/orgql>.
 
 
 
 =cut
 
 sub PDL::cungql {
-  $_[0]->type->real ? goto &PDL::__Ccungql : goto &PDL::__Ncungql;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Ccungql : goto &PDL::__Ncungql;
 }
 *cungql = \&PDL::cungql;
+#line 2880 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ccunmql = \&PDL::__Ccunmql;
+#line 2887 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ncunmql = \&PDL::__Ncunmql;
+#line 2894 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 cunmql
 
 =for sig
 
-  Signature: ([phys]A(2,p,k); int side(); int trans(); [phys]tau(2,k); [io,phys]C(2,m,n);int [o,phys]info())
+  Signature: (complex [phys]A(p,k); int side(); int trans();complex  [phys]tau(k);complex  [io,phys]C(m,n);int [o,phys]info())
 
 
 
 =for ref
 
-Complex version of ormql. Here trans = 1 means conjugate transpose.
+Complex version of L<PDL::LinearAlgebra::Real/ormql>. Here trans = 1 means conjugate transpose.
 
 
 
 =cut
 
 sub PDL::cunmql {
-  $_[0]->type->real ? goto &PDL::__Ccunmql : goto &PDL::__Ncunmql;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Ccunmql : goto &PDL::__Ncunmql;
 }
 *cunmql = \&PDL::cunmql;
+#line 2920 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ccgerqf = \&PDL::__Ccgerqf;
+#line 2927 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ncgerqf = \&PDL::__Ncgerqf;
+#line 2934 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 cgerqf
 
 =for sig
 
-  Signature: ([io,phys]A(2,m,n); [o,phys]tau(2,k); int [o,phys]info())
+  Signature: (complex [io,phys]A(m,n);complex  [o,phys]tau(k); int [o,phys]info())
 
 
 =for ref
 
-Complex version of gerqf
+Complex version of L<PDL::LinearAlgebra::Real/gerqf>
 
 
 
 =cut
 
 sub PDL::cgerqf {
-  $_[0]->type->real ? goto &PDL::__Ccgerqf : goto &PDL::__Ncgerqf;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Ccgerqf : goto &PDL::__Ncgerqf;
 }
 *cgerqf = \&PDL::cgerqf;
+#line 2959 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ccungrq = \&PDL::__Ccungrq;
+#line 2966 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ncungrq = \&PDL::__Ncungrq;
+#line 2973 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 cungrq
 
 =for sig
 
-  Signature: ([io,phys]A(2,m,n); [phys]tau(2,k); int [o,phys]info())
+  Signature: (complex [io,phys]A(m,n);complex  [phys]tau(k); int [o,phys]info())
 
 
 
 =for ref
 
-Complex version of orgrq.
+Complex version of L<PDL::LinearAlgebra::Real/orgrq>.
 
 
 
 =cut
 
 sub PDL::cungrq {
-  $_[0]->type->real ? goto &PDL::__Ccungrq : goto &PDL::__Ncungrq;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Ccungrq : goto &PDL::__Ncungrq;
 }
 *cungrq = \&PDL::cungrq;
+#line 2999 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ccunmrq = \&PDL::__Ccunmrq;
+#line 3006 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ncunmrq = \&PDL::__Ncunmrq;
+#line 3013 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 cunmrq
 
 =for sig
 
-  Signature: ([phys]A(2,k,p); int side(); int trans(); [phys]tau(2,k); [io,phys]C(2,m,n);int [o,phys]info())
+  Signature: (complex [phys]A(k,p); int side(); int trans();complex  [phys]tau(k);complex  [io,phys]C(m,n);int [o,phys]info())
 
 
 
 =for ref
 
-Complex version of ormrq. Here trans = 1 means conjugate transpose.
+Complex version of L<PDL::LinearAlgebra::Real/ormrq>. Here trans = 1 means conjugate transpose.
 
 
 
 =cut
 
 sub PDL::cunmrq {
-  $_[0]->type->real ? goto &PDL::__Ccunmrq : goto &PDL::__Ncunmrq;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Ccunmrq : goto &PDL::__Ncunmrq;
 }
 *cunmrq = \&PDL::cunmrq;
+#line 3039 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Cctzrzf = \&PDL::__Cctzrzf;
+#line 3046 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Nctzrzf = \&PDL::__Nctzrzf;
+#line 3053 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 ctzrzf
 
 =for sig
 
-  Signature: ([io,phys]A(2,m,n); [o,phys]tau(2,k); int [o,phys]info())
+  Signature: (complex [io,phys]A(m,n);complex  [o,phys]tau(k); int [o,phys]info())
 
 
 =for ref
 
-Complex version of tzrzf
+Complex version of L<PDL::LinearAlgebra::Real/tzrzf>
 
 
 
 =cut
 
 sub PDL::ctzrzf {
-  $_[0]->type->real ? goto &PDL::__Cctzrzf : goto &PDL::__Nctzrzf;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Cctzrzf : goto &PDL::__Nctzrzf;
 }
 *ctzrzf = \&PDL::ctzrzf;
+#line 3078 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ccunmrz = \&PDL::__Ccunmrz;
+#line 3085 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ncunmrz = \&PDL::__Ncunmrz;
+#line 3092 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 cunmrz
 
 =for sig
 
-  Signature: ([phys]A(2,k,p); int side(); int trans(); [phys]tau(2,k); [io,phys]C(2,m,n);int [o,phys]info())
+  Signature: (complex [phys]A(k,p); int side(); int trans();complex  [phys]tau(k);complex  [io,phys]C(m,n);int [o,phys]info())
 
 
 
 =for ref
 
-Complex version of ormrz. Here trans = 1 means conjugate transpose.
+Complex version of L<PDL::LinearAlgebra::Real/ormrz>. Here trans = 1 means conjugate transpose.
 
 
 
 =cut
 
 sub PDL::cunmrz {
-  $_[0]->type->real ? goto &PDL::__Ccunmrz : goto &PDL::__Ncunmrz;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Ccunmrz : goto &PDL::__Ncunmrz;
 }
 *cunmrz = \&PDL::cunmrz;
+#line 3118 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ccgehrd = \&PDL::__Ccgehrd;
+#line 3125 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ncgehrd = \&PDL::__Ncgehrd;
+#line 3132 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 cgehrd
 
 =for sig
 
-  Signature: ([io,phys]A(2,n,n); int [phys]ilo();int [phys]ihi();[o,phys]tau(2,k); int [o,phys]info())
+  Signature: (complex [io,phys]A(n,n); int [phys]ilo();int [phys]ihi();complex [o,phys]tau(k); int [o,phys]info())
 
 
 =for ref
 
-Complex version of gehrd
+Complex version of L<PDL::LinearAlgebra::Real/gehrd>
 
 
 
 =cut
 
 sub PDL::cgehrd {
-  $_[0]->type->real ? goto &PDL::__Ccgehrd : goto &PDL::__Ncgehrd;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Ccgehrd : goto &PDL::__Ncgehrd;
 }
 *cgehrd = \&PDL::cgehrd;
+#line 3157 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ccunghr = \&PDL::__Ccunghr;
+#line 3164 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ncunghr = \&PDL::__Ncunghr;
+#line 3171 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 cunghr
 
 =for sig
 
-  Signature: ([io,phys]A(2,n,n); int [phys]ilo();int [phys]ihi();[phys]tau(2,k); int [o,phys]info())
+  Signature: (complex [io,phys]A(n,n); int [phys]ilo();int [phys]ihi();complex [phys]tau(k); int [o,phys]info())
 
 
 
 =for ref
 
-Complex version of orghr
+Complex version of L<PDL::LinearAlgebra::Real/orghr>
 
 
 
 =cut
 
 sub PDL::cunghr {
-  $_[0]->type->real ? goto &PDL::__Ccunghr : goto &PDL::__Ncunghr;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Ccunghr : goto &PDL::__Ncunghr;
 }
 *cunghr = \&PDL::cunghr;
+#line 3197 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Cchseqr = \&PDL::__Cchseqr;
+#line 3204 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Nchseqr = \&PDL::__Nchseqr;
+#line 3211 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 chseqr
 
 =for sig
 
-  Signature: ([io,phys]H(2,n,n); int job();int compz();int [phys]ilo();int [phys]ihi();[o,phys]w(2,n); [o,phys]Z(2,m,m); int [o,phys]info())
+  Signature: (complex [io,phys]H(n,n); int job();int compz();int [phys]ilo();int [phys]ihi();complex [o,phys]w(n);complex  [o,phys]Z(m,m); int [o,phys]info())
 
 
 =for ref
 
-Complex version of hseqr
+Complex version of L<PDL::LinearAlgebra::Real/hseqr>
 
 
 
 =cut
 
 sub PDL::chseqr {
-  $_[0]->type->real ? goto &PDL::__Cchseqr : goto &PDL::__Nchseqr;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Cchseqr : goto &PDL::__Nchseqr;
 }
 *chseqr = \&PDL::chseqr;
+#line 3236 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Cctrevc = \&PDL::__Cctrevc;
+#line 3243 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Nctrevc = \&PDL::__Nctrevc;
+#line 3250 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 ctrevc
 
 =for sig
 
-  Signature: ([io,phys]T(2,n,n); int side();int howmny();int [phys]select(q);[io,phys]VL(2,m,r); [io,phys]VR(2,p,s);int [o,phys]m(); int [o,phys]info())
+  Signature: (complex [io]T(n,n); int side();int howmny();int [phys]select(q);complex [o]VL(m,m);complex  [o]VR(p,p);int [o]m(); int [o]info())
 
 
 =for ref
 
-Complex version of trevc
+Complex version of L<PDL::LinearAlgebra::Real/trevc>
 
 
 
 =cut
 
 sub PDL::ctrevc {
-  $_[0]->type->real ? goto &PDL::__Cctrevc : goto &PDL::__Nctrevc;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Cctrevc : goto &PDL::__Nctrevc;
 }
 *ctrevc = \&PDL::ctrevc;
+#line 3275 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Cctgevc = \&PDL::__Cctgevc;
+#line 3282 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Nctgevc = \&PDL::__Nctgevc;
+#line 3289 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 ctgevc
 
 =for sig
 
-  Signature: ([io,phys]A(2,n,n); int side();int howmny(); [io,phys]B(2,n,n);int [phys]select(q);[io,phys]VL(2,m,r); [io,phys]VR(2,p,s);int [o,phys]m(); int [o,phys]info())
+  Signature: (complex [io]A(n,n); int side();int howmny();complex  [io]B(n,n);int select(q);complex [o]VL(m,m);complex  [o]VR(p,p);int [o]m(); int [o]info())
 
 
 =for ref
 
-Complex version of tgevc
+Complex version of L<PDL::LinearAlgebra::Real/tgevc>
 
 
 
 =cut
 
 sub PDL::ctgevc {
-  $_[0]->type->real ? goto &PDL::__Cctgevc : goto &PDL::__Nctgevc;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Cctgevc : goto &PDL::__Nctgevc;
 }
 *ctgevc = \&PDL::ctgevc;
+#line 3314 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ccgebal = \&PDL::__Ccgebal;
+#line 3321 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ncgebal = \&PDL::__Ncgebal;
+#line 3328 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 cgebal
 
 =for sig
 
-  Signature: ([io,phys]A(2,n,n); int job(); int [o,phys]ilo();int [o,phys]ihi();[o,phys]scale(n); int [o,phys]info())
+  Signature: (complex [io,phys]A(n,n); int job(); int [o,phys]ilo();int [o,phys]ihi();[o,phys]scale(n); int [o,phys]info())
 
 
 =for ref
 
-Complex version of gebal
+Complex version of L<PDL::LinearAlgebra::Real/gebal>
 
 
 
 =cut
 
 sub PDL::cgebal {
-  $_[0]->type->real ? goto &PDL::__Ccgebal : goto &PDL::__Ncgebal;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Ccgebal : goto &PDL::__Ncgebal;
 }
 *cgebal = \&PDL::cgebal;
+#line 3353 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Cclange = \&PDL::__Cclange;
+#line 3360 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Nclange = \&PDL::__Nclange;
+#line 3367 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 clange
 
 =for sig
 
-  Signature: ([phys]A(2,n,m); int norm(); [o]b())
+  Signature: (complex [phys]A(n,m); int norm(); [o]b())
 
 
 =for ref
 
-Complex version of lange
+Complex version of L<PDL::LinearAlgebra::Real/lange>
 
 
 
 =cut
 
 sub PDL::clange {
-  $_[0]->type->real ? goto &PDL::__Cclange : goto &PDL::__Nclange;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Cclange : goto &PDL::__Nclange;
 }
 *clange = \&PDL::clange;
+#line 3392 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Cclansy = \&PDL::__Cclansy;
+#line 3399 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Nclansy = \&PDL::__Nclansy;
+#line 3406 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 clansy
 
 =for sig
 
-  Signature: ([phys]A(2, n,n); int uplo(); int norm(); [o]b())
+  Signature: (complex [phys]A( n,n); int uplo(); int norm(); [o]b())
 
 
 =for ref
 
-Complex version of lansy
+Complex version of L<PDL::LinearAlgebra::Real/lansy>
 
 
 
 =cut
 
 sub PDL::clansy {
-  $_[0]->type->real ? goto &PDL::__Cclansy : goto &PDL::__Nclansy;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Cclansy : goto &PDL::__Nclansy;
 }
 *clansy = \&PDL::clansy;
+#line 3431 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Cclantr = \&PDL::__Cclantr;
+#line 3438 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Nclantr = \&PDL::__Nclantr;
+#line 3445 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 clantr
 
 =for sig
 
-  Signature: ([phys]A(2,m,n);int uplo();int norm();int diag();[o]b())
+  Signature: (complex [phys]A(m,n);int uplo();int norm();int diag();[o]b())
 
 
 =for ref
 
-Complex version of lantr
+Complex version of L<PDL::LinearAlgebra::Real/lantr>
 
 
 
 =cut
 
 sub PDL::clantr {
-  $_[0]->type->real ? goto &PDL::__Cclantr : goto &PDL::__Nclantr;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Cclantr : goto &PDL::__Nclantr;
 }
 *clantr = \&PDL::clantr;
+#line 3470 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ccgemm = \&PDL::__Ccgemm;
+#line 3477 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ncgemm = \&PDL::__Ncgemm;
+#line 3484 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 cgemm
 
 =for sig
 
-  Signature: ([phys]A(2,m,n); int transa(); int transb(); [phys]B(2,p,q);[phys]alpha(2); [phys]beta(2); [io,phys]C(2,r,s))
+  Signature: (complex [phys]A(m,n); int transa(); int transb();complex  [phys]B(p,q);complex [phys]alpha();complex  [phys]beta();complex  [io,phys]C(r,s))
 
 
 
 =for ref
 
-Complex version of gemm. 
+Complex version of L<PDL::LinearAlgebra::Real/gemm>.
 
     Arguments   
     =========   
@@ -3091,165 +3513,190 @@ Complex version of gemm.
 =cut
 
 sub PDL::cgemm {
-  $_[0]->type->real ? goto &PDL::__Ccgemm : goto &PDL::__Ncgemm;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Ccgemm : goto &PDL::__Ncgemm;
 }
 *cgemm = \&PDL::cgemm;
+#line 3520 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ccmmult = \&PDL::__Ccmmult;
+#line 3527 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ncmmult = \&PDL::__Ncmmult;
+#line 3534 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 cmmult
 
 =for sig
 
-  Signature: ([phys]A(2,m,n); [phys]B(2,p,m); [o,phys]C(2,p,n))
+  Signature: (complex [phys]A(m,n);complex  [phys]B(p,m);complex  [o,phys]C(p,n))
 
 
 =for ref
 
-Complex version of mmult
+Complex version of L<PDL::LinearAlgebra::Real/mmult>
 
 
 
 =cut
 
 sub PDL::cmmult {
-  $_[0]->type->real ? goto &PDL::__Ccmmult : goto &PDL::__Ncmmult;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Ccmmult : goto &PDL::__Ncmmult;
 }
 *cmmult = \&PDL::cmmult;
+#line 3559 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Cccrossprod = \&PDL::__Cccrossprod;
+#line 3566 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Nccrossprod = \&PDL::__Nccrossprod;
+#line 3573 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 ccrossprod
 
 =for sig
 
-  Signature: ([phys]A(2,n,m); [phys]B(2,p,m); [o,phys]C(2,p,n))
+  Signature: (complex [phys]A(n,m);complex  [phys]B(p,m);complex  [o,phys]C(p,n))
 
 
 =for ref
 
-Complex version of crossprod
+Complex version of L<PDL::LinearAlgebra::Real/crossprod>
 
 
 
 =cut
 
 sub PDL::ccrossprod {
-  $_[0]->type->real ? goto &PDL::__Cccrossprod : goto &PDL::__Nccrossprod;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Cccrossprod : goto &PDL::__Nccrossprod;
 }
 *ccrossprod = \&PDL::ccrossprod;
+#line 3598 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ccsyrk = \&PDL::__Ccsyrk;
+#line 3605 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ncsyrk = \&PDL::__Ncsyrk;
+#line 3612 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 csyrk
 
 =for sig
 
-  Signature: ([phys]A(2,m,n); int uplo(); int trans(); [phys]alpha(2); [phys]beta(2); [io,phys]C(2,p,p))
+  Signature: (complex [phys]A(m,n); int uplo(); int trans();complex  [phys]alpha();complex  [phys]beta();complex  [io,phys]C(p,p))
 
 
 =for ref
 
-Complex version of syrk
+Complex version of L<PDL::LinearAlgebra::Real/syrk>
 
 
 
 =cut
 
 sub PDL::csyrk {
-  $_[0]->type->real ? goto &PDL::__Ccsyrk : goto &PDL::__Ncsyrk;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Ccsyrk : goto &PDL::__Ncsyrk;
 }
 *csyrk = \&PDL::csyrk;
+#line 3637 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ccdot = \&PDL::__Ccdot;
+#line 3644 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ncdot = \&PDL::__Ncdot;
+#line 3651 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 cdot
 
 =for sig
 
-  Signature: ([phys]a(2,n);int [phys]inca();[phys]b(2,n);int [phys]incb();[o,phys]c(2))
+  Signature: (complex [phys]a(n);complex [phys]b(n);complex [o]c())
 
 
 =for ref
 
-Complex version of dot
+Complex version of L<PDL::LinearAlgebra::Real/dot>
 
 
 
 =cut
 
 sub PDL::cdot {
-  $_[0]->type->real ? goto &PDL::__Ccdot : goto &PDL::__Ncdot;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Ccdot : goto &PDL::__Ncdot;
 }
 *cdot = \&PDL::cdot;
+#line 3676 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ccdotc = \&PDL::__Ccdotc;
+#line 3683 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ncdotc = \&PDL::__Ncdotc;
+#line 3690 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 cdotc
 
 =for sig
 
-  Signature: ([phys]a(2,n);int [phys]inca();[phys]b(2,n);int [phys]incb();[o,phys]c(2))
+  Signature: (complex [phys]a(n);complex [phys]b(n);complex [o,phys]c())
 
 
 
@@ -3263,155 +3710,190 @@ vector.
 =cut
 
 sub PDL::cdotc {
-  $_[0]->type->real ? goto &PDL::__Ccdotc : goto &PDL::__Ncdotc;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Ccdotc : goto &PDL::__Ncdotc;
 }
 *cdotc = \&PDL::cdotc;
+#line 3717 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ccaxpy = \&PDL::__Ccaxpy;
+#line 3724 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ncaxpy = \&PDL::__Ncaxpy;
+#line 3731 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 caxpy
 
 =for sig
 
-  Signature: ([phys]a(2,n);int [phys]inca();[phys] alpha(2);[io,phys]b(2,n);int [phys]incb())
+  Signature: (complex [phys]a(n);complex [phys] alpha();complex [io,phys]b(n))
 
 
 =for ref
 
-Complex version of axpy
+Complex version of L<PDL::LinearAlgebra::Real/axpy>
 
 
 
 =cut
 
 sub PDL::caxpy {
-  $_[0]->type->real ? goto &PDL::__Ccaxpy : goto &PDL::__Ncaxpy;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Ccaxpy : goto &PDL::__Ncaxpy;
 }
 *caxpy = \&PDL::caxpy;
+#line 3756 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ccnrm2 = \&PDL::__Ccnrm2;
+#line 3763 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ncnrm2 = \&PDL::__Ncnrm2;
+#line 3770 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 cnrm2
 
 =for sig
 
-  Signature: ([phys]a(2,n);int [phys]inca();[o,phys]b())
+  Signature: (complex [phys]a(n);[o]b())
 
 
 =for ref
 
-Complex version of nrm2
+Complex version of L<PDL::LinearAlgebra::Real/nrm2>
 
 
 
 =cut
 
 sub PDL::cnrm2 {
-  $_[0]->type->real ? goto &PDL::__Ccnrm2 : goto &PDL::__Ncnrm2;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Ccnrm2 : goto &PDL::__Ncnrm2;
 }
 *cnrm2 = \&PDL::cnrm2;
+#line 3795 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ccasum = \&PDL::__Ccasum;
+#line 3802 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ncasum = \&PDL::__Ncasum;
+#line 3809 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 casum
 
 =for sig
 
-  Signature: ([phys]a(2,n);int [phys]inca();[o,phys]b())
+  Signature: (complex [phys]a(n);[o]b())
 
 
 =for ref
 
-Complex version of asum
+Complex version of L<PDL::LinearAlgebra::Real/asum>
 
 
 
 =cut
 
 sub PDL::casum {
-  $_[0]->type->real ? goto &PDL::__Ccasum : goto &PDL::__Ncasum;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Ccasum : goto &PDL::__Ncasum;
 }
 *casum = \&PDL::casum;
+#line 3834 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ccscal = \&PDL::__Ccscal;
+#line 3841 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ncscal = \&PDL::__Ncscal;
+#line 3848 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 cscal
 
 =for sig
 
-  Signature: ([io,phys]a(2,n);int [phys]inca();[phys]scale(2))
+  Signature: (complex [io,phys]a(n);complex scale())
 
 
 =for ref
 
-Complex version of scal
+Complex version of L<PDL::LinearAlgebra::Real/scal>
 
 
 
 =cut
 
 sub PDL::cscal {
-  $_[0]->type->real ? goto &PDL::__Ccscal : goto &PDL::__Ncscal;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Ccscal : goto &PDL::__Ncscal;
 }
 *cscal = \&PDL::cscal;
+#line 3873 "Complex.pm"
 
 
 
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
+
+*__Ccsscal = \&PDL::__Ccsscal;
+#line 3880 "Complex.pm"
 
 
-=head2 sscal
+
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
+
+*__Ncsscal = \&PDL::__Ncsscal;
+#line 3887 "Complex.pm"
+
+
+
+#line 23 "../pp_defc.pl"
+
+=head2 csscal
 
 =for sig
 
-  Signature: ([io,phys]a(2,n);int [phys]inca();[phys]scale())
+  Signature: (complex [io,phys]a(n);scale())
 
 
 
@@ -3421,124 +3903,134 @@ Scales a complex vector by a real constant.
 
 
 
-=for bad
-
-sscal ignores the bad-value flag of the input ndarrays.
-It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
-
-
 =cut
 
+sub PDL::csscal {
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Ccsscal : goto &PDL::__Ncsscal;
+}
+*csscal = \&PDL::csscal;
+#line 3913 "Complex.pm"
 
 
 
-
-
-*sscal = \&PDL::sscal;
-
-
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ccrotg = \&PDL::__Ccrotg;
+#line 3920 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Ncrotg = \&PDL::__Ncrotg;
+#line 3927 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 crotg
 
 =for sig
 
-  Signature: ([io,phys]a(2);[phys]b(2);[o,phys]c(); [o,phys]s(2))
+  Signature: (complex [io,phys]a();complex [phys]b();[o,phys]c();complex  [o,phys]s())
 
 
 =for ref
 
-Complex version of rotg
+Complex version of L<PDL::LinearAlgebra::Real/rotg>
 
 
 
 =cut
 
 sub PDL::crotg {
-  $_[0]->type->real ? goto &PDL::__Ccrotg : goto &PDL::__Ncrotg;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Ccrotg : goto &PDL::__Ncrotg;
 }
 *crotg = \&PDL::crotg;
+#line 3952 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Cclacpy = \&PDL::__Cclacpy;
+#line 3959 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Nclacpy = \&PDL::__Nclacpy;
+#line 3966 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 clacpy
 
 =for sig
 
-  Signature: ([phys]A(2,m,n); int uplo(); [o,phys]B(2,p,n))
+  Signature: (complex [phys]A(m,n); int uplo();complex  [o,phys]B(p,n))
 
 
 =for ref
 
-Complex version of lacpy
+Complex version of L<PDL::LinearAlgebra::Real/lacpy>
 
 
 
 =cut
 
 sub PDL::clacpy {
-  $_[0]->type->real ? goto &PDL::__Cclacpy : goto &PDL::__Nclacpy;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Cclacpy : goto &PDL::__Nclacpy;
 }
 *clacpy = \&PDL::clacpy;
+#line 3991 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Cclaswp = \&PDL::__Cclaswp;
+#line 3998 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Nclaswp = \&PDL::__Nclaswp;
+#line 4005 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 claswp
 
 =for sig
 
-  Signature: ([io,phys]A(2,m,n); int [phys]k1(); int [phys]k2(); int [phys]ipiv(p);int [phys]inc())
+  Signature: (complex [io,phys]A(m,n); int [phys]k1(); int [phys]k2(); int [phys]ipiv(p))
 
 
 =for ref
 
-Complex version of laswp
+Complex version of L<PDL::LinearAlgebra::Real/laswp>
 
 
 
 =cut
 
 sub PDL::claswp {
-  $_[0]->type->real ? goto &PDL::__Cclaswp : goto &PDL::__Nclaswp;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Cclaswp : goto &PDL::__Nclaswp;
 }
 *claswp = \&PDL::claswp;
+#line 4030 "Complex.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -3562,15 +4054,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 4058 "Complex.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *ctricpy = \&PDL::ctricpy;
+#line 4065 "Complex.pm"
 
 
+
+#line 1058 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 
@@ -3595,51 +4090,59 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 4094 "Complex.pm"
 
 
 
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *cmstack = \&PDL::cmstack;
+#line 4101 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Cccharpol = \&PDL::__Cccharpol;
+#line 4108 "Complex.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *__Nccharpol = \&PDL::__Nccharpol;
+#line 4115 "Complex.pm"
 
 
+
+#line 23 "../pp_defc.pl"
 
 =head2 ccharpol
 
 =for sig
 
-  Signature: ([phys]A(c=2,n,n);[phys,o]Y(c=2,n,n);[phys,o]out(c=2,p);)
+  Signature: ([phys]A(c=2,n,n);[phys,o]Y(c=2,n,n);[phys,o]out(c=2,p))
 
 
 =for ref
 
-Complex version of charpol
+Complex version of L<PDL::LinearAlgebra::Real/charpol>
 
 
 
 =cut
 
 sub PDL::ccharpol {
-  $_[0]->type->real ? goto &PDL::__Cccharpol : goto &PDL::__Nccharpol;
+  ref $_[0] eq 'PDL::Complex' || $_[0]->type->real ? goto &PDL::__Cccharpol : goto &PDL::__Nccharpol;
 }
 *ccharpol = \&PDL::ccharpol;
+#line 4140 "Complex.pm"
 
 
 
-;
+
+
+#line 5425 "complex.pd"
 
 
 =head1 AUTHOR
@@ -3651,7 +4154,7 @@ it under the terms of the Perl Artistic License as in the file Artistic_2
 in this distribution.
 
 =cut
-
+#line 4158 "Complex.pm"
 
 
 

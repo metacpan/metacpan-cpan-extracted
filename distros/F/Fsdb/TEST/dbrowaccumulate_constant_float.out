@@ -1,0 +1,11 @@
+#fsdb diff accum:d
+0.0	0.5
+00.000938	1
+00.001611	1.5
+00.001736	2
+00.002006	2.5
+00.002049	3
+#  | /home/johnh/BIN/DB/dbrow 
+#  | /home/johnh/BIN/DB/dbcol diff
+#  | dbsort diff
+#   | dbrowaccumulate -C 0.5

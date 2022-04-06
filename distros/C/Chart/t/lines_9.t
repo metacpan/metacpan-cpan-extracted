@@ -4,6 +4,8 @@ BEGIN { unshift @INC, 'lib', '../lib'}
 use Chart::Lines;
 use Chart::LinesPoints;
 use strict;
+use File::Temp 0.19;
+my $samples = File::Temp->newdir();
 my $g;
 
 print "1..1\n";
@@ -20,7 +22,7 @@ $g->set( 'legend'       => 'none' );
 $g->set( 'xy_plot'      => 1 );
 $g->set( 'x_ticks'      => 'vertical' );
 
-$g->png("samples/lines_9.png");
+$g->png("$samples/lines_9.png");
 
 $g = Chart::Lines->new;
 $g->add_dataset( 10, 20, 30, 40,  50,  60 );
@@ -36,7 +38,7 @@ $g->set(
     xlabels => \@labels,
     xrange  => [ 0, 100 ]
 );
-$g->png("samples/lines_9b.png");
+$g->png("$samples/lines_9b.png");
 
 print "ok 1\n";
 

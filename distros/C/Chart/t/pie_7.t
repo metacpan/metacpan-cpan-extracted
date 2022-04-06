@@ -4,6 +4,8 @@ BEGIN { unshift @INC, 'lib', '../lib'}
 use Chart::Pie;
 use GD;
 use strict;
+use File::Temp 0.19;
+my $samples = File::Temp->newdir();
 
 print "1..1\n";
 
@@ -20,7 +22,7 @@ $g->set( 'x_label'             => '' );
 $g->set( 'ring'                => 0.1 );
 $g->set( 'colors'              => { 'background' => 'grey' } );
 
-$g->png("samples/pie_7.png");
+$g->png("$samples/pie_7.png");
 print "ok 1\n";
 
 exit(0);

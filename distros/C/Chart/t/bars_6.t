@@ -3,6 +3,8 @@
 BEGIN { unshift @INC, 'lib', '../lib'}
 use strict;
 use Chart::Bars;
+use File::Temp 0.19;
+my $samples = File::Temp->newdir();
 
 print "1..1\n";
 
@@ -42,7 +44,7 @@ $g->set(
     #    max_val            => 9000,
 );
 
-$g->png("samples/bars_6.png");
+$g->png("$samples/bars_6.png");
 print "ok 1\n";
 
 exit(0);

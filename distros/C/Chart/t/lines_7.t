@@ -3,6 +3,8 @@
 BEGIN { unshift @INC, 'lib', '../lib'}
 use Chart::Lines;
 use strict;
+use File::Temp 0.19;
+my $samples = File::Temp->newdir();
 my $g;
 
 print "1..1\n";
@@ -22,7 +24,7 @@ $g->set( 'legend'       => 'bottom' );
 $g->set( 'precision'    => '0' );
 $g->set( 'include_zero' => 'true' );
 
-$g->png("samples/lines_7.png");
+$g->png("$samples/lines_7.png");
 
 print "ok 1\n";
 

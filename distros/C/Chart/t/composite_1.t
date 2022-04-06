@@ -2,13 +2,15 @@
 
 BEGIN { unshift @INC, 'lib', '../lib'}
 use Chart::Composite;
+use File::Temp 0.19;
+my $samples = File::Temp->newdir();
 print "1..1\n";
 
 my $obj = Chart::Composite->new( 600, 500 );
 my @legend_ary;
 my ( $legend, @zeile );
 my @all_aryref;
-open( OUT, ">samples/composite_1.png" ) or die "cannot write file samples/composite_1.png\n";
+open( OUT, ">$samples/composite_1.png" ) or die "cannot write file $samples/composite_1.png\n";
 
 my $i       = 0;
 my $e       = 0;

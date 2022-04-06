@@ -21,7 +21,7 @@ sub expect_to_have_sent_once ($self) {
   is $self->events_sent->@*, 1;
 }
 
-sub expect_to_have_sent ($self, %data) {
+sub expect_to_have_sent_data ($self, %data) {
   my $event = $self->events_sent->[0];
 
   is $event->{$_} => $data{$_} for keys %data;

@@ -1,12 +1,12 @@
 package Acme::CPANModules::Sudoku;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-08-11'; # DATE
-our $DIST = 'Acme-CPANModules-Sudoku'; # DIST
-our $VERSION = '0.006'; # VERSION
-
 use strict;
 use Acme::CPANModulesUtil::Misc;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-03-18'; # DATE
+our $DIST = 'Acme-CPANModules-Sudoku'; # DIST
+our $VERSION = '0.007'; # VERSION
 
 my $text = <<'_';
 
@@ -68,14 +68,14 @@ benchmark these but for now here's the list:
 _
 
 our $LIST = {
-    summary => 'Sudoku-related modules on CPAN',
+    summary => 'List of Sudoku-related modules on CPAN',
     description => $text,
 };
 
 Acme::CPANModulesUtil::Misc::populate_entries_from_module_links_in_description;
 
 1;
-# ABSTRACT: Sudoku-related modules on CPAN
+# ABSTRACT: List of Sudoku-related modules on CPAN
 
 __END__
 
@@ -85,11 +85,11 @@ __END__
 
 =head1 NAME
 
-Acme::CPANModules::Sudoku - Sudoku-related modules on CPAN
+Acme::CPANModules::Sudoku - List of Sudoku-related modules on CPAN
 
 =head1 VERSION
 
-This document describes version 0.006 of Acme::CPANModules::Sudoku (from Perl distribution Acme-CPANModules-Sudoku), released on 2021-08-11.
+This document describes version 0.007 of Acme::CPANModules::Sudoku (from Perl distribution Acme-CPANModules-Sudoku), released on 2022-03-18.
 
 =head1 DESCRIPTION
 
@@ -146,31 +146,53 @@ L<Games::Sudoku::OO::Board>
 
 L<Games::YASudoku>
 
-=head1 ACME::MODULES ENTRIES
+=head1 ACME::CPANMODULES ENTRIES
 
 =over
 
-=item * L<Games::Sudoku::CLI>
+=item * L<Games::Sudoku::CLI> - play Sudoku on the command line
 
-=item * L<Games::Sudoku::Component::TkPlayer>
+Author: L<SZABGAB|https://metacpan.org/author/SZABGAB>
 
-=item * L<Spreadsheet::HTML::Presets::Sudoku>
+=item * L<Games::Sudoku::Component::TkPlayer> - Let's play Sudoku
+
+Author: L<ISHIGAKI|https://metacpan.org/author/ISHIGAKI>
+
+=item * L<Spreadsheet::HTML::Presets::Sudoku> - Generates 9x9 sudoku boards via HTML tables.
+
+Author: L<JEFFA|https://metacpan.org/author/JEFFA>
 
 =item * L<Games::Sudoku::Lite>
 
-=item * L<Games::Sudoku::Solver>
+Author: L<BOBO|https://metacpan.org/author/BOBO>
+
+=item * L<Games::Sudoku::Solver> - Solve 9x9-Sudokus recursively.
+
+Author: L<MEHNER|https://metacpan.org/author/MEHNER>
 
 =item * L<Games::Sudoku::General>
 
-=item * L<Games::Sudoku::CPSearch>
+Author: L<WYANT|https://metacpan.org/author/WYANT>
 
-=item * L<Games::Sudoku::Kubedoku>
+=item * L<Games::Sudoku::CPSearch> - Solve Sudoku problems quickly.
 
-=item * L<Games::Sudoku::SudokuTk>
+Author: L<MARTYLOO|https://metacpan.org/author/MARTYLOO>
 
-=item * L<Games::Sudoku::OO::Board>
+=item * L<Games::Sudoku::Kubedoku> - Sudoku Solver for any NxN puzzles
 
-=item * L<Games::YASudoku>
+Author: L<VELASCO|https://metacpan.org/author/VELASCO>
+
+=item * L<Games::Sudoku::SudokuTk> - Sudoku Game 
+
+Author: L<CGUINE|https://metacpan.org/author/CGUINE>
+
+=item * L<Games::Sudoku::OO::Board> - Object oriented Sudoku solver
+
+Author: L<COPE|https://metacpan.org/author/COPE>
+
+=item * L<Games::YASudoku> - Yet Another Sudoku Solver
+
+Author: L<WYLLIE|https://metacpan.org/author/WYLLIE>
 
 =back
 
@@ -206,6 +228,8 @@ or directly:
 This Acme::CPANModules module also helps L<lcpan> produce a more meaningful
 result for C<lcpan related-mods> command when it comes to finding related
 modules for the modules listed in this Acme::CPANModules module.
+See L<App::lcpan::Cmd::related_mods> for more details on how "related modules"
+are found.
 
 =head1 HOMEPAGE
 
@@ -214,14 +238,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Acme-CPANM
 =head1 SOURCE
 
 Source repository is at L<https://github.com/perlancar/perl-Acme-CPANModules-Sudoku>.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Sudoku>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
 
 =head1 SEE ALSO
 
@@ -252,9 +268,17 @@ beyond that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2021 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Sudoku>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

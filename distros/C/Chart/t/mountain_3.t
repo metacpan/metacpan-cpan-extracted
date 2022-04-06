@@ -2,6 +2,8 @@
 
 BEGIN { unshift @INC, 'lib', '../lib'}
 use Chart::Mountain;
+use File::Temp 0.19;
+my $samples = File::Temp->newdir();
 
 print "1..1\n";
 
@@ -76,7 +78,7 @@ $obj->set(
     'grey_background' => 0,
 );
 
-$obj->png( 'samples/mountain_3.png', \@data );
+$obj->png( "$samples/mountain_3.png", \@data );
 
 print "ok 1\n";
 exit(0);

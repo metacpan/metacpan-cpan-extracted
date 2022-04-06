@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package RT::Extension::ExcelFeed;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 =head1 NAME
 
@@ -19,7 +19,10 @@ inline HTML reports.
 
 =head1 RT VERSION
 
-Works with RT 4.2.10+, 4.4, 5.0
+Works with RT 4.4.5, 5.0.2
+
+Updates are made in version 0.07 for compatibility with RT 4.4.5 and 5.0.2.
+To run with earlier versions of RT, use version 0.06.
 
 =head1 INSTALLATION
 
@@ -32,26 +35,6 @@ Works with RT 4.2.10+, 4.4, 5.0
 =item C<make install>
 
 May need root permissions
-
-=item patch RT
-
-The following patches are also needed for RT prior to 4.4.2. Note the
-versions and only apply the patches needed for your version.
-
-Only run these the first time you install this module. If upgrading, install
-any patches that were not previously applied.
-
-Apply for both 4.2 and 4.4.0. Not needed for 4.4.1:
-
-    patch -p1 -d /path/to/rt < etc/subscription_callbacks.patch
-
-Apply for 4.2 and 4.4.0. Not needed for 4.2.13 or later, or 4.4.1.
-
-    patch -p1 -d /path/to/rt < etc/chart_callback.patch
-
-Apply for 4.2, 4.4.0 and 4.4.1:
-
-    patch -p1 -d /path/to/rt < etc/tabs_privileged_callback.patch
 
 =item Add this line to F</opt/rt5/etc/RT_SiteConfig.pm>
 

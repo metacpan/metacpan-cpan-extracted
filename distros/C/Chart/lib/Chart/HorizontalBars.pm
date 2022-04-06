@@ -1,26 +1,13 @@
-## @file
-# Implementation of Chart::HorizontalBars
-#
-# maintained and written by the
-# @author Chart Group at Geodetic Fundamental Station Wettzell (Chart@fs.wettzell.de)
-# @date 2015-03-01
-# @version 2.4.10
 
-## @class Chart::HorizontalBars
-# HorizontalBars class derived from class Base.
-#
-# This class provides all functions which are specific to
-# horizontal bars
-#
+use v5.12;
+
 package Chart::HorizontalBars;
-our $VERSION = 2.400.5;
+our @ISA     = qw(Chart::Base);
+our $VERSION = '2.400.5';
 
 use Chart::Base;
 use GD;
 use Carp;
-use strict;
-
-@Chart::HorizontalBars::ISA     = qw(Chart::Base);
 
 #>>>>>>>>>>>>>>>>>>>>>>>>>>#
 #  public methods go here  #

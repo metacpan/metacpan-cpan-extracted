@@ -33,7 +33,7 @@ Fsdb - a flat-text database for shell scripting
 
 
 =cut
-our $VERSION = '2.75';
+our $VERSION = '3.0';
 
 =head1 SYNOPSIS
 
@@ -236,48 +236,39 @@ L<http://www.isi.edu/~johnh/SOFTWARE/FSDB/index.html>.
 
 =head1 WHAT'S NEW
 
-=head2 2.75, 2022-04-02
-New type specifications in the schema to better support type conversions in python.
+=head2 3.0, 2022-04-04
+Complete type support and accordingly bump major version.
 
 =over 4
 
-=item ENHANCEMENT
+=item NEW
 
-Add optional type specifications to the schema.
-Types are not used in Perl, but are relevant in Python
-and Go Fsdb bindings.
-Types use a subset of perl pack specifiers:
-c, s, l, q are signed 8, 16, 32, and 64-bit integers,
-f is a float, d is double float,
-a is utf-8 string, and &gt; and &lt; can force big or little endianness.
-The default type for everything is "a", that is, utf-8 strings.
-Thanks to Wes Hardaker for pushing to get this long-desired feature
-out the door; his Python bindings need types. 
+The major version number is now 3.0 to correspond to the addition of types
+(although they were actually added in 2.75).
+Old fsdb files are supported (Fsdb-3.0 is backwards compatible with databases),
+but older versions will confuse types in new files
+(new Fsdb files are not forward compatible with old versions).
 
 =item ENHANCEMENT
 
-L<dbcol>, L<dbcolcreate>, L<dbcolcopylast>, and L<dbcolrename>
-now understand and propagate schema types.
-L<dbsort>, L<dbjoin>, L<dbmerge>, L<dbmerge2>
-and L<dbfilepivot> all take a 
-new option C<-t> to sort by type-inferred comparision, if a type is given.
+Type specifications in a few more programs:
+L<dbcolhisto>,
+L<dbcolscorrelate>,
+L<dbcolsregression>,
+L<dbcolstatscores>,
+L<dbrowaccumulate>,
+L<dbrowcount>,
+L<dbrowdiff>,
+L<dbrvstatdiff>.
 
 =item ENHANCEMENT
 
-L<dbcolstat>, L<dbmultistats>, and L<dbcolmovingstats>
-now include type information in their output schema.
-(They assumes input variables are floats, not integers.)
+L<dbcolhisto> now puts an empty value on any empty rows.
 
-=item ENHANCEMENT
+=item NEW
 
-Even more IPv6: the functions in
-L<Fsdb::Support::IPv6> package
-now support strings of hex digits
-as an alternate encoding for IP address
-(and they are already the output of ipv6_fullhex),
-and C<ip_fullhex_to_normal> converts full hex-encoded
-IPv4 or IPv6 addresses to their "normal" form
-(dotted-quad or IPv6 printable format).
+L<dbcoltype> redefines column types, or clears them with the C<-v> option.
+
 
 =back
 
@@ -1137,12 +1128,16 @@ some bugs.  Fsdb should work on perl from version 5.10 onward.
 
 =head1 HISTORY
 
-There have been three versions of Fsdb;
-fsdb 1.0 is a complete re-write of the pre-1995 versions,
+There have been four major versions of Fsdb:
+fsdb-0.x was begun in 1991 for my personal use.
+Fsdb 1.0 is a complete re-write of the pre-1995 versions,
 and was 
 distributed from 1995 to 2007.
 Fsdb 2.0 is a significant re-write of the 1.x versions
-for reasons described below.
+to systematically use a library and threads
+(although threads were abandoned in 2.44).
+Fsdb 3.0 in 2022 adds type specifiers to the schema,
+mostly to support use in languages with stronger typing (like Python, Go, and C).
 
 Fsdb (in its various forms) has been used extensively by its author
 since 1991.  Since 1995 it's been used by two other researchers at
@@ -1161,6 +1156,8 @@ Major changes:
 =item 2.12 2008-10-16: completion of the rewrite, and first RPM package.
 
 =item 2.44 2013-10-02: abandoning threads for improved performance
+
+=item 3.0 2022-04-04: adding type specifiers to the schema
 
 =back
 
@@ -3787,6 +3784,51 @@ as full, 128-bit hex values.
 
 =back
 
+
+=head2 2.75, 2022-04-02
+New type specifications in the schema to better support type conversions in python.
+
+=over 4
+
+=item ENHANCEMENT
+
+Add optional type specifications to the schema.
+Types are not used in Perl, but are relevant in Python
+and Go Fsdb bindings.
+Types use a subset of perl pack specifiers:
+c, s, l, q are signed 8, 16, 32, and 64-bit integers,
+f is a float, d is double float,
+a is utf-8 string, and &gt; and &lt; can force big or little endianness.
+The default type for everything is "a", that is, utf-8 strings.
+Thanks to Wes Hardaker for pushing to get this long-desired feature
+out the door; his Python bindings need types. 
+
+=item ENHANCEMENT
+
+L<dbcol>, L<dbcolcreate>, L<dbcolcopylast>, and L<dbcolrename>
+now understand and propagate schema types.
+L<dbsort>, L<dbjoin>, L<dbmerge>, L<dbmerge2>
+and L<dbfilepivot> all take a 
+new option C<-t> to sort by type-inferred comparision, if a type is given.
+
+=item ENHANCEMENT
+
+L<dbcolstat>, L<dbmultistats>, and L<dbcolmovingstats>
+now include type information in their output schema.
+(They assumes input variables are floats, not integers.)
+
+=item ENHANCEMENT
+
+Even more IPv6: the functions in
+L<Fsdb::Support::IPv6> package
+now support strings of hex digits
+as an alternate encoding for IP address
+(and they are already the output of ipv6_fullhex),
+and C<ip_fullhex_to_normal> converts full hex-encoded
+IPv4 or IPv6 addresses to their "normal" form
+(dotted-quad or IPv6 printable format).
+
+=back
 
 
 

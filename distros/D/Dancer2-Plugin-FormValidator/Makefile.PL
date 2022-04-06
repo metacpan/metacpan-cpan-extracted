@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.024000;
 
 use ExtUtils::MakeMaker;
 
@@ -14,31 +14,41 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Dancer2-Plugin-FormValidator",
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.024000",
   "NAME" => "Dancer2::Plugin::FormValidator",
   "PREREQ_PM" => {
+    "Carp" => 0,
     "Dancer2::Core::Hook" => 0,
     "Dancer2::Plugin" => 0,
     "Dancer2::Plugin::Deferred" => 0,
-    "Data::FormValidator" => 0,
-    "Data::FormValidator::Results" => 0,
+    "Email::Valid" => 0,
+    "Hash::MultiValue" => 0,
+    "Hash::Util" => 0,
+    "List::Util" => "1.45",
+    "Module::Load" => 0,
     "Moo" => 0,
     "Moo::Role" => 0,
+    "Scalar::Util" => 0,
+    "Storable" => 0,
     "Types::Common::String" => 0,
     "Types::Standard" => 0,
-    "namespace::clean" => 0
+    "namespace::clean" => 0,
+    "utf8" => 0
   },
   "TEST_REQUIRES" => {
     "Dancer2" => 0,
     "Data::FormValidator::Constraints" => 0,
     "HTTP::Request::Common" => 0,
-    "JSON::Tiny" => 0,
+    "JSON::MaybeXS" => 0,
     "Plack::Test" => 0,
     "Test::More" => 0,
     "Test::Pod" => 0,
+    "URI::Escape" => 0,
     "strict" => 0,
+    "utf8::all" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.13",
+  "VERSION" => "0.50",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -46,24 +56,33 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Carp" => 0,
   "Dancer2" => 0,
   "Dancer2::Core::Hook" => 0,
   "Dancer2::Plugin" => 0,
   "Dancer2::Plugin::Deferred" => 0,
-  "Data::FormValidator" => 0,
   "Data::FormValidator::Constraints" => 0,
-  "Data::FormValidator::Results" => 0,
+  "Email::Valid" => 0,
   "HTTP::Request::Common" => 0,
-  "JSON::Tiny" => 0,
+  "Hash::MultiValue" => 0,
+  "Hash::Util" => 0,
+  "JSON::MaybeXS" => 0,
+  "List::Util" => "1.45",
+  "Module::Load" => 0,
   "Moo" => 0,
   "Moo::Role" => 0,
   "Plack::Test" => 0,
+  "Scalar::Util" => 0,
+  "Storable" => 0,
   "Test::More" => 0,
   "Test::Pod" => 0,
   "Types::Common::String" => 0,
   "Types::Standard" => 0,
+  "URI::Escape" => 0,
   "namespace::clean" => 0,
   "strict" => 0,
+  "utf8" => 0,
+  "utf8::all" => 0,
   "warnings" => 0
 );
 

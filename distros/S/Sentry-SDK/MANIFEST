@@ -59,6 +59,9 @@ t/cgi-application-plugin-sentry.t
 t/client.t
 t/context-line.t
 t/dsn.t
+t/lib/Mock/Mojo/Request.pm
+t/lib/Mock/Mojo/Response.pm
+t/lib/Mock/Mojo/Transaction.pm
 t/lib/Mock/Mojo/UserAgent.pm
 t/lib/Mock/Sentry/Client.pm
 t/lib/Mock/Sentry/Hub.pm

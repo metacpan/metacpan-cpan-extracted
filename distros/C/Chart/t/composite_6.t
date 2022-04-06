@@ -3,6 +3,8 @@
 BEGIN { unshift @INC, 'lib', '../lib'}
 use Chart::Composite;
 use strict;
+use File::Temp 0.19;
+my $samples = File::Temp->newdir();
 
 print "1..1\n";
 
@@ -34,7 +36,7 @@ my %chart_settings = (
 );
 
 $chart->set(%chart_settings);
-$chart->png("samples/composite_6.png");
+$chart->png("$samples/composite_6.png");
 
 print "ok 1\n";
 

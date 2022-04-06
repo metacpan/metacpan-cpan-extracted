@@ -4,17 +4,20 @@ Complex/complex.pd
 Complex/Makefile.PL
 Complex/selectfunc.c
 Config
+lib/PDL/LinearAlgebra.pm
+lib/PDL/LinearAlgebra/Special.pm
 Makefile.PL
 MANIFEST			This list of files
+pp_defc.pl
 README
 Real/Makefile.PL
 Real/real.pd
 Real/selectfunc.c
-lib/PDL/LinearAlgebra.pm
-lib/PDL/LinearAlgebra/Special.pm
 t/1.t
 t/cgtsv.t
+t/common.pl
 t/gtsv.t
+t/legacy.t
 Trans/Makefile.PL
 Trans/selectfunc.c
 Trans/trans.pd

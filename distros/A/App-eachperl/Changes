@@ -1,5 +1,9 @@
 Revision history for App-eachperl
 
+0.06    2022-04-05
+        [CHANGES]
+         * Quiet the :experimental(init_expr) warning of new Object::Pad
+
 0.05    2022-02-28
         [CHANGES]
          * Added `--only-if` option

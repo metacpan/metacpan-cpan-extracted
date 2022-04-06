@@ -47,6 +47,7 @@ my @files = (
     't/leak/no_leak.t',
     't/local/autoload-get.t',
     't/local/autoload.t',
+    't/local/download_to_fh.t',
     't/local/get.t',
     't/local/http.t',
     't/local/httpsub.t',

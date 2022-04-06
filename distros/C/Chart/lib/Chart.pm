@@ -1,7 +1,6 @@
 
 package Chart;
-
-our $VERSION = 2.400.10;
+our $VERSION = 2.401.1;
 
 1;
 
@@ -21,8 +20,8 @@ Chart - a series of charting modules
 
     $obj->set ( $key_1, $val_1, ... ,$key_n, $val_n );
     $obj->set ( $key_1 => $val_1,
-	        ...
-	        $key_n => $val_n );
+            ...
+            $key_n => $val_n );
     $obj->set ( %hash );
 
     # GIFgraph.pm-style API to produce png formatted charts
@@ -304,23 +303,23 @@ This option lets you control the colors the chart will use.  It takes
 a reference to a hash.  The hash should contain keys mapped to references
 to arrays of rgb values.  For instance,
 
-	$obj->set('colors' => {'background' => [255,255,255]});
+    $obj->set('colors' => {'background' => [255,255,255]});
 
 sets the background color to white (which is the default).  Valid keys for
 this hash are
 
-	'background' (background color for the png)
-	'title' (color of the title)
-	'text' (all the text in the chart)
-	'x_label' (color of the x-axis label)
-	'y_label' (color of the first y axis label)
-	'y_label2' (color of the second y axis label)
-	'grid_lines' (color of the grid lines)
-	'x_grid_lines' (color of the x grid lines - for x axis ticks)
-	'y_grid_lines' (color of the y grid lines - for to left y axis ticks)
-	'y2_grid_lines' (color of the y2 grid lines - for right y axis ticks)
-	'dataset0'..'dataset63' (the different datasets)
-	'misc' (everything else, ie. ticks, box around the legend)
+    'background' (background color for the png)
+    'title' (color of the title)
+    'text' (all the text in the chart)
+    'x_label' (color of the x-axis label)
+    'y_label' (color of the first y axis label)
+    'y_label2' (color of the second y axis label)
+    'grid_lines' (color of the grid lines)
+    'x_grid_lines' (color of the x grid lines - for x axis ticks)
+    'y_grid_lines' (color of the y grid lines - for to left y axis ticks)
+    'y2_grid_lines' (color of the y2 grid lines - for right y axis ticks)
+    'dataset0'..'dataset63' (the different datasets)
+    'misc' (everything else, ie. ticks, box around the legend)
 
 NB. For composite charts, there is a limit of 8 datasets per component.
 The colors for 'dataset8' through 'dataset15' become the colors
@@ -396,8 +395,8 @@ and which datasets belong to which component chart. It should be
 a reference to an array of array references, containing information 
 like the following
 
-	$obj->set ('composite_info' => [ ['Bars', [1,2]],
-					 ['Lines', [3,4] ] ]);
+    $obj->set ('composite_info' => [ ['Bars', [1,2]],
+                     ['Lines', [3,4] ] ]);
 
 This example would set the two component charts to be a bar chart and
 a line chart.  It would use the first two data sets for the bar 
@@ -567,7 +566,7 @@ to arrays of data, with the first array reference pointing to an
 array of x-tick labels.  For example,
 
   @data = ( [ 'foo', 'bar', 'junk' ],
-	    [ 30.2,  23.5,  92.1   ] );
+        [ 30.2,  23.5,  92.1   ] );
 
 would set up a graph with one dataset, and three data points in that
 set.  In general, the @data array should look something like
@@ -631,7 +630,7 @@ to see how it works.
 You can also add a complete datafile to a chart object. Just use the
 add_datafile() method.
 
-	$obj->add_datafile('file', 'set' or 'pt');
+    $obj->add_datafile('file', 'set' or 'pt');
 
 file can be the name of the data file or a filehandle. 
 'set' or 'pt is the type of the datafile. 
@@ -639,15 +638,15 @@ If the parameter is 'set' then each line in the data file
 has to be a complete data set. The value of the set has to be 
 separated by white spaces. For example the file looks like this:
 
-	'foo'  'bar'
-	30     16
-	25     32
+    'foo'  'bar'
+    30     16
+    25     32
 
 If the parameter is 'pt', one line has to include all values
 of one data point separated by white spaces. For example:
 
-	'foo'  30  25
-	'bar'  16  32
+    'foo'  30  25
+    'bar'  16  32
 
 
 =item Clearing the data
@@ -662,19 +661,19 @@ have been entered.
 If you want a copy of the data that has been added so far, make a call
 to the get_data method like so:
 
-    	$dataref = $obj->get_data;
+        $dataref = $obj->get_data;
 
 It returns (you guessed it!) a reference to an array of references to
 datasets.  So the x-tick labels would be stored as
 
-    	@x_labels = @{$dataref->[0]};
+        @x_labels = @{$dataref->[0]};
 
 =item Sending the image to a file
 
 If you just want to print this chart to a file, all you have to do
 is pass the name of the file to the png() method.
 
-  	$obj->png ("foo.png");
+    $obj->png ("foo.png");
 
 =item Sending the image to a filehandle
 
@@ -682,8 +681,8 @@ If you want to do something else with the image, you can also pass
 a filehandle (either a typeglob or a FileHandle object) to png, and
 it will print directly to that.
 
-	$obj->png ($filehandle);
-	$obj->png (FILEHANDLE);
+    $obj->png ($filehandle);
+    $obj->png (FILEHANDLE);
 
 
 =item CGI and Chart
@@ -692,7 +691,7 @@ Okay, so you're probably thinking (again), "Do I always have to save these
 images to disk?  What if I want to use Chart to create dynamic images for
 my web site?"  Well, here's the answer to that.
 
-  	$obj->cgi_png ();
+    $obj->cgi_png ();
 
 The cgi_png method will print the chart, along with the appropriate http
 header, to stdout, allowing you to call chart-generating scripts directly
@@ -705,7 +704,7 @@ Like scalar_jpeg() the image is produced as a scalar
 so that the programmer-user can do whatever the heck
 s/he wants to with it:
 
-  	$obj-scalar_png($dataref)
+    $obj-scalar_png($dataref)
 
 
 
@@ -715,8 +714,8 @@ Like scalar_png() the image is produced as a scalar
 so that the programmer-user can do whatever the heck
 s/he wants to with it:
 
-  	$obj-scalar_jpeg($dataref)
-  	
+    $obj-scalar_jpeg($dataref)
+    
 =back
 
 =head2 Imagemap Support
@@ -728,19 +727,19 @@ method afterwards to retrieve the information.  You will be returned a
 data structure almost identical to the @data array described above to pass
 the data into Chart.
 
-	$imagemap_data = $obj->imagemap_dump ();
+    $imagemap_data = $obj->imagemap_dump ();
 
 Instead of single data values, you will be passed references to arrays
 of pixel information.  For Bars, HorizontalBars and StackedBars charts, 
 the arrays will contain two x-y pairs (specifying the upper left and 
 lower right corner of the bar), like so
 
-	( $x1, $y1, $x2, $y2 ) = @{ $imagemap_data->[$dataset][$datapoint] };
+    ( $x1, $y1, $x2, $y2 ) = @{ $imagemap_data->[$dataset][$datapoint] };
 
 For Lines, Points, ErrorBars, Split and LinesPoints, the arrays will contain 
 a single x-y pair (specifying the center of the point), like so
 
-	( $x, $y ) = @{ $imagemap_data->[$dataset][$datapoint] };
+    ( $x, $y ) = @{ $imagemap_data->[$dataset][$datapoint] };
 
 A few caveats apply here.  First of all, GD treats the upper-left corner
 of the png as the (0,0) point, so positive y values are measured from the
@@ -767,8 +766,6 @@ Violine and Box plots
 
 =back
 
-For elaborate plans look into the L<TODO|../TODO>.
-
 =head1 BUGS
 
 Probably quite a few, since it's been completely rewritten.  As usual,
@@ -781,8 +778,47 @@ David Bonner (dbonner@cs.bu.edu)
 
 =head1 MAINTAINER
 
+=over 4
+
+=item *
+
 Chart Group (Chart@fs.wettzell.de)
+
+=item *
+
 Herbert Breunung (lichtkind@cpan.org)
+
+=back
+
+=head1 CONTRIBUTORS
+
+=over 4
+
+
+=item *
+
+Gregor Herrmann (gregoa@debian.org)
+
+=item *
+
+Chris Dolan (chris+rt@chrisdolan.net)
+
+=item *
+
+(jarmzet@yahoo.com)
+
+=item *
+
+Ricardo Signes (rjbs@cpan.org)
+
+=item *
+
+Petr Pisar (ppisar@redhat.com)
+
+
+
+=back
+
 
 =head1 COPYRIGHT
 

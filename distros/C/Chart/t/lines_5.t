@@ -2,6 +2,8 @@
 
 BEGIN { unshift @INC, 'lib', '../lib'}
 use Chart::Lines;
+use File::Temp 0.19;
+my $samples = File::Temp->newdir();
 print "1..1\n";
 
 $g = Chart::Lines->new( 600, 300 );
@@ -41,7 +43,7 @@ $g->add_dataset(@y2_values);
 
 $g->set(%hash);
 
-$g->png("samples/lines_5.png");
+$g->png("$samples/lines_5.png");
 
 sub formatter
 {

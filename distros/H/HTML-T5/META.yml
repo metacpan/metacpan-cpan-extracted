@@ -9,7 +9,7 @@ configure_requires:
   Alien::TidyHTML5: v0.3.0
   ExtUtils::MakeMaker: '6.52'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.48, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -30,9 +30,11 @@ requires:
   constant: '0'
   perl: '5.010001'
 resources:
+  bugtracker: http://github.com/shlomif/html-tidy5/issues
   homepage: http://github.com/shlomif/html-tidy5
   license: http://www.opensource.org/licenses/artistic-license-2.0.php
-version: '0.010'
+  repository: http://github.com/shlomif/html-tidy5
+version: '0.011'
 x_contributors:
   - 'Andy Lester <andy@petdance.com>'
   - 'Jonathan Rockway <jrockway@cpan.org>'

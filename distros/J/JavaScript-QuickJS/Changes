@@ -1,5 +1,16 @@
 Revision history for Perl extension JavaScript::QuickJS:
 
+0.04
+- No production changes.
+- Fix typo’d test from 0.03.
+
+0.03 Mon 4 Apr 2022
+- Fix number conversion in 32-bit, non-64-bit-int perls.
+- Fix conversion of Perl “magic” variables to JavaScript.
+- Add more tests against number conversion.
+- Refine Perl->JS typing logic to agree with 5.36 serialization.
+- Patch QuickJS to support FreeBSD, OpenBSD, and Cygwin.
+
 0.02 Mon 28 Mar 2022
 - Documentation fixes
 

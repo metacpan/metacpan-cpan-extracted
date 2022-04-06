@@ -1,5 +1,6 @@
 package Dist::Zilla::Plugin::Babble;
-$Dist::Zilla::Plugin::Babble::VERSION = '0.001';
+$Dist::Zilla::Plugin::Babble::VERSION = '0.002';
+use Carp 'croak';
 use Moose;
 use MooseX::Types::Moose qw/ArrayRef Str/;
 use MooseX::Types::Perl qw/StrictVersionStr/;
@@ -42,11 +43,11 @@ has plugins => (
 );
 
 my %supported_since = (
-	'::CoreSignatures' => '5.028',
-	'::State'          => '5.010',
-	'::DefinedOr'      => '5.010',
-	'::PostfixDeref'   => '5.020',
-	'::PostfixDeref'   => '5.014',
+	'::CoreSignatures'        => '5.028',
+	'::State'                 => '5.010',
+	'::DefinedOr'             => '5.010',
+	'::PostfixDeref'          => '5.020',
+	'::SubstituteAndReturn'   => '5.014',
 );
 
 sub _build_plugins {
@@ -98,7 +99,7 @@ sub munge_file {
 	eval {
 		$file->content($pc->transform_document($content));
 		1;
-	} or die "Could not munge " . $file->name . ": " . $@;
+	} or croak 'Could not munge ' . $file->name . ': ' . $@;
 	return;
 }
 
@@ -124,7 +125,7 @@ Dist::Zilla::Plugin::Babble - EXPERIMENTAL Automatic Babble substitution in Dist
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

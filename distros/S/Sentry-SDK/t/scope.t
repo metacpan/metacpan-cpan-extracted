@@ -20,6 +20,10 @@ describe 'Sentry::Hub::Scope' => sub {
   my $tx;
 
   before each => sub {
+    # Reset global event processors
+    splice Sentry::Hub::Scope::get_global_event_processors()->@*, 0,
+      Sentry::Hub::Scope::get_global_event_processors()->@*;
+
     $tx   = Sentry::Tracing::Transaction->new();
     $span = Sentry::Tracing::Span->new(
       { transaction => $tx, request => { url => 'http://example.com' } });
@@ -48,7 +52,34 @@ describe 'Sentry::Hub::Scope' => sub {
         is $event->{level}, Sentry::Severity->Fatal;
       };
     };
+  };
 
+  describe 'global event processors' => sub {
+    it 'defaults to an empty array ref' => sub {
+      is_deeply Sentry::Hub::Scope::get_global_event_processors, [];
+    };
+
+    it 'adds an event processor' => sub {
+      my $processor = sub ($event, $hint = undef) {
+        return undef;
+      };
+      Sentry::Hub::Scope::add_global_event_processor($processor);
+
+      is_deeply Sentry::Hub::Scope::get_global_event_processors, [$processor];
+    };
+
+    it 'uses the global event processor' => sub {
+      my $processor = sub ($event, $hint = undef) {
+        $event->{foo} = 'bar';
+        return $event;
+      };
+      Sentry::Hub::Scope::add_global_event_processor($processor);
+
+      my $event
+        = $scope->apply_to_event({ level => Sentry::Severity->Fatal });
+
+      is $event->{foo}, 'bar';
+    };
   };
 };
 

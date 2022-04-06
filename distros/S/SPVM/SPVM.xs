@@ -16,18 +16,6 @@
 #include "spvm_native.h"
 #include "spvm_api.h"
 
-#include "spvm_compiler.h"
-#include "spvm_hash.h"
-#include "spvm_list.h"
-#include "spvm_basic_type.h"
-#include "spvm_type.h"
-#include "spvm_object.h"
-#include "spvm_csource_builder_precompile.h"
-#include "spvm_string_buffer.h"
-#include "spvm_allocator.h"
-
-#include "spvm_runtime.h"
-
 static const char* MFILE = "SPVM.xs";
 
 SV* SPVM_XS_UTIL_new_sv_object(SPVM_ENV* env, SPVM_OBJECT* object, const char* class) {
@@ -122,12 +110,12 @@ SPVM_OBJECT* SPVM_XS_UTIL_new_mulnum_array(SPVM_ENV* env, const char* basic_type
       }
 
       for (int32_t field_index = 0; field_index < class_field_ids_length; field_index++) {
-        int32_t field_id = class_field_ids_base + field_index;
-        int32_t field_name_id = SPVM_API_get_field_name_id(env, field_id);
+        int32_t mulnum_field_id = class_field_ids_base + field_index;
+        int32_t mulnum_field_name_id = SPVM_API_get_field_name_id(env, mulnum_field_id);
         
-        const char* field_name = SPVM_API_get_constant_string_value(env, field_name_id, NULL);
+        const char* mulnum_field_name = SPVM_API_get_constant_string_value(env, mulnum_field_name_id, NULL);
         
-        SV** sv_field_value_ptr = hv_fetch(hv_value, field_name, strlen(field_name), 0);
+        SV** sv_field_value_ptr = hv_fetch(hv_value, mulnum_field_name, strlen(mulnum_field_name), 0);
         SV* sv_field_value;
         if (sv_field_value_ptr) {
           sv_field_value = *sv_field_value_ptr;
@@ -139,27 +127,27 @@ SPVM_OBJECT* SPVM_XS_UTIL_new_mulnum_array(SPVM_ENV* env, const char* basic_type
 
         int32_t mulnum_field_type_basic_type_id = SPVM_API_get_type_basic_type_id(env, mulnum_field_type_id);
         switch (mulnum_field_type_basic_type_id) {
-          case SPVM_BASIC_TYPE_C_ID_BYTE: {
+          case SPVM_API_C_BASIC_TYPE_ID_BYTE: {
             ((int8_t*)elems)[(fields_length * index) + field_index] = (int8_t)SvIV(sv_field_value);
             break;
           }
-          case SPVM_BASIC_TYPE_C_ID_SHORT: {
+          case SPVM_API_C_BASIC_TYPE_ID_SHORT: {
             ((int16_t*)elems)[(fields_length * index) + field_index] = (int16_t)SvIV(sv_field_value);
             break;
           }
-          case SPVM_BASIC_TYPE_C_ID_INT: {
+          case SPVM_API_C_BASIC_TYPE_ID_INT: {
             ((int32_t*)elems)[(fields_length * index) + field_index] = (int32_t)SvIV(sv_field_value);
             break;
           }
-          case SPVM_BASIC_TYPE_C_ID_LONG: {
+          case SPVM_API_C_BASIC_TYPE_ID_LONG: {
             ((int64_t*)elems)[(fields_length * index) + field_index] = (int64_t)SvIV(sv_field_value);
             break;
           }
-          case SPVM_BASIC_TYPE_C_ID_FLOAT: {
+          case SPVM_API_C_BASIC_TYPE_ID_FLOAT: {
             ((float*)elems)[(fields_length * index) + field_index] = (float)SvNV(sv_field_value);
             break;
           }
-          case SPVM_BASIC_TYPE_C_ID_DOUBLE: {
+          case SPVM_API_C_BASIC_TYPE_ID_DOUBLE: {
             ((double*)elems)[(fields_length * index) + field_index] = (double)SvNV(sv_field_value);
             break;
           }
@@ -212,8 +200,8 @@ call_spvm_method(...)
   int32_t spvm_args_base = 3;
 
   int32_t method_is_class_method = SPVM_API_get_method_is_class_method(env, method_id);
-  int32_t method_arg_type_ids_length = SPVM_API_get_method_arg_type_ids_length(env, method_id);
-  int32_t method_arg_type_ids_base = SPVM_API_get_method_arg_type_ids_base(env, method_id);
+  int32_t method_arg_ids_length = SPVM_API_get_method_arg_ids_length(env, method_id);
+  int32_t method_arg_ids_base = SPVM_API_get_method_arg_ids_base(env, method_id);
   int32_t method_return_type_id = SPVM_API_get_method_return_type_id(env, method_id);
 
   // If class method, first argument is ignored
@@ -222,10 +210,10 @@ call_spvm_method(...)
   }
   
   // Check argument count
-  if (items - spvm_args_base < method_arg_type_ids_length) {
+  if (items - spvm_args_base < method_arg_ids_length) {
     croak("Too few arguments %s->%s at %s line %d\n", class_name, method_name, MFILE, __LINE__);
   }
-  else if (items - spvm_args_base > method_arg_type_ids_length) {
+  else if (items - spvm_args_base > method_arg_ids_length) {
     croak("Too many arguments %s->%s at %s line %d\n", class_name, method_name, MFILE, __LINE__);
   }
 
@@ -244,330 +232,376 @@ call_spvm_method(...)
   int32_t ref_stack_indexes[256];
 
   // Arguments
-  for (int32_t args_index = 0; args_index < method_arg_type_ids_length; args_index++) {
+  for (int32_t args_index = 0; args_index < method_arg_ids_length; args_index++) {
     
     int32_t args_index_nth = args_index + 1;
     
     // Get value from Perl argument stack
     SV* sv_value = ST(spvm_args_base + args_index);
-
-    int32_t arg_type_id = runtime->arg_type_ids[method_arg_type_ids_base + args_index];
+    
+    int32_t arg_id = method_arg_ids_base + args_index;
+    int32_t arg_type_id = SPVM_API_get_arg_type_id(env, arg_id);
     int32_t arg_basic_type_id = SPVM_API_get_type_basic_type_id(env, arg_type_id);
     int32_t arg_type_dimension = SPVM_API_get_type_dimension(env, arg_type_id);
     int32_t arg_type_category = SPVM_API_get_type_category(env, arg_type_id);
     
     // Process argument corresponding to the type category
     switch (arg_type_category) {
-      // Perl scalar to SPVM byte
-      case SPVM_TYPE_C_TYPE_CATEGORY_BYTE : {
-        int8_t value = (int8_t)SvIV(sv_value);
-        args_stack[args_stack_index].bval = value;
-        args_stack_index++;
-        break;
-      }
-      // Perl scalar to SPVM short
-      case SPVM_TYPE_C_TYPE_CATEGORY_SHORT : {
-        int16_t value = (int16_t)SvIV(sv_value);
-        args_stack[args_stack_index].sval = value;
-        args_stack_index++;
-        break;
-      }
-      // Perl scalar to SPVM int
-      case SPVM_TYPE_C_TYPE_CATEGORY_INT : {
-        int32_t value = (int32_t)SvIV(sv_value);
-        args_stack[args_stack_index].ival = value;
-        args_stack_index++;
-        break;
-      }
-      // Perl scalar to SPVM long
-      case SPVM_TYPE_C_TYPE_CATEGORY_LONG : {
-        int64_t value = (int64_t)SvIV(sv_value);
-        args_stack[args_stack_index].lval = value;
-        args_stack_index++;
-        break;
-      }
-      // Perl scalar to SPVM float
-      case SPVM_TYPE_C_TYPE_CATEGORY_FLOAT : {
-        float value = (float)SvNV(sv_value);
-        args_stack[args_stack_index].fval = value;
-        args_stack_index++;
-        break;
-      }
-      // Perl scalar to SPVM double
-      case SPVM_TYPE_C_TYPE_CATEGORY_DOUBLE : {
-        double value = (double)SvNV(sv_value);
-        args_stack[args_stack_index].dval = value;
-        args_stack_index++;
-        break;
-      }
-      // Perl scalar to SPVM string
-      case SPVM_TYPE_C_TYPE_CATEGORY_STRING: {
-        // Perl undef to SPVM undef
-        if (!SvOK(sv_value)) {
-          args_stack[args_stack_index].oval = NULL;
-        }
-        else {
-          // Perl non-ref scalar to SPVM string
-          // If Perl value is non-ref scalar, the value is converted to SPVM::BlessedObject::String object
-          if (!SvROK(sv_value)) {
-            // Convert Perl decoded string to loose UTF-8 bytes.
-            SV* sv_value_copy = sv_2mortal(newSVsv(sv_value));
-            sv_utf8_encode(sv_value_copy);
-            const char* chars = SvPV_nolen(sv_value_copy);
-            int32_t length = SvCUR(sv_value_copy);
-            void* string = env->new_string(env, chars, length);
-            
-            SV* sv_string = SPVM_XS_UTIL_new_sv_object(env, string, "SPVM::BlessedObject::String");
-            
-            sv_value = sv_string;
+      case SPVM_API_C_TYPE_CATEGORY_NUMERIC: {
+        switch(arg_basic_type_id) {
+          // Perl scalar to SPVM byte
+          case SPVM_API_C_BASIC_TYPE_ID_BYTE : {
+            int8_t value = (int8_t)SvIV(sv_value);
+            args_stack[args_stack_index].bval = value;
+            args_stack_index++;
+            break;
           }
-          
-          // Perl SPVM::BlessedObject::String to SPVM string
-          if (sv_isobject(sv_value) && sv_derived_from(sv_value, "SPVM::BlessedObject::String")) {
-            SPVM_OBJECT* object = SPVM_XS_UTIL_get_object(sv_value);
-            
-            args_stack[args_stack_index].oval = object;
+          // Perl scalar to SPVM short
+          case SPVM_API_C_BASIC_TYPE_ID_SHORT : {
+            int16_t value = (int16_t)SvIV(sv_value);
+            args_stack[args_stack_index].sval = value;
+            args_stack_index++;
+            break;
           }
-          else {
-            croak("%dth argument of %s->%s must be a non-ref scalar or a SPVM::BlessedObject::String object at %s line %d\n", args_index_nth, class_name, method_name, MFILE, __LINE__);
+          // Perl scalar to SPVM int
+          case SPVM_API_C_BASIC_TYPE_ID_INT : {
+            int32_t value = (int32_t)SvIV(sv_value);
+            args_stack[args_stack_index].ival = value;
+            args_stack_index++;
+            break;
+          }
+          // Perl scalar to SPVM long
+          case SPVM_API_C_BASIC_TYPE_ID_LONG : {
+            int64_t value = (int64_t)SvIV(sv_value);
+            args_stack[args_stack_index].lval = value;
+            args_stack_index++;
+            break;
+          }
+          // Perl scalar to SPVM float
+          case SPVM_API_C_BASIC_TYPE_ID_FLOAT : {
+            float value = (float)SvNV(sv_value);
+            args_stack[args_stack_index].fval = value;
+            args_stack_index++;
+            break;
+          }
+          // Perl scalar to SPVM double
+          case SPVM_API_C_BASIC_TYPE_ID_DOUBLE : {
+            double value = (double)SvNV(sv_value);
+            args_stack[args_stack_index].dval = value;
+            args_stack_index++;
+            break;
+          }
+          default: {
+            assert(0);
           }
         }
-        args_stack_index++;
         break;
       }
       // Perl SPVM::BlessedObject::Class to SPVM class
-      case SPVM_TYPE_C_TYPE_CATEGORY_CLASS:
+      case SPVM_API_C_TYPE_CATEGORY_STRING:
+      case SPVM_API_C_TYPE_CATEGORY_CLASS:
+      case SPVM_API_C_TYPE_CATEGORY_INTERFACE:
+      case SPVM_API_C_TYPE_CATEGORY_CALLBACK:
+      case SPVM_API_C_TYPE_CATEGORY_ANY_OBJECT:
       {
         if (!SvOK(sv_value)) {
           args_stack[args_stack_index].oval = NULL;
         }
         else {
-          if (sv_isobject(sv_value) && sv_derived_from(sv_value, "SPVM::BlessedObject::Class")) {
-            SPVM_OBJECT* object = SPVM_XS_UTIL_get_object(sv_value);
-            assert(arg_type_dimension == 0);
-            if (object->basic_type_id != arg_basic_type_id) {
-              croak("%dth argument of %s->%s must be %s class line %d\n", args_index_nth, class_name, method_name, MFILE, __LINE__);
+          if (arg_basic_type_id == SPVM_API_C_BASIC_TYPE_ID_STRING) {
+            // Perl non-ref scalar to SPVM string
+            // If Perl value is non-ref scalar, the value is converted to SPVM::BlessedObject::String object
+            if (!SvROK(sv_value)) {
+              // Convert Perl decoded string to loose UTF-8 bytes.
+              SV* sv_value_copy = sv_2mortal(newSVsv(sv_value));
+              sv_utf8_encode(sv_value_copy);
+              const char* chars = SvPV_nolen(sv_value_copy);
+              int32_t length = SvCUR(sv_value_copy);
+              void* string = env->new_string(env, chars, length);
+              
+              SV* sv_string = SPVM_XS_UTIL_new_sv_object(env, string, "SPVM::BlessedObject::String");
+              
+              sv_value = sv_string;
             }
-            args_stack[args_stack_index].oval = object;
+            
+            // Perl SPVM::BlessedObject::String to SPVM string
+            if (sv_isobject(sv_value) && sv_derived_from(sv_value, "SPVM::BlessedObject::String")) {
+              SPVM_OBJECT* object = SPVM_XS_UTIL_get_object(sv_value);
+              
+              args_stack[args_stack_index].oval = object;
+            }
+            else {
+              croak("%dth argument of %s->%s must be a non-ref scalar or a SPVM::BlessedObject::String object at %s line %d\n", args_index_nth, class_name, method_name, MFILE, __LINE__);
+            }
+          }
+          else if (arg_basic_type_id == SPVM_API_C_BASIC_TYPE_ID_ANY_OBJECT) {
+            if (sv_isobject(sv_value) && sv_derived_from(sv_value, "SPVM::BlessedObject")) {
+              SPVM_OBJECT* object = SPVM_XS_UTIL_get_object(sv_value);
+              args_stack[args_stack_index].oval = object;
+            }
+            else {
+              croak("%dth argument of %s->%s must be a SPVM::BlessedObject at %s line %d\n", args_index_nth, class_name, method_name, MFILE, __LINE__);
+            }
           }
           else {
-            croak("%dth argument of %s->%s must be a SPVM::BlessedObject::Class object at %s line %d\n", args_index_nth, class_name, method_name, MFILE, __LINE__);
+            if (sv_isobject(sv_value) && sv_derived_from(sv_value, "SPVM::BlessedObject::Class")) {
+              SPVM_OBJECT* object = SPVM_XS_UTIL_get_object(sv_value);
+              assert(arg_type_dimension == 0);
+              if (SPVM_API_object_get_basic_type_id(object) != arg_basic_type_id) {
+                croak("%dth argument of %s->%s must be %s class line %d\n", args_index_nth, class_name, method_name, MFILE, __LINE__);
+              }
+              args_stack[args_stack_index].oval = object;
+            }
+            else {
+              croak("%dth argument of %s->%s must be a SPVM::BlessedObject::Class object at %s line %d\n", args_index_nth, class_name, method_name, MFILE, __LINE__);
+            }
           }
         }
         args_stack_index++;
         break;
       }
-      // Perl SPVM::BlessedObject to SPVM any object
-      case SPVM_TYPE_C_TYPE_CATEGORY_ANY_OBJECT:
+      case SPVM_API_C_TYPE_CATEGORY_MULNUM:
       {
-        if (!SvOK(sv_value)) {
-          args_stack[args_stack_index].oval = NULL;
+        int32_t arg_class_id = SPVM_API_get_basic_type_class_id(env, arg_basic_type_id);
+        int32_t arg_class_field_ids_length = SPVM_API_get_class_field_ids_length(env, arg_class_id);
+        int32_t arg_class_field_ids_base = SPVM_API_get_class_field_ids_base(env, arg_class_id);
+        int32_t arg_class_field_type_id = SPVM_API_get_field_type_id(env, arg_class_field_ids_base);
+        int32_t arg_class_field_type_basic_type_id = SPVM_API_get_type_basic_type_id(env, arg_class_field_type_id);
+        assert(arg_class_field_type_basic_type_id >= 0);
+        
+        // Perl hash reference to SPVM multi numeric type
+        if (sv_derived_from(sv_value, "HASH")) {
+          HV* hv_value = (HV*)SvRV(sv_value);
+          for (int32_t field_index = 0; field_index < arg_class_field_ids_length; field_index++) {
+            int32_t mulnum_field_id = arg_class_field_ids_base + field_index;
+            int32_t mulnum_field_name_id = SPVM_API_get_field_name_id(env, mulnum_field_id);
+
+            const char* mulnum_field_name = SPVM_API_get_constant_string_value(env, mulnum_field_name_id, NULL);
+            SV** sv_field_value_ptr = hv_fetch(hv_value, mulnum_field_name, strlen(mulnum_field_name), 0);
+            SV* sv_field_value;
+            if (sv_field_value_ptr) {
+              sv_field_value = *sv_field_value_ptr;
+            }
+            else {
+              int32_t arg_class_name_id = SPVM_API_get_class_name_id(env, arg_class_id);
+              croak("%dth argument's field \"%s\" of \"%s\" is missing at %s line %d\n", args_index_nth, mulnum_field_name, SPVM_API_get_constant_string_value(env, arg_class_name_id, NULL), MFILE, __LINE__);
+            }
+            
+            switch (arg_class_field_type_basic_type_id) {
+              case SPVM_API_C_BASIC_TYPE_ID_BYTE: {
+                int8_t value = (int8_t)SvIV(sv_field_value);
+                args_stack[args_stack_index + field_index].bval = value;
+                break;
+              }
+              case SPVM_API_C_BASIC_TYPE_ID_SHORT: {
+                int16_t value = (int16_t)SvIV(sv_field_value);
+                args_stack[args_stack_index + field_index].sval = value;
+                break;
+              }
+              case SPVM_API_C_BASIC_TYPE_ID_INT: {
+                int32_t value = (int32_t)SvIV(sv_field_value);
+                args_stack[args_stack_index + field_index].ival = value;
+                break;
+              }
+              case SPVM_API_C_BASIC_TYPE_ID_LONG: {
+                int64_t value = (int64_t)SvIV(sv_field_value);
+                args_stack[args_stack_index + field_index].lval = value;
+                break;
+              }
+              case SPVM_API_C_BASIC_TYPE_ID_FLOAT: {
+                float value = (float)SvNV(sv_field_value);
+                args_stack[args_stack_index + field_index].fval = value;
+                break;
+              }
+              case SPVM_API_C_BASIC_TYPE_ID_DOUBLE: {
+                double value = (double)SvNV(sv_field_value);
+                args_stack[args_stack_index + field_index].dval = value;
+                break;
+              }
+              default: {
+                assert(0);
+              }
+            }
+          }
+          args_stack_index += arg_class_field_ids_length;
         }
         else {
-          if (sv_isobject(sv_value) && sv_derived_from(sv_value, "SPVM::BlessedObject")) {
-            SPVM_OBJECT* object = SPVM_XS_UTIL_get_object(sv_value);
-            args_stack[args_stack_index].oval = object;
+          croak("%dth argument of %s->%s must be a hash reference at %s line %d\n", args_index_nth, class_name, method_name, MFILE, __LINE__);
+        }
+        break;
+      }
+      case SPVM_API_C_TYPE_CATEGORY_NUMERIC_REF: {
+        switch (arg_basic_type_id) {
+          // Perl reference to SPVM byte reference
+          case SPVM_API_C_BASIC_TYPE_ID_BYTE: {
+            args_have_ref = 1;
+            if (!(SvROK(sv_value) && !SvROK(SvRV(sv_value)))) {
+              croak("%dth argument of %s->%s must be sa calar reference which referenced value is non-ref scalar at %s line %d\n", args_index_nth, class_name, method_name, MFILE, __LINE__);
+            }
+            SV* sv_value_deref = SvRV(sv_value);
+            int8_t value = (int8_t)SvIV(sv_value_deref);
+            ref_stack[ref_stack_index].bval = value;
+            args_stack[args_stack_index].oval = &ref_stack[ref_stack_index];
+            ref_stack_indexes[args_index] = ref_stack_index;
+            ref_stack_index++;
+            args_stack_index++;
+            break;
           }
-          else {
-            croak("%dth argument of %s->%s must be a SPVM::BlessedObject at %s line %d\n", args_index_nth, class_name, method_name, MFILE, __LINE__);
+          // Perl reference to SPVM short reference
+          case SPVM_API_C_BASIC_TYPE_ID_SHORT: {
+            args_have_ref = 1;
+            if (!(SvROK(sv_value) && !SvROK(SvRV(sv_value)))) {
+              croak("%dth argument of %s->%s must be a scalar reference which referenced value is non-ref scalar at %s line %d\n", args_index_nth, class_name, method_name, MFILE, __LINE__);
+            }
+            SV* sv_value_deref = SvRV(sv_value);
+            int16_t value = (int16_t)SvIV(sv_value_deref);
+            ref_stack[ref_stack_index].sval = value;
+            args_stack[args_stack_index].oval = &ref_stack[ref_stack_index];
+            ref_stack_indexes[args_index] = ref_stack_index;
+            ref_stack_index++;
+            args_stack_index++;
+            break;
+          }
+          // Perl reference to SPVM int reference
+          case SPVM_API_C_BASIC_TYPE_ID_INT: {
+            args_have_ref = 1;
+            if (!(SvROK(sv_value) && !SvROK(SvRV(sv_value)))) {
+              croak("%dth argument of %s->%s must be a scalar reference which referenced value is non-ref scalar at %s line %d\n", args_index_nth, class_name, method_name, MFILE, __LINE__);
+            }
+            SV* sv_value_deref = SvRV(sv_value);
+            int32_t value = (int32_t)SvIV(sv_value_deref);
+            ref_stack[ref_stack_index].ival = value;
+            args_stack[args_stack_index].oval = &ref_stack[ref_stack_index];
+            ref_stack_indexes[args_index] = ref_stack_index;
+            ref_stack_index++;
+            args_stack_index++;
+            break;
+          }
+          // Perl reference to SPVM long reference
+          case SPVM_API_C_BASIC_TYPE_ID_LONG: {
+            args_have_ref = 1;
+            if (!(SvROK(sv_value) && !SvROK(SvRV(sv_value)))) {
+              croak("%dth argument of %s->%s must be a scalar reference which referenced value is non-ref scalar at %s line %d\n", args_index_nth, class_name, method_name, MFILE, __LINE__);
+            }
+            SV* sv_value_deref = SvRV(sv_value);
+            int64_t value = (int64_t)SvIV(sv_value_deref);
+            ref_stack[ref_stack_index].lval = value;
+            args_stack[args_stack_index].oval = &ref_stack[ref_stack_index];
+            ref_stack_indexes[args_index] = ref_stack_index;
+            ref_stack_index++;
+            args_stack_index++;
+            break;
+          }
+          // Perl reference to SPVM long reference
+          case SPVM_API_C_BASIC_TYPE_ID_FLOAT: {
+            args_have_ref = 1;
+            if (!(SvROK(sv_value) && !SvROK(SvRV(sv_value)))) {
+              croak("%dth argument of %s->%s must be a scalar reference which referenced value is non-ref scalar at %s line %d\n", args_index_nth, class_name, method_name, MFILE, __LINE__);
+            }
+            SV* sv_value_deref = SvRV(sv_value);
+            float value = (float)SvNV(sv_value_deref);
+            ref_stack[ref_stack_index].fval = value;
+            args_stack[args_stack_index].oval = &ref_stack[ref_stack_index];
+            ref_stack_indexes[args_index] = ref_stack_index;
+            ref_stack_index++;
+            args_stack_index++;
+            break;
+          }
+          // Perl reference to SPVM double reference
+          case SPVM_API_C_BASIC_TYPE_ID_DOUBLE: {
+            args_have_ref = 1;
+            if (!(SvROK(sv_value) && !SvROK(SvRV(sv_value)))) {
+              croak("%dth argument of %s->%s must be a scalar reference which referenced value is non-ref scalar at %s line %d\n", args_index_nth, class_name, method_name, MFILE, __LINE__);
+            }
+            SV* sv_value_deref = SvRV(sv_value);
+            double value = (double)SvNV(sv_value_deref);
+            ref_stack[ref_stack_index].dval = value;
+            args_stack[args_stack_index].oval = &ref_stack[ref_stack_index];
+            ref_stack_indexes[args_index] = ref_stack_index;
+            ref_stack_index++;
+            args_stack_index++;
+            break;
           }
         }
+        break;
+      }
+      case SPVM_API_C_TYPE_CATEGORY_MULNUM_REF:
+      {
+        args_have_ref = 1;
+        HV* hv_value = NULL;
+        if (SvOK(sv_value)) {
+          if (SvROK(sv_value) && sv_derived_from(sv_value, "REF")) {
+            SV* hv_value_ref = SvRV(sv_value);
+            if (SvROK(hv_value_ref) && sv_derived_from(hv_value_ref , "HASH")) {
+              hv_value = (HV*)SvRV(hv_value_ref);
+            }
+          }
+        }
+        if (hv_value == NULL) {
+          croak("%dth argument of %s->%s must be a scalar reference of hash reference at %s line %d\n", args_index_nth, class_name, method_name, MFILE, __LINE__);
+        }
+        int32_t arg_class_id = SPVM_API_get_basic_type_class_id(env, arg_basic_type_id);
+        int32_t arg_class_field_ids_length = SPVM_API_get_class_field_ids_length(env, arg_class_id);
+        int32_t arg_class_field_ids_base = SPVM_API_get_class_field_ids_base(env, arg_class_id);
+        int32_t arg_class_field_type_id = SPVM_API_get_field_type_id(env, arg_class_field_ids_base);
+        int32_t arg_class_field_type_basic_type_id = SPVM_API_get_type_basic_type_id(env, arg_class_field_type_id);
+        assert(arg_class_field_type_basic_type_id >= 0);
+        for (int32_t field_index = 0; field_index < arg_class_field_ids_length; field_index++) {
+          int32_t mulnum_field_id = arg_class_field_ids_base + field_index;
+          int32_t mulnum_field_name_id = SPVM_API_get_field_name_id(env, mulnum_field_id);
+          const char* mulnum_field_name = SPVM_API_get_constant_string_value(env, mulnum_field_name_id, NULL);
+          SV** sv_field_value_ptr = hv_fetch(hv_value, mulnum_field_name, strlen(mulnum_field_name), 0);
+          SV* sv_field_value;
+          if (sv_field_value_ptr) {
+            sv_field_value = *sv_field_value_ptr;
+          }
+          else {
+            int32_t arg_class_name_id = SPVM_API_get_class_name_id(env, arg_class_id);
+            croak("%dth argument's field \"%s\" of \"%s\" is missing at %s line %d\n", args_index_nth, mulnum_field_name, SPVM_API_get_constant_string_value(env, arg_class_name_id, NULL), MFILE, __LINE__);
+          }
+          switch(arg_class_field_type_basic_type_id) {
+            case SPVM_API_C_BASIC_TYPE_ID_BYTE: {
+              int8_t value = (int8_t)SvIV(sv_field_value);
+              ((int8_t*)&ref_stack[ref_stack_index])[field_index] = value;
+              break;
+            }
+            case SPVM_API_C_BASIC_TYPE_ID_SHORT: {
+              int16_t value = (int16_t)SvIV(sv_field_value);
+              ((int16_t*)&ref_stack[ref_stack_index])[field_index] = value;
+              break;
+            }
+            case SPVM_API_C_BASIC_TYPE_ID_INT: {
+              int32_t value = (int32_t)SvIV(sv_field_value);
+              ((int32_t*)&ref_stack[ref_stack_index])[field_index] = value;
+              break;
+            }
+            case SPVM_API_C_BASIC_TYPE_ID_LONG: {
+              int64_t value = (int64_t)SvIV(sv_field_value);
+              ((int64_t*)&ref_stack[ref_stack_index])[field_index] = value;
+              break;
+            }
+            case SPVM_API_C_BASIC_TYPE_ID_FLOAT: {
+              float value = (float)SvNV(sv_field_value);
+              ((float*)&ref_stack[ref_stack_index])[field_index] = value;
+              break;
+            }
+            case SPVM_API_C_BASIC_TYPE_ID_DOUBLE: {
+              double value = (double)SvNV(sv_field_value);
+              ((double*)&ref_stack[ref_stack_index])[field_index] = value;
+              break;
+            }
+            default: {
+              assert(0);
+            }
+          }
+        }
+        args_stack[args_stack_index].oval = &ref_stack[ref_stack_index];
+        ref_stack_indexes[args_index] = ref_stack_index;
+        ref_stack_index += arg_class_field_ids_length;
         args_stack_index++;
         break;
       }
-      // Perl hash reference to SPVM byte multi numeric type
-      case SPVM_TYPE_C_TYPE_CATEGORY_MULNUM_BYTE: {
-        if (sv_derived_from(sv_value, "HASH")) {
-          int32_t arg_class_id = SPVM_API_get_basic_type_class_id(env, arg_basic_type_id);
-          int32_t arg_class_field_ids_length = SPVM_API_get_class_field_ids_length(env, arg_class_id);
-          int32_t arg_class_field_ids_base = SPVM_API_get_class_field_ids_base(env, arg_class_id);
-          int32_t arg_class_name_id = SPVM_API_get_class_name_id(env, arg_class_id);
-
-          HV* hv_value = (HV*)SvRV(sv_value);
-          int32_t fields_length = arg_class_field_ids_length;
-          for (int32_t field_index = 0; field_index < fields_length; field_index++) {
-            int32_t field_id = arg_class_field_ids_base + field_index;
-            int32_t field_name_id = SPVM_API_get_field_name_id(env, field_id);
-
-            const char* field_name = SPVM_API_get_constant_string_value(env, field_name_id, NULL);
-            SV** sv_field_value_ptr = hv_fetch(hv_value, field_name, strlen(field_name), 0);
-            SV* sv_field_value;
-            if (sv_field_value_ptr) {
-              sv_field_value = *sv_field_value_ptr;
-            }
-            else {
-              croak("%dth argument's field \"%s\" of \"%s\" is missing at %s line %d\n", args_index_nth, field_name, SPVM_API_get_constant_string_value(env, arg_class_name_id, NULL), MFILE, __LINE__);
-            }
-            int8_t value = (int8_t)SvIV(sv_field_value);
-            args_stack[args_stack_index + field_index].bval = value;
-          }
-          args_stack_index += arg_class_field_ids_length;
-        }
-        else {
-          croak("%dth argument of %s->%s must be a hash reference at %s line %d\n", args_index_nth, class_name, method_name, MFILE, __LINE__);
-        }
-        break;
-      }
-      // Perl hash reference to SPVM short multi numeric type
-      case SPVM_TYPE_C_TYPE_CATEGORY_MULNUM_SHORT: {
-        if (sv_derived_from(sv_value, "HASH")) {
-          int32_t arg_class_id = SPVM_API_get_basic_type_class_id(env, arg_basic_type_id);
-          int32_t arg_class_field_ids_length = SPVM_API_get_class_field_ids_length(env, arg_class_id);
-          int32_t arg_class_field_ids_base = SPVM_API_get_class_field_ids_base(env, arg_class_id);
-          int32_t arg_class_name_id = SPVM_API_get_class_name_id(env, arg_class_id);
-          HV* hv_value = (HV*)SvRV(sv_value);
-          int32_t fields_length = arg_class_field_ids_length;
-          for (int32_t field_index = 0; field_index < fields_length; field_index++) {
-            int32_t field_id = arg_class_field_ids_base + field_index;
-            int32_t field_name_id = SPVM_API_get_field_name_id(env, field_id);
-            const char* field_name = SPVM_API_get_constant_string_value(env, field_name_id, NULL);
-            SV** sv_field_value_ptr = hv_fetch(hv_value, field_name, strlen(field_name), 0);
-            SV* sv_field_value;
-            if (sv_field_value_ptr) {
-              sv_field_value = *sv_field_value_ptr;
-            }
-            else {
-              croak("%dth argument's field \"%s\" of \"%s\" is missing at %s line %d\n", args_index_nth, field_name, SPVM_API_get_constant_string_value(env, arg_class_name_id, NULL), MFILE, __LINE__);
-            }
-            int16_t value = (int16_t)SvIV(sv_field_value);
-            args_stack[args_stack_index + field_index].sval = value;
-          }
-          args_stack_index += arg_class_field_ids_length;
-        }
-        else {
-          croak("%dth argument of %s->%s must be a hash reference at %s line %d\n", args_index_nth, class_name, method_name, MFILE, __LINE__);
-        }
-        break;
-      }
-      // Perl hash reference to SPVM int multi numeric type
-      case SPVM_TYPE_C_TYPE_CATEGORY_MULNUM_INT: {
-        if (sv_derived_from(sv_value, "HASH")) {
-          int32_t arg_class_id = SPVM_API_get_basic_type_class_id(env, arg_basic_type_id);
-          int32_t arg_class_field_ids_length = SPVM_API_get_class_field_ids_length(env, arg_class_id);
-          int32_t arg_class_field_ids_base = SPVM_API_get_class_field_ids_base(env, arg_class_id);
-          int32_t arg_class_name_id = SPVM_API_get_class_name_id(env, arg_class_id);
-          HV* hv_value = (HV*)SvRV(sv_value);
-          int32_t fields_length = arg_class_field_ids_length;
-          for (int32_t field_index = 0; field_index < fields_length; field_index++) {
-            int32_t field_id = arg_class_field_ids_base + field_index;
-            int32_t field_name_id = SPVM_API_get_field_name_id(env, field_id);
-            const char* field_name = SPVM_API_get_constant_string_value(env, field_name_id, NULL);
-            SV** sv_field_value_ptr = hv_fetch(hv_value, field_name, strlen(field_name), 0);
-            SV* sv_field_value;
-            if (sv_field_value_ptr) {
-              sv_field_value = *sv_field_value_ptr;
-            }
-            else {
-              croak("%dth argument's field \"%s\" of \"%s\" is missing at %s line %d\n", args_index_nth, field_name, SPVM_API_get_constant_string_value(env, arg_class_name_id, NULL), MFILE, __LINE__);
-            }
-            int32_t value = (int32_t)SvIV(sv_field_value);
-            args_stack[args_stack_index + field_index].ival = value;
-          }
-          args_stack_index += arg_class_field_ids_length;
-        }
-        else {
-          croak("%dth argument of %s->%s must be a hash reference at %s line %d\n", args_index_nth, class_name, method_name, MFILE, __LINE__);
-        }
-        break;
-      }
-      // Perl hash reference to SPVM long multi numeric type
-      case SPVM_TYPE_C_TYPE_CATEGORY_MULNUM_LONG: {
-        if (sv_derived_from(sv_value, "HASH")) {
-          int32_t arg_class_id = SPVM_API_get_basic_type_class_id(env, arg_basic_type_id);
-          int32_t arg_class_field_ids_length = SPVM_API_get_class_field_ids_length(env, arg_class_id);
-          int32_t arg_class_field_ids_base = SPVM_API_get_class_field_ids_base(env, arg_class_id);
-          int32_t arg_class_name_id = SPVM_API_get_class_name_id(env, arg_class_id);
-          HV* hv_value = (HV*)SvRV(sv_value);
-          int32_t fields_length = arg_class_field_ids_length;
-          for (int32_t field_index = 0; field_index < fields_length; field_index++) {
-            int32_t field_id = arg_class_field_ids_base + field_index;
-            int32_t field_name_id = SPVM_API_get_field_name_id(env, field_id);
-            const char* field_name = SPVM_API_get_constant_string_value(env, field_name_id, NULL);
-            SV** sv_field_value_ptr = hv_fetch(hv_value, field_name, strlen(field_name), 0);
-            SV* sv_field_value;
-            if (sv_field_value_ptr) {
-              sv_field_value = *sv_field_value_ptr;
-            }
-            else {
-              croak("%dth argument's field \"%s\" of \"%s\" is missing at %s line %d\n", args_index_nth, field_name, SPVM_API_get_constant_string_value(env, arg_class_name_id, NULL), MFILE, __LINE__);
-            }
-            int64_t value = (int64_t)SvIV(sv_field_value);
-            args_stack[args_stack_index + field_index].lval = value;
-          }
-          args_stack_index += arg_class_field_ids_length;
-        }
-        else {
-          croak("%dth argument of %s->%s must be a hash reference at %s line %d\n", args_index_nth, class_name, method_name, MFILE, __LINE__);
-        }
-        break;
-      }
-      // Perl hash reference to SPVM float multi numeric type
-      case SPVM_TYPE_C_TYPE_CATEGORY_MULNUM_FLOAT: {
-        if (sv_derived_from(sv_value, "HASH")) {
-          int32_t arg_class_id = SPVM_API_get_basic_type_class_id(env, arg_basic_type_id);
-          int32_t arg_class_field_ids_length = SPVM_API_get_class_field_ids_length(env, arg_class_id);
-          int32_t arg_class_field_ids_base = SPVM_API_get_class_field_ids_base(env, arg_class_id);
-          int32_t arg_class_name_id = SPVM_API_get_class_name_id(env, arg_class_id);
-          HV* hv_value = (HV*)SvRV(sv_value);
-          int32_t fields_length = arg_class_field_ids_length;
-          for (int32_t field_index = 0; field_index < fields_length; field_index++) {
-            int32_t field_id = arg_class_field_ids_base + field_index;
-            int32_t field_name_id = SPVM_API_get_field_name_id(env, field_id);
-            const char* field_name = SPVM_API_get_constant_string_value(env, field_name_id, NULL);
-            SV** sv_field_value_ptr = hv_fetch(hv_value, field_name, strlen(field_name), 0);
-            SV* sv_field_value;
-            if (sv_field_value_ptr) {
-              sv_field_value = *sv_field_value_ptr;
-            }
-            else {
-              croak("%dth argument's field \"%s\" of \"%s\" is missing at %s line %d\n", args_index_nth, field_name, SPVM_API_get_constant_string_value(env, arg_class_name_id, NULL), MFILE, __LINE__);
-            }
-            float value = (float)SvNV(sv_field_value);
-            args_stack[args_stack_index + field_index].fval = value;
-          }
-          args_stack_index += arg_class_field_ids_length;
-        }
-        else {
-          croak("%dth argument of %s->%s must be a hash reference at %s line %d\n", args_index_nth, class_name, method_name, MFILE, __LINE__);
-        }
-        break;
-      }
-      // Perl hash reference to SPVM double multi numeric type
-      case SPVM_TYPE_C_TYPE_CATEGORY_MULNUM_DOUBLE: {
-        if (sv_derived_from(sv_value, "HASH")) {
-          int32_t arg_class_id = SPVM_API_get_basic_type_class_id(env, arg_basic_type_id);
-          int32_t arg_class_field_ids_length = SPVM_API_get_class_field_ids_length(env, arg_class_id);
-          int32_t arg_class_field_ids_base = SPVM_API_get_class_field_ids_base(env, arg_class_id);
-          int32_t arg_class_name_id = SPVM_API_get_class_name_id(env, arg_class_id);
-          HV* hv_value = (HV*)SvRV(sv_value);
-          int32_t fields_length = arg_class_field_ids_length;
-          for (int32_t field_index = 0; field_index < fields_length; field_index++) {
-            int32_t field_id = arg_class_field_ids_base + field_index;
-            int32_t field_name_id = SPVM_API_get_field_name_id(env, field_id);
-            const char* field_name = SPVM_API_get_constant_string_value(env, field_name_id, NULL);
-            SV** sv_field_value_ptr = hv_fetch(hv_value, field_name, strlen(field_name), 0);
-            SV* sv_field_value;
-            if (sv_field_value_ptr) {
-              sv_field_value = *sv_field_value_ptr;
-            }
-            else {
-              croak("%dth argument's field \"%s\" of \"%s\" is missing at %s line %d\n", args_index_nth, field_name, SPVM_API_get_constant_string_value(env, arg_class_name_id, NULL), MFILE, __LINE__);
-            }
-            double value = (double)SvNV(sv_field_value);
-            args_stack[args_stack_index + field_index].dval = value;
-          }
-          args_stack_index += arg_class_field_ids_length;
-        }
-        else {
-          croak("%dth argument of %s->%s must be a hash reference at %s line %d\n", args_index_nth, class_name, method_name, MFILE, __LINE__);
-        }
-        break;
-      }
-      case SPVM_TYPE_C_TYPE_CATEGORY_MULNUM_ARRAY:
-      case SPVM_TYPE_C_TYPE_CATEGORY_NUMERIC_ARRAY:
-      case SPVM_TYPE_C_TYPE_CATEGORY_OBJECT_ARRAY:
-      case SPVM_TYPE_C_TYPE_CATEGORY_ANY_OBJECT_ARRAY:
-      {
+      case SPVM_API_C_TYPE_CATEGORY_NUMERIC_ARRAY: {
         // Perl undef to SPVM undef
         if (!SvOK(sv_value)) {
           args_stack[args_stack_index].oval = NULL;
@@ -577,184 +611,92 @@ call_spvm_method(...)
           if (SvROK(sv_value) && sv_derived_from(sv_value, "ARRAY")) {
             
             SV* sv_elems = sv_value;
-            
             AV* av_elems = (AV*)SvRV(sv_elems);
-            
             int32_t length = av_len(av_elems) + 1;
             
-            if (arg_type_dimension == 1) {
-              switch (arg_basic_type_id) {
-                // Argument: Perl array referecne to SPVM byte array
-                case SPVM_BASIC_TYPE_C_ID_BYTE: {
-                  void* array = env->new_byte_array(env, length);
-                  int8_t* elems = env->get_elems_byte(env, array);
-                  for (int32_t i = 0; i < length; i++) {
-                    SV** sv_value_ptr = av_fetch(av_elems, i, 0);
-                    SV* sv_value = sv_value_ptr ? *sv_value_ptr : &PL_sv_undef;
-                    elems[i] = (int8_t)SvIV(sv_value);
-                  }
-                  SV* sv_array = SPVM_XS_UTIL_new_sv_object(env, array, "SPVM::BlessedObject::Array");
-                  sv_value = sv_array;
-                  break;
+            assert(arg_type_dimension == 1);
+            
+            switch (arg_basic_type_id) {
+              // Argument: Perl array referecne to SPVM byte array
+              case SPVM_API_C_BASIC_TYPE_ID_BYTE: {
+                void* array = env->new_byte_array(env, length);
+                int8_t* elems = env->get_elems_byte(env, array);
+                for (int32_t i = 0; i < length; i++) {
+                  SV** sv_value_ptr = av_fetch(av_elems, i, 0);
+                  SV* sv_value = sv_value_ptr ? *sv_value_ptr : &PL_sv_undef;
+                  elems[i] = (int8_t)SvIV(sv_value);
                 }
-                // Argument: Perl array referecne to SPVM short array
-                case SPVM_BASIC_TYPE_C_ID_SHORT: {
-                  void* array = env->new_short_array(env, length);
-                  int16_t* elems = env->get_elems_short(env, array);
-                  for (int32_t i = 0; i < length; i++) {
-                    SV** sv_value_ptr = av_fetch(av_elems, i, 0);
-                    SV* sv_value = sv_value_ptr ? *sv_value_ptr : &PL_sv_undef;
-                    elems[i] = (int16_t)SvIV(sv_value);
-                  }
-                  SV* sv_array = SPVM_XS_UTIL_new_sv_object(env, array, "SPVM::BlessedObject::Array");
-                  sv_value = sv_array;
-                  break;
+                SV* sv_array = SPVM_XS_UTIL_new_sv_object(env, array, "SPVM::BlessedObject::Array");
+                sv_value = sv_array;
+                break;
+              }
+              // Argument: Perl array referecne to SPVM short array
+              case SPVM_API_C_BASIC_TYPE_ID_SHORT: {
+                void* array = env->new_short_array(env, length);
+                int16_t* elems = env->get_elems_short(env, array);
+                for (int32_t i = 0; i < length; i++) {
+                  SV** sv_value_ptr = av_fetch(av_elems, i, 0);
+                  SV* sv_value = sv_value_ptr ? *sv_value_ptr : &PL_sv_undef;
+                  elems[i] = (int16_t)SvIV(sv_value);
                 }
-                // Argument: Perl array referecne to SPVM int array
-                case SPVM_BASIC_TYPE_C_ID_INT: {
-                  void* array = env->new_int_array(env, length);
-                  int32_t* elems = env->get_elems_int(env, array);
-                  for (int32_t i = 0; i < length; i++) {
-                    SV** sv_value_ptr = av_fetch(av_elems, i, 0);
-                    SV* sv_value = sv_value_ptr ? *sv_value_ptr : &PL_sv_undef;
-                    elems[i] = (int32_t)SvIV(sv_value);
-                  }
-                  SV* sv_array = SPVM_XS_UTIL_new_sv_object(env, array, "SPVM::BlessedObject::Array");
-                  sv_value = sv_array;
-                  break;
+                SV* sv_array = SPVM_XS_UTIL_new_sv_object(env, array, "SPVM::BlessedObject::Array");
+                sv_value = sv_array;
+                break;
+              }
+              // Argument: Perl array referecne to SPVM int array
+              case SPVM_API_C_BASIC_TYPE_ID_INT: {
+                void* array = env->new_int_array(env, length);
+                int32_t* elems = env->get_elems_int(env, array);
+                for (int32_t i = 0; i < length; i++) {
+                  SV** sv_value_ptr = av_fetch(av_elems, i, 0);
+                  SV* sv_value = sv_value_ptr ? *sv_value_ptr : &PL_sv_undef;
+                  elems[i] = (int32_t)SvIV(sv_value);
                 }
-                // Argument: Perl array referecne to SPVM long array
-                case SPVM_BASIC_TYPE_C_ID_LONG: {
-                  void* array = env->new_long_array(env, length);
-                  int64_t* elems = env->get_elems_long(env, array);
-                  for (int32_t i = 0; i < length; i++) {
-                    SV** sv_value_ptr = av_fetch(av_elems, i, 0);
-                    SV* sv_value = sv_value_ptr ? *sv_value_ptr : &PL_sv_undef;
-                    elems[i] = (int64_t)SvIV(sv_value);
-                  }
-                  SV* sv_array = SPVM_XS_UTIL_new_sv_object(env, array, "SPVM::BlessedObject::Array");
-                  sv_value = sv_array;
-                  break;
+                SV* sv_array = SPVM_XS_UTIL_new_sv_object(env, array, "SPVM::BlessedObject::Array");
+                sv_value = sv_array;
+                break;
+              }
+              // Argument: Perl array referecne to SPVM long array
+              case SPVM_API_C_BASIC_TYPE_ID_LONG: {
+                void* array = env->new_long_array(env, length);
+                int64_t* elems = env->get_elems_long(env, array);
+                for (int32_t i = 0; i < length; i++) {
+                  SV** sv_value_ptr = av_fetch(av_elems, i, 0);
+                  SV* sv_value = sv_value_ptr ? *sv_value_ptr : &PL_sv_undef;
+                  elems[i] = (int64_t)SvIV(sv_value);
                 }
-                // Argument: Perl array referecne to SPVM float array
-                case SPVM_BASIC_TYPE_C_ID_FLOAT: {
-                  void* array = env->new_float_array(env, length);
-                  float* elems = env->get_elems_float(env, array);
-                  for (int32_t i = 0; i < length; i++) {
-                    SV** sv_value_ptr = av_fetch(av_elems, i, 0);
-                    SV* sv_value = sv_value_ptr ? *sv_value_ptr : &PL_sv_undef;
-                    elems[i] = (float)SvNV(sv_value);
-                  }
-                  SV* sv_array = SPVM_XS_UTIL_new_sv_object(env, array, "SPVM::BlessedObject::Array");
-                  sv_value = sv_array;
-                  break;
+                SV* sv_array = SPVM_XS_UTIL_new_sv_object(env, array, "SPVM::BlessedObject::Array");
+                sv_value = sv_array;
+                break;
+              }
+              // Argument: Perl array referecne to SPVM float array
+              case SPVM_API_C_BASIC_TYPE_ID_FLOAT: {
+                void* array = env->new_float_array(env, length);
+                float* elems = env->get_elems_float(env, array);
+                for (int32_t i = 0; i < length; i++) {
+                  SV** sv_value_ptr = av_fetch(av_elems, i, 0);
+                  SV* sv_value = sv_value_ptr ? *sv_value_ptr : &PL_sv_undef;
+                  elems[i] = (float)SvNV(sv_value);
                 }
-                // Argument: Perl array referecne to SPVM double array
-                case SPVM_BASIC_TYPE_C_ID_DOUBLE: {
-                  void* array = env->new_double_array(env, length);
-                  double* elems = env->get_elems_double(env, array);
-                  for (int32_t i = 0; i < length; i++) {
-                    SV** sv_value_ptr = av_fetch(av_elems, i, 0);
-                    SV* sv_value = sv_value_ptr ? *sv_value_ptr : &PL_sv_undef;
-                    elems[i] = (double)SvNV(sv_value);
-                  }
-                  SV* sv_array = SPVM_XS_UTIL_new_sv_object(env, array, "SPVM::BlessedObject::Array");
-                  sv_value = sv_array;
-                  break;
+                SV* sv_array = SPVM_XS_UTIL_new_sv_object(env, array, "SPVM::BlessedObject::Array");
+                sv_value = sv_array;
+                break;
+              }
+              // Argument: Perl array referecne to SPVM double array
+              case SPVM_API_C_BASIC_TYPE_ID_DOUBLE: {
+                void* array = env->new_double_array(env, length);
+                double* elems = env->get_elems_double(env, array);
+                for (int32_t i = 0; i < length; i++) {
+                  SV** sv_value_ptr = av_fetch(av_elems, i, 0);
+                  SV* sv_value = sv_value_ptr ? *sv_value_ptr : &PL_sv_undef;
+                  elems[i] = (double)SvNV(sv_value);
                 }
-                // Argument: Perl array referecne to SPVM string array
-                case SPVM_BASIC_TYPE_C_ID_STRING: {
-                  
-                  void* array = env->new_object_array(env, SPVM_BASIC_TYPE_C_ID_STRING, length);
-                  for (int32_t i = 0; i < length; i++) {
-                    SV** sv_elem_ptr = av_fetch(av_elems, i, 0);
-                    SV* sv_elem = sv_elem_ptr ? *sv_elem_ptr : &PL_sv_undef;
-                    if (!SvOK(sv_elem)) {
-                      env->set_elem_object(env, array, i, NULL);
-                    }
-                    else {
-                      if (!SvROK(sv_elem)) {
-                        SV* sv_elem_copy = sv_2mortal(newSVsv(sv_elem));
-                        sv_utf8_encode(sv_elem_copy);
-                        const char* chars = SvPV_nolen(sv_elem_copy);
-                        int32_t length = SvCUR(sv_elem_copy);
-                        void* string = env->new_string(env, chars, length);
-                        SV* sv_string = SPVM_XS_UTIL_new_sv_object(env, string, "SPVM::BlessedObject::String");
-                        sv_elem = sv_string;
-                      }
-                      if (sv_isobject(sv_elem) && sv_derived_from(sv_elem, "SPVM::BlessedObject::String")) {
-                        SPVM_OBJECT* object = SPVM_XS_UTIL_get_object(sv_elem);
-                        env->set_elem_object(env, array, i, object);
-                      }
-                      else {
-                        croak("%dth argument of %s->%s must be inherit SPVM::BlessedObject::String at %s line %d\n", args_index_nth, class_name, method_name, MFILE, __LINE__);
-                      }
-                    }
-                  }
-                  SV* sv_array = SPVM_XS_UTIL_new_sv_object(env, array, "SPVM::BlessedObject::Array");
-                  sv_value = sv_array;
-
-                  break;
-                }
-                case SPVM_BASIC_TYPE_C_ID_ANY_OBJECT:
-                case SPVM_BASIC_TYPE_C_ID_ELEMENT:
-                {
-                  // New array
-                  void* array = env->new_object_array(env, SPVM_BASIC_TYPE_C_ID_ANY_OBJECT, length);
-
-                  for (int32_t i = 0; i < length; i++) {
-                    SV** sv_value_ptr = av_fetch(av_elems, i, 0);
-                    SV* sv_value = sv_value_ptr ? *sv_value_ptr : &PL_sv_undef;
-                    if (SvOK(sv_value)) {
-                      
-                      // Convert non-ref scalar to byte[]
-                      if (!SvROK(sv_value)) {
-                        // Copy
-                        SV* sv_value_copy = sv_2mortal(newSVsv(sv_value));
-                        
-                        // Encode to UTF-8
-                        sv_utf8_encode(sv_value_copy);
-                        
-                        int32_t length = sv_len(sv_value_copy);
-                        const char* chars = SvPV_nolen(sv_value_copy);
-                        
-                        void* string = env->new_string_raw(env, chars, length);
-                        env->inc_ref_count(env, string);
-                        
-                        sv_value = SPVM_XS_UTIL_new_sv_object(env, string, "SPVM::BlessedObject::Array");
-                      }
-                      
-                      if (!sv_derived_from(sv_value, "SPVM::BlessedObject")) {
-                        croak("Element of %dth argument of %s->%s must inherit SPVM::BlessedObject object at %s line %d\n", args_index_nth, class_name, method_name, MFILE, __LINE__);
-                      }
-                      
-                      env->set_elem_object(env, array, i, SPVM_XS_UTIL_get_object(sv_value));
-                    }
-                    else {
-                      env->set_elem_object(env, array, i, NULL);
-                    }
-                  }
-                  
-                  // New sv array
-                  SV* sv_array = SPVM_XS_UTIL_new_sv_object(env, array, "SPVM::BlessedObject::Array");
-                  sv_value = sv_array;
-                  break;
-                }
-                default: {
-                  if (arg_type_category == SPVM_TYPE_C_TYPE_CATEGORY_MULNUM_ARRAY) {
-                    SV* sv_error = NULL;
-                    const char* arg_basic_type_name = SPVM_API_get_basic_type_name(env, arg_basic_type_id);
-                    SPVM_OBJECT* array = SPVM_XS_UTIL_new_mulnum_array(env, arg_basic_type_name, sv_value, &sv_error);
-                    if (sv_error) {
-                      croak_sv(sv_error);
-                    }
-                    SV* sv_array = SPVM_XS_UTIL_new_sv_object(env, array, "SPVM::BlessedObject::Array");
-                    sv_value = sv_array;
-                  }
-                  else {
-                    assert(0);
-                  }
-                }
+                SV* sv_array = SPVM_XS_UTIL_new_sv_object(env, array, "SPVM::BlessedObject::Array");
+                sv_value = sv_array;
+                break;
+              }
+              default: {
+                assert(0);
               }
             }
           }
@@ -762,15 +704,11 @@ call_spvm_method(...)
           if (sv_isobject(sv_value) && sv_derived_from(sv_value, "SPVM::BlessedObject::Array")) {
             SPVM_OBJECT* object = SPVM_XS_UTIL_get_object(sv_value);
             
-            if (arg_basic_type_id == SPVM_BASIC_TYPE_C_ID_ELEMENT) {
-              if (object->type_dimension == 0) {
-                croak("%dth argument of %s->%s is invalid object type at %s line %d\n", args_index_nth, class_name, method_name, MFILE, __LINE__);
-              }
-            }
-            else {
-              if (!(object->basic_type_id == arg_basic_type_id && object->type_dimension == arg_type_dimension)) {
-                croak("%dth argument of %s->%s is invalid object type at %s line %d\n", args_index_nth, class_name, method_name, MFILE, __LINE__);
-              }
+            int32_t object_basic_type_id = SPVM_API_object_get_basic_type_id(object);
+            int32_t object_type_dimension = SPVM_API_object_get_type_dimension(object);
+            
+            if (!(object_basic_type_id == arg_basic_type_id && object_type_dimension == arg_type_dimension)) {
+              croak("%dth argument of %s->%s is invalid object type at %s line %d\n", args_index_nth, class_name, method_name, MFILE, __LINE__);
             }
             
             args_stack[args_stack_index].oval = object;
@@ -783,339 +721,144 @@ call_spvm_method(...)
         args_stack_index++;
         break;
       }
-      // Perl reference to SPVM byte reference
-      case SPVM_TYPE_C_TYPE_CATEGORY_REF_BYTE: {
-        args_have_ref = 1;
-        if (!(SvROK(sv_value) && !SvROK(SvRV(sv_value)))) {
-          croak("%dth argument of %s->%s must be sa calar reference which referenced value is non-ref scalar at %s line %d\n", args_index_nth, class_name, method_name, MFILE, __LINE__);
+      case SPVM_API_C_TYPE_CATEGORY_MULNUM_ARRAY:
+      {
+        // Perl undef to SPVM undef
+        if (!SvOK(sv_value)) {
+          args_stack[args_stack_index].oval = NULL;
         }
-        SV* sv_value_deref = SvRV(sv_value);
-        int8_t value = (int8_t)SvIV(sv_value_deref);
-        ref_stack[ref_stack_index].bval = value;
-        args_stack[args_stack_index].oval = &ref_stack[ref_stack_index];
-        ref_stack_indexes[args_index] = ref_stack_index;
-        ref_stack_index++;
-        args_stack_index++;
-        break;
-      }
-      // Perl reference to SPVM short reference
-      case SPVM_TYPE_C_TYPE_CATEGORY_REF_SHORT: {
-        args_have_ref = 1;
-        if (!(SvROK(sv_value) && !SvROK(SvRV(sv_value)))) {
-          croak("%dth argument of %s->%s must be a scalar reference which referenced value is non-ref scalar at %s line %d\n", args_index_nth, class_name, method_name, MFILE, __LINE__);
-        }
-        SV* sv_value_deref = SvRV(sv_value);
-        int16_t value = (int16_t)SvIV(sv_value_deref);
-        ref_stack[ref_stack_index].sval = value;
-        args_stack[args_stack_index].oval = &ref_stack[ref_stack_index];
-        ref_stack_indexes[args_index] = ref_stack_index;
-        ref_stack_index++;
-        args_stack_index++;
-        break;
-      }
-      // Perl reference to SPVM int reference
-      case SPVM_TYPE_C_TYPE_CATEGORY_REF_INT: {
-        args_have_ref = 1;
-        if (!(SvROK(sv_value) && !SvROK(SvRV(sv_value)))) {
-          croak("%dth argument of %s->%s must be a scalar reference which referenced value is non-ref scalar at %s line %d\n", args_index_nth, class_name, method_name, MFILE, __LINE__);
-        }
-        SV* sv_value_deref = SvRV(sv_value);
-        int32_t value = (int32_t)SvIV(sv_value_deref);
-        ref_stack[ref_stack_index].ival = value;
-        args_stack[args_stack_index].oval = &ref_stack[ref_stack_index];
-        ref_stack_indexes[args_index] = ref_stack_index;
-        ref_stack_index++;
-        args_stack_index++;
-        break;
-      }
-      // Perl reference to SPVM long reference
-      case SPVM_TYPE_C_TYPE_CATEGORY_REF_LONG: {
-        args_have_ref = 1;
-        if (!(SvROK(sv_value) && !SvROK(SvRV(sv_value)))) {
-          croak("%dth argument of %s->%s must be a scalar reference which referenced value is non-ref scalar at %s line %d\n", args_index_nth, class_name, method_name, MFILE, __LINE__);
-        }
-        SV* sv_value_deref = SvRV(sv_value);
-        int64_t value = (int64_t)SvIV(sv_value_deref);
-        ref_stack[ref_stack_index].lval = value;
-        args_stack[args_stack_index].oval = &ref_stack[ref_stack_index];
-        ref_stack_indexes[args_index] = ref_stack_index;
-        ref_stack_index++;
-        args_stack_index++;
-        break;
-      }
-      // Perl reference to SPVM long reference
-      case SPVM_TYPE_C_TYPE_CATEGORY_REF_FLOAT: {
-        args_have_ref = 1;
-        if (!(SvROK(sv_value) && !SvROK(SvRV(sv_value)))) {
-          croak("%dth argument of %s->%s must be a scalar reference which referenced value is non-ref scalar at %s line %d\n", args_index_nth, class_name, method_name, MFILE, __LINE__);
-        }
-        SV* sv_value_deref = SvRV(sv_value);
-        float value = (float)SvNV(sv_value_deref);
-        ref_stack[ref_stack_index].fval = value;
-        args_stack[args_stack_index].oval = &ref_stack[ref_stack_index];
-        ref_stack_indexes[args_index] = ref_stack_index;
-        ref_stack_index++;
-        args_stack_index++;
-        break;
-      }
-      // Perl reference to SPVM double reference
-      case SPVM_TYPE_C_TYPE_CATEGORY_REF_DOUBLE: {
-        args_have_ref = 1;
-        if (!(SvROK(sv_value) && !SvROK(SvRV(sv_value)))) {
-          croak("%dth argument of %s->%s must be a scalar reference which referenced value is non-ref scalar at %s line %d\n", args_index_nth, class_name, method_name, MFILE, __LINE__);
-        }
-        SV* sv_value_deref = SvRV(sv_value);
-        double value = (double)SvNV(sv_value_deref);
-        ref_stack[ref_stack_index].dval = value;
-        args_stack[args_stack_index].oval = &ref_stack[ref_stack_index];
-        ref_stack_indexes[args_index] = ref_stack_index;
-        ref_stack_index++;
-        args_stack_index++;
-        break;
-      }
-      case SPVM_TYPE_C_TYPE_CATEGORY_REF_MULNUM_BYTE: {
-        args_have_ref = 1;
-        HV* hv_value = NULL;
-        if (SvOK(sv_value)) {
-          if (SvROK(sv_value) && sv_derived_from(sv_value, "REF")) {
-            SV* hv_value_ref = SvRV(sv_value);
-            if (SvROK(hv_value_ref) && sv_derived_from(hv_value_ref , "HASH")) {
-              hv_value = (HV*)SvRV(hv_value_ref);
+        else {
+          // Argument: Perl array referecne to SPVM array
+          if (SvROK(sv_value) && sv_derived_from(sv_value, "ARRAY")) {
+            
+            SV* sv_elems = sv_value;
+            AV* av_elems = (AV*)SvRV(sv_elems);
+            int32_t length = av_len(av_elems) + 1;
+            assert(arg_type_dimension == 1);
+            
+            SV* sv_error = NULL;
+            const char* arg_basic_type_name = SPVM_API_get_basic_type_name(env, arg_basic_type_id);
+            SPVM_OBJECT* array = SPVM_XS_UTIL_new_mulnum_array(env, arg_basic_type_name, sv_value, &sv_error);
+            if (sv_error) {
+              croak_sv(sv_error);
             }
+            SV* sv_array = SPVM_XS_UTIL_new_sv_object(env, array, "SPVM::BlessedObject::Array");
+            sv_value = sv_array;
           }
-        }
-        if (hv_value == NULL) {
-          croak("%dth argument of %s->%s must be a scalar reference of hash reference at %s line %d\n", args_index_nth, class_name, method_name, MFILE, __LINE__);
-        }
-        int32_t arg_class_id = SPVM_API_get_basic_type_class_id(env, arg_basic_type_id);
-        int32_t arg_class_field_ids_length = SPVM_API_get_class_field_ids_length(env, arg_class_id);
-        int32_t arg_class_field_ids_base = SPVM_API_get_class_field_ids_base(env, arg_class_id);
-        int32_t arg_class_name_id = SPVM_API_get_class_name_id(env, arg_class_id);
-        int32_t fields_length = arg_class_field_ids_length;
-        for (int32_t field_index = 0; field_index < fields_length; field_index++) {
-          int32_t field_id = arg_class_field_ids_base + field_index;
-          int32_t field_name_id = SPVM_API_get_field_name_id(env, field_id);
-          const char* field_name = SPVM_API_get_constant_string_value(env, field_name_id, NULL);
-          SV** sv_field_value_ptr = hv_fetch(hv_value, field_name, strlen(field_name), 0);
-          SV* sv_field_value;
-          if (sv_field_value_ptr) {
-            sv_field_value = *sv_field_value_ptr;
+          
+          if (sv_isobject(sv_value) && sv_derived_from(sv_value, "SPVM::BlessedObject::Array")) {
+            SPVM_OBJECT* object = SPVM_XS_UTIL_get_object(sv_value);
+            
+            int32_t object_basic_type_id = SPVM_API_object_get_basic_type_id(object);
+            int32_t object_type_dimension = SPVM_API_object_get_type_dimension(object);
+            if (!(object_basic_type_id == arg_basic_type_id && object_type_dimension == arg_type_dimension)) {
+              croak("%dth argument of %s->%s is invalid object type at %s line %d\n", args_index_nth, class_name, method_name, MFILE, __LINE__);
+            }
+            
+            args_stack[args_stack_index].oval = object;
           }
           else {
-            croak("%dth argument's field \"%s\" of \"%s\" is missing at %s line %d\n", args_index_nth, field_name, SPVM_API_get_constant_string_value(env, arg_class_name_id, NULL), MFILE, __LINE__);
+            croak("%dth argument of %s->%s must be a valid array reference or SPVM::BlessedObject::Array at %s line %d\n", args_index_nth, class_name, method_name, MFILE, __LINE__);
           }
-          int8_t value = (int8_t)SvIV(sv_field_value);
-          ((int8_t*)&ref_stack[ref_stack_index])[field_index] = value;
         }
-        args_stack[args_stack_index].oval = &ref_stack[ref_stack_index];
-        ref_stack_indexes[args_index] = ref_stack_index;
-        ref_stack_index += fields_length;
-        args_stack_index++;
         
-        break;
-      }
-      case SPVM_TYPE_C_TYPE_CATEGORY_REF_MULNUM_SHORT: {
-        args_have_ref = 1;
-        HV* hv_value = NULL;
-        if (SvOK(sv_value)) {
-          if (SvROK(sv_value) && sv_derived_from(sv_value, "REF")) {
-            SV* hv_value_ref = SvRV(sv_value);
-            if (SvROK(hv_value_ref) && sv_derived_from(hv_value_ref , "HASH")) {
-              hv_value = (HV*)SvRV(hv_value_ref);
-            }
-          }
-        }
-        if (hv_value == NULL) {
-          croak("%dth argument of %s->%s must be a scalar reference of hash reference at %s line %d\n", args_index_nth, class_name, method_name, MFILE, __LINE__);
-        }
-        int32_t arg_class_id = SPVM_API_get_basic_type_class_id(env, arg_basic_type_id);
-        int32_t arg_class_field_ids_length = SPVM_API_get_class_field_ids_length(env, arg_class_id);
-        int32_t arg_class_field_ids_base = SPVM_API_get_class_field_ids_base(env, arg_class_id);
-        int32_t arg_class_name_id = SPVM_API_get_class_name_id(env, arg_class_id);
-        int32_t fields_length = arg_class_field_ids_length;
-        for (int32_t field_index = 0; field_index < fields_length; field_index++) {
-          int32_t field_id = arg_class_field_ids_base + field_index;
-          int32_t field_name_id = SPVM_API_get_field_name_id(env, field_id);
-          const char* field_name = SPVM_API_get_constant_string_value(env, field_name_id, NULL);
-          SV** sv_field_value_ptr = hv_fetch(hv_value, field_name, strlen(field_name), 0);
-          SV* sv_field_value;
-          if (sv_field_value_ptr) {
-            sv_field_value = *sv_field_value_ptr;
-          }
-          else {
-            croak("%dth argument's field \"%s\" of \"%s\" is missing at %s line %d\n", args_index_nth, field_name, SPVM_API_get_constant_string_value(env, arg_class_name_id, NULL), MFILE, __LINE__);
-          }
-          int16_t value = (int16_t)SvIV(sv_field_value);
-          ((int16_t*)&ref_stack[ref_stack_index])[field_index] = value;
-        }
-        args_stack[args_stack_index].oval = &ref_stack[ref_stack_index];
-        ref_stack_indexes[args_index] = ref_stack_index;
-        ref_stack_index += fields_length;
         args_stack_index++;
         break;
       }
-      case SPVM_TYPE_C_TYPE_CATEGORY_REF_MULNUM_INT: {
-        args_have_ref = 1;
-        HV* hv_value = NULL;
-        if (SvOK(sv_value)) {
-          if (SvROK(sv_value) && sv_derived_from(sv_value, "REF")) {
-            SV* hv_value_ref = SvRV(sv_value);
-            if (SvROK(hv_value_ref) && sv_derived_from(hv_value_ref , "HASH")) {
-              hv_value = (HV*)SvRV(hv_value_ref);
+      case SPVM_API_C_TYPE_CATEGORY_STRING_ARRAY:
+      case SPVM_API_C_TYPE_CATEGORY_CLASS_ARRAY:
+      case SPVM_API_C_TYPE_CATEGORY_INTERFACE_ARRAY:
+      case SPVM_API_C_TYPE_CATEGORY_CALLBACK_ARRAY:
+      case SPVM_API_C_TYPE_CATEGORY_ANY_OBJECT_ARRAY:
+      case SPVM_API_C_TYPE_CATEGORY_MULDIM_ARRAY:
+      {
+        // Perl undef to SPVM undef
+        if (!SvOK(sv_value)) {
+          args_stack[args_stack_index].oval = NULL;
+        }
+        else {
+          // Perl array referecne of argument to SPVM array
+          if (SvROK(sv_value) && sv_derived_from(sv_value, "ARRAY")) {
+            // String array
+            if (arg_basic_type_id == SPVM_API_C_BASIC_TYPE_ID_STRING && arg_type_dimension == 1) {
+              SV* sv_elems = sv_value;
+              AV* av_elems = (AV*)SvRV(sv_elems);
+              int32_t length = av_len(av_elems) + 1;
+              void* array = env->new_object_array(env, SPVM_API_C_BASIC_TYPE_ID_STRING, length);
+              for (int32_t i = 0; i < length; i++) {
+                SV** sv_elem_ptr = av_fetch(av_elems, i, 0);
+                SV* sv_elem = sv_elem_ptr ? *sv_elem_ptr : &PL_sv_undef;
+                if (!SvOK(sv_elem)) {
+                  env->set_elem_object(env, array, i, NULL);
+                }
+                else {
+                  if (!SvROK(sv_elem)) {
+                    SV* sv_elem_copy = sv_2mortal(newSVsv(sv_elem));
+                    sv_utf8_encode(sv_elem_copy);
+                    const char* chars = SvPV_nolen(sv_elem_copy);
+                    int32_t length = SvCUR(sv_elem_copy);
+                    void* string = env->new_string(env, chars, length);
+                    SV* sv_string = SPVM_XS_UTIL_new_sv_object(env, string, "SPVM::BlessedObject::String");
+                    sv_elem = sv_string;
+                  }
+                  if (sv_isobject(sv_elem) && sv_derived_from(sv_elem, "SPVM::BlessedObject::String")) {
+                    SPVM_OBJECT* object = SPVM_XS_UTIL_get_object(sv_elem);
+                    env->set_elem_object(env, array, i, object);
+                  }
+                  else {
+                    croak("%dth argument of %s->%s must be inherit SPVM::BlessedObject::String at %s line %d\n", args_index_nth, class_name, method_name, MFILE, __LINE__);
+                  }
+                }
+              }
+              SV* sv_array = SPVM_XS_UTIL_new_sv_object(env, array, "SPVM::BlessedObject::Array");
+              sv_value = sv_array;
             }
           }
-        }
-        if (hv_value == NULL) {
-          croak("%dth argument of %s->%s must be a scalar reference of hash reference at %s line %d\n", args_index_nth, class_name, method_name, MFILE, __LINE__);
-        }
-        int32_t arg_class_id = SPVM_API_get_basic_type_class_id(env, arg_basic_type_id);
-        int32_t arg_class_field_ids_length = SPVM_API_get_class_field_ids_length(env, arg_class_id);
-        int32_t arg_class_field_ids_base = SPVM_API_get_class_field_ids_base(env, arg_class_id);
-        int32_t arg_class_name_id = SPVM_API_get_class_name_id(env, arg_class_id);
-        int32_t fields_length = arg_class_field_ids_length;
-        for (int32_t field_index = 0; field_index < fields_length; field_index++) {
-          int32_t field_id = arg_class_field_ids_base + field_index;
-          int32_t field_name_id = SPVM_API_get_field_name_id(env, field_id);
-          const char* field_name = SPVM_API_get_constant_string_value(env, field_name_id, NULL);
-          SV** sv_field_value_ptr = hv_fetch(hv_value, field_name, strlen(field_name), 0);
-          SV* sv_field_value;
-          if (sv_field_value_ptr) {
-            sv_field_value = *sv_field_value_ptr;
+          
+          if (sv_isobject(sv_value) && sv_derived_from(sv_value, "SPVM::BlessedObject::Array")) {
+            SPVM_OBJECT* object = SPVM_XS_UTIL_get_object(sv_value);
+            
+            int32_t object_basic_type_id = SPVM_API_object_get_basic_type_id(object);
+            int32_t object_type_dimension = SPVM_API_object_get_type_dimension(object);
+            
+            int32_t can_assign;
+            if (object_basic_type_id == arg_basic_type_id && object_type_dimension == arg_type_dimension) {
+              can_assign = 1;
+            }
+            else {
+              if (arg_basic_type_id == SPVM_API_C_BASIC_TYPE_ID_ANY_OBJECT && arg_type_dimension == 1) {
+                if (object_basic_type_id == SPVM_API_C_BASIC_TYPE_ID_ANY_OBJECT && object_type_dimension == 1) {
+                  can_assign = 0;
+                }
+                else {
+                  can_assign = 1;
+                }
+              }
+              else if (arg_basic_type_id == SPVM_API_C_BASIC_TYPE_ID_ANY_OBJECT && arg_type_dimension == 1) {
+                can_assign = 1;
+              }
+              else {
+                can_assign = 0;
+              }
+            }
+            
+            if (!can_assign) {
+              croak("%dth argument of %s->%s is invalid object type at %s line %d\n", args_index_nth, class_name, method_name, MFILE, __LINE__);
+            }
+            
+            args_stack[args_stack_index].oval = object;
           }
           else {
-            croak("%dth argument's field \"%s\" of \"%s\" is missing at %s line %d\n", args_index_nth, field_name, SPVM_API_get_constant_string_value(env, arg_class_name_id, NULL), MFILE, __LINE__);
+            croak("%dth argument of %s->%s must be a valid array reference or SPVM::BlessedObject::Array at %s line %d\n", args_index_nth, class_name, method_name, MFILE, __LINE__);
           }
-          int32_t value = (int32_t)SvIV(sv_field_value);
-          ((int32_t*)&ref_stack[ref_stack_index])[field_index] = value;
         }
-        args_stack[args_stack_index].oval = &ref_stack[ref_stack_index];
-        ref_stack_indexes[args_index] = ref_stack_index;
-        ref_stack_index += fields_length;
+        
         args_stack_index++;
         break;
       }
-      case SPVM_TYPE_C_TYPE_CATEGORY_REF_MULNUM_LONG: {
-        args_have_ref = 1;
-        HV* hv_value = NULL;
-        if (SvOK(sv_value)) {
-          if (SvROK(sv_value) && sv_derived_from(sv_value, "REF")) {
-            SV* hv_value_ref = SvRV(sv_value);
-            if (SvROK(hv_value_ref) && sv_derived_from(hv_value_ref , "HASH")) {
-              hv_value = (HV*)SvRV(hv_value_ref);
-            }
-          }
-        }
-        if (hv_value == NULL) {
-          croak("%dth argument of %s->%s must be a scalar reference of hash reference at %s line %d\n", args_index_nth, class_name, method_name, MFILE, __LINE__);
-        }
-        int32_t arg_class_id = SPVM_API_get_basic_type_class_id(env, arg_basic_type_id);
-        int32_t arg_class_field_ids_length = SPVM_API_get_class_field_ids_length(env, arg_class_id);
-        int32_t arg_class_field_ids_base = SPVM_API_get_class_field_ids_base(env, arg_class_id);
-        int32_t arg_class_name_id = SPVM_API_get_class_name_id(env, arg_class_id);
-        int32_t fields_length = arg_class_field_ids_length;
-        for (int32_t field_index = 0; field_index < fields_length; field_index++) {
-          int32_t field_id = arg_class_field_ids_base + field_index;
-          int32_t field_name_id = SPVM_API_get_field_name_id(env, field_id);
-          const char* field_name = SPVM_API_get_constant_string_value(env, field_name_id, NULL);
-          SV** sv_field_value_ptr = hv_fetch(hv_value, field_name, strlen(field_name), 0);
-          SV* sv_field_value;
-          if (sv_field_value_ptr) {
-            sv_field_value = *sv_field_value_ptr;
-          }
-          else {
-            croak("%dth argument's field \"%s\" of \"%s\" is missing at %s line %d\n", args_index_nth, field_name, SPVM_API_get_constant_string_value(env, arg_class_name_id, NULL), MFILE, __LINE__);
-          }
-          int64_t value = (int64_t)SvIV(sv_field_value);
-          ((int64_t*)&ref_stack[ref_stack_index])[field_index] = value;
-        }
-        args_stack[args_stack_index].oval = &ref_stack[ref_stack_index];
-        ref_stack_indexes[args_index] = ref_stack_index;
-        ref_stack_index += fields_length;
-        args_stack_index++;
-        break;
-      }
-      case SPVM_TYPE_C_TYPE_CATEGORY_REF_MULNUM_FLOAT: {
-        args_have_ref = 1;
-        HV* hv_value = NULL;
-        if (SvOK(sv_value)) {
-          if (SvROK(sv_value) && sv_derived_from(sv_value, "REF")) {
-            SV* hv_value_ref = SvRV(sv_value);
-            if (SvROK(hv_value_ref) && sv_derived_from(hv_value_ref , "HASH")) {
-              hv_value = (HV*)SvRV(hv_value_ref);
-            }
-          }
-        }
-        if (hv_value == NULL) {
-          croak("%dth argument of %s->%s must be a scalar reference of hash reference at %s line %d\n", args_index_nth, class_name, method_name, MFILE, __LINE__);
-        }
-        int32_t arg_class_id = SPVM_API_get_basic_type_class_id(env, arg_basic_type_id);
-        int32_t arg_class_field_ids_length = SPVM_API_get_class_field_ids_length(env, arg_class_id);
-        int32_t arg_class_field_ids_base = SPVM_API_get_class_field_ids_base(env, arg_class_id);
-        int32_t arg_class_name_id = SPVM_API_get_class_name_id(env, arg_class_id);
-        int32_t fields_length = arg_class_field_ids_length;
-        for (int32_t field_index = 0; field_index < fields_length; field_index++) {
-          int32_t field_id = arg_class_field_ids_base + field_index;
-          int32_t field_name_id = SPVM_API_get_field_name_id(env, field_id);
-          const char* field_name = SPVM_API_get_constant_string_value(env, field_name_id, NULL);
-          SV** sv_field_value_ptr = hv_fetch(hv_value, field_name, strlen(field_name), 0);
-          SV* sv_field_value;
-          if (sv_field_value_ptr) {
-            sv_field_value = *sv_field_value_ptr;
-          }
-          else {
-            croak("%dth argument's field \"%s\" of \"%s\" is missing at %s line %d\n", args_index_nth, field_name, SPVM_API_get_constant_string_value(env, arg_class_name_id, NULL), MFILE, __LINE__);
-          }
-          float value = (float)SvNV(sv_field_value);
-          ((float*)&ref_stack[ref_stack_index])[field_index] = value;
-        }
-        args_stack[args_stack_index].oval = &ref_stack[ref_stack_index];
-        ref_stack_indexes[args_index] = ref_stack_index;
-        ref_stack_index += fields_length;
-        args_stack_index++;
-        break;
-      }
-      case SPVM_TYPE_C_TYPE_CATEGORY_REF_MULNUM_DOUBLE: {
-        args_have_ref = 1;
-        HV* hv_value = NULL;
-        if (SvOK(sv_value)) {
-          if (SvROK(sv_value) && sv_derived_from(sv_value, "REF")) {
-            SV* hv_value_ref = SvRV(sv_value);
-            if (SvROK(hv_value_ref) && sv_derived_from(hv_value_ref , "HASH")) {
-              hv_value = (HV*)SvRV(hv_value_ref);
-            }
-          }
-        }
-        if (hv_value == NULL) {
-          croak("%dth argument of %s->%s must be a scalar reference of hash reference at %s line %d\n", args_index_nth, class_name, method_name, MFILE, __LINE__);
-        }
-        int32_t arg_class_id = SPVM_API_get_basic_type_class_id(env, arg_basic_type_id);
-        int32_t arg_class_field_ids_length = SPVM_API_get_class_field_ids_length(env, arg_class_id);
-        int32_t arg_class_field_ids_base = SPVM_API_get_class_field_ids_base(env, arg_class_id);
-        int32_t arg_class_name_id = SPVM_API_get_class_name_id(env, arg_class_id);
-        int32_t fields_length = arg_class_field_ids_length;
-        for (int32_t field_index = 0; field_index < fields_length; field_index++) {
-          int32_t field_id = arg_class_field_ids_base + field_index;
-          int32_t field_name_id = SPVM_API_get_field_name_id(env, field_id);
-          const char* field_name = SPVM_API_get_constant_string_value(env, field_name_id, NULL);
-          SV** sv_field_value_ptr = hv_fetch(hv_value, field_name, strlen(field_name), 0);
-          SV* sv_field_value;
-          if (sv_field_value_ptr) {
-            sv_field_value = *sv_field_value_ptr;
-          }
-          else {
-            croak("%dth argument's field \"%s\" of \"%s\" is missing at %s line %d\n", args_index_nth, field_name, SPVM_API_get_constant_string_value(env, arg_class_name_id, NULL), MFILE, __LINE__);
-          }
-          double value = (double)SvNV(sv_field_value);
-          ((double*)&ref_stack[ref_stack_index])[field_index] = value;
-        }
-        args_stack[args_stack_index].oval = &ref_stack[ref_stack_index];
-        ref_stack_indexes[args_index] = ref_stack_index;
-        ref_stack_index += fields_length;
-        args_stack_index++;
-        break;
-      }
-      default:
+      default: {
         assert(0);
+      }
     }
   }
   
@@ -1127,161 +870,162 @@ call_spvm_method(...)
   SV* sv_return_value = NULL;
   int32_t excetpion_flag = 0;
   switch (method_return_type_category) {
-    case SPVM_TYPE_C_TYPE_CATEGORY_VOID: {
+    case SPVM_API_C_TYPE_CATEGORY_VOID: {
       excetpion_flag = env->call_spvm_method(env, method_id, args_stack);
       break;
     }
-    case SPVM_TYPE_C_TYPE_CATEGORY_BYTE: {
-      excetpion_flag = env->call_spvm_method(env, method_id, args_stack);
-      if (!excetpion_flag) {
-        sv_return_value = sv_2mortal(newSViv(args_stack[0].bval));
-      }
-      break;
-    }
-    case SPVM_TYPE_C_TYPE_CATEGORY_SHORT: {
-      excetpion_flag = env->call_spvm_method(env, method_id, args_stack);
-      if (!excetpion_flag) {
-        sv_return_value = sv_2mortal(newSViv(args_stack[0].sval));
-      }
-      break;
-    }
-    case SPVM_TYPE_C_TYPE_CATEGORY_INT: {
-      excetpion_flag = env->call_spvm_method(env, method_id, args_stack);
-      if (!excetpion_flag) {
-        sv_return_value = sv_2mortal(newSViv(args_stack[0].ival));
-      }
-      break;
-    }
-    case SPVM_TYPE_C_TYPE_CATEGORY_LONG: {
-      excetpion_flag = env->call_spvm_method(env, method_id, args_stack);
-      if (!excetpion_flag) {
-        sv_return_value = sv_2mortal(newSViv(args_stack[0].lval));
-      }
-      break;
-    }
-    case SPVM_TYPE_C_TYPE_CATEGORY_FLOAT: {
-      excetpion_flag = env->call_spvm_method(env, method_id, args_stack);
-      if (!excetpion_flag) {
-        sv_return_value = sv_2mortal(newSVnv(args_stack[0].fval));
-      }
-      break;
-    }
-    case SPVM_TYPE_C_TYPE_CATEGORY_DOUBLE: {
-      excetpion_flag = env->call_spvm_method(env, method_id, args_stack);
-      if (!excetpion_flag) {
-        sv_return_value = sv_2mortal(newSVnv(args_stack[0].dval));
-      }
-      break;
-    }
-    case SPVM_TYPE_C_TYPE_CATEGORY_STRING:
-    case SPVM_TYPE_C_TYPE_CATEGORY_CLASS:
-    case SPVM_TYPE_C_TYPE_CATEGORY_ANY_OBJECT:
-    case SPVM_TYPE_C_TYPE_CATEGORY_NUMERIC_ARRAY:
-    case SPVM_TYPE_C_TYPE_CATEGORY_OBJECT_ARRAY:
-    case SPVM_TYPE_C_TYPE_CATEGORY_ANY_OBJECT_ARRAY:
-    case SPVM_TYPE_C_TYPE_CATEGORY_MULNUM_ARRAY:
-    {
-      excetpion_flag = env->call_spvm_method(env, method_id, args_stack);
-      
-      if (!excetpion_flag) {
-        SPVM_OBJECT* return_value = (SPVM_OBJECT*)args_stack[0].oval;
-        sv_return_value = NULL;
-        if (return_value != NULL) {
-          env->inc_ref_count(env, return_value);
-          
-          // Array
-          if (return_value->type_dimension > 0) {
-            sv_return_value = SPVM_XS_UTIL_new_sv_object(env, return_value, "SPVM::BlessedObject::Array");
+    case SPVM_API_C_TYPE_CATEGORY_NUMERIC: {
+      switch (method_return_basic_type_id) {
+        case SPVM_API_C_BASIC_TYPE_ID_BYTE: {
+          excetpion_flag = env->call_spvm_method(env, method_id, args_stack);
+          if (!excetpion_flag) {
+            sv_return_value = sv_2mortal(newSViv(args_stack[0].bval));
           }
-          else {
-            
-            // String
-            if (return_value->basic_type_id == SPVM_BASIC_TYPE_C_ID_STRING) {
-              sv_return_value = SPVM_XS_UTIL_new_sv_object(env, return_value, "SPVM::BlessedObject::String");
-            }
-            // Object
-            else {
-              SV* sv_perl_class_name = sv_2mortal(newSVpv("SPVM::", 0));
-              sv_catpv(sv_perl_class_name, SPVM_API_get_basic_type_name(env, return_value->basic_type_id));
-              sv_return_value = SPVM_XS_UTIL_new_sv_object(env, return_value, SvPV_nolen(sv_perl_class_name));
-            }
-          }
+          break;
         }
-        // undef
-        else {
-          sv_return_value = &PL_sv_undef;
+        case SPVM_API_C_BASIC_TYPE_ID_SHORT: {
+          excetpion_flag = env->call_spvm_method(env, method_id, args_stack);
+          if (!excetpion_flag) {
+            sv_return_value = sv_2mortal(newSViv(args_stack[0].sval));
+          }
+          break;
+        }
+        case SPVM_API_C_BASIC_TYPE_ID_INT: {
+          excetpion_flag = env->call_spvm_method(env, method_id, args_stack);
+          if (!excetpion_flag) {
+            sv_return_value = sv_2mortal(newSViv(args_stack[0].ival));
+          }
+          break;
+        }
+        case SPVM_API_C_BASIC_TYPE_ID_LONG: {
+          excetpion_flag = env->call_spvm_method(env, method_id, args_stack);
+          if (!excetpion_flag) {
+            sv_return_value = sv_2mortal(newSViv(args_stack[0].lval));
+          }
+          break;
+        }
+        case SPVM_API_C_BASIC_TYPE_ID_FLOAT: {
+          excetpion_flag = env->call_spvm_method(env, method_id, args_stack);
+          if (!excetpion_flag) {
+            sv_return_value = sv_2mortal(newSVnv(args_stack[0].fval));
+          }
+          break;
+        }
+        case SPVM_API_C_BASIC_TYPE_ID_DOUBLE: {
+          excetpion_flag = env->call_spvm_method(env, method_id, args_stack);
+          if (!excetpion_flag) {
+            sv_return_value = sv_2mortal(newSVnv(args_stack[0].dval));
+          }
+          break;
+        }
+        default: {
+          assert(0);
         }
       }
       break;
     }
-    case SPVM_TYPE_C_TYPE_CATEGORY_MULNUM_BYTE:
-    case SPVM_TYPE_C_TYPE_CATEGORY_MULNUM_SHORT:
-    case SPVM_TYPE_C_TYPE_CATEGORY_MULNUM_INT:
-    case SPVM_TYPE_C_TYPE_CATEGORY_MULNUM_LONG:
-    case SPVM_TYPE_C_TYPE_CATEGORY_MULNUM_FLOAT:
-    case SPVM_TYPE_C_TYPE_CATEGORY_MULNUM_DOUBLE:
+    case SPVM_API_C_TYPE_CATEGORY_MULNUM:
     {
       excetpion_flag = env->call_spvm_method(env, method_id, args_stack);
       
       int32_t method_return_class_id = SPVM_API_get_basic_type_class_id(env, method_return_basic_type_id);
       int32_t method_return_class_field_ids_length = SPVM_API_get_class_field_ids_length(env, method_return_class_id);
       int32_t method_return_class_field_ids_base = SPVM_API_get_class_field_ids_base(env, method_return_class_id);
-      
       int32_t method_return_mulnum_field_id = method_return_class_field_ids_base;
       int32_t method_return_mulnum_field_type_id = SPVM_API_get_field_type_id(env, method_return_mulnum_field_id);
+      int32_t method_return_mulnum_field_type_basic_type_id = SPVM_API_get_type_basic_type_id(env, method_return_mulnum_field_type_id);
       
       HV* hv_value = (HV*)sv_2mortal((SV*)newHV());
       for (int32_t field_index = 0; field_index < method_return_class_field_ids_length; field_index++) {
-        int32_t field_id = method_return_class_field_ids_base + field_index;
-        int32_t field_name_id = SPVM_API_get_field_name_id(env, field_id);
-        const char* field_name = SPVM_API_get_constant_string_value(env, field_name_id, NULL);
-        
         SV* sv_field_value = NULL;
-        int32_t method_return_mulnum_field_type_basic_type_id = SPVM_API_get_type_basic_type_id(env, method_return_mulnum_field_type_id);
         switch (method_return_mulnum_field_type_basic_type_id) {
-          case SPVM_BASIC_TYPE_C_ID_BYTE: {
+          case SPVM_API_C_BASIC_TYPE_ID_BYTE: {
             sv_field_value = sv_2mortal(newSViv(args_stack[field_index].bval));
             break;
           }
-          case SPVM_BASIC_TYPE_C_ID_SHORT: {
+          case SPVM_API_C_BASIC_TYPE_ID_SHORT: {
             sv_field_value = sv_2mortal(newSViv(args_stack[field_index].sval));
             break;
           }
-          case SPVM_BASIC_TYPE_C_ID_INT: {
+          case SPVM_API_C_BASIC_TYPE_ID_INT: {
             sv_field_value = sv_2mortal(newSViv(args_stack[field_index].ival));
             break;
           }
-          case SPVM_BASIC_TYPE_C_ID_LONG: {
+          case SPVM_API_C_BASIC_TYPE_ID_LONG: {
             sv_field_value = sv_2mortal(newSViv(args_stack[field_index].lval));
             break;
           }
-          case SPVM_BASIC_TYPE_C_ID_FLOAT: {
+          case SPVM_API_C_BASIC_TYPE_ID_FLOAT: {
             sv_field_value = sv_2mortal(newSVnv(args_stack[field_index].fval));
             break;
           }
-          case SPVM_BASIC_TYPE_C_ID_DOUBLE: {
+          case SPVM_API_C_BASIC_TYPE_ID_DOUBLE: {
             sv_field_value = sv_2mortal(newSVnv(args_stack[field_index].dval));
             break;
           }
-          default:
+          default: {
             assert(0);
+          }
         }
         
-        (void)hv_store(hv_value, field_name, strlen(field_name), SvREFCNT_inc(sv_field_value), 0);
+        int32_t mulnum_field_id = method_return_class_field_ids_base + field_index;
+        int32_t mulnum_field_name_id = SPVM_API_get_field_name_id(env, mulnum_field_id);
+        const char* mulnum_field_name = SPVM_API_get_constant_string_value(env, mulnum_field_name_id, NULL);
+        (void)hv_store(hv_value, mulnum_field_name, strlen(mulnum_field_name), SvREFCNT_inc(sv_field_value), 0);
         sv_return_value = sv_2mortal(newRV_inc((SV*)hv_value));
       }
       break;
     }
-    default:
-      assert(0);
+    default: {
+      int32_t method_return_type_can_assign_to_any_object = SPVM_API_get_type_can_assign_to_any_object(env, method_return_type_id);
+      if (method_return_type_can_assign_to_any_object) {
+        excetpion_flag = env->call_spvm_method(env, method_id, args_stack);
+        
+        if (!excetpion_flag) {
+          SPVM_OBJECT* return_value = (SPVM_OBJECT*)args_stack[0].oval;
+          sv_return_value = NULL;
+          if (return_value != NULL) {
+            env->inc_ref_count(env, return_value);
+            
+            // Array
+            if (SPVM_API_object_get_type_dimension(return_value) > 0) {
+              sv_return_value = SPVM_XS_UTIL_new_sv_object(env, return_value, "SPVM::BlessedObject::Array");
+            }
+            else {
+              
+              int32_t return_value_basic_type_id = SPVM_API_object_get_basic_type_id(return_value);
+              // String
+              if (return_value_basic_type_id == SPVM_API_C_BASIC_TYPE_ID_STRING) {
+                sv_return_value = SPVM_XS_UTIL_new_sv_object(env, return_value, "SPVM::BlessedObject::String");
+              }
+              // Object
+              else {
+                SV* sv_perl_class_name = sv_2mortal(newSVpv("SPVM::", 0));
+                sv_catpv(sv_perl_class_name, SPVM_API_get_basic_type_name(env, return_value_basic_type_id));
+                sv_return_value = SPVM_XS_UTIL_new_sv_object(env, return_value, SvPV_nolen(sv_perl_class_name));
+              }
+            }
+          }
+          // undef
+          else {
+            sv_return_value = &PL_sv_undef;
+          }
+        }
+        break;
+      }
+      else {
+        assert(0);
+      }
+    }
   }
   
   // Restore reference value
   if (args_have_ref) {
-    for (int32_t args_index = 0; args_index < method_arg_type_ids_length; args_index++) {
+    for (int32_t args_index = 0; args_index < method_arg_ids_length; args_index++) {
       SV* sv_value = ST(spvm_args_base + args_index);
       
-      int32_t arg_type_id = runtime->arg_type_ids[method_arg_type_ids_base + args_index];
+      int32_t arg_id = method_arg_ids_base + args_index;
+      int32_t arg_type_id = SPVM_API_get_arg_type_id(env, arg_id);
       
       // Convert to runtime type
       int32_t arg_basic_type_id = SPVM_API_get_type_basic_type_id(env, arg_type_id);
@@ -1290,132 +1034,90 @@ call_spvm_method(...)
       
       int32_t ref_stack_index = ref_stack_indexes[args_index];
       switch (arg_type_category) {
-        case SPVM_TYPE_C_TYPE_CATEGORY_REF_BYTE : {
-          SV* sv_value_deref = SvRV(sv_value);
-          sv_setiv(sv_value_deref, ref_stack[ref_stack_index].bval);
+        case SPVM_API_C_TYPE_CATEGORY_NUMERIC_REF: {
+          switch (arg_basic_type_id) {
+            case SPVM_API_C_BASIC_TYPE_ID_BYTE : {
+              SV* sv_value_deref = SvRV(sv_value);
+              sv_setiv(sv_value_deref, ref_stack[ref_stack_index].bval);
+              break;
+            }
+            case SPVM_API_C_BASIC_TYPE_ID_SHORT : {
+              SV* sv_value_deref = SvRV(sv_value);
+              sv_setiv(sv_value_deref, ref_stack[ref_stack_index].sval);
+              break;
+            }
+            case SPVM_API_C_BASIC_TYPE_ID_INT : {
+              SV* sv_value_deref = SvRV(sv_value);
+              sv_setiv(sv_value_deref, ref_stack[ref_stack_index].ival);
+              break;
+            }
+            case SPVM_API_C_BASIC_TYPE_ID_LONG : {
+              SV* sv_value_deref = SvRV(sv_value);
+              sv_setiv(sv_value_deref, ref_stack[ref_stack_index].lval);
+              break;
+            }
+            case SPVM_API_C_BASIC_TYPE_ID_FLOAT : {
+              SV* sv_value_deref = SvRV(sv_value);
+              sv_setnv(sv_value_deref, ref_stack[ref_stack_index].fval);
+              break;
+            }
+            case SPVM_API_C_BASIC_TYPE_ID_DOUBLE : {
+              SV* sv_value_deref = SvRV(sv_value);
+              sv_setnv(sv_value_deref, ref_stack[ref_stack_index].dval);
+              break;
+            }
+            default: {
+              assert(0);
+            }
+          }
           break;
         }
-        case SPVM_TYPE_C_TYPE_CATEGORY_REF_SHORT : {
-          SV* sv_value_deref = SvRV(sv_value);
-          sv_setiv(sv_value_deref, ref_stack[ref_stack_index].sval);
-          break;
-        }
-        case SPVM_TYPE_C_TYPE_CATEGORY_REF_INT : {
-          SV* sv_value_deref = SvRV(sv_value);
-          sv_setiv(sv_value_deref, ref_stack[ref_stack_index].ival);
-          break;
-        }
-        case SPVM_TYPE_C_TYPE_CATEGORY_REF_LONG : {
-          SV* sv_value_deref = SvRV(sv_value);
-          sv_setiv(sv_value_deref, ref_stack[ref_stack_index].lval);
-          break;
-        }
-        case SPVM_TYPE_C_TYPE_CATEGORY_REF_FLOAT : {
-          SV* sv_value_deref = SvRV(sv_value);
-          sv_setnv(sv_value_deref, ref_stack[ref_stack_index].fval);
-          break;
-        }
-        case SPVM_TYPE_C_TYPE_CATEGORY_REF_DOUBLE : {
-          SV* sv_value_deref = SvRV(sv_value);
-          sv_setnv(sv_value_deref, ref_stack[ref_stack_index].dval);
-          break;
-        }
-        case SPVM_TYPE_C_TYPE_CATEGORY_REF_MULNUM_BYTE: {
+        case SPVM_API_C_TYPE_CATEGORY_MULNUM_REF:
+        {
           HV* hv_value = (HV*)SvRV(SvRV(sv_value));
           int32_t arg_class_id = SPVM_API_get_basic_type_class_id(env, arg_basic_type_id);
           int32_t arg_class_field_ids_length = SPVM_API_get_class_field_ids_length(env, arg_class_id);
           int32_t arg_class_field_ids_base = SPVM_API_get_class_field_ids_base(env, arg_class_id);
-
+          int32_t arg_class_field_type_id = SPVM_API_get_field_type_id(env, arg_class_field_ids_base);
+          int32_t arg_class_field_type_basic_type_id = SPVM_API_get_type_basic_type_id(env, arg_class_field_type_id);
           int32_t arg_mulnum_field_id = arg_class_field_ids_base;
           int32_t arg_mulnum_field_name_id = SPVM_API_get_field_name_id(env, arg_mulnum_field_id);
           for (int32_t field_index = 0; field_index < arg_class_field_ids_length; field_index++) {
-            int32_t field_id = arg_class_field_ids_base + field_index;
-            int32_t field_name_id = SPVM_API_get_field_name_id(env, field_id);
-            const char* field_name = SPVM_API_get_constant_string_value(env, field_name_id, NULL);
-            SV* sv_field_value = sv_2mortal(newSViv(((int8_t*)&ref_stack[ref_stack_index])[field_index]));
-            (void)hv_store(hv_value, field_name, strlen(field_name), SvREFCNT_inc(sv_field_value), 0);
+            int32_t mulnum_field_id = arg_class_field_ids_base + field_index;
+            int32_t mulnum_field_name_id = SPVM_API_get_field_name_id(env, mulnum_field_id);
+            const char* mulnum_field_name = SPVM_API_get_constant_string_value(env, mulnum_field_name_id, NULL);
+            SV* sv_field_value;
+            switch (arg_class_field_type_basic_type_id) {
+              case SPVM_API_C_BASIC_TYPE_ID_BYTE: {
+                sv_field_value = sv_2mortal(newSViv(((int8_t*)&ref_stack[ref_stack_index])[field_index]));
+                break;
+              }
+              case SPVM_API_C_BASIC_TYPE_ID_SHORT: {
+                sv_field_value = sv_2mortal(newSViv(((int16_t*)&ref_stack[ref_stack_index])[field_index]));
+                break;
+              }
+              case SPVM_API_C_BASIC_TYPE_ID_INT: {
+                sv_field_value = sv_2mortal(newSViv(((int32_t*)&ref_stack[ref_stack_index])[field_index]));
+                break;
+              }
+              case SPVM_API_C_BASIC_TYPE_ID_LONG: {
+                sv_field_value = sv_2mortal(newSViv(((int64_t*)&ref_stack[ref_stack_index])[field_index]));
+                break;
+              }
+              case SPVM_API_C_BASIC_TYPE_ID_FLOAT: {
+                sv_field_value = sv_2mortal(newSVnv(((float*)&ref_stack[ref_stack_index])[field_index]));
+                break;
+              }
+              case SPVM_API_C_BASIC_TYPE_ID_DOUBLE: {
+                sv_field_value = sv_2mortal(newSVnv(((double*)&ref_stack[ref_stack_index])[field_index]));
+                break;
+              }
+              default: {
+                assert(0);
+              }
+            }
+            (void)hv_store(hv_value, mulnum_field_name, strlen(mulnum_field_name), SvREFCNT_inc(sv_field_value), 0);
           }
-          break;
-        }
-        case SPVM_TYPE_C_TYPE_CATEGORY_REF_MULNUM_SHORT: {
-          HV* hv_value = (HV*)SvRV(SvRV(sv_value));
-          int32_t arg_class_id = SPVM_API_get_basic_type_class_id(env, arg_basic_type_id);
-          int32_t arg_class_field_ids_length = SPVM_API_get_class_field_ids_length(env, arg_class_id);
-          int32_t arg_class_field_ids_base = SPVM_API_get_class_field_ids_base(env, arg_class_id);
-          int32_t arg_mulnum_field_id = arg_class_field_ids_base;
-          int32_t arg_mulnum_field_name_id = SPVM_API_get_field_name_id(env, arg_mulnum_field_id);
-          for (int32_t field_index = 0; field_index < arg_class_field_ids_length; field_index++) {
-            int32_t field_id = arg_class_field_ids_base + field_index;
-            int32_t field_name_id = SPVM_API_get_field_name_id(env, field_id);
-            const char* field_name = SPVM_API_get_constant_string_value(env, field_name_id, NULL);
-            SV* sv_field_value = sv_2mortal(newSViv(((int16_t*)&ref_stack[ref_stack_index])[field_index]));
-            (void)hv_store(hv_value, field_name, strlen(field_name), SvREFCNT_inc(sv_field_value), 0);
-          }
-          break;
-        }
-        case SPVM_TYPE_C_TYPE_CATEGORY_REF_MULNUM_INT: {
-          HV* hv_value = (HV*)SvRV(SvRV(sv_value));
-          int32_t arg_class_id = SPVM_API_get_basic_type_class_id(env, arg_basic_type_id);
-          int32_t arg_class_field_ids_length = SPVM_API_get_class_field_ids_length(env, arg_class_id);
-          int32_t arg_class_field_ids_base = SPVM_API_get_class_field_ids_base(env, arg_class_id);
-          int32_t arg_mulnum_field_id = arg_class_field_ids_base;
-          int32_t arg_mulnum_field_name_id = SPVM_API_get_field_name_id(env, arg_mulnum_field_id);
-          for (int32_t field_index = 0; field_index < arg_class_field_ids_length; field_index++) {
-            int32_t field_id = arg_class_field_ids_base + field_index;
-            int32_t field_name_id = SPVM_API_get_field_name_id(env, field_id);
-            const char* field_name = SPVM_API_get_constant_string_value(env, field_name_id, NULL);
-            SV* sv_field_value = sv_2mortal(newSViv(((int32_t*)&ref_stack[ref_stack_index])[field_index]));
-            (void)hv_store(hv_value, field_name, strlen(field_name), SvREFCNT_inc(sv_field_value), 0);
-          }
-          break;
-        }
-        case SPVM_TYPE_C_TYPE_CATEGORY_REF_MULNUM_LONG: {
-          HV* hv_value = (HV*)SvRV(SvRV(sv_value));
-          int32_t arg_class_id = SPVM_API_get_basic_type_class_id(env, arg_basic_type_id);
-          int32_t arg_class_field_ids_length = SPVM_API_get_class_field_ids_length(env, arg_class_id);
-          int32_t arg_class_field_ids_base = SPVM_API_get_class_field_ids_base(env, arg_class_id);
-          int32_t arg_mulnum_field_id = arg_class_field_ids_base;
-          int32_t arg_mulnum_field_name_id = SPVM_API_get_field_name_id(env, arg_mulnum_field_id);
-          for (int32_t field_index = 0; field_index < arg_class_field_ids_length; field_index++) {
-            int32_t field_id = arg_class_field_ids_base + field_index;
-            int32_t field_name_id = SPVM_API_get_field_name_id(env, field_id);
-            const char* field_name = SPVM_API_get_constant_string_value(env, field_name_id, NULL);
-            SV* sv_field_value = sv_2mortal(newSViv(((int64_t*)&ref_stack[ref_stack_index])[field_index]));
-            (void)hv_store(hv_value, field_name, strlen(field_name), SvREFCNT_inc(sv_field_value), 0);
-          }
-          break;
-        }
-        case SPVM_TYPE_C_TYPE_CATEGORY_REF_MULNUM_FLOAT: {
-          HV* hv_value = (HV*)SvRV(SvRV(sv_value));
-          int32_t arg_class_id = SPVM_API_get_basic_type_class_id(env, arg_basic_type_id);
-          int32_t arg_class_field_ids_length = SPVM_API_get_class_field_ids_length(env, arg_class_id);
-          int32_t arg_class_field_ids_base = SPVM_API_get_class_field_ids_base(env, arg_class_id);
-          int32_t arg_mulnum_field_id = arg_class_field_ids_base;
-          int32_t arg_mulnum_field_name_id = SPVM_API_get_field_name_id(env, arg_mulnum_field_id);
-          for (int32_t field_index = 0; field_index < arg_class_field_ids_length; field_index++) {
-            int32_t field_id = arg_class_field_ids_base + field_index;
-            int32_t field_name_id = SPVM_API_get_field_name_id(env, field_id);
-            const char* field_name = SPVM_API_get_constant_string_value(env, field_name_id, NULL);
-            SV* sv_field_value = sv_2mortal(newSVnv(((float*)&ref_stack[ref_stack_index])[field_index]));
-            (void)hv_store(hv_value, field_name, strlen(field_name), SvREFCNT_inc(sv_field_value), 0);
-          }
-          break;
-        }
-        case SPVM_TYPE_C_TYPE_CATEGORY_REF_MULNUM_DOUBLE: {
-          HV* hv_value = (HV*)SvRV(SvRV(sv_value));
-          int32_t arg_class_id = SPVM_API_get_basic_type_class_id(env, arg_basic_type_id);
-          int32_t arg_class_field_ids_length = SPVM_API_get_class_field_ids_length(env, arg_class_id);
-          int32_t arg_class_field_ids_base = SPVM_API_get_class_field_ids_base(env, arg_class_id);
-          int32_t arg_mulnum_field_id = arg_class_field_ids_base;
-          int32_t arg_mulnum_field_name_id = SPVM_API_get_field_name_id(env, arg_mulnum_field_id);
-          for (int32_t field_index = 0; field_index < arg_class_field_ids_length; field_index++) {
-            int32_t field_id = arg_class_field_ids_base + field_index;
-            int32_t field_name_id = SPVM_API_get_field_name_id(env, field_id);
-            const char* field_name = SPVM_API_get_constant_string_value(env, field_name_id, NULL);
-            SV* sv_field_value = sv_2mortal(newSVnv(((double*)&ref_stack[ref_stack_index])[field_index]));
-            (void)hv_store(hv_value, field_name, strlen(field_name), SvREFCNT_inc(sv_field_value), 0);
-          }
-          break;
         }
       }
     }
@@ -1432,7 +1134,7 @@ call_spvm_method(...)
   // Success
   else {
     int32_t return_count;
-    if (method_return_type_category == SPVM_TYPE_C_TYPE_CATEGORY_VOID) {
+    if (method_return_type_category == SPVM_API_C_TYPE_CATEGORY_VOID) {
       return_count = 0;
     }
     else {
@@ -1469,18 +1171,21 @@ array_to_elems(...)
   
   int32_t length = env->length(env, array);
 
-  int32_t basic_type_id = array->basic_type_id;
-  int32_t dimension = array->type_dimension;
+  int32_t basic_type_id = SPVM_API_object_get_basic_type_id(array);
+  int32_t dimension = SPVM_API_object_get_type_dimension(array);
   int32_t is_array_type = dimension > 0;
   
   AV* av_values = (AV*)sv_2mortal((SV*)newAV());
   if (is_array_type) {
     int32_t element_type_dimension = dimension - 1;
+    
+    int32_t array_is_mulnum_array = env->is_mulnum_array(env, array);
+    int32_t array_is_object_array = env->is_object_array(env, array);
 
-    if (array->type_category == SPVM_TYPE_C_TYPE_CATEGORY_MULNUM_ARRAY) {
+    if (array_is_mulnum_array) {
       
       for (int32_t index = 0; index < length; index++) {
-        int32_t class_id = SPVM_API_get_basic_type_class_id(env, array->basic_type_id);
+        int32_t class_id = SPVM_API_get_basic_type_class_id(env, SPVM_API_object_get_basic_type_id(array));
         int32_t class_field_ids_length = SPVM_API_get_class_field_ids_length(env, class_id);
         int32_t class_field_ids_base = SPVM_API_get_class_field_ids_base(env, class_id);
         
@@ -1492,40 +1197,40 @@ array_to_elems(...)
         HV* hv_value = (HV*)sv_2mortal((SV*)newHV());
         int32_t field_length = class_field_ids_length;
         for (int32_t field_index = 0; field_index < class_field_ids_length; field_index++) {
-          int32_t field_id = class_field_ids_base + field_index;
-          int32_t field_name_id = SPVM_API_get_field_name_id(env, field_id);
+          int32_t mulnum_field_id = class_field_ids_base + field_index;
+          int32_t mulnum_field_name_id = SPVM_API_get_field_name_id(env, mulnum_field_id);
 
-          const char* field_name = SPVM_API_get_constant_string_value(env, field_name_id, NULL);
+          const char* mulnum_field_name = SPVM_API_get_constant_string_value(env, mulnum_field_name_id, NULL);
 
           SV* sv_field_value;
           int32_t mulnum_field_type_basic_type_id = SPVM_API_get_type_basic_type_id(env, mulnum_field_type_id);
           switch (mulnum_field_type_basic_type_id) {
-            case SPVM_BASIC_TYPE_C_ID_BYTE: {
+            case SPVM_API_C_BASIC_TYPE_ID_BYTE: {
               int8_t field_value = ((int8_t*)elems)[(field_length * index) + field_index];
               sv_field_value = sv_2mortal(newSViv(field_value));
               break;
             }
-            case SPVM_BASIC_TYPE_C_ID_SHORT: {
+            case SPVM_API_C_BASIC_TYPE_ID_SHORT: {
               int16_t field_value = ((int16_t*)elems)[(field_length * index) + field_index];
               sv_field_value = sv_2mortal(newSViv(field_value));
               break;
             }
-            case SPVM_BASIC_TYPE_C_ID_INT: {
+            case SPVM_API_C_BASIC_TYPE_ID_INT: {
               int32_t field_value = ((int32_t*)elems)[(field_length * index) + field_index];
               sv_field_value = sv_2mortal(newSViv(field_value));
               break;
             }
-            case SPVM_BASIC_TYPE_C_ID_LONG: {
+            case SPVM_API_C_BASIC_TYPE_ID_LONG: {
               int64_t field_value = ((int64_t*)elems)[(field_length * index) + field_index];
               sv_field_value = sv_2mortal(newSViv(field_value));
               break;
             }
-            case SPVM_BASIC_TYPE_C_ID_FLOAT: {
+            case SPVM_API_C_BASIC_TYPE_ID_FLOAT: {
               float field_value = ((float*)elems)[(field_length * index) + field_index];
               sv_field_value = sv_2mortal(newSVnv(field_value));
               break;
             }
-            case SPVM_BASIC_TYPE_C_ID_DOUBLE: {
+            case SPVM_API_C_BASIC_TYPE_ID_DOUBLE: {
               double field_value = ((double*)elems)[(field_length * index) + field_index];
               sv_field_value = sv_2mortal(newSVnv(field_value));
               break;
@@ -1534,14 +1239,14 @@ array_to_elems(...)
               croak("Unexpected error: set field value");
           }
           SvREFCNT_inc(sv_field_value);
-          (void)hv_store(hv_value, field_name, strlen(field_name), sv_field_value, 0);
+          (void)hv_store(hv_value, mulnum_field_name, strlen(mulnum_field_name), sv_field_value, 0);
         }
         SV* sv_value = sv_2mortal(newRV_inc((SV*)hv_value));
         av_push(av_values, SvREFCNT_inc(sv_value));
       }
     }
-    else if (array->type_category == SPVM_TYPE_C_TYPE_CATEGORY_OBJECT_ARRAY || array->type_category == SPVM_TYPE_C_TYPE_CATEGORY_ANY_OBJECT_ARRAY) {
-      if (basic_type_id == SPVM_BASIC_TYPE_C_ID_STRING) {
+    else if (array_is_object_array) {
+      if (basic_type_id == SPVM_API_C_BASIC_TYPE_ID_STRING) {
         for (int32_t i = 0; i < length; i++) {
           void* object = env->get_elem_object(env, array, i);
           
@@ -1573,7 +1278,7 @@ array_to_elems(...)
             }
             else {
               SV* sv_perl_class_name = sv_2mortal(newSVpv("SPVM::", 0));
-              sv_catpv(sv_perl_class_name, SPVM_API_get_basic_type_name(env, array->basic_type_id));
+              sv_catpv(sv_perl_class_name, SPVM_API_get_basic_type_name(env, SPVM_API_object_get_basic_type_id(array)));
               sv_value = SPVM_XS_UTIL_new_sv_object(env, value, SvPV_nolen(sv_perl_class_name));
             }
             av_push(av_values, SvREFCNT_inc(sv_value));
@@ -1583,7 +1288,7 @@ array_to_elems(...)
     }
     else {
       switch (basic_type_id) {
-        case SPVM_BASIC_TYPE_C_ID_BYTE: {
+        case SPVM_API_C_BASIC_TYPE_ID_BYTE: {
           int8_t* elems = env->get_elems_byte(env, array);
           for (int32_t i = 0; i < length; i++) {
             SV* sv_value = sv_2mortal(newSViv(elems[i]));
@@ -1591,7 +1296,7 @@ array_to_elems(...)
           }
           break;
         }
-        case SPVM_BASIC_TYPE_C_ID_SHORT: {
+        case SPVM_API_C_BASIC_TYPE_ID_SHORT: {
           int16_t* elems = env->get_elems_short(env, array);
           for (int32_t i = 0; i < length; i++) {
             SV* sv_value = sv_2mortal(newSViv(elems[i]));
@@ -1599,7 +1304,7 @@ array_to_elems(...)
           }
           break;
         }
-        case SPVM_BASIC_TYPE_C_ID_INT: {
+        case SPVM_API_C_BASIC_TYPE_ID_INT: {
           int32_t* elems = env->get_elems_int(env, array);
           for (int32_t i = 0; i < length; i++) {
             SV* sv_value = sv_2mortal(newSViv(elems[i]));
@@ -1607,7 +1312,7 @@ array_to_elems(...)
           }
           break;
         }
-        case SPVM_BASIC_TYPE_C_ID_LONG: {
+        case SPVM_API_C_BASIC_TYPE_ID_LONG: {
           int64_t* elems = env->get_elems_long(env, array);
           for (int32_t i = 0; i < length; i++) {
             SV* sv_value = sv_2mortal(newSViv(elems[i]));
@@ -1615,7 +1320,7 @@ array_to_elems(...)
           }
           break;
         }
-        case SPVM_BASIC_TYPE_C_ID_FLOAT: {
+        case SPVM_API_C_BASIC_TYPE_ID_FLOAT: {
           float* elems = env->get_elems_float(env, array);
           for (int32_t i = 0; i < length; i++) {
             SV* sv_value = sv_2mortal(newSVnv(elems[i]));
@@ -1623,7 +1328,7 @@ array_to_elems(...)
           }
           break;
         }
-        case SPVM_BASIC_TYPE_C_ID_DOUBLE: {
+        case SPVM_API_C_BASIC_TYPE_ID_DOUBLE: {
           double* elems = env->get_elems_double(env, array);
           for (int32_t i = 0; i < length; i++) {
             SV* sv_value = sv_2mortal(newSVnv(elems[i]));
@@ -1671,15 +1376,18 @@ array_to_bin(...)
   
   int32_t length = env->length(env, array);
 
-  int32_t basic_type_id = array->basic_type_id;
-  int32_t dimension = array->type_dimension;
+  int32_t basic_type_id = SPVM_API_object_get_basic_type_id(array);
+  int32_t dimension = SPVM_API_object_get_type_dimension(array);
   int32_t is_array_type = dimension > 0;
   
   SV* sv_bin;
   if (is_array_type) {
     int32_t element_type_dimension = dimension - 1;
 
-    if (array->type_category == SPVM_TYPE_C_TYPE_CATEGORY_MULNUM_ARRAY) {
+    int32_t array_is_mulnum_array = env->is_mulnum_array(env, array);
+    int32_t array_is_object_array = env->is_object_array(env, array);
+
+    if (array_is_mulnum_array) {
       int32_t class_id = SPVM_API_get_basic_type_class_id(env, basic_type_id);
       int32_t class_field_ids_length = SPVM_API_get_class_field_ids_length(env, class_id);
       int32_t class_field_ids_base = SPVM_API_get_class_field_ids_base(env, class_id);
@@ -1691,37 +1399,37 @@ array_to_bin(...)
 
       int32_t mulnum_field_type_basic_type_id = SPVM_API_get_type_basic_type_id(env, mulnum_field_type_id);
       switch (mulnum_field_type_basic_type_id) {
-        case SPVM_BASIC_TYPE_C_ID_BYTE: {
+        case SPVM_API_C_BASIC_TYPE_ID_BYTE: {
           int8_t* elems = env->get_elems_byte(env, array);
           
           sv_bin = sv_2mortal(newSVpvn((char*)elems, field_length * length));
           break;
         }
-        case SPVM_BASIC_TYPE_C_ID_SHORT: {
+        case SPVM_API_C_BASIC_TYPE_ID_SHORT: {
           int16_t* elems = env->get_elems_short(env, array);
           
           sv_bin = sv_2mortal(newSVpvn((char*)elems, field_length * length * 2));
           break;
         }
-        case SPVM_BASIC_TYPE_C_ID_INT: {
+        case SPVM_API_C_BASIC_TYPE_ID_INT: {
           int32_t* elems = env->get_elems_int(env, array);
           
           sv_bin = sv_2mortal(newSVpvn((char*)elems, field_length * length * 4));
           break;
         }
-        case SPVM_BASIC_TYPE_C_ID_LONG: {
+        case SPVM_API_C_BASIC_TYPE_ID_LONG: {
           int64_t* elems = env->get_elems_long(env, array);
           
           sv_bin = sv_2mortal(newSVpvn((char*)elems, field_length * length * 8));
           break;
         }
-        case SPVM_BASIC_TYPE_C_ID_FLOAT: {
+        case SPVM_API_C_BASIC_TYPE_ID_FLOAT: {
           float* elems = env->get_elems_float(env, array);
           
           sv_bin = sv_2mortal(newSVpvn((char*)elems, field_length * length * 4));
           break;
         }
-        case SPVM_BASIC_TYPE_C_ID_DOUBLE: {
+        case SPVM_API_C_BASIC_TYPE_ID_DOUBLE: {
           double* elems = env->get_elems_double(env, array);
           
           sv_bin = sv_2mortal(newSVpvn((char*)elems, field_length * length * 8));
@@ -1731,42 +1439,42 @@ array_to_bin(...)
           croak("Invalid type at %s line %d\n", MFILE, __LINE__);
       }
     }
-    else if (array->type_category == SPVM_TYPE_C_TYPE_CATEGORY_OBJECT_ARRAY || array->type_category == SPVM_TYPE_C_TYPE_CATEGORY_ANY_OBJECT_ARRAY) {
+    else if (array_is_object_array) {
       croak("Objec type is not supported at %s line %d\n", MFILE, __LINE__);
     }
     else {
       switch (basic_type_id) {
-        case SPVM_BASIC_TYPE_C_ID_BYTE: {
+        case SPVM_API_C_BASIC_TYPE_ID_BYTE: {
           int8_t* elems = env->get_elems_byte(env, array);
           
           sv_bin = sv_2mortal(newSVpvn((char*)elems, length));
           break;
         }
-        case SPVM_BASIC_TYPE_C_ID_SHORT: {
+        case SPVM_API_C_BASIC_TYPE_ID_SHORT: {
           int16_t* elems = env->get_elems_short(env, array);
           
           sv_bin = sv_2mortal(newSVpvn((char*)elems, length * 2));
           break;
         }
-        case SPVM_BASIC_TYPE_C_ID_INT: {
+        case SPVM_API_C_BASIC_TYPE_ID_INT: {
           int32_t* elems = env->get_elems_int(env, array);
           
           sv_bin = sv_2mortal(newSVpvn((char*)elems, length * 4));
           break;
         }
-        case SPVM_BASIC_TYPE_C_ID_LONG: {
+        case SPVM_API_C_BASIC_TYPE_ID_LONG: {
           int64_t* elems = env->get_elems_long(env, array);
           
           sv_bin = sv_2mortal(newSVpvn((char*)elems, length * 8));
           break;
         }
-        case SPVM_BASIC_TYPE_C_ID_FLOAT: {
+        case SPVM_API_C_BASIC_TYPE_ID_FLOAT: {
           float* elems = env->get_elems_float(env, array);
           
           sv_bin = sv_2mortal(newSVpvn((char*)elems, length * 4));
           break;
         }
-        case SPVM_BASIC_TYPE_C_ID_DOUBLE: {
+        case SPVM_API_C_BASIC_TYPE_ID_DOUBLE: {
           double* elems = env->get_elems_double(env, array);
           
           sv_bin = sv_2mortal(newSVpvn((char*)elems, length * 8));
@@ -1882,12 +1590,12 @@ array_set(...)
     croak("Out of range)");
   }
 
-  int32_t basic_type_id = array->basic_type_id;
-  int32_t dimension = array->type_dimension;
+  int32_t basic_type_id = SPVM_API_object_get_basic_type_id(array);
+  int32_t dimension = SPVM_API_object_get_type_dimension(array);
 
   if (dimension == 1) {
     switch (basic_type_id) {
-      case SPVM_BASIC_TYPE_C_ID_BYTE: {
+      case SPVM_API_C_BASIC_TYPE_ID_BYTE: {
         // Value
         int8_t value = (int8_t)SvIV(sv_value);
         
@@ -1898,7 +1606,7 @@ array_set(...)
         
         break;
       }
-      case SPVM_BASIC_TYPE_C_ID_SHORT: {
+      case SPVM_API_C_BASIC_TYPE_ID_SHORT: {
         // Value
         int16_t value = (int16_t)SvIV(sv_value);
         
@@ -1908,7 +1616,7 @@ array_set(...)
         elements[index] = value;
         break;
       }
-      case SPVM_BASIC_TYPE_C_ID_INT: {
+      case SPVM_API_C_BASIC_TYPE_ID_INT: {
         // Value
         int32_t value = (int32_t)SvIV(sv_value);
         
@@ -1918,7 +1626,7 @@ array_set(...)
         elements[index] = value;
         break;
       }
-      case SPVM_BASIC_TYPE_C_ID_LONG: {
+      case SPVM_API_C_BASIC_TYPE_ID_LONG: {
         // Value
         int64_t value = (int64_t)SvIV(sv_value);
         
@@ -1928,7 +1636,7 @@ array_set(...)
         elements[index] = value;
         break;
       }
-      case SPVM_BASIC_TYPE_C_ID_FLOAT: {
+      case SPVM_API_C_BASIC_TYPE_ID_FLOAT: {
         // Value
         float value = (float)SvNV(sv_value);
         
@@ -1938,7 +1646,7 @@ array_set(...)
         elements[index] = value;
         break;
       }
-      case SPVM_BASIC_TYPE_C_ID_DOUBLE: {
+      case SPVM_API_C_BASIC_TYPE_ID_DOUBLE: {
         // Value
         double value = (double)SvNV(sv_value);
         
@@ -1997,49 +1705,49 @@ array_get(...)
     croak("Out of range)");
   }
 
-  int32_t basic_type_id = array->basic_type_id;
-  int32_t dimension = array->type_dimension;
+  int32_t basic_type_id = SPVM_API_object_get_basic_type_id(array);
+  int32_t dimension = SPVM_API_object_get_type_dimension(array);
 
   SV* sv_value = NULL;
   _Bool is_object = 0;
   if (dimension == 1) {
     switch (basic_type_id) {
-      case SPVM_BASIC_TYPE_C_ID_BYTE: {
+      case SPVM_API_C_BASIC_TYPE_ID_BYTE: {
         // Get element
         int8_t* elements = env->get_elems_byte(env, array);
         int8_t value = elements[index];
         sv_value = sv_2mortal(newSViv(value));
         break;
       }
-      case SPVM_BASIC_TYPE_C_ID_SHORT: {
+      case SPVM_API_C_BASIC_TYPE_ID_SHORT: {
         // Get element
         int16_t* elements = env->get_elems_short(env, array);
         int16_t value = elements[index];
         sv_value = sv_2mortal(newSViv(value));
         break;
       }
-      case SPVM_BASIC_TYPE_C_ID_INT: {
+      case SPVM_API_C_BASIC_TYPE_ID_INT: {
         // Get element
         int32_t* elements = env->get_elems_int(env, array);
         int32_t value = elements[index];
         sv_value = sv_2mortal(newSViv(value));
         break;
       }
-      case SPVM_BASIC_TYPE_C_ID_LONG: {
+      case SPVM_API_C_BASIC_TYPE_ID_LONG: {
         // Get element
         int64_t* elements = env->get_elems_long(env, array);
         int64_t value = elements[index];
         sv_value = sv_2mortal(newSViv(value));
         break;
       }
-      case SPVM_BASIC_TYPE_C_ID_FLOAT: {
+      case SPVM_API_C_BASIC_TYPE_ID_FLOAT: {
         // Get element
         float* elements = env->get_elems_float(env, array);
         float value = elements[index];
         sv_value = sv_2mortal(newSVnv(value));
         break;
       }
-      case SPVM_BASIC_TYPE_C_ID_DOUBLE: {
+      case SPVM_API_C_BASIC_TYPE_ID_DOUBLE: {
         // Get element
         double* elements = env->get_elems_double(env, array);
         double value = elements[index];
@@ -2061,7 +1769,7 @@ array_get(...)
     SPVM_RUNTIME* runtime = env->runtime;
     
     // Element dimension
-    int32_t element_dimension = array->type_dimension - 1;
+    int32_t element_dimension = SPVM_API_object_get_type_dimension(array) - 1;
     
     // Index
     SPVM_OBJECT* value = env->get_elem_object(env, array, index);
@@ -2071,7 +1779,7 @@ array_get(...)
     
     if (element_dimension == 0) {
       SV* sv_perl_class_name = sv_2mortal(newSVpv("SPVM::", 0));
-      sv_catpv(sv_perl_class_name, SPVM_API_get_basic_type_name(env, array->basic_type_id));
+      sv_catpv(sv_perl_class_name, SPVM_API_get_basic_type_name(env, SPVM_API_object_get_basic_type_id(array)));
       sv_value = SPVM_XS_UTIL_new_sv_object(env, value, SvPV_nolen(sv_perl_class_name));
     }
     else if (element_dimension > 0) {
@@ -2106,7 +1814,7 @@ new_string_array(...)
     int32_t length = av_len(av_elems) + 1;
 
     // New array
-    SPVM_OBJECT* array = env->new_object_array(env, SPVM_BASIC_TYPE_C_ID_STRING, length);
+    SPVM_OBJECT* array = env->new_object_array(env, SPVM_API_C_BASIC_TYPE_ID_STRING, length);
 
     for (int32_t i = 0; i < length; i++) {
       SV** sv_str_value_ptr = av_fetch(av_elems, i, 0);
@@ -3135,8 +2843,8 @@ _new_object_array(...)
   // New array
   SPVM_OBJECT* array = env->new_object_array(env, basic_type_id, length);
 
-  int32_t array_basic_type_id  = array->basic_type_id;
-  int32_t array_type_dimension = array->type_dimension;
+  int32_t array_basic_type_id  = SPVM_API_object_get_basic_type_id(array);
+  int32_t array_type_dimension = SPVM_API_object_get_type_dimension(array);
   int32_t element_type_dimension = array_type_dimension - 1;
 
   for (int32_t index = 0; index < length; index++) {
@@ -3149,7 +2857,10 @@ _new_object_array(...)
     else if (sv_isobject(sv_element) && sv_derived_from(sv_element, "SPVM::BlessedObject::Class")) {
       SPVM_OBJECT* object = SPVM_XS_UTIL_get_object(sv_element);
       
-      if (object->basic_type_id == array_basic_type_id && object->type_dimension == element_type_dimension) {
+      if (basic_type_id == SPVM_API_C_BASIC_TYPE_ID_ANY_OBJECT) {
+        env->set_elem_object(env, array, index, object);
+      }
+      else if (SPVM_API_object_get_basic_type_id(object) == array_basic_type_id && SPVM_API_object_get_type_dimension(object) == element_type_dimension) {
         env->set_elem_object(env, array, index, object);
       }
       else {
@@ -3204,7 +2915,7 @@ _new_muldim_array(...)
   // New array
   SPVM_OBJECT* array = env->new_muldim_array(env, basic_type_id, element_type_dimension, length);
   
-  int32_t array_basic_type_id = array->basic_type_id;
+  int32_t array_basic_type_id = SPVM_API_object_get_basic_type_id(array);
 
   for (int32_t index = 0; index < length; index++) {
     SV** sv_element_ptr = av_fetch(av_elems, index, 0);
@@ -3216,7 +2927,7 @@ _new_muldim_array(...)
     else if (sv_isobject(sv_element) && sv_derived_from(sv_element, "SPVM::BlessedObject")) {
       SPVM_OBJECT* object = SPVM_XS_UTIL_get_object(sv_element);
       
-      if (object->basic_type_id == array_basic_type_id && object->type_dimension == element_type_dimension) {
+      if (SPVM_API_object_get_basic_type_id(object) == array_basic_type_id && SPVM_API_object_get_type_dimension(object) == element_type_dimension) {
         env->set_elem_object(env, array, index, object);
       }
       else {
@@ -3304,34 +3015,30 @@ _new_mulnum_array_from_bin(...)
 
   int32_t field_length = class_field_ids_length;
 
-  int32_t array_length;
-  
-  
   int32_t field_width;
-  
   int32_t mulnum_field_type_basic_type_id = SPVM_API_get_type_basic_type_id(env, mulnum_field_type_id);
   switch (mulnum_field_type_basic_type_id) {
-    case SPVM_BASIC_TYPE_C_ID_BYTE: {
+    case SPVM_API_C_BASIC_TYPE_ID_BYTE: {
       field_width = 1;
       break;
     }
-    case SPVM_BASIC_TYPE_C_ID_SHORT: {
+    case SPVM_API_C_BASIC_TYPE_ID_SHORT: {
       field_width = 2;
       break;
     }
-    case SPVM_BASIC_TYPE_C_ID_INT: {
+    case SPVM_API_C_BASIC_TYPE_ID_INT: {
       field_width = 4;
       break;
     }
-    case SPVM_BASIC_TYPE_C_ID_LONG: {
+    case SPVM_API_C_BASIC_TYPE_ID_LONG: {
       field_width = 8;
       break;
     }
-    case SPVM_BASIC_TYPE_C_ID_FLOAT: {
+    case SPVM_API_C_BASIC_TYPE_ID_FLOAT: {
       field_width = 4;
       break;
     }
-    case SPVM_BASIC_TYPE_C_ID_DOUBLE: {
+    case SPVM_API_C_BASIC_TYPE_ID_DOUBLE: {
       field_width = 8;
       break;
     }
@@ -3343,49 +3050,49 @@ _new_mulnum_array_from_bin(...)
     croak("Invalid binary data size at %s line %d", MFILE, __LINE__);
   }
   
-  array_length = binary_length / field_length / field_width;
+  int32_t array_length = binary_length / field_length / field_width;
 
   SPVM_OBJECT* array = env->new_mulnum_array(env, basic_type_id, array_length);
 
-  int32_t dimension = array->type_dimension;
+  int32_t dimension = SPVM_API_object_get_type_dimension(array);
   
   switch (mulnum_field_type_basic_type_id) {
-    case SPVM_BASIC_TYPE_C_ID_BYTE: {
+    case SPVM_API_C_BASIC_TYPE_ID_BYTE: {
       int8_t* elems = env->get_elems_byte(env, array);
       if (array_length > 0) {
         memcpy(elems, binary, field_length * array_length * field_width);
       }
       break;
     }
-    case SPVM_BASIC_TYPE_C_ID_SHORT: {
+    case SPVM_API_C_BASIC_TYPE_ID_SHORT: {
       int16_t* elems = env->get_elems_short(env, array);
       if (array_length > 0) {
         memcpy(elems, binary, field_length * array_length * field_width);
       }
       break;
     }
-    case SPVM_BASIC_TYPE_C_ID_INT: {
+    case SPVM_API_C_BASIC_TYPE_ID_INT: {
       int32_t* elems = env->get_elems_int(env, array);
       if (array_length > 0) {
         memcpy(elems, binary, field_length * array_length * field_width);
       }
       break;
     }
-    case SPVM_BASIC_TYPE_C_ID_LONG: {
+    case SPVM_API_C_BASIC_TYPE_ID_LONG: {
       int64_t* elems = env->get_elems_long(env, array);
       if (array_length > 0) {
         memcpy(elems, binary, field_length * array_length * field_width);
       }
       break;
     }
-    case SPVM_BASIC_TYPE_C_ID_FLOAT: {
+    case SPVM_API_C_BASIC_TYPE_ID_FLOAT: {
       float* elems = env->get_elems_float(env, array);
       if (array_length > 0) {
         memcpy(elems, binary, field_length * array_length * field_width);
       }
       break;
     }
-    case SPVM_BASIC_TYPE_C_ID_DOUBLE: {
+    case SPVM_API_C_BASIC_TYPE_ID_DOUBLE: {
       double* elems = env->get_elems_double(env, array);
       if (array_length > 0) {
         memcpy(elems, binary, field_length * array_length * field_width);
@@ -3536,7 +3243,7 @@ create_compiler(...)
   SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
   
   // Create compiler
-  void* compiler = env->compiler_new();
+  void* compiler = SPVM_API_compiler_new();
 
   size_t iv_compiler = PTR2IV(compiler);
   SV* sviv_compiler = sv_2mortal(newSViv(iv_compiler));
@@ -3561,7 +3268,7 @@ compile_spvm(...)
 
   SV** sv_compiler_ptr = hv_fetch(hv_self, "compiler", strlen("compiler"), 0);
   SV* sv_compiler = sv_compiler_ptr ? *sv_compiler_ptr : &PL_sv_undef;
-  SPVM_COMPILER* compiler = INT2PTR(SPVM_COMPILER*, SvIV(SvRV(sv_compiler)));
+  void* compiler = INT2PTR(void*, SvIV(SvRV(sv_compiler)));
   
   // Include directries
   SV** sv_module_dirs_ptr = hv_fetch(hv_self, "module_dirs", strlen("module_dirs"), 0);
@@ -3569,13 +3276,9 @@ compile_spvm(...)
   
   // Name
   const char* class_name = SvPV_nolen(sv_class_name);
-  char* class_name_copy = SPVM_ALLOCATOR_alloc_memory_block_permanent(compiler->allocator, sv_len(sv_class_name) + 1);
-  memcpy(class_name_copy, class_name, sv_len(sv_class_name));
   
   // File
   const char* start_file = SvPV_nolen(sv_start_file);
-  char* start_file_copy = SPVM_ALLOCATOR_alloc_memory_block_permanent(compiler->allocator, sv_len(sv_start_file) + 1);
-  memcpy(start_file_copy, start_file, sv_len(sv_start_file));
   
   // Line
   int32_t start_line = (int32_t)SvIV(sv_start_line);
@@ -3585,10 +3288,10 @@ compile_spvm(...)
   SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
 
   // Set starting file
-  env->compiler_set_start_file(compiler, start_file_copy);
+  SPVM_API_compiler_set_start_file(compiler, start_file);
   
   // Set starting line
-  env->compiler_set_start_line(compiler, start_line);
+  SPVM_API_compiler_set_start_line(compiler, start_line);
   
   // Add include paths
   AV* av_module_dirs;
@@ -3603,11 +3306,11 @@ compile_spvm(...)
     SV** sv_include_dir_ptr = av_fetch(av_module_dirs, i, 0);
     SV* sv_include_dir = sv_include_dir_ptr ? *sv_include_dir_ptr : &PL_sv_undef;
     char* include_dir = SvPV_nolen(sv_include_dir);
-    env->compiler_add_module_dir(compiler, include_dir);
+    SPVM_API_compiler_add_module_dir(compiler, include_dir);
   }
 
   // Compile SPVM
-  int32_t compile_error_code = env->compiler_compile_spvm(compiler, class_name_copy);
+  int32_t compile_error_code = SPVM_API_compiler_compile_spvm(compiler, class_name);
   
   SV* sv_compile_success;
   if (compile_error_code == 0) {
@@ -3642,26 +3345,25 @@ get_method_names(...)
   SV* sv_env = sv_env_ptr ? *sv_env_ptr : &PL_sv_undef;
   SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
   
-  SPVM_COMPILER* compiler;
   SV** sv_compiler_ptr = hv_fetch(hv_self, "compiler", strlen("compiler"), 0);
   SV* sv_compiler = sv_compiler_ptr ? *sv_compiler_ptr : &PL_sv_undef;
-  compiler = INT2PTR(SPVM_COMPILER*, SvIV(SvRV(sv_compiler)));
+  void* compiler = INT2PTR(void*, SvIV(SvRV(sv_compiler)));
 
   AV* av_method_names = (AV*)sv_2mortal((SV*)newAV());
   SV* sv_method_names = sv_2mortal(newRV_inc((SV*)av_method_names));
   
-  int32_t class_id = env->compiler_get_class_id(compiler, class_name);
-  int32_t methods_length = env->compiler_get_methods_length(compiler, class_id);
+  int32_t class_id = SPVM_API_compiler_get_class_id(compiler, class_name);
+  int32_t methods_length = SPVM_API_compiler_get_methods_length(compiler, class_id);
   for (int32_t method_index = 0; method_index < methods_length; method_index++) {
-    int32_t method_id = env->compiler_get_method_id(compiler, class_id, method_index);
-    const char* method_name = env->compiler_get_method_name(compiler, method_id);
+    int32_t method_id = SPVM_API_compiler_get_method_id(compiler, class_id, method_index);
+    const char* method_name = SPVM_API_compiler_get_method_name(compiler, method_id);
     SV* sv_method_name = sv_2mortal(newSVpv(method_name, 0));
     int32_t is_push = 0;
     if (SvOK(sv_category)) {
-      if(strEQ(SvPV_nolen(sv_category), "native") && env->compiler_is_native_method(compiler, method_id)) {
+      if(strEQ(SvPV_nolen(sv_category), "native") && SPVM_API_compiler_is_native_method(compiler, method_id)) {
         av_push(av_method_names, SvREFCNT_inc(sv_method_name));
       }
-      else if (strEQ(SvPV_nolen(sv_category), "precompile") && env->compiler_is_precompile_method(compiler, method_id)) {
+      else if (strEQ(SvPV_nolen(sv_category), "precompile") && SPVM_API_compiler_is_precompile_method(compiler, method_id)) {
         av_push(av_method_names, SvREFCNT_inc(sv_method_name));
       }
     }
@@ -3695,10 +3397,9 @@ get_anon_class_names_by_parent_class_name(...)
   SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
   
   // Compiler
-  SPVM_COMPILER* compiler;
   SV** sv_compiler_ptr = hv_fetch(hv_self, "compiler", strlen("compiler"), 0);
   SV* sv_compiler = sv_compiler_ptr ? *sv_compiler_ptr : &PL_sv_undef;
-  compiler = INT2PTR(SPVM_COMPILER*, SvIV(SvRV(sv_compiler)));
+  void* compiler = INT2PTR(void*, SvIV(SvRV(sv_compiler)));
 
   AV* av_anon_class_names = (AV*)sv_2mortal((SV*)newAV());
   SV* sv_anon_class_names = sv_2mortal(newRV_inc((SV*)av_anon_class_names));
@@ -3706,12 +3407,12 @@ get_anon_class_names_by_parent_class_name(...)
   // Copy class load path to builder
   int32_t class_id = SPVM_API_compiler_get_class_id(compiler, class_name);
 
-  int32_t methods_length = env->compiler_get_methods_length(compiler, class_id);
+  int32_t methods_length = SPVM_API_compiler_get_methods_length(compiler, class_id);
 
   for (int32_t method_index = 0; method_index < methods_length; method_index++) {
     
     int32_t method_id = SPVM_API_compiler_get_method_id(compiler, class_id, method_index);
-    int32_t is_anon_method = env->compiler_is_anon_method(compiler, method_id);
+    int32_t is_anon_method = SPVM_API_compiler_is_anon_method(compiler, method_id);
     
     if (is_anon_method) {
       int32_t anon_class_id =  SPVM_API_compiler_get_method_class_id(compiler, method_id);
@@ -3742,16 +3443,16 @@ get_class_names_exclude_anon(...)
 
   SV** sv_compiler_ptr = hv_fetch(hv_self, "compiler", strlen("compiler"), 0);
   SV* sv_compiler = sv_compiler_ptr ? *sv_compiler_ptr : &PL_sv_undef;
-  SPVM_COMPILER* compiler = INT2PTR(SPVM_COMPILER*, SvIV(SvRV(sv_compiler)));
+  void* compiler = INT2PTR(void*, SvIV(SvRV(sv_compiler)));
 
   AV* av_class_names = (AV*)sv_2mortal((SV*)newAV());
   SV* sv_class_names = sv_2mortal(newRV_inc((SV*)av_class_names));
 
-  int32_t classes_legnth = env->compiler_get_classes_length(compiler);
+  int32_t classes_legnth = SPVM_API_compiler_get_classes_length(compiler);
 
   for (int32_t class_id = 0; class_id < classes_legnth; class_id++) {
-    const char* class_name = env->compiler_get_class_name(compiler, class_id);
-    int32_t is_anon_class = env->compiler_is_anon_class(compiler, class_id);
+    const char* class_name = SPVM_API_compiler_get_class_name(compiler, class_id);
+    int32_t is_anon_class = SPVM_API_compiler_is_anon_class(compiler, class_id);
     if (!is_anon_class) {
       SV* sv_class_name = sv_2mortal(newSVpv(class_name, 0));
       av_push(av_class_names, SvREFCNT_inc(sv_class_name));
@@ -3777,17 +3478,16 @@ get_class_names(...)
   SV* sv_env = sv_env_ptr ? *sv_env_ptr : &PL_sv_undef;
   SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
 
-  SPVM_COMPILER* compiler;
   SV** sv_compiler_ptr = hv_fetch(hv_self, "compiler", strlen("compiler"), 0);
   SV* sv_compiler = sv_compiler_ptr ? *sv_compiler_ptr : &PL_sv_undef;
-  compiler = INT2PTR(SPVM_COMPILER*, SvIV(SvRV(sv_compiler)));
+  void* compiler = INT2PTR(void*, SvIV(SvRV(sv_compiler)));
 
   AV* av_class_names = (AV*)sv_2mortal((SV*)newAV());
   SV* sv_class_names = sv_2mortal(newRV_inc((SV*)av_class_names));
   
-  int32_t classes_legnth = env->compiler_get_classes_length(compiler);
+  int32_t classes_legnth = SPVM_API_compiler_get_classes_length(compiler);
   for (int32_t class_id = 0; class_id < classes_legnth; class_id++) {
-    const char* class_name = env->compiler_get_class_name(compiler, class_id);
+    const char* class_name = SPVM_API_compiler_get_class_name(compiler, class_id);
     SV* sv_class_name = sv_2mortal(newSVpv(class_name, 0));
     av_push(av_class_names, SvREFCNT_inc(sv_class_name));
   }
@@ -3814,15 +3514,15 @@ get_error_messages(...)
   // Compiler
   SV** sv_compiler_ptr = hv_fetch(hv_self, "compiler", strlen("compiler"), 0);
   SV* sv_compiler = sv_compiler_ptr ? *sv_compiler_ptr : &PL_sv_undef;
-  SPVM_COMPILER* compiler = INT2PTR(SPVM_COMPILER*, SvIV(SvRV(sv_compiler)));
+  void* compiler = INT2PTR(void*, SvIV(SvRV(sv_compiler)));
 
   AV* av_error_messages = (AV*)sv_2mortal((SV*)newAV());
   SV* sv_error_messages = sv_2mortal(newRV_inc((SV*)av_error_messages));
 
-  int32_t error_messages_legnth = env->compiler_get_error_messages_length(compiler);
+  int32_t error_messages_legnth = SPVM_API_compiler_get_error_messages_length(compiler);
 
   for (int32_t i = 0; i < error_messages_legnth; i++) {
-    const char* error_message = env->compiler_get_error_message(compiler, i);
+    const char* error_message = SPVM_API_compiler_get_error_message(compiler, i);
     SV* sv_error_message = sv_2mortal(newSVpv(error_message, 0));
     av_push(av_error_messages, SvREFCNT_inc(sv_error_message));
   }
@@ -3841,12 +3541,16 @@ get_classes_length(...)
 
   HV* hv_self = (HV*)SvRV(sv_self);
 
-  SPVM_COMPILER* compiler;
+  // The environment
+  SV** sv_env_ptr = hv_fetch(hv_self, "env", strlen("env"), 0);
+  SV* sv_env = sv_env_ptr ? *sv_env_ptr : &PL_sv_undef;
+  SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
+
   SV** sv_compiler_ptr = hv_fetch(hv_self, "compiler", strlen("compiler"), 0);
   SV* sv_compiler = sv_compiler_ptr ? *sv_compiler_ptr : &PL_sv_undef;
-  compiler = INT2PTR(SPVM_COMPILER*, SvIV(SvRV(sv_compiler)));
+  void* compiler = INT2PTR(void*, SvIV(SvRV(sv_compiler)));
   
-  int32_t classes_length = compiler->classes->length;
+  int32_t classes_length = SPVM_API_compiler_get_classes_length(compiler);
   SV* sv_classes_length = sv_2mortal(newSViv(classes_length));
   
   XPUSHs(sv_classes_length);
@@ -3867,10 +3571,9 @@ get_module_file(...)
   // Name
   const char* class_name = SvPV_nolen(sv_class_name);
 
-  SPVM_COMPILER* compiler;
   SV** sv_compiler_ptr = hv_fetch(hv_self, "compiler", strlen("compiler"), 0);
   SV* sv_compiler = sv_compiler_ptr ? *sv_compiler_ptr : &PL_sv_undef;
-  compiler = INT2PTR(SPVM_COMPILER*, SvIV(SvRV(sv_compiler)));
+  void* compiler = INT2PTR(void*, SvIV(SvRV(sv_compiler)));
 
   // Copy class load path to builder
   int32_t class_id = SPVM_API_compiler_get_class_id(compiler, class_name);
@@ -3903,14 +3606,13 @@ get_module_source(...)
   // Name
   const char* class_name = SvPV_nolen(sv_class_name);
 
-  SPVM_COMPILER* compiler;
   SV** sv_compiler_ptr = hv_fetch(hv_self, "compiler", strlen("compiler"), 0);
   SV* sv_compiler = sv_compiler_ptr ? *sv_compiler_ptr : &PL_sv_undef;
-  compiler = INT2PTR(SPVM_COMPILER*, SvIV(SvRV(sv_compiler)));
+  void* compiler = INT2PTR(void*, SvIV(SvRV(sv_compiler)));
 
   // Copy class load path to builder
   SV* sv_module_source;
-  const char* module_source = SPVM_HASH_fetch(compiler->module_source_symtable, class_name, strlen(class_name));
+  const char* module_source =  SPVM_API_get_module_source(compiler, class_name);
   if (module_source) {
     sv_module_source = sv_2mortal(newSVpv(module_source, 0));
   }
@@ -3937,15 +3639,29 @@ build_runtime(...)
   
   SV** sv_compiler_ptr = hv_fetch(hv_self, "compiler", strlen("compiler"), 0);
   SV* sv_compiler = sv_compiler_ptr ? *sv_compiler_ptr : &PL_sv_undef;
-  SPVM_COMPILER* compiler = INT2PTR(SPVM_COMPILER*, SvIV(SvRV(sv_compiler)));
+  void* compiler = INT2PTR(void*, SvIV(SvRV(sv_compiler)));
+  
+  void* runtime = NULL;
+  {
+    SV** sv_runtime_ptr = hv_fetch(hv_self, "runtime", strlen("runtime"), 0);
+    SV* sv_runtime = sv_runtime_ptr ? *sv_runtime_ptr : &PL_sv_undef;
+    if (SvOK(sv_runtime)) {
+      runtime = INT2PTR(void*, SvIV(SvRV(sv_runtime)));
+    }
+  }
+  
+  if (runtime) {
+    SPVM_API_runtime_free(runtime);
+    runtime = NULL;
+  }
 
   // Build runtime information
-  void* runtime = SPVM_API_runtime_new(env);
+  runtime = SPVM_API_runtime_new(env);
   SPVM_API_compiler_build_runtime(compiler, runtime);
 
-  // Free compiler
-  env->compiler_free(compiler);
-  
+  // Prepare runtime
+  SPVM_API_runtime_prepare(runtime);
+
   // Set runtime information
   size_t iv_runtime = PTR2IV(runtime);
   SV* sviv_runtime = sv_2mortal(newSViv(iv_runtime));
@@ -3955,6 +3671,28 @@ build_runtime(...)
   XSRETURN(0);
 }
 
+SV*
+free_compiler(...)
+  PPCODE:
+{
+  (void)RETVAL;
+  
+  SV* sv_self = ST(0);
+  HV* hv_self = (HV*)SvRV(sv_self);
+
+  SV** sv_env_ptr = hv_fetch(hv_self, "env", strlen("env"), 0);
+  SV* sv_env = sv_env_ptr ? *sv_env_ptr : &PL_sv_undef;
+  SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
+  
+  SV** sv_compiler_ptr = hv_fetch(hv_self, "compiler", strlen("compiler"), 0);
+  SV* sv_compiler = sv_compiler_ptr ? *sv_compiler_ptr : &PL_sv_undef;
+  void* compiler = INT2PTR(void*, SvIV(SvRV(sv_compiler)));
+
+  // Free compiler
+  SPVM_API_compiler_free(compiler);
+
+  XSRETURN(0);
+}
 
 SV*
 prepare_env(...)
@@ -3976,9 +3714,6 @@ prepare_env(...)
   if (env == NULL) {
     croak("Can't create SPVM env");
   }
-
-  // Prepare runtime
-  SPVM_API_runtime_prepare(runtime);
 
   // Set runtime information
   env->runtime = runtime;
@@ -4100,20 +3835,24 @@ DESTROY(...)
     
     // Cleanup global variables
     if (env->runtime) {
+      // Cleanup global varialbes
       env->cleanup_global_vars(env);
+      
+      // Free runtime
+      SPVM_API_runtime_free(env->runtime);
+      env->runtime = NULL;
     }
     
     env->free_env_raw(env);
   }
   
-
   XSRETURN(0);
 }
 
 MODULE = SPVM::Builder::CC		PACKAGE = SPVM::Builder::CC
 
 SV*
-build_class_csource_precompile(...)
+create_precompile_source(...)
   PPCODE:
 {
   SV* sv_self = ST(0);
@@ -4125,26 +3864,34 @@ build_class_csource_precompile(...)
   SV** sv_builder_ptr = hv_fetch(hv_self, "builder", strlen("builder"), 0);
   SV* sv_builder = sv_builder_ptr ? *sv_builder_ptr : &PL_sv_undef;
   HV* hv_builder = (HV*)SvRV(sv_builder);
+  
+  // Runtime
+  SV** sv_runtime_ptr = hv_fetch(hv_builder, "runtime", strlen("runtime"), 0);
+  SV* sv_runtime = sv_runtime_ptr ? *sv_runtime_ptr : &PL_sv_undef;
+  void* runtime = INT2PTR(void*, SvIV(SvRV(sv_runtime)));
+  
+  // New allocator
+  void* allocator = SPVM_API_allocator_new();
+  
+  // New string buffer
+  void* string_buffer = SPVM_API_string_buffer_new_tmp(allocator, 0);
 
-  SPVM_COMPILER* compiler;
-  SV** sv_compiler_ptr = hv_fetch(hv_builder, "compiler", strlen("compiler"), 0);
-  SV* sv_compiler = sv_compiler_ptr ? *sv_compiler_ptr : &PL_sv_undef;
-  compiler = INT2PTR(SPVM_COMPILER*, SvIV(SvRV(sv_compiler)));
+  // Create precompile source
+  SPVM_ENV* env = SPVM_NATIVE_new_env_raw();
+  env->runtime = runtime;
+  SPVM_API_precompile_create_precompile_source(env, string_buffer, class_name);
+  env->free_env_raw(env);
+  const char* string_buffer_value = SPVM_API_string_buffer_get_value(string_buffer);
+  int32_t string_buffer_length = SPVM_API_string_buffer_get_length(string_buffer);
+  SV* sv_precompile_source = sv_2mortal(newSVpv(string_buffer_value, string_buffer_length));
   
-  // String buffer for csource
-  SPVM_STRING_BUFFER* string_buffer = SPVM_STRING_BUFFER_new(compiler->allocator, 0, SPVM_ALLOCATOR_C_ALLOC_TYPE_TMP);
+  // Free string buffer
+  SPVM_API_string_buffer_free(string_buffer);
+  
+  // Free allocator
+  SPVM_API_allocator_free(allocator);
 
-  // Build class csource
-  
-  int32_t build_class_csource_start_memory_blocks_count_tmp = compiler->allocator->memory_blocks_count_tmp;
-  SPVM_CSOURCE_BUILDER_PRECOMPILE_build_class_csource(compiler, string_buffer, class_name);
-  assert(compiler->allocator->memory_blocks_count_tmp == build_class_csource_start_memory_blocks_count_tmp);
-  
-  SV* sv_class_csource = sv_2mortal(newSVpv(string_buffer->buffer, string_buffer->length));
-  
-  SPVM_STRING_BUFFER_free(string_buffer);
-
-  XPUSHs(sv_class_csource);
+  XPUSHs(sv_precompile_source);
   XSRETURN(1);
 }
 

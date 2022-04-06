@@ -6,6 +6,8 @@ BEGIN { unshift @INC, 'lib', '../lib'}
 
 use strict;
 use Chart::Bars;
+use File::Temp 0.19;
+my $samples = File::Temp->newdir();
 
 print "1..1\n";
 
@@ -13,7 +15,7 @@ my @x_values = ();    # x axis
 my @y_values = ();
 
 my $graphic;
-my $picture_file = "samples/bars_4.png";
+my $picture_file = "$samples/bars_4.png";
 my $min_y        = -5;                     # max. y-values
 my $max_y        = 5;
 
