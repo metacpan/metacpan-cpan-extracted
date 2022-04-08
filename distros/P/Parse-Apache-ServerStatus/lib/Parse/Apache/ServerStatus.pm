@@ -182,7 +182,7 @@ modify it under the same terms as Perl itself.
 =cut
 
 package Parse::Apache::ServerStatus;
-our $VERSION = '0.10';
+our $VERSION = "0.11";
 
 use strict;
 use warnings;
@@ -311,7 +311,7 @@ sub new {
     # </pre>
 
     $self->{rx}->{2} = qr{
-        <dt>Parent\s+Server\s+Generation:\s+(\d+)</dt>.+?
+        <dt>Parent\s+Server\s+(?:MPM\s+)?Generation:\s+(\d+)</dt>.+?
         (?:
             Total\s+accesses:\s+(\d+)\s+\-\s+Total\s+Traffic:\s+([0-9\.]+\s+[kmg]{0,1}B)</dt>.+
             <dt>([\d\.]+)\s+requests/sec\s+-\s+([\d\.]+\s+[kmg]{0,1}B)/second\s+-\s+([\d\.]+\s+[kmg]{0,1}B)/request</dt>.+

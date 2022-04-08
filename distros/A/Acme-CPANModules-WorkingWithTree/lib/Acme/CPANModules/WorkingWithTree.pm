@@ -5,9 +5,9 @@ use warnings;
 use Acme::CPANModulesUtil::Misc;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-10-07'; # DATE
+our $DATE = '2022-03-18'; # DATE
 our $DIST = 'Acme-CPANModules-WorkingWithTree'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 my $text = <<'_';
 **Basics**
@@ -72,7 +72,7 @@ Special kinds of trees: TODO.
 _
 
 our $LIST = {
-    summary => 'Working with tree data structure in Perl',
+    summary => 'List of modules to work with tree data structure',
     description => $text,
     tags => ['task'],
 };
@@ -80,7 +80,7 @@ our $LIST = {
 Acme::CPANModulesUtil::Misc::populate_entries_from_module_links_in_description;
 
 1;
-# ABSTRACT: Working with tree data structure in Perl
+# ABSTRACT: List of modules to work with tree data structure
 
 __END__
 
@@ -90,11 +90,11 @@ __END__
 
 =head1 NAME
 
-Acme::CPANModules::WorkingWithTree - Working with tree data structure in Perl
+Acme::CPANModules::WorkingWithTree - List of modules to work with tree data structure
 
 =head1 VERSION
 
-This document describes version 0.006 of Acme::CPANModules::WorkingWithTree (from Perl distribution Acme-CPANModules-WorkingWithTree), released on 2021-10-07.
+This document describes version 0.007 of Acme::CPANModules::WorkingWithTree (from Perl distribution Acme-CPANModules-WorkingWithTree), released on 2022-03-18.
 
 =head1 DESCRIPTION
 
@@ -151,73 +151,135 @@ L<Data::CSel> and its related modules: L<App::htmlsel>, L<App::jsonsel>,
 L<App::orgsel>, L<App::podsel>, L<App::ppisel>, L<App::yamlsel>,
 L<App::CSelUtils>.
 
-=head1 ACME::MODULES ENTRIES
+=head1 ACME::CPANMODULES ENTRIES
 
 =over
 
-=item * L<Tree::Object>
+=item * L<Tree::Object> - Generic tree objects
 
-=item * L<Tree::ObjectXS>
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
-=item * L<Data::Tree>
+=item * L<Tree::ObjectXS> - Generic tree objects (with XS accessors, etc)
 
-=item * L<Tree::Simple>
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
-=item * L<Tree::Node>
+=item * L<Data::Tree> - a hash-based tree-like data structure
 
-=item * L<Tree::From::Struct>
+Author: L<TEX|https://metacpan.org/author/TEX>
 
-=item * L<Tree::From::ObjArray>
+=item * L<Tree::Simple> - A simple tree object
 
-=item * L<Tree::From::Text>
+Author: L<RSAVAGE|https://metacpan.org/author/RSAVAGE>
 
-=item * L<Tree::From::TextLines>
+=item * L<Tree::Node> - Memory-efficient tree nodes in Perl
 
-=item * L<Tree::Create::Callback>
+Author: L<RRWO|https://metacpan.org/author/RRWO>
 
-=item * L<Tree::Create::Callback::ChildrenPerLevel>
+=item * L<Tree::From::Struct> - Build a tree object from hash structure
 
-=item * L<Tree::Create::Size>
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
+
+=item * L<Tree::From::ObjArray> - Build a tree of objects from a nested array of objects
+
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
+
+=item * L<Tree::From::Text> - Build a tree object from text
+
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
+
+=item * L<Tree::From::TextLines> - Build a tree object from lines of text, each line indented to express structure
+
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
+
+=item * L<Tree::Create::Callback> - Create tree object by using a callback
+
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
+
+=item * L<Tree::Create::Callback::ChildrenPerLevel> - Create tree object by using a callback (and number of children per level)
+
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
+
+=item * L<Tree::Create::Size> - Create a tree object of certain size
+
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
 =item * L<Tree::From::FS>
 
-=item * L<Data::Random::Tree>
+=item * L<Data::Random::Tree> - Create a random tree
 
-=item * L<Tree::To::Text>
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
-=item * L<Tree::To::TextLines>
+=item * L<Tree::To::Text> - Show a tree object structure as text
 
-=item * L<Text::Tree::Indented>
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
-=item * L<Tree::To::FS>
+=item * L<Tree::To::TextLines> - Render a tree object as indented text lines
 
-=item * L<Tree::Shell>
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
-=item * L<Role::TinyCommons::Tree::Node>
+=item * L<Text::Tree::Indented> - render a tree data structure in the classic indented view
 
-=item * L<Role::TinyCommons::Tree::NodeMethods>
+Author: L<NEILB|https://metacpan.org/author/NEILB>
 
-=item * L<Org::Parser>
+=item * L<Tree::To::FS> - Create a directory structure using tree object
 
-=item * L<Org::Parser::Tiny>
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
-=item * L<Tree::Dump>
+=item * L<Tree::Shell> - Navigate and manipulate in-memory tree objects using a CLI shell
 
-=item * L<Data::CSel>
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
-=item * L<App::htmlsel>
+=item * L<Role::TinyCommons::Tree::Node> - Role for a tree node object
 
-=item * L<App::jsonsel>
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
-=item * L<App::orgsel>
+=item * L<Role::TinyCommons::Tree::NodeMethods> - Role that provides tree node methods
 
-=item * L<App::podsel>
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
-=item * L<App::ppisel>
+=item * L<Org::Parser> - Parse Org documents
 
-=item * L<App::yamlsel>
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
-=item * L<App::CSelUtils>
+=item * L<Org::Parser::Tiny> - Parse Org documents with as little code (and no non-core deps) as possible
+
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
+
+=item * L<Tree::Dump> - Dump a tree object
+
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
+
+=item * L<Data::CSel> - Select tree node objects using CSS Selector-like syntax
+
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
+
+=item * L<App::htmlsel> - Select HTML::Element nodes using CSel syntax
+
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
+
+=item * L<App::jsonsel> - Select JSON elements using CSel (CSS-selector-like) syntax
+
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
+
+=item * L<App::orgsel> - Select Org document elements using CSel (CSS-selector-like) syntax
+
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
+
+=item * L<App::podsel> - Select Pod::Elemental nodes using CSel syntax
+
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
+
+=item * L<App::ppisel> - Select PPI::Element nodes using CSel syntax
+
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
+
+=item * L<App::yamlsel> - Select YAML elements using CSel (CSS-selector-like) syntax
+
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
+
+=item * L<App::CSelUtils> - Utilities related to Data::CSel
+
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
 =back
 
@@ -293,7 +355,7 @@ beyond that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2021, 2020, 2019 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

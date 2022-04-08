@@ -2,7 +2,7 @@ package Test2::Harness::Runner;
 use strict;
 use warnings;
 
-our $VERSION = '1.000119';
+our $VERSION = '1.000123';
 
 use File::Spec();
 
@@ -450,8 +450,7 @@ sub next {
     my $state = $self->state;
 
     while (1) {
-        if(my $task = $state->next_task()) {
-            next unless $task->{stage} eq $self->{+STAGE};
+        if(my $task = $state->next_task($self->{+STAGE})) {
             return $task;
         }
 

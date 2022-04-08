@@ -221,6 +221,7 @@ lib/DateTime/Locale/en_MP.pod
 lib/DateTime/Locale/en_MS.pod
 lib/DateTime/Locale/en_MT.pod
 lib/DateTime/Locale/en_MU.pod
+lib/DateTime/Locale/en_MV.pod
 lib/DateTime/Locale/en_MW.pod
 lib/DateTime/Locale/en_MY.pod
 lib/DateTime/Locale/en_NA.pod
@@ -417,6 +418,8 @@ lib/DateTime/Locale/he.pod
 lib/DateTime/Locale/he_IL.pod
 lib/DateTime/Locale/hi.pod
 lib/DateTime/Locale/hi_IN.pod
+lib/DateTime/Locale/hi_Latn.pod
+lib/DateTime/Locale/hi_Latn_IN.pod
 lib/DateTime/Locale/hr.pod
 lib/DateTime/Locale/hr_BA.pod
 lib/DateTime/Locale/hr_HR.pod
@@ -485,6 +488,8 @@ lib/DateTime/Locale/kok_IN.pod
 lib/DateTime/Locale/ks.pod
 lib/DateTime/Locale/ks_Arab.pod
 lib/DateTime/Locale/ks_Arab_IN.pod
+lib/DateTime/Locale/ks_Deva.pod
+lib/DateTime/Locale/ks_Deva_IN.pod
 lib/DateTime/Locale/ksb.pod
 lib/DateTime/Locale/ksb_TZ.pod
 lib/DateTime/Locale/ksf.pod
@@ -1018,6 +1023,7 @@ share/en-MP.pl
 share/en-MS.pl
 share/en-MT.pl
 share/en-MU.pl
+share/en-MV.pl
 share/en-MW.pl
 share/en-MY.pl
 share/en-NA.pl
@@ -1211,6 +1217,8 @@ share/haw.pl
 share/he-IL.pl
 share/he.pl
 share/hi-IN.pl
+share/hi-Latn-IN.pl
+share/hi-Latn.pl
 share/hr-BA.pl
 share/hr-HR.pl
 share/hr.pl
@@ -1277,6 +1285,8 @@ share/kok-IN.pl
 share/kok.pl
 share/ks-Arab-IN.pl
 share/ks-Arab.pl
+share/ks-Deva-IN.pl
+share/ks-Deva.pl
 share/ks.pl
 share/ksb-TZ.pl
 share/ksb.pl

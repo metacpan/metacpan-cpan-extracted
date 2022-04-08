@@ -118,10 +118,10 @@ sub start_firefox {
 	} elsif (defined $ca_cert_handle) {
 		if ($launches % 2) {
 			diag("Setting trust to list");
-			$parameters{trust} = [ '/dev/fd/' . fileno $ca_cert_handle ];
+			$parameters{trust} = [ $ca_cert_handle->filename() ];
 		} else {
 			diag("Setting trust to scalar");
-			$parameters{trust} = '/dev/fd/' . fileno $ca_cert_handle;
+			$parameters{trust} = $ca_cert_handle->filename();
 		}
 	}
 	if ((defined $major_version) && ($major_version >= 61)) {
@@ -191,7 +191,7 @@ sub start_firefox {
 			}
 			$parameters{capabilities} = Firefox::Marionette::Capabilities->new(%new);
 		}
-		if ($parameters{visible}) {
+		if (($parameters{visible}) && ($ENV{FIREFOX_NO_VISIBLE})) {
 			$skip_message = "Firefox visible tests are unreliable on a remote host";
 			return ($skip_message, undef);
 		}
@@ -560,6 +560,9 @@ SKIP: {
 	if ($ENV{FIREFOX_BINARY}) {
 		skip("No profile testing when the FIREFOX_BINARY override is used", 6);
 	}
+	if (($ENV{WATERFOX}) || ($ENV{WATERFOX_VIA_FIREFOX})) {
+		skip("No profile testing when any WATERFOX override is used", 6);
+	}
 	if (!$ENV{RELEASE_TESTING}) {
 		skip("No profile testing except for RELEASE_TESTING", 6);
 	}
@@ -851,6 +854,9 @@ SKIP: {
 		if (!$ENV{RELEASE_TESTING}) {
 			skip("No profile testing except for RELEASE_TESTING", 6);
 		}
+		if (($ENV{WATERFOX}) || ($ENV{WATERFOX_VIA_FIREFOX})) {
+			skip("No profile testing when any WATERFOX override is used", 6);
+		}
 		my $name = 'throw';
 		($skip_message, $firefox) = start_firefox(0, debug => 1, har => 1, survive => 1, profile_name => $name );
 		if (!$skip_message) {
@@ -902,7 +908,7 @@ emailAddress           = ddick\@cpan.org
 _CONFIG_
 		seek $ca_config_handle, 0, 0 or Carp::croak("Failed to seek to start of temporary file:$!");
 		fcntl $ca_config_handle, Fcntl::F_SETFD(), 0 or Carp::croak("Can't clear close-on-exec flag on temporary file:$!");
-		system {'openssl'} 'openssl', 'req', '-x509',
+		system {'openssl'} 'openssl', 'req', '-new', '-x509',
 			'-set_serial' => '1',
 			'-config'     => $ca_config_handle->filename(),
 			'-days'       => 10,
@@ -3570,17 +3576,38 @@ SKIP: {
 	diag("Final Browser version is " . $capabilities->browser_version());
 	if ($major_version >= 51) {
 		SKIP: {
-			local $TODO = (($major_version > 70) && (!$ENV{FIREFOX_HOST}) && (!$ENV{SSH_CONNECTION})) ? '' : "WebGL should be okay after 51, but can be unstable for specific versions like 65.0.2 or over a remote session";
 			my $webgl2 = $firefox->script(q[return document.createElement('canvas').getContext('webgl2') ? true : false;]);
 			my $experimental = $firefox->script(q[return document.createElement('canvas').getContext('experimental-webgl') ? true : false;]);
-			ok($webgl2 || $experimental, "WebGL is enabled for this browser");
+			my $other = $firefox->script(q[return ("WebGLRenderingContext" in window) ? true : false;]);
+			my $webgl_ok = 1;
 			if ($webgl2) {
 				diag("WebGL (webgl2) is working correctly for " . $capabilities->browser_version() . " on $^O");
 			} elsif ($experimental) {
 				diag("WebGL (experimental) is working correctly for " . $capabilities->browser_version() . " on $^O");
-			} else {
+			} elsif ($other) {
+				diag("WebGL (WebGLRenderingContext) is providing some sort of support for " . $capabilities->browser_version() . " on $^O");
+			} elsif (($^O eq 'cygwin') ||
+				($^O eq 'darwin') ||
+				($^O eq 'MSWin32'))
+			{
+				$webgl_ok = 0;
 				diag("WebGL is NOT working correctly for " . $capabilities->browser_version() . " on $^O");
+			} else {
+				my $glxinfo = `glxinfo 2>&1`;
+				$glxinfo =~ s/\s+/ /smxg;
+				if ($? == 0) {
+					if ($glxinfo =~ /^Error:/smx) {
+						diag("WebGL is NOT working correctly for " . $capabilities->browser_version() . " on $^O, probably because glxinfo has failed:$glxinfo");
+					} else {
+						$webgl_ok = 0;
+						diag("WebGL is NOT working correctly for " . $capabilities->browser_version() . " on $^O but glxinfo has run successfully:$glxinfo");
+					}
+				} else {
+					$webgl_ok = 0;
+					diag("WebGL is NOT working correctly for " . $capabilities->browser_version() . " on $^O and glxinfo cannot be run:$?");
+				}
 			}
+			ok($webgl_ok, "WebGL is enabled when visible and addons are turned on");
 		}
 	}
 	SKIP: {

@@ -963,7 +963,7 @@ require DynaLoader;
 # (move infrequently used names to @EXPORT_OK below)
 
 @EXPORT = qw(
-  PARI PARIcol PARImat PARIvar PARImat_tr parse_as_gp
+  PARI PARIcol PARImat PARIvecL PARIcolL PARImatL PARIvar PARImat_tr parse_as_gp
 );
 
 # Other items we are prepared to export if requested (may be extended during
@@ -1027,7 +1027,7 @@ sub _shiftr {
 $initmem ||= 4000000;		# How much memory for the stack
 $initprimes ||= 500000;		# Calculate primes up to this number
 
-$VERSION = '2.03052103';
+$VERSION = '2.03052201';
 
 my $true = 1;
 # Propagate sv_true, sv_false to SvIOK:

@@ -1,22 +1,33 @@
 ---
-name: HTML-KhatGallery-Plugin-SortNaturally
-version: 0.01
+abstract: 'Plugin for khatgallery to use Natural sort for index lists.'
 author:
-  - Kathryn Andersen
-abstract: Plugin for khatgallery to use Natural sort for index lists.
-license: perl
-resources:
-  license: http://dev.perl.org/licenses/
-requires:
-  HTML::KhatGallery: 0
-  Sort::Naturally: 0
+  - 'Kathryn Andersen'
 build_requires:
-  Test::More: 0
-provides:
-  HTML::KhatGallery::Plugin::SortNaturally:
-    file: lib/HTML/KhatGallery/Plugin/SortNaturally.pm
-    version: 0.01
-generated_by: Module::Build version 0.28
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Module::Build: '0.28'
+  Test::Distribution: '0'
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
-  url: http://module-build.sourceforge.net/META-spec-v1.2.html
-  version: 1.2
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HTML-KhatGallery-Plugin-SortNaturally
+requires:
+  Sort::Naturally: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/rubykat/HTML-KhatGallery-Plugin-SortNaturally
+  repository: https://github.com/rubykat/HTML-KhatGallery-Plugin-SortNaturally.git
+version: '0.02'
+x_generated_by_perl: v5.30.3
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

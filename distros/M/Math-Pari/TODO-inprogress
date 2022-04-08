@@ -1,4 +1,10 @@
-﻿Need to allow default(parisize, ...) ???  Catched by eval {}, but probably messes up our data on stack!
+﻿mathnf() locks in auto-debug since the debugged kid-module is actually built with 2.3.5, not 2.13.3. 
+
+If a user-defined function in a test calls print(), record this, and treat as a command with print().
+
+Need to allow default(parisize, ...) ???  Catched by eval {}, but probably messes up our data on stack!
+
+Report extra debuggers if our run of the debugger fails.
 
 when test() is modified without print (or error()), enable next tests again.
 	XXXX Need to use $skip_fun_rx and not $userfun???
@@ -148,3 +154,14 @@ When the function is done executing, GDB will silently stop.
 00003   itos            -1
 00004   callvoid        ___fake_MathPari_handler_vL
 00005   pushgnil
+
+
+================== DONE below this
+
+settyp() in PARIcol() assumes that the 1-arg form produces t_VEC.
+settyp() in PARImat() assumes … (what???!!!).
+
+Test engine ignores special-case of PARIcol() (and PARIvec/PARImat???)
+
+Need versions of these without special-casing (PARIvecL, PARIcolL, PARImatL).
+

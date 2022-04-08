@@ -1,0 +1,53 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.87.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 a534adfeac630f3bbb2adddb5588fa6c3842199d8ec8ebf4d344df56afd10862 Changes
+SHA256 6a01c8ca9cc78d9c46a65d1b8ae61f1a37b77cdf5f0a4075d85ed227e0d1784b LICENSE
+SHA256 6fe66361ff01c974ade28520c6f63c9fb9ea16956ebe598814cfdd11aa3f422e MANIFEST
+SHA256 8694bd0797441393bd9c5d49d80d0f52ef83622f432b26991b254dc54fef1543 META.yml
+SHA256 59851c14157e3a1747e6c1cb3f528c38208eb091d347e9a5f2dfdfe1c86e44dd Makefile.PL
+SHA256 ab5e5ad24caa06756546d35d8aa257bf2240eb4ff2ef242c98b24d802047db60 README
+SHA256 ca2c41218fad2847937c3aaa0395fb32fae89c31f93606e9c4498963e34e4276 Wikimedia.pm
+SHA256 67d139199c03b8bf8447a5a62f0d0b6dc1bd5bf6dbe04de6d21998c577823ed6 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 6ebcc53a161dd5dc0aae69e4704575f2b00181901d768a82e26722a309cfdbe4 inc/Module/Install/Base.pm
+SHA256 d3f8c839d03fd21c197d05362dbb277cd7cadb15da6390d124b61e851f15146e inc/Module/Install/Can.pm
+SHA256 e9e72e18921c10c87bc4ea4c20af83e52015b9f5775d00ac64073042403717ca inc/Module/Install/Fetch.pm
+SHA256 a7a681bf2c9eee58a372cb642ffe42b0301d1200432ba8de9f7791cd1ecc9827 inc/Module/Install/Makefile.pm
+SHA256 aa887fa65a5eb6bbd1805706ce298b3f3cd55b353ecfd37aa7d35ae419331a49 inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 26b166ff62aacdb55317d1659f160aa4935097eea9810ea980e6d747206b5dc0 inc/Module/Install/Win32.pm
+SHA256 5f73a6851a91ea44e65b924f918743ad6e860620ad7a38a39d0295e0c5652a9f inc/Module/Install/WriteAll.pm
+SHA256 f912b23097ce052b69a5d101268a8c48fe78c6c3b311de2854523bddf567f880 t/LWP-Authen-OAuth2-ServiceProvider-Wikimedia/01-use.t
+SHA256 0abf8a2dc10aab24bfc8c77ee8cc061103f64f9e0f991fd78f247d186a1c24ba t/LWP-Authen-OAuth2-ServiceProvider-Wikimedia/02-version.t
+SHA256 239b9eba86b8eaacad250a3bf9db7b9378f029bb47ef46cb3f2a3e45909d6eef t/LWP-Authen-OAuth2-ServiceProvider-Wikimedia/03-new.t
+SHA256 97a47da04b5c318dc92123a770277489b8692ace9a306f9d888d29b77d044b87 xt/LWP-Authen-OAuth2-ServiceProvider-Wikimedia/01-pod_coverage.t
+SHA256 01c87f755bd66aaf19dbd0649f84241afdb828de17a54cc6fd5e57ec39d1068c xt/LWP-Authen-OAuth2-ServiceProvider-Wikimedia/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+
+iQGzBAEBAwAdFiEERTLc1QTxqWhVvPeegmqNLzlXaRcFAmJOGmgACgkQgmqNLzlX
+aRfo5Av/bGLsAZFsxdJZS/AT95O7sStgB+XoArpFoHOvxyeRQQy++HIsC2m36yqv
+ZP5tTFkWq05DHgcu4YDmS/CE0rq7h74tFJghYZkmQk7FrsCtLMpVgOMyNe/EOVQN
+MpP4TYkaHbuE3bu6efTd4r1/uw+wDbzgKmo/gesDVn19FkYr+T1r9sMTNoSSef0L
+QqOOtyo8165ecWbED7RYT3XGnH0GqzaNrhcJmZdkRXg3ZI+OcUSiTWyiE73ofvPI
+5o8hWg30Q6sltjboizAM7WL4/e7aOqksWb7M40bfSy3j7dfDSFgI1MZXodKkqWLM
+CxDNbPEXphIWNQxy/DaZMZ0+UrHX2cHJHDydkTdudumBjOQYucwgfXr8A2lSsJMV
+Zb1Bec9yoDjmMMDoWBEqDgRq4cW4YTBUORNwXEchuG3ofTsBZBxbRyysLrSm/MNx
+ot546zv2bvQUDlFMV5dFqcm72Lbq1AD/EJ/Z+MKD2sBOtGpKNAFQRqy+Zi7XBTvw
+jEm5NeA4
+=8Zqs
+-----END PGP SIGNATURE-----

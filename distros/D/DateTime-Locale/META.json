@@ -107,27 +107,27 @@
    "provides" : {
       "DateTime::Locale" : {
          "file" : "lib/DateTime/Locale.pm",
-         "version" : "1.33"
+         "version" : "1.34"
       },
       "DateTime::Locale::Base" : {
          "file" : "lib/DateTime/Locale/Base.pm",
-         "version" : "1.33"
+         "version" : "1.34"
       },
       "DateTime::Locale::Catalog" : {
          "file" : "lib/DateTime/Locale/Catalog.pm",
-         "version" : "1.33"
+         "version" : "1.34"
       },
       "DateTime::Locale::Data" : {
          "file" : "lib/DateTime/Locale/Data.pm",
-         "version" : "1.33"
+         "version" : "1.34"
       },
       "DateTime::Locale::FromData" : {
          "file" : "lib/DateTime/Locale/FromData.pm",
-         "version" : "1.33"
+         "version" : "1.34"
       },
       "DateTime::Locale::Util" : {
          "file" : "lib/DateTime/Locale/Util.pm",
-         "version" : "1.33"
+         "version" : "1.34"
       }
    },
    "release_status" : "stable",
@@ -143,7 +143,7 @@
       },
       "x_MailingList" : "datetime@perl.org"
    },
-   "version" : "1.33",
+   "version" : "1.34",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.032001"
@@ -1017,6 +1017,7 @@
                      "p\u00f3nd\u017aela",
                      "p\u00f3nje\u017aele",
                      "ranar",
+                     "ravivaar",
                      "roka",
                      "roku",
                      "sa",
@@ -1043,6 +1044,7 @@
                      "sizhun",
                      "sjedmica",
                      "sngayan",
+                     "somvaar",
                      "ss",
                      "sublasses",
                      "sunnudagur",
@@ -1271,7 +1273,7 @@
             "class" : "Dist::Zilla::Plugin::Git::Contributors",
             "config" : {
                "Dist::Zilla::Plugin::Git::Contributors" : {
-                  "git_version" : "2.33.1",
+                  "git_version" : "2.35.1",
                   "include_authors" : 0,
                   "include_releaser" : 1,
                   "order_by" : "name",
@@ -1540,7 +1542,7 @@
             "class" : "Dist::Zilla::Plugin::DROLSKY::Git::CheckFor::CorrectBranch",
             "config" : {
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.33.1",
+                  "git_version" : "2.35.1",
                   "repo_root" : "."
                }
             },
@@ -1556,7 +1558,7 @@
             "class" : "Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts",
             "config" : {
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.33.1",
+                  "git_version" : "2.35.1",
                   "repo_root" : "."
                }
             },
@@ -1599,7 +1601,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.33.1",
+                  "git_version" : "2.35.1",
                   "repo_root" : "."
                }
             },
@@ -1629,7 +1631,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.33.1",
+                  "git_version" : "2.35.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -1646,12 +1648,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v1.33",
+                  "tag" : "v1.34",
                   "tag_format" : "v%V",
                   "tag_message" : "v%V"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.33.1",
+                  "git_version" : "2.35.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -1671,7 +1673,7 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.33.1",
+                  "git_version" : "2.35.1",
                   "repo_root" : "."
                }
             },
@@ -1712,7 +1714,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.33.1",
+                  "git_version" : "2.35.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -1732,7 +1734,7 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.33.1",
+                  "git_version" : "2.35.1",
                   "repo_root" : "."
                }
             },

@@ -9,7 +9,7 @@ use Carp qw(confess);
 
 # The following must be on the same line to ensure that $VERSION is read
 # correctly by PAUSE and installer tools. See docu of 'version'.
-use version 0.77; our $VERSION = version->declare("v2.1.0");
+use version 0.77; our $VERSION = version->declare("v2.2.0");
 
 
 sub new {
@@ -156,8 +156,35 @@ my $_reset = sub {
 
 
 # just a function, not a method.
+sub _rule_pos_array_f {
+  my ($str) = @_;
+  my @rule_pos;
+  my $idx = index($str, '|');
+  while($idx != -1) {
+    push(@rule_pos, $idx);
+    $idx = index($str, '|', $idx + 1);
+  }
+  return \@rule_pos;
+}
+
+# just a function, not a method.
+sub _int_array_cmp {
+  my ($arr1, $arr2) = @_;
+  return !1 if @$arr1 != @$arr2;
+  for (my $i = 0; $i < @$arr1; ++$i) {
+    return !1 if $arr1->[$i] != $arr2->[$i];
+  }
+  return 1;
+}
+
+# just a function, not a method.
 sub _parse_header_f {
-  my $header = shift;
+  my ($header, $pedantic) = @_;
+  $header =~ s/\s+$//;
+  my @rule_pos;
+  if ($pedantic) {
+    substr($header, -1, 1) eq '|' or die("'$header': Wrong header format");
+  }
   $header =~ s/^\s*\|.*?\|\s*// or die("'$header': Wrong header format");
   my @elem_array = $header eq "|" ? ('') : split(/\s*\|\s*/, $header);
   return ([], {}) if $header eq "";
@@ -197,7 +224,7 @@ my $_parse_row = sub {
 
 my $_parse_table = sub {
   my $self = shift;
-  my ($lines, $allow_subset) = @_;
+  my ($lines, $allow_subset, $pedantic) = @_;
   my $index = 0;
   for (; $index < @$lines; ++$index) { # skip heading empty lines
     last if $lines->[$index] =~ /\S/;
@@ -206,15 +233,37 @@ my $_parse_table = sub {
     $self->$_reset(1);
     return;
   }
-  my ($h_elems, $h_ids) = _parse_header_f($lines->[$index++]);
+  my ($h_elems, $h_ids) = _parse_header_f($lines->[$index], $pedantic);
+  my ($sep_line, $rule_pos);
+  if ($pedantic) {
+    ($sep_line = $lines->[$index]) =~ s/\s+$//;
+    $rule_pos = _rule_pos_array_f($sep_line);
+    for (my $i = 0; $i < @$rule_pos - 1; ++$i) {
+      my ($b, $e) = @{$rule_pos}[$i, $i + 1];
+      substr($sep_line, $b, 1, '+') if $i;
+      my $d = $e - $b;
+      next unless $d > 1;
+      --$d;
+      substr($sep_line, $b + 1, $d, '-' x $d);
+    }
+  }
   my $elem_ids;
   my %rows;
-  my @rowElems;                 # To keep oder of additional roe elements, if any.
-  for (; $index < @$lines; ++$index) {
-    (my $line = $lines->[$index]) =~ s/^\s+//;
+  my @rowElems;                 # To keep oder of additional row elements, if any.
+  for (++$index; $index < @$lines; ++$index) {
+    (my $line = $lines->[$index]) =~ s/\s+$//;
     last if $line eq q{};
-    next if substr($line, 0, 2) eq "|-";
-    $line =~ s/\s+$//;
+    if ($line =~ /^\s*\|-/) {
+      if ($pedantic) {
+        $line eq $sep_line or die("Invalid row separator at line " . ($index + 1));
+      }
+      next;
+    }
+    if ($pedantic) {
+      _int_array_cmp(_rule_pos_array_f($line), $rule_pos) or
+        die("Wrong row format at line " . ($index + 1));
+    }
+    $line =~ s/^\s*//;
     my ($rowElem, $rowContent) = $self->$_parse_row($line);
     die("'$rowElem': duplicate element in first column") if exists($rows{$rowElem});
     $rows{$rowElem} = $rowContent;
@@ -285,11 +334,12 @@ my $_parse_table = sub {
 
 sub get {
   my $self = shift;
-  confess("Missing argument")        if !@_;
   confess("Odd number of arguments") if @_ % 2;
   my %args = @_;
-  my $src          = delete $args{src}          // confess("Invalid value argument for 'src'");
   my $allow_subset = delete $args{allow_subset};
+  my $pedantic     = delete $args{pedantic};
+  confess("Missing argument 'src'") if !@_;
+  my $src          = delete $args{src}          // confess("Invalid value argument for 'src'");
   confess(join(", ", sort(keys(%args))) . ": unexpected argument") if %args;
   my $inputArray;
   if (ref($src)) {
@@ -306,7 +356,7 @@ sub get {
     $inputArray = [split(/\n/, $src)];
   }
   $self->$_reset() if !$self->{prespec};
-  $self->$_parse_table($inputArray, $allow_subset);
+  $self->$_parse_table($inputArray, $allow_subset, $pedantic);
   return wantarray ? @{$self}{qw(matrix elems elem_ids)} : $self;
 }
 
@@ -376,7 +426,7 @@ Text::Table::Read::RelationOn::Tiny - Read binary "relation on (over) a set" fro
 
 =head1 VERSION
 
-Version v2.1.0
+Version v2.2.0
 
 
 =head1 SYNOPSIS
@@ -400,13 +450,13 @@ The table format must look like this:
 
 
    | x\y     | this | that | foo bar |
-   |---------+------+------+---------+
+   |---------+------+------+---------|
    | this    | X    |      | X       |
-   |---------+------+------+---------+
+   |---------+------+------+---------|
    | that    |      |      | X       |
-   |---------+------+------+---------+
+   |---------+------+------+---------|
    | foo bar |      | X    |         |
-   |---------+------+------+---------+
+   |---------+------+------+---------|
 
 =over
 
@@ -430,10 +480,13 @@ The hotizontal rules are optional.
 
 =item *
 
-There is not something like a format check for the horizontal rules or
-alignment. Any line starting with C<|-> is simply ignored, regardless of the
-other subsequent characters, if any. Also, the C<|> need not to be aligned,
-and heading spaces are ignored.
+By default, there is not something like a format check for the horizontal
+rules or alignment. Any line starting with C<|-> is simply ignored, regardless
+of the other subsequent characters, if any. Also, the C<|> need not to be
+aligned, and heading spaces are ignored.
+
+However, a format check can be enabled by specifying C<get> argument
+C<pedantic> with a true value.
 
 =item *
 
@@ -585,7 +638,7 @@ description of argument C<set>.
 
 =head3 get
 
-The method reads and parses a table. It takes two named arguments.
+The method reads and parses a table. It takes the following named arguments:
 
 =over
 
@@ -614,9 +667,28 @@ that file.
 
 =item C<allow_subset>
 
-Optional. Take a boolean value. If I<true>, then rows and columns need not to
+Optional. Takes a boolean value. If I<true>, then rows and columns need not to
 be equal and may contain a subset of the relation's base set only. This way
 you can omit rows and columns not containing any incidences.
+
+=item C<pedantic>
+
+Optional. Takes a boolean value. If I<true>, then some additional table format
+checks are done:
+
+=over
+
+=item * Each row (incl. the header) must have a trailing C<|> character
+
+=item * C<|> characters (and C<+> characters of row seperators) must be aligned.
+
+=item * Row separators are also checked, but are still optional.
+
+=item * Indentation (if any) must be the same for all table rows.
+
+=back
+
+Default is I<false>.
 
 =back
 

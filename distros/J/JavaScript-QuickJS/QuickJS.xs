@@ -43,7 +43,7 @@ const char* __jstype_name_back[] = {
 static SV* _JSValue_to_SV (pTHX_ JSContext* ctx, JSValue jsval, SV** err_svp);
 
 static inline SV* _JSValue_object_to_SV (pTHX_ JSContext* ctx, JSValue jsval, SV** err_svp) {
-    assert(!err_svp);
+    assert(!*err_svp);
 
     JSPropertyEnum *tab_atom;
     uint32_t tab_atom_count;
@@ -540,8 +540,6 @@ std (SV* self_sv)
         os = 1
         helpers = 2
     CODE:
-        RETVAL = SvREFCNT_inc(self_sv);
-
         perl_qjs_s* pqjs = exs_structref_ptr(self_sv);
 
         switch (ix) {
@@ -553,10 +551,13 @@ std (SV* self_sv)
                 break;
             case 2:
                 js_std_add_helpers(pqjs->ctx, 0, NULL);
+                break;
 
             default:
-                assert(0);
+                croak("%s: Bad XS alias: %d\n", __func__, ix);
         }
+
+        RETVAL = SvREFCNT_inc(self_sv);
 
     OUTPUT:
         RETVAL

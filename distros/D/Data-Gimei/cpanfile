@@ -1,4 +1,5 @@
-requires 'perl'             => '5.022001';
+requires 'perl',             '5.022001';
+requires 'Carp';
 requires 'File::Share';
 requires 'Moo';
 requires 'YAML::XS';
@@ -8,7 +9,6 @@ requires 'version';
 
 on configure => sub {
     requires 'Module::Build::Tiny', '0.035';
-    requires 'perl', '5.008_001';
 };
 
 on develop => sub {

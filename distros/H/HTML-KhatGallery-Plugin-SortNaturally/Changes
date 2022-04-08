@@ -1,13 +1,16 @@
-Revision history for HTML-KhatGallery-Plugin-SortNaturally
+Revision History for HTML-KhatGallery-Plugin-SortNaturally
 ==========================================================
 
-0.01 Tue 15 August 2006
------------------------
+v0.02 2022-04-07
+----------------
 
-  * (15 Aug 2006) tweaking documentation
+* 2022-04-07 17:05:02 +1000
+  added .gitignore file
+* 2022-04-07 17:02:21 +1000
+  changing over to Dist::Zilla
+* 2007-12-16 09:05:15 +0000
+  revamped depot
 
-  * (15 Aug 2006) tweaking setup stuff
-
-  * (15 Aug 2006) initial checkin
-0.01 Tue Aug 15 14:32:56 2006
-	- original version; created by Module::Starter
+====================================
+End of changes in the last 1000 days
+====================================

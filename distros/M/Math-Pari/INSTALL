@@ -92,13 +92,18 @@ else fails.
 
 ==================================================================
 Other recognized options:
-  force_download		Download PARI/GP even if a directory is found
+  force_download		Download PARI/GP even if its build directory
+				  is found
+  force_patch			Patch PARI/GP build directory even if it is
+				  not in a subdirectory
   paridir=PATH_TO_DIST_DIR	Use the directory with Pari distribution
   pari_tgz=PATH_TO_TAR_GZ	To extract a local pari*.tar.gz and patch
 		(if needed) the resulting directory tree.
 				(If not a file, is considered as a filter on
 				 files to download; "pari-2.3.5.tar.gz" or
-				 "2.1" would work.)
+  version_post23_ok=NUMBER	Unless 1 (default=0), will skip (unsupported!)
+  		versions >=2.4.0 of PARI in automatic search
+  		(N/A if `paridir' is given).
 
 Obsolete:
   version23_ok=NUMBER		Unless 1 (default), will skip versions 2.3.*

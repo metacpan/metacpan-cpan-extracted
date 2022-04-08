@@ -1,9 +1,9 @@
 #!perl -wT
 
 use strict;
+use Test::Most tests => 11;
 
 use lib 'lib';
-use Test::Most tests => 10;
 use lib 't/lib';
 use MyLogger;
 
@@ -12,7 +12,7 @@ BEGIN {
 }
 
 SKIP: {
-	skip 'Database not installed', 9, if(!-r 'lib/Genealogy/ObituaryDailyTimes/database/obituaries.sql');
+	skip 'Database not installed', 10, if(!-r 'lib/Genealogy/ObituaryDailyTimes/database/obituaries.sql');
 
 	if($ENV{'TEST_VERBOSE'}) {
 		Genealogy::ObituaryDailyTimes::DB::init(logger => MyLogger->new());
@@ -32,12 +32,14 @@ SKIP: {
 	my $baal = $search->search({ first => 'Eric', last => 'Baal' });
 	is($baal->{'url'}, 'https://mlarchives.rootsweb.com/listindexes/emails?listname=gen-obit&page=96', 'Check Baal URL');
 
-	my $coppage = $search->search({ first => 'John', middle => 'W', last => 'Coppage' });
-	is($coppage->{'middle'}, 'W', 'Test middle initial');
-	is($coppage->{'url'}, 'https://www.freelists.org/post/obitdailytimes/Obituary-Daily-Times-v26no080', 'Check Coppage URL');
+	my @coppage = $search->search({ first => 'John', middle => 'W', last => 'Coppage' });
+
+	ok(scalar(@coppage) > 0, 'At least one John Coppage');
+	is(grep($_->{'middle'} eq 'W', @coppage), scalar(@coppage), 'Every match has the correct middle initial');
+	is(grep($_->{'url'} eq 'https://www.freelists.org/post/obitdailytimes/Obituary-Daily-Times-v26no080', @coppage), 1, 'Find the expected URL exactly one time');
 
 	if($ENV{'TEST_VERBOSE'}) {
-		diag(Data::Dumper->new([$coppage])->Dump());
+		diag(Data::Dumper->new([\@coppage])->Dump());
 	}
 
 	# Continuity line

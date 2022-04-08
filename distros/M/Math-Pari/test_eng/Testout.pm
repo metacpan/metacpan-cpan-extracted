@@ -3,7 +3,7 @@
 
 use strict;
 use Math::Pari qw(:DEFAULT pari_print :all);
-use vars qw($x $y $z $k $t $q $a $u $j $l $name $other $n);
+use vars qw($x $y $z $k $t $q $a $u $i $j $l $name $other $n);
 die "Need a path to a testout file" unless @ARGV;
 
 my $file = CORE::shift;
@@ -23,7 +23,11 @@ my $matched_par;
 $matched_par = qr[[^()]*(?:\((??{$matched_par})\)[^()]*)*];		# arbitrary string with ( and ) matching
 my %ourvars;
 my $ourvars_rx = qr/(?!)/;
+my $skipvars_rx = qr/(?!)/;
 
+my $can_matrix = eval {PARImat_tr([[3]]) == matrix(1, 1, my $x, my $y, sub{3})} ;	# after 2.3.5, but before support
+my $or_matrix = (not $can_matrix and "|matrix");
+my $or_matrix_out = (not $can_matrix and " (or matrix())");
 
 (my $ifile = $file) =~ s[(?<=/test/)(32|64)/][in/];
 {
@@ -174,7 +178,7 @@ sub format_matrix {
 sub format_vvector {
   my $in = CORE::shift;
   $in =~ s/~\s*$//;
-  "PARIcol($in)";
+  "PARIcolL($in)";
 }
 
 sub re_format {			# Convert PARI output to a regular expression
@@ -273,10 +277,10 @@ sub subify_iterators ($$) {
   if ($use_dollars_in_argsign) {
     $subargs = ' ($) ';
     if ($pre =~ /^(v?vector|fordiv|sumdiv|plothexport)\(/) {
-      $pre =~ /^\w+\s*\([^,]*,\s*([\$\w]+)\s*,/ or die "Unexpected iterator `$pre\{\{\{$code\}\}\}'";
+      $pre =~ /^\w+\s*\([^,]*,\s*([\$\w]+)\s*,/ or die "Cannot find iterator variable in `$pre\{\{\{$code\}\}\}'";
       $subdecl = "my $1 = CORE::shift;"
     } else {
-      $pre =~ /^\w+\s*\(\s*([\$\w]+)\s*,/ or die "Unexpected iterator `$pre\{\{\{$code\}\}\}'";
+      $pre =~ /^\w+\s*\(\s*([\$\w]+)\s*,/ or die "Cannot find iterator variable in `$pre\{\{\{$code\}\}\}'";
       $subdecl = "my $1 = CORE::shift;"
     }
   }
@@ -286,6 +290,8 @@ sub subify_iterators ($$) {
 
 sub filter_res ($) { # In PARI’s Mod() output there is an extra space comparing to ours
   my $r = CORE::shift;
+  $r =~ s/(\bmatrix\([^\s,]+)\s+/$1,/g;
+#  	warn "### ->\t$r\n";
   return $r unless $r =~ /\bMod\(/;
   $r =~ s/,\s+/,/g;
   return $r;
@@ -424,7 +430,7 @@ sub process_test {
 			(
 			  my _
 			)?
-			p? print \(
+			(?: p? print $or_matrix ) \(
 			( \[ | (1 ,)? PARImat )
 		      |	  # Too many parens: will not be wrapped in sub{...}
 		      	\b forprime .* \){5}
@@ -482,7 +488,7 @@ sub process_test {
       }
     } elsif ($userfun
 	     and $in =~ / \b ($userfun) \s* \( /x) {
-      print "# `$in'\nok $current_num # Skipping (user function containing print() or error() or a converted-to-Perl variable)\n";
+      print "# `$in'\nok $current_num # Skipping (user function containing print() or error() $or_matrix_out or a converted-to-Perl variable)\n";
       $RET = 1;
     } elsif ($installed
 	     and $in =~ / \b ($installed) \s* \( /x) {
@@ -493,8 +499,11 @@ sub process_test {
 #      # XXXX Will result in a wrong answer, but we moved these tests to a different
 #      print "# `$in'\nok $current_num # Skipping (would fail, checked in different place)\n";
 #      $RET = 1;
-    } elsif ($in =~ /\b(nonesuch now|nfisincl)\b/) {
+    } elsif ($in =~ /\b(nonesuch now|nfisincl$or_matrix)\b/) {
       print "# `$in'\nok $current_num # Skipping (possibly FATAL $1)\n";
+      $RET = 1;
+    } elsif ($in =~ /\$?\b($skipvars_rx)\b/) {
+      print "# `$in'\nok $current_num # Skipping (a variable `$1' was possibly defined in a skipped statement)\n";
       $RET = 1;
     } elsif ($in =~ $skip_fun_rx) {
       print "# `$in'\nok $current_num # Skipping (see a PARI function $1() calling print() or error())\n";
@@ -502,6 +511,8 @@ sub process_test {
     }
     # Convert transposition
     $in =~ s/(\$?\w+(\([^()]*\))?|\[([^\[\]]+(?=[\[\]])|\[[^\[\]]*\])*\])~/mattranspose($1)/g;
+    # Convert strings with a simple word
+    $in =~ s/("\w+")/'$1'/g unless $in =~ /\b(my_)?print\b/;	# XXX Silly ad hoc trick (temporary???)
     if ($in =~ /~/) {
       print "# `$in'\nok $current_num # Skipping (transpose notation)\n";
       $RET = 1;
@@ -510,7 +521,12 @@ sub process_test {
       print "# `$in'\nok $current_num # Skipping (-> notation)\n";
       $RET = 1;
     }
-    if ($RET and $in =~ /^(\w+)\([^()]*\)=(?!=)/) {
+    if ($RET) {
+      while ($in =~ /(?:^|;)\$?(\w+)=(?!=)/g) {
+        $skipvars_rx .= "|$1";
+      }
+    }
+    if ($RET and $in =~ /(?:^|;)\$?(\w+)\([^()]*\)=(?!=)/) {
       my $n = $1;
       if ($in =~ /\b(print|error|$ourvars_rx)\b/) {
 	push @skip_fun, $n;
@@ -584,6 +600,9 @@ sub process_test {
     if ($in =~ /\.((?!\d|(?<=\d\.)e-?\d)\w+(?![\w"]))/) {
       print("# `$in'\nok $current_num # Skipping: methods not supported yet (.$1)\n"), return;
     }
+    if ($in =~ /(?<!\|)\|\s*\$?\w+\s*<-/) {
+      print("# `$in'\nok $current_num # Skipping: |var<- not supported yet\n"), return;
+    }
     # Prepend $ to variables (not before '^' - inside of 'o(x^17)'):
     $in =~ s/(^|[^\$])\b([a-zA-Z]\w*)\b(?!\s*[\(^])/
       		($1 || '') . ($seen{$2} || $seen_now{$2} || '') . $2
@@ -597,189 +616,117 @@ sub process_test {
     # Simplify for the following conversion:
     $in =~ s/\brandom\(\)/random/g;
     # Sub-ify sum,prod,intnum* sumnum etc, psploth, ploth etc
+    my $oneArg = qr/(?:			# 3 levels of parentheses supported
+                      [^(,)\[\]]+
+                      (?=
+                        [(,)\[\]]
+                      )
+                    |
+                      \(		# One level of parenths
+                      (?:
+                        [^()]+
+                        (?=
+                          [()]
+                        )
+                      |
+                        \(	# Second level of parenths
+                          (?:
+                            [^()]+
+                            (?=
+                              [()]
+                            )
+                            | \( [^()]* \) # Third level of parens
+                          )*
+                        \)	# Second level of parenths ends
+                      )*
+                      \)
+                    |
+                      \[		# One level of brackets
+                      (?:
+                        [^\[\]]+
+                        (?=
+                          [\[\]]
+                        )
+                      |
+                        \[ [^\[\]]+ \] # Second level of brackets
+                      )*
+                      \]
+                    )*		# 3 levels of parenths supported
+		  /x;
     1 while
-      $in =~ s/
-		(
-		  \b
-		  (?:		# For these, sub{}ify the fourth argument
-		    sum
-		  |
-		    intnum(?!init\b)\w*
-		  |
-		    intfuncinit
-		  |
-		    int\w*inv
-		  |
-		    intcirc\w*
-		  |
-		    sumnum(?!init\b)\w*
-		  |
-		    forprime
-		  |
-		    psploth
-		  |
-		    ploth
-		  |
-		    prod (?: euler )?
-		  |
-		    direuler
-		  ) \s*
-		  \(
-		  (?:
-		     (?:
-		       [^(=,)\[\]]+ # One argument without (), []
-		       (?=
-		         [(=,)\[\]]
-		       )
-		     |		# One or two levels of parenths supported
-		       \( [^()]* \)
-		     |
-		       \( (?: [^()] | \( [^()]* \))* \)
-		     |		# Two levels of brackets supported
-		       \[ [^\[\]]* \]
-		     |
-		       \[ (?: [^\[\]] | \[ [^\[\]]* \] )* \]
-		     )*
-		  [,=]){3}		# $x,1,100
-	        |		# For these, sub{}ify the third argument
+      $in =~ s/ (
 		  \b
 		  (?:
-		    sumalt
-		  |
-		    prodinf
+                    (?:		# For these, sub{}ify the fourth argument
+                      sum
+                    |
+                      intnum(?!init\b)\w*
+                    |
+                      intfuncinit
+                    |
+                      int\w*inv
+                    |
+                      intcirc\w*
+                    |
+                      sumnum(?!init\b)\w*
+                    |
+                      forprime
+                    |
+                      psploth
+                    |
+                      ploth
+                    |
+                      prod (?: euler )?
+                    |
+                      direuler
+                    )  \s*
+		    \(  (?: $oneArg [=,] ){3}	# $x,1,100
+		  | (?:				# For these, sub{}ify the third argument
+                      sumalt
+                    |
+                      prodinf
+                    )  \s*
+		    \(  (?: $oneArg [=,] ){2}	# $x,1
+		  | (?:				# For these, sub{}ify the fifth argument
+                      plothexport
+                    )  \s*
+		    \(  (?: $oneArg [=,] ){4}	# "ps",$x,100
+		  | (			# 2: For these, sub{}ify the last argument
+                      solve
+                    |
+                      (?:
+                        post
+                      )?
+                      ploth (?! raw (?:export)? \b | sizes \b | export \b ) \w+
+                    |
+                      # sum \w*
+                      sum (?! alt | num (?:init)? \b) \w+
+                    |
+                      v? vector v?
+                    |
+                      matrix
+                    |
+                      intgen
+                    |
+                      intopen
+                    |
+                      for \w*
+                    )  \s*
+		    \(  (?: $oneArg , )*		# "ps",$x,1,100; do not accept "=" after the iterator variable
 		  )
-		  \(
-		  (?:
-		     (?:
-		       [^(=,)]+
-		       (?=
-		         [(=,)]
-		       )
-		     |
-		       \s*\w*\( [^()]+ \)\s*
-		     )*		# One level of func-call (PARI('.3')) supported
-		  [,=]){2}		# $x,1
 		)				# end group 1
 		(?!\s*sub(?:\s*\(\$*\))?\s*\{)	# Skip already converted...
-		(		# 2: This follows after a comma on toplevel
-		  (?:
-		    [^(,)\[\]]+
-		    (?=
-		      [(,)\[\]]
-		    )
-		  |
-		    \(		# One level of parenths
-		    (?:
-		      [^()]+
-		      (?=
-			[()]
-		      )
-		    |
-		      \(	# Second level of parenths
-			(?:
-			  [^()]+
-			  (?=
-			    [()]
-			  )
-			  | \( [^()]* \) # Third level of parens
-			)*
-		      \)	# Second level of parenths ends
-		    )*
-		    \)
-		  |
-		    \[		# One level of brackets
-		    (?:
-		      [^\[\]]+
-		      (?=
-			[\[\]]
-		      )
-		    |
-		      \[ [^\[\]]+ \] # Second level of brackets
-		    )*
-		    \]
-		  )*		# Two levels of parenths supported
-		)				# end group 2
-		(?= [),] )
-	      /subify_iterators("$1","$2")/xge;
-    # Do the rest (do not take = after the variable name)
-    1 while
-      $in =~ s/
-		(
-		  \b
-		  (		# For these, sub{}ify the last argument
-		    solve
-		  |
-		    (?:
-		      post
-		    )?
-		    ploth (?! raw (?:export)? \b ) \w+
-		  |
-		    # sum \w*
-		    sum (?! alt | num (?:init)? \b) \w+
-		  |
-		    # prod \w*
-		    prodinf
-		  |
-		    v? vector v?
-		  |
-		    matrix
-		  |
-		    intgen
-		  #|
-		  #  intnum
-		  |
-		    intopen
-		  |
-		    for \w*
-		  )
-		  \(
-		  (?:
-		    [^()]+
-		    (?=
-		      [(,)]
-		    )
-		  |
-		    \( [^()]+ \)
-		  )+		# One level of parenths supported
-		  ,
-		)
-		(?!\s*sub(?:\s*\(\$*\))?\s*\{)	# Skip already converted...
-		(		# 3: This follows after a comma on toplevel
-		  (?:
-		    [^(,)\[\]]+
-		    (?=
-		      [()\[\]]
-		    )
-		  |
-		    \(		# One level of parenths
-		    (?:
-		      [^()]+
-		      (?=
-			[()]
-		      )
-		    |
-		      \( [^()]+ \) # Second level of parenths
-		    )*
-		    \)
-		  |
-		    \[		# One level of brackets
-		    (?:
-		      [^\[\]]+
-		      (?=
-			[\[\]]
-		      )
-		    |
-		      \[ [^\[\]]+ \] # Second level of brackets
-		    )*
-		    \]
-		  )*		# Two levels of parenths supported
-		)
-		\)
-	      /subify_iterators("$1","$3") . ')'/xge;
+		( $oneArg )			# 3: This follows after a comma on toplevel
+		(?(2) (?= \) ) | (?= [),] ) )
+	      /subify_iterators("$1","$3")/xge;
     # Convert 10*20 to integer
     $in =~ s/(\d+)(?=\*\*\d)/ PARI($1) /g;
     # Convert blah[3], blah()[3] to blah->[-1+3]
     $in =~ s/([\w\)])\[/$1 -> [-1+/g;
+    # Fix [,3] converted to [-1+,3]
+    $in =~ s/\[-1\+,/\[-1+/g;
+    # Fix [2,3] converted to [-1+2,3]
+    $in =~ s/\[(-1\+[^,\[\]\(\)]+),([^\(\)\[\]]+)\]/\[-1+$2\]\[$1\]/g;
     # Workaround for &eval test:
     $in =~ s/\$y=\$x;&eval\b(.*)/PARI('y=x');&eval$1;\$y=\$x/;
     $in =~ s/\$yy=\$xx;&eval\b(.*)/PARI('yy=xx');&eval$1;\$yy=\$xx/;
@@ -791,6 +738,8 @@ sub process_test {
     $in =~ s/^kill\(\$(\w+)\);/kill('$1');\$$1=PARIvar '$1';/;
     # Workaround for plothsizes:
     $in =~ s/\bplothsizes\(/safe_sizes(/;
+    # XXXX Silly workaround for `my' (probably a side effect of replacing "var=" by "var," in iterators???)
+    $in =~ s/(?<=\bmy\(\$)(\w+),(?=\w+\()/$1)=(/g;
     print "# eval", ($noans ? "-$noans" : '') ,": $in\n";
     $printout = '';
     my $have_floats = ($in =~ /\d+\.\d*|\d{10,}/
@@ -881,6 +830,8 @@ sub process_test {
       } elsif ($@ =~ /high resolution graphics disabled/
 	       and 0 >= Math::Pari::have_graphics()) {
 	print "# in='$in'\nok $current_num # Skipped: graphic is disabled in this build\n";
+      } elsif ($@ =~ /pari_daemon without waitpid & setsid is not yet implemented/) {
+	print "# in='$in'\nok $current_num # Skipped: graphic (pari_daemon) is disabled in this build\n";
       } elsif ($@ =~ /gnuplot-like plotting environment not loaded yet/
 	       and $skip_gnuplot) {
 	print "# in='$in'\nok $current_num # Skipped: Term::Gnuplot is not loaded\n";

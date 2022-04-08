@@ -1,5 +1,11 @@
 Revision history for Perl extension Data-Gimei
 
+v0.0.6 2022-04-07T05:28:50Z
+
+    - remove requirements of perl version on develop
+    - Add test case to t/address.t
+    - Add handling of load error
+
 v0.0.5 2022-02-04T08:29:01Z
 
     - change requirements of perl version

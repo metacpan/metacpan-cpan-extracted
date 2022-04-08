@@ -8,7 +8,7 @@ Log::Log4perl::Tiny - mimic Log::Log4perl in one single module
 
 =head1 VERSION
 
-This document describes Log::Log4perl::Tiny version 1.6.2.
+This document describes Log::Log4perl::Tiny version 1.6.4.
 
 =begin html
 

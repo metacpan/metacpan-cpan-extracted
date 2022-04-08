@@ -45,7 +45,7 @@ unless (-t STDOUT) {		# Better reports if run with redirections
 
 chmod 0400, 'typemap' if $^O =~ /cygwin/ and -f 'typemap' and not -r 'typemap';	# bug in some installations of cygwin???
 
-my($ok23, $force_download, $force_patch, $parilib, $pariincludes, $parisrc, $paridir, $pari_version) = 1;
+my($ok23, $okPost23, $force_download, $force_patch, $parilib, $pariincludes, $parisrc, $paridir, $pari_version) = 1;
 
 grep {/^machine=(.*)$/i		 and $common::machine = $1}  @ARGV;
 grep {/^configure$/i		 and $common::do_configure = 1}	     @ARGV;
@@ -55,13 +55,14 @@ grep {/^force_download$/i	 and $force_download = 1}    @ARGV;
 grep {/^parilibs=(.*)$/i	 and $parilib = $1}	     @ARGV;
 grep {/^pariincludes=(.*)$/i	 and $pariincludes = $1}     @ARGV;
 grep {/^version23_ok=(.*)$/i	 and $ok23 = $1}	     @ARGV;
+grep {/^version_post23_ok=(.*)$/i and $okPost23 = $1}	     @ARGV;
 grep {/^force_patch(=\d+)?$/i	 and $force_patch = (defined $1 ? $1 : 1)}  @ARGV;
 # grep {/^OPTIMIZE=(?<![^\s=])-g(?!\S)/i	 and $dbg = 1}  @ARGV;	# -Og (= optimize what does not interfere with debug) needs -g
 
 # The REx should anchored-match versions to skip
-$common::skip_versions = $ok23 ? '2\.(?:[4-9]|\d\d+)\.' : '2\.(?:[3-9]|\d\d+)\.';
+$common::skip_versions = $okPost23 ? '(?!)' : ($ok23 ? '2\.(?:[4-9]|\d\d+)\.' : '2\.(?:[3-9]|\d\d+)\.');
 
-@ARGV = grep !/^((machine|paridir|pari_tgz|parilibs|pariincludes|version23_ok|force_patch)=.*|configure|force_download)$/i, @ARGV;
+@ARGV = grep !/^((machine|paridir|pari_tgz|parilibs|pariincludes|version23_ok|version_post23_ok|force_patch)=.*|configure|force_download)$/i, @ARGV;
 
 my %patchrc;
 

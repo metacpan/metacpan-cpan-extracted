@@ -9,17 +9,8 @@ use Text::Table::Read::RelationOn::Tiny;
 use constant RELATION_ON => "Text::Table::Read::RelationOn::Tiny"; # to make calls shorter.
 
 sub err_like(&$);
-#use constant TEST_DIR => catdir(dirname(__FILE__), 'test-data');
-#<
-# {
-#   note("Data error: other");
-#   my $obj = RELATION_ON->new();
-#   err_like {$obj->get(src => "|.|a|foo|a|\n")}        qr/^Wrong xxxxrow format: 'bar'/;
-#   err_like {$obj->get(src => "|.|foo|\nbar")}         qr/^Wrong row format: 'xxxbar'/;
-# #  my $obj = RELATION_ON->new();
-# #  err_like {$obj->get(src => "|.|a|foo|a|\n")}        qr/^'a': duplicate name in header/;
-# }
-# done_testing(); exit;
+sub no_err(&);
+
 {
   note("Constructor args");
   err_like {RELATION_ON->new(1)}                        qr/^Odd number of arguments/;
@@ -32,7 +23,7 @@ sub err_like(&$);
 
   err_like {RELATION_ON->new(set => {})}                qr/^set: must be an array reference/;
 
-  err_like {RELATION_ON->new(set => [1, undef, 3])}     qr/^set: entry 2: invalid/;
+ err_like {RELATION_ON->new(set => [1, undef, 3])}     qr/^set: entry 2: invalid/;
   err_like {RELATION_ON->new(set => [{}, 2, 3])}        qr/^set: entry 1: invalid/;
 
   err_like {RELATION_ON->new(set => [1, [], 3])}
@@ -133,7 +124,7 @@ sub err_like(&$);
 {
   note("get() args");
   my $obj = RELATION_ON->new();
-  err_like {$obj->get()}               qr/^Missing argument/;
+  err_like {$obj->get()}               qr/^Missing argument 'src'/;
   err_like {$obj->get(1, 2, 3)}        qr/^Odd number of arguments/;
   err_like {$obj->get(src => "",
                       FOO => 22)}      qr/^FOO: unexpected argument/;
@@ -236,6 +227,85 @@ sub err_like(&$);
 
 }
 
+{
+  note("Pedantic: header");
+  my @src = ("|.|a|b|c",
+             "|c| | | |",
+             "|b| | | |",
+             "|a| | |X|");
+  my $obj = RELATION_ON->new(set => [qw(a b c)]);
+  no_err {$obj->get(  src      => \@src)};
+  err_like {$obj->get(src      => \@src,
+                      pedantic => 1)}   qr/Wrong header format/;
+}
+
+
+{
+  note("Pedantic: row 1");
+  my @src = ("|.|a|b|c|",
+             "|c| |   | |",
+             "|b| | | |",
+             "|a| | |X|");
+  my $obj = RELATION_ON->new(set => [qw(a b c)]);
+  no_err {$obj->get(  src      => \@src)};
+  err_like {$obj->get(src      => \@src,
+                      pedantic => 1)}   qr/Wrong row format at line 2\b/;
+}
+
+{
+  note("Pedantic: row 2");
+  my @src = ("  |.|a|b|c|",
+             "|c| | | |",
+             "  |b| | | |",
+             "  |a| | |X|");
+  my $obj = RELATION_ON->new(set => [qw(a b c)]);
+  no_err {$obj->get(  src      => \@src)};
+  err_like {$obj->get(src      => \@src,
+                      pedantic => 1)}   qr/Wrong row format at line 2\b/;
+}
+
+
+{
+  note("Pedantic: row 3");
+  my @src = ("|.|a|b|c|",
+             "|c| | |  ",
+             "|b| | | |",
+             "|a| | |X|");
+  my $obj = RELATION_ON->new(set => [qw(a b c)]);
+  no_err {$obj->get(  src      => \@src)};
+  err_like {$obj->get(src      => \@src,
+                      pedantic => 1)}   qr/Wrong row format at line 2\b/;
+}
+
+
+
+{
+  note("Pedantic: row sep 1");
+  my @src = ("|.|a|b|c|",
+             "|-----",
+             "|c| | | | ",
+             "|b| | | |",
+             "|a| | |X|");
+  my $obj = RELATION_ON->new(set => [qw(a b c)]);
+  no_err {$obj->get(  src      => \@src)};
+  err_like {$obj->get(src      => \@src,
+                      pedantic => 1)}   qr/Invalid row separator at line 2\b/;
+}
+
+{
+  note("Pedantic: row sep 2");
+  my @src = ("|.|a|b|c|",
+             " |-+-+-+-|",
+             "|c| | | | ",
+             "|b| | | |",
+             "|a| | |X|");
+  my $obj = RELATION_ON->new(set => [qw(a b c)]);
+  no_err {$obj->get(  src      => \@src)};
+  err_like {$obj->get(src      => \@src,
+                      pedantic => 1)}   qr/Invalid row separator at line 2\b/;
+}
+
+
 #--------------------------------------------------------------------------------------------------
 
 #
@@ -251,9 +321,16 @@ sub err_like(&$) {
     (my $err = $@) =~ s/\n.*//s;  ## Important: cut off stacktrace
     like($err, $re, "Error message ok");
   } else {
-    fail("Coded did not produce error");
+    fail("Code did not produce error");
     return "";
   }
+}
+
+sub no_err(&) {
+  my ($sub) = @_;
+  local $Test::Builder::Level = $Test::Builder::Level + 1;
+  eval {$sub->()};
+  ok(!$@, "Code did not produce an error $@");
 }
 
 #==================================================================================================

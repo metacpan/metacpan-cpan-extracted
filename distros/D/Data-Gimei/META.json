@@ -28,8 +28,7 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "Module::Build::Tiny" : "0.035",
-            "perl" : "5.008_001"
+            "Module::Build::Tiny" : "0.035"
          }
       },
       "develop" : {
@@ -44,6 +43,7 @@
       },
       "runtime" : {
          "requires" : {
+            "Carp" : "0",
             "File::Share" : "0",
             "Moo" : "0",
             "YAML::XS" : "0",
@@ -62,7 +62,7 @@
    "provides" : {
       "Data::Gimei" : {
          "file" : "lib/Data/Gimei.pm",
-         "version" : "v0.0.5"
+         "version" : "v0.0.6"
       },
       "Data::Gimei::Address" : {
          "file" : "lib/Data/Gimei/Address.pm"
@@ -85,7 +85,7 @@
          "web" : "https://github.com/youpong/pl-gimei"
       }
    },
-   "version" : "v0.0.5",
+   "version" : "v0.0.6",
    "x_contributors" : [
       "NAKAJIMA Yusaku <yupong7@gmail.com>",
       "youpong <43817652+youpong@users.noreply.github.com>"

@@ -1,0 +1,52 @@
+NAME
+    LWP::Authen::OAuth2::ServiceProvider::Wikimedia - Access Wikimedia using
+    OAuth2.
+
+SYNOPSIS
+     use LWP::Authen::OAuth2;
+
+     my $obj = LWP::Authen::OAuth2->new(
+             client_id => '__CLIENT_ID__',
+             client_secret => '__CLIENT_SECRET__',
+             service_provider => 'Wikimedia',
+
+             %{$other_parameters},
+     );
+
+DESCRIPTION
+    See <https://www.mediawiki.org/wiki/Extension:OAuth> for MediaWiki
+    extension documentation.
+
+    See <https://www.mediawiki.org/wiki/OAuth/For_Developers> page which is
+    for developers.
+
+REGISTERING
+    Before you can use OAuth 2 with Wikimedia you need to register yourself
+    as an app. For that, go to
+    <https://meta.wikimedia.org/wiki/Special:OAuthConsumerRegistration/propo
+    se> registration page.
+
+DEPENDENCIES
+    LWP::Authen::OAuth2::ServiceProvider::MediaWiki.
+
+SEE ALSO
+    LWP::Authen::OAuth2
+        Make requests to OAuth2 APIs.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/LWP-Authen-OAuth2-ServiceProvide
+    r-MediaWiki>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © Michal Josef Špaček 2022
+
+    BSD 2-Clause License
+
+VERSION
+    0.01
+

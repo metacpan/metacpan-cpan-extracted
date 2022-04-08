@@ -10,6 +10,7 @@ use CPAN::Meta::Prereqs;
 use CPAN::Meta::Requirements;
 use Perl::PrereqScanner::NotQuiteLite;
 use Perl::PrereqScanner::NotQuiteLite::Util::Prereqs;
+use Parse::Distname;
 
 use constant WIN32 => $^O eq 'MSWin32';
 
@@ -299,7 +300,8 @@ sub _exclude_core_prereqs {
       if (Module::CoreList::is_core($module, undef, $perl_version) and
           !Module::CoreList::deprecated_in($module, undef, $perl_version)
       ) {
-        my $core_version = $Module::CoreList::version{$perl_version}{$module} or next;
+        next unless exists $Module::CoreList::version{$perl_version}{$module};
+        my $core_version = $Module::CoreList::version{$perl_version}{$module};
         next unless $req->accepts_module($module => $core_version);
         $req->clear_requirement($module);
         if ($self->{verbose}) {
@@ -371,14 +373,18 @@ sub __get_uri {
   my ($self, $module) = @_;
   my $res = $self->{index}->search_packages({ package => $module }) or return;
   ## ignore (non-dual) core modules
-  return if URI->new($res->{uri})->dist_name eq 'perl';
+  return if _dist_from_uri($res->{uri}) eq 'perl';
   return $res->{uri};
+}
+
+sub _dist_from_uri {
+  my $uri = shift;
+  $uri =~ s!^cpan:///\w+/!!;
+  Parse::Distname->new($uri)->dist;
 }
 
 sub _dedupe_indexed_prereqs {
   my ($self, $prereqs) = @_;
-
-  require URI::cpan;
 
   for my $req ($self->_requirements($prereqs)) {
     my %uri_map;
@@ -401,7 +407,7 @@ sub _dedupe_indexed_prereqs {
       }
 
       # Replace with the main module if none is versioned
-      my $dist = URI->new($uri)->dist_name;
+      my $dist = _dist_from_uri($uri);
       (my $main_module = $dist) =~ s/-/::/g;
       if ($self->_get_uri($main_module)) {
         $req->add_minimum($main_module);

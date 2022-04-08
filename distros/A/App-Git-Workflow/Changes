@@ -1,5 +1,14 @@
 Revision history for git-workflow-tools
 
+1.1.18   2022-04-06
+        Updating for release of version 1.1.18
+        Adding new files to default tests (Ivan Wills)
+        Updated date (Ivan Wills)
+        Protect against touching files not in the history (Ivan Wills)
+        Fixing docs (Ivan Wills)
+        New command git touch to set file times to when they changed in git (Ivan Wills)
+        Adding File::Touch to dependencies (Ivan Wills)
+
 1.1.17   2021-11-25
         Updating for release of version 1.1.17
         Adding new files to tests (Ivan Wills)

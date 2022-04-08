@@ -1,7 +1,7 @@
 package Mail::DKIM::DkimPolicy;
 use strict;
 use warnings;
-our $VERSION = '1.20200907'; # VERSION
+our $VERSION = '1.20220408'; # VERSION
 # ABSTRACT: represents a DKIM Sender Signing Practices record
 
 # Copyright 2005-2007 Messiah College.
@@ -193,7 +193,7 @@ Mail::DKIM::DkimPolicy - represents a DKIM Sender Signing Practices record
 
 =head1 VERSION
 
-version 1.20200907
+version 1.20220408
 
 =head1 DESCRIPTION
 

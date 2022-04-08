@@ -1,6 +1,11 @@
 Revision history for Perl extension JavaScript::QuickJS:
 
-0.04
+0.05 Thu 7 Apr 2022
+- Fix helpers() method.
+- Fix memory leak when std/os/helpers failed.
+- Fix bad assert check.
+
+0.04 Mon 4 Apr 2022
 - No production changes.
 - Fix typo’d test from 0.03.
 

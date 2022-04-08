@@ -1,0 +1,17 @@
+﻿All of the features of 2.3.5 are supported with newer versions of GP/PARI, except for iterators (sum() etc.).  For iterators
+with one variable (so: all except matrix()) there is a (temporary?) workaround: use a sub with an arg, as in:
+    sum($x,0,12, sub ($) {my $x = CORE::shift; $x^2})	# The first $x is ignored
+("Supported" does not mean that the tests do not fail; with 2.13.3, subtests 105-106 of "nfields" fail; there is also a
+mysterious precision loss in the [massaged] intnum-tests.)
+
+In addition to this, the following constructs are NOT TESTED by the test engine on newer GP/PARI
+  matrix
+  |var<-
+  System-specific graphic (at least not on windows???)
+  .methods
+  nfisincl
+  eval						(Signature "C" unsupported)
+  lexical variables are not special-cased	(Is there a need???)
+  [row,]
+  most of default()s
+(and maybe some others too — especially with unsupported signatures!).

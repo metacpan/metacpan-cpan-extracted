@@ -11,6 +11,7 @@ TODO-inprogress
 func_codes.h
 libPARI/Makefile.PL
 libPARI/gphelp
+libPARI/diff_gphelp
 libPARI/gphelp-ini
 libPARI/extract_codes.pl
 libPARI/expected_codes
@@ -79,3 +80,4 @@ auto-dbg/auto-debug-module.example-gdb-2_00
 auto-dbg/auto-debug-module.example-gdb-2_03_win
 auto-dbg/auto-debug-module.example-lldb-darwin-fail
 auto-dbg/README
+README-after2_3_5

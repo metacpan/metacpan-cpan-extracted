@@ -2,7 +2,7 @@ package Test2::Harness::Runner::State;
 use strict;
 use warnings;
 
-our $VERSION = '1.000119';
+our $VERSION = '1.000123';
 
 use Carp qw/croak/;
 
@@ -14,6 +14,8 @@ use Test2::Harness::Runner::Constants;
 
 use Test2::Harness::Runner::Run;
 use Test2::Harness::Util::Queue;
+
+use Test2::Harness::Util::UUID qw/gen_uuid/;
 
 use Test2::Harness::Util::HashBase(
     # These are construction arguments
@@ -91,15 +93,24 @@ sub done {
 
 sub next_task {
     my $self = shift;
+    my ($stage) = @_;
+
     $self->poll();
 
     while(1) {
-        return shift @{$self->{+PENDING_SPAWNS}} if @{$self->{+PENDING_SPAWNS} //= []};
+        if (@{$self->{+PENDING_SPAWNS} //= []}) {
+            my $spawn = shift @{$self->{+PENDING_SPAWNS}};
+            next unless $spawn->{stage} eq $stage;
+            $self->start_spawn($spawn);
+            return $spawn;
+        }
+
         my $task = shift @{$self->{+TASK_LIST}} or return undef;
 
         # If we are replaying a state then the task may have already completed,
         # so skip it if it is not in the running lookup.
         next unless $self->{+RUNNING_TASKS}->{$task->{job_id}};
+        next unless $task->{stage} eq $stage;
 
         return $task;
     }
@@ -121,6 +132,7 @@ my %ACTIONS = (
     queue_run   => '_queue_run',
     queue_task  => '_queue_task',
     queue_spawn => '_queue_spawn',
+    start_spawn => '_start_spawn',
     start_run   => '_start_run',
     start_task  => '_start_task',
     stop_run    => '_stop_run',
@@ -251,6 +263,7 @@ sub queue_spawn {
     my $self = shift;
     my ($spawn) = @_;
     $spawn->{spawn} //= 1;
+    $spawn->{id} //= gen_uuid();
     $self->_enqueue(queue_spawn => $spawn);
 }
 
@@ -258,6 +271,7 @@ sub _queue_spawn {
     my $self = shift;
     my ($spawn) = @_;
 
+    $spawn->{id} //= gen_uuid();
     $spawn->{spawn} //= 1;
     $spawn->{use_preload} //= 1;
 
@@ -265,6 +279,23 @@ sub _queue_spawn {
     $spawn->{stage} = $self->task_stage($spawn);
 
     push @{$self->{+PENDING_SPAWNS}} => $spawn;
+
+    return;
+}
+
+sub start_spawn {
+    my $self = shift;
+    my ($spec) = @_;
+    $self->_enqueue(start_spawn => $spec);
+}
+
+sub _start_spawn {
+    my $self = shift;
+    my ($spec) = @_;
+
+    my $uuid = $spec->{id} or die "Could not find UUID for spawn";
+
+    @{$self->{+PENDING_SPAWNS}} = grep { $_->{id} ne $uuid } @{$self->{+PENDING_SPAWNS}};
 
     return;
 }

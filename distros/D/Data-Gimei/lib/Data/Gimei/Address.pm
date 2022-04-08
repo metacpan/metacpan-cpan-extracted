@@ -4,6 +4,7 @@ use utf8;
 use feature ':5.12';
 use File::Share ':all';
 use YAML::XS;
+use Carp;
 
 use Moo;
 use namespace::clean;
@@ -32,6 +33,7 @@ around BUILDARGS => sub {
 
 sub load {
     my $yaml_path = shift // dist_file( 'Data-Gimei', 'addresses.yml' );
+    -r $yaml_path or Carp::croak("failed to load address data: $yaml_path");
 
     $addresses = YAML::XS::LoadFile($yaml_path);
 }

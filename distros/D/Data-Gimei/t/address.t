@@ -16,13 +16,16 @@ is $addr->katakana, 'ホッカイドウサッポロシチュウオウクモエ�
 is $addr->prefecture->kanji,    '北海道';
 is $addr->prefecture->hiragana, 'ほっかいどう';
 is $addr->prefecture->katakana, 'ホッカイドウ';
+is $addr->prefecture->romaji,   undef;
 
 is $addr->city->kanji,    '札幌市中央区';
 is $addr->city->hiragana, 'さっぽろしちゅうおうく';
 is $addr->city->katakana, 'サッポロシチュウオウク';
+is $addr->city->romaji,   undef;
 
 is $addr->town->kanji,    'モエレ沼公園';
 is $addr->town->hiragana, 'もえれぬまこうえん',;
 is $addr->town->katakana, 'モエレヌマコウエン';
+is $addr->town->romaji,   undef;
 
 done_testing;

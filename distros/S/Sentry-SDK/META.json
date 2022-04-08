@@ -53,7 +53,7 @@
             "Clone" : "0",
             "HTTP::Status" : "0",
             "List::Util" : "1.44",
-            "Mojolicious" : "0",
+            "Mojolicious" : "8",
             "Readonly" : "0",
             "Time::HiRes" : "0",
             "Try::Tiny" : "0",
@@ -95,7 +95,7 @@
          "web" : "https://github.com/heiseonline/perl-sentry-sdk"
       }
    },
-   "version" : "v1.2.1",
+   "version" : "v1.2.2",
    "x_contributors" : [
       "bsd <bsd@heise.de>",
       "pmb0 <2140915+pmb0@users.noreply.github.com>",

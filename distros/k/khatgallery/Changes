@@ -1,45 +1,48 @@
-Revision history for khatgallery
+Revision History for khatgallery
 ================================
 
-0.03 Sun 25 February 2007
--------------------------
+v0.23 2022-04-08
+----------------
 
-  * (25 Feb 2007) names with spaces
-  	- fixing bugs with thumbnail creation where directory names have
-  spaces in them, thanks to a patch from Chris Benson.
+* 2022-04-08 15:05:22 +1000
+  Adding more CSS classes to make styling easier.
 
-  * (17 Sep 2006) typo fix
+v0.2201 2022-04-08
+------------------
 
-0.02 Sun 17 September 2006
---------------------------
+* 2022-04-08 05:13:32 +1000
+  fixing bug with indexes
 
-  * (17 Sep 2006) fix dist error
-  	Ooops, forgot to set the dist_name to 'khatgallery'.
+v0.22 2022-04-07
+----------------
 
-0.01 Sun 17 September 2006
---------------------------
+* 2022-04-07 20:33:42 +1000
+  messing with CSS
+* 2022-04-07 20:24:13 +1000
+  messing with CSS
+* 2022-04-07 20:22:00 +1000
+  messing with CSS
+* 2022-04-07 19:37:54 +1000
+  using OurPkgVersion for the version
+* 2022-04-07 19:12:58 +1000
+  version bump
+* 2022-04-07 19:10:45 +1000
+  Making a separate method for checking images
 
-  * (17 Sep 2006) layout tweaking
-  	Tweaked the index layout so that it looks better in IE.
+v0.20 2022-04-07
+----------------
 
-  * (16 Sep 2006) basename
-  	- added file_basename to the meta data for images.
+* 2022-04-07 16:39:15 +1000
+  more changes for Dist::Zilla
+* 2022-04-07 16:27:35 +1000
+  Changing over to use Dist::Zilla
+* 2009-12-27 16:49:46 +1100
+  use Image::ExifTool and some tweaks
+* 2009-11-27 04:51:59 +0000
+  First pass at making the output directory different.
+* 2007-12-16 09:05:15 +0000
+  revamped depot
 
-  * (16 Sep 2006) new files check
-  	- improved the "new files only" algorithm to check for both
-  new and missing files in the current *directory* and to rebuild all
-  the HTML files in *that* directory if there is a new or missing file,
-  since the index will need changing but also the image HTML files because
-  of the prev/next links.
-  	- improved some documentation
-  	- new get_image_info method, so that (a) it can be overridden
-  and (b) so that kg_image_info can use it, so it is always using the
-  same data as khatgallery is.
-
-  * (9 Aug 2006) improvements
-  - documentation of khatgallery script
-  - graceful recovery if Image::Info fails when calculating thumbnail size
-  - escaping some HTML characters 
-  - adding --options option
-
-  * (6 May 2006) initial checkin
+====================================
+End of changes in the last 1000 days
+====================================

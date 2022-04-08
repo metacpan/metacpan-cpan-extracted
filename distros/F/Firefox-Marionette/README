@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    Version 1.23
+    Version 1.24
 
 SYNOPSIS
 
@@ -2402,8 +2402,10 @@ WEBGL
     an existing bug in Firefox
     <https://bugzilla.mozilla.org/show_bug.cgi?id=1375585>.
 
-    3. REMOTE AUTOMATION OF FIREFOX VIA SSH cannot be used with WebGL at
-    the moment.
+    3. It can be tricky getting WebGL <https://en.wikipedia.org/wiki/WebGL>
+    to work with a Xvfb <https://en.wikipedia.org/wiki/Xvfb> instance.
+    glxinfo <https://dri.freedesktop.org/wiki/glxinfo/> can be useful to
+    help debug issues in this case.
 
     With all those conditions being met, WebGL
     <https://en.wikipedia.org/wiki/WebGL> can be enabled like so;

@@ -1,12 +1,12 @@
 package Acme::CPANModules::WorkingWithURL;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-07-02'; # DATE
-our $DIST = 'Acme-CPANModules-WorkingWithURL'; # DIST
-our $VERSION = '0.001'; # VERSION
-
 use strict;
 use Acme::CPANModulesUtil::Misc;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-03-18'; # DATE
+our $DIST = 'Acme-CPANModules-WorkingWithURL'; # DIST
+our $VERSION = '0.002'; # VERSION
 
 my $text = <<'_';
 **Parsing**
@@ -34,7 +34,7 @@ For specific CPAN-related URLs, there are <pm:CPAN::Info::FromURL>,
 _
 
 our $LIST = {
-    summary => 'Working with URL',
+    summary => 'List of modules to work with URL',
     description => $text,
     tags => ['task'],
 };
@@ -42,7 +42,7 @@ our $LIST = {
 Acme::CPANModulesUtil::Misc::populate_entries_from_module_links_in_description;
 
 1;
-# ABSTRACT: Working with URL
+# ABSTRACT: List of modules to work with URL
 
 __END__
 
@@ -52,11 +52,11 @@ __END__
 
 =head1 NAME
 
-Acme::CPANModules::WorkingWithURL - Working with URL
+Acme::CPANModules::WorkingWithURL - List of modules to work with URL
 
 =head1 VERSION
 
-This document describes version 0.001 of Acme::CPANModules::WorkingWithURL (from Perl distribution Acme-CPANModules-WorkingWithURL), released on 2021-07-02.
+This document describes version 0.002 of Acme::CPANModules::WorkingWithURL (from Perl distribution Acme-CPANModules-WorkingWithURL), released on 2022-03-18.
 
 =head1 DESCRIPTION
 
@@ -80,31 +80,53 @@ L<Regexp::Common::URI>, L<Regexp::Pattern::URI>
 
 L<App::grep::url> (contains CLI L<grep-url>) greps URLs in lines of text.
 
-=head1 ACME::MODULES ENTRIES
+=head1 ACME::CPANMODULES ENTRIES
 
 =over
 
-=item * L<URI>
+=item * L<URI> - Uniform Resource Identifiers (absolute and relative)
 
-=item * L<URI::Info>
+Author: L<OALDERS|https://metacpan.org/author/OALDERS>
 
-=item * L<CPAN::Info::FromURL>
+=item * L<URI::Info> - Extract various information from a URI (URL)
 
-=item * L<CPAN::Release::FromURL>
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
-=item * L<CPAN::Author::FromURL>
+=item * L<CPAN::Info::FromURL> - Extract/guess information from a URL
 
-=item * L<CPAN::Dist::FromURL>
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
-=item * L<CPAN::Module::FromURL>
+=item * L<CPAN::Release::FromURL> - Extract CPAN release (tarball) name from a URL
 
-=item * L<HTML::LinkExtor>
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
+
+=item * L<CPAN::Author::FromURL> - Extract CPAN author from a URL
+
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
+
+=item * L<CPAN::Dist::FromURL> - Extract CPAN distribution name from a URL
+
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
+
+=item * L<CPAN::Module::FromURL> - Extract/guess CPAN module from a URL
+
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
+
+=item * L<HTML::LinkExtor> - Extract links from an HTML document
+
+Author: L<OALDERS|https://metacpan.org/author/OALDERS>
 
 =item * L<Regexp::Common::URI>
 
-=item * L<Regexp::Pattern::URI>
+Author: L<ABIGAIL|https://metacpan.org/author/ABIGAIL>
 
-=item * L<App::grep::url>
+=item * L<Regexp::Pattern::URI> - Regexp patterns related to URI
+
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
+
+=item * L<App::grep::url> - Print lines having URL(s) (optionally of certain criteria) in them
+
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
 =back
 
@@ -140,6 +162,8 @@ or directly:
 This Acme::CPANModules module also helps L<lcpan> produce a more meaningful
 result for C<lcpan related-mods> command when it comes to finding related
 modules for the modules listed in this Acme::CPANModules module.
+See L<App::lcpan::Cmd::related_mods> for more details on how "related modules"
+are found.
 
 =head1 HOMEPAGE
 
@@ -148,14 +172,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Acme-CPANM
 =head1 SOURCE
 
 Source repository is at L<https://github.com/perlancar/perl-Acme-CPANModules-WorkingWithURL>.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-WorkingWithURL>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
 
 =head1 SEE ALSO
 
@@ -167,11 +183,36 @@ L<cpanmodules> - CLI tool to let you browse/view the lists
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by perlancar@cpan.org.
+This software is copyright (c) 2022, 2021 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-WorkingWithURL>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

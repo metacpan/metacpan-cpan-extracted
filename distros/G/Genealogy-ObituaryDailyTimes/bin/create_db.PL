@@ -2,12 +2,18 @@
 
 # Create SQLite3 from https://sites.rootsweb.com/~obituary/ and
 #	https://mlarchives.rootsweb.com/listindexes/emails?listname=gen-obit
+#
+# -f:	force a build, otherwise it won't build on CPAN smokers or if the
+# 	database is less than a day old
+
+# If mlarchives starts to fail to download, try looking at bin/ml_from_cache
 
 use strict;
 use warnings;
 use DBI;
 # use DBD::SQLite::Constants qw/:file_open/;	# For SQLITE_OPEN_READONLY
 use File::HomeDir;
+use File::Slurp;
 use File::Spec;
 use HTML::Entities;
 use HTTP::Cache::Transparent;
@@ -32,7 +38,12 @@ BEGIN {
 	}
 }
 
-exit if($ENV{'AUTOMATED_TESTING'});
+my $force_flag;
+if(defined($ARGV[0]) && ($ARGV[0] eq '-f')) {
+	$force_flag++;
+} elsif($ENV{'AUTOMATED_TESTING'}) {
+	exit;
+}
 
 my $dir = 'lib/Genealogy/ObituaryDailyTimes/database';
 my $filename = File::Spec->catdir($dir, 'obituaries.sql');
@@ -43,7 +54,7 @@ if(!-d $dir) {
 }
 
 if(-r $filename) {
-	if((-s $filename) > 0) {
+	if(((-s $filename) > 0) && !$force_flag) {
 		# Don't bother downloading if the file is less than a day old
 		exit if(-M $filename < 1);
 	}
@@ -80,7 +91,7 @@ die "$filename: $!" if(!defined($dbh));
 
 $dbh->do('PRAGMA cache_size = -65536');	# 64MB
 $dbh->do('PRAGMA journal_mode = OFF');
-$dbh->do('CREATE TABLE obituaries(first VARCHAR, middle, VARCHAR, last VARCHAR NOT NULL, maiden VARCHAR, age INTEGER, place VARCHAR, newspaper VARCHAR NOT NULL, date DATE NOT NULL, url VARCHAR NOT NULL)');
+$dbh->do('CREATE TABLE obituaries(first VARCHAR, middle VARCHAR, last VARCHAR NOT NULL, maiden VARCHAR, age INTEGER, place VARCHAR, newspaper VARCHAR NOT NULL, date DATE NOT NULL, url VARCHAR NOT NULL)');
 
 my @queue;
 my $page = 1;
@@ -110,38 +121,56 @@ while(freelists($ua, 'v26no' . sprintf('%03d', $issue))) {
 
 flush($dbh);
 
+$issue = 1;
+while(freelists($ua, 'v27no' . sprintf('%03d', $issue))) {
+	$issue++;
+}
+
 print "\n";
 
+flush($dbh);
+
 $dbh->commit();
+$dbh->prepare('CREATE INDEX name_index ON obituaries(first, last)')->execute();
 $dbh->disconnect();
 
 sub mlarchives($$) {
-	my $ua = shift;
-	my $page = shift;
+	my @lines;
+
 	my $url = "https://mlarchives.rootsweb.com/listindexes/emails?listname=gen-obit&page=$page";
 
 	$| = 1;
 	printf "%-70s\r", $url;
 	$| = 0;
 
-	my $response = $ua->get($url);
-
-	my $data;
-	if($response->is_success) {
-		$data = $response->decoded_content();
+	if($ENV{'MLARCHIVEDIR'}) {
+		@lines = read_file(File::Spec->catfile($ENV{'MLARCHIVEDIR'}, "emails?listname=gen-obit&page=$page"));
+	} elsif($ENV{'MLARCHIVE_DIR'}) {
+		@lines = read_file(File::Spec->catfile($ENV{'MLARCHIVE_DIR'}, "emails?listname=gen-obit&page=$page"));
 	} else {
-		if($response->status_line() ne '404 Not Found') {
-			die "\n$url: ", $response->status_line();
-		}
-		return 0;
-	}
+		my $ua = shift;
+		my $page = shift;
 
-	# mlarchive data is much easier to parse because it's nicely all on one line
-	$data =~ s/\r//g;
+		my $response = $ua->get($url);
+
+		my $data;
+		if($response->is_success) {
+			$data = $response->decoded_content();
+		} else {
+			if($response->status_line() ne '404 Not Found') {
+				print STDERR "You may need to run bin/ml_from_cache\n";
+				die "\n$url: ", $response->status_line();
+			}
+			return 0;
+		}
+
+		# mlarchive data is much easier to parse because it's nicely all on one line
+		$data =~ s/\r//g;
+		@lines = split(/$/ms, $data);
+	}
 
 	# -1 => header, 0 => post-preamble, 1 => post
 	my $stage = -1;
-	my @lines = split(/$/ms, $data);
 
 	my $last_line;
 	my $rc;

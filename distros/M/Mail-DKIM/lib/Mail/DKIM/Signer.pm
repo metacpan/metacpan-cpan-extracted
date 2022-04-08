@@ -1,7 +1,7 @@
 package Mail::DKIM::Signer;
 use strict;
 use warnings;
-our $VERSION = '1.20200907'; # VERSION
+our $VERSION = '1.20220408'; # VERSION
 # ABSTRACT: generates a DKIM signature for a message
 
 # Copyright 2005-2007 Messiah College. All rights reserved.
@@ -147,6 +147,10 @@ sub finish_header {
                 ),
                 (
                     $self->{'Timestamp'} ? ( Timestamp => $self->{'Timestamp'} )
+                    : ()
+                ),
+                (
+                    $self->{'Expiration'} ? ( Expiration => $self->{'Expiration'} )
                     : ()
                 ),
             )
@@ -422,7 +426,7 @@ Mail::DKIM::Signer - generates a DKIM signature for a message
 
 =head1 VERSION
 
-version 1.20200907
+version 1.20220408
 
 =head1 SYNOPSIS
 
@@ -503,7 +507,7 @@ The "default policy" is to create a DKIM signature using the specified
 parameters, but only if the message's sender matches the domain.
 The following parameters can be passed to this new() method to
 influence the resulting signature:
-Algorithm, Method, Domain, Selector, KeyFile, Identity, Timestamp.
+Algorithm, Method, Domain, Selector, KeyFile, Identity, Timestamp, Expiration.
 
 If you want different behavior, you can provide a "signer policy"
 instead. A signer policy is a subroutine or class that determines

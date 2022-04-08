@@ -1,34 +1,42 @@
 ---
-name: khatgallery
-version: 0.03
+abstract: 'HTML photo album generator.'
 author:
-  - Kathryn Andersen
-abstract: HTML photo album generator.
-license: perl
-resources:
-  license: http://dev.perl.org/licenses/
-requires:
-  Cwd: 3
-  File::Basename: 2.73
-  File::Spec: 3
-  File::stat: 1
-  Getopt::ArgvFile: 1.09
-  Getopt::Long: 2.34
-  Image::Info: 1.16
-  Image::Magick: 6.2
-  POSIX: 0
-  Pod::Usage: 0
-  YAML: 0.35
+  - 'Kathryn Andersen <perlkat@katspace.org>'
 build_requires:
-  Test::More: 0
-provides:
-  HTML::KhatGallery:
-    file: lib/HTML/KhatGallery.pm
-    version: 0.03
-  HTML::KhatGallery::Core:
-    file: lib/HTML/KhatGallery/Core.pm
-    version: 0.03
-generated_by: Module::Build version 0.28
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Module::Build: '0.28'
+  Test::Distribution: '0'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
-  url: http://module-build.sourceforge.net/META-spec-v1.2.html
-  version: 1.2
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: khatgallery
+requires:
+  Cwd: '0'
+  File::Basename: '0'
+  File::Spec: '0'
+  File::stat: '0'
+  Getopt::ArgvFile: '0'
+  Getopt::Long: '2.34'
+  Image::ExifTool: '0'
+  POSIX: '0'
+  Pod::Usage: '0'
+  YAML: '0'
+  perl: v5.8.5
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/rubykat/khatgallery
+  repository: https://github.com/rubykat/khatgallery.git
+version: '0.23'
+x_generated_by_perl: v5.30.3
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

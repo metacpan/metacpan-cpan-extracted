@@ -62,7 +62,7 @@ our @EXPORT_OK =
   qw(BY_XPATH BY_ID BY_NAME BY_TAG BY_CLASS BY_SELECTOR BY_LINK BY_PARTIAL);
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
-our $VERSION = '1.23';
+our $VERSION = '1.24';
 
 sub _ANYPROCESS                     { return -1 }
 sub _COMMAND                        { return 0 }
@@ -1617,46 +1617,24 @@ sub _binary_directory {
 
 sub _most_recent_updates_index {
     my ($self) = @_;
-    if ( defined $self->{_cached_per_instance}->{_most_recent_updates_index} ) {
-
-    }
-    else {
-        my $binary_directory = $self->_binary_directory();
-        if ( defined $binary_directory ) {
-            my $found_updates_directory;
-            foreach my $entry (
-                $self->_directory_listing(
-                    { ignore_missing_directory => 1 },
-                    $binary_directory, 1
-                )
-              )
-            {
-                if ( $entry eq 'updates' ) {
-                    $found_updates_directory = 1;
-                }
-            }
-            if ($found_updates_directory) {
-                my $updates_path =
-                  File::Spec->catfile( $binary_directory, 'updates' );
-                my @entries;
-                foreach my $entry (
-                    $self->_directory_listing(
-                        { ignore_missing_directory => 1 },
-                        $updates_path, 1
-                    )
-                  )
-                {
-                    if ( $entry =~ /^(\d{1,10})$/smx ) {
-                        push @entries, $1;
-                    }
-                }
-                my @sorted_entries = reverse sort { $a <=> $b } @entries;
-                $self->{_cached_per_instance}->{_most_recent_updates_index} =
-                  shift @sorted_entries;
+    my $directory = $self->_binary_directory();
+    if ( my $update_directory = $self->_updates_directory_exists($directory) ) {
+        my @entries;
+        foreach my $entry (
+            $self->_directory_listing(
+                { ignore_missing_directory => 1 },
+                $update_directory, 1
+            )
+          )
+        {
+            if ( $entry =~ /^(\d{1,10})$/smx ) {
+                push @entries, $1;
             }
         }
+        my @sorted_entries = reverse sort { $a <=> $b } @entries;
+        return shift @sorted_entries;
     }
-    return $self->{_cached_per_instance}->{_most_recent_updates_index};
+    return;
 }
 
 sub _most_recent_updates_status_path {
@@ -1667,16 +1645,19 @@ sub _most_recent_updates_status_path {
         )
       )
     {
-        my $binary_directory = $self->_binary_directory();
-        return File::Spec->catfile( $binary_directory, 'updates',
-            $most_recent_updates_index, 'update.status' );
+        if ( my $updates_directory =
+            $self->_updates_directory_exists( $self->_binary_directory() ) )
+        {
+            return $self->_catfile( $updates_directory,
+                $most_recent_updates_index, 'update.status' );
+
+        }
     }
     return;
 }
 
 sub _wait_for_updating_to_finish {
     my ($self) = @_;
-    delete $self->{_cached_per_instance}->{_most_recent_updates_index};
     my $count = 1;
     my $updating;
     while ($count) {
@@ -1688,9 +1669,10 @@ sub _wait_for_updating_to_finish {
             )
           )
         {
-            my $binary_directory = $self->_binary_directory();
+            my $update_directory =
+              $self->_updates_directory_exists( $self->_binary_directory() );
             my $most_recent_update_directory =
-              File::Spec->catfile( $binary_directory, 'updates',
+              File::Spec->catfile( $update_directory,
                 $most_recent_updates_index );
             foreach my $entry (
                 $self->_directory_listing(
@@ -2906,6 +2888,71 @@ sub _find_active_update_xml_in_directory {
     return;
 }
 
+sub _updates_directory_exists {
+    my ( $self, $base_directory ) = @_;
+    if ( !$self->{_cached_per_instance}->{_update_directory} ) {
+        my $common_appdata_directory;
+        if ( $self->_ssh() ) {
+            if (   ( $self->_remote_uname() eq 'MSWin32' )
+                || ( $self->_remote_uname() eq 'cygwin' ) )
+            {
+                $common_appdata_directory =
+                  $self->_get_remote_environment_variable_via_ssh(
+                    'ALLUSERSPROFILE');
+                if ( $self->_remote_uname() eq 'cygwin' ) {
+                    $common_appdata_directory =~ s/\\/\//smxg;
+                    $common_appdata_directory =
+                      $self->_execute_via_ssh( {}, 'cygpath', '-u',
+                        $common_appdata_directory );
+                    chomp $common_appdata_directory;
+                }
+            }
+        }
+        elsif ( $OSNAME eq 'MSWin32' ) {
+            $common_appdata_directory =
+              Win32::GetFolderPath( Win32::CSIDL_COMMON_APPDATA() );
+        }
+        elsif ( $OSNAME ne 'cygwin' ) {
+            $common_appdata_directory = $ENV{ALLUSERSPROFILE};
+        }
+        if (   ($common_appdata_directory)
+            && ( !$self->{_cached_per_instance}->{_mozilla_update_directory} ) )
+        {
+            foreach my $entry (
+                $self->_directory_listing(
+                    { ignore_missing_directory => 1 },
+                    $common_appdata_directory,
+                    1
+                )
+              )
+            {
+                if ( $entry eq 'Mozilla' ) {
+                    $base_directory =
+                      $self->_remote_catfile( $common_appdata_directory,
+                        'Mozilla' );
+                    $self->{_cached_per_instance}->{_mozilla_update_directory}
+                      = $base_directory;
+                }
+            }
+        }
+        if ($base_directory) {
+            foreach my $entry (
+                $self->_directory_listing(
+                    { ignore_missing_directory => 1 },
+                    $base_directory, 1
+                )
+              )
+            {
+                if ( $entry eq 'updates' ) {
+                    $self->{_cached_per_instance}->{_update_directory} =
+                      $self->_remote_catfile( $base_directory, 'updates' );
+                }
+            }
+        }
+    }
+    return $self->{_cached_per_instance}->{_update_directory};
+}
+
 sub _active_update_xml_path {
     my ($self) = @_;
     my $path;
@@ -2916,21 +2963,15 @@ sub _active_update_xml_path {
         if (   ( $self->_remote_uname() eq 'MSWin32' )
             || ( $self->_remote_uname() eq 'cygwin' ) )
         {
-            my $common_appdata_directory =
-              $self->_get_remote_environment_variable_via_ssh(
-                'ALLUSERSPROFILE');
-            if ( $self->_remote_uname() eq 'cygwin' ) {
-                $common_appdata_directory =~ s/\\/\//smxg;
-                $common_appdata_directory =
-                  $self->_execute_via_ssh( {}, 'cygpath', '-u',
-                    $common_appdata_directory );
-                chomp $common_appdata_directory;
-            }
-            my $update_directory =
-              $self->_remote_catfile( $common_appdata_directory, 'Mozilla',
-                'updates' );
-            if ( my $found =
-                $self->_find_win32_active_update_xml($update_directory) )
+            my $update_directory;
+            if (
+                (
+                    $update_directory =
+                    $self->_updates_directory_exists($directory)
+                )
+                && ( my $found =
+                    $self->_find_win32_active_update_xml($update_directory) )
+              )
             {
                 $path = $found;
             }
@@ -2944,14 +2985,16 @@ sub _active_update_xml_path {
         }
     }
     else {
-        if ( $OSNAME eq 'MSWin32' ) {
-            my $common_appdata_directory =
-              Win32::GetFolderPath( Win32::CSIDL_COMMON_APPDATA() );
-            my $update_directory =
-              File::Spec->catdir( $common_appdata_directory, 'Mozilla',
-                'updates' );
-            if ( my $found =
-                $self->_find_win32_active_update_xml($update_directory) )
+        if ( ( $OSNAME eq 'MSWin32' ) || ( $OSNAME eq 'cygwin' ) ) {
+            my $update_directory;
+            if (
+                (
+                    $update_directory =
+                    $self->_updates_directory_exists($directory)
+                )
+                && ( my $found =
+                    $self->_find_win32_active_update_xml($update_directory) )
+              )
             {
                 $path = $found;
             }
@@ -3343,6 +3386,22 @@ sub _execute_win32_process {
 
 sub _launch_via_ssh {
     my ( $self, @arguments ) = @_;
+    my $binary = q["] . $self->_binary() . q["];
+    if ( $self->_visible() ) {
+        if (   ( $self->_remote_uname() eq 'MSWin32' )
+            || ( $self->_remote_uname() eq 'darwin' )
+            || ( $self->_remote_uname() eq 'cygwin' ) )
+        {
+        }
+        else {
+            @arguments = (
+                '-a', '-s',
+                q["] . ( join q[ ], $self->_xvfb_common_arguments() ) . q["],
+                $binary, @arguments
+            );
+            $binary = 'xvfb-run';
+        }
+    }
     if ( $OSNAME eq 'MSWin32' ) {
         my $ssh_binary = $self->_get_full_short_path_for_win32_binary('ssh')
           or Firefox::Marionette::Exception->throw(
@@ -3352,7 +3411,7 @@ sub _launch_via_ssh {
           ( $self->_ssh_arguments( env => 1 ), $self->_ssh_address() );
         my $process =
           $self->_start_win32_process( 'ssh', @ssh_arguments,
-            q["] . $self->_binary() . q["], @arguments );
+            $binary, @arguments );
         $self->{_win32_ssh_process} = $process;
         my $pid = $process->GetProcessID();
         $self->{_ssh}->{pid} = $pid;
@@ -3370,10 +3429,8 @@ sub _launch_via_ssh {
                 open STDIN, q[<], $dev_null
                   or Firefox::Marionette::Exception->throw(
                     "Failed to redirect STDIN to $dev_null:$EXTENDED_OS_ERROR");
-                $self->_ssh_exec(
-                    $self->_ssh_arguments( env => 1 ), $self->_ssh_address(),
-                    q["] . $self->_binary() . q["],    @arguments
-                  )
+                $self->_ssh_exec( $self->_ssh_arguments( env => 1 ),
+                    $self->_ssh_address(), $binary, @arguments )
                   or Firefox::Marionette::Exception->throw(
                     "Failed to exec 'ssh':$EXTENDED_OS_ERROR");
             } or do {
@@ -3647,6 +3704,24 @@ sub _debug_xvfb_execution {
     return;
 }
 
+sub _xvfb_common_arguments {
+    my ($self) = @_;
+    my $width =
+      defined $self->{window_width}
+      ? $self->{window_width}
+      : _DEFAULT_WINDOW_WIDTH();
+    my $height =
+      defined $self->{window_height}
+      ? $self->{window_height}
+      : _DEFAULT_WINDOW_HEIGHT();
+    my $width_height_depth = join q[x], $width, $height, _DEFAULT_DEPTH();
+    my @arguments          = (
+        '-screen' => '0',
+        $width_height_depth,
+    );
+    return @arguments;
+}
+
 sub _launch_xvfb {
     my ($self) = @_;
     my $xvfb_directory = $self->_xvfb_directory();
@@ -3669,19 +3744,9 @@ sub _launch_xvfb {
       or Firefox::Marionette::Exception->throw(
 "Failed to clear the close-on-exec flag on a temporary file:$EXTENDED_OS_ERROR"
       );
-    my $width =
-      defined $self->{window_width}
-      ? $self->{window_width}
-      : _DEFAULT_WINDOW_WIDTH();
-    my $height =
-      defined $self->{window_height}
-      ? $self->{window_height}
-      : _DEFAULT_WINDOW_HEIGHT();
-    my $width_height_depth = join q[x], $width, $height, _DEFAULT_DEPTH();
-    my @arguments          = (
+    my @arguments = (
         '-displayfd' => fileno $display_no_handle,
-        '-screen'    => '0',
-        $width_height_depth,
+        $self->_xvfb_common_arguments(),
         '-nolisten' => 'tcp',
         '-fbdir'    => $fbdir_directory,
     );
@@ -9312,7 +9377,7 @@ Firefox::Marionette - Automate the Firefox browser with the Marionette protocol
 
 =head1 VERSION
 
-Version 1.23
+Version 1.24
 
 =head1 SYNOPSIS
 
@@ -9363,7 +9428,7 @@ accepts a hash as a parameter and adds the specified certificate to the Firefox 
 
 =item * path - a file system path to a single L<PEM encoded X.509 certificate|https://datatracker.ietf.org/doc/html/rfc7468#section-5>.
 
-=item * string - a string containg a single L<PEM encoded X.509 certificate|https://datatracker.ietf.org/doc/html/rfc7468#section-5>
+=item * string - a string containing a single L<PEM encoded X.509 certificate|https://datatracker.ietf.org/doc/html/rfc7468#section-5>
 
 =item * trust - This is the L<trustargs|https://www.mankier.com/1/certutil#-t> value for L<NSS|https://wiki.mozilla.org/NSS>.  If defaults to 'C,,';
 
@@ -9883,7 +9948,7 @@ This utility method executes a command with arguments and returns STDOUT as a ch
 
 =head2 fill_login
 
-This method searchs the L<Password Manager|https://support.mozilla.org/en-US/kb/password-manager-remember-delete-edit-logins> for an appropriate login for any form on the current page.  The form must match the host, the action attribute and the user and password field names.
+This method searches the L<Password Manager|https://support.mozilla.org/en-US/kb/password-manager-remember-delete-edit-logins> for an appropriate login for any form on the current page.  The form must match the host, the action attribute and the user and password field names.
 
     use Firefox::Marionette();
     use IO::Prompt();
@@ -10232,7 +10297,7 @@ If no elements are found, this method will return undef.  For the same functiona
 
 =head2 html
 
-returns the page source of the content document.  This page source can be wrapped in html that firefox provides.  See the L<json|Firefox::Marionette#json> method for an alternative when dealing with response content types such as application/json and L<strip|Firefox::Marionette#strip> for an alterative when dealing with other non-html content types such as text/plain.
+returns the page source of the content document.  This page source can be wrapped in html that firefox provides.  See the L<json|Firefox::Marionette#json> method for an alternative when dealing with response content types such as application/json and L<strip|Firefox::Marionette#strip> for an alternative when dealing with other non-html content types such as text/plain.
 
     use Firefox::Marionette();
     use v5.10;
@@ -10278,7 +10343,7 @@ accepts the following as the first parameter;
 
 =back
 
-and an optional true/false second parameter to indicate if the xpi file should be a L<temporary extension|https://extensionworkshop.com/documentation/develop/temporary-installation-in-firefox/> (just for the existance of this browser instance).  Unsigned xpi files L<may only be loaded temporarily|https://wiki.mozilla.org/Add-ons/Extension_Signing> (except for L<nightly firefox installations|https://www.mozilla.org/en-US/firefox/channel/desktop/#nightly>).  It returns the GUID for the addon which may be used as a parameter to the L<uninstall|Firefox::Marionette#uninstall> method.
+and an optional true/false second parameter to indicate if the xpi file should be a L<temporary extension|https://extensionworkshop.com/documentation/develop/temporary-installation-in-firefox/> (just for the existence of this browser instance).  Unsigned xpi files L<may only be loaded temporarily|https://wiki.mozilla.org/Add-ons/Extension_Signing> (except for L<nightly firefox installations|https://www.mozilla.org/en-US/firefox/channel/desktop/#nightly>).  It returns the GUID for the addon which may be used as a parameter to the L<uninstall|Firefox::Marionette#uninstall> method.
 
     use Firefox::Marionette();
 
@@ -10874,9 +10939,9 @@ accepts a scalar containing a javascript function body that is executed in the b
 
 =item * line - Line in the client's program where this script is evaluated.
 
-=item * new - Forces the script to be evaluated in a fresh sandbox.  Note that if it is undefined, the script will normally be evaluted in a fresh sandbox.
+=item * new - Forces the script to be evaluated in a fresh sandbox.  Note that if it is undefined, the script will normally be evaluated in a fresh sandbox.
 
-=item * sandbox - Name of the sandbox to evaluate the script in.  The sandbox is cached for later re-use on the same L<window|https://developer.mozilla.org/en-US/docs/Web/API/Window> object if C<new> is false.  If he parameter is undefined, the script is evaluated in a mutable sandbox.  If the parameter is "system", it will be evaluted in a sandbox with elevated system privileges, equivalent to chrome space.
+=item * sandbox - Name of the sandbox to evaluate the script in.  The sandbox is cached for later re-use on the same L<window|https://developer.mozilla.org/en-US/docs/Web/API/Window> object if C<new> is false.  If he parameter is undefined, the script is evaluated in a mutable sandbox.  If the parameter is "system", it will be evaluated in a sandbox with elevated system privileges, equivalent to chrome space.
 
 =item * timeout - A timeout to override the default L<script|Firefox::Marionette::Timeouts#script> timeout, which, by default is 30 seconds.
 
@@ -10978,7 +11043,7 @@ returns the path to the local directory for the ssh connection (if any). For deb
 
 =head2 strip
 
-returns the page source of the content document after an attempt has been made to remove typical firefox html wrappers of non html content types such as text/plain and application/json.  See the L<json|Firefox::Marionette#json> method for an alternative when dealing with response content types such as application/json and L<html|Firefox::Marionette#html> for an alterative when dealing with html content types.  This is a convenience method that wraps the L<html|Firefox::Marionette#html> method.
+returns the page source of the content document after an attempt has been made to remove typical firefox html wrappers of non html content types such as text/plain and application/json.  See the L<json|Firefox::Marionette#json> method for an alternative when dealing with response content types such as application/json and L<html|Firefox::Marionette#html> for an alternative when dealing with html content types.  This is a convenience method that wraps the L<html|Firefox::Marionette#html> method.
 
     use Firefox::Marionette();
     use JSON();
@@ -11075,7 +11140,7 @@ accepts a parameter of a Win32 product name and returns the matching organisatio
 
 =head2 win32_product_names
 
-returns a hash of known Windows product names (such as 'Mozilla Firefox') with priority orders.  The lower the priority will determine the order that this module will check for the existance of this product.  Only of interest when sub-classing.
+returns a hash of known Windows product names (such as 'Mozilla Firefox') with priority orders.  The lower the priority will determine the order that this module will check for the existence of this product.  Only of interest when sub-classing.
 
 =head2 window_handle
 
@@ -11199,7 +11264,7 @@ There are a number of steps to getting L<WebGL|https://en.wikipedia.org/wiki/Web
 
 =item 2. The visible parameter to the L<new|Firefox::Marionette#new> method must be set.  This is due to L<an existing bug in Firefox|https://bugzilla.mozilla.org/show_bug.cgi?id=1375585>.
 
-=item 3. L<REMOTE AUTOMATION OF FIREFOX VIA SSH|Firefox::Marionette#REMOTE-AUTOMATION-OF-FIREFOX-VIA-SSH> cannot be used with WebGL at the moment.
+=item 3. It can be tricky getting L<WebGL|https://en.wikipedia.org/wiki/WebGL> to work with a L<Xvfb|https://en.wikipedia.org/wiki/Xvfb> instance.  L<glxinfo|https://dri.freedesktop.org/wiki/glxinfo/> can be useful to help debug issues in this case.
 
 =back
 

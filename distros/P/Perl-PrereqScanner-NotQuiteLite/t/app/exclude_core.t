@@ -37,4 +37,14 @@ use Foo;
 END
 }, {exclude_core => 1}, { runtime => { requires => { Foo => 0, perl => '5.020' }}});
 
+test_app('ignore core modules with undef version', sub {
+  my $tmpdir = shift;
+
+  test_file("$tmpdir/MyTest.pm", <<'END');
+use strict;
+use warnings;
+use Foo;
+END
+}, {exclude_core => 1, perl_version => 5.006}, { runtime => { requires => { Foo => 0 }}});
+
 done_testing;

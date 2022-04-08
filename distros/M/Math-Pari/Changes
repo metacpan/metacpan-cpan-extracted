@@ -1466,3 +1466,50 @@ XXX We put some stuff into paricfg.h which may be not present in the GP/PARI's o
 2.03052103
    auto-dbg/auto-debug-module.pl	New option -U.  Report the content of debugger-commands file.
    auto-dbg/README			Document cleaning after the debugger, and rerunning ./Makefile.PL.
+
+2.030522
+   Pari.xs	Do not produce an invalid value in PARIcol(x) when x is not an array reference (likewise for PARImat()).
+		New functions PARIvecL(), PARIcolL(), PARImatL() (ARGS = a list of components, no exceptions).
+		New macro sv2pariStr().
+		Support 's*' in a prototype.
+			XXX pari_print() started to keep quotes on strings???
+   Pari.pm	Export new functions by default (XXX undocumented yet).
+   test_eng/Testout.pm			Use PARIcolL() instead of PARIcol().
+					Convert foo[,3] to foo->[-1+3], and (XXX does not help???) foo[2,4] to foo->[-1+4][-1+2].
+					New global variable $i.
+					Disable subtests containing matrix() (if not yet supported).
+						XXXX Should be undone ASAP ???
+					XXXX Silly workaround for `my'.
+					XXXX Silly workaround for matrix(0,3) being converted to matrix(0 3) (XXXX why???).
+					Avoid functions defined IN A MIDDLE of a skipped expression.
+					Avoid variables defined in a skipped expression.
+					Convert strings (currently, with a simple word only, as in ps and svg, and not with print).
+						XXXX Should be undone ASAP ???
+					Streamline sub'ification of CODE argument to the iterators.
+					Recognize non-supported ploth() etc.
+						XXXX Should be made an error ASAP
+					Recognize non-yet-supported |var<-
+   libPARI/gphelp			Update to one from 2.13.3.  Fix left braces.
+   auto-dbg/auto-debug-module.pl	Update an error message.  Attempt to use dbxtool.
+   README-after2_3_5			New file.
+   Makefile.PL				New option version_post23_ok=(0|1) (untested).
+
+	Failed 8/244 test programs. 80/1565 subtests failed.		(No crashes anymore!)
+	Failed 8/244 test programs. 77/1565 subtests failed.
+	Failed 6/244 test programs. 65/1565 subtests failed.
+	Failed 6/244 test programs. 64/1565 subtests failed.
+	Failed 5/244 test programs. 63/1565 subtests failed.
+	Failed 5/244 test programs. 62/1565 subtests failed.
+	Failed 5/244 test programs. 59/1565 subtests failed.
+	Failed 5/244 test programs. 50/1565 subtests failed.
+	Failed 4/244 test programs. 49/1565 subtests failed.
+	Failed 4/244 test programs. 30/1565 subtests failed.
+	Failed 3/244 test programs. 29/1565 subtests failed.
+
+2.03052201
+   diff_gphelp		The entry in MANIFEST was wrong.
+   PariBuild.pm		Update and fix ll_ftp().
+			Make ll_ftp() active again - even if LWP is not present.
+			Retry Net::FTP 3 times, with default passive, and with passive forced to 0 or 1.
+   INSTALL		Document new (and a few old) options.
+   auto-dbg/auto-debug-module.pl	Rename Makefile.PL in the created subdirectory.

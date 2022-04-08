@@ -15,6 +15,7 @@ my $builder = Module::Build->new(
         'DateTime::Format::HTTP' => 0,
         'Error'                  => 0,
         'File::chdir'            => 0,
+        'File::Touch'            => '0.11',
         'Git'                    => 0,
         'List::MoreUtils'        => 0,
         'Path::Tiny'             => 0,
@@ -23,10 +24,8 @@ my $builder = Module::Build->new(
         'YAML'                   => 0,
         'version'                => 0,
     },
-    configure_requires => {
-        'Module::Build' => 0.38,
-    },
-    recommends => {
+    configure_requires => { 'Module::Build' => 0.38, },
+    recommends         => {
         'JSON'          => '2.0',
         'JIRA::REST'    => 0,
         'Term::Spinner' => 0,
@@ -38,12 +37,13 @@ my $builder = Module::Build->new(
         'Test::Warnings' => '0.026',
 
     },
-    add_to_cleanup     => [ 'App-Git-Workflow-*' ],
-    create_license     => 1,
-    meta_merge => {
+    add_to_cleanup => ['App-Git-Workflow-*'],
+    create_license => 1,
+    meta_merge     => {
         resources => {
             repository => 'git://github.com/ivanwills/git-workflow-tools.git',
-            bugtracker => 'https://github.com/ivanwills/git-workflow-tools/issues',
+            bugtracker =>
+                'https://github.com/ivanwills/git-workflow-tools/issues',
         },
     },
 );

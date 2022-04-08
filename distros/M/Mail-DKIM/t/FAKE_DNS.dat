@@ -1,5 +1,7 @@
 # this file contains DNS records used by verifier.t
 #
+
+expirationtest._domainkey.example.org  v=DKIM1; k=rsa; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC848PMQXuR6V4Tbj3Wb2TN/4Qon0v8ch1WoS0v5wC4/2FXHaH5g7xNwtIwgfE7kxkSqv1LnS4tUrpHjWcXJhtCkT9wkI0FOVFzKHRc7Gy7vYSFMUCnojiVVQjxY6bnyPLIIP2l/D++0awe+XCWQsjFZ+CHW5Lo/lQ/bdrUcYEU/QIDAQAB
 selector1._domainkey.messiah.edu  k=rsa; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDhMlYqwtUA9UrrDcNp/IMtdFnytggDl5oIAzJ55oWzPILZE7eX4hLdP6WperHm1WJ9M32XsiKrr4TDbWfp4WjGWBnXf8QMi+WlDuEFOvwVRC/uWy+sAiEf3VcBR5KjGvDovPnGSnW8uDntSOY4HlkTJF/BTWnk29zKmlGyGnw9mQIDAQAB
 test1._domainkey.messiah.edu  v=DKIM1; t=y; s=email; p=MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBALgSoqXVSEmfcIsOzw7oRuCCOwsmtX/SJnTWxYyj2leFxfS/AVJ+dYfY+hXqMsT7l+MZvvh/R1WzN4MO/kI/7XsCAwEAAQ==
 test2._domainkey.messiah.edu  v=DKIM1; s=email:web:fine; x1 = extra ; t = y:n:extra; h=md5:sha1; p=MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBALgSoqXVSEmfcIsOzw7oRuCCOwsmtX/SJnTWxYyj2leFxfS/AVJ+dYfY+hXqMsT7l+MZvvh/R1WzN4MO/kI/7XsCAwEAAQ== ; 

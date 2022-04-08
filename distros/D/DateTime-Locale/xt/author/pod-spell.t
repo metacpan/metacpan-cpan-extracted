@@ -724,6 +724,7 @@ en_MP
 en_MS
 en_MT
 en_MU
+en_MV
 en_MW
 en_MY
 en_NA
@@ -937,6 +938,8 @@ hete
 hh
 hi
 hi_IN
+hi_Latn
+hi_Latn_IN
 hm
 hmmss
 hms
@@ -1026,6 +1029,8 @@ kok_IN
 ks
 ks_Arab
 ks_Arab_IN
+ks_Deva
+ks_Deva_IN
 ksb
 ksb_TZ
 ksf
@@ -1250,6 +1255,7 @@ qu_BO
 qu_EC
 qu_PE
 ranar
+ravivaar
 rbreiddal
 rm
 rm_CH
@@ -1344,6 +1350,7 @@ so_DJ
 so_ET
 so_KE
 so_SO
+somvaar
 sq
 sq_AL
 sq_MK

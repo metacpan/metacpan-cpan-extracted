@@ -21,11 +21,11 @@ use namespace::autoclean;
 use File::ShareDir qw( dist_file );
 use File::Spec;
 
-our $VERSION = '1.33';
+our $VERSION = '1.34';
 
 #<<<
 ### :start CLDRVersion:
-our $CLDRVersion = 40;
+our $CLDRVersion = 41;
 ### :end CLDRVersion:
 #>>>
 
@@ -228,6 +228,7 @@ our %Codes = (
   "en-MS" => 1,
   "en-MT" => 1,
   "en-MU" => 1,
+  "en-MV" => 1,
   "en-MW" => 1,
   "en-MY" => 1,
   "en-NA" => 1,
@@ -424,6 +425,8 @@ our %Codes = (
   "he-IL" => 1,
   hi => 1,
   "hi-IN" => 1,
+  "hi-Latn" => 1,
+  "hi-Latn-IN" => 1,
   hr => 1,
   "hr-BA" => 1,
   "hr-HR" => 1,
@@ -492,6 +495,8 @@ our %Codes = (
   ks => 1,
   "ks-Arab" => 1,
   "ks-Arab-IN" => 1,
+  "ks-Deva" => 1,
+  "ks-Deva-IN" => 1,
   ksb => 1,
   "ksb-TZ" => 1,
   ksf => 1,
@@ -1040,6 +1045,7 @@ our %Names = (
   "English Madagascar" => "en-MG",
   "English Malawi" => "en-MW",
   "English Malaysia" => "en-MY",
+  "English Maldives" => "en-MV",
   "English Malta" => "en-MT",
   "English Marshall Islands" => "en-MH",
   "English Mauritius" => "en-MU",
@@ -1215,6 +1221,8 @@ our %Names = (
   "Hebrew Israel" => "he-IL",
   Hindi => "hi",
   "Hindi India" => "hi-IN",
+  "Hindi India Latin" => "hi-Latn-IN",
+  "Hindi Latin" => "hi-Latn",
   Hungarian => "hu",
   "Hungarian Hungary" => "hu-HU",
   Icelandic => "is",
@@ -1259,7 +1267,9 @@ our %Names = (
   "Kannada India" => "kn-IN",
   Kashmiri => "ks",
   "Kashmiri Arabic" => "ks-Arab",
+  "Kashmiri Devanagari" => "ks-Deva",
   "Kashmiri India Arabic" => "ks-Arab-IN",
+  "Kashmiri India Devanagari" => "ks-Deva-IN",
   Kazakh => "kk",
   "Kazakh Kazakhstan" => "kk-KZ",
   Khmer => "km",
@@ -1721,6 +1731,7 @@ our %NativeNames = (
   "English Madagascar" => "en-MG",
   "English Malawi" => "en-MW",
   "English Malaysia" => "en-MY",
+  "English Maldives" => "en-MV",
   "English Malta" => "en-MT",
   "English Marshall Islands" => "en-MH",
   "English Mauritius" => "en-MU",
@@ -1795,6 +1806,8 @@ our %NativeNames = (
   "Hausa Nijar" => "ha-NE",
   Hibena => "bez",
   "Hibena Hutanzania" => "bez-TZ",
+  "Hindi India Latin" => "hi-Latn-IN",
+  "Hindi Latin" => "hi-Latn",
   Ichibemba => "bem",
   "Ichibemba Zambia" => "bem-ZM",
   Igbo => "ig",
@@ -2317,6 +2330,8 @@ our %NativeNames = (
   "\N{U+06a9}\N{U+0672}\N{U+0634}\N{U+064f}\N{U+0631}" => "ks",
   "\N{U+06a9}\N{U+0672}\N{U+0634}\N{U+064f}\N{U+0631} \N{U+0627}\N{U+064e}\N{U+0631}\N{U+0628}\N{U+06cc}" => "ks-Arab",
   "\N{U+06a9}\N{U+0672}\N{U+0634}\N{U+064f}\N{U+0631} \N{U+06c1}\N{U+0650}\N{U+0646}\N{U+062f}\N{U+0648}\N{U+0633}\N{U+062a}\N{U+0627}\N{U+0646} \N{U+0627}\N{U+064e}\N{U+0631}\N{U+0628}\N{U+06cc}" => "ks-Arab-IN",
+  "\N{U+0915}\N{U+0949}\N{U+0936}\N{U+0941}\N{U+0930} \N{U+0926}\N{U+0947}\N{U+0935}\N{U+0928}\N{U+093e}\N{U+0917}\N{U+0930}\N{U+0940}" => "ks-Deva",
+  "\N{U+0915}\N{U+0949}\N{U+0936}\N{U+0941}\N{U+0930} \N{U+092d}\N{U+093e}\N{U+0930}\N{U+0924} \N{U+0926}\N{U+0947}\N{U+0935}\N{U+0928}\N{U+093e}\N{U+0917}\N{U+0930}\N{U+0940}" => "ks-Deva-IN",
   "\N{U+0915}\N{U+094b}\N{U+0902}\N{U+0915}\N{U+0923}\N{U+0940}" => "kok",
   "\N{U+0915}\N{U+094b}\N{U+0902}\N{U+0915}\N{U+0923}\N{U+0940} \N{U+092d}\N{U+093e}\N{U+0930}\N{U+0924}" => "kok-IN",
   "\N{U+0921}\N{U+094b}\N{U+0917}\N{U+0930}\N{U+0940}" => "doi",
@@ -2324,8 +2339,8 @@ our %NativeNames = (
   "\N{U+0928}\N{U+0947}\N{U+092a}\N{U+093e}\N{U+0932}\N{U+0940}" => "ne",
   "\N{U+0928}\N{U+0947}\N{U+092a}\N{U+093e}\N{U+0932}\N{U+0940} \N{U+0928}\N{U+0947}\N{U+092a}\N{U+093e}\N{U+0932}" => "ne-NP",
   "\N{U+0928}\N{U+0947}\N{U+092a}\N{U+093e}\N{U+0932}\N{U+0940} \N{U+092d}\N{U+093e}\N{U+0930}\N{U+0924}" => "ne-IN",
-  "\N{U+092c}\N{U+0921}\N{U+093c}\N{U+094b}" => "brx",
-  "\N{U+092c}\N{U+0921}\N{U+093c}\N{U+094b} \N{U+092d}\N{U+093e}\N{U+0930}\N{U+0924}" => "brx-IN",
+  "\N{U+092c}\N{U+0930}\N{U+2019}" => "brx",
+  "\N{U+092c}\N{U+0930}\N{U+2019} \N{U+092d}\N{U+093e}\N{U+0930}\N{U+0924}" => "brx-IN",
   "\N{U+092e}\N{U+0930}\N{U+093e}\N{U+0920}\N{U+0940}" => "mr",
   "\N{U+092e}\N{U+0930}\N{U+093e}\N{U+0920}\N{U+0940} \N{U+092d}\N{U+093e}\N{U+0930}\N{U+0924}" => "mr-IN",
   "\N{U+092e}\N{U+0948}\N{U+0925}\N{U+093f}\N{U+0932}\N{U+0940}" => "mai",
@@ -2609,6 +2624,7 @@ our %ISO639Aliases = (
   "eng-MS" => "en-MS",
   "eng-MT" => "en-MT",
   "eng-MU" => "en-MU",
+  "eng-MV" => "en-MV",
   "eng-MW" => "en-MW",
   "eng-MY" => "en-MY",
   "eng-NA" => "en-NA",
@@ -2773,6 +2789,8 @@ our %ISO639Aliases = (
   "heb-IL" => "he-IL",
   hin => "hi",
   "hin-IN" => "hi-IN",
+  "hin-Latn" => "hi-Latn",
+  "hin-Latn-IN" => "hi-Latn-IN",
   hrv => "hr",
   "hrv-BA" => "hr-BA",
   "hrv-HR" => "hr-HR",
@@ -2804,6 +2822,8 @@ our %ISO639Aliases = (
   kas => "ks",
   "kas-Arab" => "ks-Arab",
   "kas-Arab-IN" => "ks-Arab-IN",
+  "kas-Deva" => "ks-Deva",
+  "kas-Deva-IN" => "ks-Deva-IN",
   kaz => "kk",
   "kaz-KZ" => "kk-KZ",
   khm => "km",
@@ -3342,7 +3362,7 @@ my %LocaleData = (
     time_format_medium => "h:mm:ss a",
     time_format_short => "h:mm a",
     variant => undef,
-    version => 40,
+    version => 41,
   },
   en => {
     am_pm_abbreviated => [
@@ -3615,7 +3635,7 @@ my %LocaleData = (
     time_format_medium => "h:mm:ss a",
     time_format_short => "h:mm a",
     variant => undef,
-    version => 40,
+    version => 41,
   },
   "en-CA" => {
     am_pm_abbreviated => [
@@ -3894,7 +3914,7 @@ my %LocaleData = (
     time_format_medium => "h:mm:ss a",
     time_format_short => "h:mm a",
     variant => undef,
-    version => 40,
+    version => 41,
   },
   "en-US" => {
     am_pm_abbreviated => [
@@ -4167,7 +4187,7 @@ my %LocaleData = (
     time_format_medium => "h:mm:ss a",
     time_format_short => "h:mm a",
     variant => undef,
-    version => 40,
+    version => 41,
   },
   es => {
     am_pm_abbreviated => [
@@ -4451,7 +4471,7 @@ my %LocaleData = (
     time_format_medium => "H:mm:ss",
     time_format_short => "H:mm",
     variant => undef,
-    version => 40,
+    version => 41,
   },
   "fr-FR" => {
     am_pm_abbreviated => [
@@ -4724,7 +4744,7 @@ my %LocaleData = (
     time_format_medium => "HH:mm:ss",
     time_format_short => "HH:mm",
     variant => undef,
-    version => 40,
+    version => 41,
   },
   hi => {
     am_pm_abbreviated => [
@@ -5001,7 +5021,7 @@ my %LocaleData = (
     time_format_medium => "h:mm:ss a",
     time_format_short => "h:mm a",
     variant => undef,
-    version => 40,
+    version => 41,
   },
   "ja-JP" => {
     am_pm_abbreviated => [
@@ -5279,7 +5299,7 @@ my %LocaleData = (
     time_format_medium => "H:mm:ss",
     time_format_short => "H:mm",
     variant => undef,
-    version => 40,
+    version => 41,
   },
   "pt-BR" => {
     am_pm_abbreviated => [
@@ -5557,7 +5577,7 @@ my %LocaleData = (
     time_format_medium => "HH:mm:ss",
     time_format_short => "HH:mm",
     variant => undef,
-    version => 40,
+    version => 41,
   },
   "zh-Hans-CN" => {
     am_pm_abbreviated => [
@@ -5831,7 +5851,7 @@ my %LocaleData = (
     time_format_medium => "HH:mm:ss",
     time_format_short => "HH:mm",
     variant => undef,
-    version => 40,
+    version => 41,
   },
   "zh-Hant-TW" => {
     am_pm_abbreviated => [
@@ -6105,7 +6125,7 @@ my %LocaleData = (
     time_format_medium => "Bh:mm:ss",
     time_format_short => "Bh:mm",
     variant => undef,
-    version => 40,
+    version => 41,
   },
 );
 ### :end LocaleData:
@@ -6168,7 +6188,7 @@ DateTime::Locale::Data - Locale data generated from CLDR
 
 =head1 VERSION
 
-version 1.33
+version 1.34
 
 =head1 DESCRIPTION
 
@@ -6191,7 +6211,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2003 - 2021 by Dave Rolsky.
+This software is copyright (c) 2003 - 2022 by Dave Rolsky.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

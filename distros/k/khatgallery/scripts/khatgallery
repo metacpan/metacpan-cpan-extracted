@@ -4,17 +4,15 @@ require v5.8.5;
 use strict;
 use warnings;
 
+our $VERSION = '0.23'; # VERSION
+
 =head1 NAME
 
 khatgallery - generate a HTML photo-gallery.
 
 =head1 VERSION
 
-This describes version B<0.03> of khatgallery.
-
-=cut
-
-our $VERSION = '0.03';
+version 0.23
 
 =head1 SYNOPSIS
 
@@ -27,7 +25,8 @@ khatgallery [ --captions_file I<filename> ] [ --debug_level I<num> ]
 [ --image_match I<string> ] [ --options I<filename> ]
 [ --page_template I<filename> ] [ --per_page I<num> ]
 { --plugins I<PluginName> } { --meta I<string> } [ --thumbdir I<string> ]
-[ --thumb_geom I<num>xI<num> ] I<directory>
+[ --thumb_geom I<num>xI<num> ] [ --top_out_dir I<directory> ]
+[ --top_url I<url> ] I<directory>
 
 =head1 DESCRIPTION
 
@@ -170,6 +169,17 @@ It is a subdirectory below the directory where its images are.
 The size of the thumbnails.  This doesn't actually define the dimensions
 of the thumbnails, but their area.  This gives better-quality thumbnails.
 (default:100x100)
+
+=item --top_out_dir I<directory>
+
+The directory to create galleries in; HTML and thumbnails will be created
+there.  If this is not given, it is the same as the images directory.
+
+=item --top_url I<URL>
+
+The URL of the top images directory; if the top_out_dir isn't the
+same as the images directory, then we need to know this in order
+to link to the images in the images directory.
 
 =item --verbose
 
@@ -318,6 +328,7 @@ sub process_args ($) {
 	       'per_page=i',
 	       'thumbdir=s',
 	       'thumb_geom=s',
+	       'captions_file=s',
 	       'page_template|template=s',
 	       'force_html!',
 	       'force_images!',
@@ -326,6 +337,8 @@ sub process_args ($) {
 	       'dir_actions=s@',
 	       'clean_actions=s@',
 	       'image_actions=s@',
+	       'top_out_dir=s',
+	       'top_url=s',
 	      ) or pod2usage(2);
 
     if ($data_ref->{'manpage'})

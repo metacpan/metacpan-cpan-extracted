@@ -126,6 +126,10 @@ EOT
     is_deeply($elem_ids,       {Foo => 0},          'elem_ids()');
     is_deeply($obj->tab_elems, {Foo => 0},          'tab_elems()');
     is_deeply($obj->eq_ids,    {}, 'eq_ids()');
+
+    note("Still the same with pedantic => 1");
+    $obj->get(src => $input, pedantic => 1);
+    is_deeply($obj->matrix, {0 => {0 => undef}}, 'matrix() / no change using pedantic');
   }
   {
     note("Single element input / empty relation");

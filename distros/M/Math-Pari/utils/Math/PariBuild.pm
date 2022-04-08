@@ -197,25 +197,27 @@ sub debug_no_response ($) {
   return "\n$b Response content (type=$t)\n$c\n$b\n\n";
 }
 
-sub ll_ftp () {	# All Perl download failures I saw are on Linux and BSD.
+sub ll_ftp () {	# OLD: All Perl download failures I saw are on Linux and BSD.
+  # As of 2003005022: now they are mostly on older Cygwin - which do not support -e option
   # this (not very portable) solution should work there?
+  my $opt = ($^O =~ /linux|bsd/i ? '-pinegv' : '-pingv');
   open OF, '> ftp-cmd' or die "Can't open `ftp-cmd' for write: $!";
   print OF <<'EOF';		# XXXX Hardwired version!
 user anonymous auto-download-Math-Pari@cpan.org
 cd /pub/pari/unix/
 dir
-cd OLD/2.1
+cd ../OLD/2.3
 dir
 binary
-get pari-2.1.7.tgz
+get pari-2.3.5.tar.gz
 quit
 EOF
   close OF or die "Can't close `ftp-cmd' for write: $!";
   print <<EOP;
 ==============================================
-ftp -pinegv megrez.math.u-bordeaux.fr < ftp-cmd
+ftp $opt megrez.math.u-bordeaux.fr < ftp-cmd
 EOP
-  my $rc = system "ftp -pinegv megrez.math.u-bordeaux.fr < ftp-cmd";
+  my $rc = system "ftp $opt megrez.math.u-bordeaux.fr < ftp-cmd";
   print <<EOP;
 ==============================================
 EOP
@@ -233,11 +235,13 @@ EOP
 
 EOW
   warn(<<'EOW'), return unless $ENV{MATHPARI_USEFTP};
-FTP session is for debugging only; I'm ignoring the downloaded file.
-  (Set $ENV{MATHPARI_USEFTP} to TRUE to actually use the downloaded file.)
+FTP session is for debugging only; I'm ignoring the downloaded file now.
+  (Set $ENV{MATHPARI_USEFTP} to TRUE to actually use the downloaded file.
+   In fact, rerunning `Makefile.PL' should pickup this downloaded
+   file, so should succeed in finding GP/PARI archive.)
 
 EOW
-  return 'pari-2.1.7.tgz';
+  return 'pari-2.3.5.tar.gz';
 }
 
 sub extract_pari_archive ($) {
@@ -444,11 +448,12 @@ EOP
     my @extra_chdir = qw(unix OLD/2.3 OLD/2.1 OLD);
     print "Getting GP/PARI from $base_url\n";
 
+  for my $passive ([], [Passive => 0], [Passive => 1]) { # probably nowadays non-passive is a better 1st choice if default fails
     my @ret = eval {
       die "This is not an FTP url: $base_url" unless $base_url =~ m(^ftp://);
       require Net::FTP;
 
-      $ftp = Net::FTP->new($host) or die "Cannot create FTP object: $! [[[\$\@=$@]]]";
+      $ftp = Net::FTP->new($host, @$passive) or die "Cannot create FTP object: $! [[[\$\@=$@]]]";
       $ftp->login("anonymous","Math::Pari@")
         or die "Cannot login anonymously (",$ftp->message(),"): $!";
       my($c, $sub_old) = 0;
@@ -480,23 +485,27 @@ EOP
       return finish_download_pari($base_url, $dir, \%archive, $ftp)
     };
     return @ret if @ret;
+    warn "[with passive as @$passive]\n$@";
+   }
     die "Panic: unreachable" unless $@;
     {
-      warn "$@\nCan't fetch file with Net::FTP, now trying with LWP::UserAgent...\n";
+      warn "Can't fetch file with Net::FTP, now trying with LWP::UserAgent...\n";
       # second try with LWP::UserAgent
-      eval { require LWP::UserAgent; require HTML::LinkExtor }
-        or die "You do not have LWP::UserAgent and/or HTML::LinkExtor installed, cannot download, exiting...\n\n" . manual_download_instructions();
+      my $REQ = eval { require LWP::UserAgent; require HTML::LinkExtor }
+        or warn "You do not have LWP::UserAgent and/or HTML::LinkExtor installed, cannot download, trying fallback-for-debugging...\n"; # . manual_download_instructions();
       my($c, $do) = 0;
 #      my @Extra = @extra_chdir;
       my @url = map "$base_url$_", '', map "$_/", @extra_chdir;
       push @url, map { (my $in = $_) =~ s(^ftp://)(http://); $in } @url;
       while (not $c) {
+       my $resp;
+       if ($REQ) {
         $base_url = shift @url;
 	print "Not in this directory, trying `$base_url'...\n" if $do++;
 	$ua = LWP::UserAgent->new;
 	$ua->env_proxy;
 	my $req = HTTP::Request->new(GET => $base_url);
-	my $resp = $ua->request($req);
+	$resp = $ua->request($req);
 	$resp->is_success
 	  or warn("Can't fetch directory listing from $base_url: " . $resp->as_string), next;
 	%archive = ();
@@ -513,10 +522,11 @@ EOP
 	    $c++ if $match_pari_archive->($file);
 	  }
 	}
+       } else { @url = () }
 	unless ($c) {
 	  unless (@url) {
 	    warn debug_no_response($resp)
-	      . "Did not find any file matching /$match/ via FTP/HTTP.\n\n";
+	      . "Did not find any file matching /$match/ via FTP/HTTP.\n\n" if defined $resp;
 	    my $f = ll_ftp or die manual_download_instructions();
 	    return download_pari($f);
 	  }

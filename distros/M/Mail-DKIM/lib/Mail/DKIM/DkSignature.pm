@@ -1,7 +1,7 @@
 package Mail::DKIM::DkSignature;
 use strict;
 use warnings;
-our $VERSION = '1.20200907'; # VERSION
+our $VERSION = '1.20220408'; # VERSION
 # ABSTRACT: represents a DomainKeys-Signature header
 
 # Copyright 2005-2006 Messiah College. All rights reserved.
@@ -252,7 +252,7 @@ Mail::DKIM::DkSignature - represents a DomainKeys-Signature header
 
 =head1 VERSION
 
-version 1.20200907
+version 1.20220408
 
 =head1 CONSTRUCTORS
 

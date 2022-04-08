@@ -1,0 +1,83 @@
+NAME
+    Plack::App::Data::Printer - Plack Data::Printer application.
+
+SYNOPSIS
+     use Plack::App::Data::Printer;
+
+     my $obj = Plack::App::Data::Printer->new(%parameters);
+     my $psgi_ar = $obj->call($env);
+     my $app = $obj->to_app;
+
+METHODS
+  "new"
+     my $obj = Plack::App::Data::Printer->new(%parameters);
+
+    Constructor.
+
+    Returns instance of object.
+
+  "call"
+     my $psgi_ar = $obj->call($env);
+
+    Implementation of Data::Printer in plack.
+
+    Returns reference to array (PSGI structure).
+
+  "to_app"
+     my $app = $obj->to_app;
+
+    Creates Plack application.
+
+    Returns Plack::Component object.
+
+EXAMPLE
+     use strict;
+     use warnings;
+
+     use Plack::App::Data::Printer;
+     use Plack::Runner;
+
+     # Run application.
+     my $app = Plack::App::Data::Printer->new(
+             'data' => {
+                     'example' => [1, 2, {
+                             'foo' => 'bar',
+                     }, 5],
+             },
+     )->to_app;
+     Plack::Runner->new->run($app);
+
+     # Output:
+     # HTTP::Server::PSGI: Accepting connections at http://0:5000/
+
+     # > curl http://localhost:5000/
+     # {
+     #     example   [
+     #         [0] 1,
+     #         [1] 2,
+     #         [2] {
+     #                 foo   "bar"
+     #             },
+     #         [3] 5
+     #     ]
+     # }
+
+DEPENDENCIES
+    Data::Printer, Error::Pure, Plack::Component, Plack::Util::Accessor.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Plack-App-Data-Printer>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2022 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.03
+

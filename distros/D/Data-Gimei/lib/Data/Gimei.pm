@@ -1,6 +1,6 @@
 package Data::Gimei;
 
-use version; our $VERSION = version->declare("v0.0.5");
+use version; our $VERSION = version->declare("v0.0.6");
 
 use Data::Gimei::Name;
 use Data::Gimei::Address;
@@ -114,6 +114,21 @@ This module is available on CPAN.  You can install this module
 by following the step below.
 
   $ cpanm Data::Gimei
+
+=head1 DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+  $ perldoc Data::Gimei
+
+You can also look for information at:
+
+  GitHub Repository (report bugs here)
+      https://github.com/youpong/Data-Gimei
+
+  Search CPAN
+      https://metacpan.org/dist/Data-Gimei
 
 =head1 LICENSE
 

@@ -164,7 +164,7 @@ if ( $OSNAME eq 'MSWin32' ) {
     }
 }
 elsif ( $OSNAME eq 'darwin' ) {
-    foreach my $path (
+  PATH: foreach my $path (
         '/Applications/Firefox.app/Contents/MacOS/firefox',
         '/Applications/Firefox Developer Edition.app/Contents/MacOS/firefox',
         '/Applications/Firefox Nightly.app/Contents/MacOS/firefox',
@@ -173,6 +173,7 @@ elsif ( $OSNAME eq 'darwin' ) {
     {
         if ( -e $path ) {
             $binary = $path;
+            last PATH;
         }
     }
 }
@@ -275,9 +276,7 @@ if ($version_string) {
 "Please install a more recent version of Mozilla Firefox.  Current version is $major\n";
         }
     }
-    elsif (
-        $version_string =~ /^Waterfox[ ]/smx )
-    {
+    elsif ( $version_string =~ /^Waterfox[ ]/smx ) {
     }
     elsif ( $version_string =~ /^Moonchild[ ]/smx ) {
     }
@@ -364,8 +363,11 @@ WriteMakefile(
             },
         },
     },
-    PL_FILES       => {},
-    EXE_FILES      => [ 'ssh-auth-cmd-marionette', 'ca-bundle-for-firefox', 'check-firefox-certificate-authorities', 'firefox-passwords' ],
+    PL_FILES  => {},
+    EXE_FILES => [
+        'ssh-auth-cmd-marionette',               'ca-bundle-for-firefox',
+        'check-firefox-certificate-authorities', 'firefox-passwords'
+    ],
     BUILD_REQUIRES => {
         'Compress::Zlib'  => 0,
         'Cwd'             => 0,
@@ -400,7 +402,7 @@ WriteMakefile(
         'POSIX'               => 0,
         'Scalar::Util'        => 0,
         'Socket'              => 0,
-        'Text::CSV_XS'        => 0,
+        'Text::CSV_XS'        => 1.35,
         'Time::Local'         => 0,
         'Term::ReadKey'       => 0,
         'Time::HiRes'         => 0,
@@ -416,7 +418,7 @@ WriteMakefile(
               )
             : ()
         ),
-        'XML::Parser'         => 0,
+        'XML::Parser' => 0,
         (
             (
                       $OSNAME ne 'MSWin32'

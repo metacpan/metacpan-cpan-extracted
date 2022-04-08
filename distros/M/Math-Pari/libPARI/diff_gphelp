@@ -1,0 +1,53 @@
+--- gphelp-pari-ini	2022-03-27 13:37:06.192032300 -0700
++++ gphelp	2022-03-27 14:06:20.004038600 -0700
+@@ -55,7 +55,7 @@ $tex = $ENV{GPTEX} || "tex";
+ $refcard = (@ARGV and $ARGV[-1] =~ /refcard/i);
+ 
+ $dumb_pod=1, $ARGV[0] = '-to_pod' if @ARGV && $ARGV[0] eq '-to_dumb_pod';
+-&to_pod() if @ARGV == 2 && $ARGV[0] eq '-to_pod';
++&to_pod() if @ARGV[0] eq '-to_pod';
+ 
+ &options(); &init();
+ if ($#ARGV < 0) { &treat(""); cleanexit(); }
+@@ -108,6 +108,8 @@ sub options {
+       { $cb = &color(shift(@ARGV)); }
+     elsif ($_ eq "-color_underline" || $_ eq "-cu")
+       { $cu = &color(shift(@ARGV)); }
++    elsif ($_ =~ /^-pari-version=(.*)/)
++      { $version = $1; }
+     else
+       { &help(); }
+   }
+@@ -765,7 +767,7 @@ sub basic_subst {
+   s(\\footnote\s*\{?\*+\}?\s*\{\s*((?:[^{}]|\{(?:[^{}]|\{[^{}]*\})*\})*)\})
+     {$tr{startbold}FOOTNOTE$tr{endbold}$tr{lt}$tr{lt}$tr{lt} $1 $tr{gt}$tr{gt}$tr{gt}}g;
+   s/(\{[\w\s]+)\{\}([\s\w]+\})/$1$2/g;	# {nf{}init}
+-  s(\\op(?![a-zA-Z])\s*)({\\it op\\/})g;	# {nf{}init}
++  s(\\op(?![a-zA-Z])\s*)(\{\\it op\\/})g;	# {nf{}init}
+   s/\\emacs\b//;
+   s/\\unix\b//;
+   s/\\(leavevmode|strut)(?![a-zA-Z])\s*//g;
+@@ -813,8 +815,8 @@ sub basic_subst {
+   s/ *\\circ\b */ o /g;
+   s/\\d?frac\{\s*((?:[^{}]|\{[^{}]*\})*)\}\{\s*((?:[^{}]|\{[^{}]*\})*)\}/($1)\/($2)/g;
+   s(\\d?frac\s*(\d)\s*(\d))(($1/$2))g;
+-  s[{\s*(\w)\s*\\over(?![a-zA-Z])\s*(\w)\s*}]{($1/$2)}g;
+-  s[{\s*((?:[^{}]|\{[^{}]*\})*)\\over(?![a-zA-Z])\s*((?:[^{}]|\{[^{}]*\})*)}][($1)/($2)]g;
++  s[\{\s*(\w)\s*\\over(?![a-zA-Z])\s*(\w)\s*}]{($1/$2)}g;
++  s[\{\s*((?:[^{}]|\{[^{}]*\})*)\\over(?![a-zA-Z])\s*((?:[^{}]|\{[^{}]*\})*)}][($1)/($2)]g;
+ 
+   # \def\synt#1#2{\syn{#1}{\tt #2}}
+   # \def\syn#1#2{\synx{#1}{#2}{#1}}
+@@ -1251,8 +1253,10 @@ sub TeXprint {
+ }
+ 
+ sub to_pod {
+-  $to_pod = $ARGV[1];
+-  inittr();
++  shift @ARGV;
++  &options();
++  $to_pod = shift @ARGV;
++  &inittr();
+   $parifile = $to_pod;
+   %compress = ('.gz', 'gzip -cd',
+ 	       '.z', 'gzip -cd',

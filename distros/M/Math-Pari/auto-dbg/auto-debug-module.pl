@@ -4,7 +4,7 @@ use File::Path 'mkpath';
 use File::Copy 'copy';
 use Config;
 
-my $VERSION = '1.06';			# Changelog at end
+my $VERSION = '1.08';			# Changelog at end
 die "Debugging cycle detected"		# set to -1 to allow extra iteration
   if ++$ENV{PERL_DEBUG_MCODE_CYCLE} > 1;
 
@@ -129,27 +129,34 @@ unless ($skip_makefiles) {
 }
 exit 0 unless @ARGV or not $chk_module;
 
+my $dbxname = 'dbx';
 my $gdb = `gdb --version` unless $opt{d};
 my $dbx = `dbx -V -c quit` unless $gdb;
 my $lldb = `lldb --version` unless $gdb or $dbx;	# untested
-unless ($gdb or $dbx or $lldb) {
-  unless ($gdb = `gdb --version`) {
-    my($sep, @cand) = quotemeta $Config{path_sep};
-    for my $dir (split m($sep), ($ENV{PATH} || '')) {
-      for my $f (<$dir/*>) {
-        push @cand, $f if $f =~ m{dbx|gdb|lldb}i and -x $f;
-      }
+$dbx = `dbxtool -V` and $dbxname = 'dbxtool' unless $gdb or $dbx or $lldb;
+
+sub find_candidates () {
+  my($sep, @cand) = quotemeta $Config{path_sep};
+  for my $dir (split m($sep), ($ENV{PATH} || '')) {
+    for my $f (<$dir/*>) {
+      push @cand, $f if $f =~ m{dbx|gdb|lldb}i and -x $f;
     }
-    warn 'Possible candidates for debuggers: {{{'. join('}}} {{{', @cand), '}}}' if @cand;
-  };
+  }
+  warn 'Possible candidates for debuggers: {{{'. join('}}} {{{', @cand), '}}}' if @cand;
+}
+
+unless ($gdb or $dbx or $lldb) {
+  find_candidates() unless $gdb = `gdb --version`;
 }
 
 sub report_no_debugger () {
-  die "Can't find gdb or dbx" unless defined $gdb or defined $dbx or defined $lldb;
-  die "Can't parse output of gdb --version"
+  die "Can't find gdb or dbx or lldb" unless defined $gdb or defined $dbx or defined $lldb;
+  die "Can't parse output of gdb --version: {{{$gdb}}}"
     unless $dbx or $lldb or $gdb =~ /\b GDB \b | \b Copyright \b .* \b Free Software \b/x;
-  die "Can't parse output of `dbx -V -c quit'"
-    unless $gdb or $lldb or $dbx =~ /\b dbx \s+ debugger \b/xi;
+  die "Can't parse output of `dbx -V -c quit': {{{$dbx}}}"
+    unless $gdb or $lldb or $dbxname eq 'dbxtool' or $dbx =~ /\b dbx \s+ debugger \b/xi;
+  warn "Can't parse output of `dbxtool -V': {{{$dbx}}}"
+    unless $gdb or $lldb or $dbxname eq 'dbx' or $dbx =~ /\b dbx \s+ debugger \b/xi;
   die "Can't parse output of lldb --version: {{{$lldb}}}"
     unless $dbx or $gdb or $lldb =~ /\b lldb-\S*\d/x;
 }
@@ -206,6 +213,8 @@ sub do_subdir_build () {
   $make = 'make' unless defined $make;
   system $make and die "system($make): rc=$?";
   { open my $f, '>', 'autodebug-make-ok'; }	# Leave a footprint of a successful build
+  warn "Renaming Makefile.PL to orig-Makefile.PL\n\t(to avoid recursive calls from Makefile.PL in the parent directory)";
+  rename 'Makefile.PL', 'orig-Makefile.PL'; # ignore error
 }
 
 do_subdir_build() unless -f 'autodebug-make-ok';
@@ -214,7 +223,7 @@ die $postpone if $postpone;	# Reached without a debugger only with -B
 
 my $p = ($^X =~ m([\\/]) ? $^X : `which perl`) || $^X;
 chomp $p unless $p eq $^X;
-my(@cmd, $ver, $ver_done, $dscript);
+my(@cmd, $ver, $ver_done, $cand_done, $dscript);
 
 for my $script (@ARGV) {
   $script = "../$script" if not -f $script and -f "../$script";
@@ -338,13 +347,17 @@ EOP
     # regs [-f] [-F]        # Print value of registers (-f/-F: SPARC only)
     # list -<n>             # List previous <n> lines (next with +)
     #   -i or -instr        # Intermix source lines and assembly code
-    @cmd = (qw(dbx -c),		# We do not do non-integer registers...
+    @cmd = ($dbxname, qw(-c),		# We do not do non-integer registers...
 	    qq(run -Mblib $script; echo; echo =================================; echo; where -v; echo; echo =================================; echo; dump; echo; echo =================================; echo; regs; echo; echo =================================; echo; list -i +1; echo; echo =================================; echo; list -i -10; echo; echo =================================; echo; echo ============== up 1:; up; dump; echo; echo ============== up 2:; up; dump; echo; echo ============== up 3:; up; dump; echo; echo ============== up 4:; up; dump; echo ==============; /usr/proc/bin/pmap -F \$proc; quit),
 	    $p);
   }
   warn "\nDebugger's version: $ver\n" unless $ver_done++;
   warn 'Running {{{', join('}}} {{{', @cmd), "}}}\n\n";
-  system @cmd and die "Running @cmd: rc=$?", ($dscript ? "\n========= script begin\n$dscript\n========= script end\n\t" : '');
+  if (system @cmd) {
+    warn "Running @cmd: rc=$?", ($dscript ? "\n========= script begin\n$dscript\n========= script end\n\t" : '');
+    find_candidates();
+    die "I stop here,"
+  }
 }
 1;
 
@@ -383,3 +396,8 @@ __END__
 1.06	Report the script if the debugger failed.
 	Leave ./autodebug-make-ok in the build directory if make was successful.
 	New option -U for using an existing directory with a successful build.
+1.07	Update the error message if no debugger found.
+	Inspect dbxtool as a way of debugging ???.  (untested)
+	Report other debugger candidates if a run of a debugger fails.
+1.08	Rename Makefile.PL in the subdirectory (to avoid recursive calls from Makefile.PL in the parent directory).
+	Remove the corresponding warning from ./README too.

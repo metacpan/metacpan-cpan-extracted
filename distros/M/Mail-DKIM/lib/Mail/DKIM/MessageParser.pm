@@ -1,7 +1,7 @@
 package Mail::DKIM::MessageParser;
 use strict;
 use warnings;
-our $VERSION = '1.20200907'; # VERSION
+our $VERSION = '1.20220408'; # VERSION
 # ABSTRACT: Signs/verifies Internet mail with DKIM/DomainKey signatures
 
 # Copyright 2005 Messiah College. All rights reserved.
@@ -142,7 +142,7 @@ Mail::DKIM::MessageParser - Signs/verifies Internet mail with DKIM/DomainKey sig
 
 =head1 VERSION
 
-version 1.20200907
+version 1.20220408
 
 =head1 AUTHORS
 

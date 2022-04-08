@@ -1,7 +1,7 @@
 package Genealogy::ObituaryDailyTimes::DB;
 
 # Author Nigel Horne: njh@bandsman.co.uk
-# Copyright (C) 2015-2021, Nigel Horne
+# Copyright (C) 2015-2022, Nigel Horne
 
 # Usage is subject to licence terms.
 # The licence terms of this software are as follows:
@@ -39,7 +39,7 @@ package Genealogy::ObituaryDailyTimes::DB;
 # reasons it's enabled by default
 # TODO: Switch that to off by default, and enable by passing 'entry'
 
-# TODO: support a directory hierachy of databases
+# TODO: support a directory hierarchy of databases
 # TODO: consider returning an object or array of objects, rather than hashes
 # TODO:	Add redis database - could be of use for Geo::Coder::Free
 #	use select() to select a database - use the table arg
@@ -75,7 +75,7 @@ sub new {
 
 	return bless {
 		logger => $args{'logger'} || $logger,
-		directory => $args{'directory'} || $directory,	# The directory conainting the tables in XML, SQLite or CSV format
+		directory => $args{'directory'} || $directory,	# The directory containing the tables in XML, SQLite or CSV format
 		cache => $args{'cache'} || $cache,
 		table => $args{'table'},	# The name of the file containing the table, defaults to the class name
 		no_entry => $args{'no_entry'} || 0,
@@ -107,6 +107,8 @@ sub set_logger {
 	}
 
 	$self->{'logger'} = $args{'logger'};
+
+	return $self;
 }
 
 # Open the database.
@@ -288,6 +290,8 @@ sub _open {
 	$self->{$table} = $dbh;
 	my @statb = stat($slurp_file);
 	$self->{'_updated'} = $statb[9];
+
+	return $self;
 }
 
 # Returns a reference to an array of hash references of all the data meeting
@@ -391,8 +395,9 @@ sub selectall_hash {
 
 		my @rc;
 		while(my $href = $sth->fetchrow_hashref()) {
+			# FIXME: Doesn't store in the cache
+			return $href if(!wantarray);
 			push @rc, $href;
-			last if(!wantarray);
 		}
 		if($c && wantarray) {
 			$c->set($key, \@rc, '1 hour');
@@ -461,13 +466,13 @@ sub fetchrow_hashref {
 		}
 	}
 	my $key;
+	if(defined($query_args[0])) {
+		$key = "fetchrow $query " . join(', ', @query_args);
+	} else {
+		$key = "fetchrow $query";
+	}
 	my $c;
 	if($c = $self->{cache}) {
-		if(defined($query_args[0])) {
-			$key = "fetchrow $query " . join(', ', @query_args);
-		} else {
-			$key = "fetchrow $query";
-		}
 		if(my $rc = $c->get($key)) {
 			return $rc;
 		}
@@ -528,12 +533,12 @@ sub updated {
 	return $self->{'_updated'};
 }
 
-# Return the contents of an arbiratary column in the database which match the
+# Return the contents of an arbitrary column in the database which match the
 #	given criteria
 # Returns an array of the matches, or just the first entry when called in
 #	scalar context
 
-# Set distinct to 1 if you're after a uniq list
+# Set distinct to 1 if you're after a unique list
 sub AUTOLOAD {
 	our $AUTOLOAD;
 	my $column = $AUTOLOAD;
@@ -581,6 +586,12 @@ sub AUTOLOAD {
 		} else {
 			if($self->{'logger'}) {
 				$self->{'logger'}->debug("AUTOLOAD params $key isn't defined");
+			}
+			if($done_where) {
+				$query .= " AND $key IS NULL";
+			} else {
+				$query .= " WHERE $key IS NULL";
+				$done_where = 1;
 			}
 		}
 	}

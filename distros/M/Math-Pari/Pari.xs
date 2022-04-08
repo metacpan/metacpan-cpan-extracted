@@ -985,8 +985,25 @@ static int warn_undef = 0;	/* Cannot enable until 'I' prototype can be distingui
 
 #define is_gnil(g)	((g) == gnil)
 
+static GEN
+str2gen(char *s, int prefer_str)
+{
+  if (!prefer_str) return readseq(s);
+  {				/* as genconcat() */
+    long ll, l =   nchar2nlong((ll = strlen(s)) + 1);
+    GEN x = cgetg(l + 1, t_STR); 
+  
+    strncpy(GSTR(x), s, ll+1);
+    return x;
+  }
+}
+
+#define sv2pari(sv)		sv2pariHow(sv,0)
+#define sv2pariStr(sv)		sv2pariHow(sv,1)	/* When given an array, use sv2pari() on the elements */
+#define sv2pariStrDeep(sv)	sv2pariHow(sv,2)
+
 GEN
-sv2pari(SV* sv)
+sv2pariHow(SV* sv, int prefer_str)
 {
   if (SvGMAGICAL(sv)) mg_get(sv); /* MAYCHANGE in perlguts.pod - bug in perl */
   if (SvROK(sv)) {
@@ -1019,7 +1036,7 @@ sv2pari(SV* sv)
 	      for (i=0;i<=len;i++) {
 		  SV** svp=av_fetch(av,i,0);
 		  if (!svp) croak("Internal error in sv2pari!");
-		  ret[i+1]=(long)sv2pari(*svp);
+		  ret[i+1]=(long)sv2pariHow(*svp, prefer_str > 1 ? 2 : 0);
 	      }
 	      return ret;
 	  } else {
@@ -1042,10 +1059,10 @@ sv2pari(SV* sv)
 #endif	/* !defined(PERL_VERSION) || (PERL_VERSION < 6) */
       return dbltor(n);
   }
-  else if (SvPOK(sv))  return readseq(SvPV(sv,na));
+  else if (SvPOK(sv))  return str2gen(SvPV(sv,na), prefer_str);
   else if (SvIOKp(sv)) return PerlInt_to_i(sv);
   else if (SvNOKp(sv)) return dbltor((double)SvNV(sv));
-  else if (SvPOKp(sv)) return readseq(SvPV(sv,na));
+  else if (SvPOKp(sv)) return str2gen(SvPV(sv,na), prefer_str);
   else if (SvOK(sv))   croak("Variable in sv2pari is not of known type");  
 
   if (warn_undef) warn("undefined value in sv2pari");
@@ -1987,8 +2004,18 @@ fill_argvect(entree *ep, const char *s, long *has_pointer, GEN *argvec,
 		j++;
 		break;
 
-	    case 'r': /* raw */
 	    case 's': /* expanded string; empty arg yields "" */
+	        if (*s == '*') {
+	            int ii = 0;
+	            GEN out = cgetg(items-j+1, t_VEC);
+
+	            s++;
+	            argvec[i++] = out;
+	            while (j < items)
+		      out[1 + ii++] = (long)sv2pariStr(args[j++]);
+		    goto args_done;
+	        }
+	    case 'r': /* raw */
 		argvec[i++] = (GEN) SvPV(args[j],na);
 		j++;
 		break;
@@ -2104,16 +2131,18 @@ fill_argvect(entree *ep, const char *s, long *has_pointer, GEN *argvec,
 		}		
 		/* FALL THROUGH */
 	    default: 
-		croak("Unsupported code '%.1s' in signature '%s' of a PARI function", s-1, s0);
+		croak("Unsupported code '%.1s' in signature '%s' of a PARI function `%s'", s-1, s0, ep->name);
 	    }
 	if (j > items)
-	    croak("Too few args %d for PARI function %s", items, ep->name);
+	    croak("Too few args %d for PARI function `%s'", items, ep->name);
     }
     if (j < items)
 	croak("%d unused args for PARI function %s of signature `%s' (with %d args)", items - j, ep->name, ep->code, j);
+   args_done: {
 #if PURIFY
     for ( ; i<ARGS_SUPPORTED; i++) argvec[i]=NULL; 
 #endif
+    }
 }
 
 static void
@@ -2413,6 +2442,8 @@ long	oldavma=avma;
    CODE:
      if (items==1) {
        RETVAL=sv2pari(ST(0));
+       if (t_VEC == typ(RETVAL))
+         settyp(RETVAL, t_COL);
      } else {
 	int i;
 
@@ -2420,8 +2451,35 @@ long	oldavma=avma;
 	for (i=0;i<items;i++) {
 	  RETVAL[i+1]=(long)sv2pari(ST(i));
 	}
+        settyp(RETVAL, t_COL);
      }
-     settyp(RETVAL, t_COL);
+   OUTPUT:
+     RETVAL
+
+GEN
+PARIvecL(...)
+long	oldavma=avma;
+   CODE:
+	int i;
+
+	RETVAL=cgetg(items+1, t_VEC);
+	for (i=0;i<items;i++) {
+	  RETVAL[i+1]=(long)sv2pari(ST(i));
+	}
+   OUTPUT:
+     RETVAL
+
+GEN
+PARIcolL(...)
+long	oldavma=avma;
+   CODE:
+	int i;
+
+	RETVAL=cgetg(items+1, t_VEC);
+	for (i=0;i<items;i++) {
+	  RETVAL[i+1]=(long)sv2pari(ST(i));
+	}
+        settyp(RETVAL, t_COL);
    OUTPUT:
      RETVAL
 
@@ -2434,13 +2492,34 @@ long	oldavma=avma;
      } else {
 	int i;
 
-	RETVAL=cgetg(items+1, t_VEC);
+	RETVAL=cgetg(items+1, t_MAT);
 	for (i=0;i<items;i++) {
 	  RETVAL[i+1]=(long)sv2pari(ST(i));
-	  settyp(RETVAL[i+1], t_COL);
+	  if (t_VEC == typ((GEN)(RETVAL[i+1]))) {
+	    settyp(RETVAL[i+1], t_COL);
+	  } else if (t_COL != typ((GEN)(RETVAL[i+1]))) {
+	    croak("%ld'th argument (of %ld) to PARImat() is not a vector", (long)i, (long)items);
+	  }
 	}
      }
-     settyp(RETVAL, t_MAT);
+   OUTPUT:
+     RETVAL
+
+GEN
+PARImatL(...)
+long	oldavma=avma;
+   CODE:
+	int i;
+
+	RETVAL=cgetg(items+1, t_MAT);
+	for (i=0;i<items;i++) {
+	  RETVAL[i+1]=(long)sv2pari(ST(i));
+	  if (t_VEC == typ((GEN)(RETVAL[i+1]))) {
+	    settyp(RETVAL[i+1], t_COL);
+	  } else if (t_COL != typ((GEN)(RETVAL[i+1]))) {
+	    croak("%ld'th argument (of %ld) to PARImatL() is not a vector", (long)i, (long)items);
+	  }
+	}
    OUTPUT:
      RETVAL
 

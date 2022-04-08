@@ -29,6 +29,7 @@ use_ok('App::Git::Workflow::Command::RemoteDelete');
 use_ok('App::Git::Workflow::Command::ResetTo');
 use_ok('App::Git::Workflow::Command::Search');
 use_ok('App::Git::Workflow::Command::TagGrep');
+use_ok('App::Git::Workflow::Command::Touch');
 use_ok('App::Git::Workflow::Command::UpToDate');
 use_ok('App::Git::Workflow::Command::Watch');
 use_ok('App::Git::Workflow::Pom');
@@ -48,6 +49,7 @@ ok( !(system $perl, "-I $Bin/../lib", '-c', "$Bin/../bin/git-hook-setup"  ), "bi
 ok( !(system $perl, "-I $Bin/../lib", '-c', "$Bin/../bin/git-jira"        ), "bin/git-jira compiles"        );
 ok( !(system $perl, "-I $Bin/../lib", '-c', "$Bin/../bin/git-pom"         ), "bin/git-pom compiles"         );
 ok( !(system $perl, "-I $Bin/../lib", '-c', "$Bin/../bin/git-tag-grep"    ), "bin/git-tag-grep compiles"    );
+ok( !(system $perl, "-I $Bin/../lib", '-c', "$Bin/../bin/git-touch"       ), "bin/git-touch compiles"       );
 ok( !(system $perl, "-I $Bin/../lib", '-c', "$Bin/../bin/git-up-to-date"  ), "bin/git-up-to-date compiles"  );
 ok( !(system $perl, "-I $Bin/../lib", '-c', "$Bin/../bin/git-recent"      ), "bin/git-recent compiles"      );
 ok( !(system $perl, "-I $Bin/../lib", '-c', "$Bin/../bin/git-search"      ), "bin/git-search compiles"      );

@@ -14,11 +14,11 @@ Genealogy::ObituaryDailyTimes - Compare a Gedcom against the Obituary Daily Time
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =cut
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 =head1 SYNOPSIS
 
@@ -132,7 +132,7 @@ L<http://deps.cpantesters.org/?module=Genealogy::ObituaryDailyTimes>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2020-2021 Nigel Horne.
+Copyright 2020-2022 Nigel Horne.
 
 This program is released under the following licence: GPL2
 

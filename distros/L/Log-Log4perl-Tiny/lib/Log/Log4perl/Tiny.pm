@@ -2,7 +2,7 @@ package Log::Log4perl::Tiny;
 
 use strict;
 use warnings;
-{ our $VERSION = '1.6.2'; }
+{ our $VERSION = '1.6.4'; }
 
 use Carp;
 use POSIX ();
@@ -369,6 +369,7 @@ sub _carpstuff {
 
    require Carp;
    local $Carp::Internal{'' . __PACKAGE__} = 1;
+   local $Carp::CarpLevel = $Carp::CarpLevel + 2;
 
    my @message;
    @message = __expand_message_list({message => \@_})
@@ -380,7 +381,6 @@ sub _carpstuff {
       $self->$method($_) for split m{\n}mxs, $message;
    }
    if ($LOGDIE_MESSAGE_ON_STDERR) {
-      local $Carp::CarpLevel = $Carp::CarpLevel + 2;
       Carp->can($emitter)->(@message);
    }
 
@@ -474,15 +474,16 @@ BEGIN {
       C => [
          s => sub {
             my ($internal_package) = caller 0;
+            my $max_i = 5;
             my $i = 1;
             my $package;
-            while ($i <= 4) {
+            while ($i <= $max_i) {
                ($package) = caller $i;
                return '*undef*' unless defined $package;
                last if $package ne $internal_package;
                ++$i;
             } ## end while ($i <= 4)
-            return '*undef' if $i > 4;
+            return '*undef' if $i > $max_i;
             ($package) = caller($i += $caller_depth) if $caller_depth;
             return $package;
          },
@@ -596,14 +597,15 @@ BEGIN {
       M => [
          s => sub {
             my ($internal_package) = caller 0;
+            my $max_i = 5;
             my $i = 1;
-            while ($i <= 4) {
+            while ($i <= $max_i) {
                my ($package) = caller $i;
                return '*undef*' unless defined $package;
                last if $package ne $internal_package;
                ++$i;
             } ## end while ($i <= 4)
-            return '*undef' if $i > 4;
+            return '*undef' if $i > $max_i;
             $i += $caller_depth if $caller_depth;
             my (undef, undef, undef, $subroutine) = caller($i + 1);
             $subroutine = "main::" unless defined $subroutine;

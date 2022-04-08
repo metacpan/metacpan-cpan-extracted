@@ -1,22 +1,27 @@
 ---
-name: Parse-Apache-ServerStatus
-version: 0.10
+abstract: "Simple module to parse apache's server-status."
 author:
-  - Jonny Schulz
-abstract: Simple module to parse apache's server-status.
+  - 'Jonny Schulz'
+build_requires: {}
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: perl
-resources:
-  license: http://dev.perl.org/licenses/
-requires:
-  Class::Accessor::Fast: 0
-  LWP::UserAgent: 0
-  Params::Validate: 0
-  Test::More: 0
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Parse-Apache-ServerStatus
 provides:
   Parse::Apache::ServerStatus:
     file: lib/Parse/Apache/ServerStatus.pm
-    version: 0.10
-generated_by: Module::Build version 0.280801
-meta-spec:
-  url: http://module-build.sourceforge.net/META-spec-v1.2.html
-  version: 1.2
+    version: '0.11'
+requires:
+  Class::Accessor::Fast: '0'
+  LWP::UserAgent: '0'
+  Params::Validate: '0'
+  Test::More: '0'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.11'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

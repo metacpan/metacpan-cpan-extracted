@@ -1,11 +1,11 @@
 NAME
-    Acme::CPANModules::WorkingWithTree - Working with tree data structure in
-    Perl
+    Acme::CPANModules::WorkingWithTree - List of modules to work with tree
+    data structure
 
 VERSION
-    This document describes version 0.006 of
+    This document describes version 0.007 of
     Acme::CPANModules::WorkingWithTree (from Perl distribution
-    Acme-CPANModules-WorkingWithTree), released on 2021-10-07.
+    Acme-CPANModules-WorkingWithTree), released on 2022-03-18.
 
 DESCRIPTION
     Basics
@@ -61,70 +61,142 @@ DESCRIPTION
     Data::CSel and its related modules: App::htmlsel, App::jsonsel,
     App::orgsel, App::podsel, App::ppisel, App::yamlsel, App::CSelUtils.
 
-ACME::MODULES ENTRIES
-    *   Tree::Object
+ACME::CPANMODULES ENTRIES
+    *   Tree::Object - Generic tree objects
 
-    *   Tree::ObjectXS
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   Data::Tree
+    *   Tree::ObjectXS - Generic tree objects (with XS accessors, etc)
 
-    *   Tree::Simple
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   Tree::Node
+    *   Data::Tree - a hash-based tree-like data structure
 
-    *   Tree::From::Struct
+        Author: TEX <https://metacpan.org/author/TEX>
 
-    *   Tree::From::ObjArray
+    *   Tree::Simple - A simple tree object
 
-    *   Tree::From::Text
+        Author: RSAVAGE <https://metacpan.org/author/RSAVAGE>
 
-    *   Tree::From::TextLines
+    *   Tree::Node - Memory-efficient tree nodes in Perl
 
-    *   Tree::Create::Callback
+        Author: RRWO <https://metacpan.org/author/RRWO>
 
-    *   Tree::Create::Callback::ChildrenPerLevel
+    *   Tree::From::Struct - Build a tree object from hash structure
 
-    *   Tree::Create::Size
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    *   Tree::From::ObjArray - Build a tree of objects from a nested array
+        of objects
+
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    *   Tree::From::Text - Build a tree object from text
+
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    *   Tree::From::TextLines - Build a tree object from lines of text, each
+        line indented to express structure
+
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    *   Tree::Create::Callback - Create tree object by using a callback
+
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    *   Tree::Create::Callback::ChildrenPerLevel - Create tree object by
+        using a callback (and number of children per level)
+
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    *   Tree::Create::Size - Create a tree object of certain size
+
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
     *   Tree::From::FS
 
-    *   Data::Random::Tree
+    *   Data::Random::Tree - Create a random tree
 
-    *   Tree::To::Text
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   Tree::To::TextLines
+    *   Tree::To::Text - Show a tree object structure as text
 
-    *   Text::Tree::Indented
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   Tree::To::FS
+    *   Tree::To::TextLines - Render a tree object as indented text lines
 
-    *   Tree::Shell
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   Role::TinyCommons::Tree::Node
+    *   Text::Tree::Indented - render a tree data structure in the classic
+        indented view
 
-    *   Role::TinyCommons::Tree::NodeMethods
+        Author: NEILB <https://metacpan.org/author/NEILB>
 
-    *   Org::Parser
+    *   Tree::To::FS - Create a directory structure using tree object
 
-    *   Org::Parser::Tiny
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   Tree::Dump
+    *   Tree::Shell - Navigate and manipulate in-memory tree objects using a
+        CLI shell
 
-    *   Data::CSel
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   App::htmlsel
+    *   Role::TinyCommons::Tree::Node - Role for a tree node object
 
-    *   App::jsonsel
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   App::orgsel
+    *   Role::TinyCommons::Tree::NodeMethods - Role that provides tree node
+        methods
 
-    *   App::podsel
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   App::ppisel
+    *   Org::Parser - Parse Org documents
 
-    *   App::yamlsel
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   App::CSelUtils
+    *   Org::Parser::Tiny - Parse Org documents with as little code (and no
+        non-core deps) as possible
+
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    *   Tree::Dump - Dump a tree object
+
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    *   Data::CSel - Select tree node objects using CSS Selector-like syntax
+
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    *   App::htmlsel - Select HTML::Element nodes using CSel syntax
+
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    *   App::jsonsel - Select JSON elements using CSel (CSS-selector-like)
+        syntax
+
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    *   App::orgsel - Select Org document elements using CSel
+        (CSS-selector-like) syntax
+
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    *   App::podsel - Select Pod::Elemental nodes using CSel syntax
+
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    *   App::ppisel - Select PPI::Element nodes using CSel syntax
+
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    *   App::yamlsel - Select YAML elements using CSel (CSS-selector-like)
+        syntax
+
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    *   App::CSelUtils - Utilities related to Data::CSel
+
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
 FAQ
   What is an Acme::CPANModules::* module?
@@ -192,7 +264,7 @@ CONTRIBUTING
     me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021, 2020, 2019 by perlancar
+    This software is copyright (c) 2022, 2021, 2020, 2019 by perlancar
     <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
