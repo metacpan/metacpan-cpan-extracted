@@ -14,8 +14,9 @@ package Validator {
 
     sub profile {
         return {
-            name  => [qw(required)],
-            email => [qw(required email)],
+            name     => [ qw(required) ],
+            email    => [ qw(required email) ],
+            password => [ qw(required) ]
         };
     };
 
@@ -82,12 +83,15 @@ my $processor = Dancer2::Plugin::FormValidator::Processor->new(
 is_deeply(
     $processor->result->messages,
     {
-        'name' => [
+        'name'   => [
             'Name from profile is needed'
         ],
-        'email' => [
+        'email'  => [
             'Email please use valid email'
-        ]
+        ],
+        password => [
+            'Password is needed from config'
+        ],
     },
     'TEST 1: Check user defined messages(en) from validator class'
 );
@@ -105,7 +109,10 @@ is_deeply(
         ],
         'email' => [
             'Email пожалуйста укажи правильную почту'
-        ]
+        ],
+        password => [
+            'Password это нужно из конфига'
+        ],
     },
     'TEST 2: Check user defined messages(ru) from validator class'
 );

@@ -31,7 +31,7 @@ from (theta,phi) coordinates on the unit sphere (e.g. (lon,lat) on a
 planet or (RA,dec) on the celestial sphere) into some sort of
 projected coordinates, and have inverse transformations that convert
 back to (theta,phi).  This is equivalent to working from the
-equidistant cylindrical (or L<"plate caree"|/t_caree>) projection, if
+equidistant cylindrical (or L<"plate carree"|/t_carree>) projection, if
 you are a cartography wonk.
 
 The projected coordinates are generally in units of body radii
@@ -255,7 +255,13 @@ use Carp;
 our @ISA = ( 'Exporter','PDL::Transform' );
 our $VERSION = "0.6";
 $VERSION = eval $VERSION;
-our @EXPORT_OK = qw(graticule earth_image earth_coast clean_lines t_unit_sphere t_orthographic t_rot_sphere t_caree t_mercator t_utm t_sin_lat t_sinusoidal t_conic t_albers t_lambert t_stereographic t_gnomonic t_az_eqd t_az_eqa t_vertical t_perspective t_hammer t_aitoff);
+our @EXPORT_OK = qw(
+  graticule earth_image earth_coast earth_shape clean_lines t_unit_sphere
+  t_orthographic t_rot_sphere t_caree t_carree t_mercator t_utm t_sin_lat
+  t_sinusoidal t_conic t_albers t_lambert t_stereographic t_gnomonic
+  t_az_eqd t_az_eqa t_vertical t_perspective t_hammer t_aitoff
+  t_raster2fits t_raster2float
+);
 our @EXPORT = @EXPORT_OK;
 our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
@@ -388,7 +394,7 @@ sub graticule {
 
 Returns a vector coastline map based on the 1987 CIA World Coastline
 database (see author information).  The vector coastline data are in
-plate caree format so they can be converted to other projections via
+plate carree format so they can be converted to other projections via
 the L<apply|PDL::Transform/apply> method and cartographic transforms,
 and are suitable for plotting with the
 L<lines|PDL::Graphics::PGPLOT::Window/lines>
@@ -402,7 +408,7 @@ meridian, so if you want to plot it without reprojecting, you should
 run it through L</clean_lines> first:
 
     $w = pgwin();
-    $w->lines(earth_coast->clean_lines);     # plot plate caree map of world
+    $w->lines(earth_coast->clean_lines);     # plot plate carree map of world
     $w->lines(earth_coast->apply(t_gnomonic))# plot gnomonic map of world
 
 C<earth_coast> is just a quick-and-dirty way of loading the file
@@ -434,7 +440,7 @@ sub earth_coast {
 Returns an RGB image of Earth based on data from the MODIS instrument
 on the NASA EOS/Terra satellite.  (You can get a full-resolution
 image from L<http://earthobservatory.nasa.gov/Newsroom/BlueMarble/>).
-The image is a plate caree map, so you can convert it to other
+The image is a plate carree map, so you can convert it to other
 projections via the L<map|PDL::Transform/map> method and cartographic
 transforms.
 
@@ -448,8 +454,7 @@ sub earth_image {
   my $f;
   require PDL::IO::Pic;
   my $dir = "PDL/Transform/Cartography/earth_";
-  $f = ($nd =~ m/^n/i) ? "${dir}night.jpg" : "${dir}day.jpg";
-  
+  $f = (($nd//'') =~ m/^n/i) ? "${dir}night.jpg" : "${dir}day.jpg";
   local $_;
   my $im;
   my $found = 0;
@@ -457,31 +462,79 @@ sub earth_image {
     my $file = "$_/$f";
     if(-e $file) {
       $found = 1;
-      $im = PDL::IO::Pic::rpic($file)->mv(0,-1);
+      $im = PDL::IO::Pic::rpic($file);
     }
     last if defined($im);
   }
-
   barf("earth_image: $f not found in \@INC\n")
     unless defined($found);
   barf("earth_image: couldn't load $f; you may need to install netpbm.\n")
     unless defined($im);
+  t_raster2fits()->apply($im);
+}
 
-  my $h = $im->fhdr;
+=head2 earth_shape
 
-  $h->{SIMPLE} = 'T';
-  $h->{NAXIS} = 3;
-  $h->{NAXIS1}=2048;	      $h->{CRPIX1}=1024.5;    $h->{CRVAL1}=0;
-  $h->{NAXIS2}=1024;	      $h->{CRPIX2}=512.5;     $h->{CRVAL2}=0;
-  $h->{NAXIS3}=3,             $h->{CRPIX3}=1;         $h->{CRVAL3}=0;
-  $h->{CTYPE1}='Longitude';   $h->{CUNIT1}='degrees'; $h->{CDELT1}=180/1024.0;
-  $h->{CTYPE2}='Latitude';    $h->{CUNIT2}='degrees'; $h->{CDELT2}=180/1024.0;
-  $h->{CTYPE3}='RGB';         $h->{CUNIT3}='index';   $h->{CDELT3}=1.0;
-  $h->{COMMENT}='Plate Caree Projection';
-  $h->{HISTORY}='PDL Distribution Image, derived from NASA/MODIS data',
-  
-  $im->hdrcpy(1);
-  $im;
+=for usage
+
+ $fits_shape = earth_shape()
+
+=for ref
+
+(Cartography) PDL constructor - height map of Earth
+
+Returns a height map of Earth based on data from the General
+Bathymetric Chart of the Oceans (GEBCO) produced by the British
+Oceanographic Data Centre. (You can get a full-resolution image from
+L<http://visibleearth.nasa.gov/view.php?id=73934>).  The image is a
+plate carree map, so you can convert it to other projections via the
+L<map|PDL::Transform/map> method and cartographic transforms.
+The data is from 8-bit grayscale (so only 256 levels), but is returned
+in a similar format to L</earth_image>. The range represents a span of
+6400m, so Everest and the Marianas Trench are not accurately represented.
+
+To turn this into a C<float>, (C<lonlatradius,x,y>) with C<x>
+and C<y> in radians, and the radius as a C<float> as a proportion of the
+Earth's mean radius, use L</t_raster2float>.
+The Earth is treated here as a perfect sphere with sea
+level at radius 6,371km.
+
+  Value       Hex value   Float    From centre in km   Float as radius
+  Base        00          0.0      6370.69873km        0.99995
+  Sea level   0C          0.04705  6371km              1.0
+  Highest     FF          1.0      6377.09863km        1.00096
+
+Code:
+
+  $shape = earth_shape();
+  $floats = t_raster2float()->apply($shape->mv(2,0));
+  $lonlatradius = $floats->slice('0:2'); # r g b all same
+  $lonlatradius->slice('(2)') *= float((6377.09863 - 6370.69873) / 6371);
+  $lonlatradius->slice('(2)') += float(6370.69873 / 6371);
+
+=cut
+
+sub earth_shape {
+  my($nd) = shift;
+  require PDL::IO::Pic;
+  my $f = "PDL/Transform/Cartography/earth_height-2048x1024.jpg";
+  local $_;
+  my $im;
+  my $found = 0;
+  foreach (@INC) {
+    my $file = "$_/$f";
+    if(-e $file) {
+      $found = 1;
+      $im = PDL::IO::Pic::rpic($file);
+    }
+    last if defined($im);
+  }
+  barf("earth_shape: $f not found in \@INC\n")
+    unless defined($found);
+  barf("earth_shape: couldn't load $f; you may need to install netpbm.\n")
+    unless defined($im);
+  $im = $im->dummy(0,3); # fake RGB
+  t_raster2fits()->apply($im);
 }
 
 =head2 clean_lines
@@ -712,6 +765,98 @@ sub PDL::Transform::Cartography::_finish {
   return $me;
 }
 
+=head2 t_raster2float
+
+=for usage
+
+  $t = t_raster2float();
+
+=for ref
+
+(Cartography) Convert a raster (3,x,y) to C<float> (lonlatrgb,x,y)
+
+Assumes C<bytes> input, and radians and C<float> output, with the first
+2 coordinates suitable for use as plate carree.
+
+=cut
+
+sub t_raster2float {
+  my ($me) = _new(@_, 'Raster FITS plate carree to OpenGL-ready float conversion');
+  $me->{odim} = 3;
+  $me->{params}->{itype} = ['RGB','X','Y'];
+  $me->{params}->{iunit} = ['index','pixels','pixels'];
+  $me->{odim} = 2;
+  $me->{params}->{otype} = ['LonLatRGB','X','Y'];
+  $me->{params}->{ounit} = ['Float','index','index'];
+  $me->{func} = sub {
+    my($d,$o) = @_;
+    my (undef, $x, $y, @otherdims) = $d->dims;
+    my $type = float;
+    my $out_xy = zeroes(byte, $x, $y, @otherdims);
+    my $out = zeroes($type, 5, $x, $y, @otherdims);
+    $out->slice($_->[0]) .= $_->[1]
+      for ['(0)', $out_xy->xlinvals(-$PI, $PI)],
+        ['(1)', $out_xy->ylinvals(-$PI/2, $PI/2)],
+        ['2:4', $d->convert($type) / 255];
+    $out;
+  };
+  $me->{inv} = sub {
+    my($d,$o) = @_;
+    my $type = byte;
+    my (undef, $x, $y, @otherdims) = $d->dims;
+    my $out = zeroes($type, 3, $x, $y, @otherdims);
+    $out .= $d->slice('2:4') * 255;
+    $out;
+  };
+  $me;
+}
+
+=head2 t_raster2fits
+
+=for usage
+
+  $t = t_raster2fits();
+
+=for ref
+
+(Cartography) Convert a raster (3,x,y) to FITS plate carree (x,y,3)
+
+Adds suitable C<hdr>. Assumes degrees. Used by L</earth_image>.
+
+=cut
+
+sub t_raster2fits {
+  my ($me) = _new(@_, 'Raster to FITS plate carree conversion');
+  $me->{odim} = 3;
+  $me->{params}->{itype} = ['RGB','X','Y'];
+  $me->{params}->{iunit} = ['RGB','pixels','pixels'];
+  $me->{params}->{otype} = ['X','Y','RGB'];
+  $me->{params}->{ounit} = ['pixels','pixels','RGB'];
+  $me->{func} = sub {
+    my($d,$o) = @_;
+    my $out = $d->mv(0,2);
+    my $h = $out->fhdr;
+    $h->{SIMPLE} = 'T';
+    $h->{NAXIS} = $d->ndims;
+    local $_;
+    $h->{"NAXIS".($_+1)} = $out->dim($_) for 0..$out->ndims-1;
+    $h->{"CRVAL".($_+1)} = 0 for 0..$out->ndims-1;
+    $h->{"CRPIX".($_+1)} = $_<2 ? ($out->dim($_)+1)/2 : 1 for 0..$out->ndims-1;
+    my ($lon, $lat) = $out->dims;
+    $h->{CTYPE1}='Longitude';   $h->{CUNIT1}='degrees'; $h->{CDELT1}=360/$lon;
+    $h->{CTYPE2}='Latitude';    $h->{CUNIT2}='degrees'; $h->{CDELT2}=180/$lat;
+    $h->{CTYPE3}='RGB';         $h->{CUNIT3}='index';   $h->{CDELT3}=1.0;
+    $h->{COMMENT}='Plate Carree Projection';
+    $h->{HISTORY}='PDL conversion from raster image',
+    $out->hdrcpy(1);
+    $out;
+  };
+  $me->{inv} = sub {
+    my($d,$o) = @_;
+    $d->mv(2,0);
+  };
+  $me;
+}
 
 ######################################################################
 
@@ -856,7 +1001,7 @@ projection and you get an oblique one.
 Most of the projections automagically compose themselves with t_rot_sphere
 if you feed in an origin or roll angle.
 
-t_rot_sphere converts the base plate caree projection (straight lon, straight
+t_rot_sphere converts the base plate carree projection (straight lon, straight
 lat) to a Cassini projection.
 
 OPTIONS
@@ -1042,17 +1187,17 @@ sub t_orthographic {
 
 ######################################################################
 
-=head2 t_caree
+=head2 t_carree
 
 =for usage
 
-    $t = t_caree(<options>);
+    $t = t_carree(<options>);
 
 =for ref
 
-(Cartography) Plate Caree projection (cylindrical; equidistant)
+(Cartography) Plate Carree projection (cylindrical; equidistant)
 
-This is the simple Plate Caree projection -- also called a "lat/lon plot".
+This is the simple Plate Carree projection -- also called a "lat/lon plot".
 The horizontal axis is theta; the vertical axis is phi.  This is a no-op
 if the angular unit is radians; it is a simple scale otherwise. 
 
@@ -1072,10 +1217,11 @@ vertical scale (which is correct everywhere).
 
 =cut
 
-@PDL::Transform::Cartography::Caree::ISA = ('PDL::Transform::Cartography');
+@PDL::Transform::Cartography::Carree::ISA = ('PDL::Transform::Cartography');
 
-sub t_caree {
-    my($me) = _new(@_,'Plate Caree Projection');
+*t_caree = *t_carree; # compat alias for poor spellers
+sub t_carree {
+    my($me) = _new(@_,'Plate Carree Projection');
     my $p = $me->{params};
 
     $me->{otype} = ['projected longitude','latitude'];
@@ -1548,7 +1694,7 @@ the surface of the sphere).  If you specify only one then the other is
 taken to be the nearest pole.  If you specify both of them to be one
 pole then you get an equidistant azimuthal map.  If you specify both
 of them to be opposite and equidistant from the equator you get a
-Plate Caree projection.
+Plate Carree projection.
 
 =back
 
@@ -1560,9 +1706,9 @@ sub t_conic {
     my($p) = $me->{params};
 
     if($p->{cylindrical}) {
-	print STDERR "Simple conic: degenerate case; using Plate Caree\n"
+	print STDERR "Simple conic: degenerate case; using Plate Carree\n"
 	    if($PDL::verbose);
-	return t_caree($me->{options});
+	return t_carree($me->{options});
     }
 
     $p->{n} = ((cos($p->{std}->slice("(0)")) - cos($p->{std}->slice("(1)")))

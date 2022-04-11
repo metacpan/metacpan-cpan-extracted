@@ -1,5 +1,53 @@
-@  changeset:   159:354d21aee379
+@  changeset:   165:9df090eface9
 |  tag:         tip
+|  user:        Rene Schickbauer <cavac@cables.cavac.at>
+|  date:        Mon Apr 11 13:22:32 2022 +0200
+|  files:       lib/Net/Clacks/Server.pm
+|  description:
+|  Check that a tcp port has been given when we need to listen to IP adresses
+|
+|
+o  changeset:   164:e223c7a36797
+|  user:        Rene Schickbauer <cavac@cables.cavac.at>
+|  date:        Mon Apr 11 13:21:54 2022 +0200
+|  files:       lib/Net/Clacks/Client.pm
+|  description:
+|  BF: Make readtimeout default to 0 (no wait)
+|
+|
+o  changeset:   163:ad62dfafe20b
+|  user:        Rene Schickbauer <cavac@earthrise>
+|  date:        Mon Apr 11 13:13:14 2022 +0200
+|  files:       lib/Net/Clacks/Client.pm
+|  description:
+|  BF
+|
+|
+o  changeset:   162:8077fdc98a4a
+|  user:        Rene Schickbauer <cavac@earthrise>
+|  date:        Mon Apr 11 13:11:55 2022 +0200
+|  files:       devscripts/fixpragmas.pl devscripts/resetpod.pl devscripts/setcopyright.pl devscripts/setversion.pl example/chat.pl example/chat_unixdomainsocket.pl example/chatbot.pl example/clock.pl example/rawclient.pl example/server.pl lib/Net/Clacks.pm lib/Net/Clacks/ClacksCache.pm lib/Net/Clacks/Client.pm lib/Net/Clacks/Server.pm lib/Net/Clacks/UpgradeGuide.pod
+|  description:
+|  Switch to function signatures
+|
+|
+o  changeset:   161:c36e930d1dd9
+|  user:        Rene Schickbauer <cavac@earthrise>
+|  date:        Wed Mar 02 16:58:56 2022 +0100
+|  files:       example/README.txt example/chat.pl example/chatbot.pl example/clacks_master.xml example/clacks_master_unixdomainsocket.xml example/clacks_slaveserver1.xml example/clacks_slaveserver2.xml example/clock.pl
+|  description:
+|  Make sure we use IANA "dynamic ports" as default ports
+|
+|
+o  changeset:   160:914cd9fa2164
+|  user:        Rene Schickbauer <cavac@earthrise>
+|  date:        Tue Mar 01 15:45:03 2022 +0100
+|  files:       Changes
+|  description:
+|  Update Changes file
+|
+|
+o  changeset:   159:354d21aee379
 |  user:        Rene Schickbauer <cavac@earthrise>
 |  date:        Tue Mar 01 15:44:24 2022 +0100
 |  files:       MANIFEST.SKIP

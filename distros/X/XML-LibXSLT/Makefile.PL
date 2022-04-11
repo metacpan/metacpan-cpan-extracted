@@ -239,7 +239,7 @@ BUG
 
 WriteMakefile(
     'NAME'	=> 'XML::LibXSLT',
-    'VERSION_FROM' => 'LibXSLT.pm', # finds $VERSION
+    'VERSION_FROM' => 'lib/XML/LibXSLT.pm', # finds $VERSION
     'AUTHOR'    => 'Matt Sergeant',
     'ABSTRACT'  => 'Interface to GNOME libxslt library',
     'LICENSE'   => 'perl_5',

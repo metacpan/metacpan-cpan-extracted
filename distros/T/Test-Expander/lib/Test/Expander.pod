@@ -161,25 +161,29 @@ if such files don't exist, the B<%ENV> hash remains unchanged;
 
 =item
 
-otherwise, if at least one of such files exists, the B<%ENV> gets emptied (without localization) and
+otherwise, if at least one of such files exists, those elements of B<%ENV> are kept,
+which names are equal to names found in lines of B<.env> file without values.
+All remaining elements of the B<%ENV> gets emptied (without localization) and
 
 =over 2
 
 =item
 
-lines not matching the RegEx B</^\w+\s*=\s*\S/> (some alphanumeric characters representing a name of
-environment variable, optional blanks, the equal sign, again optional blanks, and at least one non-blank
-character representing the first character of environment variable value) are skipped;
+lines not matching the RegEx B</^\w+\s*(?:=\s*\S|$)?/> (some alphanumeric characters representing a name of
+environment variable, optional blanks, optionally followed by the equal sign, again optional blanks,
+and at least one non-blank character representing the first character of environment variable value) are skipped;
 
 =item
 
 in all other lines the value of the environment variable is everything from the first non-blank
 character after the equal sign until end of the line;
+if this value is omitted, the corresponding environment variable remains unchanged as it originally was in the B<%ENV>
+(if it existed there, of course);
 
 =item
 
-the value of the environment variable is evaluated by the L<string eval|https://perldoc.perl.org/functions/eval>
-so that
+the value of the environment variable (if provided) is evaluated by the
+L<string eval|https://perldoc.perl.org/functions/eval> so that
 
 =over 2
 
@@ -369,7 +373,7 @@ L<https://github.com/jsf116/Test-Expander/issues>.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2021 Jurij Fajnberg
+Copyright (c) 2021-2022 Jurij Fajnberg
 
 This program is free software; you can redistribute it and/or modify it under the same terms
 as the Perl 5 programming language system itself.

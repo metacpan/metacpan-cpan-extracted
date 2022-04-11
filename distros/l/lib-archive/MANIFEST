@@ -1,12 +1,15 @@
 Changes
+lib/lib/archive.pm
 LICENSE
 Makefile.PL
-MANIFEST
+MANIFEST			This list of files
 MANIFEST.SKIP
-lib/lib/archive.pm
 t/01_basic.t
 t/02_file.t
 t/03_url.t
+t/04_mod.t
+t/05_data.t
+t/06_expand.t
 t/arclib/VMod.tgz
 t/arclib/VMod2.tgz
 t/arclib/VMod3.tgz

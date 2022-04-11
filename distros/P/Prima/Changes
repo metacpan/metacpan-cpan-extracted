@@ -1,5 +1,11 @@
 Revision history for Perl module Prima
 
+1.64 2022-04-09
+ - Use libthai for Drawable.text_wrap
+ - PS/PDF font metric calculations simplified and fixed
+ - POD printing quality improved
+ - Support Drawable.alpha in the PDF backend
+
 1.63 2021-09-10
  - Fixes for macOS Catalina
  - Drawable changes:

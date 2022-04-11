@@ -45,12 +45,15 @@ use overload
 
 use constant F128_PV_NV_BUG => Math::Float128::Constant::_has_pv_nv_bug();
 
+# Inspired by https://github.com/Perl/perl5/issues/19550:
+use constant ISSUE_19550    => Math::Float128::Constant::_issue_19550();
+
 use subs qw(FLT128_DIG FLT128_MANT_DIG FLT128_MIN_EXP FLT128_MAX_EXP FLT128_MIN_10_EXP FLT128_MAX_10_EXP
             M_Eq M_LOG2Eq M_LOG10Eq M_LN2q M_LN10q M_PIq M_PI_2q M_PI_4q M_1_PIq M_2_PIq
             M_2_SQRTPIq M_SQRT2q M_SQRT1_2q
             FLT128_MAX FLT128_MIN FLT128_EPSILON FLT128_DENORM_MIN);
 
-$Math::Float128::VERSION = '0.15';
+$Math::Float128::VERSION = '0.16';
 
 Math::Float128->DynaLoader::bootstrap($Math::Float128::VERSION);
 
@@ -149,7 +152,13 @@ sub new {
 
     if(@_ > 1) {die "Too many arguments supplied to new() - expected no more than 1"}
 
-    my $arg = shift;
+    my $arg = shift; # At this point, an infnan might acquire a POK flag - thus
+                     # assigning to $type a value of 4, instead of 3. Such behaviour also
+                     # turns $arg into a PV and NV dualvar. It's a fairly inconsequential
+                     # bug - https://github.com/Perl/perl5/issues/19550.
+                     # I could workaround this by simply not shifting and re-assigning, but
+                     # I'll leave it as it is - otherwise there's nothing to mark that this
+                     # minor issue (which might also show up in user code) ever existed.
     my $type = _itsa($arg);
 
     return UVtoF128 ($arg) if $type == 1; #UV

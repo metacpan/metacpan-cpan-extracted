@@ -155,7 +155,7 @@ isnt(
 isnt(
     $validator->validate(
         'password',
-        {password => undef},
+        {password => 'pass'},
         'password_cnf'
     ),
     1,
@@ -460,7 +460,7 @@ is(
 
 is(
     $validator->stop_on_fail,
-    0,
+    1,
     'TEST 14: Dancer2::Plugin::FormValidator::Validator::Accepted stop_on_fail',
 );
 

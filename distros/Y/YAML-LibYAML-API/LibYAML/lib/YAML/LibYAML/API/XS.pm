@@ -2,7 +2,7 @@ package YAML::LibYAML::API::XS;
 use strict;
 use warnings;
 
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 use XSLoader;
 XSLoader::load('YAML::LibYAML::API::XS', $VERSION);

@@ -1,0 +1,163 @@
+NAME
+    Acme::CPANModules::Symlink - List of modules that deal with symbolic
+    links (symlinks)
+
+VERSION
+    This document describes version 0.001 of Acme::CPANModules::Symlink
+    (from Perl distribution Acme-CPANModules-Symlink), released on
+    2022-03-18.
+
+DESCRIPTION
+    Creating
+
+    Perl provides the "symlink" builtin.
+
+    Setup::File::Symlink can create/fix/delete symlink. Part of the Setup
+    module family, the functions in this module are idempotent with
+    transaction/undo support.
+
+    Finding
+
+    Perl provides the "-l" operator to test if a file or filehandle is a
+    symbolic link. This performs an "lstat()" call, which unlike "stat()"
+    can detect if a handle is symbolic link.
+
+    Testing
+
+    Test::Symlink
+
+    File::MoreUtil provides some utilities that are symlink-aware, like
+    "l_abs_path" and "file_exists".
+
+    Other utilities
+
+    File::Symlink::Relative creates relative symbolic links.
+
+    File::Symlink::Util provides utility routines related to symlinks.
+
+    More specific utilities
+
+    File::LinkTree::Builder
+
+    short (from App::short).
+
+    lntree (from <pm:App::lntree) to create a mirror based on symlinks.
+
+    Windows symlinks
+
+    Win32::NTFS::Symlink
+
+ACME::CPANMODULES ENTRIES
+    *   Setup::File::Symlink - Setup symlink (existence, target)
+
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    *   Test::Symlink - Test::Builder based test for symlink correctness
+
+        Author: NIKC <https://metacpan.org/author/NIKC>
+
+    *   File::MoreUtil - File-related utilities
+
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    *   File::Symlink::Relative - Create relative symbolic links
+
+        Author: WYANT <https://metacpan.org/author/WYANT>
+
+    *   File::Symlink::Util - Utilities related to symbolic links
+
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    *   File::LinkTree::Builder - builds a tree of symlinks based on file
+        metadata
+
+        Author: RJBS <https://metacpan.org/author/RJBS>
+
+    *   App::short - Manage short directory symlinks
+
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    *   Win32::NTFS::Symlink - Support for NTFS symlinks and junctions on
+        Microsoft
+
+        Author: BAYMAX <https://metacpan.org/author/BAYMAX>
+
+FAQ
+  What is an Acme::CPANModules::* module?
+    An Acme::CPANModules::* module, like this module, contains just a list
+    of module names that share a common characteristics. It is a way to
+    categorize modules and document CPAN. See Acme::CPANModules for more
+    details.
+
+  What are ways to use this Acme::CPANModules module?
+    Aside from reading this Acme::CPANModules module's POD documentation,
+    you can install all the listed modules (entries) using cpanm-cpanmodules
+    script (from App::cpanm::cpanmodules distribution):
+
+     % cpanm-cpanmodules -n Symlink
+
+    Alternatively you can use the cpanmodules CLI (from App::cpanmodules
+    distribution):
+
+        % cpanmodules ls-entries Symlink | cpanm -n
+
+    or Acme::CM::Get:
+
+        % perl -MAcme::CM::Get=Symlink -E'say $_->{module} for @{ $LIST->{entries} }' | cpanm -n
+
+    or directly:
+
+        % perl -MAcme::CPANModules::Symlink -E'say $_->{module} for @{ $Acme::CPANModules::Symlink::LIST->{entries} }' | cpanm -n
+
+    This Acme::CPANModules module also helps lcpan produce a more meaningful
+    result for "lcpan related-mods" command when it comes to finding related
+    modules for the modules listed in this Acme::CPANModules module. See
+    App::lcpan::Cmd::related_mods for more details on how "related modules"
+    are found.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Acme-CPANModules-Symlink>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Acme-CPANModules-Symlink>.
+
+SEE ALSO
+    Acme::CPANModules - about the Acme::CPANModules namespace
+
+    cpanmodules - CLI tool to let you browse/view the lists
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
+    steps required beyond that are considered a bug and can be reported to
+    me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2022 by perlancar <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Syml
+    ink>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+

@@ -7,11 +7,13 @@ use diagnostics;
 use mro 'c3';
 use English;
 use Carp;
-our $VERSION = 22;
+our $VERSION = 23;
 use autodie qw( close );
 use Array::Contains;
 use utf8;
 use Encode qw(is_utf8 encode_utf8 decode_utf8);
+use feature 'signatures';
+no warnings qw(experimental::signatures);
 #---AUTOPRAGMAEND---
 
 use IO::Socket::IP;
@@ -22,8 +24,7 @@ use IO::Select;
 use IO::Socket::SSL;
 use MIME::Base64;
 
-sub new {
-    my ($class, $server, $port, $username, $password, $clientname, $iscaching) = @_;
+sub new($class, $server, $port, $username, $password, $clientname, $iscaching = 0) {
     my $self = bless {}, $class;
 
     if(!defined($server) || !length($server)) {
@@ -50,8 +51,7 @@ sub new {
     return $self;
 }
 
-sub newSocket {
-    my ($class, $socketpath, $username, $password, $clientname, $iscaching) = @_;
+sub newSocket($class, $socketpath, $username, $password, $clientname, $iscaching = 0) {
     my $self = bless {}, $class;
 
     if(!defined($socketpath) || !length($socketpath)) {
@@ -83,9 +83,7 @@ sub newSocket {
     return $self;
 }
 
-sub init {
-    my ($self, $username, $password, $clientname, $iscaching) = @_;
-
+sub init($self, $username, $password, $clientname, $iscaching) {
     if(!defined($username) || $username eq '') {
         croak("Username not defined!");
     }
@@ -128,9 +126,7 @@ sub init {
     return;
 }
 
-sub reconnect {
-    my ($self) = @_;
-
+sub reconnect($self) {
     if(defined($self->{socket})) {
         delete $self->{socket};
     }
@@ -204,16 +200,12 @@ sub reconnect {
     return;
 }
 
-sub activate_memcached_compat {
-    my ($self) = @_;
-
+sub activate_memcached_compat($self) {
     $self->{memcached_compatibility} = 1;
     return;
 }
 
-sub getRawSocket {
-    my ($self) = @_;
-
+sub getRawSocket($self) {
     if($self->{needreconnect}) {
         $self->reconnect();
     }
@@ -221,9 +213,7 @@ sub getRawSocket {
     return $self->{socket};
 }
 
-sub doNetwork {
-    my ($self, $readtimeout) = @_;
-
+sub doNetwork($self, $readtimeout = 0) {
     if(!defined($readtimeout)) {
         # Don't wait
         $readtimeout = 0;
@@ -395,9 +385,7 @@ my %overheadflags = (
     Z => "no_flags", # Only sent when no other flags are set
 );
 
-sub getNext {
-    my ($self) = @_;
-
+sub getNext($self) {
     # Recieve next incoming message (if any)
 
 restartgetnext:
@@ -503,9 +491,7 @@ restartgetnext:
 }
 
 
-sub ping {
-    my ($self) = @_;
-
+sub ping($self) {
     if($self->{lastping} < (time - 120)) {
         # Only send a ping every 120 seconds or less
         $self->{outbuffer} .= "PING\r\n";
@@ -515,18 +501,14 @@ sub ping {
     return;
 }
 
-sub disablePing {
-    my ($self) = @_;
-
+sub disablePing($self) {
     $self->{outbuffer} .= "NOPING\r\n";
 
     return;
 }
 
 
-sub notify {
-    my ($self, $varname) = @_;
-
+sub notify($self, $varname) {
     if(!defined($varname) || !length($varname)) {
         carp("varname not defined!");
         return;
@@ -554,9 +536,7 @@ sub notify {
     return;
 }
 
-sub set { ## no critic (NamingConventions::ProhibitAmbiguousNames)
-    my ($self, $varname, $value, $forcesend) = @_;
-
+sub set($self, $varname, $value, $forcesend = 0) { ## no critic (NamingConventions::ProhibitAmbiguousNames)
     if(!defined($varname) || !length($varname)) {
         carp("varname not defined!");
         return;
@@ -603,9 +583,7 @@ sub set { ## no critic (NamingConventions::ProhibitAmbiguousNames)
     return;
 }
 
-sub listen { ## no critic (Subroutines::ProhibitBuiltinHomonyms)
-    my ($self, $varname) = @_;
-
+sub listen($self, $varname) { ## no critic (Subroutines::ProhibitBuiltinHomonyms)
     if(!defined($varname) || !length($varname)) {
         carp("varname not defined!");
         return;
@@ -620,9 +598,7 @@ sub listen { ## no critic (Subroutines::ProhibitBuiltinHomonyms)
     return;
 }
 
-sub unlisten {
-    my ($self, $varname) = @_;
-
+sub unlisten($self, $varname) {
     if(!defined($varname) || !length($varname)) {
         carp("varname not defined!");
         return;
@@ -637,9 +613,7 @@ sub unlisten {
     return;
 }
 
-sub setMonitormode {
-    my ($self, $active) = @_;
-
+sub setMonitormode($self, $active) {
     if($self->{needreconnect}) {
         $self->reconnect;
     }
@@ -653,18 +627,14 @@ sub setMonitormode {
     return;
 }
 
-sub getServerinfo {
-    my ($self) = @_;
-
+sub getServerinfo($self) {
     return $self->{serverinfo};
 }
 
 # ---------------- ClackCache handling --------------------
 # ClacksCache handling always implies doNetwork()
 # Also, we do NOT use the caching system used for SET
-sub store {
-    my ($self, $varname, $value) = @_;
-
+sub store($self, $varname, $value) {
     if(!defined($varname) || !length($varname)) {
         carp("varname not defined!");
         return;
@@ -696,9 +666,7 @@ sub store {
     return;
 }
 
-sub retrieve {
-    my ($self, $varname) = @_;
-
+sub retrieve($self, $varname) {
     if(!defined($varname) || !length($varname)) {
         carp("varname not defined!");
         return;
@@ -753,9 +721,7 @@ sub retrieve {
     return;
 }
 
-sub remove {
-    my ($self, $varname) = @_;
-
+sub remove($self, $varname) {
     if(!defined($varname) || !length($varname)) {
         carp("varname not defined!");
         return;
@@ -783,9 +749,7 @@ sub remove {
     return;
 }
 
-sub increment {
-    my ($self, $varname, $stepsize) = @_;
-
+sub increment($self, $varname, $stepsize = '') {
     if(!defined($varname) || !length($varname)) {
         carp("varname not defined!");
         return;
@@ -795,7 +759,7 @@ sub increment {
         $self->reconnect;
     }
 
-    if(!defined($stepsize)) {
+    if(!defined($stepsize) || $stepsize eq '') {
         $self->{outbuffer} .= "INCREMENT $varname\r\n";
     } else {
         $stepsize = 0 + $stepsize;
@@ -819,9 +783,7 @@ sub increment {
     return;
 }
 
-sub decrement {
-    my ($self, $varname, $stepsize) = @_;
-
+sub decrement($self, $varname, $stepsize = '') {
     if(!defined($varname) || !length($varname)) {
         carp("varname not defined!");
         return;
@@ -831,7 +793,7 @@ sub decrement {
         $self->reconnect;
     }
 
-    if(!defined($stepsize)) {
+    if(!defined($stepsize) || $stepsize eq '') {
         $self->{outbuffer} .= "DECREMENT $varname\r\n";
     } else {
         $stepsize = 0 + $stepsize;
@@ -854,9 +816,7 @@ sub decrement {
     return;
 }
 
-sub clearcache {
-    my ($self) = @_;
-
+sub clearcache($self) {
     if($self->{needreconnect}) {
         $self->reconnect;
     }
@@ -879,9 +839,7 @@ sub clearcache {
     return;
 }
 
-sub keylist {
-    my ($self) = @_;
-
+sub keylist($self) {
     if($self->{needreconnect}) {
         $self->reconnect;
     }
@@ -964,9 +922,7 @@ sub keylist {
     return @keys;
 }
 
-sub clientlist {
-    my ($self) = @_;
-
+sub clientlist($self) {
     if($self->{needreconnect}) {
         $self->reconnect;
     }
@@ -1056,9 +1012,7 @@ sub clientlist {
     return @keys;
 }
 
-sub flush {
-    my ($self, $flushid) = @_;
-
+sub flush($self, $flushid = '') {
     if(!defined($flushid) || $flushid eq '') {
         $flushid = 'AUTO' . int(rand(1_000_000)) . int(rand(1_000_000));
     }
@@ -1101,9 +1055,7 @@ sub flush {
 }
 
 
-sub autohandle_messages {
-    my ($self) = @_;
-
+sub autohandle_messages($self) {
     $self->doNetwork();
 
     while((my $line = $self->getNext())) {
@@ -1117,9 +1069,7 @@ sub autohandle_messages {
 
 # ---------------- ClackCache handling --------------------
 
-sub sendRawCommand {
-    my ($self, $command) = @_;
-
+sub sendRawCommand($self, $command) {
     if(!defined($command) || !length($command)) {
         carp("command not defined!");
         return;
@@ -1137,9 +1087,7 @@ sub sendRawCommand {
 # setAndStore combines the SET and STORE command into the SETANDSTORE server command. This is mostly done
 # for optimizing interclacks connections
 # Other clients will only get a SET notification, but the server also runs a STORE operation
-sub setAndStore {
-    my ($self, $varname, $value, $forcesend) = @_;
-
+sub setAndStore($self, $varname, $value, $forcesend = 0) {
     if(!defined($varname) || !length($varname)) {
         carp("varname not defined!");
         return;
@@ -1173,9 +1121,7 @@ sub setAndStore {
     return;
 }
 
-sub disconnect {
-    my ($self) = @_;
-
+sub disconnect($self) {
     if($self->{needreconnect}) {
         # We are not connected, just do nothing
         return;
@@ -1198,9 +1144,7 @@ sub disconnect {
     return;
 }
 
-sub DESTROY {
-    my ($self) = @_;
-
+sub DESTROY($self) {
     # Try to disconnect cleanly, but socket might already be DESTROYed, so catch any errors
     eval {
         $self->disconnect();

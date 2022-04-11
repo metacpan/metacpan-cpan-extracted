@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use 5.10.1;
 
-use Test::More;
+use Test::More 1.001005; # subtest with args
 use Test::Exception;
 use Path::Tiny;
 
@@ -13,8 +13,10 @@ my %expected = (
     'GPL-1' => qr!can be found in '/usr/share/common-licenses/GPL-1'!,
     'GPL-2' => qr!can be found in '/usr/share/common-licenses/GPL-2'!,
     'LGPL-2.1' => qr!can be found in '/usr/share/common-licenses/LGPL-2\.1'.$!,
+    'LGPL-2.1-or-later' => qr!can be found in '/usr/share/common-licenses/LGPL-2\.1'.$!,
     'MIT'   => qr/^$/,
-    'GPL-1+' =>  qr!any later version!
+    'GPL-1+' =>  qr!any later version!,
+    'GPL-2.0-or-later' =>  qr!any later version!
 );
 
 sub my_summary_test {

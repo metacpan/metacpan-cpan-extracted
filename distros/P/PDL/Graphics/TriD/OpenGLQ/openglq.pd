@@ -34,9 +34,12 @@ pp_addhdr('
 #ifdef HAVE_AGL_GLUT
 #include <OpenGL/gl.h>
 #include <OpenGL/glu.h>
+#include <OpenGL/glut.h>
 #else
 #include <GL/gl.h>
 #include <GL/glu.h>
+#include <GL/glut.h>
+#include <GL/freeglut.h>
 #endif
 /* #include <GL/glx.h> */
 ');
@@ -44,30 +47,29 @@ pp_addhdr('
 my @internal = (Doc => 'internal', NoPthreading => 1);
 
 pp_def(
-	'line_3x_3c',
-	GenericTypes => $F,
-	Pars => 'coords(tri=3,n); colors(tri,n);',
-	Code => '
-		glBegin(GL_LINE_STRIP);
-		loop(n) %{
-			glColor3f(
-				$colors(tri => 0), 
-				$colors(tri => 1),
-				$colors(tri => 2)
-			);
-			glVertex3f(
-				$coords(tri => 0), 
-				$coords(tri => 1),
-				$coords(tri => 2)
-			);
-		%}
-		glEnd();
-	',
-	@internal
+  'gl_spheres',
+  GenericTypes => $F,
+  Pars => 'coords(tri=3,n);',
+  OtherPars => 'double radius; int slices; int stacks;',
+  Code => '
+    float oldcoord0 = 0.0, oldcoord1 = 0.0, oldcoord2 = 0.0;
+    glPushMatrix();
+    loop(n) %{
+      glTranslatef(
+	$coords(tri=>0) - oldcoord0,
+	$coords(tri=>1) - oldcoord1,
+	$coords(tri=>2) - oldcoord2
+      );
+      glutSolidSphere($COMP(radius), $COMP(slices), $COMP(stacks));
+      oldcoord0 = $coords(tri=>0), oldcoord1 = $coords(tri=>1), oldcoord2 = $coords(tri=>2);
+    %}
+    glPopMatrix();
+  ',
+  @internal
 );
 
 sub TRI { my $par = join '', @_; join ',', map "$par(tri => $_)", 0..2 }
-sub make_tri { shift."(".TRI(@_).");\n" }
+sub make_tri { shift()."(".TRI(@_).");\n" }
 sub COLOR { make_tri("glColor3f",'$colors',@_) }
 sub VERTEX { make_tri("glVertex3f",'$coords',@_) }
 sub NORMAL { make_tri("glNormal3f",'$norm',@_) }
@@ -75,7 +77,7 @@ sub RPOS { make_tri("glRasterPos3f",'$coords',@_) }
 sub ADCOLOR { "
   {
     GLfloat ad[] = { ".TRI('$colors'.$_[0]).",1.0 };
-    glMaterialfv(GL_FRONT_AND_BACK,GL_AMBIENT_AND_DIFFUSE, ad);
+    glMaterialfv(GL_FRONT_AND_BACK,GL_DIFFUSE, ad);
   }
 " }
 
@@ -101,29 +103,30 @@ pp_def(
  	'gl_texts',
 	GenericTypes => $F,
  	Pars => 'coords(tri,x); ',
-	OtherPars => 'int base; SV *arr',
+	OtherPars => 'int in_glut; IV base; SV *arr',
 	Code => '
 		SV *sv = $COMP(arr);
-		AV *arr;
 		if(!(SvROK(sv) && SvTYPE(SvRV(sv))==SVt_PVAV)) {
 			$CROAK("gl_texts requires an array ref");
 		}
-		arr = (AV *)SvRV(sv);
-
-		glPushAttrib(GL_LIST_BIT);
-		glListBase($COMP(base));
-
+		AV *arr = (AV *)SvRV(sv);
+		if ( !$COMP(in_glut) ) {
+			glPushAttrib(GL_LIST_BIT);
+			glListBase($COMP(base));
+		}
 		loop(x) %{
 			SV *elem = *(av_fetch(arr, x, 0));
-			if(elem) {
-                               char *str = SvPV_nolen(elem);
-				'.RPOS().'
+			if (!elem) continue;
+                        char *str = SvPV_nolen(elem);
+			'.RPOS().'
+			if ( $COMP(in_glut) )
+				glutBitmapString((void *)$COMP(base), str);
+			else
 				glCallLists(strlen(str),GL_UNSIGNED_BYTE,
 					(GLubyte*)str);
-			}
 		%}
-
-		glPopAttrib();
+		if ( !$COMP(in_glut) )
+			glPopAttrib();
 	',
 	@internal
 );
@@ -161,12 +164,9 @@ for(
 pp_def(
 	$_->{Name}.$m->{Suf},
 	GenericTypes => $F,
-	Pars => 'coordsa(tri=3); coordsb(tri);
-		 coordsc(tri);'.
+	Pars => 'coordsa(tri=3); coordsb(tri); coordsc(tri);'.
 		 ($_->{NormalArgs}//'').
-		 'colorsa(tri); colorsb(tri);
-		 colorsc(tri);
-		 ',
+		'colorsa(tri); colorsb(tri); colorsc(tri);',
 	Code => '
 		float tmp1[3]; float tmp2[3];
 		glBegin(GL_TRIANGLES);
@@ -186,16 +186,14 @@ pp_def(
 }
 
 pp_def('gl_arrows',
-	Pars => 'coords(tri=3,n); int indsa(); int indsb();',
+	Pars => 'coords(tri=3,n); indx indsa(); indx indsb();',
 	OtherPars => 'float headlen; float width;',
 	Code => '
 		float hl = $COMP(headlen);
 		float w = $COMP(width);
-		float tmp2[3]; tmp2[0] = 0.000001; tmp2[1] = -0.0001; tmp2[2] = 1;
- 		glBegin(GL_LINES);
+		float tmp2[3] = { 0.000001, -0.0001, 1 };
 		broadcastloop %{
-			int a = $indsa();
-			int b = $indsb();
+			PDL_Indx a = $indsa(), b = $indsb();
 			float tmp1[3]; 
 			float norm[3];
 			float norm2[3];
@@ -206,15 +204,16 @@ pp_def('gl_arrows',
 				  $coords(tri => 1, n => b);
 			tmp1[2] = $coords(tri => 2, n => a) -
 				  $coords(tri => 2, n => b);
-		
+			float partback[3];
+			partback[0] = $coords(tri => 0, n => b) + hl*tmp1[0];
+			partback[1] = $coords(tri => 1, n => b) + hl*tmp1[1];
+			partback[2] = $coords(tri => 2, n => b) + hl*tmp1[2];
 			norm[0] = tmp1[1]*tmp2[2] - tmp2[1]*tmp1[2];
 			norm[1] = -(tmp1[0]*tmp2[2] - tmp2[0]*tmp1[2]);
 			norm[2] = tmp1[0]*tmp2[1] - tmp2[0]*tmp1[1];
-
 			norm2[0] = tmp1[1]*norm[2] - norm[1]*tmp1[2];
 			norm2[1] = -(tmp1[0]*norm[2] - norm[0]*tmp1[2]);
 			norm2[2] = tmp1[0]*norm[1] - norm[0]*tmp1[1];
-
 			normlen = sqrt(norm[0] * norm[0] +
 				norm[1] * norm[1] + norm[2] * norm[2]);
 			norm2len = sqrt(norm2[0] * norm2[0] +
@@ -230,40 +229,55 @@ pp_def('gl_arrows',
 			tmp1[0] /= origlen;
 			tmp1[1] /= origlen;
 			tmp1[2] /= origlen;
+			glBegin(GL_LINES);
 			glVertex3d( $coords(tri => 0, n => a) ,
 				    $coords(tri => 1, n => a) ,
 				    $coords(tri => 2, n => a) );
 			glVertex3d( $coords(tri => 0, n => b) ,
 				    $coords(tri => 1, n => b) ,
 				    $coords(tri => 2, n => b) );
+			glEnd();
 			if(w!=0) {
+			glBegin(GL_TRIANGLES);
 			glVertex3d( $coords(tri => 0, n => b) ,
 				    $coords(tri => 1, n => b) ,
 				    $coords(tri => 2, n => b) );
-			glVertex3d( $coords(tri => 0, n => b) + hl*tmp1[0] + norm[0],
-				    $coords(tri => 1, n => b) + hl*tmp1[1] + norm[1],
-				    $coords(tri => 2, n => b) + hl*tmp1[2] + norm[2]);
+			glVertex3d( partback[0] + norm[0],
+				    partback[1] + norm[1],
+				    partback[2] + norm[2]);
+			glVertex3d( partback[0] + norm2[0],
+				    partback[1] + norm2[1],
+				    partback[2] + norm2[2]);
 			glVertex3d( $coords(tri => 0, n => b) ,
 				    $coords(tri => 1, n => b) ,
 				    $coords(tri => 2, n => b) );
-			glVertex3d( $coords(tri => 0, n => b) + hl*tmp1[0] - norm[0],
-				    $coords(tri => 1, n => b) + hl*tmp1[1] - norm[1],
-				    $coords(tri => 2, n => b) + hl*tmp1[2] - norm[2]);
+			glVertex3d( partback[0] - norm[0],
+				    partback[1] - norm[1],
+				    partback[2] - norm[2]);
+			glVertex3d( partback[0] - norm2[0],
+				    partback[1] - norm2[1],
+				    partback[2] - norm2[2]);
 			glVertex3d( $coords(tri => 0, n => b) ,
 				    $coords(tri => 1, n => b) ,
 				    $coords(tri => 2, n => b) );
-			glVertex3d( $coords(tri => 0, n => b) + hl*tmp1[0] + norm2[0],
-				    $coords(tri => 1, n => b) + hl*tmp1[1] + norm2[1],
-				    $coords(tri => 2, n => b) + hl*tmp1[2] + norm2[2]);
+			glVertex3d( partback[0] + norm2[0],
+				    partback[1] + norm2[1],
+				    partback[2] + norm2[2]);
+			glVertex3d( partback[0] - norm[0],
+				    partback[1] - norm[1],
+				    partback[2] - norm[2]);
 			glVertex3d( $coords(tri => 0, n => b) ,
 				    $coords(tri => 1, n => b) ,
 				    $coords(tri => 2, n => b) );
-			glVertex3d( $coords(tri => 0, n => b) + hl*tmp1[0] - norm2[0],
-				    $coords(tri => 1, n => b) + hl*tmp1[1] - norm2[1],
-				    $coords(tri => 2, n => b) + hl*tmp1[2] - norm2[2]);
+			glVertex3d( partback[0] - norm2[0],
+				    partback[1] - norm2[1],
+				    partback[2] - norm2[2]);
+			glVertex3d( partback[0] + norm[0],
+				    partback[1] + norm[1],
+				    partback[2] + norm[2]);
+			glEnd();
 			}
 		%}
-		glEnd();
 	',
 	@internal
 );

@@ -2417,7 +2417,13 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
      abs atan2 cos sin log exp (Return object has default precision)
      int (On perl 5.8 only, NA on perl 5.6. The return object
           has default precision)
-     ""
+
+     ""  (Interpolates the value of the Math::MPFR object to a
+          decimal string)
+
+     << >> <<= >>= (These just increase/decrease the exponent by the
+                    value of the given "shift" argument)
+
      = (The copy has the same precision as the copied object.)
 
     NOTE: Making use of the '=' overloading is not recommended unless
@@ -2513,9 +2519,12 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
 
     5. If the variable is a Math::MPFR, Math::GMPz, Math::GMPf, or
        Math::GMPq object then the value of that object is used.
+       If the particular operation does not accept a Math::GMP*
+       object, then the operation dies with an appropriate error
+       message if such an object is received.
 
     6. If none of the above is true, then the second variable is
-       deemed to be of an invalid type. The subroutine croaks with
+       deemed to be of an invalid type. The operation croaks with
        an appropriate error message.
 
    #####################

@@ -5,9 +5,9 @@
 #          config values from a given file and
 #          return it as hash structure
 #
-# Copyright (c) 2000-2016 Thomas Linden <tlinden |AT| cpan.org>.
+# Copyright (c) 2000-2022 Thomas Linden <tlinden |AT| cpan.org>.
 # All Rights Reserved. Std. disclaimer applies.
-# Artistic License, same as perl itself. Have fun.
+# Licensed under the Artistic License 2.0.
 #
 # namespace
 package Config::General;
@@ -32,7 +32,7 @@ use Carp::Heavy;
 use Carp;
 use Exporter;
 
-$Config::General::VERSION = "2.63";
+$Config::General::VERSION = "2.65";
 
 use vars  qw(@ISA @EXPORT_OK);
 use base qw(Exporter);
@@ -339,7 +339,8 @@ sub _prepare {
 
   if (exists $conf{-DefaultConfig}) {
     if ($conf{-DefaultConfig} && ref($conf{-DefaultConfig}) eq 'HASH') {
-      $self->{DefaultConfig} = $conf{-DefaultConfig};
+      # copy the hashref so that it is not being modified by subsequent calls, fixes bug#142095
+      $self->{DefaultConfig} = $self->_copy($conf{-DefaultConfig});
     }
     elsif ($conf{-DefaultConfig} && ref($conf{-DefaultConfig}) eq q()) {
       $self->_read($conf{-DefaultConfig}, 'SCALAR');
@@ -516,7 +517,9 @@ sub _open {
     # A directory was included; include all the files inside that directory in ASCII order
     local *INCLUDEDIR;
     opendir INCLUDEDIR, $configfile or croak "Config::General: Could not open directory $configfile!($!)\n";
-    my @files = sort grep { -f catfile($configfile, $_) } catfile($configfile, $_), readdir INCLUDEDIR;
+    #my @files = sort grep { -f catfile($configfile, $_) } catfile($configfile, $_), readdir INCLUDEDIR;
+    # fixes rt.cpan.org#139261
+    my @files = sort grep { -f catfile($configfile, $_) } readdir INCLUDEDIR;
     closedir INCLUDEDIR;
     local $this->{CurrentConfigFilePath} = $configfile;
     for (@files) {
@@ -832,29 +835,35 @@ sub _process_apache_ifdefine {
   my($this, $rawlines) = @_;
 
   my @filtered;
-  my $includeFlag = 1;
-  my $blockLevel  = 0;
+  my @includeFlag = (1);
 
   foreach (@{$rawlines}) {
-    if (/^<\s*IfDefine\s+([!]*)("[^"]+"|\S+)\s*>/i) {
+    if (/^\s*<\s*IfDefine\s+([!]*)("[^"]+"|\S+)\s*>/i) {
       # new IFDEF block, mark following content to be included if
       # the DEF is known, otherwise skip it til end of IFDEF
       my ($negate, $define) = ($1 eq '!',$2);
 
-      $blockLevel++;
-      $includeFlag &= ((not $negate) & (exists $this->{Define}{$define}));
-    } elsif (/^<\s*\/IfDefine\s*>/i) {
-      $blockLevel--;
-      $includeFlag = $blockLevel == 0;
-    } elsif ($includeFlag && /\s*Define\s+("[^"]+"|\S+)/i) {
+      push(@includeFlag,
+           $includeFlag[-1] & 
+           ((not $negate) & (exists $this->{Define}{$define}))
+      );
+    }
+    elsif (/^\s*<\s*\/IfDefine\s*>/i) {
+      if (scalar(@includeFlag) <= 1) {
+        croak qq(Config::General: </IfDefine> without a <IfDefine>!\n);
+      }
+      pop(@includeFlag);
+    }
+    elsif ($includeFlag[-1] && /^\s*Define\s+("[^"]+"|\S+)/i) {
       # inline Define, add it to our list
       $this->{Define}{$1} = 1;
-    } elsif ($includeFlag) {
+    }
+    elsif ($includeFlag[-1]) {
       push @filtered, $_;
     }
   }
 
-  if ($blockLevel) {
+  if (scalar(@includeFlag) > 1) {
     croak qq(Config::General: Block <IfDefine> has no EndBlock statement!\n);
   }
 
@@ -2845,10 +2854,10 @@ I recommend you to read the following documents, which are supplied with Perl:
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2000-2016 Thomas Linden
+Copyright (c) 2000-2022 Thomas Linden
 
 This library is free software; you can redistribute it and/or
-modify it under the same terms as Perl itself.
+modify it under the same terms of the Artistic License 2.0.
 
 =head1 BUGS AND LIMITATIONS
 
@@ -2874,7 +2883,7 @@ Thomas Linden <tlinden |AT| cpan.org>
 
 =head1 VERSION
 
-2.63
+2.65
 
 =cut
 

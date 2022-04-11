@@ -477,7 +477,7 @@ flag set.
 
 
 
-#line 560 "bad.pd"
+#line 552 "bad.pd"
 
 
 *nbad = \&PDL::nbad;
@@ -490,7 +490,7 @@ sub PDL::nbad {
 
 
 
-#line 560 "bad.pd"
+#line 552 "bad.pd"
 
 
 *ngood = \&PDL::ngood;
@@ -503,7 +503,7 @@ sub PDL::ngood {
 
 
 
-#line 572 "bad.pd"
+#line 564 "bad.pd"
 
 
 =head2 nbad
@@ -994,7 +994,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1142 "bad.pd"
+#line 1122 "bad.pd"
 
 
 =head1 AUTHOR

@@ -15,10 +15,14 @@ sub message {
     };
 }
 
+around 'stop_on_fail' => sub {
+    return 1;
+};
+
 sub validate {
     my ($self, $field, $input) = @_;
 
-    if (defined $input->{$field}) {
+    if (exists $input->{$field}) {
         return any { $input->{$field} eq $_ } qw(yes on 1);
     }
 

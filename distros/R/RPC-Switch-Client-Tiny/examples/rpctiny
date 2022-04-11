@@ -1,0 +1,205 @@
+#!/usr/bin/env perl
+#
+# rpctiny test client for RPC::Switch::Client::Tiny module
+#
+my $usage = <<USAGE;
+usage: $0 [-w] [-H <host:port>] [-S] [-C <rpccert>] [-l <login>] [-c <config>] [-m <method>] [-a <maxasync>] [-r <user>] [-v] [-j] [<json-param>|<worker-code>]
+   -w: start test worker '{...}' instead of client
+   -W: start test worker using <workername>
+   -a: run up to <maxasync> forked workers using async RES_WAIT notification
+   -F: use flowcontrol in async worker mode
+   -c: rpcswitch <configfile> with .ini style [rpc-switch] section
+   -m: override rpc-switch <method>
+   -l: override rpc-switch <login> name
+   -H: override rpc-switch <host> name
+   -S: use SSL for rpc-switch connection
+   -C: use SSL <clientcert>.(crt|cert|key)
+   -K: use SSL <clientcert.key> if prefix differs from cert
+   -V: use SSL <cafile> to verify peer
+   -A: use <auth_method> instead of 'password' for rpcswitch
+   -t: use <timeout> for rpc responses
+   -v: verbose (print request logs) 
+   -q: quiet (just print result) (default)
+   -j: output pretty json
+
+   examples:
+   > rpctiny -m foo.add -v '{"counter": 10, "step": 2}'
+   > rpctiny -m rpcswitch.ping
+   > rpctiny -m rpcswitch.get_methods -j
+   > rpctiny -m rpcswitch.get_method_details -j '{"method": "foo.add"}'
+   > rpctiny -m rpcswitch.get_stats -j
+   > rpctiny -m rpcswitch.get_clients -j
+   > rpctiny -m rpcswitch.get_workers -j
+   > rpctiny -m other.ping:test '{val => "tiny"}'
+USAGE
+
+use strict;
+use JSON;
+use IO::Socket;
+use IO::Socket::SSL;
+use File::Basename;
+use Net::Netrc;
+use Sys::Hostname;
+use Getopt::Std;
+use Data::Dumper;
+use Config::Tiny;
+use FindBin qw($Bin);
+use lib ("$Bin/../plib", "$Bin/lib"); # search modules in local lib dir
+use RPC::Switch::Client::Tiny;
+my %opt;
+
+my @confval = qw(address port who token auth_method tls tls_cert tls_key tls_ca netrc);
+my %conf = ( map {$_ => ''} @confval );
+
+# rpc-switch defaults
+#
+my $default_address_test = '127.0.0.1';
+my $default_port_plain = '6551';
+my $default_port_tls = '6850';
+my $default_auth_method_plain = 'password';
+my $default_auth_method_tls = 'clientcert';
+my $netrc_file = '~/.netrc';
+my $default_who = 'theEmployee';
+my $default_method_worker = 'bar.add';
+my $default_method = 'rpcswitch.ping';
+
+# example worker
+#
+sub pong_handler {
+	my ($params, $rpcswitch) = @_;
+
+	printf "server got reqauth: %s\n", to_json($rpcswitch->{reqauth}) if exists $rpcswitch->{reqauth};
+	printf "server got acls: %s\n", to_json($rpcswitch->{acls}) if exists $rpcswitch->{acls};
+	printf "server got req: %s\n", $params->{val};
+
+	my $resp = {success => 1, msg => "pong $params->{val}"};
+	return $resp;
+}
+
+sub trace_cb {
+	my ($type, $msg) = @_;
+	printf "%s: %s\n", $type, to_json($msg, {pretty => $opt{j} ? 1 : 0, canonical => 1}) if $opt{v};
+
+	if (($type eq 'RCV') && exists $msg->{id} && exists $msg->{result} && (ref($msg->{result}) eq 'ARRAY') && $msg->{result}[0] && ($msg->{result}[0] eq 'RES_WAIT')) {
+		print "client got wait id: $msg->{id}\n" if $opt{v};
+	}
+}
+
+sub rpcswitch_connect {
+	my ($host, $use_tls, $cert_file, $key_file, $ca_file) = @_;
+
+	if ($use_tls) {
+		return IO::Socket::SSL->new(PeerAddr => $host, Proto => 'tcp', Timeout => 30,
+			SSL_cert_file => $cert_file, SSL_key_file => $key_file,
+			SSL_verify_mode => $ca_file ? SSL_VERIFY_PEER : SSL_VERIFY_NONE, $ca_file ? (SSL_ca_file => $ca_file) : ());
+	} else {
+		return IO::Socket::INET->new(PeerAddr => $host, Proto => 'tcp', Timeout => 30);
+	}
+}
+
+getopts('hqvwW:c:a:jbl:m:H:SC:K:V:A:t:F', \%opt);
+
+$conf{file} = $opt{c} if $opt{c};
+my $cfg = Config::Tiny->read($conf{file}) if $conf{file};
+if (defined $cfg) {
+	$cfg = { %{$cfg->{'rpc-switch'}} };
+	@conf{keys %$cfg} = values %$cfg;
+}
+$conf{auth_method} = $opt{A} if $opt{A};
+$conf{auth_method} = $opt{S} ? $default_auth_method_tls : $default_auth_method_plain if !$conf{auth_method};
+$conf{tls} = 1 if ($conf{auth_method} eq 'clientcert');
+$conf{tls} = $opt{S} if $opt{S};
+$conf{tls_cert} = $opt{C} if $opt{C};
+$conf{tls_key} = $opt{K} if $opt{K};
+$conf{tls_ca} = $opt{V} if $opt{V};
+($conf{address}, $conf{port}) = split(':', $opt{H}, 2) if $opt{H};
+$conf{port} = $conf{tls} ? $default_port_tls : $default_port_plain if !$conf{port};
+$conf{address} = $default_address_test if !$conf{address};
+
+# Read who & token from ~/.netrc file if not configured otherwise.
+# The $conf{netrc} is checked for compatibility with rpc-switch-client.
+# The 'address:port' & 'address' machine entries are less significant.
+#
+my @machine_order = ($conf{netrc}, "$conf{address}:$conf{port}", $conf{address});
+
+($conf{who}, $conf{token}) = split(':', $opt{l}, 2) if $opt{l};
+foreach my $m (@machine_order) {
+	($conf{who}, $conf{token}) = Net::Netrc->lookup($m)->lpa() if !$conf{who} && Net::Netrc->lookup($m);
+}
+$conf{who} = $default_who if !$conf{who};
+
+# Currently no empty token is allowed.
+#
+$conf{token} = $conf{who} if ($conf{auth_method} ne 'password');
+
+sub show_conf {
+	printf "   config:  %s\n", $conf{file} ? $conf{file} : '-';
+	printf "   options: $0 -H $conf{address}:$conf{port} %s%s%s%s-A $conf{auth_method} -l $conf{who}%s -m rpcswitch.ping\n",
+		$conf{tls} ? '-S ' : '',
+		$conf{tls_cert} ? "-C $conf{tls_cert} " : '',
+		$conf{tls_key} ? "-K $conf{tls_key} " : '',
+		$conf{tls_ca} ? "-V $conf{tls_ca} " : '',
+		$conf{token} && ($conf{auth_method} eq 'password') ? ":$conf{token}" : '',
+}
+
+if ($opt{h}) {
+        print $usage;
+	print "\n"; show_conf();
+        exit 0;
+}
+show_conf() if $opt{v};
+
+warn("no token configured for $conf{who} - consider adding a $netrc_file entry") if !$conf{token} && ($conf{auth_method} eq 'password');
+warn("tls_cert '$conf{tls_cert}' not found") if $conf{tls} && (! -f $conf{tls_cert});
+warn("tls_key '$conf{tls_key}' not found") if $conf{tls} && (! -f $conf{tls_key});
+
+my $val = $ARGV[0] if $ARGV[0];
+my %tmo = $opt{t} ? (timeout => $opt{t}) : ();
+my $rpchost = "$conf{address}:$conf{port}";
+my $s = rpcswitch_connect($rpchost, $conf{tls}, $conf{tls_cert}, $conf{tls_key}, $conf{tls_ca}) or die "connect $rpchost failed: $@";
+
+my $client = RPC::Switch::Client::Tiny->new(sock => $s, who => $conf{who}, token => $conf{token}, auth_method => $conf{auth_method}, trace_cb => \&trace_cb, %tmo);
+if ($opt{w} || $opt{W}) {
+	local $|=1; # autoflush stdout for request tracing
+	local $SIG{'INT'} = sub { print "INT!\n"; $client->stop(); }; # on ctrl-c stop rpc_handler
+	local $SIG{'TERM'} = sub { exit; };           # on kill call $client->DESTROY
+	my $doc = {inputs => {val => 'a val'}, outputs => {success => 'bool', msg => 'a msg'}, description => 'send a ping'};
+	if (defined $val) { eval "sub val_handler $val"; }
+	my $handler = (defined $val) ? \&val_handler : \&pong_handler;
+	my $workername = $opt{W} ? $opt{W} : 'pingpong';
+	my $method = $opt{m} ? $opt{m} : "$default_method_worker:$ENV{USER}"; # default to user specific platform name
+	my $methods = {$method => {cb => $handler, doc => $doc}};
+	if ($method =~ /^(.*):([^:]+)$/) { $methods = {$1 => {cb => $handler, doc => $doc, filter => {platform => $2}}}; } # support subproc
+	print "worker announces method: $method\n" unless $opt{m};
+
+	eval { $client->work($workername, $methods, {max_async => $opt{a} ? $opt{a} : 0, $opt{F} ? (flowcontrol => 1) : ()}) };
+	if (my $err = $@) { 
+		die "worker $err->{type} error: $err->{message}" if ref($err);
+		die "worker $err";
+	}
+	print "worker socket closed";
+} else {
+	my $reqauth;
+	my $method = $opt{m} ? $opt{m} : $default_method;
+	my $params = {};
+	if (defined $val) {
+		$params = eval { from_json($val); }; # default to json param
+		$params = eval "$val" unless $params; # else try perl format
+		die "params nether in json nor in perl format: $val" unless $params;
+	}
+	if ($method =~ /^(.*):([^:]+)$/) { # support subproc platform
+		$method = $1;
+		$params->{platform} = $2;
+	}
+	my $res = eval { $client->call($method, $params, {reqauth => $reqauth}) };
+	if (my $err = $@) { 
+		die "client $err->{type} error[$err->{code}]: $err->{message}" if $err->{type} eq 'jsonrpc';
+		die "client $err->{type} error[$err->{class}]: $err->{message}" if $err->{type} eq 'worker';
+		die "client $err";
+	}
+	printf "client got result: " if $opt{v};
+	printf "%s\n", to_json($res, {pretty => $opt{j} ? 1 : 0, canonical => 1}) if ref($res);
+	printf "%s\n", $res if !ref($res);
+}
+$s->close();
+

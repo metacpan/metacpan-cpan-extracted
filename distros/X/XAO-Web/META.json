@@ -72,6 +72,6 @@
          "web" : "https://github.com/amaltsev/XAO-Web"
       }
    },
-   "version" : "1.87",
+   "version" : "1.88",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

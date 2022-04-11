@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use Math::MPFR qw(:mpfr);
 
-print "1..27\n";
+print "1..28\n";
 
 my $n = '98765' x 1000;
 my $r = '98765' x 1000;
@@ -49,6 +49,7 @@ my $discard = eval{"$inf"}; # POK flag is now also set for $inf (mostly)
 $discard    = eval{"$nan"}; # POK flag is now also set for $nan (mostly)
 
 adj($inf, \$check, 1);
+$check++ if Math::MPFR::ISSUE_19550;
 
 $z = Math::MPFR->new($inf);
 
@@ -79,6 +80,7 @@ else {
 }
 
 adj($nan, \$check, 1);
+$check++ if Math::MPFR::ISSUE_19550;
 
 my $z2 = Math::MPFR->new($nan);
 
@@ -258,7 +260,7 @@ else {
 
 my $nv = 1.3;
 my $s  = "$nv"; # $nv should be POK && NOK if MPFR_PV_NV_BUG is 1
-                # Else (ie MPFR_NV_BUG is 0) $nv should be POK only.
+                # Else (ie MPFR_NV_BUG is 0) $nv should be NOK only.
 
 $z = Math::MPFR->new($nv);
 
@@ -270,6 +272,20 @@ else {
   print "not ok 27\n";
 }
 
+if(Math::MPFR::ISSUE_19550) {
+  if($] < 5.035010) {
+    warn "ISSUE_19550 unexpectedly set\n";
+    print "not ok 28\n";
+  }
+  else {
+    warn "ISSUE_19550 set\n";
+    print "ok 28\n";
+  }
+}
+else {
+  warn "ISSUE_19550 not set\n";
+  print "ok 28\n";
+}
 
 ########
 

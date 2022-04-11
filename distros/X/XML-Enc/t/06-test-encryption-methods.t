@@ -45,7 +45,7 @@ foreach my $km (@key_methods) {
             my $verify_response = `xmlsec1 --decrypt --privkey-pem t/sign-private.pem tmp.xml 2>&1`;
             ok( $verify_response =~ m/XML-SIG_1/, "Successfully decrypted with xmlsec1" )
                 or warn "calling xmlsec1 failed: '$verify_response'\n";
-            unlink 'tmp.xml';
+            #unlink 'tmp.xml';
         }
 
     }

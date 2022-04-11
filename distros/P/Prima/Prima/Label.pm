@@ -118,12 +118,16 @@ sub on_paint
 	my %justify = ( %{$self->textJustify}, rtl => $self->textDirection);
 	for ( my $i = 0; $i < @$ws; $i++) {
 		my $s = $canvas->text_shape($ws->[$i], %justify );
-		$s->justify(
-			$canvas, $ws->[$i], $size[0],
-			%justify,
-			($i == $#$ws) ? (letter => 0, word => 0) : ()
-		) if $s;
-		push @wss, $s // $ws->[$i];
+		if ( $s && ref($s)) {
+			$s->justify(
+				$canvas, $ws->[$i], $size[0],
+				%justify,
+				($i == $#$ws) ? (letter => 0, word => 0) : ()
+			);
+			push @wss, $s;
+		} else {
+			push @wss, $ws->[$i];
+		}
 		push @wx, $canvas->get_text_width($wss[-1]);
 	}
 
@@ -401,6 +405,9 @@ sub textJustify
 		my $tj = shift;
 		my %tj = ref($tj) ? %$tj : map { ($_, !!$tj) } qw(letter word kashida);
 		$tj{$_} //= 0 for qw(letter word kashida min_kashida);
+		if ( ref($tj) ) {
+			$tj{$_} = $$tj{$_} for qw(min_text_to_space_ratio);
+		}
 		$self->{textJustify} = \%tj;
 	} else {
 		my %h = @_;

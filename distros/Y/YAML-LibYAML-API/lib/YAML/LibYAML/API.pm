@@ -3,7 +3,7 @@ package YAML::LibYAML::API;
 use strict;
 use warnings;
 
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 use YAML::PP::Common qw/
     YAML_ANY_SCALAR_STYLE YAML_PLAIN_SCALAR_STYLE
@@ -196,9 +196,42 @@ Tina Müller <tinita@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2018 by Tina Müller
+Included libyaml:
+Copyright (c) 2017-2020 Ingy döt Net
+Copyright (c) 2006-2016 Kirill Simonov
 
-This library is free software and may be distributed under the same terms
-as perl itself.
+Perl/XS binding:
+Copyright (c) 2022 by Tina Müller.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+The MIT License
+
+Permission is hereby granted, free of charge, to any person
+obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the Software
+without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense,
+and/or sell copies of the Software, and to permit persons to
+whom the Software is furnished to do so, subject to the
+following conditions:
+
+The above copyright notice and this permission notice shall
+be included in all copies or substantial portions of the
+Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT
+WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.
 
 =cut

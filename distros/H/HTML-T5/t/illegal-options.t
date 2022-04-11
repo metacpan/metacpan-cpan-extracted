@@ -1,5 +1,14 @@
 #!perl -T
 
+BEGIN
+{
+    $ENV{LC_ALL} = 'C';
+
+    # See: https://github.com/shlomif/html-tidy5/issues/6
+    $ENV{LANG} = 'en_US.UTF-8';
+};
+
+
 use 5.010001;
 use strict;
 use warnings;

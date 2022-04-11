@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.022, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,10 +18,10 @@ name: XML-Enc
 provides:
   XML::Enc:
     file: lib/XML/Enc.pm
-    version: '0.05'
+    version: '0.06'
 requires:
   Carp: '0'
-  Crypt::AuthEnc::GCM: '0'
+  Crypt::AuthEnc::GCM: '0.062'
   Crypt::Mode::CBC: '0'
   Crypt::OpenSSL::Bignum: '0'
   Crypt::OpenSSL::RSA: '0'
@@ -36,10 +36,10 @@ requires:
 resources:
   bugtracker: https://github.com/perl-net-saml2/perl-XML-Enc/issues
   repository: git://github.com/perl-net-saml2/perl-XML-Enc.git
-version: '0.05'
+version: '0.06'
 x_contributors:
   - 'Timothy Legge <timlegge@gmail.com>'
-x_generated_by_perl: v5.32.1
+x_generated_by_perl: v5.34.0
 x_maintainers:
   - 'Timothy Legge <timlegge@cpan.org>'
 x_serialization_backend: 'YAML::Tiny version 1.73'

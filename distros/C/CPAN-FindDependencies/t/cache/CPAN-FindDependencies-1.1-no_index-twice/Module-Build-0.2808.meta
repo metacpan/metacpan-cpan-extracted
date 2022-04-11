@@ -1,0 +1,103 @@
+---
+name: Module-Build
+version: 0.2808
+author:
+  - 'Ken Williams <kwilliams@cpan.org>'
+  - |-
+    Development questions, bug reports, and patches should be sent to the
+    Module-Build mailing list at <module-build@perl.org>.
+abstract: Build and install Perl modules
+license: perl
+resources:
+  MailingList: mailto:module-build@perl.org
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Module-Build
+  homepage: http://sourceforge.net/projects/module-build
+  license: http://dev.perl.org/licenses/
+  repository: http://svn.perl.org/modules/Module-Build/
+requires:
+  Cwd: 0
+  Data::Dumper: 0
+  ExtUtils::Install: 0
+  ExtUtils::Manifest: 0
+  ExtUtils::Mkbootstrap: 0
+  File::Basename: 0
+  File::Compare: 0
+  File::Copy: 0
+  File::Find: 0
+  File::Path: 0
+  File::Spec: 0.82
+  Getopt::Long: 0
+  IO::File: 0
+  Test::Harness: 0
+  Text::Abbrev: 0
+  Text::ParseWords: 0
+  perl: 5.005_03
+recommends:
+  Archive::Tar: 1.08
+  ExtUtils::CBuilder: 0.15
+  ExtUtils::Install: 0.3
+  ExtUtils::ParseXS: 1.02
+  Module::Signature: 0.21
+  Pod::Readme: 0.04
+  version: 0.661
+provides:
+  Module::Build:
+    file: lib/Module/Build.pm
+    version: 0.2808
+  Module::Build::Base:
+    file: lib/Module/Build/Base.pm
+  Module::Build::Compat:
+    file: lib/Module/Build/Compat.pm
+    version: 0.03
+  Module::Build::Config:
+    file: lib/Module/Build/Config.pm
+  Module::Build::Cookbook:
+    file: lib/Module/Build/Cookbook.pm
+  Module::Build::ModuleInfo:
+    file: lib/Module/Build/ModuleInfo.pm
+  Module::Build::Notes:
+    file: lib/Module/Build/Notes.pm
+  Module::Build::PPMMaker:
+    file: lib/Module/Build/PPMMaker.pm
+  Module::Build::Platform::Amiga:
+    file: lib/Module/Build/Platform/Amiga.pm
+  Module::Build::Platform::Default:
+    file: lib/Module/Build/Platform/Default.pm
+  Module::Build::Platform::EBCDIC:
+    file: lib/Module/Build/Platform/EBCDIC.pm
+  Module::Build::Platform::MPEiX:
+    file: lib/Module/Build/Platform/MPEiX.pm
+  Module::Build::Platform::MacOS:
+    file: lib/Module/Build/Platform/MacOS.pm
+  Module::Build::Platform::RiscOS:
+    file: lib/Module/Build/Platform/RiscOS.pm
+  Module::Build::Platform::Unix:
+    file: lib/Module/Build/Platform/Unix.pm
+  Module::Build::Platform::VMS:
+    file: lib/Module/Build/Platform/VMS.pm
+  Module::Build::Platform::VOS:
+    file: lib/Module/Build/Platform/VOS.pm
+  Module::Build::Platform::Windows:
+    file: lib/Module/Build/Platform/Windows.pm
+  Module::Build::Platform::aix:
+    file: lib/Module/Build/Platform/aix.pm
+  Module::Build::Platform::cygwin:
+    file: lib/Module/Build/Platform/cygwin.pm
+  Module::Build::Platform::darwin:
+    file: lib/Module/Build/Platform/darwin.pm
+  Module::Build::Platform::os2:
+    file: lib/Module/Build/Platform/os2.pm
+  Module::Build::PodParser:
+    file: lib/Module/Build/PodParser.pm
+  Module::Build::PodTester:
+    file: lib/Module/Build/Base.pm
+  Module::Build::Version:
+    file: lib/Module/Build/Version.pm
+    version: 0.7203
+  Module::Build::YAML:
+    file: lib/Module/Build/YAML.pm
+    version: 0.50
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

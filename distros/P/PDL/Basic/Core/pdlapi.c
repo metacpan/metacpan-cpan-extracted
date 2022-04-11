@@ -131,12 +131,26 @@ pdl_error pdl_allocdata(pdl *it) {
     return PDL_err;    /* Nothing to be done */
   if(it->state & PDL_DONTTOUCHDATA)
     return pdl_make_error_simple(PDL_EUSERERROR, "Trying to touch data of an untouchable (mmapped?) pdl");
-  if(it->datasv == NULL)
-    it->datasv = newSVpv("",0);
-  SV* foo = it->datasv;
-  (void)SvGROW ( foo, nbytes );
-  SvCUR_set( foo, (STRLEN) nbytes );
-  it->data = (void *) SvPV_nolen( foo );
+  char was_useheap = (ncurr > sizeof(it->value)),
+    will_useheap = (nbytes > sizeof(it->value));
+  if (!was_useheap && !will_useheap) {
+    it->data = &it->value;
+  } else if (!will_useheap) {
+    /* was heap, now not */
+    void *data_old = it->data;
+    memmove(it->data = &it->value, data_old, PDLMIN(ncurr, nbytes));
+    SvREFCNT_dec((SV*)it->datasv);
+    it->datasv = NULL;
+  } else {
+    /* now change to be heap */
+    if (it->datasv == NULL)
+      it->datasv = newSVpvn("", 0);
+    (void)SvGROW((SV*)it->datasv, nbytes);
+    SvCUR_set((SV*)it->datasv, nbytes);
+    if (it->data && !was_useheap)
+      memmove(SvPV_nolen((SV*)it->datasv), it->data, PDLMIN(ncurr, nbytes));
+    it->data = SvPV_nolen((SV*)it->datasv);
+  }
   if (nbytes > ncurr) memset(it->data + ncurr, 0, nbytes - ncurr);
   it->nbytes = nbytes;
   it->state |= PDL_ALLOCATED;
@@ -250,7 +264,7 @@ pdl_error pdl__free(pdl *it) {
 	    PDLDEBUG_f(printf("SvREFCNT_dec datasv=%p\n",it->datasv);)
 	    SvREFCNT_dec(it->datasv);
 	    it->data=0;
-    } else if(it->data) {
+    } else if(it->data && it->data != &it->value) {
 	    pdl_pdl_warn("Warning: special data without datasv is not freed currently!!");
     }
     if(it->hdrsv) {
@@ -263,9 +277,9 @@ pdl_error pdl__free(pdl *it) {
     return PDL_err;
 }
 
-void pdl__removechildtrans(pdl *it,pdl_trans *trans)
+void pdl__removetrans_children(pdl *it,pdl_trans *trans)
 {
-	PDLDEBUG_f(printf("pdl__removechildtrans(%s=%p): %p\n",
+	PDLDEBUG_f(printf("pdl__removetrans_children(%s=%p): %p\n",
 	  trans->vtable->name, trans, it));
 	PDL_Indx i; int flag = 0;
 	for(i=0; i<trans->vtable->nparents; i++)
@@ -284,12 +298,13 @@ void pdl__removechildtrans(pdl *it,pdl_trans *trans)
 		pdl_pdl_warn("Child not found for pdl %p, trans %p\n",it, trans);
 }
 
-void pdl__removeparenttrans(pdl *it, pdl_trans *trans, PDL_Indx nth)
+void pdl__removetrans_parent(pdl *it, pdl_trans *trans, PDL_Indx nth)
 {
-	PDLDEBUG_f(printf("pdl__removeparenttrans(%s=%p): %p %"IND_FLAG"\n",
+	PDLDEBUG_f(printf("pdl__removetrans_parent(%s=%p): %p %"IND_FLAG"\n",
 	  trans->vtable->name, (void*)trans, (void*)(it), nth));
 	trans->pdls[nth] = 0;
-	it->trans_parent = 0;
+	if (it->trans_parent == trans) it->trans_parent = 0;
+	it->state &= ~PDL_MYDIMS_TRANS;
 }
 
 pdl_error pdl_trans_finaldestroy(pdl_trans *trans)
@@ -325,36 +340,32 @@ pdl_error pdl_destroytransform(pdl_trans *trans,int ensure,int *wd)
 		PDL_ACCUMERROR(PDL_err, pdl__ensure_trans(trans,ismutual ? 0 : PDL_PARENTDIMSCHANGED,wd));
 	pdl *destbuffer[trans->vtable->npdls];
 	int ndest = 0;
-	if (ismutual) {
-	  for(j=0; j<trans->vtable->nparents; j++) {
-	    pdl *parent = trans->pdls[j];
-	    if(!parent) continue;
-	    PDL_CHKMAGIC(parent);
-	    pdl__removechildtrans(parent,trans);
-	    if(!(parent->state & PDL_DESTROYING) && !parent->sv)
-	      destbuffer[ndest++] = parent;
+	for(j=0; j<trans->vtable->nparents; j++) {
+	  pdl *parent = trans->pdls[j];
+	  if(!parent) continue;
+	  PDL_CHKMAGIC(parent);
+	  pdl__removetrans_children(parent,trans);
+	  if (!(parent->state & PDL_DESTROYING) && !parent->sv) {
+	    parent->state |= PDL_DESTROYING; /* so no mark twice */
+	    destbuffer[ndest++] = parent;
 	  }
-	  for(; j<trans->vtable->npdls; j++) {
-	    pdl *child = trans->pdls[j];
-	    PDL_CHKMAGIC(child);
-	    pdl__removeparenttrans(child,trans,j);
-	    if(child->vafftrans) pdl_vafftrans_remove(child);
-	    if ((!(child->state & PDL_DESTROYING) && !child->sv) ||
-	        (trans->vtable->par_flags[j] & PDL_PARAM_ISTEMP))
-	      destbuffer[ndest++] = child;
-	  }
-	} else {
-	  for(j=trans->vtable->nparents; j<trans->vtable->npdls; j++) {
-	    pdl *child = trans->pdls[j];
-	    if(child->trans_parent == trans)
-	      child->trans_parent = 0;
-	    if (trans->vtable->par_flags[j] & PDL_PARAM_ISTEMP)
-	      destbuffer[ndest++] = child;
+	}
+	for(j=trans->vtable->nparents; j<trans->vtable->npdls; j++) {
+	  pdl *child = trans->pdls[j];
+	  PDL_CHKMAGIC(child);
+	  pdl__removetrans_parent(child,trans,j);
+	  if (ismutual && child->vafftrans) pdl_vafftrans_remove(child);
+	  if ((!(child->state & PDL_DESTROYING) && !child->sv) ||
+	      (trans->vtable->par_flags[j] & PDL_PARAM_ISTEMP)) {
+	    child->state |= PDL_DESTROYING; /* so no mark twice */
+	    destbuffer[ndest++] = child;
 	  }
 	}
 	PDL_ACCUMERROR(PDL_err, pdl_trans_finaldestroy(trans));
-	for(j=0; j<ndest; j++)
+	for(j=0; j<ndest; j++) {
+		destbuffer[j]->state &= ~PDL_DESTROYING; /* safe, set by us */
 		PDL_ACCUMERROR(PDL_err, pdl_destroy(destbuffer[j]));
+	}
 	PDLDEBUG_f(printf("pdl_destroytransform leaving %p\n", (void*)trans));
 	return PDL_err;
 }
@@ -379,7 +390,7 @@ pdl_error pdl_destroy(pdl *it) {
     int nafn=0;
     PDL_DECL_CHILDLOOP(it);
     PDL_CHKMAGIC(it);
-    PDLDEBUG_f(printf("pdl_destroy %p\n",(void*)it));
+    PDLDEBUG_f(printf("pdl_destroy: ");pdl_dump(it));
     if(it->state & PDL_DESTROYING) {
         PDLDEBUG_f(printf("  already destroying, returning\n"));
 	return PDL_err;
@@ -680,12 +691,11 @@ pdl_error pdl_make_trans_mutual(pdl_trans *trans)
     return PDL_err;
   }
   char dataflow = !!(pfflag || (trans->flags & PDL_ITRANS_DO_DATAFLOW_ANY));
-  if (dataflow)
-    for(i=0; i<nparents; i++) {
-      pdl *parent = trans->pdls[i];
-      PDL_RETERROR(PDL_err, pdl__addchildtrans(parent,trans));
-      if (parent->state & PDL_DATAFLOW_F) trans->flags |= PDL_ITRANS_DO_DATAFLOW_F;
-    }
+  for(i=0; i<nparents; i++) {
+    pdl *parent = trans->pdls[i];
+    PDL_RETERROR(PDL_err, pdl__addchildtrans(parent,trans));
+    if (parent->state & PDL_DATAFLOW_F) trans->flags |= PDL_ITRANS_DO_DATAFLOW_F;
+  }
   int wd[npdls];
   for(i=nparents; i<npdls; i++) {
 	pdl *child = trans->pdls[i];
@@ -827,7 +837,8 @@ pdl_error pdl_changed(pdl *it, int what, int recursing)
 	PDL_START_CHILDLOOP(it)
 	    pdl_trans *trans = PDL_CHILDLOOP_THISCHILD(it);
 	    for(j=trans->vtable->nparents; j<trans->vtable->npdls; j++)
-		CHANGED(trans->pdls[j],what,1);
+		if (trans->pdls[j] != it && (trans->pdls[j]->state & what) != what)
+		    CHANGED(trans->pdls[j],what,1);
 	PDL_END_CHILDLOOP(it)
     }
     PDLDEBUG_f(printf("pdl_changed: exiting for pdl %p\n",(void*)it));
@@ -998,11 +1009,9 @@ pdl_error pdl_sever(pdl *src)
 void pdl_propagate_badflag( pdl *it, int newval ) {
     PDL_DECL_CHILDLOOP(it)
     PDL_START_CHILDLOOP(it)
-    {
 	pdl_trans *trans = PDL_CHILDLOOP_THISCHILD(it);
-	int i;
-	for( i = trans->vtable->nparents;
-	     i < trans->vtable->npdls; i++ ) {
+	PDL_Indx i;
+	for( i = trans->vtable->nparents; i < trans->vtable->npdls; i++ ) {
 	    pdl *child = trans->pdls[i];
 	    char need_recurse = (!!newval != !!(child->state & PDL_BADVAL));
 	    if ( newval ) {
@@ -1014,25 +1023,21 @@ void pdl_propagate_badflag( pdl *it, int newval ) {
 	    if (need_recurse)
 		pdl_propagate_badflag( child, newval );
         } /* for: i */
-    }
     PDL_END_CHILDLOOP(it)
 } /* pdl_propagate_badflag */
 
 void pdl_propagate_badvalue( pdl *it ) {
     PDL_DECL_CHILDLOOP(it)
     PDL_START_CHILDLOOP(it)
-    {
 	pdl_trans *trans = PDL_CHILDLOOP_THISCHILD(it);
-	int i;
-	for( i = trans->vtable->nparents;
-	     i < trans->vtable->npdls; i++ ) {
+	PDL_Indx i;
+	for( i = trans->vtable->nparents; i < trans->vtable->npdls; i++ ) {
 	    pdl *child = trans->pdls[i];
             child->has_badvalue = 1;
             child->badvalue = it->badvalue;
 	    /* make sure we propagate to grandchildren, etc */
 	    pdl_propagate_badvalue( child );
         } /* for: i */
-    }
     PDL_END_CHILDLOOP(it)
 } /* pdl_propagate_badvalue */
 
@@ -1066,6 +1071,7 @@ pdl_trans *pdl_create_trans(pdl_transvtable *vtable) {
     it->vtable = vtable;
     PDL_CLRMAGIC(&it->broadcast);
     it->broadcast.inds = 0;
+    it->broadcast.gflags = 0;
     it->ind_sizes = (PDL_Indx *)malloc(sizeof(PDL_Indx) * vtable->ninds);
     if (!it->ind_sizes) return NULL;
     int i; for (i=0; i<vtable->ninds; i++) it->ind_sizes[i] = -1;

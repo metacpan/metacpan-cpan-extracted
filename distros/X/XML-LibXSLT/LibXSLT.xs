@@ -523,7 +523,9 @@ LibXSLT_context_element(xsltTransformContextPtr ctxt, xmlNodePtr node, xmlNodePt
 	AV *val;
 	char *strkey;
 	STRLEN len;
+#if 0
     HE *ent;
+#endif
     int count;
     xmlNodePtr result;
 

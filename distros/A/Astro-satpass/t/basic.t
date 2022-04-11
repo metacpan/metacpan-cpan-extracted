@@ -16,6 +16,21 @@ use constant PI	=> atan2 0, -1;
 use constant ARRAY_REF	=> ref [];
 use constant HASH_REF	=> ref {};
 
+use constant HAS_UNICODE_SUPPORT	=> "$]" > 5.008001;
+
+=begin comment
+
+# I wish I could do this, but the two-arg binmode requires Perl 5.8.
+
+if ( HAS_UNICODE_SUPPORT ) {
+    my $builder = Test::More->builder();
+    binmode $builder->failure_output(), ':encoding(utf-8)';
+}
+
+=end comment
+
+=cut
+
 require_ok 'Astro::Coord::ECI::Utils'
     or BAIL_OUT 'Can not continue without Astro::Coord::ECI::Utils';
 
@@ -53,9 +68,9 @@ u_cmp_eql( rad2deg => undef, undef, undef, 'rad2deg( undef )' );
 
 SKIP: {
 
-    $] ge '5.008001'
+    HAS_UNICODE_SUPPORT
 	or skip "Perl $] has insufficient Unicode support", 1;
-    u_cmp_eql( rad2dms => 1, q<57°17'44".806>, { test => 'is' },
+    u_cmp_eql( rad2dms => 1, qq<57\N{U+00B0}17'44".806>, { test => 'is' },
 	'rad2dms( 1 )' );
 }
 

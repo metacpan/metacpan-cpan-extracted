@@ -7,26 +7,29 @@ use Test::Exception;
 my $class = 'Software::LicenseMoreUtils';
 require_ok($class);
 
-# test short_name retrieved by Software::LicenseUtils
-my $gpl_lic = $class->new_from_short_name({
-    short_name => 'GPL-1',
-    holder => 'X. Ample'
-});
+my @tests = (
+    # test short_name retrieved by Software::LicenseUtils
+    [ 'GPL-1' ,'Software::License::GPL_1' ],
 
-is($gpl_lic->license_class,'Software::License::GPL_1',"license class");
+    # test fall back
+    [ 'MIT' =>  'Software::License::MIT' ],
+    [ 'Apache-2.0' => 'Software::License::Apache_2_0' ],
 
-# test fall back
-my $mit_lic = $class->new_from_short_name({
-    short_name => 'MIT',
-    holder => 'X. Ample'
-});
-is($mit_lic->license_class,'Software::License::MIT',"license class");
+    # SPDX identifiers handled by Software::LicenseUtils
+    [ 'Zlib' => 'Software::License::Zlib'],
+    [ 'PostgreSQL' => 'Software::License::PostgreSQL']
+);
 
-my $apache_lic = $class->new_from_short_name({
-    short_name => 'Apache-2.0',
-    holder => 'X. Ample'
-});
-is($apache_lic->license_class,'Software::License::Apache_2_0',"license class");
+foreach my $test (@tests) {
+    my ($short_name, $lic_class) = @$test;
+
+    my $lic = $class->new_from_short_name({
+        short_name => $short_name,
+        holder => 'X. Ample'
+    });
+
+    is($lic->license_class, $lic_class,"short name: $short_name");
+}
 
 # test also fulltext
 my $lgpl_2_lic = $class->new_from_short_name({

@@ -1,3 +1,8 @@
+3.11    2022-04-07
+
+- Make the order of args to `cpandeps` script unimportant
+    (https://github.com/DrHyde/perl-modules-CPAN-FindDependencies/issues/13)
+
 3.10    2021-08-11
 
 - Stop leaking filehandles, so it should still work even when we're not allowed

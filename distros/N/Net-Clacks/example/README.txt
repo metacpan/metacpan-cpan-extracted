@@ -66,7 +66,7 @@ $worker->run;
 <clacks>
     <appname>Clacks Master</appname>
     <ip>127.0.0.1</ip>
-    <port>18888</port>
+    <port>49888</port>
     <pingtimeout>600</pingtimeout>
     <interclackspingtimeout>60</interclackspingtimeout>
     <ssl>
@@ -129,7 +129,7 @@ my $password = 'unsafepassword';
 my $applicationname = 'clock';
 my $is_caching = 0;
 
-my $chat = Net::Clacks::Client->new('127.0.0.1', 18888, $username, $password, $applicationname, $is_caching);
+my $chat = Net::Clacks::Client->new('127.0.0.1', 49888, $username, $password, $applicationname, $is_caching);
 
 my $clockname = 'example::notify';
 
@@ -211,7 +211,7 @@ my $password = 'unsafepassword';
 my $applicationname = 'chatclient';
 my $is_caching = 0;
 
-my $chat = Net::Clacks::Client->new('127.0.0.1', 18888, $username, $password, $applicationname, $is_caching);
+my $chat = Net::Clacks::Client->new('127.0.0.1', 49888, $username, $password, $applicationname, $is_caching);
 #print 'Connected to server. Info given: ', $chat->getServerinfo(), "\n";
 
 my $chatname = 'example::chat';
@@ -290,7 +290,7 @@ my $password = 'unsafepassword';
 my $applicationname = 'chatbot';
 my $is_caching = 0;
 
-my $chat = Net::Clacks::Client->new('127.0.0.1', 18888, $username, $password, $applicationname, $is_caching);
+my $chat = Net::Clacks::Client->new('127.0.0.1', 49888, $username, $password, $applicationname, $is_caching);
 #print 'Connected to server. Info given: ', $chat->getServerinfo(), "\n";
 
 my $chatname = 'example::chat';
@@ -365,7 +365,7 @@ server). All we need is an additional XML config file:</p>
 <clacks>
     <appname>Clacks Master</appname>
     <ip>127.0.0.1</ip>
-    <port>18889</port>
+    <port>49889</port>
     <pingtimeout>600</pingtimeout>
     <interclackspingtimeout>60</interclackspingtimeout>
     <ssl>
@@ -380,7 +380,7 @@ server). All we need is an additional XML config file:</p>
     </throttle>
     <master>
         <ip>127.0.0.1</ip>
-        <port>18888</port>
+        <port>49888</port>
     </master>
 </clacks>
 </code>

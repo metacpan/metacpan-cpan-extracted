@@ -6,11 +6,14 @@ use strict;
 BEGIN
 {
     $ENV{LC_ALL} = 'C';
-};
+
+    # See: https://github.com/shlomif/html-tidy5/issues/6
+    $ENV{LANG} = 'en_US.UTF-8';
+}
 
 use Test::More tests => 3;
 
-use HTML::T5;
+use HTML::T5 ();
 
 my $html = do { local $/ = undef; <DATA> };
 
@@ -30,7 +33,6 @@ ok( $rc, 'Parsed OK' );
 my @returned = map { $_->as_string } $tidy->messages;
 s/[\r\n]+\z// for @returned;
 is_deeply( \@returned, \@expected_messages, 'Matching errors' );
-
 
 __DATA__
 <HTML>

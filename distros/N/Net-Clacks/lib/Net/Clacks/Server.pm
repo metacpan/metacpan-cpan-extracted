@@ -7,11 +7,13 @@ use diagnostics;
 use mro 'c3';
 use English;
 use Carp;
-our $VERSION = 22;
+our $VERSION = 23;
 use autodie qw( close );
 use Array::Contains;
 use utf8;
 use Encode qw(is_utf8 encode_utf8 decode_utf8);
+use feature 'signatures';
+no warnings qw(experimental::signatures);
 #---AUTOPRAGMAEND---
 
 use XML::Simple;
@@ -74,8 +76,7 @@ BEGIN {
     
 }
 
-sub new {
-    my ($class, $isDebugging, $configfile) = @_;
+sub new($class, $isDebugging, $configfile) {
 
     my $self = bless {}, $class;
 
@@ -96,9 +97,7 @@ sub new {
     return $self;
 }
 
-sub init {
-    my ($self) = @_;
-
+sub init($self) {
 
     my @paths;
     if(defined($ENV{'PC_CONFIG_PATHS'})) {
@@ -208,6 +207,9 @@ sub init {
     my @tcpsockets;
 
     if(defined($config->{ip})) {
+        if(!defined($config->{port})) {
+            croak("At least one IP defined, but no TCP port!");
+        }
         foreach my $ip (@{$config->{ip}}) {
             my $tcp = IO::Socket::IP->new(
                 LocalHost => $ip,
@@ -286,9 +288,7 @@ sub init {
     return;
 }
 
-sub loadPersistanceFile {
-    my ($self, $fname) = @_;
-
+sub loadPersistanceFile($self, $fname) {
     my %clackscache;
     my %clackscachetime;
     my %clackscacheaccesstime;
@@ -385,9 +385,7 @@ sub loadPersistanceFile {
 }
 
 
-sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
-    my ($self) = @_;
-
+sub run($self) { ## no critic (Subroutines::ProhibitExcessComplexity)
     my $savecache = 0;
     my $lastsavecache = 0;
 
@@ -1353,9 +1351,7 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
 
     return;
 }
-sub savePersistanceFile {
-    my ($self, $savecache) = @_;
-
+sub savePersistanceFile($self, $savecache) {
     if(!$self->{persistance}) {
         return;
     }
@@ -1392,9 +1388,7 @@ sub savePersistanceFile {
     return;
 }
 
-sub deref {
-    my ($self, $val) = @_;
-
+sub deref($self, $val) {
     return if(!defined($val));
 
     while(ref($val) eq "SCALAR" || ref($val) eq "REF") {
@@ -1405,9 +1399,7 @@ sub deref {
     return $val;
 }
 
-sub evalsyswrite {
-    my ($self, $socket, $buffer) = @_; 
-
+sub evalsyswrite($self, $socket, $buffer) {
     return 0 unless(length($buffer));
 
     my $written = 0;
@@ -1424,17 +1416,13 @@ sub evalsyswrite {
     return $written;
 }
 
-sub getTime {
-    my ($self) = @_;
-
+sub getTime($self) {
     my $now = time + $self->{timeoffset};
 
     return $now;
 }
 
-sub slurpBinFile {
-    my $fname = shift;
-
+sub slurpBinFile($fname) {
     # Read in file in binary mode, slurping it into a single scalar.
     # We have to make sure we use binmode *and* turn on the line termination variable completly
     # to work around the multiple idiosynchrasies of Perl on Windows

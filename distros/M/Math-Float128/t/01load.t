@@ -13,7 +13,7 @@ else {
   print "ok 1\n";
   my $v = $Math::Float128::VERSION;
 
-  if($v eq '0.15') {print "ok 2\n"}
+  if($v eq '0.16') {print "ok 2\n"}
   else {
     warn "Loaded version $v\n";
     print "not ok 2\n";

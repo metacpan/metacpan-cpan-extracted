@@ -17,4 +17,16 @@ sub stop_on_fail {
     return 0;
 }
 
+sub _field_defined_and_non_empty {
+    if (
+        exists $_[1]
+        and defined $_[1]
+        and $_[1] ne ''
+    ){
+        return 1;
+    }
+
+    return 0;
+}
+
 1;

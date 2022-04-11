@@ -1,5 +1,16 @@
 Changelog for Test-Expander
 
+1.1.1 2022-04-10 21:14:31 UTC
+    - "no warnings qw(redundant)" replaced with "no warnings" because the category "redundant" is not supported by older Perl versions.
+
+1.1.0 2022-04-10 09:51:34 UTC
+    - Fix version number (minor version increased due to new feature "keeping of environment variables specified in .env files without values").
+
+1.0.7 2022-04-09 15:28:13 UTC
+    - Allow keeping of environment variables specified in .env files without values.
+    - Log exception in case lives_ok fails.
+    - Fix minimum required version of Path::Tiny to 0.122.
+
 1.0.6 2022-03-02 11:32:43 UTC
     - throws_ok fixed properly considering the difference between RegEx and scalar as expected value.
 

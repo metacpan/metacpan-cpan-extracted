@@ -17,9 +17,11 @@ sub runtest {
   local $Test::Builder::Level = $Test::Builder::Level + 1;
   my ($in, $method, $expected_cplx, $extra) = @_;
   $expected_cplx = $expected_cplx->[1] if ref $expected_cplx eq 'ARRAY';
-  $_ = PDL::Complex::r2C($_) for $in, $expected_cplx;
+  my @cplx = ref($expected_cplx) eq 'ARRAY' ? @$expected_cplx : $expected_cplx;
+  $_ = PDL::Complex::r2C($_) for $in;
   my ($got) = $in->$method(map ref() && ref() ne 'CODE' ? PDL::Complex::r2C($_) : $_, @{$extra||[]});
-  ok fapprox($got, $expected_cplx), "PDL::Complex $method" or diag "got: $got\nexpected: $expected_cplx";
+  my $ok = grep fapprox($got, PDL::Complex::r2C($_)), @cplx;
+  ok $ok, "PDL::Complex $method" or diag "got(".ref($got)."):$got\nexpected:@cplx";
 }
 
 my $aa = cplx random(2,2,2);

@@ -19,9 +19,11 @@ sub runtest {
     my ($got) = $in->$method(@{$extra||[]});
     ok fapprox($got, $expected), $method or diag "got(".ref($got)."): $got";
   }
-  $_ = PDL->topdl($_)->r2C for $in, $expected_cplx;
+  $_ = PDL->topdl($_)->r2C for $in;
   my ($got) = $in->$method(map ref() && ref() ne 'CODE' ? $_->r2C : $_, @{$extra||[]});
-  ok fapprox($got, $expected_cplx), "native complex $method" or diag "got(".ref($got)."): $got";
+  my @cplx = ref($expected_cplx) eq 'ARRAY' ? @$expected_cplx : $expected_cplx;
+  my $ok = grep fapprox($got, PDL->topdl($_)->r2C), @cplx;
+  ok $ok, "native complex $method" or diag "got(".ref($got)."): $got\nexpected:@cplx";
 }
 
 my $aa = random(2,2,2);

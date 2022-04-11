@@ -1,5 +1,20 @@
 Revision history for Text-Table-Read-RelationOn-Tiny
 
+v2.2.4     2022/04/11
+           Used croak() from Carp instead of die() and confess()
+           Corrected typo in POD. Some minor improvements in POD section.
+
+v2.2.3     2022/04/11
+           Corrected typo in POD
+
+v2.2.2     2022/04/11
+           Added subsection PITFALLS to POD
+           If pedantic is true, then first cheack indetation of a row
+           Added tests
+
+v2.2.1     2022/04/09
+           Some fixes in POD section.
+
 v2.2.0     2022/04/08
            Add named argument 'pedantic' to get() to enable table format checking.
 

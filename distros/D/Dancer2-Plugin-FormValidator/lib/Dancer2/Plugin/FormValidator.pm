@@ -12,7 +12,7 @@ use Hash::Util qw(lock_hashref);
 use Module::Load;
 use Types::Standard qw(InstanceOf HashRef);
 
-our $VERSION = '0.50';
+our $VERSION = '0.51';
 
 plugin_keywords qw(validate_form errors validator_language);
 
@@ -179,7 +179,7 @@ Dancer2::Plugin::FormValidator - neat and easy to start form validation plugin f
 
 =head1 VERSION
 
-version 0.50
+version 0.51
 
 =head1 SYNOPSIS
 
@@ -393,6 +393,8 @@ Returns HashRef[ArrayRef] if validation failed.
 
 =head3 accepted
 
+Validates that field B<exists> and one of the listed: (yes on 1).
+
 =head3 alpha
 
 Validate that string only contain of alphabetic utf8 symbols, i.e. /^[[:alpha:]]+$/.
@@ -417,9 +419,13 @@ Validate that string only contain of latin alphabetic ascii symbols, underscore 
 
 =head3 integer
 
-=head3 length_max
+=head3 length_max:num
 
-=head3 length_min
+Validate that string length <= num.
+
+=head3 length_min:num
+
+Validate that string length >= num.
 
 =head3 max
 
@@ -468,6 +474,93 @@ Role: Dancer2::Plugin::FormValidator::Role::ProfileHasMessages.
             }
         }
     }
+
+=head1 EXTENSIONS
+
+=head2 Writing custom extensions
+
+You can extend the set of validators by writing extensions:
+
+    package Extension {
+        use Moo;
+
+        with 'Dancer2::Plugin::FormValidator::Role::Extension';
+
+        sub validators {
+            return {
+                is_true  => 'IsTrue',   # Full class name
+                email    => 'Email',    # Full class name
+                restrict => 'Restrict', # Full class name
+            }
+        }
+    }
+
+Extension should implement Role: Dancer2::Plugin::FormValidator::Role::Extension.
+
+Custom validators:
+
+    package IsTrue {
+        use Moo;
+
+        with 'Dancer2::Plugin::FormValidator::Role::Validator';
+
+        sub message {
+            return {
+                en => '%s is not a true value',
+            };
+        }
+
+        sub validate {
+            my ($self, $field, $input) = @_;
+
+            if (exists $input->{$field}) {
+                if ($input->{$field} == 1) {
+                    return 1;
+                }
+                else {
+                    return 0;
+                }
+            }
+
+            return 1;
+        }
+    }
+
+Validator should implement Role: Dancer2::Plugin::FormValidator::Role::Validator.
+
+Config:
+
+    set plugins => {
+        FormValidator => {
+            session    => {
+                namespace => '_form_validator'
+            },
+            forms      => {
+                login => 'Validator',
+            },
+            extensions => {
+                extension => {
+                    provider => 'Extension',
+                }
+            }
+        },
+    };
+
+=head2 Extensions modules
+
+There is a set of ready-made extensions available on cpan:
+
+=over 4
+
+=item *
+L<Dancer2::Plugin::FormValidator::Extension::Password|https://metacpan.org/pod/Dancer2::Plugin::FormValidator::Extension::Password>
+- for validating passwords.
+
+=item *
+L<Dancer2::Plugin::FormValidator::Extension::DBIC|https://metacpan.org/pod/Dancer2::Plugin::FormValidator::Extension::DBIC>
+- for checking fields existence in table rows.
+
+=back
 
 =head1 TODO
 

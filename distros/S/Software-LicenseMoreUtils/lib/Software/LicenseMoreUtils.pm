@@ -7,7 +7,7 @@
 # the same terms as the Perl 5 programming language system itself.
 #
 package Software::LicenseMoreUtils;
-$Software::LicenseMoreUtils::VERSION = '1.005';
+$Software::LicenseMoreUtils::VERSION = '1.006';
 use strict;
 use warnings;
 use 5.10.1;
@@ -45,6 +45,15 @@ my %more_short_names = (
     'MPL-1.0'      => 'Software::License::Mozilla_1_0',
     'MPL-1.1'      => 'Software::License::Mozilla_1_1',
     'MPL-2.0'      => 'Software::License::Mozilla_2_0',
+
+    # Some SPDX v3 identifiers
+    'LGPL-2.0-or-later' => 'Software::LicenseMoreUtils::LGPL_2',
+    'LGPL-2.1-or-later' => 'Software::License::LGPL_2_1',
+    'LGPL-3.0-or-later' => 'Software::License::LGPL_3_0',
+
+    'GPL-1.0-or-later'  => 'Software::LicenseMoreUtils::GPL_1',
+    'GPL-2.0-or-later'  => 'Software::License::GPL_2',
+    'GPL-3.0-or-later'  => 'Software::License::GPL_3',
 );
 
 sub _create_license {
@@ -52,24 +61,33 @@ sub _create_license {
     croak "no license short name specified"
           unless defined $arg->{short_name};
 
-    my $subclass = my $short = $arg->{short_name};
-    $subclass =~ s/[\-.]/_/g;
-
     my $lic_obj;
     try {
         $lic_obj = SUPER::new_from_short_name($arg);
-    } catch {
-        my $info = $more_short_names{$short} || "Software::License::$subclass";
-        my $lic_file = my $lic_class = $info;
-        $lic_file =~ s!::!/!g;
-        try {
-            require "$lic_file.pm";
-        } catch {
-            Carp::croak "Unknow license with short name $short ($_)";
-        } ;
-        delete $arg->{short_name};
-        $lic_obj = $lic_class->new( { %$arg } );
     };
+
+    return $lic_obj if $lic_obj;
+
+    try {
+        $lic_obj = SUPER::new_from_spdx_expression($arg);
+    };
+
+    return $lic_obj if $lic_obj;
+
+    my $subclass = my $short = $arg->{short_name};
+    $subclass =~ s/[\-.]/_/g;
+
+    my $info = $more_short_names{$short} || "Software::License::$subclass";
+    my $lic_file = my $lic_class = $info;
+    $lic_file =~ s!::!/!g;
+    try {
+        ## no critic (Modules::RequireBarewordIncludes)
+        require "$lic_file.pm";
+    } catch {
+        Carp::croak "Unknow license with short name $short ($_)";
+    } ;
+    delete $arg->{short_name};
+    $lic_obj = $lic_class->new( { %$arg } );
 
     return $lic_obj;
 }
@@ -87,7 +105,7 @@ sub new_from_short_name {
     my $short = $arg->{short_name};
 
     my $info = $more_short_names{$short} || '';
-    my $or_later = $short =~ /\+$/ ? 1 : 0;
+    my $or_later = $short =~ /(\+|-or-later)$/ ? 1 : 0;
     my $lic = $class->_create_license($arg);
 
     my $xlic = Software::LicenseMoreUtils::LicenseWithSummary->new({
@@ -111,7 +129,7 @@ Software::LicenseMoreUtils - More utilities and a summary for Software::License
 
 =head1 VERSION
 
-version 1.005
+version 1.006
 
 =head1 SYNOPSIS
 
@@ -193,7 +211,10 @@ Known short license names are C<GPL-*>, C<LGPL-*> , and their "or
 later version" variant C<GPL-*+>, C<LGPL-*+> C<Artistic> and
 C<Artistic-*>. Unlike vanilla L<Software::License>, this module
 accepts license name with "-" (e.g. C<GPL-2>) along with "_"
-(e.g. "C<GPL_2>")
+(e.g. "C<GPL_2>").
+
+SPDX v3 identifiers can also be used as short names. I.e. short names
+like C<GPL-2.0-only> or C<LGPL-2.1-or-later> are supported.
 
 If the short name is not known, this method tries to create a license
 object with C<Software::License> and the specified short name

@@ -21,7 +21,7 @@ use DynaLoader;
 
 
 
-#line 74 "real.pd"
+#line 78 "real.pd"
 
 use strict;
 
@@ -287,7 +287,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]A(m,n); int jobz(); [o]s(minmn); [o]U(p,p); [o]VT(s,s); int [o]info())
+  Signature: ([io]A(m,n); int jobz(); [o]s(minmn); [o]U(p,p); [o]VT(s,s); int [o]info(); int [t]iwork(iworkn))
 
 
 
@@ -686,7 +686,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]A(n,n);  int jobvl(); int jobvr(); int balance(); int sense(); [o]wr(n); [o]wi(n); [o]vl(m,m); [o]vr(p,p); int [o]ilo(); int [o]ihi(); [o]scale(n); [o]abnrm(); [o]rconde(q); [o]rcondv(r); int [o]info())
+  Signature: ([io]A(n,n);  int jobvl(); int jobvr(); int balance(); int sense(); [o]wr(n); [o]wi(n); [o]vl(m,m); [o]vr(p,p); int [o]ilo(); int [o]ihi(); [o]scale(n); [o]abnrm(); [o]rconde(q); [o]rcondv(r); int [o]info(); int [t]iwork(iworkn))
 
 
 
@@ -995,8 +995,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io,phys]A(n,n);int balanc();int jobvl();int jobvr();int sense();[io,phys]B(n,n);[o]alphar(n);[o]alphai(n);[o]beta(n);[o]VL(m,m);[o]VR(p,p);int [o]ilo();int [o]ihi();[o]lscale(n);[o]rscale(n);[o]abnrm();[o]bbnrm();[o]rconde(r);[o]rcondv(s);int [o]info())
-
+  Signature: ([io,phys]A(n,n);int balanc();int jobvl();int jobvr();int sense();[io,phys]B(n,n);[o]alphar(n);[o]alphai(n);[o]beta(n);[o]VL(m,m);[o]VR(p,p);int [o]ilo();int [o]ihi();[o]lscale(n);[o]rscale(n);[o]abnrm();[o]bbnrm();[o]rconde(r);[o]rcondv(s);int [o]info(); int [t]bwork(bworkn); int [t]iwork(iworkn))
 
 
 =for ref
@@ -1212,14 +1211,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1216 "Real.pm"
+#line 1215 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *ggevx = \&PDL::ggevx;
-#line 1223 "Real.pm"
+#line 1222 "Real.pm"
 
 
 
@@ -1231,7 +1230,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]A(n,n);  int jobvs(); int sort(); [o]wr(n); [o]wi(n); [o]vs(p,p); int [o]sdim(); int [o]info(); SV* select_func)
+  Signature: ([io]A(n,n);  int jobvs(); int sort(); [o]wr(n); [o]wi(n); [o]vs(p,p); int [o]sdim(); int [o]info(); int [t]bwork(bworkn); SV* select_func)
 
 
 
@@ -1341,14 +1340,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1345 "Real.pm"
+#line 1344 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *gees = \&PDL::gees;
-#line 1352 "Real.pm"
+#line 1351 "Real.pm"
 
 
 
@@ -1360,7 +1359,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]A(n,n);  int jobvs(); int sort(); int sense(); [o]wr(n); [o]wi(n); [o]vs(p,p); int [o]sdim(); [o]rconde();[o]rcondv(); int [o]info(); SV* select_func)
+  Signature: ([io]A(n,n);  int jobvs(); int sort(); int sense(); [o]wr(n); [o]wi(n); [o]vs(p,p); int [o]sdim(); [o]rconde();[o]rcondv(); int [o]info(); int [t]bwork(bworkn); SV* select_func)
 
 
 
@@ -1489,14 +1488,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1493 "Real.pm"
+#line 1492 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *geesx = \&PDL::geesx;
-#line 1500 "Real.pm"
+#line 1499 "Real.pm"
 
 
 
@@ -1508,7 +1507,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]A(n,n); int jobvsl();int jobvsr();int sort();[io]B(n,n);[o]alphar(n);[o]alphai(n);[o]beta(n);[o]VSL(m,m);[o]VSR(p,p);int [o]sdim();int [o]info(); SV* select_func)
+  Signature: ([io]A(n,n); int jobvsl();int jobvsr();int sort();[io]B(n,n);[o]alphar(n);[o]alphai(n);[o]beta(n);[o]VSL(m,m);[o]VSR(p,p);int [o]sdim();int [o]info(); int [t]bwork(bworkn); SV* select_func)
 
 
 
@@ -1657,14 +1656,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1661 "Real.pm"
+#line 1660 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *gges = \&PDL::gges;
-#line 1668 "Real.pm"
+#line 1667 "Real.pm"
 
 
 
@@ -1676,7 +1675,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]A(n,n); int jobvsl();int jobvsr();int sort();int sense();[io]B(n,n);[o]alphar(n);[o]alphai(n);[o]beta(n);[o]VSL(m,m);[o]VSR(p,p);int [o]sdim();[o]rconde(q=2);[o]rcondv(q=2);int [o]info(); SV* select_func)
+  Signature: ([io]A(n,n); int jobvsl();int jobvsr();int sort();int sense();[io]B(n,n);[o]alphar(n);[o]alphai(n);[o]beta(n);[o]VSL(m,m);[o]VSR(p,p);int [o]sdim();[o]rconde(q=2);[o]rcondv(q=2);int [o]info(); int [t]bwork(bworkn); int [t]iwork(iworkn); SV* select_func)
 
 
 
@@ -1862,14 +1861,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1866 "Real.pm"
+#line 1865 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *ggesx = \&PDL::ggesx;
-#line 1873 "Real.pm"
+#line 1872 "Real.pm"
 
 
 
@@ -1933,14 +1932,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1937 "Real.pm"
+#line 1936 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *syev = \&PDL::syev;
-#line 1944 "Real.pm"
+#line 1943 "Real.pm"
 
 
 
@@ -2015,14 +2014,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 2019 "Real.pm"
+#line 2018 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *syevd = \&PDL::syevd;
-#line 2026 "Real.pm"
+#line 2025 "Real.pm"
 
 
 
@@ -2034,7 +2033,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (A(n,n);  int jobz(); int range(); int uplo(); vl(); vu(); int il(); int iu(); abstol(); int [o]m(); [o]w(n); [o]z(p,p);int [o]ifail(n); int [o]info())
+  Signature: (A(n,n);  int jobz(); int range(); int uplo(); vl(); vu(); int il(); int iu(); abstol(); int [o]m(); [o]w(n); [o]z(p,p);int [o]ifail(n); int [o]info(); int [t]iwork(iworkn))
 
 
 
@@ -2154,14 +2153,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 2158 "Real.pm"
+#line 2157 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *syevx = \&PDL::syevx;
-#line 2165 "Real.pm"
+#line 2164 "Real.pm"
 
 
 
@@ -2335,14 +2334,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 2339 "Real.pm"
+#line 2338 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *syevr = \&PDL::syevr;
-#line 2346 "Real.pm"
+#line 2345 "Real.pm"
 
 
 
@@ -2435,14 +2434,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 2439 "Real.pm"
+#line 2438 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *sygv = \&PDL::sygv;
-#line 2446 "Real.pm"
+#line 2445 "Real.pm"
 
 
 
@@ -2542,14 +2541,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 2546 "Real.pm"
+#line 2545 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *sygvd = \&PDL::sygvd;
-#line 2553 "Real.pm"
+#line 2552 "Real.pm"
 
 
 
@@ -2563,7 +2562,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
   Signature: ([io]A(n,n); int itype(); int jobz(); int range();
 	  int uplo(); [io]B(n,n); vl(); vu(); int il(); int iu(); abstol();
-	  int [o]m(); [o]w(n); [o]Z(p,p); int [o]ifail(n); int [o]info())
+	  int [o]m(); [o]w(n); [o]Z(p,p); int [o]ifail(n); int [o]info();
+	  int [t]iwork(iworkn);
+	)
 
 
 
@@ -2707,14 +2708,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 2711 "Real.pm"
+#line 2712 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *sygvx = \&PDL::sygvx;
-#line 2718 "Real.pm"
+#line 2719 "Real.pm"
 
 
 
@@ -2784,14 +2785,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 2788 "Real.pm"
+#line 2789 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *gesv = \&PDL::gesv;
-#line 2795 "Real.pm"
+#line 2796 "Real.pm"
 
 
 
@@ -2803,7 +2804,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]A(n,n); int trans(); int fact(); [io]B(n,m); [io]af(n,n); int [io]ipiv(n); int [io]equed(); [o]r(p); [o]c(q); [o]X(n,m); [o]rcond(); [o]ferr(m); [o]berr(m);[o]rpvgrw();int [o]info())
+  Signature: ([io]A(n,n); int trans(); int fact(); [io]B(n,m); [io]af(n,n); int [io]ipiv(n); int [io]equed(); [o]r(p); [o]c(q); [o]X(n,m); [o]rcond(); [o]ferr(m); [o]berr(m);[o]rpvgrw();int [o]info(); [t]work(workn); int [t]iwork(n))
 
 
 =for ref
@@ -3042,14 +3043,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 3046 "Real.pm"
+#line 3047 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *gesvx = \&PDL::gesvx;
-#line 3053 "Real.pm"
+#line 3054 "Real.pm"
 
 
 
@@ -3142,14 +3143,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 3146 "Real.pm"
+#line 3147 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *sysv = \&PDL::sysv;
-#line 3153 "Real.pm"
+#line 3154 "Real.pm"
 
 
 
@@ -3161,7 +3162,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([phys]A(n,n); int uplo(); int fact(); [phys]B(n,m); [io,phys]af(n,n); int [io,phys]ipiv(n); [o]X(n,m); [o]rcond(); [o]ferr(m); [o]berr(m); int [o]info())
+  Signature: ([phys]A(n,n); int uplo(); int fact(); [phys]B(n,m); [io,phys]af(n,n); int [io,phys]ipiv(n); [o]X(n,m); [o]rcond(); [o]ferr(m); [o]berr(m); int [o]info(); int [t]iwork(n))
 
 
 
@@ -3324,14 +3325,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 3328 "Real.pm"
+#line 3329 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *sysvx = \&PDL::sysvx;
-#line 3335 "Real.pm"
+#line 3336 "Real.pm"
 
 
 
@@ -3410,14 +3411,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 3414 "Real.pm"
+#line 3415 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *posv = \&PDL::posv;
-#line 3421 "Real.pm"
+#line 3422 "Real.pm"
 
 
 
@@ -3429,7 +3430,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io,phys]A(n,n); int uplo(); int fact(); [io,phys]B(n,m); [io,phys]af(n,n); int [io]equed(); [o]s(p); [o,phys]X(n,m); [o,phys]rcond(); [o,phys]ferr(m); [o,phys]berr(m); int [o,phys]info())
+  Signature: ([io,phys]A(n,n); int uplo(); int fact(); [io,phys]B(n,m); [io,phys]af(n,n); int [io]equed(); [o]s(p); [o,phys]X(n,m); [o,phys]rcond(); [o,phys]ferr(m); [o,phys]berr(m); int [o,phys]info(); int [t]iwork(n); [t]work(workn))
 
 
 
@@ -3631,14 +3632,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 3635 "Real.pm"
+#line 3636 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *posvx = \&PDL::posvx;
-#line 3642 "Real.pm"
+#line 3643 "Real.pm"
 
 
 
@@ -3746,14 +3747,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 3750 "Real.pm"
+#line 3751 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *gels = \&PDL::gels;
-#line 3757 "Real.pm"
+#line 3758 "Real.pm"
 
 
 
@@ -3859,14 +3860,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 3863 "Real.pm"
+#line 3864 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *gelsy = \&PDL::gelsy;
-#line 3870 "Real.pm"
+#line 3871 "Real.pm"
 
 
 
@@ -3953,14 +3954,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 3957 "Real.pm"
+#line 3958 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *gelss = \&PDL::gelss;
-#line 3964 "Real.pm"
+#line 3965 "Real.pm"
 
 
 
@@ -3972,7 +3973,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io,phys]A(m,n); [io,phys]B(p,q); [phys]rcond(); [o,phys]s(r); int [o,phys]rank();int [o,phys]info())
+  Signature: ([io]A(m,n); [io]B(p,q); rcond(); [o]s(minmn); int [o]rank();int [o]info(); int [t]iwork(iworkn))
 
 
 
@@ -4074,14 +4075,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 4078 "Real.pm"
+#line 4079 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *gelsd = \&PDL::gelsd;
-#line 4085 "Real.pm"
+#line 4086 "Real.pm"
 
 
 
@@ -4159,14 +4160,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 4163 "Real.pm"
+#line 4164 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *gglse = \&PDL::gglse;
-#line 4170 "Real.pm"
+#line 4171 "Real.pm"
 
 
 
@@ -4245,14 +4246,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 4249 "Real.pm"
+#line 4250 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *ggglm = \&PDL::ggglm;
-#line 4256 "Real.pm"
+#line 4257 "Real.pm"
 
 
 
@@ -4316,14 +4317,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 4320 "Real.pm"
+#line 4321 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *getrf = \&PDL::getrf;
-#line 4327 "Real.pm"
+#line 4328 "Real.pm"
 
 
 
@@ -4387,14 +4388,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 4391 "Real.pm"
+#line 4392 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *getf2 = \&PDL::getf2;
-#line 4398 "Real.pm"
+#line 4399 "Real.pm"
 
 
 
@@ -4510,14 +4511,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 4514 "Real.pm"
+#line 4515 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *sytrf = \&PDL::sytrf;
-#line 4521 "Real.pm"
+#line 4522 "Real.pm"
 
 
 
@@ -4598,14 +4599,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 4602 "Real.pm"
+#line 4603 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *sytf2 = \&PDL::sytf2;
-#line 4609 "Real.pm"
+#line 4610 "Real.pm"
 
 
 
@@ -4672,14 +4673,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 4676 "Real.pm"
+#line 4677 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *potrf = \&PDL::potrf;
-#line 4683 "Real.pm"
+#line 4684 "Real.pm"
 
 
 
@@ -4746,14 +4747,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 4750 "Real.pm"
+#line 4751 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *potf2 = \&PDL::potf2;
-#line 4757 "Real.pm"
+#line 4758 "Real.pm"
 
 
 
@@ -4766,7 +4767,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([io,phys]A(n,n); int [phys]ipiv(n); int [o,phys]info())
-
 
 
 =for ref
@@ -4834,8 +4834,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io,phys]A(n,n); int uplo(); int [phys]ipiv(n); int [o,phys]info())
-
+  Signature: ([io]A(n,n); int uplo(); int ipiv(n); int [o]info(); [t]work(n))
 
 
 =for ref
@@ -4870,8 +4869,6 @@ C<sytrf>.
             > 0: if info = i, D(i,i) = 0; the matrix is singular and its
                  inverse could not be computed.
 
-
-
 =for example
 
  $a = random (float, 100, 100);
@@ -4892,14 +4889,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 4896 "Real.pm"
+#line 4893 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *sytri = \&PDL::sytri;
-#line 4903 "Real.pm"
+#line 4900 "Real.pm"
 
 
 
@@ -4959,14 +4956,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 4963 "Real.pm"
+#line 4960 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *potri = \&PDL::potri;
-#line 4970 "Real.pm"
+#line 4967 "Real.pm"
 
 
 
@@ -5033,14 +5030,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 5037 "Real.pm"
+#line 5034 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *trtri = \&PDL::trtri;
-#line 5044 "Real.pm"
+#line 5041 "Real.pm"
 
 
 
@@ -5103,14 +5100,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 5107 "Real.pm"
+#line 5104 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *trti2 = \&PDL::trti2;
-#line 5114 "Real.pm"
+#line 5111 "Real.pm"
 
 
 
@@ -5174,14 +5171,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 5178 "Real.pm"
+#line 5175 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *getrs = \&PDL::getrs;
-#line 5185 "Real.pm"
+#line 5182 "Real.pm"
 
 
 
@@ -5245,14 +5242,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 5249 "Real.pm"
+#line 5246 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *sytrs = \&PDL::sytrs;
-#line 5256 "Real.pm"
+#line 5253 "Real.pm"
 
 
 
@@ -5311,14 +5308,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 5315 "Real.pm"
+#line 5312 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *potrs = \&PDL::potrs;
-#line 5322 "Real.pm"
+#line 5319 "Real.pm"
 
 
 
@@ -5396,14 +5393,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 5400 "Real.pm"
+#line 5397 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *trtrs = \&PDL::trtrs;
-#line 5407 "Real.pm"
+#line 5404 "Real.pm"
 
 
 
@@ -5580,14 +5577,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 5584 "Real.pm"
+#line 5581 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *latrs = \&PDL::latrs;
-#line 5591 "Real.pm"
+#line 5588 "Real.pm"
 
 
 
@@ -5599,7 +5596,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([phys]A(n,n); int norm(); [phys]anorm(); [o,phys]rcond();int [o,phys]info())
+  Signature: (A(n,n); int norm(); anorm(); [o]rcond();int [o]info(); int [t]iwork(n); [t]work(workn))
 
 
 
@@ -5653,14 +5650,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 5657 "Real.pm"
+#line 5654 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *gecon = \&PDL::gecon;
-#line 5664 "Real.pm"
+#line 5661 "Real.pm"
 
 
 
@@ -5672,8 +5669,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([phys]A(n,n); int uplo(); int ipiv(n); [phys]anorm(); [o,phys]rcond();int [o,phys]info())
-
+  Signature: ([phys]A(n,n); int uplo(); int ipiv(n); [phys]anorm(); [o,phys]rcond();int [o,phys]info(); int [t]iwork(n); [t]work(workn))
 
 
 =for ref
@@ -5727,14 +5723,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 5731 "Real.pm"
+#line 5727 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *sycon = \&PDL::sycon;
-#line 5738 "Real.pm"
+#line 5734 "Real.pm"
 
 
 
@@ -5746,7 +5742,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([phys]A(n,n); int uplo(); [phys]anorm(); [o,phys]rcond();int [o,phys]info())
+  Signature: (A(n,n); int uplo(); anorm(); [o]rcond();int [o]info(); int [t]iwork(n); [t]work(workn))
 
 
 
@@ -5795,14 +5791,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 5799 "Real.pm"
+#line 5795 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *pocon = \&PDL::pocon;
-#line 5806 "Real.pm"
+#line 5802 "Real.pm"
 
 
 
@@ -5814,8 +5810,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([phys]A(n,n); int norm();int uplo();int diag(); [o,phys]rcond();int [o,phys]info())
-
+  Signature: (A(n,n); int norm();int uplo();int diag(); [o]rcond();int [o]info(); int [t]iwork(n); [t]work(workn))
 
 
 =for ref
@@ -5859,7 +5854,6 @@ computed as
     info:   = 0:  successful exit
             < 0:  if info = -i, the i-th argument had an illegal value
 
-
 =for example
 
  # Assume $a is upper triangular
@@ -5875,14 +5869,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 5879 "Real.pm"
+#line 5873 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *trcon = \&PDL::trcon;
-#line 5886 "Real.pm"
+#line 5880 "Real.pm"
 
 
 
@@ -5954,14 +5948,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 5958 "Real.pm"
+#line 5952 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *geqp3 = \&PDL::geqp3;
-#line 5965 "Real.pm"
+#line 5959 "Real.pm"
 
 
 
@@ -6026,14 +6020,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 6030 "Real.pm"
+#line 6024 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *geqrf = \&PDL::geqrf;
-#line 6037 "Real.pm"
+#line 6031 "Real.pm"
 
 
 
@@ -6091,14 +6085,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 6095 "Real.pm"
+#line 6089 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *orgqr = \&PDL::orgqr;
-#line 6102 "Real.pm"
+#line 6096 "Real.pm"
 
 
 
@@ -6177,14 +6171,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 6181 "Real.pm"
+#line 6175 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *ormqr = \&PDL::ormqr;
-#line 6188 "Real.pm"
+#line 6182 "Real.pm"
 
 
 
@@ -6248,14 +6242,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 6252 "Real.pm"
+#line 6246 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *gelqf = \&PDL::gelqf;
-#line 6259 "Real.pm"
+#line 6253 "Real.pm"
 
 
 
@@ -6312,14 +6306,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 6316 "Real.pm"
+#line 6310 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *orglq = \&PDL::orglq;
-#line 6323 "Real.pm"
+#line 6317 "Real.pm"
 
 
 
@@ -6398,14 +6392,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 6402 "Real.pm"
+#line 6396 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *ormlq = \&PDL::ormlq;
-#line 6409 "Real.pm"
+#line 6403 "Real.pm"
 
 
 
@@ -6471,14 +6465,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 6475 "Real.pm"
+#line 6469 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *geqlf = \&PDL::geqlf;
-#line 6482 "Real.pm"
+#line 6476 "Real.pm"
 
 
 
@@ -6536,14 +6530,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 6540 "Real.pm"
+#line 6534 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *orgql = \&PDL::orgql;
-#line 6547 "Real.pm"
+#line 6541 "Real.pm"
 
 
 
@@ -6622,14 +6616,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 6626 "Real.pm"
+#line 6620 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *ormql = \&PDL::ormql;
-#line 6633 "Real.pm"
+#line 6627 "Real.pm"
 
 
 
@@ -6696,14 +6690,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 6700 "Real.pm"
+#line 6694 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *gerqf = \&PDL::gerqf;
-#line 6707 "Real.pm"
+#line 6701 "Real.pm"
 
 
 
@@ -6761,14 +6755,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 6765 "Real.pm"
+#line 6759 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *orgrq = \&PDL::orgrq;
-#line 6772 "Real.pm"
+#line 6766 "Real.pm"
 
 
 
@@ -6847,14 +6841,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 6851 "Real.pm"
+#line 6845 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *ormrq = \&PDL::ormrq;
-#line 6858 "Real.pm"
+#line 6852 "Real.pm"
 
 
 
@@ -6939,14 +6933,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 6943 "Real.pm"
+#line 6937 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *tzrzf = \&PDL::tzrzf;
-#line 6950 "Real.pm"
+#line 6944 "Real.pm"
 
 
 
@@ -7025,14 +7019,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 7029 "Real.pm"
+#line 7023 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *ormrz = \&PDL::ormrz;
-#line 7036 "Real.pm"
+#line 7030 "Real.pm"
 
 
 
@@ -7126,14 +7120,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 7130 "Real.pm"
+#line 7124 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *gehrd = \&PDL::gehrd;
-#line 7137 "Real.pm"
+#line 7131 "Real.pm"
 
 
 
@@ -7195,14 +7189,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 7199 "Real.pm"
+#line 7193 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *orghr = \&PDL::orghr;
-#line 7206 "Real.pm"
+#line 7200 "Real.pm"
 
 
 
@@ -7305,14 +7299,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 7309 "Real.pm"
+#line 7303 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *hseqr = \&PDL::hseqr;
-#line 7316 "Real.pm"
+#line 7310 "Real.pm"
 
 
 
@@ -7324,7 +7318,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]T(n,n); int side();int howmny();int select(q);[o]VL(m,m); [o]VR(p,p);int [o]m(); int [o]info())
+  Signature: ([io]T(n,n); int side();int howmny();int select(q);[o]VL(m,m); [o]VR(p,p);int [o]m(); int [o]info(); [t]work(workn))
 
 
 
@@ -7469,14 +7463,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 7473 "Real.pm"
+#line 7467 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *trevc = \&PDL::trevc;
-#line 7480 "Real.pm"
+#line 7474 "Real.pm"
 
 
 
@@ -7488,7 +7482,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]A(n,n); int side();int howmny();[io]B(n,n);int select(q);[o]VL(m,m); [o]VR(p,p);int [o]m(); int [o]info())
+  Signature: ([io]A(n,n); int side();int howmny();[io]B(n,n);int select(q);[o]VL(m,m); [o]VR(p,p);int [o]m(); int [o]info(); [t]work(workn))
 
 
 
@@ -7612,14 +7606,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 7616 "Real.pm"
+#line 7610 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *tgevc = \&PDL::tgevc;
-#line 7623 "Real.pm"
+#line 7617 "Real.pm"
 
 
 
@@ -7728,14 +7722,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 7732 "Real.pm"
+#line 7726 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *gebal = \&PDL::gebal;
-#line 7739 "Real.pm"
+#line 7733 "Real.pm"
 
 
 
@@ -7809,14 +7803,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 7813 "Real.pm"
+#line 7807 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *gebak = \&PDL::gebak;
-#line 7820 "Real.pm"
+#line 7814 "Real.pm"
 
 
 
@@ -7828,8 +7822,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([phys]A(n,m); int norm(); [o]b())
-
+  Signature: ([phys]A(n,m); int norm(); [o]b(); [t]work(workn))
 
 
 =for ref
@@ -7864,12 +7857,10 @@ real matrix A.
 
     A:      The n by m matrix A.
 
-
 =for example
 
  $a = random (float, 100, 100);
  $norm  = $a->lange(1);
-
 
 
 =for bad
@@ -7879,14 +7870,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 7883 "Real.pm"
+#line 7874 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *lange = \&PDL::lange;
-#line 7890 "Real.pm"
+#line 7881 "Real.pm"
 
 
 
@@ -7898,8 +7889,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([phys]A(n,n); int uplo(); int norm(); [o]b())
-
+  Signature: (A(n,n); int uplo(); int norm(); [o]b(); [t]work(workn))
 
 
 =for ref
@@ -7942,13 +7932,11 @@ real symmetric matrix A.
             the matrix A, and the strictly upper triangular part of A is
             not referenced.
 
-
 =for example
 
  # Assume $a is symmetric
  $a = random (float, 100, 100);
  $norm  = $a->lansy(1, 1);
-
 
 
 =for bad
@@ -7958,14 +7946,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 7962 "Real.pm"
+#line 7950 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *lansy = \&PDL::lansy;
-#line 7969 "Real.pm"
+#line 7957 "Real.pm"
 
 
 
@@ -7977,8 +7965,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([phys]A(m,n);int uplo();int norm();int diag();[o]b())
-
+  Signature: (A(m,n);int uplo();int norm();int diag();[o]b(); [t]work(workn))
 
 
 =for ref
@@ -8027,13 +8014,11 @@ trapezoidal or triangular matrix A.
             that when diag = 1, the diagonal elements of A are not
             referenced and are assumed to be one.
 
-
 =for example
 
  # Assume $a is upper triangular
  $a = random (float, 100, 100);
  $norm  = $a->lantr(1, 1, 0);
-
 
 
 =for bad
@@ -8043,14 +8028,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 8047 "Real.pm"
+#line 8032 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *lantr = \&PDL::lantr;
-#line 8054 "Real.pm"
+#line 8039 "Real.pm"
 
 
 
@@ -8063,7 +8048,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: ([phys]A(m,n); int transa(); int transb(); [phys]B(p,q);[phys]alpha(); [phys]beta(); [io,phys]C(r,s))
-
 
 
 =for ref
@@ -8125,14 +8109,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 8129 "Real.pm"
+#line 8113 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *gemm = \&PDL::gemm;
-#line 8136 "Real.pm"
+#line 8120 "Real.pm"
 
 
 
@@ -8161,14 +8145,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 8165 "Real.pm"
+#line 8149 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *mmult = \&PDL::mmult;
-#line 8172 "Real.pm"
+#line 8156 "Real.pm"
 
 
 
@@ -8197,14 +8181,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 8201 "Real.pm"
+#line 8185 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *crossprod = \&PDL::crossprod;
-#line 8208 "Real.pm"
+#line 8192 "Real.pm"
 
 
 
@@ -8290,14 +8274,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 8294 "Real.pm"
+#line 8278 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *syrk = \&PDL::syrk;
-#line 8301 "Real.pm"
+#line 8285 "Real.pm"
 
 
 
@@ -8332,14 +8316,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 8336 "Real.pm"
+#line 8320 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *dot = \&PDL::dot;
-#line 8343 "Real.pm"
+#line 8327 "Real.pm"
 
 
 
@@ -8376,14 +8360,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 8380 "Real.pm"
+#line 8364 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *axpy = \&PDL::axpy;
-#line 8387 "Real.pm"
+#line 8371 "Real.pm"
 
 
 
@@ -8417,14 +8401,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 8421 "Real.pm"
+#line 8405 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *nrm2 = \&PDL::nrm2;
-#line 8428 "Real.pm"
+#line 8412 "Real.pm"
 
 
 
@@ -8458,14 +8442,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 8462 "Real.pm"
+#line 8446 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *asum = \&PDL::asum;
-#line 8469 "Real.pm"
+#line 8453 "Real.pm"
 
 
 
@@ -8499,14 +8483,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 8503 "Real.pm"
+#line 8487 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *scal = \&PDL::scal;
-#line 8510 "Real.pm"
+#line 8494 "Real.pm"
 
 
 
@@ -8541,14 +8525,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 8545 "Real.pm"
+#line 8529 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *rot = \&PDL::rot;
-#line 8552 "Real.pm"
+#line 8536 "Real.pm"
 
 
 
@@ -8582,14 +8566,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 8586 "Real.pm"
+#line 8570 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *rotg = \&PDL::rotg;
-#line 8593 "Real.pm"
+#line 8577 "Real.pm"
 
 
 
@@ -8640,14 +8624,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 8644 "Real.pm"
+#line 8628 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *lasrt = \&PDL::lasrt;
-#line 8651 "Real.pm"
+#line 8635 "Real.pm"
 
 
 
@@ -8696,14 +8680,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 8700 "Real.pm"
+#line 8684 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *lacpy = \&PDL::lacpy;
-#line 8707 "Real.pm"
+#line 8691 "Real.pm"
 
 
 
@@ -8760,14 +8744,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 8764 "Real.pm"
+#line 8748 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *laswp = \&PDL::laswp;
-#line 8771 "Real.pm"
+#line 8755 "Real.pm"
 
 
 
@@ -8829,14 +8813,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 8833 "Real.pm"
+#line 8817 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *lamch = \&PDL::lamch;
-#line 8840 "Real.pm"
+#line 8824 "Real.pm"
 
 
 
@@ -8889,14 +8873,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 8893 "Real.pm"
+#line 8877 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *labad = \&PDL::labad;
-#line 8900 "Real.pm"
+#line 8884 "Real.pm"
 
 
 
@@ -8923,14 +8907,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 8927 "Real.pm"
+#line 8911 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *tricpy = \&PDL::tricpy;
-#line 8934 "Real.pm"
+#line 8918 "Real.pm"
 
 
 
@@ -8958,7 +8942,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 8962 "Real.pm"
+#line 8946 "Real.pm"
 
 
 
@@ -8975,14 +8959,14 @@ sub PDL::cplx_eigen {
   }
   ($outval, $outvec);
 }
-#line 8979 "Real.pm"
+#line 8963 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *cplx_eigen = \&PDL::cplx_eigen;
-#line 8986 "Real.pm"
+#line 8970 "Real.pm"
 
 
 
@@ -9010,14 +8994,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 9014 "Real.pm"
+#line 8998 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *augment = \&PDL::augment;
-#line 9021 "Real.pm"
+#line 9005 "Real.pm"
 
 
 
@@ -9045,14 +9029,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 9049 "Real.pm"
+#line 9033 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *mstack = \&PDL::mstack;
-#line 9056 "Real.pm"
+#line 9040 "Real.pm"
 
 
 
@@ -9079,20 +9063,20 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 9083 "Real.pm"
+#line 9067 "Real.pm"
 
 
 
 #line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *charpol = \&PDL::charpol;
-#line 9090 "Real.pm"
+#line 9074 "Real.pm"
 
 
 
 
 
-#line 10909 "real.pd"
+#line 10762 "real.pd"
 
 
 =head1 AUTHOR
@@ -9104,7 +9088,7 @@ it under the terms of the Perl Artistic License as in the file Artistic_2
 in this distribution.
 
 =cut
-#line 9108 "Real.pm"
+#line 9092 "Real.pm"
 
 
 

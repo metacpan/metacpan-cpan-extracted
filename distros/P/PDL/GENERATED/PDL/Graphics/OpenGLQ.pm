@@ -3,7 +3,7 @@
 #
 package PDL::Graphics::OpenGLQ;
 
-our @EXPORT_OK = qw(line_3x_3c gl_line_strip_col gl_line_strip_nc gl_lines_col gl_lines_nc gl_points_col gl_points_nc gl_texts gl_triangles_mat gl_triangles_n_mat gl_triangles_wn_mat gl_triangles gl_triangles_n gl_triangles_wn gl_arrows );
+our @EXPORT_OK = qw(gl_spheres gl_line_strip_col gl_line_strip_nc gl_lines_col gl_lines_nc gl_points_col gl_points_nc gl_texts gl_triangles_mat gl_triangles_n_mat gl_triangles_wn_mat gl_triangles gl_triangles_n gl_triangles_wn gl_arrows );
 our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
@@ -55,7 +55,7 @@ the copyright notice should be included in the file.
 
 #line 1060 "../../../blib/lib/PDL/PP.pm"
 
-*line_3x_3c = \&PDL::line_3x_3c;
+*gl_spheres = \&PDL::gl_spheres;
 #line 60 "OpenGLQ.pm"
 
 

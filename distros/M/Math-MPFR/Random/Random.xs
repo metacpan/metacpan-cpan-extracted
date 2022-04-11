@@ -155,7 +155,10 @@ void DESTROY(gmp_randstate_t * p) {
      Safefree(p);
 }
 
-
+int _is_NOK_and_POK(SV * in) {
+  if(SvNOK(in) && SvPOK(in)) return 1;
+  return 0;
+}
 
 MODULE = Math::MPFR::Random  PACKAGE = Math::MPFR::Random
 
@@ -202,4 +205,8 @@ OUTPUT:  RETVAL
 int
 _has_pv_nv_bug ()
 
+
+int
+_is_NOK_and_POK (in)
+	SV *	in
 

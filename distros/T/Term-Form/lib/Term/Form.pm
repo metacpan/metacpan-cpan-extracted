@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '0.544';
+our $VERSION = '0.545';
 use Exporter 'import';
 our @EXPORT_OK = qw( fill_form read_line );
 
@@ -224,8 +224,55 @@ sub __reset_term {
 }
 
 
-sub _sanitized_string {
-    my ( $str ) = @_;
+sub __get_list {
+    my ( $self, $orig_list ) = @_;
+    my $list;
+    if ( $self->{color} ) {
+        $list = [ @{$self->{i}{pre}} ];
+        my $count = @{$self->{i}{pre}};
+        for my $entry ( @$orig_list ) {
+            my ( $key, $value ) = @$entry;
+            my @color;
+            $key =~ s/\x{feff}//g;
+            $key =~ s/(\e\[[\d;]*m)/push( @color, $1 ) && "\x{feff}"/ge;
+            $self->{i}{key_colors}[$count++] = [ @color ];
+            push @$list, [ $self->__sanitized_string( $key ), $value ];
+        }
+    }
+    else {
+        $list = [ @{$self->{i}{pre}}, map { [ $self->__sanitized_string( $_->[0] ), $_->[1] ] } @$orig_list ];
+    }
+    return $list;
+}
+
+
+sub __limit_key_w {
+    my ( $self, $term_w ) = @_;
+    if ( $self->{i}{max_key_w} > $term_w / 3 ) {
+        $self->{i}{max_key_w} = int( $term_w / 3 );
+    }
+}
+
+
+sub __available_width {
+    my ( $self, $term_w ) = @_;
+    $self->{i}{avail_w} = $term_w - ( $self->{i}{max_key_w} + length( $self->{i}{sep} ) + $self->{i}{arrow_w} );
+    # Subtract $self->{i}{arrow_w} for the '<' before the string.
+    # In each case where no '<'-prefix is required (diff==0) $self->{i}{arrow_w} is added again.
+    # Routins where $self->{i}{arrow_w} is added:  __left, __bspace, __home, __ctrl_u, __delete
+    # The required space (1) for the cursor (or the '>') behind the string is already subtracted in get_term_size
+}
+
+
+sub __threshold_width {
+    my ( $self ) = @_;
+    $self->{i}{th} = int( $self->{i}{avail_w} / 5 );
+    $self->{i}{th} = 40 if $self->{i}{th} > 40; ##
+}
+
+
+sub __sanitized_string {
+    my ( $self, $str ) = @_;
     if ( defined $str ) {
         $str =~ s/\t/ /g;
         $str =~ s/\v+/\ \ /g;
@@ -238,7 +285,7 @@ sub _sanitized_string {
 }
 
 
-sub __calculate_threshold {
+sub __threshold_char_count {
     my ( $self, $m ) = @_;
     $m->{th_l} = 0;
     $m->{th_r} = 0;
@@ -590,22 +637,6 @@ sub __length_longest_key {
 }
 
 
-sub __prepare_width {
-    my ( $self, $term_w ) = @_;
-    $self->{i}{term_w} = $term_w;
-    if ( $self->{i}{max_key_w} > $term_w / 3 ) {
-        $self->{i}{max_key_w} = int( $term_w / 3 );
-    }
-    $self->{i}{avail_w} = $term_w - ( $self->{i}{max_key_w} + length( $self->{i}{sep} ) + $self->{i}{arrow_w} );
-    # Subtract $self->{i}{arrow_w} for the '<' before the string.
-    # In each case where no '<'-prefix is required (diff==0) $self->{i}{arrow_w} is added again.
-    # Routins where $self->{i}{arrow_w} is added:  __left, __bspace, __home, __ctrl_u, __delete
-    # The required space (1) for the cursor (or the '>') behind the string is already subtracted in get_term_size
-    $self->{i}{th} = int( $self->{i}{avail_w} / 5 );
-    $self->{i}{th} = 40 if $self->{i}{th} > 40;
-}
-
-
 sub __prepare_hight {
     my ( $self, $list, $term_w, $term_h ) = @_;
     $self->{i}{avail_h} = $term_h;
@@ -753,7 +784,7 @@ sub __write_screen {
 
 
 sub __prepare_footer_fmt {
-    my ( $self ) = @_;
+    my ( $self, $term_w ) = @_;
     if ( ! $self->{i}{print_footer} ) {
         return;
     }
@@ -763,11 +794,11 @@ sub __prepare_footer_fmt {
     if ( $self->{footer} ) {
         $footer_fmt .= $self->{footer};
     }
-    if ( print_columns( sprintf $footer_fmt, $p_count ) > $self->{i}{term_w} ) { # color
+    if ( print_columns( sprintf $footer_fmt, $p_count ) > $term_w ) { # color
         $footer_fmt = '%0' . $width_p_count . 'd/' . $p_count;
-        if ( length( sprintf $footer_fmt, $p_count ) > $self->{i}{term_w} ) {
-            if ( $width_p_count > $self->{i}{term_w} ) {
-                $width_p_count = $self->{i}{term_w};
+        if ( length( sprintf $footer_fmt, $p_count ) > $term_w ) {
+            if ( $width_p_count > $term_w ) {
+                $width_p_count = $term_w;
             }
             $footer_fmt = '%0' . $width_p_count . '.' . $width_p_count . 's';
         }
@@ -813,7 +844,7 @@ sub __prepare_meta_menu_elements {
             $tmp =~ s/\x{feff}//g;
             $tmp =~ s/(\e\[[\d;]*m)/push( @color, $1 ) && "\x{feff}"/ge;
         }
-        $tmp = _sanitized_string( $tmp );
+        $tmp = $self->__sanitized_string( $tmp );
         if ( print_columns( $tmp ) > $term_w ) {
             $tmp = cut_to_printwidth( $tmp, $term_w, 0 );
         }
@@ -922,26 +953,13 @@ sub fill_form {
     else {
         $self->{i}{end_down} = $#$orig_list + @{$self->{i}{pre}};
     }
-    my $list;
-    if ( $self->{color} ) {
-        $list = [ @{$self->{i}{pre}} ];
-        my $count = @{$self->{i}{pre}};
-        for my $entry ( @$orig_list ) {
-            my ( $key, $value ) = @$entry;
-            my @color;
-            $key =~ s/\x{feff}//g;
-            $key =~ s/(\e\[[\d;]*m)/push( @color, $1 ) && "\x{feff}"/ge;
-            $self->{i}{key_colors}[$count++] = [ @color ];
-            push @$list, [ _sanitized_string( $key ), $value ];
-        }
-    }
-    else {
-        $list = [ @{$self->{i}{pre}}, map { [ _sanitized_string( $_->[0] ), $_->[1] ] } @$orig_list ];
-    }
+    my $list = $self->__get_list( $orig_list );
     $self->__length_longest_key( $list );
-    $self->__prepare_width( $term_w );
+    $self->__limit_key_w( $term_w );
+    $self->__available_width( $term_w );
+    $self->__threshold_width();
     $self->__prepare_hight( $list, $term_w, $term_h );
-    $self->__prepare_footer_fmt();
+    $self->__prepare_footer_fmt( $term_w );
     $self->__write_first_screen( $list );
     my $m = $self->__string_and_pos( $list );
     my $k = 0;
@@ -988,15 +1006,17 @@ sub fill_form {
             ( $term_w, $term_h ) = ( $tmp_term_w, $tmp_term_h );
             $self->__prepare_meta_menu_elements( $term_w );
             $self->__length_longest_key( $list );
-            $self->__prepare_width( $term_w );
+            $self->__limit_key_w( $term_w );
+            $self->__available_width( $term_w );
+            $self->__threshold_width();
             $self->__prepare_hight( $list, $term_w, $term_h );
-            $self->__prepare_footer_fmt();
+            $self->__prepare_footer_fmt( $term_w );
             $self->__write_first_screen( $list );
             $m = $self->__string_and_pos( $list );
         }
         # reset $m->{avail_w} to default:
         $m->{avail_w} = $self->{i}{avail_w};
-        $self->__calculate_threshold( $m );
+        $self->__threshold_char_count( $m );
         if ( $char == KEY_BSPACE || $char == CONTROL_H ) {
             $k = 1;
             if ( $locked ) {    # read_only
@@ -1239,41 +1259,42 @@ sub __print_previous_page {
 
 
 sub __before_readline {
-    my ( $self, $m ) = @_;
+    my ( $self, $m, $term_w ) = @_;
     if ( $self->{show_context} ) {
         my @pre_text_array;
         if ( $m->{diff} ) {
             my $line = '';
             my $line_w = 0;
             for my $i ( reverse( 0 .. $m->{diff} - 1 ) ) {
-                if ( $line_w + $m->{str}[$i][1] > $self->{i}{term_w} ) {
+                if ( $line_w + $m->{str}[$i][1] > $term_w ) {
                     unshift @pre_text_array, $line;
                     $line   = $m->{str}[$i][0];
                     $line_w = $m->{str}[$i][1];
-                    next;
                 }
-                $line   = $m->{str}[$i][0] . $line;
-                $line_w = $m->{str}[$i][1] + $line_w;
+                else {
+                    $line   = $m->{str}[$i][0] . $line;
+                    $line_w = $m->{str}[$i][1] + $line_w;
+                }
             }
             my $total_first_line_w = $self->{i}{max_key_w} + $line_w;
-            if ( $total_first_line_w <= $self->{i}{term_w} ) {
-                my $empty_w = $self->{i}{term_w} - $total_first_line_w;
-                unshift @pre_text_array, $self->__get_prompt() . ( ' ' x $empty_w ) . $line;
+            if ( $total_first_line_w <= $term_w ) {
+                my $empty_w = $term_w - $total_first_line_w;
+                unshift @pre_text_array, $self->{i}{prompt} . ( ' ' x $empty_w ) . $line;
             }
             else {
-                my $empty_w = $self->{i}{term_w} - $line_w;
+                my $empty_w = $term_w - $line_w;
                 unshift @pre_text_array, ' ' x $empty_w . $line;
-                unshift @pre_text_array, $self->__get_prompt();
+                unshift @pre_text_array, $self->{i}{prompt};
             }
             $self->{i}{keys}[0] = '';
         }
         else {
-            if ( ( $m->{str_w} + $self->{i}{max_key_w} ) <= $self->{i}{term_w} ) {
+            if ( ( $m->{str_w} + $self->{i}{max_key_w} ) <= $term_w ) {
                 $self->{i}{keys}[0] = $self->{i}{prompt};
             }
             else {
                 if ( length $self->{i}{prompt} ) { #
-                    unshift @pre_text_array, $self->__get_prompt();
+                    unshift @pre_text_array, $self->{i}{prompt};
                 }
                 $self->{i}{keys}[0] = '';
             }
@@ -1282,25 +1303,13 @@ sub __before_readline {
         $self->{i}{pre_text_row_count} = scalar @pre_text_array;
     }
     else {
-        $self->{i}{keys}[0] = $self->__get_prompt();
+        $self->{i}{keys}[0] = $self->{i}{prompt};
     }
-}
-
-
-sub __get_prompt {
-    my ( $self ) = @_;
-    my $prompt = $self->{i}{prompt};
-    if ( exists $self->{i}{prompt_colors} && @{$self->{i}{prompt_colors}} ) {
-        my @color = @{$self->{i}{prompt_colors}};
-        $prompt =~ s/\x{feff}/shift @color/ge;
-        $prompt .= normal();
-    }
-    return $prompt;
 }
 
 
 sub __after_readline {
-    my ( $self, $m ) = @_;
+    my ( $self, $m, $term_w ) = @_;
     my $count_chars_after = @{$m->{str}} - ( @{$m->{p_str}} + $m->{diff} );
     if ( ! $self->{show_context} || ! $count_chars_after ) {
         $self->{i}{post_text} = '';
@@ -1311,7 +1320,7 @@ sub __after_readline {
     my $line = '';
     my $line_w = 0;
     for my $i ( ( @{$m->{str}} - $count_chars_after ) .. $#{$m->{str}} ) {
-        if ( $line_w + $m->{str}[$i][1] > $self->{i}{term_w} ) {
+        if ( $line_w + $m->{str}[$i][1] > $term_w ) {
             push @post_text_array, $line;
             $line = $m->{str}[$i][0];
             $line_w = $m->{str}[$i][1];
@@ -1367,9 +1376,34 @@ sub __modify_readline_options {
 }
 
 
+sub __prepare_prompt {
+    my ( $self, $term_w, $prompt ) = @_;
+    if ( ! length $prompt ) {
+        $self->{i}{prompt} = '';
+        $self->{i}{max_key_w} = 0;
+        return;
+    }
+    my @color;
+    if ( $self->{color} ) {
+        $prompt =~ s/\x{feff}//g;
+        $prompt =~ s/(\e\[[\d;]*m)/push( @color, $1 ) && "\x{feff}"/ge;
+    }
+    $prompt = $self->__sanitized_string( $prompt );
+    $self->{i}{max_key_w} = print_columns( $prompt );
+    if ( $self->{i}{max_key_w} > $term_w / 3 ) {
+        $self->{i}{max_key_w} = int( $term_w / 3 );
+        $prompt = $self->__unicode_trim( $prompt, $self->{i}{max_key_w} );
+    }
+    if ( @color ) {
+        $prompt =~ s/\x{feff}/shift @color/ge;
+        $prompt .= normal();
+    }
+    $self->{i}{prompt} = $prompt;
+}
+
+
 sub __init_readline {
     my ( $self, $term_w, $prompt ) = @_;
-    $self->{i}{term_w} = $term_w;
     if ( $self->{clear_screen} == 0 ) {
         print "\r" . clear_to_end_of_screen();
     }
@@ -1388,25 +1422,11 @@ sub __init_readline {
     else {
         $self->{i}{info_row_count} = 0;
     }
-    $self->{i}{seps}[0] = ''; # in __readline
+    $self->{i}{seps}[0] = $self->{i}{sep} = ''; # in __readline
     $self->{i}{curr_row} = 0; # in __readlline and __string_and_pos
     $self->{i}{pre_text_row_count} = 0;
     $self->{i}{post_text_row_count} = 0;
-    if ( $self->{color} ) {
-        my @color;
-        $prompt =~ s/\x{feff}//g;
-        $prompt =~ s/(\e\[[\d;]*m)/push( @color, $1 ) && "\x{feff}"/ge;
-        $self->{i}{prompt_colors} = [ @color ];
-    }
-    $prompt = _sanitized_string( $prompt );
-    $self->{i}{max_key_w} = print_columns( $prompt );
-    if ( $self->{i}{max_key_w} > $term_w / 3 ) {
-        $self->{i}{max_key_w} = int( $term_w / 3 );
-        $self->{i}{prompt} = $self->__unicode_trim( $prompt, $self->{i}{max_key_w} );
-    }
-    else {
-        $self->{i}{prompt} = $prompt;
-    }
+    $self->__prepare_prompt( $term_w, $prompt );
     if ( $self->{show_context} ) {
         $self->{i}{arrow_left}  = '';
         $self->{i}{arrow_right} = '';
@@ -1417,15 +1437,13 @@ sub __init_readline {
         $self->{i}{arrow_left}  = '<';
         $self->{i}{arrow_right} = '>';
         $self->{i}{arrow_w} = 1;
-        $self->{i}{avail_w} = $term_w - ( $self->{i}{max_key_w} + $self->{i}{arrow_w} );
-        # arrow_w: see comment in __prepare_width
+        $self->__available_width( $term_w );
     }
-    $self->{i}{th} = int( $self->{i}{avail_w} / 5 );
-    $self->{i}{th} = 40 if $self->{i}{th} > 40;
+    $self->__threshold_width();
     if ( $self->{page} == 2 ) {
         $self->{i}{page_count} = 1; ##
         $self->{i}{print_footer} = 1;
-        $self->__prepare_footer_fmt();
+        $self->__prepare_footer_fmt( $term_w );
     }
     else {
         $self->{i}{print_footer} = 0;
@@ -1451,7 +1469,7 @@ sub readline {
     $prompt = ''                                         if ! defined $prompt;
     croak "readline: a reference is not a valid prompt." if ref $prompt;
     $opt = {}                                            if ! defined $opt;
-    if ( ! ref $opt ) { # undocumented
+    if ( ! ref $opt ) {
         $opt = { default => $opt };
     }
     elsif ( ref $opt ne 'HASH' ) {
@@ -1519,7 +1537,7 @@ sub readline {
         if ( $self->{clear_screen} < 2 ) {
             print "\r" . clear_to_end_of_screen();
         }
-        $self->__before_readline( $m );
+        $self->__before_readline( $m, $term_w );
         $up_before = $self->{i}{pre_text_row_count};
         if ( $self->{hide_cursor} ) {
             print hide_cursor();
@@ -1528,7 +1546,7 @@ sub readline {
             print $self->{i}{pre_text}, "\n";
         }
 
-        $self->__after_readline( $m );
+        $self->__after_readline( $m, $term_w );
         if ( length $self->{i}{post_text} ) {
             print "\n" . $self->{i}{post_text};
         }
@@ -1548,7 +1566,7 @@ sub readline {
         }
         # reset $m->{avail_w} to default:
         $m->{avail_w} = $self->{i}{avail_w};
-        $self->__calculate_threshold( $m );
+        $self->__threshold_char_count( $m );
         if    ( $char == NEXT_get_key                     ) { next CHAR }
         elsif ( $char == KEY_TAB                          ) { next CHAR }
         elsif ( $char == VK_UP      || $char == CONTROL_R ) { for ( 1 .. $big_step ) { last if $m->{pos} == 0; $self->__left( $m  ) } }
@@ -1602,7 +1620,7 @@ Term::Form - Read lines from STDIN.
 
 =head1 VERSION
 
-Version 0.544
+Version 0.545
 
 =cut
 
@@ -1685,19 +1703,19 @@ The first argument is a reference to an array of arrays. The arrays have 1 or 2 
 and the optional second element is the value. The key is used as the prompt string for the "readline", the value is used
 as the default value for the "readline" (initial value of input).
 
-The optional second argument is a hash-reference. The keys/options are
+The optional second argument is a hash-reference. The hash-keys/options are:
 
 =head3 auto_up
 
-0 - if the cursor is on a data row (that means not on the "back" or "confirm" menu entry) pressing C<ENTER> moves the
-cursor to the next row. If C<ENTER> is pressed when the cursor is on the last data row the cursor jumps to the first
+0 - if the cursor is on a data row (that means not on the "back" or "confirm" menu entry), pressing C<ENTER> moves the
+cursor to the next row. If C<ENTER> is pressed when the cursor is on the last data row, the cursor jumps to the first
 data row. The initially cursor position is on the first data row.
 
-1 - if the cursor is on a data row pressing C<ENTER> moves the cursor to the next row unless the cursor is on the last
+1 - if the cursor is on a data row, pressing C<ENTER> moves the cursor to the next row unless the cursor is on the last
 data row. Then pressing C<ENTER> moves the cursor to the "back" menu entry (the menu entry on the top of the menu). The
 initially cursor position is on the "back" menu entry.
 
-2 - if the cursor is on a data row pressing C<ENTER> moves the cursor to the "back" menu entry. The initially cursor
+2 - if the cursor is on a data row, pressing C<ENTER> moves the cursor to the "back" menu entry. The initially cursor
 position is on the "back" menu entry.
 
 default: C<1>

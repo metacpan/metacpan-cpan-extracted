@@ -28,15 +28,15 @@ $testPath->child($classPath)->mkpath;
 
   is(Test2::Plugin::SRand->from, 'import arg', "random seed is supplied as 'time'");
 
-  subtest 'env variable filled from a variable' => sub {
+  subtest '1st env variable filled from a variable, 2nd one kept from %ENV, 3rd one ignored' => sub {
     our $var  = 'abc';
     my $name  = 'ABC';
     my $value = '$' . __PACKAGE__ . '::var';
-    $envFile->spew("$name = $value\nJust a comment line");
-    %ENV = (xxx => 'yyy');
+    $envFile->spew("$name = $value\nJust a comment line\nX\nY");
+    %ENV = (xxx => 'yyy', X => 'A');
 
     ok(lives { $METHOD_REF->($METHOD, $CLASS, $testFile) }, 'successfully executed');
-    is(\%ENV, { $name => lc($name) },                       "'%ENV' has the expected content");
+    is(\%ENV, { $name => lc($name), X => 'A' },             "'%ENV' has the expected content");
   };
 
   subtest 'env variable filled by a self-implemented sub' => sub {

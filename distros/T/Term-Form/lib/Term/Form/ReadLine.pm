@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '0.544';
+our $VERSION = '0.545';
 use Exporter 'import';
 our @EXPORT_OK = qw( read_line );
 
@@ -108,7 +108,7 @@ Term::Form::ReadLine - Read a line from STDIN.
 
 =head1 VERSION
 
-Version 0.544
+Version 0.545
 
 =cut
 
@@ -130,7 +130,7 @@ Version 0.544
 
 =head1 DESCRIPTION
 
-C<readline> reads a line from STDIN. As soon as C<Return> is pressed C<readline> returns the read string without the
+C<readline> reads a line from STDIN. As soon as C<Return> is pressed, C<readline> returns the read string without the
 newline character - so no C<chomp> is required.
 
 The output is removed after leaving the method, so the user can decide what remains on the screen.
@@ -178,18 +178,16 @@ C<readline> reads a line from STDIN.
 The fist argument is the prompt string.
 
 The optional second argument is the default string (see option I<default>) if it is not a reference. If the second
-argument is a hash-reference, the hash is used to set the different options. The keys/options are
+argument is a hash-reference, the hash is used to set the different options. The hash-keys/options are:
 
 =head3 clear_screen
-
-If enabled, the screen is cleared before the output.
 
 0 - clears from the current position to the end of screen
 
 1 - clears the entire screen
 
-2 - clears only the readline row, if I<show_context> is not enabled and I<info> not set. If I<show_context> is enabled
-or I<info> is set clears from the current position to the end of screen as with I<clear_screen> set to 0.
+2 - clears only the readline row if I<show_context> is not enabled and I<info> not set. If I<show_context> is enabled
+or I<info> is set, clears from the current position to the end of screen as with I<clear_screen> set to 0.
 
 default: C<0>
 
@@ -199,13 +197,11 @@ This option has only meaning if the operating system is MSWin32.
 
 If the OS is MSWin32, L<Win32::Console::ANSI> is used. By default C<Win32::Console::ANSI> converts the characters from
 Windows code page to DOS code page (the so-called ANSI to OEM conversion). This conversation is disabled by default in
-C<Term::Choose> but one can enable it by setting this option.
+C<Term::Choose>, but one can enable it by setting this option.
 
-Setting this option to C<1> enables the codepage mapping offered by L<Win32::Console::ANSI>.
+0 - disables the automatic codepage mapping (default)
 
-0 - disable automatic codepage mapping (default)
-
-1 - keep automatic codepage mapping
+1 - keeps the automatic codepage mapping
 
 default: C<0>
 
@@ -249,9 +245,9 @@ default: C<0>
 
 Display the input that does not fit into the "readline" before or after the "readline".
 
-0 - disable I<show_context>
+0 - disabled
 
-1 - enable I<show_context>
+1 - enabled
 
 default: C<0>
 

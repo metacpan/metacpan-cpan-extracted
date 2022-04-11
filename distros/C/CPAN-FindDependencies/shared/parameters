@@ -1,7 +1,9 @@
 =item nowarnings
 
 Warnings about modules where we can't find their META.yml or Makefile.PL, and
-so can't divine their pre-requisites, will be suppressed;
+so can't divine their pre-requisites, will be suppressed. Other warnings may
+still be emitted though, such as those telling you about modules which have
+dodgy (but still understandable) metadata;
 
 =item fatalerrors
 

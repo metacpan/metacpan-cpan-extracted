@@ -1,6 +1,6 @@
 =head1 NAME
 
-PDL::Graphics::TriD -- PDL 3D interface
+PDL::Graphics::TriD - PDL 3D interface
 
 =head1 SYNOPSIS
 
@@ -37,7 +37,6 @@ PDL::Graphics::TriD -- PDL 3D interface
  $pic = grabpic3d(); # Returns the picture in a (3,$x,$y) float ndarray (0..1).
 
  release3d(); # the next graph will again wipe out things.
-
 
 =head1 WARNING
 
@@ -194,19 +193,12 @@ multiple bats, in which case C<$x>, C<$y>, and C<$z> would have
 multiple columns, but in general you wouldn't expect them to be
 coordinated.
 
-Finally, imagine that you have an air squadron flying in
-formation.  Your (x, y, z) data is not regularly gridded, but
-the (x, y, z) data for each plane should be coordinated and
-we can imagine that their flight path sweep out a surface.
-We could draw this data using C<line3d([$x, $y, $z])>, where
-each column in the variables corresponds to a different plane,
-but it would also make sense to draw this data using
-C<mesh3d([$x, $y, $z])>, since the planes' proximity to each
-other should be fairly consistent.  In other words, it makes
-sense to think of the planes as sweeping out a coordinated
-surface, which C<mesh3d> would draw for you, whereas you would
-not expect the trajectories of the various bats to describe a
-meaningful surface (unless you're into fractals, perhaps).
+More generally, each coordinate is expected to be arranged in a 3D
+fashion, similar to C<3,x,y>. The "3" is the actual 3D coordinates of
+each point. The "x,y" help with gridding, because each point at C<x,y>
+is expected to have as geographical neighbours C<x+1,y>, C<x-1,y>,
+C<x,y+1>, C<x,y-1>, and the grid polygon-building relies on that.
+This is how, and why, the 3D earth in C<demo 3d> arranges its data.
 
  #!/usr/bin/perl
 
@@ -238,8 +230,8 @@ meaningful surface (unless you're into fractals, perhaps).
 
  # Draw a mobius strip:
  $two_pi = 8 * atan2(1,1);
- $t = sequence(50) / 50 * $two_pi;
- # We want two paths:
+ $t = sequence(51) / 50 * $two_pi;
+ # We want three paths:
  $mobius1_x = cos($t) + 0.5 * sin($t/2);
  $mobius2_x = cos($t);
  $mobius3_x = cos($t) - 0.5 * sin($t/2);
@@ -265,7 +257,6 @@ meaningful surface (unless you're into fractals, perhaps).
  print "The same mobius strip using imag3d\n";
  imag3d $mobius_surface, {Lines => 0};
 
-
 =head1 SIMPLE ROUTINES
 
 Because using the whole object-oriented interface for doing
@@ -279,6 +270,8 @@ routines are supported:
 =for ref
 
 3D line plot, defined by a variety of contexts.
+
+Implemented by C<PDL::Graphics::TriD::LineStrip>.
 
 =for usage
 
@@ -308,6 +301,10 @@ contexts and options
 
 3D rendered image plot, defined by a variety of contexts
 
+Implemented by C<PDL::Graphics::TriD::SLattice_S>.
+
+The variant, C<imag3d_ns>, is implemented by C<PDL::Graphics::TriD::SLattice>.
+
 =for usage
 
  imag3d ndarray(3,x,y), {OPTIONS}
@@ -329,6 +326,8 @@ contexts and options
 =for ref
 
 3D mesh plot, defined by a variety of contexts
+
+Implemented by C<PDL::Graphics::TriD::Lattice>.
 
 =for usage
 
@@ -362,6 +361,8 @@ alias for mesh3d
 
 3D points plot, defined by a variety of contexts
 
+Implemented by C<PDL::Graphics::TriD::Points>.
+
 =for usage
 
  points3d ndarray(3), {OPTIONS}
@@ -383,6 +384,12 @@ contexts and options
 
 3D spheres plot (preliminary implementation)
 
+This is a preliminary implementation as a proof of
+concept.  It has fixed radii for the spheres being
+drawn and no control of color or transparency.
+
+Implemented by C<PDL::Graphics::TriD::Spheres>.
+
 =for usage
 
  spheres3d ndarray(3), {OPTIONS}
@@ -396,15 +403,13 @@ Example:
  
  - lattice of spheres at coordinates on 10x10x10 grid
 
-This is a preliminary implementation as a proof of
-concept.  It has fixed radii for the spheres being
-drawn and no control of color or transparency.
-
 =head2 imagrgb
 
 =for ref
 
 2D RGB image plot (see also imag2d)
+
+Implemented by C<PDL::Graphics::TriD::Image>.
 
 =for usage
 
@@ -428,6 +433,8 @@ e.g.
 =for ref
 
 2D RGB image plot as an object inside a 3D space
+
+Implemented by C<PDL::Graphics::TriD::Image>.
 
 =for usage
 
@@ -506,11 +513,12 @@ user explicitly presses 'q'.
  imag3d(..);
  nokeeptwiddling3d();
  $o = imag3d($c);
- while(1) {
- 	$c .= nextfunc($c);
- 	$o->data_changed();
- 	twiddle3d();		# animate one step, then return.
- }
+ do {
+	$c .= nextfunc($c);
+	$o->data_changed;
+ } while(!twiddle3d()); # animate one step, then iterate
+ keeptwiddling3d();
+ twiddle3d(); # wait one last time
 
 =head2 twiddle3d
 
@@ -530,6 +538,27 @@ returns 0.
 =for ref
 
 Close the currently-open 3D window.
+
+=head1 NOT EXPORTED
+
+These functions are not exported, partly because they are not fully
+implemented.
+
+=over
+
+=item contour3d
+
+Implemented by C<PDL::Graphics::TriD::Contours>.
+
+=item STrigrid_S_imag3d
+
+Implemented by C<PDL::Graphics::TriD::STrigrid_S>.
+
+=item STrigrid_imag3d
+
+Implemented by C<PDL::Graphics::TriD::STrigrid>.
+
+=back
 
 =head1 CONCEPTS
 
@@ -567,7 +596,7 @@ your own risk.
 The syntax C<PDL::Graphics::TriD::Scale(x,y,z)> here means that you create
 an object like
 
-	$c = new PDL::Graphics::TriD::Scale($x,$y,$z);
+	$c = PDL::Graphics::TriD::Scale->new($x,$y,$z);
 
 =head2 PDL::Graphics::TriD::LineStrip
 
@@ -638,8 +667,7 @@ method.
 # $PDL::Graphics::TriD::Settings 
 $PDL::Graphics::TriD::verbose //= 0;
 # $PDL::Graphics::TriD::keeptwiddling
-# $PDL::Graphics::TriD::hold_on
-# $PDL::Graphics::TriD::curgraph
+# $PDL::Graphics::TriD::only_one
 # $PDL::Graphics::TriD::create_window_sub
 # $PDL::Graphics::TriD::current_window
 # 
@@ -671,10 +699,8 @@ use PDL::Graphics::TriD::Rout;
 
 $PDL::Graphics::TriD::device = $PDL::Graphics::TriD::device;
 BEGIN {
-	my $dev;
-	$dev ||= $::PDL::Graphics::TriD::device; # First, take it from this variable.
+	my $dev = $PDL::Graphics::TriD::device; # First, take it from this variable.
 	$dev ||= $::ENV{PDL_3D_DEVICE};
-
         if(!defined $dev) {
 #            warn "Default PDL 3D device is GL (OpenGL):
 # Set PDL_3D_DEVICE=GL in your environment in order not to see this warning.
@@ -695,12 +721,10 @@ BEGIN {
 	my $mod = $dv;
 	$mod =~ s|::|/|g;
 	print "dev = $dev mod=$mod\n" if($verbose);
- 
 	require "$mod.pm";
 	$dv->import;
         my $verbose;
 }
-
 
 # currently only used by VRML backend
 $PDL::Graphics::TriD::Settings = $PDL::Graphics::TriD::Settings;
@@ -716,45 +740,39 @@ sub realcoords {
 		}
 		return $c ;
 	}
-	if(!ref $c->[0]) {$type = shift @$c}
-	if($#$c < 0 || $#$c>2) {
+	my @c = @$c;
+	if(!ref $c[0]) {$type = shift @c}
+	if(!@c || @c>3) {
 		barf "Must have 1..3 array members for coordinates";
 	}
-	if($#$c == 0 and $type =~ /^SURF2D$/) {
+	if(@c == 1 and $type eq "SURF2D") {
 		# surf2d -> this is z axis
-		@$c = ($c->[0]->xvals,$c->[0]->yvals,$c->[0]);
-	} elsif($#$c == 0 and $type eq "POLAR2D") {
-		my $t = 6.283 * $c->[0]->xvals / ($c->[0]->getdim(0)-1);
-		my $r = $c->[0]->yvals / ($c->[0]->getdim(1)-1);
-		@$c = ($r * sin($t), $r * cos($t), $c->[0]);
-	} elsif($#$c == 0 and $type eq "COLOR") {
+		@c = ($c[0]->xvals,$c[0]->yvals,$c[0]);
+	} elsif(@c == 1 and $type eq "POLAR2D") {
+		my $t = 6.283 * $c[0]->xvals / ($c[0]->getdim(0)-1);
+		my $r = $c[0]->yvals / ($c[0]->getdim(1)-1);
+		@c = ($r * sin($t), $r * cos($t), $c[0]);
+	} elsif(@c == 1 and $type eq "COLOR") {
 		# color -> 1 ndarray = grayscale
-		@$c = ($c->[0], $c->[0], $c->[0]);
-	} elsif($#$c == 0 and $type eq "LINE") {
-		@$c = ($c->[0]->xvals, $c->[0], 0);
-	} elsif($#$c == 1 and $type eq "LINE") {
-		@$c = ($c->[0], $c->[1], $c->[0]->xvals);
+		@c = @c[0,0,0];
+	} elsif(@c == 1 and $type eq "LINE") {
+		@c = ($c[0]->xvals, $c[0], 0);
+	} elsif(@c == 2 and $type eq "LINE") {
+		@c = (@c[0,1], $c[0]->xvals);
 	}
 	# XXX
-	if($#$c != 2) {
+	if(@c != 3) {
 		barf("Must have 3 coordinates if no interpretation (here '$type')");
 	}
 	# allow a constant (either pdl or not) to be introduced in one dimension
-        foreach(0..2){  
-	  if(ref($c->[$_]) ne "PDL" or $c->[$_]->nelem==1){
-	    $c->[$_] = $c->[$_]*(PDL->ones($c->[($_+1)%3]->dims));
+	foreach(0..2) {
+	  if(ref($c[$_]) ne "PDL" or $c[$_]->nelem==1){
+	    $c[$_] = $c[$_]*(PDL->ones($c[($_+1)%3]->dims));
 	  }
 	}
-	my $g = PDL->null;
-	&PDL::Graphics::TriD::Rout::combcoords(@$c,$g);
+	my $g = PDL::Graphics::TriD::Rout::combcoords(@c);
 	$g->dump if $PDL::Graphics::TriD::verbose;
 	return $g;
-}
-
-sub objplotcommand {
-	my($object) = @_;
-	my $win = PDL::Graphics::TriD::get_current_window();
-	my $world = $win->world();
 }
 
 sub checkargs {
@@ -772,17 +790,14 @@ sub checkargs {
 
 *keeptwiddling3d=*keeptwiddling3d=\&PDL::keeptwiddling3d;
 sub PDL::keeptwiddling3d {
-	$PDL::Graphics::TriD::keeptwiddling = (defined $_[0] ? $_[0] : 1);
+	$PDL::Graphics::TriD::keeptwiddling = $_[0] // 1;
 }
 *nokeeptwiddling3d=*nokeeptwiddling3d=\&PDL::nokeeptwiddling3d;
 sub PDL::nokeeptwiddling3d {
 	$PDL::Graphics::TriD::keeptwiddling = 0 ;
 }
 keeptwiddling3d();
-*twiddle3d = *twiddle3d = \&PDL::twiddle3d;
-sub PDL::twiddle3d {
-	twiddle_current();
-}
+*twiddle3d = *twiddle3d = *PDL::twiddle3d = \&twiddle_current;
 
 *close3d = *close3d = \&PDL::close3d;
 sub PDL::close3d {
@@ -814,7 +829,7 @@ sub PDL::describe3d {
 	require PDL::Graphics::TriD::TextObjects;
 	my ($text) = @_;
 	my $win = PDL::Graphics::TriD::get_current_window();
-	my $imag = new PDL::Graphics::TriD::Description($text);
+	my $imag = PDL::Graphics::TriD::Description->new($text);
 	$win->add_object($imag);
 #	$win->twiddle();
 }
@@ -824,7 +839,7 @@ sub PDL::imagrgb {
 	require PDL::Graphics::TriD::Image;
 	my (@data) = @_; &checkargs;
 	my $win = PDL::Graphics::TriD::get_current_window();
-	my $imag = new PDL::Graphics::TriD::Image(@data);
+	my $imag = PDL::Graphics::TriD::Image->new(@data);
 	$win->clear_viewports();
 	$win->current_viewport()->add_object($imag);
 	$win->twiddle();
@@ -836,44 +851,44 @@ sub PDL::imagrgb {
 *line3d=*line3d=\&PDL::line3d;
 sub PDL::line3d { 
     &checkargs;
-    my $obj = new PDL::Graphics::TriD::LineStrip(@_);
+    my $obj = PDL::Graphics::TriD::LineStrip->new(@_);
     print "line3d: object is $obj\n" if($PDL::Graphics::TriD::verbose);
-    &graph_object($obj);
+    graph_object($obj);
 }
 
 *contour3d=*contour3d=\&PDL::contour3d;
 sub PDL::contour3d { 
 #  &checkargs;
   require PDL::Graphics::TriD::Contours;
-  &graph_object(new PDL::Graphics::TriD::Contours(@_));
+  graph_object(PDL::Graphics::TriD::Contours->new(@_));
 }
 
 # XXX Should enable different positioning...
 *imagrgb3d=*imagrgb3d=\&PDL::imagrgb3d;
 sub PDL::imagrgb3d { &checkargs;
 	require PDL::Graphics::TriD::Image;
-	&graph_object(new PDL::Graphics::TriD::Image(@_));
+	graph_object(PDL::Graphics::TriD::Image->new(@_));
 }
 
 *imag3d_ns=*imag3d_ns=\&PDL::imag3d_ns;
 sub PDL::imag3d_ns {  &checkargs;
-	&graph_object(new PDL::Graphics::TriD::SLattice(@_));
+	graph_object(PDL::Graphics::TriD::SLattice->new(@_));
 }
 
 *imag3d=*imag3d=\&PDL::imag3d;
 sub PDL::imag3d { &checkargs;
-	&graph_object(new PDL::Graphics::TriD::SLattice_S(@_));
+	graph_object(PDL::Graphics::TriD::SLattice_S->new(@_));
 }
 
 ####################################################################
 ################ JNK 15mar11 added section start ###################
 *STrigrid_S_imag3d=*STrigrid_S_imag3d=\&PDL::STrigrid_S_imag3d;
 sub PDL::STrigrid_S_imag3d { &checkargs;
-  &graph_object(new PDL::Graphics::TriD::STrigrid_S(@_)); }
+  graph_object(PDL::Graphics::TriD::STrigrid_S->new(@_)); }
 
 *STrigrid_imag3d=*STrigrid_imag3d=\&PDL::STrigrid_imag3d;
 sub PDL::STrigrid_imag3d { &checkargs;
-  &graph_object(new PDL::Graphics::TriD::STrigrid(@_)); }
+  graph_object(PDL::Graphics::TriD::STrigrid->new(@_)); }
 ################ JNK 15mar11 added section finis ###################
 ####################################################################
 
@@ -881,17 +896,17 @@ sub PDL::STrigrid_imag3d { &checkargs;
 *lattice3d=*lattice3d=\&PDL::mesh3d;
 *PDL::lattice3d=*PDL::lattice3d=\&PDL::mesh3d;
 sub PDL::mesh3d { &checkargs;
-	&graph_object(new PDL::Graphics::TriD::Lattice(@_));
+	graph_object(PDL::Graphics::TriD::Lattice->new(@_));
 }
 
 *points3d=*points3d=\&PDL::points3d;
 sub PDL::points3d { &checkargs;
-	&graph_object(new PDL::Graphics::TriD::Points(@_));
+	graph_object(PDL::Graphics::TriD::Points->new(@_));
 }
 
 *spheres3d=*spheres3d=\&PDL::spheres3d;
 sub PDL::spheres3d { &checkargs;
-	&graph_object(new PDL::Graphics::TriD::Spheres(@_));
+	graph_object(PDL::Graphics::TriD::Spheres->new(@_));
 }
 
 *grabpic3d=*grabpic3d=\&PDL::grabpic3d;
@@ -903,10 +918,9 @@ sub PDL::grabpic3d {
 	return ($pic->float) / 255;
 }
 
-$PDL::Graphics::TriD::hold_on = 0;
-
-sub PDL::hold3d {$PDL::Graphics::TriD::hold_on =(!defined $_[0] ? 1 : $_[0]);}
-sub PDL::release3d {$PDL::Graphics::TriD::hold_on = 0;}
+$PDL::Graphics::TriD::only_one = 1;
+sub PDL::hold3d {$PDL::Graphics::TriD::only_one = !($_[0] // 1);}
+sub PDL::release3d {$PDL::Graphics::TriD::only_one = 1;}
 
 *hold3d=*hold3d=\&PDL::hold3d;
 *release3d=*release3d=\&PDL::release3d;
@@ -914,17 +928,14 @@ sub PDL::release3d {$PDL::Graphics::TriD::hold_on = 0;}
 sub get_new_graph {
     print "get_new_graph: calling PDL::Graphics::TriD::get_current_window...\n" if($PDL::Graphics::TriD::verbose);
 	my $win = PDL::Graphics::TriD::get_current_window();
-
     print "get_new_graph: calling get_current_graph...\n" if($PDL::Graphics::TriD::verbose);
 	my $g = get_current_graph($win);
     print "get_new_graph: back get_current_graph returned $g...\n" if($PDL::Graphics::TriD::verbose);
-
-	if(!$PDL::Graphics::TriD::hold_on) {
-		$g->clear_data();
-		$win->clear_viewport();
+	if ($PDL::Graphics::TriD::only_one) {
+		$g->clear_data;
+		$win->clear_viewport;
 	}
-	$g->default_axes();
-
+	$g->default_axes;
 	$win->add_object($g);
 	return $g;
 }
@@ -932,15 +943,13 @@ sub get_new_graph {
 sub get_current_graph {
    my $win = shift;
 	my $g = $win->current_viewport()->graph();
-
 	if(!defined $g) {
-		$g = new PDL::Graphics::TriD::Graph();
+		$g = PDL::Graphics::TriD::Graph->new;
 		$g->default_axes();
 		$win->current_viewport()->graph($g);
 	}
 	return $g;
 }
-
 
 # $PDL::Graphics::TriD::create_window_sub = undef;
 sub get_current_window {
@@ -952,30 +961,15 @@ sub get_current_window {
 		barf("PDL::Graphics::TriD must be used with a display mechanism: for example PDL::Graphics::TriD::GL!\n");
 	 }
 	 print "get_current_window - creating window...\n" if($PDL::Graphics::TriD::verbose);
-	 $PDL::Graphics::TriD::current_window = $win = new PDL::Graphics::TriD::Window($opts);
+	 $PDL::Graphics::TriD::current_window = $win = PDL::Graphics::TriD::Window->new($opts);
 
 	 print "get_current_window - calling set_material...\n" if($PDL::Graphics::TriD::verbose);
-	 $win->set_material(new PDL::Graphics::TriD::Material);
+	 $win->set_material(PDL::Graphics::TriD::Material->new);
   }
   return $PDL::Graphics::TriD::current_window;
 }
 
-# Get the current graphbox
-sub get_current_graphbox {
-        die "get_current_graphbox: ERROR graphbox is not implemented! \n";
-	my $graph = $PDL::Graphics::TriD::curgraph;
-	if(!defined $graph) {
-		$graph = new PDL::Graphics::TriD::Graph();
-		$graph->default_axes();
-		$PDL::Graphics::TriD::curgraph = $graph;
-	}
-	return $graph;
-}
-
-sub twiddle_current {
-	my $win = get_current_window();
-	$win->twiddle();
-}
+sub twiddle_current { get_current_window()->twiddle() }
 
 ###################################
 #
@@ -1025,19 +1019,13 @@ sub normalize {my($this,$x0,$y0,$z0,$x1,$y1,$z1) = @_;
 	return $trans;
 }
 
-
-###################################
-#
-#
 package PDL::Graphics::TriD::OneTransformation;
 use fields qw/Args/;
 
 sub new {
   my($type,@args) = @_;
   my $this = fields::new($type);
-
   $this->{Args} = [@args];
-
   $this;
 }
 
@@ -1051,21 +1039,10 @@ use base qw/PDL::Graphics::TriD::OneTransformation/;
 package PDL::Graphics::TriD::Transformation;
 use base qw/PDL::Graphics::TriD::Object/;
 
-#sub new {
-#	my($type) = @_;
-#	bless {},$type;
-#}
-
 sub add_transformation {
 	my($this,$trans) = @_;
 	push @{$this->{Transforms}},$trans;
 }
-
-
-
-=head1 BUGS
-
-Not enough is there yet.
 
 =head1 AUTHOR
 
@@ -1077,5 +1054,6 @@ conditions. For details, see the file COPYING in the PDL
 distribution. If this file is separated from the PDL distribution,
 the copyright notice should be included in the file.
 
-
 =cut
+
+1;

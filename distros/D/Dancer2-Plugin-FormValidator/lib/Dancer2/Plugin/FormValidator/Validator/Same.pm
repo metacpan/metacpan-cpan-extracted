@@ -17,7 +17,7 @@ sub message {
 sub validate {
     my ($self, $field, $input, $field2) = @_;
 
-    if (exists $input->{$field}) {
+    if ($self->_field_defined_and_non_empty($input->{$field})) {
         if (exists $input->{$field2}) {
             return $self->_is_same_as($input->{$field}, $input->{$field2});
         }

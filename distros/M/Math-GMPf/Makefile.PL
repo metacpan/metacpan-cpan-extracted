@@ -40,7 +40,7 @@ $use_quadmath == 1    ? print "Building with '__float128' support\n"
                       : print "Building without '__float128' support\n";
 
 # Next, we check to see whether there's some unhelpful beaviour regarding
-# the setting of the POK flag.
+# the setting of the POK flag - but only if $] < 5.035010.
 # This typically occurs in versions of perl prior to 5.22.0, but it can
 # arise elsewhere, eg:
 # http://www.cpantesters.org/cpan/report/dc17e330-900b-11ec-bfc9-d1f1448276d4
@@ -48,50 +48,52 @@ $use_quadmath == 1    ? print "Building with '__float128' support\n"
 # https://metacpan.org/release/HAARG/Sub-Quote-2.006006/source/t/quotify.t
 # Thank you, Haarg.
 
-use B qw(svref_2object);
+if($] < 5.035010) {
+  use B qw(svref_2object);
 
-my %flags;
-{
-  no strict 'refs';
-  for my $flag (qw(
-    SVf_IOK
-    SVf_NOK
-    SVf_POK
-    SVp_IOK
-    SVp_NOK
-    SVp_POK
-            )) {
-    if (defined &{'B::'.$flag}) {
-      $flags{$flag} = &{'B::'.$flag};
+  my %flags;
+  {
+    no strict 'refs';
+    for my $flag (qw(
+      SVf_IOK
+      SVf_NOK
+      SVf_POK
+      SVp_IOK
+      SVp_NOK
+      SVp_POK
+              )) {
+      if (defined &{'B::'.$flag}) {
+        $flags{$flag} = &{'B::'.$flag};
+      }
     }
   }
-}
 
-sub flags {
-  my $flags = B::svref_2object(\($_[0]))->FLAGS;
-  join ' ', sort grep $flags & $flags{$_}, keys %flags;
-}
+  sub flags {
+    my $flags = B::svref_2object(\($_[0]))->FLAGS;
+    join ' ', sort grep $flags & $flags{$_}, keys %flags;
+  }
 
-my $pv_nv_bug = 0;
-my $test_nv = 1.3;
-my $buggery = "$test_nv";
-my $f = flags($test_nv);
+  my $pv_nv_bug = 0;
+  my $test_nv = 1.3;
+  my $buggery = "$test_nv";
+  my $f = flags($test_nv);
 
-if($f =~ /SVf_POK/) {
-  print "Dealing with unhelpful setting of POK flag\n";
+  if($f =~ /SVf_POK/) {
+    print "Dealing with unhelpful setting of POK flag\n";
   $pv_nv_bug = 1;
-}
+  }
 
+  if($pv_nv_bug) {
+    print "\n Defining GMPF_PV_NV_BUG\n\n";
+    $defines .= " -DGMPF_PV_NV_BUG";
+    $DEFS    .= " -DGMPF_PV_NV_BUG";
+  }
+  else {
+    print "\n Not defining GMPF_PV_NV_BUG\n\n";
+  }
+}
+else { print "Not defining GMPF_PV_NV_BUG as perl version >= 5.035010\n\n" }
 ####################################
-
-if($pv_nv_bug) {
-  print "\n Defining GMPF_PV_NV_BUG\n\n";
-  $defines .= " -DGMPF_PV_NV_BUG";
-  $DEFS    .= " -DGMPF_PV_NV_BUG";
-}
-else {
-  print "\n Not defining GMPF_PV_NV_BUG\n\n";
-}
 
 if($^O =~ /MSWin32/i && $] < 5.022) {$defines .= " -D_WIN32_BIZARRE_INFNAN"}
 

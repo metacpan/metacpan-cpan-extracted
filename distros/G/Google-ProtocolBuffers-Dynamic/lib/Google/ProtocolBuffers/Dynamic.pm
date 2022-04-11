@@ -9,7 +9,7 @@ use Exporter ();
 # @EXPORT_OK/%EXPORT_TAGS are set up in XS
 *import = \&Exporter::import;
 
-our $VERSION = '0.36'; # VERSION
+our $VERSION = '0.38'; # VERSION
 
 XSLoader::load(__PACKAGE__);
 
@@ -108,7 +108,7 @@ Google::ProtocolBuffers::Dynamic - fast and complete protocol buffer implementat
 
 =head1 VERSION
 
-version 0.36
+version 0.38
 
 =head1 SYNOPSIS
 
@@ -561,6 +561,24 @@ on Perls with 64-bit integers.
 
 When enabled, values that don't fit in a 32-bit integer are returned as
 L<Math::BigInt> objects.
+
+=head2 boolean_values
+
+Defaults to C<perl>.
+
+It controls how boolean values are mapped in Perl. Accepted values are:
+
+=over 4
+
+=item perl
+
+Maps C<true> to C<1> and C<false> to C<"">.
+
+=item numeric
+
+Maps C<true> to C<1> and C<false> to C<0>.
+
+=back
 
 =head2 check_required_fields
 

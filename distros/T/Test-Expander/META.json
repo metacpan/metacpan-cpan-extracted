@@ -39,7 +39,7 @@
             "File::chdir" : "0",
             "Importer" : "0",
             "PadWalker" : "0",
-            "Path::Tiny" : "0",
+            "Path::Tiny" : "0.122",
             "Scalar::Readonly" : "0",
             "Test2::Tools::Basic" : "0",
             "Test2::Tools::Explain" : "0",
@@ -68,6 +68,6 @@
          "web" : "https://github.com/jsf116/Test-Expander"
       }
    },
-   "version" : "v1.0.6",
+   "version" : "v1.1.1",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

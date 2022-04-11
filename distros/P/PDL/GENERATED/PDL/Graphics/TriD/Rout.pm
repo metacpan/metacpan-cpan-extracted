@@ -67,7 +67,6 @@ Combine x, y and z to a single ndarray the first dimension
 of which is 3. This routine does dataflow automatically.
 
 
-
 =for bad
 
 combcoords does not process bad values.
@@ -75,14 +74,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 79 "Rout.pm"
+#line 78 "Rout.pm"
 
 
 
 #line 1060 "../../../blib/lib/PDL/PP.pm"
 
 *combcoords = \&PDL::combcoords;
-#line 86 "Rout.pm"
+#line 85 "Rout.pm"
 
 
 
@@ -116,7 +115,6 @@ objects. For use by the module L<PDL::Graphics::TriD::MathGraph>.
 For definition of the potential, see the actual function.
 
 
-
 =for bad
 
 repulse does not process bad values.
@@ -124,14 +122,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 128 "Rout.pm"
+#line 126 "Rout.pm"
 
 
 
 #line 1060 "../../../blib/lib/PDL/PP.pm"
 
 *repulse = \&PDL::repulse;
-#line 135 "Rout.pm"
+#line 133 "Rout.pm"
 
 
 
@@ -165,7 +163,6 @@ For use by the module L<PDL::Graphics::TriD::MathGraph>.
 For definition of the potential, see the actual function.
 
 
-
 =for bad
 
 attract does not process bad values.
@@ -173,14 +170,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 177 "Rout.pm"
+#line 174 "Rout.pm"
 
 
 
 #line 1060 "../../../blib/lib/PDL/PP.pm"
 
 *attract = \&PDL::attract;
-#line 184 "Rout.pm"
+#line 181 "Rout.pm"
 
 
 
@@ -207,18 +204,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 211 "Rout.pm"
+#line 208 "Rout.pm"
 
 
 
 #line 1060 "../../../blib/lib/PDL/PP.pm"
 
 *vrmlcoordsvert = \&PDL::vrmlcoordsvert;
-#line 218 "Rout.pm"
+#line 215 "Rout.pm"
 
 
 
-#line 227 "rout.pd"
+#line 214 "rout.pd"
 
 
 =head2 contour_segments
@@ -258,29 +255,20 @@ polygons.
 
 =cut
 
-use strict;
 sub PDL::Graphics::TriD::Contours::contour_segments {
 	my($this,$c,$data,$points) = @_;
 # pre compute space for output of pp routine
-
   my $segdim = ($data->getdim(0)-1)*($data->getdim(1)-1)*4;
-#  print "segdim = $segdim\n"; 
   my $segs = zeroes(3,$segdim,$c->nelem);
   my $cnt = zeroes($c->nelem);
   contour_segments_internal($c,$data,$points,$segs,$cnt);
-
-#  print "contour segments done ",$points->info,"\n";
-
   $this->{Points} = pdl->null;
-
   my $pcnt=0;
   my $ncnt;
   for(my $i=0; $i<$c->nelem; $i++){
 	   $ncnt = $cnt->slice("($i)");
       next if($ncnt==-1);
-
 		$pcnt = $pcnt+$ncnt;
-			      
 		$this->{ContourSegCnt}[$i] =  $pcnt;
 		$pcnt=$pcnt+1;    
 		$this->{Points} = $this->{Points}->append($segs->slice(":,0:$ncnt,($i)")->transpose);
@@ -288,20 +276,20 @@ sub PDL::Graphics::TriD::Contours::contour_segments {
 	$this->{Points} = $this->{Points}->transpose;
 	
 }
-#line 292 "Rout.pm"
+#line 280 "Rout.pm"
 
 
 
 #line 1060 "../../../blib/lib/PDL/PP.pm"
 
 *contour_segments_internal = \&PDL::contour_segments_internal;
-#line 299 "Rout.pm"
+#line 287 "Rout.pm"
 
 
 
 
 
-#line 469 "rout.pd"
+#line 436 "rout.pd"
 
 
 =head1 AUTHOR
@@ -315,7 +303,7 @@ distribution. If this file is separated from the PDL distribution,
 the copyright notice should be included in the file.
 
 =cut
-#line 319 "Rout.pm"
+#line 307 "Rout.pm"
 
 
 

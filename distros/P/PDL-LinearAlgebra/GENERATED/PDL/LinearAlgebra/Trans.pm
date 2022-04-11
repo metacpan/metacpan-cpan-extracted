@@ -28,7 +28,7 @@ use DynaLoader;
 
 
 
-#line 80 "trans.pd"
+#line 30 "trans.pd"
 
 use PDL::Func;
 use PDL::Core;
@@ -82,7 +82,7 @@ PDL routine sec. If you need to call it specify its origin module : PDL::Basic::
 
 =for sig
 
-  Signature: ([io,phys]A(n,n);int deg();scale();[io]trace();int [o]ns();int [o]info())
+  Signature: ([io,phys]A(n,n);int deg();scale();[io]trace();int [o]ns();int [o]info(); int [t]ipiv(n); [t]wsp(wspn))
 
 =for ref
 
@@ -95,7 +95,7 @@ The algorithm is described in Roger B. Sidje (rbs.uq.edu.au)
 ACM - Transactions On Mathematical Software, 24(1):130-156, 1998
 
      A:		On input argument matrix. On output exp(t*A).
-     		Use Fortran storage type.
+		Use Fortran storage type.
 
      deg:	the degre of the diagonal Pade to be used. 
                 a value of 6 is generally satisfactory. 
@@ -103,7 +103,7 @@ ACM - Transactions On Mathematical Software, 24(1):130-156, 1998
      scale:	time-scale (can be < 0). 
 
      trace:	on input, boolean value indicating whether or not perform
-     		a trace normalization. On output value used.
+		a trace normalization. On output value used.
 
      ns:	on output number of scaling-squaring used. 
 
@@ -158,7 +158,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex [io,phys]A(n,n);int deg();scale();int trace();int [o]ns();int [o]info())
+  Signature: (complex [io,phys]A(n,n);int deg();scale();int trace();int [o]ns();int [o]info(); int [t] ipiv(n))
 
 
 =for ref
@@ -244,7 +244,7 @@ sub PDL::ctrsqrt {
 
 =for sig
 
-  Signature: (complex [io]A(n,n);int uplo();complex [o] B(n,n);int [o]info();SV* func)
+  Signature: (complex [io]A(n,n);int uplo();complex [o] B(n,n);int [o]info(); complex [t]diag(n);SV* func)
 
 
 =for ref
@@ -263,7 +263,7 @@ sub PDL::ctrfun {
 
 
 
-#line 940 "trans.pd"
+#line 817 "trans.pd"
 
 my $pi;
 BEGIN { $pi = pdl(3.1415926535897932384626433832795029) }
@@ -1185,8 +1185,8 @@ Function will be applied on a PDL::Complex object.
  my $a = random(10,10);
  my $fun = mfun($a,'cos');
  sub sinbycos2{
- 	$_[0]->set_inplace(0);
- 	$_[0] .= $_[0]->Csin/$_[0]->Ccos**2;
+	$_[0]->set_inplace(0);
+	$_[0] .= $_[0]->Csin/$_[0]->Ccos**2;
  }
  # Try diagonalization
  $fun = mfun($a, \&sinbycos2,1);

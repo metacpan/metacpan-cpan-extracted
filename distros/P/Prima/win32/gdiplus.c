@@ -108,6 +108,28 @@ apc_gp_get_antialias( Handle self)
 	return is_apt(aptGDIPlus);
 }
 
+Bool
+apc_gp_aa_bar( Handle self, double x1, double y1, double x2, double y2)
+{
+	double dy = sys lastSize. y;
+	Point t = sys gp_transform;
+	objCheck false;
+
+	x2 -= x1 - 1;
+	y2 -= y1 - 1;
+	x1 += t.x;
+	y1 = t.y + dy - y1 - y2;
+
+	STYLUS_USE_GP_BRUSH;
+	GPCALL GdipFillRectangle(
+		sys graphics,
+		sys stylusGPResource-> brush,
+		x1, y1, x2, y2
+	);
+	apiGPErrCheckRet(false);
+
+	return true;
+}
 
 Bool
 apc_gp_aa_fill_poly( Handle self, int numPts, NPoint * points)
@@ -412,7 +434,7 @@ aa_glyphs_out( Handle self, PGlyphsOutRec t, int x, int y, int * text_advance, H
 		if ( advances ) {
 			adv = *(advances++);
 			if ( text_advance )
-				*text_advance += *advances;
+				*text_advance += adv;
 			pabc = NULL;
 			dx = *(positions++);
 			dy = *(positions++);
@@ -428,11 +450,11 @@ aa_glyphs_out( Handle self, PGlyphsOutRec t, int x, int y, int * text_advance, H
 			abc.abcfB = abci.abcB;
 			abc.abcfC = abci.abcC;
 		}
-
 		if ( !aa_render(self, x, y, &delta, pabc, adv, dx, dy))
 			return false;
 	}
-	return false;
+
+	return true;
 }
 
 #ifdef __cplusplus

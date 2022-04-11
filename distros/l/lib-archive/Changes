@@ -1,3 +1,7 @@
+0.92 2022-04-09
+  - automatic expansion to $HOME/.lib_archive_extract under debugger
+  - use env var PERL_LIB_ARCHIVE_HOME to set home dir
+
 0.91 2021-01-30
   - add archive version to extract path
 

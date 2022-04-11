@@ -18,7 +18,7 @@ sub message {
 sub validate {
     my ($self, $field, $input) = @_;
 
-    if (exists $input->{$field}) {
+    if ($self->_field_defined_and_non_empty($input->{$field})) {
         my $maybe_int = $input->{$field};
 
         if (looks_like_number($maybe_int)) {

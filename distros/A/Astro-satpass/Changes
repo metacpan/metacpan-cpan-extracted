@@ -1,3 +1,10 @@
+0.123		2022-04-09	T. R. Wyant
+    Fix truncation problem in rad2dms().  You can now specify your own
+    degree sign as the third argument to this subroutine.  The default
+    is the Unicode degree sign, "\N{U+00B0}".
+
+    Fix similar potential truncation problem in rad2hms().
+
 0.122		2021-11-10	T. R. Wyant
     Add CONTRIBUTING file
 

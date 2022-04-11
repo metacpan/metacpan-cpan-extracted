@@ -996,7 +996,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 402 "math.pd"
+#line 392 "math.pd"
 
 
 =head1 BUGS

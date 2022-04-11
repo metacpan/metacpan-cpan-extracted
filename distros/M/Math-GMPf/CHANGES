@@ -1,3 +1,8 @@
+0.48
+ - Correction to NaN handling test - the need for which is demonstrated at:
+   http://www.cpantesters.org/cpan/report/d284d78e-99ce-11ec-816f-efdcdd96d0b2
+ - Work around perl bug in https://github.com/Perl/perl5/issues/19550
+
 0.47
  - Fix bug re inconsistent settings of POK and NOK flag, which manifests itself as (eg):
    http://www.cpantesters.org/cpan/report/dc559306-900b-11ec-bfc9-d1f1448276d4

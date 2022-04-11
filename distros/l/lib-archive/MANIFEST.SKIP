@@ -1,11 +1,9 @@
-^\.(?!perltidyrc)
-^\.perlcriticrc
-.*\.bak$
-\.tar\.gz$
+^\.
+.*\.(?:bak|out)$
+.*\_\w+\.pm$
+lib-archive-\d
 ^Makefile$
 ^MYMETA\.
 ^blib
 ^pm_to_blib
 ^README.md
-^.travis.yml
-^.gitignore

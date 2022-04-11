@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '1.000008';
+our $VERSION = '1.000009';
 
 use 5.010000;
 
@@ -116,7 +116,7 @@ MaxMind::DB::Reader::XS - Fast XS implementation of MaxMind DB reader
 
 =head1 VERSION
 
-version 1.000008
+version 1.000009
 
 =head1 SYNOPSIS
 
@@ -198,7 +198,7 @@ Ran Eilam <reilam@maxmind.com>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Andy Jack Chris Weyl Florian Ragwitz Greg Oschwald Hidenori Sugiyama Mark Fowler Olaf Alders
+=for stopwords Andy Jack Chris Weyl Florian Ragwitz Greg Oschwald Hidenori Sugiyama Mark Fowler Nick Logan Olaf Alders
 
 =over 4
 
@@ -212,7 +212,7 @@ Chris Weyl <cweyl@alumni.drew.edu>
 
 =item *
 
-Florian Ragwitz <rafl@debian.org>
+Florian Ragwitz <fragwitz@maxmind.com>
 
 =item *
 
@@ -228,13 +228,17 @@ Mark Fowler <mark@twoshortplanks.com>
 
 =item *
 
+Nick Logan <nlogan@maxmind.com>
+
+=item *
+
 Olaf Alders <oalders@maxmind.com>
 
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2013 - 2019 by MaxMind, Inc.
+This software is Copyright (c) 2013 - 2022 by MaxMind, Inc.
 
 This is free software, licensed under:
 

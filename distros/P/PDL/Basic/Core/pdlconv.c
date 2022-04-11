@@ -43,8 +43,7 @@ VAFF_IO(writebackdata_vaffine, X)
 
 pdl_error pdl_converttype( pdl* a, int targtype ) {
     pdl_error PDL_err = {0, NULL, 0};
-    PDLDEBUG_f(printf("pdl_converttype %p, %d, %d\n", (void*)a, a->datatype,
-	targtype));
+    PDLDEBUG_f(printf("pdl_converttype to %d: ", targtype); pdl_dump(a));
     if(a->state & PDL_DONTTOUCHDATA)
       return pdl_make_error_simple(PDL_EUSERERROR, "Trying to converttype magical (mmaped?) pdl");
 
@@ -54,11 +53,14 @@ pdl_error pdl_converttype( pdl* a, int targtype ) {
 
     STRLEN nbytes = a->nvals * pdl_howbig(targtype); /* Size of converted data */
     STRLEN ncurr = a->nvals * pdl_howbig(intype);
-    char diffsize = ncurr != nbytes;
+    PDL_Value value;
+    char diffsize = ncurr != nbytes,
+      was_useheap = (ncurr > sizeof(value)),
+      will_useheap = (nbytes > sizeof(value));
 
-    void *b = a->data; /* pointer to old data */
+    void *data_from_void = a->data, *data_to_void = a->data;
     if (diffsize)
-       a->data = pdl_smalloc(nbytes); /* Space for changed data */
+       data_to_void = will_useheap ? pdl_smalloc(nbytes) : &value;
 
 #define THIS_ISBAD(from_badval_isnan, from_badval, from_val) \
   ((from_badval_isnan) \
@@ -66,24 +68,24 @@ pdl_error pdl_converttype( pdl* a, int targtype ) {
     : (from_val) == (from_badval))
 #define X_OUTER(datatype_from, ctype_from, ppsym_from, ...) \
     PDL_Indx i = a->nvals; \
-    ctype_from *bb = (ctype_from *) b; \
+    ctype_from *data_from_typed = (ctype_from *) data_from_void; \
     ctype_from from_badval = pdl_get_pdl_badvalue(a).value.ppsym_from; \
     char from_badval_isnan = PDL_ISNAN_##ppsym_from(from_badval); \
     PDL_GENERICSWITCH2(PDL_TYPELIST2_ALL_, targtype, X_INNER, return pdl_make_error(PDL_EUSERERROR, "Not a known data type code=%d", targtype))
 #define X_INNER(datatype_to, ctype_to, ppsym_to, shortctype_to, defbval_to, ...) \
-    ctype_to *aa = (ctype_to *) a->data; \
-    aa += i-1; bb += i-1; \
+    ctype_to *data_to_typed = (ctype_to *) data_to_void; \
+    data_to_typed += i-1; data_from_typed += i-1; \
     if (a->state & PDL_BADVAL) { \
       ctype_to to_badval = defbval_to; \
       a->has_badvalue = 0; \
       while (i--) { \
-        *aa-- = THIS_ISBAD(from_badval_isnan, from_badval, *bb) \
-          ? to_badval : (ctype_to) *bb; \
-        bb--; \
+        *data_to_typed-- = THIS_ISBAD(from_badval_isnan, from_badval, *data_from_typed) \
+          ? to_badval : (ctype_to) *data_from_typed; \
+        data_from_typed--; \
       } \
     } else \
       while (i--) \
-        *aa-- = (ctype_to) *bb--;
+        *data_to_typed-- = (ctype_to) *data_from_typed--;
     PDL_GENERICSWITCH(PDL_TYPELIST2_ALL, intype, X_OUTER, return pdl_make_error(PDL_EUSERERROR, "Not a known data type code=%d", intype))
 #undef X_INNER
 #undef X_OUTER
@@ -91,10 +93,24 @@ pdl_error pdl_converttype( pdl* a, int targtype ) {
 
     /* Store new data */
     if (diffsize) {
-      sv_setpvn((SV*) a->datasv, (char*) a->data, nbytes);
-      a->data = SvPV_nolen((SV*) a->datasv);
+      if (!was_useheap && !will_useheap) {
+        memmove(&a->value, data_to_void, nbytes);
+      } else if (!will_useheap) {
+        /* was heap, now not */
+        memmove(a->data = &a->value, data_to_void, nbytes);
+        SvREFCNT_dec((SV*)a->datasv);
+        a->datasv = NULL;
+      } else {
+        /* now change to be heap */
+        if (a->datasv == NULL)
+          a->datasv = newSVpvn("", 0);
+        (void)SvGROW((SV*)a->datasv, nbytes);
+        SvCUR_set((SV*)a->datasv, nbytes);
+        memmove(a->data = SvPV_nolen((SV*)a->datasv), data_to_void, nbytes);
+      }
     }
 
     a->datatype = targtype;
+    PDLDEBUG_f(printf("pdl_converttype after: "); pdl_dump(a));
     return PDL_err;
 }

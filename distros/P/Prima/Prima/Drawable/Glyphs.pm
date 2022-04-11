@@ -80,7 +80,7 @@ sub _debug
 		delete $f{0};
 		if ( $::application ) {
 			for my $fid ( sort keys %f ) {
-				my $f = $::application->fontMapperPalette($fid);
+				my $f = Prima::Font::Mapper->get($fid);
 				$out .= "  #$fid: $f->{name}\n";
 			}
 		}
@@ -837,6 +837,9 @@ sub justify_interspace
 
 	my $curr_width  = $canvas->get_text_width($self, to::AddOverhangs);
 	return if $curr_width > $width || $curr_width == 0;
+	my $min_text_to_space_ratio = $opt{max_text_to_space_ratio} // 0.75;
+	return if $curr_width / $width < $min_text_to_space_ratio;
+
 	my $advances = $self->[ADVANCES] or return 0;
 	my $indexes = $self->[INDEXES];
 	my $n_glyphs = scalar @{$self->[GLYPHS]};
@@ -1101,7 +1104,7 @@ The array is respected by C<text_out> (but not by C<get_text_width>).
 =item fonts
 
 Contains a set of unsigned 16-bit integers where each is an index in the font
-substitution list (see L<Prima::Drawable/fontMapperPalette>). Zero means the
+substitution list (see L<Prima::Drawable/font_mapper>). Zero means the
 current font.
 
 The font substitution is applied by C<text_shape> when C<polyfont> options is
@@ -1405,6 +1408,11 @@ that can be reused in subsequent calls.
 
 If set, runs an inter-word spacing by extending advances on all space glyphs.
 
+=item min_text_to_space_ratio FLOAT = 0.75
+
+If C<word> set, does not run inter-word justification if text to space ratio
+is too small (i e don't spread text too thin )
+
 =back
 
 =item justify_tabs CANVAS, TEXT, %OPTIONS
@@ -1557,7 +1565,7 @@ D̍üi̔s͙ a̸u̵t͏eͬ ịr͡u̍r͜e̥ d͎ǒl̋o̻rͫ i̮n̓ r͐e̔p͊rͨe̾
 
 B<Lorem Ipsum> используют потому, что тот обеспечивает более или менее стандартное заполнение шаблона.
 
-а также реальное распределение букв и пробелов в абзацах
+   а также реальное распределение букв и пробелов в абзацах
 
 =item Hebrew
 
@@ -1583,6 +1591,18 @@ Lorem Ipsum के अंश कई रूप में उपलब्ध ह�
 无可否认，当读者在浏览一个页面的排版时，难免会被可阅读的内容所分散注意力。
 
   Lorem Ipsum的目的就是为了保持字母多多少少标准及平
+
+=item Thai
+
+มีหลักฐานที่เป็นข้อเท็จจริงยืนยันมานานแล้ว
+ว่าเนื้อหาที่อ่านรู้เรื่องนั้นจะไปกวนสมาธิของคนอ่านให้เขวไปจากส่วนที้เป็น Layout เรานำ Lorem Ipsum
+มาใช้เพราะความที่มันมีการกระจายของตัวอักษรธรรมดาๆ แบบพอประมาณ ซึ่งเอามาใช้แทนการเขียนว่า
+‘ตรงนี้เป็นเนื้อหา, ตรงนี้เป็นเนื้อหา' ได้ และยังทำให้มองดูเหมือนกับภาษาอังกฤษที่อ่านได้ปกติ
+ปัจจุบันมีแพ็กเกจของซอฟท์แวร์การทำสื่อสิ่งพิมพ์ และซอฟท์แวร์การสร้างเว็บเพจ
+
+   กวนสมาธิของคนอ่านให้เขวไปจากส่วนที้เป็น Layout เรานำ Lorem Ipsum
+
+(Note: I<libthai> is required for text wrapping by the word boundary)
 
 =item Largest well-known grapheme cluster in Unicode
 

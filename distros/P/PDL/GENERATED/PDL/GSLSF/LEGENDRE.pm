@@ -201,13 +201,13 @@ The parameter norm should be:
 
 =over 3
 
-=item 'P' for unnormalized associated Legendre polynomials P_l^m(x),
-
 =item 'S' for Schmidt semi-normalized associated Legendre polynomials S_l^m(x),
 
 =item 'Y' for spherical harmonic associated Legendre polynomials Y_l^m(x), or
 
 =item 'N' for fully normalized associated Legendre polynomials N_l^m(x).
+
+=item 'P' (or any other) for unnormalized associated Legendre polynomials P_l^m(x),
 
 =back
 
@@ -217,7 +217,6 @@ csphase should be (-1) to INCLUDE the Condon-Shortley phase factor (-1)^m, or (+
 See L</gsl_sf_legendre_array_index> to get the value of C<l> and C<m> in the returned vector.
 
 
-
 =for bad
 
 gsl_sf_legendre_array processes bad values.
@@ -225,14 +224,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 229 "LEGENDRE.pm"
+#line 228 "LEGENDRE.pm"
 
 
 
 #line 1060 "../../../../blib/lib/PDL/PP.pm"
 
 *gsl_sf_legendre_array = \&PDL::gsl_sf_legendre_array;
-#line 236 "LEGENDRE.pm"
+#line 235 "LEGENDRE.pm"
 
 
 
@@ -262,14 +261,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 266 "LEGENDRE.pm"
+#line 265 "LEGENDRE.pm"
 
 
 
 #line 1060 "../../../../blib/lib/PDL/PP.pm"
 
 *gsl_sf_legendre_array_index = \&PDL::gsl_sf_legendre_array_index;
-#line 273 "LEGENDRE.pm"
+#line 272 "LEGENDRE.pm"
 
 
 
@@ -294,14 +293,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 298 "LEGENDRE.pm"
+#line 297 "LEGENDRE.pm"
 
 
 
 #line 1060 "../../../../blib/lib/PDL/PP.pm"
 
 *gsl_sf_legendre_sphPlm = \&PDL::gsl_sf_legendre_sphPlm;
-#line 305 "LEGENDRE.pm"
+#line 304 "LEGENDRE.pm"
 
 
 
@@ -326,14 +325,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 330 "LEGENDRE.pm"
+#line 329 "LEGENDRE.pm"
 
 
 
 #line 1060 "../../../../blib/lib/PDL/PP.pm"
 
 *gsl_sf_conicalP_half = \&PDL::gsl_sf_conicalP_half;
-#line 337 "LEGENDRE.pm"
+#line 336 "LEGENDRE.pm"
 
 
 
@@ -358,14 +357,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 362 "LEGENDRE.pm"
+#line 361 "LEGENDRE.pm"
 
 
 
 #line 1060 "../../../../blib/lib/PDL/PP.pm"
 
 *gsl_sf_conicalP_mhalf = \&PDL::gsl_sf_conicalP_mhalf;
-#line 369 "LEGENDRE.pm"
+#line 368 "LEGENDRE.pm"
 
 
 
@@ -390,14 +389,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 394 "LEGENDRE.pm"
+#line 393 "LEGENDRE.pm"
 
 
 
 #line 1060 "../../../../blib/lib/PDL/PP.pm"
 
 *gsl_sf_conicalP_0 = \&PDL::gsl_sf_conicalP_0;
-#line 401 "LEGENDRE.pm"
+#line 400 "LEGENDRE.pm"
 
 
 
@@ -422,14 +421,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 426 "LEGENDRE.pm"
+#line 425 "LEGENDRE.pm"
 
 
 
 #line 1060 "../../../../blib/lib/PDL/PP.pm"
 
 *gsl_sf_conicalP_1 = \&PDL::gsl_sf_conicalP_1;
-#line 433 "LEGENDRE.pm"
+#line 432 "LEGENDRE.pm"
 
 
 
@@ -454,14 +453,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 458 "LEGENDRE.pm"
+#line 457 "LEGENDRE.pm"
 
 
 
 #line 1060 "../../../../blib/lib/PDL/PP.pm"
 
 *gsl_sf_conicalP_sph_reg = \&PDL::gsl_sf_conicalP_sph_reg;
-#line 465 "LEGENDRE.pm"
+#line 464 "LEGENDRE.pm"
 
 
 
@@ -486,14 +485,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 490 "LEGENDRE.pm"
+#line 489 "LEGENDRE.pm"
 
 
 
 #line 1060 "../../../../blib/lib/PDL/PP.pm"
 
 *gsl_sf_conicalP_cyl_reg_e = \&PDL::gsl_sf_conicalP_cyl_reg_e;
-#line 497 "LEGENDRE.pm"
+#line 496 "LEGENDRE.pm"
 
 
 
@@ -518,14 +517,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 522 "LEGENDRE.pm"
+#line 521 "LEGENDRE.pm"
 
 
 
 #line 1060 "../../../../blib/lib/PDL/PP.pm"
 
 *gsl_sf_legendre_H3d = \&PDL::gsl_sf_legendre_H3d;
-#line 529 "LEGENDRE.pm"
+#line 528 "LEGENDRE.pm"
 
 
 
@@ -550,20 +549,20 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 554 "LEGENDRE.pm"
+#line 553 "LEGENDRE.pm"
 
 
 
 #line 1060 "../../../../blib/lib/PDL/PP.pm"
 
 *gsl_sf_legendre_H3d_array = \&PDL::gsl_sf_legendre_H3d_array;
-#line 561 "LEGENDRE.pm"
+#line 560 "LEGENDRE.pm"
 
 
 
 
 
-#line 344 "gsl_sf_legendre.pd"
+#line 302 "gsl_sf_legendre.pd"
 
 
 =head1 AUTHOR
@@ -578,7 +577,7 @@ PDL distribution, the copyright notice should be included in the file.
 The GSL SF modules were written by G. Jungman.
 
 =cut
-#line 582 "LEGENDRE.pm"
+#line 581 "LEGENDRE.pm"
 
 
 

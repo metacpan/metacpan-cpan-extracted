@@ -1,3 +1,9 @@
+0.08 2022-04-11T15:51:00Z
+    - Added method to find for another port when the default port is being used.
+
+0.07 2022-04-08T14:35:00Z
+    - Enable Middleware AccessLog.
+
 0.06 2022-04-03T11:47:00Z
     - Skip test if fail to open port.
 

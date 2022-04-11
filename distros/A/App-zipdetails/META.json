@@ -1,0 +1,61 @@
+{
+   "abstract" : "Display details about the internal structure of Zip files",
+   "author" : [
+      "Paul Marquess <pmqs@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-zipdetails",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Cwd" : "0",
+            "Data::Dumper" : "0",
+            "File::Basename" : "0",
+            "File::Temp" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Encode" : "0",
+            "Fcntl" : "0",
+            "Getopt::Long" : "0",
+            "IO::File" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/pmqs/zipdetails/issues"
+      },
+      "homepage" : "https://github.com/pmqs/zipdetails",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/pmqs/zipdetails.git",
+         "web" : "https://github.com/pmqs/zipdetails"
+      }
+   },
+   "version" : "2.103",
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

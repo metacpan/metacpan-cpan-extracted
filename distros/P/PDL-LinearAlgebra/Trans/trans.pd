@@ -11,10 +11,13 @@ pp_addhdr('
 pp_addhdr('
 #include <math.h>
 
+#define CONCAT_(A, B) A ## B
+#define CONCAT(A, B) CONCAT_(A, B)
+#define FORTRAN(name) CONCAT(name, F77_USCORE)
+
 typedef PDL_Long logical;
 typedef PDL_Long integer;
 typedef PDL_Long ftnlen;
-typedef struct { double r, i; } dcomplex;
 
 #ifndef abs
 #define abs(x) ((x) >= 0 ? (x) : -(x))
@@ -22,59 +25,6 @@ typedef struct { double r, i; } dcomplex;
 #ifndef max
 #define max(a,b) ((a) >= (b) ? (a) : (b))
 #endif
-
-#if __GLIBC__ > 1 && (defined __USE_MISC || defined __USE_XOPEN || defined __USE_ISOC9X)
-# define CABS(r,i) hypot (r, i)
-#else
-static double CABS (double r, double i)
-{
-    double t;
-
-    if (r < 0) r = - r;
-    if (i < 0) i = - i;
-
-    if (i > r)
-      {
-        t = r; r = i; i = t;
-      }
-
-    if (r + i == r){
-      return r;
-    }
-
-    t = i / r;
-    return r * sqrt (1 + t*t);
-}
-#endif
-
-#define CSQRT(ar,ai,cr,ci) 		\
-{					\
-        double mag = CABS ((ar), (ai));		\
-        double t;					\
-                                                \
-        if (mag == 0)				\
-          (cr) = (ci) = 0;			\
-        else if ((ar) > 0)			\
-          {					\
-            t = sqrt (0.5 * (mag + (ar)));	\
-            (cr) = t;				\
-            (ci) = 0.5 * (ai) / t;		\
-          }					\
-        else					\
-          {					\
-            t = sqrt (0.5 * (mag - (ar)));	\
-                                                \
-            if ((ai) < 0)			\
-              t = -t;				\
-                                                \
-            (cr) = 0.5 * (ai) / t;		\
-            (ci) = t;				\
-          }					\
-}
-
-#define CMULT(ar,ai,br,bi,or,oi) 		\
-        (or) = (ar)*(br) - (ai)*(bi);		\
-        (oi) = (ar)*(bi) + (ai)*(br);
 ');
 
 pp_addpm({At=>'Top'},<<'EOD');
@@ -121,7 +71,10 @@ pp_add_exported('', ' mexp mexpts mlog msqrt mpow
 			csc acsc csch acsch toreal pi');
 
 pp_def('geexp',
-          Pars => '[io,phys]A(n,n);int deg();scale();[io]trace();int [o]ns();int [o]info()',
+          Pars => '[io,phys]A(n,n);int deg();scale();[io]trace();int [o]ns();int [o]info(); int [t]ipiv(n); [t]wsp(wspn);',
+	  RedoDimsCode => '
+	    $SIZE(wspn) = 3 * $SIZE(n) * $SIZE(n);
+	  ',
        	  GenericTypes => [D],
           Code => '
 /* ----------------------------------------------------------------------| 
@@ -173,26 +126,24 @@ pp_def('geexp',
  ----------------------------------------------------------------------| 
 */
 
-	extern int dscal_(integer *, double *, double *, 
+	extern int FORTRAN(dscal)(integer *, double *, double *,
 		integer *);
-	extern int dgemm_(char *, char *, integer *, integer *, integer *, 
+	extern int FORTRAN(dgemm)(char *, char *, integer *, integer *, integer *,
 				double *, double *, integer *, double *, 
 				integer *, double *, double *, integer *, 
 				ftnlen, ftnlen);
-	extern int dgesv_(integer *, integer *, double *, 
+	extern int FORTRAN(dgesv)(integer *, integer *, double *,
 		integer *, integer *, double *, integer *, integer *);
-	extern int daxpy_(integer *, double *, double *, 
+	extern int FORTRAN(daxpy)(integer *, double *, double *,
 		integer *, double *, integer *);
-	extern double dlange_(char *norm, integer *m, integer *n, double *a, integer 
+	extern double FORTRAN(dlange)(char *norm, integer *m, integer *n, double *a, integer
 		*lda, double *work);
 
 	integer i__1, i__2, i__, j, k;
 	integer ip, mm, iq, ih2, ifree,  iused, iodd, iget, iput;
-	integer *ipiv;
 
 	double cp, cq, scale, scale2, hnorm, tracen;
-	double *coef;
-	double *wsp;
+	double *coef, *wsp = $P(wsp);
 
 	integer c__1 = 1;
 	integer c__2 = 2;
@@ -206,9 +157,7 @@ pp_def('geexp',
 
 /////////////    
 	mm = $SIZE(n) * $SIZE(n);
-	ipiv = (integer *) malloc ( $SIZE(n) * sizeof (integer));
-	coef = (double *) malloc ( (($deg() + 1) + $SIZE(n) * $SIZE(n)) * sizeof (double));
-	wsp = (double *) malloc ( 3 * mm * sizeof (double));    
+	coef = (double *) malloc(($deg() + 1 + mm) * sizeof(double));
 //////////
 
 	// ---  initialise pointers ... 
@@ -238,14 +187,12 @@ pp_def('geexp',
 	//     and set scale = t/2^ns ... 
 
 	// Compute Infinity norm
-	hnorm = dlange_("I", &(integer){$SIZE(n)}, &(integer){$SIZE(n)}, $P(A), 
+	hnorm = FORTRAN(dlange)("I", &(integer){$SIZE(n)}, &(integer){$SIZE(n)}, $P(A),
 			&(integer){$SIZE(n)}, wsp);
 	
 	hnorm = abs($scale() * hnorm);
 	if (hnorm == 0.)
 	{
-		free(ipiv);
-		free(wsp);
 		free(coef);
 		coef = $P(A);
 		$ns() = 0;
@@ -273,7 +220,7 @@ pp_def('geexp',
 		
 		// ---  H2 = scale2*H*H ... 
 		
-		dgemm_("n", "n", &(integer){$SIZE(n)}, &(integer){$SIZE(n)}, &(integer){$SIZE(n)}, &scale2, h__, &(integer){$SIZE(n)}, h__, 
+		FORTRAN(dgemm)("n", "n", &(integer){$SIZE(n)}, &(integer){$SIZE(n)}, &(integer){$SIZE(n)}, &scale2, h__, &(integer){$SIZE(n)}, h__,
 		    &(integer){$SIZE(n)}, &c_b7, &coef[ih2], &(integer){$SIZE(n)}, (ftnlen)1, (ftnlen)1);
 		
 		// ---  initialize p (numerator) and q (denominator) ...
@@ -281,8 +228,8 @@ pp_def('geexp',
 		cq = coef[$deg()];
 		for (j = 0; j < $SIZE(n); j++) {
 			for (i__ = 1; i__ <= $SIZE(n); ++i__) {
-		    		wsp[ip + j  * $SIZE(n) + i__ - 1] = 0.;
-		    		wsp[iq + j  * $SIZE(n) + i__ - 1] = 0.;
+				wsp[ip + j  * $SIZE(n) + i__ - 1] = 0.;
+				wsp[iq + j  * $SIZE(n) + i__ - 1] = 0.;
 			}
 			wsp[ip + j * ($SIZE(n) + 1)] = cp;
 			wsp[iq + j * ($SIZE(n) + 1)] = cq;
@@ -293,7 +240,7 @@ pp_def('geexp',
 		k = $deg() - 2;
 		do{
 			iused = iodd * iq + (1 - iodd) * ip;
-			dgemm_("n", "n", &(integer){$SIZE(n)}, &(integer){$SIZE(n)}, &(integer){$SIZE(n)}, &c_b11, &wsp[iused], &(integer){$SIZE(n)}, &coef[ih2], &(integer){$SIZE(n)}, &c_b7, &
+			FORTRAN(dgemm)("n", "n", &(integer){$SIZE(n)}, &(integer){$SIZE(n)}, &(integer){$SIZE(n)}, &c_b11, &wsp[iused], &(integer){$SIZE(n)}, &coef[ih2], &(integer){$SIZE(n)}, &c_b7, &
 			    wsp[ifree], &(integer){$SIZE(n)}, (ftnlen)1, (ftnlen)1);
 			for (j = 0; j < $SIZE(n); j++) {
 				wsp[ifree + j  * ($SIZE(n) + 1)] += coef[k];
@@ -308,18 +255,18 @@ pp_def('geexp',
 		// ---  Obtain (+/-)(I + 2*(p\q)) ... 
 		if (iodd == 1)
 		{
-			dgemm_("n", "n", &(integer){$SIZE(n)}, &(integer){$SIZE(n)}, &(integer){$SIZE(n)}, &scale, &wsp[iq], &(integer){$SIZE(n)}, h__, &(integer){$SIZE(n)}, &
+			FORTRAN(dgemm)("n", "n", &(integer){$SIZE(n)}, &(integer){$SIZE(n)}, &(integer){$SIZE(n)}, &scale, &wsp[iq], &(integer){$SIZE(n)}, h__, &(integer){$SIZE(n)}, &
 				c_b7, &wsp[ifree], &(integer){$SIZE(n)}, (ftnlen)1, (ftnlen)1);
 			iq = ifree;
 		}
 		else
 		{
-			dgemm_("n", "n", &(integer){$SIZE(n)}, &(integer){$SIZE(n)}, &(integer){$SIZE(n)}, &scale, &wsp[ip], &(integer){$SIZE(n)}, h__, &(integer){$SIZE(n)}, &
+			FORTRAN(dgemm)("n", "n", &(integer){$SIZE(n)}, &(integer){$SIZE(n)}, &(integer){$SIZE(n)}, &scale, &wsp[ip], &(integer){$SIZE(n)}, h__, &(integer){$SIZE(n)}, &
 				c_b7, &wsp[ifree], &(integer){$SIZE(n)}, (ftnlen)1, (ftnlen)1);
 			ip = ifree;
 		}
-		daxpy_(&mm, &c_b19, &wsp[ip], &c__1, &wsp[iq], &c__1);
-		dgesv_(&(integer){$SIZE(n)}, &(integer){$SIZE(n)}, &wsp[iq], &(integer){$SIZE(n)}, ipiv, &wsp[ip], &(integer){$SIZE(n)}, $P(info));
+		FORTRAN(daxpy)(&mm, &c_b19, &wsp[ip], &c__1, &wsp[iq], &c__1);
+		FORTRAN(dgesv)(&(integer){$SIZE(n)}, &(integer){$SIZE(n)}, &wsp[iq], &(integer){$SIZE(n)}, $P(ipiv), &wsp[ip], &(integer){$SIZE(n)}, $P(info));
 	
 		if ($info() != 0)
 		{
@@ -327,13 +274,13 @@ pp_def('geexp',
 		}
 		else
 		{
-			dscal_(&mm, &c_b23, &wsp[ip], &c__1);
+			FORTRAN(dscal)(&mm, &c_b23, &wsp[ip], &c__1);
 			for (j = 0; j < $SIZE(n); j++) {
 				wsp[ip + j  * ($SIZE(n) + 1)] += 1.;
 			}
 			iput = ip;
 			if ($ns() == 0 && iodd == 1)
-				dscal_(&mm, &c_b19, &wsp[ip], &c__1);
+				FORTRAN(dscal)(&mm, &c_b19, &wsp[ip], &c__1);
 			else{
 				// --   squaring : exp(t*H) = (exp(t*H))^(2^ns) ... 
 				iodd = 1;
@@ -341,7 +288,7 @@ pp_def('geexp',
 				for (k = 0; k < i__1; k++) {
 					iget = iodd * ip + (1 - iodd) * iq;
 					iput = (1 - iodd) * ip + iodd * iq;
-					dgemm_("n", "n", &(integer){$SIZE(n)}, &(integer){$SIZE(n)}, &(integer){$SIZE(n)}, &c_b11, &wsp[iget], &(integer){$SIZE(n)}, &wsp[iget], &(integer){$SIZE(n)}, &c_b7,
+					FORTRAN(dgemm)("n", "n", &(integer){$SIZE(n)}, &(integer){$SIZE(n)}, &(integer){$SIZE(n)}, &c_b11, &wsp[iget], &(integer){$SIZE(n)}, &wsp[iget], &(integer){$SIZE(n)}, &c_b7,
 						&wsp[iput], &(integer){$SIZE(n)}, (ftnlen)1, (ftnlen)1);
 					iodd = 1 - iodd;
 				}
@@ -364,8 +311,6 @@ pp_def('geexp',
 					coef[i__++] = wsp[i__1];
 			}
 		}
-		free(ipiv);
-		free(wsp);
 	}
 ',
 	Doc => <<EOT
@@ -380,7 +325,7 @@ The algorithm is described in Roger B. Sidje (rbs@maths.uq.edu.au)
 ACM - Transactions On Mathematical Software, 24(1):130-156, 1998
 
      A:		On input argument matrix. On output exp(t*A).
-     		Use Fortran storage type.
+		Use Fortran storage type.
 
      deg:	the degre of the diagonal Pade to be used. 
                 a value of 6 is generally satisfactory. 
@@ -388,7 +333,7 @@ ACM - Transactions On Mathematical Software, 24(1):130-156, 1998
      scale:	time-scale (can be < 0). 
 
      trace:	on input, boolean value indicating whether or not perform
-     		a trace normalization. On output value used.
+		a trace normalization. On output value used.
 
      ns:	on output number of scaling-squaring used. 
 
@@ -410,7 +355,7 @@ EOT
 
 do '../pp_defc.pl'; die if $@;
 pp_defc('geexp',
-        Pars => '[io,phys]A(2,n,n);int deg();scale();int trace();int [o]ns();int [o]info()',
+        Pars => '[io,phys]A(2,n,n);int deg();scale();int trace();int [o]ns();int [o]info(); int [t] ipiv(n)',
 	Doc => '
 =for ref
 
@@ -420,11 +365,11 @@ The algorithm is described in Roger B. Sidje (rbs@maths.uq.edu.au)
 ACM - Transactions On Mathematical Software, 24(1):130-156, 1998
 
 ',
-       	  GenericTypes => [D],
+	  GenericTypes => [D],
           Code => '
 /* ----------------------------------------------------------------------| 
  int dgpadm_(integer *ideg, integer *m, double *t, 
-	dcomplex *h__, integer *ldh, dcomplex *wsp, integer *lwsp, 
+	PDL_CDouble *h__, integer *ldh, PDL_CDouble *wsp, integer *lwsp,
 	integer *ipiv, integer *iexph, integer *ns, integer *iflag) 
 
  -----Purpose----------------------------------------------------------| 
@@ -470,38 +415,36 @@ ACM - Transactions On Mathematical Software, 24(1):130-156, 1998
 					exp(tH) in entry matrix), trace normalization.
  ----------------------------------------------------------------------| 
 */
-	static dcomplex c_b1 = {0.,0.};
-	static dcomplex c_b2 = {1.,0.};
+	static PDL_CDouble c_b1 = 0;
+	static PDL_CDouble c_b2 = 1;
 	static integer c__2 = 2;
 	static integer c__1 = 1;
 	static double c_b19 = 2.;
 	static double c_b21 = -1.;
-	integer *ipiv;
 
 	integer i__1, i__2, i__3, i__, j, k;
 	integer ip, mm, iq, ih2, iodd, iget, iput, ifree, iused;
 
 	double hnorm,d__1, d__2;
-	dcomplex scale, tracen, cp, cq, z__1;	
-	dcomplex scale2;
-	dcomplex *wsp, *h__;
+	PDL_CDouble scale, tracen, cp, cq, z__1;
+	PDL_CDouble scale2;
+	PDL_CDouble *wsp, *h__;
 
-	extern int zgemm_(char *, char *, integer *, integer *, 
-		integer *, dcomplex *, dcomplex *, integer *, 
-		dcomplex *, integer *, dcomplex *, dcomplex *, 
+	extern int FORTRAN(zgemm)(char *, char *, integer *, integer *,
+		integer *, PDL_CDouble *, PDL_CDouble *, integer *,
+		PDL_CDouble *, integer *, PDL_CDouble *, PDL_CDouble *,
 		integer *, ftnlen, ftnlen);
-	extern int zgesv_(integer *, integer *, dcomplex *, 
-		integer *, integer *, dcomplex *, integer *, integer *);
-	extern int zaxpy_(integer *, dcomplex *, 
-		dcomplex *, integer *, dcomplex *, integer *), zdscal_(
-		integer *, double *, dcomplex *, integer *);
-	extern double zlange_(char *norm, integer *m, integer *n, dcomplex *a, 
-		integer *lda, double *work);
+	extern int FORTRAN(zgesv)(integer *, integer *, PDL_CDouble *,
+		integer *, integer *, PDL_CDouble *, integer *, integer *);
+	extern int FORTRAN(zaxpy)(integer *, PDL_CDouble *,
+		PDL_CDouble *, integer *, PDL_CDouble *, integer *), FORTRAN(zdscal)(
+		integer *, double *, PDL_CDouble *, integer *);
+	extern double FORTRAN(zlange)(char *norm, integer *m, integer *n, PDL_CDouble *a,
+		integer *lda, PDL_CDouble *work);
 
-	h__ = (dcomplex *) $P(A);
+	h__ = (PDL_CDouble *) $P(A);
     
-	wsp = (dcomplex *) malloc (( $deg() + 1 +   4 * $SIZE(n) * $SIZE(n)) * sizeof (dcomplex));
-	ipiv = (integer *) malloc ( $SIZE(n) * sizeof (integer));
+	wsp = malloc (( $deg() + 1 +   4 * $SIZE(n) * $SIZE(n)) * sizeof (PDL_CDouble));
 
 	mm = $SIZE(n) * $SIZE(n);
 	$info() = 0;
@@ -511,33 +454,28 @@ ACM - Transactions On Mathematical Software, 24(1):130-156, 1998
 	iq = ip + mm;
 	ifree = iq + mm;
 
-	tracen.r = 0;
-	tracen.i = 0;
+	tracen = 0;
 	if ($trace())
 	{
 		for (i__ = 0; i__ < $SIZE(n); i__++)
 		{
-			tracen.r = tracen.r + h__[i__ + i__ * $SIZE(n)].r;
-			tracen.i = tracen.i + h__[i__ + i__ * $SIZE(n)].i;
+			tracen += h__[i__ + i__ * $SIZE(n)];
 		}
-		tracen.r = tracen.r / $SIZE(n);
-		tracen.i = tracen.i / $SIZE(n);
-		if (tracen.r  < 0){
-			tracen.r = tracen.i;
-			tracen.i = 0;
+		tracen /= $SIZE(n);
+		if (creal(tracen)  < 0){
+			tracen = cimag(tracen);
 		}
 		for (i__ = 0; i__ < $SIZE(n); i__++)
 		{
-			h__[i__ + i__ * $SIZE(n)].r = h__[i__ + i__ * $SIZE(n)].r - tracen.r ;
-			h__[i__ + i__ * $SIZE(n)].i = h__[i__ + i__ * $SIZE(n)].i - tracen.i ;
+			h__[i__ + i__ * $SIZE(n)] -= tracen;
 		}
 	}
 
 	// ---  scaling: seek ns such that ||t*H/2^ns|| < 1/2; 
 	//     and set scale = t/2^ns ... 
 	// Compute Infinity norm
-	hnorm = zlange_("I", &(integer){$SIZE(n)}, &(integer){$SIZE(n)}, &h__[0], 
-			&(integer){$SIZE(n)}, &wsp[0].r);
+	hnorm = FORTRAN(zlange)("I", &(integer){$SIZE(n)}, &(integer){$SIZE(n)}, h__,
+			&(integer){$SIZE(n)}, wsp);
 
 	    hnorm = abs($scale() * hnorm);
 	    if (hnorm == 0.)
@@ -545,8 +483,7 @@ ACM - Transactions On Mathematical Software, 24(1):130-156, 1998
 		$ns() = 0;
 		for(i__ = 0 ; i__ < $SIZE(n) ; i__++ ){
 			for(i__1 = 0 ; i__1 < $SIZE(n) ; i__1++ ){
-				h__[i__1 +  i__ *  $SIZE(n) ].r = (i__ == i__1) ? 1 : 0;
-				h__[i__1 +  i__ *  $SIZE(n) ].i = 0;
+				h__[i__1 +  i__ *  $SIZE(n) ] = (i__ == i__1) ? 1 : 0;
 			}
 		}
 	    }
@@ -554,52 +491,40 @@ ACM - Transactions On Mathematical Software, 24(1):130-156, 1998
 	    {
 		    i__2 = (integer) ((log(hnorm) / log(2.)) + 2);
 		    $ns() = max(0,i__2);
-		    scale.r = $scale() / pow(2, (double )$ns());
-		    scale.i = 0;
-		    scale2.r = scale.r * scale.r - scale.i * scale.i;
-		    scale2.i = scale.r * scale.i + scale.i * scale.r;
+		    scale = $scale() / pow(2, (double )$ns());
+		    scale2 = scale * scale;
 	
 		// ---  compute Pade coefficients ...
 		
 		    i__ = $deg() + 1;
 		    j = ($deg() << 1) + 1;
-		    wsp[0].r = 1;
-		    wsp[0].i = 0;
+		    wsp[0] = 1;
 		    for (k = 1; k <= $deg(); ++k) {
-			i__2 = k;
-			i__3 = k - 1;
 			d__1 = (double) (i__ - k);
 			d__2 = (double) (k * (j - k));
-			wsp[i__2].r = (d__1 * wsp[i__3].r) / d__2;
-			wsp[i__2].i = (d__1 * wsp[i__3].i) / d__2;
+			wsp[k] = (d__1 * wsp[k - 1]) / d__2;
 		    }
 		
 		// ---  H2 = scale2*H*H ...
-		    zgemm_("n", "n", &(integer){$SIZE(n)}, &(integer){$SIZE(n)}, &(integer){$SIZE(n)}, &scale2, &h__[0], &(integer){$SIZE(n)}, &h__[0], 
+		    FORTRAN(zgemm)("n", "n", &(integer){$SIZE(n)}, &(integer){$SIZE(n)}, &(integer){$SIZE(n)}, &scale2, &h__[0], &(integer){$SIZE(n)}, &h__[0],
 			    &(integer){$SIZE(n)}, &c_b1, &wsp[ih2], &(integer){$SIZE(n)}, (ftnlen)1, (ftnlen)1);
 		
 		// ---  initialise p (numerator) and q (denominator) ...
 		
-		    i__1 = $deg() - 1;
-		    cp.r = wsp[i__1].r;
-		    cp.i = wsp[i__1].i;
-		    i__1 = $deg();
-		    cq.r = wsp[i__1].r;
-		    cq.i = wsp[i__1].i;
+		    cp = wsp[$deg() - 1];
+		    cq = wsp[$deg()];
 
 		    for (j = 0; j < $SIZE(n); j++) {
 			for (i__ = 1; i__ <= $SIZE(n); ++i__) {
 			    i__3 = ip + j  * $SIZE(n) + i__ - 1;
-			    wsp[i__3].r = 0., wsp[i__3].i = 0.;
+			    wsp[i__3] = 0.;
 			    i__3 = iq + j  * $SIZE(n) + i__ - 1;
-			    wsp[i__3].r = 0., wsp[i__3].i = 0.;
+			    wsp[i__3] = 0.;
 			}
 			i__2 = ip + j  * ($SIZE(n) + 1);
-			wsp[i__2].r = cp.r;
-			wsp[i__2].i = cp.i;
+			wsp[i__2] = cp;
 			i__2 = iq + j  * ($SIZE(n) + 1);
-			wsp[i__2].r = cq.r;
-			wsp[i__2].i = cq.i;
+			wsp[i__2] = cq;
 		    }
 
 		     // ---  Apply Horner rule ...
@@ -608,17 +533,13 @@ ACM - Transactions On Mathematical Software, 24(1):130-156, 1998
 		    do
 		    {
 			    iused = iodd * iq + (1 - iodd) * ip;
-			    zgemm_("n", "n", &(integer){$SIZE(n)}, &(integer){$SIZE(n)}, &(integer){$SIZE(n)}, &c_b2, &wsp[iused], &(integer){$SIZE(n)}, &wsp[ih2], &(integer){$SIZE(n)}, &c_b1, &
+			    FORTRAN(zgemm)("n", "n", &(integer){$SIZE(n)}, &(integer){$SIZE(n)}, &(integer){$SIZE(n)}, &c_b2, &wsp[iused], &(integer){$SIZE(n)}, &wsp[ih2], &(integer){$SIZE(n)}, &c_b1, &
 				    wsp[ifree], &(integer){$SIZE(n)}, (ftnlen)1, (ftnlen)1);
 			    for (j = 0; j < $SIZE(n); j++) {
 				i__1 = ifree + j  * ($SIZE(n) + 1);
 				i__2 = ifree + j  * ($SIZE(n) + 1);
 				i__3 = k;
-				
-				z__1.r = wsp[i__2].r + wsp[i__3].r;
-				z__1.i = wsp[i__2].i + wsp[i__3].i;
-				wsp[i__1].r = z__1.r;
-				wsp[i__1].i = z__1.i;
+				wsp[i__1] = wsp[i__2] + wsp[i__3];
 			    }
 			    ip = (1 - iodd) * ifree + iodd * ip;
 			    iq = iodd * ifree + (1 - iodd) * iq;
@@ -631,34 +552,31 @@ ACM - Transactions On Mathematical Software, 24(1):130-156, 1998
 		// ---  Obtain (+/-)(I + 2*(p\q)) ...
 		    if (iodd != 0)
 		    {
-			zgemm_("n", "n", &(integer){$SIZE(n)}, &(integer){$SIZE(n)}, &(integer){$SIZE(n)}, &scale, &wsp[iq], &(integer){$SIZE(n)}, &h__[0], &(integer){$SIZE(n)}, &
+			FORTRAN(zgemm)("n", "n", &(integer){$SIZE(n)}, &(integer){$SIZE(n)}, &(integer){$SIZE(n)}, &scale, &wsp[iq], &(integer){$SIZE(n)}, &h__[0], &(integer){$SIZE(n)}, &
 				c_b1, &wsp[ifree], &(integer){$SIZE(n)}, (ftnlen)1, (ftnlen)1);
 			iq = ifree;
 		    }else
 		    {
-			zgemm_("n", "n", &(integer){$SIZE(n)}, &(integer){$SIZE(n)}, &(integer){$SIZE(n)}, &scale, &wsp[ip], &(integer){$SIZE(n)}, &h__[0], &(integer){$SIZE(n)}, &
+			FORTRAN(zgemm)("n", "n", &(integer){$SIZE(n)}, &(integer){$SIZE(n)}, &(integer){$SIZE(n)}, &scale, &wsp[ip], &(integer){$SIZE(n)}, &h__[0], &(integer){$SIZE(n)}, &
 				c_b1, &wsp[ifree], &(integer){$SIZE(n)}, (ftnlen)1, (ftnlen)1);
 			ip = ifree;
 		    }
-		    z__1.r = -1.;
-		    z__1.i = -0.;
-		    zaxpy_(&mm, &z__1, &wsp[ip], &c__1, &wsp[iq], &c__1);
-		    zgesv_(&(integer){$SIZE(n)}, &(integer){$SIZE(n)}, &wsp[iq], &(integer){$SIZE(n)}, ipiv, &wsp[ip], &(integer){$SIZE(n)}, $P(info));
+		    z__1 = -1.;
+		    FORTRAN(zaxpy)(&mm, &z__1, &wsp[ip], &c__1, &wsp[iq], &c__1);
+		    FORTRAN(zgesv)(&(integer){$SIZE(n)}, &(integer){$SIZE(n)}, &wsp[iq], &(integer){$SIZE(n)}, $P(ipiv), &wsp[ip], &(integer){$SIZE(n)}, $P(info));
 
 		    if ($info() == 0) 
 		    {
-			    zdscal_(&mm, &c_b19, &wsp[ip], &c__1);
+			    FORTRAN(zdscal)(&mm, &c_b19, &wsp[ip], &c__1);
 			    for (j = 0; j < $SIZE(n); j++)
 			    {
 				i__2 = ip + j  * ($SIZE(n) + 1);
 				i__3 = ip + j  * ($SIZE(n) + 1);
-
-				wsp[i__2].r = wsp[i__3].r + 1.;
-				wsp[i__2].i = wsp[i__3].i + 0.;
+				wsp[i__2] = wsp[i__3] + 1.;
 			    }
 			    iput = ip;
 			    if ($ns() == 0 && iodd != 0) 
-				zdscal_(&mm, &c_b21, &wsp[ip], &c__1);
+				FORTRAN(zdscal)(&mm, &c_b21, &wsp[ip], &c__1);
 			    else
 			    {
 				// --   squaring : exp(t*H) = (exp(t*H))^(2^ns) ...
@@ -667,39 +585,32 @@ ACM - Transactions On Mathematical Software, 24(1):130-156, 1998
 				    {
 					iget = iodd * ip + (1 - iodd) * iq;
 					iput = (1 - iodd) * ip + iodd * iq;
-					zgemm_("n", "n", &(integer){$SIZE(n)}, &(integer){$SIZE(n)}, &(integer){$SIZE(n)}, &c_b2, &wsp[iget], &(integer){$SIZE(n)}, &wsp[iget], &(integer){$SIZE(n)}, &c_b1, 
+					FORTRAN(zgemm)("n", "n", &(integer){$SIZE(n)}, &(integer){$SIZE(n)}, &(integer){$SIZE(n)}, &c_b2, &wsp[iget], &(integer){$SIZE(n)}, &wsp[iget], &(integer){$SIZE(n)}, &c_b1,
 						&wsp[iput], &(integer){$SIZE(n)}, (ftnlen)1, (ftnlen)1);
 					iodd = 1 - iodd;
 				    }
 			    }
 		    }
 
-   		    i__2 = iput + mm;
+		    i__2 = iput + mm;
 		    i__ = 0;
 		    if ($trace())
 		    {
-		    	// exp(tracen)
-			d__1 = exp(tracen.r);
-		    	tracen.r = d__1 * cos(tracen.i); 
-			tracen.i = d__1 * sin(tracen.i);
-			
+			tracen = cexp(tracen);
 			for (i__1 = iput; i__1 < i__2 ; i__1++)
-		    	{
-				h__[i__].r = tracen.r * wsp[i__1].r - tracen.i * wsp[i__1].i;
-				h__[i__++].i = tracen.r * wsp[i__1].i + tracen.i * wsp[i__1].r;
-		    	}		    
+			{
+				h__[i__++] = tracen * wsp[i__1];
+			}		    
 		    }
 		    else
 		    {
-		    	for (i__1 = iput; i__1 < i__2 ; i__1++)
-		    	{
-				h__[i__].r = wsp[i__1].r;
-				h__[i__++].i = wsp[i__1].i;
-		    	}
+			for (i__1 = iput; i__1 < i__2 ; i__1++)
+			{
+				h__[i__++] = wsp[i__1];
+			}
 		    }
 	    }
 	    free(wsp);
-	    free(ipiv);
 ',
 );
 
@@ -716,17 +627,17 @@ Manchester, England, January 1999. It\'s available at http://www.ma.man.ac.uk/~h
 If uplo is true, A is lower triangular.
 
 ',
-       	  GenericTypes => [D],
+	  GenericTypes => [D],
           Code => '
-          dcomplex *cb, *ca;
-          dcomplex s, snum, sdenum;
+          PDL_CDouble *cb, *ca;
+          PDL_CDouble s, snum, sdenum;
           double *b;
           double tt, dn;
           integer i, j, k, l, ind, ind1, ind2;
 
-	ca = (dcomplex *) $P(A);
+	ca = (PDL_CDouble *) $P(A);
 	b = (void *)$P(B);
-	cb = (dcomplex *) $P(B);
+	cb = (PDL_CDouble *) $P(B);
 
 #define subscr(a_1,a_2)\
 	($uplo()) ? (a_2) * $SIZE(n) + (a_1) : (a_1) * $SIZE(n) + (a_2)
@@ -739,54 +650,48 @@ If uplo is true, A is lower triangular.
 
   for (i = 0; i < $SIZE(n); i++){
 	ind = subscr(i,i);
-	CSQRT(ca[ind].r, ca[ind].i, cb[ind].r, cb[ind].i)
+	cb[ind] = csqrt(ca[ind]);
   }
 
   for (k = 0; k < $SIZE(n)-1; k++)
     {
       for (i = 0; i < $SIZE(n)-(k+1); i++)
 	{
- 		j = i + k + 1;
+		j = i + k + 1;
 		ind = subscr(i,j);
-		s.r = 0;
-		s.i = 0;
+		s = 0;
 
 	  for (l = i+1; l < j; l++)
 	  {
-	  	ind1 = subscr(i,l);
-	  	ind2 =  subscr(l,j);
-	  	s.r += cb[ind1].r * cb[ind2].r - cb[ind1].i * cb[ind2].i;
-	  	s.i += cb[ind1].r * cb[ind2].i + cb[ind1].i * cb[ind2].r; 
+		ind1 = subscr(i,l);
+		ind2 =  subscr(l,j);
+		s += cb[ind1] * cb[ind2];
 	  }
 
 	  ind1 = subscr(i,i);
-  	  ind2 =  subscr(j,j);
-	  sdenum.r = cb[ind1].r + cb[ind2].r;
-	  sdenum.i = cb[ind1].i + cb[ind2].i;
-	  snum.r = ca[ind].r - s.r;
-	  snum.i = ca[ind].i - s.i;
+	  ind2 =  subscr(j,j);
+	  sdenum = cb[ind1] + cb[ind2];
+	  snum = ca[ind] - s;
 
-           if (fabs (sdenum.r) > fabs (sdenum.i))
+           if (fabs (creal(sdenum)) > fabs (cimag(sdenum)))
              {
-               if (sdenum.r == 0){
-               		$info() = -1;
-               		goto ENDCTRSQRT;
+               if (creal(sdenum) == 0){
+		$info() = -1;
+			goto ENDCTRSQRT;
 		}
-	       tt = sdenum.i / sdenum.r;
-               dn = sdenum.r + tt * sdenum.i;
-               cb[ind].r = (snum.r + tt * snum.i) / dn;
-       	       cb[ind].i = (snum.i - tt * snum.r) / dn;
+	       tt = cimag(sdenum) / creal(sdenum);
+               dn = creal(sdenum) + tt * cimag(sdenum);
+               cb[ind] = (snum + tt * (-I * snum)) / dn;
              }
            else
              {
-               if (sdenum.i == 0){
-               		$info() = -1;
-               		goto ENDCTRSQRT;
+               if (cimag(sdenum) == 0){
+			$info() = -1;
+			goto ENDCTRSQRT;
 		}
-               tt = sdenum.r / sdenum.i;
-               dn = sdenum.r * tt + sdenum.i;
-               cb[ind].r = (snum.r * tt + snum.i) / dn;
-               cb[ind].i = (snum.i * tt - snum.r) / dn;
+               tt = creal(sdenum) / cimag(sdenum);
+               dn = creal(sdenum) * tt + cimag(sdenum);
+               cb[ind] = (snum * tt + (-I * snum)) / dn;
              }
 	}
     }
@@ -797,11 +702,11 @@ ENDCTRSQRT:
 );
 
 pp_addhdr('
-void dfunc_wrapper(dcomplex *p, integer n, SV* dfunc);
+void dfunc_wrapper(PDL_CDouble *p, integer n, SV* dfunc);
 ');
 
 pp_defc('trfun',
-        Pars => '[io]A(2,n,n);int uplo();[o] B(2,n,n);int [o]info()',
+        Pars => '[io]A(2,n,n);int uplo();[o] B(2,n,n);int [o]info(); complex [t]diag(n);',
 	OtherPars => "SV* func" ,
 	Doc => '
 =for ref
@@ -809,20 +714,19 @@ pp_defc('trfun',
 Apply an arbitrary function to a complex triangular matrix. Uses a recurrence of Parlett.
 If uplo is true, A is lower triangular.
 ',
-       	  GenericTypes => [D],
+	  GenericTypes => [D],
           Code => '
-          dcomplex *cb, *ca, *diag;
-          dcomplex s, snum, sdenum;
+          PDL_CDouble *cb, *ca;
+          PDL_CDouble s, snum, sdenum;
           double *b;
           double tt, dn;
           integer i, j, k, l, p, ind, ind1, ind2, tmp, c__1;
-          extern double zdotu_(double *ret, integer *n, double *dx, integer *incx, double *dy,
+          extern double FORTRAN(zdotu)(PDL_CDouble *ret, integer *n, PDL_CDouble *dx, integer *incx, PDL_CDouble *dy,
 			integer *incy);
-	diag = (dcomplex *) malloc ($SIZE(n) * sizeof(dcomplex));
 
-	ca = (dcomplex *) $P(A);
+	ca = (PDL_CDouble *) $P(A);
 	b = (double *)$P(B);
-	cb = (dcomplex *) $P(B);
+	cb = (PDL_CDouble *) $P(B);
 	c__1 = 1;
 
 #define subscr(a_1,a_2) \
@@ -830,24 +734,17 @@ If uplo is true, A is lower triangular.
 
 	$info() = 0;
 	ind = $SIZE(n) * $SIZE(n) * 2;
-
 	for (i = 0; i < ind;i++)
 		b[i] = 0;
 
-	for (i = 0; i < $SIZE(n);i++)
-	{
-		ind = subscr(i,i);
-		diag[i].r = ca[ind].r;
-		diag[i].i = ca[ind].i;
-	}
+	loop (n) %{
+		$diag() = ca[subscr(n,n)];
+	%}
 
-	dfunc_wrapper(diag, $SIZE(n), $COMP(func));
-	for (i = 0; i < $SIZE(n); i++)
-	{
-		ind = subscr(i,i);
-		cb[ind].r = diag[i].r;
-		cb[ind].i = diag[i].i;
-	}
+	dfunc_wrapper($P(diag), $SIZE(n), $COMP(func));
+	loop (n) %{
+		cb[subscr(n,n)] = $diag();
+	%}
 
 	for (p = 1; p < $SIZE(n); p++)
 	{
@@ -858,79 +755,59 @@ If uplo is true, A is lower triangular.
 			//$s = $T(,($j),($i))->Cmul($F(,($j),($j))->Csub($F(,($i),($i))));
 			ind1 = subscr(i,i);
 			ind2 = subscr(j,j);
-			s.r = cb[ind2].r - cb[ind1].r;
-			s.i = cb[ind2].i - cb[ind1].i;
 			ind = subscr(j,i);
-		  	CMULT(ca[ind].r, ca[ind].i, s.r, s.i, snum.r, snum.i)
-		  	s.r = snum.r;
-		  	s.i = snum.i;
-
+			s = snum = ca[ind] * (cb[ind2] - cb[ind1]);
 			if (i < (j-1))
 			{
-                                //$s = $s + $T(,$i+1:$j-1,($i))->cdot(1, $F(,($j), $i+1:$j-1),1)->Csub($F(,$i+1:$j-1,($i))->cdot(1,$T(,($j), $i+1:$j-1),1));			
-				
+                                //$s = $s + $T(,$i+1:$j-1,($i))->cdot(1, $F(,($j), $i+1:$j-1),1)->Csub($F(,$i+1:$j-1,($i))->cdot(1,$T(,($j), $i+1:$j-1),1));
 				// $T(,$i+1:$j-1,($i))->cdot(1, $F(,($j), $i+1:$j-1),1)
 				l = 0;
 				for(k = i+1; k < j; k++)
-				{
-					ind = subscr(j,k);
-					diag[l].r = cb[ind].r;
-					diag[l++].i = cb[ind].i;
-				}
+					$diag(n=>l++) = cb[subscr(j,k)];
 				ind = subscr(i+1,i);
                                 // TODO : Humm
-				zdotu_(&s.r, &l, &ca[ind].r, &c__1, &diag[0].r, &c__1);
-				snum.r += s.r; 
-				snum.i += s.i;
+				FORTRAN(zdotu)(&s, &l, &ca[ind], &c__1, $P(diag), &c__1);
+				snum += s;
 
 				// $F(,$i+1:$j-1,($i))->cdot(1,$T(,($j), $i+1:$j-1),1)
 				l = 0;
 				for(k = i+1; k < j; k++)
-				{
-					ind = subscr(j,k);
-					diag[l].r = ca[ind].r;
-					diag[l++].i = ca[ind].i;
-				}
+					$diag(n=>l++) = ca[subscr(j,k)];
 				ind = subscr(i+1,i);
                                 // TODO : Humm
-				zdotu_(&s.r, &l, &cb[ind].r, &c__1, &diag[0].r, &c__1);
-				snum.r -= s.r; 
-				snum.i -= s.i;
+				FORTRAN(zdotu)(&s, &l, &cb[ind], &c__1, $P(diag), &c__1);
+				snum -= s;
 				ind = subscr(j,i);
 			}
 
-		  	//$sdenum = $T(,($j),($j))->Csub($T(,($i),($i)));
-			sdenum.r = ca[ind2].r - ca[ind1].r;
-			sdenum.i = ca[ind2].i - ca[ind1].i;
+			//$sdenum = $T(,($j),($j))->Csub($T(,($i),($i)));
+			sdenum = ca[ind2] - ca[ind1];
 
 			//$s = $s / $sdenum;
-			if (fabs (sdenum.r) > fabs (sdenum.i))
+			if (fabs (creal(sdenum)) > fabs (cimag(sdenum)))
 			{
-				if (sdenum.r == 0)
+				if (creal(sdenum) == 0)
 				{
 					$info() = -1;
 					goto ENDCTRFUN;
 				}
-				tt = sdenum.i / sdenum.r;
-				dn = sdenum.r + tt * sdenum.i;
-				cb[ind].r = (snum.r + tt * snum.i) / dn;
-				cb[ind].i = (snum.i - tt * snum.r) / dn;
+				tt = cimag(sdenum) / creal(sdenum);
+				dn = creal(sdenum) + tt * cimag(sdenum);
+				cb[ind] = (snum + tt * (-I * snum)) / dn;
 			}
 			else
 			{
-				if (sdenum.i == 0)
+				if (cimag(sdenum) == 0)
 				{
 					$info() = -1;
 					goto ENDCTRFUN;
 				}
-				tt = sdenum.r / sdenum.i;
-				dn = sdenum.r * tt + sdenum.i;
-				cb[ind].r = (snum.r * tt + snum.i) / dn;
-				cb[ind].i = (snum.i * tt - snum.r) / dn;
+				tt = creal(sdenum) / cimag(sdenum);
+				dn = creal(sdenum) * tt + cimag(sdenum);
+				cb[ind] = (snum * tt + (-I * snum)) / dn;
 			}
 		}
 	}
-	free(diag);
 ENDCTRFUN:
 	;
 #undef subscr
@@ -1858,8 +1735,8 @@ Function will be applied on a PDL::Complex object.
  my $a = random(10,10);
  my $fun = mfun($a,'cos');
  sub sinbycos2{
- 	$_[0]->set_inplace(0);
- 	$_[0] .= $_[0]->Csin/$_[0]->Ccos**2;
+	$_[0]->set_inplace(0);
+	$_[0] .= $_[0]->Csin/$_[0]->Ccos**2;
  }
  # Try diagonalization
  $fun = mfun($a, \&sinbycos2,1);

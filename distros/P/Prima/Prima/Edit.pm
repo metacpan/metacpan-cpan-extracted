@@ -262,7 +262,8 @@ sub reset
 			my $j = 0;
 			for my $line ( @{$self-> {lines}})
 			{
-				my $breaks = $self-> text_wrap( $line, $size[0], $twOpts, $ti);
+				my @glyphs = $self-> text_shape( $line ) || ();
+				my $breaks = $self-> text_wrap( $line, $size[0], $twOpts, $ti, 0, -1, @glyphs);
 				for (my $i = 0; $i < @$breaks; $i+=2) {
 					my @chunk = ( undef ) x CM_SIZE;
 					$chunk[CM_CHAR_OFS] = $$breaks[$i];
@@ -946,13 +947,9 @@ sub on_keydown
 		my $l = 0;
 
 		my $chr = chr $code;
-		my ($curpos, $advance);
 		utf8::upgrade($chr) if $mod & km::Unicode;
 		my $ll = $self-> get_chunk_cluster_length($cs[1]);
-		if ( $cs[0] > $ll ) {
-			$l = $curpos - length( $c);
-			$c .= ' ' x $l;
-		}
+		$c .= ' ' x ($cs[0] - $ll) if $cs[0] > $ll;
 		my $s = $self->get_shaped_chunk($cs[1]);
 		my ($new_text, $new_offset) = $self->handle_bidi_input(
 			action     => (($block || $self->insertMode) ? q(insert) : q(overtype)),
@@ -1770,16 +1767,15 @@ sub get_chunk_dimension
 sub visual_to_physical
 {
 	my ( $self, $x, $y) = @_;
+	$x = 0 if $x < 0;
 
 	return $self-> get_shaped_chunk($y)->cluster2index($x) & ~to::RTL
 		unless $self-> {wordWrap};
 
 	my $cm = $self->{chunkMap};
-	my ($chunks, $px, $ly);
-	(undef, $ly) = $self-> visual_to_logical(undef, $y);
-	($ly, $chunks) = $self-> get_chunk_dimension($ly);
-	$x = 0 if $x < 0;
-	for ( my $i = 0; $i < $chunks; $i++) {
+	my ($ly, $chunks) = $self-> get_line_dimension($y);
+	my ($px, $i);
+	for ( $i = 0; $i < $chunks; $i++) {
 		$px = $$cm[($ly + $i) * CM_SIZE + CM_CHAR_OFS];
 		my $n_clusters = $self-> get_chunk_cluster_length( $ly + $i );
 		last if $x < $n_clusters;
@@ -1790,7 +1786,7 @@ sub visual_to_physical
 		$x -= $n_clusters;
 	}
 
-	return $px + $self-> get_shaped_chunk($ly)->cluster2index($x) & ~to::RTL;
+	return $px + $self-> get_shaped_chunk($ly + $i)->cluster2index($x) & ~to::RTL;
 }
 
 sub logical_to_physical
@@ -2215,17 +2211,19 @@ sub set_line
 	$self-> begin_undo_group;
 	$self-> push_undo_action( 'set_line', $y, $self-> {lines}-> [$y]);
 	if ( $self-> {wordWrap}) {
+		my @glyphs = $self-> text_shape( $line ) || ();
 		my $breaks = $self-> text_wrap(
 			$line,
 			$sz[0] - $self-> {defcw},
 			tw::WordBreak|tw::CalcTabs|tw::NewLineBreak|tw::ReturnChunks,
-			$self-> {tabIndent}
+			$self-> {tabIndent},
+			0, -1, @glyphs
 		);
 		my @chunkMap;
 		( undef, $ry) = $self-> physical_to_logical( 0, $y);
 		my ($ix, $cm) = ( $ry * CM_SIZE + CM_Y, $self-> {chunkMap});
 		my $max_ix = $self-> {maxChunk} * CM_SIZE + CM_Y;
-		$oldDim++, $ix += CM_SIZE while $ix <= $max_ix && $$cm[$ix + CM_Y] == $y;
+		$oldDim++, $ix += CM_SIZE while $ix <= $max_ix && $$cm[$ix] == $y;
 		$newDim = scalar @{$breaks} / 2;
 		my $i;
 		for (my $i = 0; $i < @$breaks; $i+=2) {
@@ -2809,27 +2807,28 @@ sub split_line
 {
 	my $self = $_[0];
 	my @cs = $self-> cursor;
-	my $to = $self->get_shaped_chunk($cs[1])->cursor2offset($cs[0], $self->textDirection);
-	my $c = $self-> get_line( $cs[1]);
-	$c .= ' 'x($to-length($c)) if length($c) < $to;
-	my ( $old, $new) = ( substr( $c, 0, $to), substr( $c, $to, length( $c) - $to));
+	my $to = $self-> visual_to_physical(@cs);
+	my $c  = $self-> get_line($cs[1]);
+	$c .= ' ' x ($to - length($c)) if length($c) < $to;
+	my ( $old, $new) = ( substr( $c, 0, $to), substr( $c, $to, length($c) - $to));
+	my $cm = $self->{chunkMap};
 	$self-> lock_change(1);
 	$self-> begin_undo_group;
-	$self-> set_line( $cs[1], $old, q(delete), $to, length( $c) - $to);
+	$self-> set_line( $cs[1], $old, q(delete), $to, length($c) - $to);
 	my $cshift = 0;
 	if ( $self-> {autoIndent}) {
 		my $i = 0;
 		my $add = '';
-		for ( $i = 0; $i < length( $old); $i++) {
+		for ( $i = 0; $i < length($old); $i++) {
 			my $c = substr( $old, $i, 1);
 			last if $c ne ' ' and $c ne '\t';
 			$add .= $c;
 		}
-		$new = $add.$new, $cshift = length( $add)
-			if length( $add) < length( $old);
+		$new = $add.$new, $cshift = length($add)
+			if length($add) < length($old);
 	}
 	$self-> insert_line( $cs[1]+1, $new);
-	$self-> cursor( $cshift, $cs[1] + 1);
+	$self-> cursor( $self-> physical_to_visual( $cshift, $cs[1] + 1), $cs[1] + 1);
 	$self-> end_undo_group;
 	$self-> lock_change(0);
 }
@@ -3567,6 +3566,15 @@ Not used in the class, however, used in L<Prima::Dialog::FindDialog>.
 Returns chunk of text, located at CHUNK_ID.
 Returns empty string if chunk is nonexistent.
 
+=item get_chunk_cluster_length CHUNK_ID
+
+Return length of a chunk in clusters
+
+=item get_chunk_dimension CHUNK_ID
+
+Finds the line number the CHUNK_ID belongs to, return first chunk of that line and
+how many chunks the line occupies.
+
 =item get_chunk_width TEXT, FROM, LENGTH, [ RETURN_TEXT_PTR ]
 
 Returns the width in pixels of C<substr( TEXT, FROM, LENGTH)>.  If FROM is
@@ -3578,6 +3586,10 @@ pointer is specified, the converted TEXT is stored there.
 
 Returns line of text, located at INDEX.
 Returns empty string if line is nonexistent.
+
+=item get_line_cluster_length LINE_ID
+
+Return length of a line in clusters
 
 =item get_line_dimension INDEX
 

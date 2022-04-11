@@ -1,56 +1,43 @@
-
-use blib;
-use Carp;
-
-$SIG{__DIE__} = sub {die Carp::longmess(@_);};
-
+use strict;
+use warnings;
 use PDL;
 use PDL::Graphics::TriD;
-use PDL::Graphics::TriD::Image;
-use PDL::IO::Pic;
-
 use PDL::Graphics::TriD::Graph;
-use PDL::Graphics::OpenGL;
 
-$g = new PDL::Graphics::TriD::Graph();
-$g->default_axes();
-
-$x = PDL->zeroes(3,1000);
-random($x->inplace);
-
-$g->add_dataseries(new PDL::Graphics::TriD::Points($x,$x),"pts");
-$g->bind_default("pts");
-
-$y = PDL->zeroes(3,30,30);
-axisvalues($b->slice("(0)"));
-axisvalues($b->slice("(1)")->transpose);
-
-$y /= 30;
-
+my $size = 30;
+my $y = PDL->zeroes(3,$size,$size);
+axisvalues($y->slice("(0)")->inplace);
+axisvalues($y->slice("(1)")->transpose->inplace);
+$y /= $size;
 random($y->slice("(2)")->inplace);
-
-($tmp = $y->slice("(2)")) /= 5; $tmp += 2;
-
-$c = PDL->zeroes(3,30,30);
+(my $tmp = $y->slice("(2)")) /= 5;
+my $c = PDL->zeroes(3,$size,$size);
 random($c->inplace);
 
-$g->add_dataseries(new PDL::Graphics::TriD::SLattice($y,$c),"slat");
-$g->bind_default("slat");
+my @objs = (
+  ['Lattice'],
+  ['SCLattice'],
+  ['SLattice'],
+  ['SLattice_S', {Smooth=>0}],
+  ['SLattice_S'],
+);
+my $i = 0;
+@objs = map [$i++, @$_], @objs;
+my ($below_obj, $above_obj) = map [$_, 'Lines'], -1, 0+@objs;
 
-# $g->add_dataseries(new PDL::Graphics::TriD::Lattice($y,(PDL->pdl(0,0,0)->dummy(1)->dummy(1))),
-# 	"blat");
-# $g->bind_default("blat");
+sub mk_trid { "PDL::Graphics::TriD::$_[1]"->new($y+pdl(0,0,$_[0]),$c,$_[2]) }
 
-$g->add_dataseries(new PDL::Graphics::TriD::SCLattice($y+1,$c->slice(":,0:-2,0:-2")),
-	"slat2");
-$g->bind_default("slat2");
-
-$g->scalethings();
-
-$win = PDL::Graphics::TriD::get_current_window();
-$win->clear_objects();
-$win->add_object($g);
-
-$win->twiddle();
-
-
+my $win = PDL::Graphics::TriD::get_current_window();
+my $g = PDL::Graphics::TriD::Graph->new;
+my @all = [map mk_trid(@$_), $below_obj, @objs, $above_obj];
+push @all, map [map mk_trid(@$_), $below_obj, $_, $above_obj], @objs;
+for my $these (@all) {
+  $g->clear_data;
+  $win->clear_viewport;
+  $g->default_axes;
+  $g->add_dataseries($_) for @$these;
+  $g->scalethings;
+  $win->clear_objects;
+  $win->add_object($g);
+  $win->twiddle;
+}

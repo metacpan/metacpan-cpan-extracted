@@ -141,15 +141,10 @@ Demos/General.pm
 Demos/Makefile.PL
 Demos/t/demos.t
 Demos/Transform_demo.pm
-Demos/TriD/mandel.pl
-Demos/TriD/test3.p
 Demos/TriD/test4.p
 Demos/TriD/test5.p
 Demos/TriD/test7.p
-Demos/TriD/test9.p
 Demos/TriD/testimg.p
-Demos/TriD/testvib.p
-Demos/TriD/tmathgraph.p
 Demos/TriD/tvrml.p
 Demos/TriD/tvrml2.p
 Demos/TriD1.pm
@@ -290,7 +285,6 @@ Graphics/TriD/TriD/ButtonControl.pm
 Graphics/TriD/TriD/Contours.pm
 Graphics/TriD/TriD/Control3D.pm
 Graphics/TriD/TriD/GL.pm
-Graphics/TriD/TriD/GoBoard.pm
 Graphics/TriD/TriD/Graph.pm
 Graphics/TriD/TriD/Image.pm
 Graphics/TriD/TriD/Labels.pm
@@ -303,6 +297,7 @@ Graphics/TriD/TriD/Objects.pm
 Graphics/TriD/TriD/OOGL.pm
 Graphics/TriD/TriD/Polygonize.pm
 Graphics/TriD/TriD/Quaternion.pm
+Graphics/TriD/TriD/ScrollButtonScaler.pm
 Graphics/TriD/TriD/SimpleScaler.pm
 Graphics/TriD/TriD/Surface.pm
 Graphics/TriD/TriD/TextObjects.pm
@@ -657,7 +652,9 @@ Libtmp/t/func.t
 Libtmp/Transform/Cartography/Cartography.pm
 Libtmp/Transform/Cartography/earth_coast.vec.fits
 Libtmp/Transform/Cartography/earth_day.jpg
+Libtmp/Transform/Cartography/earth_height-2048x1024.jpg
 Libtmp/Transform/Cartography/earth_night.jpg
+Libtmp/Transform/Cartography/earth_water-2048x1024.png
 Libtmp/Transform/Cartography/Makefile.PL
 Libtmp/Transform/Makefile.PL
 Libtmp/Transform/Proj4/Makefile.PL

@@ -37,9 +37,42 @@ SKIP: {
    $map->badflag(1);
    my $checksum = unpack "%16C*", ${$map->get_dataref};
    my $goodcheck = 56639;
-   if ($checksum != $goodcheck) {
-      skip "earth_image() map has bad checksum: $checksum (expected $goodcheck)", 22;
-   }
+   skip "earth_image() map has bad checksum: $checksum (expected $goodcheck)", 22
+     if $checksum != $goodcheck;
+
+   my $got = t_raster2float()->apply($map->mv(2,0));
+   $got = $got->slice(':,500:501,200:201');
+   ok all(approx $got, pdl(float, <<'EOF'), 1e-5), 't_raster2float' or diag 'got: ', $got;
+[
+ [
+  [  -1.60686  -0.956604 0.00784314  0.0705882   0.305882]
+  [  -1.60379  -0.956604 0.00784314  0.0705882   0.305882]
+ ]
+ [
+  [  -1.60686  -0.953533 0.00784314  0.0705882   0.305882]
+  [  -1.60379  -0.953533 0.00784314  0.0705882   0.305882]
+ ]
+]
+EOF
+
+   my $shape = earth_shape();
+   $got = t_raster2float()->apply($shape->mv(2,0));
+   my $lonlatradius = $got->slice('0:2'); # r g b all same
+   $lonlatradius->slice('(2)') *= float((6377.09863 - 6370.69873) / 6371);
+   $lonlatradius->slice('(2)') += float(6370.69873 / 6371);
+   $got = $lonlatradius->slice(':,500:501,200:201');
+   ok all(approx $got, pdl(float, <<'EOF'), 1e-5), 'earth_shape' or diag 'got: ', $got;
+[
+ [
+  [ -1.60686 -0.956604  0.999953]
+  [ -1.60379 -0.956604  0.999953]
+ ]
+ [
+  [ -1.60686 -0.953533  0.999953]
+  [ -1.60379 -0.953533  0.999953]
+ ]
+]
+EOF
 
    my $map_size = [500,500];
 

@@ -624,22 +624,39 @@ get_dataref(self)
 	CODE:
 	if(self->state & PDL_DONTTOUCHDATA)
 	  croak("Trying to get dataref to magical (mmaped?) pdl");
+	PDLDEBUG_f(printf("get_dataref %p\n", self));
 	pdl_barf_if_error(pdl_make_physical(self)); /* XXX IS THIS MEMLEAK WITHOUT MORTAL? */
 	if (!self->datasv) {
+	  PDLDEBUG_f(printf("get_dataref no datasv\n"));
 	  self->datasv = newSVpvn("", 0);
 	  (void)SvGROW((SV *)self->datasv, self->nbytes);
+	  SvCUR_set((SV *)self->datasv, self->nbytes);
+	  memmove(SvPV_nolen((SV*)self->datasv), self->data, self->nbytes);
 	}
 	RETVAL = newRV(self->datasv);
+	PDLDEBUG_f(printf("get_dataref end: "); pdl_dump(self));
 	OUTPUT:
 	RETVAL
 
 void
-upd_data(self)
+upd_data(self, keep_datasv=0)
 	pdl *self
+	IV keep_datasv
 	CODE:
 	if(self->state & PDL_DONTTOUCHDATA)
 	  croak("Trying to touch dataref of magical (mmaped?) pdl");
-       self->data = SvPV_nolen((SV*)self->datasv);
+	PDLDEBUG_f(printf("upd_data: "); pdl_dump(self));
+	if (keep_datasv || !PDL_USESTRUCTVALUE(self)) {
+	  self->data = SvPV_nolen((SV*)self->datasv);
+	} else if (self->datasv) {
+	  PDLDEBUG_f(printf("upd_data zap datasv\n"));
+	  memmove(self->data, SvPV_nolen((SV*)self->datasv), self->nbytes);
+	  SvREFCNT_dec(self->datasv);
+	  self->datasv = NULL;
+	} else {
+	  PDLDEBUG_f(printf("upd_data datasv gone, maybe reshaped\n"));
+	}
+	PDLDEBUG_f(printf("upd_data end: "); pdl_dump(self));
 
 void
 set_dataflow_f(self,value)
@@ -894,6 +911,7 @@ broadcastover(...)
 	croak("Not enough dimension info to create pdls");
     PDLDEBUG_f(for (i=0;i<npdls;i++) { printf("pdl %d ",i); pdl_dump(pdls[i]); });
     PDL_CLRMAGIC(&pdl_brc);
+    pdl_brc.gflags = 0; /* avoid uninitialised value use below */
     pdl_barf_if_error(pdl_initbroadcaststruct(0,pdls,realdims,creating,npdls,
 			NULL,&pdl_brc,NULL,NULL,NULL, 1));
     for(i=0, nc=npdls; i<npdls; i++)  /* create as necessary */

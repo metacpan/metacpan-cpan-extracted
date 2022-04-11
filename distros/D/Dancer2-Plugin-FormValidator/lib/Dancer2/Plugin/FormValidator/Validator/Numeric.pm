@@ -18,7 +18,7 @@ sub message {
 sub validate {
     my ($self, $field, $input) = @_;
 
-    if (exists $input->{$field}) {
+    if ($self->_field_defined_and_non_empty($input->{$field})) {
         return looks_like_number($input->{$field});
     }
 

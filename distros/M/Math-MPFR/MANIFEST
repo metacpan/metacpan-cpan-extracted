@@ -83,6 +83,7 @@ t/overload_cmp_q.t
 t/overload_cmp_z.t
 t/overload_cross_class.t
 t/overload_float128.t
+t/overload_shift.t
 t/overload_switch.t
 t/P_specifier.t
 t/pod.t

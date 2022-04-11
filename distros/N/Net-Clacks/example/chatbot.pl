@@ -7,9 +7,13 @@ use diagnostics;
 use mro 'c3';
 use English;
 use Carp;
-our $VERSION = 22;
-use Fatal qw( close );
+our $VERSION = 23;
+use autodie qw( close );
 use Array::Contains;
+use utf8;
+use Encode qw(is_utf8 encode_utf8 decode_utf8);
+use feature 'signatures';
+no warnings qw(experimental::signatures);
 #---AUTOPRAGMAEND---
 
 use Net::Clacks::Client;
@@ -22,7 +26,7 @@ my $password = 'unsafepassword';
 my $applicationname = 'chatbot';
 my $is_caching = 0;
 
-my $chat = Net::Clacks::Client->new('127.0.0.1', 18888, $username, $password, $applicationname, $is_caching);
+my $chat = Net::Clacks::Client->new('127.0.0.1', 49888, $username, $password, $applicationname, $is_caching);
 #print 'Connected to server. Info given: ', $chat->getServerinfo(), "\n";
 
 my $chatname = 'example::chat';

@@ -20,12 +20,12 @@ sv_setsv( GvSV( PL_errgv), NULL_SV)
 if ( errSave) sv_catsv( GvSV( PL_errgv), errSave);\
 if ( errSave) sv_free( errSave)
 
-extern long   apcError;
 extern List   postDestroys;
 extern int    recursiveCall;
 extern PHash  primaObjects;
 extern SV *   eventHook;
 extern Bool   use_fribidi;
+extern int    use_libthai;
 
 #define CORE_INIT_TRANSIENT(cls) ((PObject)self)->transient_class = (void*)C##cls
 
@@ -46,12 +46,21 @@ extern Bool prima_accel_notify ( Handle group, Handle self, PEvent event);
 extern Bool prima_font_notify ( Handle self, Handle child, void * font);
 extern Bool prima_find_accel( Handle self, Handle item, int * key);
 extern Bool prima_single_color_notify ( Handle self, Handle child, void * color);
-extern Bool prima_kill_all_objects( Handle self, Handle child, void * dummy);
 
 extern void  prima_init_font_mapper(void);
 extern void  prima_cleanup_font_mapper(void);
 extern PFont prima_font_mapper_save_font(const char * name, unsigned int style);
 extern PFont prima_font_mapper_get_font(unsigned int fid );
+
+#define pfmaGetCount      0
+#define pfmaIsActive      1
+#define pfmaPassivate     2
+#define pfmaActivate      3
+#define pfmaIsEnabled     4
+#define pfmaEnable        5
+#define pfmaDisable       6
+#define pfmaGetIndex      7
+extern int   prima_font_mapper_action(int action, PFont font);
 
 #ifdef __cplusplus
 }

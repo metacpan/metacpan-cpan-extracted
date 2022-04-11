@@ -4,7 +4,6 @@
 
 #include "ppport.h"
 
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -20,6 +19,7 @@
 #include <openssl/pem.h>
 #include <openssl/pkcs12.h>
 
+#include "basefunc.c"
 
 MODULE = Crypt::OpenSSL::Base::Func		PACKAGE = Crypt::OpenSSL::Base::Func		
 
@@ -38,16 +38,36 @@ int EC_POINT_get_affine_coordinates(const EC_GROUP *group, const EC_POINT *p, BI
 
 char *EC_POINT_point2hex(const EC_GROUP *group, const EC_POINT *p, point_conversion_form_t form, BN_CTX *ctx)
 
-EC_POINT *EC_POINT_hex2point(const EC_GROUP *group, const char *hex, EC_POINT *p, BN_CTX *ctx)
+EC_POINT* EC_POINT_hex2point(const EC_GROUP *group, const char *hex, EC_POINT *p, BN_CTX *ctx)
 
 const BIGNUM *EC_KEY_get0_private_key(const EC_KEY *key);
 
+EVP_PKEY* EVP_PKEY_new();
+
+int EVP_PKEY_assign_EC_KEY(EVP_PKEY *pkey, EC_KEY *key);
+
+EC_KEY *EVP_PKEY_get1_EC_KEY(EVP_PKEY *pkey);
 
 const EVP_MD *EVP_get_digestbyname(const char *name)
 
 int EVP_MD_size(const EVP_MD *md)
 
 int EVP_MD_block_size(const EVP_MD *md)
+
+int EC_KEY_set_private_key(EC_KEY *key, const BIGNUM *prv);
+
+
+
+int ecdh_pkey(EVP_PKEY *pkey_priv, EVP_PKEY *pkey_peer_pub, unsigned char **z)
+
+
+EVP_PKEY* evp_pkey_from_point_hex(EC_GROUP* group, char* point_hex, BN_CTX* ctx)
+
+EVP_PKEY* evp_pkey_from_priv_hex(EC_GROUP* group, char* priv_hex)
+
+int pem_write_evp_pkey(char* dst_fname, EVP_PKEY* pkey, int is_priv)
+
+EVP_PKEY* pem_read_pkey(char* keyfile, int is_priv)
 
 
 EC_POINT*
@@ -114,23 +134,11 @@ ecdh(local_priv_pem, peer_pub_pem)
     //printf("\nRead Peer PUBKEY Key:\n");
     //PEM_write_PUBKEY(stdout, peer_pubkey);
 
+    zlen = ecdh_pkey(pkey, peer_pubkey, &z);
 
-    EVP_PKEY_CTX *ctx;
-    ctx = EVP_PKEY_CTX_new(pkey, NULL);
+    res = newSVpv(z, zlen);
 
-    EVP_PKEY_derive_init(ctx);
-
-    EVP_PKEY_derive_set_peer(ctx, peer_pubkey);
-
-    EVP_PKEY_derive(ctx, NULL, &zlen);
-
-    z = OPENSSL_malloc(zlen);
-
-    EVP_PKEY_derive(ctx, z, &zlen);
-
-  res = newSVpv(z, zlen);
-
-      RETVAL = res;
+    RETVAL = res;
 }
   OUTPUT:
     RETVAL

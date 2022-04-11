@@ -1,8 +1,16 @@
 Revision history for Google-ProtocolBuffers-Dynamic
 
-0.36      2022-03-28 21:45:35 CEST
+0.38      2022-04-08 19:23:52 CEST
 
-0.36
+    - Compilation fix for non-threaded Perl
+
+0.37      2022-04-08 19:09:43 CEST
+
+    - Add option to control how boolean values are mapped to Perl scalars
+    - Fix bug in the logic to ignore well-known types imported using a
+      non-standard path
+
+0.36      2022-03-28 21:45:35 CEST
 
     - When a serialized protobuf descriptor includes descriptors for
       well-known types, ignore them even when imported using a non-standard

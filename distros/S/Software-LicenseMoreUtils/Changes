@@ -1,3 +1,11 @@
+1.006 2022-04-10
+
+  * new_from_short_name() can now create license object from
+    SPDX v3 identifiers. I.e using short names like GPL-2.0-only
+    or LGPL-2.1-or-later.
+  * add spdx_expression to LGPL_2
+  * require recent Test::More
+
 1.005 2020-11-15
 
   * document that GPL licenses with "or any later version" are

@@ -365,5 +365,61 @@ EOT
   is_deeply($obj->eq_ids, {}, 'eq_ids()');
 }
 
+{
+  note("Element names with heading dash");
+  my $obj = Text::Table::Read::RelationOn::Tiny->new();
+      my $input = <<'EOT';
+
+| x\y   | this | that |-blah   |-    |
+|-------+------+------+--------+-----|
+| this  | X    |      | X      |  X  |
+|-------+------+------+--------+-----|
+| that  |      |      | X      |     |
+|-------+------+------+--------+-----|
+| -blah |      | X    |        |     |
+|-------+------+------+--------+-----|
+| -     |      |      |        |     |
+|-------+------+------+--------+-----|
+
+EOT
+#Don't append a semicolon to the line above!
+
+    my $expected = [{
+                     1 => {
+                           2 => undef
+                          },
+                     0 => {
+                           0 => undef,
+                           2 => undef,
+                           3 => undef
+                          },
+                     2 => {
+                           1 => undef
+                          }
+                    },
+                    ['this', 'that', '-blah', '-'],
+                    {
+                     'this'    => 0,
+                     'that'    => 1,
+                     '-blah' => 2,
+                     '-'   => 3
+                    }
+                   ];
+    my $input_bak = $input;
+    is_deeply([$obj->get(src => $input)],
+              $expected,
+              'Return values of get(STRING) in list context'
+             );
+    is_deeply([$obj->get(src => $input, pedantic => 0)],
+              $expected,
+              'pedantic => 0 makes no difference'
+             );
+    is_deeply([$obj->get(src => $input, pedantic => 1)],
+              $expected,
+              'pedantic => 1 makes no difference'
+             );
+}
+
+
 #==================================================================================================
 done_testing();

@@ -1,6 +1,6 @@
 =head1 NAME
 
-PDL::Graphics::TriD::Labels -- Text tools
+PDL::Graphics::TriD::Labels - Text tools
 
 =head1 SYNOPSIS
 
@@ -31,7 +31,8 @@ package PDL::Graphics::TriD::Labels;
 
 use strict;
 use warnings;
-use OpenGL qw(:all);
+use OpenGL qw/ :glfunctions :glconstants /;
+use OpenGL::GLUT qw/ :all /;
 use PDL::Graphics::OpenGL::Perl::OpenGL;
 use PDL::Graphics::OpenGLQ;
 use base qw/PDL::Graphics::TriD::GObject/;
@@ -40,7 +41,7 @@ sub gdraw {
 	my($this,$points) = @_;
 	glDisable(&GL_LIGHTING);
 	glColor3d(1,1,1);
-	PDL::Graphics::OpenGLQ::gl_texts($points,$this->{Options}{Font},$this->{Options}{Strings});
+	PDL::Graphics::OpenGLQ::gl_texts($points,done_glutInit(),@{$this->{Options}}{qw(Font Strings)});
 	glEnable(&GL_LIGHTING);
 }
 
@@ -48,6 +49,5 @@ $PDL::Graphics::TriD::GL::fontbase = $PDL::Graphics::TriD::GL::fontbase;
 sub get_valid_options {
   return {UseDefcols => 0, Font=>$PDL::Graphics::TriD::GL::fontbase, Strings => [] }
 }
-
 
 1;

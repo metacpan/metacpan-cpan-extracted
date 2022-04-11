@@ -8,7 +8,7 @@ use Exporter 'import';
 
 our @EXPORT_OK = qw(floyd_warshall);
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 
 sub floyd_warshall {
@@ -55,7 +55,7 @@ Algorithm::Graphs::TransitiveClosure::Tiny - Calculate the transitive closure.
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
 
 =head1 SYNOPSIS
@@ -132,9 +132,9 @@ C<Algorithm::Graphs::TransitiveClosure::Tiny>, then the result is correct:
                    2 => undef},
            }
 
-Edge from 1 to 2 has been added! (Also note that you could use 1 instead of
-C<undef> as hash value, but the value added by the function is C<undef>
-anyway!)
+Edge from 1 to 2 has been added! (Also note that it was possible to use 1
+instead of C<undef> as hash value. This value is kept, but the value added by
+the function is still C<undef>!)
 
 
 =item *

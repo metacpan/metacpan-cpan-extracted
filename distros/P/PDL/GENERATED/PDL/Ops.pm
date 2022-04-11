@@ -1030,7 +1030,7 @@ The state of the bad-value flag of the output ndarrays is unknown.
 
 
 
-#line 314 "ops.pd"
+#line 315 "ops.pd"
 
 BEGIN { $OVERLOADS{'~'} = sub { PDL::bitnot($_[0]) } }
 #line 1037 "Ops.pm"
@@ -1335,7 +1335,7 @@ The state of the bad-value flag of the output ndarrays is unknown.
 
 
 
-#line 314 "ops.pd"
+#line 315 "ops.pd"
 
 BEGIN { $OVERLOADS{'sqrt'} = sub { PDL::sqrt($_[0]) } }
 #line 1342 "Ops.pm"
@@ -1384,7 +1384,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 314 "ops.pd"
+#line 315 "ops.pd"
 
 BEGIN { $OVERLOADS{'sin'} = sub { PDL::sin($_[0]) } }
 #line 1391 "Ops.pm"
@@ -1433,7 +1433,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 314 "ops.pd"
+#line 315 "ops.pd"
 
 BEGIN { $OVERLOADS{'cos'} = sub { PDL::cos($_[0]) } }
 #line 1440 "Ops.pm"
@@ -1482,7 +1482,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 314 "ops.pd"
+#line 315 "ops.pd"
 
 BEGIN { $OVERLOADS{'!'} = sub { PDL::not($_[0]) } }
 #line 1489 "Ops.pm"
@@ -1531,7 +1531,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 314 "ops.pd"
+#line 315 "ops.pd"
 
 BEGIN { $OVERLOADS{'exp'} = sub { PDL::exp($_[0]) } }
 #line 1538 "Ops.pm"
@@ -1580,7 +1580,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 314 "ops.pd"
+#line 315 "ops.pd"
 
 BEGIN { $OVERLOADS{'log'} = sub { PDL::log($_[0]) } }
 #line 1587 "Ops.pm"
@@ -1978,7 +1978,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 584 "ops.pd"
+#line 585 "ops.pd"
 
 
 =head2 abs
@@ -1994,14 +1994,14 @@ sub PDL::abs { $_[0]->type->real ? goto &PDL::_rabs : goto &PDL::_cabs }
 
 
 
-#line 596 "ops.pd"
+#line 597 "ops.pd"
 
 BEGIN { $OVERLOADS{'abs'} = sub { PDL::abs($_[0]) } }
 #line 2001 "Ops.pm"
 
 
 
-#line 598 "ops.pd"
+#line 599 "ops.pd"
 
 
 =head2 abs2
@@ -2105,7 +2105,7 @@ sub PDL::i2C ($) {
 
 
 
-#line 641 "ops.pd"
+#line 642 "ops.pd"
 
 # This is to used warn if an operand is non-numeric or non-PDL.
 sub warn_non_numeric_op_wrapper {

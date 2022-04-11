@@ -14,9 +14,9 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA256
 
-SHA1 a2896db4ef01a6b4014417ee87e4dea4402f48b6 Changes
-SHA1 8b1033fffe18111c2b90acf815f5598003ef24af MANIFEST
-SHA1 1fc501c275cd6974b20d8d573498ce84e3c7cc33 META.yml
+SHA1 8954bd0da5dd873c4495a36f32016adee9f93d73 Changes
+SHA1 7b82571d0d3b28fe59454092a85d4eee06ad026a MANIFEST
+SHA1 941328d01c1ba40bc427e017110a286263f57ebc META.yml
 SHA1 0c0f0a27e5e4ad67051002506f700fab2cecea21 Makefile.PL
 SHA1 4acb9bff897df1abd64641652e36cfc018e2cf5a README
 SHA1 0d99dbcef228e78d7234256e1fb1e8e468672702 TODO
@@ -28,16 +28,17 @@ SHA1 5fd0e992f3615576d9428dc2ca4a2198b22b2957 inc/Module/Install/GithubMeta.pm
 SHA1 85254e101a40b265981d7165d2b8cf0277ebfed2 inc/Module/Install/Include.pm
 SHA1 b84cf97b12f8e5ef37bea54e33ddce32dff804d1 inc/Module/Install/Makefile.pm
 SHA1 0d9fd69718198fcd1560214c4f23fcaa44f8395e inc/Module/Install/Metadata.pm
-SHA1 ad0193a17bb21562d27ac9a5f7a2fd782a3fafb5 inc/Module/Install/RTx.pm
+SHA1 e57f647aba7b4624a6155c03fb524bfeba8f0894 inc/Module/Install/RTx.pm
 SHA1 a17d6d01c9da7a5bed6fcef0038727e63d9b932a inc/Module/Install/RTx/Runtime.pm
 SHA1 8d19f4485276b987b7838d4ec01909f8055a4724 inc/Module/Install/ReadmeFromPod.pm
 SHA1 13c903897bad7f0fdd7871a4a0182ff62dfbefd5 inc/Module/Install/Substitute.pm
 SHA1 99b8179fbd9e05422b161cf91abe198744188064 inc/Module/Install/Win32.pm
 SHA1 6a91e14bbecc64e9c8e2261dfa4b360641d152e4 inc/Module/Install/WriteAll.pm
 SHA1 61eb6159a86c81ec77f4a7ae9a177e187cad4634 inc/YAML/Tiny.pm
-SHA1 3a61602d663d0f3754ee4592247f52fb04e6ed94 lib/RT/Extension/REST2.pm
-SHA1 14088b4223ec9394f6b076ebcc794216f0024fcf lib/RT/Extension/REST2/Dispatcher.pm
+SHA1 303ed85ba55b380d6f995a39453a735f7f08e6e3 lib/RT/Extension/REST2.pm
+SHA1 eb964c40711292a5c5105d3f9a38d149c5a04f60 lib/RT/Extension/REST2/Dispatcher.pm
 SHA1 1b812daf32fde4252fae54dbcb35528b6ae8a3a0 lib/RT/Extension/REST2/Middleware/Auth.pm
+SHA1 5d48a27bad46d59fe06b8e7ac271bc384b349601 lib/RT/Extension/REST2/Middleware/CleanupRequest.pm
 SHA1 70199496b833c026743d3720c709e5f28171b171 lib/RT/Extension/REST2/Middleware/ErrorAsJSON.pm
 SHA1 5ac07b8f8da65dbb4129d2a11513ab3195d8e423 lib/RT/Extension/REST2/Middleware/Log.pm
 SHA1 31dc9a795b7f043e8603617708c3e356cf9458b0 lib/RT/Extension/REST2/PodViewer.pm
@@ -122,12 +123,12 @@ SHA1 808e2d6bb9166b0abcb7005edac4d32be652f8d6 xt/user-memberships.t
 SHA1 ae9ecaba01f81b793629ade886f8c65a05875821 xt/users.t
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEFelFwSnB+u9xCpouFedxUadmpRQFAmFtsFwACgkQFedxUadm
-pRR6qQgAqTnAQcKmAYSbuqJunKPIaMDqncs8y3UZR5RHz+pbTljraae6cz8t+Ctl
-Mztg7ksjNttHByBGBQsc1sATAhcDgDYF1LaNIztoAcblzhC0VWCQ4/5h2KkLPfAB
-9x5r0ajMwiAJHrd7Ryqom0cwxez8qiYcNjgWNn0iZmr297DqxQAc4UDmk8jWiT3n
-KISInVEmiYNK7KNJLJBOSsQsoMl3dJO36hpeSlYaBBbsPAeO2Cp38TP0nzzTuK20
-euGDrmHRryITx7fyxmKB8MfXSuuWnxm2n4R9X66g3nMfR9cjiv90W9A1doXJJ1lt
-1O3vifHgZYFQWE70DAIkqO0oGtBhZw==
-=mqQc
+iQEzBAEBCAAdFiEEFelFwSnB+u9xCpouFedxUadmpRQFAmJUd3UACgkQFedxUadm
+pRRjCwf+OYlsvwyxX96OzfkxoRuqzfIO6xdNKZ1WKA5GFCzKr06jwMi5+/d0UOUc
+FrsPvqH9+4yVw3hCzWbzx47f8egD8t3yzXAAfqdGCWD71DQ1FV6bbUSYg8A78Kav
+Ur2vLc2ck85uUY6hTIprYXFtQw0HDW5SLTaiiWQoPpQYyPen1Wmjp7c7BV8QTF2W
+pKaW6MapOEWQzDbUa8PwniqRXiRos3y1qH5Lbp+xV4DpFRdckDiC2OmHRBtNOWG9
+ZpVbs1bviY63r1nVLLkMPfOGKAXP9s1DJKzXqoCCKfxNr1zT/Q2BbY/bMEEn0feZ
+/JXkEwstYyjFvph1OHwCoZigfPBiHg==
+=1GKY
 -----END PGP SIGNATURE-----

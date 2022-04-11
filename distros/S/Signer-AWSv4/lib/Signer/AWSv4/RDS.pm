@@ -21,6 +21,7 @@ package Signer::AWSv4::RDS;
       'X-Amz-Credential' => $self->access_key . "/" . $self->credential_scope,
       'X-Amz-Date' => $self->date_timestamp,
       'X-Amz-Expires' => $self->expires,
+      ($self->session_token ? ('X-Amz-Security-Token' => $self->session_token) : () ),
       'X-Amz-SignedHeaders' => $self->signed_header_list,
     }
   }
@@ -47,6 +48,8 @@ Signer::AWSv4::RDS - Generate tokens for signing into MySQL/Aurora RDS servers w
   $pass_gen = Signer::AWSv4::RDS->new(
     access_key => 'AKIAIOSFODNN7EXAMPLE',
     secret_key => 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY',
+    session_token => 'EXAMPLESESSIONTOKEN', # Required if using temporary security credentials.
+
     host => 'MyRDSEndpoint',
     user => 'iam_user',
     region => 'us-east-1',

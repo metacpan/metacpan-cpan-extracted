@@ -919,40 +919,66 @@ See L<"Fonts"> for the detailed descriptions.
 Applies to text_out(), get_text_width(), get_text_box(), get_font_abc(), get_font_def(),
 render_glyph().
 
-=item fontMapperPalette INDEX, [\%FONT | COMMAND]
+=item font_mapper
 
-A pseudo-property that manages access to a set of fonts used for substitution
-in polyfont shaping (see L</text_shape>). INDEX is the same font index used in
-C<fonts> array returned from C<text_shape>, if polyfont was used (where 0 is
-the current font).
+Returns a font mapper object that provides interface to fonts collection used
+for substitution in polyfont shaping (see L</text_shape>). The fonts can be
+accessed there either by their font hash (name and style only, currently), or
+the font's corresponding index.
 
 There are two font lists used in the substituion mechanism, I<passive> and
 I<active>. The passive font list is initiated during the toolkit start and is
-never changed. Each font there is addressed by C<INDEX>. When the actual search
+never changed. Each font there is addressed by an index. When the actual search
 for a glyph is initiated, these fonts are queried in the loop and are checked
-if they contain the required glyphs. These queries are cached, so that next
+if they contain the required glyphs. These queries are also cached, so that next
 time lookups run much quicker. That way, an C<active> font list is built, and
 next substitutions use it before trying to look into the passive list. Since
 the ordering of fonts is system based, and is rather random, some fonts may not be a good
-or aesthetic substition. Therefore C<fontMapperPallette> can assist in adding
+or aesthetic substition. Therefore the mapper  can assist in adding
 or removing particular fonts to the active list, potentially allowing an
 application to store and load user-driven selection of substitution fonts.
 
-C<fontMapperPallette> is a pseudo-property, such that it is not symmetric as
-real properties are; its call formats are several and not orthogonal to each
-other neither in syntax nor functionality. Therefore these may change in
-future.
+The following methods are available on the font mapper object:
 
-As a getter, the property returns the following depending on INDEX: If it is
--1, returns how many fonts are in the passive list. If 0, which means the current font,
-returns the index of the current font if it is found in
-the palette, or 0 otherwise. If greater than zero, returns the substitution
-FONT record from the passive list.
+=over
 
-As a setter, manages the active list, and uses COMMAND integer as a second argument.
-If COMMAND is 0, removes the INDEXth font from the active list, and if 1, marks it
-for immediate scanning and adding to the active list. The font is added in the end
-of the list, after the existing active entries.
+=item activate %FONT
+
+Adds the FONT into the active substitution list if the font is not disabled
+
+=item get INDEX
+
+Returns the font hash registered under INDEX
+
+=item count
+
+Returns number of all fonts in the collection
+
+=item index
+
+Returns what index is assigned to the currently used font, if any
+
+=item passivate %FONT
+
+Remove the font from the active substitution list
+
+=item is_active %FONT
+
+Returns whether the font is in the active substitution list or not
+
+=item enable %FONT
+
+Enables the font entry, the font will be considered for the polyfont lookup
+
+=item disable %FONT
+
+Disables the font entry, the font will not be considered for the polyfont lookup
+
+=item is_enabled %FONT
+
+Returns whether the font is enabled or not
+
+=back
 
 =item lineEnd VALUE
 
@@ -1624,7 +1650,7 @@ performed, and the result contains an extra array C<fonts> (see
 L<Prima::Drawable::Glyphs/fonts>). When the current font has all needed glyphs, the
 fonts array is not created.
 
-The font list access is available through L</fontMapperPallette>.
+The font list access is available through L</font_mapper>.
 
 Valid only with shaping levels C<ts::Glyphs> and C<ts::Full>.
 
@@ -1986,8 +2012,8 @@ strings of glyphs. In the glyph cases, some wrapping options are not
 applicable.  It is possible to send both text as TEXT and its shaped
 representation as GLYPHS.
 
-The break algorithm and its result are governed by OPTIONS integer value
-which is a combination of C<tw::> constants:
+The breaking algorithm and its result are governed by the OPTIONS integer value
+that is a combination of the following C<tw::> constants:
 
 =over 4
 
@@ -2022,16 +2048,16 @@ Not applicable in glyph wrapping.
 
 =item tw::BreakSingle
 
-Defines procedure behavior when the text cannot be fit in WIDTH,
-does not affect anything otherwise.
+Defines the method behavior when the text cannot be fit in WIDTH,
+does not affect anything else otherwise.
 
-If set, returns an empty array.
-If unset, returns a text broken by minimum number of characters per chunk.
+If set, the method returns an empty array.
+If unset, it returns a text broken by minimum number of characters per chunk.
 In the latter case, the width of the resulting text blocks B<will> exceed WIDTH.
 
 =item tw::NewLineBreak
 
-Forces new chunk after a newline character ('\n') is met.
+Forces creation of a new chunk after a newline character ('\n') is met.
 If UTF8 text is passed, unicode line break characters C<0x2028> and C<0x2029>
 produce same effect as the newline character.
 
@@ -2039,13 +2065,13 @@ Not applicable in glyph wrapping.
 
 =item tw::SpaceBreak
 
-Forces new chunk after a space character (' ') or a tab character ('\t') are met.
+Forces creation of a new chunk after a space character (' ') or a tab character ('\t') are met.
 
 Not applicable in glyph wrapping.
 
 =item tw::ReturnChunks
 
-Defines the result of text_wrap() function.
+Defines the result of the text_wrap() method.
 
 If set, the array consists of integer pairs,
 where each is a text offset within TEXT and its length.
@@ -2068,6 +2094,11 @@ In glyph wrapping means C<tw::ReturnGlyphs>.
 If unset, the TEXT breaks as soon as the chunk width exceeds WIDTH.
 If set, tries to keep words in TEXT so they do not appear in two
 chunks, e.g. breaks TEXT by words, not by characters.
+
+If Prima is compiled with the I<libthai> library, and thai text is detected,
+Prima uses the library to detects the word boundaries, because the Thai
+language does not use spaces between words. This behavior can be disabled by
+running Prima with C<--no-libthai>.
 
 Not applicable in glyph wrapping.
 

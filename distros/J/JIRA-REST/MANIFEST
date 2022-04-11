@@ -7,8 +7,10 @@ META.yml
 Makefile.PL
 README.md
 dist.ini
+examples/attach.pl
 examples/comment_issue.pl
 examples/create_issue.pl
+examples/download_attachment.pl
 examples/edit_issue.pl
 examples/lib/JIRACLI.pm
 examples/search.pl

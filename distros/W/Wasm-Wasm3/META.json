@@ -1,0 +1,55 @@
+{
+   "abstract" : "Self-contained L<WebAssembly|https://webassembly.org/> via L<wasm3|https://github.com/wasm3/wasm3>",
+   "author" : [
+      "Felipe Gasper (FELIPE)"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Wasm-Wasm3",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Alien::cmake3" : "0",
+            "ExtUtils::MakeMaker::CPANfile" : "0.09"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Slurper" : "0",
+            "Test::Deep" : "0",
+            "Test::FailWarnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/FGasper/p5-Wasm-Wasm3/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/FGasper/p5-Wasm-Wasm3.git",
+         "web" : "https://github.com/FGasper/p5-Wasm-Wasm3"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 4.07"
+}

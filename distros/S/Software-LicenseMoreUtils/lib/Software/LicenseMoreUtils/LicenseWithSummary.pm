@@ -7,7 +7,7 @@
 # the same terms as the Perl 5 programming language system itself.
 #
 package Software::LicenseMoreUtils::LicenseWithSummary;
-$Software::LicenseMoreUtils::LicenseWithSummary::VERSION = '1.005';
+$Software::LicenseMoreUtils::LicenseWithSummary::VERSION = '1.006';
 # ABSTRACT: Software::License with a summary
 
 use strict;
@@ -47,7 +47,7 @@ sub new {
         or_later => $args->{or_later},
     };
 
-    bless $self, $class;
+    return bless $self, $class;
 }
 
 sub distribution { return $distro }
@@ -90,10 +90,15 @@ sub summary_or_text {
 }
 
 sub AUTOLOAD {
-    my $self = shift;
+    my ($self, @args) = @_;
     my $lic = $self->{license};
     my ($sub) = ($AUTOLOAD =~ /(\w+)$/);
-    return $lic->$sub(@_) if ($lic and $sub ne 'DESTROY');
+    if ($lic and $sub ne 'DESTROY') {
+        return $lic->$sub(@args);
+    }
+    else {
+        return;
+    }
 }
 
 1;
@@ -110,7 +115,7 @@ Software::LicenseMoreUtils::LicenseWithSummary - Software::License with a summar
 
 =head1 VERSION
 
-version 1.005
+version 1.006
 
 =head1 SYNOPSIS
 

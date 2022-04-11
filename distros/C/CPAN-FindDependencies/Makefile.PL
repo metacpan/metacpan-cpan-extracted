@@ -32,8 +32,10 @@ WriteMakefile(
     'LWP::Simple'             => 0,
     'Module::CoreList'        => '5.20200920',
     'Parse::CPAN::Packages'   => 2.31,
+    'Pod::Perldoc'            => 3.23, # some earlier versions whine about groff on Mac
     'Scalar::Util'            => 1.14,
     'Test::Differences'       => 0,
+    'Test::Exception'         => 0,
     'Test::More'              => 0.88, # done_testing
     'Test::Time'              => 0,
     'Text::Diff'              => 0,

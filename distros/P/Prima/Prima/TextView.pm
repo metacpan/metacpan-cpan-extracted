@@ -402,7 +402,7 @@ sub block_walk
 
 sub block_wrap
 {
-	my ( $self, $canvas, $b, $state, $width) = @_;
+	my ( $self, $canvas, $b, $state, $width, %opt) = @_;
 	return tb::block_wrap( $b,
 		textPtr       => $self->{text},
 		canvas        => $canvas,
@@ -412,7 +412,21 @@ sub block_wrap
 		baseFontSize  => $self->{defaultFontSize},
 		resolution    => $self->{resolution},
 		wordBreak     => 1,
-		textDirection => $self->{textDirection}, 
+		textDirection => $self->{textDirection},
+		%opt
+	);
+}
+
+sub justify_interspace
+{
+	my ( $self, $canvas, $b, $width) = @_;
+	return tb::justify_interspace( $b,
+		textPtr       => $self->{text},
+		canvas        => $canvas,
+		width         => $width,
+		fontmap       => $self->{fontPalette},
+		baseFontSize  => $self->{defaultFontSize},
+		resolution    => $self->{resolution},
 	);
 }
 
@@ -472,10 +486,15 @@ sub paint_selection
 					$vis_start = $vis_end;
 					$self->{selectionPaintMode} = $selection_map->[$i];
 				}
-				$vis_end++;
+ 				$vis_end++;
 			}
 			$draw_text->( $glyphs, $x, $vis_start, $vis_end )
 				if $vis_end > $vis_start;
+			if ( $sx1 == $offset + $length ) {
+				$self->{selectionPaintMode} = 1;
+			} elsif ( $sx2 == $offset + $length - 1 ) {
+				$self->{selectionPaintMode} = 0;
+			}
 		},
 		code     => sub {
 			my ( $code, $data ) = @_;
@@ -485,6 +504,7 @@ sub paint_selection
 		transpose => sub {
 			my ( $x, $y, $f) = @_;
 			return if !($f & tb::X_EXTEND) || !$self->{selectionPaintMode} || $x == 0 || $y == 0;
+			$self-> realize_state( $canvas, \@state, tb::REALIZE_COLORS);
 			$canvas->clear($xy[0], $xy[1] - $$block[ tb::BLK_APERTURE_Y], $xy[0] + $x - 1, $xy[1] + $y - $$block[ tb::BLK_APERTURE_Y] - 1);
 		},
 	);
@@ -688,6 +708,7 @@ sub xy2info
 	# find text offset
 	my $ofs = 0;
 	my @pos = ($$b[ tb::BLK_X] - $x,0);
+	my $nontext_offset;
 
 	$self-> block_walk( $b,
 		position => \@pos,
@@ -696,7 +717,7 @@ sub xy2info
 			my ( $offset, $length, $width, $text) = @_;
 			my $npx = $pos[0] + $width;
 			if ( $pos[0] > 0) {
-				$ofs = $offset;
+				$ofs = $nontext_offset // $offset;
 				$self-> block_walk_abort;
 			} elsif ( $pos[0] <= 0 && $npx > 0) {
 				my $glyphs = $self-> text_shape( $text );
@@ -710,8 +731,14 @@ sub xy2info
 						($indexes->[$goffs] & ~to::RTL));
 				$self-> block_walk_abort;
 			} else {
-				$ofs = $offset + $length - 1;
+				$ofs = $offset + $length;
 			}
+			undef $nontext_offset;
+		},
+		transpose => sub {
+			my ( $x, $y, $f) = @_;
+			# for cases where a non-text block covers a text range, f ex spaces in justify
+			$nontext_offset = $ofs if $f & tb::X_EXTEND;
 		},
 	);
 
@@ -1181,6 +1208,7 @@ sub selection
 			return $offset ? $self->get_text_width($glyphs, 0, 0, $offset) : 0;
 		};
 		$self-> begin_paint_info;
+		my ($last_offset, @nontext);
 
 		$self-> block_walk( $b,
 			trace    => tb::TRACE_GEOMETRY | tb::TRACE_REALIZE_PENS | tb::TRACE_TEXT,
@@ -1188,6 +1216,17 @@ sub selection
 			position => \@xy,
 			text     => sub {
 				my ($offset, $length, undef, $text) = @_;
+				if ( @nontext ) {
+					my ( $s1, $s2 ) = ($last_offset, $offset - 1);
+					my $old_selected = (@old && $s1 >= $old[0] && $s2 <= $old[1]) ? 1 : 0;
+					my $new_selected = (@new && $s1 >= $new[0] && $s2 <= $new[1]) ? 1 : 0;
+					if ( $old_selected != $new_selected ) {
+						$cr[0] //= $nontext[0];
+						$cr[1] = $nontext[2];
+					}
+					undef @nontext;
+				}
+				$last_offset = $offset + $length;
 				my $glyphs  = $self-> text_shape($text);
 				my $oldmap = @old ? $glyphs-> selection_chunks_glyphs( map { $_ - $offset } @old) : [];
 				my $newmap = @new ? $glyphs-> selection_chunks_glyphs( map { $_ - $offset } @new) : [];
@@ -1196,6 +1235,12 @@ sub selection
 				$cr[0] //= $xy[0] + $calc->($diff->[0], $glyphs);
 				my $end = 0; $end += $_ for @$diff;
 				$cr[1] = $xy[0] + $calc->($end, $glyphs);
+			},
+			transpose => sub {
+				my ( $x, $y, $f ) = @_;
+				return unless $f & tb::X_EXTEND;
+				return unless defined $last_offset;
+				@nontext = (@xy, $xy[0] + $x, $xy[1] + $y);
 			},
 		);
 		$self-> end_paint_info;

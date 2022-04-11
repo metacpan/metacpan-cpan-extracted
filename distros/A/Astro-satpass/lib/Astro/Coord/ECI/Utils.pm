@@ -123,13 +123,13 @@ package Astro::Coord::ECI::Utils;
 use strict;
 use warnings;
 
-our $VERSION = '0.122';
+our $VERSION = '0.123';
 our @ISA = qw{Exporter};
 
 use Carp;
 ## use Config;
 ## use Data::Dumper;
-use POSIX qw{floor strftime};
+use POSIX qw{ floor modf strftime };
 use Scalar::Util qw{ blessed };
 
 my @greg_time_routines;
@@ -1103,42 +1103,50 @@ in degrees. If the argument is C<undef>, C<undef> will be returned.
 
 sub rad2deg { return defined $_[0] ? $_[0] / PI * 180 : undef }
 
-=item $deg_min_sec = rad2dms( $radians, $decimals )
+=item $deg_min_sec = rad2dms( $radians, $decimals, $degree_sign )
 
 This subroutine converts the given angle in radians to its equivalent in
 degrees, minutes and seconds, represented as a string. Degrees will be
 suppressed if zero, and minutes will be suppressed if both degrees and
-minutes are zero. If degrees are present the delimiter will be a degree
-sign (C<"\N{DEGREE SIGN}>, a.k.a. C<"\N{U+00B0}">). The delimiters for
-minutes and seconds are C<'> and C<"> respectively, with the C<">
-appearing before the decimal point.
+minutes are zero. If degrees are present the default delimiter is a
+degree sign. The delimiters for minutes and seconds are C<'> and C<">
+respectively, with the C<"> appearing before the decimal point.
 
 The optional C<$decimals> argument specifies the number of decimal
 places in the seconds value, and defaults to C<3>.
 
+The optional C<$degree_sign> argument specifies the degree sign. The
+default is a Unicode degree sign, C<"\N{DEGREE SIGN}">, a.k.a.
+C<"\N{U+00B0}">.
+
 =cut
 
 sub rad2dms {
-    my ( $rad, $dp ) = @_;
+    my ( $rad, $dp, $ds ) = @_;
     defined $rad
 	or return $rad;
     defined $dp
 	or $dp = 3;
-    my $sec = rad2deg( $rad ) * 3600;
-    ( $sec, my $sgn ) = $sec < 0 ? ( - $sec, '-' ) : ( $sec, '' );
-    my $frc = sprintf "%.${dp}f", $sec;
-    $frc =~ s/ [^.]* //smx;
-    $sec = floor( $sec );
-    my $min = floor( $sec / 60 );
-    $sec %= 60;
-    my $deg = floor( $min / 60 );
-    $min %= 60;
-    $deg or $min
-	or return sprintf q<%s%d"%s>, $sgn, $sec, $frc;
-    $deg
-	or return sprintf q<%s%d'%02d"%s>, $sgn, $sec, $frc;
-    return sprintf qq<%s%d°%02d'%02d"%s>,
-	$sgn, $deg, $min, $sec, $frc;
+    defined $ds
+	or $ds = "\N{U+00B0}";
+    my $wid = $dp + 3;
+
+    ( $rad, my $sgn ) = $rad < 0 ? ( -$rad, '-' ) : ( $rad, '' );
+    my $sec = rad2deg( $rad );
+    ( $sec, my $deg ) = modf( $sec );
+    ( $sec, my $min ) = modf( $sec * 60 );
+    $sec *= 60;
+    my $rslt;
+    if ( $deg ) {
+	$rslt = sprintf qq<%d$ds%02d'%$wid.${dp}f>, $deg, $min, $sec;
+    } elsif ( $min ) {
+	$rslt = sprintf qq<%d'%$wid.${dp}f>, $min, $sec;
+    } else {
+	$rslt = sprintf qq<%.${dp}f>, $sec;
+    }
+    $rslt =~ s/ [.] /"./smx
+	or $rslt .= q<">;
+    return "$sgn$rslt";
 }
 
 =item $hr_min_sec = rad2hms( $radians, $decimals )
@@ -1161,21 +1169,24 @@ sub rad2hms {
 	or return $rad;
     defined $dp
 	or $dp = 3;
-    my $sec = $rad * 12 / PI * 3600;
-    ( $sec, my $sgn ) = $sec < 0 ? ( - $sec, '-' ) : ( $sec, '' );
-    my $frc = sprintf "%.${dp}f", $sec;
-    $frc =~ s/ [^.]* //smx;
-    $sec = floor( $sec );
-    my $min = floor( $sec / 60 );
-    $sec %= 60;
-    my $hr = floor( $min / 60 );
-    $min %= 60;
-    $hr or $min
-	or return sprintf q<%s%ds%s>, $sgn, $sec, $frc;
-    $hr
-	or return sprintf q<%s%dm%02ds%s>, $sgn, $sec, $frc;
-    return sprintf qq<%s%dh%02dm%02ds%s>,
-	$sgn, $hr, $min, $sec, $frc;
+
+    my $wid = $dp + 3;
+    ( $rad, my $sgn ) = $rad < 0 ? ( -$rad, '-' ) : ( $rad, '' );
+    my $sec = $rad * 12 / PI;
+    ( $sec, my $hr ) = modf( $sec );
+    ( $sec, my $min ) = modf( $sec * 60 );
+    $sec *= 60;
+    my $rslt;
+    if ( $hr ) {
+	$rslt = sprintf "%dh%02dm%$wid.${dp}f", $hr, $min, $sec;
+    } elsif ( $min ) {
+	$rslt = sprintf "%dm%$wid.${dp}f", $min, $sec;
+    } else {
+	$rslt = sprintf "%.${dp}f", $sec;
+    }
+    $rslt =~ s/ [.] /s./smx
+	or $rslt .= 's';
+    return "$sgn$rslt";
 }
 
 =item $value = tan ($angle)
@@ -1537,7 +1548,7 @@ Thomas R. Wyant, III (F<wyant at cpan dot org>)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2005-2021 by Thomas R. Wyant, III
+Copyright (C) 2005-2022 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

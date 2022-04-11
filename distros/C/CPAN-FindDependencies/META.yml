@@ -34,8 +34,10 @@ requires:
   LWP::Simple: '0'
   Module::CoreList: '5.20200920'
   Parse::CPAN::Packages: '2.31'
+  Pod::Perldoc: '3.23'
   Scalar::Util: '1.14'
   Test::Differences: '0'
+  Test::Exception: '0'
   Test::More: '0.88'
   Test::Time: '0'
   Text::Diff: '0'
@@ -43,5 +45,5 @@ requires:
 resources:
   bugtracker: https://github.com/DrHyde/perl-modules-CPAN-FindDependencies/issues
   repository: https://github.com/DrHyde/perl-modules-CPAN-FindDependencies
-version: '3.10'
+version: '3.11'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

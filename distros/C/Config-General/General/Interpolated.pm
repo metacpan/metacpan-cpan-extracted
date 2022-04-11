@@ -2,13 +2,13 @@
 # Config::General::Interpolated - special Class based on Config::General
 #
 # Copyright (c) 2001 by Wei-Hon Chen <plasmaball@pchome.com.tw>.
-# Copyright (c) 2000-2014 by Thomas Linden <tlinden |AT| cpan.org>.
+# Copyright (c) 2000-2022 by Thomas Linden <tlinden |AT| cpan.org>.
 # All Rights Reserved. Std. disclaimer applies.
-# Artistic License, same as perl itself. Have fun.
+# Licensed under the terms of the Artistic License 2.0.
 #
 
 package Config::General::Interpolated;
-$Config::General::Interpolated::VERSION = "2.15";
+$Config::General::Interpolated::VERSION = "2.16";
 
 use strict;
 use Carp;
@@ -47,7 +47,7 @@ sub _set_regex {
 		                #     but can't begin with a '\'
 		 \$		# dollar sign
 		 (\{)?		# $2: optional opening curly
-		 ([a-zA-Z0-9_\-\.:\+,]+) # $3: capturing variable name (fix of #33447)
+         ([a-zA-Z0-9][a-zA-Z0-9_\-\.:\+]*) # $3: capturing variable name (fix of #33447+118746)
 		 (?(2)		# $4: if there's the opening curly...
 		 \}		#     ... match closing curly
 		)
@@ -327,6 +327,21 @@ behavior as you know of Perl itself.
 In addition you can surround variable names with curly braces to
 avoid misinterpretation by the parser.
 
+=head1 NAMING CONVENTIONS
+
+Variable names must:
+
+=over
+
+=item * start with a US-ASCII letter(a-z or A-Z) or a digit (0-9).
+
+=item * contain only US-ASCII letter(a-z or A-Z), digits (0-9), the dash (-)
+        colon (:), dot (.), underscore (_) and plus (+) characters.
+
+=back
+
+For added clarity variable names can be surrounded by curly braces.
+
 =head1 SEE ALSO
 
 L<Config::General>
@@ -340,16 +355,16 @@ L<Config::General>
 =head1 COPYRIGHT
 
 Copyright 2001 by Wei-Hon Chen E<lt>plasmaball@pchome.com.twE<gt>.
-Copyright 2002-2014 by Thomas Linden <tlinden |AT| cpan.org>.
+Copyright 2002-2022 by Thomas Linden <tlinden |AT| cpan.org>.
 
 This program is free software; you can redistribute it and/or
-modify it under the same terms as Perl itself.
+modify it under the terms of the Artistic License 2.0.
 
 See L<http://www.perl.com/perl/misc/Artistic.html>
 
 =head1 VERSION
 
-2.15
+2.16
 
 =cut
 

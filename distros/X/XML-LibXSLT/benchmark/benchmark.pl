@@ -1,36 +1,38 @@
-use Benchmark;
-use Getopt::Long;
-use File::Basename;
-use XML::XPath;
 use strict;
 use warnings;
 
-$|++;
+use Benchmark qw();
+use Getopt::Long qw/ GetOptions /;
+use File::Basename qw();
+use XML::XPath qw();
+
+STDOUT->autoflush(1);
 
 my @default_drivers = qw(
     LibXSLT
     Sablotron
-    );
+);
 
 use vars qw(
-        $component $iter $ms $kb_in $kb_out $kb_sec $result $ref_size
-        );
+    $component $iter $ms $kb_in $kb_out $kb_sec $result $ref_size
+);
 
 my @getopt_args = (
-        'c=s', # config file
-        'n=i', # number of benchmark times
-        'd=s@', # drivers
-        't', # only 1 iteration per test
-        'v', # verbose
-        'h', # help
-        'x', # XSLTMark emulation
-        );
+    'c=s',     # config file
+    'n=i',     # number of benchmark times
+    'd=s@',    # drivers
+    't',       # only 1 iteration per test
+    'v',       # verbose
+    'h',       # help
+    'x',       # XSLTMark emulation
+);
 
 my %options;
 
 Getopt::Long::config("bundling");
 
-unless (GetOptions(\%options, @getopt_args)) {
+unless ( GetOptions( \%options, @getopt_args ) )
+{
     usage();
 }
 
@@ -38,24 +40,28 @@ usage() if $options{h};
 
 $options{c} ||= 'testcases/default.conf';
 
-my $basedir = dirname($options{c});
+my $basedir = dirname( $options{c} );
 
 $options{d} ||= [@default_drivers];
 
 $options{n} ||= 1;
 
 # load drivers
-for my $driver (@{$options{d}}) {
+for my $driver ( @{ $options{d} } )
+{
     warn "Loading $driver Driver\n" if $options{v};
     require "Driver/$driver.pm";
 }
 
 # load config
 my @config;
-open(CONFIG, $options{c}) || die "Can't open config file '$options{c}' : $!";
+open( my $CONFIG_fh, '<', $options{c} )
+    || die "Can't open config file '$options{c}' : $!";
 my $current = {};
-while(my $line = <CONFIG>) {
-    if ($line =~ /^\s*$/m && %$current) {
+while ( my $line = <$CONFIG_fh> )
+{
+    if ( $line =~ /^\s*$/m && %$current )
+    {
         push @config, $current;
         $current = {};
     }
@@ -64,18 +70,52 @@ while(my $line = <CONFIG>) {
     $line =~ s/#.*$//;
     next unless $line =~ /\S/;
 
-    if ($line =~ /^\s*\[(.*)\]\s*$/) {
+    if ( $line =~ /^\s*\[(.*)\]\s*$/ )
+    {
         $current->{component} = $1;
     }
-    elsif ($line =~ /^(.*?)\s*=\s*(.*)$/) {
+    elsif ( $line =~ /^(.*?)\s*=\s*(.*)$/ )
+    {
         $current->{$1} = $2;
     }
 }
+close($CONFIG_fh);
 
-for my $driver (@{$options{d}}) {
+sub _raw_slurp
+{
+    my $filename = shift;
+
+    open my $in, '<:raw', $filename
+        or die "Cannot open '$filename' for slurping - $!";
+
+    local $/;
+    my $contents = <$in>;
+
+    close($in);
+
+    return $contents;
+}
+
+sub _utf8_slurp
+{
+    my $filename = shift;
+
+    open my $in, '<:encoding(utf8)', $filename
+        or die "Cannot open '$filename' for slurping - $!";
+
+    local $/;
+    my $contents = <$in>;
+
+    close($in);
+
+    return $contents;
+}
+
+for my $driver ( @{ $options{d} } )
+{
     my $pkg = "Driver::${driver}";
 
-    $pkg->can('init')->(verbose => $options{v});
+    $pkg->can('init')->( verbose => $options{v} );
 
     $pkg->can('chdir')->($basedir);
 
@@ -85,14 +125,17 @@ for my $driver (@{$options{d}}) {
 
     my %totals;
 
-    COMPONENT:
-    for my $cmp (@config) {
+COMPONENT:
+    for my $cmp (@config)
+    {
         warn "Running test: $cmp->{component}\n" if $options{v};
-        for (1..$options{n}) {
+        for ( 1 .. $options{n} )
+        {
             $component = $cmp->{component};
-            $iter = $ms = $kb_in = $kb_out = $kb_sec = $ref_size = 0;
+            $iter      = $ms = $kb_in = $kb_out = $kb_sec = $ref_size = 0;
 
-            if ($cmp->{skipdriver} =~ /\b\Q$driver\E\b/) {
+            if ( $cmp->{skipdriver} =~ /\b\Q$driver\E\b/ )
+            {
                 $result = 'SKIPPED';
                 print_output() unless $cmp->{written};
                 $cmp->{written}++;
@@ -100,128 +143,136 @@ for my $driver (@{$options{d}}) {
             }
 
             eval {
-                $pkg->can('load_stylesheet')->($cmp->{stylesheet});
-                $pkg->can('load_input')->($cmp->{input});
+                $pkg->can('load_stylesheet')->( $cmp->{stylesheet} );
+                $pkg->can('load_input')->( $cmp->{input} );
 
                 $iter = $cmp->{iterations};
                 $iter = 1 if $options{t};
 
+                my $bench = timeit(
+                    $iter,
+                    sub {
+                        $pkg->can('run_transform')->( $cmp->{output} );
+                    }
+                );
 
-                my $bench = timeit($iter, sub {
-                        $pkg->can('run_transform')->($cmp->{output});
-                    });
+                my $str = timestr( $bench, 'all', '5.4f' );
 
-                my $str = timestr($bench, 'all', '5.4f');
-
-                if ($str =~ /\((\d+\.\d+)/) {
+                if ( $str =~ /\((\d+\.\d+)/ )
+                {
                     $ms = $1;
                     $ms *= 1000;
                 }
 
-                $kb_in = (stat($cmp->{input}))[7];
+                $kb_in = ( stat( $cmp->{input} ) )[7];
 
-                if ($options{x}) {
+                if ( $options{x} )
+                {
                     $kb_in /= 1000;
                 }
-                else {
-                    $kb_in += (stat($cmp->{stylesheet}))[7];
+                else
+                {
+                    $kb_in += ( stat( $cmp->{stylesheet} ) )[7];
                     $kb_in /= 1024;
                 }
 
                 $kb_in *= $iter;
 
-                $kb_out = (stat($cmp->{output}))[7];
+                $kb_out = ( stat( $cmp->{output} ) )[7];
                 $kb_out /= 1024;
                 $kb_out *= $iter;
 
                 die "failed - no output\n" unless $kb_out > 0;
 
-                $kb_sec = ($kb_in + $kb_out) /
-                            ( $ms / 500 );
+                $kb_sec = ( $kb_in + $kb_out ) / ( $ms / 500 );
 
-                if ($cmp->{reference}) {
-                    $ref_size = (stat($cmp->{reference}))[7];
+                if ( $cmp->{reference} )
+                {
+                    $ref_size = ( stat( $cmp->{reference} ) )[7];
                     $ref_size /= 1024;
 
-                    open(REFERENCE, $cmp->{reference}) || die "Can't open reference '$cmp->{reference}' : $!";
-                    open(NEW, $cmp->{output}) || die "Can't open transform output '$cmp->{output}' : $!";
-                    local $/;
-                    my $ref = <REFERENCE>;
-                    my $new = <NEW>;
-                    close REFERENCE;
-                    close NEW;
+                    my $ref = _raw_slurp( $cmp->{reference} );
+                    my $new = _raw_slurp( $cmp->{output} );
                     $new =~ s/\A<\?xml.*?\?>\s*//;
                     $new =~ s/\A<!DOCTYPE.*?>\s*//;
 
-                    if (!length($new)) {
+                    if ( !length($new) )
+                    {
                         die "output length failed\n";
                     }
-                    if ($new eq $ref) {
+                    if ( $new eq $ref )
+                    {
                         $result = 'OK';
                     }
-                    else {
+                    else
+                    {
                         $result = 'CHECK OUTPUT';
                         eval {
-                            my $rpp = XML::XPath->new(xml => $ref);
-                            my $ppp = XML::XPath::XMLParser->new(xml => $new);
+                            my $rpp = XML::XPath->new( xml => $ref );
+                            my $ppp = XML::XPath::XMLParser->new( xml => $new );
                             my $npp;
-                            eval {
-                                $npp = $ppp->parse;
-                            };
-                            if ($@) {
+                            eval { $npp = $ppp->parse; };
+                            if ($@)
+                            {
                                 $npp = $ppp->parse("<norm>$new</norm>");
                             }
                             my @rnodes = $rpp->findnodes('//*');
                             my @nnodes = $npp->findnodes('//*');
-#                            warn "ref nodes: ", scalar(@rnodes), "\n";
-#                            warn "new nodes: ", scalar(@nnodes), "\n";
-                            if (@rnodes == @nnodes) {
+
+         #                            warn "ref nodes: ", scalar(@rnodes), "\n";
+         #                            warn "new nodes: ", scalar(@nnodes), "\n";
+                            if ( @rnodes == @nnodes )
+                            {
                                 $result = 'COUNT OK';
                             }
                         };
-                        if ($@) {
+                        if ($@)
+                        {
                             warn $@ if $options{v};
                         }
                     }
                 }
-                else {
+                else
+                {
                     $result = 'NO REFERENCE';
                 }
             };
-            if ($@) {
+            if ($@)
+            {
                 warn "$component failed: $@" if $options{v};
                 $result = 'ERROR';
             }
 
-            if (($result =~ /OK/) || ($result eq 'NO REFERENCE')) {
-                $totals{iter} += $iter;
-                $totals{ms} += $ms;
-                $totals{kb_in} += $kb_in;
+            if ( ( $result =~ /OK/ ) || ( $result eq 'NO REFERENCE' ) )
+            {
+                $totals{iter}   += $iter;
+                $totals{ms}     += $ms;
+                $totals{kb_in}  += $kb_in;
                 $totals{kb_out} += $kb_out;
             }
 
             print_output() unless $cmp->{written};
             $cmp->{written}++;
-        } # $options{n} loop
+        }    # $options{n} loop
 
         delete $cmp->{written};
-    } # each component
+    }    # each component
 
     $pkg->can('shutdown')->();
 
     $component = 'total';
-    $iter = $totals{iter};
-    $ms = $totals{ms};
-    $kb_in = $totals{kb_in};
-    $kb_out = $totals{kb_out};
-    $kb_sec = ($kb_in + $kb_out) /
-                ( $ms / 500 );
-    $ref_size = 0;
-    $result = '';
+    $iter      = $totals{iter};
+    $ms        = $totals{ms};
+    $kb_in     = $totals{kb_in};
+    $kb_out    = $totals{kb_out};
+    $kb_sec    = ( $kb_in + $kb_out ) / ( $ms / 500 );
+    $ref_size  = 0;
+    $result    = '';
     print_output();
 }
 
-sub usage {
+sub usage
+{
     print <<EOT;
 usage: $0 [options]
 
@@ -256,14 +307,16 @@ EOT
     exit(0);
 }
 
-sub print_header {
+sub print_header
+{
     print STDOUT <<'EOF';
 Test Component   Iter    ms   KB In  KB Out      KB/s     Result
 ==========================================================================
 EOF
 }
 
-sub print_output {
+sub print_output
+{
     printf STDOUT "%-15.15s %5.0d %5.0d %7.0f %7.0f %9.2f   %-15.15s\n",
-            $component, $iter, $ms, $kb_in, $kb_out, $kb_sec, $result;
+        $component, $iter, $ms, $kb_in, $kb_out, $kb_sec, $result;
 }

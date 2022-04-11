@@ -7,7 +7,7 @@ require Exporter;
 *import = \&Exporter::import;
 require DynaLoader;
 
-our $VERSION = '0.47';
+our $VERSION = '0.48';
 $VERSION = eval $VERSION;
 DynaLoader::bootstrap Math::GMPf::Random $VERSION;
 
@@ -15,5 +15,15 @@ DynaLoader::bootstrap Math::GMPf::Random $VERSION;
 @Math::GMPf::Random::EXPORT_OK = ();
 
 sub dl_load_flags {0} # Prevent DynaLoader from complaining and croaking
+
+sub _issue_19550 { # https://github.com/Perl/perl5/issues/19550
+  my $inf = 999 ** (999 ** 999);
+  my $discard = "$inf";
+  my $inf_copy = $inf;
+  # Using Math::GMPf::Random::_is_NOK_and_POK():
+  return 1
+    if(!_is_NOK_and_POK($inf) && _is_NOK_and_POK($inf_copy));
+  return 0;
+}
 
 1;

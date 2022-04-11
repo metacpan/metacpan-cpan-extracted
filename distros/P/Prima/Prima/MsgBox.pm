@@ -7,13 +7,7 @@ use vars qw(@ISA @EXPORT @EXPORT_OK);
 @ISA = qw(Exporter);
 @EXPORT = qw(message_box message input_box);
 @EXPORT_OK = qw(message_box message input_box);
-
-use Prima::Classes;
-use Prima::Buttons;
-use Prima::StdBitmap;
-use Prima::Label;
-use Prima::InputLine;
-use Prima::Utils;
+use Prima qw(Buttons InputLine Label ScrollWidget StdBitmap Utils);
 
 sub insert_buttons
 {
@@ -109,10 +103,12 @@ sub message_box
 	}
 
 	my $dlg = Prima::Dialog-> create(
+		borderStyle   => bs::Sizeable,
 		centered      => 1,
 		width         => 435,
 		height        => 125,
 		designScale   => [7, 18],
+		sizeMin       => [435, 125],
 		scaleChildren => 1,
 		visible       => 0,
 		text          => $title,
@@ -128,57 +124,75 @@ sub message_box
 	$dlg-> scaleChildren(0);
 
 	my $iconRight = 0;
-	my $iconView;
-	if ( $icon)
-	{
-		$icon = Prima::StdBitmap::icon( $icon);
-		if ( defined $icon) {
-			$iconView = $dlg-> insert( Widget =>
-				origin         => [
-					20,
-					($dlg-> height + $fresh-> height - $icon-> height)/2
-				],
-				size           => [ $icon-> width, $icon-> height],
-				onPaint        => sub {
-					my $self = $_[1];
-					$self-> color( $dlg-> backColor);
-					$self-> bar( 0, 0, $self-> size);
-					$self-> put_image( 0, 0, $icon);
-				},
-			);
-
-			$iconRight = $iconView-> right;
-		}
+	if ( $icon and ($icon = Prima::StdBitmap::icon( $icon))) {
+		my $iconView = $dlg-> insert( Widget =>
+			growMode       => gm::GrowHiY,
+			left           => 20,
+			width          => $icon-> width,
+			top            => $dlg-> height - 10,
+			bottom         => $fresh-> height + 20,
+			ownerBackColor => 1,
+			onPaint        => sub {
+				my $self = $_[1];
+				$self-> clear;
+				$self-> put_image(0, ($self->height - $icon->height)/2, $icon);
+			},
+		);
+		$iconRight = $iconView-> right;
 	}
 
-	my $label = $dlg-> insert( Label =>
+	my $label = $dlg-> insert( 'Label' , text => $text );
+	unless ( defined $extras->{wordWrap} ) {
+		# can the text fit in a quarter of the screen?
+		my @as    = map { $_ / 2 } $::application->size;
+		my $gl    = int( $as[1] / $label-> font-> height);
+		my $lc    = scalar @{ $label-> text_wrap( $text, $as[0],
+			tw::NewLineBreak|tw::ReturnLines|tw::WordBreak|tw::ExpandTabs|tw::CalcTabs
+		)};
+		$extras->{wordWrap} = $lc <= $gl;
+	}
+
+	my %geom = (
 		left          => $iconRight + 15,
 		right         => $dlg-> width  - 10,
 		top           => $dlg-> height - 10,
 		bottom        => $fresh-> height + 20,
-		text          => $text,
-		autoWidth     => 0,
-		wordWrap      => 1,
-		showAccelChar => 1,
-		valignment    => ta::Middle,
 		growMode      => gm::Client,
 	);
+	my $scroller;
+	if ( $extras->{wordWrap}) {
+		$label->set(%geom,
+			autoWidth     => 0,
+			wordWrap      => 1,
+			growMode      => gm::Client,
+			valignment    => ta::Middle,
+		);
+	} else {
+		$scroller = $dlg-> insert( ScrollGroup => %geom);
+		$label->set(
+			owner         => $scroller->client,
+			growMode      => gm::Center,
+			autoWidth     => 1,
+			autoHeight    => 1,
+		);
+		$scroller->use_current_size;
+	}
 
-	my $gl = int( $label-> height / $label-> font-> height);
+	# expand the dialog
+	my $gl = int(( $dlg-> height - 10 - $fresh-> height - 20) / $label-> font-> height);
 	my $lc = scalar @{ $label-> text_wrap(
 		$text,
 		$label-> width,
 		tw::NewLineBreak|tw::ReturnLines|tw::WordBreak|tw::ExpandTabs|tw::CalcTabs
 	)};
 
-	if ( $lc > $gl) {
-		my $delta = ( $lc - $gl) * $label-> font-> height;
+	 if ( $lc > $gl) {
+		my $delta = ($lc - $gl) * $label-> font-> height;
 		my $dh = $dlg-> height;
-		$delta = $::application-> height - $dh
-			if $dh + $delta > $::application-> height;
+		$delta = $::application-> height / 2 - $dh
+			if $dh + $delta > $::application-> height / 2;
 		$dlg-> height( $dh + $delta);
 		$dlg-> centered(1);
-		$iconView-> bottom( $iconView-> bottom + $delta / 2) if $iconView;
 	}
 
 	my $ret = $dlg-> execute;
@@ -398,6 +412,18 @@ to 0.
 If set, the dialog owner is set to WINDOW, otherwise to C<$::main_window>.
 Necessary to maintain window stack order under some window managers, to disallow
 windows to be brought over the message box.
+
+=item wordWrap BOOLEAN=undef
+
+message_box can can display the message in two modes. In C<wordWrap = 1> where
+the text is expected to be relatively short, plus minus, several lines, where
+the user can resize the dialog if for some reason the text is too big.  In
+C<wordWrap = 0> mode there is added a scroller, so that even if the text indeed
+is too big to get on the screen event with the maximized dialog.
+
+By default the function analyzes the message text and decides which of the two
+modes is suited best. The explicit override is possible with this
+flag.
 
 =back
 

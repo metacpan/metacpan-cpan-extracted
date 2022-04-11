@@ -1,5 +1,8 @@
 Revision history for Algorithm-Graphs-TransitiveClosure-Tiny
 
+1.01    2022/04/08
+        Minor improvement of the POD section
+
 1.00    2022/01/16
         - The second argument is now optional and has a different meaning.
         - Empty subhashes are removed by default.

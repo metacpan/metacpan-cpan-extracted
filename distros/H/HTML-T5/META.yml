@@ -34,7 +34,7 @@ resources:
   homepage: http://github.com/shlomif/html-tidy5
   license: http://www.opensource.org/licenses/artistic-license-2.0.php
   repository: http://github.com/shlomif/html-tidy5
-version: '0.011'
+version: '0.013'
 x_contributors:
   - 'Andy Lester <andy@petdance.com>'
   - 'Jonathan Rockway <jrockway@cpan.org>'

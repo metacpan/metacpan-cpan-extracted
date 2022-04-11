@@ -1740,8 +1740,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1604 "slatec.pd"
-
+#line 1580 "slatec.pd"
 
 =head1 AUTHOR
 
@@ -1754,7 +1753,7 @@ distribution. If this file is separated from the PDL distribution,
 the copyright notice should be included in the file.
 
 =cut
-#line 1758 "Slatec.pm"
+#line 1757 "Slatec.pm"
 
 
 

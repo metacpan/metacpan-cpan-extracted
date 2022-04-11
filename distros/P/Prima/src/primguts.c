@@ -50,7 +50,6 @@ static List  staticHashes;
 static int   prima_init_ok = 0;
 
 Handle application = NULL_HANDLE;
-long   apcError = 0;
 List   postDestroys;
 int    recursiveCall = 0;
 PHash  primaObjects = NULL;
@@ -60,6 +59,13 @@ Bool   use_fribidi =
 		true
 #else
 		false
+#endif
+		;
+int    use_libthai =
+#ifdef WITH_LIBTHAI
+		1
+#else
+		0
 #endif
 		;
 
@@ -155,15 +161,15 @@ strcasestr( register const char * s,  register const char * find)
 		register size_t len;
 
 		if ((c = *find++) != 0) {
-					c = tolower((unsigned char)c);
-					len = strlen(find);
-					do {
-								do {
-										if ((sc = *s++) == 0)
-													return (NULL);
-								} while ((char)tolower((unsigned char)sc) != c);
-					} while (strnicmp(s, find, len) != 0);
-					s--;
+			c = tolower((unsigned char)c);
+			len = strlen(find);
+			do {
+				do {
+					if ((sc = *s++) == 0)
+						return (NULL);
+				} while ((char)tolower((unsigned char)sc) != c);
+			} while (strnicmp(s, find, len) != 0);
+			s--;
 		}
 		return ((char *)s);
 }
@@ -568,6 +574,9 @@ common_get_options( int * argc, char *** argv)
 #ifdef WITH_FRIBIDI
 		"no-fribidi", "do not use fribidi",
 #endif
+#ifdef WITH_LIBTHAI
+		"no-libthai", "do not use libthai",
+#endif
 	};
 	*argv = common_argv;
 	*argc = sizeof( common_argv) / sizeof( char*);
@@ -592,6 +601,13 @@ common_set_option( char * option, char * value)
 	else if ( strcmp( option, "no-fribidi") == 0) {
 		if ( value) warn("`--no-fribidi' option has no parameters");
 		use_fribidi = false;
+		return true;
+	}
+#endif
+#ifdef WITH_LIBTHAI
+	else if ( strcmp( option, "no-libthai") == 0) {
+		if ( value) warn("`--no-libthai' option has no parameters");
+		use_libthai = false;
 		return true;
 	}
 #endif

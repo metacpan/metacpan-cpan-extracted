@@ -41,7 +41,7 @@ sub init
 	$self-> {pageMargins} = [0,0,0,0];
 	$self-> {resolution}  = [72,72];
 	$self-> {scale}       = [ 1, 1];
-	$self-> {rotate}      = 1;
+	$self-> {rotate}      = 0;
 	my %profile = $self-> SUPER::init(@_);
 	$self-> $_( $profile{$_}) for qw( grayscale rotate reversed );
 	$self-> $_( @{$profile{$_}}) for qw( pageSize pageMargins resolution scale );
@@ -400,10 +400,11 @@ sub fonts
 	my $enc = 'iso10646-1'; # unicode only
 	if ( !defined $family ) {
 		my @fonts;
-		my $num = $self->fontMapperPalette(-1);
+		my $fm = $self-> font_mapper;
+		my $num = $fm->count;
 		if ( $num > 0 ) {
 			for my $fid ( 1 .. $num ) {
-				my $f = $self->fontMapperPalette($fid) or next;
+				my $f = $fm->get($fid) or next;
 				$f->{encodings} = [$enc];
 				$f->{encoding} = $enc;
 				push @fonts, $f;
@@ -452,15 +453,15 @@ sub set_font
 	$curr_font = ($self->{font}->{size} // '-1'). '.' . ($self->{glyph_font} // '');
 
 	$font = { %$font };
-	my $wscale     = $font-> {width};
-	delete $font-> {width};
+	my $explicit_width = delete $font-> {width};
 
 	my $div        = 72.27 / $self-> {resolution}-> [1];
 	my $by_height  = defined($font->{height});
 	$font = Prima::Drawable-> font_match( $font, $self-> {font});
-	delete $font->{$by_height ? 'size' : 'height'};
-	$canvas->set_font( $font );
-	$font = $self-> {font} = { %{ $canvas->get_font } };
+
+	$self-> glyph_canvas_set_font(%$font);
+	my $f1000 = { %{ $self->glyph_canvas->get_font }};
+	$self-> apply_canvas_font( $f1000 );
 
 	# convert Prima size definition to PS size definition
 	#
@@ -469,34 +470,35 @@ sub set_font
 	# will not exactly be 100 points by mm.
 	#
 	# 2) hack font structure on the fly, so that caller setting $font->size(100) 
-	# will get $font->height slightly less (by internal leading) in pixels.
+	# will get $font->height padded slightly by internal leading.
 	#
 	# Here #2 is implemented
+	my $ratio;
+	my $ps_fix = $f1000->{size} / ( $f1000->{height} - $f1000->{internalLeading} );
 	if ( $by_height ) {
-		$font->{size} = int($font->{height} * $div + .5);
+		$self->{font_scale} = $font->{height} / $f1000->{height};
+		$ratio              = $self->{font_scale} * $div / $ps_fix;
 	} else {
-		my $new_h        = $font->{size} / $div;
-		my $ratio        = $font->{height} / $new_h;
-		$font->{height}  = int( $new_h + .5);
-		$font->{ascent}  = int( $font->{ascent} / $ratio + .5 );
-		$font->{descent} = $font->{height} - $font->{ascent};
+		$ratio              = $font->{size} / $f1000->{size};
+		$self->{font_scale} = $ratio / $div * $ps_fix;
 	}
+	%$font = ( %$f1000, direction => $font->{direction} );
+	# When querying glyph extensions, remember to scale to the
+	# difference between PS and Prima models, ie without and with the internal leading
+	$font->{$_}   = int( $f1000->{$_} * $self->{font_scale} + .5)
+		for qw(ascent height internalLeading externalLeading width);
+	$font->{size} = int( $f1000->{size} * $ratio + .5);
+	$font->{descent}    = $font->{height} - $font->{ascent};
 
 	# we emulate wider fonts by PS scaling, but this factor is needed
 	# when reporting horizontal glyph and text extension
-	my $font_width_divisor  = $font->{width};
-	$font-> {width} = $wscale if $wscale;
-	$self-> {font_x_scale}  = $font->{width} / $font_width_divisor;
-
-	$self-> glyph_canvas_set_font(%$font);
-	my $f1000 = $self->glyph_canvas->font;
-	$self-> apply_canvas_font( $f1000 );
-
-	# When querying glyph extensions, remember to scale to the
-	# difference between PS and Prima models. 
-	my $y_scale = 1.0 + $f1000->internalLeading / $f1000->height;
-	# Also, note that querying is on the canvas that has size=1000.
-	$self->{font_scale} = $font->{height} / $f1000->height * $y_scale;
+	if ( $explicit_width ) {
+		$self-> {font_x_scale}  = $explicit_width / $font->{width};
+		$font-> {width}         = $explicit_width;
+	} else {
+		$self-> {font_x_scale}  = 1;
+	}
+	$self->{font} = $font;
 
 	$new_font = $font->{size} . '.' . $self->{glyph_font};
 	$self-> {changed}->{font} = 1 if $curr_font ne $new_font;
@@ -530,20 +532,38 @@ sub get_text_width
 	my ( $self, $text, $flags, $from, $len) = @_;
 	$flags //= 0;
 	$from  //= 0;
+	return 0 if $from < 0;
 	my $glyphs;
 	if ( ref($text) eq 'Prima::Drawable::Glyphs') {
 		$glyphs = $text->glyphs;
-		$len    = @$glyphs if !defined($len) || $len < 0 || $len > @$glyphs;
+		$len    = @$glyphs - $from if !defined($len) || $from + $len > @$glyphs;
 	} elsif (ref($text)) {
 		$len //= -1;
 		return $text->get_text_width($self, $flags, $from, $len);
 	} else {
-		$len = length($text) if !defined($len) || $len < 0 || $len > length($text);
+		$len = length($text) - $from if !defined($len) || $from + $len > length($text);
 	}
-	return 0 unless $len;
+	return 0 if $len <= 0;
 
-	my $w = $self->glyph_canvas-> get_text_width( $text, $flags, $from, $len);
-	$w *= $self->{font_scale} unless $glyphs && $text->advances;
+	my $w;
+	if ( $glyphs && $text->advances ) {
+		if ( $flags & to::AddOverhangs) {
+			$w = $self->glyph_canvas-> get_text_width( $text, $flags & ~to::AddOverhangs, $from, $len);
+			my ($g1,$g2) = @$glyphs[$from, $from + $len - 1];
+			my $abc = $self->get_font_abc($g1,$g1,to::Glyphs) or goto NO_ABC;
+			$w += ($abc->[0] < 0) ? -$abc->[0] : 0;
+			if ( $g1 != $g2 ) {
+				$abc = $self->get_font_abc($g2,$g2,to::Glyphs) or goto NO_ABC;
+				$w += ($abc->[2] < 0) ? -$abc->[2] : 0;
+			}
+		NO_ABC:
+		} else {
+			$w = $self->glyph_canvas-> get_text_width( $text, $flags, $from, $len);
+		}
+	} else {
+		$w = $self->glyph_canvas-> get_text_width( $text, $flags, $from, $len);
+		$w *= $self->{font_scale};
+	}
 	return int( $w * $self-> {font_x_scale} + .5);
 }
 

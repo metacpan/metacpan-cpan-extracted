@@ -515,8 +515,6 @@ typedef HV *PHash;
 typedef Bool HashProc( void * item, int keyLen, void * key, void * params);
 typedef HashProc *PHashProc;
 
-extern PHash primaObjects;
-
 extern PHash
 prima_hash_create( void);
 
@@ -1930,6 +1928,8 @@ SV(MenuCheckSize)
 SV(FriBidi)
 #define   svAntialias       38
 SV(Antialias)
+#define   svLibThai         39
+SV(LibThai)
 END_TABLE(sv,UV)
 #undef SV
 
@@ -3433,6 +3433,9 @@ typedef struct _TextWrapRec {
 	int    t_bytepos;                   /* ~ offset in t_line in bytes */
 	char * t_char;                      /* letter next to ~ */
 
+	unsigned n_word_breaks;            /* array of extra word breaks */
+	int     *word_breaks;
+
 	PFontABC * ascii;                   /* eventual abc caches, to be freed after call. */
 	PList    * unicode;                 /* NB - .ascii can be present in .unicode ! */
 } TextWrapRec, *PTextWrapRec;
@@ -3544,6 +3547,9 @@ apc_gp_init( Handle self);
 
 extern Bool
 apc_gp_done( Handle self);
+
+extern Bool
+apc_gp_aa_bar( Handle self, double x1, double y1, double x2, double y2);
 
 extern Bool
 apc_gp_aa_fill_poly( Handle self, int numPts, NPoint * points);

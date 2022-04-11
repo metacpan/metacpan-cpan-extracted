@@ -5,12 +5,10 @@
 package PDL::Demos::TriD1;
 
 use PDL::Graphics::TriD;
-use PDL::Graphics::TriD::Image;
 
 sub info {('3d', '3d demo (requires TriD with OpenGL or Mesa)')}
 sub init {'
 use PDL::Graphics::TriD;
-use PDL::Graphics::TriD::Image;
 '}
 
 my @demo = (
@@ -26,7 +24,6 @@ my @demo = (
 
 		use PDL;
 		use PDL::Graphics::TriD;
-		use PDL::Graphics::TriD::Image;
 
 	to work properly.
 |],
@@ -90,16 +87,14 @@ my @demo = (
 |],
 
 [actnw => q|
-	# Draw a textured surface
-	imag3d [$x,$y,$z], [$x,$y,$z], {
-	  Material => PDL::Graphics::TriD::Material->new(
-	    Shine => 0.212766,
-	    Specular =>[0.753217,0.934416,1],
-	    Ambient =>[0,0,0],
-	    Diffuse =>[0.09855,0.153113,0.191489],
-	    Emissive =>[0, 0, 0]
-	  ),
-	};
+	# Draw a shaded, coloured, unsmoothed (default is on) surface
+	imag3d [$x,$y,$z], [$x,$y,$z], { Smooth => 0 };
+	# [press 'q' in the graphics window when done]
+|],
+
+[actnw => q|
+	# Draw a shaded, coloured, smoothed (the default) surface
+	imag3d [$x,$y,$z], [$x,$y,$z];
 	# [press 'q' in the graphics window when done]
 |],
 
@@ -154,8 +149,85 @@ my @demo = (
 |],
 
 [actnw => q|
-	# One last thing: you can plot a color image like this
-	imagrgb([$r,$g,$b]);
+	# Show graph-evolver
+	use PDL::Graphics::TriD::MathGraph;
+	use PDL::Graphics::TriD::Labels;
+	my @coords = ([0,-1,0], [-1,-1,-2], [3,5,2],
+	    [2,1,-3], [1,3,1], [1,1,2]);
+	my $from = PDL->pdl(indx, [0,1,2,3,4,4,4,5,5,5]);
+	my $to =   PDL->pdl(indx, [1,2,3,1,0,2,3,0,1,2]);
+	my @names = map '  '.join(",",@$_), @coords;
+	my $e = PDL::GraphEvolver->new(pdl(@coords));
+	$e->set_links($from,$to,PDL->ones(1));
+	my $c = $e->getcoords;
+	my $graph = PDL::Graphics::TriD::get_new_graph(); # also clears
+	hold3d();
+	nokeeptwiddling3d();
+	PDL::Graphics::TriD::graph_object(
+	  my $lab = PDL::Graphics::TriD::Labels->new($c,{Strings => \@names}));
+	PDL::Graphics::TriD::graph_object(
+		my $lin = PDL::Graphics::TriD::MathGraph->new(
+		$c, {From => $from, To => $to}));
+	PDL::Graphics::TriD::graph_object(
+		my $sph = PDL::Graphics::TriD::Spheres->new($c));
+	my $ind = 0;
+	while(1) {
+		$e->step();
+		if(++$ind%2 == 0) {
+			$_->data_changed for $lab, $lin, $sph;
+			$graph->scalethings() if (($ind % 200) == 0 or 1);
+			last if twiddle3d();
+		}
+	}
+	keeptwiddling3d();
+	release3d();
+	# [press 'q' in the graphics window when done]
+|],
+
+[actnw => q|
+	# Show the world!
+	use PDL::Transform::Cartography;
+	$shape = earth_shape();
+	$floats = t_raster2float()->apply($shape->mv(2,0));
+	$radius = $floats->slice('(2)'); # r g b all same
+	$radius *= float((6377.09863 - 6370.69873) / 6371);
+	$radius += float(6370.69873 / 6371);
+	$e_i = earth_image('day');
+	$earth = t_raster2float()->apply($e_i->mv(2,0));
+	$earth = $earth->append($radius->dummy(0));
+	$shrink = 2.5; # how much to shrink by
+	$new_x = int($e_i->dim(0) / $shrink);
+	$earth2 = $earth->mv(0,2)->match([$new_x,int($new_x/2),6])->mv(2,0); # shrink
+	($lonlatrad, $rgb) = map $earth2->slice($_), pdl(0,1,5), '2:4';
+	$sph = t_spherical()->inverse()->apply($lonlatrad);
+	imag3d($sph, $rgb, {Lines=>0});
+	# [press 'q' in the graphics window when done]
+|],
+
+[actnw => q|
+	# Show off the world!
+	# The Earth's radius doesn't proportionally vary much,
+	# but let's exaggerate it to prove we have height information!
+	$lonlatrad->slice('2') -= 1;
+	$lonlatrad->slice('2') *= 100;
+	$lonlatrad->slice('2') += 1;
+	$sph = t_spherical()->inverse()->apply($lonlatrad);
+	imag3d($sph, $rgb, {Lines=>0});
+	# [press 'q' in the graphics window when done]
+|],
+
+[actnw => q|
+	# Now zoom in over Europe
+	($lats, $lons) = map $_ / 180, pdl(22, 72), pdl(-10, 40);
+	$lats = indx(($lats + 0.5) * $earth->dim(2));
+	$lons = indx((($lons + 1) / 2) * $earth->dim(1));
+	$earth3 = $earth->slice(':', map [$_->list], $lons, $lats)->sever; # zoom
+	($lonlatrad, $rgb) = map $earth3->slice($_), pdl(0,1,5), '2:4';
+	$lonlatrad->slice('2') -= 1;
+	$lonlatrad->slice('2') *= 50; # exaggerate terrain but less
+	$lonlatrad->slice('2') += 1;
+	$sph = t_spherical()->inverse()->apply($lonlatrad);
+	imag3d($sph, $rgb, {Lines=>0});
 	# [press 'q' in the graphics window when done]
 |],
 

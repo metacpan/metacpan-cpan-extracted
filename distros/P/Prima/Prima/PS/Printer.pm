@@ -50,6 +50,7 @@ use Prima::PS::PostScript;
 use Prima::PS::PDF;
 use Prima::PS::TempFile;
 use Prima::PS::Setup;
+use Prima::MsgBox;
 
 package Prima::PS::Printer::Common;
 use Prima::sys::FS;
@@ -146,7 +147,7 @@ sub _begin_doc
 			my $h = IO::Handle-> new;
 			unless ( open $h, ">", $f) {
 				undef $h;
-				Prima::message("Error opening $f:$!");
+				message("Error opening $f:$!");
 				goto AGAIN;
 			}
 			binmode $h;
@@ -172,7 +173,7 @@ sub _begin_doc
 	} elsif ( $self-> {data}-> {spoolerType} eq 'cmd' && $self->{data}->{spoolerData} =~ /\$/) {
 		my $f = Prima::PS::TempFile->new(unlink => 0, warn => !$self->{gui});
 		unless ( defined $f ) {
-			Prima::message("Error creating temporary file: $!") if $self-> {gui};
+			message("Error creating temporary file: $!") if $self-> {gui};
 			return 0;
 		}
 		$self-> {spoolTmpFile} = $f;
@@ -186,7 +187,7 @@ my ( $sigpipe);
 
 sub __end
 {
-	my $self = $_[0];
+	my ($self, $aborted) = @_;
 	close( $self-> {spoolHandle}) if $self-> {spoolHandle} && $self-> {data}-> {spoolerType} ne 'fh';
 	if ( $self-> {data}-> {spoolerType} ne 'file') {
 		defined($sigpipe) ? $SIG{PIPE} = $sigpipe : delete($SIG{PIPE});
@@ -195,14 +196,16 @@ sub __end
 	$self-> {spoolingFailed} = undef;
 
 	if ( $self->{data}->{spoolerType} eq 'cmd' && $self->{data}->{spoolerData} =~ /\$/) {
-		my $cmd = $self->{data}->{spoolerData};
-		my $tmp = $self->{spoolName};
-		$cmd =~ s/\$/$tmp/g;
-		if ( $self->{gui} && $cmd !~ />2/) {
-			$self->{spoolSTDERR} = Prima::PS::TempFile->new_filename;
-			$cmd .= " 2>$self->{spoolSTDERR}";
+		unless ( $aborted ) {
+			my $cmd = $self->{data}->{spoolerData};
+			my $tmp = $self->{spoolName};
+			$cmd =~ s/\$/$tmp/g;
+			if ( $self->{gui} && $cmd !~ />2/) {
+				$self->{spoolSTDERR} = Prima::PS::TempFile->new_filename;
+				$cmd .= " 2>$self->{spoolSTDERR}";
+			}
+			$self-> show_msg("Error running '$cmd'") if system $cmd;
 		}
-		$self-> show_msg("Error running '$cmd'") if system $cmd;
 		$self->{spoolTmpFile}->remove;
 		undef $self->{spoolTmpFile};
 	}
@@ -218,7 +221,7 @@ sub _end_doc
 	my $self = $_[0];
 	my $backend = $self->{backend};
 	$backend->can('end_doc')->($self);
-	$self-> __end;
+	$self-> __end(0);
 }
 
 sub _abort_doc
@@ -226,7 +229,7 @@ sub _abort_doc
 	my $self = $_[0];
 	my $backend = $self->{backend};
 	$backend->can('abort_doc')->($self);
-	$self-> __end;
+	$self-> __end(1);
 	unlink $self-> {spoolName} if $self-> {data}-> {spoolerType} eq 'file';
 }
 
@@ -235,24 +238,16 @@ sub show_msg
 	my ( $self, $msg ) = @_;
 	return unless $self->{gui};
 
-	my $tmpf = $self->{spoolSTDERR};
-	my @msg;
-	if ( defined($tmpf) && (open my $f, "<", $tmpf )) {
-		while ( my $c = <$f> ) {
-			chomp $c;
-			push @msg, $c;
-			if (@msg > 5) {
-				push @msg, "...";
-				last;
-			}
-		}
+	if (
+		defined($self->{spoolSTDERR}) &&
+		(open my $f, "<", $self->{spoolSTDERR} )
+	) {
+		local $/;
+		$msg .= ": " . <$f>;
 		close $f;
 	}
-	if ( @msg ) {
-		unshift @msg, '' if length($msg[0]) + length($msg) > 60;
-		$msg .= ": ". join("\n", @msg);
-	}
-	Prima::message($msg);
+
+	message($msg);
 }
 
 sub _spool
@@ -295,9 +290,10 @@ sub _spool
 		return $ok;
 	}
 
-	if ( !(print {$self-> {spoolHandle}} $data) ||
-			( $piped && $self-> {data}-> {spoolerType} ne 'file' )
-		) {
+	if (
+		!(print {$self-> {spoolHandle}} $data) ||
+		( $piped && $self-> {data}-> {spoolerType} ne 'file' )
+	) {
 		$self-> show_msg("Error printing to '$self->{spoolName}'");
 		$self-> {spoolingFailed} = 1;
 		return 0;
@@ -408,6 +404,11 @@ sub profile_default
 	return $def;
 }
 
+sub profile_check_in
+{
+	my ( $self, $p, $default) = @_;
+	$p->{userData}->{$_} = $p->{$_} for qw(resolution reversed rotate scaling);
+}
 
 sub init
 {
@@ -443,8 +444,12 @@ sub init
 			$self-> {printers}-> {GhostView}-> {spoolerType} = 'cmd';
 			$self-> {printers}-> {GhostView}-> {spoolerData} = 'gv $';
 		}
-		$self-> {printers}-> {File} = deepcopy( $self-> {defaultData});
-		$self-> {printers}-> {File}-> {spoolerType} = 'file';
+		$self-> {printers}-> {'Save as PostScript'} = deepcopy( $self-> {defaultData});
+		$self-> {printers}-> {'Save as PostScript'}-> {spoolerType} = 'file';
+	}
+
+	if ( exists $self->{printers}->{File} && ! exists $self->{printers}->{'Save as PostScript'}) {
+		$self-> {printers}-> {'Save as PostScript'} = delete $self->{printers}->{File};
 	}
 
 	unless ( defined $pr) {
@@ -457,6 +462,13 @@ sub init
 	}
 
 	$self-> printer( $pr);
+	$self-> $_( $profile{userData}->{$_} ) for
+		grep { defined $profile{userData}->{$_} }
+		qw(reversed rotate);
+	$self-> resolution( @{$profile{userData}->{resolution}} )
+		if defined $profile{userData}->{resolution};
+	$self-> scale( ($profile{userData}->{scaling}) x 2)
+		if defined $profile{userData}->{scaling};
 	return %profile;
 }
 
@@ -502,7 +514,7 @@ sub printers
 	my $self = $_[0];
 
 	my @res;
-	for ( keys %{$self-> {printers}}) {
+	for ( sort keys %{$self-> {printers}}) {
 		my $d = $self-> {printers}-> {$_};
 		push @res, {
 			name    => $_,

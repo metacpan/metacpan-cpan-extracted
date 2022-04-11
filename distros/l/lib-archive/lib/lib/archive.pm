@@ -14,7 +14,7 @@ use MIME::Base64 qw(decode_base64);
 use IO::Uncompress::Gunzip;
 use HTTP::Tiny;
 
-our $VERSION = "0.91";
+our $VERSION = "0.92";
 
 =pod
 
@@ -59,10 +59,16 @@ lib::archive when you call your script with a relative path B<and> use releative
 paths for lib::archive.
 
 B<In standard mode the module will not create any files, not even temporary.
-Everything is extracted on the fly>. When the environment variable
-PERL_LIB_ARCHIVE_EXTRACT is set to a directory name the directories and
-files will be extracted to that path. An attempt will be made to create
-the directory should it not already exist.
+Everything is extracted on the fly>. When running under a debugger or the
+environment variable PERL_LIB_ARCHIVE_EXTRACT is set to a directory name
+the directories and files will be extracted to the filesystem. I case of
+running under a debugger without PERL_LIB_ARCHIVE_EXTRACT being set the
+extracted modules will be  saved to the .lib_archive_extract directory
+in the user's home directory (determined by C<glob('~')>). The home
+directory can be overwritten by setting the environment variable
+PERL_LIB_ARCHIVE_HOME.
+
+An attempt will be made to create the directory should it not already exist.
 
 You can use every file format Archive::Tar supports.
 
@@ -113,12 +119,15 @@ Thomas Kratz E<lt>tomk@cpan.orgE<gt>
 my $cpan   = $ENV{CPAN_MIRROR} || 'https://www.cpan.org';
 my $rx_url = qr!^(?:CPAN|https?)://!;
 my $tar    = Archive::Tar->new();
+my $home   = $ENV{PERL_LIB_ARCHIVE_HOME} // glob('~');
 
 sub import {
     my ( $class, @entries ) = @_;
     my %cache;
 
-    my $caller_file = (caller)[1];
+    my $caller_file    = (caller)[1];
+    my $under_debugger = defined($DB::single);
+    my $extract_dir    = $ENV{PERL_LIB_ARCHIVE_EXTRACT} // "$home/.lib_archive_extract";
 
     for my $entry (@entries) {
         my $is_url = $entry =~ /$rx_url/;
@@ -127,9 +136,9 @@ sub import {
             : ( $entry eq '__DATA__' ) ? _get_data($caller_file)
             :                            _get_files( $entry, $caller_file );
         for my $arc (@$arcs) {
-            my $path  = $is_url ? $entry : $arc->[0];
-            my $base  = basename($path);
-            my @ver   = $base =~ /(v?\d+\.\d+(?:\.\d+)?)/gi;
+            my $path = $is_url ? $entry : $arc->[0];
+            my $base = basename($path);
+            my @ver  = $base =~ /(v?\d+\.\d+(?:\.\d+)?)/gi;
             my %tmp;
             my $mod = 0;
             my $lib = 0;
@@ -151,9 +160,10 @@ sub import {
     unshift @INC, sub {
         my ( $cref, $rel ) = @_;
         return unless my $rec = $cache{$rel};
-        $INC{$rel} = _expand( $rel, $rec->{content}, $rec->{arcver} ) if $ENV{PERL_LIB_ARCHIVE_EXTRACT};
-        $INC{$rel} //= $rec->{path} unless defined($DB::single);
-        open( my $pfh, '<', $rec->{content} ) or croak $!;    ## no critic (RequireBriefOpen)
+        $INC{$rel} = _expand( $rel, $rec->{content}, $rec->{arcver}, $extract_dir )
+            if $ENV{PERL_LIB_ARCHIVE_EXTRACT} or $under_debugger;
+        $INC{$rel} //= $rec->{path} unless $under_debugger;
+        open( my $pfh, '<', $rec->{content} ) or croak $!;
         return $pfh;
     };
 
@@ -163,7 +173,7 @@ sub import {
 
 sub _get_files {
     my ( $glob, $cfile ) = @_;
-    ( my $glob_ux = $glob ) =~ s!\\!/!g;
+    ( my $glob_ux = $glob )                      =~ s!\\!/!g;
     ( my $cdir    = dirname( rel2abs($cfile) ) ) =~ s!\\!/!g;
     $glob_ux = "$cdir/$glob_ux" unless file_name_is_absolute($glob_ux);
     my @files;
@@ -222,8 +232,8 @@ sub _get_data {
 
 
 sub _expand {
-    my ( $rel, $cref, $ver ) = @_;
-    my $fn = $ver ? "$ENV{PERL_LIB_ARCHIVE_EXTRACT}/$ver/$rel" : "$ENV{PERL_LIB_ARCHIVE_EXTRACT}/$rel";
+    my ( $rel, $cref, $ver, $exdir ) = @_;
+    my $fn = $ver ? "$exdir/$ver/$rel" : "$exdir/$rel";
     make_path( dirname($fn) );
     open( my $fh, '>', $fn ) or die "couldn't save $fn, $!\n";
     print $fh $$cref;

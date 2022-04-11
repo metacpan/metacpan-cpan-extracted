@@ -2,7 +2,7 @@
 package Test::Expander;
 
 # The versioning is conform with https://semver.org
-our $VERSION = '1.0.6';                                     ## no critic (RequireUseStrict, RequireUseWarnings)
+our $VERSION = '1.1.1';                                     ## no critic (RequireUseStrict, RequireUseWarnings)
 
 use v5.14;
 use warnings
@@ -27,20 +27,17 @@ use Test2::V0        ();
 use Test::Expander::Constants qw(
   $ANY_EXTENSION
   $CLASS_HIERARCHY_LEVEL
-  $ERROR_WAS
+  $ERROR_WAS $EXCEPTION_PREFIX
   $FALSE
-  $EXCEPTION_PREFIX
-  $INVALID_ENV_ENTRY
-  $INVALID_VALUE
-  $NEW_FAILED $NEW_SUCCEEDED
-  $REPLACEMENT
-  $REQUIRE_DESCRIPTION $REQUIRE_IMPLEMENTATION
-  $SEARCH_PATTERN
-  $TOP_DIR_IN_PATH
-  $TRUE
-  $UNKNOWN_OPTION
-  $USE_DESCRIPTION $USE_IMPLEMENTATION
+  $INVALID_ENV_ENTRY $INVALID_VALUE
+  $KEEP_ENV_VAR
+  $NEW_FAILED $NEW_SUCCEEDED $NOTE
+  $REPLACEMENT $REQUIRE_DESCRIPTION $REQUIRE_IMPLEMENTATION
+  $SEARCH_PATTERN $SET_ENV_VAR $SET_TO
+  $TOP_DIR_IN_PATH $TRUE
+  $UNKNOWN_OPTION $USE_DESCRIPTION $USE_IMPLEMENTATION
   $VERSION_NUMBER
+  @UNEXPECTED_EXCEPTION
 );
 
 readonly_on($VERSION);
@@ -111,26 +108,25 @@ sub import {
 
   if ($CLASS) {
     readonly_on($CLASS);
-    note(q(Set $CLASS to '),      $CLASS,                                                                   q('));
-
+    $NOTE->($SET_TO, '$CLASS', $CLASS);
     $METHOD_REF = $CLASS->can($METHOD);
     $METHOD     = undef unless($METHOD_REF);
   }
   if ($METHOD) {
     readonly_on($METHOD);
-    note(q(Set $METHOD to '),     $METHOD,                                                                  q('));
+    $NOTE->($SET_TO, '$METHOD', $METHOD);
   }
   if ($METHOD_REF) {
     readonly_on($METHOD_REF);
-    note(q(Set $METHOD_REF to '), $METHOD_REF, ' -> &', $CLASS, '::', svref_2object($METHOD_REF)->GV->NAME, q('));
+    $NOTE->($SET_TO, '$METHOD_REF', '\&' . $CLASS . '::' . svref_2object($METHOD_REF)->GV->NAME);
   }
   if ($TEMP_DIR) {
     readonly_on($TEMP_DIR);
-    note(q(Set $TEMP_DIR to '),   $TEMP_DIR,                                                                q('));
+    $NOTE->($SET_TO, '$TEMP_DIR', $TEMP_DIR);
   }
   if ($TEMP_FILE) {
     readonly_on($TEMP_FILE);
-    note(q(Set $TEMP_FILE to '),  $TEMP_FILE,                                                               q('));
+    $NOTE->($SET_TO, '$TEMP_FILE', $TEMP_FILE);
   }
 
   Importer->import_into($class, scalar(caller), ());
@@ -148,6 +144,7 @@ sub lives_ok (&;$) {
   my ($coderef, $description) = @_;
 
   eval { $coderef->() };
+  { no warnings; printf($UNEXPECTED_EXCEPTION[!!$@], $@); } ## no critic (ProhibitNoWarnings)
 
   return ok(!$@, $description);
 }
@@ -220,10 +217,16 @@ sub _readEnvFile {
   my @lines = path($envFile)->lines({ chomp => 1 });
   my %env;
   while (my ($index, $line) = each(@lines)) {
-    next unless $line =~ /^ (?<name> \w+) \s* = \s* (?<value> \S .*)/x;
-    $env{$+{name}} = eval($+{value});
-    die(sprintf($INVALID_ENV_ENTRY, $index, $envFile, $line, $@)) if $@;
-    note(q(Set environment variable '), $+{name}, q(' to '), $env{$+{name}}, q(' from file '), $envFile, q('));
+    next unless $line =~ /^ (?<name> \w+) \s* (?: = \s* (?<value> \S .*) | $ )/x;
+    if (exists($+{value})) {
+      $env{$+{name}} = eval($+{value});
+      die(sprintf($INVALID_ENV_ENTRY, $index, $envFile, $line, $@)) if $@;
+      $NOTE->($SET_ENV_VAR, $+{name}, $env{$+{name}}, $envFile);
+    }
+    elsif (exists($ENV{$+{name}})) {
+      $env{$+{name}} = $ENV{$+{name}};
+      $NOTE->($KEEP_ENV_VAR, $+{name}, $ENV{$+{name}});
+    }
   }
 
   return \%env;

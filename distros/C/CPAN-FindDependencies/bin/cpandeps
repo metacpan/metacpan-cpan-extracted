@@ -22,9 +22,7 @@ if($@) {
     die "Couldn't load CPAN::FindDependencies.\n";
 }
 
-my $target = shift;
 my @deps = CPAN::FindDependencies::finddeps(
-    $target,
     nowarnings => 1,
     map {
         $_ =~ /^(--showmoduleversions|-h|--help)$/ ? () :
@@ -37,7 +35,7 @@ foreach my $dep (@deps) {
     print '  ' x $dep->depth();
     print '*' if($dep->warning());
     print $dep->name().' (dist: '.$dep->distribution();
-    print ', mod ver: '.$dep->version() if($showversion && $dep->name() ne $target);
+    print ', mod ver: '.$dep->version() if($showversion && $dep->name() ne $deps[0]->name());
     print ")\n";
 }
 
@@ -53,9 +51,9 @@ This program is a simple wrapper around CPAN::FindDependencies.
 
     cpandeps CPAN::FindDependencies
 
-    cpandeps CPAN::FindDependencies --perl 5.8.8 --cachedir ../foo/bar
+    cpandeps --perl 5.8.8 --cachedir ../foo/bar CPAN::FindDependencies
 
-    cpandeps CPAN::FindDependencies --showmoduleversions
+    cpandeps --showmoduleversions CPAN::FindDependencies
 
 Given a module name, this program will show you the module's
 dependency tree.  It takes exactly the same arguments as the
@@ -67,7 +65,9 @@ that C<nowarnings> is turned *on* by default:
 =item nowarnings
 
 Warnings about modules where we can't find their META.yml or Makefile.PL, and
-so can't divine their pre-requisites, will be suppressed;
+so can't divine their pre-requisites, will be suppressed. Other warnings may
+still be emitted though, such as those telling you about modules which have
+dodgy (but still understandable) metadata;
 
 =item fatalerrors
 

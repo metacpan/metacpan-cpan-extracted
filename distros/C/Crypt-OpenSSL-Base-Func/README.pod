@@ -64,3 +64,23 @@ see also openssl/crypto/bn/bn_sqrt.c
     my $s = bn_mod_sqrt($a, $p); #hexstring
     print $s, "\n";
     #03
+
+=head2  evp_pkey_from_point_hex
+
+    my $ec_pkey_pub = evp_pkey_from_point_hex($ec_group, $ec_point_hex, $bn_ctx);
+
+=head2 evp_pkey_from_priv_hex
+
+    my $ec_pkey_priv = evp_pkey_from_priv_hex($ec_group, $ec_priv_hex); 
+
+=head2 pem_write_evp_pkey    
+
+    my $ret = pem_write_evp_pkey($dst_fname, $evp_pkey, $is_priv);
+
+=head2 pem_read_pkey
+
+    my $evp_pkey = pem_read_pkey($key_file, $is_priv);
+
+=head2  ecdh_pkey
+
+    my $zlen = ecdh_pkey($pkey_priv, $pkey_peer_pub, \$z);

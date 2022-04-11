@@ -1,7 +1,7 @@
 <clacks>
     <appname>Clacks Slave1</appname>
     <ip>127.0.0.1</ip>
-    <port>18889</port>
+    <port>49889</port>
     <pingtimeout>600</pingtimeout>
     <interclackspingtimeout>60</interclackspingtimeout>
     <ssl>
@@ -16,6 +16,6 @@
     </throttle>
     <master>
         <ip>127.0.0.1</ip>
-        <port>18888</port>
+        <port>49888</port>
     </master>
 </clacks>

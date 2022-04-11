@@ -1,0 +1,19 @@
+--- #YAML:1.0
+name:                CPAN
+version:             1.9205
+abstract:            query, download and build perl modules from CPAN sites
+license:             perl
+generated_by:        ExtUtils::MakeMaker version 6.3601
+distribution_type:   module
+requires:     
+    File::Spec:                    0
+    File::Temp:                    0
+    Scalar::Util:                  0
+    Test::Harness:                 2.62
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Andreas Koenig <andreas.koenig.gmwojprw@franz.ak.mind.de>
+repository: "https://pause.perl.org:5460/svn/cpanpm/trunk"

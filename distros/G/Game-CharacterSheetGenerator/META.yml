@@ -1,0 +1,34 @@
+---
+abstract: 'a web app to generate character sheets'
+author:
+  - 'Alex Schroeder'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.52'
+  File::ShareDir::Install: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Game-CharacterSheetGenerator
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  File::ShareDir: '0'
+  File::Slurper: '0'
+  I18N::AcceptLanguage: '0'
+  Modern::Perl: '1.20180701'
+  Mojolicious: '0'
+  XML::LibXML: '0'
+  perl: '5.026000'
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: https://alexschroeder.ch/cgit/character-sheet-generator
+version: 1
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

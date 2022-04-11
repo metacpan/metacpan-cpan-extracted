@@ -1,10 +1,10 @@
 NAME
-    Acme::CPANModules::XSVersions - XS versions of Perl modules
+    Acme::CPANModules::XSVersions - List of XS versions of Perl modules
 
 VERSION
-    This document describes version 0.002 of Acme::CPANModules::XSVersions
+    This document describes version 0.003 of Acme::CPANModules::XSVersions
     (from Perl distribution Acme-CPANModules-XSVersions), released on
-    2019-01-15.
+    2022-03-18.
 
 SYNOPSIS
     To install all XS versions of PP modules currently installed on your
@@ -20,8 +20,6 @@ SYNOPSIS
     Acme::CM::Get, Module::Installed::Tiny, and cpanm.)
 
 DESCRIPTION
-    XS versions of Perl modules.
-
     This list catalogs (pure-) Perl modules that have their XS counterparts
     ("fast versions"), usually in separate distributions so the installation
     of the XS version is optional. The two versions of the modules provide
@@ -38,148 +36,341 @@ DESCRIPTION
 
     Additions much welcome.
 
-INCLUDED MODULES
-    *   Algorithm::Diff
+ACME::CPANMODULES ENTRIES
+    *   Algorithm::Diff - Compute `intelligent' differences between two
+        files / lists
 
-    *   Algorithm::LUHN
+        Author: RJBS <https://metacpan.org/author/RJBS>
 
-    *   Algorithm::PageRank
+    *   Algorithm::LUHN - Calculate the Modulus 10 Double Add Double
+        checksum
 
-    *   Algorithm::RectanglesContainingDot
+        Author: NEILB <https://metacpan.org/author/NEILB>
 
-    *   Bytes::Random
+    *   Algorithm::PageRank - Calculate PageRank in Perl
 
-    *   Class::Accessor::Fast
+        Author: XERN <https://metacpan.org/author/XERN>
 
-    *   Class::C3
+    *   Algorithm::RectanglesContainingDot - find rectangles containing a
+        given dot
 
-    *   Class::Load
+        Author: SALVA <https://metacpan.org/author/SALVA>
 
-    *   Convert::Bencode
+    *   Bytes::Random - Perl extension to generate random bytes.
 
-    *   Crypt::Passwd
+        Author: JOHND <https://metacpan.org/author/JOHND>
 
-    *   Crypt::TEA_PP
+    *   Class::Accessor::Fast - Faster, but less expandable, accessors
 
-    *   Crypt::XXTEA_PP
+        Author: KASEI <https://metacpan.org/author/KASEI>
 
-    *   DDC::PP
+    *   Class::C3 - A pragma to use the C3 method resolution order algorithm
 
-    *   Crypt::Skip32
+        Author: HAARG <https://metacpan.org/author/HAARG>
+
+    *   Class::Load - A working (require "Class::Name") and more
+
+        Author: ETHER <https://metacpan.org/author/ETHER>
+
+    *   Convert::Bencode - Functions for converting to/from bencoded strings
+
+        Author: ORCLEV <https://metacpan.org/author/ORCLEV>
+
+    *   Crypt::Passwd - Perl wrapper around the UFC Crypt
+
+        Author: LUISMUNOZ <https://metacpan.org/author/LUISMUNOZ>
+
+    *   Crypt::TEA_PP - Pure Perl Implementation of the Tiny Encryption
+        Algorithm
+
+        Author: JAHIY <https://metacpan.org/author/JAHIY>
+
+    *   Crypt::XXTEA_PP - Pure Perl Implementation of Corrected Block Tiny
+        Encryption Algorithm
+
+        Author: JAHIY <https://metacpan.org/author/JAHIY>
+
+    *   DDC::PP - pure-perl DDC::XS clone: constants
+
+        Author: MOOCOW <https://metacpan.org/author/MOOCOW>
+
+    *   Crypt::Skip32 - 32-bit block cipher based on Skipjack
+
+        Author: ESH <https://metacpan.org/author/ESH>
 
     *   Date::Calc
 
-    *   Directory::Iterator
+        Author: STBEY <https://metacpan.org/author/STBEY>
 
-    *   Encode
+    *   Directory::Iterator - Simple, efficient recursive directory listing
 
-    *   Encoding::FixLatin
+        Author: SANBEG <https://metacpan.org/author/SANBEG>
 
-    *   File::MMagic
+    *   Encode - character encodings in Perl
 
-    *   Geo::Coordinates::UTM
+        Author: DANKOGAI <https://metacpan.org/author/DANKOGAI>
 
-    *   Geo::Distance
+    *   Encoding::FixLatin - takes mixed encoding input and produces UTF-8
+        output
 
-    *   Geo::Hash
+        Author: GRANTM <https://metacpan.org/author/GRANTM>
 
-    *   HTTP::Headers::Fast
+    *   File::MMagic - Guess file type
+
+        Author: KNOK <https://metacpan.org/author/KNOK>
+
+    *   Geo::Coordinates::UTM - Perl extension for Latitiude Longitude
+        conversions.
+
+        Author: GRAHAMC <https://metacpan.org/author/GRAHAMC>
+
+    *   Geo::Distance - Calculate distances and closest locations.
+        (DEPRECATED)
+
+        Author: BLUEFEET <https://metacpan.org/author/BLUEFEET>
+
+    *   Geo::Hash - Encode / decode geohash.org locations.
+
+        Author: ANDYA <https://metacpan.org/author/ANDYA>
+
+    *   HTTP::Headers::Fast - faster implementation of HTTP::Headers
+
+        Author: TOKUHIROM <https://metacpan.org/author/TOKUHIROM>
 
     *   HTTP::Parser::XS::PP
 
-    *   Heap::Simple
+        Author: KAZUHO <https://metacpan.org/author/KAZUHO>
 
-    *   Image::Info
+    *   Heap::Simple - Fast and easy to use classic heaps
 
-    *   JSON::PP
+        Author: THOSPEL <https://metacpan.org/author/THOSPEL>
 
-    *   Language::Befunge::Vector
+    *   Image::Info - Extract meta information from image files
 
-    *   Language::Befunge::Storage::Generic::Vec
+        Author: SREZIC <https://metacpan.org/author/SREZIC>
 
-    *   List::BinarySearch
+    *   JSON::PP - JSON::XS compatible pure-Perl module.
 
-    *   List::Flatten
+        Author: ISHIGAKI <https://metacpan.org/author/ISHIGAKI>
 
-    *   List::MoreUtils
+    *   Language::Befunge::Vector - an opaque, N-dimensional vector class
 
-    *   List::SomeUtils
+        Author: JQUELIN <https://metacpan.org/author/JQUELIN>
 
-    *   List::Util
+    *   Language::Befunge::Storage::Generic::Vec - a generic N-dimensional
+        LaheySpace
 
-    *   List::UtilsBy
+        Author: JQUELIN <https://metacpan.org/author/JQUELIN>
 
-    *   Math::Derivative
+    *   List::BinarySearch - Binary Search within a sorted array.
 
-    *   Math::Gauss
+        Author: DAVIDO <https://metacpan.org/author/DAVIDO>
 
-    *   Math::Utils
+    *   List::Flatten - Interpolate array references in a list
 
-    *   MaxMind::DB::Reader
+        Author: OBRADOVIC <https://metacpan.org/author/OBRADOVIC>
 
-    *   Mojo::Base
+    *   List::MoreUtils - Provide the stuff missing in List::Util
 
-    *   Net::IP
+        Author: REHSACK <https://metacpan.org/author/REHSACK>
 
-    *   Net::SNMP
+    *   List::SomeUtils - Provide the stuff missing in List::Util
 
-    *   Number::Closest
+        Author: DROLSKY <https://metacpan.org/author/DROLSKY>
 
-    *   Object::Tiny
+    *   List::Util - A selection of general-utility list subroutines
 
-    *   Object::Tiny::RW
+        Author: PEVANS <https://metacpan.org/author/PEVANS>
 
-    *   PPI
+    *   List::UtilsBy - higher-order list utility functions
 
-    *   Package::Stash
+        Author: PEVANS <https://metacpan.org/author/PEVANS>
 
-    *   Params::Validate
+    *   Math::Derivative - Numeric 1st and 2nd order differentiation
 
-    *   Path::Hilbert
+        Author: JGAMBLE <https://metacpan.org/author/JGAMBLE>
 
-    *   PerlX::ArraySkip
+    *   Math::Gauss - Gaussian distribution function and its inverse
 
-    *   PerlX::Maybe
+        Author: JANERT <https://metacpan.org/author/JANERT>
 
-    *   Protocol::Redis
+    *   Math::Utils - Useful mathematical functions not in Perl.
 
-    *   Readonly
+        Author: JGAMBLE <https://metacpan.org/author/JGAMBLE>
 
-    *   Ref::Util
+    *   MaxMind::DB::Reader - Read MaxMind DB files and look up IP addresses
 
-    *   Set::IntSpan::Fast
+        Author: MAXMIND <https://metacpan.org/author/MAXMIND>
 
-    *   Set::Product
+    *   Mojo::Base - Minimal base class for Mojo projects
 
-    *   SOAP::WSDL::Deserializer::XSD
+        Author: SRI <https://metacpan.org/author/SRI>
+
+    *   Net::IP - Perl extension for manipulating IPv4/IPv6 addresses
+
+        Author: MANU <https://metacpan.org/author/MANU>
+
+    *   Net::SNMP - Object oriented interface to SNMP
+
+        Author: DTOWN <https://metacpan.org/author/DTOWN>
+
+    *   Number::Closest - Find number(s) closest to a number in a list of
+        numbers
+
+        Author: ACCARDO <https://metacpan.org/author/ACCARDO>
+
+    *   Object::Tiny - Class building as simple as it gets
+
+        Author: ETHER <https://metacpan.org/author/ETHER>
+
+    *   Object::Tiny::RW - Class building as simple as it gets (with rw
+        accessors)
+
+        Author: SCHWIGON <https://metacpan.org/author/SCHWIGON>
+
+    *   PPI - Parse, Analyze and Manipulate Perl (without perl)
+
+        Author: OALDERS <https://metacpan.org/author/OALDERS>
+
+    *   Package::Stash - Routines for manipulating stashes
+
+        Author: ETHER <https://metacpan.org/author/ETHER>
+
+    *   Params::Validate - Validate method/function parameters
+
+        Author: DROLSKY <https://metacpan.org/author/DROLSKY>
+
+    *   Path::Hilbert - A no-frills converter between 1D and 2D spaces using
+        the Hilbert curve
+
+        Author: PWBENNETT <https://metacpan.org/author/PWBENNETT>
+
+    *   PerlX::ArraySkip - sub { shift; @_ }
+
+        Author: TOBYINK <https://metacpan.org/author/TOBYINK>
+
+    *   PerlX::Maybe - return a pair only if they are both defined
+
+        Author: TOBYINK <https://metacpan.org/author/TOBYINK>
+
+    *   Protocol::Redis - Redis protocol parser/encoder with asynchronous
+        capabilities.
+
+        Author: UNDEF <https://metacpan.org/author/UNDEF>
+
+    *   Readonly - Facility for creating read-only scalars, arrays, hashes
+
+        Author: SANKO <https://metacpan.org/author/SANKO>
+
+    *   Ref::Util - Utility functions for checking references
+
+        Author: ARC <https://metacpan.org/author/ARC>
+
+    *   Set::IntSpan::Fast - Fast handling of sets containing integer spans.
+
+        Author: ANDYA <https://metacpan.org/author/ANDYA>
+
+    *   Set::Product - generates the cartesian product of a set of lists
+
+        Author: GRAY <https://metacpan.org/author/GRAY>
+
+    *   SOAP::WSDL::Deserializer::XSD - Deserializer SOAP messages into
+        SOAP::WSDL::XSD::Typelib:: objects
+
+        Author: SWALTERS <https://metacpan.org/author/SWALTERS>
 
     *   Sort::Naturally
 
-    *   String::Numeric
+        Author: BINGOS <https://metacpan.org/author/BINGOS>
+
+    *   String::Numeric - Determine whether a string represents a numeric
+        value
+
+        Author: CHANSEN <https://metacpan.org/author/CHANSEN>
 
     *   Template::Alloy
 
-    *   Template::Stash
+        Author: RHANDOM <https://metacpan.org/author/RHANDOM>
 
-    *   Text::CSV
+    *   Template::Stash - Magical storage for template variables
 
-    *   Text::Levenshtein::Damerau
+        Author: ATOOMIC <https://metacpan.org/author/ATOOMIC>
 
-    *   Time::Format
+    *   Text::CSV - comma-separated values manipulator (using XS or
+        PurePerl)
 
-    *   Type::Tiny
+        Author: ISHIGAKI <https://metacpan.org/author/ISHIGAKI>
 
-    *   Tree::Object
+    *   Text::Levenshtein::Damerau - Damerau Levenshtein edit distance.
+
+        Author: UGEXE <https://metacpan.org/author/UGEXE>
+
+    *   Time::Format - Easy-to-use date/time formatting.
+
+        Author: ROODE <https://metacpan.org/author/ROODE>
+
+    *   Type::Tiny - tiny, yet Moo(se)-compatible type constraint
+
+        Author: TOBYINK <https://metacpan.org/author/TOBYINK>
+
+    *   Tree::Object - Generic tree objects
+
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
     *   URL::Encode
 
-    *   Unix::Uptime::BSD
+        Author: CHANSEN <https://metacpan.org/author/CHANSEN>
 
-    *   XML::CompactTree
+    *   Unix::Uptime::BSD - BSD implementation of Unix::Uptime (for Darwin,
+        DragonFly, and *BSD)
 
-    *   YAML::PP
+        Author: PIOTO <https://metacpan.org/author/PIOTO>
 
-    *   match::simple
+    *   XML::CompactTree - builder of compact tree structures from XML
+        documents
+
+        Author: PAJAS <https://metacpan.org/author/PAJAS>
+
+    *   YAML::PP - YAML 1.2 processor
+
+        Author: TINITA <https://metacpan.org/author/TINITA>
+
+    *   match::simple - simplified clone of smartmatch operator
+
+        Author: TOBYINK <https://metacpan.org/author/TOBYINK>
+
+FAQ
+  What is an Acme::CPANModules::* module?
+    An Acme::CPANModules::* module, like this module, contains just a list
+    of module names that share a common characteristics. It is a way to
+    categorize modules and document CPAN. See Acme::CPANModules for more
+    details.
+
+  What are ways to use this Acme::CPANModules module?
+    Aside from reading this Acme::CPANModules module's POD documentation,
+    you can install all the listed modules (entries) using cpanm-cpanmodules
+    script (from App::cpanm::cpanmodules distribution):
+
+     % cpanm-cpanmodules -n XSVersions
+
+    Alternatively you can use the cpanmodules CLI (from App::cpanmodules
+    distribution):
+
+        % cpanmodules ls-entries XSVersions | cpanm -n
+
+    or Acme::CM::Get:
+
+        % perl -MAcme::CM::Get=XSVersions -E'say $_->{module} for @{ $LIST->{entries} }' | cpanm -n
+
+    or directly:
+
+        % perl -MAcme::CPANModules::XSVersions -E'say $_->{module} for @{ $Acme::CPANModules::XSVersions::LIST->{entries} }' | cpanm -n
+
+    This Acme::CPANModules module also helps lcpan produce a more meaningful
+    result for "lcpan related-mods" command when it comes to finding related
+    modules for the modules listed in this Acme::CPANModules module. See
+    App::lcpan::Cmd::related_mods for more details on how "related modules"
+    are found.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -189,14 +380,6 @@ SOURCE
     Source repository is at
     <https://github.com/perlancar/perl-Acme-CPANModules-XSVersions>.
 
-BUGS
-    Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-XSVe
-    rsions>
-
-    When submitting a bug or request, please include a test-file or a patch
-    to an existing test-file that illustrates the bug or desired feature.
-
 SEE ALSO
     Acme::CPANModules - about the Acme::CPANModules namespace
 
@@ -205,9 +388,34 @@ SEE ALSO
 AUTHOR
     perlancar <perlancar@cpan.org>
 
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
+    steps required beyond that are considered a bug and can be reported to
+    me.
+
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019 by perlancar@cpan.org.
+    This software is copyright (c) 2022, 2019 by perlancar
+    <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-XSVe
+    rsions>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 

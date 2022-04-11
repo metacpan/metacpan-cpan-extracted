@@ -5,6 +5,7 @@ use warnings;
 use Encode;
 use Prima;
 use Prima::PS::CFF;
+use Prima::PS::Format;
 use Prima::PS::TempFile;
 use base qw(Prima::PS::Drawable);
 
@@ -71,30 +72,6 @@ sub change_transform
 	my ( $self, $gsave ) = @_;
 	return if $self-> {delay};
 
-	my @tp = $self-> translate;
-	my @cr = $self-> clipRect;
-	my @sc = $self-> scale;
-	my $ro = $self-> rotate;
-	my $rg = $self-> region;
-
-	$cr[2] -= $cr[0];
-	$cr[3] -= $cr[1];
-	my $doClip = grep { $_ != 0 } @cr;
-	my $doTR   = grep { $_ != 0 } @tp;
-	my $doSC   = grep { $_ != 0 } @sc;
-
-	if ( !$doClip && !$doTR && !$doSC && !$ro && !$rg) {
-		$self-> emit_content('q') if $gsave;
-		return;
-	}
-
-	@cr = $self-> pixel2point( @cr);
-	@tp = $self-> pixel2point( @tp);
-	my $mcr3 = -$cr[3];
-
-	$self-> emit_content('Q') unless $gsave;
-	$self-> emit_content('q');
-
 	my ($ps, $pm) = @{ $self }{ qw(pageSize pageMargins) };
 	my @pm = (
 		@$pm[0,1],
@@ -102,17 +79,43 @@ sub change_transform
 		$ps->[1] - $pm->[3] - $pm->[1]
 	);
 
+	my @tp = $self-> translate;
+	my @cr = $self-> clipRect;
+	my @sc = $self-> scale;
+	my $ro = $self-> rotate;
+	my $rg = $self-> region;
+	if ( $self->{reversed}) {
+		$ro += 90; $tp[1] -= ($self->point2pixel($pm[2]))[0];
+		$ro /= $Prima::PS::Drawable::RAD;
+	}
+
+	$cr[2] -= $cr[0];
+	$cr[3] -= $cr[1];
+	my $doClip = grep { $_ != 0 } @cr;
+	my $doSC   = grep { $_ != 0 } @sc;
+	my $doTR   = grep { $_ != 0 } @tp;
+
+	@cr = $self-> pixel2point( @cr);
+	@tp = $self-> pixel2point( @tp );
+	my $mcr3 = -$cr[3];
+
+	$self-> emit_content('Q') unless $gsave;
+	$self-> emit_content('q');
+
+	float_inplace(@pm, @cr, @tp, @sc);
 	$self-> emit_content("h @pm re W n");
-	$self-> emit_content("h @cr re W n") if $doClip;
-	$self-> emit_content("1 0 0 1 @tp cm") if $doTR;
-	$self-> emit_content($rg-> apply_offset . " n") if $rg && !$doClip;
-	$self-> emit_content("$sc[0] 0 0 $sc[1] 0 0 cm") if $doSC;
+	$self-> emit_content("1 0 0 1 $pm[0] $pm[1] cm");
 	if ($ro != 0) {
 		my $sin1 = sin($ro);
 		my $cos  = cos($ro);
 		my $sin2 = -$sin1;
+		float_inplace($cos, $sin1, $sin2);
 		$self-> emit_content("$cos $sin1 $sin2 $cos 0 0 cm");
 	}
+	$self-> emit_content("h @cr re W n") if $doClip;
+	$self-> emit_content("1 0 0 1 @tp cm") if $doTR;
+	$self-> emit_content($rg-> apply_offset . " n") if $rg && !$doClip;
+	$self-> emit_content("$sc[0] 0 0 $sc[1] 0 0 cm") if $doSC;
 	$self-> {changed}-> {$_} = 1 for qw(fill linePattern lineWidth lineJoin lineEnd miterLimit font);
 }
 
@@ -124,6 +127,11 @@ sub fill
 		$r1 == rop::NoOper &&
 		$r2 == rop::NoOper;
 
+	if ( $self-> {changed}-> {alpha}) {
+		my $al = $self-> alpha;
+		$self-> emit_content( "/GSA$al gs");
+		$self-> {changed}-> {alpha} = 0;
+	}
 	if ( $r2 != rop::NoOper && $self-> {fpType} ne 'F') {
 		my $bk =
 			( $r2 == rop::Blackness) ? 0 :
@@ -172,7 +180,7 @@ sub stroke
 
 	if ( $self-> {changed}-> {lineWidth}) {
 		my ($lw) = $self-> pixel2point($self-> lineWidth);
-		$self-> emit_content( $lw . ' w');
+		$self-> emit_content( float_format($lw) . ' w');
 		$self-> {changed}-> {lineWidth} = 0;
 	}
 
@@ -192,8 +200,14 @@ sub stroke
 
 	if ( $self-> {changed}-> {miterLimit}) {
 		my $ml = $self-> miterLimit;
-		$self-> emit_content( "$ml M");
+		$self-> emit_content( float_format($ml) . " M");
 		$self-> {changed}-> {miterLimit} = 0;
+	}
+
+	if ( $self-> {changed}-> {alpha}) {
+		my $al = $self-> alpha;
+		$self-> emit_content( "/GSA$al gs");
+		$self-> {changed}-> {alpha} = 0;
 	}
 
 	if ( $r2 != rop::NoOper && $lp ne lp::Solid ) {
@@ -377,8 +391,10 @@ ROOT
 	$self-> {page_images}   = [];
 	$self-> {page_fonts}    = {};
 	$self-> {page_rops}     = {};
-	$self-> {all_rops}     = {};
+	$self-> {page_alphas}   = {};
+	$self-> {all_rops}      = {};
 	$self-> {all_fonts}     = {};
+	$self-> {all_alphas}    = {};
 	unless ($self-> {page_content} = $self->new_file_obj) {
 		$self-> abort_doc;
 		return 0;
@@ -441,15 +457,19 @@ PAGE
 		}
 		$self-> emit(">>");
 	}
-	$self-> emit(">>"); # % Resources
 
-	if ( keys %{ $self->{page_rops} } ) {
+	if ( keys %{ $self->{page_rops} } || keys %{ $self->{page_alphas} } ) {
 		$self-> emit("/ExtGState <<");
 		while ( my ( $name, $xid ) = each %{ $self->{page_rops} } ) {
 			$self-> emit("/GS$name $xid 0 R");
 		}
+		while ( my ( $name, $xid ) = each %{ $self->{page_alphas} } ) {
+			$self-> emit("/GSA$name $xid 0 R");
+		}
 		$self-> emit(">>");
 	}
+
+	$self-> emit(">>"); # % Resources
 
 	if ( @{ $self->{page_refs} } ) {
 		$self-> emit("/XObject <<");
@@ -665,6 +685,26 @@ sub new_page
 
 sub pages { scalar @{ $_[0]-> {pages} } }
 
+sub alpha
+{
+	return $_[0]->{alpha} unless $#_;
+	my ( $self, $alpha ) = @_;
+	$alpha = int( $alpha + .5);
+	$alpha = 0 if $alpha < 0;
+	$alpha = 255 if $alpha > 255;
+	return if ($self->{alpha} // -1 ) == $alpha;
+	$self->{alpha} = $alpha;
+	return unless $self-> get_paint_state;
+
+	my $ca = int( $alpha / 2.55 ) / 100;
+	$self-> {all_alphas}->{ $alpha } //= {
+		xid => $self-> emit_new_dummy_object("/Type /ExtGState /ca $ca /CA $ca"),
+		id  => "GSA$alpha",
+	};
+	$self-> {page_alphas}-> {$alpha} = $self->{all_alphas}->{$alpha}->{xid};
+	$self-> {changed}->{alpha} = 1;
+}
+
 sub fillPattern
 {
 	return $_[0]-> SUPER::fillPattern unless $#_;
@@ -851,7 +891,7 @@ sub glyph_out_outline
 				$newfont = $self->{font};
 				$restore_font = 0;
 			} else {
-				my $src  = $self-> fontMapperPalette($nfid);
+				my $src  = $self->font_mapper->get($nfid);
 				my $dst  = \%{$self->{font}};
 				$newfont = Prima::Drawable->font_match( $src, $dst );
 				$restore_font = 1;
@@ -884,7 +924,7 @@ sub glyph_out_outline
 		my $dx = $x2 - $x;
 		my $dy = $y2 - $y;
 		if  ($dx != 0 || $dy != 0) {
-			($dx, $dy) = map { int( $_ * 100 + 0.5) / 100 } ($dx, $dy);
+			float_inplace($dx, $dy);
 			$emit .= "$dx $dy Td ";
 		}
 		($x, $y) = ($x2, $y2);
@@ -928,8 +968,10 @@ sub text_out
 		my $cos  = cos($r);
 		my $wcos = cos($r) * $wmul;
 		my $sin2 = -$sin1;
+		float_inplace($wcos, $sin1, $sin2, $cos, $x, $y);
 		$self-> emit_content("$wcos $sin1 $sin2 $cos $x $y cm");
 	} else {
+		float_inplace($wmul, $x, $y);
 		$self-> emit_content("$wmul 0 0 1 $x $y cm");
 	}
 
@@ -938,7 +980,7 @@ sub text_out
 		my ( $ds, $bs) = ( $self-> {font}-> {direction}, $self-> textOutBaseline);
 		$self-> {font}-> {direction} = 0;
 		$self-> textOutBaseline(1) unless $bs;
-		@rb = $self-> pixel2point( @{$self-> get_text_box( $text, $from, $len)});
+		@rb = float_format($self-> pixel2point( @{$self-> get_text_box( $text, $from, $len)}));
 		$self-> {font}-> {direction} = $ds;
 		$self-> textOutBaseline($bs) unless $bs;
 	}
@@ -1019,6 +1061,7 @@ sub clear
 	$x2 -= $x1;
 	$y2 -= $y1;
 	my $c = lc $self-> cmd_rgb( $self-> backColor);
+	float_inplace($x1, $y1, $x2, $y2);
 	$self-> emit_content(<<CLEAR);
 $c
 h $x1 $y1 $x2 $y2 re f
@@ -1029,7 +1072,7 @@ CLEAR
 sub line
 {
 	my ( $self, $x1, $y1, $x2, $y2) = @_;
-	( $x1, $y1, $x2, $y2) = $self-> pixel2point( $x1, $y1, $x2, $y2);
+	( $x1, $y1, $x2, $y2) = float_format($self-> pixel2point( $x1, $y1, $x2, $y2));
 	$self-> stroke("h $x1 $y1 m $x2 $y2 l S");
 }
 
@@ -1038,7 +1081,7 @@ sub lines
 	my ( $self, $array) = @_;
 	my $i;
 	my $c = scalar @$array;
-	my @a = $self-> pixel2point( @$array);
+	my @a = float_format($self-> pixel2point( @$array));
 	$c = int( $c / 4) * 4;
 	my $z = '';
 	for ( $i = 0; $i < $c; $i += 4) {
@@ -1086,7 +1129,7 @@ sub pixel
 	return cl::Invalid unless defined $pix;
 	my $c = lc $self-> cmd_rgb( $pix);
 	my $w;
-	($x, $y, $w) = $self-> pixel2point( $x, $y, 1);
+	($x, $y, $w) = float_format($self-> pixel2point( $x, $y, 1));
 	$self-> emit_content(<<PIXEL);
 q
 $c
@@ -1363,10 +1406,6 @@ described below.
 Can be set while object is in normal stage - cannot be changed if document
 is opened. Applies to fillPattern realization and general pixel-to-point
 and vice versa calculations
-
-=item ::region
-
-- ::region is not realized ( yet?)
 
 =back
 

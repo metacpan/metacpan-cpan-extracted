@@ -197,34 +197,6 @@ some cases:
 
 =over 3
 
-=item * Generalized scalars and computed assignment
-
-If the PDL on the left-hand side of C<.=> has a dim of size 1, it can be
-treated as a generalized scalar, as in:
-
-    $x = sequence(2,3);
-    $y = zeroes(1,3);
-    $y .= $x;
-
-In this case, C<$y> is automatically treated as a 2x3-PDL during the
-broadcasting operation, but half of the values from C<$x> silently disappear.
-The output is, as Kernighan and Ritchie would say, "undefined".
-
-Further, if the value on the right of C<.=> is empty, then C<.=> becomes
-a silent no-op:
-
-    $x = zeroes(0);
-    $y = zeroes(1);
-    $y .= $x+1;
-    print $y;
-
-will print C<[0]>.  In this case, "$x+1" is empty, and "$y" is a generalized
-scalar that is adjusted to be empty, so the assignment is carried out for
-zero elements (a no-op).
-
-Both of these behaviors are considered harmful and should not be relied upon:
-they may be patched away in a future version of PDL.
-
 =item * Empty PDLs and generalized scalars
 
 Generalized scalars (PDLs with a dim of size 1) can match any size in the
@@ -3440,7 +3412,6 @@ sub str1D {
 
 sub str2D{
     my($self,$format,$level)=@_;
-#    print "STR2D:\n"; $self->printdims();
     my @dims = $self->dims();
     barf "Not 2D" if scalar(@dims)!=2;
     my $x = listref_c($self);
@@ -3979,7 +3950,7 @@ sub PDL::set_data_by_file_map {
          0
       );
 
-      $pdl->upd_data;
+      $pdl->upd_data(1);
 
       if ($PDL::debug) {
          printf STDERR "set_data_by_file_map: length \${\$pdl_dataref} is %d.\n", length ${$pdl_dataref};

@@ -4,7 +4,7 @@ MaxMind::DB::Reader::XS - Fast XS implementation of MaxMind DB reader
 
 # VERSION
 
-version 1.000008
+version 1.000009
 
 # SYNOPSIS
 
@@ -14,13 +14,13 @@ version 1.000008
 
 # DESCRIPTION
 
-Simply installing this module causes [MaxMind::DB::Reader](https://metacpan.org/pod/MaxMind::DB::Reader) to use the XS
+Simply installing this module causes [MaxMind::DB::Reader](https://metacpan.org/pod/MaxMind%3A%3ADB%3A%3AReader) to use the XS
 implementation, which is much faster than the Perl implementation.
 
 The XS implementation links against the
 [libmaxminddb](http://maxmind.github.io/libmaxminddb/) library.
 
-See [MaxMind::DB::Reader](https://metacpan.org/pod/MaxMind::DB::Reader) for API details.
+See [MaxMind::DB::Reader](https://metacpan.org/pod/MaxMind%3A%3ADB%3A%3AReader) for API details.
 
 # VERSIONING POLICY
 
@@ -72,15 +72,16 @@ Bugs may be submitted through [https://github.com/maxmind/MaxMind-DB-Reader-XS/i
 
 - Andy Jack <github@veracity.ca>
 - Chris Weyl <cweyl@alumni.drew.edu>
-- Florian Ragwitz <rafl@debian.org>
+- Florian Ragwitz <fragwitz@maxmind.com>
 - Greg Oschwald <goschwald@maxmind.com>
 - Hidenori Sugiyama <madogiwa@gmail.com>
 - Mark Fowler <mark@twoshortplanks.com>
+- Nick Logan <nlogan@maxmind.com>
 - Olaf Alders <oalders@maxmind.com>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2013 - 2019 by MaxMind, Inc.
+This software is Copyright (c) 2013 - 2022 by MaxMind, Inc.
 
 This is free software, licensed under:
 

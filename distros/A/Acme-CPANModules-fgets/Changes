@@ -1,9 +1,16 @@
-0.002   2018-02-05 (PERLANCAR)
+0.003   2022-03-18  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - Tweak Abstract (add 'List of ...') to follow convention.
+
+
+0.002   2018-02-05  Released-By: PERLANCAR
 
 	- Add note about each module's behavior in low-throughput and
 	  non-blocking mode.
 
 
-0.001   2018-02-04 (PERLANCAR)
+0.001   2018-02-04  Released-By: PERLANCAR
 
         - First release.

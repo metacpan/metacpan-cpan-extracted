@@ -1,3 +1,6 @@
+0.08 2022-04-11
+ - Support for session token on RDS (josh48601847372)
+
 0.07 2021-10-26
  - S3: Enable response header override parameters (lucas1)
 

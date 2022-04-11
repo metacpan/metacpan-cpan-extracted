@@ -33,52 +33,37 @@ $PDL::Graphics::TriD::verbose //= 0;
 
 sub new {
 	my($type,$points,$colors,$options) = @_;
-
 	print "GObject new.. calling SUPER::new...\n" if($PDL::Graphics::TriD::verbose);
 	my $this = $type->SUPER::new();
 	print "GObject new - back (SUPER::new returned $this)\n" if($PDL::Graphics::TriD::verbose);
-
 	if(!defined $options and ref $colors eq "HASH") {
 		$options = $colors;
 		undef $colors;
 	}
-
+	$options = { $options ? %$options : () };
+	$options->{UseDefcols} = 1 if !defined $colors; # for VRML efficiency
+	$this->{Options} = $options;
+	$this->check_options;
 	print "GObject new - calling realcoords\n" if($PDL::Graphics::TriD::verbose);
-	$points = PDL::Graphics::TriD::realcoords($type->r_type,$points);
+	$this->{Points} = $points = PDL::Graphics::TriD::realcoords($type->r_type,$points);
 	print "GObject new - back from  realcoords\n" if($PDL::Graphics::TriD::verbose);
-
-	if(!defined $colors) {$colors = PDL->pdl(1,1,1);
-		$colors = $type->cdummies($colors,$points);
-	        $options->{UseDefcols} = 1;  # for VRML efficiency
-	} else {
-		$colors = PDL::Graphics::TriD::realcoords("COLOR",$colors);
-	}
-
-        $this->{Options} = $options;
-	$this->{Points}  = $points;
-	$this->{Colors}  = $colors;
-
-	$this->check_options();
-	
+	$this->{Colors} = defined $colors
+	  ? PDL::Graphics::TriD::realcoords("COLOR",$colors)
+	  : $this->cdummies(PDL->pdl(1,1,1),$points);
 	print "GObject new - returning\n" if($PDL::Graphics::TriD::verbose);
 	return $this;
 }
 
-
 sub check_options {
 	my($this) = @_;
-	my %newopts;
 	my $opts = $this->get_valid_options();
+	$this->{Options} = $opts, return if !$this->{Options};
 	print "FETCHOPT: $this ".(join ',',%$opts)."\n" if $PDL::Graphics::TriD::verbose;
-	for(keys %$opts) {
-		$newopts{$_} = !exists $this->{Options}{$_} ? $opts->{$_} : delete $this->{Options}{$_};
-	}
-	if(keys %{$this->{Options}}) {
-		die("Invalid options left: ".(join ',',%{$this->{Options}}));
-	}
+	my %newopts = (%$opts, %{$this->{Options}});
+	my @invalid = grep !exists $opts->{$_}, keys %newopts;
+	die "Invalid options left: @invalid" if @invalid;
 	$this->{Options} = \%newopts;
 }
-
 
 sub set_colors {
   my($this,$colors) = @_;
@@ -89,30 +74,17 @@ sub set_colors {
   $this->data_changed;
 }
 
-sub get_valid_options {
-	return {UseDefcols => 0};
-}
-
-sub get_points {
-	return $_[0]->{Points};
-}
-
+sub get_valid_options { +{UseDefcols => 0} }
+sub get_points { $_[0]{Points} }
+sub cdummies { $_[1] }
+sub r_type { "" }
+sub defcols { $_[0]{Options}{UseDefcols} }
 
 # In the future, have this happen automatically by the ndarrays.
 sub data_changed {
 	my($this) = @_;
-	$this->changed();
+	$this->changed;
 }
-
-sub cdummies {return $_[1];}
-
-sub r_type { return ""; }
-
-sub defcols {
-  return defined($_[0]->{Options}->{UseDefcols}) &&
-    $_[0]->{Options}->{UseDefcols};
-}
-1;
 
 package PDL::Graphics::TriD::Points;
 use base qw/PDL::Graphics::TriD::GObject/;
@@ -120,12 +92,24 @@ sub get_valid_options {
 	return {UseDefcols => 0, PointSize=> 1};
 }
 
-
 package PDL::Graphics::TriD::Spheres;
 use base qw/PDL::Graphics::TriD::GObject/;
-sub get_valid_options {  # need to add radius
-	return {UseDefcols => 0, PointSize=> 1};
+# need to add radius
+sub get_valid_options {
+  +{UseDefcols => 0, PointSize=> 1}
 }
+
+package PDL::Graphics::TriD::Lines;
+use base qw/PDL::Graphics::TriD::GObject/;
+sub cdummies { return $_[1]->dummy(1); }
+sub r_type { return "SURF2D";}
+sub get_valid_options { return {UseDefcols => 0, LineWidth => 1}; }
+
+package PDL::Graphics::TriD::LineStrip;
+use base qw/PDL::Graphics::TriD::GObject/;
+sub cdummies { return $_[1]->dummy(1); }
+sub r_type { return "SURF2D";}
+sub get_valid_options { return {UseDefcols => 0, LineWidth => 1}; }
 
 ###########################################################################
 ################# JNK 15mar11 added section start #########################
@@ -138,7 +122,6 @@ sub get_valid_options {  # need to add radius
 # JNK 27nov00 new object type:
 package PDL::Graphics::TriD::GPObject;
 use base qw/PDL::Graphics::TriD::GObject/;
-
 sub new {
   my($type,$points,$faceidx,$colors,$options) = @_;
   # faceidx is 2D pdl of indices into points for each face
@@ -153,25 +136,24 @@ sub new {
   else { $colors = PDL::Graphics::TriD::realcoords("COLOR",$colors); }
   my $this = bless { Points => $points, Faceidx => $faceidx, Faces => $faces,
                      Colors => $colors, Options => $options},$type;
-  $this->check_options();return $this;
+  $this->check_options;
+  $this;
 }
-
-sub get_valid_options {
-  return { UseDefcols=>0, Lines=>0, Smooth=>1, Material=>0 }; }  
-
+sub get_valid_options { { UseDefcols=>0, Lines=>0, Smooth=>1 } }
 sub cdummies {
   return $_[1]->dummy(1,$_[2]->getdim(2))->dummy(1,$_[2]->getdim(1)); }
 
 # JNK 13dec00 new object type:
 package PDL::Graphics::TriD::STrigrid_S;
 use base qw/PDL::Graphics::TriD::GPObject/;
-
 sub cdummies {
   return $_[1]->dummy(1,$_[2]->getdim(2))->dummy(1,$_[2]->getdim(1)); }
-    
-sub get_valid_options {
-  return { UseDefcols=>0, Lines=>0, Smooth=>1, Material=>0 }; }
-  
+sub new {
+  my ($class,$points,$faceidx,$colors,$options) = @_;
+  my $this = $class->SUPER::new($points,$faceidx,$colors,$options);
+  $this->{Normals} //= $this->smoothn($this->{Points}) if $this->{Options}{Smooth};
+  $this;
+}
 # calculate smooth normals
 sub smoothn { my ($this,$ddd) = @_;
   my $v=$this->{Points};my $f=$this->{Faces};my $fvi=$this->{Faceidx};
@@ -194,82 +176,58 @@ sub smoothn { my ($this,$ddd) = @_;
   my $vn=PDL::cat(
     map { my $vfi=PDL::cat(PDL::whichND($fvi==$_))->slice(':,(1)');
           $fn->dice_axis(1,$vfi)->mv(1,0)->sumover->norm }
-        (0..(($v->dims)[1]-1)) );
+        0..($v->dim(1)-1) );
 # ----------------------------------------------------------------------------
-  return $vn; }
+  return $vn;
+}
 # JNK 06dec00 new object type:
 package PDL::Graphics::TriD::STrigrid;
 use base qw/PDL::Graphics::TriD::GPObject/;
-
 sub cdummies { # copied from SLattice_S; not yet modified...
   # called with (type,colors,faces)
   return $_[1]->dummy(1,$_[2]->getdim(2))->dummy(1,$_[2]->getdim(1)); }
-
-sub get_valid_options { # copied from SLattice_S; not yet modified...
-  return { UseDefcols => 0, Lines => 1, Smooth => 0, Material => 0 }; }
+sub get_valid_options { { UseDefcols => 0, Lines => 1, Smooth => 1 } }
 
 ################# JNK 15mar11 added section finis #########################
 ###########################################################################   
 
-package PDL::Graphics::TriD::Lattice;
-use base qw/PDL::Graphics::TriD::GObject/;
-
-sub r_type {return "SURF2D";}
-
-sub cdummies { return $_[1]->dummy(1)->dummy(1); }
-
-package PDL::Graphics::TriD::Lines;
-use base qw/PDL::Graphics::TriD::GObject/;
-
-sub cdummies { return $_[1]->dummy(1); }
-
-sub r_type { return "SURF2D";}
-
-sub get_valid_options { return {UseDefcols => 0, LineWidth => 1}; }
-
-package PDL::Graphics::TriD::LineStrip;
-use base qw/PDL::Graphics::TriD::GObject/;
-
-sub cdummies { return $_[1]->dummy(1); }
-
-sub r_type { return "SURF2D";}
-
-sub get_valid_options { return {UseDefcols => 0, LineWidth => 1}; }
-
 package PDL::Graphics::TriD::GObject_Lattice;
 use base qw/PDL::Graphics::TriD::GObject/;
-
 sub r_type {return "SURF2D";}
-
 sub get_valid_options { return {UseDefcols => 0,Lines => 1}; }
 
-# colors associated with vertices, smooth
-package PDL::Graphics::TriD::SLattice;
+package PDL::Graphics::TriD::Lattice;
 use base qw/PDL::Graphics::TriD::GObject_Lattice/;
-
-sub cdummies { return $_[1]->dummy(1,$_[2]->getdim(2))
-			-> dummy(1,$_[2]->getdim(1)); }
+sub cdummies { return $_[1]->dummy(1)->dummy(1); }
 
 # colors associated with surfaces
 package PDL::Graphics::TriD::SCLattice;
 use base qw/PDL::Graphics::TriD::GObject_Lattice/;
-
 sub cdummies { return $_[1]->dummy(1,$_[2]->getdim(2)-1)
 			-> dummy(1,$_[2]->getdim(1)-1); }
 
+# colors associated with vertices, smooth
+package PDL::Graphics::TriD::SLattice;
+use base qw/PDL::Graphics::TriD::GObject_Lattice/;
+sub cdummies { return $_[1]->dummy(1,$_[2]->getdim(2))
+			-> dummy(1,$_[2]->getdim(1)); }
 
 # colors associated with vertices
 package PDL::Graphics::TriD::SLattice_S;
 use base qw/PDL::Graphics::TriD::GObject_Lattice/;
 use fields qw/Normals/;
-
-sub cdummies { return $_[1]->dummy(1,$_[2]->getdim(2))
-			-> dummy(1,$_[2]->getdim(1)); }
-
-
-sub get_valid_options { return {UseDefcols => 0,Lines => 1, Smooth => 0,
-	Material => 0}; }
-
+sub cdummies {
+  $_[1]->slice(":," . join ',', map "*$_", ($_[2]->dims)[1,2])
+}
+sub get_valid_options {
+  {UseDefcols => 0,Lines => 1, Smooth => 1}
+}
+sub new {
+  my ($class,$points,$colors,$options) = @_;
+  my $this = $class->SUPER::new($points,$colors,$options);
+  $this->{Normals} //= $this->smoothn($this->{Points}) if $this->{Options}{Smooth};
+  $this;
+}
 # calculate smooth normals
 sub smoothn {
   my ($this,$p) = @_;
@@ -284,7 +242,6 @@ sub smoothn {
   # all triangles
   my $ortho = $trip->crossp($trid);
   $ortho->norm($ortho); # normalise inplace
-
   # now add to vertices to smooth
   my $aver = ref($p)->zeroes($p->dims);
   # step 1, upper right tri0, upper left tri1

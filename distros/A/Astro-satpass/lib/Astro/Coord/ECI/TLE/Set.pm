@@ -143,7 +143,7 @@ our @CARP_NOT = qw{
     Astro::Coord::ECI
 };
 
-our $VERSION = '0.122';
+our $VERSION = '0.123';
 
 use constant ERR_NOCURRENT => <<eod;
 Error - Can not call %s because there is no current member. Be
@@ -628,7 +628,7 @@ Thomas R. Wyant, III (F<wyant at cpan dot org>)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2005-2021 by Thomas R. Wyant, III
+Copyright (C) 2005-2022 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

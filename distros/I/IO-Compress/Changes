@@ -1,8 +1,29 @@
 CHANGES
 -------
 
+  2.105 9 April 2022
+
+      * remove WeakDecrypt
+        95892a68780426909b75b4f3d465ff02e630834e
+
+  2.104 9 April 2022
+
+      * Sync zipdetails 2.100 from https://github.com/pmqs/zipdetails
+        95c19c89b72441b76294ce93f4acf7c5cea63565
+
+      * Update date in README
+        6b40bd67ee3c295085380cb6c321abf230b481df
+
+      * WeakDecrypt should not be listed in MANIFEST
+        https://github.com/pmqs/IO-Compress/issues/39
+        9e85a8bff391481d1005547cb51c11e02e4a5768
+
+      * Update versions to 2.104
+        cec4bcd8c3e8bef5708f7b5064e5048a02e8179f
+        cec4bcd8c3e8bef5708f7b5064e5048a02e8179f
+
   2.103 3 April 2022
-  
+
       * Update version to 2.103
         97f1893892eccac69b3a8033378b0b44d7c4f3ab
 

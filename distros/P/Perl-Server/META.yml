@@ -21,6 +21,7 @@ no_index:
     - inc
 requires:
   Cwd: '0'
+  Net::EmptyPort: '0'
   Plack: '0'
   Plack::App::WWW: '0.03'
   Term::ANSIColor: '0'
@@ -29,5 +30,5 @@ resources:
   bugtracker: https://github.com/ltmbr/Perl-Server/issues
   homepage: https://github.com/ltmbr/Perl-Server
   repository: https://github.com/ltmbr/Perl-Server
-version: '0.06'
+version: '0.08'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

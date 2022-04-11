@@ -96,7 +96,10 @@ while(<$RD1>) {
 }
 
 if($ok && $count == 1) {print "ok 1\n"}
-else {print "not ok 1 $ok $count\n"}
+else {
+  warn "\n\$ok: $ok\n\$count: $count\n";
+  print "not ok 1\n";
+}
 
 $ok = 1;
 $count = 0;
@@ -108,7 +111,10 @@ while(<$RD2>) {
 }
 
 if($ok && $count == 1) {print "ok 2\n"}
-else {print "not ok 2 $ok $count\n"}
+else {
+  warn "\n\$ok: $ok\n\$count: $count\n";
+  print "not ok 2\n";
+}
 
 $ok = 1;
 $count = 0;
@@ -120,7 +126,10 @@ while(<$RD3>) {
 }
 
 if($ok && $count == 5) {print "ok 3\n"}
-else {print "not ok 3 $ok $count\n"}
+else {
+  warn "\n\$ok: $ok\n\$count: $count\n";
+  print "not ok 3\n";
+}
 
 $ok = 1;
 $count = 0;
@@ -132,7 +141,10 @@ while(<$RD4>) {
 }
 
 if($ok && $count == 5) {print "ok 4\n"}
-else {print "not ok 4 $ok $count\n"}
+else {
+  warn "\n\$ok: $ok\n\$count: $count\n";
+  print "not ok 4\n";
+}
 
 $ok = 1;
 $count = 0;
@@ -152,7 +164,10 @@ while(<$RD5>) {
 }
 
 if($ok && $count == 6) {print "ok 5\n"}
-else {print "not ok 5 $ok $count\n"}
+else {
+  warn "\n\$ok: $ok\n\$count: $count\n";
+  print "not ok 5\n";
+}
 
 $ok = 1;
 $count = 0;
@@ -169,7 +184,10 @@ while(<$RD6>) {
 }
 
 if($ok && $count == 10) {print "ok 6\n"}
-else {print "not ok 6 $ok $count\n"}
+else {
+  warn "\n\$ok: $ok\n\$count: $count\n";
+  print "not ok 6\n";
+}
 
 $ok = 1;
 $count = 0;
@@ -195,7 +213,10 @@ while(<$RD7>) {
 }
 
 if($ok && $count == 17) {print "ok 7\n"}
-else {print "not ok 7 $ok $count\n"}
+else {
+  warn "\n\$ok: $ok\n\$count: $count\n";
+  print "not ok 7\n";
+}
 
 close $RD1 or die "Can't close RD1: $!";
 close $RD2 or die "Can't close RD2: $!";
@@ -214,6 +235,9 @@ $ret = TRmpfr_inp_str($mpfr, \*$RD8, 10, GMP_RNDN);
 close $RD8 or die "Can't close RD8: $!";
 
 if($ret == 5 && $mpfr == 150) {print "ok 8\n"}
-else {print "not ok 8 $ret $mpfr\n"}
+else {
+  warn "\n\$ok: $ok\n\$count: $count\n";
+  print "not ok 8\n";
+}
 
 

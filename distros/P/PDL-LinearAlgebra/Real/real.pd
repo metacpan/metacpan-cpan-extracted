@@ -32,6 +32,10 @@ pp_addhdr('
 pp_addhdr('
 #include <math.h>
 
+#define CONCAT_(A, B) A ## B
+#define CONCAT(A, B) CONCAT_(A, B)
+#define FORTRAN(name) CONCAT(name, F77_USCORE)
+
 /* avoid annoying warnings */
 typedef PDL_Long logical;
 typedef PDL_Long integer;
@@ -52,7 +56,7 @@ typedef logical (*L_fp)();
 
 static integer c_zero = 0;
 static integer c_nine = 9;
-extern integer ilaenv_(integer *ispec, char *name__, char *opts, integer *n1,
+extern integer FORTRAN(ilaenv)(integer *ispec, char *name__, char *opts, integer *n1,
 		integer *n2, integer *n3, integer *n4, ftnlen name_len, ftnlen
 		opts_len);
 
@@ -125,10 +129,10 @@ pp_def("gtsv",
 	Pars => '[phys]DL(n); [phys]D(n); [phys]DU(n); [io,phys]B(n,nrhs); int [o,phys]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
-		extern int $TFD(s,d)gtsv_(integer *n, integer *nrhs,
+		extern int FORTRAN($TFD(s,d)gtsv)(integer *n, integer *nrhs,
 		$GENERIC() *dl, $GENERIC() *d, $GENERIC() *du, $GENERIC() *b,
                 integer *ldb, integer *info);
-		$TFD(sgtsv_,dgtsv_)(
+		FORTRAN($TFD(s,d)gtsv)(
 		&(integer){$SIZE(n)},
 		&(integer){$SIZE(nrhs)},
 		$P(DL),
@@ -204,7 +208,7 @@ pp_def("gesvd",
 	',
 	GenericTypes => [F,D],
 	Code => generate_code '
-		extern int $TFD(s,d)gesvd_(char *jobu, char *jobvt, integer *m, integer *n, $GENERIC() *a,
+		extern int FORTRAN($TFD(s,d)gesvd)(char *jobu, char *jobvt, integer *m, integer *n, $GENERIC() *a,
 		integer *lda, $GENERIC() *s, $GENERIC() *u, int *ldu,
 		$GENERIC() *vt, integer *ldvt, $GENERIC() *work, integer *lwork,
 		integer *info);
@@ -236,7 +240,7 @@ pp_def("gesvd",
 
 
 
-		$TFD(sgesvd_,dgesvd_)(
+		FORTRAN($TFD(s,d)gesvd)(
 		&trau,
 		&travt,
 		&(integer){$SIZE(m)},
@@ -255,7 +259,7 @@ pp_def("gesvd",
 		lwork = (integer )tmp_work;
 		{
 		$GENERIC() *work = ($GENERIC() *)malloc(lwork *  sizeof($GENERIC()));
-		$TFD(sgesvd_,dgesvd_)(
+		FORTRAN($TFD(s,d)gesvd)(
 		&trau,
 		&travt,
 		&(integer){$SIZE(m)},
@@ -360,26 +364,25 @@ Note that the routine returns VT = V\', not V.
 pp_def("gesdd",
        HandleBad => 0,
 	RedoDimsCode => '$SIZE(r) = PDLMIN($SIZE(m),$SIZE(n));',
-	Pars => '[io]A(m,n); int jobz(); [o]s(minmn); [o]U(p,p); [o]VT(s,s); int [o]info()',
+	Pars => '[io]A(m,n); int jobz(); [o]s(minmn); [o]U(p,p); [o]VT(s,s); int [o]info(); int [t]iwork(iworkn);',
 	RedoDimsCode => '
 	  $SIZE(minmn) = PDLMIN($SIZE(m),$SIZE(n));
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(jobz), tmp==1 || (tmp==2) || (tmp==3 && $SIZE(m)<$SIZE(n)), $PDL(U), $SIZE(p), $SIZE(minmn))
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(jobz), tmp==1 || (tmp==2) || (tmp==3 && $SIZE(m)>=$SIZE(n)), $PDL(VT), $SIZE(s), $SIZE(minmn))
+	  $SIZE(iworkn) = 8*$SIZE(minmn);
 	',
 	GenericTypes => [F,D],
 	Code => generate_code '
                 integer lwork;
-		integer *iwork;
 		integer smlsiz;
 		char tra;
-		extern int $TFD(s,d)gesdd_(char *jobz, integer *m, integer *n, $GENERIC() *
+		extern int FORTRAN($TFD(s,d)gesdd)(char *jobz, integer *m, integer *n, $GENERIC() *
 		a, integer *lda, $GENERIC() *s, $GENERIC() *u, int *ldu,
 		$GENERIC() *vt, integer *ldvt, $GENERIC() *work, integer *lwork,
 		integer *iwork, integer *info);
 
 		$GENERIC() tmp_work;
 
-		iwork = (integer *)malloc(8*$SIZE(minmn) * sizeof(integer));
 		lwork = -1;
 
 		switch ($jobz())
@@ -396,7 +399,7 @@ pp_def("gesdd",
 
 		}
 
-		$TFD(sgesdd_,dgesdd_)(
+		FORTRAN($TFD(s,d)gesdd)(
 		&tra,
 		&(integer){$SIZE(m)},
 		&(integer){$SIZE(n)},
@@ -409,19 +412,19 @@ pp_def("gesdd",
 		&(integer){$SIZE(s)},
 		&tmp_work,
 		&lwork,
-		iwork,
+		$P(iwork),
 		$P(info));
 
 		lwork = (integer )tmp_work;
 		{
 			$GENERIC() *work;
 			if (tra == \'N\'){
-				smlsiz = ilaenv_(&c_nine, "SGESDD", " ", &c_zero, &c_zero, &c_zero, &c_zero, (ftnlen)6, (ftnlen)1);
+				smlsiz = FORTRAN(ilaenv)(&c_nine, "SGESDD", " ", &c_zero, &c_zero, &c_zero, &c_zero, (ftnlen)6, (ftnlen)1);
 				lwork = max(14*min($SIZE(m),$SIZE(n))+4, 10*min($SIZE(m),
 					$SIZE(n))+2+ smlsiz*(smlsiz+8)) + max($SIZE(m),$SIZE(n));
 			}
 			work = ($GENERIC() *) malloc(lwork *  sizeof($GENERIC()));
-		$TFD(sgesdd_,dgesdd_)(
+		FORTRAN($TFD(s,d)gesdd)(
 		&tra,
 		&(integer){$SIZE(m)},
 		&(integer){$SIZE(n)},
@@ -434,11 +437,10 @@ pp_def("gesdd",
 		&(integer){$SIZE(s)},
 		work,
 		&lwork,
-		iwork,
+		$P(iwork),
 		$P(info));
 		free(work);
 		}
-		free(iwork);
 ',
       Doc => '
 
@@ -523,7 +525,7 @@ pp_def("ggsvd",
 		char pjobv = \'N\';
 		char pjobq = \'N\';
 
-		extern int $TFD(s,d)ggsvd3_(char *jobu, char *jobv, char *jobq, integer *m,
+		extern int FORTRAN($TFD(s,d)ggsvd3)(char *jobu, char *jobv, char *jobq, integer *m,
 		integer *n, integer *p, integer *k, integer *l, $GENERIC() *a,
 		integer *lda, $GENERIC() *b, integer *ldb, $GENERIC() *alpha,
 		$GENERIC() *beta, $GENERIC() *u, integer *ldu, $GENERIC() *v, integer
@@ -543,7 +545,7 @@ pp_def("ggsvd",
 		if ($jobq())
 			pjobq = \'Q\';
 
-		$TFD(sggsvd3_,dggsvd3_)(
+		FORTRAN($TFD(s,d)ggsvd3)(
 		&pjobu,
 		&pjobv,
 		&pjobq,
@@ -573,7 +575,7 @@ pp_def("ggsvd",
 
 			work = ($GENERIC() *)malloc(lwork *  sizeof($GENERIC()));
 
-		$TFD(sggsvd3_,dggsvd3_)(
+		FORTRAN($TFD(s,d)ggsvd3)(
 		&pjobu,
 		&pjobv,
 		&pjobq,
@@ -781,7 +783,7 @@ pp_def("geev",
 	Code => generate_code '
 		char jvl = \'N\';
 		char jvr = \'N\';
-		extern int $TFD(s,d)geev_(char *jobvl, char *jobvr, integer *n, $GENERIC() *a,
+		extern int FORTRAN($TFD(s,d)geev)(char *jobvl, char *jobvr, integer *n, $GENERIC() *a,
 		integer *lda, $GENERIC() *wr, $GENERIC() *wi, $GENERIC() *vl, integer *ldvl, $GENERIC() *vr,
 		integer *ldvr, $GENERIC() *work, integer *lwork, integer *info);
 
@@ -793,7 +795,7 @@ pp_def("geev",
 		if ($jobvr())
 			jvr = \'V\';
 
-		$TFD(sgeev_,dgeev_)(
+		FORTRAN($TFD(s,d)geev)(
 		&jvl,
 		&jvr,
 		&(integer){$SIZE(n)},
@@ -812,7 +814,7 @@ pp_def("geev",
 		lwork = (integer )tmp_work;
 		{
 		$GENERIC() *work = ($GENERIC() *)malloc(lwork *  sizeof($GENERIC()));
-		$TFD(sgeev_,dgeev_)(
+		FORTRAN($TFD(s,d)geev)(
 		&jvl,
 		&jvr,
 		&(integer){$SIZE(n)},
@@ -908,21 +910,21 @@ equal to 1 and largest component real.
 
 pp_def("geevx",
        HandleBad => 0,
-	Pars => '[io]A(n,n);  int jobvl(); int jobvr(); int balance(); int sense(); [o]wr(n); [o]wi(n); [o]vl(m,m); [o]vr(p,p); int [o]ilo(); int [o]ihi(); [o]scale(n); [o]abnrm(); [o]rconde(q); [o]rcondv(r); int [o]info()',
+	Pars => '[io]A(n,n);  int jobvl(); int jobvr(); int balance(); int sense(); [o]wr(n); [o]wi(n); [o]vl(m,m); [o]vr(p,p); int [o]ilo(); int [o]ihi(); [o]scale(n); [o]abnrm(); [o]rconde(q); [o]rcondv(r); int [o]info(); int [t]iwork(iworkn);',
 	RedoDimsCode => '
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(jobvl), tmp, $PDL(vl), $SIZE(m), $SIZE(n))
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(jobvr), tmp, $PDL(vr), $SIZE(p), $SIZE(n))
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(sense), tmp == 1 || tmp == 3, $PDL(rconde), $SIZE(q), $SIZE(n))
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(sense), tmp == 2 || tmp == 3, $PDL(rcondv), $SIZE(r), $SIZE(n))
+	  PDL_MAYBE_SIZE(PDL_Long, $PDL(sense), tmp == 2 || tmp == 3, $PDL(iwork), $SIZE(iworkn), 2*$SIZE(n)-2)
 	',
 	GenericTypes => [F,D],
 	Code => generate_code '
 		char jvl = \'N\';
 		char jvr = \'N\';
 		char balanc, sens;
-		integer *iwork;
 		integer lwork = -1;
-		extern int $TFD(s,d)geevx_(char *balanc, char *jobvl, char *jobvr, char *
+		extern int FORTRAN($TFD(s,d)geevx)(char *balanc, char *jobvl, char *jobvr, char *
 		sense, integer *n, $GENERIC() *a, integer *lda, $GENERIC() *wr,
 		$GENERIC() *wi, $GENERIC() *vl, integer *ldvl, $GENERIC() *vr,
 		integer *ldvr, integer *ilo, integer *ihi, $GENERIC() *scale,
@@ -951,15 +953,13 @@ pp_def("geevx",
 			case 1: sens = \'E\';
 				break;
 			case 2: sens = \'V\';
-				iwork  = (integer *)malloc ((2 * $SIZE(n) -2)* sizeof (integer));
 				break;
 			case 3: sens = \'B\';
-				iwork  = (integer *)malloc ((2 * $SIZE(n) -2)* sizeof (integer));
 				break;
 			default: sens = \'N\';
 		}
 
-		$TFD(sgeevx_,dgeevx_)(
+		FORTRAN($TFD(s,d)geevx)(
 		&balanc,
 		&jvl,
 		&jvr,
@@ -981,13 +981,13 @@ pp_def("geevx",
 		$P(rcondv),
 		&tmp_work,
 		&lwork,
-		iwork,
+		$P(iwork),
 		$P(info));
 
 		lwork = (integer )tmp_work;
 		{
 		$GENERIC() *work = ($GENERIC() *)malloc(lwork *  sizeof($GENERIC()));
-		$TFD(sgeevx_,dgeevx_)(
+		FORTRAN($TFD(s,d)geevx)(
 		&balanc,
 		&jvl,
 		&jvr,
@@ -1009,12 +1009,10 @@ pp_def("geevx",
 		$P(rcondv),
 		work,
 		&lwork,
-		iwork,
+		$P(iwork),
 		$P(info));
 		free(work);
 		}
-		if ($sense() == 2 || $sense() == 3)
-			free(iwork);
 ',
       Doc => '
 
@@ -1183,7 +1181,7 @@ pp_def("ggev",
 		integer lwork = -1;
 		char pjobvl = \'N\', pjobvr = \'N\';
 
-		extern int $TFD(s,d)ggev_(char *jobvl, char *jobvr, integer *n, $GENERIC() *
+		extern int FORTRAN($TFD(s,d)ggev)(char *jobvl, char *jobvr, integer *n, $GENERIC() *
 		a, integer *lda, $GENERIC() *b, integer *ldb, $GENERIC() *alphar,
 		$GENERIC() *alphai, $GENERIC() *beta, $GENERIC() *vl, integer *ldvl,
 		$GENERIC() *vr, integer *ldvr, $GENERIC() *work, integer *lwork,
@@ -1194,7 +1192,7 @@ pp_def("ggev",
 		if ($jobvr())
 			pjobvr = \'V\';
 
-		$TFD(sggev_,dggev_)(
+		FORTRAN($TFD(s,d)ggev)(
 		&pjobvl,
 		&pjobvr,
 		&(integer){$SIZE(n)},
@@ -1216,7 +1214,7 @@ pp_def("ggev",
 		lwork = (integer )tmp_work;
 		{
 		$GENERIC() *work = ($GENERIC() *)malloc(lwork *  sizeof($GENERIC()));
-		$TFD(sggev_,dggev_)(
+		FORTRAN($TFD(s,d)ggev)(
 		&pjobvl,
 		&pjobvr,
 		&(integer){$SIZE(n)},
@@ -1339,21 +1337,22 @@ of (A,B) satisfies
 
 pp_def("ggevx",
        HandleBad => 0,
-	Pars => '[io,phys]A(n,n);int balanc();int jobvl();int jobvr();int sense();[io,phys]B(n,n);[o]alphar(n);[o]alphai(n);[o]beta(n);[o]VL(m,m);[o]VR(p,p);int [o]ilo();int [o]ihi();[o]lscale(n);[o]rscale(n);[o]abnrm();[o]bbnrm();[o]rconde(r);[o]rcondv(s);int [o]info()',
+	Pars => '[io,phys]A(n,n);int balanc();int jobvl();int jobvr();int sense();[io,phys]B(n,n);[o]alphar(n);[o]alphai(n);[o]beta(n);[o]VL(m,m);[o]VR(p,p);int [o]ilo();int [o]ihi();[o]lscale(n);[o]rscale(n);[o]abnrm();[o]bbnrm();[o]rconde(r);[o]rcondv(s);int [o]info(); int [t]bwork(bworkn); int [t]iwork(iworkn);',
 	RedoDimsCode => '
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(jobvl), tmp, $PDL(VL), $SIZE(m), $SIZE(n))
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(jobvr), tmp, $PDL(VR), $SIZE(p), $SIZE(n))
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(sense), tmp != 2, $PDL(rconde), $SIZE(r), $SIZE(n))
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(sense), tmp != 1, $PDL(rcondv), $SIZE(s), $SIZE(n))
+	  PDL_MAYBE_SIZE(PDL_Long, $PDL(sense), tmp != 1, $PDL(iwork), $SIZE(iworkn), $SIZE(n) + 6)
+	  PDL_MAYBE_SIZE(PDL_Long, $PDL(sense), tmp == 1 || tmp == 2 || tmp == 3, $PDL(bwork), $SIZE(bworkn), $SIZE(n))
 	',
 	GenericTypes => [F,D],
 	Code => generate_code '
-		integer lwork = -1, *iwork;
-		logical *bwork;
+		integer lwork = -1;
 		char pjobvl = \'N\', pjobvr = \'N\';
 		char pbalanc, psens;
 
-		extern int $TFD(s,d)ggevx_(char *balanc, char *jobvl, char *jobvr, char *
+		extern int FORTRAN($TFD(s,d)ggevx)(char *balanc, char *jobvl, char *jobvr, char *
 		sense, integer *n, $GENERIC() *a, integer *lda, $GENERIC() *b,
 		integer *ldb, $GENERIC() *alphar, $GENERIC() *alphai, $GENERIC() *
 		beta, $GENERIC() *vl, integer *ldvl, $GENERIC() *vr, integer *ldvr,
@@ -1380,21 +1379,15 @@ pp_def("ggevx",
 		switch ($sense())
 		{
 			case 1: psens = \'E\';
-				bwork = (logical *)malloc($SIZE(n) *  sizeof(logical));
 				break;
 			case 2: psens = \'V\';
-				iwork = (integer *)malloc(($SIZE(n) + 6) *  sizeof(integer));
-				bwork = (logical *)malloc($SIZE(n) *  sizeof(logical));
 				break;
 			case 3: psens = \'B\';
-				iwork = (integer *)malloc(($SIZE(n) + 6) *  sizeof(integer));
-				bwork = (logical *)malloc($SIZE(n) *  sizeof(logical));
 				break;
 			default: psens = \'N\';
-				iwork = (integer *)malloc(($SIZE(n) + 6) *  sizeof(integer));
 		}
 
-		$TFD(sggevx_,dggevx_)(
+		FORTRAN($TFD(s,d)ggevx)(
 		&pbalanc,
 		&pjobvl,
 		&pjobvr,
@@ -1421,14 +1414,14 @@ pp_def("ggevx",
 		$P(rcondv),
 		&tmp_work,
 		&lwork,
-		iwork,
-		bwork,
+		$P(iwork),
+		$P(bwork),
 		$P(info));
 
 		lwork = (integer )tmp_work;
 		{
 		$GENERIC() *work = ($GENERIC() *)malloc(lwork *  sizeof($GENERIC()));
-		$TFD(sggevx_,dggevx_)(
+		FORTRAN($TFD(s,d)ggevx)(
 		&pbalanc,
 		&pjobvl,
 		&pjobvr,
@@ -1455,18 +1448,13 @@ pp_def("ggevx",
 		$P(rcondv),
 		work,
 		&lwork,
-		iwork,
-		bwork,
+		$P(iwork),
+		$P(bwork),
 		$P(info));
 		free(work);
 		}
-		if ($sense())
-			free(bwork);
-		if ($sense() != 1)
-			free(iwork);
 ',
       Doc => '
-
 =for ref
 
 Computes for a pair of N-by-N real nonsymmetric matrices (A,B)
@@ -1682,19 +1670,19 @@ PDL_Long dselect_wrapper(double *wr, double *wi);
 
 pp_def("gees",
        HandleBad => 0,
-	Pars => '[io]A(n,n);  int jobvs(); int sort(); [o]wr(n); [o]wi(n); [o]vs(p,p); int [o]sdim(); int [o]info()',
+	Pars => '[io]A(n,n);  int jobvs(); int sort(); [o]wr(n); [o]wi(n); [o]vs(p,p); int [o]sdim(); int [o]info(); int [t]bwork(bworkn);',
 	RedoDimsCode => '
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(jobvs), tmp, $PDL(vs), $SIZE(p), $SIZE(n))
+	  PDL_MAYBE_SIZE(PDL_Long, $PDL(sort), tmp, $PDL(bwork), $SIZE(bworkn), $SIZE(n))
 	',
-	OtherPars => "SV* select_func" ,
+	OtherPars => "SV* select_func",
 	GenericTypes => [F,D],
 	Code => generate_code '
 		char jvs = \'N\';
 		char psort = \'N\';
-		logical *bwork;
 		integer lwork = -1;
 
-		extern int $TFD(s,d)gees_(char *jobvs, char *sort, L_fp select, integer *n,
+		extern int FORTRAN($TFD(s,d)gees)(char *jobvs, char *sort, L_fp select, integer *n,
 		$GENERIC() *a, integer *lda, integer *sdim, $GENERIC() *wr,
 		$GENERIC() *wi, $GENERIC() *vs, integer *ldvs, $GENERIC() *work,
 		integer *lwork, logical *bwork, integer *info);
@@ -1705,10 +1693,9 @@ pp_def("gees",
 			jvs = \'V\';
 		if ($sort()){
 			psort = \'S\';
-			bwork  = (logical * )  malloc ($SIZE(n) * sizeof (logical));
 		}
 
-		$TFD(s,d)gees_(
+		FORTRAN($TFD(s,d)gees)(
 		&jvs,
 		&psort,
 		$TFD(f,d)select_wrapper,
@@ -1722,12 +1709,12 @@ pp_def("gees",
 		&(integer){$SIZE(p)},
 		&tmp_work,
 		&lwork,
-		bwork,
+		$P(bwork),
 		$P(info));
 		lwork = (integer )tmp_work;
 		{
 		$GENERIC() *work = ($GENERIC() *)malloc(lwork *  sizeof($GENERIC()));
-		$TFD(s,d)gees_(
+		FORTRAN($TFD(s,d)gees)(
 		&jvs,
 		&psort,
 		$TFD(f,d)select_wrapper,
@@ -1741,13 +1728,10 @@ pp_def("gees",
 		&(integer){$SIZE(p)},
 		work,
 		&lwork,
-		bwork,
+		$P(bwork),
 		$P(info));
 		free(work);
 		}
-
-		if ($sort())
-			free(bwork);
 ',
       Doc => '
 
@@ -1852,36 +1836,31 @@ The eigenvalues of such a block are a +- sqrt(bc).
 
 pp_def("geesx",
        HandleBad => 0,
-	Pars => '[io]A(n,n);  int jobvs(); int sort(); int sense(); [o]wr(n); [o]wi(n); [o]vs(p,p); int [o]sdim(); [o]rconde();[o]rcondv(); int [o]info()',
+	Pars => '[io]A(n,n);  int jobvs(); int sort(); int sense(); [o]wr(n); [o]wi(n); [o]vs(p,p); int [o]sdim(); [o]rconde();[o]rcondv(); int [o]info(); int [t]bwork(bworkn);',
 	RedoDimsCode => '
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(jobvs), tmp, $PDL(vs), $SIZE(p), $SIZE(n))
+	  PDL_MAYBE_SIZE(PDL_Long, $PDL(sort), tmp, $PDL(bwork), $SIZE(bworkn), $SIZE(n))
 	',
 	OtherPars => "SV* select_func" ,
 	GenericTypes => [F,D],
 	Code => generate_code '
 		char jvs = \'N\';
 		char psort = \'N\';
-		logical *bwork;
 		integer lwork = 0;
 		integer liwork = 1;
 		integer *iwork;
 		char sens;
-
-		extern int $TFD(s,d)geesx_(char *jobvs, char *sort, L_fp select, char * sense,
+		extern int FORTRAN($TFD(s,d)geesx)(char *jobvs, char *sort, L_fp select, char * sense,
 		integer *n, $GENERIC() *a, integer *lda, integer *sdim, $GENERIC() *wr,
 		$GENERIC() *wi, $GENERIC() *vs, integer *ldvs, $GENERIC() *rconde, $GENERIC() *rcondv,
 		$GENERIC() *work, integer *lwork, integer *iwork, integer *liwork,
 		logical *bwork, integer *info);
 		$GENERIC() *work;
 		$TFD(f,d)select_func_set($COMP(select_func));
-
-
 		if ($jobvs())
 			jvs = \'V\';
-		if ($sort()){
+		if ($sort())
 			psort = \'S\';
-			bwork  = (logical * )  malloc ($SIZE(n) * sizeof (logical));
-		}
 
 		switch ($sense())
 		{
@@ -1911,7 +1890,7 @@ pp_def("geesx",
 
 		}
 		work  = ($GENERIC() * )malloc(lwork * sizeof ($GENERIC()));
-		$TFD(s,d)geesx_(
+		FORTRAN($TFD(s,d)geesx)(
 		&jvs,
 		&psort,
 		$TFD(f,d)select_wrapper,
@@ -1930,13 +1909,11 @@ pp_def("geesx",
 		&lwork,
 		iwork,
 		&liwork,
-		bwork,
+		$P(bwork),
 		$P(info));
 
 		free(work);
 		free(iwork);
-		if ($sort())
-			free(bwork);
 ',
       Doc => '
 
@@ -2067,19 +2044,18 @@ PDL_Long dgselect_wrapper(double *zr, double *zi, double *d);
 
 pp_def("gges",
        HandleBad => 0,
-	Pars => '[io]A(n,n); int jobvsl();int jobvsr();int sort();[io]B(n,n);[o]alphar(n);[o]alphai(n);[o]beta(n);[o]VSL(m,m);[o]VSR(p,p);int [o]sdim();int [o]info()',
+	Pars => '[io]A(n,n); int jobvsl();int jobvsr();int sort();[io]B(n,n);[o]alphar(n);[o]alphai(n);[o]beta(n);[o]VSL(m,m);[o]VSR(p,p);int [o]sdim();int [o]info(); int [t]bwork(bworkn);',
 	RedoDimsCode => '
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(jobvsl), tmp, $PDL(VSL), $SIZE(m), $SIZE(n))
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(jobvsr), tmp, $PDL(VSR), $SIZE(p), $SIZE(n))
+	  PDL_MAYBE_SIZE(PDL_Long, $PDL(sort), tmp, $PDL(bwork), $SIZE(bworkn), $SIZE(n))
 	',
 	OtherPars => "SV* select_func" ,
 	GenericTypes => [F,D],
 	Code => generate_code '
 		integer lwork = -1;
 		char pjobvsl = \'N\', pjobvsr = \'N\', psort = \'N\';
-		logical *bwork;
-
-		extern int $TFD(s,d)gges_(char *jobvsl, char *jobvsr, char *sort, L_fp
+		extern int FORTRAN($TFD(s,d)gges)(char *jobvsl, char *jobvsr, char *sort, L_fp
 		delctg, integer *n, $GENERIC() *a, integer *lda, $GENERIC() *b,
 		integer *ldb, integer *sdim, $GENERIC() *alphar, $GENERIC() *alphai,
 		$GENERIC() *beta, $GENERIC() *vsl, integer *ldvsl, $GENERIC() *vsr,
@@ -2093,9 +2069,8 @@ pp_def("gges",
 			pjobvsr = \'V\';
 		if ($sort()){
 			psort = \'S\';
-			bwork = (logical *)malloc($SIZE(n) *  sizeof(logical));
 		}
-		$TFD(s,d)gges_(
+		FORTRAN($TFD(s,d)gges)(
 		&pjobvsl,
 		&pjobvsr,
 		&psort,
@@ -2115,13 +2090,13 @@ pp_def("gges",
 		&(integer){$SIZE(p)},
 		&tmp_work,
 		&lwork,
-		bwork,
+		$P(bwork),
 		$P(info));
 
 		lwork = (integer )tmp_work;
 		{
 			$GENERIC() *work = ($GENERIC() *)malloc(lwork *  sizeof($GENERIC()));
-		$TFD(s,d)gges_(
+		FORTRAN($TFD(s,d)gges)(
 		&pjobvsl,
 		&pjobvsr,
 		&psort,
@@ -2141,14 +2116,10 @@ pp_def("gges",
 		&(integer){$SIZE(p)},
 		work,
 		&lwork,
-		bwork,
+		$P(bwork),
 		$P(info));
-
 		free(work);
 		}
-		if ($sort())
-			free (bwork);
-
 ',
       Doc => '
 
@@ -2292,15 +2263,17 @@ complex conjugate pair of generalized eigenvalues.
 
 pp_def("ggesx",
        HandleBad => 0,
-	Pars => '[io]A(n,n); int jobvsl();int jobvsr();int sort();int sense();[io]B(n,n);[o]alphar(n);[o]alphai(n);[o]beta(n);[o]VSL(m,m);[o]VSR(p,p);int [o]sdim();[o]rconde(q=2);[o]rcondv(q=2);int [o]info()',
+	Pars => '[io]A(n,n); int jobvsl();int jobvsr();int sort();int sense();[io]B(n,n);[o]alphar(n);[o]alphai(n);[o]beta(n);[o]VSL(m,m);[o]VSR(p,p);int [o]sdim();[o]rconde(q=2);[o]rcondv(q=2);int [o]info(); int [t]bwork(bworkn); int [t]iwork(iworkn);',
 	RedoDimsCode => '
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(jobvsl), tmp, $PDL(VSL), $SIZE(m), $SIZE(n))
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(jobvsr), tmp, $PDL(VSR), $SIZE(p), $SIZE(n))
+	  PDL_MAYBE_SIZE(PDL_Long, $PDL(sort), tmp, $PDL(bwork), $SIZE(bworkn), $SIZE(n))
+	  $SIZE(iworkn) = $SIZE(n) + 6; // Bug in Lapack ?????
 	',
 	OtherPars => "SV* select_func" ,
 	GenericTypes => [F,D],
 	Code => generate_code '
-		integer maxwrk, lwork,liwork;
+		integer maxwrk, lwork;
 		integer minwrk = 1;
 		static integer c__0 = 0;
 		static integer c__1 = 1;
@@ -2309,9 +2282,8 @@ pp_def("ggesx",
 		char pjobvsr = \'N\';
 		char psort = \'N\';
 		char psens = \'N\';
-		logical *bwork;
 		integer *iwork;
-		extern int $TFD(s,d)ggesx_(char *jobvsl, char *jobvsr, char *sort, L_fp
+		extern int FORTRAN($TFD(s,d)ggesx)(char *jobvsl, char *jobvsr, char *sort, L_fp
 		delctg, char *sense, integer *n, $GENERIC() *a, integer *lda, $GENERIC() *b,
 		integer *ldb, integer *sdim, $GENERIC() *alphar, $GENERIC() *alphai,
 		$GENERIC() *beta, $GENERIC() *vsl, integer *ldvsl, $GENERIC() *vsr,
@@ -2324,7 +2296,6 @@ pp_def("ggesx",
 
 		if ($sort()){
 			psort = \'S\';
-			bwork = (logical *)malloc($SIZE(n) * sizeof(logical));
 		}
 
 		switch ($sense())
@@ -2338,29 +2309,20 @@ pp_def("ggesx",
 			default: psens = \'N\';
 		}
 
-//		Bug in Lapack ?????
-//		if (!$sense())
-//			liwork = 1;
-//		else
-//		{
-			liwork = $SIZE(n) + 6;
-			iwork =  (integer *)malloc(liwork *  sizeof(integer));
-//		}
-
 		// Code modified from Lapack
-		// TODO other shur form above
+		// TODO other schur form above
 		// The actual updated release (clapack 09/20/2000) do not allow
 		// querying the workspace. See release notes of Lapack
 		// for this feature.
 
 		minwrk = ($SIZE(n) + 1 << 3) + 16;
-		maxwrk = ($SIZE(n) + 1) * 7 + $SIZE(n) * (integer ) ilaenv_(&c__1, "DGEQRF", " ", &(integer){$SIZE(n)}, &c__1,
+		maxwrk = ($SIZE(n) + 1) * 7 + $SIZE(n) * (integer)FORTRAN(ilaenv)(&c__1, "DGEQRF", " ", &(integer){$SIZE(n)}, &c__1,
 		&(integer){$SIZE(n)}, &c__0, (ftnlen)6, (ftnlen)1) + 16;
 
 		if ($jobvsl())
 		{
 			integer i__1 = maxwrk;
-			integer i__2 = minwrk + $SIZE(n) * (integer )ilaenv_(&c__1, "DORGQR"
+			integer i__2 = minwrk + $SIZE(n) * (integer)FORTRAN(ilaenv)(&c__1, "DORGQR"
 				, " ", &(integer){$SIZE(n)}, &c__1, &(integer){$SIZE(n)}, &c_n1, (ftnlen)6, (ftnlen)1);
 			maxwrk = (integer ) max(i__1,i__2);
 			pjobvsl = \'V\';
@@ -2369,7 +2331,7 @@ pp_def("ggesx",
 
 		{
 		$GENERIC() *work = ($GENERIC() *)malloc(lwork *  sizeof($GENERIC()));
-		$TFD(s,d)ggesx_(
+		FORTRAN($TFD(s,d)ggesx)(
 		&pjobvsl,
 		&pjobvsr,
 		&psort,
@@ -2392,16 +2354,12 @@ pp_def("ggesx",
 		$P(rcondv),
 		work,
 		&lwork,
-		iwork,
-		&liwork,
-		bwork,
+		$P(iwork),
+		&(integer){$SIZE(iworkn)},
+		$P(bwork),
 		$P(info));
 		free(work);
 		}
-		if ($sort())
-			free(bwork);
-		free(iwork);
-
 ',
       Doc => '
 
@@ -2590,7 +2548,7 @@ pp_def("syev",
 		char puplo = \'U\';
 		integer lwork = -1;
 
-		extern int $TFD(s,d)syev_(char *jobz, char *uplo, integer *n, $GENERIC() *a,
+		extern int FORTRAN($TFD(s,d)syev)(char *jobz, char *uplo, integer *n, $GENERIC() *a,
 		integer *lda, $GENERIC() *w, $GENERIC() *work, integer *lwork,
 		integer *info);
 
@@ -2602,7 +2560,7 @@ pp_def("syev",
 			puplo = \'L\';
 
 
-		$TFD(ssyev_,dsyev_)(
+		FORTRAN($TFD(s,d)syev)(
 		&jz,
 		&puplo,
 		&(integer){$SIZE(n)},
@@ -2616,7 +2574,7 @@ pp_def("syev",
 		lwork = (integer )tmp_work;
 		{
 		$GENERIC() *work = ($GENERIC() *)malloc(lwork *  sizeof($GENERIC()));
-		$TFD(ssyev_,dsyev_)(
+		FORTRAN($TFD(s,d)syev)(
 		&jz,
 		&puplo,
 		&(integer){$SIZE(n)},
@@ -2684,7 +2642,7 @@ pp_def("syevd",
 		integer tmp_liwork;
 		integer *iwork;
 
-		extern int $TFD(s,d)syevd_(char *jobz, char *uplo, integer *n, $GENERIC() *a,
+		extern int FORTRAN($TFD(s,d)syevd)(char *jobz, char *uplo, integer *n, $GENERIC() *a,
 		integer *lda, $GENERIC() *w, $GENERIC() *work, integer *lwork,
 		integer *iwork, integer *liwork, integer *info);
 
@@ -2696,7 +2654,7 @@ pp_def("syevd",
 			puplo = \'L\';
 
 
-		$TFD(ssyevd_,dsyevd_)(
+		FORTRAN($TFD(s,d)syevd)(
 		&jz,
 		&puplo,
 		&(integer){$SIZE(n)},
@@ -2714,7 +2672,7 @@ pp_def("syevd",
 		iwork = (integer *)malloc(liwork * sizeof(integer));
 		{
 		$GENERIC() *work = ($GENERIC() *)malloc(lwork *  sizeof($GENERIC()));
-		$TFD(ssyevd_,dsyevd_)(
+		FORTRAN($TFD(s,d)syevd)(
 		&jz,
 		&puplo,
 		&(integer){$SIZE(n)},
@@ -2786,9 +2744,10 @@ workspace than syevx.
 
 pp_def("syevx",
        HandleBad => 0,
-	Pars => 'A(n,n);  int jobz(); int range(); int uplo(); vl(); vu(); int il(); int iu(); abstol(); int [o]m(); [o]w(n); [o]z(p,p);int [o]ifail(n); int [o]info()',
+	Pars => 'A(n,n);  int jobz(); int range(); int uplo(); vl(); vu(); int il(); int iu(); abstol(); int [o]m(); [o]w(n); [o]z(p,p);int [o]ifail(n); int [o]info(); int [t]iwork(iworkn);',
 	RedoDimsCode => '
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(jobz), tmp, $PDL(z), $SIZE(p), $SIZE(n))
+	  $SIZE(iworkn) = 5 * $SIZE(n);
 	',
 	GenericTypes => [F,D],
 	Code => generate_code '
@@ -2796,9 +2755,8 @@ pp_def("syevx",
 		char puplo = \'U\';
 		char prange = \'A\';
 		integer lwork = -1;
-		integer *iwork;
 
-		extern int $TFD(s,d)syevx_(char *jobz, char *range, char *uplo, integer *n,
+		extern int FORTRAN($TFD(s,d)syevx)(char *jobz, char *range, char *uplo, integer *n,
 		$GENERIC() *a, integer *lda, $GENERIC() *vl, $GENERIC() *vu, integer *
 		il, integer *iu, $GENERIC() *abstol, integer *m, $GENERIC() *w,
 		$GENERIC() *z__, integer *ldz, $GENERIC() *work, integer *lwork,
@@ -2820,9 +2778,7 @@ pp_def("syevx",
 			default: prange = \'A\';
 		}
 
-		iwork = (integer *)malloc(5 * $SIZE (n) * sizeof(integer));
-
-		$TFD(ssyevx_,dsyevx_)(
+		FORTRAN($TFD(s,d)syevx)(
 		&jz,
 		&prange,
 		&puplo,
@@ -2840,14 +2796,14 @@ pp_def("syevx",
 		&(integer){$SIZE(p)},
 		&tmp_work,
 		&lwork,
-		iwork,
+		$P(iwork),
 		$P(ifail),
 		$P(info));
 
 		lwork = (integer )tmp_work;
 		{
 		$GENERIC() *work = ($GENERIC() *)malloc(lwork *  sizeof($GENERIC()));
-		$TFD(ssyevx_,dsyevx_)(
+		FORTRAN($TFD(s,d)syevx)(
 		&jz,
 		&prange,
 		&puplo,
@@ -2865,11 +2821,10 @@ pp_def("syevx",
 		&(integer){$SIZE(p)},
 		work,
 		&lwork,
-		iwork,
+		$P(iwork),
 		$P(ifail),
 		$P(info));
 		free(work);
-		free(iwork);
 		}
 ',
       Doc => '
@@ -2996,7 +2951,7 @@ pp_def("syevr",
 		integer *iwork;
 		integer tmp_iwork;
 
-		extern int $TFD(s,d)syevr_(char *jobz, char *range, char *uplo, integer *n,
+		extern int FORTRAN($TFD(s,d)syevr)(char *jobz, char *range, char *uplo, integer *n,
 		$GENERIC() *a, integer *lda, $GENERIC() *vl, $GENERIC() *vu, integer *
 		il, integer *iu, $GENERIC() *abstol, integer *m, $GENERIC() *w,
 		$GENERIC() *z__, integer *ldz, integer *isuppz, $GENERIC() *work,
@@ -3020,7 +2975,7 @@ pp_def("syevr",
 
 
 
-		$TFD(ssyevr_,dsyevr_)(
+		FORTRAN($TFD(s,d)syevr)(
 		&jz,
 		&prange,
 		&puplo,
@@ -3049,7 +3004,7 @@ pp_def("syevr",
 		$GENERIC() *work = ($GENERIC() *)malloc(lwork *  sizeof($GENERIC()));
 		iwork = (integer *)malloc(liwork * sizeof(integer));
 
-		$TFD(ssyevr_,dsyevr_)(
+		FORTRAN($TFD(s,d)syevr)(
 		&jz,
 		&prange,
 		&puplo,
@@ -3237,10 +3192,9 @@ pp_def("sygv",
 		char puplo = \'U\';
 		integer lwork = -1;
 
-		extern int $TFD(s,d)sygv_(integer *itype, char *jobz, char *uplo, integer *
+		extern int FORTRAN($TFD(s,d)sygv)(integer *itype, char *jobz, char *uplo, integer *
 		n, $GENERIC() *a, integer *lda, $GENERIC() *b, integer *ldb,
 		$GENERIC() *w, $GENERIC() *work, integer *lwork, integer *info);
-
 		$GENERIC() tmp_work;
 
 		if ($jobz())
@@ -3249,7 +3203,7 @@ pp_def("sygv",
 			puplo = \'L\';
 
 
-		$TFD(ssygv_,dsygv_)(
+		FORTRAN($TFD(s,d)sygv)(
 		$P(itype),
 		&jz,
 		&puplo,
@@ -3266,7 +3220,7 @@ pp_def("sygv",
 		lwork = (integer )tmp_work;
 		{
 		$GENERIC() *work = ($GENERIC() *)malloc(lwork *  sizeof($GENERIC()));
-		$TFD(ssygv_,dsygv_)(
+		FORTRAN($TFD(s,d)sygv)(
 		$P(itype),
 		&jz,
 		&puplo,
@@ -3366,7 +3320,7 @@ pp_def("sygvd",
 		integer *iwork;
 		integer tmp_iwork;
 
-		extern int $TFD(s,d)sygvd_(integer *itype, char *jobz, char *uplo, integer *
+		extern int FORTRAN($TFD(s,d)sygvd)(integer *itype, char *jobz, char *uplo, integer *
 		n, $GENERIC() *a, integer *lda, $GENERIC() *b, integer *ldb,
 		$GENERIC() *w, $GENERIC() *work, integer *lwork, integer *iwork,
 		integer *liwork, integer *info);
@@ -3379,7 +3333,7 @@ pp_def("sygvd",
 			puplo = \'L\';
 
 
-		$TFD(ssygvd_,dsygvd_)(
+		FORTRAN($TFD(s,d)sygvd)(
 		$P(itype),
 		&jz,
 		&puplo,
@@ -3401,7 +3355,7 @@ pp_def("sygvd",
 
 		{
 		$GENERIC() *work = ($GENERIC() *)malloc(lwork *  sizeof($GENERIC()));
-		$TFD(ssygvd_,dsygvd_)(
+		FORTRAN($TFD(s,d)sygvd)(
 		$P(itype),
 		&jz,
 		&puplo,
@@ -3503,9 +3457,12 @@ pp_def("sygvx",
        HandleBad => 0,
 	Pars => '[io]A(n,n); int itype(); int jobz(); int range();
 	  int uplo(); [io]B(n,n); vl(); vu(); int il(); int iu(); abstol();
-	  int [o]m(); [o]w(n); [o]Z(p,p); int [o]ifail(n); int [o]info()',
+	  int [o]m(); [o]w(n); [o]Z(p,p); int [o]ifail(n); int [o]info();
+	  int [t]iwork(iworkn);
+	',
 	RedoDimsCode => '
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(jobz), tmp, $PDL(Z), $SIZE(p), $SIZE(n))
+	  $SIZE(iworkn) = 5 * $SIZE(n);
 	',
 	GenericTypes => [F,D],
 	Code => generate_code '
@@ -3513,9 +3470,7 @@ pp_def("sygvx",
 		char puplo = \'U\';
 		char prange;
 		integer lwork = -1;
-		integer *iwork;
-
-		extern int $TFD(s,d)sygvx_(integer *itype, char *jobz, char *range, char *
+		extern int FORTRAN($TFD(s,d)sygvx)(integer *itype, char *jobz, char *range, char *
 		uplo, integer *n, $GENERIC() *a, integer *lda, $GENERIC() *b, integer
 		*ldb, $GENERIC() *vl, $GENERIC() *vu, integer *il, integer *iu,
 		$GENERIC() *abstol, integer *m, $GENERIC() *w, $GENERIC() *z__,
@@ -3538,9 +3493,7 @@ pp_def("sygvx",
 			default: prange = \'A\';
 		}
 
-		iwork = (integer *)malloc((5 * $SIZE(n)) *  sizeof(integer));
-
-		$TFD(ssygvx_,dsygvx_)(
+		FORTRAN($TFD(s,d)sygvx)(
 		$P(itype),
 		&jz,
 		&prange,
@@ -3561,14 +3514,14 @@ pp_def("sygvx",
 		&(integer){$SIZE(p)},
 		&tmp_work,
 		&lwork,
-		iwork,
+		$P(iwork),
 		$P(ifail),
 		$P(info));
 
 		lwork = (integer )tmp_work;
 		{
 		$GENERIC() *work = ($GENERIC() *)malloc(lwork *  sizeof($GENERIC()));
-		$TFD(ssygvx_,dsygvx_)(
+		FORTRAN($TFD(s,d)sygvx)(
 		$P(itype),
 		&jz,
 		&prange,
@@ -3589,12 +3542,11 @@ pp_def("sygvx",
 		&(integer){$SIZE(p)},
 		work,
 		&lwork,
-		iwork,
+		$P(iwork),
 		$P(ifail),
 		$P(info));
 		free(work);
 		}
-		free(iwork);
 ',
       Doc => '
 
@@ -3737,10 +3689,9 @@ pp_def("gesv",
 	Pars => '[io,phys]A(n,n);  [io,phys]B(n,m); int [o,phys]ipiv(n); int [o,phys]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
-		extern int $TFD(s,d)gesv_(integer *n, integer *nrhs, $GENERIC() *a, integer
+		extern int FORTRAN($TFD(s,d)gesv)(integer *n, integer *nrhs, $GENERIC() *a, integer
 		*lda, integer *ipiv, $GENERIC() *b, integer *ldb, integer *info);
-
-		$TFD(sgesv_,dgesv_)(
+		FORTRAN($TFD(s,d)gesv)(
 		&(integer){$SIZE(n)},
 		&(integer){$SIZE(m)},
 		$P(A),
@@ -3802,24 +3753,21 @@ system of equations A * X = B.
 
 pp_def("gesvx",
        HandleBad => 0,
-	Pars => '[io]A(n,n); int trans(); int fact(); [io]B(n,m); [io]af(n,n); int [io]ipiv(n); int [io]equed(); [o]r(p); [o]c(q); [o]X(n,m); [o]rcond(); [o]ferr(m); [o]berr(m);[o]rpvgrw();int [o]info()',
+	Pars => '[io]A(n,n); int trans(); int fact(); [io]B(n,m); [io]af(n,n); int [io]ipiv(n); int [io]equed(); [o]r(p); [o]c(q); [o]X(n,m); [o]rcond(); [o]ferr(m); [o]berr(m);[o]rpvgrw();int [o]info(); [t]work(workn); int [t]iwork(n);',
 	RedoDimsCode => '
 	  $SIZE(p) = $SIZE(n); /* Ubuntu LAPACK 3 writes to r anyway */
 	  $SIZE(q) = $SIZE(n); /* Ubuntu LAPACK 3 writes to c anyway */
+	  $SIZE(workn) = 4 * $SIZE(n);
 	',
 	GenericTypes => [F,D],
 	Code => generate_code '
 		char ptrans, pfact, pequed;
-		integer *iwork;
-
-		extern int $TFD(s,d)gesvx_(char *fact, char *trans, integer *n, integer *
+		extern int FORTRAN($TFD(s,d)gesvx)(char *fact, char *trans, integer *n, integer *
 		nrhs, $GENERIC() *a, integer *lda, $GENERIC() *af, integer *ldaf,
 		integer *ipiv, char *equed, $GENERIC() *r__, $GENERIC() *c__,
 		$GENERIC() *b, integer *ldb, $GENERIC() *x, integer *ldx, $GENERIC() *
 		rcond, $GENERIC() *ferr, $GENERIC() *berr, $GENERIC() *work, integer *
 		iwork, integer *info);
-		$GENERIC() *work;
-
 		switch ($trans())
 		{
 			case 1: ptrans = \'T\';
@@ -3847,10 +3795,7 @@ pp_def("gesvx",
 			default:  pequed = \'N\';
 		}
 
-		work = ($GENERIC() *) malloc(4 * $SIZE(n) *  sizeof($GENERIC()));
-		iwork  = (integer *) malloc ($SIZE(n)* sizeof (integer));
-
-		$TFD(sgesvx_,dgesvx_)(
+		FORTRAN($TFD(s,d)gesvx)(
 		&pfact,
 		&ptrans,
 		&(integer){$SIZE(n)},
@@ -3870,8 +3815,8 @@ pp_def("gesvx",
 		$P(rcond),
 		$P(ferr),
 		$P(berr),
-		work,
-		iwork,
+		$P(work),
+		$P(iwork),
 		$P(info));
 
 		switch (pequed)
@@ -3884,10 +3829,7 @@ pp_def("gesvx",
 				  break;
 			default: $equed()= 0;
 		}
-		$rpvgrw()=work[0];
-
-		free(work);
-		free(iwork);
+		$rpvgrw()=$work(workn=>0);
 ',
       Doc => '
 =for ref
@@ -4127,14 +4069,14 @@ pp_def("sysv",
 	Code => generate_code '
 		char puplo = \'U\';
 		integer lwork = -1;
-		extern int $TFD(s,d)sysv_(char *uplo, integer *n, integer *nrhs, $GENERIC()
+		extern int FORTRAN($TFD(s,d)sysv)(char *uplo, integer *n, integer *nrhs, $GENERIC()
 		*a, integer *lda, integer *ipiv, $GENERIC() *b, integer *ldb,
 		$GENERIC() *work, integer *lwork, integer *info);
 		$GENERIC() tmp_work;
 		if ($uplo())
 			puplo = \'L\';
 
-		$TFD(ssysv_,dsysv_)(
+		FORTRAN($TFD(s,d)sysv)(
 		&puplo,
 		&(integer){$SIZE(n)},
 		&(integer){$SIZE(m)},
@@ -4150,7 +4092,7 @@ pp_def("sysv",
 		lwork = (integer )tmp_work;
 		{
 		$GENERIC() *work = ($GENERIC() *)malloc(lwork *  sizeof($GENERIC()));
-		$TFD(ssysv_,dsysv_)(
+		FORTRAN($TFD(s,d)sysv)(
 		&puplo,
 		&(integer){$SIZE(n)},
 		&(integer){$SIZE(m)},
@@ -4239,31 +4181,25 @@ used to solve the system of equations A * X = B.
 
 pp_def("sysvx",
        HandleBad => 0,
-	Pars => '[phys]A(n,n); int uplo(); int fact(); [phys]B(n,m); [io,phys]af(n,n); int [io,phys]ipiv(n); [o]X(n,m); [o]rcond(); [o]ferr(m); [o]berr(m); int [o]info()',
+	Pars => '[phys]A(n,n); int uplo(); int fact(); [phys]B(n,m); [io,phys]af(n,n); int [io,phys]ipiv(n); [o]X(n,m); [o]rcond(); [o]ferr(m); [o]berr(m); int [o]info(); int [t]iwork(n);',
 	GenericTypes => [F,D],
 	Code => generate_code '
 		char pfact = \'N\';
 		char puplo = \'U\';
 		integer lwork = -1;
-		integer *iwork;
-
-		extern int $TFD(s,d)sysvx_(char *fact, char *uplo, integer *n, integer *
+		extern int FORTRAN($TFD(s,d)sysvx)(char *fact, char *uplo, integer *n, integer *
 		nrhs, $GENERIC() *a, integer *lda, $GENERIC() *af, integer *ldaf,
 		integer *ipiv, $GENERIC() *b, integer *ldb, $GENERIC() *x, integer *
 		ldx, $GENERIC() *rcond, $GENERIC() *ferr, $GENERIC() *berr,
 		$GENERIC() *work, integer *lwork, integer *iwork, integer *info);
 		$GENERIC() tmp_work;
-
 		if($fact())
 			pfact = \'F\';
 
 		if ($uplo())
 			puplo = \'L\';
 
-		iwork  = (integer *) malloc ($SIZE(n)* sizeof (integer));
-
-
-		$TFD(ssysvx_,dsysvx_)(
+		FORTRAN($TFD(s,d)sysvx)(
 		&pfact,
 		&puplo,
 		&(integer){$SIZE(n)},
@@ -4282,14 +4218,14 @@ pp_def("sysvx",
 		$P(berr),
 		&tmp_work,
 		&lwork,
-		iwork,
+		$P(iwork),
 		$P(info));
 
 		lwork = (integer )tmp_work;
 		{
 		$GENERIC() *work = ($GENERIC() *)malloc(lwork *  sizeof($GENERIC()));
 
-		$TFD(ssysvx_,dsysvx_)(
+		FORTRAN($TFD(s,d)sysvx)(
 		&pfact,
 		&puplo,
 		&(integer){$SIZE(n)},
@@ -4308,12 +4244,10 @@ pp_def("sysvx",
 		$P(berr),
 		work,
 		&lwork,
-		iwork,
+		$P(iwork),
 		$P(info));
 		free(work);
 		}
-		free(iwork);
-
 ',
       Doc => '
 
@@ -4476,13 +4410,13 @@ pp_def("posv",
 	Code => generate_code '
              char puplo = \'U\';
 
-		extern int $TFD(s,d)posv_(char *uplo, integer *n, integer *nrhs, $GENERIC()
+		extern int FORTRAN($TFD(s,d)posv)(char *uplo, integer *n, integer *nrhs, $GENERIC()
 		*a, integer *lda, $GENERIC() *b, integer *ldb, integer *info);
 
 		if ($uplo())
 			puplo = \'L\';
 
-		$TFD(sposv_,dposv_)(
+		FORTRAN($TFD(s,d)posv)(
 		&puplo,
 		&(integer){$SIZE(n)},
 		&(integer){$SIZE(m)},
@@ -4552,24 +4486,21 @@ equations A * X = B.
 
 pp_def("posvx",
        HandleBad => 0,
-	Pars => '[io,phys]A(n,n); int uplo(); int fact(); [io,phys]B(n,m); [io,phys]af(n,n); int [io]equed(); [o]s(p); [o,phys]X(n,m); [o,phys]rcond(); [o,phys]ferr(m); [o,phys]berr(m); int [o,phys]info()',
+	Pars => '[io,phys]A(n,n); int uplo(); int fact(); [io,phys]B(n,m); [io,phys]af(n,n); int [io]equed(); [o]s(p); [o,phys]X(n,m); [o,phys]rcond(); [o,phys]ferr(m); [o,phys]berr(m); int [o,phys]info(); int [t]iwork(n); [t]work(workn);',
 	RedoDimsCode => '
 	  $SIZE(p) = $SIZE(n); /* Ubuntu LAPACK 3 writes to s anyway */
+	  $SIZE(workn) = 3 * $SIZE(n);
 	',
 	GenericTypes => [F,D],
 	Code => generate_code '
 		char pfact;
 		char pequed = \'N\';
 		char puplo = \'U\';
-		integer *iwork;
-
-		extern int $TFD(s,d)posvx_(char *fact, char *uplo, integer *n, integer *
+		extern int FORTRAN($TFD(s,d)posvx)(char *fact, char *uplo, integer *n, integer *
 		nrhs, $GENERIC() *a, integer *lda, $GENERIC() *af, integer *ldaf,
 		char *equed, $GENERIC() *s, $GENERIC() *b, integer *ldb, $GENERIC() *
 		x, integer *ldx, $GENERIC() *rcond, $GENERIC() *ferr, $GENERIC() *
 		berr, $GENERIC() *work, integer *iwork, integer *info);
-		$GENERIC() *work;
-
 		switch ($fact())
 		{
 			case 1: pfact = \'N\';
@@ -4583,10 +4514,7 @@ pp_def("posvx",
 		if ($uplo())
 			puplo = \'L\';
 
-		work = ($GENERIC() *) malloc(3 * $SIZE(n) *  sizeof($GENERIC()));
-		iwork  = (integer *) malloc ($SIZE(n)* sizeof (integer));
-
-		$TFD(sposvx_,dposvx_)(
+		FORTRAN($TFD(s,d)posvx)(
 		&pfact,
 		&puplo,
 		&(integer){$SIZE(n)},
@@ -4604,12 +4532,9 @@ pp_def("posvx",
 		$P(rcond),
 		$P(ferr),
 		$P(berr),
-		work,
-		iwork,
+		$P(work),
+		$P(iwork),
 		$P(info));
-
-		free(work);
-		free(iwork);
 
 		switch (pequed)
 		{
@@ -4617,7 +4542,6 @@ pp_def("posvx",
 				  break;
 			default: $equed()= 0;
 		}
-
 ',
       Doc => '
 
@@ -4820,7 +4744,7 @@ pp_def("gels",
 		char ptrans = \'N\';
 		integer lwork = -1;
 
-		extern int $TFD(s,d)gels_(char *trans, integer *m, integer *n, integer *
+		extern int FORTRAN($TFD(s,d)gels)(char *trans, integer *m, integer *n, integer *
 		nrhs, $GENERIC() *a, integer *lda, $GENERIC() *b, integer *ldb,
 		$GENERIC() *work, integer *lwork, integer *info);
 		$GENERIC() tmp_work;
@@ -4828,7 +4752,7 @@ pp_def("gels",
 		if($trans())
 			ptrans = \'T\';
 
-		$TFD(sgels_,dgels_)(
+		FORTRAN($TFD(s,d)gels)(
 		&ptrans,
 		&(integer){$SIZE(m)},
 		&(integer){$SIZE(n)},
@@ -4845,7 +4769,7 @@ pp_def("gels",
 		{
 		$GENERIC() *work = ($GENERIC() *)malloc(lwork *  sizeof($GENERIC()));
 
-		$TFD(sgels_,dgels_)(
+		FORTRAN($TFD(s,d)gels)(
 		&ptrans,
 		&(integer){$SIZE(m)},
 		&(integer){$SIZE(n)},
@@ -4955,13 +4879,13 @@ pp_def("gelsy",
 	Code => generate_code '
 		integer lwork = -1;
 
-		extern int $TFD(s,d)gelsy_(integer *m, integer *n, integer *nrhs,
+		extern int FORTRAN($TFD(s,d)gelsy)(integer *m, integer *n, integer *nrhs,
 		$GENERIC() *a, integer *lda, $GENERIC() *b, integer *ldb, integer *
 		jpvt, $GENERIC() *rcond, integer *rank, $GENERIC() *work, integer *
 		lwork, integer *info);
 		$GENERIC() tmp_work;
 
-		$TFD(sgelsy_,dgelsy_)(
+		FORTRAN($TFD(s,d)gelsy)(
 		&(integer){$SIZE(m)},
 		&(integer){$SIZE(n)},
 		&(integer){$SIZE(q)},
@@ -4980,7 +4904,7 @@ pp_def("gelsy",
 		{
 		$GENERIC() *work = ($GENERIC() *)malloc(lwork *  sizeof($GENERIC()));
 
-		$TFD(sgelsy_,dgelsy_)(
+		FORTRAN($TFD(s,d)gelsy)(
 		&(integer){$SIZE(m)},
 		&(integer){$SIZE(n)},
 		&(integer){$SIZE(q)},
@@ -5090,13 +5014,13 @@ pp_def("gelss",
 	Code => generate_code '
 		integer lwork = -1;
 
-		extern int $TFD(s,d)gelss_(integer *m, integer *n, integer *nrhs,
+		extern int FORTRAN($TFD(s,d)gelss)(integer *m, integer *n, integer *nrhs,
 		$GENERIC() *a, integer *lda, $GENERIC() *b, integer *ldb, $GENERIC() *s,
 		$GENERIC() *rcond, integer *rank, $GENERIC() *work, integer *
 		lwork, integer *info);
 		$GENERIC() tmp_work;
 
-		$TFD(sgelss_,dgelss_)(
+		FORTRAN($TFD(s,d)gelss)(
 		&(integer){$SIZE(m)},
 		&(integer){$SIZE(n)},
 		&(integer){$SIZE(q)},
@@ -5114,7 +5038,7 @@ pp_def("gelss",
 		lwork = (integer )tmp_work;
 		{
 		$GENERIC() *work = ($GENERIC() *)malloc(lwork *  sizeof($GENERIC()));
-		$TFD(sgelss_,dgelss_)(
+		FORTRAN($TFD(s,d)gelss)(
 		&(integer){$SIZE(m)},
 		&(integer){$SIZE(n)},
 		&(integer){$SIZE(q)},
@@ -5200,29 +5124,26 @@ value.
 
 pp_def("gelsd",
        HandleBad => 0,
-	Pars => '[io,phys]A(m,n); [io,phys]B(p,q); [phys]rcond(); [o,phys]s(r); int [o,phys]rank();int [o,phys]info()',
+	Pars => '[io]A(m,n); [io]B(p,q); rcond(); [o]s(minmn); int [o]rank();int [o]info(); int [t]iwork(iworkn);',
 	GenericTypes => [F,D],
-	RedoDimsCode => '$SIZE(r) = PDLMIN($SIZE(m),$SIZE(n));',
+	RedoDimsCode => '
+	  $SIZE(minmn) = PDLMAX(1,PDLMIN($SIZE(m),$SIZE(n)));
+	  integer smlsiz = FORTRAN(ilaenv)(&c_nine, "DGELSD", " ", &c_zero, &c_zero, &c_zero, &c_zero, (ftnlen)6, (ftnlen)1);
+	  integer size_i = (integer) (log((double) $SIZE(minmn) / (double) (smlsiz + 1)) /log(2.)) + 1;
+	  $SIZE(iworkn) = $SIZE(minmn) * (3 * PDLMAX(size_i,0) + 11);
+	',
 	Code => generate_code '
 		integer lwork = -1;
-		integer smlsiz, size_i, nlvl, *iwork;
-		integer minmn = min( $SIZE(m), $SIZE(n) );
+		integer minmn = $SIZE(minmn);
 
-		extern int $TFD(s,d)gelsd_(integer *m, integer *n, integer *nrhs,
+		extern int FORTRAN($TFD(s,d)gelsd)(integer *m, integer *n, integer *nrhs,
 		$GENERIC() *a, integer *lda, $GENERIC() *b, integer *ldb, $GENERIC() *s,
 		$GENERIC() *rcond, integer *rank, $GENERIC() *work, integer *
 		lwork,  integer *iwork, integer *info);
 
 		$GENERIC() tmp_work;
 
-		minmn = max(1,minmn);
-
-		smlsiz = ilaenv_(&c_nine, "DGELSD", " ", &c_zero, &c_zero, &c_zero, &c_zero, (ftnlen)6, (ftnlen)1);
-		size_i = (integer) (log(($GENERIC()) minmn / ($GENERIC()) (smlsiz + 1)) /log(2.)) + 1;
-		nlvl = max(size_i, 0);
-		iwork = (integer *)malloc((3 * minmn * nlvl + 11 * minmn) *  sizeof(integer));
-
-		$TFD(sgelsd_,dgelsd_)(
+		FORTRAN($TFD(s,d)gelsd)(
 		&(integer){$SIZE(m)},
 		&(integer){$SIZE(n)},
 		&(integer){$SIZE(q)},
@@ -5235,15 +5156,15 @@ pp_def("gelsd",
 		$P(rank),
 		&tmp_work,
 		&lwork,
-		iwork,
+		$P(iwork),
 		$P(info));
 		if ($info() != 0) $CROAK("workspace query failed: info=%d", $info());
 
 		lwork = (integer )tmp_work;
 		{
-			$GENERIC() *work = ($GENERIC() *)malloc(lwork *  sizeof($GENERIC()));
+		$GENERIC() *work = ($GENERIC() *)malloc(lwork *  sizeof($GENERIC()));
 
-		$TFD(sgelsd_,dgelsd_)(
+		FORTRAN($TFD(s,d)gelsd)(
 		&(integer){$SIZE(m)},
 		&(integer){$SIZE(n)},
 		&(integer){$SIZE(q)},
@@ -5256,12 +5177,10 @@ pp_def("gelsd",
 		$P(rank),
 		work,
 		&lwork,
-		iwork,
+		$P(iwork),
 		$P(info));
 		free(work);
 		}
-		free (iwork);
-
 ',
       Doc => '
 
@@ -5363,12 +5282,12 @@ pp_def("gglse",
 	Code => generate_code '
 		integer lwork = -1;
 
-		extern int $TFD(s,d)gglse_(integer *m, integer *n, integer *p, $GENERIC() *
+		extern int FORTRAN($TFD(s,d)gglse)(integer *m, integer *n, integer *p, $GENERIC() *
 		a, integer *lda, $GENERIC() *b, integer *ldb, $GENERIC() *c__,
 		$GENERIC() *d__, $GENERIC() *x, $GENERIC() *work, integer *lwork,
 		integer *info);
 		$GENERIC() tmp_work;
-		$TFD(sgglse_,dgglse_)(
+		FORTRAN($TFD(s,d)gglse)(
 		&(integer){$SIZE(m)},
 		&(integer){$SIZE(n)},
 		&(integer){$SIZE(p)},
@@ -5385,9 +5304,9 @@ pp_def("gglse",
 
 		lwork = (integer )tmp_work;
 		{
-			$GENERIC() *work = ($GENERIC() *)malloc(lwork *  sizeof($GENERIC()));
+		$GENERIC() *work = ($GENERIC() *)malloc(lwork *  sizeof($GENERIC()));
 
-		$TFD(sgglse_,dgglse_)(
+		FORTRAN($TFD(s,d)gglse)(
 		&(integer){$SIZE(m)},
 		&(integer){$SIZE(n)},
 		&(integer){$SIZE(p)},
@@ -5469,12 +5388,12 @@ pp_def("ggglm",
 	Code => generate_code '
 		integer lwork = -1;
 
-		extern int $TFD(s,d)ggglm_(integer *n, integer *m, integer *p, $GENERIC() *
+		extern int FORTRAN($TFD(s,d)ggglm)(integer *n, integer *m, integer *p, $GENERIC() *
 		a, integer *lda, $GENERIC() *b, integer *ldb, $GENERIC() *d__,
 		$GENERIC() *x, $GENERIC() *y, $GENERIC() *work, integer *lwork,
 		integer *info);
 		$GENERIC() tmp_work;
-		$TFD(sggglm_,dggglm_)(
+		FORTRAN($TFD(s,d)ggglm)(
 		&(integer){$SIZE(n)},
 		&(integer){$SIZE(m)},
 		&(integer){$SIZE(p)},
@@ -5492,7 +5411,7 @@ pp_def("ggglm",
 		lwork = (integer )tmp_work;
 		{
 		$GENERIC() *work = ($GENERIC() *)malloc(lwork *  sizeof($GENERIC()));
-		$TFD(sggglm_,dggglm_)(
+		FORTRAN($TFD(s,d)ggglm)(
 		&(integer){$SIZE(n)},
 		&(integer){$SIZE(m)},
 		&(integer){$SIZE(p)},
@@ -5582,9 +5501,9 @@ pp_def("getrf",
 	Pars => '[io]A(m,n); int [o]ipiv(p); int [o]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
-		extern int $TFD(s,d)getrf_(integer *m, integer *n, $GENERIC() *a, integer *
+		extern int FORTRAN($TFD(s,d)getrf)(integer *m, integer *n, $GENERIC() *a, integer *
 		lda, integer *ipiv, integer *info);
-		$TFD(sgetrf_,dgetrf_)(
+		FORTRAN($TFD(s,d)getrf)(
 		&(integer){$SIZE(m)},
 		&(integer){$SIZE(n)},
 		$P(A),
@@ -5641,9 +5560,9 @@ pp_def("getf2",
 	Pars => '[io]A(m,n); int [o]ipiv(p); int [o]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
-		extern int $TFD(s,d)getf2_(integer *m, integer *n, $GENERIC() *a, integer *
+		extern int FORTRAN($TFD(s,d)getf2)(integer *m, integer *n, $GENERIC() *a, integer *
 		lda, integer *ipiv, integer *info);
-		$TFD(sgetf2_,dgetf2_)(
+		FORTRAN($TFD(s,d)getf2)(
 		&(integer){$SIZE(m)},
 		&(integer){$SIZE(n)},
 		$P(A),
@@ -5702,14 +5621,14 @@ pp_def("sytrf",
              char puplo = \'U\';
 	     integer lwork = -1;
 
-		extern int $TFD(s,d)sytrf_(char *uplo, integer *n, $GENERIC() *a, integer *
+		extern int FORTRAN($TFD(s,d)sytrf)(char *uplo, integer *n, $GENERIC() *a, integer *
 		lda, integer *ipiv, $GENERIC() *work, integer *lwork, integer *info);
 
 		$GENERIC() tmp_work;
 		if ($uplo())
 			puplo = \'L\';
 
-		$TFD(ssytrf_,dsytrf_)(
+		FORTRAN($TFD(s,d)sytrf)(
 		&puplo,
 		&(integer){$SIZE(n)},
 		$P(A),
@@ -5722,7 +5641,7 @@ pp_def("sytrf",
 		lwork = (integer )tmp_work;
 		{
 		$GENERIC() *work = ($GENERIC() *)malloc(lwork *  sizeof($GENERIC()));
-		$TFD(ssytrf_,dsytrf_)(
+		FORTRAN($TFD(s,d)sytrf)(
 		&puplo,
 		&(integer){$SIZE(n)},
 		$P(A),
@@ -5836,12 +5755,12 @@ pp_def("sytf2",
 	Code => generate_code '
              char puplo = \'U\';
 
-		extern int $TFD(s,d)sytf2_(char *uplo, integer *n, $GENERIC() *a, integer *
+		extern int FORTRAN($TFD(s,d)sytf2)(char *uplo, integer *n, $GENERIC() *a, integer *
 		lda, integer *ipiv, integer *info);
 		if ($uplo())
 			puplo = \'L\';
 
-		$TFD(ssytf2_,dsytf2_)(
+		FORTRAN($TFD(s,d)sytf2)(
 		&puplo,
 		&(integer){$SIZE(n)},
 		$P(A),
@@ -5917,12 +5836,12 @@ pp_def("potrf",
 
              char puplo = \'U\';
 
-		extern int $TFD(s,d)potrf_(char *uplo, integer *n, $GENERIC() *a, integer *
+		extern int FORTRAN($TFD(s,d)potrf)(char *uplo, integer *n, $GENERIC() *a, integer *
 		lda, integer *info);
 		if ($uplo())
 			puplo = \'L\';
 
-		$TFD(spotrf_,dpotrf_)(
+		FORTRAN($TFD(s,d)potrf)(
 		&puplo,
 		&(integer){$SIZE(n)},
 		$P(A),
@@ -5982,12 +5901,12 @@ pp_def("potf2",
 	Code => generate_code '
              char puplo = \'U\';
 
-		extern int $TFD(s,d)potf2_(char *uplo, integer *n, $GENERIC() *a, integer *
+		extern int FORTRAN($TFD(s,d)potf2)(char *uplo, integer *n, $GENERIC() *a, integer *
 		lda, integer *info);
 		if ($uplo())
 			puplo = \'L\';
 
-		$TFD(spotf2_,dpotf2_)(
+		FORTRAN($TFD(s,d)potf2)(
 		&puplo,
 		&(integer){$SIZE(n)},
 		$P(A),
@@ -6046,11 +5965,11 @@ pp_def("getri",
 	GenericTypes => [F,D],
 	Code => generate_code '
 		integer lwork = -1;
-		extern int $TFD(s,d)getri_(integer *n, $GENERIC() *a, integer *lda, integer
+		extern int FORTRAN($TFD(s,d)getri)(integer *n, $GENERIC() *a, integer *lda, integer
 		*ipiv, $GENERIC() *work, integer *lwork, integer *info);
 
 		$GENERIC() tmp_work;
-		$TFD(sgetri_,dgetri_)(
+		FORTRAN($TFD(s,d)getri)(
 		&(integer){$SIZE(n)},
 		$P(A),
 		&(integer){$SIZE(n)},
@@ -6062,7 +5981,7 @@ pp_def("getri",
 		lwork = (integer )tmp_work;
 		{
 		$GENERIC() *work = ($GENERIC() *)malloc(lwork *  sizeof($GENERIC()));
-		$TFD(sgetri_,dgetri_)(
+		FORTRAN($TFD(s,d)getri)(
 		&(integer){$SIZE(n)},
 		$P(A),
 		&(integer){$SIZE(n)},
@@ -6074,7 +5993,6 @@ pp_def("getri",
 		}
 ',
       Doc => '
-
 =for ref
 
 Computes the inverse of a matrix using the LU factorization
@@ -6116,29 +6034,26 @@ This method inverts U and then computes inv(A) by solving the system
 
 pp_def("sytri",
        HandleBad => 0,
-	Pars => '[io,phys]A(n,n); int uplo(); int [phys]ipiv(n); int [o,phys]info()',
+	Pars => '[io]A(n,n); int uplo(); int ipiv(n); int [o]info(); [t]work(n);',
 	GenericTypes => [F,D],
 	Code => generate_code '
              char puplo = \'U\';
-		extern int $TFD(s,d)sytri_(char *uplo, integer *n, $GENERIC() *a, integer *
+		extern int FORTRAN($TFD(s,d)sytri)(char *uplo, integer *n, $GENERIC() *a, integer *
 		lda, integer *ipiv, $GENERIC() *work, integer *info);
 
-		$GENERIC() *work = ($GENERIC() *)malloc($SIZE(n) *  sizeof($GENERIC()));
 		if ($uplo())
 			puplo = \'L\';
 
-		$TFD(ssytri_, dsytri_)(
+		FORTRAN($TFD(s,d)sytri)(
 		&puplo,
 		&(integer){$SIZE(n)},
 		$P(A),
 		&(integer){$SIZE(n)},
 		$P(ipiv),
-		work,
+		$P(work),
 		$P(info));
-		free(work);
 ',
       Doc => '
-
 =for ref
 
 Computes the inverse of a real symmetric indefinite matrix
@@ -6171,8 +6086,6 @@ C<sytrf>.
             > 0: if info = i, D(i,i) = 0; the matrix is singular and its
                  inverse could not be computed.
 
-
-
 =for example
 
  $a = random (float, 100, 100);
@@ -6192,12 +6105,12 @@ pp_def("potri",
 	GenericTypes => [F,D],
 	Code => generate_code '
              char puplo = \'U\';
-		extern int $TFD(s,d)potri_(char *uplo, integer *n, $GENERIC() *a, integer *
+		extern int FORTRAN($TFD(s,d)potri)(char *uplo, integer *n, $GENERIC() *a, integer *
 		lda, integer *info);
 		if ($uplo())
 			puplo = \'L\';
 
-		$TFD(spotri_,dpotri_)(
+		FORTRAN($TFD(s,d)potri)(
 		&puplo,
 		&(integer){$SIZE(n)},
 		$P(A),
@@ -6250,14 +6163,14 @@ pp_def("trtri",
 	Code => generate_code '
              char puplo = \'U\';
              char pdiag = \'N\';
-		extern int $TFD(s,d)trtri_(char *uplo, char *diag, integer *n, $GENERIC() *a, integer *
+		extern int FORTRAN($TFD(s,d)trtri)(char *uplo, char *diag, integer *n, $GENERIC() *a, integer *
 		lda, integer *info);
 		if ($uplo())
 			puplo = \'L\';
 		if ($diag())
 			pdiag = \'U\';
 
-		$TFD(strtri_, dtrtri_)(
+		FORTRAN($TFD(s,d)trtri)(
 		&puplo,
 		&pdiag,
 		&(integer){$SIZE(n)},
@@ -6318,14 +6231,14 @@ pp_def("trti2",
 	Code => generate_code '
              char puplo = \'U\';
              char pdiag = \'N\';
-		extern int $TFD(s,d)trti2_(char *uplo, char *diag, integer *n, $GENERIC() *a, integer *
+		extern int FORTRAN($TFD(s,d)trti2)(char *uplo, char *diag, integer *n, $GENERIC() *a, integer *
 		lda, integer *info);
 		if ($uplo())
 			puplo = \'L\';
 		if ($diag())
 			pdiag = \'U\';
 
-		$TFD(strti2_, dtrti2_)(
+		FORTRAN($TFD(s,d)trti2)(
 		&puplo,
 		&pdiag,
 		&(integer){$SIZE(n)},
@@ -6381,13 +6294,13 @@ pp_def("getrs",
 	GenericTypes => [F,D],
 	Code => generate_code '
              char transp = \'N\';
-		extern int $TFD(s,d)getrs_(char *trans, integer *n, integer *nrhs,
+		extern int FORTRAN($TFD(s,d)getrs)(char *trans, integer *n, integer *nrhs,
 		$GENERIC() *a, integer *lda, integer *ipiv, $GENERIC() *b, integer *
 		ldb, integer *info);
 		if($trans())
 			transp = \'T\';
 
-		$TFD(sgetrs_,dgetrs_)(
+		FORTRAN($TFD(s,d)getrs)(
 		&transp,
 		&(integer){$SIZE(n)},
 		&(integer){$SIZE(m)},
@@ -6447,13 +6360,13 @@ pp_def("sytrs",
 	GenericTypes => [F,D],
 	Code => generate_code '
              char puplo = \'U\';
-		extern int $TFD(s,d)sytrs_(char *uplo, integer *n, integer *nrhs,
+		extern int FORTRAN($TFD(s,d)sytrs)(char *uplo, integer *n, integer *nrhs,
 		$GENERIC() *a, integer *lda, integer *ipiv, $GENERIC() *b, integer *
 		ldb, integer *info);
 		if($uplo())
 			puplo = \'L\';
 
-		$TFD(ssytrs_,dsytrs_)(
+		FORTRAN($TFD(s,d)sytrs)(
 		&puplo,
 		&(integer){$SIZE(n)},
 		&(integer){$SIZE(m)},
@@ -6514,13 +6427,13 @@ pp_def("potrs",
 	GenericTypes => [F,D],
 	Code => generate_code '
              char puplo = \'U\';
-		extern int $TFD(s,d)potrs_(char *uplo, integer *n, integer *nrhs,
+		extern int FORTRAN($TFD(s,d)potrs)(char *uplo, integer *n, integer *nrhs,
 		$GENERIC() *a, integer *lda, $GENERIC() *b, integer *ldb, integer *
 		info);
 		if($uplo())
 			puplo = \'L\';
 
-		$TFD(spotrs_,dpotrs_)(
+		FORTRAN($TFD(s,d)potrs)(
 		&puplo,
 		&(integer){$SIZE(n)},
 		&(integer){$SIZE(m)},
@@ -6576,7 +6489,7 @@ pp_def("trtrs",
              char puplo = \'U\';
              char ptrans = \'N\';
              char pdiag = \'N\';
-		extern int $TFD(s,d)trtrs_(char *uplo, char *trans, char *diag,
+		extern int FORTRAN($TFD(s,d)trtrs)(char *uplo, char *trans, char *diag,
 		integer *n, integer *nrhs,
 		$GENERIC() *a, integer *lda, $GENERIC() *b, integer *
 		ldb, integer *info);
@@ -6587,7 +6500,7 @@ pp_def("trtrs",
 		if($diag())
 			pdiag = \'U\';
 
-		$TFD(strtrs_,dtrtrs_)(
+		FORTRAN($TFD(s,d)trtrs)(
 		&puplo,
 		&ptrans,
 		&pdiag,
@@ -6667,7 +6580,7 @@ pp_def("latrs",
              char pdiag = \'N\';
              char pnormin = \'N\';
 
-		extern int $TFD(s,d)latrs_(char *uplo, char *trans, char *diag, char *
+		extern int FORTRAN($TFD(s,d)latrs)(char *uplo, char *trans, char *diag, char *
 		normin, integer *n, $GENERIC() *a, integer *lda, $GENERIC() *x,
 		$GENERIC() *scale, $GENERIC() *cnorm, integer *info);
 		if($uplo())
@@ -6679,7 +6592,7 @@ pp_def("latrs",
 		if($normin())
 			pnormin = \'Y\';
 
-		$TFD(slatrs_,dlatrs_)(
+		FORTRAN($TFD(s,d)latrs)(
 		&puplo,
 		&ptrans,
 		&pdiag,
@@ -6852,33 +6765,27 @@ than max(underflow, 1/overflow).
 
 pp_def("gecon",
        HandleBad => 0,
-	Pars => '[phys]A(n,n); int norm(); [phys]anorm(); [o,phys]rcond();int [o,phys]info()',
+	Pars => 'A(n,n); int norm(); anorm(); [o]rcond();int [o]info(); int [t]iwork(n); [t]work(workn);',
+	RedoDimsCode => '$SIZE(workn) = 4 * $SIZE(n);',
 	GenericTypes => [F,D],
 	Code => generate_code '
              char pnorm = \'I\';
-
-		extern int $TFD(s,d)gecon_(char *norm, integer *n, $GENERIC() *a, integer *
+		extern int FORTRAN($TFD(s,d)gecon)(char *norm, integer *n, $GENERIC() *a, integer *
 		lda, $GENERIC() *anorm, $GENERIC() *rcond, $GENERIC() *work, integer *
 		iwork, integer *info);
-		$GENERIC() *work = ($GENERIC() *) malloc(($SIZE(n) * 4) *  sizeof($GENERIC()));
-		integer *iwork = (integer *) malloc($SIZE(n) *  sizeof(integer));
-
 		if($norm())
 			pnorm = \'O\';
 
-		$TFD(sgecon_,dgecon_)(
+		FORTRAN($TFD(s,d)gecon)(
 		&pnorm,
 		&(integer){$SIZE(n)},
 		$P(A),
 		&(integer){$SIZE(n)},
 		$P(anorm),
 		$P(rcond),
-		work,
-		iwork,
+		$P(work),
+		$P(iwork),
 		$P(info));
-		free (work);
-		free(iwork);
-
 ',
       Doc => '
 
@@ -6927,21 +6834,17 @@ condition number is computed as
 
 pp_def("sycon",
        HandleBad => 0,
-	Pars => '[phys]A(n,n); int uplo(); int ipiv(n); [phys]anorm(); [o,phys]rcond();int [o,phys]info()',
+	Pars => '[phys]A(n,n); int uplo(); int ipiv(n); [phys]anorm(); [o,phys]rcond();int [o,phys]info(); int [t]iwork(n); [t]work(workn);',
+	RedoDimsCode => '$SIZE(workn) = 2 * $SIZE(n);',
 	GenericTypes => [F,D],
 	Code => generate_code '
              char puplo = \'U\';
-
-		extern int $TFD(s,d)sycon_(char *uplo, integer *n, $GENERIC() *a, integer *
+		extern int FORTRAN($TFD(s,d)sycon)(char *uplo, integer *n, $GENERIC() *a, integer *
 		lda, integer *ipiv, $GENERIC() *anorm, $GENERIC() *rcond, $GENERIC() *
 		work, integer *iwork, integer *info);
-		$GENERIC() *work = ($GENERIC() *) malloc(($SIZE(n) * 2) *  sizeof($GENERIC()));
-		integer *iwork = (integer *) malloc($SIZE(n) *  sizeof(integer));
-
 		if($uplo())
 			puplo = \'L\';
-
-		$TFD(ssycon_,dsycon_)(
+		FORTRAN($TFD(s,d)sycon)(
 		&puplo,
 		&(integer){$SIZE(n)},
 		$P(A),
@@ -6949,15 +6852,11 @@ pp_def("sycon",
 		$P(ipiv),
 		$P(anorm),
 		$P(rcond),
-		work,
-		iwork,
+		$P(work),
+		$P(iwork),
 		$P(info));
-		free (work);
-		free(iwork);
-
 ',
       Doc => '
-
 =for ref
 
 Estimates the reciprocal of the condition number (in the
@@ -7004,33 +6903,26 @@ condition number is computed as rcond = 1 / (anorm * norm(inv(A))).
 
 pp_def("pocon",
        HandleBad => 0,
-	Pars => '[phys]A(n,n); int uplo(); [phys]anorm(); [o,phys]rcond();int [o,phys]info()',
+	Pars => 'A(n,n); int uplo(); anorm(); [o]rcond();int [o]info(); int [t]iwork(n); [t]work(workn);',
+	RedoDimsCode => '$SIZE(workn) = 3 * $SIZE(n);',
 	GenericTypes => [F,D],
 	Code => generate_code '
              char puplo = \'U\';
-
-		extern int $TFD(s,d)pocon_(char *uplo, integer *n, $GENERIC() *a, integer *
+		extern int FORTRAN($TFD(s,d)pocon)(char *uplo, integer *n, $GENERIC() *a, integer *
 		lda, $GENERIC() *anorm, $GENERIC() *rcond, $GENERIC() *work, integer *
 		iwork, integer *info);
-		$GENERIC() *work = ($GENERIC() *) malloc(($SIZE(n) * 3) *  sizeof($GENERIC()));
-		integer *iwork = (integer *) malloc($SIZE(n) *  sizeof(integer));
-
 		if($uplo())
 			puplo = \'L\';
-
-		$TFD(spocon_,dpocon_)(
+		FORTRAN($TFD(s,d)pocon)(
 		&puplo,
 		&(integer){$SIZE(n)},
 		$P(A),
 		&(integer){$SIZE(n)},
 		$P(anorm),
 		$P(rcond),
-		work,
-		iwork,
+		$P(work),
+		$P(iwork),
 		$P(info));
-		free (work);
-		free(iwork);
-
 ',
       Doc => '
 
@@ -7074,17 +6966,15 @@ condition number is computed as rcond = 1 / (anorm * norm(inv(A))).
 
 pp_def("trcon",
        HandleBad => 0,
-	Pars => '[phys]A(n,n); int norm();int uplo();int diag(); [o,phys]rcond();int [o,phys]info()',
+	Pars => 'A(n,n); int norm();int uplo();int diag(); [o]rcond();int [o]info(); int [t]iwork(n); [t]work(workn);',
+	RedoDimsCode => '$SIZE(workn) = 3 * $SIZE(n);',
 	GenericTypes => [F,D],
 	Code => generate_code '
              char puplo = \'U\';
              char pdiag = \'N\';
              char pnorm = \'I\';
-		extern int $TFD(s,d)trcon_(char *norm, char *uplo, char *diag,integer *n, $GENERIC() *a, integer *
+		extern int FORTRAN($TFD(s,d)trcon)(char *norm, char *uplo, char *diag,integer *n, $GENERIC() *a, integer *
 		lda, $GENERIC() *rcond, $GENERIC() *work, integer *iwork, integer *info);
-		$GENERIC() *work = ($GENERIC() *) malloc(($SIZE(n) * 3) *  sizeof($GENERIC()));
-		integer *iwork = (integer *) malloc($SIZE(n) *  sizeof(integer));
-
 		if($uplo())
 			puplo = \'L\';
 		if($diag())
@@ -7092,7 +6982,7 @@ pp_def("trcon",
 		if($norm())
 			pnorm = \'O\';
 
-		$TFD(strcon_,dtrcon_)(
+		FORTRAN($TFD(s,d)trcon)(
 		&pnorm,
 		&puplo,
 		&pdiag,
@@ -7100,15 +6990,11 @@ pp_def("trcon",
 		$P(A),
 		&(integer){$SIZE(n)},
 		$P(rcond),
-		work,
-		iwork,
+		$P(work),
+		$P(iwork),
 		$P(info));
-		free (work);
-		free(iwork);
-
 ',
       Doc => '
-
 =for ref
 
 Estimates the reciprocal of the condition number of a
@@ -7150,7 +7036,6 @@ computed as
     info:   = 0:  successful exit
             < 0:  if info = -i, the i-th argument had an illegal value
 
-
 =for example
 
  # Assume $a is upper triangular
@@ -7167,12 +7052,12 @@ pp_def("geqp3",
 	Code => generate_code '
 		integer lwork = -1;
 
-		extern int $TFD(s,d)geqp3_(integer *m, integer *n, $GENERIC() *a, integer *
+		extern int FORTRAN($TFD(s,d)geqp3)(integer *m, integer *n, $GENERIC() *a, integer *
 		lda, integer *jpvt, $GENERIC() *tau, $GENERIC() *work, integer *lwork,
 		integer *info);
 		$GENERIC() tmp_work;
 
-		$TFD(sgeqp3_,dgeqp3_)(
+		FORTRAN($TFD(s,d)geqp3)(
 		&(integer){$SIZE(m)},
 		&(integer){$SIZE(n)},
 		$P(A),
@@ -7186,7 +7071,7 @@ pp_def("geqp3",
 		lwork = (integer )tmp_work;
 		{
 		$GENERIC() *work = ($GENERIC() *)malloc(lwork *  sizeof($GENERIC()));
-		$TFD(sgeqp3_,dgeqp3_)(
+		FORTRAN($TFD(s,d)geqp3)(
 		&(integer){$SIZE(m)},
 		&(integer){$SIZE(n)},
 		$P(A),
@@ -7258,12 +7143,12 @@ pp_def("geqrf",
 	Code => generate_code '
 		integer lwork = -1;
 
-		extern int $TFD(s,d)geqrf_(integer *m, integer *n, $GENERIC() *a, integer *
+		extern int FORTRAN($TFD(s,d)geqrf)(integer *m, integer *n, $GENERIC() *a, integer *
 		lda, $GENERIC() *tau, $GENERIC() *work, integer *lwork,
 		integer *info);
 		$GENERIC() tmp_work;
 
-		$TFD(sgeqrf_,dgeqrf_)(
+		FORTRAN($TFD(s,d)geqrf)(
 		&(integer){$SIZE(m)},
 		&(integer){$SIZE(n)},
 		$P(A),
@@ -7276,7 +7161,7 @@ pp_def("geqrf",
 		lwork = (integer )tmp_work;
 		{
 		$GENERIC() *work = ($GENERIC() *)malloc(lwork *  sizeof($GENERIC()));
-		$TFD(sgeqrf_,dgeqrf_)(
+		FORTRAN($TFD(s,d)geqrf)(
 		&(integer){$SIZE(m)},
 		&(integer){$SIZE(n)},
 		$P(A),
@@ -7340,12 +7225,12 @@ pp_def("orgqr",
 	Code => generate_code '
 		integer lwork = -1;
 
-		extern int $TFD(s,d)orgqr_(integer *m, integer *n, integer *k, $GENERIC() *
+		extern int FORTRAN($TFD(s,d)orgqr)(integer *m, integer *n, integer *k, $GENERIC() *
 		a, integer *lda, $GENERIC() *tau, $GENERIC() *work, integer *lwork,
 		integer *info);
 		$GENERIC() tmp_work;
 
-		$TFD(sorgqr_,dorgqr_)(
+		FORTRAN($TFD(s,d)orgqr)(
 		&(integer){$SIZE(m)},
 		&(integer){$SIZE(n)},
 		&(integer){$SIZE(k)},
@@ -7359,7 +7244,7 @@ pp_def("orgqr",
 		lwork = (integer )tmp_work;
 		{
 		$GENERIC() *work = ($GENERIC() *)malloc(lwork *  sizeof($GENERIC()));
-		$TFD(sorgqr_,dorgqr_)(
+		FORTRAN($TFD(s,d)orgqr)(
 		&(integer){$SIZE(m)},
 		&(integer){$SIZE(n)},
 		&(integer){$SIZE(k)},
@@ -7419,7 +7304,7 @@ pp_def("ormqr",
 		char ptrans = \'N\', pside = \'L\';
 		integer lwork = -1;
 
-		extern int $TFD(s,d)ormqr_(char *side, char *trans, integer *m, integer *n,
+		extern int FORTRAN($TFD(s,d)ormqr)(char *side, char *trans, integer *m, integer *n,
 		integer *k, $GENERIC() *a, integer *lda, $GENERIC() *tau, $GENERIC() *
 		c__, integer *ldc, $GENERIC() *work, integer *lwork, integer *info);
 		$GENERIC() tmp_work;
@@ -7428,7 +7313,7 @@ pp_def("ormqr",
 		if($side())
 			pside = \'R\';
 
-		$TFD(sormqr_,dormqr_)(
+		FORTRAN($TFD(s,d)ormqr)(
 		&pside,
 		&ptrans,
 		&(integer){$SIZE(m)},
@@ -7446,7 +7331,7 @@ pp_def("ormqr",
 		lwork = (integer )tmp_work;
 		{
 		$GENERIC() *work = ($GENERIC() *)malloc(lwork *  sizeof($GENERIC()));
-		$TFD(sormqr_,dormqr_)(
+		FORTRAN($TFD(s,d)ormqr)(
 		&pside,
 		&ptrans,
 		&(integer){$SIZE(m)},
@@ -7529,11 +7414,11 @@ pp_def("gelqf",
 	Code => generate_code '
 		integer lwork = -1;
 
-		extern int $TFD(s,d)gelqf_(integer *m, integer *n, $GENERIC() *a, integer *
+		extern int FORTRAN($TFD(s,d)gelqf)(integer *m, integer *n, $GENERIC() *a, integer *
 		lda, $GENERIC() *tau, $GENERIC() *work, integer *lwork, integer *info);
 		$GENERIC() tmp_work;
 
-		$TFD(sgelqf_,dgelqf_)(
+		FORTRAN($TFD(s,d)gelqf)(
 		&(integer){$SIZE(m)},
 		&(integer){$SIZE(n)},
 		$P(A),
@@ -7546,7 +7431,7 @@ pp_def("gelqf",
 		lwork = (integer )tmp_work;
 		{
 		$GENERIC() *work = ($GENERIC() *)malloc(lwork *  sizeof($GENERIC()));
-		$TFD(sgelqf_,dgelqf_)(
+		FORTRAN($TFD(s,d)gelqf)(
 		&(integer){$SIZE(m)},
 		&(integer){$SIZE(n)},
 		$P(A),
@@ -7609,12 +7494,12 @@ pp_def("orglq",
 	Code => generate_code '
 		integer lwork = -1;
 
-		extern int $TFD(s,d)orglq_(integer *m, integer *n, integer *k, $GENERIC() *
+		extern int FORTRAN($TFD(s,d)orglq)(integer *m, integer *n, integer *k, $GENERIC() *
 		a, integer *lda, $GENERIC() *tau, $GENERIC() *work, integer *lwork,
 		integer *info);
 		$GENERIC() tmp_work;
 
-		$TFD(sorglq_,dorglq_)(
+		FORTRAN($TFD(s,d)orglq)(
 		&(integer){$SIZE(m)},
 		&(integer){$SIZE(n)},
 		&(integer){$SIZE(k)},
@@ -7628,7 +7513,7 @@ pp_def("orglq",
 		lwork = (integer )tmp_work;
 		{
 		$GENERIC() *work = ($GENERIC() *)malloc(lwork *  sizeof($GENERIC()));
-		$TFD(sorglq_,dorglq_)(
+		FORTRAN($TFD(s,d)orglq)(
 		&(integer){$SIZE(m)},
 		&(integer){$SIZE(n)},
 		&(integer){$SIZE(k)},
@@ -7686,7 +7571,7 @@ pp_def("ormlq",
 		char ptrans = \'N\', pside = \'L\';
 		integer lwork = -1;
 
-		extern int $TFD(s,d)ormlq_(char *side, char *trans, integer *m, integer *n,
+		extern int FORTRAN($TFD(s,d)ormlq)(char *side, char *trans, integer *m, integer *n,
 		integer *k, $GENERIC() *a, integer *lda, $GENERIC() *tau, $GENERIC() *
 		c__, integer *ldc, $GENERIC() *work, integer *lwork, integer *info);
 		$GENERIC() tmp_work;
@@ -7695,7 +7580,7 @@ pp_def("ormlq",
 		if($side())
 			pside = \'R\';
 
-		$TFD(sormlq_,dormlq_)(
+		FORTRAN($TFD(s,d)ormlq)(
 		&pside,
 		&ptrans,
 		&(integer){$SIZE(m)},
@@ -7713,7 +7598,7 @@ pp_def("ormlq",
 		lwork = (integer )tmp_work;
 		{
 		$GENERIC() *work = ($GENERIC() *)malloc(lwork *  sizeof($GENERIC()));
-		$TFD(sormlq_,dormlq_)(
+		FORTRAN($TFD(s,d)ormlq)(
 		&pside,
 		&ptrans,
 		&(integer){$SIZE(m)},
@@ -7796,11 +7681,11 @@ pp_def("geqlf",
 	Code => generate_code '
 		integer lwork = -1;
 
-		extern int $TFD(s,d)geqlf_(integer *m, integer *n, $GENERIC() *a, integer *
+		extern int FORTRAN($TFD(s,d)geqlf)(integer *m, integer *n, $GENERIC() *a, integer *
 		lda, $GENERIC() *tau, $GENERIC() *work, integer *lwork, integer *info);
 		$GENERIC() tmp_work;
 
-		$TFD(sgeqlf_,dgeqlf_)(
+		FORTRAN($TFD(s,d)geqlf)(
 		&(integer){$SIZE(m)},
 		&(integer){$SIZE(n)},
 		$P(A),
@@ -7813,7 +7698,7 @@ pp_def("geqlf",
 		lwork = (integer )tmp_work;
 		{
 		$GENERIC() *work = ($GENERIC() *)malloc(lwork *  sizeof($GENERIC()));
-		$TFD(sgeqlf_,dgeqlf_)(
+		FORTRAN($TFD(s,d)geqlf)(
 		&(integer){$SIZE(m)},
 		&(integer){$SIZE(n)},
 		$P(A),
@@ -7878,12 +7763,12 @@ pp_def("orgql",
 	Code => generate_code '
 		integer lwork = -1;
 
-		extern int $TFD(s,d)orgql_(integer *m, integer *n, integer *k, $GENERIC() *
+		extern int FORTRAN($TFD(s,d)orgql)(integer *m, integer *n, integer *k, $GENERIC() *
 		a, integer *lda, $GENERIC() *tau, $GENERIC() *work, integer *lwork,
 		integer *info);
 		$GENERIC() tmp_work;
 
-		$TFD(sorgql_,dorgql_)(
+		FORTRAN($TFD(s,d)orgql)(
 		&(integer){$SIZE(m)},
 		&(integer){$SIZE(n)},
 		&(integer){$SIZE(k)},
@@ -7897,7 +7782,7 @@ pp_def("orgql",
 		lwork = (integer )tmp_work;
 		{
 		$GENERIC() *work = ($GENERIC() *)malloc(lwork *  sizeof($GENERIC()));
-		$TFD(sorgql_,dorgql_)(
+		FORTRAN($TFD(s,d)orgql)(
 		&(integer){$SIZE(m)},
 		&(integer){$SIZE(n)},
 		&(integer){$SIZE(k)},
@@ -7956,7 +7841,7 @@ pp_def("ormql",
 		char ptrans = \'N\', pside = \'L\';
 		integer lwork = -1;
 
-		extern int $TFD(s,d)ormql_(char *side, char *trans, integer *m, integer *n,
+		extern int FORTRAN($TFD(s,d)ormql)(char *side, char *trans, integer *m, integer *n,
 		integer *k, $GENERIC() *a, integer *lda, $GENERIC() *tau, $GENERIC() *
 		c__, integer *ldc, $GENERIC() *work, integer *lwork, integer *info);
 		$GENERIC() tmp_work;
@@ -7965,7 +7850,7 @@ pp_def("ormql",
 		if($side())
 			pside = \'R\';
 
-		$TFD(sormql_,dormql_)(
+		FORTRAN($TFD(s,d)ormql)(
 		&pside,
 		&ptrans,
 		&(integer){$SIZE(m)},
@@ -7983,7 +7868,7 @@ pp_def("ormql",
 		lwork = (integer )tmp_work;
 		{
 		$GENERIC() *work = ($GENERIC() *)malloc(lwork *  sizeof($GENERIC()));
-		$TFD(sormql_,dormql_)(
+		FORTRAN($TFD(s,d)ormql)(
 		&pside,
 		&ptrans,
 		&(integer){$SIZE(m)},
@@ -8066,11 +7951,11 @@ pp_def("gerqf",
 	Code => generate_code '
 		integer lwork = -1;
 
-		extern int $TFD(s,d)gerqf_(integer *m, integer *n, $GENERIC() *a, integer *
+		extern int FORTRAN($TFD(s,d)gerqf)(integer *m, integer *n, $GENERIC() *a, integer *
 		lda, $GENERIC() *tau, $GENERIC() *work, integer *lwork, integer *info);
 		$GENERIC() tmp_work;
 
-		$TFD(sgerqf_,dgerqf_)(
+		FORTRAN($TFD(s,d)gerqf)(
 		&(integer){$SIZE(m)},
 		&(integer){$SIZE(n)},
 		$P(A),
@@ -8083,7 +7968,7 @@ pp_def("gerqf",
 		lwork = (integer )tmp_work;
 		{
 		$GENERIC() *work = ($GENERIC() *)malloc(lwork *  sizeof($GENERIC()));
-		$TFD(sgerqf_,dgerqf_)(
+		FORTRAN($TFD(s,d)gerqf)(
 		&(integer){$SIZE(m)},
 		&(integer){$SIZE(n)},
 		$P(A),
@@ -8149,12 +8034,12 @@ pp_def("orgrq",
 	Code => generate_code '
 		integer lwork = -1;
 
-		extern int $TFD(s,d)orgrq_(integer *m, integer *n, integer *k, $GENERIC() *
+		extern int FORTRAN($TFD(s,d)orgrq)(integer *m, integer *n, integer *k, $GENERIC() *
 		a, integer *lda, $GENERIC() *tau, $GENERIC() *work, integer *lwork,
 		integer *info);
 		$GENERIC() tmp_work;
 
-		$TFD(sorgrq_,dorgrq_)(
+		FORTRAN($TFD(s,d)orgrq)(
 		&(integer){$SIZE(m)},
 		&(integer){$SIZE(n)},
 		&(integer){$SIZE(k)},
@@ -8168,7 +8053,7 @@ pp_def("orgrq",
 		lwork = (integer )tmp_work;
 		{
 		$GENERIC() *work = ($GENERIC() *)malloc(lwork *  sizeof($GENERIC()));
-		$TFD(sorgrq_,dorgrq_)(
+		FORTRAN($TFD(s,d)orgrq)(
 		&(integer){$SIZE(m)},
 		&(integer){$SIZE(n)},
 		&(integer){$SIZE(k)},
@@ -8227,7 +8112,7 @@ pp_def("ormrq",
 		char ptrans = \'N\', pside = \'L\';
 		integer lwork = -1;
 
-		extern int $TFD(s,d)ormrq_(char *side, char *trans, integer *m, integer *n,
+		extern int FORTRAN($TFD(s,d)ormrq)(char *side, char *trans, integer *m, integer *n,
 		integer *k, $GENERIC() *a, integer *lda, $GENERIC() *tau, $GENERIC() *
 		c__, integer *ldc, $GENERIC() *work, integer *lwork, integer *info);
 		$GENERIC() tmp_work;
@@ -8236,7 +8121,7 @@ pp_def("ormrq",
 		if($side())
 			pside = \'R\';
 
-		$TFD(sormrq_,dormrq_)(
+		FORTRAN($TFD(s,d)ormrq)(
 		&pside,
 		&ptrans,
 		&(integer){$SIZE(m)},
@@ -8254,7 +8139,7 @@ pp_def("ormrq",
 		lwork = (integer )tmp_work;
 		{
 		$GENERIC() *work = ($GENERIC() *)malloc(lwork *  sizeof($GENERIC()));
-		$TFD(sormrq_,dormrq_)(
+		FORTRAN($TFD(s,d)ormrq)(
 		&pside,
 		&ptrans,
 		&(integer){$SIZE(m)},
@@ -8337,11 +8222,11 @@ pp_def("tzrzf",
 	Code => generate_code '
 		integer lwork = -1;
 
-		extern int $TFD(s,d)tzrzf_(integer *m, integer *n, $GENERIC() *a, integer *
+		extern int FORTRAN($TFD(s,d)tzrzf)(integer *m, integer *n, $GENERIC() *a, integer *
 		lda, $GENERIC() *tau, $GENERIC() *work, integer *lwork, integer *info);
 		$GENERIC() tmp_work;
 
-		$TFD(stzrzf_,dtzrzf_)(
+		FORTRAN($TFD(s,d)tzrzf)(
 		&(integer){$SIZE(m)},
 		&(integer){$SIZE(n)},
 		$P(A),
@@ -8354,7 +8239,7 @@ pp_def("tzrzf",
 		lwork = (integer )tmp_work;
 		{
 		$GENERIC() *work = ($GENERIC() *)malloc(lwork *  sizeof($GENERIC()));
-		$TFD(stzrzf_,dtzrzf_)(
+		FORTRAN($TFD(s,d)tzrzf)(
 		&(integer){$SIZE(m)},
 		&(integer){$SIZE(n)},
 		$P(A),
@@ -8440,7 +8325,7 @@ pp_def("ormrz",
 		integer lwork = -1;
 		integer kk =  $SIZE(p) - $SIZE(k);
 
-		extern int $TFD(s,d)ormrz_(char *side, char *trans, integer *m, integer *n,
+		extern int FORTRAN($TFD(s,d)ormrz)(char *side, char *trans, integer *m, integer *n,
 		integer *k, integer *l, $GENERIC() *a, integer *lda, $GENERIC() *tau, $GENERIC() *
 		c__, integer *ldc, $GENERIC() *work, integer *lwork, integer *info);
 		$GENERIC() tmp_work;
@@ -8449,7 +8334,7 @@ pp_def("ormrz",
 		if($side())
 			pside = \'R\';
 
-		$TFD(sormrz_,dormrz_)(
+		FORTRAN($TFD(s,d)ormrz)(
 		&pside,
 		&ptrans,
 		&(integer){$SIZE(m)},
@@ -8468,7 +8353,7 @@ pp_def("ormrz",
 		lwork = (integer )tmp_work;
 		{
 		$GENERIC() *work = ($GENERIC() *)malloc(lwork *  sizeof($GENERIC()));
-		$TFD(sormrz_,dormrz_)(
+		FORTRAN($TFD(s,d)ormrz)(
 		&pside,
 		&ptrans,
 		&(integer){$SIZE(m)},
@@ -8553,12 +8438,12 @@ pp_def("gehrd",
 	Code => generate_code '
 		integer lwork = -1;
 
-		extern int $TFD(s,d)gehrd_(integer *n, integer *ilo, integer *ihi,
+		extern int FORTRAN($TFD(s,d)gehrd)(integer *n, integer *ilo, integer *ihi,
 		$GENERIC() *a, integer *lda, $GENERIC() *tau, $GENERIC() *work,
 		integer *lwork, integer *info);
 		$GENERIC() tmp_work;
 
-		$TFD(sgehrd_,dgehrd_)(
+		FORTRAN($TFD(s,d)gehrd)(
 		&(integer){$SIZE(n)},
 		$P(ilo),
 		$P(ihi),
@@ -8572,7 +8457,7 @@ pp_def("gehrd",
 		lwork = (integer )tmp_work;
 		{
 		$GENERIC() *work = ($GENERIC() *)malloc(lwork *  sizeof($GENERIC()));
-		$TFD(sgehrd_,dgehrd_)(
+		FORTRAN($TFD(s,d)gehrd)(
 		&(integer){$SIZE(n)},
 		$P(ilo),
 		$P(ihi),
@@ -8666,12 +8551,12 @@ pp_def("orghr",
 	Code => generate_code '
 		integer lwork = -1;
 
-		extern int $TFD(s,d)orghr_(integer *n, integer *ilo, integer *ihi,
+		extern int FORTRAN($TFD(s,d)orghr)(integer *n, integer *ilo, integer *ihi,
 		$GENERIC() *a, integer *lda, $GENERIC() *tau, $GENERIC() *work,
 		integer *lwork, integer *info);
 		$GENERIC() tmp_work;
 
-		$TFD(sorghr_,dorghr_)(
+		FORTRAN($TFD(s,d)orghr)(
 		&(integer){$SIZE(n)},
 		$P(ilo),
 		$P(ihi),
@@ -8685,7 +8570,7 @@ pp_def("orghr",
 		lwork = (integer )tmp_work;
 		{
 		$GENERIC() *work = ($GENERIC() *)malloc(lwork *  sizeof($GENERIC()));
-		$TFD(sorghr_,dorghr_)(
+		FORTRAN($TFD(s,d)orghr)(
 		&(integer){$SIZE(n)},
 		$P(ilo),
 		$P(ihi),
@@ -8749,7 +8634,7 @@ pp_def("hseqr",
 		char pjob = \'E\';
 		integer lwork = -1;
 
-		extern int $TFD(s,d)hseqr_(char *job, char *compz, integer *n, integer *ilo,
+		extern int FORTRAN($TFD(s,d)hseqr)(char *job, char *compz, integer *n, integer *ilo,
 		integer *ihi, $GENERIC() *h__, integer *ldh, $GENERIC() *wr,
 		$GENERIC() *wi, $GENERIC() *z__, integer *ldz, $GENERIC() *work,
 		integer *lwork, integer *info);
@@ -8767,7 +8652,7 @@ pp_def("hseqr",
 			default: pcompz = \'N\';
 		}
 
-		$TFD(shseqr_,dhseqr_)(
+		FORTRAN($TFD(s,d)hseqr)(
 		&pjob,
 		&pcompz,
 		&(integer){$SIZE(n)},
@@ -8786,7 +8671,7 @@ pp_def("hseqr",
 		lwork = (integer )tmp_work;
 		{
 		$GENERIC() *work = ($GENERIC() *)malloc(lwork *  sizeof($GENERIC()));
-		$TFD(shseqr_,dhseqr_)(
+		FORTRAN($TFD(s,d)hseqr)(
 		&pjob,
 		&pcompz,
 		&(integer){$SIZE(n)},
@@ -8889,22 +8774,21 @@ matrix Q:  A = Q*H*Q**T = (QZ)*T*(QZ)**T.
 
 pp_def("trevc",
        HandleBad => 0,
-	Pars => '[io]T(n,n); int side();int howmny();int select(q);[o]VL(m,m); [o]VR(p,p);int [o]m(); int [o]info()',
+	Pars => '[io]T(n,n); int side();int howmny();int select(q);[o]VL(m,m); [o]VR(p,p);int [o]m(); int [o]info(); [t]work(workn);',
 	RedoDimsCode => '
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(side), tmp != 1, $PDL(VL), $SIZE(m), $SIZE(n))
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(side), tmp != 2, $PDL(VR), $SIZE(p), $SIZE(n))
+	  $SIZE(workn) = 3 * $SIZE(n);
 	',
 	GenericTypes => [F,D],
 	Code => generate_code '
 		char pside,phowmny;
 		integer mm = PDLMAX($SIZE(m),$SIZE(p));
 
-		extern int $TFD(s,d)trevc_(char *side, char *howmny, logical *select,
+		extern int FORTRAN($TFD(s,d)trevc)(char *side, char *howmny, logical *select,
 		integer *n, $GENERIC() *t, integer *ldt, $GENERIC() *vl, integer *
 		ldvl, $GENERIC() *vr, integer *ldvr, integer *mm, integer *m,
 		$GENERIC() *work, integer *info);
-		$GENERIC() *work = ($GENERIC() *) malloc(3* $SIZE(n) *sizeof($GENERIC()));
-
 		switch ($howmny())
 		{
 			case 1: phowmny = \'B\';
@@ -8923,7 +8807,7 @@ pp_def("trevc",
 			default:pside = \'B\';
 		}
 
-		$TFD(strevc_,dtrevc_)(
+		FORTRAN($TFD(s,d)trevc)(
 		&pside,
 		&phowmny,
 		$P(select),
@@ -8936,9 +8820,8 @@ pp_def("trevc",
 		&(integer){$SIZE(p)},
 		&mm,
 		$P(m),
-		work,
+		$P(work),
 		$P(info));
-		free(work);
 
 ',
       Doc => '
@@ -9080,22 +8963,21 @@ magnitude has magnitude 1; here the magnitude of a complex number
 
 pp_def("tgevc",
        HandleBad => 0,
-	Pars => '[io]A(n,n); int side();int howmny();[io]B(n,n);int select(q);[o]VL(m,m); [o]VR(p,p);int [o]m(); int [o]info()',
+	Pars => '[io]A(n,n); int side();int howmny();[io]B(n,n);int select(q);[o]VL(m,m); [o]VR(p,p);int [o]m(); int [o]info(); [t]work(workn);',
 	RedoDimsCode => '
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(side), tmp != 1, $PDL(VL), $SIZE(m), $SIZE(n))
 	  PDL_MAYBE_SIZE(PDL_Long, $PDL(side), tmp != 2, $PDL(VR), $SIZE(p), $SIZE(n))
+	  $SIZE(workn) = 6 * $SIZE(n);
 	',
 	GenericTypes => [F,D],
 	Code => generate_code '
 		char pside,phowmny;
 		integer mm = PDLMAX($SIZE(m),$SIZE(p));
 
-		extern int $TFD(s,d)tgevc_(char *side, char *howmny, logical *select,
+		extern int FORTRAN($TFD(s,d)tgevc)(char *side, char *howmny, logical *select,
 		integer *n, $GENERIC() *a, integer *lda, $GENERIC() *b,integer *ldb,
 		$GENERIC() *vl, integer *ldvl, $GENERIC() *vr, integer *ldvr, integer *mm, integer *m,
 		$GENERIC() *work, integer *info);
-		$GENERIC() *work = ($GENERIC() *) malloc(6* $SIZE(n) *sizeof($GENERIC()));
-
 		switch ($howmny())
 		{
 			case 1: phowmny = \'B\';
@@ -9114,7 +8996,7 @@ pp_def("tgevc",
 			default:pside = \'B\';
 		}
 
-		$TFD(stgevc_,dtgevc_)(
+		FORTRAN($TFD(s,d)tgevc)(
 		&pside,
 		&phowmny,
 		$P(select),
@@ -9129,10 +9011,8 @@ pp_def("tgevc",
 		&(integer){$SIZE(p)},
 		&mm,
 		$P(m),
-		work,
+		$P(work),
 		$P(info));
-		free(work);
-
 ',
       Doc => '
 
@@ -9258,7 +9138,7 @@ pp_def("gebal",
 	Code => generate_code '
 		char pjob;
 
-		extern int $TFD(s,d)gebal_(char *job, integer *n, $GENERIC() *a, integer *
+		extern int FORTRAN($TFD(s,d)gebal)(char *job, integer *n, $GENERIC() *a, integer *
 		lda, integer *ilo, integer *ihi, $GENERIC() *scale, integer *info);
 
 	        switch ($job())
@@ -9272,7 +9152,7 @@ pp_def("gebal",
 			default:  pjob = \'N\';
 		}
 
-		$TFD(sgebal_,dgebal_)(
+		FORTRAN($TFD(s,d)gebal)(
 		&pjob,
 		&(integer){$SIZE(n)},
 		$P(A),
@@ -9380,7 +9260,7 @@ pp_def("gebak",
 		char pjob;
 		char pside =\'L\' ;
 
-		extern int $TFD(s,d)gebak_(char *job, char *side, integer *n, integer *ilo,
+		extern int FORTRAN($TFD(s,d)gebak)(char *job, char *side, integer *n, integer *ilo,
 		integer *ihi, $GENERIC() *scale, integer *m, $GENERIC() *v, integer *
 		ldv, integer *info);
 
@@ -9397,7 +9277,7 @@ pp_def("gebak",
 	        if ($side())
 			pside = \'R\';
 
-		$TFD(sgebak_,dgebak_)(
+		FORTRAN($TFD(s,d)gebak)(
 		&pjob,
 		&pside,
 		&(integer){$SIZE(n)},
@@ -9465,40 +9345,34 @@ balanced matrix output by gebal.
 
 pp_def("lange",
        HandleBad => 0,
-	Pars => '[phys]A(n,m); int norm(); [o]b()',
+	Pars => '[phys]A(n,m); int norm(); [o]b(); [t]work(workn);',
+	RedoDimsCode => '
+	  PDL_MAYBE_SIZE(PDL_Long, $PDL(norm), tmp == 2, $PDL(work), $SIZE(workn), $SIZE(n))
+	',
 	GenericTypes => [F,D],
 	Code => '
-
              char pnorm;
-
-		extern $GENERIC() $TFD(s,d)lange_(char *norm, integer *m, integer *n, $GENERIC() *a, integer
+		extern $GENERIC() FORTRAN($TFD(s,d)lange)(char *norm, integer *m, integer *n, $GENERIC() *a, integer
 		*lda, $GENERIC() *work);
-		$GENERIC() *work;
 		switch ($norm())
 		{
 			case 1: pnorm = \'O\';
 				break;
 			case 2: pnorm = \'I\';
-				work = ($GENERIC() *)malloc($SIZE(n) *  sizeof($GENERIC()));
 				break;
 			case 3: pnorm = \'F\';
 				break;
 			default: pnorm = \'M\';
 		}
-
-		$b() = $TFD(slange_,dlange_)(
+		$b() = FORTRAN($TFD(s,d)lange)(
 		&pnorm,
 		&(integer){$SIZE(n)},
 		&(integer){$SIZE(m)},
 		$P(A),
 		&(integer){$SIZE(n)},
-		work);
-		if ($norm() == 2)
-			free (work);
-
+		$P(work));
 ',
       Doc => '
-
 =for ref
 
 Computes the value of the one norm,  or the Frobenius norm, or
@@ -9531,32 +9405,28 @@ real matrix A.
 
     A:      The n by m matrix A.
 
-
 =for example
 
  $a = random (float, 100, 100);
  $norm  = $a->lange(1);
-
 ');
 
 pp_def("lansy",
        HandleBad => 0,
-	Pars => '[phys]A(n,n); int uplo(); int norm(); [o]b()',
+	Pars => 'A(n,n); int uplo(); int norm(); [o]b(); [t]work(workn);',
+	RedoDimsCode => '
+	  PDL_MAYBE_SIZE(PDL_Long, $PDL(norm), tmp == 1 || tmp == 2, $PDL(work), $SIZE(workn), $SIZE(n))
+	',
 	GenericTypes => [F,D],
 	Code => '
-
              char pnorm, puplo = \'U\';
-
-		extern $GENERIC() $TFD(s,d)lansy_(char *norm, char *uplo, integer *n, $GENERIC() *a, integer
+		extern $GENERIC() FORTRAN($TFD(s,d)lansy)(char *norm, char *uplo, integer *n, $GENERIC() *a, integer
 		*lda, $GENERIC() *work);
-		$GENERIC() *work;
 		switch ($norm())
 		{
 			case 1: pnorm = \'O\';
-				work = ($GENERIC() *)malloc($SIZE(n) *  sizeof($GENERIC()));
 				break;
 			case 2: pnorm = \'I\';
-				work = ($GENERIC() *)malloc($SIZE(n) *  sizeof($GENERIC()));
 				break;
 			case 3: pnorm = \'F\';
 				break;
@@ -9565,19 +9435,15 @@ pp_def("lansy",
 		if($uplo())
 			puplo = \'L\';
 
-		$b() = $TFD(slansy_,dlansy_)(
+		$b() = FORTRAN($TFD(s,d)lansy)(
 		&pnorm,
 		&puplo,
 		&(integer){$SIZE(n)},
 		$P(A),
 		&(integer){$SIZE(n)},
-		work);
-		if ($norm() == 2 || $norm() == 1)
-			free (work);
-
+		$P(work));
 ',
       Doc => '
-
 =for ref
 
 Computes the value of the one norm,  or the Frobenius norm, or
@@ -9618,33 +9484,30 @@ real symmetric matrix A.
             the matrix A, and the strictly upper triangular part of A is
             not referenced.
 
-
 =for example
 
  # Assume $a is symmetric
  $a = random (float, 100, 100);
  $norm  = $a->lansy(1, 1);
-
 ');
 
 pp_def("lantr",
        HandleBad => 0,
-	Pars => '[phys]A(m,n);int uplo();int norm();int diag();[o]b()',
+	Pars => 'A(m,n);int uplo();int norm();int diag();[o]b(); [t]work(workn);',
+	RedoDimsCode => '
+	  PDL_MAYBE_SIZE(PDL_Long, $PDL(norm), tmp == 2, $PDL(work), $SIZE(workn), $SIZE(m))
+	',
 	GenericTypes => [F,D],
 	Code => '
-
              char pnorm, puplo = \'U\';
              char pdiag = \'N\';
-
-		extern $GENERIC() $TFD(s,d)lantr_(char *norm, char *uplo, char *diag, integer *m, integer *n, $GENERIC() *a, integer
+		extern $GENERIC() FORTRAN($TFD(s,d)lantr)(char *norm, char *uplo, char *diag, integer *m, integer *n, $GENERIC() *a, integer
 		*lda, $GENERIC() *work);
-		$GENERIC() *work;
 		switch ($norm())
 		{
 			case 1: pnorm = \'O\';
 				break;
 			case 2: pnorm = \'I\';
-				work = ($GENERIC() *)malloc($SIZE(m) *  sizeof($GENERIC()));
 				break;
 			case 3: pnorm = \'F\';
 				break;
@@ -9654,8 +9517,7 @@ pp_def("lantr",
 			puplo = \'L\';
 		if($diag())
 			pdiag = \'U\';
-
-		$b() = $TFD(slantr_,dlantr_)(
+		$b() = FORTRAN($TFD(s,d)lantr)(
 		&pnorm,
 		&puplo,
 		&pdiag,
@@ -9663,13 +9525,9 @@ pp_def("lantr",
 		&(integer){$SIZE(n)},
 		$P(A),
 		&(integer){$SIZE(n)},
-		work);
-		if ($norm() == 2)
-			free (work);
-
+		$P(work));
 ',
       Doc => '
-
 =for ref
 
 Computes the value of the one norm,  or the Frobenius norm, or
@@ -9716,13 +9574,11 @@ trapezoidal or triangular matrix A.
             that when diag = 1, the diagonal elements of A are not
             referenced and are assumed to be one.
 
-
 =for example
 
  # Assume $a is upper triangular
  $a = random (float, 100, 100);
  $norm  = $a->lantr(1, 1, 0);
-
 ');
 
 ################################################################################
@@ -9737,8 +9593,7 @@ pp_def("gemm",
 	Code => '
 		char ptransa = \'N\';
 		char ptransb = \'N\';
-
-			extern int $TFD(s,d)gemm_(char *transa, char *transb, integer *m, integer *
+			extern int FORTRAN($TFD(s,d)gemm)(char *transa, char *transb, integer *m, integer *
 			n, integer *k, $GENERIC() *alpha, $GENERIC() *a, integer *lda,
 			$GENERIC() *b, integer *ldb, $GENERIC() *beta, $GENERIC() *c__,
 			integer *ldc);
@@ -9750,8 +9605,7 @@ pp_def("gemm",
 		if ($transb())
 			ptransb = \'T\';
 
-
-		$TFD(sgemm_,dgemm_)(
+		FORTRAN($TFD(s,d)gemm)(
 		&ptransa,
 		&ptransb,
 		&(integer){$SIZE(r)},
@@ -9767,7 +9621,6 @@ pp_def("gemm",
 		&(integer){$SIZE(r)});
 ',
       Doc => '
-
 =for ref
 
 Performs one of the matrix-matrix operations
@@ -9883,14 +9736,14 @@ pp_def("mmult",
 	GenericTypes => [F,D],
 	Code => '
 		char ptrans = \'N\';
-			extern int $TFD(s,d)gemm_(char *transa, char *transb, integer *m, integer *
+			extern int FORTRAN($TFD(s,d)gemm)(char *transa, char *transb, integer *m, integer *
 			n, integer *k, $GENERIC() *alpha, $GENERIC() *a, integer *lda,
 			$GENERIC() *b, integer *ldb, $GENERIC() *beta, $GENERIC() *c__,
 			integer *ldc);
 			$GENERIC() alpha = 1;
 			$GENERIC() beta = 0;
 
-		$TFD(sgemm_,dgemm_)(
+		FORTRAN($TFD(s,d)gemm)(
 		&ptrans,
 		&ptrans,
 		&(integer){$SIZE(p)},
@@ -9919,14 +9772,14 @@ pp_def("smmult",
 	GenericTypes => [F,D],
 	Code => '
 		char ptrans = \'N\';
-			extern int $TFD(s,d)gemmb_(char *transa, char *transb, integer *m, integer *
+			extern int FORTRAN($TFD(s,d)gemmb)(char *transa, char *transb, integer *m, integer *
 			n, integer *k, $GENERIC() *alpha, $GENERIC() *a, integer *lda,
 			$GENERIC() *b, integer *ldb, $GENERIC() *beta, $GENERIC() *c__,
 			integer *ldc);
 			$GENERIC() alpha = 1;
 			$GENERIC() beta = 0;
 
-		$TFD(sgemmb_,dgemmb_)(
+		FORTRAN($TFD(s,d)gemmb)(
 		&ptrans,
 		&ptrans,
 		&(integer){$SIZE(p)},
@@ -9958,14 +9811,14 @@ pp_def("crossprod",
 
 		char btrans = \'N\';
 		char atrans = \'T\';
-			extern int $TFD(s,d)gemm_(char *transa, char *transb, integer *m, integer *
+			extern int FORTRAN($TFD(s,d)gemm)(char *transa, char *transb, integer *m, integer *
 			n, integer *k, $GENERIC() *alpha, $GENERIC() *a, integer *lda,
 			$GENERIC() *b, integer *ldb, $GENERIC() *beta, $GENERIC() *c__,
 			integer *ldc);
 			$GENERIC() alpha = 1;
 			$GENERIC() beta = 0;
 
-		$TFD(sgemm_,dgemm_)(
+		FORTRAN($TFD(s,d)gemm)(
 		&btrans,
 		&atrans,
 		&(integer){$SIZE(p)},
@@ -9996,7 +9849,7 @@ pp_def("syrk",
 		char puplo = \'U\';
 		char ptrans = \'N\';
 
-			extern int $TFD(s,d)syrk_(char *uplo, char *trans, integer *n, integer *k,
+			extern int FORTRAN($TFD(s,d)syrk)(char *uplo, char *trans, integer *n, integer *k,
 			$GENERIC() *alpha, $GENERIC() *a, integer *lda, $GENERIC() *beta,
 			$GENERIC() *c__, integer *ldc);
 		integer kk = $trans() ? $SIZE(m) : $SIZE(n);
@@ -10008,7 +9861,7 @@ pp_def("syrk",
 			ptrans = \'T\';
 
 
-		$TFD(ssyrk_,dsyrk_)(
+		FORTRAN($TFD(s,d)syrk)(
 		&puplo,
 		&ptrans,
 		&(integer){$SIZE(p)},
@@ -10144,9 +9997,9 @@ pp_def("dot",
 	Pars => '[phys]a(n);[phys]b(n);[o,phys]c()',
 	GenericTypes => [F,D],
 	Code => '
-			extern $GENERIC() $TFD(s,d)dot_(integer *n, $GENERIC() *dx, integer *incx, $GENERIC() *dy,
+			extern $GENERIC() FORTRAN($TFD(s,d)dot)(integer *n, $GENERIC() *dx, integer *incx, $GENERIC() *dy,
 			integer *incy);
-		$c() = $TFD(sdot_,ddot_)(
+		$c() = FORTRAN($TFD(s,d)dot)(
 		&(integer){$SIZE(n)},
 		$P(a),
 		&(integer){1},
@@ -10173,9 +10026,9 @@ pp_def("axpy",
 	Pars => '[phys]a(n);[phys] alpha();[io,phys]b(m)',
 	GenericTypes => [F,D],
 	Code => '
-			extern int $TFD(s,d)axpy_(integer *n, $GENERIC() *da, $GENERIC() *dx,
+			extern int FORTRAN($TFD(s,d)axpy)(integer *n, $GENERIC() *da, $GENERIC() *dx,
 			integer *incx, $GENERIC() *dy, integer *incy);
-		$TFD(saxpy_,daxpy_)(
+		FORTRAN($TFD(s,d)axpy)(
 		&(integer){$SIZE(n)},
 		$P(alpha),
 		$P(a),
@@ -10204,9 +10057,9 @@ pp_def("nrm2",
 	Pars => '[phys]a(n);[o]b()',
 	GenericTypes => [F,D],
 	Code => '
-			extern $GENERIC() $TFD(s,d)nrm2_(integer *n, $GENERIC() *dx,
+			extern $GENERIC() FORTRAN($TFD(s,d)nrm2)(integer *n, $GENERIC() *dx,
 			integer *incx);
-		$b() = $TFD(snrm2_,dnrm2_)(
+		$b() = FORTRAN($TFD(s,d)nrm2)(
 		&(integer){$SIZE(n)},
 		$P(a),
 		&(integer){1});
@@ -10229,9 +10082,9 @@ pp_def("asum",
 	Pars => '[phys]a(n);[o]b()',
 	GenericTypes => [F,D],
 	Code => '
-			extern $GENERIC() $TFD(s,d)asum_(integer *n, $GENERIC() *dx,
+			extern $GENERIC() FORTRAN($TFD(s,d)asum)(integer *n, $GENERIC() *dx,
 			integer *incx);
-		$b() = $TFD(sasum_,dasum_)(
+		$b() = FORTRAN($TFD(s,d)asum)(
 		&(integer){$SIZE(n)},
 		$P(a),
 		&(integer){1});
@@ -10254,9 +10107,9 @@ pp_def("scal",
 	Pars => '[io,phys]a(n);scale()',
 	GenericTypes => [F,D],
 	Code => '
-			extern int $TFD(s,d)scal_(integer *n, $GENERIC() *sa,
+			extern int FORTRAN($TFD(s,d)scal)(integer *n, $GENERIC() *sa,
 			$GENERIC() *dx, integer *incx);
-		$TFD(sscal_,dscal_)(
+		FORTRAN($TFD(s,d)scal)(
 		&(integer){$SIZE(n)},
 		$P(scale),
 		$P(a),
@@ -10280,9 +10133,9 @@ pp_def("rot",
 	Pars => '[io,phys]a(n);[phys]c(); [phys]s();[io,phys]b(n)',
 	GenericTypes => [F,D],
 	Code => '
-			extern int $TFD(s,d)rot_(integer *n, $GENERIC() *dx,
+			extern int FORTRAN($TFD(s,d)rot)(integer *n, $GENERIC() *dx,
 			integer *incx, $GENERIC() *dy, integer *incy, $GENERIC() *c, $GENERIC() *s);
-		$TFD(srot_,drot_)(
+		FORTRAN($TFD(s,d)rot)(
 		&(integer){$SIZE(n)},
 		$P(a),
 		&(integer){1},
@@ -10311,10 +10164,10 @@ pp_def("rotg",
 	Pars => '[io,phys]a();[io,phys]b();[o,phys]c(); [o,phys]s()',
 	GenericTypes => [F,D],
 	Code => '
-			extern int $TFD(s,d)rotg_($GENERIC() *dx,
+			extern int FORTRAN($TFD(s,d)rotg)($GENERIC() *dx,
 			$GENERIC() *dy, $GENERIC() *c, $GENERIC() *s);
 
-		$TFD(srotg_,drotg_)(
+		FORTRAN($TFD(s,d)rotg)(
 		$P(a),
 		$P(b),
 		$P(c),
@@ -10345,12 +10198,12 @@ pp_def("lasrt",
 	GenericTypes => [F,D],
 	Code => '
 		char pwork  = \'I\';
-			extern int $TFD(s,d)lasrt_(char *id, integer *n, $GENERIC() *d__, integer *
+			extern int FORTRAN($TFD(s,d)lasrt)(char *id, integer *n, $GENERIC() *d__, integer *
 			info);
 		if ($id())
 			pwork = \'D\';
 
-		$TFD(slasrt_,dlasrt_)(
+		FORTRAN($TFD(s,d)lasrt)(
 		&pwork,
 		&(integer){$SIZE(n)},
 		$P(d),
@@ -10394,7 +10247,7 @@ pp_def("lacpy",
 	GenericTypes => [F,D],
 	Code => '
 		char puplo;
-			extern int $TFD(s,d)lacpy_(char *uplo, integer *m, integer *n, $GENERIC() *
+			extern int FORTRAN($TFD(s,d)lacpy)(char *uplo, integer *m, integer *n, $GENERIC() *
 			a, integer *lda, $GENERIC() *b, integer *ldb);
 		switch ($uplo())
 		{
@@ -10405,7 +10258,7 @@ pp_def("lacpy",
 			default: puplo = \'A\';
 		}
 
-		$TFD(slacpy_,dlacpy_)(
+		FORTRAN($TFD(s,d)lacpy)(
 		&puplo,
 		&(integer){$SIZE(m)},
 		&(integer){$SIZE(n)},
@@ -10448,10 +10301,10 @@ pp_def("laswp",
 	Pars => '[io,phys]A(m,n);int [phys]k1();int [phys] k2(); int [phys]ipiv(p);int [phys]inc()',
 	GenericTypes => [F,D],
 	Code => '
-			extern int $TFD(s,d)laswp_(integer *n, $GENERIC() *a, integer *lda, integer
+			extern int FORTRAN($TFD(s,d)laswp)(integer *n, $GENERIC() *a, integer *lda, integer
 			*k1, integer *k2, integer *ipiv, integer *incx);
 
-		$TFD(slaswp_,dlaswp_)(
+		FORTRAN($TFD(s,d)laswp)(
 		&(integer){$SIZE(n)},
 		$P(A),
 		&(integer){$SIZE(m)},
@@ -10504,7 +10357,7 @@ pp_def("lamch",
 	Code => '
 		char pcmach;
 		int tmp;
-		extern $GENERIC() $TFD(s,d)lamch_(char *cmach);
+		extern $GENERIC() FORTRAN($TFD(s,d)lamch)(char *cmach);
 
 		tmp = (int ) $cmach();
 		switch (tmp)
@@ -10529,7 +10382,7 @@ pp_def("lamch",
 				break;
 			default: pcmach = \'E\';
 		}
-		$precision() = $TFD(slamch_,dlamch_)(&pcmach);
+		$precision() = FORTRAN($TFD(s,d)lamch)(&pcmach);
 ',
       Doc => '
 
@@ -10578,9 +10431,9 @@ pp_def("labad",
 	GenericTypes => [F,D],
 	Code => '
 
-		extern int $TFD(s,d)labad_($GENERIC() *small, $GENERIC() *large);
+		extern int FORTRAN($TFD(s,d)labad)($GENERIC() *small, $GENERIC() *large);
 
-		$TFD(slabad_, dlabad_)($P(small),$P(large));
+		FORTRAN($TFD(s,d)labad)($P(small),$P(large));
 ',
       Doc => '
 
@@ -10837,7 +10690,7 @@ pp_def(
 	$GENERIC() *p, b;
 	//$GENERIC() *tmp;
 	char ptrans = \'N\';
-			extern int $TFD(s,d)gemm_(char *transa, char *transb, integer *m, integer *
+			extern int FORTRAN($TFD(s,d)gemm)(char *transa, char *transb, integer *m, integer *
 			n, integer *k, $GENERIC() *alpha, $GENERIC() *a, integer *lda,
 			$GENERIC() *b, integer *ldb, $GENERIC() *beta, $GENERIC() *c__,
 			integer *ldc);
@@ -10856,7 +10709,7 @@ pp_def(
 	for (;;)
 	{
 		i++;
-		$TFD(sgemm_,dgemm_)(&ptrans,&ptrans,&(integer){$SIZE(n)},&(integer){$SIZE(n)},
+		FORTRAN($TFD(s,d)gemm)(&ptrans,&ptrans,&(integer){$SIZE(n)},&(integer){$SIZE(n)},
 			&(integer){$SIZE(n)},&alpha,$P(A),&(integer){$SIZE(n)},	$P(Y), &(integer){$SIZE(n)},
 			&beta, p, &(integer){$SIZE(n)});
 
@@ -10921,4 +10774,3 @@ in this distribution.
 EOD
 
 pp_done();  # you will need this to finish pp processing
-

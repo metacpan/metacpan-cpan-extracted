@@ -30,7 +30,6 @@ lib/IO/Compress/RawDeflate.pm
 lib/IO/Compress/Zip/Constants.pm
 lib/IO/Compress/Zip.pm
 lib/IO/Compress/Zlib/Constants.pm
-lib/IO/Compress/Zip/WeakDecrypt.pm
 lib/IO/Compress/Zlib/Extra.pm
 lib/IO/Uncompress/Adapter/Bunzip2.pm
 lib/IO/Uncompress/Adapter/Identity.pm

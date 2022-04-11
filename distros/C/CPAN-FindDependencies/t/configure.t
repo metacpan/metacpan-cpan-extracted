@@ -18,7 +18,6 @@ is_deeply(
            nowarnings  => 1,
            perl        => 5.008008,
            maxdepth    => 1,
-           configreqs   => 1
        )
     },
     {

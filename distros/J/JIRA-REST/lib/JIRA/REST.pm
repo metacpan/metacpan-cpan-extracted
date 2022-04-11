@@ -1,6 +1,6 @@
 package JIRA::REST;
 # ABSTRACT: Thin wrapper around Jira's REST API
-$JIRA::REST::VERSION = '0.022';
+$JIRA::REST::VERSION = '0.023';
 use 5.016;
 use utf8;
 use warnings;
@@ -346,6 +346,11 @@ sub POST {
     return $self->_content();
 }
 
+sub rest_client {
+    my ($self) = @_;
+    return $self->{rest};
+}
+
 sub set_search_iterator {
     my ($self, $params) = @_;
 
@@ -425,7 +430,7 @@ JIRA::REST - Thin wrapper around Jira's REST API
 
 =head1 VERSION
 
-version 0.022
+version 0.023
 
 =head1 SYNOPSIS
 
@@ -760,6 +765,11 @@ Updates RESOURCE based on VALUE.
 
 This module provides a few utility methods.
 
+=head2 B<rest_client>
+
+Returns the L<REST::Client> object used to interact with Jira. It may be useful
+when the Jira API isn't enough and you have to go deeper.
+
 =head2 B<set_search_iterator> PARAMS
 
 Sets up an iterator for the search specified by the hash reference PARAMS.
@@ -788,7 +798,8 @@ interface to attach files to issues.
 
 =head1 PERL AND JIRA COMPATIBILITY POLICY
 
-Currently L<JIRA::REST> requires Perl 5.16 and supports Jira 7.0.
+Currently L<JIRA::REST> requires Perl 5.16 and is tested on Jira Data Center
+8.13.
 
 We try to be compatible with the Perl native packages of the oldest L<Ubuntu
 LTS|https://www.ubuntu.com/info/release-end-of-life> and
@@ -798,10 +809,10 @@ getting maintainance updates.
   +-------------+-----------------------+------+
   | End of Life | Distro                | Perl |
   +-------------+-----------------------+------+
-  |   2021-04   | Ubuntu 16.04 (xenial) | 5.22 |
   |   2023-04   | Ubuntu 18.04 (bionic) | 5.26 |
   |   2024-07   | CentOS 7              | 5.16 |
-  |   2025-04   | Ubuntu 20.04 (focal ) | 5.30 |
+  |   2025-04   | Ubuntu 20.04 (focal)  | 5.30 |
+  |   2027-04   | Ubuntu 22.04 (jammy)  | 5.34 |
   |   2029-05   | CentOS 8              | 5.26 |
   +-------------+-----------------------+------+
 
@@ -844,7 +855,7 @@ Gustavo L. de M. Chaves <gnustavo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by CPQD <www.cpqd.com.br>.
+This software is copyright (c) 2022 by CPQD <www.cpqd.com.br>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

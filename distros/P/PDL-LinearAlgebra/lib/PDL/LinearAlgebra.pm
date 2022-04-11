@@ -11,7 +11,7 @@ use PDL::LinearAlgebra::Complex;
 use PDL::LinearAlgebra::Special qw//;
 use PDL::Exporter;
 no warnings 'uninitialized';
-use constant{
+use constant {
 	NO => 0,
 	WARN => 1,
 	BARF => 2,
@@ -19,7 +19,7 @@ use constant{
 
 use strict;
 
-our $VERSION = '0.27';
+our $VERSION = '0.29';
 $VERSION = eval $VERSION;
 
 @PDL::LinearAlgebra::ISA = qw/PDL::Exporter/;
@@ -28,60 +28,19 @@ $VERSION = eval $VERSION;
 				mgeigen  mgeigenx msymeigen msymeigenx msymgeigen msymgeigenx
 				msolve mtrisolve msymsolve mpossolve msolvex msymsolvex mpossolvex
 				mrank mlls mllsy mllss mglm mlse tritosym mnorm mgschur mgschurx
-				mcrossprod mcond morth mschur mschurx posinf neginf
+				mcrossprod mcond morth mschur mschurx
 				NO WARN BARF setlaerror getlaerorr laerror/;
 %PDL::LinearAlgebra::EXPORT_TAGS = (Func=>[@PDL::LinearAlgebra::EXPORT_OK]);
 
 my $_laerror = BARF;
 
-my $posinf;
-BEGIN { $posinf = 1/pdl(0) }
-sub posinf() { $posinf->copy };
-my $neginf;
-BEGIN { $neginf = -1/pdl(0) }
-sub neginf() { $neginf->copy };
-
 {
 package # hide from CPAN indexer
   PDL::Complex;
 
-use PDL::Types;
-
 our $floatformat  = "%4.4g";    # Default print format for long numbers
 our $doubleformat = "%6.6g";
 our @ISA = @ISA ? @ISA : 'PDL'; # so still operates when no PDL::Complex
-
-*r2p = \&PDL::Complex::Cr2p;
-*p2r = \&PDL::Complex::Cp2r;
-*scale = \&PDL::Complex::Cscale;
-*conj = \&PDL::Complex::Cconj;
-*abs = \&PDL::Complex::Cabs;
-*abs2 = \&PDL::Complex::Cabs2;
-*arg = \&PDL::Complex::Carg;
-*tan = \&PDL::Complex::Ctan;
-*proj = \&PDL::Complex::Cproj;
-*asin = \&PDL::Complex::Casin;
-*acos = \&PDL::Complex::Cacos;
-*atan = \&PDL::Complex::Catan;
-*sinh = \&PDL::Complex::Csinh;
-*cosh = \&PDL::Complex::Ccosh;
-*tanh = \&PDL::Complex::Ctanh;
-*asinh = \&PDL::Complex::Casinh;
-*acosh = \&PDL::Complex::Cacosh;
-*atanh = \&PDL::Complex::Catanh;
-
-sub ecplx {
-  my ($re, $im) = @_;
-  $re = PDL->topdl($re);
-  return $re if UNIVERSAL::isa($re,'PDL::Complex') or !$re->type->real;
-  Carp::confess("Usage: ecplx(re,im) or (complex)") if !defined $im;
-  $im = PDL->topdl($im);
-  return $re->czip($im) if !defined &PDL::Complex::new_from_specification;
-  my $ret =  PDL::Complex->new_from_specification($re->type, 2, $re->dims);
-  $ret->slice('(0),') .= $re;
-  $ret->slice('(1),') .= $im;
-  return $ret;
-}
 
 *tricpy = \&PDL::LinearAlgebra::Complex::ctricpy;
 }
@@ -195,6 +154,21 @@ sub PDL::_similar {
   ref($m)->new_from_specification($m->type, @di_vals, @vdims);
 }
 sub PDL::_similar_null { ref($_[0])->null }
+sub _complex_null {
+  (defined &PDL::Complex::new_from_specification ? 'PDL::Complex' : 'PDL')->null
+}
+sub _ecplx {
+  my ($re, $im) = @_;
+  $re = PDL->topdl($re);
+  return $re if UNIVERSAL::isa($re,'PDL::Complex') or !$re->type->real;
+  Carp::confess("Usage: _ecplx(re,im) or (complex)") if !defined $im;
+  $im = PDL->topdl($im);
+  return $re->czip($im) if !defined &PDL::Complex::new_from_specification;
+  my $ret =  PDL::Complex->new_from_specification($re->type, 2, $re->dims);
+  $ret->slice('(0),') .= $re;
+  $ret->slice('(1),') .= $im;
+  return $ret;
+}
 sub PDL::_is_complex { !$_[0]->type->real }
 sub PDL::Complex::_is_complex {1}
 sub PDL::_norm {
@@ -314,7 +288,7 @@ sub _error_schur {
 sub PDL::_wrap_select_func {
   my ($m, $select_func) = @_;
   return $select_func if !defined $select_func or $m->_is_complex;
-  sub { &$select_func(PDL::Complex::ecplx(@_[0,1]), @_>2 ? PDL->topdl($_[2]) : ()) };
+  sub { &$select_func(_ecplx(@_[0,1]), @_>2 ? PDL->topdl($_[2]) : ()) };
 }
 
 *issym = \&PDL::issym;
@@ -664,7 +638,7 @@ sub PDL::mcond {
 	my $temp = $sv->slice('(0)');
         my $ret = $temp/$sv->((-1));
 	$info = $ret->flat->index(which($temp == 0));
-	$info .= posinf unless $info->isempty;
+	$info .= inf() unless $info->isempty;
 	return $ret;
 }
 
@@ -1158,7 +1132,7 @@ sub _eigen_extract {
   my $w;
   ($w, $vl) = cplx_eigen(@w, $vl, 1) if $jobvl;
   ($w, $vr) = cplx_eigen(@w, $vr, 1) if $jobvr;
-  $w = PDL::Complex::ecplx(@w) if !defined $w;
+  $w = _ecplx(@w) if !defined $w;
   ($w, $vl, $vr);
 }
 
@@ -1214,10 +1188,10 @@ sub PDL::mschur {
 		$v, my $sdim = null, my $info = null, $select_f
 	);
 	_error_schur($info, $select_func, $dims[$di], 'mschur', 'QR');
-	my @ret = !$select_func || $sdim ? () : map PDL::Complex->null, grep $_ == 2, $jobvl, $jobvr;
+	my @ret = !$select_func || $sdim ? () : map _complex_null(), grep $_ == 2, $jobvl, $jobvr;
 	push @ret, $sdim if $select_func;
 	$_ = 0 for grep $select_func && $_ == 2 && !$sdim, $jobvl, $jobvr;
-	my $w = @w == 2 ? PDL::Complex::ecplx(@w) : @w[0];
+	my $w = @w == 2 ? _ecplx(@w) : @w[0];
 	if ($jobvl || $jobvr){
 		unshift @ret, grep defined, _eigen_one(
 		  $mm, $select_func, $jobv, $jobvl, $jobvr,
@@ -1303,7 +1277,6 @@ sub PDL::mschurx {
 	my $slice_prefix = ',' x $di;
 	my($m, $jobv, $jobvl, $jobvr, $select_func, $sense, $mult,$norm) = @_;
 	my(@dims) = $m->dims;
-	my ($w, $v, %ret, $vl, $vr);
 	$mult //= 1;
 	$norm //= 1;
 	$jobv = $jobvl = $jobvr = 0 unless wantarray;
@@ -1317,27 +1290,19 @@ sub PDL::mschurx {
 	my $select_f = $m->_wrap_select_func($select_func);
 	$mm->_call_method('geesx', $jobv, $select, $sense, @w, $v, $sdim, $rconde, $rcondv,$info, $select_f);
 	_error_schur($info, $select_func, $dims[$di], 'mschurx', 'QR');
-	if ($select_func){
-		if(!$sdim){
-			if ($jobvl == 2){
-				$ret{VL} = $m->_similar_null;
-				$jobvl = 0;
-			}
-			if ($jobvr == 2){
-				$ret{VR} = $m->_similar_null;
-				$jobvr = 0;
-			}
-		}
-		$ret{n} = $sdim;
-	}
-	if ($jobvl || $jobvr){
+	my @vl = ('VL', $jobvl);
+	my @vr = ('VR', $jobvr);
+	my %ret;
+	$ret{$_->[0]} = _complex_null(), $_->[1]=0 for grep $select_func && !$sdim && $_->[1] == 2, \@vl, \@vr;
+	$ret{n} = $sdim if $select_func;
+	if ($vl[1] || $vr[1]) {
 		my ($vl, $vr) = _eigen_one(
-		  $mm, $select_func, $jobv, $jobvl, $jobvr,
+		  $mm, $select_func, $jobv, $vl[1], $vr[1],
 		  $mult, $norm, $dims[$di+1], $sdim, @w
 		);
 		$ret{$_->[0]} = $_->[1] for grep defined $_->[1], ['VL',$vl], ['VR',$vr];
 	}
-	$w = PDL::Complex::ecplx(@w);
+	my $w = _ecplx(@w);
 	if ($jobv == 2 && $select_func) {
 		$v = $sdim > 0 ? $v->t->slice("$slice_prefix:@{[$sdim-1]},")->sever : $m->_similar_null;
 	}
@@ -1480,30 +1445,19 @@ sub PDL::mgschur{
 	$_ = $m->_similar_null for my ($beta, $vsl, $vsr);
 	$mm->_call_method('gges', $jobvsl, $jobvsr, $select, $pp, @w, $beta, $vsl, $vsr, $sdim, $info, $select_f);
 	_error_schur($info, $select_func, $mdims[$di], 'mgschur', 'QZ');
+	my @vl = ('VL', $jobvl);
+	my @vr = ('VR', $jobvr);
 	my %ret;
-	if ($select_func){
-		if ($jobvl == 2){
-			if (!$sdim){
-				$ret{VL} = PDL::Complex->null;
-				$jobvl = 0;
-			}
-		}
-		if ($jobvr == 2){
-			if(!$sdim){
-				$ret{VR} = PDL::Complex->null;
-				$jobvr = 0;
-			}
-		}
-		$ret{n} = $sdim;
-	}
-	if ($jobvl || $jobvr){
+	$ret{$_->[0]} = _complex_null(), $_->[1]=0 for grep $select_func && !$sdim && $_->[1] == 2, \@vl, \@vr;
+	$ret{n} = $sdim if $select_func;
+	if ($vl[1] || $vr[1]) {
 		my ($vl, $vr) = _eigen_pair(
-		  $mm, $pp, $select_func, $jobvl, $jobvr, $jobvsl, $jobvsr, $vsl, $vsr,
+		  $mm, $pp, $select_func, $vl[1], $vr[1], $jobvsl, $jobvsr, $vsl, $vsr,
 		  $mult, $norm, $mdims[$di+1], $sdim, @w
 		);
 		$ret{$_->[0]} = $_->[1] for grep defined $_->[1], ['VL',$vl], ['VR',$vr];
 	}
-	my $w = @w == 2 ? PDL::Complex::ecplx(@w) : @w[0];
+	my $w = @w == 2 ? _ecplx(@w) : @w[0];
 	if ($jobvsl == 2 && $select_func) {
 		$ret{SL} = $sdim ? $vsl->t->slice("$slice_prefix:@{[$sdim-1]},")->sever : $m->_similar_null;
 	}
@@ -1597,10 +1551,9 @@ sub PDL::mgschurx{
 	&_square_same;
 	my($m, $p, $jobvsl, $jobvsr, $jobvl, $jobvr, $select_func, $sense, $mult, $norm) = @_;
 	my (@mdims) = $m->dims;
-	my ($vsl, $vsr, $type, %ret, $vl, $vr);
 	$mult //= 1;
 	$norm //= 1;
-	$type = $m->type;
+	my $type = $m->type;
 	my $select = $select_func ? 1 : 0;
 	$sense = 0 if !$select_func;
 	$_ = null for my ($info, $rconde, $rcondv, $sdim);
@@ -1610,22 +1563,14 @@ sub PDL::mgschurx{
 	my $select_f = $m->_wrap_select_func($select_func);
 	$mm->_call_method('ggesx', $jobvsl, $jobvsr, $select, $sense, $pp, @w, $beta, $vsl, $vsr, $sdim, $rconde, $rcondv,$info, $select_f);
 	_error_schur($info, $select_func, $mdims[$di], 'mgschurx', 'QZ');
-	if ($select_func){
-		if(!$sdim){
-			if ($jobvl == 2){
-				$ret{VL} = $m->_similar_null;
-				$jobvl = 0;
-			}
-			if ($jobvr == 2){
-				$ret{VR} = $m->_similar_null;
-				$jobvr = 0;
-			}
-		}
-		$ret{n} = $sdim;
-	}
-	if ($jobvl || $jobvr) {
+	my @vl = ('VL', $jobvl);
+	my @vr = ('VR', $jobvr);
+	my %ret;
+	$ret{$_->[0]} = _complex_null(), $_->[1]=0 for grep $select_func && !$sdim && $_->[1] == 2, \@vl, \@vr;
+	$ret{n} = $sdim if $select_func;
+	if ($vl[1] || $vr[1]) {
 		my ($vl, $vr) = _eigen_pair(
-		  $mm, $pp, $select_func, $jobvl, $jobvr, $jobvsl, $jobvsr, $vsl, $vsr,
+		  $mm, $pp, $select_func, $vl[1], $vr[1], $jobvsl, $jobvsr, $vsl, $vsr,
 		  $mult, $norm, $mdims[$di+1], $sdim, @w
 		);
 		$ret{$_->[0]} = $_->[1] for grep defined $_->[1], ['VL',$vl], ['VR',$vr];
@@ -1642,7 +1587,7 @@ sub PDL::mgschurx{
 	elsif($jobvsr){
 		$ret{SR} = $vsr->t->sever;
 	}
-	my $w = @w == 2 ? PDL::Complex::ecplx(@w) : @w[0];
+	my $w = @w == 2 ? _ecplx(@w) : @w[0];
 	$ret{info} = $info;
 	$ret{rconde} = $rconde if $sense & 1;
 	$ret{rcondv} = $rcondv if $sense & 2;
@@ -2734,7 +2679,7 @@ Works on transposed arrays.
              error => 1,
              scale => 1,
              permute=>1,
-             shur => 1
+             schur => 1
              );
  my ( $eigenvalues, $left_eigenvectors, $right_eigenvectors, %result)  = meigenx($a,%options);
  print "Error bounds for eigenvalues:\n $eigenvalues\n are:\n". transpose($result{'eerror'}) unless $info;
@@ -2879,7 +2824,7 @@ Works on transposed arrays.
              error => 1,
              scale => 1,
              permute=>1,
-             shur => 1
+             schur => 1
              );
  ($alpha, $beta, $left_eigenvectors, $right_eigenvectors, %result)  = mgeigenx($a, $b,%options);
  print "Error bounds for eigenvalues:\n $eigenvalues\n are:\n". transpose($result{'eerror'}) unless $info;

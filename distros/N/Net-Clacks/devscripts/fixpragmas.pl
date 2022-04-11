@@ -7,11 +7,13 @@ use diagnostics;
 use mro 'c3';
 use English;
 use Carp;
-our $VERSION = 22;
+our $VERSION = 23;
 use autodie qw( close );
 use Array::Contains;
 use utf8;
 use Encode qw(is_utf8 encode_utf8 decode_utf8);
+use feature 'signatures';
+no warnings qw(experimental::signatures);
 #---AUTOPRAGMAEND---
 
 # PAGECAMEL  (C) 2008-2022 Rene Schickbauer
@@ -19,7 +21,7 @@ use Encode qw(is_utf8 encode_utf8 decode_utf8);
 
 
 print "Searching files...\n";
-my @files = (find_pm('lib'), find_pm('devscripts'));
+my @files = (find_pm('lib'), find_pm('devscripts'), find_pm('example'));
 #my @files = find_pm('server');
 
 print "Changing files:\n";
@@ -52,9 +54,14 @@ foreach my $file (@files) {
             next;
         }
 
-       if($line =~ /^\#\-\-\-AUTOPRAGMA/) {
+        # Handle sub "signatures"
+        if($line =~ /^use\ feature\ \'signatures\'/ || $line =~ /^no\ warnings\ .*experimental\:\:signatures/) {
+            next;
+        }
+
+        if($line =~ /^\#\-\-\-AUTOPRAGMA/) {
            next;
-       }
+        }
 
         print $ofh $line;
 
@@ -71,11 +78,13 @@ foreach my $file (@files) {
             print $ofh "use mro 'c3';\n";
             print $ofh "use English;\n";
             print $ofh "use Carp;\n";
-            print $ofh "our \$VERSION = 22;\n";
+            print $ofh "our \$VERSION = 23;\n";
             print $ofh "use autodie qw( close );\n";
             print $ofh "use Array::Contains;\n";
             print $ofh "use utf8;\n";
             print $ofh "use Encode qw(is_utf8 encode_utf8 decode_utf8);\n";
+            print $ofh "use feature 'signatures';\n";
+            print $ofh "no warnings qw(experimental::signatures);\n";
             print $ofh "#---AUTOPRAGMAEND---\n";
             $inserted = 1;
         }
@@ -87,9 +96,7 @@ exit(0);
 
 
 
-sub find_pm {
-    my ($workDir) = @_;
-
+sub find_pm($workDir) {
     my @files;
     opendir(my $dfh, $workDir) or die($ERRNO);
     while((my $fname = readdir($dfh))) {

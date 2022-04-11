@@ -53,5 +53,19 @@ t/mirrors/privatemirror/authors/id/F/FR/FRUITCO/Fruit-1.0.tar.bz2
 t/mirrors/privatemirror/authors/id/F/FR/FRUITCO/Fruit-Role-Fermentable-1.0.zip
 bin/cpandeps-diff
 shared/tree-pruning
+t/cache/CPAN-FindDependencies-1.1-no_index-twice/02packages.details.txt.gz
+t/cache/CPAN-FindDependencies-1.1-no_index-twice/CPAN-1.9205.meta
+t/cache/CPAN-FindDependencies-1.1-no_index-twice/CPAN-FindDependencies-1.1.meta
+t/cache/CPAN-FindDependencies-1.1-no_index-twice/ExtUtils-CBuilder-0.21.meta
+t/cache/CPAN-FindDependencies-1.1-no_index-twice/File-Temp-0.19.meta
+t/cache/CPAN-FindDependencies-1.1-no_index-twice/HTML-Parser-3.60.meta
+t/cache/CPAN-FindDependencies-1.1-no_index-twice/HTML-Tagset-3.20.meta
+t/cache/CPAN-FindDependencies-1.1-no_index-twice/Module-Build-0.2808.meta
+t/cache/CPAN-FindDependencies-1.1-no_index-twice/PathTools-3.25.meta
+t/cache/CPAN-FindDependencies-1.1-no_index-twice/Scalar-List-Utils-1.19.meta
+t/cache/CPAN-FindDependencies-1.1-no_index-twice/Test-Harness-3.03.meta
+t/cache/CPAN-FindDependencies-1.1-no_index-twice/Test-Simple-0.72.meta
+t/cache/CPAN-FindDependencies-1.1-no_index-twice/YAML-0.66.meta
+t/cache/CPAN-FindDependencies-1.1-no_index-twice/libwww-perl-5.808.meta
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

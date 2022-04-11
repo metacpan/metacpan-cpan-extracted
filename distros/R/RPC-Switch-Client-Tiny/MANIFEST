@@ -1,0 +1,20 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/RPC/Switch/Client/Tiny.pm
+lib/RPC/Switch/Client/Tiny/Async.pm
+lib/RPC/Switch/Client/Tiny/Error.pm
+lib/RPC/Switch/Client/Tiny/Netstring.pm
+lib/RPC/Switch/Client/Tiny/SessionCache.pm
+t/01_use.t
+t/02_error.t
+t/03_netstring.t
+t/04_client.t
+t/05_async.t
+t/06_session.t
+examples/Makefile
+examples/rpctiny
+examples/patches/0001-fix-tls-verify-clientauth.patch
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,5 +1,7 @@
 use ExtUtils::MakeMaker;
 use Config;
+use Devel::CheckLib qw(check_lib_or_exit);
+use ExtUtils::F77;
 
 our %ldloadlibs = ($^O =~ /MSWin/ && $Config{cc} eq 'cl')
   ? (LDLOADLIBS => 'oldnames.lib kernel32.lib user32.lib gdi32.lib winspool.lib  comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib  netapi32.lib uuid.lib wsock32.lib mpr.lib winmm.lib  version.lib odbc32.lib odbccp32.lib msvcrt.lib  ../lapack/libacml.lib "C:\Program Files\Microsoft Visual Studio .NET 2003\Vc7\lib\msvcrt.lib" ')
@@ -10,7 +12,33 @@ our $libs0 = (
   eval {require ExtUtils::PkgConfig; join ' ', map ExtUtils::PkgConfig->libs($_), @pkgs} ||
   `pkg-config @pkgs --libs` ||
   '-L/usr/lib/atlas -llapack -lblas -latlas'
-) . " -lgfortran -lquadmath";
+) . ' ' . ExtUtils::F77->runtime;
+our $inc = '-DF77_USCORE='. (ExtUtils::F77->trail_ ? '_' : '');
+{
+  # work around Devel::CheckLib not doing Text::ParseWords::shellwords
+  use Text::ParseWords qw(shellwords);
+  my @libpath = map {my $r=$_;$r=~s/^-L//?$r:()} shellwords $libs0;
+  my $f77_uscore = (ExtUtils::F77->trail_ ? '_' : '');
+  check_lib_or_exit(
+    lib => 'lapack',
+    libpath => \@libpath,
+    header => [($^O =~ /MSWin/ ? 'float.h' : ()), qw(stdio.h math.h)],
+    function => <<EOF,
+
+#define F77_USCORE $f77_uscore
+#define CONCAT_(A, B) A ## B
+#define CONCAT(A, B) CONCAT_(A, B)
+#define FORTRAN(name) CONCAT(name, F77_USCORE)
+
+long c_zero = 0;
+long c_nine = 9;
+extern long FORTRAN(ilaenv)(long *ispec, char *name__, char *opts, long *n1,
+  long *n2, long *n3, long *n4, long name_len, long opts_len);
+long i = FORTRAN(ilaenv)(&c_nine, "SGESDD", " ", &c_zero, &c_zero, &c_zero, &c_zero, 6, 1);
+if (argc > 2) printf("%ld", i); /* try to stop optimiser eliminating */
+EOF
+  );
+}
 
 WriteMakefile(
   NAME => 'PDL::LinearAlgebra',
@@ -32,10 +60,12 @@ WriteMakefile(
     x_IRC => 'irc://irc.perl.org/#pdl',
   },
   CONFIGURE_REQUIRES =>  {
-    "PDL" => '2.075',
+    "PDL" => '2.078',
+    "Devel::CheckLib" => 0,
+    "ExtUtils::F77" => '1.26',
   },
   PREREQ_PM => {
-    "PDL" => '2.075', # RedoDimsCode with SIZE() available
+    "PDL" => '2.078', # PDL::Complex method aliases
   },
   TEST_REQUIRES =>  {
     "Test::More" => '0.88', # done_testing

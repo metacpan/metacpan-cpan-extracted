@@ -38,7 +38,8 @@ WriteMakefile(
         'Cwd'             => 0,
         'Plack'           => 0,
         'Plack::App::WWW' => '0.03',
-        'Term::ANSIColor' => 0
+        'Term::ANSIColor' => 0,
+        'Net::EmptyPort'  => 0
     },
     
     TEST_REQUIRES => {

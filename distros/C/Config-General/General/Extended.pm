@@ -1,9 +1,9 @@
 #
 # Config::General::Extended - special Class based on Config::General
 #
-# Copyright (c) 2000-2014 Thomas Linden <tlinden |AT| cpan.org>.
+# Copyright (c) 2000-2022 Thomas Linden <tlinden |AT| cpan.org>.
 # All Rights Reserved. Std. disclaimer applies.
-# Artistic License, same as perl itself. Have fun.
+# Licensed under the Artistic License 2.0.
 #
 
 # namespace
@@ -96,33 +96,33 @@ sub obj {
     elsif (ref($this->{config}->{$key}) eq "ARRAY") {
       my @objlist;
       foreach my $element (@{$this->{config}->{$key}}) {
-	if (ref($element) eq "HASH") {
-	  push @objlist,
-	    $this->SUPER::new( -ExtendedAccess => 1,
-			       -ConfigHash     => $element,
-			       %{$this->{Params}} );
-	}
-	else {
-	  if ($this->{StrictObjects}) {
-	    croak "element in list \"$key\" does not point to a hash reference!\n";
-	  }
-	  # else: skip this element
-	}
+        if (ref($element) eq "HASH") {
+          push @objlist,
+            $this->SUPER::new( -ExtendedAccess => 1,
+                               -ConfigHash     => $element,
+                               %{$this->{Params}} );
+        }
+        else {
+          if ($this->{StrictObjects}) {
+            croak "element in list \"$key\" does not point to a hash reference!\n";
+          }
+          # else: skip this element
+        }
       }
       return \@objlist;
     }
     elsif (ref($this->{config}->{$key}) eq "HASH") {
       return $this->SUPER::new( -ExtendedAccess => 1,
-				-ConfigHash => $this->{config}->{$key}, %{$this->{Params}} );
+                                -ConfigHash => $this->{config}->{$key}, %{$this->{Params}} );
     }
     else {
       # nothing supported
       if ($this->{StrictObjects}) {
-	croak "key \"$key\" does not point to a hash reference!\n";
+        croak "key \"$key\" does not point to a hash reference!\n";
       }
       else {
-	# be cool, create an empty object!
-	return $empty;
+        # be cool, create an empty object!
+        return $empty;
       }
     }
   }
@@ -148,10 +148,10 @@ sub value {
     }
     else {
       if ($this->{StrictObjects}) {
-	croak "Key \"$key\" does not exist within current object\n";
+        croak "Key \"$key\" does not exist within current object\n";
       }
       else {
-	return "";
+        return "";
       }
     }
   }
@@ -640,10 +640,10 @@ values under the given key will be overwritten.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2000-2014 Thomas Linden
+Copyright (c) 2000-2022 Thomas Linden
 
 This library is free software; you can redistribute it and/or
-modify it under the same terms as Perl itself.
+modify it under the terms of the Artistic License 2.0.
 
 
 =head1 BUGS

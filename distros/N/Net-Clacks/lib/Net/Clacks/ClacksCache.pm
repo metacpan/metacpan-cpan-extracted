@@ -7,19 +7,20 @@ use diagnostics;
 use mro 'c3';
 use English;
 use Carp;
-our $VERSION = 22;
+our $VERSION = 23;
 use autodie qw( close );
 use Array::Contains;
 use utf8;
 use Encode qw(is_utf8 encode_utf8 decode_utf8);
+use feature 'signatures';
+no warnings qw(experimental::signatures);
 #---AUTOPRAGMAEND---
 
 use Net::Clacks::Client;
 use YAML::Syck;
 use MIME::Base64;
 
-sub new {
-    my ($proto, %config) = @_;
+sub new($proto, %config) {
     my $class = ref($proto) || $proto;
 
     my $self = bless \%config, $class;
@@ -40,8 +41,7 @@ sub new {
     return $self;
 }
 
-sub newFromHandle {
-    my ($proto, $clacks) = @_;
+sub newFromHandle($proto, $clacks) {
     my $class = ref($proto) || $proto;
 
     my $self = bless {}, $class;
@@ -54,9 +54,7 @@ sub newFromHandle {
     return $self;
 }
 
-sub reconnect {
-    my ($self) = @_;
-
+sub reconnect($self) {
     return if($self->{initfromhandle});
     return if(defined($self->{clacks}));
 
@@ -88,23 +86,17 @@ sub reconnect {
     return;
 }
 
-sub extraInits {
-    my ($self) = @_;
-
+sub extraInits($self) {
     # Hook for application specific inits
     return;
 }
 
-sub extraDestroys {
-    my ($self) = @_;
-
+sub extraDestroys($self) {
     # Hook for application specific destroys
     return;
 }
 
-sub disconnect {
-    my ($self) = @_;
-
+sub disconnect($self) {
     eval {
         $self->{clacks}->disconnect();
     };
@@ -112,9 +104,7 @@ sub disconnect {
     return;
 }
 
-DESTROY {
-    my ($self) = @_;
-
+DESTROY($self) {
     eval {
         $self->{clacks}->disconnect();
     };
@@ -123,9 +113,7 @@ DESTROY {
     return;
 };
 
-sub get {
-    my ($self, $key) = @_;
-
+sub get($self, $key) {
     $self->reconnect(); # Make sure we are connected
 
     $key = $self->sanitize_key($key);
@@ -143,9 +131,7 @@ sub get {
     return $value;
 }
 
-sub set { ## no critic (NamingConventions::ProhibitAmbiguousNames)
-    my ($self, $key, $data) = @_;
-
+sub set($self, $key, $data) { ## no critic (NamingConventions::ProhibitAmbiguousNames)
     $self->reconnect(); # Make sure we are connected
 
     $key = $self->sanitize_key($key);
@@ -166,9 +152,7 @@ sub set { ## no critic (NamingConventions::ProhibitAmbiguousNames)
     return 1;
 }
 
-sub delete { ## no critic(BuiltinHomonyms)
-    my ($self, $key) = @_;
-
+sub delete($self, $key) { ## no critic(BuiltinHomonyms)
     $self->reconnect(); # Make sure we are connected
 
     $key = $self->sanitize_key($key);
@@ -177,14 +161,12 @@ sub delete { ## no critic(BuiltinHomonyms)
     return 1;
 }
 
-sub incr {
-    my ($self, $key, $stepsize) = @_;
-
+sub incr($self, $key, $stepsize = '') {
     $self->reconnect(); # Make sure we are connected
 
     $key = $self->sanitize_key($key);
 
-    if(!defined($stepsize)) {
+    if(!defined($stepsize) || $stepsize eq '') {
         $self->{clacks}->increment($key);
     } else {
         $self->{clacks}->increment($key, $stepsize);
@@ -192,14 +174,12 @@ sub incr {
     return 1;
 }
 
-sub decr {
-    my ($self, $key, $stepsize) = @_;
-
+sub decr($self, $key, $stepsize = '') {
     $self->reconnect(); # Make sure we are connected
 
     $key = $self->sanitize_key($key);
 
-    if(!defined($stepsize)) {
+    if(!defined($stepsize) || $stepsize eq '') {
         $self->{clacks}->decrement($key);
     } else {
         $self->{clacks}->decrement($key, $stepsize);
@@ -207,9 +187,7 @@ sub decr {
     return 1;
 }
 
-sub clacks_set {
-    my ($self, $key, $data) = @_;
-
+sub clacks_set($self, $key, $data) {
     $self->reconnect(); # Make sure we are connected
 
     $key = $self->sanitize_key($key);
@@ -219,9 +197,7 @@ sub clacks_set {
     return 1;
 }
 
-sub clacks_notify {
-    my ($self, $key) = @_;
-
+sub clacks_notify($self, $key) {
     $self->reconnect(); # Make sure we are connected
 
     $key = $self->sanitize_key($key);
@@ -231,18 +207,14 @@ sub clacks_notify {
     return 1;
 }
 
-sub clacks_keylist {
-    my ($self) = @_;
-
+sub clacks_keylist($self) {
     $self->reconnect(); # Make sure we are connected
 
     return $self->{clacks}->keylist();
 }
 
 
-sub sanitize_key {
-    my ($self, $key) = @_;
-
+sub sanitize_key($self, $key) {
     # Certain chars are not allowed in keys for protocol reason.
     # We handle this by substituting them with a tripple underline
 
@@ -252,9 +224,7 @@ sub sanitize_key {
     return $key;
 }
 
-sub deref {
-    my ($self, $val) = @_;
-
+sub deref($self, $val) {
     return if(!defined($val));
 
     while(ref($val) eq "SCALAR" || ref($val) eq "REF") {

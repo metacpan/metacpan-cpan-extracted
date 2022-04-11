@@ -5,17 +5,17 @@ use strict;
 use warnings;
 use autodie;
 
-use Carp qw(confess);
+use Carp;
 
 # The following must be on the same line to ensure that $VERSION is read
 # correctly by PAUSE and installer tools. See docu of 'version'.
-use version 0.77; our $VERSION = version->declare("v2.2.0");
+use version 0.77; our $VERSION = version->declare("v2.2.4");
 
 
 sub new {
   my $class = shift;
   $class = ref($class) if ref($class);
-  confess("Odd number of arguments") if @_ % 2;
+  croak("Odd number of arguments") if @_ % 2;
   my %args = @_;
   my $inc      = delete $args{inc}   // "X";
   my $noinc    = delete $args{noinc} // "";
@@ -23,47 +23,47 @@ sub new {
   my $eqs      = delete $args{eqs};
   my $ext      = delete $args{ext};
   my $elem_ids = delete $args{elem_ids};
-  confess(join(", ", sort(keys(%args))) . ": unexpected argument") if %args;
-  confess("inc: must be a scalar")               if ref($inc);
-  confess("noinc: must be a scalar")             if ref($noinc);
+  croak(join(", ", sort(keys(%args))) . ": unexpected argument") if %args;
+  croak("inc: must be a scalar")               if ref($inc);
+  croak("noinc: must be a scalar")             if ref($noinc);
   s/^\s+// for ($inc, $noinc);
   s/\s+$// for ($inc, $noinc);
-  confess("inc and noinc must be different")     if $inc eq $noinc;
-  confess("'|' is not allowed for inc or noinc") if $inc eq '|' || $noinc eq '|';
+  croak("inc and noinc must be different")     if $inc eq $noinc;
+  croak("'|' is not allowed for inc or noinc") if $inc eq '|' || $noinc eq '|';
   my $self = {inc    => $inc,
               noinc  => $noinc,
              };
   if (defined($set)) {
     my %seen;
-    confess("set: must be an array reference") if ref($set) ne 'ARRAY';
+    croak("set: must be an array reference") if ref($set) ne 'ARRAY';
     my $cnt = 1;
     foreach my $e (@$set) {
       if (ref($e)) {
-        confess("set: entry $cnt: invalid") if ref($e) ne 'ARRAY';
-        confess("set: entry $cnt: array not allowed if eqs is specified") if $eqs;
-        confess("set: entry $cnt: array entry must not be empty") if !@{$e};
+        croak("set: entry $cnt: invalid") if ref($e) ne 'ARRAY';
+        croak("set: entry $cnt: array not allowed if eqs is specified") if $eqs;
+        croak("set: entry $cnt: array entry must not be empty") if !@{$e};
         foreach my $sub_e (@$e) {
-          confess("set: entry $cnt: subarray contains invalid entry")
+          croak("set: entry $cnt: subarray contains invalid entry")
             if ref($sub_e) || !defined($sub_e);
-          confess("set: '$sub_e': duplicate element") if exists($seen{$sub_e});
+          croak("set: '$sub_e': duplicate element") if exists($seen{$sub_e});
           $seen{$sub_e} = undef;
         }
       } else {
-        confess("set: entry $cnt: invalid") if !defined($e);
-        confess("set: '$e': duplicate element") if exists($seen{$e});
+        croak("set: entry $cnt: invalid") if !defined($e);
+        croak("set: '$e': duplicate element") if exists($seen{$e});
         $seen{$e} = undef;
       }
       ++$cnt;
     }
     $self->{prespec} = 1;
   } else {
-    confess("eqs: not allowed without argument 'set'") if defined($eqs);
+    croak("eqs: not allowed without argument 'set'") if defined($eqs);
     $self->{prespec} = "";
   }
   if (defined($elem_ids)) {
-    confess("elem_ids: not allowed without arguments 'set' and 'ext'") if !(defined($ext) &&
+    croak("elem_ids: not allowed without arguments 'set' and 'ext'") if !(defined($ext) &&
                                                                             defined($set));
-    confess("elem_ids: must be a hash ref") if ref($elem_ids) ne 'HASH';
+    croak("elem_ids: must be a hash ref") if ref($elem_ids) ne 'HASH';
   }
   my $elems;
   my $tabElems;                # elems to be used in table --> indes in @elems
@@ -71,14 +71,14 @@ sub new {
   if ($ext) {
     if ($set) {
       foreach my $e (@$set) {
-        confess("set: no subarray allowed if 'ext' is specified") if ref($e);
+        croak("set: no subarray allowed if 'ext' is specified") if ref($e);
       }
       if ($elem_ids) {
-        confess("elem_ids: wrong number of entries") if keys(%$elem_ids) != @$set;
+        croak("elem_ids: wrong number of entries") if keys(%$elem_ids) != @$set;
         foreach my $e (@$set) {
           my $e_id = $elem_ids->{$e};
-          confess("elem_ids: '$e': missing value") if !defined($e_id);
-          confess("elem_ids: '$e': entry has wrong value") if ($e_id !~ /^\d$/         ||
+          croak("elem_ids: '$e': missing value") if !defined($e_id);
+          croak("elem_ids: '$e': entry has wrong value") if ($e_id !~ /^\d$/         ||
                                                                !defined($set->[$e_id]) ||
                                                                $set->[$e_id] ne $e);
         }
@@ -88,7 +88,7 @@ sub new {
       }
       $elems = $set;
     } else {
-      confess("ext: not allowed without argument 'set'")
+      croak("ext: not allowed without argument 'set'")
     }
     %$tabElems = %$elem_ids;
   } elsif (ref($set)) {
@@ -111,22 +111,22 @@ sub new {
         $ids{$entry} = $#elems;
       }
     }
-    confess("Internal error") if (defined($eqs) && @eqs_tmp); # Should never happen.
+    croak("Internal error") if (defined($eqs) && @eqs_tmp); # Should never happen.
     $eqs = \@eqs_tmp if @eqs_tmp;
     ($elems, $elem_ids, $tabElems, $eqIds) = (\@elems, \%ids, {%ids}, {});
   }
   if (defined($eqs)) {
-    confess("eqs: must be an array ref") if ref($eqs) ne 'ARRAY';
+    croak("eqs: must be an array ref") if ref($eqs) ne 'ARRAY';
     my %eqIds;                         # idx => array of equivalent idxes
     my %seen;
     foreach my $eqArray (@{$eqs}) {
-      confess("eqs: each entry must be an array ref") if ref($eqArray) ne 'ARRAY';
+      croak("eqs: each entry must be an array ref") if ref($eqArray) ne 'ARRAY';
       next if !@{$eqArray};
       foreach my $entry (@{$eqArray}) {
-        confess("eqs: subentry contains a non-scalar") if ref($entry);
-        confess("eqs: subentry undefined")             if !defined($entry);
-        confess("eqs: '$entry': unknown element")      if !exists($elem_ids->{$entry});
-        confess("eqs: '$entry': duplicate element")    if exists($seen{$entry});
+        croak("eqs: subentry contains a non-scalar") if ref($entry);
+        croak("eqs: subentry undefined")             if !defined($entry);
+        croak("eqs: '$entry': unknown element")      if !exists($elem_ids->{$entry});
+        croak("eqs: '$entry': duplicate element")    if exists($seen{$entry});
         $seen{$entry} = undef;
       }
       next if @{$eqArray} == 1;
@@ -183,15 +183,15 @@ sub _parse_header_f {
   $header =~ s/\s+$//;
   my @rule_pos;
   if ($pedantic) {
-    substr($header, -1, 1) eq '|' or die("'$header': Wrong header format");
+    substr($header, -1, 1) eq '|' or croak("'$header': Wrong header format");
   }
-  $header =~ s/^\s*\|.*?\|\s*// or die("'$header': Wrong header format");
+  $header =~ s/^\s*\|.*?\|\s*// or croak("'$header': Wrong header format");
   my @elem_array = $header eq "|" ? ('') : split(/\s*\|\s*/, $header);
   return ([], {}) if $header eq "";
   my $index = 0;
   my %elem_ids;
   foreach my $name (@elem_array) {
-    die("'$name': duplicate name in header") if exists($elem_ids{$name});
+    croak("'$name': duplicate name in header") if exists($elem_ids{$name});
     $elem_ids{$name} = $index++;
   }
   return (\@elem_array, \%elem_ids);
@@ -202,7 +202,7 @@ my $_parse_row = sub {
   my $self = shift;
   my $row = shift;
   my ($inc, $noinc) = @{$self}{qw(inc noinc)};
-  $row =~ s/^\|\s*([^|]*?)\s*\|\s*// or die("Wrong row format: '$row'");
+  $row =~ s/^\|\s*([^|]*?)\s*\|\s*// or croak("Wrong row format: '$row'");
   my $rowElem = $1;
   my @rowContents;
   if ($row ne "") {
@@ -214,7 +214,7 @@ my $_parse_row = sub {
       } elsif ($entry eq $noinc) {
         push(@rowContents, "");
       } else {
-        die("'$entry': unexpected entry");
+        croak("'$entry': unexpected entry");
       }
     }
   }
@@ -253,19 +253,23 @@ my $_parse_table = sub {
   for (++$index; $index < @$lines; ++$index) {
     (my $line = $lines->[$index]) =~ s/\s+$//;
     last if $line eq q{};
+    if ($pedantic) {
+      $line =~ /\S/;
+      $-[0] == $rule_pos->[0] or croak("Wrong indentation at line " . ($index + 1));
+    }
     if ($line =~ /^\s*\|-/) {
       if ($pedantic) {
-        $line eq $sep_line or die("Invalid row separator at line " . ($index + 1));
+        $line eq $sep_line or croak("Invalid row separator at line " . ($index + 1));
       }
       next;
     }
     if ($pedantic) {
       _int_array_cmp(_rule_pos_array_f($line), $rule_pos) or
-        die("Wrong row format at line " . ($index + 1));
+        croak("Wrong row format at line " . ($index + 1));
     }
     $line =~ s/^\s*//;
     my ($rowElem, $rowContent) = $self->$_parse_row($line);
-    die("'$rowElem': duplicate element in first column") if exists($rows{$rowElem});
+    croak("'$rowElem': duplicate element in first column") if exists($rows{$rowElem});
     $rows{$rowElem} = $rowContent;
     push(@rowElems, $rowElem);
   }
@@ -273,15 +277,15 @@ my $_parse_table = sub {
     my $tab_elems = $self->{tab_elems};
     $elem_ids     = $self->{elem_ids};
     foreach my $elem (keys(%{$h_ids})) {
-      die("'$elem': unknown element in table") if !exists($tab_elems->{$elem});
+      croak("'$elem': unknown element in table") if !exists($tab_elems->{$elem});
     }
     foreach my $elem (keys(%rows)) {
-      die("'$elem': unknown element in table") if !exists($tab_elems->{$elem});
+      croak("'$elem': unknown element in table") if !exists($tab_elems->{$elem});
     }
     if (!$allow_subset) {
       foreach my $elem (keys(%{$tab_elems})) {
-        die("'$elem': column missing for element") if !exists($h_ids->{$elem});
-        die("'$elem': row missing for element"   ) if !exists($rows{$elem});
+        croak("'$elem': column missing for element") if !exists($h_ids->{$elem});
+        croak("'$elem': row missing for element"   ) if !exists($rows{$elem});
       }
     }
   } else {
@@ -293,10 +297,10 @@ my $_parse_table = sub {
         }
       }
     } else {
-      die("Number of elements in header does not match number of elemens in row")
+      croak("Number of elements in header does not match number of elemens in row")
         if keys(%{$h_ids}) != keys(%rows);
       foreach my $elem (keys(%{$h_ids})) {
-        die("'$elem': row missing for element") if !exists($rows{$elem});
+        croak("'$elem': row missing for element") if !exists($rows{$elem});
       }
     }
     my %tmp = %{$h_ids};
@@ -334,18 +338,18 @@ my $_parse_table = sub {
 
 sub get {
   my $self = shift;
-  confess("Odd number of arguments") if @_ % 2;
+  croak("Odd number of arguments") if @_ % 2;
   my %args = @_;
   my $allow_subset = delete $args{allow_subset};
   my $pedantic     = delete $args{pedantic};
-  confess("Missing argument 'src'") if !@_;
-  my $src          = delete $args{src}          // confess("Invalid value argument for 'src'");
-  confess(join(", ", sort(keys(%args))) . ": unexpected argument") if %args;
+  croak("Missing argument 'src'") if !@_;
+  my $src          = delete $args{src}          // croak("Invalid value argument for 'src'");
+  croak(join(", ", sort(keys(%args))) . ": unexpected argument") if %args;
   my $inputArray;
   if (ref($src)) {
-    confess("Invalid value argument for 'src'") if ref($src) ne 'ARRAY';
+    croak("Invalid value argument for 'src'") if ref($src) ne 'ARRAY';
     foreach my $e (@{$src}) {
-      confess("src: each entry must be a defined scalar") if (ref($e) || !defined($e));
+      croak("src: each entry must be a defined scalar") if (ref($e) || !defined($e));
     }
     $inputArray = $src;
   } elsif ($src !~ /\n/) {
@@ -361,21 +365,21 @@ sub get {
 }
 
 
-sub inc         {confess("Unexpected argument(s)") if @_ > 1; $_[0]->{inc};}
-sub noinc       {confess("Unexpected argument(s)") if @_ > 1; $_[0]->{noinc};}
-sub prespec     {confess("Unexpected argument(s)") if @_ > 1; $_[0]->{prespec};}
-sub elems       {confess("Unexpected argument(s)") if @_ > 1; $_[0]->{elems};}
-sub elem_ids    {confess("Unexpected argument(s)") if @_ > 1; $_[0]->{elem_ids};}
-sub tab_elems   {confess("Unexpected argument(s)") if @_ > 1; $_[0]->{tab_elems};}
-sub eq_ids      {confess("Unexpected argument(s)") if @_ > 1; $_[0]->{eq_ids};}
+sub inc         {croak("Unexpected argument(s)") if @_ > 1; $_[0]->{inc};}
+sub noinc       {croak("Unexpected argument(s)") if @_ > 1; $_[0]->{noinc};}
+sub prespec     {croak("Unexpected argument(s)") if @_ > 1; $_[0]->{prespec};}
+sub elems       {croak("Unexpected argument(s)") if @_ > 1; $_[0]->{elems};}
+sub elem_ids    {croak("Unexpected argument(s)") if @_ > 1; $_[0]->{elem_ids};}
+sub tab_elems   {croak("Unexpected argument(s)") if @_ > 1; $_[0]->{tab_elems};}
+sub eq_ids      {croak("Unexpected argument(s)") if @_ > 1; $_[0]->{eq_ids};}
 
 
 sub matrix {
   my $self = shift;
-  confess("Odd number of arguments") if @_ % 2;
+  croak("Odd number of arguments") if @_ % 2;
   my %args = @_;
   my $bless = delete $args{bless};
-  confess("Unexpected argument(s)") if %args;
+  croak("Unexpected argument(s)") if %args;
   return if !$self->{matrix};
   bless($self->{matrix}, "Text::Table::Read::RelationOn::Tiny::_Relation_Matrix") if $bless;
   return $self->{matrix};
@@ -384,10 +388,10 @@ sub matrix {
 
 sub matrix_named {
   my $self = shift;
-  confess("Odd number of arguments") if @_ % 2;
+  croak("Odd number of arguments") if @_ % 2;
   my %args = @_;
   my $bless = delete $args{bless};
-  confess("Unexpected argument(s)") if %args;
+  croak("Unexpected argument(s)") if %args;
 
   my ($matrix, $elems) = @{$self}{qw(matrix elems)};
   return if !$matrix;
@@ -426,7 +430,7 @@ Text::Table::Read::RelationOn::Tiny - Read binary "relation on (over) a set" fro
 
 =head1 VERSION
 
-Version v2.2.0
+Version v2.2.4
 
 
 =head1 SYNOPSIS
@@ -472,7 +476,7 @@ string (this is default and can be changed, see description of C<new>).
 =item *
 
 The entry in the table's upper left corner is simply ignored and may be empty,
-but you cannot ommit the upper left C<|> character.
+but you cannot omit the upper left C<|> character.
 
 =item *
 
@@ -481,26 +485,26 @@ The hotizontal rules are optional.
 =item *
 
 By default, there is not something like a format check for the horizontal
-rules or alignment. Any line starting with C<|-> is simply ignored, regardless
-of the other subsequent characters, if any. Also, the C<|> need not to be
-aligned, and heading spaces are ignored.
+rules or the alignment. Any line starting with C<|-> is simply ignored,
+regardless of the other subsequent characters, if any. Also, the C<|>
+characters need not to be aligned, and heading spaces are ignored.
 
 However, a format check can be enabled by specifying C<get> argument
 C<pedantic> with a true value.
 
 =item *
 
-Unless you specified a base set in the construcor call, the entries (names) in
-the table's header line are the set's element names. Of course, they must be
-unique. One of these names may be the empty string. Names my contain spaces or
-punctuation chars. The C<|>, of course, cannot be part of a name.
+If you have not specified a base set in the construcor call, the entries
+(names) in the table header are the element names of the set. Of course, they
+must be unique. One of these names may be the empty string. Names my contain
+spaces or punctuation chars. The C<|>, of course, cannot be part of a name.
 
 =item *
 
 The names of the columns (header line) and the rows (first entry of each row)
 must be unique, but they don't have to appear in the same order. By default,
 the set of the header names and the set of the row names must be equal, but
-this can be chaned by argument C<allow_subset> of method C<get>.
+this can be changed by argument C<allow_subset> of method C<get>.
 
 =back
 
@@ -509,7 +513,7 @@ this can be chaned by argument C<allow_subset> of method C<get>.
 
 =head3 new
 
-The constructor take the following optional named scalar arguments:
+The constructor takes the following optional named scalar arguments:
 
 =over
 
@@ -540,21 +544,21 @@ return C<undef> before the first call to C<get>).
 
 Method C<get> will check if the elements in the input table are the same as
 those specified in the array. Furthermore, the indices in C<matrix> will
-always refere to the indices in the C<elems> array constructd from C<set>, and
+always refer to the indices in the C<elems> array constructed from C<set>, and
 C<elems> and C<elem_ids> will always return the same, regardless of the order
 of rows and columns in the input table.
 
 It may happen that there are elements that are identical with respect to the
 relation and you do not want to write duplicate rows and columns in your
-table. To cover such a case, it is allowed that entries of C<set> are array
-references again (another was is using argument C<eqs>).
+table. To cover such a case, it is allowed that entries of C<set> are
+references to array of strings again (another way is using argument C<eqs>).
 
 Example:
 
   [[qw(a a1 a2 a3)], 'b', [qw(c c1)], 'd']
 
 In this case, the elements you write in your table are C<a>, C<b>, C<c>, and
-C<d> (in case of a subarray always the first element is taken). Method C<get>
+C<d> (in case of a subarray the first element is always taken). Method C<get>
 will add corresponding rows and columns for C<a1>, C<a2>, C<a3>, and C<c1> to
 the incidence matrix. Method C<elems> will return this (the nested arrays are
 flattened):
@@ -682,7 +686,7 @@ checks are done:
 
 =item * C<|> characters (and C<+> characters of row seperators) must be aligned.
 
-=item * Row separators are also checked, but are still optional.
+=item * Row separators are also checked, but they are still optional.
 
 =item * Indentation (if any) must be the same for all table rows.
 
@@ -794,8 +798,8 @@ line), or C<undef> if you did neither call C<get> for the current object nor
 specified option C<set> when calling the constructor. See description of
 C<get> and C<new>.
 
-B<Note>: This returns a reference to an internal member, so do not change the
-contents!
+B<Note>: This returns a reference to an internal member, so don't change the
+content!
 
 
 =head3 C<elem_ids>
@@ -804,8 +808,8 @@ Returns a reference to a hash mapping elements to ids (indices in array
 returned by C<elems>), or C<undef> if you did neither call C<get> for the
 current object nor specified argument C<set> when calling the constructor.
 
-B<Note>: This returns a reference to an internal member, so do not change the
-contents!
+B<Note>: This returns a reference to an internal member, so don't change the
+content!
 
 
 =head3 C<tab_elems>
@@ -829,8 +833,8 @@ If you did not specify equivalent elements, the this method return C<undef>
 after the constructor call, but the first call to C<get> sets it to an empty
 hash.
 
-B<Note>: This returns a reference to an internal member, so do not change the
-contents!
+B<Note>: This returns a reference to an internal member, so don't change the
+content!
 
 
 =head3 C<matrix>
@@ -844,30 +848,82 @@ matrix is blessed with
 C<Text::Table::Read::RelationOn::Tiny::_Relation_Matrix> Then you can use the
 matrix as an object having exactly one method named C<related>. This method
 again takes two arguments (integers) and check if these are related with
-respect to the incidence C<matrix>. Note that c<related> does not do any
+respect to the incidence C<matrix>. Note that C<related> does not do any
 parameter check.
 
 Example:
 
-  $rel_obj->bless_matrix;
   my $matrix = $rel_obj->matrix(bless => 1);
   if ($matrix->related(2, 5)) {
     # ...
   }
 
-B<Note>: This returns a reference to an internal member, so do not change the
-contents!
+B<Note>: This returns a reference to an internal member, so don't change the
+content!
 
 
 =head3 C<matrix_named>
 
 Returns an incidence matrix just as C<matrix> does, but the keys are the
-element names rather than their indices It takes a single optional boolean
+element names rather than their indices. It takes a single optional boolean
 named argument C<bless> doing a job corresponding to the C<bless> argument of
 C<matrix>.
 
 B<Note>: Unlike C<matrix> the matrix returned by C<matrix_named> is not a data
-member and thus it is computed everytime you call thie method.
+member and thus it is computed everytime you call this method. This also means
+that you can change the content of the returned matrix without damaging
+anything.
+
+
+=head2 PITFALLS
+
+Basically, you do not need spaces around the C<|> separators. This table, for
+example, is perfectly fine:
+
+     |.|a|b|c|
+     |-+-+-+-|
+     |c| |X| |
+     |-+-+-+-|
+     |b| | | |
+     |-+-+-+-|
+     |a| | |X|
+
+However, if you have element names with a dash at the beginning, then you need
+a space at least after the first C<|> character. Example:
+
+=over
+
+=item B<WRONG>
+
+
+    | x\y   | this | that |-blah   |-    |
+    |-------+------+------+--------+-----|
+    | this  | X    |      | X      |  X  |
+    |-------+------+------+--------+-----|
+    | that  |      |      | X      |     |
+    |-------+------+------+--------+-----|
+    |-blah  |      | X    |        |     |
+    |-------+------+------+--------+-----|
+    |-      |      |      |        |     |
+    |-------+------+------+--------+-----|
+
+
+=item B<RIGHT>
+
+
+    | x\y   | this | that |-blah   |-    |
+    |-------+------+------+--------+-----|
+    | this  | X    |      | X      |  X  |
+    |-------+------+------+--------+-----|
+    | that  |      |      | X      |     |
+    |-------+------+------+--------+-----|
+    | -blah |      | X    |        |     |
+    |-------+------+------+--------+-----|
+    | -     |      |      |        |     |
+    |-------+------+------+--------+-----|
+
+=back
+
 
 
 =head1 AUTHOR

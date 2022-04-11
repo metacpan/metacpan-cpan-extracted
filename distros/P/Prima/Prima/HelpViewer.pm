@@ -1,15 +1,12 @@
 use strict;
 use warnings;
-use Prima;
-use Prima::PodView;
-use Prima::Buttons;
-use Prima::InputLine;
-use Prima::IniFile;
-use Prima::Drawable::Metafile;
-use Prima::Utils;
-use Prima::Dialog::FileDialog;
-use Prima::Dialog::FindDialog;
-use Prima::Dialog::PrintDialog;
+use Prima qw(
+	Buttons InputLine IniFile MsgBox PodView Utils
+	Drawable::Metafile
+	Dialog::FileDialog
+	Dialog::FindDialog
+	Dialog::PrintDialog
+);
 
 package Prima::HelpViewer;
 use vars qw(@helpWindows $windowClass);
@@ -99,7 +96,7 @@ sub load_link
 			close UNIQUE_FILE_HANDLE_NEVER_TO_BE_CLOSED if 0;
 		} else {
 			my $pg;
-			CMD: for my $cmd ( qw(sensible-browser xdg-open x-www-browser www-browser firefox mozilla netscape)) {
+			CMD: for my $cmd ( qw(xdg-open x-www-browser www-browser firefox mozilla sensible-browser netscape)) {
 				for ( split /:/, $ENV{PATH} ) {
 					$pg = "$_/$cmd", last CMD if -x "$_/$cmd";
 				}
@@ -199,6 +196,7 @@ $inifile = Prima::IniFile-> create(
 	file => Prima::Utils::path('HelpWindow'),
 	default => { View => {
 		FullText => 1,
+		Justify  => 1,
 		FixedFont => 'monospace',
 	}},
 );
@@ -228,6 +226,10 @@ sub profile_default
 				$_[0]-> {text}-> topicView( ! $_[0]-> menu-> toggle( $_[1]));
 				$_[0]-> update;
 				$inifile-> section('View')-> {FullText} = $_[0]-> {text}-> topicView ? 0 : 1;
+			}],
+			[ 'justify' => '~Justify text' => sub {
+				$_[0]-> {text}-> justify( $_[0]-> menu-> toggle( $_[1]));
+				$inifile-> section('View')-> {Justify} = $_[0]-> {text}-> justify ? 1 : 0;
 			}],
 			['-src' => 'View so~urce' => 'Ctrl+U' => '^U' => 'view_source'],
 			[],
@@ -407,7 +409,9 @@ sub init
 		$self-> {text}-> topicView(0);
 	} else {
 		$self-> {text}-> topicView(1);
-    }
+	}
+	$self-> {text}-> justify( $sec->{Justify});
+	$self-> menu-> justify-> checked($sec->{Justify});
 
 	$self-> {text}-> {fontPalette}-> [0]-> {name} = $sec-> {VariableFont}
 		if $sec-> {VariableFont};
@@ -426,6 +430,18 @@ sub init
 sub on_close
 {
 	my $self = $_[0];
+
+	if (( $self->{printing} // -1) > 0) {
+		$self->clear_event;
+		if ( Prima::MsgBox::message_box(
+			"Printing",
+			"Abort printing?",
+			mb::Abort|mb::Cancel|mb::Warning
+		) == mb::Abort) {
+			$self->{printing} = -2;
+		}
+	}
+
 	my $sec = $inifile-> section('View');
 
 	$sec-> {FontSize}     = $self-> {text}-> {defaultFontSize};
@@ -922,6 +938,7 @@ sub print
 		$self-> {text}-> {fontPalette}-> [$_]-> {name} = $font[$_] if defined $font[$_];
 	}
 
+	Prima::Utils::post( sub { $self-> close } ) if $self->{printing} == -2;
 	$self-> {printing} = undef;
 }
 
@@ -932,7 +949,9 @@ sub setup_dialog
 	my $t = $self-> {text};
 	unless ( defined $setupdlg) {
 		Prima::message("$@"), return
-			unless $setupdlg = Prima::VBLoad( 'Prima::HelpViewer.fm');
+			unless $setupdlg = Prima::VBLoad( 'Prima::HelpViewer.fm',
+				'Form1'  => { visible => 0, centered => 1, designScale => [ 7, 16 ]}
+			);
 	}
 
 	my $sec = $inifile-> section('View');

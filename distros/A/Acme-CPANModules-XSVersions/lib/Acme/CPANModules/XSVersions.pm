@@ -1,10 +1,14 @@
 package Acme::CPANModules::XSVersions;
 
-our $DATE = '2019-01-15'; # DATE
-our $VERSION = '0.002'; # VERSION
+use strict;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-03-18'; # DATE
+our $DIST = 'Acme-CPANModules-XSVersions'; # DIST
+our $VERSION = '0.003'; # VERSION
 
 our $LIST = {
-    summary => 'XS versions of Perl modules',
+    summary => 'List of XS versions of Perl modules',
     description => <<'_',
 
 This list catalogs (pure-) Perl modules that have their XS counterparts ("fast
@@ -106,7 +110,7 @@ _
 };
 
 1;
-# ABSTRACT: XS versions of Perl modules
+# ABSTRACT: List of XS versions of Perl modules
 
 __END__
 
@@ -116,11 +120,11 @@ __END__
 
 =head1 NAME
 
-Acme::CPANModules::XSVersions - XS versions of Perl modules
+Acme::CPANModules::XSVersions - List of XS versions of Perl modules
 
 =head1 VERSION
 
-This document describes version 0.002 of Acme::CPANModules::XSVersions (from Perl distribution Acme-CPANModules-XSVersions), released on 2019-01-15.
+This document describes version 0.003 of Acme::CPANModules::XSVersions (from Perl distribution Acme-CPANModules-XSVersions), released on 2022-03-18.
 
 =head1 SYNOPSIS
 
@@ -137,8 +141,6 @@ L<Acme::CM::Get>, L<Module::Installed::Tiny>, and L<cpanm>.)
 
 =head1 DESCRIPTION
 
-XS versions of Perl modules.
-
 This list catalogs (pure-) Perl modules that have their XS counterparts ("fast
 versions"), usually in separate distributions so the installation of the XS
 version is optional. The two versions of the modules provide the same interface.
@@ -153,153 +155,330 @@ it's available or fallback to the PP version (C<JSON::PP>).
 
 Additions much welcome.
 
-=head1 INCLUDED MODULES
+=head1 ACME::CPANMODULES ENTRIES
 
 =over
 
-=item * L<Algorithm::Diff>
+=item * L<Algorithm::Diff> - Compute `intelligent' differences between two files / lists
 
-=item * L<Algorithm::LUHN>
+Author: L<RJBS|https://metacpan.org/author/RJBS>
 
-=item * L<Algorithm::PageRank>
+=item * L<Algorithm::LUHN> - Calculate the Modulus 10 Double Add Double checksum
 
-=item * L<Algorithm::RectanglesContainingDot>
+Author: L<NEILB|https://metacpan.org/author/NEILB>
 
-=item * L<Bytes::Random>
+=item * L<Algorithm::PageRank> - Calculate PageRank in Perl
 
-=item * L<Class::Accessor::Fast>
+Author: L<XERN|https://metacpan.org/author/XERN>
 
-=item * L<Class::C3>
+=item * L<Algorithm::RectanglesContainingDot> - find rectangles containing a given dot
 
-=item * L<Class::Load>
+Author: L<SALVA|https://metacpan.org/author/SALVA>
 
-=item * L<Convert::Bencode>
+=item * L<Bytes::Random> - Perl extension to generate random bytes.
 
-=item * L<Crypt::Passwd>
+Author: L<JOHND|https://metacpan.org/author/JOHND>
 
-=item * L<Crypt::TEA_PP>
+=item * L<Class::Accessor::Fast> - Faster, but less expandable, accessors
 
-=item * L<Crypt::XXTEA_PP>
+Author: L<KASEI|https://metacpan.org/author/KASEI>
 
-=item * L<DDC::PP>
+=item * L<Class::C3> - A pragma to use the C3 method resolution order algorithm
 
-=item * L<Crypt::Skip32>
+Author: L<HAARG|https://metacpan.org/author/HAARG>
+
+=item * L<Class::Load> - A working (require "Class::Name") and more
+
+Author: L<ETHER|https://metacpan.org/author/ETHER>
+
+=item * L<Convert::Bencode> - Functions for converting to/from bencoded strings
+
+Author: L<ORCLEV|https://metacpan.org/author/ORCLEV>
+
+=item * L<Crypt::Passwd> - Perl wrapper around the UFC Crypt
+
+Author: L<LUISMUNOZ|https://metacpan.org/author/LUISMUNOZ>
+
+=item * L<Crypt::TEA_PP> - Pure Perl Implementation of the Tiny Encryption Algorithm
+
+Author: L<JAHIY|https://metacpan.org/author/JAHIY>
+
+=item * L<Crypt::XXTEA_PP> - Pure Perl Implementation of Corrected Block Tiny Encryption Algorithm
+
+Author: L<JAHIY|https://metacpan.org/author/JAHIY>
+
+=item * L<DDC::PP> - pure-perl DDC::XS clone: constants
+
+Author: L<MOOCOW|https://metacpan.org/author/MOOCOW>
+
+=item * L<Crypt::Skip32> - 32-bit block cipher based on Skipjack
+
+Author: L<ESH|https://metacpan.org/author/ESH>
 
 =item * L<Date::Calc>
 
-=item * L<Directory::Iterator>
+Author: L<STBEY|https://metacpan.org/author/STBEY>
 
-=item * L<Encode>
+=item * L<Directory::Iterator> - Simple, efficient recursive directory listing
 
-=item * L<Encoding::FixLatin>
+Author: L<SANBEG|https://metacpan.org/author/SANBEG>
 
-=item * L<File::MMagic>
+=item * L<Encode> - character encodings in Perl
 
-=item * L<Geo::Coordinates::UTM>
+Author: L<DANKOGAI|https://metacpan.org/author/DANKOGAI>
 
-=item * L<Geo::Distance>
+=item * L<Encoding::FixLatin> - takes mixed encoding input and produces UTF-8 output
 
-=item * L<Geo::Hash>
+Author: L<GRANTM|https://metacpan.org/author/GRANTM>
 
-=item * L<HTTP::Headers::Fast>
+=item * L<File::MMagic> - Guess file type
+
+Author: L<KNOK|https://metacpan.org/author/KNOK>
+
+=item * L<Geo::Coordinates::UTM> - Perl extension for Latitiude Longitude conversions.
+
+Author: L<GRAHAMC|https://metacpan.org/author/GRAHAMC>
+
+=item * L<Geo::Distance> - Calculate distances and closest locations. (DEPRECATED)
+
+Author: L<BLUEFEET|https://metacpan.org/author/BLUEFEET>
+
+=item * L<Geo::Hash> - Encode / decode geohash.org locations.
+
+Author: L<ANDYA|https://metacpan.org/author/ANDYA>
+
+=item * L<HTTP::Headers::Fast> - faster implementation of HTTP::Headers
+
+Author: L<TOKUHIROM|https://metacpan.org/author/TOKUHIROM>
 
 =item * L<HTTP::Parser::XS::PP>
 
-=item * L<Heap::Simple>
+Author: L<KAZUHO|https://metacpan.org/author/KAZUHO>
 
-=item * L<Image::Info>
+=item * L<Heap::Simple> - Fast and easy to use classic heaps
 
-=item * L<JSON::PP>
+Author: L<THOSPEL|https://metacpan.org/author/THOSPEL>
 
-=item * L<Language::Befunge::Vector>
+=item * L<Image::Info> - Extract meta information from image files
 
-=item * L<Language::Befunge::Storage::Generic::Vec>
+Author: L<SREZIC|https://metacpan.org/author/SREZIC>
 
-=item * L<List::BinarySearch>
+=item * L<JSON::PP> - JSON::XS compatible pure-Perl module.
 
-=item * L<List::Flatten>
+Author: L<ISHIGAKI|https://metacpan.org/author/ISHIGAKI>
 
-=item * L<List::MoreUtils>
+=item * L<Language::Befunge::Vector> - an opaque, N-dimensional vector class
 
-=item * L<List::SomeUtils>
+Author: L<JQUELIN|https://metacpan.org/author/JQUELIN>
 
-=item * L<List::Util>
+=item * L<Language::Befunge::Storage::Generic::Vec> - a generic N-dimensional LaheySpace
 
-=item * L<List::UtilsBy>
+Author: L<JQUELIN|https://metacpan.org/author/JQUELIN>
 
-=item * L<Math::Derivative>
+=item * L<List::BinarySearch> - Binary Search within a sorted array.
 
-=item * L<Math::Gauss>
+Author: L<DAVIDO|https://metacpan.org/author/DAVIDO>
 
-=item * L<Math::Utils>
+=item * L<List::Flatten> - Interpolate array references in a list
 
-=item * L<MaxMind::DB::Reader>
+Author: L<OBRADOVIC|https://metacpan.org/author/OBRADOVIC>
 
-=item * L<Mojo::Base>
+=item * L<List::MoreUtils> - Provide the stuff missing in List::Util
 
-=item * L<Net::IP>
+Author: L<REHSACK|https://metacpan.org/author/REHSACK>
 
-=item * L<Net::SNMP>
+=item * L<List::SomeUtils> - Provide the stuff missing in List::Util
 
-=item * L<Number::Closest>
+Author: L<DROLSKY|https://metacpan.org/author/DROLSKY>
 
-=item * L<Object::Tiny>
+=item * L<List::Util> - A selection of general-utility list subroutines
 
-=item * L<Object::Tiny::RW>
+Author: L<PEVANS|https://metacpan.org/author/PEVANS>
 
-=item * L<PPI>
+=item * L<List::UtilsBy> - higher-order list utility functions
 
-=item * L<Package::Stash>
+Author: L<PEVANS|https://metacpan.org/author/PEVANS>
 
-=item * L<Params::Validate>
+=item * L<Math::Derivative> - Numeric 1st and 2nd order differentiation
 
-=item * L<Path::Hilbert>
+Author: L<JGAMBLE|https://metacpan.org/author/JGAMBLE>
 
-=item * L<PerlX::ArraySkip>
+=item * L<Math::Gauss> - Gaussian distribution function and its inverse
 
-=item * L<PerlX::Maybe>
+Author: L<JANERT|https://metacpan.org/author/JANERT>
 
-=item * L<Protocol::Redis>
+=item * L<Math::Utils> - Useful mathematical functions not in Perl.
 
-=item * L<Readonly>
+Author: L<JGAMBLE|https://metacpan.org/author/JGAMBLE>
 
-=item * L<Ref::Util>
+=item * L<MaxMind::DB::Reader> - Read MaxMind DB files and look up IP addresses
 
-=item * L<Set::IntSpan::Fast>
+Author: L<MAXMIND|https://metacpan.org/author/MAXMIND>
 
-=item * L<Set::Product>
+=item * L<Mojo::Base> - Minimal base class for Mojo projects
 
-=item * L<SOAP::WSDL::Deserializer::XSD>
+Author: L<SRI|https://metacpan.org/author/SRI>
+
+=item * L<Net::IP> - Perl extension for manipulating IPv4/IPv6 addresses
+
+Author: L<MANU|https://metacpan.org/author/MANU>
+
+=item * L<Net::SNMP> - Object oriented interface to SNMP 
+
+Author: L<DTOWN|https://metacpan.org/author/DTOWN>
+
+=item * L<Number::Closest> - Find number(s) closest to a number in a list of numbers
+
+Author: L<ACCARDO|https://metacpan.org/author/ACCARDO>
+
+=item * L<Object::Tiny> - Class building as simple as it gets
+
+Author: L<ETHER|https://metacpan.org/author/ETHER>
+
+=item * L<Object::Tiny::RW> - Class building as simple as it gets (with rw accessors)
+
+Author: L<SCHWIGON|https://metacpan.org/author/SCHWIGON>
+
+=item * L<PPI> - Parse, Analyze and Manipulate Perl (without perl)
+
+Author: L<OALDERS|https://metacpan.org/author/OALDERS>
+
+=item * L<Package::Stash> - Routines for manipulating stashes
+
+Author: L<ETHER|https://metacpan.org/author/ETHER>
+
+=item * L<Params::Validate> - Validate method/function parameters
+
+Author: L<DROLSKY|https://metacpan.org/author/DROLSKY>
+
+=item * L<Path::Hilbert> - A no-frills converter between 1D and 2D spaces using the Hilbert curve
+
+Author: L<PWBENNETT|https://metacpan.org/author/PWBENNETT>
+
+=item * L<PerlX::ArraySkip> - sub { shift; @_ }
+
+Author: L<TOBYINK|https://metacpan.org/author/TOBYINK>
+
+=item * L<PerlX::Maybe> - return a pair only if they are both defined
+
+Author: L<TOBYINK|https://metacpan.org/author/TOBYINK>
+
+=item * L<Protocol::Redis> - Redis protocol parser/encoder with asynchronous capabilities.
+
+Author: L<UNDEF|https://metacpan.org/author/UNDEF>
+
+=item * L<Readonly> - Facility for creating read-only scalars, arrays, hashes
+
+Author: L<SANKO|https://metacpan.org/author/SANKO>
+
+=item * L<Ref::Util> - Utility functions for checking references
+
+Author: L<ARC|https://metacpan.org/author/ARC>
+
+=item * L<Set::IntSpan::Fast> - Fast handling of sets containing integer spans.
+
+Author: L<ANDYA|https://metacpan.org/author/ANDYA>
+
+=item * L<Set::Product> - generates the cartesian product of a set of lists
+
+Author: L<GRAY|https://metacpan.org/author/GRAY>
+
+=item * L<SOAP::WSDL::Deserializer::XSD> - Deserializer SOAP messages into SOAP::WSDL::XSD::Typelib:: objects
+
+Author: L<SWALTERS|https://metacpan.org/author/SWALTERS>
 
 =item * L<Sort::Naturally>
 
-=item * L<String::Numeric>
+Author: L<BINGOS|https://metacpan.org/author/BINGOS>
+
+=item * L<String::Numeric> - Determine whether a string represents a numeric value
+
+Author: L<CHANSEN|https://metacpan.org/author/CHANSEN>
 
 =item * L<Template::Alloy>
 
-=item * L<Template::Stash>
+Author: L<RHANDOM|https://metacpan.org/author/RHANDOM>
 
-=item * L<Text::CSV>
+=item * L<Template::Stash> - Magical storage for template variables
 
-=item * L<Text::Levenshtein::Damerau>
+Author: L<ATOOMIC|https://metacpan.org/author/ATOOMIC>
 
-=item * L<Time::Format>
+=item * L<Text::CSV> - comma-separated values manipulator (using XS or PurePerl)
 
-=item * L<Type::Tiny>
+Author: L<ISHIGAKI|https://metacpan.org/author/ISHIGAKI>
 
-=item * L<Tree::Object>
+=item * L<Text::Levenshtein::Damerau> - Damerau Levenshtein edit distance.
+
+Author: L<UGEXE|https://metacpan.org/author/UGEXE>
+
+=item * L<Time::Format> - Easy-to-use date/time formatting.
+
+Author: L<ROODE|https://metacpan.org/author/ROODE>
+
+=item * L<Type::Tiny> - tiny, yet Moo(se)-compatible type constraint
+
+Author: L<TOBYINK|https://metacpan.org/author/TOBYINK>
+
+=item * L<Tree::Object> - Generic tree objects
+
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
 =item * L<URL::Encode>
 
-=item * L<Unix::Uptime::BSD>
+Author: L<CHANSEN|https://metacpan.org/author/CHANSEN>
 
-=item * L<XML::CompactTree>
+=item * L<Unix::Uptime::BSD> - BSD implementation of Unix::Uptime (for Darwin, DragonFly, and *BSD)
 
-=item * L<YAML::PP>
+Author: L<PIOTO|https://metacpan.org/author/PIOTO>
 
-=item * L<match::simple>
+=item * L<XML::CompactTree> - builder of compact tree structures from XML documents
+
+Author: L<PAJAS|https://metacpan.org/author/PAJAS>
+
+=item * L<YAML::PP> - YAML 1.2 processor
+
+Author: L<TINITA|https://metacpan.org/author/TINITA>
+
+=item * L<match::simple> - simplified clone of smartmatch operator
+
+Author: L<TOBYINK|https://metacpan.org/author/TOBYINK>
 
 =back
+
+=head1 FAQ
+
+=head2 What is an Acme::CPANModules::* module?
+
+An Acme::CPANModules::* module, like this module, contains just a list of module
+names that share a common characteristics. It is a way to categorize modules and
+document CPAN. See L<Acme::CPANModules> for more details.
+
+=head2 What are ways to use this Acme::CPANModules module?
+
+Aside from reading this Acme::CPANModules module's POD documentation, you can
+install all the listed modules (entries) using L<cpanm-cpanmodules> script (from
+L<App::cpanm::cpanmodules> distribution):
+
+ % cpanm-cpanmodules -n XSVersions
+
+Alternatively you can use the L<cpanmodules> CLI (from L<App::cpanmodules>
+distribution):
+
+    % cpanmodules ls-entries XSVersions | cpanm -n
+
+or L<Acme::CM::Get>:
+
+    % perl -MAcme::CM::Get=XSVersions -E'say $_->{module} for @{ $LIST->{entries} }' | cpanm -n
+
+or directly:
+
+    % perl -MAcme::CPANModules::XSVersions -E'say $_->{module} for @{ $Acme::CPANModules::XSVersions::LIST->{entries} }' | cpanm -n
+
+This Acme::CPANModules module also helps L<lcpan> produce a more meaningful
+result for C<lcpan related-mods> command when it comes to finding related
+modules for the modules listed in this Acme::CPANModules module.
+See L<App::lcpan::Cmd::related_mods> for more details on how "related modules"
+are found.
 
 =head1 HOMEPAGE
 
@@ -308,14 +487,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Acme-CPANM
 =head1 SOURCE
 
 Source repository is at L<https://github.com/perlancar/perl-Acme-CPANModules-XSVersions>.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-XSVersions>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
 
 =head1 SEE ALSO
 
@@ -327,11 +498,36 @@ L<cpanmodules> - CLI tool to let you browse/view the lists
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2022, 2019 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-XSVersions>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

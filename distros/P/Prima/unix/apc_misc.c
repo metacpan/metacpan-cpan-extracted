@@ -758,7 +758,7 @@ apc_show_message( const char * message, Bool utf8)
 	Point textSz;
 	Point winSz;
 	TextWrapRec twr;
-	int i;
+	int i, j;
 	struct MsgDlg md, **storage;
 	Bool ret = false;
 	PList font_abc_unicode = NULL;
@@ -814,22 +814,21 @@ apc_show_message( const char * message, Bool utf8)
 			return false;
 		}
 
-		twr. text      = ( char *) message;
-		twr. utf8_text = utf8;
-		twr. textLen   = strlen( message);
+		bzero(&twr, sizeof(twr));
+		twr. text         = ( char *) message;
+		twr. utf8_text    = utf8;
+		twr. textLen      = strlen( message);
 		twr. utf8_textLen = utf8 ? prima_utf8_length( message, -1) : twr. textLen;
-		twr. width     = appSz. x * 2 / 3;
-		twr. tabIndent = 3;
-		twr. options   = twNewLineBreak | twWordBreak | twReturnLines;
-		twr. ascii     = &font_abc_ascii;
-		twr. unicode   = &font_abc_unicode;
-		twr. count     = 0;
+		twr. width        = appSz. x * 2 / 3;
+		twr. tabIndent    = 3;
+		twr. options      = twNewLineBreak | twWordBreak | twReturnLines;
+		twr. ascii        = &font_abc_ascii;
+		twr. unicode      = &font_abc_unicode;
 		guts. font_abc_nil_hack = fs;
 		wrapped = CDrawable->do_text_wrap( NULL_HANDLE, &twr, NULL, NULL);
 
 		if ( font_abc_ascii) free( font_abc_ascii);
 		if ( font_abc_unicode) {
-			int i;
 			for ( i = 0; i < font_abc_unicode-> count; i += 2)
 				free(( void*) font_abc_unicode-> items[ i + 1]);
 			plist_destroy( font_abc_unicode);
@@ -846,16 +845,16 @@ apc_show_message( const char * message, Bool utf8)
 
 		/* find text extensions */
 		max = 0;
-		for ( i = 0; i < md.count; i+=4) {
-			md.lengths[i] = wrapped[i+3];
+		for ( i = j = 0; i < md.count; i++, j += 4) {
+			md.lengths[i] = wrapped[j+3];
 			if (utf8) {
-				if (!(md.wrapped[i] = (char*)prima_alloc_utf8_to_wchar( message + wrapped[i], md.lengths[i])))
+				if (!(md.wrapped[i] = (char*)prima_alloc_utf8_to_wchar( message + wrapped[j], md.lengths[i])))
 					goto EXIT;
 				md.widths[i] = XTextWidth16( fs, (XChar2b*) md.wrapped[i], md.lengths[i]);
 			} else {
 				if (!(md.wrapped[i] = malloc( md.lengths[i] + 1)))
 					goto EXIT;
-				memcpy(md.wrapped[i], message + wrapped[i], md.lengths[i]);
+				memcpy(md.wrapped[i], message + wrapped[j], md.lengths[i]);
 				md.wrapped[i][md.lengths[i]] = 0;
 				md. widths[i] = XTextWidth( fs, md.wrapped[i], md.lengths[i]);
 			}
@@ -974,6 +973,7 @@ EXIT:
 			free(md.wrapped[i]);
 		free(md.wrapped);
 	}
+	md.wrappedCount = 0;
 
 	return ret;
 }
@@ -1098,6 +1098,7 @@ apc_sys_get_value( int v)  /* XXX one big XXX */
 ;
 	case svMenuCheckSize   : return MENU_CHECK_XOFFSET;
 	case svFriBidi         : return use_fribidi;
+	case svLibThai         : return use_libthai;
 	case svAntialias       : return guts. argb_visual. visual != NULL;
 	default:
 		return -1;

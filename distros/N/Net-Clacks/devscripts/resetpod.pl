@@ -7,11 +7,13 @@ use diagnostics;
 use mro 'c3';
 use English;
 use Carp;
-our $VERSION = 22;
+our $VERSION = 23;
 use autodie qw( close );
 use Array::Contains;
 use utf8;
 use Encode qw(is_utf8 encode_utf8 decode_utf8);
+use feature 'signatures';
+no warnings qw(experimental::signatures);
 #---AUTOPRAGMAEND---
 
 # PAGECAMEL  (C) 2008-2022 Rene Schickbauer
@@ -134,9 +136,7 @@ exit(0);
 
 
 
-sub find_pm {
-    my ($workDir) = @_;
-
+sub find_pm($workDir) {
     my @files;
     opendir(my $dfh, $workDir) or die($ERRNO);
     while((my $fname = readdir($dfh))) {

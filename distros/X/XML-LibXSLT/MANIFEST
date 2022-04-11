@@ -1,6 +1,5 @@
 Changes
 LICENSE
-LibXSLT.pm
 LibXSLT.xs
 MANIFEST
 Makefile.PL
@@ -18,6 +17,8 @@ example/bad2.xsl
 example/bad3.xsl
 example/fatal.xsl
 example/nonfatal.xsl
+lib/XML/LibXSLT.pm
+lib/XML/LibXSLT/Quick.pm
 perl-libxml-mm.c
 perl-libxml-mm.h
 ppport.h
@@ -45,6 +46,7 @@ t/pod.t
 t/rt71345_a.t
 t/rt71345_b.t
 t/style-trailing-space.t
+t/using-quick-wrapper.t
 t/xml-grammar-failures.t
 testcases/default.conf
 typemap

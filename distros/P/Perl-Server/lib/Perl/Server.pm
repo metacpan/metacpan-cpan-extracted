@@ -5,8 +5,9 @@ use warnings;
 use Cwd;
 use Plack::Runner;
 use Term::ANSIColor;
+use Net::EmptyPort qw/check_port/;
 
-our $VERSION = '0.06';
+our $VERSION = '0.08';
 
 sub new {
     my $class = shift;
@@ -23,27 +24,33 @@ sub run {
     my @argv = @_;
 
     my $type = $self->_type;   
+    
+    my $middleware = $self->_middleware;
 
     if (exists $type->{module}) {
         push(@argv, '-M');
         push(@argv, $type->{module});
         
         push(@argv, '-e');
-        push(@argv, $type->{eval});          
+        push(@argv, $middleware . '; ' . $type->{eval});                 
     } else {
+        push(@argv, '-e');
+        push(@argv, $middleware);          
+        
         push(@argv, '-a');
         push(@argv, $type->{app});        
     }
     
     unless (grep(/^(-p|--port)$/, @argv)) {
         push(@argv, '-p');
-        push(@argv, 3000);      
+        push(@argv, $self->_port);      
     }
     
     $ENV{PLACK_ENV} = 'perl-server';       
     
     my $runner = Plack::Runner->new;    
     $runner->parse_options(@argv);   
+    $runner->prepare_devel($runner);
     $self->_message($runner);
     $runner->run;
 }
@@ -91,6 +98,24 @@ sub _message {
     };     
 }
 
+sub _middleware {
+    my $middleware = 'enable "AccessLog", format => \'%h %l %u %t "%r" %>s %b "%{Referer}i" "%{User-agent}i"\'';
+    
+    return $middleware;
+}
+
+sub _port {
+    my $port = 3000;
+    
+    return $port unless check_port($port);
+    
+    while ($port++ < 65000) {
+        last unless check_port($port);
+    }
+    
+    return $port;
+}
+
 sub _name {
     print STDERR color('bold blue');
     print STDERR "Perl::Server\n\n";    
@@ -99,7 +124,7 @@ sub _name {
 sub _stop {
     print STDERR color('reset');
     print STDERR color('white');    
-    print STDERR "\nHit CTRL-C to stop the perl-server\n";
+    print STDERR "\nHit CTRL-C to stop the perl-server\n\n";
 }
 
 sub _print {

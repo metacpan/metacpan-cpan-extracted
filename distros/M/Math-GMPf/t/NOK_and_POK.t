@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use Math::GMPf qw(:mpf);
 
-print "1..36\n";
+print "1..38\n";
 
 my $n = '98765' x 1000;
 my $r = '98765' x 1000;
@@ -49,6 +49,7 @@ my $discard = eval{"$inf"}; # POK flag is now also set for $inf (mostly)
 $discard    = eval{"$nan"}; # POK flag is now also set for $nan (mostly)
 
 adj($inf, \$check, 1);
+$check++ if Math::GMPf::ISSUE_19550;
 
 eval {$z = Math::GMPf->new($inf);};
 
@@ -86,6 +87,7 @@ else {
 }
 
 adj($nan, \$check, 1);
+$check++ if Math::GMPf::ISSUE_19550;
 
 my $z2;
 eval {$z2 = Math::GMPf->new($nan);};
@@ -346,6 +348,34 @@ if(Math::GMPf::nok_pokflag() == $check) {print "ok 36\n"}
 else {
   warn "\n", Math::GMPf::nok_pokflag(), " != $check\n";
   print "not ok 36\n";
+}
+
+my $nv = 1.3;
+my $s = "$nv";
+
+my $mpf = Math::GMPf->new($nv);
+
+$check++ if GMPF_PV_NV_BUG;
+
+if(Math::GMPf::nok_pokflag() == $check) {print "ok 37\n"}
+else {
+  warn "\n", Math::GMPf::nok_pokflag(), " != $check\n";
+  print "not ok 37\n";
+}
+
+if(Math::GMPf::ISSUE_19550) {
+  if($] < 5.035010) {
+    warn "ISSUE_19550 unexpectedly set\n";
+    print "not ok 38\n";
+  }
+  else {
+    warn "ISSUE_19550 set\n";
+    print "ok 38\n";
+  }
+}
+else {
+  warn "ISSUE_19550 not set\n";
+  print "ok 38\n";
 }
 
 ########

@@ -9,7 +9,7 @@ use Test::Builder::Tester tests => 1;
 
 use Test::Expander;
 
-my $title = 'execution';
+my $title = 'execution succeeds';
 test_out("ok 1 - $title");
 lives_ok(sub {}, $title);
 test_test($title);

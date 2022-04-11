@@ -18,6 +18,9 @@
     use constant _MATH_MPC_T 	=> 10;
     use constant GMPF_PV_NV_BUG => Math::GMPf::Random::_has_pv_nv_bug();
 
+    # Inspired by https://github.com/Perl/perl5/issues/19550:
+    use constant ISSUE_19550    => Math::GMPf::Random::_issue_19550();
+
 use subs qw( __GNU_MP_VERSION __GNU_MP_VERSION_MINOR __GNU_MP_VERSION_PATCHLEVEL
              __GNU_MP_RELEASE __GMP_CC __GMP_CFLAGS GMP_LIMB_BITS GMP_NAIL_BITS);
 
@@ -83,7 +86,7 @@ fgmp_urandomb_ui fgmp_urandomm_ui
 Rmpf_get_NV Rmpf_set_NV Rmpf_get_NV_rndn Rmpf_get_d_rndn
 Rmpf_get_IV Rmpf_set_IV Rmpf_fits_IV_p
     );
-    our $VERSION = '0.47';
+    our $VERSION = '0.48';
     #$VERSION = eval $VERSION;
 
     Math::GMPf->DynaLoader::bootstrap($VERSION);
@@ -158,7 +161,13 @@ sub new {
 
     # $_[0] is the value, $_[1] (if supplied) is the base of the number
     # in the string $[_0].
-    $arg1 = shift;
+    $arg1 = shift; # At this point, an infnan might acquire a POK flag - thus
+                   # assigning to $type a value of 4, instead of 3. Such behaviour also
+                   # turns $arg into a PV and NV dualvar. It's a fairly inconsequential
+                   # bug - https://github.com/Perl/perl5/issues/19550.
+                   # I could workaround this by simply not shifting and re-assigning, but
+                   # I'll leave it as it is - otherwise there's nothing to mark that this
+                   # minor issue (which might also show up in user code) ever existed.
     $base = 10;
 
     $type = _itsa($arg1);

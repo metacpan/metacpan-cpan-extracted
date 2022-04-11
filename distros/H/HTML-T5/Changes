@@ -1,5 +1,15 @@
 Revision history for HTML-T5
 
+0.013  2022-04-10
+    - try fixing https://github.com/shlomif/html-tidy5/issues/6
+        - thanks to @eserte
+        - "Locale-specific test failures · Issue #6 · shlomif/html-tidy5"
+
+0.012  2022-04-09
+    - try fixing https://github.com/shlomif/html-tidy5/issues/6
+        - thanks to @eserte
+        - "Locale-specific test failures · Issue #6 · shlomif/html-tidy5"
+
 0.011  2022-04-06
     - "fix" the tests.
 

@@ -57,6 +57,6 @@
          "url" : "https://github.com/tomk3003/lib-archive"
       }
    },
-   "version" : "0.91",
+   "version" : "0.92",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

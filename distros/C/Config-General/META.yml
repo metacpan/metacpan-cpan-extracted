@@ -3,25 +3,26 @@ abstract: unknown
 author:
   - unknown
 build_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.130880'
-license: perl
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Config-General
 no_index:
   directory:
     - t
     - inc
 requires:
-  File::Glob: 0
-  File::Spec::Functions: 0
-  FileHandle: 0
-  IO::File: 0
+  File::Glob: '0'
+  File::Spec::Functions: '0'
+  FileHandle: '0'
+  IO::File: '0'
 resources:
-  repository: http://dev.catalyst.perl.org/repos/Config-General/trunk/
-version: 2.63
+  repository: https://github.com/TLINDEN/Config-General
+version: '2.65'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

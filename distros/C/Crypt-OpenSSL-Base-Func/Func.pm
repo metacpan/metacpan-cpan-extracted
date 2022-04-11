@@ -14,7 +14,7 @@ use Math::BigInt;
 use POSIX;
 #use Data::Dump qw/dump/;
 
-our $VERSION = '0.031';
+our $VERSION = '0.032';
 
 our @ISA = qw(Exporter);
 
@@ -31,12 +31,23 @@ EC_POINT_get_affine_coordinates
 EC_POINT_point2hex
 EC_POINT_hex2point
 EC_KEY_get0_private_key
+EVP_PKEY_new
+EVP_PKEY_assign_EC_KEY
+EVP_PKEY_get1_EC_KEY
+EC_KEY_set_private_key
+
+evp_pkey_from_point_hex
+evp_pkey_from_priv_hex
+pem_write_evp_pkey
+pem_read_pkey
 
 PKCS5_PBKDF2_HMAC 
 PKCS12_key_gen 
 i2osp
 aes_cmac 
-ecdh hex2point
+ecdh 
+ecdh_pkey
+hex2point
 bn_mod_sqrt 
 digest
 ); 

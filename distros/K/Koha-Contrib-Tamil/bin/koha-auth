@@ -3,7 +3,7 @@
 package main;
 # PODNAME: koha-auth
 # ABSTRACT: Generate authorities from bibliographic records
-$main::VERSION = '0.067';
+$main::VERSION = '0.068';
 use 5.010;
 use utf8;
 use strict;
@@ -90,7 +90,7 @@ koha-auth - Generate authorities from bibliographic records
 
 =head1 VERSION
 
-version 0.067
+version 0.068
 
 =head1 DESCRIPTION
 

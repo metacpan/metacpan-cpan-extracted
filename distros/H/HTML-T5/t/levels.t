@@ -6,6 +6,9 @@ use strict;
 BEGIN
 {
     $ENV{LC_ALL} = 'C';
+
+    # See: https://github.com/shlomif/html-tidy5/issues/6
+    $ENV{LANG} = 'en_US.UTF-8';
 };
 use Test::More tests => 3;
 

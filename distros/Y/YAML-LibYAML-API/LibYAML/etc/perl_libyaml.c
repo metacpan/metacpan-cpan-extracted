@@ -49,6 +49,8 @@ libyaml_to_perl_event(yaml_event_t *event)
     dTHX;
     HV *perl_event;
     HV *perl_version_directive;
+    AV *perl_tag_directives;
+    HV *perl_tag_directive;
     HV *perl_start_mark;
     HV *perl_end_mark;
     yaml_event_type_t type;
@@ -60,6 +62,7 @@ libyaml_to_perl_event(yaml_event_t *event)
     SV *hash_ref_start;
     SV *hash_ref_end;
     SV *scalar_value;
+    yaml_tag_directive_t *tag_directive;
 
     perl_event = newHV();
     type = event->type;
@@ -94,8 +97,28 @@ libyaml_to_perl_event(yaml_event_t *event)
                 newRV_noinc((SV *)perl_version_directive), 0
             );
         }
+        if (event->data.document_start.tag_directives.start) {
+            perl_tag_directives = newAV();
+            for (tag_directive = event->data.document_start.tag_directives.start;
+                    tag_directive != event->data.document_start.tag_directives.end;
+                    tag_directive ++) {
+                perl_tag_directive = newHV();
 
-
+                hv_store(
+                    perl_tag_directive, "handle", 6,
+                    newSVpv( (char *)tag_directive->handle, strlen((char *)tag_directive->handle)), 0
+                );
+                hv_store(
+                    perl_tag_directive, "prefix", 6,
+                    newSVpv( (char *)tag_directive->prefix, strlen((char *)tag_directive->prefix)), 0
+                );
+                av_push(perl_tag_directives, newRV_noinc((SV *)perl_tag_directive));
+            }
+            hv_store(
+                perl_event, "tag_directives", 14,
+                newRV_noinc((SV *)perl_tag_directives), 0
+            );
+        }
     }
     else if (type == YAML_DOCUMENT_END_EVENT) {
         perl_event_type = "document_end_event";

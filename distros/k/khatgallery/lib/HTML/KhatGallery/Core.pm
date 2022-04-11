@@ -1,5 +1,5 @@
 package HTML::KhatGallery::Core;
-our $VERSION = '0.23'; # VERSION
+our $VERSION = '0.2402'; # VERSION
 use strict;
 use warnings;
 
@@ -9,7 +9,7 @@ HTML::KhatGallery::Core - the core methods for HTML::KhatGallery
 
 =head1 VERSION
 
-version 0.23
+version 0.2402
 
 =head1 SYNOPSIS
 
@@ -36,7 +36,7 @@ Other functions can be added or overridden by plugin modules.
 use POSIX qw(ceil);
 use File::Basename;
 use File::Spec;
-use Cwd;
+use Cwd qw(realpath);
 use File::stat;
 use YAML qw(Dump LoadFile);
 use Image::ExifTool;
@@ -422,8 +422,10 @@ sub init_settings {
     my $self = shift;
     my $dir_state = shift;
 
-    $dir_state->{abs_dir} = File::Spec->catdir($self->{top_dir}, $dir_state->{dir});
-    $dir_state->{abs_out_dir} = File::Spec->catdir($self->{top_out_dir}, $dir_state->{dir});
+    $dir_state->{abs_dir} = File::Spec->catdir(
+        realpath($self->{top_dir}), $dir_state->{dir});
+    $dir_state->{abs_out_dir} = File::Spec->catdir(
+        realpath($self->{top_out_dir}), $dir_state->{dir});
     my @path = File::Spec->splitdir($dir_state->{abs_dir});
     if ($dir_state->{dir})
     {
@@ -1768,28 +1770,79 @@ sub need_to_generate_image {
 
 =head2 index_needs_rebuilding
 
-Check to see if there are any new (or deleted) images in this
-directory.
+Check to see if there are any new (or deleted) images or directories
+in this directory.
 
 =cut
 sub index_needs_rebuilding {
     my $self = shift;
     my $dir_state = shift;
 
-    my $dir = File::Spec->catdir($dir_state->{abs_out_dir}, $self->{thumbdir});
+    # ------- Subdirs -------------
+    # Need to check if any of the subdirs are new or deleted
+ 
+    my @subdirs = @{$dir_state->{subdirs}};
+    my @dest_subdirs = ();
+    my $dirh;
+    opendir($dirh,$dir_state->{abs_out_dir});
+    while (my $fn = readdir($dirh))
+    {
+	my $abs_fn = File::Spec->catfile($dir_state->{abs_out_dir}, $fn);
+	if ($fn =~ /^\./ or $fn eq $self->{thumbdir})
+	{
+	    # skip
+	}
+	elsif (-d $abs_fn)
+	{
+	    push @dest_subdirs, $fn;
+	}
+    }
+    closedir($dirh);
+
+    my %destdir_has_src = ();
+    my %srcdir_has_dest = ();
+    # initialise to false
+    foreach my $sd ( @subdirs )
+    {
+	$srcdir_has_dest{$sd} = 0;
+    }
+    # Are there dest-dirs without src-dirs?
+    foreach my $dsd ( @dest_subdirs )
+    {
+        if (exists $srcdir_has_dest{$dsd})
+        {
+            $srcdir_has_dest{$dsd} = 1;
+            $destdir_has_src{$dsd} = 1;
+        }
+        else
+        {
+	    $destdir_has_src{$dsd} = 0;
+            return 1;
+        }
+    }
+    # Are there src-dirs without dest-dirs? 
+    while (my ($key, $dir_exists) = each(%srcdir_has_dest))
+    {
+	if (!$dir_exists)
+	{
+	    return 1;
+	}
+    }
+
+    # --------- Thumbnail Directory ----------
+    my $thumb_dir = File::Spec->catdir($dir_state->{abs_out_dir}, $self->{thumbdir});
     my @pics = @{$dir_state->{files}};
-    $self->debug(2, "dir: $dir");
+    $self->debug(2, "dir: $thumb_dir");
 
     # if the thumbnail directory doesn't exist, then either all images
     # are new, or we don't have any images in this directory
-    if (!-d $dir)
+    if (!-d $thumb_dir)
     {
 	return (@pics ? 1 : 0);
     }
 
     # Read the thumbnail directory
-    my $dirh;
-    opendir($dirh,$dir);
+    opendir($dirh,$thumb_dir);
     my @files = grep(!/^\.{1,2}$/, readdir($dirh));
     closedir($dirh);
 
@@ -1819,7 +1872,6 @@ sub index_needs_rebuilding {
 	    else
 	    {
 		$tn_has_pic{$name} = 0;
-		print "$dir has unused image pages; needs cleaning\n" if $self->{verbose};
 		return 1;
 	    }
 	}
@@ -1837,7 +1889,6 @@ sub index_needs_rebuilding {
 	    else
 	    {
 		$tn_has_pic{$name} = 0;
-		print "$dir has unused thumbnails; needs cleaning\n" if $self->{verbose};
 		return 1;
 	    }
 	}

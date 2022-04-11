@@ -44,7 +44,9 @@ my($stdout, $stderr) = capture { system(
         help
     )
 )};
-like($stdout, qr/cpandeps.*CPAN::FindDependencies.*perl.*5.8.8/, "Can spew out some help");
+$stderr =~ s/stty: stdin isn't a terminal\s//;
+is($stderr, '', "... no unexpected whining on STDERR");
+like($stdout, qr/cpandeps.*perl.*5.8.8.*CPAN::FindDependencies/, "Can spew out some help");
 
 ($stdout, $stderr) = capture { system(
     $Config{perlpath}, (map { "-I$_" } (@INC)),
@@ -71,9 +73,28 @@ eq_or_diff($stdout, "*Tie::Scalar::Decay (dist: D/DC/DCANTRELL/Tie-Scalar-Decay-
         usemakefilepl 1
     )
 )};
+is($stderr, '', "... no whining on STDERR");
 eq_or_diff($stdout, 'Tie::Scalar::Decay (dist: D/DC/DCANTRELL/Tie-Scalar-Decay-1.1.1.tar.gz)
   Time::HiRes (dist: J/JH/JHI/Time-HiRes-1.9719.tar.gz, mod ver: 1.2)
 ', "got Tie::Scalar::Decay right using Makefile.PL and --showmoduleversions (and cope with other --args too)");
+
+# same as previous test, but with args in different order
+# see https://github.com/DrHyde/perl-modules-CPAN-FindDependencies/issues/13
+($stdout, $stderr) = capture { system(
+    $Config{perlpath}, (map { "-I$_" } (@INC)),
+    qw(
+        blib/script/cpandeps
+        --mirror DEFAULT,t/cache/Tie-Scalar-Decay-1.1.1/02packages.details.txt.gz
+        cachedir t/cache/Tie-Scalar-Decay-1.1.1
+        --showmoduleversions
+        usemakefilepl 1
+        Tie::Scalar::Decay
+    )
+)};
+is($stderr, '', "... no whining on STDERR");
+eq_or_diff($stdout, 'Tie::Scalar::Decay (dist: D/DC/DCANTRELL/Tie-Scalar-Decay-1.1.1.tar.gz)
+  Time::HiRes (dist: J/JH/JHI/Time-HiRes-1.9719.tar.gz, mod ver: 1.2)
+', "same again, but with args in different order");
 
 ($stdout, $stderr) = capture { system(
     $Config{perlpath}, (map { "-I$_" } (@INC)),
@@ -84,6 +105,7 @@ eq_or_diff($stdout, 'Tie::Scalar::Decay (dist: D/DC/DCANTRELL/Tie-Scalar-Decay-1
         mirror DEFAULT,t/cache/CPAN-FindDependencies-1.1/02packages.details.txt.gz
     )
 )};
+is($stderr, '', "... no whining on STDERR");
 eq_or_diff($stdout, 'CPAN::FindDependencies (dist: D/DC/DCANTRELL/CPAN-FindDependencies-1.1.tar.gz)
   CPAN (dist: A/AN/ANDK/CPAN-1.9205.tar.gz)
     File::Temp (dist: T/TJ/TJENNESS/File-Temp-0.19.tar.gz)

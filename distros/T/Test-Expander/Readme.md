@@ -4,7 +4,6 @@
 
 # SYNOPSIS
 
-```perl
     # Tries to automatically determine, which class and method are to be tested,
     # does not create a temporary directory:
     use Test::Expander;
@@ -17,7 +16,6 @@
     # Tries to automatically determine method, class is supplied explicitly,
     # a temporary directory is created with a name corresponing to the supplied template:
     use Test::Expander -target => 'My::Class', -tempdir => { TEMPLATE => 'my_dir.XXXXXXXX' };
-```
 
 # DESCRIPTION
 
@@ -65,14 +63,12 @@ To explain this let us assume that your test file should mock the built-in **clo
 to verify if the testee properly reacts both on its success and failure.
 For this purpose a reasonable implementation might look as follows:
 
-```perl
     my $closeSuccess = 1;
     BEGIN {
       *CORE::GLOBAL::close = sub (*) { return $closeSuccess ? CORE::close($_[0]) : 0 }
     }
 
     use Test::Expander;
-```
 
 The automated recognition of name of class to be tested can only work if the test file is located in the corresponding
 subdirectory. For instance, if the class to be tested is _Foo::Bar::Baz_, then the folder with test files
@@ -81,9 +77,7 @@ related to this class should be **t/**_Foo_**/**_Bar_**/**_Baz_ or **xt/**_Foo_*
 otherwise the module name cannot be put into the exported variable **$CLASS** and, if you want to use this variable,
 should be supplied as the value of **-target**:
 
-```perl
     use Test::Expander -target => 'Foo::Bar::Baz';
-```
 
 Furthermore, the automated recognition of the name of the method / subroutine to be tested only works if the file
 containing the class mentioned above exists and if this class has the method / subroutine with the same name as the test
@@ -118,14 +112,18 @@ An environment configuration file (**.env** file) is a line-based text file.
 Its content is interpreted as follows:
 
 - if such files don't exist, the **%ENV** hash remains unchanged;
-- otherwise, if at least one of such files exists, the **%ENV** gets emptied (without localization) and
-    - lines not matching the RegEx **/^\\w+\\s\*=\\s\*\\S/** (some alphanumeric characters representing a name of
-    environment variable, optional blanks, the equal sign, again optional blanks, and at least one non-blank
-    character representing the first character of environment variable value) are skipped;
+- otherwise, if at least one of such files exists, those elements of **%ENV** are kept,
+which names are equal to names found in lines of **.env** file without values.
+All remaining elements of the **%ENV** gets emptied (without localization) and
+    - lines not matching the RegEx **/^\\w+\\s\*(?:=\\s\*\\S|$)?/** (some alphanumeric characters representing a name of
+    environment variable, optional blanks, optionally followed by the equal sign, again optional blanks,
+    and at least one non-blank character representing the first character of environment variable value) are skipped;
     - in all other lines the value of the environment variable is everything from the first non-blank
     character after the equal sign until end of the line;
-    - the value of the environment variable is evaluated by the [string eval](https://perldoc.perl.org/functions/eval)
-    so that
+    if this value is omitted, the corresponding environment variable remains unchanged as it originally was in the **%ENV**
+    (if it existed there, of course);
+    - the value of the environment variable (if provided) is evaluated by the
+    [string eval](https://perldoc.perl.org/functions/eval) so that
         - constant values must be quoted;
         - variables and subroutines must not be quoted:
 
@@ -194,7 +192,7 @@ Please report any bugs or feature requests through the web interface at
 
 # COPYRIGHT AND LICENSE
 
-Copyright (c) 2021, 2022 Jurij Fajnberg
+Copyright (c) 2021-2022 Jurij Fajnberg
 
 This program is free software; you can redistribute it and/or modify it under the same terms
 as the Perl 5 programming language system itself.

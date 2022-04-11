@@ -1,7 +1,7 @@
 <clacks>
     <appname>Clacks Master</appname>
     <ip>127.0.0.1</ip>
-    <port>18888</port>
+    <port>49888</port>
     <pingtimeout>600</pingtimeout>
     <interclackspingtimeout>60</interclackspingtimeout>
     <persistancefile>clackspersistance.dat</persistancefile>

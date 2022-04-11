@@ -1,7 +1,7 @@
 <clacks>
     <appname>Clacks Master</appname>
     <ip>127.0.0.1</ip>
-    <port>18888</port>
+    <port>49888</port>
 
     <!-- This is the magic that makes Unix domain sockets possible
          In most (is not all) cases, you should use absolute paths.

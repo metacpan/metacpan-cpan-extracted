@@ -28,7 +28,7 @@ my $reader
     ok( $mmdb_record, 'found record for ::1.1.1.0' );
 
     is(
-        $mmdb_record->{utf8_string}, 'unicode! ☯ - ♫',
+        $mmdb_record->{utf8_string}, "unicode! \x{262f} - \x{266b}",
         'decoded utf8_string has expected value'
     );
     delta_ok(
@@ -92,7 +92,7 @@ my $reader
     is( $mmdb_record->{uint64},  uint128(0), 'decoded uint64 is 0' );
     is( $mmdb_record->{uint128}, uint128(0), 'decoded uint128 is 0' );
     is_deeply( $mmdb_record->{array}, [], 'decoded array is empty' );
-    is_deeply( $mmdb_record->{map}, {},   'decoded map is empty' );
+    is_deeply( $mmdb_record->{map},   {}, 'decoded map is empty' );
     ok( !$mmdb_record->{boolean}, 'decoded false bool' );
     is( $mmdb_record->{float}, 0, 'decoded float is 0' );
 }

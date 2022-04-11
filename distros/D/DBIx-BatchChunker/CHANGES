@@ -1,6 +1,11 @@
 Changelog for DBIx-BatchChunker
 
-v0.941.0 2021-10-08T16:18:37
+v0.941.1 2022-04-11T20:32:47
+ - Pull request #10: SRE-5264 (Brendan Byrd)
+ - Update README / LICENSE (Brendan Byrd)
+ - Add safeguard when chunk resizing reaches exactly 1 ID (Brendan Byrd)
+
+v0.941.0 2021-10-08T16:18:19
  - Update README (Brendan Byrd)
  - Pull request #9: SM-2967 (Taylor Wilkerson)
  - Support process_past_max without $DB_MAX_ID and $ls->max_end (Brendan

@@ -6,6 +6,7 @@ META.json
 META.yml
 Makefile
 Makefile.PL
+README.md
 cpanfile
 dist.ini
 examples/s3_presigned_url.pl
@@ -18,4 +19,5 @@ lib/Signer/AWSv4/SES.pm
 t/02_s3.t
 t/03_eks.t
 t/04_rds.t
+t/04_rds_with_session_token.t
 t/05_ses.t

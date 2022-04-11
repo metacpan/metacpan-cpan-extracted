@@ -1,4 +1,11 @@
-0.002   2019-01-15 (PERLANCAR)
+0.003   2022-03-18  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - Tweak Abstract (add 'List of ...') to follow convention.
+
+
+0.002   2019-01-15  Released-By: PERLANCAR
 
 	- Make pp_module scalar, not array.
 
@@ -6,6 +13,6 @@
 	  versions of all PP modules installed on your system.
 
 
-0.001   2019-01-15 (PERLANCAR)
+0.001   2019-01-15  Released-By: PERLANCAR
 
         - First release.

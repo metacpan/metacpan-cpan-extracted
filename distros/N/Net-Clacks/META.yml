@@ -31,5 +31,5 @@ requires:
   Time::HiRes: '0'
   XML::Simple: '0'
   YAML::Syck: '0'
-version: '22'
+version: '23'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

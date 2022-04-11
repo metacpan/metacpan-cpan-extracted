@@ -1566,7 +1566,7 @@ since they will not contain any bad values.
 
 
 
-#line 568 "ufunc.pd"
+#line 552 "ufunc.pd"
 
 =head2 avg
 
@@ -1596,7 +1596,7 @@ sub PDL::avg {
 
 
 
-#line 568 "ufunc.pd"
+#line 552 "ufunc.pd"
 
 =head2 sum
 
@@ -1626,7 +1626,7 @@ sub PDL::sum {
 
 
 
-#line 568 "ufunc.pd"
+#line 552 "ufunc.pd"
 
 =head2 prod
 
@@ -1656,7 +1656,7 @@ sub PDL::prod {
 
 
 
-#line 568 "ufunc.pd"
+#line 552 "ufunc.pd"
 
 =head2 davg
 
@@ -1686,7 +1686,7 @@ sub PDL::davg {
 
 
 
-#line 568 "ufunc.pd"
+#line 552 "ufunc.pd"
 
 =head2 dsum
 
@@ -1716,7 +1716,7 @@ sub PDL::dsum {
 
 
 
-#line 568 "ufunc.pd"
+#line 552 "ufunc.pd"
 
 =head2 dprod
 
@@ -1746,7 +1746,7 @@ sub PDL::dprod {
 
 
 
-#line 568 "ufunc.pd"
+#line 552 "ufunc.pd"
 
 =head2 zcheck
 
@@ -1776,7 +1776,7 @@ sub PDL::zcheck {
 
 
 
-#line 568 "ufunc.pd"
+#line 552 "ufunc.pd"
 
 =head2 and
 
@@ -1806,7 +1806,7 @@ sub PDL::and {
 
 
 
-#line 568 "ufunc.pd"
+#line 552 "ufunc.pd"
 
 =head2 band
 
@@ -1836,7 +1836,7 @@ sub PDL::band {
 
 
 
-#line 568 "ufunc.pd"
+#line 552 "ufunc.pd"
 
 =head2 or
 
@@ -1866,7 +1866,7 @@ sub PDL::or {
 
 
 
-#line 568 "ufunc.pd"
+#line 552 "ufunc.pd"
 
 =head2 bor
 
@@ -1896,7 +1896,7 @@ sub PDL::bor {
 
 
 
-#line 568 "ufunc.pd"
+#line 552 "ufunc.pd"
 
 =head2 min
 
@@ -1926,7 +1926,7 @@ sub PDL::min {
 
 
 
-#line 568 "ufunc.pd"
+#line 552 "ufunc.pd"
 
 =head2 max
 
@@ -1956,7 +1956,7 @@ sub PDL::max {
 
 
 
-#line 568 "ufunc.pd"
+#line 552 "ufunc.pd"
 
 =head2 median
 
@@ -1986,7 +1986,7 @@ sub PDL::median {
 
 
 
-#line 568 "ufunc.pd"
+#line 552 "ufunc.pd"
 
 =head2 mode
 
@@ -2016,7 +2016,7 @@ sub PDL::mode {
 
 
 
-#line 568 "ufunc.pd"
+#line 552 "ufunc.pd"
 
 =head2 oddmedian
 
@@ -2046,7 +2046,7 @@ sub PDL::oddmedian {
 
 
 
-#line 598 "ufunc.pd"
+#line 582 "ufunc.pd"
 
 
 =head2 any
@@ -2413,7 +2413,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1003 "ufunc.pd"
+#line 943 "ufunc.pd"
 
 =head2 pct
 
@@ -2421,8 +2421,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 Return the specified percentile of all elements in an ndarray. The
 specified percentile (p) must be between 0.0 and 1.0.  When the
-specified percentile falls between data points, the result is
-interpolated.
+specified percentile falls between data points, the result is interpolated.
 
 =for usage
 
@@ -2436,20 +2435,19 @@ sub PDL::pct {
 	$x->clump(-1)->pctover($p, my $tmp=PDL->nullcreate($x));
 	$tmp;
 }
-#line 2440 "Ufunc.pm"
+#line 2439 "Ufunc.pm"
 
 
 
-#line 1028 "ufunc.pd"
+#line 943 "ufunc.pd"
 
 =head2 oddpct
 
 =for ref
 
 Return the specified percentile of all elements in an ndarray. The
-specified percentile must be between 0.0 and 1.0.  When the specified
-percentile falls between two values, the nearest data value is the
-result.
+specified percentile (p) must be between 0.0 and 1.0.  When the
+specified percentile falls between data points, the nearest data value is the result.
 
 =for usage
 
@@ -2463,7 +2461,7 @@ sub PDL::oddpct {
 	$x->clump(-1)->oddpctover($p, my $tmp=PDL->nullcreate($x));
 	$tmp;
 }
-#line 2467 "Ufunc.pm"
+#line 2465 "Ufunc.pm"
 
 
 
@@ -2499,14 +2497,14 @@ Bad values are moved to the end of the array:
 
 
 =cut
-#line 2503 "Ufunc.pm"
+#line 2501 "Ufunc.pm"
 
 
 
 #line 1060 "../../blib/lib/PDL/PP.pm"
 
 *qsort = \&PDL::qsort;
-#line 2510 "Ufunc.pm"
+#line 2508 "Ufunc.pm"
 
 
 
@@ -2543,14 +2541,14 @@ Bad elements are moved to the end of the array:
 
 
 =cut
-#line 2547 "Ufunc.pm"
+#line 2545 "Ufunc.pm"
 
 
 
 #line 1060 "../../blib/lib/PDL/PP.pm"
 
 *qsorti = \&PDL::qsorti;
-#line 2554 "Ufunc.pm"
+#line 2552 "Ufunc.pm"
 
 
 
@@ -2601,14 +2599,14 @@ Vectors with bad components are moved to the end of the array:
 
 
 =cut
-#line 2605 "Ufunc.pm"
+#line 2603 "Ufunc.pm"
 
 
 
 #line 1060 "../../blib/lib/PDL/PP.pm"
 
 *qsortvec = \&PDL::qsortvec;
-#line 2612 "Ufunc.pm"
+#line 2610 "Ufunc.pm"
 
 
 
@@ -2647,20 +2645,20 @@ for L</qsortvec>.
 
 
 =cut
-#line 2651 "Ufunc.pm"
+#line 2649 "Ufunc.pm"
 
 
 
 #line 1060 "../../blib/lib/PDL/PP.pm"
 
 *qsortveci = \&PDL::qsortveci;
-#line 2658 "Ufunc.pm"
+#line 2656 "Ufunc.pm"
 
 
 
 
 
-#line 1298 "ufunc.pd"
+#line 1191 "ufunc.pd"
 
 
 =head1 AUTHOR
@@ -2675,7 +2673,7 @@ from the PDL distribution, the copyright notice should be included in
 the file.
 
 =cut
-#line 2679 "Ufunc.pm"
+#line 2677 "Ufunc.pm"
 
 
 

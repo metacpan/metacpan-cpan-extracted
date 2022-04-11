@@ -6169,9 +6169,64 @@ SV * overload_inc(pTHX_ SV * a, SV * b, SV * third) {
 }
 
 SV * overload_dec(pTHX_ SV * p, SV * b, SV * third) {
+     DEAL_WITH_NANFLAG_BUG_OVERLOADED
      SvREFCNT_inc(p);
      mpfr_sub_ui(*(INT2PTR(mpfr_t *, SvIVX(SvRV(p)))), *(INT2PTR(mpfr_t *, SvIVX(SvRV(p)))), 1, __gmpfr_default_rounding_mode);
      return p;
+}
+
+SV * overload_mul_2exp(pTHX_ SV * a, SV * b, SV * third) {
+     mpfr_t * mpfr_t_obj, t;
+     SV * obj_ref, * obj;
+
+     NEW_MATH_MPFR_OBJECT("Math::MPFR",overload_mul_2exp) /* defined in math_mpfr_include.h */
+     mpfr_init(*mpfr_t_obj);
+     OBJ_READONLY_ON /*defined in math_mpfr_include.h */
+
+     if(SV_IS_IOK(b)) {
+       if(SvUOK(b)) mpfr_mul_2ui(*mpfr_t_obj, *(INT2PTR(mpfr_t *, SvIVX(SvRV(a)))), SvUV(b), __gmpfr_default_rounding_mode);
+       else         mpfr_mul_2si(*mpfr_t_obj, *(INT2PTR(mpfr_t *, SvIVX(SvRV(a)))), SvUV(b), __gmpfr_default_rounding_mode);
+       return obj_ref;
+     }
+     croak ("In overloading of '<<' operator, the 'shift' operand must be a perl integer value (IV)");
+}
+
+SV * overload_div_2exp(pTHX_ SV * a, SV * b, SV * third) {
+     mpfr_t * mpfr_t_obj, t;
+     SV * obj_ref, * obj;
+
+     NEW_MATH_MPFR_OBJECT("Math::MPFR",overload_div_2exp) /* defined in math_mpfr_include.h */
+     mpfr_init(*mpfr_t_obj);
+     OBJ_READONLY_ON /*defined in math_mpfr_include.h */
+
+     if(SV_IS_IOK(b)) {
+       if(SvUOK(b)) mpfr_div_2ui(*mpfr_t_obj, *(INT2PTR(mpfr_t *, SvIVX(SvRV(a)))), SvUV(b), __gmpfr_default_rounding_mode);
+       else         mpfr_div_2si(*mpfr_t_obj, *(INT2PTR(mpfr_t *, SvIVX(SvRV(a)))), SvUV(b), __gmpfr_default_rounding_mode);
+       return obj_ref;
+     }
+     croak ("In overloading of '>>' operator, the 'shift' operand must be a perl integer value (IV)");
+}
+
+SV * overload_mul_2exp_eq(pTHX_ SV * a, SV * b, SV * third) {
+     SvREFCNT_inc(a);
+     if(SV_IS_IOK(b)) {
+       if(SvUOK(b)) mpfr_mul_2ui(*(INT2PTR(mpfr_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpfr_t *, SvIVX(SvRV(a)))), SvUVX(b), __gmpfr_default_rounding_mode);
+       else         mpfr_mul_2si(*(INT2PTR(mpfr_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpfr_t *, SvIVX(SvRV(a)))), SvUVX(b), __gmpfr_default_rounding_mode);
+       return a;
+     }
+     SvREFCNT_dec(a);
+     croak ("In overloading of '<<=' operator, the 'shift' operand must be a perl integer value (IV)");
+}
+
+SV * overload_div_2exp_eq(pTHX_ SV * a, SV * b, SV * third) {
+     SvREFCNT_inc(a);
+     if(SV_IS_IOK(b)) {
+       if(SvUOK(b)) mpfr_div_2ui(*(INT2PTR(mpfr_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpfr_t *, SvIVX(SvRV(a)))), SvUVX(b), __gmpfr_default_rounding_mode);
+       else         mpfr_div_2si(*(INT2PTR(mpfr_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpfr_t *, SvIVX(SvRV(a)))), SvUVX(b), __gmpfr_default_rounding_mode);
+       return a;
+     }
+     SvREFCNT_dec(a);
+     croak ("In overloading of '>>=' operator, the 'shift' operand must be a perl integer value (IV)");
 }
 
 SV * _wrap_count(pTHX) {
@@ -13221,6 +13276,42 @@ overload_dec (p, b, third)
 	SV *	third
 CODE:
   RETVAL = overload_dec (aTHX_ p, b, third);
+OUTPUT:  RETVAL
+
+SV *
+overload_mul_2exp (a, b, third)
+	SV *	a
+	SV *	b
+	SV *	third
+CODE:
+  RETVAL = overload_mul_2exp (aTHX_ a, b, third);
+OUTPUT:  RETVAL
+
+SV *
+overload_div_2exp (a, b, third)
+	SV *	a
+	SV *	b
+	SV *	third
+CODE:
+  RETVAL = overload_div_2exp (aTHX_ a, b, third);
+OUTPUT:  RETVAL
+
+SV *
+overload_mul_2exp_eq (a, b, third)
+	SV *	a
+	SV *	b
+	SV *	third
+CODE:
+  RETVAL = overload_mul_2exp_eq (aTHX_ a, b, third);
+OUTPUT:  RETVAL
+
+SV *
+overload_div_2exp_eq (a, b, third)
+	SV *	a
+	SV *	b
+	SV *	third
+CODE:
+  RETVAL = overload_div_2exp_eq (aTHX_ a, b, third);
 OUTPUT:  RETVAL
 
 SV *

@@ -333,6 +333,7 @@ sub XPending {
    my($self) = @_;
    if ( $self->{window_type} eq 'glut' ) {
       # monitor state of @fakeXEvents, return number on queue
+      OpenGL::GLUT::glutMainLoopEvent() if !@{$self->{xevents}};
       print STDERR "OO::XPending: have " .  scalar( @{$self->{xevents}} ) . " xevents\n" if $PDL::Graphics::TriD::verbose > 1;
       scalar( @{$self->{xevents}} );
    } else {
@@ -385,11 +386,52 @@ OO interface to the glpRasterFont function
 
 =cut
 
-sub glpRasterFont{
-   my($this,@args) = @_;
-   OpenGL::glpRasterFont($args[0],$args[1],$args[2],$this->{Display});
+sub glpRasterFont {
+  my($this,@args) = @_;
+  if ( $this->{window_type} eq 'glut' ) {
+     print STDERR "gdriver: window_type => 'glut' so not actually setting the rasterfont\n" if $PDL::Graphics::TriD::verbose;
+     return eval { OpenGL::GLUT_BITMAP_8_BY_13() };
+  } else {
+     # NOTE: glpRasterFont() will die() if the requested font cannot be found
+     #       The new POGL+GLUT TriD implementation uses the builtin GLUT defined
+     #       fonts and does not have this failure mode.
+     my $lb =  eval { OpenGL::glpRasterFont(@args[0..2],$this->{Display}) };
+     if ( $@ ) {
+        die "glpRasterFont: unable to load font '%s', please set PDL_3D_FONT to an existing X11 font.";
+     }
+     return $lb;
+  }
 }
 
+=head2 swap_buffers
+
+OO interface to swapping display buffers
+
+=cut
+
+sub swap_buffers {
+  my ($this) = @_;
+  if ( $this->{window_type} eq 'glut' ) {
+    OpenGL::GLUT::glutSwapBuffers();
+  } elsif ( $this->{window_type} eq 'x11' ) {
+    $this->glXSwapBuffers();
+  } else {
+    die "swap_buffers: got object with inconsistent _GLObject info\n";
+  }
+}
+
+=head2 set_window
+
+OO interface to setting the display window (if appropriate)
+
+=cut
+
+sub set_window {
+  my ($this) = @_;
+  return if $this->{window_type} ne 'glut';
+  # set GLUT context to current window (for multiwindow support)
+  OpenGL::GLUT::glutSetWindow($this->{glutwindow});
+}
 
 =head2 AUTOLOAD
 

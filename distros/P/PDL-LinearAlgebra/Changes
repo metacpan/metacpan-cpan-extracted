@@ -1,3 +1,12 @@
+0.29 2022-04-10
+- fix mnull reporting different solution on Windows - thanks @aero for CPANTesters report
+- remove PDL::Complex method aliases now in PDL 2.078
+
+0.28 2022-04-09
+- allow alternative values for complex U in mschur (#12) - thanks @sebastic for report
+- use C macro "FORTRAN()" to hide whether need _ on end of symbols
+- use [t] Pars instead of malloc for fixed-size workspace
+
 0.27 2022-04-06
 - now 64-bit safe
 - t, issym, tritosym method for complex now defaults to not conjugate

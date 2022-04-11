@@ -1,0 +1,16 @@
+RPC-Switch-Client-Tiny
+======================
+
+Lightweight client for the RPC-Switch json-rpc request multiplexer.
+
+This module works on a single socket connection, and has no
+dependencies on the Mojo framework like the RPC-Switch-Client
+module.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2022 by Barnim Dzwillo
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+

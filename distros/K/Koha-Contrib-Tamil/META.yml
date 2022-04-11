@@ -72,5 +72,5 @@ requires:
   warnings: '0'
 resources:
   repository: http://git.tamil.fr/git/Koha-Contrib-Tamil
-version: '0.067'
+version: '0.068'
 x_serialization_backend: 'YAML::Tiny version 1.70'

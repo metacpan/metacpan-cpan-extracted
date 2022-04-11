@@ -1,6 +1,12 @@
 https://github.com/amaltsev/XAO-Web
 -----------------------------------
 
+commit e5655b72472e3e9b899270b4729df7f240558ade
+Author: Andrew Maltsev <am@ejelta.com>
+Date:   Fri Apr 8 19:04:06 2022 -0700
+
+    1.88 Added array operations to Web::Clipboard
+
 commit 888d6b90c512e5f0e62f96a1fd7f7fd2e471f37a
 Author: Andrew Maltsev <am@ejelta.com>
 Date:   Tue Jun 8 14:53:36 2021 -0700
@@ -74,12 +80,4 @@ Date:   Mon Jul 20 19:13:39 2020 -0700
     v1.81 Test case fix for XAO::Base 1.27
     
     Single quote is now encoded differently.
-
-commit 7ff480a0dff0e32dcbbfaf5539548ab9647b278d
-Author: Andrew Maltsev <am@ejelta.com>
-Date:   Tue Feb 11 19:04:24 2020 -0800
-
-    Better format for benchmark dprint() output
-    
-    Easier to read when it forms columns and the total is first.
 

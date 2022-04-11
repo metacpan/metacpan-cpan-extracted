@@ -2,7 +2,7 @@ package Test2::Harness::Renderer::Formatter;
 use strict;
 use warnings;
 
-our $VERSION = '1.000123';
+our $VERSION = '1.000124';
 
 use Carp qw/croak/;
 
@@ -47,12 +47,13 @@ sub init {
     }
 
     $self->{+FORMATTER} = $f_class->new(
-        io       => $self->{+IO},
-        progress => $self->{+PROGRESS},
-        handles  => [$self->{+IO}, $self->{+IO_ERR}, $self->{+IO}],
-        verbose  => $settings->display->verbose,
-        color    => $settings->display->color,
-        no_wrap  => $settings->display->no_wrap,
+        io            => $self->{+IO},
+        progress      => $self->{+PROGRESS},
+        handles       => [$self->{+IO}, $self->{+IO_ERR}, $self->{+IO}],
+        verbose       => $settings->display->verbose,
+        color         => $settings->display->color,
+        no_wrap       => $settings->display->no_wrap,
+        is_persistent => $self->{+COMMAND_CLASS}->group eq 'persist' ? 1 : 0,
     );
 
     $self->{+DO_STEP} = $self->{+FORMATTER}->can('step') ? 1 : 0;

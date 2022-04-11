@@ -288,6 +288,22 @@ GENPROC
 
 sub DESTROY {}
 
+sub _debug
+{
+	my $f = shift;
+	printf STDERR "%d.%s [%dx%d]",
+		@{$f}{qw(size name width height)};
+	print STDERR " thin"   if $f->{style} & fs::Thin;
+	print STDERR " bold"   if $f->{style} & fs::Bold;
+	print STDERR " italic" if $f->{style} & fs::Italic;
+	print STDERR " fixed"  if $f->{pitch} == fp::Fixed;
+	print STDERR " B"      if $f->{vector} == fv::Bitmap;
+
+	printf STDERR " dir=%g", $f->{direction} if $f->{direction} != 0.0;
+	printf STDERR " %s",     $f->{encoding};
+	print STDERR "\n";
+}
+
 package Prima::Component;
 use vars qw(@ISA);
 @ISA = qw(Prima::Object);
@@ -609,6 +625,8 @@ sub fillWinding # compatibility
 	return $_[0]->fillMode & fm::Winding unless $#_;
 	$_[0]->fillMode(($_[1] ? fm::Winding : fm::Alternate) | fm::Overlay);
 }
+
+sub font_mapper { Prima::Font::Mapper->new( shift ) }
 
 package Prima::Image;
 use vars qw( @ISA);
@@ -1989,6 +2007,33 @@ sub set_text
 	$self-> notify( 'Change');
 	$self-> repaint;
 }
+
+package Prima::Font::Mapper;
+
+sub new { bless { canvas => $_[1] }, $_[0] }
+
+sub get   { Prima::Application->font_mapper_action( command => 'get_font', index => $_[1] ) }
+sub count { Prima::Application->font_mapper_action( command => 'get_count' ) }
+
+sub index
+{
+	my $canvas = $_[0]->{canvas};
+	return undef unless $canvas;
+	return Prima::Application->font_mapper_action( command => 'get_index', font => $canvas->font );
+}
+
+sub AUTOLOAD
+{
+	no strict;
+	my $self = shift;
+	my $cmd = $AUTOLOAD;
+	$cmd =~ s/.*://;
+	my %font = ( style => fs::Normal, @_ );
+	Carp::carp("at least font name is required"), return -1 unless exists $font{name};
+	return Prima::Application->font_mapper_action( command => $cmd, font => \%font );
+}
+
+sub DESTROY {}
 
 package Prima::Application;
 use vars qw(@ISA @startupNotifications);

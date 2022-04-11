@@ -13,6 +13,14 @@ On the bright side, after you've gone through this document and implemented requ
 to enjoy a newer, shinier version of your favourite real time interprocess messaging system. While i strive to
 remove bugs in each release, sometimes new ones creep in. Just keep bugging me about them until i fix them as well.
 
+=head1 SECURITY AND BACKWARD COMPATIBILITY
+
+WARNING: The author of this module only tests against stable Perl versions that are still considered "in maintenance".
+Since <Net::Clacks> contains network code, the author of this module strongly recommends to always keep your Perl installation
+as well as Net::Clacks up-to-date for security reasons.
+
+Net::Clacks may work with older versions of Perl that are out of maintenance, but these may have unfixed security flaws.
+
 =head1 IMPORTANT UPGRADE NOTES
 
 =head2 VERSION 6
@@ -261,6 +269,16 @@ of Net::Clacks tries its best to rectify that. Of course, this can't replace pro
 This version also implements "forget stale entries". That means, it removes cached entries which have not been accessed (STORE, SETANDSTORE, INCREMENT, DECREMENT, RETRIEVE) in a long time. The
 default timeframe if 24 hours, but this can be configured with the "stalecachetime" parameter (in seconds). This means that the persistancefile format changes, but this will be upgraded transparently
 by the software during startup. This changes the interclacks KEYSYNC command to include the last access time.
+
+=head2 VERSION 23
+
+This purely internal change does not break backward compatibility.
+
+Version 23 switches Net::Clacks to use function signatures (features 'signatures'). This makes the code a bit clearer to read, properly enforces the correct number of function arguments and will
+allow slimming down the argument checking in future releases.
+
+WARNING: While this change should work with Perl 5.20 and up, the author of this module only tests against stable Perl versions that are still considered "in maintenance". As of this module release,
+these are 5.32.x and 5.34.x. Since <Net::Clacks> contains network code, the author of this module recommends to always keep your Perl installation as well as Net::Clacks up-to-date for security reasons.
 
 =head1 AUTHOR
 

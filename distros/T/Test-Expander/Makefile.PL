@@ -21,7 +21,7 @@ WriteMakefile(
 		'File::Temp'            => 0,
 		'Importer'              => 0,
 		'PadWalker'             => 0,
-		'Path::Tiny'            => 0,
+		'Path::Tiny'            => '0.122',
 		'Scalar::Readonly'      => 0,
 		'Test::Files'           => 0,
 		'Test::Output'          => 0,

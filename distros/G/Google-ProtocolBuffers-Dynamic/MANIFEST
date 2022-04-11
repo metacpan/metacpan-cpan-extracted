@@ -43,6 +43,7 @@ src/upbwrapper.h
 t/001_load.t
 t/010_basic.t
 t/020_primitives.t
+t/021_bool.t
 t/025_bigints.t
 t/030_repeated.t
 t/032_map.t
@@ -79,6 +80,7 @@ t/220_accessor_style.t
 t/225_decode_unblessed.t
 t/235_fail_ref_coercion.t
 t/300_scalar_accessors.t
+t/301_boolean_accessors.t
 t/305_oneof_accessors.t
 t/310_list_accessors.t
 t/315_message_accessors.t

@@ -59,7 +59,7 @@
          "url" : "http://github.com/shlomif/html-tidy5"
       }
    },
-   "version" : "0.011",
+   "version" : "0.013",
    "x_contributors" : [
       "Andy Lester <andy@petdance.com>",
       "Jonathan Rockway <jrockway@cpan.org>",

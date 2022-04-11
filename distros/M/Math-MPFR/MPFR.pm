@@ -40,6 +40,9 @@
     use constant MPFR_3_1_6_OR_LATER    => Math::MPFR::Random::_MPFR_VERSION() > 196869 ? 1 : 0;
     use constant MPFR_PV_NV_BUG         => Math::MPFR::Random::_has_pv_nv_bug();
 
+    # Inspired by https://github.com/Perl/perl5/issues/19550:
+    use constant ISSUE_19550    => Math::MPFR::Random::_issue_19550();
+
     use subs qw(MPFR_VERSION MPFR_VERSION_MAJOR MPFR_VERSION_MINOR
                 MPFR_VERSION_PATCHLEVEL MPFR_VERSION_STRING
                 RMPFR_PREC_MIN RMPFR_PREC_MAX
@@ -72,6 +75,10 @@
     'abs'  => \&overload_abs,
     '**'   => \&overload_pow,
     '**='  => \&overload_pow_eq,
+    '<<'   => \&overload_mul_2exp,
+    '<<='  => \&overload_mul_2exp_eq,
+    '>>'   => \&overload_div_2exp,
+    '>>='  => \&overload_div_2exp_eq,
     'atan2'=> \&overload_atan2,
     'cos'  => \&overload_cos,
     'sin'  => \&overload_sin,
@@ -182,7 +189,7 @@ fr_cmp_q_rounded mpfr_max_orig_len mpfr_min_inter_prec mpfrtoa numtoa nvtoa prec
 q_add_fr q_cmp_fr q_div_fr q_mul_fr q_sub_fr rndna
 );
 
-    our $VERSION = '4.21';
+    our $VERSION = '4.22';
     #$VERSION = eval $VERSION;
 
     Math::MPFR->DynaLoader::bootstrap($VERSION);
@@ -428,7 +435,13 @@ sub new {
 
     # $_[0] is the value, $_[1] (if supplied) is the base of the number
     # in the string $[_0].
-    $arg1 = shift;
+    $arg1 = shift; # At this point, an infnan might acquire a POK flag - thus
+                   # assigning to $type a value of 4, instead of 3. Such behaviour also
+                   # turns $arg into a PV and NV dualvar. It's a fairly inconsequential
+                   # bug - https://github.com/Perl/perl5/issues/19550.
+                   # I could workaround this by simply not shifting and re-assigning, but
+                   # I'll leave it as it is - otherwise there's nothing to mark that this
+                   # minor issue (which might also show up in user code) ever existed.
     $base = 0;
 
     $type = _itsa($arg1);
