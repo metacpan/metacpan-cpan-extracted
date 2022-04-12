@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Is::Any::Is - Package for language Icelandic
 =cut
 
 package Locale::CLDR::Locales::Is::Any::Is;
-# This file auto generated from Data\common\main\is_IS.xml
-#	on Sun  3 Feb  1:57:45 pm GMT
+# This file auto generated from Data/common/main/is_IS.xml
+#	on Mon 11 Apr  5:30:43 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';

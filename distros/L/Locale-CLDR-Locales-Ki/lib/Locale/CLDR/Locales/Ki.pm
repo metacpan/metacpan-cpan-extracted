@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Ki - Package for language Kikuyu
 =cut
 
 package Locale::CLDR::Locales::Ki;
-# This file auto generated from Data\common\main\ki.xml
-#	on Sun  3 Feb  2:00:10 pm GMT
+# This file auto generated from Data/common/main/ki.xml
+#	on Mon 11 Apr  5:31:32 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -842,12 +842,12 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'abbreviated' => {
-					'pm' => q{Hwaĩ-inĩ},
 					'am' => q{Kiroko},
+					'pm' => q{Hwaĩ-inĩ},
 				},
 				'wide' => {
-					'pm' => q{Hwaĩ-inĩ},
 					'am' => q{Kiroko},
+					'pm' => q{Hwaĩ-inĩ},
 				},
 			},
 		},

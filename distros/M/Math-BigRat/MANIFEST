@@ -21,7 +21,9 @@ t/binv-mbr.t
 t/bitwise.t
 t/bnok-mbr.t
 t/const-mbr.t
+t/downgrade.t
 t/dparts-mbr.t
+t/fparts-mbr.t
 t/hang.t
 t/Math/BigRat/Test.pm
 t/new-mbr.t

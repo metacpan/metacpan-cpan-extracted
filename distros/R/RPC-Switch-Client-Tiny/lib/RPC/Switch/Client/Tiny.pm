@@ -9,7 +9,6 @@ use strict;
 use warnings;
 use Carp 'croak';
 use JSON;
-use Fcntl;
 use IO::Select;
 use IO::Socket::SSL;
 use Time::HiRes qw(time);
@@ -18,13 +17,13 @@ use RPC::Switch::Client::Tiny::Netstring;
 use RPC::Switch::Client::Tiny::Async;
 use RPC::Switch::Client::Tiny::SessionCache;
 
-our $VERSION = '1.53';
+our $VERSION = '1.54';
 
 sub new {
 	my ($class, %args) = @_;
 	my $s = $args{sock} or croak __PACKAGE__ . " expects sock";
-	my $f = fcntl($s, F_GETFL, 0) or croak __PACKAGE__ . " bad socket: $!";
-	if ($f & O_NONBLOCK) { croak __PACKAGE__ . " nonblocking socket not supported"; }
+	defined(my $b = $s->blocking()) or croak __PACKAGE__ . " bad socket: $!";
+	unless ($b) { croak __PACKAGE__ . " nonblocking socket not supported"; }
 	unless (exists $args{who}) { croak __PACKAGE__ . " expects who"; }
 	my $self = bless {
 		%args,
@@ -742,11 +741,11 @@ of the rpc-switch server.
 
 The implementation is based on the following protocols:
 
-- json-rpc 2.0: https://www.jsonrpc.org/specification
+- json-rpc 2.0: L<https://www.jsonrpc.org/specification>
 
-- netstring proto: http://cr.yp.to/proto/netstrings.txt
+- netstring proto: L<http://cr.yp.to/proto/netstrings.txt>
 
-- rpc-switch: https://github.com/a6502/rpc-switch
+- rpc-switch: L<https://github.com/a6502/rpc-switch>
 
 =head2 Error Handling
 
@@ -776,7 +775,7 @@ To pass latin1-strings as parameter, a caller would have to convert
 the input first. (see: $utf8 = Encode::encode('utf8', $latin1)).
 
 The json-rpc messages are also utf8-encoded when they are transmitted.
-(see: https://metacpan.org/pod/JSON#utf8)
+(see: L<https://metacpan.org/pod/JSON#utf8>)
 
 =head2 Async handling
 
@@ -800,7 +799,7 @@ one request with the same session_id.
 
 The session handling is loosely based on the HTTP Set-Cookie/Cookie
 Mechanism described in RFC 6265, and uses json paramters instead of
-http-headers. (see: https://datatracker.ietf.org/doc/html/rfc6265)
+http-headers. (see: L<https://datatracker.ietf.org/doc/html/rfc6265>)
 
 - the worker signals a set_session request via:
 
@@ -968,11 +967,11 @@ The valid fields of the $method_definition are:
 
 =over 4
 
-=item - cb: method handler (required)
+=item cb: method handler (required)
 
-=item - doc: optional documentation for method
+=item doc: optional documentation for method
 
-=item - filter: optional filter to restrict method subset of params
+=item filter: optional filter to restrict method subset of params
 
 =back
 

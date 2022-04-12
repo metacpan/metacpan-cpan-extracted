@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Khq - Package for language Koyra Chiini
 =cut
 
 package Locale::CLDR::Locales::Khq;
-# This file auto generated from Data\common\main\khq.xml
-#	on Sun  3 Feb  2:00:09 pm GMT
+# This file auto generated from Data/common/main/khq.xml
+#	on Mon 11 Apr  5:31:32 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -854,8 +854,8 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'abbreviated' => {
-					'pm' => q{Aluula},
 					'am' => q{Adduha},
+					'pm' => q{Aluula},
 				},
 				'wide' => {
 					'am' => q{Adduha},

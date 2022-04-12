@@ -26,6 +26,7 @@ requires:
   File::Share: '0'
   HTTP::Request: '0'
   JSON: '0'
+  LWP::Protocol::https: '0'
   MIME::Base64: '3.16'
   URI: '0'
   WWW::Mechanize: '0'
@@ -33,5 +34,5 @@ requires:
 resources:
   bugtracker: https://github.com/stevieb9/tesla-api/issues
   repository: https://github.com/stevieb9/tesla-api.git
-version: '0.09'
+version: '0.10'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

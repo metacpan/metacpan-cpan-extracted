@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Bem::Any::Zm - Package for language Bemba
 =cut
 
 package Locale::CLDR::Locales::Bem::Any::Zm;
-# This file auto generated from Data\common\main\bem_ZM.xml
-#	on Sun  3 Feb  1:40:30 pm GMT
+# This file auto generated from Data/common/main/bem_ZM.xml
+#	on Mon 11 Apr  5:24:15 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';

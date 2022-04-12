@@ -1,5 +1,5 @@
 package HTML::KhatGallery;
-our $VERSION = '0.2402'; # VERSION
+our $VERSION = '0.2405'; # VERSION
 use strict;
 use warnings;
 
@@ -9,7 +9,7 @@ HTML::KhatGallery - HTML photo album generator.
 
 =head1 VERSION
 
-version 0.2402
+version 0.2405
 
 =head1 SYNOPSIS
 

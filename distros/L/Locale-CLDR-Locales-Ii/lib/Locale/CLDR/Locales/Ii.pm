@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Ii - Package for language Sichuan Yi
 =cut
 
 package Locale::CLDR::Locales::Ii;
-# This file auto generated from Data\common\main\ii.xml
-#	on Sun  3 Feb  1:57:20 pm GMT
+# This file auto generated from Data/common/main/ii.xml
+#	on Mon 11 Apr  5:30:34 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -505,8 +505,8 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'abbreviated' => {
-					'pm' => q{ꁯꋒ},
 					'am' => q{ꎸꄑ},
+					'pm' => q{ꁯꋒ},
 				},
 				'wide' => {
 					'am' => q{ꎸꄑ},

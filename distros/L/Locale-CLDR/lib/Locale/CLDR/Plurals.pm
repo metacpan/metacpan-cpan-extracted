@@ -1,12 +1,12 @@
 package Locale::CLDR::Plurals;
-# This file auto generated from Data\common\supplemental\ordinals.xml
-#	on Sun  3 Feb  1:37:01 pm GMT
+# This file auto generated from Data/common/supplemental/ordinals.xml
+#	on Mon 11 Apr  5:22:53 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -28,6 +28,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -44,6 +45,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (0..1)) ;
@@ -60,6 +62,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$i == $_} (0)) ||  scalar (grep {$n == $_} (1)) ;
@@ -76,6 +79,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n % 100 == $_} (3..10)) ;
@@ -90,6 +94,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n % 100 == $_} (11..99)) ;
@@ -104,6 +109,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -118,6 +124,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (2)) ;
@@ -132,6 +139,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (0)) ;
@@ -148,6 +156,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n % 100 == $_} (3..10)) ;
@@ -162,6 +171,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n % 100 == $_} (11..99)) ;
@@ -176,6 +186,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -190,6 +201,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (2)) ;
@@ -204,6 +216,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (0)) ;
@@ -220,6 +233,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$i == $_} (0)) ||  scalar (grep {$n == $_} (1)) ;
@@ -236,6 +250,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -252,6 +267,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$i == $_} (1)) &&  scalar (grep {$v == $_} (0)) ;
@@ -268,6 +284,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -284,6 +301,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n % 10 == $_} (2..4)) && ! scalar (grep {$n % 100 == $_} (12..14)) ;
@@ -298,6 +316,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n % 10 == $_} (0)) ||  scalar (grep {$n % 10 == $_} (5..9)) ||  scalar (grep {$n % 100 == $_} (11..14)) ;
@@ -312,6 +331,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n % 10 == $_} (1)) && ! scalar (grep {$n % 100 == $_} (11)) ;
@@ -328,6 +348,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -344,6 +365,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -360,6 +382,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -376,6 +399,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (0..1)) ;
@@ -392,6 +416,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$i == $_} (0)) ||  scalar (grep {$n == $_} (1)) ;
@@ -408,6 +433,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n % 10 == $_} (3..4,9)) && ! scalar (grep {$n % 100 == $_} (10..19,70..79,90..99)) ;
@@ -422,6 +448,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return ! scalar (grep {$n == $_} (0)) &&  scalar (grep {$n % 1000000 == $_} (0)) ;
@@ -436,6 +463,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n % 10 == $_} (1)) && ! scalar (grep {$n % 100 == $_} (11,71,91)) ;
@@ -450,6 +478,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n % 10 == $_} (2)) && ! scalar (grep {$n % 100 == $_} (12,72,92)) ;
@@ -466,6 +495,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -482,6 +512,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$v == $_} (0)) &&  scalar (grep {$i % 10 == $_} (2..4)) && ! scalar (grep {$i % 100 == $_} (12..14)) ||  scalar (grep {$f % 10 == $_} (2..4)) && ! scalar (grep {$f % 100 == $_} (12..14)) ;
@@ -496,6 +527,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$v == $_} (0)) &&  scalar (grep {$i % 10 == $_} (1)) && ! scalar (grep {$i % 100 == $_} (11)) ||  scalar (grep {$f % 10 == $_} (1)) && ! scalar (grep {$f % 100 == $_} (11)) ;
@@ -512,6 +544,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$i == $_} (1)) &&  scalar (grep {$v == $_} (0)) ;
@@ -528,6 +561,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -544,6 +578,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -560,6 +595,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -576,6 +612,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -592,6 +629,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$i == $_} (2..4)) &&  scalar (grep {$v == $_} (0)) ;
@@ -606,6 +644,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return ! scalar (grep {$v == $_} (0))   ;
@@ -620,6 +659,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$i == $_} (1)) &&  scalar (grep {$v == $_} (0)) ;
@@ -636,6 +676,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (3)) ;
@@ -650,6 +691,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (6)) ;
@@ -664,6 +706,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -678,6 +721,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (2)) ;
@@ -692,6 +736,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (0)) ;
@@ -708,6 +753,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) || ! scalar (grep {$t == $_} (0)) &&  scalar (grep {$i == $_} (0,1)) ;
@@ -724,6 +770,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$i == $_} (1)) &&  scalar (grep {$v == $_} (0)) ;
@@ -740,6 +787,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$v == $_} (0)) &&  scalar (grep {$i % 100 == $_} (3..4)) ||  scalar (grep {$f % 100 == $_} (3..4)) ;
@@ -754,6 +802,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$v == $_} (0)) &&  scalar (grep {$i % 100 == $_} (1)) ||  scalar (grep {$f % 100 == $_} (1)) ;
@@ -768,6 +817,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$v == $_} (0)) &&  scalar (grep {$i % 100 == $_} (2)) ||  scalar (grep {$f % 100 == $_} (2)) ;
@@ -784,6 +834,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -800,6 +851,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -816,6 +868,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -832,6 +885,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$i == $_} (1)) &&  scalar (grep {$v == $_} (0)) ;
@@ -848,6 +902,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -864,6 +919,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -880,6 +936,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$i == $_} (1)) &&  scalar (grep {$v == $_} (0)) ;
@@ -896,6 +953,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -912,6 +970,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$i == $_} (0)) ||  scalar (grep {$n == $_} (1)) ;
@@ -928,6 +987,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$i == $_} (0,1)) ;
@@ -944,6 +1004,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$i == $_} (1)) &&  scalar (grep {$v == $_} (0)) ;
@@ -960,6 +1021,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$v == $_} (0)) &&  scalar (grep {$i == $_} (1,2,3)) ||  scalar (grep {$v == $_} (0)) && ! scalar (grep {$i % 10 == $_} (4,6,9)) || ! scalar (grep {$v == $_} (0)) && ! scalar (grep {$f % 10 == $_} (4,6,9)) ;
@@ -976,6 +1038,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -992,6 +1055,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$i == $_} (0,1)) ;
@@ -1008,6 +1072,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -1024,6 +1089,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$i == $_} (1)) &&  scalar (grep {$v == $_} (0)) ;
@@ -1040,6 +1106,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (3..6)) ;
@@ -1054,6 +1121,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (7..10)) ;
@@ -1068,6 +1136,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -1082,6 +1151,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (2)) ;
@@ -1098,6 +1168,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (3..10,13..19)) ;
@@ -1112,6 +1183,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1,11)) ;
@@ -1126,6 +1198,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (2,12)) ;
@@ -1142,6 +1215,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$i == $_} (1)) &&  scalar (grep {$v == $_} (0)) ;
@@ -1158,6 +1232,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -1174,6 +1249,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$i == $_} (0)) ||  scalar (grep {$n == $_} (1)) ;
@@ -1190,6 +1266,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (0..1)) ;
@@ -1206,6 +1283,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$v == $_} (0)) &&  scalar (grep {$i % 100 == $_} (0,20,40,60,80)) ;
@@ -1220,6 +1298,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return ! scalar (grep {$v == $_} (0))   ;
@@ -1234,6 +1313,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$v == $_} (0)) &&  scalar (grep {$i % 10 == $_} (1)) ;
@@ -1248,6 +1328,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$v == $_} (0)) &&  scalar (grep {$i % 10 == $_} (2)) ;
@@ -1264,6 +1345,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -1280,6 +1362,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -1296,6 +1379,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$v == $_} (0)) && ! scalar (grep {$n == $_} (0..10)) &&  scalar (grep {$n % 10 == $_} (0)) ;
@@ -1310,6 +1394,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$i == $_} (1)) &&  scalar (grep {$v == $_} (0)) ;
@@ -1324,6 +1409,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$i == $_} (2)) &&  scalar (grep {$v == $_} (0)) ;
@@ -1340,6 +1426,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$i == $_} (0)) ||  scalar (grep {$n == $_} (1)) ;
@@ -1356,6 +1443,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$v == $_} (0)) &&  scalar (grep {$i % 10 == $_} (2..4)) && ! scalar (grep {$i % 100 == $_} (12..14)) ||  scalar (grep {$f % 10 == $_} (2..4)) && ! scalar (grep {$f % 100 == $_} (12..14)) ;
@@ -1370,6 +1458,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$v == $_} (0)) &&  scalar (grep {$i % 10 == $_} (1)) && ! scalar (grep {$i % 100 == $_} (11)) ||  scalar (grep {$f % 10 == $_} (1)) && ! scalar (grep {$f % 100 == $_} (11)) ;
@@ -1386,6 +1475,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$v == $_} (0)) &&  scalar (grep {$i % 100 == $_} (3..4)) ||  scalar (grep {$f % 100 == $_} (3..4)) ;
@@ -1400,6 +1490,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$v == $_} (0)) &&  scalar (grep {$i % 100 == $_} (1)) ||  scalar (grep {$f % 100 == $_} (1)) ;
@@ -1414,6 +1505,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$v == $_} (0)) &&  scalar (grep {$i % 100 == $_} (2)) ||  scalar (grep {$f % 100 == $_} (2)) ;
@@ -1430,6 +1522,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -1446,6 +1539,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$i == $_} (0,1)) ;
@@ -1462,6 +1556,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$i == $_} (1)) &&  scalar (grep {$v == $_} (0)) ;
@@ -1478,6 +1573,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$i == $_} (1)) &&  scalar (grep {$v == $_} (0)) ;
@@ -1494,6 +1590,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$t == $_} (0)) &&  scalar (grep {$i % 10 == $_} (1)) && ! scalar (grep {$i % 100 == $_} (11)) || ! scalar (grep {$t == $_} (0)) ;
@@ -1510,6 +1607,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$i == $_} (1)) &&  scalar (grep {$v == $_} (0)) ;
@@ -1526,6 +1624,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -1540,6 +1639,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (2)) ;
@@ -1556,6 +1656,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$v == $_} (0)) && ! scalar (grep {$n == $_} (0..10)) &&  scalar (grep {$n % 10 == $_} (0)) ;
@@ -1570,6 +1671,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$i == $_} (1)) &&  scalar (grep {$v == $_} (0)) ;
@@ -1584,6 +1686,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$i == $_} (2)) &&  scalar (grep {$v == $_} (0)) ;
@@ -1600,6 +1703,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -1616,6 +1720,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$i == $_} (1)) &&  scalar (grep {$v == $_} (0)) ;
@@ -1632,6 +1737,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -1648,6 +1754,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -1664,6 +1771,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$i == $_} (0,1)) ;
@@ -1680,6 +1788,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -1696,6 +1805,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -1712,6 +1822,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -1728,6 +1839,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -1744,6 +1856,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -1760,6 +1873,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$i == $_} (0)) ||  scalar (grep {$n == $_} (1)) ;
@@ -1776,6 +1890,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -1792,6 +1907,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -1808,6 +1924,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -1822,6 +1939,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (0)) ;
@@ -1838,6 +1956,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -1854,6 +1973,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -1868,6 +1988,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (2)) ;
@@ -1884,6 +2005,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -1900,6 +2022,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$i == $_} (0,1)) && ! scalar (grep {$n == $_} (0)) ;
@@ -1914,6 +2037,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (0)) ;
@@ -1930,6 +2054,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -1946,6 +2071,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -1962,6 +2088,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (0..1)) ;
@@ -1978,6 +2105,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n % 10 == $_} (2..9)) && ! scalar (grep {$n % 100 == $_} (11..19)) ;
@@ -1992,6 +2120,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return ! scalar (grep {$f == $_} (0))   ;
@@ -2006,6 +2135,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n % 10 == $_} (1)) && ! scalar (grep {$n % 100 == $_} (11..19)) ;
@@ -2022,6 +2152,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n % 10 == $_} (1)) && ! scalar (grep {$n % 100 == $_} (11)) ||  scalar (grep {$v == $_} (2)) &&  scalar (grep {$f % 10 == $_} (1)) && ! scalar (grep {$f % 100 == $_} (11)) || ! scalar (grep {$v == $_} (2)) &&  scalar (grep {$f % 10 == $_} (1)) ;
@@ -2036,6 +2167,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n % 10 == $_} (0)) ||  scalar (grep {$n % 100 == $_} (11..19)) ||  scalar (grep {$v == $_} (2)) &&  scalar (grep {$f % 100 == $_} (11..19)) ;
@@ -2052,6 +2184,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -2068,6 +2201,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (0..1)) ;
@@ -2084,6 +2218,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -2100,6 +2235,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$v == $_} (0)) &&  scalar (grep {$i % 10 == $_} (1)) && ! scalar (grep {$i % 100 == $_} (11)) ||  scalar (grep {$f % 10 == $_} (1)) && ! scalar (grep {$f % 100 == $_} (11)) ;
@@ -2116,6 +2252,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -2132,6 +2269,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -2148,6 +2286,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return ! scalar (grep {$v == $_} (0)) ||  scalar (grep {$n == $_} (0)) || ! scalar (grep {$n == $_} (1)) &&  scalar (grep {$n % 100 == $_} (1..19)) ;
@@ -2162,6 +2301,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$i == $_} (1)) &&  scalar (grep {$v == $_} (0)) ;
@@ -2178,6 +2318,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$i == $_} (0)) ||  scalar (grep {$n == $_} (1)) ;
@@ -2194,6 +2335,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (0)) ||  scalar (grep {$n % 100 == $_} (2..10)) ;
@@ -2208,6 +2350,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n % 100 == $_} (11..19)) ;
@@ -2222,6 +2365,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -2238,6 +2382,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -2254,6 +2399,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -2268,6 +2414,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (2)) ;
@@ -2284,6 +2431,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -2300,6 +2448,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -2316,6 +2465,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -2332,6 +2482,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$i == $_} (1)) &&  scalar (grep {$v == $_} (0)) ;
@@ -2348,6 +2499,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -2364,6 +2516,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -2380,6 +2533,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -2396,6 +2550,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -2412,6 +2567,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (0..1)) ;
@@ -2428,6 +2584,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -2444,6 +2601,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -2460,6 +2618,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -2476,6 +2635,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -2492,6 +2652,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -2508,6 +2669,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (0..1)) ;
@@ -2524,6 +2686,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -2540,6 +2703,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$v == $_} (0)) &&  scalar (grep {$i % 10 == $_} (2..4)) && ! scalar (grep {$i % 100 == $_} (12..14)) ;
@@ -2554,6 +2718,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$v == $_} (0)) && ! scalar (grep {$i == $_} (1)) &&  scalar (grep {$i % 10 == $_} (0..1)) ||  scalar (grep {$v == $_} (0)) &&  scalar (grep {$i % 10 == $_} (5..9)) ||  scalar (grep {$v == $_} (0)) &&  scalar (grep {$i % 100 == $_} (12..14)) ;
@@ -2568,6 +2733,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$i == $_} (1)) &&  scalar (grep {$v == $_} (0)) ;
@@ -2584,6 +2750,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n % 10 == $_} (1)) && ! scalar (grep {$n % 100 == $_} (11)) ||  scalar (grep {$v == $_} (2)) &&  scalar (grep {$f % 10 == $_} (1)) && ! scalar (grep {$f % 100 == $_} (11)) || ! scalar (grep {$v == $_} (2)) &&  scalar (grep {$f % 10 == $_} (1)) ;
@@ -2598,6 +2765,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n % 10 == $_} (0)) ||  scalar (grep {$n % 100 == $_} (11..19)) ||  scalar (grep {$v == $_} (2)) &&  scalar (grep {$f % 100 == $_} (11..19)) ;
@@ -2614,6 +2782,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -2630,6 +2799,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$i == $_} (0..1)) ;
@@ -2646,6 +2816,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$i == $_} (1)) &&  scalar (grep {$v == $_} (0)) ;
@@ -2662,6 +2833,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -2678,6 +2850,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return ! scalar (grep {$v == $_} (0)) ||  scalar (grep {$n == $_} (0)) || ! scalar (grep {$n == $_} (1)) &&  scalar (grep {$n % 100 == $_} (1..19)) ;
@@ -2692,6 +2865,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$i == $_} (1)) &&  scalar (grep {$v == $_} (0)) ;
@@ -2708,6 +2882,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -2724,6 +2899,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$v == $_} (0)) &&  scalar (grep {$i % 10 == $_} (2..4)) && ! scalar (grep {$i % 100 == $_} (12..14)) ;
@@ -2738,6 +2914,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$v == $_} (0)) &&  scalar (grep {$i % 10 == $_} (0)) ||  scalar (grep {$v == $_} (0)) &&  scalar (grep {$i % 10 == $_} (5..9)) ||  scalar (grep {$v == $_} (0)) &&  scalar (grep {$i % 100 == $_} (11..14)) ;
@@ -2752,6 +2929,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$v == $_} (0)) &&  scalar (grep {$i % 10 == $_} (1)) && ! scalar (grep {$i % 100 == $_} (11)) ;
@@ -2768,6 +2946,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -2784,6 +2963,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -2800,6 +2980,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$i == $_} (1)) &&  scalar (grep {$v == $_} (0)) ;
@@ -2816,6 +2997,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$i == $_} (1)) &&  scalar (grep {$v == $_} (0)) ;
@@ -2832,6 +3014,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -2848,6 +3031,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -2864,6 +3048,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -2878,6 +3063,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (2)) ;
@@ -2894,6 +3080,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -2910,6 +3097,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$v == $_} (0)) &&  scalar (grep {$i % 10 == $_} (2..4)) && ! scalar (grep {$i % 100 == $_} (12..14)) ||  scalar (grep {$f % 10 == $_} (2..4)) && ! scalar (grep {$f % 100 == $_} (12..14)) ;
@@ -2924,6 +3112,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$v == $_} (0)) &&  scalar (grep {$i % 10 == $_} (1)) && ! scalar (grep {$i % 100 == $_} (11)) ||  scalar (grep {$f % 10 == $_} (1)) && ! scalar (grep {$f % 100 == $_} (11)) ;
@@ -2940,6 +3129,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (2..10)) ;
@@ -2954,6 +3144,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$i == $_} (0)) ||  scalar (grep {$n == $_} (1)) ;
@@ -2970,6 +3161,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (0,1)) ||  scalar (grep {$i == $_} (0)) &&  scalar (grep {$f == $_} (1)) ;
@@ -2986,6 +3178,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$i == $_} (2..4)) &&  scalar (grep {$v == $_} (0)) ;
@@ -3000,6 +3193,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return ! scalar (grep {$v == $_} (0))   ;
@@ -3014,6 +3208,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$i == $_} (1)) &&  scalar (grep {$v == $_} (0)) ;
@@ -3030,6 +3225,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$v == $_} (0)) &&  scalar (grep {$i % 100 == $_} (3..4)) || ! scalar (grep {$v == $_} (0)) ;
@@ -3044,6 +3240,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$v == $_} (0)) &&  scalar (grep {$i % 100 == $_} (1)) ;
@@ -3058,6 +3255,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$v == $_} (0)) &&  scalar (grep {$i % 100 == $_} (2)) ;
@@ -3074,6 +3272,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -3088,6 +3287,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (2)) ;
@@ -3104,6 +3304,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -3118,6 +3319,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (2)) ;
@@ -3134,6 +3336,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -3148,6 +3351,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (2)) ;
@@ -3164,6 +3368,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -3178,6 +3383,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (2)) ;
@@ -3194,6 +3400,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -3208,6 +3415,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (2)) ;
@@ -3224,6 +3432,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -3240,6 +3449,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -3256,6 +3466,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -3272,6 +3483,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$v == $_} (0)) &&  scalar (grep {$i % 10 == $_} (2..4)) && ! scalar (grep {$i % 100 == $_} (12..14)) ||  scalar (grep {$f % 10 == $_} (2..4)) && ! scalar (grep {$f % 100 == $_} (12..14)) ;
@@ -3286,6 +3498,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$v == $_} (0)) &&  scalar (grep {$i % 10 == $_} (1)) && ! scalar (grep {$i % 100 == $_} (11)) ||  scalar (grep {$f % 10 == $_} (1)) && ! scalar (grep {$f % 100 == $_} (11)) ;
@@ -3302,6 +3515,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -3318,6 +3532,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -3334,6 +3549,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -3350,6 +3566,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$i == $_} (1)) &&  scalar (grep {$v == $_} (0)) ;
@@ -3366,6 +3583,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$i == $_} (1)) &&  scalar (grep {$v == $_} (0)) ;
@@ -3382,6 +3600,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -3398,6 +3617,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -3414,6 +3634,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -3430,6 +3651,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -3446,6 +3668,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (0..1)) ;
@@ -3462,6 +3685,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -3478,6 +3702,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -3494,6 +3719,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$v == $_} (0)) &&  scalar (grep {$i == $_} (1,2,3)) ||  scalar (grep {$v == $_} (0)) && ! scalar (grep {$i % 10 == $_} (4,6,9)) || ! scalar (grep {$v == $_} (0)) && ! scalar (grep {$f % 10 == $_} (4,6,9)) ;
@@ -3510,6 +3736,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -3526,6 +3753,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -3542,6 +3770,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -3558,6 +3787,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (0..1)) ||  scalar (grep {$n == $_} (11..99)) ;
@@ -3574,6 +3804,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -3590,6 +3821,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$v == $_} (0)) &&  scalar (grep {$i % 10 == $_} (2..4)) && ! scalar (grep {$i % 100 == $_} (12..14)) ;
@@ -3604,6 +3836,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$v == $_} (0)) &&  scalar (grep {$i % 10 == $_} (0)) ||  scalar (grep {$v == $_} (0)) &&  scalar (grep {$i % 10 == $_} (5..9)) ||  scalar (grep {$v == $_} (0)) &&  scalar (grep {$i % 100 == $_} (11..14)) ;
@@ -3618,6 +3851,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$v == $_} (0)) &&  scalar (grep {$i % 10 == $_} (1)) && ! scalar (grep {$i % 100 == $_} (11)) ;
@@ -3634,6 +3868,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$i == $_} (1)) &&  scalar (grep {$v == $_} (0)) ;
@@ -3650,6 +3885,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -3666,6 +3902,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -3682,6 +3919,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -3698,6 +3936,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -3714,6 +3953,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (0..1)) ;
@@ -3730,6 +3970,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -3746,6 +3987,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -3762,6 +4004,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -3778,6 +4021,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$i == $_} (1)) &&  scalar (grep {$v == $_} (0)) ;
@@ -3794,6 +4038,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$i == $_} (0)) ||  scalar (grep {$n == $_} (1)) ;
@@ -3812,6 +4057,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (4)) ;
@@ -3826,6 +4072,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (6)) ;
@@ -3840,6 +4087,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1,5,7,8,9,10)) ;
@@ -3854,6 +4102,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (2,3)) ;
@@ -3870,6 +4119,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$i % 10 == $_} (3,4)) ||  scalar (grep {$i % 1000 == $_} (100,200,300,400,500,600,700,800,900)) ;
@@ -3884,6 +4134,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$i == $_} (0)) ||  scalar (grep {$i % 10 == $_} (6)) ||  scalar (grep {$i % 100 == $_} (40,60,90)) ;
@@ -3898,6 +4149,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$i % 10 == $_} (1,2,5,7,8)) ||  scalar (grep {$i % 100 == $_} (20,50,70,80)) ;
@@ -3914,6 +4166,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n % 10 == $_} (2,3)) && ! scalar (grep {$n % 100 == $_} (12,13)) ;
@@ -3930,6 +4183,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (4)) ;
@@ -3944,6 +4198,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (6)) ;
@@ -3958,6 +4213,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1,5,7,8,9,10)) ;
@@ -3972,6 +4228,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (2,3)) ;
@@ -3988,6 +4245,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (4)) ;
@@ -4002,6 +4260,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1,3)) ;
@@ -4016,6 +4275,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (2)) ;
@@ -4032,6 +4292,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (3,4)) ;
@@ -4046,6 +4307,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (5,6)) ;
@@ -4060,6 +4322,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -4074,6 +4337,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (2)) ;
@@ -4088,6 +4352,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (0,7,8,9)) ;
@@ -4104,6 +4369,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n % 10 == $_} (3)) && ! scalar (grep {$n % 100 == $_} (13)) ;
@@ -4118,6 +4384,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n % 10 == $_} (1)) && ! scalar (grep {$n % 100 == $_} (11)) ;
@@ -4132,6 +4399,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n % 10 == $_} (2)) && ! scalar (grep {$n % 100 == $_} (12)) ;
@@ -4148,6 +4416,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -4164,6 +4433,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -4180,6 +4450,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -4196,6 +4467,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (3,13)) ;
@@ -4210,6 +4482,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1,11)) ;
@@ -4224,6 +4497,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (2,12)) ;
@@ -4240,6 +4514,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (4)) ;
@@ -4254,6 +4529,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (6)) ;
@@ -4268,6 +4544,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -4282,6 +4559,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (2,3)) ;
@@ -4298,6 +4576,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (4)) ;
@@ -4312,6 +4591,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (6)) ;
@@ -4326,6 +4606,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -4340,6 +4621,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (2,3)) ;
@@ -4356,6 +4638,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1,5)) ;
@@ -4372,6 +4655,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -4388,6 +4672,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (11,8,80,800)) ;
@@ -4404,6 +4689,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$i == $_} (0)) ||  scalar (grep {$i % 100 == $_} (2..20,40,60,80)) ;
@@ -4418,6 +4704,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$i == $_} (1)) ;
@@ -4434,6 +4721,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n % 10 == $_} (6)) ||  scalar (grep {$n % 10 == $_} (9)) ||  scalar (grep {$n % 10 == $_} (0)) && ! scalar (grep {$n == $_} (0)) ;
@@ -4450,6 +4738,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -4466,6 +4755,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$i % 10 == $_} (7,8)) && ! scalar (grep {$i % 100 == $_} (17,18)) ;
@@ -4480,6 +4770,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$i % 10 == $_} (1)) && ! scalar (grep {$i % 100 == $_} (11)) ;
@@ -4494,6 +4785,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$i % 10 == $_} (2)) && ! scalar (grep {$i % 100 == $_} (12)) ;
@@ -4510,6 +4802,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -4526,6 +4819,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (4)) ;
@@ -4540,6 +4834,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -4554,6 +4849,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (2,3)) ;
@@ -4570,6 +4866,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -4586,6 +4883,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1..4)) ;
@@ -4602,6 +4900,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (4)) ;
@@ -4616,6 +4915,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (6)) ;
@@ -4630,6 +4930,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1,5,7..9)) ;
@@ -4644,6 +4945,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (2,3)) ;
@@ -4660,6 +4962,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -4676,6 +4979,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (11,8,80,800)) ;
@@ -4692,6 +4996,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (11,8,80,800)) ;
@@ -4708,6 +5013,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n % 10 == $_} (4)) && ! scalar (grep {$n % 100 == $_} (14)) ;
@@ -4722,6 +5028,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -4738,6 +5045,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n % 10 == $_} (1,2)) && ! scalar (grep {$n % 100 == $_} (11,12)) ;
@@ -4754,6 +5062,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n % 10 == $_} (6,9)) ||  scalar (grep {$n == $_} (10)) ;
@@ -4770,6 +5079,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
@@ -4786,6 +5096,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n % 10 == $_} (3)) && ! scalar (grep {$n % 100 == $_} (13)) ;
@@ -4802,6 +5113,7 @@ my %_plurals = (
 				my $t = length $f ? $f + 0 : '';
 				my $v = length $f;
 				my $w = length $t;
+				$f ||= 0;
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;

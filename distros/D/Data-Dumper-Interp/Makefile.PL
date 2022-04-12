@@ -18,7 +18,6 @@ my %WriteMakefileArgs = (
   "NAME" => "Data::Dumper::Interp",
   "PREREQ_PM" => {
     "Carp" => 0,
-    "Clone" => 0,
     "Data::Dumper" => "2.174.0",
     "Encode" => 0,
     "Exporter" => 0,
@@ -49,7 +48,7 @@ my %WriteMakefileArgs = (
     "bigrat" => 0,
     "open" => 0
   },
-  "VERSION" => "2.27",
+  "VERSION" => "3.1",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -58,7 +57,6 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Carp" => 0,
-  "Clone" => 0,
   "Data::Compare" => 0,
   "Data::Dumper" => "2.174.0",
   "Encode" => 0,

@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Exporter ();
 
-our $VERSION = '1.500006';
+our $VERSION = '1.500008';
 $VERSION =~ tr/_//d;
 
 our @EXPORT_OK;
@@ -171,9 +171,9 @@ sub all (&@) {
     Carp::croak("Not a subroutine reference");
   }
 
-  $f->() or return 0
+  $f->() or return !!0
     foreach @_;
-  return 1;
+  return !!1;
 }
 
 sub any (&@) {
@@ -183,9 +183,9 @@ sub any (&@) {
     Carp::croak("Not a subroutine reference");
   }
 
-  $f->() and return 1
+  $f->() and return !!1
     foreach @_;
-  return 0;
+  return !!0;
 }
 
 sub none (&@) {
@@ -195,9 +195,9 @@ sub none (&@) {
     Carp::croak("Not a subroutine reference");
   }
 
-  $f->() and return 0
+  $f->() and return !!0
     foreach @_;
-  return 1;
+  return !!1;
 }
 
 sub notall (&@) {
@@ -207,9 +207,9 @@ sub notall (&@) {
     Carp::croak("Not a subroutine reference");
   }
 
-  $f->() or return 1
+  $f->() or return !!1
     foreach @_;
-  return 0;
+  return !!0;
 }
 
 sub product (@) {
@@ -349,14 +349,39 @@ sub uniqnum (@) {
   my %seen;
   my @uniq =
     grep {
-      my ($NV) = unpack 'F', pack 'F', $_;
+      my $nv = $_;
+      if (ref $nv && defined &overload::ov_method && defined &overload::mycan) {
+        my $package = ref $nv;
+        if (UNIVERSAL::isa($nv, 'Math::BigInt')) {
+          $nv = \($nv->bstr);
+        }
+        elsif(my $method
+          = overload::ov_method(overload::mycan($package, '(0+'), $package)
+          || overload::ov_method(overload::mycan($package, '""'), $package)
+          || overload::ov_method(overload::mycan($package, 'bool'), $package)
+        ) {
+          $nv = $nv->$method;
+        }
+        elsif (
+          my $nomethod = overload::ov_method(overload::mycan($package, '(nomethod'), $package)
+        ) {
+          $nv = $nv->$nomethod(undef, undef, '0+');
+        }
+      }
+      if (ref $nv) {
+        $nv = \('R' . 0+$nv);
+      }
+      my $iv = $nv;
+      my $F = pack 'F', $nv;
+      my ($NV) = unpack 'F', $F;
       !$seen{
-        $NV == 0 ? 0 : (
-          ($NV == $NV
-            ? do { local $@; eval { pack 'JF', $_, $_ } }
-            : 0
-          ) || sprintf('%f', $_)
-        )
+          ref $nv         ? $$nv
+        : $NV == 0        ? 0
+        : $NV != $NV      ? sprintf('%f', $NV)
+        : int($NV) != $NV ? 'N'.$F
+        : $iv - 1 == $iv  ? sprintf('%.0f', $NV)
+        : $NV > 0         ? sprintf('%u', $iv)
+                          : sprintf('%d', $iv)
       }++;
     }
     map +(defined($_) ? $_

@@ -23,9 +23,6 @@ package App {
                 session => {
                     namespace => '_form_validator'
                 },
-                forms   => {
-                    login => 'Validator',
-                },
             },
         };
     }
@@ -33,7 +30,7 @@ package App {
     use Dancer2::Plugin::FormValidator;
 
     post '/' => sub {
-        to_json validate_form 'login';
+        to_json validate 'Validator';
     };
 }
 

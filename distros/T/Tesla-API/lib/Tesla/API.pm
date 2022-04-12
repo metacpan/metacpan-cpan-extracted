@@ -16,7 +16,7 @@ use MIME::Base64 qw(encode_base64url);
 use WWW::Mechanize;
 use URI;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 $| = 1;
 
@@ -37,6 +37,7 @@ use constant {
     DEBUG_CACHE                 => $ENV{DEBUG_TESLA_API_CACHE},
     API_CACHE_PERSIST           => 0,
     API_CACHE_TIMEOUT_SECONDS   => 2,
+    API_TIMEOUT_RETRIES         => 3,
     CACHE_FILE                  => "$home_dir/tesla_api_cache.json",
     ENDPOINTS_FILE              => dist_file('Tesla-API', 'endpoints.json'),
     OPTION_CODES_FILE           => dist_file('Tesla-API', 'option_codes.json'),
@@ -121,24 +122,37 @@ sub api {
         push @$header, 'Authorization' => $token_string;
     }
 
-    my $request = HTTP::Request->new($type, $url, $header, encode_json($api_params));
+    my $request = HTTP::Request->new(
+        $type,
+        $url,
+        $header,
+        JSON->new->allow_nonref->encode($api_params)
+    );
 
-    my $response = $self->mech->request($request);
+    my $response;
 
-    if ($response->is_success) {
-        my $response_data = _decode($response->decoded_content)->{response};
+    for (1 .. API_TIMEOUT_RETRIES) {
+        # If a timeout (ie. code 500) occurs, repeat the API call
 
-        $self->_cache(
-            endpoint => $endpoint_name,
-            id       => $id,
-            data     => $response_data
-        );
+        $response = $self->mech->request($request);
 
-        return $response_data;
+        if ($response->is_success) {
+            my $response_data = _decode($response->decoded_content)->{response};
+
+            $self->_cache(
+                endpoint => $endpoint_name,
+                id       => $id,
+                data     => $response_data
+            );
+
+            return $response_data;
+        }
+        elsif ($response->code == 500) {
+            next;
+        }
     }
-    else {
-        warn $response->status_line;
-    }
+
+    return {};
 }
 sub api_cache_clear {
     my ($self) = @_;
@@ -193,7 +207,6 @@ sub mech {
     my $www_mech = WWW::Mechanize->new(
         agent       => $self->_useragent_string,
         autocheck   => 0,
-        timeout     => 3,
         cookie_jar  => {}
     );
 
@@ -356,7 +369,12 @@ sub _access_token_generate {
         redirect_uri  => "https://auth.tesla.com/void/callback",
     };
 
-    my $request = HTTP::Request->new('POST', $url, $header, encode_json($request_data));
+    my $request = HTTP::Request->new(
+        'POST',
+        $url,
+        $header,
+        JSON->new->allow_nonref->encode($request_data)
+    );
 
     my $response = $self->mech->request($request);
 
@@ -420,7 +438,12 @@ sub _access_token_refresh {
         client_id     => 'ownerapi',
     };
 
-    my $request = HTTP::Request->new('POST', $url, $header, encode_json($request_data));
+    my $request = HTTP::Request->new(
+        'POST',
+        $url,
+        $header,
+        JSON->new->allow_nonref->encode($request_data)
+    );
 
     my $response = $self->mech->request($request);
 
@@ -452,7 +475,8 @@ sub _access_token_update {
     $self->_access_token_data($token_data);
 
     open my $fh, '>', CACHE_FILE or die $!;
-    print $fh encode_json($token_data);
+
+    print $fh JSON->new->allow_nonref->encode($token_data);
 }
 sub _authentication_code {
     # If an access token is unavailable, prompt the user with a URL to
@@ -594,16 +618,9 @@ Tesla::API - Interface to Tesla's API
         api_params  => {which_trunk => 'rear'}
     );
 
-    if ($tesla->trunk_rear) {
-        # Trunk is open
-        put_stuff_in_trunk();
-    }
-
 =head1 DESCRIPTION
 
 This distribution provides access to the Tesla API.
-
-B<WARNING>: This is an initial, beta release. The interface may change.
 
 This class is designed to be subclassed. For example, I have already begun a
 new L<Tesla::Vehicle> distribution which will have access and update methods

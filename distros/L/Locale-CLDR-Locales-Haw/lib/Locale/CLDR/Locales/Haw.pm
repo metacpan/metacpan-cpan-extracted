@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Haw - Package for language Hawaiian
 =cut
 
 package Locale::CLDR::Locales::Haw;
-# This file auto generated from Data\common\main\haw.xml
-#	on Sun  3 Feb  1:54:25 pm GMT
+# This file auto generated from Data/common/main/haw.xml
+#	on Mon 11 Apr  5:29:30 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -590,15 +590,15 @@ has 'day_periods' => (
 				},
 			},
 			'stand-alone' => {
-				'wide' => {
-					'pm' => q{PM},
+				'abbreviated' => {
 					'am' => q{AM},
+					'pm' => q{PM},
 				},
 				'narrow' => {
-					'pm' => q{PM},
 					'am' => q{AM},
+					'pm' => q{PM},
 				},
-				'abbreviated' => {
+				'wide' => {
 					'am' => q{AM},
 					'pm' => q{PM},
 				},

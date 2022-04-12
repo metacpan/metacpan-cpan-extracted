@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Kam - Package for language Kamba
 =cut
 
 package Locale::CLDR::Locales::Kam;
-# This file auto generated from Data\common\main\kam.xml
-#	on Sun  3 Feb  1:59:59 pm GMT
+# This file auto generated from Data/common/main/kam.xml
+#	on Mon 11 Apr  5:31:29 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -840,13 +840,13 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
+				'abbreviated' => {
 					'am' => q{Ĩyakwakya},
 					'pm' => q{Ĩyawĩoo},
 				},
-				'abbreviated' => {
-					'pm' => q{Ĩyawĩoo},
+				'wide' => {
 					'am' => q{Ĩyakwakya},
+					'pm' => q{Ĩyawĩoo},
 				},
 			},
 		},

@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Cy - Package for language Welsh
 =cut
 
 package Locale::CLDR::Locales::Cy;
-# This file auto generated from Data\common\main\cy.xml
-#	on Sun  3 Feb  1:45:18 pm GMT
+# This file auto generated from Data/common/main/cy.xml
+#	on Mon 11 Apr  5:25:55 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -9143,18 +9143,18 @@ has 'day_period_data' => (
 					return 'noon' if $time == 1200;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
-					return 'morning1' if $time >= 0
-						&& $time < 1200;
 					return 'evening1' if $time >= 1800
 						&& $time < 2400;
+					return 'morning1' if $time >= 0
+						&& $time < 1200;
 				}
 				if($day_period_type eq 'selection') {
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
 					return 'evening1' if $time >= 1800
 						&& $time < 2400;
 					return 'morning1' if $time >= 0
 						&& $time < 1200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
 				}
 				last SWITCH;
 				}
@@ -9164,18 +9164,18 @@ has 'day_period_data' => (
 					return 'noon' if $time == 1200;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
-					return 'morning1' if $time >= 0
-						&& $time < 1200;
 					return 'evening1' if $time >= 1800
 						&& $time < 2400;
+					return 'morning1' if $time >= 0
+						&& $time < 1200;
 				}
 				if($day_period_type eq 'selection') {
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
 					return 'evening1' if $time >= 1800
 						&& $time < 2400;
 					return 'morning1' if $time >= 0
 						&& $time < 1200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
 				}
 				last SWITCH;
 				}
@@ -9196,60 +9196,60 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'abbreviated' => {
-					'noon' => q{canol dydd},
 					'afternoon1' => q{y prynhawn},
 					'am' => q{yb},
-					'morning1' => q{y bore},
-					'pm' => q{yh},
-					'midnight' => q{canol nos},
 					'evening1' => q{yr hwyr},
-				},
-				'wide' => {
-					'am' => q{yb},
-					'morning1' => q{y bore},
-					'pm' => q{yh},
 					'midnight' => q{canol nos},
-					'evening1' => q{yr hwyr},
+					'morning1' => q{y bore},
 					'noon' => q{canol dydd},
-					'afternoon1' => q{y prynhawn},
+					'pm' => q{yh},
 				},
 				'narrow' => {
-					'morning1' => q{yn y bore},
+					'afternoon1' => q{yn y prynhawn},
 					'am' => q{b},
 					'evening1' => q{min nos},
-					'pm' => q{h},
 					'midnight' => q{canol nos},
-					'afternoon1' => q{yn y prynhawn},
+					'morning1' => q{yn y bore},
 					'noon' => q{canol dydd},
+					'pm' => q{h},
+				},
+				'wide' => {
+					'afternoon1' => q{y prynhawn},
+					'am' => q{yb},
+					'evening1' => q{yr hwyr},
+					'midnight' => q{canol nos},
+					'morning1' => q{y bore},
+					'noon' => q{canol dydd},
+					'pm' => q{yh},
 				},
 			},
 			'stand-alone' => {
 				'abbreviated' => {
-					'pm' => q{yh},
-					'midnight' => q{canol nos},
-					'evening1' => q{yr hwyr},
+					'afternoon1' => q{prynhawn},
 					'am' => q{yb},
+					'evening1' => q{yr hwyr},
+					'midnight' => q{canol nos},
 					'morning1' => q{bore},
 					'noon' => q{canol dydd},
-					'afternoon1' => q{prynhawn},
-				},
-				'wide' => {
-					'midnight' => q{canol nos},
 					'pm' => q{yh},
-					'evening1' => q{yr hwyr},
-					'am' => q{yb},
-					'morning1' => q{y bore},
-					'noon' => q{canol dydd},
-					'afternoon1' => q{y prynhawn},
 				},
 				'narrow' => {
 					'afternoon1' => q{prynhawn},
-					'noon' => q{canol dydd},
+					'am' => q{yb},
 					'evening1' => q{min nos},
 					'midnight' => q{canol nos},
-					'pm' => q{yh},
 					'morning1' => q{bore},
+					'noon' => q{canol dydd},
+					'pm' => q{yh},
+				},
+				'wide' => {
+					'afternoon1' => q{y prynhawn},
 					'am' => q{yb},
+					'evening1' => q{yr hwyr},
+					'midnight' => q{canol nos},
+					'morning1' => q{y bore},
+					'noon' => q{canol dydd},
+					'pm' => q{yh},
 				},
 			},
 		},

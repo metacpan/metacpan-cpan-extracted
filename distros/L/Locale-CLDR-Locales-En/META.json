@@ -4,7 +4,7 @@
       "John Imrie <john.imrie1@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4231",
    "keywords" : [
       "locale",
       "CLDR",
@@ -34,7 +34,7 @@
       "runtime" : {
          "requires" : {
             "DateTime" : "0.72",
-            "Locale::CLDR" : "v0.34.0",
+            "Locale::CLDR" : "v0.34.1",
             "Moo" : "2",
             "MooX::ClassAttribute" : "0.011",
             "Type::Tiny" : "0",
@@ -46,431 +46,431 @@
    "provides" : {
       "Locale::CLDR::Locales::En" : {
          "file" : "lib/Locale/CLDR/Locales/En.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::001" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/001.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::150" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/150.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Ag" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Ag.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Ai" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Ai.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::As" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/As.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::At" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/At.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Au" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Au.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Bb" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Bb.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Be" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Be.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Bi" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Bi.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Bm" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Bm.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Bs" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Bs.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Bw" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Bw.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Bz" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Bz.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Ca" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Ca.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Cc" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Cc.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Ch" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Ch.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Ck" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Ck.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Cm" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Cm.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Cx" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Cx.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Cy" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Cy.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::De" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/De.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Dg" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Dg.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Dk" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Dk.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Dm" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Dm.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Er" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Er.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Fi" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Fi.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Fj" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Fj.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Fk" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Fk.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Fm" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Fm.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Gb" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Gb.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Gd" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Gd.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Gg" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Gg.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Gh" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Gh.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Gi" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Gi.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Gm" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Gm.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Gu" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Gu.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Gy" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Gy.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Hk" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Hk.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Ie" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Ie.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Il" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Il.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Im" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Im.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::In" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/In.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Io" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Io.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Je" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Je.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Jm" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Jm.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Ke" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Ke.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Ki" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Ki.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Kn" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Kn.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Ky" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Ky.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Lc" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Lc.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Lr" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Lr.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Ls" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Ls.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Mg" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Mg.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Mh" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Mh.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Mo" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Mo.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Mp" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Mp.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Ms" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Ms.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Mt" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Mt.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Mu" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Mu.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Mw" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Mw.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::My" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/My.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Na" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Na.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Nf" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Nf.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Ng" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Ng.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Nl" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Nl.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Nr" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Nr.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Nu" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Nu.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Nz" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Nz.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Pg" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Pg.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Ph" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Ph.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Pk" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Pk.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Pn" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Pn.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Pr" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Pr.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Pw" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Pw.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Rw" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Rw.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Sb" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Sb.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Sc" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Sc.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Sd" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Sd.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Se" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Se.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Sg" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Sg.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Sh" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Sh.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Si" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Si.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Sl" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Sl.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Ss" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Ss.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Sx" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Sx.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Sz" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Sz.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Tc" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Tc.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Tk" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Tk.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::To" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/To.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Tt" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Tt.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Tv" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Tv.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Tz" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Tz.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Ug" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Ug.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Um" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Um.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Us" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Us.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Us::Posix" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Us/Posix.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Vc" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Vc.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Vg" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Vg.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Vi" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Vi.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Vu" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Vu.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Ws" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Ws.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Za" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Za.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Zm" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Zm.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::En::Any::Zw" : {
          "file" : "lib/Locale/CLDR/Locales/En/Any/Zw.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       }
    },
    "release_status" : "stable",
@@ -483,6 +483,6 @@
          "url" : "https://github.com/ThePilgrim/perlcldr.git"
       }
    },
-   "version" : "v0.34.0",
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "version" : "v0.34.1",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

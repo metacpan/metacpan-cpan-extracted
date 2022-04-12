@@ -18,7 +18,7 @@ sub message {
 sub validate {
     my ($self, $field, $input, @enum) = @_;
 
-    if ($self->_field_defined_and_non_empty($input->{$field})) {
+    if ($self->_field_defined_and_non_empty($field, $input)) {
         return $self->_is_enum($input->{$field}, @enum);
     }
 

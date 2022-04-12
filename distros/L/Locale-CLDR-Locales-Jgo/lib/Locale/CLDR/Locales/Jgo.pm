@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Jgo - Package for language Ngomba
 =cut
 
 package Locale::CLDR::Locales::Jgo;
-# This file auto generated from Data\common\main\jgo.xml
-#	on Sun  3 Feb  1:58:44 pm GMT
+# This file auto generated from Data/common/main/jgo.xml
+#	on Mon 11 Apr  5:31:04 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -646,13 +646,13 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
+				'abbreviated' => {
 					'am' => q{mbaꞌmbaꞌ},
 					'pm' => q{ŋka mbɔ́t nji},
 				},
-				'abbreviated' => {
-					'pm' => q{ŋka mbɔ́t nji},
+				'wide' => {
 					'am' => q{mbaꞌmbaꞌ},
+					'pm' => q{ŋka mbɔ́t nji},
 				},
 			},
 		},

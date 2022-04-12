@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Fo::Any::Dk - Package for language Faroese
 =cut
 
 package Locale::CLDR::Locales::Fo::Any::Dk;
-# This file auto generated from Data\common\main\fo_DK.xml
-#	on Sun  3 Feb  1:51:26 pm GMT
+# This file auto generated from Data/common/main/fo_DK.xml
+#	on Mon 11 Apr  5:28:22 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';

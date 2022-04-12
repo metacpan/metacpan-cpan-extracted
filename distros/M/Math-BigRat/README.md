@@ -1,6 +1,6 @@
 # NAME
 
-Math::BigRat - Arbitrary big rational numbers
+Math::BigRat - arbitrary size rational number math package
 
 # SYNOPSIS
 
@@ -93,6 +93,12 @@ information.
 - dparts()
 
     Returns the integer part and the fraction part.
+
+- fparts()
+
+    Returns the smallest possible numerator and denominator so that the numerator
+    divided by the denominator gives back the original value. For finite numbers,
+    both values are integers. Mnemonic: fraction.
 
 - numify()
 

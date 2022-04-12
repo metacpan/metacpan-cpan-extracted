@@ -17,7 +17,7 @@ sub message {
 sub validate {
     my ($self, $field, $input) = @_;
 
-    if (exists $input->{$field}) {
+    if ($self->_field_defined_and_non_empty($field, $input)) {
         return $input->{$field} =~ /^(?=.*[a-z])(?=.*[A-Z])(?=.*[\@\$!%*#?&])[A-Za-z\d\@\$!%*#?&]{8,}$/;
     }
 

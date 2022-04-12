@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Kn::Any::In - Package for language Kannada
 =cut
 
 package Locale::CLDR::Locales::Kn::Any::In;
-# This file auto generated from Data\common\main\kn_IN.xml
-#	on Sun  3 Feb  2:01:06 pm GMT
+# This file auto generated from Data/common/main/kn_IN.xml
+#	on Mon 11 Apr  5:31:56 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';

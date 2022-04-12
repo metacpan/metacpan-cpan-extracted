@@ -1,9 +1,13 @@
 Revision history for Perl extension Image::TextMode.
 
+0.26 2022-04-11
+ - Properly handle 512-char fonts in XBin files
+ - Handle more generic pixel data structure for BIN writes
+
 0.25 2015-02-05
  - Force bitwise-and 1 when doing XOR 1
 
-0.24 2015-09-30
+0.24 2014-09-30
  - Switched from Moose to Moo and Type::Tiny
  - When reading SAUCE records, check for "SAUCE00" for header instead of 
    just "SAUCE" as we only support version "00"

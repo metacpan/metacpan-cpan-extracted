@@ -7,14 +7,14 @@ Locale::CLDR::Locales::En::Any::Zm - Package for language English
 =cut
 
 package Locale::CLDR::Locales::En::Any::Zm;
-# This file auto generated from Data\common\main\en_ZM.xml
-#	on Sun  3 Feb  1:48:28 pm GMT
+# This file auto generated from Data/common/main/en_ZM.xml
+#	on Mon 11 Apr  5:27:10 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';

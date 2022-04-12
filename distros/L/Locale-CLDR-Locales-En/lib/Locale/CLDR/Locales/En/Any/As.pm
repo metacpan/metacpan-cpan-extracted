@@ -7,14 +7,14 @@ Locale::CLDR::Locales::En::Any::As - Package for language English
 =cut
 
 package Locale::CLDR::Locales::En::Any::As;
-# This file auto generated from Data\common\main\en_AS.xml
-#	on Sun  3 Feb  1:48:04 pm GMT
+# This file auto generated from Data/common/main/en_AS.xml
+#	on Mon 11 Apr  5:27:00 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';

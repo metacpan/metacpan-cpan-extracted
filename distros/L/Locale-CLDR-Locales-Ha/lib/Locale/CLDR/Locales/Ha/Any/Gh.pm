@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Ha::Any::Gh - Package for language Hausa
 =cut
 
 package Locale::CLDR::Locales::Ha::Any::Gh;
-# This file auto generated from Data\common\main\ha_GH.xml
-#	on Sun  3 Feb  1:54:24 pm GMT
+# This file auto generated from Data/common/main/ha_GH.xml
+#	on Mon 11 Apr  5:29:30 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';

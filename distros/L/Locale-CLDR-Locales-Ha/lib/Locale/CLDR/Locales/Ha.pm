@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Ha - Package for language Hausa
 =cut
 
 package Locale::CLDR::Locales::Ha;
-# This file auto generated from Data\common\main\ha.xml
-#	on Sun  3 Feb  1:54:23 pm GMT
+# This file auto generated from Data/common/main/ha.xml
+#	on Mon 11 Apr  5:29:29 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -1221,20 +1221,20 @@ has 'day_periods' => (
 					'pm' => q{PM},
 				},
 				'wide' => {
-					'pm' => q{PM},
 					'am' => q{AM},
+					'pm' => q{PM},
 				},
 			},
 			'stand-alone' => {
 				'abbreviated' => {
-					'pm' => q{PM},
 					'am' => q{AM},
-				},
-				'wide' => {
 					'pm' => q{PM},
-					'am' => q{AM},
 				},
 				'narrow' => {
+					'am' => q{AM},
+					'pm' => q{PM},
+				},
+				'wide' => {
 					'am' => q{AM},
 					'pm' => q{PM},
 				},
@@ -1316,6 +1316,29 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'generic' => {
+			Hm => q{HH:mm},
+			Hms => q{HH:mm:ss},
+			M => q{L},
+			MEd => q{E, M/d},
+			MMM => q{LLL},
+			MMMEd => q{E, MMM d},
+			MMMMEd => q{E, MMMM d},
+			MMMMd => q{MMMM d},
+			MMMd => q{MMM d},
+			Md => q{M/d},
+			d => q{d},
+			hm => q{h:mm a},
+			ms => q{mm:ss},
+			y => q{y},
+			yM => q{M/y},
+			yMEd => q{E, M/d/y},
+			yMMM => q{MMM y},
+			yMMMEd => q{E, MMM d, y},
+			yMMMM => q{MMMM y},
+			yQQQ => q{QQQ y},
+			yQQQQ => q{QQQQ y},
+		},
 		'gregorian' => {
 			Ed => q{E, d},
 			Hm => q{HH:mm},
@@ -1340,29 +1363,6 @@ has 'datetime_formats_available_formats' => (
 			yMMMM => q{MMMM y},
 			yMMMd => q{d MMM, y},
 			yMd => q{y-MM-dd},
-			yQQQ => q{QQQ y},
-			yQQQQ => q{QQQQ y},
-		},
-		'generic' => {
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			M => q{L},
-			MEd => q{E, M/d},
-			MMM => q{LLL},
-			MMMEd => q{E, MMM d},
-			MMMMEd => q{E, MMMM d},
-			MMMMd => q{MMMM d},
-			MMMd => q{MMM d},
-			Md => q{M/d},
-			d => q{d},
-			hm => q{h:mm a},
-			ms => q{mm:ss},
-			y => q{y},
-			yM => q{M/y},
-			yMEd => q{E, M/d/y},
-			yMMM => q{MMM y},
-			yMMMEd => q{E, MMM d, y},
-			yMMMM => q{MMMM y},
 			yQQQ => q{QQQ y},
 			yQQQQ => q{QQQQ y},
 		},

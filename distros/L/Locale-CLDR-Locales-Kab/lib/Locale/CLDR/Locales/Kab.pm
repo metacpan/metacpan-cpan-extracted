@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Kab - Package for language Kabyle
 =cut
 
 package Locale::CLDR::Locales::Kab;
-# This file auto generated from Data\common\main\kab.xml
-#	on Sun  3 Feb  1:59:33 pm GMT
+# This file auto generated from Data/common/main/kab.xml
+#	on Mon 11 Apr  5:31:20 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -4876,25 +4876,25 @@ has 'day_periods' => (
 					'am' => q{n tufat},
 					'pm' => q{n tmeddit},
 				},
-				'wide' => {
-					'pm' => q{n tmeddit},
-					'am' => q{n tufat},
-				},
 				'narrow' => {
-					'pm' => q{m},
 					'am' => q{f},
+					'pm' => q{m},
+				},
+				'wide' => {
+					'am' => q{n tufat},
+					'pm' => q{n tmeddit},
 				},
 			},
 			'stand-alone' => {
-				'narrow' => {
-					'pm' => q{MD},
+				'abbreviated' => {
 					'am' => q{FT},
+					'pm' => q{MD},
+				},
+				'narrow' => {
+					'am' => q{FT},
+					'pm' => q{MD},
 				},
 				'wide' => {
-					'pm' => q{MD},
-					'am' => q{FT},
-				},
-				'abbreviated' => {
 					'am' => q{FT},
 					'pm' => q{MD},
 				},

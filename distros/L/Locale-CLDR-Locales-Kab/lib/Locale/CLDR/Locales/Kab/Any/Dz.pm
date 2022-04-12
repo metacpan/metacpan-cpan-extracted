@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Kab::Any::Dz - Package for language Kabyle
 =cut
 
 package Locale::CLDR::Locales::Kab::Any::Dz;
-# This file auto generated from Data\common\main\kab_DZ.xml
-#	on Sun  3 Feb  1:59:59 pm GMT
+# This file auto generated from Data/common/main/kab_DZ.xml
+#	on Mon 11 Apr  5:31:29 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';

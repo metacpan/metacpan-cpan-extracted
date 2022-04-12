@@ -6,11 +6,13 @@ extends 'Image::TextMode::Writer';
 
 sub _write {
     my ( $self, $image, $fh, $options ) = @_;
+    my ( $width, $height ) = $image->dimensions;
 
-    for my $row ( @{ $image->pixeldata } ) {
-        print $fh
-            join( '',
-            map { pack( 'aC', @{ $_ }{ qw( char attr ) } ) } @$row );
+    for my $y ( 0 .. $height - 1 ) {
+        for my $x ( 0 .. $width - 1 ) {
+            my $pixel = $image->getpixel( $x, $y ) || { char => ' ', attr => 7 };
+            print $fh pack( 'aC', $pixel->{ char }, $pixel->{ attr } );
+        }
     }
 }
 
@@ -28,7 +30,7 @@ Brian Cassidy E<lt>bricas@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2008-2015 by Brian Cassidy
+Copyright 2008-2022 by Brian Cassidy
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself. 

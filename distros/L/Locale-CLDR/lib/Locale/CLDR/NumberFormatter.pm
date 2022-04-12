@@ -2,7 +2,7 @@ package Locale::CLDR::NumberFormatter;
 
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 
 use v5.10.1;
@@ -234,6 +234,7 @@ sub round {
 	my ($self, $number, $increment, $decimal_digits) = @_;
 
 	if ($increment ) {
+		$increment /= 10 ** $decimal_digits;
 		$number /= $increment;
 		$number = int ($number + .5 );
 		$number *= $increment;

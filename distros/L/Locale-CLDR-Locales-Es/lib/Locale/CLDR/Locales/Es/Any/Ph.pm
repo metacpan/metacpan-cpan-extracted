@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Es::Any::Ph - Package for language Spanish
 =cut
 
 package Locale::CLDR::Locales::Es::Any::Ph;
-# This file auto generated from Data\common\main\es_PH.xml
-#	on Sun  3 Feb  1:49:06 pm GMT
+# This file auto generated from Data/common/main/es_PH.xml
+#	on Mon 11 Apr  5:27:25 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -47,26 +47,26 @@ has 'day_period_data' => (
 		SWITCH:
 		for ($type) {
 			if ($_ eq 'gregorian') {
-				if($day_period_type eq 'selection') {
-					return 'night1' if $time >= 2000
-						&& $time < 2400;
-					return 'morning2' if $time >= 600
-						&& $time < 1200;
-					return 'morning1' if $time >= 0
-						&& $time < 600;
-					return 'evening1' if $time >= 1200
-						&& $time < 2000;
-				}
 				if($day_period_type eq 'default') {
 					return 'noon' if $time == 1200;
 					return 'evening1' if $time >= 1200
 						&& $time < 2000;
 					return 'morning1' if $time >= 0
 						&& $time < 600;
-					return 'night1' if $time >= 2000
-						&& $time < 2400;
 					return 'morning2' if $time >= 600
 						&& $time < 1200;
+					return 'night1' if $time >= 2000
+						&& $time < 2400;
+				}
+				if($day_period_type eq 'selection') {
+					return 'evening1' if $time >= 1200
+						&& $time < 2000;
+					return 'morning1' if $time >= 0
+						&& $time < 600;
+					return 'morning2' if $time >= 600
+						&& $time < 1200;
+					return 'night1' if $time >= 2000
+						&& $time < 2400;
 				}
 				last SWITCH;
 				}

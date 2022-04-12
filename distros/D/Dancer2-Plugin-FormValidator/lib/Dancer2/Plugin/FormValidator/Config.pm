@@ -60,15 +60,6 @@ has language => (
     }
 );
 
-has forms => (
-    is       => 'ro',
-    isa      => HashRef,
-    lazy     => 1,
-    builder  => sub {
-        return shift->config->{forms} // {};
-    }
-);
-
 sub BUILDARGS {
     my ($self, %args) = @_;
 
@@ -80,12 +71,6 @@ sub BUILDARGS {
     }
 
     return \%args;
-}
-
-sub form {
-    my ($self, $form) = @_;
-
-    return $self->forms->{$form};
 }
 
 1;

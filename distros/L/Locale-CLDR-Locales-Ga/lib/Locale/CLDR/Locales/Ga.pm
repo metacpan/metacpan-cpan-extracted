@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Ga - Package for language Irish
 =cut
 
 package Locale::CLDR::Locales::Ga;
-# This file auto generated from Data\common\main\ga.xml
-#	on Sun  3 Feb  1:52:34 pm GMT
+# This file auto generated from Data/common/main/ga.xml
+#	on Mon 11 Apr  5:28:48 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -9618,27 +9618,27 @@ has 'day_periods' => (
 					'am' => q{r.n.},
 					'pm' => q{i.n.},
 				},
+				'narrow' => {
+					'am' => q{a},
+					'pm' => q{p},
+				},
 				'wide' => {
 					'am' => q{r.n.},
 					'pm' => q{i.n.},
 				},
-				'narrow' => {
-					'pm' => q{p},
-					'am' => q{a},
-				},
 			},
 			'stand-alone' => {
 				'abbreviated' => {
-					'pm' => q{p.m.},
 					'am' => q{a.m.},
-				},
-				'wide' => {
 					'pm' => q{p.m.},
-					'am' => q{a.m.},
 				},
 				'narrow' => {
 					'am' => q{a},
 					'pm' => q{p},
+				},
+				'wide' => {
+					'am' => q{a.m.},
+					'pm' => q{p.m.},
 				},
 			},
 		},

@@ -132,7 +132,7 @@ for (my $i = 0 ; $i <= $#files ; $i++) {
     while (defined(my $line = <$fh>)) {
         if ($line =~ /^(\S+)/) {
             my $verstr = $1;
-            if ($verstr =~ / ^ v? ( \d+ ( \. \d+ )? ) $ /ix) {
+            if ($verstr =~ / ^ v? ( \d+ ( \. \d+ ( _ \d+ )* )? ) $ /ix) {
                 my $vernum = $1;
                 $vernum =~ tr/_//d;
                 push @vers, [ $verstr, $vernum ];
@@ -171,7 +171,7 @@ my @tags;
     $pipe -> reader(@args);
     while (defined(my $tag = <$pipe>)) {
         $tag =~ s/\s+\z//;
-        if ($tag =~ / ^ v? ( \d+ ( \. \d+ )? ) /ix) {
+        if ($tag =~ / ^ v? ( \d+ ( \. \d+ ( _ \d+ )* )? ) /ix) {
             my $vernum = $1;
             $vernum =~ tr/_//d;
             push @tags, [ $tag, $vernum ];

@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Kea::Any::Cv - Package for language Kabuverdianu
 =cut
 
 package Locale::CLDR::Locales::Kea::Any::Cv;
-# This file auto generated from Data\common\main\kea_CV.xml
-#	on Sun  3 Feb  2:00:08 pm GMT
+# This file auto generated from Data/common/main/kea_CV.xml
+#	on Mon 11 Apr  5:31:32 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';

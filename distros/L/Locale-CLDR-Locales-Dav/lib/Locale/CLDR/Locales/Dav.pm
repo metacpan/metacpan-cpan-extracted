@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Dav - Package for language Taita
 =cut
 
 package Locale::CLDR::Locales::Dav;
-# This file auto generated from Data\common\main\dav.xml
-#	on Sun  3 Feb  1:46:13 pm GMT
+# This file auto generated from Data/common/main/dav.xml
+#	on Mon 11 Apr  5:26:14 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -841,13 +841,13 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
-					'pm' => q{luma lwa p},
-					'am' => q{Luma lwa K},
-				},
 				'abbreviated' => {
-					'pm' => q{luma lwa p},
 					'am' => q{Luma lwa K},
+					'pm' => q{luma lwa p},
+				},
+				'wide' => {
+					'am' => q{Luma lwa K},
+					'pm' => q{luma lwa p},
 				},
 			},
 		},

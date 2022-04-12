@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Ak - Package for language Akan
 =cut
 
 package Locale::CLDR::Locales::Ak;
-# This file auto generated from Data\common\main\ak.xml
-#	on Sun  3 Feb  1:38:12 pm GMT
+# This file auto generated from Data/common/main/ak.xml
+#	on Mon 11 Apr  5:23:20 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -1102,8 +1102,8 @@ has 'day_periods' => (
 					'pm' => q{EW},
 				},
 				'wide' => {
-					'pm' => q{EW},
 					'am' => q{AN},
+					'pm' => q{EW},
 				},
 			},
 		},

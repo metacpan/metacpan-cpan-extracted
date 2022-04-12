@@ -1,2 +1,6 @@
+0.81 2022-04-12 14:43:31 Europe/Moscow
+    [IMPROVEMENTS]
+    * Refactored check field defined and not empty
+
 0.80 2022-04-05 23:07:03 Europe/Moscow
     Initial

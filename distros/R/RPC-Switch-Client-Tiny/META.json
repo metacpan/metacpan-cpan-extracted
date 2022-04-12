@@ -1,7 +1,7 @@
 {
    "abstract" : "Lightweight client for the RPC-Switch.",
    "author" : [
-      "Barnim Dzwillo <bd@localdomain>"
+      "Barnim Dzwillo @ Strato AG"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 6.68, CPAN::Meta::Converter version 2.120921",
@@ -31,9 +31,13 @@
          }
       },
       "runtime" : {
-         "requires" : {}
+         "requires" : {
+            "IO::Socket::SSL" : "1",
+            "JSON" : "1",
+            "perl" : "5.016"
+         }
       }
    },
    "release_status" : "stable",
-   "version" : "1.53"
+   "version" : "1.54"
 }

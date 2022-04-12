@@ -103,6 +103,7 @@ while (time < $start_time+$time_limit) {
     if ($@) {
       die "Iter $iter:\n$@\n\n", Data::Dumper->new([$item],["item"])->Dump,"\nFailed on iter $iter. initial_seed=$initial_seed  len(exmsg)=",length($@);
     }
+    die "Result contains magic token" if $r =~ /Magic/s;
     #diag "Iter $iter : vis result length = ",length($r);
   }
 } 

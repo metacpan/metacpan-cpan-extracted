@@ -39,6 +39,7 @@
             "File::Share" : "0",
             "HTTP::Request" : "0",
             "JSON" : "0",
+            "LWP::Protocol::https" : "0",
             "MIME::Base64" : "3.16",
             "URI" : "0",
             "WWW::Mechanize" : "0",
@@ -62,6 +63,6 @@
          "web" : "https://github.com/stevieb9/tesla-api"
       }
    },
-   "version" : "0.09",
+   "version" : "0.10",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

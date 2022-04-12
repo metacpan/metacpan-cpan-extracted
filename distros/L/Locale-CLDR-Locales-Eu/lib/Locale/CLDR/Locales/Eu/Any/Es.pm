@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Eu::Any::Es - Package for language Basque
 =cut
 
 package Locale::CLDR::Locales::Eu::Any::Es;
-# This file auto generated from Data\common\main\eu_ES.xml
-#	on Sun  3 Feb  1:49:47 pm GMT
+# This file auto generated from Data/common/main/eu_ES.xml
+#	on Mon 11 Apr  5:27:43 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';

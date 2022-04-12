@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Am::Any::Et - Package for language Amharic
 =cut
 
 package Locale::CLDR::Locales::Am::Any::Et;
-# This file auto generated from Data\common\main\am_ET.xml
-#	on Sun  3 Feb  1:38:31 pm GMT
+# This file auto generated from Data/common/main/am_ET.xml
+#	on Mon 11 Apr  5:23:27 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';

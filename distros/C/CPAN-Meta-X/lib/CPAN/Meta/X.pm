@@ -3,9 +3,9 @@
 package CPAN::Meta::X;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-08-27'; # DATE
+our $DATE = '2022-03-18'; # DATE
 our $DIST = 'CPAN-Meta-X'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 1;
 # ABSTRACT: Custom (x_*) keys in CPAN distribution metadata being used in the wild
@@ -22,7 +22,7 @@ CPAN::Meta::X - Custom (x_*) keys in CPAN distribution metadata being used in th
 
 =head1 VERSION
 
-This document describes version 0.006 of CPAN::Meta::X (from Perl distribution CPAN-Meta-X), released on 2021-08-27.
+This document describes version 0.007 of CPAN::Meta::X (from Perl distribution CPAN-Meta-X), released on 2022-03-18.
 
 =head1 DESCRIPTION
 
@@ -132,6 +132,19 @@ References:
 
 =back
 
+=head2 x_lists phase
+
+Express that the current distribution is including the specified module in some
+list(s), e.g. an L<Acme::CPANModules> list.
+
+References:
+
+=over
+
+=item * PERLANCAR, L<Dist::Zilla::Plugin::Acme::CPANModules>
+
+=back
+
 =head2 x_mentions phase
 
 Express that the current distribution is mentioning the specified module.
@@ -168,6 +181,10 @@ References:
 =item * L<Module::Features> specification
 
 =back
+
+=head2 x_lists relationship
+
+See L</"x_lists phase">.
 
 =head2 x_mentions relationship
 
@@ -233,7 +250,7 @@ beyond that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2021 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

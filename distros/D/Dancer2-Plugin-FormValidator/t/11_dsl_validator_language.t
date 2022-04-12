@@ -24,9 +24,6 @@ package App {
                 session => {
                     namespace => '_form_validator'
                 },
-                forms   => {
-                    login => 'Validator',
-                },
             },
         };
     }
@@ -36,7 +33,7 @@ package App {
     validator_language 'ru';
 
     post '/' => sub {
-        if (not validate_form 'login') {
+        if (not validate 'Validator') {
             to_json errors, {utf8 => 0};
         }
     };

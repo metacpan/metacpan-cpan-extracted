@@ -1,5 +1,5 @@
 package HTML::KhatGallery::Core;
-our $VERSION = '0.2402'; # VERSION
+our $VERSION = '0.2405'; # VERSION
 use strict;
 use warnings;
 
@@ -9,7 +9,7 @@ HTML::KhatGallery::Core - the core methods for HTML::KhatGallery
 
 =head1 VERSION
 
-version 0.2402
+version 0.2405
 
 =head1 SYNOPSIS
 
@@ -353,7 +353,7 @@ sub do_dir_actions {
 	my $action = shift @actions;
 	last if $state{stop};
 	$state{action} = $action;
-	$self->debug(1, "action: $action");
+	$self->debug(2, "action: $action");
 	$self->$action(\%state);
     }
     use strict qw(subs refs);
@@ -392,7 +392,7 @@ sub do_image_actions {
 	    my $action = shift @{$images_state{image_actions}};
 	    last if $images_state{stop};
 	    $images_state{action} = $action;
-	    $self->debug(1, "image_action: $action");
+	    $self->debug(2, "image_action: $action");
 	    $self->$action($dir_state,
 		\%images_state);
 	}
@@ -743,7 +743,7 @@ sub clean_thumb_dir {
 
     my $dir = File::Spec->catdir($dir_state->{abs_out_dir}, $self->{thumbdir});
     my @pics = @{$dir_state->{files}};
-    $self->debug(2, "dir: $dir");
+    $self->debug(2, "cleaning dir: $dir");
 
     return unless -d $dir;
 
@@ -884,30 +884,21 @@ sub make_thumbnail {
 	mkdir $dir_state->{abs_thumbdir};
     }
 
-    my $x = $img_state->{info}->{ImageWidth};
-    my $y = $img_state->{info}->{ImageHeight};
-    if (!$x or !$y)
-    {
-	warn "dimensions of " . $img_state->{abs_img} . " undefined -- faking it";
-	print STDERR Dump($img_state);
-	print STDERR "========================\n";
-	$x = 1024;
-	$y = 1024;
-    }
-    
-    my $pixels = $x * $y;
-    my $newx = int($x / (sqrt($x * $y) / sqrt($self->{pixelcount})));
-    my $newy = int($y / (sqrt($x * $y) / sqrt($self->{pixelcount})));
-    my $newpix = $newx * $newy;
     my $command = '';
     if ($img_state->{cur_img} =~ /\.gif$/)
     {
 	# in case this is an animated gif, get the first frame only
-	$command = "convert -geometry \"${newx}x${newy}\>\" \"$img_state->{abs_img}\[0\]\" \"$thumb_file\"";
+        $command = sprintf('convert -geometry "%d@>" %s %s',
+            $self->{pixelcount},
+            $img_state->{abs_img}[0],
+            $thumb_file);
     }
     else
     {
-	$command = "convert -geometry \"${newx}x${newy}\>\" \"$img_state->{abs_img}\" \"$thumb_file\"";
+        $command = sprintf('convert -geometry "%d@>" %s %s',
+            $self->{pixelcount},
+            $img_state->{abs_img},
+            $thumb_file);
     }
     system($command) == 0
 	or die "$command failed";
@@ -1690,11 +1681,11 @@ sub make_image_content {
 	$img_url = $dir_state->{dir_url} . '/' . $img_name;
     }
     my @out = ();
-    push @out, "<div class=\"image\">\n";
+    push @out, "<div class=\"image\" id=\"image\">\n";
     my $width = $img_state->{info}->{ImageWidth};
     my $height = $img_state->{info}->{ImageHeight};
-    push @out, "<img src=\"$img_url\" alt=\"$img_name\" style=\"width: ${width}px; height: ${height}px;\"/>\n";
-    push @out, "<p class=\"caption\">$caption</p>\n";
+    push @out, "<img src=\"$img_url\" title=\"$img_name\" alt=\"$img_name\" style=\"width: ${width}px; height: ${height}px;\"/>\n";
+    push @out, "<p class=\"caption\" id=\"caption\">$caption</p>\n";
     push @out, "</div>\n";
     return join('', @out);
 } # make_image_content
@@ -1816,6 +1807,7 @@ sub index_needs_rebuilding {
         }
         else
         {
+            $self->debug(1, "GONE DIR: $dsd");
 	    $destdir_has_src{$dsd} = 0;
             return 1;
         }
@@ -1825,6 +1817,7 @@ sub index_needs_rebuilding {
     {
 	if (!$dir_exists)
 	{
+            $self->debug(1, "NEW DIR: $key");
 	    return 1;
 	}
     }

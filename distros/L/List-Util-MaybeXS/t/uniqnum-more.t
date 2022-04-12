@@ -41,6 +41,9 @@ sub iterate_uniqnum {
       # evals are needed to handle Inf and NaN, since they may die in
       # int/uint conversions.
 
+      my $us = $uniq - 1 == $uniq ? sprintf('%.0f', $uniq) : sprintf('%u', $uniq);
+      my $is = $in - 1   == $in   ? sprintf('%.0f', $in)   : sprintf('%u', $in);
+
       my ($uj) = eval { unpack 'j', pack 'j', $uniq };
       my ($uJ) = eval { unpack 'J', pack 'J', $uniq };
       my ($uF) =        unpack 'F', pack 'F', $uniq;
@@ -59,7 +62,7 @@ sub iterate_uniqnum {
           last;
         }
       }
-      elsif ($uj == $ij && $uJ == $iJ && $uF == $iF) {
+      elsif ($uj == $ij && $uJ == $iJ && $uF == $iF && $us eq $is) {
         $dupe = 1;
         last;
       }

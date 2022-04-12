@@ -4,7 +4,7 @@ require v5.8.5;
 use strict;
 use warnings;
 
-our $VERSION = '0.2402'; # VERSION
+our $VERSION = '0.2405'; # VERSION
 
 =head1 NAME
 
@@ -12,7 +12,7 @@ kg_image_info - Check what meta-information is in an image.
 
 =head1 VERSION
 
-version 0.2402
+version 0.2405
 
 =head1 SYNOPSIS
 

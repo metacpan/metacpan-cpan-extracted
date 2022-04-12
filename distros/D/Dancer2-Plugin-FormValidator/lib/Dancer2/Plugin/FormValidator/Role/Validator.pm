@@ -18,10 +18,12 @@ sub stop_on_fail {
 }
 
 sub _field_defined_and_non_empty {
+    my ($self, $field, $input) = @_;
+
     if (
-        exists $_[1]
-        and defined $_[1]
-        and $_[1] ne ''
+        exists $input->{$field}
+        and defined $input->{$field}
+        and $input->{$field} ne ''
     ){
         return 1;
     }

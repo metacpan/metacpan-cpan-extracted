@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Jv::Any::Id - Package for language Javanese
 =cut
 
 package Locale::CLDR::Locales::Jv::Any::Id;
-# This file auto generated from Data\common\main\jv_ID.xml
-#	on Sun  3 Feb  1:59:07 pm GMT
+# This file auto generated from Data/common/main/jv_ID.xml
+#	on Mon 11 Apr  5:31:12 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';

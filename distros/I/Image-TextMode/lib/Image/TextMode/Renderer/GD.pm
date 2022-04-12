@@ -195,8 +195,28 @@ sub _prepare_options {
 
     }
 
-    $options->{ font } = _font_to_gd( $options->{ font },
-        { '9th_bit' => $options->{ '9th_bit' } } );
+    # Special case for XBin 512 char fonts, which maps to 2 x 256 char fonts
+    if( $source->isa( 'Image::TextMode::Format::XBin' ) && $source->header->{ flags } & 16 ) {
+      my $low_font = Image::TextMode::Font->new( {
+        width => $options->{ font }->width,
+        height => $options->{ font }->height,
+        chars => [ @{ $options->{ font }->chars }[ 0..255 ] ],
+      } );
+      my $high_font = Image::TextMode::Font->new( {
+        width => $options->{ font }->width,
+        height => $options->{ font }->height,
+        chars => [ @{ $options->{ font }->chars }[ 256..511 ] ],
+      } );
+
+      $options->{ font } = _font_to_gd( $low_font,
+          { '9th_bit' => $options->{ '9th_bit' } } );
+      $options->{ font_512 } = _font_to_gd( $high_font,
+          { '9th_bit' => $options->{ '9th_bit' } } );
+    }
+    else {
+      $options->{ font } = _font_to_gd( $options->{ font },
+          { '9th_bit' => $options->{ '9th_bit' } } );
+    }
 
     $options->{ truecolor } ||= 0;
     $options->{ format }    ||= 'png';
@@ -249,8 +269,13 @@ sub _render_frame {
                 );
             }
 
+            my $raw_pixel = $canvas->getpixel( $x, $y );
+            my $gd_font = $font;
+            if ( $options->{ 'font_512' } && ( $raw_pixel->{ attr } & 8 ) ) {
+              $gd_font = $options->{ 'font_512' };
+            }
             $image->string(
-                $font,
+                $gd_font,
                 $x * $ftwidth,
                 $y * $ftheight,
                 $pixel->char, $colors->[ $ced ? 0 : $pixel->fg ]
@@ -336,7 +361,7 @@ Brian Cassidy E<lt>bricas@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2008-2015 by Brian Cassidy
+Copyright 2008-2022 by Brian Cassidy
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself. 

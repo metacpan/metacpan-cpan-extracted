@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Asa::Any::Tz - Package for language Asu
 =cut
 
 package Locale::CLDR::Locales::Asa::Any::Tz;
-# This file auto generated from Data\common\main\asa_TZ.xml
-#	on Sun  3 Feb  1:39:16 pm GMT
+# This file auto generated from Data/common/main/asa_TZ.xml
+#	on Mon 11 Apr  5:23:46 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';

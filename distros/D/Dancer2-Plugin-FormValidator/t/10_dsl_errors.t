@@ -23,9 +23,6 @@ package App {
                 session => {
                     namespace => '_form_validator'
                 },
-                forms   => {
-                    login => 'Validator',
-                },
             },
         };
     }
@@ -33,7 +30,7 @@ package App {
     use Dancer2::Plugin::FormValidator;
 
     post '/' => sub {
-        if (not validate_form 'login') {
+        if (not validate 'Validator') {
             to_json errors;
         }
     };

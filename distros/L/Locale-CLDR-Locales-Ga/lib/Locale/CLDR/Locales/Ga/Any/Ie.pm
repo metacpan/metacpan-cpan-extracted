@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Ga::Any::Ie - Package for language Irish
 =cut
 
 package Locale::CLDR::Locales::Ga::Any::Ie;
-# This file auto generated from Data\common\main\ga_IE.xml
-#	on Sun  3 Feb  1:52:59 pm GMT
+# This file auto generated from Data/common/main/ga_IE.xml
+#	on Mon 11 Apr  5:28:58 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';

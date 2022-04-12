@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Ig - Package for language Igbo
 =cut
 
 package Locale::CLDR::Locales::Ig;
-# This file auto generated from Data\common\main\ig.xml
-#	on Sun  3 Feb  1:57:18 pm GMT
+# This file auto generated from Data/common/main/ig.xml
+#	on Mon 11 Apr  5:30:33 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -587,22 +587,22 @@ has 'day_periods' => (
 					'pm' => q{P.M.},
 				},
 				'wide' => {
-					'pm' => q{P.M.},
 					'am' => q{A.M.},
+					'pm' => q{P.M.},
 				},
 			},
 			'stand-alone' => {
-				'narrow' => {
-					'pm' => q{P.M.},
+				'abbreviated' => {
 					'am' => q{A.M.},
+					'pm' => q{P.M.},
+				},
+				'narrow' => {
+					'am' => q{A.M.},
+					'pm' => q{P.M.},
 				},
 				'wide' => {
-					'pm' => q{P.M.},
 					'am' => q{A.M.},
-				},
-				'abbreviated' => {
 					'pm' => q{P.M.},
-					'am' => q{A.M.},
 				},
 			},
 		},
@@ -690,6 +690,29 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'generic' => {
+			Hm => q{HH:mm},
+			Hms => q{HH:mm:ss},
+			M => q{L},
+			MEd => q{E, M/d},
+			MMM => q{LLL},
+			MMMEd => q{E, MMM d},
+			MMMMEd => q{E, MMMM d},
+			MMMMd => q{MMMM d},
+			MMMd => q{MMM d},
+			Md => q{M/d},
+			d => q{d},
+			hm => q{h:mm a},
+			ms => q{mm:ss},
+			y => q{y},
+			yM => q{M/y},
+			yMEd => q{E, M/d/y},
+			yMMM => q{MMM y},
+			yMMMEd => q{E, MMM d, y},
+			yMMMM => q{MMMM y},
+			yQQQ => q{QQQ y},
+			yQQQQ => q{QQQQ y},
+		},
 		'gregorian' => {
 			E => q{ccc},
 			EHm => q{E HH:mm},
@@ -733,29 +756,6 @@ has 'datetime_formats_available_formats' => (
 			yQQQ => q{QQQ y},
 			yQQQQ => q{QQQQ y},
 			yw => q{'week' w 'of' Y},
-		},
-		'generic' => {
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			M => q{L},
-			MEd => q{E, M/d},
-			MMM => q{LLL},
-			MMMEd => q{E, MMM d},
-			MMMMEd => q{E, MMMM d},
-			MMMMd => q{MMMM d},
-			MMMd => q{MMM d},
-			Md => q{M/d},
-			d => q{d},
-			hm => q{h:mm a},
-			ms => q{mm:ss},
-			y => q{y},
-			yM => q{M/y},
-			yMEd => q{E, M/d/y},
-			yMMM => q{MMM y},
-			yMMMEd => q{E, MMM d, y},
-			yMMMM => q{MMMM y},
-			yQQQ => q{QQQ y},
-			yQQQQ => q{QQQQ y},
 		},
 	} },
 );

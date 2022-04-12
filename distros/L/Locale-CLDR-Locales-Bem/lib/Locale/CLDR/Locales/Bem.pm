@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Bem - Package for language Bemba
 =cut
 
 package Locale::CLDR::Locales::Bem;
-# This file auto generated from Data\common\main\bem.xml
-#	on Sun  3 Feb  1:40:29 pm GMT
+# This file auto generated from Data/common/main/bem.xml
+#	on Mon 11 Apr  5:24:14 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -293,11 +293,11 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
-					'pm' => q{akasuba},
-					'am' => q{uluchelo},
-				},
 				'abbreviated' => {
+					'am' => q{uluchelo},
+					'pm' => q{akasuba},
+				},
+				'wide' => {
 					'am' => q{uluchelo},
 					'pm' => q{akasuba},
 				},

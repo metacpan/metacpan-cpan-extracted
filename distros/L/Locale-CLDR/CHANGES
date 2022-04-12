@@ -165,3 +165,15 @@ All dates are in ISO 8601 Format
     Now using CLDR version 32
     Updated tests to work with this version
     Added empty Unicode properties to older versions of perl can run with the current data set
+
+0.34.0 2018-12-17
+    Now using CLDR version 34
+    Fixed warnings when calling 'get_node' with no value
+    Fixed transliteration and added test
+    Tidied documentation
+    Restrict 'contained' regions to geographical regions (ignore political regions)
+
+0.34.1 2021-04-11
+    Fixed for-cash rounding problem
+    Fix warning in plural rules where fraction is used
+    Fix typo in POD documentation

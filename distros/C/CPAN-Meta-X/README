@@ -3,8 +3,8 @@ NAME
     used in the wild
 
 VERSION
-    This document describes version 0.006 of CPAN::Meta::X (from Perl
-    distribution CPAN-Meta-X), released on 2021-08-27.
+    This document describes version 0.007 of CPAN::Meta::X (from Perl
+    distribution CPAN-Meta-X), released on 2022-03-18.
 
 DESCRIPTION
     The CPAN distribution metadata specification allows custom keys (those
@@ -83,6 +83,14 @@ CUSTOM PREREQS PHASES
 
     *   PERLANCAR, <https://perlancar.wordpress.com/2016/12/28/x_-prereqs/>
 
+  x_lists phase
+    Express that the current distribution is including the specified module
+    in some list(s), e.g. an Acme::CPANModules list.
+
+    References:
+
+    *   PERLANCAR, Dist::Zilla::Plugin::Acme::CPANModules
+
   x_mentions phase
     Express that the current distribution is mentioning the specified
     module.
@@ -108,6 +116,9 @@ CUSTOM PREREQS RELATIONSHIPS
     References:
 
     *   Module::Features specification
+
+  x_lists relationship
+    See "x_lists phase".
 
   x_mentions relationship
     See "x_mentions phase".
@@ -157,7 +168,8 @@ CONTRIBUTING
     me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021 by perlancar <perlancar@cpan.org>.
+    This software is copyright (c) 2022, 2021 by perlancar
+    <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

@@ -22,9 +22,9 @@ is($locale->currency_format('accounting'), '#,##0.00 ¤', 'Accountcy currency f
 $locale = Locale::CLDR->new('da_DK_u_cf_standard');
 is($locale->currency_format(), '#,##0.00 ¤', 'Currency format with standard default');
 is($locale->format_currency(123456.78), '123.456,78 kr', 'Format currency with standard format, positive number and financial rounding');
-is($locale->format_currency(123456.78, 'cash'), '123.450,00 kr', 'Format currency with standard format, positive number and cash rounding');
+is($locale->format_currency(123456.78, 'cash'), '123.457,00 kr', 'Format currency with standard format, positive number and cash rounding');
 is($locale->format_currency(-123456.78), '-123.456,78 kr', 'Format currency with standard format, negitive number and financial rounding');
-is($locale->format_currency(-123456.78, 'cash'), '-123.450,00 kr', 'Format currency with standard format, negitive number and cash rounding');
+is($locale->format_currency(-123456.78, 'cash'), '-123.457,00 kr', 'Format currency with standard format, negitive number and cash rounding');
 
 $locale = Locale::CLDR->new('da_DK_u_cf_standard_cu_eur');
 is($locale->currency_format(), '#,##0.00 ¤', 'Currency format with standard default');
@@ -36,9 +36,9 @@ is($locale->format_currency(-123456.78, 'cash'), '-123.456,78 €', 'Format cur
 $locale = Locale::CLDR->new('da_DK_u_cf_account');
 is($locale->currency_format(), '#,##0.00 ¤', 'Currency format with account default');
 is($locale->format_currency(123456.78), '123.456,78 kr', 'Format currency with accountancy format, positive number and financial rounding');
-is($locale->format_currency(123456.78, 'cash'), '123.450,00 kr', 'Format currency with accountancy format, positive number and cash rounding');
+is($locale->format_currency(123456.78, 'cash'), '123.457,00 kr', 'Format currency with accountancy format, positive number and cash rounding');
 is($locale->format_currency(-123456.78), '-123.456,78 kr', 'Format currency with accountancy format, negitive number and financial rounding');
-is($locale->format_currency(-123456.78, 'cash'), '-123.450,00 kr', 'Format currency with accountancy format, negitive number and cash rounding');
+is($locale->format_currency(-123456.78, 'cash'), '-123.457,00 kr', 'Format currency with accountancy format, negitive number and cash rounding');
 
 $locale = Locale::CLDR->new('da_DK_u_cf_account_cu_eur');
 is($locale->currency_format(), '#,##0.00 ¤', 'Currency format with account default');

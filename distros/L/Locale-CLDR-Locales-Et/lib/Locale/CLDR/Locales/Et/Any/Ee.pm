@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Et::Any::Ee - Package for language Estonian
 =cut
 
 package Locale::CLDR::Locales::Et::Any::Ee;
-# This file auto generated from Data\common\main\et_EE.xml
-#	on Sun  3 Feb  1:49:30 pm GMT
+# This file auto generated from Data/common/main/et_EE.xml
+#	on Mon 11 Apr  5:27:36 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';

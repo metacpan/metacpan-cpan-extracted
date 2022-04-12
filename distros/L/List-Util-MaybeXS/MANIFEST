@@ -28,6 +28,7 @@ t/sum.t
 t/sum0.t
 t/uniq.t
 t/uniqnum-more.t
+t/uniqnum.t
 t/zip.t
 xt/all-supported.t
 xt/pod-coverage.t

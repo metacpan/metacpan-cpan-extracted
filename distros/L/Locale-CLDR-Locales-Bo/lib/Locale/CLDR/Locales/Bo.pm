@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Bo - Package for language Tibetan
 =cut
 
 package Locale::CLDR::Locales::Bo;
-# This file auto generated from Data\common\main\bo.xml
-#	on Sun  3 Feb  1:41:27 pm GMT
+# This file auto generated from Data/common/main/bo.xml
+#	on Mon 11 Apr  5:24:34 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -665,8 +665,8 @@ has 'day_periods' => (
 					'pm' => q{ཕྱི་དྲོ་},
 				},
 				'wide' => {
-					'pm' => q{ཕྱི་དྲོ་},
 					'am' => q{སྔ་དྲོ་},
+					'pm' => q{ཕྱི་དྲོ་},
 				},
 			},
 		},

@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Fr::Any::Gn - Package for language French
 =cut
 
 package Locale::CLDR::Locales::Fr::Any::Gn;
-# This file auto generated from Data\common\main\fr_GN.xml
-#	on Sun  3 Feb  1:52:09 pm GMT
+# This file auto generated from Data/common/main/fr_GN.xml
+#	on Mon 11 Apr  5:28:39 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';

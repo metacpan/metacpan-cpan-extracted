@@ -7,14 +7,14 @@ Locale::CLDR::Locales::He::Any::Il - Package for language Hebrew
 =cut
 
 package Locale::CLDR::Locales::He::Any::Il;
-# This file auto generated from Data\common\main\he_IL.xml
-#	on Sun  3 Feb  1:54:51 pm GMT
+# This file auto generated from Data/common/main/he_IL.xml
+#	on Mon 11 Apr  5:29:40 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';

@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Gd::Any::Gb - Package for language Scottish Gaelic
 =cut
 
 package Locale::CLDR::Locales::Gd::Any::Gb;
-# This file auto generated from Data\common\main\gd_GB.xml
-#	on Sun  3 Feb  1:53:30 pm GMT
+# This file auto generated from Data/common/main/gd_GB.xml
+#	on Mon 11 Apr  5:29:10 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';

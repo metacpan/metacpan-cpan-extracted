@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Gl - Package for language Galician
 =cut
 
 package Locale::CLDR::Locales::Gl;
-# This file auto generated from Data\common\main\gl.xml
-#	on Sun  3 Feb  1:53:30 pm GMT
+# This file auto generated from Data/common/main/gl.xml
+#	on Mon 11 Apr  5:29:10 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -4815,58 +4815,58 @@ has 'day_period_data' => (
 		SWITCH:
 		for ($type) {
 			if ($_ eq 'generic') {
-				if($day_period_type eq 'selection') {
-					return 'morning1' if $time >= 0
-						&& $time < 600;
-					return 'evening1' if $time >= 1300
-						&& $time < 2100;
-					return 'night1' if $time >= 2100
-						&& $time < 2400;
-					return 'morning2' if $time >= 600
-						&& $time < 1200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1300;
-				}
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
-					return 'night1' if $time >= 2100
-						&& $time < 2400;
-					return 'morning2' if $time >= 600
-						&& $time < 1200;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1300;
-					return 'morning1' if $time >= 0
-						&& $time < 600;
 					return 'evening1' if $time >= 1300
 						&& $time < 2100;
+					return 'morning1' if $time >= 0
+						&& $time < 600;
+					return 'morning2' if $time >= 600
+						&& $time < 1200;
+					return 'night1' if $time >= 2100
+						&& $time < 2400;
+				}
+				if($day_period_type eq 'selection') {
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1300;
+					return 'evening1' if $time >= 1300
+						&& $time < 2100;
+					return 'morning1' if $time >= 0
+						&& $time < 600;
+					return 'morning2' if $time >= 600
+						&& $time < 1200;
+					return 'night1' if $time >= 2100
+						&& $time < 2400;
 				}
 				last SWITCH;
 				}
 			if ($_ eq 'gregorian') {
-				if($day_period_type eq 'selection') {
-					return 'morning1' if $time >= 0
-						&& $time < 600;
-					return 'evening1' if $time >= 1300
-						&& $time < 2100;
-					return 'night1' if $time >= 2100
-						&& $time < 2400;
-					return 'morning2' if $time >= 600
-						&& $time < 1200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1300;
-				}
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
-					return 'night1' if $time >= 2100
-						&& $time < 2400;
-					return 'morning2' if $time >= 600
-						&& $time < 1200;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1300;
-					return 'morning1' if $time >= 0
-						&& $time < 600;
 					return 'evening1' if $time >= 1300
 						&& $time < 2100;
+					return 'morning1' if $time >= 0
+						&& $time < 600;
+					return 'morning2' if $time >= 600
+						&& $time < 1200;
+					return 'night1' if $time >= 2100
+						&& $time < 2400;
+				}
+				if($day_period_type eq 'selection') {
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1300;
+					return 'evening1' if $time >= 1300
+						&& $time < 2100;
+					return 'morning1' if $time >= 0
+						&& $time < 600;
+					return 'morning2' if $time >= 600
+						&& $time < 1200;
+					return 'night1' if $time >= 2100
+						&& $time < 2400;
 				}
 				last SWITCH;
 				}
@@ -4887,66 +4887,66 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'abbreviated' => {
-					'morning1' => q{da madrugada},
-					'evening1' => q{da tarde},
 					'afternoon1' => q{do mediodía},
 					'am' => q{a.m.},
-					'midnight' => q{da noite},
-					'pm' => q{p.m.},
-					'morning2' => q{da mañá},
-					'night1' => q{da noite},
-				},
-				'wide' => {
-					'pm' => q{p.m.},
-					'midnight' => q{da noite},
-					'am' => q{a.m.},
-					'night1' => q{da noite},
-					'morning2' => q{da mañá},
 					'evening1' => q{da tarde},
+					'midnight' => q{da noite},
 					'morning1' => q{da madrugada},
-					'afternoon1' => q{do mediodía},
+					'morning2' => q{da mañá},
+					'night1' => q{da noite},
+					'pm' => q{p.m.},
 				},
 				'narrow' => {
-					'morning1' => q{da madrugada},
-					'evening1' => q{da tarde},
 					'afternoon1' => q{do mediodía},
 					'am' => q{a.m.},
-					'pm' => q{p.m.},
+					'evening1' => q{da tarde},
 					'midnight' => q{da noite},
-					'night1' => q{da noite},
+					'morning1' => q{da madrugada},
 					'morning2' => q{da mañá},
+					'night1' => q{da noite},
+					'pm' => q{p.m.},
+				},
+				'wide' => {
+					'afternoon1' => q{do mediodía},
+					'am' => q{a.m.},
+					'evening1' => q{da tarde},
+					'midnight' => q{da noite},
+					'morning1' => q{da madrugada},
+					'morning2' => q{da mañá},
+					'night1' => q{da noite},
+					'pm' => q{p.m.},
 				},
 			},
 			'stand-alone' => {
 				'abbreviated' => {
-					'night1' => q{noite},
-					'morning2' => q{mañá},
-					'midnight' => q{medianoite},
-					'pm' => q{p.m.},
-					'am' => q{a.m.},
 					'afternoon1' => q{mediodía},
+					'am' => q{a.m.},
 					'evening1' => q{tarde},
+					'midnight' => q{medianoite},
 					'morning1' => q{madrugada},
-				},
-				'wide' => {
 					'morning2' => q{mañá},
 					'night1' => q{noite},
-					'am' => q{a.m.},
-					'midnight' => q{medianoite},
 					'pm' => q{p.m.},
-					'afternoon1' => q{mediodía},
-					'morning1' => q{madrugada},
-					'evening1' => q{tarde},
 				},
 				'narrow' => {
-					'pm' => q{p.m.},
-					'midnight' => q{medianoite},
+					'afternoon1' => q{mediodía},
 					'am' => q{a.m.},
+					'evening1' => q{tarde},
+					'midnight' => q{medianoite},
+					'morning1' => q{madrugada},
 					'morning2' => q{mañá},
 					'night1' => q{noite},
-					'evening1' => q{tarde},
-					'morning1' => q{madrugada},
+					'pm' => q{p.m.},
+				},
+				'wide' => {
 					'afternoon1' => q{mediodía},
+					'am' => q{a.m.},
+					'evening1' => q{tarde},
+					'midnight' => q{medianoite},
+					'morning1' => q{madrugada},
+					'morning2' => q{mañá},
+					'night1' => q{noite},
+					'pm' => q{p.m.},
 				},
 			},
 		},
@@ -5034,57 +5034,6 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
-			Bh => q{h B},
-			Bhm => q{h:mm B},
-			Bhms => q{h:mm:ss B},
-			E => q{ccc},
-			EBhm => q{E, h:mm B},
-			EBhms => q{E, h:mm:ss B},
-			EHm => q{E, HH:mm},
-			EHms => q{E, HH:mm:ss},
-			Ed => q{E d},
-			Ehm => q{E, h:mm a},
-			Ehms => q{E, h:mm:ss a},
-			Gy => q{y G},
-			GyMMM => q{MMM 'de' y G},
-			GyMMMEd => q{E, d 'de' MMM 'de' y G},
-			GyMMMd => q{d 'de' MMMM 'de' y G},
-			H => q{HH},
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			Hmsv => q{HH:mm:ss v},
-			Hmv => q{HH:mm v},
-			M => q{L},
-			MEd => q{E, d/M},
-			MMM => q{LLL},
-			MMMEd => q{E, d 'de' MMM},
-			MMMMEd => q{E, d 'de' MMMM},
-			MMMMW => q{W.'ª' 'semana' 'de' MMMM},
-			MMMMd => q{d 'de' MMMM},
-			MMMd => q{d 'de' MMM},
-			MMdd => q{dd/MM},
-			Md => q{d/M},
-			d => q{d},
-			h => q{h a},
-			hm => q{h:mm a},
-			hms => q{h:mm:ss a},
-			hmsv => q{h:mm:ss a v},
-			hmv => q{h:mm a v},
-			ms => q{mm:ss},
-			y => q{y},
-			yM => q{M/y},
-			yMEd => q{E, d/M/y},
-			yMM => q{MM/y},
-			yMMM => q{MMM 'de' y},
-			yMMMEd => q{EEE, d/MM/y},
-			yMMMM => q{MMMM 'de' y},
-			yMMMd => q{d/MM/y},
-			yMd => q{d/M/y},
-			yQQQ => q{QQQ y},
-			yQQQQ => q{QQQQ 'de' y},
-			yw => q{w.'ª' 'semana' 'de' Y},
-		},
 		'generic' => {
 			Bh => q{h B},
 			Bhm => q{h:mm B},
@@ -5140,6 +5089,57 @@ has 'datetime_formats_available_formats' => (
 			yyyyQQQ => q{QQQ y G},
 			yyyyQQQQ => q{QQQQ 'de' y G},
 		},
+		'gregorian' => {
+			Bh => q{h B},
+			Bhm => q{h:mm B},
+			Bhms => q{h:mm:ss B},
+			E => q{ccc},
+			EBhm => q{E, h:mm B},
+			EBhms => q{E, h:mm:ss B},
+			EHm => q{E, HH:mm},
+			EHms => q{E, HH:mm:ss},
+			Ed => q{E d},
+			Ehm => q{E, h:mm a},
+			Ehms => q{E, h:mm:ss a},
+			Gy => q{y G},
+			GyMMM => q{MMM 'de' y G},
+			GyMMMEd => q{E, d 'de' MMM 'de' y G},
+			GyMMMd => q{d 'de' MMMM 'de' y G},
+			H => q{HH},
+			Hm => q{HH:mm},
+			Hms => q{HH:mm:ss},
+			Hmsv => q{HH:mm:ss v},
+			Hmv => q{HH:mm v},
+			M => q{L},
+			MEd => q{E, d/M},
+			MMM => q{LLL},
+			MMMEd => q{E, d 'de' MMM},
+			MMMMEd => q{E, d 'de' MMMM},
+			MMMMW => q{W.'ª' 'semana' 'de' MMMM},
+			MMMMd => q{d 'de' MMMM},
+			MMMd => q{d 'de' MMM},
+			MMdd => q{dd/MM},
+			Md => q{d/M},
+			d => q{d},
+			h => q{h a},
+			hm => q{h:mm a},
+			hms => q{h:mm:ss a},
+			hmsv => q{h:mm:ss a v},
+			hmv => q{h:mm a v},
+			ms => q{mm:ss},
+			y => q{y},
+			yM => q{M/y},
+			yMEd => q{E, d/M/y},
+			yMM => q{MM/y},
+			yMMM => q{MMM 'de' y},
+			yMMMEd => q{EEE, d/MM/y},
+			yMMMM => q{MMMM 'de' y},
+			yMMMd => q{d/MM/y},
+			yMd => q{d/M/y},
+			yQQQ => q{QQQ y},
+			yQQQQ => q{QQQQ 'de' y},
+			yw => q{w.'ª' 'semana' 'de' Y},
+		},
 	} },
 );
 
@@ -5159,101 +5159,6 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
-			H => {
-				H => q{HH–HH},
-			},
-			Hm => {
-				H => q{HH:mm–HH:mm},
-				m => q{HH:mm–HH:mm},
-			},
-			Hmv => {
-				H => q{HH:mm–HH:mm v},
-				m => q{HH:mm–HH:mm v},
-			},
-			Hv => {
-				H => q{HH–HH v},
-			},
-			M => {
-				M => q{M–M},
-			},
-			MEd => {
-				M => q{E, d/M – E, d/M},
-				d => q{E, d/M – E, d/M},
-			},
-			MMM => {
-				M => q{MMM–MMM},
-			},
-			MMMEd => {
-				M => q{E, d MMM – E, d MMM},
-				d => q{E, d 'de' MMM – E, d 'de' MMM},
-			},
-			MMMd => {
-				M => q{d MMM – d MMM},
-				d => q{d–d 'de' MMM},
-			},
-			Md => {
-				M => q{d/M – d/M},
-				d => q{d/M – d/M},
-			},
-			d => {
-				d => q{d–d},
-			},
-			fallback => '{0} – {1}',
-			h => {
-				a => q{h a – h a},
-				h => q{h–h a},
-			},
-			hm => {
-				a => q{h:mm a – h:mm a},
-				h => q{h:mm–h:mm a},
-				m => q{h:mm–h:mm a},
-			},
-			hmv => {
-				a => q{h:mm a – h:mm a v},
-				h => q{h:mm–h:mm a v},
-				m => q{h:mm–h:mm a v},
-			},
-			hv => {
-				a => q{h a – h a v},
-				h => q{h–h a v},
-			},
-			y => {
-				y => q{y–y},
-			},
-			yM => {
-				M => q{M/y – M/y},
-				y => q{M/y – M/y},
-			},
-			yMEd => {
-				M => q{E, dd/MM/y – E, dd/MM/y},
-				d => q{E, d/M/y – E, d/M/y},
-				y => q{E, d/M/y – E, d/M/y},
-			},
-			yMMM => {
-				M => q{MMM–MMM 'de' y},
-				y => q{MMM 'de' y – MMM 'de' y},
-			},
-			yMMMEd => {
-				M => q{E, d 'de' MMM – E, d 'de' MMM 'de' y},
-				d => q{E, d MMM – E, d MMM y},
-				y => q{E, d 'de' MMM 'de' y – E, d 'de' MMM 'de' y},
-			},
-			yMMMM => {
-				M => q{MMMM–MMMM 'de' y},
-				y => q{MMMM 'de' y – MMMM 'de' y},
-			},
-			yMMMd => {
-				M => q{d MMM – d MMM 'de' y},
-				d => q{d–d 'de' MMMM 'de' y},
-				y => q{d MMM y – d MMM y},
-			},
-			yMd => {
-				M => q{d/M/y – d/M/y},
-				d => q{d/M/y – d/M/y},
-				y => q{dd/MM/y – dd/MM/y},
-			},
-		},
 		'generic' => {
 			H => {
 				H => q{HH–HH},
@@ -5347,6 +5252,101 @@ has 'datetime_formats_interval' => (
 				M => q{dd/MM/y – dd/MM/y GGGGG},
 				d => q{d/M/y – d/M/y GGGGG},
 				y => q{dd/MM/y – dd/MM/y GGGGG},
+			},
+		},
+		'gregorian' => {
+			H => {
+				H => q{HH–HH},
+			},
+			Hm => {
+				H => q{HH:mm–HH:mm},
+				m => q{HH:mm–HH:mm},
+			},
+			Hmv => {
+				H => q{HH:mm–HH:mm v},
+				m => q{HH:mm–HH:mm v},
+			},
+			Hv => {
+				H => q{HH–HH v},
+			},
+			M => {
+				M => q{M–M},
+			},
+			MEd => {
+				M => q{E, d/M – E, d/M},
+				d => q{E, d/M – E, d/M},
+			},
+			MMM => {
+				M => q{MMM–MMM},
+			},
+			MMMEd => {
+				M => q{E, d MMM – E, d MMM},
+				d => q{E, d 'de' MMM – E, d 'de' MMM},
+			},
+			MMMd => {
+				M => q{d MMM – d MMM},
+				d => q{d–d 'de' MMM},
+			},
+			Md => {
+				M => q{d/M – d/M},
+				d => q{d/M – d/M},
+			},
+			d => {
+				d => q{d–d},
+			},
+			fallback => '{0} – {1}',
+			h => {
+				a => q{h a – h a},
+				h => q{h–h a},
+			},
+			hm => {
+				a => q{h:mm a – h:mm a},
+				h => q{h:mm–h:mm a},
+				m => q{h:mm–h:mm a},
+			},
+			hmv => {
+				a => q{h:mm a – h:mm a v},
+				h => q{h:mm–h:mm a v},
+				m => q{h:mm–h:mm a v},
+			},
+			hv => {
+				a => q{h a – h a v},
+				h => q{h–h a v},
+			},
+			y => {
+				y => q{y–y},
+			},
+			yM => {
+				M => q{M/y – M/y},
+				y => q{M/y – M/y},
+			},
+			yMEd => {
+				M => q{E, dd/MM/y – E, dd/MM/y},
+				d => q{E, d/M/y – E, d/M/y},
+				y => q{E, d/M/y – E, d/M/y},
+			},
+			yMMM => {
+				M => q{MMM–MMM 'de' y},
+				y => q{MMM 'de' y – MMM 'de' y},
+			},
+			yMMMEd => {
+				M => q{E, d 'de' MMM – E, d 'de' MMM 'de' y},
+				d => q{E, d MMM – E, d MMM y},
+				y => q{E, d 'de' MMM 'de' y – E, d 'de' MMM 'de' y},
+			},
+			yMMMM => {
+				M => q{MMMM–MMMM 'de' y},
+				y => q{MMMM 'de' y – MMMM 'de' y},
+			},
+			yMMMd => {
+				M => q{d MMM – d MMM 'de' y},
+				d => q{d–d 'de' MMMM 'de' y},
+				y => q{d MMM y – d MMM y},
+			},
+			yMd => {
+				M => q{d/M/y – d/M/y},
+				d => q{d/M/y – d/M/y},
+				y => q{dd/MM/y – dd/MM/y},
 			},
 		},
 	} },

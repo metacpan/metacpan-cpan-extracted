@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Eo - Package for language Esperanto
 =cut
 
 package Locale::CLDR::Locales::Eo;
-# This file auto generated from Data\common\main\eo.xml
-#	on Sun  3 Feb  1:48:29 pm GMT
+# This file auto generated from Data/common/main/eo.xml
+#	on Mon 11 Apr  5:27:10 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -1873,17 +1873,17 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
+				'abbreviated' => {
 					'am' => q{atm},
 					'pm' => q{ptm},
 				},
 				'narrow' => {
-					'pm' => q{p},
 					'am' => q{a},
+					'pm' => q{p},
 				},
-				'abbreviated' => {
-					'pm' => q{ptm},
+				'wide' => {
 					'am' => q{atm},
+					'pm' => q{ptm},
 				},
 			},
 		},

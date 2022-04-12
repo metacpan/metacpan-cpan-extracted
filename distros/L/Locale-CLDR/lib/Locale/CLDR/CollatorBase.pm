@@ -1,12 +1,12 @@
 package Locale::CLDR::CollatorBase;
-# This file auto generated from Data\common\uca\FractionalUCA_SHORT.txt
-#	on Sun  3 Feb  1:37:18 pm GMT
+# This file auto generated from Data/common/uca/FractionalUCA_SHORT.txt
+#	on Mon 11 Apr  5:22:57 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -34039,7 +34039,7 @@ has collation_sections => (
 			nabataean => [ q(䲷 ), q(䳌 ) ],
 			newa => [ q(ⲑ ), q(ⳗ ) ],
 			nko => [ q(▓ ), q(▲ ) ],
-			nushu => [ q(﯃ 𛅰  ), q(﯃ 𛋻  ) ],
+			nushu => [ q(ﬁ 耀  ), q(ﬁ 膋  ) ],
 			ogham => [ q(㥧 ), q(㦀 ) ],
 			old_italic => [ q(䠀 ), q(䠢 ) ],
 			old_persian => [ q(䶝 ), q(䷈ ) ],

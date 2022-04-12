@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Dsb - Package for language Lower Sorbian
 =cut
 
 package Locale::CLDR::Locales::Dsb;
-# This file auto generated from Data\common\main\dsb.xml
-#	on Sun  3 Feb  1:46:45 pm GMT
+# This file auto generated from Data/common/main/dsb.xml
+#	on Mon 11 Apr  5:26:26 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -5126,12 +5126,12 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'abbreviated' => {
-					'pm' => q{wótpołdnja},
 					'am' => q{dopołdnja},
+					'pm' => q{wótpołdnja},
 				},
 				'narrow' => {
-					'pm' => q{wótp.},
 					'am' => q{dop.},
+					'pm' => q{wótp.},
 				},
 				'wide' => {
 					'am' => q{dopołdnja},

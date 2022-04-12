@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Guz::Any::Ke - Package for language Gusii
 =cut
 
 package Locale::CLDR::Locales::Guz::Any::Ke;
-# This file auto generated from Data\common\main\guz_KE.xml
-#	on Sun  3 Feb  1:54:22 pm GMT
+# This file auto generated from Data/common/main/guz_KE.xml
+#	on Mon 11 Apr  5:29:29 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';

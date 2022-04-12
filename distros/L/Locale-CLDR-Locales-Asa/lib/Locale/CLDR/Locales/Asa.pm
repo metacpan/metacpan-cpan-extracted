@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Asa - Package for language Asu
 =cut
 
 package Locale::CLDR::Locales::Asa;
-# This file auto generated from Data\common\main\asa.xml
-#	on Sun  3 Feb  1:39:15 pm GMT
+# This file auto generated from Data/common/main/asa.xml
+#	on Mon 11 Apr  5:23:46 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -840,13 +840,13 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
+				'abbreviated' => {
 					'am' => q{icheheavo},
 					'pm' => q{ichamthi},
 				},
-				'abbreviated' => {
-					'pm' => q{ichamthi},
+				'wide' => {
 					'am' => q{icheheavo},
+					'pm' => q{ichamthi},
 				},
 			},
 		},

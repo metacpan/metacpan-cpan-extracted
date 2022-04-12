@@ -1,6 +1,8 @@
 Revision history for Perl extension RPC::Switch::Client::Tiny.
 
-1.53  2022-04-11
+1.54  2022-04-12
+	- fixed cpantester Fcntl and JSON dependencies
 
-  - initial cpan release
+1.53  2022-04-11
+	- initial cpan release
 

@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Dz - Package for language Dzongkha
 =cut
 
 package Locale::CLDR::Locales::Dz;
-# This file auto generated from Data\common\main\dz.xml
-#	on Sun  3 Feb  1:46:56 pm GMT
+# This file auto generated from Data/common/main/dz.xml
+#	on Mon 11 Apr  5:26:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -1659,14 +1659,14 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'abbreviated' => {
-					'pm' => q{ཕྱི་ཆ་},
-					'am' => q{སྔ་ཆ་},
-				},
-				'wide' => {
 					'am' => q{སྔ་ཆ་},
 					'pm' => q{ཕྱི་ཆ་},
 				},
 				'narrow' => {
+					'am' => q{སྔ་ཆ་},
+					'pm' => q{ཕྱི་ཆ་},
+				},
+				'wide' => {
 					'am' => q{སྔ་ཆ་},
 					'pm' => q{ཕྱི་ཆ་},
 				},

@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Az - Package for language Azerbaijani
 =cut
 
 package Locale::CLDR::Locales::Az;
-# This file auto generated from Data\common\main\az.xml
-#	on Sun  3 Feb  1:39:41 pm GMT
+# This file auto generated from Data/common/main/az.xml
+#	on Mon 11 Apr  5:23:57 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -5988,69 +5988,69 @@ has 'day_period_data' => (
 		$day_period_type //= 'default';
 		SWITCH:
 		for ($type) {
-			if ($_ eq 'gregorian') {
-				if($day_period_type eq 'selection') {
-					return 'night2' if $time >= 0
-						&& $time < 400;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1700;
-					return 'night1' if $time >= 1900
-						&& $time < 2400;
-					return 'morning2' if $time >= 600
-						&& $time < 1200;
-					return 'evening1' if $time >= 1700
-						&& $time < 1900;
-					return 'morning1' if $time >= 400
-						&& $time < 600;
-				}
+			if ($_ eq 'generic') {
 				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
 					return 'midnight' if $time == 0;
-					return 'night1' if $time >= 1900
-						&& $time < 2400;
-					return 'morning2' if $time >= 600
-						&& $time < 1200;
-					return 'night2' if $time >= 0
-						&& $time < 400;
+					return 'noon' if $time == 1200;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1700;
-					return 'morning1' if $time >= 400
-						&& $time < 600;
 					return 'evening1' if $time >= 1700
 						&& $time < 1900;
+					return 'morning1' if $time >= 400
+						&& $time < 600;
+					return 'morning2' if $time >= 600
+						&& $time < 1200;
+					return 'night1' if $time >= 1900
+						&& $time < 2400;
+					return 'night2' if $time >= 0
+						&& $time < 400;
+				}
+				if($day_period_type eq 'selection') {
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1700;
+					return 'evening1' if $time >= 1700
+						&& $time < 1900;
+					return 'morning1' if $time >= 400
+						&& $time < 600;
+					return 'morning2' if $time >= 600
+						&& $time < 1200;
+					return 'night1' if $time >= 1900
+						&& $time < 2400;
+					return 'night2' if $time >= 0
+						&& $time < 400;
 				}
 				last SWITCH;
 				}
-			if ($_ eq 'generic') {
-				if($day_period_type eq 'selection') {
-					return 'night2' if $time >= 0
-						&& $time < 400;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1700;
-					return 'night1' if $time >= 1900
-						&& $time < 2400;
-					return 'morning2' if $time >= 600
-						&& $time < 1200;
-					return 'evening1' if $time >= 1700
-						&& $time < 1900;
-					return 'morning1' if $time >= 400
-						&& $time < 600;
-				}
+			if ($_ eq 'gregorian') {
 				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
 					return 'midnight' if $time == 0;
-					return 'night1' if $time >= 1900
-						&& $time < 2400;
-					return 'morning2' if $time >= 600
-						&& $time < 1200;
-					return 'night2' if $time >= 0
-						&& $time < 400;
+					return 'noon' if $time == 1200;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1700;
-					return 'morning1' if $time >= 400
-						&& $time < 600;
 					return 'evening1' if $time >= 1700
 						&& $time < 1900;
+					return 'morning1' if $time >= 400
+						&& $time < 600;
+					return 'morning2' if $time >= 600
+						&& $time < 1200;
+					return 'night1' if $time >= 1900
+						&& $time < 2400;
+					return 'night2' if $time >= 0
+						&& $time < 400;
+				}
+				if($day_period_type eq 'selection') {
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1700;
+					return 'evening1' if $time >= 1700
+						&& $time < 1900;
+					return 'morning1' if $time >= 400
+						&& $time < 600;
+					return 'morning2' if $time >= 600
+						&& $time < 1200;
+					return 'night1' if $time >= 1900
+						&& $time < 2400;
+					return 'night2' if $time >= 0
+						&& $time < 400;
 				}
 				last SWITCH;
 				}
@@ -6071,78 +6071,78 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'abbreviated' => {
+					'afternoon1' => q{gündüz},
 					'am' => q{AM},
+					'evening1' => q{axşamüstü},
 					'midnight' => q{gecəyarı},
-					'pm' => q{PM},
+					'morning1' => q{sübh},
 					'morning2' => q{səhər},
 					'night1' => q{axşam},
 					'night2' => q{gecə},
-					'morning1' => q{sübh},
-					'evening1' => q{axşamüstü},
-					'afternoon1' => q{gündüz},
 					'noon' => q{günorta},
-				},
-				'wide' => {
-					'night2' => q{gecə},
-					'night1' => q{axşam},
-					'morning2' => q{səhər},
 					'pm' => q{PM},
-					'midnight' => q{gecəyarı},
-					'am' => q{AM},
-					'noon' => q{günorta},
-					'afternoon1' => q{gündüz},
-					'evening1' => q{axşamüstü},
-					'morning1' => q{sübh},
 				},
 				'narrow' => {
-					'noon' => q{g},
 					'afternoon1' => q{gündüz},
-					'morning1' => q{sübh},
-					'evening1' => q{axşamüstü},
-					'night1' => q{axşam},
-					'morning2' => q{səhər},
-					'night2' => q{gecə},
 					'am' => q{a},
+					'evening1' => q{axşamüstü},
 					'midnight' => q{gecəyarı},
+					'morning1' => q{sübh},
+					'morning2' => q{səhər},
+					'night1' => q{axşam},
+					'night2' => q{gecə},
+					'noon' => q{g},
 					'pm' => q{p},
+				},
+				'wide' => {
+					'afternoon1' => q{gündüz},
+					'am' => q{AM},
+					'evening1' => q{axşamüstü},
+					'midnight' => q{gecəyarı},
+					'morning1' => q{sübh},
+					'morning2' => q{səhər},
+					'night1' => q{axşam},
+					'night2' => q{gecə},
+					'noon' => q{günorta},
+					'pm' => q{PM},
 				},
 			},
 			'stand-alone' => {
-				'wide' => {
+				'abbreviated' => {
+					'afternoon1' => q{gündüz},
+					'am' => q{AM},
+					'evening1' => q{axşamüstü},
+					'midnight' => q{gecəyarı},
+					'morning1' => q{sübh},
 					'morning2' => q{səhər},
 					'night1' => q{axşam},
 					'night2' => q{gecə},
-					'am' => q{AM},
-					'pm' => q{PM},
-					'midnight' => q{gecəyarı},
-					'afternoon1' => q{gündüz},
 					'noon' => q{günorta},
-					'morning1' => q{sübh},
-					'evening1' => q{axşamüstü},
+					'pm' => q{PM},
 				},
 				'narrow' => {
-					'morning1' => q{sübh},
-					'evening1' => q{axşamüstü},
-					'noon' => q{günorta},
 					'afternoon1' => q{gündüz},
 					'am' => q{AM},
-					'pm' => q{PM},
+					'evening1' => q{axşamüstü},
 					'midnight' => q{gecəyarı},
-					'night1' => q{axşam},
+					'morning1' => q{sübh},
 					'morning2' => q{səhər},
+					'night1' => q{axşam},
 					'night2' => q{gecə},
+					'noon' => q{günorta},
+					'pm' => q{PM},
 				},
-				'abbreviated' => {
+				'wide' => {
+					'afternoon1' => q{gündüz},
 					'am' => q{AM},
+					'evening1' => q{axşamüstü},
 					'midnight' => q{gecəyarı},
-					'pm' => q{PM},
+					'morning1' => q{sübh},
 					'morning2' => q{səhər},
 					'night1' => q{axşam},
 					'night2' => q{gecə},
-					'morning1' => q{sübh},
-					'evening1' => q{axşamüstü},
 					'noon' => q{günorta},
-					'afternoon1' => q{gündüz},
+					'pm' => q{PM},
 				},
 			},
 		},

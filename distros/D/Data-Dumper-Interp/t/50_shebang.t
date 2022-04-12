@@ -5,6 +5,7 @@ use open IO => ':locale';
 select STDERR; $|=1; select STDOUT; $|=1;
 use Scalar::Util qw(blessed reftype looks_like_number);
 use Carp;
+$SIG{__WARN__} = sub { confess "warning trapped; @_" };
 use English qw( -no_match_vars );;
 use Data::Compare qw(Compare);
 
@@ -395,7 +396,7 @@ my $ratstr  = '1/9';
   use bignum;  # BigInt and BigFloat together
 
   # stringify everything possible
-  local $Data::Dumper::Interp::Stringify = 1;  # NOTE: the '1' will be a BigInt !
+  local $Data::Dumper::Interp::Overloads = 1;  # NOTE: the '1' will be a BigInt !
 
   my $bigf = eval $bigfstr // die;
   die unless blessed($bigf) =~ /^Math::BigFloat/;
@@ -405,9 +406,9 @@ my $ratstr  = '1/9';
   die unless blessed($bigi) =~ /^Math::BigInt/;
   checklit(sub{eval $_[0]}, $bigi, qr/(?:\(Math::BigInt[^\)]*\))?${bigistr}/);
 
-  # Confirm that various Stringify values disable
+  # Confirm that various Overloads values disable
   foreach my $Sval (0, undef, "", [], [0], [""]) {
-    local $Data::Dumper::Interp::Stringify = $Sval;
+    local $Data::Dumper::Interp::Overloads = $Sval;
     my $s = vis($bigf);
     die "bug(",u($Sval),")($s)" unless $s =~ /^\(?bless.*BigFloat/s;
   }
@@ -429,11 +430,11 @@ my $ratstr  = '1/9';
   die unless blessed($rat) =~ /^Math::BigRat/;
 
   # Without stringification
-  { local $Data::Dumper::Interp::Stringify = 0;
+  { local $Data::Dumper::Interp::Overloads = 0;
     my $s = vis($bigf); die "bug($s)" unless $s =~ /^bless.*BigFloat/s;
   }
   # With explicit stringification of BigFloat only
-  { local $Data::Dumper::Interp::Stringify = [qr/^Math::BigFloat/];
+  { local $Data::Dumper::Interp::Overloads = [qr/^Math::BigFloat/];
     checklit(sub{eval $_[0]}, $bigf, qr/(?:\(Math::BigFloat[^\)]*\))?${bigfstr}/);
     # But not other classes
     my $s = vis($rat); die "bug($s)" unless $s =~ /^bless.*BigRat/s;
@@ -441,15 +442,19 @@ my $ratstr  = '1/9';
 }
 
 # Check string truncation, and that the original data is not modified in-place
-{ my $orig_str  = '["abcDEFG",["xyzABCD",{longkey => "fghIJKL"}]]';
+{ my $orig_str  = '["abcDEFG",["xyzABCD",{bareword => "fghIJKL"}]]';
   my $check_data = eval $orig_str; die "bug" if $@;
   my $orig_data  = eval $orig_str; die "bug" if $@;
   foreach my $MSw (1..9) {
     # hand-truncate to create "expected result" data
-    (my $exp_str = $orig_str) =~ s/\b([a-zA-Z]{$MSw})([a-zA-Z]*)/
-                                    $1 . (length($2) > 3 && $1.$2 ne "longkey"
-                                           ? "..." : $2)
-                                  /seg;
+    (my $exp_str = $orig_str) =~ s{("?)([a-zA-Z]{$MSw})([a-zA-Z]*+)(\1)}{
+                                    local $_ = $1
+                                             . $2 
+                                             . (length($3) > 3 ? "..." : $3)
+                                             . $4 ;
+                                    $_ = "\"$_\"" if m{^\w.*\.\.\.$}; #bareword
+                                    $_
+                                  }segx;
     local $Data::Dumper::Interp::MaxStringwidth = $MSw;
     check "with MaxStringwidth=$MSw", $exp_str, eval 'vis($orig_data)';
     die "MaxStringwidth=$MSw : Original data corrupted"

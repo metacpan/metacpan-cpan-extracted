@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Ar::Any::Dj - Package for language Arabic
 =cut
 
 package Locale::CLDR::Locales::Ar::Any::Dj;
-# This file auto generated from Data\common\main\ar_DJ.xml
-#	on Sun  3 Feb  1:38:53 pm GMT
+# This file auto generated from Data/common/main/ar_DJ.xml
+#	on Mon 11 Apr  5:23:37 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';

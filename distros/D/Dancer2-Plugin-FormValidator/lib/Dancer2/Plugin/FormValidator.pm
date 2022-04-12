@@ -12,9 +12,9 @@ use Hash::Util qw(lock_hashref);
 use Module::Load;
 use Types::Standard qw(InstanceOf HashRef);
 
-our $VERSION = '0.51';
+our $VERSION = '0.61';
 
-plugin_keywords qw(validate_form errors validator_language);
+plugin_keywords qw(validate errors validator_language);
 
 has config_obj => (
     is       => 'ro',
@@ -74,23 +74,19 @@ sub validator_language {
     return;
 }
 
-sub validate_form {
-    my ($self, $form) = @_;
+sub validate {
+    my ($self, $profile) = @_;
 
-    if (my $validator_profile = $self->config_obj->form($form)) {
-        autoload $validator_profile;
+    autoload $profile;
 
-        my $input  = $self->dsl->body_parameters->as_hashref_mixed;
-        my $result = $self->validate($input, $validator_profile->new);
+    my $input  = $self->dsl->body_parameters->as_hashref_mixed;
+    my $result = $self->_validate($input, $profile->new);
 
-        return $result->success ? $result->valid : undef;
-    }
-    else {
-        Carp::croak "Validator for $form is not defined\n";
-    }
+    return $result->success ? $result->valid : undef;
+
 }
 
-sub validate {
+sub _validate {
     my ($self, $input, $validator_profile) = @_;
 
     if (ref $input ne 'HASH') {
@@ -179,14 +175,14 @@ Dancer2::Plugin::FormValidator - neat and easy to start form validation plugin f
 
 =head1 VERSION
 
-version 0.51
+version 0.61
 
 =head1 SYNOPSIS
 
     use Dancer2::Plugin::FormValidator;
 
     post '/form' => sub {
-        if (my $valid_hash_ref = validate_form 'form') {
+        if (my $valid_hash_ref = validate 'App::Http::Forms::RegisterForm') {
             save_user_input($valid_hash_ref);
             redirect '/success_page';
         }
@@ -218,7 +214,7 @@ Won't change:
 =over 4
 
 =item *
-Dsl keywords: validate_form, validator_language, errors.
+Dsl keywords: validator_language, errors.
 
 =item *
 Template tokens: old.
@@ -245,33 +241,33 @@ Uses simple and declarative approach to validate forms:
 =head2 Validator
 
 First, you need to create class which will implements
-at least one main role: Dancer2::Plugin::FormValidator::Role::HasProfile.
+at least one main role: Dancer2::Plugin::FormValidator::Role::Profile.
 
 This role requires profile method which should return a HashRef Data::FormValidator accepts:
 
-    package App::Http::Validators::RegisterForm {
+    package App::Http::Forms::RegisterForm {
         use Moo;
         with 'Dancer2::Plugin::FormValidator::Role::Profile';
 
         sub profile {
             return {
-                name  => [qw(required length_min:4 length_max:32)]
-                email => [qw(required email)],
+                username     => [ qw(required alpha_num_ascii length_min:4 length_max:32) ],
+                email        => [ qw(required email length_max:127) ],
+                password     => [ qw(required length_max:40) ],
+                password_cnf => [ qw(required same:password) ],
+                confirm      => [ qw(required accepted) ],
             };
         };
     }
 
 =head2 Application
 
-Then you need to set an form => validator association in config:
+Then you need to set basic configuration:
 
      set plugins => {
             FormValidator => {
                 session => {
                     namespace => '_form_validator' # This is required field
-                },
-                forms   => {
-                    register_form => 'App::App::Http::Validators::RegisterForm',
                 },
             },
         };
@@ -281,7 +277,7 @@ Now you can validate POST parameters in your controller:
     use Dancer2::Plugin::FormValidator;
 
     post '/register' => sub {
-        if (my $valid_hash_ref = validate_form 'register_form') {
+        if (my $valid_hash_ref = validate 'App::Http::Forms::RegisterForm') {
             if (login($valid_hash_ref)) {
                 redirect '/success_page';
             }
@@ -361,13 +357,9 @@ Template app/register:
                         en: %s is needed from config
                         de: %s ist erforderlich
                     ...
-            forms:
-                login_form: 'App::Http::Validators::LoginForm'
-                support_form: 'App::Http::Validators::SupportForm'
-                ...
             extensions:
-                upload:
-                    provider: ...
+                dbic:
+                    provider: Dancer2::Plugin::FormValidator::Extension::DBIC
                     ...
     ...
 
@@ -375,7 +367,7 @@ Template app/register:
 
 =head3 validate
 
-    my $valid_hash_ref = validate_form $form
+    my $valid_hash_ref = validate $profile_class
 
 Returns $valid_hash_ref if validation succeed, otherwise returns undef.
 
@@ -535,9 +527,6 @@ Config:
             session    => {
                 namespace => '_form_validator'
             },
-            forms      => {
-                login => 'Validator',
-            },
             extensions => {
                 extension => {
                     provider => 'Extension',
@@ -583,6 +572,9 @@ Document all Roles and HashRef structures.
 
 =item *
 Extensions docs.
+
+=item *
+Profile docs.
 
 =item *
 Contribution and help details.

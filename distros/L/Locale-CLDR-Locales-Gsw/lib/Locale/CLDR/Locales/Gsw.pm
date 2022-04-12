@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Gsw - Package for language Swiss German
 =cut
 
 package Locale::CLDR::Locales::Gsw;
-# This file auto generated from Data\common\main\gsw.xml
-#	on Sun  3 Feb  1:53:50 pm GMT
+# This file auto generated from Data/common/main/gsw.xml
+#	on Mon 11 Apr  5:29:17 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -4053,30 +4053,30 @@ has 'day_period_data' => (
 		$day_period_type //= 'default';
 		SWITCH:
 		for ($type) {
-			if ($_ eq 'gregorian') {
+			if ($_ eq 'buddhist') {
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
-					return 'night1' if $time >= 0
-						&& $time < 500;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1400;
-					return 'morning1' if $time >= 500
-						&& $time < 1200;
 					return 'afternoon2' if $time >= 1400
 						&& $time < 1800;
 					return 'evening1' if $time >= 1800
 						&& $time < 2400;
+					return 'morning1' if $time >= 500
+						&& $time < 1200;
+					return 'night1' if $time >= 0
+						&& $time < 500;
 				}
 				if($day_period_type eq 'selection') {
 					return 'midnight' if $time == 0;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1400;
+					return 'afternoon2' if $time >= 1400
+						&& $time < 1800;
 					return 'evening1' if $time >= 1800
 						&& $time < 2400;
 					return 'morning1' if $time >= 500
 						&& $time < 1200;
-					return 'afternoon2' if $time >= 1400
-						&& $time < 1800;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1400;
 					return 'night1' if $time >= 0
 						&& $time < 500;
 				}
@@ -4085,56 +4085,56 @@ has 'day_period_data' => (
 			if ($_ eq 'generic') {
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
-					return 'night1' if $time >= 0
-						&& $time < 500;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1400;
-					return 'morning1' if $time >= 500
-						&& $time < 1200;
 					return 'afternoon2' if $time >= 1400
 						&& $time < 1800;
 					return 'evening1' if $time >= 1800
 						&& $time < 2400;
+					return 'morning1' if $time >= 500
+						&& $time < 1200;
+					return 'night1' if $time >= 0
+						&& $time < 500;
 				}
 				if($day_period_type eq 'selection') {
 					return 'midnight' if $time == 0;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1400;
+					return 'afternoon2' if $time >= 1400
+						&& $time < 1800;
 					return 'evening1' if $time >= 1800
 						&& $time < 2400;
 					return 'morning1' if $time >= 500
 						&& $time < 1200;
-					return 'afternoon2' if $time >= 1400
-						&& $time < 1800;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1400;
 					return 'night1' if $time >= 0
 						&& $time < 500;
 				}
 				last SWITCH;
 				}
-			if ($_ eq 'buddhist') {
+			if ($_ eq 'gregorian') {
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
-					return 'night1' if $time >= 0
-						&& $time < 500;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1400;
-					return 'morning1' if $time >= 500
-						&& $time < 1200;
 					return 'afternoon2' if $time >= 1400
 						&& $time < 1800;
 					return 'evening1' if $time >= 1800
 						&& $time < 2400;
+					return 'morning1' if $time >= 500
+						&& $time < 1200;
+					return 'night1' if $time >= 0
+						&& $time < 500;
 				}
 				if($day_period_type eq 'selection') {
 					return 'midnight' if $time == 0;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1400;
+					return 'afternoon2' if $time >= 1400
+						&& $time < 1800;
 					return 'evening1' if $time >= 1800
 						&& $time < 2400;
 					return 'morning1' if $time >= 500
 						&& $time < 1200;
-					return 'afternoon2' if $time >= 1400
-						&& $time < 1800;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1400;
 					return 'night1' if $time >= 0
 						&& $time < 500;
 				}
@@ -4157,36 +4157,36 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'abbreviated' => {
-					'midnight' => q{Mitternacht},
-					'pm' => q{nam.},
+					'afternoon1' => q{zmittag},
 					'afternoon2' => q{am Namittag},
 					'am' => q{vorm.},
-					'night1' => q{znacht},
 					'evening1' => q{zaabig},
+					'midnight' => q{Mitternacht},
 					'morning1' => q{am Morge},
-					'afternoon1' => q{zmittag},
+					'night1' => q{znacht},
+					'pm' => q{nam.},
 				},
 				'wide' => {
-					'evening1' => q{zaabig},
-					'morning1' => q{am Morge},
 					'afternoon1' => q{zmittag},
-					'pm' => q{am Namittag},
-					'midnight' => q{Mitternacht},
 					'afternoon2' => q{am Namittag},
 					'am' => q{am Vormittag},
+					'evening1' => q{zaabig},
+					'midnight' => q{Mitternacht},
+					'morning1' => q{am Morge},
 					'night1' => q{znacht},
+					'pm' => q{am Namittag},
 				},
 			},
 			'stand-alone' => {
 				'wide' => {
-					'night1' => q{Nacht},
-					'midnight' => q{Mitternacht},
-					'pm' => q{Namittag},
+					'afternoon1' => q{Mittag},
 					'afternoon2' => q{Namittag},
 					'am' => q{Vormittag},
-					'afternoon1' => q{Mittag},
 					'evening1' => q{Aabig},
+					'midnight' => q{Mitternacht},
 					'morning1' => q{Morge},
+					'night1' => q{Nacht},
+					'pm' => q{Namittag},
 				},
 			},
 		},
@@ -4282,7 +4282,7 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
+		'generic' => {
 			Ed => q{E d.},
 			H => q{H},
 			Hm => q{HH:mm},
@@ -4311,7 +4311,7 @@ has 'datetime_formats_available_formats' => (
 			yQQQ => q{QQQ y},
 			yQQQQ => q{QQQQ y},
 		},
-		'generic' => {
+		'gregorian' => {
 			Ed => q{E d.},
 			H => q{H},
 			Hm => q{HH:mm},
@@ -4356,7 +4356,7 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
+		'generic' => {
 			H => {
 				H => q{HH–HH},
 			},
@@ -4454,7 +4454,7 @@ has 'datetime_formats_interval' => (
 				y => q{dd.MM.y – dd.MM.y},
 			},
 		},
-		'generic' => {
+		'gregorian' => {
 			H => {
 				H => q{HH–HH},
 			},

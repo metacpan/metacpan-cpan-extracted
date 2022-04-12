@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Cu - Package for language Church Slavic
 =cut
 
 package Locale::CLDR::Locales::Cu;
-# This file auto generated from Data\common\main\cu.xml
-#	on Sun  3 Feb  1:45:16 pm GMT
+# This file auto generated from Data/common/main/cu.xml
+#	on Mon 11 Apr  5:25:54 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -732,27 +732,27 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
-					'pm' => q{ПП},
-					'am' => q{ДП},
-				},
 				'abbreviated' => {
+					'am' => q{ДП},
+					'pm' => q{ПП},
+				},
+				'wide' => {
 					'am' => q{ДП},
 					'pm' => q{ПП},
 				},
 			},
 			'stand-alone' => {
 				'abbreviated' => {
-					'pm' => q{ПП},
 					'am' => q{ДП},
+					'pm' => q{ПП},
 				},
 				'narrow' => {
 					'am' => q{ДП},
 					'pm' => q{ПП},
 				},
 				'wide' => {
-					'pm' => q{ПП},
 					'am' => q{ДП},
+					'pm' => q{ПП},
 				},
 			},
 		},

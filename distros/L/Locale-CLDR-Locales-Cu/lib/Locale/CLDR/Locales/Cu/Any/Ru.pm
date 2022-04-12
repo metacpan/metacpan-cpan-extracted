@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Cu::Any::Ru - Package for language Church Slavic
 =cut
 
 package Locale::CLDR::Locales::Cu::Any::Ru;
-# This file auto generated from Data\common\main\cu_RU.xml
-#	on Sun  3 Feb  1:45:18 pm GMT
+# This file auto generated from Data/common/main/cu_RU.xml
+#	on Mon 11 Apr  5:25:55 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';

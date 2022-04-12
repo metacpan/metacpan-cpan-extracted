@@ -7,14 +7,14 @@ Locale::CLDR::Locales::It::Any::It - Package for language Italian
 =cut
 
 package Locale::CLDR::Locales::It::Any::It;
-# This file auto generated from Data\common\main\it_IT.xml
-#	on Sun  3 Feb  1:58:13 pm GMT
+# This file auto generated from Data/common/main/it_IT.xml
+#	on Mon 11 Apr  5:30:54 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';

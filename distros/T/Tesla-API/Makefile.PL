@@ -40,6 +40,7 @@ my %WriteMakefileArgs = (
         'File::Share'       => 0,
         'HTTP::Request'     => 0,
         'JSON'              => 0,
+        'LWP::Protocol::https' => 0,
         'MIME::Base64'      => '3.16',
         'WWW::Mechanize'    => 0,
         'URI'               => 0,

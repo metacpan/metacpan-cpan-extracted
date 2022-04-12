@@ -20,16 +20,7 @@ around 'stop_on_fail' => sub {
 
 sub validate {
     my ($self, $field, $input) = @_;
-
-    if (
-        exists $input->{$field}
-        and defined $input->{$field}
-        and $input->{$field} ne ''
-    ) {
-        return 1;
-    }
-
-    return 0;
+    return $self->_field_defined_and_non_empty($field, $input);
 }
 
 1;

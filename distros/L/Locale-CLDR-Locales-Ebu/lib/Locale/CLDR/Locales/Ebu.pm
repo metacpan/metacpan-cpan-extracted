@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Ebu - Package for language Embu
 =cut
 
 package Locale::CLDR::Locales::Ebu;
-# This file auto generated from Data\common\main\ebu.xml
-#	on Sun  3 Feb  1:47:00 pm GMT
+# This file auto generated from Data/common/main/ebu.xml
+#	on Mon 11 Apr  5:26:33 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -840,13 +840,13 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
-					'pm' => q{UT},
-					'am' => q{KI},
-				},
 				'abbreviated' => {
-					'pm' => q{UT},
 					'am' => q{KI},
+					'pm' => q{UT},
+				},
+				'wide' => {
+					'am' => q{KI},
+					'pm' => q{UT},
 				},
 			},
 		},
@@ -926,7 +926,7 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
+		'generic' => {
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},
 			M => q{L},
@@ -951,7 +951,7 @@ has 'datetime_formats_available_formats' => (
 			yQQQ => q{QQQ y},
 			yQQQQ => q{QQQQ y},
 		},
-		'generic' => {
+		'gregorian' => {
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},
 			M => q{L},

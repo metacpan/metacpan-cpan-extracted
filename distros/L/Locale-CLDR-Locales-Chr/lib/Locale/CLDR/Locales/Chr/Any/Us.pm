@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Chr::Any::Us - Package for language Cherokee
 =cut
 
 package Locale::CLDR::Locales::Chr::Any::Us;
-# This file auto generated from Data\common\main\chr_US.xml
-#	on Sun  3 Feb  1:44:44 pm GMT
+# This file auto generated from Data/common/main/chr_US.xml
+#	on Mon 11 Apr  5:25:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';

@@ -7,14 +7,14 @@ Locale::CLDR::Locales::El::Any::Cy - Package for language Greek
 =cut
 
 package Locale::CLDR::Locales::El::Any::Cy;
-# This file auto generated from Data\common\main\el_CY.xml
-#	on Sun  3 Feb  1:47:46 pm GMT
+# This file auto generated from Data/common/main/el_CY.xml
+#	on Mon 11 Apr  5:26:52 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';

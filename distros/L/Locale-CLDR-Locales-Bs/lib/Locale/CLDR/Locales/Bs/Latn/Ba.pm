@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Bs::Latn::Ba - Package for language Bosnian
 =cut
 
 package Locale::CLDR::Locales::Bs::Latn::Ba;
-# This file auto generated from Data\common\main\bs_Latn_BA.xml
-#	on Sun  3 Feb  1:43:09 pm GMT
+# This file auto generated from Data/common/main/bs_Latn_BA.xml
+#	on Mon 11 Apr  5:25:08 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';

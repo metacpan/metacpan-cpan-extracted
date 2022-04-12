@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Es::Any::Es - Package for language Spanish
 =cut
 
 package Locale::CLDR::Locales::Es::Any::Es;
-# This file auto generated from Data\common\main\es_ES.xml
-#	on Sun  3 Feb  1:49:01 pm GMT
+# This file auto generated from Data/common/main/es_ES.xml
+#	on Mon 11 Apr  5:27:23 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';
