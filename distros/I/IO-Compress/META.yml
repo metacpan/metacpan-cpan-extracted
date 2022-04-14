@@ -28,5 +28,5 @@ resources:
   bugtracker: https://github.com/pmqs/IO-Compress/issues
   homepage: https://github.com/pmqs/IO-Compress
   repository: git://github.com/pmqs/IO-Compress.git
-version: '2.105'
+version: '2.106'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

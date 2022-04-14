@@ -1,6 +1,8 @@
 # -*- Mode: CPerl -*-
 # t/01_ufunc.t
-use Test::More tests => 52;
+use Test::More;
+use strict;
+use warnings;
 
 ##-- common subs
 my $TEST_DIR;
@@ -74,8 +76,8 @@ sub test_ufunc {
 
 my $BAD = pdl(0)->setvaltobad(0);
 
-foreach $missing (0,1,31,$BAD) { ## *4
-  foreach $pdl_ufunc_name (
+for my $missing (0,1,31,$BAD) { ## *4
+  for my $pdl_ufunc_name (
 			   qw(sumover prodover dsumover dprodover),  ## *13
 			   qw(andover orover bandover borover),
 			   qw(maximum minimum),
@@ -90,5 +92,5 @@ foreach $missing (0,1,31,$BAD) { ## *4
 }
 
 print "\n";
-# end of t/*.t
 
+done_testing;

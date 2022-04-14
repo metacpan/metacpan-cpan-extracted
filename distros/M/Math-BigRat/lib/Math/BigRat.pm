@@ -21,7 +21,7 @@ use Scalar::Util qw< blessed >;
 
 use Math::BigFloat ();
 
-our $VERSION = '0.2621';
+our $VERSION = '0.2622';
 
 our @ISA = qw(Math::BigFloat);
 
@@ -737,7 +737,7 @@ sub bnorm {
 
     # n/1
     if ($LIB->_is_one($x->{_d})) {
-        return $downgrade -> new($LIB -> _str($x->{_d})) if defined($downgrade);
+        return $downgrade -> new($x) if defined($downgrade);
         return $x;               # no need to reduce
     }
 
@@ -765,7 +765,7 @@ sub bneg {
     $x->{sign} =~ tr/+-/-+/
       unless ($x->{sign} eq '+' && $LIB->_is_zero($x->{_n}));
 
-    return $downgrade -> new($LIB -> _str($x->{_n}))
+    return $downgrade -> new($x)
       if defined($downgrade) && $LIB -> _is_one($x->{_d});
     $x;
 }
@@ -887,10 +887,10 @@ sub bsub {
 
     # flip sign of $x, call badd(), then flip sign of result
     $x->{sign} =~ tr/+-/-+/
-      unless $x->{sign} eq '+' && $LIB->_is_zero($x->{_n}); # not -0
-    $x->badd($y, @r);           # does norm and round
+      unless $x->{sign} eq '+' && $x -> is_zero();      # not -0
+    $x = $x->badd($y, @r);           # does norm and round
     $x->{sign} =~ tr/+-/-+/
-      unless $x->{sign} eq '+' && $LIB->_is_zero($x->{_n}); # not -0
+      unless $x->{sign} eq '+' && $x -> is_zero();      # not -0
 
     $x->bnorm();
 }
@@ -919,10 +919,13 @@ sub bmul {
     }
 
     # x == 0  # also: or y == 1 or y == -1
-    return wantarray ? ($x, $class->bzero()) : $x if $x -> is_zero();
+    if ($x -> is_zero()) {
+        $x = $downgrade -> bzero($x) if defined $downgrade;
+        return wantarray ? ($x, $class->bzero()) : $x;
+    }
 
     if ($y -> is_zero()) {
-        $x -> bzero();
+        $x = defined($downgrade) ? $downgrade -> bzero($x) : $x -> bzero();
         return wantarray ? ($x, $class->bzero()) : $x;
     }
 
@@ -971,11 +974,11 @@ sub bdiv {
     if ($x -> is_nan() || $y -> is_nan()) {
         if ($wantarray) {
             return $downgrade -> bnan(), $downgrade -> bnan()
-              if defined($downgrade) && $LIB -> _is_one($x->{_d});
+              if defined($downgrade);
             return $x -> bnan(), $class -> bnan();
         } else {
             return $downgrade -> bnan()
-              if defined($downgrade) && $LIB -> _is_one($x->{_d});
+              if defined($downgrade);
             return $x -> bnan();
         }
     }
@@ -1387,6 +1390,7 @@ sub bceil {
     $x->{_d} = $LIB->_one();                    # d => 1
     $x->{_n} = $LIB->_inc($x->{_n}) if $x->{sign} eq '+';   # +22/7 => 4/1
     $x->{sign} = '+' if $x->{sign} eq '-' && $LIB->_is_zero($x->{_n}); # -0 => 0
+    return $downgrade -> new($x) if defined $downgrade;
     $x;
 }
 
@@ -1403,6 +1407,7 @@ sub bfloor {
     $x->{_n} = $LIB->_div($x->{_n}, $x->{_d});  # 22/7 => 3/1 w/ truncate
     $x->{_d} = $LIB->_one();                    # d => 1
     $x->{_n} = $LIB->_inc($x->{_n}) if $x->{sign} eq '-';   # -22/7 => -4/1
+    return $downgrade -> new($x) if defined $downgrade;
     $x;
 }
 
@@ -1419,6 +1424,7 @@ sub bint {
     $x->{_n} = $LIB->_div($x->{_n}, $x->{_d});  # 22/7 => 3/1 w/ truncate
     $x->{_d} = $LIB->_one();                    # d => 1
     $x->{sign} = '+' if $x->{sign} eq '-' && $LIB -> _is_zero($x->{_n});
+    return $downgrade -> new($x) if defined $downgrade;
     return $x;
 }
 
@@ -1976,19 +1982,22 @@ sub bnot {
 
 sub round {
     my $x = shift;
-    $x = $downgrade -> new($x) if defined($downgrade) && $x -> is_int();
+    return $downgrade -> new($x) if defined($downgrade) &&
+      ($x -> is_int() || $x -> is_inf() || $x -> is_nan());
     $x;
 }
 
 sub bround {
     my $x = shift;
-    $x = $downgrade -> new($x) if defined($downgrade) && $x -> is_int();
+    return $downgrade -> new($x) if defined($downgrade) &&
+      ($x -> is_int() || $x -> is_inf() || $x -> is_nan());
     $x;
 }
 
 sub bfround {
     my $x = shift;
-    $x = $downgrade -> new($x) if defined($downgrade) && $x -> is_int();
+    return $downgrade -> new($x) if defined($downgrade) &&
+      ($x -> is_int() || $x -> is_inf() || $x -> is_nan());
     $x;
 }
 

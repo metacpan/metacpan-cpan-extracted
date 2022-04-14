@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Nds - Package for language Low German
 =cut
 
 package Locale::CLDR::Locales::Nds;
-# This file auto generated from Data\common\main\nds.xml
-#	on Sun  3 Feb  2:09:09 pm GMT
+# This file auto generated from Data/common/main/nds.xml
+#	on Mon 11 Apr  5:34:48 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';

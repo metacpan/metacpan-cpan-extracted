@@ -4,7 +4,7 @@
       "Peter John Acklam <pjacklam@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -31,8 +31,8 @@
       "runtime" : {
          "requires" : {
             "Carp" : "1.22",
-            "Math::BigInt" : "1.999825",
-            "Math::BigRat" : "0.2618",
+            "Math::BigInt" : "1.99983",
+            "Math::BigRat" : "0.2621",
             "perl" : "5.006"
          }
       },
@@ -50,6 +50,6 @@
          "web" : "https://github.com/pjacklam/p5-bignum"
       }
    },
-   "version" : "0.64",
+   "version" : "0.65",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -33,11 +33,8 @@ CCS/MatrixOps/Makefile.PL
 CCS/MatrixOps/ccsmatops.pd	# CCS/MatrixOps/MatrixOps.pm
 CCS/MatrixOps/MatrixOps.pm
 t/common.plt
-t/00_basic.t
-t/01_nnz.t
 t/02_encode.t
 t/03_ops.t
-CCS/t/00_basic.t
 CCS/t/01_encode.t
 CCS/t/02_indexing.t
 CCS/t/03_ufuncs.t
@@ -45,17 +42,12 @@ CCS/t/04_unops.t
 CCS/t/05_binops.t
 CCS/t/06_matops.t
 CCS/t/common.plt
-CCS/IO/t/00_basic.t
 CCS/IO/t/01_io.t
-CCS/Utils/t/00_basic.t
 CCS/Utils/t/01_nnz.t
 CCS/Utils/t/02_encode.t
 CCS/Utils/t/03_decode.t
 CCS/Utils/t/common.plt
-CCS/Ufunc/t/00_basic.t
 CCS/Ufunc/t/01_ufunc.t
 CCS/Ufunc/t/common.plt
-CCS/Ops/t/00_basic.t
-CCS/MatrixOps/t/00_basic.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

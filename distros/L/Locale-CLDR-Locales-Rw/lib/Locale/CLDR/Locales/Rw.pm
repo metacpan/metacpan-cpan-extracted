@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Rw - Package for language Kinyarwanda
 =cut
 
 package Locale::CLDR::Locales::Rw;
-# This file auto generated from Data\common\main\rw.xml
-#	on Sun  3 Feb  2:16:23 pm GMT
+# This file auto generated from Data/common/main/rw.xml
+#	on Mon 11 Apr  5:37:23 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -561,20 +561,24 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'narrow' => {
-					'pm' => q{PM},
+				'abbreviated' => {
 					'am' => q{AM},
+					'pm' => q{PM},
+				},
+				'narrow' => {
+					'am' => q{AM},
+					'pm' => q{PM},
 				},
 				'wide' => {
-					'pm' => q{PM},
 					'am' => q{AM},
-				},
-				'abbreviated' => {
 					'pm' => q{PM},
-					'am' => q{AM},
 				},
 			},
 			'stand-alone' => {
+				'abbreviated' => {
+					'am' => q{AM},
+					'pm' => q{PM},
+				},
 				'narrow' => {
 					'am' => q{AM},
 					'pm' => q{PM},
@@ -582,10 +586,6 @@ has 'day_periods' => (
 				'wide' => {
 					'am' => q{AM},
 					'pm' => q{PM},
-				},
-				'abbreviated' => {
-					'pm' => q{PM},
-					'am' => q{AM},
 				},
 			},
 		},

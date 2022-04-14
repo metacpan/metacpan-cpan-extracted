@@ -1,3 +1,19 @@
+0.65 2022-04-12
+
+ * Restore the upgrading and downgrading in "bignum", with the exception of
+   upgrading from Math::BigFloat to Math::BigRat, which I couldn't make sense
+   of. Now, both integer literals and integers (and Infs and NaNs) that are the
+   result of a computation become Math::BigInt objects, and both non-integer
+   literals and non-integers that are as a result of a computation become
+   Math::BigFloat objects. The classes used for literal integers and non-
+   integers during compile-time are configurable, as well as the classes used
+   for downgrading and upgrading during runtime.
+
+ * Add the "bigfloat" pragma, which converts all numeric literals to
+   Math::BigFloat objects. This is consistent with the "bigint" pragma, which
+   converts all numeric literals to Math::BigInt objects, and the "bigrat"
+   pragma which converts all numeric literals to Math::BigRat objects.
+
 0.64 2021-12-28
 
  * Fix CPAN RT #140470. The pragmas ignored user-specified backend libraries.

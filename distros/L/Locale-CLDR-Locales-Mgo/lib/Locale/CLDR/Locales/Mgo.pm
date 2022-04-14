@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Mgo - Package for language Metaʼ
 =cut
 
 package Locale::CLDR::Locales::Mgo;
-# This file auto generated from Data\common\main\mgo.xml
-#	on Sun  3 Feb  2:04:42 pm GMT
+# This file auto generated from Data/common/main/mgo.xml
+#	on Mon 11 Apr  5:33:08 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -655,10 +655,10 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
+		'generic' => {
 			d => q{d},
 		},
-		'generic' => {
+		'gregorian' => {
 			d => q{d},
 		},
 	} },
@@ -677,10 +677,10 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
+		'generic' => {
 			fallback => '{0} – {1}',
 		},
-		'generic' => {
+		'gregorian' => {
 			fallback => '{0} – {1}',
 		},
 	} },

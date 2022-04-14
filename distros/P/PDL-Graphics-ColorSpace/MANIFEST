@@ -3,8 +3,10 @@ Changes
 README
 Makefile.PL
 ColorSpace/RGBSpace.pm
-color_space.pp
+color_space.pd
 color_space.c
 color_space.h
 t/color_space.t
-META.yml                                 Module meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+GENERATED/PDL/Graphics/ColorSpace.pm     mod=PDL::Graphics::ColorSpace pd=color_space.pd (added by pdlpp_mkgen)

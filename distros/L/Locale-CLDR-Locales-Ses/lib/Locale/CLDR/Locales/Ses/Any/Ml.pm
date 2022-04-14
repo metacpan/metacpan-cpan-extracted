@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Ses::Any::Ml - Package for language Koyraboro Senni
 =cut
 
 package Locale::CLDR::Locales::Ses::Any::Ml;
-# This file auto generated from Data\common\main\ses_ML.xml
-#	on Sun  3 Feb  2:16:58 pm GMT
+# This file auto generated from Data/common/main/ses_ML.xml
+#	on Mon 11 Apr  5:37:36 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';

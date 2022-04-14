@@ -22,6 +22,7 @@ my %WriteMakefileArgs = (
     "LWP::Protocol::https" => "6.04",
     "LWP::UserAgent" => "6.02",
     "Log::Log4perl" => 1,
+    "MIME::Base64" => "3.00",
     "Mojolicious" => "4.13",
     "OAuth::Cmdline" => "0.07",
     "Pod::Usage" => "1.36",
@@ -37,7 +38,7 @@ my %WriteMakefileArgs = (
     "Test::MockModule" => "0.171",
     "Test::More" => 0
   },
-  "VERSION" => "3.00",
+  "VERSION" => "3.01",
   "test" => {
     "TESTS" => "t/*.t t/v3/*.t"
   }
@@ -52,6 +53,7 @@ my %FallbackPrereqs = (
   "LWP::Protocol::https" => "6.04",
   "LWP::UserAgent" => "6.02",
   "Log::Log4perl" => 1,
+  "MIME::Base64" => "3.00",
   "Mojolicious" => "4.13",
   "OAuth::Cmdline" => "0.07",
   "Pod::Usage" => "1.36",

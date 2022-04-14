@@ -58,7 +58,7 @@ int EC_KEY_set_private_key(EC_KEY *key, const BIGNUM *prv);
 
 
 
-int ecdh_pkey(EVP_PKEY *pkey_priv, EVP_PKEY *pkey_peer_pub, unsigned char **z)
+int ecdh_pkey_raw(EVP_PKEY *pkey_priv, EVP_PKEY *pkey_peer_pub, unsigned char **z)
 
 
 EVP_PKEY* evp_pkey_from_point_hex(EC_GROUP* group, char* point_hex, BN_CTX* ctx)
@@ -110,6 +110,24 @@ digest(self, bin_SV)
   OUTPUT:
     RETVAL
 
+SV*
+ecdh_pkey(pkey, peer_pubkey)
+    EVP_PKEY* pkey;
+    EVP_PKEY* peer_pubkey;
+  PREINIT:
+    unsigned char *z;
+    STRLEN zlen;
+    SV* res;
+  CODE:
+{
+
+    zlen = ecdh_pkey_raw(pkey, peer_pubkey, &z);
+    res = newSVpv(z, zlen);
+    RETVAL = res;
+}
+  OUTPUT:
+    RETVAL
+
 
 SV*
 ecdh(local_priv_pem, peer_pub_pem)
@@ -134,7 +152,7 @@ ecdh(local_priv_pem, peer_pub_pem)
     //printf("\nRead Peer PUBKEY Key:\n");
     //PEM_write_PUBKEY(stdout, peer_pubkey);
 
-    zlen = ecdh_pkey(pkey, peer_pubkey, &z);
+    zlen = ecdh_pkey_raw(pkey, peer_pubkey, &z);
 
     res = newSVpv(z, zlen);
 

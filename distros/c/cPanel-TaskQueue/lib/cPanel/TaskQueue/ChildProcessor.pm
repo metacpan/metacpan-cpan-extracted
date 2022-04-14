@@ -1,5 +1,5 @@
 package cPanel::TaskQueue::ChildProcessor;
-$cPanel::TaskQueue::ChildProcessor::VERSION = '0.902';
+$cPanel::TaskQueue::ChildProcessor::VERSION = '0.903';
 use strict;
 
 #use warnings;

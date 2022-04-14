@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Sq - Package for language Albanian
 =cut
 
 package Locale::CLDR::Locales::Sq;
-# This file auto generated from Data\common\main\sq.xml
-#	on Sun  3 Feb  2:18:29 pm GMT
+# This file auto generated from Data/common/main/sq.xml
+#	on Mon 11 Apr  5:38:12 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -4914,61 +4914,61 @@ has 'day_period_data' => (
 		$day_period_type //= 'default';
 		SWITCH:
 		for ($type) {
-			if ($_ eq 'gregorian') {
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'noon' if $time == 1200;
-					return 'night1' if $time >= 0
-						&& $time < 400;
-					return 'morning2' if $time >= 900
-						&& $time < 1200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'morning1' if $time >= 400
-						&& $time < 900;
-					return 'evening1' if $time >= 1800
-						&& $time < 2400;
-				}
-				if($day_period_type eq 'selection') {
-					return 'morning1' if $time >= 400
-						&& $time < 900;
-					return 'evening1' if $time >= 1800
-						&& $time < 2400;
-					return 'morning2' if $time >= 900
-						&& $time < 1200;
-					return 'night1' if $time >= 0
-						&& $time < 400;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-				}
-				last SWITCH;
-				}
 			if ($_ eq 'generic') {
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
 					return 'noon' if $time == 1200;
-					return 'night1' if $time >= 0
-						&& $time < 400;
-					return 'morning2' if $time >= 900
-						&& $time < 1200;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
-					return 'morning1' if $time >= 400
-						&& $time < 900;
 					return 'evening1' if $time >= 1800
 						&& $time < 2400;
+					return 'morning1' if $time >= 400
+						&& $time < 900;
+					return 'morning2' if $time >= 900
+						&& $time < 1200;
+					return 'night1' if $time >= 0
+						&& $time < 400;
 				}
 				if($day_period_type eq 'selection') {
-					return 'morning1' if $time >= 400
-						&& $time < 900;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
 					return 'evening1' if $time >= 1800
 						&& $time < 2400;
+					return 'morning1' if $time >= 400
+						&& $time < 900;
 					return 'morning2' if $time >= 900
 						&& $time < 1200;
 					return 'night1' if $time >= 0
 						&& $time < 400;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'gregorian') {
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'noon' if $time == 1200;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
+					return 'morning1' if $time >= 400
+						&& $time < 900;
+					return 'morning2' if $time >= 900
+						&& $time < 1200;
+					return 'night1' if $time >= 0
+						&& $time < 400;
+				}
+				if($day_period_type eq 'selection') {
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
+					return 'morning1' if $time >= 400
+						&& $time < 900;
+					return 'morning2' if $time >= 900
+						&& $time < 1200;
+					return 'night1' if $time >= 0
+						&& $time < 400;
 				}
 				last SWITCH;
 				}
@@ -4988,73 +4988,73 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
-					'pm' => q{e pasdites},
-					'midnight' => q{e mesnatës},
-					'am' => q{e paradites},
-					'night1' => q{e natës},
-					'morning2' => q{e paradites},
-					'evening1' => q{e mbrëmjes},
-					'morning1' => q{e mëngjesit},
+				'abbreviated' => {
 					'afternoon1' => q{e pasdites},
+					'am' => q{p.d.},
+					'evening1' => q{e mbrëmjes},
+					'midnight' => q{e mesnatës},
+					'morning1' => q{e mëngjesit},
+					'morning2' => q{e paradites},
+					'night1' => q{e natës},
 					'noon' => q{e mesditës},
+					'pm' => q{m.d.},
 				},
 				'narrow' => {
-					'night1' => q{e natës},
-					'morning2' => q{e paradites},
-					'am' => q{p.d.},
-					'pm' => q{m.d.},
-					'midnight' => q{e mesnatës},
 					'afternoon1' => q{e pasdites},
-					'noon' => q{e mesditës},
-					'morning1' => q{e mëngjesit},
+					'am' => q{p.d.},
 					'evening1' => q{e mbrëmjes},
+					'midnight' => q{e mesnatës},
+					'morning1' => q{e mëngjesit},
+					'morning2' => q{e paradites},
+					'night1' => q{e natës},
+					'noon' => q{e mesditës},
+					'pm' => q{m.d.},
 				},
-				'abbreviated' => {
-					'morning1' => q{e mëngjesit},
-					'evening1' => q{e mbrëmjes},
-					'noon' => q{e mesditës},
+				'wide' => {
 					'afternoon1' => q{e pasdites},
-					'am' => q{p.d.},
+					'am' => q{e paradites},
+					'evening1' => q{e mbrëmjes},
 					'midnight' => q{e mesnatës},
-					'pm' => q{m.d.},
+					'morning1' => q{e mëngjesit},
 					'morning2' => q{e paradites},
 					'night1' => q{e natës},
+					'noon' => q{e mesditës},
+					'pm' => q{e pasdites},
 				},
 			},
 			'stand-alone' => {
-				'wide' => {
-					'morning1' => q{mëngjes},
-					'evening1' => q{mbrëmje},
+				'abbreviated' => {
 					'afternoon1' => q{pasdite},
-					'noon' => q{mesditë},
-					'am' => q{paradite},
+					'am' => q{p.d.},
+					'evening1' => q{mbrëmje},
 					'midnight' => q{mesnatë},
-					'pm' => q{pasdite},
+					'morning1' => q{mëngjes},
 					'morning2' => q{paradite},
 					'night1' => q{natë},
+					'noon' => q{mesditë},
+					'pm' => q{m.d.},
 				},
 				'narrow' => {
-					'night1' => q{natë},
-					'morning2' => q{paradite},
-					'pm' => q{m.d.},
-					'midnight' => q{mesnatë},
-					'am' => q{p.d.},
 					'afternoon1' => q{pasdite},
-					'noon' => q{mesditë},
+					'am' => q{p.d.},
 					'evening1' => q{mbrëmje},
+					'midnight' => q{mesnatë},
 					'morning1' => q{mëngjes},
+					'morning2' => q{paradite},
+					'night1' => q{natë},
+					'noon' => q{mesditë},
+					'pm' => q{m.d.},
 				},
-				'abbreviated' => {
-					'night1' => q{natë},
-					'morning2' => q{paradite},
-					'am' => q{p.d.},
-					'pm' => q{m.d.},
-					'midnight' => q{mesnatë},
+				'wide' => {
 					'afternoon1' => q{pasdite},
-					'noon' => q{mesditë},
-					'morning1' => q{mëngjes},
+					'am' => q{paradite},
 					'evening1' => q{mbrëmje},
+					'midnight' => q{mesnatë},
+					'morning1' => q{mëngjes},
+					'morning2' => q{paradite},
+					'night1' => q{natë},
+					'noon' => q{mesditë},
+					'pm' => q{pasdite},
 				},
 			},
 		},

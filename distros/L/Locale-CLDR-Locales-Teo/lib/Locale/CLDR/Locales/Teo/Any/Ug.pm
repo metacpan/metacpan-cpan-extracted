@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Teo::Any::Ug - Package for language Teso
 =cut
 
 package Locale::CLDR::Locales::Teo::Any::Ug;
-# This file auto generated from Data\common\main\teo_UG.xml
-#	on Sun  3 Feb  2:21:19 pm GMT
+# This file auto generated from Data/common/main/teo_UG.xml
+#	on Mon 11 Apr  5:39:16 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';

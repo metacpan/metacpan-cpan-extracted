@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Rof - Package for language Rombo
 =cut
 
 package Locale::CLDR::Locales::Rof;
-# This file auto generated from Data\common\main\rof.xml
-#	on Sun  3 Feb  2:15:22 pm GMT
+# This file auto generated from Data/common/main/rof.xml
+#	on Mon 11 Apr  5:37:02 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<otrs_package version="1.0">
+    <Name>OnePointElevent</Name>
+    <!-- nofilter(TidyAll::Plugin::OTRS::SOPM::DocumentationPresent) -->
+    <Version>6.0.1</Version>
+    <ChangeLog Version="6.0.1" Date="2022-03-18 10:16:46 +0100">Ported to 6.3.</ChangeLog>
+    <Framework>6.3.x</Framework>
+    <PackageRequired Version="6.3.1">GeneralCatalog</PackageRequired>
+    <Vendor>Perl-Services.de</Vendor>
+    <URL>https://www.perl-services.de/</URL>
+    <License>GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007</License>
+    <Description Lang="en">Another test package for OPM::Validate.</Description>
+    <BuildHost>build.perl-services.de</BuildHost>
+    <BuildDate>2022-03-18 09:16:46 UTC</BuildDate>
+    <Filelist>
+         <File Permission="660" Location="doc/a-test.t" Encode="Base64">H4sIAAAAAAA</File>
+    </Filelist>
+    <DatabaseUpgrade Type="post">
+        <TableAlter Name="cip_allocate" Version="3.2.91">
+            <ForeignKeyDrop ForeignTable="general_catalog">
+                <Reference Local="criticality_id" Foreign="id"/>
+                <Reference Local="impact_id" Foreign="id"/>
+            </ForeignKeyDrop>
+        </TableAlter>
+        <TableAlter Name="cip_allocate" Version="3.2.91">
+            <ColumnAdd Name="criticality" Required="true" Size="200" Type="VARCHAR"/>
+            <ColumnAdd Name="impact" Required="true" Size="200" Type="VARCHAR"/>
+        </TableAlter>
+        <TableAlter Name="service" Version="3.2.91">
+            <ColumnAdd Name="criticality" Required="false" Size="200" Type="VARCHAR"/>
+        </TableAlter>
+    </DatabaseUpgrade>
+</otrs_package>

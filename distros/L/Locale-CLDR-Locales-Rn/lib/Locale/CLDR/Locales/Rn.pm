@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Rn - Package for language Rundi
 =cut
 
 package Locale::CLDR::Locales::Rn;
-# This file auto generated from Data\common\main\rn.xml
-#	on Sun  3 Feb  2:14:53 pm GMT
+# This file auto generated from Data/common/main/rn.xml
+#	on Mon 11 Apr  5:36:52 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -834,8 +834,8 @@ has 'day_periods' => (
 					'pm' => q{Z.MW.},
 				},
 				'wide' => {
-					'pm' => q{Z.MW.},
 					'am' => q{Z.MU.},
+					'pm' => q{Z.MW.},
 				},
 			},
 		},

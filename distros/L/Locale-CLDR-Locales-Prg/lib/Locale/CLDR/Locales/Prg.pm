@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Prg - Package for language Prussian
 =cut
 
 package Locale::CLDR::Locales::Prg;
-# This file auto generated from Data\common\main\prg.xml
-#	on Sun  3 Feb  2:13:37 pm GMT
+# This file auto generated from Data/common/main/prg.xml
+#	on Mon 11 Apr  5:36:22 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -782,12 +782,12 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'abbreviated' => {
-					'pm' => q{PM},
 					'am' => q{AM},
+					'pm' => q{PM},
 				},
 				'wide' => {
-					'pm' => q{pa pussideinan},
 					'am' => q{ankstāinan},
+					'pm' => q{pa pussideinan},
 				},
 			},
 		},
@@ -929,6 +929,9 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'generic' => {
+			fallback => '{0} – {1}',
+		},
 		'gregorian' => {
 			H => {
 				H => q{HH–HH},
@@ -1023,9 +1026,6 @@ has 'datetime_formats_interval' => (
 				d => q{dd.MM.y–dd.MM.y},
 				y => q{dd.MM.y–dd.MM.y},
 			},
-		},
-		'generic' => {
-			fallback => '{0} – {1}',
 		},
 	} },
 );

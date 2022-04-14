@@ -12,9 +12,8 @@ use Crypt::OpenSSL::EC;
 use Crypt::OpenSSL::Bignum;
 use Math::BigInt;
 use POSIX;
-#use Data::Dump qw/dump/;
 
-our $VERSION = '0.032';
+our $VERSION = '0.033';
 
 our @ISA = qw(Exporter);
 
@@ -44,9 +43,11 @@ pem_read_pkey
 PKCS5_PBKDF2_HMAC 
 PKCS12_key_gen 
 i2osp
+generate_ec_key
 aes_cmac 
 ecdh 
 ecdh_pkey
+ecdh_pkey_raw
 hex2point
 bn_mod_sqrt 
 digest
@@ -77,6 +78,29 @@ sub i2osp {
     return $s; 
 }
 
+sub generate_ec_key {
+    my ( $group, $priv_bn, $point_compress_t, $ctx ) = @_;
+    $point_compress_t //= 2;
+
+    my $priv_key = Crypt::OpenSSL::EC::EC_KEY::new();
+    $priv_key->set_group( $group );
+
+    if(! $priv_bn){
+        $priv_key->generate_key();
+        $priv_bn = $priv_key->get0_private_key();
+    }
+    my $priv_pkey = evp_pkey_from_priv_hex( $group, $priv_bn->to_hex );
+
+    my $pub_point      = $priv_key->get0_public_key();
+    my $pub_hex  = Crypt::OpenSSL::EC::EC_POINT::point2hex( $group, $pub_point, $point_compress_t, $ctx );
+    my $pub_bin  = pack( "H*", $pub_hex );
+    my $pub_pkey = evp_pkey_from_point_hex( $group, $pub_hex, $ctx );
+
+    return {
+        priv_pkey => $priv_pkey, priv_key => $priv_key, priv_bn => $priv_bn,
+        pub_pkey => $pub_pkey, pub_point => $pub_point, pub_hex => $pub_hex, pub_bin => $pub_bin,
+    };
+} ## end sub generate_ec_key
 
 
 1;

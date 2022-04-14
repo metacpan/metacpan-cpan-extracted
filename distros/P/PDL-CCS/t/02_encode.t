@@ -1,6 +1,8 @@
 # -*- Mode: CPerl -*-
 # t/02_encode.t: test ccs encoding
-use Test::More tests => 28;
+use Test::More;
+use strict;
+use warnings;
 
 ##-- common subs
 my $TEST_DIR;
@@ -131,6 +133,4 @@ pdlok("decodefull()", $p,$p2);
 $p2 = ccsdecode($ptr,$rowids,$nzvals);
 pdlok("decode()", $p,$p2);
 
-print "\n";
-# end of t/02_encode.t
-
+done_testing;

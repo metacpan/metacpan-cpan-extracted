@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Se::Any::No - Package for language Northern Sami
 =cut
 
 package Locale::CLDR::Locales::Se::Any::No;
-# This file auto generated from Data\common\main\se_NO.xml
-#	on Sun  3 Feb  2:16:55 pm GMT
+# This file auto generated from Data/common/main/se_NO.xml
+#	on Mon 11 Apr  5:37:35 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';

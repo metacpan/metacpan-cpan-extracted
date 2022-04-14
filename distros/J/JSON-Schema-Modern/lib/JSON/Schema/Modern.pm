@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Modern; # git description: v0.548-3-g0b442486
+package JSON::Schema::Modern; # git description: v0.549-8-g62710998
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema
 # KEYWORDS: JSON Schema data validation structure specification
 
-our $VERSION = '0.549';
+our $VERSION = '0.550';
 
 use 5.020;  # for fc, unicode_strings features
 use Moo;
@@ -377,6 +377,15 @@ sub evaluate ($self, $data, $schema_reference, $config_override = {}) {
           ? (annotations => $state->{annotations}) : ())
       : (errors => $state->{errors}),
   );
+}
+
+sub validate_schema ($self, $schema, $config_override = {}) {
+  croak 'validate_schema called in void context' if not defined wantarray;
+
+  my $metaschema_uri = is_plain_hashref($schema) && $schema->{'$schema'} ? $schema->{'$schema'}
+    : $self->METASCHEMA_URIS->{$self->specification_version // $self->SPECIFICATION_VERSION_DEFAULT};
+
+  return $self->evaluate($schema, $metaschema_uri, $config_override);
 }
 
 sub get ($self, $uri) {
@@ -949,7 +958,7 @@ JSON::Schema::Modern - Validate data against a schema
 
 =head1 VERSION
 
-version 0.549
+version 0.550
 
 =head1 SYNOPSIS
 
@@ -1201,6 +1210,13 @@ For example, to find the locations where all C<$ref> keywords are applied B<succ
   });
 
 The result is a L<JSON::Schema::Modern::Result> object, which can also be used as a boolean.
+
+=head2 validate_schema
+
+  $result = $js->validate_schema($schema);
+
+Evaluates the provided schema as instance data against its metaschema. Accepts C<$schema> and
+C<$config_override> parameters in the same form as L</evaluate>.
 
 =head2 traverse
 

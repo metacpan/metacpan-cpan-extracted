@@ -1,6 +1,8 @@
 # -*- Mode: CPerl -*-
 # t/03_encode.t: test ccs pointer-decoding
-use Test::More tests => 8;
+use Test::More;
+use strict;
+use warnings;
 
 ##-- common subs
 my $TEST_DIR;
@@ -72,7 +74,4 @@ $vals_proj  = $avals->index($apnzi);
 pdlok("ccs_decode_pointer:partial:dim=1:which", $which_proj->vv_qsortvec, $aslice1->whichND->vv_qsortvec);
 pdlok("ccs_decode_pointer:partial:dim=1:vals",  $vals_proj, $aslice1->indexND($which_proj));
 
-
-print "\n";
-# end of t/03_decode.t
-
+done_testing;

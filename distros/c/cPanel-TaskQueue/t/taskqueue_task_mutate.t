@@ -15,7 +15,7 @@ my $task = cPanel::TaskQueue::Task->new( { cmd => q{noop  'a \\'b\\''   "\\"c \\
 my $mtask = $task->mutate( { id => 6 } );
 isa_ok( $mtask, 'cPanel::TaskQueue::Task', 'Mutant is Correct type.' );
 
-is( $mtask->command(), 'noop', 'mutated: command is correct' );
+is( $mtask->command(),   'noop',                           'mutated: command is correct' );
 is( $mtask->argstring(), q{'a \\'b\\''   "\\"c \\" d"  e}, 'mutated: argstring is correct' );
 is_deeply( [ $mtask->args() ], [ q{a 'b'}, q{"c " d}, q{e} ], 'mutated: args list is correct' );
 is( $mtask->uuid(),          $task->uuid(),          'mutated task has original uuid.' );
@@ -27,7 +27,7 @@ isa_ok( $mtask2, 'cPanel::TaskQueue::Task', 'Mutant is Correct type.' );
 eval { $task->mutate( { timeout => -5 } ); };
 like( $@, qr/Invalid child timeout/, q{Can't mutate to a bad timeout} );
 
-is( $mtask2->command(), 'noop', 'mutated: command is correct' );
+is( $mtask2->command(),   'noop',                           'mutated: command is correct' );
 is( $mtask2->argstring(), q{'a \\'b\\''   "\\"c \\" d"  e}, 'mutated: argstring is correct' );
 is_deeply( [ $mtask2->args() ], [ q{a 'b'}, q{"c " d}, q{e} ], 'mutated: args list is correct' );
 is( $mtask2->child_timeout(), 2 * $task->child_timeout(), 'mutated: Child timeout still matches.' );

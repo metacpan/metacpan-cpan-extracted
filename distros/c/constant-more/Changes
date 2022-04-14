@@ -1,0 +1,7 @@
+
+0.1.0   Thu 14 Apr 2022 21:34:36 AEST
+        - First version
+        - Supports command line options
+        - Supports Environment variables
+        - User sub for advanced configuration
+

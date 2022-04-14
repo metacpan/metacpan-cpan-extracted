@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::Core;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Core vocabulary
 
-our $VERSION = '0.549';
+our $VERSION = '0.550';
 
 use 5.020;
 use Moo;
@@ -250,11 +250,6 @@ sub _traverse_keyword_vocabulary ($self, $schema, $state) {
     if length($state->{schema_path});
 
   my $valid = 1;
-  $valid = E($state, '$vocabulary can only appear at the document root')
-    if length($state->{traversed_schema_path}.$state->{schema_path});
-
-  $valid = E($state, 'metaschemas must have an $id')
-    if not length $state->{initial_schema_uri};
 
   my @vocabulary_classes;
   foreach my $uri (sort keys $schema->{'$vocabulary'}->%*) {
@@ -301,6 +296,11 @@ sub __fetch_vocabulary_data ($self, $state, $schema_info) {
   }
 
   my $valid = 1;
+  $valid = E($state, '$vocabulary can only appear at the document root') if length $schema_info->{document_path};
+  $valid = E($state, 'metaschemas must have an $id') if not exists $schema_info->{schema}{'$id'};
+
+  return (undef, []) if not $valid;
+
   my @vocabulary_classes;
 
   foreach my $uri (sort keys $schema_info->{schema}{'$vocabulary'}->%*) {
@@ -347,7 +347,7 @@ JSON::Schema::Modern::Vocabulary::Core - Implementation of the JSON Schema Core 
 
 =head1 VERSION
 
-version 0.549
+version 0.550
 
 =head1 DESCRIPTION
 

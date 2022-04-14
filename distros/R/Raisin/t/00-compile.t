@@ -6,13 +6,14 @@ use warnings;
 
 use Test::More;
 
-plan tests => 20 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 21 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Raisin.pm',
     'Raisin/API.pm',
     'Raisin/Decoder.pm',
     'Raisin/Encoder.pm',
+    'Raisin/Encoder/Form.pm',
     'Raisin/Encoder/JSON.pm',
     'Raisin/Encoder/Text.pm',
     'Raisin/Encoder/YAML.pm',

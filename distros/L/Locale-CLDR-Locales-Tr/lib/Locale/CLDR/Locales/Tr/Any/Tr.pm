@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Tr::Any::Tr - Package for language Turkish
 =cut
 
 package Locale::CLDR::Locales::Tr::Any::Tr;
-# This file auto generated from Data\common\main\tr_TR.xml
-#	on Sun  3 Feb  2:24:13 pm GMT
+# This file auto generated from Data/common/main/tr_TR.xml
+#	on Mon 11 Apr  5:40:25 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';

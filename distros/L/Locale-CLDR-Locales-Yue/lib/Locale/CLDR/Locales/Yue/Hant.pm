@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Yue::Hant - Package for language Cantonese
 =cut
 
 package Locale::CLDR::Locales::Yue::Hant;
-# This file auto generated from Data\common\main\yue_Hant.xml
-#	on Sun  3 Feb  2:27:17 pm GMT
+# This file auto generated from Data/common/main/yue_Hant.xml
+#	on Mon 11 Apr  5:41:36 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';

@@ -332,7 +332,10 @@ sub patch_rpaths {
   
   #  only run on unices - incomplete check but
   #  I don't think aliens work on VMS or zOS
-  return if ($on_windows or $^O =~ /darwin/i);
+  return if $on_windows;
+  
+  return patch_rpaths_macos($build)
+    if $^O =~ /darwin/i;
 
   my $h = get_alien_state_hash();
   my $install_path = $h->{install}{prefix};
@@ -397,7 +400,7 @@ sub patch_rpaths {
               ->in( getcwd() );
   my @binaries
     = grep {$_ !~ /\.o$/}  #  no object files
-      map {glob (path($_)->parent->stringify . '/*')} @gdalinfo_files;
+      map {path($_)->parent->children} @gdalinfo_files;
 
   foreach my $so_file (@binaries) {
     my ($old_rpath, $result, $stderr, @errors);
@@ -411,6 +414,129 @@ sub patch_rpaths {
       = $pe->patchelf ('--set-rpath', $rpath, $so_file);
     warn $stderr if $stderr;
   }
+
+  return;
+}
+
+sub patch_rpaths_macos {
+  my ($build) = @_;
+  
+  #  just for safety
+  return if not $^O =~ /darwin/i;
+
+  my $h = get_alien_state_hash();
+  my $install_path = $h->{install}{prefix};
+  return if !defined $install_path;
+
+  my @alien_rpaths;
+  for my $alien (@alien_deps) {
+    next if not $alien->install_type('share');
+    push @alien_rpaths, $alien->dist_dir . '/lib';
+  }
+  if (!@alien_rpaths) {
+    $build->log('No shared alien deps found, not updating rpaths');
+    return;
+  }
+
+  use File::Which qw /which/;
+  my $install_name_tool = which 'install_name_tool';
+  if (!$install_name_tool) {
+    $build->log('install_name_tool not found, not updating rpaths');
+    return;
+  }
+  my $otool = which 'otool';
+  if (!$install_name_tool) {
+    $build->log('otool not found, not updating rpaths');
+    return;
+  }
+
+  my $origin_string = '@loader_path';
+  my @inst_tool_rpath_args
+    = map {; '-add_rpath' => $_} (
+       (map {"${origin_string}/../" . path ($_)->relative($install_path)->stringify} @alien_rpaths),
+       @alien_rpaths,
+      );
+
+  $build->log ("Prepending rpaths with args " . join ' ', @inst_tool_rpath_args);
+  
+  #  need to also do the bin dir - those files only need to have $ORIGIN/../lib added
+  use File::Find::Rule;
+  my (@so_files)
+    = grep {not -l $_}
+      File::Find::Rule
+              ->file()
+              ->name( qr/^libgdal[.\d]*.dylib/ )
+              ->in( getcwd() );
+  
+  foreach my $so_file (@so_files) {
+    use Capture::Tiny qw /capture/;
+    $build->log ("Updating rpath for $so_file");
+    my ($otool_text, $old_rpath, $result, $stderr, @errors);
+    $build ->log ("Calling: $otool, '-l', $so_file");
+    #eval {
+      ($otool_text, $stderr, @errors)
+        = capture {system $otool, '-l', $so_file};
+    #};
+    #$build->log ($@) if $@;
+    #$build->log (@errors) if @errors;
+    $build->log ($stderr) if $stderr;
+    #$build->log($otool_text);  #  debug
+    
+    #  now we need to extract the rpaths
+    my @lines = split "\n", $otool_text;
+    my @existing_paths;
+    while (defined (my $line = shift @lines)) {
+        if ($line =~ /RPATH/) {
+            shift @lines;
+            $line = shift @lines;
+            $line =~ s/^\s+path\s//;
+            $line =~ s/\s\(offset.+$//;
+            push @existing_paths, $line;
+        }
+    }
+    #  remove existing
+    if (@existing_paths) {
+      $build->log ("removing existing rpaths " . join ' ', @existing_paths);
+      my @delete_args = map {; '-delete_rpath' => $_} @existing_paths;
+      ($result, $stderr, @errors)
+        = capture {system $install_name_tool, @delete_args, $so_file};
+      #$build->log($result);
+      $build->log($stderr) if $stderr;
+    }
+
+    #  now append the existing ones
+    push @inst_tool_rpath_args, map {; '-add_rpath' => $_} @existing_paths;
+    #  prepend our paths
+    ($result, $stderr, @errors)
+      = capture {system $install_name_tool, @inst_tool_rpath_args, $so_file};
+    #$build->log($result);
+    $build->log($stderr) if $stderr;
+  }
+  
+  ##  surely we could just use one of the alien props to get the dir?
+  #my (@gdalinfo_files)
+  #  = grep {not -l $_}
+  #    grep {$_ =~ m|apps/\.libs|}  #  must be in the .libs dir
+  #    File::Find::Rule
+  #            ->file()
+  #            ->name( 'gdalinfo' )
+  #            ->in( getcwd() );
+  #my @binaries
+  #  = grep {$_ !~ /\.o$/}  #  no object files
+  #    map {path($_)->parent->children} @gdalinfo_files;
+  #
+  #foreach my $so_file (@binaries) {
+  #  my ($old_rpath, $result, $stderr, @errors);
+  #  ($old_rpath, $stderr, @errors)
+  #    = $pe->patchelf ('--print-rpath', $so_file);
+  #  $old_rpath //= '';
+  #  #  prepend relative path
+  #  my $rpath = '$ORIGIN/../lib' . ($old_rpath ? (':' . $old_rpath) : '');
+  #  $build->log("Updating rpath for $so_file to $rpath, was $old_rpath");
+  #  ($result, $stderr, @errors)
+  #    = $pe->patchelf ('--set-rpath', $rpath, $so_file);
+  #  warn $stderr if $stderr;
+  #}
 
   return;
 }

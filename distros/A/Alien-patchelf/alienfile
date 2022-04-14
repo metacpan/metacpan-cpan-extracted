@@ -9,19 +9,21 @@ plugin 'Probe::CommandLine' => (
 );
  
 share {
-  #die 'Cannot run a share install on windows' if 'Alien::Build'->install_type('share');
 
-  plugin 'Download::GitHub' => (
-    github_user => 'NixOS',
-    github_repo => 'patchelf',
+  Alien::Build->log ('$ENV{ALIEN_BUILD_PRELOAD} = ' . ($ENV{ALIEN_BUILD_PRELOAD} // ''));
+
+  meta->prop->{start_url} = 'https://github.com/NixOS/patchelf.git';
+  plugin 'Download::Git' =>(
+    filter  => qr/^([0-9\.]+)$/,
+    version => qr/^([0-9\.]+)$/,
   );
-  plugin Extract => 'tar.gz';
+
   requires 'Alien::Autotools';
   plugin 'Build::Autoconf';
   if ($on_windows) {
     plugin 'Build::MSYS';
   }
-  if ($^O =~ /solaris/) {
+  if ($^O =~ /solaris/i) {
     plugin 'Build::Make' => 'gmake';
   }
   build [

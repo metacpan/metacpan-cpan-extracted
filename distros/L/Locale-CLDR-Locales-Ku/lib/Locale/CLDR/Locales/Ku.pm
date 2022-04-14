@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Ku - Package for language Kurdish
 =cut
 
 package Locale::CLDR::Locales::Ku;
-# This file auto generated from Data\common\main\ku.xml
-#	on Sun  3 Feb  2:01:59 pm GMT
+# This file auto generated from Data/common/main/ku.xml
+#	on Mon 11 Apr  5:32:18 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -1285,11 +1285,11 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
-					'pm' => q{PN},
-					'am' => q{BN},
-				},
 				'abbreviated' => {
+					'am' => q{BN},
+					'pm' => q{PN},
+				},
+				'wide' => {
 					'am' => q{BN},
 					'pm' => q{PN},
 				},

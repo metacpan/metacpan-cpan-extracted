@@ -1,0 +1,56 @@
+#!/usr/bin/perl
+
+use v5.10;
+
+# ABSTRACT: A short script to validate an opm file
+# PODNAME: validate_opm
+
+use strict;
+use warnings;
+
+our $VERSION = '1.11'; # VERSION
+
+use OPM::Validate;
+
+my $file    = _check_args() or do{ print_usage() and exit };
+my $content = do { local (@ARGV, $/) = ($file); <> };
+
+OPM::Validate->validate( $content );
+
+sub _check_args {
+    return if !@ARGV;
+    return if !-f $ARGV[0];
+
+    return $ARGV[0];
+}
+
+sub print_usage {
+    say "$0 <path_to_opm>";
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+validate_opm - A short script to validate an opm file
+
+=head1 VERSION
+
+version 1.11
+
+=head1 AUTHOR
+
+Perl-Services.de <info@perl-services.de>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021 by Perl-Services.de.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

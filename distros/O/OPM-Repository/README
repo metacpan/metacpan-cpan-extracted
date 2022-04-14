@@ -1,0 +1,100 @@
+NAME
+
+    OPM::Repository - parse OPM repositories' framework.xml files to search
+    for add ons
+
+VERSION
+
+    version 1.0.0
+
+SYNOPSIS
+
+      use OPM::Repository;
+      
+      my $repo = OPM::Repository->new(
+          sources => [qw!
+              https://opar.perl-services.de/framework.xml
+              https://download.znuny.org/releases/packages/framework.xml
+              https://download.znuny.org/releases/itsm/packages6/framework.xml
+          !],
+      );
+      
+      my ($url) = $repo->find(
+        name      => 'ITSMCore',
+        framework => '3.3',
+      );
+      
+      print $url;
+
+ BUILDARGS
+
+ATTRIBUTES
+
+      * sources
+
+METHODS
+
+ new
+
+    new has only one mandatory parameter: sources. This has to be an array
+    reference of URLs for repositories' framework.xml files.
+
+      my $repo = OPM::Repository->new(
+          sources => [qw!
+              http://opar.perl-services.de/framework.xml
+              http://ftp.framework.org/pub/framework/packages/framework.xml
+              http://ftp.framework.org/pub/framework/itsm/packages33/framework.xml
+          !],
+      );
+
+ find
+
+    Search for an add on for a given OPM version in those repositories. It
+    returns a list of urls if the add on was found, undef otherwise.
+
+      my @urls = $repo->find(
+        name      => 'ITSMCore',
+        framework => '3.3',
+      );
+
+    Find a specific version
+
+      my @urls = $repo->find(
+        name      => 'ITSMCore',
+        framework => '3.3',
+        version   => '1.4.8',
+      );
+
+ list
+
+    List all addons found in the repositories
+
+      my @addons = $repo->list;
+      say $_ for @addons;
+
+    You can also define the OPM version
+
+      my @addons = $repo->list( framework => '5.0.x' );
+      say $_ for @addons;
+
+    Both snippets print a simple list of addon names. If you want to to
+    create a list with more information, you can use
+
+      my @addons = $repo->list(
+          framework => '5.0.x',
+          details   => 1,
+      );
+      say sprintf "%s (%s) on %s\n", $_->{name}, $_->{version}, $_->{url} for @addons;
+
+AUTHOR
+
+    Renee Baecker <reneeb@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2017 by Renee Baecker.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+

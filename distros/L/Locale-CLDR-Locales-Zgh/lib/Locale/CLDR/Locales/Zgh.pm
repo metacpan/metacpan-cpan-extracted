@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Zgh - Package for language Standard Moroccan Tamazight
 =cut
 
 package Locale::CLDR::Locales::Zgh;
-# This file auto generated from Data\common\main\zgh.xml
-#	on Sun  3 Feb  2:27:18 pm GMT
+# This file auto generated from Data/common/main/zgh.xml
+#	on Mon 11 Apr  5:41:36 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -1063,15 +1063,15 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'narrow' => {
-					'pm' => q{ⵜⴰⴷⴳⴳⵯⴰⵜ},
+				'abbreviated' => {
 					'am' => q{ⵜⵉⴼⴰⵡⵜ},
+					'pm' => q{ⵜⴰⴷⴳⴳⵯⴰⵜ},
+				},
+				'narrow' => {
+					'am' => q{ⵜⵉⴼⴰⵡⵜ},
+					'pm' => q{ⵜⴰⴷⴳⴳⵯⴰⵜ},
 				},
 				'wide' => {
-					'am' => q{ⵜⵉⴼⴰⵡⵜ},
-					'pm' => q{ⵜⴰⴷⴳⴳⵯⴰⵜ},
-				},
-				'abbreviated' => {
 					'am' => q{ⵜⵉⴼⴰⵡⵜ},
 					'pm' => q{ⵜⴰⴷⴳⴳⵯⴰⵜ},
 				},
@@ -1086,8 +1086,8 @@ has 'day_periods' => (
 					'pm' => q{ⵜⴰⴷⴳⴳⵯⴰⵜ},
 				},
 				'wide' => {
-					'pm' => q{ⵜⴰⴷⴳⴳⵯⴰⵜ},
 					'am' => q{ⵜⵉⴼⴰⵡⵜ},
+					'pm' => q{ⵜⴰⴷⴳⴳⵯⴰⵜ},
 				},
 			},
 		},

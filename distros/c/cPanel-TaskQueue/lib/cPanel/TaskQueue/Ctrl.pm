@@ -1,5 +1,5 @@
 package cPanel::TaskQueue::Ctrl;
-$cPanel::TaskQueue::Ctrl::VERSION = '0.902';
+$cPanel::TaskQueue::Ctrl::VERSION = '0.903';
 use warnings;
 use strict;
 
@@ -127,7 +127,7 @@ my %commands = (
 sub new {
     my ( $class, $args ) = @_;
 
-    $args = {} unless defined $args;
+    $args = {}                                unless defined $args;
     die "Argument to new is not a hashref.\n" unless 'HASH' eq ref $args;
     foreach my $arg (@required) {
         die "Missing required '$arg' argument.\n" unless defined $args->{$arg} and length $args->{$arg};
@@ -140,14 +140,14 @@ sub new {
         $self->{$arg} = $args->{$arg};
     }
     $self->{sdir} ||= $self->{qdir} if $self->{sname};
-    $self->{out} ||= \*STDOUT;
+    $self->{out}  ||= \*STDOUT;
 
     return bless $self, $class;
 }
 
 sub run {
     my ( $self, $cmd, @args ) = @_;
-    die "No command supplied to run.\n" unless $cmd;
+    die "No command supplied to run.\n"         unless $cmd;
     die "Unrecognized command '$cmd' to run.\n" unless exists $commands{$cmd};
 
     $commands{$cmd}->{code}->( $self, $self->{out}, $self->_get_queue(), $self->_get_scheduler(), @args );
@@ -177,7 +177,7 @@ sub _get_queue {
         {
             name      => $self->{qname},
             state_dir => $self->{qdir},
-            ( exists $self->{logger} ? ( logger => $self->{logger} ) : () ),
+            ( exists $self->{logger}  ? ( logger => $self->{logger} )               : () ),
             ( defined $self->{serial} ? ( serial => $format{ lc $self->{serial} } ) : () ),
         }
     );
@@ -194,7 +194,7 @@ sub _get_scheduler {
         {
             name      => $self->{sname},
             state_dir => $self->{sdir},
-            ( exists $self->{logger} ? ( logger => $self->{logger} ) : () ),
+            ( exists $self->{logger}  ? ( logger => $self->{logger} )               : () ),
             ( defined $self->{serial} ? ( serial => $format{ lc $self->{serial} } ) : () ),
         }
     );
@@ -318,7 +318,7 @@ sub list_tasks {
     my ( $ctrl, $fh, $queue, $sched, @subcmds ) = @_;
     my $print = \&_print_task;
     if ( _any_is( 'verbose', @subcmds ) ) {
-        $print = \&_verbosely_print_task;
+        $print   = \&_verbosely_print_task;
         @subcmds = grep { $_ ne 'verbose' } @subcmds;
     }
 
@@ -451,7 +451,7 @@ sub _convert_a_state_file {
     my $curr_serial = $q->_serializer();
     if ( $new_serial ne $curr_serial ) {
         my $curr_state_file = $q->_state_file();
-        my $new_state_file = $new_serial->filename( substr( $curr_state_file, 0, rindex( $curr_state_file, '.' ) ) );
+        my $new_state_file  = $new_serial->filename( substr( $curr_state_file, 0, rindex( $curr_state_file, '.' ) ) );
         open my $ifh, '<', $curr_state_file or die "Unable to read '$curr_state_file': $!\n";
         open my $ofh, '>', $new_state_file  or die "Unable to write '$new_state_file': $!\n";
         $new_serial->save( $ofh, $curr_serial->load($ifh) );
@@ -541,9 +541,9 @@ sub delete_unprocessed_tasks {
 
 sub _print_task {
     my ( $fh, $task ) = @_;
-    print $fh '[', $task->uuid, ']: ', $task->full_command, "\n";
+    print $fh '[',           $task->uuid, ']: ', $task->full_command, "\n";
     print $fh "\tQueued:  ", scalar( localtime $task->timestamp ), "\n";
-    print $fh "\tStarted: ", scalar( localtime $task->started ), "\n" if defined $task->started;
+    print $fh "\tStarted: ", scalar( localtime $task->started ),   "\n" if defined $task->started;
     return;
 }
 

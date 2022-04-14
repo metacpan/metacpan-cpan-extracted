@@ -9,16 +9,13 @@ use strict;
 use FindBin;
 use lib "$FindBin::Bin/mocks";
 use File::Path ();
+use File::Temp ();
 
 use Test::More tests => 15;
 use cPanel::TaskQueue;
 
-my $tmpdir   = './tmp';
+my $tmpdir   = File::Temp->newdir();
 my $statedir = "$tmpdir/statedir";
-
-# In case the last test did not succeed.
-cleanup();
-File::Path::mkpath($statedir);
 
 # Set all parameters to non-defaults.
 my $q1 = cPanel::TaskQueue->new(
@@ -60,9 +57,3 @@ is( $q1->get_max_timeout(),           16,  'Original updated max timeout from fi
 is( $q1->get_max_running(),           17,  'Original updated max in process from file' );
 is( $q1->get_default_child_timeout(), 742, 'Original updated default child timeout from file' );
 
-cleanup();
-
-# Clean up after myself
-sub cleanup {
-    File::Path::rmtree($tmpdir);
-}

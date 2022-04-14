@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Vun::Any::Tz - Package for language Vunjo
 =cut
 
 package Locale::CLDR::Locales::Vun::Any::Tz;
-# This file auto generated from Data\common\main\vun_TZ.xml
-#	on Sun  3 Feb  2:26:09 pm GMT
+# This file auto generated from Data/common/main/vun_TZ.xml
+#	on Mon 11 Apr  5:41:10 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';

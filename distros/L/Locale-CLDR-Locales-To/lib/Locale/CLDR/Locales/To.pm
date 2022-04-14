@@ -7,14 +7,14 @@ Locale::CLDR::Locales::To - Package for language Tongan
 =cut
 
 package Locale::CLDR::Locales::To;
-# This file auto generated from Data\common\main\to.xml
-#	on Sun  3 Feb  2:22:16 pm GMT
+# This file auto generated from Data/common/main/to.xml
+#	on Mon 11 Apr  5:39:37 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -4970,31 +4970,31 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
-					'pm' => q{efiafi},
-					'am' => q{hengihengi},
-				},
-				'narrow' => {
-					'pm' => q{PM},
-					'am' => q{AM},
-				},
 				'abbreviated' => {
 					'am' => q{AM},
 					'pm' => q{PM},
+				},
+				'narrow' => {
+					'am' => q{AM},
+					'pm' => q{PM},
+				},
+				'wide' => {
+					'am' => q{hengihengi},
+					'pm' => q{efiafi},
 				},
 			},
 			'stand-alone' => {
 				'abbreviated' => {
-					'pm' => q{PM},
 					'am' => q{AM},
-				},
-				'wide' => {
-					'pm' => q{EA},
-					'am' => q{HH},
+					'pm' => q{PM},
 				},
 				'narrow' => {
-					'pm' => q{PM},
 					'am' => q{AM},
+					'pm' => q{PM},
+				},
+				'wide' => {
+					'am' => q{HH},
+					'pm' => q{EA},
 				},
 			},
 		},

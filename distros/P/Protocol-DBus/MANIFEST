@@ -1,13 +1,9 @@
-.github/workflows/linux.yml
-.github/workflows/macos.yml
-.github/workflows/windows.yml
-.gitignore
-.travis.yml
 Changes
 LICENSE
 MANIFEST
 Makefile.PL
 README.md
+cpanfile
 examples/anyevent.pl
 examples/anyevent_monitor.pl
 examples/credentials.pl
@@ -47,6 +43,7 @@ lib/Protocol/DBus/WriteMsg.pm
 lib/Protocol/DBus/X.pm
 lib/Protocol/DBus/X/Base.pm
 lib/Protocol/DBus/X/Rejected.pm
+lib/Protocol/DBus/X/SurpriseShutdown.pm
 t/Protocol-DBus-Address.t
 t/Protocol-DBus-Authn-Mechanism-DBUS_SESSION_SHA1-Pieces.t
 t/Protocol-DBus-Authn-Mechanism-DBUS_SESSION_SHA1.t

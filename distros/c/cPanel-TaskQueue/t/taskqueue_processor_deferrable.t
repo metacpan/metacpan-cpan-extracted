@@ -37,7 +37,7 @@ my $task = cPanel::TaskQueue::Task->new(
 
     is_deeply( [ $proc->deferral_tags($task) ], [qw(tag1 tag2 tag3)], 'Deferral tags' );
 
-    ok( !$proc->is_task_deferred( $task, {} ), 'Not deferred: empty deferral object' );
+    ok( !$proc->is_task_deferred( $task, {} ),            'Not deferred: empty deferral object' );
     ok( !$proc->is_task_deferred( $task, { fred => 1 } ), 'Not deferred: non-matching tag' );
 
     ok( $proc->is_task_deferred( $task, { tag1 => 1 } ), 'Deferred: with first tag' );
@@ -52,7 +52,7 @@ my $task = cPanel::TaskQueue::Task->new(
 
     is_deeply( [ $proc->deferral_tags($task) ], [], 'Deferral tags: none' );
 
-    ok( !$proc->is_task_deferred( $task, {} ), 'Not deferred: empty deferral object' );
+    ok( !$proc->is_task_deferred( $task, {} ),            'Not deferred: empty deferral object' );
     ok( !$proc->is_task_deferred( $task, { fred => 1 } ), 'Not deferred: non-matching tag' );
 
     ok( !$proc->is_task_deferred( $task, { tag1 => 1 } ), 'Not Deferred: with first tag' );

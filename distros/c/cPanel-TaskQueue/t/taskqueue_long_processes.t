@@ -10,11 +10,12 @@ use strict;
 use FindBin;
 use lib "$FindBin::Bin/mocks";
 use File::Path ();
+use File::Temp ();
 
 use Test::More tests => 34;
 use cPanel::TaskQueue;
 
-my $tmpdir   = './tmp';
+my $tmpdir   = File::Temp->newdir();
 my $statedir = "$tmpdir/statedir";
 
 {
@@ -31,10 +32,6 @@ my $statedir = "$tmpdir/statedir";
 }
 
 {
-    # In case the last test did not succeed.
-    cleanup();
-    File::Path::mkpath($statedir);
-
     cPanel::TaskQueue->register_task_processor( 'sleep', SleepTask->new() );
 
     my $queue = cPanel::TaskQueue->new( { name => 'tasks', state_dir => $statedir, max_running => 5 } );
@@ -79,10 +76,5 @@ my $statedir = "$tmpdir/statedir";
     ok( !$queue->has_work_to_do(), 'no outstanding tasks' );
     is( $queue->how_many_in_process(), 0, 'no more in process' );
 
-    cleanup();
 }
 
-# Clean up after myself
-sub cleanup {
-    File::Path::rmtree($tmpdir);
-}

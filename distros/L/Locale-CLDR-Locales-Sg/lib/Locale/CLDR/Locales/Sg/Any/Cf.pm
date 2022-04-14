@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Sg::Any::Cf - Package for language Sango
 =cut
 
 package Locale::CLDR::Locales::Sg::Any::Cf;
-# This file auto generated from Data\common\main\sg_CF.xml
-#	on Sun  3 Feb  2:16:59 pm GMT
+# This file auto generated from Data/common/main/sg_CF.xml
+#	on Mon 11 Apr  5:37:36 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';

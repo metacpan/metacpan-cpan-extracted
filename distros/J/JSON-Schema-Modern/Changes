@@ -1,5 +1,13 @@
 Revision history for JSON-Schema-Modern
 
+0.550     2022-04-14 04:32:32Z
+          - added 'dump' method to Result, Error and Annotation objects, for
+            easier debugging and generating test output
+          - adjusted syntax checks for $vocabulary keyword to allow for
+            bundled metaschemas
+          - new validate_schema() method, for easily validating a schema
+            against its metaschema
+
 0.549     2022-03-22 03:55:15Z
           - properly detect the metaschema in json-schema-eval
             --validate-schema
@@ -81,7 +89,7 @@ Revision history for JSON-Schema-Modern
           - add method to add format implementations after construction
           - treat media_type names case-insensitively, as per RFC6838,
             and lookups support wildcards (get_media_type('text/plain')
-            will match an entry for 'text/*' or '*/*)
+            will match an entry for 'text/*' or '*/*')
 
 0.530     2021-12-03 16:44:23Z
           - fix hash slice syntax that is not available before perl 5.28

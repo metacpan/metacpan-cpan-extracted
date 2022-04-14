@@ -54,13 +54,14 @@ sub plugin_load_no_ok {
 }
 
 sub plugin_load_ok {
-    my ($module, $name) = @_;
+    my ( $module, $name ) = @_;
 
     # Capture STDERR so Logger doesn't go to screen.
     open( my $olderr, '>&STDERR' ) or die "Can't dupe STDERR: $!";
-    close( STDERR ); open( STDERR, '>', '/dev/null' ) or die "Unable to redirect STDERR: $!";
+    close(STDERR);
+    open( STDERR, '>', '/dev/null' ) or die "Unable to redirect STDERR: $!";
 
-    my $status = cPanel::TaskQueue::PluginManager::load_plugin_by_name( $module );
+    my $status = cPanel::TaskQueue::PluginManager::load_plugin_by_name($module);
 
     open( STDERR, '>&', $olderr ) or die "Unable to restore STDERR: $!";
 

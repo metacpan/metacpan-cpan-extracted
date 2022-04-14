@@ -1,25 +1,26 @@
 ---
-abstract: parse text into an array of tokens or array of arrays
+abstract: 'parse text into an array of tokens or array of arrays'
 author:
   - 'Alexandr Ciornii <alexchorny@gmail.com>'
 build_requires:
-  ExtUtils::MakeMaker: 0
-  Scalar::Util: 0
+  ExtUtils::MakeMaker: '0'
+  Scalar::Util: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.78, CPAN::Meta::Converter version 2.143240'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Text-ParseWords
 no_index:
   directory:
     - t
     - inc
 requires:
-  perl: 5.006
+  perl: '5.006'
 resources:
-  repository: http://github.com/chorny/Text-ParseWords
-version: 3.30
+  repository: https://github.com/neilb/Text-ParseWords
+version: '3.31'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -10,7 +10,7 @@ use AnyEvent::FTP::Server::Connection;
 use Socket qw( unpack_sockaddr_in inet_ntoa );
 
 # ABSTRACT: Simple asynchronous ftp server
-our $VERSION = '0.18'; # VERSION
+our $VERSION = '0.19'; # VERSION
 
 
 $AnyEvent::FTP::Server::VERSION //= 'dev';
@@ -204,7 +204,7 @@ AnyEvent::FTP::Server - Simple asynchronous ftp server
 
 =head1 VERSION
 
-version 0.18
+version 0.19
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,12 @@
 Revision history for cPanel-TaskQueue
 
+0.903
+     - Fix exception when serializing a TaskQueue object
+     - Fix race condition in test exposed by Perl v5.35 (#34)
+     - Simplify tests by using File::Temp
+     - Mass Tidy codebase
+     - Add GitHub CI workflow
+
 0.902
      - Revert: Use atomic filesystem operations for cPanel::StateFile.
        "we have code that fails when the file is changed out from under it"

@@ -1,5 +1,5 @@
 package cPanel::TQSerializer::Storable;
-$cPanel::TQSerializer::Storable::VERSION = '0.902';
+$cPanel::TQSerializer::Storable::VERSION = '0.903';
 use Storable();
 
 #use warnings;

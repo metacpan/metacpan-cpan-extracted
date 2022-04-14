@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.1, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Minilla/v3.1.16, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,16 +27,17 @@ no_index:
 provides:
   WWW::Form::UrlEncoded::XS:
     file: lib/WWW/Form/UrlEncoded/XS.pm
-    version: '0.26'
+    version: '0.27'
 requires:
   Exporter: '0'
   perl: '5.008001'
 resources:
   bugtracker: https://github.com/kazeburo/WWW-Form-UrlEncoded-XS/issues
   homepage: https://github.com/kazeburo/WWW-Form-UrlEncoded-XS
-  repository: git://github.com/kazeburo/WWW-Form-UrlEncoded-XS.git
-version: '0.26'
+  repository: https://github.com/kazeburo/WWW-Form-UrlEncoded-XS.git
+version: '0.27'
 x_contributors:
+  - 'Brian Fraser <brian.fraser@booking.com>'
   - 'Mikko Johannes Koivunalho <mikko.koivunalho@iki.fi>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 0

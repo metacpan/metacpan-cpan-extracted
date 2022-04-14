@@ -83,4 +83,10 @@ see also openssl/crypto/bn/bn_sqrt.c
 
 =head2  ecdh_pkey
 
-    my $zlen = ecdh_pkey($pkey_priv, $pkey_peer_pub, \$z);
+    my $z = ecdh_pkey($pkey_priv, $pkey_peer_pub);
+
+=head2  generate_ec_key
+
+    my $ec_key_hash_ref = generate_ec_key( $group, $priv_bn, $point_compress_t, $ctx );
+
+=over

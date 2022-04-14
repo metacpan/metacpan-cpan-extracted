@@ -1,5 +1,5 @@
 package cPanel::StateFile::FileLocker;
-$cPanel::StateFile::FileLocker::VERSION = '0.902';
+$cPanel::StateFile::FileLocker::VERSION = '0.903';
 #use warnings;
 use strict;
 use Fcntl ();
@@ -8,7 +8,7 @@ sub new {
     my ( $class, $args_hr ) = @_;
     $args_hr = {} unless defined $args_hr;
     die "Argument to new must be a hash reference.\n" unless 'HASH' eq ref $args_hr;
-    die "Required logger argument is missing.\n" unless exists $args_hr->{logger};
+    die "Required logger argument is missing.\n"      unless exists $args_hr->{logger};
     my %args = (
         attempts      => 5,
         max_wait      => 300,    # five minutes
@@ -192,7 +192,7 @@ sub _read_lock_file {
 
             chomp( $pid, $name, $wait_time );
             $self->_throw("Invalid lock file: '$pid' is not a PID.") if $pid =~ /\D/;
-            $name = '<unknown>' unless length $name;
+            $name      = '<unknown>' unless length $name;
             $wait_time = 0 if $wait_time =~ /\D/;
             return ( $pid, $name, $wait_time );
         }

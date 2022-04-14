@@ -33,25 +33,26 @@ no_index:
 provides:
   Net::Google::Drive::Simple:
     file: lib/Net/Google/Drive/Simple.pm
-    version: '3.00'
+    version: '3.01'
   Net::Google::Drive::Simple::Core:
     file: lib/Net/Google/Drive/Simple/Core.pm
-    version: '3.00'
+    version: '3.01'
   Net::Google::Drive::Simple::Item:
     file: lib/Net/Google/Drive/Simple/Item.pm
-    version: '3.00'
+    version: '3.01'
   Net::Google::Drive::Simple::V2:
     file: lib/Net/Google/Drive/Simple/V2.pm
-    version: '3.00'
+    version: '3.01'
   Net::Google::Drive::Simple::V3:
     file: lib/Net/Google/Drive/Simple/V3.pm
-    version: '3.00'
+    version: '3.01'
 requires:
   File::MMagic: '1.29'
   JSON: '2.53'
   LWP::Protocol::https: '6.04'
   LWP::UserAgent: '6.02'
   Log::Log4perl: '1'
+  MIME::Base64: '3.00'
   Mojolicious: '4.13'
   OAuth::Cmdline: '0.07'
   Pod::Usage: '1.36'
@@ -61,7 +62,7 @@ resources:
   bugtracker: https://github.com/mschilli/net-google-drive-simple/issues
   homepage: https://github.com/mschilli/net-google-drive-simple
   repository: https://github.com/mschilli/net-google-drive-simple.git
-version: '3.00'
+version: '3.01'
 x_contributors:
   - 'Andy Baugh <thomas.baugh@cpanel.net>'
   - 'Andy Bircumshaw <github.com@networkned.co.uk>'
@@ -78,6 +79,6 @@ x_contributors:
   - 'Tim Mullin <tim@cpanel.net>'
   - 'Todd Rinaldo <toddr@cpan.org>'
   - 'Yxes <wells@cedarnet.org>'
-x_generated_by_perl: v5.32.1
+x_generated_by_perl: v5.32.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

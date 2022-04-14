@@ -1,5 +1,8 @@
 Revision history for Perl module Net::Curl::Promiser
 
+0.18 Wed 13 Apr 2022
+- Fix warning in Mojo test with old, buggy Mojo (8.43)
+
 0.17 Thu 1 Apr 2021
 - Fix Select’s get_fds() to include write-polling FDs.
 

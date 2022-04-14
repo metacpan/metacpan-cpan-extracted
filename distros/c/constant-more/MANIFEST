@@ -1,0 +1,17 @@
+Changes
+constant-more-v0.1.0.tar.gz
+lib/constant/more.pm
+lib/constant/more.pod
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+README.md
+t/00-constant-more.t
+t/01-cmd.t
+t/01-consume.t.p
+t/01-keep.t.p
+t/01-sub.t.p
+t/01-sub2.t.p
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

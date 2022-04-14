@@ -13,8 +13,8 @@ build_requires:
   Test::SharedFork: '0'
   autodie: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
-dynamic_config: 1
+  ExtUtils::MakeMaker::CPANfile: '0.09'
+dynamic_config: 0
 generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
@@ -27,8 +27,8 @@ no_index:
     - inc
 requires:
   Call::Context: '0'
-  IO::Framed: '0.15'
-  IO::SigGuard: '0.13'
+  IO::Framed: '0'
+  IO::SigGuard: '0'
   Module::Runtime: '0'
   Promise::ES6: '0'
   Socket: '2.011'
@@ -38,5 +38,5 @@ requires:
 resources:
   bugtracker: https://github.com/FGasper/p5-Protocol-DBus/issues
   repository: git://github.com/FGasper/p5-Protocol-DBus.git
-version: '0.19'
+version: '0.20'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

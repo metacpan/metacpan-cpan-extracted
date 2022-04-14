@@ -12,7 +12,7 @@ use FindBin;
 use lib "$FindBin::Bin/mocks";
 use File::Temp ();
 
-use Test::More tests => 93;
+use Test::More tests => 94;
 use Test::Exception;
 use cPanel::TaskQueue::Scheduler;
 use MockQueue;
@@ -123,17 +123,19 @@ ok( !defined $sched->peek_next_task(),          'Return undef task if no tasks.'
 ok( !defined $sched->seconds_until_next_task(), 'Return undef seconds if no tasks.' );
 
 ok( my $t1 = $sched->schedule_task( 'noop 1', { delay_seconds => 0 } ), 'Scheduled in first' );
-ok( $sched2->is_task_scheduled($t1), 'Exists in second' );
-ok( $sched2->unschedule_task($t1),   'Removed from second' );
-ok( !$sched->is_task_scheduled($t1), 'Gone in first' );
+ok( $sched2->is_task_scheduled($t1),                                    'Exists in second' );
+ok( $sched2->unschedule_task($t1),                                      'Removed from second' );
+ok( !$sched->is_task_scheduled($t1),                                    'Gone in first' );
 
 # Make certain the scheduler is empty.
 while ( my $task = $sched->peek_next_task() ) {
     $sched->unschedule_task( $task->uuid() );
 }
 
-ok( $sched->schedule_task( 'noop 0', {} ), 'Scheduled with no time setting.' );
+ok( $sched->schedule_task( 'noop 0', {} ),  'Scheduled with no time setting.' );
 ok( $sched->seconds_until_next_task() <= 0, 'Scheduled right now (or in the last second.' );
+
+is_deeply cPanel::TaskQueue::Scheduler::TO_JSON( {qw/a b c d/} ), {qw/a b c d/}, "naive TO_JSON helper";
 
 {
     my $label = 'flush_all_tasks';
@@ -143,7 +145,7 @@ ok( $sched->seconds_until_next_task() <= 0, 'Scheduled right now (or in the last
     $statedir = "$tmpdir";
 
     my $sched = cPanel::TaskQueue::Scheduler->new( { name => 'tasks', state_dir => $statedir } );
-    my $time = time + 10;
+    my $time  = time + 10;
     my @qid;
     foreach my $cnt ( 1 .. 4 ) {
         push @qid, $sched->schedule_task( "noop $cnt", { at_time => $time + $cnt } );
@@ -169,7 +171,7 @@ ok( $sched->seconds_until_next_task() <= 0, 'Scheduled right now (or in the last
     $statedir = "$tmpdir";
 
     my $sched = cPanel::TaskQueue::Scheduler->new( { name => 'tasks', state_dir => $statedir } );
-    my $time = time + 10;
+    my $time  = time + 10;
     my @qid;
     foreach my $cnt ( 1 .. 4 ) {
         push @qid, $sched->schedule_task( "noop $cnt", { at_time => $time + $cnt } );

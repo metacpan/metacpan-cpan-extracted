@@ -5,6 +5,7 @@ use warnings;
 
 use Protocol::DBus::Marshal ();
 use Protocol::DBus::Message ();
+use Protocol::DBus::X       ();
 
 use constant SINGLE_UNIX_FD_CMSGHDR => (0, 0, pack 'I!');
 
@@ -25,7 +26,7 @@ sub get_message {
     if (!$self->{'_bodysz'}) {
         if (defined recv( $self->{'_s'}, my $peek, 16, Socket::MSG_PEEK() )) {
             if (!length $peek) {
-                die "D-Bus connection closed unexpectedly!";
+                die Protocol::DBus::X->create('SurpriseShutdown');
             }
             elsif ( 16 == length $peek ) {
                 @{$self}{'_bodysz', '_hdrsz'} = unpack(

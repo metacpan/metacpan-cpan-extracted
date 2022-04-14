@@ -1,0 +1,55 @@
+{
+   "abstract" : "GraphViz Writer for Graph object",
+   "author" : [
+      "Kang-min Liu <gugod@gugod.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "App::ModuleBuildTiny version 0.029",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Graph-Writer-GraphViz",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "App::ModuleBuildTiny" : "0.029"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Graph" : "0.9275",
+            "Graph::ReadWrite" : "2.10",
+            "GraphViz" : "2.24",
+            "IO::All" : "0.87",
+            "parent" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Graph::Writer::GraphViz" : {
+         "file" : "lib/Graph/Writer/GraphViz.pm",
+         "version" : "0.12"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/gugod/Graph-Writer-GraphViz.git",
+         "web" : "https://github.com/gugod/Graph-Writer-GraphViz"
+      }
+   },
+   "version" : "0.12",
+   "x_serialization_backend" : "JSON::PP version 4.07",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
+   "x_static_install" : "1"
+}

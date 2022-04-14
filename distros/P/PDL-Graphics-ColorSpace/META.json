@@ -1,0 +1,58 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "Maggie J. Xiong  <maggiexyz+github gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "PDL-Graphics-ColorSpace",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "PDL" : "2.074"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "PDL" : "2.074"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/PDLPorters/PDL-Graphics-ColorSpace/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/PDLPorters/PDL-Graphics-ColorSpace.git",
+         "web" : "https://github.com/PDLPorters/PDL-Graphics-ColorSpace"
+      },
+      "x_IRC" : "irc://irc.perl.org/#pdl"
+   },
+   "version" : "0.201",
+   "x_serialization_backend" : "JSON::PP version 4.04"
+}

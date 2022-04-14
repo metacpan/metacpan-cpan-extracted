@@ -1,8 +1,12 @@
 Revision history for Alien::gdal
 
+1.30 2022-04-13
+    - share builds: update rpaths of libgdal dylibs on macs
+
 1.29 2022-04-02
     - share builds: update rpaths of binaries on unix operating systems
       so dependent .so files are found
+    - alienfile: remove patching code related to GDAL 2.x
 
 1.28 2022-03-19
     - share builds config: explicitly set optimisation flags

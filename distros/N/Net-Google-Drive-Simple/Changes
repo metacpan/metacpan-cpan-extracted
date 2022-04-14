@@ -1,6 +1,15 @@
 ######################################################################
 Revision history for Perl extension Net::Google::Drive::Simple
 
+3.01      2022-04-12
+        Improve Google Drive v3 API compatibility (Sawyer X)
+        * Introduce new methods for making requests for v3
+        * Support media upload and multipart upload
+        * Provide support for resumable upload
+        * Add simple file upload method: upload_file()
+        * Improve documentation
+        * Better testsuite
+
 3.00      2022-03-31
         * Add support for Google API v3 (Sawyer X)
         * Fix title option search in files() method (Sawyer X)

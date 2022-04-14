@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Yo - Package for language Yoruba
 =cut
 
 package Locale::CLDR::Locales::Yo;
-# This file auto generated from Data\common\main\yo.xml
-#	on Sun  3 Feb  2:26:16 pm GMT
+# This file auto generated from Data/common/main/yo.xml
+#	on Mon 11 Apr  5:41:13 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -1063,15 +1063,15 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
+				'abbreviated' => {
+					'am' => q{Àárọ̀},
+					'pm' => q{Ọ̀sán},
+				},
 				'narrow' => {
 					'am' => q{Àárọ̀},
 					'pm' => q{Ọ̀sán},
 				},
 				'wide' => {
-					'pm' => q{Ọ̀sán},
-					'am' => q{Àárọ̀},
-				},
-				'abbreviated' => {
 					'am' => q{Àárọ̀},
 					'pm' => q{Ọ̀sán},
 				},
@@ -1086,8 +1086,8 @@ has 'day_periods' => (
 					'pm' => q{Ọ̀sán},
 				},
 				'wide' => {
-					'pm' => q{Ọ̀sán},
 					'am' => q{Àárọ̀},
+					'pm' => q{Ọ̀sán},
 				},
 			},
 		},

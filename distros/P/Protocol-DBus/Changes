@@ -1,5 +1,9 @@
 Revision history for Perl module Protocol::DBus
 
+0.20 Wed 13 Apr 2022
+- Make unexpected socket shutdowns & errors trigger promise rejections.
+  (Previously the promises never settled.)
+
 0.19 Thu 12 Aug 2021
 - (No production changes.)
 - Fix integration test to ignore external warnings.

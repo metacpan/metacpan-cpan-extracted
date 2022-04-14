@@ -6,6 +6,7 @@
 use FindBin;
 use lib "$FindBin::Bin/mocks";
 use File::Path ();
+use File::Temp ();
 
 use Test::More tests => 7;
 my $logger;
@@ -22,16 +23,12 @@ like( $@, qr/Policies already/, 'Cannot reset policies to defaults.' );
 eval "use cPanel::TaskQueue::Scheduler ();";
 ok( !$@, 'Can reload with import turned off.' );
 
-my $tmpdir = './tmp';
+my $tmpdir = File::Temp->newdir();
 my $dir    = "$tmpdir/statefile";
-
-# clean up if last run failed.
-cleanup();
-File::Path::mkpath($dir);
 
 # test bad new calls.
 eval { my $cf = cPanel::TaskQueue::Scheduler->new(); };
-like( $@, qr/caching directory/, 'Cannot create StateFile without parameters' );
+like( $@,                         qr/caching directory/,         'Cannot create StateFile without parameters' );
 like( ( $logger->get_msgs() )[0], qr/throw.*?caching directory/, 'Logged correctly.' );
 $logger->reset_msgs();
 
@@ -44,9 +41,3 @@ ok( !$ts->schedule_task( $task, { delay_seconds => 1 } ), 'Finished trying to qu
 like( ( $logger->get_msgs() )[0], qr/info.*?0 retries/, 'Infoed correctly.' );
 $logger->reset_msgs();
 
-cleanup();
-
-# Discard temporary files that we don't need any more.
-sub cleanup {
-    File::Path::rmtree($tmpdir) if -d $tmpdir;
-}

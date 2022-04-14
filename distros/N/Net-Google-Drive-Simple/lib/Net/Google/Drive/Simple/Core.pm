@@ -10,6 +10,7 @@ use HTTP::Request  ();
 
 use File::MMagic ();
 use IO::File     ();
+use MIME::Base64 ();
 
 use OAuth::Cmdline::CustomFile  ();
 use OAuth::Cmdline::GoogleDrive ();
@@ -19,7 +20,13 @@ use Net::Google::Drive::Simple::Item ();
 use JSON qw( from_json to_json );
 use Log::Log4perl qw(:easy);
 
-our $VERSION = '3.00';
+# used in V3.pm too
+use constant {
+    'HTTP_CODE_OK'     => 200,
+    'HTTP_CODE_RESUME' => 308,
+};
+
+our $VERSION = '3.01';
 
 ###########################################
 sub new {
@@ -133,7 +140,8 @@ sub http_loop {
 
         $resp = $ua->request($req);
 
-        if ( !$resp->is_success() ) {
+        # We want to check for success but resume is not an error
+        if ( !$resp->is_success() && $resp->code() != HTTP_CODE_RESUME() ) {
             $self->error( $resp->message() );
             warn "Failed with ", $resp->code(), ": ", $resp->message(), "\n";
             if ( --$RETRIES >= 0 ) {
@@ -156,6 +164,94 @@ sub http_loop {
 }
 
 ###########################################
+sub _generate_request {
+###########################################
+    my ( $self, $url, $info ) = @_;
+
+    # default verb and headers
+    my $verb    = $info->{'http_method'};
+    my @headers = (
+        $self->{'oauth'}->authorization_headers(),
+        @{ $info->{'extra_headers'} || [] },
+    );
+
+    my $post_data;
+    if ( $info->{'body_parameters'} ) {
+        $post_data = to_json( $info->{'body_parameters'} );
+
+        if ( !$info->{'multipart'} && !$info->{'resumable'} ) {
+            push @headers, 'Content-Type', 'application/json';
+        }
+    }
+
+    # We might still have file content, with or without post data
+    # Handle GET / DELETE ("content" key might not actually existed)
+    my $content;
+    if ( $verb !~ /^( GET | DELETE )$/xms ) {
+
+        # Try to copy over content
+        $content = $info->{'body_content'};
+
+        # If this is not multipart, we can either have content or post_data
+        # but since we have no content, we use post_data and clear the var instead
+        if ( !$content && !$info->{'multipart'} ) {
+            $content = $post_data;
+            undef $post_data;
+        }
+    }
+
+    if ( $info->{'multipart'} ) {
+
+        # We have both $content and $post_data
+        # The $content is the file content
+        # The $post_data is the JSON content
+        # We need to create a new body from them
+
+        my $part1 = "Content-type: application/json; charset=UTF-8\r\n\r\n" . $post_data;
+
+        my $part2 = "Content-type: $info->{'body_parameters'}{'mimeType'}\r\nContent-Transfer-Encoding: base64\r\n\r\n" . MIME::Base64::encode_base64($content);
+
+        my $body = "--my-boundary\r\n$part1\r\n" . "--my-boundary\r\n$part2\r\n" . "--my-boundary--\r\n";
+
+        use bytes;
+        push @headers, 'Content-type' => 'multipart/related; boundary="my-boundary"',
+          'Content-Length' => length $body;
+
+        $content = $body;
+    }
+
+    my $req = HTTP::Request->new(
+        $verb,
+        $url->as_string(),
+        \@headers,
+        $content,
+    );
+
+    return $req;
+}
+
+###########################################
+sub _make_request {
+###########################################
+    my ( $self, $req, $should_return_res ) = @_;
+
+    my $res = $self->http_loop($req);
+    if ( $res->is_error() ) {
+        $self->error( $res->message() );
+        return $should_return_res ? $res : ();
+    }
+
+    # were we asked to just return the response as is?
+    $should_return_res
+      and return $res;
+
+    # v3 returns 204 on DELETE for no content
+    my $data = $res->code() == 204 ? {} : from_json( $res->content() );
+    return $data;
+}
+
+# This is only for v2, v3 has something more flexible
+###########################################
 sub http_json {
 ###########################################
     my ( $self, $url, $post_data ) = @_;
@@ -173,10 +269,8 @@ sub http_json {
 
         if ($post_data) {
             push @headers, "Content-Type", "application/json";
+            $content = to_json($post_data);
         }
-
-        defined $post_data
-          and $content = to_json($post_data);
     }
 
     my $req = HTTP::Request->new(

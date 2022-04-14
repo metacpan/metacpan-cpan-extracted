@@ -1,24 +1,40 @@
+use strict;
+use warnings;
 use PDL::Core::Dev;
 use ExtUtils::MakeMaker;
-PDL::Core::Dev->import();
 
-$package = ["color_space.pp",ColorSpace,PDL::Graphics::ColorSpace];
-%hash = pdlpp_stdargs($package);
-$hash{'OBJECT'} .= ' color_space$(OBJ_EXT)';
-$hash{'clean'}{FILES} .= ' color_space$(OBJ_EXT)';
+my $pack = [qw(color_space.pd ColorSpace PDL::Graphics::ColorSpace), undef, 1];
+my %hash = pdlpp_stdargs($pack);
+$hash{OBJECT} .= ' color_space$(OBJ_EXT)';
+$hash{clean}{FILES} .= ' color_space$(OBJ_EXT)';
 
 WriteMakefile( %hash,
-	VERSION_FROM        => 'color_space.pp',
     AUTHOR              => 'Maggie J. Xiong  <maggiexyz+github gmail.com>',
-	PM => {
-		'ColorSpace.pm'           => '$(INST_LIBDIR)/ColorSpace.pm',
-		'ColorSpace/RGBSpace.pm'  => '$(INST_LIBDIR)/ColorSpace/RGBSpace.pm',
-	},
-    PREREQ_PM => {
-        'Test::More' => 0,
-        'PDL'        => '2.4.4',
+    PM => {
+      'ColorSpace.pm'           => '$(INST_LIBDIR)/ColorSpace.pm',
+      'ColorSpace/RGBSpace.pm'  => '$(INST_LIBDIR)/ColorSpace/RGBSpace.pm',
     },
-    dist                          => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
+    CONFIGURE_REQUIRES => {
+        'PDL'        => '2.074', # multi-C etc
+    },
+    TEST_REQUIRES => {
+        'Test::More' => '0.88',
+    },
+    PREREQ_PM => {
+        'PDL'        => '2.074', # multi-C etc
+    },
+    META_MERGE => {
+       "meta-spec" => { version => 2 },
+       resources => {
+          bugtracker  => {web=>'https://github.com/PDLPorters/PDL-Graphics-ColorSpace/issues'},
+          repository  => {
+             url => 'git://github.com/PDLPorters/PDL-Graphics-ColorSpace.git',
+             type => 'git',
+             web => 'https://github.com/PDLPorters/PDL-Graphics-ColorSpace',
+          },
+          x_IRC => 'irc://irc.perl.org/#pdl',
+       },
+    },
 );
 
-sub MY::postamble {pdlpp_postamble($package)};
+sub MY::postamble {pdlpp_postamble($pack)};

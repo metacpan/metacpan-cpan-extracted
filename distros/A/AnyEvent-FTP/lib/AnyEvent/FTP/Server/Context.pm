@@ -6,7 +6,7 @@ use 5.010;
 use Moo;
 
 # ABSTRACT: FTP Server client context class
-our $VERSION = '0.18'; # VERSION
+our $VERSION = '0.19'; # VERSION
 
 with 'AnyEvent::FTP::Role::Event';
 with 'AnyEvent::FTP::Server::Role::Context';
@@ -111,7 +111,7 @@ AnyEvent::FTP::Server::Context - FTP Server client context class
 
 =head1 VERSION
 
-version 0.18
+version 0.19
 
 =head1 METHODS
 

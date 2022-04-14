@@ -1,0 +1,25 @@
+Changes
+examples/log-any/app.pl
+examples/log-any/My_Module.pm
+examples/log-dispatch/app.pl
+examples/log-dispatch/My_Module.pm
+examples/log-ger/app.pl
+examples/log-ger/My_Module.pm
+examples/log4perl/app.pl
+examples/log4perl/My_Module.pm
+lib/Log/OK.pm
+lib/Log/OK.pod
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+README.md
+t/cmd.t
+t/cmd.t.p
+t/log-any.t
+t/log-dispatch.t
+t/log-ger.t
+t/log-log4perl.t
+t/Log-OK.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

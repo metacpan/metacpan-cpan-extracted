@@ -1,6 +1,11 @@
 Revision history for OPM::Validate
 ========================================
 
+1.11   2022-04-14 12:50:00
+
+    * Switched to PERLSRVDE Dist::Zilla bundle for development
+    * Improved regex based on current ITSMCore package
+
 1.10   2021-10-01 12:40:00
 
     * Improve/Fix regular expression to validate .opm/.sopm files

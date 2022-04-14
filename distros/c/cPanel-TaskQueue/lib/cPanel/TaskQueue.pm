@@ -1,5 +1,5 @@
 package cPanel::TaskQueue;
-$cPanel::TaskQueue::VERSION = '0.902';
+$cPanel::TaskQueue::VERSION = '0.903';
 # This module handles queuing of tasks for execution. The queue is persistent
 # handles consolidating of duplicate tasks.
 
@@ -40,7 +40,7 @@ my $the_serializer;
 sub import {
     my $class = shift;
     die 'Not an even number of arguments to the ' . __PACKAGE__ . " module\n" if @_ % 2;
-    die "Policies already set elsewhere\n" if $are_policies_set;
+    die "Policies already set elsewhere\n"                                    if $are_policies_set;
     return 1 unless @_;    # Don't set the policies flag.
 
     while (@_) {
@@ -91,7 +91,7 @@ sub _get_serializer {
 }
 
 # Replacement for List::Util::first, so I don't need to bring in the whole module.
-sub _first (&@) {                                      ## no critic(ProhibitSubroutinePrototypes)
+sub _first (&@) {    ## no critic(ProhibitSubroutinePrototypes)
     my $pred = shift;
     local $_;
     foreach (@_) {
@@ -317,8 +317,10 @@ END { undef %valid_processors }    # case CPANEL-10871 to avoid a SEGV during gl
         $self->{max_task_timeout}      = $meta->{max_task_to}  if $meta->{max_task_to} > 0;
         $self->{max_in_process}        = $meta->{max_running}  if $meta->{max_running} > 0;
         $self->{default_child_timeout} = $meta->{def_child_to} if $meta->{def_child_to} > 0;
-        $self->{paused} = ( exists $meta->{paused} && $meta->{paused} ) ? 1 : 0;
-        $self->{defer_obj} = exists $meta->{defer_obj} ? $meta->{defer_obj} : undef;
+        $self->{_bump_size}            = $meta->{_bump_size} // '';
+
+        $self->{paused}    = ( exists $meta->{paused} && $meta->{paused} ) ? 1                  : 0;
+        $self->{defer_obj} = exists $meta->{defer_obj}                     ? $meta->{defer_obj} : undef;
 
         # Clean queues that have been read from disk.
         $self->{queue_waiting}   = _clean_task_list( $meta->{waiting_queue} );
@@ -355,7 +357,12 @@ END { undef %valid_processors }    # case CPANEL-10871 to avoid a SEGV during gl
             deferral_queue   => $self->{deferral_queue},
             paused           => ( $self->{paused} ? 1 : 0 ),
             defer_obj        => $self->{defer_obj},
+            _bump_size       => $self->{_bump_size} // '',
         };
+
+        $meta->{_bump_size} .= "x";
+        $meta->{_bump_size} = 'x' if length $meta->{_bump_size} > 1_024;
+
         return $self->_serializer()->save( $fh, $FILETYPE, $CACHE_VERSION, $meta );
     }
 
@@ -622,7 +629,7 @@ END { undef %valid_processors }    # case CPANEL-10871 to avoid a SEGV during gl
                     eval {
                         local $SIG{'ALRM'} = sub { die "time out reached\n"; };
                         $orig_alarm = alarm( $self->_timeout($processor) );
-                        $pid = $processor->process_task( $task->clone(), $self->{disk_state}->get_logger() );
+                        $pid        = $processor->process_task( $task->clone(), $self->{disk_state}->get_logger() );
                         alarm $orig_alarm;
                         1;
                     } or do {
@@ -632,6 +639,7 @@ END { undef %valid_processors }    # case CPANEL-10871 to avoid a SEGV during gl
                 }
             );
         }
+
         # Deal with a child process or remove from processing.
         if ($pid) {
             $task->set_pid($pid);

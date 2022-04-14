@@ -1,6 +1,8 @@
 # -*- Mode: CPerl -*-
 # t/03_ops.t: test ccs native operations
-use Test::More tests=>10;
+use Test::More;
+use strict;
+use warnings;
 
 ##-- common subs
 my $TEST_DIR;
@@ -90,5 +92,4 @@ my $cv=10**(sequence($a->dim(1))+1);
 my $nzvals_cv = ccsmult_cv($ptr,$rowids,$nzvals, $cv);
 pdlok("ccsmult_cv()", ($a * $cv->slice("*1,")), ccsdecode($ptr,$rowids,$nzvals_cv));
 
-# end of t/03_ops.t
-
+done_testing;

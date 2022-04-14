@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Ml::Any::In - Package for language Malayalam
 =cut
 
 package Locale::CLDR::Locales::Ml::Any::In;
-# This file auto generated from Data\common\main\ml_IN.xml
-#	on Sun  3 Feb  2:05:45 pm GMT
+# This file auto generated from Data/common/main/ml_IN.xml
+#	on Mon 11 Apr  5:33:27 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';

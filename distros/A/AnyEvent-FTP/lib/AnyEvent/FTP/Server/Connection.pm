@@ -7,7 +7,7 @@ use Moo;
 use AnyEvent::FTP::Request;
 
 # ABSTRACT: FTP Server connection class
-our $VERSION = '0.18'; # VERSION
+our $VERSION = '0.19'; # VERSION
 
 with 'AnyEvent::FTP::Role::Event';
 
@@ -82,7 +82,7 @@ AnyEvent::FTP::Server::Connection - FTP Server connection class
 
 =head1 VERSION
 
-version 0.18
+version 0.19
 
 =head1 METHODS
 

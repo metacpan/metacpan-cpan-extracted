@@ -5,7 +5,7 @@
 ##======================================================================
 
 use PDL::VectorValued::Dev;
-my $VERSION = '1.23.18'; ##-- update with perl-reversion from Perl::Version module
+my $VERSION = '1.23.19'; ##-- update with perl-reversion from Perl::Version module
 pp_setversion($VERSION);
 
 ##------------------------------------------------------
@@ -157,14 +157,13 @@ sub ccs_accum_hash {
  CCS_Indx ival1,ival2;
  int cmpval, carp_unsorted=0;
  $GENERIC(nzvalsOut) missingOut;
- $GENERIC(missing)   missingVal;
+ $GENERIC(missing)   missingVal = $missing();
  ).($args{decls}    ? $args{decls}    : '').q(
  ).($args{tmp_type} ? $args{tmp_type} : '$GENERIC(nzvalsOut)').q( tmp;
  //
  //-- init
  ).($args{init_code}||'').q(
  ).($args{init_missingOut} || 'missingOut = $missing();').q(
- missingVal   = $missing();
  nMissingInit = $N()-1;
  nMissing     = nMissingInit;
  ).(defined($args{tmp_reset}) ? $args{tmp_reset} :  'tmp = $nzvalsIn(NnzIn=>0);').q( /* initialize tmp */

@@ -1,3 +1,7 @@
+0.2622 2022-04-13
+
+ * Add more cases for downgrading, and more tests.
+
 0.2621 2022-04-11
 
  * Improve downgrading and upgrading.

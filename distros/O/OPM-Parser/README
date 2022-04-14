@@ -1,0 +1,96 @@
+NAME
+
+    OPM::Parser - Parser for the .opm file
+
+VERSION
+
+    version 1.06
+
+SYNOPSIS
+
+        use OPM::Parser;
+        
+        my $opm_file = 'QuickMerge-3.3.2.opm';
+        my $opm      = OPM::Parser->new( opm_file => $opm_file );
+        $opm->parse or die "OPM parse failed: ", $opm->error_string;
+        
+        say sprintf "This is version %s of package %s",
+            $opm->version,
+            $opm->name;
+        
+        say "You can install it on those framework versions: ", join ", ", @{ $opm->framework };
+        
+        say "Dependencies: ";
+        for my $dep ( @{ $opm->dependencies } ) {
+            say sprintf "%s (%s) - (%s)", 
+                $dep->{name},
+                $dep->{version},
+                $dep->{type};
+        }
+
+METHODS
+
+ new
+
+ parse
+
+    Validates and parses the .opm file. It returns 1 on success and undef
+    on error. If an error occurs, one can get the error message with
+    error_string:
+
+        my $opm_file = 'QuickMerge-3.3.2.opm';
+        my $opm      = OPM::Parser->new( opm_file => $opm_file );
+        $opm->parse or die "OPM parse failed: ", $opm->error_string;
+
+    If you want to ignore validation result, you can pass ignore_validation
+    => 1:
+
+        my $opm_file = 'QuickMerge-3.3.2.opm';
+        my $opm      = OPM::Parser->new( opm_file => $opm_file );
+        $opm->parse( ignore_validation => 1 )
+            or die "OPM parse failed: ", $opm->error_string;
+
+ as_sopm
+
+ documentation
+
+ validate
+
+ATTRIBUTES
+
+      * opm_file
+
+      * tree
+
+      * framework
+
+      * dependencies
+
+      * files
+
+      * error_string
+
+      * description
+
+      * license
+
+      * url
+
+      * vendor
+
+      * version
+
+      * name
+
+AUTHOR
+
+    Renee Baecker <reneeb@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2016 by Renee Baecker.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+

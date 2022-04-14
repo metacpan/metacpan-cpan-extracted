@@ -4,17 +4,14 @@ use strict;
 use FindBin;
 use lib "$FindBin::Bin/mocks";
 use File::Path ();
+use File::Temp ();
 
 use Test::More tests => 10;
 use cPanel::TaskQueue;
 use cPanel::TaskQueue::PluginManager;
 
-my $tmpdir   = './tmp';
+my $tmpdir   = File::Temp->newdir();
 my $statedir = "$tmpdir/state_test";
-
-# In case the last test did not succeed.
-cleanup();
-File::Path::mkpath($tmpdir) or die "Unable to create tmpdir: $!";
 
 cPanel::TaskQueue::PluginManager::load_all_plugins(
     directories => ["$FindBin::Bin/mocks"],
@@ -57,10 +54,4 @@ is( $queue->how_many_queued(), scalar(@qids), 'Commands queued for further testi
     is( $queue->find_command('hello')->uuid(), $qids[5], 'Found command that is a substring of another' );
     my @tasks = $queue->find_commands('hello');
     is_deeply( [ map { $_->uuid } @tasks ], [ $qids[5] ], 'Found only the substring command.' );
-}
-
-cleanup();
-
-sub cleanup {
-    File::Path::rmtree($tmpdir);
 }

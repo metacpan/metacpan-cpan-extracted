@@ -34,7 +34,7 @@ resource artists => sub {
         my $params = shift;
         my $artists = $schema->resultset('Artist');
 
-        present data => $artists; with => 'MusicApp::Entity::Artist';
+        present data => $artists, with => 'MusicApp::Entity::Artist';
         present count => $artists->count;
     };
 

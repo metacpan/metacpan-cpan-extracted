@@ -1,5 +1,10 @@
 Revision history for Perl extension WWW-Form-UrlEncoded-XS
 
+0.27 2022-04-14T09:32:34Z
+
+    - Fixed segfault. Thank you Hugmeir. https://github.com/kazeburo/WWW-Form-UrlEncoded-XS/pull/7
+
+
 0.26 2019-06-07T06:40:54Z
 
    - https://github.com/kazeburo/WWW-Form-UrlEncoded-XS/pull/5

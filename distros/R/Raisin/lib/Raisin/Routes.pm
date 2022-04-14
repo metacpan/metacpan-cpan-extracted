@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 package Raisin::Routes;
-$Raisin::Routes::VERSION = '0.93';
+$Raisin::Routes::VERSION = '0.94';
 use Carp;
 use Plack::Util::Accessor qw(
     cache
@@ -123,7 +123,7 @@ Raisin::Routes - A routing class for Raisin.
 
 =head1 VERSION
 
-version 0.93
+version 0.94
 
 =head1 SYNOPSIS
 

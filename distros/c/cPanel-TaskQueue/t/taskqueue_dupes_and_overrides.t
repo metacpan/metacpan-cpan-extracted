@@ -7,12 +7,13 @@ use strict;
 use FindBin;
 use lib "$FindBin::Bin/mocks";
 use File::Path ();
+use File::Temp ();
 
 use Test::More tests => 39;
 use cPanel::TaskQueue;
 use cPanel::TaskQueue::Processor;
 
-my $tmpdir      = './tmp';
+my $tmpdir      = File::Temp->newdir();
 my $statedir    = "$tmpdir/statedir";
 my $missing_dir = "$tmpdir/task_queue_test";
 
@@ -42,10 +43,6 @@ my $missing_dir = "$tmpdir/task_queue_test";
 }
 
 cPanel::TaskQueue->register_task_processor( 'mock', MockProcessor->new() );
-
-# In case the last test did not succeed.
-cleanup();
-File::Path::mkpath($tmpdir) or die "Unable to create tmpdir: $!";
 
 # Create the real TaskQueue
 my $queue = cPanel::TaskQueue->new( { name => 'tasks', state_dir => $statedir } );
@@ -109,9 +106,7 @@ ok( $queue->queue_task('mock all off'), 'queue override request' );
 is( $queue->how_many_queued(),            1,     'only one task exists' );
 is( $queue->peek_next_task()->get_arg(0), 'all', 'it is the override' );
 
-# perform cleanup.
-
-cleanup();
+exit;
 
 sub remove_and_check_tasks {
     my $q     = shift;
@@ -124,9 +119,4 @@ sub remove_and_check_tasks {
         $q->unqueue_task( $first->uuid() );
         ++$i;
     }
-}
-
-# Clean up after myself
-sub cleanup {
-    File::Path::rmtree($tmpdir) if -d $tmpdir;
 }

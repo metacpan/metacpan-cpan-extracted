@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Pt::Any::St - Package for language Portuguese
 =cut
 
 package Locale::CLDR::Locales::Pt::Any::St;
-# This file auto generated from Data\common\main\pt_ST.xml
-#	on Sun  3 Feb  2:14:33 pm GMT
+# This file auto generated from Data/common/main/pt_ST.xml
+#	on Mon 11 Apr  5:36:44 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';

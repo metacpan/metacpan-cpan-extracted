@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Sr::Cyrl::Rs - Package for language Serbian
 =cut
 
 package Locale::CLDR::Locales::Sr::Cyrl::Rs;
-# This file auto generated from Data\common\main\sr_Cyrl_RS.xml
-#	on Sun  3 Feb  2:19:16 pm GMT
+# This file auto generated from Data/common/main/sr_Cyrl_RS.xml
+#	on Mon 11 Apr  5:38:30 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';

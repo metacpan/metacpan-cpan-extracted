@@ -1,0 +1,66 @@
+---
+abstract: 'Install ticketsystem (Znuny/OTOBO) add ons'
+author:
+  - 'Renee Baecker <reneeb@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: OPM-Installer
+provides:
+  OPM::Installer:
+    file: lib/OPM/Installer.pm
+    version: v1.0.0
+  OPM::Installer::Logger:
+    file: lib/OPM/Installer/Logger.pm
+    version: v1.0.0
+  OPM::Installer::Utils::Config:
+    file: lib/OPM/Installer/Utils/Config.pm
+    version: v1.0.0
+  OPM::Installer::Utils::File:
+    file: lib/OPM/Installer/Utils/File.pm
+    version: v1.0.0
+  OPM::Installer::Utils::Linux:
+    file: lib/OPM/Installer/Utils/Linux.pm
+    version: v1.0.0
+  OPM::Installer::Utils::TS:
+    file: lib/OPM/Installer/Utils/TS.pm
+    version: v1.0.0
+  OPM::Installer::Utils::Test:
+    file: lib/OPM/Installer/Utils/Test.pm
+    version: v1.0.0
+requires:
+  App::cpanminus: '0'
+  Capture::Tiny: '0'
+  File::Basename: '0'
+  File::HomeDir: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  HTTP::Tiny: '0'
+  HTTP::Tiny::FileProtocol: '0.02'
+  IO::All: '0'
+  Module::Runtime: '0'
+  Moo: '0'
+  OPM::Parser: '1.06'
+  OPM::Repository: v1.0.0
+  OPM::Validate: '1.11'
+  Regexp::Common: '0'
+  Test::More: '0'
+  Type::Tiny: '0'
+  Types::Standard: '0'
+  perl: '5.024'
+resources:
+  bugtracker: https://github.com/perlservices/OPM-Installer/issues
+  homepage: https://github.com/perlservices/OPM-Installer
+  repository: git://github.com/perlservices/OPM-Installer.git
+version: 1.0.0
+x_contributors:
+  - 'reneeb <github@renee-baecker.de>'
+  - 'reneeb <info@perl-services.de>'
+x_generated_by_perl: v5.30.0
+x_serialization_backend: 'YAML::Tiny version 1.73'

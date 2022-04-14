@@ -8,6 +8,7 @@ my %common_reqs = (
     "ExtUtils::MakeMaker" => "6.52",
     "Alien::Build::MM" => "1.41",
     ($^O =~ /mswin/i) ? ("Alien::MSYS" => 0) : (),
+    "Alien::Build::Plugin::Download::Git" => "0",
 );
 
 my %WriteMakefileArgs = (
@@ -17,11 +18,11 @@ my %WriteMakefileArgs = (
     "VERSION_FROM" => "lib/Alien/patchelf.pm",
     "CONFIGURE_REQUIRES" => {
         %common_reqs,
-        'Alien::Build::Plugin::Download::GitHub' => '0',
+        #'Alien::Build::Plugin::Download::GitHub' => '0',
     },
     "BUILD_REQUIRES" => {
         %common_reqs,
-        "Alien::Build::Plugin::Download::GitHub" => '0',
+        #"Alien::Build::Plugin::Download::GitHub" => '0',
     },
     "TEST_REQUIRES" => {
         "Test::Alien" => 0,

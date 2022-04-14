@@ -9,9 +9,9 @@ use Cwd qw(getcwd abs_path);
 use File::chdir;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-02-12'; # DATE
+our $DATE = '2022-03-20'; # DATE
 our $DIST = 'App-GitUtils'; # DIST
-our $VERSION = '0.084'; # VERSION
+our $VERSION = '0.085'; # VERSION
 
 our %SPEC;
 
@@ -101,6 +101,9 @@ _
     args => {
         %args_common,
     },
+    deps => {
+        prog => {name=>'git', min_version=>'2.22.0'}, # for --show-current option
+    },
 };
 sub info {
     my %args = @_;
@@ -129,6 +132,9 @@ $SPEC{list_hooks} = {
     summary => 'List available hooks for the repository',
     args => {
         %args_common,
+    },
+    deps => {
+        prog => 'git',
     },
 };
 sub list_hooks {
@@ -170,6 +176,9 @@ _
             pos => 0,
             completion => $_complete_hook,
         },
+    },
+    deps => {
+        prog => 'git',
     },
 };
 sub run_hook {
@@ -279,7 +288,7 @@ App::GitUtils - Day-to-day command-line utilities for git
 
 =head1 VERSION
 
-This document describes version 0.084 of App::GitUtils (from Perl distribution App-GitUtils), released on 2022-02-12.
+This document describes version 0.085 of App::GitUtils (from Perl distribution App-GitUtils), released on 2022-03-20.
 
 =head1 SYNOPSIS
 

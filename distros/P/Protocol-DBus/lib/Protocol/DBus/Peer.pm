@@ -70,6 +70,8 @@ sub get_message {
 
     if ($msg) {
         if (my $serial = $msg->get_header('REPLY_SERIAL')) {
+            delete $_[0]->{'_on_armageddon'}{$serial};
+
             if (my $cb = delete $_[0]->{'_on_return'}{$serial}) {
                 $cb->($msg);
             }
@@ -146,6 +148,10 @@ sub send_call {
 
     my $promise_class = $self->_get_promise_class();
 
+    my $serial;
+
+    my $on_armageddon_hr = $self->{'_on_armageddon'} ||= {};
+
     my $promise = $promise_class->new( sub {
         ($res, $rej) = @_;
 
@@ -162,12 +168,16 @@ sub send_call {
             type => 'METHOD_CALL',
         );
 
+        $serial = $self->{'_last_sent_serial'};
+
+        $on_armageddon_hr->{$serial} = $rej;
+
         $ok = 1;
+    } )->finally( sub {
+        delete $on_armageddon_hr->{$serial} if $serial;
     } );
 
     if ($ok && $response_expected) {
-        my $serial = $self->{'_last_sent_serial'};
-
         # Keep references to $self out of the callback
         # in order to avoid memory leaks.
         my $on_return_hr = $self->{'_on_return'} ||= {};
@@ -178,6 +188,8 @@ sub send_call {
 
             return $promise_class->new( sub {
                 my ($res, $rej) = @_;
+
+                $on_armageddon_hr->{$serial} = $rej;
 
                 $on_return_hr->{$serial} = sub {
                     if ($_[0]->get_type() == _METHOD_RETURN_NUM()) {
@@ -378,6 +390,20 @@ sub new {
     $self->_set_up_peer_io( $socket );
 
     return $self;
+}
+
+sub do_armageddon {
+    my ($self, $why) = @_;
+
+    %{ $self->{'_on_return'} } = ();
+
+    my $on_armageddon_hr = $self->{'_on_armageddon'};
+
+    my @cbs = delete @{$on_armageddon_hr}{ keys %$on_armageddon_hr };
+
+    $_->($why) for @cbs;
+
+    return;
 }
 
 #----------------------------------------------------------------------

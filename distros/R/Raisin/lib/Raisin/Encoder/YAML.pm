@@ -6,14 +6,14 @@ use strict;
 use warnings;
 
 package Raisin::Encoder::YAML;
-$Raisin::Encoder::YAML::VERSION = '0.93';
+$Raisin::Encoder::YAML::VERSION = '0.94';
 use Encode qw(encode_utf8 decode_utf8);
 use YAML qw(Dump Load);
 
 sub detectable_by { [qw(application/x-yaml application/yaml text/x-yaml text/yaml yaml)] }
 sub content_type { 'application/x-yaml' }
 sub serialize { encode_utf8( Dump($_[1]) ) }
-sub deserialize { Load( decode_utf8($_[1]) ) }
+sub deserialize { Load( decode_utf8($_[1]->content) ) }
 
 1;
 
@@ -29,7 +29,7 @@ Raisin::Encoder::YAML - YAML serialization plugin for Raisin.
 
 =head1 VERSION
 
-version 0.93
+version 0.94
 
 =head1 DESCRIPTION
 

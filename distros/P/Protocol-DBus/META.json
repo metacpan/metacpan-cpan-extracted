@@ -3,14 +3,14 @@
    "author" : [
       "Felipe Gasper (FELIPE)"
    ],
-   "dynamic_config" : 1,
+   "dynamic_config" : 0,
    "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Protocol-DBus",
    "no_index" : {
@@ -27,14 +27,14 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker::CPANfile" : "0.09"
          }
       },
       "runtime" : {
          "requires" : {
             "Call::Context" : "0",
-            "IO::Framed" : "0.15",
-            "IO::SigGuard" : "0.13",
+            "IO::Framed" : "0",
+            "IO::SigGuard" : "0",
             "Module::Runtime" : "0",
             "Promise::ES6" : "0",
             "Socket" : "2.011",
@@ -67,6 +67,6 @@
          "web" : "https://github.com/FGasper/p5-Protocol-DBus"
       }
    },
-   "version" : "0.19",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "0.20",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

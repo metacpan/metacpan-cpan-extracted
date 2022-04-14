@@ -7,16 +7,13 @@ use strict;
 use FindBin;
 use lib "$FindBin::Bin/mocks";
 use File::Path ();
+use File::Temp ();
 
 use Test::More tests => 20;
 use cPanel::TaskQueue;
 
-my $tmpdir   = './tmp';
+my $tmpdir   = File::Temp->newdir();
 my $statedir = "$tmpdir/statedir";
-
-# In case the last test did not succeed.
-cleanup();
-File::Path::mkpath($tmpdir) or die "Unable to create tmpdir: $!";
 
 {
 
@@ -82,12 +79,5 @@ ok( !$queue->find_command('xyzzy'), 'Did not find non-existant command.' );
     my $tid = $queue->queue_task('noop 1234');
     $queue->unqueue_task($tid);
     ok( !$queue->find_task($tid), 'Can not find task that is not isn queue.' );
-}
-
-cleanup();
-
-# Clean up after myself
-sub cleanup {
-    File::Path::rmtree($tmpdir) if -d $tmpdir;
 }
 

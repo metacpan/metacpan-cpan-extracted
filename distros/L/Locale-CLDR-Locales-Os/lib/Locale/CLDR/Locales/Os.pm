@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Os - Package for language Ossetic
 =cut
 
 package Locale::CLDR::Locales::Os;
-# This file auto generated from Data\common\main\os.xml
-#	on Sun  3 Feb  2:12:37 pm GMT
+# This file auto generated from Data/common/main/os.xml
+#	on Mon 11 Apr  5:36:02 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -794,13 +794,13 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
-					'pm' => q{ӕмбисбоны фӕстӕ},
-					'am' => q{ӕмбисбоны размӕ},
-				},
 				'abbreviated' => {
 					'am' => q{AM},
 					'pm' => q{PM},
+				},
+				'wide' => {
+					'am' => q{ӕмбисбоны размӕ},
+					'pm' => q{ӕмбисбоны фӕстӕ},
 				},
 			},
 		},

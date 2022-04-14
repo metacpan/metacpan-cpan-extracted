@@ -1,0 +1,4 @@
+PRODUCT = OTRS
+VERSION = 5.0.8
+BUILDDATE = Thu Mar 10 02:37:32 CET 2016
+BUILDHOST = otrsbuild.otrs.com

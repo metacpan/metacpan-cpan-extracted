@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Shi - Package for language Tachelhit
 =cut
 
 package Locale::CLDR::Locales::Shi;
-# This file auto generated from Data\common\main\shi.xml
-#	on Sun  3 Feb  2:16:59 pm GMT
+# This file auto generated from Data/common/main/shi.xml
+#	on Mon 11 Apr  5:37:37 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -842,13 +842,13 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
+				'abbreviated' => {
 					'am' => q{ⵜⵉⴼⴰⵡⵜ},
 					'pm' => q{ⵜⴰⴷⴳⴳⵯⴰⵜ},
 				},
-				'abbreviated' => {
-					'pm' => q{ⵜⴰⴷⴳⴳⵯⴰⵜ},
+				'wide' => {
 					'am' => q{ⵜⵉⴼⴰⵡⵜ},
+					'pm' => q{ⵜⴰⴷⴳⴳⵯⴰⵜ},
 				},
 			},
 		},

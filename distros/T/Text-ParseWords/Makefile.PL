@@ -14,7 +14,7 @@ WriteMakefile1(
     },
     META_MERGE => {
         resources => {
-            repository => 'http://github.com/chorny/Text-ParseWords',
+            repository => 'https://github.com/neilb/Text-ParseWords',
         },
     },
     TEST_REQUIRES => {

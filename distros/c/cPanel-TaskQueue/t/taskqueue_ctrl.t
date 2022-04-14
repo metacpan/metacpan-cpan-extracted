@@ -20,7 +20,7 @@ File::Path::mkpath($statedir);
 
 throws_ok { cPanel::TaskQueue::Ctrl->new('fred'); } qr/not a hashref/, 'Ctrl::new requires a hashref.';
 throws_ok { cPanel::TaskQueue::Ctrl->new( { qname => 'test' } ); } qr/required 'qdir'/, 'Required qdir test.';
-throws_ok { cPanel::TaskQueue::Ctrl->new( { qdir => $statedir } ); } qr/required 'qname'/, 'Required qname test.';
+throws_ok { cPanel::TaskQueue::Ctrl->new( { qdir  => $statedir } ); } qr/required 'qname'/, 'Required qname test.';
 
 my $output;
 my $ctrl = cPanel::TaskQueue::Ctrl->new( { qdir => $statedir, qname => 'test', out => \$output } );

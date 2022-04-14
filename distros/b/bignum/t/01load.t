@@ -3,17 +3,18 @@
 use strict;
 use warnings;
 
-use Test::More tests => 3;
+use Test::More tests => 4;
 
 BEGIN {
-    use_ok('bignum');
     use_ok('bigint');
+    use_ok('bigfloat');
     use_ok('bigrat');
+    use_ok('bignum');
 };
 
+# Main modules for various distributions.
+
 my @mods = ('bignum',
-            'bigint',
-            'bigrat',
             'Math::BigInt',
             'Math::BigRat',
             'Math::BigInt::Lite',

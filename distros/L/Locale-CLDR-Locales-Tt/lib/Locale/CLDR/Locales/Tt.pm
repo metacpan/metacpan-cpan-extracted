@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Tt - Package for language Tatar
 =cut
 
 package Locale::CLDR::Locales::Tt;
-# This file auto generated from Data\common\main\tt.xml
-#	on Sun  3 Feb  2:24:13 pm GMT
+# This file auto generated from Data/common/main/tt.xml
+#	on Mon 11 Apr  5:40:25 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -1066,30 +1066,30 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'abbreviated' => {
-					'pm' => q{PM},
 					'am' => q{AM},
+					'pm' => q{PM},
 				},
 				'narrow' => {
-					'pm' => q{PM},
 					'am' => q{AM},
+					'pm' => q{PM},
 				},
 				'wide' => {
-					'pm' => q{PM},
 					'am' => q{AM},
+					'pm' => q{PM},
 				},
 			},
 			'stand-alone' => {
-				'wide' => {
+				'abbreviated' => {
 					'am' => q{AM},
 					'pm' => q{PM},
 				},
 				'narrow' => {
-					'pm' => q{PM},
 					'am' => q{AM},
+					'pm' => q{PM},
 				},
-				'abbreviated' => {
-					'pm' => q{PM},
+				'wide' => {
 					'am' => q{AM},
+					'pm' => q{PM},
 				},
 			},
 		},
@@ -1237,6 +1237,9 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'generic' => {
+			fallback => '{0} – {1}',
+		},
 		'gregorian' => {
 			H => {
 				H => q{HH–HH},
@@ -1331,9 +1334,6 @@ has 'datetime_formats_interval' => (
 				d => q{dd.MM.y – dd.MM.y},
 				y => q{dd.MM.y – dd.MM.y},
 			},
-		},
-		'generic' => {
-			fallback => '{0} – {1}',
 		},
 	} },
 );

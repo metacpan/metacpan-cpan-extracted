@@ -13,6 +13,9 @@ my %WriteMakefileArgs = (
     "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "OPM-Validate",
+  "EXE_FILES" => [
+    "bin/validate_opm"
+  ],
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.020",
   "NAME" => "OPM::Validate",
@@ -21,7 +24,7 @@ my %WriteMakefileArgs = (
     "Pod::Coverage::TrustPod" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "1.10",
+  "VERSION" => "1.11",
   "test" => {
     "TESTS" => "t/*.t"
   }

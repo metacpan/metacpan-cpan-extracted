@@ -1,12 +1,12 @@
 package Graph::Writer::GraphViz;
 use strict;
+use parent 'Graph::Writer';
+
 use IO::All;
 use GraphViz;
 use Graph::Writer;
-use vars qw(@ISA);
-@ISA = qw(Graph::Writer);
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 # Global GraphViz Parameters
 my %graph_param;
@@ -152,6 +152,10 @@ system, like, 'gif' if you have 'as_gif', 'text' if you can do
 =head1 SEE ALSO
 
 L<Graph>, L<Graph::Writer>, L<GraphViz>
+
+=head1 AUTHOR
+
+Kang-min Liu <gugod@gugod.org>
 
 =head1 CREDITS
 

@@ -1,0 +1,81 @@
+{
+   "abstract" : "parse OPM repositories' framework.xml files to search for add ons",
+   "author" : [
+      "Renee Baecker <reneeb@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "OPM-Repository",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         },
+         "suggests" : {
+            "JSON::PP" : "2.27300"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::BOM" : "0",
+            "Test::More" : "0.88",
+            "Test::NoTabs" : "0",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTTP::Tiny" : "0.036",
+            "HTTP::Tiny::FileProtocol" : "0.01",
+            "List::Util" : "1.33",
+            "Moo" : "1.003001",
+            "Regexp::Common" : "2013031301",
+            "Scalar::Util" : "1.33",
+            "Test::More" : "0.99",
+            "XML::LibXML" : "2.0106",
+            "perl" : "5.008009"
+         }
+      }
+   },
+   "provides" : {
+      "OPM::Repository" : {
+         "file" : "lib/OPM/Repository.pm",
+         "version" : "v1.0.0"
+      },
+      "OPM::Repository::Source" : {
+         "file" : "lib/OPM/Repository/Source.pm",
+         "version" : "v1.0.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/perlservices/OPM-Repository/issues"
+      },
+      "homepage" : "https://github.com/perlservices/OPM-Repository",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/perlservices/OPM-Repository.git",
+         "web" : "https://github.com/perlservices/OPM-Repository"
+      }
+   },
+   "version" : "1.0.0",
+   "x_contributors" : [
+      "H\u00e5kon H\u00e6gland <hakon.hagland@gmail.com>",
+      "reneeb <github@renee-baecker.de>",
+      "reneeb <info@perl-services.de>"
+   ],
+   "x_generated_by_perl" : "v5.30.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19"
+}
+

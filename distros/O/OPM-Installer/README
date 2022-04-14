@@ -1,0 +1,92 @@
+NAME
+
+    OPM::Installer - Install ticketsystem (Znuny/OTOBO) add ons
+
+VERSION
+
+    version 1.0.0
+
+SYNOPSIS
+
+      use OPM::Installer;
+      
+      my $installer = OPM::Installer->new;
+      $installer->install( 'FAQ' );
+      
+      # or
+      
+      my $installer = OPM::Installer->new();
+      $installer->install( package => 'FAQ', version => '2.1.9' );
+    
+      # provide path to a config file
+      my $installer = OPM::Installer->new(
+          conf => 'test.rc',
+      );
+      $installer->install( 'FAQ' );
+
+DESCRIPTION
+
+    This is an alternate installer for Znuny/OTOBO addons. The standard
+    package manager currently does not install dependencies. OPM::Installer
+    takes care of those dependencies and it can handle dependencies from
+    different places.
+
+CONFIGURATION FILE
+
+    You can provide some basic configuration in a .opminstaller.rc file:
+
+      repository=http://ftp.addon.org/pub/addon/packages
+      repository=http://ftp.addon.org/pub/addon/itsm/packages33
+      repository=http://opar.perl-services.de
+      repository=http://feature-addons.de/repo
+      path=/opt/otrs
+
+ATTRIBUTES
+
+      * conf
+
+      * force
+
+      * has
+
+      * logger
+
+      * manager
+
+      * package
+
+      * prove
+
+      * repositories
+
+      * sudo
+
+      * utils_ts
+
+      * verbose
+
+      * version
+
+ACKNOWLEDGEMENT
+
+    The development of this package was sponsored by
+    https://feature-addons.de
+
+METHODS
+
+ install
+
+ list_available
+
+AUTHOR
+
+    Renee Baecker <reneeb@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2018 by Renee Baecker.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+

@@ -1,6 +1,8 @@
 # -*- Mode: CPerl -*-
 # t/03_ufuncs.t
-use Test::More tests => 2*4*17;
+use Test::More;
+use strict;
+use warnings;
 
 ##-- common subs
 my $TEST_DIR;
@@ -11,13 +13,11 @@ BEGIN {
   eval qq{use lib ("$TEST_DIR/$_/blib/lib","$TEST_DIR/$_/blib/arch");} foreach (qw(../.. ..));
   do "$TEST_DIR/common.plt" or  die("$0: failed to load $TEST_DIR/common.plt: $@");
 }
+our ($a, $abad, $agood, $awhich, $avals, $BAD);
 
 ##-- common modules
 use PDL;
 use PDL::CCS::Nd;
-
-use version;
-my $HAVE_PDL_2_014 = version->parse($PDL::VERSION) >= version->parse("2.014");
 
 ##--------------------------------------------------------------
 ## ufunc test
@@ -62,7 +62,6 @@ sub test_ufunc {
 
   ##-- check output type
  SKIP: {
-    skip("${label}:type - only for PDL >= v2.014",1) if (!$HAVE_PDL_2_014);
     isok("${label}:type", $ccs_rc->type, $dense_rc->type)
       or diag "ccs_rc(", $ccs_rc->info, ")=$ccs_rc\n",
       "dense_rc(", $dense_rc->info, ")=$dense_rc\n";
@@ -82,9 +81,8 @@ sub test_ufunc {
 
 ##--------------------------------------------------------------
 ## all tests
-our ($BAD);
-foreach $missing (0,1,255,$BAD) { ##-- *4
-  foreach $ufunc (
+for my $missing (0,1,255,$BAD) { ##-- *4
+  for my $ufunc (
 		  qw(sumover prodover dsumover dprodover),  ## *17
 		  qw(andover orover bandover borover),
 		  qw(maximum minimum),
@@ -98,6 +96,4 @@ foreach $missing (0,1,255,$BAD) { ##-- *4
     }
 }
 
-print "\n";
-# end of t/*.t
-
+done_testing;

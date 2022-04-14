@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Tk - Package for language Turkmen
 =cut
 
 package Locale::CLDR::Locales::Tk;
-# This file auto generated from Data\common\main\tk.xml
-#	on Sun  3 Feb  2:21:58 pm GMT
+# This file auto generated from Data/common/main/tk.xml
+#	on Mon 11 Apr  5:39:30 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -4435,31 +4435,31 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
-					'pm' => q{günortadan soň},
-					'am' => q{günortadan öň},
+				'abbreviated' => {
+					'am' => q{go.öň},
+					'pm' => q{go.soň},
 				},
 				'narrow' => {
 					'am' => q{öň},
 					'pm' => q{soň},
 				},
-				'abbreviated' => {
-					'pm' => q{go.soň},
-					'am' => q{go.öň},
+				'wide' => {
+					'am' => q{günortadan öň},
+					'pm' => q{günortadan soň},
 				},
 			},
 			'stand-alone' => {
+				'abbreviated' => {
+					'am' => q{g.öň},
+					'pm' => q{g.soň},
+				},
 				'narrow' => {
-					'pm' => q{soň},
 					'am' => q{öň},
+					'pm' => q{soň},
 				},
 				'wide' => {
-					'pm' => q{günortadan soň},
 					'am' => q{günortadan öň},
-				},
-				'abbreviated' => {
-					'pm' => q{g.soň},
-					'am' => q{g.öň},
+					'pm' => q{günortadan soň},
 				},
 			},
 		},
@@ -4551,56 +4551,6 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
-			Bh => q{h B},
-			Bhm => q{h:mm B},
-			Bhms => q{h:mm:ss B},
-			E => q{ccc},
-			EBhm => q{E h:mm B},
-			EBhms => q{E h:mm:ss B},
-			EHm => q{E HH:mm},
-			EHms => q{E HH:mm:ss},
-			Ed => q{d E},
-			Ehm => q{E h:mm a},
-			Ehms => q{E h:mm:ss a},
-			Gy => q{G y},
-			GyMMM => q{G y MMM},
-			GyMMMEd => q{G y MMM d, E},
-			GyMMMd => q{G y MMM d},
-			H => q{HH},
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			Hmsv => q{HH:mm:ss v},
-			Hmv => q{HH:mm v},
-			M => q{L},
-			MEd => q{dd.MM E},
-			MMM => q{LLL},
-			MMMEd => q{d MMM E},
-			MMMMEd => q{d MMMM E},
-			MMMMW => q{'hepde' W, MMMM},
-			MMMMd => q{d MMMM},
-			MMMd => q{d MMM},
-			Md => q{dd.MM},
-			d => q{d},
-			h => q{h a},
-			hm => q{h:mm a},
-			hms => q{h:mm:ss a},
-			hmsv => q{h:mm:ss a v},
-			hmv => q{h:mm a v},
-			mmss => q{mm:ss},
-			ms => q{mm:ss},
-			y => q{y},
-			yM => q{MM.y},
-			yMEd => q{dd.MM.y E},
-			yMMM => q{MMM y},
-			yMMMEd => q{d MMM y E},
-			yMMMM => q{MMMM y},
-			yMMMd => q{d MMM y},
-			yMd => q{dd.MM.y},
-			yQQQ => q{y QQQ},
-			yQQQQ => q{y QQQQ},
-			yw => q{'hepde' w, Y},
-		},
 		'generic' => {
 			Bh => q{h B},
 			Bhm => q{h:mm B},
@@ -4653,6 +4603,56 @@ has 'datetime_formats_available_formats' => (
 			yyyyQQQ => q{G y QQQ},
 			yyyyQQQQ => q{G y QQQQ},
 		},
+		'gregorian' => {
+			Bh => q{h B},
+			Bhm => q{h:mm B},
+			Bhms => q{h:mm:ss B},
+			E => q{ccc},
+			EBhm => q{E h:mm B},
+			EBhms => q{E h:mm:ss B},
+			EHm => q{E HH:mm},
+			EHms => q{E HH:mm:ss},
+			Ed => q{d E},
+			Ehm => q{E h:mm a},
+			Ehms => q{E h:mm:ss a},
+			Gy => q{G y},
+			GyMMM => q{G y MMM},
+			GyMMMEd => q{G y MMM d, E},
+			GyMMMd => q{G y MMM d},
+			H => q{HH},
+			Hm => q{HH:mm},
+			Hms => q{HH:mm:ss},
+			Hmsv => q{HH:mm:ss v},
+			Hmv => q{HH:mm v},
+			M => q{L},
+			MEd => q{dd.MM E},
+			MMM => q{LLL},
+			MMMEd => q{d MMM E},
+			MMMMEd => q{d MMMM E},
+			MMMMW => q{'hepde' W, MMMM},
+			MMMMd => q{d MMMM},
+			MMMd => q{d MMM},
+			Md => q{dd.MM},
+			d => q{d},
+			h => q{h a},
+			hm => q{h:mm a},
+			hms => q{h:mm:ss a},
+			hmsv => q{h:mm:ss a v},
+			hmv => q{h:mm a v},
+			mmss => q{mm:ss},
+			ms => q{mm:ss},
+			y => q{y},
+			yM => q{MM.y},
+			yMEd => q{dd.MM.y E},
+			yMMM => q{MMM y},
+			yMMMEd => q{d MMM y E},
+			yMMMM => q{MMMM y},
+			yMMMd => q{d MMM y},
+			yMd => q{dd.MM.y},
+			yQQQ => q{y QQQ},
+			yQQQQ => q{y QQQQ},
+			yw => q{'hepde' w, Y},
+		},
 	} },
 );
 
@@ -4672,7 +4672,7 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
+		'generic' => {
 			H => {
 				H => q{HH–HH},
 			},
@@ -4767,7 +4767,7 @@ has 'datetime_formats_interval' => (
 				y => q{dd.MM.y – dd.MM.y},
 			},
 		},
-		'generic' => {
+		'gregorian' => {
 			H => {
 				H => q{HH–HH},
 			},

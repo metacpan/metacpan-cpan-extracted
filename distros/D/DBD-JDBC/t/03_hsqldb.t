@@ -99,7 +99,7 @@ SKIP: {
     ok($dbh->disconnect(), "disconnect");
 }; ## end skip block
 
-exit 1;
+##exit 1;
 
 sub remaining {
     $test_count - $test_builder->current_test;

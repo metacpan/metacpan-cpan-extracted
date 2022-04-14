@@ -6,14 +6,12 @@ use strict;
 use warnings;
 
 use File::Path ();
+use File::Temp ();
+
 use cPanel::TaskQueue::Scheduler();
 
-my $tmpdir   = './tmp';
+my $tmpdir   = File::Temp->newdir();
 my $statedir = "$tmpdir/taskqueue";
-
-# In case the last test did not succeed.
-cleanup();
-File::Path::mkpath($tmpdir) or die "Unable to create tmpdir: $!";
 
 my $sched = cPanel::TaskQueue::Scheduler->new( { name => 'tasks', state_dir => $statedir } );
 
@@ -49,9 +47,3 @@ like( $@, qr/Invalid token./, 'Name does not match' );
 eval { cPanel::TaskQueue::Scheduler->new( { token => 'tqsched1:|:tasks|:fred_sched.stor' } ); };
 like( $@, qr/Invalid token./, 'File does not match' );
 
-cleanup();
-
-# Clean up after myself
-sub cleanup {
-    File::Path::rmtree($tmpdir) if -e $tmpdir;
-}

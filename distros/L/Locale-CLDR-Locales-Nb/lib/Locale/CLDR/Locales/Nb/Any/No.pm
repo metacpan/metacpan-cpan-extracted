@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Nb::Any::No - Package for language Norwegian Bokmål
 =cut
 
 package Locale::CLDR::Locales::Nb::Any::No;
-# This file auto generated from Data\common\main\nb_NO.xml
-#	on Sun  3 Feb  2:09:08 pm GMT
+# This file auto generated from Data/common/main/nb_NO.xml
+#	on Mon 11 Apr  5:34:47 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';

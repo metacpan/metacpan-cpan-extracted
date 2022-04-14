@@ -37,6 +37,9 @@
 
     use constant MPC_PV_NV_BUG => Math::MPC::Constant::_has_pv_nv_bug();
 
+    # Inspired by https://github.com/Perl/perl5/issues/19550:
+    use constant ISSUE_19550    => Math::MPC::Constant::_issue_19550();
+
     use subs qw(MPC_VERSION MPC_VERSION_MAJOR MPC_VERSION_MINOR
                 MPC_VERSION_PATCHLEVEL MPC_VERSION_STRING
                 MPC_VERSION_NUM);
@@ -130,7 +133,7 @@ Rmpc_set_nan Rmpc_swap
 Rmpc_mul_sj Rmpc_mul_ld Rmpc_mul_d Rmpc_div_sj Rmpc_sj_div Rmpc_div_ld Rmpc_ld_div Rmpc_div_d Rmpc_d_div
 );
 
-    our $VERSION = '1.15';
+    our $VERSION = '1.16';
     #$VERSION = eval $VERSION;
 
     Math::MPC->DynaLoader::bootstrap($VERSION);

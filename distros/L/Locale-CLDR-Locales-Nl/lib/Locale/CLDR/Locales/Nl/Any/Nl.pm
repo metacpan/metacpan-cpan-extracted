@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Nl::Any::Nl - Package for language Dutch
 =cut
 
 package Locale::CLDR::Locales::Nl::Any::Nl;
-# This file auto generated from Data\common\main\nl_NL.xml
-#	on Sun  3 Feb  2:11:45 pm GMT
+# This file auto generated from Data/common/main/nl_NL.xml
+#	on Mon 11 Apr  5:35:44 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';

@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Wo - Package for language Wolof
 =cut
 
 package Locale::CLDR::Locales::Wo;
-# This file auto generated from Data\common\main\wo.xml
-#	on Sun  3 Feb  2:26:10 pm GMT
+# This file auto generated from Data/common/main/wo.xml
+#	on Mon 11 Apr  5:41:11 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -1071,28 +1071,28 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'abbreviated' => {
-					'pm' => q{Ngo},
-					'am' => q{Sub},
-				},
-				'wide' => {
 					'am' => q{Sub},
 					'pm' => q{Ngo},
 				},
 				'narrow' => {
+					'am' => q{Sub},
+					'pm' => q{Ngo},
+				},
+				'wide' => {
 					'am' => q{Sub},
 					'pm' => q{Ngo},
 				},
 			},
 			'stand-alone' => {
 				'abbreviated' => {
-					'pm' => q{Ngo},
-					'am' => q{Sub},
-				},
-				'wide' => {
 					'am' => q{Sub},
 					'pm' => q{Ngo},
 				},
 				'narrow' => {
+					'am' => q{Sub},
+					'pm' => q{Ngo},
+				},
+				'wide' => {
 					'am' => q{Sub},
 					'pm' => q{Ngo},
 				},

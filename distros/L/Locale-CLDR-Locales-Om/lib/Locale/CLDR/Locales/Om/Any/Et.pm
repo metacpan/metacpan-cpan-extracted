@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Om::Any::Et - Package for language Oromo
 =cut
 
 package Locale::CLDR::Locales::Om::Any::Et;
-# This file auto generated from Data\common\main\om_ET.xml
-#	on Sun  3 Feb  2:12:16 pm GMT
+# This file auto generated from Data/common/main/om_ET.xml
+#	on Mon 11 Apr  5:35:55 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';

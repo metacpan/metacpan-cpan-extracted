@@ -1,6 +1,8 @@
 # -*- Mode: CPerl -*-
 # t/04_unops.t
-use Test::More tests => 144;
+use Test::More;
+use strict;
+use warnings;
 
 ##-- common subs
 my $TEST_DIR;
@@ -11,6 +13,7 @@ BEGIN {
   eval qq{use lib ("$TEST_DIR/$_/blib/lib","$TEST_DIR/$_/blib/arch");} foreach (qw(../.. ..));
   do "$TEST_DIR/common.plt" or  die("$0: failed to load $TEST_DIR/common.plt: $@");
 }
+our ($a, $abad, $agood, $awhich, $avals, $BAD);
 
 ##-- common modules
 use PDL;
@@ -52,9 +55,8 @@ sub test_unop {
   }
 }
 
-our ($BAD);
-foreach $missing (0,1,255,$BAD) { ##-- *4
-  foreach $op (
+for my $missing (0,1,255,$BAD) { ##-- *4
+  for my $op (
 	       [qw(bitnot ~)],
 	       [qw(not !)],
 	       qw(sqrt abs sin cos log log10), 'exp' ##-- *9
@@ -65,6 +67,4 @@ foreach $missing (0,1,255,$BAD) { ##-- *4
     }
 }
 
-print "\n";
-# end of t/*.t
-
+done_testing;

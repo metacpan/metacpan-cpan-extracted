@@ -1,21 +1,8 @@
 # -*- Mode: CPerl -*-
 # t/06_matops.t
 use Test::More;
-BEGIN {
-  my $N_MATOPS = 2;
-  my $N_TESTS_PER_MATOP = 8;
-  my $N_MISSING  = 1;
-  my $N_SWAP    = 2;
-  my $N_BLOCKS = 5;
-  my $N_HACKS = (3+8);
-  plan(tests=>(
-	       $N_BLOCKS*$N_MISSING*$N_SWAP*$N_TESTS_PER_MATOP*$N_MATOPS
-	       +
-	       $N_HACKS,
-	      ),
-       todo=>[]);
-  select(STDERR); $|=1; select(STDOUT); $|=1;
-}
+use strict;
+use warnings;
 
 ##-- common subs
 my $TEST_DIR;
@@ -26,13 +13,11 @@ BEGIN {
   eval qq{use lib ("$TEST_DIR/$_/blib/lib","$TEST_DIR/$_/blib/arch");} foreach (qw(../.. ..));
   do "$TEST_DIR/common.plt" or  die("$0: failed to load $TEST_DIR/common.plt: $@");
 }
+our ($a, $abad, $agood, $awhich, $avals, $BAD);
 
 ##-- common modules
 use PDL;
 use PDL::CCS::Nd;
-
-use version;
-my $HAVE_PDL_2_014 = version->parse($PDL::VERSION) >= version->parse("2.014");
 
 ##--------------------------------------------------------------
 ## hacks
@@ -117,8 +102,7 @@ sub test_vcos_zdd {
   my $b1 = $b->pdl->setbadif($b->xvals==2);
   my $vcos1 = $ccs->vcos_zdd($b1);
   my $vcos1_want = pdl([0.8366,0.6211,-0.8366]);
-  skipordo("vcos_zdd:bad:b", ($HAVE_PDL_2_014 ? 0 : "PDL >= v2.014 only"),
-	   sub { pdlapprox("vcos_zdd:bad:b", $vcos1, $vcos1_want, 1e-4); });
+  pdlapprox("vcos_zdd:bad:b", $vcos1, $vcos1_want, 1e-4);
 }
 test_vcos_zdd();
 
@@ -149,7 +133,7 @@ sub test_matop {
   else                     { $a->where($abad) .= $missing_val; $a->badflag(0); }
 
   my $a = $::a;
-  $as = $a->toccs($missing_val);
+  my $as = $a->toccs($missing_val);
 
   $b  = PDL->topdl($b);
   $bs = $b->toccs($missing_val) if (!defined($bs));
@@ -241,9 +225,9 @@ my @missing = (0);
 ##-- Block 1 : mat * mat (rotated)
 my ($b);
 $b = $a->flat->rotate(1)->pdl->reshape($a->dims); ##-- extra pdl() before reshape() avoids realloc() crashes in PDL-2.0.14
-foreach $missing (@missing) {  	  ##-- *NMISSING
-  foreach $swap (0,1) {           ##-- *NSWAP=2
-    foreach $op (@matops) {       ##-- *1
+for my $missing (@missing) {  	  ##-- *NMISSING
+  for my $swap (0,1) {           ##-- *NSWAP=2
+    for my $op (@matops) {       ##-- *1
       if (ref($op)) { test_matop('mat.mat', @$op,        $swap, $missing, $b); }
       else          { test_matop('mat.mat', $op, undef,  $swap, $missing, $b); }
     }
@@ -252,9 +236,9 @@ foreach $missing (@missing) {  	  ##-- *NMISSING
 
 ##-- Block 2 : mat * scalar
 $b = PDL->topdl(42);
-foreach $missing (@missing) {  	  ##-- *NMISSING
-  foreach $swap (0,1) {           ##-- *NSWAP=2
-    foreach $op (@matops) {       ##-- *NMATOPS
+for my $missing (@missing) {  	  ##-- *NMISSING
+  for my $swap (0,1) {           ##-- *NSWAP=2
+    for my $op (@matops) {       ##-- *NMATOPS
       if (ref($op)) { test_matop('mat.sclr', $op->[0], $op->[1], $swap, $missing, $b); }
       else          { test_matop('mat.sclr', $op,      undef,    $swap, $missing, $b); }
     }
@@ -263,9 +247,9 @@ foreach $missing (@missing) {  	  ##-- *NMISSING
 
 ##-- Block 3 : mat * row
 $b  = sequence($a->dim(0),1)+1;
-foreach $missing (@missing) {  	  ##-- *NMISSING
-  foreach $swap (0,1) {           ##-- *NSWAP=2
-    foreach $op (@matops) {         ##-- *NMATOPS
+for my $missing (@missing) {  	  ##-- *NMISSING
+  for my $swap (0,1) {           ##-- *NSWAP=2
+    for my $op (@matops) {         ##-- *NMATOPS
       if (ref($op)) { test_matop('mat.rv', $op->[0], $op->[1], 1,     $missing, $b); } ##-- hack
       else          { test_matop('mat.rv', $op,      undef,    $swap, $missing, $b); }
     }
@@ -274,10 +258,10 @@ foreach $missing (@missing) {  	  ##-- *NMISSING
 
 ##-- Block 4 : mat * col
 $b  = sequence(1,$a->dim(1))+1;
-$bs = $b->flat->toccs->dummy(0,1);
-foreach $missing (@missing) {     ##-- *NMISSING
-  foreach $swap (0,1) {           ##-- *NSWAP=2
-    foreach $op (@matops) {       ##-- *NMATOPS
+my $bs = $b->flat->toccs->dummy(0,1);
+for my $missing (@missing) {     ##-- *NMISSING
+  for my $swap (0,1) {           ##-- *NSWAP=2
+    for my $op (@matops) {       ##-- *NMATOPS
       if (ref($op)) { test_matop('mat.cv', $op->[0], $op->[1], $swap, $missing, $b,$bs); }
       else          { test_matop('mat.cv', $op,      undef,    $swap, $missing, $b,$bs); }
     }
@@ -290,17 +274,13 @@ $b  = sequence(1,$a->dim(1))+1;
 $bs = $b->flat->toccs->dummy(0,1);
 $a  = sequence($a->dim(0),1);
 $abad = ($a==0);
-foreach $missing (@missing) {     ##-- *NMISSING
-  foreach $swap (0,1) {           ##-- *NSWAP=2
-    foreach $op (@matops) {       ##-- *NMATOPS
+for my $missing (@missing) {     ##-- *NMISSING
+  for my $swap (0,1) {           ##-- *NSWAP=2
+    for my $op (@matops) {       ##-- *NMATOPS
       if (ref($op)) { test_matop('rv.cv', $op->[0], $op->[1], $swap, $missing, $b,$bs); }
       else          { test_matop('rv.cv', $op,      undef,    $swap, $missing, $b,$bs); }
     }
   }
 }
 
-($a,$abad) = @save;
-
-print "\n";
-# end of t/*.t
-
+done_testing;

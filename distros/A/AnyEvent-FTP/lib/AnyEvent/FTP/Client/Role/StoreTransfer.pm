@@ -6,7 +6,7 @@ use 5.010;
 use Moo::Role;
 
 # ABSTRACT: Store transfer interface for AnyEvent::FTP objects
-our $VERSION = '0.18'; # VERSION
+our $VERSION = '0.19'; # VERSION
 
 sub xfer
 {
@@ -25,6 +25,7 @@ sub xfer
     else
     {
       $handle->push_shutdown;
+      $handle->destroy;
     }
   });
 }
@@ -92,7 +93,7 @@ AnyEvent::FTP::Client::Role::StoreTransfer - Store transfer interface for AnyEve
 
 =head1 VERSION
 
-version 0.18
+version 0.19
 
 =head1 AUTHOR
 

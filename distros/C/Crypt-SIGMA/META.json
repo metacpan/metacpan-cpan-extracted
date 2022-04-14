@@ -1,0 +1,52 @@
+{
+   "abstract" : "SIGMA protocol",
+   "author" : [
+      "Pan Lanlan <abbypan@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Crypt-SIGMA",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CBOR::XS" : "1.8",
+            "Crypt::AuthEnc::GCM" : "0.075",
+            "Crypt::KeyDerivation" : "0.07",
+            "Crypt::OpenSSL::Base::Func" : "0.033",
+            "Crypt::OpenSSL::Bignum" : "0.09",
+            "Crypt::OpenSSL::EC" : "1.31",
+            "Crypt::OpenSSL::ECDSA" : "0.09",
+            "Crypt::OpenSSL::Hash2Curve" : "0.03",
+            "Digest::SHA" : "6.02",
+            "Smart::Comments" : "1.06",
+            "Test::More" : "1.3",
+            "bignum" : "0.52"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/abbypan/Crypt-SIGMA.git",
+         "web" : "https://github.com/abbypan/Crypt-SIGMA"
+      }
+   },
+   "version" : "0.01",
+   "x_generated_by_perl" : "v5.34.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
+   "x_spdx_expression" : "MPL-2.0"
+}
+

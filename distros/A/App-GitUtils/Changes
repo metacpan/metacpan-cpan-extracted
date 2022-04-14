@@ -1,3 +1,9 @@
+0.085   2022-03-20  Released-By: PERLANCAR; Urgency: medium
+
+        - Specify minimum version for git dependency to 2.22.0 for 'info'
+          (for --show-current option).
+
+
 0.084   2022-02-12  Released-By: PERLANCAR; Urgency: medium
 
         - [subcommand info] Return current_branch.

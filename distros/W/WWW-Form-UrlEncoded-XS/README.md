@@ -17,7 +17,7 @@ WWW::Form::UrlEncoded::XS - XS implementation of parser and builder for applicat
 # DESCRIPTION
 
 WWW::Form::UrlEncoded::XS provides application/x-www-form-urlencoded parser and builder 
-that is implemented by XS. see [WWW::Form::UrlEncoded](https://metacpan.org/pod/WWW::Form::UrlEncoded)'s document.
+that is implemented by XS. see [WWW::Form::UrlEncoded](https://metacpan.org/pod/WWW%3A%3AForm%3A%3AUrlEncoded)'s document.
 
 # LICENSE
 

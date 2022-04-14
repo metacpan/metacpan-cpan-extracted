@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 package Raisin::Routes::Endpoint;
-$Raisin::Routes::Endpoint::VERSION = '0.93';
+$Raisin::Routes::Endpoint::VERSION = '0.94';
 use Plack::Util::Accessor qw(
     check
     code
@@ -36,7 +36,6 @@ sub new {
     # Populate params index
     for my $p (@{ $self->params }) {
         if ($p->named && (my $re = $p->regex)) {
-            $re =~ s/[\$^]//g;
             $self->{check}{ $p->name } = $re;
         }
     }
@@ -125,7 +124,7 @@ Raisin::Routes::Endpoint - Endpoint class for Raisin::Routes.
 
 =head1 VERSION
 
-version 0.93
+version 0.94
 
 =head1 ACKNOWLEDGEMENTS
 

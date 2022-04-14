@@ -7,15 +7,12 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/mocks";
 use File::Path ();
+use File::Temp ();
 
 use cPanel::TaskQueue::Scheduler ( -logger => 'cPanel::FakeLogger' );
 
-my $tmpdir   = './tmp';
-my $statedir = "$tmpdir/statedir";
-
-# In case the last test did not succeed.
-cleanup();
-File::Path::mkpath($statedir);
+my ( $tmpdir, $statedir );
+setup();
 
 {
     open( my $fh, '>', "$statedir/tasks_sched.stor" ) or die "Unable to create file: $!\n";
@@ -34,8 +31,7 @@ File::Path::mkpath($statedir);
     );
 }
 
-cleanup();
-File::Path::mkpath($statedir);
+setup();
 
 {
     use Storable ();
@@ -51,9 +47,12 @@ File::Path::mkpath($statedir);
     ok( -e "$statedir/tasks_sched.stor.broken", 'Bad file moved out of the way.' );
 }
 
-cleanup();
+exit;
 
-# Clean up after myself
-sub cleanup {
-    File::Path::rmtree($tmpdir) if -d $tmpdir;
+sub setup {
+    $tmpdir   = File::Temp->newdir();
+    $statedir = "$tmpdir/state_test";
+    File::Path::mkpath($statedir);
+
+    return;
 }

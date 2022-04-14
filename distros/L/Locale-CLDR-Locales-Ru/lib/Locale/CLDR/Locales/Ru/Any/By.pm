@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Ru::Any::By - Package for language Russian
 =cut
 
 package Locale::CLDR::Locales::Ru::Any::By;
-# This file auto generated from Data\common\main\ru_BY.xml
-#	on Sun  3 Feb  2:16:21 pm GMT
+# This file auto generated from Data/common/main/ru_BY.xml
+#	on Mon 11 Apr  5:37:23 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';

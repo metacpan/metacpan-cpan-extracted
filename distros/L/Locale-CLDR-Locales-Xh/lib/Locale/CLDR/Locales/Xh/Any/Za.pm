@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Xh::Any::Za - Package for language Xhosa
 =cut
 
 package Locale::CLDR::Locales::Xh::Any::Za;
-# This file auto generated from Data\common\main\xh_ZA.xml
-#	on Sun  3 Feb  2:26:12 pm GMT
+# This file auto generated from Data/common/main/xh_ZA.xml
+#	on Mon 11 Apr  5:41:12 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';

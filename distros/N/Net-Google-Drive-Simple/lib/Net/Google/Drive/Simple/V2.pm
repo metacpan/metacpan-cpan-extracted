@@ -14,7 +14,7 @@ use File::Basename qw( basename );
 use JSON qw( from_json to_json );
 use Log::Log4perl qw(:easy);
 
-our $VERSION = '3.00';
+our $VERSION = '3.01';
 
 ###########################################
 sub new {

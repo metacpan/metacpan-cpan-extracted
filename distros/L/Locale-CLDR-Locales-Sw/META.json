@@ -4,7 +4,7 @@
       "John Imrie <john.imrie1@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4231",
    "keywords" : [
       "locale",
       "CLDR",
@@ -34,7 +34,7 @@
       "runtime" : {
          "requires" : {
             "DateTime" : "0.72",
-            "Locale::CLDR" : "v0.34.0",
+            "Locale::CLDR" : "v0.34.1",
             "Moo" : "2",
             "MooX::ClassAttribute" : "0.011",
             "Type::Tiny" : "0",
@@ -46,27 +46,27 @@
    "provides" : {
       "Locale::CLDR::Locales::Sw" : {
          "file" : "lib/Locale/CLDR/Locales/Sw.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::Sw::Any" : {
          "file" : "lib/Locale/CLDR/Locales/Sw/Any.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::Sw::Any::Cd" : {
          "file" : "lib/Locale/CLDR/Locales/Sw/Any/Cd.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::Sw::Any::Ke" : {
          "file" : "lib/Locale/CLDR/Locales/Sw/Any/Ke.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::Sw::Any::Tz" : {
          "file" : "lib/Locale/CLDR/Locales/Sw/Any/Tz.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       },
       "Locale::CLDR::Locales::Sw::Any::Ug" : {
          "file" : "lib/Locale/CLDR/Locales/Sw/Any/Ug.pm",
-         "version" : "v0.34.0"
+         "version" : "v0.34.1"
       }
    },
    "release_status" : "stable",
@@ -79,6 +79,6 @@
          "url" : "https://github.com/ThePilgrim/perlcldr.git"
       }
    },
-   "version" : "v0.34.0",
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "version" : "v0.34.1",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

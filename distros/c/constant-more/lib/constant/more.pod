@@ -1,0 +1,257 @@
+=head1 NAME
+
+constant::more - Assign values to constants from the command arguments
+
+=head1 SYNOPSIS
+
+Can use as a direct alternative to C<use constant>:
+
+	use constant::more PI    => 4 * atan2(1, 1);
+	use constant:more DEBUG => 0;
+
+	print "Pi equals ", PI, "...\n" if DEBUG;
+
+	use constant::more {
+	    SEC   => 0,
+	    MIN   => 1,
+	    HOUR  => 2,
+	    MDAY  => 3,
+	    MON   => 4,
+	    YEAR  => 5,
+	    WDAY  => 6,
+	    YDAY  => 7,
+	    ISDST => 8,
+	};
+
+
+Parse command line arguments and/or environment variables to assign
+to constants:
+
+	# ###
+	# example.pl
+
+	use constant::more {
+		FEATURE_A_ENABLED=>{		#Name of the constant
+			val=>0,		#default value 
+			opt=>"feature1",	#Getopt::Long option specification
+			env=>"MY_APP_FEATURE_A"	#Environment variable copy value from 
+		},
+
+		FEATURE_B_CONFIG=>{
+			val=>"disabled",
+			opt=>"feature2=s",	#Getopt::Long format
+		}
+	};
+
+	
+	if(FEATURE_A_ENABLED){
+		#Do interesting things here
+		print "Feature a is enabled
+	}
+	
+	print "Feature b config is: ".FEATURE_B_CONFIG."\n";
+
+	__END__
+
+	#######
+
+	# From command line
+	perl example.pl --feature1  --feature2=active
+	
+
+	# ####
+	# output
+
+	Feature a is enabled
+	Feature b config is: active
+	
+
+
+=head1 DESCRIPTION
+
+Performs the similar tasks as C<use constant>, but adds features to assign
+values of constants from the command line or environment variables.
+
+In addition, constants are only defined/set if they don't exist already, making
+configuring and overriding constants defined in sub modules possible. A module
+can specify a default value which is used if the constant hasn't been defined
+by the top level script. 
+
+L<GetOpt::Long> option specification is used for processing command line
+options to give flexibility in how and what switches are used.  To save on
+memory, L<GetOpt::Long> is only loaded if option processing is wanted (i.e. the
+C<opt> field is specified).
+
+In advanced form, a user subroutine can be supplied to give control
+of processing. This is used by L<Log::OK> for example to generate multiple
+constants from a single input level.
+
+=head1 MOTIVATION
+
+I use the L<constant> and L<enum> pragma frequently for unchanging values in my
+code.  However, I would like to have the flexibility to configure constants at
+program start to enable debugging or platform specific code.
+
+This module started as a way of disabling logging with no runtime overhead.
+However goals changed and I made it more general purpose. I wrote the module
+C<Log::OK> to handle disabling of inactive logging statements. It uses this
+module under the hood.
+
+=head1 USAGE
+
+=head2 Implementation Details
+
+It is important to C<use constant::more> before other modules that also C<use
+constant::more>. This ensures that you can manipulate constant values from the
+top level of the program.  Otherwise you risk sub modules overriding your top
+level applications logic.
+
+Constants are defined in a callers package unless the name includes a package.
+A name with '::' in it is classed as a full name for a variable. Use this to
+declare constants in a common namespace for example.
+
+In the case of the C<val> field, command line and environment processing all
+being enabled simultaneously, the precedence of a constant's value is: command
+option, environment variable and lastly the C<val> field.
+
+
+Constant names and their values are set in a table (hash) before they are
+actually created. In the case of the Advanced Form usage  (see below), a
+constant can have it's value updated multiple times, or multiple constants
+generated from the same command line option and added to the table.  When
+processing is complete all entries in the table are created.
+
+
+The usage of the pragma takes three forms, depending on how you want to set the
+value of your constants. These are detailed in the following sections.
+
+=head2 Simple Form
+
+In its simplest form, defining an constant (or multiple) is just like the 
+C<use constant> pragma:
+
+	use constant::more NAME=>"value";	#Set a single constant
+		
+	use constant::more {			#Set multiple constants
+			NAME=>"value",
+			ANOTHER=>"one",
+	};
+
+
+The key of the hash becomes the name of the constant. 
+
+=head2 Normal Form
+
+In its normal form, one or more anonymous hashes containing keys C<val>,
+C<opt>, C<env>, C<keep> and C<sub> are used to setup the processing of a
+constant:
+
+	use constant::more {
+		MY_NAME=>{
+			val=>"john",
+			opt=>"name=s",
+			env=>"ENV_VAR_NAME",
+		},
+		ANOTHER=>{
+			value=>"one",
+		}
+	};
+
+The key for each anonymous hash is the name of the constant created (MY_NAME
+and ANOTHER from above).
+
+The field values are all optional and include:
+
+=head3 val
+
+The (default) value set for the constant if no command line option or
+environment variable is used/detected. If not provided the value of constant
+generated will be C<undef>.
+
+=head3 opt
+
+The L<GetOpt::Long> option specification to use in processing the command line.
+If not specified, no command line processing is performed and L<GetOpt::Long>
+in not loaded.
+
+=head3 env
+
+The name of the environment variable to use in setting the constant's value. If
+not provided, environment variables are not processed.
+
+=head3 keep
+
+A flag indicating if the C<@ARGV> should be left as is (to keep) or  consumed
+when processing command line options. If not specified, C<@ARGV> will have
+options consumed and only remaining options passed through.
+
+
+=head2 Advanced Form
+
+Advanced form has an additional field C<sub> which changes behaviour of the
+pragma dramatically.
+
+If a child anonymous hash contains a CODE reference in the field C<sub>, the top
+level key in the hash is B<NOT> used as the constant name, but only as a
+label.
+
+The actual constant names and values to be generated are returned as a
+key/value list from the CODE ref. 
+
+The CODE ref is called with a key/value pair. The first input argument is the
+name of the command line option, or undef if default or environment variable.
+
+The second argument is the value from the command line, default or
+environment variable.
+
+	eg:
+
+	use constant::more {
+		just_a_label=>{			#this is just a label
+			val=>"john",
+			opt=>"name=s",
+			env=>"ENV_VAR_NAME",
+			sub=>sub{
+				my ($key,$value)=@_;
+				state $i=0;
+
+				#each time this sub is called it returns 
+				#a new for a constant with value to set
+				("CONSTANT".$i++, $value);
+			
+			}
+		},
+	};
+
+The code ref may be called multiple times if command line processing is enabled
+(with the C<opt> field). If multiple matching switches are present on the
+command line, they are each passed in a call.
+
+
+The names and values returned can be different each time to implement advanced use
+cases.
+
+
+=head1 REPOSITOTY and BUGS
+
+Please report feature requests and bugs via the github:
+
+L<https://github.com/drclaw1394/perl-constant-more.git>
+
+=head1 AUTHOR
+
+Ruben Westerberg, E<lt>drclaw@mac.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2022 by Ruben Westerberg
+
+Licensed under MIT
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES,
+INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+FITNESS FOR A PARTICULAR PURPOSE.
+
+=cut

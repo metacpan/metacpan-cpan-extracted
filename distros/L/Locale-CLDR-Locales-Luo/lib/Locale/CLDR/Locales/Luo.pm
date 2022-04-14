@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Luo - Package for language Luo
 =cut
 
 package Locale::CLDR::Locales::Luo;
-# This file auto generated from Data\common\main\luo.xml
-#	on Sun  3 Feb  2:04:04 pm GMT
+# This file auto generated from Data/common/main/luo.xml
+#	on Mon 11 Apr  5:32:56 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -837,13 +837,13 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
-					'pm' => q{OT},
-					'am' => q{OD},
-				},
 				'abbreviated' => {
-					'pm' => q{OT},
 					'am' => q{OD},
+					'pm' => q{OT},
+				},
+				'wide' => {
+					'am' => q{OD},
+					'pm' => q{OT},
 				},
 			},
 		},
@@ -923,7 +923,7 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
+		'generic' => {
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},
 			M => q{L},
@@ -946,7 +946,7 @@ has 'datetime_formats_available_formats' => (
 			yQQQ => q{QQQ y},
 			yQQQQ => q{QQQQ y},
 		},
-		'generic' => {
+		'gregorian' => {
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},
 			M => q{L},

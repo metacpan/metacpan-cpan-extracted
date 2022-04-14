@@ -212,6 +212,8 @@ sub _create_get_message_callback {
             }
 
             $$_give_up_cr_r->();
+
+            $dbus->do_armageddon($err);
         }
     };
 }

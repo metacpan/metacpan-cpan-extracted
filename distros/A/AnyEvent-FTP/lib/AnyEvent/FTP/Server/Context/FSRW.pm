@@ -13,7 +13,7 @@ use Capture::Tiny qw( capture );
 extends 'AnyEvent::FTP::Server::Context::FS';
 
 # ABSTRACT: FTP Server client context class with full read/write access
-our $VERSION = '0.18'; # VERSION
+our $VERSION = '0.19'; # VERSION
 
 
 with 'AnyEvent::FTP::Server::Role::TransferPrep';
@@ -364,7 +364,7 @@ AnyEvent::FTP::Server::Context::FSRW - FTP Server client context class with full
 
 =head1 VERSION
 
-version 0.18
+version 0.19
 
 =head1 SYNOPSIS
 

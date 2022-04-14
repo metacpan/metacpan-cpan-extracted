@@ -19,7 +19,7 @@ name: App-GitUtils
 provides:
   App::GitUtils:
     file: lib/App/GitUtils.pm
-    version: '0.084'
+    version: '0.085'
 requires:
   Cwd: '0'
   Data::Sah::Compiler::perl::TH::str: '0.911'
@@ -31,6 +31,7 @@ requires:
   Log::ger: '0.038'
   Log::ger::Screen: '0'
   Perinci::CmdLine::Any: '0.09'
+  Perinci::Sub::DepChecker: '0'
   Sah::Schema::dirname: '0'
   perl: '5.010001'
   strict: '0'
@@ -39,7 +40,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-GitUtils
   homepage: https://metacpan.org/release/App-GitUtils
   repository: git://github.com/perlancar/perl-App-GitUtils.git
-version: '0.084'
+version: '0.085'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -138,8 +139,12 @@ x_Dist_Zilla:
       version: '0.02'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::EnsurePrereqToSpec
+      config:
+        Dist::Zilla::Role::ModuleMetadata:
+          Module::Metadata: '1.000037'
+          version: '0.006'
       name: '@Author::PERLANCAR/PERLANCAR::EnsurePrereqToSpec'
-      version: '0.062'
+      version: '0.064'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::MetaResources
       name: '@Author::PERLANCAR/PERLANCAR::MetaResources'

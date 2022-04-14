@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 package Raisin::Encoder::JSON;
-$Raisin::Encoder::JSON::VERSION = '0.93';
+$Raisin::Encoder::JSON::VERSION = '0.94';
 use JSON::MaybeXS qw();
 
 my $json = JSON::MaybeXS->new(utf8 => 1);
@@ -17,7 +17,7 @@ sub content_type { 'application/json; charset=utf-8' }
 
 sub serialize { $json->allow_blessed->convert_blessed->encode($_[1]) }
 
-sub deserialize { $json->allow_blessed->convert_blessed->decode($_[1]) }
+sub deserialize { $json->allow_blessed->convert_blessed->decode($_[1]->content) }
 
 1;
 
@@ -33,7 +33,7 @@ Raisin::Encoder::JSON - JSON serialization plugin for Raisin.
 
 =head1 VERSION
 
-version 0.93
+version 0.94
 
 =head1 DESCRIPTION
 

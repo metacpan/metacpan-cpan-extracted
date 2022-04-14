@@ -1,0 +1,12 @@
+Build.PL
+Changes
+examples/dps3005.pl
+lib/Electronics/PSU/DPSxxxx.pm
+LICENSE
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00use.t
+t/01dps3005.t
+t/99pod.t

@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Ky::Any::Kg - Package for language Kyrgyz
 =cut
 
 package Locale::CLDR::Locales::Ky::Any::Kg;
-# This file auto generated from Data\common\main\ky_KG.xml
-#	on Sun  3 Feb  2:02:25 pm GMT
+# This file auto generated from Data/common/main/ky_KG.xml
+#	on Mon 11 Apr  5:32:26 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';

@@ -6,22 +6,19 @@
 use FindBin;
 use lib "$FindBin::Bin/mocks";
 use File::Path ();
+use File::Temp ();
 
 use Test::More tests => 24;
 use cPanel::StateFile;
 use MockCacheable;
 
-my $tmpdir   = './tmp';
+my $tmpdir   = File::Temp->newdir();
 my $dir      = "$tmpdir/state_test";
 my $file     = "$dir/state_dir/state_file";
 my $lockname = "$file.lock";
 
 # TODO: Need to testing for timeout logic, but it would slow down the tests.
 #   Decide how I would like to turn it on provisionally: cmdline, env, etc.
-
-# clean up if last run failed.
-cleanup();
-File::Path::mkpath($tmpdir) or die "Unable to create tmpdir: $!";
 
 # test valid creation
 my $mock_obj = MockCacheable->new;
@@ -92,19 +89,11 @@ ok( !-e $lockname, "File is unlocked." );
 ok( $state->synch(), 'Synch occured.' );
 ok( !-e $lockname,   "File is not locked." );
 
-is( $mock_obj->{load_called}, 1, "file changed, load." );
-is( $mock_obj->{data}, 'This is the updated state file.', 'Correct data is loaded.' );
+is( $mock_obj->{load_called}, 1,                                 "file changed, load." );
+is( $mock_obj->{data},        'This is the updated state file.', 'Correct data is loaded.' );
 
 # Test that we don't reload after the last synch
 ok( $state->synch(), 'Synch occured.' );
-is( $mock_obj->{load_called}, 1, "don't load again." );
-is( $mock_obj->{data}, 'This is the updated state file.', 'Correct data is loaded.' );
+is( $mock_obj->{load_called}, 1,                                 "don't load again." );
+is( $mock_obj->{data},        'This is the updated state file.', 'Correct data is loaded.' );
 
-cleanup();
-
-# Discard temporary files that we don't need any more.
-sub cleanup {
-    unlink $file                if -e $file;
-    unlink $lockname            if -e $lockname;
-    File::Path::rmtree($tmpdir) if -d $tmpdir;
-}

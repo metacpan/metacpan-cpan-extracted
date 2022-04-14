@@ -1,16 +1,17 @@
 Changes
-JDBC.pm
-JDBC.pod
-MANIFEST
+lib/Bundle/DBD/JDBC.pm
+lib/DBD/JDBC.pm
+lib/DBD/JDBC.pod
 Makefile.PL
+MANIFEST			This list of files
 README
 README.basis
-ToDo
-dbd_jdbc.jar
-log4j.properties
-example/PerlServlet.java
-example/testPerlServlet.pl
-lib/Bundle/DBD/JDBC.pm
+server/dbd_jdbc.jar
+server/log4j-api-2.17.1.jar
+server/log4j-core-2.17.1.jar
+server/log4j2.properties
+server/sample-command-line.txt
+t/00-load.t
 t/01_env.t
 t/02_connect.t
 t/03_hsqldb.t

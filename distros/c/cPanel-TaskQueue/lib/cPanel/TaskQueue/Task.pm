@@ -1,5 +1,5 @@
 package cPanel::TaskQueue::Task;
-$cPanel::TaskQueue::Task::VERSION = '0.902';
+$cPanel::TaskQueue::Task::VERSION = '0.903';
 use strict;
 
 #use warnings;
@@ -7,7 +7,7 @@ use strict;
 # Namespace for the ids created by this class.
 my $task_uuid = 'TaskQueue-Task';
 
-my @fields = qw/_command _argstring _args _timestamp _uuid _child_timeout _started _pid _retries _userdata/;
+my @fields                 = qw/_command _argstring _args _timestamp _uuid _child_timeout _started _pid _retries _userdata/;
 my @must_be_defined_fields = grep { $_ ne '_pid' && $_ ne '_started' } @fields;
 
 # These methods are intended to help document the importance of the message and to supply 'seam' that
@@ -92,7 +92,7 @@ sub reconstitute {
     }
     $class->_throw("Missing '_pid' field in supplied hash")     unless exists $hash->{_pid};
     $class->_throw("Missing '_started' field in supplied hash") unless exists $hash->{_started};
-    $class->_throw(q{The '_args' field must be an array}) unless ref [] eq ref $hash->{_args};
+    $class->_throw(q{The '_args' field must be an array})       unless ref [] eq ref $hash->{_args};
 
     return bless {
         %$hash,
@@ -166,7 +166,7 @@ sub get_userdata {
     my $self = shift;
     my $key  = shift;
     $self->_throw('No userdata key specified') unless defined $key;
-    return unless exists $self->{_userdata}->{$key};
+    return                                     unless exists $self->{_userdata}->{$key};
     return $self->{_userdata}->{$key};
 }
 
@@ -227,6 +227,10 @@ sub _verify_userdata_arg {
         $class->_throw("Reference values not allowed as userdata. Keys containing references: @bad_keys");
     }
     return;
+}
+
+sub TO_JSON {
+    return { %{ $_[0] } };
 }
 
 1;

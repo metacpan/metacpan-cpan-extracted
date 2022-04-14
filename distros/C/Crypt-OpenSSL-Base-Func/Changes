@@ -1,5 +1,8 @@
 Revision history for Perl extension Crypt::OpenSSL::Base::Func.
 
+0.033 2022/04/13
+    - generate_ec_key
+
 0.032 2022/04/10
     - evp_pkey_from_point_hex
     - evp_pkey_from_priv_hex

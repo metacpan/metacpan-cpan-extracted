@@ -5,14 +5,16 @@ author:
 build_requires:
   Alien::Build: '2.25'
   Alien::Build::MM: '1.41'
-  Alien::Build::Plugin::Download::GitHub: '0'
+  Alien::Build::Plugin::Download::Git: '0'
   ExtUtils::MakeMaker: '6.52'
   Test::Alien: '0'
 configure_requires:
   Alien::Build: '2.25'
   Alien::Build::MM: '1.41'
-  Alien::Build::Plugin::Download::GitHub: '0'
-  Alien::Build::Plugin::Fetch::CurlCommand: '1.19'
+  Alien::Build::Plugin::Download::Git: '0.01'
+  Alien::Build::Plugin::Extract::Directory: '0.65'
+  Alien::Build::Plugin::Fetch::Git: '0.01'
+  Alien::Build::Plugin::Prefer::SortVersions: '0.65'
   ExtUtils::MakeMaker: '6.52'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
@@ -32,18 +34,14 @@ requires:
 resources:
   bugtracker: https://github.com/PerlAlien/Alien-patchelf/issues/
   repository: https://github.com/PerlAlien/Alien-patchelf
-version: '0.04'
+version: '0.05'
 x_alienfile:
   generated_by: 'Alien::Build::MM version 2.48'
   requires:
     share:
       Alien::Autotools: '0'
-      Alien::Build::Plugin::Download::Negotiate: '1.30'
-      Archive::Tar: '0'
+      Alien::git: '0'
       Config: '0'
-      IO::Zlib: '0'
-      Mojo::DOM58: '1.00'
-      URI: '0'
-      URI::Escape: '0'
+      Sort::Versions: '0'
     system: {}
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

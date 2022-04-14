@@ -1,0 +1,5 @@
+0.1.0   Thu 14 Apr 2022 21:58:57 AEST
+        - Original release
+        - Using constant::more for backend
+        - Sets up constants for each logging level of detected/supported logging
+        system to allow compile time disabling in conditional structures

@@ -1,5 +1,5 @@
 package cPanel::StateFile;
-$cPanel::StateFile::VERSION = '0.902';
+$cPanel::StateFile::VERSION = '0.903';
 use strict;
 
 #use warnings;
@@ -25,7 +25,7 @@ my $pkg = __PACKAGE__;
 {
 
     package DefaultLogger;
-$DefaultLogger::VERSION = '0.902';
+$DefaultLogger::VERSION = '0.903';
 sub new {
         my ($class) = @_;
         return bless {}, $class;
@@ -94,7 +94,7 @@ my $are_policies_set = 0;
 sub import {
     my ( $class, @args ) = @_;
     die 'Not an even number of arguments to the $pkg module' if @args % 2;
-    die 'Policies already set elsewhere' if $are_policies_set;
+    die 'Policies already set elsewhere'                     if $are_policies_set;
     return 1 unless @args;    # Don't set the policies flag.
 
     while (@args) {
@@ -142,11 +142,11 @@ sub import {
     {
 
         package cPanel::StateFile::Guard;
-$cPanel::StateFile::Guard::VERSION = '0.902';
+$cPanel::StateFile::Guard::VERSION = '0.903';
 sub new {
             my ( $class, $args_ref ) = @_;
             $pkg->throw('Args parameter must be a hash reference.') unless 'HASH' eq ref $args_ref;
-            $pkg->throw('No StateFile.') unless exists $args_ref->{state};
+            $pkg->throw('No StateFile.')                            unless exists $args_ref->{state};
 
             my $self = bless { state_file => $args_ref->{state} }, $class;
 
@@ -340,7 +340,7 @@ sub new {
         my $data_obj = $args_ref->{data_obj};
         $self->throw('Data object does not have required interface.')
           unless eval { $data_obj->can('load_from_cache') }
-          and eval    { $data_obj->can('save_to_cache') };
+          and eval { $data_obj->can('save_to_cache') };
 
         my ( $dirname, $file ) = ( $args_ref->{state_file} =~ m{^(.*)/([^/]*)$}g );
         $dirname =~ s{[^/]+/\.\./}{/}g;    # resolve parent references

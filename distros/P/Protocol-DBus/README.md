@@ -28,9 +28,9 @@ For blocking I/O:
 For non-blocking I/O, it is recommended to use an event loop.
 This distribution includes some connectors to simplify that work:
 
-- [Protocol::DBus::Client::IOAsync](https://metacpan.org/pod/Protocol::DBus::Client::IOAsync) (for [IO::Async](https://metacpan.org/pod/IO::Async))
-- [Protocol::DBus::Client::Mojo](https://metacpan.org/pod/Protocol::DBus::Client::Mojo) (for [Mojolicious](https://metacpan.org/pod/Mojolicious))
-- [Protocol::DBus::Client::AnyEvent](https://metacpan.org/pod/Protocol::DBus::Client::AnyEvent) (for [AnyEvent](https://metacpan.org/pod/AnyEvent))
+- [Protocol::DBus::Client::IOAsync](https://metacpan.org/pod/Protocol%3A%3ADBus%3A%3AClient%3A%3AIOAsync) (for [IO::Async](https://metacpan.org/pod/IO%3A%3AAsync))
+- [Protocol::DBus::Client::Mojo](https://metacpan.org/pod/Protocol%3A%3ADBus%3A%3AClient%3A%3AMojo) (for [Mojolicious](https://metacpan.org/pod/Mojolicious))
+- [Protocol::DBus::Client::AnyEvent](https://metacpan.org/pod/Protocol%3A%3ADBus%3A%3AClient%3A%3AAnyEvent) (for [AnyEvent](https://metacpan.org/pod/AnyEvent))
 
 Example:
 
@@ -64,7 +64,7 @@ This is fine, of course, if all you want to do is, e.g., replace
 an invocation of `gdbus` or `dbus-send` with pure Perl.
 
 If you want an interface that mimics D-Bus’s actual object system,
-you’ll need to implement it yourself or use something like [Net::DBus](https://metacpan.org/pod/Net::DBus).
+you’ll need to implement it yourself or use something like [Net::DBus](https://metacpan.org/pod/Net%3A%3ADBus).
 (See ["DIFFERENCES FROM Net::DBus"](#differences-from-net-dbus) below.)
 
 # STATUS
@@ -76,13 +76,13 @@ version. Please file bug reports as appropriate.
 
 # EXAMPLES
 
-See [Protocol::DBus::Client](https://metacpan.org/pod/Protocol::DBus::Client) and the above samples for a starting point.
+See [Protocol::DBus::Client](https://metacpan.org/pod/Protocol%3A%3ADBus%3A%3AClient) and the above samples for a starting point.
 
 Also see the distribution’s `examples/` directory.
 
 # DIFFERENCES FROM Net::DBus
 
-[Net::DBus](https://metacpan.org/pod/Net::DBus) is an XS binding to
+[Net::DBus](https://metacpan.org/pod/Net%3A%3ADBus) is an XS binding to
 [libdbus](https://www.freedesktop.org/wiki/Software/dbus/),
 the reference D-Bus implementation. It is CPAN’s most mature D-Bus
 implementation.
@@ -96,7 +96,7 @@ With Protocol::DBus you give a signature directly to send a method call.
 - Protocol::DBus can work smoothly with any event system you like,
 including custom-written ones. (The distribution ships with connectors for
 three popular ones.) Net::DBus, on the other hand, expects you to use its
-own event loop, [Net::DBus::Reactor](https://metacpan.org/pod/Net::DBus::Reactor).
+own event loop, [Net::DBus::Reactor](https://metacpan.org/pod/Net%3A%3ADBus%3A%3AReactor).
 - Protocol::DBus has a considerably lighter memory footprint.
 - Protocol::DBus is pure Perl, so on most OSes you can fat-pack it
 for easy distribution.
@@ -110,9 +110,9 @@ pure-Perl one, introspection overhead notwithstanding. YMMV. BYOB.
 
 # NOTES
 
-- UNIX FD support requires that [Socket::MsgHdr](https://metacpan.org/pod/Socket::MsgHdr) be loaded at
+- UNIX FD support requires that [Socket::MsgHdr](https://metacpan.org/pod/Socket%3A%3AMsgHdr) be loaded at
 authentication time.
-- Certain OSes may require [Socket::MsgHdr](https://metacpan.org/pod/Socket::MsgHdr) in order to authenticate
+- Certain OSes may require [Socket::MsgHdr](https://metacpan.org/pod/Socket%3A%3AMsgHdr) in order to authenticate
 via a UNIX socket. (Linux, notably, does not.) It depends if your OS can
 send local socket credentials without using [sendmsg(2)](http://man.he.net/man2/sendmsg).
 - EXTERNAL and DBUS\_COOKIE\_SHA1 authentications are supported.

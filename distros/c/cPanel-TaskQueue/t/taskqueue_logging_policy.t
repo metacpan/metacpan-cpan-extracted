@@ -6,6 +6,7 @@
 use FindBin;
 use lib "$FindBin::Bin/mocks";
 use File::Path ();
+use File::Temp ();
 
 use Test::More tests => 10;
 my $logger;
@@ -22,15 +23,11 @@ like( $@, qr/Policies already/, 'Cannot reset policies to defaults.' );
 eval "use cPanel::TaskQueue ();";
 ok( !$@, 'Can reload with import turned off.' );
 
-my $tmpdir = './tmp';
-
-# clean up if last run failed.
-cleanup();
-File::Path::mkpath($tmpdir) or die "Unable to create tmpdir: $!";
+my $tmpdir = File::Temp->newdir();
 
 # test bad new calls.
 eval { my $cf = cPanel::TaskQueue->new( {} ); };
-like( $@, qr/state directory/, 'Cannot create StateFile without parameters' );
+like( $@,                         qr/state directory/,         'Cannot create StateFile without parameters' );
 like( ( $logger->get_msgs() )[0], qr/throw.*?state directory/, 'Logged correctly.' );
 $logger->reset_msgs();
 
@@ -53,9 +50,3 @@ ok( !$queue->queue_task($task), 'Finished trying to queue a task with no retries
 like( ( $logger->get_msgs() )[0], qr/info.*?0 retries/, 'Infoed correctly.' );
 $logger->reset_msgs();
 
-cleanup();
-
-# Discard temporary files that we don't need any more.
-sub cleanup {
-    File::Path::rmtree($tmpdir) if -d $tmpdir;
-}

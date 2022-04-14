@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 package Raisin::Util;
-$Raisin::Util::VERSION = '0.93';
+$Raisin::Util::VERSION = '0.94';
 use Plack::Util;
 
 sub make_tag_from_path {
@@ -40,7 +40,7 @@ Raisin::Util - Utility subroutine for Raisin.
 
 =head1 VERSION
 
-version 0.93
+version 0.94
 
 =head1 FUNCTIONS
 

@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Smn - Package for language Inari Sami
 =cut
 
 package Locale::CLDR::Locales::Smn;
-# This file auto generated from Data\common\main\smn.xml
-#	on Sun  3 Feb  2:18:08 pm GMT
+# This file auto generated from Data/common/main/smn.xml
+#	on Mon 11 Apr  5:38:04 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -1343,8 +1343,8 @@ has 'day_periods' => (
 					'pm' => q{ep.},
 				},
 				'narrow' => {
-					'pm' => q{ep.},
 					'am' => q{ip.},
+					'pm' => q{ep.},
 				},
 				'wide' => {
 					'am' => q{ip.},
@@ -1352,17 +1352,17 @@ has 'day_periods' => (
 				},
 			},
 			'stand-alone' => {
-				'narrow' => {
-					'pm' => q{ep.},
+				'abbreviated' => {
 					'am' => q{ip.},
+					'pm' => q{ep.},
+				},
+				'narrow' => {
+					'am' => q{ip.},
+					'pm' => q{ep.},
 				},
 				'wide' => {
-					'pm' => q{ep.},
 					'am' => q{ip.},
-				},
-				'abbreviated' => {
 					'pm' => q{ep.},
-					'am' => q{ip.},
 				},
 			},
 		},

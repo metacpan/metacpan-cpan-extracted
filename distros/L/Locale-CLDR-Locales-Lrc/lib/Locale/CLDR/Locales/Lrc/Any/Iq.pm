@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Lrc::Any::Iq - Package for language Northern Luri
 =cut
 
 package Locale::CLDR::Locales::Lrc::Any::Iq;
-# This file auto generated from Data\common\main\lrc_IQ.xml
-#	on Sun  3 Feb  2:03:24 pm GMT
+# This file auto generated from Data/common/main/lrc_IQ.xml
+#	on Mon 11 Apr  5:32:45 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';

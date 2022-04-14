@@ -2,8 +2,8 @@ NAME
     App::GitUtils - Day-to-day command-line utilities for git
 
 VERSION
-    This document describes version 0.084 of App::GitUtils (from Perl
-    distribution App-GitUtils), released on 2022-02-12.
+    This document describes version 0.085 of App::GitUtils (from Perl
+    distribution App-GitUtils), released on 2022-03-20.
 
 SYNOPSIS
     This distribution provides the following command-line utilities:

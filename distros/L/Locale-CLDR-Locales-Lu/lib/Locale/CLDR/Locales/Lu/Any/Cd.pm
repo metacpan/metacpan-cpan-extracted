@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Lu::Any::Cd - Package for language Luba-Katanga
 =cut
 
 package Locale::CLDR::Locales::Lu::Any::Cd;
-# This file auto generated from Data\common\main\lu_CD.xml
-#	on Sun  3 Feb  2:04:04 pm GMT
+# This file auto generated from Data/common/main/lu_CD.xml
+#	on Mon 11 Apr  5:32:56 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';

@@ -6,16 +6,13 @@ use strict;
 use warnings;
 use FindBin;
 use File::Path ();
+use File::Temp ();
 use lib "$FindBin::Bin/mocks";
 
 use cPanel::TaskQueue ( -logger => 'cPanel::FakeLogger', -serializer => 'cPanel::TQSerializer::YAML' );
 
-my $tmpdir   = './tmp';
-my $statedir = "$tmpdir/state_test";
-
-# In case the last test did not succeed.
-cleanup();
-File::Path::mkpath($statedir);
+my ( $tmpdir, $statedir );
+setup();
 
 {
     open( my $fh, '>', "$statedir/tasks_queue.yaml" );
@@ -34,8 +31,7 @@ File::Path::mkpath($statedir);
     );
 }
 
-cleanup();
-File::Path::mkpath($statedir);
+setup();
 
 {
     use YAML::Syck ();
@@ -51,9 +47,12 @@ File::Path::mkpath($statedir);
     ok( -e "$statedir/tasks_queue.yaml.broken", 'Bad file moved out of the way.' );
 }
 
-cleanup();
+exit;
 
-# Clean up after myself
-sub cleanup {
-    File::Path::rmtree($tmpdir);
+sub setup {
+    $tmpdir   = File::Temp->newdir();
+    $statedir = "$tmpdir/state_test";
+    File::Path::mkpath($statedir);
+
+    return;
 }

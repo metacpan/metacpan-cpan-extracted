@@ -31,6 +31,7 @@ t/v3/_handle_complex_types.t
 t/v3/_handle_deprecated_params.t
 t/v3/_prepare_body_options.t
 t/v3/_validate_param_type.t
+t/v3/live.t
 t/v3/methods.t
 xt/author/00-compile.t
 xt/author/pod-coverage.t

@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Mi - Package for language Maori
 =cut
 
 package Locale::CLDR::Locales::Mi;
-# This file auto generated from Data\common\main\mi.xml
-#	on Sun  3 Feb  2:04:43 pm GMT
+# This file auto generated from Data/common/main/mi.xml
+#	on Mon 11 Apr  5:33:08 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -992,27 +992,27 @@ has 'day_periods' => (
 					'am' => q{AM},
 					'pm' => q{PM},
 				},
-				'wide' => {
+				'narrow' => {
 					'am' => q{AM},
 					'pm' => q{PM},
 				},
-				'narrow' => {
+				'wide' => {
 					'am' => q{AM},
 					'pm' => q{PM},
 				},
 			},
 			'stand-alone' => {
-				'wide' => {
-					'pm' => q{PM},
+				'abbreviated' => {
 					'am' => q{AM},
+					'pm' => q{PM},
 				},
 				'narrow' => {
 					'am' => q{AM},
 					'pm' => q{PM},
 				},
-				'abbreviated' => {
-					'pm' => q{PM},
+				'wide' => {
 					'am' => q{AM},
+					'pm' => q{PM},
 				},
 			},
 		},
@@ -1116,9 +1116,6 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
-			fallback => '{0} ki te {1}',
-		},
 		'generic' => {
 			M => {
 				M => q{MM–MM},
@@ -1181,6 +1178,9 @@ has 'datetime_formats_interval' => (
 				d => q{GGGGG y-MM-dd – y-MM-dd},
 				y => q{GGGGG y-MM-dd – y-MM-dd},
 			},
+		},
+		'gregorian' => {
+			fallback => '{0} ki te {1}',
 		},
 	} },
 );

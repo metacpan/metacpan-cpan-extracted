@@ -43,7 +43,7 @@ my $lockfile = "$filename.lock";
         like( $msgs[0], qr/info: .*?Old, but empty/, 'Empty: Empty file message detected.' );
 
         my $diff = time - $start;
-        ok( $diff < 10, "Very old lockfile taken out quickly." );
+        ok( $diff < 10,                     "Very old lockfile taken out quickly." );
         ok( open( my $fh, '<', $lockfile ), 'Lockfile readable' );
         chomp( my ( $pid, $name, $wait_time ) = <$fh> );
         close($fh);

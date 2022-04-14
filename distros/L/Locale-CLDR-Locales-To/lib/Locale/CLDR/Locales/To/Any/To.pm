@@ -7,14 +7,14 @@ Locale::CLDR::Locales::To::Any::To - Package for language Tongan
 =cut
 
 package Locale::CLDR::Locales::To::Any::To;
-# This file auto generated from Data\common\main\to_TO.xml
-#	on Sun  3 Feb  2:23:49 pm GMT
+# This file auto generated from Data/common/main/to_TO.xml
+#	on Mon 11 Apr  5:40:15 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';

@@ -7,14 +7,12 @@ use strict;
 use FindBin;
 use lib "$FindBin::Bin/mocks";
 use File::Path ();
+use File::Temp ();
 
 use Test::More tests => 20;
 use cPanel::TaskQueue;
 
-my $tmpdir = './tmp';
-
-# Make sure we are clean to start with.
-File::Path::rmtree($tmpdir);
+my $tmpdir   = File::Temp->newdir();
 my $statedir = $tmpdir;
 
 eval { cPanel::TaskQueue->register_task_processor(); };
@@ -47,9 +45,9 @@ ok(
 );
 
 ok( my $qid4 = $queue->queue_task('doit a b c'), 'Added a task with new command.' );
-ok( $queue->process_next_task(),        'Task processed immediately' );
-ok( !$queue->is_task_queued($qid4),     'Task is not queued.' );
-ok( !$queue->is_task_processing($qid4), 'Task is not processing.' );
+ok( $queue->process_next_task(),                 'Task processed immediately' );
+ok( !$queue->is_task_queued($qid4),              'Task is not queued.' );
+ok( !$queue->is_task_processing($qid4),          'Task is not processing.' );
 is( $times_executed, 1, 'doit code actually executed.' );
 
 {
@@ -84,9 +82,3 @@ like( $@, qr/Missing command/, 'Must supply a non-empty command to unregister.' 
 eval { cPanel::TaskQueue->unregister_task_processor('xyzzy'); };
 like( $@, qr/not registered/, 'Command must have been registered.' );
 
-cleanup();
-
-# Clean up after myself
-sub cleanup {
-    File::Path::rmtree($tmpdir);
-}

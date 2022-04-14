@@ -1,7 +1,7 @@
 #
 # This file is part of Software-LicenseMoreUtils
 #
-# This software is copyright (c) 2018 by Dominique Dumont.
+# This software is copyright (c) 2018, 2022 by Dominique Dumont.
 #
 # This is free software; you can redistribute it and/or modify it under
 # the same terms as the Perl 5 programming language system itself.
@@ -28,7 +28,7 @@ my %WriteMakefileArgs = (
     "Carp" => 0,
     "List::Util" => 0,
     "Path::Tiny" => 0,
-    "Software::License" => 0,
+    "Software::License" => "0.103014",
     "Software::LicenseUtils" => 0,
     "Text::Template" => 0,
     "Try::Tiny" => 0,
@@ -42,7 +42,7 @@ my %WriteMakefileArgs = (
     "Test::Exception" => 0,
     "Test::More" => "1.001005"
   },
-  "VERSION" => "1.006",
+  "VERSION" => "1.007",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -53,7 +53,7 @@ my %FallbackPrereqs = (
   "Carp" => 0,
   "List::Util" => 0,
   "Path::Tiny" => 0,
-  "Software::License" => 0,
+  "Software::License" => "0.103014",
   "Software::LicenseUtils" => 0,
   "Test::Exception" => 0,
   "Test::More" => "1.001005",

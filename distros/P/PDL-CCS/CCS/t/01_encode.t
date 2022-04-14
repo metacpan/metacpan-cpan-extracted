@@ -1,6 +1,8 @@
 # -*- Mode: CPerl -*-
 # t/01_encode.t
-use Test::More tests => 83;
+use Test::More;
+use strict;
+use warnings;
 
 ##-- common subs
 my $TEST_DIR;
@@ -11,6 +13,7 @@ BEGIN {
   eval qq{use lib ("$TEST_DIR/$_/blib/lib","$TEST_DIR/$_/blib/arch");} foreach (qw(../.. ..));
   do "$TEST_DIR/common.plt" or  die("$0: failed to load $TEST_DIR/common.plt: $@");
 }
+our ($a, $abad, $agood, $awhich, $avals, $BAD);
 
 ##-- common modules
 use PDL;
@@ -28,11 +31,7 @@ sub test_basic {
   ##-- check missing
   $missing = 0 if (!defined($missing));
   $missing = PDL->topdl($missing);
-  if ($missing->isbad) {
-    $awhichND = whichND(!isbad($a));
-  } else {
-    $awhichND = whichND($a!=$missing);
-  }
+  my $awhichND = whichND($missing->isbad ? !isbad($a) : $a!=$missing);
 
   isok("${label}:_nnz",    $ccs->_nnz==$awhichND->dim(1));
   pdlok("${label}:whichND", $ccs->whichND->vv_qsortvec, $awhichND->vv_qsortvec);
@@ -49,7 +48,7 @@ sub test_basic {
 ## missing==0
 
 ##-- 1*nbasic: newFromDense(): basic properties
-$ccs = PDL::CCS::Nd->newFromDense($a);
+my $ccs = PDL::CCS::Nd->newFromDense($a);
 test_basic("newFromDense:missing=0", $a, $ccs, 0);
 
 ##-- 2*nbasic: toccs(): basic properties
@@ -85,6 +84,4 @@ test_basic("newFromWhich:missing=BAD:implicit", $a, PDL::CCS::Nd->newFromWhich($
 isok("PDL::todense():no-copy", overload::StrVal($a)   eq overload::StrVal($a->todense));
 isok("CCS::toccs():no-copy",   overload::StrVal($ccs) eq overload::StrVal($ccs->toccs));
 
-print "\n";
-# end of t/*.t
-
+done_testing;

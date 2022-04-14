@@ -6,13 +6,14 @@ use strict;
 use warnings;
 
 package Raisin::Decoder;
-$Raisin::Decoder::VERSION = '0.93';
+$Raisin::Decoder::VERSION = '0.94';
 use parent 'Raisin::Encoder';
 
 sub builtin {
     {
         json => 'Raisin::Encoder::JSON',
         yaml => 'Raisin::Encoder::YAML',
+        form => 'Raisin::Encoder::Form',
     };
 }
 
@@ -30,7 +31,7 @@ Raisin::Decoder - A helper for L<Raisin::Middleware::Formatter> over decoder mod
 
 =head1 VERSION
 
-version 0.93
+version 0.94
 
 =head1 SYNOPSIS
 

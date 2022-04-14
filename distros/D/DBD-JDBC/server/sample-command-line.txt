@@ -1,0 +1,1 @@
+java -cp "dbd_jdbc.jar:log4j-api-2.17.1.jar:log4j-core-2.17.1.jar:." -Dlog4j2.disableJmx=true -Ddbd.port=12345 com.vizdom.dbd.jdbc.Server

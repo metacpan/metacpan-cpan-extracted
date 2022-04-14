@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Vai::Vaii::Lr - Package for language Vai
 =cut
 
 package Locale::CLDR::Locales::Vai::Vaii::Lr;
-# This file auto generated from Data\common\main\vai_Vaii_LR.xml
-#	on Sun  3 Feb  2:25:41 pm GMT
+# This file auto generated from Data/common/main/vai_Vaii_LR.xml
+#	on Mon 11 Apr  5:41:00 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';

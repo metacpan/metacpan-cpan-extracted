@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.40'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 keywords:
   - locale
   - CLDR
@@ -22,37 +22,37 @@ name: Locale-CLDR-Locales-Zh
 provides:
   Locale::CLDR::Locales::Zh:
     file: lib/Locale/CLDR/Locales/Zh.pm
-    version: v0.34.0
+    version: v0.34.1
   Locale::CLDR::Locales::Zh::Hans:
     file: lib/Locale/CLDR/Locales/Zh/Hans.pm
-    version: v0.34.0
+    version: v0.34.1
   Locale::CLDR::Locales::Zh::Hans::Cn:
     file: lib/Locale/CLDR/Locales/Zh/Hans/Cn.pm
-    version: v0.34.0
+    version: v0.34.1
   Locale::CLDR::Locales::Zh::Hans::Hk:
     file: lib/Locale/CLDR/Locales/Zh/Hans/Hk.pm
-    version: v0.34.0
+    version: v0.34.1
   Locale::CLDR::Locales::Zh::Hans::Mo:
     file: lib/Locale/CLDR/Locales/Zh/Hans/Mo.pm
-    version: v0.34.0
+    version: v0.34.1
   Locale::CLDR::Locales::Zh::Hans::Sg:
     file: lib/Locale/CLDR/Locales/Zh/Hans/Sg.pm
-    version: v0.34.0
+    version: v0.34.1
   Locale::CLDR::Locales::Zh::Hant:
     file: lib/Locale/CLDR/Locales/Zh/Hant.pm
-    version: v0.34.0
+    version: v0.34.1
   Locale::CLDR::Locales::Zh::Hant::Hk:
     file: lib/Locale/CLDR/Locales/Zh/Hant/Hk.pm
-    version: v0.34.0
+    version: v0.34.1
   Locale::CLDR::Locales::Zh::Hant::Mo:
     file: lib/Locale/CLDR/Locales/Zh/Hant/Mo.pm
-    version: v0.34.0
+    version: v0.34.1
   Locale::CLDR::Locales::Zh::Hant::Tw:
     file: lib/Locale/CLDR/Locales/Zh/Hant/Tw.pm
-    version: v0.34.0
+    version: v0.34.1
 requires:
   DateTime: '0.72'
-  Locale::CLDR: v0.34.0
+  Locale::CLDR: v0.34.1
   Moo: '2'
   MooX::ClassAttribute: '0.011'
   Type::Tiny: '0'
@@ -62,5 +62,5 @@ resources:
   bugtracker: https://github.com/ThePilgrim/perlcldr/issues
   homepage: https://github.com/ThePilgrim/perlcldr
   repository: https://github.com/ThePilgrim/perlcldr.git
-version: v0.34.0
+version: v0.34.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

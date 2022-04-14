@@ -14,7 +14,7 @@ use cPanel::TaskQueue::Task;
 ok( !defined cPanel::TaskQueue::Task->reconstitute(undef), 'Leave undef alone.' );
 
 throws_ok { cPanel::TaskQueue::Task->reconstitute('foo') } qr/hash reference/, 'Dies if argument is string';
-throws_ok { cPanel::TaskQueue::Task->reconstitute( [] ) } qr/hash reference/, 'Dies if argument is array';
+throws_ok { cPanel::TaskQueue::Task->reconstitute( [] ) } qr/hash reference/,   'Dies if argument is array';
 throws_ok { cPanel::TaskQueue::Task->reconstitute( {} ) } qr/Missing .* field/, 'Dies if argument hash is empty';
 
 {
@@ -70,8 +70,8 @@ throws_ok { cPanel::TaskQueue::Task->reconstitute( {} ) } qr/Missing .* field/, 
 {
 
     # Testing reconstituting hashes invalid args
-    my $task = cPanel::TaskQueue::Task->new( { cmd => 'foo', id => 1 } );
-    my $ohash = { %{$task} };    # Clone the task hash, removing the type.
+    my $task  = cPanel::TaskQueue::Task->new( { cmd => 'foo', id => 1 } );
+    my $ohash = { %{$task} };                                                # Clone the task hash, removing the type.
     {
         my $hash = { %{$ohash}, _args => 'a string' };
         throws_ok { cPanel::TaskQueue::Task->reconstitute($hash) } qr/The '_args' field.*array/, "'_args' cannot be a string";

@@ -38,7 +38,7 @@ my $lockfile = "$filename.lock";
         print $fh 65537, "\nFred\n", time + 5, "\n";
         close($fh);
         my $start = time;
-        my $lock = eval { $locker->file_lock($filename); };
+        my $lock  = eval { $locker->file_lock($filename); };
         ok( $lock, 'Lock returned successfully' );
         my @msgs = $logger->get_msgs();
         $logger->reset_msgs();

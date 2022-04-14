@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Nus::Any::Ss - Package for language Nuer
 =cut
 
 package Locale::CLDR::Locales::Nus::Any::Ss;
-# This file auto generated from Data\common\main\nus_SS.xml
-#	on Sun  3 Feb  2:12:13 pm GMT
+# This file auto generated from Data/common/main/nus_SS.xml
+#	on Mon 11 Apr  5:35:54 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';

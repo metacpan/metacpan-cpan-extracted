@@ -1,17 +1,8 @@
 # -*- Mode: CPerl -*-
 # t/05_binops.t
 use Test::More;
-BEGIN {
-  my $N_BINOPS = 18;
-  my $N_TESTS_PER_BINOP  = 8;
-  my $N_RUNS_PER_BLOCK = 6;
-  my $N_BLOCKS = 5;
-  plan(tests=>(
-	       $N_BLOCKS*$N_RUNS_PER_BLOCK*$N_TESTS_PER_BINOP*$N_BINOPS
-	      ),
-       todo=>[]);
-  select(STDERR); $|=1; select(STDOUT); $|=1;
-}
+use strict;
+use warnings;
 
 ##-- common subs
 my $TEST_DIR;
@@ -22,11 +13,11 @@ BEGIN {
   eval qq{use lib ("$TEST_DIR/$_/blib/lib","$TEST_DIR/$_/blib/arch");} foreach (qw(../.. ..));
   do "$TEST_DIR/common.plt" or  die("$0: failed to load $TEST_DIR/common.plt: $@");
 }
+our ($a, $abad, $agood, $awhich, $avals, $BAD);
 
 ##-- common modules
 use PDL;
 use PDL::CCS::Nd;
-
 
 ##--------------------------------------------------------------
 ## basic test
@@ -60,7 +51,7 @@ sub test_binop {
   }
 
   $b  = PDL->topdl($b);
-  $as = $a->toccs($missing_val);
+  my $as = $a->toccs($missing_val);
   $bs = $b->toccs($missing_val) if (!defined($bs));
 
   ##-- test: function syntax
@@ -133,9 +124,9 @@ my ($b);
 
 ##-- Block 1 : mat * mat
 $b = $a->flat->rotate(1)->pdl->reshape($a->dims); ##-- extra pdl() before reshape() avoids realloc() crashes in PDL-2.0.14
-foreach $missing (0,127,$BAD) {   ##-- *3
-  foreach $swap (0,1) {           ##-- *2
-    foreach $op (@binops) {       ##-- *NBINOPS
+for my $missing (0,127,$BAD) {   ##-- *3
+  for my $swap (0,1) {           ##-- *2
+    for my $op (@binops) {       ##-- *NBINOPS
       if (ref($op)) { test_binop('mat.mat', $op->[0], $op->[1], $swap, $missing, $b); }
       else          { test_binop('mat.mat', $op,      undef,    $swap, $missing, $b); }
     }
@@ -144,9 +135,9 @@ foreach $missing (0,127,$BAD) {   ##-- *3
 
 ##-- Block 2 : mat * scalar
 $b = PDL->topdl(42);
-foreach $missing (0,127,$BAD) {   ##-- *3
-  foreach $swap (0,1) {           ##-- *2
-    foreach $op (@binops) {       ##-- *NBINOPS
+for my $missing (0,127,$BAD) {   ##-- *3
+  for my $swap (0,1) {           ##-- *2
+    for my $op (@binops) {       ##-- *NBINOPS
       if (ref($op)) { test_binop('mat.sclr', $op->[0], $op->[1], $swap, $missing, $b); }
       else          { test_binop('mat.sclr', $op,      undef,    $swap, $missing, $b); }
     }
@@ -155,9 +146,9 @@ foreach $missing (0,127,$BAD) {   ##-- *3
 
 ##-- Block 3 : mat * row
 $b  = sequence($a->dim(0))+1;
-foreach $missing (0,127,$BAD) {   ##-- *3
-  foreach $swap (0,1) {           ##-- *2
-    foreach $op (@binops) {       ##-- *NBINOPS
+for my $missing (0,127,$BAD) {   ##-- *3
+  for my $swap (0,1) {           ##-- *2
+    for my $op (@binops) {       ##-- *NBINOPS
       if (ref($op)) { test_binop('mat.rv', $op->[0], $op->[1], $swap, $missing, $b); }
       else          { test_binop('mat.rv', $op,      undef,    $swap, $missing, $b); }
     }
@@ -166,10 +157,10 @@ foreach $missing (0,127,$BAD) {   ##-- *3
 
 ##-- Block 4 : mat * col
 $b  = sequence(1,$a->dim(1))+1;
-$bs = $b->flat->toccs->dummy(0,1);
-foreach $missing (0,127,$BAD) {   ##-- *3
-  foreach $swap (0,1) {           ##-- *2
-    foreach $op (@binops) {       ##-- *NBINOPS
+my $bs = $b->flat->toccs->dummy(0,1);
+for my $missing (0,127,$BAD) {   ##-- *3
+  for my $swap (0,1) {           ##-- *2
+    for my $op (@binops) {       ##-- *NBINOPS
       if (ref($op)) { test_binop('mat.cv', $op->[0], $op->[1], $swap, $missing, $b,$bs); }
       else          { test_binop('mat.cv', $op,      undef,    $swap, $missing, $b,$bs); }
     }
@@ -182,18 +173,13 @@ $b  = sequence(1,$a->dim(1))+1;
 $bs = $b->flat->toccs->dummy(0,1);
 $a  = sequence($a->dim(0),1);
 $abad = ($a==0);
-foreach $missing (0,127,$BAD) {   ##-- *3
-  foreach $swap (0,1) {           ##-- *2
-    foreach $op (@binops) {       ##-- *NBINOPS
+for my $missing (0,127,$BAD) {   ##-- *3
+  for my $swap (0,1) {           ##-- *2
+    for my $op (@binops) {       ##-- *NBINOPS
       if (ref($op)) { test_binop('rv.cv', $op->[0], $op->[1], $swap, $missing, $b,$bs); }
       else          { test_binop('rv.cv', $op,      undef,    $swap, $missing, $b,$bs); }
     }
   }
 }
 
-($a,$abad) = @save;
-
-
-print "\n";
-# end of t/*.t
-
+done_testing;

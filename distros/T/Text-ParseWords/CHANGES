@@ -1,34 +1,56 @@
-3.30
-Clarified $keep flag in doc (patch from DOM)
-Added copyright and license section to pod
-Fixed pod errors (patch from DOM)
+Revision history for Perl module Text::ParseWords
 
-3.29
-Remove pod test from distribution
+3.31  2022-04-12  NEILB
+    - Skip taint tests if running under Perl that doesn't support taint
+    - Doc: restructured section describing the $keep parameter
+    - Doc: dropped the & in front of function names, as it felt old-school
+    - Doc: updated the AUTHORS section
 
-3.28
-Better diag information in pod.t
-More metadata in META.yml
+3.30_02 2022-04-11 NEILB
+    - Restructured the part that describes the $keep parameter
+    - Dropped the & in front of function names, as it felt old-school
+    - Reworded parts of the AUTHORS section
+    - All files now use strict and warnings.
 
-3.27 (CPAN version)
-Makefile.PL rewritten
-CHANGES
-pod.t
-5.6 only (regex doesn't work on 5.5.5)
-skip unicode testing on 5.6 in ParseWords.t
-"use strict" in ParseWords.pm
-small changes due to making CPAN version
+3.30_01  2022-04-09  NEILB
+    - Skip taint tests if running under Perl that doesn't support taint
+    - Added myself to AUTHORS section and fixed pod warnings in that section
+
+3.30  2015-03-11  CHORNY
+    - Clarified $keep flag in doc (patch from DOM) (RT#88485)
+    - Added copyright and license section to pod (RT#90483 & RT#90482)
+    - Fixed pod errors (patch from DOM) (RT#91762)
+
+3.29  2013-03-17  CHORNY
+    - Remove pod test from distribution
+
+3.28  2013-02-27  CHORNY
+    - Better diag information in pod.t
+    - More metadata in META.yml
+
+3.27  2008-10-26  CHORNY
+    - Makefile.PL rewritten
+    - CHANGES
+    - pod.t
+    - 5.6 only (regex doesn't work on 5.5.5)
+        * skip unicode testing on 5.6 in ParseWords.t
+        * "use strict" in ParseWords.pm
+        * small changes due to making CPAN version
 
 3.26 (perl 5.10)
-better regex in parse_line (demerphq, perl change 31659)
-trailing backslash handling (perl #40921)
+    - better regex in parse_line (demerphq, perl change 31659)
+    - trailing backslash handling (perl #40921)
 
 3.25
-more correct handling of backslashes
+    - more correct handling of backslashes
 
-versions prior to 3.24 include other fixes from core perl
 3.24 (perl 5.8.8)
-taint.t (Alexey Tourbin, perl #33173, perl change 23838)
+    - taint.t (Alexey Tourbin, perl #33173, perl change 23838)
+    - versions prior to 3.24 include other fixes from core perl
 
-3.22
-handling of backslashed newline inside quoted text
+3.22 (not released separately to CPAN)
+    - handling of backslashed newline inside quoted text
+
+3.1  1999-03-22  HALPOM
+    - First CPAN release
+

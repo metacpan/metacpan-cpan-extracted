@@ -13,7 +13,7 @@ use constant {
 use Net::Google::Drive::Simple::V2;
 use Net::Google::Drive::Simple::V3;
 
-our $VERSION = '3.00';
+our $VERSION = '3.01';
 
 ###########################################
 sub new {

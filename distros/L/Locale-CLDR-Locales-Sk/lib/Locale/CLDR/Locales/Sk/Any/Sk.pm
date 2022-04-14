@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Sk::Any::Sk - Package for language Slovak
 =cut
 
 package Locale::CLDR::Locales::Sk::Any::Sk;
-# This file auto generated from Data\common\main\sk_SK.xml
-#	on Sun  3 Feb  2:17:44 pm GMT
+# This file auto generated from Data/common/main/sk_SK.xml
+#	on Mon 11 Apr  5:37:55 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';

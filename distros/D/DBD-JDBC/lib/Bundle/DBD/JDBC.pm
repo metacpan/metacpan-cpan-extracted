@@ -1,6 +1,6 @@
 package Bundle::DBD::JDBC;
 
-$VERSION = '0.71';
+$VERSION = '0.72';
 
 1;
 

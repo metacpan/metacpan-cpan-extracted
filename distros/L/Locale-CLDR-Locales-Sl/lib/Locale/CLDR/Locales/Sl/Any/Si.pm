@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Sl::Any::Si - Package for language Slovenian
 =cut
 
 package Locale::CLDR::Locales::Sl::Any::Si;
-# This file auto generated from Data\common\main\sl_SI.xml
-#	on Sun  3 Feb  2:18:07 pm GMT
+# This file auto generated from Data/common/main/sl_SI.xml
+#	on Mon 11 Apr  5:38:04 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';

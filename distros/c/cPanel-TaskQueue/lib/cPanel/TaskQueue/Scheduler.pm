@@ -1,5 +1,5 @@
 package cPanel::TaskQueue::Scheduler;
-$cPanel::TaskQueue::Scheduler::VERSION = '0.902';
+$cPanel::TaskQueue::Scheduler::VERSION = '0.903';
 # This module handles queuing of tasks for execution. The queue is persistent
 # handles consolidating of duplicate tasks.
 
@@ -30,7 +30,7 @@ my $pkg = __PACKAGE__;
 sub import {
     my $class = shift;
     die "Not an even number of arguments to the $pkg module\n" if @_ % 2;
-    die "Policies already set elsewhere\n" if $are_policies_set;
+    die "Policies already set elsewhere\n"                     if $are_policies_set;
     return 1 unless @_;    # Don't set the policies flag.
 
     while (@_) {
@@ -80,13 +80,17 @@ sub _get_serializer {
 }
 
 # Replacement for List::Util::first, so I don't need to bring in the whole module.
-sub _first (&@) {                                      ## no critic(ProhibitSubroutinePrototypes)
+sub _first (&@) {    ## no critic(ProhibitSubroutinePrototypes)
     my $pred = shift;
     local $_;
     foreach (@_) {
         return $_ if $pred->();
     }
     return;
+}
+
+sub TO_JSON {
+    return { %{ $_[0] } };
 }
 
 # Namespace value used when creating unique task ids.
@@ -232,11 +236,11 @@ my $tasksched_uuid = 'TaskQueue-Scheduler';
         my ( $self, $command, $args ) = @_;
 
         $self->throw('Cannot queue an empty command.') unless defined $command;
-        $self->throw('Args is not a hash ref.') unless defined $args and 'HASH' eq ref $args;
+        $self->throw('Args is not a hash ref.')        unless defined $args and 'HASH' eq ref $args;
 
         my $time = time;
         $time += $args->{delay_seconds} if exists $args->{delay_seconds};
-        $time = $args->{at_time} if exists $args->{at_time};
+        $time = $args->{at_time}        if exists $args->{at_time};
 
         if ( eval { $command->isa('cPanel::TaskQueue::Task') } ) {
             if ( 0 == $command->retries_remaining() ) {
@@ -374,7 +378,7 @@ my $tasksched_uuid = 'TaskQueue-Scheduler';
         };
         my $ex = $@;
         $guard->update_file() if $count && $guard;
-        $self->throw($ex) if $ex;
+        $self->throw($ex)     if $ex;
 
         return $count;
     }
@@ -402,7 +406,7 @@ my $tasksched_uuid = 'TaskQueue-Scheduler';
         };
         my $ex = $@;
         $guard->update_file() if @ids;
-        $self->throw($ex) if $ex;
+        $self->throw($ex)     if $ex;
 
         return @ids;
     }
@@ -437,7 +441,7 @@ my $tasksched_uuid = 'TaskQueue-Scheduler';
         my ( $self, $time, $task ) = @_;
 
         my $guard = $self->{disk_state}->synch();
-        my $item = { time => $time, task => $task };
+        my $item  = { time => $time, task => $task };
 
         # if the list is empty, or time after all in list.
         if ( !@{ $self->{time_queue} } or $time >= $self->{time_queue}->[-1]->{time} ) {

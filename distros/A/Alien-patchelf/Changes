@@ -1,5 +1,8 @@
 Revision history for Alien::patchelf
 
+0.05 2022-04-14
+    - Share builds: use Download::Git plugin instead of Download::GitHub
+
 0.04 2022-04-04
     - Share builds: Use gmake on Solaris
 

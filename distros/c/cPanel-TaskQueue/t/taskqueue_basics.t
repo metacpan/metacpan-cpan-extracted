@@ -7,16 +7,13 @@ use strict;
 use FindBin;
 use lib "$FindBin::Bin/mocks";
 use File::Path ();
+use File::Temp ();
 
 use Test::More tests => 42;
 use cPanel::TaskQueue;
 
-my $tmpdir   = './tmp';
+my $tmpdir   = File::Temp->newdir();
 my $statedir = "$tmpdir/state_test";
-
-# In case the last test did not succeed.
-cleanup();
-File::Path::mkpath($tmpdir) or die "Unable to create tmpdir: $!";
 
 # Create the real TaskQueue
 my $queue = cPanel::TaskQueue->new( { name => 'tasks', state_dir => $statedir } );
@@ -58,10 +55,10 @@ ok( !$queue->queue_task("noop a b c"), 'cannot queue a duplicate command' );
 # Look at first task
 my $task = $queue->peek_next_task();
 isa_ok( $task, 'cPanel::TaskQueue::Task', 'We have a task' );
-is( $task->command(), 'noop', 'Correct command in the queue.' );
-is( join( ' ', $task->args() ), 'a b c', 'Correct command arguments.' );
-is( $task->argstring(), 'a  b  c', 'Correct command argument string.' );
-is( $task->uuid(),      $qid2,     'Correct Task id.' );
+is( $task->command(),           'noop',    'Correct command in the queue.' );
+is( join( ' ', $task->args() ), 'a b c',   'Correct command arguments.' );
+is( $task->argstring(),         'a  b  c', 'Correct command argument string.' );
+is( $task->uuid(),              $qid2,     'Correct Task id.' );
 
 # Test a second TaskQueue on same file.
 my $q2 = cPanel::TaskQueue->new( { name => 'tasks', state_dir => $statedir } );
@@ -104,10 +101,3 @@ like( $@, qr/No Task uuid/, 'Can not check processing task without a uuid' );
 
 eval { $queue->is_task_processing(1111111); };
 like( $@, qr/No Task uuid/, 'Can not check processing task with an invalid uuid' );
-
-cleanup();
-
-# Clean up after myself
-sub cleanup {
-    File::Path::rmtree($tmpdir);
-}

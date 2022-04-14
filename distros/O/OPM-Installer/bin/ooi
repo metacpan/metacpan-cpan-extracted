@@ -1,0 +1,106 @@
+#!/usr/bin/perl
+
+# PODNAME: ooi
+# ABSTRACT: Commandline tool to install Znuny/OTOBO addons
+
+use v5.10;
+
+use strict;
+use warnings;
+
+our $VERSION = '1.0.0'; # VERSION
+
+use OPM::Installer;
+use Getopt::Long;
+
+GetOptions(
+    'p=s'     => \my $package,
+    'h'       => \my $help,
+    'r=s'     => \my @repositories,
+    'v=s'     => \my $version,
+    'vv'      => \my $verbose,
+    'version' => \my $print_version,
+    'list'    => \my $list_available,
+    'sudo'    => \my $sudo,
+    'force'   => \my $force,
+);
+
+unshift @ARGV, $package if $package;
+
+if ( $print_version ) {
+    print OPM::Installer->VERSION();
+    exit;
+}
+
+if ( $list_available ) {
+    my $installer = OPM::Installer->new;
+    for my $addon ( $installer->list_available ) {
+        say sprintf "%s (%s) from\n    %s\n",
+            $addon->{name}, $addon->{version}, $addon->{url};
+    }
+    exit;
+}
+
+if( $help || !@ARGV ) {
+    print_usage();
+    exit;
+}
+
+my %opts;
+$opts{repositories} = \@repositories if @repositories;
+$opts{version}      = $version       if $version;
+
+my %class_opts;
+$class_opts{verbose} = 1             if $verbose;
+$class_opts{sudo}    = 1             if $sudo;
+$class_opts{force}   = 1             if $force;
+
+my $installer = OPM::Installer->new( %class_opts );
+
+for my $package_info ( @ARGV ) {
+    my ($package, $version) = split /=/, $package_info;
+    $opts{version}          = $version if $version;
+
+    $installer->install(
+        package => $package,
+        %opts,
+    );
+}
+
+sub print_usage {
+    print qq~$0 [-h] [-r <repository>] [-v <version>] [vv] <package> [<package>...]
+    
+    version:    exact version of otrs package to be installed
+    repository: repository for Znuny/OTOBO packages
+    help:       show this screen
+    vv:         be verbose
+~;
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+ooi - Commandline tool to install Znuny/OTOBO addons
+
+=head1 VERSION
+
+version 1.0.0
+
+=head1 AUTHOR
+
+Renee Baecker <reneeb@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2018 by Renee Baecker.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+=cut

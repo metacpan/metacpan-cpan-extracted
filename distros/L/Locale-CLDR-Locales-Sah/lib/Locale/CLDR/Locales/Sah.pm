@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Sah - Package for language Sakha
 =cut
 
 package Locale::CLDR::Locales::Sah;
-# This file auto generated from Data\common\main\sah.xml
-#	on Sun  3 Feb  2:16:25 pm GMT
+# This file auto generated from Data/common/main/sah.xml
+#	on Mon 11 Apr  5:37:24 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -1364,28 +1364,28 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'abbreviated' => {
-					'pm' => q{ЭК},
-					'am' => q{ЭИ},
-				},
-				'wide' => {
 					'am' => q{ЭИ},
 					'pm' => q{ЭК},
 				},
 				'narrow' => {
+					'am' => q{ЭИ},
+					'pm' => q{ЭК},
+				},
+				'wide' => {
 					'am' => q{ЭИ},
 					'pm' => q{ЭК},
 				},
 			},
 			'stand-alone' => {
 				'abbreviated' => {
-					'pm' => q{ЭК},
 					'am' => q{ЭИ},
-				},
-				'wide' => {
 					'pm' => q{ЭК},
-					'am' => q{ЭИ},
 				},
 				'narrow' => {
+					'am' => q{ЭИ},
+					'pm' => q{ЭК},
+				},
+				'wide' => {
 					'am' => q{ЭИ},
 					'pm' => q{ЭК},
 				},

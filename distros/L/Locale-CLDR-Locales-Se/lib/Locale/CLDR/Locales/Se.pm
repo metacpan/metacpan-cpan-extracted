@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Se - Package for language Northern Sami
 =cut
 
 package Locale::CLDR::Locales::Se;
-# This file auto generated from Data\common\main\se.xml
-#	on Sun  3 Feb  2:16:49 pm GMT
+# This file auto generated from Data/common/main/se.xml
+#	on Mon 11 Apr  5:37:33 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -2617,17 +2617,17 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'narrow' => {
-					'pm' => q{e.b.},
-					'am' => q{i.b.},
-				},
-				'wide' => {
-					'pm' => q{eahketbeaivet},
-					'am' => q{iđitbeaivet},
-				},
 				'abbreviated' => {
 					'am' => q{i.b.},
 					'pm' => q{e.b.},
+				},
+				'narrow' => {
+					'am' => q{i.b.},
+					'pm' => q{e.b.},
+				},
+				'wide' => {
+					'am' => q{iđitbeaivet},
+					'pm' => q{eahketbeaivet},
 				},
 			},
 			'stand-alone' => {
@@ -2635,13 +2635,13 @@ has 'day_periods' => (
 					'am' => q{i.b.},
 					'pm' => q{e.b.},
 				},
-				'wide' => {
-					'pm' => q{eahketbeaivi},
-					'am' => q{iđitbeaivi},
-				},
 				'narrow' => {
-					'pm' => q{e.b.},
 					'am' => q{i.b.},
+					'pm' => q{e.b.},
+				},
+				'wide' => {
+					'am' => q{iđitbeaivi},
+					'pm' => q{eahketbeaivi},
 				},
 			},
 		},

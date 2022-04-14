@@ -1,0 +1,11 @@
+{
+    "name": "Graph-Writer-GraphViz",
+    "x_static_install": true,
+    "resources": {
+        "repository": {
+            "web": "https://github.com/gugod/Graph-Writer-GraphViz",
+            "url": "https://github.com/gugod/Graph-Writer-GraphViz.git",
+            "type": "git"
+        }
+    }
+}

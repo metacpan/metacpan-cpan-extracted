@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 package Raisin::Entity;
-$Raisin::Entity::VERSION = '0.93';
+$Raisin::Entity::VERSION = '0.94';
 use parent 'Exporter';
 
 use Carp;
@@ -188,7 +188,7 @@ Raisin::Entity - A simple facade to use with your API
 
 =head1 VERSION
 
-version 0.93
+version 0.94
 
 =head1 SYNOPSIS
 

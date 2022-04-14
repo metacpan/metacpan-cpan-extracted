@@ -8,9 +8,9 @@ use App::GitUtils;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-02-12'; # DATE
+our $DATE = '2022-03-20'; # DATE
 our $DIST = 'App-GitUtils'; # DIST
-our $VERSION = '0.084'; # VERSION
+our $VERSION = '0.085'; # VERSION
 
 my $p = '/App/GitUtils/'; # prefix
 Perinci::CmdLine::Any->new(
@@ -43,7 +43,7 @@ gu - Day-to-day command-line utilities for git
 
 =head1 VERSION
 
-This document describes version 0.084 of gu (from Perl distribution App-GitUtils), released on 2022-02-12.
+This document describes version 0.085 of gu (from Perl distribution App-GitUtils), released on 2022-03-20.
 
 =head1 SYNOPSIS
 
@@ -348,7 +348,7 @@ For fish and zsh, install L<shcompgen> as described above.
 
 This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
 
-By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F</home/u1/.config/W6YpRHJBn3.conf>, F</home/u1/W6YpRHJBn3.conf>, or F</etc/W6YpRHJBn3.conf>.
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F</home/u1/.config/9GxTiV7elC.conf>, F</home/u1/9GxTiV7elC.conf>, or F</etc/9GxTiV7elC.conf>.
 
 All found files will be read and merged.
 
@@ -413,17 +413,17 @@ List of available configuration parameters:
 
 =head1 ENVIRONMENT
 
-=head2 W6YPRHJBN3_OPT => str
+=head2 _9GXTIV7ELC_OPT => str
 
 Specify additional command-line options.
 
 =head1 FILES
 
-F</home/u1/.config/W6YpRHJBn3.conf>
+F</home/u1/.config/9GxTiV7elC.conf>
 
-F</home/u1/W6YpRHJBn3.conf>
+F</home/u1/9GxTiV7elC.conf>
 
-F</etc/W6YpRHJBn3.conf>
+F</etc/9GxTiV7elC.conf>
 
 =head1 HOMEPAGE
 

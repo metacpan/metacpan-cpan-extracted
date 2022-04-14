@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 package Raisin::Entity::Object;
-$Raisin::Entity::Object::VERSION = '0.93';
+$Raisin::Entity::Object::VERSION = '0.94';
 use Plack::Util::Accessor qw(
     desc
     name
@@ -66,7 +66,7 @@ Raisin::Entity::Object - An expose object.
 
 =head1 VERSION
 
-version 0.93
+version 0.94
 
 =head1 DESCRIPTION
 

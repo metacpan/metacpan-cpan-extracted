@@ -1,5 +1,10 @@
 Revision history for AnyEvent-FTP
 
+0.19      2022-04-12 10:33:09 -0600
+  - Fix prereq on autodie (gh#33)
+  - Fix bug in where socket handle wasn't being properly
+    destroyed after use (gh#32)
+
 0.18      2021-10-28 09:18:40 -0600
   - Fix test that could fail on some platforms because
     regexp wasn't correctly escaped (gh#31)

@@ -2,11 +2,10 @@ use ExtUtils::MakeMaker;
 require "./pdlmaker.plm";
 pdlmaker_init();
 
-##-- preqrequistes (for PREREQ_PM)
+##-- prerequisites (for PREREQ_PM)
 my %prereq = (
 	      'PDL' => '2.019',
 	      'PDL::VectorValued' => '1.0.4',
-	      'Test::More' => 0,
 	      'File::Basename' => 0,
 	     );
 
@@ -36,6 +35,9 @@ WriteMakefile(
 		    ],
 	      realclean=>{ FILES=>$realclean_files, },
 	      PREREQ_PM => {%prereq},
+	      TEST_REQUIRES => {
+		'Test::More' => '0.88',
+	      },
 	      CONFIGURE_REQUIRES => {
 				     %prereq,
 				     'ExtUtils::MakeMaker'=>0,

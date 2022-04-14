@@ -25,6 +25,7 @@ $modules{$_} = $_ for qw(
   Test2::API
   Test2::V0
   URI
+  autodie
 );
 
 $post_diag = sub {

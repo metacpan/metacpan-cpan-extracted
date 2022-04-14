@@ -62,7 +62,7 @@ EVP_PKEY* pem_read_pkey(char* keyfile, int is_priv) {
     return pkey;
 }
 
-int ecdh_pkey(EVP_PKEY *pkey_priv, EVP_PKEY *pkey_peer_pub, unsigned char **z)
+int ecdh_pkey_raw(EVP_PKEY *pkey_priv, EVP_PKEY *pkey_peer_pub, unsigned char **z)
 {
     size_t zlen;
 

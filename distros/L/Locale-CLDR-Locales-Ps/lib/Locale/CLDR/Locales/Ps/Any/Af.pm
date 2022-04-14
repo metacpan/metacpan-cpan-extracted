@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Ps::Any::Af - Package for language Pashto
 =cut
 
 package Locale::CLDR::Locales::Ps::Any::Af;
-# This file auto generated from Data\common\main\ps_AF.xml
-#	on Sun  3 Feb  2:13:56 pm GMT
+# This file auto generated from Data/common/main/ps_AF.xml
+#	on Mon 11 Apr  5:36:29 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';

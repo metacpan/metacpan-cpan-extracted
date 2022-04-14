@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Mg - Package for language Malagasy
 =cut
 
 package Locale::CLDR::Locales::Mg;
-# This file auto generated from Data\common\main\mg.xml
-#	on Sun  3 Feb  2:04:39 pm GMT
+# This file auto generated from Data/common/main/mg.xml
+#	on Mon 11 Apr  5:33:07 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -1026,13 +1026,13 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
-					'pm' => q{PM},
-					'am' => q{AM},
-				},
 				'abbreviated' => {
-					'pm' => q{PM},
 					'am' => q{AM},
+					'pm' => q{PM},
+				},
+				'wide' => {
+					'am' => q{AM},
+					'pm' => q{PM},
 				},
 			},
 			'stand-alone' => {
@@ -1045,8 +1045,8 @@ has 'day_periods' => (
 					'pm' => q{PM},
 				},
 				'wide' => {
-					'pm' => q{PM},
 					'am' => q{AM},
+					'pm' => q{PM},
 				},
 			},
 		},

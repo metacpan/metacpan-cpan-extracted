@@ -18,6 +18,7 @@ After installing, you can find documentation for these modules with the
 perldoc command.
 
     perldoc bigint
+    perldoc bigfloat
     perldoc bigrat
     perldoc bignum
 

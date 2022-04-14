@@ -7,14 +7,14 @@ Locale::CLDR::Locales::So::Any::Et - Package for language Somali
 =cut
 
 package Locale::CLDR::Locales::So::Any::Et;
-# This file auto generated from Data\common\main\so_ET.xml
-#	on Sun  3 Feb  2:18:28 pm GMT
+# This file auto generated from Data/common/main/so_ET.xml
+#	on Mon 11 Apr  5:38:12 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';

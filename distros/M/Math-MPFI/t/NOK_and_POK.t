@@ -3,7 +3,7 @@ use warnings;
 use Math::MPFR qw(:mpfr);
 use Math::MPFI qw(:mpfi);
 
-print "1..27\n";
+print "1..28\n";
 
 my $n = '98765' x 80;
 my $r = '98765' x 80;
@@ -52,6 +52,7 @@ $discard    = eval{"$nan"}; # POK flag is now also set for $nan (mostly)
 adj($inf, \$check, 1);
 
 $z = Math::MPFI->new($inf);
+$check++ if Math::MPFI::ISSUE_19550;
 
 if(Math::MPFI::nok_pokflag() == $check) {print "ok 5\n"}
 else {
@@ -83,6 +84,7 @@ else {
 }
 
 adj($nan, \$check, 1);
+$check++ if Math::MPFI::ISSUE_19550;
 
 my $z2 = Math::MPFI->new($nan);
 
@@ -268,7 +270,7 @@ else {
 
 my $nv = 1.3;
 my $s  = "$nv"; # $nv should be POK && NOK if MPFR_PV_NV_BUG is 1
-                # Else (ie MPFR_NV_BUG is 0) $nv should be POK only.
+                # Else (ie MPFR_NV_BUG is 0) $nv should be NOK only.
 
 $z = Math::MPFI->new($nv);
 
@@ -280,6 +282,20 @@ else {
   print "not ok 27\n";
 }
 
+if(Math::MPFI::ISSUE_19550) {
+  if($] < 5.035010) {
+    warn "ISSUE_19550 unexpectedly set\n";
+    print "not ok 28\n";
+  }
+  else {
+    warn "ISSUE_19550 set\n";
+    print "ok 28\n";
+  }
+}
+else {
+  warn "ISSUE_19550 not set\n";
+  print "ok 28\n";
+}
 
 ########
 

@@ -21,6 +21,13 @@ can_ok(
       update_comment
       copy_file
       create_file
+      upload_media_file
+      upload_multipart_file
+      create_resumable_upload_for
+      create_resumable_upload
+      upload_file_content_single
+      upload_file_content_multiple
+      upload_file_content_iterator
       upload_file
       delete_file
       export_file

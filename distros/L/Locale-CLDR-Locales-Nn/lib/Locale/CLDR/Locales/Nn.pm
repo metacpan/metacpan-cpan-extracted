@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Nn - Package for language Norwegian Nynorsk
 =cut
 
 package Locale::CLDR::Locales::Nn;
-# This file auto generated from Data\common\main\nn.xml
-#	on Sun  3 Feb  2:11:47 pm GMT
+# This file auto generated from Data/common/main/nn.xml
+#	on Mon 11 Apr  5:35:45 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -5853,12 +5853,12 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'abbreviated' => {
-					'pm' => q{e.m.},
 					'am' => q{f.m.},
+					'pm' => q{e.m.},
 				},
 				'narrow' => {
-					'pm' => q{e.m.},
 					'am' => q{f.m.},
+					'pm' => q{e.m.},
 				},
 				'wide' => {
 					'am' => q{formiddag},
@@ -5866,6 +5866,10 @@ has 'day_periods' => (
 				},
 			},
 			'stand-alone' => {
+				'abbreviated' => {
+					'am' => q{f.m.},
+					'pm' => q{e.m.},
+				},
 				'narrow' => {
 					'am' => q{f.m.},
 					'pm' => q{e.m.},
@@ -5873,10 +5877,6 @@ has 'day_periods' => (
 				'wide' => {
 					'am' => q{f.m.},
 					'pm' => q{e.m.},
-				},
-				'abbreviated' => {
-					'pm' => q{e.m.},
-					'am' => q{f.m.},
 				},
 			},
 		},

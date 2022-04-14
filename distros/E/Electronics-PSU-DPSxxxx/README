@@ -1,0 +1,117 @@
+NAME
+
+    Electronics::PSU::DPSxxxx - control a DPS power supply
+
+SYNOPSIS
+
+       use Future::AsyncAwait;
+    
+       use Electronics::PSU::DPSxxxx;
+    
+       my $psu = Electronics::PSU::DPSxxxx->new( dev => "/dev/ttyUSB0" );
+    
+       await $psu->set_voltage( 1.23  ); # volts
+       await $psu->set_current( 0.200 ); # amps
+    
+       await $psu->set_output_state( 1 ); # turn it on!
+
+DESCRIPTION
+
+    This module allows control of a RDTech DPS-series power supply, such as
+    the DPS3005, when connected over a serial port.
+
+ Interface Design
+
+    The interface is currently an ad-hoc collection of whatever seems to
+    work here, but my hope is to find a more generic shareable interface
+    that multiple differenet modules can use, to provide interfaces to
+    various kinds of electronics test equipment.
+
+    The intention is that it should eventually be possible to write a
+    script for performing automated electronics testing or experimentation,
+    and easily swap out modules to suit the equipment available. Similar
+    concepts apply in fields like DBI, or Device::Chip, so there should be
+    plenty of ideas to borrow.
+
+METHODS
+
+ set_voltage
+
+       await $psu->set_voltage( $volts );
+
+    Sets the output voltage, in volts.
+
+ set_current
+
+       await $psu->set_current( $amps );
+
+    Sets the output current, in amps.
+
+ read_output_voltage
+
+       $volts = await $psu->read_output_voltage;
+
+    Returns the measured voltage at the output terminals, in volts.
+
+ read_output_current
+
+       $amps = await $psu->read_output_current;
+
+    Returns the measured current at the output terminals, in amps.
+
+ read_input_voltage
+
+       $volts = await $psu->read_input_voltage;
+
+    Returns the input voltage to the PSU module, in volts.
+
+ read_output_protect
+
+       $protect = await $psu->read_output_protect;
+
+    Returns the output protection state as a string, either "ok" if
+    protection has not been triggered, or one of "OVP", "OCP" or "OPP" if
+    any of the protection mechanisms have been triggered.
+
+ read_output_mode
+
+       $mode = await $psu->read_output_mode;
+
+    Returns the output mode, as a string either "CV" for constant-voltage
+    or "CC" for constant-current.
+
+ read_multiple
+
+       @readings = await $psu->read_multiple( @names )
+
+    Returns multiple measurements in a single query. This is faster than
+    performing several individual read requests. @names should be a list of
+    string names, taken from the read_... method names. For example:
+
+       my ( $volts, $amps ) =
+          await $psu->read_multiple(qw( output_voltage output_current ));
+
+    Results are returned in the same order as the requested names.
+
+ set_output_state
+
+       await $psu->set_output_state( $on );
+
+    Switches output on / off.
+
+ read_model
+
+       $model = await $psu->read_model;
+
+    Returns the model number (e.g. 3005 for DPS3005).
+
+ read_version
+
+       $version = await $psu->read_version;
+
+    Returns firmware version as an integer.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

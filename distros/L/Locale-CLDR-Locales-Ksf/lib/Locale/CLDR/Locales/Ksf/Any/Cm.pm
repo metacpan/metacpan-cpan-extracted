@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Ksf::Any::Cm - Package for language Bafia
 =cut
 
 package Locale::CLDR::Locales::Ksf::Any::Cm;
-# This file auto generated from Data\common\main\ksf_CM.xml
-#	on Sun  3 Feb  2:01:51 pm GMT
+# This file auto generated from Data/common/main/ksf_CM.xml
+#	on Mon 11 Apr  5:32:16 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';

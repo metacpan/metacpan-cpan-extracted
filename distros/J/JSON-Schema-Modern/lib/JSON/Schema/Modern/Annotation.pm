@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Annotation;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Contains a single annotation from a JSON Schema evaluation
 
-our $VERSION = '0.549';
+our $VERSION = '0.550';
 
 use 5.020;
 use Moo;
@@ -58,6 +58,12 @@ sub TO_JSON ($self) {
   };
 }
 
+sub dump ($self) {
+  my $encoder = JSON::MaybeXS->new(utf8 => 0, convert_blessed => 1, canonical => 1, pretty => 1);
+  $encoder->indent_length(2) if $encoder->can('indent_length');
+  $encoder->encode($self);
+}
+
 1;
 
 __END__
@@ -74,7 +80,7 @@ JSON::Schema::Modern::Annotation - Contains a single annotation from a JSON Sche
 
 =head1 VERSION
 
-version 0.549
+version 0.550
 
 =head1 SYNOPSIS
 
@@ -135,6 +141,11 @@ L<https://json-schema.org/draft/2019-09/output/schema>, except that C<instanceLo
 C<keywordLocation> are JSON pointers, B<not> URI fragments. (See the
 C<strict_basic> L<JSON::Schema::Modern/output_format>
 if the distinction is important to you.)
+
+=head2 dump
+
+Returns a JSON string representing the error object, according to
+the L<specification|https://json-schema.org/draft/2019-09/json-schema-core.html#rfc.section.10>.
 
 =for stopwords OpenAPI
 

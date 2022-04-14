@@ -1,13 +1,13 @@
 #
 # This file is part of Software-LicenseMoreUtils
 #
-# This software is copyright (c) 2018 by Dominique Dumont.
+# This software is copyright (c) 2018, 2022 by Dominique Dumont.
 #
 # This is free software; you can redistribute it and/or modify it under
 # the same terms as the Perl 5 programming language system itself.
 #
 package Software::LicenseMoreUtils::LGPL_2;
-$Software::LicenseMoreUtils::LGPL_2::VERSION = '1.006';
+$Software::LicenseMoreUtils::LGPL_2::VERSION = '1.007';
 use strict;
 use warnings;
 
@@ -32,7 +32,7 @@ Software::LicenseMoreUtils::LGPL_2 - GNU Library General Public License, Version
 
 =head1 VERSION
 
-version 1.006
+version 1.007
 
 =head1 NAME
 
@@ -44,7 +44,7 @@ Dominique Dumont
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Dominique Dumont.
+This software is copyright (c) 2018, 2022 by Dominique Dumont.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

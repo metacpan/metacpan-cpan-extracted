@@ -7,7 +7,7 @@ use strict;
 use FindBin;
 use lib "$FindBin::Bin/mocks";
 
-use Test::More tests => 27;
+use Test::More tests => 28;
 use cPanel::TaskQueue::Task;
 
 my $t1 = cPanel::TaskQueue::Task->new( { cmd => 'noop', id => 1, timeout => 10 } );
@@ -36,7 +36,7 @@ is_deeply( [ $t3->args() ], [ q{a b}, q{c d}, q{e} ], 'quoted args: args list is
 
 my $t4 = cPanel::TaskQueue::Task->new( { cmd => q{noop  'a \\'b\\''   "\\"c \\" d"  e}, id => 5, timeout => 10 } );
 
-is( $t4->command(), 'noop', 'escaped quoted args: command is correct' );
+is( $t4->command(),   'noop',                           'escaped quoted args: command is correct' );
 is( $t4->argstring(), q{'a \\'b\\''   "\\"c \\" d"  e}, 'escaped quoted args: argstring is correct' );
 is_deeply( [ $t4->args() ], [ q{a 'b'}, q{"c " d}, q{e} ], 'escaped quoted args: args list is correct' );
 
@@ -58,3 +58,5 @@ is( $t1->pid, $$, ' ... but I can give it one.' );
 ok( cPanel::TaskQueue::Task::is_valid_taskid( $t1->uuid() ), 'Taskid is not valid.' );
 ok( !cPanel::TaskQueue::Task::is_valid_taskid(),             'Missing taskid is not valid.' );
 ok( !cPanel::TaskQueue::Task::is_valid_taskid('fred'),       'badly formed taskid is not valid.' );
+
+is_deeply cPanel::TaskQueue::Task::TO_JSON( { 1 .. 6 } ), { 1 .. 6 }, "naive TO_JSON helper";

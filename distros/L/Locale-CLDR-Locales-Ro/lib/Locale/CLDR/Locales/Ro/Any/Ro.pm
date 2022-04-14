@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Ro::Any::Ro - Package for language Romanian
 =cut
 
 package Locale::CLDR::Locales::Ro::Any::Ro;
-# This file auto generated from Data\common\main\ro_RO.xml
-#	on Sun  3 Feb  2:15:21 pm GMT
+# This file auto generated from Data/common/main/ro_RO.xml
+#	on Mon 11 Apr  5:37:02 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';

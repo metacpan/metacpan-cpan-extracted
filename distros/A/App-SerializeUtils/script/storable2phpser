@@ -1,11 +1,15 @@
 #!perl
 
-our $DATE = '2021-04-22'; # DATE
-our $VERSION = '0.164'; # VERSION
+## no critic: InputOutput::ProhibitInteractiveTest
 
 use 5.010001;
 use strict;
 use warnings;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-03-20'; # DATE
+our $DIST = 'App-SerializeUtils'; # DIST
+our $VERSION = '0.165'; # VERSION
 
 my ($from, $to) = $0 =~ /(\w+)2(\w+)\z/;
 $from //= "";
@@ -41,10 +45,10 @@ GET_OPTIONS: {
         unless $res;
 
     $Opts{color} //= $ENV{COLOR} // (-t STDOUT) //
-        ($to eq 'ddc' || $to eq 'json' ? 1:0);
+        ($to eq 'perlcolor' || $to eq 'json' ? 1:0);
     $Opts{dumper} //=
         $Opts{compact} ? 'Data::Dmp' :
-        $to eq 'ddc' || $Opts{color} ? 'Data::Dump::Color' :
+        $to eq 'perlcolor' || $Opts{color} ? 'Data::Dump::Color' :
         'Data::Dump';
     #use DD; print "to=$to\n"; dd \%Opts;
 
@@ -53,7 +57,7 @@ GET_OPTIONS: {
 my $code_from;
 PARSE_INPUT: {
     undef $/;
-    if ($from =~ /\A(dd?)\z/) {
+    if ($from =~ /\A(perl|perlcolor)\z/) {
         if ($Opts{safe}) {
             require Data::Undump;
             $code_from = 'Data::Undump::undump(scalar <>)';
@@ -86,7 +90,7 @@ PARSE_INPUT: {
 
 my $code_to;
 OUTPUT: {
-    if ($to =~ /\A(ddc?)\z/) {
+    if ($to =~ /\A(perl|perlcolor)\z/) {
         if ($Opts{dumper} eq 'Data::Dump::Color') {
             require Data::Dump::Color;
             $code_to = "Data::Dump::Color::dump($code_from)";
@@ -143,7 +147,7 @@ OUTPUT: {
         die "serializeutils-convert: Can't convert to '$to'\n";
     }
 
-    eval "print $code_to";
+    eval "print $code_to"; ## no critic: BuiltinFunctions::ProhibitStringyEval
     die if $@;
 } # OUTPUT
 
@@ -162,7 +166,7 @@ storable2phpser - Convert between serialization formats
 
 =head1 VERSION
 
-This document describes version 0.164 of storable2phpser (from Perl distribution App-SerializeUtils), released on 2021-04-22.
+This document describes version 0.165 of storable2phpser (from Perl distribution App-SerializeUtils), released on 2022-03-20.
 
 =head1 SYNOPSIS
 
@@ -179,10 +183,10 @@ For example, when called as C<json2yaml>:
 This script can be called as various names to convert between serialization
 formats.
 
-"dd" refers to Perl format, generated using L<Data::Dump> or L<Data::Dumper> and
-parsed using Perl's C<eval()> or L<Data::Undump>.
+"perl" refers to Perl format, generated using L<Data::Dump> or L<Data::Dumper>
+and parsed using Perl's C<eval()> or L<Data::Undump>.
 
-"ddc" refers to colored Perl format, generated using L<Data::Dump::Color>.
+"perlcolor" refers to colored Perl format, generated using L<Data::Dump::Color>.
 
 "json" is of course the popular JavaScript Object Notation described in
 L<https://www.json.org>.
@@ -202,43 +206,43 @@ L<https://www.yaml.org>.
 
 The script are installed as the following names for convenience:
 
- dd2ddc
- dd2json
- dd2phpser
- dd2sereal
- dd2storable
- dd2yaml
+ perl2perlcolor
+ perl2json
+ perl2phpser
+ perl2sereal
+ perl2storable
+ perl2yaml
 
- json2dd
- json2ddc
+ json2perl
+ json2perlcolor
  json2phpser
  json2sereal
  json2storable
  json2yaml
 
- phpser2dd
- phpser2ddc
+ phpser2perl
+ phpser2perlcolor
  phpser2json
  phpser2sereal
  phpser2storable
  phpser2yaml
 
- sereal2dd
- sereal2ddc
+ sereal2perl
+ sereal2perlcolor
  sereal2json
  sereal2phpser
  sereal2storable
  sereal2yaml
 
- storable2dd
- storable2ddc
+ storable2perl
+ storable2perlcolor
  storable2json
  storable2phpser
  storable2sereal
  storable2yaml
 
- yaml2dd
- yaml2ddc
+ yaml2perl
+ yaml2perlcolor
  yaml2json
  yaml2phpser
  yaml2sereal
@@ -250,22 +254,22 @@ The script are installed as the following names for convenience:
 
 =item * --(no-)color
 
-Only applies to output formats C<dd>, C<ddc>, C<json>, C<yaml>.
+Only applies to output formats C<perl>, C<perlcolor>, C<json>, C<yaml>.
 
 Whether to use colors. The default is from the COLOR environment variable, or
 1 when script is called interactively.
 
 =item * --(no-)compact
 
-Only applies to output formats C<json>, C<dd>.
+Only applies to output formats C<json>, C<perl>.
 
 Whether to produce compact output. The default is false when outputing
-interactively. For format C<dd>, will use L<Data::Dmp> when producing compact
+interactively. For format C<perl>, will use L<Data::Dmp> when producing compact
 output.
 
 =item * --(no-)safe
 
-Only applies to input format C<dd>.
+Only applies to input format C<perl>.
 
 Whether to parse safely. The default is false, which means parsing using Perl's
 C<eval>. When set to true, will parse using L<Data::Undump> but parsing might
@@ -273,7 +277,7 @@ fail for more complex input, e.g. recursive data structures.
 
 =item * --dumper=s
 
-Only applies to output format C<dd>.
+Only applies to output format C<perl>.
 
 Set which dumper to use. Can be set to C<Data::Dump> or C<Data::Dump::Color> or
 C<Data::Dumper>. The default is C<Data::Dump>.
@@ -328,14 +332,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-Serial
 
 Source repository is at L<https://github.com/perlancar/perl-App-SerializeUtils>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-SerializeUtils/issues>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<App::SerializeUtils>
@@ -344,11 +340,36 @@ L<App::SerializeUtils>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2018, 2017, 2015, 2014, 2013, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2022, 2021, 2020, 2018, 2017, 2015, 2014, 2013, 2011 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-SerializeUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Ksh - Package for language Colognian
 =cut
 
 package Locale::CLDR::Locales::Ksh;
-# This file auto generated from Data\common\main\ksh.xml
-#	on Sun  3 Feb  2:01:51 pm GMT
+# This file auto generated from Data/common/main/ksh.xml
+#	on Mon 11 Apr  5:32:16 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -3289,14 +3289,14 @@ has 'day_periods' => (
 					'pm' => q{n.M.},
 				},
 				'wide' => {
-					'pm' => q{Uhr nommendaachs},
 					'am' => q{Uhr vörmiddaachs},
+					'pm' => q{Uhr nommendaachs},
 				},
 			},
 			'stand-alone' => {
 				'wide' => {
-					'pm' => q{Nommendaach},
 					'am' => q{Vörmeddaach},
+					'pm' => q{Nommendaach},
 				},
 			},
 		},

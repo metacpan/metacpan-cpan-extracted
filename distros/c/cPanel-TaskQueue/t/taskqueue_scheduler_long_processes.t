@@ -28,7 +28,7 @@ use MockQueue;
     my $q = MockQueue->new();
 
     ok( $sched->schedule_task( 'noop 0', { at_time => time } ), 'command scheduled for now.' );
-    is( $sched->process_ready_tasks($q), 1, 'task queued' );
+    is( $sched->process_ready_tasks($q),        1,        'task queued' );
     is( ( $q->get_tasks() )[0]->full_command(), 'noop 0', 'Correct task.' );
     $q->clear_tasks();
 

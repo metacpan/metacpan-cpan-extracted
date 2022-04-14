@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Ro::Any::Md - Package for language Romanian
 =cut
 
 package Locale::CLDR::Locales::Ro::Any::Md;
-# This file auto generated from Data\common\main\ro_MD.xml
-#	on Sun  3 Feb  2:15:21 pm GMT
+# This file auto generated from Data/common/main/ro_MD.xml
+#	on Mon 11 Apr  5:37:02 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -233,22 +233,22 @@ has 'day_period_data' => (
 					return 'noon' if $time == 1200;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
-					return 'night1' if $time >= 2200;
-					return 'night1' if $time < 500;
 					return 'evening1' if $time >= 1800
 						&& $time < 2200;
 					return 'morning1' if $time >= 500
 						&& $time < 1200;
+					return 'night1' if $time >= 2200;
+					return 'night1' if $time < 500;
 				}
 				if($day_period_type eq 'selection') {
-					return 'morning1' if $time >= 500
-						&& $time < 1200;
-					return 'evening1' if $time >= 1800
-						&& $time < 2200;
-					return 'night1' if $time >= 2200;
-					return 'night1' if $time < 500;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
+					return 'evening1' if $time >= 1800
+						&& $time < 2200;
+					return 'morning1' if $time >= 500
+						&& $time < 1200;
+					return 'night1' if $time >= 2200;
+					return 'night1' if $time < 500;
 				}
 				last SWITCH;
 				}
@@ -268,33 +268,33 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
-					'morning1' => q{dimineața},
-					'midnight' => q{miezul nopții},
-					'evening1' => q{seara},
-					'night1' => q{noaptea},
-					'noon' => q{amiază},
-					'afternoon1' => q{după-amiaza},
-				},
 				'narrow' => {
-					'night1' => q{noapte},
 					'afternoon1' => q{după-amiază},
-					'noon' => q{amiază},
-					'morning1' => q{dimineață},
 					'evening1' => q{seară},
 					'midnight' => q{miezul nopții},
+					'morning1' => q{dimineață},
+					'night1' => q{noapte},
+					'noon' => q{amiază},
+				},
+				'wide' => {
+					'afternoon1' => q{după-amiaza},
+					'evening1' => q{seara},
+					'midnight' => q{miezul nopții},
+					'morning1' => q{dimineața},
+					'night1' => q{noaptea},
+					'noon' => q{amiază},
 				},
 			},
 			'stand-alone' => {
+				'narrow' => {
+					'afternoon1' => q{după-amiază},
+					'evening1' => q{seară},
+					'morning1' => q{dimineață},
+					'night1' => q{noapte},
+				},
 				'wide' => {
 					'midnight' => q{miezul nopții},
 					'noon' => q{amiază},
-				},
-				'narrow' => {
-					'evening1' => q{seară},
-					'morning1' => q{dimineață},
-					'afternoon1' => q{după-amiază},
-					'night1' => q{noapte},
 				},
 			},
 		},

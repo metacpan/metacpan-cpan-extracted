@@ -1,4 +1,7 @@
-use ExtUtils::MakeMaker;
+use strict;
+use warnings;
+
+use ExtUtils::MakeMaker::CPANfile;
 
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
@@ -25,33 +28,6 @@ WriteMakefile1(
 
     # Because of X::Tiny
     MIN_PERL_VERSION => 5.010000,
-
-    PREREQ_PM    => {
-        'parent'    => 0,
-        'X::Tiny'   => 0,
-        'Module::Runtime'  => 0,
-        'Call::Context' => 0,
-        'IO::Framed' => 0.15,
-        'IO::SigGuard' => 0.13,
-        'Promise::ES6' => 0,
-
-        # Perl 5.10.1 ships 1.82, which mishandles
-        # abstract-namespace Linux sockets.
-        # … and pre-2.011 mishandled UNIX socket length
-        # on cygwin.
-        'Socket' => 2.011,
-    },
-
-    TEST_REQUIRES => {
-        'autodie'         => 0,
-        'FindBin'         => 0,
-        'File::Which'     => 0,
-        'Test::Exception' => 0,
-        'Test::More'      => 0,
-        'Test::Deep' => 0,
-        'Test::FailWarnings' => 0,
-        'Test::SharedFork' => 0,
-    },
 );
 
 sub WriteMakefile1 {  #Compatibility code for old versions of EU::MM. Written by Alexandr Ciornii, version 2. Added by eumm-upgrade.

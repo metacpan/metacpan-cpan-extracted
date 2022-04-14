@@ -1,13 +1,13 @@
 #
 # This file is part of Software-LicenseMoreUtils
 #
-# This software is copyright (c) 2018 by Dominique Dumont.
+# This software is copyright (c) 2018, 2022 by Dominique Dumont.
 #
 # This is free software; you can redistribute it and/or modify it under
 # the same terms as the Perl 5 programming language system itself.
 #
 package Software::LicenseMoreUtils;
-$Software::LicenseMoreUtils::VERSION = '1.006';
+$Software::LicenseMoreUtils::VERSION = '1.007';
 use strict;
 use warnings;
 use 5.10.1;
@@ -15,7 +15,7 @@ use 5.10.1;
 use Try::Tiny;
 use Carp;
 use Software::LicenseMoreUtils::LicenseWithSummary;
-
+use Software::License 0.103014;
 
 # ABSTRACT: More utilities and a summary for Software::License
 
@@ -129,7 +129,7 @@ Software::LicenseMoreUtils - More utilities and a summary for Software::License
 
 =head1 VERSION
 
-version 1.006
+version 1.007
 
 =head1 SYNOPSIS
 
@@ -227,7 +227,7 @@ Dominique Dumont
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Dominique Dumont.
+This software is copyright (c) 2018, 2022 by Dominique Dumont.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

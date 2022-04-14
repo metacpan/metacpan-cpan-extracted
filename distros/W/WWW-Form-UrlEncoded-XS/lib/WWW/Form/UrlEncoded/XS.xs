@@ -221,9 +221,11 @@ parse_urlencoded(qs)
             mPUSHs(url_decode(aTHX_ src, p - prev + prev_s + f, i ));
         }
 
-        if ( src[src_len-1] == '&' || src[src_len-1] == ';' ) {
-            mPUSHs(newSVpv("",0));
-            mPUSHs(newSVpv("",0));
+        if ( src_len > 0 ) {
+            if ( src[src_len-1] == '&' || src[src_len-1] == ';' ) {
+                mPUSHs(newSVpv("",0));
+                mPUSHs(newSVpv("",0));
+            }
         }
 
     }
@@ -280,9 +282,11 @@ parse_urlencoded_arrayref(qs)
             av_push(av, url_decode(aTHX_ src, p - prev + prev_s + f, i ));
         }
 
-        if ( src[src_len-1] == '&' || src[src_len-1] == ';' ) {
-            av_push(av, newSVpv("",0));
-            av_push(av,newSVpv("",0));
+        if ( src_len > 0 ) {
+            if ( src[src_len-1] == '&' || src[src_len-1] == ';' ) {
+                av_push(av, newSVpv("",0));
+                av_push(av,newSVpv("",0));
+            }
         }
     }
     XSRETURN(1);

@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<otrs_package version="1.0">
+    <Name>validate</Name>
+</otrs_package>

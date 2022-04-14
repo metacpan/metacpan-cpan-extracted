@@ -1,0 +1,50 @@
+---
+abstract: 'Parser for the .opm file'
+author:
+  - 'Renee Baecker <reneeb@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: OPM-Parser
+provides:
+  OPM::Parser:
+    file: lib/OPM/Parser.pm
+    version: '1.06'
+  OPM::Parser::Types:
+    file: lib/OPM/Parser/Types.pm
+    version: '1.06'
+requires:
+  File::Basename: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  LWP::Simple: '0'
+  MIME::Base64: '0'
+  Moo: '2'
+  MooX::HandlesVia: '0.001'
+  OPM::Validate: v1.0.0
+  Path::Class: '0'
+  Try::Tiny: '0'
+  Type::Library: '1'
+  Type::Tiny: '1'
+  Type::Utils: '1'
+  Types::Standard: '1'
+  XML::LibXML: '0'
+  perl: '5.024'
+resources:
+  bugtracker: https://github.com/perlservices/OPM-Parser/issues
+  homepage: https://github.com/perlservices/OPM-Parser
+  repository: git://github.com/perlservices/OPM-Parser.git
+version: '1.06'
+x_contributors:
+  - 'Håkon Hægland <hakon.hagland@gmail.com>'
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+  - 'reneeb <info@perl-services.de>'
+x_generated_by_perl: v5.30.0
+x_serialization_backend: 'YAML::Tiny version 1.73'

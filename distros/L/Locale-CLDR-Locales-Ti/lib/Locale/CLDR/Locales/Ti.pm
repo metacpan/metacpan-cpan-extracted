@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Ti - Package for language Tigrinya
 =cut
 
 package Locale::CLDR::Locales::Ti;
-# This file auto generated from Data\common\main\ti.xml
-#	on Sun  3 Feb  2:21:48 pm GMT
+# This file auto generated from Data/common/main/ti.xml
+#	on Mon 11 Apr  5:39:26 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -1091,29 +1091,29 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
-					'pm' => q{ድሕር ሰዓት},
+				'abbreviated' => {
 					'am' => q{ንጉሆ ሰዓተ},
+					'pm' => q{ድሕር ሰዓት},
 				},
 				'narrow' => {
 					'am' => q{ንጉሆ ሰዓተ},
 					'pm' => q{ድሕር ሰዓት},
 				},
-				'abbreviated' => {
+				'wide' => {
 					'am' => q{ንጉሆ ሰዓተ},
 					'pm' => q{ድሕር ሰዓት},
 				},
 			},
 			'stand-alone' => {
-				'narrow' => {
-					'pm' => q{ድሕር ሰዓት},
+				'abbreviated' => {
 					'am' => q{ንጉሆ ሰዓተ},
+					'pm' => q{ድሕር ሰዓት},
+				},
+				'narrow' => {
+					'am' => q{ንጉሆ ሰዓተ},
+					'pm' => q{ድሕር ሰዓት},
 				},
 				'wide' => {
-					'pm' => q{ድሕር ሰዓት},
-					'am' => q{ንጉሆ ሰዓተ},
-				},
-				'abbreviated' => {
 					'am' => q{ንጉሆ ሰዓተ},
 					'pm' => q{ድሕር ሰዓት},
 				},
@@ -1199,6 +1199,13 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'generic' => {
+			MMMMdd => q{dd MMMM},
+			MMdd => q{dd/MM},
+			yMM => q{MM/y},
+			yMMMM => q{MMMM y},
+			yQQQ => q{QQQ y},
+		},
 		'gregorian' => {
 			Bh => q{h B},
 			Bhm => q{h:mm B},
@@ -1249,13 +1256,6 @@ has 'datetime_formats_available_formats' => (
 			yQQQ => q{QQQ y},
 			yQQQQ => q{y QQQQ},
 			yw => q{መበል w ሰሙን ናይ Y},
-		},
-		'generic' => {
-			MMMMdd => q{dd MMMM},
-			MMdd => q{dd/MM},
-			yMM => q{MM/y},
-			yMMMM => q{MMMM y},
-			yQQQ => q{QQQ y},
 		},
 	} },
 );

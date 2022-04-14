@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 package Raisin;
-$Raisin::VERSION = '0.93';
+$Raisin::VERSION = '0.94';
 use Carp qw(croak carp longmess);
 use HTTP::Status qw(:constants);
 use Plack::Response;
@@ -230,7 +230,7 @@ sub before_finalize {
     my $self = shift;
 
     $self->res->status(HTTP_OK) unless $self->res->status;
-    $self->res->header('X-Framework' => 'Raisin ' . __PACKAGE__->VERSION);
+    $self->res->header('X-Framework' => 'Raisin ' . (__PACKAGE__->VERSION || 'dev'));
 
     if ($self->api_version) {
         $self->res->header('X-API-Version' => $self->api_version);
@@ -315,7 +315,7 @@ Raisin - A REST API microframework for Perl.
 
 =head1 VERSION
 
-version 0.93
+version 0.94
 
 =head1 SYNOPSIS
 
@@ -449,9 +449,14 @@ It was inspired by L<Grape|https://github.com/intridea/grape>.
 
 =head2 API DESCRIPTION
 
+=head3 app
+
+Returns the C<Raisin> app. Seldom needed, because most C<Raisin::API> methods
+invoke the app directly.
+
 =head3 resource
 
-Adds a route to an application.
+Adds a route to an application. C<namespace> is a synonym for C<resource>.
 
     resource user => sub { ... };
 
@@ -474,7 +479,18 @@ Raisin allows you to nest C<route_param>:
         };
     };
 
-=head3 del, get, patch, post, put
+=head3 produces
+
+Specifies the content types produced by C<resource>.
+
+    produces ['text', 'json'];
+
+The argument is an array reference of strings corresponding to the
+keys used by C<register_encoder>. This array is compared with the
+Accept header of the request to decide what content-type will
+actually be returned from a given invocation of C<resource>.
+
+=head3 del, get, patch, post, put, head, options
 
 Shortcuts to add a C<route> restricted to the corresponding HTTP method.
 
@@ -644,11 +660,12 @@ Returns the C<PSGI> application.
 
 Provides quick access to the L<Raisin::Request> object for the current route.
 
-Use C<req> to get access to request headers, params, etc.
+Use C<req> to get access to request headers, params, env, etc.
 
     use DDP;
     p req->headers;
     p req->params;
+    p req->env;
 
     say req->header('X-Header');
 
@@ -970,6 +987,20 @@ Response format can be determined by C<Accept header> or C<route extension>.
 
 Serialization takes place automatically. So, you do not have to call
 C<encode_json> in each C<JSON> API implementation.
+
+The response format (and thus the automatic serialization) is determined in the following order:
+
+=over
+
+=item * Use the file extension, if specified. If the file is .json, choose the JSON format.
+
+=item * Attempt to find an acceptable format from the Accept header.
+
+=item * Use the default format, if specified by the C<default_format> option.
+
+=item * Default to C<YAML>.
+
+=back
 
 Your API can declare to support only one serializator by using L<Raisin/api_format>.
 

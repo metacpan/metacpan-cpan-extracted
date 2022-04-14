@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Nn::Any::No - Package for language Norwegian Nynorsk
 =cut
 
 package Locale::CLDR::Locales::Nn::Any::No;
-# This file auto generated from Data\common\main\nn_NO.xml
-#	on Sun  3 Feb  2:12:11 pm GMT
+# This file auto generated from Data/common/main/nn_NO.xml
+#	on Mon 11 Apr  5:35:54 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';

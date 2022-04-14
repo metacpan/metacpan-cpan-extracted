@@ -1,0 +1,37 @@
+Change history for OPM::Parser
+==============================
+
+1.06 2022-04-14 07:36:00
+
+  * add flag for de_opm.pl to ignore validation results when parsing an opm file
+  * initial release after rename
+
+1.05 2021-01-16 08:34:00
+
+  + use OTRS::OPM::Validate to validate opm files
+  + update dist.ini
+
+1.04 2020-12-10 11:59:00
+
+  + fix built
+
+1.03 2020-12-10 11:54:00
+
+  + improved SYNOPSIS (thanks to Håkon Hægland (@hakonhagland), PR#4)
+  + added support for OTOBO (https://otobo.de)
+
+1.02 2019-02-07 08:44:00
+
+  + forgot to remove some code where Moose was used
+  + add tests
+
+1.01 2019-02-06 13:36:00
+
+  + switched from Moose to Moo
+  + removed auto_deref from attributes
+  + added tests
+  + moved own type definitions to extra .pm
+
+0.01 2016-09-28
+
+  + initial release

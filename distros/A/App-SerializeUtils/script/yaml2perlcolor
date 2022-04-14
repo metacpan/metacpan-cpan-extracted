@@ -1,0 +1,375 @@
+#!perl
+
+## no critic: InputOutput::ProhibitInteractiveTest
+
+use 5.010001;
+use strict;
+use warnings;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-03-20'; # DATE
+our $DIST = 'App-SerializeUtils'; # DIST
+our $VERSION = '0.165'; # VERSION
+
+my ($from, $to) = $0 =~ /(\w+)2(\w+)\z/;
+$from //= "";
+$to   //= "";
+
+my %Opts;
+
+GET_OPTIONS: {
+    $Opts{compact} //= (-t STDOUT) ? 0:1;
+    $Opts{safe} //= 0;
+
+    my %go_spec = (
+        "help|h|?"  => sub {
+            print "Please see manpage for more information\n\n";
+            exit 0;
+        },
+        "version|v" => sub {
+            no warnings 'once';
+            print "serializeutils-convert version ". ($main::VERSION // "dev") .
+                ($main::DATE ? " ($main::DATE)" : "") . "\n";
+            exit 0;
+        },
+        "from=s"    => \$from,
+        "to=s"      => \$to,
+        "color!"    => \$Opts{color},
+        "compact!"  => \$Opts{compact},
+        "safe!"     => \$Opts{safe},
+        "dumper=s"  => \$Opts{dumper},
+    );
+    require Getopt::Long::Complete;
+    my $res = Getopt::Long::Complete::GetOptions(%go_spec);
+    die "serializeutils-convert: There are errors in processing options\n"
+        unless $res;
+
+    $Opts{color} //= $ENV{COLOR} // (-t STDOUT) //
+        ($to eq 'perlcolor' || $to eq 'json' ? 1:0);
+    $Opts{dumper} //=
+        $Opts{compact} ? 'Data::Dmp' :
+        $to eq 'perlcolor' || $Opts{color} ? 'Data::Dump::Color' :
+        'Data::Dump';
+    #use DD; print "to=$to\n"; dd \%Opts;
+
+} # GET_OPTIONS
+
+my $code_from;
+PARSE_INPUT: {
+    undef $/;
+    if ($from =~ /\A(perl|perlcolor)\z/) {
+        if ($Opts{safe}) {
+            require Data::Undump;
+            $code_from = 'Data::Undump::undump(scalar <>)';
+        } else {
+            $code_from = 'eval scalar <>';
+        }
+    } elsif ($from eq 'json') {
+        require JSON::MaybeXS;
+        $code_from = 'JSON::MaybeXS->new->allow_nonref->decode(scalar <>)';
+    } elsif ($from eq 'phpser') {
+        require PHP::Serialization;
+        $code_from = 'PHP::Serialization::unserialize(scalar <>)';
+    } elsif ($from eq 'sereal') {
+        require Sereal::Decoder;
+        $code_from = 'Sereal::Decoder::decode_sereal(scalar <>)';
+    } elsif ($from eq 'sexp') {
+        require SExpression::Decode::Marpa;
+        $code_from = 'SExpression::Decode::Marpa::from_sexp(scalar <>)';
+    } elsif ($from eq 'storable') {
+        require Storable;
+        $code_from = 'Storable::thaw(scalar <>)';
+    } elsif ($from eq 'yaml') {
+        no warnings 'once';
+        require YAML::Syck; $YAML::Syck::ImplicitTyping = 1;
+        $code_from = 'YAML::Syck::Load(scalar <>)';
+    } else {
+        die "serializeutils-convert: Can't convert from '$from'\n";
+    }
+} # PARSE_INPUT
+
+my $code_to;
+OUTPUT: {
+    if ($to =~ /\A(perl|perlcolor)\z/) {
+        if ($Opts{dumper} eq 'Data::Dump::Color') {
+            require Data::Dump::Color;
+            $code_to = "Data::Dump::Color::dump($code_from)";
+        } elsif ($Opts{dumper} eq 'Data::Dump') {
+            require Data::Dump;
+            $code_to = "Data::Dump::dump($code_from)";
+        # commented out, not released yet
+        #} elsif ($Opts{dumper} eq 'Data::Bahe') {
+        #    require Data::Bahe;
+        #    $code_to = "Data::Bahe::dump($code_from)";
+        } elsif ($Opts{dumper} eq 'Data::Dmp') {
+            require Data::Dmp;
+            $code_to = "Data::Dmp::dmp($code_from)";
+        } elsif ($Opts{dumper} eq 'Data::Dumper::Compact') {
+            require Data::Dumper::Compact;
+            $code_to = "Data::Dumper::Compact->dump($code_from)";
+        } elsif ($Opts{dumper} eq 'Data::Dumper') {
+            require Data::Dumper;
+            $code_to = "Data::Dumper->new([$code_from], ['data'])->".
+                "Purity(1)->Indent(1)->Terse(1)->Dump";
+        } else {
+            die "serializeutils-convert: Unknown dumper '$Opts{dumper}'\n";
+        }
+    } elsif ($to eq 'json') {
+        if ($Opts{color}) {
+            require JSON::Color;
+            $code_to = "JSON::Color::encode_json($code_from)";
+        } else {
+            require JSON::MaybeXS;
+            $code_to = "JSON::MaybeXS->new->allow_nonref->encode($code_from)";
+        }
+    } elsif ($to eq 'phpser') {
+        require PHP::Serialization;
+        $code_to = "PHP::Serialization::serialize($code_from)";
+    } elsif ($to eq 'sereal') {
+        require Sereal::Encoder;
+        $code_to = "Sereal::Encoder::encode_sereal($code_from)";
+    } elsif ($to eq 'sexp') {
+        require Data::Dump::SExpression;
+        $code_to = "Data::Dump::SExpression::dump_sexp($code_from)";
+    } elsif ($to eq 'storable') {
+        require Storable;
+        $code_to = "Storable::freeze($code_from)";
+    } elsif ($to eq 'yaml') {
+        if ($Opts{color}) {
+            require YAML::Tiny::Color;
+            $code_to = "YAML::Tiny::Color::Dump($code_from)";
+        } else {
+            no warnings 'once';
+            require YAML::Syck; $YAML::Syck::ImplicitTyping = 1;
+            $code_to = "YAML::Syck::Dump($code_from)";
+        }
+    } else {
+        die "serializeutils-convert: Can't convert to '$to'\n";
+    }
+
+    eval "print $code_to"; ## no critic: BuiltinFunctions::ProhibitStringyEval
+    die if $@;
+} # OUTPUT
+
+# ABSTRACT: Convert between serialization formats
+# PODNAME: yaml2perlcolor
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+yaml2perlcolor - Convert between serialization formats
+
+=head1 VERSION
+
+This document describes version 0.165 of yaml2perlcolor (from Perl distribution App-SerializeUtils), released on 2022-03-20.
+
+=head1 SYNOPSIS
+
+Usage:
+
+ % serializeutils-convert [OPTIONS] < INPUT-FILE
+
+For example, when called as C<json2yaml>:
+
+ % script-that-outputs-json | json2yaml
+
+=head1 DESCRIPTION
+
+This script can be called as various names to convert between serialization
+formats.
+
+"perl" refers to Perl format, generated using L<Data::Dump> or L<Data::Dumper>
+and parsed using Perl's C<eval()> or L<Data::Undump>.
+
+"perlcolor" refers to colored Perl format, generated using L<Data::Dump::Color>.
+
+"json" is of course the popular JavaScript Object Notation described in
+L<https://www.json.org>.
+
+"phpser" refers to PHP serialization format. This document describes the format
+in more details:
+L<http://www.phpinternalsbook.com/classes_objects/serialization.html>. To
+serialize/deserialize this format, the script uses L<PHP::Serialization>.
+
+"sereal" refers to the Sereal format, described in
+L<https://github.com/Sereal/Sereal/blob/master/sereal_spec.pod>.
+
+"storable" refers to the L<Storable> format.
+
+"yaml" is the Yet Another Markup Language format specified in
+L<https://www.yaml.org>.
+
+The script are installed as the following names for convenience:
+
+ perl2perlcolor
+ perl2json
+ perl2phpser
+ perl2sereal
+ perl2storable
+ perl2yaml
+
+ json2perl
+ json2perlcolor
+ json2phpser
+ json2sereal
+ json2storable
+ json2yaml
+
+ phpser2perl
+ phpser2perlcolor
+ phpser2json
+ phpser2sereal
+ phpser2storable
+ phpser2yaml
+
+ sereal2perl
+ sereal2perlcolor
+ sereal2json
+ sereal2phpser
+ sereal2storable
+ sereal2yaml
+
+ storable2perl
+ storable2perlcolor
+ storable2json
+ storable2phpser
+ storable2sereal
+ storable2yaml
+
+ yaml2perl
+ yaml2perlcolor
+ yaml2json
+ yaml2phpser
+ yaml2sereal
+ yaml2storable
+
+=head1 OPTIONS
+
+=over
+
+=item * --(no-)color
+
+Only applies to output formats C<perl>, C<perlcolor>, C<json>, C<yaml>.
+
+Whether to use colors. The default is from the COLOR environment variable, or
+1 when script is called interactively.
+
+=item * --(no-)compact
+
+Only applies to output formats C<json>, C<perl>.
+
+Whether to produce compact output. The default is false when outputing
+interactively. For format C<perl>, will use L<Data::Dmp> when producing compact
+output.
+
+=item * --(no-)safe
+
+Only applies to input format C<perl>.
+
+Whether to parse safely. The default is false, which means parsing using Perl's
+C<eval>. When set to true, will parse using L<Data::Undump> but parsing might
+fail for more complex input, e.g. recursive data structures.
+
+=item * --dumper=s
+
+Only applies to output format C<perl>.
+
+Set which dumper to use. Can be set to C<Data::Dump> or C<Data::Dump::Color> or
+C<Data::Dumper>. The default is C<Data::Dump>.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C yaml2perlcolor yaml2perlcolor
+
+in your bash startup (e.g. C<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete yaml2perlcolor 'p/*/`yaml2perlcolor`/'
+
+in your tcsh startup (e.g. C<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install C<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install C<shcompgen> as described above.
+
+=head1 ENVIRONMENT
+
+=head2 COLOR
+
+Set the default for C<--color> option.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-SerializeUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-SerializeUtils>.
+
+=head1 SEE ALSO
+
+L<App::SerializeUtils>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022, 2021, 2020, 2018, 2017, 2015, 2014, 2013, 2011 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-SerializeUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=cut

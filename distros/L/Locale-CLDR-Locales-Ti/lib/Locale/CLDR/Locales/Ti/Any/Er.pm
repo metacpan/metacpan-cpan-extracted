@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Ti::Any::Er - Package for language Tigrinya
 =cut
 
 package Locale::CLDR::Locales::Ti::Any::Er;
-# This file auto generated from Data\common\main\ti_ER.xml
-#	on Sun  3 Feb  2:21:57 pm GMT
+# This file auto generated from Data/common/main/ti_ER.xml
+#	on Mon 11 Apr  5:39:29 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';

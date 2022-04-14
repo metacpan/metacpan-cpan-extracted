@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Kw - Package for language Cornish
 =cut
 
 package Locale::CLDR::Locales::Kw;
-# This file auto generated from Data\common\main\kw.xml
-#	on Sun  3 Feb  2:02:01 pm GMT
+# This file auto generated from Data/common/main/kw.xml
+#	on Mon 11 Apr  5:32:18 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -310,8 +310,8 @@ has 'day_periods' => (
 					'pm' => q{p.m.},
 				},
 				'wide' => {
-					'pm' => q{p.m.},
 					'am' => q{a.m.},
+					'pm' => q{p.m.},
 				},
 			},
 		},

@@ -1,5 +1,18 @@
 Changes for DBD::JDBC.
 
+January 2022
+        Version 0.72
+
+        Update the server to Log4j2 as a response to CVE-2021-44228
+        (log4shell) and subsequent Log4j2 issues.
+
+        This version of the server is built for Java 1.8.
+
+        As part of the update to Log4j2, the dbd.trace property has been
+        removed. Logging levels should be configured using standard Log4j
+        methods.
+
+
 November 2008
         Version 0.71
          

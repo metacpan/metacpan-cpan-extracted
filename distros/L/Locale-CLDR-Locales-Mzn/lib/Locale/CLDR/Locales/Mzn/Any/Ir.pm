@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Mzn::Any::Ir - Package for language Mazanderani
 =cut
 
 package Locale::CLDR::Locales::Mzn::Any::Ir;
-# This file auto generated from Data\common\main\mzn_IR.xml
-#	on Sun  3 Feb  2:07:21 pm GMT
+# This file auto generated from Data/common/main/mzn_IR.xml
+#	on Mon 11 Apr  5:34:04 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';

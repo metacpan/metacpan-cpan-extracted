@@ -30,6 +30,7 @@ do { my $x = {
                                       'LWP::Protocol::https' => '6.04',
                                       'LWP::UserAgent' => '6.02',
                                       'Log::Log4perl' => '1',
+                                      'MIME::Base64' => '3.00',
                                       'Mojolicious' => '4.13',
                                       'OAuth::Cmdline' => '0.07',
                                       'Pod::Usage' => '1.36',

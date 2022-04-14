@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Mfe::Any::Mu - Package for language Morisyen
 =cut
 
 package Locale::CLDR::Locales::Mfe::Any::Mu;
-# This file auto generated from Data\common\main\mfe_MU.xml
-#	on Sun  3 Feb  2:04:39 pm GMT
+# This file auto generated from Data/common/main/mfe_MU.xml
+#	on Mon 11 Apr  5:33:07 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';

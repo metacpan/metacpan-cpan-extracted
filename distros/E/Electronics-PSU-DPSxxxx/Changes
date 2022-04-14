@@ -1,0 +1,14 @@
+Revision history for Electronics-PSU-DPSxxxx
+
+0.02    2022-04-13
+        [CHANGES]
+         * Renamed `measure_` methods to `read_...`
+         * Added `read_output_protect` and `read_output_mode`
+         * Added `read_multiple`
+         * Print a warning if incoming CRC does not match expected
+
+        [BUGFIXES]
+         * Remember to `$termios->cfmakeraw` the serial port on startup
+
+0.01    2022-04-12
+        First version, released on an unsuspecting world.

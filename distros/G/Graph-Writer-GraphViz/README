@@ -1,7 +1,64 @@
-Graph::Writer::GraphViz is an Writer object of Graph, using
-GraphViz module. All GraphViz output format should be supported
-by nature.
+NAME
 
-Cheers,
-Kang-min Liu <gugod@gugod.org>
+    Graph::Writer::GraphViz - GraphViz Writer for Graph object
+
+SYNOPSIS
+
+      my @v = qw/Alice Bob Crude Dr/;
+      my $g = Graph->new(@v);
+    
+      my $wr = Graph::Writer::GraphViz->new(-format => 'dot');
+      $wr->write_graph($g,'/tmp/graph.simple.dot');
+    
+      my $wr_png = Graph::Writer::GraphViz->new(-format => 'png');
+      $wr_png->write_graph($g,'/tmp/graph.simple.png');
+    
+      Graph::Writer::GraphViz->new(
+            -format => 'png',
+            -layout => 'twopi',
+            -ranksep => 1.5,
+            -fontsize => 8
+            -edge_color => 'grey',
+            -node_color => 'black',
+           )->write_graph($g,'/tmp/graph.png');
+
+DESCRIPTION
+
+    Graph::Writer::GraphViz is a class for writing out a Graph object with
+    GraphViz module. All GraphViz formats should be supported without a
+    problem.
+
+METHODS
+
+ new()
+
+    Unlike other Graph::Writer modules, this module provide an extra
+    parameter '-format' to new() method, in order to save different format.
+    Other supported GraphViz parameters are -layout, -ranksep, -shape,
+    -fontsize, -arrowsize. Please see the SYNOPSIS for example usage.
+
+    Valid format depends on those GraphViz as_fmt methods on your system,
+    like, 'gif' if you have 'as_gif', 'text' if you can do 'as_text'.
+
+SEE ALSO
+
+    Graph, Graph::Writer, GraphViz
+
+AUTHOR
+
+    Kang-min Liu <gugod@gugod.org>
+
+CREDITS
+
+    Thanks for RURBAN@cpan.org for noticing tests failure on different
+    platforms.
+
+COPYRIGHT
+
+    Copyright 2004 by Kang-min Liu <gugod@gugod.org>.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See <http://www.perl.com/perl/misc/Artistic.html>
 

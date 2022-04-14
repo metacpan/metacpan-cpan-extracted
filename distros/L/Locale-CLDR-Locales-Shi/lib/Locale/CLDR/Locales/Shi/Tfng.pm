@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Shi::Tfng - Package for language Tachelhit
 =cut
 
 package Locale::CLDR::Locales::Shi::Tfng;
-# This file auto generated from Data\common\main\shi_Tfng.xml
-#	on Sun  3 Feb  2:17:02 pm GMT
+# This file auto generated from Data/common/main/shi_Tfng.xml
+#	on Mon 11 Apr  5:37:37 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';

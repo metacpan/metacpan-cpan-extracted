@@ -1,6 +1,8 @@
 # -*- Mode: CPerl -*-
 # t/02_indexing.t
-use Test::More tests => 26;
+use Test::More;
+use strict;
+use warnings;
 
 ##-- common subs
 my $TEST_DIR;
@@ -90,6 +92,4 @@ my $sub2 = $ccs->pxsubset1d(1,$yi);
 isok("pxsubset1d:defined", defined($sub2));
 pdlok("pxsubset1d:vals",   $sub2->decode->dice_axis(1,$yi), $a->dice_axis(1,$yi));
 
-print "\n";
-# end of t/*.t
-
+done_testing;

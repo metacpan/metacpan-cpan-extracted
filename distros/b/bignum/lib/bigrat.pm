@@ -5,7 +5,7 @@ use warnings;
 
 use Carp qw< carp croak >;
 
-our $VERSION = '0.64';
+our $VERSION = '0.65';
 
 use Exporter;
 our @ISA            = qw( Exporter );
@@ -36,16 +36,6 @@ sub round_mode {
 sub div_scale {
     my $self = shift;
     $obj_class -> div_scale(@_);
-}
-
-sub upgrade {
-    my $self = shift;
-    $obj_class -> upgrade(@_);
-}
-
-sub downgrade {
-    my $self = shift;
-    $obj_class -> downgrade(@_);
 }
 
 sub in_effect {
@@ -224,19 +214,19 @@ my ($prev_oct, $prev_hex, $overridden);
 if (LEXICAL) { eval <<'.' }
 sub _hex(_) {
     my $hh = (caller 0)[10];
-    return $$hh{bigrat} ? bigrat::_hex_core($_[0])
-         : $$hh{bignum} ? bignum::_hex_core($_[0])
-         : $$hh{bigint} ? bigint::_hex_core($_[0])
-         : $prev_hex    ? &$prev_hex($_[0])
+    return $$hh{bigrat}   ? bigrat::_hex_core($_[0])
+         : $$hh{bigfloat} ? bigfloat::_hex_core($_[0])
+         : $$hh{bigint}   ? bigint::_hex_core($_[0])
+         : $prev_hex      ? &$prev_hex($_[0])
          : CORE::hex($_[0]);
 }
 
 sub _oct(_) {
     my $hh = (caller 0)[10];
-    return $$hh{bigrat} ? bigrat::_oct_core($_[0])
-         : $$hh{bignum} ? bignum::_oct_core($_[0])
-         : $$hh{bigint} ? bigint::_oct_core($_[0])
-         : $prev_oct    ? &$prev_oct($_[0])
+    return $$hh{bigrat}   ? bigrat::_oct_core($_[0])
+         : $$hh{bigfloat} ? bigfloat::_oct_core($_[0])
+         : $$hh{bigint}   ? bigint::_oct_core($_[0])
+         : $prev_oct      ? &$prev_oct($_[0])
          : CORE::oct($_[0]);
 }
 .
@@ -259,9 +249,9 @@ sub unimport {
 sub import {
     my $class = shift;
 
-    $^H{bigrat} = 1;                            # we are in effect
-    $^H{bigint} = undef;
-    $^H{bignum} = undef;
+    $^H{bigrat}   = 1;                          # we are in effect
+    $^H{bigint}   = undef;
+    $^H{bigfloat} = undef;
 
     # for newer Perls always override hex() and oct() with a lexical version:
     if (LEXICAL) {
@@ -274,20 +264,6 @@ sub import {
 
     while (@_) {
         my $param = shift;
-
-        # Upgrading.
-
-        if ($param eq 'upgrade') {
-            push @import, 'upgrade', shift();
-            next;
-        }
-
-        # Downgrading.
-
-        if ($param eq 'downgrade') {
-            push @import, 'downgrade', shift();
-            next;
-        }
 
         # Accuracy.
 
@@ -396,23 +372,17 @@ sub e   () { $obj_class -> new('2.718281828459045235360287471352662497757'); }
 sub bpi ($) {
     my $up = Math::BigFloat -> upgrade();   # get current upgrading, if any ...
     Math::BigFloat -> upgrade(undef);       # ... and disable
-
     my $x = Math::BigFloat -> bpi(@_);
-
     Math::BigFloat -> upgrade($up);         # reset the upgrading
-
     return $obj_class -> new($x);
 }
 
 sub bexp ($$) {
     my $up = Math::BigFloat -> upgrade();   # get current upgrading, if any ...
     Math::BigFloat -> upgrade(undef);       # ... and disable
-
     my $x = Math::BigFloat -> new(shift);
     $x -> bexp(@_);
-
     Math::BigFloat -> upgrade($up);         # reset the upgrading
-
     return $obj_class -> new($x);
 }
 
@@ -675,14 +645,6 @@ Set or get the rounding mode.
 =item div_scale()
 
 Set or get the division scale.
-
-=item upgrade()
-
-Return the class that numbers are upgraded to, if any.
-
-=item downgrade()
-
-Return the class that numbers are downgraded to, if any.
 
 =item in_effect()
 

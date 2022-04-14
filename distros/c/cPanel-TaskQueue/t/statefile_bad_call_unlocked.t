@@ -1,27 +1,25 @@
 #!/usr/bin/perl
 
+use strict;
+use warnings;
+
 use FindBin;
 use lib "$FindBin::Bin/mocks";
 
 use Test::More tests => 5;
 use File::Path ();
-
-use strict;
-use warnings;
+use File::Temp;
 
 use cPanel::StateFile;
 use MockCacheable;
 
-my $tmpdir   = './tmp';
+my $tmpdir   = File::Temp->newdir();
 my $dir      = "$tmpdir/state_test";
 my $file     = "$dir/state_dir/state_file";
 my $lockname = "$file.lock";
 
-cleanup();
-File::Path::mkpath($tmpdir) or die "Unable to create temporary directory: $!";
-
 my $mock_obj = MockCacheable->new;
-my $state = cPanel::StateFile->new( { state_file => $file, data_obj => $mock_obj } );
+my $state    = cPanel::StateFile->new( { state_file => $file, data_obj => $mock_obj } );
 
 {
     my $guard = $state->synch();
@@ -55,11 +53,4 @@ my $state = cPanel::StateFile->new( { state_file => $file, data_obj => $mock_obj
         );
     };
     like( $@, qr/test exception/, 'Exceptions are passed out of call correctly.' );
-}
-
-cleanup();
-
-# Discard temporary files that we don't need any more.
-sub cleanup {
-    File::Path::rmtree($tmpdir) if -d $tmpdir;
 }

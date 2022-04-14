@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Sr::Latn::Ba - Package for language Serbian
 =cut
 
 package Locale::CLDR::Locales::Sr::Latn::Ba;
-# This file auto generated from Data\common\main\sr_Latn_BA.xml
-#	on Sun  3 Feb  2:19:43 pm GMT
+# This file auto generated from Data/common/main/sr_Latn_BA.xml
+#	on Mon 11 Apr  5:38:40 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -172,53 +172,53 @@ has 'day_period_data' => (
 		$day_period_type //= 'default';
 		SWITCH:
 		for ($type) {
-			if ($_ eq 'gregorian') {
-				if($day_period_type eq 'selection') {
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 600;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-				}
+			if ($_ eq 'generic') {
 				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
 					return 'midnight' if $time == 0;
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 600;
+					return 'noon' if $time == 1200;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 600;
+				}
+				if($day_period_type eq 'selection') {
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 600;
 				}
 				last SWITCH;
 				}
-			if ($_ eq 'generic') {
-				if($day_period_type eq 'selection') {
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 600;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-				}
+			if ($_ eq 'gregorian') {
 				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
 					return 'midnight' if $time == 0;
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 600;
+					return 'noon' if $time == 1200;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 600;
+				}
+				if($day_period_type eq 'selection') {
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 600;
 				}
 				last SWITCH;
 				}
@@ -238,27 +238,27 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
+				'abbreviated' => {
+					'afternoon1' => q{po pod.},
 					'am' => q{prije podne},
+					'evening1' => q{veče},
+					'midnight' => q{ponoć},
+					'morning1' => q{jutro},
+					'night1' => q{noću},
+					'noon' => q{podne},
 					'pm' => q{po podne},
 				},
 				'narrow' => {
-					'morning1' => q{jutro},
+					'afternoon1' => q{po pod.},
 					'evening1' => q{veče},
 					'midnight' => q{ponoć},
+					'morning1' => q{jutro},
 					'night1' => q{noć},
-					'afternoon1' => q{po pod.},
 					'noon' => q{podne},
 				},
-				'abbreviated' => {
-					'morning1' => q{jutro},
-					'evening1' => q{veče},
-					'afternoon1' => q{po pod.},
-					'noon' => q{podne},
+				'wide' => {
 					'am' => q{prije podne},
 					'pm' => q{po podne},
-					'midnight' => q{ponoć},
-					'night1' => q{noću},
 				},
 			},
 			'stand-alone' => {
@@ -266,13 +266,13 @@ has 'day_periods' => (
 					'am' => q{prije podne},
 					'pm' => q{po podne},
 				},
-				'wide' => {
-					'am' => q{prije podne},
-					'pm' => q{po podne},
-				},
 				'narrow' => {
 					'am' => q{a},
 					'pm' => q{p},
+				},
+				'wide' => {
+					'am' => q{prije podne},
+					'pm' => q{po podne},
 				},
 			},
 		},
@@ -355,6 +355,15 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'generic' => {
+			MMMEd => {
+				M => q{E, d. MMM – E, d. MMM},
+				d => q{E, d. MMM – E, d. MMM},
+			},
+			yMd => {
+				M => q{d.M.y. – d.M.y. GGGGG},
+			},
+		},
 		'gregorian' => {
 			MEd => {
 				M => q{E, MM-dd – E, MM-dd},
@@ -377,15 +386,6 @@ has 'datetime_formats_interval' => (
 				M => q{y-MM-dd – y-MM-dd},
 				d => q{y-MM-dd – y-MM-dd},
 				y => q{y-MM-dd – y-MM-dd},
-			},
-		},
-		'generic' => {
-			MMMEd => {
-				M => q{E, d. MMM – E, d. MMM},
-				d => q{E, d. MMM – E, d. MMM},
-			},
-			yMd => {
-				M => q{d.M.y. – d.M.y. GGGGG},
 			},
 		},
 	} },

@@ -8,7 +8,7 @@ use Moo;
 extends 'AnyEvent::FTP::Server::Context::FSRW';
 
 # ABSTRACT: FTP Server client context class with read-only access
-our $VERSION = '0.18'; # VERSION
+our $VERSION = '0.19'; # VERSION
 
 
 sub cmd_stor
@@ -40,7 +40,7 @@ AnyEvent::FTP::Server::Context::FSRO - FTP Server client context class with read
 
 =head1 VERSION
 
-version 0.18
+version 0.19
 
 =head1 SYNOPSIS
 

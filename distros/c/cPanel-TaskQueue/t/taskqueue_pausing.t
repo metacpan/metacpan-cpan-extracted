@@ -4,16 +4,13 @@ use strict;
 use FindBin;
 use lib "$FindBin::Bin/mocks";
 use File::Path ();
+use File::Temp ();
 
 use Test::More tests => 15;
 use cPanel::TaskQueue;
 
-my $tmpdir   = './tmp';
+my $tmpdir   = File::Temp->newdir();
 my $statedir = "$tmpdir/state_test";
-
-# In case the last test did not succeed.
-cleanup();
-File::Path::mkpath($tmpdir) or die "Unable to create tmpdir: $!";
 
 # Create the real TaskQueue
 my $queue = cPanel::TaskQueue->new( { name => 'tasks', state_dir => $statedir } );
@@ -44,11 +41,4 @@ ok( !$queue->is_task_queued($qid), 'no longer found in queue' );
     $queue2->resume_processing;
     ok( !$queue2->is_paused, "$label: TaskQueue2 is unpaused." );
     ok( !$queue->is_paused,  "$label: TaskQueue is unpaused." );
-}
-
-cleanup();
-
-# Clean up after myself
-sub cleanup {
-    File::Path::rmtree($tmpdir);
 }

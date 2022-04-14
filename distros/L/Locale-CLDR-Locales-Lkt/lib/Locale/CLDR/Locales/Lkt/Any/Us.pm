@@ -7,14 +7,14 @@ Locale::CLDR::Locales::Lkt::Any::Us - Package for language Lakota
 =cut
 
 package Locale::CLDR::Locales::Lkt::Any::Us;
-# This file auto generated from Data\common\main\lkt_US.xml
-#	on Sun  3 Feb  2:02:50 pm GMT
+# This file auto generated from Data/common/main/lkt_US.xml
+#	on Mon 11 Apr  5:32:33 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.1');
 
 use v5.10.1;
 use mro 'c3';

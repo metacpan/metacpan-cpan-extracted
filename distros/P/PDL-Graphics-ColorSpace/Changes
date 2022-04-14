@@ -1,4 +1,10 @@
-Revision history for PDL-Graphics-ColorSpace
+0.201 2022-02-14
+- more accurate dependencies
+- adjust so docs get generated for MetaCPAN benefit
+
+0.200 2022-02-14
+- opt in to PDL 2.058+ multi-C
+- add GitHub repo metadata
 
 0.1.0	01-04-2013
 		Added support for custom RGB space.
@@ -16,4 +22,3 @@ Revision history for PDL-Graphics-ColorSpace
 
 0.0.6	02-01-2012
 		First version released on an unsuspecting world.
-
