@@ -1,11 +1,12 @@
 # ABSTRACT: Tidy YAML files
 use strict;
-use warnings;
+use warnings FATAL => qw/ substr /;
+
 use v5.20;
 use experimental qw/ signatures /;
 package YAML::Tidy;
 
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use YAML::Tidy::Node;
 use YAML::Tidy::Config;
@@ -32,19 +33,28 @@ sub new($class, %args) {
 }
 
 sub cfg($self) { $self->{cfg} }
+sub partial($self) { $self->{partial} }
 
 sub tidy($self, $yaml) {
     local $Data::Dumper::Sortkeys = 1;
     my @lines = split /\n/, $yaml, -1;
     my $tree = $self->_tree($yaml, \@lines);
+    $self->{tree} = $tree;
     $self->{lines} = \@lines;
-    $self->_process(undef, $tree);
+#    warn __PACKAGE__.':'.__LINE__.$".Data::Dumper->Dump([\@lines], ['lines']);
+    if (@lines) {
+        my $from = 0;
+        $self->_trimspaces(\$from, $tree) if $self->cfg->trimtrailing;
+        $self->_process(undef, $tree);
+    }
     $yaml = join "\n", @{ $self->{lines} };
+#    warn __PACKAGE__.':'.__LINE__.$".Data::Dumper->Dump([\$yaml], ['yaml']);
     return $yaml;
 }
 
 sub _process($self, $parent, $node) {
     my $type = $node->{type} || '';
+#    warn __PACKAGE__.':'.__LINE__.": ======== _process($parent, $node) $type\n";
     if ($node->{flow}) {
         $self->_process_flow($parent, $node);
         return;
@@ -53,6 +63,13 @@ sub _process($self, $parent, $node) {
     my $indent = $self->cfg->indent;
     my $lines = $self->{lines};
     return unless @$lines;
+
+    if ($level == -1 and $type eq 'DOC') {
+        $self->_process_doc($parent, $node);
+    }
+    my $start = $node->start;
+
+
     my $indenttoplevelscalar = 1;
     my $trimtrailing = $self->cfg->trimtrailing;
 
@@ -66,38 +83,9 @@ sub _process($self, $parent, $node) {
     }
     my $before = substr($line, 0, $col);
 
-    my $start = $node->start;
-    if ($trimtrailing) {
-        my $pre = $parent ? $parent->pre($node) : undef;
-        if ($pre) {
-            if ($pre->{line} <= $start->{line}) {
-                my ($from, $to) = ($pre->{line}, $start->{line});
-                $self->_trim($from, $to);
-            }
-        }
-        if ($level < 1 and $type ne '') {
-            # trim trailing spaces at the end of the node
-            my $last = $node->{children}->[-1];
-            my $from;
-            if ($last) {
-                my $end = $last->closestart;
-                $from = $end->{line} + 1;
-            }
-            else {
-                # empty node
-                $from = $node->open->{end}->{line};
-            }
-
-            my $end2 = $node->closestart;
-            my $to = $end2->{line};
-            if ($from <= $to) {
-                $self->_trim($from, $to);
-            }
-        }
-    }
 
     if ($node->is_collection) {
-        my $ignore_firstlevel = ($self->{partial} and $level == 0);
+        my $ignore_firstlevel = ($self->partial and $level == 0);
         if ($level < 0 or $ignore_firstlevel) {
             for my $c (@{ $node->{children} }) {
                 $self->_process($node, $c);
@@ -123,17 +111,13 @@ sub _process($self, $parent, $node) {
             }
             else {
                 if ($parent->{type} eq 'MAP' and not $node->{index} % 2) {
-                    # zero indented sequence
-                    if ($indent == 1) {
-                        $indent = 2;
-                    }
-                    $indent -= 2;
+                    # zero indented sequence?
+                    $indent = $self->cfg->indent_seq_in_map;
                 }
             }
 
         }
         my $diff = $indent - $realindent;
-#        warn __PACKAGE__.':'.__LINE__.$".Data::Dumper->Dump([\$diff], ['diff']);
         if ($diff) {
             $self->_fix_indent($node, $diff, $col);
             $node->fix_node_indent($diff);
@@ -144,23 +128,21 @@ sub _process($self, $parent, $node) {
         return;
     }
     else {
-        my $ignore_firstlevel = ($self->{partial} and $level == 0);
-        my $multiline = $node->multiline;
-        if ($parent->{type} eq 'MAP' and ($node->{index} % 2 and not $multiline)) {
-            return;
-        }
+        my $ignore_firstlevel = ($self->partial and $level == 0);
         if ($node->empty_scalar) {
             return;
         }
         if ($node->{name} eq 'alias_event') {
             return;
         }
+        if ($parent->{type} eq 'MAP' and ($node->{index} % 2 and not $node->multiline)) {
+            $self->_replace_quoting($node);
+            return;
+        }
         my $new_indent = $parent->indent + $indent;
         my $new_spaces = ' ' x $new_indent;
 
         my ($anchor, $tag, $comments, $scalar) = $self->_find_scalar_start($node);
-#        warn __PACKAGE__.':'.__LINE__.$".Data::Dumper->Dump([\$lines], ['lines']);
-#        warn __PACKAGE__.':'.__LINE__.$".Data::Dumper->Dump([\$scalar], ['scalar']);
         my $explicit_indent = 0;
         if ($scalar->[2] =~ m/[>|]/) {
             my $l = $lines->[ $scalar->[0] ];
@@ -171,36 +153,47 @@ sub _process($self, $parent, $node) {
         my $before = substr($line, 0, $col);
         if ($before =~ tr/ \t//c) {
             # same line as key
-            $before =~ s/[\t ]+$/ /;
+            my $remove = 0;
+            $before =~ s/([\t ]+)$/ / and $remove = -1 + length $1;
+            $node->open->{column} -= $remove;
+            unless ($node->multiline) {
+                $node->close->{column} -= $remove;
+            }
             $line = $before . substr($line, $col);
             $lines->[ $startline ] = $line;
             $skipfirst = 1;
         }
         my $realstart = $scalar->[0];
-        if ($trimtrailing) {
-            $self->_trim($startline, $realstart);
-        }
         unless ($ignore_firstlevel) {
-        for my $i ($startline .. $realstart) {
-            my $line = $lines->[ $i ];
-            if ($i == $startline and $col > 0) {
-                my $before = substr($line, 0, $col);
-                if ($before =~ tr/ //c) {
+            for my $i ($startline .. $realstart) {
+                my $line = $lines->[ $i ];
+                if ($i == $startline and $col > 0) {
+                    my $before = substr($line, 0, $col);
+                    if ($before =~ tr/ //c) {
+                        next;
+                    }
+                }
+                unless ($line =~ tr/ //c) {
                     next;
                 }
+                my $remove = 0;
+                $line =~ s/^( *)/$new_spaces/ and $remove = length($1) - length($new_spaces);
+                if ($i == $startline) {
+                    $node->open->{column} -= $remove;
+                    unless ($node->multiline) {
+                        $node->close->{column} -= $remove;
+                    }
+                }
+                $lines->[ $i] = $line;
             }
-            unless ($line =~ tr/ //c) {
-                next;
-            }
-            $line =~ s/^ */$new_spaces/;
-            $lines->[ $i] = $line;
-        }
         }
         # leave alone explicitly indented block scalars
         return if $explicit_indent;
 
         $startline = $realstart;
         my $endline = $node->realendline;
+#        warn __PACKAGE__.':'.__LINE__.$".Data::Dumper->Dump([\$startline], ['startline']);
+#        warn __PACKAGE__.':'.__LINE__.$".Data::Dumper->Dump([\$endline], ['endline']);
 
         my $line = $lines->[ $startline ];
         my $realcol = $scalar->[1];
@@ -268,28 +261,196 @@ sub _process($self, $parent, $node) {
         elsif ($node->{style} == YAML_PLAIN_SCALAR_STYLE or
                 $node->{style} == YAML_SINGLE_QUOTED_SCALAR_STYLE or
                 $node->{style} == YAML_DOUBLE_QUOTED_SCALAR_STYLE) {
-            $startline++ if $skipfirst;
-            $endline = $node->close->{line};
-            return if $startline >= @$lines;
-            if ($trimtrailing) {
-                $self->_trim($startline, $endline);
+            if ($node->empty_scalar) {
+                return;
             }
-            my $line = $lines->[ $startline ];
-            my ($sp) = $line =~ m/^( *)/;
-            if ($ignore_firstlevel) {
-                $new_indent = length $sp;
-                $new_spaces = ' ' x $new_indent;
-            }
-            my @slice = @$lines[$startline .. $endline ];
-            if ($level == 0 and not $indenttoplevelscalar) {
-                $new_spaces = ' ' x ($new_indent - $indent);
-            }
-            for my $line (@slice) {
-                if ($line =~ tr/ //c) {
-                    $line =~ s/^[\t ]*/$new_spaces/;
+            my $remove = 0;
+            if (not $skipfirst or $node->multiline) {
+                my $startline = $startline;
+                $startline++ if $skipfirst;
+                $endline = $node->close->{line};
+                return if $startline >= @$lines;
+                my $line = $lines->[ $startline ];
+                my ($sp) = $line =~ m/^( *)/;
+                if ($ignore_firstlevel) {
+                    $new_indent = length $sp;
+                    $new_spaces = ' ' x $new_indent;
                 }
+                my @slice = @$lines[$startline .. $endline ];
+                if ($level == 0 and not $indenttoplevelscalar) {
+                    $new_spaces = ' ' x ($new_indent - $indent);
+                }
+                for my $line (@slice) {
+                    if ($line =~ tr/ //c) {
+                        $line =~ s/^([\t ]*)/$new_spaces/
+                            and $remove = length($1) - length($new_spaces);
+                    }
+                }
+                $node->close->{column} -= $remove;
+                @$lines[$startline .. $endline ] = @slice;
             }
-            @$lines[$startline .. $endline ] = @slice;
+            if (not $node->multiline) {
+                $self->_replace_quoting($node);
+            }
+        }
+    }
+}
+
+my $RE_INT_CORE = qr{^([+-]?(?:[0-9]+))$};
+my $RE_FLOAT_CORE = qr{^([+-]?(?:\.[0-9]+|[0-9]+(?:\.[0-9]*)?)(?:[eE][+-]?[0-9]+)?)$};
+my $RE_INT_OCTAL = qr{^0o([0-7]+)$};
+my $RE_INT_HEX = qr{^0x([0-9a-fA-F]+)$};
+my @null = (qw/ null NULL Null ~ /, '');
+my @true = qw/ true TRUE True /;
+my @false = qw/ false FALSE False /;
+my @inf = qw/ .inf .Inf .INF +.inf +.Inf +.INF  -.inf -.Inf -.INF /;
+my @nan = qw/ .nan .NaN .NAN /;
+my @re = ($RE_INT_CORE, $RE_INT_OCTAL, $RE_INT_HEX,  $RE_FLOAT_CORE);
+my $re = join '|', @re;
+my @all = (@null, @true, @false, @inf, @nan);
+
+sub _replace_quoting($self, $node) {
+    # TODO nodes with tags or anchors
+    my $default_style = $self->cfg->default_scalar_style;
+    # single line flow scalars
+    if ($node->{style} != $default_style) {
+        my ($changed, $new_string) = $self->_change_style($node, $default_style);
+        if ($changed) {
+            my $lines = $self->{lines};
+            my $line = $lines->[ $node->open->{line} ];
+            my ($from, $to) = ($node->open->{column}, $node->close->{column});
+            if (defined $node->{anchor} or $node->{tag}) {
+                my ($anchor, $tag, $comments, $scalar) = $self->_find_scalar_start($node);
+                $from = $scalar->[1];
+            }
+            substr($line, $from, $to - $from, $new_string);
+            my $diff = length($new_string) - ($to - $from);
+            if ($diff) {
+                $self->{tree}->_move_columns($node->open->{line}, $node->close->{column} + 1, $diff);
+            }
+            $node->close->{column} += $diff;
+            $lines->[ $node->open->{line} ] = $line;
+        }
+    }
+}
+
+sub _change_style($self, $node, $style) {
+    my $value = $node->{value};
+    if (grep { $_ eq $value } @all or $value =~ m/($re)/ and $node->{style} == YAML_PLAIN_SCALAR_STYLE) {
+        # leave me alone
+        return (0);
+    }
+    else {
+        my $emit = $self->_emit_value($value, $style);
+        chomp $emit;
+        return (0) if $emit =~ tr/\n//;
+        my $first = substr($emit, 0, 1);
+        my $new_style =
+            $first eq "'" ? YAML_SINGLE_QUOTED_SCALAR_STYLE
+            : $first eq '"' ? YAML_DOUBLE_QUOTED_SCALAR_STYLE
+            : YAML_PLAIN_SCALAR_STYLE;
+        if ($new_style eq $style) {
+            return (1, $emit);
+        }
+    }
+    return (0);
+}
+
+sub _emit_value($self, $value, $style) {
+    my $options = {};
+    my $events = [
+        { name => 'stream_start_event' },
+        { name => 'document_start_event', implicit => 1 },
+        { name => 'scalar_event', style => $style, value => $value },
+        { name => 'document_end_event', implicit => 1 },
+        { name => 'stream_end_event' },
+    ];
+    return YAML::LibYAML::API::XS::emit_string_events($events, $options);
+}
+
+sub _process_doc($self, $parent, $node) {
+    DEBUG and say STDERR "_process_doc($node)";
+    my $lines = $self->{lines};
+    my $open = $node->open;
+    my $close = $node->close;
+    if ($node->open->{implicit} and $self->cfg->addheader and not $self->partial) {
+        # add ---
+        splice @$lines, $open->{start}->{line}, 0, '---';
+        $self->{tree}->fix_lines($open->{start}->{line}, +1);
+        $open->{start}->{line}--;
+        $open->{end}->{line}--;
+        $open->{end}->{column} = 3;
+        $open->{implicit} = 0;
+        DEBUG and say STDERR "$node";
+    }
+    elsif ($node->{index} == 1 and not $open->{implicit} and $self->cfg->removeheader and not $self->partial) {
+        # remove first ---
+        my $child = $node->{children}->[0];
+        if ($open->{version_directive} or $open->{tag_directives} or not $child->is_collection and $child->empty_scalar) {
+        }
+        else {
+            my $startline = $open->{start}->{line};
+            my $line = $lines->[ $startline ];
+            if ($line =~ m/^---[ \t]*$/) {
+                splice @$lines, $startline, 1;
+                $self->{tree}->fix_lines($open->{start}->{line}+1, -1);
+                DEBUG and say STDERR "$node";
+                $open->{implicit} = 1;
+            }
+            elsif ($line =~ s/^---[ \t]+(?=#)//) {
+                $lines->[ $startline ] = $line;
+                DEBUG and say STDERR "$node";
+                $open->{implicit} = 1;
+            }
+        }
+    }
+    if ($close->{implicit} and $self->cfg->addfooter and not $self->partial) {
+        # add ...
+        splice @$lines, $close->{start}->{line}, 0, '...';
+        $self->{tree}->fix_lines($close->{start}->{line}, +1);
+        $close->{end}->{column} = 3;
+        $close->{implicit} = 0;
+        DEBUG and say STDERR "$node";
+    }
+    elsif (not $close->{implicit} and $self->cfg->removefooter and not $self->partial) {
+        # remove ...
+        my $next = $parent->{children}->[ $node->{index} ];
+        if ($next and ($next->open->{version_directive} or $next->open->{tag_directives})) {
+        }
+        else {
+            my $startline = $close->{start}->{line};
+            my $line = $lines->[ $startline ];
+            if ($line =~ m/^\.\.\.[ \t]*$/) {
+                splice @$lines, $startline, 1;
+                $self->{tree}->fix_lines($close->{start}->{line}+1, -1);
+                $close->{implicit} = 1;
+            }
+            elsif ($line =~ s/^\.\.\.[ \t]+(?=#)//) {
+                $lines->[ $startline ] = $line;
+                $close->{implicit} = 1;
+            }
+            DEBUG and say STDERR "$node";
+        }
+    }
+}
+
+sub _trimspaces($self, $from, $node) {
+    if ($node->is_collection) {
+        my $level = $node->{level};
+        for my $c (@{ $node->{children} }) {
+            $self->_trimspaces($from, $c);
+        }
+        if ($level == -1) {
+            $self->_trim($$from, $node->end->{line});
+        }
+    }
+    elsif (defined $node->{style}) {
+        # Only spaces in block scalars must be left alone
+        if ($node->{style} eq YAML_LITERAL_SCALAR_STYLE
+            or $node->{style} eq YAML_FOLDED_SCALAR_STYLE) {
+            my ($anchor, $tag, $comments, $scalar) = $self->_find_scalar_start($node);
+            $self->_trim($$from, $scalar->[0]);
+            $$from = $node->end->{line};
         }
     }
 }
@@ -312,9 +473,6 @@ sub _process_flow($self, $parent, $node, $block_indent = undef) {
     my $startline = $node->start->{line};
     my $end = $node->end;
     my $endline = $end->{line};
-    if ($flow == 1 and $self->cfg->trimtrailing) {
-        $self->_trim($startline, $endline);
-    }
 
     my $before = substr($lines->[ $startline ], 0, $node->start->{column});
     if ($before =~ tr/ \t//c) {
@@ -361,16 +519,14 @@ sub _process_flow_scalar($self, $parent, $node, $block_indent) {
 }
 
 sub _find_scalar_start($self, $node) {
+#    warn __PACKAGE__.':'.__LINE__.": ========= _find_scalar_start $node\n";
     my $lines = $self->{lines};
     my $from = $node->line;
     my $to = $node->realendline;
     my $col = $node->indent;
     my $end = $node->end;
     my $endcol = $end->{column};
-#    warn __PACKAGE__.':'.__LINE__.$".Data::Dumper->Dump([\$endcol], ['endcol']);
-#    warn __PACKAGE__.':'.__LINE__.$".Data::Dumper->Dump([\$col], ['col']);
     my @slice = @$lines[ $from .. $to ];
-#    warn __PACKAGE__.':'.__LINE__.$".Data::Dumper->Dump([\@slice], ['slice']);
     my $anchor;
     my $tag;
     my @comments;
@@ -388,7 +544,7 @@ sub _find_scalar_start($self, $node) {
             next;
         }
         my $cur;
-        while ($part =~ m/\G\s*([&!])(\S+)/g) {
+        while ($part =~ m/\G\s*([&!])(\S*)/g) {
             my $type = $1;
             my $name = $2;
             $cur = pos $part;
@@ -419,9 +575,6 @@ sub _find_scalar_start($self, $node) {
         }
     }
     $scalar ||= [$to, length($slice[ -1 ]), ''];
-#    warn __PACKAGE__.':'.__LINE__.$".Data::Dumper->Dump([\$anchor], ['anchor']);
-#    warn __PACKAGE__.':'.__LINE__.$".Data::Dumper->Dump([\$tag], ['tag']);
-#    warn __PACKAGE__.':'.__LINE__.$".Data::Dumper->Dump([\@comments], ['comments']);
 #    warn __PACKAGE__.':'.__LINE__.$".Data::Dumper->Dump([\$scalar], ['scalar']);
     return ($anchor, $tag, \@comments, $scalar);
 }
@@ -434,8 +587,6 @@ sub _trim($self, $from, $to) {
 }
 
 sub _fix_indent($self, $node, $fix, $offset) {
-#    warn __PACKAGE__.':'.__LINE__.$".Data::Dumper->Dump([\$fix], ['fix']);
-#    warn __PACKAGE__.':'.__LINE__.$".Data::Dumper->Dump([\$offset], ['offset']);
     $offset ||= 0;
     my $startline = $node->line;
     my $lines = $self->{lines};
@@ -578,7 +729,7 @@ sub _tree($self, $yaml, $lines) {
 
 sub _parse($self, $yaml) {
     my @events;
-    YAML::LibYAML::API::XS::parse_string_events($yaml, \@events);
+    YAML::LibYAML::API::XS::parse_events($yaml, \@events);
     return \@events;
 }
 

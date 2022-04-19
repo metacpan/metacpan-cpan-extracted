@@ -20,11 +20,11 @@
 #include "spvm_type.h"
 #include "spvm_use.h"
 #include "spvm_basic_type.h"
-#include "spvm_my.h"
+#include "spvm_var_decl.h"
 #include "spvm_string_buffer.h"
 #include "spvm_method.h"
 #include "spvm_class.h"
-#include "spvm_string.h"
+#include "spvm_constant_string.h"
 
 SPVM_OP* SPVM_TOKE_new_op(SPVM_COMPILER* compiler, int32_t type) {
   
@@ -299,7 +299,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                 compiler->cur_file = embedded_file_name;
               }
               
-              SPVM_STRING* cur_file_string = SPVM_STRING_new(compiler, compiler->cur_file, strlen(compiler->cur_file));
+              SPVM_CONSTANT_STRING* cur_file_string = SPVM_CONSTANT_STRING_new(compiler, compiler->cur_file, strlen(compiler->cur_file));
               compiler->cur_file = cur_file_string->value;
               
               // Set initial information for tokenization
@@ -311,7 +311,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
             else {
               // If module not found and the module is used in require syntax, compilation errors don't occur.
               if (op_use->uv.use->is_require) {
-                SPVM_HASH_set(compiler->fail_load_class_symtable, class_name, strlen(class_name), (void*)class_name);
+                SPVM_HASH_set(compiler->not_found_class_class_symtable, class_name, strlen(class_name), (void*)class_name);
                 continue;
               }
             }
@@ -1289,7 +1289,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
           string_literal_tmp[string_literal_length] = '\0';
         }
 
-        SPVM_STRING* string_literal_string = SPVM_STRING_new(compiler, string_literal_tmp, string_literal_length);
+        SPVM_CONSTANT_STRING* string_literal_string = SPVM_CONSTANT_STRING_new(compiler, string_literal_tmp, string_literal_length);
         const char* string_literal = string_literal_string->value;
 
         SPVM_ALLOCATOR_free_memory_block_tmp(compiler->allocator, string_literal_tmp);
@@ -1382,7 +1382,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
             memcpy(&var_name_tmp[1], cur_token_ptr, var_name_length_without_sigil);
             var_name_tmp[1 + var_name_length_without_sigil] = '\0';
             
-            SPVM_STRING* var_name_string = SPVM_STRING_new(compiler, var_name_tmp, 1 + var_name_length_without_sigil);
+            SPVM_CONSTANT_STRING* var_name_string = SPVM_CONSTANT_STRING_new(compiler, var_name_tmp, 1 + var_name_length_without_sigil);
             const char* var_name = var_name_string->value;
             
             SPVM_ALLOCATOR_free_memory_block_tmp(compiler->allocator, var_name_tmp);
@@ -1566,14 +1566,14 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
           SPVM_VALUE num;
           
           // float
-          if (constant_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_FLOAT) {
+          if (constant_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT) {
             num.dval = strtof(num_str, &end);
             if (*end != '\0') {
               SPVM_COMPILER_error(compiler, "Invalid float literal at %s line %d", compiler->cur_file, compiler->cur_line);
             }
           }
           // double
-          else if (constant_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_DOUBLE) {
+          else if (constant_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE) {
             
             num.dval = strtod(num_str, &end);
             if (*end != '\0') {
@@ -1581,7 +1581,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
             }
           }
           // int
-          else if (constant_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_INT) {
+          else if (constant_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_INT) {
             errno = 0;
             int32_t out_of_range = 0;
             int32_t invalid = 0;
@@ -1627,7 +1627,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
             }
           }
           // long
-          else if (constant_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_LONG) {
+          else if (constant_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_LONG) {
             errno = 0;
             int32_t out_of_range = 0;
             int32_t invalid = 0;
@@ -1680,16 +1680,16 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
 
           // Constant op
           SPVM_OP* op_constant;
-          if (constant_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_FLOAT) {
+          if (constant_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT) {
             op_constant = SPVM_OP_new_op_constant_float(compiler, (float)num.dval, compiler->cur_file, compiler->cur_line);
           }
-          else if (constant_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_DOUBLE) {
+          else if (constant_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE) {
             op_constant = SPVM_OP_new_op_constant_double(compiler, num.dval, compiler->cur_file, compiler->cur_line);
           }
-          else if (constant_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_INT) {
+          else if (constant_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_INT) {
             op_constant = SPVM_OP_new_op_constant_int(compiler, num.lval, compiler->cur_file, compiler->cur_line);
           }
-          else if (constant_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_LONG) {
+          else if (constant_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_LONG) {
             op_constant = SPVM_OP_new_op_constant_long(compiler, num.lval, compiler->cur_file, compiler->cur_line);
           }
           
@@ -1999,8 +1999,8 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                   keyword_term = MAKE_READ_ONLY;
                 }
                 else if (strcmp(symbol_name, "my") == 0) {
-                  SPVM_OP* op_my = SPVM_OP_new_op_my(compiler, compiler->cur_file, compiler->cur_line);
-                  yylvalp->opval = op_my;
+                  SPVM_OP* op_var_decl = SPVM_OP_new_op_var_decl(compiler, compiler->cur_file, compiler->cur_line);
+                  yylvalp->opval = op_var_decl;
                   is_keyword = 1;
                   keyword_term = MY;
                 }
@@ -2293,7 +2293,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
           }
           else {
             // Create eternal symbol name
-            SPVM_STRING* symbol_name_string = SPVM_STRING_new(compiler, symbol_name, symbol_name_length);
+            SPVM_CONSTANT_STRING* symbol_name_string = SPVM_CONSTANT_STRING_new(compiler, symbol_name, symbol_name_length);
             const char* symbol_name_eternal = symbol_name_string->value;
 
             // String literal

@@ -1,5 +1,5 @@
 ---
-abstract: 'List of modules for browsing table data interactively'
+abstract: 'List of modules/tools for browsing table data interactively'
 author:
   - 'perlancar <perlancar@cpan.org>'
 build_requires:
@@ -19,14 +19,14 @@ name: Acme-CPANModules-BrowsingTableInteractively
 provides:
   Acme::CPANModules::BrowsingTableInteractively:
     file: lib/Acme/CPANModules/BrowsingTableInteractively.pm
-    version: '0.005'
+    version: '0.006'
 requires:
   strict: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-BrowsingTableInteractively
   homepage: https://metacpan.org/release/Acme-CPANModules-BrowsingTableInteractively
   repository: git://github.com/perlancar/perl-Acme-CPANModules-BrowsingTableInteractively.git
-version: '0.005'
+version: '0.006'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -34,7 +34,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Acme::CPANModules
       name: Acme::CPANModules
-      version: '0.004'
+      version: '0.005'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::CheckPendingRelease
       name: '@Author::PERLANCAR/PERLANCAR::CheckPendingRelease'

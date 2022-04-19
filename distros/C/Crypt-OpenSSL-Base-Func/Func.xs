@@ -23,51 +23,50 @@
 
 MODULE = Crypt::OpenSSL::Base::Func		PACKAGE = Crypt::OpenSSL::Base::Func		
 
+EC_GROUP *EC_GROUP_new_by_curve_name(int nid)
 
-int OBJ_sn2nid (const char *s)
-
-EC_GROUP *EC_GROUP_new_by_curve_name(int nid);
-
-const BIGNUM *EC_GROUP_get0_cofactor(const EC_GROUP *group)
-
-int EC_GROUP_get_curve(const EC_GROUP *group, BIGNUM *p, BIGNUM *a, BIGNUM *b, BN_CTX *ctx)
-
-int EC_POINT_set_affine_coordinates(const EC_GROUP *group, EC_POINT *p, const BIGNUM *x, const BIGNUM *y, BN_CTX *ctx)
-
-int EC_POINT_get_affine_coordinates(const EC_GROUP *group, const EC_POINT *p, BIGNUM *x, BIGNUM *y, BN_CTX *ctx)
-
-char *EC_POINT_point2hex(const EC_GROUP *group, const EC_POINT *p, point_conversion_form_t form, BN_CTX *ctx)
+EC_KEY *EVP_PKEY_get1_EC_KEY(EVP_PKEY *pkey)
 
 EC_POINT* EC_POINT_hex2point(const EC_GROUP *group, const char *hex, EC_POINT *p, BN_CTX *ctx)
 
-const BIGNUM *EC_KEY_get0_private_key(const EC_KEY *key);
+EVP_PKEY* EVP_PKEY_new()
 
-EVP_PKEY* EVP_PKEY_new();
+char *EC_POINT_point2hex(const EC_GROUP *group, const EC_POINT *p, point_conversion_form_t form, BN_CTX *ctx)
 
-int EVP_PKEY_assign_EC_KEY(EVP_PKEY *pkey, EC_KEY *key);
+const BIGNUM *EC_GROUP_get0_cofactor(const EC_GROUP *group)
 
-EC_KEY *EVP_PKEY_get1_EC_KEY(EVP_PKEY *pkey);
+const BIGNUM *EC_KEY_get0_private_key(const EC_KEY *key)
 
 const EVP_MD *EVP_get_digestbyname(const char *name)
 
-int EVP_MD_size(const EVP_MD *md)
+int EC_GROUP_get_curve(const EC_GROUP *group, BIGNUM *p, BIGNUM *a, BIGNUM *b, BN_CTX *ctx)
+
+int EC_KEY_set_private_key(EC_KEY *key, const BIGNUM *prv)
+
+int EC_POINT_get_affine_coordinates(const EC_GROUP *group, const EC_POINT *p, BIGNUM *x, BIGNUM *y, BN_CTX *ctx)
+
+int EC_POINT_set_affine_coordinates(const EC_GROUP *group, EC_POINT *p, const BIGNUM *x, const BIGNUM *y, BN_CTX *ctx)
 
 int EVP_MD_block_size(const EVP_MD *md)
 
-int EC_KEY_set_private_key(EC_KEY *key, const BIGNUM *prv);
+int EVP_MD_size(const EVP_MD *md)
 
+int EVP_PKEY_assign_EC_KEY(EVP_PKEY *pkey, EC_KEY *key)
 
+int OBJ_sn2nid (const char *s)
 
-int ecdh_pkey_raw(EVP_PKEY *pkey_priv, EVP_PKEY *pkey_peer_pub, unsigned char **z)
 
 
 EVP_PKEY* evp_pkey_from_point_hex(EC_GROUP* group, char* point_hex, BN_CTX* ctx)
 
 EVP_PKEY* evp_pkey_from_priv_hex(EC_GROUP* group, char* priv_hex)
 
+EVP_PKEY* pem_read_pkey(char* keyfile, int is_priv)
+
+int ecdh_pkey_raw(EVP_PKEY *pkey_priv, EVP_PKEY *pkey_peer_pub, unsigned char **z)
+
 int pem_write_evp_pkey(char* dst_fname, EVP_PKEY* pkey, int is_priv)
 
-EVP_PKEY* pem_read_pkey(char* keyfile, int is_priv)
 
 
 EC_POINT*

@@ -135,35 +135,7 @@ sub check_router {
 sub add_missing_router {
     my OSPF::LSDB::View6 $self = shift;
     my($index) = @_;
-    my $boundhash = $self->{boundhash};
-    my $externhash = $self->{externhash};
-    # create router hash
     my %rid2areas;
-    my @rids = map { keys %{$_->{routers}} }
-      map { values %$_ } values %$externhash;
-    foreach my $rid (@rids) {
-	# if ase is conneted to boundary router, router is not missing
-	next if $boundhash->{$rid};
-	$rid2areas{$rid}{ase} = 1;
-    }
-    my $sumhash = $self->{sumhash};
-    my @arearids = map { $_->{arearids} }
-      (values %$boundhash, map { values %$_ } values %$sumhash);
-    foreach my $ar (@arearids) {
-	while (my($area,$av) = each %$ar) {
-	    while (my($rid,$num) = each %$av) {
-		$rid2areas{$rid}{$area} = 1;
-	    }
-	}
-    }
-    foreach my $type (qw(pointtopoint virtual)) {
-	my $linkhash = $self->{$type."hash"} or die "Uninitialized member";
-	while (my($dstrid,$dv) = each %$linkhash) {
-	    while (my($area,$av) = each %$dv) {
-		$rid2areas{$dstrid}{$area} = 1;
-	    }
-	}
-    }
     my $nethash = $self->{nethash} or die "Uninitialized member";
     my @hashes = map { @{$_->{hashes}} } map { values %$_ }
       map { values %$_ } values %$nethash;
@@ -174,28 +146,21 @@ sub add_missing_router {
 	    $rid2areas{$_->{routerid}}{$area} = 1;
 	}
     }
-    my $routerid = $self->{ospf}{self}{routerid};
-    my $routehash = $self->{routehash} or die "Uninitialized member";
-    foreach my $rid (sort keys %rid2areas) {
-	my $rv = $rid2areas{$rid};
-	my $elem = $routehash->{$rid};
-	if (! $elem) {
-	    $routehash->{$rid} = $elem = {};
-	    $elem->{graph} = {
-		N     => "router$$index",
-		label => $rid,
-		shape => "box",
-		style => "dotted",
-	    };
-	    $elem->{index} = $$index++;
-	    if ($rid eq $routerid) {
-		$elem->{graph}{peripheries} = 2;
-	    }
-	    push @{$elem->{hashes}}, {};
-	    $elem->{areas} = $rv;
-	    $elem->{missing}++;
-	}
+    my $intraroutehash = $self->{intraroutehash};
+    @hashes = map { @{$_->{hashes}} } map { values %$_ }
+	values %$intraroutehash;
+    foreach my $ir (@hashes) {
+	my $area = $ir->{area};
+	$rid2areas{$ir->{router}}{$area} = 1;
     }
+    my $lnkhash = $self->{lnkhash};
+    @hashes = map { @{$_->{hashes}} } map { values %$_ }
+	map { values %$_ } values %$lnkhash;
+    foreach my $l (@hashes) {
+	my $area = $l->{area};
+	$rid2areas{$l->{routerid}}{$area} = 1;
+    }
+    $self->add_missing_router_common($index, %rid2areas);
 }
 
 ########################################################################
@@ -540,24 +505,29 @@ sub check_network {
 	    }
 	    foreach my $area (sort keys %$rv) {
 		my $ev = $rv->{$area};
-		$colors{gray} = $area;
-		delete $colors{yellow};
-		if (@{$ev->{hashes}} > 1) {
-		    $self->error($colors{yellow} =
-		      "Network $nid at router $rid ".
-		      "has multiple entries in area $area.");
-		}
-		delete $colors{brown};
-		my @attrids = keys %{$ev->{attachrouters}};
-		if (@attrids == 0) {
-		    $self->error($colors{red} =
-		      "Network $nid at router $rid not attached ".
-		      "to any router in area $area.");
-		}
-		if (@attrids == 1) {
-		    $self->error($colors{brown} =
-		      "Network $nid at router $rid attached only ".
-		      "to router @attrids in area $area.");
+		if ($ev->{missing}) {
+		    $self->error($colors{red} = "Network $nid missing ".
+			"in area $area.");
+		} else {
+		    $colors{gray} = $area;
+		    delete $colors{yellow};
+		    if (@{$ev->{hashes}} > 1) {
+			$self->error($colors{yellow} =
+			  "Network $nid at router $rid ".
+			  "has multiple entries in area $area.");
+		    }
+		    delete $colors{brown};
+		    my @attrids = keys %{$ev->{attachrouters}};
+		    if (@attrids == 0) {
+			$self->error($colors{red} =
+			  "Network $nid at router $rid not attached ".
+			  "to any router in area $area.");
+		    }
+		    if (@attrids == 1) {
+			$self->error($colors{brown} =
+			  "Network $nid at router $rid attached only ".
+			  "to router @attrids in area $area.");
+		    }
 		}
 		%{$ev->{colors}} = %colors;
 		# TODO move netcluster to prefix lsa
@@ -571,7 +541,7 @@ sub check_network {
 # return network hash
 sub create_network {
     my OSPF::LSDB::View6 $self = shift;
-    my $index = 0;
+    my($index) = @_;
     my %nethash;
     my %nets;
     my %netareas;
@@ -586,12 +556,12 @@ sub create_network {
 	if (! $elem) {
 	    $nethash{$addr}{$rid}{$area} = $elem = {};
 	    $elem->{graph} = {
-		N     => "network$index",
+		N     => "network$$index",
 		label => "$addr\\n$rid",
 		shape => "ellipse",
 		style => "bold",
 	    };
-	    $elem->{index} = $index++;
+	    $elem->{index} = $$index++;
 	}
 	push @{$elem->{hashes}}, $n;
 	foreach my $att (@{$n->{attachments}}) {
@@ -1371,7 +1341,6 @@ sub link2edges {
 	    my $lid = "$intf\@$rid";
 	    my $rdst = $routehash->{$rid}{graph}{N}
 	      or die "No router graph $rid";
-	    # TODO create missing router
 	    foreach my $area (sort keys %$rv) {
 		my $av = $rv->{$area};
 		my $src = $av->{graph}{N};
@@ -1503,7 +1472,6 @@ sub intrarouter2edges {
 	    my $src = $av->{graph}{N};
 	    my $dst = $routehash->{$rid}{graph}{N}
 	      or die "No router graph $rid";
-	    # TODO create missing router
 	    my %colors;
 	    $colors{gray} = $area;
 	    foreach my $i (@{$av->{hashes}}) {

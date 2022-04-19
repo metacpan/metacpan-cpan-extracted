@@ -18,7 +18,7 @@ WriteMakefile(
         'Crypt::OpenSSL::Guess' => 0.12,
         'Crypt::OpenSSL::Bignum' => 0.09,
         'Crypt::OpenSSL::EC' => 1.31,
-        'Crypt::OpenSSL::Base::Func' => 0.03,
+        'Crypt::OpenSSL::Base::Func' => 0.034,
         'Math::BigInt' => 1.999815,
         'Carp' => 0.01,
         'Test::More' => 0.01,

@@ -40,7 +40,8 @@
             "Encode" : "0",
             "Fcntl" : "0",
             "Getopt::Long" : "0",
-            "IO::File" : "0"
+            "IO::File" : "0",
+            "Time::Local" : "0"
          }
       }
    },
@@ -56,6 +57,6 @@
          "web" : "https://github.com/pmqs/zipdetails"
       }
    },
-   "version" : 2.104,
+   "version" : 2.107,
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

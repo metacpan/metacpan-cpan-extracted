@@ -54,7 +54,7 @@ use PPIx::Regexp::Constant qw{
     @CARP_NOT
 };
 
-our $VERSION = '0.084';
+our $VERSION = '0.085';
 
 =head2 accepts_perl
 

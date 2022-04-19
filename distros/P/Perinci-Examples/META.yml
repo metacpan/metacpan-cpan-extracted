@@ -19,70 +19,70 @@ name: Perinci-Examples
 provides:
   Perinci::Examples:
     file: lib/Perinci/Examples.pm
-    version: '0.822'
+    version: '0.823'
   Perinci::Examples::ArgsAs:
     file: lib/Perinci/Examples/ArgsAs.pm
-    version: '0.822'
+    version: '0.823'
   Perinci::Examples::CLI:
     file: lib/Perinci/Examples/CLI.pm
-    version: '0.822'
+    version: '0.823'
   Perinci::Examples::CSV:
     file: lib/Perinci/Examples/CSV.pm
-    version: '0.822'
+    version: '0.823'
   Perinci::Examples::CmdLineResMeta:
     file: lib/Perinci/Examples/CmdLineResMeta.pm
-    version: '0.822'
+    version: '0.823'
   Perinci::Examples::CmdLineSrc:
     file: lib/Perinci/Examples/CmdLineSrc.pm
-    version: '0.822'
+    version: '0.823'
   Perinci::Examples::Coercion:
     file: lib/Perinci/Examples/Coercion.pm
-    version: '0.822'
+    version: '0.823'
   Perinci::Examples::Completion:
     file: lib/Perinci/Examples/Completion.pm
-    version: '0.822'
+    version: '0.823'
   Perinci::Examples::FilePartial:
     file: lib/Perinci/Examples/FilePartial.pm
-    version: '0.822'
+    version: '0.823'
   Perinci::Examples::FileStream:
     file: lib/Perinci/Examples/FileStream.pm
-    version: '0.822'
+    version: '0.823'
   Perinci::Examples::NoMeta:
     file: lib/Perinci/Examples/NoMeta.pm
-    version: '0.822'
+    version: '0.823'
   Perinci::Examples::ResultNaked:
     file: lib/Perinci/Examples/ResultNaked.pm
-    version: '0.822'
+    version: '0.823'
   Perinci::Examples::Stream:
     file: lib/Perinci/Examples/Stream.pm
-    version: '0.822'
+    version: '0.823'
   Perinci::Examples::SubMeta:
     file: lib/Perinci/Examples/SubMeta.pm
-    version: '0.822'
+    version: '0.823'
   Perinci::Examples::Table:
     file: lib/Perinci/Examples/Table.pm
-    version: '0.822'
+    version: '0.823'
   Perinci::Examples::Tiny:
     file: lib/Perinci/Examples/Tiny.pm
-    version: '0.822'
+    version: '0.823'
   Perinci::Examples::Tiny::Args:
     file: lib/Perinci/Examples/Tiny/Args.pm
-    version: '0.822'
+    version: '0.823'
   Perinci::Examples::Tiny::Result:
     file: lib/Perinci/Examples/Tiny/Result.pm
-    version: '0.822'
+    version: '0.823'
   Perinci::Examples::Tx:
     file: lib/Perinci/Examples/Tx.pm
-    version: '0.822'
+    version: '0.823'
   Perinci::Examples::Version:
     file: lib/Perinci/Examples/Version.pm
-    version: '0.822'
+    version: '0.823'
   Perinci::Examples::rimetadb::ExcludedPackage:
     file: lib/Perinci/Examples/rimetadb/ExcludedPackage.pm
-    version: '0.822'
+    version: '0.823'
   Perinci::Examples::rimetadb::IncludedPackage:
     file: lib/Perinci/Examples/rimetadb/IncludedPackage.pm
-    version: '0.822'
+    version: '0.823'
 requires:
   Fcntl: '0'
   List::Util: '1.54'
@@ -101,7 +101,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Examples
   homepage: https://metacpan.org/release/Perinci-Examples
   repository: git://github.com/perlancar/perl-Perinci-Examples.git
-version: '0.822'
+version: '0.823'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

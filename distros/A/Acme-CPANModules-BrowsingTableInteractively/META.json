@@ -1,5 +1,5 @@
 {
-   "abstract" : "List of modules for browsing table data interactively",
+   "abstract" : "List of modules/tools for browsing table data interactively",
    "author" : [
       "perlancar <perlancar@cpan.org>"
    ],
@@ -61,7 +61,7 @@
    "provides" : {
       "Acme::CPANModules::BrowsingTableInteractively" : {
          "file" : "lib/Acme/CPANModules/BrowsingTableInteractively.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       }
    },
    "release_status" : "stable",
@@ -76,7 +76,7 @@
          "web" : "https://github.com/perlancar/perl-Acme-CPANModules-BrowsingTableInteractively"
       }
    },
-   "version" : "0.005",
+   "version" : "0.006",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"
@@ -85,7 +85,7 @@
          {
             "class" : "Dist::Zilla::Plugin::Acme::CPANModules",
             "name" : "Acme::CPANModules",
-            "version" : "0.004"
+            "version" : "0.005"
          },
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::CheckPendingRelease",

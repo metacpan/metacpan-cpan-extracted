@@ -1,5 +1,9 @@
 Revision history for Perl module Text::Levenshtein
 
+0.15 2022-04-16 NEILB
+    - Looking at gaps in test coverage revealed some clumsily written logic.
+      Refactoring it not only made the code better, but improved coverage.
+
 0.14 2021-03-24 NEILB
     - Added String::KeyboardDistance to SEE ALSO
     - Added Text::Levenshtein::BV to SEE ALSO

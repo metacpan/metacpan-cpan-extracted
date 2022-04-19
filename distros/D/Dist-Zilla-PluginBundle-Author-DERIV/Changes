@@ -1,5 +1,10 @@
 Revision history for Dist-Zilla-PluginBundle-Author-DERIV
 
-0.001     2020-06-18 09:53:56+00:00 UTC
-    Initial version.
+0.003     2022-04-19 08:33:08+08:00 Asia/Shanghai
+    Fix ExtUtuls::MakeMaker Version in Makefile.PL
 
+0.002     2022-04-18 15:45:01+08:00 Asia/Shanghai
+    Support pinned cpanfile versions
+
+0.001     2022-04-18 09:39:14+08:00
+    Initial version.

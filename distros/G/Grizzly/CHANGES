@@ -1,3 +1,7 @@
+v0.104 2022.04.13
+    Created an executable grizzly file
+
+
 v0.103 2021.09.22
 
     Added error handling for a missing NewsAPI key

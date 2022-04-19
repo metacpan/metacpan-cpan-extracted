@@ -8600,7 +8600,8 @@ $VAR1 = {
                                                         'start' => '21467980800'
                                                       }
                                                     ],
-                                         'size' => '21474836480'
+                                         'size' => '21474836480',
+                                         'type' => 'msdos'
                                        },
                             'dm-11' => {
                                          'label' => 'Linux device-mapper (linear)',
@@ -8632,7 +8633,8 @@ $VAR1 = {
                                                         'start' => '26841448448'
                                                       }
                                                     ],
-                                         'size' => '26843545600'
+                                         'size' => '26843545600',
+                                         'type' => 'msdos'
                                        },
                             'dm-12' => {
                                          'label' => 'Linux device-mapper (linear)',
@@ -8672,7 +8674,8 @@ $VAR1 = {
                                                         'start' => '53684994048'
                                                       }
                                                     ],
-                                         'size' => '53687091200'
+                                         'size' => '53687091200',
+                                         'type' => 'msdos'
                                        },
                             'dm-13' => {
                                          'label' => 'Linux device-mapper (linear)',
@@ -8720,7 +8723,8 @@ $VAR1 = {
                                                         'start' => '16105079296'
                                                       }
                                                     ],
-                                         'size' => '16106127360'
+                                         'size' => '16106127360',
+                                         'type' => 'gpt'
                                        },
                             'dm-15' => {
                                          'label' => 'Linux device-mapper (linear)',
@@ -8768,7 +8772,8 @@ $VAR1 = {
                                                         'start' => '8588886016'
                                                       }
                                                     ],
-                                         'size' => '16106127360'
+                                         'size' => '16106127360',
+                                         'type' => 'gpt'
                                        },
                             'dm-16' => {
                                          'label' => 'Linux device-mapper (linear)',
@@ -8813,7 +8818,8 @@ $VAR1 = {
                                                         'start' => '53684994048'
                                                       }
                                                     ],
-                                         'size' => '53687091200'
+                                         'size' => '53687091200',
+                                         'type' => 'msdos'
                                        },
                             'dm-17' => {
                                          'label' => 'Linux device-mapper (linear)',
@@ -8850,7 +8856,8 @@ $VAR1 = {
                                                         'start' => '16105079296'
                                                       }
                                                     ],
-                                         'size' => '16106127360'
+                                         'size' => '16106127360',
+                                         'type' => 'gpt'
                                        },
                             'dm-18' => {
                                          'label' => 'Linux device-mapper (linear)',
@@ -8882,7 +8889,8 @@ $VAR1 = {
                                                         'start' => '16105079296'
                                                       }
                                                     ],
-                                         'size' => '16106127360'
+                                         'size' => '16106127360',
+                                         'type' => 'gpt'
                                        },
                             'dm-19' => {
                                          'label' => 'Linux device-mapper (linear)',
@@ -8922,7 +8930,8 @@ $VAR1 = {
                                                         'start' => '16105079296'
                                                       }
                                                     ],
-                                         'size' => '16106127360'
+                                         'size' => '16106127360',
+                                         'type' => 'gpt'
                                        },
                             'dm-20' => {
                                          'label' => 'Linux device-mapper (linear)',
@@ -8941,7 +8950,8 @@ $VAR1 = {
                                                         'start' => '1048576'
                                                       }
                                                     ],
-                                         'size' => '107374182400'
+                                         'size' => '107374182400',
+                                         'type' => 'gpt'
                                        },
                             'dm-23' => {
                                          'label' => 'Linux device-mapper (linear)',
@@ -8981,7 +8991,8 @@ $VAR1 = {
                                                         'start' => '16105079296'
                                                       }
                                                     ],
-                                         'size' => '16106127360'
+                                         'size' => '16106127360',
+                                         'type' => 'gpt'
                                        },
                             'dm-24' => {
                                          'label' => 'Linux device-mapper (linear)',
@@ -9021,7 +9032,8 @@ $VAR1 = {
                                                         'start' => '16105079296'
                                                       }
                                                     ],
-                                         'size' => '16106127360'
+                                         'size' => '16106127360',
+                                         'type' => 'gpt'
                                        },
                             'dm-25' => {
                                          'label' => 'Linux device-mapper (linear)',
@@ -9069,7 +9081,8 @@ $VAR1 = {
                                                         'start' => '16105079296'
                                                       }
                                                     ],
-                                         'size' => '16106127360'
+                                         'size' => '16106127360',
+                                         'type' => 'gpt'
                                        },
                             'dm-26' => {
                                          'label' => 'Linux device-mapper (linear)',
@@ -9117,7 +9130,8 @@ $VAR1 = {
                                                         'start' => '16105079296'
                                                       }
                                                     ],
-                                         'size' => '16106127360'
+                                         'size' => '16106127360',
+                                         'type' => 'gpt'
                                        },
                             'dm-27' => {
                                          'label' => 'Linux device-mapper (linear)',
@@ -9165,7 +9179,8 @@ $VAR1 = {
                                                         'start' => '16105079296'
                                                       }
                                                     ],
-                                         'size' => '16106127360'
+                                         'size' => '16106127360',
+                                         'type' => 'gpt'
                                        },
                             'dm-28' => {
                                          'label' => 'Linux device-mapper (linear)',
@@ -9213,7 +9228,8 @@ $VAR1 = {
                                                         'start' => '16105079296'
                                                       }
                                                     ],
-                                         'size' => '16106127360'
+                                         'size' => '16106127360',
+                                         'type' => 'gpt'
                                        },
                             'dm-33' => {
                                          'label' => 'Linux device-mapper (linear)',
@@ -9245,7 +9261,8 @@ $VAR1 = {
                                                         'start' => '21473787904'
                                                       }
                                                     ],
-                                         'size' => '21474836480'
+                                         'size' => '21474836480',
+                                         'type' => 'gpt'
                                        },
                             'dm-34' => {
                                          'label' => 'Linux device-mapper (linear)',
@@ -9285,7 +9302,8 @@ $VAR1 = {
                                                         'start' => '16105078784'
                                                       }
                                                     ],
-                                         'size' => '16106127360'
+                                         'size' => '16106127360',
+                                         'type' => 'gpt'
                                        },
                             'dm-37' => {
                                          'label' => 'Linux device-mapper (linear)',
@@ -9325,7 +9343,8 @@ $VAR1 = {
                                                         'start' => '16105078784'
                                                       }
                                                     ],
-                                         'size' => '16106127360'
+                                         'size' => '16106127360',
+                                         'type' => 'gpt'
                                        },
                             'dm-9' => {
                                         'label' => 'Linux device-mapper (linear)',
@@ -9373,7 +9392,8 @@ $VAR1 = {
                                                        'start' => '16105079296'
                                                      }
                                                    ],
-                                        'size' => '16106127360'
+                                        'size' => '16106127360',
+                                        'type' => 'gpt'
                                       },
                             'sda' => {
                                        'label' => 'ATA WDC WD101KRYZ-01',
@@ -9453,7 +9473,8 @@ $VAR1 = {
                                                       'start' => '5498631880704'
                                                     }
                                                   ],
-                                       'size' => '10000831348736'
+                                       'size' => '10000831348736',
+                                       'type' => 'gpt'
                                      },
                             'sdb' => {
                                        'label' => 'ATA Crucial_CT960M50',
@@ -9511,7 +9532,8 @@ $VAR1 = {
                                                       'start' => '960196771840'
                                                     }
                                                   ],
-                                       'size' => '960197124096'
+                                       'size' => '960197124096',
+                                       'type' => 'gpt'
                                      },
                             'sdc' => {
                                        'label' => 'ATA WDC WD101KRYZ-01',
@@ -9583,7 +9605,8 @@ $VAR1 = {
                                                       'start' => '5498631880704'
                                                     }
                                                   ],
-                                       'size' => '10000831348736'
+                                       'size' => '10000831348736',
+                                       'type' => 'gpt'
                                      },
                             'sdd' => {
                                        'label' => 'ATA WDC WD40EFRX-68W',
@@ -9652,7 +9675,8 @@ $VAR1 = {
                                                       'start' => '4000762036224'
                                                     }
                                                   ],
-                                       'size' => '4000787030016'
+                                       'size' => '4000787030016',
+                                       'type' => 'gpt'
                                      },
                             'sde' => {
                                        'label' => 'ATA ST4000NE0025-2EW',
@@ -9692,7 +9716,8 @@ $VAR1 = {
                                                       'start' => '3299608625152'
                                                     }
                                                   ],
-                                       'size' => '4000787030016'
+                                       'size' => '4000787030016',
+                                       'type' => 'gpt'
                                      },
                             'sdf' => {
                                        'label' => 'ATA WDC WD141KRYZ-01',
@@ -9777,7 +9802,8 @@ $VAR1 = {
                                                       'start' => '6598143508480'
                                                     }
                                                   ],
-                                       'size' => '14000519643136'
+                                       'size' => '14000519643136',
+                                       'type' => 'gpt'
                                      }
                           },
           'udev' => {

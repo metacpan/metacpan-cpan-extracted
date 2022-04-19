@@ -17,13 +17,15 @@ use RPC::Switch::Client::Tiny::Netstring;
 use RPC::Switch::Client::Tiny::Async;
 use RPC::Switch::Client::Tiny::SessionCache;
 
-our $VERSION = '1.54';
+our $VERSION = '1.55';
 
 sub new {
 	my ($class, %args) = @_;
 	my $s = $args{sock} or croak __PACKAGE__ . " expects sock";
-	defined(my $b = $s->blocking()) or croak __PACKAGE__ . " bad socket: $!";
-	unless ($b) { croak __PACKAGE__ . " nonblocking socket not supported"; }
+	unless ($^O eq 'MSWin32') { # cpantester: strawberry perl does not support blocking() call
+		defined(my $b = $s->blocking()) or croak __PACKAGE__ . " bad socket: $!";
+		unless ($b) { croak __PACKAGE__ . " nonblocking socket not supported"; }
+	}
 	unless (exists $args{who}) { croak __PACKAGE__ . " expects who"; }
 	my $self = bless {
 		%args,

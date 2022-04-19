@@ -46,7 +46,6 @@ requires 'Dist::Zilla::Plugin::GithubMeta', 0;
 requires 'Dist::Zilla::Plugin::OverridePkgVersion', 0;
 requires 'Dist::Zilla::Plugin::License', 0;
 requires 'Dist::Zilla::Plugin::ReadmeAnyFromPod', 0;
-requires 'Dist::Zilla::Plugin::ReadmeAnyFromPod', 0;
 requires 'Dist::Zilla::Plugin::Manifest', 0;
 requires 'Dist::Zilla::Plugin::ManifestSkip', 0;
 requires 'Dist::Zilla::Plugin::NextRelease', 0;
@@ -63,4 +62,4 @@ requires 'Dist::Zilla::Plugin::ArchiveRelease', 0;
 requires 'Dist::Zilla::Plugin::Git::Push', 0;
 requires 'Test::CPAN::Meta', 0;
 requires 'Perl::Version', 0;
-
+requires 'ExtUtils::MakeMaker', '>= 7.64';

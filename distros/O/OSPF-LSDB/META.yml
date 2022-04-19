@@ -4,9 +4,11 @@ author:
   - 'BLUHM <bluhm@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  Pod::Checker: '0'
   Test::EOL: '0'
+  Test::More: '0'
   Test::NoWarnings: '0'
-  Test::Pod: '0'
+  Test::Pod: '1.00'
   Test::Requires: '0'
   Test::Strict: '0'
 configure_requires:
@@ -27,13 +29,19 @@ requires:
   Data::Validate: '0'
   Data::Validate::Struct: '0'
   File::Slurp: '0'
+  File::Temp: '0'
+  Getopt::Long: '0'
+  IPC::Open2: '0'
   List::MoreUtils: '0'
+  POSIX: '0'
   Regexp::Common: '0'
   Regexp::IPv6: '0'
+  Sys::Hostname: '0'
+  Time::HiRes: '0'
   YAML::Syck: '0'
   perl: '5.010000'
 resources:
   homepage: https://sourceforge.net/projects/ospfview/
   repository: git://git.code.sf.net/p/ospfview/code
-version: '1.13'
+version: '1.15'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

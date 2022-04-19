@@ -51,6 +51,7 @@ sub test_ufunc {
   if ($missing_val->isbad) { $a = $a->setbadif($abad); }
   else                     { $a->where($abad) .= $missing_val; $a->badflag(0); }
 
+  $missing_val = $missing_val->convert($a->type);
   my @ccs_ufunc_missing = $missing_val->isbad && $ccs_ufunc_name !~ /^n(?:bad|good)/ ? (0,0) : ($missing_val,$a->dim(0));
 
   my $dense_rc = $pdl_ufunc->($a);

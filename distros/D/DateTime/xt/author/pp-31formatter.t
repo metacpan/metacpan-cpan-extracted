@@ -10,6 +10,8 @@ use Test::More;
 
 use DateTime;
 
+undef $ENV{PERL_DATETIME_DEFAULT_TZ};
+
 {
     package Formatter;
 

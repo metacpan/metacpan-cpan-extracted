@@ -30,7 +30,7 @@
       },
       "develop" : {
          "requires" : {
-            "List::Util" : "1.50",
+            "List::Util" : "1.56",
             "Test::More" : "0.88",
             "Test::Pod" : "1.14",
             "Test::Pod::Coverage" : "1.04"
@@ -39,7 +39,7 @@
       "runtime" : {
          "requires" : {},
          "suggests" : {
-            "List::Util" : "1.50"
+            "List::Util" : "1.56"
          }
       },
       "test" : {
@@ -63,6 +63,6 @@
          "web" : "https://github.com/haarg/List-Util-MaybeXS"
       }
    },
-   "version" : "1.500008",
+   "version" : "1.500009",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

@@ -17,14 +17,14 @@ name: OPM-Validate
 provides:
   OPM::Validate:
     file: lib/OPM/Validate.pm
-    version: '1.11'
+    version: '1.12'
 requires:
   perl: '5.020'
 resources:
   bugtracker: https://github.com/perlservices/OPM-Validate/issues
   homepage: https://github.com/perlservices/OPM-Validate
   repository: git://github.com/perlservices/OPM-Validate.git
-version: '1.11'
+version: '1.12'
 x_contributors:
   - 'reneeb <info@perl-services.de>'
 x_generated_by_perl: v5.30.0

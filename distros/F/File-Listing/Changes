@@ -1,5 +1,12 @@
 Revision history for File-Listing
 
+6.15      2022-04-17 04:09:58 -0600
+  - Main git repository has now been detached from the original
+    repository (originally it was a fork).  The old repository
+    can be found at https://github.com/gisle/file-listing
+  - Adjust test suite to handle systems that cannot handle
+    year 2038+ dates (gh#24)
+
 6.14      2020-11-30 05:48:07 -0700
   - Production version identical to 6.12_01
 

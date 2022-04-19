@@ -2,9 +2,9 @@
 package Perinci::Examples::Tiny;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-03-08'; # DATE
+our $DATE = '2022-04-15'; # DATE
 our $DIST = 'Perinci-Examples'; # DIST
-our $VERSION = '0.822'; # VERSION
+our $VERSION = '0.823'; # VERSION
 
 our %SPEC;
 
@@ -176,7 +176,7 @@ Perinci::Examples::Tiny - Small examples
 
 =head1 VERSION
 
-This document describes version 0.822 of Perinci::Examples::Tiny (from Perl distribution Perinci-Examples), released on 2022-03-08.
+This document describes version 0.823 of Perinci::Examples::Tiny (from Perl distribution Perinci-Examples), released on 2022-04-15.
 
 =head1 DESCRIPTION
 

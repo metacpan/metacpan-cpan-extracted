@@ -1,0 +1,28 @@
+---
+abstract: unknown
+author:
+  - unknown
+build_requires:
+  Test::More: '0.47'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Option-Option
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Exporter: '0'
+  File::Basename: '0'
+  perl: '5.016001'
+  version: '0'
+resources: {}
+version: v0.1
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

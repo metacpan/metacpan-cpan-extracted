@@ -2,8 +2,9 @@
 
 use strict;
 use warnings;
-use Test::More;
 use File::Find;
+use Test::More;
+
 use lib '.';
 
 my @libs = qw(

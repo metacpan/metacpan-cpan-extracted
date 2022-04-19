@@ -14,8 +14,9 @@ use Crypt::OpenSSL::Base::Func;
 use Math::BigInt;
 use POSIX;
 #use Data::Dump qw/dump/;
+#use Smart::Comments;
 
-our $VERSION = '0.03';
+our $VERSION = '0.031';
 
 our @ISA = qw(Exporter);
 
@@ -29,6 +30,7 @@ our @EXPORT = qw(
   map_to_curve_sswu_straight_line
 
   sn2z
+  sn2k_m
   get_hash2curve_params
   expand_message_xmd
   hash_to_field
@@ -57,92 +59,94 @@ our %H2C_CNF = (
   },
 );
 
+
 sub get_hash2curve_params {
-  my ( $group_name, $type ) = @_;
+    my ( $group_name, $type ) = @_;
 
-  my $nid   = OBJ_sn2nid( $group_name );
-  my $group = Crypt::OpenSSL::EC::EC_GROUP::new_by_curve_name( $nid );
-  my $ctx   = Crypt::OpenSSL::Bignum::CTX->new();
+    my $ec_params_r = get_ec_params($group_name);
 
+    $ec_params_r->{h2f} = $H2C_CNF{$group_name}{h2f};
 
-  my $p = Crypt::OpenSSL::Bignum->new();
-  my $a = Crypt::OpenSSL::Bignum->new();
-  my $b = Crypt::OpenSSL::Bignum->new();
-  EC_GROUP_get_curve( $group, $p, $a, $b, $ctx );
+    if($type){
+        my $z = sn2z( $group_name, $type );
 
-  my $c1;
-  my $c2;
-  my $z;
-  if($type){
-      $z = sn2z( $group_name, $type );
+        my $c1 = Crypt::OpenSSL::Bignum->new();
+        my $c2 = Crypt::OpenSSL::Bignum->new();
+        $H2C_CNF{$group_name}{$type}{calc_c1_c2_func}->( $c1, $c2, 
+            @{$ec_params_r}{qw/p a b/}, 
+            $z, 
+            $ec_params_r->{ctx}, 
+        );
 
-      $c1 = Crypt::OpenSSL::Bignum->new();
-      $c2 = Crypt::OpenSSL::Bignum->new();
-      $H2C_CNF{$group_name}{$type}{calc_c1_c2_func}->( $c1, $c2, $p, $a, $b, $z, $ctx );
-  }
+        @{$ec_params_r}{qw/c1 c2 z/} = ($c1, $c2, $z);
 
-  return [ $group, $c1, $c2, $p, $a, $b, $z, $ctx ];
+    }
+
+    $ec_params_r;
 } ## end sub get_hash2curve_params
 
 sub hash_to_curve {
   my ( $msg, $DST, $group_name, $type, $hash_name, $expand_message_func, $clear_cofactor_flag ) = @_;
 
-  my $params_ref = get_hash2curve_params( $group_name, $type );
-  my ( $group, $c1, $c2, $p, $a, $b, $z, $ctx ) = @$params_ref;
+  my $h2c_r = get_hash2curve_params( $group_name, $type );
+  #my ( $group, $c1, $c2, $p, $a, $b, $z, $ctx ) = @$params_ref;
 
   my $count = 2;
-  my ( $k, $m ) = sn2k_m( $group_name );
-  my @res = hash_to_field( $msg, $count, $DST, $p, $m, $k, $hash_name, $expand_message_func );
+  #my ( $k, $m ) = sn2k_m( $group_name );
+  my @res = hash_to_field( $msg, $count, $DST, $h2c_r->{p}, $h2c_r->{h2f}{m}, $h2c_r->{h2f}{k}, $hash_name, $expand_message_func );
 
   my $u0 = $res[0][0];
-  my $Q0 = map_to_curve( $params_ref, $group_name, $type, $u0, $clear_cofactor_flag );
+  my $Q0 = map_to_curve( $h2c_r, $group_name, $type, $u0, $clear_cofactor_flag );
 
   my $u1 = $res[1][0];
-  my $Q1 = map_to_curve( $params_ref, $group_name, $type, $u1, $clear_cofactor_flag );
+  my $Q1 = map_to_curve( $h2c_r, $group_name, $type, $u1, $clear_cofactor_flag );
 
-  my $Q = Crypt::OpenSSL::EC::EC_POINT::new( $group );
-  Crypt::OpenSSL::EC::EC_POINT::add( $group, $Q, $Q0, $Q1, $ctx );
+  my $Q = Crypt::OpenSSL::EC::EC_POINT::new( $h2c_r->{group} );
+  Crypt::OpenSSL::EC::EC_POINT::add( $h2c_r->{group}, $Q, $Q0, $Q1, $h2c_r->{ctx} );
 
   return $Q unless ( $clear_cofactor_flag );
 
-  my $P = Crypt::OpenSSL::EC::EC_POINT::new( $group );
-  clear_cofactor( $group, $P, $Q, $ctx );
+  my $P = Crypt::OpenSSL::EC::EC_POINT::new( $h2c_r->{group} );
+  clear_cofactor( $h2c_r->{group}, $P, $Q, $h2c_r->{ctx} );
 
-  return wantarray ? ($P, $params_ref) : $P;
+  return wantarray ? ($P, $h2c_r) : $P;
 } ## end sub hash_to_curve
 
 sub encode_to_curve {
   my ( $msg, $DST, $group_name, $type, $hash_name, $expand_message_func, $clear_cofactor_flag ) = @_;
 
-  my $params_ref = get_hash2curve_params( $group_name, $type );
-  my ( $group, $c1, $c2, $p, $a, $b, $z, $ctx ) = @$params_ref;
+  my $h2c_r = get_hash2curve_params( $group_name, $type );
+  #my ( $group, $c1, $c2, $p, $a, $b, $z, $ctx ) = @$params_ref;
 
   my $count = 1;
-  my ( $k, $m ) = sn2k_m( $group_name );
-  my @res = hash_to_field( $msg, $count, $DST, $p, $m, $k, $hash_name, $expand_message_func );
+  #my ( $k, $m ) = sn2k_m( $group_name );
+  #my @res = hash_to_field( $msg, $count, $DST, $p, $m, $k, $hash_name, $expand_message_func );
+  my @res = hash_to_field( $msg, $count, $DST, $h2c_r->{p}, $h2c_r->{h2f}{m}, $h2c_r->{h2f}{k}, $hash_name, $expand_message_func );
 
   my $u = $res[0][0];
-  my $P = map_to_curve( $params_ref, $group_name, $type, $u, $clear_cofactor_flag );
-  return wantarray ? ($P, $params_ref) : $P;
+  my $P = map_to_curve( $h2c_r, $group_name, $type, $u, $clear_cofactor_flag );
+  return wantarray ? ($P, $h2c_r) : $P;
 }
 
 sub map_to_curve {
   my ( $params_ref, $group_name, $type, $u, $clear_cofactor_flag ) = @_;
 
-  my ( $group, $c1, $c2, $p, $a, $b, $z, $ctx ) = @$params_ref;
+  #my ( $group, $c1, $c2, $p, $a, $b, $z, $ctx ) = @$params_ref;
 
   my $x = Crypt::OpenSSL::Bignum->new();
   my $y = Crypt::OpenSSL::Bignum->new();
-  $H2C_CNF{$group_name}{$type}{map_to_curve_func}->( $c1, $c2, $p, $a, $b, $z, $u, $x, $y, $ctx );
+  $H2C_CNF{$group_name}{$type}{map_to_curve_func}->( 
+      @{$params_ref}{qw/c1 c2 p a b z/}, 
+      $u, $x, $y, $params_ref->{ctx} );
 
-  my $Q = Crypt::OpenSSL::EC::EC_POINT::new( $group );
-  Crypt::OpenSSL::EC::EC_POINT::new( $group );
-  EC_POINT_set_affine_coordinates( $group, $Q, $x, $y, $ctx );
+  my $Q = Crypt::OpenSSL::EC::EC_POINT::new( $params_ref->{group} );
+  Crypt::OpenSSL::EC::EC_POINT::new( $params_ref->{group} );
+  EC_POINT_set_affine_coordinates( $params_ref->{group}, $Q, $x, $y, $params_ref->{ctx} );
 
   return $Q unless ( $clear_cofactor_flag );
 
-  my $P = Crypt::OpenSSL::EC::EC_POINT::new( $group );
-  clear_cofactor( $group, $P, $Q, $ctx );
+  my $P = Crypt::OpenSSL::EC::EC_POINT::new( $params_ref->{group} );
+  clear_cofactor( $params_ref->{group}, $P, $Q, $params_ref->{ctx} );
   return $P;
 } ## end sub map_to_curve
 
@@ -176,7 +180,9 @@ sub hash_to_field {
   $L = ceil(($L + $k)/8);
 
   my $len_in_bytes  = $count * $m * $L;
+  ### len_in_bytes: $len_in_bytes
   my $uniform_bytes = $expand_message_func->( $msg, $DST, $len_in_bytes, $hash_name );
+  ### uniform_bytes: unpack("H*", $uniform_bytes)
 
   my @res;
   for my $i ( 0 .. $count - 1 ) {
@@ -184,13 +190,20 @@ sub hash_to_field {
     for my $j ( 0 .. $m - 1 ) {
       my $elm_offset = $L * ( $j + $i * $m );
       my $tv         = substr( $uniform_bytes, $elm_offset, $L );
+      ### $elm_offset
+      ### $L
+      ### tv: unpack("H*", $tv)
       my $tv_bn      = Math::BigInt->from_bytes( $tv );           # from hexadecimal
       $tv_bn->bmod( $p_bigint );
 
       #my $e_j = $tv_bn->to_hex();
       my $e_j   = $tv_bn->to_bytes();
+      ### e_j: unpack("H*", $e_j)
       my $e_j_u = Crypt::OpenSSL::Bignum->new_from_bin( $e_j );
 
+      ### e_j_u hex: $e_j_u->to_hex()
+      ### e_j_u decimal: $e_j_u->to_decimal()
+      
       push @u, $e_j_u;
     }
     push @res, \@u;
@@ -211,7 +224,11 @@ sub expand_message_xmd {
   my $DST_len     = length( $DST );
   my $DST_len_hex = pack( "C*", $DST_len );
   my $DST_prime   = $DST . $DST_len_hex;
-
+  ### DST: unpack("H*", $DST)
+  ### $DST_len
+  ### DST_len_hex: unpack("H*", $DST_len_hex)
+  ### DST_prime: unpack("H*", $DST_prime)
+  
   #my $rn    = $h_r->block_size() * 2;
   my $rn    = EVP_MD_block_size( $h_r ) * 2;
   my $Z_pad = pack( "H$rn", '00' );
@@ -221,6 +238,8 @@ sub expand_message_xmd {
   my $zero = pack( "H*", '00' );
 
   my $msg_prime = $Z_pad . $msg . $l_i_b_str . $zero . $DST_prime;
+  ### msg_prime: unpack("H*", $msg_prime)
+  
   my $len       = pack( "C*", 1 );
   my $b0        = digest( $h_r, $msg_prime );
 

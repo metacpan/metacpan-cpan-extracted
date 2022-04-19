@@ -9,7 +9,7 @@ extends 'Code::TidyAll::Plugin';
 
 with 'Code::TidyAll::Role::GenericExecutable';
 
-our $VERSION = '0.81';
+our $VERSION = '0.82';
 
 sub validate_file {
     my $self = shift;
@@ -36,7 +36,7 @@ Code::TidyAll::Plugin::GenericValidator - A plugin to run any executable as a va
 
 =head1 VERSION
 
-version 0.81
+version 0.82
 
 =head1 SYNOPSIS
 

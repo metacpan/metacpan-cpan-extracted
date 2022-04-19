@@ -1,5 +1,8 @@
 Revision history for Perl extension Crypt::OpenSSL::Base::Func.
 
+0.034 2022/04/16
+    - random_bn
+
 0.033 2022/04/13
     - generate_ec_key
 

@@ -1,0 +1,136 @@
+class Math::Complex : precompile {
+  use Math;
+  
+  use Complex_2f;
+  use Complex_2d;
+  
+  native static method cabs : double ($z : Complex_2d);
+  native static method cabsf : float ($z : Complex_2f);
+  native static method cacos : Complex_2d ($z : Complex_2d);
+  native static method cacosf : Complex_2f ($z : Complex_2f);
+  native static method cacosh : Complex_2d ($z : Complex_2d);
+  native static method cacoshf : Complex_2f ($z : Complex_2f);
+  
+  static method cadd : Complex_2d ($z1 : Complex_2d, $z2 : Complex_2d) {
+    my $z_out : Complex_2d;
+    $z_out->{re} = $z1->{re} + $z2->{re};
+    $z_out->{im} = $z1->{im} + $z2->{im};
+    return $z_out;
+  }
+  
+  static method caddf : Complex_2f ($z1 : Complex_2f, $z2 : Complex_2f) {
+    my $z_out : Complex_2f;
+    $z_out->{re} = $z1->{re} + $z2->{re};
+    $z_out->{im} = $z1->{im} + $z2->{im};
+    return $z_out;
+  }
+  
+  native static method carg : double ($z : Complex_2d);
+  native static method cargf : float ($z : Complex_2f);
+  native static method casin : Complex_2d ($z : Complex_2d);
+  native static method casinf : Complex_2f ($z : Complex_2f);
+  native static method casinh : Complex_2d ($z : Complex_2d);
+  native static method casinhf : Complex_2f ($z : Complex_2f);
+  native static method catan : Complex_2d ($z : Complex_2d);
+  native static method catanf : Complex_2f ($z : Complex_2f);
+  native static method catanh : Complex_2d ($z : Complex_2d);
+  native static method catanhf : Complex_2f ($z : Complex_2f);
+  native static method cbrt : double ($x : double);
+  native static method cbrtf : float ($x : float);
+  native static method ccos : Complex_2d ($z : Complex_2d);
+  native static method ccosf : Complex_2f ($z : Complex_2f);
+  native static method ccosh : Complex_2d ($z : Complex_2d);
+  native static method ccoshf : Complex_2f ($z : Complex_2f);
+  
+  static method cdiv : Complex_2d ($z1 : Complex_2d, $z2 : Complex_2d) {
+    my $z_out : Complex_2d;
+    $z_out->{re} = ($z1->{re} * $z2->{re} + $z1->{im} * $z2->{im}) / ($z2->{re} * $z2->{re} + $z2->{im} * $z2->{im});
+    $z_out->{im} = ($z1->{im} * $z2->{re} - $z1->{re} * $z2->{im}) / ($z2->{re} * $z2->{re} + $z2->{im} * $z2->{im});
+    return $z_out;
+  }
+  
+  static method cdivf : Complex_2f ($z1 : Complex_2f, $z2 : Complex_2f) {
+    my $z_out : Complex_2f;
+    $z_out->{re} = ($z1->{re} * $z2->{re} + $z1->{im} * $z2->{im}) / ($z2->{re} * $z2->{re} + $z2->{im} * $z2->{im});
+    $z_out->{im} = ($z1->{im} * $z2->{re} - $z1->{re} * $z2->{im}) / ($z2->{re} * $z2->{re} + $z2->{im} * $z2->{im});
+    return $z_out;
+  }
+  
+  native static method cexp : Complex_2d ($z : Complex_2d);
+  native static method cexpf : Complex_2f ($z : Complex_2f);
+  native static method clog : Complex_2d ($z : Complex_2d);
+  native static method clogf : Complex_2f ($z : Complex_2f);
+  
+  static method cmul : Complex_2d ($z1 : Complex_2d, $z2 : Complex_2d) {
+    my $z_out : Complex_2d;
+    $z_out->{re} = $z1->{re} * $z2->{re} - $z1->{im} * $z2->{im};
+    $z_out->{im} = $z1->{re} * $z2->{im} + $z1->{im} * $z2->{re};
+    return $z_out;
+  }
+  
+  static method cmulf : Complex_2f ($z1 : Complex_2f, $z2 : Complex_2f) {
+    my $z_out : Complex_2f;
+    $z_out->{re} = $z1->{re} * $z2->{re} - $z1->{im} * $z2->{im};
+    $z_out->{im} = $z1->{re} * $z2->{im} + $z1->{im} * $z2->{re};
+    return $z_out;
+  }
+  
+  static method complex : Complex_2d ($x : double, $y : double) {
+    my $z_out : Complex_2d;
+    $z_out->{re} = $x;
+    $z_out->{im} = $y;
+    return $z_out;
+  }
+  
+  static method complexf : Complex_2f ($x : float, $y : float) {
+    my $z_out : Complex_2f;
+    $z_out->{re} = $x;
+    $z_out->{im} = $y;
+    return $z_out;
+  }
+  
+  native static method conj : Complex_2d ($z : Complex_2d);
+  native static method conjf : Complex_2f ($z : Complex_2f);
+  native static method cpow : Complex_2d ($z1 : Complex_2d, $z2 : Complex_2d);
+  native static method cpowf : Complex_2f ($z1 : Complex_2f, $z2 : Complex_2f);
+  
+  static method cscamul : Complex_2d ($c : double, $z : Complex_2d) {
+    my $z_out : Complex_2d;
+    $z_out->{re} = $c * $z->{re};
+    $z_out->{im} = $c * $z->{im};
+    return $z_out;
+  }
+  
+  static method cscamulf : Complex_2f ($c : float, $z : Complex_2f) {
+    my $z_out : Complex_2f;
+    $z_out->{re} = $c * $z->{re};
+    $z_out->{im} = $c * $z->{im};
+    return $z_out;
+  }
+  
+  native static method csin : Complex_2d ($z : Complex_2d);
+  native static method csinf : Complex_2f ($z : Complex_2f);
+  native static method csinh : Complex_2d ($z : Complex_2d);
+  native static method csinhf : Complex_2f ($z : Complex_2f);
+  native static method csqrt : Complex_2d ($z : Complex_2d);
+  native static method csqrtf : Complex_2f ($z : Complex_2f);
+  
+  static method csub : Complex_2d ($z1 : Complex_2d, $z2 : Complex_2d) {
+    my $z_out : Complex_2d;
+    $z_out->{re} = $z1->{re} - $z2->{re};
+    $z_out->{im} = $z1->{im} - $z2->{im};
+    return $z_out;
+  }
+  
+  static method csubf : Complex_2f ($z1 : Complex_2f, $z2 : Complex_2f) {
+    my $z_out : Complex_2f;
+    $z_out->{re} = $z1->{re} - $z2->{re};
+    $z_out->{im} = $z1->{im} - $z2->{im};
+    return $z_out;
+  }
+  
+  native static method ctan : Complex_2d ($z : Complex_2d);
+  native static method ctanf : Complex_2f ($z : Complex_2f);
+  native static method ctanh : Complex_2d ($z : Complex_2d);
+  native static method ctanhf : Complex_2f ($z : Complex_2f);
+}

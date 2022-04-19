@@ -16,47 +16,13 @@ my @ids = grep { m/^[A-Z0-9]{4}$/ } readdir $dh;
 closedir $dh;
 
 # libyaml parse error
-my @skip = qw/
-    2JQS
-    2LFX
-    2SXE
-    4ABK
-    4MUZ
-
-    5MUD
-    5T43
-    6BCT
-    6LVF
-    6M2F
-
-    7Z25
-    8XYN
-    9SA2
-    A2M4
-    BEC7
-
-    DBG4
-    DK3J
-    FP8R
-    FRK4
-    HWV9
-
-    K3WX
-    M7A3
-    NHX8
-    NJ66
-    NKF9
-
-    Q5MG
-    QT73
-    R4YG
-    S3PD
-    UT92
-
-    W4TN
-    W5VH
-    CFD4
-/;
+my @skip;
+open my $fh, '<', "$Bin/libyaml.skip";
+chomp(@skip = <$fh>);
+close $fh;
+@skip = grep {
+    length $_ and not m/^ *#/
+} @skip;
 
 # later
 push @skip, qw/
@@ -76,11 +42,11 @@ for my $id (sort @ids) {
 }
 
 @valid = @valid[0..168];
-#@valid = $valid[0];
+#@valid = @valid[17..17];
 my @indents = (1 .. 4);
 
 my @yt = map {
-    my $cfg = YAML::Tidy::Config->new( configfile => "$Bin/../utils/config$_.yaml" );
+    my $cfg = YAML::Tidy::Config->new( configfile => "$Bin/data/configs/config$_.yaml" );
     YAML::Tidy->new( cfg => $cfg );
 } (0 .. 4);
 

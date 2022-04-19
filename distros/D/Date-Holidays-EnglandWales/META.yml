@@ -1,23 +1,25 @@
---- #YAML:1.0
-name:               Date-Holidays-EnglandWales
-version:            0.07
-abstract:           Determines bank holidays
+---
+abstract: 'Determines bank holidays'
 author:
-    - Jason Clifford <jason@ukfsn.org>
-license:            unknown
-distribution_type:  module
-configure_requires:
-    ExtUtils::MakeMaker:  0
+  - 'Jason Clifford <jason@ukfsn.org>'
 build_requires:
-    ExtUtils::MakeMaker:  0
-requires:
-    DateTime:             ~
-    DateTime::Event::Easter:  ~
-no_index:
-    directory:
-        - t
-        - inc
-generated_by:       ExtUtils::MakeMaker version 6.56
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+license: unknown
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Date-Holidays-EnglandWales
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  DateTime::Event::Easter: '0'
+  Time::Piece: '0'
+  Time::Seconds: '0'
+version: '0.08'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

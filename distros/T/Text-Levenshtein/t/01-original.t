@@ -7,7 +7,7 @@ use 5.006;
 use strict;
 use warnings;
 
-use Test::More 0.88 tests => 9;
+use Test::More 0.88 tests => 13;
 
 use Text::Levenshtein qw(distance fastdistance);
 
@@ -22,3 +22,7 @@ my @foo = distance("foo","four","foo","bar");
 my @bar = (2,0,3);
 is_deeply(\@foo,\@bar,"Array test: Correct distances foo four foo bar");
 is_deeply(fastdistance("foo","boo"),1,"Fast test: Correct distance foo boo");
+is_deeply(fastdistance("foo",""),3,"Fast test: Correct distance 'foo' and ''");
+is_deeply(fastdistance("foo",undef),3,"Fast test: Correct distance 'foo' and undef");
+is_deeply(fastdistance("","foo"),3,"Fast test: Correct distance '' and 'foo'");
+is_deeply(fastdistance(undef,"foo"),3,"Fast test: Correct distance undef and 'foo'");

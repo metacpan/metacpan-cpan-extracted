@@ -145,6 +145,7 @@ xt/author/precious.t
 xt/author/test-version.t
 xt/extra/pp-is-loaded.t
 xt/extra/test-all-my-deps.t
+xt/extra/test-ignores-env-vars.t
 xt/extra/xs-is-loaded.t
 xt/release/cpan-changes.t
 xt/release/meta-json.t

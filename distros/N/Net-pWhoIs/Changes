@@ -4,3 +4,14 @@ Revision history for Perl extension Net::pWhoIs.
 	- original version; created by h2xs 1.23 with options
 		-L./Net -XAn Net::pWhoIs
 
+0.02  Wed Feb 02 11:02:18 2022
+        - Fixed bug in socket code.  There is no difference between handling of single and bulk queries.  Decoupled input from constructor, now part of pwhois method.  Added method to generate formatted report.  Included full featured client.
+
+0.04  Sun Apr 17 10:36:00 2022
+        -  Added code to support legacy query handling, previously in constructor.  Skipping unresolvable hostnames, previously ending script with die.  Fixed POD/README.
+
+0.05  Sun Apr 17 18:40:00 2022
+        -  Trivial Documentation update.
+
+0.06  Tue Apr 17 02:33:23 2022
+        -  Fixed testing bug.

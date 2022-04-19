@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 ##########################################################################
-# Copyright (c) 2012-2021 Alexander Bluhm <alexander.bluhm@gmx.net>
+# Copyright (c) 2012-2022 Alexander Bluhm <alexander.bluhm@gmx.net>
 #
 # Permission to use, copy, modify, and distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
@@ -20,7 +20,7 @@ use strict;
 use warnings;
 use File::Temp;
 use Getopt::Long qw(:config posix_default bundling);
-use IO::Handle;
+use IPC::Open2;
 use POSIX;
 use Time::HiRes qw(time sleep);
 use OSPF::LSDB::ospfd;
@@ -114,32 +114,28 @@ sub main() {
 	kill SIGINT, $$;
     };
     $SIG{CHLD} = sub {
-	return unless $pid;
-	local ($!, $?);
-	$? = 0;
-	waitpid($pid, POSIX::WNOHANG);
-	die "'@cmd' failed: $?" if $? &&
-	    ((WIFEXITED($?) && WEXITSTATUS($?) != 0) ||
-	    (WIFSIGNALED($?) && WTERMSIG($?) != SIGTERM));
-	$gone = 1 if kill(0, $pid) == 0;
+	if ($pid) {
+	    local ($!, $?);
+	    if (waitpid($pid, POSIX::WNOHANG) > 0) {
+		die "'@cmd' failed: $?" if $? &&
+		    ((WIFEXITED($?) && WEXITSTATUS($?) != 0) ||
+		    (WIFSIGNALED($?) && WTERMSIG($?) != SIGTERM));
+		undef $pid;
+		$gone = 1;
+	    }
+	}
     };
 
     my $class = $ipv6 ? 'OSPF::LSDB::View6' : 'OSPF::LSDB::View';
     if ($legend) {
 	my $dot = $class->legend();
 	$gone = 0;
-	$pid = open($fh, '|-', @cmd)
+	$pid = open2(undef, $fh, @cmd)
 	    or die "Open pipe to '@cmd' failed: $!";
 	print $fh $dot, "\n";
-	# work around the non interruptable wait in CORE::close.
-	IO::Handle::flush($fh);
-	POSIX::close(fileno($fh));
+	close($fh)
+	    or die "Close pipe to '@cmd' failed: $!";
 	pause();
-	unless (close($fh)) {
-	    die "'@cmd' failed: $?" if WIFSIGNALED($?) &&
-		WTERMSIG($?) != SIGTERM;
-	}
-	undef $pid;
 	exit 0;
     }
 
@@ -159,14 +155,7 @@ sub main() {
 	eval { $ospf->parse(); };
 	if ($@) {
 	    warn $@;
-	    if ($pid) {
-		kill SIGTERM, $pid;
-		unless (close($fh)) {
-		    die "'@cmd' failed: $?" if WIFSIGNALED($?) &&
-			WTERMSIG($?) != SIGTERM;
-		}
-		undef $pid;
-	    }
+	    kill SIGTERM, $pid if $pid;
 	    next;
 	}
 
@@ -202,23 +191,29 @@ sub main() {
 	    print map { "$_\n" } @errors, "" if @errors;
 	}
 
+	my $chldsigset = POSIX::SigSet->new( &POSIX::SIGCHLD );
+	my $oldsigset = POSIX::SigSet->new();
+	sigprocmask(POSIX::SIG_BLOCK, $chldsigset, $oldsigset)
+	    or die "Block sigprocmask failed: $!";
 	if ($pid) {
 	    kill SIGTERM, $pid;
-	    $? = 0;
-	    unless (close($fh)) {
+	    if (waitpid($pid, 0) > 0) {
 		die "'@cmd' failed: $?" if $? &&
 		    ((WIFEXITED($?) && WEXITSTATUS($?) != 0) ||
 		    (WIFSIGNALED($?) && WTERMSIG($?) != SIGTERM));
+		undef $pid;
+		$gone = 1;
 	    }
-	    undef $pid;
 	}
+	sigprocmask(POSIX::SIG_SETMASK, $oldsigset, undef)
+	    or die "Setmask sigprocmask failed: $!";
+
 	$gone = 0;
-	$pid = open($fh, '|-', @cmd)
+	$pid = open2(undef, $fh, @cmd)
 	    or die "Open pipe to '@cmd' failed: $!";
 	print $fh $dot, "\n";
-	# work around the wait in CORE::close.
-	IO::Handle::flush($fh);
-	POSIX::close(fileno($fh));
+	close($fh)
+	    or die "Close pipe to '@cmd' failed: $!";
     }
 }
 

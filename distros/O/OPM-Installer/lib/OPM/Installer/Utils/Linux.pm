@@ -5,7 +5,7 @@ package OPM::Installer::Utils::Linux;
 use strict;
 use warnings;
 
-our $VERSION = '1.0.0'; # VERSION
+our $VERSION = '1.0.1'; # VERSION
 
 use Moo::Role;
 
@@ -43,7 +43,7 @@ OPM::Installer::Utils::Linux - helper functions for ticketsystem addon installat
 
 =head1 VERSION
 
-version 1.0.0
+version 1.0.1
 
 =head1 AUTHOR
 

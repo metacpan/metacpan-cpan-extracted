@@ -57,7 +57,7 @@ use PPIx::Regexp::Util qw{
 
 use Scalar::Util qw{ looks_like_number };
 
-our $VERSION = '0.084';
+our $VERSION = '0.085';
 
 our $DEFAULT_POSTDEREF;
 defined $DEFAULT_POSTDEREF
@@ -130,9 +130,6 @@ defined $DEFAULT_POSTDEREF
 		return;
 	    };
 
-	defined $args{postderef}
-	    and __PACKAGE__->_deprecation_notice( attribute => 'postderef' );
-
 	my $self = {
 	    index_locations => $args{index_locations},	# Index locations
 	    capture => undef,	# Captures from find_regexp.
@@ -159,8 +156,6 @@ defined $DEFAULT_POSTDEREF
 	    mode => 'init',	# Initialize
 	    modifiers => [{}],	# Modifier hash.
 	    pending => [],	# Tokens made but not returned.
-	    postderef => defined $args{postderef} ?
-		$args{postderef} : 1,
 	    prior => TOKEN_UNKNOWN,	# Prior significant token.
 	    source => $re,	# The object we were initialized with.
 	    strict => $args{strict},	# like "use re 'strict';".
@@ -579,10 +574,7 @@ sub prior_significant_token {
 # This method is private to the PPIx-Regexp package, and may be changed
 # or retracted without warning. What it does is to recognize postfix
 # dereferences. It returns the length in characters of the first postfix
-# dereference found, or a false value if none is found. This returns
-# false immediately unless the tokenizer was instantiated with the
-# C<postderef> argument true, or if it was not specified and
-# C<$DEFAULT_POSTDEREF> was true when the tokenizer was instantiated.
+# dereference found, or a false value if none is found.
 #
 # The optional $iterator argument can be one of the following:
 #   - A code reference, which will be called to provide PPI::Element
@@ -598,8 +590,6 @@ sub prior_significant_token {
 {
     sub __recognize_postderef {
 	my ( $self, $token, $iterator ) = @_;
-	$self->{postderef}
-	    or return;
 
 	# Note that if ppi() gets called I have to hold a reference to
 	# the returned object until I am done with all its children.
@@ -739,6 +729,8 @@ sub tokens {
 #	This method returns true if the deprecation is in progress. In
 #	fact it returns the deprecation level.
 
+=begin comment
+
 {
 
     my %deprecate = (
@@ -764,19 +756,17 @@ sub tokens {
 	return;
     }
 
-=begin comment
-
     sub _deprecation_in_progress {
 	my ( $self, $type, $name ) = @_;
 	$deprecate{$type} or return;
 	return $deprecate{$type}{$name};
     }
 
+}
+
 =end comment
 
 =cut
-
-}
 
 sub _remainder {
     my ( $self ) = @_;
@@ -1320,17 +1310,6 @@ of the PPI class) before it is tokenized.
 
 This Boolean option specifies that the locations of the generated tokens
 are to be computed.
-
-=item postderef boolean
-
-B<THIS ARGUMENT IS DEPRECATED>.
-See L<DEPRECATION NOTICE|PPIx::Regexp/DEPRECATION NOTICE> in L<PPIx::Regexp|PPIx::Regexp> for the details.
-
-This option specifies whether the tokenizer recognizes postfix
-dereferencing. See the L<PPIx::Regexp|PPIx::Regexp>
-L<new()|PPIx::Regexp/new> documentation for the details.
-
-C<$PPIx::Regexp::Tokenizer::DEFAULT_POSTDEREF> is not exported.
 
 =item strict boolean
 

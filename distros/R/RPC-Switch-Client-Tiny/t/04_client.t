@@ -6,6 +6,9 @@ use warnings;
 use FindBin ();
 use lib "$FindBin::Bin/../lib";
 
+# cpantester: strawberry perl defaults to JSON::PP and has blessing problem with JSON::true objects
+BEGIN { $ENV{PERL_JSON_BACKEND} = 'JSON::backportPP' if ($^O eq 'MSWin32'); }
+
 use Test::More;
 use JSON;
 use Socket;
@@ -92,6 +95,7 @@ $in->close();
 
 # test nonblocking
 #
+unless ($^O eq 'MSWin32') { # cpantester: strawberry perl does not support blocking() call
 socketpair($out, $in, AF_UNIX, SOCK_STREAM, PF_UNSPEC) or die "socketpair: $!";
 $out->blocking(0);
 $client = eval { RPC::Switch::Client::Tiny->new(sock => $out, who => $who, token => $token, auth_method => $auth_method) };
@@ -99,6 +103,9 @@ $err = $@;
 like($err, qr/nonblocking socket not supported/, "test blocking");
 $out->close();
 $in->close();
+} else {
+is('', '', "skip test blocking");
+}
 
 # test against mock server
 #
@@ -411,6 +418,7 @@ is($err, '', "test rpctiny worker session expire");
 $s->close();
 
 END {
-	kill 9, $pid if (($main_pid == $$) && defined $pid && ($pid > 0));
+	# note: for cpantester strawberry perl pid can be negative
+	kill 9, $pid if (($main_pid == $$) && defined $pid && $pid);
 }
 

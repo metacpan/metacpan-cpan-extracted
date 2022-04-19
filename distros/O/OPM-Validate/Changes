@@ -1,6 +1,10 @@
 Revision history for OPM::Validate
 ========================================
 
+1.12   2022-04-17 07:54:00
+
+    * improve regex based on check of publicly available opms
+
 1.11   2022-04-14 12:50:00
 
     * Switched to PERLSRVDE Dist::Zilla bundle for development

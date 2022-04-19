@@ -144,7 +144,7 @@ Module::Generic::Scalar - String Manipulation Object Class
 
 =head1 VERSION
 
-    v1.2.0
+    v1.2.1
 
 =head1 DESCRIPTION
 
@@ -639,9 +639,16 @@ Provided with a list of arguments, and this replace the placeholders just like L
 
 =head2 substr
 
-Provided with an offset, an optional length and an optional replacement string, and this return a new L<Module::Generic::Scalar> object.
+Provided with an offset, an optional length and an optional replacement string, and this modifies in-place the current object string and return a new L<Module::Generic::Scalar> object of the string segment thus altered or removed or replaced.
 
 See L<perlfunc/"substr"> for more information.
+
+    $s = 'I disapprove of what you say, but I will defend to the death your right to say it'; # Evelyn Hall, "Friends of Voltaire"
+    $s->substr( 2, 13 );
+    # returns a new object containing 'disapprove of'
+    $s->substr( 2, 13, 'really do not approve' );
+    # returns a new object containing 'disapprove of' and the current object now contains:
+    # 'I really do not approve what you say, but I will defend to the death your right to say it'
 
 =head2 tr
 

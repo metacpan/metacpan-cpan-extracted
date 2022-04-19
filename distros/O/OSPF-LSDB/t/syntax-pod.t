@@ -2,9 +2,9 @@
 
 use strict;
 use warnings;
-use Test::More;
-use Pod::Checker;
 use File::Find;
+use Pod::Checker;
+use Test::More;
 
 my @pods;
 push @pods, map { "doc/$_.pod" } qw(

@@ -1,0 +1,46 @@
+NAME
+    Option::Option
+
+SYNOPSIS
+    Provides objects that can hold results that can be unwrapped similar to
+    Rust
+
+        use Option::Option;
+
+        my $option = Option::Option->new("something");
+
+        # This croaks:
+        print $var;
+
+        # This works
+        my $var = $option->unwrap();
+        print $var;
+
+        # This also works and has a helpful error message
+        my $var = $option->expect("get my something");
+        print $var;
+
+AUTHOR
+    Lee Katz
+
+METHODS
+    new()
+        Creates a new object with a variable
+
+    unwrap()
+        Checks if the variable is defined and if it is, returns it. If not
+        defined, croaks.
+
+    expect($msg)
+        Checks if the variable is defined and if it is, returns it. If not
+        defined, croaks with error message.
+
+    toString()
+        Dies with an error message, describing that the object was attempted
+        to be used in a scalar context without unwrapping. This subroutine
+        is not meant to be used directly.
+
+            my $var = Option::Option->new("something");
+            my $concat = $var . " wicked this way comes";
+            # dies with error message during the concatenation
+

@@ -1,19 +1,32 @@
-name: Graph-SocialMap
-version: 0.12
-abstract: Easy way to create social map.
-author: Kang-min Liu (gugod@gugod.org)
-license: perl
-distribution_type: module
+---
+abstract: 'Easy tool to create social network map'
+author:
+  - 'Kang-min Liu <gugod@gugod.org>'
 build_requires:
-  YAML: 0
-  Test::More: 0
-  Test::Simple: 0
+  Test::More: '0'
+  Test::Simple: '0'
+  YAML: '0'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'App::ModuleBuildTiny version 0.029, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Graph-SocialMap
+provides:
+  Graph::SocialMap:
+    file: lib/Graph/SocialMap.pm
+    version: '0.13'
 requires:
-  Spiffy: 0.21
-  Graph: 0.54
-  Graph::Writer::GraphViz: 0.07
-  Quantum::Superpositions: 0
-no_index:
-  directory:
-    - inc
-generated_by: Module::Install version 0.36
+  Graph: '0.54'
+  Graph::Writer::GraphViz: '0.07'
+  Quantum::Superpositions: '0'
+  Spiffy: '0.21'
+resources:
+  repository: https://github.com/gugod/Graph-SocialMap.git
+version: '0.13'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
+x_static_install: '1'

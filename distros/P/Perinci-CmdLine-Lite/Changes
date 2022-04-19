@@ -1,3 +1,11 @@
+1.918   2022-04-15  Released-By: PERLANCAR; Urgency: medium
+
+        - Add basic support for --format=vd. This is currently the most basic
+          support. I plan to add some metadata settings like column type (from
+          result metadata attribute `table.field_types` or
+          `table.field_formats`) and so on.
+
+
 1.917   2022-01-29  Released-By: PERLANCAR; Urgency: medium
 
 	- Bump prereq versions (particularly, Perinci::Sub::GetArgs::Argv

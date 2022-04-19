@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/DateTime.pm
-## Version v0.2.2
+## Version v0.3.0
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2022/03/08
+## Modified 2022/04/08
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -57,7 +57,7 @@ BEGIN
         )?
     )?
     /x;
-    our $VERSION = 'v0.2.2';
+    our $VERSION = 'v0.3.0';
 };
 
 # use strict;
@@ -131,6 +131,8 @@ sub new
     }
     return( bless( { dt => $dt->clone } => ( ref( $this ) || $this ) )->init( @_ ) );
 }
+
+sub datetime { return( shift->_set_get_object_without_init( 'dt' => 'DateTime' ) ); }
 
 sub op
 {
@@ -760,7 +762,7 @@ Module::Generic::DateTime - A DateTime wrapper for enhanced features
 
 =head1 VERSION
 
-    v0.2.2
+    v0.3.0
 
 =head1 DESCRIPTION
 

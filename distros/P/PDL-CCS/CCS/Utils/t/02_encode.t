@@ -37,10 +37,10 @@ my ($aptr1,$awi1) = ccs_encode_pointers($awhich->slice("(1),"));
 
 ##-- 1..2
 my $awhich_want = pdl(long, [[0,0],[0,1],[0,3],[1,1],[1,2],[1,4],[1,5],[2,2],[2,3],[3,2],[3,3],[3,4],[4,0],[4,3],[4,4],[4,5]]);
-my $avals_want  = pdl([10,3,3,9,7,8,4,8,8,7,7,9,-2,5,9,2]);
-my $avals_want  = $a->indexND($awhich_want);
+my $avals_want_raw = pdl([10,3,3,9,7,8,4,8,8,7,7,9,-2,5,9,2]);
+my $avals_want = $a->indexND($awhich_want);
 pdlok("whichND", $awhich,$awhich_want);
-pdlok("vals",    $avals, $avals_want);
+pdlok("vals",  $avals, $avals_want);
 
 ##-- 3..4: ptr0
 pdlok("ccs_encode_pointers:ptr0",   $aptr0, pdl(long,[0,3,7,9,12,16]));

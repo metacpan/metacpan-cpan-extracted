@@ -48,7 +48,7 @@ use PPIx::Regexp::Constant qw{
 use PPIx::Regexp::Tokenizer;
 use PPIx::Regexp::Util qw{ __choose_tokenizer_class __instance };
 
-our $VERSION = '0.084';
+our $VERSION = '0.085';
 
 use constant LOCATION_WIDTH	=> 19;
 
@@ -113,15 +113,6 @@ be dumped.
 If true, this option causes the C<perl_version_introduced> and
 C<perl_version_removed> values associated with each object dumped to be
 displayed.
-
-=item postderef Boolean
-
-B<THIS ARGUMENT IS DEPRECATED>.  See L<DEPRECATION
-NOTICE|PPIx::QuoteLike/DEPRECATION NOTICE> in
-L<PPIx::QuoteLike|PPIx::QuoteLike> for the details.
-
-If true, postfix dereferences are recognized in code and interpolations.
-See the tokenizer's L<new()|PPIx::Regexp::Tokenizer/new> for details.
 
 =item ppi Boolean
 

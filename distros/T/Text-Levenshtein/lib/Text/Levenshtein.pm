@@ -1,5 +1,5 @@
 package Text::Levenshtein;
-$Text::Levenshtein::VERSION = '0.14';
+$Text::Levenshtein::VERSION = '0.15';
 use 5.006;
 use strict;
 use warnings;
@@ -63,12 +63,13 @@ sub fastdistance
         $eq = $eq_with_diacritics;
     }
 
-    return 0 if $s eq $t;
-    return length($s) if !$t || length($t) == 0;
-    return length($t) if !$s || length($s) == 0;
+    my $s_length = defined($s) ? length($s) : 0;
+    my $t_length = defined($t) ? length($t) : 0;
 
-    my $s_length = length($s);
-    my $t_length = length($t);
+    return $s_length if $t_length == 0;
+    return $t_length if $s_length == 0;
+
+    return 0 if $s eq $t;
 
     for ($i = 0; $i < $t_length + 1; $i++) {
         $v0[$i] = $i;

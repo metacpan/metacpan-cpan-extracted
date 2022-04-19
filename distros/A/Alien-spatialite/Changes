@@ -1,5 +1,10 @@
 Revision history for Alien::spatialite
 
+1.09 2022-04-18
+    - Share builds on windows:
+      - fix compilation of dynamic libs on windows
+      - move .la files out of the way so gdal will compile
+
 1.07 2022-04-01
     - Share builds: change method of requiring Alien::patchelf
 

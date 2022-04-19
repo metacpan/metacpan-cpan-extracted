@@ -2159,6 +2159,377 @@ EOF
 },
 
 {
+id => "intrarouter.0",
+text => "Multiple intra area router prefixes, no error.",
+errors => [],
+colors => { black => 1, },
+clusters => {},
+options => "-i",
+yaml => <<EOF,
+---
+database:
+  intrarouters:
+    - address: 0.0.1.1
+      area: 1.0.0.0
+      interface: 0.0.1.1
+      prefixes:
+        - metric: 1
+          prefixaddress: 1:1::1
+          prefixlength: 64
+        - metric: 2
+          prefixaddress: 1:1::2
+          prefixlength: 128
+      router: 0.1.0.0
+      routerid: 0.1.0.0
+    - address: 0.0.1.2
+      area: 2.0.0.0
+      interface: 0.0.1.2
+      prefixes:
+        - metric: 1
+          prefixaddress: 2:1::1
+          prefixlength: 64
+      router: 0.1.0.0
+      routerid: 0.1.0.0
+    - address: 0.0.2.3
+      area: 2.0.0.0
+      interface: 0.0.2.3
+      prefixes:
+        - metric: 1
+          prefixaddress: 2:2::3
+          prefixlength: 64
+      router: 0.2.0.0
+      routerid: 0.2.0.0
+  routers:
+    - area: 1.0.0.0
+      bits:
+        B: 1
+        E: 0
+        V: 0
+      routerid: 0.1.0.0
+    - area: 2.0.0.0
+      bits:
+        B: 1
+        E: 0
+        V: 0
+      routerid: 0.1.0.0
+    - area: 2.0.0.0
+      bits:
+        B: 0
+        E: 0
+        V: 0
+      routerid: 0.2.0.0
+self:
+  areas:
+    - 1.0.0.0
+    - 2.0.0.0
+  routerid: 0.1.0.0
+EOF
+},
+
+{
+id => "intrarouter.1",
+text => "Router from intra area router prefix missing.",
+errors => [
+"Router 0.2.0.0 missing.",
+],
+colors => { red => 1, },
+clusters => {},
+options => "-i",
+yaml => <<EOF,
+---
+database:
+  intrarouters:
+    - address: 0.0.1.1
+      area: 1.0.0.0
+      interface: 0.0.1.1
+      prefixes:
+        - metric: 1
+          prefixaddress: 1:1::1
+          prefixlength: 64
+      router: 0.2.0.0
+      routerid: 0.1.0.0
+  routers:
+    - area: 1.0.0.0
+      bits:
+        B: 1
+        E: 0
+        V: 0
+      routerid: 0.1.0.0
+self:
+  areas:
+    - 1.0.0.0
+  routerid: 0.1.0.0
+EOF
+},
+
+{
+id => "intranetwork.0",
+text => "Multiple intra area network prefixes, no error.",
+errors => [],
+colors => { black => 1, },
+clusters => {},
+options => "-i",
+yaml => <<EOF,
+---
+database:
+  networks:
+    - address: 0.0.1.1
+      area: 1.0.0.0
+      attachments:
+        - routerid: 0.1.0.0
+        - routerid: 0.2.0.0
+      routerid: 0.1.0.0
+    - address: 0.0.1.2
+      area: 2.0.0.0
+      attachments:
+        - routerid: 0.1.0.0
+        - routerid: 0.3.0.0
+      routerid: 0.1.0.0
+  intranetworks:
+    - address: 0.0.1.1
+      area: 1.0.0.0
+      interface: 0.0.1.1
+      prefixes:
+        - metric: 10
+          prefixaddress: 1:1::1
+          prefixlength: 64
+        - metric: 2
+          prefixaddress: 1:1::2
+          prefixlength: 128
+      router: 0.1.0.0
+      routerid: 0.1.0.0
+    - address: 0.0.1.2
+      area: 2.0.0.0
+      interface: 0.0.1.2
+      prefixes:
+        - metric: 20
+          prefixaddress: 2:1::1
+          prefixlength: 64
+      router: 0.1.0.0
+      routerid: 0.1.0.0
+    - address: 0.0.1.2
+      area: 2.0.0.0
+      interface: 0.0.1.2
+      prefixes:
+        - metric: 30
+          prefixaddress: 2:1::3
+          prefixlength: 64
+      router: 0.1.0.0
+      routerid: 0.1.0.0
+  routers:
+    - area: 1.0.0.0
+      bits:
+        B: 1
+        E: 0
+        V: 0
+      transits:
+        - address: 0.0.1.1
+          interface: 0.0.1.1
+          metric: 10
+          routerid: 0.1.0.0
+      routerid: 0.1.0.0
+    - area: 2.0.0.0
+      bits:
+        B: 1
+        E: 0
+        V: 0
+      transits:
+        - address: 0.0.1.2
+          interface: 0.0.1.2
+          metric: 20
+          routerid: 0.1.0.0
+      routerid: 0.1.0.0
+    - area: 1.0.0.0
+      bits:
+        B: 0
+        E: 0
+        V: 0
+      transits:
+        - address: 0.0.1.1
+          interface: 0.0.2.3
+          metric: 30
+          routerid: 0.1.0.0
+      routerid: 0.2.0.0
+    - area: 2.0.0.0
+      bits:
+        B: 0
+        E: 0
+        V: 0
+      transits:
+        - address: 0.0.1.2
+          interface: 0.0.3.4
+          metric: 40
+          routerid: 0.1.0.0
+      routerid: 0.3.0.0
+self:
+  areas:
+    - 1.0.0.0
+    - 2.0.0.0
+  routerid: 0.1.0.0
+EOF
+},
+
+{
+id => "intranetwork.1",
+text => "Multiple intra area network prefixes, no error.",
+errors => [
+"Network 0.0.1.2\@0.1.0.0 missing in area 1.0.0.0.",
+"Network 0.0.1.2\@0.1.0.0 not attached to designated router 0.1.0.0 in area 1.0.0.0.",
+],
+colors => { red => 2, },
+clusters => {},
+options => "-i",
+yaml => <<EOF,
+---
+database:
+  networks:
+    - address: 0.0.1.1
+      area: 1.0.0.0
+      attachments:
+        - routerid: 0.1.0.0
+        - routerid: 0.2.0.0
+      routerid: 0.1.0.0
+  intranetworks:
+    - address: 0.0.1.1
+      area: 1.0.0.0
+      interface: 0.0.1.2
+      prefixes:
+        - metric: 10
+          prefixaddress: 1:1::1
+          prefixlength: 64
+      router: 0.1.0.0
+      routerid: 0.1.0.0
+  routers:
+    - area: 1.0.0.0
+      bits:
+        B: 0
+        E: 0
+        V: 0
+      transits:
+        - address: 0.0.1.1
+          interface: 0.0.1.1
+          metric: 10
+          routerid: 0.1.0.0
+      routerid: 0.1.0.0
+    - area: 1.0.0.0
+      bits:
+        B: 0
+        E: 0
+        V: 0
+      transits:
+        - address: 0.0.1.1
+          interface: 0.0.2.1
+          metric: 20
+          routerid: 0.1.0.0
+      routerid: 0.2.0.0
+self:
+  areas:
+    - 1.0.0.0
+  routerid: 0.1.0.0
+EOF
+},
+
+{
+id => "link.0",
+text => "Multiple link prefixes, no error.",
+errors => [],
+colors => { black => 1, },
+clusters => {},
+options => "-l",
+yaml => <<EOF,
+---
+database:
+  routers:
+    - area: 1.0.0.0
+      bits:
+        B: 1
+        E: 0
+        V: 0
+      routerid: 0.1.0.0
+    - area: 2.0.0.0
+      bits:
+        B: 1
+        E: 0
+        V: 0
+      routerid: 0.1.0.0
+    - area: 2.0.0.0
+      bits:
+        B: 0
+        E: 0
+        V: 0
+      routerid: 0.2.0.0
+  links:
+    - area: 1.0.0.0
+      interface: 0.0.1.1
+      linklocal: fe80::1
+      prefixes:
+        - metric: 1
+          prefixaddress: 1:1::1
+          prefixlength: 64
+        - metric: 2
+          prefixaddress: 1:1::2
+          prefixlength: 128
+      routerid: 0.1.0.0
+    - area: 2.0.0.0
+      interface: 0.0.1.2
+      linklocal: fe80::2
+      prefixes:
+        - metric: 1
+          prefixaddress: 2:1::1
+          prefixlength: 64
+      routerid: 0.1.0.0
+    - area: 2.0.0.0
+      interface: 0.0.2.3
+      linklocal: fe80::3
+      prefixes:
+        - metric: 1
+          prefixaddress: 2:2::3
+          prefixlength: 64
+      routerid: 0.2.0.0
+self:
+  areas:
+    - 1.0.0.0
+    - 2.0.0.0
+  routerid: 0.1.0.0
+EOF
+},
+
+{
+id => "link.1",
+text => "Router from link prefix missing.",
+errors => [
+"Router 0.2.0.0 missing.",
+],
+colors => { red => 1, },
+clusters => {},
+options => "-l",
+yaml => <<EOF,
+---
+database:
+  routers:
+    - area: 1.0.0.0
+      bits:
+        B: 1
+        E: 0
+        V: 0
+      routerid: 0.1.0.0
+  links:
+    - area: 1.0.0.0
+      interface: 0.0.1.1
+      linklocal: fe80::1
+      prefixes:
+        - metric: 1
+          prefixaddress: 1:1::1
+          prefixlength: 64
+      routerid: 0.2.0.0
+self:
+  areas:
+    - 1.0.0.0
+  routerid: 0.1.0.0
+EOF
+},
+
+{
 id => "summary.0",
 text => "Multiple summary networks, no error.",
 errors => [],

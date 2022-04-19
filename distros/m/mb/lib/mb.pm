@@ -3,7 +3,7 @@ package mb;
 # You are welcome! MOJIBAKE-san, you are our friend forever!!
 ######################################################################
 #
-# mb - run Perl script in MBCS encoding (not only CJK ;-)
+# mb - Scripting in Big5, Big5-HKSCS, GBK, Sjis, UHC, UTF-8, ...
 #
 # https://metacpan.org/release/mb
 #
@@ -13,7 +13,7 @@ package mb;
 use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.41';
+$VERSION = '0.42';
 $VERSION = $VERSION;
 
 # internal use
@@ -5269,7 +5269,7 @@ __END__
 
 =head1 NAME
 
-mb - run Perl script in MBCS encoding (not only CJK ;-)
+mb - Scripting in Big5, Big5-HKSCS, GBK, Sjis, UHC, UTF-8, ...
 
 =head1 SYNOPSIS
 
@@ -5835,11 +5835,55 @@ To install this software without make, type the following:
     -----------------------------------------
     encoding     DAMEMOJI      hex dump
     -----------------------------------------
-    big5         "功"          [A5 5C]
-    big5hkscs    "声"          [89 5C]
-    gb18030      "乗"          [81 5C]
-    gbk          "乗"          [81 5C]
-    sjis         "ソ"          [83 5C]
+    big5         "世"          [A5 40]
+                 "加"          [A5 5B]
+                 "功"          [A5 5C]
+                 "包"          [A5 5D]
+                 "匆"          [A5 5E]
+                 "匝"          [A5 60]
+                 "叻"          [A5 7B]
+                 "四"          [A5 7C]
+                 "囚"          [A5 7D]
+    -----------------------------------------
+    big5hkscs    "蕋"          [8F 40]
+                 "团"          [89 5B]
+                 "声"          [89 5C]
+                 "处"          [89 5D]
+                 "备"          [89 5E]
+                 "头"          [89 60]
+                 "询"          [89 7B]
+                 "车"          [89 7C]
+                 "轧"          [89 7D]
+    -----------------------------------------
+    gb18030      "丂"          [81 40]
+                 "乕"          [81 5B]
+                 "乗"          [81 5C]
+                 "乚"          [81 5D]
+                 "乛"          [81 5E]
+                 "乣"          [81 60]
+                 "亄"          [81 7B]
+                 "亅"          [81 7C]
+                 "亇"          [81 7D]
+    -----------------------------------------
+    gbk          "丂"          [81 40]
+                 "乕"          [81 5B]
+                 "乗"          [81 5C]
+                 "乚"          [81 5D]
+                 "乛"          [81 5E]
+                 "乣"          [81 60]
+                 "亄"          [81 7B]
+                 "亅"          [81 7C]
+                 "亇"          [81 7D]
+    -----------------------------------------
+    sjis         "ァ"          [83 40]
+                 "ゼ"          [83 5B]
+                 "ソ"          [83 5C]
+                 "ゾ"          [83 5D]
+                 "タ"          [83 5E]
+                 "チ"          [83 60]
+                 "ボ"          [83 7B]
+                 "ポ"          [83 7C]
+                 "マ"          [83 7D]
     -----------------------------------------
 
   mb.pm modulino escapes literal DAMEMOJI in your script and save as new script.
@@ -5848,11 +5892,55 @@ To install this software without make, type the following:
     -----------------------------------------
     encoding     not DAMEMOJI  hex dump
     -----------------------------------------
-    big5         "功\"         [A5 [5C] 5C]
-    big5hkscs    "声\"         [89 [5C] 5C]
-    gb18030      "乗\"         [81 [5C] 5C]
-    gbk          "乗\"         [81 [5C] 5C]
-    sjis         "ソ\"         [83 [5C] 5C]
+    big5         "功@"         [A5 [5C] 40]
+                 "功["         [A5 [5C] 5B]
+                 "功\"         [A5 [5C] 5C]
+                 "功]"         [A5 [5C] 5D]
+                 "功^"         [A5 [5C] 5E]
+                 "功`"         [A5 [5C] 60]
+                 "功{"         [A5 [5C] 7B]
+                 "功|"         [A5 [5C] 7C]
+                 "功}"         [A5 [5C] 7D]
+    -----------------------------------------
+    big5hkscs    "蕚@"         [8F [5C] 40]
+                 "声["         [89 [5C] 5B]
+                 "声\"         [89 [5C] 5C]
+                 "声]"         [89 [5C] 5D]
+                 "声^"         [89 [5C] 5E]
+                 "声`"         [89 [5C] 60]
+                 "声{"         [89 [5C] 7B]
+                 "声|"         [89 [5C] 7C]
+                 "声}"         [89 [5C] 7D]
+    -----------------------------------------
+    gb18030      "乗@"         [81 [5C] 40]
+                 "乗["         [81 [5C] 5B]
+                 "乗\"         [81 [5C] 5C]
+                 "乗]"         [81 [5C] 5D]
+                 "乗^"         [81 [5C] 5E]
+                 "乗`"         [81 [5C] 60]
+                 "乗{"         [81 [5C] 7B]
+                 "乗|"         [81 [5C] 7C]
+                 "乗}"         [81 [5C] 7D]
+    -----------------------------------------
+    gbk          "乗@"         [81 [5C] 40]
+                 "乗["         [81 [5C] 5B]
+                 "乗\"         [81 [5C] 5C]
+                 "乗]"         [81 [5C] 5D]
+                 "乗^"         [81 [5C] 5E]
+                 "乗`"         [81 [5C] 60]
+                 "乗{"         [81 [5C] 7B]
+                 "乗|"         [81 [5C] 7C]
+                 "乗}"         [81 [5C] 7D]
+    -----------------------------------------
+    sjis         "ソ@"         [83 [5C] 40]
+                 "ソ["         [83 [5C] 5B]
+                 "ソ\"         [83 [5C] 5C]
+                 "ソ]"         [83 [5C] 5D]
+                 "ソ^"         [83 [5C] 5E]
+                 "ソ`"         [83 [5C] 60]
+                 "ソ{"         [83 [5C] 7B]
+                 "ソ|"         [83 [5C] 7C]
+                 "ソ}"         [83 [5C] 7D]
     -----------------------------------------
 
   then mb.pm executes "script.oo.pl"
@@ -5861,11 +5949,55 @@ To install this software without make, type the following:
     -----------------------------------------
     encoding     memory        hex dump
     -----------------------------------------
-    big5         "功"          [A5] [5C]
-    big5hkscs    "声"          [89] [5C]
-    gb18030      "乗"          [81] [5C]
-    gbk          "乗"          [81] [5C]
-    sjis         "ソ"          [83] [5C]
+    big5         "世"          [A5] [40]
+                 "加"          [A5] [5B]
+                 "功"          [A5] [5C]
+                 "包"          [A5] [5D]
+                 "匆"          [A5] [5E]
+                 "匝"          [A5] [60]
+                 "叻"          [A5] [7B]
+                 "四"          [A5] [7C]
+                 "囚"          [A5] [7D]
+    -----------------------------------------
+    big5hkscs    "蕋"          [8F] [40]
+                 "团"          [89] [5B]
+                 "声"          [89] [5C]
+                 "处"          [89] [5D]
+                 "备"          [89] [5E]
+                 "头"          [89] [60]
+                 "询"          [89] [7B]
+                 "车"          [89] [7C]
+                 "轧"          [89] [7D]
+    -----------------------------------------
+    gb18030      "丂"          [81] [40]
+                 "乕"          [81] [5B]
+                 "乗"          [81] [5C]
+                 "乚"          [81] [5D]
+                 "乛"          [81] [5E]
+                 "乣"          [81] [60]
+                 "亄"          [81] [7B]
+                 "亅"          [81] [7C]
+                 "亇"          [81] [7D]
+    -----------------------------------------
+    gbk          "丂"          [81] [40]
+                 "乕"          [81] [5B]
+                 "乗"          [81] [5C]
+                 "乚"          [81] [5D]
+                 "乛"          [81] [5E]
+                 "乣"          [81] [60]
+                 "亄"          [81] [7B]
+                 "亅"          [81] [7C]
+                 "亇"          [81] [7D]
+    -----------------------------------------
+    sjis         "ァ"          [83] [40]
+                 "ゼ"          [83] [5B]
+                 "ソ"          [83] [5C]
+                 "ゾ"          [83] [5D]
+                 "タ"          [83] [5E]
+                 "チ"          [83] [60]
+                 "ボ"          [83] [7B]
+                 "ポ"          [83] [7C]
+                 "マ"          [83] [7D]
     -----------------------------------------
 
 =head1 MBCS character casing
@@ -6999,18 +7131,18 @@ programming environment like at that time.
   +-------------+--------------+---------------------------------------------------------------------+
   | OS encoding | I/O encoding |                           script encoding                           |
   |             |              |----------------------------------+----------------------------------+
-  |             |              |              CP932               |              UTF-8               |
+  |             |              |              Sjis                |              UTF-8               |
   +-------------+--------------+----------------------------------+----------------------------------+
   |             |              |  > perl mb.pm script.pl          |  > perl mb.pm -e utf8 script.pl  |
-  |             |    CP932     |                                  |  use IOas::CP932; # I/O          |
+  |             |    Sjis      |                                  |  use IOas::Sjis;  # I/O          |
   |             |              |                                  |  use mb::Encode;  # file-path    |
-  |    CP932    +--------------+----------------------------------+----------------------------------+
+  |    Sjis     +--------------+----------------------------------+----------------------------------+
   |             |              |  > perl mb.pm script.pl          |  > perl mb.pm -e utf8 script.pl  |
   |             |    UTF-8     |  use IOas::UTF8; # I/O           |                                  |
   |             |              |                                  |  use mb::Encode;  # file-path    |
   +-------------+--------------+----------------------------------+----------------------------------+
   |             |              |  $ perl mb.pm -e sjis script.pl  |  $ perl mb.pm script.pl          |
-  |             |    CP932     |                                  |  use IOas::CP932; # I/O          |
+  |             |    Sjis      |                                  |  use IOas::Sjis;  # I/O          |
   |             |              |  use mb::Encode; # file-path     |                                  |
   |    UTF-8    +--------------+----------------------------------+----------------------------------+
   |             |              |  $ perl mb.pm -e sjis script.pl  |  $ perl mb.pm script.pl          |
@@ -7022,18 +7154,18 @@ programming environment like at that time.
   +-------------+--------------+---------------------------------------------------------------------+
   | OS encoding | I/O encoding |                           script encoding                           |
   |             |              |----------------------------------+----------------------------------+
-  |             |              |              CP932               |              UTF-8               |
+  |             |              |              Sjis                |              UTF-8               |
   +-------------+--------------+----------------------------------+----------------------------------+
   |             |              |  > perl mb.pm script.pl          |                                  |
-  |             |    CP932     |                                  |                                  |
+  |             |    Sjis      |                                  |                                  |
   |             |              |                                  |                                  |
-  |    CP932    +--------------+----------------------------------+----------------------------------+
+  |    Sjis     +--------------+----------------------------------+----------------------------------+
   |             |              |                                  |  > perl mb.pm -e utf8 script.pl  |
   |             |    UTF-8     |                                  |                                  |
   |             |              |                                  |  use mb::Encode;  # file-path    |
   +-------------+--------------+----------------------------------+----------------------------------+
   |             |              |  $ perl mb.pm -e sjis script.pl  |                                  |
-  |             |    CP932     |                                  |                                  |
+  |             |    Sjis      |                                  |                                  |
   |             |              |  use mb::Encode; # file-path     |                                  |
   |    UTF-8    +--------------+----------------------------------+----------------------------------+
   |             |              |                                  |  $ perl mb.pm script.pl          |
@@ -7046,13 +7178,13 @@ programming environment like at that time.
   encoding
   O-I-S     description
   ----------------------------------------------------------------------
-  C-C-C     Best choice when I/O is CP932 encoding
-  C-C-U     
-  C-U-C     
-  C-U-U     Better choice when I/O is UTF-8 encoding, since not so slow
-  U-C-C     Better choice when I/O is CP932 encoding, since not so slow
-  U-C-U     
-  U-U-C     
+  S-S-S     Best choice when I/O is Sjis  encoding
+  S-S-U     
+  S-U-S     
+  S-U-U     Better choice when I/O is UTF-8 encoding, since not so slow
+  U-S-S     Better choice when I/O is Sjis  encoding, since not so slow
+  U-S-U     
+  U-U-S     
   U-U-U     Best choice when I/O is UTF-8 encoding
   ----------------------------------------------------------------------
   see also: 7 superstitions about character encoding I encountered

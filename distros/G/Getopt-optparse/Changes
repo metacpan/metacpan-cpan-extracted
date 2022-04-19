@@ -1,0 +1,8 @@
+Revision history for Perl extension Getopt-optparse.
+
+0.01  Tue Apr 19 03:43:57 2022
+	- original version; created by h2xs 1.23 with options
+		-L./Getopt -XAn Getopt-optparse
+
+0.02  Tue Apr 19 03:45:00 2022
+        - Initial commit.

@@ -14,8 +14,55 @@ SYNOPSIS
   $ perl mb.pm -e uhc       MBCS_Perl_script.pl
   $ perl mb.pm -e utf8      MBCS_Perl_script.pl
   $ perl mb.pm -e wtf8      MBCS_Perl_script.pl
-  
+
   C:\WINDOWS> perl mb.pm script.pl ??-DOS-like *wildcard* available
+
+  MBCS quotes:
+        qq/ DAMEMOJI 功声乗ソ /
+         q/ DAMEMOJI 功声乗ソ /
+         m/ DAMEMOJI 功声乗ソ /
+         s/ DAMEMOJI 功声乗ソ / DAMEMOJI 功声乗ソ /
+    split / DAMEMOJI 功声乗ソ /
+        tr/ DAMEMOJI 功声乗ソ / DAMEMOJI 功声乗ソ /
+         y/ DAMEMOJI 功声乗ソ / DAMEMOJI 功声乗ソ /
+        qr/ DAMEMOJI 功声乗ソ /
+
+  MBCS subroutines:
+    mb::chop(...);
+    mb::chr(...);
+    mb::do 'file';
+    mb::dosglob(...);
+    mb::eval 'string';
+    mb::getc(...);
+    mb::index(...);
+    mb::index_byte(...);
+    mb::length(...);
+    mb::ord(...);
+    mb::require 'file';
+    mb::reverse(...);
+    mb::rindex(...);
+    mb::rindex_byte(...);
+    mb::substr(...);
+    mb::use Module;
+    mb::no Module;
+
+  MBCS special variables:
+    $mb::PERL
+    $mb::ORIG_PROGRAM_NAME
+
+  supported encodings:
+    Big5, Big5-HKSCS, EUC-JP, GB18030, GBK, Sjis, UHC, UTF-8, WTF-8
+
+  supported operating systems:
+    Apple Inc. OS X,
+    Hewlett-Packard Development Company, L.P. HP-UX,
+    International Business Machines Corporation AIX,
+    Microsoft Corporation Windows,
+    Oracle Corporation Solaris,
+    and Other Systems
+
+  supported perl versions:
+    perl version 5.005_03 to newest perl
 
 DESCRIPTION
 

@@ -4,6 +4,9 @@ use warnings;
 use Test::More tests => 138;
 use XML::Sig;
 use File::Which;
+use Crypt::OpenSSL::Guess;
+
+my ($major, $minor, $letter) = Crypt::OpenSSL::Guess->openssl_version();
 
 my @hash_alg = qw/sha1 sha224 sha256 sha384 sha512 ripemd160/;
 foreach my $alg (@hash_alg) {
@@ -23,6 +26,8 @@ foreach my $alg (@hash_alg) {
 
 SKIP: {
     skip "xmlsec1 not installed", 2 unless which('xmlsec1');
+
+    skip "openssl 3+ does not support ripemd160", 2 if ($major ge 3 && $alg =~ /ripemd160/);
 
     ok( (open XML, '>', "t/tmp.xml"), "File t/tmp.xml opened for write");
     print XML $signed;
@@ -51,6 +56,8 @@ foreach my $alg (@hash_alg) {
 
 SKIP: {
     skip "xmlsec1 not installed", 2 unless which('xmlsec1');
+
+    skip "openssl 3+ does not support ripemd160", 2 if ($major ge 3 && $alg =~ /ripemd160/);
 
     ok( (open XML, '>', "t/tmp.xml"), "File opened for write");
     print XML $signed;
@@ -83,6 +90,8 @@ foreach my $alg (@hash_alg) {
 SKIP: {
     skip "xmlsec1 not installed", 2 unless which('xmlsec1');
 
+    skip "openssl 3+ does not support ripemd160", 2 if ($major ge 3 && $alg =~ /ripemd160/);
+
     ok( (open XML, '>', "t/tmp.xml"), "File opened for write");
     print XML $signed;
     close XML;
@@ -109,6 +118,8 @@ foreach my $alg (@hash_alg) {
 
     SKIP: {
         skip "xmlsec1 not installed", 2 unless which('xmlsec1');
+
+        skip "openssl 3+ does not support ripemd160", 2 if ($major ge 3 && $alg =~ /ripemd160/);
 
         ok( (open XML, '>', "t/tmp.xml"), "File opened for write");
         print XML $signed;

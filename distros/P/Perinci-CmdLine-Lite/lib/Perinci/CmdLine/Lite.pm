@@ -16,9 +16,9 @@ extends 'Perinci::CmdLine::Base';
 
 # put global variables alphabetically here
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-01-29'; # DATE
+our $DATE = '2022-04-15'; # DATE
 our $DIST = 'Perinci-CmdLine-Lite'; # DIST
-our $VERSION = '1.917'; # VERSION
+our $VERSION = '1.918'; # VERSION
 
 has default_prompt_template => (
     is=>'rw',
@@ -29,7 +29,7 @@ has validate_args => (
     default => 1,
 );
 
-my $formats = [qw/text text-simple text-pretty json json-pretty csv termtable html html+datatables perl/];
+my $formats = [qw/text text-simple text-pretty json json-pretty csv termtable html html+datatables perl vd/];
 
 sub BUILD {
     my ($self, $args) = @_;
@@ -371,6 +371,13 @@ sub hook_format_result {
         $fmt = 'text-pretty';
         no warnings 'once';
         $ENV{FORMAT_PRETTY_TABLE_BACKEND} //= 'Term::TablePrint';
+    } elsif ($fmt eq 'vd') { # view in Visidata
+        $fmt = 'text-pretty';
+        $ENV{VIEW_RESULT} //= 1;
+        no warnings 'once';
+        $Perinci::CmdLine::Base::tempfile_opt_suffix = '.csv';
+        $ENV{FORMAT_PRETTY_TABLE_BACKEND} //= 'Text::Table::CSV';
+        $r->{viewer} //= 'vd';
     }
 
     my $fres = Perinci::Result::Format::Lite::format(
@@ -647,7 +654,7 @@ Perinci::CmdLine::Lite - A Rinci/Riap-based command-line application framework
 
 =head1 VERSION
 
-This document describes version 1.917 of Perinci::CmdLine::Lite (from Perl distribution Perinci-CmdLine-Lite), released on 2022-01-29.
+This document describes version 1.918 of Perinci::CmdLine::Lite (from Perl distribution Perinci-CmdLine-Lite), released on 2022-04-15.
 
 =head1 SYNOPSIS
 

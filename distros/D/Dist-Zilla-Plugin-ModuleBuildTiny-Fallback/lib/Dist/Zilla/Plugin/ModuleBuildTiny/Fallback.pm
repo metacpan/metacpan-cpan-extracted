@@ -1,40 +1,41 @@
 use strict;
 use warnings;
-package Dist::Zilla::Plugin::ModuleBuildTiny::Fallback; # git description: v0.024-3-gb825f3e
-# vim: set ts=8 sts=4 sw=4 tw=115 et :
-# ABSTRACT: Generate a Build.PL that uses Module::Build::Tiny, falling back to Module::Build as needed
+package Dist::Zilla::Plugin::ModuleBuildTiny::Fallback; # git description: v0.025-17-gb471c35
+# vim: set ts=8 sts=2 sw=2 tw=115 et :
+# ABSTRACT: Generate a Build.PL that uses Module::Build::Tiny and Module::Build
 # KEYWORDS: plugin installer Module::Build Build.PL toolchain legacy ancient backcompat
 
-our $VERSION = '0.025';
+our $VERSION = '0.026';
 
 use Moose;
 with
     'Dist::Zilla::Role::BeforeBuild',
+    'Dist::Zilla::Role::AfterBuild',
     'Dist::Zilla::Role::FileGatherer',
     'Dist::Zilla::Role::BuildPL',
     'Dist::Zilla::Role::PrereqSource';
 
-use MooseX::Types;
-use MooseX::Types::Moose 'ArrayRef';
+use Types::Standard qw(Str HashRef ArrayRef ConsumerOf);
 use Dist::Zilla::Plugin::ModuleBuild;
 use Dist::Zilla::Plugin::ModuleBuildTiny;
 use Moose::Util 'find_meta';
-use List::Util 'first';
+use List::Keywords qw(first any);
 use Scalar::Util 'blessed';
+use Path::Tiny;
 use namespace::autoclean;
 
 has mb_version => (
-    is => 'ro', isa => 'Str',
+    is => 'ro', isa => Str,
     # <mst> 0.28 is IIRC when install_base changed incompatibly
     default => '0.28',
 );
 
 has mbt_version => (
-    is => 'ro', isa => 'Str',
+    is => 'ro', isa => Str,
 );
 
 has _extra_args => (
-    isa => 'HashRef',
+    isa => HashRef,
     lazy => 1,
     default => sub { +{} },
     traits => ['Hash'],
@@ -42,7 +43,7 @@ has _extra_args => (
 );
 
 has plugins => (
-    isa => ArrayRef[role_type('Dist::Zilla::Role::BuildPL')],
+    isa => ArrayRef[ConsumerOf['Dist::Zilla::Role::BuildPL']],
     init_arg => undef,
     lazy => 1,
     default => sub {
@@ -113,7 +114,7 @@ sub before_build
 {
     my $self = shift;
 
-    my @plugins = grep { $_->isa(__PACKAGE__) } @{ $self->zilla->plugins };
+    my @plugins = grep $_->isa(__PACKAGE__), @{ $self->zilla->plugins };
     $self->log_fatal('two [ModuleBuildTiny::Fallback] plugins detected!') if @plugins > 1;
 }
 
@@ -135,8 +136,8 @@ sub gather_files
                 $files{ blessed $plugin }{file} = $build_pl;
                 $files{ blessed $plugin }{content} = $build_pl->content;
 
-                # we leave the MBT version in place; we will fold our content
-                # into this object later
+                # we leave MBT's version of Build.PL in place; we will fold all additional content (and
+                # Module::Build's code)into this object later
                 $self->zilla->prune_file($build_pl) if blessed($plugin) eq 'Dist::Zilla::Plugin::ModuleBuild';
             }
         }
@@ -153,6 +154,14 @@ sub register_prereqs
     # configure_requires wasn't being respected anyway
     my ($mb, $mbt) = $self->plugins;
     $mbt->register_prereqs;
+}
+
+sub after_build {
+  my $self = shift;
+
+  $self->log('share/ files present: did you forget to include [ShareDir]?')
+    if any { path('share')->subsumes($_->name) } @{ $self->zilla->files }
+      and not @{ $self->zilla->plugins_with(-ShareDir) };
 }
 
 sub setup_installer
@@ -217,7 +226,7 @@ sub setup_installer
 
     # prereq specifications don't always provide exact versions - we just weed
     # those out for now, as this shouldn't occur that frequently.
-    delete @{$configure_requires}{ grep { not version::is_strict($configure_requires->{$_}) } keys %$configure_requires };
+    delete @{$configure_requires}{ grep !version::is_strict($configure_requires->{$_}), keys %$configure_requires };
 
     $mbt_build_pl->content(
         ( defined $preamble ? $preamble : '' )
@@ -229,9 +238,9 @@ use warnings;
 
 my %configure_requires = (
 FALLBACK1
-    . join('', map {
-            "    '$_' => '$configure_requires->{$_}',\n"
-        } sort keys %$configure_requires)
+    . join('', map
+            "    '$_' => '$configure_requires->{$_}',\n",
+            sort keys %$configure_requires)
     . <<'FALLBACK2'
 );
 
@@ -240,7 +249,7 @@ my %errors = map {
     $_ => $@,
 } keys %configure_requires;
 
-if (!grep { $_ } values %errors)
+if (!grep $_, values %errors)
 {
 FALLBACK2
     . $mbt_content . "}\n"
@@ -302,9 +311,9 @@ __PACKAGE__->meta->make_immutable;
 #pod
 #pod *** WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING ***
 #pod
-#pod If you're seeing this warning, your toolchain is really, really old* and you'll
-#pod almost certainly have problems installing CPAN modules from this century. But
-#pod never fear, dear user, for we have the technology to fix this!
+#pod If you're seeing this warning, your toolchain is really, really old* and
+#pod you'll almost certainly have problems installing CPAN modules from this
+#pod century. But never fear, dear user, for we have the technology to fix this!
 #pod
 #pod If you're using CPAN.pm to install things, then you can upgrade it using:
 #pod
@@ -322,9 +331,9 @@ __PACKAGE__->meta->make_immutable;
 #pod
 #pod ----
 #pod
-#pod * Alternatively, you are running this file manually, in which case you need
-#pod to learn to first fulfill all configure requires prerequisites listed in
-#pod META.yml or META.json -- or use a cpan client to install this distribution.
+#pod * Alternatively, you are running this file manually, in which case you need to
+#pod learn to first fulfill all configure requires prerequisites listed in META.yml
+#pod or META.json -- or use a cpan client to install this distribution.
 #pod
 #pod You can also silence this warning for future installations by setting the
 #pod PERL_MB_FALLBACK_SILENCE_WARNING environment variable, but please don't do
@@ -346,7 +355,7 @@ __PACKAGE__->meta->make_immutable;
 #pod fallback case. It is up to you to decide whether it is still a good idea to use
 #pod this plugin in this situation.
 #pod
-#pod =for Pod::Coverage before_build gather_files register_prereqs setup_installer
+#pod =for Pod::Coverage before_build gather_files register_prereqs after_build setup_installer
 #pod
 #pod =head1 CONFIGURATION OPTIONS
 #pod
@@ -383,11 +392,11 @@ __PACKAGE__->meta->make_immutable;
 
 =head1 NAME
 
-Dist::Zilla::Plugin::ModuleBuildTiny::Fallback - Generate a Build.PL that uses Module::Build::Tiny, falling back to Module::Build as needed
+Dist::Zilla::Plugin::ModuleBuildTiny::Fallback - Generate a Build.PL that uses Module::Build::Tiny and Module::Build
 
 =head1 VERSION
 
-version 0.025
+version 0.026
 
 =head1 SYNOPSIS
 
@@ -415,9 +424,9 @@ When the L<Module::Build> fallback code is run, an added preamble is printed:
 
     *** WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING ***
 
-    If you're seeing this warning, your toolchain is really, really old* and you'll
-    almost certainly have problems installing CPAN modules from this century. But
-    never fear, dear user, for we have the technology to fix this!
+    If you're seeing this warning, your toolchain is really, really old* and
+    you'll almost certainly have problems installing CPAN modules from this
+    century. But never fear, dear user, for we have the technology to fix this!
 
     If you're using CPAN.pm to install things, then you can upgrade it using:
 
@@ -435,9 +444,9 @@ When the L<Module::Build> fallback code is run, an added preamble is printed:
 
     ----
 
-    * Alternatively, you are running this file manually, in which case you need
-    to learn to first fulfill all configure requires prerequisites listed in
-    META.yml or META.json -- or use a cpan client to install this distribution.
+    * Alternatively, you are running this file manually, in which case you need to
+    learn to first fulfill all configure requires prerequisites listed in META.yml
+    or META.json -- or use a cpan client to install this distribution.
 
     You can also silence this warning for future installations by setting the
     PERL_MB_FALLBACK_SILENCE_WARNING environment variable, but please don't do
@@ -456,7 +465,7 @@ additional build-time dependency checks), as that code will not run in the
 fallback case. It is up to you to decide whether it is still a good idea to use
 this plugin in this situation.
 
-=for Pod::Coverage before_build gather_files register_prereqs setup_installer
+=for Pod::Coverage before_build gather_files register_prereqs after_build setup_installer
 
 =head1 CONFIGURATION OPTIONS
 
@@ -507,7 +516,7 @@ L<http://dzil.org/#mailing-list>.
 There is also an irc channel available for users of this distribution, at
 L<C<#distzilla> on C<irc.perl.org>|irc://irc.perl.org/#distzilla>.
 
-I am also usually active on irc, as 'ether' at C<irc.perl.org>.
+I am also usually active on irc, as 'ether' at C<irc.perl.org> and C<irc.libera.chat>.
 
 =head1 AUTHOR
 
@@ -525,9 +534,9 @@ the same terms as the Perl 5 programming language system itself.
 __DATA__
 *** WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING ***
 
-If you're seeing this warning, your toolchain is really, really old* and you'll
-almost certainly have problems installing CPAN modules from this century. But
-never fear, dear user, for we have the technology to fix this!
+If you're seeing this warning, your toolchain is really, really old* and
+you'll almost certainly have problems installing CPAN modules from this
+century. But never fear, dear user, for we have the technology to fix this!
 
 If you're using CPAN.pm to install things, then you can upgrade it using:
 
@@ -545,9 +554,9 @@ Gang, the irc.perl.org #toolchain IRC channel, and the number 42.
 
 ----
 
-* Alternatively, you are running this file manually, in which case you need
-to learn to first fulfill all configure requires prerequisites listed in
-META.yml or META.json -- or use a cpan client to install this distribution.
+* Alternatively, you are running this file manually, in which case you need to
+learn to first fulfill all configure requires prerequisites listed in META.yml
+or META.json -- or use a cpan client to install this distribution.
 
 You can also silence this warning for future installations by setting the
 PERL_MB_FALLBACK_SILENCE_WARNING environment variable, but please don't do

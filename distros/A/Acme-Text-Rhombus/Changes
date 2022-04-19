@@ -1,5 +1,13 @@
 Revision history for Perl extension Acme::Text::Rhombus.
 
+0.21  2022-04-18  <schubiger@cpan.org>
+
+ - Merged development version to stable.
+
+0.20_01  2022-04-16  <schubiger@cpan.org>
+
+ - Add digit enumeration and according docs/tests.
+
 0.20  2018-10-17  <schubiger@cpan.org>
 
  - Merged development version to stable.

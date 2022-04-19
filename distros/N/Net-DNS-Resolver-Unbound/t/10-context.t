@@ -3,9 +3,11 @@
 
 use strict;
 use warnings;
-use Test::More tests => 8;
+use Test::More;
 
 use Net::DNS::Resolver::Unbound;
+
+plan tests => 7;
 
 
 ok( Net::DNS::Resolver::Unbound->string(), 'default configuration' );
@@ -33,18 +35,13 @@ my @result = $resolver->option($option);
 is( pop(@result), $value, 'multi-valued resolver option' );
 
 
-eval { my $resolver = Net::DNS::Resolver::Unbound->new( option => {$option, $value} ); };
-my ($option_usage) = split /\n/, "$@\n";
-ok( $option_usage, "Unbound option usage\t[$option_usage]" );
-
-
 $resolver->send('localhost');		## side effect: finalise config
 
 eval { my $value = $resolver->config('filename') };
 my ($reject_option) = split /\n/, "$@\n";
 ok( $reject_option, "reject Unbound option\t[$reject_option]" );
 
-## exercise special config options
+## exercise special config options	(all rejected)
 eval { $resolver->add_ta('zone DS') };
 eval { $resolver->add_ta_file('filename') };
 eval { $resolver->add_ta_autr('filename') };

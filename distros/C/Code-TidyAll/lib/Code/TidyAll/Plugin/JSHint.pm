@@ -17,7 +17,7 @@ has options => (
 
 with qw( Code::TidyAll::Role::RunsCommand Code::TidyAll::Role::Tempdir );
 
-our $VERSION = '0.81';
+our $VERSION = '0.82';
 
 sub _build_cmd {'jshint'}
 
@@ -61,7 +61,7 @@ Code::TidyAll::Plugin::JSHint - Use jshint with tidyall
 
 =head1 VERSION
 
-version 0.81
+version 0.82
 
 =head1 SYNOPSIS
 

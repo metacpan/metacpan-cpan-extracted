@@ -83,23 +83,23 @@
    "provides" : {
       "Net::Google::Drive::Simple" : {
          "file" : "lib/Net/Google/Drive/Simple.pm",
-         "version" : "3.01"
+         "version" : "3.02"
       },
       "Net::Google::Drive::Simple::Core" : {
          "file" : "lib/Net/Google/Drive/Simple/Core.pm",
-         "version" : "3.01"
+         "version" : "3.02"
       },
       "Net::Google::Drive::Simple::Item" : {
          "file" : "lib/Net/Google/Drive/Simple/Item.pm",
-         "version" : "3.01"
+         "version" : "3.02"
       },
       "Net::Google::Drive::Simple::V2" : {
          "file" : "lib/Net/Google/Drive/Simple/V2.pm",
-         "version" : "3.01"
+         "version" : "3.02"
       },
       "Net::Google::Drive::Simple::V3" : {
          "file" : "lib/Net/Google/Drive/Simple/V3.pm",
-         "version" : "3.01"
+         "version" : "3.02"
       }
    },
    "release_status" : "stable",
@@ -114,7 +114,7 @@
          "web" : "https://github.com/mschilli/net-google-drive-simple"
       }
    },
-   "version" : "3.01",
+   "version" : "3.02",
    "x_contributors" : [
       "Andy Baugh <thomas.baugh@cpanel.net>",
       "Andy Bircumshaw <github.com@networkned.co.uk>",

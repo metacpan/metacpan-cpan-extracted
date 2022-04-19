@@ -4,7 +4,7 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "TAP",
       "test",
@@ -16,7 +16,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Test-Harness",
    "no_index" : {
@@ -53,6 +53,6 @@
          "url" : "http://github.com/Perl-Toolchain-Gang/Test-Harness/tree/master"
       }
    },
-   "version" : "3.42",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "3.44",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

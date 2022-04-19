@@ -1,5 +1,5 @@
 ##########################################################################
-# Copyright (c) 2010-2021 Alexander Bluhm <alexander.bluhm@gmx.net>
+# Copyright (c) 2010-2022 Alexander Bluhm <alexander.bluhm@gmx.net>
 #
 # Permission to use, copy, modify, and distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
@@ -96,9 +96,13 @@ sub ospfctl_show {
     } else {
 	die "Control socket '$self->{ospfsock}' for $self->{ospfd} missing.\n";
     }
-    my @lines = wantarray ? `@cmd` : scalar `@cmd`;
-    die "Command '@cmd' failed: $?\n" if $?;
-    return wantarray ? @lines : $lines[0];
+    open(my $fh, '-|', @cmd)
+	or die "Open pipe from '@cmd' failed: $!";
+    my @lines = $fh->getlines();
+    close($fh) or die $! ?
+	"Close pipe from '@cmd' failed: $!" :
+	"Command '@cmd' failed: $?\n";
+    return wantarray ? @lines : join("", @lines);
 }
 
 sub read_files {

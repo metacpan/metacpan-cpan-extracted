@@ -9,6 +9,8 @@ my %common_reqs = (
     "Alien::Build::MM" => "1.41",
     ($^O =~ /mswin/i) ? ("Alien::MSYS" => 0) : (),
     "Alien::Build::Plugin::Download::Git" => "0",
+    "File::Which" => "0",
+    "Capture::Tiny" => "0",
 );
 
 my %WriteMakefileArgs = (

@@ -1,5 +1,27 @@
 Revision history for Test-Harness
 
+3.44     17-04-2022
+        - Release 3.43_06 as non-dev
+
+3.43_06  11-04-2022
+        - Fix skipping SEGV test
+
+3.43_05  07-04-2022
+        - Fix failing SEGV test on Windows
+
+3.43_04 22-01-2022
+        - Remove ASCII-isms to better work on EBCDIC
+
+3.43_03 30-07-2021
+        - Move timer initialization
+        - Fix YAMLish behaviour with empty values
+        - fix eintr error handling in TAP::Parser::Multiplexer
+        - Parse out signal name & core dump.
+
+3.43_02 25-03-2020
+        - Let the aggregator finish gracefully after bailout
+        - Make prove respect HARNESS_VERBOSE if no verbosity flags are passed
+
 3.42    19-03-2018
         - Enable rulesfile.t to run in core
 

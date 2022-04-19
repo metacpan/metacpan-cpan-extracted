@@ -757,7 +757,7 @@ Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 
 CPAN ID: jdeguest
 
-L<https://git.deguest.jp/jack/Module-Generic>
+L<https://gitlab.com/jackdeguest/Module-Generic>
 
 =head1 SEE ALSO
 

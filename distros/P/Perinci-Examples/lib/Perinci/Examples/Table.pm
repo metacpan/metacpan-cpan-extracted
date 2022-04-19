@@ -6,9 +6,9 @@ use utf8;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-03-08'; # DATE
+our $DATE = '2022-04-15'; # DATE
 our $DIST = 'Perinci-Examples'; # DIST
-our $VERSION = '0.822'; # VERSION
+our $VERSION = '0.823'; # VERSION
 
 our %SPEC;
 
@@ -98,7 +98,10 @@ sub sales {
     ];
 
     [200, "OK", $table, {
-        'table.fields' => [qw/year lang title sales/],
+        'table.fields'        => [qw/year   lang   title sales/],
+        'table.field_types'   => [qw/int    str    str   float/],
+        'table.field_formats' => [   '',    '',    '',   'number'],
+        'table.field_aligns'  => [qw/middle middle left  right/],
     }];
 }
 
@@ -117,7 +120,7 @@ Perinci::Examples::Table - Table examples
 
 =head1 VERSION
 
-This document describes version 0.822 of Perinci::Examples::Table (from Perl distribution Perinci-Examples), released on 2022-03-08.
+This document describes version 0.823 of Perinci::Examples::Table (from Perl distribution Perinci-Examples), released on 2022-04-15.
 
 =head1 DESCRIPTION
 

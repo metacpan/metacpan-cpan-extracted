@@ -5,7 +5,6 @@
 #include <assert.h>
 
 #include "spvm_native.h"
-#include "spvm_api.h"
 
 int32_t main(int32_t argc, const char *argv[]) {
   
@@ -58,7 +57,7 @@ int32_t main(int32_t argc, const char *argv[]) {
   // Leave scope
   env->leave_scope(env, scope_id);
   
-  SPVM_API_free_env_prepared(env);
+  env->free_env_prepared(env);
   
   return status;
 }
@@ -71,37 +70,37 @@ SPVM_ENV* SPVM_NATIVE_new_env_prepared() {
   SPVM_ENV* env = SPVM_NATIVE_new_env_raw();
   
   // Create compiler
-  void* compiler = SPVM_API_compiler_new();
+  void* compiler = env->api->compiler->new_compiler();
   
   // compiler->debug = 1;
   
-  SPVM_API_compiler_set_start_file(compiler, class_name);
+  env->api->compiler->set_start_file(compiler, class_name);
 
-  SPVM_API_compiler_set_start_line(compiler, 0);
+  env->api->compiler->set_start_line(compiler, 0);
   
   // Add module directory
   char* module_dir = "solo/SPVM";
-  SPVM_API_compiler_add_module_dir(compiler, module_dir);
+  env->api->compiler->add_module_dir(compiler, module_dir);
 
-  int32_t compile_error_code = SPVM_API_compiler_compile_spvm(compiler, class_name);
+  int32_t compile_error_code = env->api->compiler->compile_spvm(compiler, class_name);
   
   if (compile_error_code != 0) {
-    int32_t error_messages_length = SPVM_API_compiler_get_error_messages_length(compiler);
+    int32_t error_messages_length = env->api->compiler->get_error_messages_length(compiler);
     for (int32_t i = 0; i < error_messages_length; i++) {
-      const char* error_message = SPVM_API_compiler_get_error_message(compiler, i);
+      const char* error_message = env->api->compiler->get_error_message(compiler, i);
       fprintf(stderr, "%s\n", error_message);
     }
     exit(255);
   }
 
   // Build runtime information
-  void* runtime = SPVM_API_runtime_new(env);
-  SPVM_API_compiler_build_runtime(compiler, runtime);
+  void* runtime = env->api->runtime->new_runtime(env);
+  env->api->compiler->build_runtime(compiler, runtime);
   
-  SPVM_API_compiler_free(compiler);
+  env->api->compiler->free_compiler(compiler);
   
   // Prepare runtime
-  SPVM_API_runtime_prepare(runtime);
+  env->api->runtime->prepare(runtime);
 
   // Set runtime information
   env->runtime = runtime;

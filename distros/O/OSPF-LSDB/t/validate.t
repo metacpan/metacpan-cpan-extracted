@@ -3,6 +3,7 @@
 use strict;
 use warnings;
 use Test::More tests => 3;
+
 use OSPF::LSDB::YAML;
 
 my @yamlfiles = map { "example/ospf$_.yaml" } ("", "d", "6d");;

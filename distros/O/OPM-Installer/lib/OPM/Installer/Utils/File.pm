@@ -7,7 +7,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.0.0'; # VERSION
+our $VERSION = '1.0.1'; # VERSION
 
 use File::HomeDir;
 use File::Spec;
@@ -39,7 +39,7 @@ sub list_available {
    my @repositories = @{ $self->repositories || [] };
 
    for my $repo_url ( @repositories ) {
-       $repo_url .= '/otrs.xml' if '/otrs.xml' ne substr $repo_url, -9;
+       $repo_url .= '/otrs.xml' if '.xml' ne substr $repo_url, -4;
    }
 
    my $repo = OPM::Repository->new(
@@ -73,7 +73,7 @@ sub resolve_path {
         my @repositories = @{ $self->repositories || [] };
 
         for my $repo ( @repositories ) {
-            $repo .= '/otrs.xml' if '/otrs.xml' ne substr $repo, -9;
+            $repo .= '/otrs.xml' if '.xml' ne substr $repo, -4;
         }
 
         say "Searching these repositories: @repositories" if $self->verbose;
@@ -168,7 +168,7 @@ OPM::Installer::Utils::File - File related utility functions
 
 =head1 VERSION
 
-version 1.0.0
+version 1.0.1
 
 =head1 SYNOPSIS
 

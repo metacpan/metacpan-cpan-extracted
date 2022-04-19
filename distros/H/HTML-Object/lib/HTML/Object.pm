@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object.pm
-## Version v0.1.3
+## Version v0.1.4
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/04/20
-## Modified 2022/03/11
+## Modified 2022/04/16
 ## All rights reserved
 ## 
 ## 
@@ -34,7 +34,7 @@ BEGIN
     use Module::Generic::File qw( file );
     use Nice::Try;
     use Scalar::Util ();
-    our $VERSION = 'v0.1.3';
+    our $VERSION = 'v0.1.4';
     our $DICT = {};
     our $LINK_ELEMENTS = {};
     our $FATAL_ERROR = 0;
@@ -548,7 +548,7 @@ sub parse
     my $self = shift( @_ );
     my $this = shift( @_ );
     my $opts = $self->_get_args_as_hash( @_ );
-    if( ref( $this ) eq 'CODE' || ref( $this ) eq 'GLOB' || "$this" =~ /<\w+>/ )
+    if( ref( $this ) eq 'CODE' || ref( $this ) eq 'GLOB' || "$this" =~ /<\w+/ || CORE::length( "$this" ) > 1024 )
     {
         return( $self->parse_data( $this, $opts ) );
     }
@@ -885,7 +885,7 @@ To enable fatal error and also implement try-catch (using L<Nice::Try>) :
 
 =head1 VERSION
 
-    v0.1.3
+    v0.1.4
 
 =head1 DESCRIPTION
 

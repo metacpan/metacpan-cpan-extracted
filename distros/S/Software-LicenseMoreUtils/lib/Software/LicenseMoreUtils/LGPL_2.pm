@@ -7,7 +7,7 @@
 # the same terms as the Perl 5 programming language system itself.
 #
 package Software::LicenseMoreUtils::LGPL_2;
-$Software::LicenseMoreUtils::LGPL_2::VERSION = '1.007';
+$Software::LicenseMoreUtils::LGPL_2::VERSION = '1.008';
 use strict;
 use warnings;
 
@@ -32,7 +32,7 @@ Software::LicenseMoreUtils::LGPL_2 - GNU Library General Public License, Version
 
 =head1 VERSION
 
-version 1.007
+version 1.008
 
 =head1 NAME
 

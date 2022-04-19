@@ -1,5 +1,5 @@
 {
-   "abstract" : "Unbound resolver base for Net::DNS",
+   "abstract" : "Net::DNS resolver based on libunbound",
    "author" : [
       "Dick Franks"
    ],
@@ -34,7 +34,7 @@
          "requires" : {
             "Carp" : "1.1",
             "DynaLoader" : "1.04",
-            "Net::DNS" : "1.18",
+            "Net::DNS" : "1.19",
             "perl" : "5.008009"
          }
       },
@@ -49,6 +49,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.11",
+   "version" : "1.12",
    "x_serialization_backend" : "JSON::PP version 2.27200"
 }

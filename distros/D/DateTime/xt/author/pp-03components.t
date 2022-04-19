@@ -8,6 +8,9 @@ use warnings;
 use Test::More;
 
 use DateTime;
+
+undef $ENV{PERL_DATETIME_DEFAULT_TZ};
+
 {
     my $d = DateTime->new(
         year      => 2001,

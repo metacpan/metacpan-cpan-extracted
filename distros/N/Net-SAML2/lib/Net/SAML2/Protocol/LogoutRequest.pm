@@ -1,6 +1,8 @@
 use strict;
 use warnings;
 package Net::SAML2::Protocol::LogoutRequest;
+our $VERSION = '0.55'; # VERSION
+
 use Moose;
 use MooseX::Types::Common::String qw/ NonEmptySimpleStr /;
 use MooseX::Types::URI qw/ Uri /;
@@ -10,8 +12,6 @@ use XML::Generator;
 with 'Net::SAML2::Role::ProtocolMessage';
 
 # ABSTRACT: SAML2 LogoutRequest Protocol object
-
-our $VERSION = '0.53';
 
 
 has 'session'       => (isa => NonEmptySimpleStr, is => 'ro', required => 1);
@@ -95,7 +95,7 @@ Net::SAML2::Protocol::LogoutRequest - SAML2 LogoutRequest Protocol object
 
 =head1 VERSION
 
-version 0.53
+version 0.55
 
 =head1 SYNOPSIS
 

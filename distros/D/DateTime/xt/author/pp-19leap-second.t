@@ -10,6 +10,8 @@ use Test::More;
 use DateTime;
 use DateTime::LeapSecond;
 
+undef $ENV{PERL_DATETIME_DEFAULT_TZ};
+
 # tests using UTC times
 {
 

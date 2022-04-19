@@ -1,7 +1,10 @@
 Revision history for Perl extension Date::Holidays::EnglandWales.
 
+0.08  Sat Apr 16 13:11:00 2022
+    - Move Spring Bank Holiday and add Platinum Jubilee
+
 0.07  Sat Apr 16 17:50:00 2011
-    - Drop Time::Piece and use DateTime instead - courtesy of David 
+    - Drop Time::Piece and use DateTime instead - courtesy of David
         Precious (http://www.preshweb.co.uk/)
 
 0.06  Tue Nov 23 15:22:00 2010

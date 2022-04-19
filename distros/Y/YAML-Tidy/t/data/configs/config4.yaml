@@ -1,0 +1,4 @@
+---
+indentation: { spaces: 2 }
+trailing-spaces: keep
+scalar-style: { default }

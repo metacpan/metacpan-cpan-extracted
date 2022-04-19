@@ -35,7 +35,7 @@ my %metadata = (
 my %prerequisite = (
 	'Carp'	     => 1.10,
 	'DynaLoader' => 1.04,
-	'Net::DNS'   => 1.18,
+	'Net::DNS'   => 1.19,
 	);
 
 
@@ -97,7 +97,7 @@ sub install {
 	}
 
 	eval "require $distro";		## no critic
-	my @version = ( 'version', eval { $distro->VERSION || () } );
+	my @version = ( 'version', eval { $distro->VERSION } );
 
 	my $nameregex = join '\W+', '', split /::/, "$distro.pm\$";
 	my @installed = grep { $_ && m/$nameregex/io } values %INC;

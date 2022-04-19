@@ -1,6 +1,10 @@
 History for OPM::Installer
 ================================
 
-1.0.0 2022 2022-04-14 08:00
+1.0.1 2022-04-19 13:35:00
 
-     * initial release after rename
+  * append otrs.xml to repo url only if the url does not link to an xml file
+
+1.0.0 2022-04-14 08:00:00
+
+  * initial release after rename

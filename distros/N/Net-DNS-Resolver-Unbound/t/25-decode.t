@@ -5,14 +5,13 @@ use strict;
 use warnings;
 use Test::More;
 
-use Net::DNS;
 use Net::DNS::Resolver::Unbound;
 
 my $resolver = Net::DNS::Resolver::Unbound->new();
 
-
 plan skip_all => 'no local nameserver' unless $resolver->nameservers;
-plan tests    => 3;
+plan tests    => 4;
+
 
 my $qname = 'ns.net-dns.org';
 
@@ -23,6 +22,12 @@ my $secure = $ub_ctx->mock_result( $qname, 1, 0 );
 $resolver->_reset_errorstring;
 $resolver->_decode_result($secure);
 is( $resolver->errorstring(), '', 'secure flag set' );
+
+
+my $insecure = $ub_ctx->mock_result( $qname, 0, 0 );
+$resolver->_reset_errorstring;
+$resolver->_decode_result($insecure);
+is( $resolver->errorstring(), 'INSECURE', 'secure flag not set' );
 
 
 my $bogus = $ub_ctx->mock_result( $qname, 0, 1 );

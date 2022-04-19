@@ -33,7 +33,7 @@ use constant {
 
 use constant { 'DEF_CHUNK_SIZE' => SIZE_5MB() * 2 };    # 10 MB
 
-our $VERSION = '3.01';
+our $VERSION = '3.02';
 
 # TODO:
 # * requestId are random UUIDs that we should probably generate (drive_create)
@@ -597,6 +597,27 @@ sub copy_file {
     };
 
     return $self->_handle_api_method( $info, $options );
+}
+
+# Helper
+###########################################
+sub create_folder {
+###########################################
+    my ( $self, $name, $parent_id ) = @_;
+
+    defined $name && length $name
+      or LOGDIE('create_folder() missing name');
+
+    defined $parent_id && length $parent_id
+      or LOGDIE('create_folder() missing parent_id');
+
+    return $self->create_file(
+        {
+            'name'     => $name,
+            'mimeType' => "application/vnd.google-apps.folder",
+            'parents'  => [$parent_id],
+        }
+    );
 }
 
 # Metadata only
@@ -1240,6 +1261,7 @@ sub get_file {
 
     my $info = {
         'query_parameters' => {
+            'alt'                       => [ TYPE_STRING(),  0 ],
             'acknowledgeAbuse'          => [ TYPE_BOOLEAN(), 0 ],
             'fields'                    => [ TYPE_STRING(),  0 ],
             'includePermissionsForView' => [ TYPE_STRING(),  0 ],
@@ -1247,12 +1269,26 @@ sub get_file {
             'supportsTeamDrives'        => [ TYPE_BOOLEAN(), 0 ],
         },
 
+        'parameter_checks' => {
+            'alt' => sub {
+                $_ eq 'media'
+                  or return 'must be: media';
+
+                return 0;
+            },
+        },
+
         'path'        => "files/$fileId",
         'method_name' => 'get_file',
         'http_method' => HTTP_METHOD_GET(),
     };
 
-    return $self->_handle_api_method( $info, $options );
+    if ( $options->{'alt'} eq 'media' ) {
+        $info->{'return_http_response'} = 1;
+    }
+
+    my $response = $self->_handle_api_method( $info, $options );
+    return $response->decoded_content();
 }
 
 ###########################################
@@ -2118,7 +2154,7 @@ sub children {
     $opts->{'maxResults'}
       and LOGDIE("'maxResults' not supported, use 'pagesize' instead");
 
-    my ( $folder_id, $parent ) = $self->_path_resolve( $path, $search_opts );
+    my ( $folder_id, $parent ) = $self->_path_resolve( $path, $opts, $search_opts );
 
     return unless defined $folder_id;
 
@@ -2168,7 +2204,7 @@ sub children_by_folder_id {
     if ( $opts->{'fields'} ) {
         $opts->{'fields'} .= ',';
     }
-    $opts->{'fields'} .= 'files(id,kind,name,mimeType,originalFilename,trashed)';
+    $opts->{'fields'} .= 'files(id,kind,name,mimeType,parents,originalFilename,trashed)';
 
     # Find only those not in the trash
     # possibly go through all paged results
@@ -2204,8 +2240,9 @@ sub children_by_folder_id {
 ###########################################
 sub _path_resolve {
 ###########################################
-    my ( $self, $path, $search_opts ) = @_;
+    my ( $self, $path, $opts, $search_opts ) = @_;
 
+    $opts        = {} if !defined $opts;
     $search_opts = {} if !defined $search_opts;
 
     my @parts = grep length, split '/', $path;
@@ -2220,22 +2257,18 @@ sub _path_resolve {
 
         # We append to 'q' parameter in case the user provided it
         my $name = $part =~ s{\'}{\\\'}xmsgr;
-        if ( defined $search_opts->{'q'} && length $search_opts->{'q'} ) {
-            $search_opts->{'q'} .= ' AND ';
-        }
-        else {
-            $search_opts->{'q'} = '';
-        }
-        $search_opts->{'q'} .= "name = '$name'";
 
-        my $children = $self->children_by_folder_id( $folder_id, {}, $search_opts )
-          or return;
+        my $children = $self->children_by_folder_id(
+            $folder_id,
+            {},
+            { %{$search_opts}, 'name' => $name },
+        ) or return;
 
         for my $child (@$children) {
             DEBUG( "Found child: " . $child->name() );
 
             if ( $child->name() eq $part ) {
-                $folder_id = $child->{'id'};
+                $folder_id = $child->id();
                 unshift @ids, $folder_id;
                 $parent = $folder_id;
                 DEBUG("Parent: $parent");
@@ -2462,6 +2495,19 @@ This is also known as C<files.copy>.
 You can read about the parameters on the Google Drive
 L<API page|https://developers.google.com/drive/api/v3/reference/files/copy>.
 
+=head2 C<create_folder>
+
+    my $folder_data = $gd->create_folder( $name, $parent_id );
+    print $folder_data->{'id'};
+
+This method is just for convenience. It's effectively:
+
+        $self->create_file({
+            'name'     => $name,
+            'mimeType' => "application/vnd.google-apps.folder",
+            'parents'  => [$parent_id],
+        });
+
 =head2 C<create_file>
 
     my $file = $gd->create_file({%params});
@@ -2681,7 +2727,15 @@ L<API page|https://developers.google.com/drive/api/v3/reference/files/generateId
 
 =head2 C<get_file>
 
-    my $file = $gd->get_file( $fileId, {%params} );
+    my $file_metadata = $gd->get_file( $fileId, {%params} );
+
+    my $file_content = $gd->get_file(
+        $fileId,
+        {
+            'alt'              => 'media',      # get the content
+            'acknowledgeAbuse' => JSON::true(), # (optional) when there's risk
+        },
+    );
 
 Parameters are optional.
 

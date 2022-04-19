@@ -1,3 +1,10 @@
+1.1.101  2022-03-20  Released-By: PERLANCAR; Urgency: medium
+
+         - Specify that in function argument property 'deps', the dep type
+           'prog' can also be a defhash containing properties 'name' and
+           'min_version'.
+
+
 1.1.100  2022-01-23  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
 
 	 - [incompatible change] Rename 'title' result metadata property to

@@ -1,5 +1,8 @@
 Revision history for Perl module Lingua::EN::Syllable
 
+0.31 2022-04-16 NEILB
+    - Added two more tests to get 100% test coverage
+
 0.30 2016-02-14 NEILB
     - Merged PR from MANWAR, which added MetaProvides::Package to dist.ini
 

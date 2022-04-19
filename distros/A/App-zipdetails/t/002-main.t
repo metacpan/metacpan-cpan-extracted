@@ -9,7 +9,7 @@ use File::Temp qw( tempdir);
 use File::Basename;
 use File::Find;
 
-plan tests => 33 * 10 ;
+plan tests => 34 * 10 ;
 
 sub run;
 
@@ -31,7 +31,7 @@ my @failed = ();
 
 find(
         sub { $dirs{$File::Find::dir} = $_
-                 if /\.($exts)$/ && ! $skip_dirs{ $File::Find::dir };
+                 if /\.($exts)$/i && ! $skip_dirs{ $File::Find::dir };
              },
              't/files'
     );
@@ -127,6 +127,10 @@ sub run
     my $out = readFile($stdout);
     my $err = readFile($stderr);
 
+    # normalise EOL
+    $out =~ s/\r\n/\n/g;
+    $err =~ s/\r\n/\n/g;
+
     unlink $stdout, $stderr
         unless $keep;
 
@@ -137,16 +141,16 @@ sub readFile
 {
     my $f = shift ;
 
-    my @strings ;
+    open (F, "<$f")
+        or die "Cannot open $f: $!\n" ;
 
-    {
-        open (F, "<$f")
-            or die "Cannot open $f: $!\n" ;
-        binmode F;
-        @strings = <F> ;
-        close F ;
-    }
+    binmode F;
+    local $/;
+    my $data = <F> ;
 
-    return @strings if wantarray ;
-    return join "", @strings ;
+    # normalise EOL
+    $data =~ s/\r\n/\n/g;
+    close F ;
+
+    return $data;
 }

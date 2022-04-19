@@ -3,35 +3,37 @@ package Acme::Text::Rhombus;
 use strict;
 use warnings;
 use base qw(Exporter);
+use constant LINES   => 25;
+use constant FILLUP  => '+';
+use constant FORWARD => 1;
 
-our ($VERSION, @EXPORT_OK);
+our ($VERSION, @EXPORT_OK, %EXPORT_TAGS);
+my @subs;
 
-$VERSION = '0.20';
-@EXPORT_OK = qw(rhombus);
+$VERSION = '0.21';
+@subs = qw(rhombus rhombus_letter rhombus_digit);
+@EXPORT_OK = @subs;
+%EXPORT_TAGS = ('all' => [ @subs ]);
 
-sub rhombus
+my $get_opt = sub
 {
-    my %opts = @_;
+    my ($opts, $opt, $regex, $default) = @_;
+    return (exists $opts->{$opt}
+        && defined $opts->{$opt}
+               and $opts->{$opt} =~ $regex) ? $opts->{$opt} : $default;
+};
 
-    my $get_opt = sub
-    {
-        my ($opt, $regex, $default) = @_;
-        return (exists $opts{$opt}
-            && defined $opts{$opt}
-                   and $opts{$opt} =~ $regex) ? $opts{$opt} : $default;
-    };
+sub _draw_rhombus
+{
+    my ($mode, $lines, $char, $case, $fillup, $forward) = @_;
 
-    my $lines   = $get_opt->('lines',   qr/^\d+$/,                25);
-    my $letter  = $get_opt->('letter',  qr/^[a-zA-Z]$/,          'a');
-    my $case    = $get_opt->('case',    qr/^(?:low|upp)er$/, 'upper');
-    my $fillup  = $get_opt->('fillup',  qr/^\S$/,                '+');
-    my $forward = $get_opt->('forward', qr/^[01]$/,                1);
+    my ($is_letter, $is_digit) = ($mode eq 'letter', $mode eq 'digit');
 
     my %alter = (
         lower => sub { lc $_[0] },
         upper => sub { uc $_[0] },
     );
-    $letter = $alter{$case}->($letter);
+    $char = $alter{$case}->($char) if $is_letter;
 
     $lines++ if $lines % 2 == 0;
 
@@ -41,19 +43,55 @@ sub rhombus
         my $spaces = ($lines - $repeat) / 2;
 
         $rhombus .= $fillup x $spaces;
-        $rhombus .= $letter x $repeat;
+        $rhombus .= $char   x $repeat;
         $rhombus .= $fillup x $spaces;
         $rhombus .= "\n";
 
         $repeat = $line < ($lines / 2) ? $repeat + 2 : $repeat - 2;
-        $letter = $forward ? chr(ord($letter) + 1) : chr(ord($letter) - 1);
 
-        if ($letter !~ /[a-zA-Z]/) {
-            $letter = $alter{$case}->($forward ? 'a' : 'z');
+        if ($is_letter) {
+            $char = $forward ? chr(ord($char) + 1) : chr(ord($char) - 1);
+        }
+        elsif ($is_digit) {
+            $char = $forward ? $char + 1 : $char - 1;
+        }
+
+        if ($is_letter && $char !~ /[a-zA-Z]/) {
+            $char = $alter{$case}->($forward ? 'a' : 'z');
+        }
+        elsif ($is_digit and $char > 9 || $char < 0) {
+            $char = $forward ? 0 : 9;
         }
     }
 
     return $rhombus;
+}
+
+sub rhombus { return rhombus_letter(@_); }
+
+sub rhombus_letter
+{
+    my %opts = @_;
+
+    my $lines   = $get_opt->(\%opts, 'lines',   qr/^\d+$/,             LINES);
+    my $letter  = $get_opt->(\%opts, 'letter',  qr/^[a-zA-Z]$/,          'a');
+    my $case    = $get_opt->(\%opts, 'case',    qr/^(?:low|upp)er$/, 'upper');
+    my $fillup  = $get_opt->(\%opts, 'fillup',  qr/^\S$/,             FILLUP);
+    my $forward = $get_opt->(\%opts, 'forward', qr/^[01]$/,          FORWARD);
+
+    return _draw_rhombus('letter', $lines, $letter, $case, $fillup, $forward);
+}
+
+sub rhombus_digit
+{
+    my %opts = @_;
+
+    my $lines   = $get_opt->(\%opts, 'lines',   qr/^\d+$/,    LINES);
+    my $digit   = $get_opt->(\%opts, 'digit',   qr/^\d$/,         0);
+    my $fillup  = $get_opt->(\%opts, 'fillup',  qr/^\S$/,    FILLUP);
+    my $forward = $get_opt->(\%opts, 'forward', qr/^[01]$/, FORWARD);
+
+    return _draw_rhombus('digit', $lines, $digit, undef, $fillup, $forward);
 }
 
 1;
@@ -61,7 +99,7 @@ __END__
 
 =head1 NAME
 
-Acme::Text::Rhombus - Draw a rhombus with letters
+Acme::Text::Rhombus - Draw a rhombus with letters/digits
 
 =head1 SYNOPSIS
 
@@ -94,7 +132,7 @@ Acme::Text::Rhombus - Draw a rhombus with letters
 
 =head1 FUNCTIONS
 
-=head2 rhombus
+=head2 rhombus, rhombus_letter
 
 Draws a rhombus with letters and returns it as a string.
 
@@ -131,11 +169,48 @@ Forward letter enumeration. Defaults to boolean C<1>.
 
 =back
 
+=head2 rhombus_digit
+
+Draws a rhombus with digits and returns it as a string.
+
+If no option value is supplied or if it is invalid, then a default
+will be silently assumed (omitting all options will return a rhombus
+of 25 lines).
+
+Given that the specified number of lines is even, it will be
+incremented to satisfy the requirement of being an odd number.
+
+Options:
+
+=over 4
+
+=item * C<lines>
+
+Number of lines to be printed. Defaults to 25.
+
+=item * C<digit>
+
+Digit to start with. Defaults to C<0>.
+
+=item * C<fillup>
+
+The fillup character. Defaults to C<+>.
+
+=item * C<forward>
+
+Forward digit enumeration. Defaults to boolean C<1>.
+
+=back
+
 =head1 EXPORT
 
 =head2 Functions
 
-C<rhombus()> is exportable.
+C<rhombus(), rhombus_letter(), rhombus_digit()> are exportable.
+
+=head2 Tags
+
+C<:all - *()>
 
 =head1 AUTHOR
 

@@ -1,5 +1,16 @@
 Revision history for XML-Sig
 
+0.57 -- Fri Apr 15 19:56:05 ADT 2022
+
+  [Notable Changes since 0.56]
+  Detect openssl v3+ as ripemd160 xmlsec tests likely will not work
+
+  - db82c5b Bump version to 0.57 for release
+  - bf28389 Specify explicit required modules in dist.ini
+  - 14f47c7 Update tests as OpenSSL v3 dropped support for ripemd160
+  - 6ab23c9 Move to OurPkgVersion to remove version from repo
+  - 50dc1ed v0.56
+
 0.56 -- Tue Mar 15 21:04:47 ADT 2022
 
   - f8a7779 Update release VERSION

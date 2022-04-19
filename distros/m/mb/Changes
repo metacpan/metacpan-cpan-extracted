@@ -1,5 +1,9 @@
 Revision history for this software.
 
+0.42  2022-04-19 00:00:00
+  - update POD
+  - created by INABA Hitoshi
+
 0.41  2022-03-18 00:00:00
   - fix eratta of comments
   - update POD

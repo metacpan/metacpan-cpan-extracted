@@ -30,7 +30,7 @@ requires:
   warnings: '0'
 resources:
   repository: https://github.com/iamllcoolray/grizzly.git
-version: '0.103'
-x_generated_by_perl: v5.32.1
+version: '0.104'
+x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: MIT

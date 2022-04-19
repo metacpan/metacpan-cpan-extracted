@@ -1,7 +1,7 @@
 do { my $x = {
        'configure' => {
                         'requires' => {
-                                        'ExtUtils::MakeMaker' => '0'
+                                        'ExtUtils::MakeMaker' => '7.64'
                                       }
                       },
        'develop' => {
@@ -83,6 +83,7 @@ do { my $x = {
                                       'Dist::Zilla::Role::PluginBundle::Easy' => '0',
                                       'Dist::Zilla::Role::PluginBundle::PluginRemover' => '0',
                                       'Dist::Zilla::Util' => '0',
+                                      'ExtUtils::MakeMaker' => '7.64',
                                       'Moose' => '0',
                                       'Perl::Version' => '0',
                                       'Test::CPAN::Meta' => '0',
@@ -95,7 +96,7 @@ do { my $x = {
                                      'CPAN::Meta' => '2.120900'
                                    },
                    'requires' => {
-                                   'ExtUtils::MakeMaker' => '0',
+                                   'ExtUtils::MakeMaker' => '7.64',
                                    'File::Spec' => '0',
                                    'IO::Handle' => '0',
                                    'IPC::Open3' => '0',

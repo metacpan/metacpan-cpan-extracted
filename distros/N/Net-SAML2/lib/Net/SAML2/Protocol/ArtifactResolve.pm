@@ -1,12 +1,12 @@
 use strict;
 use warnings;
 package Net::SAML2::Protocol::ArtifactResolve;
+our $VERSION = '0.55'; # VERSION
+
 use Moose;
 use MooseX::Types::URI qw/ Uri /;
 
 with 'Net::SAML2::Role::ProtocolMessage';
-
-our $VERSION = '0.53';
 
 # ABSTRACT: Net::SAML2::Protocol::ArtifactResolve - ArtifactResolve protocol class
 
@@ -59,7 +59,7 @@ Net::SAML2::Protocol::ArtifactResolve - Net::SAML2::Protocol::ArtifactResolve - 
 
 =head1 VERSION
 
-version 0.53
+version 0.55
 
 =head1 SYNOPSIS
 

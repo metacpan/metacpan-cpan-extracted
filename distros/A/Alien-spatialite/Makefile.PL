@@ -58,7 +58,10 @@ my %WriteMakefileArgs = (
 );
 
 use Alien::Build::MM;
-my $abmm = Alien::Build::MM->new ();
+my $abmm = Alien::Build::MM->new (
+    #my_alienfile_meta => 0,
+    clean_install => 1,
+);
 %WriteMakefileArgs = $abmm->mm_args(%WriteMakefileArgs);
 
 WriteMakefile(%WriteMakefileArgs);

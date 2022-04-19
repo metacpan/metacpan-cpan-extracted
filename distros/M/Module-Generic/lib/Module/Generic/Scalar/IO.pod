@@ -43,7 +43,7 @@ Module::Generic::Scalar::IO - Generic Module Scalar IO Class
 
 =head1 VERSION
 
-    v0.1.0
+    v0.1.1
 
 =head1 DESCRIPTION
 
@@ -114,6 +114,10 @@ i.e. without the leading "M", since L</getc> positioned us after.
 
 So, be careful about your position in the string.
 
+=head2 length
+
+Returns the size of the underlining scalar reference in bytes.
+
 =head2 line
 
 Provided with a callback as a subroutine reference or anonymous subroutine, and this will call the callback passing it each line of the scalar.
@@ -176,6 +180,10 @@ It returns the number of data read at the last position, or C<undef> if there wa
 This takes 2 arguments: an integer representing a position in the string and another integer representing the action to take.
 
 Quoting from L<perlfunc/seek>: "The values for WHENCE are 0 to set the new position *in bytes* to POSITION; 1 to set it to the current position plus POSITION; and 2 to set it to EOF plus POSITION, typically negative."
+
+=head2 size
+
+Alias for L</length>
 
 =head2 sysread
 

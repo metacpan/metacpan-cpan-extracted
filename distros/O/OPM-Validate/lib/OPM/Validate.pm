@@ -7,7 +7,7 @@ use v5.20;
 use strict;
 use warnings;
 
-our $VERSION = '1.11'; # VERSION
+our $VERSION = '1.12'; # VERSION
 
 my %boundaries = (
     # tag             min max
@@ -105,6 +105,8 @@ sub _grammar {
                (?:<License>.*?</License>(?{++$s{License}; $check->('License')})) |
                (?:<BuildDate>.*?</BuildDate>(?{$s{BuildDate}++; $check->('BuildDate')})) |
                (?:<BuildHost>.*?</BuildHost>(?{$s{BuildHost}++; $check->('BuildHost')})) |
+               (?:<BuildCommitID>.*?</BuildCommitID>) |
+               (?:<PackageIsDownloadable>.*?</PackageIsDownloadable>) |
                (?:<OS>.*?</OS>) |
                (?&FRAMEWORK) |
                (?&DESCRIPTION) |
@@ -115,6 +117,10 @@ sub _grammar {
                (?&PREREQ) |
                (?&DATABASE) |
                (?&CHANGELOG)
+           )
+
+           (?<CUSTOM>
+             <(?<custom>[A-Za-z0-9]+)[^>]*>.*?</\g{custom}>(?{ print $+{custom},"\n" })
            )
 
            (?<FRAMEWORK>
@@ -140,8 +146,8 @@ sub _grammar {
 
            (?<CHANGELOG>
                <ChangeLog (?{delete $s{'ChangeLog.Date'}; delete $s{'ChangeLog.Version'}; })
-                   ( \s+ (?&CHANGELOG_ATTR))+>.*?
-               </ChangeLog> (?{$check->('ChangeLog.Date', 1, 1); $check->('ChangeLog.Version', 1, 1); })
+                   ( \s+ (?&CHANGELOG_ATTR))*>.*?
+               </ChangeLog> (?{$check->('ChangeLog.Date', 1, 0); $check->('ChangeLog.Version', 1, 0); })
                (*COMMIT)
            )
 
@@ -151,16 +157,17 @@ sub _grammar {
            )
 
            (?<INTRO>
-               <Intro(?<intro_type>Install|Upgrade|Reinstall|Uninstall) (?{delete $s{Intro};})
+               <Intro(?<intro_type>Install|Upgrade|Reinstall|Uninstall)(?{delete $s{Intro};})
+                     (?:(?<intro_pre_post>Pre|Post|)(?{++$s{Intro}->{Type} if $+{intro_pre_post}}))?
                    ( \s+ (?&INTRO_ATTR))+>.*?
-               </Intro\g{intro_type}> (?{$check->('Intro.Type', 1, 1);})
+               </Intro\g{intro_type}\g{intro_pre_post}> (?{$check->('Intro.Type', 1, 1);})
                (*COMMIT)
            )
 
            (?<INTRO_ATTR>
                (?:Type="(?i:Post|Pre)"(?{++$s{Intro}->{Type}; $check->('Intro.Type',1,1)})) |
-               (?:Title="[^"]+"(?{++$s{Intro}->{Title}; $check->('Intro.Title',1)})) |
-               (?:Format="[^"]+"(?{++$s{Intro}->{Format}; $check->('Intro.Format',1)})) |
+               (?:Title="[^"]*"(?{++$s{Intro}->{Title}; $check->('Intro.Title',1)})) |
+               (?:Format="[^"]*"(?{++$s{Intro}->{Format}; $check->('Intro.Format',1)})) |
                (?:Lang="[A-Za-z]+"(?{++$s{Intro}->{Lang}; $check->('Intro.Lang',1)})) |
                (?:Translatable="[01]"(?{++$s{Intro}->{Translatable}; $check->('Intro.Translatable',1)})) |
                (?:Version="[0-9\.]+"(?{++$s{Intro}->{Version}; $check->('Intro.Version',$+{intro_type} eq 'Upgrade' ? 1 : 0)}))
@@ -168,8 +175,8 @@ sub _grammar {
      
            (?<CODE>
                <Code(?<code_type>Install|Upgrade|Reinstall|Uninstall) (?{delete $s{Code};})
-                   ( \s+ (?&CODE_ATTR))+>.*?
-               </Code\g{code_type}> (?{$check->('Code.Type', 1, 1);})
+                   ( \s+ (?&CODE_ATTR))*>.*?
+               </Code\g{code_type}> (?{$check->('Code.Type', 1);})
                (*COMMIT)
            )
 
@@ -229,14 +236,14 @@ sub _grammar {
            (?<DATABASE>
                <Database(?<database_type>Install|Upgrade|Reinstall|Uninstall) (?{delete $s{Database}})
                    ( \s+ (?&DATABASE_ATTR)){0,3}>
-                   (\s* (?&DATABASE_TAGS) )+ \s*
+                   (\s* (?&DATABASE_TAGS) )* \s*
                </Database\g{database_type}>
                (*COMMIT)
            )
 
            (?<DATABASE_ATTR>
                (?:Type="(?i:Post|Pre)"(?{++$s{Database}->{Type}; $check->('Database.Type',1)})) |
-               (?:Version="[^"]+"(?{++$s{Database}->{Version}; $check->('Database.Version', 0)}))
+               (?:Version="[^"]+"(?{++$s{Database}->{Version}; $check->('Database.Version',1)}))
            )
 
            (?<DATABASE_TAGS>
@@ -263,10 +270,16 @@ sub _grammar {
 
            (?<TABLE_ALTER>
                <TableAlter (?{delete $s{Table};})
-                   ( \s+ (?&TABLE_ATTR))+>
-                   (\s* (?&TABLE_ALTER_TAGS) )+ \s*
+                   ( \s+ (?&TABLE_ALTER_ATTR))+>
+                   (\s* (?&TABLE_ALTER_TAGS) )*? \s*
                </TableAlter>
                (*COMMIT)
+           )
+
+           (?<TABLE_ALTER_ATTR>
+               (?&TABLE_ATTR) |
+               (?: \s* NameNew="[^"]*?") |
+               (?: \s* NameOld="[^"]*?")
            )
 
            (?<TABLE_ALTER_TAGS>
@@ -289,8 +302,8 @@ sub _grammar {
 
            (?<TABLE_ATTR>
                (?:Name="([^"]+)"(?{$pos{'Table.Name'} = pos(); ++$s{Table}->{Name}; $check->('Table.Name',1,1)})) |
-               (?:Type="(?i:Post|Pre)"(?{++$s{Table}->{Type}; $check->('Table.Type',0)})) |
-               (?:Version="[^"]+"(?{++$s{Table}->{Version}; $check->('Table.Version',$+{database_type} eq 'Upgrade' ? 1 : 0)}))
+               (?:Type="(?i:Post|Pre)"(?{++$s{Table}->{Type}; $check->('Table.Type',1)})) |
+               (?:Version="[^"]+"(?{++$s{Table}->{Version}; $check->('Table.Version', 1)}))
            )
 
            (?<COLUMN>
@@ -307,28 +320,28 @@ sub _grammar {
 
            (?<COLUMN_ATTR>
                (?:Name="[^"]+"(?{++$s{Column}->{Name}; $check->('Column.Name',1,1);})) |
-               (?:AutoIncrement="(?:true|false)"(?{++$s{Column}->{AutoIncrement}; $check->('Column.AutoIncrement',1)})) |
-               (?:Required="(?:true|false)"(?{++$s{Column}->{Required}; $check->('Column.Required',1)})) |
-               (?:PrimaryKey="(?:true|false)"(?{++$s{Column}->{PrimaryKey}; $check->('Column.PrimaryKey',1)})) |
+               (?:AutoIncrement="(?i:true|false)"(?{++$s{Column}->{AutoIncrement}; $check->('Column.AutoIncrement',1)})) |
+               (?:Required="(?i:true|false|0|1)"(?{++$s{Column}->{Required}; $check->('Column.Required',1)})) |
+               (?:PrimaryKey="(?i:true|false)"(?{++$s{Column}->{PrimaryKey}; $check->('Column.PrimaryKey',1)})) |
                (?:\bType="[A-Za-z]+"(?{++$s{Column}->{Type}; $check->('Column.Type',1)})) |
-               (?:Size="\d+"(?{++$s{Column}->{Size}; $check->('Column.Size',1)})) |
+               (?:Size="\d+(?:,\d+)?"(?{++$s{Column}->{Size}; $check->('Column.Size',1)})) |
                (?:Default="[^"]+"(?{++$s{Column}->{Default}; $check->('Column.Default',1)}))
            )
 
            (?<COLUMN_CHANGE>
                <ColumnChange (?{delete $s{Column}})
-                   ( \s+ (?&COLUMN_CHANGE_ATTR))+ \s* (?:/>|>\s*</ColumnChange>)
+                   (?: \s+ (?&COLUMN_CHANGE_ATTR))+ \s* (?:/>|>\s*</ColumnChange>)
                (*COMMIT)
            )
 
            (?<COLUMN_CHANGE_ATTR>
-               (?:NameOld=".*?"(?{++$s{Column}->{NameOld}; $check->('Column.NameOld',1)})) |
-               (?:NameNew=".*?"(?{++$s{Column}->{NameNew}; $check->('Column.NameNew',1)})) |
+               (?:NameOld="[^"]*?"(?{++$s{Column}->{NameOld}; $check->('Column.NameOld',1)})) |
+               (?:NameNew="[^"]*?"(?{++$s{Column}->{NameNew}; $check->('Column.NameNew',1)})) |
                (?:AutoIncrement="(?:true|false)"(?{++$s{Column}->{AutoIncrement}; $check->('Column.AutoIncrement',1)})) |
-               (?:Required="(?:true|false)"(?{++$s{Column}->{Required}; $check->('Column.Required',1)})) |
+               (?:Required="(?:true|false|0|1)"(?{++$s{Column}->{Required}; $check->('Column.Required',1)})) |
                (?:PrimaryKey="(?:true|false)"(?{++$s{Column}->{PrimaryKey}; $check->('Column.PrimaryKey',1)})) |
                (?:Type=".*?"(?{++$s{Column}->{Type}; $check->('Column.Type',1)})) |
-               (?:Size="\d+"(?{++$s{Column}->{Size}; $check->('Column.Size',1)})) |
+               (?:Size="\d+(?:,\d+)?"(?{++$s{Column}->{Size}; $check->('Column.Size',1)})) |
                (?:Default=".*?"(?{++$s{Column}->{Default}; $check->('Column.Default',1)}))
            )
 
@@ -361,6 +374,7 @@ sub _grammar {
                    ( \s+ (?&INSERT_DATA_ATTR))+>
                    .*?
                </Data>
+               (*COMMIT)
            )
 
            (?<INSERT_DATA_ATTR>
@@ -373,75 +387,102 @@ sub _grammar {
                <Index ( \s+ Name=".*?")?>
                    (\s+ (?&INDEX_COLUMN) )+ \s*
                </Index>
-           )
-
-           (?<INDEX_COLUMN>
-               <IndexColumn (?{ delete $s{'Generic.Name'}; })
-                   ( \s+ (?&NAME_ATTR))? \s* (?:/>|>\s*</IndexColumn>)
+               (?{ delete $s{'Generic.Name'}; })
+               (*COMMIT)
            )
 
            (?<INDEX_CREATE>
                <IndexCreate (?{ delete $s{'Generic.Name'}; })
-                   ( \s+ (?&NAME_ATTR))? \s* (?:/>|>\s*</IndexCreate>)
+                   ( \s* (?&NAME_ATTR))? \s* (?:/>|>
+                   (\s+ (?&INDEX_COLUMN) )* \s*
+               </IndexCreate>)
+               (?{ delete $s{'Generic.Name'}; })
+               (*COMMIT)
+           )
+
+           (?<INDEX_COLUMN>
+               <IndexColumn (?{ delete $s{'Generic.Name'}; })
+                   ( \s* (?&NAME_OR_SIZE_ATTR))* \s* (?:/>|>\s*</IndexColumn>)
+               (?{ delete $s{'Generic.Name'}; })
+               (*COMMIT)
+           )
+
+           (?<NAME_OR_SIZE_ATTR>
+               (?&NAME_ATTR) |
+               (?:Size="[^"]*")
            )
 
            (?<INDEX_DROP>
                <IndexDrop (?{ delete $s{'Generic.Name'}; })
-                   ( \s+ (?&NAME_ATTR))? \s* (?:/>|>\s*</IndexDrop>)
+                   ( \s* (?&NAME_ATTR))? \s* (?:/>|>\s*</IndexDrop>)
+               (?{ delete $s{'Generic.Name'}; })
+               (*COMMIT)
            )
 
            (?<UNIQUE>
                <Unique ( \s+ Name=".*?")?>
                    (\s+ (?&UNIQUE_COLUMN) )+ \s*
                </Unique>
+               (*COMMIT)
            )
 
            (?<UNIQUE_COLUMN>
                <UniqueColumn (?{ delete $s{'Generic.Name'}; })
                    ( \s+ (?&NAME_ATTR))? \s* (?:/>|>\s*</UniqueColumn>)
+               (?{ delete $s{'Generic.Name'}; })
+               (*COMMIT)
            )
 
            (?<UNIQUE_CREATE>
                <UniqueCreate (?{ delete $s{'Generic.Name'}; })
                    ( \s+ (?&NAME_ATTR))? \s* (?:/>|>\s*</UniqueCreate>)
+               (?{ delete $s{'Generic.Name'}; })
+               (*COMMIT)
            )
 
            (?<UNIQUE_DROP>
-               <UniqueDrop ( \s+ Name=".*?")? \s* (?:/>|>\s*</UniqueDrop>)
+               <UniqueDrop ( \s+ Name="[^"]+")? \s* (?:/>|>\s*</UniqueDrop>)
+               (*COMMIT)
            )
 
            (?<NAME_ATTR>
-               (?:Name=".*?"(?{++$s{'Generic.Name'}; $check->('Generic.Name',1,1)}))
+               (?:Name="[^"]+"(?{++$s{'Generic.Name'}; $check->('Generic.Name',1,1)}))
            )
      
            (?<FOREIGN_KEY>
                <ForeignKey (?{delete $s{'ForeignTable'};}) (?: \s+ (?&FOREIGN_TABLE) )+>
                    (\s+ (?&REFERENCE) )+ \s*
                </ForeignKey>
+               (*COMMIT)
            )
 
            (?<FOREIGN_KEY_CREATE>
                <ForeignKeyCreate (?{ delete $s{'ForeignTable'}; })
-                   ( \s+ (?&NAME_ATTR))? \s* (?:/>|>\s*</ForeignKeyCreate>)
+                   (?: \s+ (?:(?&NAME_ATTR)|(?&FOREIGN_TABLE)))? \s* (?:/>|>\s*
+                   (\s+ (?&REFERENCE) )* \s*
+               </ForeignKeyCreate>)
+               (*COMMIT)
            )
 
            (?<FOREIGN_KEY_DROP>
-               <ForeignKeyDrop ( \s+ (?:Name|ForeignTable)=".*?")? \s* (?:/>|>\s*(?:(?&REFERENCE)\s*)*</ForeignKeyDrop>)
+               <ForeignKeyDrop ( \s+ (?:Name|ForeignTable)="[^"]+")? \s* (?:/>|>\s*(?:(?&REFERENCE)\s*)*</ForeignKeyDrop>)
+               (*COMMIT)
            )
 
            (?<FOREIGN_TABLE>
-               (?:ForeignTable=".*?"(?{++$s{'ForeignTable'}; $check->('ForeignTable',1,1)}))
+               (?:ForeignTable="[^"]+"(?{++$s{'ForeignTable'}; $check->('ForeignTable',1,1)}))
            )
 
            (?<REFERENCE>
                <Reference (?{ delete @s{qw/Reference.Local Reference.Foreign/}; })
                    ( \s+ (?&REFERENCE_ATTR) )+ \s*
                (?:\s*/>|>\s*</Reference>)
+               (*COMMIT)
            )
 
            (?<REFERENCE_ATTR>
-               (?:Local=".*?"(?{++$s{'Reference.Local'}; $check->('Reference.Local',1,1)})) |
-               (?:Foreign=".*?"(?{++$s{'Reference.Foreign'}; $check->('Reference.Foreign',1,1)}))
+               (?:Local="[^"]+"(?{++$s{'Reference.Local'}; $check->('Reference.Local',1,1)})) |
+               (?:Foreign="[^"]+"(?{++$s{'Reference.Foreign'}; $check->('Reference.Foreign',1,1)}))
            )
        )
     }xms;
@@ -463,7 +504,7 @@ OPM::Validate - Validate .opm files
 
 =head1 VERSION
 
-version 1.11
+version 1.12
 
 =head1 SYNOPSIS
 

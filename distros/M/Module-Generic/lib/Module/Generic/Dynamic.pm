@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Dynamic.pm
-## Version v1.1.0
-## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Version v1.1.1
+## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2022/02/27
+## Modified 2022/03/30
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -19,7 +19,7 @@ BEGIN
     use warnings::register;
     use Scalar::Util ();
     # use Class::ISA;
-    our $VERSION = 'v1.1.0';
+    our $VERSION = 'v1.1.1';
 };
 
 use strict;
@@ -94,7 +94,7 @@ EOT
 #             my $o = $hash->{ $k }->{_looping} ? $hash->{ $k }->{_looping} : $new_class->new( $hash->{ $k } );
 #             $data->{ $clean_field } = $o;
 #             $hash->{ $k }->{_looping} = $o;
-            eval( "sub ${new_class}::${clean_field} { return( shift->_set_get_object( $clean_field, '$new_class', \@_ ) ); }" );
+            eval( "sub ${new_class}::${clean_field} { return( shift->_set_get_object( '$clean_field', '$new_class', \@_ ) ); }" );
             die( $@ ) if( $@ );
             $self->$clean_field( $hash->{ $k } );
         }

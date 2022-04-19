@@ -82,12 +82,12 @@ WriteMakefile(
         resources => {
         #    homepage    => undef,
             repository  => {
-                url         => 'git@git.deguest.jp:jack/Module-Generic.git',
-                web         => 'https://git.deguest.jp/jack/Module-Generic',
+                url         => 'git@gitlab.com:jackdeguest/Module-Generic.git',
+                web         => 'https://gitlab.com/jackdeguest/Module-Generic',
                 type        => 'git',
             },
             bugtracker => {
-                web         => 'https://git.deguest.jp/jack/Module-Generic/issues',
+                web         => 'https://gitlab.com/jackdeguest/Module-Generic/issues',
             },
         },
     }) : ()),

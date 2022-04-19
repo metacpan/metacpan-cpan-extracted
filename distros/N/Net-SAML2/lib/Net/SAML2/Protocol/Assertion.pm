@@ -1,6 +1,8 @@
 use strict;
 use warnings;
 package Net::SAML2::Protocol::Assertion;
+our $VERSION = '0.55'; # VERSION
+
 use Moose;
 use MooseX::Types::DateTime qw/ DateTime /;
 use MooseX::Types::Common::String qw/ NonEmptySimpleStr /;
@@ -8,11 +10,11 @@ use DateTime;
 use DateTime::HiRes;
 use DateTime::Format::XSD;
 use Net::SAML2::XML::Util qw/ no_comments /;
+use Net::SAML2::XML::Sig;
+use XML::Enc;
 use XML::LibXML;
 
 with 'Net::SAML2::Role::ProtocolMessage';
-
-our $VERSION = '0.53';
 
 # ABSTRACT: Net::SAML2::Protocol::Assertion - SAML2 assertion object
 
@@ -33,12 +35,53 @@ sub new_from_xml {
     my($class, %args) = @_;
 
     my $dom = no_comments($args{xml});
+    my $key_file = $args{key_file};
+    my $cacert = $args{cacert};
 
     my $xpath = XML::LibXML::XPathContext->new($dom);
     $xpath->registerNs('saml',  'urn:oasis:names:tc:SAML:2.0:assertion');
     $xpath->registerNs('samlp', 'urn:oasis:names:tc:SAML:2.0:protocol');
+    $xpath->registerNs('xenc', 'http://www.w3.org/2001/04/xmlenc#');
 
     my $attributes = {};
+
+    if ($xpath->findnodes('//saml:EncryptedAssertion')) {
+        if ( ! defined $key_file) {
+            die "Encrypted Assertions require key_file";
+        }
+        my $decrypted;
+        my $enc = XML::Enc->new(
+                        { key => $key_file , no_xml_declaration => 1 }, );
+        $decrypted  = $enc->decrypt($dom->toString());
+        $dom        = XML::LibXML->load_xml(string => $decrypted);
+        $xpath      = XML::LibXML::XPathContext->new($dom);
+        $xpath->registerNs('saml',  'urn:oasis:names:tc:SAML:2.0:assertion');
+        $xpath->registerNs('samlp', 'urn:oasis:names:tc:SAML:2.0:protocol');
+        $xpath->registerNs('dsig', 'http://www.w3.org/2000/09/xmldsig#');
+        $xpath->registerNs('xenc', 'http://www.w3.org/2001/04/xmlenc#');
+
+        my $xml_opts->{ no_xml_declaration } = 1;
+
+        my $assert = $xpath->findnodes('//saml:Assertion')->[0];
+        my @signedinfo = $xpath->findnodes('dsig:Signature', $assert);
+
+        if (defined $assert && (scalar @signedinfo ne 0)) {
+            my $x   = Net::SAML2::XML::Sig->new($xml_opts);
+            my $ret = $x->verify($assert->serialize);
+            die "Decrypted Assertion signature check failed" unless $ret;
+
+            if ($cacert) {
+                my $cert = $x->signer_cert
+                    or die "Certificate not provided and not in SAML Response, cannot validate";
+
+                my $ca = Crypt::OpenSSL::Verify->new($cacert, { strict_certs => 0, });
+                if (! $ca->verify($cert)) {
+                    die "Decrypted Assertion - Unable to verify signer cert with cacert: $cert->subject";
+                }
+            }
+        }
+    }
+
     for my $node (
         $xpath->findnodes('//saml:Assertion/saml:AttributeStatement/saml:Attribute'))
     {
@@ -123,7 +166,7 @@ Net::SAML2::Protocol::Assertion - Net::SAML2::Protocol::Assertion - SAML2 assert
 
 =head1 VERSION
 
-version 0.53
+version 0.55
 
 =head1 SYNOPSIS
 
@@ -149,6 +192,22 @@ Arguments:
 =item B<xml>
 
 XML data
+
+=item B<key_file>
+
+Optional but Required handling Encrypted Assertions.
+
+path to the SP's private key file that matches the SP's public certificate
+used by the IdP to Encrypt the response (or parts of the response)
+
+=item B<cacert>
+
+path to the CA certificate for verification.  Optional: This is only used for
+validating the certificate provided for a signed Assertion that was found
+when the EncryptedAssertion is decrypted.
+
+While optional it is recommended for ensuring that the Assertion in an
+EncryptedAssertion is properly validated.
 
 =back
 

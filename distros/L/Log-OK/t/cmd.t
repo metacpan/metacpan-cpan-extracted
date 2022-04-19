@@ -9,7 +9,7 @@ BEGIN {
 my $dir=dirname __FILE__;
 
 my $fh;
-unless(open $fh, "-|","perl $dir/cmd.t.p --verbose info"){
+unless(open $fh, "-|","$^X $dir/cmd.t.p --verbose info"){
         die "error opening process";
 }
 my @results=<$fh>;

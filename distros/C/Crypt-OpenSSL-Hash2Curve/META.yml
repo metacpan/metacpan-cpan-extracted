@@ -24,7 +24,7 @@ recommends:
   Crypt::OpenSSL::Bignum: '0.09'
 requires:
   Carp: '0.01'
-  Crypt::OpenSSL::Base::Func: '0.03'
+  Crypt::OpenSSL::Base::Func: '0.034'
   Crypt::OpenSSL::Bignum: '0.09'
   Crypt::OpenSSL::EC: '1.31'
   Crypt::OpenSSL::Guess: '0.12'
@@ -38,5 +38,5 @@ resources:
   homepage: http://github.com/abbypan/Crypt-OpenSSL-Hash2Curve
   license: http://dev.perl.org/licenses/
   repository: http://github.com/abbypan/Crypt-OpenSSL-Hash2Curve
-version: '0.03'
+version: '0.031'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

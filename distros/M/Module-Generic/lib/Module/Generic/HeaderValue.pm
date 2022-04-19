@@ -128,6 +128,7 @@ sub new_from_header
 {
     my $self = shift( @_ );
     my $s    = shift( @_ );
+    $s =~ s/\015?\012$//gs if( index( $s, "\012" ) != -1 );
     return( $self->error( 'Header value is required' ) ) if( !defined( $s ) || !length( $s ) );
     my $opts = $self->_get_args_as_hash( @_ );
     $opts->{debug} //= $self->debug || 0;

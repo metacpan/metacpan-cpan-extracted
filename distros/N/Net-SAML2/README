@@ -2,7 +2,7 @@ NAME
     Net::SAML2 - SAML2 bindings and protocol implementation
 
 VERSION
-    version 0.53
+    version 0.55
 
 SYNOPSIS
       See TUTORIAL.md for implementation documentation and
@@ -61,7 +61,9 @@ SYNOPSIS
 
             if ($ret) {
                     my $assertion = Net::SAML2::Protocol::Assertion->new_from_xml(
-                            xml => decode_base64($saml_response)
+                            xml         => decode_base64($saml_response),
+                            key_file    => "SP-Private-Key.pem",    # Required for EncryptedAssertions
+                            cacert      => "IdP-cacert.pem",        # Required for EncryptedAssertions
                     );
 
                     # ...
@@ -81,6 +83,9 @@ DESCRIPTION
     Keycloak
     Auth0 (requires Net::SAML2 >=0.39)
     PingIdentity
+        Version 0.54 and newer support EncryptedAssertions. No changes
+        required to existing SP applications if EncryptedAssertions are not
+        in use.
 
 NAME
     Net::SAML2 - SAML bindings and protocol implementation

@@ -10,9 +10,9 @@ use Log::ger;
 
 # put global variables alphabetically here
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-01-29'; # DATE
+our $DATE = '2022-04-15'; # DATE
 our $DIST = 'Perinci-CmdLine-Lite'; # DIST
-our $VERSION = '1.917'; # VERSION
+our $VERSION = '1.918'; # VERSION
 
 sub meta {
     return {
@@ -84,7 +84,7 @@ Perinci::CmdLine::Plugin::Plugin::Disable - Prevent the loading (activation) of 
 
 =head1 VERSION
 
-This document describes version 1.917 of Perinci::CmdLine::Plugin::Plugin::Disable (from Perl distribution Perinci-CmdLine-Lite), released on 2022-01-29.
+This document describes version 1.918 of Perinci::CmdLine::Plugin::Plugin::Disable (from Perl distribution Perinci-CmdLine-Lite), released on 2022-04-15.
 
 =head1 SYNOPSIS
 

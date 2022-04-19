@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '1.57';
+our $VERSION = '1.58';
 
 use Carp ();
 use DateTime;
@@ -362,7 +362,7 @@ DateTime::Duration - Duration objects for date math
 
 =head1 VERSION
 
-version 1.57
+version 1.58
 
 =head1 SYNOPSIS
 

@@ -1,10 +1,42 @@
 ==================================================
-Changes from 2020-04-22 00:00:00 +0000 to present.
+Changes from 2021-04-15 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 1.0.7 at 2021-04-22 21:24:56 +0000
+version 1.0.8 at 2022-04-15 08:51:35 +0000
 ------------------------------------------
+
+  Change: 62ceefb78477bb532746a7b6d9331a00b732723e
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2022-04-15 10:51:30 +0000
+
+    New version 
+
+  Change: d78aa22604a8acb6a7d7478f3d0238b185b4ccf0
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2022-04-15 10:48:55 +0000
+
+    bigint does not work with sprintf
+
+    it completely fails with bignum >= 0.63 cf
+    https://rt.cpan.org/Ticket/Display.html?id=141330
+
+    So, we explicitely convert to standard scalar at the end. And
+    rounding is also fixed 
+
+  Change: 6e6158b6c9047725f83f664b02bef6621957df37
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2022-04-15 10:46:39 +0000
+
+    old version of lsblk does not provide required information
+
+    Falling back on info from parted or udev 
+
+  Change: e5e8fe852111f4e2374f47d30fbaac29ed3e8b6e
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2021-04-26 15:25:25 +0000
+
+    Fix handling of faultly drive with LSI 
 
   Change: 8698ff9def6985e80adff6c97cf9d0693b48ce79
   Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>

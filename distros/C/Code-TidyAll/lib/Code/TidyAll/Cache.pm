@@ -9,7 +9,7 @@ use Specio::Library::Path::Tiny;
 
 use Moo;
 
-our $VERSION = '0.81';
+our $VERSION = '0.82';
 
 has cache_dir => (
     is       => 'ro',
@@ -70,7 +70,7 @@ Code::TidyAll::Cache - A simple caching engine which stores key/value pairs
 
 =head1 VERSION
 
-version 0.81
+version 0.82
 
 =head1 SUPPORT
 

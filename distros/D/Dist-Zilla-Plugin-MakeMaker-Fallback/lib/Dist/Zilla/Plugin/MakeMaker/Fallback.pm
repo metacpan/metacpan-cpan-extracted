@@ -1,18 +1,19 @@
 use strict;
 use warnings;
-package Dist::Zilla::Plugin::MakeMaker::Fallback; # git description: v0.029-2-gbde03e5
-# vim: set ts=8 sts=4 sw=4 tw=115 et :
+package Dist::Zilla::Plugin::MakeMaker::Fallback; # git description: v0.030-7-gf28e755
+# vim: set ts=8 sts=2 sw=2 tw=115 et :
 # ABSTRACT: Generate a Makefile.PL containing a warning for legacy users
 # KEYWORDS: plugin installer MakeMaker Makefile.PL toolchain legacy ancient backcompat
 
-our $VERSION = '0.030';
+our $VERSION = '0.031';
 
 use Moose;
 extends 'Dist::Zilla::Plugin::MakeMaker::Awesome' => { -version => '0.47' };
 with 'Dist::Zilla::Role::AfterBuild' => { -excludes => [qw(dump_config mvp_multivalue_args mvp_aliases)] };
 
-use List::Util 'first';
+use List::Keywords 0.03 qw(first any);
 use version;
+use Path::Tiny;
 use namespace::autoclean;
 
 has skip_release_testing => (
@@ -44,6 +45,10 @@ sub after_build
 
     my $build_pl = first { $_->name eq 'Build.PL' } @{ $self->zilla->files };
     $self->log_fatal('No Build.PL found to fall back from!') if not $build_pl;
+
+    $self->log('share/ files present: did you forget to include [ShareDir]?')
+      if any { path('share')->subsumes($_->name) } @{ $self->zilla->files }
+        and not @{ $self->zilla->plugins_with(-ShareDir) };
 }
 
 around _build_WriteMakefile_args => sub
@@ -76,10 +81,10 @@ CODE
     # those out for now, as this shouldn't occur that frequently.  There is no
     # point in using CPAN::Meta, as that wasn't in core in the range of perl
     # versions that is likely to not have satisfied these prereqs.
-    delete @{$configure_requires}{ grep { not version::is_strict($configure_requires->{$_}) } keys %$configure_requires };
-    join('', map {
-            "    '$_' => '$configure_requires->{$_}',\n"
-        } sort keys %$configure_requires)
+    delete @{$configure_requires}{ grep !version::is_strict($configure_requires->{$_}), keys %$configure_requires };
+    join('', map
+            "    '$_' => '$configure_requires->{$_}',\n",
+            sort keys %$configure_requires)
 CODE
     . "\x7d\x7d);\n" . <<'CODE'
 
@@ -88,7 +93,7 @@ my %errors = map {
     $_ => $@,
 } keys %configure_requires;
 
-if (grep { $_ } values %errors)
+if (grep $_, values %errors)
 {
     warn "Errors from configure prereqs:\n"
         . do {
@@ -267,7 +272,7 @@ Dist::Zilla::Plugin::MakeMaker::Fallback - Generate a Makefile.PL containing a w
 
 =head1 VERSION
 
-version 0.030
+version 0.031
 
 =head1 SYNOPSIS
 
@@ -383,7 +388,7 @@ L<http://dzil.org/#mailing-list>.
 There is also an irc channel available for users of this distribution, at
 L<C<#distzilla> on C<irc.perl.org>|irc://irc.perl.org/#distzilla>.
 
-I am also usually active on irc, as 'ether' at C<irc.perl.org>.
+I am also usually active on irc, as 'ether' at C<irc.perl.org> and C<irc.libera.chat>.
 
 =head1 AUTHOR
 

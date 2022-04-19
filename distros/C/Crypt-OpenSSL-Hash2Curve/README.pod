@@ -41,7 +41,6 @@ https://datatracker.ietf.org/doc/draft-irtf-cfrg-hash-to-curve/
 =item get_hash2curve_params
 
     my $group_params_ref = get_hash2curve_params($group_name, $type);
-    # $group_params_ref = [ $group, $c1, $c2, $p, $a, $b, $z, $ctx ];
 
 =item map_to_curve
 

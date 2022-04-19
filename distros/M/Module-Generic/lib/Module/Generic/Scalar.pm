@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Scalar.pm
-## Version v1.2.0
-## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Version v1.2.1
+## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2022/02/27
+## Modified 2022/04/10
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -19,6 +19,7 @@ BEGIN
     use vars qw( $DEBUG );
     use Module::Generic::Array;
     use Module::Generic::Boolean;
+    use Module::Generic::Null;
     use Module::Generic::Number;
     use Module::Generic::Scalar;
     # So that the user can say $obj->isa( 'Module::Generic::Scalar' ) and it would return true
@@ -80,7 +81,7 @@ BEGIN
         fallback => 1,
     );
     $DEBUG = 0;
-    our $VERSION = 'v1.2.0';
+    our $VERSION = 'v1.2.1';
 };
 
 use strict;
@@ -115,7 +116,7 @@ sub new
     return( bless( \$init => ( ref( $this ) || $this ) ) );
 }
 
-sub append { ${$_[0]} .= $_[1]; return( $_[0] ); }
+sub append { ${$_[0]} .= ( Scalar::Util::reftype( $_[1] ) eq 'SCALAR' ? ${$_[1]} : $_[1] ); return( $_[0] ); }
 
 sub as_array { return( Module::Generic::Array->new( [ ${$_[0]} ] ) ); }
 
@@ -395,11 +396,8 @@ sub object { return( $_[0] ); }
 sub open
 {
     my $self = shift( @_ );
-    my $io = Module::Generic::Scalar::IO->new( $self ) || do
-    {
-        $! = Module::Generic::Scalar::IO->error;
-        return;
-    };
+    my $io = Module::Generic::Scalar::IO->new( $self, @_ ) || 
+        return( $self->pass_error( Module::Generic::Scalar::IO->error ) );
     return( $io );
 }
 
@@ -434,7 +432,7 @@ sub pad
 
 sub pos { return( $_[0]->_number( @_ > 1 ? ( CORE::pos( ${$_[0]} ) = $_[1] ) : CORE::pos( ${$_[0]} ) ) ); }
 
-sub prepend { return( shift->substr( 0, 0, shift( @_ ) ) ); }
+sub prepend { return( shift->substr( 0, 0, ( Scalar::Util::reftype( $_[0] ) eq 'SCALAR' ? ${$_[0]} : $_[0] ) ) ); }
 
 sub quotemeta { return( __PACKAGE__->_new( CORE::quotemeta( ${$_[0]} ) ) ); }
 
@@ -443,8 +441,8 @@ sub right { return( $_[0]->_new( CORE::substr( ${$_[0]}, ( CORE::int( $_[1] ) * 
 sub replace
 {
     my( $self, $re, $replacement ) = @_;
-    ## Only to test if this was a regular expression. If it was the array will contain successful match, other it will be empty
-    ## @rv will contain the regexp matches or the result of the eval
+    # Only to test if this was a regular expression. If it was the array will contain successful match, other it will be empty
+    # @rv will contain the regexp matches or the result of the eval
     my @matches = ();
     my @rv = ();
     $re = CORE::defined( $re ) 
@@ -503,17 +501,17 @@ sub set
 {
     my $self = CORE::shift( @_ );
     my $init;
-    if( ref( $_[0] ) eq 'SCALAR' || UNIVERSAL::isa( $_[0], 'SCALAR' ) )
+    if( Scalar::Util::reftype( $_[0] ) eq 'SCALAR' )
     {
         $init = ${$_[0]};
     }
-    elsif( ref( $_[0] ) eq 'ARRAY' || UNIVERSAL::isa( $_[0], 'ARRAY' ) )
+    elsif( Scalar::Util::reftype( $_[0] ) eq 'ARRAY' )
     {
         $init = CORE::join( '', @{$_[0]} );
     }
     elsif( ref( $_[0] ) )
     {
-        warn( "I do not know what to do with \"", $_[0], "\"\n" ) if( $self->_warnings_is_enabled );
+        warn( "I do not know what to do with \"", $_[0], "\" (", overload::StrVal( $_[0] ), ")\n" ) if( $self->_warnings_is_enabled );
         return;
     }
     else
@@ -659,7 +657,7 @@ sub _warnings_is_enabled { return( warnings::enabled( ref( $_[0] ) || $_[0] ) );
         fallback => 1,
     );
     our $ERROR = '';
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.1.1';
 
 #     sub as_string
 #     {
@@ -699,6 +697,16 @@ sub _warnings_is_enabled { return( warnings::enabled( ref( $_[0] ) || $_[0] ) );
         {
             return( ref( $self ) ? *$self->{error} : $ERROR );
         }
+    }
+
+    # Redo this method, because we do not want 'croak'
+    sub getlines
+    {
+        my $self = shift( @_ );
+        wantarray or return( $self->error( "Cannot call getlines in scalar context!" ) );
+        my( $line, @lines );
+        push( @lines, $line ) while( defined( $line = $self->getline ) );
+        return( @lines );
     }
 
     sub length
@@ -741,7 +749,7 @@ sub _warnings_is_enabled { return( warnings::enabled( ref( $_[0] ) || $_[0] ) );
         }
 
         # Setup:
-        *$self->{Pos} = 0;          # seek position
+        *$self->{Pos} = 0;         # seek position
         *$self->{SR}  = $ref;      # scalar reference
         # print( STDERR __PACKAGE__, "::open: Scalar ref object is: ", overload::StrVal( *$self->{SR} ), "\n" );
         return( $self );
@@ -759,6 +767,26 @@ sub _warnings_is_enabled { return( warnings::enabled( ref( $_[0] ) || $_[0] ) );
         1;
     }
     
+    # Redo this method to remove 'croak'
+    sub seek
+    {
+        my( $self, $pos, $whence ) = @_;
+        my $eofpos = CORE::length( ${*$self->{SR}} );
+
+        # Seek:
+        if    ( $whence == 0) { *$self->{Pos} = $pos }             # SEEK_SET
+        elsif ( $whence == 1) { *$self->{Pos} += $pos }            # SEEK_CUR
+        elsif ( $whence == 2) { *$self->{Pos} = $eofpos + $pos }   # SEEK_END
+        else                  { return( $self->error( "Bad seek whence ($whence)" ) ); }
+
+        # Fixup:
+        if( *$self->{Pos} < 0)       { *$self->{Pos} = 0 }
+        if( *$self->{Pos} > $eofpos) { *$self->{Pos} = $eofpos }
+        return(1);
+    }
+    
+    sub size { return( CORE::shift->length ); }
+
     sub truncate
     {
         my $self = CORE::shift( @_ );

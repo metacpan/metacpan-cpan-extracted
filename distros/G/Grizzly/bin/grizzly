@@ -1,0 +1,42 @@
+#!/usr/bin/env perl
+# ABSTRACT: Grizzly application script
+# PODNAME: Grizzly
+
+use strict;
+use warnings;
+
+use FindBin qw($Bin);
+use lib "$Bin/../lib";
+use Grizzly;
+
+my %arg = ( show_version_cmd => 1, );
+my $cmd = Grizzly->new( \%arg );
+$cmd->run;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Grizzly - Grizzly application script
+
+=head1 VERSION
+
+version 0.104
+
+=head1 AUTHOR
+
+Nobunaga <nobunaga@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2022 by Nobunaga.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+=cut

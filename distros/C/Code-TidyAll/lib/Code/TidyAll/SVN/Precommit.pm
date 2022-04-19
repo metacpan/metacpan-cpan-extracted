@@ -13,7 +13,7 @@ use Try::Tiny;
 
 use Moo;
 
-our $VERSION = '0.81';
+our $VERSION = '0.82';
 
 # Public
 has conf_name                => ( is => 'ro' );
@@ -182,7 +182,7 @@ Code::TidyAll::SVN::Precommit - Subversion pre-commit hook that requires files t
 
 =head1 VERSION
 
-version 0.81
+version 0.82
 
 =head1 SYNOPSIS
 

@@ -14,8 +14,8 @@ my $u = Crypt::OpenSSL::Bignum->new_from_hex($u_hex);
 my $params_ref = get_hash2curve_params($group_name, $type);
 my $P  = map_to_curve($params_ref, $group_name, $type, $u, 0);
 
-my $group = $params_ref->[0];
-my $ctx = $params_ref->[-1];
+my $group = $params_ref->{group};
+my $ctx = $params_ref->{ctx};
 
 my $bn = Crypt::OpenSSL::EC::EC_POINT::point2hex($group, $P, 4, $ctx);
 is($bn, '04993B46E30BA9CFC3DC2D3AE2CF9733CF03994E74383C4E1B4A92E8D6D466B321C4A642979162FBDE9E1C9A6180BD27A0594491E4C231F51006D0BF7992D07127', 'map to curve');

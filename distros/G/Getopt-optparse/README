@@ -1,0 +1,91 @@
+NAME
+    Getopt::optparse - optparse style processing of command line options
+
+SYNOPSIS
+        use Getopt::optparse;
+        my $parser = Getopt::optparse->new();
+        $parser->add_option(
+            '--hostname', 
+            {
+                dest => 'hostname',
+                help => 'Remote hostname',
+                default => 'localhost.localdomain'
+            }
+        );
+        $parser->add_option(
+            '--username', 
+            {
+                dest => 'username',
+                help => 'Username for new ILO account'
+            }
+        );
+        $parser->add_option( 
+            '--global',
+            dest    => 'global',
+            action  => 'store_true',
+            help    => 'Show global',
+            default => 0
+        )
+
+        my $options = $parser->parse_args();
+        printf("Hostname is: %s\n", $options->{hostname});
+        printf("Username is: %s\n", $options->{username});
+        if ($options->{global}) {
+
+        }
+
+DESCRIPTION
+    Library which allows Python optparse style processing of command line
+    options.
+
+CONSTRUCTOR
+    $parser = Getopt::optparse->new( \%options )
+        Construct a new "Getopt::optparse" object and return it. Hash
+        reference argument may be provided though none are required.
+
+METHODS
+    The following methods are available:
+
+    Getopt::optparse->add_option()
+            $parser->add_option(
+                '--hostname',
+                {
+                    dest => 'hostname',
+                    help => 'Remote hostname',
+                    default => 'localhost.localdomain'
+                }
+            )
+
+        Add option to be parsed from command line. Accepts two arguments:
+
+        Option Name
+            Value to be parsed from command line. --hostname in the above
+            example. This library uses only double dash.
+
+        Option Attributes. A hash reference.
+            These may include:
+
+            dest
+                Name of key were parsed option will be stored.
+
+            default (optional)
+                Value of dest if no option is parsed on command line.
+
+            help (optional)
+                Text message displayed when --help is found on command line.
+
+            action (optional)
+                Presently only store_true supported. Using this makes dest
+                true or false. (0 or 1)
+
+    Getopt::optparse->parse_args()
+            my $options = $parser->parse_args();
+            printf("Hostname is: %s\n", $options->{hostname});
+            printf("Username is: %s\n", $options->{username});
+
+        Parse added options from command line and return their values as a
+        hash reference.
+
+AUTHOR
+    Matt Hersant <matt_hersant@yahoo.com>
+

@@ -33,18 +33,18 @@ sub test_ufunc {
     or die("no CCS Ufunc PDL::CCS::Nd::${ufunc_name} defined!");
 
   $missing_val = 0 if (!defined($missing_val));
-  $missing_val = PDL->topdl($missing_val);
+  $missing_val = PDL->topdl($a->type, $missing_val);
   if ($missing_val->isbad) { $a = $a->setbadif($abad); }
   else                     { $a->where($abad) .= $missing_val; $a->badflag(0); }
 
   ##-- sorting with bad values doesn't work right in PDL-2.015 ; ccs/vv sorts BAD as minimal, PDL sort BAD as maximal: wtf?
   if ($ufunc_name =~ /qsort/ && $missing_val->isbad) {
     my $inf = $^O =~ /MSWin32/i ? (99**99)**99 : 'inf';
-    $missing_val = $inf;
+    $missing_val = PDL->topdl($inf);
     $a->inplace->setbadtoval($inf);
   }
 
-  my $ccs      = $a->toccs($missing_val);
+  my $ccs      = $a->toccs($missing_val->convert($a->type));
   $ccs->_whichND($ccs->_whichND->ccs_indx()) if ($ccs->_whichND->type != PDL::ccs_indx());
   my $dense_rc = $pdl_ufunc->($a);
   my $ccs_rc   = $ccs_ufunc->($ccs);

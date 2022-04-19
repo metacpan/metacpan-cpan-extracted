@@ -12,12 +12,16 @@ share {
 
   Alien::Build->log ('$ENV{ALIEN_BUILD_PRELOAD} = ' . ($ENV{ALIEN_BUILD_PRELOAD} // ''));
 
+  #my $version_filter = have_cpp17() ? qr/^([0-9\.]+)$/ : qr/^(0.13.1)$/;
+  #Alien::Build->log("version filter: $version_filter");
+
   meta->prop->{start_url} = 'https://github.com/NixOS/patchelf.git';
   plugin 'Download::Git' =>(
-    filter  => qr/^([0-9\.]+)$/,
+    filter  => get_version_filter(),
     version => qr/^([0-9\.]+)$/,
   );
 
+  my $config_call = '%{configure}';
   requires 'Alien::Autotools';
   plugin 'Build::Autoconf';
   if ($on_windows) {
@@ -25,11 +29,43 @@ share {
   }
   if ($^O =~ /solaris/i) {
     plugin 'Build::Make' => 'gmake';
+    $config_call = "MAKE=gmake $config_call";
   }
   build [
     'sh ./bootstrap.sh',  #  windows needs explicit shell call
-    '%{configure}',
+    $config_call,
     '%{make}',
     '%{make} install',
   ];
 };
+
+#  Compile a c++ file to see if we can support c++17.
+#  If not then fall back to an older version.
+#  We could use ExtUtils::CBuilder but it is not
+#  cooperating - patches welcome.
+sub get_version_filter {
+  my $default_filter = qr/^([0-9\.]+)$/;
+
+  #  compiler might not be called c++
+  use File::Which qw /which/;
+  use Capture::Tiny qw /capture/;
+  
+  my $cc = which ('c++') or which ('g++')
+    or return $default_filter;
+
+  my $source_file = Path::Tiny->tempfile();
+  open my $FH, '>', $source_file or die "Can't create $source_file: $!";
+  print $FH 'int main () { return 1; }\n';
+  close $FH;
+  
+  my @args = ($cc, '-std=c++17', $source_file);
+  my ($stdout, $stderr, @error) = capture {system @args};
+  
+  #  should set a meta_prop value on first pass 
+  my $have_cpp_17 = not $stderr =~ /\Qunrecognized command line option '-std=c++17'/;
+  meta->prop->{my_have_cpp17} = $have_cpp_17;
+  if (!$have_cpp_17) {
+    Alien::Build->log("The c++ compiler does not support -std=c++17, falling back to patchelf 0.13.1");
+  }
+  return $have_cpp_17 ? $default_filter : qr/^(0.13.1)$/
+}

@@ -16,7 +16,7 @@ use Try::Tiny;
 
 use Moo;
 
-our $VERSION = '0.81';
+our $VERSION = '0.82';
 
 has allow_repeated_push => (
     is      => 'ro',
@@ -196,7 +196,7 @@ Code::TidyAll::Git::Prereceive - Git pre-receive hook that requires files to be 
 
 =head1 VERSION
 
-version 0.81
+version 0.82
 
 =head1 SYNOPSIS
 

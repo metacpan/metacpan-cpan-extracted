@@ -1,0 +1,91 @@
+=pod
+
+=head1 NAME
+
+Option::Option
+
+=head1 SYNOPSIS
+
+Provides objects that can hold results that can be unwrapped
+similar to Rust
+
+    use Option::Option;
+
+    my $option = Option::Option->new("something");
+
+    # This croaks:
+    print $var;
+
+    # This works
+    my $var = $option->unwrap();
+    print $var;
+
+    # This also works and has a helpful error message
+    my $var = $option->expect("get my something");
+    print $var;
+
+=head1 AUTHOR
+
+Lee Katz
+
+=head1 METHODS
+
+
+=cut
+
+=pod
+
+=over
+
+=item new()
+
+Creates a new object with a variable
+
+
+=cut
+
+=pod
+
+=item unwrap()
+
+Checks if the variable is defined and if it is, returns it.
+If not defined, croaks.
+
+=back
+
+
+=cut
+
+=pod
+
+=over
+
+=item expect($msg)
+
+Checks if the variable is defined and if it is, returns it.
+If not defined, croaks with error message.
+
+=back
+
+
+=cut
+
+=pod
+
+=over 
+
+=item toString()
+
+Dies with an error message, describing that the object was attempted to be used
+in a scalar context without unwrapping.
+This subroutine is not meant to be used directly.
+
+    my $var = Option::Option->new("something");
+    my $concat = $var . " wicked this way comes";
+    # dies with error message during the concatenation
+
+=back
+
+
+=cut
+

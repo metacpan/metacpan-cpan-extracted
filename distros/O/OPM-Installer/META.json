@@ -45,7 +45,7 @@
             "Moo" : "0",
             "OPM::Parser" : "1.06",
             "OPM::Repository" : "v1.0.0",
-            "OPM::Validate" : "1.11",
+            "OPM::Validate" : "1.12",
             "Regexp::Common" : "0",
             "Test::More" : "0",
             "Type::Tiny" : "0",
@@ -57,31 +57,31 @@
    "provides" : {
       "OPM::Installer" : {
          "file" : "lib/OPM/Installer.pm",
-         "version" : "v1.0.0"
+         "version" : "v1.0.1"
       },
       "OPM::Installer::Logger" : {
          "file" : "lib/OPM/Installer/Logger.pm",
-         "version" : "v1.0.0"
+         "version" : "v1.0.1"
       },
       "OPM::Installer::Utils::Config" : {
          "file" : "lib/OPM/Installer/Utils/Config.pm",
-         "version" : "v1.0.0"
+         "version" : "v1.0.1"
       },
       "OPM::Installer::Utils::File" : {
          "file" : "lib/OPM/Installer/Utils/File.pm",
-         "version" : "v1.0.0"
+         "version" : "v1.0.1"
       },
       "OPM::Installer::Utils::Linux" : {
          "file" : "lib/OPM/Installer/Utils/Linux.pm",
-         "version" : "v1.0.0"
+         "version" : "v1.0.1"
       },
       "OPM::Installer::Utils::TS" : {
          "file" : "lib/OPM/Installer/Utils/TS.pm",
-         "version" : "v1.0.0"
+         "version" : "v1.0.1"
       },
       "OPM::Installer::Utils::Test" : {
          "file" : "lib/OPM/Installer/Utils/Test.pm",
-         "version" : "v1.0.0"
+         "version" : "v1.0.1"
       }
    },
    "release_status" : "stable",
@@ -96,7 +96,7 @@
          "web" : "https://github.com/perlservices/OPM-Installer"
       }
    },
-   "version" : "1.0.0",
+   "version" : "1.0.1",
    "x_contributors" : [
       "reneeb <github@renee-baecker.de>",
       "reneeb <info@perl-services.de>"

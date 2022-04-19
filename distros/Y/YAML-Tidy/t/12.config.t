@@ -28,7 +28,7 @@ subtest default => sub {
 subtest 'unknown-args' => sub {
     my $cfg = eval { YAML::Tidy::Config->new( foo => 23 ) };
     my $err = $@;
-    like $err, qr{Unknown configuration keys: foo};
+    like $err, qr{Unknown configuration parameters: foo};
 };
 
 done_testing;

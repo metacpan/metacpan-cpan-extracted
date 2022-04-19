@@ -2,13 +2,12 @@ use strict;
 use warnings;
 
 use Test::More 0.88;
+use Test::Needs { 'Dist::Zilla::Plugin::CheckBin' => '0.004' };
 use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
 use Test::DZil;
 use Test::Fatal;
 use Path::Tiny;
 use Test::Deep;
-
-use Test::Needs { 'Dist::Zilla::Plugin::CheckBin' => '0.004' };
 
 my $tzil = Builder->from_config(
     { dist_root => 'does-not-exist' },

@@ -12,15 +12,13 @@ PPIx::Regexp - Represent a regular expression of some sort
 
 =head1 DEPRECATION NOTICE
 
-The L<postderef|/postderef Boolean> argument to L<new()|/new> is being
-put through a deprecation cycle and retracted. After the retraction,
-postfix dereferences will always be recognized. This is the default
-behaviour now.
+The C<postderef> argument to L<new()|/new> is retracted, and
+postfix dereferences are always be recognized.
 
 Starting with version 0.074_01, the first use of this argument warned.
-warn. With version 0.079_01, all uses will warn. With version 0.080_01,
-all uses will become fatal. With the first release on or after April 15
-2022 all mention of this argument will be removed.
+With version 0.079_01, all uses warned. With version 0.080_01,
+all uses became fatal. With version 0.084_01, all mention of this
+argument was removed, except for this notice.
 
 =head1 INHERITANCE
 
@@ -197,7 +195,7 @@ use PPIx::Regexp::Util qw{
 };
 use Scalar::Util qw{ refaddr };
 
-our $VERSION = '0.084';
+our $VERSION = '0.085';
 
 =head2 new
 

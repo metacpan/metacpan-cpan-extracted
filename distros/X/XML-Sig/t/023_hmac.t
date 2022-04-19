@@ -5,6 +5,9 @@ use warnings;
 
 use Test::More tests => 31;
 use File::Which;
+use Crypt::OpenSSL::Guess;
+
+my ($major, $minor, $letter) = Crypt::OpenSSL::Guess->openssl_version();
 
 
 BEGIN {
@@ -26,6 +29,9 @@ foreach my $alg (@hash_alg) {
 
     SKIP: {
         skip "xmlsec1 not installed", 2 unless which('xmlsec1');
+
+        skip "openssl 3+ does not support ripemd160 signatures",
+            2 if ($major ge 3 && $alg eq 'ripemd160');
 
         # Try whether xmlsec is correctly installed which
         # doesn't seem to be the case on every cpan testing machine

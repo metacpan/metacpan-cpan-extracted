@@ -151,6 +151,7 @@ LICENSE
 Makefile.PL
 MANIFEST
 README
+README.md
 t/00.load.t
 t/01.element.t
 t/07.characterdata.t
@@ -184,6 +185,7 @@ t/30.add.t
 t/30.xquery.t
 t/90.pod.t
 t/91.coverage.t
+t/92.signature.t
 t/98.up-to-date.t
 t/99.kwalitee.t
 t/minidom.pm
@@ -194,3 +196,4 @@ t/test_load2.html
 t/test_load_fragment.html
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

@@ -1,3 +1,11 @@
+1.15 2022-04-18
+    - Statisfy CPAN testers requirement on more platforms.
+    - Print and warn about missing network and router from intra
+      area and link prefix.
+
+1.14 2022-04-16
+    - Avoid zombie processes from ospfctl and dot in ospfview.
+
 1.13 2021-08-21
     - Rework term and child signal handling in ospfview.
     - Fix strict test for cpan testers, skip ospfview.cgi.

@@ -1,0 +1,33 @@
+Revision history for SPVM::Math::Complex
+
+0.09  2021-02-23
+        * SPVM::Math::Complex only supports FreeBSD 12+ because old FreeBSD doesn't support C99 math functions correctly, such as cpow.
+
+0.08  2021-02-22
+        * Fix the FreeBSD version checking
+
+0.07  2021-02-22
+        * SPVM::Math::Complex needs SPVM 0.9506+ to run Makefile.PL.
+        * SPVM::Math::Complex only supports FreeBSD 10+ because old FreeBSD doesn't support C99 math functions correctly.
+
+0.06  2021-02-01
+        * SPVM::Math::Complex needs SPVM 0.9500+
+0.05  2021-12-24
+        [CHANGES]
+        * Fix only document.
+
+0.04  2021-12-24
+        [CHANGES]
+        * Catch up with latest SPVM 0.9021.
+
+0.03  2021-12-23
+        [CHANGES]
+        * Catch up with latest SPVM.
+
+0.02  2021-12-21
+        [CHANGES]
+        * Catch up with latest SPVM.
+
+0.01  2021-12-07
+        [CHANGES]
+        * SPVM::Math::Complex is separated from SPVM core module.

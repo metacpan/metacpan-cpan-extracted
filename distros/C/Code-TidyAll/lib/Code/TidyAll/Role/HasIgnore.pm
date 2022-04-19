@@ -9,7 +9,7 @@ use Specio::Library::String;
 
 use Moo::Role;
 
-our $VERSION = '0.81';
+our $VERSION = '0.82';
 
 has ignore => (
     is      => 'ro',
@@ -67,7 +67,7 @@ Code::TidyAll::Role::HasIgnore - A role for any class that has a list of ignored
 
 =head1 VERSION
 
-version 0.81
+version 0.82
 
 =head1 SUPPORT
 

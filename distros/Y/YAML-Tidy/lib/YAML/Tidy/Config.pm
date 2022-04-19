@@ -5,9 +5,22 @@ use v5.20;
 use experimental qw/ signatures /;
 package YAML::Tidy::Config;
 
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use Cwd;
+use YAML::PP::Common qw/
+    YAML_PLAIN_SCALAR_STYLE YAML_SINGLE_QUOTED_SCALAR_STYLE
+    YAML_DOUBLE_QUOTED_SCALAR_STYLE YAML_LITERAL_SCALAR_STYLE
+    YAML_FOLDED_SCALAR_STYLE
+    YAML_FLOW_SEQUENCE_STYLE YAML_FLOW_MAPPING_STYLE
+/;
+my %stylemap = (
+    plain => YAML_PLAIN_SCALAR_STYLE,
+    single => YAML_SINGLE_QUOTED_SCALAR_STYLE,
+    double => YAML_DOUBLE_QUOTED_SCALAR_STYLE,
+#    literal => YAML_LITERAL_SCALAR_STYLE,
+#    folded => YAML_FOLDED_SCALAR_STYLE,
+);
 
 sub new($class, %args) {
     my $yaml;
@@ -51,6 +64,7 @@ sub new($class, %args) {
     my $indent = delete $cfg->{indentation} || {};
     $indent->{spaces} = $overridespaces if defined $overridespaces;
     $indent->{spaces} //= 2; # TODO support keeping original indent
+    $indent->{'block-sequence-in-mapping'} //= 0;
     my $trimtrailing = $cfg->{'trailing-spaces'} || '';
     if ($trimtrailing eq 'fix') {
         $trimtrailing = 1;
@@ -58,15 +72,23 @@ sub new($class, %args) {
     else {
         $trimtrailing = 0;
     }
+    my $scalarstyle = { default => YAML_PLAIN_SCALAR_STYLE };
+    if (my $scalar = delete $cfg->{'scalar-style'}) {
+        my $default = $scalar->{default};
+        $scalarstyle->{default} = $default ? $stylemap{ $default } : undef;
+    }
 
     delete @args{qw/ configfile configdata /};
     if (my @unknown = keys %args) {
-        die "Unknown configuration keys: @unknown";
+        die "Unknown configuration parameters: @unknown";
     }
     my $self = bless {
         version => $v,
         indentation => $indent,
         trimtrailing => $trimtrailing,
+        header => delete $cfg->{header} // 'keep',
+        footer => delete $cfg->{footer} // 'keep',
+        scalar_style => $scalarstyle,
     }, $class;
     return $self;
 }
@@ -82,11 +104,41 @@ sub _homedir($class) {
 sub indent($self) {
     return $self->{indentation}->{spaces};
 }
+sub indent_seq_in_map($self) {
+    return $self->{indentation}->{'block-sequence-in-mapping'};
+}
 
 sub trimtrailing($self) {
     return $self->{trimtrailing};
 }
 
+sub addheader($self) {
+    my $header = $self->{header};
+    return 0 if $header eq 'keep';
+    return $header ? 1 : 0;
+}
+
+sub addfooter($self) {
+    my $footer = $self->{footer};
+    return 0 if $footer eq 'keep';
+    return $footer ? 1 : 0;
+}
+
+sub removeheader($self) {
+    my $header = $self->{header};
+    return 0 if $header eq 'keep';
+    return $header ? 0 : 1;
+}
+
+sub removefooter($self) {
+    my $footer = $self->{footer};
+    return 0 if $footer eq 'keep';
+    return $footer ? 0 : 1;
+}
+
+sub default_scalar_style($self) {
+    return $self->{scalar_style}->{default};
+}
 
 sub standardcfg {
     my $yaml = <<'EOM';
@@ -94,7 +146,11 @@ sub standardcfg {
 v: v0.1
 indentation:
   spaces: 2
+  block-sequence-in-mapping: 0
 trailing-spaces: fix
+header: true
+scalar-style:
+    default: plain
 EOM
 }
 

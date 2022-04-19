@@ -9,7 +9,7 @@ use PDL;
 use Carp qw(confess);
 use strict;
 
-our $VERSION = '1.23.19';
+our $VERSION = '1.23.20';
 our @ISA = ('PDL::Exporter');
 our @EXPORT_OK =
   (

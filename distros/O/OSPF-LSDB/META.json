@@ -36,18 +36,26 @@
             "Data::Validate" : "0",
             "Data::Validate::Struct" : "0",
             "File::Slurp" : "0",
+            "File::Temp" : "0",
+            "Getopt::Long" : "0",
+            "IPC::Open2" : "0",
             "List::MoreUtils" : "0",
+            "POSIX" : "0",
             "Regexp::Common" : "0",
             "Regexp::IPv6" : "0",
+            "Sys::Hostname" : "0",
+            "Time::HiRes" : "0",
             "YAML::Syck" : "0",
             "perl" : "5.010000"
          }
       },
       "test" : {
          "requires" : {
+            "Pod::Checker" : "0",
             "Test::EOL" : "0",
+            "Test::More" : "0",
             "Test::NoWarnings" : "0",
-            "Test::Pod" : "0",
+            "Test::Pod" : "1.00",
             "Test::Requires" : "0",
             "Test::Strict" : "0"
          }
@@ -61,6 +69,6 @@
          "url" : "git://git.code.sf.net/p/ospfview/code"
       }
    },
-   "version" : "1.13",
+   "version" : "1.15",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

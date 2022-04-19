@@ -45,7 +45,7 @@
    "provides" : {
       "OPM::Validate" : {
          "file" : "lib/OPM/Validate.pm",
-         "version" : "1.11"
+         "version" : "1.12"
       }
    },
    "release_status" : "stable",
@@ -60,7 +60,7 @@
          "web" : "https://github.com/perlservices/OPM-Validate"
       }
    },
-   "version" : "1.11",
+   "version" : "1.12",
    "x_contributors" : [
       "reneeb <info@perl-services.de>"
    ],

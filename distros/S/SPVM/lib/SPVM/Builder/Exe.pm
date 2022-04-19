@@ -392,11 +392,7 @@ sub create_bootstrap_source {
 #include <assert.h>
 
 #include "spvm_native.h"
-#include "spvm_api.h"
 
-// This will be removed in the near feature release
-#include "spvm_compiler.h"
-#include "spvm_hash.h"
 EOS
     
     $boot_source .= "// module source get functions declaration\n";
@@ -486,7 +482,7 @@ int32_t main(int32_t argc, const char *argv[]) {
   // Leave scope
   env->leave_scope(env, scope_id);
 
-  SPVM_API_free_env_prepared(env);
+  env->free_env_prepared(env);
 
   return status;
 }
@@ -505,9 +501,9 @@ EOS
   SPVM_ENV* env = SPVM_NATIVE_new_env_raw();
   
   // Create compiler
-  SPVM_COMPILER* compiler = SPVM_API_compiler_new();
+  void* compiler = env->api->compiler->new_compiler();
 
-  SPVM_API_compiler_set_start_file(compiler, class_name);
+  env->api->compiler->set_start_file(compiler, class_name);
 
   // Set module source_files
 EOS
@@ -518,37 +514,37 @@ EOS
       
       $boot_source .= "  {\n";
       $boot_source .= "    const char* module_source = SPMODSRC__${class_cname}__get_module_source();\n";
-      $boot_source .= qq(    SPVM_HASH_set(compiler->module_source_symtable, "$class_name", strlen("$class_name"), (void*)module_source);\n);
+      $boot_source .= qq(    env->api->compiler->set_module_source_by_name(compiler, "$class_name", module_source);\n);
       $boot_source .= "  }\n";
     }
     $boot_source .= "\n";
 
     $boot_source .= <<'EOS';
 
-  int32_t compile_error_code = SPVM_API_compiler_compile_spvm(compiler, class_name);
+  int32_t compile_error_code = env->api->compiler->compile_spvm(compiler, class_name);
 
   if (compile_error_code != 0) {
-    int32_t error_messages_length = SPVM_API_compiler_get_error_messages_length(compiler);
+    int32_t error_messages_length = env->api->compiler->get_error_messages_length(compiler);
     for (int32_t i = 0; i < error_messages_length; i++) {
-      const char* error_message = SPVM_API_compiler_get_error_message(compiler, i);
+      const char* error_message = env->api->compiler->get_error_message(compiler, i);
       fprintf(stderr, "%s\n", error_message);
     }
     exit(255);
   }
 
   // Build runtime information
-  void* runtime = SPVM_API_runtime_new(env);
-  SPVM_API_compiler_build_runtime(compiler, runtime);
+  void* runtime = env->api->runtime->new_runtime(env);
+  env->api->compiler->build_runtime(compiler, runtime);
 
 EOS
     
     $boot_source .= <<'EOS';
     
   // Free compiler
-  SPVM_API_compiler_free(compiler);
+  env->api->compiler->free_compiler(compiler);
 
   // Prepare runtime
-  SPVM_API_runtime_prepare(runtime);
+  env->api->runtime->prepare(runtime);
 
   // Set runtime information
   env->runtime = runtime;
@@ -569,9 +565,9 @@ EOS
   { 
     const char* class_name = "$class_name";
     const char* method_name = "$precompile_method_name";
-    int32_t method_id = env->get_method_id_without_signature(env, class_name, method_name);
+    int32_t method_id = env->api->runtime->get_method_id_by_name(env->runtime, class_name, method_name);
     void* precompile_address = SPVMPRECOMPILE__${class_cname}__$precompile_method_name;
-    env->set_precompile_method_address(env, method_id, precompile_address);
+    env->api->runtime->set_precompile_method_address(env->runtime, method_id, precompile_address);
   }
 EOS
       }
@@ -588,9 +584,9 @@ EOS
   { 
     const char* class_name = "$class_name";
     const char* method_name = "$native_method_name";
-    int32_t method_id = env->get_method_id_without_signature(env, class_name, method_name);
+    int32_t method_id = env->api->runtime->get_method_id_by_name(env->runtime, class_name, method_name);
     void* native_address = SPVM__${class_cname}__$native_method_name;
-    env->set_native_method_address(env, method_id, native_address);
+    env->api->runtime->set_native_method_address(env->runtime, method_id, native_address);
   }
 EOS
       }
@@ -715,7 +711,7 @@ sub create_spvm_module_sources {
     # Source creating callback
     my $create_cb = sub {
       # This source is UTF-8 binary
-      my $module_source = $builder->get_module_source($class_name);
+      my $module_source = $builder->get_module_source_by_name($class_name);
       my $module_source_c_hex = $module_source;
       
       # Escape to Hex C launguage string literal

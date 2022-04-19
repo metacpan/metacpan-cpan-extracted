@@ -89,4 +89,16 @@ see also openssl/crypto/bn/bn_sqrt.c
 
     my $ec_key_hash_ref = generate_ec_key( $group, $priv_bn, $point_compress_t, $ctx );
 
+=head2  random_bn
+
+    my $random_bn = random_bn($Nn);
+
+    my $Nn = 16;
+    my $random_bn = random_bn($Nn);
+    print $random_bn->to_hex, "\n";
+
+=head2 point2hex
+
+    my $point_hex = point2hex($group_name, $point, $point_compress_t);
+
 =over

@@ -10,6 +10,8 @@ use Test::Fatal;
 
 use DateTime;
 
+undef $ENV{PERL_DATETIME_DEFAULT_TZ};
+
 {
 
     # Tests creating objects from epoch time

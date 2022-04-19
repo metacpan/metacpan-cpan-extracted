@@ -6,7 +6,7 @@ use warnings;
 use File::Temp;
 use Getopt::Long qw(GetOptionsFromArray :config posix_default bundling);
 use Test::NoWarnings;
-use Test::More tests => 4*65 + 1;
+use Test::More tests => 4*71 + 1;
 
 use OSPF::LSDB::YAML;
 use OSPF::LSDB::View6;
@@ -36,6 +36,8 @@ foreach my $t (@$tests) {
 	c => sub { $todo{cluster} = 1 },
 	e => sub { $todo{external}{generate}  = 1 },
 	E => sub { $todo{external}{aggregate} = 1 },
+	i => sub { $todo{intra}{generate}     = 1 },
+	l => sub { $todo{link}{generate}      = 1 },
 	s => sub { $todo{summary}{generate}   = 1 },
 	S => sub { $todo{summary}{aggregate}  = 1 },
     ) or die("Bad option: $t->{option}");

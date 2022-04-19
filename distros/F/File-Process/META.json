@@ -1,5 +1,5 @@
 {
-   "abstract" : "File processing utiltiy",
+   "abstract" : "File processing utility",
    "author" : [
       "Rob Lauer <rlauer6@comcast.net>"
    ],
@@ -34,37 +34,24 @@
       },
       "runtime" : {
          "requires" : {
-            "Carp" : "1.26",
-            "Carp::Always" : "0.12",
-            "English" : "1.05",
             "IO::Scalar" : "2.113",
-            "ReadonlyX" : "1.04",
-            "Scalar::Util" : "1.5",
-            "parent" : "0.225",
-            "strict" : "1.07",
-            "vars" : "1.02",
-            "warnings" : "1.13"
+            "ReadonlyX" : "1.04"
          }
       },
       "test" : {
          "requires" : {
-            "Data::Dumper" : "2.145",
-            "JSON::PP" : "4.07",
             "ReadonlyX" : "1.04",
-            "Test::More" : "1.001014",
-            "Text::CSV_XS" : "1.00",
-            "strict" : "1.07",
-            "warnings" : "1.13"
+            "Text::CSV_XS" : "1.00"
          }
       }
    },
    "provides" : {
       "File::Process" : {
          "file" : "lib/File/Process.pm",
-         "version" : "0.05"
+         "version" : "0.07"
       }
    },
    "release_status" : "stable",
-   "version" : "0.05",
+   "version" : "0.07",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

@@ -51,6 +51,7 @@ my %WriteMakefileArgs = (
     },
     LICENSE             => 'perl_5',
     MIN_PERL_VERSION    => 'v5.26.1',
+    (MM->can('signature_target') ? (SIGN => 1) : ()),
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'HTML-Object-*' },
     ( eval { ExtUtils::MakeMaker->VERSION(6.46) } ? ( META_MERGE => {
@@ -59,12 +60,12 @@ my %WriteMakefileArgs = (
         resources => {
         #    homepage    => undef,
             repository  => {
-                url         => 'git@git.deguest.jp:jack/HTML-Object.git',
-                web         => 'https://git.deguest.jp/jack/HTML-Object',
+                url         => 'git@gitlab.com:jackdeguest/HTML-Object.git',
+                web         => 'https://gitlab.com/jackdeguest/HTML-Object',
                 type        => 'git',
             },
             bugtracker => {
-                web         => 'https://git.deguest.jp/jack/HTML-Object/issues',
+                web         => 'https://gitlab.com/jackdeguest/HTML-Object/issues',
             },
         },
     }) : ()),

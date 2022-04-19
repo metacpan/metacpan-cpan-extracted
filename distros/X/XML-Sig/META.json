@@ -5,7 +5,7 @@
       "Timothy Legge <timlegge@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.022, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -59,6 +59,7 @@
       },
       "test" : {
          "requires" : {
+            "Crypt::OpenSSL::Guess" : "0",
             "File::Which" : "0",
             "Test::Exception" : "0",
             "Test::More" : "0"
@@ -68,7 +69,7 @@
    "provides" : {
       "XML::Sig" : {
          "file" : "lib/XML/Sig.pm",
-         "version" : "0.56"
+         "version" : "0.57"
       }
    },
    "release_status" : "stable",
@@ -82,7 +83,7 @@
          "web" : "https://github.com/perl-net-saml2/perl-XML-Sig"
       }
    },
-   "version" : "0.56",
+   "version" : "0.57",
    "x_contributors" : [
       "Byrne Reese <byrne@cpan.org>",
       "Chris Andrews <chris@nodnol.org>",
@@ -93,7 +94,7 @@
       "Michael Hendricks <michael@ndrix.org>",
       "Timothy Legge <timlegge@gmail.com>"
    ],
-   "x_generated_by_perl" : "v5.32.1",
+   "x_generated_by_perl" : "v5.34.0",
    "x_maintainers" : [
       "Timothy Legge <timlegge@gmail.com>"
    ],

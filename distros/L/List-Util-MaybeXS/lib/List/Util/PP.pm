@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Exporter ();
 
-our $VERSION = '1.500008';
+our $VERSION = '1.500009';
 $VERSION =~ tr/_//d;
 
 our @EXPORT_OK;
@@ -360,7 +360,7 @@ sub uniqnum (@) {
           || overload::ov_method(overload::mycan($package, '""'), $package)
           || overload::ov_method(overload::mycan($package, 'bool'), $package)
         ) {
-          $nv = $nv->$method;
+          $nv = $nv->$method(undef, !!0);
         }
         elsif (
           my $nomethod = overload::ov_method(overload::mycan($package, '(nomethod'), $package)
@@ -373,6 +373,8 @@ sub uniqnum (@) {
       }
       my $iv = $nv;
       my $F = pack 'F', $nv;
+      my $Fplus = pack 'F', $nv + 1;
+      my $Fminus = pack 'F', $nv - 1;
       my ($NV) = unpack 'F', $F;
       !$seen{
           ref $nv         ? $$nv
@@ -380,6 +382,7 @@ sub uniqnum (@) {
         : $NV != $NV      ? sprintf('%f', $NV)
         : int($NV) != $NV ? 'N'.$F
         : $iv - 1 == $iv  ? sprintf('%.0f', $NV)
+        : $F ne $Fplus && $F ne $Fminus ? sprintf('%.0f', $NV)
         : $NV > 0         ? sprintf('%u', $iv)
                           : sprintf('%d', $iv)
       }++;

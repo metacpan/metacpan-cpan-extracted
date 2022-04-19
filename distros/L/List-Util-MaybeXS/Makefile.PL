@@ -22,12 +22,12 @@ my %META = (
       requires => {
       },
       suggests => {
-        'List::Util' => '1.50',
+        'List::Util' => '1.56',
       },
     },
     develop   => {
       requires => {
-        'List::Util' => '1.50',
+        'List::Util' => '1.56',
         'Test::Pod::Coverage' => '1.04',
         'Test::Pod' => '1.14',
         'Test::More' => '0.88',

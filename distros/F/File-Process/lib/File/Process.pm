@@ -5,13 +5,12 @@ use warnings;
 
 use parent qw{ Exporter };
 
-use vars qw{ @EXPORT_OK @EXPORT };
+our @EXPORT = qw{ process_file };    ## no critic (Modules::ProhibitAutomaticExportation)
 
-@EXPORT    = qw{ process_file };
-@EXPORT_OK = qw{ post pre process filter next_line };
+our @EXPORT_OK   = qw{ post pre process filter next_line };
+our %EXPORT_TAGS = ( 'all' => \@EXPORT_OK );
 
 use Carp;
-use Carp::Always;
 use English qw{-no_match_vars};
 use IO::Scalar;
 use ReadonlyX;
@@ -24,7 +23,7 @@ Readonly my $FALSE   => 0;
 Readonly my $EMPTY   => q{};
 Readonly my $NL      => "\n";
 
-our $VERSION = '0.05';
+our $VERSION = '0.07';
 
 our %DEFAULT_PROCESSORS = (
   pre       => \&_pre,
@@ -196,22 +195,22 @@ sub process_file {
 } ## end sub process_file
 
 sub post {    ## no critic [Subroutines::RequireArgUnpacking]
-  my ( $fh, $all_lines, $args ) = @_;
-  return ( $_[2]->{default_processors}->{post}->(@_) );
+  return $_[2]->{default_processors}->{post}->(@_);
+}
+
+sub filter {    ## no critic [Subroutines::RequireArgUnpacking]
+  return $_[2]->{default_processors}->{filter}->(@_);
 }
 
 sub pre {    ## no critic [Subroutines::RequireArgUnpacking]
-  my ( $fh, $args ) = @_;
-  return ( $args->{default_processors}->{pre}->(@_) );
+  return $_[1]->{default_processors}->{pre}->(@_);
 }
 
 sub process {    ## no critic [Subroutines::RequireArgUnpacking]
-  my ( $fh, $all_lines, $args ) = @_;
   return $_[2]->{default_processors}->{process}->(@_);
 }
 
 sub next_line {    ## no critic [Subroutines::RequireArgUnpacking]
-  my ( $fh, $all_lines, $args ) = @_;
   return $_[2]->{default_processors}->{next_line}->(@_);
 }
 
@@ -379,9 +378,16 @@ text file. The class exports 1 method (C<process_file>) which invokes
 multiple subroutines that you can override or use in conjunction with
 your custom processors.
 
-=head1 METHODS AND SUBROUTINES
+=head1 EXPORTED METHODS
 
-By default, only C<process_file> is exported.
+This module exports 1 method by default (C<process_file>). You can
+export all of the default processor methods using the tag ':all'.
+
+ use File::Process qw{ pre post };
+
+ use File::Process qw{ :all };
+
+=head1 METHODS AND SUBROUTINES
 
 =head2 process_file(file, options)
 

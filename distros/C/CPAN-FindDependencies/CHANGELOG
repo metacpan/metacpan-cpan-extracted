@@ -1,3 +1,7 @@
+3.12    2022-04-12
+
+- Fix a minor bug in the tests that caused failures when nothing was actually wrong
+
 3.11    2022-04-07
 
 - Make the order of args to `cpandeps` script unimportant

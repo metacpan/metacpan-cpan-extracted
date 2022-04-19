@@ -73,14 +73,15 @@ share {
   plugin 'PkgConfig::PPWrapper';
 
   my $build_static = ($^O =~ /mswin/i) ? '' : '--disable-shared';
-  $build_static = '';
-  $build_static = '--enable-static=no';  #  override - needed?  leftover from gdal
-  $build_static = '' if $ENV{FORCE_DYNAMIC};
+  #$build_static = '';
+  #$build_static = '--enable-static=no';  #  override - needed?  leftover from gdal
+  $build_static = '--enable-shared=yes';
+  #$build_static = '' if $ENV{FORCE_DYNAMIC};
 
   # most of these are crude  
   # we can enable librttopo when we have an alien for it
   my $extra_build_args
-    = ($on_windows ? '--target=mingw32' : '')
+    = ($on_windows ? '--target=mingw32 ' : '')
       . join ' ', (qw /
       --enable-libxml2=no
       --enable-examples=no
@@ -147,11 +148,29 @@ share {
     \&pause,
     $make_cmd,
     \&patch_rpaths,
+    \&rename_la_files,
     $make_inst_cmd,
     #@make_clean
   ];
 
 };
+
+
+sub rename_la_files {
+    #  need to return if not share
+    return if !$on_windows;
+    
+    use File::Find::Rule;
+    my @la_files
+      = File::Find::Rule->file()
+                        ->name( '*.la' )
+                        ->in( '.' );
+    foreach my $file (@la_files) {
+        Alien::Build->log("Renaming $file so it will not interfere with gdal compilation");
+        rename $file, $file . '.bak';
+    }
+
+}
 
 #  should be a gather hook working on the stage dir
 sub patch_rpaths {

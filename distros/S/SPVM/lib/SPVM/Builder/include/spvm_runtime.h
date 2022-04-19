@@ -15,19 +15,19 @@ struct spvm_runtime {
   SPVM_OPCODE* opcodes;
 
   // The length of operation codes
-  int32_t opcode_ids_length;
+  int32_t opcodes_length;
 
   // String buffer
-  const char* string_buffer;
+  const char* constant_strings_buffer;
 
   // String buffer length
-  int32_t string_buffer_length;
+  int32_t constant_strings_buffer_length;
 
   // Strings
-  SPVM_RUNTIME_STRING* strings;
+  SPVM_RUNTIME_CONSTANT_STRING* constant_strings;
 
   // The length of strings
-  int32_t strings_length;
+  int32_t constant_strings_length;
   
   // Basic types
   SPVM_RUNTIME_BASIC_TYPE* basic_types;
@@ -63,13 +63,13 @@ struct spvm_runtime {
   int32_t* arg_type_ids;
 
   // The length of methods
-  int32_t arg_type_ids_length;
+  int32_t arg_types_length;
 
   // Anon nethod ids
   int32_t* anon_method_method_ids;
 
   // The length of anon method ids
-  int32_t anon_method_method_ids_length;
+  int32_t anon_method_methods_length;
 
   // Class variables
   SPVM_RUNTIME_CLASS_VAR* class_vars;
@@ -84,7 +84,7 @@ struct spvm_runtime {
   int32_t fields_length;
   
   // String symtable
-  SPVM_HASH* string_symtable;
+  SPVM_HASH* constant_string_symtable;
 
   // Runtime Basic type symbol table
   SPVM_HASH* basic_type_symtable;

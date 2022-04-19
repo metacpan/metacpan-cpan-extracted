@@ -1,5 +1,14 @@
 Revision history for Alien::patchelf
 
+0.07 2022-04-16
+    - Share builds:
+      - also check for g++ in c++17 fallback
+      - Solaris: prefix MAKE=gmake to configure call
+
+0.06 2022-04-15
+    - Share builds: Fall back to patchelf 0.13.1 when
+      compiler does not support c++17 (if it is called as "c++")
+
 0.05 2022-04-14
     - Share builds: use Download::Git plugin instead of Download::GitHub
 

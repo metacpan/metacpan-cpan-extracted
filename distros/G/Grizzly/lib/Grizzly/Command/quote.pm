@@ -110,7 +110,7 @@ Grizzly::Command::quote - Gets a stock quote for the given symbol
 
 =head1 VERSION
 
-version 0.103
+version 0.104
 
 =head1 SYNOPSIS
 
@@ -140,7 +140,7 @@ Nobunaga <nobunaga@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2021 by Nobunaga.
+This software is Copyright (c) 2022 by Nobunaga.
 
 This is free software, licensed under:
 

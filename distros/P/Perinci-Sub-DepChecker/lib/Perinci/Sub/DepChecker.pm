@@ -4,7 +4,7 @@ use 5.010001;
 use strict;
 use warnings;
 use experimental 'smartmatch';
-#use Log::Any '$log';
+use Log::ger;
 
 require Exporter;
 our @ISA = qw(Exporter);
@@ -14,8 +14,10 @@ our @EXPORT_OK = qw(
                        list_mentioned_dep_clauses
                );
 
-our $VERSION = '0.11'; # VERSION
-our $DATE = '2015-09-03'; # DATE
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-03-20'; # DATE
+our $DIST = 'Perinci-Sub-DepChecker'; # DIST
+our $VERSION = '0.121'; # VERSION
 
 my $pa;
 
@@ -26,7 +28,7 @@ sub check_deps {
         my $dval = $val->{$dname};
         unless (defined &{"checkdep_$dname"}) {
             # give a chance to load from a module first
-            eval { require "Perinci/Sub/Dep/$dname.pm" };
+            eval { my $mod_pm = "Perinci/Sub/Dep/$dname.pm"; require $mod_pm };
             return "Unknown dependency type: $dname"
                 unless defined &{"checkdep_$dname"};
         }
@@ -82,14 +84,35 @@ sub checkdep_code {
 sub checkdep_prog {
     my ($cval) = @_;
 
-    if ($cval =~ m!/!) {
-        return "Program $cval not executable" unless (-x $cval);
+    $cval = ref $cval eq 'HASH' ? $cval : {name=>$cval};
+    my $prog_name = $cval->{name} or return "BUG: Program name not specified in dependency";
+
+    if ($prog_name =~ m!/!) {
+        return "Program $prog_name not executable" unless (-x $prog_name);
     } else {
         require File::Which;
-        return "Program $cval not found in PATH (".
+        return "Program $prog_name not found in PATH (".
             join(":", File::Spec->path).")"
-                unless File::Which::which($cval);
+                unless File::Which::which($prog_name);
     }
+
+    if (defined $cval->{min_version}) {
+        require IPC::System::Options;
+        require Version::Util;
+
+        if ($prog_name eq 'git') {
+            my $ver = IPC::System::Options::readpipe({log=>1}, "git --version");
+            my ($exit_code, $signal, $core_dump) = ($? < 0 ? $? : $? >> 8, $? & 127, $? & 128);
+            return "ERR: Cannot check git version with 'git --version': exit_code=$exit_code"
+                if $exit_code;
+            ($ver) = $ver =~ /git version (.+)/ or return "ERR: Cannot extract version from response '$ver'";
+            return "git version ($) is less than required ($cval->{min_version})"
+                if Version::Util::version_lt($ver, $cval->{min_version});
+        } else {
+            return "ERR: Cannot check minimum version for program '$prog_name'";
+        }
+    }
+
     "";
 }
 
@@ -213,7 +236,7 @@ Perinci::Sub::DepChecker - Check dependencies from 'deps' property
 
 =head1 VERSION
 
-This document describes version 0.11 of Perinci::Sub::DepChecker (from Perl distribution Perinci-Sub-DepChecker), released on 2015-09-03.
+This document describes version 0.121 of Perinci::Sub::DepChecker (from Perl distribution Perinci-Sub-DepChecker), released on 2022-03-20.
 
 =head1 SYNOPSIS
 
@@ -298,12 +321,6 @@ Example:
 
  list_mentioned_dep_clauses({any=>[{a=>1}, {b=>1}]}) # => [qw/any a b/]
 
-=head1 SEE ALSO
-
-L<Perinci>
-
-'deps' section in L<Rinci::function>
-
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Perinci-Sub-DepChecker>.
@@ -312,6 +329,46 @@ Please visit the project's homepage at L<https://metacpan.org/release/Perinci-Su
 
 Source repository is at L<https://github.com/perlancar/perl-Perinci-Sub-DepChecker>.
 
+=head1 SEE ALSO
+
+L<Perinci>
+
+'deps' section in L<Rinci::function>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <stevenharyanto@gmail.com>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022, 2015, 2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Sub-DepChecker>
@@ -319,16 +376,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2015 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

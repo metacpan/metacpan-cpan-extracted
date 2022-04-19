@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/syohex/p5-List-Utils-By.svg?branch=master)](https://travis-ci.org/syohex/p5-List-Utils-By) [![MetaCPAN Release](https://badge.fury.io/pl/List-UtilsBy-XS.svg)](https://metacpan.org/release/List-UtilsBy-XS)
+[![Actions Status](https://github.com/syohex/p5-List-Utils-By/workflows/CI/badge.svg)](https://github.com/syohex/p5-List-Utils-By/actions) [![MetaCPAN Release](https://badge.fury.io/pl/List-UtilsBy-XS.svg)](https://metacpan.org/release/List-UtilsBy-XS)
 # NAME
 
 List::UtilsBy::XS - XS implementation of List::UtilsBy
@@ -19,7 +19,7 @@ Functions are more fast than original ones.
 
 # FUNCTIONS
 
-Same as [List::UtilsBy](https://metacpan.org/pod/List::UtilsBy)
+Same as [List::UtilsBy](https://metacpan.org/pod/List%3A%3AUtilsBy)
 
 List::UtilsBy::XS implements following functions.
 
@@ -49,7 +49,7 @@ Limitations are:
 
 ## Don't change argument `$_` in code block
 
-[List::UtilsBy](https://metacpan.org/pod/List::UtilsBy) localizes `$_` in the code block, but List::UtilsBy::XS
+[List::UtilsBy](https://metacpan.org/pod/List%3A%3AUtilsBy) localizes `$_` in the code block, but List::UtilsBy::XS
 doesn't localize it and it is only alias same as `map`, `grep`. So you
 should not modify `$_` in callback subroutine.
 
@@ -73,4 +73,4 @@ it under the same terms as Perl itself.
 
 # SEE ALSO
 
-[List::UtilsBy](https://metacpan.org/pod/List::UtilsBy)
+[List::UtilsBy](https://metacpan.org/pod/List%3A%3AUtilsBy)

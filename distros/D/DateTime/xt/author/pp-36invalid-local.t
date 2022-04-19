@@ -10,6 +10,8 @@ use Test::More;
 
 use DateTime;
 
+undef $ENV{PERL_DATETIME_DEFAULT_TZ};
+
 my $badlt_rx = qr/Invalid local time|local time [0-9\-:T]+ does not exist/;
 
 {

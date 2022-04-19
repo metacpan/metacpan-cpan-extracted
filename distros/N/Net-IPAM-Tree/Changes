@@ -1,5 +1,11 @@
 Revision history for Net-IPAM-Tree
 
+3.02    Sun, 17 Apr 2022 21:53:31 +0200
+        - better superset algo
+
+3.01    Mon, 05 Apr 2021 17:03:04 +0200
+        - just POD
+
 3.00    Sat, 03 Apr 2021 18:14:49 +0200
         - ATTENTION: incompatible change, simplified API
         - new algo

@@ -27,6 +27,8 @@ is(slurp($tmp), slurp("example/all.dot"), "$0 output") or do {
     system('diff', '-up', "example/all.dot", $tmp->filename);
 };
 
+my $code = $^O eq "MSWin32" ? 1<<8 : 2<<8;
+
 foreach my $opt (qw(b e p s w)) {
     my $options = '-'.lc($opt).uc($opt);
     my $pid = open(my $fh, '-|');
@@ -40,7 +42,7 @@ foreach my $opt (qw(b e p s w)) {
     }
     my $out = eval { local $/; <$fh> };
     close($fh) || !$! or die "Fork and open pipe failed: $!";
-    is($?, 2<<8, "$0 option $opt")
+    is($?, $code, "$0 option $opt")
 	or diag("Options $options may not be used together");
     like($out, qr{^Error: Options -$opt }m, "$0 usage $opt")
 	or diag("No error: $out");

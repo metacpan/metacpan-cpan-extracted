@@ -337,10 +337,25 @@ sub create_router {
 sub add_missing_router {
     my OSPF::LSDB::View $self = shift;
     my($index) = @_;
+    my %rid2areas;
+    my $nethash = $self->{nethash} or die "Uninitialized member";
+    my @hashes = map { @{$_->{hashes}} } map { values %$_ }
+      map { values %$_ } map { values %$_ } values %$nethash;
+    foreach my $n (@hashes) {
+	my $area = $n->{area};
+	$rid2areas{$n->{routerid}}{$area} = 1;
+	foreach (@{$n->{attachments}}) {
+	    $rid2areas{$_->{routerid}}{$area} = 1;
+	}
+    }
+    $self->add_missing_router_common($index, %rid2areas);
+}
+
+sub add_missing_router_common {
+    my OSPF::LSDB::View $self = shift;
+    my($index, %rid2areas) = @_;
     my $boundhash = $self->{boundhash};
     my $externhash = $self->{externhash};
-    # create router hash
-    my %rid2areas;
     my @rids = map { keys %{$_->{routers}} }
       map { values %$_ } values %$externhash;
     foreach my $rid (@rids) {
@@ -364,16 +379,6 @@ sub add_missing_router {
 	    while (my($area,$av) = each %$dv) {
 		$rid2areas{$dstrid}{$area} = 1;
 	    }
-	}
-    }
-    my $nethash = $self->{nethash} or die "Uninitialized member";
-    my @hashes = map { @{$_->{hashes}} } map { values %$_ }
-      map { values %$_ } map { values %$_ } values %$nethash;
-    foreach my $n (@hashes) {
-	my $area = $n->{area};
-	$rid2areas{$n->{routerid}}{$area} = 1;
-	foreach (@{$n->{attachments}}) {
-	    $rid2areas{$_->{routerid}}{$area} = 1;
 	}
     }
     my $routerid = $self->{ospf}{self}{routerid};

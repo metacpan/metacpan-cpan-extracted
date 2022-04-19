@@ -8,17 +8,23 @@
 struct spvm_env;
 typedef struct spvm_env SPVM_ENV;
 
+struct spvm_env_api;
+typedef struct spvm_env_api SPVM_ENV_API;
+
 struct spvm_env_compiler;
-typedef struct spvm_env SPVM_ENV_COMPILER;
+typedef struct spvm_env_compiler SPVM_ENV_COMPILER;
 
 struct spvm_env_runtime;
-typedef struct spvm_env SPVM_ENV_RUNTIME;
+typedef struct spvm_env_runtime SPVM_ENV_RUNTIME;
+
+struct spvm_env_precompile;
+typedef struct spvm_env_precompile SPVM_ENV_PRECOMPILE;
 
 struct spvm_env_string_buffer;
-typedef struct spvm_env SPVM_ENV_STRING_BUFFER;
+typedef struct spvm_env_string_buffer SPVM_ENV_STRING_BUFFER;
 
 struct spvm_env_allocator;
-typedef struct spvm_env SPVM_ENV_ALLOCATOR;
+typedef struct spvm_env_allocator SPVM_ENV_ALLOCATOR;
 
 typedef union spvm_value SPVM_VALUE;
 
@@ -37,12 +43,6 @@ union spvm_value {
   float* fref;
   double* dref;
 };
-
-
-
-
-
-
 
 
 
@@ -283,63 +283,181 @@ struct spvm_env {
   int32_t (*init_env)(SPVM_ENV* env);
   void (*call_init_blocks)(SPVM_ENV* env);
   void (*cleanup_global_vars)(SPVM_ENV* env);
-  void* (*get_native_method_address)(SPVM_ENV* env, int32_t method_id);
-  void* (*get_precompile_method_address)(SPVM_ENV*, int32_t method_id);
-  void (*set_native_method_address)(SPVM_ENV* env, int32_t method_id, void* address);
-  void (*set_precompile_method_address)(SPVM_ENV* env, int32_t method_id, void* address);
   int32_t (*is_object_array)(SPVM_ENV* env, void* object);
-  int32_t (*get_method_id_without_signature)(SPVM_ENV* env, const char* class_name, const char* method_name);
-  const char* (*get_constant_string_value)(SPVM_ENV* env, int32_t string_id, int32_t* string_length);
-  void* (*compiler_new)();
-  void (*compiler_free)(void* compiler);
-  void (*compiler_set_start_line)(void* compiler, int32_t start_line);
-  int32_t (*compiler_get_start_line)(void* compiler);
-  void (*compiler_set_start_file)(void* compiler, const char* start_file);
-  const char* (*compiler_get_start_file)(void* compiler);
-  void (*compiler_add_module_dir)(void* compiler, const char* module_dir);
-  int32_t (*compiler_get_module_dirs_length )(void* compiler);
-  const char* (*compiler_get_module_dir )(void* compiler, int32_t module_dir_id);
-  int32_t (*compiler_compile_spvm)(void* compiler, const char* class_name);
-  int32_t (*compiler_get_error_messages_length)(void* compiler);
-  const char* (*compiler_get_error_message)(void* compiler, int32_t index);
-  int32_t (*compiler_get_class_id)(void* compiler, const char* class_name);
-  int32_t (*compiler_get_classes_length)(void* compiler);
-  const char* (*compiler_get_class_name)(void* compiler, int32_t class_id);
-  int32_t (*compiler_is_anon_class)(void* compiler, int32_t class_id);
-  int32_t (*compiler_get_methods_length)(void* compiler, int32_t class_id);
-  int32_t (*compiler_get_method_id)(void* compiler, int32_t class_id, int32_t method_index_of_class);
-  int32_t (*compiler_get_method_id_by_name)(void* compiler, const char* class_name, const char* method_name);
-  const char* (*compiler_get_method_name)(void* compiler, int32_t method_id);
-  const char* (*compiler_get_method_signature)(void* compiler, int32_t method_id);
-  int32_t (*compiler_is_anon_method)(void* compiler, int32_t method_id);
-  int32_t (*compiler_is_init_block_method)(void* compiler, int32_t method_id);
-  int32_t (*compiler_is_native_method)(void* compiler, int32_t method_id);
-  int32_t (*compiler_is_precompile_method)(void* compiler, int32_t method_id);
-  void (*compiler_build_runtime)(void* compiler, void* runtime);
   int32_t (*can_assign_array_element)(SPVM_ENV* env, void* array, void* element);
+  SPVM_ENV_API* api;
+  void (*free_env_prepared)(SPVM_ENV* env);
 };
 
-struct spvm_env_allocator {
-  void* (*new_allocator)();
-  void (*free_allocator)(SPVM_ENV_ALLOCATOR* compiler);
-};
 
-struct spvm_env_string_buffer {
-  void* (*new_string_buffer)();
-  void (*free_string_buffer)(SPVM_ENV_STRING_BUFFER* compiler);
+
+
+
+
+
+
+struct spvm_env_runtime {
+  void* (*new_runtime)();
+  void (*free_runtime)(void* runtime);
+  void (*prepare)(void* runtime);
+  int32_t* (*get_opcodes)(void* runtime);
+  int32_t (*get_opcodes_length)(void* runtime);
+  int32_t (*get_classes_length)(void* runtime);
+  int32_t (*get_constant_string_id)(void* runtime, const char* string);
+  const char* (*get_constant_string_value)(void* runtime, int32_t constant_string_id, int32_t* string_length);
+  const char* (*get_name)(void* runtime, int32_t constant_string_id);
+  int32_t (*get_basic_type_id_by_name)(void* runtime, const char* basic_type_name);
+  int32_t (*get_basic_type_name_id)(void* runtime, int32_t basic_type_id);
+  int32_t (*get_basic_type_class_id)(void* runtime, int32_t basic_type_id);
+  int32_t (*get_basic_type_category)(void* runtime, int32_t basic_type_id);
+  int32_t (*get_type_basic_type_id)(void* runtime, int32_t type_id);
+  int32_t (*get_type_dimension)(void* runtime, int32_t type_id);
+  int32_t (*get_type_width)(void* runtime, int32_t type_id);
+  int32_t (*get_type_is_object)(void* runtime, int32_t type_id);
+  int32_t (*get_type_is_ref)(void* runtime, int32_t type_id);
+  int32_t (*get_class_id_by_name)(void* runtime, const char* class_name);
+  int32_t (*get_class_name_id)(void* runtime, int32_t class_id);
+  int32_t (*get_class_module_file_id)(void* runtime, int32_t class_id);
+  int32_t (*get_class_is_anon)(void* runtime, int32_t class_id);
+  int32_t (*get_class_fields_base_id)(void* runtime, int32_t class_id);
+  int32_t (*get_class_fields_length)(void* runtime, int32_t class_id);
+  int32_t (*get_class_methods_base_id)(void* runtime, int32_t class_id);
+  int32_t (*get_class_methods_length)(void* runtime, int32_t class_id);
+  int32_t (*get_class_class_vars_base_id)(void* runtime, int32_t class_id);
+  int32_t (*get_class_class_vars_length)(void* runtime, int32_t class_id);
+  int32_t (*get_class_anon_methods_base_id)(void* runtime, int32_t class_id);
+  int32_t (*get_class_anon_methods_length)(void* runtime, int32_t class_id);
+  int32_t (*get_class_var_id_by_index)(void* runtime, int32_t class_id, int32_t class_var_index);
+  int32_t (*get_class_var_id_by_name)(void* runtime, const char* class_name, const char* class_var_name);
+  int32_t (*get_class_var_name_id)(void* runtime, int32_t class_var_id);
+  int32_t (*get_class_var_signature_id)(void* runtime, int32_t class_var_id);
+  int32_t (*get_class_var_class_id)(void* runtime, int32_t class_var_id);
+  int32_t (*get_field_id_by_index)(void* runtime, int32_t class_id, int32_t field_index);
+  int32_t (*get_field_id_by_name)(void* runtime, const char* class_name, const char* field_name);
+  int32_t (*get_field_name_id)(void* runtime, int32_t field_id);
+  int32_t (*get_field_type_id)(void* runtime, int32_t field_id);
+  int32_t (*get_field_signature_id)(void* runtime, int32_t field_id);
+  int32_t (*get_field_class_id)(void* runtime, int32_t field_id);
+  int32_t (*get_method_id_by_index)(void* runtime, int32_t class_id, int32_t method_index);
+  int32_t (*get_method_id_by_name)(void* runtime, const char* class_name, const char* method_name);
+  int32_t (*get_method_name_id)(void* runtime, int32_t method_id);
+  int32_t (*get_method_signature_id)(void* runtime, int32_t method_id);
+  int32_t (*get_method_return_type_id)(void* runtime, int32_t method_id);
+  int32_t (*get_method_class_id)(void* runtime, int32_t method_id);
+  int32_t (*get_method_is_class_method)(void* runtime, int32_t method_id);
+  int32_t (*get_method_is_anon)(void* runtime, int32_t method_id);
+  int32_t (*get_method_is_native)(void* runtime, int32_t method_id);
+  int32_t (*get_method_is_precompile)(void* runtime, int32_t method_id);
+  int32_t (*get_method_call_stack_byte_vars_length)(void* runtime, int32_t method_id);
+  int32_t (*get_method_call_stack_short_vars_length)(void* runtime, int32_t method_id);
+  int32_t (*get_method_call_stack_int_vars_length)(void* runtime, int32_t method_id);
+  int32_t (*get_method_call_stack_long_vars_length)(void* runtime, int32_t method_id);
+  int32_t (*get_method_call_stack_float_vars_length)(void* runtime, int32_t method_id);
+  int32_t (*get_method_call_stack_double_vars_length)(void* runtime, int32_t method_id);
+  int32_t (*get_method_call_stack_object_vars_length)(void* runtime, int32_t method_id);
+  int32_t (*get_method_call_stack_ref_vars_length)(void* runtime, int32_t method_id);
+  int32_t (*get_method_mortal_stack_length)(void* runtime, int32_t method_id);
+  int32_t (*get_method_opcodes_base_id)(void* runtime, int32_t method_id);
+  int32_t (*get_method_opcodes_length)(void* runtime, int32_t method_id);
+  int32_t (*get_method_args_base_id)(void* runtime, int32_t method_id);
+  int32_t (*get_method_args_length)(void* runtime, int32_t method_id);
+  int32_t (*get_arg_type_id)(void* runtime, int32_t arg_id);
+  int32_t (*get_anon_method_method_id)(void* runtime, int32_t anon_method_id);
+  void* (*get_native_method_address)(void* runtime, int32_t method_id);
+  void (*set_native_method_address)(void* runtime, int32_t method_id, void* address);
+  void* (*get_precompile_method_address)(SPVM_ENV*, int32_t method_id);
+  void (*set_precompile_method_address)(void* runtime, int32_t method_id, void* address);
+  void* object_header_byte_size;
+  void* object_weaken_backref_head_offset;
+  void* object_ref_count_offset;
+  void* object_basic_type_id_offset;
+  void* object_type_dimension_offset;
+  void* object_flag_offset;
+  void* object_length_offset;
 };
 
 struct spvm_env_compiler {
   void* (*new_compiler)();
-  void (*free_compiler)(SPVM_ENV_COMPILER* compiler);
+  void (*free_compiler)(void* compiler);
+  void (*set_start_line)(void* compiler, int32_t start_line);
+  int32_t (*get_start_line)(void* compiler);
+  void (*set_start_file)(void* compiler, const char* start_file);
+  const char* (*get_start_file)(void* compiler);
+  void (*add_module_dir)(void* compiler, const char* module_dir);
+  int32_t (*get_module_dirs_length )(void* compiler);
+  const char* (*get_module_dir )(void* compiler, int32_t module_dir_id);
+  int32_t (*compile_spvm)(void* compiler, const char* class_name);
+  int32_t (*get_error_messages_length)(void* compiler);
+  const char* (*get_error_message)(void* compiler, int32_t index);
+  void (*build_runtime)(void* compiler, void* runtime);
+  const char* (*get_module_source_by_name)(void* compiler, const char* class_name);
+  void (*set_module_source_by_name)(void* compiler, const char* class_name, const char* module_source);
 };
 
-struct spvm_env_runtime {
-  void* (*new_runtime)();
-  void (*free_runtime)(SPVM_ENV_RUNTIME* compiler);
+struct spvm_env_precompile {
+  void* (*new_precompile)();
+  void (*free_precompile)(void* precompile);
+  void (*set_runtime)(void* precompile, void* runtime);
+  void* (*get_runtime)(void* precompile);
+  void (*create_precompile_source)(void* precompile, void* string_buffer, const char* class_name);
 };
 
 SPVM_ENV* SPVM_NATIVE_new_env_raw();
 SPVM_ENV* SPVM_NATIVE_new_env_prepared();
+
+enum {
+  SPVM_NATIVE_C_BASIC_TYPE_ID_UNKNOWN,
+  SPVM_NATIVE_C_BASIC_TYPE_ID_UNDEF,
+  SPVM_NATIVE_C_BASIC_TYPE_ID_VOID,
+  SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE,
+  SPVM_NATIVE_C_BASIC_TYPE_ID_SHORT,
+  SPVM_NATIVE_C_BASIC_TYPE_ID_INT,
+  SPVM_NATIVE_C_BASIC_TYPE_ID_LONG,
+  SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT,
+  SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE,
+  SPVM_NATIVE_C_BASIC_TYPE_ID_STRING,
+  SPVM_NATIVE_C_BASIC_TYPE_ID_ANY_OBJECT,
+  SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE_OBJECT,
+  SPVM_NATIVE_C_BASIC_TYPE_ID_SHORT_OBJECT,
+  SPVM_NATIVE_C_BASIC_TYPE_ID_INT_OBJECT,
+  SPVM_NATIVE_C_BASIC_TYPE_ID_LONG_OBJECT,
+  SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT_OBJECT,
+  SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE_OBJECT,
+  SPVM_NATIVE_C_BASIC_TYPE_ID_BOOL_OBJECT,
+};
+
+enum {
+  SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_UNKNOWN,
+  SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_NOT_FOUND_CLASS,
+  SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_UNDEF,
+  SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_VOID,
+  SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_NUMERIC,
+  SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_MULNUM,
+  SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_STRING,
+  SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_CLASS,
+  SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_INTERFACE,
+  SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_CALLBACK,
+  SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_ANY_OBJECT,
+};
+
+struct spvm_env_allocator {
+  void* (*new_allocator)();
+  void (*free_allocator)(void* allocator);
+};
+
+struct spvm_env_string_buffer {
+  void* (*new_string_buffer_tmp)();
+  void (*free_string_buffer)(void* string_buffer);
+  const char* (*get_value)(void* string_buffer);
+  int32_t (*get_length)(void* string_buffer);
+};
+
+struct spvm_env_api {
+  SPVM_ENV_ALLOCATOR* allocator;
+  SPVM_ENV_STRING_BUFFER* string_buffer;
+  SPVM_ENV_COMPILER* compiler;
+  SPVM_ENV_PRECOMPILE* precompile;
+  SPVM_ENV_RUNTIME* runtime;
+};
 
 #endif

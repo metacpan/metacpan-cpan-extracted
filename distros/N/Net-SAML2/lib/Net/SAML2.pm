@@ -1,13 +1,11 @@
 use strict;
 use warnings;
 package Net::SAML2;
+our $VERSION = '0.55'; # VERSION
 
 require 5.008_001;
 
 # ABSTRACT: SAML2 bindings and protocol implementation
-
-our $VERSION = '0.53';
-$VERSION = eval {$VERSION};
 
 
 # entities
@@ -41,7 +39,7 @@ Net::SAML2 - SAML2 bindings and protocol implementation
 
 =head1 VERSION
 
-version 0.53
+version 0.55
 
 =head1 SYNOPSIS
 
@@ -101,7 +99,9 @@ version 0.53
 
         if ($ret) {
                 my $assertion = Net::SAML2::Protocol::Assertion->new_from_xml(
-                        xml => decode_base64($saml_response)
+                        xml         => decode_base64($saml_response),
+                        key_file    => "SP-Private-Key.pem",    # Required for EncryptedAssertions
+                        cacert      => "IdP-cacert.pem",        # Required for EncryptedAssertions
                 );
 
                 # ...
@@ -131,6 +131,9 @@ Identity Providers (IdPs).  It has been tested against:
 =item Auth0 (requires Net::SAML2 >=0.39)
 
 =item PingIdentity
+
+Version 0.54 and newer support EncryptedAssertions.  No changes required to existing
+SP applications if EncryptedAssertions are not in use.
 
 =back
 

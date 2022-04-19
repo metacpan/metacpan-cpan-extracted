@@ -10,6 +10,8 @@ use Test::Warnings 0.005 ':all';
 
 use DateTime;
 
+undef $ENV{PERL_DATETIME_DEFAULT_TZ};
+
 my $year_5001_epoch = 95649120000;
 
 ## no critic (TestingAndDebugging::ProhibitNoWarnings)

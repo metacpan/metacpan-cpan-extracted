@@ -1,3 +1,7 @@
+1.008 2022-04-16
+
+  * fix: handle SPDX short name like LGPL-3.0-only
+
 1.007 2022-04-13
 
   * Add missing dependency on Software::License >= 0.103014

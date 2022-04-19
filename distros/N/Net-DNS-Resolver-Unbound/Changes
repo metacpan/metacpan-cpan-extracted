@@ -1,6 +1,10 @@
 Revision history for Perl extension Net::DNS::Resolver::Unbound.
 
 
+**** 1.12  [unreleased]
+	Documentation nit-picking.
+
+
 **** 1.11  Mar 28, 2022
 	Ignore unimplemented prefer-ip* options in old Unbound.
 

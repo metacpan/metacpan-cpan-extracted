@@ -16,7 +16,7 @@
 #include "spvm_list.h"
 #include "spvm_method.h"
 #include "spvm_var.h"
-#include "spvm_my.h"
+#include "spvm_var_decl.h"
 #include "spvm_allocator.h"
 #include "spvm_class.h"
 #include "spvm_field_access.h"
@@ -34,7 +34,7 @@
 #include "spvm_basic_type.h"
 #include "spvm_case_info.h"
 #include "spvm_array_field_access.h"
-#include "spvm_string.h"
+#include "spvm_constant_string.h"
 
 void SPVM_OPCODE_BUILDER_set_opcode_id(SPVM_COMPILER* compiler, SPVM_OPCODE* opcode, int32_t opcode_id) {
   opcode->id = opcode_id;
@@ -51,7 +51,7 @@ void SPVM_OPCODE_BUILDER_push_if_die(
 )
 {
   SPVM_METHOD* method = op_method->uv.method;
-  int32_t method_opcode_ids_base = method->opcode_ids_base;
+  int32_t method_opcodes_base_id = method->opcodes_base_id;
   
   if (push_eval_opcode_rel_index_stack->length > 0) {
     SPVM_OPCODE opcode;
@@ -63,7 +63,7 @@ void SPVM_OPCODE_BUILDER_push_if_die(
     
     SPVM_OPCODE_ARRAY_push_opcode(compiler, opcode_array, &opcode);
     
-    int32_t if_die_catch_opcode_rel_index = opcode_array->length - 1 - method_opcode_ids_base;
+    int32_t if_die_catch_opcode_rel_index = opcode_array->length - 1 - method_opcodes_base_id;
     
     SPVM_LIST_push(if_die_catch_goto_opcode_rel_index_stack, (void*)(intptr_t)if_die_catch_opcode_rel_index);
   }
@@ -75,7 +75,7 @@ void SPVM_OPCODE_BUILDER_push_if_die(
     opcode.operand2 = line;
     SPVM_OPCODE_ARRAY_push_opcode(compiler, opcode_array, &opcode);
 
-    int32_t if_die_return_opcode_rel_index = opcode_array->length - 1 - method_opcode_ids_base;
+    int32_t if_die_return_opcode_rel_index = opcode_array->length - 1 - method_opcodes_base_id;
     
     SPVM_LIST_push(if_die_return_goto_opcode_rel_index_stack, (void*)(intptr_t)(if_die_return_opcode_rel_index));
   }
@@ -160,9 +160,9 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
           // Object temporary variable stack
           SPVM_LIST* object_op_var_tmp_stack = SPVM_LIST_new(compiler->allocator, 0, SPVM_ALLOCATOR_C_ALLOC_TYPE_TMP);
           
-          int32_t method_opcode_ids_base = opcode_array->length;
+          int32_t method_opcodes_base_id = opcode_array->length;
           
-          method->opcode_ids_base = method_opcode_ids_base;
+          method->opcodes_base_id = method_opcodes_base_id;
           
           // Run OPs
           SPVM_OP* op_base = method->op_block;
@@ -174,55 +174,27 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
           // Copy arguments to variables
           int32_t stack_index = 0;
           for (int32_t args_index = 0; args_index < method->args_length; args_index++) {
-            SPVM_MY* arg = SPVM_LIST_get(method->mys, args_index);
+            SPVM_VAR_DECL* arg = SPVM_LIST_get(method->var_decls, args_index);
             SPVM_TYPE* arg_type = arg->type;
+            int32_t arg_type_dimension = arg->type->dimension;
             SPVM_BASIC_TYPE* arg_basic_type = arg_type->basic_type;
+            int32_t arg_type_is_ref = SPVM_TYPE_is_ref_type(compiler, arg_basic_type->id, arg_type_dimension, arg_type->flag);
+            int32_t arg_basic_type_category = arg_type->basic_type->category;
             
             SPVM_OPCODE opcode;
             memset(&opcode, 0, sizeof(SPVM_OPCODE));
             int32_t type_width = arg_type->width;
-            switch (arg_type->category) {
-              case SPVM_TYPE_C_CATEGORY_NUMERIC: {
-                switch (arg_basic_type->id) {
-                  case SPVM_BASIC_TYPE_C_ID_BYTE: {
-                    SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_ARG_BYTE);
+
+            if (arg_type_dimension == 0) {
+              if (arg_type_is_ref) {
+                switch (arg_basic_type_category) {
+                  case SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_NUMERIC:
+                  case SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_MULNUM:
+                  {
+                    SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_ARG_REF);
                     opcode.operand1 = arg->mem_id;
                     opcode.operand2 = stack_index;
-                    stack_index++;
-                    break;
-                  }
-                  case SPVM_BASIC_TYPE_C_ID_SHORT: {
-                    SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_ARG_SHORT);
-                    opcode.operand1 = arg->mem_id;
-                    opcode.operand2 = stack_index;
-                    stack_index++;
-                    break;
-                  }
-                  case SPVM_BASIC_TYPE_C_ID_INT: {
-                    SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_ARG_INT);
-                    opcode.operand1 = arg->mem_id;
-                    opcode.operand2 = stack_index;
-                    stack_index++;
-                    break;
-                  }
-                  case SPVM_BASIC_TYPE_C_ID_LONG: {
-                    SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_ARG_LONG);
-                    opcode.operand1 = arg->mem_id;
-                    opcode.operand2 = stack_index;
-                    stack_index++;
-                    break;
-                  }
-                  case SPVM_BASIC_TYPE_C_ID_FLOAT: {
-                    SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_ARG_FLOAT);
-                    opcode.operand1 = arg->mem_id;
-                    opcode.operand2 = stack_index;
-                    stack_index++;
-                    break;
-                  }
-                  case SPVM_BASIC_TYPE_C_ID_DOUBLE: {
-                    SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_ARG_DOUBLE);
-                    opcode.operand1 = arg->mem_id;
-                    opcode.operand2 = stack_index;
+                    opcode.operand3 = type_width;
                     stack_index++;
                     break;
                   }
@@ -230,80 +202,148 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                     assert(0);
                   }
                 }
-                break;
               }
-              case SPVM_TYPE_C_CATEGORY_MULNUM:
-              {
-                SPVM_CLASS* arg_class = arg_basic_type->class;
-                SPVM_FIELD* arg_mulnum_field = SPVM_LIST_get(arg_class->fields, 0);
-                SPVM_TYPE* arg_mulnum_field_type = arg_mulnum_field->type;
-                SPVM_BASIC_TYPE* arg_mulnum_field_basic_type = arg_mulnum_field_type->basic_type;
-                
-                switch (arg_mulnum_field_basic_type->id) {
-                  case SPVM_BASIC_TYPE_C_ID_BYTE: {
-                    SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_ARG_MULNUM_BYTE);
+              else {
+                switch (arg_basic_type_category) {
+                  case SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_NUMERIC: {
+                    switch (arg_basic_type->id) {
+                      case SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE: {
+                        SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_ARG_BYTE);
+                        opcode.operand1 = arg->mem_id;
+                        opcode.operand2 = stack_index;
+                        stack_index++;
+                        break;
+                      }
+                      case SPVM_NATIVE_C_BASIC_TYPE_ID_SHORT: {
+                        SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_ARG_SHORT);
+                        opcode.operand1 = arg->mem_id;
+                        opcode.operand2 = stack_index;
+                        stack_index++;
+                        break;
+                      }
+                      case SPVM_NATIVE_C_BASIC_TYPE_ID_INT: {
+                        SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_ARG_INT);
+                        opcode.operand1 = arg->mem_id;
+                        opcode.operand2 = stack_index;
+                        stack_index++;
+                        break;
+                      }
+                      case SPVM_NATIVE_C_BASIC_TYPE_ID_LONG: {
+                        SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_ARG_LONG);
+                        opcode.operand1 = arg->mem_id;
+                        opcode.operand2 = stack_index;
+                        stack_index++;
+                        break;
+                      }
+                      case SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT: {
+                        SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_ARG_FLOAT);
+                        opcode.operand1 = arg->mem_id;
+                        opcode.operand2 = stack_index;
+                        stack_index++;
+                        break;
+                      }
+                      case SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE: {
+                        SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_ARG_DOUBLE);
+                        opcode.operand1 = arg->mem_id;
+                        opcode.operand2 = stack_index;
+                        stack_index++;
+                        break;
+                      }
+                      default: {
+                        assert(0);
+                      }
+                    }
                     break;
                   }
-                  case SPVM_BASIC_TYPE_C_ID_SHORT: {
-                    SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_ARG_MULNUM_SHORT);
+                  case SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_MULNUM:
+                  {
+                    SPVM_CLASS* arg_class = arg_basic_type->class;
+                    SPVM_FIELD* arg_mulnum_field = SPVM_LIST_get(arg_class->fields, 0);
+                    SPVM_TYPE* arg_mulnum_field_type = arg_mulnum_field->type;
+                    SPVM_BASIC_TYPE* arg_mulnum_field_basic_type = arg_mulnum_field_type->basic_type;
+                    
+                    switch (arg_mulnum_field_basic_type->id) {
+                      case SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE: {
+                        SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_ARG_MULNUM_BYTE);
+                        break;
+                      }
+                      case SPVM_NATIVE_C_BASIC_TYPE_ID_SHORT: {
+                        SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_ARG_MULNUM_SHORT);
+                        break;
+                      }
+                      case SPVM_NATIVE_C_BASIC_TYPE_ID_INT: {
+                        SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_ARG_MULNUM_INT);
+                        break;
+                      }
+                      case SPVM_NATIVE_C_BASIC_TYPE_ID_LONG: {
+                        SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_ARG_MULNUM_LONG);
+                        break;
+                      }
+                      case SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT: {
+                        SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_ARG_MULNUM_FLOAT);
+                        break;
+                      }
+                      case SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE: {
+                        SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_ARG_MULNUM_DOUBLE);
+                        break;
+                      }
+                    }
+                    opcode.operand1 = arg->mem_id;
+                    opcode.operand2 = stack_index;
+                    opcode.operand3 = type_width;
+                    stack_index += type_width;
                     break;
                   }
-                  case SPVM_BASIC_TYPE_C_ID_INT: {
-                    SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_ARG_MULNUM_INT);
+                  case SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_STRING:
+                  case SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_CLASS:
+                  case SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_INTERFACE:
+                  case SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_CALLBACK:
+                  case SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_ANY_OBJECT:
+                  {
+                    SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_ARG_OBJECT);
+                    opcode.operand1 = arg->mem_id;
+                    opcode.operand2 = stack_index;
+                    opcode.operand3 = type_width;
+                    stack_index++;
                     break;
                   }
-                  case SPVM_BASIC_TYPE_C_ID_LONG: {
-                    SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_ARG_MULNUM_LONG);
-                    break;
-                  }
-                  case SPVM_BASIC_TYPE_C_ID_FLOAT: {
-                    SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_ARG_MULNUM_FLOAT);
-                    break;
-                  }
-                  case SPVM_BASIC_TYPE_C_ID_DOUBLE: {
-                    SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_ARG_MULNUM_DOUBLE);
-                    break;
+                  default: {
+                    assert(0);
                   }
                 }
-                opcode.operand1 = arg->mem_id;
-                opcode.operand2 = stack_index;
-                opcode.operand3 = type_width;
-                stack_index += type_width;
-                break;
               }
-              case SPVM_TYPE_C_CATEGORY_STRING:
-              case SPVM_TYPE_C_CATEGORY_CLASS:
-              case SPVM_TYPE_C_CATEGORY_INTERFACE:
-              case SPVM_TYPE_C_CATEGORY_CALLBACK:
-              case SPVM_TYPE_C_CATEGORY_ANY_OBJECT:
-              case SPVM_TYPE_C_CATEGORY_NUMERIC_ARRAY:
-              case SPVM_TYPE_C_CATEGORY_MULNUM_ARRAY:
-              case SPVM_TYPE_C_CATEGORY_STRING_ARRAY:
-              case SPVM_TYPE_C_CATEGORY_CLASS_ARRAY:
-              case SPVM_TYPE_C_CATEGORY_INTERFACE_ARRAY:
-              case SPVM_TYPE_C_CATEGORY_CALLBACK_ARRAY:
-              case SPVM_TYPE_C_CATEGORY_ANY_OBJECT_ARRAY:
-              case SPVM_TYPE_C_CATEGORY_MULDIM_ARRAY:
-              {
-                SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_ARG_OBJECT);
-                opcode.operand1 = arg->mem_id;
-                opcode.operand2 = stack_index;
-                opcode.operand3 = type_width;
-                stack_index++;
-                break;
+            }
+            else if (arg_type_dimension == 1) {
+              switch (arg_basic_type_category) {
+                case SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_NUMERIC:
+                case SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_MULNUM:
+                case SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_STRING:
+                case SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_CLASS:
+                case SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_INTERFACE:
+                case SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_CALLBACK:
+                case SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_ANY_OBJECT:
+                {
+                  SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_ARG_OBJECT);
+                  opcode.operand1 = arg->mem_id;
+                  opcode.operand2 = stack_index;
+                  opcode.operand3 = type_width;
+                  stack_index++;
+                  break;
+                }
+                default: {
+                  assert(0);
+                }
               }
-              case SPVM_TYPE_C_CATEGORY_NUMERIC_REF:
-              case SPVM_TYPE_C_CATEGORY_MULNUM_REF:
-              {
-                SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_ARG_REF);
-                opcode.operand1 = arg->mem_id;
-                opcode.operand2 = stack_index;
-                opcode.operand3 = type_width;
-                stack_index++;
-                break;
-              }
-              default:
-                assert(0);
+            }
+            else if (arg_type_dimension == 2) {
+              SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_ARG_OBJECT);
+              opcode.operand1 = arg->mem_id;
+              opcode.operand2 = stack_index;
+              opcode.operand3 = type_width;
+              stack_index++;
+            }
+            else {
+              assert(0);
             }
             
             SPVM_OPCODE_ARRAY_push_opcode(compiler, opcode_array, &opcode);
@@ -335,7 +375,7 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                   SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GOTO);
                   SPVM_OPCODE_ARRAY_push_opcode(compiler, opcode_array, &opcode);
                   
-                  int32_t opcode_rel_index = opcode_array->length - 1 - method_opcode_ids_base;
+                  int32_t opcode_rel_index = opcode_array->length - 1 - method_opcodes_base_id;
                   
                   SPVM_LIST_push(loop_first_goto_opcode_rel_index_stack, (void*)(intptr_t)opcode_rel_index);
                 }
@@ -345,7 +385,7 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                   SPVM_LIST_push(break_block_base_stack, (void*)(intptr_t)break_block_base);
                 }
                 else if (op_cur->uv.block->id == SPVM_BLOCK_C_ID_EVAL) {
-                  int32_t opcode_rel_index = opcode_array->length - method_opcode_ids_base;
+                  int32_t opcode_rel_index = opcode_array->length - method_opcodes_base_id;
                   
                   SPVM_LIST_push(push_eval_opcode_rel_index_stack, (void*)(intptr_t)opcode_rel_index);
 
@@ -368,7 +408,7 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
               case SPVM_OP_C_ID_CASE: {
                 if (switch_info_stack->length > 0) {
                   SPVM_SWITCH_INFO* switch_info = SPVM_LIST_get(switch_info_stack, switch_info_stack->length - 1);
-                  int32_t opcode_rel_index = opcode_array->length - method_opcode_ids_base;
+                  int32_t opcode_rel_index = opcode_array->length - method_opcodes_base_id;
                   op_cur->uv.case_info->opcode_rel_index = opcode_rel_index;
                 }
                 break;
@@ -376,7 +416,7 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
               case SPVM_OP_C_ID_DEFAULT: {
                 if (switch_info_stack->length > 0) {
                   SPVM_SWITCH_INFO* switch_info = SPVM_LIST_get(switch_info_stack, switch_info_stack->length - 1);
-                  switch_info->default_opcode_rel_index = opcode_array->length - method_opcode_ids_base;
+                  switch_info->default_opcode_rel_index = opcode_array->length - method_opcodes_base_id;
                 }
                 break;
               }
@@ -402,15 +442,15 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                         SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GOTO);
                         SPVM_OPCODE_ARRAY_push_opcode(compiler, opcode_array, &opcode);
                         
-                        int32_t opcode_rel_index = opcode_array->length - 1 - method_opcode_ids_base;
+                        int32_t opcode_rel_index = opcode_array->length - 1 - method_opcodes_base_id;
                         SPVM_LIST_push(if_block_end_goto_opcode_rel_index_stack, (void*)(intptr_t)opcode_rel_index);
                       }
 
                       int32_t if_eq_or_if_ne_goto_opcode_rel_index = (intptr_t)SPVM_LIST_pop(if_eq_or_if_ne_goto_opcode_rel_index_stack);
                       
                       // Set jump
-                      SPVM_OPCODE* if_eq_or_if_ne_goto = (opcode_array->values + method_opcode_ids_base + if_eq_or_if_ne_goto_opcode_rel_index);
-                      int32_t if_eq_or_if_ne_jump_opcode_rel_index = opcode_array->length - method_opcode_ids_base;
+                      SPVM_OPCODE* if_eq_or_if_ne_goto = (opcode_array->values + method_opcodes_base_id + if_eq_or_if_ne_goto_opcode_rel_index);
+                      int32_t if_eq_or_if_ne_jump_opcode_rel_index = opcode_array->length - method_opcodes_base_id;
                       if_eq_or_if_ne_goto->operand0 = if_eq_or_if_ne_jump_opcode_rel_index;
                     }
                     else if (op_cur->uv.block->id == SPVM_BLOCK_C_ID_ELSE) {
@@ -419,8 +459,8 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                       
                       int32_t if_block_end_goto_opcode_rel_index = (intptr_t)SPVM_LIST_pop(if_block_end_goto_opcode_rel_index_stack);
                       
-                      SPVM_OPCODE* if_block_end_goto = (opcode_array->values + method_opcode_ids_base + if_block_end_goto_opcode_rel_index);
-                      int32_t if_block_end_jump_opcode_rel_index = opcode_array->length - method_opcode_ids_base;
+                      SPVM_OPCODE* if_block_end_goto = (opcode_array->values + method_opcodes_base_id + if_block_end_goto_opcode_rel_index);
+                      int32_t if_block_end_jump_opcode_rel_index = opcode_array->length - method_opcodes_base_id;
                       if_block_end_goto->operand0 = if_block_end_jump_opcode_rel_index;
                     }
                     else if (op_cur->uv.block->id == SPVM_BLOCK_C_ID_LOOP_INIT) {
@@ -432,8 +472,8 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                       for (int32_t i = 0; i < last_goto_opcode_rel_index_stack_pop_count; i++) {
                         int32_t last_goto_opcode_rel_index = (intptr_t)SPVM_LIST_pop(last_goto_opcode_rel_index_stack);
                         
-                        SPVM_OPCODE* last_goto = (opcode_array->values + method_opcode_ids_base + last_goto_opcode_rel_index);
-                        int32_t last_goto_jump_opcode_rel_index = opcode_array->length - method_opcode_ids_base;
+                        SPVM_OPCODE* last_goto = (opcode_array->values + method_opcodes_base_id + last_goto_opcode_rel_index);
+                        int32_t last_goto_jump_opcode_rel_index = opcode_array->length - method_opcodes_base_id;
                         last_goto->operand0 = last_goto_jump_opcode_rel_index;
                       }
                     }
@@ -446,8 +486,8 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                       for (int32_t i = 0; i < next_goto_opcode_rel_index_stack_pop_count; i++) {
                         int32_t next_goto_opcode_rel_index = (intptr_t)SPVM_LIST_pop(next_goto_opcode_rel_index_stack);
                         
-                        SPVM_OPCODE* next_goto = (opcode_array->values + method_opcode_ids_base + next_goto_opcode_rel_index);
-                        int32_t next_goto_jump_opcode_rel_index = opcode_array->length - method_opcode_ids_base;
+                        SPVM_OPCODE* next_goto = (opcode_array->values + method_opcodes_base_id + next_goto_opcode_rel_index);
+                        int32_t next_goto_jump_opcode_rel_index = opcode_array->length - method_opcodes_base_id;
                         next_goto->operand0 = next_goto_jump_opcode_rel_index;
                       }
                     }
@@ -460,8 +500,8 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                       for (int32_t i = 0; i < break_goto_opcode_rel_index_stack_pop_count; i++) {
                         int32_t break_goto_opcode_rel_index = (intptr_t)SPVM_LIST_pop(break_goto_opcode_rel_index_stack);
                         
-                        SPVM_OPCODE* break_goto = (opcode_array->values + method_opcode_ids_base + break_goto_opcode_rel_index);
-                        int32_t break_goto_jump_opcode_rel_index = opcode_array->length - method_opcode_ids_base;
+                        SPVM_OPCODE* break_goto = (opcode_array->values + method_opcodes_base_id + break_goto_opcode_rel_index);
+                        int32_t break_goto_jump_opcode_rel_index = opcode_array->length - method_opcodes_base_id;
                         break_goto->operand0 = break_goto_jump_opcode_rel_index;
                       }
                     }
@@ -470,8 +510,8 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                       while (if_die_catch_goto_opcode_rel_index_stack->length > 0) {
                         int32_t if_die_catch_goto_opcode_rel_index = (intptr_t)SPVM_LIST_pop(if_die_catch_goto_opcode_rel_index_stack);
                         
-                        SPVM_OPCODE* if_die_catch_goto = (opcode_array->values + method_opcode_ids_base + if_die_catch_goto_opcode_rel_index);
-                        int32_t if_die_catch_goto_jump_rel_index = opcode_array->length - method_opcode_ids_base;
+                        SPVM_OPCODE* if_die_catch_goto = (opcode_array->values + method_opcodes_base_id + if_die_catch_goto_opcode_rel_index);
+                        int32_t if_die_catch_goto_jump_rel_index = opcode_array->length - method_opcodes_base_id;
                         if_die_catch_goto->operand0 = if_die_catch_goto_jump_rel_index;
                       }
                       
@@ -482,8 +522,8 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                         
                         int32_t return_goto_opcode_rel_index = (intptr_t)SPVM_LIST_pop(return_goto_opcode_rel_index_stack);
                         
-                        SPVM_OPCODE* return_goto = (opcode_array->values + method_opcode_ids_base + return_goto_opcode_rel_index);
-                        int32_t return_goto_jump_opcode_rel_index = opcode_array->length - method_opcode_ids_base;
+                        SPVM_OPCODE* return_goto = (opcode_array->values + method_opcodes_base_id + return_goto_opcode_rel_index);
+                        int32_t return_goto_jump_opcode_rel_index = opcode_array->length - method_opcodes_base_id;
                         return_goto->operand1 = return_goto_jump_opcode_rel_index;
                       }
 
@@ -491,8 +531,8 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                       while (if_die_return_goto_opcode_rel_index_stack->length > 0) {
                         int32_t if_die_return_goto_opcode_rel_index = (intptr_t)SPVM_LIST_pop(if_die_return_goto_opcode_rel_index_stack);
                         
-                        SPVM_OPCODE* if_die_return_goto = (opcode_array->values + method_opcode_ids_base + if_die_return_goto_opcode_rel_index);
-                        int32_t if_die_return_goto_jump_opcode_rel_index = opcode_array->length - method_opcode_ids_base;
+                        SPVM_OPCODE* if_die_return_goto = (opcode_array->values + method_opcodes_base_id + if_die_return_goto_opcode_rel_index);
+                        int32_t if_die_return_goto_jump_opcode_rel_index = opcode_array->length - method_opcodes_base_id;
                         if_die_return_goto->operand0 = if_die_return_goto_jump_opcode_rel_index;
                       }
                     }
@@ -522,9 +562,9 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                   case SPVM_OP_C_ID_VAR: {
                     if (op_cur->uv.var->is_declaration) {
                       
-                      SPVM_MY* my = op_cur->uv.var->my;
+                      SPVM_VAR_DECL* var_decl = op_cur->uv.var->var_decl;
                       
-                      SPVM_TYPE* type = SPVM_OP_get_type(compiler, my->op_my);
+                      SPVM_TYPE* type = SPVM_OP_get_type(compiler, var_decl->op_var_decl);
                       if (SPVM_TYPE_is_object_type(compiler, type->basic_type->id, type->dimension, type->flag)) {
                         
                         SPVM_OPCODE opcode;
@@ -544,7 +584,7 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                       }
                       
                       // Initialized not initialized variable
-                      if (!op_cur->uv.var->is_initialized && !op_cur->uv.var->my->is_arg) {
+                      if (!op_cur->uv.var->is_initialized && !op_cur->uv.var->var_decl->is_arg) {
                         // Multi numeric type
                         if (SPVM_TYPE_is_mulnum_type(compiler, type->basic_type->id, type->dimension, type->flag)) {
                           SPVM_CLASS* value_class = type->basic_type->class;
@@ -562,32 +602,32 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                           int32_t mem_id_out;
                           int32_t mem_id_in;
                           switch (field_type->basic_type->id) {
-                            case SPVM_BASIC_TYPE_C_ID_BYTE: {
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE: {
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_INIT_MULNUM_BYTE);
                               mem_id_out = SPVM_OP_get_mem_id(compiler, op_cur);
                               break;
                             }
-                            case SPVM_BASIC_TYPE_C_ID_SHORT: {
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_SHORT: {
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_INIT_MULNUM_SHORT);
                               mem_id_out = SPVM_OP_get_mem_id(compiler, op_cur);
                               break;
                             }
-                            case SPVM_BASIC_TYPE_C_ID_INT: {
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_INT: {
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_INIT_MULNUM_INT);
                               mem_id_out = SPVM_OP_get_mem_id(compiler, op_cur);
                               break;
                             }
-                            case SPVM_BASIC_TYPE_C_ID_LONG: {
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_LONG: {
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_INIT_MULNUM_LONG);
                               mem_id_out = SPVM_OP_get_mem_id(compiler, op_cur);
                               break;
                             }
-                            case SPVM_BASIC_TYPE_C_ID_FLOAT: {
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT: {
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_INIT_MULNUM_FLOAT);
                               mem_id_out = SPVM_OP_get_mem_id(compiler, op_cur);
                               break;
                             }
-                            case SPVM_BASIC_TYPE_C_ID_DOUBLE: {
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE: {
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_INIT_MULNUM_DOUBLE);
                               mem_id_out = SPVM_OP_get_mem_id(compiler, op_cur);
                               break;
@@ -622,27 +662,27 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                           
                           int32_t mem_id_out;
                           switch (type->basic_type->id) {
-                            case SPVM_BASIC_TYPE_C_ID_BYTE:
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE:
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_INIT_BYTE);
                               mem_id_out = SPVM_OP_get_mem_id(compiler, op_cur);
                               break;
-                            case SPVM_BASIC_TYPE_C_ID_SHORT:
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_SHORT:
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_INIT_SHORT);
                               mem_id_out = SPVM_OP_get_mem_id(compiler, op_cur);
                               break;
-                            case SPVM_BASIC_TYPE_C_ID_INT:
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_INT:
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_INIT_INT);
                               mem_id_out = SPVM_OP_get_mem_id(compiler, op_cur);
                               break;
-                            case SPVM_BASIC_TYPE_C_ID_LONG:
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_LONG:
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_INIT_LONG);
                               mem_id_out = SPVM_OP_get_mem_id(compiler, op_cur);
                               break;
-                            case SPVM_BASIC_TYPE_C_ID_FLOAT:
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT:
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_INIT_FLOAT);
                               mem_id_out = SPVM_OP_get_mem_id(compiler, op_cur);
                               break;
-                            case SPVM_BASIC_TYPE_C_ID_DOUBLE:
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE:
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_INIT_DOUBLE);
                               mem_id_out = SPVM_OP_get_mem_id(compiler, op_cur);
                               break;
@@ -675,7 +715,7 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                       SPVM_TYPE* type_dist = SPVM_OP_get_type(compiler, op_assign_dist);
 
                       // Push object temporary variable stack
-                      if (op_assign_dist->uv.var->my->is_tmp) {
+                      if (op_assign_dist->uv.var->var_decl->is_tmp) {
                         if (SPVM_TYPE_is_object_type(compiler, type_dist->basic_type->id, type_dist->dimension, type_dist->flag)) {
                           SPVM_LIST_push(object_op_var_tmp_stack, op_assign_dist);
                         }
@@ -815,37 +855,37 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                             int32_t mem_id_out;
                             int32_t mem_id_in;
                             switch (field_type->basic_type->id) {
-                              case SPVM_BASIC_TYPE_C_ID_BYTE: {
+                              case SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE: {
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_MOVE_MULNUM_BYTE);
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                 mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
                                 break;
                               }
-                              case SPVM_BASIC_TYPE_C_ID_SHORT: {
+                              case SPVM_NATIVE_C_BASIC_TYPE_ID_SHORT: {
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_MOVE_MULNUM_SHORT);
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                 mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
                                 break;
                               }
-                              case SPVM_BASIC_TYPE_C_ID_INT: {
+                              case SPVM_NATIVE_C_BASIC_TYPE_ID_INT: {
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_MOVE_MULNUM_INT);
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                 mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
                                 break;
                               }
-                              case SPVM_BASIC_TYPE_C_ID_LONG: {
+                              case SPVM_NATIVE_C_BASIC_TYPE_ID_LONG: {
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_MOVE_MULNUM_LONG);
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                 mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
                                 break;
                               }
-                              case SPVM_BASIC_TYPE_C_ID_FLOAT: {
+                              case SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT: {
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_MOVE_MULNUM_FLOAT);
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                 mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
                                 break;
                               }
-                              case SPVM_BASIC_TYPE_C_ID_DOUBLE: {
+                              case SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE: {
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                 mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_MOVE_MULNUM_DOUBLE);
@@ -1019,14 +1059,14 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                           SPVM_OP* op_term_args = op_assign_src->last;
                           SPVM_OP* op_term_arg = op_term_args->first;
 
-                          SPVM_LIST* args = method_call_method->mys;
+                          SPVM_LIST* args = method_call_method->var_decls;
                           {
                             int32_t arg_index;
                             for (arg_index = 0; arg_index < method_call_method->args_length; arg_index++) {
-                              SPVM_MY* arg_my = SPVM_LIST_get(args, arg_index);
+                              SPVM_VAR_DECL* arg_var_decl = SPVM_LIST_get(args, arg_index);
                               
                               // Argument type
-                              SPVM_TYPE* arg_type = arg_my->type;
+                              SPVM_TYPE* arg_type = arg_var_decl->type;
 
                               // Term argment type
                               op_term_arg = SPVM_OP_sibling(compiler, op_term_arg);
@@ -1063,32 +1103,32 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                                   
                                   int32_t mem_id_arg;
                                   switch (field_type->basic_type->id) {
-                                    case SPVM_BASIC_TYPE_C_ID_BYTE: {
+                                    case SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE: {
                                       SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_PUSH_ARG_MULNUM_BYTE);
                                       mem_id_arg = SPVM_OP_get_mem_id(compiler, op_term_arg);
                                       break;
                                     }
-                                    case SPVM_BASIC_TYPE_C_ID_SHORT: {
+                                    case SPVM_NATIVE_C_BASIC_TYPE_ID_SHORT: {
                                       SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_PUSH_ARG_MULNUM_SHORT);
                                       mem_id_arg = SPVM_OP_get_mem_id(compiler, op_term_arg);
                                       break;
                                     }
-                                    case SPVM_BASIC_TYPE_C_ID_INT: {
+                                    case SPVM_NATIVE_C_BASIC_TYPE_ID_INT: {
                                       SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_PUSH_ARG_MULNUM_INT);
                                       mem_id_arg = SPVM_OP_get_mem_id(compiler, op_term_arg);
                                       break;
                                     }
-                                    case SPVM_BASIC_TYPE_C_ID_LONG: {
+                                    case SPVM_NATIVE_C_BASIC_TYPE_ID_LONG: {
                                       SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_PUSH_ARG_MULNUM_LONG);
                                       mem_id_arg = SPVM_OP_get_mem_id(compiler, op_term_arg);
                                       break;
                                     }
-                                    case SPVM_BASIC_TYPE_C_ID_FLOAT: {
+                                    case SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT: {
                                       SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_PUSH_ARG_MULNUM_FLOAT);
                                       mem_id_arg = SPVM_OP_get_mem_id(compiler, op_term_arg);
                                       break;
                                     }
-                                    case SPVM_BASIC_TYPE_C_ID_DOUBLE: {
+                                    case SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE: {
                                       SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_PUSH_ARG_MULNUM_DOUBLE);
                                       mem_id_arg = SPVM_OP_get_mem_id(compiler, op_term_arg);
                                       break;
@@ -1119,32 +1159,32 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                                 else if (SPVM_TYPE_is_numeric_type(compiler, arg_type->basic_type->id, arg_type->dimension, arg_type->flag)) {
                                   int32_t mem_id_arg;
                                   switch (arg_type->basic_type->id) {
-                                    case SPVM_BASIC_TYPE_C_ID_BYTE: {
+                                    case SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE: {
                                       SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_PUSH_ARG_BYTE);
                                       mem_id_arg = SPVM_OP_get_mem_id(compiler, op_term_arg);
                                       break;
                                     }
-                                    case SPVM_BASIC_TYPE_C_ID_SHORT: {
+                                    case SPVM_NATIVE_C_BASIC_TYPE_ID_SHORT: {
                                       SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_PUSH_ARG_SHORT);
                                       mem_id_arg = SPVM_OP_get_mem_id(compiler, op_term_arg);
                                       break;
                                     }
-                                    case SPVM_BASIC_TYPE_C_ID_INT: {
+                                    case SPVM_NATIVE_C_BASIC_TYPE_ID_INT: {
                                       SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_PUSH_ARG_INT);
                                       mem_id_arg = SPVM_OP_get_mem_id(compiler, op_term_arg);
                                       break;
                                     }
-                                    case SPVM_BASIC_TYPE_C_ID_LONG: {
+                                    case SPVM_NATIVE_C_BASIC_TYPE_ID_LONG: {
                                       SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_PUSH_ARG_LONG);
                                       mem_id_arg = SPVM_OP_get_mem_id(compiler, op_term_arg);
                                       break;
                                     }
-                                    case SPVM_BASIC_TYPE_C_ID_FLOAT: {
+                                    case SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT: {
                                       SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_PUSH_ARG_FLOAT);
                                       mem_id_arg = SPVM_OP_get_mem_id(compiler, op_term_arg);
                                       break;
                                     }
-                                    case SPVM_BASIC_TYPE_C_ID_DOUBLE: {
+                                    case SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE: {
                                       SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_PUSH_ARG_DOUBLE);
                                       mem_id_arg = SPVM_OP_get_mem_id(compiler, op_term_arg);
                                       break;
@@ -1182,27 +1222,27 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                             // Numeric type
                             if (SPVM_TYPE_is_numeric_type(compiler, call_method_return_type->basic_type->id, call_method_return_type->dimension, call_method_return_type->flag)) {
                               switch (call_method_return_type->basic_type->id) {
-                                case SPVM_BASIC_TYPE_C_ID_BYTE: {
+                                case SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE: {
                                   mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                   break;
                                 }
-                                case SPVM_BASIC_TYPE_C_ID_SHORT: {
+                                case SPVM_NATIVE_C_BASIC_TYPE_ID_SHORT: {
                                   mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                   break;
                                 }
-                                case SPVM_BASIC_TYPE_C_ID_INT: {
+                                case SPVM_NATIVE_C_BASIC_TYPE_ID_INT: {
                                   mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                   break;
                                 }
-                                case SPVM_BASIC_TYPE_C_ID_LONG: {
+                                case SPVM_NATIVE_C_BASIC_TYPE_ID_LONG: {
                                   mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                   break;
                                 }
-                                case SPVM_BASIC_TYPE_C_ID_FLOAT: {
+                                case SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT: {
                                   mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                   break;
                                 }
-                                case SPVM_BASIC_TYPE_C_ID_DOUBLE: {
+                                case SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE: {
                                   mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                   break;
                                 }
@@ -1231,27 +1271,27 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                               assert(SPVM_TYPE_is_numeric_type(compiler, field_type->basic_type->id, field_type->dimension, field_type->flag));
                               
                               switch (field_type->basic_type->id) {
-                                case SPVM_BASIC_TYPE_C_ID_BYTE: {
+                                case SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE: {
                                   mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                   break;
                                 }
-                                case SPVM_BASIC_TYPE_C_ID_SHORT: {
+                                case SPVM_NATIVE_C_BASIC_TYPE_ID_SHORT: {
                                   mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                   break;
                                 }
-                                case SPVM_BASIC_TYPE_C_ID_INT: {
+                                case SPVM_NATIVE_C_BASIC_TYPE_ID_INT: {
                                   mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                   break;
                                 }
-                                case SPVM_BASIC_TYPE_C_ID_LONG: {
+                                case SPVM_NATIVE_C_BASIC_TYPE_ID_LONG: {
                                   mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                   break;
                                 }
-                                case SPVM_BASIC_TYPE_C_ID_FLOAT: {
+                                case SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT: {
                                   mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                   break;
                                 }
-                                case SPVM_BASIC_TYPE_C_ID_DOUBLE: {
+                                case SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE: {
                                   mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                   break;
                                 }
@@ -1277,27 +1317,27 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                             // Numeric type
                             if (SPVM_TYPE_is_numeric_type(compiler, call_method_return_type->basic_type->id, call_method_return_type->dimension, call_method_return_type->flag)) {
                               switch (call_method_return_type->basic_type->id) {
-                                case SPVM_BASIC_TYPE_C_ID_BYTE: {
+                                case SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE: {
                                   mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                   break;
                                 }
-                                case SPVM_BASIC_TYPE_C_ID_SHORT: {
+                                case SPVM_NATIVE_C_BASIC_TYPE_ID_SHORT: {
                                   mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                   break;
                                 }
-                                case SPVM_BASIC_TYPE_C_ID_INT: {
+                                case SPVM_NATIVE_C_BASIC_TYPE_ID_INT: {
                                   mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                   break;
                                 }
-                                case SPVM_BASIC_TYPE_C_ID_LONG: {
+                                case SPVM_NATIVE_C_BASIC_TYPE_ID_LONG: {
                                   mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                   break;
                                 }
-                                case SPVM_BASIC_TYPE_C_ID_FLOAT: {
+                                case SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT: {
                                   mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                   break;
                                 }
-                                case SPVM_BASIC_TYPE_C_ID_DOUBLE: {
+                                case SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE: {
                                   mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                   break;
                                 }
@@ -1326,27 +1366,27 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                               assert(SPVM_TYPE_is_numeric_type(compiler, field_type->basic_type->id, field_type->dimension, field_type->flag));
                               
                               switch (field_type->basic_type->id) {
-                                case SPVM_BASIC_TYPE_C_ID_BYTE: {
+                                case SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE: {
                                   mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                   break;
                                 }
-                                case SPVM_BASIC_TYPE_C_ID_SHORT: {
+                                case SPVM_NATIVE_C_BASIC_TYPE_ID_SHORT: {
                                   mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                   break;
                                 }
-                                case SPVM_BASIC_TYPE_C_ID_INT: {
+                                case SPVM_NATIVE_C_BASIC_TYPE_ID_INT: {
                                   mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                   break;
                                 }
-                                case SPVM_BASIC_TYPE_C_ID_LONG: {
+                                case SPVM_NATIVE_C_BASIC_TYPE_ID_LONG: {
                                   mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                   break;
                                 }
-                                case SPVM_BASIC_TYPE_C_ID_FLOAT: {
+                                case SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT: {
                                   mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                   break;
                                 }
-                                case SPVM_BASIC_TYPE_C_ID_DOUBLE: {
+                                case SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE: {
                                   mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                   break;
                                 }
@@ -1425,27 +1465,27 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                           memset(&opcode, 0, sizeof(SPVM_OPCODE));
                           int32_t mem_id_out;
                           switch (element_type->basic_type->id) {
-                            case SPVM_BASIC_TYPE_C_ID_BYTE:
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE:
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_MULNUM_ARRAY_FIELD_BYTE);
                               mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                               break;
-                            case SPVM_BASIC_TYPE_C_ID_SHORT:
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_SHORT:
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_MULNUM_ARRAY_FIELD_SHORT);
                               mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                               break;
-                            case SPVM_BASIC_TYPE_C_ID_INT:
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_INT:
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_MULNUM_ARRAY_FIELD_INT);
                               mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                               break;
-                            case SPVM_BASIC_TYPE_C_ID_LONG:
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_LONG:
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_MULNUM_ARRAY_FIELD_LONG);
                               mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                               break;
-                            case SPVM_BASIC_TYPE_C_ID_FLOAT:
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT:
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_MULNUM_ARRAY_FIELD_FLOAT);
                               mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                               break;
-                            case SPVM_BASIC_TYPE_C_ID_DOUBLE:
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE:
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_MULNUM_ARRAY_FIELD_DOUBLE);
                               mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                               break;
@@ -1538,27 +1578,27 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                               memset(&opcode, 0, sizeof(SPVM_OPCODE));
                               int32_t mem_id_out;
                               switch (field_type->basic_type->id) {
-                                case SPVM_BASIC_TYPE_C_ID_BYTE:
+                                case SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE:
                                   SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_MULNUM_FIELD_DEREF_BYTE);
                                   mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                   break;
-                                case SPVM_BASIC_TYPE_C_ID_SHORT:
+                                case SPVM_NATIVE_C_BASIC_TYPE_ID_SHORT:
                                   SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_MULNUM_FIELD_DEREF_SHORT);
                                   mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                   break;
-                                case SPVM_BASIC_TYPE_C_ID_INT:
+                                case SPVM_NATIVE_C_BASIC_TYPE_ID_INT:
                                   SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_MULNUM_FIELD_DEREF_INT);
                                   mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                   break;
-                                case SPVM_BASIC_TYPE_C_ID_LONG:
+                                case SPVM_NATIVE_C_BASIC_TYPE_ID_LONG:
                                   SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_MULNUM_FIELD_DEREF_LONG);
                                   mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                   break;
-                                case SPVM_BASIC_TYPE_C_ID_FLOAT:
+                                case SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT:
                                   SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_MULNUM_FIELD_DEREF_FLOAT);
                                   mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                   break;
-                                case SPVM_BASIC_TYPE_C_ID_DOUBLE:
+                                case SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE:
                                   SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_MULNUM_FIELD_DEREF_DOUBLE);
                                   mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                   break;
@@ -1583,32 +1623,32 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                               int32_t mem_id_out;
                               int32_t mem_id_in;
                               switch (field_type->basic_type->id) {
-                                case SPVM_BASIC_TYPE_C_ID_BYTE:
+                                case SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE:
                                   SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_MULNUM_FIELD_BYTE);
                                   mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                   mem_id_in = SPVM_OP_get_mem_id(compiler, op_term_invocant);
                                   break;
-                                case SPVM_BASIC_TYPE_C_ID_SHORT:
+                                case SPVM_NATIVE_C_BASIC_TYPE_ID_SHORT:
                                   SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_MULNUM_FIELD_SHORT);
                                   mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                   mem_id_in = SPVM_OP_get_mem_id(compiler, op_term_invocant);
                                   break;
-                                case SPVM_BASIC_TYPE_C_ID_INT:
+                                case SPVM_NATIVE_C_BASIC_TYPE_ID_INT:
                                   SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_MULNUM_FIELD_INT);
                                   mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                   mem_id_in = SPVM_OP_get_mem_id(compiler, op_term_invocant);
                                   break;
-                                case SPVM_BASIC_TYPE_C_ID_LONG:
+                                case SPVM_NATIVE_C_BASIC_TYPE_ID_LONG:
                                   SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_MULNUM_FIELD_LONG);
                                   mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                   mem_id_in = SPVM_OP_get_mem_id(compiler, op_term_invocant);
                                   break;
-                                case SPVM_BASIC_TYPE_C_ID_FLOAT:
+                                case SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT:
                                   SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_MULNUM_FIELD_FLOAT);
                                   mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                   mem_id_in = SPVM_OP_get_mem_id(compiler, op_term_invocant);
                                   break;
-                                case SPVM_BASIC_TYPE_C_ID_DOUBLE:
+                                case SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE:
                                   SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_MULNUM_FIELD_DOUBLE);
                                   mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                   mem_id_in = SPVM_OP_get_mem_id(compiler, op_term_invocant);
@@ -1635,27 +1675,27 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                               }
                               else {
                                 switch (field_type->basic_type->id) {
-                                  case SPVM_BASIC_TYPE_C_ID_BYTE:
+                                  case SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE:
                                     SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_FIELD_BYTE);
                                     mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                     break;
-                                  case SPVM_BASIC_TYPE_C_ID_SHORT:
+                                  case SPVM_NATIVE_C_BASIC_TYPE_ID_SHORT:
                                     SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_FIELD_SHORT);
                                     mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                     break;
-                                  case SPVM_BASIC_TYPE_C_ID_INT:
+                                  case SPVM_NATIVE_C_BASIC_TYPE_ID_INT:
                                     SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_FIELD_INT);
                                     mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                     break;
-                                  case SPVM_BASIC_TYPE_C_ID_LONG:
+                                  case SPVM_NATIVE_C_BASIC_TYPE_ID_LONG:
                                     SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_FIELD_LONG);
                                     mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                     break;
-                                  case SPVM_BASIC_TYPE_C_ID_FLOAT:
+                                  case SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT:
                                     SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_FIELD_FLOAT);
                                     mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                     break;
-                                  case SPVM_BASIC_TYPE_C_ID_DOUBLE:
+                                  case SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE:
                                     SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_FIELD_DOUBLE);
                                     mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                     break;
@@ -1695,27 +1735,27 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                             assert(SPVM_TYPE_is_numeric_type(compiler, element_type->basic_type->id, element_type->dimension, element_type->flag));
                             int32_t mem_id_out;
                             switch (element_type->basic_type->id) {
-                              case SPVM_BASIC_TYPE_C_ID_BYTE:
+                              case SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE:
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_MULNUM_ARRAY_BYTE);
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                 break;
-                              case SPVM_BASIC_TYPE_C_ID_SHORT:
+                              case SPVM_NATIVE_C_BASIC_TYPE_ID_SHORT:
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_MULNUM_ARRAY_SHORT);
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                 break;
-                              case SPVM_BASIC_TYPE_C_ID_INT:
+                              case SPVM_NATIVE_C_BASIC_TYPE_ID_INT:
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_MULNUM_ARRAY_INT);
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                 break;
-                              case SPVM_BASIC_TYPE_C_ID_LONG:
+                              case SPVM_NATIVE_C_BASIC_TYPE_ID_LONG:
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_MULNUM_ARRAY_LONG);
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                 break;
-                              case SPVM_BASIC_TYPE_C_ID_FLOAT:
+                              case SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT:
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_MULNUM_ARRAY_FLOAT);
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                 break;
-                              case SPVM_BASIC_TYPE_C_ID_DOUBLE:
+                              case SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE:
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_MULNUM_ARRAY_DOUBLE);
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                 break;
@@ -1747,27 +1787,27 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                             }
                             else {
                               switch (element_type->basic_type->id) {
-                                case SPVM_BASIC_TYPE_C_ID_BYTE:
+                                case SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE:
                                   SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_ARRAY_ELEMENT_BYTE);
                                   mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                   break;
-                                case SPVM_BASIC_TYPE_C_ID_SHORT:
+                                case SPVM_NATIVE_C_BASIC_TYPE_ID_SHORT:
                                   SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_ARRAY_ELEMENT_SHORT);
                                   mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                   break;
-                                case SPVM_BASIC_TYPE_C_ID_INT:
+                                case SPVM_NATIVE_C_BASIC_TYPE_ID_INT:
                                   SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_ARRAY_ELEMENT_INT);
                                   mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                   break;
-                                case SPVM_BASIC_TYPE_C_ID_LONG:
+                                case SPVM_NATIVE_C_BASIC_TYPE_ID_LONG:
                                   SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_ARRAY_ELEMENT_LONG);
                                   mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                   break;
-                                case SPVM_BASIC_TYPE_C_ID_FLOAT:
+                                case SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT:
                                   SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_ARRAY_ELEMENT_FLOAT);
                                   mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                   break;
-                                case SPVM_BASIC_TYPE_C_ID_DOUBLE:
+                                case SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE:
                                   SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_ARRAY_ELEMENT_DOUBLE);
                                   mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                   break;
@@ -1804,27 +1844,27 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                           }
                           else {
                             switch (type->basic_type->id) {
-                              case SPVM_BASIC_TYPE_C_ID_BYTE:
+                              case SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE:
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_CLASS_VAR_BYTE);
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                 break;
-                              case SPVM_BASIC_TYPE_C_ID_SHORT:
+                              case SPVM_NATIVE_C_BASIC_TYPE_ID_SHORT:
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_CLASS_VAR_SHORT);
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                 break;
-                              case SPVM_BASIC_TYPE_C_ID_INT:
+                              case SPVM_NATIVE_C_BASIC_TYPE_ID_INT:
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_CLASS_VAR_INT);
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                 break;
-                              case SPVM_BASIC_TYPE_C_ID_LONG:
+                              case SPVM_NATIVE_C_BASIC_TYPE_ID_LONG:
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_CLASS_VAR_LONG);
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                 break;
-                              case SPVM_BASIC_TYPE_C_ID_FLOAT:
+                              case SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT:
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_CLASS_VAR_FLOAT);
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                 break;
-                              case SPVM_BASIC_TYPE_C_ID_DOUBLE:
+                              case SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE:
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_CLASS_VAR_DOUBLE);
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                 break;
@@ -1852,27 +1892,27 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                             
                             assert(SPVM_TYPE_is_numeric_type(compiler, element_type->basic_type->id, element_type->dimension, element_type->flag));
                             int32_t mem_id_out;
-                            if (element_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_BYTE) {
+                            if (element_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE) {
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_DEREF_MULNUM_BYTE);
                               mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                             }
-                            else if (element_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_SHORT) {
+                            else if (element_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_SHORT) {
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_DEREF_MULNUM_SHORT);
                               mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                             }
-                            else if (element_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_INT) {
+                            else if (element_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_INT) {
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_DEREF_MULNUM_INT);
                               mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                             }
-                            else if (element_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_LONG) {
+                            else if (element_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_LONG) {
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_DEREF_MULNUM_LONG);
                               mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                             }
-                            else if (element_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_FLOAT) {
+                            else if (element_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT) {
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_DEREF_MULNUM_FLOAT);
                               mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                             }
-                            else if (element_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_DOUBLE) {
+                            else if (element_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE) {
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_DEREF_MULNUM_DOUBLE);
                               mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                             }
@@ -1896,27 +1936,27 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                             
                             int32_t mem_id_out;
                             switch (src_type->basic_type->id) {
-                              case SPVM_BASIC_TYPE_C_ID_BYTE:
+                              case SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE:
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_DEREF_BYTE);
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                 break;
-                              case SPVM_BASIC_TYPE_C_ID_SHORT:
+                              case SPVM_NATIVE_C_BASIC_TYPE_ID_SHORT:
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_DEREF_SHORT);
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                 break;
-                              case SPVM_BASIC_TYPE_C_ID_INT:
+                              case SPVM_NATIVE_C_BASIC_TYPE_ID_INT:
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_DEREF_INT);
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                 break;
-                              case SPVM_BASIC_TYPE_C_ID_LONG:
+                              case SPVM_NATIVE_C_BASIC_TYPE_ID_LONG:
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_DEREF_LONG);
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                 break;
-                              case SPVM_BASIC_TYPE_C_ID_FLOAT:
+                              case SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT:
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_DEREF_FLOAT);
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                 break;
-                              case SPVM_BASIC_TYPE_C_ID_DOUBLE:
+                              case SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE:
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_DEREF_DOUBLE);
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                 break;
@@ -1955,27 +1995,27 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                             assert(SPVM_TYPE_is_numeric_type(compiler, field_type->basic_type->id, field_type->dimension, field_type->flag));
                             
                             switch (field_type->basic_type->id) {
-                              case SPVM_BASIC_TYPE_C_ID_BYTE:
+                              case SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE:
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_REF_BYTE);
                                 mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
                                 break;
-                              case SPVM_BASIC_TYPE_C_ID_SHORT:
+                              case SPVM_NATIVE_C_BASIC_TYPE_ID_SHORT:
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_REF_SHORT);
                                 mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
                                 break;
-                              case SPVM_BASIC_TYPE_C_ID_INT:
+                              case SPVM_NATIVE_C_BASIC_TYPE_ID_INT:
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_REF_INT);
                                 mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
                                 break;
-                              case SPVM_BASIC_TYPE_C_ID_LONG:
+                              case SPVM_NATIVE_C_BASIC_TYPE_ID_LONG:
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_REF_LONG);
                                 mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
                                 break;
-                              case SPVM_BASIC_TYPE_C_ID_FLOAT:
+                              case SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT:
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_REF_FLOAT);
                                 mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
                                 break;
-                              case SPVM_BASIC_TYPE_C_ID_DOUBLE:
+                              case SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE:
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_REF_DOUBLE);
                                 mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
                                 break;
@@ -1985,27 +2025,27 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                           }
                           else if (SPVM_TYPE_is_numeric_type(compiler, src_type->basic_type->id, src_type->dimension, src_type->flag)) {
                             switch (src_type->basic_type->id) {
-                              case SPVM_BASIC_TYPE_C_ID_BYTE:
+                              case SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE:
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_REF_BYTE);
                                 mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
                                 break;
-                              case SPVM_BASIC_TYPE_C_ID_SHORT:
+                              case SPVM_NATIVE_C_BASIC_TYPE_ID_SHORT:
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_REF_SHORT);
                                 mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
                                 break;
-                              case SPVM_BASIC_TYPE_C_ID_INT:
+                              case SPVM_NATIVE_C_BASIC_TYPE_ID_INT:
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_REF_INT);
                                 mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
                                 break;
-                              case SPVM_BASIC_TYPE_C_ID_LONG:
+                              case SPVM_NATIVE_C_BASIC_TYPE_ID_LONG:
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_REF_LONG);
                                 mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
                                 break;
-                              case SPVM_BASIC_TYPE_C_ID_FLOAT:
+                              case SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT:
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_REF_FLOAT);
                                 mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
                                 break;
-                              case SPVM_BASIC_TYPE_C_ID_DOUBLE:
+                              case SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE:
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_REF_DOUBLE);
                                 mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
                                 break;
@@ -2045,16 +2085,16 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                           assert(SPVM_TYPE_is_numeric_type(compiler, type_dist->basic_type->id, type_dist->dimension, type_dist->flag));
 
                           switch (type_dist->basic_type->id) {
-                            case SPVM_BASIC_TYPE_C_ID_INT:
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_INT:
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_ADD_INT);
                               break;
-                            case SPVM_BASIC_TYPE_C_ID_LONG:
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_LONG:
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_ADD_LONG);
                               break;
-                            case SPVM_BASIC_TYPE_C_ID_FLOAT:
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT:
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_ADD_FLOAT);
                               break;
-                            case SPVM_BASIC_TYPE_C_ID_DOUBLE:
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE:
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_ADD_DOUBLE);
                               break;
                             default:
@@ -2079,16 +2119,16 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
 
                           assert(SPVM_TYPE_is_numeric_type(compiler, type_dist->basic_type->id, type_dist->dimension, type_dist->flag));
                           switch (type_dist->basic_type->id) {
-                            case SPVM_BASIC_TYPE_C_ID_INT:
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_INT:
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_SUBTRACT_INT);
                               break;
-                            case SPVM_BASIC_TYPE_C_ID_LONG:
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_LONG:
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_SUBTRACT_LONG);
                               break;
-                            case SPVM_BASIC_TYPE_C_ID_FLOAT:
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT:
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_SUBTRACT_FLOAT);
                               break;
-                            case SPVM_BASIC_TYPE_C_ID_DOUBLE:
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE:
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_SUBTRACT_DOUBLE);
                               break;
                             default:
@@ -2113,16 +2153,16 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
 
                           assert(SPVM_TYPE_is_numeric_type(compiler, type_dist->basic_type->id, type_dist->dimension, type_dist->flag));
                           switch (type_dist->basic_type->id) {
-                            case SPVM_BASIC_TYPE_C_ID_INT:
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_INT:
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_MULTIPLY_INT);
                               break;
-                            case SPVM_BASIC_TYPE_C_ID_LONG:
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_LONG:
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_MULTIPLY_LONG);
                               break;
-                            case SPVM_BASIC_TYPE_C_ID_FLOAT:
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT:
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_MULTIPLY_FLOAT);
                               break;
-                            case SPVM_BASIC_TYPE_C_ID_DOUBLE:
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE:
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_MULTIPLY_DOUBLE);
                               break;
                             default:
@@ -2147,16 +2187,16 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                           
                           assert(SPVM_TYPE_is_numeric_type(compiler, type_dist->basic_type->id, type_dist->dimension, type_dist->flag));
                           switch (type_dist->basic_type->id) {
-                            case SPVM_BASIC_TYPE_C_ID_INT:
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_INT:
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_DIVIDE_INT);
                               break;
-                            case SPVM_BASIC_TYPE_C_ID_LONG:
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_LONG:
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_DIVIDE_LONG);
                               break;
-                            case SPVM_BASIC_TYPE_C_ID_FLOAT:
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT:
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_DIVIDE_FLOAT);
                               break;
-                            case SPVM_BASIC_TYPE_C_ID_DOUBLE:
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE:
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_DIVIDE_DOUBLE);
                               break;
                             default:
@@ -2175,8 +2215,8 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                           
                           // Check die
                           switch (type_dist->basic_type->id) {
-                            case SPVM_BASIC_TYPE_C_ID_INT:
-                            case SPVM_BASIC_TYPE_C_ID_LONG:
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_INT:
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_LONG:
                               SPVM_OPCODE_BUILDER_push_if_die(compiler, opcode_array, push_eval_opcode_rel_index_stack, if_die_catch_goto_opcode_rel_index_stack, if_die_return_goto_opcode_rel_index_stack, method->op_method, op_cur->line);
                             break;
                           }
@@ -2234,13 +2274,13 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                           int32_t mem_id_in1;
                           int32_t mem_id_in2;
                           switch (type_dist->basic_type->id) {
-                            case SPVM_BASIC_TYPE_C_ID_INT:
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_INT:
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_REMAINDER_INT);
                               mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                               mem_id_in1 = SPVM_OP_get_mem_id(compiler, op_assign_src->first);
                               mem_id_in2 = SPVM_OP_get_mem_id(compiler, op_assign_src->last);
                               break;
-                            case SPVM_BASIC_TYPE_C_ID_LONG:
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_LONG:
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_REMAINDER_LONG);
                               mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                               mem_id_in1 = SPVM_OP_get_mem_id(compiler, op_assign_src->first);
@@ -2259,8 +2299,8 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                           // Check die
                           assert(SPVM_TYPE_is_numeric_type(compiler, type_dist->basic_type->id, type_dist->dimension, type_dist->flag));
                           switch (type_dist->basic_type->id) {
-                            case SPVM_BASIC_TYPE_C_ID_INT:
-                            case SPVM_BASIC_TYPE_C_ID_LONG:
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_INT:
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_LONG:
                               SPVM_OPCODE_BUILDER_push_if_die(compiler, opcode_array, push_eval_opcode_rel_index_stack, if_die_catch_goto_opcode_rel_index_stack, if_die_return_goto_opcode_rel_index_stack, method->op_method, op_cur->line);
                             break;
                           }
@@ -2316,12 +2356,12 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                           int32_t mem_id_in1;
                           int32_t mem_id_out;
                           switch (type_dist->basic_type->id) {
-                            case SPVM_BASIC_TYPE_C_ID_INT:
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_INT:
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_LEFT_SHIFT_INT);
                               mem_id_in1 = SPVM_OP_get_mem_id(compiler, op_assign_src->first);
                               mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                               break;
-                            case SPVM_BASIC_TYPE_C_ID_LONG:
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_LONG:
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_LEFT_SHIFT_LONG);
                               mem_id_in1 = SPVM_OP_get_mem_id(compiler, op_assign_src->first);
                               mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
@@ -2347,12 +2387,12 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                           int32_t mem_id_in1;
                           int32_t mem_id_out;
                           switch (type_dist->basic_type->id) {
-                            case SPVM_BASIC_TYPE_C_ID_INT:
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_INT:
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_RIGHT_ARITHMETIC_SHIFT_INT);
                               mem_id_in1 = SPVM_OP_get_mem_id(compiler, op_assign_src->first);
                               mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                               break;
-                            case SPVM_BASIC_TYPE_C_ID_LONG:
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_LONG:
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_RIGHT_ARITHMETIC_SHIFT_LONG);
                               mem_id_in1 = SPVM_OP_get_mem_id(compiler, op_assign_src->first);
                               mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
@@ -2378,12 +2418,12 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                           int32_t mem_id_out;
                           int32_t mem_id_in1;
                           switch (type_dist->basic_type->id) {
-                            case SPVM_BASIC_TYPE_C_ID_INT:
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_INT:
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_RIGHT_LOGICAL_SHIFT_INT);
                               mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                               mem_id_in1 = SPVM_OP_get_mem_id(compiler, op_assign_src->first);
                               break;
-                            case SPVM_BASIC_TYPE_C_ID_LONG:
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_LONG:
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_RIGHT_LOGICAL_SHIFT_LONG);
                               mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                               mem_id_in1 = SPVM_OP_get_mem_id(compiler, op_assign_src->first);
@@ -2410,13 +2450,13 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                           int32_t mem_id_in1;
                           int32_t mem_id_in2;
                           switch (type_dist->basic_type->id) {
-                            case SPVM_BASIC_TYPE_C_ID_INT:
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_INT:
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_BIT_AND_INT);
                               mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                               mem_id_in1 = SPVM_OP_get_mem_id(compiler, op_assign_src->first);
                               mem_id_in2 = SPVM_OP_get_mem_id(compiler, op_assign_src->last);
                               break;
-                            case SPVM_BASIC_TYPE_C_ID_LONG:
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_LONG:
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_BIT_AND_LONG);
                               mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                               mem_id_in1 = SPVM_OP_get_mem_id(compiler, op_assign_src->first);
@@ -2444,13 +2484,13 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                           int32_t mem_id_in1;
                           int32_t mem_id_in2;
                           switch (type_dist->basic_type->id) {
-                            case SPVM_BASIC_TYPE_C_ID_INT:
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_INT:
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_BIT_OR_INT);
                               mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                               mem_id_in1 = SPVM_OP_get_mem_id(compiler, op_assign_src->first);
                               mem_id_in2 = SPVM_OP_get_mem_id(compiler, op_assign_src->last);
                               break;
-                            case SPVM_BASIC_TYPE_C_ID_LONG:
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_LONG:
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_BIT_OR_LONG);
                               mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                               mem_id_in1 = SPVM_OP_get_mem_id(compiler, op_assign_src->first);
@@ -2477,13 +2517,13 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                           int32_t mem_id_in1;
                           int32_t mem_id_in2;
                           switch (type_dist->basic_type->id) {
-                            case SPVM_BASIC_TYPE_C_ID_INT:
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_INT:
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_BIT_XOR_INT);
                               mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                               mem_id_in1 = SPVM_OP_get_mem_id(compiler, op_assign_src->first);
                               mem_id_in2 = SPVM_OP_get_mem_id(compiler, op_assign_src->last);
                               break;
-                            case SPVM_BASIC_TYPE_C_ID_LONG:
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_LONG:
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_BIT_XOR_LONG);
                               mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                               mem_id_in1 = SPVM_OP_get_mem_id(compiler, op_assign_src->first);
@@ -2509,12 +2549,12 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                           int32_t mem_id_out;
                           int32_t mem_id_in;
                           switch (type_dist->basic_type->id) {
-                            case SPVM_BASIC_TYPE_C_ID_INT:
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_INT:
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_BIT_NOT_INT);
                               mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                               mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src->first);
                               break;
-                            case SPVM_BASIC_TYPE_C_ID_LONG:
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_LONG:
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_BIT_NOT_LONG);
                               mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                               mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src->first);
@@ -2538,22 +2578,22 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                           int32_t mem_id_out;
                           int32_t mem_id_in;
                           switch (type_dist->basic_type->id) {
-                            case SPVM_BASIC_TYPE_C_ID_INT:
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_INT:
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_MOVE_INT);
                               mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                               mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src->first);
                               break;
-                            case SPVM_BASIC_TYPE_C_ID_LONG:
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_LONG:
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_MOVE_LONG);
                               mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                               mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src->first);
                               break;
-                            case SPVM_BASIC_TYPE_C_ID_FLOAT:
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT:
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_MOVE_FLOAT);
                               mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                               mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src->first);
                               break;
-                            case SPVM_BASIC_TYPE_C_ID_DOUBLE:
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE:
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_MOVE_DOUBLE);
                               mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                               mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src->first);
@@ -2594,22 +2634,22 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                           int32_t mem_id_out;
                           int32_t mem_id_in;
                           switch (type_dist->basic_type->id) {
-                            case SPVM_BASIC_TYPE_C_ID_INT:
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_INT:
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_NEGATE_INT);
                               mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                               mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src->first);
                               break;
-                            case SPVM_BASIC_TYPE_C_ID_LONG:
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_LONG:
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_NEGATE_LONG);
                               mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                               mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src->first);
                               break;
-                            case SPVM_BASIC_TYPE_C_ID_FLOAT:
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT:
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_NEGATE_FLOAT);
                               mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                               mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src->first);
                               break;
-                            case SPVM_BASIC_TYPE_C_ID_DOUBLE:
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE:
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_NEGATE_DOUBLE);
                               mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                               mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src->first);
@@ -2633,27 +2673,27 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
 
                             int32_t mem_id_out;
                             switch (type_dist->basic_type->id) {
-                              case SPVM_BASIC_TYPE_C_ID_BYTE:
+                              case SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE:
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_MOVE_CONSTANT_BYTE);
                                 opcode.operand1 = (uint16_t)(uint8_t)constant->value.bval;
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                 break;
-                              case SPVM_BASIC_TYPE_C_ID_INT:
+                              case SPVM_NATIVE_C_BASIC_TYPE_ID_INT:
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_MOVE_CONSTANT_INT);
                                 opcode.operand1 = (uint32_t)constant->value.ival;
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                 break;
-                              case SPVM_BASIC_TYPE_C_ID_LONG:
+                              case SPVM_NATIVE_C_BASIC_TYPE_ID_LONG:
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_MOVE_CONSTANT_LONG);
                                 *(int64_t*)&opcode.operand1 = constant->value.lval;
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                 break;
-                              case SPVM_BASIC_TYPE_C_ID_FLOAT:
+                              case SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT:
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_MOVE_CONSTANT_FLOAT);
                                 opcode.operand1 = (uint32_t)constant->value.ival;
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                 break;
-                              case SPVM_BASIC_TYPE_C_ID_DOUBLE:
+                              case SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE:
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_MOVE_CONSTANT_DOUBLE);
                                 *(double*)&opcode.operand1 = constant->value.dval;
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
@@ -2677,7 +2717,7 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                             
                             const char* constant_string_value = constant->value.oval;
                             int32_t constant_string_length = constant->string_length;
-                            SPVM_STRING* constant_string = SPVM_HASH_get(compiler->string_symtable, constant_string_value, constant_string_length);
+                            SPVM_CONSTANT_STRING* constant_string = SPVM_HASH_get(compiler->constant_string_symtable, constant_string_value, constant_string_length);
                             assert(constant_string);
                             
                             opcode.operand0 = mem_id_out;
@@ -2707,32 +2747,32 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                             int32_t mem_id_in;
 
                             if (SPVM_TYPE_is_numeric_type(compiler, dist_type->basic_type->id, dist_type->dimension, dist_type->flag)) {
-                              if (dist_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_BYTE) {
+                              if (dist_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE) {
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_MOVE_BYTE);
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_dist_term);
                                 mem_id_in = SPVM_OP_get_mem_id(compiler, op_src_term);
                               }
-                              else if (dist_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_SHORT) {
+                              else if (dist_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_SHORT) {
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_CONVERT_BYTE_TO_SHORT);
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_dist_term);
                                 mem_id_in = SPVM_OP_get_mem_id(compiler, op_src_term);
                               }
-                              else if (dist_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_INT) {
+                              else if (dist_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_INT) {
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_CONVERT_BYTE_TO_INT);
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_dist_term);
                                 mem_id_in = SPVM_OP_get_mem_id(compiler, op_src_term);
                               }
-                              else if (dist_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_LONG) {
+                              else if (dist_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_LONG) {
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_CONVERT_BYTE_TO_LONG);
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_dist_term);
                                 mem_id_in = SPVM_OP_get_mem_id(compiler, op_src_term);
                               }
-                              else if (dist_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_FLOAT) {
+                              else if (dist_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT) {
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_CONVERT_BYTE_TO_FLOAT);
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_dist_term);
                                 mem_id_in = SPVM_OP_get_mem_id(compiler, op_src_term);
                               }
-                              else if (dist_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_DOUBLE) {
+                              else if (dist_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE) {
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_CONVERT_BYTE_TO_DOUBLE);
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_dist_term);
                                 mem_id_in = SPVM_OP_get_mem_id(compiler, op_src_term);
@@ -2771,32 +2811,32 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                             int32_t mem_id_out;
                             int32_t mem_id_in;
                             if (SPVM_TYPE_is_numeric_type(compiler, dist_type->basic_type->id, dist_type->dimension, dist_type->flag)) {
-                              if (dist_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_BYTE) {
+                              if (dist_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE) {
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_CONVERT_SHORT_TO_BYTE);
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_dist_term);
                                 mem_id_in = SPVM_OP_get_mem_id(compiler, op_src_term);
                               }
-                              else if (dist_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_SHORT) {
+                              else if (dist_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_SHORT) {
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_MOVE_SHORT);
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_dist_term);
                                 mem_id_in = SPVM_OP_get_mem_id(compiler, op_src_term);
                               }
-                              else if (dist_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_INT) {
+                              else if (dist_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_INT) {
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_CONVERT_SHORT_TO_INT);
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_dist_term);
                                 mem_id_in = SPVM_OP_get_mem_id(compiler, op_src_term);
                               }
-                              else if (dist_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_LONG) {
+                              else if (dist_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_LONG) {
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_CONVERT_SHORT_TO_LONG);
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_dist_term);
                                 mem_id_in = SPVM_OP_get_mem_id(compiler, op_src_term);
                               }
-                              else if (dist_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_FLOAT) {
+                              else if (dist_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT) {
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_CONVERT_SHORT_TO_FLOAT);
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_dist_term);
                                 mem_id_in = SPVM_OP_get_mem_id(compiler, op_src_term);
                               }
-                              else if (dist_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_DOUBLE) {
+                              else if (dist_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE) {
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_CONVERT_SHORT_TO_DOUBLE);
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_dist_term);
                                 mem_id_in = SPVM_OP_get_mem_id(compiler, op_src_term);
@@ -2835,32 +2875,32 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                             int32_t mem_id_out;
                             int32_t mem_id_in;
                             if (SPVM_TYPE_is_numeric_type(compiler, dist_type->basic_type->id, dist_type->dimension, dist_type->flag)) {
-                              if (dist_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_BYTE) {
+                              if (dist_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE) {
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_CONVERT_INT_TO_BYTE);
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_dist_term);
                                 mem_id_in = SPVM_OP_get_mem_id(compiler, op_src_term);
                               }
-                              else if (dist_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_SHORT) {
+                              else if (dist_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_SHORT) {
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_CONVERT_INT_TO_SHORT);
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_dist_term);
                                 mem_id_in = SPVM_OP_get_mem_id(compiler, op_src_term);
                               }
-                              else if (dist_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_INT) {
+                              else if (dist_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_INT) {
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_MOVE_INT);
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_dist_term);
                                 mem_id_in = SPVM_OP_get_mem_id(compiler, op_src_term);
                               }
-                              else if (dist_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_LONG) {
+                              else if (dist_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_LONG) {
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_CONVERT_INT_TO_LONG);
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_dist_term);
                                 mem_id_in = SPVM_OP_get_mem_id(compiler, op_src_term);
                               }
-                              else if (dist_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_FLOAT) {
+                              else if (dist_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT) {
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_CONVERT_INT_TO_FLOAT);
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_dist_term);
                                 mem_id_in = SPVM_OP_get_mem_id(compiler, op_src_term);
                               }
-                              else if (dist_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_DOUBLE) {
+                              else if (dist_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE) {
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_CONVERT_INT_TO_DOUBLE);
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_dist_term);
                                 mem_id_in = SPVM_OP_get_mem_id(compiler, op_src_term);
@@ -2899,32 +2939,32 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                             int32_t mem_id_out;
                             int32_t mem_id_in;
                             if (SPVM_TYPE_is_numeric_type(compiler, dist_type->basic_type->id, dist_type->dimension, dist_type->flag)) {
-                              if (dist_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_BYTE) {
+                              if (dist_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE) {
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_CONVERT_LONG_TO_BYTE);
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_dist_term);
                                 mem_id_in = SPVM_OP_get_mem_id(compiler, op_src_term);
                               }
-                              else if (dist_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_SHORT) {
+                              else if (dist_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_SHORT) {
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_CONVERT_LONG_TO_SHORT);
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_dist_term);
                                 mem_id_in = SPVM_OP_get_mem_id(compiler, op_src_term);
                               }
-                              else if (dist_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_INT) {
+                              else if (dist_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_INT) {
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_CONVERT_LONG_TO_INT);
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_dist_term);
                                 mem_id_in = SPVM_OP_get_mem_id(compiler, op_src_term);
                               }
-                              else if (dist_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_LONG) {
+                              else if (dist_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_LONG) {
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_MOVE_LONG);
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_dist_term);
                                 mem_id_in = SPVM_OP_get_mem_id(compiler, op_src_term);
                               }
-                              else if (dist_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_FLOAT) {
+                              else if (dist_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT) {
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_CONVERT_LONG_TO_FLOAT);
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_dist_term);
                                 mem_id_in = SPVM_OP_get_mem_id(compiler, op_src_term);
                               }
-                              else if (dist_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_DOUBLE) {
+                              else if (dist_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE) {
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_CONVERT_LONG_TO_DOUBLE);
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_dist_term);
                                 mem_id_in = SPVM_OP_get_mem_id(compiler, op_src_term);
@@ -2963,32 +3003,32 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                             int32_t mem_id_out;
                             int32_t mem_id_in;
                             if (SPVM_TYPE_is_numeric_type(compiler, dist_type->basic_type->id, dist_type->dimension, dist_type->flag)) {
-                              if (dist_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_BYTE) {
+                              if (dist_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE) {
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_CONVERT_FLOAT_TO_BYTE);
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_dist_term);
                                 mem_id_in = SPVM_OP_get_mem_id(compiler, op_src_term);
                               }
-                              else if (dist_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_SHORT) {
+                              else if (dist_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_SHORT) {
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_CONVERT_FLOAT_TO_SHORT);
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_dist_term);
                                 mem_id_in = SPVM_OP_get_mem_id(compiler, op_src_term);
                               }
-                              else if (dist_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_INT) {
+                              else if (dist_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_INT) {
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_CONVERT_FLOAT_TO_INT);
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_dist_term);
                                 mem_id_in = SPVM_OP_get_mem_id(compiler, op_src_term);
                               }
-                              else if (dist_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_LONG) {
+                              else if (dist_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_LONG) {
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_CONVERT_FLOAT_TO_LONG);
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_dist_term);
                                 mem_id_in = SPVM_OP_get_mem_id(compiler, op_src_term);
                               }
-                              else if (dist_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_FLOAT) {
+                              else if (dist_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT) {
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_MOVE_FLOAT);
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_dist_term);
                                 mem_id_in = SPVM_OP_get_mem_id(compiler, op_src_term);
                               }
-                              else if (dist_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_DOUBLE) {
+                              else if (dist_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE) {
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_CONVERT_FLOAT_TO_DOUBLE);
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_dist_term);
                                 mem_id_in = SPVM_OP_get_mem_id(compiler, op_src_term);
@@ -3027,32 +3067,32 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                             int32_t mem_id_out;
                             int32_t mem_id_in;
                             if (SPVM_TYPE_is_numeric_type(compiler, dist_type->basic_type->id, dist_type->dimension, dist_type->flag)) {
-                              if (dist_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_BYTE) {
+                              if (dist_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE) {
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_CONVERT_DOUBLE_TO_BYTE);
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_dist_term);
                                 mem_id_in = SPVM_OP_get_mem_id(compiler, op_src_term);
                               }
-                              else if (dist_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_SHORT) {
+                              else if (dist_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_SHORT) {
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_CONVERT_DOUBLE_TO_SHORT);
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_dist_term);
                                 mem_id_in = SPVM_OP_get_mem_id(compiler, op_src_term);
                               }
-                              else if (dist_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_INT) {
+                              else if (dist_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_INT) {
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_CONVERT_DOUBLE_TO_INT);
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_dist_term);
                                 mem_id_in = SPVM_OP_get_mem_id(compiler, op_src_term);
                               }
-                              else if (dist_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_LONG) {
+                              else if (dist_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_LONG) {
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_CONVERT_DOUBLE_TO_LONG);
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_dist_term);
                                 mem_id_in = SPVM_OP_get_mem_id(compiler, op_src_term);
                               }
-                              else if (dist_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_FLOAT) {
+                              else if (dist_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT) {
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_CONVERT_DOUBLE_TO_FLOAT);
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_dist_term);
                                 mem_id_in = SPVM_OP_get_mem_id(compiler, op_src_term);
                               }
-                              else if (dist_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_DOUBLE) {
+                              else if (dist_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE) {
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_MOVE_DOUBLE);
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_dist_term);
                                 mem_id_in = SPVM_OP_get_mem_id(compiler, op_src_term);
@@ -3353,7 +3393,7 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                               
                               if (type_dimension == 1) {
                                 switch (basic_type_id) {
-                                  case SPVM_BASIC_TYPE_C_ID_BYTE: {
+                                  case SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE: {
                                     SPVM_OPCODE opcode;
                                     memset(&opcode, 0, sizeof(SPVM_OPCODE));
                                     SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_NEW_BYTE_ARRAY);
@@ -3370,7 +3410,7 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                                     
                                     break;
                                   }
-                                  case SPVM_BASIC_TYPE_C_ID_SHORT: {
+                                  case SPVM_NATIVE_C_BASIC_TYPE_ID_SHORT: {
                                     SPVM_OPCODE opcode;
                                     memset(&opcode, 0, sizeof(SPVM_OPCODE));
                                     SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_NEW_SHORT_ARRAY);
@@ -3387,7 +3427,7 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                                     
                                     break;
                                   }
-                                  case SPVM_BASIC_TYPE_C_ID_INT: {
+                                  case SPVM_NATIVE_C_BASIC_TYPE_ID_INT: {
                                     SPVM_OPCODE opcode;
                                     memset(&opcode, 0, sizeof(SPVM_OPCODE));
 
@@ -3405,7 +3445,7 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                                     
                                     break;
                                   }
-                                  case SPVM_BASIC_TYPE_C_ID_LONG: {
+                                  case SPVM_NATIVE_C_BASIC_TYPE_ID_LONG: {
                                     SPVM_OPCODE opcode;
                                     memset(&opcode, 0, sizeof(SPVM_OPCODE));
 
@@ -3423,7 +3463,7 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
 
                                     break;
                                   }
-                                  case SPVM_BASIC_TYPE_C_ID_FLOAT: {
+                                  case SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT: {
                                     SPVM_OPCODE opcode;
                                     memset(&opcode, 0, sizeof(SPVM_OPCODE));
 
@@ -3441,7 +3481,7 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
 
                                     break;
                                   }
-                                  case SPVM_BASIC_TYPE_C_ID_DOUBLE: {
+                                  case SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE: {
                                     SPVM_OPCODE opcode;
                                     memset(&opcode, 0, sizeof(SPVM_OPCODE));
 
@@ -3555,37 +3595,37 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                             int32_t mem_id_out;
                             int32_t mem_id_in;
                             switch (field_type->basic_type->id) {
-                              case SPVM_BASIC_TYPE_C_ID_BYTE: {
+                              case SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE: {
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_MOVE_MULNUM_BYTE);
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                 mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
                                 break;
                               }
-                              case SPVM_BASIC_TYPE_C_ID_SHORT: {
+                              case SPVM_NATIVE_C_BASIC_TYPE_ID_SHORT: {
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_MOVE_MULNUM_SHORT);
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                 mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
                                 break;
                               }
-                              case SPVM_BASIC_TYPE_C_ID_INT: {
+                              case SPVM_NATIVE_C_BASIC_TYPE_ID_INT: {
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_MOVE_MULNUM_INT);
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                 mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
                                 break;
                               }
-                              case SPVM_BASIC_TYPE_C_ID_LONG: {
+                              case SPVM_NATIVE_C_BASIC_TYPE_ID_LONG: {
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_MOVE_MULNUM_LONG);
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                 mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
                                 break;
                               }
-                              case SPVM_BASIC_TYPE_C_ID_FLOAT: {
+                              case SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT: {
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_MOVE_MULNUM_FLOAT);
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                 mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
                                 break;
                               }
-                              case SPVM_BASIC_TYPE_C_ID_DOUBLE: {
+                              case SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE: {
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_MOVE_MULNUM_DOUBLE);
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                 mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
@@ -3639,32 +3679,32 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                             int32_t mem_id_out;
                             int32_t mem_id_in;
                             switch (type_dist->basic_type->id) {
-                              case SPVM_BASIC_TYPE_C_ID_BYTE:
+                              case SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE:
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_MOVE_BYTE);
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                 mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
                                 break;
-                              case SPVM_BASIC_TYPE_C_ID_SHORT:
+                              case SPVM_NATIVE_C_BASIC_TYPE_ID_SHORT:
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_MOVE_SHORT);
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                 mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
                                 break;
-                              case SPVM_BASIC_TYPE_C_ID_INT:
+                              case SPVM_NATIVE_C_BASIC_TYPE_ID_INT:
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_MOVE_INT);
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                 mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
                                 break;
-                              case SPVM_BASIC_TYPE_C_ID_LONG:
+                              case SPVM_NATIVE_C_BASIC_TYPE_ID_LONG:
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_MOVE_LONG);
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                 mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
                                 break;
-                              case SPVM_BASIC_TYPE_C_ID_FLOAT:
+                              case SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT:
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_MOVE_FLOAT);
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                 mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
                                 break;
-                              case SPVM_BASIC_TYPE_C_ID_DOUBLE:
+                              case SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE:
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_MOVE_DOUBLE);
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                 mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
@@ -3712,28 +3752,28 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                             int32_t mem_id_in1;
                             int32_t mem_id_in2;
                             if (SPVM_TYPE_is_numeric_type(compiler, operand_type->basic_type->id, operand_type->dimension, operand_type->flag)) {
-                              if (operand_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_BYTE) {
+                              if (operand_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE) {
                                 assert(0);
                               }
-                              else if (operand_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_SHORT) {
+                              else if (operand_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_SHORT) {
                                 assert(0);
                               }
-                              else if (operand_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_INT) {
+                              else if (operand_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_INT) {
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_EQ_INT);
                                 mem_id_in1 = SPVM_OP_get_mem_id(compiler, op_assign_src->first);
                                 mem_id_in2 = SPVM_OP_get_mem_id(compiler, op_assign_src->last);
                               }
-                              else if (operand_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_LONG) {
+                              else if (operand_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_LONG) {
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_EQ_LONG);
                                 mem_id_in1 = SPVM_OP_get_mem_id(compiler, op_assign_src->first);
                                 mem_id_in2 = SPVM_OP_get_mem_id(compiler, op_assign_src->last);
                               }
-                              else if (operand_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_FLOAT) {
+                              else if (operand_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT) {
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_EQ_FLOAT);
                                 mem_id_in1 = SPVM_OP_get_mem_id(compiler, op_assign_src->first);
                                 mem_id_in2 = SPVM_OP_get_mem_id(compiler, op_assign_src->last);
                               }
-                              else if (operand_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_DOUBLE) {
+                              else if (operand_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE) {
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_EQ_DOUBLE);
                                 mem_id_in1 = SPVM_OP_get_mem_id(compiler, op_assign_src->first);
                                 mem_id_in2 = SPVM_OP_get_mem_id(compiler, op_assign_src->last);
@@ -3787,28 +3827,28 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                             int32_t mem_id_in1;
                             int32_t mem_id_in2;
                             if (SPVM_TYPE_is_numeric_type(compiler, operand_type->basic_type->id, operand_type->dimension, operand_type->flag)) {
-                              if (operand_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_BYTE) {
+                              if (operand_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE) {
                                 assert(0);
                               }
-                              else if (operand_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_SHORT) {
+                              else if (operand_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_SHORT) {
                                 assert(0);
                               }
-                              else if (operand_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_INT) {
+                              else if (operand_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_INT) {
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_NE_INT);
                                 mem_id_in1 = SPVM_OP_get_mem_id(compiler, op_assign_src->first);
                                 mem_id_in2 = SPVM_OP_get_mem_id(compiler, op_assign_src->last);
                               }
-                              else if (operand_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_LONG) {
+                              else if (operand_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_LONG) {
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_NE_LONG);
                                 mem_id_in1 = SPVM_OP_get_mem_id(compiler, op_assign_src->first);
                                 mem_id_in2 = SPVM_OP_get_mem_id(compiler, op_assign_src->last);
                               }
-                              else if (operand_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_FLOAT) {
+                              else if (operand_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT) {
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_NE_FLOAT);
                                 mem_id_in1 = SPVM_OP_get_mem_id(compiler, op_assign_src->first);
                                 mem_id_in2 = SPVM_OP_get_mem_id(compiler, op_assign_src->last);
                               }
-                              else if (operand_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_DOUBLE) {
+                              else if (operand_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE) {
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_NE_DOUBLE);
                                 mem_id_in1 = SPVM_OP_get_mem_id(compiler, op_assign_src->first);
                                 mem_id_in2 = SPVM_OP_get_mem_id(compiler, op_assign_src->last);
@@ -3843,22 +3883,22 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                           int32_t mem_id_in1;
                           int32_t mem_id_in2;
                           switch (operand_type->basic_type->id) {
-                            case SPVM_BASIC_TYPE_C_ID_INT:
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_INT:
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GT_INT);
                               mem_id_in1 = SPVM_OP_get_mem_id(compiler, op_assign_src->first);
                               mem_id_in2 = SPVM_OP_get_mem_id(compiler, op_assign_src->last);
                               break;
-                            case SPVM_BASIC_TYPE_C_ID_LONG:
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_LONG:
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GT_LONG);
                               mem_id_in1 = SPVM_OP_get_mem_id(compiler, op_assign_src->first);
                               mem_id_in2 = SPVM_OP_get_mem_id(compiler, op_assign_src->last);
                               break;
-                            case SPVM_BASIC_TYPE_C_ID_FLOAT:
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT:
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GT_FLOAT);
                               mem_id_in1 = SPVM_OP_get_mem_id(compiler, op_assign_src->first);
                               mem_id_in2 = SPVM_OP_get_mem_id(compiler, op_assign_src->last);
                               break;
-                            case SPVM_BASIC_TYPE_C_ID_DOUBLE:
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE:
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GT_DOUBLE);
                               mem_id_in1 = SPVM_OP_get_mem_id(compiler, op_assign_src->first);
                               mem_id_in2 = SPVM_OP_get_mem_id(compiler, op_assign_src->last);
@@ -3883,22 +3923,22 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                           int32_t mem_id_in1;
                           int32_t mem_id_in2;
                           switch (operand_type->basic_type->id) {
-                            case SPVM_BASIC_TYPE_C_ID_INT:
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_INT:
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GE_INT);
                               mem_id_in1 = SPVM_OP_get_mem_id(compiler, op_assign_src->first);
                               mem_id_in2 = SPVM_OP_get_mem_id(compiler, op_assign_src->last);
                               break;
-                            case SPVM_BASIC_TYPE_C_ID_LONG:
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_LONG:
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GE_LONG);
                               mem_id_in1 = SPVM_OP_get_mem_id(compiler, op_assign_src->first);
                               mem_id_in2 = SPVM_OP_get_mem_id(compiler, op_assign_src->last);
                               break;
-                            case SPVM_BASIC_TYPE_C_ID_FLOAT:
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT:
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GE_FLOAT);
                               mem_id_in1 = SPVM_OP_get_mem_id(compiler, op_assign_src->first);
                               mem_id_in2 = SPVM_OP_get_mem_id(compiler, op_assign_src->last);
                               break;
-                            case SPVM_BASIC_TYPE_C_ID_DOUBLE:
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE:
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GE_DOUBLE);
                               mem_id_in1 = SPVM_OP_get_mem_id(compiler, op_assign_src->first);
                               mem_id_in2 = SPVM_OP_get_mem_id(compiler, op_assign_src->last);
@@ -3923,22 +3963,22 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                           int32_t mem_id_in1;
                           int32_t mem_id_in2;
                           switch (operand_type->basic_type->id) {
-                            case SPVM_BASIC_TYPE_C_ID_INT:
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_INT:
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_LT_INT);
                               mem_id_in1 = SPVM_OP_get_mem_id(compiler, op_assign_src->first);
                               mem_id_in2 = SPVM_OP_get_mem_id(compiler, op_assign_src->last);
                               break;
-                            case SPVM_BASIC_TYPE_C_ID_LONG:
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_LONG:
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_LT_LONG);
                               mem_id_in1 = SPVM_OP_get_mem_id(compiler, op_assign_src->first);
                               mem_id_in2 = SPVM_OP_get_mem_id(compiler, op_assign_src->last);
                               break;
-                            case SPVM_BASIC_TYPE_C_ID_FLOAT:
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT:
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_LT_FLOAT);
                               mem_id_in1 = SPVM_OP_get_mem_id(compiler, op_assign_src->first);
                               mem_id_in2 = SPVM_OP_get_mem_id(compiler, op_assign_src->last);
                               break;
-                            case SPVM_BASIC_TYPE_C_ID_DOUBLE:
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE:
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_LT_DOUBLE);
                               mem_id_in1 = SPVM_OP_get_mem_id(compiler, op_assign_src->first);
                               mem_id_in2 = SPVM_OP_get_mem_id(compiler, op_assign_src->last);
@@ -3963,22 +4003,22 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                           int32_t mem_id_in1;
                           int32_t mem_id_in2;
                           switch (operand_type->basic_type->id) {
-                            case SPVM_BASIC_TYPE_C_ID_INT:
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_INT:
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_LE_INT);
                               mem_id_in1 = SPVM_OP_get_mem_id(compiler, op_assign_src->first);
                               mem_id_in2 = SPVM_OP_get_mem_id(compiler, op_assign_src->last);
                               break;
-                            case SPVM_BASIC_TYPE_C_ID_LONG:
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_LONG:
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_LE_LONG);
                               mem_id_in1 = SPVM_OP_get_mem_id(compiler, op_assign_src->first);
                               mem_id_in2 = SPVM_OP_get_mem_id(compiler, op_assign_src->last);
                               break;
-                            case SPVM_BASIC_TYPE_C_ID_FLOAT:
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT:
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_LE_FLOAT);
                               mem_id_in1 = SPVM_OP_get_mem_id(compiler, op_assign_src->first);
                               mem_id_in2 = SPVM_OP_get_mem_id(compiler, op_assign_src->last);
                               break;
-                            case SPVM_BASIC_TYPE_C_ID_DOUBLE:
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE:
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_LE_DOUBLE);
                               mem_id_in1 = SPVM_OP_get_mem_id(compiler, op_assign_src->first);
                               mem_id_in2 = SPVM_OP_get_mem_id(compiler, op_assign_src->last);
@@ -4003,22 +4043,22 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                           int32_t mem_id_in1;
                           int32_t mem_id_in2;
                           switch (operand_type->basic_type->id) {
-                            case SPVM_BASIC_TYPE_C_ID_INT:
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_INT:
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_CMP_INT);
                               mem_id_in1 = SPVM_OP_get_mem_id(compiler, op_assign_src->first);
                               mem_id_in2 = SPVM_OP_get_mem_id(compiler, op_assign_src->last);
                               break;
-                            case SPVM_BASIC_TYPE_C_ID_LONG:
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_LONG:
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_CMP_LONG);
                               mem_id_in1 = SPVM_OP_get_mem_id(compiler, op_assign_src->first);
                               mem_id_in2 = SPVM_OP_get_mem_id(compiler, op_assign_src->last);
                               break;
-                            case SPVM_BASIC_TYPE_C_ID_FLOAT:
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT:
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_CMP_FLOAT);
                               mem_id_in1 = SPVM_OP_get_mem_id(compiler, op_assign_src->first);
                               mem_id_in2 = SPVM_OP_get_mem_id(compiler, op_assign_src->last);
                               break;
-                            case SPVM_BASIC_TYPE_C_ID_DOUBLE:
+                            case SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE:
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_CMP_DOUBLE);
                               mem_id_in1 = SPVM_OP_get_mem_id(compiler, op_assign_src->first);
                               mem_id_in2 = SPVM_OP_get_mem_id(compiler, op_assign_src->last);
@@ -4098,25 +4138,25 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                             
                             int32_t mem_id_in;
                             if (SPVM_TYPE_is_numeric_type(compiler, type->basic_type->id, type->dimension, type->flag)) {
-                              if (type->basic_type->id == SPVM_BASIC_TYPE_C_ID_BYTE) {
+                              if (type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE) {
                                 assert(0);
                               }
-                              else if (type->basic_type->id == SPVM_BASIC_TYPE_C_ID_SHORT) {
+                              else if (type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_SHORT) {
                                 assert(0);
                               }
-                              else if (type->basic_type->id == SPVM_BASIC_TYPE_C_ID_INT) {
+                              else if (type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_INT) {
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_BOOL_INT);
                                 mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src->first);
                               }
-                              else if (type->basic_type->id == SPVM_BASIC_TYPE_C_ID_LONG) {
+                              else if (type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_LONG) {
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_BOOL_LONG);
                                 mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src->first);
                               }
-                              else if (type->basic_type->id == SPVM_BASIC_TYPE_C_ID_FLOAT) {
+                              else if (type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT) {
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_BOOL_FLOAT);
                                 mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src->first);
                               }
-                              else if (type->basic_type->id == SPVM_BASIC_TYPE_C_ID_DOUBLE) {
+                              else if (type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE) {
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_BOOL_DOUBLE);
                                 mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src->first);
                               }
@@ -4231,7 +4271,7 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                           // Default branch
                           int32_t default_opcode_rel_index = switch_info->default_opcode_rel_index;
                           if (default_opcode_rel_index == 0) {
-                            default_opcode_rel_index = opcode_array->length + 1 - method_opcode_ids_base;
+                            default_opcode_rel_index = opcode_array->length + 1 - method_opcodes_base_id;
                           }
                           switch_info->default_opcode_rel_index = default_opcode_rel_index;
 
@@ -4339,32 +4379,32 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                               int32_t mem_id_in;
                               if (SPVM_TYPE_is_numeric_type(compiler, method->return_type->basic_type->id, method->return_type->dimension, method->return_type->flag)) {
                                 switch (method->return_type->basic_type->id) {
-                                  case SPVM_BASIC_TYPE_C_ID_BYTE: {
+                                  case SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE: {
                                     SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_RETURN_BYTE);
                                     mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src->first);
                                     break;
                                   }
-                                  case SPVM_BASIC_TYPE_C_ID_SHORT: {
+                                  case SPVM_NATIVE_C_BASIC_TYPE_ID_SHORT: {
                                     SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_RETURN_SHORT);
                                     mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src->first);
                                     break;
                                   }
-                                  case SPVM_BASIC_TYPE_C_ID_INT: {
+                                  case SPVM_NATIVE_C_BASIC_TYPE_ID_INT: {
                                     SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_RETURN_INT);
                                     mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src->first);
                                     break;
                                   }
-                                  case SPVM_BASIC_TYPE_C_ID_LONG: {
+                                  case SPVM_NATIVE_C_BASIC_TYPE_ID_LONG: {
                                     SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_RETURN_LONG);
                                     mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src->first);
                                     break;
                                   }
-                                  case SPVM_BASIC_TYPE_C_ID_FLOAT: {
+                                  case SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT: {
                                     SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_RETURN_FLOAT);
                                     mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src->first);
                                     break;
                                   }
-                                  case SPVM_BASIC_TYPE_C_ID_DOUBLE: {
+                                  case SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE: {
                                     SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_RETURN_DOUBLE);
                                     mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src->first);
                                     break;
@@ -4388,32 +4428,32 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                                 assert(SPVM_TYPE_is_numeric_type(compiler, field_type->basic_type->id, field_type->dimension, field_type->flag));
 
                                 switch (field_type->basic_type->id) {
-                                  case SPVM_BASIC_TYPE_C_ID_BYTE: {
+                                  case SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE: {
                                     mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src->first);
                                     SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_RETURN_MULNUM_BYTE);
                                     break;
                                   }
-                                  case SPVM_BASIC_TYPE_C_ID_SHORT: {
+                                  case SPVM_NATIVE_C_BASIC_TYPE_ID_SHORT: {
                                     mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src->first);
                                     SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_RETURN_MULNUM_SHORT);
                                     break;
                                   }
-                                  case SPVM_BASIC_TYPE_C_ID_INT: {
+                                  case SPVM_NATIVE_C_BASIC_TYPE_ID_INT: {
                                     mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src->first);
                                     SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_RETURN_MULNUM_INT);
                                     break;
                                   }
-                                  case SPVM_BASIC_TYPE_C_ID_LONG: {
+                                  case SPVM_NATIVE_C_BASIC_TYPE_ID_LONG: {
                                     mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src->first);
                                     SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_RETURN_MULNUM_LONG);
                                     break;
                                   }
-                                  case SPVM_BASIC_TYPE_C_ID_FLOAT: {
+                                  case SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT: {
                                     mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src->first);
                                     SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_RETURN_MULNUM_FLOAT);
                                     break;
                                   }
-                                  case SPVM_BASIC_TYPE_C_ID_DOUBLE: {
+                                  case SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE: {
                                     mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src->first);
                                     SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_RETURN_MULNUM_DOUBLE);
                                     break;
@@ -4441,7 +4481,7 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                             SPVM_OPCODE_ARRAY_push_opcode(compiler, opcode_array, &opcode);
                           }
                           
-                          int32_t return_opcode_rel_index = opcode_array->length - 1 - method_opcode_ids_base;
+                          int32_t return_opcode_rel_index = opcode_array->length - 1 - method_opcodes_base_id;
                           
                           SPVM_LIST_push(return_goto_opcode_rel_index_stack, (void*)(intptr_t)return_opcode_rel_index);
                           
@@ -4454,7 +4494,7 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                           SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GOTO);
                           SPVM_OPCODE_ARRAY_push_opcode(compiler, opcode_array, &opcode);
                           
-                          int32_t opcode_rel_index = opcode_array->length - 1 - method_opcode_ids_base;
+                          int32_t opcode_rel_index = opcode_array->length - 1 - method_opcodes_base_id;
                           
                           SPVM_LIST_push(last_goto_opcode_rel_index_stack, (void*)(intptr_t)opcode_rel_index);
                           
@@ -4467,7 +4507,7 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                           SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GOTO);
                           SPVM_OPCODE_ARRAY_push_opcode(compiler, opcode_array, &opcode);
                           
-                          int32_t opcode_rel_index = opcode_array->length - 1 - method_opcode_ids_base;
+                          int32_t opcode_rel_index = opcode_array->length - 1 - method_opcodes_base_id;
                           
                           SPVM_LIST_push(break_goto_opcode_rel_index_stack, (void*)(intptr_t)opcode_rel_index);
                           
@@ -4480,7 +4520,7 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                           SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GOTO);
                           SPVM_OPCODE_ARRAY_push_opcode(compiler, opcode_array, &opcode);
                           
-                          int32_t opcode_rel_index = opcode_array->length - 1 - method_opcode_ids_base;
+                          int32_t opcode_rel_index = opcode_array->length - 1 - method_opcodes_base_id;
                           
                           SPVM_LIST_push(next_goto_opcode_rel_index_stack, (void*)(intptr_t)opcode_rel_index);
                           
@@ -4490,8 +4530,8 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                           // Set loop first GOTO opcode
                           int32_t loop_first_goto_opcode_rel_index = (intptr_t)SPVM_LIST_get(loop_first_goto_opcode_rel_index_stack, loop_first_goto_opcode_rel_index_stack->length - 1);
                           
-                          SPVM_OPCODE* loop_first_goto = (opcode_array->values + method_opcode_ids_base + loop_first_goto_opcode_rel_index);
-                          int32_t loop_first_goto_jump_opcode_rel_index = opcode_array->length - method_opcode_ids_base;
+                          SPVM_OPCODE* loop_first_goto = (opcode_array->values + method_opcodes_base_id + loop_first_goto_opcode_rel_index);
+                          int32_t loop_first_goto_jump_opcode_rel_index = opcode_array->length - method_opcodes_base_id;
                           loop_first_goto->operand0 = loop_first_goto_jump_opcode_rel_index;
                           
                           break;
@@ -4500,7 +4540,7 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                         case SPVM_OP_C_ID_CONDITION_NOT:
                         {
                           
-                          int32_t opcode_rel_index = opcode_array->length - method_opcode_ids_base;
+                          int32_t opcode_rel_index = opcode_array->length - method_opcodes_base_id;
 
                           SPVM_OPCODE opcode;
                           memset(&opcode, 0, sizeof(SPVM_OPCODE));
@@ -4556,27 +4596,27 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                           mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
                         }
                         else {
-                          if (type->basic_type->id == SPVM_BASIC_TYPE_C_ID_BYTE) {
+                          if (type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE) {
                             SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_SET_CLASS_VAR_BYTE);
                             mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
                           }
-                          else if (type->basic_type->id == SPVM_BASIC_TYPE_C_ID_SHORT) {
+                          else if (type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_SHORT) {
                             SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_SET_CLASS_VAR_SHORT);
                             mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
                           }
-                          else if (type->basic_type->id == SPVM_BASIC_TYPE_C_ID_INT) {
+                          else if (type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_INT) {
                             SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_SET_CLASS_VAR_INT);
                             mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
                           }
-                          else if (type->basic_type->id == SPVM_BASIC_TYPE_C_ID_LONG) {
+                          else if (type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_LONG) {
                             SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_SET_CLASS_VAR_LONG);
                             mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
                           }
-                          else if (type->basic_type->id == SPVM_BASIC_TYPE_C_ID_FLOAT) {
+                          else if (type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT) {
                             SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_SET_CLASS_VAR_FLOAT);
                             mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
                           }
-                          else if (type->basic_type->id == SPVM_BASIC_TYPE_C_ID_DOUBLE) {
+                          else if (type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE) {
                             SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_SET_CLASS_VAR_DOUBLE);
                             mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
                           }
@@ -4600,27 +4640,27 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                       
                       assert(SPVM_TYPE_is_numeric_ref_type(compiler, type->basic_type->id, type->dimension, type->flag));
                       int32_t mem_id_in;
-                      if (type->basic_type->id == SPVM_BASIC_TYPE_C_ID_BYTE) {
+                      if (type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE) {
                         SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_SET_DEREF_BYTE);
                         mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
                       }
-                      else if (type->basic_type->id == SPVM_BASIC_TYPE_C_ID_SHORT) {
+                      else if (type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_SHORT) {
                         SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_SET_DEREF_SHORT);
                         mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
                       }
-                      else if (type->basic_type->id == SPVM_BASIC_TYPE_C_ID_INT) {
+                      else if (type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_INT) {
                         SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_SET_DEREF_INT);
                         mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
                       }
-                      else if (type->basic_type->id == SPVM_BASIC_TYPE_C_ID_LONG) {
+                      else if (type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_LONG) {
                         SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_SET_DEREF_LONG);
                         mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
                       }
-                      else if (type->basic_type->id == SPVM_BASIC_TYPE_C_ID_FLOAT) {
+                      else if (type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT) {
                         SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_SET_DEREF_FLOAT);
                         mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
                       }
-                      else if (type->basic_type->id == SPVM_BASIC_TYPE_C_ID_DOUBLE) {
+                      else if (type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE) {
                         SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_SET_DEREF_DOUBLE);
                         mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
                       }
@@ -4664,6 +4704,9 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                       SPVM_OP* op_term_index = op_array_access->last;
 
                       SPVM_TYPE* array_type = SPVM_OP_get_type(compiler, op_term_array);
+                      int32_t array_type_dimension = array_type->dimension;
+                      int32_t array_basic_type_id = array_type->basic_type->id;
+                      int32_t array_basic_type_category = array_type->basic_type->category;
 
                       if (SPVM_TYPE_is_any_object_array_type(compiler, array_type->basic_type->id, array_type->dimension, array_type->flag)) {
                         SPVM_TYPE* src_type = SPVM_OP_get_type(compiler, op_assign_src);
@@ -4710,27 +4753,27 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                         
                         assert(SPVM_TYPE_is_numeric_type(compiler, element_type->basic_type->id, element_type->dimension, element_type->flag));
                         int32_t mem_id_in;
-                        if (element_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_BYTE) {
+                        if (element_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE) {
                           SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_SET_MULNUM_ARRAY_BYTE);
                           mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
                         }
-                        else if (element_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_SHORT) {
+                        else if (element_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_SHORT) {
                           SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_SET_MULNUM_ARRAY_SHORT);
                           mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
                         }
-                        else if (element_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_INT) {
+                        else if (element_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_INT) {
                           SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_SET_MULNUM_ARRAY_INT);
                           mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
                         }
-                        else if (element_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_LONG) {
+                        else if (element_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_LONG) {
                           SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_SET_MULNUM_ARRAY_LONG);
                           mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
                         }
-                        else if (element_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_FLOAT) {
+                        else if (element_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT) {
                           SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_SET_MULNUM_ARRAY_FLOAT);
                           mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
                         }
-                        else if (element_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_DOUBLE) {
+                        else if (element_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE) {
                           SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_SET_MULNUM_ARRAY_DOUBLE);
                           mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
                         }
@@ -4776,27 +4819,27 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                           
                           int32_t mem_id_in;
                           if (SPVM_TYPE_is_numeric_type(compiler, element_type->basic_type->id, element_type->dimension, element_type->flag)) {
-                            if (element_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_BYTE) {
+                            if (element_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE) {
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_SET_ARRAY_ELEMENT_BYTE);
                               mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
                             }
-                            else if (element_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_SHORT) {
+                            else if (element_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_SHORT) {
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_SET_ARRAY_ELEMENT_SHORT);
                               mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
                             }
-                            else if (element_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_INT) {
+                            else if (element_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_INT) {
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_SET_ARRAY_ELEMENT_INT);
                               mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
                             }
-                            else if (element_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_LONG) {
+                            else if (element_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_LONG) {
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_SET_ARRAY_ELEMENT_LONG);
                               mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
                             }
-                            else if (element_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_FLOAT) {
+                            else if (element_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT) {
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_SET_ARRAY_ELEMENT_FLOAT);
                               mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
                             }
-                            else if (element_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_DOUBLE) {
+                            else if (element_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE) {
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_SET_ARRAY_ELEMENT_DOUBLE);
                               mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
                             }
@@ -4806,22 +4849,23 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                           }
                           else {
                             int32_t is_check_type;
-                            switch (array_type->category) {
-                              case SPVM_TYPE_C_CATEGORY_INTERFACE_ARRAY:
-                              case SPVM_TYPE_C_CATEGORY_CALLBACK_ARRAY:
-                              case SPVM_TYPE_C_CATEGORY_ANY_OBJECT_ARRAY:
-                              {
-                                is_check_type = 1;
-                                break;
-                              }
-                              default: {
-                                is_check_type = 0;
-                                break;
+                            if (array_type_dimension == 1) {
+                              switch (array_basic_type_category) {
+                                case SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_INTERFACE:
+                                case SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_CALLBACK:
+                                case SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_ANY_OBJECT:
+                                {
+                                  is_check_type = 1;
+                                  break;
+                                }
+                                default: {
+                                  is_check_type = 0;
+                                  break;
+                                }
                               }
                             }
                             
                             if (is_check_type) {
-                              assert(array_type->dimension == 1);
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_SET_ARRAY_ELEMENT_OBJECT_CHECK_TYPE);
                             }
                             else {
@@ -4862,27 +4906,27 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                         memset(&opcode, 0, sizeof(SPVM_OPCODE));
                         int32_t mem_id_in;
                         switch (src_type->basic_type->id) {
-                          case SPVM_BASIC_TYPE_C_ID_BYTE:
+                          case SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE:
                             SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_SET_MULNUM_FIELD_DEREF_BYTE);
                             mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
                             break;
-                          case SPVM_BASIC_TYPE_C_ID_SHORT:
+                          case SPVM_NATIVE_C_BASIC_TYPE_ID_SHORT:
                             SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_SET_MULNUM_FIELD_DEREF_SHORT);
                             mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
                             break;
-                          case SPVM_BASIC_TYPE_C_ID_INT:
+                          case SPVM_NATIVE_C_BASIC_TYPE_ID_INT:
                             SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_SET_MULNUM_FIELD_DEREF_INT);
                             mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
                             break;
-                          case SPVM_BASIC_TYPE_C_ID_LONG:
+                          case SPVM_NATIVE_C_BASIC_TYPE_ID_LONG:
                             SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_SET_MULNUM_FIELD_DEREF_LONG);
                             mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
                             break;
-                          case SPVM_BASIC_TYPE_C_ID_FLOAT:
+                          case SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT:
                             SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_SET_MULNUM_FIELD_DEREF_FLOAT);
                             mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
                             break;
-                          case SPVM_BASIC_TYPE_C_ID_DOUBLE:
+                          case SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE:
                             SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_SET_MULNUM_FIELD_DEREF_DOUBLE);
                             mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
                             break;
@@ -4906,32 +4950,32 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                         assert(SPVM_TYPE_is_numeric_type(compiler, src_type->basic_type->id, src_type->dimension, src_type->flag));
                         int32_t mem_id_out;
                         int32_t mem_id_in;
-                        if (src_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_BYTE) {
+                        if (src_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE) {
                           SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_SET_MULNUM_FIELD_BYTE);
                           mem_id_out = SPVM_OP_get_mem_id(compiler, op_term_invocant);
                           mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
                         }
-                        else if (src_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_SHORT) {
+                        else if (src_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_SHORT) {
                           SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_SET_MULNUM_FIELD_SHORT);
                           mem_id_out = SPVM_OP_get_mem_id(compiler, op_term_invocant);
                           mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
                         }
-                        else if (src_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_INT) {
+                        else if (src_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_INT) {
                           SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_SET_MULNUM_FIELD_INT);
                           mem_id_out = SPVM_OP_get_mem_id(compiler, op_term_invocant);
                           mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
                         }
-                        else if (src_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_LONG) {
+                        else if (src_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_LONG) {
                           SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_SET_MULNUM_FIELD_LONG);
                           mem_id_out = SPVM_OP_get_mem_id(compiler, op_term_invocant);
                           mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
                         }
-                        else if (src_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_FLOAT) {
+                        else if (src_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT) {
                           SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_SET_MULNUM_FIELD_FLOAT);
                           mem_id_out = SPVM_OP_get_mem_id(compiler, op_term_invocant);
                           mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
                         }
-                        else if (src_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_DOUBLE) {
+                        else if (src_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE) {
                           SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_SET_MULNUM_FIELD_DOUBLE);
                           mem_id_out = SPVM_OP_get_mem_id(compiler, op_term_invocant);
                           mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
@@ -4969,27 +5013,27 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                           
                           int32_t mem_id_in;
                           if (SPVM_TYPE_is_numeric_type(compiler, src_type->basic_type->id, src_type->dimension, src_type->flag)) {
-                            if (src_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_BYTE) {
+                            if (src_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE) {
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_SET_FIELD_BYTE);
                               mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
                             }
-                            else if (src_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_SHORT) {
+                            else if (src_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_SHORT) {
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_SET_FIELD_SHORT);
                               mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
                             }
-                            else if (src_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_INT) {
+                            else if (src_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_INT) {
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_SET_FIELD_INT);
                               mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
                             }
-                            else if (src_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_LONG) {
+                            else if (src_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_LONG) {
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_SET_FIELD_LONG);
                               mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
                             }
-                            else if (src_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_FLOAT) {
+                            else if (src_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT) {
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_SET_FIELD_FLOAT);
                               mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
                             }
-                            else if (src_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_DOUBLE) {
+                            else if (src_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE) {
                               SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_SET_FIELD_DOUBLE);
                               mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
                             }
@@ -5038,27 +5082,27 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                       memset(&opcode, 0, sizeof(SPVM_OPCODE));
                       
                       int32_t mem_id_in;
-                      if (element_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_BYTE) {
+                      if (element_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE) {
                         SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_SET_MULNUM_ARRAY_FIELD_BYTE);
                         mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
                       }
-                      else if (element_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_SHORT) {
+                      else if (element_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_SHORT) {
                         SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_SET_MULNUM_ARRAY_FIELD_SHORT);
                         mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
                       }
-                      else if (element_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_INT) {
+                      else if (element_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_INT) {
                         SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_SET_MULNUM_ARRAY_FIELD_INT);
                         mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
                       }
-                      else if (element_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_LONG) {
+                      else if (element_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_LONG) {
                         SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_SET_MULNUM_ARRAY_FIELD_LONG);
                         mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
                       }
-                      else if (element_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_FLOAT) {
+                      else if (element_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT) {
                         SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_SET_MULNUM_ARRAY_FIELD_FLOAT);
                         mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
                       }
-                      else if (element_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_DOUBLE) {
+                      else if (element_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE) {
                         SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_SET_MULNUM_ARRAY_FIELD_DOUBLE);
                         mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src);
                       }
@@ -5117,7 +5161,7 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
           SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode,  SPVM_OPCODE_C_ID_END_METHOD);
           SPVM_OPCODE_ARRAY_push_opcode(compiler, opcode_array, &opcode);
 
-          method->opcode_ids_length = opcode_array->length - method->opcode_ids_base;
+          method->opcodes_length = opcode_array->length - method->opcodes_base_id;
           
           method->mortal_stack_length = mortal_stack_top_max + 1;
           

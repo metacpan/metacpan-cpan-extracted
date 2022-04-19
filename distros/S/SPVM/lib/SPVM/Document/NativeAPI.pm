@@ -812,39 +812,7 @@ Native APIs of L<SPVM> have the IDs that is corresponding to the names. These ID
   183 init_env,
   184 call_init_blocks,
   185 cleanup_global_vars,
-  186 get_native_method_address,
-  187 get_precompile_method_address,
-  188 set_native_method_address,
-  189 set_precompile_method_address,
-  190 is_object_array,
-  191 get_method_id_without_signature,
-  192 get_constant_string_value,
-  193 compiler_new,
-  194 compiler_free,
-  195 compiler_set_start_line,
-  196 compiler_get_start_line,
-  197 compiler_set_start_file,
-  198 compiler_get_start_file,
-  199 compiler_add_module_dir,
-  200 compiler_get_module_dirs_length,
-  201 compiler_get_module_dir,
-  202 compiler_compile_spvm,
-  203 compiler_get_error_messages_length,
-  204 compiler_get_error_message,
-  205 compiler_get_class_id,
-  206 compiler_get_classes_length,
-  207 compiler_get_class_name,
-  208 compiler_is_anon_class,
-  209 compiler_get_methods_length,
-  210 compiler_get_method_id,
-  211 compiler_get_method_id_by_name,
-  212 compiler_get_method_name,
-  213 compiler_get_method_signature,
-  214 compiler_is_anon_method,
-  215 compiler_is_init_block_method,
-  216 compiler_is_native_method,
-  217 compiler_is_precompile_method,
-  218 compiler_build_runtime,
+  186 is_object_array,
 
 =head1 List of Native APIs
 
@@ -891,6 +859,8 @@ Offset of type dimension in object structure. This is used internally.
   void* object_type_category_offset;
 
 Offset of runtime type category in object structure. This is used internally.
+
+This value is always C<NULL>, because SPVM 0.9511+, this value is any more used.
 
 =head2 object_flag_offset
 
@@ -2665,30 +2635,6 @@ Call C<INIT> blocks.
 
 Cleanup gloval variable, such as class variables and the exception variable.
 
-=head2 get_native_method_address
-  
-  void* (*get_native_method_address)(SPVM_ENV* env, int32_t method_id);
-
-Get the native method address.
-
-=head2 get_precompile_method_address
-  
-  void* (*get_precompile_method_address)(SPVM_ENV* env, int32_t method_id);
-
-Get the precompile method address.
-
-=head2 set_native_method_address
-  
-  void (*set_native_method_address)(SPVM_ENV* env, int32_t method_id, void* address);
-
-Set the native method address.
-
-=head2 set_precompile_method_address
-  
-  void (*set_precompile_method_address)(SPVM_ENV* env, int32_t method_id, void* address);
-
-Set the precompile method address.
-
 =head2 is_object_array
 
   int32_t (*is_object_array)(SPVM_ENV* env, void* object);
@@ -2697,185 +2643,25 @@ If the object is a object array, returns C<1>, otherwise returns C<0>.
 
 If the object is C<NULL>, returns C<0>.
 
-=head2 get_method_id_without_signature
+=head1 Compiler Native API
 
-  int32_t (*get_method_id_without_signature)(SPVM_ENV* env, const char* class_name, const char* method_name);
+L<SPVM::Document::NativeAPI::Compiler>
 
-Get the method ID by the class name and method name. If the method does not exists, a negative value is returned.
+=head1 Precompile Native API
 
-=head2 get_method_id_without_signature
+L<SPVM::Document::NativeAPI::Precompile>
 
-  int32_t (*get_method_id_without_signature)(SPVM_ENV* env, const char* class_name, const char* method_name);
+=head1 Runtime Native API
 
-Get the method ID by the class name and method name. If the method does not exists, a negative value is returned.
+L<SPVM::Document::NativeAPI::Runtime>
 
-=head2 get_constant_string_value
+=head1 String Buffer Native API
 
-  const char* (*get_constant_string_value)(SPVM_ENV* env, int32_t string_id, int32_t* string_length);
+L<SPVM::Document::NativeAPI::StringBuffer>
 
-Get the value and length of the string with the string ID. 
+=head1 Allocator Native API
 
-=head2 compiler_new
-  
-  void* (*compiler_new)();
-
-New a SVPM compiler.
-
-=head2 compiler_free
-  
-  void (*compiler_free)(void* compiler);
-
-Free a compiler.
-
-=head2 compiler_set_start_line
-  
-  void (*compiler_set_start_line)(void* compiler, int32_t start_line);
-
-Set the start line of the compiler.
-
-=head2 compiler_get_start_line
-  
-  int32_t (*compiler_get_start_line)(void* compiler);
-
-Get the start line of the compiler.
-
-=head2 compiler_set_start_file
-  
-  void (*compiler_set_start_file)(void* compiler, const char* start_file);
-
-Set the start file of the compiler.
-
-=head2 compiler_get_start_file
-  
-  const char* (*compiler_get_start_file)(void* compiler);
-
-Get the start file of the compiler.
-
-=head2 compiler_add_module_dir
-  
-  void (*compiler_add_module_dir)(void* compiler, const char* module_dir);
-
-Add a module searching directory of the compiler.
-
-=head2 compiler_get_module_dirs_length
-  
-  int32_t (*compiler_get_module_dirs_length)(void* compiler);
-
-Get the length of the module searching directories of the compiler.
-
-=head2 compiler_get_module_dir
-
-  const char* (*compiler_get_module_dir)(void* compiler, int32_t module_dir_id);
-
-Get a searching directories of the compiler with the index.
-
-=head2 compiler_compile_spvm
-  
-  int32_t (*compiler_compile_spvm)(void* compiler, const char* class_name);
-
-Compile the SPVM class.
-
-=head2 compiler_get_error_messages_length
-  
-  int32_t (*compiler_get_error_messages_length)(void* compiler);
-
-Get the length of the compiler error messages.
-
-=head2 compiler_get_error_message
-  
-  const char* (*compiler_get_error_message)(void* compiler, int32_t index);
-
-Get a compiler error messages with the index.
-
-=head2 compiler_get_class_id
-  
-  int32_t (*compiler_get_class_id)(void* compiler, const char* class_name);
-
-Get class ID with the class name.
-
-If the class doesn't found, return a negative value.
-
-=head2 compiler_get_classes_length
-  
-  int32_t (*compiler_get_classes_length)(void* compiler);
-
-Get the length of classes that is compiled by the compiler.
-
-=head2 compiler_get_class_name
-  
-  const char* (*compiler_get_class_name)(void* compiler, int32_t class_id);
-
-Get the class name with the class id.
-
-=head2 compiler_is_anon_class
-  
-  int32_t (*compiler_is_anon_class)(void* compiler, int32_t class_id);
-
-If the class is an anon class, return C<1>, otherwise return C<0>.
-
-=head2 compiler_get_methods_length
-  
-  int32_t (*compiler_get_methods_length)(void* compiler, int32_t class_id);
-
-Get the length of methods of the class.
-
-=head2 compiler_get_method_id
-  
-  int32_t (*compiler_get_method_id)(void* compiler, int32_t class_id, int32_t method_index_of_class);
-
-Get the method id with the class id and the method index of the class.
-
-If the method doesn't found, return a negative value.
-
-=head2 compiler_get_method_id_by_name
-  
-  int32_t (*compiler_get_method_id_by_name)(void* compiler, const char* class_name, const char* method_name);
-
-Get the method id with the class name and the method name.
-
-If the method doesn't found, return a negative value.
-
-=head2 compiler_get_method_name
-  
-  const char* (*compiler_get_method_name)(void* compiler, int32_t method_id);
-
-Get the method name with the method ID.
-
-=head2 compiler_get_method_signature
-  
-  const char* (*compiler_get_method_signature)(void* compiler, int32_t method_id);
-
-Get the method signature with the method ID.
-
-=head2 compiler_is_anon_method
-  
-  int32_t (*compiler_is_anon_method)(void* compiler, int32_t method_id);
-
-Get the method name with the method ID.
-
-=head2 compiler_is_init_block_method
-  
-  int32_t (*compiler_is_init_block_method)(void* compiler, int32_t method_id);
-
-If the method is the method of C<INIT> block, return C<1>, otherwise return C<0>.
-
-=head2 compiler_is_native_method
-  
-  int32_t (*compiler_is_native_method)(void* compiler, int32_t method_id);
-
-If the method is a native method, return C<1>, otherwise return C<0>.
-
-=head2 compiler_is_precompile_method
-  
-  int32_t (*compiler_is_precompile_method)(void* compiler, int32_t method_id);
-
-If the method is a precompile method, return C<1>, otherwise return C<0>.
-
-=head2 compiler_build_runtime
-
-  void* (*compiler_build_runtime)(void* compiler);
-
-Build runtime information.
+L<SPVM::Document::NativeAPI::Allocator>
 
 =head1 Utilities
 

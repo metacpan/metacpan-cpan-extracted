@@ -27,9 +27,10 @@ requires:
   Fcntl: '0'
   Getopt::Long: '0'
   IO::File: '0'
+  Time::Local: '0'
 resources:
   bugtracker: https://github.com/pmqs/zipdetails/issues
   homepage: https://github.com/pmqs/zipdetails
   repository: git://github.com/pmqs/zipdetails.git
-version: 2.104
+version: 2.107
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

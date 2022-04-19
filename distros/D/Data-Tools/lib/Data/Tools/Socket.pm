@@ -13,7 +13,7 @@ use strict;
 use Exporter;
 use Time::HiRes qw( time );
 
-our $VERSION = '1.28';
+our $VERSION = '1.29';
 
 our @ISA    = qw( Exporter );
 our @EXPORT = qw(
@@ -266,8 +266,8 @@ Data::Tools::Socket uses:
 =head1 AUTHOR
 
   Vladi Belperchinov-Shabanski "Cade"
-#        <cade@noxrun.com> <cade@bis.bg> <cade@cpan.org>
-#  http://cade.noxrun.com/  
+        <cade@noxrun.com> <cade@bis.bg> <cade@cpan.org>
+  http://cade.noxrun.com/  
 
 
 =cut

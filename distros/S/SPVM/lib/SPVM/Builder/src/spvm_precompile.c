@@ -7,26 +7,48 @@
 
 #include "spvm_precompile.h"
 
+#include "spvm_allocator.h"
 #include "spvm_native.h"
 #include "spvm_api.h"
+#include "spvm_api_runtime.h"
 #include "spvm_string_buffer.h"
 #include "spvm_opcode.h"
 
-void SPVM_PRECOMPILE_create_precompile_source(SPVM_ENV* env, SPVM_STRING_BUFFER* string_buffer, const char* class_name) {
+SPVM_PRECOMPILE* SPVM_PRECOMPILE_new() {
+  SPVM_PRECOMPILE* precompile = SPVM_ALLOCATOR_alloc_memory_block_unmanaged(sizeof(SPVM_PRECOMPILE));
   
-  // Runtime
-  SPVM_RUNTIME* runtime = env->runtime;
+  return precompile;
+}
+
+void SPVM_PRECOMPILE_free(SPVM_PRECOMPILE* precompile) {
+  
+  SPVM_ALLOCATOR_free_memory_block_unmanaged(precompile);
+  precompile = NULL;
+}
+
+void SPVM_PRECOMPILE_set_runtime(SPVM_PRECOMPILE* precompile, SPVM_RUNTIME* runtime) {
+  
+  precompile->runtime = runtime;
+}
+
+SPVM_RUNTIME* SPVM_PRECOMPILE_get_runtime(SPVM_PRECOMPILE* precompile) {
+  
+  return precompile->runtime;
+}
+
+void SPVM_PRECOMPILE_create_precompile_source(SPVM_PRECOMPILE* precompile, SPVM_STRING_BUFFER* string_buffer, const char* class_name) {
+  SPVM_RUNTIME* runtime = precompile->runtime;
   
   // Class
-  int32_t class_id = SPVM_API_get_class_id(env, class_name);
-  int32_t class_is_anon = SPVM_API_get_class_is_anon(env, class_id);
-  int32_t class_module_file_id = SPVM_API_get_class_module_file_id(env, class_id);
-  const char* class_module_file = SPVM_API_get_name(env, class_module_file_id);
-  int32_t class_method_ids_base = SPVM_API_get_class_method_ids_base(env, class_id);
-  int32_t class_method_ids_length = SPVM_API_get_class_method_ids_length(env, class_id);
+  int32_t class_id = SPVM_API_RUNTIME_get_class_id_by_name(runtime, class_name);
+  int32_t class_is_anon = SPVM_API_RUNTIME_get_class_is_anon(runtime, class_id);
+  int32_t class_module_file_id = SPVM_API_RUNTIME_get_class_module_file_id(runtime, class_id);
+  const char* class_module_file = SPVM_API_RUNTIME_get_name(runtime, class_module_file_id);
+  int32_t class_methods_base_id = SPVM_API_RUNTIME_get_class_methods_base_id(runtime, class_id);
+  int32_t class_methods_length = SPVM_API_RUNTIME_get_class_methods_length(runtime, class_id);
   
   // Head part - include and define
-  SPVM_PRECOMPILE_build_head(env, string_buffer);
+  SPVM_PRECOMPILE_build_head(precompile, string_buffer);
   
   // Constant strings
   if (!class_is_anon) {
@@ -43,17 +65,17 @@ void SPVM_PRECOMPILE_create_precompile_source(SPVM_ENV* env, SPVM_STRING_BUFFER*
   SPVM_STRING_BUFFER_add(string_buffer, "// Method declarations\n");
   {
     int32_t method_index;
-    for (method_index = 0; method_index < class_method_ids_length; method_index++) {
-      int32_t method_id = class_method_ids_base + method_index;
+    for (method_index = 0; method_index < class_methods_length; method_index++) {
+      int32_t method_id = class_methods_base_id + method_index;
 
-      int32_t method_name_id = SPVM_API_get_method_name_id(env, method_id);
-      const char* method_name = SPVM_API_get_name(env, method_name_id);
-      int32_t method_signature_id = SPVM_API_get_method_signature_id(env, method_id);
-      const char* method_signature = SPVM_API_get_name(env, method_signature_id);
-      int32_t method_has_precompile_flag = SPVM_API_get_method_has_precompile_flag(env, method_id);
+      int32_t method_name_id = SPVM_API_RUNTIME_get_method_name_id(runtime, method_id);
+      const char* method_name = SPVM_API_RUNTIME_get_name(runtime, method_name_id);
+      int32_t method_signature_id = SPVM_API_RUNTIME_get_method_signature_id(runtime, method_id);
+      const char* method_signature = SPVM_API_RUNTIME_get_name(runtime, method_signature_id);
+      int32_t method_has_precompile_flag = SPVM_API_RUNTIME_get_method_is_precompile(runtime, method_id);
 
       if (method_has_precompile_flag) {
-        SPVM_PRECOMPILE_build_method_declaration(env, string_buffer, class_name, method_name);
+        SPVM_PRECOMPILE_build_method_declaration(precompile, string_buffer, class_name, method_name);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n");
       }
     }
@@ -64,33 +86,34 @@ void SPVM_PRECOMPILE_create_precompile_source(SPVM_ENV* env, SPVM_STRING_BUFFER*
   SPVM_STRING_BUFFER_add(string_buffer, "// Method implementations\n");
   {
     int32_t method_index;
-    for (method_index = 0; method_index < class_method_ids_length; method_index++) {
-      int32_t method_id = class_method_ids_base + method_index;
-      int32_t method_name_id = SPVM_API_get_method_name_id(env, method_id);
-      const char* method_name = SPVM_API_get_name(env, method_name_id);
-      int32_t method_has_precompile_flag = SPVM_API_get_method_has_precompile_flag(env, method_id);
+    for (method_index = 0; method_index < class_methods_length; method_index++) {
+      int32_t method_id = class_methods_base_id + method_index;
+      int32_t method_name_id = SPVM_API_RUNTIME_get_method_name_id(runtime, method_id);
+      const char* method_name = SPVM_API_RUNTIME_get_name(runtime, method_name_id);
+      int32_t method_has_precompile_flag = SPVM_API_RUNTIME_get_method_is_precompile(runtime, method_id);
       if (method_has_precompile_flag) {
-        SPVM_PRECOMPILE_build_method_implementation(env, string_buffer, class_name, method_name);
+        SPVM_PRECOMPILE_build_method_implementation(precompile, string_buffer, class_name, method_name);
       }
     }
   }
   SPVM_STRING_BUFFER_add(string_buffer, "\n");
   
   // If the class has anon methods, the anon methods is merged to this class
-  int32_t class_anon_method_ids_length = SPVM_API_get_class_anon_method_ids_length(env, class_id);
-  if (class_anon_method_ids_length > 0) {
-    int32_t class_anon_method_ids_base = SPVM_API_get_class_anon_method_ids_base(env, class_id);
-    for (int32_t anon_method_id = class_anon_method_ids_base; anon_method_id < class_anon_method_ids_length; anon_method_id++) {
-      int32_t anon_method_method_id = SPVM_API_get_anon_method_method_id(env, anon_method_id);
-      int32_t anon_method_class_id = SPVM_API_get_method_class_id(env, anon_method_method_id);
-      int32_t anon_method_class_name_id = SPVM_API_get_class_name_id(env, anon_method_class_id);
-      const char* anon_method_class_name = SPVM_API_get_name(env, anon_method_class_name_id);
-      SPVM_PRECOMPILE_create_precompile_source(env, string_buffer, anon_method_class_name);
+  int32_t class_anon_methods_length = SPVM_API_RUNTIME_get_class_anon_methods_length(runtime, class_id);
+  if (class_anon_methods_length > 0) {
+    int32_t class_anon_methods_base_id = SPVM_API_RUNTIME_get_class_anon_methods_base_id(runtime, class_id);
+    for (int32_t anon_method_id = class_anon_methods_base_id; anon_method_id < class_anon_methods_length; anon_method_id++) {
+      int32_t anon_method_method_id = SPVM_API_RUNTIME_get_anon_method_method_id(runtime, anon_method_id);
+      int32_t anon_method_class_id = SPVM_API_RUNTIME_get_method_class_id(runtime, anon_method_method_id);
+      int32_t anon_method_class_name_id = SPVM_API_RUNTIME_get_class_name_id(runtime, anon_method_class_id);
+      const char* anon_method_class_name = SPVM_API_RUNTIME_get_name(runtime, anon_method_class_name_id);
+      SPVM_PRECOMPILE_create_precompile_source(precompile, string_buffer, anon_method_class_name);
     }
   }
 }
 
-void SPVM_PRECOMPILE_build_head(SPVM_ENV* env, SPVM_STRING_BUFFER* string_buffer) {
+void SPVM_PRECOMPILE_build_head(SPVM_PRECOMPILE* precompile, SPVM_STRING_BUFFER* string_buffer) {
+  SPVM_RUNTIME* runtime = precompile->runtime;
   
   // Include headers and define macros
   SPVM_STRING_BUFFER_add(string_buffer,
@@ -141,7 +164,8 @@ void SPVM_PRECOMPILE_build_head(SPVM_ENV* env, SPVM_STRING_BUFFER* string_buffer
   );
 }
 
-void SPVM_PRECOMPILE_build_method_declaration(SPVM_ENV* env, SPVM_STRING_BUFFER* string_buffer, const char* class_name, const char* method_name) {
+void SPVM_PRECOMPILE_build_method_declaration(SPVM_PRECOMPILE* precompile, SPVM_STRING_BUFFER* string_buffer, const char* class_name, const char* method_name) {
+  SPVM_RUNTIME* runtime = precompile->runtime;
   
   // Method declaration
   SPVM_STRING_BUFFER_add(string_buffer, "int32_t SPVMPRECOMPILE__");
@@ -161,24 +185,22 @@ void SPVM_PRECOMPILE_build_method_declaration(SPVM_ENV* env, SPVM_STRING_BUFFER*
   SPVM_STRING_BUFFER_add(string_buffer, "(SPVM_ENV* env, SPVM_VALUE* stack)");
 }
 
-void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFFER* string_buffer, const char* class_name, const char* method_name) {
+void SPVM_PRECOMPILE_build_method_implementation(SPVM_PRECOMPILE* precompile, SPVM_STRING_BUFFER* string_buffer, const char* class_name, const char* method_name) {
+  SPVM_RUNTIME* runtime = precompile->runtime;
 
-  // Runtime
-  SPVM_RUNTIME* runtime = env->runtime;
   
   // Class
-  int32_t class_id = SPVM_API_get_class_id(env, class_name);
-  int32_t class_module_file_id = SPVM_API_get_class_module_file_id(env, class_id);
-  const char* class_module_file = SPVM_API_get_name(env, class_module_file_id);
-  int32_t class_is_anon = SPVM_API_get_class_is_anon(env, class_id);
+  int32_t class_id = SPVM_API_RUNTIME_get_class_id_by_name(runtime, class_name);
+  int32_t class_module_file_id = SPVM_API_RUNTIME_get_class_module_file_id(runtime, class_id);
+  const char* class_module_file = SPVM_API_RUNTIME_get_name(runtime, class_module_file_id);
+  int32_t class_is_anon = SPVM_API_RUNTIME_get_class_is_anon(runtime, class_id);
   
   // Method
-  int32_t method_id = SPVM_API_get_method_id_without_signature(env, class_name, method_name);
-  int32_t method_return_type_id = SPVM_API_get_method_return_type_id(env, method_id);
-  int32_t method_return_type_category = SPVM_API_get_type_category(env, method_return_type_id);
+  int32_t method_id = SPVM_API_RUNTIME_get_method_id_by_name(runtime, class_name, method_name);
+  int32_t method_return_type_id = SPVM_API_RUNTIME_get_method_return_type_id(runtime, method_id);
 
   // Method declaration
-  SPVM_PRECOMPILE_build_method_declaration(env, string_buffer, class_name, method_name);
+  SPVM_PRECOMPILE_build_method_declaration(precompile, string_buffer, class_name, method_name);
 
   // Block start
   SPVM_STRING_BUFFER_add(string_buffer, " {\n");
@@ -201,7 +223,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
   int32_t stack_index = 0;
 
   // object variable declarations
-  int32_t call_stack_object_vars_length = SPVM_API_get_method_call_stack_object_vars_length(env, method_id);
+  int32_t call_stack_object_vars_length = SPVM_API_RUNTIME_get_method_call_stack_object_vars_length(runtime, method_id);
   if (call_stack_object_vars_length > 0) {
     SPVM_STRING_BUFFER_add(string_buffer, "  void* object_vars[");
     SPVM_STRING_BUFFER_add_int(string_buffer, call_stack_object_vars_length);
@@ -209,7 +231,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
   }
 
   // ref variable declarations
-  int32_t call_stack_ref_vars_length = SPVM_API_get_method_call_stack_ref_vars_length(env, method_id);
+  int32_t call_stack_ref_vars_length = SPVM_API_RUNTIME_get_method_call_stack_ref_vars_length(runtime, method_id);
   if (call_stack_ref_vars_length > 0) {
     SPVM_STRING_BUFFER_add(string_buffer, "  void* ref_vars[");
     SPVM_STRING_BUFFER_add_int(string_buffer, call_stack_ref_vars_length);
@@ -217,7 +239,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
   }
 
   // double variable declarations
-  int32_t call_stack_double_vars_length = SPVM_API_get_method_call_stack_double_vars_length(env, method_id);
+  int32_t call_stack_double_vars_length = SPVM_API_RUNTIME_get_method_call_stack_double_vars_length(runtime, method_id);
   if (call_stack_double_vars_length > 0) {
     SPVM_STRING_BUFFER_add(string_buffer, "  double double_vars[");
     SPVM_STRING_BUFFER_add_int(string_buffer, call_stack_double_vars_length);
@@ -225,7 +247,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
   }
 
   // float variable declarations
-  int32_t call_stack_float_vars_length = SPVM_API_get_method_call_stack_float_vars_length(env, method_id);
+  int32_t call_stack_float_vars_length = SPVM_API_RUNTIME_get_method_call_stack_float_vars_length(runtime, method_id);
   if (call_stack_float_vars_length > 0) {
     SPVM_STRING_BUFFER_add(string_buffer, "  float float_vars[");
     SPVM_STRING_BUFFER_add_int(string_buffer, call_stack_float_vars_length);
@@ -233,7 +255,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
   }
 
   // long variable declarations
-  int32_t call_stack_long_vars_length = SPVM_API_get_method_call_stack_long_vars_length(env, method_id);
+  int32_t call_stack_long_vars_length = SPVM_API_RUNTIME_get_method_call_stack_long_vars_length(runtime, method_id);
   if (call_stack_long_vars_length > 0) {
     SPVM_STRING_BUFFER_add(string_buffer, "  int64_t long_vars[");
     SPVM_STRING_BUFFER_add_int(string_buffer, call_stack_long_vars_length);
@@ -241,7 +263,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
   }
 
   // int variable declarations
-  int32_t call_stack_int_vars_length = SPVM_API_get_method_call_stack_int_vars_length(env, method_id);
+  int32_t call_stack_int_vars_length = SPVM_API_RUNTIME_get_method_call_stack_int_vars_length(runtime, method_id);
   if (call_stack_int_vars_length > 0) {
     SPVM_STRING_BUFFER_add(string_buffer, "  int32_t int_vars[");
     SPVM_STRING_BUFFER_add_int(string_buffer, call_stack_int_vars_length);
@@ -251,7 +273,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
   // Exception
   SPVM_STRING_BUFFER_add(string_buffer, "  int32_t exception_flag = 0;\n");
   
-  int32_t method_mortal_stack_length = SPVM_API_get_method_mortal_stack_length(env, method_id);
+  int32_t method_mortal_stack_length = SPVM_API_RUNTIME_get_method_mortal_stack_length(runtime, method_id);
   if (method_mortal_stack_length > 0) {
     SPVM_STRING_BUFFER_add(string_buffer, "  int32_t mortal_stack[");
     SPVM_STRING_BUFFER_add_int(string_buffer, method_mortal_stack_length);
@@ -260,7 +282,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
   }
   
   // short variable declarations
-  int32_t call_stack_short_vars_length = SPVM_API_get_method_call_stack_short_vars_length(env, method_id);
+  int32_t call_stack_short_vars_length = SPVM_API_RUNTIME_get_method_call_stack_short_vars_length(runtime, method_id);
   if (call_stack_short_vars_length > 0) {
     SPVM_STRING_BUFFER_add(string_buffer, "  int16_t short_vars[");
     SPVM_STRING_BUFFER_add_int(string_buffer, call_stack_short_vars_length);
@@ -268,7 +290,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
   }
 
   // byte variable declarations
-  int32_t call_stack_byte_vars_length = SPVM_API_get_method_call_stack_byte_vars_length(env, method_id);
+  int32_t call_stack_byte_vars_length = SPVM_API_RUNTIME_get_method_call_stack_byte_vars_length(runtime, method_id);
   if (call_stack_byte_vars_length > 0) {
     SPVM_STRING_BUFFER_add(string_buffer, "  int8_t byte_vars[");
     SPVM_STRING_BUFFER_add_int(string_buffer, call_stack_byte_vars_length);
@@ -278,21 +300,21 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
   // Convert string
   SPVM_STRING_BUFFER_add(string_buffer, "  char convert_string_buffer[21];\n");
   
-  SPVM_OPCODE* opcodes = SPVM_API_runtime_get_opcodes(runtime);
-  int32_t method_opcode_ids_base = SPVM_API_get_method_opcode_ids_base(env, method_id);
-  int32_t opcode_ids_length = SPVM_API_get_method_opcode_ids_length(env, method_id);
+  SPVM_OPCODE* opcodes = SPVM_API_RUNTIME_get_opcodes(runtime);
+  int32_t method_opcodes_base_id = SPVM_API_RUNTIME_get_method_opcodes_base_id(runtime, method_id);
+  int32_t opcodes_length = SPVM_API_RUNTIME_get_method_opcodes_length(runtime, method_id);
   int32_t opcode_index = 0;
   
   SPVM_OPCODE* opcode = NULL;
 
-  while (opcode_index < opcode_ids_length) {
+  while (opcode_index < opcodes_length) {
 
     // Line label
     SPVM_STRING_BUFFER_add(string_buffer, "L");
     SPVM_STRING_BUFFER_add_int(string_buffer, opcode_index);
     SPVM_STRING_BUFFER_add(string_buffer, ": ");
     
-    opcode = &(opcodes[method_opcode_ids_base + opcode_index]);
+    opcode = &(opcodes[method_opcodes_base_id + opcode_index]);
 
     int32_t opcode_id = opcode->id;
 
@@ -504,171 +526,171 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
         break;
       }
       case SPVM_OPCODE_C_ID_BOOL_INT: {
-        SPVM_PRECOMPILE_add_bool(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand1);
+        SPVM_PRECOMPILE_add_bool(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand1);
         break;
       }
       case SPVM_OPCODE_C_ID_BOOL_LONG: {
-        SPVM_PRECOMPILE_add_bool(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand1);
+        SPVM_PRECOMPILE_add_bool(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand1);
         break;
       }
       case SPVM_OPCODE_C_ID_BOOL_FLOAT: {
-        SPVM_PRECOMPILE_add_bool(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand1);
+        SPVM_PRECOMPILE_add_bool(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand1);
         break;
       }
       case SPVM_OPCODE_C_ID_BOOL_DOUBLE: {
-        SPVM_PRECOMPILE_add_bool(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand1);
+        SPVM_PRECOMPILE_add_bool(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand1);
         break;
       }
       case SPVM_OPCODE_C_ID_BOOL_BOOL_OBJECT: {
-        SPVM_PRECOMPILE_add_bool(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BOOL_OBJECT, opcode->operand1);
+        SPVM_PRECOMPILE_add_bool(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BOOL_OBJECT, opcode->operand1);
         break;
       }
       case SPVM_OPCODE_C_ID_BOOL_OBJECT: {
-        SPVM_PRECOMPILE_add_bool(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1);
+        SPVM_PRECOMPILE_add_bool(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1);
         break;
       }
       case SPVM_OPCODE_C_ID_IS_UNDEF: {
         SPVM_STRING_BUFFER_add(string_buffer, "  ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, 0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, 0);
         SPVM_STRING_BUFFER_add(string_buffer, " = ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1);
         SPVM_STRING_BUFFER_add(string_buffer, " == NULL;\n");
         break;
       }
       case SPVM_OPCODE_C_ID_IS_NOT_UNDEF: {
         SPVM_STRING_BUFFER_add(string_buffer, "  ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, 0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, 0);
         SPVM_STRING_BUFFER_add(string_buffer, " = ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1);
         SPVM_STRING_BUFFER_add(string_buffer, " != NULL;\n");
         break;
       }
       case SPVM_OPCODE_C_ID_EQ_INT: {
-        SPVM_PRECOMPILE_add_numeric_eq(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand1, opcode->operand2);
+        SPVM_PRECOMPILE_add_numeric_eq(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand1, opcode->operand2);
         break;
       }
       case SPVM_OPCODE_C_ID_EQ_LONG: {
-        SPVM_PRECOMPILE_add_numeric_eq(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand1, opcode->operand2);
+        SPVM_PRECOMPILE_add_numeric_eq(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand1, opcode->operand2);
         break;
       }
       case SPVM_OPCODE_C_ID_EQ_FLOAT: {
-        SPVM_PRECOMPILE_add_numeric_eq(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand1, opcode->operand2);
+        SPVM_PRECOMPILE_add_numeric_eq(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand1, opcode->operand2);
         break;
       }
       case SPVM_OPCODE_C_ID_EQ_DOUBLE: {
-        SPVM_PRECOMPILE_add_numeric_eq(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand1, opcode->operand2);
+        SPVM_PRECOMPILE_add_numeric_eq(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand1, opcode->operand2);
         break;
       }
       case SPVM_OPCODE_C_ID_EQ_OBJECT: {
-        SPVM_PRECOMPILE_add_numeric_eq(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1, opcode->operand2);
+        SPVM_PRECOMPILE_add_numeric_eq(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1, opcode->operand2);
         break;
       }
       case SPVM_OPCODE_C_ID_NE_INT: {
-        SPVM_PRECOMPILE_add_numeric_ne(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand1, opcode->operand2);
+        SPVM_PRECOMPILE_add_numeric_ne(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand1, opcode->operand2);
         break;
       }
       case SPVM_OPCODE_C_ID_NE_LONG: {
-        SPVM_PRECOMPILE_add_numeric_ne(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand1, opcode->operand2);
+        SPVM_PRECOMPILE_add_numeric_ne(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand1, opcode->operand2);
         break;
       }
       case SPVM_OPCODE_C_ID_NE_FLOAT: {
-        SPVM_PRECOMPILE_add_numeric_ne(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand1, opcode->operand2);
+        SPVM_PRECOMPILE_add_numeric_ne(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand1, opcode->operand2);
         break;
       }
       case SPVM_OPCODE_C_ID_NE_DOUBLE: {
-        SPVM_PRECOMPILE_add_numeric_ne(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand1, opcode->operand2);
+        SPVM_PRECOMPILE_add_numeric_ne(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand1, opcode->operand2);
         break;
       }
       case SPVM_OPCODE_C_ID_NE_OBJECT: {
-        SPVM_PRECOMPILE_add_numeric_ne(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1, opcode->operand2);
+        SPVM_PRECOMPILE_add_numeric_ne(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1, opcode->operand2);
         break;
       }
       case SPVM_OPCODE_C_ID_GT_INT: {
-        SPVM_PRECOMPILE_add_numeric_gt(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand1, opcode->operand2);
+        SPVM_PRECOMPILE_add_numeric_gt(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand1, opcode->operand2);
         break;
       }
       case SPVM_OPCODE_C_ID_GT_LONG: {
-        SPVM_PRECOMPILE_add_numeric_gt(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand1, opcode->operand2);
+        SPVM_PRECOMPILE_add_numeric_gt(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand1, opcode->operand2);
         break;
       }
       case SPVM_OPCODE_C_ID_GT_FLOAT: {
-        SPVM_PRECOMPILE_add_numeric_gt(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand1, opcode->operand2);
+        SPVM_PRECOMPILE_add_numeric_gt(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand1, opcode->operand2);
         break;
       }
       case SPVM_OPCODE_C_ID_GT_DOUBLE: {
-        SPVM_PRECOMPILE_add_numeric_gt(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand1, opcode->operand2);
+        SPVM_PRECOMPILE_add_numeric_gt(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand1, opcode->operand2);
         break;
       }
       case SPVM_OPCODE_C_ID_GE_INT: {
-        SPVM_PRECOMPILE_add_numeric_ge(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand1, opcode->operand2);
+        SPVM_PRECOMPILE_add_numeric_ge(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand1, opcode->operand2);
         break;
       }
       case SPVM_OPCODE_C_ID_GE_LONG: {
-        SPVM_PRECOMPILE_add_numeric_ge(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand1, opcode->operand2);
+        SPVM_PRECOMPILE_add_numeric_ge(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand1, opcode->operand2);
         break;
       }
       case SPVM_OPCODE_C_ID_GE_FLOAT: {
-        SPVM_PRECOMPILE_add_numeric_ge(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand1, opcode->operand2);
+        SPVM_PRECOMPILE_add_numeric_ge(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand1, opcode->operand2);
         break;
       }
       case SPVM_OPCODE_C_ID_GE_DOUBLE: {
-        SPVM_PRECOMPILE_add_numeric_ge(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand1, opcode->operand2);
+        SPVM_PRECOMPILE_add_numeric_ge(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand1, opcode->operand2);
         break;
       }
       case SPVM_OPCODE_C_ID_LT_INT: {
-        SPVM_PRECOMPILE_add_numeric_lt(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand1, opcode->operand2);
+        SPVM_PRECOMPILE_add_numeric_lt(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand1, opcode->operand2);
         break;
       }
       case SPVM_OPCODE_C_ID_LT_LONG: {
-        SPVM_PRECOMPILE_add_numeric_lt(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand1, opcode->operand2);
+        SPVM_PRECOMPILE_add_numeric_lt(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand1, opcode->operand2);
         break;
       }
       case SPVM_OPCODE_C_ID_LT_FLOAT: {
-        SPVM_PRECOMPILE_add_numeric_lt(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand1, opcode->operand2);
+        SPVM_PRECOMPILE_add_numeric_lt(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand1, opcode->operand2);
         break;
       }
       case SPVM_OPCODE_C_ID_LT_DOUBLE: {
-        SPVM_PRECOMPILE_add_numeric_lt(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand1, opcode->operand2);
+        SPVM_PRECOMPILE_add_numeric_lt(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand1, opcode->operand2);
         break;
       }
       case SPVM_OPCODE_C_ID_LE_INT: {
-        SPVM_PRECOMPILE_add_numeric_le(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand1, opcode->operand2);
+        SPVM_PRECOMPILE_add_numeric_le(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand1, opcode->operand2);
         break;
       }
       case SPVM_OPCODE_C_ID_LE_LONG: {
-        SPVM_PRECOMPILE_add_numeric_le(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand1, opcode->operand2);
+        SPVM_PRECOMPILE_add_numeric_le(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand1, opcode->operand2);
         break;
       }
       case SPVM_OPCODE_C_ID_LE_FLOAT: {
-        SPVM_PRECOMPILE_add_numeric_le(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand1, opcode->operand2);
+        SPVM_PRECOMPILE_add_numeric_le(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand1, opcode->operand2);
         break;
       }
       case SPVM_OPCODE_C_ID_LE_DOUBLE: {
-        SPVM_PRECOMPILE_add_numeric_le(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand1, opcode->operand2);
+        SPVM_PRECOMPILE_add_numeric_le(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand1, opcode->operand2);
         break;
       }
       case SPVM_OPCODE_C_ID_CMP_INT: {
-        SPVM_PRECOMPILE_add_numeric_cmp(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand1, opcode->operand2);
+        SPVM_PRECOMPILE_add_numeric_cmp(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand1, opcode->operand2);
         break;
       }
       case SPVM_OPCODE_C_ID_CMP_LONG: {
-        SPVM_PRECOMPILE_add_numeric_cmp(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand1, opcode->operand2);
+        SPVM_PRECOMPILE_add_numeric_cmp(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand1, opcode->operand2);
         break;
       }
       case SPVM_OPCODE_C_ID_CMP_FLOAT: {
-        SPVM_PRECOMPILE_add_numeric_cmp(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand1, opcode->operand2);
+        SPVM_PRECOMPILE_add_numeric_cmp(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand1, opcode->operand2);
         break;
       }
       case SPVM_OPCODE_C_ID_CMP_DOUBLE: {
-        SPVM_PRECOMPILE_add_numeric_cmp(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand1, opcode->operand2);
+        SPVM_PRECOMPILE_add_numeric_cmp(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand1, opcode->operand2);
         break;
       }
       case SPVM_OPCODE_C_ID_IS_TYPE:
       {
         int32_t check_basic_type_id = opcode->operand2;
         int32_t check_type_dimension = opcode->operand3;
-        int32_t basic_type_name_id = SPVM_API_get_basic_type_name_id(env, check_basic_type_id);
-        const char* basic_type_name = SPVM_API_get_name(env, basic_type_name_id);
+        int32_t basic_type_name_id = SPVM_API_RUNTIME_get_basic_type_name_id(runtime, check_basic_type_id);
+        const char* basic_type_name = SPVM_API_RUNTIME_get_name(runtime, basic_type_name_id);
         int32_t dimension = check_type_dimension;
         
         SPVM_STRING_BUFFER_add(string_buffer, "  {\n"
@@ -690,16 +712,16 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
         SPVM_STRING_BUFFER_add_int(string_buffer, dimension);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n"
                                               "      void* object = ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n"
                                               "      if (object) {\n"
                                               "        int32_t object_basic_type_id = *(int32_t*)((intptr_t)object + (intptr_t)env->object_basic_type_id_offset);\n"
                                               "        int32_t object_type_dimension = *(uint8_t*)((intptr_t)object + (intptr_t)env->object_type_dimension_offset);\n");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, 0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, 0);
         SPVM_STRING_BUFFER_add(string_buffer, " = env->is_type(env, object, check_basic_type_id, check_type_dimension);\n"
                                               "      }\n"
                                               "      else {\n");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, 0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, 0);
         SPVM_STRING_BUFFER_add(string_buffer, " = 0;\n"
                                               "      }\n"
                                               "    }\n"
@@ -711,8 +733,8 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       {
         int32_t check_basic_type_id = opcode->operand2;
         int32_t check_type_dimension = opcode->operand3;
-        int32_t basic_type_name_id = SPVM_API_get_basic_type_name_id(env, check_basic_type_id);
-        const char* basic_type_name = SPVM_API_get_name(env, basic_type_name_id);
+        int32_t basic_type_name_id = SPVM_API_RUNTIME_get_basic_type_name_id(runtime, check_basic_type_id);
+        const char* basic_type_name = SPVM_API_RUNTIME_get_name(runtime, basic_type_name_id);
         int32_t dimension = check_type_dimension;
         
         SPVM_STRING_BUFFER_add(string_buffer, "  {\n"
@@ -732,15 +754,15 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
         SPVM_STRING_BUFFER_add_int(string_buffer, dimension);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n"
                                               "      void* object = ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n"
                                               "      if (object) {\n"
                                               "        int32_t object_basic_type_id = *(int32_t*)((intptr_t)object + (intptr_t)env->object_basic_type_id_offset);\n");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, 0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, 0);
         SPVM_STRING_BUFFER_add(string_buffer, " = env->has_callback(env, object, callback_basic_type_id);\n"
                                               "      }\n"
                                               "      else {\n");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, 0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, 0);
         SPVM_STRING_BUFFER_add(string_buffer, " = 0;\n"
                                               "      }\n"
                                               "    }\n"
@@ -752,8 +774,8 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       {
         int32_t check_basic_type_id = opcode->operand2;
         int32_t check_type_dimension = opcode->operand3;
-        int32_t basic_type_name_id = SPVM_API_get_basic_type_name_id(env, check_basic_type_id);
-        const char* basic_type_name = SPVM_API_get_name(env, basic_type_name_id);
+        int32_t basic_type_name_id = SPVM_API_RUNTIME_get_basic_type_name_id(runtime, check_basic_type_id);
+        const char* basic_type_name = SPVM_API_RUNTIME_get_name(runtime, basic_type_name_id);
         int32_t dimension = check_type_dimension;
         
         SPVM_STRING_BUFFER_add(string_buffer, "  {\n"
@@ -775,15 +797,15 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
         SPVM_STRING_BUFFER_add_int(string_buffer, dimension);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n"
                                               "      void* object = ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n"
                                               "      if (object) {\n"
                                               "        int32_t object_basic_type_id = *(int32_t*)((intptr_t)object + (intptr_t)env->object_basic_type_id_offset);\n");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, 0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, 0);
         SPVM_STRING_BUFFER_add(string_buffer, "      = env->has_interface(env, object, interface_basic_type_id);\n"
                                               "      }\n"
                                               "      else {\n");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, 0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, 0);
         SPVM_STRING_BUFFER_add(string_buffer, " = 0;\n"
                                               "      }\n"
                                               "    }\n"
@@ -801,14 +823,14 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       {
         SPVM_STRING_BUFFER_add(string_buffer, "  {\n"
                                               "    void* object1 = ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n");
         SPVM_STRING_BUFFER_add(string_buffer, "    void* object2 = ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand2);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand2);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n");
         SPVM_STRING_BUFFER_add(string_buffer, "    if (object1 == NULL && object2 == NULL) {\n");
         SPVM_STRING_BUFFER_add(string_buffer, "      ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, 0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, 0);
         SPVM_STRING_BUFFER_add(string_buffer, " = ");
         switch (opcode_id) {
           case SPVM_OPCODE_C_ID_STRING_EQ: {
@@ -843,7 +865,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
         SPVM_STRING_BUFFER_add(string_buffer, "    }\n"
                                               "    else if (object1 != NULL && object2 == NULL) {\n"
                                               "      ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, 0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, 0);
         SPVM_STRING_BUFFER_add(string_buffer, " = ");
         switch (opcode_id) {
           case SPVM_OPCODE_C_ID_STRING_EQ: {
@@ -878,7 +900,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
         SPVM_STRING_BUFFER_add(string_buffer, "    }\n"
                                               "    else if (object1 == NULL && object2 != NULL) {\n"
                                               "      ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, 0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, 0);
         SPVM_STRING_BUFFER_add(string_buffer, " = ");
         switch (opcode_id) {
           case SPVM_OPCODE_C_ID_STRING_EQ: {
@@ -927,7 +949,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
                                               "        cmp = length1 < lenght2 ? -1 : 1;\n"
                                               "      }\n"
                                               "      ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, 0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, 0);
         SPVM_STRING_BUFFER_add(string_buffer, " = ");
         switch (opcode_id) {
           case SPVM_OPCODE_C_ID_STRING_EQ: {
@@ -966,289 +988,289 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
         break;
       }
       case SPVM_OPCODE_C_ID_ADD_INT: {
-        SPVM_PRECOMPILE_add_add(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0, opcode->operand1, opcode->operand2);
+        SPVM_PRECOMPILE_add_add(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0, opcode->operand1, opcode->operand2);
         break;
       }
       case SPVM_OPCODE_C_ID_ADD_LONG: {
-        SPVM_PRECOMPILE_add_add(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0, opcode->operand1, opcode->operand2);
+        SPVM_PRECOMPILE_add_add(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0, opcode->operand1, opcode->operand2);
         break;
       }
       case SPVM_OPCODE_C_ID_ADD_FLOAT: {
-        SPVM_PRECOMPILE_add_add(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand0, opcode->operand1, opcode->operand2);
+        SPVM_PRECOMPILE_add_add(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand0, opcode->operand1, opcode->operand2);
         break;
       }
       case SPVM_OPCODE_C_ID_ADD_DOUBLE: {
-        SPVM_PRECOMPILE_add_add(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand0, opcode->operand1, opcode->operand2);
+        SPVM_PRECOMPILE_add_add(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand0, opcode->operand1, opcode->operand2);
         break;
       }
       case SPVM_OPCODE_C_ID_SUBTRACT_INT: {
-        SPVM_PRECOMPILE_add_subtract(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0, opcode->operand1, opcode->operand2);
+        SPVM_PRECOMPILE_add_subtract(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0, opcode->operand1, opcode->operand2);
         break;
       }
       case SPVM_OPCODE_C_ID_SUBTRACT_LONG: {
-        SPVM_PRECOMPILE_add_subtract(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0, opcode->operand1, opcode->operand2);
+        SPVM_PRECOMPILE_add_subtract(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0, opcode->operand1, opcode->operand2);
         break;
       }
       case SPVM_OPCODE_C_ID_SUBTRACT_FLOAT: {
-        SPVM_PRECOMPILE_add_subtract(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand0, opcode->operand1, opcode->operand2);
+        SPVM_PRECOMPILE_add_subtract(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand0, opcode->operand1, opcode->operand2);
         break;
       }
       case SPVM_OPCODE_C_ID_SUBTRACT_DOUBLE: {
-        SPVM_PRECOMPILE_add_subtract(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand0, opcode->operand1, opcode->operand2);
+        SPVM_PRECOMPILE_add_subtract(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand0, opcode->operand1, opcode->operand2);
         break;
       }
       case SPVM_OPCODE_C_ID_MULTIPLY_INT: {
-        SPVM_PRECOMPILE_add_multiply(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0, opcode->operand1, opcode->operand2);
+        SPVM_PRECOMPILE_add_multiply(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0, opcode->operand1, opcode->operand2);
         break;
       }
       case SPVM_OPCODE_C_ID_MULTIPLY_LONG: {
-        SPVM_PRECOMPILE_add_multiply(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0, opcode->operand1, opcode->operand2);
+        SPVM_PRECOMPILE_add_multiply(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0, opcode->operand1, opcode->operand2);
         break;
       }
       case SPVM_OPCODE_C_ID_MULTIPLY_FLOAT: {
-        SPVM_PRECOMPILE_add_multiply(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand0, opcode->operand1, opcode->operand2);
+        SPVM_PRECOMPILE_add_multiply(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand0, opcode->operand1, opcode->operand2);
         break;
       }
       case SPVM_OPCODE_C_ID_MULTIPLY_DOUBLE: {
-        SPVM_PRECOMPILE_add_multiply(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand0, opcode->operand1, opcode->operand2);
+        SPVM_PRECOMPILE_add_multiply(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand0, opcode->operand1, opcode->operand2);
         break;
       }
       case SPVM_OPCODE_C_ID_DIVIDE_INT: {
-        SPVM_PRECOMPILE_add_divide_integral(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0, opcode->operand1, opcode->operand2);
+        SPVM_PRECOMPILE_add_divide_integral(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0, opcode->operand1, opcode->operand2);
         break;
       }
       case SPVM_OPCODE_C_ID_DIVIDE_LONG: { 
-        SPVM_PRECOMPILE_add_divide_integral(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0, opcode->operand1, opcode->operand2);
+        SPVM_PRECOMPILE_add_divide_integral(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0, opcode->operand1, opcode->operand2);
         break;
       }
       case SPVM_OPCODE_C_ID_DIVIDE_FLOAT: {
-        SPVM_PRECOMPILE_add_divide_floating_point(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand0, opcode->operand1, opcode->operand2);
+        SPVM_PRECOMPILE_add_divide_floating_point(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand0, opcode->operand1, opcode->operand2);
         break;
       }
       case SPVM_OPCODE_C_ID_DIVIDE_DOUBLE: {
-        SPVM_PRECOMPILE_add_divide_floating_point(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand0, opcode->operand1, opcode->operand2);
+        SPVM_PRECOMPILE_add_divide_floating_point(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand0, opcode->operand1, opcode->operand2);
         break;
       }
       case SPVM_OPCODE_C_ID_DIVIDE_UNSIGNED_INT: {
-        SPVM_PRECOMPILE_add_divide_unsigned_int(env, string_buffer, opcode->operand0, opcode->operand1, opcode->operand2);
+        SPVM_PRECOMPILE_add_divide_unsigned_int(precompile, string_buffer, opcode->operand0, opcode->operand1, opcode->operand2);
         break;
       }
       case SPVM_OPCODE_C_ID_DIVIDE_UNSIGNED_LONG: {
-        SPVM_PRECOMPILE_add_divide_unsigned_long(env, string_buffer, opcode->operand0, opcode->operand1, opcode->operand2);
+        SPVM_PRECOMPILE_add_divide_unsigned_long(precompile, string_buffer, opcode->operand0, opcode->operand1, opcode->operand2);
         break;
       }
       case SPVM_OPCODE_C_ID_REMAINDER_INT: {
-        SPVM_PRECOMPILE_add_remainder_integral(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0, opcode->operand1, opcode->operand2);
+        SPVM_PRECOMPILE_add_remainder_integral(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0, opcode->operand1, opcode->operand2);
         break;
       }
       case SPVM_OPCODE_C_ID_REMAINDER_LONG: { 
-        SPVM_PRECOMPILE_add_remainder_integral(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0, opcode->operand1, opcode->operand2);
+        SPVM_PRECOMPILE_add_remainder_integral(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0, opcode->operand1, opcode->operand2);
         break;
       }
       case SPVM_OPCODE_C_ID_LEFT_SHIFT_INT: {
-        SPVM_PRECOMPILE_add_left_shift(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0, opcode->operand1, opcode->operand2);
+        SPVM_PRECOMPILE_add_left_shift(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0, opcode->operand1, opcode->operand2);
         break;
       }
       case SPVM_OPCODE_C_ID_LEFT_SHIFT_LONG: {
-        SPVM_PRECOMPILE_add_left_shift(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0, opcode->operand1, opcode->operand2);
+        SPVM_PRECOMPILE_add_left_shift(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0, opcode->operand1, opcode->operand2);
         break;
       }
       case SPVM_OPCODE_C_ID_REMAINDER_UNSIGNED_INT: {
-        SPVM_PRECOMPILE_add_remainder_unsigned_int(env, string_buffer, opcode->operand0, opcode->operand1, opcode->operand2);
+        SPVM_PRECOMPILE_add_remainder_unsigned_int(precompile, string_buffer, opcode->operand0, opcode->operand1, opcode->operand2);
         break;
       }
       case SPVM_OPCODE_C_ID_REMAINDER_UNSIGNED_LONG: {
-        SPVM_PRECOMPILE_add_remainder_unsigned_long(env, string_buffer, opcode->operand0, opcode->operand1, opcode->operand2);
+        SPVM_PRECOMPILE_add_remainder_unsigned_long(precompile, string_buffer, opcode->operand0, opcode->operand1, opcode->operand2);
         break;
       }
       case SPVM_OPCODE_C_ID_RIGHT_ARITHMETIC_SHIFT_INT: {
-        SPVM_PRECOMPILE_add_right_arithmetic_shift(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0, opcode->operand1, opcode->operand2);
+        SPVM_PRECOMPILE_add_right_arithmetic_shift(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0, opcode->operand1, opcode->operand2);
         break;
       }
       case SPVM_OPCODE_C_ID_RIGHT_ARITHMETIC_SHIFT_LONG: {
-        SPVM_PRECOMPILE_add_right_arithmetic_shift(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0, opcode->operand1, opcode->operand2);
+        SPVM_PRECOMPILE_add_right_arithmetic_shift(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0, opcode->operand1, opcode->operand2);
         break;
       }
       case SPVM_OPCODE_C_ID_RIGHT_LOGICAL_SHIFT_INT: {
-        SPVM_PRECOMPILE_add_right_logical_shift(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0, opcode->operand1, opcode->operand2);
+        SPVM_PRECOMPILE_add_right_logical_shift(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0, opcode->operand1, opcode->operand2);
         break;
       }
       case SPVM_OPCODE_C_ID_RIGHT_LOGICAL_SHIFT_LONG: {
-        SPVM_PRECOMPILE_add_right_logical_shift(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0, opcode->operand1, opcode->operand2);
+        SPVM_PRECOMPILE_add_right_logical_shift(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0, opcode->operand1, opcode->operand2);
         break;
       }
       case SPVM_OPCODE_C_ID_BIT_AND_INT: {
-        SPVM_PRECOMPILE_add_bit_and(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0, opcode->operand1, opcode->operand2);
+        SPVM_PRECOMPILE_add_bit_and(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0, opcode->operand1, opcode->operand2);
         break;
       }
       case SPVM_OPCODE_C_ID_BIT_AND_LONG: {
-        SPVM_PRECOMPILE_add_bit_and(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0, opcode->operand1, opcode->operand2);
+        SPVM_PRECOMPILE_add_bit_and(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0, opcode->operand1, opcode->operand2);
         break;
       }
       case SPVM_OPCODE_C_ID_BIT_OR_INT: {
-        SPVM_PRECOMPILE_add_bit_or(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0, opcode->operand1, opcode->operand2);
+        SPVM_PRECOMPILE_add_bit_or(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0, opcode->operand1, opcode->operand2);
         break;
       }
       case SPVM_OPCODE_C_ID_BIT_OR_LONG: {
-        SPVM_PRECOMPILE_add_bit_or(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0, opcode->operand1, opcode->operand2);
+        SPVM_PRECOMPILE_add_bit_or(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0, opcode->operand1, opcode->operand2);
         break;
       }
       case SPVM_OPCODE_C_ID_BIT_XOR_INT: {
-        SPVM_PRECOMPILE_add_bit_xor(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0, opcode->operand1, opcode->operand2);
+        SPVM_PRECOMPILE_add_bit_xor(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0, opcode->operand1, opcode->operand2);
         break;
       }
       case SPVM_OPCODE_C_ID_BIT_XOR_LONG: {
-        SPVM_PRECOMPILE_add_bit_xor(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0, opcode->operand1, opcode->operand2);
+        SPVM_PRECOMPILE_add_bit_xor(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0, opcode->operand1, opcode->operand2);
         break;
       }
       case SPVM_OPCODE_C_ID_NEGATE_INT: {
-        SPVM_PRECOMPILE_add_negate(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0, opcode->operand1);
+        SPVM_PRECOMPILE_add_negate(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0, opcode->operand1);
         break;
       }
       case SPVM_OPCODE_C_ID_NEGATE_LONG: {
-        SPVM_PRECOMPILE_add_negate(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0, opcode->operand1);
+        SPVM_PRECOMPILE_add_negate(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0, opcode->operand1);
         break;
       }
       case SPVM_OPCODE_C_ID_NEGATE_FLOAT: {
-        SPVM_PRECOMPILE_add_negate(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand0, opcode->operand1);
+        SPVM_PRECOMPILE_add_negate(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand0, opcode->operand1);
         break;
       }
       case SPVM_OPCODE_C_ID_NEGATE_DOUBLE: {
-        SPVM_PRECOMPILE_add_negate(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand0, opcode->operand1);
+        SPVM_PRECOMPILE_add_negate(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand0, opcode->operand1);
         break;
       }
       case SPVM_OPCODE_C_ID_BIT_NOT_INT: {
-        SPVM_PRECOMPILE_add_complement(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0, opcode->operand1);
+        SPVM_PRECOMPILE_add_complement(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0, opcode->operand1);
         break;
       }
       case SPVM_OPCODE_C_ID_BIT_NOT_LONG: {
-        SPVM_PRECOMPILE_add_complement(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0, opcode->operand1);
+        SPVM_PRECOMPILE_add_complement(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0, opcode->operand1);
         break;
       }
       case SPVM_OPCODE_C_ID_CONVERT_SHORT_TO_BYTE: {
-        SPVM_PRECOMPILE_add_convert(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, opcode->operand0, opcode->operand1);
+        SPVM_PRECOMPILE_add_convert(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, opcode->operand0, opcode->operand1);
         break;
       }
       case SPVM_OPCODE_C_ID_CONVERT_INT_TO_BYTE: {
-        SPVM_PRECOMPILE_add_convert(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0, opcode->operand1);
+        SPVM_PRECOMPILE_add_convert(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0, opcode->operand1);
         break;
       }
       case SPVM_OPCODE_C_ID_CONVERT_LONG_TO_BYTE: {
-        SPVM_PRECOMPILE_add_convert(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0, opcode->operand1);
+        SPVM_PRECOMPILE_add_convert(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0, opcode->operand1);
         break;
       }
       case SPVM_OPCODE_C_ID_CONVERT_FLOAT_TO_BYTE: {
-        SPVM_PRECOMPILE_add_convert(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand0, opcode->operand1);
+        SPVM_PRECOMPILE_add_convert(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand0, opcode->operand1);
         break;
       }
       case SPVM_OPCODE_C_ID_CONVERT_DOUBLE_TO_BYTE: {
-        SPVM_PRECOMPILE_add_convert(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand0, opcode->operand1);
+        SPVM_PRECOMPILE_add_convert(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand0, opcode->operand1);
         break;
       }
       case SPVM_OPCODE_C_ID_CONVERT_BYTE_TO_SHORT: {
-        SPVM_PRECOMPILE_add_convert(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, opcode->operand0, opcode->operand1);
+        SPVM_PRECOMPILE_add_convert(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, opcode->operand0, opcode->operand1);
         break;
       }
       case SPVM_OPCODE_C_ID_CONVERT_INT_TO_SHORT: {
-        SPVM_PRECOMPILE_add_convert(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0, opcode->operand1);
+        SPVM_PRECOMPILE_add_convert(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0, opcode->operand1);
         break;
       }
       case SPVM_OPCODE_C_ID_CONVERT_LONG_TO_SHORT: {
-        SPVM_PRECOMPILE_add_convert(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0, opcode->operand1);
+        SPVM_PRECOMPILE_add_convert(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0, opcode->operand1);
         break;
       }
       case SPVM_OPCODE_C_ID_CONVERT_FLOAT_TO_SHORT: {
-        SPVM_PRECOMPILE_add_convert(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand0, opcode->operand1);
+        SPVM_PRECOMPILE_add_convert(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand0, opcode->operand1);
         break;
       }
       case SPVM_OPCODE_C_ID_CONVERT_DOUBLE_TO_SHORT: {
-        SPVM_PRECOMPILE_add_convert(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand0, opcode->operand1);
+        SPVM_PRECOMPILE_add_convert(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand0, opcode->operand1);
         break;
       }
       case SPVM_OPCODE_C_ID_CONVERT_BYTE_TO_INT: {
-        SPVM_PRECOMPILE_add_convert(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, opcode->operand0, opcode->operand1);
+        SPVM_PRECOMPILE_add_convert(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, opcode->operand0, opcode->operand1);
         break;
       }
       case SPVM_OPCODE_C_ID_CONVERT_SHORT_TO_INT: {
-        SPVM_PRECOMPILE_add_convert(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, opcode->operand0, opcode->operand1);
+        SPVM_PRECOMPILE_add_convert(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, opcode->operand0, opcode->operand1);
         break;
       }
       case SPVM_OPCODE_C_ID_CONVERT_LONG_TO_INT: {
-        SPVM_PRECOMPILE_add_convert(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0, opcode->operand1);
+        SPVM_PRECOMPILE_add_convert(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0, opcode->operand1);
         break;
       }
       case SPVM_OPCODE_C_ID_CONVERT_FLOAT_TO_INT: {
-        SPVM_PRECOMPILE_add_convert(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand0, opcode->operand1);
+        SPVM_PRECOMPILE_add_convert(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand0, opcode->operand1);
         break;
       }
       case SPVM_OPCODE_C_ID_CONVERT_DOUBLE_TO_INT: {
-        SPVM_PRECOMPILE_add_convert(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand0, opcode->operand1);
+        SPVM_PRECOMPILE_add_convert(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand0, opcode->operand1);
         break;
       }
       case SPVM_OPCODE_C_ID_CONVERT_BYTE_TO_LONG: {
-        SPVM_PRECOMPILE_add_convert(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, opcode->operand0, opcode->operand1);
+        SPVM_PRECOMPILE_add_convert(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, opcode->operand0, opcode->operand1);
         break;
       }
       case SPVM_OPCODE_C_ID_CONVERT_SHORT_TO_LONG: {
-        SPVM_PRECOMPILE_add_convert(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, opcode->operand0, opcode->operand1);
+        SPVM_PRECOMPILE_add_convert(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, opcode->operand0, opcode->operand1);
         break;
       }
       case SPVM_OPCODE_C_ID_CONVERT_INT_TO_LONG: {
-        SPVM_PRECOMPILE_add_convert(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0, opcode->operand1);
+        SPVM_PRECOMPILE_add_convert(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0, opcode->operand1);
         break;
       }
       case SPVM_OPCODE_C_ID_CONVERT_FLOAT_TO_LONG: {
-        SPVM_PRECOMPILE_add_convert(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand0, opcode->operand1);
+        SPVM_PRECOMPILE_add_convert(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand0, opcode->operand1);
         break;
       }
       case SPVM_OPCODE_C_ID_CONVERT_DOUBLE_TO_LONG: {
-        SPVM_PRECOMPILE_add_convert(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand0, opcode->operand1);
+        SPVM_PRECOMPILE_add_convert(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand0, opcode->operand1);
         break;
       }
       case SPVM_OPCODE_C_ID_CONVERT_BYTE_TO_FLOAT: {
-        SPVM_PRECOMPILE_add_convert(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, opcode->operand0, opcode->operand1);
+        SPVM_PRECOMPILE_add_convert(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, opcode->operand0, opcode->operand1);
         break;
       }
       case SPVM_OPCODE_C_ID_CONVERT_SHORT_TO_FLOAT: {
-        SPVM_PRECOMPILE_add_convert(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, opcode->operand0, opcode->operand1);
+        SPVM_PRECOMPILE_add_convert(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, opcode->operand0, opcode->operand1);
         break;
       }
       case SPVM_OPCODE_C_ID_CONVERT_INT_TO_FLOAT: {
-        SPVM_PRECOMPILE_add_convert(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0, opcode->operand1);
+        SPVM_PRECOMPILE_add_convert(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0, opcode->operand1);
         break;
       }
       case SPVM_OPCODE_C_ID_CONVERT_LONG_TO_FLOAT: {
-        SPVM_PRECOMPILE_add_convert(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0, opcode->operand1);
+        SPVM_PRECOMPILE_add_convert(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0, opcode->operand1);
         break;
       }
       case SPVM_OPCODE_C_ID_CONVERT_DOUBLE_TO_FLOAT: {
-        SPVM_PRECOMPILE_add_convert(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand0, opcode->operand1);
+        SPVM_PRECOMPILE_add_convert(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand0, opcode->operand1);
         break;
       }
       case SPVM_OPCODE_C_ID_CONVERT_BYTE_TO_DOUBLE: {
-        SPVM_PRECOMPILE_add_convert(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, opcode->operand0, opcode->operand1);
+        SPVM_PRECOMPILE_add_convert(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, opcode->operand0, opcode->operand1);
         break;
       }
       case SPVM_OPCODE_C_ID_CONVERT_SHORT_TO_DOUBLE: {
-        SPVM_PRECOMPILE_add_convert(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, opcode->operand0, opcode->operand1);
+        SPVM_PRECOMPILE_add_convert(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, opcode->operand0, opcode->operand1);
         break;
       }
       case SPVM_OPCODE_C_ID_CONVERT_INT_TO_DOUBLE: {
-        SPVM_PRECOMPILE_add_convert(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0, opcode->operand1);
+        SPVM_PRECOMPILE_add_convert(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0, opcode->operand1);
         break;
       }
       case SPVM_OPCODE_C_ID_CONVERT_LONG_TO_DOUBLE: {
-        SPVM_PRECOMPILE_add_convert(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0, opcode->operand1);
+        SPVM_PRECOMPILE_add_convert(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0, opcode->operand1);
         break;
       }
       case SPVM_OPCODE_C_ID_CONVERT_FLOAT_TO_DOUBLE: {
-        SPVM_PRECOMPILE_add_convert(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand0, opcode->operand1);
+        SPVM_PRECOMPILE_add_convert(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand0, opcode->operand1);
         break;
       }
       case SPVM_OPCODE_C_ID_CONVERT_STRING_TO_BYTE_ARRAY: {
         SPVM_STRING_BUFFER_add(string_buffer, "  {\n"
                                               "    void* src_string = ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n"
                                               "    int32_t src_string_length = env->length(env, src_string);"
                                               "    const char* src_string_data = env->get_chars(env, src_string);"
@@ -1256,7 +1278,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
                                               "    int8_t* byte_array_data = env->get_elems_byte(env, byte_array);"
                                               "    memcpy(byte_array_data, src_string_data, src_string_length);"
                                               "    SPVM_API_OBJECT_ASSIGN(&");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, ", byte_array);\n"
                                               "  }\n");
         break;
@@ -1264,13 +1286,13 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       case SPVM_OPCODE_C_ID_CONVERT_BYTE_ARRAY_TO_STRING: {
         SPVM_STRING_BUFFER_add(string_buffer, "  {\n"
                                               "    void* src_byte_array = ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n"
                                               "    int32_t src_byte_array_length = env->length(env, src_byte_array);"
                                               "    int8_t* src_byte_array_data = env->get_elems_byte(env, src_byte_array);"
                                               "    void* string = env->new_string_raw(env, (const char*)src_byte_array_data, src_byte_array_length);"
                                               "    SPVM_API_OBJECT_ASSIGN(&");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, ", string);\n"
                                               "  }\n");
         break;
@@ -1286,32 +1308,32 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
         switch (opcode_id) {
           case SPVM_OPCODE_C_ID_CONVERT_BYTE_TO_STRING:
             SPVM_STRING_BUFFER_add(string_buffer, "    sprintf(convert_string_buffer, \"%\" PRId8, ");
-            SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, opcode->operand1);
+            SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, opcode->operand1);
             SPVM_STRING_BUFFER_add(string_buffer, ");\n");
             break;
           case SPVM_OPCODE_C_ID_CONVERT_SHORT_TO_STRING:
             SPVM_STRING_BUFFER_add(string_buffer, "    sprintf(convert_string_buffer, \"%\" PRId16, ");
-            SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, opcode->operand1);
+            SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, opcode->operand1);
             SPVM_STRING_BUFFER_add(string_buffer, ");\n");
             break;
           case SPVM_OPCODE_C_ID_CONVERT_INT_TO_STRING:
             SPVM_STRING_BUFFER_add(string_buffer, "    sprintf(convert_string_buffer, \"%\" PRId32, ");
-            SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand1);
+            SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand1);
             SPVM_STRING_BUFFER_add(string_buffer, ");\n");
             break;
           case SPVM_OPCODE_C_ID_CONVERT_LONG_TO_STRING:
             SPVM_STRING_BUFFER_add(string_buffer, "    sprintf(convert_string_buffer, \"%\" PRId64, ");
-            SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand1);
+            SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand1);
             SPVM_STRING_BUFFER_add(string_buffer, ");\n");
             break;
           case SPVM_OPCODE_C_ID_CONVERT_FLOAT_TO_STRING:
             SPVM_STRING_BUFFER_add(string_buffer, "    sprintf(convert_string_buffer, \"%g\", ");
-            SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand1);
+            SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand1);
             SPVM_STRING_BUFFER_add(string_buffer, ");\n");
             break;
           case SPVM_OPCODE_C_ID_CONVERT_DOUBLE_TO_STRING:
             SPVM_STRING_BUFFER_add(string_buffer, "    sprintf(convert_string_buffer, \"%g\", ");
-            SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand1);
+            SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand1);
             SPVM_STRING_BUFFER_add(string_buffer, ");\n");
             break;
         }
@@ -1319,7 +1341,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
         SPVM_STRING_BUFFER_add(string_buffer, "    int32_t string_length = strlen(convert_string_buffer);\n"
                                               "    void* string = env->new_string_raw(env, convert_string_buffer, string_length);\n"
                                               "    SPVM_API_OBJECT_ASSIGN(&");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, ", string);\n"
                                               "  }\n");
 
@@ -1327,43 +1349,43 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       }
       case SPVM_OPCODE_C_ID_INIT_BYTE: {
         SPVM_STRING_BUFFER_add(string_buffer, "  ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, opcode->operand0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, " = 0;\n");
         break;
       }
       case SPVM_OPCODE_C_ID_INIT_SHORT: {
         SPVM_STRING_BUFFER_add(string_buffer, "  ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, opcode->operand0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, " = 0;\n");
         break;
       }
       case SPVM_OPCODE_C_ID_INIT_INT: {
         SPVM_STRING_BUFFER_add(string_buffer, "  ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, " = 0;\n");
         break;
       }
       case SPVM_OPCODE_C_ID_INIT_LONG: {
         SPVM_STRING_BUFFER_add(string_buffer, "  ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, " = 0;\n");
         break;
       }
       case SPVM_OPCODE_C_ID_INIT_FLOAT: {
         SPVM_STRING_BUFFER_add(string_buffer, "  ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, " = 0;\n");
         break;
       }
       case SPVM_OPCODE_C_ID_INIT_DOUBLE: {
         SPVM_STRING_BUFFER_add(string_buffer, "  ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, " = 0;\n");
         break;
       }
       case SPVM_OPCODE_C_ID_INIT_UNDEF: {
         SPVM_STRING_BUFFER_add(string_buffer, "  SPVM_API_OBJECT_ASSIGN(&");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, ", NULL);\n");
         break;
       }
@@ -1371,7 +1393,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
         int32_t fields_length = opcode->operand2;
         for (int32_t field_index = 0; field_index < fields_length; field_index++) {
           SPVM_STRING_BUFFER_add(string_buffer, "  ");
-          SPVM_PRECOMPILE_add_operand_value(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, opcode->operand0, field_index);
+          SPVM_PRECOMPILE_add_operand_value(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, opcode->operand0, field_index);
           SPVM_STRING_BUFFER_add(string_buffer, " = 0;\n");
         }
         break;
@@ -1380,7 +1402,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
         int32_t fields_length = opcode->operand2;
         for (int32_t field_index = 0; field_index < fields_length; field_index++) {
           SPVM_STRING_BUFFER_add(string_buffer, "  ");
-          SPVM_PRECOMPILE_add_operand_value(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, opcode->operand0, field_index);
+          SPVM_PRECOMPILE_add_operand_value(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, opcode->operand0, field_index);
           SPVM_STRING_BUFFER_add(string_buffer, " = 0;\n");
         }
         break;
@@ -1389,7 +1411,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
         int32_t fields_length = opcode->operand2;
         for (int32_t field_index = 0; field_index < fields_length; field_index++) {
           SPVM_STRING_BUFFER_add(string_buffer, "  ");
-          SPVM_PRECOMPILE_add_operand_value(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0, field_index);
+          SPVM_PRECOMPILE_add_operand_value(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0, field_index);
           SPVM_STRING_BUFFER_add(string_buffer, " = 0;\n");
         }
         break;
@@ -1398,7 +1420,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
         int32_t fields_length = opcode->operand2;
         for (int32_t field_index = 0; field_index < fields_length; field_index++) {
           SPVM_STRING_BUFFER_add(string_buffer, "  ");
-          SPVM_PRECOMPILE_add_operand_value(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0, field_index);
+          SPVM_PRECOMPILE_add_operand_value(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0, field_index);
           SPVM_STRING_BUFFER_add(string_buffer, " = 0;\n");
         }
         break;
@@ -1407,7 +1429,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
         int32_t fields_length = opcode->operand2;
         for (int32_t field_index = 0; field_index < fields_length; field_index++) {
           SPVM_STRING_BUFFER_add(string_buffer, "  ");
-          SPVM_PRECOMPILE_add_operand_value(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand0, field_index);
+          SPVM_PRECOMPILE_add_operand_value(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand0, field_index);
           SPVM_STRING_BUFFER_add(string_buffer, " = 0;\n");
         }
         break;
@@ -1416,14 +1438,14 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
         int32_t fields_length = opcode->operand2;
         for (int32_t field_index = 0; field_index < fields_length; field_index++) {
           SPVM_STRING_BUFFER_add(string_buffer, "  ");
-          SPVM_PRECOMPILE_add_operand_value(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand0, field_index);
+          SPVM_PRECOMPILE_add_operand_value(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand0, field_index);
           SPVM_STRING_BUFFER_add(string_buffer, " = 0;\n");
         }
         break;
       }
       case SPVM_OPCODE_C_ID_MOVE_CONSTANT_BYTE: {
         SPVM_STRING_BUFFER_add(string_buffer, "  ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, opcode->operand0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, " = ");
         SPVM_STRING_BUFFER_add_char(string_buffer, (int8_t)opcode->operand1);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n");
@@ -1431,7 +1453,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       }
       case SPVM_OPCODE_C_ID_MOVE_CONSTANT_INT: {
         SPVM_STRING_BUFFER_add(string_buffer, "  ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, " = ");
         SPVM_STRING_BUFFER_add_int(string_buffer, (int32_t)opcode->operand1);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n");
@@ -1441,7 +1463,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
         int64_t long_value = *(int64_t*)&opcode->operand1;
         
         SPVM_STRING_BUFFER_add(string_buffer, "  ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, " = ");
         SPVM_STRING_BUFFER_add_long(string_buffer, long_value);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n");
@@ -1454,7 +1476,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
         SPVM_STRING_BUFFER_add(string_buffer, "  {\n"
                                               "    SPVM_VALUE tmp_constant;\n"
                                               "    ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, " = (tmp_constant.ival = ");
         SPVM_STRING_BUFFER_add_int(string_buffer, value.ival);
         SPVM_STRING_BUFFER_add(string_buffer, ", tmp_constant.fval);\n"
@@ -1470,7 +1492,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
         SPVM_STRING_BUFFER_add(string_buffer, "  {\n"
                                               "    SPVM_VALUE tmp_constant;\n"
                                               "    ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, " = (tmp_constant.lval = ");
         SPVM_STRING_BUFFER_add_long(string_buffer, value.lval);
         SPVM_STRING_BUFFER_add(string_buffer, ", tmp_constant.dval);\n"
@@ -1478,60 +1500,60 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
         break;
       }
       case SPVM_OPCODE_C_ID_GET_ARRAY_ELEMENT_BYTE:
-        SPVM_PRECOMPILE_add_array_fetch(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, opcode->operand0, opcode->operand1, opcode->operand2);
+        SPVM_PRECOMPILE_add_array_fetch(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, opcode->operand0, opcode->operand1, opcode->operand2);
         break;
       case SPVM_OPCODE_C_ID_GET_ARRAY_ELEMENT_SHORT:
-        SPVM_PRECOMPILE_add_array_fetch(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, opcode->operand0, opcode->operand1, opcode->operand2);
+        SPVM_PRECOMPILE_add_array_fetch(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, opcode->operand0, opcode->operand1, opcode->operand2);
         break;
       case SPVM_OPCODE_C_ID_GET_ARRAY_ELEMENT_INT:
-        SPVM_PRECOMPILE_add_array_fetch(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0, opcode->operand1, opcode->operand2);
+        SPVM_PRECOMPILE_add_array_fetch(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0, opcode->operand1, opcode->operand2);
         break;
       case SPVM_OPCODE_C_ID_GET_ARRAY_ELEMENT_LONG:
-        SPVM_PRECOMPILE_add_array_fetch(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0, opcode->operand1, opcode->operand2);
+        SPVM_PRECOMPILE_add_array_fetch(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0, opcode->operand1, opcode->operand2);
         break;
       case SPVM_OPCODE_C_ID_GET_ARRAY_ELEMENT_FLOAT:
-        SPVM_PRECOMPILE_add_array_fetch(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand0, opcode->operand1, opcode->operand2);
+        SPVM_PRECOMPILE_add_array_fetch(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand0, opcode->operand1, opcode->operand2);
         break;
       case SPVM_OPCODE_C_ID_GET_ARRAY_ELEMENT_DOUBLE:
-        SPVM_PRECOMPILE_add_array_fetch(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand0, opcode->operand1, opcode->operand2);
+        SPVM_PRECOMPILE_add_array_fetch(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand0, opcode->operand1, opcode->operand2);
         break;
       case SPVM_OPCODE_C_ID_GET_MULNUM_ARRAY_BYTE: {
         int32_t fields_length = opcode->operand3;
-        SPVM_PRECOMPILE_add_mulnum_array_fetch(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, opcode->operand0, opcode->operand1, opcode->operand2, fields_length);
+        SPVM_PRECOMPILE_add_mulnum_array_fetch(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, opcode->operand0, opcode->operand1, opcode->operand2, fields_length);
         break;
       }
       case SPVM_OPCODE_C_ID_GET_MULNUM_ARRAY_SHORT: {
         int32_t fields_length = opcode->operand3;
-        SPVM_PRECOMPILE_add_mulnum_array_fetch(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, opcode->operand0, opcode->operand1, opcode->operand2, fields_length);
+        SPVM_PRECOMPILE_add_mulnum_array_fetch(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, opcode->operand0, opcode->operand1, opcode->operand2, fields_length);
         break;
       }
       case SPVM_OPCODE_C_ID_GET_MULNUM_ARRAY_INT: {
         int32_t fields_length = opcode->operand3;
-        SPVM_PRECOMPILE_add_mulnum_array_fetch(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0, opcode->operand1, opcode->operand2, fields_length);
+        SPVM_PRECOMPILE_add_mulnum_array_fetch(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0, opcode->operand1, opcode->operand2, fields_length);
         break;
       }
       case SPVM_OPCODE_C_ID_GET_MULNUM_ARRAY_LONG: {
         int32_t fields_length = opcode->operand3;
-        SPVM_PRECOMPILE_add_mulnum_array_fetch(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0, opcode->operand1, opcode->operand2, fields_length);
+        SPVM_PRECOMPILE_add_mulnum_array_fetch(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0, opcode->operand1, opcode->operand2, fields_length);
         break;
       }
       case SPVM_OPCODE_C_ID_GET_MULNUM_ARRAY_FLOAT: {
         int32_t fields_length = opcode->operand3;
-        SPVM_PRECOMPILE_add_mulnum_array_fetch(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand0, opcode->operand1, opcode->operand2, fields_length);
+        SPVM_PRECOMPILE_add_mulnum_array_fetch(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand0, opcode->operand1, opcode->operand2, fields_length);
         break;
       }
       case SPVM_OPCODE_C_ID_GET_MULNUM_ARRAY_DOUBLE: {
         int32_t fields_length = opcode->operand3;
-        SPVM_PRECOMPILE_add_mulnum_array_fetch(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand0, opcode->operand1, opcode->operand2, fields_length);
+        SPVM_PRECOMPILE_add_mulnum_array_fetch(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand0, opcode->operand1, opcode->operand2, fields_length);
         break;
       }
       case SPVM_OPCODE_C_ID_GET_ARRAY_ELEMENT_OBJECT:
         SPVM_STRING_BUFFER_add(string_buffer, "  {\n"
                                               "    void* array = ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n"
                                               "    int32_t index = ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand2);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand2);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n"
                                               "    if (__builtin_expect(array == NULL, 0)) { \n"
                                               "      env->set_exception(env, env->new_string_nolen_raw(env, \"Array must not be undef\")); \n"
@@ -1545,7 +1567,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
                                               "      else { \n"
                                               "        void* object = ((void**)((intptr_t)array + object_header_byte_size))[index];\n"
                                               "        SPVM_API_OBJECT_ASSIGN(&");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, ", object); \n"
                                               "      } \n"
                                               "    } \n"
@@ -1554,65 +1576,65 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       case SPVM_OPCODE_C_ID_GET_MULNUM_ARRAY_FIELD_BYTE: {
         int32_t fields_length = (opcode->operand3 & 0xFF) + 1;
         int32_t field_index = opcode->operand3 >> 8;
-        SPVM_PRECOMPILE_add_mulnum_array_field_fetch(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, opcode->operand0, opcode->operand1, opcode->operand2, fields_length, field_index);
+        SPVM_PRECOMPILE_add_mulnum_array_field_fetch(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, opcode->operand0, opcode->operand1, opcode->operand2, fields_length, field_index);
         break;
       }
       case SPVM_OPCODE_C_ID_GET_MULNUM_ARRAY_FIELD_SHORT: {
         int32_t fields_length = (opcode->operand3 & 0xFF) + 1;
         int32_t field_index = opcode->operand3 >> 8;
-        SPVM_PRECOMPILE_add_mulnum_array_field_fetch(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, opcode->operand0, opcode->operand1, opcode->operand2, fields_length, field_index);
+        SPVM_PRECOMPILE_add_mulnum_array_field_fetch(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, opcode->operand0, opcode->operand1, opcode->operand2, fields_length, field_index);
         break;
       }
       case SPVM_OPCODE_C_ID_GET_MULNUM_ARRAY_FIELD_INT: {
         int32_t fields_length = (opcode->operand3 & 0xFF) + 1;
         int32_t field_index = opcode->operand3 >> 8;
-        SPVM_PRECOMPILE_add_mulnum_array_field_fetch(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0, opcode->operand1, opcode->operand2, fields_length, field_index);
+        SPVM_PRECOMPILE_add_mulnum_array_field_fetch(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0, opcode->operand1, opcode->operand2, fields_length, field_index);
         break;
       }
       case SPVM_OPCODE_C_ID_GET_MULNUM_ARRAY_FIELD_LONG: {
         int32_t fields_length = (opcode->operand3 & 0xFF) + 1;
         int32_t field_index = opcode->operand3 >> 8;
-        SPVM_PRECOMPILE_add_mulnum_array_field_fetch(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0, opcode->operand1, opcode->operand2, fields_length, field_index);
+        SPVM_PRECOMPILE_add_mulnum_array_field_fetch(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0, opcode->operand1, opcode->operand2, fields_length, field_index);
         break;
       }
       case SPVM_OPCODE_C_ID_GET_MULNUM_ARRAY_FIELD_FLOAT: {
         int32_t fields_length = (opcode->operand3 & 0xFF) + 1;
         int32_t field_index = opcode->operand3 >> 8;
-        SPVM_PRECOMPILE_add_mulnum_array_field_fetch(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand0, opcode->operand1, opcode->operand2, fields_length, field_index);
+        SPVM_PRECOMPILE_add_mulnum_array_field_fetch(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand0, opcode->operand1, opcode->operand2, fields_length, field_index);
         break;
       }
       case SPVM_OPCODE_C_ID_GET_MULNUM_ARRAY_FIELD_DOUBLE: {
         int32_t fields_length = (opcode->operand3 & 0xFF) + 1;
         int32_t field_index = opcode->operand3 >> 8;
-        SPVM_PRECOMPILE_add_mulnum_array_field_fetch(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand0, opcode->operand1, opcode->operand2, fields_length, field_index);
+        SPVM_PRECOMPILE_add_mulnum_array_field_fetch(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand0, opcode->operand1, opcode->operand2, fields_length, field_index);
         break;
       }
       case SPVM_OPCODE_C_ID_SET_ARRAY_ELEMENT_BYTE:
-        SPVM_PRECOMPILE_add_array_store(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, opcode->operand0, opcode->operand1, opcode->operand2);
+        SPVM_PRECOMPILE_add_array_store(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, opcode->operand0, opcode->operand1, opcode->operand2);
         break;
       case SPVM_OPCODE_C_ID_SET_ARRAY_ELEMENT_SHORT:
-        SPVM_PRECOMPILE_add_array_store(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, opcode->operand0, opcode->operand1, opcode->operand2);
+        SPVM_PRECOMPILE_add_array_store(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, opcode->operand0, opcode->operand1, opcode->operand2);
         break;
       case SPVM_OPCODE_C_ID_SET_ARRAY_ELEMENT_INT:
-        SPVM_PRECOMPILE_add_array_store(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0, opcode->operand1, opcode->operand2);
+        SPVM_PRECOMPILE_add_array_store(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0, opcode->operand1, opcode->operand2);
         break;
       case SPVM_OPCODE_C_ID_SET_ARRAY_ELEMENT_LONG:
-        SPVM_PRECOMPILE_add_array_store(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0, opcode->operand1, opcode->operand2);
+        SPVM_PRECOMPILE_add_array_store(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0, opcode->operand1, opcode->operand2);
         break;
       case SPVM_OPCODE_C_ID_SET_ARRAY_ELEMENT_FLOAT:
-        SPVM_PRECOMPILE_add_array_store(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand0, opcode->operand1, opcode->operand2);
+        SPVM_PRECOMPILE_add_array_store(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand0, opcode->operand1, opcode->operand2);
         break;
       case SPVM_OPCODE_C_ID_SET_ARRAY_ELEMENT_DOUBLE:
-        SPVM_PRECOMPILE_add_array_store(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand0, opcode->operand1, opcode->operand2);
+        SPVM_PRECOMPILE_add_array_store(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand0, opcode->operand1, opcode->operand2);
         break;
       case SPVM_OPCODE_C_ID_SET_ARRAY_ELEMENT_OBJECT:
       {
         SPVM_STRING_BUFFER_add(string_buffer, "  {\n"
                                               "    void* array = ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n"
                                               "    int32_t index = ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand1);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand1);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n"
                                               "    if (__builtin_expect(array == NULL, 0)) { \n"
                                               "      env->set_exception(env, env->new_string_nolen_raw(env, \"Array must not be undef\")); \n"
@@ -1628,7 +1650,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
                                               "        SPVM_API_OBJECT_ASSIGN(\n"
                                               "          element_address, "
                                               "        ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand2);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand2);
         SPVM_STRING_BUFFER_add(string_buffer, "\n"
                                               "        );\n"
                                               "      }\n"
@@ -1641,10 +1663,10 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       {
         SPVM_STRING_BUFFER_add(string_buffer, "  {\n"
                                               "    void* array = ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n");
         SPVM_STRING_BUFFER_add(string_buffer, "    int32_t index = ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand1);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand1);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n"
                                               "    if (__builtin_expect(array == NULL, 0)) { \n"
                                               "      env->set_exception(env, env->new_string_nolen_raw(env, \"Array must not be undef\")); \n"
@@ -1658,7 +1680,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
                                               "      else {\n"
                                               "        void** element_address = &((void**)((intptr_t)array + object_header_byte_size))[index];\n"
                                               "        void* object = ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand2);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand2);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n"
                                               "        int32_t can_assign = env->can_assign_array_element(env, array, object);\n"
                                               "        if (can_assign) {\n"
@@ -1679,24 +1701,24 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       {
         SPVM_STRING_BUFFER_add(string_buffer, "  {\n");
         SPVM_STRING_BUFFER_add(string_buffer, "    void* array = ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n");
         SPVM_STRING_BUFFER_add(string_buffer, "    int32_t index = ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand1);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand1);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n");
         SPVM_STRING_BUFFER_add(string_buffer, "    if (__builtin_expect(");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, " == NULL, 0)) { \n"
                                               "      env->set_exception(env, env->new_string_nolen_raw(env, \"Array must not be undef\")); \n"
                                               "      exception_flag = 1;\n"
                                               "    } \n"
                                               "    else { \n"
                                               "      if (__builtin_expect(");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand1);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand1);
         SPVM_STRING_BUFFER_add(string_buffer, " < 0 || ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand1);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand1);
         SPVM_STRING_BUFFER_add(string_buffer, "  >= *(int32_t*)((intptr_t)");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, " + (intptr_t)env->object_length_offset), 0)) { \n"
                                               "        env->set_exception(env, env->new_string_nolen_raw(env, \"Index is out of range\")); \n"
                                               "        exception_flag = 1;\n"
@@ -1715,106 +1737,106 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       }
       case SPVM_OPCODE_C_ID_SET_MULNUM_ARRAY_BYTE: {
         int32_t fields_length = opcode->operand3;
-        SPVM_PRECOMPILE_add_mulnum_array_store(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, opcode->operand0, opcode->operand1, opcode->operand2, fields_length);
+        SPVM_PRECOMPILE_add_mulnum_array_store(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, opcode->operand0, opcode->operand1, opcode->operand2, fields_length);
         break;
       }
       case SPVM_OPCODE_C_ID_SET_MULNUM_ARRAY_SHORT: {
         int32_t fields_length = opcode->operand3;
-        SPVM_PRECOMPILE_add_mulnum_array_store(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, opcode->operand0, opcode->operand1, opcode->operand2, fields_length);
+        SPVM_PRECOMPILE_add_mulnum_array_store(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, opcode->operand0, opcode->operand1, opcode->operand2, fields_length);
         break;
       }
       case SPVM_OPCODE_C_ID_SET_MULNUM_ARRAY_INT: {
         int32_t fields_length = opcode->operand3;
-        SPVM_PRECOMPILE_add_mulnum_array_store(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0, opcode->operand1, opcode->operand2, fields_length);
+        SPVM_PRECOMPILE_add_mulnum_array_store(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0, opcode->operand1, opcode->operand2, fields_length);
         break;
       }
       case SPVM_OPCODE_C_ID_SET_MULNUM_ARRAY_LONG: {
         int32_t fields_length = opcode->operand3;
-        SPVM_PRECOMPILE_add_mulnum_array_store(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0, opcode->operand1, opcode->operand2, fields_length);
+        SPVM_PRECOMPILE_add_mulnum_array_store(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0, opcode->operand1, opcode->operand2, fields_length);
         break;
       }
       case SPVM_OPCODE_C_ID_SET_MULNUM_ARRAY_FLOAT: {
         int32_t fields_length = opcode->operand3;
-        SPVM_PRECOMPILE_add_mulnum_array_store(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand0, opcode->operand1, opcode->operand2, fields_length);
+        SPVM_PRECOMPILE_add_mulnum_array_store(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand0, opcode->operand1, opcode->operand2, fields_length);
         break;
       }
       case SPVM_OPCODE_C_ID_SET_MULNUM_ARRAY_DOUBLE: {
         int32_t fields_length = opcode->operand3;
-        SPVM_PRECOMPILE_add_mulnum_array_store(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand0, opcode->operand1, opcode->operand2, fields_length);
+        SPVM_PRECOMPILE_add_mulnum_array_store(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand0, opcode->operand1, opcode->operand2, fields_length);
         break;
       }
       case SPVM_OPCODE_C_ID_SET_MULNUM_ARRAY_FIELD_BYTE: {
         int32_t fields_length = (opcode->operand3 & 0xFF) + 1;
         int32_t field_index = opcode->operand3 >> 8;
-        SPVM_PRECOMPILE_add_mulnum_array_field_store(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, opcode->operand0, opcode->operand1, opcode->operand2, fields_length, field_index);
+        SPVM_PRECOMPILE_add_mulnum_array_field_store(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, opcode->operand0, opcode->operand1, opcode->operand2, fields_length, field_index);
         break;
       }
       case SPVM_OPCODE_C_ID_SET_MULNUM_ARRAY_FIELD_SHORT: {
         int32_t fields_length = (opcode->operand3 & 0xFF) + 1;
         int32_t field_index = opcode->operand3 >> 8;
-        SPVM_PRECOMPILE_add_mulnum_array_field_store(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, opcode->operand0, opcode->operand1, opcode->operand2, fields_length, field_index);
+        SPVM_PRECOMPILE_add_mulnum_array_field_store(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, opcode->operand0, opcode->operand1, opcode->operand2, fields_length, field_index);
         break;
       }
       case SPVM_OPCODE_C_ID_SET_MULNUM_ARRAY_FIELD_INT: {
         int32_t fields_length = (opcode->operand3 & 0xFF) + 1;
         int32_t field_index = opcode->operand3 >> 8;
-        SPVM_PRECOMPILE_add_mulnum_array_field_store(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0, opcode->operand1, opcode->operand2, fields_length, field_index);
+        SPVM_PRECOMPILE_add_mulnum_array_field_store(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0, opcode->operand1, opcode->operand2, fields_length, field_index);
         break;
       }
       case SPVM_OPCODE_C_ID_SET_MULNUM_ARRAY_FIELD_LONG: {
         int32_t fields_length = (opcode->operand3 & 0xFF) + 1;
         int32_t field_index = opcode->operand3 >> 8;
-        SPVM_PRECOMPILE_add_mulnum_array_field_store(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0, opcode->operand1, opcode->operand2, fields_length, field_index);
+        SPVM_PRECOMPILE_add_mulnum_array_field_store(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0, opcode->operand1, opcode->operand2, fields_length, field_index);
         break;
       }
       case SPVM_OPCODE_C_ID_SET_MULNUM_ARRAY_FIELD_FLOAT: {
         int32_t fields_length = (opcode->operand3 & 0xFF) + 1;
         int32_t field_index = opcode->operand3 >> 8;
-        SPVM_PRECOMPILE_add_mulnum_array_field_store(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand0, opcode->operand1, opcode->operand2, fields_length, field_index);
+        SPVM_PRECOMPILE_add_mulnum_array_field_store(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand0, opcode->operand1, opcode->operand2, fields_length, field_index);
         break;
       }
       case SPVM_OPCODE_C_ID_SET_MULNUM_ARRAY_FIELD_DOUBLE: {
         int32_t fields_length = (opcode->operand3 & 0xFF) + 1;
         int32_t field_index = opcode->operand3 >> 8;
-        SPVM_PRECOMPILE_add_mulnum_array_field_store(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand0, opcode->operand1, opcode->operand2, fields_length, field_index);
+        SPVM_PRECOMPILE_add_mulnum_array_field_store(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand0, opcode->operand1, opcode->operand2, fields_length, field_index);
         break;
       }
       case SPVM_OPCODE_C_ID_MOVE_BYTE: {
-        SPVM_PRECOMPILE_add_move(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, opcode->operand0, opcode->operand1);
+        SPVM_PRECOMPILE_add_move(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, opcode->operand0, opcode->operand1);
         break;
       }
       case SPVM_OPCODE_C_ID_MOVE_SHORT: {
-        SPVM_PRECOMPILE_add_move(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, opcode->operand0, opcode->operand1);
+        SPVM_PRECOMPILE_add_move(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, opcode->operand0, opcode->operand1);
         break;
       }
       case SPVM_OPCODE_C_ID_MOVE_INT: {
-        SPVM_PRECOMPILE_add_move(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0, opcode->operand1);
+        SPVM_PRECOMPILE_add_move(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0, opcode->operand1);
         break;
       }
       case SPVM_OPCODE_C_ID_MOVE_LONG: {
-        SPVM_PRECOMPILE_add_move(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0, opcode->operand1);
+        SPVM_PRECOMPILE_add_move(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0, opcode->operand1);
         break;
       }
       case SPVM_OPCODE_C_ID_MOVE_FLOAT: {
-        SPVM_PRECOMPILE_add_move(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand0, opcode->operand1);
+        SPVM_PRECOMPILE_add_move(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand0, opcode->operand1);
         break;
       }
       case SPVM_OPCODE_C_ID_MOVE_DOUBLE: {
-        SPVM_PRECOMPILE_add_move(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand0, opcode->operand1);
+        SPVM_PRECOMPILE_add_move(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand0, opcode->operand1);
         break;
       }
       case SPVM_OPCODE_C_ID_MOVE_OBJECT: {
           SPVM_STRING_BUFFER_add(string_buffer, "  SPVM_API_OBJECT_ASSIGN(&");
-          SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
+          SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
           SPVM_STRING_BUFFER_add(string_buffer, ", ");
-          SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1);
+          SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1);
           SPVM_STRING_BUFFER_add(string_buffer, ");\n");
         break;
       }
       case SPVM_OPCODE_C_ID_MOVE_OBJECT_CHECK_READ_ONLY: {
           SPVM_STRING_BUFFER_add(string_buffer, "  {\n"
                                                 "    void* string = ");
-          SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1);
+          SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1);
           SPVM_STRING_BUFFER_add(string_buffer, ";\n"
                                                 "    if (env->is_read_only(env, string)) {\n"
                                                 "      void* exception = env->new_string_nolen_raw(env, \"Read-only strings can't be converted to mutable strings.\");\n"
@@ -1823,7 +1845,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
                                                 "    }\n"
                                                 "    else {\n"
                                                 "  SPVM_API_OBJECT_ASSIGN(&");
-          SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
+          SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
           SPVM_STRING_BUFFER_add(string_buffer, ", string);\n"
                                                 "    }\n"
                                                 "  }\n");
@@ -1832,7 +1854,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       case SPVM_OPCODE_C_ID_COPY: {
           SPVM_STRING_BUFFER_add(string_buffer, "  {\n"
                                                 "    void* object = ");
-          SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1);
+          SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1);
           SPVM_STRING_BUFFER_add(string_buffer, ";\n"
                                                 "    if (object) {\n"
                                                 "      if (!(env->is_string(env, object) || env->is_numeric_array(env, object) || env->is_mulnum_array(env, object))) {\n"
@@ -1843,13 +1865,13 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
                                                 "      else {\n"
                                                 "        void* new_object_raw = env->copy_raw(env, object);\n"
                                                 "  SPVM_API_OBJECT_ASSIGN(&");
-          SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
+          SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
           SPVM_STRING_BUFFER_add(string_buffer, ", new_object_raw);\n"
                                                   "    }\n"
                                                   "  }\n"
                                                   "  else {\n"
                                                 "      SPVM_API_OBJECT_ASSIGN(&");
-          SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
+          SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
           SPVM_STRING_BUFFER_add(string_buffer, ", NULL);\n"
                                                   "  }\n"
                                                 "  }\n");
@@ -1857,21 +1879,21 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       }
       case SPVM_OPCODE_C_ID_MOVE_UNDEF: {
           SPVM_STRING_BUFFER_add(string_buffer, "  SPVM_API_OBJECT_ASSIGN(&");
-          SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
+          SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
           SPVM_STRING_BUFFER_add(string_buffer, ", NULL);");
         break;
       }
       case SPVM_OPCODE_C_ID_MOVE_REF: {
-        SPVM_PRECOMPILE_add_move(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_REF, opcode->operand0, opcode->operand1);
+        SPVM_PRECOMPILE_add_move(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_REF, opcode->operand0, opcode->operand1);
         break;
       }
       case SPVM_OPCODE_C_ID_MOVE_MULNUM_BYTE: {
         int32_t fields_length = opcode->operand2;
         for (int32_t field_index = 0; field_index < fields_length; field_index++) {
           SPVM_STRING_BUFFER_add(string_buffer, "  ");
-          SPVM_PRECOMPILE_add_operand_value(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, opcode->operand0, field_index);
+          SPVM_PRECOMPILE_add_operand_value(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, opcode->operand0, field_index);
           SPVM_STRING_BUFFER_add(string_buffer, " = ");
-          SPVM_PRECOMPILE_add_operand_value(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, opcode->operand1, field_index);
+          SPVM_PRECOMPILE_add_operand_value(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, opcode->operand1, field_index);
           SPVM_STRING_BUFFER_add(string_buffer, ";\n");
         }
         break;
@@ -1880,9 +1902,9 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
         int32_t fields_length = opcode->operand2;
         for (int32_t field_index = 0; field_index < fields_length; field_index++) {
           SPVM_STRING_BUFFER_add(string_buffer, "  ");
-          SPVM_PRECOMPILE_add_operand_value(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, opcode->operand0, field_index);
+          SPVM_PRECOMPILE_add_operand_value(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, opcode->operand0, field_index);
           SPVM_STRING_BUFFER_add(string_buffer, " = ");
-          SPVM_PRECOMPILE_add_operand_value(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, opcode->operand1, field_index);
+          SPVM_PRECOMPILE_add_operand_value(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, opcode->operand1, field_index);
           SPVM_STRING_BUFFER_add(string_buffer, ";\n");
         }
         break;
@@ -1891,9 +1913,9 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
         int32_t fields_length = opcode->operand2;
         for (int32_t field_index = 0; field_index < fields_length; field_index++) {
           SPVM_STRING_BUFFER_add(string_buffer, "  ");
-          SPVM_PRECOMPILE_add_operand_value(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0, field_index);
+          SPVM_PRECOMPILE_add_operand_value(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0, field_index);
           SPVM_STRING_BUFFER_add(string_buffer, " = ");
-          SPVM_PRECOMPILE_add_operand_value(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand1, field_index);
+          SPVM_PRECOMPILE_add_operand_value(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand1, field_index);
           SPVM_STRING_BUFFER_add(string_buffer, ";\n");
         }
         break;
@@ -1902,9 +1924,9 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
         int32_t fields_length = opcode->operand2;
         for (int32_t field_index = 0; field_index < fields_length; field_index++) {
           SPVM_STRING_BUFFER_add(string_buffer, "  ");
-          SPVM_PRECOMPILE_add_operand_value(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0, field_index);
+          SPVM_PRECOMPILE_add_operand_value(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0, field_index);
           SPVM_STRING_BUFFER_add(string_buffer, " = ");
-          SPVM_PRECOMPILE_add_operand_value(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand1, field_index);
+          SPVM_PRECOMPILE_add_operand_value(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand1, field_index);
           SPVM_STRING_BUFFER_add(string_buffer, ";\n");
         }
         break;
@@ -1913,9 +1935,9 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
         int32_t fields_length = opcode->operand2;
         for (int32_t field_index = 0; field_index < fields_length; field_index++) {
           SPVM_STRING_BUFFER_add(string_buffer, "  ");
-          SPVM_PRECOMPILE_add_operand_value(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand0, field_index);
+          SPVM_PRECOMPILE_add_operand_value(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand0, field_index);
           SPVM_STRING_BUFFER_add(string_buffer, " = ");
-          SPVM_PRECOMPILE_add_operand_value(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand1, field_index);
+          SPVM_PRECOMPILE_add_operand_value(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand1, field_index);
           SPVM_STRING_BUFFER_add(string_buffer, ";\n");
         }
         break;
@@ -1924,9 +1946,9 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
         int32_t fields_length = opcode->operand2;
         for (int32_t field_index = 0; field_index < fields_length; field_index++) {
           SPVM_STRING_BUFFER_add(string_buffer, "  ");
-          SPVM_PRECOMPILE_add_operand_value(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand0, field_index);
+          SPVM_PRECOMPILE_add_operand_value(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand0, field_index);
           SPVM_STRING_BUFFER_add(string_buffer, " = ");
-          SPVM_PRECOMPILE_add_operand_value(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand1, field_index);
+          SPVM_PRECOMPILE_add_operand_value(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand1, field_index);
           SPVM_STRING_BUFFER_add(string_buffer, ";\n");
         }
         break;
@@ -1934,108 +1956,108 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       case SPVM_OPCODE_C_ID_GET_MULNUM_FIELD_BYTE: {
         int32_t field_index = opcode->operand2;
         SPVM_STRING_BUFFER_add(string_buffer, "  ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, opcode->operand0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, " = ");
-        SPVM_PRECOMPILE_add_operand_value(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, opcode->operand1, field_index);
+        SPVM_PRECOMPILE_add_operand_value(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, opcode->operand1, field_index);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n");
         break;
       }
       case SPVM_OPCODE_C_ID_GET_MULNUM_FIELD_SHORT: {
         int32_t field_index = opcode->operand2;
         SPVM_STRING_BUFFER_add(string_buffer, "  ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, opcode->operand0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, " = ");
-        SPVM_PRECOMPILE_add_operand_value(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, opcode->operand1, field_index);
+        SPVM_PRECOMPILE_add_operand_value(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, opcode->operand1, field_index);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n");
         break;
       }
       case SPVM_OPCODE_C_ID_GET_MULNUM_FIELD_INT: {
         int32_t field_index = opcode->operand2;
         SPVM_STRING_BUFFER_add(string_buffer, "  ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, " = ");
-        SPVM_PRECOMPILE_add_operand_value(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand1, field_index);
+        SPVM_PRECOMPILE_add_operand_value(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand1, field_index);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n");
         break;
       }
       case SPVM_OPCODE_C_ID_GET_MULNUM_FIELD_LONG: {
         int32_t field_index = opcode->operand2;
         SPVM_STRING_BUFFER_add(string_buffer, "  ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, " = ");
-        SPVM_PRECOMPILE_add_operand_value(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand1, field_index);
+        SPVM_PRECOMPILE_add_operand_value(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand1, field_index);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n");
         break;
       }
       case SPVM_OPCODE_C_ID_GET_MULNUM_FIELD_FLOAT: {
         int32_t field_index = opcode->operand2;
         SPVM_STRING_BUFFER_add(string_buffer, "  ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, " = ");
-        SPVM_PRECOMPILE_add_operand_value(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand1, field_index);
+        SPVM_PRECOMPILE_add_operand_value(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand1, field_index);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n");
         break;
       }
       case SPVM_OPCODE_C_ID_GET_MULNUM_FIELD_DOUBLE: {
         int32_t field_index = opcode->operand2;
         SPVM_STRING_BUFFER_add(string_buffer, "  ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, " = ");
-        SPVM_PRECOMPILE_add_operand_value(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand1, field_index);
+        SPVM_PRECOMPILE_add_operand_value(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand1, field_index);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n");
         break;
       }
       case SPVM_OPCODE_C_ID_SET_MULNUM_FIELD_BYTE: {
         int32_t field_index = opcode->operand2;
         SPVM_STRING_BUFFER_add(string_buffer, "  ");
-        SPVM_PRECOMPILE_add_operand_value(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, opcode->operand0, field_index);
+        SPVM_PRECOMPILE_add_operand_value(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, opcode->operand0, field_index);
         SPVM_STRING_BUFFER_add(string_buffer, " = ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, opcode->operand1);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, opcode->operand1);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n");
         break;
       }
       case SPVM_OPCODE_C_ID_SET_MULNUM_FIELD_SHORT: {
         int32_t field_index = opcode->operand2;
         SPVM_STRING_BUFFER_add(string_buffer, "  ");
-        SPVM_PRECOMPILE_add_operand_value(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, opcode->operand0, field_index);
+        SPVM_PRECOMPILE_add_operand_value(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, opcode->operand0, field_index);
         SPVM_STRING_BUFFER_add(string_buffer, " = ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, opcode->operand1);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, opcode->operand1);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n");
         break;
       }
       case SPVM_OPCODE_C_ID_SET_MULNUM_FIELD_INT: {
         int32_t field_index = opcode->operand2;
         SPVM_STRING_BUFFER_add(string_buffer, "  ");
-        SPVM_PRECOMPILE_add_operand_value(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0, field_index);
+        SPVM_PRECOMPILE_add_operand_value(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0, field_index);
         SPVM_STRING_BUFFER_add(string_buffer, " = ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand1);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand1);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n");
         break;
       }
       case SPVM_OPCODE_C_ID_SET_MULNUM_FIELD_LONG: {
         int32_t field_index = opcode->operand2;
         SPVM_STRING_BUFFER_add(string_buffer, "  ");
-        SPVM_PRECOMPILE_add_operand_value(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0, field_index);
+        SPVM_PRECOMPILE_add_operand_value(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0, field_index);
         SPVM_STRING_BUFFER_add(string_buffer, " = ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand1);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand1);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n");
         break;
       }
       case SPVM_OPCODE_C_ID_SET_MULNUM_FIELD_FLOAT: {
         int32_t field_index = opcode->operand2;
         SPVM_STRING_BUFFER_add(string_buffer, "  ");
-        SPVM_PRECOMPILE_add_operand_value(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand0, field_index);
+        SPVM_PRECOMPILE_add_operand_value(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand0, field_index);
         SPVM_STRING_BUFFER_add(string_buffer, " = ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand1);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand1);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n");
         break;
       }
       case SPVM_OPCODE_C_ID_SET_MULNUM_FIELD_DOUBLE: {
         int32_t field_index = opcode->operand2;
         SPVM_STRING_BUFFER_add(string_buffer, "  ");
-        SPVM_PRECOMPILE_add_operand_value(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand0, field_index);
+        SPVM_PRECOMPILE_add_operand_value(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand0, field_index);
         SPVM_STRING_BUFFER_add(string_buffer, " = ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand1);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand1);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n");
         break;
       }
@@ -2072,8 +2094,8 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       }
       case SPVM_OPCODE_C_ID_NEW_OBJECT: {
         int32_t basic_type_id = opcode->operand1;
-        int32_t basic_type_name_id = SPVM_API_get_basic_type_name_id(env, basic_type_id);
-        const char* basic_type_name = SPVM_API_get_name(env, basic_type_name_id);
+        int32_t basic_type_name_id = SPVM_API_RUNTIME_get_basic_type_name_id(runtime, basic_type_id);
+        const char* basic_type_name = SPVM_API_RUNTIME_get_name(runtime, basic_type_name_id);
 
         SPVM_STRING_BUFFER_add(string_buffer, "  {\n"
                                               "    int32_t access_basic_type_id = env->get_basic_type_id(env, \"");
@@ -2096,7 +2118,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
                                               "      }\n"
                                               "      else {\n"
                                               "        SPVM_API_OBJECT_ASSIGN(&");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, ", object);\n"
                                               "      }\n"
                                               "    }\n"
@@ -2107,7 +2129,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       case SPVM_OPCODE_C_ID_NEW_BYTE_ARRAY: {
         SPVM_STRING_BUFFER_add(string_buffer, "  {\n"
                                               "    int32_t length = *(int32_t*)&");
-        SPVM_PRECOMPILE_add_var(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand1);
+        SPVM_PRECOMPILE_add_var(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand1);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n"
                                               "    if (length >= 0) {\n"
                                               "      void* object = env->new_byte_array_raw(env, length);\n"
@@ -2118,7 +2140,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
                                               "      }\n"
                                               "      else {\n"
                                               "        SPVM_API_OBJECT_ASSIGN((void**)&");
-        SPVM_PRECOMPILE_add_var(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
+        SPVM_PRECOMPILE_add_var(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, ", object);\n"
                                               "      }\n"
                                               "    }\n"
@@ -2133,7 +2155,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       case SPVM_OPCODE_C_ID_NEW_SHORT_ARRAY: {
         SPVM_STRING_BUFFER_add(string_buffer, "  {\n"
                                               "    int32_t length = *(int32_t*)&");
-        SPVM_PRECOMPILE_add_var(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand1);
+        SPVM_PRECOMPILE_add_var(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand1);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n"
                                               "    if (length >= 0) {\n"
                                               "      void* object = env->new_short_array_raw(env, length);\n"
@@ -2144,7 +2166,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
                                               "      }\n"
                                               "      else {\n"
                                               "        SPVM_API_OBJECT_ASSIGN((void**)&");
-        SPVM_PRECOMPILE_add_var(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
+        SPVM_PRECOMPILE_add_var(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, ", object);\n"
                                               "      }\n"
                                               "    }\n"
@@ -2159,7 +2181,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       case SPVM_OPCODE_C_ID_NEW_INT_ARRAY: {
         SPVM_STRING_BUFFER_add(string_buffer, "  {\n"
                                               "    int32_t length = *(int32_t*)&");
-        SPVM_PRECOMPILE_add_var(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand1);
+        SPVM_PRECOMPILE_add_var(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand1);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n"
                                               "    if (length >= 0) {\n"
                                               "      void* object = env->new_int_array_raw(env, length);\n"
@@ -2170,7 +2192,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
                                               "      }\n"
                                               "      else {\n"
                                               "        SPVM_API_OBJECT_ASSIGN((void**)&");
-        SPVM_PRECOMPILE_add_var(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
+        SPVM_PRECOMPILE_add_var(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, ", object);\n"
                                               "      }\n"
                                               "    }\n"
@@ -2185,7 +2207,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       case SPVM_OPCODE_C_ID_NEW_LONG_ARRAY: {
         SPVM_STRING_BUFFER_add(string_buffer, "  {\n"
                                               "    int32_t length = *(int32_t*)&");
-        SPVM_PRECOMPILE_add_var(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand1);
+        SPVM_PRECOMPILE_add_var(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand1);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n"
                                               "    if (length >= 0) {\n"
                                               "      void* object = env->new_long_array_raw(env, length);\n"
@@ -2196,7 +2218,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
                                               "      }\n"
                                               "      else {\n"
                                               "        SPVM_API_OBJECT_ASSIGN((void**)&");
-        SPVM_PRECOMPILE_add_var(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
+        SPVM_PRECOMPILE_add_var(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, ", object);\n"
                                               "      }\n"
                                               "    }\n"
@@ -2211,7 +2233,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       case SPVM_OPCODE_C_ID_NEW_FLOAT_ARRAY: {
         SPVM_STRING_BUFFER_add(string_buffer, "  {\n"
                                               "    int32_t length = *(int32_t*)&");
-        SPVM_PRECOMPILE_add_var(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand1);
+        SPVM_PRECOMPILE_add_var(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand1);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n"
                                               "    if (length >= 0) {\n"
                                               "      void* object = env->new_float_array_raw(env, length);\n"
@@ -2222,7 +2244,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
                                               "      }\n"
                                               "      else {\n"
                                               "        SPVM_API_OBJECT_ASSIGN((void**)&");
-        SPVM_PRECOMPILE_add_var(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
+        SPVM_PRECOMPILE_add_var(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, ", object);\n"
                                               "      }\n"
                                               "    }\n"
@@ -2237,7 +2259,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       case SPVM_OPCODE_C_ID_NEW_DOUBLE_ARRAY: {
         SPVM_STRING_BUFFER_add(string_buffer, "  {\n"
                                               "    int32_t length = *(int32_t*)&");
-        SPVM_PRECOMPILE_add_var(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand1);
+        SPVM_PRECOMPILE_add_var(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand1);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n"
                                               "    if (length >= 0) {\n"
                                               "      void* object = env->new_double_array_raw(env, length);\n"
@@ -2248,7 +2270,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
                                               "      }\n"
                                               "      else {\n"
                                               "        SPVM_API_OBJECT_ASSIGN((void**)&");
-        SPVM_PRECOMPILE_add_var(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
+        SPVM_PRECOMPILE_add_var(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, ", object);\n"
                                               "      }\n"
                                               "    }\n"
@@ -2262,8 +2284,8 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       }
       case SPVM_OPCODE_C_ID_NEW_OBJECT_ARRAY: {
         int32_t basic_type_id = opcode->operand1;
-        int32_t basic_type_name_id = SPVM_API_get_basic_type_name_id(env, basic_type_id);
-        const char* basic_type_name = SPVM_API_get_name(env, basic_type_name_id);
+        int32_t basic_type_name_id = SPVM_API_RUNTIME_get_basic_type_name_id(runtime, basic_type_id);
+        const char* basic_type_name = SPVM_API_RUNTIME_get_name(runtime, basic_type_name_id);
 
         SPVM_STRING_BUFFER_add(string_buffer, "  {\n");
         
@@ -2284,7 +2306,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
                                               "access_basic_type_id"
                                               ";\n"
                                               "      int32_t length = *(int32_t*)&");
-        SPVM_PRECOMPILE_add_var(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand2);
+        SPVM_PRECOMPILE_add_var(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand2);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n"
                                               "      if (length >= 0) {\n"
                                               "        void* object = env->new_object_array_raw(env, basic_type_id, length);\n"
@@ -2295,7 +2317,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
                                               "        }\n"
                                               "        else {\n"
                                               "          SPVM_API_OBJECT_ASSIGN((void**)&");
-        SPVM_PRECOMPILE_add_var(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
+        SPVM_PRECOMPILE_add_var(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, ", object);\n"
                                               "        }\n"
                                               "      }\n"
@@ -2310,8 +2332,8 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       }
       case SPVM_OPCODE_C_ID_NEW_MULTI_ARRAY: {
         int32_t basic_type_id = opcode->operand1;
-        int32_t basic_type_name_id = SPVM_API_get_basic_type_name_id(env, basic_type_id);
-        const char* basic_type_name = SPVM_API_get_name(env, basic_type_name_id);
+        int32_t basic_type_name_id = SPVM_API_RUNTIME_get_basic_type_name_id(runtime, basic_type_id);
+        const char* basic_type_name = SPVM_API_RUNTIME_get_name(runtime, basic_type_name_id);
         int32_t element_dimension = opcode->operand3;
         
         SPVM_STRING_BUFFER_add(string_buffer, "  {\n"
@@ -2330,7 +2352,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
                                               "access_basic_type_id"
                                               ";\n");
         SPVM_STRING_BUFFER_add(string_buffer, "      int32_t length = *(int32_t*)&");
-        SPVM_PRECOMPILE_add_var(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand2);
+        SPVM_PRECOMPILE_add_var(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand2);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n"
                                               "      if (length >= 0) {\n"
                                               "        void* object = env->new_muldim_array_raw(env, basic_type_id, ");
@@ -2343,7 +2365,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
                                               "        }\n"
                                               "        else {\n"
                                               "          SPVM_API_OBJECT_ASSIGN((void**)&");
-        SPVM_PRECOMPILE_add_var(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
+        SPVM_PRECOMPILE_add_var(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, ", object);\n"
                                               "        }\n"
                                               "      }\n"
@@ -2359,8 +2381,8 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       }
       case SPVM_OPCODE_C_ID_NEW_MULNUM_ARRAY: {
         int32_t basic_type_id = opcode->operand1;
-        int32_t basic_type_name_id = SPVM_API_get_basic_type_name_id(env, basic_type_id);
-        const char* basic_type_name = SPVM_API_get_name(env, basic_type_name_id);
+        int32_t basic_type_name_id = SPVM_API_RUNTIME_get_basic_type_name_id(runtime, basic_type_id);
+        const char* basic_type_name = SPVM_API_RUNTIME_get_name(runtime, basic_type_name_id);
 
         SPVM_STRING_BUFFER_add(string_buffer, "  {\n"
                                               "    int32_t access_basic_type_id = env->get_basic_type_id(env, \"");
@@ -2378,7 +2400,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
                                               "access_basic_type_id"
                                               ";\n"
                                               "      int32_t length = *(int32_t*)&");
-        SPVM_PRECOMPILE_add_var(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand2);
+        SPVM_PRECOMPILE_add_var(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand2);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n"
                                               "      if (length >= 0) {\n"
                                               "        void* object = env->new_mulnum_array_raw(env, basic_type_id, length);\n"
@@ -2389,7 +2411,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
                                               "        }\n"
                                               "        else {\n"
                                               "          SPVM_API_OBJECT_ASSIGN((void**)&");
-        SPVM_PRECOMPILE_add_var(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
+        SPVM_PRECOMPILE_add_var(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, ", object);\n"
                                               "        }\n"
                                               "      }\n"
@@ -2404,10 +2426,10 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
         break;
       }
       case SPVM_OPCODE_C_ID_NEW_STRING: {
-        int32_t string_id = opcode->operand1;
+        int32_t constant_string_id = opcode->operand1;
         
         int32_t constant_string_length;
-        const char* constant_string_value = SPVM_API_get_constant_string_value(env, string_id, &constant_string_length);
+        const char* constant_string_value = SPVM_API_RUNTIME_get_constant_string_value(runtime, constant_string_id, &constant_string_length);
 
         SPVM_STRING_BUFFER_add(string_buffer,
           "  {\n"
@@ -2431,7 +2453,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
           "      env->make_read_only(env, string);\n"
           "      SPVM_API_OBJECT_ASSIGN(&"
         );
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer,
           ", string);\n"
           "    }\n"
@@ -2442,16 +2464,16 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       }
       case SPVM_OPCODE_C_ID_ARRAY_LENGTH: {
         SPVM_STRING_BUFFER_add(string_buffer, "  if (");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1);
         SPVM_STRING_BUFFER_add(string_buffer, " == NULL) {\n"
                                               "    env->set_exception(env, env->new_string_nolen_raw(env, \"Can't get array length of undef value.\"));\n"
                                               "    exception_flag = 1;\n"
                                               "  }\n"
                                               "  else {\n"
                                               "    ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, " = *(int32_t*)((intptr_t)");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1);
         SPVM_STRING_BUFFER_add(string_buffer, " + (intptr_t)env->object_length_offset);\n"
                                               "  }\n");
         break;
@@ -2459,10 +2481,10 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       case SPVM_OPCODE_C_ID_IS_READ_ONLY: {
         SPVM_STRING_BUFFER_add(string_buffer, "  {\n"
                                               "    void* string = ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n"
                                               "    int32_t is_read_only = env->is_read_only(env, string);\n");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, 0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, 0);
         SPVM_STRING_BUFFER_add(string_buffer, " = is_read_only;\n"
                                               "  }\n");
         break;
@@ -2470,13 +2492,13 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       case SPVM_OPCODE_C_ID_WEAKEN_FIELD: {
         int32_t field_id = opcode->operand1;
         
-        int32_t field_class_id = SPVM_API_get_field_class_id(env, field_id);
-        int32_t field_class_name_id = SPVM_API_get_class_name_id(env, field_class_id);
-        const char* field_class_name = SPVM_API_get_name(env, field_class_name_id);
-        int32_t field_name_id = SPVM_API_get_field_name_id(env, field_id);
-        const char* field_name = SPVM_API_get_name(env, field_name_id);
-        int32_t field_signature_id = SPVM_API_get_field_signature_id(env, field_id);
-        const char* field_signature = SPVM_API_get_name(env, field_signature_id);
+        int32_t field_class_id = SPVM_API_RUNTIME_get_field_class_id(runtime, field_id);
+        int32_t field_class_name_id = SPVM_API_RUNTIME_get_class_name_id(runtime, field_class_id);
+        const char* field_class_name = SPVM_API_RUNTIME_get_name(runtime, field_class_name_id);
+        int32_t field_name_id = SPVM_API_RUNTIME_get_field_name_id(runtime, field_id);
+        const char* field_name = SPVM_API_RUNTIME_get_name(runtime, field_name_id);
+        int32_t field_signature_id = SPVM_API_RUNTIME_get_field_signature_id(runtime, field_id);
+        const char* field_signature = SPVM_API_RUNTIME_get_name(runtime, field_signature_id);
 
         SPVM_STRING_BUFFER_add(string_buffer, "  {\n"
                                               "    int32_t access_field_id = env->get_field_id(env, \"");
@@ -2498,7 +2520,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
                                               "    if (!exception_flag) {\n"
                                               "      int32_t access_field_offset = env->get_field_offset(env, access_field_id);\n"
                                               "      void* object = ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n"
                                               "      if (object == NULL) {\n"
                                               "        void* exception = env->new_string_nolen_raw(env, \"Object to weaken an object field must not be undefined.\");\n"
@@ -2521,13 +2543,13 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       case SPVM_OPCODE_C_ID_UNWEAKEN_FIELD: {
         int32_t field_id = opcode->operand1;
         
-        int32_t field_class_id = SPVM_API_get_field_class_id(env, field_id);
-        int32_t field_class_name_id = SPVM_API_get_class_name_id(env, field_class_id);
-        const char* field_class_name = SPVM_API_get_name(env, field_class_name_id);
-        int32_t field_name_id = SPVM_API_get_field_name_id(env, field_id);
-        const char* field_name = SPVM_API_get_name(env, field_name_id);
-        int32_t field_signature_id = SPVM_API_get_field_signature_id(env, field_id);
-        const char* field_signature = SPVM_API_get_name(env, field_signature_id);
+        int32_t field_class_id = SPVM_API_RUNTIME_get_field_class_id(runtime, field_id);
+        int32_t field_class_name_id = SPVM_API_RUNTIME_get_class_name_id(runtime, field_class_id);
+        const char* field_class_name = SPVM_API_RUNTIME_get_name(runtime, field_class_name_id);
+        int32_t field_name_id = SPVM_API_RUNTIME_get_field_name_id(runtime, field_id);
+        const char* field_name = SPVM_API_RUNTIME_get_name(runtime, field_name_id);
+        int32_t field_signature_id = SPVM_API_RUNTIME_get_field_signature_id(runtime, field_id);
+        const char* field_signature = SPVM_API_RUNTIME_get_name(runtime, field_signature_id);
 
         SPVM_STRING_BUFFER_add(string_buffer, "  {\n"
                                               "    int32_t access_field_id = env->get_field_id(env, \"");
@@ -2552,7 +2574,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
                                               "access_field_id"
                                               ");\n"
                                               "      void* object = ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n"
                                               "      if (object == NULL) {\n"
                                               "        void* exception = env->new_string_nolen_raw(env, \"Object to weaken an object field must not be undefined.\");\n"
@@ -2570,13 +2592,13 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       case SPVM_OPCODE_C_ID_ISWEAK_FIELD: {
         int32_t field_id = opcode->operand2;
         
-        int32_t field_class_id = SPVM_API_get_field_class_id(env, field_id);
-        int32_t field_class_name_id = SPVM_API_get_class_name_id(env, field_class_id);
-        const char* field_class_name = SPVM_API_get_name(env, field_class_name_id);
-        int32_t field_name_id = SPVM_API_get_field_name_id(env, field_id);
-        const char* field_name = SPVM_API_get_name(env, field_name_id);
-        int32_t field_signature_id = SPVM_API_get_field_signature_id(env, field_id);
-        const char* field_signature = SPVM_API_get_name(env, field_signature_id);
+        int32_t field_class_id = SPVM_API_RUNTIME_get_field_class_id(runtime, field_id);
+        int32_t field_class_name_id = SPVM_API_RUNTIME_get_class_name_id(runtime, field_class_id);
+        const char* field_class_name = SPVM_API_RUNTIME_get_name(runtime, field_class_name_id);
+        int32_t field_name_id = SPVM_API_RUNTIME_get_field_name_id(runtime, field_id);
+        const char* field_name = SPVM_API_RUNTIME_get_name(runtime, field_name_id);
+        int32_t field_signature_id = SPVM_API_RUNTIME_get_field_signature_id(runtime, field_id);
+        const char* field_signature = SPVM_API_RUNTIME_get_name(runtime, field_signature_id);
 
         SPVM_STRING_BUFFER_add(string_buffer, "  {\n"
                                               "    int32_t access_field_id = env->get_field_id(env, \"");
@@ -2598,7 +2620,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
                                               "    if (!exception_flag) {\n"
                                               "      int32_t access_field_offset = env->get_field_offset(env, access_field_id);\n"
                                               "      void* object = ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n"
                                               "      if (object == NULL) {\n"
                                               "        void* exception = env->new_string_nolen_raw(env, \"Object to weaken an object field must not be undefined.\");\n"
@@ -2609,7 +2631,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
                                               "        void** get_field_object_address = (void**)((intptr_t)object + object_header_byte_size + "
                                               "access_field_offset"
                                               ");\n");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, 0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, 0);
         SPVM_STRING_BUFFER_add(string_buffer, " = env->isweak(env, get_field_object_address);\n"
                                               "      }\n"
                                               "    }\n"
@@ -2619,16 +2641,16 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       case SPVM_OPCODE_C_ID_REFCNT: {
         SPVM_STRING_BUFFER_add(string_buffer, "  {\n"
                                               "    void* object = ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n");
         SPVM_STRING_BUFFER_add(string_buffer, "    if (object == NULL) {\n");
         SPVM_STRING_BUFFER_add(string_buffer, "      ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, " = 0;\n"
                                               "    }\n"
                                               "    else {\n"
                                               "      ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, "    = env->get_ref_count(env, object);\n"
                                               "    }\n"
                                               "  }\n");
@@ -2638,10 +2660,10 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       {
         SPVM_STRING_BUFFER_add(string_buffer, "  {\n"
                                               "    void* string1 = ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n"
                                               "    void* string2 = ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand2);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand2);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n"
                                               "    if (string1 == NULL) {\n"
                                               "      void* exception = env->new_string_nolen_raw(env, \"\\\".\\\" operater left value must be defined\");\n"
@@ -2656,7 +2678,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
                                               "    else {\n"
                                               "      void* string3 = env->concat_raw(env, string1, string2);\n"
                                               "      SPVM_API_OBJECT_ASSIGN(&");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, ", string3);\n"
                                               "    }\n"
                                               "  }\n");
@@ -2666,17 +2688,17 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       case SPVM_OPCODE_C_ID_REFOP: {
         SPVM_STRING_BUFFER_add(string_buffer, "  {\n"
                                               "    void* object = ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n"
                                               "    if (object == NULL) {\n"
                                               "      ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, " = NULL;\n"
                                               "    }\n"
                                               "    else {\n"
                                               "      void* type_name = env->get_type_name_raw(env, object);\n"
                                               "      SPVM_API_OBJECT_ASSIGN(&");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, ", type_name);\n"
                                               "    }\n"
                                               "  }\n");
@@ -2685,11 +2707,11 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       case SPVM_OPCODE_C_ID_DUMP: {
         SPVM_STRING_BUFFER_add(string_buffer, "  {\n"
                                               "    void* object = ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n"
                                               "    void* dump = env->dump_raw(env, object);\n"
                                               "    SPVM_API_OBJECT_ASSIGN(&");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, ", dump);\n"
                                               "  }\n");
         break;
@@ -2697,7 +2719,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       case SPVM_OPCODE_C_ID_NEW_STRING_LEN: {
         SPVM_STRING_BUFFER_add(string_buffer, "  {\n"
                                               "    int32_t length = *(int32_t*)&");
-        SPVM_PRECOMPILE_add_var(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand1);
+        SPVM_PRECOMPILE_add_var(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand1);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n"
                                               "    if (length >= 0) {\n"
                                               "      void* object = env->new_string_raw(env, NULL, length);\n"
@@ -2708,7 +2730,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
                                               "      }\n"
                                               "      else {\n"
                                               "        SPVM_API_OBJECT_ASSIGN((void**)&");
-        SPVM_PRECOMPILE_add_var(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
+        SPVM_PRECOMPILE_add_var(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, ", object);\n"
                                               "      }\n"
                                               "    }\n"
@@ -2728,7 +2750,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       }
       case SPVM_OPCODE_C_ID_IF_EQ_ZERO: {
         SPVM_STRING_BUFFER_add(string_buffer, "  if (");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, 0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, 0);
         SPVM_STRING_BUFFER_add(string_buffer, " == 0) { goto L");
         SPVM_STRING_BUFFER_add_int(string_buffer, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, "; }\n");
@@ -2736,7 +2758,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       }
       case SPVM_OPCODE_C_ID_IF_NE_ZERO: {
         SPVM_STRING_BUFFER_add(string_buffer, "  if (");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, 0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, 0);
         SPVM_STRING_BUFFER_add(string_buffer, ") { goto L");
         SPVM_STRING_BUFFER_add_int(string_buffer, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, "; }\n");
@@ -2745,9 +2767,9 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       case SPVM_OPCODE_C_ID_PUSH_ARG_BYTE:
       {
         SPVM_STRING_BUFFER_add(string_buffer, "  ");
-        SPVM_PRECOMPILE_add_stack(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, stack_index);
+        SPVM_PRECOMPILE_add_stack(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, stack_index);
         SPVM_STRING_BUFFER_add(string_buffer, " = ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, opcode->operand0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n");
         stack_index++;
         break;
@@ -2755,9 +2777,9 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       case SPVM_OPCODE_C_ID_PUSH_ARG_SHORT:
       {
         SPVM_STRING_BUFFER_add(string_buffer, "  ");
-        SPVM_PRECOMPILE_add_stack(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, stack_index);
+        SPVM_PRECOMPILE_add_stack(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, stack_index);
         SPVM_STRING_BUFFER_add(string_buffer, " = ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, opcode->operand0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n");
         stack_index++;
         break;
@@ -2765,9 +2787,9 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       case SPVM_OPCODE_C_ID_PUSH_ARG_INT:
       {
         SPVM_STRING_BUFFER_add(string_buffer, "  ");
-        SPVM_PRECOMPILE_add_stack(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, stack_index);
+        SPVM_PRECOMPILE_add_stack(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, stack_index);
         SPVM_STRING_BUFFER_add(string_buffer, " = ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n");
         stack_index++;
         break;
@@ -2775,9 +2797,9 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       case SPVM_OPCODE_C_ID_PUSH_ARG_LONG:
       {
         SPVM_STRING_BUFFER_add(string_buffer, "  ");
-        SPVM_PRECOMPILE_add_stack(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, stack_index);
+        SPVM_PRECOMPILE_add_stack(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, stack_index);
         SPVM_STRING_BUFFER_add(string_buffer, " = ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n");
         stack_index++;
         break;
@@ -2785,9 +2807,9 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       case SPVM_OPCODE_C_ID_PUSH_ARG_FLOAT:
       {
         SPVM_STRING_BUFFER_add(string_buffer, "  ");
-        SPVM_PRECOMPILE_add_stack(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, stack_index);
+        SPVM_PRECOMPILE_add_stack(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, stack_index);
         SPVM_STRING_BUFFER_add(string_buffer, " = ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n");
         stack_index++;
         break;
@@ -2795,9 +2817,9 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       case SPVM_OPCODE_C_ID_PUSH_ARG_DOUBLE:
       {
         SPVM_STRING_BUFFER_add(string_buffer, "  ");
-        SPVM_PRECOMPILE_add_stack(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, stack_index);
+        SPVM_PRECOMPILE_add_stack(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, stack_index);
         SPVM_STRING_BUFFER_add(string_buffer, " = ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n");
         stack_index++;
         break;
@@ -2805,9 +2827,9 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       case SPVM_OPCODE_C_ID_PUSH_ARG_OBJECT:
       {
         SPVM_STRING_BUFFER_add(string_buffer, "  ");
-        SPVM_PRECOMPILE_add_stack(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, stack_index);
+        SPVM_PRECOMPILE_add_stack(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, stack_index);
         SPVM_STRING_BUFFER_add(string_buffer, " = ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n");
         stack_index++;
         break;
@@ -2815,9 +2837,9 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       case SPVM_OPCODE_C_ID_PUSH_ARG_REF:
       {
         SPVM_STRING_BUFFER_add(string_buffer, "  ");
-        SPVM_PRECOMPILE_add_stack(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_REF, stack_index);
+        SPVM_PRECOMPILE_add_stack(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_REF, stack_index);
         SPVM_STRING_BUFFER_add(string_buffer, " = ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_REF, opcode->operand0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_REF, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n");
         stack_index++;
         break;
@@ -2825,7 +2847,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       case SPVM_OPCODE_C_ID_PUSH_ARG_UNDEF:
       {
         SPVM_STRING_BUFFER_add(string_buffer, "  ");
-        SPVM_PRECOMPILE_add_stack(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, stack_index);
+        SPVM_PRECOMPILE_add_stack(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, stack_index);
         SPVM_STRING_BUFFER_add(string_buffer, " = NULL;\n");
         stack_index++;
         
@@ -2835,9 +2857,9 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
         int32_t fields_length = opcode->operand1;
         for (int32_t field_index = 0; field_index < fields_length; field_index++) {
           SPVM_STRING_BUFFER_add(string_buffer, "  ");
-          SPVM_PRECOMPILE_add_stack(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, stack_index + field_index);
+          SPVM_PRECOMPILE_add_stack(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, stack_index + field_index);
           SPVM_STRING_BUFFER_add(string_buffer, " = ");
-          SPVM_PRECOMPILE_add_operand_value(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, opcode->operand0, field_index);
+          SPVM_PRECOMPILE_add_operand_value(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, opcode->operand0, field_index);
           SPVM_STRING_BUFFER_add(string_buffer, ";\n");
         }
         stack_index += fields_length;
@@ -2847,9 +2869,9 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
         int32_t fields_length = opcode->operand1;
         for (int32_t field_index = 0; field_index < fields_length; field_index++) {
           SPVM_STRING_BUFFER_add(string_buffer, "  ");
-          SPVM_PRECOMPILE_add_stack(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, stack_index + field_index);
+          SPVM_PRECOMPILE_add_stack(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, stack_index + field_index);
           SPVM_STRING_BUFFER_add(string_buffer, " = ");
-          SPVM_PRECOMPILE_add_operand_value(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, opcode->operand0, field_index);
+          SPVM_PRECOMPILE_add_operand_value(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, opcode->operand0, field_index);
           SPVM_STRING_BUFFER_add(string_buffer, ";\n");
         }
         stack_index += fields_length;
@@ -2859,9 +2881,9 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
         int32_t fields_length = opcode->operand1;
         for (int32_t field_index = 0; field_index < fields_length; field_index++) {
           SPVM_STRING_BUFFER_add(string_buffer, "  ");
-          SPVM_PRECOMPILE_add_stack(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, stack_index + field_index);
+          SPVM_PRECOMPILE_add_stack(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, stack_index + field_index);
           SPVM_STRING_BUFFER_add(string_buffer, " = ");
-          SPVM_PRECOMPILE_add_operand_value(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0, field_index);
+          SPVM_PRECOMPILE_add_operand_value(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0, field_index);
           SPVM_STRING_BUFFER_add(string_buffer, ";\n");
         }
         stack_index += fields_length;
@@ -2871,9 +2893,9 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
         int32_t fields_length = opcode->operand1;
         for (int32_t field_index = 0; field_index < fields_length; field_index++) {
           SPVM_STRING_BUFFER_add(string_buffer, "  ");
-          SPVM_PRECOMPILE_add_stack(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, stack_index + field_index);
+          SPVM_PRECOMPILE_add_stack(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, stack_index + field_index);
           SPVM_STRING_BUFFER_add(string_buffer, " = ");
-          SPVM_PRECOMPILE_add_operand_value(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0, field_index);
+          SPVM_PRECOMPILE_add_operand_value(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0, field_index);
           SPVM_STRING_BUFFER_add(string_buffer, ";\n");
         }
         stack_index += fields_length;
@@ -2883,9 +2905,9 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
         int32_t fields_length = opcode->operand1;
         for (int32_t field_index = 0; field_index < fields_length; field_index++) {
           SPVM_STRING_BUFFER_add(string_buffer, "  ");
-          SPVM_PRECOMPILE_add_stack(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, stack_index + field_index);
+          SPVM_PRECOMPILE_add_stack(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, stack_index + field_index);
           SPVM_STRING_BUFFER_add(string_buffer, " = ");
-          SPVM_PRECOMPILE_add_operand_value(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand0, field_index);
+          SPVM_PRECOMPILE_add_operand_value(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand0, field_index);
           SPVM_STRING_BUFFER_add(string_buffer, ";\n");
         }
         stack_index += fields_length;
@@ -2895,9 +2917,9 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
         int32_t fields_length = opcode->operand1;
         for (int32_t field_index = 0; field_index < fields_length; field_index++) {
           SPVM_STRING_BUFFER_add(string_buffer, "  ");
-          SPVM_PRECOMPILE_add_stack(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, stack_index + field_index);
+          SPVM_PRECOMPILE_add_stack(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, stack_index + field_index);
           SPVM_STRING_BUFFER_add(string_buffer, " = ");
-          SPVM_PRECOMPILE_add_operand_value(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand0, field_index);
+          SPVM_PRECOMPILE_add_operand_value(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand0, field_index);
           SPVM_STRING_BUFFER_add(string_buffer, ";\n");
         }
         stack_index += fields_length;
@@ -2907,8 +2929,8 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
         int32_t check_basic_type_id = opcode->operand2;
         int32_t check_type_dimension = opcode->operand3;
 
-        int32_t cast_basic_type_name_id = SPVM_API_get_basic_type_name_id(env, check_basic_type_id);
-        const char* cast_basic_type_name = SPVM_API_get_name(env, cast_basic_type_name_id);
+        int32_t cast_basic_type_name_id = SPVM_API_RUNTIME_get_basic_type_name_id(runtime, check_basic_type_id);
+        const char* cast_basic_type_name = SPVM_API_RUNTIME_get_name(runtime, cast_basic_type_name_id);
         
         SPVM_STRING_BUFFER_add(string_buffer, "  {\n"
                                               "    int32_t access_basic_type_id = env->get_basic_type_id(env, \"");
@@ -2927,16 +2949,16 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
         SPVM_STRING_BUFFER_add_int(string_buffer, check_type_dimension);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n");
         SPVM_STRING_BUFFER_add(string_buffer, "      void* object = ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n"
                                               "      if (object != NULL) {\n"
                                               "        int32_t object_basic_type_id = *(int32_t*)((intptr_t)object + (intptr_t)env->object_basic_type_id_offset);\n"
                                               "        int32_t object_type_dimension_id = *(uint8_t*)((intptr_t)object + (intptr_t)env->object_type_dimension_offset);\n"
                                               "        if (object_basic_type_id == check_basic_type_id && object_type_dimension_id == check_type_dimension) {\n"
                                               "          SPVM_API_OBJECT_ASSIGN(&");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, ", ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1);
         SPVM_STRING_BUFFER_add(string_buffer, ");\n"
                                               "        }\n"
                                               "        else {\n"
@@ -2953,8 +2975,8 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       case SPVM_OPCODE_C_ID_CHECK_CALLBACK: {
         int32_t check_basic_type_id = opcode->operand2;
 
-        int32_t cast_basic_type_name_id = SPVM_API_get_basic_type_name_id(env, check_basic_type_id);
-        const char* cast_basic_type_name = SPVM_API_get_name(env, cast_basic_type_name_id);
+        int32_t cast_basic_type_name_id = SPVM_API_RUNTIME_get_basic_type_name_id(runtime, check_basic_type_id);
+        const char* cast_basic_type_name = SPVM_API_RUNTIME_get_name(runtime, cast_basic_type_name_id);
         
         SPVM_STRING_BUFFER_add(string_buffer, "  {\n"
                                               "    int32_t access_basic_type_id = env->get_basic_type_id(env, \"");
@@ -2972,15 +2994,15 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
                                               "access_basic_type_id"
                                               ";\n");
         SPVM_STRING_BUFFER_add(string_buffer, "      void* object = ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n"
                                               "      if (object != NULL) {\n"
                                               "        int32_t object_basic_type_id = *(int32_t*)((intptr_t)object + (intptr_t)env->object_basic_type_id_offset);\n"
                                               "        if (env->has_callback(env, object, callback_basic_type_id)) {\n"
                                               "          SPVM_API_OBJECT_ASSIGN(&");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, ", ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1);
         SPVM_STRING_BUFFER_add(string_buffer, ");\n"
                                               "        }\n"
                                               "        else {\n"
@@ -2997,8 +3019,8 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       case SPVM_OPCODE_C_ID_CHECK_INTERFACE: {
         int32_t check_basic_type_id = opcode->operand2;
 
-        int32_t cast_basic_type_name_id = SPVM_API_get_basic_type_name_id(env, check_basic_type_id);
-        const char* cast_basic_type_name = SPVM_API_get_name(env, cast_basic_type_name_id);
+        int32_t cast_basic_type_name_id = SPVM_API_RUNTIME_get_basic_type_name_id(runtime, check_basic_type_id);
+        const char* cast_basic_type_name = SPVM_API_RUNTIME_get_name(runtime, cast_basic_type_name_id);
         
         SPVM_STRING_BUFFER_add(string_buffer, "  {\n"
                                               "    int32_t access_basic_type_id = env->get_basic_type_id(env, \"");
@@ -3016,15 +3038,15 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
                                               "access_basic_type_id"
                                               ";\n"
                                               "      void* object = ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n"
                                               "      if (object != NULL) {\n"
                                               "        int32_t object_basic_type_id = *(int32_t*)((intptr_t)object + (intptr_t)env->object_basic_type_id_offset);\n"
                                               "        if (env->has_interface(env, object, interface_basic_type_id)) {\n"
                                               "          SPVM_API_OBJECT_ASSIGN(&");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, ", ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1);
         SPVM_STRING_BUFFER_add(string_buffer, ");\n"
                                               "        }\n"
                                               "        else {\n"
@@ -3045,17 +3067,18 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
         int32_t var_id = opcode->operand0;
         int32_t decl_method_id = opcode->operand1;
 
-        int32_t decl_method_name_id = SPVM_API_get_method_name_id(env, decl_method_id);
-        const char* decl_method_name = SPVM_API_get_name(env, decl_method_name_id);
-        int32_t decl_method_signature_id = SPVM_API_get_method_signature_id(env, decl_method_id);
-        const char* decl_method_signature = SPVM_API_get_name(env, decl_method_signature_id);
-        int32_t decl_method_class_id = SPVM_API_get_method_class_id(env, decl_method_id);
-        int32_t decl_method_class_name_id = SPVM_API_get_class_name_id(env, decl_method_class_id);
-        const char* decl_method_class_name = SPVM_API_get_name(env, decl_method_class_name_id);
-        int32_t decl_method_has_precompile_flag = SPVM_API_get_method_has_precompile_flag(env, decl_method_id);
-        int32_t decl_method_return_type_id = SPVM_API_get_method_return_type_id(env, decl_method_id);
-        int32_t decl_method_return_type_category = SPVM_API_get_type_category(env, decl_method_return_type_id);
-        int32_t decl_method_return_basic_type_id = SPVM_API_get_type_basic_type_id(env, decl_method_return_type_id);
+        int32_t decl_method_name_id = SPVM_API_RUNTIME_get_method_name_id(runtime, decl_method_id);
+        const char* decl_method_name = SPVM_API_RUNTIME_get_name(runtime, decl_method_name_id);
+        int32_t decl_method_signature_id = SPVM_API_RUNTIME_get_method_signature_id(runtime, decl_method_id);
+        const char* decl_method_signature = SPVM_API_RUNTIME_get_name(runtime, decl_method_signature_id);
+        int32_t decl_method_class_id = SPVM_API_RUNTIME_get_method_class_id(runtime, decl_method_id);
+        int32_t decl_method_class_name_id = SPVM_API_RUNTIME_get_class_name_id(runtime, decl_method_class_id);
+        const char* decl_method_class_name = SPVM_API_RUNTIME_get_name(runtime, decl_method_class_name_id);
+        int32_t decl_method_has_precompile_flag = SPVM_API_RUNTIME_get_method_is_precompile(runtime, decl_method_id);
+        int32_t decl_method_return_type_id = SPVM_API_RUNTIME_get_method_return_type_id(runtime, decl_method_id);
+        int32_t decl_method_return_type_dimension = SPVM_API_RUNTIME_get_type_dimension(runtime, decl_method_return_type_id);
+        int32_t decl_method_return_basic_type_id = SPVM_API_RUNTIME_get_type_basic_type_id(runtime, decl_method_return_type_id);
+        int32_t decl_method_return_basic_type_category = SPVM_API_RUNTIME_get_basic_type_category(runtime, decl_method_return_basic_type_id);
         
         SPVM_STRING_BUFFER_add(string_buffer, "  // ");
         SPVM_STRING_BUFFER_add(string_buffer, (char*)decl_method_class_name);
@@ -3125,7 +3148,6 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
             }
           }
           
-
           SPVM_STRING_BUFFER_add(string_buffer, "    if (call_method_id < 0) {\n"
                                                 "      void* exception = env->new_string_nolen_raw(env, \"Can't find the \\\"");
           SPVM_STRING_BUFFER_add(string_buffer, (char*)decl_method_name);
@@ -3143,166 +3165,172 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
         
         // Call method
         SPVM_STRING_BUFFER_add(string_buffer, "    if (!exception_flag) {\n");
-        switch (decl_method_return_type_category) {
-          case SPVM_API_C_TYPE_CATEGORY_VOID: {
-            break;
-          }
-          case SPVM_API_C_TYPE_CATEGORY_NUMERIC: {
-            switch (decl_method_return_basic_type_id) {
-              case SPVM_API_C_BASIC_TYPE_ID_BYTE: {
-                SPVM_STRING_BUFFER_add(string_buffer, "      ");
-                SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, var_id);
-                SPVM_STRING_BUFFER_add(string_buffer, " = ");
-                SPVM_PRECOMPILE_add_stack(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, 0);
-                SPVM_STRING_BUFFER_add(string_buffer, ";\n");
-                break;
-              }
-              case SPVM_API_C_BASIC_TYPE_ID_SHORT: {
-                SPVM_STRING_BUFFER_add(string_buffer, "      ");
-                SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, var_id);
-                SPVM_STRING_BUFFER_add(string_buffer, " = ");
-                SPVM_PRECOMPILE_add_stack(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, 0);
-                SPVM_STRING_BUFFER_add(string_buffer, ";\n");
-                break;
-              }
-              case SPVM_API_C_BASIC_TYPE_ID_INT: {
-                SPVM_STRING_BUFFER_add(string_buffer, "      ");
-                SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, var_id);
-                SPVM_STRING_BUFFER_add(string_buffer, " = ");
-                SPVM_PRECOMPILE_add_stack(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, 0);
-                SPVM_STRING_BUFFER_add(string_buffer, ";\n");
-                break;
-              }
-              case SPVM_API_C_BASIC_TYPE_ID_LONG: {
-                SPVM_STRING_BUFFER_add(string_buffer, "      ");
-                SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, var_id);
-                SPVM_STRING_BUFFER_add(string_buffer, " = ");
-                SPVM_PRECOMPILE_add_stack(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, 0);
-                SPVM_STRING_BUFFER_add(string_buffer, ";\n");
-                break;
-              }
-              case SPVM_API_C_BASIC_TYPE_ID_FLOAT: {
-                SPVM_STRING_BUFFER_add(string_buffer, "      ");
-                SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, var_id);
-                SPVM_STRING_BUFFER_add(string_buffer, " = ");
-                SPVM_PRECOMPILE_add_stack(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, 0);
-                SPVM_STRING_BUFFER_add(string_buffer, ";\n");
-                break;
-              }
-              case SPVM_API_C_BASIC_TYPE_ID_DOUBLE: {
-                SPVM_STRING_BUFFER_add(string_buffer, "      ");
-                SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, var_id);
-                SPVM_STRING_BUFFER_add(string_buffer, " = ");
-                SPVM_PRECOMPILE_add_stack(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, 0);
-                SPVM_STRING_BUFFER_add(string_buffer, ";\n");
-                break;
-              }
-              default: {
-                assert(0);
-              }
+        if (decl_method_return_type_dimension == 0) {
+          switch (decl_method_return_basic_type_category) {
+            case SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_VOID: {
+              break;
             }
-            break;
-          }
-          case SPVM_API_C_TYPE_CATEGORY_STRING:
-          case SPVM_API_C_TYPE_CATEGORY_CLASS:
-          case SPVM_API_C_TYPE_CATEGORY_INTERFACE:
-          case SPVM_API_C_TYPE_CATEGORY_CALLBACK:
-          case SPVM_API_C_TYPE_CATEGORY_ANY_OBJECT:
-          case SPVM_API_C_TYPE_CATEGORY_NUMERIC_ARRAY:
-          case SPVM_API_C_TYPE_CATEGORY_STRING_ARRAY:
-          case SPVM_API_C_TYPE_CATEGORY_CLASS_ARRAY:
-          case SPVM_API_C_TYPE_CATEGORY_INTERFACE_ARRAY:
-          case SPVM_API_C_TYPE_CATEGORY_CALLBACK_ARRAY:
-          case SPVM_API_C_TYPE_CATEGORY_ANY_OBJECT_ARRAY:
-          case SPVM_API_C_TYPE_CATEGORY_MULDIM_ARRAY:
-          case SPVM_API_C_TYPE_CATEGORY_MULNUM_ARRAY:
-          {
-            SPVM_STRING_BUFFER_add(string_buffer, "      SPVM_API_OBJECT_ASSIGN(&");
-            SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, var_id);
-            SPVM_STRING_BUFFER_add(string_buffer, ", stack[0].oval);\n");
-            break;
-          }
-          case SPVM_API_C_TYPE_CATEGORY_MULNUM:
-          {
-            int32_t decl_method_return_class_id = SPVM_API_get_basic_type_class_id(env, decl_method_return_basic_type_id);
-            int32_t decl_method_return_class_field_ids_length = SPVM_API_get_class_field_ids_length(env, decl_method_return_class_id);
-            int32_t decl_method_return_class_field_ids_base = SPVM_API_get_class_field_ids_base(env, decl_method_return_class_id);
-            int32_t decl_method_return_class_field_type_id = SPVM_API_get_field_type_id(env, decl_method_return_class_field_ids_base);
-            int32_t decl_method_return_class_field_type_basic_type_id = SPVM_API_get_type_basic_type_id(env, decl_method_return_class_field_type_id);
-            assert(decl_method_return_class_field_type_basic_type_id >= 0);
-            
-            switch (decl_method_return_class_field_type_basic_type_id) {
-              case SPVM_API_C_BASIC_TYPE_ID_BYTE: {
-                int32_t decl_method_return_type_width = opcode->operand3;
-                for (int32_t field_index = 0; field_index < decl_method_return_type_width; field_index++) {
+            case SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_NUMERIC: {
+              switch (decl_method_return_basic_type_id) {
+                case SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE: {
                   SPVM_STRING_BUFFER_add(string_buffer, "      ");
-                  SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, var_id + field_index);
+                  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, var_id);
                   SPVM_STRING_BUFFER_add(string_buffer, " = ");
-                  SPVM_PRECOMPILE_add_stack(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, field_index);
+                  SPVM_PRECOMPILE_add_stack(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, 0);
                   SPVM_STRING_BUFFER_add(string_buffer, ";\n");
+                  break;
                 }
-                break;
-              }
-              case SPVM_API_C_BASIC_TYPE_ID_SHORT: {
-                int32_t decl_method_return_type_width = opcode->operand3;
-                for (int32_t field_index = 0; field_index < decl_method_return_type_width; field_index++) {
+                case SPVM_NATIVE_C_BASIC_TYPE_ID_SHORT: {
                   SPVM_STRING_BUFFER_add(string_buffer, "      ");
-                  SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, var_id + field_index);
+                  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, var_id);
                   SPVM_STRING_BUFFER_add(string_buffer, " = ");
-                  SPVM_PRECOMPILE_add_stack(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, field_index);
+                  SPVM_PRECOMPILE_add_stack(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, 0);
                   SPVM_STRING_BUFFER_add(string_buffer, ";\n");
+                  break;
                 }
-                break;
-              }
-              case SPVM_API_C_BASIC_TYPE_ID_INT: {
-                int32_t decl_method_return_type_width = opcode->operand3;
-                for (int32_t field_index = 0; field_index < decl_method_return_type_width; field_index++) {
+                case SPVM_NATIVE_C_BASIC_TYPE_ID_INT: {
                   SPVM_STRING_BUFFER_add(string_buffer, "      ");
-                  SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, var_id + field_index);
+                  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, var_id);
                   SPVM_STRING_BUFFER_add(string_buffer, " = ");
-                  SPVM_PRECOMPILE_add_stack(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, field_index);
+                  SPVM_PRECOMPILE_add_stack(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, 0);
                   SPVM_STRING_BUFFER_add(string_buffer, ";\n");
+                  break;
                 }
-                break;
-              }
-              case SPVM_API_C_BASIC_TYPE_ID_LONG: {
-                int32_t decl_method_return_type_width = opcode->operand3;
-                for (int32_t field_index = 0; field_index < decl_method_return_type_width; field_index++) {
+                case SPVM_NATIVE_C_BASIC_TYPE_ID_LONG: {
                   SPVM_STRING_BUFFER_add(string_buffer, "      ");
-                  SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, var_id + field_index);
+                  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, var_id);
                   SPVM_STRING_BUFFER_add(string_buffer, " = ");
-                  SPVM_PRECOMPILE_add_stack(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, field_index);
+                  SPVM_PRECOMPILE_add_stack(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, 0);
                   SPVM_STRING_BUFFER_add(string_buffer, ";\n");
+                  break;
                 }
-                break;
-              }
-              case SPVM_API_C_BASIC_TYPE_ID_FLOAT: {
-                int32_t decl_method_return_type_width = opcode->operand3;
-                for (int32_t field_index = 0; field_index < decl_method_return_type_width; field_index++) {
+                case SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT: {
                   SPVM_STRING_BUFFER_add(string_buffer, "      ");
-                  SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, var_id + field_index);
+                  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, var_id);
                   SPVM_STRING_BUFFER_add(string_buffer, " = ");
-                  SPVM_PRECOMPILE_add_stack(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, field_index);
+                  SPVM_PRECOMPILE_add_stack(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, 0);
                   SPVM_STRING_BUFFER_add(string_buffer, ";\n");
+                  break;
                 }
-                break;
-              }
-              case SPVM_API_C_BASIC_TYPE_ID_DOUBLE: {
-                int32_t decl_method_return_type_width = opcode->operand3;
-                for (int32_t field_index = 0; field_index < decl_method_return_type_width; field_index++) {
+                case SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE: {
                   SPVM_STRING_BUFFER_add(string_buffer, "      ");
-                  SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, var_id + field_index);
+                  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, var_id);
                   SPVM_STRING_BUFFER_add(string_buffer, " = ");
-                  SPVM_PRECOMPILE_add_stack(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, field_index);
+                  SPVM_PRECOMPILE_add_stack(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, 0);
                   SPVM_STRING_BUFFER_add(string_buffer, ";\n");
+                  break;
                 }
-                break;
+                default: {
+                  assert(0);
+                }
               }
-              default: {
-                assert(0);
+              break;
+            }
+            case SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_MULNUM:
+            {
+              int32_t decl_method_return_class_id = SPVM_API_RUNTIME_get_basic_type_class_id(runtime, decl_method_return_basic_type_id);
+              int32_t decl_method_return_class_fields_length = SPVM_API_RUNTIME_get_class_fields_length(runtime, decl_method_return_class_id);
+              int32_t decl_method_return_class_fields_base_id = SPVM_API_RUNTIME_get_class_fields_base_id(runtime, decl_method_return_class_id);
+              int32_t decl_method_return_class_field_type_id = SPVM_API_RUNTIME_get_field_type_id(runtime, decl_method_return_class_fields_base_id);
+              int32_t decl_method_return_class_field_type_basic_type_id = SPVM_API_RUNTIME_get_type_basic_type_id(runtime, decl_method_return_class_field_type_id);
+              assert(decl_method_return_class_field_type_basic_type_id >= 0);
+              
+              switch (decl_method_return_class_field_type_basic_type_id) {
+                case SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE: {
+                  int32_t decl_method_return_type_width = opcode->operand3;
+                  for (int32_t field_index = 0; field_index < decl_method_return_type_width; field_index++) {
+                    SPVM_STRING_BUFFER_add(string_buffer, "      ");
+                    SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, var_id + field_index);
+                    SPVM_STRING_BUFFER_add(string_buffer, " = ");
+                    SPVM_PRECOMPILE_add_stack(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, field_index);
+                    SPVM_STRING_BUFFER_add(string_buffer, ";\n");
+                  }
+                  break;
+                }
+                case SPVM_NATIVE_C_BASIC_TYPE_ID_SHORT: {
+                  int32_t decl_method_return_type_width = opcode->operand3;
+                  for (int32_t field_index = 0; field_index < decl_method_return_type_width; field_index++) {
+                    SPVM_STRING_BUFFER_add(string_buffer, "      ");
+                    SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, var_id + field_index);
+                    SPVM_STRING_BUFFER_add(string_buffer, " = ");
+                    SPVM_PRECOMPILE_add_stack(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, field_index);
+                    SPVM_STRING_BUFFER_add(string_buffer, ";\n");
+                  }
+                  break;
+                }
+                case SPVM_NATIVE_C_BASIC_TYPE_ID_INT: {
+                  int32_t decl_method_return_type_width = opcode->operand3;
+                  for (int32_t field_index = 0; field_index < decl_method_return_type_width; field_index++) {
+                    SPVM_STRING_BUFFER_add(string_buffer, "      ");
+                    SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, var_id + field_index);
+                    SPVM_STRING_BUFFER_add(string_buffer, " = ");
+                    SPVM_PRECOMPILE_add_stack(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, field_index);
+                    SPVM_STRING_BUFFER_add(string_buffer, ";\n");
+                  }
+                  break;
+                }
+                case SPVM_NATIVE_C_BASIC_TYPE_ID_LONG: {
+                  int32_t decl_method_return_type_width = opcode->operand3;
+                  for (int32_t field_index = 0; field_index < decl_method_return_type_width; field_index++) {
+                    SPVM_STRING_BUFFER_add(string_buffer, "      ");
+                    SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, var_id + field_index);
+                    SPVM_STRING_BUFFER_add(string_buffer, " = ");
+                    SPVM_PRECOMPILE_add_stack(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, field_index);
+                    SPVM_STRING_BUFFER_add(string_buffer, ";\n");
+                  }
+                  break;
+                }
+                case SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT: {
+                  int32_t decl_method_return_type_width = opcode->operand3;
+                  for (int32_t field_index = 0; field_index < decl_method_return_type_width; field_index++) {
+                    SPVM_STRING_BUFFER_add(string_buffer, "      ");
+                    SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, var_id + field_index);
+                    SPVM_STRING_BUFFER_add(string_buffer, " = ");
+                    SPVM_PRECOMPILE_add_stack(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, field_index);
+                    SPVM_STRING_BUFFER_add(string_buffer, ";\n");
+                  }
+                  break;
+                }
+                case SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE: {
+                  int32_t decl_method_return_type_width = opcode->operand3;
+                  for (int32_t field_index = 0; field_index < decl_method_return_type_width; field_index++) {
+                    SPVM_STRING_BUFFER_add(string_buffer, "      ");
+                    SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, var_id + field_index);
+                    SPVM_STRING_BUFFER_add(string_buffer, " = ");
+                    SPVM_PRECOMPILE_add_stack(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, field_index);
+                    SPVM_STRING_BUFFER_add(string_buffer, ";\n");
+                  }
+                  break;
+                }
+                default: {
+                  assert(0);
+                }
               }
+              break;
+            }
+            case SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_STRING:
+            case SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_CLASS:
+            case SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_INTERFACE:
+            case SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_CALLBACK:
+            case SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_ANY_OBJECT:
+            {
+              SPVM_STRING_BUFFER_add(string_buffer, "      SPVM_API_OBJECT_ASSIGN(&");
+              SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, var_id);
+              SPVM_STRING_BUFFER_add(string_buffer, ", stack[0].oval);\n");
+              break;
+            }
+            default: {
+              assert(0);
             }
           }
+        }
+        else if (decl_method_return_type_dimension > 0) {
+          SPVM_STRING_BUFFER_add(string_buffer, "      SPVM_API_OBJECT_ASSIGN(&");
+          SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, var_id);
+          SPVM_STRING_BUFFER_add(string_buffer, ", stack[0].oval);\n");
+        }
+        else {
+          assert(0);
         }
 
         SPVM_STRING_BUFFER_add(string_buffer, "    }\n");
@@ -3350,7 +3378,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       case SPVM_OPCODE_C_ID_PRINT: {
         SPVM_STRING_BUFFER_add(string_buffer, "  {\n"
                                               "    void* object = ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n"
                                               "    if (object) {\n"
                                               "      const char* bytes = env->get_chars(env, object);\n"
@@ -3366,7 +3394,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       case SPVM_OPCODE_C_ID_MAKE_READ_ONLY: {
         SPVM_STRING_BUFFER_add(string_buffer, "  {\n"
                                               "    void* string = ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n"
                                               "    env->make_read_only(env, string);\n"
                                               "  }\n");
@@ -3380,7 +3408,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
         
         SPVM_STRING_BUFFER_add(string_buffer, "  {\n"
                                               "    void* object = ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n"
                                               "    int32_t empty_or_undef = 0;\n"
                                               "    if (object) {\n"
@@ -3425,9 +3453,9 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       case SPVM_OPCODE_C_ID_RETURN_BYTE: {
         int32_t var_id = opcode->operand0;
         SPVM_STRING_BUFFER_add(string_buffer, "  ");
-        SPVM_PRECOMPILE_add_stack(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, 0);
+        SPVM_PRECOMPILE_add_stack(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, 0);
         SPVM_STRING_BUFFER_add(string_buffer, " = ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, var_id);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, var_id);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n");
         SPVM_STRING_BUFFER_add(string_buffer, "  goto L");
         SPVM_STRING_BUFFER_add_int(string_buffer, opcode->operand1);
@@ -3437,9 +3465,9 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       case SPVM_OPCODE_C_ID_RETURN_SHORT: {
         int32_t var_id = opcode->operand0;
         SPVM_STRING_BUFFER_add(string_buffer, "  ");
-        SPVM_PRECOMPILE_add_stack(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, 0);
+        SPVM_PRECOMPILE_add_stack(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, 0);
         SPVM_STRING_BUFFER_add(string_buffer, " = ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, var_id);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, var_id);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n");
         SPVM_STRING_BUFFER_add(string_buffer, "  goto L");
         SPVM_STRING_BUFFER_add_int(string_buffer, opcode->operand1);
@@ -3449,9 +3477,9 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       case SPVM_OPCODE_C_ID_RETURN_INT: {
         int32_t var_id = opcode->operand0;
         SPVM_STRING_BUFFER_add(string_buffer, "  ");
-        SPVM_PRECOMPILE_add_stack(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, 0);
+        SPVM_PRECOMPILE_add_stack(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, 0);
         SPVM_STRING_BUFFER_add(string_buffer, " = ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, var_id);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, var_id);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n");
         SPVM_STRING_BUFFER_add(string_buffer, "  goto L");
         SPVM_STRING_BUFFER_add_int(string_buffer, opcode->operand1);
@@ -3461,9 +3489,9 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       case SPVM_OPCODE_C_ID_RETURN_LONG: {
         int32_t var_id = opcode->operand0;
         SPVM_STRING_BUFFER_add(string_buffer, "  ");
-        SPVM_PRECOMPILE_add_stack(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, 0);
+        SPVM_PRECOMPILE_add_stack(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, 0);
         SPVM_STRING_BUFFER_add(string_buffer, " = ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, var_id);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, var_id);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n");
         SPVM_STRING_BUFFER_add(string_buffer, "  goto L");
         SPVM_STRING_BUFFER_add_int(string_buffer, opcode->operand1);
@@ -3473,9 +3501,9 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       case SPVM_OPCODE_C_ID_RETURN_FLOAT: {
         int32_t var_id = opcode->operand0;
         SPVM_STRING_BUFFER_add(string_buffer, "  ");
-        SPVM_PRECOMPILE_add_stack(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, 0);
+        SPVM_PRECOMPILE_add_stack(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, 0);
         SPVM_STRING_BUFFER_add(string_buffer, " = ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, var_id);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, var_id);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n");
         SPVM_STRING_BUFFER_add(string_buffer, "  goto L");
         SPVM_STRING_BUFFER_add_int(string_buffer, opcode->operand1);
@@ -3485,9 +3513,9 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       case SPVM_OPCODE_C_ID_RETURN_DOUBLE: {
         int32_t var_id = opcode->operand0;
         SPVM_STRING_BUFFER_add(string_buffer, "  ");
-        SPVM_PRECOMPILE_add_stack(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, 0);
+        SPVM_PRECOMPILE_add_stack(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, 0);
         SPVM_STRING_BUFFER_add(string_buffer, " = ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, var_id);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, var_id);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n");
         SPVM_STRING_BUFFER_add(string_buffer, "  goto L");
         SPVM_STRING_BUFFER_add_int(string_buffer, opcode->operand1);
@@ -3502,9 +3530,9 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
         // Multi numeric type
         for (int32_t field_index = 0; field_index < method_return_type_width; field_index++) {
           SPVM_STRING_BUFFER_add(string_buffer, "  ");
-          SPVM_PRECOMPILE_add_stack(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, field_index);
+          SPVM_PRECOMPILE_add_stack(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, field_index);
           SPVM_STRING_BUFFER_add(string_buffer, " = ");
-          SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, var_id + field_index);
+          SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, var_id + field_index);
           SPVM_STRING_BUFFER_add(string_buffer, ";\n");
         }
         SPVM_STRING_BUFFER_add(string_buffer, "  goto L");
@@ -3518,9 +3546,9 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
         int32_t method_return_type_width = opcode->operand2;
         for (int32_t field_index = 0; field_index < method_return_type_width; field_index++) {
           SPVM_STRING_BUFFER_add(string_buffer, "  ");
-          SPVM_PRECOMPILE_add_stack(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, field_index);
+          SPVM_PRECOMPILE_add_stack(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, field_index);
           SPVM_STRING_BUFFER_add(string_buffer, " = ");
-          SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, var_id + field_index);
+          SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, var_id + field_index);
           SPVM_STRING_BUFFER_add(string_buffer, ";\n");
         }
         SPVM_STRING_BUFFER_add(string_buffer, "  goto L");
@@ -3534,9 +3562,9 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
         int32_t method_return_type_width = opcode->operand2;
         for (int32_t field_index = 0; field_index < method_return_type_width; field_index++) {
           SPVM_STRING_BUFFER_add(string_buffer, "  ");
-          SPVM_PRECOMPILE_add_stack(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, field_index);
+          SPVM_PRECOMPILE_add_stack(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, field_index);
           SPVM_STRING_BUFFER_add(string_buffer, " = ");
-          SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, var_id + field_index);
+          SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, var_id + field_index);
           SPVM_STRING_BUFFER_add(string_buffer, ";\n");
         }
         SPVM_STRING_BUFFER_add(string_buffer, "  goto L");
@@ -3552,9 +3580,9 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
         // Multi numeric type
         for (int32_t field_index = 0; field_index < method_return_type_width; field_index++) {
           SPVM_STRING_BUFFER_add(string_buffer, "  ");
-          SPVM_PRECOMPILE_add_stack(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, field_index);
+          SPVM_PRECOMPILE_add_stack(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, field_index);
           SPVM_STRING_BUFFER_add(string_buffer, " = ");
-          SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, var_id + field_index);
+          SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, var_id + field_index);
           SPVM_STRING_BUFFER_add(string_buffer, ";\n");
         }
         SPVM_STRING_BUFFER_add(string_buffer, "  goto L");
@@ -3568,9 +3596,9 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
         int32_t method_return_type_width = opcode->operand2;
         for (int32_t field_index = 0; field_index < method_return_type_width; field_index++) {
           SPVM_STRING_BUFFER_add(string_buffer, "  ");
-          SPVM_PRECOMPILE_add_stack(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, field_index);
+          SPVM_PRECOMPILE_add_stack(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, field_index);
           SPVM_STRING_BUFFER_add(string_buffer, " = ");
-          SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, var_id + field_index);
+          SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, var_id + field_index);
           SPVM_STRING_BUFFER_add(string_buffer, ";\n");
         }
         SPVM_STRING_BUFFER_add(string_buffer, "  goto L");
@@ -3584,9 +3612,9 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
         int32_t method_return_type_width = opcode->operand2;
         for (int32_t field_index = 0; field_index < method_return_type_width; field_index++) {
           SPVM_STRING_BUFFER_add(string_buffer, "  ");
-          SPVM_PRECOMPILE_add_stack(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, field_index);
+          SPVM_PRECOMPILE_add_stack(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, field_index);
           SPVM_STRING_BUFFER_add(string_buffer, " = ");
-          SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, var_id + field_index);
+          SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, var_id + field_index);
           SPVM_STRING_BUFFER_add(string_buffer, ";\n");
         }
         SPVM_STRING_BUFFER_add(string_buffer, "  goto L");
@@ -3597,7 +3625,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       case SPVM_OPCODE_C_ID_RETURN_OBJECT:
       {
         SPVM_STRING_BUFFER_add(string_buffer, "  *(void**)&stack[0] = ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n"
                                               "  if (*(void**)&stack[0] != NULL) {\n"
                                               "    SPVM_API_INC_REF_COUNT_ONLY(*(void**)&stack[0]);\n"
@@ -3627,10 +3655,10 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
         int32_t case_infos_length = opcode->operand3;
 
         SPVM_STRING_BUFFER_add(string_buffer, "  switch(");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, ") {\n");
         for (int32_t case_index = 0; case_index < case_infos_length; case_index++) {
-          SPVM_OPCODE* opcode_case_info = &(opcodes[method_opcode_ids_base + opcode_index + 1 + case_index]);
+          SPVM_OPCODE* opcode_case_info = &(opcodes[method_opcodes_base_id + opcode_index + 1 + case_index]);
 
           int32_t match = opcode_case_info->operand1;
           int32_t opcode_rel_index = opcode_case_info->operand2;
@@ -3653,7 +3681,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       }
       case SPVM_OPCODE_C_ID_REF_BYTE: {
         SPVM_STRING_BUFFER_add(string_buffer, "  *(void**)&");
-        SPVM_PRECOMPILE_add_var(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_REF, opcode->operand0);
+        SPVM_PRECOMPILE_add_var(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_REF, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, " = &byte_vars[");
         SPVM_STRING_BUFFER_add_int(string_buffer, opcode->operand1);
         SPVM_STRING_BUFFER_add(string_buffer, "];\n");
@@ -3661,7 +3689,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       }
       case SPVM_OPCODE_C_ID_REF_SHORT: {
         SPVM_STRING_BUFFER_add(string_buffer, "  *(void**)&");
-        SPVM_PRECOMPILE_add_var(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_REF, opcode->operand0);
+        SPVM_PRECOMPILE_add_var(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_REF, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, " = &short_vars[");
         SPVM_STRING_BUFFER_add_int(string_buffer, opcode->operand1);
         SPVM_STRING_BUFFER_add(string_buffer, "];\n");
@@ -3669,7 +3697,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       }
       case SPVM_OPCODE_C_ID_REF_INT: {
         SPVM_STRING_BUFFER_add(string_buffer, "  *(void**)&");
-        SPVM_PRECOMPILE_add_var(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_REF, opcode->operand0);
+        SPVM_PRECOMPILE_add_var(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_REF, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, " = &int_vars[");
         SPVM_STRING_BUFFER_add_int(string_buffer, opcode->operand1);
         SPVM_STRING_BUFFER_add(string_buffer, "];\n");
@@ -3677,7 +3705,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       }
       case SPVM_OPCODE_C_ID_REF_LONG: {
         SPVM_STRING_BUFFER_add(string_buffer, "  *(void**)&");
-        SPVM_PRECOMPILE_add_var(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_REF, opcode->operand0);
+        SPVM_PRECOMPILE_add_var(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_REF, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, " = &long_vars[");
         SPVM_STRING_BUFFER_add_int(string_buffer, opcode->operand1);
         SPVM_STRING_BUFFER_add(string_buffer, "];\n");
@@ -3685,7 +3713,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       }
       case SPVM_OPCODE_C_ID_REF_FLOAT: {
         SPVM_STRING_BUFFER_add(string_buffer, "  *(void**)&");
-        SPVM_PRECOMPILE_add_var(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_REF, opcode->operand0);
+        SPVM_PRECOMPILE_add_var(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_REF, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, " = &float_vars[");
         SPVM_STRING_BUFFER_add_int(string_buffer, opcode->operand1);
         SPVM_STRING_BUFFER_add(string_buffer, "];\n");
@@ -3693,7 +3721,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       }
       case SPVM_OPCODE_C_ID_REF_DOUBLE: {
         SPVM_STRING_BUFFER_add(string_buffer, "  *(void**)&");
-        SPVM_PRECOMPILE_add_var(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_REF, opcode->operand0);
+        SPVM_PRECOMPILE_add_var(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_REF, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, " = &double_vars[");
         SPVM_STRING_BUFFER_add_int(string_buffer, opcode->operand1);
         SPVM_STRING_BUFFER_add(string_buffer, "];\n");
@@ -3701,134 +3729,134 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       }
       case SPVM_OPCODE_C_ID_DEREF_MULNUM_BYTE: {
         int32_t fields_length = opcode->operand3;
-        SPVM_PRECOMPILE_add_mulnum_deref(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, opcode->operand0, opcode->operand1, fields_length);
+        SPVM_PRECOMPILE_add_mulnum_deref(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, opcode->operand0, opcode->operand1, fields_length);
         break;
       }
       case SPVM_OPCODE_C_ID_DEREF_MULNUM_SHORT: {
         int32_t fields_length = opcode->operand3;
-        SPVM_PRECOMPILE_add_mulnum_deref(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, opcode->operand0, opcode->operand1, fields_length);
+        SPVM_PRECOMPILE_add_mulnum_deref(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, opcode->operand0, opcode->operand1, fields_length);
         break;
       }
       case SPVM_OPCODE_C_ID_DEREF_MULNUM_INT: {
         int32_t fields_length = opcode->operand3;
-        SPVM_PRECOMPILE_add_mulnum_deref(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0, opcode->operand1, fields_length);
+        SPVM_PRECOMPILE_add_mulnum_deref(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0, opcode->operand1, fields_length);
         break;
       }
       case SPVM_OPCODE_C_ID_DEREF_MULNUM_LONG: {
         int32_t fields_length = opcode->operand3;
-        SPVM_PRECOMPILE_add_mulnum_deref(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0, opcode->operand1, fields_length);
+        SPVM_PRECOMPILE_add_mulnum_deref(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0, opcode->operand1, fields_length);
         break;
       }
       case SPVM_OPCODE_C_ID_DEREF_MULNUM_FLOAT: {
         int32_t fields_length = opcode->operand3;
-        SPVM_PRECOMPILE_add_mulnum_deref(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand0, opcode->operand1, fields_length);
+        SPVM_PRECOMPILE_add_mulnum_deref(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand0, opcode->operand1, fields_length);
         break;
       }
       case SPVM_OPCODE_C_ID_DEREF_MULNUM_DOUBLE: {
         int32_t fields_length = opcode->operand3;
-        SPVM_PRECOMPILE_add_mulnum_deref(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand0, opcode->operand1, fields_length);
+        SPVM_PRECOMPILE_add_mulnum_deref(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand0, opcode->operand1, fields_length);
         break;
       }
       case SPVM_OPCODE_C_ID_GET_MULNUM_FIELD_DEREF_BYTE: {
         int32_t field_index = opcode->operand2;
-        SPVM_PRECOMPILE_add_mulnum_deref_get_field(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, opcode->operand0, opcode->operand1, field_index);
+        SPVM_PRECOMPILE_add_mulnum_deref_get_field(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, opcode->operand0, opcode->operand1, field_index);
         break;
       }
       case SPVM_OPCODE_C_ID_GET_MULNUM_FIELD_DEREF_SHORT: {
         int32_t field_index = opcode->operand2;
-        SPVM_PRECOMPILE_add_mulnum_deref_get_field(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, opcode->operand0, opcode->operand1, field_index);
+        SPVM_PRECOMPILE_add_mulnum_deref_get_field(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, opcode->operand0, opcode->operand1, field_index);
         break;
       }
       case SPVM_OPCODE_C_ID_GET_MULNUM_FIELD_DEREF_INT: {
         int32_t field_index = opcode->operand2;
-        SPVM_PRECOMPILE_add_mulnum_deref_get_field(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0, opcode->operand1, field_index);
+        SPVM_PRECOMPILE_add_mulnum_deref_get_field(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0, opcode->operand1, field_index);
         break;
       }
       case SPVM_OPCODE_C_ID_GET_MULNUM_FIELD_DEREF_LONG: {
         int32_t field_index = opcode->operand2;
-        SPVM_PRECOMPILE_add_mulnum_deref_get_field(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0, opcode->operand1, field_index);
+        SPVM_PRECOMPILE_add_mulnum_deref_get_field(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0, opcode->operand1, field_index);
         break;
       }
       case SPVM_OPCODE_C_ID_GET_MULNUM_FIELD_DEREF_FLOAT: {
         int32_t field_index = opcode->operand2;
-        SPVM_PRECOMPILE_add_mulnum_deref_get_field(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand0, opcode->operand1, field_index);
+        SPVM_PRECOMPILE_add_mulnum_deref_get_field(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand0, opcode->operand1, field_index);
         break;
       }
       case SPVM_OPCODE_C_ID_GET_MULNUM_FIELD_DEREF_DOUBLE: {
         int32_t field_index = opcode->operand2;
-        SPVM_PRECOMPILE_add_mulnum_deref_get_field(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand0, opcode->operand1, field_index);
+        SPVM_PRECOMPILE_add_mulnum_deref_get_field(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand0, opcode->operand1, field_index);
         break;
       }
       case SPVM_OPCODE_C_ID_SET_MULNUM_FIELD_DEREF_BYTE: {
         int32_t field_index = opcode->operand2;
-        SPVM_PRECOMPILE_add_mulnum_deref_set_field(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, opcode->operand0, opcode->operand1, field_index);
+        SPVM_PRECOMPILE_add_mulnum_deref_set_field(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, opcode->operand0, opcode->operand1, field_index);
         break;
       }
       case SPVM_OPCODE_C_ID_SET_MULNUM_FIELD_DEREF_SHORT: {
         int32_t field_index = opcode->operand2;
-        SPVM_PRECOMPILE_add_mulnum_deref_set_field(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, opcode->operand0, opcode->operand1, field_index);
+        SPVM_PRECOMPILE_add_mulnum_deref_set_field(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, opcode->operand0, opcode->operand1, field_index);
         break;
       }
       case SPVM_OPCODE_C_ID_SET_MULNUM_FIELD_DEREF_INT: {
         int32_t field_index = opcode->operand2;
-        SPVM_PRECOMPILE_add_mulnum_deref_set_field(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0, opcode->operand1, field_index);
+        SPVM_PRECOMPILE_add_mulnum_deref_set_field(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0, opcode->operand1, field_index);
         break;
       }
       case SPVM_OPCODE_C_ID_SET_MULNUM_FIELD_DEREF_LONG: {
         int32_t field_index = opcode->operand2;
-        SPVM_PRECOMPILE_add_mulnum_deref_set_field(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0, opcode->operand1, field_index);
+        SPVM_PRECOMPILE_add_mulnum_deref_set_field(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0, opcode->operand1, field_index);
         break;
       }
       case SPVM_OPCODE_C_ID_SET_MULNUM_FIELD_DEREF_FLOAT: {
         int32_t field_index = opcode->operand2;
-        SPVM_PRECOMPILE_add_mulnum_deref_set_field(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand0, opcode->operand1, field_index);
+        SPVM_PRECOMPILE_add_mulnum_deref_set_field(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand0, opcode->operand1, field_index);
         break;
       }
       case SPVM_OPCODE_C_ID_SET_MULNUM_FIELD_DEREF_DOUBLE: {
         int32_t field_index = opcode->operand2;
-        SPVM_PRECOMPILE_add_mulnum_deref_set_field(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand0, opcode->operand1, field_index);
+        SPVM_PRECOMPILE_add_mulnum_deref_set_field(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand0, opcode->operand1, field_index);
         break;
       }
       case SPVM_OPCODE_C_ID_GET_FIELD_BYTE: {
         int32_t field_id = opcode->operand2;
-        SPVM_PRECOMPILE_add_get_field(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, opcode->operand0, opcode->operand1, field_id);
+        SPVM_PRECOMPILE_add_get_field(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, opcode->operand0, opcode->operand1, field_id);
         break;
       }
       case SPVM_OPCODE_C_ID_GET_FIELD_SHORT: {
         int32_t field_id = opcode->operand2;
-        SPVM_PRECOMPILE_add_get_field(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, opcode->operand0, opcode->operand1, field_id);
+        SPVM_PRECOMPILE_add_get_field(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, opcode->operand0, opcode->operand1, field_id);
         break;
       }
       case SPVM_OPCODE_C_ID_GET_FIELD_INT: {
         int32_t field_id = opcode->operand2;
-        SPVM_PRECOMPILE_add_get_field(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0, opcode->operand1, field_id);
+        SPVM_PRECOMPILE_add_get_field(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0, opcode->operand1, field_id);
         break;
       }
       case SPVM_OPCODE_C_ID_GET_FIELD_LONG: {
         int32_t field_id = opcode->operand2;
-        SPVM_PRECOMPILE_add_get_field(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0, opcode->operand1, field_id);
+        SPVM_PRECOMPILE_add_get_field(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0, opcode->operand1, field_id);
         break;
       }
       case SPVM_OPCODE_C_ID_GET_FIELD_FLOAT: {
         int32_t field_id = opcode->operand2;
-        SPVM_PRECOMPILE_add_get_field(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand0, opcode->operand1, field_id);
+        SPVM_PRECOMPILE_add_get_field(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand0, opcode->operand1, field_id);
         break;
       }
       case SPVM_OPCODE_C_ID_GET_FIELD_DOUBLE: {
         int32_t field_id = opcode->operand2;
-        SPVM_PRECOMPILE_add_get_field(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand0, opcode->operand1, field_id);
+        SPVM_PRECOMPILE_add_get_field(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand0, opcode->operand1, field_id);
         break;
       }
       case SPVM_OPCODE_C_ID_GET_FIELD_OBJECT: {
         int32_t field_id = opcode->operand2;
         
-        int32_t field_class_id = SPVM_API_get_field_class_id(env, field_id);
-        int32_t field_class_name_id = SPVM_API_get_class_name_id(env, field_class_id);
-        const char* field_class_name = SPVM_API_get_name(env, field_class_name_id);
-        int32_t field_name_id = SPVM_API_get_field_name_id(env, field_id);
-        const char* field_name = SPVM_API_get_name(env, field_name_id);
-        int32_t field_signature_id = SPVM_API_get_field_signature_id(env, field_id);
-        const char* field_signature = SPVM_API_get_name(env, field_signature_id);
+        int32_t field_class_id = SPVM_API_RUNTIME_get_field_class_id(runtime, field_id);
+        int32_t field_class_name_id = SPVM_API_RUNTIME_get_class_name_id(runtime, field_class_id);
+        const char* field_class_name = SPVM_API_RUNTIME_get_name(runtime, field_class_name_id);
+        int32_t field_name_id = SPVM_API_RUNTIME_get_field_name_id(runtime, field_id);
+        const char* field_name = SPVM_API_RUNTIME_get_name(runtime, field_name_id);
+        int32_t field_signature_id = SPVM_API_RUNTIME_get_field_signature_id(runtime, field_id);
+        const char* field_signature = SPVM_API_RUNTIME_get_name(runtime, field_signature_id);
 
         SPVM_STRING_BUFFER_add(string_buffer, "  {\n");
         SPVM_STRING_BUFFER_add(string_buffer, "    int32_t access_field_id = env->get_field_id(env, \"");
@@ -3851,7 +3879,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
                                               "      int32_t access_field_offset"
                                               " = env->get_field_offset(env, access_field_id);\n"
                                               "      void* object = ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n"
                                               "      if (__builtin_expect(object == NULL, 0)) {\n"
                                               "        env->set_exception(env, env->new_string_nolen_raw(env, \"Object must be not undef.\"));\n"
@@ -3862,7 +3890,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
                                               "access_field_offset"
                                               ");\n"
                                               "        SPVM_API_OBJECT_ASSIGN(&");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, ", get_field_object);\n"
                                               "      }\n"
                                               "    }\n"
@@ -3871,45 +3899,45 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       }
       case SPVM_OPCODE_C_ID_SET_FIELD_BYTE: {
         int32_t field_id = opcode->operand1;
-        SPVM_PRECOMPILE_add_set_field(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, opcode->operand0, field_id, opcode->operand2);
+        SPVM_PRECOMPILE_add_set_field(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, opcode->operand0, field_id, opcode->operand2);
         break;
       }
       case SPVM_OPCODE_C_ID_SET_FIELD_SHORT: {
         int32_t field_id = opcode->operand1;
-        SPVM_PRECOMPILE_add_set_field(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, opcode->operand0, field_id, opcode->operand2);
+        SPVM_PRECOMPILE_add_set_field(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, opcode->operand0, field_id, opcode->operand2);
         break;
       }
       case SPVM_OPCODE_C_ID_SET_FIELD_INT: {
         int32_t field_id = opcode->operand1;
-        SPVM_PRECOMPILE_add_set_field(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0, field_id, opcode->operand2);
+        SPVM_PRECOMPILE_add_set_field(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0, field_id, opcode->operand2);
         break;
       }
       case SPVM_OPCODE_C_ID_SET_FIELD_LONG: {
         int32_t field_id = opcode->operand1;
-        SPVM_PRECOMPILE_add_set_field(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0, field_id, opcode->operand2);
+        SPVM_PRECOMPILE_add_set_field(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0, field_id, opcode->operand2);
         break;
       }
       case SPVM_OPCODE_C_ID_SET_FIELD_FLOAT: {
         int32_t field_id = opcode->operand1;
-        SPVM_PRECOMPILE_add_set_field(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand0, field_id, opcode->operand2);
+        SPVM_PRECOMPILE_add_set_field(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand0, field_id, opcode->operand2);
         break;
       }
       case SPVM_OPCODE_C_ID_SET_FIELD_DOUBLE: {
         int32_t field_id = opcode->operand1;
-        SPVM_PRECOMPILE_add_set_field(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand0, field_id, opcode->operand2);
+        SPVM_PRECOMPILE_add_set_field(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand0, field_id, opcode->operand2);
         break;
       }
       case SPVM_OPCODE_C_ID_SET_FIELD_OBJECT:
       {
         int32_t field_id = opcode->operand1;
         
-        int32_t field_class_id = SPVM_API_get_field_class_id(env, field_id);
-        int32_t field_class_name_id = SPVM_API_get_class_name_id(env, field_class_id);
-        const char* field_class_name = SPVM_API_get_name(env, field_class_name_id);
-        int32_t field_name_id = SPVM_API_get_field_name_id(env, field_id);
-        const char* field_name = SPVM_API_get_name(env, field_name_id);
-        int32_t field_signature_id = SPVM_API_get_field_signature_id(env, field_id);
-        const char* field_signature = SPVM_API_get_name(env, field_signature_id);
+        int32_t field_class_id = SPVM_API_RUNTIME_get_field_class_id(runtime, field_id);
+        int32_t field_class_name_id = SPVM_API_RUNTIME_get_class_name_id(runtime, field_class_id);
+        const char* field_class_name = SPVM_API_RUNTIME_get_name(runtime, field_class_name_id);
+        int32_t field_name_id = SPVM_API_RUNTIME_get_field_name_id(runtime, field_id);
+        const char* field_name = SPVM_API_RUNTIME_get_name(runtime, field_name_id);
+        int32_t field_signature_id = SPVM_API_RUNTIME_get_field_signature_id(runtime, field_id);
+        const char* field_signature = SPVM_API_RUNTIME_get_name(runtime, field_signature_id);
 
         SPVM_STRING_BUFFER_add(string_buffer, "  {\n"
                                               "    int32_t access_field_id = env->get_field_id(env, \"");
@@ -3934,7 +3962,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
                                               "access_field_id"
                                               ");\n"
                                               "      void* object = ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, ";"
                                               "      if (__builtin_expect(object == NULL, 0)) {\n"
                                               "        env->set_exception(env, env->new_string_nolen_raw(env, \"Object must be not undef.\"));\n"
@@ -3946,7 +3974,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
                                               ");\n"
                                               "        SPVM_API_OBJECT_ASSIGN("
                                               "get_field_object_address,");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand2);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand2);
         SPVM_STRING_BUFFER_add(string_buffer, "    );\n"
                                               "      }\n"
                                               "    }\n"
@@ -3958,13 +3986,13 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       {
         int32_t field_id = opcode->operand1;
         
-        int32_t field_class_id = SPVM_API_get_field_class_id(env, field_id);
-        int32_t field_class_name_id = SPVM_API_get_class_name_id(env, field_class_id);
-        const char* field_class_name = SPVM_API_get_name(env, field_class_name_id);
-        int32_t field_name_id = SPVM_API_get_field_name_id(env, field_id);
-        const char* field_name = SPVM_API_get_name(env, field_name_id);
-        int32_t field_signature_id = SPVM_API_get_field_signature_id(env, field_id);
-        const char* field_signature = SPVM_API_get_name(env, field_signature_id);
+        int32_t field_class_id = SPVM_API_RUNTIME_get_field_class_id(runtime, field_id);
+        int32_t field_class_name_id = SPVM_API_RUNTIME_get_class_name_id(runtime, field_class_id);
+        const char* field_class_name = SPVM_API_RUNTIME_get_name(runtime, field_class_name_id);
+        int32_t field_name_id = SPVM_API_RUNTIME_get_field_name_id(runtime, field_id);
+        const char* field_name = SPVM_API_RUNTIME_get_name(runtime, field_name_id);
+        int32_t field_signature_id = SPVM_API_RUNTIME_get_field_signature_id(runtime, field_id);
+        const char* field_signature = SPVM_API_RUNTIME_get_name(runtime, field_signature_id);
 
         SPVM_STRING_BUFFER_add(string_buffer, "  {\n"
                                               "    int32_t access_field_id = env->get_field_id(env, \"");
@@ -3989,7 +4017,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
                                               "access_field_id"
                                               ");\n"
                                               "      void* object = ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, ";"
                                               "      if (__builtin_expect(object == NULL, 0)) {\n"
                                               "      env->set_exception(env, env->new_string_nolen_raw(env, \"Object must be not undef.\"));\n"
@@ -4007,51 +4035,51 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
         break;
       }
       case SPVM_OPCODE_C_ID_GET_DEREF_BYTE: {
-        SPVM_PRECOMPILE_add_get_deref(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, opcode->operand0, opcode->operand1);
+        SPVM_PRECOMPILE_add_get_deref(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, opcode->operand0, opcode->operand1);
         break;
       }
       case SPVM_OPCODE_C_ID_GET_DEREF_SHORT: {
-        SPVM_PRECOMPILE_add_get_deref(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, opcode->operand0, opcode->operand1);
+        SPVM_PRECOMPILE_add_get_deref(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, opcode->operand0, opcode->operand1);
         break;
       }
       case SPVM_OPCODE_C_ID_GET_DEREF_INT: {
-        SPVM_PRECOMPILE_add_get_deref(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0, opcode->operand1);
+        SPVM_PRECOMPILE_add_get_deref(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0, opcode->operand1);
         break;
       }
       case SPVM_OPCODE_C_ID_GET_DEREF_LONG: {
-        SPVM_PRECOMPILE_add_get_deref(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0, opcode->operand1);
+        SPVM_PRECOMPILE_add_get_deref(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0, opcode->operand1);
         break;
       }
       case SPVM_OPCODE_C_ID_GET_DEREF_FLOAT: {
-        SPVM_PRECOMPILE_add_get_deref(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand0, opcode->operand1);
+        SPVM_PRECOMPILE_add_get_deref(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand0, opcode->operand1);
         break;
       }
       case SPVM_OPCODE_C_ID_GET_DEREF_DOUBLE: {
-        SPVM_PRECOMPILE_add_get_deref(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand0, opcode->operand1);
+        SPVM_PRECOMPILE_add_get_deref(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand0, opcode->operand1);
         break;
       }
       case SPVM_OPCODE_C_ID_SET_DEREF_BYTE: {
-        SPVM_PRECOMPILE_add_set_deref(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, opcode->operand0, opcode->operand1);
+        SPVM_PRECOMPILE_add_set_deref(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, opcode->operand0, opcode->operand1);
         break;
       }
       case SPVM_OPCODE_C_ID_SET_DEREF_SHORT: {
-        SPVM_PRECOMPILE_add_set_deref(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, opcode->operand0, opcode->operand1);
+        SPVM_PRECOMPILE_add_set_deref(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, opcode->operand0, opcode->operand1);
         break;
       }
       case SPVM_OPCODE_C_ID_SET_DEREF_INT: {
-        SPVM_PRECOMPILE_add_set_deref(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0, opcode->operand1);
+        SPVM_PRECOMPILE_add_set_deref(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0, opcode->operand1);
         break;
       }
       case SPVM_OPCODE_C_ID_SET_DEREF_LONG: {
-        SPVM_PRECOMPILE_add_set_deref(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0, opcode->operand1);
+        SPVM_PRECOMPILE_add_set_deref(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0, opcode->operand1);
         break;
       }
       case SPVM_OPCODE_C_ID_SET_DEREF_FLOAT: {
-        SPVM_PRECOMPILE_add_set_deref(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand0, opcode->operand1);
+        SPVM_PRECOMPILE_add_set_deref(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand0, opcode->operand1);
         break;
       }
       case SPVM_OPCODE_C_ID_SET_DEREF_DOUBLE: {
-        SPVM_PRECOMPILE_add_set_deref(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand0, opcode->operand1);
+        SPVM_PRECOMPILE_add_set_deref(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand0, opcode->operand1);
         break;
       }
       case SPVM_OPCODE_C_ID_GET_CLASS_VAR_BYTE:
@@ -4063,13 +4091,13 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       {
         int32_t class_var_id = opcode->operand1;
         
-        int32_t class_var_class_id = SPVM_API_get_class_var_class_id(env, class_var_id);
-        int32_t class_var_class_name_id = SPVM_API_get_class_name_id(env, class_var_class_id);
-        const char* class_var_class_name = SPVM_API_get_name(env, class_var_class_name_id);
-        int32_t class_var_name_id = SPVM_API_get_class_var_name_id(env, class_var_id);
-        const char* class_var_name = SPVM_API_get_name(env, class_var_name_id);
-        int32_t class_var_signature_id = SPVM_API_get_class_var_signature_id(env, class_var_id);
-        const char* class_var_signature = SPVM_API_get_name(env, class_var_signature_id);
+        int32_t class_var_class_id = SPVM_API_RUNTIME_get_class_var_class_id(runtime, class_var_id);
+        int32_t class_var_class_name_id = SPVM_API_RUNTIME_get_class_name_id(runtime, class_var_class_id);
+        const char* class_var_class_name = SPVM_API_RUNTIME_get_name(runtime, class_var_class_name_id);
+        int32_t class_var_name_id = SPVM_API_RUNTIME_get_class_var_name_id(runtime, class_var_id);
+        const char* class_var_name = SPVM_API_RUNTIME_get_name(runtime, class_var_name_id);
+        int32_t class_var_signature_id = SPVM_API_RUNTIME_get_class_var_signature_id(runtime, class_var_id);
+        const char* class_var_signature = SPVM_API_RUNTIME_get_name(runtime, class_var_signature_id);
 
         int32_t class_var_access_ctype_id;
         switch (opcode_id) {
@@ -4115,9 +4143,9 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
                                               "    }\n"
                                               "    if (!exception_flag) {\n"
                                               "      ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, class_var_access_ctype_id, opcode->operand0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, class_var_access_ctype_id, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, " = *(");
-        SPVM_STRING_BUFFER_add(string_buffer, (char*)SPVM_PRECOMPILE_get_ctype_name(env, class_var_access_ctype_id));
+        SPVM_STRING_BUFFER_add(string_buffer, (char*)SPVM_PRECOMPILE_get_ctype_name(precompile, class_var_access_ctype_id));
         SPVM_STRING_BUFFER_add(string_buffer, "*)&((SPVM_VALUE*)env->class_vars_heap)[access_class_var_id];\n"
                                               "    }\n"
                                               "  }\n");
@@ -4127,13 +4155,13 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       case SPVM_OPCODE_C_ID_GET_CLASS_VAR_OBJECT: {
         int32_t class_var_id = opcode->operand1;
         
-        int32_t class_var_class_id = SPVM_API_get_class_var_class_id(env, class_var_id);
-        int32_t class_var_class_name_id = SPVM_API_get_class_name_id(env, class_var_class_id);
-        const char* class_var_class_name = SPVM_API_get_name(env, class_var_class_name_id);
-        int32_t class_var_name_id = SPVM_API_get_class_var_name_id(env, class_var_id);
-        const char* class_var_name = SPVM_API_get_name(env, class_var_name_id);
-        int32_t class_var_signature_id = SPVM_API_get_class_var_signature_id(env, class_var_id);
-        const char* class_var_signature = SPVM_API_get_name(env, class_var_signature_id);
+        int32_t class_var_class_id = SPVM_API_RUNTIME_get_class_var_class_id(runtime, class_var_id);
+        int32_t class_var_class_name_id = SPVM_API_RUNTIME_get_class_name_id(runtime, class_var_class_id);
+        const char* class_var_class_name = SPVM_API_RUNTIME_get_name(runtime, class_var_class_name_id);
+        int32_t class_var_name_id = SPVM_API_RUNTIME_get_class_var_name_id(runtime, class_var_id);
+        const char* class_var_name = SPVM_API_RUNTIME_get_name(runtime, class_var_name_id);
+        int32_t class_var_signature_id = SPVM_API_RUNTIME_get_class_var_signature_id(runtime, class_var_id);
+        const char* class_var_signature = SPVM_API_RUNTIME_get_name(runtime, class_var_signature_id);
 
         SPVM_STRING_BUFFER_add(string_buffer, "  {\n"
                                               "    int32_t access_class_var_id = env->get_class_var_id(env, \"");
@@ -4154,7 +4182,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
                                               "    }\n"
                                               "    if (!exception_flag) {\n"
                                               "      SPVM_API_OBJECT_ASSIGN(&");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, ", *(void**)&((SPVM_VALUE*)env->class_vars_heap)[access_class_var_id]);\n"
                                               "    }\n"
                                               "  }\n");
@@ -4170,13 +4198,13 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       {
         int32_t class_var_id = opcode->operand0;
         
-        int32_t class_var_class_id = SPVM_API_get_class_var_class_id(env, class_var_id);
-        int32_t class_var_class_name_id = SPVM_API_get_class_name_id(env, class_var_class_id);
-        const char* class_var_class_name = SPVM_API_get_name(env, class_var_class_name_id);
-        int32_t class_var_name_id = SPVM_API_get_class_var_name_id(env, class_var_id);
-        const char* class_var_name = SPVM_API_get_name(env, class_var_name_id);
-        int32_t class_var_signature_id = SPVM_API_get_class_var_signature_id(env, class_var_id);
-        const char* class_var_signature = SPVM_API_get_name(env, class_var_signature_id);
+        int32_t class_var_class_id = SPVM_API_RUNTIME_get_class_var_class_id(runtime, class_var_id);
+        int32_t class_var_class_name_id = SPVM_API_RUNTIME_get_class_name_id(runtime, class_var_class_id);
+        const char* class_var_class_name = SPVM_API_RUNTIME_get_name(runtime, class_var_class_name_id);
+        int32_t class_var_name_id = SPVM_API_RUNTIME_get_class_var_name_id(runtime, class_var_id);
+        const char* class_var_name = SPVM_API_RUNTIME_get_name(runtime, class_var_name_id);
+        int32_t class_var_signature_id = SPVM_API_RUNTIME_get_class_var_signature_id(runtime, class_var_id);
+        const char* class_var_signature = SPVM_API_RUNTIME_get_name(runtime, class_var_signature_id);
 
         int32_t class_var_access_ctype_id;
         switch (opcode_id) {
@@ -4223,9 +4251,9 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
                                               "    }\n"
                                               "    if (!exception_flag) {\n"
                                               "      *(");
-        SPVM_STRING_BUFFER_add(string_buffer, (char*)SPVM_PRECOMPILE_get_ctype_name(env, class_var_access_ctype_id));
+        SPVM_STRING_BUFFER_add(string_buffer, (char*)SPVM_PRECOMPILE_get_ctype_name(precompile, class_var_access_ctype_id));
         SPVM_STRING_BUFFER_add(string_buffer, "*)&((SPVM_VALUE*)env->class_vars_heap)[access_class_var_id] = ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, class_var_access_ctype_id, opcode->operand1);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, class_var_access_ctype_id, opcode->operand1);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n"
                                               "    }\n"
                                               "  }\n");
@@ -4235,13 +4263,13 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       case SPVM_OPCODE_C_ID_SET_CLASS_VAR_OBJECT: {
         int32_t class_var_id = opcode->operand0;
         
-        int32_t class_var_class_id = SPVM_API_get_class_var_class_id(env, class_var_id);
-        int32_t class_var_class_name_id = SPVM_API_get_class_name_id(env, class_var_class_id);
-        const char* class_var_class_name = SPVM_API_get_name(env, class_var_class_name_id);
-        int32_t class_var_name_id = SPVM_API_get_class_var_name_id(env, class_var_id);
-        const char* class_var_name = SPVM_API_get_name(env, class_var_name_id);
-        int32_t class_var_signature_id = SPVM_API_get_class_var_signature_id(env, class_var_id);
-        const char* class_var_signature = SPVM_API_get_name(env, class_var_signature_id);
+        int32_t class_var_class_id = SPVM_API_RUNTIME_get_class_var_class_id(runtime, class_var_id);
+        int32_t class_var_class_name_id = SPVM_API_RUNTIME_get_class_name_id(runtime, class_var_class_id);
+        const char* class_var_class_name = SPVM_API_RUNTIME_get_name(runtime, class_var_class_name_id);
+        int32_t class_var_name_id = SPVM_API_RUNTIME_get_class_var_name_id(runtime, class_var_id);
+        const char* class_var_name = SPVM_API_RUNTIME_get_name(runtime, class_var_name_id);
+        int32_t class_var_signature_id = SPVM_API_RUNTIME_get_class_var_signature_id(runtime, class_var_id);
+        const char* class_var_signature = SPVM_API_RUNTIME_get_name(runtime, class_var_signature_id);
 
         SPVM_STRING_BUFFER_add(string_buffer, "  {\n"
                                               "    int32_t access_class_var_id = env->get_class_var_id(env, \"");
@@ -4266,7 +4294,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
                                               "      SPVM_API_OBJECT_ASSIGN((void**)&((SPVM_VALUE*)env->class_vars_heap)["
                                               "access_class_var_id"
                                               "],\n");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1);
         SPVM_STRING_BUFFER_add(string_buffer, ");"
                                               "    }\n"
                                               "  }\n");
@@ -4276,13 +4304,13 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       case SPVM_OPCODE_C_ID_SET_CLASS_VAR_UNDEF: {
         int32_t class_var_id = opcode->operand0;
         
-        int32_t class_var_class_id = SPVM_API_get_class_var_class_id(env, class_var_id);
-        int32_t class_var_class_name_id = SPVM_API_get_class_name_id(env, class_var_class_id);
-        const char* class_var_class_name = SPVM_API_get_name(env, class_var_class_name_id);
-        int32_t class_var_name_id = SPVM_API_get_class_var_name_id(env, class_var_id);
-        const char* class_var_name = SPVM_API_get_name(env, class_var_name_id);
-        int32_t class_var_signature_id = SPVM_API_get_class_var_signature_id(env, class_var_id);
-        const char* class_var_signature = SPVM_API_get_name(env, class_var_signature_id);
+        int32_t class_var_class_id = SPVM_API_RUNTIME_get_class_var_class_id(runtime, class_var_id);
+        int32_t class_var_class_name_id = SPVM_API_RUNTIME_get_class_name_id(runtime, class_var_class_id);
+        const char* class_var_class_name = SPVM_API_RUNTIME_get_name(runtime, class_var_class_name_id);
+        int32_t class_var_name_id = SPVM_API_RUNTIME_get_class_var_name_id(runtime, class_var_id);
+        const char* class_var_name = SPVM_API_RUNTIME_get_name(runtime, class_var_name_id);
+        int32_t class_var_signature_id = SPVM_API_RUNTIME_get_class_var_signature_id(runtime, class_var_id);
+        const char* class_var_signature = SPVM_API_RUNTIME_get_name(runtime, class_var_signature_id);
         
         SPVM_STRING_BUFFER_add(string_buffer, "  {\n"
                                               "    int32_t access_class_var_id = env->get_class_var_id(env, \"");
@@ -4314,13 +4342,13 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       }
       case SPVM_OPCODE_C_ID_GET_EXCEPTION_VAR: {
         SPVM_STRING_BUFFER_add(string_buffer, "  SPVM_API_OBJECT_ASSIGN(&");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, ", env->get_exception(env));\n");
         break;
       }
       case SPVM_OPCODE_C_ID_SET_EXCEPTION_VAR: {
         SPVM_STRING_BUFFER_add(string_buffer, "  env->set_exception(env, ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, ");\n");
         break;
       }
@@ -4334,14 +4362,14 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       case SPVM_OPCODE_C_ID_CONVERT_BYTE_TO_BYTE_OBJECT: {
         SPVM_STRING_BUFFER_add(string_buffer, "  {\n"
                                               "    int8_t value = ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, opcode->operand1);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, opcode->operand1);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n"
-                                              "    int32_t basic_type_id = (intptr_t)(void*)env->byte_object_basic_type_id;\n"
+                                              "    int32_t basic_type_id = SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE_OBJECT;\n"
                                               "    void* object = env->new_object_raw(env, basic_type_id);\n"
                                               "    SPVM_VALUE* fields = (SPVM_VALUE*)((intptr_t)object + object_header_byte_size);\n"
                                               "    *(int8_t*)&fields[0] = value;\n"
                                               "    SPVM_API_OBJECT_ASSIGN(&");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, ", object);\n"
                                               "  }\n");
         
@@ -4350,14 +4378,14 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       case SPVM_OPCODE_C_ID_CONVERT_SHORT_TO_SHORT_OBJECT: {
         SPVM_STRING_BUFFER_add(string_buffer, "  {\n"
                                               "    int16_t value = ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, opcode->operand1);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, opcode->operand1);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n"
-                                              "    int32_t basic_type_id = (intptr_t)(void*)env->short_object_basic_type_id;\n"
+                                              "    int32_t basic_type_id = SPVM_NATIVE_C_BASIC_TYPE_ID_SHORT_OBJECT;\n"
                                               "    void* object = env->new_object_raw(env, basic_type_id);\n"
                                               "    SPVM_VALUE* fields = (SPVM_VALUE*)((intptr_t)object + object_header_byte_size);\n"
                                               "    *(int16_t*)&fields[0] = value;\n"
                                               "    SPVM_API_OBJECT_ASSIGN(&");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, ", object);\n"
                                               "  }\n");
         
@@ -4366,14 +4394,14 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       case SPVM_OPCODE_C_ID_CONVERT_INT_TO_INT_OBJECT: {
         SPVM_STRING_BUFFER_add(string_buffer, "  {\n"
                                               "    int32_t value = ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand1);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand1);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n"
-                                              "    int32_t basic_type_id = (intptr_t)(void*)env->int_object_basic_type_id;\n"
+                                              "    int32_t basic_type_id = SPVM_NATIVE_C_BASIC_TYPE_ID_INT_OBJECT;\n"
                                               "    void* object = env->new_object_raw(env, basic_type_id);\n"
                                               "    SPVM_VALUE* fields = (SPVM_VALUE*)((intptr_t)object + object_header_byte_size);\n"
                                               "    *(int32_t*)&fields[0] = value;\n"
                                               "    SPVM_API_OBJECT_ASSIGN(&");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, ", object);\n"
                                               "  }\n");
         
@@ -4382,14 +4410,14 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       case SPVM_OPCODE_C_ID_CONVERT_LONG_TO_LONG_OBJECT: {
         SPVM_STRING_BUFFER_add(string_buffer, "  {\n"
                                               "    int64_t value = ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand1);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand1);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n"
-                                              "    int32_t basic_type_id = (intptr_t)(void*)env->long_object_basic_type_id;\n"
+                                              "    int32_t basic_type_id = SPVM_NATIVE_C_BASIC_TYPE_ID_LONG_OBJECT;\n"
                                               "    void* object = env->new_object_raw(env, basic_type_id);\n"
                                               "    SPVM_VALUE* fields = (SPVM_VALUE*)((intptr_t)object + object_header_byte_size);\n"
                                               "    *(int64_t*)&fields[0] = value;\n"
                                               "    SPVM_API_OBJECT_ASSIGN(&");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, ", object);\n");
         SPVM_STRING_BUFFER_add(string_buffer, "  }\n");
         
@@ -4398,14 +4426,14 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       case SPVM_OPCODE_C_ID_CONVERT_FLOAT_TO_FLOAT_OBJECT: {
         SPVM_STRING_BUFFER_add(string_buffer, "  {\n"
                                               "    float value = ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand1);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand1);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n"
-                                              "    int32_t basic_type_id = (intptr_t)(void*)env->float_object_basic_type_id;\n"
+                                              "    int32_t basic_type_id = SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT_OBJECT;\n"
                                               "    void* object = env->new_object_raw(env, basic_type_id);\n"
                                               "    SPVM_VALUE* fields = (SPVM_VALUE*)((intptr_t)object + object_header_byte_size);\n"
                                               "    *(float*)&fields[0] = value;\n"
                                               "    SPVM_API_OBJECT_ASSIGN(&");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, ", object);\n"
                                               "  }\n");
         
@@ -4414,14 +4442,14 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       case SPVM_OPCODE_C_ID_CONVERT_DOUBLE_TO_DOUBLE_OBJECT: {
         SPVM_STRING_BUFFER_add(string_buffer, "  {\n");
         SPVM_STRING_BUFFER_add(string_buffer, "    double value = ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand1);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand1);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n"
-                                              "    int32_t basic_type_id = (intptr_t)(void*)env->double_object_basic_type_id;\n"
+                                              "    int32_t basic_type_id = SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE_OBJECT;\n"
                                               "    void* object = env->new_object_raw(env, basic_type_id);\n"
                                               "    SPVM_VALUE* fields = (SPVM_VALUE*)((intptr_t)object + object_header_byte_size);\n"
                                               "    *(double*)&fields[0] = value;\n"
                                               "    SPVM_API_OBJECT_ASSIGN(&");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, ", object);\n");
         SPVM_STRING_BUFFER_add(string_buffer, "  }\n");
         
@@ -4430,7 +4458,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       case SPVM_OPCODE_C_ID_CONVERT_BYTE_OBJECT_TO_BYTE: {
         SPVM_STRING_BUFFER_add(string_buffer, "  {\n");
         SPVM_STRING_BUFFER_add(string_buffer, "    void* object = ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n"
                                               "    if (object == NULL) {\n"
                                               "      void* exception = env->new_string_nolen_raw(env, \"Can't convert undef value.\");\n"
@@ -4440,10 +4468,10 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
                                               "    else {\n"
                                               "      int32_t object_basic_type_id = *(int32_t*)((intptr_t)object + (intptr_t)env->object_basic_type_id_offset);\n"
                                               "      int32_t object_type_dimension_id = *(uint8_t*)((intptr_t)object + (intptr_t)env->object_type_dimension_offset);\n"
-                                              "      if (object_basic_type_id == (intptr_t)(void*)env->byte_object_basic_type_id && object_type_dimension_id == 0) {\n"
+                                              "      if (object_basic_type_id == SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE_OBJECT && object_type_dimension_id == 0) {\n"
                                               "        SPVM_VALUE* fields = (SPVM_VALUE*)((intptr_t)object + object_header_byte_size);\n"
                                               "        \n");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, opcode->operand0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_BYTE, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, " = *(int8_t*)&fields[0];\n"
                                               "      }\n"
                                               "      else {\n"
@@ -4458,7 +4486,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       case SPVM_OPCODE_C_ID_CONVERT_SHORT_OBJECT_TO_SHORT: {
         SPVM_STRING_BUFFER_add(string_buffer, "  {\n"
                                               "    void* object = ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n"
                                               "    if (object == NULL) {\n"
                                               "      void* exception = env->new_string_nolen_raw(env, \"Can't convert undef value.\");\n"
@@ -4468,10 +4496,10 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
                                               "    else {\n"
                                               "      int32_t object_basic_type_id = *(int32_t*)((intptr_t)object + (intptr_t)env->object_basic_type_id_offset);\n"
                                               "      int32_t object_type_dimension_id = *(uint8_t*)((intptr_t)object + (intptr_t)env->object_type_dimension_offset);\n"
-                                              "      if (object_basic_type_id == (intptr_t)(void*)env->short_object_basic_type_id && object_type_dimension_id == 0) {\n"
+                                              "      if (object_basic_type_id == SPVM_NATIVE_C_BASIC_TYPE_ID_SHORT_OBJECT && object_type_dimension_id == 0) {\n"
                                               "        SPVM_VALUE* fields = (SPVM_VALUE*)((intptr_t)object + object_header_byte_size);\n"
                                               "        \n");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, opcode->operand0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_SHORT, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, " = *(int16_t*)&fields[0];\n"
                                               "      }\n"
                                               "      else {\n"
@@ -4486,7 +4514,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       case SPVM_OPCODE_C_ID_CONVERT_INT_OBJECT_TO_INT: {
         SPVM_STRING_BUFFER_add(string_buffer, "  {\n"
                                               "    void* object = ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n"
                                               "    if (object == NULL) {\n"
                                               "      void* exception = env->new_string_nolen_raw(env, \"Can't convert undef value.\");\n"
@@ -4496,10 +4524,10 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
                                               "    else {\n"
                                               "      int32_t object_basic_type_id = *(int32_t*)((intptr_t)object + (intptr_t)env->object_basic_type_id_offset);\n"
                                               "      int32_t object_type_dimension_id = *(uint8_t*)((intptr_t)object + (intptr_t)env->object_type_dimension_offset);\n"
-                                              "      if (object_basic_type_id == (intptr_t)(void*)env->int_object_basic_type_id && object_type_dimension_id == 0) {\n"
+                                              "      if (object_basic_type_id == SPVM_NATIVE_C_BASIC_TYPE_ID_INT_OBJECT && object_type_dimension_id == 0) {\n"
                                               "        SPVM_VALUE* fields = (SPVM_VALUE*)((intptr_t)object + object_header_byte_size);\n"
                                               "        \n");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, " = *(int32_t*)&fields[0];\n"
                                               "      }\n"
                                               "      else {\n"
@@ -4514,7 +4542,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       case SPVM_OPCODE_C_ID_CONVERT_LONG_OBJECT_TO_LONG: {
         SPVM_STRING_BUFFER_add(string_buffer, "  {\n"
                                               "    void* object = ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n"
                                               "    if (object == NULL) {\n"
                                               "      void* exception = env->new_string_nolen_raw(env, \"Can't convert undef value.\");\n"
@@ -4524,10 +4552,10 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
                                               "    else {\n"
                                               "      int32_t object_basic_type_id = *(int32_t*)((intptr_t)object + (intptr_t)env->object_basic_type_id_offset);\n"
                                               "      int32_t object_type_dimension_id = *(uint8_t*)((intptr_t)object + (intptr_t)env->object_type_dimension_offset);\n"
-                                              "      if (object_basic_type_id == (intptr_t)(void*)env->long_object_basic_type_id && object_type_dimension_id == 0) {\n"
+                                              "      if (object_basic_type_id == SPVM_NATIVE_C_BASIC_TYPE_ID_LONG_OBJECT && object_type_dimension_id == 0) {\n"
                                               "        SPVM_VALUE* fields = (SPVM_VALUE*)((intptr_t)object + object_header_byte_size);\n"
                                               "        \n");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, " = *(int64_t*)&fields[0];\n"
                                               "      }\n"
                                               "      else {\n"
@@ -4542,7 +4570,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       case SPVM_OPCODE_C_ID_CONVERT_FLOAT_OBJECT_TO_FLOAT: {
         SPVM_STRING_BUFFER_add(string_buffer, "  {\n"
                                               "    void* object = ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n"
                                               "    if (object == NULL) {\n"
                                               "      void* exception = env->new_string_nolen_raw(env, \"Can't convert undef value.\");\n"
@@ -4552,10 +4580,10 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
                                               "    else {\n"
                                               "      int32_t object_basic_type_id = *(int32_t*)((intptr_t)object + (intptr_t)env->object_basic_type_id_offset);\n"
                                               "      int32_t object_type_dimension_id = *(uint8_t*)((intptr_t)object + (intptr_t)env->object_type_dimension_offset);\n"
-                                              "      if (object_basic_type_id == (intptr_t)(void*)env->float_object_basic_type_id && object_type_dimension_id == 0) {\n"
+                                              "      if (object_basic_type_id == SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT_OBJECT && object_type_dimension_id == 0) {\n"
                                               "        SPVM_VALUE* fields = (SPVM_VALUE*)((intptr_t)object + object_header_byte_size);\n"
                                               "        \n");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, " = *(float*)&fields[0];\n"
                                               "      }\n"
                                               "      else {\n"
@@ -4570,7 +4598,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       case SPVM_OPCODE_C_ID_CONVERT_DOUBLE_OBJECT_TO_DOUBLE: {
         SPVM_STRING_BUFFER_add(string_buffer, "  {\n"
                                               "    void* object = ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n"
                                               "    if (object == NULL) {\n"
                                               "      void* exception = env->new_string_nolen_raw(env, \"Can't convert undef value.\");\n"
@@ -4580,10 +4608,10 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
                                               "    else {\n"
                                               "      int32_t object_basic_type_id = *(int32_t*)((intptr_t)object + (intptr_t)env->object_basic_type_id_offset);\n"
                                               "      int32_t object_type_dimension_id = *(uint8_t*)((intptr_t)object + (intptr_t)env->object_type_dimension_offset);\n"
-                                              "      if (object_basic_type_id == (intptr_t)(void*)env->double_object_basic_type_id && object_type_dimension_id == 0) {\n"
+                                              "      if (object_basic_type_id == SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE_OBJECT && object_type_dimension_id == 0) {\n"
                                               "        SPVM_VALUE* fields = (SPVM_VALUE*)((intptr_t)object + object_header_byte_size);\n"
                                               "        \n");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, " = *(double*)&fields[0];\n"
                                               "      }\n"
                                               "      else {\n"
@@ -4597,25 +4625,25 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
       }
       case SPVM_OPCODE_C_ID_HAS_IMPLEMENT: {
         int32_t implement_method_id = opcode->operand2;
-        int32_t implement_method_name_id = SPVM_API_get_method_name_id(env, implement_method_id);
-        const char* implement_method_name = SPVM_API_get_name(env, implement_method_name_id);
+        int32_t implement_method_name_id = SPVM_API_RUNTIME_get_method_name_id(runtime, implement_method_id);
+        const char* implement_method_name = SPVM_API_RUNTIME_get_name(runtime, implement_method_name_id);
 
         int32_t interface_basic_type_id = opcode->operand3;
-        int32_t interface_basic_type_class_id = SPVM_API_get_basic_type_class_id(env, interface_basic_type_id);
+        int32_t interface_basic_type_class_id = SPVM_API_RUNTIME_get_basic_type_class_id(runtime, interface_basic_type_id);
 
-        int32_t interface_class_id = SPVM_API_get_basic_type_class_id(env, interface_basic_type_class_id);
-        int32_t interface_class_name_id = SPVM_API_get_class_name_id(env, interface_class_id);
-        const char* interface_class_name = SPVM_API_get_name(env, interface_class_name_id);
+        int32_t interface_class_id = SPVM_API_RUNTIME_get_basic_type_class_id(runtime, interface_basic_type_class_id);
+        int32_t interface_class_name_id = SPVM_API_RUNTIME_get_class_name_id(runtime, interface_class_id);
+        const char* interface_class_name = SPVM_API_RUNTIME_get_name(runtime, interface_class_name_id);
         
-        int32_t interface_method_id = SPVM_API_get_method_id_without_signature(env, interface_class_name, implement_method_name);
-        int32_t interface_method_signature_id = SPVM_API_get_method_signature_id(env, interface_method_id);
-        const char* interface_method_signature = SPVM_API_get_name(env, interface_method_signature_id);
+        int32_t interface_method_id = SPVM_API_RUNTIME_get_method_id_by_name(runtime, interface_class_name, implement_method_name);
+        int32_t interface_method_signature_id = SPVM_API_RUNTIME_get_method_signature_id(runtime, interface_method_id);
+        const char* interface_method_signature = SPVM_API_RUNTIME_get_name(runtime, interface_method_signature_id);
 
         const char* implement_method_signature = interface_method_signature;
         
         SPVM_STRING_BUFFER_add(string_buffer, "  {\n"
                                               "    void* object = ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n"
                                               "    int32_t call_method_id = env->get_instance_method_id(env, object, ");
         SPVM_STRING_BUFFER_add(string_buffer, implement_method_name);
@@ -4623,7 +4651,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
         SPVM_STRING_BUFFER_add(string_buffer, implement_method_signature);
         SPVM_STRING_BUFFER_add(string_buffer, ");"
                                               "    ");
-        SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, 0);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, 0);
         SPVM_STRING_BUFFER_add(string_buffer, "  call_method_id >= 0;\n"
                                               "  }\n");
 
@@ -4637,7 +4665,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
   
   // No exception
   SPVM_STRING_BUFFER_add(string_buffer, "  if (!exception_flag) {\n");
-  int32_t method_return_type_can_assign_to_any_object = SPVM_API_get_type_can_assign_to_any_object(env, method_return_type_id);
+  int32_t method_return_type_can_assign_to_any_object = SPVM_API_RUNTIME_get_type_is_object(runtime, method_return_type_id);
   if (method_return_type_can_assign_to_any_object) {
     SPVM_STRING_BUFFER_add(string_buffer, "    if (stack[0].oval != NULL) { SPVM_API_DEC_REF_COUNT_ONLY(stack[0].oval); }\n");
   }
@@ -4647,7 +4675,10 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_ENV* env, SPVM_STRING_BUFF
                                         "\n");
 }
 
-const char* SPVM_PRECOMPILE_get_ctype_name(SPVM_ENV* env, int32_t ctype_id) {
+const char* SPVM_PRECOMPILE_get_ctype_name(SPVM_PRECOMPILE* precompile, int32_t ctype_id) {
+  SPVM_RUNTIME* runtime = precompile->runtime;
+
+  
   switch (ctype_id) {
     case SPVM_PRECOMPILE_C_CTYPE_ID_BYTE:
       return "int8_t";
@@ -4678,7 +4709,8 @@ const char* SPVM_PRECOMPILE_get_ctype_name(SPVM_ENV* env, int32_t ctype_id) {
   return NULL;
 }
 
-void SPVM_PRECOMPILE_add_var(SPVM_ENV* env, SPVM_STRING_BUFFER* string_buffer, int32_t ctype_id, int32_t index) {
+void SPVM_PRECOMPILE_add_var(SPVM_PRECOMPILE* precompile, SPVM_STRING_BUFFER* string_buffer, int32_t ctype_id, int32_t index) {
+  SPVM_RUNTIME* runtime = precompile->runtime;
   
   switch (ctype_id) {
     case SPVM_PRECOMPILE_C_CTYPE_ID_BYTE: {
@@ -4736,7 +4768,10 @@ void SPVM_PRECOMPILE_add_var(SPVM_ENV* env, SPVM_STRING_BUFFER* string_buffer, i
   }
 }
 
-void SPVM_PRECOMPILE_add_var_value(SPVM_ENV* env, SPVM_STRING_BUFFER* string_buffer, int32_t ctype_id, int32_t index, int32_t field_index) {
+void SPVM_PRECOMPILE_add_var_value(SPVM_PRECOMPILE* precompile, SPVM_STRING_BUFFER* string_buffer, int32_t ctype_id, int32_t index, int32_t field_index) {
+  SPVM_RUNTIME* runtime = precompile->runtime;
+
+  
   switch (ctype_id) {
     case SPVM_PRECOMPILE_C_CTYPE_ID_BYTE: {
       SPVM_STRING_BUFFER_add(string_buffer, "byte_vars[");
@@ -4779,221 +4814,261 @@ void SPVM_PRECOMPILE_add_var_value(SPVM_ENV* env, SPVM_STRING_BUFFER* string_buf
   }
 }
 
-void SPVM_PRECOMPILE_add_operand(SPVM_ENV* env, SPVM_STRING_BUFFER* string_buffer, int32_t ctype_id, int32_t var_index) {
-  SPVM_PRECOMPILE_add_var(env, string_buffer, ctype_id, var_index);
+void SPVM_PRECOMPILE_add_operand(SPVM_PRECOMPILE* precompile, SPVM_STRING_BUFFER* string_buffer, int32_t ctype_id, int32_t var_index) {
+  SPVM_RUNTIME* runtime = precompile->runtime;
+
+  
+  SPVM_PRECOMPILE_add_var(precompile, string_buffer, ctype_id, var_index);
 }
 
-void SPVM_PRECOMPILE_add_operand_deref(SPVM_ENV* env, SPVM_STRING_BUFFER* string_buffer, int32_t ctype_id, int32_t var_index) {
+void SPVM_PRECOMPILE_add_operand_deref(SPVM_PRECOMPILE* precompile, SPVM_STRING_BUFFER* string_buffer, int32_t ctype_id, int32_t var_index) {
+  SPVM_RUNTIME* runtime = precompile->runtime;
+  
   SPVM_STRING_BUFFER_add(string_buffer, "*(");
-  SPVM_STRING_BUFFER_add(string_buffer, (char*)SPVM_PRECOMPILE_get_ctype_name(env, ctype_id));
+  SPVM_STRING_BUFFER_add(string_buffer, (char*)SPVM_PRECOMPILE_get_ctype_name(precompile, ctype_id));
   SPVM_STRING_BUFFER_add(string_buffer, "*)*(void**)&");
-  SPVM_PRECOMPILE_add_var(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_REF, var_index);
+  SPVM_PRECOMPILE_add_var(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_REF, var_index);
 }
 
-void SPVM_PRECOMPILE_add_stack(SPVM_ENV* env, SPVM_STRING_BUFFER* string_buffer, int32_t ctype_id, int32_t var_index) {
+void SPVM_PRECOMPILE_add_stack(SPVM_PRECOMPILE* precompile, SPVM_STRING_BUFFER* string_buffer, int32_t ctype_id, int32_t var_index) {
+  SPVM_RUNTIME* runtime = precompile->runtime;
+  
   SPVM_STRING_BUFFER_add(string_buffer, "*(");
-  SPVM_STRING_BUFFER_add(string_buffer, (char*)SPVM_PRECOMPILE_get_ctype_name(env, ctype_id));
+  SPVM_STRING_BUFFER_add(string_buffer, (char*)SPVM_PRECOMPILE_get_ctype_name(precompile, ctype_id));
   SPVM_STRING_BUFFER_add(string_buffer, "*)&");
   SPVM_STRING_BUFFER_add(string_buffer, "stack[");
   SPVM_STRING_BUFFER_add_int(string_buffer, var_index);
   SPVM_STRING_BUFFER_add(string_buffer, "]");
 }
 
-void SPVM_PRECOMPILE_add_operand_value(SPVM_ENV* env, SPVM_STRING_BUFFER* string_buffer, int32_t ctype_id, int32_t var_index, int32_t field_index) {
-  SPVM_PRECOMPILE_add_var_value(env, string_buffer, ctype_id, var_index, field_index);
+void SPVM_PRECOMPILE_add_operand_value(SPVM_PRECOMPILE* precompile, SPVM_STRING_BUFFER* string_buffer, int32_t ctype_id, int32_t var_index, int32_t field_index) {
+  SPVM_RUNTIME* runtime = precompile->runtime;
+  
+  SPVM_PRECOMPILE_add_var_value(precompile, string_buffer, ctype_id, var_index, field_index);
 }
 
-void SPVM_PRECOMPILE_add_bool(SPVM_ENV* env, SPVM_STRING_BUFFER* string_buffer, int32_t ctype_id, int32_t in_index) {
+void SPVM_PRECOMPILE_add_bool(SPVM_PRECOMPILE* precompile, SPVM_STRING_BUFFER* string_buffer, int32_t ctype_id, int32_t in_index) {
+  SPVM_RUNTIME* runtime = precompile->runtime;
+  
   SPVM_STRING_BUFFER_add(string_buffer, "  ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, 0);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, 0);
   if (ctype_id == SPVM_PRECOMPILE_C_CTYPE_ID_INT) {
     SPVM_STRING_BUFFER_add(string_buffer, " = ");
-    SPVM_PRECOMPILE_add_operand(env, string_buffer, ctype_id, in_index);
+    SPVM_PRECOMPILE_add_operand(precompile, string_buffer, ctype_id, in_index);
     SPVM_STRING_BUFFER_add(string_buffer, ";\n");
   }
   else if (ctype_id == SPVM_PRECOMPILE_C_CTYPE_ID_BOOL_OBJECT) {
     SPVM_STRING_BUFFER_add(string_buffer, " = !!env->get_bool_object_value(env, ");
-    SPVM_PRECOMPILE_add_operand(env, string_buffer, ctype_id, in_index);
+    SPVM_PRECOMPILE_add_operand(precompile, string_buffer, ctype_id, in_index);
     SPVM_STRING_BUFFER_add(string_buffer, ");\n");
   }
   else {
     SPVM_STRING_BUFFER_add(string_buffer, " = !!");
-    SPVM_PRECOMPILE_add_operand(env, string_buffer, ctype_id, in_index);
+    SPVM_PRECOMPILE_add_operand(precompile, string_buffer, ctype_id, in_index);
     SPVM_STRING_BUFFER_add(string_buffer, ";\n");
   }
 }
 
-void SPVM_PRECOMPILE_add_numeric_eq(SPVM_ENV* env, SPVM_STRING_BUFFER* string_buffer, int32_t ctype_id, int32_t in1_index, int32_t in2_index) {
+void SPVM_PRECOMPILE_add_numeric_eq(SPVM_PRECOMPILE* precompile, SPVM_STRING_BUFFER* string_buffer, int32_t ctype_id, int32_t in1_index, int32_t in2_index) {
+  SPVM_RUNTIME* runtime = precompile->runtime;
+  
   SPVM_STRING_BUFFER_add(string_buffer, "  ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, 0);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, 0);
   SPVM_STRING_BUFFER_add(string_buffer, " = (");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, ctype_id, in1_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, ctype_id, in1_index);
   SPVM_STRING_BUFFER_add(string_buffer, " == ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, ctype_id, in2_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, ctype_id, in2_index);
   SPVM_STRING_BUFFER_add(string_buffer, ");\n");
 }
 
-void SPVM_PRECOMPILE_add_numeric_ne(SPVM_ENV* env, SPVM_STRING_BUFFER* string_buffer, int32_t ctype_id, int32_t in1_index, int32_t in2_index) {
+void SPVM_PRECOMPILE_add_numeric_ne(SPVM_PRECOMPILE* precompile, SPVM_STRING_BUFFER* string_buffer, int32_t ctype_id, int32_t in1_index, int32_t in2_index) {
+  SPVM_RUNTIME* runtime = precompile->runtime;
+  
   SPVM_STRING_BUFFER_add(string_buffer, "  ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, 0);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, 0);
   SPVM_STRING_BUFFER_add(string_buffer, " = (");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, ctype_id, in1_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, ctype_id, in1_index);
   SPVM_STRING_BUFFER_add(string_buffer, " != ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, ctype_id, in2_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, ctype_id, in2_index);
   SPVM_STRING_BUFFER_add(string_buffer, ");\n");
 }
 
-void SPVM_PRECOMPILE_add_numeric_gt(SPVM_ENV* env, SPVM_STRING_BUFFER* string_buffer, int32_t ctype_id, int32_t in1_index, int32_t in2_index) {
+void SPVM_PRECOMPILE_add_numeric_gt(SPVM_PRECOMPILE* precompile, SPVM_STRING_BUFFER* string_buffer, int32_t ctype_id, int32_t in1_index, int32_t in2_index) {
+  SPVM_RUNTIME* runtime = precompile->runtime;
   SPVM_STRING_BUFFER_add(string_buffer, "  ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, 0);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, 0);
   SPVM_STRING_BUFFER_add(string_buffer, " = (");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, ctype_id, in1_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, ctype_id, in1_index);
   SPVM_STRING_BUFFER_add(string_buffer, " > ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, ctype_id, in2_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, ctype_id, in2_index);
   SPVM_STRING_BUFFER_add(string_buffer, ");\n");
 }
 
-void SPVM_PRECOMPILE_add_numeric_ge(SPVM_ENV* env, SPVM_STRING_BUFFER* string_buffer, int32_t ctype_id, int32_t in1_index, int32_t in2_index) {
+void SPVM_PRECOMPILE_add_numeric_ge(SPVM_PRECOMPILE* precompile, SPVM_STRING_BUFFER* string_buffer, int32_t ctype_id, int32_t in1_index, int32_t in2_index) {
+  SPVM_RUNTIME* runtime = precompile->runtime;
+  
   SPVM_STRING_BUFFER_add(string_buffer, "  ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, 0);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, 0);
   SPVM_STRING_BUFFER_add(string_buffer, " = (");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, ctype_id, in1_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, ctype_id, in1_index);
   SPVM_STRING_BUFFER_add(string_buffer, " >= ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, ctype_id, in2_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, ctype_id, in2_index);
   SPVM_STRING_BUFFER_add(string_buffer, ");\n");
 }
 
-void SPVM_PRECOMPILE_add_numeric_lt(SPVM_ENV* env, SPVM_STRING_BUFFER* string_buffer, int32_t ctype_id, int32_t in1_index, int32_t in2_index) {
+void SPVM_PRECOMPILE_add_numeric_lt(SPVM_PRECOMPILE* precompile, SPVM_STRING_BUFFER* string_buffer, int32_t ctype_id, int32_t in1_index, int32_t in2_index) {
+  SPVM_RUNTIME* runtime = precompile->runtime;
+  
   SPVM_STRING_BUFFER_add(string_buffer, "  ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, 0);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, 0);
   SPVM_STRING_BUFFER_add(string_buffer, " = (");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, ctype_id, in1_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, ctype_id, in1_index);
   SPVM_STRING_BUFFER_add(string_buffer, " < ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, ctype_id, in2_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, ctype_id, in2_index);
   SPVM_STRING_BUFFER_add(string_buffer, ");\n");
 }
 
-void SPVM_PRECOMPILE_add_numeric_le(SPVM_ENV* env, SPVM_STRING_BUFFER* string_buffer, int32_t ctype_id, int32_t in1_index, int32_t in2_index) {
+void SPVM_PRECOMPILE_add_numeric_le(SPVM_PRECOMPILE* precompile, SPVM_STRING_BUFFER* string_buffer, int32_t ctype_id, int32_t in1_index, int32_t in2_index) {
+  SPVM_RUNTIME* runtime = precompile->runtime;
+  
   SPVM_STRING_BUFFER_add(string_buffer, "  ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, 0);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, 0);
   SPVM_STRING_BUFFER_add(string_buffer, " = (");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, ctype_id, in1_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, ctype_id, in1_index);
   SPVM_STRING_BUFFER_add(string_buffer, " <= ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, ctype_id, in2_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, ctype_id, in2_index);
   SPVM_STRING_BUFFER_add(string_buffer, ");\n");
 }
 
-void SPVM_PRECOMPILE_add_numeric_cmp(SPVM_ENV* env, SPVM_STRING_BUFFER* string_buffer, int32_t ctype_id, int32_t in1_index, int32_t in2_index) {
+void SPVM_PRECOMPILE_add_numeric_cmp(SPVM_PRECOMPILE* precompile, SPVM_STRING_BUFFER* string_buffer, int32_t ctype_id, int32_t in1_index, int32_t in2_index) {
+  SPVM_RUNTIME* runtime = precompile->runtime;
+  
 
   SPVM_STRING_BUFFER_add(string_buffer, "  ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, 0);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, 0);
   SPVM_STRING_BUFFER_add(string_buffer, " = ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, ctype_id, in1_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, ctype_id, in1_index);
   SPVM_STRING_BUFFER_add(string_buffer, " > ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, ctype_id, in2_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, ctype_id, in2_index);
   SPVM_STRING_BUFFER_add(string_buffer, " ? 1\n");
   SPVM_STRING_BUFFER_add(string_buffer, "            : ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, ctype_id, in1_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, ctype_id, in1_index);
   SPVM_STRING_BUFFER_add(string_buffer, " < ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, ctype_id, in2_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, ctype_id, in2_index);
   SPVM_STRING_BUFFER_add(string_buffer, " ? -1\n");
   SPVM_STRING_BUFFER_add(string_buffer, "            : 0;\n");
 }
 
-void SPVM_PRECOMPILE_add_add(SPVM_ENV* env, SPVM_STRING_BUFFER* string_buffer, int32_t ctype_id, int32_t out_index, int32_t in1_index, int32_t in2_index) {
+void SPVM_PRECOMPILE_add_add(SPVM_PRECOMPILE* precompile, SPVM_STRING_BUFFER* string_buffer, int32_t ctype_id, int32_t out_index, int32_t in1_index, int32_t in2_index) {
+  SPVM_RUNTIME* runtime = precompile->runtime;
+  
   SPVM_STRING_BUFFER_add(string_buffer, "  ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, ctype_id, out_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, ctype_id, out_index);
   SPVM_STRING_BUFFER_add(string_buffer, " = ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, ctype_id, in1_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, ctype_id, in1_index);
   SPVM_STRING_BUFFER_add(string_buffer, " + ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, ctype_id, in2_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, ctype_id, in2_index);
   SPVM_STRING_BUFFER_add(string_buffer, ";\n");
 }
 
-void SPVM_PRECOMPILE_add_subtract(SPVM_ENV* env, SPVM_STRING_BUFFER* string_buffer, int32_t ctype_id, int32_t out_index, int32_t in1_index, int32_t in2_index) {
+void SPVM_PRECOMPILE_add_subtract(SPVM_PRECOMPILE* precompile, SPVM_STRING_BUFFER* string_buffer, int32_t ctype_id, int32_t out_index, int32_t in1_index, int32_t in2_index) {
+  SPVM_RUNTIME* runtime = precompile->runtime;
+  
   SPVM_STRING_BUFFER_add(string_buffer, "  ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, ctype_id, out_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, ctype_id, out_index);
   SPVM_STRING_BUFFER_add(string_buffer, " = ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, ctype_id, in1_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, ctype_id, in1_index);
   SPVM_STRING_BUFFER_add(string_buffer, " - ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, ctype_id, in2_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, ctype_id, in2_index);
   SPVM_STRING_BUFFER_add(string_buffer, ";\n");
 }
 
-void SPVM_PRECOMPILE_add_multiply(SPVM_ENV* env, SPVM_STRING_BUFFER* string_buffer, int32_t ctype_id, int32_t out_index, int32_t in1_index, int32_t in2_index) {
+void SPVM_PRECOMPILE_add_multiply(SPVM_PRECOMPILE* precompile, SPVM_STRING_BUFFER* string_buffer, int32_t ctype_id, int32_t out_index, int32_t in1_index, int32_t in2_index) {
+  SPVM_RUNTIME* runtime = precompile->runtime;
+  
   SPVM_STRING_BUFFER_add(string_buffer, "  ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, ctype_id, out_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, ctype_id, out_index);
   SPVM_STRING_BUFFER_add(string_buffer, " = ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, ctype_id, in1_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, ctype_id, in1_index);
   SPVM_STRING_BUFFER_add(string_buffer, " * ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, ctype_id, in2_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, ctype_id, in2_index);
   SPVM_STRING_BUFFER_add(string_buffer, ";\n");
 }
 
-void SPVM_PRECOMPILE_add_divide_integral(SPVM_ENV* env, SPVM_STRING_BUFFER* string_buffer, int32_t ctype_id, int32_t out_index, int32_t in1_index, int32_t in2_index) {
+void SPVM_PRECOMPILE_add_divide_integral(SPVM_PRECOMPILE* precompile, SPVM_STRING_BUFFER* string_buffer, int32_t ctype_id, int32_t out_index, int32_t in1_index, int32_t in2_index) {
+  SPVM_RUNTIME* runtime = precompile->runtime;
+  
   SPVM_STRING_BUFFER_add(string_buffer, "  if (__builtin_expect(");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, ctype_id, in2_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, ctype_id, in2_index);
   SPVM_STRING_BUFFER_add(string_buffer, " == 0, 0)) { \n"
                                         "    env->set_exception(env, env->new_string_nolen_raw(env, \"0 division\"));\n"
                                         "    exception_flag = 1;\n"
                                         "  } else {\n"
                                         "    ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, ctype_id, out_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, ctype_id, out_index);
   SPVM_STRING_BUFFER_add(string_buffer, " = ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, ctype_id, in1_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, ctype_id, in1_index);
   SPVM_STRING_BUFFER_add(string_buffer, " / ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, ctype_id, in2_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, ctype_id, in2_index);
   SPVM_STRING_BUFFER_add(string_buffer, ";\n");
   SPVM_STRING_BUFFER_add(string_buffer, "  } \n");
 }
 
-void SPVM_PRECOMPILE_add_divide_unsigned_int(SPVM_ENV* env, SPVM_STRING_BUFFER* string_buffer, int32_t out_index, int32_t in1_index, int32_t in2_index) {
+void SPVM_PRECOMPILE_add_divide_unsigned_int(SPVM_PRECOMPILE* precompile, SPVM_STRING_BUFFER* string_buffer, int32_t out_index, int32_t in1_index, int32_t in2_index) {
+  SPVM_RUNTIME* runtime = precompile->runtime;
+  
   SPVM_STRING_BUFFER_add(string_buffer, "  if (__builtin_expect(");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, in2_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, in2_index);
   SPVM_STRING_BUFFER_add(string_buffer, " == 0, 0)) { \n"
                                         "    env->set_exception(env, env->new_string_nolen_raw(env, \"0 division\"));\n"
                                         "    exception_flag = 1;\n"
                                         "  } else {\n"
                                         "    ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, out_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, out_index);
   SPVM_STRING_BUFFER_add(string_buffer, " = (uint32_t)");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, in1_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, in1_index);
   SPVM_STRING_BUFFER_add(string_buffer, " / (uint32_t)");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, in2_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, in2_index);
   SPVM_STRING_BUFFER_add(string_buffer, ";\n");
   SPVM_STRING_BUFFER_add(string_buffer, "  } \n");
 }
 
-void SPVM_PRECOMPILE_add_divide_unsigned_long(SPVM_ENV* env, SPVM_STRING_BUFFER* string_buffer, int32_t out_index, int32_t in1_index, int32_t in2_index) {
+void SPVM_PRECOMPILE_add_divide_unsigned_long(SPVM_PRECOMPILE* precompile, SPVM_STRING_BUFFER* string_buffer, int32_t out_index, int32_t in1_index, int32_t in2_index) {
+  SPVM_RUNTIME* runtime = precompile->runtime;
+  
   SPVM_STRING_BUFFER_add(string_buffer, "  if (__builtin_expect(");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, in2_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, in2_index);
   SPVM_STRING_BUFFER_add(string_buffer, " == 0, 0)) { \n"
                                         "    env->set_exception(env, env->new_string_nolen_raw(env, \"0 division\"));\n"
                                         "    exception_flag = 1;\n"
                                         "  } else {\n"
                                         "    ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, out_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, out_index);
   SPVM_STRING_BUFFER_add(string_buffer, " = (uint64_t)");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, in1_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, in1_index);
   SPVM_STRING_BUFFER_add(string_buffer, " / (uint64_t)");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, in2_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, in2_index);
   SPVM_STRING_BUFFER_add(string_buffer, ";\n");
   SPVM_STRING_BUFFER_add(string_buffer, "  } \n");
 }
 
-void SPVM_PRECOMPILE_add_divide_floating_point(SPVM_ENV* env, SPVM_STRING_BUFFER* string_buffer, int32_t ctype_id, int32_t out_index, int32_t in1_index, int32_t in2_index) {
+void SPVM_PRECOMPILE_add_divide_floating_point(SPVM_PRECOMPILE* precompile, SPVM_STRING_BUFFER* string_buffer, int32_t ctype_id, int32_t out_index, int32_t in1_index, int32_t in2_index) {
+  SPVM_RUNTIME* runtime = precompile->runtime;
+  
   SPVM_STRING_BUFFER_add(string_buffer, "  ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, ctype_id, out_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, ctype_id, out_index);
   SPVM_STRING_BUFFER_add(string_buffer, " = ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, ctype_id, in1_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, ctype_id, in1_index);
   SPVM_STRING_BUFFER_add(string_buffer, " / ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, ctype_id, in2_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, ctype_id, in2_index);
   SPVM_STRING_BUFFER_add(string_buffer, ";\n");
 }
 
-void SPVM_PRECOMPILE_add_remainder_integral(SPVM_ENV* env, SPVM_STRING_BUFFER* string_buffer, int32_t ctype_id, int32_t out_index, int32_t in1_index, int32_t in2_index) {
+void SPVM_PRECOMPILE_add_remainder_integral(SPVM_PRECOMPILE* precompile, SPVM_STRING_BUFFER* string_buffer, int32_t ctype_id, int32_t out_index, int32_t in1_index, int32_t in2_index) {
+  SPVM_RUNTIME* runtime = precompile->runtime;
+  
   SPVM_STRING_BUFFER_add(string_buffer, "  if (__builtin_expect(");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, ctype_id, in2_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, ctype_id, in2_index);
   SPVM_STRING_BUFFER_add(string_buffer, " == 0, 0)) {\n"
                                         "    void* exception = env->new_string_nolen_raw(env, \"0 division\");\n"
                                         "    env->set_exception(env, exception);\n"
@@ -5001,18 +5076,20 @@ void SPVM_PRECOMPILE_add_remainder_integral(SPVM_ENV* env, SPVM_STRING_BUFFER* s
                                         "  }\n"
                                         "  else {\n"
                                         "    ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, ctype_id, out_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, ctype_id, out_index);
   SPVM_STRING_BUFFER_add(string_buffer, " = ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, ctype_id, in1_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, ctype_id, in1_index);
   SPVM_STRING_BUFFER_add(string_buffer, " % /* REMAINDER */ "); // % have undarstandable bug.
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, ctype_id, in2_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, ctype_id, in2_index);
   SPVM_STRING_BUFFER_add(string_buffer, ";\n");
   SPVM_STRING_BUFFER_add(string_buffer, "  }\n");
 }
 
-void SPVM_PRECOMPILE_add_remainder_unsigned_int(SPVM_ENV* env, SPVM_STRING_BUFFER* string_buffer, int32_t out_index, int32_t in1_index, int32_t in2_index) {
+void SPVM_PRECOMPILE_add_remainder_unsigned_int(SPVM_PRECOMPILE* precompile, SPVM_STRING_BUFFER* string_buffer, int32_t out_index, int32_t in1_index, int32_t in2_index) {
+  SPVM_RUNTIME* runtime = precompile->runtime;
+  
   SPVM_STRING_BUFFER_add(string_buffer, "  if (__builtin_expect(");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, in2_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, in2_index);
   SPVM_STRING_BUFFER_add(string_buffer, " == 0, 0)) {\n"
                                         "    void* exception = env->new_string_nolen_raw(env, \"0 division\");\n"
                                         "    env->set_exception(env, exception);\n"
@@ -5020,18 +5097,20 @@ void SPVM_PRECOMPILE_add_remainder_unsigned_int(SPVM_ENV* env, SPVM_STRING_BUFFE
                                         "  }\n"
                                         "  else {\n"
                                         "    ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, out_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, out_index);
   SPVM_STRING_BUFFER_add(string_buffer, " = (uint32_t)");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, in1_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, in1_index);
   SPVM_STRING_BUFFER_add(string_buffer, " % /* REMAINDER */ (uint32_t)"); // % have undarstandable bug.
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, in2_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, in2_index);
   SPVM_STRING_BUFFER_add(string_buffer, ";\n"
                                         "  }\n");
 }
 
-void SPVM_PRECOMPILE_add_remainder_unsigned_long(SPVM_ENV* env, SPVM_STRING_BUFFER* string_buffer, int32_t out_index, int32_t in1_index, int32_t in2_index) {
+void SPVM_PRECOMPILE_add_remainder_unsigned_long(SPVM_PRECOMPILE* precompile, SPVM_STRING_BUFFER* string_buffer, int32_t out_index, int32_t in1_index, int32_t in2_index) {
+  SPVM_RUNTIME* runtime = precompile->runtime;
+  
   SPVM_STRING_BUFFER_add(string_buffer, "  if (__builtin_expect(");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, in2_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, in2_index);
   SPVM_STRING_BUFFER_add(string_buffer, " == 0, 0)) {\n"
                                         "    void* exception = env->new_string_nolen_raw(env, \"0 division\");\n"
                                         "    env->set_exception(env, exception);\n"
@@ -5039,22 +5118,24 @@ void SPVM_PRECOMPILE_add_remainder_unsigned_long(SPVM_ENV* env, SPVM_STRING_BUFF
                                         "  }\n"
                                         "  else {\n"
                                         "    ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, out_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, out_index);
   SPVM_STRING_BUFFER_add(string_buffer, " = (uint64_t)");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, in1_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, in1_index);
   SPVM_STRING_BUFFER_add(string_buffer, " % /* REMAINDER */ (uint64_t)"); // % have undarstandable bug.
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, in2_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_LONG, in2_index);
   SPVM_STRING_BUFFER_add(string_buffer, ";\n");
   SPVM_STRING_BUFFER_add(string_buffer, "  }\n");
 }
 
-void SPVM_PRECOMPILE_add_left_shift(SPVM_ENV* env, SPVM_STRING_BUFFER* string_buffer, int32_t ctype_id, int32_t out_index, int32_t in1_index, int32_t in2_index) {
+void SPVM_PRECOMPILE_add_left_shift(SPVM_PRECOMPILE* precompile, SPVM_STRING_BUFFER* string_buffer, int32_t ctype_id, int32_t out_index, int32_t in1_index, int32_t in2_index) {
+  SPVM_RUNTIME* runtime = precompile->runtime;
+  
   SPVM_STRING_BUFFER_add(string_buffer, "  ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, ctype_id, out_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, ctype_id, out_index);
   SPVM_STRING_BUFFER_add(string_buffer, " = (");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, ctype_id, in1_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, ctype_id, in1_index);
   SPVM_STRING_BUFFER_add(string_buffer, " << ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, in2_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, in2_index);
   if (ctype_id == SPVM_PRECOMPILE_C_CTYPE_ID_INT) {
     SPVM_STRING_BUFFER_add(string_buffer, ")");
   }
@@ -5067,17 +5148,19 @@ void SPVM_PRECOMPILE_add_left_shift(SPVM_ENV* env, SPVM_STRING_BUFFER* string_bu
   SPVM_STRING_BUFFER_add(string_buffer, ";\n");
 }
 
-void SPVM_PRECOMPILE_add_right_logical_shift(SPVM_ENV* env, SPVM_STRING_BUFFER* string_buffer, int32_t ctype_id, int32_t out_index, int32_t in1_index, int32_t in2_index) {
+void SPVM_PRECOMPILE_add_right_logical_shift(SPVM_PRECOMPILE* precompile, SPVM_STRING_BUFFER* string_buffer, int32_t ctype_id, int32_t out_index, int32_t in1_index, int32_t in2_index) {
+  SPVM_RUNTIME* runtime = precompile->runtime;
+  
   SPVM_STRING_BUFFER_add(string_buffer, "  ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, ctype_id, out_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, ctype_id, out_index);
   SPVM_STRING_BUFFER_add(string_buffer, " = ((");
-  SPVM_STRING_BUFFER_add(string_buffer, (char*)SPVM_PRECOMPILE_get_ctype_name(env, ctype_id));
+  SPVM_STRING_BUFFER_add(string_buffer, (char*)SPVM_PRECOMPILE_get_ctype_name(precompile, ctype_id));
   SPVM_STRING_BUFFER_add(string_buffer, ")((u");
-  SPVM_STRING_BUFFER_add(string_buffer, (char*)SPVM_PRECOMPILE_get_ctype_name(env, ctype_id));
+  SPVM_STRING_BUFFER_add(string_buffer, (char*)SPVM_PRECOMPILE_get_ctype_name(precompile, ctype_id));
   SPVM_STRING_BUFFER_add(string_buffer, ")");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, ctype_id, in1_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, ctype_id, in1_index);
   SPVM_STRING_BUFFER_add(string_buffer, " >> ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, in2_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, in2_index);
   if (ctype_id == SPVM_PRECOMPILE_C_CTYPE_ID_INT) {
     SPVM_STRING_BUFFER_add(string_buffer, ")");
   }
@@ -5090,13 +5173,15 @@ void SPVM_PRECOMPILE_add_right_logical_shift(SPVM_ENV* env, SPVM_STRING_BUFFER* 
   SPVM_STRING_BUFFER_add(string_buffer, ");\n");
 }
 
-void SPVM_PRECOMPILE_add_right_arithmetic_shift(SPVM_ENV* env, SPVM_STRING_BUFFER* string_buffer, int32_t ctype_id, int32_t out_index, int32_t in1_index, int32_t in2_index) {
+void SPVM_PRECOMPILE_add_right_arithmetic_shift(SPVM_PRECOMPILE* precompile, SPVM_STRING_BUFFER* string_buffer, int32_t ctype_id, int32_t out_index, int32_t in1_index, int32_t in2_index) {
+  SPVM_RUNTIME* runtime = precompile->runtime;
+  
   SPVM_STRING_BUFFER_add(string_buffer, "  ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, ctype_id, out_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, ctype_id, out_index);
   SPVM_STRING_BUFFER_add(string_buffer, " = (");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, ctype_id, in1_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, ctype_id, in1_index);
   SPVM_STRING_BUFFER_add(string_buffer, " >> ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, in2_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, in2_index);
   if (ctype_id == SPVM_PRECOMPILE_C_CTYPE_ID_INT) {
     SPVM_STRING_BUFFER_add(string_buffer, ")");
   }
@@ -5109,85 +5194,103 @@ void SPVM_PRECOMPILE_add_right_arithmetic_shift(SPVM_ENV* env, SPVM_STRING_BUFFE
   SPVM_STRING_BUFFER_add(string_buffer, ";\n");
 }
 
-void SPVM_PRECOMPILE_add_bit_and(SPVM_ENV* env, SPVM_STRING_BUFFER* string_buffer, int32_t ctype_id, int32_t out_index, int32_t in1_index, int32_t in2_index) {
+void SPVM_PRECOMPILE_add_bit_and(SPVM_PRECOMPILE* precompile, SPVM_STRING_BUFFER* string_buffer, int32_t ctype_id, int32_t out_index, int32_t in1_index, int32_t in2_index) {
+  SPVM_RUNTIME* runtime = precompile->runtime;
+  
   SPVM_STRING_BUFFER_add(string_buffer, "  ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, ctype_id, out_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, ctype_id, out_index);
   SPVM_STRING_BUFFER_add(string_buffer, " = ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, ctype_id, in1_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, ctype_id, in1_index);
   SPVM_STRING_BUFFER_add(string_buffer, " & ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, ctype_id, in2_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, ctype_id, in2_index);
   SPVM_STRING_BUFFER_add(string_buffer, ";\n");
 }
 
-void SPVM_PRECOMPILE_add_bit_or(SPVM_ENV* env, SPVM_STRING_BUFFER* string_buffer, int32_t ctype_id, int32_t out_index, int32_t in1_index, int32_t in2_index) {
+void SPVM_PRECOMPILE_add_bit_or(SPVM_PRECOMPILE* precompile, SPVM_STRING_BUFFER* string_buffer, int32_t ctype_id, int32_t out_index, int32_t in1_index, int32_t in2_index) {
+  SPVM_RUNTIME* runtime = precompile->runtime;
+  
   SPVM_STRING_BUFFER_add(string_buffer, "  ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, ctype_id, out_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, ctype_id, out_index);
   SPVM_STRING_BUFFER_add(string_buffer, " = ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, ctype_id, in1_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, ctype_id, in1_index);
   SPVM_STRING_BUFFER_add(string_buffer, " | ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, ctype_id, in2_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, ctype_id, in2_index);
   SPVM_STRING_BUFFER_add(string_buffer, ";\n");
 }
 
-void SPVM_PRECOMPILE_add_bit_xor(SPVM_ENV* env, SPVM_STRING_BUFFER* string_buffer, int32_t ctype_id, int32_t out_index, int32_t in1_index, int32_t in2_index) {
+void SPVM_PRECOMPILE_add_bit_xor(SPVM_PRECOMPILE* precompile, SPVM_STRING_BUFFER* string_buffer, int32_t ctype_id, int32_t out_index, int32_t in1_index, int32_t in2_index) {
+  SPVM_RUNTIME* runtime = precompile->runtime;
+  
   SPVM_STRING_BUFFER_add(string_buffer, "  ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, ctype_id, out_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, ctype_id, out_index);
   SPVM_STRING_BUFFER_add(string_buffer, " = ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, ctype_id, in1_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, ctype_id, in1_index);
   SPVM_STRING_BUFFER_add(string_buffer, " ^ ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, ctype_id, in2_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, ctype_id, in2_index);
   SPVM_STRING_BUFFER_add(string_buffer, ";\n");
 }
 
-void SPVM_PRECOMPILE_add_negate(SPVM_ENV* env, SPVM_STRING_BUFFER* string_buffer, int32_t ctype_id, int32_t out_index, int32_t in_index) {
+void SPVM_PRECOMPILE_add_negate(SPVM_PRECOMPILE* precompile, SPVM_STRING_BUFFER* string_buffer, int32_t ctype_id, int32_t out_index, int32_t in_index) {
+  SPVM_RUNTIME* runtime = precompile->runtime;
+  
   SPVM_STRING_BUFFER_add(string_buffer, "  ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, ctype_id, out_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, ctype_id, out_index);
   SPVM_STRING_BUFFER_add(string_buffer, " = -");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, ctype_id, in_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, ctype_id, in_index);
   SPVM_STRING_BUFFER_add(string_buffer, ";\n");
 }
 
-void SPVM_PRECOMPILE_add_plus(SPVM_ENV* env, SPVM_STRING_BUFFER* string_buffer, int32_t ctype_id, int32_t out_index, int32_t in_index) {
+void SPVM_PRECOMPILE_add_plus(SPVM_PRECOMPILE* precompile, SPVM_STRING_BUFFER* string_buffer, int32_t ctype_id, int32_t out_index, int32_t in_index) {
+  SPVM_RUNTIME* runtime = precompile->runtime;
+  
   SPVM_STRING_BUFFER_add(string_buffer, "  ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, ctype_id, out_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, ctype_id, out_index);
   SPVM_STRING_BUFFER_add(string_buffer, " = ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, ctype_id, in_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, ctype_id, in_index);
   SPVM_STRING_BUFFER_add(string_buffer, ";\n");
 }
 
-void SPVM_PRECOMPILE_add_complement(SPVM_ENV* env, SPVM_STRING_BUFFER* string_buffer, int32_t ctype_id, int32_t out_index, int32_t in_index) {
+void SPVM_PRECOMPILE_add_complement(SPVM_PRECOMPILE* precompile, SPVM_STRING_BUFFER* string_buffer, int32_t ctype_id, int32_t out_index, int32_t in_index) {
+  SPVM_RUNTIME* runtime = precompile->runtime;
+  
   SPVM_STRING_BUFFER_add(string_buffer, "  ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, ctype_id, out_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, ctype_id, out_index);
   SPVM_STRING_BUFFER_add(string_buffer, " = ~");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, ctype_id, in_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, ctype_id, in_index);
   SPVM_STRING_BUFFER_add(string_buffer, ";\n");
 }
 
-void SPVM_PRECOMPILE_add_inc(SPVM_ENV* env, SPVM_STRING_BUFFER* string_buffer, int32_t ctype_id, int32_t out_index, int32_t number) {
+void SPVM_PRECOMPILE_add_inc(SPVM_PRECOMPILE* precompile, SPVM_STRING_BUFFER* string_buffer, int32_t ctype_id, int32_t out_index, int32_t number) {
+  SPVM_RUNTIME* runtime = precompile->runtime;
+  
   SPVM_STRING_BUFFER_add(string_buffer, "  ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, ctype_id, out_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, ctype_id, out_index);
   SPVM_STRING_BUFFER_add(string_buffer, " += ");
   SPVM_STRING_BUFFER_add_int(string_buffer, number);
   SPVM_STRING_BUFFER_add(string_buffer, ";\n");
 }
 
-void SPVM_PRECOMPILE_add_convert(SPVM_ENV* env, SPVM_STRING_BUFFER* string_buffer, int32_t out_ctype_id, int32_t in_ctype_id, int32_t out_index, int32_t in_index) {
+void SPVM_PRECOMPILE_add_convert(SPVM_PRECOMPILE* precompile, SPVM_STRING_BUFFER* string_buffer, int32_t out_ctype_id, int32_t in_ctype_id, int32_t out_index, int32_t in_index) {
+  SPVM_RUNTIME* runtime = precompile->runtime;
+  
   SPVM_STRING_BUFFER_add(string_buffer, "  ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, out_ctype_id, out_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, out_ctype_id, out_index);
   SPVM_STRING_BUFFER_add(string_buffer, " = (");
-  SPVM_STRING_BUFFER_add(string_buffer, (char*)SPVM_PRECOMPILE_get_ctype_name(env, out_ctype_id));
+  SPVM_STRING_BUFFER_add(string_buffer, (char*)SPVM_PRECOMPILE_get_ctype_name(precompile, out_ctype_id));
   SPVM_STRING_BUFFER_add(string_buffer, ")");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, in_ctype_id, in_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, in_ctype_id, in_index);
   SPVM_STRING_BUFFER_add(string_buffer, ";\n");
 }
 
-void SPVM_PRECOMPILE_add_array_fetch(SPVM_ENV* env, SPVM_STRING_BUFFER* string_buffer, int32_t element_ctype_id, int32_t out_index, int32_t array_index, int32_t index_index) {
+void SPVM_PRECOMPILE_add_array_fetch(SPVM_PRECOMPILE* precompile, SPVM_STRING_BUFFER* string_buffer, int32_t element_ctype_id, int32_t out_index, int32_t array_index, int32_t index_index) {
+  SPVM_RUNTIME* runtime = precompile->runtime;
+  
   SPVM_STRING_BUFFER_add(string_buffer, "  {\n"
                                         "    void* array = ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, array_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, array_index);
   SPVM_STRING_BUFFER_add(string_buffer, ";\n"
                                         "    int32_t index = ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, index_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, index_index);
   SPVM_STRING_BUFFER_add(string_buffer, ";\n"
                                         "    if (__builtin_expect(array == NULL, 0)) { \n"
                                         "      env->set_exception(env, env->new_string_nolen_raw(env, \"Array must not be undef\")); \n"
@@ -5200,22 +5303,24 @@ void SPVM_PRECOMPILE_add_array_fetch(SPVM_ENV* env, SPVM_STRING_BUFFER* string_b
                                         "      } \n"
                                         "      else { \n"
                                         "        ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, element_ctype_id, out_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, element_ctype_id, out_index);
   SPVM_STRING_BUFFER_add(string_buffer, " = ((");
-  SPVM_STRING_BUFFER_add(string_buffer, (char*)SPVM_PRECOMPILE_get_ctype_name(env, element_ctype_id));
+  SPVM_STRING_BUFFER_add(string_buffer, (char*)SPVM_PRECOMPILE_get_ctype_name(precompile, element_ctype_id));
   SPVM_STRING_BUFFER_add(string_buffer, "*)((intptr_t)array + object_header_byte_size))[index];\n"
                                         "      } \n"
                                         "    } \n"
                                         "  } \n");
 }
 
-void SPVM_PRECOMPILE_add_array_store(SPVM_ENV* env, SPVM_STRING_BUFFER* string_buffer, int32_t element_ctype_id, int32_t array_index, int32_t index_index, int32_t in_index) {
+void SPVM_PRECOMPILE_add_array_store(SPVM_PRECOMPILE* precompile, SPVM_STRING_BUFFER* string_buffer, int32_t element_ctype_id, int32_t array_index, int32_t index_index, int32_t in_index) {
+  SPVM_RUNTIME* runtime = precompile->runtime;
+  
   SPVM_STRING_BUFFER_add(string_buffer, "  {\n"
                                         "    void* array = ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, array_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, array_index);
   SPVM_STRING_BUFFER_add(string_buffer, ";\n"
                                         "    int32_t index = ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, index_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, index_index);
   SPVM_STRING_BUFFER_add(string_buffer, ";\n"
                                         "    if (__builtin_expect(array == NULL, 0)) { \n"
                                         "      env->set_exception(env, env->new_string_nolen_raw(env, \"Array must not be undef\")); \n"
@@ -5228,22 +5333,24 @@ void SPVM_PRECOMPILE_add_array_store(SPVM_ENV* env, SPVM_STRING_BUFFER* string_b
                                         "      } \n"
                                         "      else { \n"
                                         "((");
-  SPVM_STRING_BUFFER_add(string_buffer, (char*)SPVM_PRECOMPILE_get_ctype_name(env, element_ctype_id));
+  SPVM_STRING_BUFFER_add(string_buffer, (char*)SPVM_PRECOMPILE_get_ctype_name(precompile, element_ctype_id));
   SPVM_STRING_BUFFER_add(string_buffer, "*)((intptr_t)array + object_header_byte_size))[index] = ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, element_ctype_id, in_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, element_ctype_id, in_index);
   SPVM_STRING_BUFFER_add(string_buffer, ";\n"
                                         "      } \n"
                                         "    } \n"
                                         "  } \n");
 }
 
-void SPVM_PRECOMPILE_add_mulnum_array_fetch(SPVM_ENV* env, SPVM_STRING_BUFFER* string_buffer, int32_t element_ctype_id, int32_t out_index, int32_t array_index, int32_t index_index, int32_t fields_length) {
+void SPVM_PRECOMPILE_add_mulnum_array_fetch(SPVM_PRECOMPILE* precompile, SPVM_STRING_BUFFER* string_buffer, int32_t element_ctype_id, int32_t out_index, int32_t array_index, int32_t index_index, int32_t fields_length) {
+  SPVM_RUNTIME* runtime = precompile->runtime;
+  
   SPVM_STRING_BUFFER_add(string_buffer, "  {\n"
                                         "    void* array = ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, array_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, array_index);
   SPVM_STRING_BUFFER_add(string_buffer, ";\n"
                                         "    int32_t index = ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, index_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, index_index);
   SPVM_STRING_BUFFER_add(string_buffer, ";\n"
                                         "    if (__builtin_expect(array == NULL, 0)) { \n"
                                         "      env->set_exception(env, env->new_string_nolen_raw(env, \"Array must not be undef\")); \n"
@@ -5259,9 +5366,9 @@ void SPVM_PRECOMPILE_add_mulnum_array_fetch(SPVM_ENV* env, SPVM_STRING_BUFFER* s
     int32_t field_index;
     for (field_index = 0; field_index < fields_length; field_index++) {
       SPVM_STRING_BUFFER_add(string_buffer, "        ");
-      SPVM_PRECOMPILE_add_operand_value(env, string_buffer, element_ctype_id, out_index, field_index);
+      SPVM_PRECOMPILE_add_operand_value(precompile, string_buffer, element_ctype_id, out_index, field_index);
       SPVM_STRING_BUFFER_add(string_buffer, " = ((");
-      SPVM_STRING_BUFFER_add(string_buffer, (char*)SPVM_PRECOMPILE_get_ctype_name(env, element_ctype_id));
+      SPVM_STRING_BUFFER_add(string_buffer, (char*)SPVM_PRECOMPILE_get_ctype_name(precompile, element_ctype_id));
       SPVM_STRING_BUFFER_add(string_buffer, "*)((intptr_t)array + object_header_byte_size))[");
       SPVM_STRING_BUFFER_add_int(string_buffer, fields_length);
       SPVM_STRING_BUFFER_add(string_buffer, " * index + ");
@@ -5274,13 +5381,15 @@ void SPVM_PRECOMPILE_add_mulnum_array_fetch(SPVM_ENV* env, SPVM_STRING_BUFFER* s
                                         "  } \n");
 }
 
-void SPVM_PRECOMPILE_add_mulnum_array_field_fetch(SPVM_ENV* env, SPVM_STRING_BUFFER* string_buffer, int32_t element_ctype_id, int32_t out_index, int32_t array_index, int32_t index_index, int32_t fields_length, int32_t field_index) {
+void SPVM_PRECOMPILE_add_mulnum_array_field_fetch(SPVM_PRECOMPILE* precompile, SPVM_STRING_BUFFER* string_buffer, int32_t element_ctype_id, int32_t out_index, int32_t array_index, int32_t index_index, int32_t fields_length, int32_t field_index) {
+  SPVM_RUNTIME* runtime = precompile->runtime;
+  
   SPVM_STRING_BUFFER_add(string_buffer, "  {\n"
                                         "    void* array = ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, array_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, array_index);
   SPVM_STRING_BUFFER_add(string_buffer, ";\n");
   SPVM_STRING_BUFFER_add(string_buffer, "    int32_t index = ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, index_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, index_index);
   SPVM_STRING_BUFFER_add(string_buffer, ";\n"
                                         "    if (__builtin_expect(array == NULL, 0)) { \n"
                                         "      env->set_exception(env, env->new_string_nolen_raw(env, \"Array must not be undef\")); \n"
@@ -5293,9 +5402,9 @@ void SPVM_PRECOMPILE_add_mulnum_array_field_fetch(SPVM_ENV* env, SPVM_STRING_BUF
                                         "      } \n"
                                         "      else { \n"
                                         "        ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, element_ctype_id, out_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, element_ctype_id, out_index);
   SPVM_STRING_BUFFER_add(string_buffer, " = ((");
-  SPVM_STRING_BUFFER_add(string_buffer, (char*)SPVM_PRECOMPILE_get_ctype_name(env, element_ctype_id));
+  SPVM_STRING_BUFFER_add(string_buffer, (char*)SPVM_PRECOMPILE_get_ctype_name(precompile, element_ctype_id));
   SPVM_STRING_BUFFER_add(string_buffer, "*)((intptr_t)array + object_header_byte_size))[");
   SPVM_STRING_BUFFER_add_int(string_buffer, fields_length);
   SPVM_STRING_BUFFER_add(string_buffer, " * index + ");
@@ -5306,13 +5415,15 @@ void SPVM_PRECOMPILE_add_mulnum_array_field_fetch(SPVM_ENV* env, SPVM_STRING_BUF
                                         "  } \n");
 }
 
-void SPVM_PRECOMPILE_add_mulnum_array_store(SPVM_ENV* env, SPVM_STRING_BUFFER* string_buffer, int32_t element_ctype_id, int32_t array_index, int32_t index_index, int32_t in_index, int32_t fields_length) {
+void SPVM_PRECOMPILE_add_mulnum_array_store(SPVM_PRECOMPILE* precompile, SPVM_STRING_BUFFER* string_buffer, int32_t element_ctype_id, int32_t array_index, int32_t index_index, int32_t in_index, int32_t fields_length) {
+  SPVM_RUNTIME* runtime = precompile->runtime;
+  
   SPVM_STRING_BUFFER_add(string_buffer, "  {\n"
                                         "    void* array = ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, array_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, array_index);
   SPVM_STRING_BUFFER_add(string_buffer, ";\n"
                                         "    int32_t index = ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, index_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, index_index);
   SPVM_STRING_BUFFER_add(string_buffer, ";\n"
                                         "    if (__builtin_expect(array == NULL, 0)) { \n"
                                         "      env->set_exception(env, env->new_string_nolen_raw(env, \"Array must not be undef\")); \n"
@@ -5329,13 +5440,13 @@ void SPVM_PRECOMPILE_add_mulnum_array_store(SPVM_ENV* env, SPVM_STRING_BUFFER* s
     int32_t field_index;
     for (field_index = 0; field_index < fields_length; field_index++) {
       SPVM_STRING_BUFFER_add(string_buffer, "      ((");
-      SPVM_STRING_BUFFER_add(string_buffer, (char*)SPVM_PRECOMPILE_get_ctype_name(env, element_ctype_id));
+      SPVM_STRING_BUFFER_add(string_buffer, (char*)SPVM_PRECOMPILE_get_ctype_name(precompile, element_ctype_id));
       SPVM_STRING_BUFFER_add(string_buffer, "*)((intptr_t)array + object_header_byte_size))[");
       SPVM_STRING_BUFFER_add_int(string_buffer, fields_length);
       SPVM_STRING_BUFFER_add(string_buffer, " * index + ");
       SPVM_STRING_BUFFER_add_int(string_buffer, field_index);
       SPVM_STRING_BUFFER_add(string_buffer, "] = ");
-      SPVM_PRECOMPILE_add_operand_value(env, string_buffer, element_ctype_id, in_index, field_index);
+      SPVM_PRECOMPILE_add_operand_value(precompile, string_buffer, element_ctype_id, in_index, field_index);
       SPVM_STRING_BUFFER_add(string_buffer, ";\n");
     }
   }
@@ -5345,13 +5456,15 @@ void SPVM_PRECOMPILE_add_mulnum_array_store(SPVM_ENV* env, SPVM_STRING_BUFFER* s
                                         "  } \n");
 }
 
-void SPVM_PRECOMPILE_add_mulnum_array_field_store(SPVM_ENV* env, SPVM_STRING_BUFFER* string_buffer, int32_t element_ctype_id, int32_t array_index, int32_t index_index, int32_t in_index, int32_t fields_length, int32_t field_index) {
+void SPVM_PRECOMPILE_add_mulnum_array_field_store(SPVM_PRECOMPILE* precompile, SPVM_STRING_BUFFER* string_buffer, int32_t element_ctype_id, int32_t array_index, int32_t index_index, int32_t in_index, int32_t fields_length, int32_t field_index) {
+  SPVM_RUNTIME* runtime = precompile->runtime;
+  
   SPVM_STRING_BUFFER_add(string_buffer, "  {\n"
                                         "    void* array = ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, array_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, array_index);
   SPVM_STRING_BUFFER_add(string_buffer, ";\n"
                                         "    int32_t index = ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, index_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, index_index);
   SPVM_STRING_BUFFER_add(string_buffer, ";\n"
                                         "    if (__builtin_expect(array == NULL, 0)) { \n"
                                         "      env->set_exception(env, env->new_string_nolen_raw(env, \"Array must not be undef\")); \n"
@@ -5364,20 +5477,22 @@ void SPVM_PRECOMPILE_add_mulnum_array_field_store(SPVM_ENV* env, SPVM_STRING_BUF
                                         "      } \n"
                                         "      else { \n"
                                         "        ((");
-  SPVM_STRING_BUFFER_add(string_buffer, (char*)SPVM_PRECOMPILE_get_ctype_name(env, element_ctype_id));
+  SPVM_STRING_BUFFER_add(string_buffer, (char*)SPVM_PRECOMPILE_get_ctype_name(precompile, element_ctype_id));
   SPVM_STRING_BUFFER_add(string_buffer, "*)((intptr_t)array + object_header_byte_size))[");
   SPVM_STRING_BUFFER_add_int(string_buffer, fields_length);
   SPVM_STRING_BUFFER_add(string_buffer, " * index + ");
   SPVM_STRING_BUFFER_add_int(string_buffer, field_index);
   SPVM_STRING_BUFFER_add(string_buffer, "] = ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, element_ctype_id, in_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, element_ctype_id, in_index);
   SPVM_STRING_BUFFER_add(string_buffer, ";\n"
                                         "      }\n"
                                         "    }\n"
                                         "  }\n");
 }
 
-void SPVM_PRECOMPILE_add_mulnum_deref(SPVM_ENV* env, SPVM_STRING_BUFFER* string_buffer, int32_t element_ctype_id, int32_t out_var_id, int32_t ref_var_id, int32_t fields_length) {
+void SPVM_PRECOMPILE_add_mulnum_deref(SPVM_PRECOMPILE* precompile, SPVM_STRING_BUFFER* string_buffer, int32_t element_ctype_id, int32_t out_var_id, int32_t ref_var_id, int32_t fields_length) {
+  SPVM_RUNTIME* runtime = precompile->runtime;
+  
 
   SPVM_STRING_BUFFER_add(string_buffer, "  {\n");
   switch (element_ctype_id) {
@@ -5410,7 +5525,7 @@ void SPVM_PRECOMPILE_add_mulnum_deref(SPVM_ENV* env, SPVM_STRING_BUFFER* string_
   SPVM_STRING_BUFFER_add(string_buffer, "];\n");
   for (int32_t field_index = 0; field_index < fields_length; field_index++) {
     SPVM_STRING_BUFFER_add(string_buffer, "    *(");
-    SPVM_STRING_BUFFER_add(string_buffer, (char*)SPVM_PRECOMPILE_get_ctype_name(env, element_ctype_id));
+    SPVM_STRING_BUFFER_add(string_buffer, (char*)SPVM_PRECOMPILE_get_ctype_name(precompile, element_ctype_id));
     SPVM_STRING_BUFFER_add(string_buffer, "*)&");
     switch (element_ctype_id) {
       case SPVM_PRECOMPILE_C_CTYPE_ID_BYTE: {
@@ -5443,7 +5558,7 @@ void SPVM_PRECOMPILE_add_mulnum_deref(SPVM_ENV* env, SPVM_STRING_BUFFER* string_
     SPVM_STRING_BUFFER_add(string_buffer, " + ");
     SPVM_STRING_BUFFER_add_int(string_buffer, field_index);
     SPVM_STRING_BUFFER_add(string_buffer, "]  = *(");
-    SPVM_STRING_BUFFER_add(string_buffer, (char*)SPVM_PRECOMPILE_get_ctype_name(env, element_ctype_id));
+    SPVM_STRING_BUFFER_add(string_buffer, (char*)SPVM_PRECOMPILE_get_ctype_name(precompile, element_ctype_id));
     SPVM_STRING_BUFFER_add(string_buffer, "*)&value_ref[");
     SPVM_STRING_BUFFER_add_int(string_buffer, field_index);
     SPVM_STRING_BUFFER_add(string_buffer, "];\n");
@@ -5451,8 +5566,8 @@ void SPVM_PRECOMPILE_add_mulnum_deref(SPVM_ENV* env, SPVM_STRING_BUFFER* string_
   SPVM_STRING_BUFFER_add(string_buffer, "  }\n");
 }
 
-void SPVM_PRECOMPILE_add_mulnum_deref_get_field(SPVM_ENV* env, SPVM_STRING_BUFFER* string_buffer, int32_t element_ctype_id, int32_t out_var_id, int32_t ref_var_id, int32_t field_index) {
-
+void SPVM_PRECOMPILE_add_mulnum_deref_get_field(SPVM_PRECOMPILE* precompile, SPVM_STRING_BUFFER* string_buffer, int32_t element_ctype_id, int32_t out_var_id, int32_t ref_var_id, int32_t field_index) {  
+  SPVM_RUNTIME* runtime = precompile->runtime;
   SPVM_STRING_BUFFER_add(string_buffer, "  {\n");
   switch (element_ctype_id) {
     case SPVM_PRECOMPILE_C_CTYPE_ID_BYTE: {
@@ -5483,7 +5598,7 @@ void SPVM_PRECOMPILE_add_mulnum_deref_get_field(SPVM_ENV* env, SPVM_STRING_BUFFE
   SPVM_STRING_BUFFER_add_int(string_buffer, ref_var_id);
   SPVM_STRING_BUFFER_add(string_buffer, "];\n"
                                         "    *(");
-  SPVM_STRING_BUFFER_add(string_buffer, (char*)SPVM_PRECOMPILE_get_ctype_name(env, element_ctype_id));
+  SPVM_STRING_BUFFER_add(string_buffer, (char*)SPVM_PRECOMPILE_get_ctype_name(precompile, element_ctype_id));
   SPVM_STRING_BUFFER_add(string_buffer, "*)&");
   switch (element_ctype_id) {
     case SPVM_PRECOMPILE_C_CTYPE_ID_BYTE: {
@@ -5514,14 +5629,16 @@ void SPVM_PRECOMPILE_add_mulnum_deref_get_field(SPVM_ENV* env, SPVM_STRING_BUFFE
   SPVM_STRING_BUFFER_add(string_buffer, "[");
   SPVM_STRING_BUFFER_add_int(string_buffer, out_var_id);
   SPVM_STRING_BUFFER_add(string_buffer, "] = *(");
-  SPVM_STRING_BUFFER_add(string_buffer, (char*)SPVM_PRECOMPILE_get_ctype_name(env, element_ctype_id));
+  SPVM_STRING_BUFFER_add(string_buffer, (char*)SPVM_PRECOMPILE_get_ctype_name(precompile, element_ctype_id));
   SPVM_STRING_BUFFER_add(string_buffer, "*)&value_ref[");
   SPVM_STRING_BUFFER_add_int(string_buffer, field_index);
   SPVM_STRING_BUFFER_add(string_buffer, "];\n"
                                         "  }\n");
 }
 
-void SPVM_PRECOMPILE_add_mulnum_deref_set_field(SPVM_ENV* env, SPVM_STRING_BUFFER* string_buffer, int32_t element_ctype_id, int32_t ref_var_id, int32_t in_var_id, int32_t field_index) {
+void SPVM_PRECOMPILE_add_mulnum_deref_set_field(SPVM_PRECOMPILE* precompile, SPVM_STRING_BUFFER* string_buffer, int32_t element_ctype_id, int32_t ref_var_id, int32_t in_var_id, int32_t field_index) {
+  SPVM_RUNTIME* runtime = precompile->runtime;
+  
   SPVM_STRING_BUFFER_add(string_buffer, "  {\n");
   switch (element_ctype_id) {
     case SPVM_PRECOMPILE_C_CTYPE_ID_BYTE: {
@@ -5552,11 +5669,11 @@ void SPVM_PRECOMPILE_add_mulnum_deref_set_field(SPVM_ENV* env, SPVM_STRING_BUFFE
   SPVM_STRING_BUFFER_add_int(string_buffer, ref_var_id);
   SPVM_STRING_BUFFER_add(string_buffer, "];\n"
                                         "    *(");
-  SPVM_STRING_BUFFER_add(string_buffer, (char*)SPVM_PRECOMPILE_get_ctype_name(env, element_ctype_id));
+  SPVM_STRING_BUFFER_add(string_buffer, (char*)SPVM_PRECOMPILE_get_ctype_name(precompile, element_ctype_id));
   SPVM_STRING_BUFFER_add(string_buffer, "*)&value_ref[");
   SPVM_STRING_BUFFER_add_int(string_buffer, field_index);
   SPVM_STRING_BUFFER_add(string_buffer, "] = *(");
-  SPVM_STRING_BUFFER_add(string_buffer, (char*)SPVM_PRECOMPILE_get_ctype_name(env, element_ctype_id));
+  SPVM_STRING_BUFFER_add(string_buffer, (char*)SPVM_PRECOMPILE_get_ctype_name(precompile, element_ctype_id));
   SPVM_STRING_BUFFER_add(string_buffer, "*)&");
   switch (element_ctype_id) {
     case SPVM_PRECOMPILE_C_CTYPE_ID_BYTE: {
@@ -5590,39 +5707,46 @@ void SPVM_PRECOMPILE_add_mulnum_deref_set_field(SPVM_ENV* env, SPVM_STRING_BUFFE
                                         "  }\n");
 }
 
-void SPVM_PRECOMPILE_add_move(SPVM_ENV* env, SPVM_STRING_BUFFER* string_buffer, int32_t ctype_id, int32_t out_index, int32_t in_index) {
-  SPVM_STRING_BUFFER_add(string_buffer, "  ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, ctype_id, out_index);
-  SPVM_STRING_BUFFER_add(string_buffer, " = ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, ctype_id, in_index);
-  SPVM_STRING_BUFFER_add(string_buffer, ";\n");
-}
-
-void SPVM_PRECOMPILE_add_get_deref(SPVM_ENV* env, SPVM_STRING_BUFFER* string_buffer, int32_t ctype_id, int32_t out_index, int32_t in_index) {
-  SPVM_STRING_BUFFER_add(string_buffer, "  ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, ctype_id, out_index);
-  SPVM_STRING_BUFFER_add(string_buffer, " = ");
-  SPVM_PRECOMPILE_add_operand_deref(env, string_buffer, ctype_id, in_index);
-  SPVM_STRING_BUFFER_add(string_buffer, ";\n");
-}
-
-void SPVM_PRECOMPILE_add_set_deref(SPVM_ENV* env, SPVM_STRING_BUFFER* string_buffer, int32_t ctype_id, int32_t out_index, int32_t in_index) {
-  SPVM_STRING_BUFFER_add(string_buffer, "  ");
-  SPVM_PRECOMPILE_add_operand_deref(env, string_buffer, ctype_id, out_index);
-  SPVM_STRING_BUFFER_add(string_buffer, " = ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, ctype_id, in_index);
-  SPVM_STRING_BUFFER_add(string_buffer, ";\n");
-}
-
-void SPVM_PRECOMPILE_add_get_field(SPVM_ENV* env, SPVM_STRING_BUFFER* string_buffer, int32_t field_ctype_id, int32_t out_index, int32_t object_index, int32_t field_id) {
+void SPVM_PRECOMPILE_add_move(SPVM_PRECOMPILE* precompile, SPVM_STRING_BUFFER* string_buffer, int32_t ctype_id, int32_t out_index, int32_t in_index) {
+  SPVM_RUNTIME* runtime = precompile->runtime;
   
-  int32_t field_class_id = SPVM_API_get_field_class_id(env, field_id);
-  int32_t field_class_name_id = SPVM_API_get_class_name_id(env, field_class_id);
-  const char* field_class_name = SPVM_API_get_name(env, field_class_name_id);
-  int32_t field_name_id = SPVM_API_get_field_name_id(env, field_id);
-  const char* field_name = SPVM_API_get_name(env, field_name_id);
-  int32_t field_signature_id = SPVM_API_get_field_signature_id(env, field_id);
-  const char* field_signature = SPVM_API_get_name(env, field_signature_id);
+  SPVM_STRING_BUFFER_add(string_buffer, "  ");
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, ctype_id, out_index);
+  SPVM_STRING_BUFFER_add(string_buffer, " = ");
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, ctype_id, in_index);
+  SPVM_STRING_BUFFER_add(string_buffer, ";\n");
+}
+
+void SPVM_PRECOMPILE_add_get_deref(SPVM_PRECOMPILE* precompile, SPVM_STRING_BUFFER* string_buffer, int32_t ctype_id, int32_t out_index, int32_t in_index) {
+  SPVM_RUNTIME* runtime = precompile->runtime;
+  
+  SPVM_STRING_BUFFER_add(string_buffer, "  ");
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, ctype_id, out_index);
+  SPVM_STRING_BUFFER_add(string_buffer, " = ");
+  SPVM_PRECOMPILE_add_operand_deref(precompile, string_buffer, ctype_id, in_index);
+  SPVM_STRING_BUFFER_add(string_buffer, ";\n");
+}
+
+void SPVM_PRECOMPILE_add_set_deref(SPVM_PRECOMPILE* precompile, SPVM_STRING_BUFFER* string_buffer, int32_t ctype_id, int32_t out_index, int32_t in_index) {
+  SPVM_RUNTIME* runtime = precompile->runtime;
+  
+  SPVM_STRING_BUFFER_add(string_buffer, "  ");
+  SPVM_PRECOMPILE_add_operand_deref(precompile, string_buffer, ctype_id, out_index);
+  SPVM_STRING_BUFFER_add(string_buffer, " = ");
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, ctype_id, in_index);
+  SPVM_STRING_BUFFER_add(string_buffer, ";\n");
+}
+
+void SPVM_PRECOMPILE_add_get_field(SPVM_PRECOMPILE* precompile, SPVM_STRING_BUFFER* string_buffer, int32_t field_ctype_id, int32_t out_index, int32_t object_index, int32_t field_id) {
+  SPVM_RUNTIME* runtime = precompile->runtime;
+  
+  int32_t field_class_id = SPVM_API_RUNTIME_get_field_class_id(runtime, field_id);
+  int32_t field_class_name_id = SPVM_API_RUNTIME_get_class_name_id(runtime, field_class_id);
+  const char* field_class_name = SPVM_API_RUNTIME_get_name(runtime, field_class_name_id);
+  int32_t field_name_id = SPVM_API_RUNTIME_get_field_name_id(runtime, field_id);
+  const char* field_name = SPVM_API_RUNTIME_get_name(runtime, field_name_id);
+  int32_t field_signature_id = SPVM_API_RUNTIME_get_field_signature_id(runtime, field_id);
+  const char* field_signature = SPVM_API_RUNTIME_get_name(runtime, field_signature_id);
 
   SPVM_STRING_BUFFER_add(string_buffer, "  {\n"
                                         "    int32_t access_field_id = env->get_field_id(env, \"");
@@ -5649,7 +5773,7 @@ void SPVM_PRECOMPILE_add_get_field(SPVM_ENV* env, SPVM_STRING_BUFFER* string_buf
                                         "access_field_id"
                                         ");\n"
                                         "      void* object = ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, object_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, object_index);
   SPVM_STRING_BUFFER_add(string_buffer, ";\n"
                                         "      if (__builtin_expect(object == NULL, 0)) {\n"
                                         "        env->set_exception(env, env->new_string_nolen_raw(env, \"The invocants of getting fields must not be undefined values\"));\n"
@@ -5657,9 +5781,9 @@ void SPVM_PRECOMPILE_add_get_field(SPVM_ENV* env, SPVM_STRING_BUFFER* string_buf
                                         "      }\n"
                                         "      else {\n"
                                         "        ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, field_ctype_id, out_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, field_ctype_id, out_index);
   SPVM_STRING_BUFFER_add(string_buffer, " = *(");
-  SPVM_STRING_BUFFER_add(string_buffer, (char*)SPVM_PRECOMPILE_get_ctype_name(env, field_ctype_id));
+  SPVM_STRING_BUFFER_add(string_buffer, (char*)SPVM_PRECOMPILE_get_ctype_name(precompile, field_ctype_id));
   SPVM_STRING_BUFFER_add(string_buffer, "*)((intptr_t)object + object_header_byte_size + "
                                         "access_field_offset"
                                         ");\n"
@@ -5668,15 +5792,16 @@ void SPVM_PRECOMPILE_add_get_field(SPVM_ENV* env, SPVM_STRING_BUFFER* string_buf
                                         "  }\n");
 }
 
-void SPVM_PRECOMPILE_add_set_field(SPVM_ENV* env, SPVM_STRING_BUFFER* string_buffer, int32_t field_ctype_id, int32_t object_index, int32_t field_id, int32_t in_index) {
+void SPVM_PRECOMPILE_add_set_field(SPVM_PRECOMPILE* precompile, SPVM_STRING_BUFFER* string_buffer, int32_t field_ctype_id, int32_t object_index, int32_t field_id, int32_t in_index) {
+  SPVM_RUNTIME* runtime = precompile->runtime;
   
-  int32_t field_class_id = SPVM_API_get_field_class_id(env, field_id);
-  int32_t field_class_name_id = SPVM_API_get_class_name_id(env, field_class_id);
-  const char* field_class_name = SPVM_API_get_name(env, field_class_name_id);
-  int32_t field_name_id = SPVM_API_get_field_name_id(env, field_id);
-  const char* field_name = SPVM_API_get_name(env, field_name_id);
-  int32_t field_signature_id = SPVM_API_get_field_signature_id(env, field_id);
-  const char* field_signature = SPVM_API_get_name(env, field_signature_id);
+  int32_t field_class_id = SPVM_API_RUNTIME_get_field_class_id(runtime, field_id);
+  int32_t field_class_name_id = SPVM_API_RUNTIME_get_class_name_id(runtime, field_class_id);
+  const char* field_class_name = SPVM_API_RUNTIME_get_name(runtime, field_class_name_id);
+  int32_t field_name_id = SPVM_API_RUNTIME_get_field_name_id(runtime, field_id);
+  const char* field_name = SPVM_API_RUNTIME_get_name(runtime, field_name_id);
+  int32_t field_signature_id = SPVM_API_RUNTIME_get_field_signature_id(runtime, field_id);
+  const char* field_signature = SPVM_API_RUNTIME_get_name(runtime, field_signature_id);
 
   SPVM_STRING_BUFFER_add(string_buffer, "  {\n");
   SPVM_STRING_BUFFER_add(string_buffer, "    int32_t access_field_id = env->get_field_id(env, \"");
@@ -5703,7 +5828,7 @@ void SPVM_PRECOMPILE_add_set_field(SPVM_ENV* env, SPVM_STRING_BUFFER* string_buf
                                         "access_field_id"
                                         ");\n"
                                         "      void* object = ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, object_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, object_index);
   SPVM_STRING_BUFFER_add(string_buffer, ";\n"
                                         "      if (__builtin_expect(object == NULL, 0)) {\n"
                                         "        env->set_exception(env, env->new_string_nolen_raw(env, \"Invocants of setting fields must not be undefined values\"));\n"
@@ -5711,9 +5836,9 @@ void SPVM_PRECOMPILE_add_set_field(SPVM_ENV* env, SPVM_STRING_BUFFER* string_buf
                                         "      }\n"
                                         "      else {\n"
                                         "        *(");
-  SPVM_STRING_BUFFER_add(string_buffer, (char*)SPVM_PRECOMPILE_get_ctype_name(env, field_ctype_id));
+  SPVM_STRING_BUFFER_add(string_buffer, (char*)SPVM_PRECOMPILE_get_ctype_name(precompile, field_ctype_id));
   SPVM_STRING_BUFFER_add(string_buffer, "*)((intptr_t)object + object_header_byte_size + access_field_offset) = ");
-  SPVM_PRECOMPILE_add_operand(env, string_buffer, field_ctype_id, in_index);
+  SPVM_PRECOMPILE_add_operand(precompile, string_buffer, field_ctype_id, in_index);
   SPVM_STRING_BUFFER_add(string_buffer, ";\n"
                                         "      }\n"
                                         "    }\n"

@@ -55,7 +55,7 @@ requires:
   warnings: '0'
   warnings::register: '0'
 resources:
-  bugtracker: https://git.deguest.jp/jack/HTML-Object/issues
-  repository: https://git.deguest.jp/jack/HTML-Object
-version: v0.1.3
+  bugtracker: https://gitlab.com/jackdeguest/HTML-Object/issues
+  repository: https://gitlab.com/jackdeguest/HTML-Object
+version: v0.1.4
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,5 +1,5 @@
 package Lingua::EN::Syllable;
-$Lingua::EN::Syllable::VERSION = '0.30';
+$Lingua::EN::Syllable::VERSION = '0.31';
 # ABSTRACT: count the number of syllables in English words
 
 use 5.006;

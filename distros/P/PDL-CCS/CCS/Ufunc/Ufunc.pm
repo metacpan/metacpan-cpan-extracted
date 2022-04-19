@@ -13,7 +13,7 @@ use DynaLoader;
 
 
 
-   $PDL::CCS::Ufunc::VERSION = 1.23.19;
+   $PDL::CCS::Ufunc::VERSION = 1.23.20;
    @ISA    = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::CCS::Ufunc $VERSION;
@@ -1174,7 +1174,7 @@ The state of the bad-value flag of the output piddles is unknown.
     missing();
     indx N();
     indx [o]ixOut(Ndims,NnzOut);
-    int+ [o]nzvalsOut(NnzOut);
+    indx [o]nzvalsOut(NnzOut);
     indx [o]nOut();
     )
 
@@ -1257,7 +1257,7 @@ The state of the bad-value flag of the output piddles is unknown.
     missing();
     indx N();
     indx [o]ixOut(Ndims,NnzOut);
-    int+ [o]nzvalsOut(NnzOut);
+    indx [o]nzvalsOut(NnzOut);
     indx [o]nOut();
     )
 

@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
 keywords:
   - TAP
   - test
@@ -29,5 +29,5 @@ resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Test-Harness
   homepage: http://testanything.org/
   repository: http://github.com/Perl-Toolchain-Gang/Test-Harness/tree/master
-version: '3.42'
+version: '3.44'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -5,7 +5,7 @@
 ##======================================================================
 
 use PDL::VectorValued::Dev;
-my $VERSION = '1.23.19'; ##-- update with perl-reversion from Perl::Version module
+my $VERSION = '1.23.20'; ##-- update with perl-reversion from Perl::Version module
 pp_setversion($VERSION);
 
 ##------------------------------------------------------
@@ -98,6 +98,8 @@ pp_addhdr( $PDL::CCS::Config::ccsConfig{INDX_TYPEDEF} );
 ##    tmp_addval      => $ppcode_or_undef,   ##-- add PP value $nzvalsIn(NnzIn=>nnzii) to tmp
 ##    tmp_reset       => $ppcode_or_undef,   ##-- reset tmp on index change (default: tmp=$nzvalsIn(NnzIn=>nnzii)) --> QUITE USELESS
 ##    doc_addmissing  => $addmissing_doc,    ##-- doc for 'addmissing'
+##    copybad_ix      => $ppcode_or_undef,   ##-- CopyBadStatusCode ppcode for ix
+##    copybad_nzvals  => $ppcode_or_undef,   ##-- CopyBadStatusCode ppcode for nzvals
 ##    extra           => \%extraPPArgs,      ##-- extra args for vvpp_def()
 sub ccs_accum_hash {
   my ($op_codename,$op_docname,%args) = @_;
@@ -215,20 +217,27 @@ sub ccs_accum_hash {
  }'.q(
  //-- END
 )),
-  CopyBadStatusCode => (
-q(
-  /* propagate badflag if inplace AND it has changed */
-  if ( $ISPDLSTATEBAD(nzvalsIn) || $ISPDLSTATEBAD(missing) ) {
-    $SETPDLSTATEBAD(nzvalsOut);
-  } else {
-    $SETPDLSTATEGOOD(nzvalsOut);
-  }
+  CopyBadStatusCode =>
+  (
+   ($args{copybad_ix} || q(
+  /* set ixOut badflag */
   if ( $ISPDLSTATEBAD(ixIn) ) {
     $SETPDLSTATEBAD(ixOut);
+    PDL->propagate_badflag( ixOut, 1 );
   } else {
     $SETPDLSTATEGOOD(ixOut);
+    PDL->propagate_badflag( ixOut, 0 );
   }
-)),
+  )).($args{copybad_nzvals} || q(
+  /* set nzvalsOut badflag */
+  if ( $ISPDLSTATEBAD(nzvalsIn) || $ISPDLSTATEBAD(missing) ) {
+    $SETPDLSTATEBAD(nzvalsOut);
+    PDL->propagate_badflag( nzvalsOut, 1 );
+  } else {
+    $SETPDLSTATEGOOD(nzvalsOut);
+    PDL->propagate_badflag( nzvalsOut, 0 );
+  }
+  ))),
 	   Doc =>
 (q(
 Accumulated ).${op_docname}.q( over values $nzvalsIn() associated with vector-valued keys $ixIn().
@@ -508,6 +517,12 @@ ccs_accum_def('nbad', 'number of bad values',
 		  tmp_reset      =>'tmp = 0;',
 		 )
 	      ),
+	      setbad_nzvals =>
+	      (q(
+	       /* nzvalsOut is always good for nbad() */
+               $SETPDLSTATEGOOD(nzvalsOut);
+	       PDL->propagate_badflag( nzvalsOut, 0 );
+	      )),
 	      doc_addmissing => <<'EOMD',
 
 Should handle missing values appropriately.
@@ -519,7 +534,7 @@ EOMD
 ## Operations: Accumulators (Ufuncs): ngood
 ccs_accum_def('ngood', 'number of good values',
 	      extra          =>{HandleBad=>1},
-	      out_type       =>'int+',
+	      out_type       =>'indx',
 	      max_type_perl  =>'ccs_indx', #$PDL::CCS::Config::ccsConfig{INT_TYPE_MAX_IONAME},
 	      #init_missingOut=>'missingOut=$N();',
 	      init_missingOut=>'missingOut=missingVal;', ##-- not really right, but compatible
@@ -535,6 +550,12 @@ ccs_accum_def('ngood', 'number of good values',
 		  tmp_reset      =>'tmp=1;'
 		 )
 	      ),
+	      setbad_nzvals =>
+	      (q(
+	       /* nzvalsOut is always good for ngood() */
+               $SETPDLSTATEGOOD(nzvalsOut);
+	       PDL->propagate_badflag( nzvalsOut, 0 );
+	      )),
 	      doc_addmissing => <<'EOMD',
 
 Should handle missing values appropriately.
@@ -545,13 +566,19 @@ EOMD
 ##--------------------------------------------------------------
 ## Operations: Accumulators (Ufuncs): nnz
 ccs_accum_def('nnz', 'number of non-zero values',
-	      out_type       =>'int+',
+	      out_type       =>'indx',
 	      max_type_perl  =>$PDL::CCS::Config::ccsConfig{INT_TYPE_MAX_IONAME},
 	      #init_missingOut=>'missingOut=$N();',
 	      init_missingOut=>'missingOut=missingVal;', ##-- not really right, but compatible
 	      tmp_addmissing =>'if (nMissing > 0 && missingVal != 0) { tmp += nMissing; }',
 	      tmp_addval     =>'if ($nzvalsIn(NnzIn=>nnzii) != 0) tmp++;',
 	      tmp_reset      =>'tmp = ( $nzvalsIn(NnzIn=>nnzii) != 0 ) ? 1 : 0;',
+	      setbad_nzvals =>
+	      (q(
+	       /* nzvalsOut is always good for nnz() */
+               $SETPDLSTATEGOOD(nzvalsOut);
+	       PDL->propagate_badflag( nzvalsOut, 0 );
+	      )),
 	      doc_addmissing => <<'EOMD',
 
 Should handle missing values appropriately.

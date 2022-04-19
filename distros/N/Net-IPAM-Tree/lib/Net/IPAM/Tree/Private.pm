@@ -38,7 +38,7 @@ sub _build_index_tree {
   # get prev child idx for this parent
   my $prev = $t->{_tree}{$parent}[-1];
 
-  # item is covered by previous child, it's an ancestot, not a sibling
+  # item is covered by previous child, it's an ancestor, not a sibling
   if ( $t->{_items}[$prev]->contains( $t->{_items}[$child] ) ) {
 
     # rec-descent
@@ -57,16 +57,63 @@ sub _build_index_tree {
 #
 # returns the outermost containing block or undef
 sub _superset {
-  my ( $t, $thing ) = @_;
+  my ( $t, $block ) = @_;
 
-  # find first item in root-level equal to or superset of block
-  for my $i ( @{ $t->{_tree}{_ROOT} } ) {
-    if ( $t->{_items}[$i]->cmp($thing) == 0 || $t->{_items}[$i]->contains($thing) ) {
+  # derefernce child idxs array
+  my $c_idxs = $t->{_tree}{_ROOT};
+
+  # find first index where child->{block} >= block
+  my $idx = List::MoreUtils::lower_bound { $t->{_items}[$_]->cmp($block) } @$c_idxs;
+
+  # returns -1 on undefined list
+  if ( $idx < 0 ) {
+    return;
+  }
+
+  # test if found by exact match?
+  # search index may be at end, take care for index panics
+  if ( $idx < @$c_idxs ) {
+
+    # deref for better reading and debugging
+    my $i = $c_idxs->[$idx];
+
+    if ( $t->{_items}[$i]->cmp($block) == 0 ) {
+
+      # the items on root level are disjunct, maybe overlapping, BUT NOT covering each other
+      # therefore we can return here, no element before can overlap this item
+
       return $t->{_items}[$i];
     }
   }
 
-  return;
+  # not equal and no item before can cover block
+  if ( $idx == 0 ) {
+    return;
+  }
+
+  # remember match
+  my $match;
+
+  # some items before idx may cover item, find the leftmost
+  for ( my $j = $idx - 1 ; $j >= 0 ; $j-- ) {
+
+    # deref for better reading and debugging
+    my $i = $c_idxs->[$j];
+
+    if ( $t->{_items}[$i]->contains($block) ) {
+
+      # save match, but continue to find leftmost superset
+      $match = $t->{_items}[$i];
+      next;
+    }
+
+    # remember: the items on root level are disjunct, maybe overlapping, BUT NOT covering each other
+    # premature stop condition without item coverage, last match was superset
+
+    last;
+  }
+
+  return $match;
 }
 
 ####
@@ -86,8 +133,7 @@ sub _lookup {
   my $c_idxs = $t->{_tree}{$parent};
 
   # find first index where child->{block} >= block
-  my $idx =
-    List::MoreUtils::lower_bound { $t->{_items}[$_]->cmp($block) } @$c_idxs;
+  my $idx = List::MoreUtils::lower_bound { $t->{_items}[$_]->cmp($block) } @$c_idxs;
 
   # found by exact match?
   # search index may be -1 or at end, take care for index panics
@@ -217,7 +263,7 @@ TODO
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2020-2021 by Karl Gaissmaier.
+This software is copyright (c) 2020-2022 by Karl Gaissmaier.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

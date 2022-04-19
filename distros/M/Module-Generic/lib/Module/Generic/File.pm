@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/File.pm
-## Version v0.3.4
+## Version v0.4.0
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/20
-## Modified 2022/03/18
+## Modified 2022/04/07
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -119,7 +119,7 @@ BEGIN
     # $URI::file::DEFAULT_AUTHORITY = undef;
     $FILES_TO_REMOVE = {};
     $GLOBBING = 0;
-    our $VERSION = 'v0.3.4';
+    our $VERSION = 'v0.4.0';
 };
 
 use strict;
@@ -192,7 +192,12 @@ sub init
         # Otherwise, use the current directory
         else
         {
-            $base_dir = $self->_uri_file_cwd;
+            $base_dir = $self->_uri_file_cwd || do
+            {
+                my $tmpdir = $self->sys_tmpdir;
+                CORE::chdir( $tmpdir ) || return( $self->error( "Current directory does not exist. It was most likely removed while perl was running and I could not chdir to the system temporary directory '$tmpdir': $!" ) );
+                $base_dir = $tmpdir;
+            };
         }
         $self->{base_dir} = $base_dir;
     }
@@ -627,10 +632,26 @@ sub chmod
     my $file = $self->filename;
     $self->message( 3, "Setting file mode '$mode' to file \"$file\"." );
     $self->message( 3, "Does the directory \"${file}\" exist? ", ( -d( $file ) ? 'yes' : 'no' ) );
-    CORE::chmod( $mode, $file ) || return( $self->error( "An error occurred while changing mode for file \"$file\" to $mode: $!" ) );
+    CORE::chmod( $mode, $file ) || return( $self->error( sprintf( "An error occurred while changing mode for file \"$file\" to %o: $!", $mode ) ) );
     $self->message( 3, "Resetting file info." );
     $self->finfo->reset;
     return( $self );
+}
+
+sub chown
+{
+    my $self = shift( @_ );
+    my( $uid, $gid ) = @_;
+    my $f = $self->filename;
+    my $what = $self->is_dir ? 'directory' : 'file';
+    try
+    {
+        return( CORE::chown( $uid, $gid, "$f" ) );
+    }
+    catch( $e )
+    {
+        return( $self->error( "Unable to chown ${what} $f: $e" ) );
+    }
 }
 
 sub cleanup { return( shift->_set_get_boolean( 'auto_remove', @_ ) ); }
@@ -860,7 +881,7 @@ sub content
             }
             else
             {
-                $self->open( '<', $opts ) || return( $self->pass_error );
+                $io = $self->open( '<', $opts ) || return( $self->pass_error );
             }
             $a = $self->new_array( [ $io->getlines ] );
             $io->seek( $pos, Fcntl::SEEK_SET ) if( defined( $pos ) );
@@ -1398,6 +1419,8 @@ sub is_empty
 sub is_file { return( shift->finfo->is_file ); }
 
 sub is_link { return( shift->finfo->is_link ); }
+
+sub is_opened { return( shift->opened( @_ ) ); }
 
 sub is_part_of
 {
@@ -3677,7 +3700,8 @@ sub _uri_file_cwd
     my $self = shift( @_ );
     # This is optional and may be undefined
     my $os   = shift( @_ );
-    return( URI->new( URI::file->cwd )->file( $os || $self->{os} || $^O ) );
+    my $cwd  = URI::file->cwd || return( '' );
+    return( URI->new( $cwd )->file( $os || $self->{os} || $^O ) );
 }
 
 sub _uri_file_new
@@ -3935,7 +3959,7 @@ Module::Generic::File - File Object Abstraction Class
 
 =head1 VERSION
 
-    v0.3.4
+    v0.4.0
 
 =head1 DESCRIPTION
 
@@ -3960,7 +3984,7 @@ Takes a boolean value. Automatically removes the temporary directory or file whe
 
 =item I<base_dir>
 
-Sets the base directory for this file.
+Sets the base directory for this file. If none is provided, it will attempt to get the current working directory, and if it cannot find it, most likely because it has been removed while your perl script was running, then it will try to C<chdir> to the system temporary directory, and if that, too, fails, it will set an L<error|Module::Generic/error> return C<undef>
 
 =item I<base_file>
 
@@ -4139,6 +4163,18 @@ Provided with a file name (not a full path), and this will return a new file obj
 Provided with an octal value or a human file mode such as C<a+rw> and this will attempt to set the file or directory mode accordingly.
 
 It returns the current object upon success or undef and sets an exception object upon error.
+
+=head2 chown
+
+Provided with an C<uid> and a C<gid> and this will call L<perlfunc/chown> on the underlying directory or file.
+
+Both C<uid> and C<gid> must be provided, but you can provide a value of C<-1> to tell perl you do not want to change the value.
+
+It returns true if the file or directory was changed, or o otherwise.
+
+If an error occurred, it sets an L<error|Module::Generic/error> and return C<undef>
+
+See L<perlport> for C<chown> portability limitations.
 
 =head2 cleanup
 
@@ -4487,6 +4523,10 @@ Returns true if the element is regular file or false otherwise.
 =head2 is_link
 
 Returns true if the element is symbolic link or false otherwise.
+
+=head2 is_opened
+
+Alias to L</opened>
 
 =head2 is_part_of
 

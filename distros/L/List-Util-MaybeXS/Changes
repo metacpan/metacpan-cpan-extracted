@@ -1,5 +1,9 @@
 Revision history for List-Util-MaybeXS
 
+1.500009 - 2022-04-19
+  - fix calls to unary overloads to match how perl calls them
+  - account for quadmath systems and other high-precision floats in uniqnum
+
 1.500008 - 2022-04-12
   - return real boolean values from all, any, none, notall
 

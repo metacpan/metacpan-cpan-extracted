@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 our $VERSION;
-$VERSION = '1.11';
+$VERSION = '1.12';
 
 use Carp;
 use Net::DNS;
@@ -16,7 +16,7 @@ warn "\n\n$@\n" if $@;
 
 =head1 NAME
 
-Net::DNS::Resolver::Unbound - Unbound resolver base for Net::DNS
+Net::DNS::Resolver::Unbound - Net::DNS resolver based on libunbound
 
 =head1 SYNOPSIS
 
@@ -49,8 +49,8 @@ in outbound packets.
 
 =item *
 
-It is not possible to send a pre-constructed DNS query packet to a
-nameserver. A best-effort attempt is made using (qname,qtype,qclass)
+It is not possible to send a pre-constructed packet to a nameserver.
+A best-effort attempt is made instead using (qname,qtype,qclass)
 extracted from the presented packet.
 
 =back
@@ -80,10 +80,7 @@ sub new {
 	$self->{ub_ctx} = Net::DNS::Resolver::Unbound::Context->new();
 	while ( my $attr = shift ) {
 		my $value = shift;
-		my $ref	  = ref($value);
-		croak "usage: $class->new( $attr => [...] )"
-				if $ref && ( $ref ne 'ARRAY' );
-		$self->$attr( $ref ? @$value : $value );
+		$self->$attr( ref($value) ? @$value : $value );
 	}
 	return $self;
 }
@@ -205,7 +202,7 @@ sub set_fwd {
     $resolver->set_tls( 0 );
     $resolver->set_tls( 1 );
 
-Use DNS over TLS to send queries to machines specified using set_fwd().
+Use DNS over TLS for queries to nameservers specified using set_fwd().
 
 =cut
 
@@ -220,8 +217,8 @@ sub set_tls {
     $resolver->set_stub( 'zone', '10.1.2.3', 0 );
 
 Add a stub zone, with given address to send to. This is for custom root
-hints or pointing to a local authoritative dns server. For dns resolvers
-and the 'DHCP DNS' ip address, use ub_ctx_set_fwd.
+hints or pointing to a local authoritative DNS server. For DNS resolvers
+and the 'DHCP DNS' IP address, use set_fwd().
 
 =cut
 
@@ -314,7 +311,7 @@ sub add_ta_autr {
 
     $resolver->trusted_keys( 'filename' );
 
-Pass the name of a bind-style config file containing trusted-keys{}.
+Pass the name of a BIND-style config file containing trusted-keys{}.
 
 =cut
 
@@ -475,7 +472,7 @@ DEALINGS IN THE SOFTWARE.
 =head1 SEE ALSO
 
 L<perl>, L<Net::DNS>, L<Net::DNS::Resolver>,
-L<Unbound|https://unbound.docs.nlnetlabs.nl/en/latest>
+L<Unbound|https://www.nlnetlabs.nl/projects/unbound/>
 
 =cut
 

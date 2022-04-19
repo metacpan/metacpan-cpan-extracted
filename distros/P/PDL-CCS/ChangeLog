@@ -1,3 +1,10 @@
+v1.23.20 Tue, 19 Apr 2022 11:03:00 +0200 moocow
+	+ fixed variable-clobbering warning in 02_encode.t
+	+ type-mismatch fixes for ccs ufunc counters https://github.com/moocow-the-bovine/PDL-CCS/issues/6
+	  - ccs ufunc counters (nbad, ngood, nnz) set out_type=>'indx' rather than out_type=>'int+'
+	  - ccs ufunc counters always clear nzvalsOut bad-flag in CopyBadStatusCode
+	  - ccs ufunc tests ensure $missing->type==$nzvalsIn->type
+
 v1.23.19 Thu, 14 Apr 2022 17:05:42 +0200 mohawk2
 	+ update default config for recent PDL
 	+ fix for ccs_accum_hash() code generator in ccsufunc.pd

@@ -1,7 +1,7 @@
 #
 # This file is part of StorageDisplay
 #
-# This software is copyright (c) 2020 by Vincent Danjean.
+# This software is copyright (c) 2014-2022 by Vincent Danjean.
 #
 # This is free software; you can redistribute it and/or modify it under
 # the same terms as the Perl 5 programming language system itself.
@@ -12,7 +12,7 @@ use warnings;
 package StorageDisplay::Collect;
 # ABSTRACT: modules required to collect data. No dependencies (but perl itself)
 
-our $VERSION = '1.0.7'; # VERSION
+our $VERSION = '1.0.8'; # VERSION
 
 
 use Storable;
@@ -755,9 +755,10 @@ sub collect {
                     next;
                 }
             } elsif ($state == 1) {
-                if ($line =~ /.*:([0-9]+)B:[^:]*:[0-9]+:[0-9]+:[^:]*:(.*):;/) {
+                if ($line =~ /.*:([0-9]+)B:[^:]*:[0-9]+:[0-9]+:([^:]*):(.*):;/) {
                     $parted->{size} = $1;
-                    $parted->{label} = $2;
+                    $parted->{type} = $2;
+                    $parted->{label} = $3;
                     $state = 2;
                     next;
                 }
@@ -1644,7 +1645,7 @@ StorageDisplay::Collect - modules required to collect data. No dependencies (but
 
 =head1 VERSION
 
-version 1.0.7
+version 1.0.8
 
 Main class, allows one to register collectors and run them (through the collect method)
 
@@ -1674,7 +1675,7 @@ Vincent Danjean <Vincent.Danjean@ens-lyon.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Vincent Danjean.
+This software is copyright (c) 2014-2022 by Vincent Danjean.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

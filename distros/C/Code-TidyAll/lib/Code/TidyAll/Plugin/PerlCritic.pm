@@ -9,7 +9,7 @@ extends 'Code::TidyAll::Plugin';
 
 with 'Code::TidyAll::Role::RunsCommand';
 
-our $VERSION = '0.81';
+our $VERSION = '0.82';
 
 # On Windows only the batch file is actually executable.
 my $cmd = $^O eq 'MSWin32' ? 'perlcritic.bat' : 'perlcritic';
@@ -40,7 +40,7 @@ Code::TidyAll::Plugin::PerlCritic - Use perlcritic with tidyall
 
 =head1 VERSION
 
-version 0.81
+version 0.82
 
 =head1 SYNOPSIS
 

@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '0.545';
+our $VERSION = '0.546';
 use Exporter 'import';
 our @EXPORT_OK = qw( read_line );
 
@@ -59,6 +59,7 @@ sub _valid_options {
         hide_cursor      => '[ 0 1 2 ]',       # hide_cursor == 2 # documentation
         no_echo          => '[ 0 1 2 ]',
         page             => '[ 0 1 2 ]',       # undocumented
+        history          => 'Array_Str',
         default          => 'Str',
         footer           => 'Str',             # undocumented
         info             => 'Str',
@@ -74,6 +75,7 @@ sub _defaults {
         default            => '',
         footer             => '',
         hide_cursor        => 1,
+        history            => [],
         info               => '',
         no_echo            => 0,
         page               => 1,
@@ -108,7 +110,7 @@ Term::Form::ReadLine - Read a line from STDIN.
 
 =head1 VERSION
 
-Version 0.545
+Version 0.546
 
 =cut
 
@@ -153,11 +155,15 @@ C<Home> or C<Ctrl-A>: Move to the start of the line.
 
 C<End> or C<Ctrl-E>: Move to the end of the line.
 
-C<Up-Arrow> or C<Ctrl-R>: Move back 10 characters.
+C<Page-Up> or C<Ctrl-P>: Move back 10 characters.
 
-C<Down-Arrow> or C<Ctrl-S>: Move forward 10 characters.
+C<Page-Down> or C<Ctrl-N>: Move forward 10 characters.
 
 C<Ctrl-X>: If the input puffer is not empty, the input puffer is cleared, else C<Ctrl-X> returns nothing (undef).
+
+C<Up-Arrow> or C<Ctrl-R>: History up.
+
+C<Down-Arrow> or C<Ctrl-S>: History down.
 
 =head1 METHODS
 
@@ -226,6 +232,16 @@ Set a initial value of input.
 1 - enabled
 
 default: C<1>
+
+=head3 history
+
+This option allows one to pass a C<readline> history as a reference to an array.
+
+If the entered string matches the beginning of one or more history entries, only these matched history entries are used.
+
+See L</Keys> for how to move through the history.
+
+default: empty
 
 =head3 info
 

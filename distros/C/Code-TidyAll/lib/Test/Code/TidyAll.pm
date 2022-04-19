@@ -13,7 +13,7 @@ use Text::Diff::Table;
 
 use Exporter qw(import);
 
-our $VERSION = '0.81';
+our $VERSION = '0.82';
 
 my $test = Test::Builder->new;
 
@@ -94,7 +94,7 @@ Test::Code::TidyAll - Check that all your files are tidy and valid according to 
 
 =head1 VERSION
 
-version 0.81
+version 0.82
 
 =head1 SYNOPSIS
 

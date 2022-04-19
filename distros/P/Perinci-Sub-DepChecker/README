@@ -1,27 +1,30 @@
-SYNOPSIS
+NAME
+    Perinci::Sub::DepChecker - Check dependencies from 'deps' property
 
+VERSION
+    This document describes version 0.121 of Perinci::Sub::DepChecker (from
+    Perl distribution Perinci-Sub-DepChecker), released on 2022-03-20.
+
+SYNOPSIS
      use Perinci::Spec::DepChecker qw(check_deps dep_satisfy_rel list_mentioned_dep_clauses);
-    
+
      my $err = check_deps($meta->{deps});
      print "Dependencies not met: $err" if $err;
-    
+
      print "We need to prepare foo"
          if dep_satisfy_rel('foo', $meta->{deps}) =~ /^(?:must|might)$/;
 
 DESCRIPTION
-
     The 'deps' spec clause adds information about subroutine dependencies.
     This module performs check on it.
 
     This module is currently mainly used by Perinci::Sub::Wrapper.
 
 FUNCTIONS
-
     None is exported by default, but every function is exportable.
 
- check_deps($deps) => ERRSTR
-
-    Check dependencies. Will in turn call various checkdep_NAME()
+  check_deps($deps) => ERRSTR
+    Check dependencies. Will in turn call various "checkdep_NAME()"
     subroutines. Return empty string if all dependencies are met, or a
     string containing an error message stating a dependency error.
 
@@ -29,34 +32,33 @@ FUNCTIONS
 
      my $err = check_deps({env=>'DEBUG'});
 
-    Will check environment variable DEBUG. If true, will return an empty
-    string. Otherwise will set $err with something like Environment
-    variable DEBUG not set/true.
+    Will check environment variable "DEBUG". If true, will return an empty
+    string. Otherwise will set $err with something like "Environment
+    variable DEBUG not set/true".
 
     Another example:
 
      my $err = check_deps({ all=>[{env=>"A"}, {env=>"B", prog=>"bc"}] });
 
-    The above will check environment variables A, B, as well as program bc.
-    All dependencies must be met (because we use the and metaclause).
+    The above will check environment variables "A", "B", as well as program
+    "bc". All dependencies must be met (because we use the "and"
+    metaclause).
 
-    To support a custom dependency named NAME, just define checkdep_NAME
-    subroutine in Perinci::Sub::DepChecker package which accepts a value
-    and should return an empty string on success or an error message
-    string.
+    To support a custom dependency named "NAME", just define "checkdep_NAME"
+    subroutine in Perinci::Sub::DepChecker package which accepts a value and
+    should return an empty string on success or an error message string.
 
- dep_satisfy_rel($name, $deps) => STR
-
+  dep_satisfy_rel($name, $deps) => STR
     Check dep satisfication relationship, i.e. whether dependency named
     $name must be satisfied in $deps. Due to all, any, and none clauses,
     this needs to be checked recursively and might yield an inconclusive
     answer ("maybe").
 
-    Return "must" if $name definitely must be satisfied in $deps, "must
-    not" if definitely not, "" if need not be satisfied (dep clause does
-    not exist in deps), "impossible" if condition is impossible to be
-    satisfied (due to conflicts), "might" if dep might need to be satisfied
-    (but might also not).
+    Return "must" if $name definitely must be satisfied in $deps, "must not"
+    if definitely not, "" if need not be satisfied (dep clause does not
+    exist in deps), "impossible" if condition is impossible to be satisfied
+    (due to conflicts), "might" if dep might need to be satisfied (but might
+    also not).
 
     Examples:
 
@@ -73,19 +75,62 @@ FUNCTIONS
     "might" be needed, or want to avoid preparing something that "must not"
     be present.
 
- list_mentioned_dep_clauses($deps) => ARRAYREF
-
-    List all dep clauses mentioned in $deps. The returned array is not
-    sorted alphabetically, so you will have to do it yourself if you need
-    it sorted.
+  list_mentioned_dep_clauses($deps) => ARRAYREF
+    List all dep clauses mentioned in $deps. The returned array is *not*
+    sorted alphabetically, so you will have to do it yourself if you need it
+    sorted.
 
     Example:
 
      list_mentioned_dep_clauses({any=>[{a=>1}, {b=>1}]}) # => [qw/any a b/]
 
-SEE ALSO
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Perinci-Sub-DepChecker>.
 
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Perinci-Sub-DepChecker>.
+
+SEE ALSO
     Perinci
 
     'deps' section in Rinci::function
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTOR
+    Steven Haryanto <stevenharyanto@gmail.com>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
+    steps required beyond that are considered a bug and can be reported to
+    me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2022, 2015, 2014, 2013, 2012, 2011 by
+    perlancar <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Sub-DepChecke
+    r>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 

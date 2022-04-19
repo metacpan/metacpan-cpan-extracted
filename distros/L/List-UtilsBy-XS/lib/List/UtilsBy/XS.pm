@@ -8,7 +8,7 @@ use XSLoader;
 
 use parent qw/Exporter/;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 our @EXPORT_OK = qw(
     sort_by

@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-Plugin-MakeMaker-Fallback
 
+0.031     2022-04-15 02:43:29Z
+          - warn about a possible missing [ShareDir]
+
 0.030     2018-09-16 05:39:52Z
           - bump prereq of [MakeMaker::Awesome] to ensure options are fixed
 

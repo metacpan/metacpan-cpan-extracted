@@ -9,7 +9,7 @@ extends 'Code::TidyAll::Plugin';
 
 with 'Code::TidyAll::Role::RunsCommand';
 
-our $VERSION = '0.81';
+our $VERSION = '0.82';
 
 sub _build_cmd {'js-beautify'}
 
@@ -38,7 +38,7 @@ Code::TidyAll::Plugin::JSBeautify - Use js-beautify with tidyall
 
 =head1 VERSION
 
-version 0.81
+version 0.82
 
 =head1 SYNOPSIS
 

@@ -39,6 +39,8 @@ my %EXPECTED_SYLLABLE_COUNT =
     executed        => 4,
     accused         => 2,
     dosed           => 1,
+    w               => 2,
+    cwm             => 1,
 
 );
 

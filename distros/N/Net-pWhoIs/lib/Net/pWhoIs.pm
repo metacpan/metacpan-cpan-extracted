@@ -5,7 +5,7 @@ use Socket;
 use IO::Socket::INET;
 use Scalar::Util 'reftype';
 
-our $VERSION = '0.01';
+our $VERSION = '0.06';
  
 $| = 1;
 
@@ -31,10 +31,6 @@ sub new {
         $self->{$key} = $args->{$key};
     }
 
-    if (!$self->{req}) {
-        die "Attribute 'req' is required for this module.\n";
-    }
-
     bless $self, $class;
 
     return $self;
@@ -49,7 +45,7 @@ sub resolveReq {
     if ($what !~ /\\d+\\.\\d+\\.\\d+\\.\\d+/) {
         my @host = gethostbyname($what);
         if (scalar(@host) == 0) {
-            die "Failed host to resolve to IP: $what\n";
+            return;
         } else {
             return Socket::inet_ntoa($host[4]);
         }
@@ -60,69 +56,65 @@ sub resolveReq {
 sub pwhois {
 ######################################################
     my $self = shift;
+    my $what = shift;
 
-    if (Scalar::Util::reftype($self->{req}) eq 'ARRAY') {
-        return $self->pwhoisBulk();
+    my @req;
+
+    # Here for legacy purposes only.
+    if ($self->{req}) { 
+        @req  = @{$self->{req}};
     }
 
-    my $socket = new IO::Socket::INET (
-        PeerHost => $self->{pwhoisserver},
-        PeerPort => $self->{port},
-        Proto    => 'tcp',
-    );
-    die "Cannot connect to server $!\n" unless $socket;
-
-    my $resolved = $self->resolveReq($self->{req});
-    my $size = $socket->send($resolved);
-
-    shutdown($socket, 1);
- 
-    my $response;
-    $socket->recv($response, 1024);
-    $socket->close();
-
-    my $formatted;
-    if ($response) {
-        $formatted = $self->formatResponse($response);
-    }
-    return $formatted;
-}
-
-######################################################
-sub pwhoisBulk {
-######################################################
-    my $self = shift;
-
-    my $socket = new IO::Socket::INET (
-        PeerHost => $self->{pwhoisserver},
-        PeerPort => $self->{port},
-        Proto    => 'tcp',
-    );
-    die "Cannot connect to server $!\n" unless $socket;
-
-    $socket->send("begin\n");
-
-    my %results;
-    for my $elmt (@{$self->{req}}) {
-        my $resolved = $self->resolveReq($elmt);
-
-        $socket->send("$resolved\n");
-
-        my $response;
-        $socket->recv($response, 1024);
-
-        if ($response) {
-            my $formatted = $self->formatResponse($response);
-            if ($formatted) {
-                $results{$elmt} = $formatted;
-            }
+    # Passed value shall trump legacy.
+    if ($what) {
+        if (Scalar::Util::reftype($what) eq 'ARRAY') {
+            @req  = @{$what};
+        }
+        else {
+            push @req, $what;
         }
     }
 
-    $socket->send("end\n");
+    if (! @req) {
+        # Nothing to process.
+        return;
+    }
 
+    my $socket = new IO::Socket::INET (
+        PeerHost => $self->{pwhoisserver},
+        PeerPort => $self->{port},
+        Proto    => 'tcp',
+    );
+    die "Cannot connect to server $!\n" unless $socket;
+
+    # Build request
+    # This array is needed to handle hosts which can't be resolved to IP.
+    my @req_new;
+    my $request = "begin\n";
+    for my $elmt (@req) {
+        my $resolved = $self->resolveReq($elmt);
+        if ($resolved) {
+            $request .= "$resolved\n";
+	    push @req_new, $elmt;
+        }
+    }
+    $request .= "end\n";
+
+    $socket->send($request);
     shutdown($socket, 1);
+
+    my $responses;
+    while (my $line = $socket->getline) {
+        $responses .= $line;
+    }
     $socket->close();
+
+    my %results;
+    my $cntr = 0;
+    for my $response (split /\n\n/, $responses) {
+        my $formatted = $self->formatResponse($response);
+        $results{$req_new[$cntr++]} = $formatted;
+    }
 
     return \%results;
 }
@@ -146,6 +138,22 @@ sub formatResponse {
     return \%formatted;
 }
 
+######################################################
+sub printReport {
+######################################################
+    my $self = shift;
+    my $what = shift;
+
+    my $report;
+    for my $req (keys %{$what}) {
+        $report .= sprintf ("Request: %s\n", $req);
+        for my $key (sort keys %{$what->{$req}}) {
+            $report .= sprintf("%-22s : %s\n", $key, $what->{$req}{$key});
+        }
+    }
+    return $report;
+}
+
 1;
 
 =head1 NAME
@@ -154,44 +162,62 @@ Net::pWhoIs - Client library for Prefix WhoIs (pWhois)
 
 =head1 SYNOPSIS
 
-  use Net::pWhoIs;
+    use Net::pWhoIs;
 
-  my %attrs = ( req => '166.70.12.30' );
-  my $obj = Net::pWhoIs->new(\%attrs);
-  my $output = $obj->pwhois();
-  # Output for single query is hashref.
-  for my $elmt (qw{org-name country city region}) {
-      print $output->{$elmt}, "\n";
-  }
+    my $obj = Net::pWhoIs->new();
+  
+    # You may pass hostnames or IP addresses.
+    my @array = qw(
+        166.70.12.30
+        207.20.243.105
+        67.225.131.208
+        perlmonks.org
+	brokenhost.brokendomain.co
+        8.8.8.8
+        12.12.12.12
+        ftp2.freebsd.org
+    );
 
-  # Bulk query, combination of IPs and hostnames.
-  my @list = ('166.70.12.30', '207.20.243.105', '67.225.131.208', 'perlmonks.org');
-  my $obj = Net::pWhoIs->new({ req => \@list });
-  # Output for bulk queries is array of hashrefs.
-  my $output = $obj->pwhois();
+    # You can pass an array.
+    my $output = $obj->pwhois(\@array);
 
-  use Data::Dumper;
-  print Dumper($output);
+    # Or you can pass a scalar.
+    my $output = $obj->pwhois('8.8.8.8');
+
+    # Generate a formatted report.
+    print $obj->printReport($output);
+  
+    # Or manipulate the data yourself.
+    for my $req (keys %{$output}) {
+        # req contains queried item.
+	print $req, "\n";
+        for my $key (keys %{$output->{$req}}) {
+	    # key contains name of pwhois query result item.  Output ref contains value of pwhois query result item.
+            printf("%s : %s\n", $key, $output->{$req}{$key});
+        }
+
+	# Or grab it direct.
+        print $output->{$req}{'city'}, "\n";
+        print $output->{$req}{'org-name'}, "\n";
+    }
+
 
 =head1 DESCRIPTION
 
-Client for pWhois service.  Includes support for bulk queries.
+Client library for pWhois service.  Includes support for bulk queries.
 
 =head1 CONSTRUCTOR
-
-The following constructor methods are available:
 
 =over 4
 
 =item $obj = Net::pWhoIs->new( %options )
 
-This method constructs a new C<Net::pWhoIs> object and returns it.
+Construct a new C<Net::pWhoIs> object and return it.
 Key/value pair arguments may be provided to set up the initial state.
-The only require argument is: req.
+The 
 
     pwhoisserver  whois.pwhois.org
     port          43
-    req           Rlequired argument, may be scalar or array
 
 =back
 
@@ -203,40 +229,45 @@ The following methods are available:
 
 =item Net::pWhoIs->pwhois()
 
-Perform a single query.  Returns a hashref.
+Perform queries on passed arrayref or scalar.  Thus both single query and bulk queries supported.  Returns a hash of hashrefs.  Unresolvable hostnames are skipped.
 
 =back
 
 =over 4
 
-=item Net::pWhoIs->pwhoisBulk()
+=item Net::pWhoIs->printReport()
 
-Perform bulk queries using a single socket.  Returns an array of hashrefs.  This method is called by Net::pWhoIs->pwhois() if the req argument is an array.
+An optional method which generates a formated report to stdout.  Accepts returned output from Net::pWhoIs->pwhois()
 
 =back
 
-=head1 HASHREF KEYS
+=head1 Client
 
-The following list hashref keys returned by pwhois or pwhoisBulk.
+A full featured client is included: pwhoiscli.pl.  Pass it hostnames or IP seperated by space.
 
-    ip
+=head1 OUTPUT HASHREF KEYS
+
+The following is the list hashref keys returned by pwhois.
+
     as-org-name
     as-path
-    origin-as
-    org-name
-    country-code
-    prefix
-    net-name
-    latitude
-    longitude
     cache-date
     city
-    region
     country
+    country-code
+    ip
+    latitude
+    longitude
+    net-name
+    org-name
+    origin-as
+    prefix
+    region
+    route-originated-date
+    route-originated-ts
 
 =head1 AUTHOR
 
-Mat Hersant <matt_hersant@yahoo.com>
+Matt Hersant <matt_hersant@yahoo.com>
 
 =cut
-

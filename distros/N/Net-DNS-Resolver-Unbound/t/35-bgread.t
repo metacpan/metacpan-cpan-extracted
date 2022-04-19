@@ -3,12 +3,14 @@
 
 use strict;
 use warnings;
-use Test::More tests => 15;
+use Test::More;
 
-use Net::DNS;
 use Net::DNS::Resolver::Unbound;
 
 my $resolver = Net::DNS::Resolver::Unbound->new();
+
+plan skip_all => 'no local nameserver' unless $resolver->nameservers;
+plan tests => 15;
 
 
 for ( my $handle = undef ) {

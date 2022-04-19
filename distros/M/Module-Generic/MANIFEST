@@ -39,7 +39,7 @@ MANIFEST
 META.yml
 README
 README.md
-SIGNATURE
+SIGNATURE			Public-key signature (added by MakeMaker)
 t/00.load.t
 t/01.pod.t
 t/02.num.t

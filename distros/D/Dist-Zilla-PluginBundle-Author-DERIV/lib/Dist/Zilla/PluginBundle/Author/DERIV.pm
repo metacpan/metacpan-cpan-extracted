@@ -4,7 +4,7 @@ package Dist::Zilla::PluginBundle::Author::DERIV;
 use strict;
 use warnings;
 
-our $VERSION = '0.001';
+our $VERSION = '0.003';
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
 =head1 NAME
@@ -41,11 +41,14 @@ has authority => (
     },
 );
 
-has installer => (
+has eumm_version => (
     is      => 'ro',
     isa     => 'Str',
     lazy    => 1,
-    default => sub { shift->payload->{installer} // 'MakeMaker' },
+    default => sub {
+        my $self = shift;
+        $self->payload->{'MakeMaker.eumm_version'} // $self->payload->{eumm_version} // '7.64';
+    },
 );
 
 sub configure {
@@ -105,7 +108,7 @@ sub configure {
         ['Manifest'],
         ['ManifestSkip'],
 
-        $self->installer,     # e.g. MakeMaker
+        ['MakeMaker', { eumm_version => $self->eumm_version }],
         ['NextRelease'],
         ['CheckChangesHasContent'],
         ['Git::Check' => {allow_dirty => [@allow_dirty], untracked_files => 'ignore'}],

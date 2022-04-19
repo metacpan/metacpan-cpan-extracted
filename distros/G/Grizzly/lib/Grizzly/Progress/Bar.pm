@@ -47,7 +47,7 @@ Grizzly::Progress::Bar - Runs a progress bar when called
 
 =head1 VERSION
 
-version 0.103
+version 0.104
 
 =head1 DESCRIPTION
 
@@ -73,7 +73,7 @@ Nobunaga <nobunaga@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2021 by Nobunaga.
+This software is Copyright (c) 2022 by Nobunaga.
 
 This is free software, licensed under:
 

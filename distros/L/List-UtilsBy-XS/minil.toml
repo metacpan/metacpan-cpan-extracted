@@ -1,5 +1,5 @@
 name = "List-UtilsBy-XS"
-badges = ['travis', 'metacpan']
+badges = ['github-actions/CI', 'metacpan']
 module_maker="ModuleBuild"
 
 [build]

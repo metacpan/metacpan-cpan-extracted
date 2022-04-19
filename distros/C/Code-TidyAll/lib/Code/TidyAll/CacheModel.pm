@@ -12,7 +12,7 @@ use Specio::Library::String;
 
 use Moo;
 
-our $VERSION = '0.81';
+our $VERSION = '0.82';
 
 has base_sig => (
     is      => 'ro',
@@ -141,7 +141,7 @@ Code::TidyAll::CacheModel - Caching model for Code::TidyAll
 
 =head1 VERSION
 
-version 0.81
+version 0.82
 
 =head1 SYNOPSIS
 

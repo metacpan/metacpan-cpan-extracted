@@ -1,5 +1,34 @@
 Revision history for Perl extension Net::SAML2.
 
+0.55 -- Fri Apr 15 21:06:36 ADT 2022
+
+  [ Significant Changes since 0.53 ]
+
+  Support for EncryptedAssertions is automatic if one is received but the
+  call to Net::SAML2::Protocol::Assertion must provide a key and cacert to
+  decrypt the EncryptedAssertion and Verify the Signature on the decrypted
+  Assertion if it is Signed.  No changes are required for existing applications
+  that do not use EncryptedAssertions.
+
+  [ Commits ]
+  - 159332d Bump version for 0.55 release
+  - 92a1eb5 Support Unsigned encrypted Assertions
+  - 39016c6 v0.54
+
+0.54 -- Sat Apr 09 18:13:04 ADT 2022
+
+  [ Significant Changes since 0.53 ]
+
+  Support for EncryptedAssertion
+
+  [ Commits ]
+  - b166c3e Updates for new Version
+  - ab8c986 Move to OurPkgVersion and remove VERSION from repo
+  - 6d1b058 Merge pull request #57 from timlegge/encrypted-assertions
+  - bff02f7 Minor lighttpd config update for testapp
+  - 94e42b0 Support EncryptedAssertions
+  - 34a432c v0.53
+
 0.53 -- Thu Feb 03 21:02:47 AST 2022
 
   [Significant Changes since 0.52]

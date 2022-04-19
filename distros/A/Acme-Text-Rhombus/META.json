@@ -1,16 +1,16 @@
 {
-   "abstract" : "Draw a rhombus with letters",
+   "abstract" : "Draw a rhombus with letters/digits",
    "author" : [
       "Steven Schubiger <schubiger@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Acme-Text-Rhombus",
    "prereqs" : {
@@ -33,7 +33,7 @@
    "provides" : {
       "Acme::Text::Rhombus" : {
          "file" : "lib/Acme/Text/Rhombus.pm",
-         "version" : "0.20"
+         "version" : "0.21"
       }
    },
    "release_status" : "stable",
@@ -45,6 +45,6 @@
          "url" : "https://github.com/stsc/Acme-Text-Rhombus"
       }
    },
-   "version" : "0.20",
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "version" : "0.21",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

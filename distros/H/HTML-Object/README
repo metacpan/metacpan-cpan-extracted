@@ -1,15 +1,289 @@
-pod2text HTML::Object.pm > README
+NAME
+    HTML::Object - HTML Parser, Modifier and Query Interface
 
-If this is still here it means the programmer was too lazy to create the readme file.
+SYNOPSIS
+        use HTML::Object;
+        my $p = HTML::Object->new( debug => 5 );
+        my $doc = $p->parse( $file, { utf8 => 1 } ) || die( $p->error, "\n" );
+        print $doc->as_string;
 
-You can create it now by using the command shown above from this directory.
+    or, using the HTML DOM implementation same as the Web API:
 
-At the very least you should be able to use this set of instructions
-to install the module...
+        use HTML::Object::DOM global_dom => 1;
+        # then you can also use HTML::Object::XQuery for jQuery like DOM manipulation
+        my $p = HTML::Object::DOM->new;
+        my $doc = $p->parse_data( $some_html ) || die( $p->error, "\n" );
+        $('div.inner')->after( "<p>Test</p>" );
+    
+        # returns an HTML::Object::DOM::Collection
+        my $divs = $doc->getElementsByTagName( 'div' );
+        my $new = $doc->createElement( 'div' );
+        $new->setAttribute( id => 'newDiv' );
+        $divs->[0]->parent->replaceChild( $new, $divs->[0] );
+        # etc.
 
-perl Makefile.PL
-make
-make test
-make install
+    To enable fatal error and also implement try-catch (using Nice::Try) :
 
-If you are on a windows box you should use 'nmake' rather than 'make'.
+        use HTML::Object fatal_error => 1, try_catch => 1;
+
+VERSION
+        v0.1.4
+
+DESCRIPTION
+    This module is yet another HTML parser, manipulation and query
+    interface. It uses the C parser from HTML::Parser and has the unique
+    particularity that it does not try to decode the entire html document
+    tree only to re-encode it when printing out its data as string like so
+    many other html parsers out there do. Instead, it modifies only the
+    parts required. The rest is returned exactly as it was found in the
+    HTML. This is faster and safer.
+
+    It uses an external json data dictionary file of html tags
+    ("html_tags_dict.json").
+
+    There are 3 ways to manipulate and query the html data:
+
+    1. HTML::Object::Element
+        This is lightweight and simple
+
+    2. HTML::Object::DOM
+        This is an alternative HTML parser also based on HTML::Parser, and
+        that implements fully the Web API with DOM (Data Object Model), so
+        you can query the HTML with perl equivalent to JavaScript methods of
+        the Web API. It has been designed to be strictly identical to the
+        Web API.
+
+    3. HTML::Object::XQuery
+        This interface provides a jQuery like API and requires the use of
+        HTML::Object::DOM. However, this is not designed to be a perl
+        implementation of JavaScript, but rather a perl implementation of
+        DOM manipulation methods found in jQuery.
+
+    Note that this interface does not enforce HTML standard. It is up to you
+    the developer to decide what value to use and where the HTML elements
+    should go in the HTML tree and what to do with it.
+
+METHODS
+  new
+    Instantiate a new HTML::Object object.
+
+  add_comment
+    This is a parser method called that will add a comment to the stack of
+    html elements.
+
+  add_declaration
+    This is a parser method called that will add a declaration to the stack
+    of html elements.
+
+  add_default
+    This is a parser method called that will add a default html tag to the
+    stack of html elements.
+
+  add_end
+    This is a parser method called that will add a closing html tag to the
+    stack of html elements.
+
+  add_space
+    This is a parser method called that will add a space to the stack of
+    html elements.
+
+  add_start
+    This is a parser method called that will add a starting html tag to the
+    stack of html elements.
+
+  add_text
+    This is a parser method called that will add a text to the stack of html
+    elements.
+
+  current_parent
+    Sets or gets the current parent, which must be an HTML::Object::Element
+    object or an inheriting class.
+
+  dictionary
+    Returns an hash reference containing the HTML tags dictionary. Its
+    structure is:
+
+    *   dict
+
+        This property reflects an hash containing all the known tags. Each
+        tag has the following possible properties:
+
+        *       description
+
+                String
+
+        *       is_deprecated
+
+                Boolean value
+
+        *       is_empty
+
+                Boolean value
+
+        *       is_inline
+
+                Boolean value
+
+        *       is_svg
+
+                Boolean value that describes whether this is a tag dedicated
+                to svg.
+
+        *       link_in
+
+                Array reference of HTML attributes containing links
+
+        *       ref
+
+                The reference URL to the online web documentation for this
+                tag.
+
+    *   meta
+
+        This property holds an hash reference containing the following meta
+        information:
+
+        *       author
+
+                String
+
+        *       updated
+
+                ISO 8601 datetime
+
+        *       version
+
+                Version number
+
+  document
+    Sets or gets the document HTML::Object::Document object.
+
+  get_definition
+    Get the hash definition for a given tag (case does not matter).
+
+    The tags definition is taken from the external file
+    "html_tags_dict.json" that is provided with this package.
+
+  new_closing
+    Creates and returns a new closing html element HTML::Object::Closing,
+    passing it any arguments provided.
+
+  new_comment
+    Creates and returns a new closing html element HTML::Object::Comment,
+    passing it any arguments provided.
+
+  new_declaration
+    Creates and returns a new closing html element
+    HTML::Object::Declaration, passing it any arguments provided.
+
+  new_document
+    Creates and returns a new closing html element HTML::Object::Document,
+    passing it any arguments provided.
+
+  new_element
+    Creates and returns a new closing html element HTML::Object::Element,
+    passing it any arguments provided.
+
+  new_space
+    Creates and returns a new closing html element HTML::Object::Space,
+    passing it any arguments provided.
+
+  new_special
+    Provided with an HTML tag class name and hash or hash reference of
+    options and this will load that class and instantiate an object passing
+    it the options provided. It returns the object thus Instantiated.
+
+    This is used to instantiate object for special class to handle certain
+    HTML tag, such as "a"
+
+  new_text
+    Creates and returns a new closing html element HTML::Object::Text,
+    passing it any arguments provided.
+
+  parse
+    Provided with some "data" (see below), and some options as hash or hash
+    reference and this will parse it and return a new HTML::Object::Document
+    object.
+
+    Possible accepted data are:
+
+    *code*
+        "parse_data" will be called with it.
+
+    *glob*
+        "parse_data" will be called with it.
+
+    *string*
+        "parse_file" will be called with it.
+
+    Other reference will return an error.
+
+  parse_data
+    Provided with some "data" and some options as hash or hash reference and
+    this will parse the given data and return a HTML::Object::Document
+    object.
+
+    If the option *utf8* is provided, the "data" received will be converted
+    to utf8 using "decode" in Encode. If an error occurs decoding the data
+    into utf8, the error will be set as an Module::Generic::Exception object
+    and undef will be returned.
+
+  parse_file
+    Provided with a file path and some options as hash or hash reference and
+    this will parse the file.
+
+    If the option *utf8* is provided, the file will be opened with "binmode"
+    in perlfunc set to "utf8"
+
+    It returns a new HTML::Object::Document
+
+  parse_url
+    Provided with an URI supported by LWP::UserAgent and this will issue a
+    GET query and parse the resulting HTML data, and return a new
+    HTML::Object::Document or HTML::Object::DOM::Document depending on which
+    interface you use (either HTML::Object or HTML::Object::DOM.
+
+    If an error occurred, this will set an error and return "undef".
+
+    You can get the response object with "response"
+
+  parser
+    Sets or gets a HTML::Parser object.
+
+  post_process
+    Provided with an HTML::Object::Element and this will post process its
+    parsing.
+
+  response
+    Get the latest HTTP::Response object from the HTTP query made using
+    "parse_url"
+
+  sanity_check
+    Provided with an HTML::Object::Element and this will perform some sanity
+    checks and report the result on "STDOUT".
+
+  set_dom
+    Provided with a HTML::Object::Document object and this sets the global
+    variable $GLOBAL_DOM. This is particularly useful when using
+    HTML::Object::XQuery to do things like:
+
+        my $collection = $('div');
+
+CREDITS
+    Throughout the documentation of this distribution, a lot of
+    descriptions, references and examples have been borrowed from Mozilla. I
+    have also contributed to improving their documentation by fixing bugs
+    and typos on their site.
+
+AUTHOR
+    Jacques Deguest <jack@deguest.jp>
+
+SEE ALSO
+    HTML::Object::DOM, HTML::Object::Element, HTML::Object::XQuery
+
+COPYRIGHT & LICENSE
+    Copyright (c) 2021 DEGUEST Pte. Ltd.
+
+    You can use, copy, modify and redistribute this package and associated
+    files under the same terms as Perl itself.
+

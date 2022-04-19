@@ -5,7 +5,7 @@ package OPM::Installer::Utils::TS;
 use strict;
 use warnings;
 
-our $VERSION = '1.0.0'; # VERSION
+our $VERSION = '1.0.1'; # VERSION
 
 use Carp;
 use Moo;
@@ -155,7 +155,7 @@ OPM::Installer::Utils::TS - class that provides helper functionality regarding t
 
 =head1 VERSION
 
-version 1.0.0
+version 1.0.1
 
 =begin Pod::Coverage
 

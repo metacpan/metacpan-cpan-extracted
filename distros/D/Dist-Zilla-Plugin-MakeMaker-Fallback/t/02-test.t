@@ -25,7 +25,7 @@ use RunTests;
     sub setup_installer {
         my $self = shift;
 
-        my @mfpl = grep { $_->name eq 'Makefile.PL' or $_->name eq 'Build.PL' } @{ $self->zilla->files };
+        my @mfpl = grep +($_->name eq 'Makefile.PL' or $_->name eq 'Build.PL'), @{ $self->zilla->files };
         $self->log_fatal('No Makefile.PL or Build.PL was found!') unless @mfpl == 2;
 
         # munges build scripts to add a line that saves the *TESTING

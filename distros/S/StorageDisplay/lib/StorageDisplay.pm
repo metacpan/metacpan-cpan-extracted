@@ -1,7 +1,7 @@
 #
 # This file is part of StorageDisplay
 #
-# This software is copyright (c) 2020 by Vincent Danjean.
+# This software is copyright (c) 2014-2022 by Vincent Danjean.
 #
 # This is free software; you can redistribute it and/or modify it under
 # the same terms as the Perl 5 programming language system itself.
@@ -13,7 +13,7 @@ use 5.14.0;
 package StorageDisplay;
 # ABSTRACT: Collect and display storages on linux machines
 
-our $VERSION = '1.0.7'; # VERSION
+our $VERSION = '1.0.8'; # VERSION
 
 1;
 
@@ -795,12 +795,19 @@ sub createPartitionTable {
     my $block = $self->block($dev);
     my $elem;
 
-    if ($block->blk_info("PTTYPE") eq "gpt") {
+    my $pttype = $block->blk_info("PTTYPE");
+    $pttype //= $self->get_info('partitions', $dev, 'type');
+    if (! defined($pttype)) {
+        $self->error("Unkown partition table for ".$block->name);
+	return;
+    }
+
+    if ($pttype eq "gpt") {
         $elem = StorageDisplay::Partition::GPT->new($block, $self);
-    } elsif ($block->blk_info("PTTYPE") eq "dos") {
+    } elsif ($pttype eq "dos" || $pttype eq "msdos") {
         $elem = StorageDisplay::Partition::MSDOS->new($block, $self);
     } else {
-        $self->warn("Unknown partition type ".$block->blk_info("PTTYPE")." for ".$block->name);
+        $self->warn("Unknown partition type ".$pttype." for ".$block->name);
         return;
     }
     if (!$self->_registerElement($elem)) {
@@ -1803,9 +1810,9 @@ sub disp_size {
     my $size = shift;
     my $unit = 'B';
     my $d=2;
-
+    #print STDERR "\n\ninit size=$size\n";
     {
-        use bigint;
+        use bigrat;
         my $divide = 1;
         if ($size >= 1024) { $unit = 'kiB'; }
         if ($size >= 1048576) { $unit = 'MiB'; $divide *= 1024; }
@@ -1822,6 +1829,10 @@ sub disp_size {
         $size = $size * 1000 / 1024;
         if ($size >= 10000) { $d = 1;}
         if ($size >= 100000) { $d = 0;}
+        #print STDERR "size=$size ", ref($size), "\n";
+        $size=int($size/10**(3-$d)+0.5)*10**(3-$d);
+        #print STDERR "size=$size ", ref($size), "\n";
+        $size = $size->numify();
     }
     return sprintf("%.$d"."f $unit", $size/1000);
 }
@@ -4256,6 +4267,28 @@ around BUILDARGS => sub {
         );
 };
 
+sub hwsize {
+    my $self = shift;
+    my $hwsize = shift;
+
+    if ($hwsize =~ /^[0-9]+$/) {
+        return $hwsize;
+    } elsif ($hwsize =~ /^([0-9]+)([BKMGTP])$/) {
+        my %pow = (
+            'B' => 0,
+            'K' => 1,
+            'M' => 2,
+            'G' => 3,
+            'T' => 4,
+            'P' => 5,
+            );
+        return $1 * (1024 ** $pow{$2});
+    } else {
+        print STDERR "Warning: cannot interpret size $hwsize, using -1\n";
+        return -1;
+    }
+}
+
 sub BUILD {
     my $self=shift;
     my $args=shift;
@@ -4307,11 +4340,15 @@ sub BUILD {
     }
     foreach my $dev (sort { $a->{'ID'} cmp $b->{'ID'} }
                      (values %{$args->{'Array'}})) {
+        #print STDERR Dumper($dev);
         my $devname = $dev->{'OS Path'};
         my $block = $st->block($devname);
+        #print STDERR Dumper($block->blk_info("SIZE")//$self->hwsize($dev->{'Size'}));
         my $raid_device = StorageDisplay::RAID::LSI::Megacli::RaidDevice->new(
             $self, $st, $block,
-            'size' => $block->blk_info("SIZE"),
+            # If the disk is not attached to linux (or have been 'deleted')
+            # the SIZE would be unknown from blk
+            'size' => $block->blk_info("SIZE")//$self->hwsize($dev->{'Size'}),
             'raid-level' => $dev->{'Type'},
             %{$dev},
             );
@@ -4518,6 +4555,10 @@ sub BUILD {
                 );
         } else {
             $id=$dev->{'enclosure'}.":".$dev->{'slot'};
+            if ($id eq '0:0') { # can be the case of FLD drives
+                $id .= ' ('.($cur_missing_count++).')';
+            }
+            #print STDERR "Adding $id\n";
             my $devpath = 'LSISASIrcu@'.$id;
             my $block;
             {
@@ -4538,7 +4579,7 @@ sub BUILD {
                 'raiddevice' => $id,
                 'state' => $dev->{'state'},
                 'model' => join(' ', $dev->{'manufacturer'}, $dev->{'model-number'}, $dev->{'serial-no'}),
-                'size' => $dev->{'size'},
+                'size' => $dev->{'size'}//'0', # No size on some FLD devices
                 'slot' => $id,
                 );
             if (defined($block)) {
@@ -4550,6 +4591,8 @@ sub BUILD {
         $self->addChild($d);
         $self->_add_named_raw_device($id, $d);
     }
+    my $defined_missing_count = $cur_missing_count;
+    $cur_missing_count = $missing_count;
     foreach my $dev (sort { $a->{'id'} cmp $b->{'id'} }
                      @{$args->{'volumes'}}) {
         my $devname = $args->{'wwid'}->{$dev->{'wwid'}};
@@ -4570,12 +4613,16 @@ sub BUILD {
             if ($id eq '0:0') {
                 $id .= ' ('.($cur_missing_count++).')';
             }
+            #print STDERR "Getting $id\n";
             my $rdsk = $self->raw_device($id);
             $rdsk->volume($raid_device);
             $rdsk->phyid($phyid);
         }
     }
-
+    if ($cur_missing_count != $defined_missing_count) {
+        print STDERR "Internal warning: wrong total of missing drives: $cur_missing_count != $defined_missing_count\n";
+    }
+    $missing_count = ($cur_missing_count > $defined_missing_count)?$cur_missing_count:$defined_missing_count;
     return $self;
 };
 
@@ -5030,7 +5077,7 @@ StorageDisplay - Collect and display storages on linux machines
 
 =head1 VERSION
 
-version 1.0.7
+version 1.0.8
 
 Replay commands
 
@@ -5040,7 +5087,7 @@ Vincent Danjean <Vincent.Danjean@ens-lyon.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Vincent Danjean.
+This software is copyright (c) 2014-2022 by Vincent Danjean.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

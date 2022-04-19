@@ -73,9 +73,9 @@ You can pass the configuration file via the `-c`/`--config-file` switch.
 The default config: [.yamltidy](.yamltidy)
 
 An indentation of two spaces is recommended.
-Sequences will currently be zero-indented, because the hyphen `-` counts
+Sequences will by default be zero-indented, because the hyphen `-` counts
 as indentation.
-An option to change that behaviour will be added.
+The option `block-sequence-in-mapping` can influence that.
 
 The best output for 4 spaces is subject to discussion for a lot of test cases.
 
@@ -118,7 +118,7 @@ The best output for 4 spaces is subject to discussion for a lot of test cases.
 ### Mappings for vim
 
 
-    :noremap <leader>yt ggvG:!yamltidy -<CR>
+    :noremap <leader>yt :%!yamltidy -<CR>
 
 Type `<leader>yt` to tidy the whole buffer
 

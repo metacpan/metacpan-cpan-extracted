@@ -5,7 +5,6 @@ use strict;
 use warnings;
 use Test::More;
 
-use Net::DNS;
 use Net::DNS::Resolver::Unbound;
 
 my $resolver = Net::DNS::Resolver::Unbound->new( debug_level => 0 );

@@ -16,7 +16,7 @@ name: Net-IPAM-Tree
 provides:
   Net::IPAM::Tree:
     file: lib/Net/IPAM/Tree.pm
-    version: '3.00'
+    version: '3.02'
   Net::IPAM::Tree::Private:
     file: lib/Net/IPAM/Tree/Private.pm
 requires:
@@ -25,5 +25,5 @@ requires:
   Net::IPAM::IP: '3.00'
   Scalar::Util: '1.39'
   perl: v5.10.0
-version: '3.00'
+version: '3.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -4,13 +4,14 @@ author:
   - 'Byrne Reese <byrne@cpan.org>'
   - 'Timothy Legge <timlegge@cpan.org>'
 build_requires:
+  Crypt::OpenSSL::Guess: '0'
   File::Which: '0'
   Test::Exception: '0'
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.022, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,7 +20,7 @@ name: XML-Sig
 provides:
   XML::Sig:
     file: lib/XML/Sig.pm
-    version: '0.56'
+    version: '0.57'
 requires:
   Carp: '0'
   Class::Accessor: '0'
@@ -44,7 +45,7 @@ requires:
 resources:
   bugtracker: https://github.com/perl-net-saml2/perl-XML-Sig/issues
   repository: git://github.com/perl-net-saml2/perl-XML-Sig.git
-version: '0.56'
+version: '0.57'
 x_contributors:
   - 'Byrne Reese <byrne@cpan.org>'
   - 'Chris Andrews <chris@nodnol.org>'
@@ -54,7 +55,7 @@ x_contributors:
   - 'Peter Marschall <peter@adpm.de>'
   - 'Michael Hendricks <michael@ndrix.org>'
   - 'Timothy Legge <timlegge@gmail.com>'
-x_generated_by_perl: v5.32.1
+x_generated_by_perl: v5.34.0
 x_maintainers:
   - 'Timothy Legge <timlegge@gmail.com>'
 x_serialization_backend: 'YAML::Tiny version 1.73'

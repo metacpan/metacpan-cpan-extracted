@@ -1,0 +1,61 @@
+{
+   "abstract" : "Easy tool to create social network map",
+   "author" : [
+      "Kang-min Liu <gugod@gugod.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "App::ModuleBuildTiny version 0.029",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Graph-SocialMap",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::Simple" : "0",
+            "YAML" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "App::ModuleBuildTiny" : "0.029"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Graph" : "0.54",
+            "Graph::Writer::GraphViz" : "0.07",
+            "Quantum::Superpositions" : "0",
+            "Spiffy" : "0.21"
+         }
+      }
+   },
+   "provides" : {
+      "Graph::SocialMap" : {
+         "file" : "lib/Graph/SocialMap.pm",
+         "version" : "0.13"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/gugod/Graph-SocialMap.git",
+         "web" : "https://github.com/gugod/Graph-SocialMap"
+      }
+   },
+   "version" : "0.13",
+   "x_serialization_backend" : "JSON::PP version 4.07",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
+   "x_static_install" : "1"
+}

@@ -33,13 +33,13 @@ my %WriteMakefileArgs = (
     "Moo" => 0,
     "OPM::Parser" => "1.06",
     "OPM::Repository" => "1.0.0",
-    "OPM::Validate" => "1.11",
+    "OPM::Validate" => "1.12",
     "Regexp::Common" => 0,
     "Test::More" => 0,
     "Type::Tiny" => 0,
     "Types::Standard" => 0
   },
-  "VERSION" => "1.0.0",
+  "VERSION" => "1.0.1",
   "test" => {
     "TESTS" => "t/*.t t/config/*.t t/file/*.t t/functions/*.t t/installer/*.t t/logger/*.t t/otrs/*.t"
   }
@@ -60,7 +60,7 @@ my %FallbackPrereqs = (
   "Moo" => 0,
   "OPM::Parser" => "1.06",
   "OPM::Repository" => "1.0.0",
-  "OPM::Validate" => "1.11",
+  "OPM::Validate" => "1.12",
   "Regexp::Common" => 0,
   "Test::More" => 0,
   "Type::Tiny" => 0,

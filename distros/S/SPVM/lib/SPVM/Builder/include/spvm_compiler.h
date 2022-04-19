@@ -92,19 +92,19 @@ struct spvm_compiler {
   SPVM_LIST* error_messages;
   
   // Strings - string literals and symbol names
-  SPVM_LIST* strings;
+  SPVM_LIST* constant_strings;
   
   // String symtable
-  SPVM_HASH* string_symtable;
+  SPVM_HASH* constant_string_symtable;
 
   // String Buffer
-  SPVM_STRING_BUFFER* string_buffer;
+  SPVM_STRING_BUFFER* constant_strings_buffer;
   
   // Used module symtable
   SPVM_HASH* used_class_symtable;
 
   // Fail load class symtable
-  SPVM_HASH* fail_load_class_symtable;
+  SPVM_HASH* not_found_class_class_symtable;
   
   // Operation codes
   SPVM_OPCODE_ARRAY* opcode_array;

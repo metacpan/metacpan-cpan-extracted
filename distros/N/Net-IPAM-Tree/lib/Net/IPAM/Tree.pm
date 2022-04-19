@@ -1,6 +1,6 @@
 package Net::IPAM::Tree;
 
-our $VERSION = '3.00';
+our $VERSION = '3.02';
 
 use 5.10.0;
 use strict;
@@ -198,15 +198,15 @@ sub to_string {
   return;
 }
 
-=head2 walk
+=head2 walk($walk_func)
 
 Walks the ordered tree, see L<to_string()>.
 
-  my $err_string = $t->walk($callback);
+  my $err_string = $t->walk($walk_func);
 
-For every item the callback function is called with the following hash-ref:
+For every item the walk_func function is called with the following hash-ref:
 
-    my $err = $callback->(
+    my $err = $walk_func->(
       {
         depth  => $i,           # starts at 0
         item   => $item,        # current block
@@ -218,13 +218,13 @@ For every item the callback function is called with the following hash-ref:
 The current depth is counting from 0.
 
 On error, the walk is stopped and the error is returned to the caller.
-The callback B<MUST> return undef if there is no error!
+The walk_func B<MUST> return undef if there is no error!
 
 =cut
 
 sub walk {
   my ( $self, $cb ) = @_;
-  Carp::croak("missing arg,")                        unless defined $cb;
+  Carp::croak("missing arg,") unless defined $cb;
   Carp::croak("wrong arg, callback is no CODE_REF,") unless ref $cb eq 'CODE';
 
   foreach my $c ( @{ $self->{_tree}{_ROOT} } ) {
@@ -272,7 +272,7 @@ L<Net::IPAM::Block>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2020-2021 by Karl Gaissmaier.
+This software is copyright (c) 2020-2022 by Karl Gaissmaier.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

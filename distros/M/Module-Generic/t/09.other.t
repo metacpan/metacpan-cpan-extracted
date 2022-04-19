@@ -184,10 +184,10 @@ subtest 'parse datetime' => sub
     {
         my $def = $dates->[$i];
         # XXX
-        if( $def->{test} eq '1626475051' )
-        {
-            $o->debug( $DEBUG );
-        }
+#         if( $def->{test} eq '1626475051' )
+#         {
+#             $o->debug( $DEBUG );
+#         }
         my $dt = $o->_parse_timestamp( $def->{test} );
         if( $def->{test} eq '1626475051' )
         {

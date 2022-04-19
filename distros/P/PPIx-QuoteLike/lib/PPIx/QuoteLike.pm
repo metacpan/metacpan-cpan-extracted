@@ -39,7 +39,7 @@ use PPIx::QuoteLike::Utils qw{
 };
 use Scalar::Util ();
 
-our $VERSION = '0.021';
+our $VERSION = '0.022';
 
 use constant CLASS_CONTROL       => 'PPIx::QuoteLike::Token::Control';
 use constant CLASS_DELIMITER     => 'PPIx::QuoteLike::Token::Delimiter';
@@ -68,12 +68,6 @@ use constant NO_INDENTATION	=>
 
 	my @children;
 
-	if ( defined $arg{postderef} ) {
-	    $class->_deprecation_notice( attribute => 'postderef' );
-	} else {
-	    $arg{postderef} = 1;
-	}
-
 	if ( $arg{location} ) {
 	    ARRAY_REF eq ref $arg{location}
 		or croak q<Argument 'location' must be an array reference>;
@@ -94,7 +88,6 @@ use constant NO_INDENTATION	=>
 	    encoding	=> $arg{encoding},
 	    failures	=> 0,
 	    location	=> $arg{location},
-	    postderef	=> ( $arg{postderef} ? 1 : 0 ),
 	    source	=> $source,
 	};
 
@@ -330,6 +323,10 @@ sub delimiters {
 #	This method returns true if the deprecation is in progress. In
 #	fact it returns the deprecation level.
 
+=begin comment
+
+# Abandoned in place, against future need.
+
 {
 
     my %deprecate = (
@@ -356,6 +353,10 @@ sub delimiters {
     }
 
 }
+
+=end comment
+
+=cut
 
 sub _get_value_scalar {
     my ( $self, $method ) = @_;
@@ -522,14 +523,6 @@ sub perl_version_removed {
 	}
     }
     return $max;
-}
-
-sub postderef {
-    my ( $self ) = @_;
-    # TODO postderef - eventually this goes away.
-    __PACKAGE__ eq caller
-	or $self->_deprecation_notice( attribute => 'postderef' );
-    return $self->{postderef};
 }
 
 sub schild {
@@ -715,8 +708,7 @@ sub __decode {
 		    or return [ CLASS_INTERPOLATION, "$sigil$rest" ];
 		# At this point we have @{[ ... ]}.
 		my @arg;
-		$self->postderef()
-		    and _has_postderef( "$1" )
+		_has_postderef( "$1" )
 		    and push @arg, postderef => 1;
 		return [ CLASS_INTERPOLATION, "$sigil$rest", @arg ];
 	    }
@@ -746,8 +738,7 @@ sub __decode {
 
 	    my @arg;
 
-	    if ( $self->postderef()
-		    and defined( my $deref = _match_postderef( $_[2] ) ) ) {
+	    if ( defined( my $deref = _match_postderef( $_[2] ) ) ) {
 		$interp .= $deref;
 		push @arg, postderef => 1;
 	    }
@@ -1057,15 +1048,14 @@ L<https://github.com/Perl-Critic/PPI/issues/251> is resolved.
 
 =head1 DEPRECATION NOTICE
 
-The L<postderef|/postderef> argument to L<new()|/new> is being put
-through a deprecation cycle and retracted. After the retraction, postfix
-dereferences will always be recognized. This is the default behaviour
-now.
+The C<postderef> argument to L<new()|/new> is being put through a
+deprecation cycle and retracted. After the retraction, postfix
+dereferences will always be recognized.
 
 Starting with version 0.012_01, the first use of this argument warned.
-With version 0.016_01, all uses will warn. With version 0.017_01 all
-uses will be fatal. With the first release after
-April 15 2022, all mention of this argument will be removed.
+With version 0.016_01, all uses warn. With version 0.017_01 all uses are
+fatal. With 0.0.021_01, all mention of this argument is removed, except
+of course for this notice.
 
 =head1 INHERITANCE
 
@@ -1129,17 +1119,6 @@ This argument is a reference to an array compatible with that returned
 by the L<PPI::Element|PPI::Element> location() method. It defaults to
 the location of the C<$source> argument if that was a
 L<PPI::Element|PPI::Element>, otherwise no locations will be available.
-
-=item postderef
-
-B<THIS ARGUMENT IS DEPRECATED>.
-See L<DEPRECATION NOTICE|/DEPRECATION NOTICE> above for the details.
-
-This Boolean argument determines whether postfix dereferencing is
-recognized in interpolation. If unspecified, or specified as C<undef>,
-it defaults to true. In version 0.012 it defaulted to the value of
-C<$PPIx::QuoteLike::DEFAULT_POSTDEREF>. This variable was not exported,
-and was true by default.
 
 =item trace
 

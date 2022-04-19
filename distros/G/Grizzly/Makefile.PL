@@ -14,7 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Grizzly",
   "EXE_FILES" => [
-    "bin/grizzly.pl"
+    "bin/grizzly"
   ],
   "LICENSE" => "mit",
   "NAME" => "Grizzly",
@@ -37,7 +37,7 @@ my %WriteMakefileArgs = (
     "App::Cmd::Tester" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.103",
+  "VERSION" => "0.104",
   "test" => {
     "TESTS" => "t/*.t"
   }

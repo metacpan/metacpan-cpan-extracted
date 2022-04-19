@@ -2,10 +2,10 @@
 
 use strict;
 use warnings;
-use Test::More;
-use Test::Strict;
 use File::Find;
 use File::Slurp 'slurp';
+use Test::More;
+use Test::Requires 'Test::Strict';
 
 my @scripts = map { local $_ = $_; "script/$_.cgi" } qw(
     ospfview

@@ -1,5 +1,5 @@
 NAME
-    Acme::Text::Rhombus - Draw a rhombus with letters
+    Acme::Text::Rhombus - Draw a rhombus with letters/digits
 
 SYNOPSIS
      use Acme::Text::Rhombus qw(rhombus);
@@ -30,7 +30,7 @@ SYNOPSIS
      +++++++Q+++++++
 
 FUNCTIONS
-  rhombus
+  rhombus, rhombus_letter
     Draws a rhombus with letters and returns it as a string.
 
     If no option value is supplied or if it is invalid, then a default will
@@ -63,9 +63,40 @@ FUNCTIONS
 
         Forward letter enumeration. Defaults to boolean 1.
 
+  rhombus_digit
+    Draws a rhombus with digits and returns it as a string.
+
+    If no option value is supplied or if it is invalid, then a default will
+    be silently assumed (omitting all options will return a rhombus of 25
+    lines).
+
+    Given that the specified number of lines is even, it will be incremented
+    to satisfy the requirement of being an odd number.
+
+    Options:
+
+    *   "lines"
+
+        Number of lines to be printed. Defaults to 25.
+
+    *   "digit"
+
+        Digit to start with. Defaults to 0.
+
+    *   "fillup"
+
+        The fillup character. Defaults to "+".
+
+    *   "forward"
+
+        Forward digit enumeration. Defaults to boolean 1.
+
 EXPORT
   Functions
-    "rhombus()" is exportable.
+    "rhombus(), rhombus_letter(), rhombus_digit()" are exportable.
+
+  Tags
+    ":all - *()"
 
 AUTHOR
     Steven Schubiger <schubiger@cpan.org>

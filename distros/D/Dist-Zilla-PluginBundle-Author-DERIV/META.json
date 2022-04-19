@@ -4,7 +4,7 @@
       "Deriv Services Ltd <DERIV@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -25,7 +25,7 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "7.64"
          }
       },
       "develop" : {
@@ -107,6 +107,7 @@
             "Dist::Zilla::Role::PluginBundle::Easy" : "0",
             "Dist::Zilla::Role::PluginBundle::PluginRemover" : "0",
             "Dist::Zilla::Util" : "0",
+            "ExtUtils::MakeMaker" : "7.64",
             "Moose" : "0",
             "Perl::Version" : "0",
             "Test::CPAN::Meta" : "0",
@@ -119,7 +120,7 @@
             "CPAN::Meta" : "2.120900"
          },
          "requires" : {
-            "ExtUtils::MakeMaker" : "0",
+            "ExtUtils::MakeMaker" : "7.64",
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
@@ -132,29 +133,30 @@
    "provides" : {
       "Dist::Zilla::PluginBundle::Author::DERIV" : {
          "file" : "lib/Dist/Zilla/PluginBundle/Author/DERIV.pm",
-         "version" : "0.001"
+         "version" : "0.003"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/binary-com/perl-Dist-Zilla-PluginBundle-Author-DERIV/issues"
+         "web" : "https://github.com/chylli-binary/perl-Dist-Zilla-PluginBundle-Author-DERIV/issues"
       },
-      "homepage" : "https://github.com/binary-com/perl-Dist-Zilla-PluginBundle-Author-DERIV",
+      "homepage" : "https://github.com/chylli-binary/perl-Dist-Zilla-PluginBundle-Author-DERIV",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/binary-com/perl-Dist-Zilla-PluginBundle-Author-DERIV.git",
-         "web" : "https://github.com/binary-com/perl-Dist-Zilla-PluginBundle-Author-DERIV"
+         "url" : "https://github.com/chylli-binary/perl-Dist-Zilla-PluginBundle-Author-DERIV.git",
+         "web" : "https://github.com/chylli-binary/perl-Dist-Zilla-PluginBundle-Author-DERIV"
       }
    },
-   "version" : "0.001",
+   "version" : "0.003",
    "x_authority" : "cpan:DERIV",
    "x_contributors" : [
-      "Eyad Arnabeh <eyadof@gmail.com>",
-      "Tom Molesworth <tom@binary.com>"
+      "chylli-binary <chylli@binary.com>",
+      "Tom Molesworth <tom@binary.com>",
+      "Eyad Arnabeh <eyadof@gmail.com>"
    ],
-   "x_generated_by_perl" : "v5.26.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.11",
+   "x_generated_by_perl" : "v5.34.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

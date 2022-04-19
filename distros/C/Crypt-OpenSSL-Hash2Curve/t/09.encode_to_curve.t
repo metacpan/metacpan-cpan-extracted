@@ -5,6 +5,7 @@ use Test::More ;
 use Crypt::OpenSSL::EC;
 use Crypt::OpenSSL::Bignum;
 use Crypt::OpenSSL::Hash2Curve;
+use Crypt::OpenSSL::Base::Func;
 #use Data::Dump qw/dump/;
 
 
@@ -14,10 +15,7 @@ my $group_name = "prime256v1";
 my $type = 'sswu';
 my $P = encode_to_curve($msg, $DST, $group_name, $type, 'SHA256', \&expand_message_xmd , 0 );
 
-my $params_ref = get_hash2curve_params($group_name, $type);
-my $group = $params_ref->[0];
-my $ctx = $params_ref->[-1];
-my $bn = Crypt::OpenSSL::EC::EC_POINT::point2hex($group, $P, 4, $ctx);
+my $bn = sn_point2hex($group_name, $P, 4);
 is($bn, '04993B46E30BA9CFC3DC2D3AE2CF9733CF03994E74383C4E1B4A92E8D6D466B321C4A642979162FBDE9E1C9A6180BD27A0594491E4C231F51006D0BF7992D07127', 'encode_to_curve');
 
 done_testing;

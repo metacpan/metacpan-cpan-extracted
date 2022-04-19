@@ -676,6 +676,7 @@ CODE:
         ST(0) = sv_2mortal(newSViv(av_len(ret_vals)+1));
     } else {
         len = av_len(ret_vals) + 1;
+        EXTEND(SP, len);
         for (i = 0; i < len; i++) {
             ST(i) = sv_mortalcopy(*av_fetch(ret_vals, i, 0));
         }

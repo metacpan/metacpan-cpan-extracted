@@ -2,7 +2,7 @@ package Log::OK;
 
 use strict;
 use warnings;
-use version; our $VERSION=version->declare("v0.1.0");
+use version; our $VERSION=version->declare("v0.1.1");
 
 use Carp qw<croak>;
 use constant::more ();
@@ -68,7 +68,7 @@ sub auto_detect {
 sub log_any {
         DEBUG_ and say "setup for Log::Any";
         my ($opt, $value)=@_;
-        state %lookup= (
+        state $lookup= {
 
         EMERGENCY => 0,
         ALERT     => 1,
@@ -82,7 +82,7 @@ sub log_any {
         INFORM    => 6,
         DEBUG     => 7,
         TRACE     => 8,
-    );
+	};
 	state $level=0;	
 	$value//="EMERGENCY"; #Default if undefined
 	$value=1 if $value eq "" or $value eq 0;
@@ -96,8 +96,8 @@ sub log_any {
 		}
 		else{
 		
-			$level=$lookup{$_};	
-			croak "Log::OK: unknown level \"$value\" for Log::Any. Valid options: ".join ', ', keys %lookup unless defined $level;
+			$level=$lookup->{$_};	
+			croak "Log::OK: unknown level \"$value\" for Log::Any. Valid options: ".join ', ', keys %$lookup unless defined $level;
 		}
 	}
 
@@ -127,14 +127,14 @@ sub log_ger {
 	
 	DEBUG_ and say "setup for Log::ger";
 	my ($opt, $value)=@_;
-	state %lookup=(
+	state $lookup={
 		fatal   => 10,
 		error   => 20,
 		warn    => 30,
 		info    => 40,
 		debug   => 50,
 		trace   => 60,
-	);
+	};
 	state $level=10;
 	$value//="fatal"; #Default if undefined
 	$value=1 if $value eq "" or $value eq 0;
@@ -147,12 +147,11 @@ sub log_ger {
 			$level=60 if $level > 60;
 		}
 		else{
-			$level=$lookup{$_};	
-			croak "Log::OK: unknown level \"$value\" for Log::ger. Valid options: ".join ', ', keys %lookup unless defined $level;
+			$level=$lookup->{$_};	
+			croak "Log::OK: unknown level \"$value\" for Log::ger. Valid options: ".join ', ', keys %$lookup unless defined $level;
 		}
 	}
 
-	#my $level=$lookup{lc $value}//int($value);
 	(
 		#TODO: these values don't work well with 
 		#incremental logging levels from the command line
@@ -172,7 +171,7 @@ sub log_ger {
 sub log_dispatch {
 	DEBUG_ and say "setup for Log::Dispatch";
 	my ($opt, $value)=@_;
-	state %lookup=(
+	state $lookup={
 		debug=>0,
 		info=>1,
 		notice=>2,
@@ -187,7 +186,7 @@ sub log_dispatch {
 		err=>4,
 		crit=>5,
 		emerg=>7
-	);
+	};
 	state $level;
 	$value//="emergency"; #Default if undefined
 	$value=1 if $value eq "" or $value eq 0;
@@ -201,12 +200,11 @@ sub log_dispatch {
 		}
 		else{
 		
-			$level=$lookup{$_};	
-			croak "Log::OK: unknown level \"$value\" for Log::Dispatch. Valid options: ".join ', ', keys %lookup unless defined $level;
+			$level=$lookup->{$_};	
+			croak "Log::OK: unknown level \"$value\" for Log::Dispatch. Valid options: ".join ', ', keys %$lookup unless defined $level;
 		}
 	}
 
-	#my $level=$lookup{lc $value}//int($value);
 
 
 
@@ -237,7 +235,7 @@ sub log_log4perl {
 	DEBUG_ and say "setup for Log::Log4perl";
 
 	my ($opt, $value)=@_;
-	state %lookup=(
+	state $lookup={
 
 		ALL   => 0,
 		TRACE =>  5000,
@@ -247,14 +245,14 @@ sub log_log4perl {
 		ERROR => 40000,
 		FATAL => 50000,
 		OFF   => (2 ** 31) - 1
-	);
+	};
 
-	state @levels=( 0,5000,10000,20000,30000,40000,50000,(2**31)-1);
+	state $levels=[ 0,5000,10000,20000,30000,40000,50000,(2**31)-1];
 
 	DEBUG_ and say "";
 	DEBUG_ and say "VALUE: $value";
 	my $level;
-	state $index=$#levels;
+	state $index=@$levels-1;
 
 	$value//="FATAL"; #Default if undefined
 	$value=1 if $value eq "" or $value eq 0;
@@ -265,20 +263,19 @@ sub log_log4perl {
 			#assume number
 			$index-=$_;
 			$index=0 if $index< 0;
-			$index=$#levels if $index > $#levels;
-			$level=$levels[$index];
-			croak "Log::OK: unknown level \"$value\" for Log::Log4perl" unless grep $level==$_, @levels;
+			$index=@$levels-1 if $index > @$levels-1;
+			$level=$levels->[$index];
+			croak "Log::OK: unknown level \"$value\" for Log::Log4perl" unless grep $level==$_, @$levels;
 
 		}
 		else{
-			$level=$lookup{$_};	
+			$level=$lookup->{$_};	
 
-			croak "Log::OK: unknown level \"$value\" for Log::Dispatch. Valid options: ".join ', ', keys %lookup unless defined $level;
-			($index)=grep $levels[$_]==$level, 0..$#levels;
+			croak "Log::OK: unknown level \"$value\" for Log::Log4perl. Valid options: ".join ', ', keys %$lookup unless defined $level;
+			($index)=grep $levels->[$_]==$level, 0..@$levels-1;
 		}
 	}
 
-	#my $level=$lookup{uc $value}//int($value);
 
 	DEBUG_ and say "LEVEL: $level";
 
@@ -286,7 +283,7 @@ sub log_log4perl {
 		#TODO: these values don't work well with 
 		#incremental logging levels from the command line
 
-		"Log::OK::OFF"=>$level<=$lookup{OFF},
+		"Log::OK::OFF"=>$level<=$lookup->{OFF},
 		"Log::OK::FATAL"=>$level<=50000,
 		"Log::OK::ERROR"=>$level<=40000,
 		"Log::OK::WARN"=>$level<=30000,

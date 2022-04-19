@@ -29,7 +29,9 @@ sub child_stop {
 	my %id = (exists $child->{id}) ? (id => exists $child->{id}) : ();
 	my %reason = ();
 
-	if (WIFSTOPPED($status)) {
+	if ($^O eq 'MSWin32') { # cpantester: strawberry perl does not support WIF calls
+		%reason = (reason => $child->{state});
+	} elsif (WIFSTOPPED($status)) {
 		warn "worker child $pid stopped\n";
 		return 0;
 	} elsif (WIFSIGNALED($status)) {
@@ -74,7 +76,7 @@ sub childs_reap {
 				$child->{state} = 'term';
 			}
 		} elsif ($res < 0) {
-			warn "worker child $child->{pid}: disappeared";
+			warn "worker child $child->{pid}: disappeared" unless ($^O eq 'MSWin32');
 			$self->child_stop($child->{pid}, 0);
 		} else {
 			$self->child_stop($child->{pid}, $?);

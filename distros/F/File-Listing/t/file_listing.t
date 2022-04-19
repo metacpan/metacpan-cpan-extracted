@@ -2,7 +2,6 @@ use strict;
 use warnings;
 use File::Listing;
 use Test::More;
-use Data::Dumper qw( Dumper );
 
 subtest 'unix' => sub {
 
@@ -153,7 +152,6 @@ subtest 'apache' => sub {
 
       my @listing = parse_dir(shift @dir, undef, "apache");
       ok(@listing);
-      note Dumper(\@listing);
    };
   }
 
@@ -172,14 +170,64 @@ subtest 'apache' => sub {
       [localtime($time)]->[5] + 1900;
     };
 
+    ## hack to test the test of 2038 bug systems when
+    ## you do not have one handy.
+    #require Test2::Mock;
+    #my $mock = Test2::Mock->new( class => 'Time::Local' );
+    #$mock->around( 'timelocal' => sub {
+    #  my $orig = shift;
+    #  my(undef,undef,undef,undef,undef, $year) = @_;
+    #  die "frooble bits" if $year >= 2038;
+    #  $orig->(@_);
+    #});
+
+    my $max_year = 2500;
+
+    local $@;
+    eval {
+      require Time::Local;
+      Time::Local::timelocal(0, 30, 16, 29, 5, 2038);
+    };
+
+    if(my $error = $@)
+    {
+      diag '';
+      diag "WARNING WARNING WARNING";
+      diag '';
+      diag "Your Perl / Operating System does not support dates in 2038.";
+      diag "(probably due to 32 bit unix epoch).";
+      diag "I will skip tests with these types of dates, but you should";
+      diag "upgrade your Perl / Operating System if possible";
+      diag '';
+      diag "actual exception: $error";
+      diag '';
+      diag "WARNING WARNING WARNING";
+      $max_year = 2037;
+    }
+
     # Note: explicitly not tested are two digit years,
     # because the current behavior is probably wrong.
     # Right now we assume 9x is 199x and 0-89 is 20xx,
     # which is definitely wrong in the long term, but
     # I don't even have any examples where apache provides
     # a two digit date.
-    foreach my $year (1970..2500) {
-      is( $parse->("$year-06-29 16:30"), $year, "year = $year" );
+    foreach my $year (1970..$max_year) {
+      local $@;
+
+      my $got = eval { $parse->("$year-06-29 16:30") };
+      my $error = $@;
+      my $expected = $year;
+      my $name = "year = $year";
+
+      if($error)
+      {
+        fail($name);
+        diag "parser threw exception: $error";
+      }
+      else
+      {
+        is( $got, $expected, $name );
+      }
     }
 
   };

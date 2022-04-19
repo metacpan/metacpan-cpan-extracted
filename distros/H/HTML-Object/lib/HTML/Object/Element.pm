@@ -1,11 +1,12 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/Element.pm
-## Version v0.1.0
+## Version v0.1.1
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/04/25
-## Modified 2021/08/23
+## Modified 2022/04/16
 ## All rights reserved
+## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
@@ -33,7 +34,7 @@ BEGIN
     our $LOOK_LIKE_HTML = qr/^[[:blank:]\h]*\<\w+.*?\>/;
     our $LOOK_LIKE_IT_HAS_HTML = qr/\<\w+.*?\>/;
     our $ATTRIBUTE_NAME_RE = qr/\w[\w\-]*/;
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.1.1';
 };
 
 sub init
@@ -552,7 +553,7 @@ sub detach
     return if( !$parent );
     my $id  = $self->eid;
     my $pos;
-    my $new = $parent->for(sub
+    my $new = $parent->children->for(sub
     {
         my( $i, $e ) = @_;
         if( $e->eid eq $id )
@@ -1687,7 +1688,7 @@ HTML::Object::Element - HTML Element Object
 
 =head1 VERSION
 
-    v0.1.0
+    v0.1.1
 
 =head1 DESCRIPTION
 

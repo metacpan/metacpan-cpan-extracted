@@ -1,6 +1,8 @@
 use strict;
 use warnings;
 package Net::SAML2::Protocol::LogoutResponse;
+our $VERSION = '0.55'; # VERSION
+
 use Moose;
 use MooseX::Types::URI qw/ Uri /;
 use Net::SAML2::XML::Util qw/ no_comments /;
@@ -8,8 +10,6 @@ use Net::SAML2::XML::Util qw/ no_comments /;
 with 'Net::SAML2::Role::ProtocolMessage';
 
 # ABSTRACT: SAML2 LogoutResponse Protocol object
-
-our $VERSION = '0.53';
 
 
 has 'status'      => (isa => 'Str', is => 'ro', required => 1);
@@ -91,7 +91,7 @@ Net::SAML2::Protocol::LogoutResponse - SAML2 LogoutResponse Protocol object
 
 =head1 VERSION
 
-version 0.53
+version 0.55
 
 =head1 SYNOPSIS
 

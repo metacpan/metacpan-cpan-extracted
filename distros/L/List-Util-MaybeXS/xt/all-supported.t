@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 use Test::More;
-use List::Util;
+use List::Util 1.56;
 use List::Util::MaybeXS;
 use List::Util::PP;
 

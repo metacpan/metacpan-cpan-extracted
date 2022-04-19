@@ -9,7 +9,7 @@ extends 'Code::TidyAll::Plugin';
 
 with 'Code::TidyAll::Role::GenericExecutable';
 
-our $VERSION = '0.81';
+our $VERSION = '0.82';
 
 sub transform_file {
     my $self = shift;
@@ -37,7 +37,7 @@ Code::TidyAll::Plugin::GenericTransformer - A plugin to run any executable as a 
 
 =head1 VERSION
 
-version 0.81
+version 0.82
 
 =head1 SYNOPSIS
 

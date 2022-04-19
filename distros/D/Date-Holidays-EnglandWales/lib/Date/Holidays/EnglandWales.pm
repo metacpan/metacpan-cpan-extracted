@@ -10,7 +10,7 @@ use DateTime::Event::Easter;
 require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT = qw( is_holiday is_uk_holiday );
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 
 =head1 NAME
@@ -53,7 +53,7 @@ is_uk_holiday
 
 This module uses the following modules which you can get from CPAN.
 
-DateTime
+Time::Piece
 DateTime::Event::Easter
 
 =head1 SEE ALSO
@@ -101,13 +101,13 @@ sub is_uk_holiday {
     if ( $year == 2011 && $month == 4 ) {
         return "Wedding of Prince William and Kate Middleton" if $day == 29;
     }
-    
+
     if ( $month == 5 ) {
         return "Early May Bank Holiday" if (
             ( $day >= 1 && $day <= 7 && $dt->day_of_week == 1 ) );
 
         return "Spring Bank Holiday" if (
-            $year != 2012 && 
+            $year != 2012 && $year != 2022 &&
             ( $day >= 25 && $dt->day_of_week == 1 ) );
     }
 
@@ -115,6 +115,11 @@ sub is_uk_holiday {
         return "Spring Bank Holiday" if $day == 4;
         return "Queen's Diamond Jubilee" if $day == 5;  # Subject to Her Maj not dying first but I cannot be bothered to code for that.
         return undef;
+    }
+
+    if ( $year == 2022 && $month == 6) {
+        return "Spring Bank Holiday" if $day == 2;
+        return "Queen's Platinum Jubilee" if $day == 3; # She's still here
     }
 
     if ( $month == 8 ) {

@@ -7,7 +7,7 @@
 # the same terms as the Perl 5 programming language system itself.
 #
 package Software::LicenseMoreUtils;
-$Software::LicenseMoreUtils::VERSION = '1.007';
+$Software::LicenseMoreUtils::VERSION = '1.008';
 use strict;
 use warnings;
 use 5.10.1;
@@ -24,7 +24,6 @@ use base qw/Software::LicenseUtils/;
 # a short name with '+' at the end of the short name implies an
 # "or later" clause.  i.e. GPL-1+ is "GPL-1 or any later version"
 my %more_short_names = (
-    'Apache-1.1'   => 'Software::License::Apache_1_1',
     'Apache-2'     => 'Software::License::Apache_2_0',
     'Artistic'     => 'Software::License::Artistic_1_0',
     'Artistic-1'   => 'Software::License::Artistic_1_0',
@@ -33,27 +32,17 @@ my %more_short_names = (
     'Expat'        => 'Software::License::MIT',
     'LGPL-2'       => 'Software::LicenseMoreUtils::LGPL_2',
     'LGPL_2'       => 'Software::LicenseMoreUtils::LGPL_2',
-    'LGPL-2.1'     => 'Software::License::LGPL_2_1',
-    'GPL-1+'       => 'Software::License::GPL_1',
-    'GPL-2+'       => 'Software::License::GPL_2',
-    'GPL-3+'       => 'Software::License::GPL_3',
-    'LGPL-2+'      => 'Software::LicenseMoreUtils::LGPL_2',
-    'LGPL_2+'      => 'Software::LicenseMoreUtils::LGPL_2',
-    'LGPL-2.1+'    => 'Software::License::LGPL_2_1',
-    'LGPL-3+'      => 'Software::License::LGPL_3_0',
-    'LGPL-3.0+'    => 'Software::License::LGPL_3_0',
+    'LGPL-3'       => 'Software::License::LGPL_3_0',
     'MPL-1.0'      => 'Software::License::Mozilla_1_0',
     'MPL-1.1'      => 'Software::License::Mozilla_1_1',
     'MPL-2.0'      => 'Software::License::Mozilla_2_0',
 
-    # Some SPDX v3 identifiers
-    'LGPL-2.0-or-later' => 'Software::LicenseMoreUtils::LGPL_2',
-    'LGPL-2.1-or-later' => 'Software::License::LGPL_2_1',
-    'LGPL-3.0-or-later' => 'Software::License::LGPL_3_0',
+    # GPL SPDX identifiers have another convention for GPL version number
+    'LGPL-2.0' => 'Software::LicenseMoreUtils::LGPL_2',
 
-    'GPL-1.0-or-later'  => 'Software::LicenseMoreUtils::GPL_1',
-    'GPL-2.0-or-later'  => 'Software::License::GPL_2',
-    'GPL-3.0-or-later'  => 'Software::License::GPL_3',
+    'GPL-1.0'  => 'Software::License::GPL_1',
+    'GPL-2.0'  => 'Software::License::GPL_2',
+    'GPL-3.0'  => 'Software::License::GPL_3',
 );
 
 sub _create_license {
@@ -74,7 +63,11 @@ sub _create_license {
 
     return $lic_obj if $lic_obj;
 
-    my $subclass = my $short = $arg->{short_name};
+    my $short = $arg->{short_name};
+    $short =~ s/-(only|or-later)$//;
+    $short =~ s/\+$//;
+
+    my $subclass = $short;
     $subclass =~ s/[\-.]/_/g;
 
     my $info = $more_short_names{$short} || "Software::License::$subclass";
@@ -129,7 +122,7 @@ Software::LicenseMoreUtils - More utilities and a summary for Software::License
 
 =head1 VERSION
 
-version 1.007
+version 1.008
 
 =head1 SYNOPSIS
 

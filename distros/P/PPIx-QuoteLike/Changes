@@ -1,3 +1,7 @@
+0.022		2022-04-15	T. R. Wyant
+    Remove 'postderef' argument to new().  Postfix dereference is always
+    recognized.
+
 0.021		2022-04-03	T. R. Wyant
     Recognize postfix deref in '@{[ ... ]}' for determining minimum Perl
     version.  This recognizes all forms of postfix dereference,

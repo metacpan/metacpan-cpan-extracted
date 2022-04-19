@@ -1,0 +1,11 @@
+{
+    "name": "Graph-SocialMap",
+    "x_static_install": true,
+    "resources": {
+        "repository": {
+            "web": "https://github.com/gugod/Graph-SocialMap",
+            "url": "https://github.com/gugod/Graph-SocialMap.git",
+            "type": "git"
+        }
+    }
+}

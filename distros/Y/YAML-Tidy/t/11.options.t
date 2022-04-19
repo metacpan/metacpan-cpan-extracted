@@ -26,7 +26,10 @@ EOM
         d: e
         f: g
 EOM
-    my $yt = YAML::Tidy->new( partial => 1 );
+    my $yt = YAML::Tidy->new(
+      partial => 1,
+      cfg => YAML::Tidy::Config->new( configfile => "$Bin/data/configs/config1.yaml" ),
+    );
     my $out = $yt->tidy($yaml);
     is($out, $partial, 'Partial tidy keeps first level of indent');
 

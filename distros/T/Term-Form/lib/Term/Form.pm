@@ -4,12 +4,12 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '0.545';
+our $VERSION = '0.546';
 use Exporter 'import';
-our @EXPORT_OK = qw( fill_form read_line );
+our @EXPORT_OK = qw( fill_form read_line ); #
 
 use Carp       qw( croak );
-use List::Util qw( any );
+use List::Util qw( any none );
 
 use Term::Choose::LineFold        qw( line_fold print_columns cut_to_printwidth );
 use Term::Choose::Constants       qw( :all );
@@ -110,6 +110,7 @@ sub _valid_options { ###
             keep               => '[ 1-9 ][ 0-9 ]*', # undocumented
             read_only          => 'Array_Int',
             section_separators => 'Array_Int',       # 24.06.2021 removed
+            history            => 'Array_Str',
             skip_items         => 'Regexp',          # experimental
                                                      # only keys are checked, passed values are ignored
                                                      # it's up to the user to remove the skipped items from the returned array
@@ -130,6 +131,7 @@ sub _valid_options { ###
             hide_cursor      => '[ 0 1 2 ]',
             no_echo          => '[ 0 1 2 ]',
             page             => '[ 0 1 2 ]',
+            history          => 'Array_Str',
             default          => 'Str',
             footer           => 'Str',
             info             => 'Str',
@@ -168,6 +170,7 @@ sub _defaults { ###
         default            => '',
         footer             => '',
         hide_cursor        => 1,
+        history            => [],
         info               => '',
         keep               => 5,
         no_echo            => 0,
@@ -207,6 +210,12 @@ sub __reset_term {
     elsif ( $self->{hide_cursor} == 2 ) {
         print hide_cursor();
     }
+}
+
+
+sub __reset {
+    my ( $self, $up ) = @_;
+    $self->__reset_term( $up );
     if ( exists $self->{backup_instance_defaults} ) {
         my $instance_defaults = $self->{backup_instance_defaults};
         for my $key ( keys %$self ) {
@@ -490,7 +499,6 @@ sub __add_char {
         $m->{diff}++;
     }
 }
-
 
 sub _unshift_element {
     my ( $m, $pos ) = @_;
@@ -911,7 +919,7 @@ sub fill_form {
     $self->{i}{arrow_w} = 1;
     local $| = 1;
     local $SIG{INT} = sub {
-        $self->__reset_term();
+        $self->__reset(); #
         print "^C\n";
         exit;
     };
@@ -993,7 +1001,7 @@ sub fill_form {
         }
         $self->{i}{direction} = 'down';
         if ( ! defined $char ) {
-            $self->__reset_term();
+            $self->__reset();
             warn "EOT: $!";
             return;
         }
@@ -1149,7 +1157,7 @@ sub fill_form {
                 $m = $self->__string_and_pos( $list );
             }
             elsif ( $list->[$self->{i}{curr_row}][0] eq $self->{back} ) {
-                    $self->__reset_term( $up );
+                    $self->__reset( $up );
                     return;
             }
             else {
@@ -1166,12 +1174,12 @@ sub fill_form {
             my $up = $self->{i}{curr_row} - $self->{i}{begin_row};
             $up += $self->{i}{info_prompt_row_count} if $self->{i}{info_prompt_row_count};
             if ( $list->[$self->{i}{curr_row}][0] eq $self->{back} ) {
-                $self->__reset_term( $up );
+                $self->__reset( $up );
                 return;
             }
             elsif ( $list->[$self->{i}{curr_row}][0] eq $self->{confirm} ) {
                 splice @$list, 0, @{$self->{i}{pre}};
-                $self->__reset_term( $up );
+                $self->__reset( $up );
                 return [ map { [ $orig_list->[$_][0], $list->[$_][1] ] } 0 .. $#{$list} ];
             }
             if ( $self->{auto_up} == 2 ) {
@@ -1373,6 +1381,62 @@ sub __modify_readline_options {
     if ( $self->{page} == 2 && $self->{clear_screen} != 1 ) {
         $self->{clear_screen} = 1;
     }
+    $self->{history} = [ grep { length } @{$self->{history}} ];
+}
+
+
+sub __select_history {
+    my ( $self, $m, $prompt, $history_up ) = @_;
+    if ( ! @{$self->{history}} ) {
+        return $m;
+    }
+    my $current = join '', map { $_->[0] } @{$m->{str}};
+    if ( none { $_ eq $current } @{$self->{history}} ) {
+        $self->{i}{curr_string} = $current;
+    }
+    my @history;
+    if ( any { $_ eq $current } @{$self->{i}{prev_filtered_history}//[]} ) {
+        @history = @{$self->{i}{prev_filtered_history}}
+    }
+    elsif ( any { $_ =~ /^\Q$current\E/i && $_ ne $current } @{$self->{history}} ) {
+        @history = grep { $_ =~ /^\Q$current\E/i && $_ ne $current } @{$self->{history}};
+        @{$self->{i}{prev_filtered_history}} = @history;
+        $self->{i}{history_idx} = @history;
+    }
+    else {
+        @history = @{$self->{history}};
+        if ( @{$self->{i}{prev_filtered_history}//[]} ) {
+            $self->{i}{prev_filtered_history} = [];
+            $self->{i}{history_idx} = @history;
+        };
+        if ( ! defined $self->{i}{history_idx} ) {
+            $self->{i}{history_idx} = @history;
+        }
+    }
+    if ( ! defined $self->{i}{history_idx} ) {
+        $self->{i}{history_idx} = @history;
+        # first up-key pressed -> last history entry and not curr_string
+    }
+    push @history, $self->{i}{curr_string} // '';
+    if ( $history_up ) {
+        if ( $self->{i}{history_idx} == 0 ) {
+            $self->{i}{beep} = 1;
+        }
+        else {
+            --$self->{i}{history_idx};
+        }
+    }
+    else {
+        if ( $self->{i}{history_idx} >= $#history ) {
+            $self->{i}{beep} = 1;
+        }
+        else {
+            ++$self->{i}{history_idx};
+        }
+    }
+    my $list = [ [ $prompt, $history[$self->{i}{history_idx}] ] ];
+    $m = $self->__string_and_pos( $list );
+    return $m;
 }
 
 
@@ -1502,7 +1566,7 @@ sub readline {
     }
     local $| = 1;
     local $SIG{INT} = sub {
-        $self->__reset_term();
+        $self->__reset(); #
         print "^C\n";
         exit;
     };
@@ -1560,40 +1624,42 @@ sub readline {
         $self->__print_readline( $m );
         my $char = $self->{plugin}->__get_key_OS();
         if ( ! defined $char ) {
-            $self->__reset_term();
+            $self->__reset();
             warn "EOT: $!";
             return;
         }
         # reset $m->{avail_w} to default:
         $m->{avail_w} = $self->{i}{avail_w};
         $self->__threshold_char_count( $m );
-        if    ( $char == NEXT_get_key                     ) { next CHAR }
-        elsif ( $char == KEY_TAB                          ) { next CHAR }
-        elsif ( $char == VK_UP      || $char == CONTROL_R ) { for ( 1 .. $big_step ) { last if $m->{pos} == 0; $self->__left( $m  ) } }
-        elsif ( $char == VK_DOWN    || $char == CONTROL_S ) { for ( 1 .. $big_step ) { last if $m->{pos} == @{$m->{str}}; $self->__right( $m ) } }
-        elsif ( $char == CONTROL_U                        ) { $self->__ctrl_u( $m ) }
-        elsif ( $char == CONTROL_K                        ) { $self->__ctrl_k( $m ) }
-        elsif ( $char == VK_RIGHT   || $char == CONTROL_F ) { $self->__right(  $m ) }
-        elsif ( $char == VK_LEFT    || $char == CONTROL_B ) { $self->__left(   $m ) }
-        elsif ( $char == VK_END     || $char == CONTROL_E ) { $self->__end(    $m ) }
-        elsif ( $char == VK_HOME    || $char == CONTROL_A ) { $self->__home(   $m ) }
-        elsif ( $char == KEY_BSPACE || $char == CONTROL_H ) { $self->__bspace( $m ) }
-        elsif ( $char == VK_DELETE  || $char == CONTROL_D ) { $self->__delete( $m ) }
-        elsif ( $char == CONTROL_X ) {
+        if    ( $char == NEXT_get_key                       ) { next CHAR }
+        elsif ( $char == KEY_TAB                            ) { next CHAR }
+        elsif ( $char == VK_PAGE_UP   || $char == CONTROL_P ) { for ( 1 .. $big_step ) { last if $m->{pos} == 0; $self->__left( $m  ) } }
+        elsif ( $char == VK_PAGE_DOWN || $char == CONTROL_N ) { for ( 1 .. $big_step ) { last if $m->{pos} == @{$m->{str}}; $self->__right( $m ) } }
+        elsif (                          $char == CONTROL_U ) { $self->__ctrl_u( $m ) }
+        elsif (                          $char == CONTROL_K ) { $self->__ctrl_k( $m ) }
+        elsif ( $char == VK_RIGHT     || $char == CONTROL_F ) { $self->__right(  $m ) }
+        elsif ( $char == VK_LEFT      || $char == CONTROL_B ) { $self->__left(   $m ) }
+        elsif ( $char == VK_END       || $char == CONTROL_E ) { $self->__end(    $m ) }
+        elsif ( $char == VK_HOME      || $char == CONTROL_A ) { $self->__home(   $m ) }
+        elsif ( $char == KEY_BSPACE   || $char == CONTROL_H ) { $self->__bspace( $m ) }
+        elsif ( $char == VK_DELETE    || $char == CONTROL_D ) { $self->__delete( $m ) }
+        elsif ( $char == VK_UP        || $char == CONTROL_R ) { $m = $self->__select_history( $m, $prompt, 1 ) }
+        elsif ( $char == VK_DOWN      || $char == CONTROL_S ) { $m = $self->__select_history( $m, $prompt, 0 ) }
+        elsif (                          $char == CONTROL_X ) {
             if ( @{$m->{str}} ) {
                 my $list = [ [ $prompt, '' ] ];
                 $m = $self->__string_and_pos( $list );
             }
             else {
-                $self->__reset_term( $self->{i}{info_row_count} + $self->{i}{pre_text_row_count} );
+                $self->__reset( $self->{i}{info_row_count} + $self->{i}{pre_text_row_count} );
                 return;
             }
         }
-        elsif ( $char == VK_PAGE_UP || $char == VK_PAGE_DOWN || $char == VK_INSERT ) {
+        elsif ( $char == VK_INSERT ) {
             $self->{i}{beep} = 1;
         }
         elsif ( $char == LINE_FEED || $char == CARRIAGE_RETURN ) {
-            $self->__reset_term( $self->{i}{info_row_count} + $self->{i}{pre_text_row_count} );
+            $self->__reset( $self->{i}{info_row_count} + $self->{i}{pre_text_row_count} );
             return join( '', map { $_->[0] } @{$m->{str}} );
         }
         else {
@@ -1620,7 +1686,7 @@ Term::Form - Read lines from STDIN.
 
 =head1 VERSION
 
-Version 0.545
+Version 0.546
 
 =cut
 

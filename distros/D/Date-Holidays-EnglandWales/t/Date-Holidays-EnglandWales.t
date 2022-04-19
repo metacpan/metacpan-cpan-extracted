@@ -5,7 +5,7 @@
 
 # change 'tests => 1' to 'tests => last_test_to_print';
 
-use Test::More tests => 16;
+use Test::More tests => 19;
 BEGIN { use_ok('Date::Holidays::EnglandWales') };
 
 #########################
@@ -39,5 +39,13 @@ ok(is_uk_holiday("2011-05-30"),
     "2011-05-30 is a holiday (Spring Bank Holiday)");
 ok(is_uk_holiday("2011-08-29"),
     "2011-08-29 is a holiday (Late Summer Holiday)");
+
+# 2022 is a special year. The spring bank holiday moved to 2nd June and extra day added for Queen's Jubilee
+ok(!is_uk_holiday("2022-05-27"),
+    "2022-05-27 is not a holiday (moved to 2nd June)");
+ok(is_uk_holiday("2022-06-02"),
+    "2022-06-02 is a holiday (Spring Bank Holiday)");
+ok(is_uk_holiday("2022-06-03"),
+    "2022-06-03 is a holiday (Queen's Platinum Jubilee)");
 
 

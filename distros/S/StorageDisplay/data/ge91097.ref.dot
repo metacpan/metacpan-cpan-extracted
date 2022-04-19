@@ -71,7 +71,7 @@ digraph "machine"{
 			style=striped;fillcolor="pink;0.771782.2:green"
 		]; }
 		{ "@FS@/boot/efi" [
-			label="/boot/efi\nDevice: /dev/vda1\nvfat\nSize: 285 MiB\nFree: 280 MiB\nUsed: 5.12 MiB";
+			label="/boot/efi\nDevice: /dev/vda1\nvfat\nSize: 285 MiB\nFree: 280 MiB\nUsed: 5.13 MiB";
 			style=striped;fillcolor="pink;0.017993.2:green"
 		]; }
 		label="Mounted FS and swap";

@@ -2,8 +2,8 @@
 
 use strict;
 use warnings;
-use Test::More;
 use File::Find;
+use Test::More;
 
 my @scripts = map { local $_ = $_; "./script/$_" } qw(
     ciscoospf2yaml
@@ -15,6 +15,8 @@ my @scripts = map { local $_ = $_; "./script/$_" } qw(
 );
 
 plan tests => 3 * @scripts;
+
+my $code = $^O eq "MSWin32" ? 1<<8 : 2<<8;
 
 foreach (@scripts) {
     my $pid = open(my $fh, '-|');
@@ -29,7 +31,7 @@ foreach (@scripts) {
     }
     my $out = eval { local $/; <$fh> };
     close($fh) || !$! or die "Fork and open pipe failed: $!";
-    is($?, 2<<8, "$_ exit") or diag("Script $_ exit code is not 2<<8: $?");
+    is($?, $code, "$_ exit") or diag("Script $_ exit code is not 2<<8: $?");
     like($out, qr{^Usage: $_ }m, "$_ usage") or diag("No usage: $out");
 }
 

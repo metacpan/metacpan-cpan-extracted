@@ -29,7 +29,7 @@ use Try::Tiny;
 
 use Moo 2.000000;
 
-our $VERSION = '0.81';
+our $VERSION = '0.82';
 
 sub default_conf_names { ( 'tidyall.ini', '.tidyallrc' ) }
 
@@ -850,7 +850,7 @@ Code::TidyAll - Engine for tidyall, your all-in-one code tidier and validator
 
 =head1 VERSION
 
-version 0.81
+version 0.82
 
 =head1 SYNOPSIS
 
@@ -1066,13 +1066,17 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Adam Herzog Andy Jack Bernhard Schmalhofer Finn Smith George Hartzell Graham Knop Gregory Oschwald Joe Crotty Kenneth Ölwing Mark Fowler Grimes Martin Gruner Mohammad S Anwar Nick Tonkin Olaf Alders Pedro Melo Ricardo Signes Sergey Romanov Shlomi Fish timgimyee
+=for stopwords Adam Herzog Andreas Vögele Andy Jack Bernhard Schmalhofer Finn Smith George Hartzell Graham Knop Gregory Oschwald Joe Crotty Kenneth Ölwing Mark Fowler Grimes Martin Gruner Mohammad S Anwar Nick Tonkin Olaf Alders Pedro Melo Ricardo Signes Sergey Romanov Shlomi Fish timgimyee
 
 =over 4
 
 =item *
 
 Adam Herzog <adam@adamherzog.com>
+
+=item *
+
+Andreas Vögele <andreas@andreasvoegele.com>
 
 =item *
 

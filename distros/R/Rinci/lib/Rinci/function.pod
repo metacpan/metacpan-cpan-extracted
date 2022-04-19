@@ -1,3 +1,5 @@
+# no code
+## no critic: RequireUseStrict
 package Rinci::function; # just to make PodWeaver happy
 
 # AUTHORITY
@@ -24,7 +26,7 @@ Rinci::function - Metadata for your functions/methods
 
 =head1 VERSION
 
-This document describes version 1.1.100 of Rinci::function (from Perl distribution Rinci), released on 2022-01-23.
+This document describes version 1.1.101 of Rinci::function (from Perl distribution Rinci), released on 2022-03-20.
 
 =head1 INTRODUCTION
 
@@ -558,6 +560,7 @@ L</"deps (function property)"> property. It is a hash or dep types and values.
 The most important dep type is C<arg> (dependency to another argument). Some dep
 types are special: C<all>, C<any>, C<none>. Example:
 
+ # function metadata property
  args => {
      delete => {
          schema=>'bool',
@@ -567,6 +570,8 @@ types are special: C<all>, C<any>, C<none>. Example:
          schema => 'bool',
          deps => {arg=>'delete'},
      },
+     ...
+ },
 
 The above example states that argument C<force> "depends on" C<delete>. What it
 means (usually) is that specifying C<force> only makes sense when C<delete> is
@@ -575,6 +580,60 @@ also specified. In a CLI context:
  % prog --delete --force
 
 Specifying C<--force> without C<--delete> doesn't make sense.
+
+To depend on any one of several arguments, use the dep type C<any>, e.g.:
+
+ # function metadata property
+ args => {
+     delete => {
+         schema=>'bool',
+     },
+     replace => {
+         schema=>'bool',
+     },
+     force => {
+         summary => 'Force deletion',
+         schema => 'bool',
+         deps => {any => [
+             {arg=>'delete'},
+             {arg=>'replace'},
+         ]},
+     },
+     ...
+ },
+
+In CLI context, this means C<--force> can be specified when C<--delete> or
+C<--replace> is specified.
+
+To depend on several arguments, use the dep type C<all>, e.g.:
+
+ # function metadata property
+ args => {
+     red => {
+         schema=>'uint',
+         pos => 0,
+     },
+     green => {
+         schema=>'uint',
+         pos => 1,
+     },
+     blue => {
+         schema=>'uint',
+         pos => 2,
+     },
+     rgb16 => {
+         schema => 'Use 3x16bits = 48bits to represent RGB value instead of the default 3x8 = 24bits',
+         deps => {all => [
+             {arg=>'red'},
+             {arg=>'green'},
+             {arg=>'blue'},
+         ]},
+     },
+     ...
+ },
+
+In CLI context, this means specifying C<--rgb16> only makes sense when all of
+C<--ed>, C<--green>, C<--blue> are specified.
 
 =head3 filters
 
@@ -1345,12 +1404,16 @@ Example:
 
 =item * prog
 
-Str. Require that a program exists. If STR doesn't contain path separator
-character '/' it will be searched in PATH. Windows filesystem should also use
-Unix-style path, e.g. "C:/Program Files/Foo/Bar.exe".
+Str of defhash. Require that a program exists and is executable. If STR doesn't
+contain path separator character '/' it will be searched in PATH. Windows
+filesystem should also use Unix-style path, e.g. "C:/Program Files/Foo/Bar.exe".
 
  prog => 'rsync'   # any rsync found on PATH
  prog => '/bin/su' # won't accept any other su
+
+As an alternative to just a string, the dep value can also be a defhash.
+Currently known properties for the defhash: C<name> (program name or path,
+required), C<min_version> (minimum version).
 
 =item * pkg
 
@@ -1590,7 +1653,7 @@ beyond that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

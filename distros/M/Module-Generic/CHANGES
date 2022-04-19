@@ -1,6 +1,19 @@
 Revision history for Perl module Module::Generic
 
-v0.23.0 2022-03-27T20:30:48+0900
+v0.23.1 2022-03-28T11:18:17+0900
+    - Added method  _set_get_glob in Module::Generic
+    - Corrected a small bug in Module::Generic::Dynamic
+    - Corrected a small bug in method content() in Module::Generic::File
+    - Added method chown in Module::Generic::File
+    - Added method datetime in Module::Generic::DateTime
+    - Made a minor correction in chmod when reporting the mode upon error
+    - Changed autoload of methods in Module::Generic
+    - Updated the methods append and prepend in Module::Generic::Scalar to also accept sa calar reference or object
+    - Changed return value for _set_get_scalar_as_object to the object when the context is object
+    - Corrected a minor bug in pass_error in Module::Generic
+    - Minor improvement on when a directory was removed while perl was running affecting _uri_file_cwd() in Module::Generic::File
+
+v0.23.0 2022-03-27T20:30:48Z +0900
     - Minor improvement in _parse_timestamp
     - Implemented inline autoloading of some subroutines
 

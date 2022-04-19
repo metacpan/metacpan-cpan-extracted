@@ -1,11 +1,89 @@
 Revision history for SPVM
+0.9511  2021-04-18
+        [CHANGE]
+        * Support cast from class muldim array to interface muldim array
+        * Support cast from class muldim array to callback muldim array
+        * Add postfix type cast syntax
+          
+          $num->(string)
+          
+          This is same as
+          
+          (string)$num;
+        * Improve field access error message.
+        * Move compiler native APIs from env->compier_xxx to env->api->compiler->xxx.
+          // Compiler API
+          void* compiler_api = env->api->compiler;
+          
+          // New compiler
+          void* compiler = compiler_api->new_compiler();
+          
+          // Compile SPVM
+          int32_t status = compiler_api->compile_spvm(compiler, "MyClass");
+          
+          // Free compiler
+          compiler_api->free_compiler(compiler);
+        * Move the following native APIs to env->api->runtime->xxx.
+          
+          get_precompile_method_address
+          set_native_method_address
+          set_precompile_method_address
+          get_method_id_without_signature
+          get_method_id_without_signature
+          get_constant_string_value
+
+          // Runtime API
+          void* runtime_api = env->api->runtime;
+          
+          // New runtime
+          void* runtime = runtime_api->new_runtime();
+          
+          // Free runtime
+          runtime_api->free_runtime(runtime);
+
+        * Add SPVM::Document::NativeAPI::Compiler document.
+        * Add SPVM::Document::NativeAPI::Runtime document.
+        * Improve English syntax of error messages.
+        [BUG FIX]
+        * Fix the bug that dump weaken objects.
+        * Fix the bug of isweak operator compile checking.
+        
+        [NON BACKWORD COMPATIBLE CHANGES]
+        * Internally used Native APIs object_type_category_offset become always NULL.
+        * Remove native APIs from env->compier_xxx. This APIs is moved to compiler native APIs.
+        * Remove the following native APIs
+          get_precompile_method_address
+          set_native_method_address
+          set_precompile_method_address
+          get_method_id_without_signature
+          get_method_id_without_signature
+          get_constant_string_value
+        * Native API "is_object_array" ID becomes 186
+        * Remove the following compiler APIs.
+          int32_t (*get_methods_length)(void* compiler, int32_t class_id);
+          int32_t (*get_method_id)(void* compiler, int32_t class_id, int32_t method_index_of_class);
+          int32_t (*get_method_id_by_name)(void* compiler, const char* class_name, const char* method_name);
+          const char* (*get_method_name)(void* compiler, int32_t method_id);
+          const char* (*get_method_signature)(void* compiler, int32_t method_id);
+          int32_t (*is_anon_method)(void* compiler, int32_t method_id);
+          int32_t (*is_init_block_method)(void* compiler, int32_t method_id);
+          int32_t (*is_native_method)(void* compiler, int32_t method_id);
+          int32_t (*is_precompile_method)(void* compiler, int32_t method_id);
+          const char* (*get_class_module_file)(void* compiler, int32_t class_id);
+          int32_t (*get_class_id)(void* compiler, const char* class_name);
+          int32_t (*get_classes_length)(void* compiler);
+          const char* (*get_class_name)(void* compiler, int32_t class_id);
+          int32_t (*is_anon_class)(void* compiler, int32_t class_id);
+          int32_t (*get_method_class_id)(void* compiler, int32_t method_id);
+        * Reorder compiler native APIs.
+        
 0.9510  2021-04-05
         [CHANGE]
         * Add alias syntax
         * Improve the error messages of object-to-numeric type conversion
         * Add type comment syntax
         * Support cast from class array to interface array
-        * Support cats from class array to callback array
+        * Support cast from class array to callback array
           
         [BUG FIX]
         * Fix the bug that the runtime is not freed.

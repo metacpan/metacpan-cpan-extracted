@@ -69,7 +69,7 @@ use PPIx::Regexp::Token::Unmatched			();
 use PPIx::Regexp::Tokenizer				();
 use PPIx::Regexp::Util qw{ __choose_tokenizer_class __instance };
 
-our $VERSION = '0.084';
+our $VERSION = '0.085';
 
 =head2 new
 

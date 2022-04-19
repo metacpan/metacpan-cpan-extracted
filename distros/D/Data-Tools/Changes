@@ -1,5 +1,13 @@
 Revision history for Perl extension Data::Tools
 
+1.29 2022-04-17
+
+    Data::Tools::Time
+
+    - added definition of julian_date_from_utime()
+    - make julian_date_from_ymd( year, month, day ) to allow optional day, or month and day
+    - added julian_date_from_md( month, day )
+
 1.28 2022-04-04
 
     - CSV parse code fixed to handle trailing fields with wrong count of "s

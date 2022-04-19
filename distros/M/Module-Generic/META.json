@@ -98,13 +98,13 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://git.deguest.jp/jack/Module-Generic/issues"
+         "web" : "https://gitlab.com/jackdeguest/Module-Generic/issues"
       },
       "repository" : {
          "type" : "git",
-         "web" : "https://git.deguest.jp/jack/Module-Generic"
+         "web" : "https://gitlab.com/jackdeguest/Module-Generic"
       }
    },
-   "version" : "v0.23.0",
+   "version" : "v0.23.1",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

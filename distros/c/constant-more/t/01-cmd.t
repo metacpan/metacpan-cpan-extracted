@@ -10,7 +10,7 @@ my $dir =dirname __FILE__;
 {
 	#Tests keeping command line options after processing
 	my $fh;
-	unless(open $fh, "-|", "perl -I $dir/../lib $dir/01-keep.t.p --test_option 10"){
+	unless(open $fh, "-|", "$^X -I $dir/../lib $dir/01-keep.t.p --test_option 10"){
 		die "Could not open sub process";
 	}
 
@@ -28,7 +28,7 @@ my $dir =dirname __FILE__;
 {
 	#Tests consuming command line options during processing
 	my $fh;
-	unless(open $fh, "-|", "perl -I $dir/../lib $dir/01-consume.t.p --test_option 10"){
+	unless(open $fh, "-|", "$^X -I $dir/../lib $dir/01-consume.t.p --test_option 10"){
 		die "Could not open sub process";
 	}
 
@@ -46,7 +46,7 @@ my $dir =dirname __FILE__;
 {
 	#Tests sub called mulitple times from command line, synthetically generating different constant names
 	my $fh;
-	unless(open $fh, "-|", "perl -I $dir/../lib $dir/01-sub.t.p --test_option 10 --test_option 20"){
+	unless(open $fh, "-|", "$^X -I $dir/../lib $dir/01-sub.t.p --test_option 10 --test_option 20"){
 		die "Could not open sub process";
 	}
 
@@ -65,7 +65,7 @@ my $dir =dirname __FILE__;
 	#Tests sub called mulitple times from command line, ensuring the same constant is updated be for
 	#being created
 	my $fh;
-	unless(open $fh, "-|", "perl -I $dir/../lib $dir/01-sub.t.p --test_option 10 --test_option 20"){
+	unless(open $fh, "-|", "$^X -I $dir/../lib $dir/01-sub.t.p --test_option 10 --test_option 20"){
 		die "Could not open sub process";
 	}
 

@@ -5,7 +5,7 @@ use warnings;
 
 use base qw(Config::INI::Reader);
 
-our $VERSION = '0.81';
+our $VERSION = '0.82';
 
 my %multi_value = map { $_ => 1 } qw( ignore inc ok_exit_codes select shebang );
 
@@ -40,7 +40,7 @@ Code::TidyAll::Config::INI::Reader - A L<Config::INI::Reader> subclass which can
 
 =head1 VERSION
 
-version 0.81
+version 0.82
 
 =head1 SUPPORT
 

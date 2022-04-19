@@ -1,5 +1,5 @@
 ---
-abstract: 'Unbound resolver base for Net::DNS'
+abstract: 'Net::DNS resolver based on libunbound'
 author:
   - 'Dick Franks'
 build_requires:
@@ -24,7 +24,7 @@ no_index:
 requires:
   Carp: '1.1'
   DynaLoader: '1.04'
-  Net::DNS: '1.18'
+  Net::DNS: '1.19'
   perl: '5.008009'
-version: '1.11'
+version: '1.12'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

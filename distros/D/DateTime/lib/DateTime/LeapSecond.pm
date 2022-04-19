@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '1.57';
+our $VERSION = '1.58';
 
 our ( @RD, @LEAP_SECONDS, %RD_LENGTH );
 
@@ -134,7 +134,7 @@ DateTime::LeapSecond - leap seconds table and utilities
 
 =head1 VERSION
 
-version 1.57
+version 1.58
 
 =head1 SYNOPSIS
 

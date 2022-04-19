@@ -13,6 +13,7 @@ __DATA__
 API
 Adam
 Alders
+Andreas
 Andy
 Anwar
 Bernhard
@@ -107,8 +108,10 @@ Tokuhiro
 Tonkin
 Util
 Vim
+Vögele
 Zglob
 adam
+andreas
 andyjack
 argv
 ascii

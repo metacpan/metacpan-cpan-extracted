@@ -96,7 +96,7 @@ PROTOTYPES: ENABLE
 void
 DESTROY(struct av* handle)
     CODE:
-	av_pop(handle);
+	sv_2mortal( (SV*) handle );
 
 int
 async_id(struct av* handle)
@@ -302,6 +302,10 @@ ub_wait(struct ub_ctx* ctx)
 
 
 
+########################
+## TEST PURPOSES ONLY ##
+########################
+
 MODULE = Net::DNS::Resolver::Unbound	PACKAGE = Net::DNS::Resolver::libunbound
 
 SV*
@@ -310,11 +314,6 @@ VERSION(void)
 	RETVAL = newSVpv( ub_version(), 0 );
     OUTPUT:
 	RETVAL
-
-
-########################
-## TEST PURPOSES ONLY ##
-########################
 
 Net::DNS::Resolver::Unbound::Handle
 emulate_callback(int async_id, int err, struct ub_result* result=NULL)

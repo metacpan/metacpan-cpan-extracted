@@ -2,9 +2,9 @@
 
 use strict;
 use warnings;
-use Test::More;
-use Test::Strict;
 use File::Find;
+use Test::More;
+use Test::Requires 'Test::Strict';
 
 my @scripts = map { local $_ = $_; "script/$_" } qw(
     ciscoospf2yaml

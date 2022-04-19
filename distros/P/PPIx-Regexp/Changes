@@ -1,3 +1,7 @@
+0.085		2022-04-16	T. R. Wyant
+    Remove 'postderef' argument to PPIx::Regexp->new().  Postfix
+    dereference is always recognized.
+
 0.084		2022-04-02	T. R. Wyant
     Require PPI 1.238 for postfix deref support, and recode the
     postfix deref logic in terms of 1.238's functionality.

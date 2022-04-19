@@ -16,7 +16,7 @@
   #include "spvm_list.h"
   #include "spvm_class.h"
   #include "spvm_descriptor.h"
-  #include "spvm_string.h"
+  #include "spvm_constant_string.h"
 %}
 
 %token <opval> CLASS HAS METHOD OUR ENUM MY USE AS REQUIRE ALIAS ALLOW CURRENT_CLASS MUTABLE
@@ -41,7 +41,7 @@
 %type <opval> array_access field_access weaken_field unweaken_field isweak_field convert array_length
 %type <opval> assign inc dec allow has_implement
 %type <opval> new array_init
-%type <opval> my_var var implement
+%type <opval> var_decl var implement
 %type <opval> expression opt_expressions expressions opt_expression case_statements
 %type <opval> field_name method_name class_name class_alias_name is_read_only
 %type <opval> type qualified_type basic_type array_type
@@ -174,7 +174,7 @@ init_block
   : INIT block
     { 
       SPVM_OP* op_method = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_METHOD, compiler->cur_file, compiler->cur_line);
-      SPVM_STRING* method_name_string = SPVM_STRING_new(compiler, "INIT", strlen("INIT"));
+      SPVM_CONSTANT_STRING* method_name_string = SPVM_CONSTANT_STRING_new(compiler, "INIT", strlen("INIT"));
       const char* method_name = method_name_string->value;
       SPVM_OP* op_method_name = SPVM_OP_new_op_name(compiler, "INIT", compiler->cur_file, compiler->cur_line);
       SPVM_OP* op_void_type = SPVM_OP_new_op_void_type(compiler, compiler->cur_file, compiler->cur_line);
@@ -601,7 +601,7 @@ if_statement
       SPVM_OP* op_if = SPVM_OP_build_if_statement(compiler, $1, $3, $5, $6);
       
       // if is wraped with block to allow the following syntax
-      //  if (my $var = 3) { ... }
+      //  if (var_decl $var = 3) { ... }
       SPVM_OP* op_block = SPVM_OP_new_op_block(compiler, $1->file, $1->line);
       SPVM_OP_insert_child(compiler, op_block, op_block->last, op_if);
       
@@ -612,7 +612,7 @@ if_statement
       SPVM_OP* op_if = SPVM_OP_build_if_statement(compiler, $1, $3, $5, $6);
       
       // if is wraped with block to allow the following syntax
-      //  if (my $var = 3) { ... }
+      //  if (var_decl $var = 3) { ... }
       SPVM_OP* op_block = SPVM_OP_new_op_block(compiler, $1->file, $1->line);
       SPVM_OP_insert_child(compiler, op_block, op_block->last, op_if);
       
@@ -687,7 +687,7 @@ expression
   | new
   | array_init
   | array_length
-  | my_var
+  | var_decl
   | unary_op
   | binary_op
   | assign
@@ -1040,6 +1040,11 @@ convert
       SPVM_OP* op_convert = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_CONVERT, $2->file, $2->line);
       $$ = SPVM_OP_build_convert(compiler, op_convert, $2, $4, NULL);
     }
+  | expression ARROW '(' qualified_type ')' %prec CONVERT
+    {
+      SPVM_OP* op_convert = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_CONVERT, $4->file, $4->line);
+      $$ = SPVM_OP_build_convert(compiler, op_convert, $4, $1, NULL);
+    }
 
 array_access
   : expression ARROW '[' expression ']'
@@ -1165,14 +1170,14 @@ array_length
       $$ = SPVM_OP_build_array_length(compiler, op_array_length, $4);
     }
 
-my_var
+var_decl
   : MY var ':' qualified_type opt_type_comment
     {
-      $$ = SPVM_OP_build_my(compiler, $1, $2, $4, NULL);
+      $$ = SPVM_OP_build_var_decl(compiler, $1, $2, $4, NULL);
     }
   | MY var
     {
-      $$ = SPVM_OP_build_my(compiler, $1, $2, NULL, NULL);
+      $$ = SPVM_OP_build_var_decl(compiler, $1, $2, NULL, NULL);
     }
 
 var

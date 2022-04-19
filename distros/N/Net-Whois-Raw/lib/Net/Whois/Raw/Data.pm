@@ -1,5 +1,5 @@
 package Net::Whois::Raw::Data;
-$Net::Whois::Raw::Data::VERSION = '2.99032';
+$Net::Whois::Raw::Data::VERSION = '2.99034';
 # ABSTRACT: Config for Net::Whois::Raw.
 
 use utf8;
@@ -872,13 +872,11 @@ our %servers = qw(
     COLLEGE     whois.centralnic.com
     CONTACT     whois.centralnic.com
     COOP        whois.centralnic.com
-    DESIGN      whois.centralnic.com
     FAN         whois.centralnic.com
     FANS        whois.centralnic.com
     FEEDBACK    whois.centralnic.com
     FORUM       whois.centralnic.com
     HOST        whois.centralnic.com
-    INK         whois.centralnic.com
     LOVE        whois.centralnic.com
     LPL         whois.centralnic.com
     LPLFINANCIAL whois.centralnic.com
@@ -899,7 +897,6 @@ our %servers = qw(
     THEATRE     whois.centralnic.com
     TICKETS     whois.centralnic.com
     WEBSITE     whois.centralnic.com
-    WIKI        whois.centralnic.com
     XYZ         whois.centralnic.com
 
     ORG.NS      whois.pir.org
@@ -1398,6 +1395,8 @@ our %servers = qw(
 
     DELOITTE                whois.nic.deloitte
 
+    DESIGN                  whois.nic.design
+
     DIY                     whois.nic.diy
 
     DOHA                    whois.nic.doha
@@ -1479,6 +1478,8 @@ our %servers = qw(
     ICU                     whois.nic.icu
 
     IFM                     whois.nic.ifm
+
+    INK                     whois.nic.ink
 
     INSURANCE               whois.nic.insurance
 
@@ -2077,6 +2078,8 @@ our %servers = qw(
     UNICOM                  whois.nic.unicom
 
     WANGGOU                 whois.nic.wanggou
+
+    WIKI                    whois.nic.wiki
 
     WOW                     whois.nic.wow
 
@@ -4528,7 +4531,7 @@ Net::Whois::Raw::Data - Config for Net::Whois::Raw.
 
 =head1 VERSION
 
-version 2.99032
+version 2.99034
 
 =head1 AUTHOR
 
@@ -4536,7 +4539,7 @@ Alexander Nalobin <alexander@nalobin.ru>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2002-2021 by Alexander Nalobin.
+This software is copyright (c) 2002-2022 by Alexander Nalobin.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -5,7 +5,7 @@ package OPM::Installer::Logger;
 use strict;
 use warnings;
 
-our $VERSION = '1.0.0'; # VERSION
+our $VERSION = '1.0.1'; # VERSION
 
 use Moo;
 use IO::All;
@@ -66,7 +66,7 @@ OPM::Installer::Logger - A simple logger for OPM::Installer
 
 =head1 VERSION
 
-version 1.0.0
+version 1.0.1
 
 =head1 SYNOPSIS
 

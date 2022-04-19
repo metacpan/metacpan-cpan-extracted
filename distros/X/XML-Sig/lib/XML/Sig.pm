@@ -1,7 +1,8 @@
-package XML::Sig;
-
 use strict;
 use warnings;
+
+package XML::Sig;
+our $VERSION = '0.57';
 
 use Encode;
 # ABSTRACT: XML::Sig - A toolkit to help sign and verify XML Digital Signatures
@@ -10,7 +11,6 @@ use Encode;
 use vars qw($VERSION @EXPORT_OK %EXPORT_TAGS $DEBUG);
 
 $DEBUG = 0;
-our $VERSION = '0.56';
 
 use base qw(Class::Accessor);
 XML::Sig->mk_accessors(qw(key));
@@ -1653,7 +1653,7 @@ XML::Sig - XML::Sig - A toolkit to help sign and verify XML Digital Signatures
 
 =head1 VERSION
 
-version 0.56
+version 0.57
 
 =head1 SYNOPSIS
 
@@ -1997,7 +1997,7 @@ This software is copyright (c) 2022 by Byrne Reese, Chris Andrews and Others; in
             2015       Mike Wisener
             2016       Jeff Fearn
             2017       Mike Wisener, xmikew
-            2019-2021  Timothy Legge
+            2019-2022  Timothy Legge
 
 
 This is free software; you can redistribute it and/or modify it under
