@@ -429,6 +429,11 @@ sub post_clear_objects {
         description => '',
         required => '1',
     },
+    'extended_query_parameters' => {
+        data_type => 'hash',
+        description => 'extended query parameters',
+        required => '1',
+    },
     };
     __PACKAGE__->method_documentation->{ 'post_export' } = { 
     	summary => '',
@@ -479,6 +484,13 @@ sub post_export {
     # query params
     if ( exists $args{'format'}) {
         $query_params->{'format'} = $self->{api_client}->to_query_value($args{'format'});
+    }
+
+    if ( exists $args{'extended_query_parameters'} ) {   
+        my $map_extended_query_parameters =$args{'extended_query_parameters'};
+        while ( my ($key,$value) = each( %$map_extended_query_parameters ) ) {
+             $query_params->{$key} = $self->{api_client}->to_query_value($value);
+        }
     }
 
     $self->{api_client}->check_access_token();

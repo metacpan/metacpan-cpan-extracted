@@ -29,7 +29,7 @@ my @pardef =
 
 
 my @p;
-my %config = (verbose=>0, program=>'uninteresting');
+my %config = (verbose=>0, program=>'uninteresting', 'shortdefaults'=>0);
 
 my $param = Config::Param->new(dclone(\%config), dclone(\@pardef)); 
 my ($parconf, $pardef) = $param->current_setup();

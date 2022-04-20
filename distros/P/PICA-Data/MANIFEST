@@ -25,6 +25,7 @@ lib/PICA/Schema/Builder.pm
 lib/PICA/Writer/Base.pm
 lib/PICA/Writer/Binary.pm
 lib/PICA/Writer/Generic.pm
+lib/PICA/Writer/Import.pm
 lib/PICA/Writer/JSON.pm
 lib/PICA/Writer/PIXML.pm
 lib/PICA/Writer/PPXML.pm

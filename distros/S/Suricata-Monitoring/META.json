@@ -1,0 +1,59 @@
+{
+   "abstract" : "LibreNMS JSON SNMP extend and Nagios style check for Suricata stats",
+   "author" : [
+      "Zane C. Bowers-Hadley <vvelox@vvelox.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Suricata-Monitoring",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "File::Path" : "0",
+            "File::ReadBackwards" : "0",
+            "File::Slurp" : "0",
+            "JSON" : "0",
+            "Time::Piece" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/VVelox/Suricata-Monitoring"
+      }
+   },
+   "version" : "v0.0.1",
+   "x_serialization_backend" : "JSON::PP version 4.04"
+}

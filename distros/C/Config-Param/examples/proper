@@ -11,11 +11,21 @@ use lib File::Spec->catfile($Bin,'..','lib');
 
 use Config::Param;
 
+sub sentinel # (name, sign, op, value)
+{
+	print STDERR "sentinel: Operation on $_[1]$_[1]$_[0].\n";
+	print STDERR "sentinel: You want to apply operation $_[2] to parameter $_[0].\n"
+		if defined $_[2];
+	print STDERR "sentinel: The fresh value: $_[3]\n"
+		if defined $_[3];
+	return 0; # all good
+}
+
 my $p = Config::Param::get
 (
 	{
 		 version=>'0.0.1'
-		#,verbose=>1
+		,verbose=>2
 		,program=>'the_program'
 		,tagline=>'the best program ever'
 		,usage=>'the_program [parameters] whatever'
@@ -35,6 +45,11 @@ my $p = Config::Param::get
 			}
 		] 
 		,info=>'That is the best program ever written. This is the best description I can give you. Peace.'
+		,ordered=>1
+		,posixhelp=>1
+		,shortdefaults=>1
+		,lazy=>0
+		,call=>\&sentinel
 	},
 	[
 		{
@@ -43,19 +58,59 @@ my $p = Config::Param::get
 			short=>'p',
 			help=>'A parameter.'
 		},{
+			long=>'parb',
+			value=>undef,
+			short=>'P',
+			help=>'A parameter that needs an argument.',
+			flags=>$Config::Param::arg
+		},{
+			long=>'murray',
+			value=>['a','b'],
+			short=>'B',
+			help=>'An array parameter with default separator and append.',
+			defsep=>',',
+			flags=>$Config::Param::append
+		},{
+			section=>'distance stuff'
+		,	flags=>$Config::Param::arg
+		,	call=>\&sentinel
+		},{
 			long=>'meter',
-			value=>'I got value but no help text, neither short name.'
+			value=>'I got value but no help text, neither short name.',
+			arg=>'measure'
 		},{
 			long=>'hash',
 			value=>{key=>'value'},
 			short=>'H',
-			help=>'Yes, a hash parameter.'
+			help=>'Yes, a hash parameter for the advanced user.',
+			level=>3
 		},{
 			long=>'array',
 			value=>[1, 2, 3, 4, 5, 'end'],
 			short=>'A',
 			help=>'Yes, an array parameter.'
-		}
+		},{
+			section=>'advanced switches and counters',
+			flags=>$Config::Param::switch,
+			level=>2
+		,	call=>\&sentinel
+		},{
+			long=>'switch',
+			value=>0,
+			short=>'s',
+			help=>'just a switch'
+		},{
+			long=>'count',
+			value=>0,
+			short=>'c',
+			help=>'a counterswitch',
+			addflags=>$Config::Param::count
+		},{
+			section=>'confusion with truth'
+		,	call=>\&sentinel
+		},
+		[ 'on',  0, '1', 'something to switch on',  '' ],
+		[ 'off', 1, '0', 'something to switch off', 'ignoreme', $Config::Param::switch ]
 	]
 );
 

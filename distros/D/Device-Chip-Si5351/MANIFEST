@@ -1,0 +1,17 @@
+Build.PL
+Changes
+examples/si5351.pl
+lib/Device/Chip/Si5351.pm
+MANIFEST			This list of files
+t/00use.t
+t/01status.t
+t/10chip-config.t
+t/11pll-config.t
+t/12multisynth-config.t
+t/13clk-config.t
+t/20config-sharing.t
+t/99pod.t
+README
+LICENSE
+META.yml
+META.json

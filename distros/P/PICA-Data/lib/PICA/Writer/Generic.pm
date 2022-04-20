@@ -1,7 +1,7 @@
 package PICA::Writer::Generic;
 use v5.14.1;
 
-our $VERSION = '2.02';
+our $VERSION = '2.03';
 
 use charnames qw(:full);
 
@@ -25,11 +25,6 @@ sub END_OF_RECORD {
         exists $self->{gs}
         ? "$self->{gs}"
         : "\N{INFORMATION SEPARATOR THREE}";
-}
-
-sub write_subfield {
-    my ($self, $code, $value) = @_;
-    $self->{fh}->print($self->SUBFIELD_INDICATOR . $code . $value);
 }
 
 1;

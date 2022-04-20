@@ -4,7 +4,7 @@ HTTP::CSPHeader - manage dynamic content security policy headers
 
 # VERSION
 
-version v0.1.1
+version v0.1.2
 
 # SYNOPSIS
 
@@ -100,6 +100,9 @@ This is a read-only accessor.
 This resets any changes to the ["policy"](#policy) and clears the ["nonce"](#nonce).
 It should be run at the start of each HTTP request.
 
+If you never make use of the nonce, and never ["amend"](#amend) the headers,
+then you do not need to run this method.
+
 ## amend
 
 ```perl
@@ -111,13 +114,50 @@ This amends the ["policy"](#policy).
 If the `$directive` starts with a `+` then the value will be
 appended to it.  Otherwise the change will overwrite the value.
 
-If the value if `undef`, then the directive will be deleted.
+If the value is `undef`, then the directive will be deleted.
+
+# EXAMPLES
+
+## Mojolicious
+
+You can use this with [Mojolicious](https://metacpan.org/pod/Mojolicious):
+
+```perl
+use HTTP::CSPHeader;
+
+use feature 'state';
+
+$self->hook(
+  before_dispatch => sub ($c) {
+
+    state $csp = HTTP::CSPHeader->new(
+        policy => {
+            'default-src' => q['self'],
+            'script-src'  => q['self'],
+        },
+        nonces_for => 'script-src',
+    );
+
+    $csp->reset;
+
+    $c->stash( csp_nonce => $csp->nonce );
+
+    $c->res->headers->content_security_policy( $csp->header );
+  }
+);
+```
+
+and in your templates, you can use the following for inline scripts:
+
+```
+<script nonce="<%= $csp_nonce %>"> ... </script>
+```
+
+If you do not need the nonce, then you might consider using [Mojolicious::Plugin::CSPHeader](https://metacpan.org/pod/Mojolicious%3A%3APlugin%3A%3ACSPHeader).
 
 # SEE ALSO
 
 [https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy)
-
-[Mojolicious::Plugin::CSPHeader](https://metacpan.org/pod/Mojolicious%3A%3APlugin%3A%3ACSPHeader)
 
 # SOURCE
 

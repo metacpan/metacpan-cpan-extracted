@@ -4,11 +4,11 @@
 #  (C) Paul Evans, 2015-2021 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.43;  # ADJUST
+use Object::Pad 0.57;  # :does
 
-package Test::Device::Chip::Adapter 0.20;
+package Test::Device::Chip::Adapter 0.22;
 class Test::Device::Chip::Adapter
-   implements Device::Chip::Adapter;
+   :does(Device::Chip::Adapter);
 
 use Carp;
 
@@ -106,29 +106,29 @@ associated expectation method, whose name is prefixed C<expect_>. Each returns
 an expectation object, which has additional methods to control the behaviour of
 that invocation.
 
-   $exp = $adapter->expect_write_gpios( \%gpios )
-   $exp = $adapter->expect_read_gpios( \@gpios )
-   $exp = $adapter->expect_tris_gpios( \@gpios )
-   $exp = $adapter->expect_write( $bytes )
-   $exp = $adapter->expect_read( $len )
-   $exp = $adapter->expect_write_then_read( $bytes, $len )
-   $exp = $adapter->expect_readwrite( $bytes_out )
-   $exp = $adapter->expect_assert_ss
-   $exp = $adapter->expect_release_ss
-   $exp = $adapter->expect_readwrite_no_ss( $bytes_out )
-   $exp = $adapter->expect_write_no_ss( $bytes )
+   $exp = $adapter->expect_write_gpios( \%gpios );
+   $exp = $adapter->expect_read_gpios( \@gpios );
+   $exp = $adapter->expect_tris_gpios( \@gpios );
+   $exp = $adapter->expect_write( $bytes );
+   $exp = $adapter->expect_read( $len );
+   $exp = $adapter->expect_write_then_read( $bytes, $len );
+   $exp = $adapter->expect_readwrite( $bytes_out );
+   $exp = $adapter->expect_assert_ss;
+   $exp = $adapter->expect_release_ss;
+   $exp = $adapter->expect_readwrite_no_ss( $bytes_out );
+   $exp = $adapter->expect_write_no_ss( $bytes );
 
 The returned expectation object allows the test script to specify what such an
 invocation should return or throw.
 
-   $exp->returns( $bytes_in )
-   $exp->fails( $failure )
+   $exp->returns( $bytes_in );
+   $exp->fails( $failure );
 
 Expectations for an atomic I²C transaction are performed inline, using the
 following additional methods:
 
-   $adapter->expect_txn_start()
-   $adapter->expect_txn_stop()
+   $adapter->expect_txn_start();
+   $adapter->expect_txn_stop();
 
 =cut
 
@@ -160,6 +160,7 @@ BEGIN {
                            [qw( SPI )] ],
    );
 
+   use Object::Pad ':experimental(mop)';
    my $meta = Object::Pad::MOP::Class->for_caller;
 
    foreach my $method ( keys %METHODS ) {
@@ -225,7 +226,7 @@ methods would be used by the unit test script controlling it.
 
 =head2 check_and_clear
 
-   $adapter->check_and_clear( $name )
+   $adapter->check_and_clear( $name );
 
 Checks that by now, every expected method has indeed been called, and emits a
 new test output line via L<Test::Builder>. Regardless, the expectations are

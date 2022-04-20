@@ -2,7 +2,6 @@ use strict;
 $^W = 1;
 
 use Test::More;
-END { done_testing }
 
 use Devel::CheckOS ':booleans';
 
@@ -14,3 +13,5 @@ ok(os_isnt('AnOperatingSystem::v1'), "os_isnt works for a multi-level name that 
 
 ok(join(' ', Devel::CheckOS::list_platforms()) =~ /\bLinux::v2_6\b/,
     "list_platforms supports multi-level names");
+
+done_testing;

@@ -17,7 +17,7 @@ our @EXPORT_OK = qw(
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2022-03-20'; # DATE
 our $DIST = 'Perinci-Sub-DepChecker'; # DIST
-our $VERSION = '0.121'; # VERSION
+our $VERSION = '0.122'; # VERSION
 
 my $pa;
 
@@ -100,17 +100,24 @@ sub checkdep_prog {
         require IPC::System::Options;
         require Version::Util;
 
+        my ($ver_cmd, $ver_extract);
         if ($prog_name eq 'git') {
-            my $ver = IPC::System::Options::readpipe({log=>1}, "git --version");
-            my ($exit_code, $signal, $core_dump) = ($? < 0 ? $? : $? >> 8, $? & 127, $? & 128);
-            return "ERR: Cannot check git version with 'git --version': exit_code=$exit_code"
-                if $exit_code;
-            ($ver) = $ver =~ /git version (.+)/ or return "ERR: Cannot extract version from response '$ver'";
-            return "git version ($) is less than required ($cval->{min_version})"
-                if Version::Util::version_lt($ver, $cval->{min_version});
+            $ver_cmd = "git --version";
+            $ver_extract = sub { $_[0] =~ /git version (.+)/ ? $1 : undef };
+        } elsif ($prog_name eq 'perl') {
+            $ver_cmd = "perl -v";
+            $ver_extract = sub { $_[0] =~ /\(v(.+?)\)/ ? $1 : undef };
         } else {
             return "ERR: Cannot check minimum version for program '$prog_name'";
         }
+
+        my $ver = IPC::System::Options::readpipe({log=>1}, $ver_cmd);
+        my ($exit_code, $signal, $core_dump) = ($? < 0 ? $? : $? >> 8, $? & 127, $? & 128);
+        return "ERR: Cannot check version with '$ver_cmd': exit_code=$exit_code"
+            if $exit_code;
+        ($ver) = $ver_extract->($ver) or return "ERR: Cannot extract version from response '$ver'";
+        return "Program '$prog_name' version ($) is less than required ($cval->{min_version})"
+            if Version::Util::version_lt($ver, $cval->{min_version});
     }
 
     "";
@@ -236,7 +243,7 @@ Perinci::Sub::DepChecker - Check dependencies from 'deps' property
 
 =head1 VERSION
 
-This document describes version 0.121 of Perinci::Sub::DepChecker (from Perl distribution Perinci-Sub-DepChecker), released on 2022-03-20.
+This document describes version 0.122 of Perinci::Sub::DepChecker (from Perl distribution Perinci-Sub-DepChecker), released on 2022-03-20.
 
 =head1 SYNOPSIS
 

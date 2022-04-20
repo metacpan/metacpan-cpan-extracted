@@ -134,6 +134,22 @@ await $chip->mount( $adapter );
       '->cached_read_reg multi after ->cached_write_reg' );
 }
 
+# cached write with mask
+{
+   $adapter->expect_write_then_read( pack( "C", 11 ), 1 )
+      ->returns( "\x88" );
+   $adapter->expect_write( pack( "C a*", 10, "\x5A\x58\x5A" ) );
+
+   await $chip->cached_write_reg_masked( 10, "\x5A\x5A\x5A", "\xFF\xF0\xFF" );
+
+   $adapter->check_and_clear( '->cached_write_reg_masked' );
+
+   is_deeply( await $chip->cached_read_reg( 10, 3 ), "\x5A\x58\x5A",
+      '->cached_read_reg reads back masked write data' );
+
+   $adapter->check_and_clear( '->cached_read_reg after ->cached_write_reg_masked' );
+}
+
 # wide data
 {
    {

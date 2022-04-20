@@ -16,13 +16,9 @@ use Digest::SHA;
 use JSON;
 use Want;
 use overload
-	fallback => 0,
-	'eq'     => sub {_compare(@_)},
+	'eq'     => sub {  _compare(@_)},
 	'ne'     => sub {! _compare(@_)},
-	'bool'   => sub {
-		my $self = shift;
-		! ($self->errors && scalar @{$self->errors});
-	};
+	fallback => 1;
 
 sub _compare {
 	my ($self, $other, $swap) = @_;
@@ -50,7 +46,7 @@ sub _compare {
 	return $canonself eq $canonother;
 }
 
-our $VERSION = '2.24';
+our $VERSION = '2.25';
 
 =encoding utf8
 
@@ -199,7 +195,7 @@ you can almost freely interleave above listed styles in order to access to eleme
 	$j->secondnode->thirdnode->a = 7;
 	delete $j->secondnode->{thirdnode}; # will delete thirdnode as expected in hash structures.
 
-you can compare the JSONP object with another Perl data structure or JSON string via C<eq> and C<ne> overloaded operators, it will return true if the two operands will result in same JSON structure and values:
+you can compare the JSONP object with another JSONP object, Perl data structure or JSON string via C<eq> and C<ne> overloaded operators, it will return true if the two operands will result in same JSON structure and values:
 
 	my $j = JSONP->new(
 		{
@@ -221,6 +217,8 @@ you can compare the JSONP object with another Perl data structure or JSON string
 
 	say $j eq $json ? 'the same' : 'different'; # will print 'the same'
 	say $j ne $json ? 'different' : 'the same'; # will print 'the same'
+	say $j eq $j ? 'the same' : 'different'; # will print 'the same'
+	say $j ne $j ? 'different' : 'the same'; # will print 'the same'
 	say $j eq 'a random string, not a valid JSON' ? 'the same' : 'different'; # will print 'different'
 	say $j eq '{"akey": "something"}' ? 'the same' : 'different'; # will print 'different'
 

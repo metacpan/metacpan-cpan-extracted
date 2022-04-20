@@ -1,5 +1,8 @@
 Revision history for Perl extension HTTP::Any.
 
+1.02  2022-04-20
+	- fixed URL for HTTP::Any::Curl when redirect via proxy
+
 1.01  2021-09-16
 	- fix name
 

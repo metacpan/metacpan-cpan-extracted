@@ -30,7 +30,7 @@ name: HTTP-CSPHeader
 provides:
   HTTP::CSPHeader:
     file: lib/HTTP/CSPHeader.pm
-    version: v0.1.1
+    version: v0.1.2
 recommends:
   Math::Random::ISAAC::XS: '0'
   Type::Tiny::XS: '0'
@@ -45,7 +45,7 @@ requires:
 resources:
   bugtracker: https://github.com/robrwo/perl-HTTP-CSPHeader/issues
   repository: git://github.com/robrwo/perl-HTTP-CSPHeader.git
-version: v0.1.1
+version: v0.1.2
 x_authority: cpan:RRWO
 x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.73'

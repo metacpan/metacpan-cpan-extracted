@@ -6,7 +6,7 @@
 use v5.26;
 use Object::Pad 0.35;
 
-package Device::Chip::Adapter 0.20;
+package Device::Chip::Adapter 0.22;
 role Device::Chip::Adapter :repr(HASH) :compat(invokable);
 
 use utf8;
@@ -52,7 +52,7 @@ that it provides the interface described by this documentation.
 
 =head2 new_from_description
 
-   $adapter = Device::Chip::Adapter->new_from_description( $DESC )
+   $adapter = Device::Chip::Adapter->new_from_description( $DESC );
 
 This utility method is provided to allow end-user programs a convenient way to
 construct a useable C<Device::Chip::Adapter> instance from a given single
@@ -168,7 +168,7 @@ method make_protocol
 
 =head2 shutdown
 
-   $adapter->shutdown
+   $adapter->shutdown;
 
 Shuts down the adapter in whatever manner is appropriate at the end of the
 lifetime of the containing program; or at least, at the point when the program
@@ -211,7 +211,7 @@ provided by the adapter.
 
 =head2 list_gpios
 
-   @pin_names = $protocol->list_gpios
+   @pin_names = $protocol->list_gpios;
 
 Returns a list of the names of GPIO pins that are available for the chip
 driver to use. This list would depend on the pins available on the adapter
@@ -222,7 +222,7 @@ for example C<MOSI>, C<SDA>, C<DTR>, C<Q0>, etc...
 
 =head2 meta_gpios
 
-   @pin_definitions = $protocol->meta_gpios
+   @pin_definitions = $protocol->meta_gpios;
 
 Returns a list of definition objects that define the behavior of the GPIO
 pins. This should be returned in the same order as the L</list_gpios> method.

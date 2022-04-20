@@ -14,8 +14,8 @@ $Test::Strict::TEST_SKIP = [
     getcwd()."/t/../script/ospfview.cgi",
     getcwd()."/t/../blib/script/ospfview.cgi",
     # different path for CPAN testers on Windows
-    getcwd()."/script/ospfview.cgi",
-    getcwd()."/blib/script/ospfview.cgi",
+    getcwd()."\\script\\ospfview.cgi",
+    getcwd()."\\blib\\script\\ospfview.cgi",
 ];
 
 all_perl_files_ok();

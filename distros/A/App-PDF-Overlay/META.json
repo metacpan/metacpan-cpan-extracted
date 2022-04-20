@@ -1,0 +1,67 @@
+{
+   "abstract" : "pdfolay - insert a PDF document over/under another document",
+   "author" : [
+      "Johan Vromans <jv@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-PDF-Overlay",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.5503",
+            "PDF::API2" : "2.042",
+            "Pod::Find" : "0",
+            "Pod::Usage" : "0",
+            "Test::More" : "0",
+            "perl" : "5.010001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "App::PDF::Overlay" : {
+         "file" : "lib/App/PDF/Overlay.pm",
+         "version" : "0.002"
+      },
+      "pdfolay" : {
+         "file" : "script/pdfolay",
+         "version" : "0.002"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "https://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.002",
+   "x_serialization_backend" : "JSON::PP version 4.06"
+}

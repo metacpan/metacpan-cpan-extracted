@@ -1,5 +1,10 @@
 Revision history for List-Util-MaybeXS
 
+1.500010 - 2022-04-20
+  - uniqnum: fix handling numbers near the max unsigned int on some systems
+    where packing as a float gives different values when their decimal value
+    is the same
+
 1.500009 - 2022-04-19
   - fix calls to unary overloads to match how perl calls them
   - account for quadmath systems and other high-precision floats in uniqnum

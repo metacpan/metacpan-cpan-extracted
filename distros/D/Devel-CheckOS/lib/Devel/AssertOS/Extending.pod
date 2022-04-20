@@ -53,8 +53,6 @@ If you want to support a 'family' of OSes, then instead of matching against
 C<$^O>, instead use C<Devel::CheckOS::os_is> to check that we're running on
 any of the OSes in your family, like this:
 
-match any of several values of C<$^O> like this:
-
     package Devel::AssertOS::FreeSoftware;
     use Devel::CheckOS;
     use strict;
@@ -85,6 +83,17 @@ I would like to reserve the namespace C<Devel::AssertOS::OSFeatures::*>.
 If you want to release a module that tells the user whether a particular
 feature is available (eg, whether POSIX shell redirection can be expected
 to work) then please discuss it with me first.
+
+=head1 ALIASES
+
+I would like to reserve the namespace C<Devel::AssertOS::Alias::*> for use
+by OS aliases. If you want to release a module that provides an alternative
+name for an OS please discuss it with me first.
+
+Alias modules are simpler than normal extensions, they just need to call
+C<Devel::CheckOS::register_alias()> when loaded, with the name of the alias
+as its first argument and the real name of the OS as the second. See
+L<Devel::AssertOS::Alias::MacOS> for an example.
 
 =head1 BUGS and FEEDBACK
 

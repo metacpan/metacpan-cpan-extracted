@@ -51,7 +51,15 @@ foreach my $os (@oses) {
         exit(1);
     }
 }
-my @modulefiles = keys %{{map { $_ => $INC{$_} } grep { /Devel/i && /(Check|Assert)OS/i } keys %INC}};
+my @modulefiles = keys %{{
+    map { $_ => $INC{$_} }
+    grep {
+        /\bDevel\b/i &&
+        /\b(Check|Assert)OS\b/i &&
+        $_ !~ /\bAlias\b/i
+    }
+    keys %INC
+}};
 
 mkdir 'inc';
 mkdir 'inc/Devel';
@@ -97,7 +105,13 @@ foreach my $file (@files) {
     if(open(FILE, $file)) { $contents = <FILE>; close(FILE); }
     open(FILE, ">$file") || die("Can't write $file\n");
     print FILE 'use lib qw(inc); use Devel::AssertOS qw('.
-        join(' ', @oses).
+        join(' ',
+            sort { $a cmp  $b } map {
+                exists($Devel::CheckOS::OS_ALIASES{$_})
+                  ? $Devel::CheckOS::OS_ALIASES{$_}
+                  : $_
+            } @oses
+        ).
         ");\n\n";
     print FILE $contents;
     close(FILE);

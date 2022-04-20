@@ -4,13 +4,13 @@
       "Thomas Orgis <thomas@orgis.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4214",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Config-Param",
    "prereqs" : {
@@ -35,10 +35,11 @@
    "provides" : {
       "Config::Param" : {
          "file" : "lib/Config/Param.pm",
-         "version" : "3.002000"
+         "version" : "4.000002"
       },
       "Config::Param::FileWorker" : {
-         "file" : "lib/Config/Param/FileWorker.pm"
+         "file" : "lib/Config/Param/FileWorker.pm",
+         "version" : "4.000002"
       }
    },
    "release_status" : "stable",
@@ -47,5 +48,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "3.002000"
+   "version" : "4.000002",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

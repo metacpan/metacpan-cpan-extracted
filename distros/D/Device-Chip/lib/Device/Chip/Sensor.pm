@@ -4,14 +4,15 @@
 #  (C) Paul Evans, 2020-2021 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.43;  # ADJUST
+use Object::Pad 0.63;  # :experimental
 
-package Device::Chip::Sensor 0.20;
+package Device::Chip::Sensor 0.22;
 
 use strict;
 use warnings;
 
 use experimental 'signatures';
+use Object::Pad ':experimental(mop)';
 
 use Carp;
 
@@ -121,7 +122,9 @@ default will be created by prefixing C<"read_"> onto the sensor name.
 
 =back
 
-=head2 declare_sensor_counter $name => %params;
+=head2 declare_sensor_counter
+
+   declare_sensor_counter $name => %params;
 
 Declares a sensor of the C<counter> type. This will pass C<undef> for the
 units and 0 for precision.

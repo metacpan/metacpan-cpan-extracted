@@ -1,0 +1,234 @@
+NAME
+
+    Device::Chip::Si5351 - chip driver for Si5351
+
+SYNOPSIS
+
+       use Device::Chip::Si5351;
+       use Future::AsyncAwait;
+    
+       my $chip = Device::Chip::Si5351->new;
+       await $chip->mount( Device::Chip::Adapter::...->new );
+    
+       await $chip->init;
+    
+       await $chip->change_pll_config( "A",
+          SRC   => "XTAL",
+          ratio => 24,
+       );
+    
+       await $chip->change_multisynth_config( 0,
+          SRC   => "PLLA",
+          ratio => 50,
+       );
+    
+       await $chip->change_clk_config( 0,
+          SRC => "MSn",
+          PDN => 0,
+          OE  => 1,
+       );
+    
+       await $chip->reset_plls;
+    
+       # CLK0 output will now be set to the crystal reference frequency
+       # multiplied by 24, divided by 50. Assuming a 25.000MHz reference
+       # crystal, the output will therefore be 12.000MHz.
+
+DESCRIPTION
+
+    This Device::Chip subclass provides specific communication to a Silabs
+    Si5153 chip attached to a computer via an I²C adapter.
+
+    The reader is presumed to be familiar with the general operation of
+    this chip; the documentation here will not attempt to explain or define
+    chip-specific concepts or features, only the use of this module to
+    access them.
+
+METHODS
+
+ init
+
+       await $chip->init;
+
+    Performs initialisation setup on the chip as recommended by the
+    datasheet: disables all outputs and powers down all output drivers.
+    After this, individual outputs can be powered up and enabled again by
+    "change_clk_config".
+
+ read_status
+
+       $status = await $chip->read_status;
+
+    Reads and returns the chip status register, as a HASH reference with
+    the following keys:
+
+       SYS_INIT  => BOOL
+       LOL_A     => BOOL
+       LOL_B     => BOOL
+       LOS_CLKIN => BOOL
+       LOS_XTAL  => BOOL
+       REVID     => INT
+
+ read_config
+
+       $config = await $chip->read_config;
+
+    Reads and returns the overall chip configuration, as a HASH reference
+    with the following keys:
+
+       XTAL_CL      => "6pF" | "8pF" | "10pF"
+       CLKIN_FANOUT => BOOL
+       XO_FANOUT    => BOOL
+       MS_FANOUT    => BOOL
+
+ change_config
+
+       await $chip->change_config( %changes );
+
+    Writes changes to the overall chip configuration registers. Any fields
+    not specified will retain their current values.
+
+ read_pll_config
+
+       $config = await $chip->read_pll_config( $pll )
+
+    Reads and returns the PLL synthesizer configuration registers for the
+    given PLL unit (which should be "A" or "B"), as a HASH reference with
+    the following keys:
+
+       P1  => INT
+       P2  => INT
+       P3  => INT
+       SRC => "XTAL" | "CLKIN"
+
+    Additionally, the following extra fields will be inferred from the
+    basic parameters, as a convenience:
+
+       ratio_a => INT  # integral part of ratio
+       ratio_b => INT  # numerator of fractional part of ratio
+       ratio_c => INT  # denominator of fractional part of ratio
+    
+       ratio => NUM    # ratio expressed as a float
+
+ change_pll_config
+
+       await $chip->change_pll_config( $pll, %changes )
+
+    Writes changes to the PLL synthesizer configuration registers for the
+    given PLL unit. Any fields not specified will retain their current
+    values.
+
+    As a convenience, the feedback division ratio can be supplied using the
+    three ratio_... parameters, rather than the raw Pn values.
+
+    To set an integer ratio, this can alternatively be supplied directly by
+    the ratio parameter. This must be an integer, however. To avoid
+    floating-point inaccuracies in fractional ratios, the three ratio_...
+    parameters must be used if the ratio is not a simple integer.
+
+ reset_plls
+
+       await $chip->reset_plls;
+
+    Resets the PLLs. This method should be called at the end of
+    configuration to reset the PLL and divider units to begin outputting
+    the configured frequencies.
+
+ read_multisynth_config
+
+       $config = await $chip->read_multisynth_config( $idx )
+
+    Reads and returns the Multisynth frequency divider configuration
+    registers for the given unit (which should be an integer 0 to 5), as a
+    HASH reference with the following keys:
+
+       P1     => INT
+       P2     => INT
+       P3     => INT
+       DIVBY4 => BOOL
+       INT    => BOOL
+       SRC    => "PLLA" | "PLLB"
+       PHOFF  => INT
+
+    Note that this method returns the setting of the appropriate
+    phase-offset register. Even though the datasheet names this as if it
+    were related to the clock output unit, it in fact relates to the
+    Multisynth divider.
+
+    Additionally, the following extra fields will be inferred from the
+    basic parameters, as a convenience:
+
+       ratio_a => INT  # integral part of ratio
+       ratio_b => INT  # numerator of fractional part of ratio
+       ratio_c => INT  # denominator of fractional part of ratio
+    
+       ratio => NUM    # ratio expressed as a float
+
+    Note that the integer-only Multisynth units 6 and 7 are not currently
+    supported.
+
+ change_multisynth_config
+
+       await $chip->change_multisynth_config( $pll, %changes )
+
+    Writes changes to the Multisynth frequency divider configuration
+    registers for the given unit. Any fields not specified will retain
+    their current values.
+
+    As a convenience, the division ratio can be supplied using the three
+    ratio_... parameters, rather than the raw Pn values.
+
+    To set an integer ratio, this can alternatively be supplied directly by
+    the ratio parameter. This must be an integer, however. To avoid
+    floating-point inaccuracies in fractional ratios, the three ratio_...
+    parameters must be used if the ratio is not a simple integer.
+
+ read_clk_config
+
+       $config = $chip->read_clk_config( $idx )
+
+    Reads and returns the clock output pin configuration registers for the
+    given pin index (in the range 0 to 5), as a HASH reference with the
+    following keys:
+
+       IDRV => "2mA" | "4mA" | "6mA" | "8mA"
+       SRC  => "XTAL" | "CLKIN" | "MS04" | "MSn"
+       INV  => BOOL
+       PDN  => BOOL
+       DIV  => 1 | 2 | 4 | 8 | 16 | 32 | 64 | 128
+       OE   => BOOL
+
+    Note that the OE field has positive logic; it is true when the output
+    is enabled (by the OEMASK register having a 0 bit in the corresponding
+    position).
+
+ change_clk_config
+
+       await $chip->change_clk_config( $idx, %changes );
+
+    Writes changes to the clock output pin configuration registers for the
+    given pin index. Any fields not specified will retain their current
+    values.
+
+TODO
+
+    This module is missing support for several chip features, mostly
+    because I only have the MSOP-10 version of the Si5351A chip, so I
+    cannot actually test:
+
+      * Integer-only multisynth units 6 and 7 and their associated clock
+      output pins.
+
+      * The VCXO of Si5351B.
+
+      * The CLKIN of Si5351C.
+
+    Additionally, lacking a spectrum analyser I cannot confirm operation
+    of:
+
+      * Spread-spectrum parameters of PLLA.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

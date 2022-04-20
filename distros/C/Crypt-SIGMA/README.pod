@@ -22,6 +22,14 @@ SIGMA_I
 
     my $ks = derive_ks( $z, $na, $nb, $hash_name, $key_len );
 
+=head2  verify_msg_mac_sig
+    
+    my $verify_result = verify_msg_mac_sig($data_to_mac_r, $sig_r, $km, $sig_pub, $pack_msg_func, $mac_func, $verify_func);
+
+=head2  gen_msg_mac_sig_enc
+
+    my $cipher_info = gen_msg_mac_sig_enc($data_to_enc_r, $data_to_mac_r, $km, $sign_priv, $ke, $pack_msg_func, $mac_func, $sign_func, $enc_func);
+
 =head2  a_send_msg1
 
     my $a_send_msg1_r = a_send_msg1( $group, $random_range, $point_compress_t, $pack_msg_func, $ctx );
@@ -36,7 +44,11 @@ SIGMA_I
 
 =head2  a_recv_msg2
 
-    my $a_recv_msg2_r = a_recv_msg2( $group, $msg2, $na, $ek_key_a_r, $hash_name, $key_len, $pack_msg_func, $unpack_msg_func, $mac_func, $sig_verify_func, $dec_func, $ctx);
+    my $a_recv_msg2_r = a_recv_msg2( $group, $msg1_r, $msg2, $hash_name, $key_len, $unpack_msg_func, $dec_func, $ctx );
+
+=head2  a_verify_msg2
+
+    my $a_verify_msg2_result = a_verify_msg2( $msg1_r, $a_recv_msg2_r, $pack_msg_func, $mac_func, $sig_verify_func );
 
 =head2  a_send_msg3
     

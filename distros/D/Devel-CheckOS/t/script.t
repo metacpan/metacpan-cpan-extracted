@@ -7,8 +7,6 @@ use File::Spec;
 use Devel::CheckOS;
 use Cwd;
 
-END { done_testing(); }
-
 my $cwd = getcwd();
 
 use Config ();
@@ -33,7 +31,7 @@ sub checkDashl {
     is_deeply(
         [sort { $a cmp $b } (Devel::CheckOS::list_platforms())],
         [sort { $a cmp $b } split(/, /, $cmd)],
-	'-l spews the right stuff'
+        '-l spews the right stuff'
     );
     chdir($cwd);
     ok(!-e File::Spec->catfile($projectdir, 'MANIFEST'),
@@ -60,20 +58,20 @@ sub checkCopyCorrectModulesPOSIXRedir {
     foreach(@modules) {
         ok(-e File::Spec->catfile(
             $projectdir, qw(inc Devel AssertOS), split('::', "$_.pm")),
-	    join('/', "inc/Devel/AssertOS", split('::', "$_.pm"))." exists");
+            join('/', "inc/Devel/AssertOS", split('::', "$_.pm"))." exists");
     }
     is_deeply(
         [sort {$a cmp $b} split("\n", _getfile(File::Spec->catfile($projectdir, 'MANIFEST')))],
-	[sort {$a cmp $b} (
+        [sort {$a cmp $b} (
             qw(
-	        inc/Devel/CheckOS.pm inc/Devel/AssertOS.pm
-	        MANIFEST Makefile.PL
+                inc/Devel/CheckOS.pm inc/Devel/AssertOS.pm
+                MANIFEST Makefile.PL
             ),
             (map {
                 join('/', "inc/Devel/AssertOS", split('::', "$_.pm"))
             } @modules)
-	)],
-	'... and update MANIFEST correctly'
+        )],
+        '... and update MANIFEST correctly'
     );
 }
 
@@ -85,39 +83,39 @@ sub checkCopyCorrectModulesLinux26MicrosoftWindows {
     print "# use-devel-assertos Linux::v2_6 MicrosoftWindows\n";
     ok(-e File::Spec->catfile(
         $projectdir, qw(inc Devel AssertOS Linux v2_6.pm)),
-	"inc/Devel/AssertOS/Linux/v2_6.pm exists");
+        "inc/Devel/AssertOS/Linux/v2_6.pm exists");
     ok(-e File::Spec->catfile(
         $projectdir, qw(inc Devel AssertOS Linux.pm)),
-	"inc/Devel/AssertOS/Linux.pm exists");
+        "inc/Devel/AssertOS/Linux.pm exists");
     ok(-e File::Spec->catfile(
         $projectdir, qw(inc Devel AssertOS MSWin32.pm)),
-	"inc/Devel/AssertOS/MSWin32.pm exists");
+        "inc/Devel/AssertOS/MSWin32.pm exists");
     ok(-e File::Spec->catfile(
         $projectdir, qw(inc Devel AssertOS Cygwin.pm)),
-	"inc/Devel/AssertOS/Cygwin.pm exists");
+        "inc/Devel/AssertOS/Cygwin.pm exists");
     ok(-e File::Spec->catfile(
         $projectdir, qw(inc Devel AssertOS MicrosoftWindows.pm)),
-	"inc/Devel/AssertOS/MicrosoftWindows.pm exists");
+        "inc/Devel/AssertOS/MicrosoftWindows.pm exists");
     ok(-e File::Spec->catfile(
         $projectdir, qw(inc Devel AssertOS MSYS.pm)),
-	"inc/Devel/AssertOS/MSYS.pm exists");
+        "inc/Devel/AssertOS/MSYS.pm exists");
     ok(-e File::Spec->catfile(
         $projectdir, qw(inc Devel AssertOS.pm)),
-	"inc/Devel/AssertOS.pm exists");
+        "inc/Devel/AssertOS.pm exists");
     ok(-e File::Spec->catfile(
         $projectdir, qw(inc Devel CheckOS.pm)),
-	"inc/Devel/CheckOS.pm exists");
+        "inc/Devel/CheckOS.pm exists");
     is_deeply(
         [sort split("\n", _getfile(File::Spec->catfile($projectdir, 'MANIFEST')))],
-	[sort qw( inc/Devel/AssertOS/Android.pm
-	    inc/Devel/AssertOS/Linux/v2_6.pm inc/Devel/AssertOS/Linux.pm
-	    inc/Devel/AssertOS/MSWin32.pm inc/Devel/AssertOS/Cygwin.pm
-	    inc/Devel/AssertOS/MicrosoftWindows.pm
+        [sort qw( inc/Devel/AssertOS/Android.pm
+            inc/Devel/AssertOS/Linux/v2_6.pm inc/Devel/AssertOS/Linux.pm
+            inc/Devel/AssertOS/MSWin32.pm inc/Devel/AssertOS/Cygwin.pm
+            inc/Devel/AssertOS/MicrosoftWindows.pm
         inc/Devel/AssertOS/MSYS.pm
-	    inc/Devel/CheckOS.pm inc/Devel/AssertOS.pm
-	    MANIFEST Makefile.PL
-	)],
-	'... and update MANIFEST correctly'
+            inc/Devel/CheckOS.pm inc/Devel/AssertOS.pm
+            MANIFEST Makefile.PL
+        )],
+        '... and update MANIFEST correctly'
     );
 }
 
@@ -163,12 +161,12 @@ wibblywobblywoo', # mmm, significant whitespace
     );
     is_deeply(
         [sort split("\n", _getfile(File::Spec->catfile($projectdir, 'MANIFEST')))],
-	[sort qw( inc/Devel/AssertOS/Android.pm
-	    inc/Devel/AssertOS/Linux.pm inc/Devel/AssertOS/MSWin32.pm
-	    inc/Devel/CheckOS.pm inc/Devel/AssertOS.pm
-	    HLAGH
-	)],
-	'... and update MANIFEST correctly'
+        [sort qw( inc/Devel/AssertOS/Android.pm
+            inc/Devel/AssertOS/Linux.pm inc/Devel/AssertOS/MSWin32.pm
+            inc/Devel/CheckOS.pm inc/Devel/AssertOS.pm
+            HLAGH
+        )],
+        '... and update MANIFEST correctly'
     );
 }
 
@@ -191,35 +189,37 @@ wibblywobblywoo', # mmm, significant whitespace
     );
     is_deeply(
         [sort split("\n", _getfile(File::Spec->catfile($projectdir, 'MANIFEST')))],
-	[sort qw( inc/Devel/AssertOS/Android.pm
-	    inc/Devel/AssertOS/Linux.pm inc/Devel/AssertOS/MSWin32.pm
-	    inc/Devel/CheckOS.pm inc/Devel/AssertOS.pm
-	    HLAGH
-	)],
-	'... and update MANIFEST correctly'
+        [sort qw( inc/Devel/AssertOS/Android.pm
+            inc/Devel/AssertOS/Linux.pm inc/Devel/AssertOS/MSWin32.pm
+            inc/Devel/CheckOS.pm inc/Devel/AssertOS.pm
+            HLAGH
+        )],
+        '... and update MANIFEST correctly'
     );
 }
 
 sub emptydir {
     my $projectdir = File::Temp->newdir();
-    _run_script($projectdir, qw(Linux MSWin32));
+    _run_script($projectdir, qw(MacOS Linux MSWin32));
     ok(-e File::Spec->catfile($projectdir, 'Makefile.PL'),
         "create Makefile.PL if there's neither Makefile.PL nor Build.PL");
     is_deeply(
         _getfile(File::Spec->catfile($projectdir, 'Makefile.PL')),
-        'use lib qw(inc); use Devel::AssertOS qw(Linux MSWin32);
+        'use lib qw(inc); use Devel::AssertOS qw(Linux MSWin32 MacOSX);
 
 ', # mmm, significant whitespace
         '... and created it correctly'
     );
     is_deeply(
         [sort split("\n", _getfile(File::Spec->catfile($projectdir, 'MANIFEST')))],
-	[sort qw( inc/Devel/AssertOS/Android.pm
-	    inc/Devel/AssertOS/Linux.pm inc/Devel/AssertOS/MSWin32.pm
-	    inc/Devel/CheckOS.pm inc/Devel/AssertOS.pm
-	    MANIFEST Makefile.PL
-	)],
-	'... and MANIFEST created OK where there wasn\'t one'
+        [sort qw(
+            inc/Devel/AssertOS/Android.pm
+            inc/Devel/AssertOS/Linux.pm inc/Devel/AssertOS/MSWin32.pm
+            inc/Devel/AssertOS/MacOSX.pm
+            inc/Devel/CheckOS.pm inc/Devel/AssertOS.pm
+            MANIFEST Makefile.PL
+        )],
+        '... and MANIFEST created OK where there wasn\'t one'
     );
 }
 
@@ -232,3 +232,5 @@ sub _run_script {
     system($^X, $cwd.'/bin/use-devel-assertos', '-q', @_);
     chdir($cwd);
 }
+
+done_testing();

@@ -16,18 +16,18 @@ use MIME::Base64 qw(encode_base64url);
 use WWW::Mechanize;
 use URI;
 
-our $VERSION = '0.10';
+our $VERSION = '1.00';
 
 $| = 1;
 
 my $home_dir;
 
 # The %api_cache hash is a cache for Tesla API call data across all objects.
-# The $api_cache_alive_time is a timestamp of last cache write for a particular
-# endpoint/ID pair, and is relative to API_CACHE_TIMEOUT_SECONDS
+# It is managed by the _api_cache() private method. Each cache slot contains the
+# time() that it was stored, and will time out after
+# API_CACHE_TIMEOUT_SECONDS/api_cache_time()
 
 my %api_cache;
-my $api_cache_alive_time = time;
 
 BEGIN {
     $home_dir = File::HomeDir->my_home;
@@ -38,17 +38,21 @@ use constant {
     API_CACHE_PERSIST           => 0,
     API_CACHE_TIMEOUT_SECONDS   => 2,
     API_TIMEOUT_RETRIES         => 3,
-    CACHE_FILE                  => "$home_dir/tesla_api_cache.json",
+    AUTH_CACHE_FILE             => "$home_dir/tesla_auth_cache.json",
     ENDPOINTS_FILE              => dist_file('Tesla-API', 'endpoints.json'),
     OPTION_CODES_FILE           => dist_file('Tesla-API', 'option_codes.json'),
+    TOKEN_EXPIRY_WINDOW         => 5,
     URL_API                     => 'https://owner-api.teslamotors.com/',
     URL_ENDPOINTS               => 'https://raw.githubusercontent.com/tdorssers/TeslaPy/master/teslapy/endpoints.json',
     URL_OPTION_CODES            => 'https://raw.githubusercontent.com/tdorssers/TeslaPy/master/teslapy/option_codes.json',
     URL_AUTH                    => 'https://auth.tesla.com/oauth2/v3/authorize',
     URL_TOKEN                   => 'https://auth.tesla.com/oauth2/v3/token',
+    USERAGENT_STRING            => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:98.0) Gecko/20100101 Firefox/98.0',
+    USERAGENT_TIMEOUT           => 180,
 };
 
 # Public object methods
+
 sub new {
     my ($class, %params) = @_;
     my $self = bless {}, $class;
@@ -85,7 +89,7 @@ sub api {
 
     my $type = $endpoint->{TYPE};
     my $auth = $endpoint->{AUTH};
-    my $uri = $endpoint->{URI};
+    my $uri  = $endpoint->{URI};
 
     if ($uri =~ /\{/) {
         if (! defined $id || $id !~ /^\d+$/) {
@@ -97,20 +101,13 @@ sub api {
     # Return early if all cache mechanisms check out
 
     if ($self->api_cache_persist || $self->api_cache_time) {
-        if (DEBUG_CACHE) {
-            printf(
-                "Cache - Alive: $api_cache_alive_time, Timeout: %.2f, Persist: %d\n",
-                $self->api_cache_time,
-                $self->api_cache_persist
-            );
-        }
-        if ($self->api_cache_persist || time - $api_cache_alive_time <= $self->api_cache_time) {
-            if ($self->_cache(endpoint => $endpoint_name, id => $id)) {
+        my $cache = $self->_api_cache(endpoint => $endpoint_name, id => $id);
+        if ($cache) {
+            if ($self->api_cache_persist || time - $cache->{time} <= $self->api_cache_time) {
                 print "Returning cache for $endpoint_name/$id pair...\n" if DEBUG_CACHE;
-                return $self->_cache(endpoint => $endpoint_name, id => $id);
+                return $cache->{data};
             }
         }
-        print "No cache present for $endpoint_name/$id pair...\n" if DEBUG_CACHE;
     }
 
     my $url = URI->new(URL_API . $uri);
@@ -129,30 +126,16 @@ sub api {
         JSON->new->allow_nonref->encode($api_params)
     );
 
-    my $response;
+    my ($success, $code, $response_data) = $self->_tesla_api_call($request);
+    my $data = _decode($response_data)->{response};
 
-    for (1 .. API_TIMEOUT_RETRIES) {
-        # If a timeout (ie. code 500) occurs, repeat the API call
+    $self->_api_cache(
+        endpoint => $endpoint_name,
+        id       => $id,
+        data     => $data
+    );
 
-        $response = $self->mech->request($request);
-
-        if ($response->is_success) {
-            my $response_data = _decode($response->decoded_content)->{response};
-
-            $self->_cache(
-                endpoint => $endpoint_name,
-                id       => $id,
-                data     => $response_data
-            );
-
-            return $response_data;
-        }
-        elsif ($response->code == 500) {
-            next;
-        }
-    }
-
-    return {};
+    return $data;
 }
 sub api_cache_clear {
     my ($self) = @_;
@@ -168,6 +151,9 @@ sub api_cache_persist {
 sub api_cache_time {
     my ($self, $cache_seconds) = @_;
     if (defined $cache_seconds) {
+        if ($cache_seconds !~ /^\d+$/) {
+            croak "api_cache_time() requires an int as \$cache_seconds param";
+        }
         $self->{api_cache_time} = $cache_seconds;
     }
     return $self->{api_cache_time} // API_CACHE_TIMEOUT_SECONDS;
@@ -205,16 +191,15 @@ sub mech {
     return $self->{mech} if $self->{mech};
 
     my $www_mech = WWW::Mechanize->new(
-        agent       => $self->_useragent_string,
-        autocheck   => 0,
-        cookie_jar  => {}
+        agent      => $self->useragent_string,
+        autocheck  => 0,
+        cookie_jar => {},
+        timeout    => $self->useragent_timeout
     );
 
     $self->{mech} = $www_mech;
-}
-sub object_data {
-    my ($self) = @_;
-    return $self->{data};
+
+    return $self->{mech};
 }
 sub option_codes {
     my ($self, $code) = @_;
@@ -259,54 +244,72 @@ sub update_data_files {
         (my $data_method = $filename) =~ s/\.json//;
 
         my $url = URI->new($data_url);
-        my $response = $self->mech->get($url);
 
-        if ($response->is_success) {
-            my $new_data = decode_json($response->decoded_content);
-            my $existing_data = $self->$data_method;
+        my $request = HTTP::Request->new('GET', $url,);
 
-            my $data_differs;
+        my ($success, $code, $response_data) = $self->_tesla_api_call($request);
+        my $new_data = decode_json($response_data);
+        my $existing_data = $self->$data_method;
 
-            if (scalar keys %$new_data != scalar keys %$existing_data) {
-                $data_differs = 1;
-            }
+        my $data_differs;
 
-            if (! $data_differs) {
-                for my $key (keys %$new_data) {
-                    if (! exists $existing_data->{$key}) {
-                        $data_differs = 1;
-                        last;
-                    }
-                }
-                for my $key (keys %$existing_data) {
-                    if (! exists $new_data->{$key}) {
-                        $data_differs = 1;
-                        last;
-                    }
-                }
-            }
+        if (scalar keys %$new_data != scalar keys %$existing_data) {
+                                                               $data_differs = 1;
+                                                               }
 
-            if ($data_differs) {
-                $self->{reset_data} = 1;
-                my $file = dist_file('Tesla-API', $filename);
-
-                # Make a backup copy
-
-                my $backup = "$file." . time;
-                copy($file, $backup) or die "Can't create $file backup file!: $!";
-
-                chmod 0644, $file;
-
-                open my $fh, '>', "$file"
-                    or die "Can't open '$file' for writing: $!";
-
-                print $fh JSON->new->pretty->encode($new_data);
-            }
+        if (! $data_differs) {
+            for my $key (keys %$new_data) {
+                                      if (! exists $existing_data->{$key}) {
+                                      $data_differs = 1;
+                                      last;
+                                      }
+                                      }
+            for my $key (keys %$existing_data) {
+                                           if (! exists $new_data->{$key}) {
+                                           $data_differs = 1;
+                                           last;
+                                           }
+                                           }
         }
-        else {
-            croak $response->status_line;
+
+        if ($data_differs) {
+            $self->{reset_data} = 1;
+            my $file = dist_file('Tesla-API', $filename);
+
+            # Make a backup copy
+
+            my $backup = "$file." . time;
+            copy($file, $backup) or die "Can't create $file backup file!: $!";
+
+            chmod 0644, $file;
+
+            open my $fh, '>', "$file"
+                or die "Can't open '$file' for writing: $!";
+
+            print $fh JSON->new->pretty->encode($new_data);
         }
     }
+}
+sub useragent_string {
+    my ($self, $ua_string) = @_;
+
+    if (defined $ua_string) {
+        $self->{useragent_string} = $ua_string;
+    }
+
+    return $self->{useragent_string} // USERAGENT_STRING;
+}
+sub useragent_timeout {
+    my ($self, $timeout) = @_;
+
+    if (defined $timeout) {
+        if ($timeout !~ /^\d+?(?:\.\d+)?$/) {
+            croak "useragent_timeout() requires an integer or float";
+        }
+        $self->{useragent_timeout} = $timeout;
+    }
+
+    return $self->{useragent_timeout} // USERAGENT_TIMEOUT;
 }
 
 # Private methods
@@ -317,14 +320,11 @@ sub _access_token {
 
     my ($self) = @_;
 
-    if (! -e CACHE_FILE) {
-        my $auth_code = $self->_authentication_code;
-        $self->_access_token_generate($auth_code);
+    if (! -e $self->_authentication_cache_file) {
+        $self->_access_token_generate;
     }
 
-    my $valid_token = $self->_access_token_validate;
-
-    if (! $valid_token) {
+    if (! $self->_access_token_valid) {
         $self->_access_token_refresh;
     }
 
@@ -333,7 +333,7 @@ sub _access_token {
     return $self->{access_token};
 }
 sub _access_token_data {
-    # Fetches and stores the cache data file dat
+    # Fetches and stores the access token data to the AUTH_CACHE_FILE
 
     my ($self, $data) = @_;
 
@@ -342,7 +342,12 @@ sub _access_token_data {
     return $self->{cache_data} if $self->{cache_data};
 
     {
-        open my $fh, '<', CACHE_FILE or die "Can't open Tesla cache file " . CACHE_FILE . ": $!";
+        local $/;
+        open my $fh, '<', $self->_authentication_cache_file or die
+            "Can't open Tesla cache file " .
+            $self->_authentication_cache_file .
+            ": $!";
+
         my $json = <$fh>;
         $self->{cache_data} = decode_json($json);
     }
@@ -352,11 +357,9 @@ sub _access_token_data {
 sub _access_token_generate {
     # Generates an access token and stores it in the cache file
 
-    my ($self, $auth_code) = @_;
+    my ($self) = @_;
 
-    if (! defined $auth_code) {
-        croak "_access_token_generate() requires an \$auth_code parameter";
-    }
+    my $auth_code = $self->_authentication_code;
 
     my $url = URI->new(URL_TOKEN);
     my $header = ['Content-Type' => 'application/json; charset=UTF-8'];
@@ -376,31 +379,25 @@ sub _access_token_generate {
         JSON->new->allow_nonref->encode($request_data)
     );
 
-    my $response = $self->mech->request($request);
+    my ($success, $code, $response_data)= $self->_tesla_api_call($request);
 
-    if ($response->is_success) {
-        my $token_data = decode_json($response->decoded_content);
+    my $token_data = decode_json($response_data);
 
-        $token_data = $self->_access_token_set_expiry($token_data);
-        $self->_access_token_update($token_data);
+    $token_data = $self->_access_token_set_expiry($token_data);
+    $self->_access_token_update($token_data);
 
-        return $token_data;
-    }
-    else {
-        croak $self->mech->response->status_line;
-    }
+    return $token_data;
 }
-sub _access_token_validate {
+sub _access_token_valid {
     # Checks the validity of an existing token
 
     my ($self) = @_;
 
     my $token_expires_at = $self->_access_token_data->{expires_at};
-    my $token_expires_in = $self->_access_token_data->{expires_in};
 
     my $valid = 0;
 
-    if (time + $token_expires_in < $token_expires_at) {
+    if (time + TOKEN_EXPIRY_WINDOW < $token_expires_at) {
         $valid = 1;
     }
 
@@ -445,23 +442,19 @@ sub _access_token_refresh {
         JSON->new->allow_nonref->encode($request_data)
     );
 
-    my $response = $self->mech->request($request);
+    my ($success, $code, $response_data) = $self->_tesla_api_call($request);
 
-    if ($response->is_success) {
-        my $token_data = decode_json($response->decoded_content);
+    # Extract the token data
+    my $token_data = decode_json($response_data);
 
-        # Re-add the existing refresh token; its still valid
-        $token_data->{refresh_token} = $refresh_token;
+    # Re-add the existing refresh token; its still valid
+    $token_data->{refresh_token} = $refresh_token;
 
-        # Set the expiry time
-        $token_data = $self->_access_token_set_expiry($token_data);
+    # Set the expiry time
+    $token_data = $self->_access_token_set_expiry($token_data);
 
-        # Update the cached token
-        $self->_access_token_update($token_data);
-    }
-    else {
-        croak $self->mech->response->status_line;
-    }
+    # Update the cached token
+    $self->_access_token_update($token_data);
 }
 sub _access_token_update {
     # Writes the new or updated token to the cache file
@@ -474,15 +467,97 @@ sub _access_token_update {
 
     $self->_access_token_data($token_data);
 
-    open my $fh, '>', CACHE_FILE or die $!;
+    open my $fh, '>', $self->_authentication_cache_file or die $!;
 
     print $fh JSON->new->allow_nonref->encode($token_data);
+}
+sub _api_attempts {
+    # Stores and returns the number of attempts of each API call to Tesla
+
+    my ($self, $add) = @_;
+
+    if (defined $add) {
+        $self->{api_attempts}++;
+    }
+
+    return $self->{api_attempts} || 0;
+}
+sub _api_cache {
+    # Stores the Tesla API fetched data
+    my ($self, %params) = @_;
+
+    my $endpoint = $params{endpoint};
+    my $id = $params{id} // 0;
+    my $data = $params{data};
+
+    if (! $endpoint) {
+        croak "_api_cache() requires an endpoint name sent in";
+    }
+
+    if ($data) {
+        $api_cache{$endpoint}{$id}{data} = $data;
+        $api_cache{$endpoint}{$id}{time} = time;
+    }
+
+    return $api_cache{$endpoint}{$id};
+}
+sub _api_cache_data {
+    # Returns the entire API cache (for testing)
+    return %api_cache;
+}
+sub _authentication_cache_file {
+    my ($self, $filename) = @_;
+
+    if (defined $filename) {
+        $self->{authentication_cache_file} = $filename;
+    }
+
+    return $self->{authentication_cache_file} || AUTH_CACHE_FILE;
 }
 sub _authentication_code {
     # If an access token is unavailable, prompt the user with a URL to
     # authenticate to Tesla, and have them paste in the resulting URL
     # We then extract and return the access code to generate the access
     # token
+
+    my ($self) = @_;
+
+    return $self->{authentication_code} if $self->{authentication_code};
+
+    my $auth_url = $self->_authentication_code_url;
+
+    print "\n$auth_url\n";
+
+    print "\nPaste URL here: ";
+
+    my $code_url = <STDIN>;
+    chomp $code_url;
+
+    my $code = $self->_authentication_code_extract($code_url);
+
+    $self->{authentication_code} = $code;
+
+    return $code;
+}
+sub _authentication_code_extract {
+    # Pull in the pasted URL with the code, extract the code,
+    # and return it
+
+    my ($self, $code_url) = @_;
+
+    my $code;
+
+    if ($code_url =~ /code=(.*?)\&/) {
+        $code = $1;
+    }
+    else {
+        croak "Could not extract the authorization code from the URL";
+    }
+
+    return $code;
+}
+sub _authentication_code_url {
+    # Generate Tesla's authentication URL
 
     my ($self) = @_;
     my $auth_url = URI->new(URL_AUTH);
@@ -501,27 +576,11 @@ sub _authentication_code {
     $auth_url->query_form(%params);
 
     print
-        "Please follow the URL displayed below in your browser and log into Tesla, " .
+        "\nPlease follow the URL displayed below in your browser and log into Tesla, " .
         "then paste the URL from the resulting 'Page Not Found' page's address bar, " .
         "then hit ENTER:\n";
 
-    print "\n$auth_url\n";
-
-    print "\nPaste URL here: ";
-
-    my $code_url = <STDIN>;
-    chomp $code_url;
-
-    my $code;
-
-    if ($code_url =~ /code=(.*?)\&/) {
-        $code = $1;
-    }
-    else {
-        croak "Could not extract the authorization code from the URL";
-    }
-
-    return $code;
+    return $auth_url;
 }
 sub _authentication_code_verifier {
     # When generating an access token, generate and store a code
@@ -539,25 +598,6 @@ sub _authentication_code_verifier {
 
     return $self->{authentication_code_verifier} = $code_verifier;
 }
-sub _cache {
-    # Stores the Tesla API fetched data
-    my ($self, %params) = @_;
-
-    my $endpoint = $params{endpoint};
-    my $id = $params{id} // 0;
-    my $data = $params{data};
-
-    if (! $endpoint) {
-        croak "_cache() requires an endpoint name sent in";
-    }
-
-    if ($data) {
-        $api_cache{$endpoint}{$id} = $data;
-        $api_cache_alive_time = time;
-    }
-
-    return $api_cache{$endpoint}{$id};
-}
 sub _decode {
     # Decode JSON to Perl
     my ($json) = @_;
@@ -565,7 +605,7 @@ sub _decode {
     return $perl;
 }
 sub _random_string {
-    # Returns a proper length alpha-num string for token code
+    # Returns a proper length alpha-num string for Tesla API token code
     # verification key
 
     my @chars = ('A' .. 'Z', 'a' .. 'z', 0 .. 9);
@@ -573,11 +613,37 @@ sub _random_string {
     $rand_string .= $chars[rand @chars] for 1 .. 85;
     return $rand_string;
 }
-sub _useragent_string {
-    # Returns the user agent string
-    my ($self) = @_;
-    my $ua = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:98.0) Gecko/20100101 Firefox/98.0';
-    return $ua;
+sub _tesla_api_call {
+    # Responsible for all calls to the Tesla API
+
+    my ($self, $request) = @_;
+
+    my $response;
+
+    for (1 .. API_TIMEOUT_RETRIES) {
+        $response = $self->mech->request($request);
+
+        $self->_api_attempts(1);
+
+        if ($response->is_success) {
+            last;
+        }
+    }
+
+    if (! $response->is_success) {
+        my $error_string = sprintf(
+            "Error - Tesla API said: '%s'",
+            $self->mech->response->status_line
+        );
+
+        croak $error_string;
+    }
+
+    return (
+        $response->is_success,
+        $response->code,
+        $response->decoded_content
+    );
 }
 
 1;
@@ -640,8 +706,8 @@ be redirected again to a "Page Not Found" page, in which you must copy the URL
 from the address bar and paste it back into the console.
 
 We then internally generate an access token for you, store it in a
-C<tesla_cache.json> file in your home directory, and use it on all subsequent
-accesses.
+C<tesla_auth_cache.json> file in your home directory, and use it on all
+subsequent accesses.
 
 B<NOTE>: If you do not have a Tesla account, you can still instantiate a
 L<Tesla::API> object by supplying the C<< unauthenticated => 1 >> parameter
@@ -736,12 +802,6 @@ To get a list of endpoint names:
 
 Returns the L<WWW::Mechanize> object we've instantiated internally.
 
-=head2 object_data
-
-Returns a hash reference of the data we've collected for you and stashed
-within the object. This does not reflect the entire object, just the data
-returned from Tesla's API.
-
 =head2 option_codes
 
 B<NOTE>: I'm unsure if the option codes are vehicle specific, or general for
@@ -755,6 +815,27 @@ Checks to see if there are any updates to the C<endpoints.json> or
 C<option_codes.json> files online, and updates them locally.
 
 Takes no parameters, there is no return. C<croak()>s on failure.
+
+=head2 useragent_string($ua_string)
+
+Sets/gets the useragent string we send to the Tesla API.
+
+I<Optional, String>: The user agent browser string to send to the Tesla API.
+
+I<Return>: String, the currently set value.
+
+=head2 useragent_timeout($timeout)
+
+Sets/gets the timeout we use in the L<WWW::Mechanize|/mech> object that we
+communicate to the Tesla API with.
+
+Parameters:
+
+    $timeout
+
+I<Optional, Integer/Float>: The timeout in seconds or fractions of a second.
+
+I<Return>: Integer/Float, the currently set value.
 
 =head1 METHODS - API CACHE
 
@@ -1017,6 +1098,136 @@ Output (massively and significantly snipped for brevity):
               'timestamp' => '1647461524710'
         }
     };
+
+=head1 CONFIGURATION VARIABLES
+
+Most configuration options used in this software are defined as constants in the
+library file. Some are defaults that can be overridden via method calls, others
+are only modifiable by updating the actual value in the file.
+
+=head2 DEBUG_CACHE
+
+Prints to C<STDOUT> debugging output from the caching mechanism.
+
+I<Override>: C<$ENV{DEBUG_TESLA_API_CACHE}>
+
+=head2 API_CACHE_PERSIST
+
+Always/never use the cache once data has been retrieved through the Tesla API.
+
+I<Default>: False (C<0>).
+
+I<Override>: None
+
+=head2 API_CACHE_TIMEOUT_SECONDS
+
+How many seconds to reuse the cached data retrieved from the Tesla API.
+
+I<Default>: C<2>
+
+I<Override>: L</api_cache_time($cache_seconds)>
+
+=head2 API_CACHE_RETRIES
+
+How many times we'll try a Tesla API call in the event of a failure.
+
+I<Default>: C<3>
+
+I<Override>: None
+
+=head2 AUTH_CACHE_FILE
+
+The path and filename of the file we'll store the Tesla API access token
+information.
+
+I<Default>: C<$home_dir/tesla_api_cache.json>
+
+I<Override>: C<_authentication_cache_file()>, used primarily for unit testing.
+
+=head2 ENDPOINTS_FILE
+
+The path and filename of the file we'll store the Tesla API endpoint description
+file.
+
+I<Default>: C<dist_file('Tesla-API', 'endpoints.json')>
+
+I<Override>: None
+
+=head2 OPTION_CODES_FILE
+
+The path and filename of the file we'll store the product option code list file
+for Tesla products.
+
+I<Default>: C<dist_file('Tesla-API', 'option_codes.json')>
+
+I<Override>: None
+
+=head2 TOKEN_EXPIRY_WINDOW
+
+The number of seconds we'll add to the current time when validating the token
+expiry. This is effectively a cusion window so that the token has at least this
+many seconds before expiring to ensure the next call won't use an invalidated
+token
+
+I<Default>: C<5>
+
+I<Override>: None
+
+=head2 URI_API
+
+The URL we use to communicate with the Tesla API for data retrieval operations.
+
+I<Default>: C<https://owner-api.teslamotors.com/>
+
+I<Override>: None
+
+=head2 URI_ENDPOINTS
+
+The URL we use to retrieve the updated Tesla API endpoints file.
+
+I<Default>: C<https://raw.githubusercontent.com/tdorssers/TeslaPy/master/teslapy/endpoints.json>
+
+I<Override>: None
+
+=head2 URI_OPTION_CODES
+
+The URL we use to retrieve the updated Tesla API product option codes file.
+
+I<Default>: C<https://raw.githubusercontent.com/tdorssers/TeslaPy/master/teslapy/option_codes.json>
+
+I<Override>: None
+
+=head2 URI_AUTH
+
+The URL we use to perform the Tesla API authentication routines.
+
+I<Default>: C<https://auth.tesla.com/oauth2/v3/authorize>
+
+I<Override>: None
+
+=head2 URI_TOKEN
+
+The URL we use to fetch and update the Tesla API access tokens.
+
+I<Default>: C<https://auth.tesla.com/oauth2/v3/token>
+
+I<Override>: None
+
+=head2 USERAGENT_STRING
+
+String used to identify the 'browser' we're using to access the Tesla API.
+
+I<Default>: C<Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:98.0) Gecko/20100101 Firefox/98.0>
+
+I<Override>: L</useragent_string($ua_string)>
+
+=head2 USERAGENT_TIMEOUT
+
+Number of seconds before we classify a call to the Tesla API as timed out.
+
+I<Default>: C<180>
+
+I<Override>: L</useragent_timeout($timeout)>
 
 =head1 AUTHOR
 

@@ -1,7 +1,7 @@
 package App::picadata;
 use v5.14.1;
 
-our $VERSION = '2.02';
+our $VERSION = '2.03';
 
 use Getopt::Long qw(GetOptionsFromArray :config bundling);
 use Pod::Usage;
@@ -25,6 +25,7 @@ my %TYPES = (
     ext    => 'Binary',
     plain  => 'Plain',
     pp     => 'Plain',
+    import => 'Import',
     plus   => 'Plus',
     norm   => 'Plus',
     normpp => 'Plus',
@@ -170,9 +171,9 @@ sub new {
 
     $opt->{input} = @argv ? \@argv : ['-'];
 
-    if ($opt->{from}) {
+    if (my $name = $opt->{from}) {
         $opt->{from} = $TYPES{lc $opt->{from}}
-            or $opt->{error} = "unknown serialization type: " . $opt->{from};
+            or $opt->{error} = "unknown serialization type: $name";
     }
 
     # default output format
@@ -188,9 +189,9 @@ sub new {
         }
     }
 
-    if ($opt->{to}) {
+    if (my $name = $opt->{to}) {
         $opt->{to} = $TYPES{lc $opt->{to}}
-            or $opt->{error} = "unknown serialization type: " . $opt->{to};
+            or $opt->{error} = "unknown serialization type: $name";
     }
 
     $opt->{command} = $command;

@@ -1,37 +1,53 @@
 NAME
     Getopt::optparse - optparse style processing of command line options
 
+    This library only supports double dash options: --
+
 SYNOPSIS
         use Getopt::optparse;
         my $parser = Getopt::optparse->new();
         $parser->add_option(
             '--hostname', 
             {
-                dest => 'hostname',
-                help => 'Remote hostname',
+                dest    => 'hostname',
+                help    => 'Remote hostname',
                 default => 'localhost.localdomain'
+            }
+        );
+        $parser->add_option( 
+            '--global', {
+                dest    => 'global',
+                action  => 'store_true',
+                help    => 'Show global',
+                default => 0
             }
         );
         $parser->add_option(
             '--username', 
             {
-                dest => 'username',
-                help => 'Username for new ILO account'
+                dest   => 'username',
+                action => 'append',
+                help   => 'Usernames to analyze'
             }
         );
-        $parser->add_option( 
-            '--global',
-            dest    => 'global',
-            action  => 'store_true',
-            help    => 'Show global',
-            default => 0
-        )
+        $parser->add_option(
+            '--v', 
+            {
+                dest   => 'verbose',
+                action => 'count',
+                help   => 'Increment verbosity'
+            }
+        );
 
         my $options = $parser->parse_args();
         printf("Hostname is: %s\n", $options->{hostname});
         printf("Username is: %s\n", $options->{username});
-        if ($options->{global}) {
 
+        if ($options->{global}) {
+        }
+
+        for my $uname (@{$options->{username}}) {
+            print $uname, "\n";
         }
 
 DESCRIPTION
@@ -46,7 +62,10 @@ CONSTRUCTOR
 METHODS
     The following methods are available:
 
-    Getopt::optparse->add_option()
+    Getopt::optparse->add_option( 'optionname', {option_attributes} )
+        Add option to be parsed from command line. Accepts two arguments.
+        Both are required:
+
             $parser->add_option(
                 '--hostname',
                 {
@@ -56,8 +75,6 @@ METHODS
                 }
             )
 
-        Add option to be parsed from command line. Accepts two arguments:
-
         Option Name
             Value to be parsed from command line. --hostname in the above
             example. This library uses only double dash.
@@ -65,26 +82,39 @@ METHODS
         Option Attributes. A hash reference.
             These may include:
 
-            dest
-                Name of key were parsed option will be stored.
+            dest    Name of key were parsed option will be stored.
 
             default (optional)
-                Value of dest if no option is parsed on command line.
+                    Value of dest if no option is parsed on command line.
 
             help (optional)
-                Text message displayed when --help is found on command line.
+                    Text message displayed when --help is found on command
+                    line.
 
             action (optional)
-                Presently only store_true supported. Using this makes dest
-                true or false. (0 or 1)
+                    The following actions are supported.
+
+                    store_true
+                            Using this makes dest true or false. (0 or 1).
+                            If the option is found.
+
+                    append  Using this appends each occurrance of an option
+                            to an array reference.
+
+                    count   using this increments dest by one for every
+                            occurrence.
 
     Getopt::optparse->parse_args()
-            my $options = $parser->parse_args();
-            printf("Hostname is: %s\n", $options->{hostname});
-            printf("Username is: %s\n", $options->{username});
-
         Parse added options from command line and return their values as a
         hash reference.
+
+            my $options = $parser->parse_args();
+
+            printf("Hostname is: %s\n", $options->{hostname});
+
+            for my $uname (@{$options->{username}}) {
+                print $uname, "\n";
+            }
 
 AUTHOR
     Matt Hersant <matt_hersant@yahoo.com>

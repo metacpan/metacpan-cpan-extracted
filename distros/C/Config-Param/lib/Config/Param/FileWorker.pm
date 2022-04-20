@@ -4,6 +4,9 @@ use Config::Param;
 use IO::File;
 use Storable qw(dclone);
 
+our $VERSION = '4.000002'; # updated by release script
+$VERSION = eval $VERSION;
+
 sub new
 {
 	my $class = shift;

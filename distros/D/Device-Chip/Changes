@@ -1,5 +1,22 @@
 Revision history for Device-Chip
 
+0.22    2022-04-20
+        [CHANGES]
+         * General improvements to documentation, especially Authoring guide
+
+        [BUGFIXES]
+         * Requires Object::Pad version 0.63 to get `:experimental` import tag
+
+0.21    2022-04-19
+        [CHANGES]
+         * Use the new `:isa` and `:does` from Object::Pad 0.57
+         * Quiet the experimental warnings of Object::Pad 0.61
+         * Added ->cached_write_reg_masked method to
+           Device::Chip::Base::RegisteredI2C
+
+        [BUGFIXES]
+         * Permit ->cached_write_reg to write buffers that include a "\n" byte
+
 0.20    2021-10-18
         [CHANGES]
          * Use ADJUST blocks from Object::Pad to avoid BUILD blocks

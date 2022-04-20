@@ -1,7 +1,7 @@
 package PICA::Writer::Base;
 use v5.14.1;
 
-our $VERSION = '2.02';
+our $VERSION = '2.03';
 
 use Scalar::Util qw(blessed openhandle reftype);
 use PICA::Schema qw(clean_pica);
@@ -48,7 +48,7 @@ sub write {
 sub write_identifier {
     my ($self, $field) = @_;
 
-    my $fh = $self->{fh};
+    my $fh  = $self->{fh};
     my %col = %{$self->{color} // {}};
 
     $fh->print($col{tag} ? colored($field->[0], $col{tag}) : $field->[0]);
@@ -92,6 +92,11 @@ sub write_field {
 sub write_annotation {
 
     # ignore field annotation by default
+}
+
+sub write_subfield {
+    my ($self, $code, $value) = @_;
+    $self->{fh}->print($self->SUBFIELD_INDICATOR . $code . $value);
 }
 
 sub end {

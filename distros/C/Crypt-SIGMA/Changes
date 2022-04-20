@@ -1,5 +1,8 @@
 Revision history for Perl extension Crypt::SIGMA.
 
+0.011 2022/04/19
+    - add other_data_a, other_data_b
+
 0.01  2022/04/09   
     - init.
 

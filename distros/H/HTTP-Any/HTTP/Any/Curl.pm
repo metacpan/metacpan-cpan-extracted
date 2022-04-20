@@ -212,7 +212,7 @@ sub __headers {
 	my ($url, $htext, @h) = @_;
 	my $h = _parse_headers($url, $htext);
 	if (@h) {
-		return $h, __headers($$h{location}, @h);
+		return $h, __headers($$h{location} || $url, @h);
 	} else {
 		return $h;
 	}

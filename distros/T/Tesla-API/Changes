@@ -1,5 +1,37 @@
 Revision history for Tesla-API
 
+1.00    2022-04-19
+    - This version is now deemed stable; The user-facing API calls will now
+      remain consistent going forward
+    - Each API cache object now contains the time it was stored. This allows
+      each cache object to time out individually (fixes #10)
+    - Added useragent_string() and useragent_timeout() (overrides constants)
+    - Added new POD section detailing the constants/overrides
+    - Fix issue in token validation where the token would always be classified
+      as expired
+    - All Tesla API calls are now routed through a new _tesla_api_call() method;
+      accepts a $request, returns a $response. This allows all calls to route
+      through the API retry functionality
+    - Added _api_attempts(); returns the number of attempts we've made for each
+      individual call to Tesla's API
+    - Renamed _cache() to _api_cache()
+    - Renamed CACHE_FILE to AUTH_CACHE_FILE
+    - Added _authentication_cache_file() which allows changing the default
+      AUTH_CACHE_FILE path to something custom (primarily for testing)
+    - Moved call to _authentication_code() from _access_token() to
+      _access_token_generate()
+    - Rename _access_token_validate() to _access_token_valid()
+    - _tesla_api_call() now returns $status, $code and
+      $response->decoded_content
+    - Add tests for nearly the entire authentication and access token routines
+    - Add prereq of Mock::Sub for test suite
+    - useragent_timeout() now croaks if timeout param isn't an int or float
+    - Removed object_data(). Wasn't being used, and essentially just stored the
+      api_cache() anyways
+    - api_cache_time() croaks if an int isn't sent in
+    - Added api_cache_data(), returns the entire API cache (primarily for
+      testing)
+
 0.10    2022-04-11
     - Remove erroneous call example from Tesla::Vehicle from the SYNOPSIS
     - Added prereq of LWP::Protocol::https

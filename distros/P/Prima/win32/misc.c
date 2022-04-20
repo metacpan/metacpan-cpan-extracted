@@ -218,8 +218,8 @@ apc_sys_get_value( int sysValue)
 	case svLayeredWidgets: return guts. displayBMInfo. bmiHeader. biBitCount > 8;
 	case svFixedPointerSize: return 0;
 	case svMenuCheckSize   : return GetSystemMetrics( SM_CXMENUCHECK );
-	case svFriBidi         : return use_fribidi;
-	case svLibThai         : return use_libthai;
+	case svFriBidi         : return prima_guts.use_fribidi;
+	case svLibThai         : return prima_guts.use_libthai;
 	case svAntialias       : return 1;
 	default:
 		return -1;
@@ -352,7 +352,7 @@ apc_fetch_resource( const char *className, const char *name,
 			duplicate_string( PComponent( owner)-> name), false), 0);
 		list_insert_at(&ids[0], ( Handle) prima_normalize_resource_string(
 			duplicate_string(
-				( owner == application) ? "Prima" : CComponent( owner)-> className
+				( owner == prima_guts.application) ? "Prima" : CComponent( owner)-> className
 			), true), 0);
 		owner = PComponent( owner)-> owner;
 	}

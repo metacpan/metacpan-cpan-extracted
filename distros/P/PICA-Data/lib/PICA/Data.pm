@@ -1,7 +1,7 @@
 package PICA::Data;
 use v5.14.1;
 
-our $VERSION = '2.02';
+our $VERSION = '2.03';
 
 use Exporter 'import';
 our @EXPORT_OK
@@ -421,6 +421,7 @@ use PICA::Parser::JSON;
 use PICA::Writer::XML;
 use PICA::Writer::Plus;
 use PICA::Writer::Plain;
+use PICA::Writer::Import;
 use PICA::Writer::Binary;
 use PICA::Writer::PPXML;
 use PICA::Writer::PIXML;
@@ -481,6 +482,9 @@ sub _pica_module {
     }
     elsif ($type =~ /^(pica)?plain$/) {
         "${base}::Plain"->new(@_);
+    }
+    elsif ($type eq 'import') {
+        "${base}::Import"->new(@_);
     }
     elsif ($type =~ /^(pica)?xml$/) {
         "${base}::XML"->new(@_);
@@ -709,6 +713,10 @@ L<PICA::Writer::Generic> for type C<generic> (PICA with self defined data separa
 =item 
 
 L<PICA::Writer::Plain> for type C<plain> or C<picaplain> (human-readable PICA+)
+
+=item 
+
+L<PICA::Writer::Import> for type C<import> (PICA Import format)
 
 =item 
 

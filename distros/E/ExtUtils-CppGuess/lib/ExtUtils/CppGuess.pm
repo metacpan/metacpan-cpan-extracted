@@ -39,6 +39,12 @@ It can generate the necessary options to the L<Module::Build>
 constructor or to L<ExtUtils::MakeMaker>'s C<WriteMakefile>
 function.
 
+=head1 ENVIRONMENT
+
+As of 0.24, the environment variable C<CXX>
+defines the obvious value, and will be used instead of any detection.
+Supplied arguments to L</new> will still win.
+
 =head1 METHODS
 
 =head2 new
@@ -195,14 +201,14 @@ use Capture::Tiny 'capture_merged';
 use File::Spec::Functions qw(catfile);
 use File::Temp qw(tempdir);
 
-our $VERSION = '0.23';
+our $VERSION = '0.25';
 
 sub new {
     my( $class, %args ) = @_;
-    my $self = bless { %args }, $class;
+    my $self = bless \%args, $class;
 
     # Allow override of default %Config::Config; useful in testing.
-    if( ! exists $self->{config} || ! defined $self->{config} ) {
+    if( !defined $self->{config} ) {
       if ($ExtUtils::MakeMaker::Config::VERSION) {
         # tricksy hobbitses are overriding Config, go with it
         $self->{config} = \%ExtUtils::MakeMaker::Config::Config;
@@ -211,30 +217,12 @@ sub new {
       }
     }
 
-    # Allow a 'cc' %args.  If not supplied, pull from {config}, or $Config{cc}.
-    if( ! exists $self->{cc} || ! defined $self->{cc} ) {
-      $self->{cc}
-        = exists $self->{config}{cc} && defined $self->{config}{cc}
-        ? $self->{config}{cc}
-        : $Config::Config{cc};
+    for (['cc','cc',$Config::Config{cc}], ['os','osname',$^O], ['osvers','osvers','']) {
+      my ($key, $confkey, $fallback) = @$_;
+      next if defined $self->{$key};
+      $self->{$key} =
+        defined $self->{config}{$confkey} ? $self->{config}{$confkey} : $fallback;
     }
-
-    # Set up osname.
-    if( ! exists $self->{os} || ! defined $self->{os} ) {
-      $self->{os}
-        = exists $self->{config}{osname} && defined $self->{config}{osname}
-        ? $self->{config}{osname}
-        : $^O;
-    }
-
-    # Set up osvers.
-    if( ! exists $self->{osvers} || ! defined $self->{osvers} ) {
-      $self->{osvers}
-        = exists $self->{config}{osvers} && defined $self->{config}{osvers}
-        ? $self->{config}{osvers}
-        : '';
-    }
-
     return $self;
 }
 
@@ -248,6 +236,9 @@ sub _cc     { shift->{cc}     }
 sub _os     { shift->{os}     }
 sub _osvers { shift->{osvers} }
 
+our %ENV2VAL = (
+  CXX => 'compiler_command',
+);
 # This is IBM's "how to compile on" list with lots of compilers:
 # https://www.ibm.com/support/knowledgecenter/en/SS4PJT_5.2.0/com.ibm.help.cd52.unix.doc/com.ibm.help.cdunix_user.doc/CDU_Compiling_Custom_Programs.html
 sub guess_compiler {
@@ -288,7 +279,9 @@ sub guess_compiler {
       extra_cflags => '-TP -EHsc',
       extra_lflags => 'msvcprt.lib',
     );
-  } else {
+  }
+  $guess{$ENV2VAL{$_}} = $ENV{$_} for grep defined $ENV{$_}, keys %ENV2VAL;
+  if (!%guess) {
     my $v1 = `$c_compiler -v`;
     my $v2 = `$c_compiler -V`;
     my $v3 = `$c_compiler --version`;

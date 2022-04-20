@@ -5,7 +5,6 @@ use File::Spec;
 use lib File::Spec->catdir(qw(t lib));
 
 use Test::More;
-END { done_testing }
 
 use Devel::CheckOS;
 
@@ -67,3 +66,5 @@ foreach my $o (sort { lc($platforms{$a}) cmp lc($platforms{$b}) } keys %platform
     # eval "use Devel::AssertOS::$platform";
     ok(Devel::CheckOS::os_is($platform) == 0, "unsupported: $platform when \t\$^O = $^O");
 }
+
+done_testing;

@@ -1,0 +1,571 @@
+#!/usr/bin/env perl
+
+=head1 NAME
+
+suricata_stat_check - LibreNMS JSON SNMP extend and Nagios style check for Suricata stats.
+
+=head1 SYNOPSIS
+
+suricata_stats_check [B<-m> single] [B<-s> <eve>] [B<-S> <instance name>] [B<-d> <drop percent warn>]
+[B<-D> <drop percent crit>]  [B<-e> <error delta warn>] [B<-E> <error delta crit>]
+[B<-r> <error percent warn>] [B<-r> <error percent crit>]
+
+suricata_stats_check B<-m> slug [B<-s> <slug>] [B<-l> <log dir>]  [B<-d> <drop percent warn>]
+[B<-D> <drop percent crit>]  [B<-e> <error delta warn>] [B<-E> <error delta crit>]
+[B<-r> <error percent warn>] [B<-r> <error percent crit>]
+
+suricata_stats_check B<-m> manual B<-1> <manual>  [B<-d> <drop percent warn>]
+[B<-D> <drop percent crit>]  [B<-e> <error delta warn>] [B<-E> <error delta crit>]
+[B<-r> <error percent warn>] [B<-r> <error percent crit>] [B<-2> <manual>] [B<-3> <manual>]
+[B<-4> <manual>] [B<-5> <manual>] [B<-6> <manual>] [B<-7> <manual>]
+[B<-8> <manual>] [B<-9> <manual>] [B<-0> <manual>]
+
+suricata_stats_check -c
+
+=head1 DESCRIPTION
+
+For Nagious, this should be ran via NRPE.
+
+For LibreNMS, this should be set up to run from cron and as a snmp extend.
+
+cron...
+
+*/5 * * * * /usr/local/bin/suricata_stat_check
+
+snmp.conf...
+
+extend suricata-stats /usr/local/bin/suricata_stat_check -c
+
+=head1 FLAGS
+
+=head2 -m <mode>
+
+Mode to run in.
+
+Default: single
+
+=head2 -s <eve>
+
+Eve file for use with single mode.
+
+Default: /var/log/suricata/eve.json
+
+=head2 -S <instance name>
+
+Instance name to use in single mode.
+
+Default: ids
+
+=head2 -s <slug>
+
+The slug to use in slug mode.
+
+Default: alert
+
+=head2 -l <log dir>
+
+Log directory for slug mode.
+
+Default: /var/log/suricata
+
+=head2 -0 <manual>
+
+A file to use in manual mode.
+
+=head2 -1 <manual>
+
+A file to use in manual mode.
+
+=head2-2 <manual>
+
+A file to use in manual mode.
+
+=head2 -3 <manual>
+
+A file to use in manual mode.
+
+=head2 -4 <manual>
+
+A file to use in manual mode.
+
+=head2 -5 <manual>
+
+A file to use in manual mode.
+
+=head2 -6 <manual>
+
+A file to use in manual mode.
+
+=head2 -7 <manual>
+
+A file to use in manual mode.
+
+=head2 -8 <manual>
+
+A file to use in manual mode.
+
+=head2 -9 <manual>
+
+A file to use in manual mode.
+
+=head2 -0 <manual>
+
+A file to use in manual mode.
+
+=head2 -d <drop percent warn>
+
+Percent of drop packets to warn on.
+
+Default: 0.75%
+
+=head2 -D <drop percent crit>
+
+Percent of dropped packets to critical on.
+
+Default: 1%
+
+=head2 -e <error delta warn>
+
+Error delta to warn on.
+
+Default: 1
+
+=head2 -E <error delta crit>
+
+Error delta to critical on.
+
+Default: 2
+
+=head2 -r <error percent warn>
+
+Percent of drop packets to warn on.
+
+Default: 0.05%
+
+=head2 -R <error percent crit>
+
+Percent of drop packets to warn on.
+
+Default: 0.1%
+
+=head2 -n
+
+Run as a nagios check style instead of LibreNMS.
+
+=head2 -h
+
+Print help info.
+
+=head2 --help
+
+Print help info.
+
+=head2 -v
+
+Print version info.
+
+=head2 --version
+
+Print version info.
+
+=head1 MODES
+
+=head2 single
+
+Use the specified eve file, -e, and the specified instance name, -i.
+
+=head2 slug
+
+Check the dir specified, -l. for files starting with the slug, -s.
+The files must match //^$slug\-[A-Za-z\_\-]\.[Jj][Ss][Oo][Nn]$//.
+The instance name is formed by removing //^$slug\-/// and //\.[Jj][Ss][Oo][Nn]$//.
+So "alert-ids.json" becomes "ids".
+
+=head2 manual
+
+Use the files specified via -0 to -9 to specify instance
+names and files. The value taken by each of those is comma seperated
+with the first part being the instance name and the second being the
+eve file. So "inet,/var/log/suricata/inet.json" would be a instance
+name of "inet" with a eve file of "/var/log/suricata/inet.json".
+
+=cut
+
+use strict;
+use warnings;
+use Getopt::Long;
+use File::Slurp;
+use Suricata::Monitoring;
+
+sub version {
+	print "suricata_stat_check v. 0.0.1\n";
+}
+
+sub help {
+	&version;
+
+	print '
+
+-m <mode>                Mode to run in.
+                         Default: single
+
+-s <eve>                 Eve file for use with single mode.
+                         Default: /var/log/suricata/eve.json
+-S <instance name>       Instance name to use in single mode.
+                         Default: ids
+
+-s <slug>                The slug to use in slug mode.
+                         Default: alert
+-l <log dir>             Log directory for slug mode.
+                         Default: /var/log/suricata
+
+-0 <manual>              A file to use in manual mode.
+-1 <manual>              A file to use in manual mode.
+-2 <manual>              A file to use in manual mode.
+-3 <manual>              A file to use in manual mode.
+-4 <manual>              A file to use in manual mode.
+-5 <manual>              A file to use in manual mode.
+-6 <manual>              A file to use in manual mode.
+-7 <manual>              A file to use in manual mode.
+-8 <manual>              A file to use in manual mode.
+-9 <manual>              A file to use in manual mode.
+-0 <manual>              A file to use in manual mode.
+
+-c                       Print the cache and exit.
+
+-d <drop percent warn>   Percent of drop packets to warn on.
+                         Default: 0.75%
+-D <drop percent crit>   Percent of dropped packets to critical on.
+                         Default: 1%
+-e <error delta warn>    Error delta to warn on.
+                         Default: 1
+-E <error delta crit>    Error delta to critical on.
+                         Default: 2
+-r <error percent warn>  Percent of drop packets to warn on.
+                         Default: 0.05%
+-R <error percent crit>  Percent of drop packets to warn on.
+                         Default: 0.1%
+
+-n                       Run as a nagios check style instead of LibreNMS.
+
+-h                       Print help info.
+--help                   Print help info.
+-v                       Print version info.
+--version                Print version info.
+
+
+* Modes
+
+- single :: Use the specified eve file, -e, and the specified instance
+  name, -i.
+
+- slug :: Check the dir specified, -l. for files starting with the
+  slug, -s. The files must match
+  //^$slug\-[A-Za-z\_\-]\.[Jj][Ss][Oo][Nn]$//. The instance name is formed
+  by removing //^$slug\-/// and //\.[Jj][Ss][Oo][Nn]$//. So
+  "alert-ids.json" becomes "ids".
+
+- manual :: Use the files specified via -0 to -9 to specify instance
+  names and files. The value taken by each of those is comma seperated
+  with the first part being the instance name and the second being the
+  eve file. So "inet,/var/log/suricata/inet.json" would be a instance
+  name of "inet" with a eve file of "/var/log/suricata/inet.json".
+';
+}
+
+sub instance_name_check {
+	my $name = $_[0];
+
+	if ( !defined($name) ) {
+		return undef;
+	}
+	elsif ( $name eq '' ) {
+		return undef;
+	}
+	elsif ( $name =~ /[\t\n\ \;\/\\\:\"\']/ ) {
+		return undef;
+	}
+
+	return 1;
+}
+
+# get the commandline options
+my $help        = 0;
+my $version     = 0;
+my $slug        = 'alert';
+my $mode        = 'single';
+my $single_eve  = '/var/log/suricata/eve.json';
+my $single_name = 'ids';
+my $log_dir     = '/var/log/suricata';
+my $instance_0;
+my $instance_1;
+my $instance_2;
+my $instance_3;
+my $instance_4;
+my $instance_5;
+my $instance_6;
+my $instance_7;
+my $instance_8;
+my $instance_9;
+my $nagios;
+my $drop_percent_warn  = '.75';
+my $drop_percent_crit  = '1';
+my $error_delta_warn   = '1';
+my $error_delta_crit   = '2';
+my $error_percent_warn = '.05';
+my $error_percent_crit = '.1';
+my $print_cache;
+Getopt::Long::Configure('no_ignore_case');
+Getopt::Long::Configure('bundling');
+GetOptions(
+	'version' => \$version,
+	'v'       => \$version,
+	'help'    => \$help,
+	'h'       => \$help,
+	's=s'     => \$slug,
+	'm=s'     => \$mode,
+	'l=s'     => \$log_dir,
+	's=s'     => \$single_eve,
+	'S=s'     => \$single_name,
+	'0=s'     => \$instance_0,
+	'1=s'     => \$instance_1,
+	'2=s'     => \$instance_2,
+	'3=s'     => \$instance_3,
+	'4=s'     => \$instance_4,
+	'5=s'     => \$instance_5,
+	'6=s'     => \$instance_6,
+	'7=s'     => \$instance_7,
+	'8=s'     => \$instance_8,
+	'9=s'     => \$instance_9,
+	'n'       => \$nagios,
+	'd=s'     => \$drop_percent_warn,
+	'D=s'     => \$drop_percent_crit,
+	'e=s'     => \$error_delta_warn,
+	'E=s'     => \$error_delta_crit,
+	'r=s'     => \$error_percent_warn,
+	'R=s'     => \$error_percent_crit,
+	'c'       => \$print_cache,
+);
+
+# print version or help if requested
+if ($help) {
+	&help;
+	exit 42;
+}
+if ($version) {
+	&version;
+	exit 42;
+}
+
+# prints the cache and exists if requested
+if ($print_cache) {
+	my $cache=read_file('/var/cache/suricata-monitoring/stats.json');
+	print $cache;
+	exit;
+}
+
+my $instances = {};
+
+if ( $mode eq 'single' ) {
+
+	if ( !-f $single_eve ) {
+		die( '"' . $single_eve . '" does not exist' );
+	}
+
+	if ( !&instance_name_check($single_name) ) {
+		die( '"' . $single_name . '" is not a valid instance name' );
+	}
+
+	$instances->{$single_name} = $single_eve;
+}
+elsif ( $mode eq 'slug' ) {
+	my $dh;
+	my $found = 0;
+	opendir( $dh, $log_dir ) or die( 'Ubable to open dir "' . $log_dir . '"' );
+	while ( readdir($dh) ) {
+		if ( $_ =~ /^$slug-[A-Za-z\-\_0-9]+\.[Jj][Ss][Oo][Nn]$/ ) {
+			my $instance = $_;
+			$instance =~ s/^$slug\-//;
+			$instance =~ s/\.[Jj][Ss][Oo][Nn]$//;
+			$instances->{$instance} = $log_dir . '/' . $_;
+		}
+	}
+	close($dh);
+}
+elsif ( $mode eq 'manual' ) {
+
+	# grab instance from -0
+	if ( defined($instance_0) ) {
+		my ( $instance, $eve ) = split( /\,/, $instance_0, 2 );
+		if ( !defined($eve) ) {
+			die( '"' . $instance_0 . '" does not contain a eve file' );
+		}
+		if ( !-f $eve ) {
+			die( '"' . $eve . '" does not exist' );
+		}
+		if ( !&instance_name_check($instance) ) {
+			die( '"' . $instance . '" is not a valid instance name' );
+		}
+		$instances->{$instance} = $eve;
+	}
+
+	# grab instance from -1
+	if ( defined($instance_1) ) {
+		my ( $instance, $eve ) = split( /\,/, $instance_1, 2 );
+		if ( !defined($eve) ) {
+			die( '"' . $instance_1 . '" does not contain a eve file' );
+		}
+		if ( !-f $eve ) {
+			die( '"' . $eve . '" does not exist' );
+		}
+		if ( !&instance_name_check($instance) ) {
+			die( '"' . $instance . '" is not a valid instance name' );
+		}
+		$instances->{$instance} = $eve;
+	}
+
+	# grab instance from -2
+	if ( defined($instance_2) ) {
+		my ( $instance, $eve ) = split( /\,/, $instance_2, 2 );
+		if ( !defined($eve) ) {
+			die( '"' . $instance_2 . '" does not contain a eve file' );
+		}
+		if ( !-f $eve ) {
+			die( '"' . $eve . '" does not exist' );
+		}
+		if ( !&instance_name_check($instance) ) {
+			die( '"' . $instance . '" is not a valid instance name' );
+		}
+		$instances->{$instance} = $eve;
+	}
+
+	# grab instance from -3
+	if ( defined($instance_3) ) {
+		my ( $instance, $eve ) = split( /\,/, $instance_3, 2 );
+		if ( !defined($eve) ) {
+			die( '"' . $instance_3 . '" does not contain a eve file' );
+		}
+		if ( !-f $eve ) {
+			die( '"' . $eve . '" does not exist' );
+		}
+		if ( !&instance_name_check($instance) ) {
+			die( '"' . $instance . '" is not a valid instance name' );
+		}
+		$instances->{$instance} = $eve;
+	}
+
+	# grab instance from -4
+	if ( defined($instance_4) ) {
+		my ( $instance, $eve ) = split( /\,/, $instance_4, 2 );
+		if ( !defined($eve) ) {
+			die( '"' . $instance_4 . '" does not contain a eve file' );
+		}
+		if ( !-f $eve ) {
+			die( '"' . $eve . '" does not exist' );
+		}
+		if ( !&instance_name_check($instance) ) {
+			die( '"' . $instance . '" is not a valid instance name' );
+		}
+		$instances->{$instance} = $eve;
+	}
+
+	# grab instance from -5
+	if ( defined($instance_5) ) {
+		my ( $instance, $eve ) = split( /\,/, $instance_5, 2 );
+		if ( !defined($eve) ) {
+			die( '"' . $instance_5 . '" does not contain a eve file' );
+		}
+		if ( !-f $eve ) {
+			die( '"' . $eve . '" does not exist' );
+		}
+		if ( !&instance_name_check($instance) ) {
+			die( '"' . $instance . '" is not a valid instance name' );
+		}
+		$instances->{$instance} = $eve;
+	}
+
+	# grab instance from -6
+	if ( defined($instance_6) ) {
+		my ( $instance, $eve ) = split( /\,/, $instance_6, 2 );
+		if ( !defined($eve) ) {
+			die( '"' . $instance_6 . '" does not contain a eve file' );
+		}
+		if ( !-f $eve ) {
+			die( '"' . $eve . '" does not exist' );
+		}
+		if ( !&instance_name_check($instance) ) {
+			die( '"' . $instance . '" is not a valid instance name' );
+		}
+		$instances->{$instance} = $eve;
+	}
+
+	# grab instance from -7
+	if ( defined($instance_7) ) {
+		my ( $instance, $eve ) = split( /\,/, $instance_7, 2 );
+		if ( !defined($eve) ) {
+			die( '"' . $instance_7 . '" does not contain a eve file' );
+		}
+		if ( !-f $eve ) {
+			die( '"' . $eve . '" does not exist' );
+		}
+		if ( !&instance_name_check($instance) ) {
+			die( '"' . $instance . '" is not a valid instance name' );
+		}
+		$instances->{$instance} = $eve;
+	}
+
+	# grab instance from -8
+	if ( defined($instance_8) ) {
+		my ( $instance, $eve ) = split( /\,/, $instance_8, 2 );
+		if ( !defined($eve) ) {
+			die( '"' . $instance_8 . '" does not contain a eve file' );
+		}
+		if ( !-f $eve ) {
+			die( '"' . $eve . '" does not exist' );
+		}
+		if ( !&instance_name_check($instance) ) {
+			die( '"' . $instance . '" is not a valid instance name' );
+		}
+		$instances->{$instance} = $eve;
+	}
+
+	# grab instance from -9
+	if ( defined($instance_9) ) {
+		my ( $instance, $eve ) = split( /\,/, $instance_9, 2 );
+		if ( !defined($eve) ) {
+			die( '"' . $instance_9 . '" does not contain a eve file' );
+		}
+		if ( !-f $eve ) {
+			die( '"' . $eve . '" does not exist' );
+		}
+		if ( !&instance_name_check($instance) ) {
+			die( '"' . $instance . '" is not a valid instance name' );
+		}
+		$instances->{$instance} = $eve;
+	}
+}
+else {
+	die( '"' . $mode . '" is not a understood mode' );
+}
+
+# put together the args hash
+my $args = {
+	mode               => 'librenms',
+	drop_percent_warn  => $drop_percent_warn,
+	drop_percent_crit  => $drop_percent_crit,
+	error_delta_warn   => $error_delta_warn,
+	error_delta_crit   => $error_delta_crit,
+	error_percent_warn => $error_percent_warn,
+	error_percent_crit => $error_percent_crit,
+	files              => $instances,
+};
+
+if ($nagios) {
+	$args->{mode} = 'nagios';
+}
+
+my $sm       = Suricata::Monitoring->new($args);
+my $returned = $sm->run;
+$sm->print_output;
+exit $returned->{alert};
+

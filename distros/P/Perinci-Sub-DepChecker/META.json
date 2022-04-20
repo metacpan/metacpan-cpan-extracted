@@ -55,7 +55,7 @@
    "provides" : {
       "Perinci::Sub::DepChecker" : {
          "file" : "lib/Perinci/Sub/DepChecker.pm",
-         "version" : "0.121"
+         "version" : "0.122"
       }
    },
    "release_status" : "stable",
@@ -70,7 +70,7 @@
          "web" : "https://github.com/perlancar/perl-Perinci-Sub-DepChecker"
       }
    },
-   "version" : "0.121",
+   "version" : "0.122",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

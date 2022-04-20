@@ -3,14 +3,35 @@ lib/Tesla/API.pm
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
+MYMETA.json.lock
 share/endpoints.json
 share/option_codes.json
-t/00-load.t
-t/05-endpoints.t
-t/10-api_unauth.t
+t/001-auth_cache_file.t
+t/005-auth_code_verifier.t
+t/010-auth_code_url.t
+t/015-auth_code_extract.t
+t/110-access_token_generate.t
+t/115-access_token_set_expiry.t
+t/120-access_token_update.t
+t/125-access_token_valid.t
+t/130-access_token_data.t
+t/135-access_token_refresh.t
+t/200-mech.t
+t/205-useragent_string.t
+t/210-useragent_timeout.t
+t/300-api_cache_persist.t
+t/305-api_cache_time.t
+t/310-api_cache.t
+t/315-api_cache_clear.t
+t/900-endpoints.t
+t/905-option_codes.t
+t/910-api_unauth.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
 t/test_data/endpoints.json
+t/test_data/option_codes.json
+t/test_data/test_data.json
+t/TestSuite.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

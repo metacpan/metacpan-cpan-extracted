@@ -48,6 +48,7 @@
       },
       "test" : {
          "requires" : {
+            "Mock::Sub" : "1.09",
             "Test::More" : "0"
          }
       }
@@ -63,6 +64,6 @@
          "web" : "https://github.com/stevieb9/tesla-api"
       }
    },
-   "version" : "0.10",
+   "version" : "1.00",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -20,12 +20,29 @@ sv_setsv( GvSV( PL_errgv), NULL_SV)
 if ( errSave) sv_catsv( GvSV( PL_errgv), errSave);\
 if ( errSave) sv_free( errSave)
 
-extern List   postDestroys;
-extern int    recursiveCall;
-extern PHash  primaObjects;
-extern SV *   eventHook;
-extern Bool   use_fribidi;
-extern int    use_libthai;
+typedef struct {
+	Handle     application;
+	List       post_destroys;
+	int        recursive_call;
+	PHash      objects;
+	SV *       event_hook;
+	Bool       use_fribidi;
+	int        use_libthai;
+	List       static_hashes;
+	int        init_ok;
+	PHash      vmt_hash;
+	List       static_objects;
+	PAnyObject kill_chain;
+	PAnyObject ghost_chain;
+	Bool       app_is_dead;
+} PrimaGuts, *PPrimaGuts;
+
+#define P_APPLICATION PApplication(prima_guts.application)
+#define C_APPLICATION CApplication(prima_guts.application)
+
+extern PrimaGuts prima_guts;
+
+extern PPrimaGuts prima_api_guts(void);
 
 #define CORE_INIT_TRANSIENT(cls) ((PObject)self)->transient_class = (void*)C##cls
 
@@ -38,7 +55,17 @@ extern void prima_init_image_subsystem( void);
 extern void prima_cleanup_image_subsystem( void);
 
 /* kernel exports */
-extern XS( Component_set_notification_FROMPERL);
+XS( Prima_options);
+XS( Prima_dl_export);
+XS( Prima_message_FROMPERL);
+XS( create_from_Perl);
+XS( destroy_from_Perl);
+XS( Object_alive_FROMPERL);
+XS( Component_set_notification_FROMPERL);
+XS( Component_event_hook_FROMPERL);
+XS(Utils_getdir_FROMPERL);
+XS(Utils_stat_FROMPERL);
+XS(Utils_closedir_FROMPERL);
 
 extern PRGBColor prima_read_palette( int * palSize, SV * palette);
 extern Bool prima_read_point( SV *rvav, int * pt, int number, char * error);
@@ -61,6 +88,43 @@ extern PFont prima_font_mapper_get_font(unsigned int fid );
 #define pfmaDisable       6
 #define pfmaGetIndex      7
 extern int   prima_font_mapper_action(int action, PFont font);
+
+extern void
+prima_register_notifications( PVMT vmt);
+
+/* OpenMP support */
+extern int  prima_omp_max_threads(void);
+extern int  prima_omp_thread_num(void);
+extern void prima_omp_set_num_threads(int num);
+
+#ifdef HAVE_OPENMP
+#define OMP_MAX_THREADS prima_omp_max_threads()
+#define OMP_THREAD_NUM prima_omp_thread_num()
+#else
+#define OMP_MAX_THREADS 1
+#define OMP_THREAD_NUM  0
+#endif
+
+typedef struct {
+	void *stack, *heap;
+	unsigned int elem_size, count, size;
+} semistatic_t;
+
+extern void
+semistatic_init( semistatic_t * s, void * stack, unsigned int elem_size, unsigned int static_size);
+
+extern int
+semistatic_expand( semistatic_t * s, unsigned int desired_elems);
+
+extern void
+semistatic_done( semistatic_t * s);
+
+#define semistatic_at(s,type,i) (((type*)s.heap)[i])
+
+#define semistatic_push(s,type,v) \
+	((( s.count >= s.size ) ? semistatic_expand(&s,-1) : 1) && \
+		(((((type*)s.heap)[s.count++])=v) || 1))
+
 
 #ifdef __cplusplus
 }

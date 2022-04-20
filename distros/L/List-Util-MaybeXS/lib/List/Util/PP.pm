@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Exporter ();
 
-our $VERSION = '1.500009';
+our $VERSION = '1.500010';
 $VERSION =~ tr/_//d;
 
 our @EXPORT_OK;
@@ -372,17 +372,24 @@ sub uniqnum (@) {
         $nv = \('R' . 0+$nv);
       }
       my $iv = $nv;
-      my $F = pack 'F', $nv;
-      my $Fplus = pack 'F', $nv + 1;
-      my $Fminus = pack 'F', $nv - 1;
-      my ($NV) = unpack 'F', $F;
+      my $F;
+      my $NV;
+      my $f;
+
       !$seen{
           ref $nv         ? $$nv
-        : $NV == 0        ? 0
+        : ($NV = (unpack 'F', ($F = pack 'F', $nv))[0]) == 0
+                          ? 0
         : $NV != $NV      ? sprintf('%f', $NV)
         : int($NV) != $NV ? 'N'.$F
-        : $iv - 1 == $iv  ? sprintf('%.0f', $NV)
-        : $F ne $Fplus && $F ne $Fminus ? sprintf('%.0f', $NV)
+        : (
+          $iv - 1 == $iv
+        )                 ? sprintf('%.0f', $NV)
+        : (
+          ($f = sprintf('%.0f', $NV)) ne sprintf('%.0f', $NV + 1)
+          &&
+          ($f)                        ne sprintf('%.0f', $NV - 1)
+        )                 ? $f
         : $NV > 0         ? sprintf('%u', $iv)
                           : sprintf('%d', $iv)
       }++;

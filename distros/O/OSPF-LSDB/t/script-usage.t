@@ -16,23 +16,26 @@ my @scripts = map { local $_ = $_; "./script/$_" } qw(
 
 plan tests => 3 * @scripts;
 
-my $code = $^O eq "MSWin32" ? 1<<8 : 2<<8;
+SKIP: {
+    skip "pipe and exit on Windows", 2 * scalar @scripts if $^O eq "MSWin32";
 
-foreach (@scripts) {
-    my $pid = open(my $fh, '-|');
-    defined($pid) or die "Fork and open pipe failed: $!";
-    if (!$pid) {
-	# child
-	open(STDERR, '>&', \*STDOUT) or die "Dup stdout to stderr failed: $!";
-	$0 = $_;
-	@ARGV = '-h';
-	do $0;
-	die "Do $0 did not exit";
+    foreach (@scripts) {
+	my $pid = open(my $fh, '-|');
+	defined($pid) or die "Fork and open pipe failed: $!";
+	if (!$pid) {
+	    # child
+	    open(STDERR, '>&', \*STDOUT)
+		or die "Dup stdout to stderr failed: $!";
+	    $0 = $_;
+	    @ARGV = '-h';
+	    do $0;
+	    die "Do $0 did not exit";
+	}
+	my $out = eval { local $/; <$fh> };
+	close($fh) || !$! or die "Fork and open pipe failed: $!";
+	is($?, 2<<8, "$_ exit") or diag("Script $_ exit code is not 2<<8: $?");
+	like($out, qr{^Usage: $_ }m, "$_ usage") or diag("No usage: $out");
     }
-    my $out = eval { local $/; <$fh> };
-    close($fh) || !$! or die "Fork and open pipe failed: $!";
-    is($?, $code, "$_ exit") or diag("Script $_ exit code is not 2<<8: $?");
-    like($out, qr{^Usage: $_ }m, "$_ usage") or diag("No usage: $out");
 }
 
 my %files = map { $_ => 1 } @scripts;

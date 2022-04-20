@@ -1,6 +1,6 @@
 #!perl -T
 
-use Test::More tests => 8;
+use Test::More tests => 10;
 use Config::Param;
 use Storable qw(dclone);
 
@@ -22,12 +22,29 @@ Config::Param::get
 		,'', {'key'=>3, 'donkey'=>'animal'}, 'H', 'help text for hash H'
 		,'parmX', 'Y', '',  'helptext for last one (scalar)'
 	]
+	, []
+	, $errors
+);
+
+# one from definition, aborts on first one, always
+ok( @{$errors} == 1, 'definiton errors 1a');
+
+Config::Param::get
+(
+	{ silenterr=>1, nofinals=>1, noexit=>1, nofile=>1 }
+	,
+	[
+		 '1234', 'a string', 'a', 'help text for scalar 1'
+		,'parm2', 33, 'b', 'help text for scalar 2'
+		,'parmX', 'Y', '',  'helptext for last one (scalar)'
+	]
 	, ['--not-existing', '--parm2=17', '--parmA-=bla']
 	, $errors
 );
 
-# one from definition, 3 from cmd line
-ok( @{$errors} == 4, 'definiton errors 1');
+# two from cmdline
+ok( @{$errors} == 2, 'definiton errors 1b');
+
 
 # another run, still one error in definition
 
@@ -46,8 +63,8 @@ Config::Param::get
 	, $errors
 );
 
-# one from definition, 3 from cmd line
-ok( @{$errors} == 4, 'definiton errors 2');
+# one from definition, 3 from cmd line, abort on def!
+ok( @{$errors} == 1, 'definiton errors 2');
 
 # another run, sane definition, errors in cmd line
 Config::Param::get
@@ -61,11 +78,30 @@ Config::Param::get
 		,'parmH', {'key'=>3, 'donkey'=>'animal'}, 'H', 'help text for hash H'
 		,'parmX', 'Y', '',  'helptext for last one (scalar)'
 	]
-	, ['--not-existing', '--parm2=17', '--parmA-=bla']
+	, ['--not-existing', '--parm2%=17', '--parmA-=bla']
 	, $errors
 );
 
-ok( @{$errors} == 2, 'cmdline errors');
+ok( @{$errors} == 2, 'cmdline errors 1');
+
+# Test the operator application stage, as --parmA-=bla passes parsing itself,
+# but is invalid on to actually operate.
+Config::Param::get
+(
+	{ silenterr=>1, nofinals=>1, noexit=>1, nofile=>1 }
+	,
+	[
+		 'parm1', 'a string', 'a', 'help text for scalar 1'
+		,'parm2', 33, 'b', 'help text for scalar 2'
+		,'parmA', [ 1, 2, 'free', 'beer' ], 'A', 'help text for array A'
+		,'parmH', {'key'=>3, 'donkey'=>'animal'}, 'H', 'help text for hash H'
+		,'parmX', 'Y', '',  'helptext for last one (scalar)'
+	]
+	, ['--parm2=17', '--parmA-=bla']
+	, $errors
+);
+
+ok( @{$errors} == 1, 'cmdline errors 2');
 
 # no errors at all
 Config::Param::get

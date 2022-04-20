@@ -5,7 +5,6 @@ author:
 build_requires:
   Capture::Tiny: '0'
   Cwd: '0'
-  Data::Dumper: '0'
   ExtUtils::CBuilder: '0.280231'
   ExtUtils::MakeMaker: '0'
   ExtUtils::Manifest: '0'
@@ -34,5 +33,5 @@ requires:
 resources:
   bugtracker: https://github.com/tsee/extutils-cppguess/issues
   repository: git://github.com/tsee/extutils-cppguess
-version: '0.23'
+version: '0.25'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

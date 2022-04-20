@@ -5,7 +5,6 @@ use File::Spec;
 use lib File::Spec->catdir(qw(t lib));
 
 use Test::More;
-END { done_testing }
 
 eval "use Devel::AssertOS";
 ok($@ =~ /needs at least one param/i,
@@ -13,3 +12,5 @@ ok($@ =~ /needs at least one param/i,
 
 eval "use Devel::AssertOS::NotAnOperatingSystem";
 ok($@ =~ /OS unsupported/i);
+
+done_testing;

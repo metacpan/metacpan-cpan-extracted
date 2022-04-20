@@ -1,7 +1,7 @@
 package PICA::Writer::Plus;
 use v5.14.1;
 
-our $VERSION = '2.02';
+our $VERSION = '2.03';
 
 use charnames qw(:full);
 
@@ -10,11 +10,6 @@ use parent 'PICA::Writer::Base';
 sub SUBFIELD_INDICATOR {"\N{INFORMATION SEPARATOR ONE}"}
 sub END_OF_FIELD       {"\N{INFORMATION SEPARATOR TWO}"}
 sub END_OF_RECORD      {"\N{LINE FEED}";}
-
-sub write_subfield {
-    my ($self, $code, $value) = @_;
-    $self->{fh}->print($self->SUBFIELD_INDICATOR . $code . $value);
-}
 
 1;
 __END__

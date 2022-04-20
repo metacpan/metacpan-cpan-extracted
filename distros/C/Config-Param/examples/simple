@@ -16,8 +16,9 @@ my $p = Config::Param::get
 	{
 		 version=>'0.0.1'
 		#,verbose=>1
+		,posixhelp=>$ENV{PARAM_POSIXHELP}
 		,info=> <<EOT
-just a quick hack to demonstrate Config::Paramm
+just a quick hack to demonstrate Config::Param
 
 usage:
 	$0 [parameters] whatever

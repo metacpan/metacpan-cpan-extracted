@@ -1,5 +1,51 @@
 =head1 Revision history for Config-Param
 
+=over 2
+
+=item - update paramorama script
+
+=item - fix module version of FileWorker
+
+=back
+
+=item * B<4.000001> (2021-04-20)
+
+(only release machinery)
+
+=item * B<4.000000> (2021-04-20)
+
+=over 2
+
+=item - refinement all around, fixing syntax issues here and there,
+some error messag rephrasing
+
+=item - added parameter flags: append, arg, switch, count, nonempty
+
+=item - posixhelp option for a more traditional style for help messages
+
+=item - introduced sections and parameter level for sorting help output
+
+=item - infopod for more formatting of DESCRIPTION and possibly terminal message
+
+=item - added regex and call for checking values while/after parameter parsing
+
+=item - fix array/hash splits with characters that have regex meaning
+
+=item - fall back to IPC::run as another way to get at terminal width
+
+=item - explicitly disregard comment lines in config file parsing instead
+of as a by-product of syntax checking (yes, really, I know)
+
+=item - allow --hash=foo to set an undefined value in a hash
+
+=item - add shortdefaults (freeing -h and -I for other uses)
+
+=item - no die/croak anymore, final_action() with useful values from sysexits.h
+  (EX_USAGE, EX_CONFIG, EX_SOFTWARE)
+
+
+=back
+
 =item * B<3.002000> (2015-12-10)
 
 =over 2

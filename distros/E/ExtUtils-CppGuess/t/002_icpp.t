@@ -1,6 +1,5 @@
 use strict;
 use warnings;
-use Data::Dumper;
 use Test::More;
 use ExtUtils::CppGuess;
 
@@ -91,7 +90,6 @@ my @METHODS = qw(
   is_msvc is_gcc is_clang is_sunstudio
   compiler_command linker_flags
 );
-$Data::Dumper::Indent = $Data::Dumper::Sortkeys = $Data::Dumper::Terse = 1;
 
 run_test(@$_) for @DATA;
 
@@ -101,5 +99,5 @@ sub run_test {
   my ($args, $expect) = @_;
   my $guess = ExtUtils::CppGuess->new(%$args);
   my %got = map {$_ => $guess->$_} @METHODS;
-  is_deeply \%got, $expect or diag Dumper [ $args, \%got, $expect ];
+  is_deeply \%got, $expect or diag explain [ $args, \%got, $expect ];
 }

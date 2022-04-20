@@ -1,5 +1,8 @@
 Revision history for Perl extension Crypt::OPAQUE.
 
+0.011 2022/04/19
+    - with sigma_i.
+
 0.01  2022/04/16   
     - init.
 

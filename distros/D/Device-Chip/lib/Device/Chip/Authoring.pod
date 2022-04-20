@@ -25,6 +25,11 @@ which can drive both the C<TSL2560> and C<TSL2561> variants. If this is the
 case the documentation should name all the individual variants directly, in
 order to make it show up properly on keyword searches and the like.
 
+As most chip names are given in all-capitals and include digits as well, this
+naming scheme should be sufficient to distinguish driver module names from
+other parts of infrastructure, which are all named in title case and lack
+digits.
+
 The L<Device::Class> package provides a base class that such a specific
 implementation class could use as a superclass, but it is not required to.
 The important detail is that it provides the interface described by the main
@@ -46,22 +51,50 @@ communicate with the chip.
 
 =head2 PROTOCOL
 
-  $pname = Device::Chip->PROTOCOL
+  $pname = Device::Chip->PROTOCOL;
 
 This method is invoked by L<Device::Chip/mount> to enquire which protocol the
 chip wishes to use, as the first stage of configuring the adapter. This method
 should return a protocol name suitable for
 L<Device::Chip::Adapter/make_protocol>.
 
-=head2 I<PNAME>_options
+=head2 <PNAME>_options
 
-  %options = $chip->PNAME_options( %params )
+  %options = $chip->PNAME_options( %params );
 
 Optional methods of this general form (where I<PNAME> is the protocol name
 being used) will be called by L<Device::Chip/mount> once the protocol instance
 is available. If such a method exists, the values it returns will be used to
 invoke the protocol's C<configure> method. It is passed a copy of the
 parameters that were given to the C<mount> method.
+
+A typical C<SPI_options> method usually just gives the SPI mode and maximum
+supported bitrate.
+
+  method SPI_options ( %params )
+  {
+    return (
+      mode        => 0,
+      max_bitrate => 1E6, # 1MHz
+    );
+  }
+
+A typical C<I2C_options> method would return the chip address and maximum
+supported bitrate. Often a mount parameter called C<addr> is accepted to set
+a different address. As this may be provided by the user in a string with the
+C<0x..> prefix, don't forget to call C<oct> on it to parse that hex string
+into an integer.
+
+  method I2C_options ( %params )
+  {
+    my $addr = $params{addr} // 0x20;
+    $addr = oct $addr if $addr =~ m/^0/;
+
+    return (
+      addr        => $addr,
+      max_bitrate => 400E3, # 400kHz
+    );
+  }
 
 =head1 BASE CLASS METHODS
 
@@ -70,14 +103,14 @@ a convenience to chip driver authors.
 
 =head2 adapter
 
-  $adapter = $chip->adapter
+  $adapter = $chip->adapter;
 
 Returns the current adapter that the chip is mounted on. This will be some
 instance implementing the companion interface, L<Device::Chip::Adapter>.
 
 =head2 protocol
 
-  $protocol = $chip->protocol
+  $protocol = $chip->protocol;
 
 Returns the adapter protocol module that the chip driver code will use to
 actually communicate with the chip.
@@ -94,7 +127,7 @@ different use-cases.
 
 =head2 read_config
 
-  $config = $chip->read_config->get
+  $config = await $chip->read_config;
 
 Most chips this module is applicable to will contain some amount of
 configuration, stored inside the chip, which is accessible over its interface.
@@ -117,7 +150,7 @@ L<Data::Bitfield> convenient for implementing this.
 
 =head2 change_config
 
-  $chip->change_config( %changes )->get
+  await $chip->change_config( %changes );
 
 This L<Future>-returning method should be provided in conjunction with
 L</read_config>, to allow the user to make changes to the chip's
@@ -136,8 +169,8 @@ updated.
 
 =head2 read_<register> and write_<register>
 
-  $value = $chip->read_...->get
-  $chip->write_...( $value )->get
+  $value = await $chip->read_...;
+  await $chip->write_...( $value );
 
 If there is other register-like storage accessible on the chip that for some
 reason would not be suitable for or considered as configuration (such as live
@@ -168,6 +201,17 @@ a raw integer value directly with one method, and a second method to convert
 that value into an actual voltage. The latter should be named to suggest the
 units it returns, for example:
 
-  $intvalue = $adcchip->read_adc->get
+  $intvalue = await $adcchip->read_adc;
 
-  $voltage = $adcchip->read_adc_voltage->get
+  $voltage = await $adcchip->read_adc_voltage;
+
+Finally, if the chip's main purpose is to act as some kind of sensor, making
+measurements about the world around it, consider using L<Device::Chip::Sensor>
+to declare metadata about its abilities in a standard way, so that other
+tooling can query and make use of it.
+
+=head1 AUTHOR
+
+Paul Evans <leonerd@leonerd.org.uk>
+
+=cut

@@ -11,8 +11,8 @@ use lib 'lib';
 # one of these is not like the other
 # this is really a sanity check that loading bogus modules doesn't Fuck Shit Up
 use Devel::CheckOS;
-Devel::CheckOS::list_family_members('Unix');
-Devel::CheckOS::list_family_members('MicrosoftWindows');
+my @dont_care = Devel::CheckOS::list_family_members('Unix');
+   @dont_care = Devel::CheckOS::list_family_members('MicrosoftWindows');
 
 my(@OSes, @notOSes, @extrafiles) = ();
 if($ENV{AUTOMATED_TESTING}) {
@@ -67,13 +67,12 @@ WriteMakefile(
         },
     },
     MIN_PERL_VERSION => "5.6.0",
-    # FIXME have this look at all the modules, or summat
     VERSION_FROM => 'lib/Devel/CheckOS.pm',
     PREREQ_PM    => {
-        'Test::More'       => '0.88', # done_testing
+        'Test::Warnings'   => 0,
+        'Test::More'       => 0.88, # done_testing
         'File::Find::Rule' => 0.28,
         'File::Temp'       => 0.19,
-        # 'Exporter' => 0 # core
     },
     EXE_FILES    => [qw(
         bin/use-devel-assertos

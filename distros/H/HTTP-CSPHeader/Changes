@@ -1,5 +1,13 @@
 Revision history for HTTP-CSPHeader
 
+v0.1.2    2022-04-20 20:41:14+01:00 Europe/London
+  [Documentation]
+  - Added example of usage with Mojolicious.
+
+  - Fixed typo.
+
+  - Added note about when the reset method can be skipped.
+
 v0.1.1    2022-04-04 11:20:36+01:00 Europe/London
   [Enhancements]
   - Removed Ref::Util from dependencies, but added Type::Tiny::XS as recommended.

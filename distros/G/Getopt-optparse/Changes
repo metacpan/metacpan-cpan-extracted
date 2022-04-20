@@ -6,3 +6,12 @@ Revision history for Perl extension Getopt-optparse.
 
 0.02  Tue Apr 19 03:45:00 2022
         - Initial commit.
+
+0.05  Tue Apr 19 14:03:14 2022
+        - Added support for actions count and append.
+
+0.06  Wed Apr 20 07:52:21 2022
+        - Made code more readable.  Added special character in --help output for action count:++ and append:[].  Updated POD.
+
+0.07  Wed Apr 20 11:37:17 2022
+        - Added support for single dash options.  Syntax changes.

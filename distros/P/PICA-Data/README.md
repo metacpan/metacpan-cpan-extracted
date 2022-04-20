@@ -135,6 +135,7 @@ Create a PICA writer object (see [PICA::Writer::Base](https://metacpan.org/pod/P
 - [PICA::Writer::Binary](https://metacpan.org/pod/PICA%3A%3AWriter%3A%3ABinary) for type `binary` (binary PICA)
 - [PICA::Writer::Generic](https://metacpan.org/pod/PICA%3A%3AWriter%3A%3AGeneric) for type `generic` (PICA with self defined data separators)
 - [PICA::Writer::Plain](https://metacpan.org/pod/PICA%3A%3AWriter%3A%3APlain) for type `plain` or `picaplain` (human-readable PICA+)
+- [PICA::Writer::Import](https://metacpan.org/pod/PICA%3A%3AWriter%3A%3AImport) for type `import` (PICA Import format)
 - [PICA::Writer::Plus](https://metacpan.org/pod/PICA%3A%3AWriter%3A%3APlus) for type `plus` or `picaplus` (normalized PICA+)
 - [PICA::Writer::JSON](https://metacpan.org/pod/PICA%3A%3AWriter%3A%3AJSON) for type `json` (PICA JSON)
 - [PICA::Writer::XML](https://metacpan.org/pod/PICA%3A%3AWriter%3A%3AXML) for type `xml` or `picaxml` (PICA-XML)

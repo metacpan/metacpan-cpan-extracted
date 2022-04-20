@@ -33,6 +33,7 @@ my @args = ('-b-=3', '--parm1.=!', '--parmH.=more=of it', '--parmX=Z');
 my @p;
 my %config = ();
 $config{verbose} = 0;
+#$config{noexit} = 1;
 my $builtins = Config::Param::builtins(\%config);
 
 #$Config::Param::verbose = 1;

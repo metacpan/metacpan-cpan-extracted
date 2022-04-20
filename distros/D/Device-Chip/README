@@ -38,7 +38,7 @@ CONSTRUCTOR
 
  new
 
-       $chip = Device::Chip->new
+       $chip = Device::Chip->new;
 
     Returns a new instance of a chip driver object.
 

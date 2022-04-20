@@ -82,4 +82,6 @@ CppGuessTest\.obj
 ^t/module_build/
 ^t/makemaker/
 
+^\.github/
+
 \.swp$

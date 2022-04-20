@@ -8,6 +8,7 @@ use Test::XML;
 use PICA::Data qw(pica_writer pica_parser pica_string);
 use PICA::Writer::Plain;
 use PICA::Writer::Plus;
+use PICA::Writer::Import;
 use PICA::Writer::XML;
 use PICA::Writer::PPXML;
 use PICA::Parser::PPXML;
@@ -65,6 +66,20 @@ sub write_result {
     close $fh;
 
     return do {local (@ARGV, $/) = $filename; <>};
+}
+
+note 'PICA::Writer::Import';
+{
+    my $out = write_result('import', {}, @pica_records);
+    my $expect = <<EXPECT;
+\x1D
+\x1E003@ \x1F01041318383
+\x1E021A \x1FaHello \$¥!
+\x1D
+\x1E028C/01 \x1FdEmma\x1FaGoldman
+EXPECT
+
+    is $out, $expect, 'Import Writer';
 }
 
 note 'PICA::Writer::Plus';

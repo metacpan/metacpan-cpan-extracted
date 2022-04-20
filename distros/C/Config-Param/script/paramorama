@@ -11,7 +11,10 @@ use lib File::Spec->catfile($Bin,'..','lib');
 use Config::Param;
 use Cwd qw(abs_path);
 
-my $version = '1.0.1';
+# For posixhelp and flags
+Config::Param->VERSION(4);
+
+my $version = '1.0.2';
 my $tagline = "a tool to parse / write Config::Param config files for other programs";
 my $usage = "$0 [parameters] some.conf [parameters] [param names]";
 my $info = "It parses the parameters defined in some.conf to act like the program the file is for when parsing command line parameters that might be following.
@@ -28,12 +31,13 @@ my $p = Config::Param::get
 		,usage=>$usage
 		,info=>$info
 		,author=>'Thomas Orgis <thomas@orgis.org>'
-		,copyright=>'Copyright (c) 2012 Thomas Orgis, Free Software licensed under the same terms as Perl 5.10'
+		,copyright=>'Copyright (c) 2022 Thomas Orgis, Free Software licensed under the same terms as Perl 5.10'
+		,posixhelp=>1
 	},
 	[
-		 'includes', 0, 'i', 'print out list of included config files referenced from the given one (including the primary one)'
-		,'absolute', 0, 'a', 'print out absolute file paths'
-		,'verbose',0,'','be outspoken'
+		 [ 'includes', 0, 'i', 'print out list of included config files referenced from the given one (including the primary one)', '', $Config::Param::switch ]
+		,[ 'absolute', 0, 'a', 'print out absolute file paths', '', $Config::Param::switch ]
+		,[ 'verbose',0,'','be outspoken', '', $Config::Param::count ]
 	]
 );
 
@@ -76,7 +80,6 @@ __END__
 
 paramorama - a tool to parse / write Config::Param config files for other programs
 
-
 =head1 SYNOPSIS
 
 	script/paramorama [parameters] some.conf [parameters] [param names]
@@ -95,13 +98,13 @@ These are the general rules for specifying parameters to this program:
 
 	paramorama -s -xyz -s=value --long --long=value [--] [files/stuff]
 
-You mention the parameters/switches you want to change in any order or even multiple times (they are processed in the oder given, later operations overriding/extending earlier settings.
+You mention the options to change parameters in any order or even multiple times. They are processed in the oder given, later operations overriding/extending earlier settings. Using the separator "--" stops option parsing
 An only mentioned short/long name (no "=value") means setting to 1, which is true in the logical sense. Also, prepending + instead of the usual - negates this, setting the value to 0 (false).
 Specifying "-s" and "--long" is the same as "-s=1" and "--long=1", while "+s" and "++long" is the sames as "-s=0" and "--long=0".
 
-There are also different operators than just "=" available, notably ".=", "+=", "-=", "*=" and "/=" for concatenation / appending array/hash elements and scalar arithmetic operations on the value. Arrays are appended to via "array.=element", hash elements are set via "hash.=name=value". You can also set more array/hash elements by specifying a separator after the long parameter line like this for comma separation
+There are also different operators than just "=" available, notably ".=", "+=", "-=", "*=" and "/=" for concatenation / appending array/hash elements and scalar arithmetic operations on the value. Arrays are appended to via "array.=element", hash elements are set via "hash.=name=value". You can also set more array/hash elements by specifying a separator after the long parameter line like this for comma separation:
 
-	 --array/,/=1,2,3  --hash/,/=name=val,name2=val2
+	--array/,/=1,2,3  --hash/,/=name=val,name2=val2
 
 The available parameters are these, default values (in Perl-compatible syntax) at the time of generating this document following the long/short names:
 
@@ -124,8 +127,7 @@ special: just -I or --config causes printing a current config file to STDOUT
 
 	0
 
-show the help message; 1: normal help, >1: more help; "par": help for paramter "par" only
-
+Show the help message. Value 1..9: help level, par: help for paramter par (long name) only.
 
 Additional fun with negative values, optionally followed by comma-separated list of parameter names:
 -1: list par names, -2: list one line per name, -3: -2 without builtins, -10: dump values (Perl style), -11: dump values (lines), -100: print POD.
@@ -157,5 +159,91 @@ Thomas Orgis <thomas@orgis.org>
 =head1 LICENSE AND COPYRIGHT
 
 Copyright (c) 2012 Thomas Orgis, Free Software licensed under the same terms as Perl 5.10
+
+=cut
+
+=head1 NAME
+
+paramorama - a tool to parse / write Config::Param config files for other programs
+
+=head1 SYNOPSIS
+
+	script/paramorama [parameters] some.conf [parameters] [param names]
+
+=head1 DESCRIPTION
+
+It parses the parameters defined in some.conf to act like the program the file is for when parsing command line parameters that might be following.
+
+Any non-parameter words given after the config file are treated as parameter names to print out the values from. Note that the values are simply printed separated by single line breaks. If parameter values can contain line breaks themselves, the output of multiple parameters is ambiguous. Hash and array parameters are printed one element/pair per line (name=value for hashes). Here, too, line breaks complicate things but the mechanism is useful enough when avoiding such data. For the full deal, you can print and parse the configuration file.
+
+Empty scalars will trigger one empty line of output, empty arrays will trigger _no_ lines of output.
+
+=head1 PARAMETERS
+
+These are the general rules for specifying parameters to this program:
+
+	paramorama -s -xyz -s=value --long --long=value [--] [files/stuff]
+
+You mention the options to change parameters in any order or even multiple times. They are processed in the oder given, later operations overriding/extending earlier settings. Using the separator "--" stops option parsing
+An only mentioned short/long name (no "=value") means setting to 1, which is true in the logical sense. Also, prepending + instead of the usual - negates this, setting the value to 0 (false).
+Specifying "-s" and "--long" is the same as "-s=1" and "--long=1", while "+s" and "++long" is the sames as "-s=0" and "--long=0".
+
+There are also different operators than just "=" available, notably ".=", "+=", "-=", "*=" and "/=" for concatenation / appending array/hash elements and scalar arithmetic operations on the value. Arrays are appended to via "array.=element", hash elements are set via "hash.=name=value". You can also set more array/hash elements by specifying a separator after the long parameter line like this for comma separation:
+
+	--array/,/=1,2,3  --hash/,/=name=val,name2=val2
+
+The available parameters are these, default values (in Perl-compatible syntax) at the time of generating this document following the long/short names:
+
+=over 2
+
+=item B<absolute>, B<a> (scalar)
+
+	0
+
+print out absolute file paths
+
+=item B<config>, B<I> (array)
+
+	[]
+
+Which configfile(s) to use (overriding automatic search in likely paths);
+special: just -I or --config causes printing a current config file to STDOUT
+
+=item B<help>, B<h> (scalar)
+
+	0
+
+Show the help message. Value 1..9: help level, par: help for paramter par (long name) only.
+
+Additional fun with negative values, optionally followed by comma-separated list of parameter names:
+-1: list par names, -2: list one line per name, -3: -2 without builtins, -10: dump values (Perl style), -11: dump values (lines), -100: print POD.
+
+=item B<includes>, B<i> (scalar)
+
+	0
+
+print out list of included config files referenced from the given one (including the primary one)
+
+=item B<verbose> (scalar)
+
+	0
+
+be outspoken
+
+=item B<version> (scalar)
+
+	0
+
+print out the program version
+
+=back
+
+=head1 AUTHOR
+
+Thomas Orgis <thomas@orgis.org>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2022 Thomas Orgis, Free Software licensed under the same terms as Perl 5.10
 
 =cut

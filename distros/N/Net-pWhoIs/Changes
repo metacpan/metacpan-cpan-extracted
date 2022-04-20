@@ -15,3 +15,6 @@ Revision history for Perl extension Net::pWhoIs.
 
 0.06  Tue Apr 17 02:33:23 2022
         -  Fixed testing bug.
+
+0.07  Wed Apr 20 10:41:03 2022
+        -  printReport method: added newline between results.  Stripped tabs.  Updated POD

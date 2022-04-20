@@ -8,10 +8,10 @@ use Test::More;
 use Future::AsyncAwait;
 
 {
-   use Object::Pad 0.19;
+   use Object::Pad 0.57;
 
    class TestChip
-      extends Device::Chip;
+      :isa(Device::Chip);
 
    use Device::Chip::Sensor -declare;
 

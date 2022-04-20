@@ -1,0 +1,26 @@
+#!/usr/bin/env perl
+
+use strict;
+
+# Only needed to find modules in the dist archive.
+use FindBin qw($Bin);
+use File::Spec;
+use lib File::Spec->catfile($Bin,'..','lib');
+
+# actual example code
+
+my $tagline = 'no long explanations';
+
+use Config::Param;
+
+# Read configuration
+my $p = Config::Param::get
+({
+	tagline=>$tagline
+,	usage=>"$0"
+#,	info=>"There is actually not that much to explain."
+,	author=>'Mystery Person'
+},[
+]);
+
+print "My sole purpose is to give you $tagline.\n";

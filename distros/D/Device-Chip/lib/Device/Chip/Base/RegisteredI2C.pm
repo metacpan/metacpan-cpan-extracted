@@ -4,10 +4,10 @@
 #  (C) Paul Evans, 2015-2019 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.19;
+use Object::Pad 0.57;  # :isa
 
-package Device::Chip::Base::RegisteredI2C 0.20;
-class Device::Chip::Base::RegisteredI2C extends Device::Chip;
+package Device::Chip::Base::RegisteredI2C 0.22;
+class Device::Chip::Base::RegisteredI2C :isa(Device::Chip);
 
 use utf8;
 
@@ -190,7 +190,7 @@ async method cached_write_reg ( $reg, $val )
       } 0 .. $len-1
    );
 
-   my @want = $val =~ m/(.{$datasize})/g;
+   my @want = $val =~ m/(.{$datasize})/sg;
 
    # Determine chunks that need rewriting
    my @f;
@@ -207,6 +207,59 @@ async method cached_write_reg ( $reg, $val )
    }
 
    await Future->needs_all( @f );
+}
+
+=head2 cached_write_reg_masked
+
+   await $chip->cached_write_reg_masked( $reg, $val, $mask );
+
+Performs a read-modify-write operation to update the given register location.
+This method will first read the current value of the register for the length
+of the value and mask. It will then modify this value, taking bits from the
+value given by I<$val> where the corresponding bit in I<$mask> is set, or
+leaving them unchanged where the I<$mask> bit is clear. This updated value is
+then written back.
+
+Both the initial read and the subsequent write operation will pass through the
+cache as for L</cached_read_reg> and L</cached_write_reg>.
+
+The length of I<$mask> must equal the length of I<$val>. A mask value with all
+bits set is equivalent to just calling L</cached_write_reg>. A mask value with
+all bits clear is equivalent to no update (except that the chip registers may
+still be read to fill the cache.
+
+This method should be used by chip drivers for interacting with
+configuration-style registers; that is, registers that the chip itself will
+treat as simple storage of values. It is not suitable for registers that the
+chip itself will update.
+
+=cut
+
+async method cached_write_reg_masked ( $reg, $val, $mask )
+{
+   length $mask == length $val or
+      croak "Require length(mask) == length(val)";
+
+   my $readreg = $reg;
+   my $readlen = ( length $val ) / ( my $datasize = $self->REG_DATA_BYTES );
+   my $wasval  = "";
+
+   pos( $mask ) = 0;
+   while( $readlen and $mask =~ m/\G\xFF{$datasize}/g ) {
+      $readreg++, $readlen--;
+      $wasval .= "\0" x $datasize;
+   }
+
+   if( $mask =~ m/(\xFF{$datasize})+$/ ) {
+      $readlen -= ( $+[0] - $-[0] ) / $datasize;
+   }
+
+   $wasval .= await $self->cached_read_reg( $readreg, $readlen ) if $readlen > 0;
+
+   $val &= $mask;
+   $val |= ( $wasval & ~$mask );
+
+   await $self->cached_write_reg( $reg, $val );
 }
 
 =head1 AUTHOR

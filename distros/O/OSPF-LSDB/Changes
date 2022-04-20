@@ -1,3 +1,6 @@
+1.16 2022-04-20
+    - Try again to statisfy CPAN testers on Windows.
+
 1.15 2022-04-18
     - Statisfy CPAN testers requirement on more platforms.
     - Print and warn about missing network and router from intra

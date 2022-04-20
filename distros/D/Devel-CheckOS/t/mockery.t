@@ -6,8 +6,6 @@ use lib File::Spec->catdir(qw(t lib));
 
 use Test::More;
 
-END { done_testing }
-
 my %platforms = (
     # $^O       => platform name
     aix         => 'AIX',
@@ -81,3 +79,5 @@ foreach my $o (sort { lc($platforms{$a}) cmp lc($platforms{$b}) }keys %platforms
     ok(Devel::CheckOS::os_is('Linux'), "Android is also Linux");
     ok(Devel::CheckOS::os_is('Unix'), "Android is also Unix");
 }
+
+done_testing;

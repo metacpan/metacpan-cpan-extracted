@@ -23243,6 +23243,11 @@ sub cells_ranges_put_worksheet_cells_range {
         description => 'output storage name.',
         required => '0',
     },
+    'extended_query_parameters' => {
+        data_type => 'hash',
+        description => 'extended query parameters',
+        required => '1',
+    },    
     };
     __PACKAGE__->method_documentation->{ 'cells_save_as_post_document_save_as' } = { 
     	summary => 'Convert document and save result to storage.',
@@ -23304,7 +23309,12 @@ sub cells_save_as_post_document_save_as {
     if ( exists $args{'out_storage_name'}) {
         $query_params->{'outStorageName'} = $self->{api_client}->to_query_value($args{'out_storage_name'});
     }
-
+    if ( exists $args{'extended_query_parameters'} ) {   
+        my $map_extended_query_parameters =$args{'extended_query_parameters'};
+        while ( my ($key,$value) = each( %$map_extended_query_parameters ) ) {
+             $query_params->{$key} = $self->{api_client}->to_query_value($value);
+        }
+    }
     # path params
     if ( exists $args{'name'}) {
         my $_base_variable = "{" . "name" . "}";
@@ -25963,6 +25973,11 @@ sub cells_workbook_get_page_count {
         description => 'output storage name.',
         required => '0',
     },
+    'extended_query_parameters' => {
+        data_type => 'hash',
+        description => 'extended query parameters',
+        required => '1',
+    },    
     };
     __PACKAGE__->method_documentation->{ 'cells_workbook_get_workbook' } = { 
     	summary => 'Read workbook info or export.',
@@ -26034,7 +26049,12 @@ sub cells_workbook_get_workbook {
     if ( exists $args{'out_storage_name'}) {
         $query_params->{'outStorageName'} = $self->{api_client}->to_query_value($args{'out_storage_name'});
     }
-
+    if ( exists $args{'extended_query_parameters'} ) {   
+        my $map_extended_query_parameters =$args{'extended_query_parameters'};
+        while ( my ($key,$value) = each( %$map_extended_query_parameters ) ) {
+             $query_params->{$key} = $self->{api_client}->to_query_value($value);
+        }
+    }
     # path params
     if ( exists $args{'name'}) {
         my $_base_variable = "{" . "name" . "}";
@@ -28205,6 +28225,11 @@ sub cells_workbook_post_workbooks_text_search {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
+    },    
+    'extended_query_parameters' => {
+        data_type => 'hash',
+        description => 'extended query parameters',
+        required => '1',
     },
     };
     __PACKAGE__->method_documentation->{ 'cells_workbook_put_convert_workbook' } = { 
@@ -28257,7 +28282,12 @@ sub cells_workbook_put_convert_workbook {
     if ( exists $args{'storage_name'}) {
         $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
-
+    if ( exists $args{'extended_query_parameters'} ) {   
+        my $map_extended_query_parameters =$args{'extended_query_parameters'};
+        while ( my ($key,$value) = each( %$map_extended_query_parameters ) ) {
+             $query_params->{$key} = $self->{api_client}->to_query_value($value);
+        }
+    }
     $self->{api_client}->check_access_token();
     my $_body_data;
     # body params

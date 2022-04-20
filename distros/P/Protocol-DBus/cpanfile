@@ -4,7 +4,7 @@ requires 'parent';
 requires 'X::Tiny';
 requires 'Module::Runtime';
 requires 'Call::Context';
-requires 'IO::Framed';
+requires 'IO::Framed' => 0.16;
 requires 'IO::SigGuard';
 requires 'Promise::ES6';
 

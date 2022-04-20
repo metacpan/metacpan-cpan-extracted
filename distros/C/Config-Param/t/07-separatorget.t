@@ -1,6 +1,6 @@
 #!perl -T
 
-use Test::More tests => 2;
+use Test::More tests => 3;
 use Config::Param;
 use Storable qw(dclone);
 
@@ -58,3 +58,8 @@ delete $config{nofile};
 $p = Config::Param::get(\%config,dclone(\@pardef),[]);
 for my $b (keys %{$builtins}){ delete $p->{$b}; }
 is_deeply($p, \%afterfact, "compact array/hash from config file");
+
+push(@args, '-H//', '--arr//');
+$p = Config::Param::get(\%config,dclone(\@pardef),dclone(\@args));
+
+ok( (@{$p->{arr}} == () && %{$p->{has}} == ()), "erasure" );

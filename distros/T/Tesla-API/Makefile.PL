@@ -31,6 +31,7 @@ my %WriteMakefileArgs = (
         'File::ShareDir::Install' => '0',
     },
     TEST_REQUIRES => {
+        'Mock::Sub'  => '1.09',
         'Test::More' => '0',
     },
     PREREQ_PM => {

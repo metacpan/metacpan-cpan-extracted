@@ -145,7 +145,7 @@ you can almost freely interleave above listed styles in order to access to eleme
 	$j->secondnode->thirdnode->a = 7;
 	delete $j->secondnode->{thirdnode}; # will delete thirdnode as expected in hash structures.
 
-you can compare the JSONP object with another Perl data structure or JSON string via C<eq> and C<ne> overloaded operators, it will return true if the two operands will result in same JSON structure and values:
+you can compare the JSONP object with another JSONP object, Perl data structure or JSON string via C<eq> and C<ne> overloaded operators, it will return true if the two operands will result in same JSON structure and values:
 
 	my $j = JSONP->new(
 		{
@@ -167,6 +167,8 @@ you can compare the JSONP object with another Perl data structure or JSON string
 
 	say $j eq $json ? 'the same' : 'different'; # will print 'the same'
 	say $j ne $json ? 'different' : 'the same'; # will print 'the same'
+	say $j eq $j ? 'the same' : 'different'; # will print 'the same'
+	say $j ne $j ? 'different' : 'the same'; # will print 'the same'
 	say $j eq 'a random string, not a valid JSON' ? 'the same' : 'different'; # will print 'different'
 	say $j eq '{"akey": "something"}' ? 'the same' : 'different'; # will print 'different'
 

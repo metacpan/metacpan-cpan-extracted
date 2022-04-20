@@ -1,7 +1,7 @@
 package PICA::Parser::JSON;
 use v5.14.1;
 
-our $VERSION = '2.02';
+our $VERSION = '2.03';
 
 use JSON::PP;
 our $JSON = JSON::PP->new;

@@ -6,7 +6,7 @@
 use v5.26;
 use Object::Pad 0.19;
 
-package Device::Chip 0.20;
+package Device::Chip 0.22;
 class Device::Chip :repr(HASH);
 
 use Carp;
@@ -59,7 +59,7 @@ it. This is supplied by invoking the L</mount> method. For example:
 
 =head2 new
 
-   $chip = Device::Chip->new
+   $chip = Device::Chip->new;
 
 Returns a new instance of a chip driver object.
 

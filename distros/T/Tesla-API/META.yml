@@ -4,6 +4,7 @@ author:
   - 'Steve Bertrand <steveb@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  Mock::Sub: '1.09'
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -34,5 +35,5 @@ requires:
 resources:
   bugtracker: https://github.com/stevieb9/tesla-api/issues
   repository: https://github.com/stevieb9/tesla-api.git
-version: '0.10'
+version: '1.00'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

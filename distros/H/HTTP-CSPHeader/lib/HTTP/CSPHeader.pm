@@ -16,7 +16,7 @@ use Types::Standard qw/ ArrayRef is_ArrayRef Bool HashRef Str /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.1.1';
+our $VERSION = 'v0.1.2';
 
 
 has _base_policy => (
@@ -164,7 +164,7 @@ HTTP::CSPHeader - manage dynamic content security policy headers
 
 =head1 VERSION
 
-version v0.1.1
+version v0.1.2
 
 =head1 SYNOPSIS
 
@@ -258,6 +258,9 @@ This is a read-only accessor.
 This resets any changes to the L</policy> and clears the L</nonce>.
 It should be run at the start of each HTTP request.
 
+If you never make use of the nonce, and never L</amend> the headers,
+then you do not need to run this method.
+
 =head2 amend
 
   $csp->amend( $directive1 => $value1, $directive2 => $value2, ... );
@@ -267,13 +270,46 @@ This amends the L</policy>.
 If the C<$directive> starts with a C<+> then the value will be
 appended to it.  Otherwise the change will overwrite the value.
 
-If the value if C<undef>, then the directive will be deleted.
+If the value is C<undef>, then the directive will be deleted.
+
+=head1 EXAMPLES
+
+=head2 Mojolicious
+
+You can use this with L<Mojolicious>:
+
+  use HTTP::CSPHeader;
+
+  use feature 'state';
+
+  $self->hook(
+    before_dispatch => sub ($c) {
+
+      state $csp = HTTP::CSPHeader->new(
+          policy => {
+              'default-src' => q['self'],
+              'script-src'  => q['self'],
+          },
+          nonces_for => 'script-src',
+      );
+
+      $csp->reset;
+
+      $c->stash( csp_nonce => $csp->nonce );
+
+      $c->res->headers->content_security_policy( $csp->header );
+    }
+  );
+
+and in your templates, you can use the following for inline scripts:
+
+  <script nonce="<%= $csp_nonce %>"> ... </script>
+
+If you do not need the nonce, then you might consider using L<Mojolicious::Plugin::CSPHeader>.
 
 =head1 SEE ALSO
 
 L<https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy>
-
-L<Mojolicious::Plugin::CSPHeader>
 
 =head1 SOURCE
 

@@ -27,23 +27,26 @@ is(slurp($tmp), slurp("example/all.dot"), "$0 output") or do {
     system('diff', '-up', "example/all.dot", $tmp->filename);
 };
 
-my $code = $^O eq "MSWin32" ? 1<<8 : 2<<8;
+SKIP: {
+    skip "pipe and exit on Windows", 10 if $^O eq "MSWin32";
 
-foreach my $opt (qw(b e p s w)) {
-    my $options = '-'.lc($opt).uc($opt);
-    my $pid = open(my $fh, '-|');
-    defined($pid) or die "Fork and open pipe failed: $!";
-    if (!$pid) {
-	# child
-	open(STDERR, '>&', \*STDOUT) or die "Dup stdout to stderr failed: $!";
-	@ARGV = ($options, "/dev/null");
-	do $0;
-	die "Do $0 did not exit";
+    foreach my $opt (qw(b e p s w)) {
+	my $options = '-'.lc($opt).uc($opt);
+	my $pid = open(my $fh, '-|');
+	defined($pid) or die "Fork and open pipe failed: $!";
+	if (!$pid) {
+	    # child
+	    open(STDERR, '>&', \*STDOUT)
+		or die "Dup stdout to stderr failed: $!";
+	    @ARGV = ($options, "/dev/null");
+	    do $0;
+	    die "Do $0 did not exit";
+	}
+	my $out = eval { local $/; <$fh> };
+	close($fh) || !$! or die "Fork and open pipe failed: $!";
+	is($?, 2<<8, "$0 option $opt")
+	    or diag("Options $options may not be used together");
+	like($out, qr{^Error: Options -$opt }m, "$0 usage $opt")
+	    or diag("No error: $out");
     }
-    my $out = eval { local $/; <$fh> };
-    close($fh) || !$! or die "Fork and open pipe failed: $!";
-    is($?, $code, "$0 option $opt")
-	or diag("Options $options may not be used together");
-    like($out, qr{^Error: Options -$opt }m, "$0 usage $opt")
-	or diag("No error: $out");
 }

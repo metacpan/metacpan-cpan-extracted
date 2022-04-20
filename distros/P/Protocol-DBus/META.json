@@ -33,7 +33,7 @@
       "runtime" : {
          "requires" : {
             "Call::Context" : "0",
-            "IO::Framed" : "0",
+            "IO::Framed" : "0.16",
             "IO::SigGuard" : "0",
             "Module::Runtime" : "0",
             "Promise::ES6" : "0",
@@ -67,6 +67,6 @@
          "web" : "https://github.com/FGasper/p5-Protocol-DBus"
       }
    },
-   "version" : "0.20",
+   "version" : "0.21",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

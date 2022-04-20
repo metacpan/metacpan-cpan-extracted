@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Exporter (); BEGIN { *import = \&Exporter::import }
 
-our $VERSION = '1.500009';
+our $VERSION = '1.500010';
 $VERSION =~ tr/_//d;
 
 our @EXPORT_OK;

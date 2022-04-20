@@ -11,11 +11,11 @@ use Future::AsyncAwait 0.47;
 use Device::Chip::ProtocolBase::SPI;
 
 {
-   use Object::Pad;
+   use Object::Pad 0.57;
 
    class TestAdapter
-      extends Test::Device::Chip::Adapter
-      implements Device::Chip::ProtocolBase::SPI;
+      :isa(Test::Device::Chip::Adapter)
+      :does(Device::Chip::ProtocolBase::SPI);
 }
 
 my $adapter = TestAdapter->new;

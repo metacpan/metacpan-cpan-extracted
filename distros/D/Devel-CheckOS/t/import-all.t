@@ -3,8 +3,6 @@ $^W = 1;
 
 use Test::More;
 
-END { done_testing(); }
-
 use Devel::CheckOS ':all';
 
 use File::Spec;
@@ -23,3 +21,5 @@ ok($@ =~ /OS unsupported/i, "die_unsupported imported");
 
 ok((grep { /^AnOperatingSystem$/i } list_platforms()),
    "list_platforms imported");
+
+done_testing();

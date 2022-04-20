@@ -16,6 +16,12 @@ use Crypt::OPAQUE;
 use Smart::Comments;
 use CBOR::XS;
 
+use bignum;
+use FindBin qw($Bin);
+use Crypt::SIGMA;
+use Crypt::KeyDerivation ':all';
+use Crypt::AuthEnc::GCM qw(gcm_encrypt_authenticate gcm_decrypt_verify);
+
 #create RegistrationRequest: oprf_context(mode,suite,context_string), pwdU, blind, blinded_element, blinded_message, request.data
 #0
 #Ciphersuite(name='OPRF(P-256, SHA-256)', identifier=3, group=<sagelib.groups.GroupP256 object at 0x7fd171c66d10>, H=<built-in function openssl_sha256>, hash=<function <lambda> at 0x7fd171c7fe20>)
@@ -48,6 +54,7 @@ my $req_r = create_registration_request($pwd, $blind, $DST, $group_name, $type, 
 
 is($req_r->{request}{data}, pack("H*", '02a0e1e2b7d6676136224e19c9fdd495d91f49bfe5e8a192e712f065a448e52d28'), 'create_registration_request');
 
+my $s_priv_hex = 'c36139381df63bfc91c850db0b9cfbec7a62e86d80040a41aa7725bf0e79d5e5';
 my $s_pub = pack("H*", '035f40ff9cf88aa1f5cd4fe5fd3da9ea65a4923a5594f84fd9f2092d6067784874');
 my $oprf_seed = pack("H*", '62f60b286d20ce4fd1d64809b0021dad6ed5d52a2c8cf27ae6582543a0a8dce2');
 my $Nseed = 32;
