@@ -12,9 +12,9 @@ use IO::Interactive qw(is_interactive);
 
 # put global variables alphabetically here
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-04-15'; # DATE
+our $DATE = '2022-04-21'; # DATE
 our $DIST = 'Perinci-CmdLine-Lite'; # DIST
-our $VERSION = '1.918'; # VERSION
+our $VERSION = '1.920'; # VERSION
 
 # TODO: this class can actually be a role instead of base class for pericmd &
 # pericmd-lite.
@@ -1650,7 +1650,14 @@ sub select_output_handle {
             }
 
             my $viewer = $r->{viewer} // $resmeta->{"cmdline.viewer"} //
-                $default_viewer // $ENV{VIEWER} // $ENV{BROWSER};
+                $default_viewer // $ENV{VIEWER} // $ENV{BROWSER} // do {
+                    if ($^O eq 'MSWin32') {
+                        require Browser::Find::Windows;
+                        Browser::Find::Windows::find_browser();
+                    } else {
+                        undef;
+                    }
+                };
             last if defined $viewer && !$viewer; # ENV{VIEWER} can be set 0/'' to disable viewing result using external program
             die [500, "No VIEWER program set"] unless defined $viewer;
             $r->{viewer} = $viewer;
@@ -1818,7 +1825,7 @@ sub display_result {
         print $handle $fres;
         if (defined $r->{viewer}) {
             require ShellQuote::Any::Tiny;
-            my $cmd = $r->{viewer} ." ". ShellQuote::Any::Tiny::shell_quote($r->{viewer_temp_path});
+            my $cmd = ShellQuote::Any::Tiny::shell_quote($r->{viewer}) ." ". ShellQuote::Any::Tiny::shell_quote($r->{viewer_temp_path});
             system $cmd;
         }
     }
@@ -1885,7 +1892,7 @@ Perinci::CmdLine::Base - Base class for Perinci::CmdLine{::Classic,::Lite}
 
 =head1 VERSION
 
-This document describes version 1.918 of Perinci::CmdLine::Base (from Perl distribution Perinci-CmdLine-Lite), released on 2022-04-15.
+This document describes version 1.920 of Perinci::CmdLine::Base (from Perl distribution Perinci-CmdLine-Lite), released on 2022-04-21.
 
 =head1 DESCRIPTION
 

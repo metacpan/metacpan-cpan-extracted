@@ -5,7 +5,7 @@ use warnings;
 use parent qw( Alien::Base );
 use Capture::Tiny qw /:all/;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 sub patchelf {
     my ($self, @args) = @_;

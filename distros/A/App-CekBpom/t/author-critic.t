@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/App/CekBpom.pm','script/cek-bpom-products'];
+my $filenames = ['lib/App/CekBpom.pm','script/cek-bpom-products','script/cek-bpom-products-browser'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

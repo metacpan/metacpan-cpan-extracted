@@ -63,6 +63,6 @@
          "web" : "https://github.com/tsee/extutils-cppguess"
       }
    },
-   "version" : "0.25",
+   "version" : "0.26",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

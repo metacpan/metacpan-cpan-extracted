@@ -1,5 +1,19 @@
 Revision history for Types-SQL
 
+v0.4.1    2022-04-21 14:00:49+01:00 Europe/London
+  [Bug Fixes]
+  - Char with no size parameter should default to 1. N.B. this may be an incompatible change.
+
+  [Documentation]
+  - Bumped copyright year.
+
+  - Fix encoding of links in README.
+
+  [Toolchain]
+  - Removed use of Travis CI.
+
+  - Remove bad MANIFEST.SKIP rule.
+
 v0.4.0    2018-12-04 10:36:59+00:00 Europe/London
   [Enhancements]
   - Added SmallInt, BigInt.

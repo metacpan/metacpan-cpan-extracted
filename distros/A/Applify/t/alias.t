@@ -11,7 +11,7 @@ HERE
 my $script = $app->_script;
 
 is_deeply(run(qw(-i 42)),    undef, 'alias -i not defined');
-is_deeply(run(qw(--age 43)), 43,,   'but --age is defined');
+is_deeply(run(qw(--age 43)), 43,    'but --age is defined');
 
 $script->{options}[0]{alias} = ['i'];
 is_deeply(run(qw(-i 44)), 44, 'alias -i defined');

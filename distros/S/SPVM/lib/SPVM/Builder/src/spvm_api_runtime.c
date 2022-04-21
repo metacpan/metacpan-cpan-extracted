@@ -117,7 +117,8 @@ SPVM_ENV_RUNTIME* SPVM_API_RUNTIME_new_env() {
     SPVM_API_RUNTIME_get_type_is_ref,
     SPVM_API_RUNTIME_get_class_id_by_name,
     SPVM_API_RUNTIME_get_class_name_id,
-    SPVM_API_RUNTIME_get_class_module_file_id,
+    SPVM_API_RUNTIME_get_class_module_rel_file_id,
+    SPVM_API_RUNTIME_get_class_module_dir_id,
     SPVM_API_RUNTIME_get_class_is_anon,
     SPVM_API_RUNTIME_get_class_fields_base_id,
     SPVM_API_RUNTIME_get_class_fields_length,
@@ -493,15 +494,26 @@ int32_t SPVM_API_RUNTIME_get_class_is_anon(SPVM_RUNTIME* runtime, int32_t class_
   return class_is_anon;
 }
 
-int32_t SPVM_API_RUNTIME_get_class_module_file_id(SPVM_RUNTIME* runtime, int32_t class_id) {
+int32_t SPVM_API_RUNTIME_get_class_module_rel_file_id(SPVM_RUNTIME* runtime, int32_t class_id) {
   
   SPVM_RUNTIME_CLASS* class = SPVM_API_RUNTIME_get_class(runtime, class_id);
   
   assert(class);
   
-  int32_t class_module_file_id = class->module_file_id;
+  int32_t class_module_rel_file_id = class->module_rel_file_id;
   
-  return class_module_file_id;
+  return class_module_rel_file_id;
+}
+
+int32_t SPVM_API_RUNTIME_get_class_module_dir_id(SPVM_RUNTIME* runtime, int32_t class_id) {
+  
+  SPVM_RUNTIME_CLASS* class = SPVM_API_RUNTIME_get_class(runtime, class_id);
+  
+  assert(class);
+  
+  int32_t class_module_dir_id = class->module_dir_id;
+  
+  return class_module_dir_id;
 }
 
 int32_t SPVM_API_RUNTIME_get_class_fields_base_id(SPVM_RUNTIME* runtime, int32_t class_id) {
@@ -815,16 +827,35 @@ SPVM_RUNTIME_METHOD* SPVM_API_RUNTIME_get_method_by_class_id_and_method_name(SPV
   
   SPVM_RUNTIME_METHOD* found_method = NULL;
   if (class->methods_length > 0) {
-    for (int32_t method_id = class->methods_base_id; method_id <  class->methods_base_id + class->methods_length; method_id++) {
-      SPVM_RUNTIME_METHOD* method = SPVM_API_RUNTIME_get_method(runtime, method_id);
-      const char* method_name = SPVM_API_RUNTIME_get_name(runtime, method->name_id);
-      if (strcmp(method_name, search_method_name) == 0) {
+    // Performe binary searching because methods are sorted by the names
+    int32_t cur_min_index = class->methods_base_id;
+    int32_t cur_max_index = cur_min_index + class->methods_length - 1;
+    
+    while (1) {
+      if (cur_max_index < cur_min_index) {
+        break;
+      }
+      
+      int32_t cur_half_index = cur_min_index + (cur_max_index - cur_min_index) / 2;
+
+      SPVM_RUNTIME_METHOD* method = SPVM_API_RUNTIME_get_method(runtime, cur_half_index);
+      const char* cur_half_method_name = SPVM_API_RUNTIME_get_name(runtime, method->name_id);
+      
+      int32_t cmp_result = strcmp(search_method_name, cur_half_method_name);
+      
+      if (cmp_result > 0) {
+        cur_min_index = cur_half_index + 1;
+      }
+      else if (cmp_result < 0) {
+        cur_max_index = cur_half_index - 1;
+      }
+      else {
         found_method = method;
         break;
       }
     }
   }
-  
+
   return found_method;
 }
 

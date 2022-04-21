@@ -1,5 +1,15 @@
 =head1 Revision history for Config-Param
 
+=item * B<4.000003> (2022-04-21)
+
+=over 2
+
+=item - disable numeric warnings on scalar arithmetic operators
+
+=back
+
+=item * B<4.000002> (2022-04-20)
+
 =over 2
 
 =item - update paramorama script
@@ -8,11 +18,11 @@
 
 =back
 
-=item * B<4.000001> (2021-04-20)
+=item * B<4.000001> (2022-04-20)
 
 (only release machinery)
 
-=item * B<4.000000> (2021-04-20)
+=item * B<4.000000> (2022-04-20)
 
 =over 2
 

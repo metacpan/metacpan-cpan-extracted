@@ -5,6 +5,7 @@ use strict;
 use warnings;
 use Test::More 0.98;
 
+use File::Which;
 use Perinci::Sub::DepChecker qw(
                                    check_deps
                                    dep_satisfy_rel
@@ -61,10 +62,16 @@ subtest 'exec in PATH' => sub {
     # hash form
     deps_met {exec=>{name=>$perl_name}}, "perl (hash)";
 
-    # min_version
+    # min_version of perl
     deps_met   {exec=>{name=>'perl', min_version=>$]}}, "min_version 1";
     deps_unmet {exec=>{name=>'perl', min_version=>'9.999'}}, "min_version 2";
 
+    # min_version of git
+    subtest "min_version of git" => sub {
+        plan skip_all => 'git is not available' unless which "git";
+        deps_met   {exec=>{name=>'git', min_version=>1}}, "min_version 1"; # i'm assuming all git out there is >v1
+        deps_unmet {exec=>{name=>'git', min_version=>'9.999'}}, "min_version 2";
+    };
 };
 
 # perl's caching defeats this?

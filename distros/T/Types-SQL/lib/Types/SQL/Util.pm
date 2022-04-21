@@ -8,7 +8,7 @@ use Exporter qw/ import /;
 use PerlX::Maybe qw/ maybe /;
 use Safe::Isa 1.000008 qw/ $_isa $_call_if_can /;
 
-our $VERSION = 'v0.4.0';
+our $VERSION = 'v0.4.1';
 
 # RECOMMEND PREREQ: PerlX::Maybe::XS
 
@@ -226,7 +226,7 @@ Types::SQL::Util - extract DBIx::Class column_info from types
 
 =head1 VERSION
 
-version v0.4.0
+version v0.4.1
 
 =head1 SYNOPSIS
 
@@ -374,7 +374,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016-2018 by Robert Rothenberg.
+This software is Copyright (c) 2016-2022 by Robert Rothenberg.
 
 This is free software, licensed under:
 

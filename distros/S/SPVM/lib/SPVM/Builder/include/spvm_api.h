@@ -160,8 +160,8 @@ SPVM_OBJECT* SPVM_API_new_string_raw(SPVM_ENV* env, const char* bytes, int32_t l
 // Exception
 int32_t SPVM_API_set_exception(SPVM_ENV* env, SPVM_OBJECT* exception);
 SPVM_OBJECT* SPVM_API_exception(SPVM_ENV* env);
-SPVM_OBJECT* SPVM_API_new_stack_trace_raw(SPVM_ENV* env, SPVM_OBJECT* exception, const char* class_name, const char* method_name, const char* file, int32_t line);
-SPVM_OBJECT* SPVM_API_new_stack_trace(SPVM_ENV* env, SPVM_OBJECT* exception, const char* class_name, const char* method_name, const char* file, int32_t line);
+SPVM_OBJECT* SPVM_API_new_stack_trace_raw(SPVM_ENV* env, SPVM_OBJECT* exception, int32_t method_id, int32_t line);
+SPVM_OBJECT* SPVM_API_new_stack_trace(SPVM_ENV* env, SPVM_OBJECT* exception, int32_t method_id, int32_t line);
 
 // Reference count
 void SPVM_API_inc_ref_count(SPVM_ENV* env, SPVM_OBJECT* object);
@@ -299,5 +299,9 @@ int32_t SPVM_API_is_object_array(SPVM_ENV* env, SPVM_OBJECT* object);
 void SPVM_API_free_env_prepared(SPVM_ENV* env);
 
 int32_t SPVM_API_can_assign_array_element(SPVM_ENV* env, SPVM_OBJECT* array, SPVM_OBJECT* element);
+
+int32_t SPVM_API_get_method_id_cache(SPVM_ENV* env, const char* method_cache_name, int32_t method_cache_name_length);
+int32_t SPVM_API_get_field_id_cache(SPVM_ENV* env, const char* field_cache_name, int32_t field_cache_name_length);
+int32_t SPVM_API_get_class_var_id_cache(SPVM_ENV* env, const char* class_var_cache_name, int32_t class_var_cache_name_length);
 
 #endif

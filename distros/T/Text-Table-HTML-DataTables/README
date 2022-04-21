@@ -3,9 +3,9 @@ NAME
     DataTables plugin
 
 VERSION
-    This document describes version 0.010 of Text::Table::HTML::DataTables
+    This document describes version 0.011 of Text::Table::HTML::DataTables
     (from Perl distribution Text-Table-HTML-DataTables), released on
-    2022-01-23.
+    2022-03-22.
 
 SYNOPSIS
      use Text::Table::HTML::DataTables;
@@ -73,6 +73,23 @@ FUNCTIONS
         HTML head as well as table "<caption>" element in the HTML body
         containing the provided caption. The caption will be HTML-encoded.
 
+    *   default_length
+
+        Integer, defaults to 1000. Set the default page size.
+
+    *   library_link_mode
+
+        Str, defaults to "local". Instructs how to link or embed the
+        JavaScript libraries in the generated HTML page. Valid values
+        include: "local" (the HTML will link to the local filesystem copy of
+        the libraries, e.g. in the shared distribution directory), "cdn"
+        (not yet implemented, the HTML will link to the CDN version of the
+        libraries), "embed" (the HTML will embed the libraries directly).
+
+ENVIRONMENT
+  PERL_TEXT_TABLE_HTML_DATATABLES_OPT_LIBRARY_LINK_MODE
+    String. Used to set the default for the "library_link_mode" option.
+
 HOMEPAGE
     Please visit the project's homepage at
     <https://metacpan.org/release/Text-Table-HTML-DataTables>.
@@ -108,7 +125,7 @@ CONTRIBUTING
     me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2022, 2020, 2016 by perlancar
+    This software is copyright (c) 2022, 2021, 2020, 2016 by perlancar
     <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under

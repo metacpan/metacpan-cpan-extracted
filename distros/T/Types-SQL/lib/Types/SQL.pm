@@ -22,7 +22,7 @@ use namespace::autoclean;
 
 # ABSTRACT: a library of SQL types
 
-our $VERSION = 'v0.4.0';
+our $VERSION = 'v0.4.1';
 
 
 sub VERSION { # for older Perls
@@ -82,9 +82,9 @@ our $Char = _generate_type(
         my ( $self, $size ) = @_;
         my $parent = $self->parent->my_methods->{dbic_column_info};
         return (
-            $parent->( $self->parent, $size || $self->type_parameter ),
+            $parent->( $self->parent, $size || $self->type_parameter || 1 ),
             data_type => 'char',
-            maybe size => $size || $self->type_parameter,
+            size      => $size || $self->type_parameter || 1,
         );
     },
 );
@@ -196,7 +196,7 @@ Types::SQL - a library of SQL types
 
 =head1 VERSION
 
-version v0.4.0
+version v0.4.1
 
 =head1 SYNOPSIS
 
@@ -242,6 +242,8 @@ Returns a C<varchar> data type, with an optional size parameter.
   my $type = Char[ $size ];
 
 Returns a C<char> data type, with an optional size parameter.
+
+If C<$size> is omitted, then it will default to 1.
 
 =head2 C<Integer>
 
@@ -337,7 +339,7 @@ Slaven Rezić <slaven@rezic.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016-2018 by Robert Rothenberg.
+This software is Copyright (c) 2016-2022 by Robert Rothenberg.
 
 This is free software, licensed under:
 

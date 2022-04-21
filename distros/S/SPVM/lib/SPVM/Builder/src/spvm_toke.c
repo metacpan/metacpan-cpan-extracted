@@ -205,12 +205,13 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
 
             // Byte, Short, Int, Long, Float, Double, Bool is already existsregistered in module source symtable
             const char* found_module_source = SPVM_HASH_get(compiler->module_source_symtable, class_name, strlen(class_name));
+            const char* module_dir = NULL;
             if (!found_module_source) {
               // Search module file
               FILE* fh = NULL;
               int32_t module_dirs_length = compiler->module_dirs->length;
               for (int32_t i = 0; i < module_dirs_length; i++) {
-                const char* module_dir = (const char*) SPVM_LIST_get(compiler->module_dirs, i);
+                module_dir = (const char*) SPVM_LIST_get(compiler->module_dirs, i);
                 
                 // File name
                 int32_t file_name_length = (int32_t)(strlen(module_dir) + 1 + strlen(cur_rel_file));
@@ -286,6 +287,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
 
               // Copy original source to current source because original source is used at other places(for example, SPVM::Builder::Exe)
               compiler->cur_src = (char*)src;
+              compiler->cur_dir = module_dir;
               compiler->cur_rel_file = cur_rel_file;
               compiler->cur_rel_file_class_name = class_name;
               

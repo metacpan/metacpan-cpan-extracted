@@ -1,5 +1,9 @@
 Revision history for LWP-ConsoleLogger
 
+0.000044  2022-04-21 14:20:07Z
+    - Document that Everywhere can be used with the -M switch (GH#22) (Olaf
+      Alders)
+
 0.000043  2021-03-04 19:00:40Z
     - Ensure that a silent logger is actually silent (GH#21) (Olaf Alders)
 

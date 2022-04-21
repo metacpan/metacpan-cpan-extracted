@@ -1,5 +1,5 @@
 {
-   "abstract" : "Check BPOM products/manufacturers (\"sarana\") via the command-line (CLI interface for cekbpom.pom.go.id)",
+   "abstract" : "Check registered products & manufacturers (CLIs for cekbpom.pom.go.id)",
    "author" : [
       "perlancar <perlancar@cpan.org>"
    ],
@@ -67,7 +67,7 @@
    "provides" : {
       "App::CekBpom" : {
          "file" : "lib/App/CekBpom.pm",
-         "version" : "0.018"
+         "version" : "0.020"
       }
    },
    "release_status" : "stable",
@@ -82,7 +82,7 @@
          "web" : "https://github.com/perlancar/perl-App-CekBpom"
       }
    },
-   "version" : "0.018",
+   "version" : "0.020",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

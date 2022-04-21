@@ -52,7 +52,7 @@ my %WriteMakefile = (
 	'LICENSE'       => 'perl',
 	'AUTHOR'        => 'Steffen Mueller <smueller@cpan.org>',
 
-    'EXE_FILES' => ['bin/dumbbench'],
+	'EXE_FILES' => ['bin/dumbbench'],
 
 	'CONFIGURE_REQUIRES' => {
 		'ExtUtils::MakeMaker'   => '6.64',
@@ -75,7 +75,8 @@ my %WriteMakefile = (
 		'Params::Util'      => '0',
 		'parent'            => '0',
 		'Statistics::CaseResampling' => '0.06',
-		'Time::HiRes'       => '0',
+		# Time::HiRes::clock_gettime() for Windows was implemented in 1.9764
+		'Time::HiRes'       => ($^O eq 'MSWin32' ? '1.9764': '0'),
 		},
 
 	'META_MERGE' => {

@@ -2,7 +2,7 @@ package Dumbbench::Instance::Cmd;
 use strict;
 use warnings;
 use Carp ();
-use Time::HiRes ();
+use Time::HiRes qw(clock_gettime CLOCK_MONOTONIC);
 
 use Dumbbench::Instance;
 use parent 'Dumbbench::Instance';
@@ -93,15 +93,15 @@ sub single_run {
   my ($start, $end);
   if ($self->use_shell) {
     my $cmd = join ' ', @cmd;
-    $start = Time::HiRes::time();
+    $start = clock_gettime(CLOCK_MONOTONIC);
     system($cmd);
-    $end = Time::HiRes::time();
+    $end = clock_gettime(CLOCK_MONOTONIC);
   }
   else {
     my $cmd = $cmd[0];
-    $start = Time::HiRes::time();
+    $start = clock_gettime(CLOCK_MONOTONIC);
     system({$cmd} @cmd);
-    $end = Time::HiRes::time();
+    $end = clock_gettime(CLOCK_MONOTONIC);
   }
 
   my $duration = $end-$start;

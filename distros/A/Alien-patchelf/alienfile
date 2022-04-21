@@ -47,22 +47,12 @@ sub get_version_filter {
   my $default_filter = qr/^([0-9\.]+)$/;
 
   #  compiler might not be called c++
-  use File::Which qw /which/;
-  use Capture::Tiny qw /capture/;
-  
-  my $cc = which ('c++') or which ('g++')
-    or return $default_filter;
+  use ExtUtils::CppGuess 0.25;
 
-  my $source_file = Path::Tiny->tempfile();
-  open my $FH, '>', $source_file or die "Can't create $source_file: $!";
-  print $FH 'int main () { return 1; }\n';
-  close $FH;
-  
-  my @args = ($cc, '-std=c++17', $source_file);
-  my ($stdout, $stderr, @error) = capture {system @args};
-  
-  #  should set a meta_prop value on first pass 
-  my $have_cpp_17 = not $stderr =~ /\Qunrecognized command line option '-std=c++17'/;
+  my $cppg = ExtUtils::CppGuess->new()
+    or return $default_filter;
+  my $have_cpp_17 = eval {$cppg->cpp_standard_flag('C++17'); 1};
+
   meta->prop->{my_have_cpp17} = $have_cpp_17;
   if (!$have_cpp_17) {
     Alien::Build->log("The c++ compiler does not support -std=c++17, falling back to patchelf 0.13.1");

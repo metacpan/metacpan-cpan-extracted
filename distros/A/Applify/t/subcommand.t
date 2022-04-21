@@ -116,11 +116,7 @@ HERE
   is_help $script, <<'HERE', 'subcommand log';
 Usage:
 
-    subcommand.t [command] [options]
-
-Commands:
-    list  provide a listing
-    log   provide a log
+    subcommand.t log [options]
 
 Options:
     --input-file  input

@@ -39,8 +39,8 @@ my $script = $app->_script;
 $script->option(str => foo_bar => 'Foo can something');
 $script->option(str => foo_2   => 'foo_2 can something else', 42);
 $script->option(str => foo_3   => 'foo_3 can also something', 123, required => 1);
-$script->option(str => foo_4   => 'foo_4 can also something', 123, n_of => '@');
-$script->option(str => foo_5   => 'foo_5 can also something', 123, n_of => '@', required => 1);
+$script->option(str => foo_4   => 'foo_4 can also something', 123, n_of     => '@');
+$script->option(str => foo_5   => 'foo_5 can also something', 123, n_of     => '@', required => 1);
 
 my $application_class = $script->_generate_application_class(sub { });
 like $application_class, qr{^Applify::__ANON__2__::}, 'generated application class';
@@ -50,6 +50,10 @@ is_deeply $script->_default_options,
   [{arg => 'help', documentation => 'Print this help text', name => 'help', type => 'bool'}], 'default options';
 is_help $script, <<'HERE', 'only help';
 Usage:
+
+    help.t [options]
+
+Options:
     --foo-bar  Foo can something
     --foo-2    foo_2 can something else
  *  --foo-3    foo_3 can also something
@@ -66,8 +70,8 @@ HERE
 
 eval { $script->documentation(undef) };
 like $@, qr{Usage: documentation }, 'need to give documentation(...) a true value';
-is $script->documentation('Applify'), $script, 'documentation(...) return $self on set';
-is $script->documentation, 'Applify', 'documentation() return what was set';
+is $script->documentation('Applify'), $script,   'documentation(...) return $self on set';
+is $script->documentation,            'Applify', 'documentation() return what was set';
 
 $script->documentation(__FILE__)->version('1.23');
 is_deeply [map { $_->{arg} } @{$script->_default_options}], [qw(help man version)],
@@ -77,6 +81,10 @@ is_help $script, <<'HERE', 'help, man, version';
 dummy synopsis...
 
 Usage:
+
+    help.t [options]
+
+Options:
     --foo-bar  Foo can something
     --foo-2    foo_2 can something else
  *  --foo-3    foo_3 can also something
@@ -100,6 +108,10 @@ is_help $script, <<'HERE', 'fatpacked code';
 How to run your script.
 
 Usage:
+
+    help.t [options]
+
+Options:
     --foo-bar  Foo can something
     --foo-2    foo_2 can something else
  *  --foo-3    foo_3 can also something

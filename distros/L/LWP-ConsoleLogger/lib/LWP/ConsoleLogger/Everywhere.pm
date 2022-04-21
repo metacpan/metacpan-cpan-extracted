@@ -2,7 +2,7 @@ package LWP::ConsoleLogger::Everywhere;
 use strict;
 use warnings;
 
-our $VERSION = '0.000043';
+our $VERSION = '0.000044';
 
 use Class::Method::Modifiers ();
 use LWP::ConsoleLogger::Easy qw( debug_ua );
@@ -72,7 +72,7 @@ LWP::ConsoleLogger::Everywhere - LWP tracing everywhere
 
 =head1 VERSION
 
-version 0.000043
+version 0.000044
 
 =head1 SYNOPSIS
 
@@ -94,6 +94,11 @@ version 0.000043
     $ENV{LWPCL_REDACT_HEADERS} = 'Authorization,Foo,Bar';
     $ENV{LWPCL_REDACT_PARAMS} = 'seekrit,password,credit_card';
 
+    # Or observe without changing your code
+    PERL5OPT="-MLWP::ConsoleLogger::Everywhere" carton install
+
+    perl -MLWP::ConsoleLogger::Everywhere my-script.pl
+
 =head1 DESCRIPTION
 
 This module turns on L<LWP::ConsoleLogger::Easy> debugging for every L<LWP::UserAgent> or L<Mojo::UserAgent>
@@ -104,6 +109,10 @@ anywhere in your code and it will work.
 You can access and configure the loggers individually after they have been created
 using the C<loggers> class method. To change all of them at once, use the C<set> class
 method instead.
+
+See
+L<https://www.olafalders.com/2021/12/01/observing-network-traffic-with-lwp-consolelogger-everywhere/>
+for a practical example of how to use this module.
 
 =head1 CLASS METHODS
 
@@ -161,7 +170,7 @@ Olaf Alders <olaf@wundercounter.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2014-2019 by MaxMind, Inc.
+This software is Copyright (c) 2014 by MaxMind, Inc.
 
 This is free software, licensed under:
 

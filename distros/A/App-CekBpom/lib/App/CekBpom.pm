@@ -8,9 +8,9 @@ use Log::ger;
 use Time::HiRes qw(time);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-04-05'; # DATE
+our $DATE = '2022-04-21'; # DATE
 our $DIST = 'App-CekBpom'; # DIST
-our $VERSION = '0.018'; # VERSION
+our $VERSION = '0.020'; # VERSION
 
 use Exporter qw(import);
 our @EXPORT_OK = qw(cek_bpom_products);
@@ -373,7 +373,7 @@ sub cek_bpom_products {
 }
 
 1;
-# ABSTRACT: Check BPOM products/manufacturers ("sarana") via the command-line (CLI interface for cekbpom.pom.go.id)
+# ABSTRACT: Check registered products & manufacturers (CLIs for cekbpom.pom.go.id)
 
 __END__
 
@@ -383,11 +383,11 @@ __END__
 
 =head1 NAME
 
-App::CekBpom - Check BPOM products/manufacturers ("sarana") via the command-line (CLI interface for cekbpom.pom.go.id)
+App::CekBpom - Check registered products & manufacturers (CLIs for cekbpom.pom.go.id)
 
 =head1 VERSION
 
-This document describes version 0.018 of App::CekBpom (from Perl distribution App-CekBpom), released on 2022-04-05.
+This document describes version 0.020 of App::CekBpom (from Perl distribution App-CekBpom), released on 2022-04-21.
 
 =head1 DESCRIPTION
 

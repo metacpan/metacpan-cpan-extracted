@@ -65,10 +65,9 @@ do { my $x = {
                                       'Try::Tiny' => '0',
                                       'Types::Common::Numeric' => '0',
                                       'Types::Standard' => '0',
-                                      'URI::Query' => '0',
                                       'URI::QueryParam' => '0',
                                       'XML::Simple' => '0',
-                                      'perl' => '5.013010',
+                                      'perl' => '5.016',
                                       'strict' => '0',
                                       'warnings' => '0'
                                     }
@@ -91,14 +90,14 @@ do { my $x = {
                                    'Plack::Handler::HTTP::Server::Simple' => '0.016',
                                    'Plack::Test' => '0',
                                    'Plack::Test::Agent' => '0',
-                                   'Test::FailWarnings' => '0',
                                    'Test::Fatal' => '0',
                                    'Test::LWP::UserAgent' => '0',
                                    'Test::More' => '0',
                                    'Test::Most' => '0',
+                                   'Test::Warnings' => '0',
                                    'URI::file' => '0',
                                    'WWW::Mechanize' => '0',
-                                   'perl' => '5.013010',
+                                   'perl' => '5.016',
                                    'version' => '0'
                                  }
                  }

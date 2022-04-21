@@ -11,9 +11,9 @@ use parent 'Perinci::CmdLine::PluginBase';
 
 # put global variables alphabetically here
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-04-15'; # DATE
+our $DATE = '2022-04-21'; # DATE
 our $DIST = 'Perinci-CmdLine-Lite'; # DIST
-our $VERSION = '1.918'; # VERSION
+our $VERSION = '1.920'; # VERSION
 
 sub meta {
     return {
@@ -52,7 +52,7 @@ Perinci::CmdLine::Plugin::Flow::Exit - Exit program
 
 =head1 VERSION
 
-This document describes version 1.918 of Perinci::CmdLine::Plugin::Flow::Exit (from Perl distribution Perinci-CmdLine-Lite), released on 2022-04-15.
+This document describes version 1.920 of Perinci::CmdLine::Plugin::Flow::Exit (from Perl distribution Perinci-CmdLine-Lite), released on 2022-04-21.
 
 =head1 SYNOPSIS
 

@@ -3,6 +3,8 @@ use warnings;
 use Test::More;
 use ExtUtils::CppGuess;
 
+delete $ENV{CXX};
+
 my @DATA = (
   [
     { os => 'MSWin32', cc => 'cl', config => {ccflags => ''} },

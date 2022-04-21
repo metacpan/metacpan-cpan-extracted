@@ -1,5 +1,8 @@
 Revision history for Alien::patchelf
 
+0.08 2022-04-21
+    - Share builds: Use ExtUtils::CppGuess to check for c++17 support
+
 0.07 2022-04-16
     - Share builds:
       - also check for g++ in c++17 fallback

@@ -8,7 +8,7 @@ use LWP::ConsoleLogger ();
 use LWP::UserAgent     ();
 use Path::Tiny qw( path );
 use Test::Fatal qw( exception );
-use Test::Most;
+use Test::Most import => [qw( diag done_testing is ok )];
 use URI::file      ();
 use WWW::Mechanize ();
 

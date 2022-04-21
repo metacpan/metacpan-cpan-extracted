@@ -151,8 +151,8 @@ struct spvm_env {
   void* (*new_pointer)(SPVM_ENV* env, int32_t basic_type_id, void* pointer);
   void* (*concat_raw)(SPVM_ENV* env, void* string1, void* string2);
   void* (*concat)(SPVM_ENV* env, void* string1, void* string2);
-  void* (*new_stack_trace_raw)(SPVM_ENV* env, void* exception, const char* class_name, const char* method_name, const char* file, int32_t line);
-  void* (*new_stack_trace)(SPVM_ENV* env, void* exception, const char* class_name, const char* method_name, const char* file, int32_t line);
+  void* (*new_stack_trace_raw)(SPVM_ENV* env, void* exception, int32_t method_id, int32_t line);
+  void* (*new_stack_trace)(SPVM_ENV* env, void* exception, int32_t method_id, int32_t line);
   int32_t (*length)(SPVM_ENV* env, void* array);
   int8_t* (*get_elems_byte)(SPVM_ENV* env, void* array);
   int16_t* (*get_elems_short)(SPVM_ENV* env, void* array);
@@ -287,6 +287,10 @@ struct spvm_env {
   int32_t (*can_assign_array_element)(SPVM_ENV* env, void* array, void* element);
   SPVM_ENV_API* api;
   void (*free_env_prepared)(SPVM_ENV* env);
+  int32_t (*get_method_id_cache)(SPVM_ENV* env, const char* method_cache_name, int32_t method_cache_name_length);
+  int32_t (*get_field_id_cache)(SPVM_ENV* env, const char* field_cache_name, int32_t field_cache_name_length);
+  int32_t (*get_class_var_id_cache)(SPVM_ENV* env, const char* class_var_cache_name, int32_t class_var_cache_name_length);
+  void* allocator;
 };
 
 
@@ -317,7 +321,8 @@ struct spvm_env_runtime {
   int32_t (*get_type_is_ref)(void* runtime, int32_t type_id);
   int32_t (*get_class_id_by_name)(void* runtime, const char* class_name);
   int32_t (*get_class_name_id)(void* runtime, int32_t class_id);
-  int32_t (*get_class_module_file_id)(void* runtime, int32_t class_id);
+  int32_t (*get_class_module_rel_file_id)(void* runtime, int32_t class_id);
+  int32_t (*get_class_module_dir_id)(void* runtime, int32_t class_id);
   int32_t (*get_class_is_anon)(void* runtime, int32_t class_id);
   int32_t (*get_class_fields_base_id)(void* runtime, int32_t class_id);
   int32_t (*get_class_fields_length)(void* runtime, int32_t class_id);

@@ -3,6 +3,15 @@ use strict;
 use warnings;
 use List::Util qw/min max sum/;
 require Dumbbench;
+
+BEGIN {
+	eval {
+		require SOOT;
+		SOOT->import( ':all' );
+		1;
+		} or die "You need the SOOT module to use Dumbbench::BoxPlot.\nThis is not an easy installation, which is why we don't require it.\n";
+	}
+
 use SOOT qw/:all/;
 
 use Class::XSAccessor {

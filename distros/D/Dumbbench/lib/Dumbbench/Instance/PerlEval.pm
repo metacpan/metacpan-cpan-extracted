@@ -13,7 +13,7 @@ package Dumbbench::Instance::PerlEval;
 use strict;
 use warnings;
 use Carp ();
-use Time::HiRes ();
+use Time::HiRes qw(clock_gettime CLOCK_MONOTONIC);
 
 use Dumbbench::Instance;
 use parent 'Dumbbench::Instance';
@@ -111,9 +111,9 @@ sub _run {
     #my $start;
     #my $tbase = Time::HiRes::time();
     #while ( ($start = Time::HiRes::time()) <= $tbase+1.e-15 ) {} # wait for clock tick. See discussion in Benchmark.pm comments
-    my $start = Time::HiRes::time();
+    my $start = clock_gettime(CLOCK_MONOTONIC);
     Dumbbench::Instance::PerlEval::_Lexical::doeval($n, \$code);
-    my $end = Time::HiRes::time();
+    my $end = clock_gettime(CLOCK_MONOTONIC);
 
     $duration = $end-$start;
     if ($duration > TOO_SMALL) {

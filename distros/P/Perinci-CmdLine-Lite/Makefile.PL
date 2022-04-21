@@ -53,10 +53,10 @@ my %WriteMakefileArgs = (
     "Perinci::Result::Format::Lite" => "0.286",
     "Perinci::Sub::Complete" => "0.935",
     "Perinci::Sub::GetArgs::Argv" => "0.846",
-    "PerlIO::locale" => 0,
     "Progress::Any::Output" => 0,
     "Progress::Any::Output::TermProgressBarColor" => "0.17",
     "Scalar::Util" => 0,
+    "ShellQuote::Any::Tiny" => 0,
     "Text::ParseWords" => 0,
     "parent" => 0,
     "strict" => 0,
@@ -70,7 +70,7 @@ my %WriteMakefileArgs = (
     "Test::Perinci::CmdLine" => "1.480",
     "YAML::Old" => 0
   },
-  "VERSION" => "1.918",
+  "VERSION" => "1.920",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -109,10 +109,10 @@ my %FallbackPrereqs = (
   "Perinci::Result::Format::Lite" => "0.286",
   "Perinci::Sub::Complete" => "0.935",
   "Perinci::Sub::GetArgs::Argv" => "0.846",
-  "PerlIO::locale" => 0,
   "Progress::Any::Output" => 0,
   "Progress::Any::Output::TermProgressBarColor" => "0.17",
   "Scalar::Util" => 0,
+  "ShellQuote::Any::Tiny" => 0,
   "Test::More" => "0.98",
   "Test::Perinci::CmdLine" => "1.480",
   "Text::ParseWords" => 0,
@@ -131,6 +131,10 @@ unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {
 
 delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
   unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
+
+if ( $^O eq 'MSWin32' ) {
+	$WriteMakefileArgs{PREREQ_PM}{'Browser::Find::Windows'} = $FallbackPrereqs{'Browser::Find::Windows'} = '0';
+}
 
 WriteMakefile(%WriteMakefileArgs);
 

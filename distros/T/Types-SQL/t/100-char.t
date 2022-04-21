@@ -21,6 +21,7 @@ subtest 'no size' => sub {
     is_deeply \%info => {
         data_type  => 'char',
         is_numeric => 0,
+        size       => 1,
       },
       'column_info'
       or note( explain \%info );

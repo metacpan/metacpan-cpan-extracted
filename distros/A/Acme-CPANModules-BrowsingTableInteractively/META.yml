@@ -19,14 +19,14 @@ name: Acme-CPANModules-BrowsingTableInteractively
 provides:
   Acme::CPANModules::BrowsingTableInteractively:
     file: lib/Acme/CPANModules/BrowsingTableInteractively.pm
-    version: '0.006'
+    version: '0.007'
 requires:
   strict: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-BrowsingTableInteractively
   homepage: https://metacpan.org/release/Acme-CPANModules-BrowsingTableInteractively
   repository: git://github.com/perlancar/perl-Acme-CPANModules-BrowsingTableInteractively.git
-version: '0.006'
+version: '0.007'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

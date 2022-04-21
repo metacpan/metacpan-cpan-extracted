@@ -4,25 +4,24 @@ use warnings;
 use 5.006;
 
 package LWP::ConsoleLogger;
-our $VERSION = '0.000043';
+our $VERSION = '0.000044';
 use Data::Printer { end_separator => 1, hash_separator => ' => ' };
-use DateTime qw();
-use HTML::Restrict qw();
-use HTTP::Body ();
-use HTTP::CookieMonster qw();
+use DateTime            ();
+use HTML::Restrict      ();
+use HTTP::Body          ();
+use HTTP::CookieMonster ();
 use JSON::MaybeXS qw( decode_json );
 use List::AllUtils qw( any apply none );
-use Log::Dispatch qw();
+use Log::Dispatch ();
 use Moo;
 use MooX::StrictConstructor;
 use Parse::MIME qw( parse_mime_type );
 use Ref::Util qw( is_blessed_ref );
-use Term::Size::Any qw( chars );
-use Text::SimpleTable::AutoWidth 0.09 qw();
+use Term::Size::Any ();
+use Text::SimpleTable::AutoWidth 0.09 ();
 use Try::Tiny qw( catch try );
 use Types::Common::Numeric qw( PositiveInt );
 use Types::Standard qw( ArrayRef Bool CodeRef InstanceOf );
-use URI::Query qw();
 use URI::QueryParam qw();
 use XML::Simple qw( XMLin );
 
@@ -226,10 +225,10 @@ sub _log_headers {
     $t->captions( [ ucfirst $type . ' Header', 'Value' ] );
 
     foreach my $name ( sort $headers->header_field_names ) {
-        my $val = (
-            any { $name eq $_ }
-            @{ $self->headers_to_redact }
-        ) ? '[REDACTED]' : $headers->header($name);
+        my $val
+            = ( any { $name eq $_ } @{ $self->headers_to_redact } )
+            ? '[REDACTED]'
+            : $headers->header($name);
         $t->row( $name, $val );
     }
 
@@ -280,10 +279,9 @@ sub _log_params {
     my $t = Text::SimpleTable::AutoWidth->new();
     $t->captions( [ 'Key', 'Value' ] );
     foreach my $name ( sort keys %params ) {
-        my @values = (
-            any { $name eq $_ }
-            @{ $self->params_to_redact }
-            ) ? '[REDACTED]'
+        my @values
+            = ( any { $name eq $_ } @{ $self->params_to_redact } )
+            ? '[REDACTED]'
             : ref $params{$name} ? @{ $params{$name} }
             :                      $params{$name};
 
@@ -364,8 +362,7 @@ sub _get_content {
     my ( $type, $subtype ) = apply { lc $_ } parse_mime_type($content_type);
     if (
         ( $type ne 'text' )
-        && (
-            none { $_ eq $subtype }
+        && ( none { $_ eq $subtype }
             ( 'javascript', 'html', 'json', 'xml', 'x-www-form-urlencoded', )
         )
         && $subtype !~ m{$json_regex}
@@ -556,7 +553,7 @@ LWP::ConsoleLogger - LWP tracing and debugging
 
 =head1 VERSION
 
-version 0.000043
+version 0.000044
 
 =head1 SYNOPSIS
 
@@ -898,7 +895,7 @@ Olaf Alders <olaf@wundercounter.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2014-2019 by MaxMind, Inc.
+This software is Copyright (c) 2014 by MaxMind, Inc.
 
 This is free software, licensed under:
 

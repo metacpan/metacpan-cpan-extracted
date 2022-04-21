@@ -30,7 +30,7 @@ use Carp;
 use 5.008;
 # major.minor.bugfix, the latter two with 3 digits each
 # or major.minor_alpha
-our $VERSION = '4.000002';
+our $VERSION = '4.000003';
 $VERSION = eval $VERSION;
 our %features = qw(array 1 hash 1);
 
@@ -2140,6 +2140,7 @@ sub INT_apply_op
 
 	if($self->{type}{$_[0]} == $scalar)
 	{
+		no warnings 'numeric';
 		my $par = \$self->{param}{$_[0]}; # scalar ref
 		if   ($_[1] eq  '='){ $$par  = $_[2]; }
 		elsif($_[1] eq '.='){ $$par .= $_[2]; }
@@ -2782,7 +2783,7 @@ a man page.
 =back
 
 
-=head2 configuration file parsing
+=head2 Configuration file parsing
 
 The module also introduces a simple but flexible configuration file facility. Configuration means simply setting the same parameters that are available to the command line.
 
@@ -3566,7 +3567,7 @@ Thomas Orgis <thomas@orgis.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2004-2021, Thomas Orgis.
+Copyright (C) 2004-2022, Thomas Orgis.
 
 This module is free software; you
 can redistribute it and/or modify it under the same terms

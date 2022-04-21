@@ -4,8 +4,8 @@ use warnings;
 use LWP::ConsoleLogger::Easy qw( debug_ua );
 use LWP::UserAgent ();
 use Path::Tiny qw( path );
-use Test::FailWarnings;
-use Test::More;
+use Test::Warnings;
+use Test::More import => [qw( done_testing is )];
 
 my $mech = LWP::UserAgent->new;
 debug_ua($mech);

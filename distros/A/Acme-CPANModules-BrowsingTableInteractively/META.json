@@ -61,7 +61,7 @@
    "provides" : {
       "Acme::CPANModules::BrowsingTableInteractively" : {
          "file" : "lib/Acme/CPANModules/BrowsingTableInteractively.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       }
    },
    "release_status" : "stable",
@@ -76,7 +76,7 @@
          "web" : "https://github.com/perlancar/perl-Acme-CPANModules-BrowsingTableInteractively"
       }
    },
-   "version" : "0.006",
+   "version" : "0.007",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

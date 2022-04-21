@@ -13,7 +13,7 @@ use constant SUB_NAME_IS_AVAILABLE => $INC{'App/FatPacker/Trace.pm'}
 our $INSTANTIATING = 0;
 our $PERLDOC       = 'perldoc';
 our $SUBCMD_PREFIX = 'command';
-our $VERSION = '0.22';
+our $VERSION = '0.23';
 my $ANON = 0;
 
 sub app {
@@ -165,24 +165,36 @@ sub print_help {
   my $width   = 0;
   my %notes;
 
-  $self->_print_synopsis;
-
-OPTION:
   for my $option (@options) {
     my $length = length($option->{name} || '');
     $width = $length if $width < $length;
   }
 
-  print "Usage:\n";
+  # subcommand help?
+  if ($self->{subcommand}) {
+    print "Usage:\n";
+    print "\n    ", File::Basename::basename($0), " ", $self->{subcommand}, " [options]\n";
+  }
 
-  if (%{$self->{subcommands} || {}}) {
+  # top level help with subcommands?
+  elsif (%{$self->{subcommands} || {}}) {
+    $self->_print_synopsis;
+    print "Usage:\n";
     my $subcmds = [sort { $a->{name} cmp $b->{name} } values %{$self->{subcommands}}];
     my ($width) = sort { $b <=> $a } map { length($_->{name}) } @$subcmds;
     print "\n    ", File::Basename::basename($0), " [command] [options]\n";
     print "\nCommands:\n";
     printf("    %-${width}s  %s\n", @{$_}{'name', 'desc'}) for @$subcmds;
-    print "\nOptions:\n";
   }
+
+  # top level help, no subcommands
+  else {
+    $self->_print_synopsis;
+    print "Usage:\n";
+    print "\n    ", File::Basename::basename($0), " [options]\n";
+  }
+
+  print "\nOptions:\n";
 
   $width += 2;
 
@@ -263,8 +275,8 @@ sub _calculate_option_spec {
   elsif ($option->{type} =~ /^str/)            { $spec .= '=s' }
   elsif ($option->{type} =~ /^int/i)           { $spec .= '=i' }
   elsif ($option->{type} =~ /^num/i)           { $spec .= '=f' }
-  elsif ($option->{type} =~ /^file/)           { $spec .= '=s' }                                                  # TODO
-  elsif ($option->{type} =~ /^dir/)            { $spec .= '=s' }                                                  # TODO
+  elsif ($option->{type} =~ /^file/)           { $spec .= '=s' }    # TODO
+  elsif ($option->{type} =~ /^dir/)            { $spec .= '=s' }    # TODO
   else                                         { die 'Usage: option {bool|flag|inc|str|int|num|file|dir} ...' }
 
   # Let Types::Type handle the validation
@@ -286,7 +298,7 @@ sub _default_options {
 
   push @default, {name => 'help',    documentation => 'Print this help text'};
   push @default, {name => 'man',     documentation => 'Display manual for this application'} if $self->documentation;
-  push @default, {name => 'version', documentation => 'Print application name and version'} if $self->version;
+  push @default, {name => 'version', documentation => 'Print application name and version'}  if $self->version;
 
   return [map { $_->{type} = 'bool'; $_->{arg} = $_->{name}; $_ } @default];
 }
@@ -415,8 +427,8 @@ sub _print_synopsis {
   my $FH = $self->_documentation_class_handle($documentation, $classpath);
 
   while (<$FH>) {
-    last  if $print and /^=(?:cut|head1)/;
-    print if $print;
+    last       if $print and /^=(?:cut|head1)/;
+    print      if $print;
     $print = 1 if /^=head1 SYNOPSIS/;
   }
 }
@@ -465,7 +477,7 @@ Applify - Write object oriented scripts with ease
 
 =head1 VERSION
 
-0.22
+0.23
 
 =head1 DESCRIPTION
 

@@ -1,3 +1,15 @@
+0.020   2022-04-21  Released-By: PERLANCAR; Urgency: medium
+
+        - Add script: cek-bpom-products-browser.
+
+
+0.019   2022-04-05  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - Tweak Abstract.
+
+
 0.018   2022-04-05  Released-By: PERLANCAR; Urgency: medium
 
         - Mark the use of --get-product-detail option in filename.
@@ -5,8 +17,8 @@
 
 0.017   2022-01-23  Released-By: PERLANCAR; Urgency: medium
 
-	- Adjust with Perinci::Result::Format::Lite 0.285 & Rinci 1.1.100
-          ('title' result metadata property becomes 'caption').
+	- Adjust to Perinci::Result::Format::Lite 0.285 & Rinci 1.1.100 ('title'
+          result metadata property becomes 'caption').
 
 
 0.016   2021-12-09  Released-By: PERLANCAR; Urgency: medium

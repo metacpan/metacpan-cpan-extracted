@@ -3,14 +3,14 @@ package LWP::ConsoleLogger::Easy;
 use strict;
 use warnings;
 
-our $VERSION = '0.000043';
+our $VERSION = '0.000044';
 
-use HTTP::Request;
-use HTTP::Response;
-use LWP::ConsoleLogger;
+use HTTP::Request      ();
+use HTTP::Response     ();
+use LWP::ConsoleLogger ();
 use Module::Load::Conditional qw( can_load );
 use Sub::Exporter -setup => { exports => ['debug_ua'] };
-use String::Trim;
+use String::Trim qw( trim );
 
 my %VERBOSITY = (
     dump_content => 8,
@@ -116,7 +116,7 @@ LWP::ConsoleLogger::Easy - Easy LWP tracing and debugging
 
 =head1 VERSION
 
-version 0.000043
+version 0.000044
 
 =head1 SYNOPSIS
 
@@ -245,7 +245,7 @@ Olaf Alders <olaf@wundercounter.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2014-2019 by MaxMind, Inc.
+This software is Copyright (c) 2014 by MaxMind, Inc.
 
 This is free software, licensed under:
 

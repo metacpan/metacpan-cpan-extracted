@@ -1243,17 +1243,15 @@ Do the same as C<concat_raw>, and add the created string object to the mortal st
 
 =head2 new_stack_trace_raw
 
-  void* (*new_stack_trace_raw)(SPVM_ENV* env, void* exception, const char* class_name, const char* method_name, const char* file, int32_t line);
+  void* (*new_stack_trace_raw)(SPVM_ENV* env, void* exception, int32_t method_id, int32_t line);
 
-If you specify a byte[] type exception message and a class name, method name, file name and line number, the character string of the class name, method name, file name and line number is added to the end of the byte[] type exception message. The added character string will be returned.
-
-This function does not add objects to the mortal stack, use new_stack_trace to avoid memory leaks for normal use.
+Create a string object that represents a stack trace by adding the file and line the method is called to the end of the exception message.
 
 =head2 new_stack_trace
 
-  void* (*new_stack_trace)(SPVM_ENV* env, void* exception, const char* class_name, const char* method_name, const char* file, int32_t line);
+  void* (*new_stack_trace)(SPVM_ENV* env, void* exception, int32_t method_id, int32_t line);
 
-When a byte[] type exception message and a class name, method name, file name and line number are specified, the string of the class name, method name, file name and line number is added to the end of the string type exception message. Returns a new string type object. Add the newly created object to the mortal stack.
+Same as L</"new_stack_trace_raw">, and push the created object to the mortal stack.
 
 =head2 length
 
@@ -1819,19 +1817,19 @@ Specifying the address of the object releases the weak reference to the object.
 
   void* (*alloc_memory_block_zero)(SPVM_ENV* env, int64_t byte_size);
 
-If you specify the size in bytes, the memory block is allocated and the pointer of the allocated memory block is returned. If fail to alloc memory, return NULL. If success, all bits in the memory block are initialized with 0 and the memory block count (memory_blocks_count)is incremented by 1.
+If you specify the size in bytes, the memory block is allocated and the pointer of the allocated memory block is returned. If fail to alloc memory, return NULL. If success, all bits in the memory block are initialized with C<0> and the memory block count (memory_blocks_count)is incremented by C<1>.
 
 =head2 free_memory_block
 
   void (*free_memory_block)(SPVM_ENV* env, void* block);
 
-If block is not NULL, free the memory and memory blocks count(memory_blocks_count) is decremented by 1.
+If block is not NULL, free the memory and memory blocks count(memory_blocks_count) is decremented by C<1>.
 
 =head2 get_memory_blocks_count
 
   int32_t (*get_memory_blocks_count)(SPVM_ENV* env);
 
-Returns the current number of memory blocks.
+Returns the current number of memory blocks of thie environment.
 
 The memory block is increased by 1 when an object is created, when the alloc_memory_block_zero function is called, and when a back reference is added by the weaken function.
 

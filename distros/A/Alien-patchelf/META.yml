@@ -3,12 +3,15 @@ abstract: 'Alien package for the patchelf utility'
 author:
   - 'Shawn Laffan <shawnlaffan@gmail.com>'
 build_requires:
+  Alien::Autotools: '0'
   Alien::Build: '2.25'
   Alien::Build::MM: '1.41'
   Alien::Build::Plugin::Download::Git: '0'
-  Capture::Tiny: '0'
+  Alien::git: '0'
+  Config: '0'
+  ExtUtils::CppGuess: '0.25'
   ExtUtils::MakeMaker: '6.52'
-  File::Which: '0'
+  Sort::Versions: '0'
   Test::Alien: '0'
 configure_requires:
   Alien::Build: '2.25'
@@ -17,11 +20,10 @@ configure_requires:
   Alien::Build::Plugin::Extract::Directory: '0.65'
   Alien::Build::Plugin::Fetch::Git: '0.01'
   Alien::Build::Plugin::Prefer::SortVersions: '0.65'
-  Capture::Tiny: '0'
+  ExtUtils::CppGuess: '0.25'
   ExtUtils::MakeMaker: '6.52'
-  File::Which: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -38,7 +40,7 @@ requires:
 resources:
   bugtracker: https://github.com/PerlAlien/Alien-patchelf/issues/
   repository: https://github.com/PerlAlien/Alien-patchelf
-version: '0.07'
+version: '0.08'
 x_alienfile:
   generated_by: 'Alien::Build::MM version 2.48'
   requires:

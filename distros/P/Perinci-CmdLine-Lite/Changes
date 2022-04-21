@@ -1,3 +1,21 @@
+1.920   2022-04-21  Released-By: PERLANCAR; Urgency: medium
+
+        - Use Browser::Find::Windows to set a default viewer on Windows.
+
+        - [bugfix] Quote program name too when executing command (e.g. on
+          Windows a program's path often contains spaces, e.g. "C:/Program
+          Files/Mozilla Firefox/firefox.exe").
+
+        - [dist] [bugfix] Add missing dependency to ShellQuote::Any::Tiny
+          which was once embedded.
+
+
+1.919   2022-04-21  Released-By: PERLANCAR; Urgency: medium
+
+        - Move dependeny PerlIO::locale from RuntimeRequires to
+          RuntimeRecommends to work around installation problem on Windows.
+
+
 1.918   2022-04-15  Released-By: PERLANCAR; Urgency: medium
 
         - Add basic support for --format=vd. This is currently the most basic

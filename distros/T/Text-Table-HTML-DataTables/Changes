@@ -1,3 +1,8 @@
+0.011   2022-03-22  Released-By: PERLANCAR; Urgency: medium
+
+        - Add option 'library_link_mode'.
+
+
 0.010   2022-01-23  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
 
 	- [incompatible change] Rename 'title' option to 'caption'.

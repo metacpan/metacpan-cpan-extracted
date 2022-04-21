@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-01-23'; # DATE
+our $DATE = '2022-03-22'; # DATE
 our $DIST = 'Text-Table-HTML-DataTables'; # DIST
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '0.011'; # VERSION
 
 sub _encode {
     state $load = do { require HTML::Entities };
@@ -20,17 +20,16 @@ sub _escape_uri {
 }
 
 sub table {
-    require File::ShareDir;
     require HTML::Entities;
     require JSON::PP;
 
     my %params = @_;
     my $rows = $params{rows} or die "Must provide rows!";
     my $default_length = int($params{default_length} // 1000);
+    my $library_link_mode = $params{library_link_mode} //
+        $ENV{PERL_TEXT_TABLE_HTML_DATATABLES_OPT_LIBRARY_LINK_MODE} // 'local';
 
     my $max_index = _max_array_index($rows);
-
-    my $dist_dir = File::ShareDir::dist_dir('Text-Table-HTML-DataTables');
 
     # here we go...
     my @table;
@@ -40,9 +39,37 @@ sub table {
     push @table, "<head>\n";
 
     push @table, qq(<title>).HTML::Entities::encode_entities($params{caption}).qq(</title>\n) if defined $params{caption};
-    push @table, qq(<link rel="stylesheet" type="text/css" href="file://)._escape_uri("$dist_dir/datatables-1.10.22/datatables.css").qq(">\n);
-    push @table, qq(<script src="file://)._escape_uri("$dist_dir/jquery-2.2.4/jquery-2.2.4.min.js").qq("></script>\n);
-    push @table, qq(<script src="file://)._escape_uri("$dist_dir/datatables-1.10.22/datatables.js").qq("></script>\n);
+
+    my $jquery_ver = '2.2.4';
+    my $datatables_ver = '1.10.22';
+    if ($library_link_mode eq 'embed') {
+        require File::ShareDir;
+        require File::Slurper;
+        my $dist_dir = File::ShareDir::dist_dir('Text-Table-HTML-DataTables');
+        my $path;
+
+        $path = "$dist_dir/datatables-$datatables_ver/datatables.css";
+        -r $path or die "Can't embed $path: $!";
+        push @table, "<!-- embedding datatables.css -->\n<style>\n", File::Slurper::read_text($path), "\n</style>\n\n";
+
+        $path = "$dist_dir/jquery-$jquery_ver/jquery-$jquery_ver.min.js";
+        -r $path or die "Can't embed $path: $!";
+        push @table, "<!-- embedding jquery.js -->\n<script>\n", File::Slurper::read_text($path), "\n</script>\n\n";
+
+
+        $path = "$dist_dir/datatables-$datatables_ver/datatables.js";
+        -r $path or die "Can't embed $path: $!";
+        push @table, "<!-- embedding datatables.js -->\n<script>\n", File::Slurper::read_text($path), "\n</script>\n\n";
+
+    } elsif ($library_link_mode eq 'local') {
+        require File::ShareDir;
+        my $dist_dir = File::ShareDir::dist_dir('Text-Table-HTML-DataTables');
+        push @table, qq(<link rel="stylesheet" type="text/css" href="file://)._escape_uri("$dist_dir/datatables-$datatables_ver/datatables.css").qq(">\n);
+        push @table, qq(<script src="file://)._escape_uri("$dist_dir/jquery-$jquery_ver/jquery-$jquery_ver.min.js").qq("></script>\n);
+        push @table, qq(<script src="file://)._escape_uri("$dist_dir/datatables-$datatables_ver/datatables.js").qq("></script>\n);
+    } else {
+        die "Unknown value for the 'library_link_mode' option: '$library_link_mode', please use one of local|embed";
+    }
 
     push @table, '<script>';
     my $dt_opts = {
@@ -129,7 +156,7 @@ Text::Table::HTML::DataTables - Generate HTML table with jQuery and DataTables p
 
 =head1 VERSION
 
-This document describes version 0.010 of Text::Table::HTML::DataTables (from Perl distribution Text-Table-HTML-DataTables), released on 2022-01-23.
+This document describes version 0.011 of Text::Table::HTML::DataTables (from Perl distribution Text-Table-HTML-DataTables), released on 2022-03-22.
 
 =head1 SYNOPSIS
 
@@ -206,7 +233,26 @@ Optional. Str. If set, will output a HTML C<< <title> >> element in the HTML
 head as well as table C<< <caption> >> element in the HTML body containing the
 provided caption. The caption will be HTML-encoded.
 
+=item * default_length
+
+Integer, defaults to 1000. Set the default page size.
+
+=item * library_link_mode
+
+Str, defaults to C<local>. Instructs how to link or embed the JavaScript
+libraries in the generated HTML page. Valid values include: C<local> (the HTML
+will link to the local filesystem copy of the libraries, e.g. in the shared
+distribution directory), C<cdn> (not yet implemented, the HTML will link to the
+CDN version of the libraries), C<embed> (the HTML will embed the libraries
+directly).
+
 =back
+
+=head1 ENVIRONMENT
+
+=head2 PERL_TEXT_TABLE_HTML_DATATABLES_OPT_LIBRARY_LINK_MODE
+
+String. Used to set the default for the C<library_link_mode> option.
 
 =head1 HOMEPAGE
 
@@ -247,7 +293,7 @@ beyond that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2020, 2016 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2021, 2020, 2016 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,10 +1,10 @@
 NAME
-    App::CekBpom - Check BPOM products/manufacturers ("sarana") via the
-    command-line (CLI interface for cekbpom.pom.go.id)
+    App::CekBpom - Check registered products & manufacturers (CLIs for
+    cekbpom.pom.go.id)
 
 VERSION
-    This document describes version 0.018 of App::CekBpom (from Perl
-    distribution App-CekBpom), released on 2022-04-05.
+    This document describes version 0.020 of App::CekBpom (from Perl
+    distribution App-CekBpom), released on 2022-04-21.
 
 DESCRIPTION
     See included script cek-bpom-products and cek-bpom-manufacturers.

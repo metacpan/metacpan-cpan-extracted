@@ -3,7 +3,7 @@ use utf8;
 use ExtUtils::MakeMaker;
 my %WriteMakefileArgs = (
   NAME           => 'Applify',
-  AUTHOR         => 'Jan Henning Thorsen <jhthorsen@cpan.org>',
+  AUTHOR         => 'Diab Jerius <djerius@cfa.harvard.edu>',
   LICENSE        => 'artistic_2',
   ABSTRACT_FROM  => 'lib/Applify.pm',
   VERSION_FROM   => 'lib/Applify.pm',

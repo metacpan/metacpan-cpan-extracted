@@ -4,7 +4,7 @@ use warnings;
 use Carp ();
 use Time::HiRes ();
 
-our $VERSION = '0.501';
+our $VERSION = '0.503';
 
 require Dumbbench::Result;
 require Dumbbench::Stats;
@@ -258,7 +258,7 @@ sub report {
         scalar(@{$instance->timings})-$result->nsamples
       );
       printf(
-        "%sRounded run time per iteration: %s (%.1f%%)\n",
+        "%sRounded run time per iteration (seconds): %s (%.1f%%)\n",
         $name,
         $result_str,
         $sigma/$mean*100
@@ -275,8 +275,7 @@ sub report {
 
 sub box_plot {
   my $self = shift;
-  eval "require Dumbbench::BoxPlot;";
-  return() if $@;
+  require Dumbbench::BoxPlot;
 
   return Dumbbench::BoxPlot->new($self);
 }
@@ -303,7 +302,7 @@ This will start churning for a while and then prints something like:
 
   Ran 23 iterations of the command.
   Rejected 3 samples as outliers.
-  Rounded run time per iteration: 9.519e-01 +/- 3.7e-03 (0.4%)
+  Rounded run time per iteration (seconds): 9.519e-01 +/- 3.7e-03 (0.4%)
 
 As a module:
 
@@ -398,7 +397,9 @@ method for accessing the numeric benchmark results.
 
 =head2 box_plot
 
-Returns a L<Dumbbench::BoxPlot> instance.
+Returns a L<Dumbbench::BoxPlot> instance. Note that you need L<SOOT>
+installed to use that module, but this does not require it as a
+prerequisite since it's not a trivial installation.
 
 A L<Dumbbench::BoxPlot> is a nice an easy way to get a graphic chart if
 you're in the mood instead of getting the same results from C<report>.
@@ -406,7 +407,7 @@ you're in the mood instead of getting the same results from C<report>.
 If you don't want to get into the details of L<Dumbbench::BoxPlot>, you can do:
 
   # $bench is your Dumbbench instance
-  $bench->box_plot->show;
+  eval { $bench->box_plot->show };
 
 =head1 HOW IT WORKS AND WHY IT DOESN'T
 

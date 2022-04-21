@@ -6,6 +6,7 @@ use Alien::patchelf;
 
 UTILITY:
 {
+    diag 'Testing Alien::patchelf version: ' . Alien::patchelf->version;
     my ($result, $stderr, $exit) = Alien::patchelf->patchelf ("--help");
     like ($stderr, qr{^syntax\:\s.*patchelf},
         'Got expected first line from patchelf utility');

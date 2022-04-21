@@ -5,7 +5,7 @@ use strict;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2022-04-15'; # DATE
 our $DIST = 'Acme-CPANModules-BrowsingTableInteractively'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 our $LIST = {
     summary => 'List of modules/tools for browsing table data interactively',
@@ -19,7 +19,7 @@ a favorite choice for writing tools these days. That said, Perl is still a great
 glue to help make those tools work together better for you.
 
 
-1) *Visidata*, <https://www.visidata.org>
+1) **Visidata**, <https://www.visidata.org>
 
 This is currently my favorite. It's terminal-based, written in Python, and has
 more features than any other tools currently written in Perl, by far. vd has
@@ -43,7 +43,7 @@ has support for Visidata. You can specify command-line option `--format=vd` to
 browse the output of your CLI program in Visidata.
 
 
-2) *DataTables*, L<https://datatables.net>
+2) **DataTables**, <https://datatables.net>
 
 DataTables is a JavaScript (jQuery-based) library to add controls to your HTML
 table so you can filter rows incrementally, sort rows, reorder columns, and so
@@ -59,7 +59,7 @@ also has support for DataTables. You can specify command-line option
 output in browser.
 
 
-3) *Tickit::Widget::Table*, <pm:Tickit::Widget::Table>
+3) **Tickit::Widget::Table**, <pm:Tickit::Widget::Table>
 
 This module lets you browse the table in a terminal. Using the <pm:Tickit>
 library, the advantages it's supposed to have is mouse support. It's still very
@@ -68,7 +68,7 @@ columns will be the same. There's no horizontal scrolling support or a way to
 see long text in a column. Not updated since 2016.
 
 
-4) *Term::TablePrint*, <pm:Term::TablePrint>
+4) **Term::TablePrint**, <pm:Term::TablePrint>
 
 This module lets you browse the table in a terminal. Provides roughly the same
 features like Tickit::Widget::Table with an extra one: you can press Enter on a
@@ -79,10 +79,10 @@ There is currently no support beyond the most basic stuffs, so no column hiding,
 reordering, etc.
 
 
-5) *less*
+5) **less**
 
-Don't forget this good ol' Unix pager. You can render your table data as an
-ASCII table (using modules like <pm:Text::Table::More>, <pm:Text::ANSITable>, or
+Don't forget the good ol' Unix pager. You can render your table data as an ASCII
+table (using modules like <pm:Text::Table::More>, <pm:Text::ANSITable>, or
 <pm:Text::Table::Any> for more formats to choose from) then pipe the output to
 it. At least with *less* you can scroll horizontally or perform incremental
 searching (though not interactive filtering of rows).
@@ -118,7 +118,7 @@ Acme::CPANModules::BrowsingTableInteractively - List of modules/tools for browsi
 
 =head1 VERSION
 
-This document describes version 0.006 of Acme::CPANModules::BrowsingTableInteractively (from Perl distribution Acme-CPANModules-BrowsingTableInteractively), released on 2022-04-15.
+This document describes version 0.007 of Acme::CPANModules::BrowsingTableInteractively (from Perl distribution Acme-CPANModules-BrowsingTableInteractively), released on 2022-04-15.
 
 =head1 DESCRIPTION
 
@@ -129,7 +129,7 @@ Let me say first that the best tools are not Perl-based since sadly Perl is not
 a favorite choice for writing tools these days. That said, Perl is still a great
 glue to help make those tools work together better for you.
 
-1) I<Visidata>, L<https://www.visidata.org>
+1) B<Visidata>, L<https://www.visidata.org>
 
 This is currently my favorite. It's terminal-based, written in Python, and has
 more features than any other tools currently written in Perl, by far. vd has
@@ -152,7 +152,7 @@ My CLI framework L<Perinci::CmdLine> (L<Perinci::CmdLine::Lite>, v1.918+)
 has support for Visidata. You can specify command-line option C<--format=vd> to
 browse the output of your CLI program in Visidata.
 
-2) I<DataTables>, LL<https://datatables.net>
+2) B<DataTables>, L<https://datatables.net>
 
 DataTables is a JavaScript (jQuery-based) library to add controls to your HTML
 table so you can filter rows incrementally, sort rows, reorder columns, and so
@@ -167,7 +167,7 @@ C<--format=html+datatables> to output your CLI program's result as HTML table
 (using L<Text::Table::HTML::DataTables>) when possible and then browse the
 output in browser.
 
-3) I<Tickit::Widget::Table>, L<Tickit::Widget::Table>
+3) B<Tickit::Widget::Table>, L<Tickit::Widget::Table>
 
 This module lets you browse the table in a terminal. Using the L<Tickit>
 library, the advantages it's supposed to have is mouse support. It's still very
@@ -175,7 +175,7 @@ basic: you either have to specify each column width manually or the width of all
 columns will be the same. There's no horizontal scrolling support or a way to
 see long text in a column. Not updated since 2016.
 
-4) I<Term::TablePrint>, L<Term::TablePrint>
+4) B<Term::TablePrint>, L<Term::TablePrint>
 
 This module lets you browse the table in a terminal. Provides roughly the same
 features like Tickit::Widget::Table with an extra one: you can press Enter on a
@@ -185,10 +185,10 @@ you can better see a row that has many columns or columns with long text.
 There is currently no support beyond the most basic stuffs, so no column hiding,
 reordering, etc.
 
-5) I<less>
+5) B<less>
 
-Don't forget this good ol' Unix pager. You can render your table data as an
-ASCII table (using modules like L<Text::Table::More>, L<Text::ANSITable>, or
+Don't forget the good ol' Unix pager. You can render your table data as an ASCII
+table (using modules like L<Text::Table::More>, L<Text::ANSITable>, or
 L<Text::Table::Any> for more formats to choose from) then pipe the output to
 it. At least with I<less> you can scroll horizontally or perform incremental
 searching (though not interactive filtering of rows).

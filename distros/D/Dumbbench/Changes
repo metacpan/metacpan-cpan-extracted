@@ -1,5 +1,8 @@
 Revision history for Perl module Dumbbench
 
+0.503 2022-04-21T08:47:35Z
+	* xenu replaced time() with clock_gettime(CLOCK_MONOTONIC) GitHub #11
+
 0.501 2021-02-15T16:39:38Z
 	* Align the rates and precision separately (Github #4). This changes
 	the data structure that cmpthese returns by inserting a column in

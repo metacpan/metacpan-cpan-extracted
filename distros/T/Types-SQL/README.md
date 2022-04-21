@@ -4,7 +4,7 @@ Types::SQL - a library of SQL types
 
 # VERSION
 
-version v0.4.0
+version v0.4.1
 
 # SYNOPSIS
 
@@ -17,9 +17,9 @@ my $type = Varchar[16];
 # DESCRIPTION
 
 This module provides a type library of SQL types.  These are
-[Type::Tiny](https://metacpan.org/pod/Type::Tiny) objects that are augmented with a `dbic_column_info`
+[Type::Tiny](https://metacpan.org/pod/Type%3A%3ATiny) objects that are augmented with a `dbic_column_info`
 method that returns column information for use with
-[DBIx::Class](https://metacpan.org/pod/DBIx::Class).
+[DBIx::Class](https://metacpan.org/pod/DBIx%3A%3AClass).
 
 # TYPES
 
@@ -56,6 +56,8 @@ my $type = Char[ $size ];
 ```
 
 Returns a `char` data type, with an optional size parameter.
+
+If `$size` is omitted, then it will default to 1.
 
 ## `Integer`
 
@@ -94,7 +96,7 @@ If `$scale` is omitted, then it is assumed to be `0`.
 # CUSTOM TYPES
 
 Any type that has these types as a parent can have column information
-extracted using [Types::SQL::Util](https://metacpan.org/pod/Types::SQL::Util).
+extracted using [Types::SQL::Util](https://metacpan.org/pod/Types%3A%3ASQL%3A%3AUtil).
 
 Alternatively, you can specify a custom `dbic_column_info` method in
 a type, e.g.:
@@ -116,7 +118,7 @@ my $type = Type::Tiny->new(
 ```
 
 The method should return a hash of values that are passed to the
-`add_column` method of [DBIx::Class::ResultSource](https://metacpan.org/pod/DBIx::Class::ResultSource).
+`add_column` method of [DBIx::Class::ResultSource](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3AResultSource).
 
 # ROADMAP
 
@@ -125,11 +127,11 @@ in 2019.
 
 # SEE ALSO
 
-[Type::Tiny](https://metacpan.org/pod/Type::Tiny).
+[Type::Tiny](https://metacpan.org/pod/Type%3A%3ATiny).
 
-[Types::SQL::Util](https://metacpan.org/pod/Types::SQL::Util), which provides a utility function for translating
-these types and other types from [Types::Standard](https://metacpan.org/pod/Types::Standard) into column
-information for [DBIx::Class::ResultSource](https://metacpan.org/pod/DBIx::Class::ResultSource).
+[Types::SQL::Util](https://metacpan.org/pod/Types%3A%3ASQL%3A%3AUtil), which provides a utility function for translating
+these types and other types from [Types::Standard](https://metacpan.org/pod/Types%3A%3AStandard) into column
+information for [DBIx::Class::ResultSource](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3AResultSource).
 
 # SOURCE
 
@@ -155,7 +157,7 @@ Slaven Rezić <slaven@rezic.de>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016-2018 by Robert Rothenberg.
+This software is Copyright (c) 2016-2022 by Robert Rothenberg.
 
 This is free software, licensed under:
 

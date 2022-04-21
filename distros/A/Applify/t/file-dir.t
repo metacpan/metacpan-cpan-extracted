@@ -28,10 +28,10 @@ my $script = $app->_script;
   local @ARGV = ('--directory', '.', '--path', 'bin', '--failsafe', '/tmp');
   my $app = $script->app;
   isa_ok $app->directory, 'TestApp::File', 'directory option';
-  isa_ok $app->output, 'TestApp::File', 'default';
-  is $app->output, 'example/output.txt', 'output file default';
-  is ref($app->path_string), '', 'path is a string not one of those objects';
-  is ref($app->failsafe), '', 'failsafe is a string not one of those objects';
+  isa_ok $app->output,    'TestApp::File', 'default';
+  is $app->output,           'example/output.txt', 'output file default';
+  is ref($app->path_string), '',                   'path is a string not one of those objects';
+  is ref($app->failsafe),    '',                   'failsafe is a string not one of those objects';
 }
 
 {
@@ -67,7 +67,7 @@ my $script = $app->_script;
 }
 
 
-is_deeply(run('--directory' => 'example', '--check' => 'this'),  ['example', undef], 'undef');
+is_deeply(run('--directory' => 'example', '--check' => 'this'), ['example', undef], 'undef');
 
 is_deeply(run('--directory' => 'example', '--config' => 'test'), ['example', 'test'], 'this test');
 

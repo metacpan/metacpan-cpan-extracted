@@ -136,6 +136,29 @@ sub config_file {
   }
 }
 
+sub dynamic_lib {
+  my $self = shift;
+  if (@_) {
+    $self->{dynamic_lib} = $_[0];
+    return $self;
+  }
+  else {
+    return $self->{dynamic_lib};
+  }
+}
+
+
+sub static_lib {
+  my $self = shift;
+  if (@_) {
+    $self->{static_lib} = $_[0];
+    return $self;
+  }
+  else {
+    return $self->{static_lib};
+  }
+}
+
 # Methods
 sub new {
   my $class = shift;
@@ -993,14 +1016,50 @@ sub link {
     my $link_info_object_files = [map { $_->to_string } @$link_info_object_file_infos];
     my $link_info_ldflags_str = join(' ', @$link_info_ldflags);
     
-    # Create the executable file
+    my $dynamic_lib = $self->dynamic_lib;
+    my $static_lib = $self->static_lib;
+    
+    # CBuilder
     my $cbuilder = ExtUtils::CBuilder->new(quiet => $self->quiet, config => $cbuilder_config);
-    $cbuilder->link_executable(
-      objects => $link_info_object_files,
-      module_name => $link_info_class_name,
-      exe_file => $link_info_output_file,
-      extra_linker_flags => $link_info_ldflags_str,
-    );
+
+    # Create a dynamic library
+    if ($dynamic_lib) {
+      my $link_info_output_dir = dirname $link_info_output_file;
+      my $link_info_output_file_base = basename $link_info_output_file;
+      my $lib_file = $link_info_output_file;
+      unless ($link_info_output_file_base =~ /\./) {
+        $lib_file .= ".$Config{dlext}";
+      }
+      
+      $cbuilder->link(
+        objects => $link_info_object_files,
+        module_name => $link_info_class_name,
+        lib_file => $lib_file,
+        extra_linker_flags => $link_info_ldflags_str,
+      );
+    }
+    # Create a static library
+    elsif ($static_lib) {
+      my $link_info_output_dir = dirname $link_info_output_file;
+      my $link_info_output_file_base = basename $link_info_output_file;
+      my $lib_file = $link_info_output_file;
+      unless ($link_info_output_file_base =~ /\./) {
+        $lib_file .= ".a";
+      }
+    
+      my @object_files = map { "$_" } @$link_info_object_files;
+      my @ar_cmd = ('ar', 'rc', $lib_file, @object_files);
+      $cbuilder->do_system(@ar_cmd);
+    }
+    # Create an executable file
+    else {
+      $cbuilder->link_executable(
+        objects => $link_info_object_files,
+        module_name => $link_info_class_name,
+        exe_file => $link_info_output_file,
+        extra_linker_flags => $link_info_ldflags_str,
+      );
+    }
   }
   
   return $output_file;

@@ -1,6 +1,5 @@
 .perltidyrc
 .ship.conf
-.travis.yml
 Changes
 cpanfile
 example/fatpack.sh
